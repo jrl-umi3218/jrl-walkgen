@@ -1,0 +1,70 @@
+8
+
+dir
+70
+svn+ssh://jrlserver/home/svn/PatternGeneratorJRL/trunk/PatternGeneratorJRL/plugin
+svn+ssh://jrlserver/home/svn
+
+
+
+2006-10-23T15:10:50.555973Z
+69
+grxuser
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+141d0e4c-6019-0410-890b-add6da449540
+
+WalkGenJRL.cpp
+file
+
+
+
+
+2006-11-07T19:30:07.000000Z
+244529fcb31e62d2e2f0ec551e05a9c4
+2006-10-23T15:10:50.555973Z
+69
+grxuser
+
+script
+dir
+
+corba
+dir
+
+Makefile.user
+file
+
+
+
+
+2006-11-07T19:30:07.000000Z
+5e2a633da18a6067f5c6080812e1f49b
+2006-09-11T09:37:52.932782Z
+59
+grxuser
+
+Makefile
+file
+
+
+
+
+2006-11-07T19:30:07.000000Z
+ca7b23a3f7538c27f6309b45a44e9fd3
+2006-08-02T23:18:20.146231Z
+14
+grxuser
+

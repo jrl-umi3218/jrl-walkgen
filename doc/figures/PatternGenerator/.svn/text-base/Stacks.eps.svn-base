@@ -1,0 +1,234 @@
+%!PS-Adobe-2.0 EPSF-2.0
+%%Title: Stacks.fig
+%%Creator: fig2dev Version 3.2 Patchlevel 5-alpha7
+%%CreationDate: Mon Feb 27 13:52:13 2006
+%%BoundingBox: 0 0 429 422
+%Magnification: 1.0000
+%%EndComments
+/$F2psDict 200 dict def
+$F2psDict begin
+$F2psDict /mtrx matrix put
+/col-1 {0 setgray} bind def
+/col0 {0.000 0.000 0.000 srgb} bind def
+/col1 {0.000 0.000 1.000 srgb} bind def
+/col2 {0.000 1.000 0.000 srgb} bind def
+/col3 {0.000 1.000 1.000 srgb} bind def
+/col4 {1.000 0.000 0.000 srgb} bind def
+/col5 {1.000 0.000 1.000 srgb} bind def
+/col6 {1.000 1.000 0.000 srgb} bind def
+/col7 {1.000 1.000 1.000 srgb} bind def
+/col8 {0.000 0.000 0.560 srgb} bind def
+/col9 {0.000 0.000 0.690 srgb} bind def
+/col10 {0.000 0.000 0.820 srgb} bind def
+/col11 {0.530 0.810 1.000 srgb} bind def
+/col12 {0.000 0.560 0.000 srgb} bind def
+/col13 {0.000 0.690 0.000 srgb} bind def
+/col14 {0.000 0.820 0.000 srgb} bind def
+/col15 {0.000 0.560 0.560 srgb} bind def
+/col16 {0.000 0.690 0.690 srgb} bind def
+/col17 {0.000 0.820 0.820 srgb} bind def
+/col18 {0.560 0.000 0.000 srgb} bind def
+/col19 {0.690 0.000 0.000 srgb} bind def
+/col20 {0.820 0.000 0.000 srgb} bind def
+/col21 {0.560 0.000 0.560 srgb} bind def
+/col22 {0.690 0.000 0.690 srgb} bind def
+/col23 {0.820 0.000 0.820 srgb} bind def
+/col24 {0.500 0.190 0.000 srgb} bind def
+/col25 {0.630 0.250 0.000 srgb} bind def
+/col26 {0.750 0.380 0.000 srgb} bind def
+/col27 {1.000 0.500 0.500 srgb} bind def
+/col28 {1.000 0.630 0.630 srgb} bind def
+/col29 {1.000 0.750 0.750 srgb} bind def
+/col30 {1.000 0.880 0.880 srgb} bind def
+/col31 {1.000 0.840 0.000 srgb} bind def
+
+end
+save
+newpath 0 422 moveto 0 0 lineto 429 0 lineto 429 422 lineto closepath clip newpath
+-16.3 426.0 translate
+1 -1 scale
+
+/cp {closepath} bind def
+/ef {eofill} bind def
+/gr {grestore} bind def
+/gs {gsave} bind def
+/sa {save} bind def
+/rs {restore} bind def
+/l {lineto} bind def
+/m {moveto} bind def
+/rm {rmoveto} bind def
+/n {newpath} bind def
+/s {stroke} bind def
+/sh {show} bind def
+/slc {setlinecap} bind def
+/slj {setlinejoin} bind def
+/slw {setlinewidth} bind def
+/srgb {setrgbcolor} bind def
+/rot {rotate} bind def
+/sc {scale} bind def
+/sd {setdash} bind def
+/ff {findfont} bind def
+/sf {setfont} bind def
+/scf {scalefont} bind def
+/sw {stringwidth} bind def
+/tr {translate} bind def
+/tnt {dup dup currentrgbcolor
+  4 -2 roll dup 1 exch sub 3 -1 roll mul add
+  4 -2 roll dup 1 exch sub 3 -1 roll mul add
+  4 -2 roll dup 1 exch sub 3 -1 roll mul add srgb}
+  bind def
+/shd {dup dup currentrgbcolor 4 -2 roll mul 4 -2 roll mul
+  4 -2 roll mul srgb} bind def
+/$F2psBegin {$F2psDict begin /$F2psEnteredState save def} def
+/$F2psEnd {$F2psEnteredState restore end} def
+
+$F2psBegin
+10 setmiterlimit
+0 slj 0 slc
+ 0.06299 0.06299 sc
+%
+% Fig objects follow
+%
+% 
+% here starts figure with depth 50
+% Arc
+7.500 slw
+0 slc
+gs  clippath
+2681 2404 m 2847 2415 l 2851 2356 l 2685 2345 l 2685 2345 l 2803 2383 l 2681 2404 l cp
+eoclip
+n 2632.5 4342.5 1967.9 -112.1663 -84.0939 arc
+gs col0 s gr
+ gr
+
+% arrowhead
+0 slj
+n 2681 2404 m 2803 2383 l 2685 2345 l 2681 2404 l  cp gs 0.00 setgray ef gr  col0 s
+% Arc
+gs  clippath
+2039 5984 m 1890 5906 l 1862 5959 l 2011 6037 l 2011 6037 l 1919 5955 l 2039 5984 l cp
+eoclip
+n 2542.5 4852.5 1268.2 74.5666 120.9638 arc
+gs col0 s gr
+ gr
+
+% arrowhead
+n 2039 5984 m 1919 5955 l 2011 6037 l 2039 5984 l  cp gs 0.00 setgray ef gr  col0 s
+% Polyline
+n 810 1440 m 4680 1440 l 4680 6390 l 810 6390 l
+ cp gs col0 s gr 
+% Polyline
+n 2880 2250 m 4410 2250 l 4410 4320 l 2880 4320 l
+ cp gs col0 s gr 
+% Polyline
+ [60] 0 sd
+n 270 450 m 4950 450 l 4950 6750 l 270 6750 l
+ cp gs col0 s gr  [] 0 sd
+% Polyline
+n 1170 2520 m 2610 2520 l 2610 4140 l 1170 4140 l
+ cp gs col0 s gr 
+% Polyline
+n 2880 5130 m 4410 5130 l 4410 6210 l 2880 6210 l
+ cp gs col0 s gr 
+% Polyline
+gs  clippath
+6058 3090 m 6225 3090 l 6225 3030 l 6058 3030 l 6058 3030 l 6178 3060 l 6058 3090 l cp
+eoclip
+n 4410 3060 m
+ 6210 3060 l gs col0 s gr gr
+
+% arrowhead
+n 6058 3090 m 6178 3060 l 6058 3030 l 6058 3090 l  cp gs 0.00 setgray ef gr  col0 s
+% Polyline
+n 1170 4680 m 2610 4680 l 2610 5940 l 1170 5940 l
+ cp gs col0 s gr 
+% Polyline
+gs  clippath
+1920 4292 m 1920 4125 l 1860 4125 l 1860 4292 l 1860 4292 l 1890 4172 l 1920 4292 l cp
+eoclip
+n 1890 4680 m
+ 1890 4140 l gs col0 s gr gr
+
+% arrowhead
+n 1920 4292 m 1890 4172 l 1860 4292 l 1920 4292 l  cp gs 0.00 setgray ef gr  col0 s
+% Polyline
+ [60] 0 sd
+gs  clippath
+2042 4425 m 1875 4425 l 1875 4485 l 2042 4485 l 2042 4485 l 1922 4455 l 2042 4425 l cp
+eoclip
+n 3600 5130 m 3600 4455 l
+ 1890 4455 l gs col0 s gr gr
+ [] 0 sd
+% arrowhead
+n 2042 4425 m 1922 4455 l 2042 4485 l 2042 4425 l  cp gs 0.00 setgray ef gr  col0 s
+% Polyline
+n 6206 5625 m 6214 5625 l gs col0 s gr
+% Polyline
+gs  clippath
+4562 5550 m 4395 5550 l 4395 5610 l 4562 5610 l 4562 5610 l 4442 5580 l 4562 5550 l cp
+eoclip
+n 6210 5580 m
+ 4410 5580 l gs col0 s gr gr
+
+% arrowhead
+n 4562 5550 m 4442 5580 l 4562 5610 l 4562 5550 l  cp gs 0.00 setgray ef gr  col0 s
+/Helvetica ff 238.13 scf sf
+630 270 m
+gs 1 -1 sc (HRPSYS) col0 sh gr
+/Helvetica ff 238.13 scf sf
+855 1260 m
+gs 1 -1 sc (WalkGenJRL plugin) col0 sh gr
+/Helvetica ff 190.50 scf sf
+6480 3105 m
+gs 1 -1 sc (Motor) col0 sh gr
+/Helvetica ff 238.13 scf sf
+1305 3015 m
+gs 1 -1 sc (ZMP stack) col0 sh gr
+/Helvetica ff 238.13 scf sf
+3060 2700 m
+gs 1 -1 sc (Real Time ) col0 sh gr
+/Helvetica ff 238.13 scf sf
+3150 3105 m
+gs 1 -1 sc (control) col0 sh gr
+/Helvetica ff 238.13 scf sf
+3195 3510 m
+gs 1 -1 sc (method) col0 sh gr
+/Helvetica ff 190.50 scf sf
+1485 3330 m
+gs 1 -1 sc (\(data for ) col0 sh gr
+/Helvetica ff 190.50 scf sf
+1440 3645 m
+gs 1 -1 sc (every 5ms\)) col0 sh gr
+/Helvetica ff 190.50 scf sf
+1440 4995 m
+gs 1 -1 sc (Foot Stack) col0 sh gr
+/Helvetica ff 190.50 scf sf
+1305 5310 m
+gs 1 -1 sc (\(support foot) col0 sh gr
+/Helvetica ff 190.50 scf sf
+1575 5535 m
+gs 1 -1 sc (position\)) col0 sh gr
+/Helvetica ff 190.50 scf sf
+1305 6210 m
+gs 1 -1 sc (push in) col0 sh gr
+/Helvetica ff 190.50 scf sf
+1620 2250 m
+gs 1 -1 sc (pop out) col0 sh gr
+/Helvetica ff 190.50 scf sf
+3060 5400 m
+gs 1 -1 sc (User interface) col0 sh gr
+/Helvetica ff 190.50 scf sf
+2970 5760 m
+gs 1 -1 sc (Jython/CORBA) col0 sh gr
+/Helvetica ff 190.50 scf sf
+3690 4770 m
+gs 1 -1 sc (creation) col0 sh gr
+/Helvetica ff 190.50 scf sf
+6435 5625 m
+gs 1 -1 sc (Client) col0 sh gr
+% here ends figure;
+$F2psEnd
+rs
+showpage
+%%Trailer
+%EOF
