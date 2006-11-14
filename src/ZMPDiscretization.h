@@ -71,7 +71,8 @@ namespace PatternGeneratorJRL
       public :
     
       /// Constructor
-      ZMPDiscretization(string DataFile="");
+	ZMPDiscretization(string DataFile="",
+			  HumanoidSpecificities *aHS=0);
 
       /// Destructor
       ~ZMPDiscretization();
@@ -337,12 +338,14 @@ namespace PatternGeneratorJRL
 
     // Keep an object which relates the specificities
     // with an abstract layer.
-    HumanoidSpecificities aHS;
-
+    HumanoidSpecificities *m_HS;
+    
     /// Matrices for the dynamical system.
-      VNL::Matrix<double> m_A,m_B,m_C;
-
-   
+    VNL::Matrix<double> m_A,m_B,m_C;
+      
+      
+    /// Values for the foot dimensions.
+    double m_FootB, m_FootH, m_FootF;
 
    };
 };

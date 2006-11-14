@@ -48,10 +48,10 @@ all: $(LIBRARY) $(SHLIBRARY)  TestFootPrintPGInterface \
 # TestLapack
 
 AR= ar cru
-CRTSHLIB= gcc -shared -Wl
+CRTSHLIB= gcc-3.3 -shared -Wl
 
 
-CXX=g++
+CXX=g++-3.3
 
 HDRS= Polynome.h \
 	PolynomeFoot.h \
@@ -75,7 +75,7 @@ HDRS= Polynome.h \
 	OptimalControllerSolver.h \
 	ConvexHull.h \
 	HumanoidSpecificities.h \
-	qld.h
+	qld.h 
 
 SRCS= Polynome.cpp \
 	PolynomeFoot.cpp \
@@ -110,7 +110,9 @@ CXX_OPT = -g
 #CXX_OPT = -O3
 CXX_FLAGS +=  -I. -I../include  -Wall
 
-LIBS_FLAGS = -L. -L../lib -lVNL -lf2c 
+
+LIBS_FLAGS = -L. -L../lib -lVNL -lg2c 
+
 ROBOT=HRP2JRL
 PICFLAGS = -fpic
 
@@ -156,7 +158,7 @@ TestLapack.o: TestLapack.cpp $(HDRS)
 	$(CXX) $(CXX_OPT) $(CXX_FLAGS) -c $<
 
 #TestLapack: TestLapack.o 
-#	$(CXX) -g -o $@ $< ./libdgges.a -lg2c ./blas.a
+#	$(CXX) -g -o $@ $< ./libdgges.a -lf2c ./blas.a
 
 $(LIBRARY): $(OBJS) $(OBJS_C)
 	$(AR) $(LIBRARY) $(OBJS) $(OBJS_C)

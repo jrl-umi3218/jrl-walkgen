@@ -50,7 +50,7 @@ namespace PatternGeneratorJRL
 
     // Destructor
     ~HumanoidSpecificities();
-
+    
     // Returns the width of the foot given in parameter:
     // @param WhichFoot : -1 Right foot 1 Left foot.
     // @paran Width: width of the foot, 
@@ -59,16 +59,71 @@ namespace PatternGeneratorJRL
     //  0 otherwise.
     int GetFootSize(int WhichFoot, double &Width,double &Height);
     
+    // Returns the width of the foot given in parameter:
+    // @param aFileName : Name of the file where the humanoid parameters are stored.
+    // @paran HumanoidName : Name of the humanoid. 
+    int ReadXML(string & aFileName, string & HumanoidName);
+
+    // Display the information stored inside the object.
+    // Namely for debugging.
+    void Display();
+
+    // Returns the length of the tibia
+    // @param WhichSide: -1 Right 1 Left.
+    double GetTibiaLength(int WhichSide);
+
+    // Returns the length of the femur
+    // @param WhichSide: -1 Right 1 Left.
+    double GetFemurLength(int WhichSide);
+
+    // Returns the length of the Upper arm
+    // @param WhichSide: -1 Right 1 Left.
+    double GetUpperArmLength(int WhichSide);
+
+    // Returns the length of the Fore arm
+    // @param WhichSide: -1 Right 1 Left.    
+    double GetForeArmLength(int WhichSide);
+
+    // Returns the ankle position
+    // @param WhichSide: -1 Right 1 Left.    
+    // @return AnklePosition: (X,Y,Z)
+    void GetAnklePosition(int WhichSide, double AnklePosition[3]);
+
+    // Returns the position of the Hip regarding the waist's origin.
+    // @param WhichSide: -1 Right 1 Left.
+    // @ return WaistToHip translation.
+    void GetWaistToHip(int WhichSide, double WaistToHip[3]);
+
   protected:
     
-    // Store foot's height and width.
+    // Store foot's height, width and depth.
     double m_FootHeight[2];
     double m_FootWidth[2];
+    double m_FootDepth[2];
+
+    // Store position of the ankles in the feet.
+    double m_AnklePosition[2][3];
 
     // Pointer towards the dynamic multibody structure.
     DynamicMultiBody *m_DMB;
     
+    // Tibia's length
+    double m_TibiaLength[2];
+    
+    // Femur's length
+    double m_FemurLength[2];
+
+    // Upper arm's length.
+    double m_UpperArmLength[2];
+
+    // Forearm's length.
+    double m_ForeArmLength[2];
+
+    // Waist to hip translation
+    double m_WaistToHip[2][3];
+    
   };
+
 };
 
 #endif

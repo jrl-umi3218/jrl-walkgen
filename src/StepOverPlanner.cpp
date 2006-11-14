@@ -15,6 +15,7 @@
 
 
    Copyright (c) 2005-2006, 
+   Bjorn Verrelst
    Olivier Stasse,
    Ramzi Sellouati
    
@@ -49,16 +50,40 @@
 
 using namespace::PatternGeneratorJRL;
 
-StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters)
+StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
+				 HumanoidSpecificities *aHS)
 {
+
+  m_HS = aHS;
+  // Get information specific to the humanoid.
+  double lWidth,lHeight;
+  double AnklePosition[3];
+
+  if (m_HS!=0)
+    {
+      m_HS->GetFootSize(-1,lWidth,lHeight);
+      m_HS->GetAnklePosition(-1,AnklePosition);
+      m_AnkleSoilDistance = AnklePosition[2];
+      m_tipToAnkle = lWidth-AnklePosition[0];
+      m_heelToAnkle = m_AnkleSoilDistance;	
+  
+    }
+  else 
+    {
+      lWidth = 0.2; lHeight=0.15;
+      cerr << "WARNING: no object with humanoid specificities properly defined." << endl;
+      m_AnkleSoilDistance = 0.1;
+      m_tipToAnkle = 0.1;
+      m_heelToAnkle = 0.1;
+  
+    }
+
   m_CollDet =0;
 
   SetObstacleInformation(ObstacleParameters);
 
-  m_tipToAnkle = 0.1356;
-  m_heelToAnkle = 0.105;	
 		
-  m_soleToAnkle = 0.105;
+  m_soleToAnkle = m_AnkleSoilDistance;
 	
   m_heelDistAfter = 0.0;
   m_tipDistBefore = 0.0;
@@ -121,8 +146,9 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters)
   m_StaticToTheRightHip(1,0) = -0.06;
   m_StaticToTheRightHip(2,0) = m_DiffBetweenComAndWaist;
 
-  //defining the points on the shank to set the boundary lines of the leg layout
-  //for the values of the coordinates see paper guan san IROS 2004 'feasibility of humanoid robots stepping over obstacles'
+  // defining the points on the shank to set the boundary lines of the leg layout
+  // for the values of the coordinates see paper guan san IROS 2004 
+  // 'feasibility of humanoid robots stepping over obstacles'
 
   double RadiusKnee;
   double Angle1,Angle2;
@@ -292,7 +318,8 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition> &aFootHolds
   // first leg over the obsacle
 
   tempPos.sx=m_StepOverStepLenght;
-  tempPos.sy=(-1.0)*(tempPos.sy)/std::fabs((double)tempPos.sy)*m_nominalStepWidth;//*cos(m_WaistRotationStepOver*M_PI/180.0);
+  tempPos.sy=(-1.0)*(tempPos.sy)/std::fabs((double)tempPos.sy)*m_nominalStepWidth;
+  //*cos(m_WaistRotationStepOver*M_PI/180.0);
   tempPos.theta=0.0;
   tempPos.SStime=m_TsingleStepOver; 
   tempPos.DStime=m_Tdble; 
@@ -302,7 +329,8 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition> &aFootHolds
   // second leg over the obsacle
 
   tempPos.sx=m_nominalStepLenght;
-  tempPos.sy=(-1.0)*(tempPos.sy)/std::fabs((double)tempPos.sy)*m_nominalStepWidth;//*cos(m_WaistRotationStepOver*M_PI/180.0);
+  tempPos.sy=(-1.0)*(tempPos.sy)/std::fabs((double)tempPos.sy)*m_nominalStepWidth;
+  //*cos(m_WaistRotationStepOver*M_PI/180.0);
   tempPos.theta=0.0;
   tempPos.SStime=m_TsingleStepOver; 
   tempPos.DStime=m_TdbleStepOver; 
@@ -347,7 +375,8 @@ void StepOverPlanner::DoubleSupportFeasibility()
   double StepOverStepLenght, StepOverStepLenghtMin, StepOverStepLenghtMax; 
   double StepOverCOMHeight, StepOverCOMHeightMin, StepOverCOMHeightMax; 
   double OrientationHipToObstacle, OrientationFeetToObstacle = 0.0, OmegaAngleFeet = 0.0;
-  double DoubleSupportCOMPosFactor;  //this is the factor determining aproximately the COM position due to preview control during double support
+  //this is the factor determining aproximately the COM position due to preview control during double support
+  double DoubleSupportCOMPosFactor;  
 
 
   int EvaluationNumber = 10;

@@ -15,6 +15,7 @@
 
 
     Copyright (c) 2005-2006, 
+    Bjorn Verrelst
     Olivier Stasse,
     Ramzi Sellouati
    

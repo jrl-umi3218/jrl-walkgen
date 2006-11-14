@@ -153,7 +153,6 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
     case 3:
     case 1:
       {	
-	int li=0;
 	ODEBUG4( "Walk Mode with HipHeight Variation Selected","DebugGMFKW.dat" );
 	RelativeFootPosition aFootPosition;
 	

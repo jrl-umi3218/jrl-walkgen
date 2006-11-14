@@ -73,9 +73,17 @@
 
 using namespace::PatternGeneratorJRL;
 
-ZMPDiscretization::ZMPDiscretization(string DataFile):
-  aHS()
+ZMPDiscretization::ZMPDiscretization(string DataFile, HumanoidSpecificities *aHS)
 {
+  m_HS = aHS;
+  
+  double lWidth,lHeight;
+  m_HS->GetFootSize(-1,lWidth,lHeight);
+  double AnklePosition[3];
+  m_HS->GetAnklePosition(-1,AnklePosition);
+  m_FootB = AnklePosition[0];
+  m_FootH = AnklePosition[2];
+  m_FootF = lWidth-AnklePosition[0];
   
   m_A.Resize(6,6);
   
@@ -426,7 +434,8 @@ void ZMPDiscretization::UpdateFootPosition(deque<FootAbsolutePosition> &SupportF
   {
     // Make sure the foot is not going inside the floor.
     double dX=0,Z1=0,Z2=0,X1=0,X2=0;
-    double B=0.093,H=0.105,F=0.123; // WARNING : PARAMETERS specific to HRP2 !
+    double B=m_FootB,H=m_FootH,F=m_FootF; 
+
     if (lOmega<0)
       {
 	X1 = B*cos(-lOmega);
@@ -2032,8 +2041,8 @@ int ZMPDiscretization::BuildLinearConstraintInequalities2(deque<FootAbsolutePosi
     lRightFootHalfWidth,lRightFootHalfHeight;
   
   // Read humanoid specificities.
-  aHS.GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight);
-  aHS.GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight);
+  m_HS->GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight);
+  m_HS->GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight);
   
   lRightFootHalfWidth *= 0.5;
   lRightFootHalfHeight *= 0.5;
@@ -2226,8 +2235,8 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
     lRightFootHalfWidth,lRightFootHalfHeight;
   
   // Read humanoid specificities.
-  aHS.GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight);
-  aHS.GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight);
+  m_HS->GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight);
+  m_HS->GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight);
 
   lRightFootHalfWidth *= 0.5;
   lRightFootHalfHeight *= 0.5;

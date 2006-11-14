@@ -54,6 +54,7 @@
 #include <UpperBodyMotion.h>
 #include <GenerateMotionFromKineoWorks.h>
 #include <StepStackHandler.h>
+#include <HumanoidSpecificities.h>
 
 namespace PatternGeneratorJRL
 {
@@ -115,6 +116,9 @@ namespace PatternGeneratorJRL
 
     // This method the constraints on the foot dimension for PBW's algorithm
     void m_SetPBWConstraint(istringstream &strm);
+
+    // This method set PBW's algorithm for ZMP trajectory planning.
+    void m_SetAlgoForZMPTraj(istringstream &strm);
 
     // This methods is doing the real job for the arc,
     // but does not prepare for the support foot.
@@ -467,6 +471,13 @@ namespace PatternGeneratorJRL
     
     /*! Preview window */
     unsigned int m_QP_N;
+
+    /*! Boolean to use PBW ZMP planner. */
+    unsigned char m_BoolPBWAlgo;
+
+    /*! Humanoid specific data object handler. */
+    HumanoidSpecificities *m_HS;
+    
   };
 };
 #endif

@@ -1,5 +1,7 @@
 #include <fstream>
 #include <PatternGeneratorInterface.h>
+#include <sys/time.h>
+#include <time.h>
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) cerr << "PatternGeneratorInterface :" << x << endl
@@ -23,8 +25,31 @@
 #define ODEBUG6(x,y)
 
 namespace PatternGeneratorJRL {
-  PatternGeneratorInterface::PatternGeneratorInterface(istringstream &strm)
+  PatternGeneratorInterface::PatternGeneratorInterface(istringstream &strm)    
   {
+
+    string PCParameters;
+    strm >> PCParameters;
+
+    string HRP2JRLpath;// = "/home/stasse/OpenHRP/etc/HRP2JRL/";
+    strm >> HRP2JRLpath;
+
+    string HRP2JRLfilename;// = "HRP2JRLmain.wrl";
+    strm >> HRP2JRLfilename;
+
+    string HumanoidSpecificitiesFileName;
+    strm >> HumanoidSpecificitiesFileName;
+    // Load the specific data of the humanoid.
+    cout << "Load the specific data of the humanoid " << endl;
+    m_HS = new HumanoidSpecificities();
+
+    string aHumanoidName;
+    m_HS->ReadXML(HumanoidSpecificitiesFileName,aHumanoidName);
+    m_HS->Display();
+    cout << "Here at the end"  << endl;
+
+    m_BoolPBWAlgo = 0;
+    // Initialize (if needed) debugging actions.
     ODEBUG4("Step 0","DebugPGI.txt");
     m_StepStackHandler = 0;
     m_dt = 0.005;
@@ -51,6 +76,7 @@ namespace PatternGeneratorJRL {
     RESETDEBUG4("DebugDataOnLine.txt");
     RESETDEBUG4("DebugDataWaistYaw.dat");
     RESETDEBUG5("DebugGMFKW.dat");
+
     m_ObstacleDetected = false;
 
     // Initialization of obstacle parameters informations.	
@@ -140,15 +166,13 @@ namespace PatternGeneratorJRL {
     m_DeltaFeasibilityLimit =0.0;
 
     ODEBUG4("Step 2","DebugPGI.txt");	
-    m_ZMPD = new ZMPDiscretization();
-    m_IK = new InverseKinematics();
+    m_ZMPD = new ZMPDiscretization("",m_HS);
+    m_IK = new InverseKinematics(m_HS);
 	
     m_ZARM = -1.0;
     m_GainFactor = 1.7;	
 	
     //  string PCParameters="/home/stasse/OpenHRP/PatternGeneratorJRL/src/PreviewControlParameters.ini";
-    string PCParameters;
-    strm >> PCParameters;
     m_PC = new PreviewControl();
     ofstream DebugFile;
     ofstream DebugFileLong;
@@ -168,10 +192,6 @@ namespace PatternGeneratorJRL {
     m_GMFKW->SetPreviewControl(m_PC);
   
     m_DMB = new DynamicMultiBody();
-    string HRP2JRLpath;// = "/home/stasse/OpenHRP/etc/HRP2JRL/";
-    strm >> HRP2JRLpath;
-    string HRP2JRLfilename;// = "HRP2JRLmain.wrl";
-    strm >> HRP2JRLfilename;
 	
     m_2DMB = new DynamicMultiBody();
 	
@@ -182,12 +202,12 @@ namespace PatternGeneratorJRL {
     m_DiffBetweenComAndWaist[0] = -0.0136923;
     m_DiffBetweenComAndWaist[1] = -0.00380861;
     m_DiffBetweenComAndWaist[2] = -0.15769;
-    m_ZMPpcwmbz = new ZMPPreviewControlWithMultiBodyZMP();
+    m_ZMPpcwmbz = new ZMPPreviewControlWithMultiBodyZMP(m_HS);
     m_ZMPpcwmbz->SetPreviewControl(m_PC);
     m_ZMPpcwmbz->SetDynamicMultiBodyModel(m_DMB);
     m_ZMPpcwmbz->SetInverseKinematics(m_IK);
 	
-    m_StOvPl = new StepOverPlanner(m_ObstaclePars);
+    m_StOvPl = new StepOverPlanner(m_ObstaclePars,m_HS);
     m_StOvPl->SetPreviewControl(m_PC);
     m_StOvPl->SetDynamicMultiBodyModel(m_DMB);
     m_StOvPl->SetInverseKinematics(m_IK);
@@ -229,6 +249,8 @@ namespace PatternGeneratorJRL {
 
     m_QP_T = 0.02;
     m_QP_N = 75;
+
+
   }
 
   PatternGeneratorInterface::~PatternGeneratorInterface()
@@ -652,6 +674,9 @@ namespace PatternGeneratorJRL {
     VNL::Vector<double> lStartingCOMPosition(3,0.0);	
     VNL::Matrix<double> BodyAnglesIni;
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
+    struct timeval begin, end, time1, time2, time3, time4, time5, time6;
+    
+    gettimeofday(&begin,0);
 
     ODEBUG6("FinishAndRealizeStepSequence() - 1","DebugGMFKW.dat");
     m_Xmax = m_IK->ComputeXmax(m_ZARM); // Laaaaaazzzzzyyyyy guy...
@@ -685,7 +710,8 @@ namespace PatternGeneratorJRL {
     // profil. Suppose to preempt the first stage of control.
     deque<ZMPPosition> NewZMPPositions;
 
-    if (0)
+    cout << "COM_Buffer size: " << m_COMBuffer.size() << endl;
+    if (m_BoolPBWAlgo)
       {
 	m_ZMPD->BuildZMPTrajectoryFromFootTrajectory(m_LeftFootPositions,
 						     m_RightFootPositions,
@@ -707,15 +733,17 @@ namespace PatternGeneratorJRL {
 
 	
       }
-    
-    
-    if (m_COMBuffer.size()==0)
-      m_COMBuffer.resize(m_RightFootPositions.size());
+    else
+      {
+	m_COMBuffer.clear();
+	m_COMBuffer.resize(m_RightFootPositions.size());
+      }
 
     aZMPBuffer.resize(m_RightFootPositions.size());
 
     ODEBUG6("FinishAndRealizeStepSequence() - 3 ","DebugGMFKW.dat");
 
+    gettimeofday(&time2,0);
     //this function calculates a buffer with COM values after a first preview round,
     // currently required to calculate the arm swing before "onglobal step of control"
     // in order to take the arm swing motion into account in the second preview loop
@@ -812,7 +840,7 @@ namespace PatternGeneratorJRL {
 	  m_UpperBodyPositionsBuffer[0].Joints[j];	  
       }
 	
-    
+    gettimeofday(&time3,0);    
     ODEBUG6("FinishAndRealizeStepSequence() - 7 ","DebugGMFKW.dat");
 
     // Very important, you have to make sure that the correct COM position is 
@@ -826,7 +854,12 @@ namespace PatternGeneratorJRL {
 	m_COMBuffer[i].z[1] = m_COMBuffer[i].z[2] = 0.0;
       }
 
-			
+    if (m_StepStackHandler->GetWalkMode()==0) 
+      {
+	for(unsigned int i=0;i<m_ZMPPositions.size()-m_NL;i++)
+	  m_COMBuffer[i].theta = m_ZMPPositions[i+m_NL-1].theta;
+      }
+
     if ((m_StepStackHandler->GetWalkMode()==1)	||
 	(m_StepStackHandler->GetWalkMode()==3)	)
       {
@@ -870,6 +903,8 @@ namespace PatternGeneratorJRL {
     DebugFile.close();
   
 #endif 
+
+    gettimeofday(&time4,0);
     ODEBUG6("FinishAndRealizeStepSequence() - 8 ","DebugGMFKW.dat");
     // Read NL informations from ZMPRefPositions.
     int localWalkMode = m_StepStackHandler->GetWalkMode();
@@ -881,6 +916,7 @@ namespace PatternGeneratorJRL {
 				     m_RightFootPositions,
 				     BodyAnglesIni);
 
+	gettimeofday(&time5,0);
 	for(unsigned int i=0;i<m_NL;i++)
 	  {
 	    VNL::Matrix<double> qArmr(7,1,0.0), qArml(7,1,0.0);
@@ -898,7 +934,9 @@ namespace PatternGeneratorJRL {
 	    
 	    m_COMBuffer[i+1].x[0] = aCOMPosition.x[0];
 	    m_COMBuffer[i+1].y[0] = aCOMPosition.y[0];
-
+	    m_COMBuffer[i+1].omega = aCOMPosition.omega;
+	    m_COMBuffer[i+1].theta = aCOMPosition.theta;
+	    
 	    // Compute Upper body heuristic according to the COM.
 	    ComputeUpperBodyHeuristicForNormalWalking(qArmr, qArml,
 						      aCOMPosition, 
@@ -925,6 +963,7 @@ namespace PatternGeneratorJRL {
 			 m_RightFootPositions,
 			 BodyAnglesIni);
 
+    gettimeofday(&time6,0);
     ODEBUG("FinishAndRealizeStepSequence() - 9 ");
 	
     m_ZMPpcwmbz->GetDifferenceBetweenComAndWaist(  m_DiffBetweenComAndWaist);
@@ -932,6 +971,15 @@ namespace PatternGeneratorJRL {
     ODEBUG("FinishAndRealizeStepSequence() - 10 ");
     
     m_ShouldBeRunning = true;
+    gettimeofday(&end,0);
+    ODEBUG3(endl << 
+	    "Step 1 : "<<  time1.tv_sec-begin.tv_sec + 0.000001 * (time1.tv_usec -begin.tv_usec) << endl << 
+	    "Step 2 : "<<  time2.tv_sec-time1.tv_sec + 0.000001 * (time2.tv_usec -time1.tv_usec) << endl << 
+	    "Step 3 : "<<  time3.tv_sec-time2.tv_sec + 0.000001 * (time3.tv_usec -time2.tv_usec) << endl << 
+	    "Step 4 : "<<  time4.tv_sec-time3.tv_sec + 0.000001 * (time4.tv_usec -time3.tv_usec) << endl << 
+	    "Step 5 : "<<  time5.tv_sec-time4.tv_sec + 0.000001 * (time5.tv_usec -time4.tv_usec) << endl << 
+	    "Step 6 : "<<  time6.tv_sec-time5.tv_sec + 0.000001 * (time6.tv_usec -time5.tv_usec) << endl << 
+	    "Total time : "<< end.tv_sec-begin.tv_sec + 0.000001 * (end.tv_usec -begin.tv_usec) );
   }
 
 
@@ -1023,9 +1071,27 @@ namespace PatternGeneratorJRL {
 
     else if (aCmd==":setpbwconstraint")
       m_SetPBWConstraint(strm);
+
+    else if (aCmd==":SetAlgoForZmpTrajectory")
+      m_SetAlgoForZMPTraj(strm);
     return 0;
   }
 
+  void PatternGeneratorInterface::m_SetAlgoForZMPTraj(istringstream &strm)
+  {
+    string ZMPTrajAlgo;
+    strm >> ZMPTrajAlgo;
+    if (ZMPTrajAlgo=="PBW")
+      {
+	m_BoolPBWAlgo=1;
+	
+      }
+    else if (ZMPTrajAlgo=="Kajita")
+      {
+	m_BoolPBWAlgo=0;
+      }
+    
+  }
   void PatternGeneratorInterface::m_SetPBWConstraint(istringstream &strm)
   {
     string PBWCmd;
@@ -1212,6 +1278,10 @@ namespace PatternGeneratorJRL {
     // Update the queue of ZMP ref
     m_ZMPpcwmbz->UpdateTheZMPRefQueue(m_ZMPPositions[2*m_NL-1]);
 
+    if (m_StepStackHandler->GetWalkMode()==0)
+      {
+	m_COMBuffer[m_NL-1].theta = m_ZMPPositions[m_NL-1].theta;
+      }
     COMPositionFromPC1 = m_COMBuffer[m_NL-1];
 
     // Compute the first stage to get the COM evaluation from the first stage of control.

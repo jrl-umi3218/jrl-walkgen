@@ -68,9 +68,25 @@ using namespace PatternGeneratorJRL;
 
 #define ODEBUG3(x)  std::cout << x << endl;
 
-ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
+ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(HumanoidSpecificities *aHS)
 {
+  m_HS = aHS;
   m_ZMPCoMTrajectoryAlgorithm = 1;
+
+  if (m_HS!=0)
+    {
+      double AnklePosition[3];
+      // Take the right ankle position (should be equivalent)
+      m_HS->GetAnklePosition(-1,AnklePosition);
+      m_AnkleSoilDistance = AnklePosition[2];
+      ODEBUG("AnkleSoilDistnace =" << m_AnkleSoilDistance);
+    }
+  else
+    {
+      cerr << "Warning: No appropriate definition of Humanoid Specifities" << endl;
+      cerr << "Use default value: " << 0.1 << endl;
+      m_AnkleSoilDistance = 0.1;
+    }
 
   RESETDEBUG4("DebugData.txt");
   RESETDEBUG4("DebugDataqr.txt");
@@ -94,12 +110,33 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   for(unsigned int i=0;i<3;i++)
     m_DiffBetweenComAndWaist[i] = 0.0;
   m_Dt.Resize(3,1);
-  
-  // Displacement between the hip and RLINK2 
-  // WARNING : Specific to HRP2 !
+
+#if 1
+  // Displacement between the hip and the waist.
+  if (m_HS==0)
+    {
+      m_Dt(0,0) = 0.0;
+      m_Dt(1,0) = 0.04;
+      m_Dt(2,0) = 0.0;
+    }
+  else
+    {
+      double WaistToHip[3];
+      // Takes the left one.
+      m_HS->GetWaistToHip(1,WaistToHip);
+      ODEBUG3(WaistToHip[0] << " "
+	      << WaistToHip[1] << " "
+	      << WaistToHip[2] << " ");
+      m_Dt(0,0) = WaistToHip[0];
+      m_Dt(1,0) = WaistToHip[1];
+      m_Dt(2,0) = WaistToHip[2];
+    }
+#else
   m_Dt(0,0) = 0.0;
   m_Dt(1,0) = 0.035;
   m_Dt(2,0) = 0.0;
+#endif
+  ODEBUG3( "m_DT: " << m_Dt);
 
   m_StaticToTheLeftHip.Resize(3,1);
   m_StaticToTheRightHip.Resize(3,1);
@@ -180,14 +217,14 @@ void ZMPPreviewControlWithMultiBodyZMP::SetInverseKinematics(InverseKinematics *
 
 
 
-int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePosition LeftFootPosition,
-							      FootAbsolutePosition RightFootPosition,
-							      ZMPPosition NewZMPRefPos,
+int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
+							      FootAbsolutePosition &RightFootPosition,
+							      ZMPPosition &NewZMPRefPos,
 							      VNL::Matrix<double> & lqr, 
 							      VNL::Matrix<double> & lql, 
 							      COMPosition & refCOMPosition,
 							      COMPosition & finalCOMPosition,
-							      VNL::Matrix<double> UpperBodyAngles)
+							      VNL::Matrix<double> &UpperBodyAngles)
 {
   VNL::Matrix<double> BodyAttitude(3,3,0.0);
   VNL::Matrix<double> qr(6,1,0.0), ql(6,1,0.0);
@@ -200,13 +237,13 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   return 1;
 }
 
-int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePosition LeftFootPosition,
-							      FootAbsolutePosition RightFootPosition,
-							      ZMPPosition NewZMPRefPos,
+int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
+							      FootAbsolutePosition &RightFootPosition,
+							      ZMPPosition &NewZMPRefPos,
 							      VNL::Matrix<double> & lqr, 
 							      VNL::Matrix<double> & lql, 
 							      COMPosition & refandfinalCOMPosition,
-							      VNL::Matrix<double> UpperBodyAngles)
+							      VNL::Matrix<double> &UpperBodyAngles)
 {
   VNL::Matrix<double> BodyAttitude(3,3,0.0);
   VNL::Matrix<double> qr(6,1,0.0), ql(6,1,0.0);
@@ -321,9 +358,9 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(VNL::Matrix<double> 
   Foot_R(2,0) = -so;        Foot_R(2,1) = 0;        Foot_R(2,2) = co;
   
   // position
-  Foot_P(0,0)=LeftFootPosition.x+0.105*so;
+  Foot_P(0,0)=LeftFootPosition.x+ m_AnkleSoilDistance*so;
   Foot_P(1,0)=LeftFootPosition.y;
-  Foot_P(2,0)=LeftFootPosition.z+0.105*co -(aCOMPosition.z[0] + ToTheHip(2,0));
+  Foot_P(2,0)=LeftFootPosition.z+ m_AnkleSoilDistance*co -(aCOMPosition.z[0] + ToTheHip(2,0));
   
   // Compute the inverse kinematics.
   m_IK->ComputeInverseKinematics2ForLegs(Body_R,
@@ -347,9 +384,9 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(VNL::Matrix<double> 
   Foot_R(2,0) =  -so;       Foot_R(2,1) =  0;       Foot_R(2,2) = co;
   
   // position
-  Foot_P(0,0)=RightFootPosition.x+0.105*so;
+  Foot_P(0,0)=RightFootPosition.x+m_AnkleSoilDistance*so;
   Foot_P(1,0)=RightFootPosition.y;
-  Foot_P(2,0)=RightFootPosition.z+0.105*co - (aCOMPosition.z[0] + ToTheHip(2,0));;
+  Foot_P(2,0)=RightFootPosition.z+m_AnkleSoilDistance*co - (aCOMPosition.z[0] + ToTheHip(2,0));;
   
   // COM position
   ToTheHip = Body_R * m_TranslationToTheRightHip;
@@ -411,8 +448,8 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(VNL::Matrix<double> 
   return 1;
 }
 
-int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition LeftFootPosition,
-							    FootAbsolutePosition RightFootPosition,
+int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition &LeftFootPosition,
+							    FootAbsolutePosition &RightFootPosition,
 							    COMPosition & afCOMPosition,
 							    VNL::Matrix<double> &ql,
 							    VNL::Matrix<double> &qr,
@@ -505,6 +542,16 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 				  m_sxzmp,m_syzmp,
 				  m_FIFOZMPRefPositions,0,
 				  zmpx2, zmpy2, true);
+
+      for(unsigned j=0;j<3;j++)
+	acomp.x[j] = m_PC1x(j,0);
+      
+      for(unsigned j=0;j<3;j++)
+	acomp.y[j] = m_PC1y(j,0);
+      
+      for(unsigned j=0;j<3;j++)
+	acomp.z[j] = afCOMPosition.z[j];
+  
     }
   else  if (m_ZMPCoMTrajectoryAlgorithm==ZMPCOM_TRAJECTORY_WIEBER) 
     {
@@ -532,14 +579,6 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 #endif
 
 
-  for(unsigned j=0;j<3;j++)
-    acomp.x[j] = m_PC1x(j,0);
-  
-  for(unsigned j=0;j<3;j++)
-    acomp.y[j] = m_PC1y(j,0);
-
-  for(unsigned j=0;j<3;j++)
-    acomp.z[j] = afCOMPosition.z[j];
 
 
   {
@@ -604,9 +643,9 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
   Foot_R(2,0) = -so;        Foot_R(2,1) = 0;        Foot_R(2,2) = co;
 
   // position
-  Foot_P(0,0)=LeftFootPosition.x+0.105*so;
+  Foot_P(0,0)=LeftFootPosition.x+m_AnkleSoilDistance*so;
   Foot_P(1,0)=LeftFootPosition.y;
-  Foot_P(2,0)=LeftFootPosition.z+0.105*co - (afCOMPosition.z[0] + ToTheHip(2,0));
+  Foot_P(2,0)=LeftFootPosition.z+m_AnkleSoilDistance*co - (afCOMPosition.z[0] + ToTheHip(2,0));
 
   ODEBUG4( Body_P(0,0) <<  " " << Body_P(1,0) <<  " " << Body_P(2,0)  << " " 
 	   << Foot_P(0,0) <<  " " << Foot_P(1,0) <<  " " << Foot_P(2,0)  << " "
@@ -644,9 +683,9 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
   Foot_R(2,0) =  -so;       Foot_R(2,1) =  0;       Foot_R(2,2) = co;
   
   // position
-  Foot_P(0,0)=RightFootPosition.x+0.105*so;
+  Foot_P(0,0)=RightFootPosition.x+m_AnkleSoilDistance*so;
   Foot_P(1,0)=RightFootPosition.y;
-  Foot_P(2,0)=RightFootPosition.z+0.105*co - (afCOMPosition.z[0] + ToTheHip(2,0));;
+  Foot_P(2,0)=RightFootPosition.z+m_AnkleSoilDistance*co - (afCOMPosition.z[0] + ToTheHip(2,0));;
   
   // COM position
   ToTheHip = Body_R * m_TranslationToTheRightHip;
@@ -1021,7 +1060,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(VNL::Matrix<double> 
 }
 
 
-int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(VNL::Matrix<double> BodyAngles,
+int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(VNL::Matrix<double> &BodyAngles,
 							   VNL::Vector<double> &aStartingCOMPosition,
 							   FootAbsolutePosition & InitLeftFootPosition,
 							   FootAbsolutePosition & InitRightFootPosition)
@@ -1040,7 +1079,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(VNL::Matrix<double> B
   return 0;
 }
 
-int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(VNL::Matrix<double> BodyAngles,
+int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(VNL::Matrix<double> &BodyAngles,
 							   VNL::Vector<double> &aStartingCOMPosition,
 							   VNL::Vector<double> &aWaistPosition,
 							   FootAbsolutePosition & InitLeftFootPosition,
@@ -1064,11 +1103,11 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(VNL::Matrix<double> B
   return 0;
 }
 
-int ZMPPreviewControlWithMultiBodyZMP::Setup(deque<ZMPPosition> ZMPRefPositions,
-					     deque<COMPosition> COMPositions,
-					     deque<FootAbsolutePosition> LeftFootPositions,
-					     deque<FootAbsolutePosition> RightFootPositions,
-					     VNL::Matrix<double> BodyAngles)
+int ZMPPreviewControlWithMultiBodyZMP::Setup(deque<ZMPPosition> &ZMPRefPositions,
+					     deque<COMPosition> &COMPositions,
+					     deque<FootAbsolutePosition> &LeftFootPositions,
+					     deque<FootAbsolutePosition> &RightFootPositions,
+					     VNL::Matrix<double> &BodyAngles)
 {
   SetupFirstPhase(ZMPRefPositions,
 		  COMPositions,
@@ -1085,11 +1124,11 @@ int ZMPPreviewControlWithMultiBodyZMP::Setup(deque<ZMPPosition> ZMPRefPositions,
   return 0;
 }
 
-int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> ZMPRefPositions,
-						       deque<COMPosition> COMPositions,
-						       deque<FootAbsolutePosition> LeftFootPositions,
-						       deque<FootAbsolutePosition> RightFootPositions,
-						       VNL::Matrix<double> BodyAngles)
+int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRefPositions,
+						       deque<COMPosition> &COMPositions,
+						       deque<FootAbsolutePosition> &LeftFootPositions,
+						       deque<FootAbsolutePosition> &RightFootPositions,
+						       VNL::Matrix<double> &BodyAngles)
 {
   ODEBUG6("Beginning of Setup 0 ","DebugData.txt");
   ODEBUG("Setup");
@@ -1155,11 +1194,11 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> ZMPRef
 }
 
 
-int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> ZMPRefPositions,
-							   deque<COMPosition> COMPositions,
-							   deque<FootAbsolutePosition> LeftFootPositions,
-							   deque<FootAbsolutePosition> RightFootPositions,
-							   VNL::Matrix<double> BodyAngles,
+int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &ZMPRefPositions,
+							   deque<COMPosition> &COMPositions,
+							   deque<FootAbsolutePosition> &LeftFootPositions,
+							   deque<FootAbsolutePosition> &RightFootPositions,
+							   VNL::Matrix<double> &BodyAngles,
 							   int localindex)
 {
   VNL::Matrix<double> UpperBodyAngles(28,1,0.0);
@@ -1328,7 +1367,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateCOM( VNL::Matrix<double> BodyAngl
 
   WaistPosition.x = 0.0;
   WaistPosition.y = 0.0;
-  WaistPosition.z = -lFootPosition.z+0.105;
+  WaistPosition.z = -lFootPosition.z+m_AnkleSoilDistance;
 
   InitRightFootPosition.x = lFootPosition.x;
   InitRightFootPosition.y = lFootPosition.y;
@@ -1352,7 +1391,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateCOM( VNL::Matrix<double> BodyAngl
   m_DiffBetweenComAndWaist[0] =  -lCOMPosition.x;
   m_DiffBetweenComAndWaist[1] =  -lCOMPosition.y;
   m_DiffBetweenComAndWaist[2] =  -lCOMPosition.z 
-    -(m_PC->GetHeightOfCoM() + lFootPosition.z - 0.105 - lCOMPosition.z); // This term is usefull if
+    -(m_PC->GetHeightOfCoM() + lFootPosition.z - m_AnkleSoilDistance - lCOMPosition.z); // This term is usefull if
   // the initial position does not put z at Zc
   
   // The most important line of the method...
@@ -1455,4 +1494,24 @@ VNL::Vector<double>  ZMPPreviewControlWithMultiBodyZMP::GetCurrentPositionofWais
 void ZMPPreviewControlWithMultiBodyZMP::UpdateTheZMPRefQueue(ZMPPosition NewZMPRefPos)
 {
   m_FIFOZMPRefPositions.push_back(NewZMPRefPos);
+}
+ 
+void ZMPPreviewControlWithMultiBodyZMP::SetAlgorithmForZMPAndCoMTrajectoryGeneration(int aZMPComTraj)
+{
+  switch(aZMPComTraj)
+    {
+    case ZMPCOM_TRAJECTORY_KAJITA:
+      m_ZMPCoMTrajectoryAlgorithm = ZMPCOM_TRAJECTORY_KAJITA;
+      break;
+    case ZMPCOM_TRAJECTORY_WIEBER:
+      m_ZMPCoMTrajectoryAlgorithm = ZMPCOM_TRAJECTORY_WIEBER;
+      break;
+    default:
+      break;
+    }
+}
+
+int ZMPPreviewControlWithMultiBodyZMP::GetAlgorithmForZMPAndCoMTrajectoryGeneration()
+{
+  return m_ZMPCoMTrajectoryAlgorithm;
 }

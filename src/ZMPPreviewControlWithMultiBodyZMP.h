@@ -48,6 +48,7 @@
 #include <InverseKinematics.h>
 #include <DynamicMultiBody.h>
 #include <ZMPDiscretization.h>
+#include <HumanoidSpecificities.h>
 
 using namespace::std;
 
@@ -155,15 +156,20 @@ namespace PatternGeneratorJRL
       VNL::Matrix<double> m_FinalDesiredCOMPose;
       
       /// Store the index for the algorithm to use for ZMP and CoM trajectory.
-	int m_ZMPCoMTrajectoryAlgorithm;
+      int m_ZMPCoMTrajectoryAlgorithm;
 
+      /// Store the distance between the ankle and the soil.
+	double m_AnkleSoilDistance;
+       
+      /// Store a reference to the object handling humanoid specific data.
+      HumanoidSpecificities *m_HS;
     public:
 	
 	static const int ZMPCOM_TRAJECTORY_KAJITA=1;
-	static const int ZMPCOM_TRAJECTORY_WIEBER=1;
+	static const int ZMPCOM_TRAJECTORY_WIEBER=2;
 
       /// Constructor.
-      ZMPPreviewControlWithMultiBodyZMP();
+      ZMPPreviewControlWithMultiBodyZMP(HumanoidSpecificities *aHS);
 
       /// Destructor
       ~ZMPPreviewControlWithMultiBodyZMP();
@@ -197,26 +203,26 @@ namespace PatternGeneratorJRL
 	  @return finalCOMPosition: returns position, velocity and acceleration of the CoM 
 	  after the second stage of control, i.e. the final value.
        */
-      int OneGlobalStepOfControl(FootAbsolutePosition LeftFootPosition,
-				 FootAbsolutePosition RightFootPosition,
-				 ZMPPosition NewZMPRefPos,
+      int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
+				 FootAbsolutePosition &RightFootPosition,
+				 ZMPPosition &NewZMPRefPos,
 				 VNL::Matrix<double> & lqr, 
 				 VNL::Matrix<double> & lql, 
 				 COMPosition & refCOMPosition, 
 				 COMPosition & finalCOMPosition,
-				 VNL::Matrix<double> UpperBodyAngles);
+				 VNL::Matrix<double> &UpperBodyAngles);
 
       // For bakward compatibility this method complies with the previous
       // approach by merging the reference and final value.
       // Compare to the previous method the intermediate value of the COMPosition 
       // after the first stage is not provided.
-      int OneGlobalStepOfControl(FootAbsolutePosition LeftFootPosition,
-				 FootAbsolutePosition RightFootPosition,
-				 ZMPPosition NewZMPRefPos,
+      int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
+				 FootAbsolutePosition &RightFootPosition,
+				 ZMPPosition &NewZMPRefPos,
 				 VNL::Matrix<double> & lqr, 
 				 VNL::Matrix<double> & lql, 
 				 COMPosition & refandfinalCOMPosition,
-				 VNL::Matrix<double> UpperBodyAngles);
+				 VNL::Matrix<double> &UpperBodyAngles);
 	
       // First stage of the control, 
       // i.e.preview control on the CART model with delayed step parameters,
@@ -224,8 +230,8 @@ namespace PatternGeneratorJRL
       // and ZMP calculated with the multi body model.
       // aCOMPosition will be updated with the new value of the COM computed by
       // the card model.
-      int FirstStageOfControl(FootAbsolutePosition LeftFootPosition,
-			      FootAbsolutePosition RightFootPosition,
+      int FirstStageOfControl(FootAbsolutePosition &LeftFootPosition,
+			      FootAbsolutePosition &RightFootPosition,
 			      COMPosition & refCOMPosition,
 			      VNL::Matrix<double> &ql,
 			      VNL::Matrix<double> &qr,
@@ -252,7 +258,7 @@ namespace PatternGeneratorJRL
       // velocities set to zero, and returns the values of the COM in aStaringCOMPosition.
       // Assuming that the waist is at (0,0,0)
       // it returns the associate initial values for the left and right foot.
-      int EvaluateStartingCoM(VNL::Matrix<double> BodyAngles,
+      int EvaluateStartingCoM(VNL::Matrix<double> &BodyAngles,
 			      VNL::Vector<double> &aStartingCOMPosition,
 			      FootAbsolutePosition & InitLeftFootPosition,
 			      FootAbsolutePosition & InitRightFootPosition);
@@ -261,36 +267,36 @@ namespace PatternGeneratorJRL
       // velocities set to zero, and returns the values of the COM in aStaringCOMPosition.
       // Assuming that the waist is at (0,0,0)
       // it returns the associate initial values for the left and right foot.
-      int EvaluateStartingCoM(VNL::Matrix<double> BodyAngles,
+      int EvaluateStartingCoM(VNL::Matrix<double> &BodyAngles,
 			      VNL::Vector<double> &aStartingCOMPosition,
 			      VNL::Vector<double> &aWaistPosition,
 			      FootAbsolutePosition & InitLeftFootPosition,
 			      FootAbsolutePosition & InitRightFootPosition);
 
       // Setup, compute all the steps to get NL ZMP multibody values.
-      int Setup(deque<ZMPPosition> ZMPRefPositions,
-		deque<COMPosition> COMPositions,
-		deque<FootAbsolutePosition> LeftFootPositions,
-		deque<FootAbsolutePosition> RightFootPositions,
-		VNL::Matrix<double> BodyAngles);
+      int Setup(deque<ZMPPosition> &ZMPRefPositions,
+		deque<COMPosition> &COMPositions,
+		deque<FootAbsolutePosition> &LeftFootPositions,
+		deque<FootAbsolutePosition> &RightFootPositions,
+		VNL::Matrix<double> &BodyAngles);
 
       // Setup, : First steps: Initialize properly the internal fields
       // of ZMPPreviewControlWithMultiBodyZMP for the setup phase.
-      int SetupFirstPhase(deque<ZMPPosition> ZMPRefPositions,
-			  deque<COMPosition> COMPositions,
-			  deque<FootAbsolutePosition> LeftFootPositions,
-			  deque<FootAbsolutePosition> RightFootPositions,
-			  VNL::Matrix<double> BodyAngles);
+      int SetupFirstPhase(deque<ZMPPosition> &ZMPRefPositions,
+			  deque<COMPosition> &COMPositions,
+			  deque<FootAbsolutePosition> &LeftFootPositions,
+			  deque<FootAbsolutePosition> &RightFootPositions,
+			  VNL::Matrix<double> &BodyAngles);
 
 
       // Setup, : Iterative step: Update the first values of the Preview control
       // This structure is needed if it is needed to modify BodyAngles according
       // to the value of the COM.
-      int SetupIterativePhase(deque<ZMPPosition> ZMPRefPositions,
-			      deque<COMPosition> COMPositions,
-			      deque<FootAbsolutePosition> LeftFootPositions,
-			      deque<FootAbsolutePosition> RightFootPositions,
-			      VNL::Matrix<double> BodyAngles, int localindex);
+      int SetupIterativePhase(deque<ZMPPosition> &ZMPRefPositions,
+			      deque<COMPosition> &COMPositions,
+			      deque<FootAbsolutePosition> &LeftFootPositions,
+			      deque<FootAbsolutePosition> &RightFootPositions,
+			      VNL::Matrix<double> &BodyAngles, int localindex);
       
       
       //create an extra COM buffer with first preview round to be used by the stepover planner
@@ -334,6 +340,9 @@ namespace PatternGeneratorJRL
 
       /// Set the algorithm used for ZMP and CoM trajectory.
       void SetAlgorithmForZMPAndCoMTrajectoryGeneration(int anAlgo);
+
+      /// Get the algorithm used for ZMP and CoM trajectory.
+      int GetAlgorithmForZMPAndCoMTrajectoryGeneration();
     };
 };
 #endif /* _ZMPREVIEWCONTROLWITHMULTIBODYZMP_H_ */

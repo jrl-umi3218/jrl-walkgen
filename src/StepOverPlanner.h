@@ -57,6 +57,7 @@
 #include <InverseKinematics.h>
 #include <DynamicMultiBody.h>
 #include <deque>
+#include <HumanoidSpecificities.h>
 
 
 
@@ -80,7 +81,8 @@ class CollisionDetector;
       public :
      
       /// Constructor
-      StepOverPlanner(ObstaclePar &ObstacleParameters);
+      StepOverPlanner(ObstaclePar &ObstacleParameters,
+		      HumanoidSpecificities *aHS);
 
       /// Destructor
       ~StepOverPlanner();
@@ -322,14 +324,15 @@ class CollisionDetector;
       /// Keep the ZMP reference.
       deque<ZMPPosition> m_FIFOTmpZMPPosition;
 
-	/// time distribution at which the specific intermediate points for the stepping over splines are to be exerted
-	vector<double> m_TimeDistrFactor;
-		
+      /// time distribution at which the specific intermediate points for the stepping over splines are to be exerted
+      vector<double> m_TimeDistrFactor;
+	
+      /// Reference to the humanoid specificities.
+      HumanoidSpecificities *m_HS;
+
+      /// Distance from the ankle to the soil.
+      double m_AnkleSoilDistance;
     };
-
-
-
-
 
 };
 #include<CollisionDetector.h>

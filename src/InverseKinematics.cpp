@@ -50,15 +50,28 @@
 
 using namespace::PatternGeneratorJRL;
 
-InverseKinematics::InverseKinematics()
+InverseKinematics::InverseKinematics(HumanoidSpecificities *aHS)
 {
-m_KneeAngleBound=0.0*M_PI/180.0;
-m_KneeAngleBoundCos=cos(m_KneeAngleBound);
-m_KneeAngleBound1=30.0*M_PI/180.0; //sets a minimum angle for the knee and protects for overstretch
-m_KneeAngleBoundCos1=cos(m_KneeAngleBound1);  //used during inverse kin calculations
+  m_KneeAngleBound=0.0*M_PI/180.0;
+  m_KneeAngleBoundCos=cos(m_KneeAngleBound);
+  m_KneeAngleBound1=30.0*M_PI/180.0; //sets a minimum angle for the knee and protects for overstretch
+  m_KneeAngleBoundCos1=cos(m_KneeAngleBound1);  //used during inverse kin calculations
+  
+  //m_KneeAngleBound=15.0*M_PI/180.0; //sets a minimum angle for the knee and protects for overstretch
+  m_KneeAngleBoundCos2= 1.336;//cos(m_KneeAngleBound2);
 
-//m_KneeAngleBound=15.0*M_PI/180.0; //sets a minimum angle for the knee and protects for overstretch
-m_KneeAngleBoundCos2= 1.336;//cos(m_KneeAngleBound2);
+  m_HS = aHS;
+  if (m_HS!=0)
+    {
+      m_FemurLength = m_HS->GetFemurLength(-1);
+      m_TibiaLength = m_HS->GetTibiaLength(-1);
+    }
+  else
+    {
+      m_FemurLength=0.25;
+      m_TibiaLength=0.25;
+    }
+  
 }
 
 InverseKinematics::~InverseKinematics()
@@ -72,7 +85,7 @@ int InverseKinematics::ComputeInverseKinematicsForLegs3(VNL::Matrix<double> Body
 						       VNL::Matrix<double> Foot_P,
 						       VNL::Matrix<double> &q)
 {
-  double A=0.3,B=0.3,C,c5,q6a;
+  double A=m_FemurLength,B=m_TibiaLength,C,c5,q6a;
   VNL::Matrix<double> r(3,1);
   VNL::Matrix<double> rT(3,3);
 #if 0
@@ -169,7 +182,7 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(VNL::Matrix<double> Body
 							VNL::Matrix<double> Foot_P,
 							VNL::Matrix<double> &q)
 {
-  double A=0.3,B=0.3,C,c5,q6a;
+  double A=m_FemurLength,B=m_TibiaLength,C,c5,q6a;
   VNL::Matrix<double> r(3,1);
   VNL::Matrix<double> rT(3,3);
   VNL::Matrix<double> Foot_Rt(3,3);

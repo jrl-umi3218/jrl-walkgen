@@ -49,6 +49,8 @@
 #include <VNL/matrix.h>
 #include <iostream>
 
+#include <HumanoidSpecificities.h>
+
 namespace PatternGeneratorJRL
 {
   /** Inverse Kinematics for generic humanoids.
@@ -59,7 +61,7 @@ namespace PatternGeneratorJRL
     {
     public:
       /// Constructor.
-      InverseKinematics();
+      InverseKinematics(HumanoidSpecificities *aHS);
       
       /// Destructor
       ~InverseKinematics();
@@ -96,6 +98,10 @@ namespace PatternGeneratorJRL
 	double m_KneeAngleBoundCos,m_KneeAngleBound;
 	double m_KneeAngleBoundCos1,m_KneeAngleBound1;
     	double m_KneeAngleBoundCos2;
+
+	double m_FemurLength,m_TibiaLength;
+
+	HumanoidSpecificities *m_HS;
     };
 };
 #endif /*_INVERSE_KINEMATICS_H_ */
