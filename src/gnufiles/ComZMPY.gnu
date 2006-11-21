@@ -1,0 +1,1 @@
+plot "DebugDataLong.txt" u 7 w l t "CoM Multibody", "DebugDataLong.txt" u 9 w l t "CoM Preview", "DebugDataLong.txt" u 3 w l t "Desired ZMP", "DebugDataLong.txt" u 5 w l t "ZMP Multibody"
