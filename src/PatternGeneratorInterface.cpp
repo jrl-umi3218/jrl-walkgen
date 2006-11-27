@@ -31,10 +31,10 @@ namespace PatternGeneratorJRL {
     string PCParameters;
     strm >> PCParameters;
 
-    string HRP2JRLpath;// = "/home/stasse/OpenHRP/etc/HRP2JRL/";
+    string HRP2JRLpath = "/local/jrl/src/OpenHRP/etc/HRP2JRL/";
     strm >> HRP2JRLpath;
 
-    string HRP2JRLfilename;// = "HRP2JRLmain.wrl";
+    string HRP2JRLfilename = "HRP2JRLmain.wrl";
     strm >> HRP2JRLfilename;
 
     string HumanoidSpecificitiesFileName;
@@ -464,6 +464,7 @@ namespace PatternGeneratorJRL {
       case 3:
       case 1:
 	{
+	  cout<<"calling m_StepStackHandler()"<<endl;
 	  m_StepStackHandler->ReadStepSequenceAccordingToWalkMode(strm);
 	  break;
 	}

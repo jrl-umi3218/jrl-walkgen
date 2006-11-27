@@ -48,10 +48,14 @@ all: $(LIBRARY) $(SHLIBRARY)  TestFootPrintPGInterface \
 # TestLapack
 
 AR= ar cru
-CRTSHLIB= gcc-3.3 -shared -Wl
+#CRTSHLIB= gcc-3.3 -shared -Wl
+CRTSHLIB= gcc32 -shared -Wl
+#CRTSHLIB= gcc -shared -Wl
 
 
-CXX=g++-3.3
+#CXX=g++-3.3
+CXX=g++32
+#CXX=g++
 
 HDRS= Polynome.h \
 	PolynomeFoot.h \
@@ -72,10 +76,10 @@ HDRS= Polynome.h \
 	GenerateMotionFromKineoWorks.h \
 	StepStackHandler.h \
 	PatternGeneratorInterface.h \
-	OptimalControllerSolver.h \
 	ConvexHull.h \
 	HumanoidSpecificities.h \
 	qld.h 
+#	OptimalControllerSolver.h \
 
 SRCS= Polynome.cpp \
 	PolynomeFoot.cpp \
@@ -96,22 +100,23 @@ SRCS= Polynome.cpp \
 	GenerateMotionFromKineoWorks.cpp \
 	StepStackHandler.cpp \
 	PatternGeneratorInterface.cpp \
-	OptimalControllerSolver.cpp \
 	ConvexHull.cpp \
 	HumanoidSpecificities.cpp \
 	qld.cpp
+#	OptimalControllerSolver.cpp  \
 
 
 OBJS=${SRCS:.cpp=.o}
 
-CXX_FLAGS = -Wall 
+#CXX_FLAGS = -Wall -fno-threadsafe-statics #-fno-threadsafe-statics
+CXX_FLAGS = -Wall # for gcc32	
 CXX_OPT = -g
 
 #CXX_OPT = -O3
 CXX_FLAGS +=  -I. -I../include  -Wall
 
 
-LIBS_FLAGS = -L. -L../lib -lVNL -lg2c 
+LIBS_FLAGS = -L. -L../lib ../lib/libVNL.a -lstdc++ -L/usr/lib -lg2c 
 
 ROBOT=HRP2JRL
 PICFLAGS = -fpic
@@ -170,7 +175,8 @@ $(SHLIBRARY): $(OBJS) $(OBJS_C)
 $(SHLIBRARY): $(OBJS)
 
 doc:	
-	doc++ --dir html $(HDRS)
+	cd ../doc; doxygen pgjrl.conf
+#	doc++ --dir html $(HDRS)
 clean:
 	rm -f *.o *~ *\# *.so *.a
 	(cd shared; rm -f *.o)

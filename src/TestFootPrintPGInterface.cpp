@@ -180,7 +180,7 @@ int main(void)
 {
 
   cout << "Starting point " << endl;
-  std::istringstream strm("PreviewControlParameters.ini ../../../../etc/HRP2JRL/ HRP2JRLmain.wrl");
+  std::istringstream strm("PreviewControlParameters.ini ../../etc/HRP2JRL/ HRP2JRLmain.wrl HRP2Specificities.xml");
   PatternGeneratorInterface * aPGI;
   aPGI = new PatternGeneratorInterface(strm);
 

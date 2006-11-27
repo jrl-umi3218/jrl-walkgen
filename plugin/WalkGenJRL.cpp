@@ -1,14 +1,6 @@
 /** @doc This object generate all the values for the foot trajectories,
     and the desired ZMP based on a sequence of steps.
    
-    CVS Information:
-    $Id$
-    $Author$
-    $Date $
-    $Revision$
-    $Source $
-    $Log $
-
     Copyright (c) 2005-2006, 
     @author Olivier Stasse, Ramzi Sellouati, Bjorn Verrelst
    
@@ -37,12 +29,13 @@
     IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <MatrixAbstractLayer.h>
+
 #include "plugin.h"
 #include "bodyinfo.h"
 #include "seqplugin.h" 
 #include <walkpluginJRL_skel.h>
 #include <fstream>
-#include <VNL/Algo/matrixinverse.h>
 #include <PatternGeneratorInterface.h>
 
 
@@ -83,7 +76,6 @@ public:
   void m_SetDoubleSupportTime(istringstream &strm);
 
   void Matrix2Quaternion(VNL::Matrix<double> R,double q[4]);
-  
 
    // Interface for hrpsys.
   void m_SetObstacleParameters(istringstream &strm);
@@ -96,6 +88,7 @@ public:
   void m_DumpZMPreel(istringstream &strm);
   void m_ReadFileFromKineoWorks(istringstream &strm);
   void m_Synchronize(istringstream &strm);
+  void m_SetAlgoForZmpTrajectory(istringstream &strm);
 
   // This method only update the Step Sequence stack.
   void m_PartialStepSequence(istringstream &strm);
@@ -215,7 +208,7 @@ public:
 
   CORBA::Boolean isWalking() 
     throw(CORBA::SystemException);
-  
+
 protected:
 
   // The pattern generator interface.
@@ -304,6 +297,8 @@ WalkGenJRL::WalkGenJRL(istringstream &strm)
   register_method(":finish",(method)&WalkGenJRL::m_FinishAndRealizeStepSequence);
   register_method(":SendStackToControl",(method)&WalkGenJRL::m_SendStackToControl);
   register_method(":setpbwconstraint",(method)&WalkGenJRL::m_SetPBWConstraint);
+  register_method(":SetAlgoForZmpTrajectory",(method)&WalkGenJRL::m_SetAlgoForZmpTrajectory);
+
   m_CurrentJointValues.Resize(40,1);
 
   m_ZMPIndex = 0;
@@ -852,6 +847,13 @@ void WalkGenJRL::m_SetPBWConstraint (istringstream &strm)
   if (m_PGI!=0)
     m_PGI->m_SetPBWConstraint(strm);
   
+}
+
+void WalkGenJRL::m_SetAlgoForZmpTrajectory(istringstream &strm)
+{
+  if (m_PGI!=0)
+    m_PGI->m_SetAlgoForZMPTraj(strm);
+
 }
 
 CORBA::Long WalkGenJRL::getLegJointSpeed( dsequence_out dq)
