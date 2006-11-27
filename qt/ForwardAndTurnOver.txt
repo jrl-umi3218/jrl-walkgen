@@ -1,0 +1,10 @@
+:omega 0.0
+:walkmode 0
+:stepheight 0.07
+:singlesupporttime 0.78
+:doublesupporttime 0.02
+:armparameters 0.5
+:ZMPShiftParameters 0.015 0.015 0.015 0.015
+:TimeDistributionParameters 2.0 3.7 1.7 3.0
+:UpperBodyMotionParameters -0.1 -1.0 0.0
+:stepseq 0.0 -0.095 0.0 0.2 0.19 0.0 0.0 -0.19 10.0 0.0 0.19 10.0 0.0 -0.19 10.0 0.0 0.19 10.0 0.0 -0.19 10.0 0.0 0.19 10.0 0.0 -0.19 10.0 0.0 0.19 10.0 0.0 -0.19 10.0 0.0 0.19 10.0 0.0 -0.19 10.0 0.0 0.19 10.0 0.0 -0.19 10.0 0.0 0.19 10.0 0.0 -0.19 10.0 0.0 0.19 10.0 0.0 -0.19 10.0 0.0 0.19 10.0 0.0 -0.19 0.0 
