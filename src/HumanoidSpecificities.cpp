@@ -4,7 +4,7 @@
 #define ODEBUG3(x) cerr << "HumanoidSpecificities :" << x << endl
 #define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "PGI: " << x << endl; DebugFile.close();}
-#if 0
+#if 1
 #define ODEBUG(x) cerr << "HumanoidsSpecificities :" <<  x << endl
 #else
 #define ODEBUG(x) 

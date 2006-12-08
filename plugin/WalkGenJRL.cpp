@@ -48,7 +48,7 @@
 #define ODEBUG(x) 
 #endif
 
-#if 0
+#if 1
 #define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "WalkGenJRL: " << x << endl; DebugFile.close();}
 #define _DEBUG_4_ACTIVATED_ 1 
@@ -268,7 +268,7 @@ WalkGenJRL::WalkGenJRL(istringstream &strm)
 
   m_ShouldBeRunning = false;
 
-  m_DebugMode = 0;
+  m_DebugMode = 1;
 
   m_PGI = new PatternGeneratorInterface(strm);
 

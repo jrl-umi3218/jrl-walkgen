@@ -48,8 +48,10 @@ user_clean:
 #	cp $(SOURCE_DIR)/script/TestWalkGenJRLIntegrateExperiment2.py $(IOSRVBIN)/script/TestWalkGenJRLIntegrateExperiment2.py
 $(IOSRVBIN)/script/TestWalkGenPBW.py: $(SOURCE_DIR)/script/TestWalkGenPBW.py
 	cp -f $(SOURCE_DIR)/script/TestWalkGenPBW.py $(IOSRVBIN)/script
+$(IOSRVBIN)/script/PartialDemoChambreDeCommerce.py: $(SOURCE_DIR)/script/PartialDemoChambreDeCommerce.py
+	cp -f $(SOURCE_DIR)/script/PartialDemoChambreDeCommerce.py $(IOSRVBIN)/script
 
 $(IOSRVBIN)/libWalkGen.so: $(SOURCE_DIR)/../src/libWalkGenJRL.so
 	cp -f $(SOURCE_DIR)/../src/libWalkGenJRL.so $(IOSRVBIN)
 
-user_install:$(IOSRVBIN)/libWalkGen.so $(IOSRVBIN)/script/TestWalkGenPBW.py
+user_install:$(IOSRVBIN)/libWalkGen.so $(IOSRVBIN)/script/TestWalkGenPBW.py $(IOSRVBIN)/script/PartialDemoChambreDeCommerce.py
