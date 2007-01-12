@@ -1,21 +1,9 @@
 /* Polynomes object for generating foot and hip trajectories while stepping over.
-
-CVS Information:
-$Id: PolynomeFoot.cpp,v 1.2 2006-01-18 06:34:58 stasse Exp $
-$Author: stasse $
-$Date: 2006-01-18 06:34:58 $
-$Revision: 1.2 $
-$Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/PolynomeFoot.cpp,v $
-$Log: PolynomeFoot.cpp,v $
-Revision 1.2  2006-01-18 06:34:58  stasse
-OS: Updated the names of the contributors, the documentation
-and added a sample file for WalkPlugin
-
-
+   
 Copyright (c) 2005-2006, 
 Olivier Stasse,
 Ramzi Sellouati
-   
+
 JRL-Japan, CNRS/AIST
 
 All rights reserved.
@@ -41,12 +29,30 @@ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <iostream>
-#include <VNL/Algo/determinant.h>
-#include <VNL/Algo/matrixinverse.h>
-#include <VNL/matrix.h>
+#include <MatrixAbstractLayer.h>
 #include <vector>
-#include <VNL/vector.h>
 #include <StepOverPolynome.h>
+
+#define ODEBUG2(x)
+#define ODEBUG3(x) cerr << "StepOverPolynome :" << x << endl
+#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
+#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "PGI: " << x << endl; DebugFile.close();}
+#if 0
+#define ODEBUG(x) cerr << "StepOverPolynome :" <<  x << endl
+#else
+#define ODEBUG(x) 
+#endif
+
+#if 0
+#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
+#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "PGI: " << x << endl; DebugFile.close();}
+#define _DEBUG_4_ACTIVATED_ 1 
+#else
+#define RESETDEBUG4(y) 
+#define ODEBUG4(x,y)
+#endif
+
+#define ODEBUG6(x,y)
 
 using namespace::std;
 using namespace::PatternGeneratorJRL;
@@ -57,9 +63,11 @@ StepOverPolynomeFoot::StepOverPolynomeFoot() :Polynome(8)
   // SetParameters(boundCond,timeDistr);
 }
 
-void StepOverPolynomeFoot::SetParameters(VNL::Vector<double> boundCond, vector<double> timeDistr)
+void StepOverPolynomeFoot::SetParameters(MAL_VECTOR(boundCond,double), 
+					 vector<double> timeDistr)
 {
-  VNL::Matrix<double> Base(8,8),Temp(8,8);
+  MAL_MATRIX_DIM(Base,double,8,8);
+  MAL_MATRIX_DIM(Temp,double,8,8);
 
   double t1,t2,T;
   double Ts2,Ts3,Ts4,Ts5,Ts6,Ts7;
@@ -90,7 +98,7 @@ void StepOverPolynomeFoot::SetParameters(VNL::Vector<double> boundCond, vector<d
  
   double detBase;
 
-  detBase=Determinant(Base); 
+  detBase=MAL_MATRIX_RET_DETERMINANT(Base,double); 
 
   // cout << "determinant of Base matrix: " << detBase << endl;
 
@@ -98,8 +106,9 @@ void StepOverPolynomeFoot::SetParameters(VNL::Vector<double> boundCond, vector<d
   for (unsigned int i=0;i<boundCond.size();i++)
     {
       Temp=Base;
-      Temp.SetColumn(i,boundCond);
-      m_Coefficients[i] =Determinant(Temp)/detBase;
+      for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(Temp);j++)
+	Temp(j,i) = boundCond(j);
+      m_Coefficients[i] = MAL_MATRIX_RET_DETERMINANT(Temp,double)/detBase;
     };
 
 }
@@ -114,9 +123,11 @@ StepOverPolynomeFootZtoX::StepOverPolynomeFootZtoX() :Polynome(3)
   // SetParameters(boundCond,timeDistr);
 }
 
-void StepOverPolynomeFootZtoX::SetParameters(VNL::Vector<double> Zpos, vector<double> Xpos)
+void StepOverPolynomeFootZtoX::SetParameters(MAL_VECTOR(Zpos,double),
+					     vector<double> Xpos)
 {
-  VNL::Matrix<double> Base(4,4),Temp(4,4);
+  MAL_MATRIX_DIM(Base,double,4,4);
+  MAL_MATRIX_DIM(Temp,double,4,4);
 
   double x1,x2,x3;
   double x1s2,x1s3,x2s2,x2s3,x3s2,x3s3;
@@ -142,14 +153,14 @@ void StepOverPolynomeFootZtoX::SetParameters(VNL::Vector<double> Zpos, vector<do
   
   double detBase;
 
-  detBase=Determinant(Base); 
-
+  detBase=MAL_MATRIX_RET_DETERMINANT(Base,double); 
  
   for (unsigned int i=0;i<Zpos.size();i++)
     {
       Temp=Base;
-      Temp.SetColumn(i,Zpos);
-      m_Coefficients[i] =Determinant(Temp)/detBase;
+      for(unsigned int j=0;j<Zpos.size();j++)
+	Temp(j,i) = Zpos(j);
+      m_Coefficients[i] = MAL_MATRIX_RET_DETERMINANT(Temp,double)/detBase;
     };
 
 }
@@ -165,16 +176,16 @@ StepOverPolynomeFootXtoTime::StepOverPolynomeFootXtoTime() :Polynome(4)
   // SetParameters(boundCond,timeDistr);
 }
 
-void StepOverPolynomeFootXtoTime::SetParameters(VNL::Vector<double> Xbound, vector<double> timeDistr)
+void StepOverPolynomeFootXtoTime::SetParameters(MAL_VECTOR(Xbound,double), 
+						vector<double> timeDistr)
 {
-  VNL::Matrix<double> Base(5,5),Temp(5,5);
+  MAL_MATRIX_DIM(Base,double,5,5);
+  MAL_MATRIX_DIM(Temp,double,5,5);
 
   double t1,t2,T;
   double Ts2,Ts3,Ts4;
   double t1s2,t1s3,t1s4;
   double t2s2,t2s3,t2s4;
-  
-  
 
   t1=timeDistr[0];
   t2=timeDistr[1];
@@ -183,9 +194,6 @@ void StepOverPolynomeFootXtoTime::SetParameters(VNL::Vector<double> Xbound, vect
   Ts2=T*T;Ts3=T*Ts2;Ts4=T*Ts3;
   t1s2=t1*t1;t1s3=t1*t1s2;t1s4=t1*t1s3;;
   t2s2=t2*t2;t2s3=t2*t2s2;t2s4=t2*t2s3;
-
-
- 
   
   Base(0,0)=1.0;Base(0,1)=0.0;Base(0,2)=0.0;Base(0,3)=0.0;Base(0,4)=0.0;
   Base(1,0)=1.0;Base(1,1)=t1  ;Base(1,2)=t1s2;Base(1,3)=t1s3;Base(1,4)=t1s4;
@@ -193,21 +201,18 @@ void StepOverPolynomeFootXtoTime::SetParameters(VNL::Vector<double> Xbound, vect
   Base(3,0)=1.0;Base(3,1)=T  ;Base(3,2)=Ts2;Base(3,3)=Ts3;Base(3,4)=Ts4;
   Base(4,0)=0.0;Base(4,1)=1.0;Base(4,2)=2.0*T;Base(4,3)=3.0*Ts2;Base(4,4)=4.0*Ts3;
  
-
-
- 
   double detBase;
 
-  detBase=Determinant(Base); 
+  detBase=MAL_MATRIX_RET_DETERMINANT(Base,double); 
 
   // cout << "determinant of Base matrix: " << detBase << endl;
 
- 
   for (unsigned int i=0;i<Xbound.size();i++)
     {
       Temp=Base;
-      Temp.SetColumn(i,Xbound);
-      m_Coefficients[i] =Determinant(Temp)/detBase;
+      for (unsigned int j=0;j<Xbound.size();j++)
+	Temp(j,i) = Xbound(j);
+      m_Coefficients[i] = MAL_MATRIX_RET_DETERMINANT(Temp,double)/detBase;
     };
 
 }
@@ -225,9 +230,11 @@ StepOverPolynomeHip4::StepOverPolynomeHip4() :Polynome(4)
   // SetParameters(boundCond,timeDistr);
 }
 
-void StepOverPolynomeHip4::SetParameters(VNL::Vector<double> boundCond, vector<double> timeDistr)
+void StepOverPolynomeHip4::SetParameters(MAL_VECTOR(boundCond,double), 
+					 vector<double> timeDistr)
 {
-  VNL::Matrix<double> Base(4,4),Temp(4,4);
+  MAL_MATRIX_DIM(Base,double,4,4);
+  MAL_MATRIX_DIM(Temp,double,4,4);
 
   double T;
   double Ts2,Ts3;
@@ -253,7 +260,7 @@ void StepOverPolynomeHip4::SetParameters(VNL::Vector<double> boundCond, vector<d
  
   double detBase;
 
-  detBase=Determinant(Base); 
+  detBase=MAL_MATRIX_RET_DETERMINANT(Base,double); 
 
   // cout << "determinant of Base matrix: " << detBase << endl;
 
@@ -261,8 +268,9 @@ void StepOverPolynomeHip4::SetParameters(VNL::Vector<double> boundCond, vector<d
   for (unsigned int i=0;i<boundCond.size();i++)
     {
       Temp=Base;
-      Temp.SetColumn(i,boundCond);
-      m_Coefficients[i] =Determinant(Temp)/detBase;
+      for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(Temp);j++)
+	Temp(j,i) = boundCond(j);
+      m_Coefficients[i] =MAL_MATRIX_RET_DETERMINANT(Temp,double)/detBase;
     };
 
 }
@@ -283,22 +291,21 @@ StepOverSpline::StepOverSpline()
   // SetParameters(boundCond,timeDistr);
 }
 
-void StepOverSpline::SetParameters(VNL::Vector<double> Points)
+void StepOverSpline::SetParameters(MAL_VECTOR(Points,double))
 {
-  VNL::Matrix<double> LhSide(4,4),RhSide(4,1),TempSol(4,1);
-
-
+  MAL_MATRIX_DIM(LhSide,double,4,4);
+  MAL_MATRIX_DIM(RhSide,double,4,1);
+  MAL_MATRIX_DIM(TempSol,double,4,1);
  
   number = Points.size();
  
-  LhSide.Resize(number,number);
-  RhSide.Resize(number,1);
-  TempSol.Resize(number,1);
-  Coefficients.Resize(4,number);
+  MAL_MATRIX_RESIZE(LhSide,number,number);
+  MAL_MATRIX_RESIZE(RhSide,number,1);
+  MAL_MATRIX_RESIZE(TempSol,number,1);
+  MAL_MATRIX_RESIZE(Coefficients,4,number);
 
   for (unsigned int i=0;i<number;i++)
     { 
-	
       for (unsigned int j=0;j<number;j++)
 	LhSide(i,j)=0.0;
     }
@@ -321,8 +328,9 @@ void StepOverSpline::SetParameters(VNL::Vector<double> Points)
   LhSide(0,0) = 2.0;
   LhSide(number-1,number-1) = 2.0;
 
-
-  TempSol=SVDInverse(LhSide)*RhSide;
+  MAL_MATRIX(iLhSide, double);
+  MAL_INVERSE(LhSide,iLhSide,double);
+  MAL_C_eq_A_by_B(TempSol,iLhSide,RhSide);
 	
   for (unsigned int i=0;i<number-1;i++)
     {
@@ -334,8 +342,9 @@ void StepOverSpline::SetParameters(VNL::Vector<double> Points)
   
 }
 
-
-double StepOverSpline::GetValueSpline(VNL::Vector<double> TimePoints, double CurrentLocalTime) // TimePoints has to be defined [t1=O, t2, t3,....,tnumber]
+// TimePoints has to be defined [t1=O, t2, t3,....,tnumber]
+double StepOverSpline::GetValueSpline(MAL_VECTOR(TimePoints,double), 
+				      double CurrentLocalTime) 
 {
   double ValueSpline =0.0;
   unsigned int numberComp;
@@ -363,12 +372,14 @@ double StepOverSpline::GetValueSpline(VNL::Vector<double> TimePoints, double Cur
  
     } // for
  
-  if (CurrentLocalTime>=TimePoints(number-1)) // if the CurrentLocalTime is out of range it will return the end position if t>tmax 
+  // if the CurrentLocalTime is out of range 
+  // it will return the end position if t>tmax 
+  if (CurrentLocalTime>=TimePoints(number-1)) 
     {
       ValueSpline = Coefficients(0,(number-1))
-	+Coefficients(1,(number-1))
-	+Coefficients(2,(number-1))
-	+Coefficients(3,(number-1));
+	+ Coefficients(1,(number-1))
+	+ Coefficients(2,(number-1))
+	+ Coefficients(3,(number-1));
       // cout << "NCS: timevalue is beyond the range of given time intervals, last position is returned" << endl;
     }
  
@@ -415,19 +426,21 @@ StepOverClampedCubicSpline::StepOverClampedCubicSpline()
   // SetParameters(boundCond,timeDistr);
 }
  
-void StepOverClampedCubicSpline::SetParameters(VNL::Vector<double> Points,
-					       VNL::Vector<double> TimePoints,
-					       VNL::Vector<double> DerivativeEndPoints)
+void StepOverClampedCubicSpline::SetParameters(MAL_VECTOR( Points, double),
+					       MAL_VECTOR( TimePoints, double),
+					       MAL_VECTOR( DerivativeEndPoints,double))
 {
-  VNL::Matrix<double> LhSide(4,4),RhSide(4,1),TempSol(4,1);
-  VNL::Vector<double> h(4);
+  MAL_MATRIX_DIM( LhSide,double,4,4);
+  MAL_MATRIX_DIM( RhSide,double,4,1);
+  MAL_MATRIX_DIM( TempSol,double,4,1);
+  MAL_VECTOR_DIM( h,double,4);
   number = Points.size()-1;
  
-  LhSide.Resize(number+1,number+1);
-  RhSide.Resize(number+1,1);
-  TempSol.Resize(number+1,1);
-  Coefficients.Resize(4,number);
-  h.Resize(number);
+  MAL_MATRIX_RESIZE(LhSide,number+1,number+1);
+  MAL_MATRIX_RESIZE(RhSide,number+1,1);
+  MAL_MATRIX_RESIZE(TempSol,number+1,1);
+  MAL_MATRIX_RESIZE(Coefficients,4,number);
+  MAL_VECTOR_RESIZE(h,number);
 
   for (unsigned int i=0;i<number;i++)
     { 
@@ -460,13 +473,18 @@ void StepOverClampedCubicSpline::SetParameters(VNL::Vector<double> Points,
   LhSide(number,number) = 2.0*h(number-1);
   LhSide(number,number-1) = h(number-1);
   LhSide(number-1,number) = h(number-1);
- 
-  TempSol=SVDInverse(LhSide)*RhSide;
+
+  MAL_MATRIX_DIM(iLhSide,double,
+		 MAL_MATRIX_NB_ROWS(LhSide),
+		 MAL_MATRIX_NB_COLS(LhSide));
+  MAL_INVERSE(LhSide,iLhSide,double);
+  MAL_C_eq_A_by_B(TempSol,iLhSide,RhSide);
 
   for (unsigned int i=0;i<number;i++)
     {
       Coefficients(0,i) = Points(i);
-      Coefficients(1,i) = (Points(i+1)-Points(i)-(2.0*TempSol(i,0)+TempSol(i+1,0))*h(i)*h(i)/3.0)/h(i);
+      Coefficients(1,i) = (Points(i+1)-Points(i)-(2.0*TempSol(i,0)+TempSol(i+1,0))
+			   *h(i)*h(i)/3.0)/h(i);
       Coefficients(2,i) = TempSol(i,0);
       Coefficients(3,i) = (TempSol(i+1,0)-TempSol(i,0))/(3.0*h(i));
     } 
@@ -475,7 +493,7 @@ void StepOverClampedCubicSpline::SetParameters(VNL::Vector<double> Points,
  
 
 
-double StepOverClampedCubicSpline::GetValueSpline(VNL::Vector<double> TimePoints, double CurrentLocalTime)
+double StepOverClampedCubicSpline::GetValueSpline(MAL_VECTOR( TimePoints,double), double CurrentLocalTime)
 {
   double ValueSpline =0.0;
   unsigned int numberComp;
@@ -494,7 +512,8 @@ double StepOverClampedCubicSpline::GetValueSpline(VNL::Vector<double> TimePoints
 	  Time0to1=(CurrentLocalTime-TimePoints(i));
 	  Time0to1_2=Time0to1*Time0to1;
 	  Time0to1_3=Time0to1_2*Time0to1; 
-	  ValueSpline = Coefficients(0,i)+Coefficients(1,i)*Time0to1+Coefficients(2,i)*Time0to1_2+Coefficients(3,i)*Time0to1_3; 
+	  ValueSpline = Coefficients(0,i)+Coefficients(1,i)*Time0to1+
+	    Coefficients(2,i)*Time0to1_2+Coefficients(3,i)*Time0to1_3; 
 	  break;
 	} //if 
  

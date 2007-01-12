@@ -1,16 +1,6 @@
 #   Copyright (c) 2005-2006, 
 #   Olivier Stasse, Ramzi Sellouati
 #   
-#    CVS Information:
-#    $Id: Makefile,v 1.3 2006-01-18 06:34:58 stasse Exp $
-#    $Author: stasse $
-#    $Date: 2006-01-18 06:34:58 $
-#    $Revision: 1.3 $
-#    $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/Makefile,v $
-#    $Log: Makefile,v $
-#    Revision 1.3  2006-01-18 06:34:58  stasse
-#    OS: Updated the names of the contributors, the documentation
-#    and added a sample file for WalkPlugin
 #
 #
 #   JRL-Japan, CNRS/AIST
@@ -48,14 +38,10 @@ all: $(LIBRARY) $(SHLIBRARY)  TestFootPrintPGInterface \
 # TestLapack
 
 AR= ar cru
-#CRTSHLIB= gcc-3.3 -shared -Wl
-CRTSHLIB= gcc32 -shared -Wl
-#CRTSHLIB= gcc -shared -Wl
+CRTSHLIB= gcc-3.3 -shared -Wl
 
 
-#CXX=g++-3.3
-CXX=g++32
-#CXX=g++
+CXX=g++-3.3
 
 HDRS= Polynome.h \
 	PolynomeFoot.h \
@@ -72,6 +58,7 @@ HDRS= Polynome.h \
 	StepOverPolynome.h\
 	CollisionDetector.h\
 	WaistHeightVariation.h\
+	OptimalControllerSolver.h \
 	UpperBodyMotion.h \
 	GenerateMotionFromKineoWorks.h \
 	StepStackHandler.h \
@@ -79,7 +66,6 @@ HDRS= Polynome.h \
 	ConvexHull.h \
 	HumanoidSpecificities.h \
 	qld.h 
-#	OptimalControllerSolver.h \
 
 SRCS= Polynome.cpp \
 	PolynomeFoot.cpp \
@@ -91,6 +77,7 @@ SRCS= Polynome.cpp \
 	fileReader.cpp \
 	Body.cpp \
 	DynamicBody.cpp \
+	OptimalControllerSolver.cpp \
 	ZMPPreviewControlWithMultiBodyZMP.cpp \
 	StepOverPlanner.cpp\
 	StepOverPolynome.cpp\
@@ -103,20 +90,43 @@ SRCS= Polynome.cpp \
 	ConvexHull.cpp \
 	HumanoidSpecificities.cpp \
 	qld.cpp
-#	OptimalControllerSolver.cpp  \
 
+
+#LIB_MATRIX=_VNL_MATRIX_
+LIB_MATRIX=_BOOST_MATRIX_
 
 OBJS=${SRCS:.cpp=.o}
 
-#CXX_FLAGS = -Wall -fno-threadsafe-statics #-fno-threadsafe-statics
-CXX_FLAGS = -Wall # for gcc32	
-CXX_OPT = -g
+CXX_FLAGS = -Wall 
+# Choice for the matrix library
 
-#CXX_OPT = -O3
-CXX_FLAGS +=  -I. -I../include  -Wall
+ifeq ($(LIB_MATRIX),_BOOST_MATRIX_)
+  CXX_FLAGS += -I/usr/include/boost-sandbox/ 
+  CXX_FLAGS += -I/usr/local/atlas/include
+endif
 
 
-LIBS_FLAGS = -L. -L../lib ../lib/libVNL.a -lstdc++ -L/usr/lib -lg2c 
+#CXX_OPT = -g
+CXX_OPT = -O3
+
+CXX_FLAGS += -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_
+
+
+CXX_FLAGS +=   -I../include -I. -Wall
+CXX_FLAGS += -D$(LIB_MATRIX)
+
+LIBS_FLAGS = -L. 
+
+ifeq ($(LIB_MATRIX),_VNL_MATRIX_)
+ LIBS_FLAGS+=-L../lib -lVNL -llapack
+endif
+
+ifeq ($(LIB_MATRIX),_BOOST_MATRIX_)
+# LIBS_FLAGS+= -L/usr/local/atlas/lib -llapack -lcblas -latlas
+  LIBS_FLAGS+= -llapack 
+endif
+
+LIBS_FLAGS+=
 
 ROBOT=HRP2JRL
 PICFLAGS = -fpic
@@ -153,6 +163,12 @@ TestFootPrintPGInterface.o: TestFootPrintPGInterface.cpp $(HDRS)
 TestFootPrintPGInterface: TestFootPrintPGInterface.o $(OBJS)
 	$(CXX) -g -o $@ TestFootPrintPGInterface.o  -L.  -lWalkGenJRL $(LIBS_FLAGS)
 
+TestDynamicMultiBody.o: TestDynamicMultiBody.cpp $(HDRS) 
+	$(CXX) $(CXX_OPT) $(CXX_FLAGS) -c $<
+
+TestDynamicMultiBody: TestDynamicMultiBody.o $(OBJS)
+	$(CXX) -g -o $@ TestDynamicMultiBody.o  -L.  -lWalkGenJRL $(LIBS_FLAGS)
+
 TestRiccatiEquation.o: TestRiccatiEquation.cpp $(HDRS) 
 	$(CXX) $(CXX_OPT) $(CXX_FLAGS) -c $<
 
@@ -175,10 +191,10 @@ $(SHLIBRARY): $(OBJS) $(OBJS_C)
 $(SHLIBRARY): $(OBJS)
 
 doc:	
-	cd ../doc; doxygen pgjrl.conf
-#	doc++ --dir html $(HDRS)
+	doc++ --dir html $(HDRS)
 clean:
 	rm -f *.o *~ *\# *.so *.a
+	rm -f ../include/*.h
 	(cd shared; rm -f *.o)
 
 clean-all:	

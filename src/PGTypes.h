@@ -1,6 +1,8 @@
 #ifndef _PATTERN_GENERATOR_TYPES_H_
 #define  _PATTERN_GENERATOR_TYPES_H_
 
+#include <MatrixAbstractLayer.h>
+
 namespace PatternGeneratorJRL
 {
   /// Structure to store the COM position computed by the preview control. 
@@ -58,8 +60,8 @@ namespace PatternGeneratorJRL
   /// Linear constraint.
   struct LinearConstraintInequality_s
   {
-    VNL::Matrix<double> A;
-    VNL::Matrix<double> B;
+    MAL_MATRIX(A,double);
+    MAL_MATRIX(B,double);
     double StartingTime, EndingTime;
   };
   typedef struct LinearConstraintInequality_s 

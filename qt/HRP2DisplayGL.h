@@ -10,6 +10,7 @@
 #include <vector>
 
 
+
 class HRP2DisplayGL : public QGLWidget
 {
   Q_OBJECT
@@ -61,7 +62,7 @@ class HRP2DisplayGL : public QGLWidget
   Body  * m_BODYa,
     * m_BODYb,
     * m_BODYc,
-
+    
     * m_RLEGLINK0,
     * m_RLEGLINK1,
     * m_RLEGLINK2,

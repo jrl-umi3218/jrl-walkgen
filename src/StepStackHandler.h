@@ -1,15 +1,7 @@
 
-/** @doc This object handle the step stack of the pattern generator.
+/* This object handle the step stack of the pattern generator.
     It allows also to create automatically stack of steps according to 
     some high level functionnalities.
-
-    SVN Information:
-   $Id$
-   $Author$
-   $Date$
-   $Revision $
-   $Source $
-   $Log $
 
 
    Copyright (c) 2005-2006, 
@@ -43,18 +35,27 @@
 #ifndef _STEP_STACK_HANDLER_H_
 #define _STEP_STACK_HANDLER_H_
 
+#include <MatrixAbstractLayer.h>
 #include <StepOverPlanner.h>
 
 namespace PatternGeneratorJRL
 {
   
+  /*! @ingroup pgjrl
+    This class is in charge of handling the stack of footprints.
+    There is two modes currently:
+    - An off-line mode, where the complete stack is send to 
+    the ZMP reference trajectory generator object, and created off-line.
+    - An on-line mode, where one step at a time is send to 
+    the ZMP reference trajectory generator object. 
+   */
   class StepStackHandler
   {
   public:
-    /// Constructor
+    /*! Constructor */
     StepStackHandler();
 
-    /// Destructor
+    /*! Destructor */
     ~StepStackHandler();
 
     /*! Create a sequence of step to realize an arc of rayon R,
@@ -82,91 +83,91 @@ namespace PatternGeneratorJRL
     */
     void SetWalkMode(int lWalkMode);
 
-    /// Get the walking mode.
+    /*! Get the walking mode. */
     int GetWalkMode();
 
 
-    /// Set the link towards an instance of Step Over planner.
+    /*! Set the link towards an instance of Step Over planner. */
     void SetStepOverPlanner(StepOverPlanner *aSOP);
 
-    /// Take a serie of string as an input and 
-    /// read the steps according to the chosen walkmode.
+    /*! Take a serie of string as an input and 
+      read the steps according to the chosen walkmode. */
     void ReadStepSequenceAccordingToWalkMode(istringstream &strm);
 
-    /// Real a partial sequence of steps
-    /// without termination and immediate execution. 
+    /*! Real a partial sequence of steps
+      without termination and immediate execution. */ 
     void m_PartialStepSequence(istringstream &strm);
 
-    /// Set the single time support.
-    void SetSingleTimeSupport(double m_TSsupport);
+    /*! Set the single time support. */
+    void SetSingleTimeSupport(double aSingleSupportTime);
 
-    /// Get the time for single support.
+    /*! Get the time for single support. */
     double GetSingleTimeSupport();
     
-    /// Set the time for double support.
-    void SetDoubleTimeSupport(double m_TDsupport);
+    /*! Set the time for double support. */
+    void SetDoubleTimeSupport(double aDoubleSupportTime);
     
-    /// Get the time for double support.
+    /*! Get the time for double support. */
     double GetDoubleTimeSupport();
 
-    /// Prepare the stack to start for a specific support foot.
+    /*! Prepare the stack to start for a specific support foot. */
     void PrepareForSupportFoot(int SupportFoot);
     
-    /// Prepare the stack to start for a specific support foot.
-    /// (The parser interface).
+    /*! Prepare the stack to start for a specific support foot. */
+    /*! (The parser interface). */
     void m_PrepareForSupportFoot(istringstream & strm);
 
-    /// To force the last generated support foot.
+    /*! To force the last generated support foot. */
     void FinishOnTheLastCorrectSupportFoot();
 
-    /// To create a copy and perform a clean (or not)
-    /// depending on the value of the boolean b_clean.
+    /*! To create a copy and perform a clean (or not)
+      depending on the value of the boolean b_clean. */
     void CopyRelativeFootPosition(deque<RelativeFootPosition> & lRelativeFootPositions,
 				  bool PerformClean);
     
-    /// Start On Line stepping.
+    /*! Start On Line stepping. */
     void StartOnLineStep();
 
-    /// Add a standard step on the stack.
+    /*! Add a standard step on the stack. */
     void AddStandardOnLineStep(bool NewStep, 
 			       double NewStepX,
 			       double NewStepY,
 			       double Theta);
 
-    /// Returns current state for on line stepping.
+    /*! Returns current state for on line stepping. */
     bool IsOnLineSteppingOn();
  
-    /// Remove the first step in the stack.
-    /// Returns true if this is the end of the sequence.
+    /*! Remove the first step in the stack. */
+    /*! Returns true if this is the end of the sequence. */
     bool RemoveFirstStepInTheStack();
 
-    /// Add a step in the stack.
+    /*! Add a step in the stack. */
     void AddStepInTheStack(double sx, double sy,
 			   double theta, double sstime,
 			   double dstime);
     
-    /// Stop On Line stepping.
+    /*! Stop On Line stepping. */
     void StopOnLineStep();
 
-    /// Returns the first step of the stack.
+    /*! Returns the first step of the stack. */
     RelativeFootPosition ReturnBackFootPosition();
 
   protected:
 
-    /// Vector of relative foot position.
+    /*! Vector of relative foot position. */
     deque<RelativeFootPosition> m_RelativeFootPositions;
 
-    /// Keep the last correct support foot.
+    /*! Keep the last correct support foot. */
     int m_KeepLastCorrectSupportFoot;
 
-    /// Keeps the current walking mode.
+    /*! Keeps the current walking mode. */
     int m_WalkMode;
 
-    /// Link to the step over planner.
+    /*! Link to the step over planner. */
     StepOverPlanner *m_StOvPl;	
 
-    /// Default value for Single time support and double time support.
-    double m_TSsupport, m_TDsupport;
+    /*! Default value for Single time support and double time support. */
+    double m_SingleSupportTime, m_DoubleSupportTime;
 
     /*! Position and parameters related to the obstacle. */
     ObstaclePar m_ObstaclePars;

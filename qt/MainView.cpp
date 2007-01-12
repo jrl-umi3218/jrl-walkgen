@@ -5,6 +5,9 @@
 //
 //    Licensed under the terms of the Lesser General Public License.
 //
+
+#include <MatrixAbstractLayer.h>
+
 #include <iostream>
 #include <fstream>
 #include <qspinbox.h> 
@@ -30,7 +33,7 @@
 
 #include <GL/glut.h>
 #include "MainView.h"
-#include <VNL/matrix.h>
+
 
 //#include "viewpointdialog.h"
 //#include "coordinates.h"
@@ -41,6 +44,8 @@
 #include "HRP2Display.h"
 #include "MotorValuesEdit.h"
 
+
+using namespace PatternGeneratorJRL;
 
 QProgressDialog *pd;
 QLabel *label_mesh, *label_features, *label_fps;
@@ -66,7 +71,6 @@ MainView::MainView(int argc, char **argv)
 {
   //// Set OpenGL options
   glutInit(&argc,argv);
-
 
   m_Workspace = new QWorkspace(this, "Workspace");
 
@@ -96,7 +100,7 @@ MainView::MainView(int argc, char **argv)
   PGModes->insertItem("Start On Line",this, SLOT(StartOnLine()), Key_S);
   PGModes->insertItem("Stop On Line",this, SLOT(StopOnLine()), Key_T);
 
-  std::istringstream strm("../src/PreviewControlParameters.ini ../../../../../OpenHRP/etc/HRP2JRL/ HRP2JRLmain.wrl");
+  std::istringstream strm("../src/PreviewControlParameters.ini ../../../../../OpenHRP/etc/HRP2JRL/ HRP2JRLmain.wrl HRP2Specificities.xml");
   m_PGI =  new PatternGeneratorJRL::PatternGeneratorInterface(strm);
 
   // Status bar.
@@ -122,6 +126,8 @@ MainView::MainView(int argc, char **argv)
 
   // Connect to the joystick.
   m_Joystick = new Joystick();
+
+  MAL_MATRIX_RESIZE(UpperBodyAngles,28,1);
 }
 
 MainView::~MainView()
@@ -270,9 +276,10 @@ void MainView::timerEvent()
 
   if (m_PGI!=0)
     {
-      VNL::Matrix<double> qr(6,1,0.0),ql(6,1,0.0),
-	UpperBodyAngles(28,1,0.0),
-	ZMPTarget(3,1,0.0);
+      MAL_MATRIX_DIM(qr,double,6,1);
+      MAL_MATRIX_DIM(ql,double,6,1);
+
+      MAL_MATRIX_DIM(ZMPTarget,double,3,1);
       PatternGeneratorJRL::COMPosition CurrentWaistPosition;
 
       if(m_PGI->RunOneStepOfTheControlLoop(qr,ql,UpperBodyAngles,ZMPTarget,CurrentWaistPosition))
@@ -295,14 +302,14 @@ void MainView::timerEvent()
 	  
 	  double WaistPosture[16];
 	  //ComputeAPostureFromEulerAngles(CurrentWaistPosition,WaistPosture);
-	  VNL::Matrix<double> lWaistAbsPos;
+	  MAL_MATRIX(lWaistAbsPos,double);
 	  m_PGI->getWaistPositionMatrix(lWaistAbsPos);
 
 	  for(int i=0;i<4;i++)
 	    for(int j=0;j<4;j++)
 	      WaistPosture[i*4+j] = lWaistAbsPos(i,j);
 	  
-	  cout << "Position: " << WaistPosture[3] << " " << WaistPosture[7] << " " << WaistPosture[11] << endl;
+	  //cout << "Position: " << WaistPosture[3] << " " << WaistPosture[7] << " " << WaistPosture[11] << endl;
 	  emit sendMotorsAndWaistPosture(lMotors,WaistPosture);
 	}
       else
@@ -382,21 +389,22 @@ void MainView::InitialPosition(QString s )
 
       // Conversion in radians.
       double degtorad = M_PI/180.0;
-      VNL::Matrix<double> InitialPosition(40,1,0.0),CurrentPosition(40,1,0.0);
+      MAL_MATRIX_DIM(InitialPosition,double,40,1);
+      MAL_MATRIX_DIM(CurrentPosition,double,40,1);
   
       for(int i=0;i<30;i++)
 	{
 	  lMotors[i] *=degtorad;
 	  
-	  InitialPosition[i][0] = lMotors[i];
+	  InitialPosition(i,0) = lMotors[i];
 
 	  //std::cout << i << " : " << lMotors[i] << std::endl;
 	}
       m_PGI->SetCurrentJointValues(InitialPosition);
 
       // Find the associate Waist Position.
-      VNL::Vector<double> lStartingCOMPosition(3);
-      VNL::Vector<double> lStartingWaistPosition(3);
+      MAL_S3_VECTOR(lStartingCOMPosition,double);
+      MAL_S3_VECTOR(lStartingWaistPosition,double);
       PatternGeneratorJRL::FootAbsolutePosition InitLeftAbsPos,
 	InitRightAbsPos;
 
@@ -414,7 +422,9 @@ void MainView::InitialPosition(QString s )
       WaistPosture[3] = lStartingWaistPosition(0);
       WaistPosture[7] = lStartingWaistPosition(1);
       WaistPosture[11] = lStartingWaistPosition(2);
-
+      cout << "Initialization Position " << WaistPosture[3] << " " 
+	   << WaistPosture[7] << " " 
+	   << WaistPosture[11] << endl;
       emit sendMotorsAndWaistPosture(lMotors,WaistPosture);
     } 
 }

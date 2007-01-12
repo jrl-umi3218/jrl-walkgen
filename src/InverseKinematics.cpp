@@ -3,19 +3,6 @@
    The legs are supposed to have 3 links.
    Please look at the documentation for more information.
 
-   CVS Information:
-   $Id: InverseKinematics.cpp,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/InverseKinematics.cpp,v $
-   $Log: InverseKinematics.cpp,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
-   OS: Updated the names of the contributors, the documentation
-   and added a sample file for WalkPlugin
-
-
-
    Copyright (c) 2005-2006, 
    Olivier Stasse,
    Ramzi Sellouati
@@ -78,16 +65,16 @@ InverseKinematics::~InverseKinematics()
 {
 }
 
-int InverseKinematics::ComputeInverseKinematicsForLegs3(VNL::Matrix<double> Body_R,
-						       VNL::Matrix<double> Body_P,
-						       VNL::Matrix<double> Dt,
-						       VNL::Matrix<double> Foot_R,
-						       VNL::Matrix<double> Foot_P,
-						       VNL::Matrix<double> &q)
+int InverseKinematics::ComputeInverseKinematicsForLegs3(MAL_S3x3_MATRIX(,double) &Body_R,
+							MAL_S3_VECTOR( ,double) &Body_P,
+							MAL_S3_VECTOR( ,double) &Dt,
+							MAL_S3x3_MATRIX(,double) &Foot_R, 
+							MAL_S3_VECTOR(,double) &Foot_P,
+							MAL_MATRIX(, double) &q)
 {
   double A=m_FemurLength,B=m_TibiaLength,C,c5,q6a;
-  VNL::Matrix<double> r(3,1);
-  VNL::Matrix<double> rT(3,3);
+  MAL_S3_VECTOR( r,double);
+  MAL_S3x3_MATRIX( rT,double);
 #if 0
   cout << "Body_R" << Body_R<<endl;
   cout << "Body_P" << Body_P<<endl;
@@ -97,16 +84,18 @@ int InverseKinematics::ComputeInverseKinematicsForLegs3(VNL::Matrix<double> Body
   
   cout << "Dt" << Dt << endl;
 #endif
-  rT= Foot_R.Transpose();
+  rT= MAL_S3x3_RET_TRANSPOSE(Foot_R);
 #if 0
   cout << "rT" << rT<< endl;
   cout << "rT" << rT<< endl;
   cout << "Body_R * Dt - Foot_P" << Body_R * Dt - Foot_P << endl;
 #endif
-  r = rT * (Body_P +  Body_R * Dt - Foot_P);
-  C = sqrt(r(0,0)*r(0,0)+
-	   r(1,0)*r(1,0)+
-	   r(2,0)*r(2,0));
+  r = Body_P +  MAL_S3x3_RET_A_by_B(Body_R , Dt) - Foot_P;
+  r = MAL_S3x3_RET_A_by_B(rT ,r);
+	    
+  C = sqrt(r(0)*r(0)+
+	   r(1)*r(1)+
+	   r(2)*r(2));
   //C2 =sqrt(C1*C1-D*D);
   c5 = (C*C-A*A-B*B)/(2.0*A*B);
   //cout << r(0,0) << " " << r(1,0) << " "  << r(2,0) <<" ";
@@ -130,7 +119,7 @@ int InverseKinematics::ComputeInverseKinematicsForLegs3(VNL::Matrix<double> Body
 
   float c,s,cz,sz;
 
-  q(5,0) = atan2(r(1,0),r(2,0));
+  q(5,0) = atan2(r(1),r(2));
   if (q(5,0)>M_PI/2.0)
     {
       q(5,0) = q(5,0)-M_PI;
@@ -140,13 +129,14 @@ int InverseKinematics::ComputeInverseKinematicsForLegs3(VNL::Matrix<double> Body
       q(5,0)+= M_PI;
     }
 
-  q(4,0) = -atan2(r(0,0), (r(2,0)<0? -1.0:1.0)*sqrt(r(1,0)*r(1,0)+r(2,0)*r(2,0) )) - q6a;
+  q(4,0) = -atan2(r(0), (r(2)<0? -1.0:1.0)*sqrt(r(1)*r(1)+r(2)*r(2) )) - q6a;
 
-  VNL::Matrix<double> R(3,3),BRt(3,3);
+  MAL_S3x3_MATRIX( R,double);
+  MAL_S3x3_MATRIX(BRt,double);
 
-  BRt = Body_R.Transpose();
-
-  VNL::Matrix<double> Rroll(3,3);
+  BRt = MAL_S3x3_RET_TRANSPOSE(Body_R);
+		  
+  MAL_S3x3_MATRIX(Rroll,double);
   c = cos(-q(5,0));
   s = sin(-q(5,0));
 
@@ -155,7 +145,7 @@ int InverseKinematics::ComputeInverseKinematicsForLegs3(VNL::Matrix<double> Body
   Rroll(2,0) = 0.0;   Rroll(2,1) = s;   Rroll(2,2) = c; 
 
 
-  VNL::Matrix<double> Rpitch(3,3);
+  MAL_S3x3_MATRIX( Rpitch,double);
   c = cos(-q(4,0)-q(3,0));
   s = sin(-q(4,0)-q(3,0));
 
@@ -164,7 +154,11 @@ int InverseKinematics::ComputeInverseKinematicsForLegs3(VNL::Matrix<double> Body
   Rpitch(2,0) = -s;    Rpitch(2,1) = 0;   Rpitch(2,2) = c; 
 
   //  cout << " BRt"  << BRt << endl;
-  R = BRt * Foot_R * Rroll *Rpitch;
+  R = MAL_S3x3_RET_A_by_B(BRt, Foot_R );
+  MAL_S3x3_MATRIX(Rtmp,double);
+  Rtmp = MAL_S3x3_RET_A_by_B(Rroll,Rpitch);
+  R = MAL_S3x3_RET_A_by_B(R,Rtmp);
+
   q(0,0) = atan2(-R(0,1),R(1,1));
   
   cz = cos(q(0,0)); sz = sin(q(0,0));
@@ -175,17 +169,17 @@ int InverseKinematics::ComputeInverseKinematicsForLegs3(VNL::Matrix<double> Body
   return 0;
 }
 
-int InverseKinematics::ComputeInverseKinematics2ForLegs(VNL::Matrix<double> Body_R,
-							VNL::Matrix<double> Body_P,
-							VNL::Matrix<double> Dt,
-							VNL::Matrix<double> Foot_R,
-							VNL::Matrix<double> Foot_P,
-							VNL::Matrix<double> &q)
+int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double) &Body_R,
+							MAL_S3_VECTOR( ,double) &Body_P,
+							MAL_S3_VECTOR( ,double) &Dt,
+							MAL_S3x3_MATRIX( ,double) &Foot_R,
+							MAL_S3_VECTOR( ,double) &Foot_P,
+							MAL_MATRIX( ,double)&q)
 {
   double A=m_FemurLength,B=m_TibiaLength,C,c5,q6a;
-  VNL::Matrix<double> r(3,1);
-  VNL::Matrix<double> rT(3,3);
-  VNL::Matrix<double> Foot_Rt(3,3);
+  MAL_S3_VECTOR( r,double);
+  MAL_S3x3_MATRIX( rT,double);
+  MAL_S3x3_MATRIX( Foot_Rt,double);
   double NormofDt;
 
   // New part for the inverse kinematics specific to the HRP-2
@@ -193,40 +187,40 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(VNL::Matrix<double> Body
 
   // We compute the position of the body inside the reference
   // frame of the foot.
-  VNL::Matrix<double> v(3,1);
+  MAL_S3_VECTOR( v,double);
   double theta, psi, Cp;
-  float OppSignOfDtY = Dt(1,0) < 0.0 ? 1.0 : -1.0;
+  float OppSignOfDtY = Dt(1) < 0.0 ? 1.0 : -1.0;
 
-  Foot_Rt = Foot_R.Transpose();
+  Foot_Rt = MAL_S3x3_RET_TRANSPOSE(Foot_R);
   v = Body_P - Foot_P;
-  v = Foot_Rt * v;
+  v = MAL_S3x3_RET_A_by_B(Foot_Rt , v);
   //  cout << "v : "<< v <<endl;
-  r(0,0) = v(0,0);
-  NormofDt = sqrt(Dt(0,0)*Dt(0,0) + Dt(1,0)*Dt(1,0) + Dt(2,0)*Dt(2,0));
+  r(0) = v(0);
+  NormofDt = sqrt(Dt(0)*Dt(0) + Dt(1)*Dt(1) + Dt(2)*Dt(2));
   //  cout << "Norm of Dt: " << NormofDt << endl;
-  Cp = sqrt(v(1,0)*v(1,0)+v(2,0)*v(2,0) - NormofDt * NormofDt);
+  Cp = sqrt(v(1)*v(1)+v(2)*v(2) - NormofDt * NormofDt);
   psi = OppSignOfDtY * atan2(NormofDt,Cp);
 
   
   //  cout << "vz: " << v(2,0) << " vy :" << v(1,0) << endl;
 #if 0
-  if (v(1,0)<0.0)
+  if (v(1)<0.0)
     {
-      theta = atan2(v(2,0),-v(1,0));
-      r(1,0) = -cos(psi+theta)*Cp;
+      theta = atan2(v(2),-v(1));
+      r(1) = -cos(psi+theta)*Cp;
     }
   else 
     {
-      theta = atan2(v(2,0),v(1,0));
-      r(1,0) = cos(psi+theta)*Cp;
+      theta = atan2(v(2),v(1));
+      r(1) = cos(psi+theta)*Cp;
     }
 #else
-  theta = atan2(v(2,0),v(1,0));
+  theta = atan2(v(2),v(1));
   
-  r(1,0) = cos(psi+theta)*Cp;
+  r(1) = cos(psi+theta)*Cp;
 #endif
 
-  r(2,0) = sin(psi+theta)*Cp;
+  r(2) = sin(psi+theta)*Cp;
   
   //  cout << "r : " << r << endl;
 #if 0
@@ -245,9 +239,9 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(VNL::Matrix<double> Body
   cout << "Body_R * Dt - Foot_P" << Body_R * Dt - Foot_P << endl;
 #endif
   //  r = rT * (Body_P +  Body_R * Dt - Foot_P);
-  C = sqrt(r(0,0)*r(0,0)+
-	   r(1,0)*r(1,0)+
-	   r(2,0)*r(2,0));
+  C = sqrt(r(0)*r(0)+
+	   r(1)*r(1)+
+	   r(2)*r(2));
   //C2 =sqrt(C1*C1-D*D);
   c5 = (C*C-A*A-B*B)/(2.0*A*B);
   //cout << r(0,0) << " " << r(1,0) << " "  << r(2,0) <<" ";
@@ -255,38 +249,38 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(VNL::Matrix<double> Body
   //  cout << C << " " ;
   if (c5>=m_KneeAngleBoundCos)
     {
-	//double klojo;
+      //double klojo;
 
-	q(3,0)=m_KneeAngleBound;
+      q(3,0)=m_KneeAngleBound;
 
-/*	if (c5>=m_KneeAngleBoundCos2)
-		q(3,0) =m_KneeAngleBound;
-        else 
+      /*	if (c5>=m_KneeAngleBoundCos2)
+	q(3,0) =m_KneeAngleBound;
+	else 
 	{
- 
-  
-
-double a,b,c,d;
+	  
+	  
+	  
+	double a,b,c,d;
 	a =  6.59620337503859;
 	b = -13.77121203051706;
 	c = 9.82223457054312;
 	d = -2.32950990645471;
-
+	  
 	q(3,0)= a+b*c5+c*c5*c5+d*c5*c5*c5;
-
+	  
 	}
-		
+	  
 
-	
-*/    
-	}
+	  
+      */    
+    }
   else if (c5<=-1.0)
     {
       q(3,0)= M_PI;
     }
   else 
     {
-     q(3,0)= acos(c5);
+      q(3,0)= acos(c5);
     }
   q6a = asin((A/C)*sin(M_PI- q(3,0)));
   // q6b = atan2(D,C2);
@@ -294,7 +288,7 @@ double a,b,c,d;
 
   float c,s,cz,sz;
 
-  q(5,0) = atan2(r(1,0),r(2,0));
+  q(5,0) = atan2(r(1),r(2));
   if (q(5,0)>M_PI/2.0)
     {
       q(5,0) = q(5,0)-M_PI;
@@ -304,37 +298,42 @@ double a,b,c,d;
       q(5,0)+= M_PI;
     }
 
-  q(4,0) = -atan2(r(0,0), (r(2,0)<0? -1.0:1.0)*sqrt(r(1,0)*r(1,0)+r(2,0)*r(2,0) )) - q6a;
+  q(4,0) = -atan2(r(0), (r(2)<0? -1.0:1.0)*sqrt(r(1)*r(1)+r(2)*r(2) )) - q6a;
 
-  VNL::Matrix<double> R(3,3),BRt(3,3);
+  MAL_S3x3_MATRIX(R,double);
+  MAL_S3x3_MATRIX(BRt,double);
 
-  BRt = Body_R.Transpose();
-
-  VNL::Matrix<double> Rroll(3,3);
+  BRt = MAL_S3x3_RET_TRANSPOSE(Body_R);
+  
+  MAL_S3x3_MATRIX( Rroll,double);
   c = cos(-q(5,0));
   s = sin(-q(5,0));
-
+  
   Rroll(0,0) = 1.0;   Rroll(0,1) = 0.0;   Rroll(0,2) = 0.0; 
   Rroll(1,0) = 0.0;   Rroll(1,1) = c;   Rroll(1,2) = -s; 
   Rroll(2,0) = 0.0;   Rroll(2,1) = s;   Rroll(2,2) = c; 
-
-
-  VNL::Matrix<double> Rpitch(3,3);
+  
+  
+  MAL_S3x3_MATRIX( Rpitch,double);
   c = cos(-q(4,0)-q(3,0));
   s = sin(-q(4,0)-q(3,0));
-
+  
   Rpitch(0,0) = c;     Rpitch(0,1) = 0;   Rpitch(0,2) = s; 
   Rpitch(1,0) = 0.0;   Rpitch(1,1) = 1;   Rpitch(1,2) = 0; 
   Rpitch(2,0) = -s;    Rpitch(2,1) = 0;   Rpitch(2,2) = c; 
-
+  
   //  cout << " BRt"  << BRt << endl;
-  R = BRt * Foot_R * Rroll *Rpitch;
+  R = MAL_S3x3_RET_A_by_B(BRt, Foot_R );
+  MAL_S3x3_MATRIX(Rtmp,double);
+  Rtmp = MAL_S3x3_RET_A_by_B(Rroll,Rpitch);
+  R = MAL_S3x3_RET_A_by_B(R,Rtmp);
+
   q(0,0) = atan2(-R(0,1),R(1,1));
   
   cz = cos(q(0,0)); sz = sin(q(0,0));
   q(1,0) = atan2(R(2,1), -R(0,1)*sz + R(1,1) *cz);
   q(2,0) = atan2( -R(2,0), R(2,2));
-
+  
   //  exit(0);
   return 0;
 }
@@ -356,7 +355,7 @@ int InverseKinematics::ComputeInverseKinematicsForArms(double X,double Z,
 {
   double A=0.25,
     B=0.25;
-
+  
   double C=0.0,Gamma=0.0,Theta=0.0;
   C = sqrt(X*X+Z*Z);
   

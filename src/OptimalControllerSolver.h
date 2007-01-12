@@ -1,14 +1,6 @@
 /** @doc Object to compute the weights of the preview control
     @ingroup previewcontrol
     @endgroup
-   $Id:$
-   $Author: stasse $
-   $Date:$
-   $Revision:$
-   $Source:  $
-   $Log: $
-   Revision 1.2  2006-01-18 06:34:58  stasse
-
 
 
    Copyright (c) 2005-2006, 
@@ -41,7 +33,7 @@
 #ifndef _OPTIMAL_CONTROLLER_SOLVER_H_
 #define _OPTIMAL_CONTROLLER_SOLVER_H_
 
-#include <VNL/matrix.h>
+#include <MatrixAbstractLayer.h>
 
 namespace PatternGeneratorJRL
 {
@@ -85,9 +77,9 @@ namespace PatternGeneratorJRL
   {
   public:
     /*! A constructor */
-    OptimalControllerSolver(VNL::Matrix<double> &A, 
-			    VNL::Matrix<double> &b, 
-			    VNL::Matrix<double> &c,
+    OptimalControllerSolver(MAL_MATRIX(&A,double), 
+			    MAL_MATRIX(&b,double), 
+			    MAL_MATRIX(&c,double),
 			    double Q, double R, 
 			    unsigned int Nl);
 
@@ -100,13 +92,13 @@ namespace PatternGeneratorJRL
     /*! Display the weights */
     void DisplayWeights();
 
-    bool GeneralizedSchur(VNL::Matrix<double> *A,
-			  VNL::Matrix<double> *B,
-			  VNL::Vector<double> *alphar,
-			  VNL::Vector<double> *alphai,
-			  VNL::Vector<double> *beta,
-			  VNL::Matrix<double> *L,
-			  VNL::Matrix<double> *R);
+    bool GeneralizedSchur(MAL_MATRIX(&A,double),
+			  MAL_MATRIX(&B,double),
+			  MAL_VECTOR(&alphar,double),
+			  MAL_VECTOR(&alphai,double),
+			  MAL_VECTOR(&beta,double),
+			  MAL_MATRIX(&L,double),
+			  MAL_MATRIX(&R,double));
   protected:
     
     /*! The matrices needed for the dynamical system such as
@@ -117,7 +109,9 @@ namespace PatternGeneratorJRL
       \f}
       
      */
-    VNL::Matrix<double> m_A, m_b, m_c;
+    MAL_MATRIX(m_A,double);
+    MAL_MATRIX(m_b,double);
+    MAL_MATRIX(m_c,double);
 
     /*! The coefficent of the index criteria:
      \f[
@@ -128,8 +122,9 @@ namespace PatternGeneratorJRL
 
     
     /*! The weights themselves */
-    VNL::Matrix<double> m_K,m_F;
-
+    MAL_MATRIX(m_K,double); 
+    MAL_MATRIX(m_F,double);
+			  
     /*! The size of the window for the preview */
     int m_Nl;
   };

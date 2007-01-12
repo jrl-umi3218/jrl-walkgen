@@ -1,16 +1,11 @@
-/* @doc Fundamental object used to compute :
+/* Fundamental object used to compute :
+   
    - Center Of Mass,
    - Zero Momentum Point.
-
-   $Id: Body.h,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/Body.h,v $
-   $Log: Body.h,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
    OS: Updated the names of the contributors, the documentation
    and added a sample file for WalkPlugin
+   OS (21/12/2006): removed any reference to non-homogeneous matrix
+   library.
 
 
    Copyright (c) 2005-2006, 
@@ -47,111 +42,123 @@
 #ifndef _BODY_H_
 #define _BODY_H_
 
-#include<iostream>
+#include <iostream>
 #include <string>
+//#include "linalg.h"
+#include <MatrixAbstractLayer.h>
 
-#include "linalg.h"
+using namespace::std;
 
 namespace PatternGeneratorJRL
 {
 
-/** This object is used to compute the Center Of Masse,
-    and store some basic information of each body of the robot. */    
-class Body
-{
- protected:
-
-  /// Physical parameters of the body.
-   //@{
-   /// Label
-  int label;
-  /// Mass
-  double masse;
-  /// Position of the Center of Mass.
-  vector3d posCoM;
-  /// Inertia Matrix.
-  matrix3d inertie;
-  //@}
+  /** @ingroup forwardynamics
+      This object is used to compute the Center Of Masse,
+      and store some basic information of each body of the robot. 
+  */    
+  class Body
+  {
+  protected:
+    
+    /*! Physical parameters of the body. */
+    //@{
+    /*! Label */
+    int label;
+    /*! Mass */
+    double masse;
+    /*! Position of the Center of Mass. */
+    MAL_S3_VECTOR(posCoM,double);
+    /*! Inertia Matrix. */
+    MAL_S3x3_MATRIX(inertie,double);
+    //@}
   
-  /// Number of objects.
-  int nombreObjets;
-  /// Name of the body
-  std::string Name;
-
-  /// Label of the mother of the body in a tree structure.
-  int labelMother;
+    /*! Number of objects. */
+    int nombreObjets;
+    /*! Name of the body */
+    std::string Name;
+    
+    /*! Label of the mother of the body in a tree structure. */
+    int labelMother;
   
-  // Says if the body has been explored.
-  int m_Explored;
+    /*! Says if the body has been explored. */
+    int m_Explored;
+    
+  public:
+    
+    /*! Basic constructor. */
+    Body(void);
+    
+    /*! Constructor while parsing. */
+    Body(double masse);
 
-public:
+    /*! Constructor while parsing. */
+    Body(double masse, 
+	 MAL_S3_VECTOR(positionCoM,double));
+
+    Body(double masse, 
+	 MAL_S3_VECTOR(positionCoM,double), 
+	 MAL_S3x3_MATRIX(matriceInertie,double));
+     
+    /*! Destructor. */
+    ~Body(void);
+    
+    /* Assignment operator. */
+    Body & operator=( Body const & r);
+    
+    /*! Get the label of the body. */
+    int getLabel(void) const;
+    
+    /*! Set the label of the body. */
+    void setLabel(int i);
+    
+    /*! Get the mass of the body. */
+    double getMasse(void) const;
+    
+    /*! Set the mass of the body. */
+    void setMasse(double);
+    
+    /*! Get the inertia matrix of the body. */
+    MAL_S3x3_MATRIX(,double) getInertie(void) const;
+    
+    /*! Set the inertia matrix of the body. */
+    void setInertie(double mi[9]);
+    
+    /*! Get the position of the center of Mass. */
+    MAL_S3_VECTOR(,double) getPositionCoM(void) const;
+    
+    /*! Set the position of the center of Mass. */
+    void setPositionCoM(double cm[3]);
+    
+    /*! Returns the label of the mother. */
+    int getLabelMother() const;
+    
+    /*!  Set the label of the mother. */
+    void setLabelMother(int);
+    
+    /*!  Get the number of geometric objects. */
+    int getNbObjets() const;
+    
+    /*!  Set the number of geometric objects. */
+    void setNombreObjets(int n);
+    
+    /*!  Display the number of geometric objects (stdout). */
+    void afficherNombreObjets(void);
+    
+    /*!  Returns if the object has been explored or not. */
+    int getExplored() const;
+
+    /*!  Set the object as explored. */
+    void setExplored(int anEx);
   
-  /// Basic constructor.
-  Body(void);
+    /*!  Returns the name of the object. */
+    std::string getName() const;
 
-  /// Constructor while parsing.
-  Body(double masse, vector3d positionCoM = 0, matrix3d matriceInertie = matrix3d::identity);
+    /*!  Specify the name of the object. */
+    void setName(char *);
 
-  /// Destructor.
-  ~Body(void);
-  
-  /// Assignment operator.
-  Body & operator=( Body const & r);
-
-  /// Get the label of the body.
-  int getLabel(void) const;
-
-  /// Set the label of the body.
-  void setLabel(int i);
-
-  /// Get the mass of the body.
-  double getMasse(void) const;
-  
-  /// Set the mass of the body.
-  void setMasse(double);
-
-  /// Get the inertia matrix of the body.
-  matrix3d getInertie(void) const;
-
-  /// Set the inertia matrix of the body.
-  void setInertie(double mi[9]);
-  
-  /// Get the position of the center of Mass.
-  vector3d getPositionCoM(void) const;
-
-  /// Set the position of the center of Mass.
-  void setPositionCoM(double cm[3]);
-
-  /// Returns the label of the mother.
-  int getLabelMother() const;
-
-  /// Set the label of the mother.
-  void setLabelMother(int);
-  
-  /// Get the number of geometric objects.
-  int getNbObjets() const;
-
-  /// Set the number of geometric objects.
-  void setNombreObjets(int n);
-
-  /// Display the number of geometric objects (stdout).
-  void afficherNombreObjets(void);
-
-  /// Returns if the object has been explored or not.
-  int getExplored() const;
-
-  /// Set the object as explored.
-  void setExplored(int anEx);
-  
-  /// Returns the name of the object.
-  std::string getName() const;
-
-  /// Specify the name of the object.
-  void setName(char *);
-
-  /// Display on stdout all the information of the body.
-  void Display();
-};
+    /*!  Display on stdout all the information of the body. */
+    void Display();
+  };
 
 };
 #endif /* Body_H_*/

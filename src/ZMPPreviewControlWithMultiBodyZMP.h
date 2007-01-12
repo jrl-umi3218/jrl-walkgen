@@ -1,16 +1,5 @@
-/** @doc This object generate all the values for the foot trajectories,
+/* This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of steps.
-
-   $Id: ZMPPreviewControlWithMultiBodyZMP.h,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/ZMPPreviewControlWithMultiBodyZMP.h,v $
-   $Log: ZMPPreviewControlWithMultiBodyZMP.h,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
-   OS: Updated the names of the contributors, the documentation
-   and added a sample file for WalkPlugin
-
 
    Copyright (c) 2005-2006, 
    @author Olivier Stasse, Ramzi Sellouati
@@ -43,18 +32,21 @@
 #define _ZMPREVIEWCONTROLWITHMULTIBODYZMP_H_
 
 #include <deque>
-#include <VNL/matrix.h>
+
+#include <MatrixAbstractLayer.h>
+
 #include <PreviewControl.h>
 #include <InverseKinematics.h>
 #include <DynamicMultiBody.h>
-#include <ZMPDiscretization.h>
+#include <PGTypes.h>
 #include <HumanoidSpecificities.h>
 
 using namespace::std;
 
 namespace PatternGeneratorJRL
 {
-  /** Object to generate the angle positions
+  /** @ingroup pgjrl
+      Object to generate the angle positions
       every 5 ms from a set of absolute foot positions.
       This algorithm use the preview control proposed by Kajita-San
       in ICRA 2003 Biped Walking Pattern Generation by using Preview
@@ -70,123 +62,145 @@ namespace PatternGeneratorJRL
     {
     protected:
 
-      /// Vector from the Waist to the left and right hip.
-      VNL::Matrix<double> m_StaticToTheLeftHip, m_StaticToTheRightHip,
-	m_TranslationToTheLeftHip, m_TranslationToTheRightHip;
+      /*! Vector from the Waist to the left and right hip. */
+      //@{
+      /*! Static part from the waist to the left hip.. */
+      MAL_S3_VECTOR(m_StaticToTheLeftHip,double);
+      /*! Static part from the waist to the right hip. */
+      MAL_S3_VECTOR(m_StaticToTheRightHip,double);
+      /*! Dynamic part from the waist to the left hip. */
+      MAL_S3_VECTOR(m_TranslationToTheLeftHip,double);
+      /*! Dynamic part form the waist to the right hip. */
+      MAL_S3_VECTOR( m_TranslationToTheRightHip,double);
 
-      /// Displacement between the hip and the foot.
-      VNL::Matrix<double> m_Dt;
+      /*! Displacement between the hip and the foot. */
+      MAL_S3_VECTOR(m_Dt,double);
 
       
-	/// Pointer to the Preview Control object.
+      /*! Pointer to the Preview Control object. */
       PreviewControl *m_PC;
-      /// Pointer to the Dynamic Multi body model.
+      /*! Pointer to the Dynamic Multi body model. */
       DynamicMultiBody *m_DMB;
 
-      /// Pointer to the Inverse Kinematics model.
+      /*! Pointer to the Inverse Kinematics model. */
       InverseKinematics *m_IK;
 
-      /// Previous joint values.
-      VNL::Matrix<double> m_prev_ql,m_prev_qr;
-      VNL::Matrix<double> m_prev_UpperBodyAngles;
+      /*! Previous joint values. */
+      //@{ 
+      /*! For the left leg. */
+      MAL_MATRIX(m_prev_ql,double);
+      /*! For the right leg. */
+      MAL_MATRIX(m_prev_qr,double);
+      /*! For the upper body. */
+      MAL_MATRIX(m_prev_UpperBodyAngles,double);
+      //@}
 
 
-      /// Sampling Period.
+      /*! Sampling Period. */
       double m_SamplingPeriod;
       
-      /// Previous Linear momentum.
-      vector3d m_prev_P;
+      /*! Previous Linear momentum. */
+      MAL_S3_VECTOR( m_prev_P,double);
       
-      /// Previous Angular momentum.
-      vector3d m_prev_L;
+      /*! Previous Angular momentum. */
+      MAL_S3_VECTOR(m_prev_L,double) ;
 
-      /// Preview control time.
+      /*! Preview control time. */
       double m_PreviewControlTime;
       
-      /// Size of the preview control window.
+      /*! Size of the preview control window. */
       unsigned int m_NL;
 
-      /// Final state of the leg joints.
-      VNL::Matrix<double> Finalql, Finalqr;
+      /*! Final state of the leg joints. */
+      //@{
+      /*! The left leg */
+      MAL_MATRIX( Finalql,double);
+      /*! The right leg */
+      MAL_MATRIX( Finalqr,double);
+      //@}
       
-      /// Fifo for the ZMP ref.
+      /*! Fifo for the ZMP ref. */
       deque<ZMPPosition> m_FIFOZMPRefPositions;
       
-      /// Fifo for the ZMP ref.
+      /*! Fifo for the ZMP ref. */
       deque<ZMPPosition> m_FIFODeltaZMPPositions;
 
-      /// Fifo for the COM reference.
+      /*! Fifo for the COM reference. */
       deque<COMPosition> m_FIFOCOMPositions;
       
-      /// Fifo for the positionning of the left foot.
+      /*! Fifo for the positionning of the left foot. */
       deque<FootAbsolutePosition> m_FIFOLeftFootPosition;
       
-      /// Fifo for the positionning of the right foot.
+      /*! Fifo for the positionning of the right foot. */
       deque<FootAbsolutePosition> m_FIFORightFootPosition;
 
-      /// Error on preview control for the cart model.
+      /*! Error on preview control for the cart model. */
       double m_sxzmp, m_syzmp;
       
-      /// Error on preview control for the delta zmp.
+      /*! Error on preview control for the delta zmp. */
       double m_sxDeltazmp, m_syDeltazmp;
 
-      /// State of the Preview control.
-      VNL::Matrix<double> m_PC1x,m_PC1y;
+      /*! State of the Preview control. */
+      MAL_MATRIX( m_PC1x,double);
+      MAL_MATRIX(m_PC1y,double);
 
-      /// State of the Second Preview control.
-      VNL::Matrix<double> m_Deltax, m_Deltay;
+      /*! State of the Second Preview control. */
+      MAL_MATRIX( m_Deltax, double);
+      MAL_MATRIX(m_Deltay,double);
 
-      /// Starting a new step sequences.
+      /*! Starting a new step sequences. */
       bool m_StartingNewSequence;
 
-      /// Keep the ZMP reference.
+      /*! Keep the ZMP reference. */
       deque<ZMPPosition> m_FIFOTmpZMPPosition;
 	
-      ///extra COMPosition buffer calculated to give to the stepover planner 
+      /*!extra COMPosition buffer calculated to give to the stepover planner  */
       vector<COMPosition> m_ExtraCOMBuffer;
 
-      /// Difference between the CoM and the Waist from the initialization phase,
-      /// i.e. not reevaluated while walking.
-      VNL::Vector<double> m_DiffBetweenComAndWaist;
+      /*! Difference between the CoM and the Waist 
+      from the initialization phase,
+      i.e. not reevaluated while walking. */
+      MAL_S3_VECTOR(m_DiffBetweenComAndWaist,double);
 
-      /// COM Starting position.
-      vector3d m_StartingCOMPosition;
+      /*! COM Starting position. */
+      MAL_S3_VECTOR(m_StartingCOMPosition,double);
 
-      /// Final COM pose.
-      VNL::Matrix<double> m_FinalDesiredCOMPose;
+      /*! Final COM pose. */
+      MAL_MATRIX(m_FinalDesiredCOMPose,double);
       
-      /// Store the index for the algorithm to use for ZMP and CoM trajectory.
+      /*! Store the index for the algorithm to use for ZMP and CoM trajectory. */
       int m_ZMPCoMTrajectoryAlgorithm;
-
-      /// Store the distance between the ankle and the soil.
-	double m_AnkleSoilDistance;
-       
-      /// Store a reference to the object handling humanoid specific data.
+      
+      /*! Store the distance between the ankle and the soil. */
+      double m_AnkleSoilDistance;
+	
+      /*! Store a reference to the object handling humanoid specific data. */
       HumanoidSpecificities *m_HS;
+
     public:
 	
-	static const int ZMPCOM_TRAJECTORY_KAJITA=1;
-	static const int ZMPCOM_TRAJECTORY_WIEBER=2;
-
-      /// Constructor.
+      static const int ZMPCOM_TRAJECTORY_KAJITA=1;
+      static const int ZMPCOM_TRAJECTORY_WIEBER=2;
+      
+      /*! Constructor. */
       ZMPPreviewControlWithMultiBodyZMP(HumanoidSpecificities *aHS);
 
-      /// Destructor
+      /*! Destroctor. */
       ~ZMPPreviewControlWithMultiBodyZMP();
 
-      /// Set the link to the preview control.
+      /*! Set the link to the preview control. */
       void SetPreviewControl(PreviewControl *aPC);
       
-      /// Set the link with the Dynamic Multi Body model.
+      /*! Set the link with the Dynamic Multi Body model. */
       void SetDynamicMultiBodyModel(DynamicMultiBody *aDMB);
 
-      /// Set the link with the inverse kinematics model.
+      /*! Set the link with the inverse kinematics model. */
       void SetInverseKinematics(InverseKinematics *anIK);      
       
-      /// Returns the difference between the Waist and the CoM for a starting position.
+      /*! Returns the difference between the Waist and the CoM for a starting position. */
       void GetDifferenceBetweenComAndWaist(double lComAndWaist[3]);
 
-      /** Perform a 5 ms step to generate the full set of angular positions.
+      /*! Perform a 5 ms step to generate the full set of angular positions.
 	  The main point of the preview control is to use the future to compute
 	  the current state needed for the robot. Therefore knowing that
 	  the future window needed is of size NL=SamplingPeriod * PreviewControlWindow,
@@ -206,142 +220,223 @@ namespace PatternGeneratorJRL
       int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 				 FootAbsolutePosition &RightFootPosition,
 				 ZMPPosition &NewZMPRefPos,
-				 VNL::Matrix<double> & lqr, 
-				 VNL::Matrix<double> & lql, 
+				 MAL_MATRIX( & lqr,double), 
+				 MAL_MATRIX(& lql,double), 
 				 COMPosition & refCOMPosition, 
 				 COMPosition & finalCOMPosition,
-				 VNL::Matrix<double> &UpperBodyAngles);
+				 MAL_MATRIX(&UpperBodyAngles,double));
 
-      // For bakward compatibility this method complies with the previous
-      // approach by merging the reference and final value.
-      // Compare to the previous method the intermediate value of the COMPosition 
-      // after the first stage is not provided.
+      /*! For bakward compatibility this method complies with the previous
+	approach by merging the reference and final value.
+	Compare to the previous method the intermediate value of the COMPosition 
+	after the first stage is not provided. 
+	@param LeftFootPosition: The position of the k+NL Left Foot position.
+	@param RightFootPosition: The position of the k+NL Right Foot position.
+	@param NewZMPRefPos: The ZMP position at k + 2*NL.
+	@return qr,ql: 1x6 vector for the right and left legs angular values at k.
+	@param refandfinalCOMPosition: reference values at k for the COM, 
+	right now only the height is taken into account. The output of the first 
+	stage of control is returned inside this structure. Returns position, 
+	velocity and acceleration of the CoM after the second stage of control, 
+	i.e. the final value.	
+      */
       int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 				 FootAbsolutePosition &RightFootPosition,
 				 ZMPPosition &NewZMPRefPos,
-				 VNL::Matrix<double> & lqr, 
-				 VNL::Matrix<double> & lql, 
+				 MAL_MATRIX(& lqr,double), 
+				 MAL_MATRIX(& lql,double), 
 				 COMPosition & refandfinalCOMPosition,
-				 VNL::Matrix<double> &UpperBodyAngles);
+				 MAL_MATRIX( &UpperBodyAngles,double));
 	
-      // First stage of the control, 
-      // i.e.preview control on the CART model with delayed step parameters,
-      // Inverse Kinematics,
-      // and ZMP calculated with the multi body model.
-      // aCOMPosition will be updated with the new value of the COM computed by
-      // the card model.
+      /*! First stage of the control, 
+	i.e.preview control on the CART model with delayed step parameters,
+	Inverse Kinematics, and ZMP calculated with the multi body model.
+	aCOMPosition will be updated with the new value of the COM computed by
+	the card model.
+	@param LeftFootPosition: The position of the k+NL Left Foot position.
+	@param RightFootPosition: The position of the k+NL Right Foot position.
+	@param refCOMPosition: A COM position of reference, in this context,
+	this will be the height of the waist.
+	@return ql,qr: The joint values for the left and right legs (1x6 vector for each).
+	@return BodyAttitude: A 4x4 matrix which gives the position and the orientation
+	of the waist.
+      */
       int FirstStageOfControl(FootAbsolutePosition &LeftFootPosition,
 			      FootAbsolutePosition &RightFootPosition,
 			      COMPosition & refCOMPosition,
-			      VNL::Matrix<double> &ql,
-			      VNL::Matrix<double> &qr,
-			      VNL::Matrix<double> &BodyAttitude);
+			      MAL_MATRIX( &ql,double),
+			      MAL_MATRIX( &qr,double),
+			      MAL_S3x3_MATRIX( &BodyAttitude,double));
 
-      // This methods is used only to update the queue of ZMP difference
-      // for the second stage of control. Also it does not return
-      // anything this method is crucial for the overall process.
-      int EvaluateMultiBodyZMP(VNL::Matrix<double> &ql,
-				VNL::Matrix<double> &qr,
-				VNL::Matrix<double> &UpperBodyAngles,
-				VNL::Matrix<double> &BodyAttitude,
+      /*! This methods is used only to update the queue of ZMP difference
+	for the second stage of control. Also it does not return
+	anything this method is crucial for the overall process.
+	@param ql, qr: The joint values for the left and right legs.
+	@param UpperBodyAngles: The joint values for the upper body.
+	@param BodyAttitude: A 4x4 matrix which gives the position and the 
+	orientation of the waist.
+	@param StartingIteration: -1 for the initialization, >=0 for 
+	a counter which gives the time.
+      */
+      int EvaluateMultiBodyZMP(MAL_MATRIX( &ql,double),
+				MAL_MATRIX( &qr,double),
+				MAL_MATRIX( &UpperBodyAngles,double),
+				MAL_S3x3_MATRIX( &BodyAttitude,double),
 				int StartingIteration);
 
-      // Second stage of the control,
-      // i.e. preview control on the Delta ZMP.
-      // COM correction,
-      // and computation of the final robot state
-      // (only the left and right legs).
-      int SecondStageOfControl(VNL::Matrix<double> & lqr, VNL::Matrix<double> & lql, 
+      /*! Second stage of the control, i.e. preview control on the Delta ZMP.
+	COM correction, and computation of the final robot state
+	(only the left and right legs).
+	@return lqr, lql : The final value for the left and right leg joint values.
+	@return aCOMPosition: The final position of the CoM.
+      */
+      int SecondStageOfControl(MAL_MATRIX( & lqr,double), 
+			       MAL_MATRIX( & lql,double), 
 			       COMPosition & aCOMPosition);
 
-      // Compute the COM of the robot with the Joint values given in BodyAngles,
-      // velocities set to zero, and returns the values of the COM in aStaringCOMPosition.
-      // Assuming that the waist is at (0,0,0)
-      // it returns the associate initial values for the left and right foot.
-      int EvaluateStartingCoM(VNL::Matrix<double> &BodyAngles,
-			      VNL::Vector<double> &aStartingCOMPosition,
+      /*! Compute the COM of the robot with the Joint values given in BodyAngles,
+	velocities set to zero, and returns the values of the COM in aStaringCOMPosition.
+	Assuming that the waist is at (0,0,0)
+	it returns the associate initial values for the left and right foot.
+	@param BodyAngles: 4x4 matrix of the robot's root (most of the time, the waist)
+	pose (position + orientation).
+	@return aStartingCOMPosition: Returns the 3D position of the CoM for the current
+	position of the robot.
+	@return InitLeftFootPosition: Returns the position of the left foot in
+	the waist coordinates frame.
+	@return InitRightFootPosition: Returns the position of the right foot
+	in the waist coordinates frame.
+      */
+      int EvaluateStartingCoM(MAL_MATRIX( &BodyAngles,double),
+			      MAL_S3_VECTOR( &aStartingCOMPosition,double),
 			      FootAbsolutePosition & InitLeftFootPosition,
 			      FootAbsolutePosition & InitRightFootPosition);
 
-      // Compute the COM of the robot with the Joint values given in BodyAngles,
-      // velocities set to zero, and returns the values of the COM in aStaringCOMPosition.
-      // Assuming that the waist is at (0,0,0)
-      // it returns the associate initial values for the left and right foot.
-      int EvaluateStartingCoM(VNL::Matrix<double> &BodyAngles,
-			      VNL::Vector<double> &aStartingCOMPosition,
-			      VNL::Vector<double> &aWaistPosition,
+      /*! Compute the COM of the robot with the Joint values given in BodyAngles,
+	velocities set to zero, and returns the values of the COM in aStaringCOMPosition.
+	Assuming that the waist is at (0,0,0)
+	it returns the associate initial values for the left and right foot.
+	@param BodyAngles: Vector of the joint values for the robot.
+	@return aStartingCOMPosition: Position of the CoM.
+	@return aWaistPosition: Position of the Waist.
+	@return InitLeftFootPosition: Position of the left foot in the waist coordinates frame.
+	@return InitRightFootPosition: Position of the right foot in the waist coordinates
+	frame.
+      */
+      int EvaluateStartingCoM(MAL_MATRIX( &BodyAngles,double),
+			      MAL_S3_VECTOR( &aStartingCOMPosition,double),
+			      MAL_S3_VECTOR( &aWaistPosition,double),
 			      FootAbsolutePosition & InitLeftFootPosition,
 			      FootAbsolutePosition & InitRightFootPosition);
 
-      // Setup, compute all the steps to get NL ZMP multibody values.
+      /*! Setup, compute all the steps to get NL ZMP multibody values.
+	@param ZMPRefPositions: FIFO of the ZMP reference values.
+	@param COMPositions: FIFO of the COM reference positions 
+	   (here only the height position is taken into account).
+	@param LeftFootPositions: FIFO of the left foot positions computed by
+	ZMPDiscretization (the object creating the ZMP and foot reference 
+	trajectories).
+	@param RightFootPositions: idem than the previous one but for the 
+	right foot.
+	@param BodyAngles: Value of the upper body joints.
+       */
       int Setup(deque<ZMPPosition> &ZMPRefPositions,
 		deque<COMPosition> &COMPositions,
 		deque<FootAbsolutePosition> &LeftFootPositions,
 		deque<FootAbsolutePosition> &RightFootPositions,
-		VNL::Matrix<double> &BodyAngles);
+		MAL_MATRIX( &BodyAngles,double));
 
-      // Setup, : First steps: Initialize properly the internal fields
-      // of ZMPPreviewControlWithMultiBodyZMP for the setup phase.
+      /*! Setup, : First steps: Initialize properly the internal fields
+	of ZMPPreviewControlWithMultiBodyZMP for the setup phase.
+       	@param ZMPRefPositions: FIFO of the ZMP reference values.
+	@param COMPositions: FIFO of the COM reference positions 
+	   (here only the height position is taken into account).
+	@param LeftFootPositions: FIFO of the left foot positions computed by
+	ZMPDiscretization (the object creating the ZMP and foot reference 
+	trajectories).
+	@param RightFootPositions: idem than the previous one but for the 
+	right foot.
+	@param BodyAngles: Value of the upper body joints.
+      */
       int SetupFirstPhase(deque<ZMPPosition> &ZMPRefPositions,
 			  deque<COMPosition> &COMPositions,
 			  deque<FootAbsolutePosition> &LeftFootPositions,
 			  deque<FootAbsolutePosition> &RightFootPositions,
-			  VNL::Matrix<double> &BodyAngles);
+			  MAL_MATRIX( &BodyAngles,double));
 
 
-      // Setup, : Iterative step: Update the first values of the Preview control
-      // This structure is needed if it is needed to modify BodyAngles according
-      // to the value of the COM.
+      /*! Setup, : Iterative step: Update the first values of the Preview control
+	This structure is needed if it is needed to modify BodyAngles according
+	to the value of the COM.
+	@param ZMPRefPositions: FIFO of the ZMP reference values.
+	@param COMPositions: FIFO of the COM reference positions 
+	   (here only the height position is taken into account).
+	@param LeftFootPositions: FIFO of the left foot positions computed by
+	ZMPDiscretization (the object creating the ZMP and foot reference 
+	trajectories).
+	@param RightFootPositions: idem than the previous one but for the 
+	right foot.
+	@param BodyAngles: Value of the upper body joints.
+	@param localindex: Value of the index which goes from 0 to 2 * m_NL.
+      */
       int SetupIterativePhase(deque<ZMPPosition> &ZMPRefPositions,
 			      deque<COMPosition> &COMPositions,
 			      deque<FootAbsolutePosition> &LeftFootPositions,
 			      deque<FootAbsolutePosition> &RightFootPositions,
-			      VNL::Matrix<double> &BodyAngles, int localindex);
+			      MAL_MATRIX( &BodyAngles,double), int localindex);
       
       
-      //create an extra COM buffer with first preview round to be used by the stepover planner
-      void CreateExtraCOMBuffer(deque<COMPosition> &m_ExtraCOMBuffer,
-				deque<ZMPPosition> &m_ExtraZMPBuffer,
-				deque<ZMPPosition> &m_ExtraZMPRefBuffer);
+      /*! Create an extra COM buffer with first preview round to be 
+	used by the stepover planner.
+	@param ExtraCOMBuffer: Extra FIFO for the CoM positions.
+	@param ExtraZMPBuffer: Extra FIFO for the ZMP positions (for the stepping over
+	first preview control).
+	@param ExtraZMPRefBuffer: Extra FIFO for the ZMP ref positions.
+      */
+      void CreateExtraCOMBuffer(deque<COMPosition> &ExtraCOMBuffer,
+				deque<ZMPPosition> &ExtraZMPBuffer,
+				deque<ZMPPosition> &ExtraZMPRefBuffer);
       
 
-      // Evaluate CoM for a given position.
-      // Assuming that the waist is at (0,0,0)
-      // It returns the associate initial values for the left and right foot.
-      int EvaluateCOM(VNL::Matrix<double> BodyAngles,
+      /*! Evaluate CoM for a given position.
+	Assuming that the waist is at (0,0,0)
+	It returns the associate initial values for the left and right foot.
+      */
+      int EvaluateCOM(MAL_MATRIX( &BodyAngles,double),
 		      double omega, double theta,
-		      vector3d &lCOMPosition,
+		      MAL_S3_VECTOR( &lCOMPosition,double),
+		      FootAbsolutePosition & LeftFootPosition,
+		      FootAbsolutePosition & RightFootPosition);
+      
+      /*! Evaluate CoM for a given position.
+	Assuming that the waist is at (0,0,0)
+	It returns the associate initial values for the left and right foot.*/
+      int EvaluateCOM(MAL_MATRIX( &BodyAngles,double),
+		      double omega, double theta,
+		      MAL_S3_VECTOR( &lCOMPosition,double),
+		      MAL_S3_VECTOR( &WaistPosition,double),
 		      FootAbsolutePosition & LeftFootPosition,
 		      FootAbsolutePosition & RightFootPosition);
 
-      // Evaluate CoM for a given position.
-      // Assuming that the waist is at (0,0,0)
-      // It returns the associate initial values for the left and right foot.
-      int EvaluateCOM(VNL::Matrix<double> BodyAngles,
-		      double omega, double theta,
-		      vector3d &lCOMPosition,
-		      vector3d &WaistPosition,
-		      FootAbsolutePosition & LeftFootPosition,
-		      FootAbsolutePosition & RightFootPosition);
+      /*! This method returns the final COM pose matrix after the second stage of control. */
+      MAL_MATRIX(,double) GetFinalDesiredCOMPose();
 
-      /// This method returns the final COM pose matrix after the second stage of control.
-      VNL::Matrix<double> GetFinalDesiredCOMPose();
+      /*! This method returns the current waist position in the COM reference 
+	frame. This can be used with the previous method to get the final Waist 
+	position.
+      */
+      MAL_VECTOR(GetCurrentPositionofWaistInCOMFrame(),double);
 
-      /// This method returns the current waist position in the COM reference 
-      /// frame. This can be used with the previous method to get the final Waist 
-      /// position.
-      VNL::Vector<double> GetCurrentPositionofWaistInCOMFrame();
-
-      /// Returns the last element of the COM FIFO in the first stage of control
+      /*! Returns the last element of the COM FIFO in the first stage of control */
       COMPosition GetLastCOMFromFirstStage();
 
-      /// Update the queue of ZMP reference value.
+      /*! Update the queue of ZMP reference value. */
       void UpdateTheZMPRefQueue(ZMPPosition NewZMPRefPos);
 
-      /// Set the algorithm used for ZMP and CoM trajectory.
+      /*! Set the algorithm used for ZMP and CoM trajectory. */
       void SetAlgorithmForZMPAndCoMTrajectoryGeneration(int anAlgo);
-
-      /// Get the algorithm used for ZMP and CoM trajectory.
+ 
+      /*! Get the algorithm used for ZMP and CoM trajectory. */
       int GetAlgorithmForZMPAndCoMTrajectoryGeneration();
     };
 };

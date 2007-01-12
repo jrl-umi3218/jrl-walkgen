@@ -1,17 +1,4 @@
-/** @doc Object to perform preview control on a cart model.
-    
-   CVS Information:
-   $Id: PreviewControl.cpp,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/PreviewControl.cpp,v $
-   $Log: PreviewControl.cpp,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
-   OS: Updated the names of the contributors, the documentation
-   and added a sample file for WalkPlugin
-
-
+/** Object to perform preview control on a cart model.
 
    Copyright (c) 2005-2006, 
    @author Olivier Stasse, Ramzi Sellouati
@@ -47,13 +34,12 @@ using namespace::PatternGeneratorJRL;
 
 PreviewControl::PreviewControl()
 {
-  m_A.Resize(3,3);
-  m_B.Resize(3,1);
-  m_C.Resize(1,3);
+  MAL_MATRIX_RESIZE(m_A,3,3);
+  MAL_MATRIX_RESIZE(m_B,3,1);
+  MAL_MATRIX_RESIZE(m_C,1,3);
 
-  m_Kx.Resize(1,3);
+  MAL_MATRIX_RESIZE(m_Kx,1,3);
   m_Ks = 0;
-  m_F =0;
 }
 
 PreviewControl::~PreviewControl()
@@ -93,10 +79,10 @@ void PreviewControl::ReadPrecomputedFile(string aFileName)
       aif >> r;
       m_Ks=r;
 
-
+      
       m_SizeOfPreviewWindow = (unsigned int)(m_PreviewControlTime/
 					     m_SamplingPeriod);
-      m_F.Resize(m_SizeOfPreviewWindow,1);
+      MAL_MATRIX_RESIZE(m_F,m_SizeOfPreviewWindow,1);
 
       for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
 	{
@@ -125,7 +111,8 @@ void PreviewControl::ReadPrecomputedFile(string aFileName)
     
 }
 
-int PreviewControl::OneIterationOfPreview(VNL::Matrix<double> & x, VNL::Matrix<double> & y,
+int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double), 
+					  MAL_MATRIX(& y, double),
 					  double & sxzmp, double & syzmp,
 					  deque<PatternGeneratorJRL::ZMPPosition> & ZMPPositions,
 					  unsigned int lindex,
@@ -135,9 +122,10 @@ int PreviewControl::OneIterationOfPreview(VNL::Matrix<double> & x, VNL::Matrix<d
 
   double ux=0.0, uy=0.0;
 
-  VNL::Matrix<double> r(1,1);
+  MAL_MATRIX_DIM(r,double,1,1);
+
   // Compute the command.
-  r = m_Kx*x;
+  r = MAL_RET_A_by_B(m_Kx,x);
   ux = - r(0,0) + m_Ks * sxzmp ;
 
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
@@ -149,16 +137,17 @@ int PreviewControl::OneIterationOfPreview(VNL::Matrix<double> & x, VNL::Matrix<d
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
     ux += m_F(i,0)* ZMPPositions[lindex+i].px;
 
-  r = m_Kx * y;
+  r = MAL_RET_A_by_B(m_Kx, y);
+
   uy = - r(0,0) + m_Ks * syzmp;
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
     uy += m_F(i,0)* ZMPPositions[lindex+i].py;
   
-  x = m_A*x + ux*m_B;
-  y = m_A*y + uy*m_B;
+  x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
+  y = MAL_RET_A_by_B(m_A,y) + uy * m_B;
    
-  zmpx2 = (m_C*x)(0,0);
-  zmpy2 = (m_C*y)(0,0);
+  zmpx2 = (MAL_RET_A_by_B(m_C,x))(0,0);
+  zmpy2 = (MAL_RET_A_by_B(m_C,y))(0,0);
   
   if (Simulation)
     {

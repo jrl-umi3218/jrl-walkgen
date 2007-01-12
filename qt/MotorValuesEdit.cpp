@@ -1,9 +1,14 @@
+#include <iostream>
+using namespace std;
+
 #include "MotorValuesEdit.h"
+
 #include <qpushbutton.h>
 #include <qvbox.h>
 #include <qhbox.h>
 #include <qlabel.h>
 #include <qscrollview.h>
+
 
 MotorValuesEdit::MotorValuesEdit(QWidget *parent,
 				 const char *name,
@@ -31,7 +36,6 @@ MotorValuesEdit::~MotorValuesEdit()
 
 void MotorValuesEdit::SetMultiBody(MultiBody *aMB)
 {
-  MultiBody *a2MB = aMB;
   vector<float*> lienSpinner;			//pointeur sur les variables de transformations
 
   m_MB = aMB;
@@ -40,16 +44,15 @@ void MotorValuesEdit::SetMultiBody(MultiBody *aMB)
   if (m_MB==0)
     return;
   
-  cout << "MotorValueEdit::SetMultiBody: "<< m_MB->listeCorps.size() << endl;
-  lienSpinner = m_MB->listeVariableTransformation;
-  cout << lienSpinner.size() << endl;
+  cout << "MotorValueEdit::SetMultiBody: "<< m_MB->liaisons.size() << endl;
 
-  m_Table = new QTable(lienSpinner.size()-4,2,m_VBox);
+  m_Table = new QTable(m_MB->liaisons.size()-4,2,m_VBox);
 
-  for(int i=0,k=0;i<m_MB->listeCorps.size();i++)
+  for(int i=0,k=0;i<m_MB->liaisons.size();i++)
     {
       string CorpsName ;
       QString Value;
+
       if ((CorpsName!="HRP2") &&
 	  (CorpsName!="WAIST"))
 	{

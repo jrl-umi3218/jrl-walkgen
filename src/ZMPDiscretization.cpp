@@ -1,17 +1,6 @@
 /* This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of steps.
 
-   CVS Information: 
-   $Id: ZMPDiscretization.cpp,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/ZMPDiscretization.cpp,v $
-   $Log: ZMPDiscretization.cpp,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
-   OS: Updated the names of the contributors, the documentation
-   and added a sample file for WalkPlugin
-
 
    Copyright (c) 2005-2006, 
    Olivier Stasse,
@@ -85,12 +74,12 @@ ZMPDiscretization::ZMPDiscretization(string DataFile, HumanoidSpecificities *aHS
   m_FootH = AnklePosition[2];
   m_FootF = lWidth-AnklePosition[0];
   
-  m_A.Resize(6,6);
-  
-  m_B.Resize(6,1);
-  m_C.Resize(2,6);
+  MAL_MATRIX_RESIZE(m_A,6,6);
+  MAL_MATRIX_RESIZE(m_B,6,1);
+  MAL_MATRIX_RESIZE(m_C,2,6);
 
   m_RelativeFootPositions.clear();
+
   //  m_Omega = 3.0;
   //m_Omega = 1.0;
   m_Omega =0.0;
@@ -166,13 +155,13 @@ ZMPDiscretization::ZMPDiscretization(string DataFile, HumanoidSpecificities *aHS
 
 #endif
 
-  m_CurrentSupportFootPosition.Resize(3,3);
+  MAL_MATRIX_RESIZE(m_CurrentSupportFootPosition,3,3);
   for(int i=0;i<3;i++)
     for(int j=0;j<3;j++)
       if (i!=j)
-	m_CurrentSupportFootPosition[i][j]= 0.0;
+	m_CurrentSupportFootPosition(i,j)= 0.0;
       else
-	m_CurrentSupportFootPosition[i][j]= 1.0;
+	m_CurrentSupportFootPosition(i,j)= 1.0;
   
   // Create the window for the filter.
   double T=0.050; // Arbritrary from Kajita's San Matlab files.
@@ -194,8 +183,8 @@ ZMPDiscretization::ZMPDiscretization(string DataFile, HumanoidSpecificities *aHS
     m_ZMPFilterWindow[i]/= sum;
 
   // Prepare size of the matrix used in on-line walking
-  m_vdiffsupppre.Resize(2,1);
-  for(unsigned int i=0;i<m_vdiffsupppre.Rows();i++)
+  MAL_MATRIX_RESIZE(m_vdiffsupppre,2,1);
+  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(m_vdiffsupppre);i++)
     m_vdiffsupppre(i,0) = 0.0;
 
   RESETDEBUG5("DebugDataRFPos.txt");
@@ -484,7 +473,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 					     deque<FootAbsolutePosition> &LeftHandAbsolutePositions,
 					     deque<FootAbsolutePosition> &RightHandAbsolutePositions, 
 					     double Xmax,
-					     VNL::Vector<double> & lStartingCOMPosition,
+					     MAL_S3_VECTOR(& lStartingCOMPosition,double),
 					     FootAbsolutePosition & InitLeftFootAbsolutePosition,
 					     FootAbsolutePosition & InitRightFootAbsolutePosition)
 {
@@ -495,13 +484,18 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   double TimeForThisFootPosition=0.0;
   ZMPPositions.clear();
   unsigned int AddArraySize=0;
-   VNL::Matrix<double> CurrentSupportFootPosition(3,3);
+  MAL_MATRIX_DIM(CurrentSupportFootPosition,double,3,3);
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
   FootAbsolutePosition CurrentRightHandAbsPos, CurrentLeftHandAbsPos;
 
+  MAL_MATRIX_DIM(MM,double,2,2);
+  MAL_MATRIX_DIM(Orientation,double,2,2);
+  MAL_MATRIX_DIM(v,double,2,1);
+  MAL_MATRIX_DIM(v2,double,2,1);
+  MAL_MATRIX_DIM(vrel,double,2,1);
+  MAL_MATRIX_DIM(vdiffsupp,double,2,1);
+  MAL_MATRIX_DIM(vdiffsupppre,double,2,1);
 
-  VNL::Matrix<double> MM(2,2),Orientation(2,2);
-  VNL::Matrix<double> v(2,1), v2(2,1),vrel(2,1),vdiffsupp(2,1),vdiffsupppre(2,1);
   int CurrentZMPindex=0;
   double CurrentAbsTheta=0.0;
   double NextTheta=0, NextZMPTheta=0, BufferNextZMPTheta=0,
@@ -697,8 +691,8 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
       v(0,0) = RelativeFootPositions[i].sx;
       v(1,0) = RelativeFootPositions[i].sy;
       
-      Orientation = MM * Orientation;
-      v2 = Orientation * v;
+      Orientation = MAL_RET_A_by_B(MM , Orientation);
+      v2 = MAL_RET_A_by_B(Orientation, v);
 
       for(int k=0;k<2;k++)
 	for(int l=0;l<2;l++)
@@ -717,15 +711,15 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
       px0 = ZMPPositions[CurrentZMPindex-1].px;
       py0 = ZMPPositions[CurrentZMPindex-1].py;
 
-      VNL::Vector<double> ZMPInFootCoordinates(3);
+      MAL_VECTOR_DIM(ZMPInFootCoordinates,double,3);
       
       ZMPInFootCoordinates[0] = m_ZMPNeutralPosition[0];
       ZMPInFootCoordinates[1] = m_ZMPNeutralPosition[1];
       ZMPInFootCoordinates[2] = 1.0;
+
+      MAL_VECTOR_DIM(ZMPInWorldCoordinates,double,3);
       
-      VNL::Vector<double> ZMPInWorldCoordinates(3);
-      
-      ZMPInWorldCoordinates = CurrentSupportFootPosition * ZMPInFootCoordinates; 
+      ZMPInWorldCoordinates = MAL_RET_A_by_B(CurrentSupportFootPosition,ZMPInFootCoordinates); 
 
       delta_x = (ZMPInWorldCoordinates(0) - px0)/SizeOf1stPhase;
       delta_y = (ZMPInWorldCoordinates(1) - py0)/SizeOf1stPhase;
@@ -753,10 +747,13 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	  
 	  if (RelativeFootPositions[i+1].stepType == 5)
 	    {
-	      delta_x = (CurrentSupportFootPosition(0,2)-(m_ZMPShift[0] +m_ZMPShift[2]+m_ZMPShift[1] +m_ZMPShift[3]) - px0)/SizeOf1stPhase;
+	      delta_x = (CurrentSupportFootPosition(0,2)-(m_ZMPShift[0] +m_ZMPShift[2]+
+							  m_ZMPShift[1] +m_ZMPShift[3]) - px0)/SizeOf1stPhase;
 	      delta_y = (CurrentSupportFootPosition(1,2)- py0)/SizeOf1stPhase;
-	      //delta_x = (CurrentSupportFootPosition(0,2)-(m_ZMPShift3Begin + m_ZMPShift4Begin+m_ZMPShift3End + m_ZMPShift4End) - px0)/SizeOf1stPhase;
-	      //delta_y = (CurrentSupportFootPosition(1,2)-(WhoIsSupportFoot)*(m_ZMPShift3BeginY + m_ZMPShift4BeginY+m_ZMPShift3EndY + m_ZMPShift4EndY) - py0)/SizeOf1stPhase;
+	      //delta_x = (CurrentSupportFootPosition(0,2)-(m_ZMPShift3Begin +
+	      // m_ZMPShift4Begin+m_ZMPShift3End + m_ZMPShift4End) - px0)/SizeOf1stPhase;
+	      //delta_y = (CurrentSupportFootPosition(1,2)-(WhoIsSupportFoot)*
+	      //(m_ZMPShift3BeginY + m_ZMPShift4BeginY+m_ZMPShift3EndY + m_ZMPShift4EndY) - py0)/SizeOf1stPhase;
 	    }
 	
 	}   	
@@ -838,11 +835,11 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	  MM(0,0) = c;      MM(0,1) = -s;
 	  MM(1,0) = s;      MM(1,1) = c;
 	  
-	  Orientation = MM*Orientation;
+	  Orientation = MAL_RET_A_by_B(MM,Orientation);
 
 	  v(0,0) = RelativeFootPositions[i+1].sx;
 	  v(1,0) = RelativeFootPositions[i+1].sy;
-	  vdiffsupp = Orientation *v;
+	  vdiffsupp = MAL_RET_A_by_B(Orientation,v);
 	  
 	  vrel = vdiffsupp + vdiffsupppre;
 
@@ -902,15 +899,15 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
       for(unsigned int k=0;k<SizeOfSndPhase;k++)
 	{
 
-	   VNL::Vector<double> ZMPInFootCoordinates(3);
+	  MAL_VECTOR_DIM(ZMPInFootCoordinates,double,3);
 
 	  ZMPInFootCoordinates[0] = m_ZMPNeutralPosition[0];
 	  ZMPInFootCoordinates[1] = m_ZMPNeutralPosition[1];
 	  ZMPInFootCoordinates[2] = 1.0;
 	  
-	   VNL::Vector<double> ZMPInWorldCoordinates(3);
+	  MAL_VECTOR_DIM(ZMPInWorldCoordinates,double,3);
 
-	  ZMPInWorldCoordinates = CurrentSupportFootPosition * ZMPInFootCoordinates; 
+	  ZMPInWorldCoordinates = MAL_RET_A_by_B(CurrentSupportFootPosition , ZMPInFootCoordinates); 
 
 	  ODEBUG4("CSFP: " << CurrentSupportFootPosition << endl <<
 		   "ZMPiWC"  << ZMPInWorldCoordinates << endl, "DebugData.txt");	
@@ -929,14 +926,16 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 		    {	delta_x = (CurrentSupportFootPosition(0,2)+m_ZMPShift[1] - px02)/SizeOfSndPhase;
 		    delta_y = (CurrentSupportFootPosition(1,2) - py02)/SizeOfSndPhase;
 		    //delta_x = (CurrentSupportFootPosition(0,2)+m_ZMPShift3End - px02)/SizeOfSndPhase;
-		    //delta_y = (CurrentSupportFootPosition(1,2)+(WhoIsSupportFoot)*m_ZMPShift3EndY - py02)/SizeOfSndPhase;
+		    //delta_y = (CurrentSupportFootPosition(1,2)+
+		    // (WhoIsSupportFoot)*m_ZMPShift3EndY - py02)/SizeOfSndPhase;
 		    }
 		  else
 		    {
 		      delta_x = (CurrentSupportFootPosition(0,2)+m_ZMPShift[3] - px02)/SizeOfSndPhase;
 		      delta_y = (CurrentSupportFootPosition(1,2)- py02)/SizeOfSndPhase;
 		      //delta_x = (CurrentSupportFootPosition(0,2)+m_ZMPShift4End - px02)/SizeOfSndPhase;
-		      //delta_y = (CurrentSupportFootPosition(1,2)+(WhoIsSupportFoot)*m_ZMPShift4EndY - py02)/SizeOfSndPhase;
+		      //delta_y = (CurrentSupportFootPosition(1,2)+
+		      // (WhoIsSupportFoot)*m_ZMPShift4EndY - py02)/SizeOfSndPhase;
 		    }
 	
 		  ZMPPositions[CurrentZMPindex].px = 
@@ -969,7 +968,9 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	    {
 	      UpdateFootPosition(LeftFootAbsolutePositions,
 				 RightFootAbsolutePositions,
-				 CurrentZMPindex,k,indexinitial,ModulatedSingleSupportTime,RelativeFootPositions[i+1].stepType);
+				 CurrentZMPindex,k,indexinitial,
+				 ModulatedSingleSupportTime,
+				 RelativeFootPositions[i+1].stepType);
 	      SignLHAND=1;
 	      SignRHAND=-1;
 	    }
@@ -977,7 +978,9 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	    {
 	      UpdateFootPosition(RightFootAbsolutePositions,
 				 LeftFootAbsolutePositions,
-				 CurrentZMPindex,k,indexinitial,ModulatedSingleSupportTime,RelativeFootPositions[i+1].stepType);
+				 CurrentZMPindex,k,indexinitial,
+				 ModulatedSingleSupportTime,
+				 RelativeFootPositions[i+1].stepType);
 	      SignLHAND=-1;
 	      SignRHAND=1;
 	      
@@ -1236,12 +1239,12 @@ void ZMPDiscretization::SetZMPShift(vector<double> &ZMPShift)
 
 /* Initialiazation of the on-line stacks. */
 int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,					     
-				   deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-				   deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-				   FootAbsolutePosition & InitLeftFootAbsolutePosition,
-				   FootAbsolutePosition & InitRightFootAbsolutePosition,
-				   deque<RelativeFootPosition> &RelativeFootPositions,
-				   VNL::Vector<double> & lStartingCOMPosition)
+				  deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+				  deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+				  FootAbsolutePosition & InitLeftFootAbsolutePosition,
+				  FootAbsolutePosition & InitRightFootAbsolutePosition,
+				  deque<RelativeFootPosition> &RelativeFootPositions,
+				  MAL_S3_VECTOR(& lStartingCOMPosition,double))
 {
   m_RelativeFootPositions.clear();
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
@@ -1350,7 +1353,9 @@ void ZMPDiscretization::UpdateCurrentSupportFootPosition(RelativeFootPosition aR
   // First orientation
   double c = cos(aRFP.theta*M_PI/180.0);
   double s = sin(aRFP.theta*M_PI/180.0);
-  VNL::Matrix<double> MM(2,2,0.0),Orientation(2,2,0.0);
+  MAL_MATRIX_DIM(MM,double,2,2);
+  MAL_MATRIX_DIM(Orientation,double,2,2);
+
   MM(0,0) = c;      MM(0,1) = -s;
   MM(1,0) = s;      MM(1,1) = c;
   for(int k=0;k<2;k++)
@@ -1358,12 +1363,14 @@ void ZMPDiscretization::UpdateCurrentSupportFootPosition(RelativeFootPosition aR
       Orientation(k,l) = m_CurrentSupportFootPosition(k,l);
   
   // second position.
-  VNL::Matrix<double> v(2,1),v2(2,1);
+  MAL_MATRIX_DIM(v,double,2,1);
+  MAL_MATRIX_DIM(v2,double,2,1);
+
   v(0,0) = aRFP.sx;
   v(1,0) = aRFP.sy;
   
-  Orientation = MM * Orientation;
-  v2 = Orientation * v;
+  Orientation = MAL_RET_A_by_B(MM , Orientation);
+  v2 = MAL_RET_A_by_B(Orientation, v);
   ODEBUG("v :" << v  << " "
 	  "v2 : " << v2 << " "
 	  "Orientation : " << Orientation << " "
@@ -1394,7 +1401,9 @@ void ZMPDiscretization::OnLine(RelativeFootPosition NewRelativeFootPosition,
   int WhoIsSupportFoot=1;
   double TimeFirstPhase=0.0;
   int CurrentZMPindex=0;
-  VNL::Matrix<double> vdiffsupp(2,1),vrel(2,1);
+  MAL_MATRIX_DIM(vdiffsupp,double,2,1);
+  MAL_MATRIX_DIM(vrel,double,2,1);
+
   double lTdble=0.02, lTsingle=0.78;
 
   ODEBUG6(m_RelativeFootPositions[0].sx << " "  << 
@@ -1456,15 +1465,15 @@ void ZMPDiscretization::OnLine(RelativeFootPosition NewRelativeFootPosition,
   py0 = FinalZMPPositions.back().py;
   theta0 = FinalZMPPositions.back().theta;
   
-  VNL::Vector<double> ZMPInFootCoordinates(3);
+  MAL_VECTOR_DIM(ZMPInFootCoordinates,double,3);
   
   ZMPInFootCoordinates[0] = m_ZMPNeutralPosition[0];
   ZMPInFootCoordinates[1] = m_ZMPNeutralPosition[1];
   ZMPInFootCoordinates[2] = 1.0;
   
-  VNL::Vector<double> ZMPInWorldCoordinates(3);
+  MAL_VECTOR_DIM(ZMPInWorldCoordinates,double,3);
   
-  ZMPInWorldCoordinates = m_CurrentSupportFootPosition * ZMPInFootCoordinates; 
+  ZMPInWorldCoordinates = MAL_RET_A_by_B(m_CurrentSupportFootPosition, ZMPInFootCoordinates); 
   
   delta_x = (ZMPInWorldCoordinates(0) - px0)/SizeOf1stPhase;
   delta_y = (ZMPInWorldCoordinates(1) - py0)/SizeOf1stPhase;
@@ -1566,15 +1575,18 @@ void ZMPDiscretization::OnLine(RelativeFootPosition NewRelativeFootPosition,
       double c,s;
       c = cos(NextTheta*M_PI/180.0);
       s = sin(NextTheta*M_PI/180.0);
-      VNL::Matrix<double> Orientation(2,2,0.0),v(2,1,0.0);
+      MAL_MATRIX_DIM(Orientation,double,2,2);
+      MAL_MATRIX_DIM(v,double,2,1);
       Orientation(0,0) = c;      Orientation(0,1) = -s;
       Orientation(1,0) = s;      Orientation(1,1) = c;
 	  
-      Orientation =Orientation*m_CurrentSupportFootPosition.Extract(2,2); 
+      MAL_MATRIX_DIM(SubOrientation,double,2,2);
+      MAL_MATRIX_C_eq_EXTRACT_A(SubOrientation,m_CurrentSupportFootPosition,double,0,0,2,2);
+      Orientation = MAL_RET_A_by_B(Orientation,SubOrientation) ; 
       
       v(0,0) = m_RelativeFootPositions[1].sx;
       v(1,0) = m_RelativeFootPositions[1].sy;
-      vdiffsupp = Orientation *v;
+      vdiffsupp = MAL_RET_A_by_B(Orientation,v);
 	  
       vrel = vdiffsupp + m_vdiffsupppre;
 
@@ -1635,15 +1647,16 @@ void ZMPDiscretization::OnLine(RelativeFootPosition NewRelativeFootPosition,
   for(unsigned int k=0;k<SizeOfSndPhase;k++)
     {
 
-      VNL::Vector<double> ZMPInFootCoordinates(3);
+      MAL_VECTOR_DIM(ZMPInFootCoordinates,double,3);
 
       ZMPInFootCoordinates[0] = m_ZMPNeutralPosition[0];
       ZMPInFootCoordinates[1] = m_ZMPNeutralPosition[1];
       ZMPInFootCoordinates[2] = 1.0;
 	  
-      VNL::Vector<double> ZMPInWorldCoordinates(3);
+      MAL_VECTOR_DIM(ZMPInWorldCoordinates,double,3);
 
-      ZMPInWorldCoordinates = m_CurrentSupportFootPosition * ZMPInFootCoordinates; 
+      ZMPInWorldCoordinates = MAL_RET_A_by_B(m_CurrentSupportFootPosition, 
+					     ZMPInFootCoordinates); 
 
       ODEBUG4("CSFP: " << m_CurrentSupportFootPosition << endl <<
 	      "ZMPiWC"  << ZMPInWorldCoordinates << endl, "DebugData.txt");	
@@ -1701,7 +1714,8 @@ void ZMPDiscretization::OnLine(RelativeFootPosition NewRelativeFootPosition,
 	{
 	  UpdateFootPosition(LeftFootAbsolutePositions,
 			     RightFootAbsolutePositions,
-			     CurrentZMPindex,k,indexinitial,ModulatedSingleSupportTime,m_RelativeFootPositions[1].stepType);
+			     CurrentZMPindex,k,indexinitial,ModulatedSingleSupportTime,
+			     m_RelativeFootPositions[1].stepType);
 	  SignLHAND=1;
 	  SignRHAND=-1;
 	}
@@ -1709,7 +1723,8 @@ void ZMPDiscretization::OnLine(RelativeFootPosition NewRelativeFootPosition,
 	{
 	  UpdateFootPosition(RightFootAbsolutePositions,
 			     LeftFootAbsolutePositions,
-			     CurrentZMPindex,k,indexinitial,ModulatedSingleSupportTime,m_RelativeFootPositions[1].stepType);
+			     CurrentZMPindex,k,indexinitial,ModulatedSingleSupportTime,
+			     m_RelativeFootPositions[1].stepType);
 	  SignLHAND=-1;
 	  SignRHAND=1;
 	      
@@ -1892,13 +1907,13 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
 // and that the foot's interior is at the left of the points.
 // The result is : A [ Zx(k), Zy(k)]' + B  >=0
 int ZMPDiscretization::ComputeLinearSystem(vector<CH_Point> aVecOfPoints, 
-					   VNL::Matrix<double> &A,
-					   VNL::Matrix<double> &B)
+					   MAL_MATRIX(&A,double),
+					   MAL_MATRIX(&B,double))
 {
   double a,b,c;
   unsigned int n = aVecOfPoints.size();
-  A.Resize(aVecOfPoints.size(),2);
-  B.Resize(aVecOfPoints.size(),1);
+  MAL_MATRIX_RESIZE(A,aVecOfPoints.size(),2);
+  MAL_MATRIX_RESIZE(B,aVecOfPoints.size(),1);
 
   // Dump a file to display on scilab .
   // This should be removed during real usage inside a robot.
@@ -2401,7 +2416,7 @@ int ZMPDiscretization::BuildMatricesPxPu(double * & Px,double * &Pu,
 					 deque<LinearConstraintInequality_t *> & QueueOfLConstraintInequalities,
 					 double Com_Height,
 					 unsigned int &NbOfConstraints,
-					 VNL::Vector<double> & xk)
+					 MAL_VECTOR(& xk,double))
 {
   // Discretize the problem.
   ODEBUG(" N:" << N << " T: " << T);
@@ -2470,7 +2485,7 @@ int ZMPDiscretization::BuildMatricesPxPu(double * & Px,double * &Pu,
 	{
 	  break;
 	}
-      IndexConstraint += (*LCI_it)->A.Rows();
+      IndexConstraint += MAL_MATRIX_NB_ROWS((*LCI_it)->A);
     }  
   NbOfConstraints = IndexConstraint;
 
@@ -2492,36 +2507,36 @@ int ZMPDiscretization::BuildMatricesPxPu(double * & Px,double * &Pu,
 	}
 
       // For each constraint.
-      for(unsigned j=0;j<(*LCI_it)->A.Rows();j++)
+      for(unsigned j=0;j<MAL_MATRIX_NB_ROWS((*LCI_it)->A);j++)
 	{
 	  Px[IndexConstraint] = 
 	    // X Axis * A
 	    (xk[0] +
 	     xk[1] * T *(i+1) + 
 	     xk[2]*((i+1)*(i+1)*T*T/2 - Com_Height/9.81))
-	     * (*LCI_it)->A[j][0] 
+	    * (*LCI_it)->A(j,0)
 	     + 
 	     // Y Axis * A
 	    ( xk[3]+ xk[4]* T * (i+1) + 
 	       xk[5]*((i+1)*(i+1)*T*T/2 - Com_Height/9.81))	  
-	     * (*LCI_it)->A[j][1] 
+	    * (*LCI_it)->A(j,1)
 	     // Constante part of the constraint
-	     + (*LCI_it)->B[j][0];
+	    + (*LCI_it)->B(j,0);
 
-	  ODEBUG6(Px[IndexConstraint] << " " << (*LCI_it)->A[j][0]  << " "
-		  << (*LCI_it)->A[j][1] << " " << (*LCI_it)->B[j][0]  ,Buffer);
+	  ODEBUG6(Px[IndexConstraint] << " " << (*LCI_it)->A(j,0)  << " "
+		  << (*LCI_it)->A[j][1] << " " << (*LCI_it)->B(j,0) ,Buffer);
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer2);
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer3);
 	  for(unsigned k=0;k<=i;k++)
 	    {
 	      // X axis
 	      Pu[IndexConstraint+k*(NbOfConstraints+1)] = 
-		(*LCI_it)->A[j][0]*
+		(*LCI_it)->A(j,0)*
 		((1+3*(i-k)+3*(i-k)*(i-k))*T*T*T/6.0 - T * Com_Height/9.81);
 	      
 	      // Y axis
 	      Pu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
-		(*LCI_it)->A[j][1]*
+		(*LCI_it)->A(j,1)*
 		((1+3*(i-k)+3*(i-k)*(i-k))*T*T*T/6.0 - T * Com_Height/9.81);
 		 
 	      
@@ -2577,71 +2592,75 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
   double *Px=0,*Pu=0;
   unsigned int NbOfConstraints=8*N; // Nb of constraints to be taken into account
   // for each iteration
-  VNL::Vector<double> xk,Buk,zk;
-  VNL::Matrix<double> vnlPx, vnlPu,vnlValConstraint,
-    vnlX, 
-    vnlStorePx,vnlStoreX;
-  VNL::Vector<int> ConstraintNb;
-  VNL::Matrix<double> PPu, VPu, VPx, PPx;
-  VNL::Matrix<double> Id,OptA,OptB, OptC;
-  VNL::Vector<double> ZMPRef,OptD;
+  MAL_VECTOR(xk,double);MAL_VECTOR(Buk,double);MAL_VECTOR(zk,double);
+  MAL_MATRIX(vnlPx,double); MAL_MATRIX(vnlPu,double);
+  MAL_MATRIX(vnlValConstraint,double);
+  MAL_MATRIX(vnlX,double);MAL_MATRIX(vnlStorePx,double);
+  MAL_MATRIX(vnlStoreX,double);
+  MAL_VECTOR(ConstraintNb,int);
+  MAL_MATRIX(PPu,double); MAL_MATRIX(VPu,double); 
+  MAL_MATRIX(VPx,double); MAL_MATRIX(PPx,double);
+  MAL_MATRIX(Id,double);MAL_MATRIX(OptA,double);
+  MAL_MATRIX(OptB,double);MAL_MATRIX( OptC,double);
+  MAL_VECTOR(ZMPRef,double);MAL_VECTOR(OptD,double);
   double alpha = 200.0, beta = 1000.0;
   int CriteriaToMaximize=1;
 
 
-  if (0)
+  if (1)
     RESETDEBUG5("DebugInterpol.dat");
 
-  PPu.Resize(2*N,2*N);
-  VPu.Resize(2*N,2*N);
-  PPx.Resize(2*N,6);
-  VPx.Resize(2*N,6);
-  Id.Resize(2*N,2*N);
-  ZMPRef.Resize(2*N);
+  MAL_MATRIX_RESIZE(PPu,2*N,2*N);
+  MAL_MATRIX_RESIZE(VPu,2*N,2*N);
+  MAL_MATRIX_RESIZE(PPx,2*N,6);
+  MAL_MATRIX_RESIZE(VPx,2*N,6);
+  MAL_MATRIX_RESIZE(Id,2*N,2*N);
+  MAL_VECTOR_RESIZE(ZMPRef,2*N);
+
   for(unsigned int i=0;i<N;i++)
     {
       // Compute VPx and PPx
-      VPx[i][0]   = 0.0;   VPx[i][1] =     1.0; VPx[i][2]   = (i+1)*T;
-      VPx[i][3]   = 0.0;   VPx[i][4] =     0.0; VPx[i][5]   = 0.0;
-      VPx[i+N][0] = 0.0;   VPx[i+N][1] =   0.0; VPx[i+N][2] = 0.0;
-      VPx[i+N][3] = 0.0;   VPx[i+N][4] =   1.0; VPx[i+N][5] = (i+1)*T;
+      VPx(i,0)   = 0.0;   VPx(i,1) =     1.0; VPx(i,2)   = (i+1)*T;
+      VPx(i,3)   = 0.0;   VPx(i,4) =     0.0; VPx(i,5)   = 0.0;
+      VPx(i+N,0) = 0.0;   VPx(i+N,1) =   0.0; VPx(i+N,2) = 0.0;
+      VPx(i+N,3) = 0.0;   VPx(i+N,4) =   1.0; VPx(i+N,5) = (i+1)*T;
 
-      PPx[i][0] = 1.0; PPx[i][1]     = (i+1)*T; PPx[i][2] = (i+1)*(i+1)*T*T*0.5;
-      PPx[i][3] = 0.0; PPx[i][4]     =       0; PPx[i][5] = 0.;
-      PPx[i+N][0] = 0.0; PPx[i+N][1] =     0.0; PPx[i+N][2] = 0.0;
-      PPx[i+N][3] = 1.0; PPx[i+N][4] = (i+1)*T; PPx[i+N][5] = (i+1)*(i+1)*T*T*0.5;
+      PPx(i,0) = 1.0; PPx(i,1)     = (i+1)*T; PPx(i,2) = (i+1)*(i+1)*T*T*0.5;
+      PPx(i,3) = 0.0; PPx(i,4)     =       0; PPx(i,5) = 0.;
+      PPx(i+N,0) = 0.0; PPx(i+N,1) =     0.0; PPx(i+N,2) = 0.0;
+      PPx(i+N,3) = 1.0; PPx(i+N,4) = (i+1)*T; PPx(i+N,5) = (i+1)*(i+1)*T*T*0.5;
       
       
       for(unsigned int j=0;j<N;j++)
 	{
-	  PPu[i][j]=0;
+	  PPu(i,j)=0;
 	  
 	  if (j<=i)
 	    {
 
-	      VPu[i][j]= (2*(i-j)+1)*T*T*0.5 ;
-	      VPu[i+N][j+N]= (2*(i-j)+1)*T*T*0.5 ;
-	      VPu[i][j+N]=0.0;
-	      VPu[i+N][j]=0.0;
+	      VPu(i,j)= (2*(i-j)+1)*T*T*0.5 ;
+	      VPu(i+N,j+N)= (2*(i-j)+1)*T*T*0.5 ;
+	      VPu(i,j+N)=0.0;
+	      VPu(i+N,j)=0.0;
 
-	      PPu[i][j]= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T*T*T/6.0;
-	      PPu[i+N][j+N]= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T*T*T/6.0;
-	      PPu[i][j+N]=0.0;
-	      PPu[i+N][j]=0.0;
+	      PPu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T*T*T/6.0;
+	      PPu(i+N,j+N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T*T*T/6.0;
+	      PPu(i,j+N)=0.0;
+	      PPu(i+N,j)=0.0;
 
 	    }
 	  else
 	    {
 
-	      VPu[i][j] = 0.0;
-	      VPu[i+N][j+N]=0.0;
-	      VPu[i][j+N]=0.0;
-	      VPu[i+N][j]=0.0;
+	      VPu(i,j) = 0.0;
+	      VPu(i+N,j+N)=0.0;
+	      VPu(i,j+N)=0.0;
+	      VPu(i+N,j)=0.0;
 
-	      PPu[i][j] = 0.0;
-	      PPu[i+N][j+N]=0.0;
-	      PPu[i][j+N]=0.0;
-	      PPu[i+N][j]=0.0;
+	      PPu(i,j) = 0.0;
+	      PPu(i+N,j+N)=0.0;
+	      PPu(i,j+N)=0.0;
+	      PPu(i+N,j)=0.0;
 
 	    }
 
@@ -2683,13 +2702,13 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
       aof.close();
     }
   
-  vnlX.Resize(2*N,1);
-
-  xk.Resize(6);
+  MAL_MATRIX_RESIZE(vnlX,2*N,1);
+  
+  MAL_VECTOR_RESIZE(xk,6);
   for(unsigned int i=0;i<6;i++)
     xk[i] = 0.0;
-  Buk.Resize(6);
-  zk.Resize(2);
+  MAL_VECTOR_RESIZE(Buk,6);
+  MAL_VECTOR_RESIZE(zk,2);
 
   int m = NbOfConstraints;
   int me= 0;
@@ -2755,7 +2774,7 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 
   deque<LinearConstraintInequality_t *> QueueOfLConstraintInequalities;
   
-  if (0)
+  if (1)
     {
       RESETDEBUG5("DebugPBW.dat");
       RESETDEBUG5("DebugPBW_Pb.dat");
@@ -2784,28 +2803,52 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
       LCI_it++;
     }
   
-  vnlStorePx.Resize(6*N,1+(unsigned int)(QueueOfLConstraintInequalities.back()->EndingTime/(T)));
-  for(unsigned int i=0;i<vnlStorePx.Rows();i++)
+  MAL_MATRIX_RESIZE(vnlStorePx,
+		    6*N,
+		    1+(unsigned int)(QueueOfLConstraintInequalities.back()->EndingTime/(T)));
+  
+  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(vnlStorePx);i++)
     {
-      for(unsigned int j=0;j<vnlStorePx.Cols();j++)
+      for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(vnlStorePx);j++)
 	{
-	  vnlStorePx[i][j] =0.0;
+	  vnlStorePx(i,j) =0.0;
 	}
     }
-  vnlStoreX.Resize(2*N,1+(unsigned int)(QueueOfLConstraintInequalities.back()->EndingTime/(T)));
+  MAL_MATRIX_RESIZE(vnlStoreX,
+		    2*N,1+(unsigned int)(QueueOfLConstraintInequalities.back()->EndingTime/(T)));
+
   for(unsigned int i=0;i<2*N;i++)
-    vnlStoreX[i][0] = 0.0;
+    vnlStoreX(i,0) = 0.0;
   
-  ConstraintNb.Resize(1+(unsigned int)(QueueOfLConstraintInequalities.back()->EndingTime/(T)));
+  MAL_VECTOR_RESIZE(ConstraintNb,
+		    1+(unsigned int)(QueueOfLConstraintInequalities.back()->EndingTime/(T)));
 
   // pre computes the matrices needed for the optimization.
-  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
+
+  //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
+  MAL_MATRIX(lterm1,double);
+  lterm1 = MAL_RET_TRANSPOSE(PPu);
+  lterm1 = MAL_RET_A_by_B(lterm1, PPu);
+  lterm1 = beta * lterm1;
+
+  MAL_MATRIX(lterm2,double);
+  lterm2 = MAL_RET_TRANSPOSE(VPu);
+  lterm2 = MAL_RET_A_by_B(lterm2, VPu);
+  lterm2 = alpha * lterm2;
+
+  MAL_MATRIX_RESIZE(OptA,
+		    MAL_MATRIX_NB_ROWS(lterm1),
+		    MAL_MATRIX_NB_COLS(lterm1));
+  MAL_MATRIX_SET_IDENTITY(OptA);
+  OptA = OptA + lterm1 + lterm2;
+
+
 
   if (CriteriaToMaximize==1)
     {
       for(unsigned int i=0;i<2*N;i++)
 	for(unsigned int j=0;j<2*N;j++)
-	  C[j*2*N+i] = OptA[i][j];
+	  C[j*2*N+i] = OptA(i,j);
 
       if (0)
 	{
@@ -2816,17 +2859,21 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	  for(unsigned int i=0;i<2*N;i++)
 	    {
 	      for(unsigned int j=0;j<2*N-1;j++)
-		aof << OptA[i][j] << " ";
-	      aof << OptA[i][2*N-1];
+		aof << OptA(i,j) << " ";
+	      aof << OptA(i,2*N-1);
 	      aof << endl;
 	    }
 	  aof.close(); 
 	  
 	}
     }
-
-  OptB = beta * PPu.Transpose() * PPx;
-  OptB = alpha * VPu.Transpose() * VPx + OptB;
+  
+  lterm1 = MAL_RET_TRANSPOSE(PPu);
+  lterm1 = MAL_RET_A_by_B(lterm1,PPx);
+  OptB = MAL_RET_TRANSPOSE(VPu);
+  OptB = MAL_RET_A_by_B(OptB,VPx);
+  OptB = alpha * OptB;
+  OptB = OptB + beta * lterm1;
 
   if (0)
   {
@@ -2834,29 +2881,30 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
     char Buffer[1024];
     sprintf(Buffer,"OptB.dat");
     aof.open(Buffer,ofstream::out);
-    for(unsigned int i=0;i<OptB.Rows();i++)
+    for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(OptB);i++)
       {
-	for(unsigned int j=0;j<OptB.Cols()-1;j++)
-	  aof << OptB[i][j] << " ";
-	aof << OptB[i][OptB.Cols()-1];
+	for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(OptB)-1;j++)
+	  aof << OptB(i,j) << " ";
+	aof << OptB(i,MAL_MATRIX_NB_COLS(OptB)-1);
 	aof << endl;
       }
     aof.close(); 
     
   }
   
-  OptC = beta * PPu.Transpose();
+  OptC = MAL_RET_TRANSPOSE(PPu);
+  OptC = beta * OptC;
   if (0)
   {
     ofstream aof;
     char Buffer[1024];
     sprintf(Buffer,"OptC.dat");
     aof.open(Buffer,ofstream::out);
-    for(unsigned int i=0;i<OptC.Rows();i++)
+    for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(OptC);i++)
       {
-	for(unsigned int j=0;j<OptC.Cols()-1;j++)
-	  aof << OptC[i][j] << " ";
-	aof << OptC[i][OptC.Cols()-1];
+	for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(OptC)-1;j++)
+	  aof << OptC(i,j) << " ";
+	aof << OptC(i,MAL_MATRIX_NB_COLS(OptC)-1);
 	aof << endl;
       }
     aof.close(); 
@@ -2912,7 +2960,10 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 
       if (CriteriaToMaximize==1)
 	{
-	  OptD = OptB * xk - OptC * ZMPRef;
+	  MAL_VECTOR(lterm1v,double);
+	  MAL_C_eq_A_by_B(lterm1v,OptC,ZMPRef);
+	  MAL_C_eq_A_by_B(OptD,OptB,xk);
+	  OptD -= lterm1v;
 	  for(unsigned int i=0;i<2*N;i++)
 	    D[i] = OptD[i];
 
@@ -2946,14 +2997,14 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 
       // Verification
       ConstraintNb[li] = m;
-      vnlPu.Resize(m,2*N);
-      vnlPx.Resize(m,1);
+      MAL_MATRIX_RESIZE(vnlPu,m,2*N);
+      MAL_MATRIX_RESIZE(vnlPx,m,1);
       
   
       for(int i=0; i<m;i++)
 	{
-	  vnlPx[i][0] =
-	  vnlStorePx[i][li] = Px[i];
+	  vnlPx(i,0) =
+	    vnlStorePx(i,li) = Px[i];
 	}
 
       iwar[0]=1;
@@ -2973,15 +3024,15 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 
       for(int i=0; i<m;i++)
 	for(unsigned int j=0; j<2*N;j++)
-	  vnlPu[i][j] = Pu[j*(m+1)+i];
+	  vnlPu(i,j) = Pu[j*(m+1)+i];
 
       for(unsigned int i=0; i<2*N;i++)
 	{
-	  vnlStoreX[i][li] = X[i];
-	  vnlX[i][0] = X[i];
+	  vnlStoreX(i,li) = X[i];
+	  vnlX(i,0) = X[i];
 	}
 
-      vnlValConstraint = vnlPu * vnlX  + vnlPx;
+      vnlValConstraint = MAL_RET_A_by_B(vnlPu, vnlX)  + vnlPx;
       
       if (0)
       {
@@ -2996,7 +3047,7 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	aof.close(); 
       }
 
-      if (vnlValConstraint.Cols()!=1)
+      if (MAL_MATRIX_NB_COLS(vnlValConstraint)!=1)
 	{
 	  cout << "Problem during validation of the constraints matrix: " << endl;
 	  cout << "   size for the columns different from 1" << endl;
@@ -3005,11 +3056,11 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
       for(int i=0;i<m;i++)
 	{
 	  unsigned int pbOnCurrent=0;
-	  if (vnlValConstraint[i][0]<-1e-8)
+	  if (vnlValConstraint(i,0)<-1e-8)
 	    {
 	      ODEBUG3("Problem during validation of the constraint: ");
 	      ODEBUG3("  constraint " << i << " is not positive");
-	      ODEBUG3(vnlValConstraint[i][0]);
+	      ODEBUG3(vnlValConstraint(i,0));
 	      pbOnCurrent = 1;
 	    }
 
@@ -3028,13 +3079,14 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 
       ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
 
-      Buk[0] = X[0]*m_B[0][0];
-      Buk[1] = X[0]*m_B[1][0];
-      Buk[2] = X[0]*m_B[2][0];
-
-      Buk[3] = X[N]*m_B[3][0];
-      Buk[4] = X[N]*m_B[4][0];
-      Buk[5] = X[N]*m_B[5][0];
+      // Compute the command multiply 
+      Buk[0] = X[0]*m_B(0,0);
+      Buk[1] = X[0]*m_B(1,0);
+      Buk[2] = X[0]*m_B(2,0);
+      
+      Buk[3] = X[N]*m_B(3,0);
+      Buk[4] = X[N]*m_B(4,0);
+      Buk[5] = X[N]*m_B(5,0);
 
 
       // Fill the queues with the interpolated CoM values.
@@ -3079,29 +3131,33 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 
 	  COMPositions.push_back(aCOMPos);
 
+	  // Compute ZMP position and orientation.
 	  ZMPPosition aZMPPos;
-	  aZMPPos.px = m_C[0][0] * aCOMPos.x[0] +
-	    m_C[0][1] * aCOMPos.x[1] + m_C[0][2] * aCOMPos.x[2];
+	  aZMPPos.px = m_C(0,0) * aCOMPos.x[0] +
+	    m_C(0,1) * aCOMPos.x[1] + m_C(0,2) * aCOMPos.x[2];
 	  
-	  aZMPPos.py = m_C[0][0] * aCOMPos.y[0] +
-	    m_C[0][1] * aCOMPos.y[1] + m_C[0][2] * aCOMPos.y[2];
+	  aZMPPos.py = m_C(0,0) * aCOMPos.y[0] +
+	    m_C(0,1) * aCOMPos.y[1] + m_C(0,2) * aCOMPos.y[2];
 
 	  aZMPPos.theta = ZMPRefPositions[li*interval+lk].theta;
 	  aZMPPos.stepType = ZMPRefPositions[li*interval+lk].stepType;
 
+	  // Put it into the stack.
 	  NewFinalZMPPositions.push_back(aZMPPos);
 	  
-	  ODEBUG6(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
+	  ODEBUG5(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
 		  aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<
-		  aCOMPos.theta << " " 
+		  aCOMPos.theta << " " <<
 		  aZMPPos.px << " " << aZMPPos.py <<  " " << aZMPPos.theta << " " << 
 		  X[0] << " " << X[N] << " " << 
 		  lkSP << " " << T , "DebugInterpol.dat");
 	}
-      zk = m_C*xk;
-      xk = m_A*xk + Buk ;
 
-      ODEBUG6(xk[0] << " " << xk[1] << " " << xk[2] << " " <<
+      // Simulate the dynamical system
+      MAL_C_eq_A_by_B(zk,m_C,xk);
+      xk = MAL_RET_A_by_B(m_A,xk) + Buk ;
+
+      ODEBUG5(xk[0] << " " << xk[1] << " " << xk[2] << " " <<
 	      xk[3] << " " << xk[4] << " " << xk[5] << " " <<
 	      X[0]  << " " << X[N]  << " " << 
 	      zk[0] << " " << zk[1] << " " << 
@@ -3109,7 +3165,8 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	      ,"DebugPBW.dat");
       ODEBUG6("uk:" << uk,"DebugPBW.dat");
       ODEBUG6("xk:" << xk,"DebugPBW.dat");
-      
+
+      // Compute CPU consumption time.
       gettimeofday(&end,0);
       CurrentCPUTime = end.tv_sec - start.tv_sec + 
 	0.000001 * (end.tv_usec - start.tv_usec);
@@ -3137,11 +3194,11 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
       ofstream aof;
       aof.open("StorePx.dat",ofstream::out);
       
-      for(unsigned int i=0;i<vnlStorePx.Rows();i++)
+      for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(vnlStorePx);i++)
 	{
-	  for(unsigned int j=0;j<vnlStorePx.Cols();j++)
+	  for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(vnlStorePx);j++)
 	    {
-	      aof << vnlStorePx[i][j] << " ";
+	      aof << vnlStorePx(i,j) << " ";
 	    }
 	  aof << endl;
 	}
@@ -3152,25 +3209,26 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
       sprintf(lBuffer,"StoreX.dat");
       aof.open(lBuffer,ofstream::out);
       
-      for(unsigned int i=0;i<vnlStoreX.Rows();i++)
+      for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(vnlStoreX);i++)
 	{
-	  for(unsigned int j=0;j<vnlStoreX.Cols();j++)
+	  for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(vnlStoreX);j++)
 	    {
-	      aof << vnlStoreX[i][j] << " ";
+	      aof << vnlStoreX(i,j) << " ";
 	    }
 	  aof << endl;
 	}
       aof.close();
       
       aof.open("Cnb.dat",ofstream::out);
-      for(unsigned int i=0;i<ConstraintNb.Size();i++)
+      for(unsigned int i=0;i<MAL_VECTOR_SIZE(ConstraintNb);i++)
 	{
 	  aof << ConstraintNb[i]<<endl;
 	}
       aof.close();
     }
   
-  cout << "Size of PX: " << vnlStorePx.Rows() << " " << vnlStorePx.Cols() << " " << endl;
+  cout << "Size of PX: " << MAL_MATRIX_NB_ROWS(vnlStorePx) << " " 
+       << MAL_MATRIX_NB_COLS(vnlStorePx) << " " << endl;
   delete C;
   delete D;
   delete XL;

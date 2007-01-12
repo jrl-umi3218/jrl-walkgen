@@ -1,4 +1,5 @@
-/* @doc Computation of the dynamic aspect for a robot.
+/* Computation of the dynamic aspect for a robot.
+   
    This class will load the description of a robot from a VRML file
    following the OpenHRP syntax. Using ForwardVelocity it is then
    possible specifying the angular velocity and the angular value 
@@ -8,19 +9,6 @@
 
    This implantation is an updated based on a mixture between 
    the code provided by Jean-Remy and Adrien.
-
-
-   CVS Information:
-   $Id: DynamicMultiBody.h,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/DynamicMultiBody.h,v $
-   $Log: DynamicMultiBody.h,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
-   OS: Updated the names of the contributors, the documentation
-   and added a sample file for WalkPlugin
-
   
    Copyright (c) 2005-2006, 
    @author Olivier Stasse, Ramzi Sellouati, Jean-Remy Chardonnet, Adrien Escande, Abderrahmane Kheddar
@@ -52,202 +40,253 @@
 
 #ifndef _DYNAMIC_MULTI_BODY_H_
 #define _DYNAMIC_MULTI_BODY_H_
-
-
 #include <vector>
 
-using namespace::std;
-
-#include <VNL/matrix.h>
+#include <MatrixAbstractLayer.h>
 #include <MultiBody.h>
 #include <DynamicBody.h>
-
-namespace PatternGeneratorJRL {
-
-/// This class simulates the dynamic of a multibody robot.
-class DynamicMultiBody : public MultiBody
+using namespace::std;
+namespace PatternGeneratorJRL 
 {
- protected:
 
-  /// Label of the root.
-  int labelTheRoot;
-
-  /// Dynamic Bodies
-  vector<DynamicBody> listOfBodies;
-
-  /// Array to convert Joint Id from VRL file to Body array index.
-  vector<int> ConvertJOINTIDToBodyID;
-
-  /** Update body parameters from the bodyinfo list of 
+  /** @ingroup forwardynamics
+      This class simulates the dynamic of a multibody robot.
+  */
+  class DynamicMultiBody : public MultiBody
+  {
+  protected:
+    
+    /**  Label of the root. */
+    int labelTheRoot;
+    
+    /**  List of bodies with dynamical properties */
+    vector<DynamicBody> listOfBodies;
+    
+    /** Array to convert Joint Id from VRL file to Body array index. */
+    vector<int> ConvertJOINTIDToBodyID;
+    
+    /** Update body parameters from the bodyinfo list of 
       joints and the internal list of bodies. */
-  void UpdateBodyParametersFromJoint(int cID, int lD);
+    void UpdateBodyParametersFromJoint(int cID, int lD);
+    
+    /** The skew matrix related to the CoM position. */
+    MAL_S3x3_MATRIX(,double) SkewCoM;
 
-  /// The skew matrix related to the CoM position.
-  matrix3d SkewCoM;
+    /** Weighted CoM position. */
+    MAL_S3_VECTOR(,double) positionCoMPondere;
+    
+    /** Splitted inertial matrices. */
+    MAL_MATRIX(m_MHStarB,double);
+    MAL_MATRIX(m_MHStarLeftFoot,double); 
+    MAL_MATRIX(m_MHStarRightFoot,double);
+    MAL_MATRIX(m_MHFree,double);
+    
+    /** Inversed Jacobian for the left and right foot. */
+    MAL_MATRIX(m_ILeftJacobian,double);
+    MAL_MATRIX(m_IRightJacobian,double);
+    MAL_MATRIX(m_ERBFI_Left,double);
+    MAL_MATRIX(m_ERBFI_Right,double);
 
-  /// Splitted inertial matrices.
-  VNL::Matrix<double> m_MHStarB, m_MHStarLeftFoot, m_MHStarRightFoot, m_MHFree;
-
-  /// Inversed Jacobian for the left and right foot.
-  VNL::Matrix<double> m_ILeftJacobian,m_IRightJacobian;
-  VNL::Matrix<double> m_ERBFI_Left, m_ERBFI_Right;
+    /** Linear momentum vector */
+    MAL_S3_VECTOR(,double) m_P;
+    
+    /** Angular momentum vector. */
+    MAL_S3_VECTOR(,double) m_L;
+    
+    /** Starting the computation. */
+    bool m_FirstTime;
+    
+  public:
+    
+    /** Default constructor. */
+    DynamicMultiBody(void);
+    
+    /** Destructor */
+    virtual  ~DynamicMultiBody();
+    
   
+    //-----------------------------
+    // Forward model computation
+    //-----------------------------
+    
+    /** Parse a vrml file which describes the robot. The format
+     should be compatible with the one specified by OpenHRP. */
+    virtual void parserVRML(string path, string nom, const char *option);
 
- public:
+    /** \name Dynamic parameters computation related methods 
+	@{
+     */
+    
+    /** Computation the velocity following a tree like path.
+	It is assume that the value of the joint has been
+	correctly set. */
+    void ForwardVelocity(MAL_S3_VECTOR(,double) &PosForRoot, 
+			 MAL_S3x3_MATRIX(,double) &OrientationForRoot, 
+			 MAL_S3_VECTOR(,double) &v0ForRoot);
+    
+    /** Compute Inertia Matrices for Resolved Mometum Control
+	Fist pass for tilde m and tilde c */
+    void InertiaMatricesforRMCFirstStep();
+    
+    /** Second pass for tilde I, and the inertia matrix M and H
+	splitted across all the bodies in RMC_m and RMC_h. */
+    void InertiaMatricesforRMCSecondStep();
+    
+    /** Initialisation of the direct model computation */
+    void ForwardDynamics(int corpsCourant, int liaisonDeProvenance);
+    
+    
+    /** Calculate ZMP. */
+    void CalculateZMP(double &px, 
+		      double &py,
+		      MAL_S3_VECTOR(,double) dP, 
+		      MAL_S3_VECTOR(,double) dL, 
+		      double zmpz);
 
-  /// Constructor.
-  DynamicMultiBody(void);
-  
-  /// Destructor
-  virtual  ~DynamicMultiBody();
+    /** Compute the matrices MH*B, MH*Fi,MHFree  (Kajita IROS 2003 p. 1645) */
+    void BuildSplittedInertialMatrices(  vector<int> LeftLeg, 
+					 vector<int> RightLeg,
+					 int WaistIndex, 
+					 vector<int> FreeJoints);
+    
+    /** Build the linear system for Resolved Momentum Control. */
+    void BuildLinearSystemForRMC(MAL_MATRIX( &PLref, double),
+				 MAL_MATRIX(&XiLeftFootRef,double),
+				 MAL_MATRIX(&XiRightFootRef,double),
+				 int NbOfFreeJoints,
+				 MAL_MATRIX(&S,double),
+				 MAL_MATRIX(&XiBdThetaFreeRef,double),
+				 MAL_MATRIX(&XiBdThetaFree,double),
+				 MAL_MATRIX(&LeftLegVelocity,double),
+				 MAL_MATRIX(&RightLegVelocity,double));
 
-  /// Weighted CoM position.
-  vector3d positionCoMPondere;
+    /** @}*/ 
+    
+    /** Jacobian computation related methods 
+	@{
+     */
+    
+    /** Computig the Jacobian. */
+    int ComputeJacobian(int corps1, int corps2, 
+			MAL_S3_VECTOR(,double) coordLocales, 
+			double *jacobienne[6]);
 
-  /// Get the position of the center of Mass.
-  vector3d getPositionCoM(void);
+    /** Computing the Jacobian with a path (links) */
+    void ComputeJacobianWithPath(vector<int> aPath,
+				 MAL_MATRIX(&J,double));
 
-  /// Momentum vector
-  vector3d m_P;
+    /** Modifying the initial body. */
+    void changerCorpsInitial(int nouveauCorps);
 
-  /// Angular momentum vector.
-  vector3d m_L;
-
-  /// Starting the computation.
-  bool m_FirstTime;
-
-  
-  //-----------------------------
-  // Forward model computation
-  //-----------------------------
-
-  virtual void parserVRML(string path, string nom, const char *option);
-
-  /** Computation the velocity following a tree like path.
-      It is assume that the value of the joint has been
-      correctly set. */
-  void ForwardVelocity(vector3d PosForRoot, matrix3d OrientationForRoot, vector3d v0ForRoot);
-
-  /** Compute Inertia Matrices for Resolved Mometum Control
-      Fist pass for tilde m and tilde c */
-  void InertiaMatricesforRMCFirstStep();
-
-  /** Second pass for tilde I, and the inertia matrix M and H
-      splitted across all the bodies in RMC_m and RMC_h. */
-  void InertiaMatricesforRMCSecondStep();
-
-  /// Initialisation of the direct model computation
-  void ForwardDynamics(int corpsCourant, int liaisonDeProvenance);
-  
-  /// Computig the Jacobian.
-  int ComputeJacobian(int corps1, int corps2, vector3d coordLocales, double *jacobienne[6]);
-
-  /// Computing the Jacobian with a path (links)
-  void ComputeJacobianWithPath(vector<int> aPath, VNL::Matrix<double> &J);
-
-  /// Modifying the initial body.
-  void changerCorpsInitial(int nouveauCorps);
-
-  /// Finding a path between two bodies   (this is the version of "trouverCheminEntre" and has been set in english) 
-  vector<int> FindPathBetween(int body1, int body2);
+    /** Finding a path between two bodies   
+      (this is the version of "trouverCheminEntre" and has been set in english) 
+    */
+    vector<int> FindPathBetween(int body1, int body2);
 
 
-  /// Finding a path between the current body and the targeted body.
-  void trouverCheminEntreAux(int corpsCourant, int corpsVise, int liaisonDeProvenance, vector<int> &chemin);
+    /** Finding a path between the current body and the targeted body. */
+    void trouverCheminEntreAux(int corpsCourant, int corpsVise, 
+			       int liaisonDeProvenance, vector<int> &chemin);
 
-  /// Give the position of a body's point in a frame. 
-  vector3d getPositionPointDansRepere(vector3d point, int corpsDuPoint, int corpsDuRepere);
+    inline void empilerTransformationsLiaisonDirecte(int liaison);
+    inline void empilerTransformationsLiaisonInverse(int liaison);
+    
+    void calculerMatriceTransformationEntre(int corps1, int corps2, float *matrice);
+    void calculerMatriceTransformationEntre(int corps1, int corps2, double *matrice);
+    
+    vector<int> trouverCheminEntre(int corps1, int corps2);
 
-  /// Get back the joint values.
-  double Getq(int JointID);
 
-  /// Specifies the joint values.
-  void Setq(int JointID, double q);
+    /** @} */
 
-  /// Specifies the joint speed values.
-  void Setdq(int JointID, double dq);
-  
-  /// Get the joint speed values.
-  double Getdq(int JointID);
+    /** Give the position of a body's point in a frame.  */
+    MAL_S3_VECTOR(,double) getPositionPointDansRepere(MAL_S3_VECTOR(,double) point, 
+						      int corpsDuPoint, int corpsDuRepere);
 
-  /// Get the linear velocity for the joint
-  vector3d Getv(int JointID);
+    /** \name Getter and setter for dynamic bodies  */
 
-  /// Get the linear velocity for the body.
-  vector3d GetvBody(int BodyID);
+    /** @{ */
 
-  /// Set the orientation for the body.
-  void SetRBody(int BodyID, matrix3d R);
+    /** Get back the joint values. */
+    double Getq(int JointID);
+    
+    /** Specifies the joint values. */
+    void Setq(int JointID, double q);
+    
+    /** Specifies the joint speed values. */
+    void Setdq(int JointID, double dq);
+    
+    /** Get the joint speed values. */
+    double Getdq(int JointID);
+    
+    /** Get the linear velocity for the joint */
+    MAL_S3_VECTOR(,double) Getv(int JointID);
+    
+    /** Get the linear velocity for the body. */
+    MAL_S3_VECTOR(,double) GetvBody(int BodyID);
+    
+    /**  Set the orientation for the body. */
+    void SetRBody(int BodyID, MAL_S3x3_MATRIX(,double) R);
+    
+    /** Set the linear velocity. */
+    void Setv(int JointID, MAL_S3_VECTOR(,double) v0);
+    
+    /** Set the angular velocity. */
+    void Setw(int JointID, MAL_S3_VECTOR(,double) w);
+    
+    /** Get the angular velocity. */
+    MAL_S3_VECTOR(,double) Getw(int JointID);
+    
+    /** Get the angular velocity for the body. */
+    MAL_S3_VECTOR(,double) GetwBody(int BodyID);
+    
+    /** Get the position */
+    MAL_S3_VECTOR(,double) Getp(int JointID);
+    
+    /** Get the Angular Momentum */
+    MAL_S3_VECTOR(,double) GetL(int JointID);
+    
+    /** Get the Linear Momentum */
+    MAL_S3_VECTOR(,double) GetP(int JointID);
+    
+    /** Set the position, to be used with the first body. */
+    void Setp(int JointID, MAL_S3_VECTOR(,double) apos);
 
-  /// Set the linear velocity.
-  void Setv(int JointID, double v0);
+    /** Gives the two momentums vector. */
+    void GetPandL(MAL_S3_VECTOR(,double) &aP, 
+		  MAL_S3_VECTOR(,double) &aL);
 
-  /// Set the angular velocity.
-  void Setw(int JointID, double w);
+    /** Get the position of the center of Mass. */
+    MAL_S3_VECTOR(,double) getPositionCoM(void);
+        
+    
+    /** Returns the name of the body i. */
+    string GetName(int JointID);
 
-  /// Get the angular velocity.
-  vector3d Getw(int JointID);
+    /** @} */
 
-  /// Get the angular velocity for the body.
-  vector3d GetwBody(int BodyID);
-  
-  /// Get the position
-  vector3d Getp(int JointID);
+    /** \name Methods related to the construction of a tree,
+	by specifying a root among the vertices of the undirected graph.
+	@{ 
+    */
 
-  /// Get the Angular Momentum
-  vector3d GetL(int JointID);
+    /** Specify the root of the tree and recompute it. */
+    void SpecifyTheRootLabel(int ID);
+    
+    /** Relabel the current body \a corpsCourant according to the 
+	link (specified by \a liaisonDeProvenance ) by which this body is explored.
+     */
+    void ReLabelling(int corpsCourant, int liaisonDeProvenance);
+    
+    /** @} */
 
-  /// Get the Linear Momentum
-  vector3d GetP(int JointID);
-
-  /// Set the position, to be used with the first body.
-  void Setp(int JointID, vector3d apos);
-  
-  /// Specify the root of the tree and recompute it.
-  void SpecifyTheRootLabel(int ID);
-  
-  /// Print all the informations.
-  void PrintAll();
-
-  inline void empilerTransformationsLiaisonDirecte(int liaison);
-  inline void empilerTransformationsLiaisonInverse(int liaison);
-
-  void calculerMatriceTransformationEntre(int corps1, int corps2, float *matrice);
-  void calculerMatriceTransformationEntre(int corps1, int corps2, double *matrice);
-
-  vector<int> trouverCheminEntre(int corps1, int corps2);
-
-  void ReLabelling(int corpsCourant, int liaisonDeProvenance);
-
-  // Gives the two momentums vector.
-  void GetPandL(vector3d &aP, vector3d &aL);
-
-  // Calculate ZMP.
-  void CalculateZMP(double &px, 
-		    double &py,
-		    vector3d dP, vector3d dL, double zmpz);
-
-  /// Returns the name of the body i.
-  string GetName(int JointID);
-
-  /// Compute the D operator (Kajita IROS 2003 p. 1647)
-  matrix3d D(vector3d r);
-
-  /// Compute the matrices MH*B, MH*Fi,MHFree  (Kajita IROS 2003 p. 1645)
-  void BuildSplittedInertialMatrices(  vector<int> LeftLeg, vector<int> RightLeg,
-				       int WaistIndex, vector<int> FreeJoints);
-
-  /// Build the linear system for Resolved Momentum Control.
-  void BuildLinearSystemForRMC(VNL::Matrix<double> &PLref, 
-			       VNL::Matrix<double> &XiLeftFootRef,
-			       VNL::Matrix<double> &XiRightFootRef,
-			       int NbOfFreeJoints,
-			       VNL::Matrix<double> &S,
-			       VNL::Matrix<double> &XiBdThetaFreeRef,
-			       VNL::Matrix<double> &XiBdThetaFree,       
-			       VNL::Matrix<double> &LeftLegVelocity,
-			       VNL::Matrix<double> &RightLegVelocity);
-
-};
+    /** Print all the informations. */
+    void PrintAll();
+    
+    /** Compute the D operator (Kajita IROS 2003 p. 1647) */
+    MAL_S3x3_MATRIX(,double) D(MAL_S3_VECTOR(,double) &r);
+    
+    
+  };
 };
 #endif

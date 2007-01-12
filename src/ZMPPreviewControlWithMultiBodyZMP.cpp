@@ -1,18 +1,6 @@
 /** @doc This object generate all the values for the foot trajectories,
     and the desired ZMP based on a sequence of steps.
    
-    CVS Information:
-    $Id: ZMPPreviewControlWithMultiBodyZMP.cpp,v 1.4 2006-01-18 06:34:58 stasse Exp $
-    $Author: stasse $
-    $Date: 2006-01-18 06:34:58 $
-    $Revision: 1.4 $
-    $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/ZMPPreviewControlWithMultiBodyZMP.cpp,v $
-    $Log: ZMPPreviewControlWithMultiBodyZMP.cpp,v $
-    Revision 1.4  2006-01-18 06:34:58  stasse
-    OS: Updated the names of the contributors, the documentation
-    and added a sample file for WalkPlugin
-
-
     Copyright (c) 2005-2006, 
     @author Olivier Stasse, Ramzi Sellouati
    
@@ -70,6 +58,7 @@ using namespace PatternGeneratorJRL;
 
 ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(HumanoidSpecificities *aHS)
 {
+
   m_HS = aHS;
   m_ZMPCoMTrajectoryAlgorithm = 1;
 
@@ -104,84 +93,78 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(HumanoidSpe
   RESETDEBUG4("DebugDataIKL.dat");
   RESETDEBUG4("DebugDataIKR.dat");
   RESETDEBUG4("DebugDataWP.txt");
-
-  m_DiffBetweenComAndWaist.Resize(3);
-
+  RESETDEBUG4("Dump.dat");
+  
   for(unsigned int i=0;i<3;i++)
     m_DiffBetweenComAndWaist[i] = 0.0;
-  m_Dt.Resize(3,1);
 
 #if 1
   // Displacement between the hip and the waist.
   if (m_HS==0)
     {
-      m_Dt(0,0) = 0.0;
-      m_Dt(1,0) = 0.04;
-      m_Dt(2,0) = 0.0;
+      m_Dt(0) = 0.0;
+      m_Dt(1) = 0.04;
+      m_Dt(2) = 0.0;
     }
   else
     {
       double WaistToHip[3];
       // Takes the left one.
       m_HS->GetWaistToHip(1,WaistToHip);
-      ODEBUG3(WaistToHip[0] << " "
+      ODEBUG(WaistToHip[0] << " "
 	      << WaistToHip[1] << " "
 	      << WaistToHip[2] << " ");
-      m_Dt(0,0) = WaistToHip[0];
-      m_Dt(1,0) = WaistToHip[1];
-      m_Dt(2,0) = WaistToHip[2];
+      m_Dt(0) = WaistToHip[0];
+      m_Dt(1) = WaistToHip[1];
+      m_Dt(2) = WaistToHip[2];
     }
 #else
-  m_Dt(0,0) = 0.0;
-  m_Dt(1,0) = 0.035;
-  m_Dt(2,0) = 0.0;
+  m_Dt(0) = 0.0;
+  m_Dt(1) = 0.035;
+  m_Dt(2) = 0.0;
 #endif
-  ODEBUG3( "m_DT: " << m_Dt);
-
-  m_StaticToTheLeftHip.Resize(3,1);
-  m_StaticToTheRightHip.Resize(3,1);
-  m_TranslationToTheLeftHip.Resize(3,1);
-  m_TranslationToTheRightHip.Resize(3,1);
+  ODEBUG( "m_DT: " << m_Dt[0] << " " << m_Dt[1] << " " << m_Dt[2]);
 
   // Displacement between the COM and the waist
   // WARNING : Specific to HRP2 !
 
-  VNL::Matrix<double> StaticToTheLeftHip(3,1),StaticToTheRightHip(3,1);
-  m_StaticToTheLeftHip(0,0) = 0.0;
-  m_StaticToTheLeftHip(1,0) = 0.06;
-  m_StaticToTheLeftHip(2,0) = 0.0; // BE CAREFUL HAS TO BEEN INITIALIZED by EvaluateCOM DiffBetweenComAndWaist;
+  MAL_S3_VECTOR(StaticToTheLeftHip,double);
+  MAL_S3_VECTOR(StaticToTheRightHip,double);
+  m_StaticToTheLeftHip(0) = 0.0;
+  m_StaticToTheLeftHip(1) = 0.06;
+  m_StaticToTheLeftHip(2) = 0.0; // BE CAREFUL HAS TO BEEN INITIALIZED by EvaluateCOM DiffBetweenComAndWaist;
   m_TranslationToTheLeftHip = m_StaticToTheLeftHip;
 
-  m_StaticToTheRightHip(0,0) = 0.0;
-  m_StaticToTheRightHip(1,0) = -0.06;
-  m_StaticToTheRightHip(2,0) = 0.0; // BE CAREFUL HAS TO BEEN INITIALIZED by EvaluateCOM DiffBetweenComAndWaist;
+  m_StaticToTheRightHip(0) = 0.0;
+  m_StaticToTheRightHip(1) = -0.06;
+  m_StaticToTheRightHip(2) = 0.0; // BE CAREFUL HAS TO BEEN INITIALIZED by EvaluateCOM DiffBetweenComAndWaist;
   m_TranslationToTheRightHip = m_StaticToTheRightHip;
 
 
   // Initialize the joint related variables.
-  m_prev_ql.Resize(6,1);
-  m_prev_qr.Resize(6,1);
+  MAL_MATRIX_RESIZE(m_prev_ql,6,1);
+  MAL_MATRIX_RESIZE(m_prev_qr,6,1);
 	
-  m_prev_UpperBodyAngles.Resize(28,1);
+  MAL_MATRIX_RESIZE(m_prev_UpperBodyAngles,28,1);
 
   // Initialize the size of the final leg joint values.
-  Finalql.Resize(6,1);
-  Finalqr.Resize(6,1);
+  MAL_MATRIX_RESIZE(Finalql,6,1);
+  MAL_MATRIX_RESIZE(Finalqr,6,1);
 
   // Sampling period.
   m_SamplingPeriod = -1;
 
 
   // Initialization of the first and second preview controls.
-  m_PC1x.Resize(3,1);  m_PC1y.Resize(3,1);
-  m_Deltax.Resize(3,1);  m_Deltay.Resize(3,1);
+  MAL_MATRIX_RESIZE(m_PC1x,3,1);  MAL_MATRIX_RESIZE(m_PC1y,3,1);
+  MAL_MATRIX_RESIZE(m_Deltax,3,1);  MAL_MATRIX_RESIZE(m_Deltay,3,1);
 
   m_DMB = 0;
   m_PC = 0;
   m_IK = 0;
   m_StartingNewSequence = true;
 
-  m_FinalDesiredCOMPose.Resize(4,4);	
+  MAL_MATRIX_RESIZE(m_FinalDesiredCOMPose,4,4);	
   for(int i=0;i<4;i++)
     for(int j=0;j<4;j++)	
       m_FinalDesiredCOMPose(i,j) =0.0;
@@ -220,14 +203,15 @@ void ZMPPreviewControlWithMultiBodyZMP::SetInverseKinematics(InverseKinematics *
 int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 							      FootAbsolutePosition &RightFootPosition,
 							      ZMPPosition &NewZMPRefPos,
-							      VNL::Matrix<double> & lqr, 
-							      VNL::Matrix<double> & lql, 
+							      MAL_MATRIX(& lqr,double), 
+							      MAL_MATRIX(& lql,double), 
 							      COMPosition & refCOMPosition,
 							      COMPosition & finalCOMPosition,
-							      VNL::Matrix<double> &UpperBodyAngles)
+							      MAL_MATRIX( &UpperBodyAngles,double))
 {
-  VNL::Matrix<double> BodyAttitude(3,3,0.0);
-  VNL::Matrix<double> qr(6,1,0.0), ql(6,1,0.0);
+  MAL_S3x3_MATRIX(BodyAttitude,double);
+  MAL_MATRIX_DIM(qr,double,6,1);
+  MAL_MATRIX_DIM(ql,double,6,1);
 
   m_FIFOZMPRefPositions.push_back(NewZMPRefPos);
   FirstStageOfControl(LeftFootPosition,RightFootPosition,refCOMPosition,ql,qr,BodyAttitude);
@@ -240,13 +224,14 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 							      FootAbsolutePosition &RightFootPosition,
 							      ZMPPosition &NewZMPRefPos,
-							      VNL::Matrix<double> & lqr, 
-							      VNL::Matrix<double> & lql, 
+							      MAL_MATRIX(& lqr,double), 
+							      MAL_MATRIX(& lql,double), 
 							      COMPosition & refandfinalCOMPosition,
-							      VNL::Matrix<double> &UpperBodyAngles)
+							      MAL_MATRIX(&UpperBodyAngles,double))
 {
-  VNL::Matrix<double> BodyAttitude(3,3,0.0);
-  VNL::Matrix<double> qr(6,1,0.0), ql(6,1,0.0);
+  MAL_S3x3_MATRIX(BodyAttitude,double);
+  MAL_MATRIX_DIM(qr,double,6,1);
+  MAL_MATRIX_DIM(ql,double,6,1);
 
   m_FIFOZMPRefPositions.push_back(NewZMPRefPos);
   FirstStageOfControl(LeftFootPosition,RightFootPosition,refandfinalCOMPosition,ql,qr,BodyAttitude);
@@ -263,16 +248,19 @@ COMPosition ZMPPreviewControlWithMultiBodyZMP::GetLastCOMFromFirstStage()
   return aCOM;
 }
 
-int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(VNL::Matrix<double> & lqr, VNL::Matrix<double> & lql, 
+int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(MAL_MATRIX(& lqr,double), 
+							    MAL_MATRIX(& lql,double), 
 							    COMPosition & afCOMPosition)
 {
   double Deltazmpx2,Deltazmpy2;
   // Inverse Kinematics variables.
 
-  VNL::Matrix<double> Body_R(3,3), Body_P(3,1);
-  VNL::Matrix<double> Foot_R(3,3), Foot_P(3,1);
+  MAL_S3x3_MATRIX(Body_R,double);
+  MAL_S3_VECTOR(Body_P,double);
+  MAL_S3x3_MATRIX(Foot_R,double);
+  MAL_S3_VECTOR(Foot_P,double);
   float c,s,co,so;
-  VNL::Matrix<double> ToTheHip(3,1);
+  MAL_S3_VECTOR(ToTheHip,double);
   COMPosition aCOMPosition = m_FIFOCOMPositions[0];
   FootAbsolutePosition LeftFootPosition, RightFootPosition;
 
@@ -287,7 +275,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(VNL::Matrix<double> 
 			      Deltazmpx2,Deltazmpy2,
 			      true);
   
-  ODEBUG4(m_Deltax[0][0] << " " << m_Deltay[0][0] , "DebugDataDeltaCOM.txt");
+  ODEBUG4(m_Deltax(0,0) << " " << m_Deltay(0,0) , "DebugDataDeltaCOM.txt");
   ODEBUG6("m_TranslationToTheLeft" << m_TranslationToTheLeft ,"DebugData.txt");
   // Correct COM position    but be carefull this is the COM for NL steps behind.
   for(int i=0;i<3;i++)
@@ -331,10 +319,10 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(VNL::Matrix<double> 
   Body_R(2,0) = 0;       Body_R(2,1) = 0;        Body_R(2,2) = 1;
   */ 
   // COM position
-  ToTheHip = Body_R * m_TranslationToTheLeftHip;
-  Body_P(0,0) = aCOMPosition.x[0] + ToTheHip(0,0) ;
-  Body_P(1,0) = aCOMPosition.y[0] + ToTheHip(1,0);
-  Body_P(2,0) = 0.0; // aCOMPosition.z[0] + ToTheHip(2,0);
+  MAL_S3x3_C_eq_A_by_B(ToTheHip,Body_R , m_TranslationToTheLeftHip);
+  Body_P(0) = aCOMPosition.x[0] + ToTheHip(0) ;
+  Body_P(1) = aCOMPosition.y[0] + ToTheHip(1);
+  Body_P(2) = 0.0; // aCOMPosition.z[0] + ToTheHip(2,0);
 
   m_FinalDesiredCOMPose(0,3) = aCOMPosition.x[0];
   m_FinalDesiredCOMPose(1,3) = aCOMPosition.y[0];
@@ -358,9 +346,9 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(VNL::Matrix<double> 
   Foot_R(2,0) = -so;        Foot_R(2,1) = 0;        Foot_R(2,2) = co;
   
   // position
-  Foot_P(0,0)=LeftFootPosition.x+ m_AnkleSoilDistance*so;
-  Foot_P(1,0)=LeftFootPosition.y;
-  Foot_P(2,0)=LeftFootPosition.z+ m_AnkleSoilDistance*co -(aCOMPosition.z[0] + ToTheHip(2,0));
+  Foot_P(0)=LeftFootPosition.x+ m_AnkleSoilDistance*so;
+  Foot_P(1)=LeftFootPosition.y;
+  Foot_P(2)=LeftFootPosition.z+ m_AnkleSoilDistance*co -(aCOMPosition.z[0] + ToTheHip(2));
   
   // Compute the inverse kinematics.
   m_IK->ComputeInverseKinematics2ForLegs(Body_R,
@@ -371,7 +359,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(VNL::Matrix<double> 
 					 lql);
 
   // RIGHT FOOT //
-  m_Dt(1,0) = -m_Dt(1,0);
+  m_Dt(1) = -m_Dt(1);
 
   // Right Foot.
   c = cos(RightFootPosition.theta*M_PI/180.0);
@@ -384,15 +372,15 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(VNL::Matrix<double> 
   Foot_R(2,0) =  -so;       Foot_R(2,1) =  0;       Foot_R(2,2) = co;
   
   // position
-  Foot_P(0,0)=RightFootPosition.x+m_AnkleSoilDistance*so;
-  Foot_P(1,0)=RightFootPosition.y;
-  Foot_P(2,0)=RightFootPosition.z+m_AnkleSoilDistance*co - (aCOMPosition.z[0] + ToTheHip(2,0));;
+  Foot_P(0)=RightFootPosition.x+m_AnkleSoilDistance*so;
+  Foot_P(1)=RightFootPosition.y;
+  Foot_P(2)=RightFootPosition.z+m_AnkleSoilDistance*co - (aCOMPosition.z[0] + ToTheHip(2));;
   
   // COM position
-  ToTheHip = Body_R * m_TranslationToTheRightHip;
-  Body_P(0,0) = aCOMPosition.x[0] + ToTheHip(0,0) ;
-  Body_P(1,0) = aCOMPosition.y[0] + ToTheHip(1,0);
-  Body_P(2,0) = 0.0;// aCOMPosition.z[0] + ToTheHip(2,0);
+  MAL_S3x3_C_eq_A_by_B(ToTheHip, Body_R, m_TranslationToTheRightHip);
+  Body_P(0) = aCOMPosition.x[0] + ToTheHip(0) ;
+  Body_P(1) = aCOMPosition.y[0] + ToTheHip(1);
+  Body_P(2) = 0.0;// aCOMPosition.z[0] + ToTheHip(2,0);
   
   m_IK->ComputeInverseKinematics2ForLegs(Body_R,
 					 Body_P,
@@ -400,7 +388,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(VNL::Matrix<double> 
 					 Foot_R,
 					 Foot_P,
 					 lqr);
-  m_Dt(1,0) = -m_Dt(1,0);
+  m_Dt(1) = -m_Dt(1);
 
 #ifdef _DEBUG_
   ofstream aof_LastZMP;
@@ -451,18 +439,20 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(VNL::Matrix<double> 
 int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition &LeftFootPosition,
 							    FootAbsolutePosition &RightFootPosition,
 							    COMPosition & afCOMPosition,
-							    VNL::Matrix<double> &ql,
-							    VNL::Matrix<double> &qr,
-							    VNL::Matrix<double> &BodyAttitude)
+							    MAL_MATRIX(&ql,double),
+							    MAL_MATRIX(&qr,double),
+							    MAL_S3x3_MATRIX(&BodyAttitude,double))
 
 {
 
 	
   double zmpx2, zmpy2;
   // Inverse Kinematics variables.
-  matrix3d Body_Rm3d;
-  VNL::Matrix<double> Body_R(3,3,0.0), Body_P(3,1,0.0);
-  VNL::Matrix<double> Foot_R(3,3,0.0), Foot_P(3,1,0.0);
+  MAL_S3x3_MATRIX(Body_Rm3d,double);
+  MAL_S3x3_MATRIX(Body_R,double);
+  MAL_S3_VECTOR(Body_P,double);
+  MAL_S3x3_MATRIX(Foot_R,double);
+  MAL_S3_VECTOR(Foot_P,double);
   float c,s,co,so;
 
   /* int LINKSFORRARM[7] = { 16, 17, 18, 19, 20, 21, 22};
@@ -473,7 +463,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
      int LINKSFORLHAND[5] = { 35, 36, 37, 38, 39};	
   */
  
-  VNL::Matrix<double> ToTheHip(3,1);
+  MAL_S3_VECTOR(ToTheHip,double);
 
 
 #ifdef _DEBUG_
@@ -556,11 +546,14 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
   else  if (m_ZMPCoMTrajectoryAlgorithm==ZMPCOM_TRAJECTORY_WIEBER) 
     {
       for(unsigned j=0;j<3;j++)
-	acomp.x[j] = afCOMPosition.x[j];
+	acomp.x[j] = m_PC1x(j,0)= afCOMPosition.x[j];
       
       for(unsigned j=0;j<3;j++)
-	acomp.y[j] = afCOMPosition.y[j];
-      
+	acomp.y[j] = m_PC1y(j,0)= afCOMPosition.y[j];
+
+      for(unsigned j=0;j<3;j++)
+	acomp.z[j] = afCOMPosition.z[j];
+
     }
   
       
@@ -596,7 +589,8 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 	    << acomp.x[2]<< " "
 	    << acomp.y[2] <<  " " 
 	    << acomp.z[2] << " "
-
+	    << afCOMPosition.x[0] << " " 
+	    << afCOMPosition.y[0] << " " 
 	    ,"DebugDataCOMPC1.txt");
   }
 
@@ -613,9 +607,9 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
   so = sin(afCOMPosition.omega*M_PI/180.0);
 
   // COM Orientation
-  Body_R(0,0) = Body_Rm3d.m[0] = c*co;       Body_R(0,1) = Body_Rm3d.m[1] = -s;       Body_R(0,2) = Body_Rm3d.m[2] = c*so;
-  Body_R(1,0) = Body_Rm3d.m[3] = s*co;       Body_R(1,1) = Body_Rm3d.m[4] =  c;       Body_R(1,2) = Body_Rm3d.m[5] = s*so;
-  Body_R(2,0) = Body_Rm3d.m[6] = -so;       Body_R(2,1) = Body_Rm3d.m[7] = 0;        Body_R(2,2) = Body_Rm3d.m[8] = co;
+  Body_R(0,0) = c*co;       Body_R(0,1) = -s;       Body_R(0,2) = c*so;
+  Body_R(1,0) = s*co;       Body_R(1,1) =  c;       Body_R(1,2) = s*so;
+  Body_R(2,0) = -so;       Body_R(2,1)   =  0;       Body_R(2,2) = co;
   
   /* // COM Orientation
      Body_R(0,0) = Body_Rm3d.m[0] = c;       Body_R(0,1) = Body_Rm3d.m[1] = -s;       Body_R(0,2) = Body_Rm3d.m[2] = 0;
@@ -623,12 +617,12 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
      Body_R(2,0) = Body_Rm3d.m[6] = 0;       Body_R(2,1) = Body_Rm3d.m[7] = 0;        Body_R(2,2) = Body_Rm3d.m[8] = 1;
   */
   // HIP position
-  ToTheHip = Body_R * m_TranslationToTheLeftHip;
-  Body_P(0,0) = acomp.x[0] + ToTheHip(0,0) ;
-  Body_P(1,0) = acomp.y[0] + ToTheHip(1,0);
-  Body_P(2,0) = 0.0; // afCOMPosition.z[0] + ToTheHip(2,0);
+  MAL_S3x3_C_eq_A_by_B(ToTheHip, Body_R, m_TranslationToTheLeftHip);
+  Body_P(0) = acomp.x[0] + ToTheHip(0) ;
+  Body_P(1) = acomp.y[0] + ToTheHip(1);
+  Body_P(2) = 0.0; // afCOMPosition.z[0] + ToTheHip(2);
 
-  acomp.hip=Body_P(2,0);
+  acomp.hip=Body_P(2);
 
   // Left Foot.
   c = cos(LeftFootPosition.theta*M_PI/180.0);
@@ -643,13 +637,14 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
   Foot_R(2,0) = -so;        Foot_R(2,1) = 0;        Foot_R(2,2) = co;
 
   // position
-  Foot_P(0,0)=LeftFootPosition.x+m_AnkleSoilDistance*so;
-  Foot_P(1,0)=LeftFootPosition.y;
-  Foot_P(2,0)=LeftFootPosition.z+m_AnkleSoilDistance*co - (afCOMPosition.z[0] + ToTheHip(2,0));
+  Foot_P(0)=LeftFootPosition.x+m_AnkleSoilDistance*so;
+  Foot_P(1)=LeftFootPosition.y;
+  Foot_P(2)=LeftFootPosition.z+m_AnkleSoilDistance*co - (afCOMPosition.z[0] + ToTheHip(2));
 
-  ODEBUG4( Body_P(0,0) <<  " " << Body_P(1,0) <<  " " << Body_P(2,0)  << " " 
-	   << Foot_P(0,0) <<  " " << Foot_P(1,0) <<  " " << Foot_P(2,0)  << " "
-	   << acomp.x[0] << " " << acomp.y[0] << " " << ToTheHip(0,0) << " " << ToTheHip(1,0)<< " " << ToTheHip(2,0)<< " " 
+  ODEBUG4( Body_P(0) <<  " " << Body_P(1) <<  " " << Body_P(2)  << " " 
+	   << Foot_P(0) <<  " " << Foot_P(1) <<  " " << Foot_P(2)  << " "
+	   << acomp.x[0] << " " << acomp.y[0] << " " 
+	   << ToTheHip(0) << " " << ToTheHip(1)<< " " << ToTheHip(2)<< " " 
 	   << so << " " << co << " " << LeftFootPosition.omega,
 	   "DebugDataIKL.dat");
   
@@ -668,7 +663,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 	   ql(4,0)*180/M_PI << " " <<  
 	   ql(5,0)*180/M_PI, "DebugDataql.txt" );
 
-  m_Dt(1,0) = -m_Dt(1,0);
+  m_Dt(1) = -m_Dt(1);
 
 
   // Right Foot.
@@ -683,19 +678,19 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
   Foot_R(2,0) =  -so;       Foot_R(2,1) =  0;       Foot_R(2,2) = co;
   
   // position
-  Foot_P(0,0)=RightFootPosition.x+m_AnkleSoilDistance*so;
-  Foot_P(1,0)=RightFootPosition.y;
-  Foot_P(2,0)=RightFootPosition.z+m_AnkleSoilDistance*co - (afCOMPosition.z[0] + ToTheHip(2,0));;
+  Foot_P(0)=RightFootPosition.x+m_AnkleSoilDistance*so;
+  Foot_P(1)=RightFootPosition.y;
+  Foot_P(2)=RightFootPosition.z+m_AnkleSoilDistance*co - (afCOMPosition.z[0] + ToTheHip(2));;
   
   // COM position
-  ToTheHip = Body_R * m_TranslationToTheRightHip;
-  Body_P(0,0)=acomp.x[0] + ToTheHip(0,0);
-  Body_P(1,0)=acomp.y[0] + ToTheHip(1,0);
-  Body_P(2,0)=0.0; //afCOMPosition.z[0] + ToTheHip(2,0);
+  MAL_S3x3_C_eq_A_by_B(ToTheHip, Body_R, m_TranslationToTheRightHip);
+  Body_P(0)=acomp.x[0] + ToTheHip(0);
+  Body_P(1)=acomp.y[0] + ToTheHip(1);
+  Body_P(2)=0.0; //afCOMPosition.z[0] + ToTheHip(2,0);
 
-  ODEBUG4( Body_P(0,0) <<  " " << Body_P(1,0) <<  " " << Body_P(2,0)  << " " 
-	   << Foot_P(0,0) <<  " " << Foot_P(1,0) <<  " " << Foot_P(2,0)  << " "
-	   << acomp.x[0] << " " << acomp.y[0] << " " << ToTheHip(0,0) << " " << ToTheHip(1,0)<< " " 
+  ODEBUG4( Body_P(0) <<  " " << Body_P(1) <<  " " << Body_P(2)
+	   << Foot_P(0) <<  " " << Foot_P(1) <<  " " << Foot_P(2)  << " "
+	   << acomp.x[0] << " " << acomp.y[0] << " " << ToTheHip(0) << " " << ToTheHip(1)<< " " 
 	   << so << " " << co ,
 	   "DebugDataIKR.dat");
   
@@ -737,10 +732,10 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
   return 1;
 }
 
-int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(VNL::Matrix<double> &ql,
-							    VNL::Matrix<double> &qr,
-							    VNL::Matrix<double> &UpperBodyAngles,
-							    VNL::Matrix<double> &BodyAttitude,
+int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(MAL_MATRIX( &ql,double),
+							    MAL_MATRIX( &qr,double),
+							    MAL_MATRIX( &UpperBodyAngles,double),
+							    MAL_S3x3_MATRIX( &BodyAttitude,double),
 							    int StartingIteration)
 {
   // Forward Kinematics variables.
@@ -751,10 +746,18 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(VNL::Matrix<double> 
   double ZMPz=0.0;
 
   // Momentum vectors.
-  vector3d P(0,0,0),L(0,0,0),  dP(0,0,0), dL(0,0,0);
+  MAL_S3_VECTOR(P,double);
+  MAL_S3_VECTOR(L,double);
+  MAL_S3_VECTOR(dP,double);
+  MAL_S3_VECTOR(dL,double);
+  P[0]=0.0;P[1]=0.0;P[2]=0.0;
+  L[0]=0.0;L[1]=0.0;L[2]=0.0;
+  dP[0]=0.0;dP[1]=0.0; dP[2]=0.0;
+  dL[0]=0.0;dL[1]=0.0; dL[2]=0.0;
 
-  VNL::Matrix<double> dql(6,1,0.0), dqr(6,1,0.0);
-  VNL::Matrix<double> dUpperBodyAngles(28,1,0.0);
+  MAL_MATRIX_DIM(dql,double,6,1);
+  MAL_MATRIX_DIM(dqr,double,6,1);
+  MAL_MATRIX_DIM(dUpperBodyAngles,double,28,1);
   
   // Update the Dynamic multi body model 
   for(unsigned int j=0;j<6;j++)
@@ -767,13 +770,8 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(VNL::Matrix<double> 
 
       m_DMB->Setdq(LINKSFORLLEG[j],dql(j,0));
       m_prev_ql(j,0) = ql(j,0);
-#ifdef _DEBUG_
-      if (aof_IK1.is_open())
-	{
-	  aof_IK1 << ql(j,0)<< " " << dql(j,0) << " ";
-	}
-#endif
     }
+
   ODEBUG4( dql(0,0)<< " " <<  dql(1,0)  << " " << dql(2,0) << " " 
 	   << dql(3,0) << "  " << dql(4,0) << " " << dql(5,0), "DebugDatadql.txt" );
   
@@ -787,18 +785,10 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(VNL::Matrix<double> 
 	dqr(j,0) = 0;
       m_DMB->Setdq(LINKSFORRLEG[j],dqr(j,0));
       m_prev_qr(j,0) = qr(j,0);
-#ifdef _DEBUG_
-      if (aof_IK1.is_open())
-	{
-	  aof_IK1 << qr(j,0)<< " " << dqr(j,0) << " ";
-	}
-#endif
 
     }
   ODEBUG4( dqr(0,0)<< " " <<  dqr(1,0)  << " " << dqr(2,0) << " " 
 	   << dqr(3,0) << "  " << dqr(4,0) << " " << dqr(5,0), "DebugDatadqr.txt" );
-  
-  
 
   // Update the Dynamic multi body model with upperbody motion
   for(int j=0;j<28;j++)
@@ -813,13 +803,6 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(VNL::Matrix<double> 
 
       ODEBUG6( "dq"<< j << " : " << dUpperBodyAngles(j,0), "DebugData.txt" );  
       m_prev_UpperBodyAngles(j,0) = UpperBodyAngles(j,0);
-#ifdef _DEBUG_
-      if (aof_IK1.is_open())
-	{
-	  aof_IK1 << UpperBodyAngles(j,0)<< " " 
-		  << dUpperBodyAngles(j,0) << " ";
-	}
-#endif
     }
   ODEBUG4( UpperBodyAngles(0,0) << " " <<
 	   UpperBodyAngles(1,0) << " " <<
@@ -881,52 +864,67 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(VNL::Matrix<double> 
 	   , "DebugDatadUB.txt" );
 
   
-  m_Dt(1,0) = -m_Dt(1,0);
+  m_Dt(1) = -m_Dt(1);
 
   // Compute the waist position in a similar manner than for the hip.
-  VNL::Vector<double> AbsoluteWaistPosition(3);
+  MAL_S3_VECTOR(AbsoluteWaistPosition,double);
 
-  AbsoluteWaistPosition = BodyAttitude* m_DiffBetweenComAndWaist;
+  MAL_S3x3_C_eq_A_by_B(AbsoluteWaistPosition, BodyAttitude, m_DiffBetweenComAndWaist);
   AbsoluteWaistPosition[0] += m_PC1x(0,0);
   AbsoluteWaistPosition[1] += m_PC1y(0,0);
 
-  vector3d WaistPosition;
-  vector3d WaistVelocity;
+  MAL_S3_VECTOR(WaistPosition,double);
+  MAL_S3_VECTOR(WaistVelocity,double);
 	
   COMPosition afCOMPosition = m_FIFOCOMPositions.back();
-  WaistVelocity.x = m_PC1x(1,0);
-  WaistVelocity.y = m_PC1y(1,0);
-  WaistVelocity.z = afCOMPosition.z[1];
+  WaistVelocity[0] = m_PC1x(1,0);
+  WaistVelocity[1] = m_PC1y(1,0);
+  WaistVelocity[2] = afCOMPosition.z[1];
   
-#if 0
-  WaistPosition.x = m_PC1x(0,0);
-  WaistPosition.y = m_PC1y(0,0);
-#else
-  WaistPosition.x = AbsoluteWaistPosition[0];
-  WaistPosition.y = AbsoluteWaistPosition[1];
-#endif
-  VNL::Matrix<double> ToTheHip(3,1);
-  ToTheHip = BodyAttitude * m_TranslationToTheLeftHip;
-  WaistPosition.z = afCOMPosition.z[0] + ToTheHip(2,0) - 0.705; 
-  // Compensate for the static translation, not the WAIST position
+  WaistPosition[0] = AbsoluteWaistPosition[0];
+  WaistPosition[1] = AbsoluteWaistPosition[1];
 
+
+  MAL_S3_VECTOR(ToTheHip,double);
+  MAL_S3x3_C_eq_A_by_B(ToTheHip , BodyAttitude , m_TranslationToTheLeftHip);
+  WaistPosition[2] = afCOMPosition.z[0] + ToTheHip(2) - 0.705; 
+
+  // Compensate for the static translation, not the WAIST position
   // but it is the body position which start on the ground.
   
-  ODEBUG4( WaistPosition.x << " " << WaistPosition.y << " " << WaistPosition.z << " " << 
-	   WaistVelocity.x << " " << WaistVelocity.y << " " << WaistVelocity.z << " "
+  ODEBUG4( WaistPosition[0] << " " << WaistPosition[1] << " " << WaistPosition[2] << " " << 
+	   WaistVelocity[0] << " " << WaistVelocity[1] << " " << WaistVelocity[2] << " "
 	   << m_DiffBetweenComAndWaist[0] << " "
 	   << m_DiffBetweenComAndWaist[1] << " "
 	   << m_DiffBetweenComAndWaist[2] << " " 
 	   << m_PC1x(1,0) << " " << m_PC1y(1,0), "DebugDataWP.txt");
 
-  // COM Orientation
-  matrix3d Body_Rm3d;
-  int k=0;
-  for(int i=0;i<3;i++)
-    for(int j=0;j<3;j++)
-      Body_Rm3d.m[k++] = BodyAttitude(i,j);
+  {
+    /* Test */
+    ofstream DumpStream;
+    DumpStream.open("Dump.dat",ofstream::app);
+    for(int i=0;i<m_DMB->NbOfLinks();i++)
+      {
+	DumpStream << m_DMB->Getq(i) << " "
+		   << m_DMB->Getdq(i) << " ";
+      }
 
-  m_DMB->ForwardVelocity(WaistPosition,Body_Rm3d, WaistVelocity);
+    DumpStream << WaistPosition[0] << " "
+	       << WaistPosition[1] << " "
+	       << WaistPosition[2] << " " ;
+    for(int i=0;i<9;i++)
+      DumpStream << BodyAttitude[i] << " ";
+
+    DumpStream << WaistVelocity[0] << " "
+	       << WaistVelocity[1] << " "
+	       << WaistVelocity[2] << endl ;
+    
+    
+  }
+  
+    
+  // Call the forward dynamic.
+  m_DMB->ForwardVelocity(WaistPosition,BodyAttitude, WaistVelocity);
 
   // Get angular and linear momentum.
   if ((StartingIteration>0) || 
@@ -937,8 +935,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(VNL::Matrix<double> 
       if ((StartingIteration>1) ||
 	  (StartingIteration==-1))
 	{
-	  if ((StartingIteration==1) ||
-	      (StartingIteration==2))
+	  if (StartingIteration==2) 
 	    {
 	      // For the first iteration, we assume that the previous values were the same.
 	      m_prev_P = P;
@@ -962,65 +959,12 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(VNL::Matrix<double> 
   m_DMB->CalculateZMP(ZMPmultibody[0],ZMPmultibody[1],
 		      dP, dL, ZMPz);
   
-#ifdef _DEBUG_
-  aof_WCOMdMom 
-    << dP.x << " " << dP.y << " " << dP.z  << " " 
-    << dL.x << " " << dL.y << " " << dL.z  << " " 
-    << ZMPz << " " 
-    << m_DMB->positionCoMPondere.x << " " 
-    << m_DMB->positionCoMPondere.y << " " 
-    << m_DMB->positionCoMPondere.z << " "
-    << m_DMB->getMasse() << endl;
-    
-
-  aof_Momentums << m_FIFOZMPRefPositions[0].time << " "
-		<< P.x << " " << P.y << " " << P.z << " "
-		<< L.x << " " << L.y << " " << L.z << endl;
-  ofstream aof_ZMPMB;
-  static unsigned char FirstCallZMPMB=1;
-  if (FirstCallZMPMB)
-    {
-      aof_ZMPMB.open("ZMPMB.dat",ofstream::out);
-      FirstCallZMPMB = 0;
-    }
-  else 
-    {
-      aof_ZMPMB.open("ZMPMB.dat",ofstream::app);
-    }
-  if (aof_ZMPMB.is_open())
-    {
-      aof_ZMPMB << m_FIFOZMPRefPositions[0].time << " " 
-	        << ZMPmultibody[0] << " " << ZMPmultibody[1] <<  " "
-	        << m_FIFOZMPRefPositions[0].px << " " 
-	        << m_FIFOZMPRefPositions[0].py << " " 
-		<< WaistPosition.x << " " << WaistPosition.y << " " << WaistPosition.z << " "  <<endl;
-      aof_ZMPMB.close();
-    }
-  ofstream aof_ZMPPreviewControl;
-  if (FirstCallZMPMB)
-    {
-      aof_ZMPPreviewControl.open("PosPreviewControlFS.dat",ofstream::out);
-      FirstCallZMPMB = 0;
-    }
-  else 
-    {
-      aof_ZMPPreviewControl.open("PosPreviewControlFS.dat",ofstream::app);
-    }
-  for(int i=0;i<m_DMB->NbOfLinks();i++)
-    {
-      vector3d avec = m_DMB->Getp(i);
-      aof_ZMPPreviewControl << avec.x << " " <<  avec.y << " "  << avec.z << " " ;
-    }
-  aof_ZMPPreviewControl << endl;
-  aof_ZMPPreviewControl.close();      
-  
-#endif
 
   ODEBUG4( StartingIteration << " " << ZMPmultibody[0] << " " << ZMPmultibody[1] << " " 
-	   << P.x << " " << P.y << " " << P.z << " " 
-	   << L.x << " " << L.y << " " << P.z << " " 
-	   << dP.x << " " << dP.y << " " << dP.z <<" " 
-	   << dL.x << " " << dL.y << " " << dL.z << " " << dL ,"DebugDataZMPMB1.txt");
+	   << P[0] << " " << P[1] << " " << P[2] << " " 
+	   << L[0]<< " " << L[1]<< " " << P[2] << " " 
+	   << dP[0] << " " << dP[1]<< " " << dP[2] <<" " 
+	   << dL[0]<< " " << dL[1] << " " << dL[2] << " " << dL ,"DebugDataZMPMB1.txt");
   //COMFromMB = m_DMB->getPositionCoM();
   
   m_prev_P = P;
@@ -1035,33 +979,15 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(VNL::Matrix<double> 
 	  << m_FIFOZMPRefPositions[0].px << " " << m_FIFOZMPRefPositions[0].py  << " " 
 	  << ZMPmultibody[0] << " " << ZMPmultibody[1] , "DebugDataDiffZMP.txt");
   m_FIFODeltaZMPPositions.push_back(aZMPpos);
-
+  
   m_StartingNewSequence = false;
 
-#ifdef _DEBUG_
-  if (aof_WCOMdMom.is_open())
-    aof_WCOMdMom.close();
-
-  if (aof_Momentums.is_open())
-    aof_Momentums.close();
-
-  if (aof_CartZMP.is_open())
-    {
-      aof_CartZMP.close();
-    }
-
-  if (aof_IK1.is_open())
-    {
-      aof_IK1<< endl;
-      aof_IK1.close();
-    }
-#endif 
   return 1;
 }
 
 
-int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(VNL::Matrix<double> &BodyAngles,
-							   VNL::Vector<double> &aStartingCOMPosition,
+int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(MAL_MATRIX(&BodyAngles,double),
+							   MAL_S3_VECTOR(&aStartingCOMPosition,double),
 							   FootAbsolutePosition & InitLeftFootPosition,
 							   FootAbsolutePosition & InitRightFootPosition)
 {
@@ -1072,20 +998,20 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(VNL::Matrix<double> &
 	      InitLeftFootPosition,
 	      InitRightFootPosition);
   
-  aStartingCOMPosition[0] = m_StartingCOMPosition.x;
-  aStartingCOMPosition[1] = m_StartingCOMPosition.y;
-  aStartingCOMPosition[2] = m_StartingCOMPosition.z;
+  aStartingCOMPosition[0] = m_StartingCOMPosition[0];
+  aStartingCOMPosition[1] = m_StartingCOMPosition[1];
+  aStartingCOMPosition[2] = m_StartingCOMPosition[2];
   
   return 0;
 }
 
-int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(VNL::Matrix<double> &BodyAngles,
-							   VNL::Vector<double> &aStartingCOMPosition,
-							   VNL::Vector<double> &aWaistPosition,
+int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(MAL_MATRIX(&BodyAngles,double),
+							   MAL_S3_VECTOR(&aStartingCOMPosition,double),
+							   MAL_S3_VECTOR(&aWaistPosition,double),
 							   FootAbsolutePosition & InitLeftFootPosition,
 							   FootAbsolutePosition & InitRightFootPosition)
 {
-  vector3d WaistPosition;
+  MAL_S3_VECTOR(WaistPosition,double);
   EvaluateCOM(BodyAngles,
 	      0.0,0.0,
 	      m_StartingCOMPosition,
@@ -1093,12 +1019,12 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(VNL::Matrix<double> &
 	      InitLeftFootPosition,
 	      InitRightFootPosition);
   
-  aWaistPosition[0] = WaistPosition.x;
-  aWaistPosition[1] = WaistPosition.y;
-  aWaistPosition[2] = WaistPosition.z;
-  aStartingCOMPosition[0] = m_StartingCOMPosition.x;
-  aStartingCOMPosition[1] = m_StartingCOMPosition.y;
-  aStartingCOMPosition[2] = m_StartingCOMPosition.z;
+  aWaistPosition[0] = WaistPosition[0];
+  aWaistPosition[1] = WaistPosition[1];
+  aWaistPosition[2] = WaistPosition[2];
+  aStartingCOMPosition[0] = m_StartingCOMPosition[0];
+  aStartingCOMPosition[1] = m_StartingCOMPosition[1];
+  aStartingCOMPosition[2] = m_StartingCOMPosition[2];
   
   return 0;
 }
@@ -1107,8 +1033,9 @@ int ZMPPreviewControlWithMultiBodyZMP::Setup(deque<ZMPPosition> &ZMPRefPositions
 					     deque<COMPosition> &COMPositions,
 					     deque<FootAbsolutePosition> &LeftFootPositions,
 					     deque<FootAbsolutePosition> &RightFootPositions,
-					     VNL::Matrix<double> &BodyAngles)
+					     MAL_MATRIX(&BodyAngles,double))
 {
+  ODEBUG("Here!");
   SetupFirstPhase(ZMPRefPositions,
 		  COMPositions,
 		  LeftFootPositions,
@@ -1128,7 +1055,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
 						       deque<COMPosition> &COMPositions,
 						       deque<FootAbsolutePosition> &LeftFootPositions,
 						       deque<FootAbsolutePosition> &RightFootPositions,
-						       VNL::Matrix<double> &BodyAngles)
+						       MAL_MATRIX(&BodyAngles,double))
 {
   ODEBUG6("Beginning of Setup 0 ","DebugData.txt");
   ODEBUG("Setup");
@@ -1141,8 +1068,8 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
   m_syDeltazmp = 0.0;
 
   // Initialization of previous momentum
-  m_prev_P.x = m_prev_P.y = m_prev_P.z =
-    m_prev_L.x = m_prev_L.y = m_prev_L.z = 0.0;
+  m_prev_P[0] = m_prev_P[1] = m_prev_P[2] =
+    m_prev_L[0] = m_prev_L[1] = m_prev_L[2] = 0.0;
 
   m_StartingNewSequence = true;
 
@@ -1155,30 +1082,30 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
   
   ODEBUG6("After EvaluateCOM","DebugData.txt");
 
-  VNL::Matrix<double> UpperBodyAngles(28,1,0.0);
+  MAL_MATRIX_DIM(UpperBodyAngles,double,28,1);
   for(int i=0;i<28;i++)
-    UpperBodyAngles[i][0] = BodyAngles[12+i][0];
+    UpperBodyAngles(i,0) = BodyAngles(12+i,0);
 
   ODEBUG6("Beginning of Setup 1 ","DebugData.txt");	
-  m_PC1x(0,0)= m_StartingCOMPosition.x;
+  m_PC1x(0,0)= m_StartingCOMPosition[0];
   ODEBUG("COMPC1 init X: " <<  m_PC1x(0,0));
   //m_PC1x(0,0) = 0.0;
   m_PC1x(1,0)= 0.0;
   m_PC1x(2,0)= 0.0;
   
-  m_PC1y(0,0)= m_StartingCOMPosition.y;
+  m_PC1y(0,0)= m_StartingCOMPosition[1];
   ODEBUG("COMPC1 init Y: " <<  m_PC1y(0,0));
   //m_PC1y(0,0) = 0.0;
   m_PC1y(1,0)= 0;    
   m_PC1y(2,0)= 0;
 
-  m_Deltax(0,0)= 0.0; //-StartingCOMPosition.x;    
+  m_Deltax(0,0)= 0.0; //-StartingCOMPosition[0];    
   m_Deltax(1,0)= 0;    m_Deltax(2,0)= 0;
-  m_Deltay(0,0)= 0.0; //-StartingCOMPosition.y;    
+  m_Deltay(0,0)= 0.0; //-StartingCOMPosition[1];    
   m_Deltay(1,0)= 0;    m_Deltay(2,0)= 0;
    
-  //  m_sxzmp=-StartingCOMPosition.x;m_syzmp=-StartingCOMPosition.y;
-  //  zmpx2=StartingCOMPosition.x;zmpy2=StartingCOMPosition.y;
+  //  m_sxzmp=-StartingCOMPosition[0];m_syzmp=-StartingCOMPosition[1];
+  //  zmpx2=StartingCOMPosition[0];zmpy2=StartingCOMPosition[1];
   m_sxzmp = 0.0; m_syzmp =0.0;
   zmpx2 = 0.0; zmpy2 = 0.0;
       
@@ -1198,16 +1125,19 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
 							   deque<COMPosition> &COMPositions,
 							   deque<FootAbsolutePosition> &LeftFootPositions,
 							   deque<FootAbsolutePosition> &RightFootPositions,
-							   VNL::Matrix<double> &BodyAngles,
+							   MAL_MATRIX( &BodyAngles,double),
 							   int localindex)
 {
-  VNL::Matrix<double> UpperBodyAngles(28,1,0.0);
+  MAL_MATRIX_DIM(UpperBodyAngles,double,28,1);
   for(int i=0;i<28;i++)
-    UpperBodyAngles[i][0] = BodyAngles[12+i][0];
+    UpperBodyAngles(i,0) = BodyAngles(12+i,0);
   
-  VNL::Matrix<double> BodyAttitude(3,3,0.0);
-  VNL::Matrix<double> qr(6,1,0.0), ql(6,1,0.0);
-
+  MAL_S3x3_MATRIX(BodyAttitude,double);
+  MAL_MATRIX_DIM(qr,double,6,1);
+  MAL_MATRIX_DIM(ql,double,6,1);
+  ODEBUG(COMPositions[localindex].x[0]<< " " <<
+	 COMPositions[localindex].y[0]<< " " <<
+	 COMPositions[localindex].z[0]<< " ");
   FirstStageOfControl(LeftFootPositions[localindex],RightFootPositions[localindex],COMPositions[localindex],
 		      ql,qr,BodyAttitude);
   EvaluateMultiBodyZMP(ql,qr,UpperBodyAngles,BodyAttitude,localindex);
@@ -1215,11 +1145,14 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
   m_FIFOZMPRefPositions.push_back(ZMPRefPositions[localindex+1+m_NL]);
   return 0;
 }
-void ZMPPreviewControlWithMultiBodyZMP::CreateExtraCOMBuffer(deque<COMPosition> &m_ExtraCOMBuffer,deque<ZMPPosition> &m_ExtraZMPBuffer, deque<ZMPPosition> &m_ExtraZMPRefBuffer)
+void ZMPPreviewControlWithMultiBodyZMP::CreateExtraCOMBuffer(deque<COMPosition> &m_ExtraCOMBuffer,
+							     deque<ZMPPosition> &m_ExtraZMPBuffer, 
+							     deque<ZMPPosition> &m_ExtraZMPRefBuffer)
 
 {
   deque<ZMPPosition> aFIFOZMPRefPositions;
-  VNL::Matrix<double> aPC1x,aPC1y; 
+  MAL_MATRIX(aPC1x,double);
+  MAL_MATRIX(aPC1y,double);
   double aSxzmp, aSyzmp;
   double aZmpx2, aZmpy2;
 	
@@ -1277,7 +1210,10 @@ void ZMPPreviewControlWithMultiBodyZMP::CreateExtraCOMBuffer(deque<COMPosition> 
 #ifdef _DEBUG_
       if (aof_ExtraCOM.is_open())
 	{
-	  aof_ExtraCOM << m_ExtraZMPRefBuffer[i].time << " " << m_ExtraZMPRefBuffer[i].px << " "<< aPC1x(0,0)<< " " << aPC1y(0,0) << endl;
+	  aof_ExtraCOM << m_ExtraZMPRefBuffer[i].time << " " 
+		       << m_ExtraZMPRefBuffer[i].px << " "
+		       << aPC1x(0,0)<< " " 
+		       << aPC1y(0,0) << endl;
 	}
 #endif
 		
@@ -1295,50 +1231,50 @@ void ZMPPreviewControlWithMultiBodyZMP::CreateExtraCOMBuffer(deque<COMPosition> 
 }
 
 
-int ZMPPreviewControlWithMultiBodyZMP::EvaluateCOM( VNL::Matrix<double> BodyAngles,
+int ZMPPreviewControlWithMultiBodyZMP::EvaluateCOM( MAL_MATRIX( &BodyAngles,double),
 						    double omega, double theta,
-						    vector3d &lCOMPosition,
+						    MAL_S3_VECTOR( &lCOMPosition,double),
 						    FootAbsolutePosition & InitLeftFootPosition,
 						    FootAbsolutePosition & InitRightFootPosition)
 {
-  vector3d lWaistPosition;
+  MAL_S3_VECTOR(lWaistPosition,double);
   return EvaluateCOM(BodyAngles,
-	      omega,theta,
-	      lCOMPosition, lWaistPosition,
-	      InitLeftFootPosition, InitRightFootPosition);
+		     omega,theta,
+		     lCOMPosition, lWaistPosition,
+		     InitLeftFootPosition, InitRightFootPosition);
   
 }
-int ZMPPreviewControlWithMultiBodyZMP::EvaluateCOM( VNL::Matrix<double> BodyAngles,
+int ZMPPreviewControlWithMultiBodyZMP::EvaluateCOM( MAL_MATRIX( & BodyAngles,double),
 						    double omega, double theta,
-						    vector3d &lCOMPosition,
-						    vector3d &WaistPosition,
+						    MAL_S3_VECTOR( &lCOMPosition,double),
+						    MAL_S3_VECTOR( &WaistPosition,double),
 						    FootAbsolutePosition & InitLeftFootPosition,
 						    FootAbsolutePosition & InitRightFootPosition)
 
 {
-  matrix3d Body_Rm3d;
+  MAL_S3x3_MATRIX(Body_Rm3d,double);
 
   memset(&InitLeftFootPosition,1,sizeof(FootAbsolutePosition));
   memset(&InitRightFootPosition,1,sizeof(FootAbsolutePosition));
 
   // Update the Dynamic multi body model 
-  for(unsigned int j=0;j<BodyAngles.Rows();j++)
+  for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(BodyAngles);j++)
     {
-      ODEBUG4( "EvalueCOM2 :" <<  j << " " << (BodyAngles[j][0]*180/M_PI), "DebugDataStartingCOM.dat");
-      m_DMB->Setq(j,BodyAngles[j][0]);
+      ODEBUG4( "EvalueCOM2 :" <<  j << " " << (BodyAngles(j,0)*180/M_PI), "DebugDataStartingCOM.dat");
+      m_DMB->Setq(j,BodyAngles(j,0));
       m_DMB->Setdq(j,0.0);
     }
 
   // Update the velocity.
-  vector3d RootPosition;
-  vector3d RootVelocity;
-  RootVelocity.x = 0.0;
-  RootVelocity.y = 0.0;
-  RootVelocity.z = 0.0;
+  MAL_S3_VECTOR(RootPosition,double);
+  MAL_S3_VECTOR(RootVelocity,double);
+  RootVelocity[0] = 0.0;
+  RootVelocity[1] = 0.0;
+  RootVelocity[2] = 0.0;
   
-  RootPosition.x = 0.0;
-  RootPosition.y = 0.0;
-  RootPosition.z = -0.705; 
+  RootPosition[0] = 0.0;
+  RootPosition[1] = 0.0;
+  RootPosition[2] = -0.705; 
 
   double c,s,co,so;
   ODEBUG4( "omega: " << omega << " theta: " << theta ,"DebugDataStartingCOM.dat"); 
@@ -1350,94 +1286,98 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateCOM( VNL::Matrix<double> BodyAngl
   so = sin(omega*M_PI/180.0);
   
   // COM Orientation
-  Body_Rm3d.m[0] = c*co;        Body_Rm3d.m[1] = -s;      Body_Rm3d.m[2] = c*so;
-  Body_Rm3d.m[3] = s*co;        Body_Rm3d.m[4] =  c;      Body_Rm3d.m[5] = s*so;
-  Body_Rm3d.m[6] = -so;         Body_Rm3d.m[7] = 0;       Body_Rm3d.m[8] = co;
+  Body_Rm3d(0,0) = c*co;        Body_Rm3d(0,1) = -s;      Body_Rm3d(0,2) = c*so;
+  Body_Rm3d(1,0) = s*co;        Body_Rm3d(1,1) =  c;      Body_Rm3d(1,2) = s*so;
+  Body_Rm3d(2,0) = -so;         Body_Rm3d(2,1) = 0;       Body_Rm3d(2,2) = co;
 
   // Compensate for the static translation, not the WAIST position
   // but it is the body position which start on the ground.
   
   m_DMB->ForwardVelocity(RootPosition,Body_Rm3d, RootVelocity);
   
-  ODEBUG4("Root Position:" << RootPosition.x << " "
-	 << RootPosition.y << " "
-	  << RootPosition.z , "DebugDataStartingCOM.dat");
-  vector3d lFootPosition;
+  ODEBUG4("Root Position:" << RootPosition[0] << " "
+	 << RootPosition[1] << " "
+	  << RootPosition[2] , "DebugDataStartingCOM.dat");
+  MAL_S3_VECTOR(lFootPosition,double);
   lFootPosition  = m_DMB->Getp(5);  
 
-  WaistPosition.x = 0.0;
-  WaistPosition.y = 0.0;
-  WaistPosition.z = -lFootPosition.z+m_AnkleSoilDistance;
+  WaistPosition[0] = 0.0;
+  WaistPosition[1] = 0.0;
+  WaistPosition[2] = -lFootPosition[2]+m_AnkleSoilDistance;
 
-  InitRightFootPosition.x = lFootPosition.x;
-  InitRightFootPosition.y = lFootPosition.y;
+  InitRightFootPosition.x = lFootPosition[0];
+  InitRightFootPosition.y = lFootPosition[1];
   InitRightFootPosition.z = 0.0;
 
 
-  ODEBUG( "Right Foot Position: " << lFootPosition.x << " "
-       << lFootPosition.y << " "
-       << lFootPosition.z );
-  vector3d LeftHip;
+  ODEBUG( "Right Foot Position: " 
+	  << lFootPosition[0] << " "
+	  << lFootPosition[1] << " "
+	  << lFootPosition[2] );
+  MAL_S3_VECTOR(LeftHip,double);
   LeftHip = m_DMB->Getp(6);
-  ODEBUG( "Left Hip Position: " << LeftHip.x << " "
-       << LeftHip.y << " "
-       << LeftHip.z );
+  ODEBUG( "Left Hip Position: " 
+	  << LeftHip[0] << " "
+	  << LeftHip[1] << " "
+	  << LeftHip[2] );
   
   lCOMPosition = m_DMB->getPositionCoM();
-  ODEBUG4( "COM positions: " << lCOMPosition.x << " "
-	  << lCOMPosition.y << " "
-	   << lCOMPosition.z,"DebugDataStartingCOM.dat");
+  ODEBUG4( "COM positions: " 
+	   << lCOMPosition[0] << " "
+	   << lCOMPosition[1] << " "
+	   << lCOMPosition[2],"DebugDataStartingCOM.dat");
 
-  m_DiffBetweenComAndWaist[0] =  -lCOMPosition.x;
-  m_DiffBetweenComAndWaist[1] =  -lCOMPosition.y;
-  m_DiffBetweenComAndWaist[2] =  -lCOMPosition.z 
-    -(m_PC->GetHeightOfCoM() + lFootPosition.z - m_AnkleSoilDistance - lCOMPosition.z); // This term is usefull if
+  m_DiffBetweenComAndWaist[0] =  -lCOMPosition[0];
+  m_DiffBetweenComAndWaist[1] =  -lCOMPosition[1];
+  m_DiffBetweenComAndWaist[2] =  -lCOMPosition[2] 
+    -(m_PC->GetHeightOfCoM() + lFootPosition[2] - m_AnkleSoilDistance - lCOMPosition[2]); // This term is usefull if
   // the initial position does not put z at Zc
   
   // The most important line of the method...
   // The one which initialize correctly the height of the pattern generator.
   for(int i=0;i<3;i++)
     {
-      m_TranslationToTheLeftHip(i,0) = m_StaticToTheLeftHip(i,0) + m_DiffBetweenComAndWaist[i];
-      m_TranslationToTheRightHip(i,0) = m_StaticToTheRightHip(i,0) + m_DiffBetweenComAndWaist[i];
+      m_TranslationToTheLeftHip(i) = m_StaticToTheLeftHip(i) + m_DiffBetweenComAndWaist[i];
+      m_TranslationToTheRightHip(i) = m_StaticToTheRightHip(i) + m_DiffBetweenComAndWaist[i];
     }
 
-  VNL::Matrix<double> lqr(6,1);
-  VNL::Matrix<double> Foot_R(3,3),Body_R(3,3);
-  VNL::Matrix<double> Body_P(3,1),Foot_P(3,1);
+  MAL_MATRIX_DIM(lqr,double,6,1);
+  MAL_S3x3_MATRIX(Foot_R,double);
+  MAL_S3x3_MATRIX(Body_R,double);
+  MAL_S3_VECTOR(Body_P,double);
+  MAL_S3_VECTOR(Foot_P,double);
   for(unsigned int i=0;i<3;i++)
     for(unsigned int j=0;j<3;j++)
       {
 	if (i!=j)
-	  Foot_R[i][j] = 
-	    Body_R[i][j] = 0.0;
+	  Foot_R(i,j) = 
+	    Body_R(i,j) = 0.0;
 	else 
-	  Foot_R[i][j] = 
-	    Body_R[i][j] = 1.0;
+	  Foot_R(i,j) = 
+	    Body_R(i,j) = 1.0;
       }  
-  VNL::Matrix<double> ToTheHip(3,1);
+  MAL_S3_VECTOR(ToTheHip,double);
 
-  ODEBUG( Body_R << endl
-	  << Foot_R );
-  ToTheHip = Body_R * m_TranslationToTheRightHip;
+  ODEBUG(Body_R << endl << Foot_R );
+  MAL_S3x3_C_eq_A_by_B(ToTheHip,Body_R, m_TranslationToTheRightHip);
   ODEBUG("m_StaticToTheRightHip " << m_TranslationToTheRightHip);
   ODEBUG( "ToTheHip " << ToTheHip );
 
-  Body_P(0, 0)= LeftHip.x;
-  Body_P(1, 0)= LeftHip.y;
-  Body_P(2, 0)= 0.0;
+  Body_P(0)= LeftHip[0];
+  Body_P(1)= LeftHip[1];
+  Body_P(2)= 0.0;
 
 
   lFootPosition =  m_DMB->Getp(11);  
-  InitLeftFootPosition.x = lFootPosition.x;
-  InitLeftFootPosition.y = lFootPosition.y;
+  InitLeftFootPosition.x = lFootPosition[0];
+  InitLeftFootPosition.y = lFootPosition[1];
   InitLeftFootPosition.z = 0.0;
   
   ODEBUG( "Body_R " << Body_R );
   ODEBUG( "Body_P  " << Body_P );
-  Foot_P(0,0) = lFootPosition.x;
-  Foot_P(1,0) = lFootPosition.y;
-  Foot_P(2,0) = lFootPosition.z;
+  Foot_P(0) = lFootPosition[0];
+  Foot_P(1) = lFootPosition[1];
+  Foot_P(2) = lFootPosition[2];
 
   InitRightFootPosition.z = 0.0;
   ODEBUG( "Foot_P  " << Foot_P );
@@ -1445,7 +1385,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateCOM( VNL::Matrix<double> BodyAngl
   ODEBUG( "m_Dt" << m_Dt );
 
   // RIGHT FOOT.
-  m_Dt(1,0) = -m_Dt(1,0);
+  m_Dt(1) = -m_Dt(1);
   
   // Compute the inverse kinematics.
   m_IK->ComputeInverseKinematics2ForLegs(Body_R,
@@ -1455,17 +1395,10 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateCOM( VNL::Matrix<double> BodyAngl
 					 Foot_P,
 					 lqr);
 
-  m_Dt(1,0)= -m_Dt(1,0);
+  m_Dt(1)= -m_Dt(1);
 
 
 
-#if 0
-  cout << "Right leg \t Initial Position" << endl;
-  for(unsigned int i=0;i<6;i++)
-    cout << (lqr[i][0]*180.0/M_PI) <<  " \t " 
-	 << (BodyAngles[i][0]*180/M_PI) << endl ;
-  cout << endl;
-#endif
 
   return 1;
 }
@@ -1476,14 +1409,14 @@ void ZMPPreviewControlWithMultiBodyZMP::GetDifferenceBetweenComAndWaist(double l
     lDiffBetweenComAndWaist[i] =    m_DiffBetweenComAndWaist[i];
 }
 
-VNL::Matrix<double> ZMPPreviewControlWithMultiBodyZMP::GetFinalDesiredCOMPose()
+MAL_MATRIX(,double) ZMPPreviewControlWithMultiBodyZMP::GetFinalDesiredCOMPose()
 {
    return m_FinalDesiredCOMPose;
 }
 
-VNL::Vector<double>  ZMPPreviewControlWithMultiBodyZMP::GetCurrentPositionofWaistInCOMFrame()
+MAL_VECTOR(ZMPPreviewControlWithMultiBodyZMP::GetCurrentPositionofWaistInCOMFrame(),double)
 {
-  VNL::Vector<double> CurPosWICF_homogeneous(4);
+  MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4);
   for(int i=0;i<3;i++)
      CurPosWICF_homogeneous[i] = m_DiffBetweenComAndWaist[i];
   CurPosWICF_homogeneous[3] = 1.0;

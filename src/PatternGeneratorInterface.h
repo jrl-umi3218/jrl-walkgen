@@ -43,6 +43,7 @@
 #define _PATTERN_GENERATOR_INTERFACE_H_
 
 #include <sstream>
+#include <MatrixAbstractLayer.h>
 #include <StepOverPlanner.h>
 #include <ZMPPreviewControlWithMultiBodyZMP.h>
 #include <ZMPDiscretization.h>
@@ -58,8 +59,11 @@
 
 namespace PatternGeneratorJRL
 {
-  /** @class 
-      @ingroup Interface
+  /** @ingroup Interface
+      This class is the interface between the Pattern Generator and the 
+      external world. In addition to the classical setter and getter for various parameters
+      there is the possibility to pass commands a string of stream to the method
+      \a ParseCmd().
    */
   class PatternGeneratorInterface
   {    
@@ -181,16 +185,16 @@ namespace PatternGeneratorJRL
     // @param : ZMPTarget : The target ZMP in the waist reference frame.
     // @param : outWaistPosition: The evaluated waist position.
     // @return: True is there is still some data to send, false otherwise.
-    bool RunOneStepOfTheControlLoop(VNL::Matrix<double> &qr,
-				    VNL::Matrix<double> &ql,
-				    VNL::Matrix<double> &UpperBodyAngles,
-				    VNL::Matrix<double> &ZMPTarget,
+    bool RunOneStepOfTheControlLoop(MAL_MATRIX( &qr,double),
+				    MAL_MATRIX( &ql,double),
+				    MAL_MATRIX( &UpperBodyAngles,double),
+				    MAL_MATRIX( &ZMPTarget,double),
 				    COMPosition & outWaistPosition);
 
     // Debug control loop.
-    void DebugControlLoop(VNL::Matrix<double> &qr,
-			  VNL::Matrix<double> &ql,
-			  VNL::Matrix<double> &UpperBodyAngles,
+    void DebugControlLoop(MAL_MATRIX( &qr,double),
+			  MAL_MATRIX( &ql,double),
+			  MAL_MATRIX( &UpperBodyAngles,double),
 			  COMPosition outWaistPosition,
 			  int localindex);
 
@@ -199,17 +203,18 @@ namespace PatternGeneratorJRL
       It also updates the state of the robot if other control mechanisms 
       modifies the upper body part and if this should be taken into account
       into the pattern generator in the second loop of control. */
-    void SetCurrentJointValues(VNL::Matrix<double> lCurrentJointValues);
+    void SetCurrentJointValues(MAL_MATRIX( &lCurrentJointValues,double));
 
     /*! Returns the walking mode. */
     int GetWalkMode();
     
     /*! Get the leg joint velocity */
-    void GetLegJointVelocity(VNL::Matrix<double> &dqr, VNL::Matrix<double> &dql);
+    void GetLegJointVelocity(MAL_MATRIX( &dqr,double), 
+			     MAL_MATRIX( &dql,double));
 
     /* Computer Upper body heuristic for normal walking . */
-    void ComputeUpperBodyHeuristicForNormalWalking(    VNL::Matrix<double> &qArmr, 
-						       VNL::Matrix<double> &qArml,
+    void ComputeUpperBodyHeuristicForNormalWalking(    MAL_MATRIX( &qArmr, double),
+						       MAL_MATRIX( &qArml,double),
 						       COMPosition aCOMPosition,
 						       FootAbsolutePosition RFP,
 						       FootAbsolutePosition LFP );
@@ -235,8 +240,8 @@ namespace PatternGeneratorJRL
      for the given posture of the robot.
      * @param ClearStepStackHandler: Clean the stack of steps after copy.
      */
-    void CommonInitializationOfWalking(VNL::Vector<double>  & lStartingCOMPosition,
-				       VNL::Matrix<double>  & BodyAnglesIni,
+    void CommonInitializationOfWalking(MAL_S3_VECTOR(  & lStartingCOMPosition,double),
+				       MAL_MATRIX(  & BodyAnglesIni,double),
 				       FootAbsolutePosition & InitLeftFootAbsPos, 
 				       FootAbsolutePosition & InitRightFootAbsPos,
 				       deque<RelativeFootPosition> & lRelativeFootPositions,
@@ -248,17 +253,17 @@ namespace PatternGeneratorJRL
     void ExpandCOMAndUpperBodyPositionsQueues(int aNumber);
 
     /*! Compute the COM, left and right foot position for a given BodyAngle position */
-    void EvaluateStartingCOM(VNL::Matrix<double>  & BodyAnglesIni,
-							VNL::Vector<double>  & lStartingCOMPosition,
-							FootAbsolutePosition & InitLeftFootAbsPos, 
-							FootAbsolutePosition & InitRightFootAbsPos);
-
+    void EvaluateStartingCOM(MAL_MATRIX(  & BodyAnglesIni,double),
+			     MAL_S3_VECTOR(  & lStartingCOMPosition,double),
+			     FootAbsolutePosition & InitLeftFootAbsPos, 
+			     FootAbsolutePosition & InitRightFootAbsPos);
+    
     /*! Compute the COM, left and right foot position for a given BodyAngle position */
-    void EvaluateStartingCOM(VNL::Matrix<double>  & BodyAnglesIni,
-							VNL::Vector<double>  & lStartingCOMPosition,
-							VNL::Vector<double>  & lStartingWaistPosition,
-							FootAbsolutePosition & InitLeftFootAbsPos, 
-							FootAbsolutePosition & InitRightFootAbsPos);
+    void EvaluateStartingCOM(MAL_MATRIX(  & BodyAnglesIni,double),
+			     MAL_S3_VECTOR(  & lStartingCOMPosition,double),
+			     MAL_S3_VECTOR(  & lStartingWaistPosition,double),
+			     FootAbsolutePosition & InitLeftFootAbsPos, 
+			     FootAbsolutePosition & InitRightFootAbsPos);
     
     /*! Add an online step */
     void AddOnLineStep(double X, double Y, double Theta);
@@ -279,9 +284,8 @@ namespace PatternGeneratorJRL
 			  double &dy,
 			  double &omega) ;
 
-    /*! An other method to get the waist position using
-      VNL matrix. */
-    void getWaistPositionMatrix(VNL::Matrix<double> &lWaistAbsPos);
+    /*! An other method to get the waist position using a matrix. */
+    void getWaistPositionMatrix(MAL_MATRIX( &lWaistAbsPos,double));
      
 
   protected:
@@ -350,32 +354,32 @@ namespace PatternGeneratorJRL
     /*! Current Joint values of the robot. */
     vector<double> m_CurrentJointValues;
 
-    /*! Position of the waist: */
-    /// Relative:
-    VNL::Matrix<double> m_WaistRelativePos;
+    /*! Position of the waist: 
+      Relative.*/
+    MAL_MATRIX( m_WaistRelativePos,double);
     
-    /// Absolute:
-    VNL::Matrix<double> m_WaistAbsPos;
+    /*! Absolute: */
+    MAL_MATRIX( m_WaistAbsPos,double);
     
-    /// Orientation:
+    /*! Orientation: */
     double m_AbsTheta, m_AbsMotionTheta;
     
-    /// Position of the motion:
-    VNL::Matrix<double> m_MotionAbsPos;
-    VNL::Matrix<double> m_MotionAbsOrientation;
+    /*! Position of the motion: */
+    MAL_MATRIX( m_MotionAbsPos,double);
+    MAL_MATRIX( m_MotionAbsOrientation,double);
     
-    /// Absolute speed:
-    VNL::Matrix<double> m_AbsLinearVelocity;
-    VNL::Matrix<double> m_AbsAngularVelocity;
+    /*! Absolute speed:*/
+    MAL_MATRIX( m_AbsLinearVelocity,double);
+    MAL_MATRIX( m_AbsAngularVelocity,double);
 
-    /// Aboluste acceleration
-    VNL::Matrix<double> m_AbsLinearAcc;
+    /*! Aboluste acceleration */
+    MAL_MATRIX( m_AbsLinearAcc,double);
     
-    /// Keeps track of the last correct support foot.
+    /*! Keeps track of the last correct support foot. */
     int m_KeepLastCorrectSupportFoot;
     
-    /// Boolean to ensure a correct initialization of the 
-    /// step's stack.
+    /*! Boolean to ensure a correct initialization of the 
+      step's stack. */
     bool m_IncorrectInitialization;
 
     /*! Buffer of ZMP positions */
@@ -383,7 +387,6 @@ namespace PatternGeneratorJRL
 
     /*! Buffer of Absolute foot position (World frame) */
     deque<FootAbsolutePosition> m_FootAbsolutePositions;
-    
 
     /*! Buffer of absolute foot position. */
     deque<FootAbsolutePosition> m_LeftFootPositions,m_RightFootPositions;
@@ -411,7 +414,8 @@ namespace PatternGeneratorJRL
     double m_ZARM;
 
     /*! Store the leg's joint velocity. */
-    VNL::Matrix<double> m_dql, m_dqr;
+    MAL_MATRIX( m_dql,double);
+    MAL_MATRIX( m_dqr,double);
 
     /**! Local copy of Preview Control parameters. */
     /*! Sampling period of the control loop. */
@@ -438,17 +442,23 @@ namespace PatternGeneratorJRL
     double m_Xmax;      
 
     /*! Variables used to compute speed for other purposes. */
-    VNL::Matrix<double> m_prev_qr, m_prev_ql;
-    VNL::Matrix<double> m_prev_dqr, m_prev_dql;
+    MAL_MATRIX( m_prev_qr,double);
+    MAL_MATRIX( m_prev_ql,double);
+    MAL_MATRIX( m_prev_dqr, double);
+    MAL_MATRIX( m_prev_dql, double);
 
 
     /* Debug variables. */
-    VNL::Matrix<double> m_Debug_prev_qr, m_Debug_prev_ql;
-    VNL::Matrix<double> m_Debug_prev_dqr, m_Debug_prev_dql;
-    VNL::Matrix<double> m_Debug_prev_UpperBodyAngles;
-    VNL::Matrix<double> m_Debug_prev_qr_RefState, m_Debug_prev_ql_RefState;
+    MAL_MATRIX( m_Debug_prev_qr, double);
+    MAL_MATRIX(m_Debug_prev_ql,double);
+    MAL_MATRIX( m_Debug_prev_dqr, double);
+    MAL_MATRIX(m_Debug_prev_dql,double);
+    MAL_MATRIX( m_Debug_prev_UpperBodyAngles,double);
+    MAL_MATRIX( m_Debug_prev_qr_RefState, double);
+    MAL_MATRIX(m_Debug_prev_ql_RefState,double);
+
     double m_Debug_prev_qWaistYaw, m_Debug_prev_dqWaistYaw;
-    vector3d m_Debug_prev_P, m_Debug_prev_L;
+    MAL_S3_VECTOR(,double) m_Debug_prev_P, m_Debug_prev_L;
     bool m_FirstPrint, m_FirstRead;
 
     bool m_ShouldBeRunning;

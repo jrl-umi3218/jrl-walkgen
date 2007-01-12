@@ -3,17 +3,6 @@
    If you want to change the reference trajectories, and the planning
    of the foot, thOn pageis is the object to modify.
 
-   CVS Information:
-   $Id: ZMPDiscretization.h,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/ZMPDiscretization.h,v $
-   $Log: ZMPDiscretization.h,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
-   OS: Updated the names of the contributors, the documentation
-   and added a sample file for WalkPlugin
-
 
    Copyright (c) 2005-2006, 
    @author Olivier Stasse,Ramzi Sellouati
@@ -46,7 +35,7 @@
 #ifndef _FOOT_PRINT_H_
 #define _FOOT_PRINT_H_
 
-#include <VNL/matrix.h>
+#include <MatrixAbstractLayer.h>
 
 #include <deque>
 #include <string>
@@ -146,7 +135,7 @@ namespace PatternGeneratorJRL
 				deque<FootAbsolutePosition> &LeftHandAbsolutePositions,
 				deque<FootAbsolutePosition> &RightHandAbsolutePositions, 
 				double Xmax,
-				VNL::Vector<double> & lStartingCOMPosition,
+				MAL_S3_VECTOR(& lStartingCOMPosition,double),
 				FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				FootAbsolutePosition & InitRightFootAbsolutePosition);
 
@@ -199,7 +188,7 @@ namespace PatternGeneratorJRL
 		     FootAbsolutePosition & InitLeftFootAbsolutePosition,
 		     FootAbsolutePosition & InitRightFootAbsolutePosition,
 		     deque<RelativeFootPosition> &RelativeFootPositions,
-		     VNL::Vector<double> & lStartingCOMPosition);
+		     MAL_S3_VECTOR(& lStartingCOMPosition,double));
     
       /// Methods to update the stack on-line by inserting a new foot position.
       void OnLine(RelativeFootPosition NewRelativeFootPosition,
@@ -251,12 +240,12 @@ namespace PatternGeneratorJRL
 			    & QueueOfLConstraintInequalities,
 			    double Com_Height,
 			    unsigned int &NbOfConstraints,
-			    VNL::Vector<double> &xk);
+			    MAL_VECTOR(&xk,double));
 
       /*! This method helps to build a linear system for constraining the ZMP. */
       int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
-			       VNL::Matrix<double> &A,
-			       VNL::Matrix<double> &B);
+			      MAL_MATRIX(&A,double),
+			      MAL_MATRIX(&B,double));
 
    protected:
 
@@ -321,7 +310,7 @@ namespace PatternGeneratorJRL
 
     // Current absolute support position in 2D (but 
     // with homogeneous coordinates).
-    VNL::Matrix<double> m_CurrentSupportFootPosition;
+    MAL_MATRIX(m_CurrentSupportFootPosition,double);
 
     // Window for the filtering of the ZMP positions..
     vector<double> m_ZMPFilterWindow;
@@ -334,14 +323,16 @@ namespace PatternGeneratorJRL
     double m_CurrentTime;
 
     // Keep track of the previous foot support position.
-    VNL::Matrix<double> m_vdiffsupppre;
+    MAL_MATRIX(m_vdiffsupppre,double);
 
     // Keep an object which relates the specificities
     // with an abstract layer.
     HumanoidSpecificities *m_HS;
     
     /// Matrices for the dynamical system.
-    VNL::Matrix<double> m_A,m_B,m_C;
+    MAL_MATRIX(m_A,double);
+    MAL_MATRIX(m_B,double);
+    MAL_MATRIX(m_C,double);
       
       
     /// Values for the foot dimensions.

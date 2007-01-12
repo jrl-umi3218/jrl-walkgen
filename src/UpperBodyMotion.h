@@ -3,20 +3,9 @@
    If you want to change the reference trajectories, and the planning
    of the foot, thOn pageis is the object to modify.
 
-   CVS Information:
-   $Id: ZMPDiscretization.h,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/ZMPDiscretization.h,v $
-   $Log: ZMPDiscretization.h,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
-   OS: Updated the names of the contributors, the documentation
-   and added a sample file for WalkPlugin
-
-
    Copyright (c) 2005-2006, 
-   @author Olivier Stasse,Ramzi Sellouati
+   @author Bjorn Verrelst,
+   Olivier Stasse
    
    JRL-Japan, CNRS/AIST
 
@@ -46,7 +35,7 @@
 #ifndef _UPPER_BODY_MOTION_
 #define _UPPER_BODY_MOTION_
 
-#include <VNL/matrix.h>
+#include <MatrixAbstractLayer.h>
 
 #include <vector>
 #include <string>
@@ -60,12 +49,7 @@ using namespace::std;
 
 namespace PatternGeneratorJRL
 {
-  
-
-  
- 
-
- 
+   
   class UpperBodyMotion
     {
       public :
@@ -75,12 +59,12 @@ namespace PatternGeneratorJRL
 
       /// Destructor
       ~UpperBodyMotion();
+      
+      void GenerateDataFile(string aFileName, int LenghtDataArray);
 
-    void GenerateDataFile(string aFileName, int LenghtDataArray);
-
-    void ReadDataFile(string aFileName,  VNL::Matrix<double> &UpperBodyAngles);
-
-    void WriteDataFile(string aFileName, VNL::Matrix<double> &UpperBodyAngles);
+      void ReadDataFile(string aFileName, MAL_MATRIX(&UpperBodyAngles,double));
+      
+      void WriteDataFile(string aFileName, MAL_MATRIX(&UpperBodyAngles,double));
 	
     
    protected:

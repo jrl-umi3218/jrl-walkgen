@@ -8,7 +8,10 @@
 #ifndef _MOTOR_VALUES_EDIT_H_
 #define _MOTOR_VALUES_EDIT_H_
 
-#include "MultiBody.h"
+#include <./HRP2Model/MultiBody.h>
+
+
+
 #include <qwidget.h>
 #include <qtable.h>
 #include <qvbox.h>
@@ -19,7 +22,7 @@ class MotorValuesEdit: public QWidget
   Q_OBJECT
 
    public:
-  MotorValuesEdit(QWidget * parent, const char * name, MultiBody *aMB=0);
+  MotorValuesEdit(QWidget * parent, const char * name,MultiBody *aMB=0);
 
   ~MotorValuesEdit();
 
@@ -45,7 +48,7 @@ class MotorValuesEdit: public QWidget
 
   // Reference to the robot's multibody.
   MultiBody *m_MB;
-
+  
   // Table;
   QTable * m_Table;
 

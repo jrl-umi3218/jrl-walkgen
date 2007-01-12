@@ -2,15 +2,10 @@
    - Center Of Mass,
    - Zero Momentum Point.
    
-   $Id: Body.cpp,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/Body.cpp,v $
-   $Log: Body.cpp,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
    OS: Updated the names of the contributors, the documentation
    and added a sample file for WalkPlugin
+   OS (21/12/2006): removed any reference to non-homogeneous matrix
+   library.
 
 
    Copyright (c) 2005-2006, 
@@ -45,9 +40,6 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <iostream>
-
-using namespace std;
 #include "Body.h"
 
 using namespace PatternGeneratorJRL;
@@ -58,22 +50,44 @@ Body::Body(void)
 {
   //  label = cptCorps++;
   masse	= 0;
-  posCoM	= 0;
-  inertie = matrix3d::identity;
+  posCoM[0] = 0;
+  posCoM[1] = 0;
+  posCoM[2] = 0;
+  MAL_S3x3_MATRIX_SET_IDENTITY(inertie);
   nombreObjets = 0;
   label=-1;
   labelMother=-1;
   m_Explored =0 ;
 }
 
-Body::Body(double masse, vector3d positionCoM, matrix3d matriceInertie) 
+Body::Body(double lmasse) 
 {
   //  label = cptCorps++;
-  this->masse		= masse;
-  this->posCoM	= positionCoM;
-  this->inertie	= matriceInertie;
+  this->masse		= lmasse;
   nombreObjets = 0;
   m_Explored =0 ;
+}
+
+Body::Body(double lmasse, 
+	   MAL_S3_VECTOR(positionCoM,double)) 
+{
+  //  label = cptCorps++;
+  this->masse		= lmasse;
+  nombreObjets = 0;
+  m_Explored =0 ;  
+  this->posCoM	= positionCoM;
+}
+Body::Body(double lmasse, 
+	   MAL_S3_VECTOR(positionCoM,double), 
+	   MAL_S3x3_MATRIX(matriceInertie,double)) 
+{
+  //  label = cptCorps++;
+  this->posCoM	= positionCoM;
+  this->masse		= lmasse;
+  nombreObjets = 0;
+  m_Explored =0 ;  
+
+  this->inertie	= matriceInertie;
 }
 
 
@@ -102,16 +116,16 @@ double Body::getMasse(void) const
   return masse;
 }
 
-vector3d Body::getPositionCoM(void) const
+MAL_S3_VECTOR(,double) Body::getPositionCoM(void) const
 {
   return posCoM;
 }
 
 void Body::setPositionCoM(double cm[3])
 {
-  posCoM.x = cm[0];
-  posCoM.y = cm[1];
-  posCoM.z = cm[2];
+  posCoM[0] = cm[0];
+  posCoM[1] = cm[1];
+  posCoM[2] = cm[2];
 
 }
 
@@ -125,7 +139,7 @@ void Body::afficherNombreObjets() {
 }
 
 
-matrix3d Body::getInertie() const
+MAL_S3x3_MATRIX(,double) Body::getInertie() const
 {
   return inertie;
 }
@@ -160,8 +174,9 @@ Body & Body::operator=( Body const & r)
 
 void Body::setInertie(double mi[9])
 {
-  for(unsigned int i=0;i<9;i++)
-      inertie[i] = mi[i];
+  for(unsigned int i=0;i<3;i++)
+    for(unsigned int j=0;j<3;j++)
+      inertie(i,j) = mi[i*3+j];
 }
 
 void Body::setMasse(double lmasse)
@@ -176,8 +191,13 @@ void Body::Display()
   cout << "Center of Mass    : " << posCoM[0] << " " 
        << posCoM[1] << " " <<posCoM[2]<<endl;
   cout << "Matrix of Inertie : " << endl;
+  for(int i=0;i<3;i++)
+    {
+      for(int j=0;j<3;j++)
+	cout << inertie(i,j) << " ";
+      cout << endl;
+    }
   cout << "Mother: " << labelMother<< endl;
-  inertie.display();
 }
 
 void Body::setLabelMother(int al)

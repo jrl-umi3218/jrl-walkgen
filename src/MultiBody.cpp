@@ -2,18 +2,12 @@
    - Center Of Mass,
    - Zero Momentum Point.
 
-   CVS Information:
-   $Id: MultiBody.cpp,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/MultiBody.cpp,v $
-   $Log: MultiBody.cpp,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
    OS: Updated the names of the contributors, the documentation
    and added a sample file for WalkPlugin
-
-
+   OS (21/12/2006): removed any reference to non-homogeneous matrix
+   library.
+   OS (10/01/2007): Put the abstract layer for small matrix library.
+   
    Copyright (c) 2005-2006, 
    Adrien Escande,
    Abderrahmane Kheddar,  
@@ -49,11 +43,14 @@
 using namespace PatternGeneratorJRL;
 
 // surcharge operateur
-bool PatternGeneratorJRL::operator==(const PatternGeneratorJRL::appariement a1, const PatternGeneratorJRL::appariement a2) {
-return (a1.corps==a2.corps);}
+bool PatternGeneratorJRL::operator==(const PatternGeneratorJRL::appariement a1, 
+				     const PatternGeneratorJRL::appariement a2) 
+{
+  return (a1.corps==a2.corps);
+}
 
 
-transfo::transfo(int ltype, vector3d laxe, 
+transfo::transfo(int ltype, MAL_S3_VECTOR(,double) laxe, 
 		 float lquantite, float *lrotation):
   type(ltype),
   axe(laxe),
@@ -114,15 +111,20 @@ transfo & transfo::operator=(const transfo & r)
   return *this;
 };
 
-//Attention, cet operateur est defini pour des matrices openGL : il effectue leur transposee avant de multiplier
-vector3d operator * (const double* m, const vector3d v)
+
+// Caution: This operator is specific to OpenGL matrices: it transposes the
+// matrix before multiplication.
+MAL_S3_VECTOR(,double) operator * (double* m, MAL_S3_VECTOR(,double) v) 
 {
-  vector3d result = 0;
-  result.x = m[0]*v.x + m[4]*v.y + m[8]*v.z+ m[12];
-  result.y = m[1]*v.x + m[5]*v.y + m[9]*v.z+ m[13];
-  result.z = m[2]*v.x + m[6]*v.y + m[10]*v.z+ m[14];
+  MAL_S3_VECTOR(,double) result;
+
+  result[0] = m[0]*v[0] + m[4]*v[1] +  m[8]*v[2]+ m[12];
+  result[1] = m[1]*v[0] + m[5]*v[1] +  m[9]*v[2]+ m[13];
+  result[2] = m[2]*v[0] + m[6]*v[1] + m[10]*v[2]+ m[14];
   return result;
 }
+
+
 //Pour matrice OpenGL
 void Matrix2AxeAngle(float R[16],double Axis[3], double & Angle)
 {
@@ -246,8 +248,10 @@ void MultiBody::ajouterLiaison(Body &corps1, Body &corps2, internalLink l)
   }
 }
 
-void MultiBody::ajouterLiaisonFixe(Body &corps1, Body &corps2, vector3d translationStat, 
-				   vector3d axeRotationStat, double angleRotationStat)
+void MultiBody::ajouterLiaisonFixe(Body &corps1, Body &corps2, 
+				   MAL_S3_VECTOR(,double) translationStat, 
+				   MAL_S3_VECTOR(,double) axeRotationStat, 
+				   double angleRotationStat)
 {
   //recherche de l'index du premier corps dans listeCorps
   unsigned int index1;
@@ -266,7 +270,9 @@ void MultiBody::ajouterLiaisonFixe(Body &corps1, Body &corps2, vector3d translat
   }
 
   //creation de la liaison
-  internalLink l = {cptLiaison++, FIX_JOINT, translationStat, axeRotationStat, angleRotationStat, vector<transfo>(), index1, index2};
+  internalLink l = {cptLiaison++, FIX_JOINT, 
+		    translationStat, axeRotationStat, angleRotationStat, 
+		    vector<transfo>(), index1, index2};
   listeLiaisons.push_back(l);		//ajout de la liaison a la liste
   //creation de l'appariement corps2, liaison
   appariement a2 = {index2, listeLiaisons.size()-1};
@@ -279,8 +285,11 @@ void MultiBody::ajouterLiaisonFixe(Body &corps1, Body &corps2, vector3d translat
   }
 }
 
-void MultiBody::ajouterLiaisonRotation(Body &corps1, Body &corps2, vector3d axe, vector3d translationStat, 
-				       vector3d axeRotationStat, double angleRotationStat)
+void MultiBody::ajouterLiaisonRotation(Body &corps1, Body &corps2, 
+				       MAL_S3_VECTOR(,double) axe, 
+				       MAL_S3_VECTOR(,double) translationStat, 
+				       MAL_S3_VECTOR(,double) axeRotationStat, 
+				       double angleRotationStat)
 {
   //recherche de l'index du premier corps dans listeCorps
   unsigned int index1;
@@ -302,7 +311,8 @@ void MultiBody::ajouterLiaisonRotation(Body &corps1, Body &corps2, vector3d axe,
   transfo t (ROTATION, axe, 0, NULL);
 
   //creation de la liaison
-  internalLink l = {cptLiaison++, REVOLUTE_JOINT, translationStat, axeRotationStat, angleRotationStat, vector<transfo>(), index1, index2};
+  internalLink l = {cptLiaison++, REVOLUTE_JOINT, translationStat, axeRotationStat, 
+		    angleRotationStat, vector<transfo>(), index1, index2};
   l.listeTransformation.push_back(t);	//ajout rotation dynamique;
   listeLiaisons.push_back(l);		//ajout de la liaison a la liste
   //creation de l'appariement corps2, liaison
@@ -429,7 +439,7 @@ void MultiBody::inverserLiaison(int i)
 
 
 
-vector3d MultiBody::getPositionCoM(void)
+MAL_S3_VECTOR(,double) MultiBody::getPositionCoM(void)
 {
   return (positionCoMPondere/masse);
 }
@@ -457,12 +467,23 @@ void MultiBody::afficherCorps()
 
 void MultiBody::afficherLiaisons(void) {
   for (unsigned int i=0; i<listeLiaisons.size(); i++) {
-    cout << "Name: "<< listeLiaisons[i].Name << " JointID in VRML " << listeLiaisons[i].IDinVRML << " " ;
-    cout << "liaison de type " << listeLiaisons[i].type << "  label "<< listeLiaisons[i].label << "  liant le corps " 
-	 << listeLiaisons[i].indexCorps1 << " au corps " << listeLiaisons[i].indexCorps2 << "\n";
-    cout << "translationStatique : " << listeLiaisons[i].translationStatique << endl;
+    cout << "Name: "<< listeLiaisons[i].Name 
+	 << " JointID in VRML " 
+	 << listeLiaisons[i].IDinVRML << " " ;
+    cout << "liaison de type " << listeLiaisons[i].type 
+	 << "  label "<< listeLiaisons[i].label 
+	 << "  liant le corps " 
+	 << listeLiaisons[i].indexCorps1 
+	 << " au corps " << listeLiaisons[i].indexCorps2 << "\n";
+    cout << "translationStatique : " << endl;
+    for(int j=0;j<3;j++)
+      cout << listeLiaisons[i].translationStatique[j] << " ";
+    cout << endl;
     if (listeLiaisons[i].type > 0) {
-      cout << "    axe : " << listeLiaisons[i].listeTransformation[0].axe << endl;
+      cout << "    axe : " << endl;
+      for(int j=0;j<3;j++)
+	cout << listeLiaisons[i].listeTransformation[0].axe[j] << " ";
+      cout << endl;
     }
   }
   cout << "\n";
@@ -473,12 +494,20 @@ void MultiBody::parserVRML(string path, string nom, const char* option)
   //-----------------------------------------
   // Declaration des variables
 
+  MAL_S3_VECTOR(lxaxis,double);
+  MAL_S3_VECTOR(lyaxis,double);
+  MAL_S3_VECTOR(lzaxis,double);
+  MAL_S3_VECTOR(lnull,double);
+  lxaxis[0]=1.0;lxaxis[1]=0.0;lxaxis[2]=0.0;
+  lyaxis[0]=0.0;lyaxis[1]=1.0;lyaxis[2]=0.0;
+  lzaxis[0]=0.0;lzaxis[1]=0.0;lzaxis[2]=1.0;
+  lnull[0]=0.0;lnull[1]=0.0;lnull[2]=0.0;
   FILE *fichier;
   int cptCorps = 0;
   int profondeur,jointID;
   bool childDescription = false;
   double cm[3], lmasse, mi[9];
-  double r[4], tr[3];
+  //  double r[4], tr[3];
   Body *dernierCorps = NULL;
   string nomWRML = path;
   nomWRML += nom;
@@ -608,7 +637,7 @@ void MultiBody::parserVRML(string path, string nom, const char* option)
 	  return;
 	if (profondeur < PROFONDEUR_MAX)
 	  {
-	    //	    corpsCourant[profondeur] = Body(masse, vector3d(cm[0], cm[1], cm[2]), mi);
+	    //	    corpsCourant[profondeur] = Body(masse, MAL_VECTOR(,double)(cm[0], cm[1], cm[2]), mi);
 	    corpsCourant[profondeur].setLabel(cptCorps++);
 	    corpsCourant[profondeur].setName(BufferDEFNAME);
 	    corpsCourant[profondeur].setInertie(mi);
@@ -639,38 +668,42 @@ void MultiBody::parserVRML(string path, string nom, const char* option)
       liaisonCourante.Name = BufferDEFNAME;
       liaisonCourante.listeTransformation.clear();
       liaisonCourante.IDinVRML = -1;
-      
+
       for (int k=0; k<((liaisonCourante.type==1)?3:1); k++) {
 	switch (nextJointKeyWord(fichier)) {
 	case AXE_X :
 	  {
-	    transfo at(ROTATION, vector3d(1, 0, 0), 0, NULL);
+	    transfo at(ROTATION, lxaxis, 0, NULL);
 	    liaisonCourante.listeTransformation.push_back(at);
 	  }
 	  break;
 	case AXE_Y :
 	  {
-	    transfo at(ROTATION, vector3d(0, 1, 0), 0, NULL);
+	    transfo at(ROTATION, lyaxis, 0, NULL);
 	    liaisonCourante.listeTransformation.push_back(at);
 	  }
 	  break;
 	case AXE_Z :
 	  {
-	    transfo at(ROTATION, vector3d(0, 0, 1), 0, NULL);
+	    transfo at(ROTATION, lzaxis, 0, NULL);
 	    liaisonCourante.listeTransformation.push_back(at);
 	  }
 	  break;
 	case JOINT_TRANSLATION :
 	  {
-	    fscanf(fichier," %lf %lf %lf",&tr[0],&tr[1],&tr[2]);
-	    liaisonCourante.translationStatique = vector3d(tr[0], tr[1], tr[2]);
+	    fscanf(fichier," %lf %lf %lf",
+		   &liaisonCourante.translationStatique[0],
+		   &liaisonCourante.translationStatique[1],
+		   &liaisonCourante.translationStatique[2]);
 	  }
 	  break;
 	case JOINT_ROTATION :
 	  {
-	    fscanf(fichier," %lf %lf %lf %lf",&r[0],&r[1],&r[2],&r[3]);
-	    liaisonCourante.axeRotationStatique = vector3d(r[0], r[1], r[2]);
-	    liaisonCourante.angleRotationStatique = r[3];
+	    fscanf(fichier," %lf %lf %lf %lf",
+		   &liaisonCourante.axeRotationStatique[0],
+		   &liaisonCourante.axeRotationStatique[1],
+		   &liaisonCourante.axeRotationStatique[2],
+		   &liaisonCourante.angleRotationStatique);
 	  }
 	  break;
 	case JOINT_ID :
@@ -682,25 +715,26 @@ void MultiBody::parserVRML(string path, string nom, const char* option)
 	  break;
 	}
       }
-      if (liaisonCourante.type == FREE_JOINT) {							//liaison FREE
-	transfo transDyn1(TRANSLATION, vector3d(1,0,0), 0, NULL);
-	transfo transDyn2(TRANSLATION, vector3d(0,1,0), 0, NULL);
-	transfo transDyn3(TRANSLATION, vector3d(0,0,1), 0, NULL);
-	transfo transDyn4(ROTATION_LIBRE, 0, 0, new float[16]);
-	transDyn4.rotation()[0] = 1;	transDyn4.rotation()[1] = 0;
-	transDyn4.rotation()[2] = 0;	transDyn4.rotation()[3] = 0;
-	transDyn4.rotation()[4] = 0;	transDyn4.rotation()[5] = 1;
-	transDyn4.rotation()[6] = 0;	transDyn4.rotation()[7] = 0;
-	transDyn4.rotation()[8] = 0;	transDyn4.rotation()[9] = 0;
-	transDyn4.rotation()[10] = 1;	transDyn4.rotation()[11] = 0;
-	transDyn4.rotation()[12] = 0;	transDyn4.rotation()[13] = 0;
-	transDyn4.rotation()[14] = 0;	transDyn4.rotation()[15] = 1;
-	liaisonCourante.listeTransformation.push_back(transDyn1);
-	liaisonCourante.listeTransformation.push_back(transDyn2);
-	liaisonCourante.listeTransformation.push_back(transDyn3);
-	liaisonCourante.listeTransformation.push_back(transDyn4);
-      }
-
+      if (liaisonCourante.type == FREE_JOINT) 
+	{	//liaison FREE
+	  transfo transDyn1(TRANSLATION, lxaxis, 0, NULL);
+	  transfo transDyn2(TRANSLATION, lyaxis, 0, NULL);
+	  transfo transDyn3(TRANSLATION, lzaxis, 0, NULL);
+	  transfo transDyn4(ROTATION_LIBRE, lnull, 0, new float[16]);
+	  transDyn4.rotation()[0] = 1;	transDyn4.rotation()[1] = 0;
+	  transDyn4.rotation()[2] = 0;	transDyn4.rotation()[3] = 0;
+	  transDyn4.rotation()[4] = 0;	transDyn4.rotation()[5] = 1;
+	  transDyn4.rotation()[6] = 0;	transDyn4.rotation()[7] = 0;
+	  transDyn4.rotation()[8] = 0;	transDyn4.rotation()[9] = 0;
+	  transDyn4.rotation()[10] = 1;	transDyn4.rotation()[11] = 0;
+	  transDyn4.rotation()[12] = 0;	transDyn4.rotation()[13] = 0;
+	  transDyn4.rotation()[14] = 0;	transDyn4.rotation()[15] = 1;
+	  liaisonCourante.listeTransformation.push_back(transDyn1);
+	  liaisonCourante.listeTransformation.push_back(transDyn2);
+	  liaisonCourante.listeTransformation.push_back(transDyn3);
+	  liaisonCourante.listeTransformation.push_back(transDyn4);
+	}
+      
       break;
     case -1:
       cout << "Anomalie -1" << endl;

@@ -1,19 +1,5 @@
-/** @doc Object to perform preview control on a cart model.
-
-   CVS Information:
-   $Id: PreviewControl.h,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/PreviewControl.h,v $
-   $Log: PreviewControl.h,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
-   OS: Updated the names of the contributors, the documentation
-   and added a sample file for WalkPlugin
-
-
-
-   Copyright (c) 2005-2006, 
+/* Object to perform preview control on a cart model
+    Copyright (c) 2005-2006, 
    @author Olivier Stasse, Ramzi Sellouati
    
    JRL-Japan, CNRS/AIST
@@ -47,24 +33,26 @@
 #include <iostream>
 #include <string>
 #include <deque>
+
+#include <MatrixAbstractLayer.h>
 using namespace::std;
 
-
-#include <VNL/matrix.h>
 #include <PGTypes.h>
 
 namespace PatternGeneratorJRL
 {
 
 
-  /// Class to implement the preview control
+  /** @ingroup previewcontrol
+      @brief Class to implement the preview control
+   */
   class PreviewControl
     {
     public:
-      /// Constructor
+      /*! Constructor */
       PreviewControl();
 
-      /// Destructor
+      /*! Destructor */
       ~PreviewControl();
 
       /** Read the file of parameters aFileName
@@ -73,52 +61,55 @@ namespace PatternGeneratorJRL
       void ReadPrecomputedFile(string aFileName);
   
 
-      /// One iteration of the preview control.
-      int OneIterationOfPreview(VNL::Matrix<double> & x, VNL::Matrix<double> & y,
+      /*! One iteration of the preview control. */
+      int OneIterationOfPreview(MAL_MATRIX(& x,double), 
+				MAL_MATRIX(& y,double),
 				double & sxzmp, double & syzmp,
 				deque<PatternGeneratorJRL::ZMPPosition> & ZMPPositions,
 				unsigned int lindex,
 				double & zmpx2, double & zmpy2,
 				bool Simulation);
 
-      /// Getter for the sampling period.
+      /*! Getter for the sampling period. */
       double SamplingPeriod();
 
-      /// Getter for the preview control time.
+      /*! Getter for the preview control time. */
       double PreviewControlTime();
 
-      /// Getter for the height position of the CoM.
+      /*! Getter for the height position of the CoM. */
       double GetHeightOfCoM();
 
-      /// Overloading of << operator.
+      /*! Overloading of << operator. */
       void print();
 
     protected:
 
-      /// Matrices for preview control.
-      VNL::Matrix<double> m_A, m_B, m_C;
+      /*! Matrices for preview control. */
+      MAL_MATRIX(m_A,double);
+      MAL_MATRIX(m_B,double);
+      MAL_MATRIX(m_C,double);
 
-      /// Control parameters.
-       //@{
-      ///
-      VNL::Matrix <double> m_Kx;
-      /// 
+      /*! Control parameters. */
+      //@{
+      /*! Gain on the current state of the CoM. */
+      MAL_MATRIX(m_Kx,double);
+      /*! Gain on the current ZMP. */
       double m_Ks;
-      /// Window 
-      VNL::Matrix<double> m_F;
+      /*! Window  */
+      MAL_MATRIX(m_F,double);
       //@}
       /// Preview parameters.
        //@{
-      /// Time for the preview control
+       /*! Time for the preview control */
       double m_PreviewControlTime;
       
-      /// Sampling period for the preview 
+      /*! Sampling period for the preview  */
       double m_SamplingPeriod;
 
-      /// Size of the preview window.
+      /*! Size of the preview window. */
       unsigned int m_SizeOfPreviewWindow;
-  
-      /// Height of the CoM.
+      
+      /*! Height of the CoM. */
       double m_Zc;
       //@}
     };

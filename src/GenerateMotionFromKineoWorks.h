@@ -3,16 +3,6 @@
    model of the robot. The link between this partial model is given by
    an auxiliary file, and the redefinition of the virtual functions of this class.
 
-   The current object is 
-   CVS Information: 
-   $Id$
-   $Author$
-   $Date$
-   $Revision$
-   $Source$
-   $Log$
-
-
    Copyright (c) 2005-2006, 
    Olivier Stasse,
    

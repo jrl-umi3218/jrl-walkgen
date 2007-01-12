@@ -3,15 +3,6 @@
    model of the robot. The link between this partial model is given by
    an auxiliary file, and the redefinition of the virtual functions of this class.
 
-   The current object is 
-   CVS Information: 
-   $Id$
-   $Author$
-   $Date$
-   $Revision$
-   $Source$
-   $Log$
-
 
    Copyright (c) 2005-2006, 
    Olivier Stasse,
@@ -46,6 +37,8 @@
 #include <PreviewControl.h>
 #include <ZMPDiscretization.h>
 #include <GenerateMotionFromKineoWorks.h>
+
+#include <MatrixAbstractLayer.h>
 
 #define _DEBUG_
 namespace PatternGeneratorJRL 
@@ -175,7 +168,6 @@ namespace PatternGeneratorJRL
 
 	aif.close();
       }
-    cout << "Number of nodes read" << m_Path.size() << endl;
     return 0;
   }
 
@@ -203,7 +195,8 @@ namespace PatternGeneratorJRL
   void GenerateMotionFromKineoWorks::CreateBufferFirstPreview(deque<ZMPPosition> &ZMPRefBuffer)
   {
     deque<ZMPPosition> aFIFOZMPRefPositions;
-    VNL::Matrix<double> aPC1x,aPC1y; 
+    MAL_MATRIX(aPC1x,double);
+    MAL_MATRIX(aPC1y,double);
     double aSxzmp, aSyzmp;
     double aZmpx2, aZmpy2;
 	
@@ -217,7 +210,7 @@ namespace PatternGeneratorJRL
     aSxzmp = 0.0;//m_sxzmp;
     aSyzmp = 0.0;//m_syzmp;
 
-    aPC1x.Resize(3,1);  aPC1y.Resize(3,1);
+    MAL_MATRIX_RESIZE(aPC1x,3,1);  MAL_MATRIX_RESIZE(aPC1y,3,1);
 
     aPC1x(0,0)= 0;    aPC1x(1,0)= 0;    aPC1x(2,0)= 0;
     aPC1y(0,0)= 0;    aPC1y(1,0)= 0;    aPC1y(2,0)= 0;
@@ -348,10 +341,11 @@ namespace PatternGeneratorJRL
 	//! Find the closest (X,Y,Z) position in the remaining part of the CoM buffer.
 	for(unsigned int i=count;i<m_COMBuffer.size();i++)
 	  {
-	    double ldist= (lX-m_COMBuffer[i].x[0])*(lX - m_COMBuffer[i].x[0]) /*+
-										(lY - m_COMBuffer[i].y[0])*(lY-m_COMBuffer[i].y[0]) +
-										(lZ - m_COMBuffer[i].z[0])*(lZ-m_COMBuffer[i].z[0]) */;
-      
+	    double ldist= (lX-m_COMBuffer[i].x[0])*(lX - m_COMBuffer[i].x[0]) 
+	      /*+
+		(lY - m_COMBuffer[i].y[0])*(lY-m_COMBuffer[i].y[0]) +
+		(lZ - m_COMBuffer[i].z[0])*(lZ-m_COMBuffer[i].z[0]) */;
+	    
 	    if (ldist<dist)
 	      {
 		dist = ldist;
@@ -359,8 +353,8 @@ namespace PatternGeneratorJRL
 	      }
 	  }
     
-	cout << "lX: " << lX <<" lY: " << lY << " lZ: " << lZ << endl
-	     << dist << " " << CountTarget << " " << count << endl;
+	/* cout << "lX: " << lX <<" lY: " << lY << " lZ: " << lZ << endl
+	     << dist << " " << CountTarget << " " << count << endl; */
 	/*! Create the linear interpolation between the previous
 	  reference value and the newly found. */
     

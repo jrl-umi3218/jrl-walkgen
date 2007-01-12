@@ -14,6 +14,7 @@
 #include <qtoolbutton.h>
 #include <qtimer.h>
 
+#include <MatrixAbstractLayer.h>
 #include <PatternGeneratorInterface.h>
 #include <HRP2Display.h>
 #include <joystick.h>
@@ -110,6 +111,7 @@ class MainView: public QMainWindow
     QTimer * m_timer;
     PatternGeneratorJRL::PatternGeneratorInterface * m_PGI;
     Joystick * m_Joystick;
+    MAL_MATRIX(UpperBodyAngles,double);
 };
 
 #endif

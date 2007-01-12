@@ -3,17 +3,10 @@
    OS: Almost all the modifications are related to the computation
    of the Resolved Momentum Control.
 
-   $Id: DynamicBody.cpp,v 1.2 2006-01-18 06:34:58 stasse Exp $
-   $Author: stasse $
-   $Date: 2006-01-18 06:34:58 $
-   $Revision: 1.2 $
-   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/DynamicBody.cpp,v $
-   $Log: DynamicBody.cpp,v $
-   Revision 1.2  2006-01-18 06:34:58  stasse
    OS: Updated the names of the contributors, the documentation
    and added a sample file for WalkPlugin
-
-
+   OS (21/12/2006): removed any reference to non-homogeneous matrix
+   library.
 
    Copyright (c) 2005-2006, 
    Jean Remy Chardonnet,
@@ -59,30 +52,24 @@ DynamicBody::DynamicBody():Body()
   dq = 0.0;
   ddq = 0.0;
 
-  // Inertia related.
-  w_I.setZero();
-  R.setIdentity();
-  Ivv.setZero();
-  Iwv.setZero();
-  Iww.setZero();
   
-  a.x = a.y = a.z = 0;
-  b.x = b.y = b.z = 0;
-  c.x = c.y = c.z = 0;
-  w_c.x = w_c.y = w_c.z = 0;
-  p.x = p.y = p.z = 0;
-  v0.x = v0.y = v0.z = 0;
-  dv.x = dv.y = dv.z = 0;
-  w.x = w.y = w.z = 0;
-  dw.x = dw.y = dw.z = 0;
-  sv.x = sv.y = sv.z = 0;
-  sw.x = sw.y = sw.z = 0;
-  cv.x = cv.y = cv.z = 0;
-  cw.x = cw.y = cw.z = 0;
-  hhv.x = hhv.y = hhv.z = 0;
-  hhw.x = hhw.y = hhw.z = 0;
-  pph.x = pph.y = pph.z = 0;
-  ppb.x = ppb.y = ppb.z = 0;
+  a[0] = a[1] = a[2] = 0;
+  b[0] = b[1] = b[2] = 0;
+  c[0] = c[1] = c[2] = 0;
+  w_c[0] = w_c[1] = w_c[2] = 0;
+  p[0] = p[1] = p[2] = 0;
+  v0[0] = v0[1] = v0[2] = 0;
+  dv[0] = dv[1] = dv[2] = 0;
+  w[0] = w[1] = w[2] = 0;
+  dw[0] = dw[1] = dw[2] = 0;
+  sv[0] = sv[1] = sv[2] = 0;
+  sw[0] = sw[1] = sw[2] = 0;
+  cv[0] = cv[1] = cv[2] = 0;
+  cw[0] = cw[1] = cw[2] = 0;
+  hhv[0] = hhv[1] = hhv[2] = 0;
+  hhw[0] = hhw[1] = hhw[2] = 0;
+  pph[0] = pph[1] = pph[2] = 0;
+  ppb[0] = ppb[1] = ppb[2] = 0;
   
 }
 
