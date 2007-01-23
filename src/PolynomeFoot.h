@@ -44,10 +44,17 @@
 #ifndef _POLYNOME_FOOT_H_
 #define _POLYNOME_FOOT_H_
 
-#include <Polynome.h>
-#include <VNL/matrix.h>
+#ifdef max
+#undef max
+#undef min
+#endif
+
 #include <vector>
+#include <Polynome.h>
+#ifdef _VNL_MATRIX_
+#include <VNL/matrix.h>
 #include <VNL/vector.h>
+#endif
 
 namespace PatternGeneratorJRL
 {

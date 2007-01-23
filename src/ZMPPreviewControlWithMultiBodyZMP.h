@@ -31,6 +31,11 @@
 #ifndef _ZMPREVIEWCONTROLWITHMULTIBODYZMP_H_
 #define _ZMPREVIEWCONTROLWITHMULTIBODYZMP_H_
 
+#ifdef max
+#undef max
+#undef min
+#endif
+
 #include <deque>
 
 #include <MatrixAbstractLayer.h>

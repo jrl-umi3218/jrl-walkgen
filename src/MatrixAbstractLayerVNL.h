@@ -18,6 +18,8 @@
 #include <VNL/Algo/determinant.h>
 #include <VNL/Algo/svd.h>
 #include <VNL/NetLib/netlib.h>
+#undef max
+#undef min
 
 /*!
  * @defgroup VNL
@@ -100,7 +102,10 @@
 #define MAL_MATRIX_C_eq_EXTRACT_A(C,A,type, top,left, nbrows, nbcols) \
   C = A.Extract(nbrows,nbcols,top,left)
 
-#define MAL_MATRIX_RET_DETERMINANT(name)	\
+/*
+  Type is not taken into account. It is just for compatibility with boost.
+*/
+#define MAL_MATRIX_RET_DETERMINANT(name, type)	\
   Determinant(name)
 
 #endif

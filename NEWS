@@ -1,0 +1,1 @@
+Version 2.0 has been made compatible with different linear algebra libraries through an abstraction layer.

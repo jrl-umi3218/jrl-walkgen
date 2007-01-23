@@ -29,6 +29,10 @@
 #ifndef _PREVIEW_CONTROL_H_
 #define _PREVIEW_CONTROL_H_
 
+#ifdef max
+#undef max
+#undef min
+#endif
 
 #include <iostream>
 #include <string>

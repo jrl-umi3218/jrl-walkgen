@@ -36,16 +36,21 @@
 #define _STEPOVER_PLANNER_H_
 
 
+#ifdef max
+#undef max
+#undef min
+#endif
 
-#include <MatrixAbstractLayer.h>
 #include <vector>
 #include <string>
+#include <deque>
+
+#include <MatrixAbstractLayer.h>
 #include <ZMPDiscretization.h>
 #include <PreviewControl.h>
 #include <StepOverPolynome.h>
 #include <InverseKinematics.h>
 #include <DynamicMultiBody.h>
-#include <deque>
 #include <HumanoidSpecificities.h>
 
 

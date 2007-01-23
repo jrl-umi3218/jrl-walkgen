@@ -35,7 +35,8 @@
 #include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/lu.hpp>
 
-#include <f2c.h>
+typedef int logical; 
+
 //#include <cblas.h>
 //#include <clapack.h>
 

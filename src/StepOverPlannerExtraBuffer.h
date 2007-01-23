@@ -46,15 +46,21 @@
 #ifndef _STEPOVER_PLANNER_H_
 #define _STEPOVER_PLANNER_H_
 
-#include <VNL/matrix.h>
+#ifdef max
+#undef max
+#undef min
+#endif
+
+#include <deque>
 #include <vector>
 #include <string>
+
+#include <VNL/matrix.h>
 #include <ZMPDiscretization.h>
 #include <PreviewControl.h>
 #include <StepOverPolynome.h>
 #include <InverseKinematics.h>
 #include <DynamicMultiBody.h>
-#include <deque>
 
 //#include <PolynomeFoot.h>
 

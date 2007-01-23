@@ -177,11 +177,11 @@
   included into \a matrix. The other values are set to zero.
 
   if \n
-  \f$ A = \left( \begin{matrix}
+  \f$ A = \left( \begin{array}{cccc}
   1 & 2 & 3 & 4 \\
   5 & 6 & 7 & 8 \\
   9 & 10& 11& 12 \\
-  \end{matrix}
+  \end{array}
   \right) \f$
   \n
   then with 
@@ -189,11 +189,11 @@
   MAL_S3x3_MATRIX_SET_IDENTITY(A)
   \endcode
   \f$ A\f$ becomes \n
-  \f$ A = \left( \begin{matrix}
+  \f$ A = \left( \begin{array}{cccc}
   1 & 0 & 0 & 0 \\
   0 & 1 & 0 & 0 \\
   0 & 0 & 1 & 0 \\
-  \end{matrix}
+  \end{array}
   \right) \f$
 
 

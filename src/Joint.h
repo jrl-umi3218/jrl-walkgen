@@ -89,12 +89,12 @@ namespace PatternGeneratorJRL
       
     \f$
     R= \left[ 
-    \begin{matrix}
+    \begin{array}{cccc}
     r_{0} & r_{1} & r_{2} & r_{3} \\
     r_{4} & r_{5} & r_{6} & r_{7} \\
     r_{8} & r_{9} & r_{10} & r_{11} \\
     r_{12} & r_{13} & r_{14} & r_{15} \\
-    \end{matrix}
+    \end{array}
     \right]
     \f$
     where \f$rotation(i) = r_{i}\f$.

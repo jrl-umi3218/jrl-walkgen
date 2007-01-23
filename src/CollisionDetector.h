@@ -33,12 +33,10 @@
 #ifndef _COLLISION_DETECTOR_H_
 #define _COLLISION_DETECTOR_H_
 
-
-
-#include <MatrixAbstractLayer.h>
 #include <vector>
 #include <string>
 
+#include <MatrixAbstractLayer.h>
 
 namespace PatternGeneratorJRL
 {

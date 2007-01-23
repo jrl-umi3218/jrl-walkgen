@@ -35,10 +35,15 @@
 #ifndef _FOOT_PRINT_H_
 #define _FOOT_PRINT_H_
 
-#include <MatrixAbstractLayer.h>
+#ifdef max
+#undef max
+#undef min
+#endif
 
 #include <deque>
 #include <string>
+#include <MatrixAbstractLayer.h>
+
 //#define FULL_POLYNOME
 
 using namespace::std;

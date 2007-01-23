@@ -34,14 +34,20 @@
 #ifndef _WAISTHEIGHT_VARIATION_H_
 #define _WAISTHEIGHT_VARIATION_H_
 
-#include <MatrixAbstractLayer.h>
+#ifdef max
+#undef max
+#undef min
+#endif
 
+#include <deque>
 #include <vector>
 #include <string>
+
+#include <MatrixAbstractLayer.h>
+
 #include <Polynome.h>
 #include <ZMPDiscretization.h>
 #include <PreviewControl.h>
-#include <deque>
 
 
 
