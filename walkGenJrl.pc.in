@@ -6,5 +6,5 @@ includedir=@includedir@
 Name: @PACKAGE@
 Description: Walk generator for humanoid robot based on preview control
 Version: @VERSION@
-Libs: -L${libdir} -lwalkGenJRL
-Cflags: -I${includedir}/walkGenJRL
+Libs: -L${libdir} -lwalkGenJRL @VNL_LIB@ @ATLAS_LIB@ 
+Cflags: -I${includedir}/walkGenJRL @BOOST_CFLAGS@ @BOOST_SANDBOX_CFLAGS@ @VNL_CFLAGS@ @ATLAS_CFLAGS@ 

@@ -17,7 +17,7 @@
 #include <VNL/Algo/matrixinverse.h>
 #include <VNL/Algo/determinant.h>
 #include <VNL/Algo/svd.h>
-#include <VNL/NetLib/netlib.h>
+#include <netlib.h>
 #undef max
 #undef min
 
