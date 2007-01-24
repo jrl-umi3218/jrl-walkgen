@@ -434,7 +434,6 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
       Romega(0,2) = 0;
       Romega(1,2) = 0;
       
-      //      RiR = VNL::MatrixInverse<double> (MSupportFoot* Romegastep);
       MAL_MATRIX(lTmp,double);
       MAL_C_eq_A_by_B(lTmp,MSupportFoot,Romegastep);
       MAL_INVERSE(lTmp, RiR,double);
@@ -534,7 +533,6 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
       iRomega(1,0) = sinlOmegaStep;
       iRomega(1,1) = coslOmegaStep;
       
-      //RiR = VNL::MatrixInverse<double> (MSupportFoot*iRomega);
       MAL_MATRIX(lTmp,double);
       MAL_C_eq_A_by_B(lTmp,MSupportFoot,iRomega);
       MAL_INVERSE(lTmp, RiR,double);

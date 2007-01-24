@@ -15,6 +15,7 @@
 @SET_MAKE@
 
 
+
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -37,6 +38,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+bin_PROGRAMS = TestFootPrintPGInterface$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(walkGenJRL_HEADERS)
@@ -52,7 +54,8 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(walkGenJRLdir)"
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
+	"$(DESTDIR)$(walkGenJRLdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libwalkGenJRL_la_LIBADD =
@@ -79,6 +82,14 @@ am_libwalkGenJRL_la_OBJECTS = libwalkGenJRL_la-Polynome.lo \
 	libwalkGenJRL_la-HumanoidSpecificities.lo \
 	libwalkGenJRL_la-qld.lo
 libwalkGenJRL_la_OBJECTS = $(am_libwalkGenJRL_la_OBJECTS)
+binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
+PROGRAMS = $(bin_PROGRAMS)
+am_TestFootPrintPGInterface_OBJECTS =  \
+	TestFootPrintPGInterface-TestFootPrintPGInterface.$(OBJEXT)
+TestFootPrintPGInterface_OBJECTS =  \
+	$(am_TestFootPrintPGInterface_OBJECTS)
+TestFootPrintPGInterface_DEPENDENCIES =  \
+	$(top_builddir)/src/libwalkGenJRL.la
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -90,8 +101,10 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libwalkGenJRL_la_SOURCES)
-DIST_SOURCES = $(libwalkGenJRL_la_SOURCES)
+SOURCES = $(libwalkGenJRL_la_SOURCES) \
+	$(TestFootPrintPGInterface_SOURCES)
+DIST_SOURCES = $(libwalkGenJRL_la_SOURCES) \
+	$(TestFootPrintPGInterface_SOURCES)
 walkGenJRLHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(walkGenJRL_HEADERS)
 ETAGS = etags
@@ -226,11 +239,9 @@ libwalkGenJRL_la_SOURCES = \
 	qld.cpp
 
 libwalkGenJRL_la_CPPFLAGS = -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib
-
-#bin_PROGRAMS = TestFootPrintPGInterface
-#TestFootPrintPGInterface_SOURCES = TestFootPrintPGInterface.cpp
-#TestFootPrintPGInterface_CPPFLAGS = -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib
-#LD_ADD = $(builddir)/libwalkGenJRL.la
+TestFootPrintPGInterface_SOURCES = TestFootPrintPGInterface.cpp
+TestFootPrintPGInterface_CPPFLAGS = -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib
+TestFootPrintPGInterface_LDADD = $(top_builddir)/src/libwalkGenJRL.la
 walkGenJRLdir = @includedir@/walkGenJRL
 walkGenJRL_HEADERS = \
 	Polynome.h \
@@ -319,6 +330,37 @@ clean-libLTLIBRARIES:
 	done
 libwalkGenJRL.la: $(libwalkGenJRL_la_OBJECTS) $(libwalkGenJRL_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(libwalkGenJRL_la_LDFLAGS) $(libwalkGenJRL_la_OBJECTS) $(libwalkGenJRL_la_LIBADD) $(LIBS)
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  if test -f $$p \
+	     || test -f $$p1 \
+	  ; then \
+	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(bindir)/$$f'"; \
+	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
+	  else :; fi; \
+	done
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  f=`echo "$$p" | sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
+	  echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(bindir)/$$f"; \
+	done
+
+clean-binPROGRAMS:
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  echo " rm -f $$p $$f"; \
+	  rm -f $$p $$f ; \
+	done
+TestFootPrintPGInterface$(EXEEXT): $(TestFootPrintPGInterface_OBJECTS) $(TestFootPrintPGInterface_DEPENDENCIES) 
+	@rm -f TestFootPrintPGInterface$(EXEEXT)
+	$(CXXLINK) $(TestFootPrintPGInterface_LDFLAGS) $(TestFootPrintPGInterface_OBJECTS) $(TestFootPrintPGInterface_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -326,6 +368,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-Body.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-CollisionDetector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-ConvexHull.Plo@am__quote@
@@ -532,6 +575,20 @@ libwalkGenJRL_la-qld.lo: qld.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-qld.lo `test -f 'qld.cpp' || echo '$(srcdir)/'`qld.cpp
 
+TestFootPrintPGInterface-TestFootPrintPGInterface.o: TestFootPrintPGInterface.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestFootPrintPGInterface_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestFootPrintPGInterface-TestFootPrintPGInterface.o -MD -MP -MF "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo" -c -o TestFootPrintPGInterface-TestFootPrintPGInterface.o `test -f 'TestFootPrintPGInterface.cpp' || echo '$(srcdir)/'`TestFootPrintPGInterface.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo" "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Po"; else rm -f "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestFootPrintPGInterface.cpp' object='TestFootPrintPGInterface-TestFootPrintPGInterface.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestFootPrintPGInterface_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestFootPrintPGInterface-TestFootPrintPGInterface.o `test -f 'TestFootPrintPGInterface.cpp' || echo '$(srcdir)/'`TestFootPrintPGInterface.cpp
+
+TestFootPrintPGInterface-TestFootPrintPGInterface.obj: TestFootPrintPGInterface.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestFootPrintPGInterface_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestFootPrintPGInterface-TestFootPrintPGInterface.obj -MD -MP -MF "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo" -c -o TestFootPrintPGInterface-TestFootPrintPGInterface.obj `if test -f 'TestFootPrintPGInterface.cpp'; then $(CYGPATH_W) 'TestFootPrintPGInterface.cpp'; else $(CYGPATH_W) '$(srcdir)/TestFootPrintPGInterface.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo" "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Po"; else rm -f "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestFootPrintPGInterface.cpp' object='TestFootPrintPGInterface-TestFootPrintPGInterface.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestFootPrintPGInterface_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestFootPrintPGInterface-TestFootPrintPGInterface.obj `if test -f 'TestFootPrintPGInterface.cpp'; then $(CYGPATH_W) 'TestFootPrintPGInterface.cpp'; else $(CYGPATH_W) '$(srcdir)/TestFootPrintPGInterface.cpp'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -636,9 +693,11 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
+install-binPROGRAMS: install-libLTLIBRARIES
+
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(walkGenJRLdir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(walkGenJRLdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -667,8 +726,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
-	mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
+	clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -688,7 +747,7 @@ info-am:
 
 install-data-am: install-walkGenJRLHEADERS
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
 
 install-info: install-info-am
 
@@ -714,21 +773,22 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES \
-	uninstall-walkGenJRLHEADERS
+uninstall-am: uninstall-binPROGRAMS uninstall-info-am \
+	uninstall-libLTLIBRARIES uninstall-walkGenJRLHEADERS
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libLTLIBRARIES clean-libtool ctags distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am \
-	install-libLTLIBRARIES install-man install-strip \
-	install-walkGenJRLHEADERS installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-info-am uninstall-libLTLIBRARIES \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
+	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
+	distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-exec install-exec-am \
+	install-info install-info-am install-libLTLIBRARIES \
+	install-man install-strip install-walkGenJRLHEADERS \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-info-am uninstall-libLTLIBRARIES \
 	uninstall-walkGenJRLHEADERS
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

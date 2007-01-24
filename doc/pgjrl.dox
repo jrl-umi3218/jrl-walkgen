@@ -1,6 +1,6 @@
 # Doxyfile 1.4.2
 
-@INCLUDE = common.dox
+@INCLUDE = ../doc/common.dox
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -35,10 +35,8 @@ SHOW_DIRECTORIES       = NO
 #---------------------------------------------------------------------------
 FILE_PATTERNS          = *.h *.idl
 EXCLUDE_PATTERNS       = 
-INPUT                  = ./additionalHeader \
-			 ../src/ \
-			 ../plugin/ \
-			 ../plugin/corba \
+INPUT                  = ../doc/additionalHeader \
+			 ../src/ 
 			
 
 #---------------------------------------------------------------------------
@@ -61,9 +59,9 @@ VERBATIM_HEADERS       = NO
 # configuration options related to the HTML output
 #---------------------------------------------------------------------------
 HTML_OUTPUT            = html
-HTML_STYLESHEET        = pgjrl.css
-HTML_HEADER            = header.html
-HTML_FOOTER            = footer.html
+HTML_STYLESHEET        = ../doc/pgjrl.css
+HTML_HEADER            = ../doc/header.html
+HTML_FOOTER            = ../doc/footer.html
 
 #---------------------------------------------------------------------------
 # configuration options related to the LaTeX output

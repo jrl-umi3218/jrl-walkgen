@@ -228,7 +228,7 @@ void KineoWorks(PatternGeneratorInterface &aPGI)
 int main(void)
 {
 
-  std::istringstream strm("PreviewControlParameters.ini ../../../../etc/HRP2JRL/ HRP2JRLmain.wrl HRP2Specificities.xml");
+  std::istringstream strm("PreviewControlParameters.ini ../../etc/HRP2JRL/ HRP2JRLmain.wrl HRP2Specificities.xml");
   PatternGeneratorInterface * aPGI;
   aPGI = new PatternGeneratorInterface(strm);
 
@@ -329,9 +329,9 @@ int main(void)
   for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
     {
       //  ShortStraightWalking(*aPGI);
-      StraightWalkingPBW(*aPGI);
+      // StraightWalkingPBW(*aPGI);
       //KineoWorks(*aPGI);
-      //StraightWalking(*aPGI);
+      StraightWalking(*aPGI);
       //Turn90DegreesWalking(aPGI);
       //TurningOnTheCircle(*aPGI); // Should generate the same than the one previous (but shorter to specify).
       //  TurningOnTheCircleTowardsTheCenter(*aPGI);

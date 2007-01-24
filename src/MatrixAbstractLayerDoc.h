@@ -54,7 +54,7 @@
 #define MAL_VECTOR_NORM(name) 
 #undef MAL_VECTOR_NORM
 
-/*! \brief Returns in \a res the cross product of two vectors \f$ v_1,v_2 \in \mathbb{R}^3 \f$.
+/*! \brief Returns in \a res the cross product of two vectors \f$ v_1,v_2 \in {\bf R}^3 \f$.
  * The cross product \f$ res = v_1 \times v_2 \f$ is defined as:
  * \f{eqnarray*}
  * res^x &=  v_1^y v_2^z  - v_2^y v_1^x \\

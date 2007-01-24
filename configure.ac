@@ -18,8 +18,6 @@ AC_SUBST(BOOST_SANDBOX_CFLAGS)
 AC_SUBST(BOOST_CFLAGS)
 AC_SUBST(VNL_CFLAGS)
 AC_SUBST(VNL_LIB)
-AC_SUBST(ATLAS_CFLAGS)
-AC_SUBST(ATLAS_LIB)
 
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
@@ -41,21 +39,19 @@ AC_ARG_WITH(boost-sandbox,
 AC_ARG_WITH(VNL,
 	for using VNL linear algebra package,
 	VNL_CFLAGS="-I${withval}/include -D_VNL_MATRIX_"
-	VNL_LIB="-L${withval}/lib -lVNL -llapack"
+	VNL_LIB="-L${withval}/lib -lVNL"
 	CXXFLAGS="${CXXFLAGS} -D_VNL_MATRIX_ -I${withval}/include"
-	LDFLAGS="${LDFLAGS} -L${withval}/lib -lVNL -llapack",
+	LDFLAGS="${LDFLAGS} -L${withval}/lib -lVNL",
 	)
 
-AC_ARG_WITH(atlas,
-	for lapack cblas and atlas,
-	ATLAS_CFLAGS="-D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_ -I${withval}/include"
-	ATLAS_LIB="-L${withval}/lib -llapack -lcblas -latlas"
-	CXXFLAGS="${CXXFLAGS} -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_ -I${withval}/include"
-	LDFLAGS="${LDFLAGS} -L${withval}/lib -llapack -lcblas -latlas",
-	ATLAS_CFLAGS="-D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_"
-	ATLAS_LIB="-L/usr/lib/atlas -llapack -lcblas -latlas"
-	CXXFLAGS="${CXXFLAGS} -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_"
-	LDFLAGS="${LDFLAGS} -L/usr/lib/atlas -llapack -lcblas -latlas")
+AC_ARG_WITH(lapack,
+	for lapack,
+	LAPACK_CFLAGS="-I${withval}/include"
+	LAPACK_LIBS="-L${withval}/lib",
+	)
+
+CXXFLAGS="${CXXFLAGS} -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_"
+LDFLAGS="${LDFLAGS} -llapack"
 
 AC_OUTPUT(Makefile
 	src/Makefile

@@ -51,10 +51,6 @@
 
 #include <vector>
 #include <Polynome.h>
-#ifdef _VNL_MATRIX_
-#include <VNL/matrix.h>
-#include <VNL/vector.h>
-#endif
 
 namespace PatternGeneratorJRL
 {

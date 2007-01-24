@@ -1044,7 +1044,7 @@ Optional Packages:
 for ublas
 for lapack bindings
 for using VNL linear algebra package
-for lapack cblas and atlas
+for lapack
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -18700,25 +18700,22 @@ fi;
 if test "${with_VNL+set}" = set; then
   withval="$with_VNL"
   VNL_CFLAGS="-I${withval}/include -D_VNL_MATRIX_"
-	VNL_LIB="-L${withval}/lib -lVNL -llapack"
+	VNL_LIB="-L${withval}/lib -lVNL"
 	CXXFLAGS="${CXXFLAGS} -D_VNL_MATRIX_ -I${withval}/include"
-	LDFLAGS="${LDFLAGS} -L${withval}/lib -lVNL -llapack"
+	LDFLAGS="${LDFLAGS} -L${withval}/lib -lVNL"
 fi;
 
 
-# Check whether --with-atlas or --without-atlas was given.
-if test "${with_atlas+set}" = set; then
-  withval="$with_atlas"
-  ATLAS_CFLAGS="-D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_ -I${withval}/include"
-	ATLAS_LIB="-L${withval}/lib -llapack -lcblas -latlas"
-	CXXFLAGS="${CXXFLAGS} -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_ -I${withval}/include"
-	LDFLAGS="${LDFLAGS} -L${withval}/lib -llapack -lcblas -latlas"
-else
-  ATLAS_CFLAGS="-D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_"
-	ATLAS_LIB="-L/usr/lib/atlas -llapack -lcblas -latlas"
-	CXXFLAGS="${CXXFLAGS} -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_"
-	LDFLAGS="${LDFLAGS} -L/usr/lib/atlas -llapack -lcblas -latlas"
+# Check whether --with-lapack or --without-lapack was given.
+if test "${with_lapack+set}" = set; then
+  withval="$with_lapack"
+  LAPACK_CFLAGS="-I${withval}/include"
+	LAPACK_LIBS="-L${withval}/lib"
 fi;
+
+CXXFLAGS="${CXXFLAGS} -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_"
+LDFLAGS="${LDFLAGS} -llapack"
+
 
                                                   ac_config_files="$ac_config_files Makefile src/Makefile doc/Makefile doc/pgjrl.dox walkGenJrl.pc"
 cat >confcache <<\_ACEOF
