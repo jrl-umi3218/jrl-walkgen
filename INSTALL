@@ -1,3 +1,33 @@
+
+Installation instructions specific to walkGenJrl
+================================================
+
+This file explains how to install walkGenJrl lib. It does not compile and install the plugin.
+
+Basic Installation
+------------------
+
+walkGenJrl uses matrix and vector computations. To support these computation, two packages can be used:
+Boost or VNL. 
+
+To install do the following steps:
+
+mkdir build
+cd build
+
+To configure with VNL:
+../configure --with-VNL=PATH_TO_VNL
+where PATH_TO_VNL is the path to the directory where VNL is installed (for instance /usr/local)
+
+To configure with boost:
+../configure --with-boost=PATH_TO_BOOST --with-boost-sandbox=PATH_TO_BOOST_SANDBOX --with-atlas=PATH_TO_ATLAS
+If one of these packages is installed in your distribution (in /usr), you can omit the corresponding --with-xxxx option. 
+
+All common configure options (--prefix=..., ...) are obviously also applicable. See below for details.
+
+make 
+make install
+-
 Installation Instructions
 *************************
 

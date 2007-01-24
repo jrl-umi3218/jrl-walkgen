@@ -32,9 +32,6 @@
 
 #include <iostream>
 #include <OptimalControllerSolver.h>
-#ifdef _VNL_MATRIX_
-#include <f2c.h>
-#endif
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) cerr << "OptimalControllerServer :" << x << endl

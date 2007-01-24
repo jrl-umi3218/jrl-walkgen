@@ -26,10 +26,10 @@ libwalkGenJRL_la_SOURCES = \
 
 libwalkGenJRL_la_CPPFLAGS = -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib
 
-#bin_PROGRAMS = TestFootPrintPGInterface
-#TestFootPrintPGInterface_SOURCES = TestFootPrintPGInterface.cpp
-#TestFootPrintPGInterface_CPPFLAGS = -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib
-#LD_ADD = $(builddir)/libwalkGenJRL.la
+bin_PROGRAMS = TestFootPrintPGInterface
+TestFootPrintPGInterface_SOURCES = TestFootPrintPGInterface.cpp
+TestFootPrintPGInterface_CPPFLAGS = -I$(srcdir) 
+TestFootPrintPGInterface_LDADD = $(top_builddir)/src/libwalkGenJRL.la
 
 walkGenJRLdir = @includedir@/walkGenJRL
 walkGenJRL_HEADERS = \

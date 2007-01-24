@@ -42,10 +42,9 @@
 */
 #include <iostream>
 #include <PolynomeFoot.h>
-#include <VNL/Algo/determinant.h>
-#include <VNL/matrix.h>
 #include <vector>
-#include <VNL/vector.h>
+
+
 
 using namespace::std;
 using namespace::PatternGeneratorJRL;
