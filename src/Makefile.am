@@ -33,26 +33,44 @@ TestFootPrintPGInterface_LDADD = $(top_builddir)/src/libwalkGenJRL.la
 
 walkGenJRLdir = @includedir@/walkGenJRL
 walkGenJRL_HEADERS = \
+	Body.h \
+	CollisionDetector.h \
+	ConvexHull.h \
+	DynamicBody.h \
+	DynamicMultiBody.h \
+	GenerateMotionFromKineoWorks.h \
+	HumanoidDynamicMultiBody.h \
+	HumanoidSpecificities.h \
+	InverseKinematics.h \
+	Joint.h \
+	MatrixAbstractLayer.h \
+	MatrixAbstractLayerBoost.h \
+	MatrixAbstractLayerDoc.h \
+	MatrixAbstractLayerSmall.h \
+	MatrixAbstractLayerSmallMatrix3x3Default.h \
+	MatrixAbstractLayerSmallVector3Default.h \
+	MatrixAbstractLayerVNL.h \
+	MultiBody.h \
+	OptimalControllerSolver.h \
+	PGTypes.h \
+	PatternGeneratorInterface.h \
 	Polynome.h \
 	PolynomeFoot.h \
-	ZMPDiscretization.h \
 	PreviewControl.h \
-	InverseKinematics.h \
-	MultiBody.h \
-	DynamicMultiBody.h \
-	fileReader.h \
-	Body.h \
-	DynamicBody.h \
-	ZMPPreviewControlWithMultiBodyZMP.h \
-	StepOverPlanner.h\
-	StepOverPolynome.h\
-	CollisionDetector.h\
-	WaistHeightVariation.h\
-	OptimalControllerSolver.h \
-	UpperBodyMotion.h \
-	GenerateMotionFromKineoWorks.h \
+	StepOverPlanner.h \
+	StepOverPolynome.h \
 	StepStackHandler.h \
-	PatternGeneratorInterface.h \
-	ConvexHull.h \
-	HumanoidSpecificities.h \
-	qld.h 
+	UpperBodyMotion.h \
+	WaistHeightVariation.h \
+	ZMPDiscretization.h \
+	ZMPPreviewControlWithMultiBodyZMP.h \
+	configJRLWPG.h \
+	fileReader.h \
+	linalg.h \
+	mathout.h \
+	matrix.h \
+	matrix3.h \
+	matrix4.h \
+	qld.h \
+	quaternion.h \
+	vector3.h 
