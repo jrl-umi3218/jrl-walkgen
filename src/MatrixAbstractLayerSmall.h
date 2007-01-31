@@ -8,6 +8,9 @@
  * 
  */
 
+#ifndef __WPG_VECTOR_SMALL__
+#define __WPG_VECTOR_SMALL__
+
 /*!
  * @{
  */
@@ -245,4 +248,4 @@
 #define MAL_S3x3_MATRIX_RET_DETERMINANT(name,type)
 #undef MAL_S3x3_MATRIX_RET_DETERMINANT
 
-
+#endif
