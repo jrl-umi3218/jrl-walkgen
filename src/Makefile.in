@@ -14,6 +14,35 @@
 
 @SET_MAKE@
 
+#
+# Copyright (c) 2007 LAAS/CNRS                        --  Wed Jan 31 2007
+# All rights reserved.
+#
+# Redistribution  and  use in source   and binary forms,  with or without
+# modification, are permitted provided that  the following conditions are
+# met:
+#
+#   1. Redistributions  of  source code must  retain  the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#   2. Redistributions in binary form must  reproduce the above copyright
+#      notice,  this list of  conditions and  the following disclaimer in
+#      the  documentation   and/or  other  materials   provided with  the
+#      distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE  AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+# ANY  EXPRESS OR IMPLIED WARRANTIES, INCLUDING,  BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES   OF MERCHANTABILITY AND  FITNESS  FOR  A PARTICULAR
+# PURPOSE ARE DISCLAIMED.  IN NO  EVENT SHALL THE AUTHOR OR  CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT,  INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING,  BUT  NOT LIMITED TO, PROCUREMENT  OF
+# SUBSTITUTE  GOODS OR SERVICES;  LOSS   OF  USE,  DATA, OR PROFITS;   OR
+# BUSINESS  INTERRUPTION) HOWEVER CAUSED AND  ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE  USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+
 
 
 srcdir = @srcdir@
@@ -40,8 +69,8 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = TestFootPrintPGInterface$(EXEEXT)
 subdir = src
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(walkGenJRL_HEADERS)
+DIST_COMMON = $(dist_config_DATA) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(walkGenJRL_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -55,7 +84,7 @@ am__vpath_adj = case $$p in \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(walkGenJRLdir)"
+	"$(DESTDIR)$(configdir)" "$(DESTDIR)$(walkGenJRLdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libwalkGenJRL_la_LIBADD =
@@ -105,6 +134,8 @@ SOURCES = $(libwalkGenJRL_la_SOURCES) \
 	$(TestFootPrintPGInterface_SOURCES)
 DIST_SOURCES = $(libwalkGenJRL_la_SOURCES) \
 	$(TestFootPrintPGInterface_SOURCES)
+dist_configDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(dist_config_DATA)
 walkGenJRLHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(walkGenJRL_HEADERS)
 ETAGS = etags
@@ -141,6 +172,7 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
+GREP = @GREP@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -167,12 +199,9 @@ STRIP = @STRIP@
 VERSION = @VERSION@
 VNL_CFLAGS = @VNL_CFLAGS@
 VNL_LIB = @VNL_LIB@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -189,27 +218,39 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+configdir = $(datadir)/$(PACKAGE)
+dist_config_DATA = \
+	HRP2Specificities.xml		\
+	PreviewControlParameters.ini
+
 lib_LTLIBRARIES = libwalkGenJRL.la
 libwalkGenJRL_la_SOURCES = \
 	Polynome.cpp \
@@ -240,6 +281,8 @@ libwalkGenJRL_la_CPPFLAGS = -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib
 TestFootPrintPGInterface_SOURCES = TestFootPrintPGInterface.cpp
 TestFootPrintPGInterface_CPPFLAGS = -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib
 TestFootPrintPGInterface_LDADD = $(top_builddir)/src/libwalkGenJRL.la
+
+# XXX Please select only public headers, i.e. those that are to be installed.
 walkGenJRLdir = @includedir@/walkGenJRL
 walkGenJRL_HEADERS = \
 	Body.h \
@@ -614,6 +657,23 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
+install-dist_configDATA: $(dist_config_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(configdir)" || $(mkdir_p) "$(DESTDIR)$(configdir)"
+	@list='$(dist_config_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_configDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(configdir)/$$f'"; \
+	  $(dist_configDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(configdir)/$$f"; \
+	done
+
+uninstall-dist_configDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_config_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(configdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(configdir)/$$f"; \
+	done
 install-walkGenJRLHEADERS: $(walkGenJRL_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(walkGenJRLdir)" || $(mkdir_p) "$(DESTDIR)$(walkGenJRLdir)"
@@ -709,11 +769,11 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(DATA) $(HEADERS)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(walkGenJRLdir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(configdir)" "$(DESTDIR)$(walkGenJRLdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -761,7 +821,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-walkGenJRLHEADERS
+install-data-am: install-dist_configDATA install-walkGenJRLHEADERS
 
 install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
 
@@ -789,21 +849,23 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-info-am \
-	uninstall-libLTLIBRARIES uninstall-walkGenJRLHEADERS
+uninstall-am: uninstall-binPROGRAMS uninstall-dist_configDATA \
+	uninstall-info-am uninstall-libLTLIBRARIES \
+	uninstall-walkGenJRLHEADERS
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
 	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
 	distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-strip install-walkGenJRLHEADERS \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
+	install-data install-data-am install-dist_configDATA \
+	install-exec install-exec-am install-info install-info-am \
+	install-libLTLIBRARIES install-man install-strip \
+	install-walkGenJRLHEADERS installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
+	uninstall-am uninstall-binPROGRAMS uninstall-dist_configDATA \
 	uninstall-info-am uninstall-libLTLIBRARIES \
 	uninstall-walkGenJRLHEADERS
 
