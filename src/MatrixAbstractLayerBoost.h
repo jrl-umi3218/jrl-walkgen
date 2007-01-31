@@ -94,29 +94,25 @@ namespace lapack = boost::numeric::bindings::lapack;
 
 #define MAL_INVERSE(name, inv_matrix, type)		\
   {							\
-    ublas::matrix<type> U(name.size1(),name.size2());	\
-    ublas::matrix<type> VT(name.size1(),name.size2());	\
+    ublas::matrix<type,ublas::column_major> I = name;	\
+    ublas::matrix<type,ublas::column_major> U(name.size1(),name.size2()); \
+    ublas::matrix<type,ublas::column_major> VT(name.size1(),name.size2());	\
     ublas::vector<type> s(name.size1());		\
     char Jobu='A'; /* Compute complete U Matrix */	\
     char Jobvt='A'; /* Compute complete VT Matrix */	\
     char Lw='O'; /* Compute the optimal size for the working vector */ \
-    ublas::matrix<type> nametranspose;                  \
+    ublas::matrix<type,ublas::column_major> nametranspose;                  \
     nametranspose = trans(name);                        \
     int lw = lapack::gesvd_work(Lw,Jobu,Jobvt,nametranspose);    \
     ublas::vector<double> w(lw);		        \
-    lapack::gesvd(Jobu, Jobvt,name,s,U,VT,w);		\
+    lapack::gesvd(Jobu, Jobvt,I,s,U,VT,w);		\
     ublas::matrix<type> S(name.size1(),name.size2());	\
     for(unsigned int i=0;i<s.size();i++)		\
       for(unsigned int j=0;j<s.size();j++)              \
 	if (i==j) S(i,i)=1/s(i); else S(i,j)=0;		\
     ublas::matrix<type> tmp1;				\
-    /* It appears that getsvd return Ut and V instead   \
-       of U and VT as specified by the documentation*/	\
-    tmp1 = prod(S,U);					\
-    tmp1 = prod(VT,tmp1);				\
-    /* This transpose issue is probablue due to the     \
-       FORTRAN format of the matrices */                \
-    inv_matrix = trans(tmp1);                           \
+    tmp1 = prod(S,trans(U));				\
+    inv_matrix = prod(trans(VT),tmp1);			\
   }
 
 #define MAL_PSEUDOINVERSE(matrix, pinv_matrix, type)
