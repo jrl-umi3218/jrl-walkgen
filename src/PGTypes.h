@@ -1,5 +1,5 @@
-#ifndef _PATTERN_GENERATOR_TYPES_H_
-#define  _PATTERN_GENERATOR_TYPES_H_
+#ifndef __PG_PATTERN_GENERATOR_TYPES_H_
+#define __PG_PATTERN_GENERATOR_TYPES_H_
 
 #include <MatrixAbstractLayer.h>
 

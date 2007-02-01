@@ -41,8 +41,8 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _POLYNOME_H_
-#define _POLYNOME_H_
+#ifndef __PG_POLYNOME_H_
+#define __PG_POLYNOME_H_
 
 #include <vector>
 

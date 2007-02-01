@@ -32,8 +32,8 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _FOOT_PRINT_H_
-#define _FOOT_PRINT_H_
+#ifndef __PG_FOOT_PRINT_H_
+#define __PG_FOOT_PRINT_H_
 
 #ifdef max
 #undef max

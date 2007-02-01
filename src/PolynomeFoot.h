@@ -41,8 +41,8 @@
 */
 
 
-#ifndef _POLYNOME_FOOT_H_
-#define _POLYNOME_FOOT_H_
+#ifndef __PG_POLYNOME_FOOT_H_
+#define __PG_POLYNOME_FOOT_H_
 
 #ifdef max
 #undef max

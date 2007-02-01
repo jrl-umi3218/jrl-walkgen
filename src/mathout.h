@@ -7,8 +7,10 @@
  */
 
 
-#if !defined(MATH_OUPUT_DEFINED)
-#define MATH_OUPUT_DEFINED
+//#if !defined(MATH_OUPUT_DEFINED)
+
+#ifndef __PG_MATH_OUTPUT_DEFINED_
+#define __PH_MATH_OUTPUT_DEFINED_
 
 #include <iostream>
 #include <iomanip>

@@ -41,6 +41,11 @@
    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+#ifndef __PG_FILE_HEADER__
+#define __PG_FILE_HEADER__
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -77,3 +82,6 @@ namespace PatternGeneratorJRL
   /// Returns the type of the next joint inside the file.
   int typeOfJoint(FILE* fichier);
 };
+
+
+#endif

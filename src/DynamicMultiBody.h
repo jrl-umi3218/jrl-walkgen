@@ -38,8 +38,8 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _DYNAMIC_MULTI_BODY_H_
-#define _DYNAMIC_MULTI_BODY_H_
+#ifndef __PG_DYNAMIC_MULTI_BODY_H_
+#define __PG_DYNAMIC_MULTI_BODY_H_
 #include <vector>
 
 #include <MatrixAbstractLayer.h>

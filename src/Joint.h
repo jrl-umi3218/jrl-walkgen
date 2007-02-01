@@ -28,8 +28,8 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _WPG_JRL_JOINT_H_
-#define _WPG_JRL_JOINT_H_
+#ifndef __PG_JRL_JOINT_H_
+#define __PG_JRL_JOINT_H_
 #include <MatrixAbstractLayer.h>
 #include <jrlJoint.h>
 

@@ -32,8 +32,8 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _STEP_STACK_HANDLER_H_
-#define _STEP_STACK_HANDLER_H_
+#ifndef __PG_STEP_STACK_HANDLER_H_
+#define __PG_STEP_STACK_HANDLER_H_
 
 #include <MatrixAbstractLayer.h>
 #include <StepOverPlanner.h>

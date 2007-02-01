@@ -8,8 +8,8 @@
  * 
  */
 
-#ifndef __WPG_VECTOR_SMALL__
-#define __WPG_VECTOR_SMALL__
+#ifndef __PG_VECTOR_SMALL__
+#define __PG_VECTOR_SMALL__
 
 /*!
  * @{

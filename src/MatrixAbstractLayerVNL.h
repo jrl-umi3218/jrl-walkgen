@@ -10,6 +10,10 @@
  * (c) 2006 , Olivier Stasse JRL-Japan, CNRS-AIST, ISRI.
  */
 
+
+#ifndef __PG_VNL_MATRIX_
+#define __PG_VNL_MATRIX_
+
 #ifdef _VNL_MATRIX_
 
 #include <VNL/matrix.h>
@@ -110,3 +114,4 @@
 
 #endif
 
+#endif

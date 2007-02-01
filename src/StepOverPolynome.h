@@ -30,8 +30,8 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O
 */
 
 
-#ifndef _STEPOVER_POLYNOME_H_
-#define _STEPOVER_POLYNOME_H_
+#ifndef __PG_STEPOVER_POLYNOME_H_
+#define __PG_STEPOVER_POLYNOME_H_
 
 #include <MatrixAbstractLayer.h>
 #include <Polynome.h>

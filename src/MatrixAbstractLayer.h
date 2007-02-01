@@ -28,10 +28,11 @@
  */
 
 
-#ifndef _MATRIX_ABSTRACT_LAYER_H_
-#define _MATRIX_ABSTRACT_LAYER_H_
+#ifndef __PG_MATRIX_ABSTRACT_LAYER_H_
+#define __PG_MATRIX_ABSTRACT_LAYER_H_
 
 #include "MatrixAbstractLayerDoc.h"
+
 
 #ifdef _VNL_MATRIX_
 #include "MatrixAbstractLayerVNL.h"
@@ -40,6 +41,7 @@
 #else
 #error "You need to choose one linear algebra package. Please reconfigure with option --with-boost-sandbox=PATH_TO_BOOST_SANDBOX or --with-VNL=PATH_TO_VNL"
 #endif
+
 
 #include "MatrixAbstractLayerSmall.h"
 #include "MatrixAbstractLayerSmallVector3Default.h"

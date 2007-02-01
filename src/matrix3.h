@@ -12,7 +12,7 @@
 *	m[6] m[7] m[8]		m(2,0) m(2,1) m(2,2)	*
 ************************************************/
 #ifndef _MATRIX_3_H_
-#define  _MATRIX_3_H_
+#define _MATRIX_3_H_
 
 #include "vector3.h"
 #include <iostream>

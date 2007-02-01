@@ -3,8 +3,10 @@
  *
  */
 
-#if !defined(LINALG_H_DEFINED_2004_07_27)
-#define LINALG_H_DEFINED_2004_07_27
+//#if !defined(LINALG_H_DEFINED_2004_07_27)
+
+#ifndef __PG_LINALG_H_DEFINED_2004_07_27_
+#define __PG_LINALG_H_DEFINED_2004_07_27_
 
 #include "vector3.h"
 #include "matrix3.h"

@@ -11,6 +11,9 @@
  */
 
 
+#ifndef __PG_BOOST_MATRIX_
+#define __PG_BOOST_MATRIX_
+
 #ifdef _BOOST_MATRIX_
 
 /*!
@@ -196,6 +199,8 @@ template<class type> inline double __ret_mal_matrix_ret_determinant(ublas::matri
   };
 
 #define _MAL_VERSION_ 1
+#endif
+
 #endif
 
 
