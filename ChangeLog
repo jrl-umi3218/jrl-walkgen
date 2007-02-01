@@ -1,5 +1,6 @@
 1 - protection again double inclusion of MatrixAbstractLayerSmall.h
 2 - protection again double inclusion check and add on all file
+3 - correct the file MatrixAbstractLayer.h with include "configJRLWPG.h"
 
 
 

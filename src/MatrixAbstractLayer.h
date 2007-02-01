@@ -33,6 +33,7 @@
 
 #include "MatrixAbstractLayerDoc.h"
 
+#include "configJRLWPG.h"
 
 #ifdef _VNL_MATRIX_
 #include "MatrixAbstractLayerVNL.h"
@@ -43,7 +44,7 @@
 #endif
 
 
-#include "MatrixAbstractLayerSmall.h"
+//#include "MatrixAbstractLayerSmall.h"
 #include "MatrixAbstractLayerSmallVector3Default.h"
 #include "MatrixAbstractLayerSmallMatrix3x3Default.h"
 
