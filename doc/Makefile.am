@@ -26,18 +26,23 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+walkGenJRLDocdir = $(datadir)/doc/walkGenJRL
+
 EXTRA_DIST=\
 	common.dox	\
 	header.html	\
 	footer.html	\
-	additionalHeader/modules.h
+	pgjrl.css \
+	additionalHeader/modules.h \
+	pictures/HRP2.jpg
 
+all: html
 
-walkGenJRLDocdir = $(datadir)/doc/walkGenJRL
-
-install: html
+install: 
 	mkdir -p $(walkGenJRLDocdir)
-	$(INSTALL_DATA) $</* $(walkGenJRLDocdir)
+	$(INSTALL_DATA) html/* $(walkGenJRLDocdir)
+	mkdir -p $(walkGenJRLDocdir)/pictures
+	$(INSTALL_DATA) $(srcdir)/pictures/* $(walkGenJRLDocdir)/pictures
 
 html: pgjrl.dox
 	doxygen $<
