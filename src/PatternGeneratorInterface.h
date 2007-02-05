@@ -377,7 +377,7 @@ public:
                                  FootAbsolutePosition & InitRightFootAbsPos);
 
         /**
-                  \brief  Compute the COM, left and right foot position for a given BodyAngle position 
+        \brief  Compute the COM, left and right foot position for a given BodyAngle position 
         \param BodyAnglesIni :
         \param IStartingCOMPosition : 
         \param InitLeftFootAbsPos :
@@ -390,7 +390,7 @@ public:
                                  FootAbsolutePosition & InitRightFootAbsPos);
 
         /**
-                  \brief  Add an online step 
+        \brief  Add an online step 
         \param X :
         \param Y : 
         \param Theta :
@@ -403,36 +403,36 @@ public:
          */
 
         /**
-                  \brief  Update the current waist absolute position 
+        \brief  Update the current waist absolute position 
         \param UpdateAbsMotionOrNot :
          */
         void UpdateAbsolutePosition(bool UpdateAbsMotionOrNot);
 
         /**
-                  \brief  Get the waist position and orientation as a quaternion, and the planar X-Y orientation in Orientation. 
-         \param TQ : 
+        \brief  Get the waist position and orientation as a quaternion, and the planar X-Y orientation in Orientation. 
+        \param TQ : TQ[0-2] the position of the Waist and [3-6] the Orientation of the waist (quarternion)
         \param Orientation :
          */
         void getWaistPositionAndOrientation(double TQ[7],double &Orientation);
 
         /**
-                  \brief  Set Waist position and Orientation 
-         \param TQ :
+         \brief  Set Waist position and Orientation 
+        \param TQ : TQ[0-2] the position of the Waist and [3-6] the Orientation of the waist (quarternion)
          */
         void setWaistPositionAndOrientation(double TQ[7]);
 
         /**
-                  \brief Get Waist velocity 
-        \param dx :
-        \param dy :
-                  \param omega
+        \brief Get Waist velocity 
+        \param dx : velocity in x direction
+        \param dy : velocity in y direction
+        \param omega : rotation velocity 
          */
         void getWaistVelocity(double &dx,
                               double &dy,
                               double &omega) ;
 
         /**
-                  \brief  An other method to get the waist position using  matrix. 
+        \brief  An other method to get the waist position using  matrix. 
         \param lWaistAbsPos :
          */
         void getWaistPositionMatrix(MAL_MATRIX( &lWaistAbsPos,double));
