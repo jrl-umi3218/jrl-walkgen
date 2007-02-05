@@ -175,13 +175,15 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+walkGenJRLDocdir = $(datadir)/doc/walkGenJRL
 EXTRA_DIST = \
 	common.dox	\
 	header.html	\
 	footer.html	\
-	additionalHeader/modules.h
+	pgjrl.css \
+	additionalHeader/modules.h \
+	pictures/HRP2.jpg
 
-walkGenJRLDocdir = $(datadir)/doc/walkGenJRL
 all: all-am
 
 .SUFFIXES:
@@ -234,7 +236,7 @@ CTAGS:
 
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/additionalHeader
+	$(mkdir_p) $(distdir)/additionalHeader $(distdir)/pictures
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -343,9 +345,13 @@ uninstall-am: uninstall-info-am
 	uninstall-info-am
 
 
-install: html
+all: html
+
+install: 
 	mkdir -p $(walkGenJRLDocdir)
-	$(INSTALL_DATA) $</* $(walkGenJRLDocdir)
+	$(INSTALL_DATA) html/* $(walkGenJRLDocdir)
+	mkdir -p $(walkGenJRLDocdir)/pictures
+	$(INSTALL_DATA) $(srcdir)/pictures/* $(walkGenJRLDocdir)/pictures
 
 html: pgjrl.dox
 	doxygen $<
