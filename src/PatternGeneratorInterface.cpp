@@ -617,7 +617,7 @@ namespace PatternGeneratorJRL {
 	m_COMBuffer[i].z[2] = 0.0;
 
 	m_COMBuffer[i].omega = 0.0;
-	m_COMBuffer[i].hip = 0.0;
+	m_COMBuffer[i].phi = 0.0;
       
       }
     
@@ -760,7 +760,7 @@ namespace PatternGeneratorJRL {
 	m_COMBuffer[i].z[2] = 0.0;
 
 	m_COMBuffer[i].omega = 0.0;
-	m_COMBuffer[i].hip = 0.0;
+	m_COMBuffer[i].phi = 0.0;
       
       }
     
@@ -2247,7 +2247,7 @@ namespace PatternGeneratorJRL {
 	aCOMPos.z[2] = 0.0;
 	
 	aCOMPos.omega = 0.0;
-	aCOMPos.hip = 0.0;
+	aCOMPos.phi = 0.0;
 	m_COMBuffer.push_back(aCOMPos);
 	
 	// Add UpperBody Position set at a default value.

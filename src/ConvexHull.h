@@ -43,8 +43,9 @@
 
 namespace PatternGeneratorJRL
 {
-  /** @class
-      @ingroup geometry
+  /** 
+      \class
+      \ingroup geometry
   */
   typedef struct 
   {

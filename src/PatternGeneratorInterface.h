@@ -58,8 +58,9 @@
 
 namespace PatternGeneratorJRL
 {
-/** @class
-      @ingroup Interface
+/** 
+    \class
+    \ingroup Interface
  */
 class PatternGeneratorInterface
 {

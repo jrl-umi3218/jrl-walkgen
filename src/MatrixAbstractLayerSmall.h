@@ -1,8 +1,8 @@
 /*! This part of the documentation specifies what is the functionnality
  * of each macro, it is the responsability of the implementor to comply with this
  * specification.
- * @defgroup vector
- * @ingroup linearalgebra
+ * \defgroup vector
+ * \ingroup linearalgebra
  * 
  * (c) Olivier Stasse, JRL, CNRS-AIST, ISRI, 2007
  * 

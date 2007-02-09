@@ -622,7 +622,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
   Body_P(1) = acomp.y[0] + ToTheHip(1);
   Body_P(2) = 0.0; // afCOMPosition.z[0] + ToTheHip(2);
 
-  acomp.hip=Body_P(2);
+  acomp.phi=Body_P(2);
 
   // Left Foot.
   c = cos(LeftFootPosition.theta*M_PI/180.0);

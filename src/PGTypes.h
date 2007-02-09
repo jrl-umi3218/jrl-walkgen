@@ -5,14 +5,22 @@
 
 namespace PatternGeneratorJRL
 {
-  /// Structure to store the COM position computed by the preview control. 
+  /**
+     \brief : Structure to store the COM position computed by the preview control. 
+     \param x : x position, x velocity, x accelaration
+     \param y : x position, x velocity, x accelaration
+     \param x : x position, x velocity, x accelaration
+     \param theta : orientation of the waist (euler Angle)
+     \param omega : orientation of the waist (euler Angle)
+     \param phi : orientation of the waist (euler Angle)
+  */
   struct COMPosition_s
   {
     double x[3],y[3]; 
     double z[3];    	
     double theta;
     double omega;
-    double hip;
+    double phi;
      	
   };
   typedef struct COMPosition_s COMPosition;
