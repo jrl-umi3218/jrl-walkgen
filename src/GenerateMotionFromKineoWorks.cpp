@@ -249,7 +249,7 @@ namespace PatternGeneratorJRL
 	    m_COMBuffer[i].y[j] = aPC1y(j,0);
 	  }
 
-	m_COMBuffer[i].theta = ZMPRefBuffer[i].theta;
+	m_COMBuffer[i].yaw = ZMPRefBuffer[i].theta;
 		
 	aFIFOZMPRefPositions.pop_front();
 	
