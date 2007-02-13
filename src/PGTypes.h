@@ -13,7 +13,8 @@ namespace PatternGeneratorJRL
      \param yaw : orientation of the waist (euler Angle) in degree
      \param pitch : orientation of the waist (euler Angle) in degree
      \param roll : orientation of the waist (euler Angle) in degree
-  */
+*/
+
   struct COMPosition_s
   {
     double x[3],y[3]; 
@@ -21,6 +22,7 @@ namespace PatternGeneratorJRL
     double yaw;
     double pitch;
     double roll;
+
      	
   };
   typedef struct COMPosition_s COMPosition;
