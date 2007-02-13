@@ -690,9 +690,10 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 
       v(0,0) = RelativeFootPositions[i].sx;
       v(1,0) = RelativeFootPositions[i].sy;
-      
+
       Orientation = MAL_RET_A_by_B(MM , Orientation);
       v2 = MAL_RET_A_by_B(Orientation, v);
+
 
       for(int k=0;k<2;k++)
 	for(int l=0;l<2;l++)
@@ -892,7 +893,8 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	{
 	StepOverPolyPlanner(RelativeFootPositions[i].stepType);
 	};
-*/	double px02,py02;
+      */	
+      double px02,py02;
       px02 = ZMPPositions[CurrentZMPindex-1].px;
       py02 = ZMPPositions[CurrentZMPindex-1].py;
 

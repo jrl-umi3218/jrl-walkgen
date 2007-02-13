@@ -172,7 +172,7 @@ void TurningOnTheCircle(PatternGeneratorInterface &aPGI)
   }
 
   {
-     istringstream strm2(":arc 0.0 0.75 90.0 -1");
+     istringstream strm2(":arc 0.0 2.0 90.0 -1");
      aPGI.ParseCmd(strm2);
   }
   
@@ -331,9 +331,9 @@ int main(void)
       //  ShortStraightWalking(*aPGI);
       // StraightWalkingPBW(*aPGI);
       //KineoWorks(*aPGI);
-      StraightWalking(*aPGI);
+      //StraightWalking(*aPGI);
       //Turn90DegreesWalking(aPGI);
-      //TurningOnTheCircle(*aPGI); // Should generate the same than the one previous (but shorter to specify).
+      TurningOnTheCircle(*aPGI); // Should generate the same than the one previous (but shorter to specify).
       //  TurningOnTheCircleTowardsTheCenter(*aPGI);
       //TurningOnTheCircleTowardsTheCenter(aPGI);
       //StartOnLineWalking(*aPGI);

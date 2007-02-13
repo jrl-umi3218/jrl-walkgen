@@ -42,7 +42,7 @@ INPUT                  = ../doc/additionalHeader \
 #---------------------------------------------------------------------------
 # configuration options related to inserting images
 #---------------------------------------------------------------------------
-IMAGE_PATH = ./figures
+IMAGE_PATH = ../doc/figures
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
 #---------------------------------------------------------------------------

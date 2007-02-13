@@ -13,12 +13,40 @@
 # PARTICULAR PURPOSE.
 
 
+
+#
+# Copyright (c) 2007 LAAS/CNRS                        --  Wed Jan 31 2007
+# All rights reserved.
+#
+# Redistribution  and  use in source   and binary forms,  with or without
+# modification, are permitted provided that  the following conditions are
+# met:
+#
+#   1. Redistributions  of  source code must  retain  the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#   2. Redistributions in binary form must  reproduce the above copyright
+#      notice,  this list of  conditions and  the following disclaimer in
+#      the  documentation   and/or  other  materials   provided with  the
+#      distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE  AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+# ANY  EXPRESS OR IMPLIED WARRANTIES, INCLUDING,  BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES   OF MERCHANTABILITY AND  FITNESS  FOR  A PARTICULAR
+# PURPOSE ARE DISCLAIMED.  IN NO  EVENT SHALL THE AUTHOR OR  CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT,  INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING,  BUT  NOT LIMITED TO, PROCUREMENT  OF
+# SUBSTITUTE  GOODS OR SERVICES;  LOSS   OF  USE,  DATA, OR PROFITS;   OR
+# BUSINESS  INTERRUPTION) HOWEVER CAUSED AND  ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE  USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 srcdir = .
 top_srcdir = ..
 
-pkgdatadir = $(datadir)/walkGenJRL
-pkglibdir = $(libdir)/walkGenJRL
-pkgincludedir = $(includedir)/walkGenJRL
+pkgdatadir = $(datadir)/walkgenjrl
+pkglibdir = $(libdir)/walkgenjrl
+pkgincludedir = $(includedir)/walkgenjrl
 top_builddir = ..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = /usr/bin/install -c
@@ -47,14 +75,14 @@ CONFIG_CLEAN_FILES = pgjrl.dox
 SOURCES =
 DIST_SOURCES =
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/stasse/src/OpenHRP/walkGenJRL/missing --run aclocal-1.9
+ACLOCAL = ${SHELL} /home/stasse/src/OpenHRP/PatternGeneratorJRLLaas/missing --run aclocal-1.9
 AMDEP_FALSE = #
 AMDEP_TRUE = 
-AMTAR = ${SHELL} /home/stasse/src/OpenHRP/walkGenJRL/missing --run tar
+AMTAR = ${SHELL} /home/stasse/src/OpenHRP/PatternGeneratorJRLLaas/missing --run tar
 AR = ar
-AUTOCONF = ${SHELL} /home/stasse/src/OpenHRP/walkGenJRL/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/stasse/src/OpenHRP/walkGenJRL/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/stasse/src/OpenHRP/walkGenJRL/missing --run automake-1.9
+AUTOCONF = ${SHELL} /home/stasse/src/OpenHRP/PatternGeneratorJRLLaas/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/stasse/src/OpenHRP/PatternGeneratorJRLLaas/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/stasse/src/OpenHRP/PatternGeneratorJRLLaas/missing --run automake-1.9
 AWK = gawk
 BOOST_CFLAGS = -I/usr/include/boost/include
 BOOST_SANDBOX_CFLAGS = -I/usr/include/boost-sandbox -D_BOOST_MATRIX_
@@ -68,7 +96,7 @@ CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2 -I/usr/include/boost/include -I/usr/include/boost-sandbox -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"AC_PACKAGE_TARNAME\" -DVERSION=\"AC_PACKAGE_VERSION\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1 
+DEFS = -DPACKAGE_NAME=\"walkGenJRL\" -DPACKAGE_TARNAME=\"walkgenjrl\" -DPACKAGE_VERSION=\"2.0\" -DPACKAGE_STRING=\"walkGenJRL\ 2.0\" -DPACKAGE_BUGREPORT=\"openrobots@laas.fr\" -DPACKAGE=\"walkgenjrl\" -DVERSION=\"2.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1 
 DEPDIR = .deps
 ECHO = echo
 ECHO_C = 
@@ -88,14 +116,14 @@ LIBS =
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/stasse/src/OpenHRP/walkGenJRL/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/stasse/src/OpenHRP/PatternGeneratorJRLLaas/missing --run makeinfo
 OBJEXT = o
-PACKAGE = walkGenJRL
-PACKAGE_BUGREPORT = 
-PACKAGE_NAME = 
-PACKAGE_STRING = 
-PACKAGE_TARNAME = 
-PACKAGE_VERSION = 
+PACKAGE = walkgenjrl
+PACKAGE_BUGREPORT = openrobots@laas.fr
+PACKAGE_NAME = walkGenJRL
+PACKAGE_STRING = walkGenJRL 2.0
+PACKAGE_TARNAME = walkgenjrl
+PACKAGE_VERSION = 2.0
 PATH_SEPARATOR = :
 RANLIB = ranlib
 SET_MAKE = 
@@ -134,7 +162,7 @@ host_os = linux-gnu
 host_vendor = pc
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /home/stasse/src/OpenHRP/walkGenJRL/install-sh
+install_sh = /home/stasse/src/OpenHRP/PatternGeneratorJRLLaas/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var
@@ -148,6 +176,14 @@ sharedstatedir = ${prefix}/com
 sysconfdir = ${prefix}/etc
 target_alias = 
 walkGenJRLDocdir = $(datadir)/doc/walkGenJRL
+EXTRA_DIST = \
+	common.dox	\
+	header.html	\
+	footer.html	\
+	pgjrl.css \
+	additionalHeader/modules.h \
+	pictures/HRP2.jpg
+
 all: all-am
 
 .SUFFIXES:
@@ -200,6 +236,7 @@ CTAGS:
 
 
 distdir: $(DISTFILES)
+	$(mkdir_p) $(distdir)/additionalHeader $(distdir)/pictures
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -308,9 +345,13 @@ uninstall-am: uninstall-info-am
 	uninstall-info-am
 
 
-install:html
+all: html
+
+install: 
 	mkdir -p $(walkGenJRLDocdir)
-	$(INSTALL_DATA) $</* $(walkGenJRLDocdir)
+	$(INSTALL_DATA) html/* $(walkGenJRLDocdir)
+	mkdir -p $(walkGenJRLDocdir)/pictures
+	$(INSTALL_DATA) $(srcdir)/pictures/* $(walkGenJRLDocdir)/pictures
 
 html: pgjrl.dox
 	doxygen $<

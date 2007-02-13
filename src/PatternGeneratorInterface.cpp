@@ -855,7 +855,8 @@ namespace PatternGeneratorJRL {
 	m_COMBuffer[i].z[1] = m_COMBuffer[i].z[2] = 0.0;
       }
 
-    if (m_StepStackHandler->GetWalkMode()==0) 
+    if ((m_StepStackHandler->GetWalkMode()==0) ||
+	(m_StepStackHandler->GetWalkMode()==4))
       {
 	for(unsigned int i=0;i<m_ZMPPositions.size()-m_NL;i++)
 	  //	  m_COMBuffer[i].theta = m_ZMPPositions[i+m_NL-1].theta;
@@ -1321,9 +1322,10 @@ namespace PatternGeneratorJRL {
     // Update the queue of ZMP ref
     m_ZMPpcwmbz->UpdateTheZMPRefQueue(m_ZMPPositions[2*m_NL]);
     
-    if (m_StepStackHandler->GetWalkMode()==0)
+    if ((m_StepStackHandler->GetWalkMode()==0)||
+	(m_StepStackHandler->GetWalkMode()==4))
       {
-	m_COMBuffer[m_NL-1].theta = m_ZMPPositions[m_NL].theta;
+	m_COMBuffer[m_NL].theta = m_ZMPPositions[m_NL].theta;
       }
     COMPositionFromPC1 = m_COMBuffer[m_NL];
     
