@@ -616,8 +616,8 @@ namespace PatternGeneratorJRL {
 	m_COMBuffer[i].z[1] = 0.0;
 	m_COMBuffer[i].z[2] = 0.0;
 
-	m_COMBuffer[i].omega = 0.0;
-	m_COMBuffer[i].phi = 0.0;
+	m_COMBuffer[i].pitch = 0.0;
+	m_COMBuffer[i].roll = 0.0;
       
       }
     
@@ -759,8 +759,8 @@ namespace PatternGeneratorJRL {
 	m_COMBuffer[i].z[1] = 0.0;
 	m_COMBuffer[i].z[2] = 0.0;
 
-	m_COMBuffer[i].omega = 0.0;
-	m_COMBuffer[i].phi = 0.0;
+	m_COMBuffer[i].pitch = 0.0;
+	m_COMBuffer[i].roll = 0.0;
       
       }
     
@@ -860,7 +860,7 @@ namespace PatternGeneratorJRL {
       {
 	for(unsigned int i=0;i<m_ZMPPositions.size()-m_NL;i++)
 	  //	  m_COMBuffer[i].theta = m_ZMPPositions[i+m_NL-1].theta;
-	  m_COMBuffer[i].theta = m_ZMPPositions[i].theta;
+	  m_COMBuffer[i].yaw = m_ZMPPositions[i].theta;
       }
 
     if ((m_StepStackHandler->GetWalkMode()==1)	||
@@ -957,7 +957,7 @@ namespace PatternGeneratorJRL {
 		
 		m_COMBuffer[i+1].x[0] = aCOMPosition.x[0];
 		m_COMBuffer[i+1].y[0] = aCOMPosition.y[0];
-		m_COMBuffer[i+1].omega = aCOMPosition.omega;
+		m_COMBuffer[i+1].pitch = aCOMPosition.pitch;
 		//		m_COMBuffer[i+1].theta = aCOMPosition.theta;
 	      }
 	    else 
@@ -1236,8 +1236,8 @@ namespace PatternGeneratorJRL {
     
     // Compute the position of the hand according to the 
     // leg.
-    TempCos = cos(aCOMPosition.theta*M_PI/180.0);
-    TempSin = sin(aCOMPosition.theta*M_PI/180.0);
+    TempCos = cos(aCOMPosition.yaw*M_PI/180.0);
+    TempSin = sin(aCOMPosition.yaw*M_PI/180.0);
     
     TempXR = TempCos * (RFP.x  - aCOMPosition.x[0]) + 
       TempSin * (RFP.y  - aCOMPosition.y[0]);
@@ -1325,7 +1325,7 @@ namespace PatternGeneratorJRL {
     if ((m_StepStackHandler->GetWalkMode()==0)||
 	(m_StepStackHandler->GetWalkMode()==4))
       {
-	m_COMBuffer[m_NL].theta = m_ZMPPositions[m_NL].theta;
+	m_COMBuffer[m_NL].yaw = m_ZMPPositions[m_NL].theta;
       }
     COMPositionFromPC1 = m_COMBuffer[m_NL];
     
@@ -1367,7 +1367,7 @@ namespace PatternGeneratorJRL {
     if(m_StepStackHandler->GetWalkMode()==2)
       {
 	///this angle is introduced to rotate the upperbody when the waist is rotated during stepover
-	qWaistYaw = -m_COMBuffer[m_NL].theta*M_PI/180.0;
+	qWaistYaw = -m_COMBuffer[m_NL].yaw*M_PI/180.0;
 	ODEBUG4(qWaistYaw,"DebugDataWaistYaw.dat");
 	//this is not correct yet since it uses COMPositionFromPC1.theta which also changes when turning....
 	//it will be modified in the near future	
@@ -1390,7 +1390,7 @@ namespace PatternGeneratorJRL {
 	if (m_UpperBodyMotion[2]!=0)
 	  {
 	    
-	    COMPositionFromPC1.omega = m_UpperBodyMotion[2]*fabs(COMPositionFromPC1.theta);
+	    COMPositionFromPC1.pitch = m_UpperBodyMotion[2]*fabs(COMPositionFromPC1.yaw);
 	  }
 	
       } 
@@ -1511,7 +1511,7 @@ namespace PatternGeneratorJRL {
     double temp3;
     temp1 = m_ZMPPositions[0].px - outWaistPosition.x[0];
     temp2 = m_ZMPPositions[0].py - outWaistPosition.y[0];
-    temp3 = finalCOMPosition.theta*M_PI/180.0;
+    temp3 = finalCOMPosition.yaw*M_PI/180.0;
     
     ZMPTarget(0,0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
     ZMPTarget(1,0) = -sin(temp3)*temp1+cos(temp3)*temp2;
@@ -2000,7 +2000,7 @@ namespace PatternGeneratorJRL {
 		      << WaistVelocity[0] <<  "\t"  
 		      << WaistVelocity[1] <<  "\t"  
 		      << WaistVelocity[2] <<  "\t"  
-		      << aWaistPosition.theta <<  "\t" 
+		      << aWaistPosition.yaw <<  "\t" 
 		      << m_LeftFootPositions[0].x <<  "\t"  
 		      << m_LeftFootPositions[0].y <<  "\t"  
 		      << m_LeftFootPositions[0].z <<  "\t"  
@@ -2248,8 +2248,8 @@ namespace PatternGeneratorJRL {
 	aCOMPos.z[1] = 0.0;
 	aCOMPos.z[2] = 0.0;
 	
-	aCOMPos.omega = 0.0;
-	aCOMPos.phi = 0.0;
+	aCOMPos.pitch = 0.0;
+	aCOMPos.roll = 0.0;
 	m_COMBuffer.push_back(aCOMPos);
 	
 	// Add UpperBody Position set at a default value.
@@ -2289,7 +2289,7 @@ namespace PatternGeneratorJRL {
     m_WaistRelativePos(3,2) = 0.0;
     m_WaistRelativePos(3,3) = 1.0;
   
-    double thetarad = m_CurrentWaistState.theta*M_PI/180.0;
+    double thetarad = m_CurrentWaistState.yaw*M_PI/180.0;
     double c = cos(thetarad);
     double s = sin(thetarad);
   

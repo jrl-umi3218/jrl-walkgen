@@ -293,11 +293,11 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(MAL_MATRIX(& lqr,dou
 	  << aCOMPosition.omega ,"DebugDataCOMPC2.txt");
 
   //  afCOMPosition.hip =  m_PC->GetHeightOfCoM() + ToTheHip(3,1) ;//-0.705;
-  c = cos(aCOMPosition.theta*M_PI/180.0);
-  s = sin(aCOMPosition.theta*M_PI/180.0);
+  c = cos(aCOMPosition.yaw*M_PI/180.0);
+  s = sin(aCOMPosition.yaw*M_PI/180.0);
 	
-  co = cos(aCOMPosition.omega*M_PI/180.0);
-  so = sin(aCOMPosition.omega*M_PI/180.0);
+  co = cos(aCOMPosition.pitch*M_PI/180.0);
+  so = sin(aCOMPosition.pitch*M_PI/180.0);
 
   // COM Orientation
   Body_R(0,0) =  m_FinalDesiredCOMPose(0,0) = c*co;       
@@ -594,17 +594,17 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 	    ,"DebugDataCOMPC1.txt");
   }
 
-  acomp.omega = afCOMPosition.omega;
-  acomp.theta = afCOMPosition.theta;
+  acomp.pitch = afCOMPosition.pitch;
+  acomp.yaw = afCOMPosition.yaw;
 
  // c = cos((m_FIFOZMPRefPositions[0].theta+afCOMPosition.theta)*M_PI/180.0);
   //s = sin((m_FIFOZMPRefPositions[0].theta+afCOMPosition.theta)*M_PI/180.0);
 
-  c = cos((afCOMPosition.theta)*M_PI/180.0);
-  s = sin((afCOMPosition.theta)*M_PI/180.0);
+  c = cos((afCOMPosition.yaw)*M_PI/180.0);
+  s = sin((afCOMPosition.yaw)*M_PI/180.0);
 
-  co = cos(afCOMPosition.omega*M_PI/180.0);
-  so = sin(afCOMPosition.omega*M_PI/180.0);
+  co = cos(afCOMPosition.pitch*M_PI/180.0);
+  so = sin(afCOMPosition.pitch*M_PI/180.0);
 
   // COM Orientation
   Body_R(0,0) = c*co;       Body_R(0,1) = -s;       Body_R(0,2) = c*so;
@@ -622,7 +622,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
   Body_P(1) = acomp.y[0] + ToTheHip(1);
   Body_P(2) = 0.0; // afCOMPosition.z[0] + ToTheHip(2);
 
-  acomp.phi=Body_P(2);
+  acomp.roll=Body_P(2);
 
   // Left Foot.
   c = cos(LeftFootPosition.theta*M_PI/180.0);
@@ -713,7 +713,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
   // Fill the COM positions FIFO.
  // acomp.theta = m_FIFOZMPRefPositions[0].theta+afCOMPosition.theta;
 
- acomp.theta = afCOMPosition.theta;
+ acomp.yaw = afCOMPosition.yaw;
 
   
  // Update the value of the input parameter.
@@ -1202,7 +1202,7 @@ void ZMPPreviewControlWithMultiBodyZMP::CreateExtraCOMBuffer(deque<COMPosition> 
       m_ExtraZMPBuffer[i].px=aZmpx2;
       m_ExtraZMPBuffer[i].py=aZmpy2;
 
-      m_ExtraCOMBuffer[i].theta = m_ExtraZMPRefBuffer[i].theta;
+      m_ExtraCOMBuffer[i].yaw = m_ExtraZMPRefBuffer[i].theta;
 		
       aFIFOZMPRefPositions.pop_front();
 	

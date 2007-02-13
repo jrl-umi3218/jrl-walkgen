@@ -10,17 +10,17 @@ namespace PatternGeneratorJRL
      \param x : x position, x velocity, x accelaration
      \param y : x position, x velocity, x accelaration
      \param x : x position, x velocity, x accelaration
-     \param theta : orientation of the waist (euler Angle)
-     \param omega : orientation of the waist (euler Angle)
-     \param phi : orientation of the waist (euler Angle)
+     \param roll : orientation of the waist (RPY) in degree
+     \param pitch : orientation of the waist (RPY) in degree
+     \param yaw : orientation of the waist (RPY) in degree
   */
   struct COMPosition_s
   {
     double x[3],y[3]; 
     double z[3];    	
-    double theta;
-    double omega;
-    double phi;
+    double roll;
+    double pitch;
+    double yaw;
      	
   };
   typedef struct COMPosition_s COMPosition;

@@ -3129,7 +3129,7 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	    xk[5] +  // Acceleration
 	    lkSP * X[N]; // Jerk
 
-	  aCOMPos.theta = ZMPRefPositions[li*interval+lk].theta;
+	  aCOMPos.yaw = ZMPRefPositions[li*interval+lk].theta;
 
 	  COMPositions.push_back(aCOMPos);
 
@@ -3149,7 +3149,7 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	  
 	  ODEBUG5(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
 		  aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<
-		  aCOMPos.theta << " " <<
+		  aCOMPos.yaw << " " <<
 		  aZMPPos.px << " " << aZMPPos.py <<  " " << aZMPPos.theta << " " << 
 		  X[0] << " " << X[N] << " " << 
 		  lkSP << " " << T , "DebugInterpol.dat");

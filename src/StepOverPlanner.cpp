@@ -482,11 +482,11 @@ void StepOverPlanner::DoubleSupportFeasibility()
 	  aCOMPosition.y[0] = TempCOMPosition(1);
 	  aCOMPosition.z[0] = TempCOMPosition(2);
 	
-	  aCOMPosition.theta = - m_WaistRotationStepOver;//m_ObstacleParameters.theta + OrientationHipToObstacle;  
+	  aCOMPosition.yaw = - m_WaistRotationStepOver;//m_ObstacleParameters.theta + OrientationHipToObstacle;  
 	
 			
-	  c = cos(aCOMPosition.theta*M_PI/180.0);
-	  s = sin(aCOMPosition.theta*M_PI/180.0);
+	  c = cos(aCOMPosition.yaw*M_PI/180.0);
+	  s = sin(aCOMPosition.yaw*M_PI/180.0);
 	
 	  // COM Orientation
 	  Body_R(0,0) = c;       Body_R(0,1) = -s;       Body_R(0,2) = 0;
@@ -1428,7 +1428,7 @@ void StepOverPlanner::PolyPlannerHip()
 	m_COMBuffer[i+aStart].z[1]=(m_COMBuffer[i+aStart].z[0]-m_COMBuffer[i+aStart-1].z[0])/m_SamplingPeriod;
 	m_COMBuffer[i+aStart].z[2]=(m_COMBuffer[i+aStart].z[1]-m_COMBuffer[i+aStart-1].z[1])/m_SamplingPeriod;
 
-	m_COMBuffer[i+aStart].theta=m_PolynomeStepOverHipRotation->Compute(LocalTime)+m_COMBuffer[aStart].theta;			
+	m_COMBuffer[i+aStart].yaw=m_PolynomeStepOverHipRotation->Compute(LocalTime)+m_COMBuffer[aStart].yaw;			
       }
 		
 		
@@ -1446,7 +1446,7 @@ void StepOverPlanner::PolyPlannerHip()
       m_COMBuffer[i+aStart].z[1]=(m_COMBuffer[i+aStart].z[0]-m_COMBuffer[i+aStart-1].z[0])/m_SamplingPeriod;
       m_COMBuffer[i+aStart].z[2]=(m_COMBuffer[i+aStart].z[1]-m_COMBuffer[i+aStart-1].z[1])/m_SamplingPeriod;
 
-      m_COMBuffer[i+aStart].theta=m_COMBuffer[i+aStart-1].theta;
+      m_COMBuffer[i+aStart].yaw=m_COMBuffer[i+aStart-1].yaw;
     }
 	
 
@@ -1483,7 +1483,7 @@ void StepOverPlanner::PolyPlannerHip()
 	m_COMBuffer[i+aStart].z[1]=(m_COMBuffer[i+aStart].z[0]-m_COMBuffer[i+aStart-1].z[0])/m_SamplingPeriod;
 	m_COMBuffer[i+aStart].z[2]=(m_COMBuffer[i+aStart].z[1]-m_COMBuffer[i+aStart-1].z[1])/m_SamplingPeriod;
 
-	m_COMBuffer[i+aStart].theta=m_PolynomeStepOverHipRotation->Compute(LocalTime)+m_COMBuffer[aStart].theta;
+	m_COMBuffer[i+aStart].yaw=m_PolynomeStepOverHipRotation->Compute(LocalTime)+m_COMBuffer[aStart].yaw;
       }
     }
 
@@ -1679,7 +1679,7 @@ void StepOverPlanner::CreateBufferFirstPreview(deque<COMPosition> &m_COMBuffer,
       m_ZMPBuffer[i].px=aZmpx2;
       m_ZMPBuffer[i].py=aZmpy2;
 
-      m_COMBuffer[i].theta = m_ZMPRefBuffer[i].theta;
+      m_COMBuffer[i].yaw = m_ZMPRefBuffer[i].theta;
 		
       aFIFOZMPRefPositions.pop_front();
 	
