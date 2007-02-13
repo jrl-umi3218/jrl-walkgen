@@ -1,0 +1,1 @@
+plot "DebugDataLong.txt" u 2:3 w l title "ZMP ref", "DebugDataLong.txt" u 6:7 w l title "Final COM", "DebugDataLong.txt" u 15:16 w l title "Left Foot", "DebugDataLong.txt" u 18:19 w l title "Right Foot"

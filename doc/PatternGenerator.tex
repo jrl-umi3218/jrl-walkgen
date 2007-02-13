@@ -156,10 +156,60 @@ NbOfStepsInt &= \lfloor NbOfSteps \rfloor \\
 \end{equation}
 The robot perform $NbOfStepsInt$ of $\theta_{steps}$ degrees.
 The last step is of $\theta_{last}$ degrees.
+$StepMax$ is the maximum step length. It is fixed by default at 0.15 cm.
 \par
 The function will exit almost immediatly, and the motion will NOT
 be performed unless you call the {\bf finish} function.
 Before calling finish, it is strongly advice to use {\bf lastsupport}.
+
+The internal algorithm puts footprint on each side of an arc.
+Therefore the left foot trajectory and the right trajectory are on two arcs.
+If we note $\Delta Feet$ the distance between the two feet along the $y-axis$ 
+(in the OpenHRP frame), then the internal arc has a ray of $R - \Delta Feet$.
+The external arc has a ray of $R + \Delta Feet$.
+Considering the case depicted in figure \ref{pic:ArcAlgo2},
+and assuming that $SF= -1$ if the support is the left foot,
+and $SF=1$ if the support foot is the right foot, the coordinates
+of the support foot is :	
+\begin{equation*}
+\begin{aligned}
+x(k)_{sf} &= R + SF  \Delta Feet  sin(k \theta_{steps}) - (R-SF \Delta Feet ) sin(k \theta_{steps}) \\
+y(k)_{sf} &= -(R + SF  \Delta Feet  cos(\theta_{steps}) - (R-SF \Delta Feet ) cos(k \theta_{steps}) )\\
+\end{aligned}
+\end{equation*}
+
+In order to give the proper translation for the relative foot position
+between support foot $k-1$ and $k$, we note $v_{w}$ this translation in the
+world reference frame (as depicted in figure \ref{pic:ArcAlgo}). 
+If $v_{i}$ is the same vector but expressed in the reference frame of support foot $k$,
+then 
+\begin{equation*}
+v_w = {\bf R}_{k \theta_{steps}} v_i
+\end{equation*}
+One can remark that $v_i$ is the translation $(sx,sy)$ we are looking for.
+Indeed the support foot $k$ has the proper orientation after $k \theta_{steps}$ rotation.
+Then by computing $v_w = [ x(k)_{sf}-x(k-1)_{sf} \; y(k)_{sf}-y(k-1)_{sf} ]^T$, 
+we get 
+\begin{equation*}
+v_i = {\bf R}^{-1}_{k \theta_{steps}} v_w = {\bf R}^{T}_{k \theta_{steps}} v_w
+\end{equation*}
+
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[width=6cm]{./figures/PatternGenerator/arcalgo2}
+\caption{Splitting the arc into small arc of $\theta_{steps}$ degrees}
+\label{pic:ArcAlgo2}
+\end{center}
+\end{figure}
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[height=6cm]{./figures/PatternGenerator/arcalgo}
+\caption{Computing $v_w$ into the reference frame of support foot $k$ }
+\label{pic:ArcAlgo}
+\end{center}
+\end{figure}
+
 \begin{itemize}
 \item \textbf{Jython availability:} yes
 \item \textbf{Corba availability:} no
