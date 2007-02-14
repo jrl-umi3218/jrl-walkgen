@@ -3,7 +3,7 @@ dnl
 dnl Copyright (c) 2007 CNRS/LAAS
 dnl
 dnl
-AC_INIT([walkGenJRL],[2.0],[openrobots@laas.fr])
+AC_INIT([walkGenJRL],[2.1],[openrobots@laas.fr])
 AC_PREREQ(2.59)
 
 AM_INIT_AUTOMAKE
