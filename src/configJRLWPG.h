@@ -8,3 +8,5 @@
 /*! Uses the default implementation for the small 3d vector */
 #define _DEFAULT_VECTOR3D_ 1
 
+/*! Uses the default implementation for the small 3d vector */
+#define _DEFAULT_VECTOR4D_ 1

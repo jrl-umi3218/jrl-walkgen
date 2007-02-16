@@ -743,33 +743,6 @@ If you wish to generate new walking criterion, here are some reference curves.
 \end{center}
 \end{figure}
 
-
-\subsection{The angular momentum problem}
-\begin{figure}[htb]
-\begin{center}
-\includegraphics[width=\linewidth]{./figures/PatternGenerator/AngularMomentum}
-\caption{Angular Momentum after ZMP correction}
-\label{pic:AngularMomentum}
-\end{center}
-\end{figure}
-
-
-The main problem related to this walking pattern is the generation of
-unwelcome angular momentum around the z-axis. It creates strong rotation
-for the robot during double-support phase. This is partly due to the fact that
-in the previous part, the upper body motion has been totally ignored.
-They are two possibilities to solve the problem: either design a heuristic 
-aiming at compensate for the z-axis momentum, either implement a proper
-control strategy to move the free upper-body's joints.
-A heuristic involving only the arms is described, and the remaining part
-of this document will described the concept of \textit{resolved momentum control}.
-
-\subsection{Arm motion heuristic}
-
-The main idea is to generate a motion with the arms which compensate the Z-axis moment 
-by doing an arm movement. The basic idea is to generate a motion where the hand movement
-has a linear relationship with the foot of the same side in the waist coordinates.
-
 \section{Finding the weights for the preview control }
 
 In this section we recall some well-known results in control theory in order to compute 
@@ -875,6 +848,151 @@ with
      \end{matrix}
      \right)
      \end{equation}
+
+\section{The angular momentum problem}
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[width=\linewidth]{./figures/PatternGenerator/AngularMomentum}
+\caption{Angular Momentum after ZMP correction}
+\label{pic:AngularMomentum}
+\end{center}
+\end{figure}
+
+\subsection{The problem}
+
+The main problem related to this walking pattern is the generation of
+unwelcome angular momentum around the z-axis. It creates strong rotation
+for the robot during double-support phase. This is partly due to the fact that
+in the previous part, the upper body motion has been totally ignored.
+They are two possibilities to solve the problem: either design a heuristic 
+aiming at compensate for the z-axis momentum, either implement a proper
+control strategy to move the free upper-body's joints.
+A heuristic involving only the arms is described, and the remaining part
+of this document will described the concept of \textit{resolved momentum control}.
+
+\subsection{Arm motion heuristic}
+
+The main idea is to generate a motion with the arms which compensate the Z-axis moment 
+by doing an arm movement. The basic idea is to generate a motion where the hand movement
+has a linear relationship with the foot of the same side in the waist coordinates.
+
+
+
+
+\section{To change the library}
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[angle=270,width=0.7\linewidth]{./figures/PatternGenerator/ZMPSchemeSoftware}
+\caption{Overall structure of the library based on the control scheme.}
+\label{pic:OverallStructure}
+\end{center}
+\end{figure}
+
+\subsection{Introduction}
+The overall architecture of the library relies on the ZMP preview control scheme as explained previously.
+The main objects are depicted in Fig. \ref{pic:OverallStructure} and are :
+\begin{itemize}
+\item {\bf ZMPDiscretization}: Transform the stack of foot position in ZMP and position trajectories to be used
+every 5 ms.
+\item {\bf ZMPPreviewControlWithMultiBodyZMP}: Realize the control of the ZMP trajectory using Preview Control, and 
+an estimation of the robot's multibody ZMP. The object is made of two main methods {\bf FirstStageOfControl} and {\bf SecondStageOfControl}.
+The sub-objects used are:
+\begin{itemize}
+\item {\bf PreviewControl}: Object which implements the preview control of the cart-table model.
+\item {\bf InverseKinematics}: Object which implements the simplified inverse kinematics for the legs and the arms.
+\item {\bf DynamicMultibody}: Computes the dynamic of the robot to get the multibody's ZMP.
+\end{itemize}
+\end{itemize}
+
+\subsection{ZMPDiscretization}
+This object transforms a stack of support foot position into a stack of ZMP, orientation and foot position every 5 ms.
+The position in X and Y follow third orders polynomial for the foot and the ZMP position. 
+\par
+This object is currently assume to produce a full motion from the beginning where the robot is at the half-sitting position 
+up to the end where the robot is also at the half-sitting position.
+The method in charge of this is {\bf GetZMPDiscretization}. This function should be
+changed in order to have a dynamical planning of the foot.
+The motion is splitted into three parts:
+\begin{enumerate}
+\item The beginning of the motion which adds the time of the preview control window to slowly prepare
+the robot to move towards the first support foot.
+\item For each step there is a decomposition of three phases: 
+\begin{enumerate}
+\item a half-double phase for the non-support foot take-off, 
+\item a flying phase,
+\item a landing phase. 
+\end{enumerate}
+\item A final phase where the ZMP is the middle of the two last position of the support foot.
+\end{enumerate}
+\par
+The polynomials used for the foot generation can be changed, but happen to be a problem for stability. 
+Indeed the acceleration is set to be zero at the beginning 
+and at the end of the trajectory with a fifth order polynomial. For the foot this prevent compensation for the momentum around 
+the Z-axis.
+
+{\bf TODO}: They are unuseful code inside this part which should be removed.
+The hand behavior should be put here. The code should more versatile for dynamic planning.
+
+\subsection{Preview Control}
+This object implements the preview control described previously. 
+It is assumed that the control parameters and the size of the window would be provided through
+a parameters file. The current format is as follows:
+\begin{verbatim}
+ZMP_Height
+Sampling_Period
+Preview_Control_Time
+Kx_0 Kx_1 Kx_2
+Ks
+F_0 F_1 ... F_SizeOfPreviewWindow
+\end{verbatim}
+where $SizeOfPreviewWindow = Preview\_Control\_Time \times Sampling\_Period$.
+\par
+{\bf TODO:} VNL offers the capabilities to solve the Ricatti equations 
+associated with the linear system. The Schur decomposition could be used for that.
+
+\subsection{Dynamic Multi Body}
+This object reads a VRML file following the format of OpenHRP2 and creates a tree
+of bodies. Using the {\bf ForwardVelocity} method it is possible to simulate the
+dynamic of the robot by specifying the position, orientation and linear velocity
+of a root body. This root body is set by default to the waist when reading the
+object at start. It can be modified using {\bf SpecifyTheRootLabel}. 
+To make it work, the joint position and their speed must be also provided.
+\par
+The computation of ZMP is done by keeping track of the linear and angular momentum
+through {\bf GetPandL}. You have to perform a simple difference for both of them between two iterations
+and call {\bf CalculateZMP} which takes them as an input.
+DynamicMultiBody has been modified to compute the matrices needed for the resolved momentum control.
+See TestFootPrint2.cpp in src for a practical example.
+
+{\bf TODO}: Add the angular velocity for the {\bf ForwardVelocity} method.
+Remove the french naming.
+
+\subsection{ZMPPreviewControlWithZMPMultiBody}
+
+This object implements the queues and the synchronization between the different object
+for controlling one iteration of the overall scheme. Once the ZMP stack has been build,
+only one position for each foot and for the ZMP must be provided.
+The delays between the queues have to be carefully chosen after the explanation provided previously.
+The corresponding joint values are then computed and are provided as well as the CoM
+position and orientation.
+This object should not be modified unless the preview control window is itself modified.
+
+\chapter{The Upper body Motion}
+
+\section{Walking Mode inside the Pattern Generator V.2 }
+
+\begin{table}
+\begin{tabular}{|c|c|} \hline
+Walk Mode & Meaning \\ \hline \hline
+{\bf 0} & Normal walking \\
+{\bf 1} & Modification of the hip height \\
+{\bf 2} & Stepping over \\
+{\bf 3} & Planification of the upper body motion with way-points \\
+{\bf 4} & Let the other plugin modify the upper body \\ \hline 
+\end{tabular}
+\caption{Handling of the upper body motion according to the walking mode}
+\end{table}
 
 \section{Momentum Equation}
 
@@ -1358,118 +1476,29 @@ pelvis height is desirable for most of the case.
 The references for the right and left foot ${\bf \xi}^{ref}_{F_1}$ and ${\bf \xi}^{ref}_{F_2}$
 are computed according to the method described previously.
 
+\appendix{Software interface to the pattern generator}
 
-\section{To change the library}
+In order to isolate the algorithms used for generating a walking pattern motion
+a generic interface has been created. 
 
-\begin{figure}[htb]
-\begin{center}
-\includegraphics[angle=270,width=0.7\linewidth]{./figures/PatternGenerator/ZMPSchemeSoftware}
-\caption{Overall structure of the library based on the control scheme.}
-\label{pic:OverallStructure}
-\end{center}
-\end{figure}
+\appendix{Specifying  Humanoid's data}
 
-\subsection{Introduction}
-The overall architecture of the library relies on the ZMP preview control scheme as explained previously.
-The main objects are depicted in Fig. \ref{pic:OverallStructure} and are :
-\begin{itemize}
-\item {\bf ZMPDiscretization}: Transform the stack of foot position in ZMP and position trajectories to be used
-every 5 ms.
-\item {\bf ZMPPreviewControlWithMultiBodyZMP}: Realize the control of the ZMP trajectory using Preview Control, and 
-an estimation of the robot's multibody ZMP. The object is made of two main methods {\bf FirstStageOfControl} and {\bf SecondStageOfControl}.
-The sub-objects used are:
-\begin{itemize}
-\item {\bf PreviewControl}: Object which implements the preview control of the cart-table model.
-\item {\bf InverseKinematics}: Object which implements the simplified inverse kinematics for the legs and the arms.
-\item {\bf DynamicMultibody}: Computes the dynamic of the robot to get the multibody's ZMP.
-\end{itemize}
-\end{itemize}
-
-\subsection{ZMPDiscretization}
-This object transforms a stack of support foot position into a stack of ZMP, orientation and foot position every 5 ms.
-The position in X and Y follow third orders polynomial for the foot and the ZMP position. 
-\par
-This object is currently assume to produce a full motion from the beginning where the robot is at the half-sitting position 
-up to the end where the robot is also at the half-sitting position.
-The method in charge of this is {\bf GetZMPDiscretization}. This function should be
-changed in order to have a dynamical planning of the foot.
-The motion is splitted into three parts:
-\begin{enumerate}
-\item The beginning of the motion which adds the time of the preview control window to slowly prepare
-the robot to move towards the first support foot.
-\item For each step there is a decomposition of three phases: 
-\begin{enumerate}
-\item a half-double phase for the non-support foot take-off, 
-\item a flying phase,
-\item a landing phase. 
-\end{enumerate}
-\item A final phase where the ZMP is the middle of the two last position of the support foot.
-\end{enumerate}
-\par
-The polynomials used for the foot generation can be changed, but happen to be a problem for stability. 
-Indeed the acceleration is set to be zero at the beginning 
-and at the end of the trajectory with a fifth order polynomial. For the foot this prevent compensation for the momentum around 
-the Z-axis.
-
-{\bf TODO}: They are unuseful code inside this part which should be removed.
-The hand behavior should be put here. The code should more versatile for dynamic planning.
-
-\subsection{Preview Control}
-This object implements the preview control described previously. 
-It is assumed that the control parameters and the size of the window would be provided through
-a parameters file. The current format is as follows:
-\begin{verbatim}
-ZMP_Height
-Sampling_Period
-Preview_Control_Time
-Kx_0 Kx_1 Kx_2
-Ks
-F_0 F_1 ... F_SizeOfPreviewWindow
-\end{verbatim}
-where $SizeOfPreviewWindow = Preview\_Control\_Time \times Sampling\_Period$.
-\par
-{\bf TODO:} VNL offers the capabilities to solve the Ricatti equations 
-associated with the linear system. The Schur decomposition could be used for that.
-
-\subsection{Dynamic Multi Body}
-This object reads a VRML file following the format of OpenHRP2 and creates a tree
-of bodies. Using the {\bf ForwardVelocity} method it is possible to simulate the
-dynamic of the robot by specifying the position, orientation and linear velocity
-of a root body. This root body is set by default to the waist when reading the
-object at start. It can be modified using {\bf SpecifyTheRootLabel}. 
-To make it work, the joint position and their speed must be also provided.
-\par
-The computation of ZMP is done by keeping track of the linear and angular momentum
-through {\bf GetPandL}. You have to perform a simple difference for both of them between two iterations
-and call {\bf CalculateZMP} which takes them as an input.
-DynamicMultiBody has been modified to compute the matrices needed for the resolved momentum control.
-See TestFootPrint2.cpp in src for a practical example.
-
-{\bf TODO}: Add the angular velocity for the {\bf ForwardVelocity} method.
-Remove the french naming.
-
-\subsection{ZMPPreviewControlWithZMPMultiBody}
-
-This object implements the queues and the synchronization between the different object
-for controlling one iteration of the overall scheme. Once the ZMP stack has been build,
-only one position for each foot and for the ZMP must be provided.
-The delays between the queues have to be carefully chosen after the explanation provided previously.
-The corresponding joint values are then computed and are provided as well as the CoM
-position and orientation.
-This object should not be modified unless the preview control window is itself modified.
-
-\chapter{The Upper body Motion}
-
-\section{Walking Mode inside the Pattern Generator V.2 }
-
+\section{Introduction}
+Also the model of the robot is specified by a VRML file using the OpenHRP's format,
+they are no information specifying which JOINTS correspond to the head, foot and hands.
+The current solution is to use a XML file to specify those information.
+The information currently stored are:
 \begin{table}
-\begin{tabular}{|c|c|} \hline
-Walk Mode & Meaning \\ \hline \hline
-{\bf 0} & Normal walking \\
-{\bf 1} & Modification of the hip height \\
-{\bf 2} & Stepping over \\
-{\bf 3} & Planification of the upper body motion with way-points \\
-{\bf 4} & Let the other plugin modify the upper body \\ \hline 
+\begin{tabular}{|c|c|c|} \hline
+Part of the body & Side of the body & Fields \\ \hline \hline
+Feet & Right and Left & 
+Size of the feet (width, height, depth) \linebreak 
+Ankle Position (x,y,z) \linebreak
+Liste of Joints  \\ \hline
+Waist & Right and Left & Distance between waist and hip \\ \hline
 \end{tabular}
-\caption{Handling of the upper body motion according to the walking mode}
 \end{table}
+The first section describe the different fields and their format.
+
+\section{XML's fields}
+In order 

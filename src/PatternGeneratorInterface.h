@@ -44,18 +44,15 @@
 
 #include <sstream>
 #include <MatrixAbstractLayer.h>
-#include <StepOverPlanner.h>
+
 #include <ZMPPreviewControlWithMultiBodyZMP.h>
 #include <ZMPDiscretization.h>
 #include <PreviewControl.h>
-#include <InverseKinematics.h>
-#include <DynamicMultiBody.h>
-#include <StepOverPlanner.h>
-#include <WaistHeightVariation.h>
-#include <UpperBodyMotion.h>
+#include <ComAndFootRealizationByGeometry.h>
 #include <GenerateMotionFromKineoWorks.h>
 #include <StepStackHandler.h>
-#include <HumanoidSpecificities.h>
+#include <HumanoidDynamicMultiBody.h>
+#include <StepOverPlanner.h>
 
 namespace PatternGeneratorJRL
 {
@@ -185,17 +182,13 @@ namespace PatternGeneratorJRL
     // @param : ZMPTarget : The target ZMP in the waist reference frame.
     // @param : outWaistPosition: The evaluated waist position.
     // @return: True is there is still some data to send, false otherwise.
-    bool RunOneStepOfTheControlLoop(MAL_MATRIX( &qr,double),
-				    MAL_MATRIX( &ql,double),
-				    MAL_MATRIX( &UpperBodyAngles,double),
-				    MAL_MATRIX( &ZMPTarget,double),
-				    COMPosition & outWaistPosition);
+    bool RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
+				    MAL_VECTOR(,double) & CurrentVelocity,
+				    MAL_VECTOR( &ZMPTarget,double));
 
     // Debug control loop.
-    void DebugControlLoop(MAL_MATRIX( &qr,double),
-			  MAL_MATRIX( &ql,double),
-			  MAL_MATRIX( &UpperBodyAngles,double),
-			  COMPosition outWaistPosition,
+    void DebugControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
+			  MAL_VECTOR(,double) & CurrentVelocity,
 			  int localindex);
 
     /*! Set the current joint values of the robot.
@@ -203,21 +196,15 @@ namespace PatternGeneratorJRL
       It also updates the state of the robot if other control mechanisms 
       modifies the upper body part and if this should be taken into account
       into the pattern generator in the second loop of control. */
-    void SetCurrentJointValues(MAL_MATRIX( &lCurrentJointValues,double));
+    void SetCurrentJointValues(MAL_VECTOR( &lCurrentJointValues,double));
 
     /*! Returns the walking mode. */
     int GetWalkMode();
     
     /*! Get the leg joint velocity */
-    void GetLegJointVelocity(MAL_MATRIX( &dqr,double), 
-			     MAL_MATRIX( &dql,double));
+    void GetLegJointVelocity(MAL_VECTOR( &dqr,double), 
+			     MAL_VECTOR( &dql,double));
 
-    /* Computer Upper body heuristic for normal walking . */
-    void ComputeUpperBodyHeuristicForNormalWalking(    MAL_MATRIX( &qArmr, double),
-						       MAL_MATRIX( &qArml,double),
-						       COMPosition aCOMPosition,
-						       FootAbsolutePosition RFP,
-						       FootAbsolutePosition LFP );
     /*! Start the creation of steps on line. */
     void StartOnLineStepSequencing();
 
@@ -241,7 +228,7 @@ namespace PatternGeneratorJRL
      * @param ClearStepStackHandler: Clean the stack of steps after copy.
      */
     void CommonInitializationOfWalking(MAL_S3_VECTOR(  & lStartingCOMPosition,double),
-				       MAL_MATRIX(  & BodyAnglesIni,double),
+				       MAL_VECTOR(  & BodyAnglesIni,double),
 				       FootAbsolutePosition & InitLeftFootAbsPos, 
 				       FootAbsolutePosition & InitRightFootAbsPos,
 				       deque<RelativeFootPosition> & lRelativeFootPositions,
@@ -253,17 +240,9 @@ namespace PatternGeneratorJRL
     void ExpandCOMAndUpperBodyPositionsQueues(int aNumber);
 
     /*! Compute the COM, left and right foot position for a given BodyAngle position */
-    void EvaluateStartingCOM(MAL_MATRIX(  & BodyAnglesIni,double),
-			     MAL_S3_VECTOR(  & lStartingCOMPosition,double),
-			     FootAbsolutePosition & InitLeftFootAbsPos, 
-			     FootAbsolutePosition & InitRightFootAbsPos);
+    void EvaluateStartingCOM(MAL_VECTOR(  & Configuration,double),
+			     MAL_S3_VECTOR(  & lStartingCOMPosition,double));
     
-    /*! Compute the COM, left and right foot position for a given BodyAngle position */
-    void EvaluateStartingCOM(MAL_MATRIX(  & BodyAnglesIni,double),
-			     MAL_S3_VECTOR(  & lStartingCOMPosition,double),
-			     MAL_S3_VECTOR(  & lStartingWaistPosition,double),
-			     FootAbsolutePosition & InitLeftFootAbsPos, 
-			     FootAbsolutePosition & InitRightFootAbsPos);
     
     /*! Add an online step */
     void AddOnLineStep(double X, double Y, double Theta);
@@ -285,17 +264,25 @@ namespace PatternGeneratorJRL
 			  double &omega) ;
 
     /*! An other method to get the waist position using a matrix. */
-    void getWaistPositionMatrix(MAL_MATRIX( &lWaistAbsPos,double));
+    void getWaistPositionMatrix(MAL_S4x4_MATRIX( &lWaistAbsPos,double));
      
 
-  protected:
-
-    /*! Planner for stepping over an obstacle. */
-    StepOverPlanner *m_StOvPl;
+    /*! \name Methods related to the handling of the objects contained 
+      inside this class.  
+      @{
+    */
     
-    /*! Planner for the waist variation for stepping
-      over an obstacle. */
-    WaistHeightVariation *m_WaistPlanner;	
+    /*! Objects instanciation. */
+    void ObjectsInstanciation(string & HumanoidSpecificitiesFileName);
+
+    /*! Inter object relations initialization. */
+    void InterObjectRelationInitialization(string & PCParametersFileName,
+					   string & HumanoidVRMLFileDirectory,
+					   string & HumanoidVRMLFileName);
+
+    /*! @}*/
+
+  private:
 
     /*! Object to handle the stack of relative steps. */
     StepStackHandler *m_StepStackHandler;
@@ -304,18 +291,7 @@ namespace PatternGeneratorJRL
       obstacle. */
     vector<double> m_ZMPShift;
 
-    /*! Position and parameters related to the obstacle. */
-    ObstaclePar m_ObstaclePars;
-
-    /*! Boolean on the obstacle's detection */
-    bool m_ObstacleDetected;	
     
-    /*! Variable for delta feasibility limit */
-    double m_DeltaFeasibilityLimit;	
-
-    /*! Object to store the upper body motion. */
-    UpperBodyMotion *m_UpBody;
-
     /*! Gain factor for the default arm motion while walking. */
     double m_GainFactor;
 
@@ -351,29 +327,29 @@ namespace PatternGeneratorJRL
     /*! Conversion between the index of the plan and the robot DOFs. */
     vector<int> m_ConversionForUpperBodyFromLocalIndexToRobotDOFs;
     
-    /*! Current Joint values of the robot. */
-    vector<double> m_CurrentJointValues;
+    /*! Current Actuated Joint values of the robot. */
+    vector<double> m_CurrentActuatedJointValues;
 
     /*! Position of the waist: 
       Relative.*/
-    MAL_MATRIX( m_WaistRelativePos,double);
+    MAL_S4x4_MATRIX( m_WaistRelativePos,double);
     
     /*! Absolute: */
-    MAL_MATRIX( m_WaistAbsPos,double);
+    MAL_S4x4_MATRIX( m_WaistAbsPos,double);
     
     /*! Orientation: */
     double m_AbsTheta, m_AbsMotionTheta;
     
     /*! Position of the motion: */
-    MAL_MATRIX( m_MotionAbsPos,double);
-    MAL_MATRIX( m_MotionAbsOrientation,double);
+    MAL_S4x4_MATRIX( m_MotionAbsPos,double);
+    MAL_S4x4_MATRIX( m_MotionAbsOrientation,double);
     
     /*! Absolute speed:*/
-    MAL_MATRIX( m_AbsLinearVelocity,double);
-    MAL_MATRIX( m_AbsAngularVelocity,double);
+    MAL_S4_VECTOR( m_AbsLinearVelocity,double);
+    MAL_S4_VECTOR( m_AbsAngularVelocity,double);
 
     /*! Aboluste acceleration */
-    MAL_MATRIX( m_AbsLinearAcc,double);
+    MAL_S4_VECTOR( m_AbsLinearAcc,double);
     
     /*! Keeps track of the last correct support foot. */
     int m_KeepLastCorrectSupportFoot;
@@ -394,16 +370,10 @@ namespace PatternGeneratorJRL
     /*! Buffer of absolute Hand position. */
     deque<FootAbsolutePosition> m_LeftHandPositions,m_RightHandPositions;
     
-    /*! Time Distribution factor */
-    vector<double> m_TimeDistrFactor;
    
     /*! Buffer of current Upper Body motion. */
     vector<double> m_UpperBodyMotion;
 
-    /*! Store the difference between the Center Of Mass
-      and the Waist position. */
-    double m_DiffBetweenComAndWaist[3];
-    
     /*! Store the debug mode. */
     int m_DebugMode;
 
@@ -413,9 +383,6 @@ namespace PatternGeneratorJRL
     /*! Store the height of the arm. */
     double m_ZARM;
 
-    /*! Store the leg's joint velocity. */
-    MAL_MATRIX( m_dql,double);
-    MAL_MATRIX( m_dqr,double);
 
     /**! Local copy of Preview Control parameters. */
     /*! Sampling period of the control loop. */
@@ -442,20 +409,20 @@ namespace PatternGeneratorJRL
     double m_Xmax;      
 
     /*! Variables used to compute speed for other purposes. */
-    MAL_MATRIX( m_prev_qr,double);
-    MAL_MATRIX( m_prev_ql,double);
-    MAL_MATRIX( m_prev_dqr, double);
-    MAL_MATRIX( m_prev_dql, double);
+    MAL_VECTOR( m_prev_qr,double);
+    MAL_VECTOR( m_prev_ql,double);
+    MAL_VECTOR( m_prev_dqr, double);
+    MAL_VECTOR( m_prev_dql, double);
 
 
     /* Debug variables. */
-    MAL_MATRIX( m_Debug_prev_qr, double);
-    MAL_MATRIX(m_Debug_prev_ql,double);
-    MAL_MATRIX( m_Debug_prev_dqr, double);
-    MAL_MATRIX(m_Debug_prev_dql,double);
-    MAL_MATRIX( m_Debug_prev_UpperBodyAngles,double);
-    MAL_MATRIX( m_Debug_prev_qr_RefState, double);
-    MAL_MATRIX(m_Debug_prev_ql_RefState,double);
+    MAL_VECTOR( m_Debug_prev_qr, double);
+    MAL_VECTOR( m_Debug_prev_ql,double);
+    MAL_VECTOR( m_Debug_prev_dqr, double);
+    MAL_VECTOR( m_Debug_prev_dql,double);
+    MAL_VECTOR( m_Debug_prev_UpperBodyAngles,double);
+    MAL_VECTOR( m_Debug_prev_qr_RefState, double);
+    MAL_VECTOR( m_Debug_prev_ql_RefState,double);
 
     double m_Debug_prev_qWaistYaw, m_Debug_prev_dqWaistYaw;
     MAL_S3_VECTOR(,double) m_Debug_prev_P, m_Debug_prev_L;
@@ -485,9 +452,36 @@ namespace PatternGeneratorJRL
     /*! Boolean to use PBW ZMP planner. */
     unsigned char m_BoolPBWAlgo;
 
-    /*! Humanoid specific data object handler. */
-    HumanoidSpecificities *m_HS;
+    /*! Humanoid Dynamic robot */
+    HumanoidDynamicMultiBody * m_HumanoidDynamicRobot, * m_2HumanoidDynamicRobot;
+
+    /*! Speed of the leg. */
+    MAL_VECTOR(,double) m_dqr,m_dql;
+
+    /*! Objet to realize the generate the posture for given CoM
+      and feet positions. */
+    ComAndFootRealization * m_ComAndFootRealization;
+
+    /* \name Object related to stepping over. 
+       @{
+     */
     
+    /*! Planner for stepping over an obstacle. */
+    StepOverPlanner *m_StOvPl;
+
+    /*! Position and parameters related to the obstacle. */
+    ObstaclePar m_ObstaclePars;
+    
+    /*! Boolean on the obstacle's detection */
+    bool m_ObstacleDetected;	
+
+    /*! Time Distribution factor */
+    vector<double> m_TimeDistrFactor;
+
+    /*! Variable for delta feasibility limit */
+    double m_DeltaFeasibilityLimit;	
+    
+    /* @} */
   };
 };
 #endif

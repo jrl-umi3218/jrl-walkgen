@@ -38,7 +38,7 @@
 #define deg2rad(x) x*M_PI/180.0
 #define rad2deg(x) x*180.0/M_PI
 
-#if 1
+#if 0
 #define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "StepStackHandler: " << x << endl; DebugFile.close();}
 #else
 #define ODEBUG4(x,y) 
@@ -135,9 +135,18 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 	    else 
 	      break;
 				
+	    aFootPosition.DeviationHipHeight = 0;
 	    aFootPosition.SStime=m_SingleSupportTime;
 	    aFootPosition.DStime=m_DoubleSupportTime;
 	    aFootPosition.stepType=1;
+
+	    ODEBUG4(aFootPosition.sx << " " <<
+		    aFootPosition.sy << " " <<
+		    aFootPosition.theta << " " << 
+		    aFootPosition.SStime << " " << 
+		    aFootPosition.DStime << " " << 
+		    aFootPosition.DeviationHipHeight << " " ,
+		    "DebugGMFKW.dat");
 			
 	    m_RelativeFootPositions.push_back(aFootPosition);
 	  }
@@ -215,6 +224,7 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
   double OmegaStep=0;
   double OmegaTotal=deg2rad(arc_deg);
   double LastOmegaStep=0.0;
+  int DirectionRay = -1;
 
   // Compute the ray of the arc.
   R = sqrt(x*x+y*y);
@@ -240,39 +250,74 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
     {
       StepMax = -StepMax;
       LastStep = -LastStep;
+      DirectionRay = 1;
     }
   if (y<0)
     {
       OmegaStep= -OmegaStep;
       LastOmegaStep = -LastOmegaStep;
     }
-#if 0
-  ofstream DebugFile;
-  DebugFile.open("/tmp/output.txt",ofstream::app);
-  DebugFile << NumberOfStep << " "
-	    << LastStep<< " "
-	    << arc_deg<< " "
-	    << endl;
-  DebugFile.close();
-#endif
+
+  ODEBUG4(NumberOfStep << " "
+	  << LastStep<< " "
+	  << arc_deg, "DebugFootPrint.dat");
   
+
+  double Omegakp = 0.0,
+    Omegak=0.0;
+
   for(int i=0;i<NumberOfStep;i++)
     {
+      ODEBUG("SupportFoot " << SupportFoot);
       aFootPosition.sx = StepMax;
       aFootPosition.sy = SupportFoot*0.19;
       aFootPosition.theta = OmegaStep;
+
+      {
+	MAL_MATRIX_DIM(A,double,2,2);
+	MAL_MATRIX_SET_IDENTITY(A);
+	MAL_MATRIX_DIM(Ap,double,2,2);
+	MAL_MATRIX_SET_IDENTITY(Ap);
+	
+	Omegakp = Omegak;
+	Omegak = Omegak + OmegaStep;
+	ODEBUG("Omegak:" << Omegak );
+	double c,s;
+	c = cos(Omegak*M_PI/180.0);
+	s = sin(Omegak*M_PI/180.0);
+
+	// Transpose of the orientation matrix 
+	// to get the inverse of the orientation matrix.
+	A(0,0) =  c; A(0,1) = s;
+	A(1,0) = -s; A(1,1) =  c;
+
+	double cp,sp;
+	cp = cos(Omegakp*M_PI/180.0);
+	sp = sin(Omegakp*M_PI/180.0);
+	
+	MAL_VECTOR_DIM(lv,double,2);
+	MAL_VECTOR_DIM(lv2,double,2);
+	lv(0) = (R+DirectionRay*SupportFoot*0.095)*s - (R-DirectionRay*SupportFoot*0.095)*sp;
+	lv(1) = -((R+DirectionRay*SupportFoot*0.095)*c - (R-DirectionRay*SupportFoot*0.095)*cp);
+	MAL_C_eq_A_by_B(lv2,A,lv);
+	ODEBUG(" X: " << (R+DirectionRay*SupportFoot*0.095)*s << " " << (R-DirectionRay*SupportFoot*0.095)*sp 
+		<< " " << StepMax << " " << lv(0) << " " << lv2(0) );
+	ODEBUG(" Y: " << (R+DirectionRay*SupportFoot*0.095)*c << " " << (R-DirectionRay*SupportFoot*0.095)*cp 
+		<< " " << SupportFoot*0.19 << " " << lv(1) << " " << lv2(1));
+
+	
+	aFootPosition.sx = lv2(0);
+	aFootPosition.sy = lv2(1);
+	
+      }
+      
       aFootPosition.SStime = m_SingleSupportTime;
       aFootPosition.DStime = m_DoubleSupportTime;
       m_RelativeFootPositions.push_back(aFootPosition);
 
-#if 0
-      DebugFile.open("/tmp/output.txt",ofstream::app);
-      DebugFile << aFootPosition.sx<< " "
-		<< aFootPosition.sy<< " "
-		<< aFootPosition.theta<< " "
-		<< endl;
-      DebugFile.close();
-#endif
+      ODEBUG4(aFootPosition.sx<< " "
+	      << aFootPosition.sy<< " "
+	      << aFootPosition.theta,"DebugFootPrint.dat");
 
       SupportFoot = - SupportFoot;
     }
@@ -281,18 +326,47 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
       aFootPosition.sx = LastStep;
       aFootPosition.sy = SupportFoot*0.19;
       aFootPosition.theta = LastOmegaStep;
+
+      {
+	MAL_MATRIX_DIM(A,double,2,2);
+	MAL_MATRIX_SET_IDENTITY(A);
+	
+	Omegakp = Omegak;
+	Omegak = Omegak + LastOmegaStep;
+	ODEBUG( "Omegak:" << Omegak );
+	double c,s;
+	c = cos(Omegak*M_PI/180.0);
+	s = sin(Omegak*M_PI/180.0);
+	
+	double cp,sp;
+	cp = cos(Omegakp*M_PI/180.0);
+	sp = sin(Omegakp*M_PI/180.0);
+	
+	A(0,0) = c;  A(0,1) =s;
+	A(1,0) = -s;  A(1,1) = c;
+	MAL_VECTOR_DIM(lv,double,2);
+	MAL_VECTOR_DIM(lv2,double,2);
+	lv(0) = (R+DirectionRay*SupportFoot*0.095)*s - (R-DirectionRay*SupportFoot*0.095)*sp;
+	lv(1) = -((R+DirectionRay*SupportFoot*0.095)*c - (R-DirectionRay*SupportFoot*0.095)*cp);
+	MAL_C_eq_A_by_B(lv2,A,lv);
+	ODEBUG(" X: " << (R+DirectionRay*SupportFoot*0.095)*s << " " << (R-DirectionRay*SupportFoot*0.095)*sp 
+		<< " " << lv(0) << " " << lv2(0) );
+	ODEBUG(" Y: " << (R+DirectionRay*SupportFoot*0.095)*c << " " << (R-DirectionRay*SupportFoot*0.095)*cp 
+		<< " " << lv(1) << " " << lv2(1) );
+	
+	aFootPosition.sx = lv2(0);
+	aFootPosition.sy = lv2(1);
+	
+      }
+
       aFootPosition.SStime = m_SingleSupportTime;
       aFootPosition.DStime = m_DoubleSupportTime;
       
       m_RelativeFootPositions.push_back(aFootPosition);
-#if 0
-      DebugFile.open("/tmp/output.txt",ofstream::app);
-      DebugFile << aFootPosition.sx<< " "
-		<< aFootPosition.sy<< " "
-		<< aFootPosition.theta<< " "
-		<< endl;
-      DebugFile.close();
-#endif
+
+      ODEBUG4(aFootPosition.sx<< " "
+	      << aFootPosition.sy<< " "
+	      << aFootPosition.theta,"DebugFootPrint.dat");
 
       SupportFoot = - SupportFoot;
     }
