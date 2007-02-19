@@ -1,0 +1,9 @@
+1 - protection again double inclusion of MatrixAbstractLayerSmall.h
+2 - protection again double inclusion check and add on all file
+3 - correct the file MatrixAbstractLayer.h with include "configJRLWPG.h"
+4 - Remake the doxygen comment in PatternGeneratorInterface to actualy
+	appears in the html doc
+5 - version 2.1 : jrl-CIRDynamic structure + Com and Feet Realization object
+
+
+walkGenJRL 2.0 released January 31, 2007
