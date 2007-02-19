@@ -308,7 +308,6 @@ int main(void)
   }
 
 
-
   MAL_VECTOR(,double) CurrentConfiguration;
   MAL_VECTOR(,double) CurrentVelocity;
   MAL_VECTOR_DIM(ZMPTarget,double,3);

@@ -105,7 +105,8 @@ void DynamicMultiBody::SpecifyTheRootLabel(int ID)
   // Right now it is assume that the first body is the world,
   // and that this body is related to another body.
   // Thus liaisons[ID].size() should be equal to one.
-  
+
+
   if (liaisons[ID].size()!=1)
     {
       cout << "Wrong assumption concerning the initial body." << endl;
@@ -113,7 +114,7 @@ void DynamicMultiBody::SpecifyTheRootLabel(int ID)
     }
   int ld = liaisons[ID][0].liaison;
   m_RootOfTheJointsTree = & listeLiaisons[ld].aJoint;
-
+  m_RootOfTheJointsTree->setLinkedBody(listOfBodies[ID]);
   // Start the vector of joints.
   m_JointVector.clear();
   m_JointVector.insert(m_JointVector.end(),m_RootOfTheJointsTree);

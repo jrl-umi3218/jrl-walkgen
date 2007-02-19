@@ -104,6 +104,64 @@ int main()
   // Test the tree.
   RecursiveDisplayOfJoints(rootJoint);
 
+
+  // Tes the computation of the jacobian.
+  double dInitPos[40] = { 
+    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
+
+    0.0, 0.0, 0.0, 0.0, // chest and head
+
+    15.0, -10.0, 0.0, -30.0, 0.0, 0.0, 10.0, // right arm
+    15.0,  10.0, 0.0, -30.0, 0.0, 0.0, 10.0, // left arm 
+
+    -20.0, 20.0, -20.0, 20.0, -20.0, // right hand
+    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
+  };
+
+  int NbOfDofs = aDMB->numberDof();
+  
+  MAL_VECTOR_DIM(aCurrentConf,double,NbOfDofs);
+  int lindex=0;
+  for(int i=0;i<6;i++)
+    aCurrentConf[lindex++] = 0.0;
+
+  for(int i=0;i<40;i++)
+    aCurrentConf[lindex++] = dInitPos[i];
+  
+  aDMB->currentConfiguration(aCurrentConf);
+
+  MAL_VECTOR_DIM(aCurrentVel,double,NbOfDofs); 
+  lindex=0;
+  for(int i=0;i<NbOfDofs;i++)
+    aCurrentVel[lindex++] = 0.0;
+  
+  aDMB->currentVelocity(aCurrentVel);
+
+  aDMB->computeForwardKinematics();
+
+  std::vector<CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *> aVec = aDMB->jointVector();
+  
+  Joint  * aJoint = (Joint *)aVec[22]; // Try to get the hand.
+
+  cout << aJoint->getName() << endl;
+  
+  aJoint->computeJacobianJointWrtConfig();
+
+  MAL_MATRIX(,double) aJ = aJoint->jacobianJointWrtConfig();
+  
+  for(int i=0;i<6;i++)
+    {
+      for(int j=0;j<MAL_MATRIX_NB_COLS(aJ);j++)
+	{
+	  if (aJ(i,j)==0.0)
+	    printf("0 ");
+	  else
+	    printf("%10.5f ",aJ(i,j));
+	}
+      printf("\n");
+    }
+  
   delete aDMB;
   delete aHDMB;
   
