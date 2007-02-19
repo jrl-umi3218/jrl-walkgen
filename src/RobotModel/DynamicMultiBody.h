@@ -55,7 +55,9 @@ namespace PatternGeneratorJRL
   /** @ingroup forwardynamics
       This class simulates the dynamic of a multibody robot.
   */
-  class DynamicMultiBody : public  CjrlDynamicRobot, 
+  class DynamicMultiBody : public  CjrlDynamicRobot<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),
+    MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>, 
     public MultiBody 
     
   {
@@ -200,7 +202,8 @@ namespace PatternGeneratorJRL
     MAL_S3_VECTOR(,double) m_ZMP;
 
     /** Vector of pointers towards the joints. */
-    std::vector<CjrlJoint *> m_JointVector;
+    std::vector<CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+      MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *> m_JointVector;
 
     /**! \name Internal computation of Joints @{ */
     /*! \brief Method to compute the number of joints
@@ -234,6 +237,10 @@ namespace PatternGeneratorJRL
     /*! The method to build the two previous vectors. */
     void BuildStateVectorToJointAndDOFs();
 
+    /*! The method to allocate and reallocate the
+      Jacobian of the joints. */
+    void UpdateTheSizeOfJointsJacobian();
+
     /*! @} */
 
     /*! Iteration number */
@@ -264,7 +271,8 @@ namespace PatternGeneratorJRL
 	correctly set. */
     void ForwardVelocity(MAL_S3_VECTOR(,double) &PosForRoot, 
 			 MAL_S3x3_MATRIX(,double) &OrientationForRoot, 
-			 MAL_S3_VECTOR(,double) &v0ForRoot);
+			 MAL_S3_VECTOR(,double) &v0ForRoot,
+			 MAL_S3_VECTOR(,double) &wForRoot);
     
     /** \brief Compute Inertia Matrices for Resolved Mometum Control
 	Fist pass for tilde m and tilde c */
@@ -419,7 +427,8 @@ namespace PatternGeneratorJRL
     string GetName(int JointID);
 
     /** Returns a CjrlJoint corresponding to body JointID in the VRML numbering system . */
-    CjrlJoint * GetJointFromVRMLID(int JointID);
+    CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * GetJointFromVRMLID(int JointID);
 
     /** Returns a vector to transfer from VRML ID to configuration ID . */
     void GetJointIDInConfigurationFromVRMLID(vector<int> & VectorFromVRMLIDToConfigurationID);
@@ -459,17 +468,20 @@ namespace PatternGeneratorJRL
     /**
        \brief Set the root joint of the robot.
     */
-    void rootJoint(CjrlJoint& inJoint);
+    void rootJoint(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>& inJoint);
     
     /**
        \brief Get the root joint of the robot.
     */
-    CjrlJoint* rootJoint() const;
+    CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* rootJoint() const;
     
     /**
        \brief Get a vector containing all the joints.
     */
-    std::vector<CjrlJoint *> jointVector();
+    std::vector<CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *> jointVector();
     
     /**
        \brief Get the number of degrees of freedom of the robot.

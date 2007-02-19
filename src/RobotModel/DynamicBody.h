@@ -113,7 +113,7 @@ namespace PatternGeneratorJRL
     MAL_S3_VECTOR(,double) m_RMC_h;
     int sister;
     int child;
-
+    
     /*! Default Constructor. */
     DynamicBody();
 

@@ -227,7 +227,8 @@ void DynamicMultiBody::ReLabelling(int corpsCourant, int liaisonDeProvenance)
 
 void DynamicMultiBody::ForwardVelocity(MAL_S3_VECTOR(&PosForRoot,double), 
 				       MAL_S3x3_MATRIX(&OrientationForRoot,double),
-				       MAL_S3_VECTOR(&v0ForRoot,double) )
+				       MAL_S3_VECTOR(&v0ForRoot,double),
+				       MAL_S3_VECTOR(&wForRoot,double))
 {
   double norm_w, th;
  //  int NbOfNodes=1;
@@ -241,6 +242,8 @@ void DynamicMultiBody::ForwardVelocity(MAL_S3_VECTOR(&PosForRoot,double),
   listOfBodies[labelTheRoot].p = PosForRoot;
   listOfBodies[labelTheRoot].v0 = v0ForRoot;
   listOfBodies[labelTheRoot].R = OrientationForRoot;
+  listOfBodies[labelTheRoot].w = wForRoot;
+
   currentNode = listOfBodies[labelTheRoot].child;
   //  cout << "STARTING FORWARD VELOCITY " << v0ForRoot << endl;
   
@@ -924,6 +927,7 @@ void DynamicMultiBody::parserVRML(string path, string nom,
   SpecifyTheRootLabel(0);
   ComputeNumberOfJoints();
   BuildStateVectorToJointAndDOFs();
+  UpdateTheSizeOfJointsJacobian();
 
   MAL_VECTOR_RESIZE(m_Configuration,m_NbDofs);
   MAL_VECTOR_RESIZE(m_Velocity,m_NbDofs);
@@ -1499,11 +1503,13 @@ string DynamicMultiBody::GetName(int JointID)
     
 }
 
-CjrlJoint * DynamicMultiBody::GetJointFromVRMLID(int JointID)
+CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	  MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * DynamicMultiBody::GetJointFromVRMLID(int JointID)
 {
   if ((JointID>=0) && 
       ((unsigned int)JointID<listOfBodies.size()))
-    return (CjrlJoint *)listOfBodies[ConvertIDINVRMLToBodyID[JointID]].joint();
+    return (CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *)listOfBodies[ConvertIDINVRMLToBodyID[JointID]].joint();
   return 0;
 }
 
@@ -1820,20 +1826,23 @@ void DynamicMultiBody::SetRBody(int BodyID, MAL_S3x3_MATRIX(,double) R)
 /***********************************************/
 
 // Set the root joint of the robot.
-void DynamicMultiBody::rootJoint(CjrlJoint & inJoint)
+void DynamicMultiBody::rootJoint(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+				 MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> & inJoint)
 {
   m_RootOfTheJointsTree = & (Joint &)inJoint;
   
 }
 
 // Get the robot joint of the robot.
-CjrlJoint * DynamicMultiBody::rootJoint() const
+CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	  MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * DynamicMultiBody::rootJoint() const
 {
   return m_RootOfTheJointsTree;
 }
 
 // Get a vector containning all the joints
-std::vector<CjrlJoint *> DynamicMultiBody::jointVector()
+std::vector<CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>*> DynamicMultiBody::jointVector()
 {
   return m_JointVector;
 }
@@ -1878,7 +1887,20 @@ void DynamicMultiBody::BuildStateVectorToJointAndDOFs()
       int r;
       // ASSUMPTION: The joint in the VRML have only one degree of freedom.
       if ((r=((Joint *)m_JointVector[m_StateVectorToJoint[i]])->getIDinVRML())!=-1)
-	m_VRMLIDToConfiguration[r] = i;
+	{
+	  m_VRMLIDToConfiguration[r] = i;
+	}
+
+      ((Joint *)m_JointVector[m_StateVectorToJoint[i]])->stateVectorPosition((unsigned int)i);
+    }
+
+}
+
+void DynamicMultiBody::UpdateTheSizeOfJointsJacobian()
+{
+  for(int i=0;i<m_JointVector.size();i++)
+    {
+      ((Joint *)m_JointVector[i])->resizeJacobianJointWrtConfig(m_NbDofs);
     }
 }
 
@@ -2087,6 +2109,7 @@ bool DynamicMultiBody::computeForwardKinematics()
   MAL_S3_VECTOR(,double) lPositionForRoot;
   MAL_S3x3_MATRIX(,double) lOrientationForRoot;
   MAL_S3_VECTOR(,double) lLinearVelocityForRoot;
+  MAL_S3_VECTOR(,double) lAngularVelocityForRoot;
 
   for(unsigned int i=0;i<3;i++)
     {
@@ -2100,11 +2123,16 @@ bool DynamicMultiBody::computeForwardKinematics()
   
   for(unsigned int i=0;i<3;i++)
     lLinearVelocityForRoot(i)  = m_Velocity(i);
+
+  for(unsigned int i=3;i<6;i++)
+    lAngularVelocityForRoot(i-3)  = m_Velocity(i);
+    
   
   ODEBUG(" Position for Root: " << lPositionForRoot);
   ForwardVelocity(lPositionForRoot,
 		  lOrientationForRoot,
-		  lLinearVelocityForRoot);
+		  lLinearVelocityForRoot,
+		  lAngularVelocityForRoot);
 
   return true;
 }

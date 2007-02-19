@@ -36,6 +36,7 @@
 
 namespace PatternGeneratorJRL
 {  
+
   /** @ingroup forwardynamics
        Define a transformation from a body to another
       Supported type:
@@ -43,7 +44,9 @@ namespace PatternGeneratorJRL
       - Translation of a vector : quantite*axe	(type = TRANSLATION)
       - Rotation through a homogeneous matrix : *rotation (type = FREE_LIBRE)
   */
-  class Joint: public CjrlJoint
+  class Joint: public CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>
+    
   {
 
   private:
@@ -64,13 +67,16 @@ namespace PatternGeneratorJRL
     Joint * m_FatherJoint;
 
     /*! Vector of childs */
-    std::vector<CjrlJoint *> m_Children;
+    std::vector< CjrlJoint<MAL_MATRIX(,double),MAL_S4x4_MATRIX(,double), MAL_S3x3_MATRIX(,double), 
+      MAL_VECTOR(,double), MAL_S3_VECTOR(,double)> *> m_Children;
 
     /*! Vector of joints from the root to this joint. */
-    std::vector<CjrlJoint *> m_FromRootToThis;
+    std::vector< CjrlJoint<MAL_MATRIX(,double),MAL_S4x4_MATRIX(,double), MAL_S3x3_MATRIX(,double), 
+      MAL_VECTOR(,double), MAL_S3_VECTOR(,double)> *> m_FromRootToThis;
 
     /*! Pointer towards the body. */
-    CjrlBody * m_Body;
+    CjrlBody<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+      MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * m_Body;
 
     /*! Name */
     string m_Name;
@@ -79,7 +85,13 @@ namespace PatternGeneratorJRL
     int m_IDinVRML;
 
     /*! Rigid Velocity */
-    CjrlRigidVelocity m_RigidVelocity;
+    CjrlRigidVelocity<MAL_S3_VECTOR(,double)> m_RigidVelocity;
+    
+    /*! Jacobian with respect to the current configuration */
+    MAL_MATRIX(,double) m_J;
+
+    /*! First entry into the state vector */
+    unsigned int m_StateVectorPosition;
 
   public: 
     
@@ -214,21 +226,25 @@ namespace PatternGeneratorJRL
       @{
      */
     /*! \brief parent Joint */
-    CjrlJoint &  parentJoint() const ;
+    CjrlJoint<MAL_MATRIX(,double),MAL_S4x4_MATRIX(,double), MAL_S3x3_MATRIX(,double), MAL_VECTOR(,double), 
+      MAL_S3_VECTOR(,double)> &  parentJoint() const ;
 
     /*! \brief Add a child Joint */
-    bool addChildJoint(const CjrlJoint &);
+    bool addChildJoint(const CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double), MAL_S3x3_MATRIX(,double),
+		       MAL_VECTOR(,double), MAL_S3_VECTOR(,double) >&);
     
     /*! \brief Count the number of child joints */
     unsigned int countChildJoints() const;
     
     /*! \brief Returns the child joint at the given rank */
-    const CjrlJoint & childJoint(unsigned int givenRank) const;
+    const CjrlJoint<MAL_MATRIX(,double),MAL_S4x4_MATRIX(,double), MAL_S3x3_MATRIX(,double), 
+      MAL_VECTOR(,double), MAL_S3_VECTOR(,double)> & childJoint(unsigned int givenRank) const;
 
     /*! \brief Joints from root to this joint */
-    std::vector<CjrlJoint *> jointsFromRootToThis() const ;
+    std::vector< CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+      MAL_VECTOR(,double), MAL_S3_VECTOR(,double)> * > jointsFromRootToThis() const ;
     /*! @} */
-
+    
     /*! \name Joint Kinematics 
       @{
      */
@@ -257,7 +273,7 @@ namespace PatternGeneratorJRL
        \return the linear velocity \f${\bf v}\f$ of the origin of the joint frame
        and the angular velocity \f${\bf \omega}\f$ of the joint frame.
     */
-    CjrlRigidVelocity jointVelocity();
+    CjrlRigidVelocity<MAL_S3_VECTOR(,double)> jointVelocity();
     
     /**
        \brief Get the acceleration of the joint.
@@ -265,7 +281,7 @@ namespace PatternGeneratorJRL
        The acceleratoin is determined by the configuration of the robot 
        and its first and second time derivative: \f$({\bf q},{\bf \dot{q}}, {\bf \ddot{q}})\f$.
     */
-    CjrlRigidAcceleration jointAcceleration();
+    CjrlRigidAcceleration<MAL_S3_VECTOR(,double)> jointAcceleration();
     
     /**
        \brief Get the number of degrees of freedom of the joint.
@@ -299,19 +315,24 @@ namespace PatternGeneratorJRL
        \left(\begin{array}{l} {\bf v} \\ {\bf \omega}\end{array}\right) = J {\bf \dot{q}}
        \f]
     */
-    MAL_MATRIX(,double) jacobianPositionJointWrtConfig() const ;
+    const MAL_MATRIX(,double) & jacobianJointWrtConfig() const;
     
     /**
        \brief Compute the joint's jacobian wrt the robot configuration.
     */
-    MAL_MATRIX(,double) computeJacobianJointWrtConfig();
+    void computeJacobianJointWrtConfig();
     
     /**
        \brief Get the jacobian of the point specified in local frame by inPointJointFrame.
        
     */
-    MAL_MATRIX(,double) jacobianPointWrtConfig(MAL_S3_VECTOR(,double) inPointJointFrame) const ;
+    MAL_MATRIX(,double) jacobianPointWrtConfig(const MAL_S3_VECTOR(,double) & inPointJointFrame) const ;
 
+    /** 
+	\brief resize the Jacobian with the number of DOFs.
+    */
+    void resizeJacobianJointWrtConfig(int lNbDofs);
+      
     /**
        @}
     */
@@ -324,12 +345,14 @@ namespace PatternGeneratorJRL
     /**
        \brief Get a pointer to the linked body (if any).
     */
-    CjrlBody* linkedBody() const;
+    CjrlBody<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+      MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* linkedBody() const;
  	
     /**
        \brief Link a body to the joint.
     */
-    int setLinkedBody (CjrlBody& inBody);
+    void setLinkedBody (CjrlBody<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+		       MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>& inBody);
   
     /**
        @}
@@ -339,6 +362,13 @@ namespace PatternGeneratorJRL
 
     /*! Specify the joint father. */
     void SetFatherJoint(Joint *aFather);
+
+    /*! Set the state vector position. */
+    inline unsigned int  stateVectorPosition()
+      { return m_StateVectorPosition; }
+    
+    inline void stateVectorPosition(unsigned aStateVectorPosition)
+      { m_StateVectorPosition = aStateVectorPosition;}
 
   };
 };

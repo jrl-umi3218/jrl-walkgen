@@ -56,7 +56,8 @@ namespace PatternGeneratorJRL
   private:
 
     /*! Store the dynamic robot. */
-    CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot;
+    CjrlHumanoidDynamicRobot<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+      MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * m_HumanoidDynamicRobot;
     
     /*! Store the height of the CoM */
     double m_HeightOfCoM;
@@ -118,13 +119,18 @@ namespace PatternGeneratorJRL
     
     /*! @param aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
-    inline  virtual bool setHumanoidDynamicRobot(const CjrlHumanoidDynamicRobot *aHumanoidDynamicRobot)
-    { m_HumanoidDynamicRobot = (CjrlHumanoidDynamicRobot *)aHumanoidDynamicRobot;
+    inline  virtual bool setHumanoidDynamicRobot(const CjrlHumanoidDynamicRobot<MAL_MATRIX(,double), 
+						 MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+						 MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *aHumanoidDynamicRobot)
+    { m_HumanoidDynamicRobot = (CjrlHumanoidDynamicRobot<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),
+				MAL_S3x3_MATRIX(,double),
+				MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *)aHumanoidDynamicRobot;
       return true;}
 
     /*! @param aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
-    inline CjrlHumanoidDynamicRobot * getHumanoidDynamicRobot() const
+    inline CjrlHumanoidDynamicRobot<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+      MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * getHumanoidDynamicRobot() const
       { return m_HumanoidDynamicRobot;}
     
     /** @} */

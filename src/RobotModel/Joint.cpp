@@ -92,12 +92,14 @@ Joint & Joint::operator=(const Joint & r)
 /* Implementation of the generic JRL interface */
 /***********************************************/
 
-CjrlJoint & Joint::parentJoint() const
+CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	  MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> & Joint::parentJoint() const
 {
   return *m_FatherJoint;
 }
 
-bool Joint::addChildJoint(const CjrlJoint & aJoint)
+bool Joint::addChildJoint(const CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+			  MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> & aJoint)
 {
   Joint * pjoint = (Joint *)&aJoint;
   m_Children.push_back(pjoint);
@@ -109,7 +111,8 @@ unsigned int Joint::countChildJoints() const
   return m_Children.size();
 }
 
-const CjrlJoint & Joint::childJoint(unsigned int givenRank) const
+const CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+		MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> & Joint::childJoint(unsigned int givenRank) const
 {
   if ((givenRank>=0) && (givenRank<m_Children.size()))
     return *m_Children[givenRank];
@@ -117,7 +120,8 @@ const CjrlJoint & Joint::childJoint(unsigned int givenRank) const
   return *m_Children[0];
 }
 
-std::vector<CjrlJoint *> Joint::jointsFromRootToThis() const 
+std::vector<CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+		      MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *> Joint::jointsFromRootToThis() const 
 {
   return m_FromRootToThis;
 }
@@ -143,12 +147,12 @@ const MAL_S4x4_MATRIX(,double) & Joint::currentTransformation() const
   return *A;
 }
 
-CjrlRigidVelocity Joint::jointVelocity()
+CjrlRigidVelocity<MAL_S3_VECTOR(,double)> Joint::jointVelocity()
 {
   return m_RigidVelocity;
 }
 
-CjrlRigidAcceleration Joint::jointAcceleration()
+CjrlRigidAcceleration<MAL_S3_VECTOR(,double)> Joint::jointAcceleration()
 {
   // TODO : Update the member of this object
   // TODO : when calling ForwardDynamics.
@@ -162,7 +166,7 @@ CjrlRigidAcceleration Joint::jointAcceleration()
       a = m_DBody->dv;
       b = m_DBody->dw;
     }
-  CjrlRigidAcceleration ajrlRA(a,b);
+  CjrlRigidAcceleration<MAL_S3_VECTOR(,double)> ajrlRA(a,b);
   
   return ajrlRA;
 
@@ -190,25 +194,48 @@ unsigned int Joint::numberDof() const
   return r;
 }
 
-MAL_MATRIX(,double) Joint::jacobianPositionJointWrtConfig() const
-{
-  cerr << "MAL_MATRIX(,double) Joint::jacobianPositionJointWrtConfig() " << endl;
-  cerr << "This function should be implemented" << endl;
-  MAL_MATRIX(,double) J;
-  
-  return J;
+const MAL_MATRIX(,double) & Joint::jacobianJointWrtConfig() const
+{  
+  return m_J;
 }
 
-MAL_MATRIX(,double) Joint::computeJacobianJointWrtConfig()
+void Joint::resizeJacobianJointWrtConfig(int lNbDofs)
 {
-  cerr << "MAL_MATRIX(,double) Joint::computeJacobianJointWrtConfig() " << endl;
-  cerr << "This function should be implemented" << endl;
-  MAL_MATRIX(,double) A;
-  return A;
-
+  m_J.resize(6,lNbDofs);
 }
 
-MAL_MATRIX(,double) Joint::jacobianPointWrtConfig(MAL_S3_VECTOR(,double) inPointJointFrame) const
+void Joint::computeJacobianJointWrtConfig()
+{
+
+  DynamicBody * FinalBody = (DynamicBody *)m_Body;
+  MAL_S3_VECTOR(,double) pn = FinalBody->p;
+
+
+  for(int i=0;i<m_FromRootToThis.size();i++)
+    {
+      MAL_VECTOR_DIM(LinearAndAngularVelocity,double,6);
+
+      DynamicBody * aBody=  (DynamicBody *) m_FromRootToThis[i]->linkedBody();
+
+      MAL_S3_VECTOR(,double) aRa,dp;
+      MAL_S3x3_C_eq_A_by_B(aRa,aBody->R, aBody->a);
+
+      unsigned int lcol = ((Joint *)m_FromRootToThis[i])->stateVectorPosition();
+
+      dp = pn - aBody->p;
+
+      MAL_S3_VECTOR(,double) lv;
+      MAL_S3_VECTOR_CROSS_PRODUCT(lv,aRa,dp);
+      
+      for(int j=0;j<3;j++)
+	{
+	  m_J(j,lcol) =  lv[j];
+	  m_J(j+3,lcol) = lv[j+3];
+	}
+    }
+}
+
+MAL_MATRIX(,double) Joint::jacobianPointWrtConfig(const MAL_S3_VECTOR(,double) & inPointJointFrame) const
 {
   cerr << "MAL_MATRIX(,double) Joint::jacobianPointWrtConfig() " << endl;
   cerr << "This function should be implemented" << endl;
@@ -217,15 +244,16 @@ MAL_MATRIX(,double) Joint::jacobianPointWrtConfig(MAL_S3_VECTOR(,double) inPoint
 
 }
 
-CjrlBody * Joint::linkedBody() const
+CjrlBody<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	 MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * Joint::linkedBody() const
 {
   return m_Body;
 }
 
-int Joint::setLinkedBody(CjrlBody & inBody)
+void Joint::setLinkedBody(CjrlBody<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+			  MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> & inBody)
 {
   m_Body = &inBody;
-  return 1;
 }
 
 void Joint::SetFatherJoint(Joint *aFather)
@@ -235,7 +263,8 @@ void Joint::SetFatherJoint(Joint *aFather)
   if ((m_FromRootToThis.size()==0) &&
       (m_FatherJoint!=0))
     {
-      CjrlJoint * aJoint;
+      CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * aJoint;
       aJoint=m_FatherJoint;
       while(aJoint!=0)
 	{

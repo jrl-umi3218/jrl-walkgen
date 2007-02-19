@@ -57,7 +57,8 @@ namespace PatternGeneratorJRL
       This object is used to compute the Center Of Masse,
       and store some basic information of each body of the robot. 
   */    
-  class Body : public CjrlBody
+  class Body : public CjrlBody<MAL_MATRIX(,double),MAL_S4x4_MATRIX(,double), 
+    MAL_S3x3_MATRIX(,double), MAL_VECTOR(,double), MAL_S3_VECTOR(,double)>
   {
   protected:
     
@@ -214,7 +215,8 @@ namespace PatternGeneratorJRL
     /**
        \brief Get const pointer to the joint the body is attached to.
     */
-    const CjrlJoint* joint() const;
+    const CjrlJoint<MAL_MATRIX(,double),MAL_S4x4_MATRIX(,double), 
+      MAL_S3x3_MATRIX(,double), MAL_VECTOR(,double), MAL_S3_VECTOR(,double)> * joint() const;
     
 
     /*! @} */

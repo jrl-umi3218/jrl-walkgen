@@ -176,7 +176,9 @@ namespace PatternGeneratorJRL
 
 
     /*! Reimplementation of the setter of the HumanoidDynamicRobot. */
-    bool setHumanoidDynamicRobot(const CjrlHumanoidDynamicRobot * aHumanoidDynamicRobot);
+    bool setHumanoidDynamicRobot(const CjrlHumanoidDynamicRobot<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),
+				 MAL_S3x3_MATRIX(,double),
+				 MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * aHumanoidDynamicRobot);
 
     /*! Compute the angles values considering a 6DOF leg for a given configuration
       of the waist and the foot of the leg:

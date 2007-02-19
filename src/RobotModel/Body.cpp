@@ -249,7 +249,8 @@ void Body::inertiaMatrix(const MAL_S3x3_MATRIX(,double) &inInertiaMatrix)
   inertie = inInertiaMatrix;
 }
 
-const CjrlJoint * Body::joint() const
+const CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+		MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * Body::joint() const
 {
   return m_AttachedJoint;
 }

@@ -55,27 +55,35 @@ namespace PatternGeneratorJRL
   This specific class is the specialization of the generic class CjrlHumanoidDynamicRobot.
 
   */
-  class HumanoidDynamicMultiBody: public CjrlHumanoidDynamicRobot
+  class HumanoidDynamicMultiBody: public CjrlHumanoidDynamicRobot<MAL_MATRIX(,double), 
+    MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>
     {
     private:
       
       /** \brief Store the implementation of Dynamic Multi Body */
-      CjrlDynamicRobot *m_DMB;
+      CjrlDynamicRobot<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *m_DMB;
 
       /** \brief Store the Left Hand Joint */
-      CjrlJoint * m_LeftHandJoint;
-
+      CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * m_LeftHandJoint;
+      
       /** \brief Store the Right Hand Joint */
-      CjrlJoint * m_RightHandJoint;
+      CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * m_RightHandJoint;
       
       /** \brief Store the Left Foot Joint */
-      CjrlJoint * m_LeftFootJoint;
-
+      CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * m_LeftFootJoint;
+      
       /** \brief Store the Right Foot Joint */
-      CjrlJoint * m_RightFootJoint;
-
+      CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * m_RightFootJoint;
+      
       /** \brief Store the Gaze Joint */
-      CjrlJoint * m_GazeJoint;
+      CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * m_GazeJoint;
 
       /** \name Gaze related store */
 
@@ -88,7 +96,8 @@ namespace PatternGeneratorJRL
       /** @} */
       
       /** \brief Vector of fixed joints. */
-      std::vector<CjrlJoint *> m_VectorOfFixedJoints;
+      std::vector<CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *> m_VectorOfFixedJoints;
 
       /*! Object to store the specificities to an instance of a humanoid robot. */
       HumanoidSpecificities *m_HS;
@@ -123,7 +132,8 @@ namespace PatternGeneratorJRL
 	  @{
       */
       /*! Constructor */
-      HumanoidDynamicMultiBody(CjrlDynamicRobot * aDMB,
+      HumanoidDynamicMultiBody(CjrlDynamicRobot<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+			       MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * aDMB,
 			       string aFileNameForHumanoidSpecificities);
       
       /*! Destructor */
@@ -153,49 +163,57 @@ namespace PatternGeneratorJRL
       /**
 	 \brief Set the pointer to the left hand joint.
       */
-      inline void leftHand(CjrlJoint* inLeftHand)
+      inline void leftHand(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+			   MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* inLeftHand)
 	{ m_LeftHandJoint = (Joint *)inLeftHand;};
       
       /** 
 	  \brief Get a pointer to the left hand.
       */
-      inline CjrlJoint* leftHand() 
+      inline CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* leftHand() 
 	{ return m_LeftHandJoint;}
       
       /**
 	 \brief Set the pointer to the right hand joint.
       */
-      inline void rightHand(CjrlJoint* inRightHand)
+      inline void rightHand(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+			    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* inRightHand)
 	{ m_RightHandJoint = (Joint *)inRightHand;}
       
       /** 
 	  \brief Get a pointer to the right hand.
       */
-      inline CjrlJoint* rightHand()
+      inline CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* rightHand()
 	{ return m_RightHandJoint;}
       
       /**
 	 \brief Set the pointer to the left foot joint.
       */
-      inline void leftFoot(CjrlJoint* inLeftFoot)
+      inline void leftFoot(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+			   MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* inLeftFoot)
 	{ m_LeftFootJoint = (Joint *)inLeftFoot;}
       
       /** 
 	  \brief Get a pointer to the left foot.
       */
-      inline CjrlJoint* leftFoot() 
+      inline CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* leftFoot() 
 	{ return m_LeftFootJoint;};
       
       /**
 	 \brief Set the pointer to the right foot joint.
       */
-      inline void rightFoot(CjrlJoint* inRightFoot)
+      inline void rightFoot(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+			    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* inRightFoot)
 	{m_RightFootJoint = (Joint *) inRightFoot;}
       
       /** 
 	  \brief Get a pointer to the right foot.
       */
-      inline CjrlJoint* rightFoot()
+      inline CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* rightFoot()
 	{return m_RightFootJoint;}
       
       /** 
@@ -203,13 +221,15 @@ namespace PatternGeneratorJRL
 	  
 	  \note  For most humanoid robots, the gaze joint is the head.
       */
-      inline void gazeJoint(CjrlJoint* inGazeJoint)
+      inline void gazeJoint(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+			    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* inGazeJoint)
 	{ m_GazeJoint = (Joint *)inGazeJoint; }
       
       /**
 	 \brief Get gaze joint
       */
-      CjrlJoint* gazeJoint()
+      CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* gazeJoint()
 	{ return m_GazeJoint; }
       
       /**
@@ -224,8 +244,11 @@ namespace PatternGeneratorJRL
 	 a gaze direction.
 
       */
-      inline void setGaze( MAL_S3_VECTOR(,double)& inVector, MAL_S3_VECTOR(,double) & inPoint)
+      inline void gaze( MAL_S3_VECTOR(,double)& inVector, MAL_S3_VECTOR(,double) & inPoint)
 	{ m_LineVector = inVector; m_LinePoint = inPoint;};
+
+      inline void gaze( const MAL_S3_VECTOR(,double)& inVector)
+	{ m_LineVector = inVector;};
       
       /** 
 	  \brief Get the gaze orientation in the local frame of the gaze joint.
@@ -235,7 +258,7 @@ namespace PatternGeneratorJRL
 	  @return outPoint: The point by which the line is going through in the head reference frame.
 
       */
-      inline void getGaze(MAL_S3_VECTOR(,double) & outVector, MAL_S3_VECTOR(,double) & outPoint ) const
+      inline void gaze(MAL_S3_VECTOR(,double) & outVector, MAL_S3_VECTOR(,double) & outPoint ) const
 	{ outVector = m_LineVector; outPoint = m_LinePoint;};
 	
       
@@ -250,7 +273,8 @@ namespace PatternGeneratorJRL
 	  \brief Add a joint to the vector of fixed joints.
 	  This Declares a joint as fixed in the world.
       */
-      bool addFixedJoint(CjrlJoint* inFixedJoint) ;
+      void addFixedJoint(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+			 MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* inFixedJoint) ;
       
       /** 
 	  \brief Count joints that are fixed in the world.
@@ -261,12 +285,30 @@ namespace PatternGeneratorJRL
 	  \brief Remove a joint from the vector of fixed joints.
 	  The input joint will no longer be considered fixed in the world.
       */
-      bool removeFixedJoint(CjrlJoint* inFixedJoint);
+      void removeFixedJoint(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+			    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* inFixedJoint);
       
        /** 
 	   \brief Return the fixed joint at rank inRank 
        */
-      const CjrlJoint& fixedJoint(unsigned int inJointRank) const ;
+      const CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>& fixedJoint(unsigned int inJointRank) const ;
+
+      
+      /**
+	 \brief Get the jacobian of a joint wrt to internal configuration variables assuming a joint is fixed.
+	 
+	 Fixed joint is first fixed joint in vector.
+	 \return true if there is at least one fixed joint, false otherwise.  
+      */
+      bool jacobianJointWrtFixedJoint(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+				      MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* inJoint, 
+				      MAL_MATRIX(,double) & outJacobian);
+      
+      /** 
+	  \brief Return the distance between the sole of a foot and its joint center
+      */
+      double footHeight() const;
 
 
       /** @} */
@@ -300,18 +342,21 @@ namespace PatternGeneratorJRL
       /**
 	 \brief Set the root joint of the robot.
       */
-      void rootJoint(CjrlJoint& inJoint);
+      void rootJoint(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+		     MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>& inJoint);
      
       
       /**
 	 \brief Get the root joint of the robot.
       */
-      CjrlJoint* rootJoint() const ;
+      CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* rootJoint() const ;
       
       /**
 	 \brief Get a vector containing all the joints.
       */
-      std::vector<CjrlJoint *> jointVector() ;
+      std::vector<CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *> jointVector() ;
       
       /**
 	 \brief Get the number of degrees of freedom of the robot.

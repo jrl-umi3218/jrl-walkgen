@@ -6,7 +6,8 @@
 using namespace std;
 using namespace PatternGeneratorJRL;
 
-void RecursiveDisplayOfJoints(CjrlJoint *aJoint)
+void RecursiveDisplayOfJoints(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+			      MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *aJoint)
 {
   if (aJoint==0)
     return;
@@ -39,7 +40,8 @@ void RecursiveDisplayOfJoints(CjrlJoint *aJoint)
     aJoint->currentTransformation() << endl;
 
   cout << " Joint from root to here:" << endl;
-  std::vector<CjrlJoint *> JointsFromRootToHere = aJoint->jointsFromRootToThis();
+  std::vector<CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *> JointsFromRootToHere = aJoint->jointsFromRootToThis();
   cout << " Nb of nodes: " << JointsFromRootToHere.size() << endl;
   for(int i=0;i<JointsFromRootToHere.size();i++)
     {
@@ -50,10 +52,10 @@ void RecursiveDisplayOfJoints(CjrlJoint *aJoint)
       cout << a3Joint->getName() << endl;
 
     }
-  CjrlRigidVelocity aRV = aJoint->jointVelocity();
+  CjrlRigidVelocity<MAL_S3_VECTOR(,double)> aRV = aJoint->jointVelocity();
   cout << " Linear Velocity " << aRV.linearVelocity() << endl;
   cout << " Angular Velocity " << aRV.rotationVelocity() << endl;
-  CjrlRigidAcceleration aRA = aJoint->jointAcceleration();
+  CjrlRigidAcceleration<MAL_S3_VECTOR(,double)> aRA = aJoint->jointAcceleration();
   cout << " Linear Acceleration " << aRA.linearAcceleration() << endl;
   cout << " Angular Acceleration " << aRA.rotationAcceleration() << endl;
 
@@ -62,15 +64,18 @@ void RecursiveDisplayOfJoints(CjrlJoint *aJoint)
   for(int i=0;i<NbChildren;i++)
     {
       // Returns a const so we have to force the casting/
-      RecursiveDisplayOfJoints((CjrlJoint *)&aJoint->childJoint(i)); 
+      RecursiveDisplayOfJoints((CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+				MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *)&aJoint->childJoint(i)); 
     }
   cout << " End for Joint: " << a2Joint->getName() << endl;
 }
 
 
-void DisplayDynamicRobotInformation(CjrlDynamicRobot *aDynamicRobot)
+void DisplayDynamicRobotInformation(CjrlDynamicRobot<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+				    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *aDynamicRobot)
 {
-  std::vector<CjrlJoint *> aVec = aDynamicRobot->jointVector();
+  std::vector<CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *> aVec = aDynamicRobot->jointVector();
   int r = aVec.size();
   cout << "Number of joints :" << r << endl;
   for(int i=0;i<r;i++)
@@ -92,7 +97,8 @@ int main()
   HumanoidDynamicMultiBody *aHDMB = new HumanoidDynamicMultiBody(aDMB,aFileName);
 
   // Display tree of the joints.
-  CjrlJoint * rootJoint = aHDMB->rootJoint();  
+  CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * rootJoint = aHDMB->rootJoint();  
   bool ok=true;
 
   // Test the tree.

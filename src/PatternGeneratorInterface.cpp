@@ -62,7 +62,7 @@ namespace PatternGeneratorJRL {
 
     RESETDEBUG4("DebugData.txt");
     RESETDEBUG4("DebugPGI.txt");
-    RESETDEBUG4("DebugDataLong.txt");
+    RESETDEBUG5("DebugDataLong.txt");
     RESETDEBUG4("DebugDataZMPTargetZ.dat");
     RESETDEBUG4("LeftLegAngle.txt");
     RESETDEBUG4("RightLegAngle.txt");

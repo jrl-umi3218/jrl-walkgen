@@ -24,7 +24,11 @@
 
 using namespace PatternGeneratorJRL;
 
-HumanoidDynamicMultiBody::HumanoidDynamicMultiBody(CjrlDynamicRobot *aDMB,
+
+
+HumanoidDynamicMultiBody::HumanoidDynamicMultiBody(CjrlDynamicRobot<MAL_MATRIX(,double), 
+						   MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+						   MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *aDMB,
 						   string aFileNameForHumanoidSpecificities)
 {
   m_DMB = aDMB;
@@ -170,10 +174,11 @@ void HumanoidDynamicMultiBody::ComputingZeroMomentumPoint()
 
 /* Methods related to the fixed joints */
 
-bool HumanoidDynamicMultiBody::addFixedJoint(CjrlJoint *inFixedJoint)
+void HumanoidDynamicMultiBody::addFixedJoint(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),
+					     MAL_S3x3_MATRIX(,double),
+					     MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *inFixedJoint)
 {
   m_VectorOfFixedJoints.insert(m_VectorOfFixedJoints.end(),inFixedJoint);
-  return true;
 }
 
 unsigned int HumanoidDynamicMultiBody::countFixedJoints() const
@@ -181,19 +186,24 @@ unsigned int HumanoidDynamicMultiBody::countFixedJoints() const
   return m_VectorOfFixedJoints.size();
 }
 
-bool HumanoidDynamicMultiBody::removeFixedJoint(CjrlJoint * inFixedJoint)
+void HumanoidDynamicMultiBody::removeFixedJoint(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),
+						MAL_S3x3_MATRIX(,double),
+						MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * inFixedJoint)
 {
-  std::vector<CjrlJoint *>::iterator it_Joint = m_VectorOfFixedJoints.begin();
+  std::vector<CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+    MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *>::iterator it_Joint = m_VectorOfFixedJoints.begin();
   while((*it_Joint!= inFixedJoint) &&
 	(it_Joint!=m_VectorOfFixedJoints.end()))
     it_Joint++;
 
   if (it_Joint!=m_VectorOfFixedJoints.end())
     m_VectorOfFixedJoints.erase(it_Joint);
-  return true;
+
 }
 
-const CjrlJoint & HumanoidDynamicMultiBody::fixedJoint(unsigned int inJointRank) const
+const CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+		MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> & 
+HumanoidDynamicMultiBody::fixedJoint(unsigned int inJointRank) const
 {
   if ((inJointRank>0) & (inJointRank<=m_VectorOfFixedJoints.size()))
       return *m_VectorOfFixedJoints[inJointRank];
@@ -206,20 +216,23 @@ const CjrlJoint & HumanoidDynamicMultiBody::fixedJoint(unsigned int inJointRank)
 /* the part inherited from jrlDynamicRobot.        */
 /***************************************************/
 
-void HumanoidDynamicMultiBody::rootJoint(CjrlJoint & inJoint)
+void HumanoidDynamicMultiBody::rootJoint(CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+					 MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> & inJoint)
 {
   if (m_DMB!=0)
     m_DMB->rootJoint(inJoint);
 }
 
-CjrlJoint * HumanoidDynamicMultiBody::rootJoint() const
+CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+	  MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * HumanoidDynamicMultiBody::rootJoint() const
 {
   if (m_DMB==0)
     return 0;
   return m_DMB->rootJoint();
 }
 
-std::vector< CjrlJoint *> HumanoidDynamicMultiBody::jointVector()
+std::vector< CjrlJoint<MAL_MATRIX(,double), MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+		       MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> *> HumanoidDynamicMultiBody::jointVector()
 {  
   return  m_DMB->jointVector();
 }
@@ -319,6 +332,23 @@ const MAL_MATRIX(,double) & HumanoidDynamicMultiBody::jacobianCenterOfMass() con
   return m_DMB->jacobianCenterOfMass();
 }
 
+bool HumanoidDynamicMultiBody::jacobianJointWrtFixedJoint(CjrlJoint<MAL_MATRIX(,double), 
+							  MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
+							  MAL_VECTOR(,double),MAL_S3_VECTOR(,double)>* inJoint, 
+							  MAL_MATRIX(,double) & outJacobian)
+{
+  cerr<< " The method HumanoidDynamicMultiBody::jacobianJointWrtFixedJoint " <<endl
+      << " is not implemented yet. " << endl;
+  return true;
+}
+
+double HumanoidDynamicMultiBody::footHeight() const
+{
+  cerr<< " The method HumanoidDynamicMultiBody::footHeight() " <<endl
+      << " is not implemented yet. " << endl;
+  
+  return -1.0;
+}
 /***************************************************/
 /* End of the implementation                       */
 /***************************************************/
