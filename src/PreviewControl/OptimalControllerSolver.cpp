@@ -31,8 +31,7 @@
 */
 
 #include <iostream>
-#include <OptimalControllerSolver.h>
-#include <f2c.h>
+#include <PreviewControl/OptimalControllerSolver.h>
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) cerr << "OptimalControllerServer :" << x << endl
@@ -58,14 +57,29 @@
 using namespace PatternGeneratorJRL;
 using namespace std;
 
-  logical sb02ox (double *alphar, double * alphai, double *beta)
-  {
-    logical r;
-    double w =dlapy2_(alphar,alphai);
-    double w2 = fabs(*beta);
-    r = w < w2;
-    return r;
-  }
+
+typedef long int logical;
+typedef double doublereal;
+typedef logical(* L_fp)(...);
+typedef int integer ;
+extern "C" {
+extern doublereal dlapy2_(doublereal *, doublereal *); 
+extern double dlamch_ (char *);
+extern /* Subroutine */ int dgges_(char *, char *, char *, L_fp, integer *
+				   , doublereal *, integer *, doublereal *, integer *, integer *, 
+				   doublereal *, doublereal *, doublereal *, doublereal *, integer *,
+				   doublereal *, integer *, doublereal *, integer *, logical *, 
+				   integer *);
+}
+
+logical sb02ox (double *_alphar, double * _alphai, double *_beta)
+{
+  logical r;
+  double w =dlapy2_(_alphar,_alphai);
+  double w2 = fabs(*_beta);
+  r = w < w2;
+  return r;
+}
 
 /* 
    Inspired from scilab 4.0...
@@ -89,11 +103,11 @@ using namespace std;
    The function value SB02OW is set to true for a stable eigenvalue
      and to false, otherwise.
 */
-logical sb02ow (double *alphar, double * alphai, double *beta)
+logical sb02ow (double *_alphar, double * _alphai, double *_beta)
 {
-  logical r = ((*alphar <0.0) && (*beta>0.0)) ||
-    ( (*alphar>0.0) && (*beta<0.0)) &&
-      ( fabs(*beta) > fabs(*alphar)*dlamch_("p"));
+  logical r = ((*_alphar <0.0) && (*_beta>0.0)) ||
+    ( (*_alphar>0.0) && (*_beta<0.0)) &&
+      ( fabs(*_beta) > fabs(*_alphar)*dlamch_("p"));
       ;
     return r;
   }

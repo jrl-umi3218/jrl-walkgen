@@ -34,11 +34,13 @@
 #include <iostream>
 #include <fstream>
 
-#include <PreviewControl.h>
-#include <ZMPDiscretization.h>
-#include <GenerateMotionFromKineoWorks.h>
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
-#include <MatrixAbstractLayer.h>
+#include <PreviewControl/PreviewControl.h>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
+#include <MotionGeneration/GenerateMotionFromKineoWorks.h>
+
+
 
 #define _DEBUG_
 namespace PatternGeneratorJRL 

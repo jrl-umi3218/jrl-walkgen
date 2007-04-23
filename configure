@@ -1483,8 +1483,8 @@ Optional Packages:
   --with-tags[=TAGS]      include additional configurations [automatic]
 for ublas
 for lapack bindings
-for using VNL linear algebra package
 for lapack
+for JRL JAPAN implementation of robot dynamics abstract interface
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -19198,17 +19198,6 @@ fi
 
 
 
-
-# Check whether --with-VNL was given.
-if test "${with_VNL+set}" = set; then
-  withval=$with_VNL; VNL_CFLAGS="-I${withval}/include -D_VNL_MATRIX_"
-	VNL_LIB="-L${withval}/lib -lVNL"
-	CXXFLAGS="${CXXFLAGS} -D_VNL_MATRIX_ -I${withval}/include"
-	LDFLAGS="${LDFLAGS} -L${withval}/lib -lVNL"
-fi
-
-
-
 # Check whether --with-lapack was given.
 if test "${with_lapack+set}" = set; then
   withval=$with_lapack; LAPACK_CFLAGS="-I${withval}/include"
@@ -19216,10 +19205,20 @@ if test "${with_lapack+set}" = set; then
 fi
 
 
-CXXFLAGS="${CXXFLAGS} -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_"
+
+
+# Check whether --with-dynamics-JRLJapan was given.
+if test "${with_dynamics_JRLJapan+set}" = set; then
+  withval=$with_dynamics_JRLJapan; JRLCIRDYNAMICS_CFLAGS=-I${withval}/include
+	CXXFLAGS="${CXXFLAGS} -I${withval}/include"
+	LDFLAGS="${LDFLAGS} -L${withval}/lib -ldynamicsJRLJapan"
+fi
+
+
+CXXFLAGS="${CXXFLAGS}"
 LDFLAGS="${LDFLAGS} -llapack"
 
-ac_config_files="$ac_config_files Makefile src/Makefile doc/Makefile doc/pgjrl.dox walkGenJrl.pc"
+ac_config_files="$ac_config_files Makefile src/Makefile include/walkGenJrl/Makefile include/walkGenJrl/Mathematics/Makefile include/walkGenJrl/MotionGeneration/Makefile include/walkGenJrl/PreviewControl/Makefile include/walkGenJrl/ZMPRefTrajectoryGeneration/Makefile doc/Makefile unitTesting/Makefile doc/pgjrl.dox walkGenJrl.pc"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -19822,7 +19821,13 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "include/walkGenJrl/Makefile") CONFIG_FILES="$CONFIG_FILES include/walkGenJrl/Makefile" ;;
+    "include/walkGenJrl/Mathematics/Makefile") CONFIG_FILES="$CONFIG_FILES include/walkGenJrl/Mathematics/Makefile" ;;
+    "include/walkGenJrl/MotionGeneration/Makefile") CONFIG_FILES="$CONFIG_FILES include/walkGenJrl/MotionGeneration/Makefile" ;;
+    "include/walkGenJrl/PreviewControl/Makefile") CONFIG_FILES="$CONFIG_FILES include/walkGenJrl/PreviewControl/Makefile" ;;
+    "include/walkGenJrl/ZMPRefTrajectoryGeneration/Makefile") CONFIG_FILES="$CONFIG_FILES include/walkGenJrl/ZMPRefTrajectoryGeneration/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
+    "unitTesting/Makefile") CONFIG_FILES="$CONFIG_FILES unitTesting/Makefile" ;;
     "doc/pgjrl.dox") CONFIG_FILES="$CONFIG_FILES doc/pgjrl.dox" ;;
     "walkGenJrl.pc") CONFIG_FILES="$CONFIG_FILES walkGenJrl.pc" ;;
 

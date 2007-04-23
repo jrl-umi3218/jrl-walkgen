@@ -35,7 +35,7 @@
 
 #define _DEBUG_
 #include <fstream>
-#include <CollisionDetector.h>
+#include <MotionGeneration/CollisionDetector.h>
 
 
 using namespace::PatternGeneratorJRL;

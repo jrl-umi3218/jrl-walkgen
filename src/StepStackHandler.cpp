@@ -33,7 +33,7 @@
 #include <fstream>
 #include <math.h>
 
-#include <MatrixAbstractLayer.h>
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
 #define deg2rad(x) x*M_PI/180.0
 #define rad2deg(x) x*180.0/M_PI

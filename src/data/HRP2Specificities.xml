@@ -24,6 +24,8 @@
     <Left>
       <WaistToHip>0.0 0.06 0.0</WaistToHip>
     </Left>
+    <JointNb> 1 </JointNb>
+    <JointsID> -1 </JointsID>
   </Waist>
   <Legs>
     <Right>

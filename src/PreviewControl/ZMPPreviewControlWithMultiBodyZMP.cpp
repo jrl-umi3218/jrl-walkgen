@@ -31,7 +31,7 @@
 //#define _DEBUG_
 #include <iostream>
 #include <fstream>
-#include <ZMPPreviewControlWithMultiBodyZMP.h>
+#include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
 
 using namespace PatternGeneratorJRL;
 
@@ -69,7 +69,7 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   RESETDEBUG4("DebugDataql.txt");
   RESETDEBUG4("DebugDatadqr.txt");
   RESETDEBUG4("DebugDatadql.txt");
-  RESETDEBUG4("DebugDataDiffZMP.txt");
+  RESETDEBUG5("DebugDataDiffZMP.txt");
   RESETDEBUG4("DebugDataCOMPC1.txt");
   RESETDEBUG4("DebugDataCOMPC2.txt");
   RESETDEBUG4("DebugDataZMPMB1.txt");
@@ -99,7 +99,8 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
     for(int j=0;j<4;j++)	
       m_FinalDesiredCOMPose(i,j) =0.0;
 
-  
+
+  m_NumberOfIterations = 0;
 }
 
 
@@ -120,6 +121,7 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMPosition 
 								    FootAbsolutePosition &aRightFAP,
 								    MAL_VECTOR(,double) &CurrentConfiguration,
 								    MAL_VECTOR(,double) &CurrentVelocity,
+								    int IterationNumber,
 								    int StageOfTheAlgorithm)
 {
 
@@ -172,6 +174,7 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMPosition 
 								   aRightFootPosition,
 								   CurrentConfiguration,
 								   CurrentVelocity,
+								   IterationNumber,
 								   StageOfTheAlgorithm);
 
   if (StageOfTheAlgorithm==0)
@@ -207,7 +210,9 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   ODEBUG("CTCFR");
   CallToComAndFootRealization(acompos,aLeftFAP,aRightFAP,
 			      CurrentConfiguration,
-			      CurrentVelocity,0);
+			      CurrentVelocity,
+			      m_NumberOfIterations,
+			      0);
   ODEBUG("EvaluateMultiBodyZMP");
   EvaluateMultiBodyZMP(-1);
   ODEBUG("SecondStage");
@@ -217,9 +222,37 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   CallToComAndFootRealization(refandfinalCOMPosition,aLeftFAP,aRightFAP,
 			      CurrentConfiguration,
 			      CurrentVelocity,
+			      m_NumberOfIterations - m_NL,
 			      1);
+  // Here it is assumed that the 4x4 CoM matrix 
+  // is the orientation of the free flyer and
+  // its position.
+  double c,co,s,so;
+  c = cos(CurrentConfiguration(5));
+  s = sin(CurrentConfiguration(5));
+
+  co = cos(CurrentConfiguration(3));
+  so = sin(CurrentConfiguration(3));
+
+  m_FinalDesiredCOMPose(0,0) = c*co;       
+  m_FinalDesiredCOMPose(0,1) = -s;       
+  m_FinalDesiredCOMPose(0,2) = c*so;
+  
+  m_FinalDesiredCOMPose(1,0) = s*co;       
+  m_FinalDesiredCOMPose(1,1) =  c;       
+  m_FinalDesiredCOMPose(1,2) = s*so;
+
+  m_FinalDesiredCOMPose(2,0) =  -so;       
+  m_FinalDesiredCOMPose(2,1)=  0;        
+  m_FinalDesiredCOMPose(2,2) = co;  
+
+  m_FinalDesiredCOMPose(0,3) = refandfinalCOMPosition.x[0];
+  m_FinalDesiredCOMPose(1,3) = refandfinalCOMPosition.y[0];
+  m_FinalDesiredCOMPose(2,3) = refandfinalCOMPosition.z[0];
+  m_FinalDesiredCOMPose(3,3) = 1.0;
   ODEBUG("End of second stage");
   
+  m_NumberOfIterations++;
   return 1;
 }
 
@@ -470,7 +503,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteration)
 {
 
-  // Call the  Dynamic Multu Body computation of the dynamic parameters.
+  // Call the  Dynamic Multi Body computation of the dynamic parameters.
   m_HumanoidDynamicRobot->computeForwardKinematics();
   
   // Call the Humanoid Dynamic Multi Body robot model to
@@ -483,7 +516,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   aZMPpos.px = m_FIFOZMPRefPositions[0].px - ZMPmultibody[0];
   aZMPpos.py = m_FIFOZMPRefPositions[0].py - ZMPmultibody[1];
   aZMPpos.time = m_FIFOZMPRefPositions[0].time;
-  ODEBUG4(aZMPpos.px << " " << aZMPpos.py << " " 
+  ODEBUG5(aZMPpos.px << " " << aZMPpos.py << " " 
 	  << m_FIFOZMPRefPositions[0].px << " " << m_FIFOZMPRefPositions[0].py  << " " 
 	  << ZMPmultibody[0] << " " << ZMPmultibody[1] , "DebugDataDiffZMP.txt");
   m_FIFODeltaZMPPositions.push_back(aZMPpos);
@@ -596,9 +629,12 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
 			      RightFootPositions[localindex],
 			      CurrentConfiguration,
 			      CurrentVelocity,
+			      m_NumberOfIterations,
 			      0);  
   EvaluateMultiBodyZMP(localindex);
   m_FIFOZMPRefPositions.push_back(ZMPRefPositions[localindex+1+m_NL]);
+
+  m_NumberOfIterations++;
   return 0;
 }
 void ZMPPreviewControlWithMultiBodyZMP::CreateExtraCOMBuffer(deque<COMPosition> &m_ExtraCOMBuffer,

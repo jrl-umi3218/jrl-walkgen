@@ -32,7 +32,7 @@
 */
 //#define _DEBUG_
 #include <fstream>
-#include <StepOverPlanner.h>
+#include <MotionGeneration/StepOverPlanner.h>
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) cerr << "StepOverPlanner :" << x << endl
@@ -63,12 +63,12 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
 
   m_HS = aHS;
   // Get information specific to the humanoid.
-  double lWidth,lHeight;
+  double lWidth,lHeight,lZ;
   double AnklePosition[3];
 
   if (m_HS!=0)
     {
-      m_HS->GetFootSize(-1,lWidth,lHeight);
+      m_HS->GetFootSize(-1,lWidth,lHeight,lZ);
       m_HS->GetAnklePosition(-1,AnklePosition);
       m_AnkleSoilDistance = AnklePosition[2];
       m_tipToAnkle = lWidth-AnklePosition[0];

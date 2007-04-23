@@ -34,9 +34,9 @@
 #include <time.h>
 #include <iostream>
 #include <fstream>
-#include <ZMPDiscretization.h>
-#include <ConvexHull.h>
-#include <qld.h>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
+#include <Mathematics/ConvexHull.h>
+#include <Mathematics/qld.h>
 
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
@@ -66,13 +66,13 @@ ZMPDiscretization::ZMPDiscretization(string DataFile, HumanoidSpecificities *aHS
 {
   m_HS = aHS;
   
-  double lWidth,lHeight;
-  m_HS->GetFootSize(-1,lWidth,lHeight);
+  double lWidth,lHeight,lDepth;
+  m_HS->GetFootSize(-1,lDepth,lWidth,lHeight);
   double AnklePosition[3];
   m_HS->GetAnklePosition(-1,AnklePosition);
   m_FootB = AnklePosition[0];
   m_FootH = AnklePosition[2];
-  m_FootF = lWidth-AnklePosition[0];
+  m_FootF = lDepth-AnklePosition[0];
   
   MAL_MATRIX_RESIZE(m_A,6,6);
   MAL_MATRIX_RESIZE(m_B,6,1);
@@ -557,6 +557,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   RightHandAbsolutePositions.resize(AddArraySize);
 
   // Also very important for the initialization: reshape the ZMP reference for a smooth starting.
+  ODEBUG3("lStartingCOMPosition :" << lStartingCOMPosition);
 #if 1
   double startingZMPREF[2] = { lStartingCOMPosition(0), lStartingCOMPosition(1)};
 #else
@@ -2053,11 +2054,11 @@ int ZMPDiscretization::BuildLinearConstraintInequalities2(deque<FootAbsolutePosi
   // in order to create the corresponding trajectory.
   ComputeConvexHull aCH;
   double lLeftFootHalfWidth,lLeftFootHalfHeight,
-    lRightFootHalfWidth,lRightFootHalfHeight;
+    lRightFootHalfWidth,lRightFootHalfHeight,lZ;
   
   // Read humanoid specificities.
-  m_HS->GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight);
-  m_HS->GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight);
+  m_HS->GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight,lZ);
+  m_HS->GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight,lZ);
   
   lRightFootHalfWidth *= 0.5;
   lRightFootHalfHeight *= 0.5;
@@ -2242,11 +2243,11 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
   // in order to create the corresponding trajectory.
   ComputeConvexHull aCH;
   double lLeftFootHalfWidth,lLeftFootHalfHeight,
-    lRightFootHalfWidth,lRightFootHalfHeight;
+    lRightFootHalfWidth,lRightFootHalfHeight,lZ;
   
   // Read humanoid specificities.
-  m_HS->GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight);
-  m_HS->GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight);
+  m_HS->GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight,lZ);
+  m_HS->GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight,lZ);
 
   lRightFootHalfWidth *= 0.5;
   lRightFootHalfHeight *= 0.5;

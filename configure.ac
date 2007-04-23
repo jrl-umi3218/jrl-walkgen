@@ -3,6 +3,9 @@ dnl
 dnl Copyright (c) 2007 CNRS/LAAS
 dnl
 dnl
+dnl Modified by Olivier Stasse 2007 CNRS/AIST
+dnl
+
 AC_INIT(src/PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp)
 
 AM_INIT_AUTOMAKE
@@ -35,27 +38,32 @@ AC_ARG_WITH(boost-sandbox,
 	CPPFLAGS="${CPPFLAGS} -D_BOOST_MATRIX_",
 	)
 
-
-AC_ARG_WITH(VNL,
-	for using VNL linear algebra package,
-	VNL_CFLAGS="-I${withval}/include -D_VNL_MATRIX_"
-	VNL_LIB="-L${withval}/lib -lVNL"
-	CXXFLAGS="${CXXFLAGS} -D_VNL_MATRIX_ -I${withval}/include"
-	LDFLAGS="${LDFLAGS} -L${withval}/lib -lVNL",
-	)
-
 AC_ARG_WITH(lapack,
 	for lapack,
 	LAPACK_CFLAGS="-I${withval}/include"
 	LAPACK_LIBS="-L${withval}/lib",
 	)
 
-CXXFLAGS="${CXXFLAGS} -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_"
+
+AC_ARG_WITH(dynamics-JRLJapan,
+	for JRL JAPAN implementation of robot dynamics abstract interface,
+	JRLCIRDYNAMICS_CFLAGS=-I${withval}/include
+	CXXFLAGS="${CXXFLAGS} -I${withval}/include"
+	LDFLAGS="${LDFLAGS} -L${withval}/lib -ldynamicsJRLJapan",
+	)
+
+CXXFLAGS="${CXXFLAGS}"
 LDFLAGS="${LDFLAGS} -llapack"
 
 AC_OUTPUT(Makefile
 	src/Makefile
+	include/walkGenJrl/Makefile
+	include/walkGenJrl/Mathematics/Makefile
+	include/walkGenJrl/MotionGeneration/Makefile
+	include/walkGenJrl/PreviewControl/Makefile
+	include/walkGenJrl/ZMPRefTrajectoryGeneration/Makefile
 	doc/Makefile
+	unitTesting/Makefile
 	doc/pgjrl.dox
 	walkGenJrl.pc
 )

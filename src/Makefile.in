@@ -14,8 +14,6 @@
 
 @SET_MAKE@
 
-
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -38,11 +36,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = TestFootPrintPGInterface$(EXEEXT) \
-	TestHumanoidDynamicRobot$(EXEEXT)
 subdir = src
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(walkGenJRL_HEADERS)
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -55,8 +50,7 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(walkGenJRLdir)"
+am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libwalkGenJRL_la_LIBADD =
@@ -68,12 +62,6 @@ am_libwalkGenJRL_la_OBJECTS = libwalkGenJRL_la-Polynome.lo \
 	libwalkGenJRL_la-OptimalControllerSolver.lo \
 	libwalkGenJRL_la-ZMPPreviewControlWithMultiBodyZMP.lo \
 	libwalkGenJRL_la-ZMPDiscretization.lo \
-	libwalkGenJRL_la-fileReader.lo libwalkGenJRL_la-Joint.lo \
-	libwalkGenJRL_la-Body.lo libwalkGenJRL_la-MultiBody.lo \
-	libwalkGenJRL_la-DynamicBody.lo \
-	libwalkGenJRL_la-DynamicMultiBody.lo \
-	libwalkGenJRL_la-HumanoidDynamicMultiBody.lo \
-	libwalkGenJRL_la-HumanoidSpecificities.lo \
 	libwalkGenJRL_la-InverseKinematics.lo \
 	libwalkGenJRL_la-StepOverPlanner.lo \
 	libwalkGenJRL_la-CollisionDetector.lo \
@@ -84,20 +72,6 @@ am_libwalkGenJRL_la_OBJECTS = libwalkGenJRL_la-Polynome.lo \
 	libwalkGenJRL_la-StepStackHandler.lo \
 	libwalkGenJRL_la-PatternGeneratorInterface.lo
 libwalkGenJRL_la_OBJECTS = $(am_libwalkGenJRL_la_OBJECTS)
-binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
-PROGRAMS = $(bin_PROGRAMS)
-am_TestFootPrintPGInterface_OBJECTS =  \
-	TestFootPrintPGInterface-TestFootPrintPGInterface.$(OBJEXT)
-TestFootPrintPGInterface_OBJECTS =  \
-	$(am_TestFootPrintPGInterface_OBJECTS)
-TestFootPrintPGInterface_DEPENDENCIES =  \
-	$(top_builddir)/src/libwalkGenJRL.la
-am_TestHumanoidDynamicRobot_OBJECTS =  \
-	TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.$(OBJEXT)
-TestHumanoidDynamicRobot_OBJECTS =  \
-	$(am_TestHumanoidDynamicRobot_OBJECTS)
-TestHumanoidDynamicRobot_DEPENDENCIES =  \
-	$(top_builddir)/src/libwalkGenJRL.la
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -109,14 +83,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libwalkGenJRL_la_SOURCES) \
-	$(TestFootPrintPGInterface_SOURCES) \
-	$(TestHumanoidDynamicRobot_SOURCES)
-DIST_SOURCES = $(libwalkGenJRL_la_SOURCES) \
-	$(TestFootPrintPGInterface_SOURCES) \
-	$(TestHumanoidDynamicRobot_SOURCES)
-walkGenJRLHEADERS_INSTALL = $(INSTALL_HEADER)
-HEADERS = $(walkGenJRL_HEADERS)
+SOURCES = $(libwalkGenJRL_la_SOURCES)
+DIST_SOURCES = $(libwalkGenJRL_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -236,14 +204,6 @@ libwalkGenJRL_la_SOURCES = \
 	./PreviewControl/OptimalControllerSolver.cpp \
 	./PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp \
 	./ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp \
-	./RobotModel/fileReader.cpp \
-	./RobotModel/Joint.cpp \
-	./RobotModel/Body.cpp \
-	./RobotModel/MultiBody.cpp \
-	./RobotModel/DynamicBody.cpp \
-	./RobotModel/DynamicMultiBody.cpp \
-	./RobotModel/HumanoidDynamicMultiBody.cpp \
-	./RobotModel/HumanoidSpecificities.cpp \
 	./MotionGeneration/InverseKinematics.cpp \
 	./MotionGeneration/StepOverPlanner.cpp\
 	./MotionGeneration/CollisionDetector.cpp\
@@ -254,42 +214,8 @@ libwalkGenJRL_la_SOURCES = \
 	StepStackHandler.cpp \
 	PatternGeneratorInterface.cpp 
 
-libwalkGenJRL_la_CPPFLAGS = -I$(srcdir)/Mathematics -I$(srcdir)/PreviewControl -I$(srcdir)/ZMPRefTrajectoryGeneration -I$(srcdir)/RobotModel -I$(srcdir)/MotionGeneration -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib -I$(top_srcdir)/../jrlCIR-dynamics/interfaces
-TestFootPrintPGInterface_SOURCES = TestFootPrintPGInterface.cpp
-TestFootPrintPGInterface_CPPFLAGS = -I$(srcdir)/Mathematics -I$(srcdir)/PreviewControl -I$(srcdir)/ZMPRefTrajectoryGeneration -I$(srcdir)/RobotModel -I$(srcdir)/MotionGeneration -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib -I$(top_srcdir)/../jrlCIR-dynamics/interfaces
-TestFootPrintPGInterface_LDADD = $(top_builddir)/src/libwalkGenJRL.la
-TestHumanoidDynamicRobot_SOURCES = TestHumanoidDynamicRobot.cpp
-TestHumanoidDynamicRobot_CPPFLAGS = -I$(srcdir)/Mathematics -I$(srcdir)/PreviewControl -I$(srcdir)/ZMPRefTrajectoryGeneration -I$(srcdir)/RobotModel -I$(srcdir)/MotionGeneration -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib -I$(top_srcdir)/../jrlCIR-dynamics/interfaces
-TestHumanoidDynamicRobot_LDADD = $(top_builddir)/src/libwalkGenJRL.la
-walkGenJRLdir = @includedir@/walkGenJRL
-walkGenJRL_HEADERS = \
-	./Mathematics/Polynome.h \
-	./Mathematics/PolynomeFoot.h \
-	./Mathematics/StepOverPolynome.h\
-	./Mathematics/ConvexHull.h \
-	./Mathematics/qld.h \
-	./PreviewControl/PreviewControl.h \
-	./PreviewControl/OptimalControllerSolver.h \
-	./PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h \
-	./ZMPRefTrajectoryGeneration/ZMPDiscretization.h \
-	./RobotModel/fileReader.h \
-	./RobotModel/Body.h \
-	./RobotModel/MultiBody.h \
-	./RobotModel/DynamicBody.h \
-	./RobotModel/DynamicMultiBody.h \
-	./RobotModel/HumanoidDynamicMultiBody.h \
-	./RobotModel/HumanoidSpecificities.h \
-	./MotionGeneration/InverseKinematics.h \
-	./MotionGeneration/StepOverPlanner.h\
-	./MotionGeneration/CollisionDetector.h\
-	./MotionGeneration/WaistHeightVariation.h\
-	./MotionGeneration/UpperBodyMotion.h \
-	./MotionGeneration/GenerateMotionFromKineoWorks.h \
-	./MotionGeneration/ComAndFootRealization.h \
-	./MotionGeneration/ComAndFootRealizationByGeometry.h \
-	StepStackHandler.h \
-	PatternGeneratorInterface.h 
-
+libwalkGenJRL_la_CPPFLAGS = -I$(srcdir)/../include/walkGenJrl/	  
+libwalkGenJRL_la_LIBS = -llapack
 all: all-am
 
 .SUFFIXES:
@@ -352,40 +278,6 @@ clean-libLTLIBRARIES:
 	done
 libwalkGenJRL.la: $(libwalkGenJRL_la_OBJECTS) $(libwalkGenJRL_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(libwalkGenJRL_la_LDFLAGS) $(libwalkGenJRL_la_OBJECTS) $(libwalkGenJRL_la_LIBADD) $(LIBS)
-install-binPROGRAMS: $(bin_PROGRAMS)
-	@$(NORMAL_INSTALL)
-	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  if test -f $$p \
-	     || test -f $$p1 \
-	  ; then \
-	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
-	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(bindir)/$$f'"; \
-	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
-	  else :; fi; \
-	done
-
-uninstall-binPROGRAMS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  f=`echo "$$p" | sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
-	  echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(bindir)/$$f"; \
-	done
-
-clean-binPROGRAMS:
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  echo " rm -f $$p $$f"; \
-	  rm -f $$p $$f ; \
-	done
-TestFootPrintPGInterface$(EXEEXT): $(TestFootPrintPGInterface_OBJECTS) $(TestFootPrintPGInterface_DEPENDENCIES) 
-	@rm -f TestFootPrintPGInterface$(EXEEXT)
-	$(CXXLINK) $(TestFootPrintPGInterface_LDFLAGS) $(TestFootPrintPGInterface_OBJECTS) $(TestFootPrintPGInterface_LDADD) $(LIBS)
-TestHumanoidDynamicRobot$(EXEEXT): $(TestHumanoidDynamicRobot_OBJECTS) $(TestHumanoidDynamicRobot_DEPENDENCIES) 
-	@rm -f TestHumanoidDynamicRobot$(EXEEXT)
-	$(CXXLINK) $(TestHumanoidDynamicRobot_LDFLAGS) $(TestHumanoidDynamicRobot_OBJECTS) $(TestHumanoidDynamicRobot_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -393,20 +285,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-Body.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-CollisionDetector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-ComAndFootRealizationByGeometry.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-ConvexHull.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-DynamicBody.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-DynamicMultiBody.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-GenerateMotionFromKineoWorks.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-HumanoidDynamicMultiBody.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-HumanoidSpecificities.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-InverseKinematics.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-Joint.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-MultiBody.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-OptimalControllerSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-PatternGeneratorInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-Polynome.Plo@am__quote@
@@ -419,7 +302,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-WaistHeightVariation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-ZMPDiscretization.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-ZMPPreviewControlWithMultiBodyZMP.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-fileReader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-qld.Plo@am__quote@
 
 .cpp.o:
@@ -506,62 +388,6 @@ libwalkGenJRL_la-ZMPDiscretization.lo: ./ZMPRefTrajectoryGeneration/ZMPDiscretiz
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-ZMPDiscretization.lo `test -f './ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp' || echo '$(srcdir)/'`./ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp
 
-libwalkGenJRL_la-fileReader.lo: ./RobotModel/fileReader.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libwalkGenJRL_la-fileReader.lo -MD -MP -MF "$(DEPDIR)/libwalkGenJRL_la-fileReader.Tpo" -c -o libwalkGenJRL_la-fileReader.lo `test -f './RobotModel/fileReader.cpp' || echo '$(srcdir)/'`./RobotModel/fileReader.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libwalkGenJRL_la-fileReader.Tpo" "$(DEPDIR)/libwalkGenJRL_la-fileReader.Plo"; else rm -f "$(DEPDIR)/libwalkGenJRL_la-fileReader.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='./RobotModel/fileReader.cpp' object='libwalkGenJRL_la-fileReader.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-fileReader.lo `test -f './RobotModel/fileReader.cpp' || echo '$(srcdir)/'`./RobotModel/fileReader.cpp
-
-libwalkGenJRL_la-Joint.lo: ./RobotModel/Joint.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libwalkGenJRL_la-Joint.lo -MD -MP -MF "$(DEPDIR)/libwalkGenJRL_la-Joint.Tpo" -c -o libwalkGenJRL_la-Joint.lo `test -f './RobotModel/Joint.cpp' || echo '$(srcdir)/'`./RobotModel/Joint.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libwalkGenJRL_la-Joint.Tpo" "$(DEPDIR)/libwalkGenJRL_la-Joint.Plo"; else rm -f "$(DEPDIR)/libwalkGenJRL_la-Joint.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='./RobotModel/Joint.cpp' object='libwalkGenJRL_la-Joint.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-Joint.lo `test -f './RobotModel/Joint.cpp' || echo '$(srcdir)/'`./RobotModel/Joint.cpp
-
-libwalkGenJRL_la-Body.lo: ./RobotModel/Body.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libwalkGenJRL_la-Body.lo -MD -MP -MF "$(DEPDIR)/libwalkGenJRL_la-Body.Tpo" -c -o libwalkGenJRL_la-Body.lo `test -f './RobotModel/Body.cpp' || echo '$(srcdir)/'`./RobotModel/Body.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libwalkGenJRL_la-Body.Tpo" "$(DEPDIR)/libwalkGenJRL_la-Body.Plo"; else rm -f "$(DEPDIR)/libwalkGenJRL_la-Body.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='./RobotModel/Body.cpp' object='libwalkGenJRL_la-Body.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-Body.lo `test -f './RobotModel/Body.cpp' || echo '$(srcdir)/'`./RobotModel/Body.cpp
-
-libwalkGenJRL_la-MultiBody.lo: ./RobotModel/MultiBody.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libwalkGenJRL_la-MultiBody.lo -MD -MP -MF "$(DEPDIR)/libwalkGenJRL_la-MultiBody.Tpo" -c -o libwalkGenJRL_la-MultiBody.lo `test -f './RobotModel/MultiBody.cpp' || echo '$(srcdir)/'`./RobotModel/MultiBody.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libwalkGenJRL_la-MultiBody.Tpo" "$(DEPDIR)/libwalkGenJRL_la-MultiBody.Plo"; else rm -f "$(DEPDIR)/libwalkGenJRL_la-MultiBody.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='./RobotModel/MultiBody.cpp' object='libwalkGenJRL_la-MultiBody.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-MultiBody.lo `test -f './RobotModel/MultiBody.cpp' || echo '$(srcdir)/'`./RobotModel/MultiBody.cpp
-
-libwalkGenJRL_la-DynamicBody.lo: ./RobotModel/DynamicBody.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libwalkGenJRL_la-DynamicBody.lo -MD -MP -MF "$(DEPDIR)/libwalkGenJRL_la-DynamicBody.Tpo" -c -o libwalkGenJRL_la-DynamicBody.lo `test -f './RobotModel/DynamicBody.cpp' || echo '$(srcdir)/'`./RobotModel/DynamicBody.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libwalkGenJRL_la-DynamicBody.Tpo" "$(DEPDIR)/libwalkGenJRL_la-DynamicBody.Plo"; else rm -f "$(DEPDIR)/libwalkGenJRL_la-DynamicBody.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='./RobotModel/DynamicBody.cpp' object='libwalkGenJRL_la-DynamicBody.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-DynamicBody.lo `test -f './RobotModel/DynamicBody.cpp' || echo '$(srcdir)/'`./RobotModel/DynamicBody.cpp
-
-libwalkGenJRL_la-DynamicMultiBody.lo: ./RobotModel/DynamicMultiBody.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libwalkGenJRL_la-DynamicMultiBody.lo -MD -MP -MF "$(DEPDIR)/libwalkGenJRL_la-DynamicMultiBody.Tpo" -c -o libwalkGenJRL_la-DynamicMultiBody.lo `test -f './RobotModel/DynamicMultiBody.cpp' || echo '$(srcdir)/'`./RobotModel/DynamicMultiBody.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libwalkGenJRL_la-DynamicMultiBody.Tpo" "$(DEPDIR)/libwalkGenJRL_la-DynamicMultiBody.Plo"; else rm -f "$(DEPDIR)/libwalkGenJRL_la-DynamicMultiBody.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='./RobotModel/DynamicMultiBody.cpp' object='libwalkGenJRL_la-DynamicMultiBody.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-DynamicMultiBody.lo `test -f './RobotModel/DynamicMultiBody.cpp' || echo '$(srcdir)/'`./RobotModel/DynamicMultiBody.cpp
-
-libwalkGenJRL_la-HumanoidDynamicMultiBody.lo: ./RobotModel/HumanoidDynamicMultiBody.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libwalkGenJRL_la-HumanoidDynamicMultiBody.lo -MD -MP -MF "$(DEPDIR)/libwalkGenJRL_la-HumanoidDynamicMultiBody.Tpo" -c -o libwalkGenJRL_la-HumanoidDynamicMultiBody.lo `test -f './RobotModel/HumanoidDynamicMultiBody.cpp' || echo '$(srcdir)/'`./RobotModel/HumanoidDynamicMultiBody.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libwalkGenJRL_la-HumanoidDynamicMultiBody.Tpo" "$(DEPDIR)/libwalkGenJRL_la-HumanoidDynamicMultiBody.Plo"; else rm -f "$(DEPDIR)/libwalkGenJRL_la-HumanoidDynamicMultiBody.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='./RobotModel/HumanoidDynamicMultiBody.cpp' object='libwalkGenJRL_la-HumanoidDynamicMultiBody.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-HumanoidDynamicMultiBody.lo `test -f './RobotModel/HumanoidDynamicMultiBody.cpp' || echo '$(srcdir)/'`./RobotModel/HumanoidDynamicMultiBody.cpp
-
-libwalkGenJRL_la-HumanoidSpecificities.lo: ./RobotModel/HumanoidSpecificities.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libwalkGenJRL_la-HumanoidSpecificities.lo -MD -MP -MF "$(DEPDIR)/libwalkGenJRL_la-HumanoidSpecificities.Tpo" -c -o libwalkGenJRL_la-HumanoidSpecificities.lo `test -f './RobotModel/HumanoidSpecificities.cpp' || echo '$(srcdir)/'`./RobotModel/HumanoidSpecificities.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libwalkGenJRL_la-HumanoidSpecificities.Tpo" "$(DEPDIR)/libwalkGenJRL_la-HumanoidSpecificities.Plo"; else rm -f "$(DEPDIR)/libwalkGenJRL_la-HumanoidSpecificities.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='./RobotModel/HumanoidSpecificities.cpp' object='libwalkGenJRL_la-HumanoidSpecificities.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-HumanoidSpecificities.lo `test -f './RobotModel/HumanoidSpecificities.cpp' || echo '$(srcdir)/'`./RobotModel/HumanoidSpecificities.cpp
-
 libwalkGenJRL_la-InverseKinematics.lo: ./MotionGeneration/InverseKinematics.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libwalkGenJRL_la-InverseKinematics.lo -MD -MP -MF "$(DEPDIR)/libwalkGenJRL_la-InverseKinematics.Tpo" -c -o libwalkGenJRL_la-InverseKinematics.lo `test -f './MotionGeneration/InverseKinematics.cpp' || echo '$(srcdir)/'`./MotionGeneration/InverseKinematics.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libwalkGenJRL_la-InverseKinematics.Tpo" "$(DEPDIR)/libwalkGenJRL_la-InverseKinematics.Plo"; else rm -f "$(DEPDIR)/libwalkGenJRL_la-InverseKinematics.Tpo"; exit 1; fi
@@ -625,34 +451,6 @@ libwalkGenJRL_la-PatternGeneratorInterface.lo: PatternGeneratorInterface.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-PatternGeneratorInterface.lo `test -f 'PatternGeneratorInterface.cpp' || echo '$(srcdir)/'`PatternGeneratorInterface.cpp
 
-TestFootPrintPGInterface-TestFootPrintPGInterface.o: TestFootPrintPGInterface.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestFootPrintPGInterface_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestFootPrintPGInterface-TestFootPrintPGInterface.o -MD -MP -MF "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo" -c -o TestFootPrintPGInterface-TestFootPrintPGInterface.o `test -f 'TestFootPrintPGInterface.cpp' || echo '$(srcdir)/'`TestFootPrintPGInterface.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo" "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Po"; else rm -f "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestFootPrintPGInterface.cpp' object='TestFootPrintPGInterface-TestFootPrintPGInterface.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestFootPrintPGInterface_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestFootPrintPGInterface-TestFootPrintPGInterface.o `test -f 'TestFootPrintPGInterface.cpp' || echo '$(srcdir)/'`TestFootPrintPGInterface.cpp
-
-TestFootPrintPGInterface-TestFootPrintPGInterface.obj: TestFootPrintPGInterface.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestFootPrintPGInterface_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestFootPrintPGInterface-TestFootPrintPGInterface.obj -MD -MP -MF "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo" -c -o TestFootPrintPGInterface-TestFootPrintPGInterface.obj `if test -f 'TestFootPrintPGInterface.cpp'; then $(CYGPATH_W) 'TestFootPrintPGInterface.cpp'; else $(CYGPATH_W) '$(srcdir)/TestFootPrintPGInterface.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo" "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Po"; else rm -f "$(DEPDIR)/TestFootPrintPGInterface-TestFootPrintPGInterface.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestFootPrintPGInterface.cpp' object='TestFootPrintPGInterface-TestFootPrintPGInterface.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestFootPrintPGInterface_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestFootPrintPGInterface-TestFootPrintPGInterface.obj `if test -f 'TestFootPrintPGInterface.cpp'; then $(CYGPATH_W) 'TestFootPrintPGInterface.cpp'; else $(CYGPATH_W) '$(srcdir)/TestFootPrintPGInterface.cpp'; fi`
-
-TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.o: TestHumanoidDynamicRobot.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestHumanoidDynamicRobot_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.o -MD -MP -MF "$(DEPDIR)/TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.Tpo" -c -o TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.o `test -f 'TestHumanoidDynamicRobot.cpp' || echo '$(srcdir)/'`TestHumanoidDynamicRobot.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.Tpo" "$(DEPDIR)/TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.Po"; else rm -f "$(DEPDIR)/TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestHumanoidDynamicRobot.cpp' object='TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestHumanoidDynamicRobot_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.o `test -f 'TestHumanoidDynamicRobot.cpp' || echo '$(srcdir)/'`TestHumanoidDynamicRobot.cpp
-
-TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.obj: TestHumanoidDynamicRobot.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestHumanoidDynamicRobot_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.obj -MD -MP -MF "$(DEPDIR)/TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.Tpo" -c -o TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.obj `if test -f 'TestHumanoidDynamicRobot.cpp'; then $(CYGPATH_W) 'TestHumanoidDynamicRobot.cpp'; else $(CYGPATH_W) '$(srcdir)/TestHumanoidDynamicRobot.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.Tpo" "$(DEPDIR)/TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.Po"; else rm -f "$(DEPDIR)/TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestHumanoidDynamicRobot.cpp' object='TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(TestHumanoidDynamicRobot_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestHumanoidDynamicRobot-TestHumanoidDynamicRobot.obj `if test -f 'TestHumanoidDynamicRobot.cpp'; then $(CYGPATH_W) 'TestHumanoidDynamicRobot.cpp'; else $(CYGPATH_W) '$(srcdir)/TestHumanoidDynamicRobot.cpp'; fi`
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -662,23 +460,6 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-install-walkGenJRLHEADERS: $(walkGenJRL_HEADERS)
-	@$(NORMAL_INSTALL)
-	test -z "$(walkGenJRLdir)" || $(mkdir_p) "$(DESTDIR)$(walkGenJRLdir)"
-	@list='$(walkGenJRL_HEADERS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(walkGenJRLHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(walkGenJRLdir)/$$f'"; \
-	  $(walkGenJRLHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(walkGenJRLdir)/$$f"; \
-	done
-
-uninstall-walkGenJRLHEADERS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(walkGenJRL_HEADERS)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(walkGenJRLdir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(walkGenJRLdir)/$$f"; \
-	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -729,7 +510,6 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/Mathematics $(distdir)/MotionGeneration $(distdir)/PreviewControl $(distdir)/RobotModel $(distdir)/ZMPRefTrajectoryGeneration
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -758,11 +538,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
-install-binPROGRAMS: install-libLTLIBRARIES
-
+all-am: Makefile $(LTLIBRARIES)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(walkGenJRLdir)"; do \
+	for dir in "$(DESTDIR)$(libdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -791,8 +569,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
-	clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
+	mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -810,9 +588,9 @@ info: info-am
 
 info-am:
 
-install-data-am: install-walkGenJRLHEADERS
+install-data-am:
 
-install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
+install-exec-am: install-libLTLIBRARIES
 
 install-info: install-info-am
 
@@ -838,23 +616,20 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-info-am \
-	uninstall-libLTLIBRARIES uninstall-walkGenJRLHEADERS
+uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
-	distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-strip install-walkGenJRLHEADERS \
-	installcheck installcheck-am installdirs maintainer-clean \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-libLTLIBRARIES clean-libtool ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am \
+	install-libLTLIBRARIES install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-info-am uninstall-libLTLIBRARIES \
-	uninstall-walkGenJRLHEADERS
+	tags uninstall uninstall-am uninstall-info-am \
+	uninstall-libLTLIBRARIES
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

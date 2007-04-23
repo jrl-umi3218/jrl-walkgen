@@ -32,7 +32,7 @@
 */
 #define _DEBUG_
 
-#include <WaistHeightVariation.h>
+#include <MotionGeneration/WaistHeightVariation.h>
 #include <fstream>
 
 using namespace::PatternGeneratorJRL;

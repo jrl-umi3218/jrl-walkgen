@@ -3,13 +3,21 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include <ComAndFootRealizationByGeometry.h>
-#include <HumanoidDynamicMultiBody.h>
+#include <MotionGeneration/ComAndFootRealizationByGeometry.h>
+#include <robotDynamicsJRLJapan/HumanoidDynamicMultiBody.h>
 
 
 #if 0
-#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "CAFRBG: " << x << endl; DebugFile.close();}
+
+#define RESETDEBUG4(y) { ofstream DebugFile; \
+    DebugFile.open(y,ofstream::out); \
+    DebugFile.close();}
+
+#define ODEBUG4(x,y) { ofstream DebugFile; \
+    DebugFile.open(y,ofstream::app); \
+    DebugFile << "CAFRBG: " << x << endl; \
+    DebugFile.close();}
+
 #else
 #define RESETDEBUG4(y) 
 #define ODEBUG4(x,y) 
@@ -40,9 +48,12 @@ ComAndFootRealizationByGeometry::ComAndFootRealizationByGeometry()
 
   // By assumption on this implementation
   // the humanoid is assume to have 6 DOFs per leg.
- 
-
   m_AnkleSoilDistance = 0.1;
+
+  MAL_VECTOR_FILL(m_prev_Configuration,0.0);
+  MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
+  MAL_VECTOR_FILL(m_prev_Velocity,0.0);
+  MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
 
   RESETDEBUG4("DebugDataqr_0.dat");
   RESETDEBUG4("DebugDataqr_1.dat");
@@ -62,24 +73,28 @@ ComAndFootRealizationByGeometry::ComAndFootRealizationByGeometry()
 void ComAndFootRealizationByGeometry::Initialization()
 {
 
+  ODEBUG("Enter 0.0 ");
   // Planners for stepping over.
   m_WaistPlanner = new WaistHeightVariation();
   m_UpBody = new UpperBodyMotion();
-  
+  ODEBUG("Enter 1.0 ");
   if (m_HS!=0)
     {
+      ODEBUG("Enter 2.0 ");
       double AnklePosition[3];
       // Take the right ankle position (should be equivalent)
       m_HS->GetAnklePosition(-1,AnklePosition);
       m_AnkleSoilDistance = AnklePosition[2];
       ODEBUG("AnkleSoilDistnace =" << m_AnkleSoilDistance);
 
+      ODEBUG("Enter 3.0 ");
       // Update the index to change the configuration according
       // to the VRML ID.
       
       HumanoidDynamicMultiBody * aHDMB = (HumanoidDynamicMultiBody *)getHumanoidDynamicRobot();
       aHDMB->GetJointIDInConfigurationFromVRMLID(m_GlobalVRMLIDtoConfiguration);
 
+      ODEBUG("Enter 4.0 ");
       // Extract the indexes of the Left leg.
       int r=m_HS->GetLegJointNb(1) + m_HS->GetFootJointNb(1);
       if (r!=6)
@@ -112,6 +127,7 @@ void ComAndFootRealizationByGeometry::Initialization()
 	    }
 	}
 
+      ODEBUG("Enter 5.0 ");
       // Extract the indexes of the Right leg.
       r=m_HS->GetLegJointNb(-1) + m_HS->GetFootJointNb(-1);
       if (r!=6)
@@ -122,11 +138,16 @@ void ComAndFootRealizationByGeometry::Initialization()
 	}
       else
 	{
-	   m_RightLegIndexInVRML.resize(6);
-	   m_RightLegIndexinConfiguration.resize(6);
+	  ODEBUG("Enter 6.0 " << this);
+	  m_RightLegIndexInVRML.resize(6);
+	  m_RightLegIndexinConfiguration.resize(6);
 	  
+	  ODEBUG("Enter 6.1 " );
+		  
 	  std::vector<int> tmp = m_HS->GetLegJoints(-1);
 	  int lindex =0;
+
+	  ODEBUG("Enter 6.1 " << tmp.size() );
 	  // Here we assume that they are in a decending order.
 	  for(int i=0;i<tmp.size();i++)
 	    {
@@ -136,14 +157,17 @@ void ComAndFootRealizationByGeometry::Initialization()
 	    }
 	  
 	  tmp = m_HS->GetFootJoints(-1);
+	  ODEBUG("Enter 6.2 " << tmp.size() << " " << lindex);
 	  for(int i=0;i<tmp.size();i++)
 	    {
 	      m_RightLegIndexInVRML[lindex] = tmp[i];
+	      ODEBUG(" m_RightLegIndexInVRML[ "<< lindex << " ]= "<< tmp[i]);
 	      m_RightLegIndexinConfiguration[lindex] = m_GlobalVRMLIDtoConfiguration[tmp[i]];
 	      lindex++;
 	    }
 	}
       
+      ODEBUG("Enter 7.0 ");
       // Extract the indexes of the Left Arm.
       r=m_HS->GetArmJointNb(1);
       if (r!=7)
@@ -154,6 +178,7 @@ void ComAndFootRealizationByGeometry::Initialization()
 	}
       else 
 	{
+	  ODEBUG("Enter 8.0 ");
 	  m_LeftArmIndexInVRML.resize(7);
 	  m_LeftArmIndexinConfiguration.resize(7);
 	  
@@ -168,6 +193,7 @@ void ComAndFootRealizationByGeometry::Initialization()
 	    }
 	}
 
+      ODEBUG("Enter 9.0 ");
       // Extract the indexes of the Right Arm.
       r=m_HS->GetArmJointNb(-1);
       if (r!=7)
@@ -178,6 +204,7 @@ void ComAndFootRealizationByGeometry::Initialization()
 	}
       else 
 	{
+	  ODEBUG("Enter 10.0 ");
 	  m_RightArmIndexInVRML.resize(7);
 	  m_RightArmIndexinConfiguration.resize(7);
 	  
@@ -191,7 +218,7 @@ void ComAndFootRealizationByGeometry::Initialization()
 	      lindex++;
 	    }
 	}
-
+      ODEBUG("Enter 11.0 ");
     }
   
   ODEBUG("RightLegIndex: " 
@@ -220,6 +247,14 @@ void ComAndFootRealizationByGeometry::Initialization()
 	  << m_LeftLegIndexinConfiguration[3] << " " 
 	  << m_LeftLegIndexinConfiguration[4] << " " 
 	  << m_LeftLegIndexinConfiguration[5] ); 
+
+  ODEBUG("Enter 12.0 ");
+
+  MAL_VECTOR_FILL(m_prev_Configuration,0.0);
+  MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
+  MAL_VECTOR_FILL(m_prev_Velocity,0.0);
+  MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
+  
 }
 
 ComAndFootRealizationByGeometry::~ComAndFootRealizationByGeometry()
@@ -237,6 +272,8 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 							FootAbsolutePosition & InitLeftFootPosition, 
 							FootAbsolutePosition & InitRightFootPosition)
 {
+
+
   if (m_InverseKinematics==0)
     {
       cerr << "ComAndFootRealizationByGeometry::InitializationUpperBody "  << endl
@@ -281,10 +318,12 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   
   ODEBUG4("Size of body angles ini: " << MAL_VECTOR_SIZE(BodyAnglesIni),
 	  "DebugDataStartingCOM.dat");
-  for(int i=0;i<MAL_VECTOR_SIZE(BodyAnglesIni);i++)
+
+  for(int i=0;i<m_GlobalVRMLIDtoConfiguration.size();i++)
     {
       CurrentConfig[m_GlobalVRMLIDtoConfiguration[i]] = BodyAnglesIni[i];
-      ODEBUG4( m_GlobalVRMLIDtoConfiguration[i] << " " << CurrentConfig[m_GlobalVRMLIDtoConfiguration[i]]*180/M_PI  , 
+      ODEBUG4( m_GlobalVRMLIDtoConfiguration[i] << " " << 
+	       CurrentConfig[m_GlobalVRMLIDtoConfiguration[i]]*180/M_PI  , 
 	         "DebugDataStartingCOM.dat");
 	
     }
@@ -424,6 +463,11 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 
   m_Dt(1)= -m_Dt(1);
 
+  MAL_VECTOR_FILL(m_prev_Configuration,0.0);
+  MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
+  MAL_VECTOR_FILL(m_prev_Velocity,0.0);
+  MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
+  
 }
 
 bool ComAndFootRealizationByGeometry::InitializationUpperBody(deque<ZMPPosition> &inZMPPositions,
@@ -736,7 +780,9 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
 									      MAL_VECTOR(,double) & aLeftFoot,
 									      MAL_VECTOR(,double) & aRightFoot,
 									      MAL_VECTOR(,double) & CurrentConfiguration,
-									      MAL_VECTOR(,double) & CurrentVelocity,					      						      int Stage)
+									      MAL_VECTOR(,double) & CurrentVelocity,
+									      int IterationNumber,
+			      						      int Stage)
 {
 
   ODEBUG("CPFGCAFP: " << aLeftFoot << " " << aRightFoot );
@@ -847,11 +893,23 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
      we should update the current stored values.  */
   if (Stage==0)
     {
-      /* Compute the speed */
-      for(int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
+      if (IterationNumber>0)
 	{
-	  CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration[i])/ getSamplingPeriod();
-	  /* Keep the new value for the legs. */
+	  /* Compute the speed */
+	  for(int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
+	    {
+	      CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration[i])/ getSamplingPeriod();
+	      /* Keep the new value for the legs. */
+	    }
+	}
+      else 
+	{
+	  /* Compute the speed */
+	  for(int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
+	    {
+	      CurrentVelocity[i] = 0.0;
+	      /* Keep the new value for the legs. */
+	    }
 	}
 
       m_prev_Configuration = CurrentConfiguration;
@@ -859,16 +917,29 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
   else if (Stage==1)
     {
 
-      /* Compute the speed */
-      for(int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
+      if (IterationNumber>0)
 	{
-	  CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration1[i])/ getSamplingPeriod();
-	  /* Keep the new value for the legs. */
+	  /* Compute the speed */
+	  for(int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
+	    {
+	      CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration1[i])/ getSamplingPeriod();
+	      /* Keep the new value for the legs. */
+	    }
+	}
+      else
+	{
+	  /* Compute the speed */
+	  for(int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
+	    {
+	      CurrentVelocity[i] = 0.0;
+	      /* Keep the new value for the legs. */
+	    }
 	}
       m_prev_Configuration1 = CurrentConfiguration;
 
     }
-  
+
+
   for(int i=0;i<6;i++)
     CurrentVelocity[i] = aCoMSpeed(i);
 
@@ -876,8 +947,7 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
   ODEBUG( "CurrentVelocity :" << endl << CurrentVelocity);
   ODEBUG4("SamplingPeriod " << getSamplingPeriod(),"LegsSpeed.dat");
 
-  string aDebugFileName;
-    
+  string aDebugFileName;    
 
   ODEBUG4( (1.0/M_PI)*180.0*lql[0] << " " <<
 	   (1.0/M_PI)*180.0*lql[1] << " " <<
@@ -888,8 +958,10 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
 
   ODEBUG4(CurrentVelocity,"DebugDataVelocity.dat");
 
-  ODEBUG4( aCoMPosition[0] << " " <<
+  ODEBUG4( aCoMPosition[0] 
+	   << " " <<
 	   aCoMPosition[1],"COMPC1.dat");
+
   return true;
 }
 
@@ -1040,9 +1112,7 @@ void ComAndFootRealizationByGeometry::ComputeUpperBodyHeuristicForNormalWalking(
   
 }  
 
-bool ComAndFootRealizationByGeometry::setHumanoidDynamicRobot(const CjrlHumanoidDynamicRobot<MAL_MATRIX(,double), 
-							      MAL_S4x4_MATRIX(,double),MAL_S3x3_MATRIX(,double),
-							      MAL_VECTOR(,double),MAL_S3_VECTOR(,double)> * aHumanoidDynamicRobot)
+bool ComAndFootRealizationByGeometry::setHumanoidDynamicRobot(const CjrlHumanoidDynamicRobot * aHumanoidDynamicRobot)
 {
   ComAndFootRealization::setHumanoidDynamicRobot(aHumanoidDynamicRobot);
   HumanoidDynamicMultiBody *aHDMB = (HumanoidDynamicMultiBody *)aHumanoidDynamicRobot;

@@ -42,7 +42,7 @@
 */
 
 #include <iostream>
-#include <Polynome.h>
+#include <Mathematics/Polynome.h>
 
 using namespace::PatternGeneratorJRL;
 

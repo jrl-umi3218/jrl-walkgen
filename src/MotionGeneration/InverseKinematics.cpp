@@ -32,7 +32,7 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <math.h>
-#include <InverseKinematics.h>
+#include <MotionGeneration/InverseKinematics.h>
 
 
 using namespace::PatternGeneratorJRL;
@@ -257,9 +257,6 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
 	q(3) =m_KneeAngleBound;
 	else 
 	{
-	  
-	  
-	  
 	double a,b,c,d;
 	a =  6.59620337503859;
 	b = -13.77121203051706;
