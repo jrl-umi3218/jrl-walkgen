@@ -1,0 +1,52 @@
+  <LinkJointNameAndRank>
+       <Nb> 40 </Nb>
+
+       <Link> RLEG_JOINT0 6 </Link>
+       <Link> RLEG_JOINT1 7 </Link>
+       <Link> RLEG_JOINT2 8 </Link>
+       <Link> RLEG_JOINT3 9 </Link>
+       <Link> RLEG_JOINT4 10 </Link>
+       <Link> RLEG_JOINT5 11 </Link>
+
+       <Link> LLEG_JOINT0 12 </Link>
+       <Link> LLEG_JOINT1 13 </Link>
+       <Link> LLEG_JOINT2 14 </Link>
+       <Link> LLEG_JOINT3 15 </Link>
+       <Link> LLEG_JOINT4 16 </Link>
+       <Link> LLEG_JOINT5 17 </Link>
+
+       <Link> CHEST_JOINT0 18 </Link>
+       <Link> CHEST_JOINT1 19 </Link>
+
+       <Link> HEAD_JOINT0 20 </Link>
+       <Link> HEAD_JOINT1 21 </Link>
+
+       <Link> RARM_JOINT0 22 </Link>
+       <Link> RARM_JOINT1 23 </Link>
+       <Link> RARM_JOINT2 24 </Link>
+       <Link> RARM_JOINT3 25 </Link>
+       <Link> RARM_JOINT4 26 </Link>
+       <Link> RARM_JOINT5 27 </Link>
+       <Link> RARM_JOINT6 28 </Link>
+       
+       <Link> LARM_JOINT0 29 </Link>
+       <Link> LARM_JOINT1 30 </Link>
+       <Link> LARM_JOINT2 31 </Link>
+       <Link> LARM_JOINT3 32 </Link>
+       <Link> LARM_JOINT4 33 </Link>
+       <Link> LARM_JOINT5 34 </Link> 
+       <Link> LARM_JOINT6 35 </Link>
+
+       <Link> RHAND_JOINT0 36 </Link>
+       <Link> RHAND_JOINT1 37 </Link>
+       <Link> RHAND_JOINT2 38 </Link>
+       <Link> RHAND_JOINT3 39 </Link>
+       <Link> RHAND_JOINT4 40 </Link>
+
+       <Link> LHAND_JOINT0 41 </Link>
+       <Link> LHAND_JOINT1 42 </Link>
+       <Link> LHAND_JOINT2 43 </Link>
+       <Link> LHAND_JOINT3 44 </Link>
+       <Link> LHAND_JOINT4 45 </Link>
+
+  </LinkJointNameAndRank> 

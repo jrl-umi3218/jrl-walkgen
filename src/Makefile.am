@@ -28,83 +28,34 @@
 
 configdir=	$(datadir)/$(PACKAGE)
 dist_config_DATA=\
-	HRP2Specificities.xml		\
-	PreviewControlParameters.ini
+	./data/HRP2Specificities.xml		\
+	./data/PreviewControlParameters.ini
 
 lib_LTLIBRARIES = libwalkGenJRL.la
 libwalkGenJRL_la_SOURCES = \
-	Polynome.cpp \
-	PolynomeFoot.cpp \
-	ZMPDiscretization.cpp \
-	PreviewControl.cpp \
-	InverseKinematics.cpp \
-	MultiBody.cpp \
-	DynamicMultiBody.cpp \
-	fileReader.cpp \
-	Body.cpp \
-	DynamicBody.cpp \
-	OptimalControllerSolver.cpp \
-	ZMPPreviewControlWithMultiBodyZMP.cpp \
-	StepOverPlanner.cpp\
-	StepOverPolynome.cpp\
-	CollisionDetector.cpp\
-        WaistHeightVariation.cpp\
-	UpperBodyMotion.cpp \
-	GenerateMotionFromKineoWorks.cpp \
+	./Mathematics/Polynome.cpp \
+	./Mathematics/PolynomeFoot.cpp \
+	./Mathematics/StepOverPolynome.cpp\
+	./Mathematics/ConvexHull.cpp \
+	./Mathematics/qld.cpp \
+	./PreviewControl/PreviewControl.cpp \
+	./PreviewControl/OptimalControllerSolver.cpp \
+	./PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp \
+	./ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp \
+	./MotionGeneration/InverseKinematics.cpp \
+	./MotionGeneration/StepOverPlanner.cpp\
+	./MotionGeneration/CollisionDetector.cpp\
+	./MotionGeneration/WaistHeightVariation.cpp\
+	./MotionGeneration/UpperBodyMotion.cpp \
+	./MotionGeneration/GenerateMotionFromKineoWorks.cpp \
+	./MotionGeneration/ComAndFootRealizationByGeometry.cpp \
 	StepStackHandler.cpp \
-	PatternGeneratorInterface.cpp \
-	ConvexHull.cpp \
-	HumanoidSpecificities.cpp \
-	qld.cpp
+	PatternGeneratorInterface.cpp 
 
-libwalkGenJRL_la_CPPFLAGS = -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib
+libwalkGenJRL_la_CPPFLAGS = -I$(srcdir)/../include/walkGenJrl/	  
+libwalkGenJRL_la_LIBS = -llapack
 
-bin_PROGRAMS = TestFootPrintPGInterface
-TestFootPrintPGInterface_SOURCES = TestFootPrintPGInterface.cpp
-TestFootPrintPGInterface_CPPFLAGS = -I$(srcdir) -I$(top_srcdir)/include/VNL/NetLib
-TestFootPrintPGInterface_LDADD = $(top_builddir)/src/libwalkGenJRL.la
 
-# XXX Please select only public headers, i.e. those that are to be installed.
-walkGenJRLdir = @includedir@/walkGenJRL
-walkGenJRL_HEADERS = \
-	Body.h \
-	CollisionDetector.h \
-	ConvexHull.h \
-	DynamicBody.h \
-	DynamicMultiBody.h \
-	GenerateMotionFromKineoWorks.h \
-	HumanoidDynamicMultiBody.h \
-	HumanoidSpecificities.h \
-	InverseKinematics.h \
-	Joint.h \
-	MatrixAbstractLayer.h \
-	MatrixAbstractLayerBoost.h \
-	MatrixAbstractLayerDoc.h \
-	MatrixAbstractLayerSmall.h \
-	MatrixAbstractLayerSmallMatrix3x3Default.h \
-	MatrixAbstractLayerSmallVector3Default.h \
-	MatrixAbstractLayerVNL.h \
-	MultiBody.h \
-	OptimalControllerSolver.h \
-	PGTypes.h \
-	PatternGeneratorInterface.h \
-	Polynome.h \
-	PolynomeFoot.h \
-	PreviewControl.h \
-	StepOverPlanner.h \
-	StepOverPolynome.h \
-	StepStackHandler.h \
-	UpperBodyMotion.h \
-	WaistHeightVariation.h \
-	ZMPDiscretization.h \
-	ZMPPreviewControlWithMultiBodyZMP.h \
-	configJRLWPG.h \
-	fileReader.h \
-	linalg.h \
-	mathout.h \
-	matrix.h \
-	matrix3.h \
-	matrix4.h \
-	qld.h \
-	quaternion.h \
-	vector3.h 
+
+
+

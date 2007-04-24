@@ -42,7 +42,7 @@ INPUT                  = @top_srcdir@/doc/additionalHeader \
 #---------------------------------------------------------------------------
 # configuration options related to inserting images
 #---------------------------------------------------------------------------
-IMAGE_PATH = @top_srcdir@/doc/figures
+IMAGE_PATH = ./figures
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
 #---------------------------------------------------------------------------

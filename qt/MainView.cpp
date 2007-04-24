@@ -100,7 +100,7 @@ MainView::MainView(int argc, char **argv)
   PGModes->insertItem("Start On Line",this, SLOT(StartOnLine()), Key_S);
   PGModes->insertItem("Stop On Line",this, SLOT(StopOnLine()), Key_T);
 
-  std::istringstream strm("../src/PreviewControlParameters.ini ../../../../../OpenHRP/etc/HRP2JRL/ HRP2JRLmain.wrl HRP2Specificities.xml");
+  std::istringstream strm("../src/PreviewControlParameters.ini ../../../OpenHRP/etc/HRP2JRL/ HRP2JRLmain.wrl HRP2Specificities.xml");
   m_PGI =  new PatternGeneratorJRL::PatternGeneratorInterface(strm);
 
   // Status bar.

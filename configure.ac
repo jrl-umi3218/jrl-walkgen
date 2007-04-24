@@ -3,10 +3,13 @@ dnl
 dnl Copyright (c) 2007 CNRS/LAAS
 dnl
 dnl
-AC_INIT([walkGenJRL],[2.1],[openrobots@laas.fr])
+dnl Modified by Olivier Stasse 2007 CNRS/AIST
+dnl
+AC_INIT([walkGenJRL],[2.2],[openrobots@laas.fr])
 AC_PREREQ(2.59)
 
 AM_INIT_AUTOMAKE
+
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
@@ -30,7 +33,6 @@ AC_ARG_WITH(boost-sandbox,
 	CPPFLAGS="${CPPFLAGS} -D_BOOST_MATRIX_",
 	)
 
-
 AC_ARG_WITH(VNL,
 	AS_HELP_STRING([--with-VNL], [VNL linear algebra package prefix]),
 	VNL_CFLAGS="-I${withval}/include -D_VNL_MATRIX_"
@@ -50,7 +52,13 @@ LDFLAGS="${LDFLAGS} -llapack"
 
 AC_OUTPUT(Makefile
 	src/Makefile
+	include/walkGenJrl/Makefile
+	include/walkGenJrl/Mathematics/Makefile
+	include/walkGenJrl/MotionGeneration/Makefile
+	include/walkGenJrl/PreviewControl/Makefile
+	include/walkGenJrl/ZMPRefTrajectoryGeneration/Makefile
 	doc/Makefile
+	unitTesting/Makefile
 	doc/pgjrl.dox
 	walkGenJrl.pc
 )

@@ -1,0 +1,68 @@
+<Humanoid name="HRP2">
+  <Feet>	
+    <Right>
+	<SizeX> 0.2172 </SizeX>
+	<SizeY> 0.138 </SizeY>
+        <SizeZ> 0.105 </SizeZ>
+        <AnklePosition> 0.059 0.0933 0.105 </AnklePosition>
+        <JointNb> 2 </JointNb>
+        <JointsID> 4 5 </JointsID>
+    </Right>
+    <Left>
+	<SizeX> 0.2172 </SizeX>
+	<SizeY> 0.138 </SizeY>
+        <SizeZ> 0.105 </SizeZ>
+        <AnklePosition>0.059 0.0933 0.105</AnklePosition>
+        <JointNb> 2 </JointNb>
+        <JointsID> 10 11 </JointsID>
+    </Left>
+  </Feet>	
+  <Waist>
+    <Right>
+      <WaistToHip>0.0 -0.06 0.0</WaistToHip>
+    </Right>
+    <Left>
+      <WaistToHip>0.0 0.06 0.0</WaistToHip>
+    </Left>
+    <JointNb> 1 </JointNb>
+    <JointsID> -1 </JointsID>
+  </Waist>
+  <Legs>
+    <Right>
+        <HipLength>0.0 -0.035 0.0 </HipLength>
+        <FemurLength> 0.3 </FemurLength>
+        <TibiaLength> 0.3 </TibiaLength>
+        <JointNb> 4 </JointNb>
+        <JointsID> 0 1 2 3</JointsID>
+    </Right>
+    <Left> 
+        <HipLength>0.0 0.035 0.0</HipLength> 
+        <FemurLength>0.3</FemurLength>
+        <TibiaLength> 0.3 </TibiaLegnth>
+        <JointNb> 4 </JointNb>
+        <JointsID> 6 7 8 9 </JointsID>
+    </Left>
+  </Legs>
+  <Arms>
+    <Right>
+        <UpperArmLength> 0.25 </UpperArmLength>
+        <ForeArmLength> 0.25 </ForeArmLength>
+        <JointNb> 7 </JointNb>
+        <JointsID> 16 17 18 19 20 21 22 </JointsID>
+    </Right>
+    <Left>
+        <UpperArmLength> 0.25 </UpperArmLength>
+        <ForeArmLength> 0.25 </ForeArmLength>
+        <JointNb> 7 </JointNb>
+        <JointsID> 23 24 25 26 27 28 29 </JointsID>
+    </Left>
+  </Arms>
+  <Head> 
+       <JointNb> 2 </JointNb>
+       <JointsID> 14 15 </JointsID>
+  </Head>
+  <Chest>
+       <JointNb> 2 </JointNb>
+       <JointsID> 12 13 </JointsID>
+  </Chest>
+</Humanoid>

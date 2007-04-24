@@ -32,13 +32,13 @@ EXTRA_DIST=\
 	common.dox	\
 	header.html	\
 	footer.html	\
-	pgjrl.css \
-	additionalHeader/modules.h \
+	pgjrl.css 	\
+	additionalHeader/modules.h 	\
 	pictures/HRP2.jpg
 
 all: html
 
-install: 
+install:html
 	mkdir -p $(walkGenJRLDocdir)
 	$(INSTALL_DATA) html/* $(walkGenJRLDocdir)
 	mkdir -p $(walkGenJRLDocdir)/pictures

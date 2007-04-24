@@ -33,12 +33,12 @@
 #include <fstream>
 #include <math.h>
 
-#include <MatrixAbstractLayer.h>
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
 #define deg2rad(x) x*M_PI/180.0
 #define rad2deg(x) x*180.0/M_PI
 
-#if 1
+#if 0
 #define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "StepStackHandler: " << x << endl; DebugFile.close();}
 #else
 #define ODEBUG4(x,y) 
@@ -137,6 +137,7 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 	    else 
 	      break;
 				
+	    aFootPosition.DeviationHipHeight = 0;
 	    aFootPosition.SStime=m_SingleSupportTime;
 	    aFootPosition.DStime=m_DoubleSupportTime;
 	    aFootPosition.stepType=1;
@@ -146,7 +147,7 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 		    aFootPosition.SStime << " " << 
 		    aFootPosition.DStime << " " << 
 		    aFootPosition.DeviationHipHeight << " " ,
-		    "DebugFootPrint.dat");
+		    "DebugGMFKW.dat");
 			
 	    m_RelativeFootPositions.push_back(aFootPosition);
 	  }
