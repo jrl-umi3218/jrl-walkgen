@@ -52,8 +52,15 @@ libwalkGenJRL_la_SOURCES = \
 	StepStackHandler.cpp \
 	PatternGeneratorInterface.cpp 
 
-libwalkGenJRL_la_CPPFLAGS = -I$(srcdir)/../include/walkGenJrl/	  
-libwalkGenJRL_la_LIBS = -llapack
+libwalkGenJRL_la_CPPFLAGS = \
+	-I$(srcdir)/../include/walkGenJrl/ \
+	@DYNAMICJRLJAP_CFLAGS@ 
+
+
+libwalkGenJRL_la_LIBS = \
+	-llapack \
+	@DYNAMICJRLJAP_LIBS@
+
 
 
 

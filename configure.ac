@@ -15,37 +15,43 @@ AC_PROG_LIBTOOL
 
 AC_PROG_CXX
 
-AC_SUBST(BOOST_SANDBOX_CFLAGS)
-AC_SUBST(BOOST_CFLAGS)
-AC_SUBST(VNL_CFLAGS)
-AC_SUBST(VNL_LIB)
+dnl AC_SUBST(BOOST_SANDBOX_CFLAGS)
+dnl AC_SUBST(BOOST_CFLAGS)
+dnl AC_SUBST(VNL_CFLAGS)
+dnl AC_SUBST(VNL_LIB)
+dnl
+dnl AC_ARG_WITH(boost,
+dnl	AS_HELP_STRING([--with-boost], [boost installation prefix]),
+dnl	BOOST_CFLAGS=-I${withval}/include
+dnl	CXXFLAGS="${CXXFLAGS} -I${withval}/include",
+dnl	)
+dnl
+dnl AC_ARG_WITH(boost-sandbox, 
+dnl	AS_HELP_STRING([--with-boost-sandbox], [boost-sandbox prefix (lapack bindings)]),
+dnl	BOOST_SANDBOX_CFLAGS="-I${withval} -D_BOOST_MATRIX_"
+dnl	CXXFLAGS="${CXXFLAGS} -I${withval}" 
+dnl	CPPFLAGS="${CPPFLAGS} -D_BOOST_MATRIX_",
+dnl	)
+dnl
+dnl AC_ARG_WITH(VNL,
+dnl	AS_HELP_STRING([--with-VNL], [VNL linear algebra package prefix]),
+dnl	VNL_CFLAGS="-I${withval}/include -D_VNL_MATRIX_"
+dnl	VNL_LIB="-L${withval}/lib -lVNL"
+dnl	CXXFLAGS="${CXXFLAGS} -D_VNL_MATRIX_ -I${withval}/include"
+dnl	LDFLAGS="${LDFLAGS} -L${withval}/lib -lVNL",
+dnl	)
+dnl
+dnl AC_ARG_WITH(lapack,
+dnl	AS_HELP_STRING([--with-lapack], [lapack prefix]),
+dnl	LAPACK_CFLAGS="-I${withval}/include"
+dnl	LAPACK_LIBS="-L${withval}/lib",
+dnl	)
 
-AC_ARG_WITH(boost,
-	AS_HELP_STRING([--with-boost], [boost installation prefix]),
-	BOOST_CFLAGS=-I${withval}/include
-	CXXFLAGS="${CXXFLAGS} -I${withval}/include",
-	)
 
-AC_ARG_WITH(boost-sandbox, 
-	AS_HELP_STRING([--with-boost-sandbox], [boost-sandbox prefix (lapack bindings)]),
-	BOOST_SANDBOX_CFLAGS="-I${withval} -D_BOOST_MATRIX_"
-	CXXFLAGS="${CXXFLAGS} -I${withval}" 
-	CPPFLAGS="${CPPFLAGS} -D_BOOST_MATRIX_",
-	)
+PKG_CHECK_MODULES(DYNAMICJRLJAP, dynamicsJRLJapan >= 1.0 )
+AC_SUBST(DYNAMICJRLJAP_CFLAGS)
+AC_SUBST(DYNAMICJRLJAP_LIBS)
 
-AC_ARG_WITH(VNL,
-	AS_HELP_STRING([--with-VNL], [VNL linear algebra package prefix]),
-	VNL_CFLAGS="-I${withval}/include -D_VNL_MATRIX_"
-	VNL_LIB="-L${withval}/lib -lVNL"
-	CXXFLAGS="${CXXFLAGS} -D_VNL_MATRIX_ -I${withval}/include"
-	LDFLAGS="${LDFLAGS} -L${withval}/lib -lVNL",
-	)
-
-AC_ARG_WITH(lapack,
-	AS_HELP_STRING([--with-lapack], [lapack prefix]),
-	LAPACK_CFLAGS="-I${withval}/include"
-	LAPACK_LIBS="-L${withval}/lib",
-	)
 
 CXXFLAGS="${CXXFLAGS} -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_"
 LDFLAGS="${LDFLAGS} -llapack"
