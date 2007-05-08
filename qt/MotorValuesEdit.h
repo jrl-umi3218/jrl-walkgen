@@ -16,20 +16,19 @@
 #include <qtable.h>
 #include <qvbox.h>
 
-
 class MotorValuesEdit: public QWidget
 {
   Q_OBJECT
 
    public:
-  MotorValuesEdit(QWidget * parent, const char * name,MultiBody *aMB=0);
+  MotorValuesEdit(QWidget * parent, const char * name,HRP2DisplayNS::MultiBody *aMB=0);
 
   ~MotorValuesEdit();
 
 
  public:
   //Specify the multibody  to use 
-  void SetMultiBody(MultiBody *aMB);
+  void SetMultiBody(HRP2DisplayNS::MultiBody *aMB);
 
   public slots:
 
@@ -47,7 +46,7 @@ class MotorValuesEdit: public QWidget
   void resizeEvent(QResizeEvent *aRE);
 
   // Reference to the robot's multibody.
-  MultiBody *m_MB;
+  HRP2DisplayNS::MultiBody *m_MB;
   
   // Table;
   QTable * m_Table;

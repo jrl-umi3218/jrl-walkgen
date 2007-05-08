@@ -11,6 +11,8 @@ using namespace std;
 
 #define LISTE_VIDE 0
 
+namespace HRP2DisplayNS
+{
 struct geometrieCorps {
 	int nb;
 	int *liste;
@@ -21,4 +23,5 @@ int parserASE(const char* nom, const char *option);
 
 
 geometrieCorps lireBOD(string path, string nom, const char *option);
+};
 #endif /*_PARSER_ASE_H_ */

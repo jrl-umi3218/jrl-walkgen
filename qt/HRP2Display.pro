@@ -12,5 +12,5 @@ HEADERS += HRP2Display.h HRP2DisplayGL.h \
 SOURCES += HRP2Display.cpp HRP2DisplayGL.cpp MotorValuesEdit.cpp main.cpp MainView.cpp \
 	HRP2Model/ASE.cpp joystick.cpp
 
-INCLUDEPATH += ./HRP2Model /usr/include/GL ../src ../include
-LIBS += -lglut -L../src/ -lWalkGenJRL -L../lib -lVNL -lg2c
+INCLUDEPATH += ./HRP2Model /usr/include/GL ../src ../include /usr/local/include/walkGenJrl/ /usr/include/boost-sandbox/ 
+LIBS += -lglut -L../src/ -lwalkGenJRL -ldynamicsJRLJapan -L../lib -llapack -lg2c 

@@ -59,7 +59,7 @@ class HRP2DisplayGL : public QGLWidget
     // Angles for the robot.
 
 
-  Body  * m_BODYa,
+  HRP2DisplayNS::Body  * m_BODYa,
     * m_BODYb,
     * m_BODYc,
     

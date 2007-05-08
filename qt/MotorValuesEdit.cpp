@@ -1,8 +1,10 @@
 #include <iostream>
+
+
 using namespace std;
 
 #include "MotorValuesEdit.h"
-
+using namespace HRP2DisplayNS;
 #include <qpushbutton.h>
 #include <qvbox.h>
 #include <qhbox.h>
@@ -12,7 +14,7 @@ using namespace std;
 
 MotorValuesEdit::MotorValuesEdit(QWidget *parent,
 				 const char *name,
-				 MultiBody *aMB)
+				 HRP2DisplayNS::MultiBody *aMB)
   :QWidget(parent,name)
 {
   m_Table = 0;
@@ -34,7 +36,7 @@ MotorValuesEdit::~MotorValuesEdit()
 {
 }
 
-void MotorValuesEdit::SetMultiBody(MultiBody *aMB)
+void MotorValuesEdit::SetMultiBody(HRP2DisplayNS::MultiBody *aMB)
 {
   vector<float*> lienSpinner;			//pointeur sur les variables de transformations
 

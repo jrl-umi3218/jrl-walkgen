@@ -134,7 +134,7 @@ void UpperBodyMotion::ReadDataFile(string aFileName, MAL_MATRIX(&UpperBodyAngles
       aif.close();
     }
   else 
-    std::cerr << "Unable to open " << aFileName << endl;
+    std::cerr << "UpperBodyMotion - Unable to open " << aFileName << endl;
   
 }
 

@@ -6,7 +6,7 @@
 //    Licensed under the terms of the Lesser General Public License.
 //
 
-#include <MatrixAbstractLayer.h>
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
 #include <iostream>
 #include <fstream>
@@ -45,7 +45,6 @@
 #include "MotorValuesEdit.h"
 
 
-using namespace PatternGeneratorJRL;
 
 QProgressDialog *pd;
 QLabel *label_mesh, *label_features, *label_fps;
@@ -100,9 +99,22 @@ MainView::MainView(int argc, char **argv)
   PGModes->insertItem("Start On Line",this, SLOT(StartOnLine()), Key_S);
   PGModes->insertItem("Stop On Line",this, SLOT(StopOnLine()), Key_T);
 
-  std::istringstream strm("../src/PreviewControlParameters.ini ../../../OpenHRP/etc/HRP2JRL/ HRP2JRLmain.wrl HRP2Specificities.xml");
+  std::istringstream strm("../src/data/PreviewControlParameters.ini ../../../../etc/HRP2JRL/ HRP2JRLmain.wrl ./HRP2Specificities.xml ./HRP2LinkJointRank.xml");
+  /*
+  std::string  AString;
+  strm >> AString ;
+  cout << AString << endl;
+  strm >> AString ;
+  cout << AString << endl;
+  strm >> AString ;
+  cout << AString << endl;
+  strm >> AString ;
+  cout << AString << endl;
+  strm >> AString ;
+  cout << AString << endl;
+  */
   m_PGI =  new PatternGeneratorJRL::PatternGeneratorInterface(strm);
-
+  
   // Status bar.
   // Display speed of display.
   label_fps = new QLabel(" FPS: 0.0 ", statusBar(), "FPS Label");
@@ -126,7 +138,7 @@ MainView::MainView(int argc, char **argv)
 
   // Connect to the joystick.
   m_Joystick = new Joystick();
-
+  
   MAL_MATRIX_RESIZE(UpperBodyAngles,28,1);
 }
 
@@ -162,7 +174,7 @@ void MainView::LoadCameraParameters()
 
 void MainView::load_view(int id)
 {
-
+  int lid =id;
 }
 
 void MainView::GenerateImageFromViews()
@@ -255,11 +267,11 @@ void MainView::ComputeAPostureFromEulerAngles(PatternGeneratorJRL::COMPosition &
 {
   // Compute Waist Posture.
   double c,s,co,so;
-  c = cos(aPosition.theta*M_PI/180.0);
-  s = sin(aPosition.theta*M_PI/180.0);
+  c = cos(aPosition.yaw*M_PI/180.0);
+  s = sin(aPosition.yaw*M_PI/180.0);
   
-  co = cos(aPosition.omega*M_PI/180.0);
-  so = sin(aPosition.omega*M_PI/180.0);
+  co = cos(aPosition.pitch*M_PI/180.0);
+  so = sin(aPosition.pitch*M_PI/180.0);
   
   // COM Orientation
   Posture[0] = c*co;Posture[1]  = -s; Posture[2] = c*so;Posture[3]  = aPosition.x[0];
@@ -279,10 +291,15 @@ void MainView::timerEvent()
       MAL_MATRIX_DIM(qr,double,6,1);
       MAL_MATRIX_DIM(ql,double,6,1);
 
-      MAL_MATRIX_DIM(ZMPTarget,double,3,1);
-      PatternGeneratorJRL::COMPosition CurrentWaistPosition;
+      MAL_VECTOR(,double) CurrentConfiguration;
+      MAL_VECTOR(,double) CurrentVelocity;
 
-      if(m_PGI->RunOneStepOfTheControlLoop(qr,ql,UpperBodyAngles,ZMPTarget,CurrentWaistPosition))
+      MAL_VECTOR_DIM(ZMPTarget,double,3);
+
+
+      if(m_PGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
+					   CurrentVelocity,
+					   ZMPTarget))
 	{
 	  double lMotors[30];
 
@@ -290,26 +307,40 @@ void MainView::timerEvent()
 
 	  // Right Leg
 	  for(int i=0;i<6;i++)
-	    lMotors[GlobalIndex++] = qr(i,0);
+	    lMotors[GlobalIndex++] = CurrentConfiguration(6+i);
 	  
 	  // Left Leg 
 	  for(int i=0;i<6;i++)
-	    lMotors[GlobalIndex++] = ql(i,0);
+	    lMotors[GlobalIndex++] = CurrentConfiguration(12+i);
 	  
 	  // UpperBody
 	  for(int i=0;i<18;i++)
-	    lMotors[GlobalIndex++] = UpperBodyAngles(i,0);
+	    lMotors[GlobalIndex++] = CurrentConfiguration(18+i);
 	  
 	  double WaistPosture[16];
-	  //ComputeAPostureFromEulerAngles(CurrentWaistPosition,WaistPosture);
-	  MAL_MATRIX(lWaistAbsPos,double);
-	  m_PGI->getWaistPositionMatrix(lWaistAbsPos);
+	  double COMtheta, COMomega;
+	  double CosOmega, SinOmega;
+	  double CosTheta, SinTheta;
 
-	  for(int i=0;i<4;i++)
-	    for(int j=0;j<4;j++)
-	      WaistPosture[i*4+j] = lWaistAbsPos(i,j);
+	  COMtheta = CurrentConfiguration(5);
+	  COMomega = CurrentConfiguration(4);
+
+	  CosTheta = cos(COMtheta*M_PI/180.0);
+	  SinTheta = sin(COMtheta*M_PI/180.0);
 	  
-	  //cout << "Position: " << WaistPosture[3] << " " << WaistPosture[7] << " " << WaistPosture[11] << endl;
+	  CosOmega = cos(COMomega*M_PI/180.0);
+	  SinOmega = sin(COMomega*M_PI/180.0);
+	  
+	  WaistPosture[0] = CosTheta*CosOmega; WaistPosture[1] = -SinTheta; WaistPosture[2]  = CosTheta*SinOmega;
+	  WaistPosture[4] = SinTheta*CosOmega; WaistPosture[5] =  CosTheta; WaistPosture[6]  = SinTheta*SinOmega;
+	  WaistPosture[8] =         -SinOmega; WaistPosture[9] =         0; WaistPosture[10] = CosOmega;
+
+	  for(int i=0;i<3;i++)
+	    {
+	      WaistPosture[3*4+i] = 0.0;
+	      WaistPosture[i*4+3] = CurrentConfiguration(i);
+	    }
+	  WaistPosture[15] = 1.0;
 	  emit sendMotorsAndWaistPosture(lMotors,WaistPosture);
 	}
       else
@@ -332,10 +363,12 @@ void MainView::timerEvent()
 
 void MainView::takeShot(int item)
 {
+  int litem = item;
 }
 
 void MainView::save_as(int item)
 {
+  int litem = item;
 }
 
 void MainView::load_file()
@@ -389,16 +422,15 @@ void MainView::InitialPosition(QString s )
 
       // Conversion in radians.
       double degtorad = M_PI/180.0;
-      MAL_MATRIX_DIM(InitialPosition,double,40,1);
-      MAL_MATRIX_DIM(CurrentPosition,double,40,1);
+      MAL_VECTOR_DIM(InitialPosition,double,41);
+      MAL_VECTOR_DIM(CurrentPosition,double,41);
   
       for(int i=0;i<30;i++)
 	{
 	  lMotors[i] *=degtorad;
 	  
-	  InitialPosition(i,0) = lMotors[i];
+	  InitialPosition(i) = lMotors[i];
 
-	  //std::cout << i << " : " << lMotors[i] << std::endl;
 	}
       m_PGI->SetCurrentJointValues(InitialPosition);
 
@@ -409,10 +441,7 @@ void MainView::InitialPosition(QString s )
 	InitRightAbsPos;
 
       m_PGI->EvaluateStartingCOM(InitialPosition,
-				 lStartingCOMPosition,
-				 lStartingWaistPosition,
-				 InitLeftAbsPos,
-				 InitRightAbsPos);
+				 lStartingCOMPosition);
 
       double WaistPosture[16]={1.0, 0.0, 0.0, 0.0,
 			       0.0, 1.0, 0.0, 0.0,
@@ -422,9 +451,6 @@ void MainView::InitialPosition(QString s )
       WaistPosture[3] = lStartingWaistPosition(0);
       WaistPosture[7] = lStartingWaistPosition(1);
       WaistPosture[11] = lStartingWaistPosition(2);
-      cout << "Initialization Position " << WaistPosture[3] << " " 
-	   << WaistPosture[7] << " " 
-	   << WaistPosture[11] << endl;
       emit sendMotorsAndWaistPosture(lMotors,WaistPosture);
     } 
 }

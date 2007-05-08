@@ -98,7 +98,7 @@ void PreviewControl::ReadPrecomputedFile(string aFileName)
       aif.close();
     }
   else 
-    cerr << "Unable to open " << aFileName << endl;
+    cerr << "PreviewControl - Unable to open " << aFileName << endl;
     
 }
 

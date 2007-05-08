@@ -100,7 +100,9 @@ am_libwalkGenJRL_la_OBJECTS = libwalkGenJRL_la-Polynome.lo \
 	libwalkGenJRL_la-GenerateMotionFromKineoWorks.lo \
 	libwalkGenJRL_la-ComAndFootRealizationByGeometry.lo \
 	libwalkGenJRL_la-StepStackHandler.lo \
-	libwalkGenJRL_la-PatternGeneratorInterface.lo
+	libwalkGenJRL_la-PatternGeneratorInterface.lo \
+	libwalkGenJRL_la-SimplePlugin.lo \
+	libwalkGenJRL_la-SimplePluginManager.lo
 libwalkGenJRL_la_OBJECTS = $(am_libwalkGenJRL_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -151,6 +153,7 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
+GREP = @GREP@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -177,13 +180,9 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_STRIP = @ac_ct_STRIP@
-ac_pt_PKG_CONFIG = @ac_pt_PKG_CONFIG@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -200,23 +199,30 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
@@ -245,7 +251,9 @@ libwalkGenJRL_la_SOURCES = \
 	./MotionGeneration/GenerateMotionFromKineoWorks.cpp \
 	./MotionGeneration/ComAndFootRealizationByGeometry.cpp \
 	StepStackHandler.cpp \
-	PatternGeneratorInterface.cpp 
+	PatternGeneratorInterface.cpp \
+	SimplePlugin.cpp \
+	SimplePluginManager.cpp 
 
 libwalkGenJRL_la_CPPFLAGS = \
 	-I$(srcdir)/../include/walkGenJrl/ \
@@ -334,6 +342,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-Polynome.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-PolynomeFoot.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-PreviewControl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-SimplePlugin.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-SimplePluginManager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-StepOverPlanner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-StepOverPolynome.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwalkGenJRL_la-StepStackHandler.Plo@am__quote@
@@ -489,6 +499,20 @@ libwalkGenJRL_la-PatternGeneratorInterface.lo: PatternGeneratorInterface.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='PatternGeneratorInterface.cpp' object='libwalkGenJRL_la-PatternGeneratorInterface.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-PatternGeneratorInterface.lo `test -f 'PatternGeneratorInterface.cpp' || echo '$(srcdir)/'`PatternGeneratorInterface.cpp
+
+libwalkGenJRL_la-SimplePlugin.lo: SimplePlugin.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libwalkGenJRL_la-SimplePlugin.lo -MD -MP -MF "$(DEPDIR)/libwalkGenJRL_la-SimplePlugin.Tpo" -c -o libwalkGenJRL_la-SimplePlugin.lo `test -f 'SimplePlugin.cpp' || echo '$(srcdir)/'`SimplePlugin.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libwalkGenJRL_la-SimplePlugin.Tpo" "$(DEPDIR)/libwalkGenJRL_la-SimplePlugin.Plo"; else rm -f "$(DEPDIR)/libwalkGenJRL_la-SimplePlugin.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SimplePlugin.cpp' object='libwalkGenJRL_la-SimplePlugin.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-SimplePlugin.lo `test -f 'SimplePlugin.cpp' || echo '$(srcdir)/'`SimplePlugin.cpp
+
+libwalkGenJRL_la-SimplePluginManager.lo: SimplePluginManager.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libwalkGenJRL_la-SimplePluginManager.lo -MD -MP -MF "$(DEPDIR)/libwalkGenJRL_la-SimplePluginManager.Tpo" -c -o libwalkGenJRL_la-SimplePluginManager.lo `test -f 'SimplePluginManager.cpp' || echo '$(srcdir)/'`SimplePluginManager.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libwalkGenJRL_la-SimplePluginManager.Tpo" "$(DEPDIR)/libwalkGenJRL_la-SimplePluginManager.Plo"; else rm -f "$(DEPDIR)/libwalkGenJRL_la-SimplePluginManager.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SimplePluginManager.cpp' object='libwalkGenJRL_la-SimplePluginManager.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libwalkGenJRL_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libwalkGenJRL_la-SimplePluginManager.lo `test -f 'SimplePluginManager.cpp' || echo '$(srcdir)/'`SimplePluginManager.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

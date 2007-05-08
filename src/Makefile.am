@@ -50,7 +50,9 @@ libwalkGenJRL_la_SOURCES = \
 	./MotionGeneration/GenerateMotionFromKineoWorks.cpp \
 	./MotionGeneration/ComAndFootRealizationByGeometry.cpp \
 	StepStackHandler.cpp \
-	PatternGeneratorInterface.cpp 
+	PatternGeneratorInterface.cpp \
+	SimplePlugin.cpp \
+	SimplePluginManager.cpp 
 
 libwalkGenJRL_la_CPPFLAGS = \
 	-I$(srcdir)/../include/walkGenJrl/ \

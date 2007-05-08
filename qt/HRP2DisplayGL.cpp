@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 #include "HRP2DisplayGL.h"
 
 HRP2DisplayGL::HRP2DisplayGL(QWidget *parent, const char *name) : QGLWidget(parent,name)
@@ -159,96 +160,96 @@ void HRP2DisplayGL::initializeGL(void)
 void HRP2DisplayGL::LoadOpenGLFiles()
 {
   // Body
-  m_BODYa= new Body("./HRP2Model/BODYa.ASE","r");
-  m_BODYb= new Body("./HRP2Model/BODYb.ASE","r");
-  m_BODYc= new Body("./HRP2Model/BODYc.ASE","r");
+  m_BODYa= new HRP2DisplayNS::Body("./HRP2Model/BODYa.ASE","r");
+  m_BODYb= new HRP2DisplayNS::Body("./HRP2Model/BODYb.ASE","r");
+  m_BODYc= new HRP2DisplayNS::Body("./HRP2Model/BODYc.ASE","r");
 
   // Jambe droite
-  m_RLEGLINK0= new Body("./HRP2Model/RLEG_LINK0.ASE","r");
-  m_RLEGLINK1= new Body("./HRP2Model/RLEG_LINK1.ASE","r");
-  m_RLEGLINK2= new Body("./HRP2Model/RLEG_LINK2.ASE","r");
-  m_RLEGLINK3= new Body("./HRP2Model/RLEG_LINK3.ASE","r");
-  m_RLEGLINK4= new Body("./HRP2Model/RLEG_LINK4.ASE","r");
-  m_RLEGLINK5a= new Body("./HRP2Model/RLEG_LINK5a.ASE","r");
-  m_RLEGLINK5b= new Body("./HRP2Model/RLEG_LINK5b.ASE","r");
+  m_RLEGLINK0= new HRP2DisplayNS::Body("./HRP2Model/RLEG_LINK0.ASE","r");
+  m_RLEGLINK1= new HRP2DisplayNS::Body("./HRP2Model/RLEG_LINK1.ASE","r");
+  m_RLEGLINK2= new HRP2DisplayNS::Body("./HRP2Model/RLEG_LINK2.ASE","r");
+  m_RLEGLINK3= new HRP2DisplayNS::Body("./HRP2Model/RLEG_LINK3.ASE","r");
+  m_RLEGLINK4= new HRP2DisplayNS::Body("./HRP2Model/RLEG_LINK4.ASE","r");
+  m_RLEGLINK5a= new HRP2DisplayNS::Body("./HRP2Model/RLEG_LINK5a.ASE","r");
+  m_RLEGLINK5b= new HRP2DisplayNS::Body("./HRP2Model/RLEG_LINK5b.ASE","r");
 
   // Jambe gauche
-  m_LLEGLINK0= new Body("./HRP2Model/LLEG_LINK0.ASE","r");
-  m_LLEGLINK1= new Body("./HRP2Model/LLEG_LINK1.ASE","r");
-  m_LLEGLINK2= new Body("./HRP2Model/LLEG_LINK2.ASE","r");
-  m_LLEGLINK3= new Body("./HRP2Model/LLEG_LINK3.ASE","r");
-  m_LLEGLINK4= new Body("./HRP2Model/LLEG_LINK4.ASE","r");
-  m_LLEGLINK5a= new Body("./HRP2Model/LLEG_LINK5a.ASE","r");
-  m_LLEGLINK5b= new Body("./HRP2Model/LLEG_LINK5b.ASE","r");
+  m_LLEGLINK0= new HRP2DisplayNS::Body("./HRP2Model/LLEG_LINK0.ASE","r");
+  m_LLEGLINK1= new HRP2DisplayNS::Body("./HRP2Model/LLEG_LINK1.ASE","r");
+  m_LLEGLINK2= new HRP2DisplayNS::Body("./HRP2Model/LLEG_LINK2.ASE","r");
+  m_LLEGLINK3= new HRP2DisplayNS::Body("./HRP2Model/LLEG_LINK3.ASE","r");
+  m_LLEGLINK4= new HRP2DisplayNS::Body("./HRP2Model/LLEG_LINK4.ASE","r");
+  m_LLEGLINK5a= new HRP2DisplayNS::Body("./HRP2Model/LLEG_LINK5a.ASE","r");
+  m_LLEGLINK5b= new HRP2DisplayNS::Body("./HRP2Model/LLEG_LINK5b.ASE","r");
 
   // Torse
-  m_CHESTLINK0= new Body("./HRP2Model/CHEST_LINK0.ASE","r");
-  m_CHESTLINK1a= new Body("./HRP2Model/CHEST_LINK1a.ASE","r");
-  m_CHESTLINK1b= new Body("./HRP2Model/CHEST_LINK1b.ASE","r");
-  m_CHESTLINK1c= new Body("./HRP2Model/CHEST_LINK1c.ASE","r");
-  m_CHESTLINK1d= new Body("./HRP2Model/CHEST_LINK1d.ASE","r");
-  m_CHESTLINK1e= new Body("./HRP2Model/CHEST_LINK1e.ASE","r");
+  m_CHESTLINK0= new HRP2DisplayNS::Body("./HRP2Model/CHEST_LINK0.ASE","r");
+  m_CHESTLINK1a= new HRP2DisplayNS::Body("./HRP2Model/CHEST_LINK1a.ASE","r");
+  m_CHESTLINK1b= new HRP2DisplayNS::Body("./HRP2Model/CHEST_LINK1b.ASE","r");
+  m_CHESTLINK1c= new HRP2DisplayNS::Body("./HRP2Model/CHEST_LINK1c.ASE","r");
+  m_CHESTLINK1d= new HRP2DisplayNS::Body("./HRP2Model/CHEST_LINK1d.ASE","r");
+  m_CHESTLINK1e= new HRP2DisplayNS::Body("./HRP2Model/CHEST_LINK1e.ASE","r");
 
 	// Tete
-  m_HEADLINK0= new Body("./HRP2Model/HEAD_LINK0.ASE","r");
-  m_HEADLINK1a= new Body("./HRP2Model/HEAD_LINK1a.ASE","r");
-  m_HEADLINK1b= new Body("./HRP2Model/HEAD_LINK1b.ASE","r");
-  m_HEADLINK1c= new Body("./HRP2Model/HEAD_LINK1c.ASE","r");
-  m_HEADLINK1d= new Body("./HRP2Model/HEAD_LINK1d.ASE","r");
-  m_HEADLINK1e= new Body("./HRP2Model/HEAD_LINK1e.ASE","r");
+  m_HEADLINK0= new HRP2DisplayNS::Body("./HRP2Model/HEAD_LINK0.ASE","r");
+  m_HEADLINK1a= new HRP2DisplayNS::Body("./HRP2Model/HEAD_LINK1a.ASE","r");
+  m_HEADLINK1b= new HRP2DisplayNS::Body("./HRP2Model/HEAD_LINK1b.ASE","r");
+  m_HEADLINK1c= new HRP2DisplayNS::Body("./HRP2Model/HEAD_LINK1c.ASE","r");
+  m_HEADLINK1d= new HRP2DisplayNS::Body("./HRP2Model/HEAD_LINK1d.ASE","r");
+  m_HEADLINK1e= new HRP2DisplayNS::Body("./HRP2Model/HEAD_LINK1e.ASE","r");
 
 	// Bras droit
-  m_RARMLINK0= new Body("./HRP2Model/RARM_LINK0.ASE","r");
-  m_RARMLINK1= new Body("./HRP2Model/RARM_LINK1.ASE","r");
-  m_RARMLINK2a= new Body("./HRP2Model/RARM_LINK2a.ASE","r");
-  m_RARMLINK2b= new Body("./HRP2Model/RARM_LINK2b.ASE","r");
-  m_RARMLINK3a= new Body("./HRP2Model/RARM_LINK3a.ASE","r");
-  m_RARMLINK3b= new Body("./HRP2Model/RARM_LINK3b.ASE","r");
-  m_RARMLINK4= new Body("./HRP2Model/RARM_LINK4.ASE","r");
+  m_RARMLINK0= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK0.ASE","r");
+  m_RARMLINK1= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK1.ASE","r");
+  m_RARMLINK2a= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK2a.ASE","r");
+  m_RARMLINK2b= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK2b.ASE","r");
+  m_RARMLINK3a= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK3a.ASE","r");
+  m_RARMLINK3b= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK3b.ASE","r");
+  m_RARMLINK4= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK4.ASE","r");
  
   // Main droite
-  m_RH0= new Body("./HRP2Model/RARM_LINK5a.ASE", "r");
-  m_RH1= new Body("./HRP2Model/RARM_LINK5b.ASE", "r");
-  m_RH2= new Body("./HRP2Model/RARM_LINK6a.ASE", "r");
-  m_RH3= new Body("./HRP2Model/RARM_LINK6b.ASE", "r");
+  m_RH0= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK5a.ASE", "r");
+  m_RH1= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK5b.ASE", "r");
+  m_RH2= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK6a.ASE", "r");
+  m_RH3= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK6b.ASE", "r");
 
-  m_RG0= new Body("./HRP2Model/RARM_LINK5.ASE", "r");
-  m_RG1= new Body("./HRP2Model/RARM_LINK5_LOWERa.ASE", "r");
-  m_RG2= new Body("./HRP2Model//RARM_LINK5_LOWERb.ASE", "r");
-  m_RG3= new Body("./HRP2Model/RARM_LINK6.ASE",  "r");
-  m_RG4= new Body("./HRP2Model/RHAND_LINK0.ASE", "r");
-  m_RG5= new Body("./HRP2Model/RHAND_LINK1.ASE", "r");
-  m_RG6= new Body("./HRP2Model/RHAND_LINK2.ASE", "r");
-  m_RG7= new Body("./HRP2Model/RHAND_LINK3.ASE", "r");
-  m_RG8= new Body("./HRP2Model/RHAND_LINK4.ASE", "r");
+  m_RG0= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK5.ASE", "r");
+  m_RG1= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK5_LOWERa.ASE", "r");
+  m_RG2= new HRP2DisplayNS::Body("./HRP2Model//RARM_LINK5_LOWERb.ASE", "r");
+  m_RG3= new HRP2DisplayNS::Body("./HRP2Model/RARM_LINK6.ASE",  "r");
+  m_RG4= new HRP2DisplayNS::Body("./HRP2Model/RHAND_LINK0.ASE", "r");
+  m_RG5= new HRP2DisplayNS::Body("./HRP2Model/RHAND_LINK1.ASE", "r");
+  m_RG6= new HRP2DisplayNS::Body("./HRP2Model/RHAND_LINK2.ASE", "r");
+  m_RG7= new HRP2DisplayNS::Body("./HRP2Model/RHAND_LINK3.ASE", "r");
+  m_RG8= new HRP2DisplayNS::Body("./HRP2Model/RHAND_LINK4.ASE", "r");
 	
 
   // Bras Gauche
-  m_LARMLINK0= new Body("./HRP2Model/LARM_LINK0.ASE","r");
-  m_LARMLINK1= new Body("./HRP2Model/LARM_LINK1.ASE","r");
-  m_LARMLINK2a= new Body("./HRP2Model/LARM_LINK2a.ASE","r");
-  m_LARMLINK2b= new Body("./HRP2Model/LARM_LINK2b.ASE","r");
-  m_LARMLINK3a= new Body("./HRP2Model/LARM_LINK3a.ASE","r");
-  m_LARMLINK3b= new Body("./HRP2Model/LARM_LINK3b.ASE","r");
-  m_LARMLINK4= new Body("./HRP2Model/LARM_LINK4.ASE","r");
+  m_LARMLINK0= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK0.ASE","r");
+  m_LARMLINK1= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK1.ASE","r");
+  m_LARMLINK2a= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK2a.ASE","r");
+  m_LARMLINK2b= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK2b.ASE","r");
+  m_LARMLINK3a= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK3a.ASE","r");
+  m_LARMLINK3b= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK3b.ASE","r");
+  m_LARMLINK4= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK4.ASE","r");
 
   // Main Gauche
   // HumanLike hand
-  m_LH0= new Body("./HRP2Model/LARM_LINK5a.ASE", "r");
-  m_LH1= new Body("./HRP2Model/LARM_LINK5b.ASE", "r");
-  m_LH2= new Body("./HRP2Model/LARM_LINK6a.ASE", "r");
-  m_LH3= new Body("./HRP2Model/LARM_LINK6b.ASE", "r");
+  m_LH0= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK5a.ASE", "r");
+  m_LH1= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK5b.ASE", "r");
+  m_LH2= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK6a.ASE", "r");
+  m_LH3= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK6b.ASE", "r");
 
   // GripperLike hand
-  m_LG0= new Body("./HRP2Model/LARM_LINK5.ASE", "r");
-  m_LG1= new Body("./HRP2Model/LARM_LINK5_LOWERa.ASE", "r");
-  m_LG2= new Body("./HRP2Model/LARM_LINK5_LOWERb.ASE", "r");
-  m_LG3= new Body("./HRP2Model/LARM_LINK6.ASE", "r");
-  m_LG4= new Body("./HRP2Model/LHAND_LINK0.ASE", "r");
-  m_LG5= new Body("./HRP2Model/LHAND_LINK1.ASE", "r");
-  m_LG6= new Body("./HRP2Model/LHAND_LINK2.ASE", "r");
-  m_LG7= new Body("./HRP2Model/LHAND_LINK3.ASE", "r");
-  m_LG8= new Body("./HRP2Model/LHAND_LINK4.ASE", "r");
+  m_LG0= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK5.ASE", "r");
+  m_LG1= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK5_LOWERa.ASE", "r");
+  m_LG2= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK5_LOWERb.ASE", "r");
+  m_LG3= new HRP2DisplayNS::Body("./HRP2Model/LARM_LINK6.ASE", "r");
+  m_LG4= new HRP2DisplayNS::Body("./HRP2Model/LHAND_LINK0.ASE", "r");
+  m_LG5= new HRP2DisplayNS::Body("./HRP2Model/LHAND_LINK1.ASE", "r");
+  m_LG6= new HRP2DisplayNS::Body("./HRP2Model/LHAND_LINK2.ASE", "r");
+  m_LG7= new HRP2DisplayNS::Body("./HRP2Model/LHAND_LINK3.ASE", "r");
+  m_LG8= new HRP2DisplayNS::Body("./HRP2Model/LHAND_LINK4.ASE", "r");
 
 
   // Fin chargement des objets graphiques

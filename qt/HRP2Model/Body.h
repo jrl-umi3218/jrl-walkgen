@@ -1,5 +1,8 @@
-#ifndef _BODY_H_
-#define _BODY_H_
+#ifndef _HRP2DISPLAYNS_BODY_H_
+#define _HRP2DISPLAYNS_BODY_H_
+
+namespace HRP2DisplayNS
+{
 
 class Body
 {
@@ -11,5 +14,6 @@ public:
 	Body(void);
 	Body(const char *, const char *);
 	~Body(void);
+};
 };
 #endif

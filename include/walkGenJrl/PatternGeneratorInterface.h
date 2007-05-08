@@ -57,16 +57,19 @@
 #include <StepStackHandler.h>
 #include <robotDynamicsJRLJapan/HumanoidDynamicMultiBody.h>
 
+#include <SimplePluginManager.h>
 
 namespace PatternGeneratorJRL
 {
+  class SimplePlugin;
+
   /** @ingroup Interface
       This class is the interface between the Pattern Generator and the 
       external world. In addition to the classical setter and getter for various parameters
       there is the possibility to pass commands a string of stream to the method
       \a ParseCmd().
    */
-  class PatternGeneratorInterface
+  class PatternGeneratorInterface : public SimplePluginManager
   {    
   public:
     
@@ -288,6 +291,16 @@ namespace PatternGeneratorJRL
 
     /*! @}*/
 
+    /*! System to call a given method based on registration of a method. 
+      @{
+     */
+    /*! \brief This method register a method to a specific
+      object which derivates from SimplePlugin class 
+    */
+    bool RegisterMethod(string &MethodName, SimplePlugin *aSP);
+
+    /*! @} */
+
   private:
 
     /*! Object to handle the stack of relative steps. */
@@ -496,7 +509,13 @@ namespace PatternGeneratorJRL
     double m_DeltaFeasibilityLimit;	
     
     /* @} */
+
+
+
   };
+
 };
+
+
 #endif
 

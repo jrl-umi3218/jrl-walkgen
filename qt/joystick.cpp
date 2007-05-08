@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include "joystick.h"
 
 #define JOYSTICK_DEVFS "/dev/input/js0" /* devfs */

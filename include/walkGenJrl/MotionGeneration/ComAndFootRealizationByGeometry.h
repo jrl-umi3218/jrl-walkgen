@@ -62,7 +62,7 @@ namespace PatternGeneratorJRL
     /*! \name Constructor and destructor */
 
     /*! Constructor */
-    ComAndFootRealizationByGeometry();
+    ComAndFootRealizationByGeometry(PatternGeneratorInterface * aPatternGeneratorInterface);
     /*! Destructor */
     ~ComAndFootRealizationByGeometry();
     /** @} */
@@ -215,6 +215,10 @@ namespace PatternGeneratorJRL
 			      MAL_VECTOR(,double) & qr,
 			      MAL_S3_VECTOR(,double) & AbsoluteWaistPosition);
 
+    /*! \brief Implement the Plugin part to receive information from 
+      PatternGeneratorInterface.
+     */
+    void CallMethod(string &Method, istringstream &istrm);
 
   private:
 
@@ -237,8 +241,12 @@ namespace PatternGeneratorJRL
     /*! Pointer to Inverse Kinematics */
     InverseKinematics * m_InverseKinematics;
     
-    /*! Displacement between the hip and the foot. */
-    MAL_S3_VECTOR(m_Dt,double);
+    /*! \brief Displacement between the hip and the foot. @{*/
+    /*! \brief For the right foot. */
+    MAL_S3_VECTOR(m_DtRight,double);
+    /*! \brief For the left foot. */
+    MAL_S3_VECTOR(m_DtLeft,double);
+    /*! @} */
     
     /*! \name Vector from the Waist to the left and right hip. */
 

@@ -557,7 +557,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   RightHandAbsolutePositions.resize(AddArraySize);
 
   // Also very important for the initialization: reshape the ZMP reference for a smooth starting.
-  ODEBUG3("lStartingCOMPosition :" << lStartingCOMPosition);
+  ODEBUG("lStartingCOMPosition :" << lStartingCOMPosition);
 #if 1
   double startingZMPREF[2] = { lStartingCOMPosition(0), lStartingCOMPosition(1)};
 #else
@@ -2275,6 +2275,8 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
   double prev_xmin=1e7, prev_xmax=-1e7, prev_ymin=1e7, prev_ymax=-1e7;
   RESETDEBUG4("ConstraintMax.dat");
 
+  double s_t,c_t;
+
   // Going through the set of generated data for each 5 ms.
   // from this extract a set of linear constraints.
   for(unsigned int i=0;i<LeftFootAbsolutePositions.size();i++)
@@ -2330,10 +2332,19 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 	      lx=LeftFootAbsolutePositions[i].x;
 	      ly=LeftFootAbsolutePositions[i].y;
 	      
+	      s_t = sin(LeftFootAbsolutePositions[i].theta); 
+	      c_t = cos(LeftFootAbsolutePositions[i].theta);  
 	      for(unsigned j=0;j<4;j++)
 		{
-		  aVecOfPoints[j].col = lx + lxcoefs[j]*  lLeftFootHalfWidth;
-		  aVecOfPoints[j].row = ly + lycoefs[j]*  lLeftFootHalfHeight;
+		  aVecOfPoints[j].col = lx + ( lxcoefs[j] * lLeftFootHalfWidth 
+					       * c_t 
+					       - lycoefs[j] * 
+					       lLeftFootHalfHeight * s_t );
+		  aVecOfPoints[j].row = ly + ( lxcoefs[j] * lLeftFootHalfWidth 
+					       * s_t 
+					       + lycoefs[j] * 
+					       lLeftFootHalfHeight * c_t );
+
 
 		  // Computes the maxima.
 		  xmin = aVecOfPoints[j].col < xmin ? aVecOfPoints[j].col : xmin;
@@ -2345,12 +2356,19 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 	      ODEBUG("State 3-1 " << xmin << " " << xmax << " " << ymin << " " << ymax);
 	      lx=RightFootAbsolutePositions[i].x;
 	      ly=RightFootAbsolutePositions[i].y;
+
+	      s_t = sin(RightFootAbsolutePositions[i].theta); //+
+	      c_t = cos(RightFootAbsolutePositions[i].theta); //+ 
+	      
 	      ODEBUG("Right Foot: " << lx << " " << ly );
 	      for(unsigned j=0;j<4;j++)
 		{
-		  aVecOfPoints[j+4].col = lx + lxcoefs[j]*  lRightFootHalfWidth;
-		  aVecOfPoints[j+4].row = ly + lycoefs[j]*  lRightFootHalfHeight;
-		  
+		  aVecOfPoints[j+4].col = lx + ( lxcoefs[j] * lRightFootHalfWidth
+						 * c_t - lycoefs[j] * 
+						 lRightFootHalfHeight * s_t ); 
+		  aVecOfPoints[j+4].row = ly + ( lxcoefs[j] * lRightFootHalfWidth
+						 * s_t + lycoefs[j] * 
+						 lRightFootHalfHeight * c_t );  
 		  // Computes the maxima.
 		  xmin = aVecOfPoints[j+4].col < xmin ? aVecOfPoints[j+4].col : xmin;
 		  xmax = aVecOfPoints[j+4].col > xmax ? aVecOfPoints[j+4].col : xmax;
@@ -2374,12 +2392,16 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 		{
 		  lx=LeftFootAbsolutePositions[i].x;
 		  ly=LeftFootAbsolutePositions[i].y;
-	      
-		  for(unsigned j=0;j<4;j++)
+		  
+		  s_t = sin(LeftFootAbsolutePositions[i].theta); 
+		  c_t = cos(LeftFootAbsolutePositions[i].theta); 		  for(unsigned j=0;j<4;j++)
 		    {
-		      TheConvexHull[j].col = lx + lxcoefs[j]*  lLeftFootHalfWidth;
-		      TheConvexHull[j].row = ly + lycoefs[j]*  lLeftFootHalfHeight;
-
+		      TheConvexHull[j].col = lx + 
+			( lxcoefs[j] * lLeftFootHalfWidth * c_t - 
+			  lycoefs[j] * lLeftFootHalfHeight * s_t ); 
+		      TheConvexHull[j].row = ly + 
+			( lxcoefs[j] * lLeftFootHalfWidth * s_t + 
+			  lycoefs[j] * lLeftFootHalfHeight * c_t ); 
 		      // Computes the maxima.
 		      xmin = TheConvexHull[j].col < xmin ? TheConvexHull[j].col : xmin;
 		      xmax = TheConvexHull[j].col > xmax ? TheConvexHull[j].col : xmax;
@@ -2393,11 +2415,18 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 		{
 		  lx=RightFootAbsolutePositions[i].x;
 		  ly=RightFootAbsolutePositions[i].y;
-		  
+		  s_t = sin(RightFootAbsolutePositions[i].theta); 
+		  c_t = cos(RightFootAbsolutePositions[i].theta);      
 		  for(unsigned j=0;j<4;j++)
 		    {
-		      TheConvexHull[j].col = lx + lxcoefs[j]*  lRightFootHalfWidth;
-		      TheConvexHull[j].row = ly + lycoefs[j]*  lRightFootHalfHeight;
+		      TheConvexHull[j].col = lx + ( lxcoefs[j] * 
+						    lRightFootHalfWidth * c_t - 
+						    lycoefs[j] * 
+						    lRightFootHalfHeight * s_t );
+		      TheConvexHull[j].row = ly + ( lxcoefs[j] * 
+						    lRightFootHalfWidth * s_t +
+						    lycoefs[j] * 
+						    lRightFootHalfHeight * c_t ); 
 		      // Computes the maxima.
 		      xmin = TheConvexHull[j].col < xmin ? TheConvexHull[j].col : xmin;
 		      xmax = TheConvexHull[j].col > xmax ? TheConvexHull[j].col : xmax;
@@ -3220,7 +3249,7 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
       CurrentCPUTime = end.tv_sec - start.tv_sec + 
 	0.000001 * (end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
-      ODEBUG("Current Time : " << StartingTime << " " << 
+      ODEBUG3("Current Time : " << StartingTime << " " << 
 	      " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime << 
 	      "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 

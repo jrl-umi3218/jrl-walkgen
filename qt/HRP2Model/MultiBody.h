@@ -1,5 +1,5 @@
-#ifndef MULTIBODY_H
-#define MULTIBODY_H
+#ifndef _HRP2DISPLAYNS_MULTIBODY_H
+#define _HRP2DISPLAYNS_MULTIBODY_H
 
 #define INTERFACE
 
@@ -24,6 +24,9 @@ using namespace std;
 #define ROTATION_LIBRE	0x1002
 
 #define PROFONDEUR_MAX	50
+
+namespace HRP2DisplayNS
+{
 
 static int cptLiaison= 0;	//pour labeliser les liaisons
 
@@ -167,5 +170,5 @@ public:
 	vector<Body> listeCorps;
 };
 
-
-#endif
+};
+#endif /* _HRP2DISPLAYNS_ */

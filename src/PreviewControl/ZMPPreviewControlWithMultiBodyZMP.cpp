@@ -135,9 +135,9 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMPosition 
   aCOMPosition(0) = acomp.x[0];
   aCOMPosition(1) = acomp.y[0];
   aCOMPosition(2) = acomp.z[0];
-  aCOMPosition(3) = acomp.yaw;
+  aCOMPosition(3) = 0;
   aCOMPosition(4) = acomp.pitch;
-  aCOMPosition(5) = 0;
+  aCOMPosition(5) = acomp.yaw;
   
 
   aCOMSpeed(0) = acomp.x[1];

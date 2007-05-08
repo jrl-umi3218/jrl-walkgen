@@ -14,7 +14,7 @@
 #include <qtoolbutton.h>
 #include <qtimer.h>
 
-#include <MatrixAbstractLayer.h>
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 #include <PatternGeneratorInterface.h>
 #include <HRP2Display.h>
 #include <joystick.h>

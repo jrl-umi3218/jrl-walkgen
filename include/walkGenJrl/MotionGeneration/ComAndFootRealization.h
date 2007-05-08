@@ -34,10 +34,14 @@
 #define _COM_AND_FOOT_REALIZATION_H_
 
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
+#include <SimplePlugin.h>
 #include <StepStackHandler.h>
+
 
 namespace PatternGeneratorJRL
 {
+  class PatternGeneratorInterface;
+
   /** @ingroup Interface
       This abstract specifies the different methods
       called by the Pattern Generator to generate a body posture.
@@ -51,7 +55,7 @@ namespace PatternGeneratorJRL
       preview loop of the class \a ZMPPreviewControlWithMultiBodyZMP class.
 
    */
-  class ComAndFootRealization
+  class ComAndFootRealization : public SimplePlugin
   {
   private:
 
@@ -74,7 +78,14 @@ namespace PatternGeneratorJRL
     /*! \brief Constructor 
 
      */
-    inline ComAndFootRealization() {};
+    inline ComAndFootRealization(PatternGeneratorInterface * aPatternGeneratorInterface):
+      SimplePlugin((PatternGeneratorJRL::SimplePluginManager *)aPatternGeneratorInterface)
+      ,m_HumanoidDynamicRobot(0)
+      ,m_HeightOfCoM(0)
+      ,m_SamplingPeriod(0.005)
+      ,m_StepStackHandler(0)
+      {
+      };
       
     /*! \brief virtual destructor */
     inline virtual ~ComAndFootRealization() {};
@@ -193,9 +204,9 @@ namespace PatternGeneratorJRL
 
     /*! @} */
     
-    
   };
 
 };
+
 
 #endif

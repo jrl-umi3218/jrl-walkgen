@@ -26,6 +26,7 @@
 #define ODEBUG6(x,y)
 
 namespace PatternGeneratorJRL {
+
   PatternGeneratorInterface::PatternGeneratorInterface(istringstream &strm)    
   {
 
@@ -216,7 +217,7 @@ namespace PatternGeneratorJRL {
     // INFO: implementation of CjrlDynamicRobot.
     m_DMB = new DynamicMultiBody();
     m_DMB->setComputeZMP(true);
-    m_DMB->setComputeBackwardDynamics(true);
+    m_DMB->setComputeBackwardDynamics(false);
     // INFO: This where you should instanciate your own
     // INFO: implementation of CjrlHumanoidDynamicRobot
     m_HumanoidDynamicRobot= new HumanoidDynamicMultiBody(m_DMB,HumanoidSpecificitiesFileName);
@@ -224,7 +225,7 @@ namespace PatternGeneratorJRL {
     // INFO: This where you should instanciate your own
     // INFO: object for Com and Foot realization.
     // INFO: The default one is based on a geometrical approach.
-    m_ComAndFootRealization = new ComAndFootRealizationByGeometry();
+    m_ComAndFootRealization = new ComAndFootRealizationByGeometry(this);
 
     // ZMP reference and Foot trajectory planner.
     m_ZMPD = new ZMPDiscretization("",m_HumanoidDynamicRobot->getHumanoidSpecificities());
@@ -241,7 +242,7 @@ namespace PatternGeneratorJRL {
     // Object to investiguate the result of the second preview loop.
     m_2DMB = new DynamicMultiBody();
     m_2DMB->setComputeZMP(true);
-     m_2DMB->setComputeBackwardDynamics(true);
+     m_2DMB->setComputeBackwardDynamics(false);
     // INFO: This where you should instanciate your own
     // INFO: implementation of CjrlHumanoidDynamicRobot
     m_2HumanoidDynamicRobot= new HumanoidDynamicMultiBody(m_2DMB,HumanoidSpecificitiesFileName);
@@ -436,19 +437,6 @@ namespace PatternGeneratorJRL {
 	
   }
 
-  void PatternGeneratorInterface::m_SetArmParameters(istringstream &strm)
-  {
-    ODEBUG("Arm Parameters");
-    while(!strm.eof())
-      {
-	if (!strm.eof())
-	  {
-	    strm >> m_GainFactor;
-	  }
-	else break;
-      }
-  }
-
   void PatternGeneratorInterface::m_SetZMPShiftParameters(istringstream &strm)
   {
     ODEBUG("SetZMPShitParameters");
@@ -560,7 +548,9 @@ namespace PatternGeneratorJRL {
 						      MAL_S3_VECTOR(  & lStartingCOMPosition,double))
   {
     m_HumanoidDynamicRobot->currentConfiguration(Configuration);
-    lStartingCOMPosition = m_HumanoidDynamicRobot->positionCenterOfMass();
+    m_DMB->setComputeCoM(true);
+    m_DMB->computeForwardKinematics();
+    lStartingCOMPosition = m_DMB->positionCenterOfMass();
   }
 
 
@@ -595,7 +585,7 @@ namespace PatternGeneratorJRL {
 
     // Initialize consequently the ComAndFoot Realization object.
     m_ZMPpcwmbz->EvaluateStartingCoM(BodyAnglesIni,lStartingCOMPosition,
-				   InitLeftFootAbsPos, InitRightFootAbsPos);
+				     InitLeftFootAbsPos, InitRightFootAbsPos);
 
     
     if (0)
@@ -752,7 +742,7 @@ namespace PatternGeneratorJRL {
 				 InitLeftFootAbsPos,
 				 InitRightFootAbsPos);
 
-    ODEBUG3("First m_ZMPPositions" << m_ZMPPositions[0].px << " " << m_ZMPPositions[0].py);
+    ODEBUG("First m_ZMPPositions" << m_ZMPPositions[0].px << " " << m_ZMPPositions[0].py);
     deque<ZMPPosition> aZMPBuffer;
 
     gettimeofday(&time1,0);
@@ -1032,6 +1022,14 @@ namespace PatternGeneratorJRL {
   {
     string aCmd;
     strm >> aCmd;
+
+    
+    if (CallMethod(aCmd,strm))
+      {
+	ODEBUG3("Method " << aCmd << " found and handled.");
+	return 0;
+      }
+
     ODEBUG("PGI:ParseCmd: Commande: " << aCmd);
     if (aCmd==":omega")
       m_SetOmega(strm);
@@ -1044,9 +1042,6 @@ namespace PatternGeneratorJRL {
 
     else if (aCmd==":doublesupporttime")
       m_SetDoubleSupportTime(strm);
-
-    else if (aCmd==":armparameters")
-      m_SetArmParameters(strm);
 
     else if (aCmd==":LimitsFeasibility")
       m_SetLimitsFeasibility(strm);
@@ -1263,10 +1258,13 @@ namespace PatternGeneratorJRL {
     // TODO : to take into account the real pose of the CoM of the robot.
     MAL_S4x4_MATRIX( FinalDesiredCOMPose,double);
     FinalDesiredCOMPose = m_ZMPpcwmbz->GetFinalDesiredCOMPose();			
+    ODEBUG("FinalDesiredCOMPose :" << FinalDesiredCOMPose);
     MAL_S4x4_MATRIX( PosOfWaistInCOMF,double);
     PosOfWaistInCOMF = m_ZMPpcwmbz->GetCurrentPositionofWaistInCOMFrame();
     MAL_S4x4_MATRIX( AbsWaist,double);
     MAL_S4x4_C_eq_A_by_B(AbsWaist ,FinalDesiredCOMPose , PosOfWaistInCOMF);
+    ODEBUG("AbsWaist " << AbsWaist);
+    ODEBUG("PosOfWaistInCOMF " << PosOfWaistInCOMF);
 
     COMPosition outWaistPosition;
     outWaistPosition = finalCOMPosition;
@@ -1295,7 +1293,7 @@ namespace PatternGeneratorJRL {
 		
     m_CurrentWaistState = outWaistPosition;
 
-    bool UpdateAbsMotionOrNot = false;
+    bool UpdateAbsMotionOrNot = true;
 
     //    if ((u=(m_count - (m_ZMPPositions.size()-2*m_NL)))>=0)
     if ((u=m_ZMPPositions.size()-2*m_NL)==0)
@@ -2227,6 +2225,8 @@ namespace PatternGeneratorJRL {
     dy = m_AbsLinearVelocity(1);
     omega = m_AbsAngularVelocity(2);
   }
+
+
 }
 
 
