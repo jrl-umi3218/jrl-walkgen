@@ -19397,7 +19397,6 @@ fi
 
 
 CXXFLAGS="${CXXFLAGS} -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_"
-LDFLAGS="${LDFLAGS} -llapack"
 
                                                                                                               ac_config_files="$ac_config_files Makefile src/Makefile include/walkGenJrl/Makefile include/walkGenJrl/Mathematics/Makefile include/walkGenJrl/MotionGeneration/Makefile include/walkGenJrl/PreviewControl/Makefile include/walkGenJrl/ZMPRefTrajectoryGeneration/Makefile doc/Makefile unitTesting/Makefile doc/pgjrl.dox walkGenJrl.pc"
 cat >confcache <<\_ACEOF
