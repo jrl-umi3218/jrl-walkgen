@@ -1,20 +1,21 @@
-<<<<<<< HEAD:ChangeLog
+2007/05/10
+	1. (mathieu) correct configure.ac and src/Makefile.am to accept correctly the flags of dynamicsJRLJap package.
+	note : make comments in configure.ac but didn't clean it
+
+	
 walkGenJRL 2.1 released February 14, 2007
 
-=======
 1 - protection again double inclusion of MatrixAbstractLayerSmall.h
 2 - protection again double inclusion check and add on all file
 3 - correct the file MatrixAbstractLayer.h with include "configJRLWPG.h"
->>>>>>> bob/master:ChangeLog
+
 4 - Remake the doxygen comment in PatternGeneratorInterface to actualy
 	appears in the html doc
-<<<<<<< HEAD:ChangeLog
+
 3 - correct the file MatrixAbstractLayer.h with include "configJRLWPG.h"
 2 - protection again double inclusion check and add on all file
 1 - protection again double inclusion of MatrixAbstractLayerSmall.h
-=======
-5 - version 2.1 : jrl-CIRDynamic structure + Com and Feet Realization object
 
->>>>>>> bob/master:ChangeLog
+5 - version 2.1 : jrl-CIRDynamic structure + Com and Feet Realization object
 
 walkGenJRL 2.0 released January 31, 2007
