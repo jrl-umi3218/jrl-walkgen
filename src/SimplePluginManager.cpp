@@ -71,7 +71,6 @@ void SimplePluginManager::Print( )
 { 
   std::map<char*, SimplePlugin * , ltstr>::iterator it_SP;
   
-  cout << "Size of SimplePlugins: " << m_SimplePlugins.size() << endl;
 
   it_SP =m_SimplePlugins.begin();
   while(it_SP!=m_SimplePlugins.end())
@@ -93,8 +92,7 @@ bool SimplePluginManager::RegisterMethod(string &MethodName, SimplePlugin *aSP)
       strcpy(Buffer,(char *)MethodName.c_str());
       m_SimplePlugins[Buffer] = aSP;
 
-      ODEBUG3("Registered method " << MethodName << " for plugin " << aSP << endl);
-      Print();
+      ODEBUG("Registered method " << MethodName << " for plugin " << aSP << endl);
       return true;
     }
   return false;
@@ -105,20 +103,14 @@ bool SimplePluginManager::RegisterMethod(string &MethodName, SimplePlugin *aSP)
 bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
 {
   
-  std::map<char*, SimplePlugin * , ltstr>::iterator it_SP, cur  = m_SimplePlugins.find((char *)MethodName.c_str());
+  std::map<char*, SimplePlugin * , ltstr>::iterator cur  = m_SimplePlugins.find((char *)MethodName.c_str());
   
-  ODEBUG3("Size of SimplePlugins: " << m_SimplePlugins.size());
-  it_SP = m_SimplePlugins.begin();
-  while(it_SP!=m_SimplePlugins.end())
-    {
-      cout << it_SP->first << endl;
-      it_SP++;
-    }
+  ODEBUG("Size of SimplePlugins: " << m_SimplePlugins.size());
 
   if (cur!=m_SimplePlugins.end())
     {
       SimplePlugin * aSP = cur->second;
-      ODEBUG3("Found the method " << MethodName << " for plugin :" << aSP ); 
+      ODEBUG("Found the method " << MethodName << " for plugin :" << aSP ); 
       if (aSP!=0)
 	{
 	  aSP->CallMethod(MethodName,istrm);
@@ -131,7 +123,7 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
     }
   else
     {
-      cout << "Not found the method " << MethodName << endl;
+      ODEBUG("Not found the method " << MethodName);
     }
   return false;
   

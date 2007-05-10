@@ -182,10 +182,8 @@ namespace PatternGeneratorJRL
       
     //this is the rotationmatrix from world frame to obstacle frame
     MAL_S3x3_MATRIX(m_ObstacleRotInv,double); 
-
        
     float m_StepOverStepLenght,m_StepOverHipHeight;
-	
 	
     deque<RelativeFootPosition> m_FootHolds;
 
@@ -346,6 +344,7 @@ namespace PatternGeneratorJRL
 		
     /*! Distance from the ankle to the soil.*/
     double m_AnkleSoilDistance;
+
   };
 
 };

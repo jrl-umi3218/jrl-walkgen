@@ -61,6 +61,8 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
 				 HumanoidSpecificities *aHS)
 {
 
+  m_IK = new InverseKinematics(aHS);
+
   m_HS = aHS;
   // Get information specific to the humanoid.
   double lWidth,lHeight,lZ;
@@ -128,7 +130,6 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
 	
   m_DMB = 0;
   m_PC = 0;
-  m_IK = 0;
   m_ZMPDiscr = 0;
 	
   // Displacement between the hip and RLINK2
@@ -235,6 +236,9 @@ StepOverPlanner::~StepOverPlanner()
 
   if (m_CollDet!=0)
     delete m_CollDet;
+
+  if (m_IK!=0)
+    delete m_IK;
 }
 
 void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition> &aFootHolds)

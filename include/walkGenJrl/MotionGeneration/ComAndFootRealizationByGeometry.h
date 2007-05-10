@@ -220,6 +220,12 @@ namespace PatternGeneratorJRL
      */
     void CallMethod(string &Method, istringstream &istrm);
 
+    /*! Get the current position of the waist in the COM reference frame 
+      @return a 4x4 matrix which contains the pose and the position of the waist
+      in the CoM reference frame.
+    */
+    MAL_S4x4_MATRIX(,double) GetCurrentPositionofWaistInCOMFrame();
+      
   private:
 
     /*! \name Objects for stepping over. 
@@ -292,6 +298,10 @@ namespace PatternGeneratorJRL
       i.e. not reevaluated while walking. */
     MAL_S3_VECTOR(m_DiffBetweenComAndWaist,double);
 
+    /*! Difference between the CoM and the Waist 
+      in the CoM reference frame. */
+    MAL_S3_VECTOR(m_ComAndWaistInRefFrame,double);
+
     /*! Link towards Humanoids specificities */
     HumanoidSpecificities * m_HS;
 
@@ -324,12 +334,18 @@ namespace PatternGeneratorJRL
     vector<int> m_LeftArmIndexinConfiguration;
     /*! \brief For the right leg, Specific for the Inverse Kinematics. */
     vector<int> m_RightArmIndexinConfiguration;
+    
+    /*! \brief For the chest. */
+    vector<int> m_ChestIndexinConfiguration;
 
     /*! \brief For the entire system. */
     vector<int> m_GlobalVRMLIDtoConfiguration;
 
     /*! Gain factor for the arm motion heuristic. */
     double m_GainFactor;
+
+    /*! Buffer of current Upper Body motion. */
+    vector<double> m_UpperBodyMotion;
 
   };
 

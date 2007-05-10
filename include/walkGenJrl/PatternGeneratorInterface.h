@@ -313,9 +313,6 @@ namespace PatternGeneratorJRL
     /*! Gain factor for the default arm motion while walking. */
     double m_GainFactor;
 
-    /*! Inverse Kinematics of the robot. */
-    InverseKinematics *m_IK;
-
     /*! Object to generate a ZMP profile from
       the step of stacks. It provides a buffer for
       the ZMP position to be used every dt
@@ -391,8 +388,6 @@ namespace PatternGeneratorJRL
     /* \brief Methods related to upper body motion. 
        @{
      */
-    /*! Buffer of current Upper Body motion. */
-    vector<double> m_UpperBodyMotion;
 
     /*! Index of Upper body joints. */
     vector<int> m_UpperBodyJoints;

@@ -82,6 +82,7 @@ namespace PatternGeneratorJRL {
 
     RESETDEBUG4("DDCC.dat");
     RESETDEBUG4("DDCV.dat");
+    RESETDEBUG5("DebugDataWaist.dat");
     // End if Initialization
 
     m_ObstacleDetected = false;
@@ -149,10 +150,6 @@ namespace PatternGeneratorJRL {
     m_ZMPShift[3] = 0.02;
 
 
-    m_UpperBodyMotion.resize(3);
-    m_UpperBodyMotion[0]=0.0;
-    m_UpperBodyMotion[1]=0.0;
-    m_UpperBodyMotion[2]=0.0;
 
   
     for(int i=0;i<4;i++)
@@ -309,7 +306,6 @@ namespace PatternGeneratorJRL {
 
     m_StOvPl->SetPreviewControl(m_PC);
     m_StOvPl->SetDynamicMultiBodyModel(m_DMB);
-    m_StOvPl->SetInverseKinematics(m_IK);
     m_StOvPl->SetZMPDiscretization(m_ZMPD);
 
 
@@ -586,7 +582,8 @@ namespace PatternGeneratorJRL {
     // Initialize consequently the ComAndFoot Realization object.
     m_ZMPpcwmbz->EvaluateStartingCoM(BodyAnglesIni,lStartingCOMPosition,
 				     InitLeftFootAbsPos, InitRightFootAbsPos);
-
+    
+    ODEBUG( "CommonInitializationOfWalking " << BodyAnglesIni );
     
     if (0)
       {
@@ -728,9 +725,14 @@ namespace PatternGeneratorJRL {
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,true);
   
-
+    
     ODEBUG6("Size of lRelativeFootPositions :" << lRelativeFootPositions.size(),"DebugGMFKW.dat");
-    // Create the appropriate arrays
+
+
+    ODEBUG("CurrentZMPNeutralPosition: " << CurrentZMPNeutralPosition [0] << " "
+	    << CurrentZMPNeutralPosition[1] );
+    
+    // Create the ZMP reference.
     m_ZMPD->GetZMPDiscretization(m_ZMPPositions,
 				 m_FootAbsolutePositions,
 				 lRelativeFootPositions,
@@ -786,6 +788,7 @@ namespace PatternGeneratorJRL {
     ODEBUG6("FinishAndRealizeStepSequence() - 3 ","DebugGMFKW.dat");
 
     gettimeofday(&time2,0);
+
     //this function calculates a buffer with COM values after a first preview round,
     // currently required to calculate the arm swing before "onglobal step of control"
     // in order to take the arm swing motion into account in the second preview loop
@@ -1026,7 +1029,7 @@ namespace PatternGeneratorJRL {
     
     if (CallMethod(aCmd,strm))
       {
-	ODEBUG3("Method " << aCmd << " found and handled.");
+	ODEBUG("Method " << aCmd << " found and handled.");
 	return 0;
       }
 
@@ -1051,9 +1054,6 @@ namespace PatternGeneratorJRL {
 
     else if (aCmd==":TimeDistributionParameters")
       m_SetTimeDistrParameters(strm);
-
-    else if (aCmd==":UpperBodyMotionParameters")
-      m_SetUpperBodyMotionParameters(strm);
 
     else if (aCmd==":stepseq")
       m_StepSequence(strm);
@@ -1183,21 +1183,6 @@ namespace PatternGeneratorJRL {
     ODEBUG("Upper Body Motion Parameters");
     while(!strm.eof())
       {
-	if (!strm.eof())
-	  {
-	    strm >> m_UpperBodyMotion[0];
-	  }
-	else break;
-	if (!strm.eof())
-	  {
-	    strm >> m_UpperBodyMotion[1];
-	  }
-	else break;
-	if (!strm.eof())
-	  {
-	    strm >> m_UpperBodyMotion[2];
-	  }
-	else break;
       }
   }
 
@@ -1249,28 +1234,51 @@ namespace PatternGeneratorJRL {
 					finalCOMPosition,
 					CurrentConfiguration,
 					CurrentVelocity);
+
+    for(unsigned int i=0;i<m_CurrentActuatedJointValues.size();i++)
+      {
+	Joint * aJoint = (Joint *)m_DMB->GetJointFromVRMLID(i);
+	if (aJoint !=0)
+	  m_CurrentActuatedJointValues[i] = aJoint->quantity();
+      }
     
+    
+    /*  if (m_count==0)
+      {
+	for(unsigned int i=0;i<m_CurrentActuatedJointValues.size();i++)
+	  cout << m_CurrentActuatedJointValues[i] << " " ;
+	cout << endl;
+      }
+    */
     m_COMBuffer[0] = finalCOMPosition;  
 
     m_count++;
 
-    // TODO : Correct the following computation
-    // TODO : to take into account the real pose of the CoM of the robot.
-    MAL_S4x4_MATRIX( FinalDesiredCOMPose,double);
-    FinalDesiredCOMPose = m_ZMPpcwmbz->GetFinalDesiredCOMPose();			
-    ODEBUG("FinalDesiredCOMPose :" << FinalDesiredCOMPose);
+    // Compute the waist position in the current motion global reference frame.
+//     MAL_S4x4_MATRIX( FinalDesiredCOMPose,double);
+//     FinalDesiredCOMPose = m_ZMPpcwmbz->GetFinalDesiredCOMPose();			
+//     ODEBUG3("FinalDesiredCOMPose :" << FinalDesiredCOMPose);
     MAL_S4x4_MATRIX( PosOfWaistInCOMF,double);
     PosOfWaistInCOMF = m_ZMPpcwmbz->GetCurrentPositionofWaistInCOMFrame();
-    MAL_S4x4_MATRIX( AbsWaist,double);
-    MAL_S4x4_C_eq_A_by_B(AbsWaist ,FinalDesiredCOMPose , PosOfWaistInCOMF);
-    ODEBUG("AbsWaist " << AbsWaist);
-    ODEBUG("PosOfWaistInCOMF " << PosOfWaistInCOMF);
+    // MAL_S4x4_MATRIX( AbsWaist,double);
+//     MAL_S4x4_C_eq_A_by_B(AbsWaist ,FinalDesiredCOMPose , PosOfWaistInCOMF);
+//     ODEBUG3("AbsWaist " << AbsWaist);
+//     ODEBUG3("PosOfWaistInCOMF " << PosOfWaistInCOMF);
+//     ODEBUG3("Configuration(0-2): " << 
+//  	    CurrentConfiguration(0) << " " <<
+//  	    CurrentConfiguration(1) << " " <<
+//  	    CurrentConfiguration(2));
 
     COMPosition outWaistPosition;
     outWaistPosition = finalCOMPosition;
-    outWaistPosition.x[0] =  AbsWaist[0];
-    outWaistPosition.y[0] =  AbsWaist[1];
-    outWaistPosition.z[0] =  AbsWaist[2];
+    outWaistPosition.x[0] =  CurrentConfiguration(0);
+    outWaistPosition.y[0] =  CurrentConfiguration(1);
+    outWaistPosition.z[0] =  CurrentConfiguration(2);
+    
+    // In case we are at the end of the motion
+    double CurrentZMPNeutralPosition[2];
+    CurrentZMPNeutralPosition[0] = m_ZMPPositions[0].px;
+    CurrentZMPNeutralPosition[1] = m_ZMPPositions[0].py;
     
     double temp1;
     double temp2;
@@ -1292,8 +1300,12 @@ namespace PatternGeneratorJRL {
     m_UpperBodyPositionsBuffer.pop_front();
 		
     m_CurrentWaistState = outWaistPosition;
+    ODEBUG5("CurrentWaistState: " 
+	    << m_CurrentWaistState.x[0]  << " " 
+	    << m_CurrentWaistState.y[0] << " " 
+	    << m_CurrentWaistState.z[0] << " ","DebugDataWaist.dat" );
 
-    bool UpdateAbsMotionOrNot = true;
+    bool UpdateAbsMotionOrNot = false;
 
     //    if ((u=(m_count - (m_ZMPPositions.size()-2*m_NL)))>=0)
     if ((u=m_ZMPPositions.size()-2*m_NL)==0)
@@ -1333,13 +1345,27 @@ namespace PatternGeneratorJRL {
 	    //	cout << "Sorry not enough information" << endl;
 	    m_ShouldBeRunning = false;
 	    UpdateAbsMotionOrNot = true;
+
+	    // Specifies the next starting ZMP position    
+	    //	    m_ZMPD->setZMPNeutralPosition(CurrentZMPNeutralPosition);
+
 	    ODEBUG("m_count " << m_count <<
 		   " m_ZMPPositions.size() " << m_ZMPPositions.size() << 
 		   " u : " << u);
 	  }
+
+	/*	
+	ODEBUG3("CurrentActuatedJointValues at the end: " );
+	for(unsigned int i=0;i<m_CurrentActuatedJointValues.size();i++)
+	  cout << m_CurrentActuatedJointValues[i] << " " ;
+	cout << endl;
+	*/
+	ODEBUG5("*** TAG *** " , "DebugDataIK.dat");
+
       }
 
     // Update the absolute position of the robot.
+    // to be done only when the robot has finish a motion.
     UpdateAbsolutePosition(UpdateAbsMotionOrNot);
     return true;
   }
@@ -1354,7 +1380,6 @@ namespace PatternGeneratorJRL {
     if (m_ZMPPositions.size()-2*m_NL<0)
       return;
     
-    cout << "m_count " << m_count << endl;
     MAL_VECTOR_DIM(dqlRefState,double,6);
     MAL_VECTOR_DIM(dqrRefState,double,6);
     MAL_VECTOR_DIM(qArmr,double,7);
@@ -1572,27 +1597,27 @@ namespace PatternGeneratorJRL {
     DebugFileLong.open("DebugDataLong.txt",ofstream::app);
     int lindex=0;
     if (m_FirstPrint)
-      {   
-	DebugFileLong << lindex++ << "-time" << "\t" 
-		      << lindex++ << "-ZMPdesiredX"<< "\t" 
-		      << lindex++ << "-ZMPdesiredY"<< "\t" 
-		      << lindex++ << "-ZMPMultiBodyX"<< "\t" 
-		      << lindex++ << "-ZMPMultiBodyY"<< "\t" 
-		      << lindex++ << "-COMrecomputedX" << "\t"
-		      << lindex++ << "-COMrecomputedY" << "\t"
-		      << lindex++ << "-COMPositionX"<< "\t" 
-		      << lindex++ << "-COMPositionY"<< "\t" 
-		      << lindex++ << "-COMPositionZ"<< "\t" 	
-		      << lindex++ << "-COMVelocityX"<< "\t" 
-		      << lindex++ << "-COMVelocityY"<< "\t" 
-		      << lindex++ << "-COMVelocityZ"<< "\t" 
-		      << lindex++ << "-COMOrientation"<< "\t"
-		      << lindex++ << "-LeftFootPositionsX"<< "\t" 
-		      << lindex++ << "-LeftFootPositionsY"<< "\t" 
-		      << lindex++ << "-LeftFootPositionsZ"<< "\t" 
-		      << lindex++ << "-RightFootPositionsX" << "\t" 
-		      << lindex++ << "-RightFootPositionsY" << "\t" 
-		      << lindex++ << "-RightFootPositionsZ" << "\t";
+      {  
+	DebugFileLong << lindex++ << "-time" << "\t"                   //  1
+		      << lindex++ << "-ZMPdesiredX"<< "\t"             //  2
+		      << lindex++ << "-ZMPdesiredY"<< "\t"             //  3
+		      << lindex++ << "-ZMPMultiBodyX"<< "\t"           //  4
+		      << lindex++ << "-ZMPMultiBodyY"<< "\t"           //  5
+		      << lindex++ << "-COMrecomputedX" << "\t"         //  6
+		      << lindex++ << "-COMrecomputedY" << "\t"         //  7
+		      << lindex++ << "-COMPositionX"<< "\t"            //  8
+		      << lindex++ << "-COMPositionY"<< "\t"            //  9
+		      << lindex++ << "-COMPositionZ"<< "\t" 	       // 10
+		      << lindex++ << "-COMVelocityX"<< "\t"            // 11
+		      << lindex++ << "-COMVelocityY"<< "\t"            // 12
+		      << lindex++ << "-COMVelocityZ"<< "\t"            // 13
+		      << lindex++ << "-COMOrientation"<< "\t"          // 14
+		      << lindex++ << "-LeftFootPositionsX"<< "\t"      // 15
+		      << lindex++ << "-LeftFootPositionsY"<< "\t"      // 16
+		      << lindex++ << "-LeftFootPositionsZ"<< "\t"      // 17
+		      << lindex++ << "-RightFootPositionsX" << "\t"    // 18
+		      << lindex++ << "-RightFootPositionsY" << "\t"    // 19
+		      << lindex++ << "-RightFootPositionsZ" << "\t";   // 20
 	// 20 cols
 
 	for(unsigned int i=0;i<6;i++)
@@ -1997,6 +2022,7 @@ namespace PatternGeneratorJRL {
 	
 	for(int i=0;i<aNumber;i++)
 	  {
+	    // SPECIFIC TO A ROBOT ...
 	    anUpperBodyPos.Joints.resize(28);
 	    
 	    for(unsigned int j=0;j<28;j++)
@@ -2063,11 +2089,10 @@ namespace PatternGeneratorJRL {
   
     MAL_S4x4_C_eq_A_by_B(m_WaistAbsPos, m_MotionAbsPos , m_WaistRelativePos);
     
-    /*
-      cout << "Motion Abs Pos " << m_MotionAbsPos<< endl;
-      cout << "Waist Relative Pos " << m_WaistRelativePos<< endl;
-      cout << "Waist Abs Pos " << m_WaistAbsPos << endl;
-    */
+    ODEBUG("Motion Abs Pos " << m_MotionAbsPos);
+    ODEBUG("Waist Relative Pos " << m_WaistRelativePos);
+    ODEBUG("Waist Abs Pos " << m_WaistAbsPos);
+
     m_AbsAngularVelocity(0) = 0.0;
     m_AbsAngularVelocity(1) = 0.0;
     

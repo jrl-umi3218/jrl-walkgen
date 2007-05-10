@@ -316,31 +316,65 @@ void MainView::timerEvent()
 	  // UpperBody
 	  for(int i=0;i<18;i++)
 	    lMotors[GlobalIndex++] = CurrentConfiguration(18+i);
+	 
 	  
 	  double WaistPosture[16];
-	  double COMtheta, COMomega;
-	  double CosOmega, SinOmega;
-	  double CosTheta, SinTheta;
-
-	  COMtheta = CurrentConfiguration(5);
-	  COMomega = CurrentConfiguration(4);
-
-	  CosTheta = cos(COMtheta*M_PI/180.0);
-	  SinTheta = sin(COMtheta*M_PI/180.0);
-	  
-	  CosOmega = cos(COMomega*M_PI/180.0);
-	  SinOmega = sin(COMomega*M_PI/180.0);
-	  
-	  WaistPosture[0] = CosTheta*CosOmega; WaistPosture[1] = -SinTheta; WaistPosture[2]  = CosTheta*SinOmega;
-	  WaistPosture[4] = SinTheta*CosOmega; WaistPosture[5] =  CosTheta; WaistPosture[6]  = SinTheta*SinOmega;
-	  WaistPosture[8] =         -SinOmega; WaistPosture[9] =         0; WaistPosture[10] = CosOmega;
-
-	  for(int i=0;i<3;i++)
+	  if (0)
 	    {
-	      WaistPosture[3*4+i] = 0.0;
-	      WaistPosture[i*4+3] = CurrentConfiguration(i);
+
+	      double COMtheta, COMomega;
+	      double CosOmega, SinOmega;
+	      double CosTheta, SinTheta;
+	      
+	      COMtheta = CurrentConfiguration(5);
+	      COMomega = CurrentConfiguration(4);
+	      
+	      CosTheta = cos(COMtheta*M_PI/180.0);
+	      SinTheta = sin(COMtheta*M_PI/180.0);
+	      
+	      CosOmega = cos(COMomega*M_PI/180.0);
+	      SinOmega = sin(COMomega*M_PI/180.0);
+	      
+	      WaistPosture[0] = CosTheta*CosOmega; WaistPosture[1] = -SinTheta; WaistPosture[2]  = CosTheta*SinOmega;
+	      WaistPosture[4] = SinTheta*CosOmega; WaistPosture[5] =  CosTheta; WaistPosture[6]  = SinTheta*SinOmega;
+	      WaistPosture[8] =         -SinOmega; WaistPosture[9] =         0; WaistPosture[10] = CosOmega;
+	      
+	      
+	      for(int i=0;i<3;i++)
+		{
+		  WaistPosture[3*4+i] = 0.0;
+		  WaistPosture[i*4+3] = CurrentConfiguration(i);
+		}
+	      
+	      WaistPosture[15] = 1.0;
+		
+	      /*
+	      for(int i=0;i<4;i++)
+		{
+		  for(int j=0;j<4;j++)
+		    cout << WaistPosture[i*4+j] << " " ;
+		  cout << endl;
+		}
+	      */
 	    }
-	  WaistPosture[15] = 1.0;
+	  else
+	    {
+	      MAL_S4x4_MATRIX(,double) lWaistAbsPos;
+	      m_PGI->getWaistPositionMatrix(lWaistAbsPos);
+	      for(int i=0;i<4;i++)
+		for(int j=0;j<4;j++)
+		  WaistPosture[i*4+j] = lWaistAbsPos(i,j);
+
+	      /*
+	      cout << "WaistPosture-2: " << endl ;
+	      for(int i=0;i<4;i++)
+		{
+		  for(int j=0;j<4;j++)
+		    cout << WaistPosture[i*4+j] << " " ;
+		  cout << endl;
+		}
+	      */
+	    }
 	  emit sendMotorsAndWaistPosture(lMotors,WaistPosture);
 	}
       else

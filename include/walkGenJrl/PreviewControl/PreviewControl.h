@@ -84,7 +84,7 @@ namespace PatternGeneratorJRL
 
       /*! Overloading of << operator. */
       void print();
-
+      
     protected:
 
       /*! Matrices for preview control. */

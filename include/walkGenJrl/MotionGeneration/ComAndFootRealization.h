@@ -203,6 +203,12 @@ namespace PatternGeneratorJRL
       { return m_StepStackHandler; }
 
     /*! @} */
+
+    /*! Get the current position of the waist in the COM reference frame 
+      @return a 4x4 matrix which contains the pose and the position of the waist
+      in the CoM reference frame.
+    */
+    virtual MAL_S4x4_MATRIX(,double) GetCurrentPositionofWaistInCOMFrame() = 0;
     
   };
 

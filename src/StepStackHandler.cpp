@@ -671,7 +671,6 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
 // Prepare the stack to start a motion on a specific support foot
 void StepStackHandler::PrepareForSupportFoot(int SupportFoot)
 {
-  cout << "PrepareForSupportFoot " << endl;
   RelativeFootPosition aFootPosition;
   aFootPosition.sx = 0;
   aFootPosition.sy = SupportFoot*0.095;

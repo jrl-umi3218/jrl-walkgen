@@ -246,6 +246,13 @@ namespace PatternGeneratorJRL
       int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
 			      MAL_MATRIX(&A,double),
 			      MAL_MATRIX(&B,double));
+      
+      /*! Set the ZMP neutral position in the global coordinates system */
+      void setZMPNeutralPosition(const double aZMPNeutralPosition[2])
+      { 
+	m_ZMPNeutralPosition[0] = aZMPNeutralPosition[0];
+	m_ZMPNeutralPosition[1] = aZMPNeutralPosition[1];
+      }
 
    protected:
 
