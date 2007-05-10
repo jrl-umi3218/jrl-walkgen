@@ -6,7 +6,7 @@ includedir=@includedir@
 Name: @PACKAGE@
 Description: Walk generator for humanoid robot based on preview control
 Version: @VERSION@
-Requires: dynamics-JRLJapan
+Requires: dynamicsJRLJapan
 Libs: -L${libdir} -lwalkGenJRL @DYNAMICJRLJAP_LIBS@
 Cflags: -I${includedir}/walkGenJRL @DYNAMICJRLJAP_CFLAGS@
 
