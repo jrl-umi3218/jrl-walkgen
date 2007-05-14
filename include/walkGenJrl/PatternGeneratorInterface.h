@@ -183,11 +183,12 @@ namespace PatternGeneratorJRL
 
     // Run One Step of the global control loop
     // aka The Main Method To Be Used.
-    // @param : qr, ql : the joint values for the legs (right : qr, and left : ql). 
-    // @param : qArmr, qArml : the joint values for the arms ( right: qArmr, and left : qArml)
-    // @param : UpperBodyAngles : the angles corresponding to the upper part of the body.
+    // @param : CurrentConfiguration: The current configuration of the robot according to 
+    // the implementation of dynamic-JRLJapan. This should be first position and orientation
+    // of the waist, and then all the DOFs of your robot. 
+    // @param : CurrentVelocity:  The current velocity of the robot according to the 
+    // the implementation of dynamic-JRLJapan. 
     // @param : ZMPTarget : The target ZMP in the waist reference frame.
-    // @param : outWaistPosition: The evaluated waist position.
     // @return: True is there is still some data to send, false otherwise.
     bool RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
 				    MAL_VECTOR(,double) & CurrentVelocity,

@@ -152,7 +152,6 @@ ZMPDiscretization::ZMPDiscretization(string DataFile, HumanoidSpecificities *aHS
 #else
   m_ZMPNeutralPosition[0] = 0.0;
   m_ZMPNeutralPosition[1] = 0.0;
-
 #endif
 
   MAL_MATRIX_RESIZE(m_CurrentSupportFootPosition,3,3);
@@ -669,7 +668,8 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
       TimeForThisFootPosition = TimeFirstPhase+ m_Tsingle;
       ODEBUG4("TimeFirstPhase: " << TimeFirstPhase << " m_Tsingle: " << m_Tsingle,"DebugData.txt");
       // Compute the size of cells to add inside the array.
-      AddArraySize = (unsigned int)(TimeForThisFootPosition/m_SamplingPeriod);
+      double lSize = TimeForThisFootPosition/m_SamplingPeriod;
+      AddArraySize = (unsigned int)lSize;
 
       currentsize = ZMPPositions.size();
       ZMPPositions.resize(currentsize+AddArraySize);
@@ -1958,7 +1958,6 @@ int ZMPDiscretization::ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
 	      y1 = aVecOfPoints[i].row;
 	      x2 = aVecOfPoints[i+1].col;
 	      x1 = aVecOfPoints[i].col;
-
 	    }
 	  
 	  
@@ -2332,8 +2331,8 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 	      lx=LeftFootAbsolutePositions[i].x;
 	      ly=LeftFootAbsolutePositions[i].y;
 	      
-	      s_t = sin(LeftFootAbsolutePositions[i].theta); 
-	      c_t = cos(LeftFootAbsolutePositions[i].theta);  
+	      s_t = sin(LeftFootAbsolutePositions[i].theta*M_PI*180.0); 
+	      c_t = cos(LeftFootAbsolutePositions[i].theta*M_PI*180.0);  
 	      for(unsigned j=0;j<4;j++)
 		{
 		  aVecOfPoints[j].col = lx + ( lxcoefs[j] * lLeftFootHalfWidth 
@@ -2357,10 +2356,10 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 	      lx=RightFootAbsolutePositions[i].x;
 	      ly=RightFootAbsolutePositions[i].y;
 
-	      s_t = sin(RightFootAbsolutePositions[i].theta); //+
-	      c_t = cos(RightFootAbsolutePositions[i].theta); //+ 
+	      s_t = sin(RightFootAbsolutePositions[i].theta*M_PI*180.0); //+
+	      c_t = cos(RightFootAbsolutePositions[i].theta*M_PI*180.0); //+ 
 	      
-	      ODEBUG("Right Foot: " << lx << " " << ly );
+	      ODEBUG3("Right Foot: " << lx << " " << ly << " " << RightFootAbsolutePositions[i].theta);
 	      for(unsigned j=0;j<4;j++)
 		{
 		  aVecOfPoints[j+4].col = lx + ( lxcoefs[j] * lRightFootHalfWidth
@@ -2393,8 +2392,9 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 		  lx=LeftFootAbsolutePositions[i].x;
 		  ly=LeftFootAbsolutePositions[i].y;
 		  
-		  s_t = sin(LeftFootAbsolutePositions[i].theta); 
-		  c_t = cos(LeftFootAbsolutePositions[i].theta); 		  for(unsigned j=0;j<4;j++)
+		  s_t = sin(LeftFootAbsolutePositions[i].theta*M_PI*180.0); 
+		  c_t = cos(LeftFootAbsolutePositions[i].theta*M_PI*180.0);
+ 		  for(unsigned j=0;j<4;j++)
 		    {
 		      TheConvexHull[j].col = lx + 
 			( lxcoefs[j] * lLeftFootHalfWidth * c_t - 
@@ -2415,8 +2415,8 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 		{
 		  lx=RightFootAbsolutePositions[i].x;
 		  ly=RightFootAbsolutePositions[i].y;
-		  s_t = sin(RightFootAbsolutePositions[i].theta); 
-		  c_t = cos(RightFootAbsolutePositions[i].theta);      
+		  s_t = sin(RightFootAbsolutePositions[i].theta*M_PI*180.0); 
+		  c_t = cos(RightFootAbsolutePositions[i].theta*M_PI*180.0);      
 		  for(unsigned j=0;j<4;j++)
 		    {
 		      TheConvexHull[j].col = lx + ( lxcoefs[j] * 
@@ -2686,7 +2686,9 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 
 
   if (1)
-    RESETDEBUG4("DebugInterpol.dat");
+    {
+      RESETDEBUG5("DebugInterpol.dat");
+    }
 
   MAL_MATRIX_RESIZE(PPu,2*N,2*N);
   MAL_MATRIX_RESIZE(VPu,2*N,2*N);
@@ -2882,7 +2884,8 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
     }
   
   MAL_MATRIX_RESIZE(vnlStorePx,
-		    6*N,
+		    NbOfConstraints,
+		    //6*N,
 		    1+(unsigned int)(QueueOfLConstraintInequalities.back()->EndingTime/(T)));
   
   for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(vnlStorePx);i++)
@@ -3223,7 +3226,7 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	  // Put it into the stack.
 	  NewFinalZMPPositions.push_back(aZMPPos);
 	  
-	  ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
+	  ODEBUG5(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
 		  aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<
 		  aCOMPos.yaw << " " <<
 		  aZMPPos.px << " " << aZMPPos.py <<  " " << aZMPPos.theta << " " << 
@@ -3232,8 +3235,9 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	}
 
       // Simulate the dynamical system
-      MAL_C_eq_A_by_B(zk,m_C,xk);
       xk = MAL_RET_A_by_B(m_A,xk) + Buk ;
+      // Modif. from Dimitar: Initially a mistake regarding the ordering.
+      MAL_C_eq_A_by_B(zk,m_C,xk);
 
       ODEBUG4(xk[0] << " " << xk[1] << " " << xk[2] << " " <<
 	      xk[3] << " " << xk[4] << " " << xk[5] << " " <<
@@ -3249,9 +3253,9 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
       CurrentCPUTime = end.tv_sec - start.tv_sec + 
 	0.000001 * (end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
-      ODEBUG3("Current Time : " << StartingTime << " " << 
-	      " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime << 
-	      "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
+      ODEBUG("Current Time : " << StartingTime << " " << 
+	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime << 
+	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
     }
   // Current heuristic to complete the ZMP buffer:
@@ -3305,8 +3309,8 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
       aof.close();
     }
   
-  cout << "Size of PX: " << MAL_MATRIX_NB_ROWS(vnlStorePx) << " " 
-       << MAL_MATRIX_NB_COLS(vnlStorePx) << " " << endl;
+  /*  cout << "Size of PX: " << MAL_MATRIX_NB_ROWS(vnlStorePx) << " " 
+      << MAL_MATRIX_NB_COLS(vnlStorePx) << " " << endl; */
   delete C;
   delete D;
   delete XL;
@@ -3321,7 +3325,7 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
   while(LCI_it!=QueueOfLConstraintInequalities.end())
     {
       //      cout << *LCI_it << endl; 
-      cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime << endl;
+      //      cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime << endl;
       delete *(LCI_it);
       LCI_it++;
     }

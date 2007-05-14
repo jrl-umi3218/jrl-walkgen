@@ -588,13 +588,13 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
 
   ODEBUG6("Beginning of Setup 1 ","DebugData.txt");	
   m_PC1x(0,0)= m_StartingCOMPosition[0];
-  ODEBUG("COMPC1 init X: " <<  m_PC1x(0,0));
+  ODEBUG3("COMPC1 init X: " <<  m_PC1x(0,0));
   //m_PC1x(0,0) = 0.0;
   m_PC1x(1,0)= 0.0;
   m_PC1x(2,0)= 0.0;
   
   m_PC1y(0,0)= m_StartingCOMPosition[1];
-  ODEBUG("COMPC1 init Y: " <<  m_PC1y(0,0));
+  ODEBUG3("COMPC1 init Y: " <<  m_PC1y(0,0));
   //m_PC1y(0,0) = 0.0;
   m_PC1y(1,0)= 0;    
   m_PC1y(2,0)= 0;

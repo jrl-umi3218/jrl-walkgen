@@ -90,6 +90,7 @@ void StraightWalkingPBW(PatternGeneratorInterface &aPGI)
     aPGI.ParseCmd(strm2);
   }
 
+  if (0)
   {
     istringstream strm2(":setpbwconstraint XY 0.07 0.05");
     aPGI.ParseCmd(strm2);
@@ -117,11 +118,12 @@ void CurvedWalkingPBW(PatternGeneratorInterface &aPGI)
     aPGI.ParseCmd(strm2);
   }
 
-  {
-    istringstream strm2(":setpbwconstraint XY 0.07 0.05");
-    aPGI.ParseCmd(strm2);
-  }
-
+  if (0)
+    {
+      istringstream strm2(":setpbwconstraint XY 0.07 0.05");
+      aPGI.ParseCmd(strm2);
+    }
+  
   {
     istringstream strm2(":stepseq 0.0 -0.095 0.0 \
                      0.2 0.19 10.0  \
@@ -343,6 +345,7 @@ int main(int argc, char *argv[])
   };
 #endif
 
+  // This is a vector corresponding to the DOFs actuated of the robot.
   MAL_VECTOR_DIM(InitialPosition,double,40);
   MAL_VECTOR_DIM(CurrentPosition,double,40);
   for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
@@ -352,15 +355,16 @@ int main(int argc, char *argv[])
   // Specify the walking mode: here the default one.
   if (1)
   {
-    istringstream strm2(":walkmode 4");
+    istringstream strm2(":walkmode 0");
     aPGI->ParseCmd(strm2);
   }
 
-
-  MAL_VECTOR(,double) CurrentConfiguration;
-  MAL_VECTOR(,double) CurrentVelocity;
-  MAL_VECTOR_DIM(PreviousConfiguration,double,47) ;
-  MAL_VECTOR_DIM(PreviousVelocity,double,47);
+  // This is a vector corresponding to ALL the DOFS of the robot:
+  // free flyer + actuated DOFS.
+  MAL_VECTOR_DIM(CurrentConfiguration,double,46);
+  MAL_VECTOR_DIM(CurrentVelocity,double,46);
+  MAL_VECTOR_DIM(PreviousConfiguration,double,46) ;
+  MAL_VECTOR_DIM(PreviousVelocity,double,46);
   for(int i=0;i<6;i++)
     {
       PreviousConfiguration[i] = 
@@ -384,11 +388,12 @@ int main(int argc, char *argv[])
   for (unsigned int lNbIt=0;lNbIt<2;lNbIt++)
     {
       // ShortStraightWalking(*aPGI);
-      //      CurvedWalkingPBW(*aPGI);
+      // CurvedWalkingPBW(*aPGI);
       // KineoWorks(*aPGI);
-      // StraightWalking(*aPGI);
+      //StraightWalking(*aPGI);
+      StraightWalkingPBW(*aPGI);
       // Turn90DegreesWalking(aPGI);
-      TurningOnTheCircle(*aPGI); 
+      // TurningOnTheCircle(*aPGI); 
       
       // Should generate the same than the one previous (but shorter to specify).
 
