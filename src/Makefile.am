@@ -28,6 +28,7 @@
 
 configdir=	$(datadir)/$(PACKAGE)
 dist_config_DATA=\
+	./data/HRP2LinkJointRank.xml		\
 	./data/HRP2Specificities.xml		\
 	./data/PreviewControlParameters.ini
 
@@ -62,9 +63,3 @@ libwalkGenJRL_la_CPPFLAGS = \
 libwalkGenJRL_la_LDFLAGS = \
 	-llapack \
 	@DYNAMICJRLJAP_LIBS@
-
-
-
-
-
-
