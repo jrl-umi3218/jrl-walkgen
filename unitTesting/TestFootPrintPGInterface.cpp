@@ -420,9 +420,9 @@ int main(int argc, char *argv[])
   for (unsigned int lNbIt=0;lNbIt<2;lNbIt++)
     {
       // ShortStraightWalking(*aPGI);
-      // CurvedWalkingPBW2(*aPGI);
+      CurvedWalkingPBW2(*aPGI);
       // KineoWorks(*aPGI);
-      StraightWalking(*aPGI);
+      // StraightWalking(*aPGI);
       //      CurvedWalkingPBW(*PGI);
       // StraightWalkingPBW(*aPGI);
       // Turn90DegreesWalking(aPGI);

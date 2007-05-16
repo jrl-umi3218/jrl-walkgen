@@ -48,7 +48,7 @@ dnl	LAPACK_LIBS="-L${withval}/lib",
 dnl	)
 
 
-PKG_CHECK_MODULES(DYNAMICJRLJAP, dynamicsJRLJapan >= 1.0 )
+PKG_CHECK_MODULES(DYNAMICJRLJAP, dynamicsJRLJapan >= 1.1 )
 AC_SUBST(DYNAMICJRLJAP_CFLAGS)
 AC_SUBST(DYNAMICJRLJAP_LIBS)
 
@@ -68,4 +68,3 @@ AC_OUTPUT(Makefile
 	doc/pgjrl.dox
 	walkGenJrl.pc
 )
-

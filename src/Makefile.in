@@ -228,6 +228,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 configdir = $(datadir)/$(PACKAGE)
 dist_config_DATA = \
+	./data/HRP2LinkJointRank.xml		\
 	./data/HRP2Specificities.xml		\
 	./data/PreviewControlParameters.ini
 

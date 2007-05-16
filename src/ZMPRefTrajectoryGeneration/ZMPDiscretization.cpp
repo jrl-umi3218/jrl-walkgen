@@ -2349,10 +2349,10 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 	{
 	  double xmin=1e7, xmax=-1e7, ymin=1e7, ymax=-1e7;
 
-	  ODEBUG3("LeftFootAbsolutePositions[" << i << " ].theta= " << 
+	  ODEBUG("LeftFootAbsolutePositions[" << i << " ].theta= " << 
 		  LeftFootAbsolutePositions[i].theta);
 
-	  ODEBUG3("RightFootAbsolutePositions[" << i << " ].theta= " << 
+	  ODEBUG("RightFootAbsolutePositions[" << i << " ].theta= " << 
 		  RightFootAbsolutePositions[i].theta);
 	      
 	  vector<CH_Point> TheConvexHull;
