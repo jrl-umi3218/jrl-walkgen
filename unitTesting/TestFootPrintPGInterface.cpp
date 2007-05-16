@@ -8,50 +8,24 @@ using namespace::PatternGeneratorJRL;
 
 void CommonInitialization(PatternGeneratorInterface &aPGI)
 {
-  {
-    std::istringstream strm2(":omega 0.0");
-    aPGI.ParseCmd(strm2);
-  }
-
-  {
-    istringstream strm2(":stepheight 0.07");
-    aPGI.ParseCmd(strm2);
-  }
-
-  {
-    istringstream strm2(":singlesupporttime 0.78");
-    aPGI.ParseCmd(strm2);
-  }
-
-  {
-    istringstream strm2(":doublesupporttime 0.02");
-    aPGI.ParseCmd(strm2);
-  }
+  const char lBuffer[9][256] =
+    {":omega 0.0",
+     ":stepheight 0.07",
+     ":singlesupporttime 0.78",
+     ":doublesupporttime 0.02",
+     ":armparameters 0.5",
+     ":LimitsFeasibility 0.0",
+     ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
+     ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
+     ":UpperBodyMotionParameters -0.1 -1.0 0.0"
+    };
   
-  {
-    istringstream strm2(":armparameters 0.5");
-    aPGI.ParseCmd(strm2);
-  }
-
-  {
-    istringstream strm2(":LimitsFeasibility 0.0");
-    aPGI.ParseCmd(strm2);
-  }
+  for(int i=0;i<9;i++)
+    {
+      std::istringstream strm(lBuffer[i]);
+      aPGI.ParseCmd(strm);
+    }
   
-  {
-    istringstream strm2(":ZMPShiftParameters 0.015 0.015 0.015 0.015");
-    aPGI.ParseCmd(strm2);
-  }
-
-  {
-    istringstream strm2(":TimeDistributionParameters 2.0 3.7 1.7 3.0");
-    aPGI.ParseCmd(strm2);
-  }
-  
-  {
-    istringstream strm2(":UpperBodyMotionParameters -0.1 -1.0 0.0");
-    aPGI.ParseCmd(strm2);
-  }
 
 }
 
