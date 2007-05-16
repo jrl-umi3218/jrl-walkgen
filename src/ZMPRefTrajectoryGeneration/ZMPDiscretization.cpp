@@ -547,7 +547,10 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   ODEBUG4("Step 2","DebugData.txt");
 
   // Initialization of the ZMP position (stable values during the Preview control time window).
-  AddArraySize = (int)(m_PreviewControlTime/m_SamplingPeriod);
+  {
+    double ldAddArraySize =m_PreviewControlTime/m_SamplingPeriod; 
+      AddArraySize = (int)ldAddArraySize;
+  }
   ODEBUG4(AddArraySize,"DebugData.txt");
   ZMPPositions.resize(AddArraySize);
   LeftFootAbsolutePositions.resize(AddArraySize);
@@ -708,7 +711,8 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
       SupportFootAbsolutePositions[i].theta = CurrentAbsTheta;
 
       // First Phase of the step cycle.
-      unsigned int SizeOf1stPhase = (unsigned int)(TimeFirstPhase/m_SamplingPeriod);
+      double ltmp = TimeFirstPhase/m_SamplingPeriod;
+      unsigned int SizeOf1stPhase = (unsigned int)ltmp;
       double px0,py0,delta_x,delta_y;
       px0 = ZMPPositions[CurrentZMPindex-1].px;
       py0 = ZMPPositions[CurrentZMPindex-1].py;
@@ -884,7 +888,9 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
       m_PolynomeOmega2->SetParameters(ModulatedSingleSupportTime,2*m_Omega);
       //m_PolynomeZMPTheta->SetParameters(m_Tsingle,NextZMPTheta);
       m_PolynomeZMPTheta->SetParameters(m_Tsingle,NextTheta);
-      unsigned int SizeOfSndPhase = (unsigned int)(m_Tsingle/m_SamplingPeriod);
+      double l2tmp = m_Tsingle/m_SamplingPeriod;
+      unsigned int SizeOfSndPhase = (unsigned int)l2tmp;
+
       int indexinitial = CurrentZMPindex-1;
       int SignRHAND=1, SignLHAND=1;
 
@@ -1019,7 +1025,8 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 
   // Deal with the end phase of the walking.
   TimeForThisFootPosition = m_Tdble/2.0;
-  AddArraySize = (unsigned int)(TimeForThisFootPosition/m_SamplingPeriod);
+  double lAddArraySize = TimeForThisFootPosition/m_SamplingPeriod;
+  AddArraySize = (unsigned int)lAddArraySize;
   
   currentsize = ZMPPositions.size();
   ZMPPositions.resize(currentsize+AddArraySize);
@@ -1031,7 +1038,8 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   ODEBUG4(" GetZMPDiscretization: Step 7 " << currentsize << " " << AddArraySize,"DebugData.txt");
 
 
-  unsigned int SizeOfEndPhase = (unsigned int)(m_Tdble/(2*m_SamplingPeriod));
+  double dSizeOfEndPhase = m_Tdble/(2*m_SamplingPeriod);
+  unsigned int SizeOfEndPhase = (unsigned int)dSizeOfEndPhase;
   double px0,py0,delta_x,delta_y;
   double pxf=0,pyf=0;
   px0 = ZMPPositions[CurrentZMPindex-1].px;
@@ -1090,7 +1098,10 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   //       << " ZMPY: "<<  ZMPPositions[CurrentZMPindex-1].py  << endl; 
 
   // Added a new phase for exhausting the preview control
-  AddArraySize = (int)(3.0*m_PreviewControlTime/m_SamplingPeriod);
+  {
+    double ldAddArraySize = 3.0*m_PreviewControlTime/m_SamplingPeriod;
+    AddArraySize = (int)ldAddArraySize;
+  }
   currentsize = ZMPPositions.size();
   ZMPPositions.resize(currentsize+AddArraySize);
   LeftFootAbsolutePositions.resize(currentsize+AddArraySize);
@@ -1276,8 +1287,12 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   ODEBUG4("ZMP::InitOnLine - Step 2.5 ","ZMDInitOnLine.txt");
 
   ODEBUG4("ZMP::InitOnLine - Step 3 ","ZMDInitOnLine.txt");
-  // Initialization of the ZMP position (stable values during the Preview control time window).
-  int AddArraySize = (int)(m_PreviewControlTime/m_SamplingPeriod);
+  // Initialization of the ZMP position (stable values during the Preview control time window). 
+  int AddArraySize;
+  {
+    double ldAddArraySize = m_PreviewControlTime/m_SamplingPeriod;
+    AddArraySize = (int) ldAddArraySize;
+  }
   ODEBUG(AddArraySize);
   FinalZMPPositions.resize(AddArraySize);
   LeftFootAbsolutePositions.resize(AddArraySize);
@@ -1445,7 +1460,8 @@ void ZMPDiscretization::OnLine(RelativeFootPosition NewRelativeFootPosition,
   double TimeForThisFootPosition = TimeFirstPhase+ lTsingle;
   ODEBUG4("TimeFirstPhase: " << TimeFirstPhase << " lTsingle: " << lTsingle,"DebugData.txt");
   // Compute the size of cells to add inside the array.
-  int AddArraySize = (unsigned int)(TimeForThisFootPosition/m_SamplingPeriod);
+  double l2AddArraySize= TimeForThisFootPosition/m_SamplingPeriod;
+  int AddArraySize = (unsigned int)l2AddArraySize;
 
   ZMPPositions.resize(AddArraySize);
   LeftFootAbsolutePositions.resize(AddArraySize);
@@ -1459,7 +1475,8 @@ void ZMPDiscretization::OnLine(RelativeFootPosition NewRelativeFootPosition,
   UpdateCurrentSupportFootPosition(m_RelativeFootPositions[0]);
   
   // First Phase of the step cycle.
-  unsigned int SizeOf1stPhase = (unsigned int)(TimeFirstPhase/m_SamplingPeriod);
+  double dSizeOf1stPhase =TimeFirstPhase/m_SamplingPeriod;
+  unsigned int SizeOf1stPhase = (unsigned int)dSizeOf1stPhase;
   ODEBUG("m_vdiffsupppre : " << m_vdiffsupppre); 
   double px0,py0,theta0, delta_x,delta_y;
 
@@ -1631,7 +1648,8 @@ void ZMPDiscretization::OnLine(RelativeFootPosition NewRelativeFootPosition,
   m_PolynomeOmega2->SetParameters(ModulatedSingleSupportTime,2*m_Omega);
   //m_PolynomeZMPTheta->SetParameters(lTsingle,NextZMPTheta);
   m_PolynomeZMPTheta->SetParameters(lTsingle,NextTheta);
-  unsigned int SizeOfSndPhase = (unsigned int)(lTsingle/m_SamplingPeriod);
+  double dSizeOfSndPhase = lTsingle/m_SamplingPeriod;
+  unsigned int SizeOfSndPhase = (unsigned int)dSizeOfSndPhase;
   int indexinitial = CurrentZMPindex-1;
   int SignRHAND=1, SignLHAND=1;
 
@@ -1803,7 +1821,8 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
   double TimeForThisFootPosition;
   // Deal with the end phase of the walking.
   TimeForThisFootPosition = m_Tdble/2.0;
-  unsigned int AddArraySize = (unsigned int)(TimeForThisFootPosition/m_SamplingPeriod);
+  double dlAddArraySize = TimeForThisFootPosition/m_SamplingPeriod;
+  unsigned int AddArraySize = (unsigned int)dlAddArraySize;
   
   unsigned int CurrentZMPindex;
   unsigned int currentsize = CurrentZMPindex = ZMPPositions.size();
@@ -1814,7 +1833,8 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
   ODEBUG4(" GetZMPDiscretization: Step 7 " << currentsize << " " << AddArraySize,"DebugData.txt");
 
 
-  unsigned int SizeOfEndPhase = (unsigned int)(m_Tdble/(2*m_SamplingPeriod));
+  double dSizeOfEndPhase = m_Tdble/(2*m_SamplingPeriod);
+  unsigned int SizeOfEndPhase = (unsigned int)dSizeOfEndPhase;
   double px0,py0,delta_x,delta_y;
   double pxf=0,pyf=0;
   px0 = ZMPPositions[CurrentZMPindex-1].px;
@@ -1868,7 +1888,11 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
   //       << " ZMPY: "<<  ZMPPositions[CurrentZMPindex-1].py  << endl; 
 
   // Added a new phase for exhausting the preview control
-  AddArraySize = (int)(3.0*m_PreviewControlTime/m_SamplingPeriod);
+  {
+    double ldAddArraySize = 3.0*m_PreviewControlTime/m_SamplingPeriod;
+    AddArraySize = (int)ldAddArraySize;
+  }
+  
   currentsize = ZMPPositions.size();
   ZMPPositions.resize(currentsize+AddArraySize);
   LeftFootAbsolutePositions.resize(currentsize+AddArraySize);
@@ -2297,6 +2321,7 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 	}
       else
 	{
+	  
 	  if (LeftFootAbsolutePositions[i].z>0)
 	    {
 	      if (State!=2)
@@ -2309,6 +2334,14 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 		ComputeCH=1;
 	      State=1;
 	    }
+	  else if ((RightFootAbsolutePositions[i].z==0.0) &&
+		   (LeftFootAbsolutePositions[i].z==0.0))
+	    {
+	      if (State!=3)
+		ComputeCH=1;
+	      State=3;
+	    } 
+
 	  
 	}
 
@@ -2316,6 +2349,12 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 	{
 	  double xmin=1e7, xmax=-1e7, ymin=1e7, ymax=-1e7;
 
+	  ODEBUG3("LeftFootAbsolutePositions[" << i << " ].theta= " << 
+		  LeftFootAbsolutePositions[i].theta);
+
+	  ODEBUG3("RightFootAbsolutePositions[" << i << " ].theta= " << 
+		  RightFootAbsolutePositions[i].theta);
+	      
 	  vector<CH_Point> TheConvexHull;
 	  // Check if we are in a single or double support phase,
 	  // by testing the step type. In double support phase
@@ -2331,8 +2370,8 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 	      lx=LeftFootAbsolutePositions[i].x;
 	      ly=LeftFootAbsolutePositions[i].y;
 	      
-	      s_t = sin(LeftFootAbsolutePositions[i].theta*M_PI*180.0); 
-	      c_t = cos(LeftFootAbsolutePositions[i].theta*M_PI*180.0);  
+	      s_t = sin(LeftFootAbsolutePositions[i].theta*M_PI/180.0); 
+	      c_t = cos(LeftFootAbsolutePositions[i].theta*M_PI/180.0);  
 	      for(unsigned j=0;j<4;j++)
 		{
 		  aVecOfPoints[j].col = lx + ( lxcoefs[j] * lLeftFootHalfWidth 
@@ -2356,10 +2395,11 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 	      lx=RightFootAbsolutePositions[i].x;
 	      ly=RightFootAbsolutePositions[i].y;
 
-	      s_t = sin(RightFootAbsolutePositions[i].theta*M_PI*180.0); //+
-	      c_t = cos(RightFootAbsolutePositions[i].theta*M_PI*180.0); //+ 
 	      
-	      ODEBUG3("Right Foot: " << lx << " " << ly << " " << RightFootAbsolutePositions[i].theta);
+	      s_t = sin(RightFootAbsolutePositions[i].theta*M_PI/180.0); //+
+	      c_t = cos(RightFootAbsolutePositions[i].theta*M_PI/180.0); //+ 
+	      
+	      ODEBUG("Right Foot: " << lx << " " << ly << " " << RightFootAbsolutePositions[i].theta);
 	      for(unsigned j=0;j<4;j++)
 		{
 		  aVecOfPoints[j+4].col = lx + ( lxcoefs[j] * lRightFootHalfWidth
@@ -2392,12 +2432,12 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 		  lx=LeftFootAbsolutePositions[i].x;
 		  ly=LeftFootAbsolutePositions[i].y;
 		  
-		  s_t = sin(LeftFootAbsolutePositions[i].theta*M_PI*180.0); 
-		  c_t = cos(LeftFootAbsolutePositions[i].theta*M_PI*180.0);
+		  s_t = sin(LeftFootAbsolutePositions[i].theta*M_PI/180.0); 
+		  c_t = cos(LeftFootAbsolutePositions[i].theta*M_PI/180.0);
  		  for(unsigned j=0;j<4;j++)
 		    {
 		      TheConvexHull[j].col = lx + 
-			( lxcoefs[j] * lLeftFootHalfWidth * c_t - 
+			( lxcoefs[j] * lLeftFootHalfWidth * c_t -
 			  lycoefs[j] * lLeftFootHalfHeight * s_t ); 
 		      TheConvexHull[j].row = ly + 
 			( lxcoefs[j] * lLeftFootHalfWidth * s_t + 
@@ -2415,12 +2455,12 @@ int ZMPDiscretization::BuildLinearConstraintInequalities(deque<FootAbsolutePosit
 		{
 		  lx=RightFootAbsolutePositions[i].x;
 		  ly=RightFootAbsolutePositions[i].y;
-		  s_t = sin(RightFootAbsolutePositions[i].theta*M_PI*180.0); 
-		  c_t = cos(RightFootAbsolutePositions[i].theta*M_PI*180.0);      
+		  s_t = sin(RightFootAbsolutePositions[i].theta*M_PI/180.0); 
+		  c_t = cos(RightFootAbsolutePositions[i].theta*M_PI/180.0);      
 		  for(unsigned j=0;j<4;j++)
 		    {
 		      TheConvexHull[j].col = lx + ( lxcoefs[j] * 
-						    lRightFootHalfWidth * c_t - 
+						    lRightFootHalfWidth * c_t -
 						    lycoefs[j] * 
 						    lRightFootHalfHeight * s_t );
 		      TheConvexHull[j].row = ly + ( lxcoefs[j] * 
@@ -2530,8 +2570,6 @@ int ZMPDiscretization::BuildMatricesPxPu(double * & Px,double * &Pu,
   if (LCI_it==QueueOfLConstraintInequalities.end())
     {
       cout << "HERE 3" << endl;
-      exit(0);
-
       return -1;
     }
       
@@ -2685,11 +2723,8 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
   int CriteriaToMaximize=1;
 
 
-  if (1)
-    {
-      RESETDEBUG5("DebugInterpol.dat");
-    }
-
+  RESETDEBUG4("DebugInterpol.dat");
+  
   MAL_MATRIX_RESIZE(PPu,2*N,2*N);
   MAL_MATRIX_RESIZE(VPu,2*N,2*N);
   MAL_MATRIX_RESIZE(PPx,2*N,6);
@@ -2862,9 +2897,8 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
       ODEBUG6("A:" << m_A << endl << "B:" << m_B, "DebugPBW_Pb.dat");
   
 
-      ofstream aof;
-      aof.open("Constraints.dat",ofstream::out);
-      aof.close();
+      RESETDEBUG5("Constraints.dat");
+
     }
       
   // Build a set of linear constraint inequalities.
@@ -2883,10 +2917,11 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
       LCI_it++;
     }
   
+  double lSizeMat = QueueOfLConstraintInequalities.back()->EndingTime/T;
   MAL_MATRIX_RESIZE(vnlStorePx,
 		    NbOfConstraints,
 		    //6*N,
-		    1+(unsigned int)(QueueOfLConstraintInequalities.back()->EndingTime/(T)));
+		    1+(unsigned int)lSizeMat);
   
   for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(vnlStorePx);i++)
     {
@@ -2896,13 +2931,13 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	}
     }
   MAL_MATRIX_RESIZE(vnlStoreX,
-		    2*N,1+(unsigned int)(QueueOfLConstraintInequalities.back()->EndingTime/(T)));
+		    2*N,1+(unsigned int)lSizeMat);
 
   for(unsigned int i=0;i<2*N;i++)
     vnlStoreX(i,0) = 0.0;
   
   MAL_VECTOR_RESIZE(ConstraintNb,
-		    1+(unsigned int)(QueueOfLConstraintInequalities.back()->EndingTime/(T)));
+		    1+(unsigned int)lSizeMat);
 
   // pre computes the matrices needed for the optimization.
 
@@ -2994,7 +3029,12 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
   
   double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
   struct timeval start,end;
-  int li=0; int interval=(int)(T/m_SamplingPeriod);
+  int li=0; 
+  double dinterval = T /  m_SamplingPeriod;
+  int interval=(int)dinterval;
+
+  ODEBUG("0.0 " << QueueOfLConstraintInequalities.back()->EndingTime-	N*T << " " 
+	  << " T: " << T << " N: " << N << " interval " << interval);
   for(double StartingTime=0.0;
       StartingTime<QueueOfLConstraintInequalities.back()->EndingTime-
 	N*T;
@@ -3095,11 +3135,10 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	      X,U,&iout, &ifail, &iprint,
 	      war, &lwar,
 	      iwar, &liwar,&Eps);
-
       if (ifail!=0)
 	{
 	  cout << "IFAIL: " << ifail << endl;
-	  //	  exit(0);
+	  return -1;
 	}
 
 
@@ -3132,8 +3171,10 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	{
 	  cout << "Problem during validation of the constraints matrix: " << endl;
 	  cout << "   size for the columns different from 1" << endl;
-	  exit(0);
+	  return -1;
 	}
+
+
       for(int i=0;i<m;i++)
 	{
 	  unsigned int pbOnCurrent=0;
@@ -3152,12 +3193,11 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 		      << " StartingTime :" << StartingTime);
 	      if (pbOnCurrent)
 		{
-		  exit(0);
+		  return -1;
 		}
 	    }
 	    
 	}
-
       ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
 
       // Compute the command multiply 
@@ -3226,14 +3266,13 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	  // Put it into the stack.
 	  NewFinalZMPPositions.push_back(aZMPPos);
 	  
-	  ODEBUG5(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
+	  ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
 		  aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<
 		  aCOMPos.yaw << " " <<
 		  aZMPPos.px << " " << aZMPPos.py <<  " " << aZMPPos.theta << " " << 
 		  X[0] << " " << X[N] << " " << 
 		  lkSP << " " << T , "DebugInterpol.dat");
 	}
-
       // Simulate the dynamical system
       xk = MAL_RET_A_by_B(m_A,xk) + Buk ;
       // Modif. from Dimitar: Initially a mistake regarding the ordering.
@@ -3258,10 +3297,27 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
 	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
     }
+  ODEBUG("NewZMPsize: " << NewFinalZMPPositions.size());
   // Current heuristic to complete the ZMP buffer:
   // fill with the last correct value.
   ZMPPosition LastZMPPos = NewFinalZMPPositions.back();
-  for (unsigned int i=0;i< N*T/m_SamplingPeriod;i++)
+
+  ODEBUG("N*T/m_SamplingPeriod :" << N*T/m_SamplingPeriod << " " << (int)N*T/m_SamplingPeriod);
+  double lLimit = N*T/m_SamplingPeriod;
+  int Limit = (int)lLimit;
+  
+  ODEBUG("Limit: " << Limit);
+
+  // This test is here to compensate for the discrency 
+  // between ZMPRef Position and the new one.
+  // As the parameters N and T can be different you may have one
+  // or two iterations of difference. They are compensate for here.
+  // It is assumed that NewFinalZMPPositions.size() < ZMPRefPositions.size()
+  if ((Limit + NewFinalZMPPositions.size()) != ZMPRefPositions.size())
+    Limit = ZMPRefPositions.size() - NewFinalZMPPositions.size();
+
+  ODEBUG("Limit: " << Limit);
+  for (unsigned int i=0;i< Limit;i++)
   {
     ZMPPosition aZMPPos;
     aZMPPos.px = LastZMPPos.px;
@@ -3270,7 +3326,7 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
     aZMPPos.stepType = LastZMPPos.stepType;
     NewFinalZMPPositions.push_back(aZMPPos);
   }
-
+  ODEBUG("NewZMPsize: " << NewFinalZMPPositions.size());
   if (0)
     {
       ofstream aof;

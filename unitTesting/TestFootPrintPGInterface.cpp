@@ -109,7 +109,6 @@ void StraightWalkingPBW(PatternGeneratorInterface &aPGI)
 
 }
 
-
 void CurvedWalkingPBW(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
@@ -132,6 +131,39 @@ void CurvedWalkingPBW(PatternGeneratorInterface &aPGI)
                      0.2 -0.19 10.0 \
                      0.2 0.19 10.0 \
                      0.0 -0.19 0.0");
+    aPGI.ParseCmd(strm2);
+  }
+
+}
+
+
+void CurvedWalkingPBW2(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+  {
+    istringstream strm2(":SetAlgoForZmpTrajectory PBW");
+    aPGI.ParseCmd(strm2);
+  }
+
+  if (0)
+    {
+      istringstream strm2(":setpbwconstraint XY 0.07 0.05");
+      aPGI.ParseCmd(strm2);
+    }
+  
+  {
+    istringstream strm2(":stepseq 0.0 -0.095 0.0 \
+                     0.2 0.19 10.0  \
+                     0.2 -0.19 10.0 \
+                     0.2 0.19 10.0  \
+                     0.2 -0.19 10.0 \
+                     0.2 0.19 10.0 \
+                     0.2 -0.19 -10.0 \
+                     0.2 0.19 -10.0  \
+                     0.2 -0.19 -10.0 \
+                     0.2 0.19 -10.0 \
+                     0.2 -0.19 -10.0 \
+                     0.0 0.19 0.0");
     aPGI.ParseCmd(strm2);
   }
 
@@ -388,10 +420,11 @@ int main(int argc, char *argv[])
   for (unsigned int lNbIt=0;lNbIt<2;lNbIt++)
     {
       // ShortStraightWalking(*aPGI);
-      // CurvedWalkingPBW(*aPGI);
+      // CurvedWalkingPBW2(*aPGI);
       // KineoWorks(*aPGI);
-      //StraightWalking(*aPGI);
-      StraightWalkingPBW(*aPGI);
+      StraightWalking(*aPGI);
+      //      CurvedWalkingPBW(*PGI);
+      // StraightWalkingPBW(*aPGI);
       // Turn90DegreesWalking(aPGI);
       // TurningOnTheCircle(*aPGI); 
       

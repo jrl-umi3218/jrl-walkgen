@@ -69,9 +69,9 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   RESETDEBUG4("DebugDataql.txt");
   RESETDEBUG4("DebugDatadqr.txt");
   RESETDEBUG4("DebugDatadql.txt");
-  RESETDEBUG5("DebugDataDiffZMP.txt");
-  RESETDEBUG5("DebugDataCOMPC1.txt");
-  RESETDEBUG5("DebugDataWaistZMP.txt");
+  RESETDEBUG4("DebugDataDiffZMP.txt");
+  RESETDEBUG4("DebugDataCOMPC1.txt");
+  RESETDEBUG4("DebugDataWaistZMP.txt");
   RESETDEBUG4("DebugDataCOMPC2.txt");
   RESETDEBUG4("DebugDataZMPMB1.txt");
   RESETDEBUG4("DebugDataDeltaCOM.txt");
@@ -180,8 +180,8 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMPosition 
 
   if (StageOfTheAlgorithm==0)
     {
-
-      ODEBUG5(CurrentConfiguration(0) << " " << CurrentConfiguration(1) << " " << CurrentConfiguration(2) ,
+      ODEBUG("StageOfTheAlgorithm=0" << CurrentConfiguration );
+      ODEBUG4(CurrentConfiguration(0) << " " << CurrentConfiguration(1) << " " << CurrentConfiguration(2) ,
 	      "DebugDataWaistZMP.txt");
       /* Update the current configuration vector */
       m_HumanoidDynamicRobot->currentConfiguration(CurrentConfiguration);
@@ -203,7 +203,10 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 
   //  m_FIFOZMPRefPositions.push_back(NewZMPRefPos);
 
-  ODEBUG("FirstStage");
+  ODEBUG("FirstStage " << CurrentConfiguration);
+  ODEBUG("LFP : " << LeftFootPosition.x<< " " << LeftFootPosition.y << " " << LeftFootPosition.z);
+  ODEBUG("RFP : " << RightFootPosition.x<< " " << RightFootPosition.y << " " << RightFootPosition.z);
+  
   FirstStageOfControl(LeftFootPosition,RightFootPosition,refandfinalCOMPosition);
   // This call is suppose to initialize 
   // correctly the current configuration, speed and acceleration.
@@ -211,15 +214,16 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[m_NL];
   FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[m_NL];
 
-  ODEBUG("CTCFR");
+
   CallToComAndFootRealization(acompos,aLeftFAP,aRightFAP,
 			      CurrentConfiguration,
 			      CurrentVelocity,
 			      m_NumberOfIterations,
 			      0);
-  ODEBUG("EvaluateMultiBodyZMP");
+  
+
   EvaluateMultiBodyZMP(-1);
-  ODEBUG("SecondStage");
+  
   aLeftFAP = m_FIFOLeftFootPosition[0];
   aRightFAP = m_FIFORightFootPosition[0];
   SecondStageOfControl(refandfinalCOMPosition);
@@ -228,6 +232,7 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 			      CurrentVelocity,
 			      m_NumberOfIterations - m_NL,
 			      1);
+
   // Here it is assumed that the 4x4 CoM matrix 
   // is the orientation of the free flyer and
   // its position.
@@ -468,7 +473,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
   {
     ZMPPosition lZMPPos = m_FIFOZMPRefPositions[0];
-    ODEBUG5(acomp.x[0]<< " "
+    ODEBUG4(acomp.x[0]<< " "
 	    << acomp.y[0] <<  " " 
 	    << acomp.z[0] << " "
 	    << zmpx2 << " " 
@@ -522,7 +527,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   aZMPpos.px = m_FIFOZMPRefPositions[0].px - ZMPmultibody[0];
   aZMPpos.py = m_FIFOZMPRefPositions[0].py - ZMPmultibody[1];
   aZMPpos.time = m_FIFOZMPRefPositions[0].time;
-  ODEBUG5(aZMPpos.px << " " << aZMPpos.py << " " 
+  ODEBUG4(aZMPpos.px << " " << aZMPpos.py << " " 
 	  << m_FIFOZMPRefPositions[0].px << " " << m_FIFOZMPRefPositions[0].py  << " " 
 	  << ZMPmultibody[0] << " " << ZMPmultibody[1] << " "  
 	  << CoMmultibody[0] << " " << CoMmultibody[1], "DebugDataDiffZMP.txt");
@@ -588,13 +593,13 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
 
   ODEBUG6("Beginning of Setup 1 ","DebugData.txt");	
   m_PC1x(0,0)= m_StartingCOMPosition[0];
-  ODEBUG3("COMPC1 init X: " <<  m_PC1x(0,0));
+  ODEBUG("COMPC1 init X: " <<  m_PC1x(0,0));
   //m_PC1x(0,0) = 0.0;
   m_PC1x(1,0)= 0.0;
   m_PC1x(2,0)= 0.0;
   
   m_PC1y(0,0)= m_StartingCOMPosition[1];
-  ODEBUG3("COMPC1 init Y: " <<  m_PC1y(0,0));
+  ODEBUG("COMPC1 init Y: " <<  m_PC1y(0,0));
   //m_PC1y(0,0) = 0.0;
   m_PC1y(1,0)= 0;    
   m_PC1y(2,0)= 0;
@@ -630,6 +635,9 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
 							   int localindex)
 {
 
+  ODEBUG("SetupIterativePhase " << localindex << " " << CurrentConfiguration );
+  ODEBUG("COMPosition["<<localindex<<"]=" << COMPositions[localindex].x[0] << " " << 
+	  COMPositions[localindex].y[0] << " " << COMPositions[localindex].z[0]);
   FirstStageOfControl(LeftFootPositions[localindex],RightFootPositions[localindex],COMPositions[localindex]);
   CallToComAndFootRealization(m_FIFOCOMPositions[localindex],
 			      LeftFootPositions[localindex],
@@ -776,8 +784,10 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(MAL_VECTOR(&BodyAngle
 							   FootAbsolutePosition & InitLeftFootPosition,
 							   FootAbsolutePosition & InitRightFootPosition)
 {
+  ODEBUG("EvaluateStartingCOM: BodyAnglesInit :" << BodyAnglesInit);
   m_ComAndFootRealization->InitializationCoM(BodyAnglesInit,m_StartingCOMPosition,
 					     InitLeftFootPosition, InitRightFootPosition);  
+  ODEBUG("EvaluateStartingCOM: m_StartingCOMPosition: " << m_StartingCOMPosition);
   aStartingCOMPosition[0] = m_StartingCOMPosition[0];
   aStartingCOMPosition[1] = m_StartingCOMPosition[1];
   aStartingCOMPosition[2] = m_StartingCOMPosition[2];

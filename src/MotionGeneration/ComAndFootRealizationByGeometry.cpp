@@ -430,6 +430,15 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   InitRightFootPosition.y = lFootPosition[1];
   InitRightFootPosition.z = 0.0;
 
+  // We assume that the foot is flat on the floor...
+  // Thus
+  // lFootPose(0:2,0:2)=
+  // coct    -st    -soct
+  // cost     ct    -sost
+  // so        0    co
+  InitRightFootPosition.omega = atan2(lFootPose(2,0),lFootPose(2,2))*180/M_PI;
+  InitRightFootPosition.theta = atan2(-lFootPose(0,1),lFootPose(1,1))*180/M_PI;
+
   // Initialise the left foot position.
   lFootPose = getHumanoidDynamicRobot()->leftFoot()->initialPosition();  
   
@@ -439,6 +448,15 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   InitLeftFootPosition.x = lFootPosition[0];
   InitLeftFootPosition.y = lFootPosition[1];
   InitLeftFootPosition.z = 0.0;
+  InitLeftFootPosition.theta = 0.0;
+  // We assume that the foot is flat on the floor...
+  // Thus
+  // lFootPose(0:2,0:2)=
+  // coct    -st    -soct
+  // cost     ct    -sost
+  // so        0    co
+  InitLeftFootPosition.omega = atan2(lFootPose(2,0),lFootPose(2,2))*180/M_PI;
+  InitLeftFootPosition.theta = atan2(-lFootPose(0,1),lFootPose(1,1))*180/M_PI;
 
   ODEBUG4( "Left Foot Position: " 
 	   << lFootPosition[0] << " "
@@ -523,8 +541,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   Foot_P(0) = lFootPosition[0];
   Foot_P(1) = lFootPosition[1];
   Foot_P(2) = lFootPosition[2];
-
-  InitRightFootPosition.z = 0.0;
+  
   ODEBUG4( "Foot_P " << Foot_P, "DebugDataStartingCOM.dat" );
   ODEBUG4( "Foot_R " << Foot_R, "DebugDataStartingCOM.dat" );
   ODEBUG4( "m_Dt Left : " << m_DtLeft << " Right : " << m_DtRight, "DebugDataStartingCOM.dat" );

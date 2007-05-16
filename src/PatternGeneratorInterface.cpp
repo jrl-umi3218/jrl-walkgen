@@ -82,7 +82,7 @@ namespace PatternGeneratorJRL {
 
     RESETDEBUG4("DDCC.dat");
     RESETDEBUG4("DDCV.dat");
-    RESETDEBUG5("DebugDataWaist.dat");
+    RESETDEBUG4("DebugDataWaist.dat");
     // End if Initialization
 
     m_ObstacleDetected = false;
@@ -239,7 +239,8 @@ namespace PatternGeneratorJRL {
     // Object to investiguate the result of the second preview loop.
     m_2DMB = new DynamicMultiBody();
     m_2DMB->setComputeZMP(true);
-     m_2DMB->setComputeBackwardDynamics(false);
+    m_2DMB->setComputeBackwardDynamics(false);
+    
     // INFO: This where you should instanciate your own
     // INFO: implementation of CjrlHumanoidDynamicRobot
     m_2HumanoidDynamicRobot= new HumanoidDynamicMultiBody(m_2DMB,HumanoidSpecificitiesFileName);
@@ -582,7 +583,7 @@ namespace PatternGeneratorJRL {
     // Initialize consequently the ComAndFoot Realization object.
     m_ZMPpcwmbz->EvaluateStartingCoM(BodyAnglesIni,lStartingCOMPosition,
 				     InitLeftFootAbsPos, InitRightFootAbsPos);
-    ODEBUG3("StartingCOMPosition: " << lStartingCOMPosition);
+    ODEBUG("StartingCOMPosition: " << lStartingCOMPosition);
     // We also initialize the iteration number inside DMB.
     m_DMB->ResetIterationNumber();
     
@@ -711,7 +712,7 @@ namespace PatternGeneratorJRL {
   
   void PatternGeneratorInterface::FinishAndRealizeStepSequence()
   { 
-    ODEBUG3("PGI-Start");
+    ODEBUG("PGI-Start");
     MAL_S3_VECTOR(lStartingCOMPosition,double);	
     MAL_VECTOR( BodyAnglesIni,double);
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
@@ -726,14 +727,14 @@ namespace PatternGeneratorJRL {
 
     MAL_VECTOR(,double) lCurrentConfiguration;
     lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();  
-    ODEBUG3("lCurrent Configuration :" << lCurrentConfiguration );
+    ODEBUG("lCurrent Configuration :" << lCurrentConfiguration );
 
     deque<RelativeFootPosition> lRelativeFootPositions;
     CommonInitializationOfWalking(lStartingCOMPosition,
 				  BodyAnglesIni,
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,true);
-    ODEBUG3( "Pass through here " );
+    ODEBUG( "Pass through here " );
     lCurrentConfiguration(0) = 0.0;
     lCurrentConfiguration(1) = 0.0;
     lCurrentConfiguration(2) = 0.0;
@@ -776,7 +777,8 @@ namespace PatternGeneratorJRL {
     if (m_BoolPBWAlgo)
       {
 	ODEBUG("PBW algo set on");
-
+	ODEBUG("Size of COMBuffer: " << m_COMBuffer.size());
+	m_COMBuffer.clear();
 	m_ZMPD->BuildZMPTrajectoryFromFootTrajectory(m_LeftFootPositions,
 						     m_RightFootPositions,
 						     m_ZMPPositions,
@@ -949,14 +951,13 @@ namespace PatternGeneratorJRL {
 
 	MAL_VECTOR(,double) CurrentConfiguration;
 	CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();  
-	cout << "FinishAndRealizeStepSequence: CurrentConfiguration " << CurrentConfiguration << endl;
 	MAL_VECTOR(,double) CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
 	
 	for(unsigned int i=0;i<m_NL;i++)
 	  {
 	    COMPosition aCOMPosition;
 	    
-	    ODEBUG3("PGI: " << i <<  " " 
+	    ODEBUG("PGI: " << i <<  " " 
 		   << m_COMBuffer[i].x[0] << " "
 		   << m_COMBuffer[i].y[0] << " "
 		   << m_COMBuffer[i].z[0]);
@@ -1247,24 +1248,14 @@ namespace PatternGeneratorJRL {
 	   << " " << m_ZMPPositions[2*m_NL].px 
 	   << " " << m_ZMPPositions[2*m_NL].py );
 
-    if (m_count==0)
-      {
-	cout << "RunOneStepOfTheControlLoop - begin : "
-	     << CurrentConfiguration(0) << " "
-	     << CurrentConfiguration(1) << " "
-	     << CurrentConfiguration(2) << " " 
-	     << finalCOMPosition.x[0] << " " 
-	     << finalCOMPosition.y[0] << " " 
-	     << m_COMBuffer.size() << endl;
-      }
-
+    ODEBUG(m_count << " before-CurrentConfiguration " << CurrentConfiguration);
     m_ZMPpcwmbz->OneGlobalStepOfControl(m_LeftFootPositions[m_NL],
 					m_RightFootPositions[m_NL],
 					m_ZMPPositions[2*m_NL],
 					finalCOMPosition,
 					CurrentConfiguration,
 					CurrentVelocity);
-
+    ODEBUG(m_count << " CurrentConfiguration " << CurrentConfiguration);
     for(unsigned int i=0;i<m_CurrentActuatedJointValues.size();i++)
       {
 	Joint * aJoint = (Joint *)m_DMB->GetJointFromVRMLID(i);
@@ -1283,13 +1274,6 @@ namespace PatternGeneratorJRL {
     */
     m_COMBuffer[0] = finalCOMPosition;  
 
-    if (m_count==0)
-      {
-	cout << "RunOneStepOfTheControlLoop - end : "
-	     << CurrentConfiguration(0) << " "
-	     << CurrentConfiguration(1) << " "
-	     << CurrentConfiguration(2) << endl;
-      }
     m_count++;
 
     // Compute the waist position in the current motion global reference frame.
@@ -1338,7 +1322,7 @@ namespace PatternGeneratorJRL {
     m_UpperBodyPositionsBuffer.pop_front();
 		
     m_CurrentWaistState = outWaistPosition;
-    ODEBUG5("CurrentWaistState: " 
+    ODEBUG4("CurrentWaistState: " 
 	    << m_CurrentWaistState.x[0] << " " 
 	    << m_CurrentWaistState.y[0] << " " 
 	    << m_CurrentWaistState.z[0] << " ","DebugDataWaist.dat" );
@@ -1398,7 +1382,7 @@ namespace PatternGeneratorJRL {
 	  cout << m_CurrentActuatedJointValues[i] << " " ;
 	cout << endl;
 	*/
-	ODEBUG5("*** TAG *** " , "DebugDataIK.dat");
+	ODEBUG4("*** TAG *** " , "DebugDataIK.dat");
 
       }
 
@@ -1442,12 +1426,6 @@ namespace PatternGeneratorJRL {
     MAL_S3_VECTOR(ZMPmultibody,double);
 
     
-    if (m_count==1)
-      {
-	ODEBUG3("Waist position: " << 
-		CurrentConfiguration(0) << " "  << 
-		CurrentConfiguration(1) );
-      }
     if (m_count>1)
       {
 	for(int i=0;i<6;i++)
@@ -2034,7 +2012,6 @@ namespace PatternGeneratorJRL {
 
     // TO DO: take the joint specific to the legs
     // and create the appropriate vector.
-    cout << "PatternGeneratorInterface::GetLegJointVelocity: to implement" << endl;
     for(int i=0;i<6;i++)
       {
 	dqr(i) = m_dqr(i);
