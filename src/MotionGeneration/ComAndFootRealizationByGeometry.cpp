@@ -436,8 +436,12 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   // coct    -st    -soct
   // cost     ct    -sost
   // so        0    co
-  InitRightFootPosition.omega = atan2(lFootPose(2,0),lFootPose(2,2))*180/M_PI;
-  InitRightFootPosition.theta = atan2(-lFootPose(0,1),lFootPose(1,1))*180/M_PI;
+  InitRightFootPosition.omega =
+    atan2(MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,0),
+	  MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,2))*180/M_PI;
+  InitRightFootPosition.theta =
+    atan2(-MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 0,1),
+	  MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 1,1))*180/M_PI;
 
   // Initialise the left foot position.
   lFootPose = getHumanoidDynamicRobot()->leftFoot()->initialPosition();
@@ -455,8 +459,12 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   // coct    -st    -soct
   // cost     ct    -sost
   // so        0    co
-  InitLeftFootPosition.omega = atan2(lFootPose(2,0),lFootPose(2,2))*180/M_PI;
-  InitLeftFootPosition.theta = atan2(-lFootPose(0,1),lFootPose(1,1))*180/M_PI;
+  InitLeftFootPosition.omega =
+    atan2(MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,0),
+	  MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,2))*180/M_PI;
+  InitLeftFootPosition.theta =
+    atan2(-MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 0,1),
+	  MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 1,1))*180/M_PI;
 
   ODEBUG4( "Left Foot Position: "
 	   << lFootPosition[0] << " "
