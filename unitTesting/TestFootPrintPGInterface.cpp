@@ -353,7 +353,7 @@ int main(int argc, char *argv[])
 
   // This is a vector corresponding to the DOFs actuated of the robot.
   MAL_VECTOR_DIM(InitialPosition,double,40);
-  MAL_VECTOR_DIM(CurrentPosition,double,40);
+  //MAL_VECTOR_DIM(CurrentPosition,double,40);
   for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
     InitialPosition(i) = dInitPos[i]*M_PI/180.0;
   aPGI->SetCurrentJointValues(InitialPosition);
@@ -386,7 +386,7 @@ int main(int argc, char *argv[])
   MAL_VECTOR_DIM(ZMPTarget,double,3);
   
     
-  COMPosition CurrentWaistPosition;
+  //COMPosition CurrentWaistPosition;
   struct timeval begin,end;
   unsigned long int NbOfIt=0;
   gettimeofday(&begin,0);
