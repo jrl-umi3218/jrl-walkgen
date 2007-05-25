@@ -1,11 +1,16 @@
+walkGenJRL 2.3 released May 25, 2007
+
+	14. (tho) Added -release flag to libtool so that library names
+	reflect package version.
+	13. (tho) Removed explicit -llapack for linking libwalkGenJRL as
+	it is inherited from dynamicsJRLJapan LDFLAGS.
+	12. (mathieu) replace the file HRP2LinkJointRank in /src/data with
+	a good version of the file
+	11. (mathieu) cleaning file configure.ac and README
+
 walkGenJRL 2.2 released May 15, 2007
 
-	   12. (mathieu) replace the file HRP2LinkJointRank in /src/data with a good version of the file
-
-	   11. (mathieu) cleaning file configure.ac and README
-
 	   10. XXX missing many entries
-
 	   9 - (mathieu) correct configure.ac and src/Makefile.am to accept correctly
 	       the flags of dynamicsJRLJap package.
 	       note : make comments in configure.ac but didn't clean it
