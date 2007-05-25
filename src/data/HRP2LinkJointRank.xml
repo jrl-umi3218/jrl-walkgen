@@ -1,6 +1,6 @@
   <LinkJointNameAndRank>
-       <Nb> 40 </Nb>
-
+       <Nb> 41 </Nb>
+       <Link> WAIST 0 </Link>
        <Link> RLEG_JOINT0 6 </Link>
        <Link> RLEG_JOINT1 7 </Link>
        <Link> RLEG_JOINT2 8 </Link>
