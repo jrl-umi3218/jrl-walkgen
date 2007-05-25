@@ -61,5 +61,5 @@ libwalkGenJRL_la_CPPFLAGS = \
 
 
 libwalkGenJRL_la_LDFLAGS = \
-	-llapack \
-	@DYNAMICJRLJAP_LIBS@
+	@DYNAMICJRLJAP_LIBS@		\
+	-release ${PACKAGE_VERSION}
