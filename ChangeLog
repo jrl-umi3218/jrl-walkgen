@@ -1,3 +1,8 @@
+walkGenJRL 2.3.1 released June 25, 2007
+
+	15. (tho) Removed last joints from left and right arms (numer 22
+	and 29).
+
 walkGenJRL 2.3 released May 25, 2007
 
 	14. (tho) Added -release flag to libtool so that library names
