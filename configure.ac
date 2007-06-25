@@ -6,7 +6,7 @@ dnl
 dnl Modified by Olivier Stasse 2007 CNRS/AIST
 dnl
 
-AC_INIT([walkGenJRL],[2.3],[openrobots@laas.fr])
+AC_INIT([walkGenJRL],[2.3.1],[openrobots@laas.fr])
 AC_PREREQ(2.59)
 
 AM_INIT_AUTOMAKE
@@ -17,7 +17,7 @@ AC_PROG_LIBTOOL
 AC_PROG_CXX
 
 
-PKG_CHECK_MODULES(DYNAMICJRLJAP, dynamicsJRLJapan >= 1.1 )
+PKG_CHECK_MODULES(DYNAMICJRLJAP, dynamicsJRLJapan >= 1.1)
 AC_SUBST(DYNAMICJRLJAP_CFLAGS)
 AC_SUBST(DYNAMICJRLJAP_LIBS)
 
