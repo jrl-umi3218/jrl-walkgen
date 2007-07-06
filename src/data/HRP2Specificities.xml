@@ -47,14 +47,14 @@
     <Right>
         <UpperArmLength> 0.25 </UpperArmLength>
         <ForeArmLength> 0.25 </ForeArmLength>
-        <JointNb> 6 </JointNb>
-        <JointsID> 16 17 18 19 20 21 </JointsID>
+        <JointNb> 7 </JointNb>
+        <JointsID> 16 17 18 19 20 21 22 </JointsID>
     </Right>
     <Left>
         <UpperArmLength> 0.25 </UpperArmLength>
         <ForeArmLength> 0.25 </ForeArmLength>
-        <JointNb> 6 </JointNb>
-        <JointsID> 23 24 25 26 27 28 </JointsID>
+        <JointNb> 7 </JointNb>
+        <JointsID> 23 24 25 26 27 28 29 </JointsID>
     </Left>
   </Arms>
   <Head> 
