@@ -55,7 +55,7 @@
 #include <MotionGeneration/StepOverPlanner.h>
 
 #include <StepStackHandler.h>
-#include <robotDynamicsJRLJapan/HumanoidDynamicMultiBody.h>
+#include <dynamicsJRLJapan/HumanoidDynamicMultiBody.h>
 
 #include <SimplePluginManager.h>
 

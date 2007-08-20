@@ -37,7 +37,7 @@
 
 #include <PreviewControl/PreviewControl.h>
 #include <PGTypes.h>
-#include <robotDynamicsJRLJapan/HumanoidSpecificities.h>
+#include <dynamicsJRLJapan/HumanoidSpecificities.h>
 #include <MotionGeneration/ComAndFootRealization.h>
 
 using namespace::std;

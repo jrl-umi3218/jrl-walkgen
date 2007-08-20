@@ -4,7 +4,7 @@
 #include <time.h>
 
 #include <MotionGeneration/ComAndFootRealizationByGeometry.h>
-#include <robotDynamicsJRLJapan/HumanoidDynamicMultiBody.h>
+#include <dynamicsJRLJapan/HumanoidDynamicMultiBody.h>
 
 
 #if 0

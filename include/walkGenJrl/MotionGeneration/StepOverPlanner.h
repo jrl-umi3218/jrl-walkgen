@@ -46,8 +46,8 @@
 #include <Mathematics/StepOverPolynome.h>
 #include <MotionGeneration/InverseKinematics.h>
 
-#include <robotDynamicsJRLJapan/DynamicMultiBody.h>
-#include <robotDynamicsJRLJapan/HumanoidSpecificities.h>
+#include <dynamicsJRLJapan/DynamicMultiBody.h>
+#include <dynamicsJRLJapan/HumanoidSpecificities.h>
 #include <deque>
 
 

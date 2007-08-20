@@ -38,7 +38,7 @@
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 #include <iostream>
 
-#include <robotDynamicsJRLJapan/HumanoidSpecificities.h>
+#include <dynamicsJRLJapan/HumanoidSpecificities.h>
 using namespace dynamicsJRLJapan;
 
 namespace PatternGeneratorJRL

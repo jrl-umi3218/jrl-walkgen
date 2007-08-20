@@ -48,7 +48,7 @@ using namespace::std;
 #include <Mathematics/PolynomeFoot.h>
 #include <Mathematics/ConvexHull.h>
 #include <PreviewControl/PreviewControl.h>
-#include <robotDynamicsJRLJapan/HumanoidSpecificities.h>
+#include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
 using namespace dynamicsJRLJapan;
 namespace PatternGeneratorJRL
