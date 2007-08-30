@@ -6,24 +6,19 @@ dnl
 dnl Modified by Olivier Stasse 2007 CNRS/AIST
 dnl
 
-AC_INIT([walkGenJRL],[2.3.2],[openrobots@laas.fr])
+AC_INIT([walkGenJRL],[2.3.3],[openrobots@laas.fr])
 AC_PREREQ(2.59)
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign no-define])
 
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
 AC_PROG_CXX
 
-
+define(dynamicsjrljapan_reqd, [dynamicsJRLJapan >= 1.5])
+AC_SUBST(DYNAMICSJRLJAPAN_REQD, "dynamicsjrljapan_reqd")
 PKG_CHECK_MODULES(DYNAMICJRLJAP, dynamicsJRLJapan >= 1.1)
-AC_SUBST(DYNAMICJRLJAP_CFLAGS)
-AC_SUBST(DYNAMICJRLJAP_LIBS)
-
-
-CXXFLAGS="${CXXFLAGS} -D_DEFAULT_MATRIX3x3_ -D_DEFAULT_VECTOR3D_"
-dnl LDFLAGS="${LDFLAGS} -llapack"
 
 AC_OUTPUT(Makefile
 	src/Makefile
