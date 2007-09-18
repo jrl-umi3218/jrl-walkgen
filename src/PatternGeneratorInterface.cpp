@@ -1312,8 +1312,7 @@ namespace PatternGeneratorJRL {
 
     ZMPTarget(0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
     ZMPTarget(1) = -sin(temp3)*temp1+cos(temp3)*temp2;
-    ZMPTarget(2) =
-      -finalCOMPosition.z[0] - MAL_S4x4_MATRIX_ACCESS_I(PosOfWaistInCOMF, 2);
+    ZMPTarget(2) = -outWaistPosition.z[0];
 
     ODEBUG4(finalCOMPosition.z[0] << " " << PosOfWaitInCOMF[2] << " " << ZMPTarget(2,0),
 	    "DebugDataZMPTargetZ.dat");
