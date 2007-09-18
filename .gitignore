@@ -1,4 +1,11 @@
 Makefile.in
 aclocal.m4
-configure
 autom4te.cache
+config.guess
+config.sub
+configure
+doc/Makefile.in
+include/Makefile.in
+src/Makefile.in
+unitTesting/Makefile.in
+ltmain.sh
