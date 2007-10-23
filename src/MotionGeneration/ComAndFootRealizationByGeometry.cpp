@@ -386,8 +386,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 
     }
 
-  DynamicMultiBody *aDMB =   ((DynamicMultiBody *)((HumanoidDynamicMultiBody *)getHumanoidDynamicRobot())
-			      ->getDynamicMultiBody());
+  DynamicMultiBody *aDMB =   dynamic_cast<DynamicMultiBody*>(getHumanoidDynamicRobot());
   aDMB->currentConfiguration(CurrentConfig);
   ODEBUG("Configuration 1.5 stage " << CurrentConfig);
   ODEBUG("Forward Kinematics for InitializationCoM");

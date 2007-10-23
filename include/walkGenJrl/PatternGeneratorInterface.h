@@ -323,9 +323,6 @@ namespace PatternGeneratorJRL
     /*! The Preview Control object. */
     PreviewControl *m_PC;
     
-    /*! The multibody objects. */
-    DynamicMultiBody *m_DMB,*m_2DMB;
-
     /*! The object to be used to perform one step of
       control, and generates the corrected CoM trajectory. */
     ZMPPreviewControlWithMultiBodyZMP *m_ZMPpcwmbz;
