@@ -1,4 +1,5 @@
-/** Polynomes object for generating foot and hip trajectories while stepping over.
+/* 
+   Polynomes object for generating foot and hip trajectories while stepping over.
     
 Copyright (c) 2005-2006, 
 @author Bjorn Verrelst, Olivier Stasse
@@ -39,9 +40,14 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O
 
 
 namespace PatternGeneratorJRL
+/** 
+    \addtogroup walkGenJrl_steppingover 
+    @{
+*/
 {
-  /*! @ingroup steppingover 
-    @brief Polynome used for Z trajectory during stepover. */
+  /**
+     \brief Polynome used for Z trajectory during stepover. */
+  */
   class StepOverPolynomeFoot : public Polynome
   {
   public:
@@ -60,7 +66,7 @@ namespace PatternGeneratorJRL
 
 
 
-  /*! @ingroup steppingover
+  /*! 
     @brief Polynome used for Z trajectory during stepover. */
   class StepOverPolynomeFootZtoX : public Polynome
   {
@@ -79,7 +85,7 @@ namespace PatternGeneratorJRL
   };
 
 
-  /*! @ingroup stepping over
+  /*! 
     @brief Polynome used for X trajectory in function of time 
     to combine with StepOverPolynomeFootZtoX.*/
   class StepOverPolynomeFootXtoTime : public Polynome
@@ -97,7 +103,7 @@ namespace PatternGeneratorJRL
     ~StepOverPolynomeFootXtoTime();
   };
 
-  /*! @ingroup steppingover 
+  /*! 
     @brief Polynome for the hip trajectory. 
   */
   class StepOverPolynomeHip4 : public Polynome
@@ -120,7 +126,7 @@ namespace PatternGeneratorJRL
 
 
 
-  /*! @ingroup steppingover 
+  /*! 
     @brief spline function calculation
     class to calculate cubic splines */
   class StepOverSpline 
@@ -145,8 +151,7 @@ namespace PatternGeneratorJRL
     MAL_MATRIX( Coefficients,double);
   };
 
-  /*! @ingroup steppingover
-    class to calculate Clamped Cubic splines */
+  /*! \brief Calculate Clamped Cubic splines */
   class StepOverClampedCubicSpline 
   {
   public:
@@ -170,7 +175,9 @@ namespace PatternGeneratorJRL
     MAL_MATRIX( Coefficients,double);
     
   };
-  
+  /**
+     @}
+  */  
 };
 
 #endif /* _STEPOVER_POLYNOME_H_ */

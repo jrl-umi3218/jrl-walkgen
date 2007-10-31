@@ -1,4 +1,5 @@
-/** @doc This object generate all the values for the foot trajectories,
+/*
+   This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of relative steps.
    If you want to change the reference trajectories, and the planning
    of the foot, this is the object to modify.

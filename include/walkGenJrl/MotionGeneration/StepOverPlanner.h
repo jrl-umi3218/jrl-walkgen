@@ -1,4 +1,5 @@
-/** @doc This object generate all the values for the foot trajectories,
+/* 
+    This object generate all the values for the foot trajectories,
     and the desired ZMP based on a sequence of relative steps.
     If you want to change the reference trajectories, and the planning
     of the foot, this is the object to modify.
@@ -57,6 +58,10 @@
 
 namespace PatternGeneratorJRL
 {
+  /**
+     \addtogroup walkGenJrl_steppingover
+     @{
+  */
 
   class CollisionDetector;
   /*!  Structure to store the obstacle parameters and positions.*/
@@ -69,7 +74,7 @@ namespace PatternGeneratorJRL
   };
   typedef struct ObstaclePar_t ObstaclePar;
 
-  /*!  Object to compute new foot trajectories to step over obstacle dynamically*/
+  /*!  \brief Object to compute new foot trajectories to step over obstacle dynamically*/
   class StepOverPlanner
   {
   public :
@@ -347,6 +352,10 @@ namespace PatternGeneratorJRL
 
   };
 
+/**
+   @}
+*/
 };
+
 #include<MotionGeneration/CollisionDetector.h>
 #endif /* _STEPOVER_PLANNER_H_ */

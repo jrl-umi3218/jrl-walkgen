@@ -1,4 +1,4 @@
-/* @doc Inverse Kinematics for legs and arms of a canonical
+/* Inverse Kinematics for legs and arms of a canonical
    humanoid robot. The arm are supposed to have 2 links.
    The legs are supposed to have 3 links.
    Please look at the documentation for more information.
@@ -43,7 +43,7 @@ using namespace dynamicsJRLJapan;
 
 namespace PatternGeneratorJRL
 {
-  /** Inverse Kinematics for generic humanoids.
+  /** \brief Inverse Kinematics for generic humanoids.
       Some parameters are however specific to the HRP2.
       Please modify the code if needed. 
   */  

@@ -41,8 +41,8 @@ namespace PatternGeneratorJRL
   
   class SimplePluginManager;
 
-  /*! \class    Each object derivating of this class are supposed
-   to populate a PGI instance to handle approprietly
+  /*! \brief Each object derivating from this class is supposed to 
+    populate a PGI instance to handle approprietly
    parsing from the PGI.
   */
   class SimplePlugin

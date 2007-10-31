@@ -1,4 +1,5 @@
-/* This class can inherited for creating the trajectory of the robot's joints
+/* 
+   This class can inherited for creating the trajectory of the robot's joints
    given a path provided by KineoWorks. This path can be based on a partial
    model of the robot. The link between this partial model is given by
    an auxiliary file, and the redefinition of the virtual functions of this class.
@@ -49,9 +50,9 @@ namespace PatternGeneratorJRL
     vector<double> Joints;
   } KWNode;
 
-  /*! This object is in charge of reading a path
-    provided by KineoWorks and transform it in 
-    a proper motion for the walking pattern generator.
+  /** 
+      \brief Read a path provided by KineoWorks 
+      Transform the path in a proper motion for the walking pattern generator.
   */
   class GenerateMotionFromKineoWorks
     {

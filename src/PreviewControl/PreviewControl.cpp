@@ -1,4 +1,4 @@
-/** Object to perform preview control on a cart model.
+/* Object to perform preview control on a cart model.
 
    Copyright (c) 2005-2006, 
    @author Olivier Stasse, Ramzi Sellouati

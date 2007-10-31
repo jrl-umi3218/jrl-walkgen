@@ -40,11 +40,16 @@
 #include <MotionGeneration/UpperBodyMotion.h>
 #include <MotionGeneration/GenerateMotionFromKineoWorks.h>
 
+
 namespace PatternGeneratorJRL
 {
-  /* @ingroup pgjrl
-     This object realizes different kind of motion: stepping over, 
-     execution of planned trajectory, lowering the waist, but they all
+  /** 
+      \addtogroup pgjrl
+      @{
+  */
+  /** 
+      \brief Realize different kind of motion: stepping over, execution of planned trajectory, lowering the waist.
+      All kinds of motion
      assume that the upper body position is separated from the legs.
      It also assumes that the robot has 6 DoFs legs. 
      It is then a simple matter of inverse geometry,
@@ -349,6 +354,9 @@ namespace PatternGeneratorJRL
 
   };
 
+/**
+   @}
+*/
 
 };
 #endif 

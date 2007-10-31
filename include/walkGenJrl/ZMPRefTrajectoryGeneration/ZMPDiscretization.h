@@ -1,7 +1,8 @@
-/** @doc This object generate all the values for the foot trajectories,
-   and the desired ZMP based on a sequence of relative steps.
-   If you want to change the reference trajectories, and the planning
-   of the foot, thOn pageis is the object to modify.
+/*
+  This object generate all the values for the foot trajectories,
+  and the desired ZMP based on a sequence of relative steps.
+  If you want to change the reference trajectories, and the planning
+  of the foot, thOn pageis is the object to modify.
 
 
    Copyright (c) 2005-2006, 
@@ -55,7 +56,9 @@ namespace PatternGeneratorJRL
 {
 
 
-  /// Object to compute the trajectories of the foot, the waist and the arms.
+  /** 
+      \brief Object to compute the trajectories of the foot, the waist and the arms.
+  */
   class ZMPDiscretization
     {
       public :

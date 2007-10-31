@@ -1,8 +1,5 @@
-/* @doc Object to compute the weights of the preview control
-    @ingroup previewcontrol
-    @endgroup
-
-
+/* 
+   
    Copyright (c) 2005-2006, 
    @author Olivier Stass
    
@@ -35,12 +32,16 @@
 
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
+
 namespace PatternGeneratorJRL
 {
-  /** @ingroup previewcontrol
+  /** 
+      \addtogroup walkGenJrl_previewcontrol
+      @{
+  */
+  /** \brief Computes the gains for preview control for a given discrete system. 
 
-     This class computes the gains for preview control for a given 
-     discrete system. The discrete system is defined by three matrix A, b, c
+  The discrete system is defined by three matrix A, b, c
      such as :
      \f{eqnarray*}
 
@@ -129,5 +130,9 @@ namespace PatternGeneratorJRL
     /*! The size of the window for the preview */
     int m_Nl;
   };
+  /**
+     @}
+  */
 };
+
 #endif /* _OPTIMAL_CONTROLLER_SOLVER_H_ */

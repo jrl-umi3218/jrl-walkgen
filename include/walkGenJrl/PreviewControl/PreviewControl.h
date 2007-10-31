@@ -39,12 +39,14 @@ using namespace::std;
 
 #include <PGTypes.h>
 
+    
 namespace PatternGeneratorJRL
 {
-
-
-  /** @ingroup previewcontrol
-      
+  /** 
+      \addtogroup walkGenJrl_previewcontrol
+      @{
+  */
+  /**
       \brief Class to implement the preview control
    */
   class PreviewControl
@@ -117,6 +119,10 @@ namespace PatternGeneratorJRL
       double m_Zc;
       //@}
     };
+  /**
+     @}
+  */
 }
+
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #endif /* _PREVIEW_CONTROL_H_ */

@@ -41,12 +41,15 @@
 namespace PatternGeneratorJRL
 {
   
-  /*! @ingroup pgjrl
-    This class is in charge of handling the stack of footprints.
+  /** 
+      \addtogroup pgjrl
+      @{
+  */
+  /** \brief This class is in charge of handling the stack of footprints.
     There is two modes currently:
-    - An off-line mode, where the complete stack is send to 
+    \li An off-line mode, where the complete stack is send to 
     the ZMP reference trajectory generator object, and created off-line.
-    - An on-line mode, where one step at a time is send to 
+    \li An on-line mode, where one step at a time is send to 
     the ZMP reference trajectory generator object. 
    */
   class StepStackHandler
@@ -181,6 +184,8 @@ namespace PatternGeneratorJRL
     /*! Transition for finishing on line stepping. */
     bool m_TransitionFinishOnLine;
   };
-
+  /**
+     @}
+  */
 };
 #endif /* _FOOT_PRINT_H_*/

@@ -36,13 +36,13 @@ SHOW_DIRECTORIES       = NO
 FILE_PATTERNS          = *.h *.idl
 EXCLUDE_PATTERNS       = 
 INPUT                  = @top_srcdir@/doc/additionalHeader \
-			 @top_srcdir@/src/ 
+			 @top_srcdir@/include 
 			
 
 #---------------------------------------------------------------------------
 # configuration options related to inserting images
 #---------------------------------------------------------------------------
-IMAGE_PATH = ./figures
+IMAGE_PATH = @top_srcdir@/doc/figures
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
 #---------------------------------------------------------------------------
@@ -100,9 +100,9 @@ GENERATE_PERLMOD       = NO
 CLASS_DIAGRAMS         = YES
 HIDE_UNDOC_RELATIONS   = YES
 HAVE_DOT               = YES
-CLASS_GRAPH            = YES
-COLLABORATION_GRAPH    = YES
-GROUP_GRAPHS           = YES
+CLASS_GRAPH            = NO
+COLLABORATION_GRAPH    = NO
+GROUP_GRAPHS           = NO
 UML_LOOK               = NO
 TEMPLATE_RELATIONS     = NO
 INCLUDE_GRAPH          = YES

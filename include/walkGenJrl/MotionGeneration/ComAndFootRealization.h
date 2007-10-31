@@ -37,14 +37,18 @@
 #include <SimplePlugin.h>
 #include <StepStackHandler.h>
 
-
 namespace PatternGeneratorJRL
 {
+  /** 
+      \addtogroup  walkGenJrl_Interface
+      @{
+  */
+  
   class PatternGeneratorInterface;
 
-  /** @ingroup Interface
-      This abstract specifies the different methods
-      called by the Pattern Generator to generate a body posture.
+  /**
+     \brief Specifies the different methods called by the Pattern Generator to generate a body posture.
+
       Taking as an input CoM and feet postures, it is in charge of
       finding a body posture, according to different strategies.
 
@@ -212,7 +216,9 @@ namespace PatternGeneratorJRL
     
   };
 
+/**
+   @}
+*/
 };
-
 
 #endif

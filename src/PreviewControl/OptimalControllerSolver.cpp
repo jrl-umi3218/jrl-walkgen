@@ -1,7 +1,4 @@
-/** @doc Object to compute the weights of the preview control
-    @ingroup previewcontrol
-    @endgroup
-
+/*
    Copyright (c) 2005-2006, 
    @author Olivier Stasse
    

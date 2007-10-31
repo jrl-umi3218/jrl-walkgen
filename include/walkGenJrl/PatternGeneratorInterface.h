@@ -1,14 +1,5 @@
-/** @doc  This object provides a unified interface to access the pattern generator.
+/* This object provides a unified interface to access the pattern generator.
     It allows to hide all the computation and hacking to the user.
-
-    SVN Information:
-   $Id$
-   $Author$
-   $Date$
-   $Revision $
-   $Source $
-   $Log $
-
 
    Copyright (c) 2005-2006, 
    @author Olivier Stasse
@@ -59,11 +50,16 @@
 
 #include <SimplePluginManager.h>
 
+
 namespace PatternGeneratorJRL
 {
+/**
+   \addtogroup walkGenJrl_Interface
+   @{
+*/
   class SimplePlugin;
 
-  /** @ingroup Interface
+  /** 
       This class is the interface between the Pattern Generator and the 
       external world. In addition to the classical setter and getter for various parameters
       there is the possibility to pass commands a string of stream to the method
@@ -507,6 +503,9 @@ namespace PatternGeneratorJRL
 
   };
 
+/**
+   @}
+*/
 };
 
 

@@ -8,12 +8,12 @@ new functionnalities were added. Those functionnalities are dynamical stepping-o
 and upper-body motion.
 
 
-\section sec_approach Approach implemented
+\section walkGenJrl_sec_approach Approach implemented
 
 The immediate available reference for this code is \ref Kajita2003 .
 But numerous details were given in Kajita's book \ref Kajita2005 .
 
-\section sec_organization Organization of the code
+\section walkGenJrl_sec_organization Organization of the code
 
 The code relative to the Walking Pattern Generator library is divided into three parts:
 \li the library itself,
@@ -22,8 +22,8 @@ through CORBA,
 \li several examples with a console interface,
 \li a Qt GUI.
 
-\image html ./figures/PatternGenerator/Stacks.png "Architecture of the Pattern Generator's stacks."
-\image latex ./figures/PatternGenerator/Stacks.pdf "Architecture of the Pattern Generator's stacks."
+\image html PatternGenerator/Stacks.png "Architecture of the Pattern Generator's stacks."
+\image latex PatternGenerator/Stacks.pdf "Architecture of the Pattern Generator's stacks."
 
 \subsection subsec_WalkGenJRL_library The library libWalkGenJRL.so
 
@@ -58,52 +58,60 @@ Bjorn Verrelst and Kazuhito Yokoi and Olivier Stasse and Hitoshi Arisumi and Bra
 "Mobility of Humanoid Robots: Stepping over Large Obstacles Dynamically",
 International Conference on Mechatronics and Automation
 
-@defgroup pgjrl JRL Walking Pattern Generator Library (WalkGenJRL)
-This library is intended to implement walking pattern generator algorithms for humanoid robots.
 
 
-@defgroup forwardynamics Robot Model
-@ingroup pgjrl
-This group implements a forward dynamic algorithm in order to compute basic properties
-of a robot described in the OpenHRP format (specialized VRML).
+   \defgroup pgjrl JRL Walking Pattern Generator Library (WalkGenJRL)
+   @{
 
-@defgroup steppingover Stepping Over
-@ingroup pgjrl
-This group implements the stepping over algorithm as presented
-by Bjorn Verrelst \ref Verrelst2006 .
+   This library is intended to implement walking pattern generator algorithms for humanoid robots.
 
+*/
 
-@defgroup previewcontrol Preview Control
-@ingroup pgjrl
-This group implements the preview control algorithm for the cart-model
-as presented by Kajita in \ref Kajita2003 .
+/**
+   \defgroup walkGenJrl_steppingover Stepping Over
 
-@defgroup mathematics Mathematics
-@ingroup pgjrl
-This group implements some basic mathematical tools for the Pattern Generator.
+   This group implements the stepping over algorithm as presented
+   by Bjorn Verrelst \ref Verrelst2006 .
+*/
 
-@defgroup geometry Geometry
-@ingroup mathematics
-This group implements some geometrical tool needed for the PG.
+/**
+   \defgroup walkGenJrl_previewcontrol Preview Control
 
-@defgroup linearalgebra Linear algebra
-@ingroup mathematics
-This group mostly implements an abstract layer for matrices operations, 
-and fast matrix operations for tiny matrices (3x3 and 4x4).
+   This group implements the preview control algorithm for the cart-model
+   as presented by Kajita in \ref Kajita2003 .
 
-@defgroup Interface Interface for the PatternGeneratorJRL
-@ingroup pgjrl
-This group reinforces the independance between the internal
-structure of the Walking Pattern Generator and external
-algorithms. The main class is \a PatternGeneratorInterface
-which allow to handle very simply the WPG.
+*/
+
+/**
+   \defgroup walkGenJrl_geometry Geometry
+   
+   This group implements some basic geometrical tools for the Pattern Generator.
+   @{
+*/
 
 
-\defgroup pginterfaces  Interfaces to WalkGenJRL
-This group shows how to interface the WalkGenJRL library to three kinds of applications:
-\li An OpenHRP plugin, to run in real-time inside an HRP-2 humanoid robot,
-\li A console program, for quick but yet complete testing of the pattern generator,
-\li An OpenGL interface.
+/**
+   @}
+*/
 
+/**
+   \defgroup walkGenJrl_Interface Interface for the PatternGeneratorJRL
+
+   This group reinforces the independance between the internal
+   structure of the Walking Pattern Generator and external
+   algorithms. The main class is \a PatternGeneratorInterface
+   which allow to handle very simply the WPG.
+*/
+
+/**
+   @}
+*/
+
+/**
+   \defgroup pginterfaces  Interfaces to WalkGenJRL
+   This group shows how to interface the WalkGenJRL library to three kinds of applications:
+   \li An OpenHRP plugin, to run in real-time inside an HRP-2 humanoid robot,
+   \li A console program, for quick but yet complete testing of the pattern generator,
+   \li An OpenGL interface.
 
 */

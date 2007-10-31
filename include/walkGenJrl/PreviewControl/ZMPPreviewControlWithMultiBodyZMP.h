@@ -44,10 +44,14 @@ using namespace::std;
 
 namespace PatternGeneratorJRL
 {
-  /** @ingroup pgjrl
+/** 
+    \addtogroup pgjrl
+    @{
+*/
 
-      Object to generate the angle positions
-      every 5 ms from a set of absolute foot positions.
+  /**
+     \brief Generate the angle positions every 5 ms from a set of absolute foot positions.
+
       This algorithm use the preview control proposed by Kajita-San
       in ICRA 2003 Biped Walking Pattern Generation by using Preview
       Control of Zero-Moment Point pp.1620--1626.
@@ -430,5 +434,8 @@ namespace PatternGeneratorJRL
 
 
     };
+/**
+   @}
+*/
 };
 #endif /* _ZMPREVIEWCONTROLWITHMULTIBODYZMP_H_ */

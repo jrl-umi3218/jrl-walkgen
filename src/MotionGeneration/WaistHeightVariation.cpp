@@ -1,4 +1,4 @@
-/** This object generate all the values for the foot trajectories,
+/* This object generate all the values for the foot trajectories,
     and the desired ZMP based on a sequence of steps.
 
     Copyright (c) 2005-2006, 

@@ -43,7 +43,7 @@ namespace PatternGeneratorJRL
   class SimplePlugin;
 
   
-  /*! \class  This object takes care of dispatching the call 
+  /*! \brief  This object takes care of dispatching the call 
     appropriatly.
     
   */

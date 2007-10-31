@@ -1,13 +1,4 @@
-/** @doc  This object allow to build a convex hull on a list of 2D points.
-
-    SVN Information:
-   $Id$
-   $Author$
-   $Date$
-   $Revision $
-   $Source $
-   $Log $
-
+/* 
 
    Copyright (c) 2005-2006, 
    @author Olivier Stasse
@@ -43,8 +34,9 @@
 
 namespace PatternGeneratorJRL
 {
-  /** @class
-      @ingroup geometry
+  /** 
+      \addtogroup walkGenJrl_geometry
+      @{
   */
   typedef struct 
   {
@@ -52,6 +44,10 @@ namespace PatternGeneratorJRL
   } CH_Point;
   
   typedef std::vector<CH_Point> ConvexHullList;
+
+  /**
+     \brief This object allow to build a convex hull on a list of 2D points.
+  */
 
   class ComputeConvexHull
   {
@@ -65,5 +61,8 @@ namespace PatternGeneratorJRL
 		      std::vector<CH_Point> &TheConvexHull);
     
   };
+  /**
+     @}
+  */
 };
 #endif
