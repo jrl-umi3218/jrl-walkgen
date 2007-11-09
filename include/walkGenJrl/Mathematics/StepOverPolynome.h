@@ -46,7 +46,7 @@ namespace PatternGeneratorJRL
 */
 {
   /**
-     \brief Polynome used for Z trajectory during stepover. */
+     \brief Polynome used for Z trajectory during stepover. 
   */
   class StepOverPolynomeFoot : public Polynome
   {
