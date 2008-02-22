@@ -26,7 +26,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-walkGenJRLDocdir = $(datadir)/doc/walkGenJRL
+walkGenJRLDocdir = $(datadir)/doc/walkGenJrl
 
 EXTRA_DIST=\
 	common.dox	\

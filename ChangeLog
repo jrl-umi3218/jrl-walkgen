@@ -1,4 +1,4 @@
-$Id: ChangeLog 2007/11/09 18:23:49 mallet $ 
+	20. Install doc in $(datadir)/doc/walkGenJrl instead of $(datadir)/doc/walkGenJRL
 	
 walkGenJRL 2.4 released November 08, 2007
 
