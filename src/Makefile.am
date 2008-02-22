@@ -1,5 +1,6 @@
 #
-# Copyright (c) 2007 LAAS/CNRS                        --  Wed Jan 31 2007
+# Copyright (c) 2007
+#      IS/AIST-ST2I/CNRS Joint Japanese-French Robotics Laboratory (JRL).
 # All rights reserved.
 #
 # Redistribution  and  use in source   and binary forms,  with or without
