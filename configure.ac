@@ -6,7 +6,7 @@ dnl
 dnl Modified by Olivier Stasse 2007 CNRS/AIST
 dnl
 
-AC_INIT([walkGenJRL],[2.4],[openrobots@laas.fr])
+AC_INIT([walkGenJrl],[2.4],[openrobots@laas.fr])
 AC_PREREQ(2.59)
 
 AM_INIT_AUTOMAKE([foreign no-define])
