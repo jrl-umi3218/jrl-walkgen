@@ -2,8 +2,10 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
+datarootdir=@datarootdir@
+docdir=@datadir@/doc/@PACKAGE_NAME@
 
-Name: @PACKAGE@
+Name: @PACKAGE_NAME@
 Description: Walk generator for humanoid robot based on preview control
 Version: @VERSION@
 Requires: @DYNAMICSJRLJAPAN_REQD@
