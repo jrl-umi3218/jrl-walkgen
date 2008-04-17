@@ -391,8 +391,11 @@ namespace PatternGeneratorJRL
       void UpdateTheZMPRefQueue(ZMPPosition NewZMPRefPos);
 
       /*! \name Setter and getter for the ComAndZMPTrajectoryGeneration. */
-      inline bool setComAndFootRealization(ComAndFootRealization * aCFR)
-	{ m_ComAndFootRealization = aCFR;};
+      inline bool setComAndFootRealization(ComAndFootRealization * aCFR) { 
+	m_ComAndFootRealization = aCFR;
+	return true ;
+      };
+
       inline ComAndFootRealization * getComAndFootRealization()
 	{ return m_ComAndFootRealization;};
       
