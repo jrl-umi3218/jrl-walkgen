@@ -1,4 +1,8 @@
-	20. Install doc in $(datadir)/doc/walkGenJrl instead of $(datadir)/doc/walkGenJRL
+walkGenJRL 2.4.1 released May 13, 2008
+
+	22. Added missing return statement.
+	21. Install doc in $(datadir)/doc/walkGenJrl instead of $(datadir)/doc/walkGenJRL
+	20. Rename package to walkGenJrl to be consistent with pkgconfig file name
 	
 walkGenJRL 2.4 released November 08, 2007
 
