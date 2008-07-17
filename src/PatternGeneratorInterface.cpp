@@ -658,12 +658,12 @@ namespace PatternGeneratorJRL {
 
 	if (i==0)
 	  {
-	    for(unsigned int j=0;j<m_NbOfUpperBodyJoints;j++)
+	    for(int j=0;j<m_NbOfUpperBodyJoints;j++)
 	      m_UpperBodyPositionsBuffer[i].Joints[j] =
 		lCurrentJointValues[m_UpperBodyJoints[j]];
 	  }
 	// Initialize the upper body motion to the current stored value.
-	for(unsigned int j=0;j<m_NbOfUpperBodyJoints;j++)
+	for(int j=0;j<m_NbOfUpperBodyJoints;j++)
 	  m_UpperBodyPositionsBuffer[i].Joints[j] = m_UpperBodyPositionsBuffer[0].Joints[j];
       }
 
@@ -866,12 +866,12 @@ namespace PatternGeneratorJRL {
 
 	    if (i==0)
 	      {
-		for(unsigned int j=0;j<m_NbOfUpperBodyJoints;j++)
+		for(int j=0;j<m_NbOfUpperBodyJoints;j++)
 		  m_UpperBodyPositionsBuffer[i].Joints[j] =
 		    lCurrentJointValues[m_UpperBodyJoints[j]];
 	      }
 	    // Initialize the upper body motion to the current stored value.
-	    for(unsigned int j=0;j<m_NbOfUpperBodyJoints;j++)
+	    for(int j=0;j<m_NbOfUpperBodyJoints;j++)
 	      m_UpperBodyPositionsBuffer[i].Joints[j] = m_UpperBodyPositionsBuffer[0].Joints[j];
 	  }
 
@@ -1216,8 +1216,7 @@ namespace PatternGeneratorJRL {
 	return false;
       }
 
-    double qWaistYaw=0.0;
-    COMPosition COMPositionFromPC1,finalCOMPosition;
+    COMPosition finalCOMPosition;
 
     // New scheme:
     // Update the queue of ZMP ref
@@ -1228,7 +1227,6 @@ namespace PatternGeneratorJRL {
       {
 	m_COMBuffer[m_NL].yaw = m_ZMPPositions[m_NL].theta;
       }
-    //    COMPositionFromPC1 = m_COMBuffer[m_NL];
     finalCOMPosition =  m_COMBuffer[m_NL];
 
     ODEBUG("ZMP : " << m_ZMPPositions[0].px
@@ -1396,10 +1394,6 @@ namespace PatternGeneratorJRL {
     MAL_VECTOR_DIM(qArmr,double,7);
     MAL_VECTOR_DIM(qArml,double,7);
 
-    int LINKSFORRLEG[6] = { 0, 1, 2, 3,  4, 5};
-    int LINKSFORLLEG[6] = { 6, 7, 8, 9, 10, 11};
-    //    int LINKSFORRARM[6] = { 16, 17, 18, 19, 20, 21};
-    //    int LINKSFORLARM[6] = { 23, 24, 25, 26, 27, 28};
 
     MAL_VECTOR_DIM( dql,double,6);
     MAL_VECTOR_DIM( dqr,double,6);
@@ -1434,11 +1428,6 @@ namespace PatternGeneratorJRL {
     double qWaistYaw=0.0,dqWaistYaw=0.0,ddqWaistYaw;
     //get real angles and ZMP
 
-    // Computes New Multybody ZMP.  and angular velocity of real angles
-    //upperbody angles
-    //	m_2HumanoidDynamicRobot->Setq(LINKSFORUPPERBODY[0],qWaistYaw);
-    //	m_2HumanoidDynamicRobot->Setq(LINKSFORUPPERBODY[1],0.0);
-
     if (m_count>1)
       {
 	dqWaistYaw = (qWaistYaw-m_Debug_prev_qWaistYaw)/m_SamplingPeriod;
@@ -1472,8 +1461,6 @@ namespace PatternGeneratorJRL {
       }
 #endif
 
-    //	m_2HumanoidDynamicRobot->Setdq(LINKSFORUPPERBODY[0],dqWaistYaw);
-    //	m_2HumanoidDynamicRobot->Setdq(LINKSFORUPPERBODY[1],0.0);
 
     m_Debug_prev_qWaistYaw = qWaistYaw;
     m_Debug_prev_dqWaistYaw = dqWaistYaw;
@@ -1843,7 +1830,7 @@ namespace PatternGeneratorJRL {
 		      << lfpo
 		      << endl;
 	// 127  =119 + 8
-	for(unsigned int j=0;j<m_NbOfUpperBodyJoints;j++)
+	for(int j=0;j<m_NbOfUpperBodyJoints;j++)
 	  {
 	    DebugFileUpperBody << CurrentConfiguration(m_UpperBodyJoints[j]) << "\t"  ;
 	  }

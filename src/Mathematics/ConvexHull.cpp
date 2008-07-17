@@ -104,7 +104,7 @@ namespace PatternGeneratorJRL
 
 	// Check if the current point already exist with the same angle.
 	// Cannot use find because of some pb with gcc version 2.95.
-	set<CH_Point, ltCH_Point>::iterator it_PtinPolarCoord;
+	set<CH_Point, ltCH_Point>::iterator it_PtinPolarCoord, toDestroy;
       
 	it_PtinPolarCoord = ListOfPointinPolarCoord.begin();
 	while (it_PtinPolarCoord!=ListOfPointinPolarCoord.end())
@@ -117,11 +117,19 @@ namespace PatternGeneratorJRL
 			      distance1, distance2);
 		if (distance1<=distance2)
 		  {
-		    ListOfPointinPolarCoord.erase(it_PtinPolarCoord);
+		    toDestroy = it_PtinPolarCoord;
+		    it_PtinPolarCoord++;
+		    ListOfPointinPolarCoord.erase(toDestroy);
 		  }
-		else bInsert=0;
+		else 
+		  {
+		    it_PtinPolarCoord++;
+		    bInsert=0;
+		  }
 	      }
-	    it_PtinPolarCoord++;
+	    else 
+	      it_PtinPolarCoord++;
+
 	  }
 
 	if (bInsert)

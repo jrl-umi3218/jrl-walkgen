@@ -3317,7 +3317,7 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
     Limit = ZMPRefPositions.size() - NewFinalZMPPositions.size();
 
   ODEBUG("Limit: " << Limit);
-  for (unsigned int i=0;i< Limit;i++)
+  for (int i=0;i< Limit;i++)
   {
     ZMPPosition aZMPPos;
     aZMPPos.px = LastZMPPos.px;
@@ -3367,14 +3367,14 @@ int ZMPDiscretization::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePo
   
   /*  cout << "Size of PX: " << MAL_MATRIX_NB_ROWS(vnlStorePx) << " " 
       << MAL_MATRIX_NB_COLS(vnlStorePx) << " " << endl; */
-  delete C;
-  delete D;
-  delete XL;
-  delete XU;
-  delete X;
+  delete [] C;
+  delete [] D;
+  delete [] XL;
+  delete [] XU;
+  delete [] X;
   free(war);
   free(U);
-  delete iwar;
+  delete [] iwar;
   // Clean the queue of Linear Constraint Inequalities.
   //  deque<LinearConstraintInequality_t *>::iterator LCI_it;
   LCI_it = QueueOfLConstraintInequalities.begin();

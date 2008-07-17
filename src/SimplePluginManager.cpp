@@ -88,7 +88,7 @@ bool SimplePluginManager::RegisterMethod(string &MethodName, SimplePlugin *aSP)
   std::map<char*, SimplePlugin * , ltstr>::iterator cur  = m_SimplePlugins.find((char *)MethodName.c_str());
   if (cur==m_SimplePlugins.end())
     {
-      char *Buffer = new char[MethodName.size()];
+      char *Buffer = new char[MethodName.size()+1];
       strcpy(Buffer,(char *)MethodName.c_str());
       m_SimplePlugins[Buffer] = aSP;
 
