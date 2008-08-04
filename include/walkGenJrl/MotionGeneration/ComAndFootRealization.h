@@ -34,21 +34,17 @@
 #define _COM_AND_FOOT_REALIZATION_H_
 
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
-#include <SimplePlugin.h>
-#include <StepStackHandler.h>
+#include <walkGenJrl/SimplePlugin.h>
+#include <walkGenJrl/StepStackHandler.h>
+
 
 namespace PatternGeneratorJRL
 {
-  /** 
-      \addtogroup  walkGenJrl_Interface
-      @{
-  */
-  
   class PatternGeneratorInterface;
 
-  /**
-     \brief Specifies the different methods called by the Pattern Generator to generate a body posture.
-
+  /** @ingroup motiongeneration
+      This abstract specifies the different methods
+      called by the Pattern Generator to generate a body posture.
       Taking as an input CoM and feet postures, it is in charge of
       finding a body posture, according to different strategies.
 
@@ -113,10 +109,10 @@ namespace PatternGeneratorJRL
       and two for the angular velocity.
       @param LeftFoot: a 5 dimensional following the same convention than for \a CoMPosition.
       @param RightFoot: idem.
+      @param CurrentConfiguration: The result is a state vector containing the position which are put inside this parameter.
+      @param CurrentVelocity: The result is a state vector containing the speed which are put inside this parameter.x
+      @param IterationNumber: Number of iteration.
       @param Stage: indicates which stage is reach by the Pattern Generator.
-
-
-
     */
     virtual bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) &CoMPosition,
 							 MAL_VECTOR(,double) &CoMSpeed,
@@ -138,8 +134,7 @@ namespace PatternGeneratorJRL
     { m_HumanoidDynamicRobot = (CjrlHumanoidDynamicRobot *)aHumanoidDynamicRobot;
       return true;}
 
-    /*! @param aHumanoidDynamicRobot: an object able to compute dynamic parameters
-      of the robot. */
+    /*! Returns the object able to compute dynamic parametersof the robot. */
     inline CjrlHumanoidDynamicRobot * getHumanoidDynamicRobot() const
       { return m_HumanoidDynamicRobot;}
     
@@ -216,9 +211,7 @@ namespace PatternGeneratorJRL
     
   };
 
-/**
-   @}
-*/
 };
+
 
 #endif

@@ -1,6 +1,17 @@
-/* 
-   Polynomes object for trajectories.
-   
+/* Polynomes object for trajectories.
+      
+   CVS Information:
+   $Id: Polynome.cpp,v 1.2 2006-01-18 06:34:58 stasse Exp $
+   $Author: stasse $
+   $Date: 2006-01-18 06:34:58 $
+   $Revision: 1.2 $
+   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/Polynome.cpp,v $
+   $Log: Polynome.cpp,v $
+   Revision 1.2  2006-01-18 06:34:58  stasse
+   OS: Updated the names of the contributors, the documentation
+   and added a sample file for WalkPlugin
+
+
    Copyright (c) 2005-2006, 
    Olivier Stasse,
    Ramzi Sellouati
@@ -31,7 +42,7 @@
 */
 
 #include <iostream>
-#include <Mathematics/Polynome.h>
+#include <walkGenJrl/Mathematics/Polynome.h>
 
 using namespace::PatternGeneratorJRL;
 
@@ -57,11 +68,27 @@ double Polynome::Compute(double t)
   return r;
 }
 
-vector<double> Polynome::GetCoefficients()
+double Polynome::ComputeDerivative(double t)
 {
-  return m_Coefficients;
+  double r=0,pt=1;
+  for(unsigned int i=1;i<m_Coefficients.size();i++)
+    {
+      r += i*m_Coefficients[i]*pt;
+      pt *=t;
+    }
+  return r;
 }
 
+void Polynome::GetCoefficients(vector<double> &lCoefficients) const
+{
+ lCoefficients = m_Coefficients;
+}
+
+
+void Polynome::SetCoefficients(vector<double> &lCoefficients)
+{
+  m_Coefficients = lCoefficients;
+}
 
 void Polynome::print()
 {

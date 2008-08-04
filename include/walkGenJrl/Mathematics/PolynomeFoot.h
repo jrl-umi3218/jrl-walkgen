@@ -1,4 +1,18 @@
-/* 
+/** \file PolynomeFoot.h
+    \brief Polynomes object for trajectories.
+   All references are from Kajita san's book
+
+   $Id: PolynomeFoot.h,v 1.2 2006-01-18 06:34:58 stasse Exp $
+   $Author: stasse $
+   $Date: 2006-01-18 06:34:58 $
+   $Revision: 1.2 $
+   $Source: /home/CVSREPOSITORY/PatternGeneratorJRL/src/PolynomeFoot.h,v $
+   $Log: PolynomeFoot.h,v $
+   Revision 1.2  2006-01-18 06:34:58  stasse
+   OS: Updated the names of the contributors, the documentation
+   and added a sample file for WalkPlugin
+
+
    Copyright (c) 2005-2006, 
    @author Olivier Stasse, Ramzi Sellouati
    
@@ -13,7 +27,7 @@
    this list of conditions and the following disclaimer.
    * Redistributions in binary form must reproduce the above copyright notice, 
    this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-   * Neither the name of the <ORGANIZATION> nor the names of its contributors 
+   * Neither the name of the CNRS and AIST nor the names of its contributors 
    may be used to endorse or promote products derived from this software without specific prior written permission.
    
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
@@ -37,10 +51,11 @@
 #endif
 
 #include <vector>
-#include <Mathematics/Polynome.h>
+#include <walkGenJrl/Mathematics/Polynome.h>
 
 namespace PatternGeneratorJRL
 {
+
   /// Polynome used for X,Y and Theta trajectories.
   class Polynome3 : public Polynome
     {
@@ -50,11 +65,25 @@ namespace PatternGeneratorJRL
        FP: Final position */
       Polynome3(double FT, double FP);
 
-      /// Set the parameters
+      /*!  Set the parameters 
+	This method assumes implictly a position
+	set to zero, and a speed equals to zero.
+       */
       void SetParameters(double FT, double FP);
+
+      /*! Set the parameters such that
+	the initial position, and initial speed
+	are different from zero.
+       */
+      void SetParametersWithInitPosInitSpeed(double FT,
+					     double FP,
+					     double InitPos,
+					     double InitSpeed);
+
       /// Destructor.
       ~Polynome3();
     };
+
   /// Polynome used for Z trajectory.
   class Polynome4 : public Polynome
     {
@@ -70,6 +99,7 @@ namespace PatternGeneratorJRL
       /// Destructor.
       ~Polynome4();
     };
+
   /// Polynome used for X,Y and Theta trajectories.
   class Polynome5 : public Polynome
     {

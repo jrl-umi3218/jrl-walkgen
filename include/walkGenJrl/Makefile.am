@@ -4,7 +4,9 @@
 SUBDIRS= Mathematics \
 	PreviewControl \
 	ZMPRefTrajectoryGeneration \
-	MotionGeneration 
+	MotionGeneration  \
+	FootTrajectoryGeneration \
+	GlobalStrategyManagers 
 
 walkGenJrldir = @includedir@/walkGenJrl
 walkGenJrl_HEADERS = \
@@ -12,6 +14,7 @@ walkGenJrl_HEADERS = \
 	PatternGeneratorInterface.h  \
 	SimplePlugin.h \
 	SimplePluginManager.h \
-	PGTypes.h
+	PGTypes.h \
+	Clock.h
 
 

@@ -1,5 +1,4 @@
-/* 
-   This class can inherited for creating the trajectory of the robot's joints
+/* This class can inherited for creating the trajectory of the robot's joints
    given a path provided by KineoWorks. This path can be based on a partial
    model of the robot. The link between this partial model is given by
    an auxiliary file, and the redefinition of the virtual functions of this class.
@@ -39,8 +38,8 @@
 #include <string>
 #include <vector>
 
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
-#include <PreviewControl/PreviewControl.h>
+#include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
+#include <walkGenJrl/PreviewControl/PreviewControl.h>
 
 namespace PatternGeneratorJRL
 {
@@ -50,9 +49,9 @@ namespace PatternGeneratorJRL
     vector<double> Joints;
   } KWNode;
 
-  /** 
-      \brief Read a path provided by KineoWorks 
-      Transform the path in a proper motion for the walking pattern generator.
+  /*! This object is in charge of reading a path
+    provided by KineoWorks and transform it in 
+    a proper motion for the walking pattern generator.
   */
   class GenerateMotionFromKineoWorks
     {
@@ -67,12 +66,13 @@ namespace PatternGeneratorJRL
       /*! Read a file named FileName to create the connection between
 	a partial model and the pattern generator. 
 	Default format is the following:
-	Nb_Of_DOFs_from_the_reduced_model
-	index_0
-	.
-	.
-	.
-	index_[Nb_Of_DOFs_from_the_reduced_model-1]
+	\li \c Nb_Of_DOFs_from_the_reduced_model
+	\li \c index_0
+	\li \c .
+	\li \c .
+	\li \c .
+	\li \c index_[Nb_Of_DOFs_from_the_reduced_model-1]
+
 	If the index is equal to -1, then there is an internal meaning
 	which goes beyond the current object.
       */

@@ -1,4 +1,5 @@
-/* Realizes the CoM and Foot position by assuming that the robot
+/* \file ComAndFootRealizationByGeometry.h
+   \brief Realizes the CoM and Foot position by assuming that the robot
    has 6 DoFs legs. It is then a simple matter of inverse geometry,
    relying on the inverse kinematics object.
   
@@ -32,24 +33,20 @@
 #ifndef _COM_AND_FOOT_REALIZATION_BY_GEOMETRY_H_
 #define _COM_AND_FOOT_REALIZATION_BY_GEOMETRY_H_
 
-#include <PGTypes.h>
-#include <MotionGeneration/InverseKinematics.h>
-#include <MotionGeneration/ComAndFootRealization.h> 
-#include <MotionGeneration/StepOverPlanner.h>
-#include <MotionGeneration/WaistHeightVariation.h>
-#include <MotionGeneration/UpperBodyMotion.h>
-#include <MotionGeneration/GenerateMotionFromKineoWorks.h>
-
+#include <walkGenJrl/PGTypes.h>
+#include <walkGenJrl/MotionGeneration/InverseKinematics.h>
+#include <walkGenJrl/MotionGeneration/ComAndFootRealization.h> 
+#include <walkGenJrl/MotionGeneration/StepOverPlanner.h>
+#include <walkGenJrl/MotionGeneration/WaistHeightVariation.h>
+#include <walkGenJrl/MotionGeneration/UpperBodyMotion.h>
+#include <walkGenJrl/MotionGeneration/GenerateMotionFromKineoWorks.h>
 
 namespace PatternGeneratorJRL
 {
-  /** 
-      \addtogroup pgjrl
-      @{
-  */
-  /** 
-      \brief Realize different kind of motion: stepping over, execution of planned trajectory, lowering the waist.
-      All kinds of motion
+  /* @ingroup motiongeneration
+
+     This object realizes different kind of motion: stepping over, 
+     execution of planned trajectory, lowering the waist, but they all
      assume that the upper body position is separated from the legs.
      It also assumes that the robot has 6 DoFs legs. 
      It is then a simple matter of inverse geometry,
@@ -81,11 +78,17 @@ namespace PatternGeneratorJRL
       Very important: This method is assume to set correctly the body angles of
       its \a HumanoidDynamicRobot and a subsequent call to the ZMP position 
       will return the associated ZMP vector.
-      @param CoMPosition: a 5 dimensional vector with the first dimension for position,
+      @param[in] CoMPosition a 5 dimensional vector with the first dimension for position,
       and the last two for the orientation (Euler angle).
-      @param LeftFoot: a 5 dimensional following the same convention than for \a CoMPosition.
-      @param RightFoot: idem.
-      @param Stage: indicates which stage is reach by the Pattern Generator. If this is the 
+      @param[in] aCoMSpeed a 5 dimensional vector with the first dimension for linear velocity,
+      and the last two for the angular velocity.
+      @param[in] LeftFoot a 5 dimensional following the same convention than for \a CoMPosition.
+      @param[in] RightFoot idem.
+      @param[out] CurrentConfiguration The result is a state vector containing 
+      the position which are put inside this parameter.
+      @param[out] CurrentVelocity The result is a state vector containing the speed which are put inside this parameter.x
+      @param[in] IterationNumber Number of iteration.
+      @param[in] Stage indicates which stage is reach by the Pattern Generator. If this is the 
       last stage, we store some information.
       
     */
@@ -187,12 +190,13 @@ namespace PatternGeneratorJRL
 
     /*! Compute the angles values considering a 6DOF leg for a given configuration
       of the waist and the foot of the leg:
-      @param : Body_R : orientation of the Waist.
-      @param : Body_P: position of the waist.
-      @param : aFoot: A vector giving the foot configuration (x,y,z, theta, omega).
-      @param : lDt: Vector describing the hip configuration.
-      @param : aCoMPosition: Position of the CoM.
-      @return : lq : Values of the leg which realize the position asked for.
+      @param[in] Body_R : orientation of the Waist.
+      @param[in] Body_P: position of the waist.
+      @param[in] aFoot: A vector giving the foot configuration (x,y,z, theta, omega).
+      @param[in] lDt: Vector describing the hip configuration.
+      @param[in] aCoMPosition: Position of the CoM.
+      @param[in] ToTheHip: Vector to go from the Waist to the Hip.
+      @param[out] lq : Values of the leg which realize the position asked for.
      */
     bool KinematicsForOneLeg(MAL_S3x3_MATRIX(,double) & Body_R,
 			     MAL_S3_VECTOR(,double) & Body_P,
@@ -208,9 +212,9 @@ namespace PatternGeneratorJRL
       @param aLeftFoot: Position of the foot (x,y,z, theta, omega).
       @param aRightFoot: Position of the foot (x,y,z,theta,omega).
       @param Stage: Stage of the ZMP Preview algorithm.
-      @return ql: Angles for the left leg.
-      @return qr: Angles for the right leg.
-      
+      @param ql: Angles for the left leg to achieve the positions.
+      @param qr: Angles for the right leg to achieve the positions.
+      @param AbsoluteWaistPosition: The waist position.
      */
     bool KinematicsForTheLegs(MAL_VECTOR(,double) & aCoMPosition,
 			      MAL_VECTOR(,double) & aLeftFoot,
@@ -354,9 +358,6 @@ namespace PatternGeneratorJRL
 
   };
 
-/**
-   @}
-*/
 
 };
 #endif 

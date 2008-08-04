@@ -1,6 +1,5 @@
 #
-# Copyright (c) 2007
-#      IS/AIST-ST2I/CNRS Joint Japanese-French Robotics Laboratory (JRL).
+# Copyright (c) 2007 LAAS/CNRS                        --  Wed Jan 31 2007
 # All rights reserved.
 #
 # Redistribution  and  use in source   and binary forms,  with or without
@@ -35,15 +34,28 @@ dist_config_DATA=\
 
 lib_LTLIBRARIES = libwalkGenJRL.la
 libwalkGenJRL_la_SOURCES = \
+	./FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp \
+	./FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp \
+	./FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp \
+	./FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp \
+	./GlobalStrategyManagers/CoMAndFootOnlyStrategy.cpp \
+	./GlobalStrategyManagers/GlobalStrategyManager.cpp \
+	./GlobalStrategyManagers/DoubleStagePreviewControlStrategy.cpp \
 	./Mathematics/Polynome.cpp \
 	./Mathematics/PolynomeFoot.cpp \
 	./Mathematics/StepOverPolynome.cpp\
 	./Mathematics/ConvexHull.cpp \
 	./Mathematics/qld.cpp \
+	./Mathematics/AnalyticalZMPCOGTrajectory.cpp \
 	./PreviewControl/PreviewControl.cpp \
 	./PreviewControl/OptimalControllerSolver.cpp \
 	./PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp \
+	./ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.cpp \
 	./ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp \
+	./ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp \
+	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp \
+	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp \
+	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaFull.cpp \
 	./MotionGeneration/InverseKinematics.cpp \
 	./MotionGeneration/StepOverPlanner.cpp\
 	./MotionGeneration/CollisionDetector.cpp\
@@ -54,10 +66,11 @@ libwalkGenJRL_la_SOURCES = \
 	StepStackHandler.cpp \
 	PatternGeneratorInterface.cpp \
 	SimplePlugin.cpp \
-	SimplePluginManager.cpp 
+	SimplePluginManager.cpp \
+	Clock.cpp
 
 libwalkGenJRL_la_CPPFLAGS = \
-	-I$(srcdir)/../include/walkGenJrl/ \
+	-I$(srcdir)/../include/ \
 	@DYNAMICJRLJAP_CFLAGS@ 
 
 

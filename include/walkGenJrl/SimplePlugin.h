@@ -41,8 +41,8 @@ namespace PatternGeneratorJRL
   
   class SimplePluginManager;
 
-  /*! \brief Each object derivating from this class is supposed to 
-    populate a PGI instance to handle approprietly
+  /*! Each object derivating of this class are supposed
+   to populate a PGI instance to handle approprietly
    parsing from the PGI.
   */
   class SimplePlugin
@@ -54,19 +54,24 @@ namespace PatternGeneratorJRL
   public:
     
     /*! \brief Pointer towards the PGI which is handling this object. */
-    inline SimplePlugin(SimplePluginManager * lSPM): m_SimplePluginManager(lSPM)       {};
+    inline SimplePlugin(SimplePluginManager * lSPM)
+      : m_SimplePluginManager(lSPM)    
+      {};
       
-      inline virtual ~SimplePlugin() {};
+      inline virtual ~SimplePlugin() 
+	{};
       
       /*! \name Register the method for which this object can be called
-      by a higher parser. */
+	by a higher parser. */
       bool RegisterMethod(std::string &MethodName);
       
       /*! \name Virtual method to redispatch the method. */
       virtual void CallMethod(std::string &Method, std::istringstream & astrm) = 0;
       
-    
+      /*! \name Get the simple plugin manager */
+      SimplePluginManager * getSimplePluginManager() const
+      { return m_SimplePluginManager; } 
   };
 };
-
+#include <walkGenJrl/SimplePluginManager.h>
 #endif /* _PGI_SIMPLE_PLUGIN_H_ */

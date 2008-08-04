@@ -30,8 +30,8 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <SimplePlugin.h>
-#include <SimplePluginManager.h>
+#include <walkGenJrl/SimplePlugin.h>
+#include <walkGenJrl/SimplePluginManager.h>
 
 using namespace std;
 using namespace PatternGeneratorJRL;

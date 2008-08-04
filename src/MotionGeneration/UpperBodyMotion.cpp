@@ -30,7 +30,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O
 */
 #include <iostream>
 #include <fstream>
-#include <MotionGeneration/UpperBodyMotion.h>
+#include <walkGenJrl/MotionGeneration/UpperBodyMotion.h>
 
 using namespace::PatternGeneratorJRL;
 

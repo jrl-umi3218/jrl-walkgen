@@ -29,9 +29,11 @@ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <iostream>
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 #include <vector>
-#include <Mathematics/StepOverPolynome.h>
+
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+
+#include <walkGenJrl/Mathematics/StepOverPolynome.h>
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) cerr << "StepOverPolynome :" << x << endl

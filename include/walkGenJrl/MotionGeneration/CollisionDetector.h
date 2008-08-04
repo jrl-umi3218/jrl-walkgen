@@ -39,22 +39,17 @@
 #include <vector>
 #include <string>
 
+
 namespace PatternGeneratorJRL
 {
-/** 
-    \addtogroup walkGenJrl_steppingover
-    @{
-*/
-
 
   static const double  RadToGrad = 57.295779578; 
   static const double  GradToRad = 0.0174532925; 
   
   struct ObstaclePar_t ;
   typedef struct ObstaclePar_t ObstaclePar;
-
-  /**
-      \brief Object to detect collisions between robot leg and obstacle
+  /** @ingroup steppingover
+      @brief Object to detect collisions between robot leg and obstacle
    */
   class CollisionDetector
     {
@@ -138,9 +133,11 @@ namespace PatternGeneratorJRL
 	
 		
     };
-/**
-   @}
- */
+
+
+
+
+
 };
-#include <MotionGeneration/StepOverPlanner.h>
+#include <walkGenJrl/MotionGeneration/StepOverPlanner.h>
 #endif /* _COLLISION_DETECTOR_H_ */

@@ -2,7 +2,7 @@
 #include <time.h>
 #include <sstream>
 #include <fstream>
-#include <PatternGeneratorInterface.h>
+#include <walkGenJrl/PatternGeneratorInterface.h>
 
 using namespace::PatternGeneratorJRL;
 
@@ -25,8 +25,6 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
       std::istringstream strm(lBuffer[i]);
       aPGI.ParseCmd(strm);
     }
-  
-
 }
 
 void StraightWalking(PatternGeneratorInterface &aPGI)
@@ -159,6 +157,27 @@ void ShortStraightWalking(PatternGeneratorInterface &aPGI)
 
 }
 
+void AnalyticalShortStraightWalking(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+  {
+    istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
+    aPGI.ParseCmd(strm2);
+  }
+
+  {
+    istringstream strm2(":stepseq 0.0 -0.095 0.0 \
+                     0.2  0.19 0.0 \
+                     0.2 -0.19 0.0 \
+                     0.2  0.19 0.0 \
+                     0.2 -0.19 0.0 \
+                     0.2  0.19 0.0 \
+                     0.0 -0.19 0.0");
+    aPGI.ParseCmd(strm2);
+  }
+
+}
+
 void Turn90DegreesWalking(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
@@ -228,7 +247,30 @@ void StartOnLineWalking(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
   {
-    istringstream strm2(":StartOnLineStepSequencing");
+    /*    istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0 \
+                     0.2 0.19 0.0 \				   \
+                     0.2 -0.19 0.0");*/
+    istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0 \
+                     0.2 0.19 0.0 \				   
+                     0.2 -0.19 0.0");
+
+    aPGI.ParseCmd(strm2);
+  }
+}
+
+void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+
+  {
+    istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
+    aPGI.ParseCmd(strm2);
+  }
+
+  {
+    istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0 \
+                     0.2 0.19 0.0 \				   
+                     0.2 -0.19 0.0");
     aPGI.ParseCmd(strm2);
   }
 }
@@ -262,18 +304,26 @@ void KineoWorks(PatternGeneratorInterface &aPGI)
 
 int main(int argc, char *argv[])
 {
+#if 1
+
   if (argc!=6)
     {
       cerr << " This program takes 5 arguments: " << endl;
       cerr << "./TestHumanoidDynamicRobot PATH_TO_PC_PARAMS_FILE PATH_TO_VRML_FILE VRML_FILE_NAME PATH_TO_SPECIFICITIES_XML LINK_JOINT_RANK" << endl;
       exit(-1);
     }	
-
   string PCParametersFile = argv[1];
   string VRMLPath=argv[2];
   string VRMLFileName=argv[3];
   string SpecificitiesFileName = argv[4];
   string LinkJointRank = argv[5];
+#else 
+  string PCParametersFile("/home/stasse/src/OpenHRP/JRL/src/PatternGeneratorJRL_underdev/src/data/PreviewControlParameters.ini");
+  string VRMLPath("/home/stasse/src/OpenHRP/etc/HRP2JRL/");
+  string VRMLFileName("HRP2JRLmain.wrl");
+  string SpecificitiesFileName("/home/stasse/src/OpenHRP/JRL/src/PatternGeneratorJRL_underdev/src/data/HRP2Specificities.xml");
+  string LinkJointRank("/home/stasse/src/OpenHRP/JRL/src/PatternGeneratorJRL_underdev/src/data/HRP2LinkJointRank.xml");
+#endif
   string Global=PCParametersFile;
   Global+= " ";
   Global+=VRMLPath;
@@ -387,17 +437,30 @@ int main(int argc, char *argv[])
   
     
   //COMPosition CurrentWaistPosition;
-  struct timeval begin,end;
-  unsigned long int NbOfIt=0;
-  gettimeofday(&begin,0);
+  struct timeval begin,end,beginmodif,endmodif;
+  unsigned long int NbOfIt=0, NbOfItToCompute=0;
+
+
+  bool TestChangeFoot = true;
+
+  COMPosition finalCOMPosition;
+  FootAbsolutePosition LeftFootPosition;
+  FootAbsolutePosition RightFootPosition;
+  ofstream aof,aofq;
+  aofq.open("TestConfiguration.dat",ofstream::out);
+  aof.open("TestFGPI.dat",ofstream::out);
+  double totaltime=0,maxtime=0;
+  double timemodif = 0;
 
   for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
     {
-      ShortStraightWalking(*aPGI);
-      //CurvedWalkingPBW2(*aPGI);
+      //ShortStraightWalking(*aPGI);
+      // CurvedWalkingPBW2(*aPGI);
       // KineoWorks(*aPGI);
       // StraightWalking(*aPGI);
-      //      CurvedWalkingPBW(*PGI);
+      
+      // AnalyticalShortStraightWalking(*aPGI);
+      // CurvedWalkingPBW(*PGI);
       // StraightWalkingPBW(*aPGI);
       // Turn90DegreesWalking(aPGI);
       // TurningOnTheCircle(*aPGI); 
@@ -406,32 +469,80 @@ int main(int argc, char *argv[])
 
       // TurningOnTheCircleTowardsTheCenter(*aPGI);
       // TurningOnTheCircleTowardsTheCenter(aPGI);
-      // StartOnLineWalking(*aPGI);
+      StartAnalyticalOnLineWalking(*aPGI);
       
-      while(aPGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
-					     CurrentVelocity,
-					     ZMPTarget))
+
+      bool ok = true;
+      while(ok)
 	{
+
+	  gettimeofday(&begin,0);
+	  ok = aPGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
+					   CurrentVelocity,
+					   ZMPTarget,
+					   finalCOMPosition,
+					   LeftFootPosition,
+					   RightFootPosition);
+	  gettimeofday(&end,0);
+	  double ltime = end.tv_sec-begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
+	  if (maxtime<ltime)
+	    maxtime = ltime;
 	  NbOfIt++;
+
+	  if (ltime>0.000300)
+	    {
+	      totaltime += ltime;
+	      NbOfItToCompute++;
+	    }
+
 	  // cout << "LocalIndex :" << NbOfIt << endl;
 	  // Record the angular values generated by the PG.
 	  // aPGI->SetCurrentJointValues(CurrentPosition);
 	  
-	  if (0)
+	  //aPGI->DebugControlLoop(PreviousConfiguration,PreviousVelocity,NbOfIt);
+	  PreviousConfiguration = CurrentConfiguration;
+	  PreviousVelocity = CurrentVelocity;
+	  
+#if 1
+
+	  if ((NbOfIt>14.43*200) && 
+	      TestChangeFoot)
 	    {
-	      aPGI->DebugControlLoop(PreviousConfiguration,PreviousVelocity,NbOfIt);
-	      PreviousConfiguration = CurrentConfiguration;
-	      PreviousVelocity = CurrentVelocity;
-	      if (NbOfIt>30*200) /* Stop after 30 seconds the on-line stepping */
-		{
-		  StopOnLineWalking(*aPGI);
-		}
+	      FootAbsolutePosition aFAP;
+	      aFAP.x=0.55;
+	      aFAP.y=-0.095;
+	      gettimeofday(&beginmodif,0);
+	      aPGI->ChangeOnLineStep(15.5,aFAP);
+	      gettimeofday(&endmodif,0);
+	      timemodif = endmodif.tv_sec-beginmodif.tv_sec + 0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
+	      TestChangeFoot=false;
 	    }
+#endif	  
+	  if (NbOfIt>30*200) /* Stop after 30 seconds the on-line stepping */
+	    {
+	      StopOnLineWalking(*aPGI);
+	    }
+
+#if 1
+	  aof << NbOfIt*0.005 << " " 
+	      << finalCOMPosition.x[0] << " "<< finalCOMPosition.y[0] << " " << finalCOMPosition.z[0] << " "
+	      << ZMPTarget(0) << " " << ZMPTarget(1) << " " 
+	      << LeftFootPosition.x << " " << LeftFootPosition.y << " " << LeftFootPosition.z << " "
+	      << RightFootPosition.x << " " << RightFootPosition.y << " " << RightFootPosition.z << endl;
+	  for(unsigned int k=0;k<30;k++)
+	    {
+	      aofq << CurrentConfiguration[k+6]*180/M_PI << " ";
+	    }
+	  aofq << endl;
+#endif
 	}
     }
-  gettimeofday(&end,0);
-  double ltime = end.tv_sec-begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
-  cout << "Number of iterations " << NbOfIt << endl;
-  cout << "Time consumption: " << (double)ltime/(double)NbOfIt << endl;
+  aofq.close();
+  aof.close();
 
+  delete aPGI;
+
+  cout << "Number of iterations " << NbOfIt << " " << NbOfItToCompute << endl;
+  cout << "Time consumption: " << (double)totaltime/(double)NbOfItToCompute << " max time: " << maxtime <<endl;
+  cout << "Time for modif: " << timemodif << endl;
 }

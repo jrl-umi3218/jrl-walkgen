@@ -1,5 +1,5 @@
-
-/* This object handle the step stack of the pattern generator.
+/* \file StepStackHandler.h
+   \brief This object handle the step stack of the pattern generator.
     It allows also to create automatically stack of steps according to 
     some high level functionnalities.
 
@@ -35,49 +35,36 @@
 #ifndef _STEP_STACK_HANDLER_H_
 #define _STEP_STACK_HANDLER_H_
 
+#include <deque>
+
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
-#include <MotionGeneration/StepOverPlanner.h>
+
+#include <walkGenJrl/SimplePlugin.h>
+#include <walkGenJrl/PGTypes.h>
 
 namespace PatternGeneratorJRL
 {
-  
-  /** 
-      \addtogroup pgjrl
-      @{
-  */
-  /** \brief This class is in charge of handling the stack of footprints.
+  class StepOverPlanner;
+
+  /*! @ingroup pgjrl
+    This class is in charge of handling the stack of footprints.
     There is two modes currently:
-    \li An off-line mode, where the complete stack is send to 
+    - An off-line mode, where the complete stack is send to 
     the ZMP reference trajectory generator object, and created off-line.
-    \li An on-line mode, where one step at a time is send to 
+    - An on-line mode, where one step at a time is send to 
     the ZMP reference trajectory generator object. 
    */
-  class StepStackHandler
+  class StepStackHandler : public SimplePlugin
   {
   public:
-    /*! Constructor */
-    StepStackHandler();
+    /*! \brief Constructor */
+    StepStackHandler(SimplePluginManager *lSPM);
 
-    /*! Destructor */
+    /*! \brief Destructor */
     ~StepStackHandler();
 
-    /*! Create a sequence of step to realize an arc of rayon R,
-     for arc_deg degrees, starting with the support foot defined
-     by SupportFoot. The direction of the robot is towards
-     the  center of the arc.
-    */
-    void CreateArcCenteredInStepStack(  double R,
-					double arc_deg, 
-					int SupportFoot);
-    /*! Create a sequence of steps to realize an arc of rayon R,
-      for arc_deg degrees, starting with the support foot defined
-      by SupportFoot. The direction of the robot is tangent
-      to the arc centered in x and y.
-     */
-    void CreateArcInStepStack(  double x,double y, double R,
-				double arc_deg, int SupportFoot);
 
-    /*! Specify the walking mode:
+    /*! \brief Specify the walking mode:
       0: Normal walking.
       1: Lower the height.
       2: Stepping over.
@@ -86,79 +73,117 @@ namespace PatternGeneratorJRL
     */
     void SetWalkMode(int lWalkMode);
 
-    /*! Get the walking mode. */
+    /*! \brief Get the walking mode. */
     int GetWalkMode();
 
 
-    /*! Set the link towards an instance of Step Over planner. */
+    /*! \brief Set the link towards an instance of Step Over planner. */
     void SetStepOverPlanner(StepOverPlanner *aSOP);
 
-    /*! Take a serie of string as an input and 
+    /*! \brief Take a serie of string as an input and 
       read the steps according to the chosen walkmode. */
     void ReadStepSequenceAccordingToWalkMode(istringstream &strm);
 
-    /*! Real a partial sequence of steps
+    /*! \brief Real a partial sequence of steps
       without termination and immediate execution. */ 
     void m_PartialStepSequence(istringstream &strm);
 
-    /*! Set the single time support. */
+    /*! \brief Set the single time support. */
     void SetSingleTimeSupport(double aSingleSupportTime);
 
-    /*! Get the time for single support. */
+    /*! \brief Get the time for single support. */
     double GetSingleTimeSupport();
     
-    /*! Set the time for double support. */
+    /*! \brief Set the time for double support. */
     void SetDoubleTimeSupport(double aDoubleSupportTime);
     
-    /*! Get the time for double support. */
+    /*! \brief Get the time for double support. */
     double GetDoubleTimeSupport();
 
-    /*! Prepare the stack to start for a specific support foot. */
+    /*! \brief Prepare the stack to start for a specific support foot. */
     void PrepareForSupportFoot(int SupportFoot);
     
-    /*! Prepare the stack to start for a specific support foot. */
-    /*! (The parser interface). */
-    void m_PrepareForSupportFoot(istringstream & strm);
-
-    /*! To force the last generated support foot. */
+    /*! \brief To force the last generated support foot. */
     void FinishOnTheLastCorrectSupportFoot();
 
-    /*! To create a copy and perform a clean (or not)
-      depending on the value of the boolean b_clean. */
-    void CopyRelativeFootPosition(deque<RelativeFootPosition> & lRelativeFootPositions,
+    /*! \brief Creates a copy of relative foot positions and reset the stack (or not).
+     \param[in] lRelativeFootPositions The stack of relative foot to be copied.
+     \param[in] PerformClean Reset the stack if PerformClean is true, otherwise does nothing.
+    */
+    void CopyRelativeFootPosition(std::deque<RelativeFootPosition> & lRelativeFootPositions,
 				  bool PerformClean);
-    
-    /*! Start On Line stepping. */
-    void StartOnLineStep();
 
-    /*! Add a standard step on the stack. */
+    /*! \name Method related to online stepping. 
+      @{
+     */
+    
+    /*! \brief Start On Line stepping. */
+    void StartOnLineStep();
+        
+    /*! \brief Stop On Line stepping. */
+    void StopOnLineStep();
+
+    /*! \brief Add a standard step on the stack. */
     void AddStandardOnLineStep(bool NewStep, 
 			       double NewStepX,
 			       double NewStepY,
 			       double Theta);
 
-    /*! Returns current state for on line stepping. */
+    /*! \brief Returns current state for on line stepping. */
     bool IsOnLineSteppingOn();
- 
-    /*! Remove the first step in the stack. */
-    /*! Returns true if this is the end of the sequence. */
+    /*! @} */
+
+    /*! \brief Methods to handle the stack. 
+      @{
+     */
+
+    /*! \brief Remove the first step in the stack. 
+      @return Returns true if this is the end of the sequence. */
     bool RemoveFirstStepInTheStack();
 
-    /*! Add a step in the stack. */
+    /*! \brief Add a step in the stack. */
     void AddStepInTheStack(double sx, double sy,
 			   double theta, double sstime,
 			   double dstime);
-    
-    /*! Stop On Line stepping. */
-    void StopOnLineStep();
 
-    /*! Returns the first step of the stack. */
+    /*! \brief Returns the first step of the stack. */
     RelativeFootPosition ReturnBackFootPosition();
+
+    /*! \brief Returns the size of the stack. */
+    int ReturnStackSize();
+
+    /*! @} */
+
+    /*! \name High level methods to create stack of steps for large motion. 
+      @{
+     */
+    /*! \brief Create a sequence of step to realize an arc of rayon R,
+     for arc_deg degrees, starting with the support foot defined
+     by SupportFoot. The direction of the robot is towards
+     the  center of the arc.
+    */
+    void CreateArcCenteredInStepStack(  double R,
+					double arc_deg, 
+					int SupportFoot);
+    /*! \brief Create a sequence of steps to realize an arc of rayon R,
+      for arc_deg degrees, starting with the support foot defined
+      by SupportFoot. The direction of the robot is tangent
+      to the arc centered in x and y.
+     */
+    void CreateArcInStepStack(  double x,double y, double R,
+				double arc_deg, int SupportFoot);
+    /*! @} */
+
+    /*! \brief Handling methods for the plugin mecanism.
+     This method is a reimplementation of the interface inherited
+     by SimplePlugin.
+    */
+    virtual void CallMethod(std::string &Method, std::istringstream &strm);
 
   protected:
 
     /*! Vector of relative foot position. */
-    deque<RelativeFootPosition> m_RelativeFootPositions;
+    std::deque<RelativeFootPosition> m_RelativeFootPositions;
 
     /*! Keep the last correct support foot. */
     int m_KeepLastCorrectSupportFoot;
@@ -172,9 +197,6 @@ namespace PatternGeneratorJRL
     /*! Default value for Single time support and double time support. */
     double m_SingleSupportTime, m_DoubleSupportTime;
 
-    /*! Position and parameters related to the obstacle. */
-    ObstaclePar m_ObstaclePars;
-
     /*! Variable for delta feasibility limit */
     double m_DeltaFeasibilityLimit;	
     
@@ -184,8 +206,7 @@ namespace PatternGeneratorJRL
     /*! Transition for finishing on line stepping. */
     bool m_TransitionFinishOnLine;
   };
-  /**
-     @}
-  */
+
 };
+#include <walkGenJrl/MotionGeneration/StepOverPlanner.h>
 #endif /* _FOOT_PRINT_H_*/

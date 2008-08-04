@@ -41,8 +41,9 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <iostream>
-#include <Mathematics/PolynomeFoot.h>
 #include <vector>
+
+#include <walkGenJrl/Mathematics/PolynomeFoot.h>
 
 
 
@@ -64,8 +65,22 @@ void Polynome3::SetParameters(double FT, double FP)
   m_Coefficients[3] = -2.0*FP/(tmp*FT);
 }
 
+void Polynome3::SetParametersWithInitPosInitSpeed(double FT,
+						  double FP,
+						  double InitPos,
+						  double InitSpeed)
+{
+  double tmp;
+  m_Coefficients[0] = InitPos;
+  m_Coefficients[1] = InitSpeed;
+  tmp = FT*FT;
+  m_Coefficients[2] = (3*FP - 3*InitPos - 2*InitSpeed*FT)/tmp;
+  m_Coefficients[3] = (InitSpeed*FT+ 2*InitPos - 2*FP)/(tmp*FT);
+}
+
 Polynome3::~Polynome3()
 {}
+
 Polynome4::Polynome4(double FT, double FP) :Polynome(4)
 {
   SetParameters(FT,FP);

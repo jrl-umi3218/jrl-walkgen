@@ -1,4 +1,4 @@
-/* This object generate all the values for the foot trajectories,
+/** This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of steps.
 
    Copyright (c) 2005-2006, 
@@ -32,7 +32,7 @@
 */
 //#define _DEBUG_
 #include <fstream>
-#include <MotionGeneration/StepOverPlanner.h>
+#include <walkGenJrl/MotionGeneration/StepOverPlanner.h>
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) cerr << "StepOverPlanner :" << x << endl
@@ -251,12 +251,7 @@ void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition> &aFootHolds
 
   /// Returns the double support time.
   float GetTDoubleSupport();	
-	
-	
-
-
 		 
-	 
   DoubleSupportFeasibility(); //perform this function to set m_StepOverStepLenght and  m_StepOverHipHeight;
 	 
 
@@ -821,8 +816,6 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
 
   aTimeDistr.resize(3);
 	
-
-
 	
   aTimeDistr[0]=m_TimeDistrFactor[0]*StepTime/5.0;
   aTimeDistr[1]=m_TimeDistrFactor[1]*StepTime/5.0;
@@ -845,8 +838,6 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
 
   ZfootSpeedBound(0)=0.0;
   ZfootSpeedBound(1)=0.0;
-
-
 	
   int NumberIntermediate = 0,NumberIntermediate2 = 0,Counter =0,CounterTemp =0;
   double IntermediateTimeStep;
@@ -858,24 +849,16 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
   MAL_VECTOR_RESIZE(ZfootPos,2+ 3*NumberIntermediate);
   MAL_VECTOR_RESIZE(TimeIntervalsZ,2+3*NumberIntermediate);
   SpeedWeightZ.resize(NumberIntermediate);
-    
-
-	
-
 	
   ZfootPos(0) = 0.0;
   ZfootPos(1) = Point1Z;
 	
   TimeIntervalsZ(0) = 0.0;
   TimeIntervalsZ(1) = aTimeDistr[0];
-	
-	
 
   //from point1Z going up to top 	
 	
-	
   IntermediateTimeStep = (aTimeDistr[1]-aTimeDistr[0])/2.0/(NumberIntermediate);
-
 	
   SpeedAccZ = 0.0;
   IntermediateZAcc = 0.0;

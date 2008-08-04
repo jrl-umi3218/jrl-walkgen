@@ -1,5 +1,5 @@
 #include <sstream>
-#include <PatternGeneratorInterface.h>
+#include <walkGenJrl/PatternGeneratorInterface.h>
 
 using namespace::PatternGeneratorJRL;
 

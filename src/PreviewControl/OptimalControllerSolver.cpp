@@ -1,4 +1,7 @@
-/*
+/** @doc Object to compute the weights of the preview control
+    @ingroup previewcontrol
+    @endgroup
+
    Copyright (c) 2005-2006, 
    @author Olivier Stasse
    
@@ -28,7 +31,7 @@
 */
 
 #include <iostream>
-#include <PreviewControl/OptimalControllerSolver.h>
+#include <walkGenJrl/PreviewControl/OptimalControllerSolver.h>
 
 
 #define ODEBUG2(x)
@@ -68,6 +71,7 @@ extern /* Subroutine */ int dgges_(char *, char *, char *, L_fp, integer *
 				   doublereal *, doublereal *, doublereal *, doublereal *, integer *,
 				   doublereal *, integer *, doublereal *, integer *, logical *, 
 				   integer *);
+
 }
 
 logical sb02ox (double *_alphar, double * _alphai, double *_beta)
@@ -187,7 +191,7 @@ bool OptimalControllerSolver::GeneralizedSchur(MAL_MATRIX( &A,double),
 
 }
 
-void OptimalControllerSolver::ComputeWeights()
+void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
 {
   // Compute the symplectic matrix related 
   // to the discrete dynamical system given in parameters.
@@ -217,20 +221,24 @@ void OptimalControllerSolver::ComputeWeights()
 
   MAL_MATRIX(H21,double);
   H21 = MAL_RET_TRANSPOSE(m_c);
+  ODEBUG3("H21 (1):" << H21);
   H21 = H21 * m_Q;
+  ODEBUG3("H21 (2):" << H21);
   H21 = MAL_RET_A_by_B(H21, m_c);
+  ODEBUG3("H21 (3):" << H21);
   H21 = -H21;
-
+  
+  ODEBUG3("H21:" << H21);
   for(int i=0;i< n;i++)
     for(int j=0;j<n;j++)
       H(i+n,j) = H21(i,j);
 
-  ODEBUG("H:" << endl << H);
+  ODEBUG3("H:" << endl << H);
   MAL_MATRIX_DIM(E,double,2*n,2*n);
   MAL_MATRIX_SET_IDENTITY(E);
 
   MAL_MATRIX(G,double);
-  G = MAL_RET_A_by_B((m_b * (1/m_R)) , tm_b);
+  G = MAL_RET_A_by_B(m_b * (1/m_R) , tm_b);
 
   MAL_MATRIX(At,double);
   At= MAL_RET_TRANSPOSE(m_A);
@@ -284,11 +292,11 @@ void OptimalControllerSolver::ComputeWeights()
   MAL_MATRIX(r,double);
 
   double la;
-  r = tm_b;
-  r = MAL_RET_A_by_B(r,P);
-  r = MAL_RET_A_by_B(r,m_b);
-  la = m_R + r(0,0);
-  la = 1/la;
+  r = tm_b;  // b^T
+  r = MAL_RET_A_by_B(r,P); // b^T P
+  r = MAL_RET_A_by_B(r,m_b); // b^T P b
+  la = m_R + r(0,0); // R + b^T P b
+  la = 1/la; 
   
   // Computes the weights for the accumulated difference.
   // and the speed.
@@ -308,10 +316,13 @@ void OptimalControllerSolver::ComputeWeights()
   PreMatrix = la * tm_b;
   BaseOfRecursion = m_A - MAL_RET_A_by_B(m_b , m_K);
   BaseOfRecursion = MAL_RET_TRANSPOSE(BaseOfRecursion);
-  Recursive = BaseOfRecursion;
+
   PostMatrix = MAL_RET_TRANSPOSE(m_c);
   PostMatrix = PostMatrix * m_Q;
-  PostMatrix = MAL_RET_A_by_B(P ,PostMatrix);
+  if (Mode==MODE_WITHOUT_INITIALPOS)
+    PostMatrix = MAL_RET_A_by_B(P ,PostMatrix);
+
+  Recursive = PostMatrix;
 
   ODEBUG("BaseOfRecursion:" << endl << BaseOfRecursion << endl << 
 	 "Recursive:" << endl << Recursive << endl << 
@@ -321,10 +332,9 @@ void OptimalControllerSolver::ComputeWeights()
   MAL_MATRIX_RESIZE(m_F,m_Nl,1);
   for(int k=0;k<m_Nl;k++)
     {
-      Intermediate = MAL_RET_A_by_B(Recursive, PostMatrix);
-      Intermediate = MAL_RET_A_by_B(PreMatrix, Intermediate);
+      Intermediate = MAL_RET_A_by_B(PreMatrix, Recursive);
       m_F(k,0) = Intermediate(0,0);
-      Recursive = MAL_RET_A_by_B(Recursive,BaseOfRecursion);
+      Recursive = MAL_RET_A_by_B(BaseOfRecursion,Recursive);
     }
   
 }
@@ -333,4 +343,14 @@ void OptimalControllerSolver::DisplayWeights()
 {
   std::cout << "K:" << m_K << std::endl;
   std::cout << "F:" << m_F << std::endl;
+}
+
+void OptimalControllerSolver::GetF(MAL_MATRIX(& lF, double))
+{
+  lF = m_F;
+}
+
+void OptimalControllerSolver::GetK(MAL_MATRIX(& lK,double))
+{
+  lK = m_K;
 }

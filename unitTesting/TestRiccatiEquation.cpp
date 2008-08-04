@@ -1,5 +1,41 @@
+/*! \file TestRiccatiEquation.cpp
+  \brief Example to solve the Riccati Equation for the preview control.
+
+   Copyright (c) 2007, 
+   @author Olivier Stasse,
+
+   $Id$
+   
+   JRL-Japan, CNRS/AIST
+
+   All rights reserved.
+   
+   Redistribution and use in source and binary forms, with or without modification, 
+   are permitted provided that the following conditions are met:
+   
+   * Redistributions of source code must retain the above copyright notice, 
+   this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above copyright notice, 
+   this list of conditions and the following disclaimer in the documentation 
+   and/or other materials provided with the distribution.
+   * Neither the name of the CNRS/AIST nor the names of its contributors 
+   may be used to endorse or promote products derived from this software without specific prior written permission.
+   
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
+   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
+   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
+   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
+   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
+   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
 #include <iostream>
-#include "PreviewControl/OptimalControllerSolver.h"
+#include <fstream>
+#include <walkGenJrl/PreviewControl/OptimalControllerSolver.h>
 
 using namespace std;
 
@@ -7,15 +43,20 @@ int main()
 {
   PatternGeneratorJRL::OptimalControllerSolver *anOCS;
 
+  /* Declare the linear system */
   MAL_MATRIX_DIM(A,double,3,3);
   MAL_MATRIX_DIM(b,double,3,1);
   MAL_MATRIX_DIM(c,double,1,3);
+  MAL_MATRIX(, double) lF;
+
+  /* Declare the weights for the function */
+  ofstream aof;
   double Q, R;
   int Nl;
   double T = 0.005;
 
-  // Build the initial discrete system
-  // regarding the CoM and the ZMP.
+  /* Build the initial discrete system
+     regarding the CoM and the ZMP. */
   A(0,0) = 1.0; A(0,1) =   T; A(0,2) = T*T/2.0;
   A(1,0) = 0.0; A(1,1) = 1.0; A(1,2) = T;
   A(2,0) = 0.0; A(2,1) = 0.0; A(2,2) = 1;
@@ -26,12 +67,12 @@ int main()
 
   c(0,0) = 1.0;
   c(0,1) = 0.0;
-  c(0,2) = -0.814/9.81;
-
+  c(0,2) = -0.814/9.8;
+  
   Q = 1.0;
   R = 1e-6;
 
-  Nl = (int)(0.8/T);
+  Nl = (int)(1.6/T);
 
   // Build the derivated system
   MAL_MATRIX_DIM(Ax,double,4,4);
@@ -63,13 +104,69 @@ int main()
 
   cx(0,0) =1.0;
   cout << "cx: " << endl << cx << endl;
-
-
   
+
   anOCS = new PatternGeneratorJRL::OptimalControllerSolver(Ax,bx,cx,Q,R,Nl);
 
-  anOCS->ComputeWeights();
+  anOCS->ComputeWeights(PatternGeneratorJRL::OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 
   anOCS->DisplayWeights();
+
+  anOCS->GetF(lF);
+
+  aof.open("WeightsOutput.dat",ofstream::out);
+
+  for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lF);li++)
+    {
+      aof << lF(li,0) << endl;
+    }
+  aof.close();
+
   delete anOCS;
+
+
+  // Build the initial discrete system
+  // regarding the CoM and the ZMP.
+  T=0.01;
+  A(0,0) = 1.0; A(0,1) =   T; A(0,2) = T*T/2.0;
+  A(1,0) = 0.0; A(1,1) = 1.0; A(1,2) = T;
+  A(2,0) = 0.0; A(2,1) = 0.0; A(2,2) = 1;
+
+  b(0,0) = T*T*T/6.0;
+  b(1,0) = T*T/2.0;
+  b(2,0) = T;
+
+  c(0,0) = 1.0;
+  c(0,1) = 0.0;
+  c(0,2) = -0.814/9.8;
+
+  //Q = 10000000.000000;
+  //  R = 1.000000 ;
+  Q = 1.0;
+  R = 1e-5;
+
+  Nl = (int)(1.6/T);
+
+  cout << "A: " << endl << A << endl;
+  cout << "b: " << endl << b << endl;
+  cout << "c: " << endl << c << endl;
+  cout << "Nl: " << Nl << endl;
+  anOCS = new PatternGeneratorJRL::OptimalControllerSolver(A,b,c,Q,R,Nl);
+
+  anOCS->ComputeWeights(PatternGeneratorJRL::OptimalControllerSolver::MODE_WITH_INITIALPOS);
+
+  anOCS->DisplayWeights();
+
+  anOCS->GetF(lF);
+
+  aof.open("WeightsOutput2.dat",ofstream::out);
+
+  for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lF);li++)
+    {
+      aof << lF(li,0) << endl;
+    }
+  aof.close();
+
+  delete anOCS;
+
 }

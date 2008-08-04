@@ -1,43 +1,46 @@
-/*  This object generate all the values for the foot trajectories,
-    and the desired ZMP based on a sequence of steps.
+/*! \filte ZMPPreviewControlWithMultiBodyZMP.cpp
+  \brief This object generate all the values for the foot trajectories,
+  and the desired ZMP based on a sequence of steps.
+  
+  Copyright (c) 2005-2006,
+  @author Olivier Stasse, Ramzi Sellouati
+  
+  JRL-Japan, CNRS/AIST
 
-    Copyright (c) 2005-2006,
-    @author Olivier Stasse, Ramzi Sellouati
-
-    JRL-Japan, CNRS/AIST
-
-    All rights reserved.
-
-    Redistribution and use in source and binary forms, with or without modification,
-    are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-    * Neither the name of the <ORGANIZATION> nor the names of its contributors
-    may be used to endorse or promote products derived from this software without specific prior written permission.
-
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
-    OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
-    OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  All rights reserved.
+  
+  Redistribution and use in source and binary forms, with or without modification,
+  are permitted provided that the following conditions are met:
+  
+  * Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+  * Neither the name of the CNRS/AIST nor the names of its contributors
+  may be used to endorse or promote products derived from this software without specific prior written permission.
+  
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+  AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+  OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+  OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 //#define _DEBUG_
 #include <iostream>
 #include <fstream>
-#include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
+#include <walkGenJrl/PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
 
 using namespace PatternGeneratorJRL;
 
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "ZMPPCWMBZ: " << x << endl; DebugFile.close();}
+#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); \
+    DebugFile << "ZMPPCWMBZ: " << x << endl; \
+    DebugFile.close();}
 #else
 #define RESETDEBUG4(y)
 #define ODEBUG4(x,y)
@@ -62,7 +65,7 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   m_ComAndFootRealization = 0;
   m_HumanoidDynamicRobot = 0;
 
-  m_ZMPCoMTrajectoryAlgorithm = 1;
+  m_StageStrategy = 1;
 
   RESETDEBUG4("DebugData.txt");
   RESETDEBUG4("DebugDataqr.txt");
@@ -220,18 +223,21 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 			      CurrentVelocity,
 			      m_NumberOfIterations,
 			      0);
-  
-
-  EvaluateMultiBodyZMP(-1);
+  if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
+    EvaluateMultiBodyZMP(-1);
   
   aLeftFAP = m_FIFOLeftFootPosition[0];
   aRightFAP = m_FIFORightFootPosition[0];
   SecondStageOfControl(refandfinalCOMPosition);
-  CallToComAndFootRealization(refandfinalCOMPosition,aLeftFAP,aRightFAP,
-			      CurrentConfiguration,
-			      CurrentVelocity,
-			      m_NumberOfIterations - m_NL,
-			      1);
+  
+  if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
+    {
+      CallToComAndFootRealization(refandfinalCOMPosition,aLeftFAP,aRightFAP,
+				  CurrentConfiguration,
+				  CurrentVelocity,
+				  m_NumberOfIterations - m_NL,
+				  1);
+    }
   // Here it is assumed that the 4x4 CoM matrix 
   // is the orientation of the free flyer and
   // its position.
@@ -285,19 +291,23 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMPosition &finalCO
 
   // Preview control on delta ZMP.
 
-
-  m_PC->OneIterationOfPreview(m_Deltax,m_Deltay, m_sxDeltazmp, m_syDeltazmp,
-			      m_FIFODeltaZMPPositions,0,
-			      Deltazmpx2,Deltazmpy2,
-			      true);
-
-
-  // Correct COM position    but be carefull this is the COM for NL steps behind.
-  for(int i=0;i<3;i++)
+  if ((m_StageStrategy==ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY)||
+      (m_StageStrategy==ZMPCOM_TRAJECTORY_FULL))
     {
-      aCOMPosition.x[i] += m_Deltax(i,0);
-      aCOMPosition.y[i] += m_Deltay(i,0);
+      m_PC->OneIterationOfPreview(m_Deltax,m_Deltay, m_sxDeltazmp, m_syDeltazmp,
+				  m_FIFODeltaZMPPositions,0,
+				  Deltazmpx2,Deltazmpy2,
+				  true);
+      
+      
+      // Correct COM position    but be carefull this is the COM for NL steps behind.
+      for(int i=0;i<3;i++)
+	{
+	  aCOMPosition.x[i] += m_Deltax(i,0);
+	  aCOMPosition.y[i] += m_Deltay(i,0);
+	}
     }
+
   ODEBUG4(m_Deltax(0,0) << " " << m_Deltay(0,0) << " "
 	  << aCOMPosition.x[0] << " " << aCOMPosition.y[0], "DebugDataDeltaCOM.txt");
   // Update finalCOMPosition
@@ -416,7 +426,8 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
   COMPosition acomp;
 
-  if (m_ZMPCoMTrajectoryAlgorithm==ZMPCOM_TRAJECTORY_KAJITA)
+  if ((m_StageStrategy==ZMPCOM_TRAJECTORY_FULL)
+      || (m_StageStrategy==ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY))
     {
       m_PC->OneIterationOfPreview(m_PC1x,m_PC1y,
 				  m_sxzmp,m_syzmp,
@@ -436,7 +447,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
       acomp.pitch = afCOMPosition.pitch;
 
     }
-  else  if (m_ZMPCoMTrajectoryAlgorithm==ZMPCOM_TRAJECTORY_WIEBER)
+  else  if (m_StageStrategy==ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY)
     {
       for(unsigned j=0;j<3;j++)
 	acomp.x[j] = m_PC1x(j,0)= afCOMPosition.x[j];
@@ -744,23 +755,28 @@ void ZMPPreviewControlWithMultiBodyZMP::UpdateTheZMPRefQueue(ZMPPosition NewZMPR
   m_FIFOZMPRefPositions.push_back(NewZMPRefPos);
 }
 
-void ZMPPreviewControlWithMultiBodyZMP::SetAlgorithmForZMPAndCoMTrajectoryGeneration(int aZMPComTraj){
+void ZMPPreviewControlWithMultiBodyZMP::SetStrategyForStageActivation(int aZMPComTraj)
+{
   switch(aZMPComTraj)
     {
-    case ZMPCOM_TRAJECTORY_KAJITA:
-      m_ZMPCoMTrajectoryAlgorithm = ZMPCOM_TRAJECTORY_KAJITA;
+    case ZMPCOM_TRAJECTORY_FULL:
+      m_StageStrategy = ZMPCOM_TRAJECTORY_FULL;
       break;
-    case ZMPCOM_TRAJECTORY_WIEBER:
-      m_ZMPCoMTrajectoryAlgorithm = ZMPCOM_TRAJECTORY_WIEBER;
+    case ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY:
+      m_StageStrategy = ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY;
       break;
+    case ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY:
+      m_StageStrategy = ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY;
+      break;
+
     default:
       break;
     }
 }
 
-int ZMPPreviewControlWithMultiBodyZMP::GetAlgorithmForZMPAndCoMTrajectoryGeneration()
+int ZMPPreviewControlWithMultiBodyZMP::GetStrategyForStageActivation()
 {
-  return m_ZMPCoMTrajectoryAlgorithm;
+  return m_StageStrategy;
 }
 
 // TODO : Compute the position of the waist inside the COM Frame.
@@ -778,10 +794,18 @@ MAL_S4x4_MATRIX(,double)  ZMPPreviewControlWithMultiBodyZMP::GetFinalDesiredCOMP
 }
 
 
+int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingState(MAL_VECTOR(&BodyAnglesInit,double),
+							     MAL_S3_VECTOR(&aStartingCOMPosition,double),
+							     FootAbsolutePosition & InitLeftFootPosition,
+							     FootAbsolutePosition & InitRightFootPosition)
+{
+  EvaluateStartingCoM(BodyAnglesInit,aStartingCOMPosition,
+		      InitLeftFootPosition, InitRightFootPosition);
+}
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(MAL_VECTOR(&BodyAnglesInit,double),
-							   MAL_S3_VECTOR(&aStartingCOMPosition,double),
-							   FootAbsolutePosition & InitLeftFootPosition,
-							   FootAbsolutePosition & InitRightFootPosition)
+							     MAL_S3_VECTOR(&aStartingCOMPosition,double),
+							     FootAbsolutePosition & InitLeftFootPosition,
+							     FootAbsolutePosition & InitRightFootPosition)
 {
   ODEBUG("EvaluateStartingCOM: BodyAnglesInit :" << BodyAnglesInit);
   m_ComAndFootRealization->InitializationCoM(BodyAnglesInit,m_StartingCOMPosition,
@@ -792,4 +816,14 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(MAL_VECTOR(&BodyAngle
   aStartingCOMPosition[2] = m_StartingCOMPosition[2];
 
   return 0;
+}
+
+void ZMPPreviewControlWithMultiBodyZMP::SetStrategyForPCStages(int Strategy)
+{
+  m_StageStrategy = Strategy;
+}
+
+int ZMPPreviewControlWithMultiBodyZMP::GetStrategyForPCStages()
+{
+  return m_StageStrategy;
 }

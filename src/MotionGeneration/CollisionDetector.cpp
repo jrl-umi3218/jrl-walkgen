@@ -1,4 +1,4 @@
-/* This object is detecting the collisions between lower leg 
+/** This object is detecting the collisions between lower leg 
     and the obstacle if there are any, 
     and calculates necessary displacements to avoid the collision
 
@@ -35,7 +35,7 @@
 
 #define _DEBUG_
 #include <fstream>
-#include <MotionGeneration/CollisionDetector.h>
+#include <walkGenJrl/MotionGeneration/CollisionDetector.h>
 
 
 using namespace::PatternGeneratorJRL;

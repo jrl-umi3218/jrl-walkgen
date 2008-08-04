@@ -1,5 +1,5 @@
-/* 
-    This object generate all the values for the foot trajectories,
+/** \file StepOverPlanner.h
+    \brief  This object generate all the values for the foot trajectories,
     and the desired ZMP based on a sequence of relative steps.
     If you want to change the reference trajectories, and the planning
     of the foot, this is the object to modify.
@@ -19,7 +19,7 @@
     * Redistributions in binary form must reproduce the above copyright notice, 
     this list of conditions and the following disclaimer in the documentation 
     and/or other materials provided with the distribution.
-    * Neither the name of the <ORGANIZATION> nor the names of its contributors 
+    * Neither the name of the CNRS and AIST nor the names of its contributors 
     may be used to endorse or promote products derived from this software without specific prior written permission.
    
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
@@ -37,60 +37,55 @@
 #define _STEPOVER_PLANNER_H_
 
 
-
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+/*! System includes */
 #include <vector>
 #include <string>
-
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
-#include <PreviewControl/PreviewControl.h>
-#include <Mathematics/StepOverPolynome.h>
-#include <MotionGeneration/InverseKinematics.h>
-
-#include <dynamicsJRLJapan/DynamicMultiBody.h>
-#include <dynamicsJRLJapan/HumanoidSpecificities.h>
 #include <deque>
 
+/*! MAL */
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
+/*! DynamicsJRLJapan */
+#include <dynamicsJRLJapan/DynamicMultiBody.h>
+#include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
-
-//#include <PolynomeFoot.h>
+/*! Humanoid Walking Pattern Generator */
+#include <walkGenJrl/PreviewControl/PreviewControl.h>
+#include <walkGenJrl/Mathematics/StepOverPolynome.h>
+#include <walkGenJrl/MotionGeneration/InverseKinematics.h>
 
 namespace PatternGeneratorJRL
 {
-  /**
-     \addtogroup walkGenJrl_steppingover
-     @{
-  */
-
+  class ZMPDiscretization;
   class CollisionDetector;
-  /*!  Structure to store the obstacle parameters and positions.*/
+  /*! \brief Structure to store the obstacle parameters and positions.*/
   struct ObstaclePar_t
   { 
-    // x, y in meters, theta in DEGREES.
+    /*! \brief x, y in meters, theta in DEGREES. */
     double x,y,z,theta; 
-    // h,w,d in meters and represent the height, width and depth.*/
+    /*! \brief  h,w,d in meters and represent the height, width and depth.*/
     double h,w,d;       
   };
   typedef struct ObstaclePar_t ObstaclePar;
 
-  /*!  \brief Object to compute new foot trajectories to step over obstacle dynamically*/
+  /*!\ingroup steppingover 
+    \brief Object to compute new foot trajectories to step over obstacle dynamically*/
   class StepOverPlanner
   {
   public :
      
-    /*!  Constructor */
+    /*! \brief  Constructor */
     StepOverPlanner(ObstaclePar &ObstacleParameters,
 		    HumanoidSpecificities * aHS);
 
-    /*!  Destructor */
+    /*! \brief  Destructor */
     ~StepOverPlanner();
 
-    /*! function which calculates the different relative 
-      footholds to be set in function of an obstacle in front*/
+    /*! \brief Method which calculates the different relative 
+      footholds to be set in function of an obstacle in front. */
     void CalculateFootHolds(deque<RelativeFootPosition> &FootHolds);
 	
-    /*! call for polynomial planning of both steps during the obstacle stepover */
+    /*! \brief Call for polynomial planning of both steps during the obstacle stepover */
     void PolyPlanner(deque<COMPosition> &aCOMBuffer, 
 		     deque<FootAbsolutePosition> & aLeftFootBuffer, 
 		     deque<FootAbsolutePosition> & aRightFootBuffer,
@@ -352,10 +347,10 @@ namespace PatternGeneratorJRL
 
   };
 
-/**
-   @}
-*/
 };
 
-#include<MotionGeneration/CollisionDetector.h>
+#include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
+#include <walkGenJrl/MotionGeneration/CollisionDetector.h>
+
+
 #endif /* _STEPOVER_PLANNER_H_ */

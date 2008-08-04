@@ -43,7 +43,7 @@ namespace PatternGeneratorJRL
   class SimplePlugin;
 
   
-  /*! \brief  This object takes care of dispatching the call 
+  /*! This class takes care of dispatching the call 
     appropriatly.
     
   */
@@ -55,9 +55,9 @@ namespace PatternGeneratorJRL
 
     struct ltstr
     {
-      bool operator()(const char* s1, const char* s2) const
+      bool operator()(const std::string s1, const std::string s2) const
       {
-	return strcmp(s1, s2) < 0;
+	return strcmp((char*)s1.c_str(), (char*)s2.c_str()) < 0;
       }
     };
 
@@ -65,18 +65,17 @@ namespace PatternGeneratorJRL
   protected:
 
     /*! Set of plugins sorted by names */
-    std::map<char *, SimplePlugin *, ltstr>  m_SimplePlugins;
+    std::multimap<std::string, SimplePlugin *, ltstr>  m_SimplePlugins;
 
   public: 
     
     /*! \brief Pointer towards the PGI which is handling this object. */
     inline SimplePluginManager()
       {};
-    inline virtual ~SimplePluginManager() 
-      {};
+    virtual ~SimplePluginManager();
     
     /*! Get the map of plugins. */
-    const std::map<char *, SimplePlugin *, ltstr>  & getSimplePlugins() const
+    const std::multimap<std::string, SimplePlugin *, ltstr>  & getSimplePlugins() const
       { return m_SimplePlugins;};
     /*! \name Register the method for which this object can be called
       by a higher parser. */
@@ -91,6 +90,6 @@ namespace PatternGeneratorJRL
   };
 };
 
-#include <SimplePlugin.h>
+#include <walkGenJrl/SimplePlugin.h>
 
 #endif /* _PGI_SIMPLE_PLUGIN_H_ */

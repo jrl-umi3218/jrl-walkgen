@@ -37,16 +37,14 @@
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 using namespace::std;
 
-#include <PGTypes.h>
+#include <walkGenJrl/PGTypes.h>
 
-    
 namespace PatternGeneratorJRL
 {
-  /** 
-      \addtogroup walkGenJrl_previewcontrol
-      @{
-  */
-  /**
+
+
+  /** @ingroup previewcontrol
+      
       \brief Class to implement the preview control
    */
   class PreviewControl
@@ -72,6 +70,14 @@ namespace PatternGeneratorJRL
 				unsigned int lindex,
 				double & zmpx2, double & zmpy2,
 				bool Simulation);
+
+      /*! One iteration of the preview control along one axis */
+      int OneIterationOfPreview1D(MAL_MATRIX( &x, double), 
+				  double & sxzmp,
+				  deque<double> & ZMPPositions,
+				  unsigned int lindex,
+				  double & zmpx2,
+				  bool Simulation);
 
       /*! Getter for the sampling period. */
       inline double SamplingPeriod() const
@@ -119,10 +125,6 @@ namespace PatternGeneratorJRL
       double m_Zc;
       //@}
     };
-  /**
-     @}
-  */
 }
-
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
+#include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #endif /* _PREVIEW_CONTROL_H_ */

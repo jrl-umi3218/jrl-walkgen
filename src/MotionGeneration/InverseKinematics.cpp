@@ -32,7 +32,7 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <math.h>
-#include <MotionGeneration/InverseKinematics.h>
+#include <walkGenJrl/MotionGeneration/InverseKinematics.h>
 
 
 using namespace::PatternGeneratorJRL;

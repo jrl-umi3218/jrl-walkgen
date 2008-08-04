@@ -54,11 +54,11 @@
 
 #define ODEBUG3(x) std::cout << "StepStackHandler:" << x << endl;
 
-#include <StepStackHandler.h>
+#include <walkGenJrl/StepStackHandler.h>
 
 using namespace::PatternGeneratorJRL;
 
-StepStackHandler::StepStackHandler()
+StepStackHandler::StepStackHandler(SimplePluginManager *lSPM) : SimplePlugin(lSPM)
 {
   m_OnLineSteps = false;
   m_SingleSupportTime = 0.0;
@@ -68,6 +68,23 @@ StepStackHandler::StepStackHandler()
   m_KeepLastCorrectSupportFoot=1;
   m_RelativeFootPositions.clear();
   m_TransitionFinishOnLine=false;
+
+  std::string aMethodName[7] = 
+    {":walkmode",
+     ":singlesupporttime",
+     ":doublesupporttime",
+     ":supportfoot",
+     ":lastsupport",
+     ":arc",
+     ":arccentered"};
+
+  for(int i=0;i<7;i++)
+    {
+      if (!RegisterMethod(aMethodName[i]))
+	{
+	  std::cerr << "Unable to register " << aMethodName << std::endl;
+	}
+    }
   RESETDEBUG5("DebugFootPrint.dat");
 }
 
@@ -80,6 +97,11 @@ StepStackHandler::~StepStackHandler()
 RelativeFootPosition StepStackHandler::ReturnBackFootPosition()
 {
   return m_RelativeFootPositions.back();
+}
+
+int StepStackHandler::ReturnStackSize()
+{
+  return m_RelativeFootPositions.size();
 }
 
 void StepStackHandler::CopyRelativeFootPosition(deque<RelativeFootPosition> &lRelativeFootPositions,
@@ -151,6 +173,8 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 			
 	    m_RelativeFootPositions.push_back(aFootPosition);
 	  }
+
+	ODEBUG("m_RelativeFootPositions: " << m_RelativeFootPositions.size());
 	break;
       }
     case 3:
@@ -681,19 +705,6 @@ void StepStackHandler::PrepareForSupportFoot(int SupportFoot)
   m_RelativeFootPositions.push_back(aFootPosition);
 }
 
-void StepStackHandler::m_PrepareForSupportFoot(istringstream &strm)
-{
-  int SupportFoot=-1;
-  while(!strm.eof())
-    {
-      if (!strm.eof())
-	strm >> SupportFoot;
-      else break;
-    }  
-  PrepareForSupportFoot(SupportFoot);
-  
-}
-
 void StepStackHandler::StopOnLineStep()
 {
   //  m_OnLineSteps = false;
@@ -706,6 +717,7 @@ void StepStackHandler::StopOnLineStep()
 
 void StepStackHandler::StartOnLineStep()
 {
+#if 0
   if (!m_OnLineSteps)
     m_RelativeFootPositions.clear();
 
@@ -735,6 +747,9 @@ void StepStackHandler::StartOnLineStep()
 	
       m_KeepLastCorrectSupportFoot= -   m_KeepLastCorrectSupportFoot;
     }
+#else
+  m_OnLineSteps = true;
+#endif
   ODEBUG("StartOnLineStep(): " << m_RelativeFootPositions.size());
 }
 
@@ -876,3 +891,87 @@ void StepStackHandler::m_PartialStepSequence(istringstream &strm)
     }
 }
 
+/* Implementation of the plugin methods. */
+void StepStackHandler::CallMethod(std::string &Method, std::istringstream &strm)
+{
+  if (Method==":singlesupporttime")
+    {
+      strm >> m_SingleSupportTime;
+    }
+  else if (Method==":doublesupporttime")
+    {
+      strm >> m_DoubleSupportTime;
+    }
+  else if (Method==":walkmode")
+    {
+      strm >> m_WalkMode;
+    }
+  else if (Method==":supportfoot")
+    {
+      int SupportFoot=-1;
+      strm >> SupportFoot;
+      PrepareForSupportFoot(SupportFoot);
+    }
+  else if (Method==":lastsupport")
+    {
+      FinishOnTheLastCorrectSupportFoot();
+    }
+  else if (Method==":arc")
+    {
+      double x,y,R=0.0,arc_deg;
+      int SupportFoot=-1;
+      
+      
+      while(!strm.eof())
+	{
+	  
+	  if (!strm.eof())
+	    strm >> x;
+	  else break;
+	  
+	  if (!strm.eof())
+	    strm >> y;
+	  else break;
+	  
+	  if (!strm.eof())
+	    strm >> arc_deg;
+	  else break;
+	  
+	if (!strm.eof())
+	  strm >> SupportFoot;
+	else break;
+	}
+      
+      
+      CreateArcInStepStack(x,y,R,arc_deg,SupportFoot);
+    }
+  else if (Method==":arccentered")
+    {
+      double R,arc_deg;
+      int SupportFoot=-1;
+      ODEBUG4("m_CreateArcCenteredInStepStack 1", "DebugData.txt");
+      
+      while(!strm.eof())
+	{
+	  
+	  if (!strm.eof())
+	    strm >> R;
+	  else break;
+	  
+	  
+	  if (!strm.eof())
+	    strm >> arc_deg;
+	  else break;
+	  
+	  if (!strm.eof())
+	    strm >> SupportFoot;
+	  else break;
+	  
+	  
+	}
+      ODEBUG4("m_CreateArcCenteredInStepStack 2", "DebugData.txt");
+      CreateArcCenteredInStepStack(R,arc_deg,SupportFoot);
+      ODEBUG4("m_CreateArcCenteredInStepStack 3", "DebugData.txt");
+    }
+
+}

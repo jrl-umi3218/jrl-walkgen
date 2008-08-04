@@ -1,7 +1,8 @@
 #include <fstream>
-#include <PatternGeneratorInterface.h>
 #include <sys/time.h>
 #include <time.h>
+
+#include <walkGenJrl/PatternGeneratorInterface.h>
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) cerr << "PatternGeneratorInterface :" << x << endl
@@ -117,20 +118,15 @@ namespace PatternGeneratorJRL {
 				      LinkJointRank);
     ODEBUG("End of Inter Object Relation Initialization ");
     // Initialization of the strategy for ZMP ref trajectory generation.
-    m_BoolPBWAlgo = 0;
+    m_AlgorithmforZMPCOM = ZMPCOM_KAJITA_2003;
 
     // Initialize (if needed) debugging actions.
     m_dt = 0.005;
     m_DOF = m_HumanoidDynamicRobot->numberDof();
-    m_UpperBodyJoints = m_HumanoidDynamicRobot->
-      getHumanoidSpecificities()->GetUpperBodyJoints();
-    m_NbOfUpperBodyJoints = m_UpperBodyJoints.size();
 
     m_SamplingPeriod = m_PC->SamplingPeriod();
     m_PreviewControlTime = m_PC->PreviewControlTime();
     m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
-
-
 
     /* For debug purposes. */
     MAL_VECTOR_RESIZE(m_Debug_prev_qr,6);
@@ -148,9 +144,6 @@ namespace PatternGeneratorJRL {
     m_ZMPShift[1] = 0.07;
     m_ZMPShift[2] = 0.02;
     m_ZMPShift[3] = 0.02;
-
-
-
 
     for(int i=0;i<4;i++)
       {
@@ -197,12 +190,7 @@ namespace PatternGeneratorJRL {
     m_NewStep = false;
     m_ShouldBeRunning = false;
 
-    m_ConstraintOnX = 0.04;
-    m_ConstraintOnY = 0.04;
-
-    m_QP_T = 0.02;
-    m_QP_N = 75;
-
+    m_InternalClock = 0.0;
 
   }
 
@@ -211,21 +199,30 @@ namespace PatternGeneratorJRL {
     // Create fundamental objects to make the WPG runs.
 
     // INFO: This where you should instanciate your own
-    // INFO: implementation of CjrlDynamicRobot.
-    DynamicMultiBody DMB;
-    DMB.setComputeZMP(true);
-    DMB.setComputeBackwardDynamics(false);
-    // INFO: This where you should instanciate your own
     // INFO: implementation of CjrlHumanoidDynamicRobot
-    m_HumanoidDynamicRobot= new HumanoidDynamicMultiBody(DMB,HumanoidSpecificitiesFileName);
+    m_HumanoidDynamicRobot= new HumanoidDynamicMultiBody();
+    m_HumanoidDynamicRobot->SetHumanoidSpecificitiesFile(HumanoidSpecificitiesFileName);
+    m_HumanoidDynamicRobot->setComputeZMP(true);
+    m_HumanoidDynamicRobot->setComputeBackwardDynamics(false);
 
     // INFO: This where you should instanciate your own
     // INFO: object for Com and Foot realization.
     // INFO: The default one is based on a geometrical approach.
     m_ComAndFootRealization = new ComAndFootRealizationByGeometry(this);
 
-    // ZMP reference and Foot trajectory planner.
-    m_ZMPD = new ZMPDiscretization("",m_HumanoidDynamicRobot->getHumanoidSpecificities());
+    // Creates the foot trajectory generator.
+    m_FeetTrajectoryGenerator = new LeftAndRightFootTrajectoryGenerationMultiple(this,
+										 m_HumanoidDynamicRobot->getHumanoidSpecificities());
+
+    // ZMP reference and Foot trajectory planner (Preview control method from Kajita2003)
+    m_ZMPD = new ZMPDiscretization(this,"",m_HumanoidDynamicRobot->getHumanoidSpecificities());
+
+    // ZMP and CoM generation using the method proposed in Wieber2006.
+    m_ZMPQP = new ZMPQPWithConstraint(this,"",m_HumanoidDynamicRobot->getHumanoidSpecificities());
+
+    // ZMP and CoM generation using the analytical method proposed in Morisawa2007.
+    m_ZMPM = new AnalyticalMorisawaCompact(this);
+    m_ZMPM->SetHumanoidSpecificities(m_HumanoidDynamicRobot->getHumanoidSpecificities());
 
     // Preview control for a 3D Linear inverse pendulum
     m_PC = new PreviewControl();
@@ -236,19 +233,39 @@ namespace PatternGeneratorJRL {
     // Object to have a Dynamic multibody robot model.
     // for the second preview loop.
 
+    // Object to investiguate the result of the second preview loop.
     // INFO: This where you should instanciate your own
     // INFO: implementation of CjrlHumanoidDynamicRobot
-    m_2HumanoidDynamicRobot= new HumanoidDynamicMultiBody(DMB, HumanoidSpecificitiesFileName);
+    m_2HumanoidDynamicRobot= new HumanoidDynamicMultiBody();
+    m_2HumanoidDynamicRobot->SetHumanoidSpecificitiesFile(HumanoidSpecificitiesFileName);
+    m_2HumanoidDynamicRobot->setComputeZMP(true);
+    m_2HumanoidDynamicRobot->setComputeBackwardDynamics(false);
+    
 
     // Stack of steps handler.
-    m_StepStackHandler = new StepStackHandler();
+    m_StepStackHandler = new StepStackHandler(this);
 
     // Stepping over planner.
     m_StOvPl = new StepOverPlanner(m_ObstaclePars,
 				   m_HumanoidDynamicRobot->getHumanoidSpecificities());
 
-    // The object to realize the global stage of preview control.
-    m_ZMPpcwmbz = new ZMPPreviewControlWithMultiBodyZMP();
+
+    // The creation of the double stage preview control manager.
+    m_DoubleStagePCStrategy = new DoubleStagePreviewControlStrategy(this);
+    m_DoubleStagePCStrategy->SetBufferPositions(&m_ZMPPositions,
+						&m_COMBuffer,
+						&m_LeftFootPositions,
+						&m_RightFootPositions);
+
+    
+    m_CoMAndFootOnlyStrategy = new CoMAndFootOnlyStrategy(this);
+    m_CoMAndFootOnlyStrategy->SetBufferPositions(&m_ZMPPositions,
+						 &m_COMBuffer,
+						 &m_LeftFootPositions,
+						 &m_RightFootPositions);
+
+    // Default handler :DoubleStagePreviewControl.
+    m_GlobalStrategyManager = m_DoubleStagePCStrategy;
 
     // End of the creation of the fundamental objects.
 
@@ -264,21 +281,38 @@ namespace PatternGeneratorJRL {
     m_Zc = m_PC->GetHeightOfCoM();
 
     // Initialize the Preview Control general object.
-    m_ZMPpcwmbz->SetPreviewControl(m_PC);
-    m_ZMPpcwmbz->setHumanoidDynamicRobot(m_HumanoidDynamicRobot);
-    m_ZMPpcwmbz->setComAndFootRealization(m_ComAndFootRealization);
+    m_DoubleStagePCStrategy->InitInterObjects(m_PC,
+					      m_HumanoidDynamicRobot,
+					      m_ComAndFootRealization,
+					      m_StepStackHandler);
+        
+    m_CoMAndFootOnlyStrategy->InitInterObjects(m_PC,
+					       m_HumanoidDynamicRobot,
+					       m_ComAndFootRealization,
+					       m_StepStackHandler);
+
+    // Initialize the ZMP trajectory generator.
+    m_ZMPD->SetSamplingPeriod(m_PC->SamplingPeriod());
+    m_ZMPD->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+
+    m_ZMPQP->SetSamplingPeriod(m_PC->SamplingPeriod());
+    m_ZMPQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+    
+    m_ZMPM->SetSamplingPeriod(m_PC->SamplingPeriod());
+    m_ZMPM->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+    m_ZMPM->SetFeetTrajectoryGenerator(m_FeetTrajectoryGenerator);
 
     // The motion generator based on a Kineoworks pathway is given here.
     m_GMFKW->SetPreviewControl(m_PC);
 
     // Read the robot VRML file model.
     m_HumanoidDynamicRobot->parserVRML(HumanoidVRMLFileDirectory,
-		      HumanoidVRMLFileName,
-		      HumanoidLinkJointRank.c_str());
+				       HumanoidVRMLFileName,
+				       HumanoidLinkJointRank.c_str());
 
     m_2HumanoidDynamicRobot->parserVRML(HumanoidVRMLFileDirectory,
-		       HumanoidVRMLFileName,
-		       HumanoidLinkJointRank.c_str());
+					HumanoidVRMLFileName,
+					HumanoidLinkJointRank.c_str());
 
     m_HumanoidDynamicRobot->SetTimeStep(m_PC->SamplingPeriod());
     m_2HumanoidDynamicRobot->SetTimeStep(m_PC->SamplingPeriod());
@@ -286,7 +320,6 @@ namespace PatternGeneratorJRL {
     // The link between specific Humanoid information
     // and joint of the dynamic multi robot
     // can be done only with the VRML file has been read (obvious isn't it ? )
-
     m_HumanoidDynamicRobot->LinkBetweenJointsAndEndEffectorSemantic();
     m_2HumanoidDynamicRobot->LinkBetweenJointsAndEndEffectorSemantic();
 
@@ -295,6 +328,7 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization->SetHeightOfTheCoM(m_PC->GetHeightOfCoM());
 
     m_ComAndFootRealization->setSamplingPeriod(m_PC->SamplingPeriod());
+
 
     m_ComAndFootRealization->SetStepStackHandler(m_StepStackHandler);
 
@@ -307,8 +341,7 @@ namespace PatternGeneratorJRL {
 
     m_StepStackHandler->SetStepOverPlanner(m_StOvPl);
     m_StepStackHandler->SetWalkMode(0);
-    // End of the initialization of the fundamental object.
-
+    // End of the initialization of the fundamental object. 
   }
 
   PatternGeneratorInterface::~PatternGeneratorInterface()
@@ -325,10 +358,13 @@ namespace PatternGeneratorJRL {
       delete m_StepStackHandler;
     ODEBUG4("Destructor: did m_StepStackHandler","DebugPGI.txt");
 
-    if (m_ZMPpcwmbz!=0)
-      delete m_ZMPpcwmbz;
-    ODEBUG4("Destructor: did m_ZMPpcwmbz","DebugPGI.txt");
+    if (m_2HumanoidDynamicRobot!=0)
+      delete m_2HumanoidDynamicRobot;
+    ODEBUG4("Destructor: did m_2HumanoidDynamicRobot","DebugPGI.txt");
 
+    if (m_HumanoidDynamicRobot!=0)
+      delete m_HumanoidDynamicRobot;
+    ODEBUG4("Destructor: did m_HumanoidDynamicRobot","DebugPGI.txt");
 
     if (m_GMFKW!=0)
       delete m_GMFKW;
@@ -342,7 +378,19 @@ namespace PatternGeneratorJRL {
       delete m_ZMPD;
     ODEBUG4("Destructor: did m_ZMPD","DebugPGI.txt");
 
+    if (m_ZMPQP!=0)
+      delete m_ZMPQP;
+    ODEBUG4("Destructor: did m_ZMPQP","DebugPGI.txt");
 
+    if (m_ZMPM!=0)
+      delete m_ZMPM;
+    ODEBUG4("Destructor: did m_ZMPM","DebugPGI.txt");
+
+    if (m_ComAndFootRealization!=0)
+      delete m_ComAndFootRealization;
+
+    if (m_FeetTrajectoryGenerator!=0)
+      delete m_FeetTrajectoryGenerator;
   }
 
   void PatternGeneratorInterface::m_SetObstacleParameters(istringstream &strm)
@@ -453,19 +501,6 @@ namespace PatternGeneratorJRL {
       }
   }
 
-  void PatternGeneratorInterface::m_WhichWalkMode(istringstream &strm)
-  {
-    while(!strm.eof())
-      {
-	if (!strm.eof())
-	  {
-	    int lWalkMode;
-	    strm >> lWalkMode;
-	    m_StepStackHandler->SetWalkMode(lWalkMode);
-	  }
-	else break;
-      }
-  }
 
   void PatternGeneratorInterface::m_SetLimitsFeasibility(istringstream &strm)
   {
@@ -479,16 +514,11 @@ namespace PatternGeneratorJRL {
 	else break;
       }
   }
-
-
-  void PatternGeneratorInterface::m_StepSequence(istringstream &strm)
+  
+  void PatternGeneratorInterface::ReadSequenceOfSteps(istringstream &strm)
   {
-
-    ODEBUG6("Step Sequence","DebugGMFKW.dat");
-    ofstream DebugFile;
-
     // Read the data inside strm.
-
+    
 
     switch (m_StepStackHandler->GetWalkMode())
       {
@@ -517,7 +547,7 @@ namespace PatternGeneratorJRL {
 	}
       default:
 	{
-	  ODEBUG3( "PLease select proper walk mode. \
+	  ODEBUG3( "Please select proper walk mode. \
             (0 for normal walking ; \
              1 for walking with waistheight variation ; \
              2 for walking with obstacle stepover)" );
@@ -525,6 +555,15 @@ namespace PatternGeneratorJRL {
 	}
       }
     ODEBUG("Just before starting to Finish and RealizeStepSequence()");
+
+  }
+
+  void PatternGeneratorInterface::m_StepSequence(istringstream &strm)
+  {
+
+    ODEBUG6("Step Sequence","DebugGMFKW.dat");
+    ofstream DebugFile;
+    ReadSequenceOfSteps(strm);
     FinishAndRealizeStepSequence();
   }
 
@@ -538,7 +577,7 @@ namespace PatternGeneratorJRL {
   }
 
 
-  void PatternGeneratorInterface::CommonInitializationOfWalking(MAL_S3_VECTOR(  & lStartingCOMPosition,double),
+  void PatternGeneratorInterface::CommonInitializationOfWalking(COMPosition  & lStartingCOMPosition,
 								MAL_VECTOR(  & BodyAnglesIni,double),
 								FootAbsolutePosition & InitLeftFootAbsPos,
 								FootAbsolutePosition & InitRightFootAbsPos,
@@ -546,7 +585,6 @@ namespace PatternGeneratorJRL {
 								vector<double> & lCurrentJointValues,
 								bool ClearStepStackHandler)
   {
-    m_FootAbsolutePositions.clear();
     m_ZMPPositions.clear();
     m_LeftFootPositions.clear();
     m_RightFootPositions.clear();
@@ -566,15 +604,25 @@ namespace PatternGeneratorJRL {
 
     // Copy the relative foot position from the stack handler to here.
     m_StepStackHandler->CopyRelativeFootPosition(lRelativeFootPositions,ClearStepStackHandler);
+    ODEBUG("Size of lRelativeFootPositions: " << lRelativeFootPositions.size());
+    for(int i=0;i<lRelativeFootPositions.size();i++)
+      {
+	ODEBUG(lRelativeFootPositions[i].sx << " " << 
+		lRelativeFootPositions[i].sy << " " <<  
+		lRelativeFootPositions[i].theta );
+
+      }
 
     // Initialize consequently the ComAndFoot Realization object.
-    m_ZMPpcwmbz->EvaluateStartingCoM(BodyAnglesIni,lStartingCOMPosition,
-				     InitLeftFootAbsPos, InitRightFootAbsPos);
-    ODEBUG("StartingCOMPosition: " << lStartingCOMPosition);
+    m_GlobalStrategyManager->EvaluateStartingState(BodyAnglesIni,lStartingCOMPosition,
+						   InitLeftFootAbsPos, InitRightFootAbsPos);
+
+    ODEBUG("StartingCOMPosition: " << lStartingCOMPosition.x[0] << " " 
+	   << lStartingCOMPosition.y[0] );
     // We also initialize the iteration number inside DMB.
     m_HumanoidDynamicRobot->ResetIterationNumber();
 
-    ODEBUG( "CommonInitializationOfWalking " << BodyAnglesIni );
+    ODEBUG("CommonInitializationOfWalking " << BodyAnglesIni );
 
     if (0)
       {
@@ -597,40 +645,63 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterface::m_StartOnLineStepSequencing(istringstream &strm2)
   {
+    m_InternalClock = 0.0;
+    ReadSequenceOfSteps(strm2);
     StartOnLineStepSequencing();
-
   }
 
   void PatternGeneratorInterface::StartOnLineStepSequencing()
   {
-    MAL_S3_VECTOR( lStartingCOMPosition,double);
+    COMPosition lStartingCOMPosition;
     MAL_VECTOR( BodyAnglesIni,double);
 
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
+    memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
+    memset(&InitRightFootAbsPos,0,sizeof(InitRightFootAbsPos));
+    
     deque<RelativeFootPosition> lRelativeFootPositions;
     vector<double> lCurrentJointValues;
 
-    ODEBUG("StartOnLineStepSequencing - 1 ");
+    ODEBUG3("StartOnLineStepSequencing - 1 ");
     m_StepStackHandler->StartOnLineStep();
 
-    ODEBUG("StartOnLineStepSequencing - 2 ");
+
     CommonInitializationOfWalking(lStartingCOMPosition,
 				  BodyAnglesIni,
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,false);
 
     ODEBUG("StartOnLineStepSequencing - 3 "
-	   << lStartingCOMPosition << " "
+	   << lStartingCOMPosition.x[0] << " "
 	   << lRelativeFootPositions.size()
 	   );
 
-    int NbOfStepsToRemoveFromTheStack=m_ZMPD->InitOnLine(m_ZMPPositions,
+    int NbOfStepsToRemoveFromTheStack=0;
+    if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
+      {
+	NbOfStepsToRemoveFromTheStack=m_ZMPD->InitOnLine(m_ZMPPositions,
+							 m_COMBuffer,
 							 m_LeftFootPositions,
 							 m_RightFootPositions,
 							 InitLeftFootAbsPos,
 							 InitRightFootAbsPos,
 							 lRelativeFootPositions,
 							 lStartingCOMPosition );
+      }
+    else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+      {
+	m_ZMPM->SetCurrentTime(m_InternalClock);
+	NbOfStepsToRemoveFromTheStack = m_ZMPM->InitOnLine(m_ZMPPositions,
+							   m_COMBuffer,
+							   m_LeftFootPositions,
+							   m_RightFootPositions,
+							   InitLeftFootAbsPos,
+							   InitRightFootAbsPos,
+							   lRelativeFootPositions,
+							   lStartingCOMPosition );
+	ODEBUG("After Initializing the Analytical Morisawa part. " << m_LeftFootPositions.size()
+		<< " " << m_RightFootPositions.size());
+      }
 
     // Keep the last one to be removed at the next insertion.
     for(int i=0;i<NbOfStepsToRemoveFromTheStack-1;i++)
@@ -650,22 +721,6 @@ namespace PatternGeneratorJRL {
 
       }
 
-    // Initialization of the upper body motion.
-    m_UpperBodyPositionsBuffer.resize(m_ZMPPositions.size());
-    for(unsigned int i=0;i<m_UpperBodyPositionsBuffer.size();i++)
-      {
-	m_UpperBodyPositionsBuffer[i].Joints.resize(m_UpperBodyJoints.size());
-
-	if (i==0)
-	  {
-	    for(int j=0;j<m_NbOfUpperBodyJoints;j++)
-	      m_UpperBodyPositionsBuffer[i].Joints[j] =
-		lCurrentJointValues[m_UpperBodyJoints[j]];
-	  }
-	// Initialize the upper body motion to the current stored value.
-	for(int j=0;j<m_NbOfUpperBodyJoints;j++)
-	  m_UpperBodyPositionsBuffer[i].Joints[j] = m_UpperBodyPositionsBuffer[0].Joints[j];
-      }
 
     // Initialization of the first preview.
     for(int j=0; j<m_DOF;j++)
@@ -674,10 +729,10 @@ namespace PatternGeneratorJRL {
 	ODEBUG4(BodyAnglesIni(j),"DebugDataOnLine.txt");
       }
 
-    m_ZMPpcwmbz->Setup(m_ZMPPositions,
-		       m_COMBuffer,
-		       m_LeftFootPositions,
-		       m_RightFootPositions);
+    m_GlobalStrategyManager->Setup(m_ZMPPositions,
+				   m_COMBuffer,
+				   m_LeftFootPositions,
+				   m_RightFootPositions);
 
     m_ShouldBeRunning=true;
 
@@ -700,7 +755,7 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterface::FinishAndRealizeStepSequence()
   { 
     ODEBUG("PGI-Start");
-    MAL_S3_VECTOR(lStartingCOMPosition,double);	
+    COMPosition lStartingCOMPosition;	
     MAL_VECTOR( BodyAnglesIni,double);
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
     struct timeval begin, end, time1, time2, time3, time4, time5, time6;
@@ -734,72 +789,21 @@ namespace PatternGeneratorJRL {
     ODEBUG6("Size of lRelativeFootPositions :" << lRelativeFootPositions.size(),"DebugGMFKW.dat");
 
 
-    ODEBUG("CurrentZMPNeutralPosition: "
-	   << CurrentZMPNeutralPosition[0]
-	   << " "
-	   << CurrentZMPNeutralPosition[1] );
-
+    
     // Create the ZMP reference.
-    m_ZMPD->GetZMPDiscretization(m_ZMPPositions,
-				 m_FootAbsolutePositions,
-				 lRelativeFootPositions,
-				 m_LeftFootPositions,
-				 m_RightFootPositions,
-				 m_LeftHandPositions,
-				 m_RightHandPositions,
-				 m_Xmax, lStartingCOMPosition,
-				 InitLeftFootAbsPos,
-				 InitRightFootAbsPos);
+    CreateZMPReferences(lRelativeFootPositions,
+			lStartingCOMPosition,
+			InitLeftFootAbsPos,
+			InitRightFootAbsPos);
 
     ODEBUG("First m_ZMPPositions" << m_ZMPPositions[0].px << " " << m_ZMPPositions[0].py);
     deque<ZMPPosition> aZMPBuffer;
 
-    gettimeofday(&time1,0);
     // Option : Use Wieber06's algorithm to compute a new ZMP
     // profil. Suppose to preempt the first stage of control.
-    deque<ZMPPosition> NewZMPPositions;
-
-    ODEBUG( "COM_Buffer size: " << m_COMBuffer.size());
-
-
-    if (m_BoolPBWAlgo)
-      {
-	ODEBUG("PBW algo set on");
-	ODEBUG("Size of COMBuffer: " << m_COMBuffer.size());
-	m_COMBuffer.clear();
-	m_ZMPD->BuildZMPTrajectoryFromFootTrajectory(m_LeftFootPositions,
-						     m_RightFootPositions,
-						     m_ZMPPositions,
-						     NewZMPPositions,
-						     m_COMBuffer,
-						     m_ConstraintOnX,
-						     m_ConstraintOnY,
-						     m_QP_T,
-						     m_QP_N);
-	if (m_ZMPPositions.size()!=NewZMPPositions.size())
-	  {
-	    cout << "Problem here between m_ZMPPositions and new zmp positions" << endl;
-	    cout << m_ZMPPositions.size() << " " << NewZMPPositions.size() << endl;
-	  }
-
-	for(unsigned int i=0;i<m_ZMPPositions.size();i++)
-	  m_ZMPPositions[i] = NewZMPPositions[i];
-
-
-      }
-    else
-      {
-	m_COMBuffer.clear();
-	m_COMBuffer.resize(m_RightFootPositions.size());
-      }
-
     aZMPBuffer.resize(m_RightFootPositions.size());
 
-    ODEBUG6("FinishAndRealizeStepSequence() - 3 ","DebugGMFKW.dat");
-
-    gettimeofday(&time2,0);
-
-    //this function calculates a buffer with COM values after a first preview round,
+    // this function calculates a buffer with COM values after a first preview round,
     // currently required to calculate the arm swing before "onglobal step of control"
     // in order to take the arm swing motion into account in the second preview loop
     if (m_StepStackHandler->GetWalkMode()==2)
@@ -818,7 +822,7 @@ namespace PatternGeneratorJRL {
 
       }
 
-    if (0)
+    if (1)
       {
 	m_ZMPD->DumpDataFiles("/tmp/ZMPSetup.dat",
 			      "/tmp/LeftFootAbsolutePosSetup.dat",
@@ -838,62 +842,6 @@ namespace PatternGeneratorJRL {
     ODEBUG6("FinishAndRealizeStepSequence() - 5 ","DebugGMFKW.dat");
     // Link the current trajectory and GenerateMotionFromKineoWorks.
 
-    // Specify the buffer.
-
-    m_UpperBodyPositionsBuffer.clear();
-
-
-    if (m_StepStackHandler->GetWalkMode()==3)
-      {
-	ODEBUG6("Before Starting GMFKW","DebugGMFKW.dat");
-	m_GMFKW->CreateBufferFirstPreview(m_ZMPPositions);
-
-	// Map the path found by KineoWorks onto the ZMP buffer.
-	m_ConversionForUpperBodyFromLocalIndexToRobotDOFs.clear();
-
-	m_GMFKW->ComputeUpperBodyPosition(m_UpperBodyPositionsBuffer,
-					  m_ConversionForUpperBodyFromLocalIndexToRobotDOFs);
-	ODEBUG6("After GMFKW","DebugGMFKW.dat");
-      }
-    else
-      {
-	// Create the stack of upper body motion.
-	m_UpperBodyPositionsBuffer.resize(m_ZMPPositions.size());
-
-	for(unsigned int i=0;i<m_UpperBodyPositionsBuffer.size();i++)
-	  {
-	    m_UpperBodyPositionsBuffer[i].Joints.resize(28);
-
-	    if (i==0)
-	      {
-		for(int j=0;j<m_NbOfUpperBodyJoints;j++)
-		  m_UpperBodyPositionsBuffer[i].Joints[j] =
-		    lCurrentJointValues[m_UpperBodyJoints[j]];
-	      }
-	    // Initialize the upper body motion to the current stored value.
-	    for(int j=0;j<m_NbOfUpperBodyJoints;j++)
-	      m_UpperBodyPositionsBuffer[i].Joints[j] = m_UpperBodyPositionsBuffer[0].Joints[j];
-	  }
-
-
-	// Create the conversion array.
-	m_ConversionForUpperBodyFromLocalIndexToRobotDOFs.resize(m_DOF);
-	for(unsigned int i=0;i<m_ConversionForUpperBodyFromLocalIndexToRobotDOFs.size();i++)
-	  m_ConversionForUpperBodyFromLocalIndexToRobotDOFs[i] = i;
-      }
-
-    ODEBUG6("FinishAndRealizeStepSequence() - 6 ","DebugCG.ctx");
-
-    for(unsigned int j=0;
-	j<m_UpperBodyPositionsBuffer[0].Joints.size();
-	j++)
-      {
-	BodyAnglesIni(m_ConversionForUpperBodyFromLocalIndexToRobotDOFs[j]) =
-	  m_UpperBodyPositionsBuffer[0].Joints[j];
-      }
-
-    gettimeofday(&time3,0);
-    ODEBUG6("FinishAndRealizeStepSequence() - 7 ","DebugGMFKW.dat");
 
     // Very important, you have to make sure that the correct COM position is
     // set inside this buffer.
@@ -926,71 +874,22 @@ namespace PatternGeneratorJRL {
     gettimeofday(&time4,0);
     ODEBUG6("FinishAndRealizeStepSequence() - 8 ","DebugGMFKW.dat");
     // Read NL informations from ZMPRefPositions.
-    int localWalkMode = m_StepStackHandler->GetWalkMode();
-    if ((localWalkMode==0) ||
-	(localWalkMode==3))
-      {
-	m_ZMPpcwmbz->SetupFirstPhase(m_ZMPPositions,
-				     m_COMBuffer,
-				     m_LeftFootPositions,
-				     m_RightFootPositions);
-
-	gettimeofday(&time5,0);
-
-	MAL_VECTOR(,double) CurrentConfiguration;
-
-	CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();  
-	MAL_VECTOR(,double) CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
-
-	for(unsigned int i=0;i<m_NL;i++)
-	  {
-	    COMPosition aCOMPosition;
-	    ODEBUG("PGI: " << i <<  " " 
-		   << m_COMBuffer[i].x[0] << " "
-		   << m_COMBuffer[i].y[0] << " "
-		   << m_COMBuffer[i].z[0]);
+    m_GlobalStrategyManager->Setup(m_ZMPPositions,
+				   m_COMBuffer,
+				   m_LeftFootPositions,
+				   m_RightFootPositions);
 
 
-	    m_ZMPpcwmbz->SetupIterativePhase(m_ZMPPositions,
-					     m_COMBuffer,
-					     m_LeftFootPositions,
-					     m_RightFootPositions,
-					     CurrentConfiguration,
-					     CurrentVelocity,
-					     i);
-
-	    // Take the new COM computed by the first stage of Preview control.
-	    if (m_BoolPBWAlgo == 0)
-	      {
-		aCOMPosition = m_ZMPpcwmbz->GetLastCOMFromFirstStage();
-
-		m_COMBuffer[i+1].x[0] = aCOMPosition.x[0];
-		m_COMBuffer[i+1].y[0] = aCOMPosition.y[0];
-		m_COMBuffer[i+1].pitch = aCOMPosition.pitch;
-		//		m_COMBuffer[i+1].theta = aCOMPosition.theta;
-	      }
-	    else
-	      aCOMPosition = m_COMBuffer[i];
-
-	  }
-
-      }
-    else
-      {
-	gettimeofday(&time5,0);
-	m_ZMPpcwmbz->Setup(m_ZMPPositions,
-			   m_COMBuffer,
-			   m_LeftFootPositions,
-			   m_RightFootPositions);
-      }
-
-    gettimeofday(&time6,0);
+    gettimeofday(&time5,0);
     ODEBUG("FinishAndRealizeStepSequence() - 9 ");
 
     m_count = 0;
     ODEBUG("FinishAndRealizeStepSequence() - 10 ");
 
     m_ShouldBeRunning = true;
+
+    m_InternalClock = 0.0;
+
     gettimeofday(&end,0);
     ODEBUG(endl <<
 	    "Step 1 : "<<  time1.tv_sec-begin.tv_sec +
@@ -1037,27 +936,15 @@ namespace PatternGeneratorJRL {
     string aCmd;
     strm >> aCmd;
 
-
+    ODEBUG("PARSECMD");
     if (CallMethod(aCmd,strm))
       {
 	ODEBUG("Method " << aCmd << " found and handled.");
-	return 0;
       }
 
     ODEBUG("PGI:ParseCmd: Commande: " << aCmd);
-    if (aCmd==":omega")
-      m_SetOmega(strm);
 
-    else if (aCmd==":stepheight")
-      m_SetStepHeight(strm);
-
-    else if (aCmd==":singlesupporttime")
-      m_SetSingleSupportTime(strm);
-
-    else if (aCmd==":doublesupporttime")
-      m_SetDoubleSupportTime(strm);
-
-    else if (aCmd==":LimitsFeasibility")
+    if (aCmd==":LimitsFeasibility")
       m_SetLimitsFeasibility(strm);
 
     else if (aCmd==":ZMPShiftParameters")
@@ -1069,23 +956,8 @@ namespace PatternGeneratorJRL {
     else if (aCmd==":stepseq")
       m_StepSequence(strm);
 
-    else if (aCmd==":walkmode")
-      m_WhichWalkMode(strm);
-
-    else if (aCmd==":lastsupport")
-      m_FinishOnTheLastCorrectSupportFoot(strm);
-
-    else if (aCmd==":supportfoot")
-      m_PrepareForSupportFoot(strm);
-
     else if (aCmd==":finish")
       m_FinishAndRealizeStepSequence(strm);
-
-    else if (aCmd==":arccentered")
-      m_CreateArcCenteredInStepStack(strm);
-
-    else if (aCmd==":arc")
-      m_CreateArcInStepStack(strm);
 
     else if (aCmd==":StartOnLineStepSequencing")
       m_StartOnLineStepSequencing(strm);
@@ -1095,9 +967,6 @@ namespace PatternGeneratorJRL {
 
     else if (aCmd==":readfilefromkw")
       m_ReadFileFromKineoWorks(strm);
-
-    else if (aCmd==":setpbwconstraint")
-      m_SetPBWConstraint(strm);
 
     else if (aCmd==":SetAlgoForZmpTrajectory")
       m_SetAlgoForZMPTraj(strm);
@@ -1110,83 +979,20 @@ namespace PatternGeneratorJRL {
     strm >> ZMPTrajAlgo;
     if (ZMPTrajAlgo=="PBW")
       {
-	m_BoolPBWAlgo=1;
-	m_ZMPpcwmbz->SetAlgorithmForZMPAndCoMTrajectoryGeneration(ZMPPreviewControlWithMultiBodyZMP::
-								  ZMPCOM_TRAJECTORY_WIEBER);
+	m_AlgorithmforZMPCOM = ZMPCOM_WIEBER_2006;
+	m_GlobalStrategyManager = m_DoubleStagePCStrategy;
       }
     else if (ZMPTrajAlgo=="Kajita")
       {
-	m_BoolPBWAlgo=0;
-	m_ZMPpcwmbz->SetAlgorithmForZMPAndCoMTrajectoryGeneration(ZMPPreviewControlWithMultiBodyZMP::
-								  ZMPCOM_TRAJECTORY_KAJITA);
-
+	m_AlgorithmforZMPCOM = ZMPCOM_KAJITA_2003;
+	m_GlobalStrategyManager = m_DoubleStagePCStrategy;
       }
-
-  }
-  void PatternGeneratorInterface::m_SetPBWConstraint(istringstream &strm)
-  {
-    string PBWCmd;
-    strm >> PBWCmd;
-    if (PBWCmd=="XY")
+    else if (ZMPTrajAlgo=="Morisawa")
       {
-	strm >> m_ConstraintOnX;
-	strm >> m_ConstraintOnY;
-	cout << "Constraint On X: " << m_ConstraintOnX
-	     << " Constraint On Y: " << m_ConstraintOnY << endl;
+	m_AlgorithmforZMPCOM = ZMPCOM_MORISAWA_2007;
+	m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
+	m_CoMAndFootOnlyStrategy->SetTheLimitOfTheBuffer(m_ZMPM->ReturnOptimalTimeToRegenerateAStep());
       }
-    else if (PBWCmd=="T")
-      {
-	strm >> m_QP_T;
-	cout << "Sampling for the QP " << m_QP_T <<endl;
-      }
-    else if (PBWCmd=="N")
-      {
-	strm >> m_QP_N;
-	cout << "Preview window for the QP " << m_QP_N << endl;
-      }
-  }
-  void PatternGeneratorInterface::m_SetOmega(istringstream &strm)
-  {
-    double anOmega;
-    strm >> anOmega;
-    ODEBUG("OMEGA :" << anOmega);
-    if (m_ZMPD!=0)
-      m_ZMPD->SetOmega(anOmega);
-  }
-
-  void PatternGeneratorInterface::m_SetStepHeight(istringstream &strm)
-  {
-    float StepHeight;
-    strm >> StepHeight;
-    ODEBUG("StepHeight :" << StepHeight);
-    if (m_ZMPD!=0)
-      m_ZMPD->SetStepHeight(StepHeight);
-  }
-
-  void PatternGeneratorInterface::m_SetSingleSupportTime(istringstream &strm)
-  {
-    //float TSsupport;
-    strm >> m_TSsupport;
-    ODEBUG("SingleSupportTime :" << m_TSsupport);
-    if (m_ZMPD!=0)
-      m_ZMPD->SetTSingleSupport(m_TSsupport);
-
-    if (m_StepStackHandler!=0)
-      m_StepStackHandler->SetSingleTimeSupport(m_TSsupport);
-
-  }
-
-  void PatternGeneratorInterface::m_SetDoubleSupportTime(istringstream &strm)
-  {
-
-    strm >> m_TDsupport;
-    ODEBUG("DoubleSupportTime :" << m_TDsupport);
-    if (m_ZMPD!=0)
-      m_ZMPD->SetTDoubleSupport(m_TDsupport);
-
-    if (m_StepStackHandler!=0)
-      m_StepStackHandler->SetDoubleTimeSupport(m_TDsupport);
-
   }
 
   void PatternGeneratorInterface::m_SetUpperBodyMotionParameters(istringstream &strm)
@@ -1202,12 +1008,57 @@ namespace PatternGeneratorJRL {
   bool PatternGeneratorInterface::RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
 							     MAL_VECTOR(,double) & CurrentVelocity,
 							     MAL_VECTOR( &ZMPTarget,double))
+  {
+    COMPosition finalCOMPosition;
+    FootAbsolutePosition LeftFootPosition,RightFootPosition;
+
+    RunOneStepOfTheControlLoop(CurrentConfiguration,
+			       CurrentVelocity,
+			       ZMPTarget,
+			       finalCOMPosition,
+			       LeftFootPosition,
+			       RightFootPosition);
+    
+  }
+
+  bool PatternGeneratorInterface::RunOneStepOfTheControlLoop(FootAbsolutePosition &LeftFootPosition,
+							     FootAbsolutePosition &RightFootPosition,
+							     ZMPPosition &ZMPRefPos,
+							     COMPosition &COMRefPos)
+  {
+    MAL_VECTOR(,double)  CurrentConfiguration;
+    MAL_VECTOR(,double)  CurrentVelocity;
+    MAL_VECTOR( ZMPTarget,double);
+
+    RunOneStepOfTheControlLoop(CurrentConfiguration,
+			       CurrentVelocity,
+			       ZMPTarget,
+			       COMRefPos,
+			       LeftFootPosition,
+			       RightFootPosition);
+
+    bzero(&ZMPRefPos,sizeof(ZMPPosition));
+    ZMPRefPos.px = ZMPTarget(0);
+    ZMPRefPos.py = ZMPTarget(1);
+    
+  }
+
+
+  bool PatternGeneratorInterface::RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
+							     MAL_VECTOR(,double) & CurrentVelocity,
+							     MAL_VECTOR( &ZMPTarget,double),
+							     COMPosition &finalCOMPosition,
+							     FootAbsolutePosition &LeftFootPosition, 
+							     FootAbsolutePosition &RightFootPosition )
+
 
   {
 
+    m_InternalClock+=m_SamplingPeriod;
+
     long int u=0;
     if ((!m_ShouldBeRunning) ||
-	(m_ZMPPositions.size()< 2*m_NL+1))
+	(m_GlobalStrategyManager->EndOfMotion()<0))
       {
 	ODEBUG(" m_ShoulBeRunning " << m_ShouldBeRunning << endl <<
 		" m_ZMPPositions " << m_ZMPPositions.size() << endl <<
@@ -1216,99 +1067,42 @@ namespace PatternGeneratorJRL {
 	return false;
       }
 
-    COMPosition finalCOMPosition;
+    if (m_StepStackHandler->IsOnLineSteppingOn())
+      {
+	// ********* WARNING THIS IS THE TIME CONSUMING PART *******************
+	if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
+	  {
+	  }
+	else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
+	  {
+	    m_ZMPD->OnLine(m_InternalClock,
+			   m_ZMPPositions,
+			   m_COMBuffer,
+			   m_LeftFootPositions,			   
+			   m_RightFootPositions);
+	  }
+	else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+	  {
+	    m_ZMPM->OnLine(m_InternalClock,
+			   m_ZMPPositions,
+			   m_COMBuffer,
+			   m_LeftFootPositions,
+			   m_RightFootPositions);
+	  }
+      }
+    
+
+    m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,
+						    RightFootPosition,
+						    ZMPTarget,
+						    finalCOMPosition,
+						    CurrentConfiguration,
+						    CurrentVelocity);
 
     // New scheme:
     // Update the queue of ZMP ref
-    m_ZMPpcwmbz->UpdateTheZMPRefQueue(m_ZMPPositions[2*m_NL]);
-
-    if ((m_StepStackHandler->GetWalkMode()==0) ||
-	(m_StepStackHandler->GetWalkMode()==4))
-      {
-	m_COMBuffer[m_NL].yaw = m_ZMPPositions[m_NL].theta;
-      }
-    finalCOMPosition =  m_COMBuffer[m_NL];
-
-    ODEBUG("ZMP : " << m_ZMPPositions[0].px
-	   << " " << m_ZMPPositions[0].py
-	   << " " << m_ZMPPositions[2*m_NL].px
-	   << " " << m_ZMPPositions[2*m_NL].py );
-
-    ODEBUG(m_count << " before-CurrentConfiguration " << CurrentConfiguration);
-    m_ZMPpcwmbz->OneGlobalStepOfControl(m_LeftFootPositions[m_NL],
-					m_RightFootPositions[m_NL],
-					m_ZMPPositions[2*m_NL],
-					finalCOMPosition,
-					CurrentConfiguration,
-					CurrentVelocity);
-    ODEBUG(m_count << " CurrentConfiguration " << CurrentConfiguration);
-    for(unsigned int i=0;i<m_CurrentActuatedJointValues.size();i++)
-      {
-	Joint * aJoint = (Joint *)m_HumanoidDynamicRobot->GetJointFromVRMLID(i);
-	if (aJoint !=0)
-	  m_CurrentActuatedJointValues[i] = aJoint->quantity();
-      }
-
-
-    /*
-      if (m_count==0)
-        {
-          for(unsigned int i=0;i<m_CurrentActuatedJointValues.size();i++)
-	    cout << m_CurrentActuatedJointValues[i] << " " ;
-	  cout << endl;
-	}
-    */
-    m_COMBuffer[0] = finalCOMPosition;
-
     m_count++;
-
-    // Compute the waist position in the current motion global reference frame.
-    //     MAL_S4x4_MATRIX( FinalDesiredCOMPose,double);
-    //     FinalDesiredCOMPose = m_ZMPpcwmbz->GetFinalDesiredCOMPose();
-    //     ODEBUG3("FinalDesiredCOMPose :" << FinalDesiredCOMPose);
-    MAL_S4x4_MATRIX( PosOfWaistInCOMF,double);
-    PosOfWaistInCOMF = m_ZMPpcwmbz->GetCurrentPositionofWaistInCOMFrame();
-    // MAL_S4x4_MATRIX( AbsWaist,double);
-    //     MAL_S4x4_C_eq_A_by_B(AbsWaist ,FinalDesiredCOMPose , PosOfWaistInCOMF);
-    //     ODEBUG3("AbsWaist " << AbsWaist);
-    //     ODEBUG3("PosOfWaistInCOMF " << PosOfWaistInCOMF);
-    //     ODEBUG3("Configuration(0-2): " <<
-    //  	    CurrentConfiguration(0) << " " <<
-    //  	    CurrentConfiguration(1) << " " <<
-    //  	    CurrentConfiguration(2));
-
-    COMPosition outWaistPosition;
-    outWaistPosition = finalCOMPosition;
-    outWaistPosition.x[0] =  CurrentConfiguration(0);
-    outWaistPosition.y[0] =  CurrentConfiguration(1);
-    outWaistPosition.z[0] =  CurrentConfiguration(2);
-
-    // In case we are at the end of the motion
-    double CurrentZMPNeutralPosition[2];
-    CurrentZMPNeutralPosition[0] = m_ZMPPositions[0].px;
-    CurrentZMPNeutralPosition[1] = m_ZMPPositions[0].py;
-
-    double temp1;
-    double temp2;
-    double temp3;
-    temp1 = m_ZMPPositions[0].px - outWaistPosition.x[0];
-    temp2 = m_ZMPPositions[0].py - outWaistPosition.y[0];
-    temp3 = finalCOMPosition.yaw*M_PI/180.0;
-
-    ZMPTarget(0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
-    ZMPTarget(1) = -sin(temp3)*temp1+cos(temp3)*temp2;
-    ZMPTarget(2) = -outWaistPosition.z[0];
-
-    ODEBUG4(finalCOMPosition.z[0] << " " << PosOfWaitInCOMF[2] << " " << ZMPTarget(2,0),
-	    "DebugDataZMPTargetZ.dat");
-    m_ZMPPositions.pop_front();
-    m_COMBuffer.pop_front();
-    m_LeftFootPositions.pop_front();
-    m_RightFootPositions.pop_front();
-    m_UpperBodyPositionsBuffer.pop_front();
-
-    m_CurrentWaistState = outWaistPosition;
-
+    
     ODEBUG4("CurrentWaistState: " 
 	    << m_CurrentWaistState.x[0] << " " 
 	    << m_CurrentWaistState.y[0] << " " 
@@ -1317,8 +1111,9 @@ namespace PatternGeneratorJRL {
     bool UpdateAbsMotionOrNot = false;
 
     //    if ((u=(m_count - (m_ZMPPositions.size()-2*m_NL)))>=0)
-    if ((u=m_ZMPPositions.size()-2*m_NL)==0)
+    if (m_GlobalStrategyManager->EndOfMotion()==GlobalStrategyManager::NEW_STEP_NEEDED)
       {
+	ODEBUG("NEW STEP NEEDED" << m_InternalClock/m_SamplingPeriod << " Internal Clock :" << m_InternalClock);
 	if (m_StepStackHandler->IsOnLineSteppingOn())
 	  {
 	    // CAREFULL: we assume that this sequence will create temporary
@@ -1338,15 +1133,43 @@ namespace PatternGeneratorJRL {
 
 	    // Create the new values for the ZMP and feet trajectories queues.
 	    int beforesize = m_ZMPPositions.size();
-	    m_ZMPD->OnLine(lRelativeFootPositions,
-			   m_ZMPPositions,
-			   m_LeftFootPositions,
-			   m_RightFootPositions,
-			   EndSequence);
+
+	    ODEBUG("Asking a new step");
+	    
+	    // ********* WARNING THIS IS THE TIME CONSUMING PART *******************
+	    if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
+	      {
+	      }
+	    else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
+	      {
+		m_ZMPD->OnLineAddFoot(lRelativeFootPositions,
+				      m_ZMPPositions,
+				      m_COMBuffer,
+				      m_LeftFootPositions,			   
+				      m_RightFootPositions,
+				      EndSequence);
+	      }
+	    else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+	      {
+		ODEBUG("Putting a new step SX: " << 
+			lRelativeFootPositions.sx << " SY: " 
+			<< lRelativeFootPositions.sy );
+		m_ZMPM->SetCurrentTime(m_InternalClock);
+		m_ZMPM->OnLineAddFoot(lRelativeFootPositions,
+				      m_ZMPPositions,
+				      m_COMBuffer,
+				      m_LeftFootPositions,
+				      m_RightFootPositions,
+				      EndSequence);
+		ODEBUG("Left and Right foot positions queues: " 
+			<< m_LeftFootPositions.size() << " " 
+			<< m_RightFootPositions.size() );
+	      }
+	    // ************* THIS HAS TO FIT INSIDE THE control step time  ***********
 	    int aftersize = m_ZMPPositions.size();
 
 	    // Create the new values for the COM and Upper body positions queues.
-	    ExpandCOMAndUpperBodyPositionsQueues(aftersize-beforesize);
+	    //ExpandCOMPositionsQueues(aftersize-beforesize);
 
 	  }
 	else
@@ -1394,6 +1217,10 @@ namespace PatternGeneratorJRL {
     MAL_VECTOR_DIM(qArmr,double,7);
     MAL_VECTOR_DIM(qArml,double,7);
 
+    int LINKSFORRLEG[6] = { 0, 1, 2, 3,  4, 5};
+    int LINKSFORLLEG[6] = { 6, 7, 8, 9, 10, 11};
+    //    int LINKSFORRARM[6] = { 16, 17, 18, 19, 20, 21};
+    //    int LINKSFORLARM[6] = { 23, 24, 25, 26, 27, 28};
 
     MAL_VECTOR_DIM( dql,double,6);
     MAL_VECTOR_DIM( dqr,double,6);
@@ -1404,7 +1231,6 @@ namespace PatternGeneratorJRL {
     MAL_VECTOR_DIM( ddqal,double,6);
     MAL_VECTOR_DIM( ddqar,double,6);
 
-    MAL_VECTOR_DIM( dUpperBodyAngles,double,m_NbOfUpperBodyJoints);
 
     MAL_S3_VECTOR(ZMPmultibody,double);
 
@@ -1428,6 +1254,11 @@ namespace PatternGeneratorJRL {
     double qWaistYaw=0.0,dqWaistYaw=0.0,ddqWaistYaw;
     //get real angles and ZMP
 
+    // Computes New Multybody ZMP.  and angular velocity of real angles
+    //upperbody angles
+    //	m_2HumanoidDynamicRobot->Setq(LINKSFORUPPERBODY[0],qWaistYaw);
+    //	m_2HumanoidDynamicRobot->Setq(LINKSFORUPPERBODY[1],0.0);
+
     if (m_count>1)
       {
 	dqWaistYaw = (qWaistYaw-m_Debug_prev_qWaistYaw)/m_SamplingPeriod;
@@ -1442,25 +1273,9 @@ namespace PatternGeneratorJRL {
 	ddqWaistYaw = 0.0;
       }
 
-#if 0
-    // Update the Dynamic multi body model with upperbody motion
-    for(int j=0;j<m_NbOfUpperBodyJoints;j++)
-      {
 
-	// Hard coded function to check HRP-2 .
-	// Free flyer + the current degree of freedoms.
-	m_2HumanoidDynamicRobot->Setq(m_UpperBodyJoints[j],
-		     CurrentConfiguration(m_UpperBodyJoints[j]));
-	if (m_count>1)
-	  dUpperBodyAngles(j) = (CurrentConfiguration(m_UpperBodyJoints[j])-
-				 m_Debug_prev_UpperBodyAngles(j))/m_SamplingPeriod;
-	else
-	  dUpperBodyAngles(j) = 0.0;
-	m_2HumanoidDynamicRobot->Setdq(m_UpperBodyJoints[j],dUpperBodyAngles(j));
-	m_Debug_prev_UpperBodyAngles(j) = CurrentConfiguration(m_UpperBodyJoints[j]);
-      }
-#endif
-
+    //	m_2HumanoidDynamicRobot->Setdq(LINKSFORUPPERBODY[0],dqWaistYaw);
+    //	m_2HumanoidDynamicRobot->Setdq(LINKSFORUPPERBODY[1],0.0);
 
     m_Debug_prev_qWaistYaw = qWaistYaw;
     m_Debug_prev_dqWaistYaw = dqWaistYaw;
@@ -1514,35 +1329,6 @@ namespace PatternGeneratorJRL {
 	     UpperBodyAngles(26) << " " <<
 	     UpperBodyAngles(27) << " "
 	     , "DebugDataUBDisplay.txt" );
-    ODEBUG4( dUpperBodyAngles(0) << " " <<
-	     dUpperBodyAngles(1) << " " <<
-	     dUpperBodyAngles(2) << " " <<
-	     dUpperBodyAngles(3) << " " <<
-	     dUpperBodyAngles(4) << " " <<
-	     dUpperBodyAngles(5) << " " <<
-	     dUpperBodyAngles(6) << " " <<
-	     dUpperBodyAngles(7) << " " <<
-	     dUpperBodyAngles(8) << " " <<
-	     dUpperBodyAngles(9) << " " <<
-	     dUpperBodyAngles(10) << " " <<
-	     dUpperBodyAngles(11) << " " <<
-	     dUpperBodyAngles(12) << " " <<
-	     dUpperBodyAngles(13) << " " <<
-	     dUpperBodyAngles(14) << " " <<
-	     dUpperBodyAngles(15) << " " <<
-	     dUpperBodyAngles(16) << " " <<
-	     dUpperBodyAngles(17) << " " <<
-	     dUpperBodyAngles(18) << " " <<
-	     dUpperBodyAngles(19) << " " <<
-	     dUpperBodyAngles(20) << " " <<
-	     dUpperBodyAngles(21) << " " <<
-	     dUpperBodyAngles(22) << " " <<
-	     dUpperBodyAngles(23) << " " <<
-	     dUpperBodyAngles(24) << " " <<
-	     dUpperBodyAngles(25) << " " <<
-	     dUpperBodyAngles(26) << " " <<
-	     dUpperBodyAngles(27) << " ",
-	     "DebugDatadUBDisplay.txt" );
 
     MAL_S3_VECTOR(WaistPosition,double);
     MAL_S3_VECTOR(WaistVelocity,double);
@@ -1550,7 +1336,7 @@ namespace PatternGeneratorJRL {
     MAL_S3x3_MATRIX(Body_Rm3d,double);
 
     MAL_S4x4_MATRIX( FinalDesiredCOMPose,double);
-    FinalDesiredCOMPose= m_ZMPpcwmbz->GetFinalDesiredCOMPose();
+    //    FinalDesiredCOMPose= m_ZMPpcwmbz->GetFinalDesiredCOMPose();
 
     WaistPosition[0] = CurrentConfiguration(0);
     WaistPosition[1] = CurrentConfiguration(1);
@@ -1790,14 +1576,14 @@ namespace PatternGeneratorJRL {
 
 	DebugFileLong << dqWaistYaw*180.0/M_PI <<  "\t" ;
 	// 82 lines = 57 + 25
-	for(unsigned int i=0;i<6;i++)
-	  {
-	    DebugFileLong << dUpperBodyAngles(11+i)*180.0/M_PI<<  "\t" ;
-	  }
-	for(unsigned int i=0;i<6;i++)
-	  {
-	    DebugFileLong << dUpperBodyAngles(4+i)*180.0/M_PI<<  "\t" ;
-	  }
+// 	for(unsigned int i=0;i<6;i++)
+// 	  {
+// 	    DebugFileLong << dUpperBodyAngles(11+i)*180.0/M_PI<<  "\t" ;
+// 	  }
+// 	for(unsigned int i=0;i<6;i++)
+// 	  {
+// 	    DebugFileLong << dUpperBodyAngles(4+i)*180.0/M_PI<<  "\t" ;
+// 	  }
 	// 94 = 82 + 12 cols
 	// angular accelerations
 	for(unsigned int i=0;i<6;i++)
@@ -1829,12 +1615,6 @@ namespace PatternGeneratorJRL {
 		      << rfpo << "\t"
 		      << lfpo
 		      << endl;
-	// 127  =119 + 8
-	for(int j=0;j<m_NbOfUpperBodyJoints;j++)
-	  {
-	    DebugFileUpperBody << CurrentConfiguration(m_UpperBodyJoints[j]) << "\t"  ;
-	  }
-	DebugFileUpperBody << endl;
       }
     DebugFileLong.close();
     DebugFileUpperBody.close();
@@ -1885,11 +1665,6 @@ namespace PatternGeneratorJRL {
       }
   }
 
-  void PatternGeneratorInterface::m_FinishOnTheLastCorrectSupportFoot(istringstream &strm)
-  {
-    m_StepStackHandler->FinishOnTheLastCorrectSupportFoot();
-
-  }
 
   void PatternGeneratorInterface::m_FinishAndRealizeStepSequence(istringstream &strm)
   {
@@ -1905,76 +1680,12 @@ namespace PatternGeneratorJRL {
     FinishAndRealizeStepSequence();
   }
 
-  void PatternGeneratorInterface::m_CreateArcInStepStack(istringstream &strm)
-  {
-    double x,y,R=0.0,arc_deg;
-    int SupportFoot=-1;
-
-
-    while(!strm.eof())
-      {
-
-	if (!strm.eof())
-	  strm >> x;
-	else break;
-
-	if (!strm.eof())
-	  strm >> y;
-	else break;
-
-	if (!strm.eof())
-	  strm >> arc_deg;
-	else break;
-
-	if (!strm.eof())
-	  strm >> SupportFoot;
-	else break;
-      }
-
-
-    m_StepStackHandler->CreateArcInStepStack(x,y,R,arc_deg,SupportFoot);
-  }
-
-  void PatternGeneratorInterface::m_CreateArcCenteredInStepStack(istringstream &strm)
-  {
-    double R,arc_deg;
-    int SupportFoot=-1;
-    ODEBUG4("m_CreateArcCenteredInStepStack 1", "DebugData.txt");
-
-    while(!strm.eof())
-      {
-
-	if (!strm.eof())
-	  strm >> R;
-	else break;
-
-
-	if (!strm.eof())
-	  strm >> arc_deg;
-	else break;
-
-	if (!strm.eof())
-	  strm >> SupportFoot;
-	else break;
-
-
-      }
-    ODEBUG4("m_CreateArcCenteredInStepStack 2", "DebugData.txt");
-    m_StepStackHandler->CreateArcCenteredInStepStack(R,arc_deg,SupportFoot);
-    ODEBUG4("m_CreateArcCenteredInStepStack 3", "DebugData.txt");
-
-  }
 
   int PatternGeneratorInterface::GetWalkMode()
   {
     return m_StepStackHandler->GetWalkMode();
   }
 
-  void PatternGeneratorInterface::m_PrepareForSupportFoot(istringstream & strm)
-  {
-    if (m_StepStackHandler!=0)
-      m_StepStackHandler->m_PrepareForSupportFoot(strm);
-  }
 
   void PatternGeneratorInterface::m_PartialStepSequence(istringstream &strm)
   {
@@ -1995,7 +1706,7 @@ namespace PatternGeneratorJRL {
       }
   }
 
-  void PatternGeneratorInterface::ExpandCOMAndUpperBodyPositionsQueues(int aNumber)
+  void PatternGeneratorInterface::ExpandCOMPositionsQueues(int aNumber)
   {
     COMPosition aCOMPos;
     KWNode anUpperBodyPos;
@@ -2014,21 +1725,6 @@ namespace PatternGeneratorJRL {
 	// Add UpperBody Position set at a default value.
       }
 
-    if (m_StepStackHandler->GetWalkMode()!=3)
-      {
-
-	for(int i=0;i<aNumber;i++)
-	  {
-	    // SPECIFIC TO A ROBOT ...
-	    anUpperBodyPos.Joints.resize(28);
-
-	    for(unsigned int j=0;j<28;j++)
-	      anUpperBodyPos.Joints[j] = m_CurrentActuatedJointValues[j+12];
-
-	    m_UpperBodyPositionsBuffer.push_back(anUpperBodyPos);
-	  }
-
-      }
   }
 
 
@@ -2119,75 +1815,6 @@ namespace PatternGeneratorJRL {
 	m_AbsMotionTheta = m_AbsTheta;
       }
 
-#if 0
-    aof_WaistAbsPos.open("/tmp/WaistOrientation.dat",ofstream::app);
-    TransformQuaternion aTQ;
-    getWaistPositionAndOrientation(aTQ);
-    aof_WaistAbsPos << aTQ.qw << " "
-		    << aTQ.qx << " "
-		    << aTQ.qy << " "
-		    << aTQ.qz << " "
-		    << m_AbsTheta << " "
-		    << m_CurrentWaistState.theta << " "
-		    <<endl;
-    aof_WaistAbsPos.close();
-
-
-    aof_WaistAbsPos.open("/tmp/WaistAbsPositionPG.dat",ofstream::app);
-    aof_WaistAbsPos << m_WaistAbsPos(0,3) << " "
-		    << m_WaistAbsPos(1,3) << " "
-		    << m_WaistAbsPos(2,3) << " "
-		    << m_AbsLinearVelocity[0,0] << " "
-		    << m_AbsLinearVelocity[1,0] << " "
-		    << (m_WaistAbsPos(0,3] - prevWaistAbsPos(0,3])/m_dt << " "
-		    << (m_WaistAbsPos(1,3] - prevWaistAbsPos(1,3])/m_odt << " "
-		    << m_AbsAngularVelocity[2,0] << " "
-		    <<endl;
-    aof_WaistAbsPos.close();
-
-    if (m_count%6==0)
-      {
-	aof_WaistAbsPos.open("/tmp/SensorsSimu.dat",ofstream::app);
-	for(int li=0;li<3;li++)
-	  aof_WaistAbsPos << rs->rate[0][li] << " ";
-	for(int li=0;li<3;li++)
-	  aof_WaistAbsPos << rs->accel[0][li] << " ";
-	aof_WaistAbsPos <<  endl;
-	aof_WaistAbsPos.close();
-
-	aof_WaistAbsPos.open("/tmp/Sensors2.dat",ofstream::app);
-	for(int li=0;li<2;li++)
-	  aof_WaistAbsPos << "0.0 ";
-	aof_WaistAbsPos << m_AbsAngularVelocity[2][0] << " ";
-	for(int li=0;li<3;li++)
-	  aof_WaistAbsPos << "0.0 ";
-	aof_WaistAbsPos <<  endl;
-	aof_WaistAbsPos.close();
-
-	aof_WaistAbsPos.open("/tmp/Control.dat",ofstream::app);
-	aof_WaistAbsPos << m_AbsLinearAcc[0][0] << " "
-			<< m_AbsLinearAcc[1][0] << " "
-			<< "0.0 " << endl;
-	aof_WaistAbsPos.close();
-
-	aof_WaistAbsPos.open("/tmp/WaistVelocity.dat",ofstream::app);
-	aof_WaistAbsPos << m_AbsLinearVelocity[0][0]<< " "
-			<< m_AbsLinearVelocity[1][0]<< endl;
-	aof_WaistAbsPos.close();
-
-	aof_WaistAbsPos.open("/tmp/WaistOrientation.dat",ofstream::app);
-	TransformQuaternion aTQ;
-	getWaistPositionAndOrientation(aTQ);
-	aof_WaistAbsPos << aTQ.qw << " "
-			<< aTQ.qx << " "
-			<< aTQ.qy << " "
-			<< aTQ.qz << endl;
-	aof_WaistAbsPos.close();
-
-
-      }
-#endif
-
   }
 
   void PatternGeneratorInterface::getWaistPositionMatrix(MAL_S4x4_MATRIX( &lWaistAbsPos,double))
@@ -2260,6 +1887,73 @@ namespace PatternGeneratorJRL {
   }
 
 
+  int PatternGeneratorInterface::ChangeOnLineStep(double time,
+						  FootAbsolutePosition & aFootAbsolutePosition)
+  {
+    /* Compute the index of the interval which will be modified. */
+    if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+      {
+	m_ZMPM->SetCurrentTime(m_InternalClock);
+	m_ZMPM->OnLineFootChange(time,
+				 aFootAbsolutePosition,
+				 m_ZMPPositions,
+				 m_COMBuffer,
+				 m_LeftFootPositions,
+				 m_RightFootPositions,
+				 m_StepStackHandler);
+	return 0;
+      }
+    return -1;
+  }
+
+  int PatternGeneratorInterface::CreateZMPReferences(deque<RelativeFootPosition> &lRelativeFootPositions,
+						     COMPosition &lStartingCOMPosition,
+						     FootAbsolutePosition &InitLeftFootAbsPos, 
+						     FootAbsolutePosition &InitRightFootAbsPos)
+  {
+    if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
+      {
+	m_COMBuffer.clear();
+	m_ZMPQP->GetZMPDiscretization(m_ZMPPositions,
+				      m_COMBuffer,
+				      lRelativeFootPositions,
+				      m_LeftFootPositions,
+				      m_RightFootPositions,
+				      m_Xmax, lStartingCOMPosition,
+				      InitLeftFootAbsPos,
+				      InitRightFootAbsPos);      
+	//m_ZMPQP->GetComBuffer(m_COMBuffer);
+      }    
+    else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
+      {
+	m_ZMPD->GetZMPDiscretization(m_ZMPPositions,
+				     m_COMBuffer,
+				     lRelativeFootPositions,
+				     m_LeftFootPositions,
+				     m_RightFootPositions,
+				     m_Xmax, lStartingCOMPosition,
+				     InitLeftFootAbsPos,
+				     InitRightFootAbsPos);
+	//	m_COMBuffer.clear();
+	//	m_COMBuffer.resize(m_RightFootPositions.size());
+      }
+    else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+      {
+	ODEBUG("ZMPCOM_MORISAWA_2007");
+	m_ZMPM->GetZMPDiscretization(m_ZMPPositions,
+				     m_COMBuffer,
+				     lRelativeFootPositions,
+				     m_LeftFootPositions,
+				     m_RightFootPositions,
+				     m_Xmax, lStartingCOMPosition,
+				     InitLeftFootAbsPos,
+				     InitRightFootAbsPos);
+
+	ODEBUG("ZMPCOM_MORISAWA_2007 " << m_ZMPPositions.size() );
+	//	m_ZMPM->GetComBuffer(m_COMBuffer);
+      }
+  }
+  
 }
 
 

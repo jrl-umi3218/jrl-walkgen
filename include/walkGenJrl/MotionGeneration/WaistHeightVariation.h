@@ -1,5 +1,6 @@
-/*
-   This object generate all the values for the foot trajectories,
+/** \file WaistHeightVariation.h
+
+    \brief This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of relative steps.
    If you want to change the reference trajectories, and the planning
    of the foot, this is the object to modify.
@@ -18,7 +19,7 @@
    this list of conditions and the following disclaimer.
    * Redistributions in binary form must reproduce the above copyright notice, 
    this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-   * Neither the name of the <ORGANIZATION> nor the names of its contributors 
+   * Neither the name of the CNRS and AIST nor the names of its contributors 
    may be used to endorse or promote products derived from this software without specific prior written permission.
    
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
@@ -35,14 +36,15 @@
 #ifndef _WAISTHEIGHT_VARIATION_H_
 #define _WAISTHEIGHT_VARIATION_H_
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
-
 #include <vector>
 #include <string>
-#include <Mathematics/Polynome.h>
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
-#include <PreviewControl/PreviewControl.h>
 #include <deque>
+
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+
+#include <walkGenJrl/Mathematics/Polynome.h>
+#include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
+#include <walkGenJrl/PreviewControl/PreviewControl.h>
 
 
 

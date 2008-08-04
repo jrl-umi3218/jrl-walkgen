@@ -1,4 +1,4 @@
-/* Inverse Kinematics for legs and arms of a canonical
+/* @doc Inverse Kinematics for legs and arms of a canonical
    humanoid robot. The arm are supposed to have 2 links.
    The legs are supposed to have 3 links.
    Please look at the documentation for more information.
@@ -43,56 +43,56 @@ using namespace dynamicsJRLJapan;
 
 namespace PatternGeneratorJRL
 {
-  /** \brief Inverse Kinematics for generic humanoids.
+  /** Inverse Kinematics for generic humanoids.
       Some parameters are however specific to the HRP2.
       Please modify the code if needed. 
   */  
   class InverseKinematics 
-    {
-    public:
-      /*! Constructor. */
-      InverseKinematics(HumanoidSpecificities *aHS);
+  {
+  public:
+    /*! Constructor. */
+    InverseKinematics(HumanoidSpecificities *aHS);
       
-      /*! Destructor */ 
-      ~InverseKinematics();
+    /*! Destructor */ 
+    ~InverseKinematics();
       
       
-      /*! Compute InverseKinematics for legs. */
-      int ComputeInverseKinematicsForLegs3(MAL_S3x3_MATRIX(,double) &Body_R,
-					   MAL_S3_VECTOR(,double) &  Body_P,
-					   MAL_S3_VECTOR(,double) &Dt,
-					   MAL_S3x3_MATRIX(,double) &Foot_R,
-					   MAL_S3_VECTOR(,double) &Foot_P,
-					   MAL_VECTOR(,double) &q);
+    /*! Compute InverseKinematics for legs. */
+    int ComputeInverseKinematicsForLegs3(MAL_S3x3_MATRIX(,double) &Body_R,
+					 MAL_S3_VECTOR(,double) &  Body_P,
+					 MAL_S3_VECTOR(,double) &Dt,
+					 MAL_S3x3_MATRIX(,double) &Foot_R,
+					 MAL_S3_VECTOR(,double) &Foot_P,
+					 MAL_VECTOR(,double) &q);
       
 
-      /*! Compute InverseKinematics for legs. */
-      int ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX( ,double)& Body_R,
-					   MAL_S3_VECTOR(,double) &Body_P,
-					   MAL_S3_VECTOR(,double) &Dt,
-					   MAL_S3x3_MATRIX(,double) &Foot_R,
-					   MAL_S3_VECTOR(,double) &Foot_P,
-					   MAL_VECTOR( ,double) &q);
+    /*! Compute InverseKinematics for legs. */
+    int ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX( ,double)& Body_R,
+					 MAL_S3_VECTOR(,double) &Body_P,
+					 MAL_S3_VECTOR(,double) &Dt,
+					 MAL_S3x3_MATRIX(,double) &Foot_R,
+					 MAL_S3_VECTOR(,double) &Foot_P,
+					 MAL_VECTOR( ,double) &q);
       
-      /*! Compute InverseKinematics for arms. */
-      int ComputeInverseKinematicsForArms(double X,
-					  double Z,
-					  double &Alpha,
-					  double &Beta);
+    /*! Compute InverseKinematics for arms. */
+    int ComputeInverseKinematicsForArms(double X,
+					double Z,
+					double &Alpha,
+					double &Beta);
       
-      /*! Compute Arm swing maximum amplitude. */
-      double ComputeXmax(double & lZ);
+    /*! Compute Arm swing maximum amplitude. */
+    double ComputeXmax(double & lZ);
       
-    protected:
+  protected:
       
-      double m_KneeAngleBoundCos,m_KneeAngleBound;
-      double m_KneeAngleBoundCos1,m_KneeAngleBound1;
-      double m_KneeAngleBoundCos2;
+    double m_KneeAngleBoundCos,m_KneeAngleBound;
+    double m_KneeAngleBoundCos1,m_KneeAngleBound1;
+    double m_KneeAngleBoundCos2;
       
-      double m_FemurLength,m_TibiaLength;
+    double m_FemurLength,m_TibiaLength;
       
-      HumanoidSpecificities *m_HS;
-    };
+    HumanoidSpecificities *m_HS;
+  };
 };
 #endif /*_INVERSE_KINEMATICS_H_ */
 

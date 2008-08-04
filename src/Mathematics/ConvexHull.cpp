@@ -1,6 +1,37 @@
-#include <Mathematics/ConvexHull.h>
+/** \file ConvexHull.h
+    \brief This object allow to build a convex hull on a list of 2D points.
+
+   Copyright (c) 2005-2006, 
+   @author Olivier Stasse
+   
+   JRL-Japan, CNRS/AIST
+
+   All rights reserved.
+   
+   Redistribution and use in source and binary forms, with or without modification, 
+   are permitted provided that the following conditions are met:
+   
+   * Redistributions of source code must retain the above copyright notice, 
+   this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above copyright notice, 
+   this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+   * Neither the name of the CNRS and AIST nor the names of its contributors 
+   may be used to endorse or promote products derived from this software without specific prior written permission.
+   
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
+   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
+   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
+   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
+   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
+   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 #include <set>
 #include <math.h>
+
+#include <walkGenJrl/Mathematics/ConvexHull.h>
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) cerr << "ConvexHull :" << x << endl
@@ -104,7 +135,7 @@ namespace PatternGeneratorJRL
 
 	// Check if the current point already exist with the same angle.
 	// Cannot use find because of some pb with gcc version 2.95.
-	set<CH_Point, ltCH_Point>::iterator it_PtinPolarCoord, toDestroy;
+	set<CH_Point, ltCH_Point>::iterator it_PtinPolarCoord;
       
 	it_PtinPolarCoord = ListOfPointinPolarCoord.begin();
 	while (it_PtinPolarCoord!=ListOfPointinPolarCoord.end())
@@ -117,19 +148,11 @@ namespace PatternGeneratorJRL
 			      distance1, distance2);
 		if (distance1<=distance2)
 		  {
-		    toDestroy = it_PtinPolarCoord;
-		    it_PtinPolarCoord++;
-		    ListOfPointinPolarCoord.erase(toDestroy);
+		    ListOfPointinPolarCoord.erase(it_PtinPolarCoord);
 		  }
-		else 
-		  {
-		    it_PtinPolarCoord++;
-		    bInsert=0;
-		  }
+		else bInsert=0;
 	      }
-	    else 
-	      it_PtinPolarCoord++;
-
+	    it_PtinPolarCoord++;
 	  }
 
 	if (bInsert)

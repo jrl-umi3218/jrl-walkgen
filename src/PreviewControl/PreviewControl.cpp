@@ -1,4 +1,4 @@
-/* Object to perform preview control on a cart model.
+/** Object to perform preview control on a cart model.
 
    Copyright (c) 2005-2006, 
    @author Olivier Stasse, Ramzi Sellouati
@@ -27,8 +27,30 @@
    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#define ODEBUG2(x)
+#define ODEBUG3(x) cerr << "PreviewControl :" << x << endl
+#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
+#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "PC: " << x << endl; DebugFile.close();}
+#if 0
+#define ODEBUG(x) cerr << "PreviewControl :" <<  x << endl
+#else
+#define ODEBUG(x)
+#endif
+
+#if 0
+#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
+#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); \
+    DebugFile << "PC: " << x << endl; DebugFile.close();}
+#define _DEBUG_4_ACTIVATED_ 1
+#else
+#define RESETDEBUG4(y)
+#define ODEBUG4(x,y)
+#endif
+
+#define ODEBUG6(x,y)
+
 #include <fstream>
-#include <PreviewControl/PreviewControl.h>
+#include <walkGenJrl/PreviewControl/PreviewControl.h>
 
 using namespace::PatternGeneratorJRL;
 
@@ -148,6 +170,49 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
   
 
   
+  return 0;
+}
+
+int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double), 
+					    double & sxzmp,
+					    deque<double> & ZMPPositions,
+					    unsigned int lindex,
+					    double & zmpx2,
+					    bool Simulation)
+{
+
+  double ux=0.0;
+
+  MAL_MATRIX_DIM(r,double,1,1);
+
+  // Compute the command.
+  r = MAL_RET_A_by_B(m_Kx,x);
+  ux = - r(0,0) + m_Ks * sxzmp ;
+  
+  ODEBUG( "x: " << x);
+  ODEBUG(" ux phase 1: " << ux);
+  if(ZMPPositions.size()<m_SizeOfPreviewWindow)
+    {
+      cout << "You've got a problem here " << endl;
+      exit(0);
+    }
+  
+  for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
+    ux += m_F(i,0)* ZMPPositions[lindex+i];
+  ODEBUG(" ux preview window phase: " << ux );
+  x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
+   
+  zmpx2 = (MAL_RET_A_by_B(m_C,x))(0,0);
+  
+  if (Simulation)
+    {
+      sxzmp += (ZMPPositions[lindex] - zmpx2);
+    }
+  
+  ODEBUG("zmpx: " << zmpx2 );
+  ODEBUG("sxzmp: " << sxzmp);
+  ODEBUG("********");
+
   return 0;
 }
 

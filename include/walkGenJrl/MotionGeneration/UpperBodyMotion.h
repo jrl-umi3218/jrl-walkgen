@@ -1,5 +1,4 @@
-/*
-    This object generate all the values for the foot trajectories,
+/** @doc This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of relative steps.
    If you want to change the reference trajectories, and the planning
    of the foot, thOn pageis is the object to modify.
@@ -44,7 +43,7 @@
 
 using namespace::std;
 
-#include <Mathematics/PolynomeFoot.h>
+#include <walkGenJrl/Mathematics/PolynomeFoot.h>
 
 
 
