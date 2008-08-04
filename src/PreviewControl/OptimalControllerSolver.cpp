@@ -230,7 +230,7 @@ void OptimalControllerSolver::ComputeWeights()
   MAL_MATRIX_SET_IDENTITY(E);
 
   MAL_MATRIX(G,double);
-  G = MAL_RET_A_by_B(m_b * (1/m_R) , tm_b);
+  G = MAL_RET_A_by_B((m_b * (1/m_R)) , tm_b);
 
   MAL_MATRIX(At,double);
   At= MAL_RET_TRANSPOSE(m_A);
