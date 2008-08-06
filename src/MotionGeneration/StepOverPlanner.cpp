@@ -934,7 +934,6 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
 
     }
 
-
   m_ClampedCubicSplineStepOverFootZ->SetParameters(ZfootPos,TimeIntervalsZ,ZfootSpeedBound);
  
 

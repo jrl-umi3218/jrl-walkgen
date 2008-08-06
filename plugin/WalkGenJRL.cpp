@@ -29,14 +29,24 @@
     IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <MatrixAbstractLayer.h>
+#if 0 /* MAL 2.0 */
+#include <MatrixAbstractLayer/boost.h>
+namespace ml = maal::boost;
+#else
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#endif
 
 #include "plugin.h"
 #include "bodyinfo.h"
 #include "seqplugin.h" 
+#ifdef ORBIX
 #include <walkpluginJRL_skel.h>
+#endif
+#ifdef OMNIORB4
+#include <walkpluginJRL.h>
+#endif
 #include <fstream>
-#include <PatternGeneratorInterface.h>
+#include <walkGenJrl/PatternGeneratorInterface.h>
 
 
 #define ODEBUG2(x)
@@ -70,38 +80,20 @@ public:
   bool cleanup(robot_state* rs, motor_command* mc);// phase:waiting_cleanup  
   void m_echo(istringstream &strm); 
   void m_StepSequence(istringstream &strm);
-  void m_SetOmega(istringstream &strm);
-  void m_SetStepHeight(istringstream &strm);
-  void m_SetSingleSupportTime(istringstream &strm);
-  void m_SetDoubleSupportTime(istringstream &strm);
 
-  void Matrix2Quaternion(VNL::Matrix<double> R,double q[4]);
+   void Matrix2Quaternion(MAL_MATRIX(,double) R,double q[4]);
 
    // Interface for hrpsys.
-  void m_SetObstacleParameters(istringstream &strm);
-  void m_SetArmParameters(istringstream &strm);
-  void m_SetZMPShiftParameters(istringstream &strm);
-  void m_SetTimeDistrParameters(istringstream &strm);
-  void m_SetUpperBodyMotionParameters(istringstream &strm);
-  void m_SetLimitsFeasibility(istringstream &strm);
-  void m_WhichWalkMode(istringstream &strm);
+   void m_ParseCmd(istringstream &strm);
+
   void m_DumpZMPreel(istringstream &strm);
   void m_ReadFileFromKineoWorks(istringstream &strm);
   void m_Synchronize(istringstream &strm);
-  void m_SetAlgoForZmpTrajectory(istringstream &strm);
 
   // This method only update the Step Sequence stack.
   void m_PartialStepSequence(istringstream &strm);
 
-  void m_SetPBWConstraint(istringstream &strm);
 
-  // This method creates an arc on the step sequence stack.
-  // (Just an interface)
-  void m_CreateArcInStepStack(istringstream &strm);
-
-  // This method creates a centered arc on the step sequence stack.
-  // (Just an interface)
-  void m_CreateArcCenteredInStepStack(istringstream &strm);
 
 
   // This method is doing the real job for preparing the
@@ -225,33 +217,39 @@ protected:
   double m_generalbuffer[3*200*120];
   int m_generalIndex, m_generalIndexmax;
   double m_zmpreeldebug[3],m_zmptarget[3];
-  seqplugin *m_seq;
+  seqplugin_var m_seq;
   unsigned long int m_count;
 
   bool m_SetupBool;
 
-  VNL::Matrix<double> m_CurrentJointValues;
+  MAL_VECTOR(m_CurrentJointValues,double);
+
+  /*! Current value of the joints from the Humanoid Walking Pattern Generator. */
+  MAL_VECTOR(m_CurrentStateFromPG,double);
+
+  /*! Current speed of the joints from the Humanoid Walking Pattern Generator. */
+  MAL_VECTOR(m_CurrentVelocityFromPG,double);
 
   // Position of the waist:
   // Relative:
-  VNL::Matrix<double> m_WaistRelativePos;
+  MAL_MATRIX(,double) m_WaistRelativePos;
 
   // Absolute:
-  VNL::Matrix<double> m_WaistAbsPos;
+  MAL_MATRIX(,double) m_WaistAbsPos;
 
   // Orientation:
   double m_AbsTheta, m_AbsMotionTheta;
 
   // Position of the motion:
-  VNL::Matrix<double> m_MotionAbsPos;
-  VNL::Matrix<double> m_MotionAbsOrientation;
+  MAL_MATRIX(,double) m_MotionAbsPos;
+  MAL_MATRIX(,double) m_MotionAbsOrientation;
 
   // Absolute speed:
-  VNL::Matrix<double> m_AbsLinearVelocity;
-  VNL::Matrix<double> m_AbsAngularVelocity;
+  MAL_MATRIX(,double) m_AbsLinearVelocity;
+  MAL_MATRIX(,double) m_AbsAngularVelocity;
 
   // Absolute acceleration
-  VNL::Matrix<double> m_AbsLinearAcc;
+  MAL_MATRIX(,double) m_AbsLinearAcc;
  
   // Current Waist state return by the Pattern Generator Interface.
   COMPosition m_CurrentWaistState;
@@ -273,33 +271,18 @@ WalkGenJRL::WalkGenJRL(istringstream &strm)
   m_PGI = new PatternGeneratorInterface(strm);
 
   // Register method the hrpsys interpreter.
+  register_method(":parsecmd",(method)&WalkGenJRL::m_ParseCmd);
   register_method(":echo",(method)&WalkGenJRL::m_echo);
-  register_method(":walkmode",(method)&WalkGenJRL::m_WhichWalkMode);
   register_method(":synchronize",(method)&WalkGenJRL::m_Synchronize);
   register_method(":stepseq",(method)&WalkGenJRL::m_StepSequence);
-  register_method(":omega",(method)&WalkGenJRL::m_SetOmega);
-  register_method(":stepheight",(method)&WalkGenJRL::m_SetStepHeight);
-  register_method(":singlesupporttime",(method)&WalkGenJRL::m_SetSingleSupportTime);
-  register_method(":doublesupporttime",(method)&WalkGenJRL::m_SetDoubleSupportTime);
-  register_method(":obstacleparameters",(method)&WalkGenJRL::m_SetObstacleParameters);
-  register_method(":armparameters",(method)&WalkGenJRL::m_SetArmParameters);
-  register_method(":ZMPShiftParameters",(method)&WalkGenJRL::m_SetZMPShiftParameters);
-  register_method(":TimeDistributeParameters",(method)&WalkGenJRL::m_SetTimeDistrParameters);
-  register_method(":UpperBodyMotionParameters",(method)&WalkGenJRL::m_SetUpperBodyMotionParameters);
-  register_method(":LimitsFeasibility",(method)&WalkGenJRL::m_SetLimitsFeasibility);
   register_method(":dumpzmpreel",(method)&WalkGenJRL::m_DumpZMPreel);
   register_method(":readfilefromkw",(method)&WalkGenJRL:: m_ReadFileFromKineoWorks);
-  register_method(":supportfoot",(method)&WalkGenJRL::m_PrepareForSupportFoot);
-  register_method(":arc",(method)&WalkGenJRL::m_CreateArcInStepStack);
-  register_method(":arccentered",(method)&WalkGenJRL::m_CreateArcCenteredInStepStack);
   register_method(":pstepseq",(method)&WalkGenJRL::m_PartialStepSequence);
-  register_method(":lastsupport",(method)&WalkGenJRL::m_FinishOnTheLastCorrectSupportFoot);
-  register_method(":finish",(method)&WalkGenJRL::m_FinishAndRealizeStepSequence);
   register_method(":SendStackToControl",(method)&WalkGenJRL::m_SendStackToControl);
-  register_method(":setpbwconstraint",(method)&WalkGenJRL::m_SetPBWConstraint);
-  register_method(":SetAlgoForZmpTrajectory",(method)&WalkGenJRL::m_SetAlgoForZmpTrajectory);
 
-  m_CurrentJointValues.Resize(40,1);
+  m_CurrentJointValues.resize(40);
+  m_CurrentStateFromPG.resize(46);
+  m_CurrentVelocityFromPG.resize(46);
 
   m_ZMPIndex = 0;
   m_ZMPIndexmax = 3*200*120;
@@ -309,7 +292,8 @@ WalkGenJRL::WalkGenJRL(istringstream &strm)
 
   RESETDEBUG4("WPDebugDataql.dat");
   RESETDEBUG4("Debug5.dat");
-  RESETDEBUG4("DebugZMPFinale.dat")
+  RESETDEBUG4("DebugZMPFinale.dat");
+  RESETDEBUG4("DebugData.txt");
 }
 
 WalkGenJRL::~WalkGenJRL()
@@ -318,49 +302,14 @@ WalkGenJRL::~WalkGenJRL()
     delete m_PGI;
 }
 
-void WalkGenJRL::m_SetObstacleParameters(istringstream &strm)
+void WalkGenJRL::m_ParseCmd(istringstream &strm)
 {
   if (m_PGI!=0)
-    m_PGI->m_SetObstacleParameters(strm);
-}
-
-void WalkGenJRL::m_SetArmParameters(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_SetArmParameters(strm);
-    
-}
-
-void WalkGenJRL::m_SetUpperBodyMotionParameters(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_SetUpperBodyMotionParameters(strm);
-}
-
-
-void WalkGenJRL::m_SetTimeDistrParameters(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_SetTimeDistrParameters(strm);
-}
-
-
-void WalkGenJRL::m_SetZMPShiftParameters(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_SetZMPShiftParameters(strm);
-}
-
-void WalkGenJRL::m_WhichWalkMode(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_WhichWalkMode(strm);
-}
-
-void WalkGenJRL::m_SetLimitsFeasibility(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_SetLimitsFeasibility(strm);
+    {
+      ODEBUG4("Before ParseCmd:","DebugData.txt");
+      m_PGI->ParseCmd(strm);
+      ODEBUG4("After ParseCmd:","DebugData.txt");
+    }
 }
 
 void WalkGenJRL::m_echo(istringstream &strm)
@@ -388,25 +337,20 @@ void WalkGenJRL::m_StepSequence(istringstream &strm)
 {
   if (m_PGI!=0)
     m_PGI->m_StepSequence(strm);
-  
-#if 0
-  while(m_ShouldBeRunning)
-    {
-      usleep(10000);
-    }
-#endif
 }
 
 bool WalkGenJRL::setup(robot_state *rs, motor_command *mc) 
 {
   
   m_seq = seqplugin::_narrow(manager->find("seq",""));
-	
   // Store the current motor command
   for(unsigned int i=0;i<DOF;i++)
     {	
-      ODEBUG4( "setup from robot for first time :" <<  i << " " << (mc->angle[i]*180/M_PI), "DebugData.txt");
-      m_CurrentJointValues(i,0) = rs->angle[i];
+      ODEBUG4( "setup from robot for first time :" <<  i 
+	       << " " << (mc->angle[i]*180/M_PI) 
+	       << MAL_VECTOR_SIZE(m_CurrentJointValues) << " "
+	       << m_PGI, "DebugData.txt");
+      m_CurrentJointValues(i) = rs->angle[i];
     }
   if (m_PGI!=0)
     m_PGI->SetCurrentJointValues(m_CurrentJointValues);
@@ -416,36 +360,30 @@ bool WalkGenJRL::setup(robot_state *rs, motor_command *mc)
 void WalkGenJRL::control(robot_state *rs, motor_command *mc) 
 {
 	
-  VNL::Matrix<double> dql(6,1,0.0), dqr(6,1,0.0);
-  VNL::Matrix<double> qr(6,1,0.0), ql(6,1,0.0);
-  VNL::Matrix<double> UpperBodyAngles(28,1,0.0);
-  VNL::Matrix<double> ZMPTarget(3,1,0.0);
+  MAL_VECTOR_DIM(ZMPTarget,double,3);
   RobotState_var ref_state;	
   // Store the current motor command
   for(unsigned int i=0;i<DOF;i++)
     {
-      //      ODEBUG4( "EvalueCOM read from robot for first time :" <<  i << " " << (mc->angle[i]*180/M_PI), "DebugData.txt");
-      // WARNING EXTRA MEGA SUPER DANGEROUS !!! DO NOT PUT MC FOR VISUAL SERVOING... 
-#if 0
-      m_CurrentJointValues(i,0) = rs->angle[i];
-      if (i>11)
-	UpperBodyAngles(i-12,0) = rs->angle[i];
-#else
-      m_CurrentJointValues(i,0) = mc->angle[i];
-      if (i>11)
-	UpperBodyAngles(i-12,0) = mc->angle[i];
-#endif
+      ODEBUG4( "EvalueCOM read from robot for first time :" <<  i << " " << (mc->angle[i]*180/M_PI), "DebugData.txt");
+      m_CurrentJointValues(i) = 
+	m_CurrentStateFromPG(i) =
+	mc->angle[i];
+      
     }
 
   if (m_PGI!=0)
     m_PGI->SetCurrentJointValues(m_CurrentJointValues);
   
+  ODEBUG4("WalkGenJRL : m_ShouldBeRunning" << m_ShouldBeRunning,"DebugData.txt");
   if (!m_ShouldBeRunning)
     return;
 
   ODEBUG4("WalkGenJRL still running","DebugData.txt");
-  ODEBUG4(UpperBodyAngles(3,0),"DebugDataUBA.txt");
-  if (m_PGI->RunOneStepOfTheControlLoop(qr,ql,UpperBodyAngles,ZMPTarget,m_CurrentWaistState))
+
+  if (m_PGI->RunOneStepOfTheControlLoop(m_CurrentStateFromPG,
+					m_CurrentVelocityFromPG,
+					ZMPTarget))
     {    
       ODEBUG4("Go inside","DebugData.txt");
       if (rs->zmp.length()>0)
@@ -462,50 +400,30 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	  m_seq->getReferenceState(ref_state);
 	}
 				
-	
-      if (m_DebugMode>0)
-	m_PGI->DebugControlLoop(qr,ql,UpperBodyAngles,m_CurrentWaistState,m_count);
-		
       if (m_seq) 
 	{            
 
 	  // if seq exists use the ReferenceState
-	  for(unsigned int i=0;i<6;i++)
+	  for(unsigned int i=0;i<40;i++)
 	    {
-	      ref_state->angle[RLEG_JOINT0+i]=qr(i,0);
+	      ref_state->angle[i]=m_CurrentStateFromPG(i+6);
 	    }
 		
-	  for(unsigned int i=0;i<6;i++)
-	    {
-	      ref_state->angle[LLEG_JOINT0+i]=ql(i,0);
-		
-	    }
-	  ODEBUG4( qr(0,0)*180.0/M_PI << " " << qr(1,0) *180.0/M_PI  << " " << qr(2,0)*180.0/M_PI << " " << qr(3,0)*180.0/M_PI << " " << qr(4,0)*180.0/M_PI,"WPDebugDataql.dat");
-
-	  if (m_PGI->GetWalkMode()!=4)
-	    {
-	      for(unsigned int i=0;i<7;i++)
-		{
-		  ref_state->angle[RARM_JOINT0+i]=UpperBodyAngles(i+4,0);
-		}
-	      
-	      for(unsigned int i=0;i<7;i++)
-		{
-		  ref_state->angle[LARM_JOINT0+i]=UpperBodyAngles(i+11,0);
-		}
-	      
-	      ref_state->angle[CHEST_JOINT0] = UpperBodyAngles(0,0);
-	      ref_state->angle[CHEST_JOINT0+1] = UpperBodyAngles(1,0);
-	    }
+	  ODEBUG4( m_CurrentStateFromPG(0+6)*180.0/M_PI 
+		   << " " << m_CurrentStateFromPG(1+6) *180.0/M_PI  
+		   << " " << m_CurrentStateFromPG(2+6) *180.0/M_PI 
+		   << " " << m_CurrentStateFromPG(3+6) *180.0/M_PI 
+		   << " " << m_CurrentStateFromPG(4) *180.0/M_PI,
+		   "WPDebugDataql.dat");
 	    
 	  //ZMP ref. in the waist reference frame.
 	
 
-	  m_zmptarget[0] = ZMPTarget(0,0);
-	  m_zmptarget[1] = ZMPTarget(1,0);
-	  m_zmptarget[2] = ZMPTarget(2,0);
+	  m_zmptarget[0] = ZMPTarget(0);
+	  m_zmptarget[1] = ZMPTarget(1);
+	  m_zmptarget[2] = ZMPTarget(2);
 		
-	  ODEBUG4( ZMPTarget(0,0) << " " << ZMPTarget(1,0) << " " << ZMPTarget(2,0),"Debug5.dat");
+	  ODEBUG4( ZMPTarget(0) << " " << ZMPTarget(1) << " " << ZMPTarget(2),"Debug5.dat");
 	  memcpy(ref_state->zmp.get_buffer(),m_zmptarget,sizeof(double)*3);     // just change zmp
 
 	  //cout << mc->waistPos[2] << " "
@@ -530,7 +448,12 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	      double temp2;
 	      double temp3;
 	     
-	      temp3 = m_CurrentWaistState.theta*M_PI/180.0;
+	      m_CurrentWaistState.x[0] = aTQ[0];
+	      m_CurrentWaistState.y[0] = aTQ[1];
+	      m_CurrentWaistState.z[0] = aTQ[2];
+	      m_CurrentWaistState.yaw = WaistAbsOrientation;
+
+	      temp3 = m_CurrentWaistState.yaw*M_PI/180.0;
 	      // This does the inverse of the transformation perform inside PGI. (use the transpose of the matrix).
 	      temp1 = m_zmptarget[0] * cos(temp3) + m_zmptarget[1] * -sin(temp3) ;
 	      temp2 = m_zmptarget[0] * sin(temp3) + m_zmptarget[1] * cos(temp3) ;
@@ -554,6 +477,13 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	  m_seq->setReferenceState(ref_state,dt);                              // send seq the next ref_state              
 	}
 
+      if (m_DebugMode>0)
+	{
+	  m_PGI->DebugControlLoop(m_CurrentStateFromPG,
+				  m_CurrentVelocityFromPG,
+				  m_count);
+	}
+	    
       m_count++;
     }	
   else 
@@ -566,31 +496,6 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 bool WalkGenJRL::cleanup(robot_state *rs,motor_command *mc) 
 {
   return true;
-}
-
-void WalkGenJRL::m_SetOmega(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_SetOmega(strm);
-}
-
-void WalkGenJRL::m_SetStepHeight(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_SetStepHeight(strm);
-}
-
-void WalkGenJRL::m_SetSingleSupportTime(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_SetSingleSupportTime(strm);
-}
-
-void WalkGenJRL::m_SetDoubleSupportTime(istringstream &strm)
-{
-	
-  if (m_PGI!=0)
-    m_PGI->m_SetDoubleSupportTime(strm);
 }
 
 
@@ -783,32 +688,6 @@ void WalkGenJRL::setWaistPositionAndOrientation(const TransformQuaternion & aTQ)
     m_PGI->setWaistPositionAndOrientation(TQ);
 }
 
-void WalkGenJRL::m_CreateArcInStepStack(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_CreateArcInStepStack(strm);
-}
-
-void WalkGenJRL::m_PrepareForSupportFoot(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_PrepareForSupportFoot(strm);
-}
-
-void WalkGenJRL::m_FinishOnTheLastCorrectSupportFoot(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_FinishOnTheLastCorrectSupportFoot(strm);
-  m_count = 0;
-#if 0
-  while(m_ShouldBeRunning)
-    {
-      usleep(10000);
-    }
-#endif
-
-}
-
 void WalkGenJRL::m_SendStackToControl(istringstream &strm)
 {
   m_ShouldBeRunning=true;
@@ -834,38 +713,17 @@ void WalkGenJRL::m_PartialStepSequence(istringstream &strm)
     m_PGI->m_PartialStepSequence(strm);
 }
 
-void WalkGenJRL::m_CreateArcCenteredInStepStack(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_CreateArcCenteredInStepStack(strm);
-  
-}
-
-
-void WalkGenJRL::m_SetPBWConstraint (istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_SetPBWConstraint(strm);
-  
-}
-
-void WalkGenJRL::m_SetAlgoForZmpTrajectory(istringstream &strm)
-{
-  if (m_PGI!=0)
-    m_PGI->m_SetAlgoForZMPTraj(strm);
-
-}
-
 CORBA::Long WalkGenJRL::getLegJointSpeed( dsequence_out dq)
     throw(CORBA::SystemException)
 {
   // Joint velocity.
-  VNL::Matrix<double> dql, dqr;
+  MAL_VECTOR(dql,double);
+  MAL_VECTOR(dqr,double);
   
   // Initialization of the  computed
   // leg's articular speed.
-  dqr.Resize(6,1);
-  dql.Resize(6,1);
+  MAL_VECTOR_RESIZE(dqr,6);
+  MAL_VECTOR_RESIZE(dql,6);
 
   
   dsequence_var adq = new dsequence;
@@ -873,8 +731,8 @@ CORBA::Long WalkGenJRL::getLegJointSpeed( dsequence_out dq)
   m_PGI->GetLegJointVelocity(dqr,dql);
   for(int i=0;i<6;i++)
     {
-      adq[i] = dqr(i,0);
-      adq[6+i] =dql(i,0);
+      adq[i] = dqr(i);
+      adq[6+i] =dql(i);
     }
   dq = adq._retn();
   return 12;

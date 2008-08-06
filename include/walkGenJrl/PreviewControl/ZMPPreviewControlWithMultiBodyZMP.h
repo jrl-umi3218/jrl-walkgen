@@ -435,7 +435,7 @@ namespace PatternGeneratorJRL
 
       /*! \name Setter and getter for the ComAndZMPTrajectoryGeneration. */
       inline bool setComAndFootRealization(ComAndFootRealization * aCFR)
-	{ m_ComAndFootRealization = aCFR;};
+      { m_ComAndFootRealization = aCFR; return true;};
       inline ComAndFootRealization * getComAndFootRealization()
 	{ return m_ComAndFootRealization;};
       

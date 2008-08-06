@@ -3,15 +3,13 @@ include Makefile
 
 USER_PLUGINS = 	$(IOSRVBIN)/WalkGenJRL.$(DLLSFX) 
 
-USER_OBJS    = 	$(IOSRVBIN)/WalkGenJRL.$(OSFX)\
-	     	$(IOSRVBIN)/walkpluginJRL_skel.$(OSFX) \
-	     	$(IOSRVBIN)/walkpluginJRL.$(OSFX)
+USER_OBJS    = 	$(IOSRVBIN)/WalkGenJRL.$(OSFX)
 
 user_targets:make_stubskel $(USER_PLUGINS)
 
 #PATTERNGENERATORJRLDIR=$(OPENHRPHOME)/PatternGeneratorJRL/trunk/PatternGeneratorJRL/
 # changed PATTERNGENERATORJRLDIR
-PATTERNGENERATORJRLDIR=$(OPENHRPHOME)/PatternGeneratorJRL
+PATTERNGENERATORJRLDIR=$(SOURCE_DIR)/
 
 $(USER_PLUGINS):
 	$(LINK) $(SOFLAGS) $(OUTOPT)$@ $^
@@ -22,9 +20,9 @@ $(USER_OBJS):
 make_stubskel:
 	cd $(CONTROLLER)/$(CORBA_DIR);make
 
-CXX_FLAGS+=-I$(PATTERNGENERATORJRLDIR)/include -I$(PATTERNGENERATORJRLDIR)/plugin/corba/ORBIX/cpp
+CXX_FLAGS+=-I$(PATTERNGENERATORJRLDIR)/include -I$(PATTERNGENERATORJRLDIR)/plugin/corba/OmniORB4/cpp -I$(OB_INCLUDE_DIR)
 # add -L$(PATTERNGENERATORJRLDIR)/src
-LINK_FLAGS+=-L$(PATTERNGENERATORJRLDIR)/lib -L$(PATTERNGENERATORJRLDIR)/src -lWalkGenJRL $(PATTERNGENERATORJRLDIR)/lib/libVNL.a -lpthread -lstdc++ -lg2c #-lf2c
+LINK_FLAGS+=-L$(PATTERNGENERATORJRLDIR)/lib -L$(PATTERNGENERATORJRLDIR)/src -lWalkGenJRL -L$(OB_LIBS_DIR) $(OB_LIBS) -lpthread -lstdc++ -lg2c #-lf2c
 
 
 COMMON_TARGET_H= plugin.h $(CONTROLLER)/$(CORBA_DIR)/common.h
@@ -32,9 +30,6 @@ $(IOSRVBIN)/WalkGenJRL.$(DLLSFX): $(IOSRVBIN)/WalkGenJRL.$(OSFX) seqplugin.$(OSF
 #$(IOSRVBIN)/libWalkGenJRL.$(DLLSFX): $(IOSRVBIN)/WalkGenJRL.$(OSFX) seqplugin.$(OSFX) dynamicsPlugin.$(OSFX)  $(IOSRVBIN)/walkpluginJRL_skel.$(OSFX) $(IOSRVBIN)/walkpluginJRL.$(OSFX)
 
 $(IOSRVBIN)/WalkGenJRL.$(OSFX): $(SOURCE_DIR)/WalkGenJRL.cpp $(COMMON_TARGET_H) seqplugin.h dynamicsPlugin.h
-$(IOSRVBIN)/walkpluginJRL_skel.$(OSFX):$(SOURCE_DIR)/corba/ORBIX/cpp/walkpluginJRL_skel.cpp common.h 
-$(IOSRVBIN)/walkpluginJRL.$(OSFX):$(SOURCE_DIR)/corba/ORBIX/cpp/walkpluginJRL.cpp common.h 
-
 
 user_clean:
 	rm -f $(USER_PLUGINS) $(USER_OBJS)
@@ -46,12 +41,10 @@ user_clean:
 #$(IOSRVBIN)/script/TestWalkGenJRLIntegrateExperiment2.py: $(SOURCE_DIR)/script/TestWalkGenJRLIntegrateExperiment2.py
 #	cp -f $(SOURCE_DIR)/script/TestWalkGenJRLIntegrateExperiment2.py $(IOSRVBIN)/script
 #	cp $(SOURCE_DIR)/script/TestWalkGenJRLIntegrateExperiment2.py $(IOSRVBIN)/script/TestWalkGenJRLIntegrateExperiment2.py
-$(IOSRVBIN)/script/TestWalkGenPBW.py: $(SOURCE_DIR)/script/TestWalkGenPBW.py
-	cp -f $(SOURCE_DIR)/script/TestWalkGenPBW.py $(IOSRVBIN)/script
-$(IOSRVBIN)/script/PartialDemoChambreDeCommerce.py: $(SOURCE_DIR)/script/PartialDemoChambreDeCommerce.py
-	cp -f $(SOURCE_DIR)/script/PartialDemoChambreDeCommerce.py $(IOSRVBIN)/script
+#$(IOSRVBIN)/script/TestWalkGenPBW.py: $(SOURCE_DIR)/script/TestWalkGenPBW.py
+#	cp -f $(SOURCE_DIR)/script/TestWalkGenPBW.py $(IOSRVBIN)/script
 
 $(IOSRVBIN)/libWalkGen.so: $(SOURCE_DIR)/../src/libWalkGenJRL.so
 	cp -f $(SOURCE_DIR)/../src/libWalkGenJRL.so $(IOSRVBIN)
 
-user_install:$(IOSRVBIN)/libWalkGen.so $(IOSRVBIN)/script/TestWalkGenPBW.py $(IOSRVBIN)/script/PartialDemoChambreDeCommerce.py
+user_install:$(IOSRVBIN)/libWalkGen.so 

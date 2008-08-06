@@ -251,7 +251,7 @@ void StartOnLineWalking(PatternGeneratorInterface &aPGI)
                      0.2 0.19 0.0 \				   \
                      0.2 -0.19 0.0");*/
     istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0 \
-                     0.2 0.19 0.0 \				   
+                     0.2 0.19 0.0 \
                      0.2 -0.19 0.0");
 
     aPGI.ParseCmd(strm2);
@@ -269,7 +269,7 @@ void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI)
 
   {
     istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0 \
-                     0.2 0.19 0.0 \				   
+                     0.2 0.19 0.0 \
                      0.2 -0.19 0.0");
     aPGI.ParseCmd(strm2);
   }
@@ -300,6 +300,21 @@ void KineoWorks(PatternGeneratorInterface &aPGI)
     aPGI.ParseCmd(strm2);
   }
 
+}
+
+void SteppingOver(PatternGeneratorInterface &aPGI)
+{
+  const char lBuffer[3][256] =
+    { ":walkmode 2",
+      ":UpperBodyMotionParameters -0.1 -1.0 0.0",
+      ":stepseq 0.0 -0.095 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.2 -0.19 0.0  0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.0 0.19 0.0"
+    };
+  
+  for(int i=0;i<3;i++)
+    {
+      std::istringstream strm(lBuffer[i]);
+      aPGI.ParseCmd(strm);
+    }
 }
 
 int main(int argc, char *argv[])
@@ -454,7 +469,8 @@ int main(int argc, char *argv[])
 
   for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
     {
-      //ShortStraightWalking(*aPGI);
+      SteppingOver(*aPGI);
+      // ShortStraightWalking(*aPGI);
       // CurvedWalkingPBW2(*aPGI);
       // KineoWorks(*aPGI);
       // StraightWalking(*aPGI);
@@ -469,7 +485,7 @@ int main(int argc, char *argv[])
 
       // TurningOnTheCircleTowardsTheCenter(*aPGI);
       // TurningOnTheCircleTowardsTheCenter(aPGI);
-      StartAnalyticalOnLineWalking(*aPGI);
+      //StartAnalyticalOnLineWalking(*aPGI);
       
 
       bool ok = true;

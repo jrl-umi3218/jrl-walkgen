@@ -87,10 +87,9 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   RESETDEBUG4("Dump.dat");
   RESETDEBUG4("DebugDataCOM_0.dat");
   RESETDEBUG4("DebugDataCOM_1.dat");
-
+  RESETDEBUG5("DebugConfSO.dat");
   // Sampling period.
   m_SamplingPeriod = -1;
-
 
   // Initialization of the first and second preview controls.
   MAL_MATRIX_RESIZE(m_PC1x,3,1);  MAL_MATRIX_RESIZE(m_PC1y,3,1);
@@ -135,14 +134,12 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMPosition 
   MAL_VECTOR_DIM(aCOMPosition,double,6);
   MAL_VECTOR_DIM(aCOMSpeed,double,6);
 
-
   aCOMPosition(0) = acomp.x[0];
   aCOMPosition(1) = acomp.y[0];
   aCOMPosition(2) = acomp.z[0];
   aCOMPosition(3) = 0;
   aCOMPosition(4) = acomp.pitch;
   aCOMPosition(5) = acomp.yaw;
-
 
   aCOMSpeed(0) = acomp.x[1];
   aCOMSpeed(1) = acomp.y[1];
@@ -223,13 +220,18 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 			      CurrentVelocity,
 			      m_NumberOfIterations,
 			      0);
+
+  ODEBUG4("Current Configuration Stage 1: " << CurrentConfiguration,"DebugConfSO.dat");
   if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
     EvaluateMultiBodyZMP(-1);
   
   aLeftFAP = m_FIFOLeftFootPosition[0];
   aRightFAP = m_FIFORightFootPosition[0];
-  SecondStageOfControl(refandfinalCOMPosition);
   
+  SecondStageOfControl(refandfinalCOMPosition);
+  ODEBUG4("refandfinalCOMPosition: x: " << refandfinalCOMPosition.x 
+	  " y: " << refandfinalCOMPosition.y
+	  " z: " << refandfinalCOMPosition.z,"DebugData.txt" );
   if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
     {
       CallToComAndFootRealization(refandfinalCOMPosition,aLeftFAP,aRightFAP,
@@ -237,7 +239,9 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 				  CurrentVelocity,
 				  m_NumberOfIterations - m_NL,
 				  1);
+      ODEBUG4("Current Configuration Stage 2: " << CurrentConfiguration,"DebugConfSO.dat");
     }
+
   // Here it is assumed that the 4x4 CoM matrix 
   // is the orientation of the free flyer and
   // its position.
@@ -284,6 +288,9 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMPosition &finalCO
   // Inverse Kinematics variables.
 
   COMPosition aCOMPosition = m_FIFOCOMPositions[0];
+  ODEBUG4("aCOMPosition: x: " << aCOMPosition.x 
+	  " y: " << aCOMPosition.y
+	  " z: " << aCOMPosition.z,"DebugData.txt" );
   FootAbsolutePosition LeftFootPosition, RightFootPosition;
 
   LeftFootPosition = m_FIFOLeftFootPosition[0];

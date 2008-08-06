@@ -46,6 +46,7 @@ libwalkGenJRL_la_SOURCES = \
 	./Mathematics/StepOverPolynome.cpp\
 	./Mathematics/ConvexHull.cpp \
 	./Mathematics/qld.cpp \
+	./Mathematics/jrlgesvd.f \
 	./Mathematics/AnalyticalZMPCOGTrajectory.cpp \
 	./PreviewControl/PreviewControl.cpp \
 	./PreviewControl/OptimalControllerSolver.cpp \
