@@ -8,6 +8,6 @@ docdir=@datadir@/doc/@PACKAGE_NAME@
 Name: @PACKAGE_NAME@
 Description: Walk generator for humanoid robot based on preview control
 Version: @VERSION@
-Requires: @DYNAMICSJRLJAPAN_REQD@
+Requires: @DYNAMICJRLJAP_REQD@
 Libs: -L${libdir} -lwalkGenJRL
 Cflags: -I${includedir}/walkGenJrl
