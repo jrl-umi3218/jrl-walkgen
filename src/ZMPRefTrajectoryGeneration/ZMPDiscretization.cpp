@@ -551,7 +551,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	  NextTheta=0.0;
 	  lStepHeight = 0.0;
 	}
-#if 1
+#if 0
       cout << "vrel: " << vrel(0,0) << " " << vrel(1,0) << endl;
       cout << "vdiffsupp: " << vdiffsupp(0,0) << " " << vdiffsupp(1,0) << endl;
       cout << "vdiffsupppre: " << vdiffsupppre(0,0) << " " << vdiffsupppre(1,0) << endl;

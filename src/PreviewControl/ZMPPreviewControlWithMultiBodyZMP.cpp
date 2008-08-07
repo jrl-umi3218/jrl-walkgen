@@ -214,7 +214,6 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[m_NL];
   FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[m_NL];
 
-
   CallToComAndFootRealization(acompos,aLeftFAP,aRightFAP,
 			      CurrentConfiguration,
 			      CurrentVelocity,
@@ -229,9 +228,9 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   aRightFAP = m_FIFORightFootPosition[0];
   
   SecondStageOfControl(refandfinalCOMPosition);
-  ODEBUG4("refandfinalCOMPosition: x: " << refandfinalCOMPosition.x 
-	  " y: " << refandfinalCOMPosition.y
-	  " z: " << refandfinalCOMPosition.z,"DebugData.txt" );
+  ODEBUG4("refandfinalCOMPosition: x: " << refandfinalCOMPosition.x[0] << 
+	  " y: " << refandfinalCOMPosition.y[0] <<
+	  " z: " << refandfinalCOMPosition.z[0],"DebugData.txt" );
   if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
     {
       CallToComAndFootRealization(refandfinalCOMPosition,aLeftFAP,aRightFAP,

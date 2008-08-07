@@ -57,7 +57,8 @@ namespace ml = maal::boost;
 #else
 #define ODEBUG(x) 
 #endif
-
+#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
+#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "WalkGenJRL: " << x << endl; DebugFile.close();}
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "WalkGenJRL: " << x << endl; DebugFile.close();}
@@ -268,7 +269,7 @@ WalkGenJRL::WalkGenJRL(istringstream &strm)
   RESETDEBUG4("Debug5.dat");
   RESETDEBUG4("DebugZMPFinale.dat");
   RESETDEBUG4("DebugData.txt");
-
+  RESETDEBUG4("DebugWalkGenJRL.txt");
   m_ShouldBeRunning = false;
 
   m_DebugMode = 1;
@@ -338,7 +339,11 @@ void WalkGenJRL::m_Synchronize(istringstream &strm)
 void WalkGenJRL::m_StepSequence(istringstream &strm)
 {
   if (m_PGI!=0)
-    m_PGI->m_StepSequence(strm);
+    {
+      ODEBUG4("NEW STEP SEQUENCE","DebugWalkGenJRL.txt");
+      ODEBUG4("NEW STEP SEQUENCE","DebugDataIKArms.txt");
+      m_PGI->m_StepSequence(strm);
+    }
 }
 
 bool WalkGenJRL::setup(robot_state *rs, motor_command *mc) 
@@ -375,7 +380,10 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
     }
 
   if (m_PGI!=0)
-    m_PGI->SetCurrentJointValues(m_CurrentJointValues);
+    {
+      m_PGI->SetCurrentJointValues(m_CurrentJointValues);
+      ODEBUG4(m_count << "Beginning: " << m_CurrentJointValues , "DebugWalkGenJRL.txt");
+    }
   
   ODEBUG4("WalkGenJRL : m_ShouldBeRunning" << m_ShouldBeRunning,"DebugData.txt");
   if (!m_ShouldBeRunning)
@@ -485,7 +493,7 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 				  m_CurrentVelocityFromPG,
 				  m_count);
 	}
-	    
+      ODEBUG4(m_count << "FromPG: " << m_CurrentStateFromPG , "DebugWalkGenJRL.txt");	    
       m_count++;
     }	
   else 

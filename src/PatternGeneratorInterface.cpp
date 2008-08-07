@@ -606,7 +606,7 @@ namespace PatternGeneratorJRL {
 
     // Copy the relative foot position from the stack handler to here.
     m_StepStackHandler->CopyRelativeFootPosition(lRelativeFootPositions,ClearStepStackHandler);
-    ODEBUG("Size of lRelativeFootPositions: " << lRelativeFootPositions.size());
+    ODEBUG4("Size of lRelativeFootPositions: " << lRelativeFootPositions.size(),"DebugData.txt");
     for(int i=0;i<lRelativeFootPositions.size();i++)
       {
 	ODEBUG(lRelativeFootPositions[i].sx << " " << 
@@ -619,12 +619,11 @@ namespace PatternGeneratorJRL {
     m_GlobalStrategyManager->EvaluateStartingState(BodyAnglesIni,lStartingCOMPosition,
 						   InitLeftFootAbsPos, InitRightFootAbsPos);
 
-    ODEBUG("StartingCOMPosition: " << lStartingCOMPosition.x[0] << " " 
-	   << lStartingCOMPosition.y[0] );
+    ODEBUG4("StartingCOMPosition: " << lStartingCOMPosition.x[0] << " "  << lStartingCOMPosition.y[0],"DebugData.txt");
     // We also initialize the iteration number inside DMB.
     m_HumanoidDynamicRobot->ResetIterationNumber();
 
-    ODEBUG("CommonInitializationOfWalking " << BodyAnglesIni );
+    ODEBUG4("CommonInitializationOfWalking " << BodyAnglesIni,"DebugData.txt" );
 
     if (0)
       {

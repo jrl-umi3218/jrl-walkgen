@@ -31,6 +31,9 @@
   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include <iostream>
+#include <fstream>
+using namespace std;
 
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
@@ -54,8 +57,6 @@
 #endif
 
 #define ODEBUG3(x)  std::cout << x << endl;
-
-#include <iostream>
 
 #include <walkGenJrl/GlobalStrategyManagers/DoubleStagePreviewControlStrategy.h>
 
@@ -137,7 +138,8 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 				      finalCOMPosition,
 				      CurrentConfiguration,
 				      CurrentVelocity);
-  
+  ODEBUG4("finalCOMPosition:" <<finalCOMPosition.x[0] << " " 
+	  << finalCOMPosition.y[0] ,"DebugData.txt");
   
   (*m_COMBuffer)[0] = finalCOMPosition;
   
