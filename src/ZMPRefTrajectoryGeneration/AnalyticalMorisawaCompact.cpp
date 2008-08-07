@@ -121,7 +121,7 @@ namespace PatternGeneratorJRL
     m_NewStepInTheStackOfAbsolutePosition = false;
 
     
-    RESETDEBUG5("Test.dat");
+    RESETDEBUG4("Test.dat");
   }
 
 
@@ -694,7 +694,7 @@ namespace PatternGeneratorJRL
 	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos);
 	FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
 	
-	ODEBUG5(aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
+	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
 		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Test.dat");
       }
@@ -702,7 +702,7 @@ namespace PatternGeneratorJRL
 #if 0
     ODEBUG3("Interval Valid_001.dat : begin : " << m_AbsoluteTimeReference << 
 	    " end : " << m_AbsoluteTimeReference+m_PreviewControlTime);
-    RESETDEBUG5("Valid_001.dat");
+    RESETDEBUG4("Valid_001.dat");
     for(double t=m_AbsoluteTimeReference; 
 	t<m_AbsoluteTimeReference+m_PreviewControlTime; 
 	t+= m_SamplingPeriod)
@@ -728,7 +728,7 @@ namespace PatternGeneratorJRL
 	FootAbsolutePosition RightFootAbsPos;
 	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos);
 	
-	ODEBUG5(t << " " << 
+	ODEBUG4(t << " " << 
 		aZMPPos.px << " " << aZMPPos.py << " " << 
 		aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
 		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
@@ -899,7 +899,7 @@ namespace PatternGeneratorJRL
 	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos,lIndexInterval);
 	FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
 
-	ODEBUG5(aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
+	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
 		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Test.dat");
       }
@@ -912,7 +912,7 @@ namespace PatternGeneratorJRL
     static unsigned int NbOfTests = 2;
     char BufferFileName[1024];
     sprintf(BufferFileName,"Valid_%03d.dat",NbOfTests++);
-    RESETDEBUG5(BufferFileName);
+    RESETDEBUG4(BufferFileName);
     ODEBUG3(BufferFileName);
     for(double t=m_AbsoluteTimeReference; t<m_AbsoluteTimeReference+m_PreviewControlTime; t+= 0.005)
       {
@@ -938,7 +938,7 @@ namespace PatternGeneratorJRL
 	FootAbsolutePosition RightFootAbsPos;
 	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos);
 	
-	ODEBUG5(t << " " << 
+	ODEBUG4(t << " " << 
 		aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
 		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,BufferFileName);

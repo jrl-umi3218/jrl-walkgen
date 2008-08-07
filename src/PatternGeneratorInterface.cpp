@@ -78,7 +78,7 @@ namespace PatternGeneratorJRL {
     RESETDEBUG4("UpperBodyAngles.txt");
     RESETDEBUG4("DebugZMPFinale.txt");
 
-    RESETDEBUG5("DebugGMFKW.dat");
+    RESETDEBUG4("DebugGMFKW.dat");
     RESETDEBUG4("DebugDataCOM.txt");
 
     RESETDEBUG4("DDCC.dat");
@@ -561,12 +561,12 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterface::m_StepSequence(istringstream &strm)
   {
 
-    ODEBUG5("Step Sequence","DebugGMFKW.dat");
+    ODEBUG4("Step Sequence","DebugGMFKW.dat");
     ofstream DebugFile;
     ReadSequenceOfSteps(strm);
-    ODEBUG5("After reading Step Sequence","DebugGMFKW.dat");
+    ODEBUG4("After reading Step Sequence","DebugGMFKW.dat");
     FinishAndRealizeStepSequence();
-    ODEBUG5("After finish and realize Step Sequence","DebugGMFKW.dat");
+    ODEBUG4("After finish and realize Step Sequence","DebugGMFKW.dat");
   }
 
   void PatternGeneratorInterface::EvaluateStartingCOM(MAL_VECTOR(  & Configuration,double),
@@ -764,7 +764,7 @@ namespace PatternGeneratorJRL {
 
     gettimeofday(&begin,0);
 
-    ODEBUG5("FinishAndRealizeStepSequence() - 1","DebugGMFKW.dat");
+    ODEBUG4("FinishAndRealizeStepSequence() - 1","DebugGMFKW.dat");
 
     vector<double> lCurrentJointValues;
     m_ZMPD->SetZMPShift(m_ZMPShift);
@@ -772,14 +772,14 @@ namespace PatternGeneratorJRL {
     MAL_VECTOR(,double) lCurrentConfiguration;
 
     lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();  
-    ODEBUG5("lCurrent Configuration :" << lCurrentConfiguration,"DebugGMFKW.dat" );
+    ODEBUG4("lCurrent Configuration :" << lCurrentConfiguration,"DebugGMFKW.dat" );
 
     deque<RelativeFootPosition> lRelativeFootPositions;
     CommonInitializationOfWalking(lStartingCOMPosition,
 				  BodyAnglesIni,
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,true);
-    ODEBUG5( "Pass through here ","DebugGMFKW.dat" );
+    ODEBUG4( "Pass through here ","DebugGMFKW.dat" );
     lCurrentConfiguration(0) = 0.0;
     lCurrentConfiguration(1) = 0.0;
     lCurrentConfiguration(2) = 0.0;
@@ -788,7 +788,7 @@ namespace PatternGeneratorJRL {
     lCurrentConfiguration(5) = 0.0;
     m_HumanoidDynamicRobot->currentConfiguration(lCurrentConfiguration);
 
-    ODEBUG5("Size of lRelativeFootPositions :" << lRelativeFootPositions.size(),"DebugGMFKW.dat");
+    ODEBUG4("Size of lRelativeFootPositions :" << lRelativeFootPositions.size(),"DebugGMFKW.dat");
     
     // Create the ZMP reference.
     CreateZMPReferences(lRelativeFootPositions,
@@ -810,7 +810,7 @@ namespace PatternGeneratorJRL {
       m_StOvPl->CreateBufferFirstPreview(m_COMBuffer,aZMPBuffer,m_ZMPPositions);
 
 
-    ODEBUG5("FinishAndRealizeStepSequence() - 4 ","DebugGMFKW.dat");
+    ODEBUG4("FinishAndRealizeStepSequence() - 4 ","DebugGMFKW.dat");
     for(unsigned int i=0;i<m_COMBuffer.size();i++)
       {
 	m_COMBuffer[i].z[0] = m_PC->GetHeightOfCoM();
@@ -835,7 +835,7 @@ namespace PatternGeneratorJRL {
 			      m_RightFootPositions);
       }
 
-    ODEBUG5("FinishAndRealizeStepSequence() - 5 ","DebugGMFKW.dat");
+    ODEBUG4("FinishAndRealizeStepSequence() - 5 ","DebugGMFKW.dat");
     // Link the current trajectory and GenerateMotionFromKineoWorks.
 
     // Very important, you have to make sure that the correct COM position is
@@ -857,23 +857,23 @@ namespace PatternGeneratorJRL {
 	  m_COMBuffer[i].yaw = m_ZMPPositions[i].theta;
       }
 
-    ODEBUG5("FinishAndRealizeStepSequence() - 6 ","DebugGMFKW.dat");
-    ODEBUG5("m_ZMPPositions : " << m_ZMPPositions.size() << endl <<
+    ODEBUG4("FinishAndRealizeStepSequence() - 6 ","DebugGMFKW.dat");
+    ODEBUG4("m_ZMPPositions : " << m_ZMPPositions.size() << endl <<
 	    " m_LeftFootPositions: " << m_LeftFootPositions.size()<< endl <<
 	    " m_RightFootPositions: " << m_RightFootPositions.size()<< endl <<
 	    " m_TimeDistrFactor" << m_TimeDistrFactor.size() << endl <<
 	    "m_COMBuffer : " << m_COMBuffer.size() << endl,"DebugGMFKW.dat");
     if(m_StepStackHandler->GetWalkMode()==2)
       {
-	ODEBUG5("FinishAndRealizeStepSequence() - 6.25 ","DebugGMFKW.dat");
+	ODEBUG4("FinishAndRealizeStepSequence() - 6.25 ","DebugGMFKW.dat");
 	m_StOvPl->TimeDistributeFactor(m_TimeDistrFactor);
-	ODEBUG5("FinishAndRealizeStepSequence() - 6.5 ","DebugGMFKW.dat");
+	ODEBUG4("FinishAndRealizeStepSequence() - 6.5 ","DebugGMFKW.dat");
 	m_StOvPl->PolyPlanner(m_COMBuffer,m_LeftFootPositions,m_RightFootPositions,m_ZMPPositions);
-	ODEBUG5("FinishAndRealizeStepSequence() - 6.75 ","DebugGMFKW.dat");
+	ODEBUG4("FinishAndRealizeStepSequence() - 6.75 ","DebugGMFKW.dat");
       }
 
     gettimeofday(&time4,0);
-    ODEBUG5("FinishAndRealizeStepSequence() - 7 ","DebugGMFKW.dat");
+    ODEBUG4("FinishAndRealizeStepSequence() - 7 ","DebugGMFKW.dat");
     // Read NL informations from ZMPRefPositions.
     m_GlobalStrategyManager->Setup(m_ZMPPositions,
 				   m_COMBuffer,

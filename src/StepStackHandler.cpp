@@ -40,9 +40,12 @@
 
 #if 0
 #define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "StepStackHandler: " << x << endl; DebugFile.close();}
+#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #else
 #define ODEBUG4(x,y) 
+#define RESETDEBUG4(y)
 #endif
+
 #define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "SSH: " << x << endl; DebugFile.close();}
 
@@ -85,7 +88,7 @@ StepStackHandler::StepStackHandler(SimplePluginManager *lSPM) : SimplePlugin(lSP
 	  std::cerr << "Unable to register " << aMethodName << std::endl;
 	}
     }
-  RESETDEBUG5("DebugFootPrint.dat");
+  RESETDEBUG4("DebugFootPrint.dat");
 }
 
 StepStackHandler::~StepStackHandler()

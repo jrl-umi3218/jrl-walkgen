@@ -87,7 +87,7 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   RESETDEBUG4("Dump.dat");
   RESETDEBUG4("DebugDataCOM_0.dat");
   RESETDEBUG4("DebugDataCOM_1.dat");
-  RESETDEBUG5("DebugConfSO.dat");
+  RESETDEBUG4("DebugConfSO.dat");
   // Sampling period.
   m_SamplingPeriod = -1;
 

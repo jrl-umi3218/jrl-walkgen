@@ -58,7 +58,7 @@ namespace ml = maal::boost;
 #define ODEBUG(x) 
 #endif
 
-#if 1
+#if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "WalkGenJRL: " << x << endl; DebugFile.close();}
 #define _DEBUG_4_ACTIVATED_ 1 
@@ -264,11 +264,17 @@ plugin* create_plugin(istringstream &strm)
 WalkGenJRL::WalkGenJRL(istringstream &strm)
 {
 
+  RESETDEBUG4("WPDebugDataql.dat");
+  RESETDEBUG4("Debug5.dat");
+  RESETDEBUG4("DebugZMPFinale.dat");
+  RESETDEBUG4("DebugData.txt");
+
   m_ShouldBeRunning = false;
 
   m_DebugMode = 1;
-
+  ODEBUG4("Before creating the object.","DebugData.txt");
   m_PGI = new PatternGeneratorInterface(strm);
+  ODEBUG4("After creating the object.","DebugData.txt");
 
   // Register method the hrpsys interpreter.
   register_method(":parsecmd",(method)&WalkGenJRL::m_ParseCmd);
@@ -290,10 +296,6 @@ WalkGenJRL::WalkGenJRL(istringstream &strm)
   m_generalIndex = 0;
   m_generalIndexmax = 3*200*120;
 
-  RESETDEBUG4("WPDebugDataql.dat");
-  RESETDEBUG4("Debug5.dat");
-  RESETDEBUG4("DebugZMPFinale.dat");
-  RESETDEBUG4("DebugData.txt");
 }
 
 WalkGenJRL::~WalkGenJRL()
