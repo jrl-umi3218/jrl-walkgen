@@ -76,12 +76,12 @@ ComAndFootRealizationByGeometry::ComAndFootRealizationByGeometry(PatternGenerato
 
   RESETDEBUG4("LegsSpeed.dat");
   RESETDEBUG4("COMPC1.dat");
-  RESETDEBUG4("DebugDataIK.dat");
+  RESETDEBUG5("DebugDataIK.dat");
   RESETDEBUG4("DebugDatamDtL.dat");
   RESETDEBUG4("DebugDataStartingCOM.dat");
 
   RESETDEBUG4("DebugDataCOMForHeuristic.txt");
-  RESETDEBUG4("DebugDataIKArms.txt");
+  RESETDEBUG5("DebugDataIKArms.txt");
   RESETDEBUG4("DebugDataqArmsHeuristic.txt");
   RESETDEBUG4("DebugDataVelocity0.dat");
   RESETDEBUG4("DebugDataVelocity1.dat");
@@ -489,7 +489,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
     -(GetHeightOfTheCoM() + lFootPosition[2] - m_AnkleSoilDistance - lStartingCOMPosition[2]);
   // This term is usefull if
 
-  ODEBUG("m_DiffBetweenComAndWaist :" << m_DiffBetweenComAndWaist);
+  ODEBUG5("m_DiffBetweenComAndWaist :" << m_DiffBetweenComAndWaist,"DebugData.txt");
   // the initial position does not put z at Zc
 
   // The most important line of the method...
@@ -911,7 +911,7 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
 			      						      int Stage)
 {
 
-  ODEBUG("CPFGCAFP: " << aLeftFoot << " " << aRightFoot );
+  ODEBUG4("CPFGCAFP: " << aLeftFoot << " " << aRightFoot ,"DebugDataIKArms.txt");
   if (m_InverseKinematics==0)
     {
       cerr << "ComAndFootRealizationByGeometry::InitializationUpperBody "  << endl
@@ -1198,6 +1198,10 @@ void ComAndFootRealizationByGeometry::ComputeUpperBodyHeuristicForNormalWalking(
   FootAbsolutePosition RFP,
   FootAbsolutePosition LFP )*/
 {
+
+  ODEBUG5("aCOMPosition:" << aCOMPosition << endl <<
+	  "Right Foot Position:" << RFP << endl <<
+	  "Left Foot Position:" << LFP << endl, "DebugDataIKArms.txt");
   if (m_InverseKinematics==0)
     {
       cerr << "ComAndFootRealizationByGeometry::InitializationUpperBody "  << endl
@@ -1209,7 +1213,7 @@ void ComAndFootRealizationByGeometry::ComputeUpperBodyHeuristicForNormalWalking(
 
   double GainX = m_GainFactor * m_Xmax/0.2;
 
-  ODEBUG4(m_ZARM << " " << m_Xmax << " " << GainX << " " << m_GainFactor,"DebugDataIKArms.txt");
+  ODEBUG5(m_ZARM << " " << m_Xmax << " " << GainX << " " << m_GainFactor,"DebugDataIKArms.txt");
   // Arms Motion : Heuristic based.
   double Alpha,Beta;
   //Temporary variables
@@ -1218,27 +1222,34 @@ void ComAndFootRealizationByGeometry::ComputeUpperBodyHeuristicForNormalWalking(
 
   // Compute the position of the hand according to the
   // leg.
-  TempCos = cos(aCOMPosition(3)*M_PI/180.0);
-  TempSin = sin(aCOMPosition(3)*M_PI/180.0);
+  TempCos = cos(aCOMPosition(5)*M_PI/180.0);
+  TempSin = sin(aCOMPosition(5)*M_PI/180.0);
 
   TempXR = TempCos * (RFP(0)  - aCOMPosition(0)) +
     TempSin * (RFP(1)  - aCOMPosition(1));
   TempXL = TempCos * (LFP(0)  - aCOMPosition(0)) +
     TempSin * (LFP(1)  - aCOMPosition(1));
 
-  ODEBUG4(aCOMPosition(0) << " " << aCOMPosition(1),"DebugDataCOMForHeuristic.txt");
+  ODEBUG5(aCOMPosition(0) << " " << aCOMPosition(1) << " " << aCOMPosition(3),"DebugDataIKArms.txt");
+  ODEBUG5(RFP(0) << " " << RFP(1) ,"DebugDataIKArms.txt");
+  ODEBUG5(LFP(0) << " " << LFP(1) ,"DebugDataIKArms.txt");
 
   TempARight = TempXR*-1.0;
   TempALeft = TempXL*-1.0;
 
-  ODEBUG4("Values:" << TempALeft * GainX << " " << m_ZARM << " " << m_Xmax,"DebugDataIKArms.txt");
+  ODEBUG5("Values: TL " << TempALeft << 
+	  " TR " << TempARight << 
+	  " "    << GainX << 
+	  " "    << m_ZARM << 
+	  " "    << m_Xmax ,"DebugDataIKArms.txt");
+
   // Compute angles using inverse kinematics and the computed hand position.
   m_InverseKinematics->ComputeInverseKinematicsForArms(TempALeft * GainX,
 						       m_ZARM,
 						       Alpha,
 						       Beta);
 
-  ODEBUG4("ComputeHeuristicArm: Step 2 ","DebugDataIKArms.txt");
+  ODEBUG5("ComputeHeuristicArm: Step 2 ","DebugDataIKArms.txt");
   qArml(0)= Alpha;
   qArml(1)= 10.0*M_PI/180.0;
   qArml(2)= 0.0;
@@ -1247,7 +1258,7 @@ void ComAndFootRealizationByGeometry::ComputeUpperBodyHeuristicForNormalWalking(
   qArml(5)= 0.0;
   qArml(6)= 10.0*M_PI/180.0;
 
-  ODEBUG4( "IK Left arm p:" << qArml(0)<< " " <<  qArml(1)  << " " << qArml(2)
+  ODEBUG5( "IK Left arm p:" << qArml(0)<< " " <<  qArml(1)  << " " << qArml(2)
 	      << " " << qArml(3) << "  " << qArml(4) << " " << qArml(5), "DebugDataIKArms.txt" );
 
 
@@ -1263,11 +1274,11 @@ void ComAndFootRealizationByGeometry::ComputeUpperBodyHeuristicForNormalWalking(
   qArmr(5)= 0.0;
   qArmr(6)= 10.0*M_PI/180.0;;
 
-  ODEBUG4( "IK Right arm p:" << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2)
+  ODEBUG5( "IK Right arm p:" << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2)
 	   << " " << qArmr(3) << "  " << qArmr(4) << " " << qArmr(5), "DebugDataIKArms.txt" );
 
 
-  ODEBUG4( qArml(0)<< " " <<  qArml(1)  << " " << qArml(2) << " "
+  ODEBUG5( qArml(0)<< " " <<  qArml(1)  << " " << qArml(2) << " "
 	   << qArml(3) << "  " << qArml(4) << " " << qArml(5) << " "
 	   << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2) << " "
 	   << qArmr(3) << "  " << qArmr(4) << " " << qArmr(5), "DebugDataqArmsHeuristic.txt");
