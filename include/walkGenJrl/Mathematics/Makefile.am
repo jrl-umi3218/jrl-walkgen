@@ -4,4 +4,5 @@ walkGenJrl_HEADERS = ./Polynome.h \
 	./PolynomeFoot.h \
 	./StepOverPolynome.h\
 	./ConvexHull.h \
-	./qld.h 
+	./qld.h \
+	./AnalyticalZMPCOGTrajectory.h
