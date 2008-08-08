@@ -82,11 +82,11 @@ namespace PatternGeneratorJRL
 
     /*! \brief Take a serie of string as an input and 
       read the steps according to the chosen walkmode. */
-    void ReadStepSequenceAccordingToWalkMode(istringstream &strm);
+    void ReadStepSequenceAccordingToWalkMode(std::istringstream &strm);
 
     /*! \brief Real a partial sequence of steps
       without termination and immediate execution. */ 
-    void m_PartialStepSequence(istringstream &strm);
+    void m_PartialStepSequence(std::istringstream &strm);
 
     /*! \brief Set the single time support. */
     void SetSingleTimeSupport(double aSingleSupportTime);

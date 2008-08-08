@@ -195,11 +195,11 @@ namespace PatternGeneratorJRL
 
 
     */
-    virtual void GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
-				      deque<COMPosition> & CoMPositions,
-				      deque<RelativeFootPosition> &RelativeFootPositions,
-				      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-				      deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+    virtual void GetZMPDiscretization(std::deque<ZMPPosition> & ZMPPositions,
+				      std::deque<COMPosition> & CoMPositions,
+				      std::deque<RelativeFootPosition> &RelativeFootPositions,
+				      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+				      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 				      double Xmax,
 				      COMPosition & lStartingCOMPosition,
 				      FootAbsolutePosition & InitLeftFootAbsolutePosition,
@@ -224,13 +224,13 @@ namespace PatternGeneratorJRL
       @param[in] RelativeFootPositions: The set of relative positions to be taken into account.
       @param[in] lStartingCOMPosition: The initial position of the CoM given as a 3D vector.
     */
-    virtual int InitOnLine(deque<ZMPPosition> & ZMPPositions,
-			   deque<COMPosition> & CoMPositions,
-			   deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-			   deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
+    virtual int InitOnLine(std::deque<ZMPPosition> & ZMPPositions,
+			   std::deque<COMPosition> & CoMPositions,
+			   std::deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+			   std::deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
 			   FootAbsolutePosition & InitLeftFootAbsolutePosition,
 			   FootAbsolutePosition & InitRightFootAbsolutePosition,
-			   deque<RelativeFootPosition> &RelativeFootPositions,
+			   std::deque<RelativeFootPosition> &RelativeFootPositions,
 			   COMPosition & lStartingCOMPosition)   = 0;
     
     /* ! Methods to update the stack on-line by inserting a new foot position. 
@@ -245,10 +245,10 @@ namespace PatternGeneratorJRL
        obtained from the new foot trajectories.
      */
     virtual void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-			       deque<ZMPPosition> & FinalZMPPositions,					     
-			       deque<COMPosition> & CoMPositions,
-			       deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-			       deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+			       std::deque<ZMPPosition> & FinalZMPPositions,					     
+			       std::deque<COMPosition> & CoMPositions,
+			       std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+			       std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 			       bool EndSequence) = 0;
 
     /* ! \brief Method to change to update on line the queues necessary of the system.
@@ -265,10 +265,10 @@ namespace PatternGeneratorJRL
        @return If the method failed it returns -1, 0 otherwise.
      */
     virtual void OnLine(double time,
-		       deque<ZMPPosition> & FinalZMPPositions,			     
-		       deque<COMPosition> & CoMPositions,
-		       deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-		       deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)=0;
+		       std::deque<ZMPPosition> & FinalZMPPositions,			     
+		       std::deque<COMPosition> & CoMPositions,
+		       std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+		       std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)=0;
 
     /* ! \brief Method to change on line the landing position of a foot.
        @param[in] time : Current time.
@@ -285,10 +285,10 @@ namespace PatternGeneratorJRL
      */
     virtual int OnLineFootChange(double time,
 				 FootAbsolutePosition &aFootAbsolutePosition,
-				 deque<ZMPPosition> & FinalZMPPositions,			     
-				 deque<COMPosition> & CoMPositions,
-				 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-				 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+				 std::deque<ZMPPosition> & FinalZMPPositions,			     
+				 std::deque<COMPosition> & CoMPositions,
+				 std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+				 std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 				 StepStackHandler * aStepStackHandler)=0;
 
     /*! \brief Return the time at which it is optimal to regenerate a step in online mode. 
