@@ -56,6 +56,7 @@ AC_OUTPUT(Makefile
 	unitTesting/Makefile
 	plugin/Makefile.user
 	plugin/Makefile
+	plugin/corba/Makefile
 	doc/pgjrl.dox
 	walkGenJrl.pc
 )
