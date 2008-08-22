@@ -1,4 +1,4 @@
-/* This object generate all the values for the foot trajectories,
+ /* This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of steps.
 
 
@@ -240,17 +240,22 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   // the current support position and the precedent.
 
   // Initialize who is support foot.
+  double CurrentZMPTheta=0;
+  CurrentZMPTheta = (CurrentRightFootAbsPos.theta + CurrentLeftFootAbsPos.theta)/2.0;
+
   if (RelativeFootPositions[0].sy < 0 )
     {
       WhoIsSupportFoot = -1;//Right
-      vdiffsupppre(0,0) = 0;
-      vdiffsupppre(1,0) = 2.0 * RelativeFootPositions[0].sy;
+      vdiffsupppre(0,0) = CurrentRightFootAbsPos.x - CurrentLeftFootAbsPos.x;
+      vdiffsupppre(1,0) = CurrentRightFootAbsPos.y - CurrentLeftFootAbsPos.y;
+      CurrentTheta = CurrentRightFootAbsPos.theta - CurrentLeftFootAbsPos.theta;
     }
   else 
     {
       WhoIsSupportFoot = 1;// Left
-      vdiffsupppre(0,0) = 0;
-      vdiffsupppre(1,0) = 2.0 * RelativeFootPositions[0].sy;
+      vdiffsupppre(0,0) = -CurrentRightFootAbsPos.x + CurrentLeftFootAbsPos.x;
+      vdiffsupppre(1,0) = -CurrentRightFootAbsPos.y + CurrentLeftFootAbsPos.y;
+      CurrentTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
     }
 
 
@@ -286,7 +291,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
       ZMPPositions[CurrentZMPindex].px = startingZMPREF[0] + (finalZMPREF[0] - startingZMPREF[0])*coef;
       ZMPPositions[CurrentZMPindex].py = startingZMPREF[1] + (finalZMPREF[1] - startingZMPREF[1])*coef;
 
-      ZMPPositions[CurrentZMPindex].theta = 0.0;
+      ZMPPositions[CurrentZMPindex].theta = CurrentAbsTheta;
       ZMPPositions[CurrentZMPindex].time = CurrentTime;
       ZMPPositions[CurrentZMPindex].stepType = 0;
 

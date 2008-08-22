@@ -1478,36 +1478,6 @@ namespace PatternGeneratorJRL {
 		      << endl;
 
 
-	DebugFileUpperBody << "Chest_Joint0"<< "\t"
-			   << "Chest_Joint1"<< "\t"
-			   << "Head_Joint0"<< "\t"
-			   << "Head_Joint1"<< "\t"
-			   << "Rarm_Joint0"<< "\t"
-			   << "Rarm_Joint1"<< "\t"
-			   << "Rarm_Joint2"<< "\t"
-			   << "Rarm_Joint3"<< "\t"
-			   << "Rarm_Joint4"<< "\t"
-			   << "Rarm_Joint5"<< "\t"
-			   << "Rarm_Joint6"<< "\t"
-			   << "Larm_Joint0"<< "\t"
-			   << "Larm_Joint1"<< "\t"
-			   << "Larm_Joint2"<< "\t"
-			   << "Larm_Joint3"<< "\t"
-			   << "Larm_Joint4"<< "\t"
-			   << "Larm_Joint5"<< "\t"
-			   << "Larm_Joint6"<< "\t"
-			   << "Rhand_Joint0"<< "\t"
-			   << "Rhand_Joint1"<< "\t"
-			   << "Rhand_Joint2"<< "\t"
-			   << "Rhand_Joint3"<< "\t"
-			   << "Rhand_Joint4"<< "\t"
-			   << "Lhand_Joint0"<< "\t"
-			   << "Lhand_Joint1"<< "\t"
-			   << "Lhand_Joint2"<< "\t"
-			   << "Lhand_Joint3"<< "\t"
-			   << "Lhand_Joint4"<< "\t"
-			   << endl;
-
 
 	m_FirstPrint = false;
       }

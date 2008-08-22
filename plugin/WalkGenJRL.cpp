@@ -272,7 +272,7 @@ WalkGenJRL::WalkGenJRL(istringstream &strm)
   RESETDEBUG4("DebugWalkGenJRL.txt");
   m_ShouldBeRunning = false;
 
-  m_DebugMode = 1;
+  m_DebugMode = 0;
   ODEBUG4("Before creating the object.","DebugData.txt");
   m_PGI = new PatternGeneratorInterface(strm);
   ODEBUG4("After creating the object.","DebugData.txt");
@@ -395,7 +395,7 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 					m_CurrentVelocityFromPG,
 					ZMPTarget))
     {    
-      ODEBUG4("Go inside","DebugData.txt");
+      ODEBUG4("Go inside 1","DebugData.txt");
       if (rs->zmp.length()>0)
 	{
 	  for(unsigned int i=0;i<3;i++)
@@ -404,15 +404,11 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	  if (m_ZMPIndex>=m_ZMPIndexmax)
 	    m_ZMPIndex = 0;
 	}
-
+      ODEBUG4("Go inside 2","DebugData.txt");
       if (m_seq) 
 	{ 
 	  m_seq->getReferenceState(ref_state);
-	}
-				
-      if (m_seq) 
-	{            
-
+	  
 	  // if seq exists use the ReferenceState
 	  for(unsigned int i=0;i<40;i++)
 	    {
@@ -428,7 +424,7 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	    
 	  //ZMP ref. in the waist reference frame.
 	
-
+	  ODEBUG4("Go inside 3","DebugData.txt");
 	  m_zmptarget[0] = ZMPTarget(0);
 	  m_zmptarget[1] = ZMPTarget(1);
 	  m_zmptarget[2] = ZMPTarget(2);
@@ -445,13 +441,14 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	  //	  ref_state->waistPos[1] = m_CurrentWaistState.y[0];
 	  //	  ref_state->waistPos[2] = m_CurrentWaistState.z[0];//m_Zc -m_DiffBetweenComAndWaist;
 
+	  ODEBUG4("Go inside 4","DebugData.txt");
 	  ref_state->waistPos[0] = aTQ[0];
 	  ref_state->waistPos[1] = aTQ[1];
 	  ref_state->waistPos[2] = aTQ[2];
 	  ref_state->waistRpy[2] = WaistAbsOrientation;
 
 	  //cout << ref_state->waistPos[2] << endl;
-
+	  ODEBUG4("Go inside 5","DebugData.txt");
 	  if (m_DebugMode>0)
 	    {
 	      double temp1;
@@ -462,6 +459,7 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	      m_CurrentWaistState.y[0] = aTQ[1];
 	      m_CurrentWaistState.z[0] = aTQ[2];
 	      m_CurrentWaistState.yaw = WaistAbsOrientation;
+	      ODEBUG4("Go inside 6","DebugData.txt");
 
 	      temp3 = m_CurrentWaistState.yaw*M_PI/180.0;
 	      // This does the inverse of the transformation perform inside PGI. (use the transpose of the matrix).
@@ -478,20 +476,23 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 		       ref_state->waistPos[1] << " " << 
 		       ref_state->waistPos[2]  
 		       ,"DebugZMPFinale.dat");
+	      ODEBUG4("Go inside 7","DebugData.txt");
 	    }
 
 	  ref_state->waistRpy[0] =0.0;
 	  ref_state->waistRpy[1] =0.0;
 	  //	  ref_state->waistRpy[2] =m_CurrentWaistState.theta*M_PI/180;
-		
+	  ODEBUG4("Go inside 8","DebugData.txt");
 	  m_seq->setReferenceState(ref_state,dt);                              // send seq the next ref_state              
 	}
 
       if (m_DebugMode>0)
 	{
+	  ODEBUG4("Go inside 9","DebugData.txt");
 	  m_PGI->DebugControlLoop(m_CurrentStateFromPG,
 				  m_CurrentVelocityFromPG,
 				  m_count);
+	  ODEBUG4("Go inside 10","DebugData.txt");
 	}
       ODEBUG4(m_count << "FromPG: " << m_CurrentStateFromPG , "DebugWalkGenJRL.txt");	    
       m_count++;
