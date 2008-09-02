@@ -178,11 +178,10 @@ namespace PatternGeneratorJRL
       { m_HumanoidDynamicRobot = (CjrlHumanoidDynamicRobot *)aHumanoidDynamicRobot;
 	return true;}
     
-    /*! Returns the object able to compute the dynamic parameters
-      of the robot. */
+    /*! \brief Returns the object able to compute the dynamic parameters of the robot. */
     inline CjrlHumanoidDynamicRobot * getHumanoidDynamicRobot() const
       { return m_HumanoidDynamicRobot;}
-    
+
     /** @} */
 
   };

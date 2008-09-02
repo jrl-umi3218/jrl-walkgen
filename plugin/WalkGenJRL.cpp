@@ -202,6 +202,8 @@ public:
   CORBA::Boolean isWalking() 
     throw(CORBA::SystemException);
 
+   CORBA::Boolean ParseCmd(const char *aCmd);
+
 protected:
 
   // The pattern generator interface.
@@ -574,7 +576,7 @@ void WalkGenJRL::setRfootPos(CORBA::Float x, CORBA::Float y, CORBA::Float th)
 void WalkGenJRL::setRfootPosNoWait(CORBA::Float x, CORBA::Float y, CORBA::Float th)
   throw(CORBA::SystemException)
 {
-  // TO DO
+  m_PGI->AddStepInStack(x,y,th);
 }
 
 void WalkGenJRL::setLfootPos(CORBA::Float x, CORBA::Float y, CORBA::Float th)
@@ -586,7 +588,7 @@ void WalkGenJRL::setLfootPos(CORBA::Float x, CORBA::Float y, CORBA::Float th)
 void WalkGenJRL::setLfootPosNoWait(CORBA::Float x, CORBA::Float y, CORBA::Float th)
   throw(CORBA::SystemException)
 {
-  // TO DO
+  m_PGI->AddStepInStack(x,y,th);
 }
 
 void WalkGenJRL::stopWalking()
@@ -598,7 +600,12 @@ void WalkGenJRL::stopWalking()
 void WalkGenJRL::waitArrival()
   throw(CORBA::SystemException)
 {
-  // TO DO 
+  m_ShouldBeRunning=true;
+  while(m_ShouldBeRunning)
+    {
+      usleep(10000);
+    }
+
 }
 
 void WalkGenJRL::startStepping()
@@ -747,4 +754,10 @@ CORBA::Long WalkGenJRL::getLegJointSpeed( dsequence_out dq)
     }
   dq = adq._retn();
   return 12;
+}
+
+CORBA::Boolean WalkGenJRL::ParseCmd(const char *aCmd)
+{
+  istringstream strm(aCmd);
+  m_PGI->ParseCmd(strm);
 }

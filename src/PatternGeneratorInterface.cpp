@@ -1010,12 +1010,12 @@ namespace PatternGeneratorJRL {
     COMPosition finalCOMPosition;
     FootAbsolutePosition LeftFootPosition,RightFootPosition;
 
-    RunOneStepOfTheControlLoop(CurrentConfiguration,
-			       CurrentVelocity,
-			       ZMPTarget,
-			       finalCOMPosition,
-			       LeftFootPosition,
-			       RightFootPosition);
+    return RunOneStepOfTheControlLoop(CurrentConfiguration,
+				      CurrentVelocity,
+				      ZMPTarget,
+				      finalCOMPosition,
+				      LeftFootPosition,
+				      RightFootPosition);
     
   }
 
@@ -1027,8 +1027,9 @@ namespace PatternGeneratorJRL {
     MAL_VECTOR(,double)  CurrentConfiguration;
     MAL_VECTOR(,double)  CurrentVelocity;
     MAL_VECTOR( ZMPTarget,double);
+    bool r=false;
 
-    RunOneStepOfTheControlLoop(CurrentConfiguration,
+    r = RunOneStepOfTheControlLoop(CurrentConfiguration,
 			       CurrentVelocity,
 			       ZMPTarget,
 			       COMRefPos,
@@ -1038,7 +1039,7 @@ namespace PatternGeneratorJRL {
     bzero(&ZMPRefPos,sizeof(ZMPPosition));
     ZMPRefPos.px = ZMPTarget(0);
     ZMPRefPos.py = ZMPTarget(1);
-    
+    return r;
   }
 
 
@@ -1097,10 +1098,26 @@ namespace PatternGeneratorJRL {
 						    CurrentConfiguration,
 						    CurrentVelocity);
 
+    
     // New scheme:
     // Update the queue of ZMP ref
     m_count++;
     
+    // Update the waist state, it is assumed that the waist is the free flyer 
+    // Depending on the strategy used to generate the CoM trajectory
+    // this can be empty.
+
+    m_CurrentWaistState.x[0]  = CurrentConfiguration[0];
+    m_CurrentWaistState.y[0]  = CurrentConfiguration[1];
+    m_CurrentWaistState.z[0]  = CurrentConfiguration[2];
+    m_CurrentWaistState.roll  = CurrentConfiguration[3];
+    m_CurrentWaistState.pitch = CurrentConfiguration[4];
+    m_CurrentWaistState.yaw   = CurrentConfiguration[5];
+
+    m_CurrentWaistState.x[1]  = CurrentVelocity[0];
+    m_CurrentWaistState.y[1]  = CurrentVelocity[1];
+    m_CurrentWaistState.z[1]  = CurrentVelocity[2];
+
     ODEBUG4("CurrentWaistState: " 
 	    << m_CurrentWaistState.x[0] << " " 
 	    << m_CurrentWaistState.y[0] << " " 
@@ -1919,6 +1936,14 @@ namespace PatternGeneratorJRL {
 
 	ODEBUG("ZMPCOM_MORISAWA_2007 " << m_ZMPPositions.size() );
 	//	m_ZMPM->GetComBuffer(m_COMBuffer);
+      }
+  }
+  
+  void PatternGeneratorInterface::AddStepInStack(double dx, double dy, double theta)
+  {
+    if (m_StepStackHandler!=0)
+      {
+	m_StepStackHandler->AddStepInTheStack(dx,dy,theta,m_TSsupport, m_TDsupport);
       }
   }
   

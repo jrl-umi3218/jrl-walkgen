@@ -136,6 +136,7 @@ public:
   void setWaistPositionAndOrientation(const TransformQuaternion& aTQ);
   void getWaistAcceleration(TransformQuaternion& aTQ);
   CORBA::Boolean isWalking();
+  CORBA::Boolean ParseCmd(const char* aCmd);
 
   inline _objref_walkpluginJRL()  { _PR_setobj(0); }  // nil
   _objref_walkpluginJRL(omniIOR*, omniIdentity*);
@@ -188,6 +189,7 @@ public:
   virtual void setWaistPositionAndOrientation(const TransformQuaternion& aTQ) = 0;
   virtual void getWaistAcceleration(TransformQuaternion& aTQ) = 0;
   virtual CORBA::Boolean isWalking() = 0;
+  virtual CORBA::Boolean ParseCmd(const char* aCmd) = 0;
   
 public:  // Really protected, workaround for xlC
   virtual _CORBA_Boolean _dispatch(omniCallHandle&);
@@ -213,75 +215,6 @@ public:
 };
 
 
-
-template <class _omniT>
-class POA_walkpluginJRL_tie : public virtual POA_walkpluginJRL
-{
-public:
-  POA_walkpluginJRL_tie(_omniT& t)
-    : pd_obj(&t), pd_poa(0), pd_rel(0) {}
-  POA_walkpluginJRL_tie(_omniT& t, PortableServer::POA_ptr p)
-    : pd_obj(&t), pd_poa(p), pd_rel(0) {}
-  POA_walkpluginJRL_tie(_omniT* t, CORBA::Boolean r=1)
-    : pd_obj(t), pd_poa(0), pd_rel(r) {}
-  POA_walkpluginJRL_tie(_omniT* t, PortableServer::POA_ptr p,CORBA::Boolean r=1)
-    : pd_obj(t), pd_poa(p), pd_rel(r) {}
-  ~POA_walkpluginJRL_tie() {
-    if( pd_poa )  CORBA::release(pd_poa);
-    if( pd_rel )  delete pd_obj;
-  }
-
-  _omniT* _tied_object() { return pd_obj; }
-
-  void _tied_object(_omniT& t) {
-    if( pd_rel )  delete pd_obj;
-    pd_obj = &t;
-    pd_rel = 0;
-  }
-
-  void _tied_object(_omniT* t, CORBA::Boolean r=1) {
-    if( pd_rel )  delete pd_obj;
-    pd_obj = t;
-    pd_rel = r;
-  }
-
-  CORBA::Boolean _is_owner()        { return pd_rel; }
-  void _is_owner(CORBA::Boolean io) { pd_rel = io;   }
-
-  PortableServer::POA_ptr _default_POA() {
-    if( !pd_poa )  return PortableServer::POA::_the_root_poa();
-    else           return PortableServer::POA::_duplicate(pd_poa);
-  }
-
-  void setTargetPos(CORBA::Float x, CORBA::Float y, CORBA::Float th) { pd_obj->setTargetPos(x, y, th); }
-  void setTargetPosNoWait(CORBA::Float x, CORBA::Float y, CORBA::Float th) { pd_obj->setTargetPosNoWait(x, y, th); }
-  void setArc(CORBA::Float x, CORBA::Float y, CORBA::Float th) { pd_obj->setArc(x, y, th); }
-  void setArcNoWait(CORBA::Float x, CORBA::Float y, CORBA::Float th) { pd_obj->setArcNoWait(x, y, th); }
-  void setRfootPos(CORBA::Float x, CORBA::Float y, CORBA::Float th) { pd_obj->setRfootPos(x, y, th); }
-  void setRfootPosNoWait(CORBA::Float x, CORBA::Float y, CORBA::Float th) { pd_obj->setRfootPosNoWait(x, y, th); }
-  void setLfootPos(CORBA::Float x, CORBA::Float y, CORBA::Float th) { pd_obj->setLfootPos(x, y, th); }
-  void setLfootPosNoWait(CORBA::Float x, CORBA::Float y, CORBA::Float th) { pd_obj->setLfootPosNoWait(x, y, th); }
-  CORBA::Long getLegJointSpeed(dsequence_out dq) { return pd_obj->getLegJointSpeed(dq); }
-  void stopWalking() { pd_obj->stopWalking(); }
-  void waitArrival() { pd_obj->waitArrival(); }
-  void startStepping() { pd_obj->startStepping(); }
-  void stopStepping() { pd_obj->stopStepping(); }
-  void setWalkingVelocity(CORBA::Float dx, CORBA::Float dy, CORBA::Float dth) { pd_obj->setWalkingVelocity(dx, dy, dth); }
-  void getWaistVelocity(CORBA::Float& vx, CORBA::Float& vy, CORBA::Float& omega) { pd_obj->getWaistVelocity(vx, vy, omega); }
-  void getWaistPositionAndOrientation(TransformQuaternion& aTQ, CORBA::Float& Orientation) { pd_obj->getWaistPositionAndOrientation(aTQ, Orientation); }
-  void setWaistPositionAndOrientation(const TransformQuaternion& aTQ) { pd_obj->setWaistPositionAndOrientation(aTQ); }
-  void getWaistAcceleration(TransformQuaternion& aTQ) { pd_obj->getWaistAcceleration(aTQ); }
-  CORBA::Boolean isWalking() { return pd_obj->isWalking(); }
-  void start() { pd_obj->start(); }
-  void stop() { pd_obj->stop(); }
-  void sendMsg(const char* msg) { pd_obj->sendMsg(msg); }
-
-
-private:
-  _omniT*                 pd_obj;
-  PortableServer::POA_ptr pd_poa;
-  CORBA::Boolean          pd_rel;
-};
 
 
 

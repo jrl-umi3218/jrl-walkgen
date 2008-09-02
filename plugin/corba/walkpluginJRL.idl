@@ -123,5 +123,16 @@ interface walkpluginJRL : Plugin
   void getWaistAcceleration(out TransformQuaternion aTQ);
 
   boolean isWalking();
+
+  /*!******************************************************
+   *
+   * Interface specific to JRL Walking Pattern Generator
+   * 
+   *******************************************************/
+
+  /*! \brief This method allows to send directly to the Pattern Generator control commands.
+   */
+  boolean ParseCmd(in string aCmd);
+
 };
 

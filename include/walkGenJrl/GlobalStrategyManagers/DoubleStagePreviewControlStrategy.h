@@ -113,7 +113,7 @@ namespace PatternGeneratorJRL
     */
     int EndOfMotion();
 
-    /*! Reimplement the Call method for SimplePlugin part */
+    /*! \brief Reimplement the Call method for SimplePlugin part */
     void CallMethod(std::string &Method, std::istringstream &astrm);
 
     /*! \brief This method specify the algorithm to use for generating
@@ -121,7 +121,7 @@ namespace PatternGeneratorJRL
      */
     void SetAlgoForZMPTraj(istringstream &strm);
 
-    /*! Prepare the buffers at the beginning of the foot positions. 
+    /*! \brief  Prepare the buffers at the beginning of the foot positions. 
       @param[out] aZMPositions: ZMP position reference
       @param[out] aCOMBuffer: COM trajectory 
       @param[out] aLeftFootAbsolutePositions: Trajectory of absolute positions for the left foot.
@@ -131,6 +131,9 @@ namespace PatternGeneratorJRL
 	       deque<COMPosition> & aCOMBuffer,
 	       deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
 	       deque<FootAbsolutePosition> & aRightFootAbsolutePositions );
+
+    /*! \brief Get Waist state. */
+    bool getWaistState(WaistState & aWaistState);
 
   protected:
     

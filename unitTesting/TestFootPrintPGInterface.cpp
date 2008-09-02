@@ -327,6 +327,22 @@ void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI)
   }
 }
 
+void StrangeStartingPosition(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+
+  {
+    istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
+    aPGI.ParseCmd(strm2);
+  }
+
+  {
+    istringstream strm2(":stepseq 0.075 0.125 7.16197 0.15 -0.25 14.3239");
+    aPGI.ParseCmd(strm2);
+  }
+}
+
+
 void StopOnLineWalking(PatternGeneratorInterface &aPGI)
 {
   istringstream strm2(":StopOnLineStepSequencing");
@@ -454,7 +470,7 @@ int main(int argc, char *argv[])
 #endif
 
   // Normal position - New half sitting 
-#if 1 
+#if 0
   double dInitPos[40] = { 
     0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
 
@@ -468,6 +484,33 @@ int main(int argc, char *argv[])
   };
 #endif
 
+// Strange position 1
+  double dInitPos[40] = 
+    {
+      14.323945,  -6.0363396,  -13.459409,    44.02602,  -30.566611,    6.0363396,
+      0.0000001,   7.4859801,  -27.663319,    44.65489,  -16.991579,   -7.4859801,
+      0.,    0.,    0.,    0.,    
+      12.397718,  -10.000004,    0.,  -29.618538,    0.,    0.,    10.0,
+      16.536364,   10.000004,    0.,  -29.828011,    0.,    0.,    10.0,
+
+      -10.0,  10.0, -10.0,  10,   -10.0, 
+      -10.0,  10.0, -10.0,  10.0, -10.0 
+    };
+#if 0
+  double dInitPos[40] = 
+    {
+      -7.16197, -7.69299, -16.1787, 44.5201, -28.3415,  7.69299, 
+      7.16197,   5.74946, -31.3668, 44.1057, -12.7389, -5.74946,
+
+      0., 0., 0., 0., 
+
+      12.622 , -10, 0, -29.678 , 0, 0, 10, 
+      16.7091,  10, 0, -29.7841, 0, 0, 10, 
+      
+      -10.0,  10.0, -10.0,  10,   -10.0, 
+      -10.0,  10.0, -10.0,  10.0, -10.0 
+    };
+#endif 
   // This is a vector corresponding to the DOFs actuated of the robot.
   MAL_VECTOR_DIM(InitialPosition,double,40);
   //MAL_VECTOR_DIM(CurrentPosition,double,40);
@@ -519,13 +562,15 @@ int main(int argc, char *argv[])
   double totaltime=0,maxtime=0;
   double timemodif = 0;
 
-  for (unsigned int lNbIt=0;lNbIt<2;lNbIt++)
+  for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
     {
+      StrangeStartingPosition(*aPGI);
+      /*
       if (lNbIt==1)
 	TestNewPG1(*aPGI);
       else if (lNbIt==2)
 	TestNewPG2(*aPGI);
-
+      */
       // SteppingOver(*aPGI);
       // ShortStraightWalking(*aPGI);
       // CurvedWalkingPBW2(*aPGI);
@@ -550,7 +595,7 @@ int main(int argc, char *argv[])
 	{
 
 	  gettimeofday(&begin,0);
-#if 0
+#if 1
 	  ok = aPGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
 					   CurrentVelocity,
 					   ZMPTarget,
@@ -596,11 +641,12 @@ int main(int argc, char *argv[])
 	      timemodif = endmodif.tv_sec-beginmodif.tv_sec + 0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
 	      TestChangeFoot=false;
 	    }
-#endif	  
+
 	  if (NbOfIt>30*200) /* Stop after 30 seconds the on-line stepping */
 	    {
 	      StopOnLineWalking(*aPGI);
 	    }
+#endif
 
 #if 1
 	  aof << NbOfIt*0.005 << " " 

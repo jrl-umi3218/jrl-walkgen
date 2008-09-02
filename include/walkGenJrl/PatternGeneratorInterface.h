@@ -79,6 +79,11 @@ namespace PatternGeneratorJRL
       external world. In addition to the classical setter and getter for various parameters
       there is the possibility to pass commands a string of stream to the method
       \a ParseCmd().
+      
+      There is a set of functionnalities directly supported by the API:
+      
+     
+      
    */
   class PatternGeneratorInterface : public SimplePluginManager
   {    
@@ -92,7 +97,12 @@ namespace PatternGeneratorJRL
 
     /*! Destructor */
     ~PatternGeneratorInterface();
-
+    
+    /*! \brief Function to specify steps in the stack of the walking pattern generator. 
+      This method is different AddOnLineStep which is the default step add when there is no policy,
+      or no step available.
+     */
+    void AddStepInStack(double dx, double dy, double theta);
     
     /*! \name High levels function to create automatically stack of steps following specific motions. 
       @{

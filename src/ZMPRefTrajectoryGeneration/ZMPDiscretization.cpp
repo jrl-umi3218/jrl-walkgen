@@ -231,10 +231,15 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   // Initialize position of the feet.  
   CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
   CurrentLeftFootAbsPos.time = 0.0;
-  
-  ODEBUG("CurrentLeftFootAbsPos.y: " << CurrentLeftFootAbsPos.y);
   CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
   CurrentRightFootAbsPos.time = 0.0;
+
+  
+  ODEBUG3("CurrentLeftFootAbsPos:  ( " << CurrentLeftFootAbsPos.x <<  " , "
+	  << CurrentLeftFootAbsPos.y <<  " , " << CurrentLeftFootAbsPos.theta <<  " )( "
+	  " CurrentRightFootAbsPos: (" << CurrentRightFootAbsPos.x <<  " , "
+	  << CurrentRightFootAbsPos.y <<  " , " << CurrentRightFootAbsPos.theta <<  " ) " 
+	  );
 
   // V pre is the difference between 
   // the current support position and the precedent.
@@ -242,7 +247,9 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   // Initialize who is support foot.
   double CurrentZMPTheta=0;
   CurrentZMPTheta = (CurrentRightFootAbsPos.theta + CurrentLeftFootAbsPos.theta)/2.0;
-
+  cout << "CurrentZMPTheta at start: " << CurrentZMPTheta << " " 
+       << CurrentRightFootAbsPos.theta << " " 
+       << CurrentLeftFootAbsPos.theta <<endl;
   if (RelativeFootPositions[0].sy < 0 )
     {
       WhoIsSupportFoot = -1;//Right
@@ -257,8 +264,8 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
       vdiffsupppre(1,0) = -CurrentRightFootAbsPos.y + CurrentLeftFootAbsPos.y;
       CurrentTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
     }
-
-
+  cout << "vdiffsupppre : " << vdiffsupppre(0,0) << " " << vdiffsupppre(1,0) << endl;
+  
   ODEBUG4("Step 2","DebugData.txt");
 
   // Initialization of the ZMP position (stable values during the Preview control time window).
@@ -324,7 +331,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   int SupportFootInsideTurn=0;
 
   ODEBUG4("Step 3 "<< RelativeFootPositions.size(),"DebugData.txt");
-
+  ODEBUG3("Step 3 "<< RelativeFootPositions.size());
   for(unsigned int i=0;i<RelativeFootPositions.size()-1;i++)
     {
       if (RelativeFootPositions[i+1].DStime!=0.0)
@@ -556,7 +563,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	  NextTheta=0.0;
 	  lStepHeight = 0.0;
 	}
-#if 0
+#if 1
       cout << "vrel: " << vrel(0,0) << " " << vrel(1,0) << endl;
       cout << "vdiffsupp: " << vdiffsupp(0,0) << " " << vdiffsupp(1,0) << endl;
       cout << "vdiffsupppre: " << vdiffsupppre(0,0) << " " << vdiffsupppre(1,0) << endl;
@@ -730,11 +737,12 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   // We assume that the last positon of the ZMP
   // will the middle of the two last position
   // of the support foot.
+  cout << LeftFootAbsolutePositions[CurrentZMPindex-1].x << " " << RightFootAbsolutePositions[CurrentZMPindex-1].x <<endl;
   pxf = (LeftFootAbsolutePositions[CurrentZMPindex-1].x+
 	 RightFootAbsolutePositions[CurrentZMPindex-1].x)/2.0;
   pyf = (LeftFootAbsolutePositions[CurrentZMPindex-1].y+
 	 RightFootAbsolutePositions[CurrentZMPindex-1].y)/2.0;
-  //  cout << "PX: " << pxf << " PY: " << pyf<< endl;
+  cout << "PX: " << pxf << " PY: " << pyf<< endl;
   
   delta_x = (pxf - px0)/(double)SizeOfEndPhase;
   delta_y = (pyf - py0)/(double)SizeOfEndPhase;
@@ -770,7 +778,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 
   // Added a new phase for exhausting the preview control
   {
-    double ldAddArraySize = 3.0*m_PreviewControlTime/m_SamplingPeriod;
+    double ldAddArraySize = 4.0*m_PreviewControlTime/m_SamplingPeriod;
     AddArraySize = (int)ldAddArraySize;
   }
   currentsize = ZMPPositions.size();
@@ -810,6 +818,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 
   FilterZMPRef(ZMPPositions,FinalZMPPositions);
   FinalCOMPositions.resize(FinalZMPPositions.size());
+  cout << "FinalZMPPositions.size(): " <<FinalZMPPositions.size() <<endl;
 }
 
 

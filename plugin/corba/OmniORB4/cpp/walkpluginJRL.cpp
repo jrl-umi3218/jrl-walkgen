@@ -421,7 +421,7 @@ public:
 
 // Local call call-back function.
 static void
-_0RL_lcfn_bd2897e33721d236_c0000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bd2897e33721d236_c0000000(omniCallDescriptor*, omniServant* svnt)
 {
   
   _impl_walkpluginJRL* impl = (_impl_walkpluginJRL*) svnt->_ptrToInterface(walkpluginJRL::_PD_repoId);
@@ -442,7 +442,7 @@ void _objref_walkpluginJRL::stopWalking()
 }
 // Local call call-back function.
 static void
-_0RL_lcfn_bd2897e33721d236_d0000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bd2897e33721d236_d0000000(omniCallDescriptor*, omniServant* svnt)
 {
   
   _impl_walkpluginJRL* impl = (_impl_walkpluginJRL*) svnt->_ptrToInterface(walkpluginJRL::_PD_repoId);
@@ -463,7 +463,7 @@ void _objref_walkpluginJRL::waitArrival()
 }
 // Local call call-back function.
 static void
-_0RL_lcfn_bd2897e33721d236_e0000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bd2897e33721d236_e0000000(omniCallDescriptor*, omniServant* svnt)
 {
   
   _impl_walkpluginJRL* impl = (_impl_walkpluginJRL*) svnt->_ptrToInterface(walkpluginJRL::_PD_repoId);
@@ -484,7 +484,7 @@ void _objref_walkpluginJRL::startStepping()
 }
 // Local call call-back function.
 static void
-_0RL_lcfn_bd2897e33721d236_f0000000(omniCallDescriptor* cd, omniServant* svnt)
+_0RL_lcfn_bd2897e33721d236_f0000000(omniCallDescriptor*, omniServant* svnt)
 {
   
   _impl_walkpluginJRL* impl = (_impl_walkpluginJRL*) svnt->_ptrToInterface(walkpluginJRL::_PD_repoId);
@@ -791,6 +791,73 @@ CORBA::Boolean _objref_walkpluginJRL::isWalking()
 
 
 }
+// Proxy call descriptor class. Mangled signature:
+//  _cboolean_i_cstring
+class _0RL_cd_bd2897e33721d236_b1000000
+  : public omniCallDescriptor
+{
+public:
+  inline _0RL_cd_bd2897e33721d236_b1000000(LocalCallFn lcfn,const char* op_,size_t oplen,_CORBA_Boolean upcall=0):
+     omniCallDescriptor(lcfn, op_, oplen, 0, 0, 0, upcall) {}
+  
+  void marshalArguments(cdrStream&);
+  void unmarshalArguments(cdrStream&);
+
+  void unmarshalReturnedValues(cdrStream&);
+  void marshalReturnedValues(cdrStream&);
+  
+  
+  CORBA::String_var arg_0_;
+  const char* arg_0;
+  CORBA::Boolean result;
+};
+
+void _0RL_cd_bd2897e33721d236_b1000000::marshalArguments(cdrStream& _n)
+{
+  _n.marshalString(arg_0,0);
+
+}
+
+void _0RL_cd_bd2897e33721d236_b1000000::unmarshalArguments(cdrStream& _n)
+{
+  arg_0_ = _n.unmarshalString(0);
+  arg_0 = arg_0_.in();
+
+}
+
+void _0RL_cd_bd2897e33721d236_b1000000::marshalReturnedValues(cdrStream& _n)
+{
+  _n.marshalBoolean(result);
+
+}
+
+void _0RL_cd_bd2897e33721d236_b1000000::unmarshalReturnedValues(cdrStream& _n)
+{
+  result = _n.unmarshalBoolean();
+
+}
+
+// Local call call-back function.
+static void
+_0RL_lcfn_bd2897e33721d236_c1000000(omniCallDescriptor* cd, omniServant* svnt)
+{
+  _0RL_cd_bd2897e33721d236_b1000000* tcd = (_0RL_cd_bd2897e33721d236_b1000000*)cd;
+  _impl_walkpluginJRL* impl = (_impl_walkpluginJRL*) svnt->_ptrToInterface(walkpluginJRL::_PD_repoId);
+  tcd->result = impl->ParseCmd(tcd->arg_0);
+
+
+}
+
+CORBA::Boolean _objref_walkpluginJRL::ParseCmd(const char* aCmd)
+{
+  _0RL_cd_bd2897e33721d236_b1000000 _call_desc(_0RL_lcfn_bd2897e33721d236_c1000000, "ParseCmd", 9);
+  _call_desc.arg_0 = aCmd;
+
+  _invoke(_call_desc);
+  return _call_desc.result;
+
+
+}
 _pof_walkpluginJRL::~_pof_walkpluginJRL() {}
 
 
@@ -973,6 +1040,14 @@ _impl_walkpluginJRL::_dispatch(omniCallHandle& _handle)
   if( omni::strMatch(op, "isWalking") ) {
 
     _0RL_cd_bd2897e33721d236_91000000 _call_desc(_0RL_lcfn_bd2897e33721d236_a1000000, "isWalking", 10, 1);
+    
+    _handle.upcall(this,_call_desc);
+    return 1;
+  }
+
+  if( omni::strMatch(op, "ParseCmd") ) {
+
+    _0RL_cd_bd2897e33721d236_b1000000 _call_desc(_0RL_lcfn_bd2897e33721d236_c1000000, "ParseCmd", 9, 1);
     
     _handle.upcall(this,_call_desc);
     return 1;

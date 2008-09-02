@@ -79,6 +79,8 @@ DoubleStagePreviewControlStrategy::DoubleStagePreviewControlStrategy(SimplePlugi
 	  std::cerr<< "Unable to register " << aMethodName[i]  << endl;
 	}
     }
+  
+  RESETDEBUG5("ZMPRefAndWaist.dat");
 }
 
 DoubleStagePreviewControlStrategy::~DoubleStagePreviewControlStrategy()
@@ -173,6 +175,12 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   double temp1;
   double temp2;
   double temp3;
+
+  ODEBUG5((*m_ZMPPositions)[0].px <<  " " << 
+	  outWaistPosition.x[0] << " " <<
+	  (*m_ZMPPositions)[0].py << " " <<
+	  outWaistPosition.y[0], "ZMPRefAndWaist.dat");
+
   temp1 = (*m_ZMPPositions)[0].px - outWaistPosition.x[0];
   temp2 = (*m_ZMPPositions)[0].py - outWaistPosition.y[0];
   temp3 = finalCOMPosition.yaw*M_PI/180.0;

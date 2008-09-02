@@ -55,7 +55,7 @@ namespace PatternGeneratorJRL
      	
   };
   typedef struct COMPosition_s COMPosition;
-
+  typedef struct COMPosition_s WaistState;
   /** Structure to store each foot position when the user is specifying 
       a sequence of relative positions. */
   struct RelativeFootPosition_s
