@@ -72,6 +72,7 @@ int CoMAndFootOnlyStrategy::InitInterObjects(PreviewControl * aPC,
 							StepStackHandler * aSSH)
 {
   m_ComAndFootRealization = aCFR;
+  return 0;
 }
 
 int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
@@ -132,6 +133,7 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
     }
 
   ODEBUG("End of OneGlobalStepOfControl");
+  return 0;
 }
 
 
@@ -153,7 +155,7 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
   aStartingCOMPosition.x[0] = lStartingCOMPosition(0);
   aStartingCOMPosition.y[0] = lStartingCOMPosition(1);
   aStartingCOMPosition.z[0] = lStartingCOMPosition(2);
-  
+  return 0;
 }
 
 int CoMAndFootOnlyStrategy::EndOfMotion()

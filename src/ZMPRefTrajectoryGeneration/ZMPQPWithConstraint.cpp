@@ -1458,7 +1458,7 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
     Limit = ZMPRefPositions.size() - NewFinalZMPPositions.size();
 
   ODEBUG("Limit: " << Limit);
-  for (unsigned int i=0;i< Limit;i++)
+  for (int i=0;i< Limit;i++)
   {
     ZMPPosition aZMPPos;
     aZMPPos.px = LastZMPPos.px;
@@ -1609,7 +1609,7 @@ void ZMPQPWithConstraint::CallMethod(std::string & Method, std::istringstream &s
 
 void ZMPQPWithConstraint::GetComBuffer(deque<COMPosition> &aCOMBuffer)
 {
-  for(int i=0;i<m_COMBuffer.size();i++)
+  for(unsigned int i=0;i<m_COMBuffer.size();i++)
     {
       aCOMBuffer.push_back(m_COMBuffer[i]);
     }

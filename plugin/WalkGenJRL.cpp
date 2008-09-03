@@ -760,4 +760,5 @@ CORBA::Boolean WalkGenJRL::ParseCmd(const char *aCmd)
 {
   istringstream strm(aCmd);
   m_PGI->ParseCmd(strm);
+  return true;
 }

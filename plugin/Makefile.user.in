@@ -46,7 +46,8 @@ user_clean:
 #$(IOSRVBIN)/script/TestWalkGenPBW.py: $(SOURCE_DIR)/script/TestWalkGenPBW.py
 #	cp -f $(SOURCE_DIR)/script/TestWalkGenPBW.py $(IOSRVBIN)/script
 
-$(IOSRVBIN)/libWalkGen.so: $(SOURCE_DIR)/../src/libWalkGenJRL.so
-	cp -f $(SOURCE_DIR)/../src/libWalkGenJRL.so $(IOSRVBIN)
+$(IOSRVBIN)/libWalkGen.so: $(BUILD_DIR)/../src/libWalkGenJRL.so
+	cp -f $(BUILD_DIR)/../src/libWalkGenJRL.so $(IOSRVBIN)
 
-user_install:$(IOSRVBIN)/libWalkGen.so 
+user_install: 
+	cd @abs_builddir@/corba; $(MAKE) install

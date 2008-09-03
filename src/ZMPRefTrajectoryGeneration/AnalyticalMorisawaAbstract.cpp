@@ -87,6 +87,7 @@ namespace PatternGeneratorJRL
   bool AnalyticalMorisawaAbstract::SetNumberOfStepsInAdvance(int lNumberOfStepsInAdvance)
   {
     m_NumberOfStepsInAdvance = lNumberOfStepsInAdvance;
+    return true;
   }
 
 
@@ -115,6 +116,7 @@ namespace PatternGeneratorJRL
   int AnalyticalMorisawaAbstract::SetDeltaTj(vector<double> &GetTj)
   {
     m_DeltaTj = GetTj;
+    return 0;
   }
 
   bool AnalyticalMorisawaAbstract::GetPolynomialWeights(vector<double> &PolynomialWeights)
@@ -156,6 +158,6 @@ namespace PatternGeneratorJRL
     for(unsigned int i=0;i<obj.m_Omegaj.size();i++)
       os << obj.m_Omegaj[i] << " ";
     os << endl;
-    
+    return os;
   }
 }

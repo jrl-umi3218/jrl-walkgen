@@ -68,7 +68,7 @@ FootTrajectoryGenerationMultiple::~FootTrajectoryGenerationMultiple()
 
 void FootTrajectoryGenerationMultiple::SetNumberOfIntervals(int lNumberOfIntervals)
 {
-  if (m_SetOfFootTrajectoryGenerationObjects.size()==lNumberOfIntervals)
+  if (m_SetOfFootTrajectoryGenerationObjects.size()==(unsigned int)lNumberOfIntervals)
     return;
   
   for(unsigned int i=0;i<m_SetOfFootTrajectoryGenerationObjects.size();i++)
@@ -140,6 +140,7 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
   double deltaj = t - m_AbsoluteTimeReference - m_RefTime[IndexInterval];
   ODEBUG("IndexInterval : " << IndexInterval );
   m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAll(aFootAbsolutePosition,deltaj);
+  return true;
 }
 
 bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & aFootAbsolutePosition)

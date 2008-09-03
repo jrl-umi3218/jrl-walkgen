@@ -1,7 +1,8 @@
 SUBDIRS = src \
 	doc \
 	include/walkGenJrl \
-	unitTesting
+        unitTesting \
+	plugin
 
 walkGenJrldir = $(libdir)/pkgconfig
 walkGenJrl_DATA = walkGenJrl.pc

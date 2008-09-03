@@ -577,7 +577,6 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
   
   /* Keep track of the interval index once this is
      for single support, once for double support */
-  int IntervalIndex=0;
 
   ODEBUG("CurrentSupportFootPosition: " << CurrentSupportFootPosition);
   ODEBUG("RelativeFootPositions: " << RelativeFootPositions.size());
@@ -791,8 +790,8 @@ double LeftAndRightFootTrajectoryGenerationMultiple::GetStepHeight()
 
 double LeftAndRightFootTrajectoryGenerationMultiple::GetAbsoluteTimeReference()
 {
-  double res;
-  double LeftATR,RightATR;
+  double res=0.0;
+  double LeftATR=0.0,RightATR=0.0;
   if (m_LeftFootTrajectory!=0)
     LeftATR = m_LeftFootTrajectory->GetAbsoluteTimeReference();
   if (m_RightFootTrajectory!=0)

@@ -156,7 +156,7 @@ namespace PatternGeneratorJRL
     m_DeltaTj[0]=m_Tsingle*3.0;
     //m_DeltaTj[0]=m_Tsingle*1.0;
     m_StepTypes[0] = DOUBLE_SUPPORT;
-    for(unsigned int i=1;i<m_NumberOfIntervals;i++)
+    for(int i=1;i<m_NumberOfIntervals;i++)
       {
 	if (i%2==0)
 	  {
@@ -176,7 +176,7 @@ namespace PatternGeneratorJRL
     
     if (m_VerboseLevel>=2)
       {
-	for(unsigned int i=0;i<m_NumberOfIntervals;i++)
+	for(int i=0;i<m_NumberOfIntervals;i++)
 	  cout << m_DeltaTj[i] << " ";
 	cout << endl;
       }
@@ -185,7 +185,7 @@ namespace PatternGeneratorJRL
     m_PolynomialDegrees.resize(m_NumberOfIntervals);
     m_PolynomialDegrees[0] = 4;
     m_PolynomialDegrees[m_NumberOfIntervals-1] = 4;
-    for(unsigned int i=1;i<m_NumberOfIntervals-1;i++)
+    for(int i=1;i<m_NumberOfIntervals-1;i++)
       m_PolynomialDegrees[i] = 3;    
     
 
@@ -194,7 +194,7 @@ namespace PatternGeneratorJRL
       {
 	m_FeetTrajectoryGenerator->SetDeltaTj(m_DeltaTj);
       }
-    
+    return true;
   }
 
 
@@ -361,7 +361,7 @@ namespace PatternGeneratorJRL
 
     lCoMZ->resize(NbOfIntervals);
     lZMPZ->resize(NbOfIntervals);
-    for(unsigned int i=0;i<NbOfIntervals;i++)
+    for(int i=0;i<NbOfIntervals;i++)
       {
 	(*lCoMZ)[i] = lStartingCOMPosition(2,0); 
 	(*lZMPZ)[i] = 0.0;
@@ -439,8 +439,6 @@ namespace PatternGeneratorJRL
 	    (*lZMPY)[j+1] = m_AbsoluteSupportFootPositions[i].y;	    
 	  }
 
-	FootAbsolutePosition LeftFootFinalPosition;
-	FootAbsolutePosition RightFootFinalPosition;
 								 
 	// Strategy for the final CoM pos: middle of the segment
 	// between the two final steps, in order to be statically stable.

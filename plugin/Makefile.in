@@ -1,13 +1,11 @@
 SOURCE_DIR = @abs_srcdir@
+BUILD_DIR = @abs_buildir@
 
-ifndef OPENHRPHOME
-OPENHRPHOME=../../../..
-endif
+ifdef OPENHRPHOME
 
 ifndef ROBOT
 ROBOT=HRP2JRL
 endif
-
 
 SYSDIR=$(OPENHRPHOME)/Controller/IOserver/sys/plugin
 
@@ -25,3 +23,7 @@ echo_clean:
 
 install:sample_install
 clean:sample_clean echo_clean
+
+all: sample
+
+endif

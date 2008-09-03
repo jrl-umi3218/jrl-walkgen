@@ -805,8 +805,9 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingState(MAL_VECTOR(&BodyAng
 							     FootAbsolutePosition & InitLeftFootPosition,
 							     FootAbsolutePosition & InitRightFootPosition)
 {
-  EvaluateStartingCoM(BodyAnglesInit,aStartingCOMPosition,
+  int r = EvaluateStartingCoM(BodyAnglesInit,aStartingCOMPosition,
 		      InitLeftFootPosition, InitRightFootPosition);
+  return r;
 }
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(MAL_VECTOR(&BodyAnglesInit,double),
 							     MAL_S3_VECTOR(&aStartingCOMPosition,double),
