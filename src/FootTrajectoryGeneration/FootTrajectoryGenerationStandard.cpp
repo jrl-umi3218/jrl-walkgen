@@ -213,6 +213,7 @@ double FootTrajectoryGenerationStandard::ComputeAll(FootAbsolutePosition & aFoot
   aFootAbsolutePosition.domega = m_PolynomeZ->ComputeDerivative(Time);
   aFootAbsolutePosition.omega2 = m_PolynomeOmega->Compute(Time);
   aFootAbsolutePosition.domega2 = m_PolynomeOmega->Compute(Time);
+  return Time;
 }
 
 double FootTrajectoryGenerationStandard::Compute(unsigned int PolynomeIndex, double Time)

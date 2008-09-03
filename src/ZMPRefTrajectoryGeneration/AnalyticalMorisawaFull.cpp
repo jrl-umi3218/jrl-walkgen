@@ -102,7 +102,7 @@ namespace PatternGeneratorJRL
     m_DeltaTj.resize(m_NumberOfIntervals);
     m_Omegaj.resize(m_NumberOfIntervals);
 
-    for(unsigned int i=0;i<m_NumberOfIntervals;i++)
+    for(int i=0;i<m_NumberOfIntervals;i++)
       {
 	if (i%2==0)
 	  m_DeltaTj[i] = m_Tsingle;
@@ -113,7 +113,7 @@ namespace PatternGeneratorJRL
 
     if (m_VerboseLevel>=2)
       {
-	for(unsigned int i=0;i<m_NumberOfIntervals;i++)
+	for(int i=0;i<m_NumberOfIntervals;i++)
 	  cout << m_DeltaTj[i] << " ";
 	cout << endl;
       }
@@ -122,10 +122,10 @@ namespace PatternGeneratorJRL
     m_PolynomialDegrees.resize(m_NumberOfIntervals);
     m_PolynomialDegrees[0] = 4;
     m_PolynomialDegrees[m_NumberOfIntervals-1] = 4;
-    for(unsigned int i=1;i<m_NumberOfIntervals-1;i++)
+    for(int i=1;i<m_NumberOfIntervals-1;i++)
       m_PolynomialDegrees[i] = 3;    
     
-  
+    return true;
   }
 
   void AnalyticalMorisawaFull::ComputeZ1(unsigned int &rowindex)
@@ -220,7 +220,7 @@ namespace PatternGeneratorJRL
     m_Z(rowindex,colindex+4) = c0 = cosh(Omegaj * m_DeltaTj[intervalindex]);
     m_Z(rowindex,colindex+5) = s0 = sinh(Omegaj * m_DeltaTj[intervalindex]);
     m_Z(rowindex,colindex+6) = -1.0;
-    if (intervalindex!=m_NumberOfIntervals-2)
+    if ((int)intervalindex!=m_NumberOfIntervals-2)
       m_Z(rowindex,colindex+10) = -1.0;
     else
       m_Z(rowindex,colindex+11) = -1.0;
@@ -237,7 +237,7 @@ namespace PatternGeneratorJRL
     m_Z(rowindex,colindex+4) = Omegaj * s0;
     m_Z(rowindex,colindex+5) = Omegaj * c0;
     m_Z(rowindex,colindex+7) = -1.0;
-    if (intervalindex!=m_NumberOfIntervals-2)
+    if ((int)intervalindex!=m_NumberOfIntervals-2)
       m_Z(rowindex,colindex+11) = -Omegaj;
     else
       m_Z(rowindex,colindex+12) = -m_Omegaj[m_NumberOfIntervals-1];
@@ -369,7 +369,7 @@ namespace PatternGeneratorJRL
   void AnalyticalMorisawaFull::BuildingTheZMatrix(vector<double> &lCoM, vector<double> &lZMP )
   {
 
-    if ((lCoM.size()!=m_NumberOfIntervals) || (lZMP.size()!=m_NumberOfIntervals))
+    if ((lCoM.size()!=(unsigned int)m_NumberOfIntervals) || (lZMP.size()!=(unsigned int)m_NumberOfIntervals))
       return;
 
     for(unsigned int i=0;i<lCoM.size();i++)
@@ -377,7 +377,6 @@ namespace PatternGeneratorJRL
 	m_Omegaj[i]=sqrt(9.86/ (lCoM[i] - lZMP[i]));
       }
     unsigned NbRows, NbCols;
-    unsigned int i,j;
     unsigned int rowindex=0;
     unsigned int colindex=0;
 
@@ -395,10 +394,6 @@ namespace PatternGeneratorJRL
 
 
     // Compute Z1
-  
-    double c0=0.0,s0= 0.0;
-    double SquareOmega0 = m_Omegaj[0]*m_Omegaj[0];
-
     ComputeZ1(rowindex);
     colindex+= m_PolynomialDegrees[0]+3;
 
@@ -444,7 +439,7 @@ namespace PatternGeneratorJRL
     m_w(1) = InitialCoMSpeed;
 
     // For each Position the same sequence
-    for(unsigned int i=0;i<m_NumberOfIntervals;i++)
+    for(int i=0;i<m_NumberOfIntervals;i++)
       {
 	unsigned int lindex=6*i+2;
 	if (i!=m_NumberOfIntervals-1)
@@ -629,6 +624,7 @@ namespace PatternGeneratorJRL
 					 COMPosition & lStartingCOMPosition)
   {
     cout << "To be implemented" << endl;
+    return 0;
   }
 
   void AnalyticalMorisawaFull::OnLine(double time,
@@ -677,7 +673,7 @@ namespace PatternGeneratorJRL
     lV.resize(m_NumberOfIntervals);
     lW.resize(m_NumberOfIntervals);
 
-    for(unsigned int i=0;i<m_NumberOfIntervals;i++)
+    for(int i=0;i<m_NumberOfIntervals;i++)
       {
 	Polynome * aPolynome=0;
 	aAZCT.GetFromListOfCOGPolynomials(i,aPolynome);

@@ -198,7 +198,8 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   m_RightFootPositions->pop_front();
   
   m_CurrentWaistState = outWaistPosition;
-  
+
+  return 0;
 }
 
 int DoubleStagePreviewControlStrategy::EvaluateStartingState(MAL_VECTOR( &,double) BodyAngles,
@@ -217,6 +218,7 @@ int DoubleStagePreviewControlStrategy::EvaluateStartingState(MAL_VECTOR( &,doubl
   aStartingCOMPosition.x[0] = lStartingCOMPosition(0);
   aStartingCOMPosition.y[0] = lStartingCOMPosition(1);
   aStartingCOMPosition.z[0] = lStartingCOMPosition(2);
+  return 0;
 }
 
 int DoubleStagePreviewControlStrategy::EndOfMotion()
