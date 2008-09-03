@@ -564,7 +564,7 @@ int main(int argc, char *argv[])
 
   for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
     {
-      StrangeStartingPosition(*aPGI);
+      //StrangeStartingPosition(*aPGI);
       /*
       if (lNbIt==1)
 	TestNewPG1(*aPGI);
@@ -572,7 +572,7 @@ int main(int argc, char *argv[])
 	TestNewPG2(*aPGI);
       */
       // SteppingOver(*aPGI);
-      // ShortStraightWalking(*aPGI);
+      ShortStraightWalking(*aPGI);
       // CurvedWalkingPBW2(*aPGI);
       // KineoWorks(*aPGI);
       // StraightWalking(*aPGI);
