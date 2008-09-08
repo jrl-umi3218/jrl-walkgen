@@ -196,6 +196,7 @@ namespace PatternGeneratorJRL
       @param[in] lDt: Vector describing the hip configuration.
       @param[in] aCoMPosition: Position of the CoM.
       @param[in] ToTheHip: Vector to go from the Waist to the Hip.
+      @param[in] LeftOrRight: -1 for the right leg, 1 for the left.
       @param[out] lq : Values of the leg which realize the position asked for.
      */
     bool KinematicsForOneLeg(MAL_S3x3_MATRIX(,double) & Body_R,
@@ -204,7 +205,8 @@ namespace PatternGeneratorJRL
 			     MAL_S3_VECTOR(,double) &lDt,
 			     MAL_VECTOR(,double) &aCoMPosition,
 			     MAL_S3_VECTOR(,double) &ToTheHip,
-			     MAL_VECTOR(,double) &lq);
+			     int LeftOrRight,
+			     MAL_VECTOR(,double) &lq );
     
     /*! Compute the angles values considering two 6DOF legs for a given configuration
       of the waist and of the feet:
@@ -299,8 +301,11 @@ namespace PatternGeneratorJRL
     /*! Final COM pose. */
     MAL_S4x4_MATRIX(m_FinalDesiredCOMPose,double);
       
-    /*! Store the distance between the ankle and the soil. */
-    double m_AnkleSoilDistance;
+    /*! Store the position of the ankle in the right feet. */
+    MAL_S3_VECTOR(m_AnklePositionRight,double);
+
+    /*! Store the position of the ankle in the left feet. */
+    MAL_S3_VECTOR(m_AnklePositionLeft,double);
         
     /*! Difference between the CoM and the Waist 
       from the initialization phase,

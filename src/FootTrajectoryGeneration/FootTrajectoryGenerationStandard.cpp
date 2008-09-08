@@ -28,12 +28,16 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <iostream>
+#include <fstream>
 #include <walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) std::cerr << "FootTrajectoryGenerationStandard :" << x << std::endl
 #define RESETDEBUG5(y) { std::ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG5(x,y) { std::ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "PGI: " << x << endl; DebugFile.close();}
+#define ODEBUG5(x,y) { std::ofstream DebugFile; \
+    DebugFile.open(y,ofstream::app); \
+    DebugFile << "PGI: " << x << endl; \
+    DebugFile.close();}
 #if 0
 #define ODEBUG(x) std::cerr << "FootTrajectoryGenerationStandard :" <<  x << std::endl
 #else
@@ -73,10 +77,27 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   m_HS->GetFootSize(-1,lDepth,lWidth,lHeight);
   double AnklePosition[3];
   m_HS->GetAnklePosition(-1,AnklePosition);
-  m_FootB = AnklePosition[0];
-  m_FootH = AnklePosition[2];
+
+  /*! Compute information for omega. */
+  m_FootB =  AnklePosition[0];
+  m_FootH = m_AnklePositionRight[2] = AnklePosition[2];
+  m_AnklePositionRight[1] = AnklePosition[1];
   m_FootF = lDepth-AnklePosition[0];
 
+  m_AnklePositionRight[0] = -lDepth*0.5 + AnklePosition[0];
+  m_AnklePositionRight[1] = lWidth*0.5 - AnklePosition[1];
+  m_AnklePositionRight[2] = AnklePosition[2];
+  
+  /* Compute Left foot coordinates */
+  m_HS->GetAnklePosition(1,AnklePosition);
+  m_HS->GetFootSize(1,lDepth,lWidth,lHeight);
+
+  m_AnklePositionLeft[0] = -lDepth*0.5 + AnklePosition[0];
+  m_AnklePositionLeft[1] = -lWidth*0.5 + AnklePosition[1];
+  m_AnklePositionLeft[2] = AnklePosition[2];
+
+
+  RESETDEBUG4("GeneratedFoot.dat");
 }
 
 FootTrajectoryGenerationStandard::~FootTrajectoryGenerationStandard()
@@ -259,7 +280,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 							  int CurrentAbsoluteIndex,  
 							  int IndexInitial, 
 							  double ModulatedSingleSupportTime,
-							  int StepType)
+							  int StepType, int LeftOrRight)
 {
   unsigned int k = CurrentAbsoluteIndex - IndexInitial;
   // Local time
@@ -355,6 +376,8 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   double dFX=0,dFY=0,dFZ=0;
   double lOmega = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega*M_PI/180.0;
   double lTheta = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta*M_PI/180.0;
+  double c = cos(lTheta);
+  double s = sin(lTheta);
 
   //  if (ProtectionNeeded)
   {
@@ -380,8 +403,6 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 	dX = (F - X1 + X2);
 	dFZ = Z1 + Z2 - H;
       }
-    double c = cos(lTheta);
-    double s = sin(lTheta);
     dFX = c*dX;
     dFY = s*dX;
   }
@@ -392,11 +413,44 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   aoflocal << dFX << " " << dFY << " " << dFZ << " " << lOmega << endl;
   aoflocal.close();
 #endif
+  MAL_S3_VECTOR(Foot_Shift,double);
+#if 0
+  double co,so;
+
+  co = cos(lOmega);
+  so = sin(lOmega);
+  
+  // COM Orientation
+  MAL_S3x3_MATRIX(Foot_R,double);
+
+  Foot_R(0,0) = c*co;        Foot_R(0,1) = -s;      Foot_R(0,2) = c*so;
+  Foot_R(1,0) = s*co;        Foot_R(1,1) =  c;      Foot_R(1,2) = s*so;
+  Foot_R(2,0) = -so;         Foot_R(2,1) = 0;       Foot_R(2,2) = co;
+
+  if (LeftOrRight==-1)
+    {
+      MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionRight);
+    }
+  else if (LeftOrRight==1)
+    MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionLeft);
 
   // Modification of the foot position.
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x += dFX;
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y += dFY;
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z += dFZ;
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x += (dFX + Foot_Shift(0));
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y += (dFY + Foot_Shift(1));
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z += (dFZ + Foot_Shift(2));
+#else
+  // Modification of the foot position.
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x += dFX ;
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y += dFY ;
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z += dFZ ;
+#endif
+  
+  ODEBUG4( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift 
+	   << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )" 
+	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x << " "
+	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y << " "
+	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z << " "
+	   ,"GeneratedFoot.dat");
 
 }
 

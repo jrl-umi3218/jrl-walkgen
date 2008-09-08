@@ -128,7 +128,8 @@ namespace PatternGeneratorJRL
 	  current situation. */
       void UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
 			      deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
-			      int index, int k, int indexinitial, double ModulationSupportTime,int StepType);
+			      int index, int k, int indexinitial, double ModulationSupportTime,int StepType,
+			      int LeftOrRight);
 
       /*! IIR filtering of ZMP Position X put in ZMP Position Y. */
       void FilterZMPRef(deque<ZMPPosition> &ZMPPositionsX,

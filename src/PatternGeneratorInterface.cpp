@@ -329,7 +329,6 @@ namespace PatternGeneratorJRL {
 
     m_ComAndFootRealization->setSamplingPeriod(m_PC->SamplingPeriod());
 
-
     m_ComAndFootRealization->SetStepStackHandler(m_StepStackHandler);
 
     m_ComAndFootRealization->Initialization();
@@ -607,7 +606,7 @@ namespace PatternGeneratorJRL {
     // Copy the relative foot position from the stack handler to here.
     m_StepStackHandler->CopyRelativeFootPosition(lRelativeFootPositions,ClearStepStackHandler);
     ODEBUG4("Size of lRelativeFootPositions: " << lRelativeFootPositions.size(),"DebugData.txt");
-    for(int i=0;i<lRelativeFootPositions.size();i++)
+    for(unsigned int i=0;i<lRelativeFootPositions.size();i++)
       {
 	ODEBUG(lRelativeFootPositions[i].sx << " " << 
 		lRelativeFootPositions[i].sy << " " <<  
@@ -759,7 +758,7 @@ namespace PatternGeneratorJRL {
     COMPosition lStartingCOMPosition;	
     MAL_VECTOR( BodyAnglesIni,double);
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
-    struct timeval begin, end, time1, time2, time3, time4, time5, time6;
+    struct timeval begin, end, time4, time5;
 
     gettimeofday(&begin,0);
 
@@ -1055,7 +1054,6 @@ namespace PatternGeneratorJRL {
 
     m_InternalClock+=m_SamplingPeriod;
 
-    long int u=0;
     if ((!m_ShouldBeRunning) ||
 	(m_GlobalStrategyManager->EndOfMotion()<0))
       {
@@ -1121,7 +1119,11 @@ namespace PatternGeneratorJRL {
     ODEBUG4("CurrentWaistState: " 
 	    << m_CurrentWaistState.x[0] << " " 
 	    << m_CurrentWaistState.y[0] << " " 
-	    << m_CurrentWaistState.z[0] << " ","DebugDataWaist.dat" );
+	    << m_CurrentWaistState.z[0] << " "
+	    << m_CurrentWaistState.roll << " "
+	    << m_CurrentWaistState.pitch << " "
+	    << m_CurrentWaistState.yaw,
+	    "DebugDataWaist.dat" );
 
     bool UpdateAbsMotionOrNot = false;
 
@@ -1146,8 +1148,6 @@ namespace PatternGeneratorJRL {
 	    // Remove the previous step.
 	    bool EndSequence = m_StepStackHandler->RemoveFirstStepInTheStack();
 
-	    // Create the new values for the ZMP and feet trajectories queues.
-	    int beforesize = m_ZMPPositions.size();
 
 	    ODEBUG("Asking a new step");
 	    
@@ -1181,10 +1181,6 @@ namespace PatternGeneratorJRL {
 			<< m_RightFootPositions.size() );
 	      }
 	    // ************* THIS HAS TO FIT INSIDE THE control step time  ***********
-	    int aftersize = m_ZMPPositions.size();
-
-	    // Create the new values for the COM and Upper body positions queues.
-	    //ExpandCOMPositionsQueues(aftersize-beforesize);
 
 	  }
 	else
@@ -1232,8 +1228,8 @@ namespace PatternGeneratorJRL {
     MAL_VECTOR_DIM(qArmr,double,7);
     MAL_VECTOR_DIM(qArml,double,7);
 
-    int LINKSFORRLEG[6] = { 0, 1, 2, 3,  4, 5};
-    int LINKSFORLLEG[6] = { 6, 7, 8, 9, 10, 11};
+    //    int LINKSFORRLEG[6] = { 0, 1, 2, 3,  4, 5};
+    //    int LINKSFORLLEG[6] = { 6, 7, 8, 9, 10, 11};
     //    int LINKSFORRARM[6] = { 16, 17, 18, 19, 20, 21};
     //    int LINKSFORLARM[6] = { 23, 24, 25, 26, 27, 28};
 
@@ -1730,7 +1726,7 @@ namespace PatternGeneratorJRL {
     MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 3,2) = 0.0;
     MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 3,3) = 1.0;
 
-    double thetarad = m_CurrentWaistState.yaw*M_PI/180.0;
+    double thetarad = m_CurrentWaistState.yaw;
     double c = cos(thetarad);
     double s = sin(thetarad);
 
@@ -1937,6 +1933,7 @@ namespace PatternGeneratorJRL {
 	ODEBUG("ZMPCOM_MORISAWA_2007 " << m_ZMPPositions.size() );
 	//	m_ZMPM->GetComBuffer(m_COMBuffer);
       }
+    return 0;
   }
   
   void PatternGeneratorInterface::AddStepInStack(double dx, double dy, double theta)

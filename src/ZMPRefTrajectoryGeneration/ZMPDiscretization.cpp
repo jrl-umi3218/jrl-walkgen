@@ -235,7 +235,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   CurrentRightFootAbsPos.time = 0.0;
 
   
-  ODEBUG3("CurrentLeftFootAbsPos:  ( " << CurrentLeftFootAbsPos.x <<  " , "
+  ODEBUG("CurrentLeftFootAbsPos:  ( " << CurrentLeftFootAbsPos.x <<  " , "
 	  << CurrentLeftFootAbsPos.y <<  " , " << CurrentLeftFootAbsPos.theta <<  " )( "
 	  " CurrentRightFootAbsPos: (" << CurrentRightFootAbsPos.x <<  " , "
 	  << CurrentRightFootAbsPos.y <<  " , " << CurrentRightFootAbsPos.theta <<  " ) " 
@@ -247,9 +247,9 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   // Initialize who is support foot.
   double CurrentZMPTheta=0;
   CurrentZMPTheta = (CurrentRightFootAbsPos.theta + CurrentLeftFootAbsPos.theta)/2.0;
-  cout << "CurrentZMPTheta at start: " << CurrentZMPTheta << " " 
+  ODEBUG("CurrentZMPTheta at start: " << CurrentZMPTheta << " " 
        << CurrentRightFootAbsPos.theta << " " 
-       << CurrentLeftFootAbsPos.theta <<endl;
+	 << CurrentLeftFootAbsPos.theta);
   if (RelativeFootPositions[0].sy < 0 )
     {
       WhoIsSupportFoot = -1;//Right
@@ -264,7 +264,6 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
       vdiffsupppre(1,0) = -CurrentRightFootAbsPos.y + CurrentLeftFootAbsPos.y;
       CurrentTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
     }
-  cout << "vdiffsupppre : " << vdiffsupppre(0,0) << " " << vdiffsupppre(1,0) << endl;
   
   ODEBUG4("Step 2","DebugData.txt");
 
@@ -563,7 +562,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	  NextTheta=0.0;
 	  lStepHeight = 0.0;
 	}
-#if 1
+#if 0
       cout << "vrel: " << vrel(0,0) << " " << vrel(1,0) << endl;
       cout << "vdiffsupp: " << vdiffsupp(0,0) << " " << vdiffsupp(1,0) << endl;
       cout << "vdiffsupppre: " << vdiffsupppre(0,0) << " " << vdiffsupppre(1,0) << endl;
@@ -677,7 +676,8 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 								     RightFootAbsolutePositions,
 								     CurrentZMPindex,indexinitial,
 								     ModulatedSingleSupportTime,
-								     RelativeFootPositions[i+1].stepType);
+								     RelativeFootPositions[i+1].stepType,
+								     -1);
 	      SignLHAND=1;
 	      SignRHAND=-1;
 	    }
@@ -687,7 +687,8 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 								     LeftFootAbsolutePositions,
 								     CurrentZMPindex,indexinitial,
 								     ModulatedSingleSupportTime,
-								     RelativeFootPositions[i+1].stepType);
+								     RelativeFootPositions[i+1].stepType,
+								     1);
 	      SignLHAND=-1;
 	      SignRHAND=1;
 	      
@@ -818,7 +819,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 
   FilterZMPRef(ZMPPositions,FinalZMPPositions);
   FinalCOMPositions.resize(FinalZMPPositions.size());
-  cout << "FinalZMPPositions.size(): " <<FinalZMPPositions.size() <<endl;
+  ODEBUG("FinalZMPPositions.size(): " <<FinalZMPPositions.size());
 }
 
 
@@ -1420,7 +1421,8 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 								 RightFootAbsolutePositions,
 								 CurrentZMPindex,indexinitial,
 								 ModulatedSingleSupportTime,
-								 m_RelativeFootPositions[1].stepType);
+								 m_RelativeFootPositions[1].stepType,
+								 -1);
 	  SignLHAND=1;
 	  SignRHAND=-1;
 	}
@@ -1430,7 +1432,8 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 								 LeftFootAbsolutePositions,
 								 CurrentZMPindex,indexinitial,
 								 ModulatedSingleSupportTime,
-								 m_RelativeFootPositions[1].stepType);
+								 m_RelativeFootPositions[1].stepType,
+								 1);
 	  SignLHAND=-1;
 	  SignRHAND=1;
 	      

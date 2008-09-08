@@ -4,7 +4,7 @@
 	<SizeX> 0.2172 </SizeX>
 	<SizeY> 0.138 </SizeY>
         <SizeZ> 0.105 </SizeZ>
-        <AnklePosition> 0.059 0.0933 0.105 </AnklePosition>
+        <AnklePosition> 0.0933 0.059 0.105 </AnklePosition>
         <JointNb> 2 </JointNb>
         <JointsID> 4 5 </JointsID>
     </Right>
@@ -12,7 +12,7 @@
 	<SizeX> 0.2172 </SizeX>
 	<SizeY> 0.138 </SizeY>
         <SizeZ> 0.105 </SizeZ>
-        <AnklePosition>0.059 0.0933 0.105</AnklePosition>
+        <AnklePosition>0.0933 0.059 0.105</AnklePosition>
         <JointNb> 2 </JointNb>
         <JointsID> 10 11 </JointsID>
     </Left>

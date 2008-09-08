@@ -99,7 +99,7 @@ namespace PatternGeneratorJRL
 				   int CurrentAbsoluteIndex,  
 				   int IndexInitial, 
 				   double ModulatedSingleSupportTime,
-				   int StepType);
+				   int StepType,int LeftOrRight);
    
    /*! Initialize internal data structures.
      In this specific case, it is in charge of creating the polynomial structures.
@@ -178,6 +178,14 @@ namespace PatternGeneratorJRL
 
    /*! \brief Foot dimension. */
    double m_FootB, m_FootH, m_FootF;
+
+   /*! \brief Position of the ankle in the left foot. */
+   MAL_S3_VECTOR(m_AnklePositionLeft,double);
+
+   /*! \brief Position of the ankle in the right foot. */
+   MAL_S3_VECTOR(m_AnklePositionRight,double);
+
+   
 
   };
   

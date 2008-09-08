@@ -1336,7 +1336,7 @@ namespace PatternGeneratorJRL
     lW.resize(m_NumberOfIntervals);
 
 
-    for(unsigned int i=0;i<m_NumberOfIntervals-1;i++)
+    for(int i=0;i<m_NumberOfIntervals-1;i++)
       {
 	lV[i] = m_y[lindex++];
 	lW[i] = m_y[lindex++];
@@ -1397,7 +1397,7 @@ namespace PatternGeneratorJRL
   {
 
     // The Index Step can be equal to m_NumberOfIntervals.
-    if (IndexStep<m_NumberOfIntervals)
+    if ((int)IndexStep<m_NumberOfIntervals)
       
       if (m_StepTypes[IndexStep]!=DOUBLE_SUPPORT)
 	{
@@ -1447,7 +1447,7 @@ namespace PatternGeneratorJRL
     m_DeltaTj[0] = NewTime;
     m_StepTypes[0] = m_StepTypes[IndexStartingInterval];
 
-    for(unsigned int i=1;i<m_NumberOfIntervals;i++)
+    for(int i=1;i<m_NumberOfIntervals;i++)
       {
 	if (m_StepTypes[i-1]==DOUBLE_SUPPORT)
 	  {
@@ -1479,7 +1479,7 @@ namespace PatternGeneratorJRL
     if (IndexStartingInterval!=0)
       {
 	/* Shift the current value of the profil. */
-	unsigned int i,j;
+	int i,j;
 	for(i=IndexStartingInterval,j=0;i<m_NumberOfIntervals;i++,j++)
 	  {
 	    /* Shift the ZMP profil */
@@ -1679,7 +1679,7 @@ namespace PatternGeneratorJRL
 
     
     /* If the end condition has been changed... */
-    if (IndexStep+1==m_NumberOfIntervals-1)
+    if ((int)IndexStep+1==m_NumberOfIntervals-1)
       {
 	aCTIPX.FinalCoMPos = NewFootAbsPos.x;
 	aCTIPY.FinalCoMPos = NewFootAbsPos.y;
@@ -1738,7 +1738,7 @@ namespace PatternGeneratorJRL
 
     /* ! This part of the code is not used if we are just trying to add
        a foot step. */
-    if (IndexStep<m_NumberOfIntervals)
+    if ((int)IndexStep<m_NumberOfIntervals)
       {
 	/* Compute the time of maximal fluctuation for the initial solution along the X axis.*/
 	Tmax = aAZCTX.FluctuationMaximal();
@@ -1765,7 +1765,7 @@ namespace PatternGeneratorJRL
 		       aCTIPX,aCTIPY);
 		
 	/* Recompute the coefficient of the ZMP/COG trajectories objects. */
-	for(unsigned int i=1;i<m_NumberOfIntervals-1;i++)
+	for(int i=1;i<m_NumberOfIntervals-1;i++)
 	  {
 	    aAZCTX.Building3rdOrderPolynomial(i,(*aCTIPX.ZMPProfil)[i-1],(*aCTIPX.ZMPProfil)[i]);
 	    aAZCTY.Building3rdOrderPolynomial(i,(*aCTIPY.ZMPProfil)[i-1],(*aCTIPY.ZMPProfil)[i]);
@@ -1867,7 +1867,7 @@ namespace PatternGeneratorJRL
     aAZCTY.SetStartingTimeIntervalsAndHeightVariation(m_DeltaTj,m_Omegaj);
     
     /* Recompute the coefficient of the ZMP/COG trajectories objects. */
-    for(unsigned int i=1;i<m_NumberOfIntervals-1;i++)
+    for(int i=1;i<m_NumberOfIntervals-1;i++)
       {
 	aAZCTX.Building3rdOrderPolynomial(i,(*aCTIPX.ZMPProfil)[i-1],(*aCTIPX.ZMPProfil)[i]);
 	aAZCTY.Building3rdOrderPolynomial(i,(*aCTIPY.ZMPProfil)[i-1],(*aCTIPY.ZMPProfil)[i]);
@@ -1948,7 +1948,7 @@ namespace PatternGeneratorJRL
     RESETDEBUG4("ProfilZMPError.dat");
     for(double lx=0;lx<m_DeltaTj[0]+2*PreviewWindowTime;lx+=m_SamplingPeriod)
       {
-	double r=0.0,lZMP;
+	double r=0.0;
 	if (lx<m_DeltaTj[0])
 	  {
 	    double lZMP;

@@ -113,7 +113,7 @@ namespace PatternGeneratorJRL
 				    int CurrentAbsoluteIndex,  
 				    int IndexInitial, 
 				    double ModulatedSingleSupportTime,
-				    int StepType)=0;
+				    int StepType, int LeftOrRight)=0;
 
     /*! Initialize internal data structures. */
     virtual void InitializeInternalDataStructures()=0;

@@ -470,9 +470,10 @@ int main(int argc, char *argv[])
 #endif
 
   // Normal position - New half sitting 
-#if 0
+#if 1
   double dInitPos[40] = { 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
+    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 
+    0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
 
     0.0, 0.0, 0.0, 0.0, // chest and head
 
@@ -484,6 +485,7 @@ int main(int argc, char *argv[])
   };
 #endif
 
+#if 0
 // Strange position 1
   double dInitPos[40] = 
     {
@@ -496,7 +498,7 @@ int main(int argc, char *argv[])
       -10.0,  10.0, -10.0,  10,   -10.0, 
       -10.0,  10.0, -10.0,  10.0, -10.0 
     };
-#if 0
+
   double dInitPos[40] = 
     {
       -7.16197, -7.69299, -16.1787, 44.5201, -28.3415,  7.69299, 
@@ -666,8 +668,9 @@ int main(int argc, char *argv[])
   aof.close();
 
   delete aPGI;
-
+  /*
   cout << "Number of iterations " << NbOfIt << " " << NbOfItToCompute << endl;
   cout << "Time consumption: " << (double)totaltime/(double)NbOfItToCompute << " max time: " << maxtime <<endl;
   cout << "Time for modif: " << timemodif << endl;
+  */
 }
