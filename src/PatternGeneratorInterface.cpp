@@ -190,6 +190,7 @@ namespace PatternGeneratorJRL {
     m_NewStep = false;
     m_ShouldBeRunning = false;
 
+    m_AbsMotionTheta = 0;
     m_InternalClock = 0.0;
 
   }
@@ -390,6 +391,12 @@ namespace PatternGeneratorJRL {
 
     if (m_FeetTrajectoryGenerator!=0)
       delete m_FeetTrajectoryGenerator;
+
+    if (m_DoubleStagePCStrategy!=0)
+      delete m_DoubleStagePCStrategy;
+
+    if (m_CoMAndFootOnlyStrategy!=0)
+      delete m_CoMAndFootOnlyStrategy;
   }
 
   void PatternGeneratorInterface::m_SetObstacleParameters(istringstream &strm)

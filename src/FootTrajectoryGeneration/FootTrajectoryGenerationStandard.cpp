@@ -96,13 +96,28 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   m_AnklePositionLeft[1] = -lWidth*0.5 + AnklePosition[1];
   m_AnklePositionLeft[2] = AnklePosition[2];
 
-
   RESETDEBUG4("GeneratedFoot.dat");
 }
 
 FootTrajectoryGenerationStandard::~FootTrajectoryGenerationStandard()
 {
+  if (m_PolynomeX!=0)
+    delete m_PolynomeX;
   
+  if (m_PolynomeY!=0)
+    delete m_PolynomeY;
+
+  if (m_PolynomeZ!=0)
+    delete m_PolynomeZ;
+
+  if (m_PolynomeOmega!=0)
+    delete m_PolynomeOmega;
+
+  if (m_PolynomeOmega2!=0)
+    delete m_PolynomeOmega2;
+
+  if (m_PolynomeTheta!=0)
+    delete m_PolynomeTheta;
 }
 
 void FootTrajectoryGenerationStandard::InitializeInternalDataStructures()
@@ -352,7 +367,6 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   // First treat the lift-off.
   if (LocalTime<EndOfLiftOff)
     {
-      //cerr << " Case 1 " ;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
 	m_PolynomeOmega->Compute(LocalTime) ;      
       ProtectionNeeded=true;
@@ -360,26 +374,25 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   // Prepare for the landing.
   else if (LocalTime<StartLanding)
     {
-      //      cerr << " Case 2 " ;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
 	m_Omega - m_PolynomeOmega2->Compute(LocalTime-EndOfLiftOff);
     }
   // Realize the landing.
   else 
     {
-      //      cerr << " Case 3 " ;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
 	m_PolynomeOmega->Compute(LocalTime - StartLanding)  - m_Omega;
       ProtectionNeeded=true;
     }
-
   double dFX=0,dFY=0,dFZ=0;
-  double lOmega = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega*M_PI/180.0;
-  double lTheta = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta*M_PI/180.0;
+  double lOmega = 0.0;
+  lOmega = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega*M_PI/180.0;
+  double lTheta = 0.0;
+  lTheta = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta*M_PI/180.0;
+
   double c = cos(lTheta);
   double s = sin(lTheta);
 
-  //  if (ProtectionNeeded)
   {
     // Make sure the foot is not going inside the floor.
     double dX=0,Z1=0,Z2=0,X1=0,X2=0;

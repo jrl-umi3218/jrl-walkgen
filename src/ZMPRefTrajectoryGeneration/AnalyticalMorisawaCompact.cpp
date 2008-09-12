@@ -127,14 +127,17 @@ namespace PatternGeneratorJRL
 
   AnalyticalMorisawaCompact::~AnalyticalMorisawaCompact()
   {
-    // Display the clock for some part of the code.
-    cout << "Part of the foot position computation + queue handling." << endl;
-    m_Clock1.Display();
-    cout << "Part of the foot change landing position" << endl;
-    m_Clock2.Display();
-    cout << "Part on the analytical ZMP COG trajectories and foot polynomial computation" << endl;
-    m_Clock3.Display();
-
+    if (m_VerboseLevel>2)
+      {
+	// Display the clock for some part of the code.
+	cout << "Part of the foot position computation + queue handling." << endl;
+	m_Clock1.Display();
+	cout << "Part of the foot change landing position" << endl;
+	m_Clock2.Display();
+	cout << "Part on the analytical ZMP COG trajectories and foot polynomial computation" << endl;
+	m_Clock3.Display();
+      }
+    
     if (m_AnalyticalZMPCoGTrajectoryX!=0)
       delete m_AnalyticalZMPCoGTrajectoryX;
 
@@ -477,7 +480,7 @@ namespace PatternGeneratorJRL
       }
 
     /*! Build 3rd order polynomials. */
-    for(unsigned int i=1;i<NbOfIntervals-1;i++)
+    for(int i=1;i<NbOfIntervals-1;i++)
       {
 	m_AnalyticalZMPCoGTrajectoryX->Building3rdOrderPolynomial(i,(*lZMPX)[i-1],(*lZMPX)[i]);
 	m_AnalyticalZMPCoGTrajectoryY->Building3rdOrderPolynomial(i,(*lZMPY)[i-1],(*lZMPY)[i]);
@@ -554,9 +557,6 @@ namespace PatternGeneratorJRL
     ODEBUG("m_SampligPeriod: " << m_SamplingPeriod);
     ODEBUG("m_PreviewControlTime: " << m_PreviewControlTime);
 
-    double lSizeOfArray = m_PreviewControlTime / m_SamplingPeriod;
-    ODEBUG(lSizeOfArray);
-
     for(double t=0.0; t<m_PreviewControlTime; t+= 0.005)
       {
 	/*! Feed the ZMPPositions. */
@@ -617,7 +617,7 @@ namespace PatternGeneratorJRL
 	  lMStartingCOMPosition(i,j)= 0.0;
       }
     
-    for(int i=0;i< maxrelsteps;i++)
+    for(unsigned int i=0;i< maxrelsteps;i++)
       m_RelativeFootPositions.push_back(RelativeFootPositions[i]);
     
     if (m_RelativeFootPositions[0].sy < 0)
@@ -643,12 +643,7 @@ namespace PatternGeneratorJRL
 	cerr<< "Error: Humanoid Specificities not initialized. " << endl;
 	return -1;
       }
-    
-
-    
-    double lSizeOfArray = m_PreviewControlTime / m_SamplingPeriod;
-    ODEBUG(lSizeOfArray);
-    
+       
     ODEBUG( " t1: " << m_Tsingle*2 << " t2: " << 4*m_Tsingle+m_Tdble <<
 	     " t1: " << m_Tsingle*2/m_SamplingPeriod << " t2: " << (4*m_Tsingle+m_Tdble)/m_SamplingPeriod );
 
@@ -792,7 +787,6 @@ namespace PatternGeneratorJRL
   {
     ODEBUG("****************** Begin OnLineAddFoot **************************");
 
-    double NewPosX, NewPosY;
     unsigned int IndexLastZMPProfil = m_CTIPX.ZMPProfil->size();//m_CTIPX.ZMPProfil->size()-2;
 
     // The strategy is simple: we trigger a false modification of the last
@@ -972,7 +966,7 @@ namespace PatternGeneratorJRL
     // Just be carefull:
     // at iteration j, we still build m_w for the 
     // interval j-1.
-    for(unsigned int j=1;j<m_NumberOfIntervals;j++)
+    for(int j=1;j<m_NumberOfIntervals;j++)
       {
 	// Takes back the polynomial needed to compute m_w.
 	Polynome *aPolynomeNext,*aPolynome;
@@ -1133,16 +1127,14 @@ namespace PatternGeneratorJRL
   {
     // First row : Connection of the position of the CoM 
     double Omegaj=m_Omegaj[intervalindex];
-    double SquareOmegaj=Omegaj*Omegaj;
     double Omegam=m_Omegaj[m_NumberOfIntervals-1];
     
     
-    double Deltat = m_DeltaTj[intervalindex];  
     double c0=0.0,s0=0.0;
     m_Z(rowindex,colindex) = c0 = cosh(Omegaj * m_DeltaTj[intervalindex]);
     m_Z(rowindex,colindex+1) = s0 = sinh(Omegaj * m_DeltaTj[intervalindex]);
 
-    if (intervalindex!=m_NumberOfIntervals-2)
+    if ((int)intervalindex!=m_NumberOfIntervals-2)
       {  
 	m_Z(rowindex,colindex+2) = -1.0;
       }
@@ -1156,7 +1148,7 @@ namespace PatternGeneratorJRL
     // Second row : Connection of the velocity of the CoM  
     m_Z(rowindex,colindex) = Omegaj * s0;
     m_Z(rowindex,colindex+1) = Omegaj * c0;
-    if (intervalindex!=m_NumberOfIntervals-2)
+    if ((int)intervalindex!=m_NumberOfIntervals-2)
       m_Z(rowindex,colindex+3) = -Omegaj;
     else
       {
@@ -1233,7 +1225,7 @@ namespace PatternGeneratorJRL
   void AnalyticalMorisawaCompact::BuildingTheZMatrix(vector<double> &lCoM, vector<double> &lZMP )
   {
 
-    if ((lCoM.size()!=m_NumberOfIntervals) || (lZMP.size()!=m_NumberOfIntervals))
+    if (((int)lCoM.size()!=m_NumberOfIntervals) || ((int)lZMP.size()!=m_NumberOfIntervals))
       return;
 
     for(unsigned int i=0;i<lCoM.size();i++)
@@ -1246,7 +1238,6 @@ namespace PatternGeneratorJRL
   void AnalyticalMorisawaCompact::BuildingTheZMatrix()
   {
     unsigned NbRows, NbCols;
-    unsigned int i,j;
     unsigned int rowindex=0;
     unsigned int colindex=0;
 
@@ -1256,7 +1247,6 @@ namespace PatternGeneratorJRL
     MAL_MATRIX_RESIZE(m_Z,NbRows,NbCols);
 
     // Initial condition for the COG position and the velocity 
-    double c0=0.0,s0= 0.0;
     double SquareOmega0 = m_Omegaj[0]*m_Omegaj[0];
   
     MAL_MATRIX_FILL(m_Z,0.0);
@@ -1479,7 +1469,8 @@ namespace PatternGeneratorJRL
     if (IndexStartingInterval!=0)
       {
 	/* Shift the current value of the profil. */
-	int i,j;
+	int i;
+	unsigned int j;
 	for(i=IndexStartingInterval,j=0;i<m_NumberOfIntervals;i++,j++)
 	  {
 	    /* Shift the ZMP profil */
@@ -1549,7 +1540,6 @@ namespace PatternGeneratorJRL
 	    ODEBUG(" NeededSteps : " << NeededSteps << 
 		    "  " <<aStepStackHandler->ReturnStackSize() << 
 		    " r: " << r);
-	    bool EndSequence = aStepStackHandler->RemoveFirstStepInTheStack();
 
 	    /* Takes the number of Relative Foot Positions needed. */
 	    deque<RelativeFootPosition> lRelativeFootPositions;
@@ -1587,7 +1577,7 @@ namespace PatternGeneratorJRL
 	    /*! Remove the corresponding step from the stack of relative and absolute
 	      foot positions. */
 	    ODEBUG("IndexStartingInterval: " <<IndexStartingInterval << " " << IndexStartingInterval/2);
-	    for(int li=0;li<IndexStartingInterval/2;li++)
+	    for(unsigned int li=0;li<IndexStartingInterval/2;li++)
 	      {
 		m_RelativeFootPositions.pop_front();    
 		m_AbsoluteSupportFootPositions.pop_front();
@@ -1696,6 +1686,7 @@ namespace PatternGeneratorJRL
 			      m_CTIPX,
 			      *m_AnalyticalZMPCoGTrajectoryY,
 			      m_CTIPY,true);
+    return 0;
   }
 							   
   int AnalyticalMorisawaCompact::ChangeFootLandingPosition(double t,
@@ -2064,7 +2055,6 @@ namespace PatternGeneratorJRL
 			      m_CTIPY,true,
 			      aStepStackHandler);
     
-    double LocalTimeFrame = m_CurrentTime - m_AbsoluteTimeReference;
     //unsigned int ControlIndex = (unsigned int)((time - m_CurrentTime)/0.005);
 
 

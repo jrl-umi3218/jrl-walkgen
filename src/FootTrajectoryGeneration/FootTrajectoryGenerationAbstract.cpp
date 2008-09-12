@@ -6,6 +6,7 @@ FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginM
 								   dynamicsJRLJapan::HumanoidSpecificities *aHS) 
   : SimplePlugin(lSPM)
 {
+  m_Omega = 0.0;
   m_HS= aHS;  
   m_SamplingPeriod = 0.005;
 

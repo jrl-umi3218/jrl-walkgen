@@ -309,6 +309,14 @@ void ComAndFootRealizationByGeometry::Initialization()
 
 ComAndFootRealizationByGeometry::~ComAndFootRealizationByGeometry()
 {
+  if (m_WaistPlanner!=0)
+    delete m_WaistPlanner;
+
+  if (m_UpBody!=0)
+    delete m_UpBody;
+
+  if (m_InverseKinematics!=0)
+    delete m_InverseKinematics;
 }
 
 /*! This initialization phase does the following:
@@ -440,7 +448,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   InitRightFootPosition.x = lFootPosition[0];
   InitRightFootPosition.y = lFootPosition[1];
   InitRightFootPosition.z = 0.0;
-  ODEBUG3( "InitRightFootPosition : " << InitRightFootPosition.x << " " << InitRightFootPosition.y );
+  ODEBUG( "InitRightFootPosition : " << InitRightFootPosition.x << " " << InitRightFootPosition.y );
   // We assume that the foot is flat on the floor...
   // Thus
   // lFootPose(0:2,0:2)=
@@ -476,7 +484,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   InitLeftFootPosition.z = 0.0;
   InitLeftFootPosition.theta = 0.0;
 
-  ODEBUG3("InitLeftFootPosition : " << InitLeftFootPosition.x << " " << InitLeftFootPosition.y );
+  ODEBUG("InitLeftFootPosition : " << InitLeftFootPosition.x << " " << InitLeftFootPosition.y );
   // We assume that the foot is flat on the floor...
   // Thus
   // lFootPose(0:2,0:2)=
@@ -506,7 +514,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   m_DiffBetweenComAndWaist[1] =  -lStartingCOMPosition[1];
   m_DiffBetweenComAndWaist[2] =  -lStartingCOMPosition[2]
     -(GetHeightOfTheCoM() + lFootPosition[2] - lStartingCOMPosition[2]);
-  cout << m_DiffBetweenComAndWaist[0] << " " << m_DiffBetweenComAndWaist[1] << " " << m_DiffBetweenComAndWaist[2] << endl;
+  ODEBUG( m_DiffBetweenComAndWaist[0] << " " << m_DiffBetweenComAndWaist[1] << " " << m_DiffBetweenComAndWaist[2]);
   // This term is usefull if
 
   ODEBUG4("m_DiffBetweenComAndWaist :" << m_DiffBetweenComAndWaist,"DebugData.txt");

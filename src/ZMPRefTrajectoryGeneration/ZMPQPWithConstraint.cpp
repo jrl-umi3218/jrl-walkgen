@@ -68,6 +68,8 @@ ZMPQPWithConstraint::ZMPQPWithConstraint(SimplePluginManager *lSPM,
 
 ZMPQPWithConstraint::~ZMPQPWithConstraint()
 {
+  if (m_ZMPD!=0)
+    delete m_ZMPD;
 }
 
 

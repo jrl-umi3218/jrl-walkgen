@@ -80,7 +80,7 @@ DoubleStagePreviewControlStrategy::DoubleStagePreviewControlStrategy(SimplePlugi
 	}
     }
   
-  RESETDEBUG5("ZMPRefAndWaist.dat");
+  RESETDEBUG4("ZMPRefAndWaist.dat");
 }
 
 DoubleStagePreviewControlStrategy::~DoubleStagePreviewControlStrategy()
@@ -176,7 +176,7 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   double temp2;
   double temp3;
 
-  ODEBUG5((*m_ZMPPositions)[0].px <<  " " << 
+  ODEBUG4((*m_ZMPPositions)[0].px <<  " " << 
 	  outWaistPosition.x[0] << " " <<
 	  (*m_ZMPPositions)[0].py << " " <<
 	  outWaistPosition.y[0], "ZMPRefAndWaist.dat");

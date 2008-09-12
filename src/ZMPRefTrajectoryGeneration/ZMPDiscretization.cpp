@@ -319,7 +319,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	 aoflocal << "0.0 0.0 0.0 "<<endl;
 	 aoflocal.close(); */	  
     }
-  // cout << ZMPPositions.size() << " " << CurrentZMPindex << endl;
+
   // Initialization of the foot position.
   ODEBUG4("Step 2.75 " << RelativeFootPositions.size() ,"DebugData.txt");
   double c,s;
@@ -330,7 +330,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   int SupportFootInsideTurn=0;
 
   ODEBUG4("Step 3 "<< RelativeFootPositions.size(),"DebugData.txt");
-  ODEBUG3("Step 3 "<< RelativeFootPositions.size());
+  ODEBUG4("Step 3 "<< RelativeFootPositions.size(),"DebugData.txt");
   for(unsigned int i=0;i<RelativeFootPositions.size()-1;i++)
     {
       if (RelativeFootPositions[i+1].DStime!=0.0)
@@ -338,12 +338,6 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	  m_Tdble =RelativeFootPositions[i+1].DStime; 
 	  m_Tsingle =RelativeFootPositions[i+1].SStime; 
 	}
-      /*
-	if (WhoIsSupportFoot==1)
-	cout << "Left" << endl;
-	else 
-	cout << "Right" << endl;
-      */
       // Compute on the direction of the support foot.
       double stheta = sin(RelativeFootPositions[i+1].theta*M_PI/180.0);     
       // Go to the left
@@ -702,9 +696,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	  CurrentTime += m_SamplingPeriod;
 	  CurrentZMPindex++;
 	}
-      // cout << SignLHAND << " " << SignRHAND << endl;
       //-- End Of Second phase.
-      //      cout << ZMPPositions.size() << " " << CurrentZMPindex << endl;
 
       if (WhoIsSupportFoot==1)
 	WhoIsSupportFoot = -1;//Right
@@ -738,12 +730,11 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
   // We assume that the last positon of the ZMP
   // will the middle of the two last position
   // of the support foot.
-  cout << LeftFootAbsolutePositions[CurrentZMPindex-1].x << " " << RightFootAbsolutePositions[CurrentZMPindex-1].x <<endl;
+  ODEBUG(LeftFootAbsolutePositions[CurrentZMPindex-1].x << " " << RightFootAbsolutePositions[CurrentZMPindex-1].x );
   pxf = (LeftFootAbsolutePositions[CurrentZMPindex-1].x+
 	 RightFootAbsolutePositions[CurrentZMPindex-1].x)/2.0;
   pyf = (LeftFootAbsolutePositions[CurrentZMPindex-1].y+
 	 RightFootAbsolutePositions[CurrentZMPindex-1].y)/2.0;
-  cout << "PX: " << pxf << " PY: " << pyf<< endl;
   
   delta_x = (pxf - px0)/(double)SizeOfEndPhase;
   delta_y = (pyf - py0)/(double)SizeOfEndPhase;
@@ -1550,7 +1541,6 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
 	 RightFootAbsolutePositions[CurrentZMPindex-1].x)/2.0;
   pyf = (LeftFootAbsolutePositions[CurrentZMPindex-1].y+
 	 RightFootAbsolutePositions[CurrentZMPindex-1].y)/2.0;
-  //  cout << "PX: " << pxf << " PY: " << pyf<< endl;
   
   delta_x = (pxf - px0)/(double)SizeOfEndPhase;
   delta_y = (pyf - py0)/(double)SizeOfEndPhase;

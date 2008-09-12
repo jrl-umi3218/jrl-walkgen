@@ -269,8 +269,6 @@ WalkGenJRL::WalkGenJRL(istringstream &strm)
   RESETDEBUG4("DebugZMPFinale.dat");
   RESETDEBUG4("DebugData.txt");
   RESETDEBUG4("DebugWalkGenJRL.txt");
-  RESETDEBUG5("WalkPosQ.txt");
-  RESETDEBUG5("WalkPosZMP.txt");
   m_ShouldBeRunning = false;
 
   m_DebugMode = 0;
@@ -414,34 +412,20 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	  for(unsigned int i=0;i<36;i++)
 	    {
 	      //ref_state->angle[i]=m_CurrentStateFromPG(i+6);
-	      mc->angle[i] = m_CurrentStateFromPG(i+6);
+	      ref_state->angle[i] = m_CurrentStateFromPG(i+6);
 	    }
 
-	  mc->angle[30]=-m_CurrentStateFromPG(22+6);
-	  mc->angle[31]=m_CurrentStateFromPG(22+6);
-	  mc->angle[32]=-m_CurrentStateFromPG(22+6);
-	  mc->angle[33]=m_CurrentStateFromPG(22+6);
-	  mc->angle[34]=-m_CurrentStateFromPG(22+6);
+	  ref_state->angle[30]=-m_CurrentStateFromPG(22+6);
+	  ref_state->angle[31]=m_CurrentStateFromPG(22+6);
+	  ref_state->angle[32]=-m_CurrentStateFromPG(22+6);
+	  ref_state->angle[33]=m_CurrentStateFromPG(22+6);
+	  ref_state->angle[34]=-m_CurrentStateFromPG(22+6);
 
-	  mc->angle[35]=-m_CurrentStateFromPG(22+6);
-	  mc->angle[36]=m_CurrentStateFromPG(22+6);
-	  mc->angle[37]=-m_CurrentStateFromPG(22+6);
-	  mc->angle[38]=m_CurrentStateFromPG(22+6);
-	  mc->angle[39]=-m_CurrentStateFromPG(22+6);
-
-	  {
-	    ofstream DebugFile; 
-	    DebugFile.open("WalkPosQ.txt",ofstream::app);
-	    DebugFile << m_count * 0.005 << " " ;
-	    for(unsigned int i=0;i<40;i++)
-	      {
-		DebugFile << mc->angle[i] << " ";
-	      }
-	    DebugFile << endl;
-	    DebugFile.close();	
-	    
-	    
-	  }
+	  ref_state->angle[35]=-m_CurrentStateFromPG(22+6);
+	  ref_state->angle[36]=m_CurrentStateFromPG(22+6);
+	  ref_state->angle[37]=-m_CurrentStateFromPG(22+6);
+	  ref_state->angle[38]=m_CurrentStateFromPG(22+6);
+	  ref_state->angle[39]=-m_CurrentStateFromPG(22+6);
 	  ODEBUG4( m_CurrentStateFromPG(0+6)*180.0/M_PI 
 		   << " " << m_CurrentStateFromPG(1+6) *180.0/M_PI  
 		   << " " << m_CurrentStateFromPG(2+6) *180.0/M_PI 
@@ -459,24 +443,11 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 
 	  ODEBUG4( ZMPTarget(0) << " " << ZMPTarget(1) << " " << ZMPTarget(2),"Debug5.dat");
 	  //memcpy(ref_state->zmp.get_buffer(),m_zmptarget,sizeof(double)*3);     // just change zmp
-	  mc->zmp[0] = m_zmptarget[0];
-	  mc->zmp[1] = m_zmptarget[1];
-	  mc->zmp[2] = m_zmptarget[2];
+	  ref_state->zmp[0] = m_zmptarget[0];
+	  ref_state->zmp[1] = m_zmptarget[1];
+	  ref_state->zmp[2] = m_zmptarget[2];
 
-	  {
-	    ofstream DebugFile; 
-	    DebugFile.open("WalkPosZMP.txt",ofstream::app);
-	    DebugFile << m_count * 0.005 << " " ;
-	    for(unsigned int i=0;i<3;i++)
-	      {
-		DebugFile << mc->zmp[i] << " " ;
-	      }
-	    DebugFile << endl;
-	    DebugFile.close();	
-	    
-	    
-	  }
-	  //cout << mc->waistPos[2] << " "
+	  //cout << ref_state->waistPos[2] << " "
 	  //<< m_Zc << " " << aCOMPosition.z[0] << endl;
 	  
 	  double aTQ[7],WaistAbsOrientation;
@@ -490,10 +461,10 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 // 	  ref_state->waistPos[1] = aTQ[1];
 // 	  ref_state->waistPos[2] = aTQ[2];
 // 	  ref_state->waistRpy[2] = WaistAbsOrientation;
-	  mc->waistPos[0] = aTQ[0];
-	  mc->waistPos[1] = aTQ[1];
-	  mc->waistPos[2] = aTQ[2];
-	  mc->waistRpy[2] = WaistAbsOrientation;
+	  ref_state->waistPos[0] = aTQ[0];
+	  ref_state->waistPos[1] = aTQ[1];
+	  ref_state->waistPos[2] = aTQ[2];
+	  ref_state->waistRpy[2] = WaistAbsOrientation;
 
 	  //cout << ref_state->waistPos[2] << endl;
 	  ODEBUG4("Go inside 5","DebugData.txt");
@@ -532,7 +503,7 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	  //	  ref_state->waistRpy[2] =m_CurrentWaistState.theta*M_PI/180;
 	  ODEBUG4("Go inside 8","DebugData.txt");
 	  
-	  //m_seq->setReferenceState(ref_state,dt);                              // send seq the next ref_state              
+	  m_seq->setReferenceState(ref_state,dt);                              // send seq the next ref_state              
 	}
 
       if (m_DebugMode>0)

@@ -268,21 +268,21 @@ namespace PatternGeneratorJRL
   void AnalyticalZMPCOGTrajectory::SetCoGHyperbolicCoefficients(vector<double> &lV,
 								vector<double> &lW)
   {
-    if (lV.size()==m_NbOfIntervals)
+    if ((int)lV.size()==m_NbOfIntervals)
       m_V = lV;
-    if (lW.size()==m_NbOfIntervals)
+    if ((int)lW.size()==m_NbOfIntervals)
       m_W = lW;
   }
 
   void AnalyticalZMPCOGTrajectory::SetStartingTimeIntervalsAndHeightVariation(vector<double> &lTj,
 									      vector<double> &lomegaj)
   {
-    if (lTj.size()==m_NbOfIntervals)
+    if ((int)lTj.size()==m_NbOfIntervals)
       {
 	m_DeltaTj = lTj;
 	m_RefTime.resize(lTj.size());
 	double reftime = 0;
-	for(int j=0;j<m_DeltaTj.size();j++)
+	for(unsigned int j=0;j<m_DeltaTj.size();j++)
 	  {
 	    m_RefTime[j] = reftime;
 	    reftime += m_DeltaTj[j];
@@ -290,7 +290,7 @@ namespace PatternGeneratorJRL
       }
     else 
       cerr << "Pb while initializing the time intervals. " << lTj.size() << " " << m_NbOfIntervals << endl;
-    if (lomegaj.size()==m_NbOfIntervals)
+    if ((int)lomegaj.size()==m_NbOfIntervals)
       m_omegaj = lomegaj;
     else 
       cerr << "Pb while initializing the omega " <<endl;
@@ -298,7 +298,7 @@ namespace PatternGeneratorJRL
 
   void AnalyticalZMPCOGTrajectory::SetPolynomialDegrees(vector<unsigned int> &lPolynomialDegree)
   {
-    if (lPolynomialDegree.size()==m_NbOfIntervals)
+    if ((int)lPolynomialDegree.size()==m_NbOfIntervals)
       m_PolynomialDegree=lPolynomialDegree;
   
     for(unsigned int i=0;i<m_PolynomialDegree.size();i++)
@@ -347,7 +347,7 @@ namespace PatternGeneratorJRL
   {
     aPoly = 0;
 
-    if ((j>=0) && (j<m_NbOfIntervals))
+    if ((int)j<m_NbOfIntervals)
       {
 	aPoly = m_ListOfCOGPolynomials[j];
 	return true;
@@ -359,7 +359,7 @@ namespace PatternGeneratorJRL
   {
     aPoly = 0;
 
-    if ((j>=0) && (j<m_NbOfIntervals))
+    if ((int)j<m_NbOfIntervals)
       {
 	aPoly = m_ListOfZMPPolynomials[j];
 	return true;
@@ -396,7 +396,7 @@ namespace PatternGeneratorJRL
   void AnalyticalZMPCOGTrajectory::TransfertCoefficientsFromCOGTrajectoryToZMPOne(vector<double> &lCoMZ,
 										  vector<double> &lZMPZ)
   {
-    for(unsigned int j=0;j<m_NbOfIntervals;j++)
+    for(int j=0;j<m_NbOfIntervals;j++)
       {
 	double lCoMZ2 = lCoMZ[j];
 	double lZMPZ2 = lZMPZ[j];

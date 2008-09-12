@@ -173,8 +173,6 @@ namespace PatternGeneratorJRL
    /*! \brief Polynome for Z axis position. */
    Polynome4 *m_PolynomeZ;
    
-   /*! \brief Omega is the angle with which the foot take off, or lands. */
-   double m_Omega;
 
    /*! \brief Foot dimension. */
    double m_FootB, m_FootH, m_FootF;

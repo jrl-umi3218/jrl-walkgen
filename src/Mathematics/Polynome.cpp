@@ -59,7 +59,7 @@ Polynome::~Polynome()
 
 double Polynome::Compute(double t)
 {
-  double r=0,pt=1;
+  double r=0.0,pt=1.0;
   for(unsigned int i=0;i<m_Coefficients.size();i++)
     {
       r += m_Coefficients[i]*pt;

@@ -44,6 +44,9 @@ InverseKinematics::InverseKinematics(HumanoidSpecificities *aHS)
   m_KneeAngleBound1=30.0*M_PI/180.0; //sets a minimum angle for the knee and protects for overstretch
   m_KneeAngleBoundCos1=cos(m_KneeAngleBound1);  //used during inverse kin calculations
   
+  m_FemurLength=0.25;
+  m_TibiaLength=0.25;
+  
   //m_KneeAngleBound=15.0*M_PI/180.0; //sets a minimum angle for the knee and protects for overstretch
   m_KneeAngleBoundCos2= 1.336;//cos(m_KneeAngleBound2);
 
@@ -52,11 +55,6 @@ InverseKinematics::InverseKinematics(HumanoidSpecificities *aHS)
     {
       m_FemurLength = m_HS->GetFemurLength(-1);
       m_TibiaLength = m_HS->GetTibiaLength(-1);
-    }
-  else
-    {
-      m_FemurLength=0.25;
-      m_TibiaLength=0.25;
     }
   
 }
@@ -176,11 +174,11 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
 							MAL_S3_VECTOR( ,double) &Foot_P,
 							MAL_VECTOR( ,double)&q)
 {
-  double A=m_FemurLength,B=m_TibiaLength,C,c5,q6a;
+  double A=m_FemurLength,B=m_TibiaLength,C=0.0,c5=0.0,q6a=0.0;
   MAL_S3_VECTOR( r,double);
   MAL_S3x3_MATRIX( rT,double);
   MAL_S3x3_MATRIX( Foot_Rt,double);
-  double NormofDt;
+  double NormofDt=0.0;
 
   // New part for the inverse kinematics specific to the HRP-2
   // robot. The computation of rx, ry and rz is different.
@@ -188,7 +186,7 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
   // We compute the position of the body inside the reference
   // frame of the foot.
   MAL_S3_VECTOR( v,double);
-  double theta, psi, Cp;
+  double theta=0.0, psi=0.0, Cp=0.0;
   float OppSignOfDtY = Dt(1) < 0.0 ? 1.0 : -1.0;
 
   Foot_Rt = MAL_S3x3_RET_TRANSPOSE(Foot_R);
