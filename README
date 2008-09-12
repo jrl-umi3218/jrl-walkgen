@@ -12,11 +12,12 @@ Basic Installation
 
 
 To install do the following steps:
+./autogen.sh
 
 mkdir build
 cd build
 
-../configure --prefix=PATH_TO_INSTALL_DIR  
+../configure --prefix=PATH_TO_INSTALL_DIR  --with-boost=BOOSTDIR --with-boost-sandbox=BOOSTDIR_SANDBOX
 
 make 
 make install
