@@ -116,6 +116,8 @@ namespace PatternGeneratorJRL
 				COMPosition & lStartingCOMPosition,
 				FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				FootAbsolutePosition & InitRightFootAbsolutePosition);
+
+
       /*! Dump data files. */
       void DumpDataFiles(string ZMPFileName, string FootFileName,			       
 			 deque<ZMPPosition> &ZMPPositions,
