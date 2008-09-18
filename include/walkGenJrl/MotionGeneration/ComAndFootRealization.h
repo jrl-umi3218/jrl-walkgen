@@ -116,10 +116,12 @@ namespace PatternGeneratorJRL
     */
     virtual bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) &CoMPosition,
 							 MAL_VECTOR(,double) &CoMSpeed,
+							 MAL_VECTOR(,double) &CoMAcc,
 							 MAL_VECTOR(,double) &LeftFoot,
 							 MAL_VECTOR(,double) &RightFoot,
 							 MAL_VECTOR(,double) &CurrentConfiguration,
 							 MAL_VECTOR(,double) &CurrentVelocity,
+							 MAL_VECTOR(,double) &CurrentAcceleration,
 							 int IterationNumber,
 							 int Stage) =0;
 

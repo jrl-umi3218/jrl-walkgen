@@ -80,7 +80,8 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
 						   MAL_VECTOR(,double) & ZMPRefPos,
 						   COMPosition & finalCOMPosition,
 						   MAL_VECTOR(,double) & CurrentConfiguration,
-						   MAL_VECTOR(,double) & CurrentVelocity)
+						   MAL_VECTOR(,double) & CurrentVelocity,
+						   MAL_VECTOR(,double) & CurrentAcceleration)
 {
   ODEBUG("Begin OneGlobalStepOfControl");
   

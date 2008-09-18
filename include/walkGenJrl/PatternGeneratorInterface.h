@@ -179,6 +179,7 @@ namespace PatternGeneratorJRL
     */
     bool RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
 				    MAL_VECTOR(,double) & CurrentVelocity,
+				    MAL_VECTOR(,double) & CurrentAcceleration,
 				    MAL_VECTOR(,double) & ZMPTarget);
 
     /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
@@ -195,6 +196,7 @@ namespace PatternGeneratorJRL
     */
     bool RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
 				    MAL_VECTOR(,double) & CurrentVelocity,
+				    MAL_VECTOR(,double) & CurrentAcceleration,
 				    MAL_VECTOR(,double) &ZMPTarget,
 				    COMPosition &COMPosition,
 				    FootAbsolutePosition &LeftFootPosition,
@@ -216,6 +218,7 @@ namespace PatternGeneratorJRL
     /*! \brief Debug control loop */
     void DebugControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
 			  MAL_VECTOR(,double) & CurrentVelocity,
+			  MAL_VECTOR(,double) & CurrentAcceleration,
 			  int localindex);
 
     /*! Set the current joint values of the robot.

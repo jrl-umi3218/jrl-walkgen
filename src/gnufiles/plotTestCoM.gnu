@@ -1,1 +1,1 @@
-plot "TestFGPI.dat" u 1 w l, "TestFGPI.dat" u 2 w l, "TestFGPI.dat" u 4 w l, "TestFGPI.dat" u 5 w l
+plot "TestFGPI.dat" u 2 w l, "TestFGPI.dat" u 3 w l, "TestFGPI.dat" u 4 w l

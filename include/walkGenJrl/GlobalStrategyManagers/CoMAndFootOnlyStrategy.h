@@ -75,7 +75,8 @@ namespace PatternGeneratorJRL
 			       MAL_VECTOR(,double) & ZMPRefPos,
 			       COMPosition & finalCOMPosition,
 			       MAL_VECTOR(,double) & CurrentConfiguration,
-			       MAL_VECTOR(,double) & CurrentVelocity);
+			       MAL_VECTOR(,double) & CurrentVelocity,
+			       MAL_VECTOR(,double) & CurrentAcceleration);
     
 
     

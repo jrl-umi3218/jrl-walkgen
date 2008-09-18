@@ -116,7 +116,15 @@ namespace PatternGeneratorJRL
 				COMPosition & lStartingCOMPosition,
 				FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				FootAbsolutePosition & InitRightFootAbsolutePosition);
-
+      void GetZMPDiscretization2(deque<ZMPPosition> & ZMPPositions,
+				deque<COMPosition> & CoMPositions,
+				deque<RelativeFootPosition> &RelativeFootPositions,
+				deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+				deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+				double Xmax,
+				COMPosition & lStartingCOMPosition,
+				FootAbsolutePosition & InitLeftFootAbsolutePosition,
+				FootAbsolutePosition & InitRightFootAbsolutePosition);
 
       /*! Dump data files. */
       void DumpDataFiles(string ZMPFileName, string FootFileName,			       
@@ -194,6 +202,7 @@ namespace PatternGeneratorJRL
 
       /// End phase of the walking.
       void EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
+				  deque<COMPosition> &FinalCOMPositions,
 				  deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 				  deque<FootAbsolutePosition> &RightFootAbsolutePositions);
       
@@ -206,7 +215,7 @@ namespace PatternGeneratorJRL
       }
 
 
-   protected:
+   private:
 
 
       /* ! ModulationSupportCoefficient coeeficient to wait a little before foot is of the ground */
@@ -228,10 +237,18 @@ namespace PatternGeneratorJRL
       /* ! Current orientation of the support foot. */
       double m_CurrentTheta;
       
-      /* ! Current absolute support position in 2D (but 
+      /*! \name Handling the support foot position 
+	@{
+       */
+      /* ! \brief Current absolute support position in 2D (but 
 	 with homogeneous coordinates). */
       MAL_MATRIX(m_CurrentSupportFootPosition,double);
-      
+
+      /* ! \brief Previous position of the support foot */ 
+      MAL_MATRIX(m_PrevCurrentSupportFootPosition,double);
+
+      /*! @} */
+
       /* ! Window for the filtering of the ZMP positions.. */
       vector<double> m_ZMPFilterWindow;
       
@@ -256,6 +273,22 @@ namespace PatternGeneratorJRL
       
       /*! Object to handle foot trajectory generation */
       FootTrajectoryGenerationStandard * m_FootTrajectoryGenerationStandard;
+
+      /*! Object to handle the preview control (mostly to get the CoM height). */
+      PreviewControl *m_PC;
+
+
+
+    public:
+      /*! \brief Get the reference to the preview control object. */
+      PreviewControl * GetPreviewControl()
+      { return m_PC;}
+
+      /*! \brief Set the reference to the preview control object. */
+      int  SetPreviewControl(PreviewControl *aPC)
+      { m_PC=aPC; return 0;}
+
+      
 
    };
 };

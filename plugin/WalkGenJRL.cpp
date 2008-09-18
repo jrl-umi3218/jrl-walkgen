@@ -230,6 +230,9 @@ protected:
   /*! Current speed of the joints from the Humanoid Walking Pattern Generator. */
   MAL_VECTOR(m_CurrentVelocityFromPG,double);
 
+  /*! Current acceleration of the joints from the Humanoid Walking Pattern Generator. */
+  MAL_VECTOR(m_CurrentAccelerationFromPG,double);
+
   // Position of the waist:
   // Relative:
   MAL_MATRIX(,double) m_WaistRelativePos;
@@ -392,6 +395,7 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 
   if (m_PGI->RunOneStepOfTheControlLoop(m_CurrentStateFromPG,
 					m_CurrentVelocityFromPG,
+					m_CurrentAccelerationFromPG,
 					ZMPTarget))
     {    
       ODEBUG4("Go inside 1","DebugData.txt");
@@ -511,6 +515,7 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	  ODEBUG4("Go inside 9","DebugData.txt");
 	  m_PGI->DebugControlLoop(m_CurrentStateFromPG,
 				  m_CurrentVelocityFromPG,
+				  m_CurrentAccelerationFromPG,
 				  m_count);
 	  ODEBUG4("Go inside 10","DebugData.txt");
 	}

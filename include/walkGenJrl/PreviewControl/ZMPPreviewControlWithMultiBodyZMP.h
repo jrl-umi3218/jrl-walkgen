@@ -250,7 +250,8 @@ namespace PatternGeneratorJRL
 				 ZMPPosition &NewZMPRefPos,
 				 COMPosition & finalCOMPosition,
 				 MAL_VECTOR(,double) & CurrentConfiguration,
-				 MAL_VECTOR(,double) & CurrentVelocity);
+				 MAL_VECTOR(,double) & CurrentVelocity,
+				 MAL_VECTOR(,double) & CurrentAcceleration);
 
 	
       /*! First stage of the control, 
@@ -388,6 +389,7 @@ namespace PatternGeneratorJRL
 			      deque<FootAbsolutePosition> &RightFootPositions,
 			      MAL_VECTOR(,double) &CurrentConfiguration,
 			      MAL_VECTOR(,double) & CurrentVelocity,
+			      MAL_VECTOR(,double) & CurrentAcceleration,
 			      int localindex);
       
       
@@ -449,6 +451,8 @@ namespace PatternGeneratorJRL
 	to the position of the free floating, and the articular values.
 	@param[out] CurrentVelocity: Returns the part of state vector corresponding
 	to the velocity of the free floating and the articular values.
+	@param[out] CurrentAcceleration: Returns the part of state vector corresponding 
+	to the acceleration of the free floating, and the articular values.
 	@param[in] IterationNumber: Number of time slot realized so far.
 	@param[in] StageOfTheAlgorithm: Indicates if this is the second stage of 
 	the preview control or the first one.
@@ -458,6 +462,7 @@ namespace PatternGeneratorJRL
 				       FootAbsolutePosition &aRightFAP,
 				       MAL_VECTOR(,double) & CurrentConfiguration,
 				       MAL_VECTOR(,double) & CurrentVelocity,
+				       MAL_VECTOR(,double) & CurrentAcceleration,
 				       int IterationNumber,
 				       int StageOfTheAlgorithm);
 

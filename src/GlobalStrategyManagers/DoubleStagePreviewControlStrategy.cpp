@@ -50,6 +50,7 @@ using namespace std;
 
 #define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "DoubleStagePreviewControlStrategy: " << x << endl; DebugFile.close();}
+
 #if 1
 #define ODEBUG(x)
 #else
@@ -112,9 +113,9 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 							      MAL_VECTOR(,double) & ZMPRefPos,
 							      COMPosition & finalCOMPosition,
 							      MAL_VECTOR(,double) & CurrentConfiguration,
-							      MAL_VECTOR(,double) & CurrentVelocity)
+							      MAL_VECTOR(,double) & CurrentVelocity,
+							      MAL_VECTOR(,double) & CurrentAcceleration)
 {
-      
   // New scheme:
   // Update the queue of ZMP ref
   m_ZMPpcwmbz->UpdateTheZMPRefQueue((*m_ZMPPositions)[2*m_NL]);
@@ -133,19 +134,22 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 	 << " " << (*m_ZMPPositions)[2*m_NL].py );
   
   ODEBUG(m_count << " before-CurrentConfiguration " << CurrentConfiguration);
-    
+  
   m_ZMPpcwmbz->OneGlobalStepOfControl((*m_LeftFootPositions)[m_NL],
 				      (*m_RightFootPositions)[m_NL],
 				      (*m_ZMPPositions)[2*m_NL],
 				      finalCOMPosition,
 				      CurrentConfiguration,
-				      CurrentVelocity);
+				      CurrentVelocity,
+				      CurrentAcceleration);
   ODEBUG4("finalCOMPosition:" <<finalCOMPosition.x[0] << " " 
 	  << finalCOMPosition.y[0] ,"DebugData.txt");
   
   (*m_COMBuffer)[0] = finalCOMPosition;
   
-  
+  LeftFootPosition = (*m_LeftFootPositions)[0];
+  RightFootPosition = (*m_RightFootPositions)[0];
+    
   // Compute the waist position in the current motion global reference frame.
   //     MAL_S4x4_MATRIX( FinalDesiredCOMPose,double);
   //     FinalDesiredCOMPose = m_ZMPpcwmbz->GetFinalDesiredCOMPose();
@@ -192,6 +196,7 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 	  "DebugDataZMPTargetZ.dat");
   m_ZMPPositions->pop_front();
   m_COMBuffer->pop_front();
+  ODEBUG("m_COMBuffer.size: " << m_COMBuffer->size());
   m_LeftFootPositions->pop_front();
   m_RightFootPositions->pop_front();
   
@@ -221,10 +226,15 @@ int DoubleStagePreviewControlStrategy::EvaluateStartingState(MAL_VECTOR( &,doubl
 
 int DoubleStagePreviewControlStrategy::EndOfMotion()
 {
-  if (m_ZMPPositions->size()< 2*m_NL+1)
-    return -1;
-  else   if (m_ZMPPositions->size()== 2*m_NL)
+  ODEBUG("m_ZMPPositions->size()  2*m_NL+1 2*m_NL " 
+	  << m_ZMPPositions->size() << " "
+	  << 2*m_NL+1 << " " 
+	  << 2*m_NL << " " );
+  if (m_ZMPPositions->size()== 2*m_NL)
     return 0;
+  else if (m_ZMPPositions->size()< 2*m_NL+1)
+    return -1;
+
   return 1;
 
 }

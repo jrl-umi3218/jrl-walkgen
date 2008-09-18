@@ -295,6 +295,7 @@ namespace PatternGeneratorJRL {
     // Initialize the ZMP trajectory generator.
     m_ZMPD->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPD->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+    m_ZMPD->SetPreviewControl(m_PC);
 
     m_ZMPQP->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
@@ -625,6 +626,9 @@ namespace PatternGeneratorJRL {
     m_GlobalStrategyManager->EvaluateStartingState(BodyAnglesIni,lStartingCOMPosition,
 						   InitLeftFootAbsPos, InitRightFootAbsPos);
 
+    ODEBUG("StartingCOMPosition: " << lStartingCOMPosition.x[0] 
+	    << " "  << lStartingCOMPosition.y[0]
+	    << " "  << lStartingCOMPosition.z[0]);
     ODEBUG4("StartingCOMPosition: " << lStartingCOMPosition.x[0] << " "  << lStartingCOMPosition.y[0],"DebugData.txt");
     // We also initialize the iteration number inside DMB.
     m_HumanoidDynamicRobot->ResetIterationNumber();
@@ -669,7 +673,7 @@ namespace PatternGeneratorJRL {
     deque<RelativeFootPosition> lRelativeFootPositions;
     vector<double> lCurrentJointValues;
 
-    ODEBUG3("StartOnLineStepSequencing - 1 ");
+    ODEBUG("StartOnLineStepSequencing - 1 ");
     m_StepStackHandler->StartOnLineStep();
 
 
@@ -678,6 +682,7 @@ namespace PatternGeneratorJRL {
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,false);
 
+    
     ODEBUG("StartOnLineStepSequencing - 3 "
 	   << lStartingCOMPosition.x[0] << " "
 	   << lRelativeFootPositions.size()
@@ -686,6 +691,7 @@ namespace PatternGeneratorJRL {
     int NbOfStepsToRemoveFromTheStack=0;
     if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
       {
+	ODEBUG("ZMPCOM KAJITA 2003 - 2 ");
 	NbOfStepsToRemoveFromTheStack=m_ZMPD->InitOnLine(m_ZMPPositions,
 							 m_COMBuffer,
 							 m_LeftFootPositions,
@@ -694,6 +700,7 @@ namespace PatternGeneratorJRL {
 							 InitRightFootAbsPos,
 							 lRelativeFootPositions,
 							 lStartingCOMPosition );
+
       }
     else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
       {
@@ -713,21 +720,6 @@ namespace PatternGeneratorJRL {
     // Keep the last one to be removed at the next insertion.
     for(int i=0;i<NbOfStepsToRemoveFromTheStack-1;i++)
       m_StepStackHandler->RemoveFirstStepInTheStack();
-
-
-    // Initialization of the COM buffer.
-    m_COMBuffer.resize(m_ZMPPositions.size());
-    for(unsigned int i=0;i<m_COMBuffer.size();i++)
-      {
-	m_COMBuffer[i].z[0] = m_PC->GetHeightOfCoM();
-	m_COMBuffer[i].z[1] = 0.0;
-	m_COMBuffer[i].z[2] = 0.0;
-
-	m_COMBuffer[i].pitch = 0.0;
-	m_COMBuffer[i].roll = 0.0;
-
-      }
-
 
     // Initialization of the first preview.
     for(int j=0; j<m_DOF;j++)
@@ -815,18 +807,6 @@ namespace PatternGeneratorJRL {
       m_StOvPl->CreateBufferFirstPreview(m_COMBuffer,aZMPBuffer,m_ZMPPositions);
 
 
-    ODEBUG4("FinishAndRealizeStepSequence() - 4 ","DebugGMFKW.dat");
-    for(unsigned int i=0;i<m_COMBuffer.size();i++)
-      {
-	m_COMBuffer[i].z[0] = m_PC->GetHeightOfCoM();
-	m_COMBuffer[i].z[1] = 0.0;
-	m_COMBuffer[i].z[2] = 0.0;
-
-	m_COMBuffer[i].pitch = 0.0;
-	m_COMBuffer[i].roll = 0.0;
-
-      }
-
     if (0)
       {
 	m_ZMPD->DumpDataFiles("/tmp/ZMPSetup.dat",
@@ -848,19 +828,6 @@ namespace PatternGeneratorJRL {
     // X and Y  will be defined by the PG, but the height has to be specified.
     // by default it should be Zc.
     // If you want to change use modewalk 2.
-    for(unsigned int i=0;i<m_COMBuffer.size();i++)
-      {
-	m_COMBuffer[i].z[0] = m_PC->GetHeightOfCoM();
-	m_COMBuffer[i].z[1] = m_COMBuffer[i].z[2] = 0.0;
-      }
-
-    if ((m_StepStackHandler->GetWalkMode()==0) ||
-	(m_StepStackHandler->GetWalkMode()==4))
-      {
-	for(unsigned int i=0;i<m_ZMPPositions.size()-m_NL;i++)
-	  //	  m_COMBuffer[i].theta = m_ZMPPositions[i+m_NL-1].theta;
-	  m_COMBuffer[i].yaw = m_ZMPPositions[i].theta;
-      }
 
     ODEBUG4("FinishAndRealizeStepSequence() - 6 ","DebugGMFKW.dat");
     ODEBUG4("m_ZMPPositions : " << m_ZMPPositions.size() << endl <<
@@ -1011,6 +978,7 @@ namespace PatternGeneratorJRL {
 
   bool PatternGeneratorInterface::RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
 							     MAL_VECTOR(,double) & CurrentVelocity,
+							     MAL_VECTOR(,double) & CurrentAcceleration,
 							     MAL_VECTOR( &ZMPTarget,double))
   {
     COMPosition finalCOMPosition;
@@ -1018,6 +986,7 @@ namespace PatternGeneratorJRL {
 
     return RunOneStepOfTheControlLoop(CurrentConfiguration,
 				      CurrentVelocity,
+				      CurrentAcceleration,
 				      ZMPTarget,
 				      finalCOMPosition,
 				      LeftFootPosition,
@@ -1032,15 +1001,17 @@ namespace PatternGeneratorJRL {
   {
     MAL_VECTOR(,double)  CurrentConfiguration;
     MAL_VECTOR(,double)  CurrentVelocity;
+    MAL_VECTOR(,double)  CurrentAcceleration;
     MAL_VECTOR( ZMPTarget,double);
     bool r=false;
 
     r = RunOneStepOfTheControlLoop(CurrentConfiguration,
-			       CurrentVelocity,
-			       ZMPTarget,
-			       COMRefPos,
-			       LeftFootPosition,
-			       RightFootPosition);
+				   CurrentVelocity,
+				   CurrentAcceleration,
+				   ZMPTarget,
+				   COMRefPos,
+				   LeftFootPosition,
+				   RightFootPosition);
 
     bzero(&ZMPRefPos,sizeof(ZMPPosition));
     ZMPRefPos.px = ZMPTarget(0);
@@ -1051,6 +1022,7 @@ namespace PatternGeneratorJRL {
 
   bool PatternGeneratorInterface::RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
 							     MAL_VECTOR(,double) & CurrentVelocity,
+							     MAL_VECTOR(,double) & CurrentAcceleration,
 							     MAL_VECTOR( &ZMPTarget,double),
 							     COMPosition &finalCOMPosition,
 							     FootAbsolutePosition &LeftFootPosition, 
@@ -1073,6 +1045,7 @@ namespace PatternGeneratorJRL {
 
     if (m_StepStackHandler->IsOnLineSteppingOn())
       {
+	ODEBUG("On Line Stepping: ON!");
 	// ********* WARNING THIS IS THE TIME CONSUMING PART *******************
 	if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
 	  {
@@ -1101,7 +1074,8 @@ namespace PatternGeneratorJRL {
 						    ZMPTarget,
 						    finalCOMPosition,
 						    CurrentConfiguration,
-						    CurrentVelocity);
+						    CurrentVelocity,
+						    CurrentAcceleration);
 
     
     // New scheme:
@@ -1224,6 +1198,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterface::DebugControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
 						   MAL_VECTOR(,double) & CurrentVelocity,
+						   MAL_VECTOR(,double) & CurrentAcceleration,
 						   int localindex)
   {
 
@@ -1384,6 +1359,7 @@ namespace PatternGeneratorJRL {
 
     m_2HumanoidDynamicRobot->currentConfiguration(CurrentConfiguration);
     m_2HumanoidDynamicRobot->currentVelocity(CurrentVelocity);
+    m_2HumanoidDynamicRobot->currentAcceleration(CurrentAcceleration);
 
     m_2HumanoidDynamicRobot->computeForwardKinematics();
     ZMPmultibody = m_2HumanoidDynamicRobot->zeroMomentumPoint();

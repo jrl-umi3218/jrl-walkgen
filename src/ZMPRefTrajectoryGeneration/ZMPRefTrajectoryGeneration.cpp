@@ -58,6 +58,7 @@ using namespace PatternGeneratorJRL;
 ZMPRefTrajectoryGeneration::ZMPRefTrajectoryGeneration(SimplePluginManager *lSPM)
   : SimplePlugin(lSPM)
 {
+
   ODEBUG("Identification: " << this);
   std::string aMethodName[4] = 
     {":omega",":stepheight",":singlesupporttime",":doublesupporttime"};

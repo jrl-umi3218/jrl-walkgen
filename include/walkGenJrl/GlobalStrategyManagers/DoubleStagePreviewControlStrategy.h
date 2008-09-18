@@ -65,13 +65,15 @@ namespace PatternGeneratorJRL
       @param[out] COMPosition: returns position, velocity and acceleration of the CoM.
       @param[out] CurrentConfiguration: The results is a state vector containing the articular positions.
       @param[out] CurrentVelocity: The results is a state vector containing the speed.
+      @param[out] CurrentAcceleration: The results is a state vector containing the acceleration.
     */
     int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 			       FootAbsolutePosition &RightFootPosition,
 			       MAL_VECTOR(,double) & ZMPRefPos,
 			       COMPosition & COMPosition,
 			       MAL_VECTOR(,double) & CurrentConfiguration,
-			       MAL_VECTOR(,double) & CurrentVelocity);
+			       MAL_VECTOR(,double) & CurrentVelocity,
+			       MAL_VECTOR(,double) & CurrentAcceleration);
     
 
     

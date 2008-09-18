@@ -86,21 +86,24 @@ int main(int argc, char *argv[])
   // free flyer + actuated DOFS.
   MAL_VECTOR_DIM(CurrentConfiguration,double,46);
   MAL_VECTOR_DIM(CurrentVelocity,double,46);
+  MAL_VECTOR_DIM(CurrentAcceleration,double,46);
   MAL_VECTOR_DIM(PreviousConfiguration,double,46) ;
   MAL_VECTOR_DIM(PreviousVelocity,double,46);
+  MAL_VECTOR_DIM(PreviousAcceleration,double,46);
   MAL_VECTOR_DIM(ZMPTarget,double,3);
   int NbOfIt=0;
 
   StraightWalking(*aPGI);
   while(aPGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
 					 CurrentVelocity,
+					 CurrentAcceleration,
 					     ZMPTarget))
     {
       NbOfIt++;
-      aPGI->DebugControlLoop(PreviousConfiguration,PreviousVelocity,NbOfIt);
+      aPGI->DebugControlLoop(PreviousConfiguration,PreviousVelocity,PreviousAcceleration,NbOfIt);
       PreviousConfiguration = CurrentConfiguration;
       PreviousVelocity = CurrentVelocity;
-
+      PreviousAcceleration = CurrentAcceleration;
     }
 
 }

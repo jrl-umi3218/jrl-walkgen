@@ -121,11 +121,11 @@ void ComAndFootRealizationByGeometry::Initialization()
       m_HS->GetFootSize(-1,lDepth,lWidth,lHeight);
       
       m_AnklePositionRight[0] = -lDepth*0.5 + lAnklePositionRight[0];
-      m_AnklePositionLeft[0] = -lDepth*0.5 + lAnklePositionLeft[0];
-      m_AnklePositionRight[1] = lWidth*0.5 - lAnklePositionRight[1];
-      m_AnklePositionLeft[1] = - lWidth*0.5 + lAnklePositionLeft[1];
-      m_AnklePositionRight[2] = lAnklePositionRight[2];
-      m_AnklePositionLeft[2] = lAnklePositionLeft[2];
+      m_AnklePositionLeft[0]  = -lDepth*0.5 + lAnklePositionLeft[0];
+      m_AnklePositionRight[1] =   lWidth*0.5 - lAnklePositionRight[1];
+      m_AnklePositionLeft[1]  = - lWidth*0.5 + lAnklePositionLeft[1];
+      m_AnklePositionRight[2] =   lAnklePositionRight[2];
+      m_AnklePositionLeft[2]  =   lAnklePositionLeft[2];
 
       ODEBUG("Enter 3.0 ");
       // Update the index to change the configuration according
@@ -425,7 +425,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   MAL_S4x4_MATRIX_SET_IDENTITY(RightFootTranslation);
 
   for(unsigned int i=0;i<3;i++)
-    MAL_S4x4_MATRIX_ACCESS_I_J(RightFootTranslation, i,3) = - 
+    MAL_S4x4_MATRIX_ACCESS_I_J(RightFootTranslation, i,3) = -
       m_AnklePositionRight[i];
 
   lFootPose = MAL_S4x4_RET_A_by_B(lFootPose,RightFootTranslation);
@@ -942,10 +942,12 @@ bool ComAndFootRealizationByGeometry::KinematicsForTheLegs(MAL_VECTOR(,double) &
 
 bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
 									      MAL_VECTOR(,double) & aCoMSpeed,
+									      MAL_VECTOR(,double) & aCoMAcc,
 									      MAL_VECTOR(,double) & aLeftFoot,
 									      MAL_VECTOR(,double) & aRightFoot,
 									      MAL_VECTOR(,double) & CurrentConfiguration,
 									      MAL_VECTOR(,double) & CurrentVelocity,
+									      MAL_VECTOR(,double) & CurrentAcceleration,
 									      int IterationNumber,
 			      						      int Stage)
 {
@@ -1088,6 +1090,15 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
   // Update the speed values.
   /* If this is the first call ( stage = 0)
      we should update the current stored values.  */
+  /* Initialize the acceleration */
+  for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentAcceleration);i++)
+    {
+      CurrentAcceleration[i] = 0.0;
+      /* Keep the new value for the legs. */
+    }
+  
+  double ldt =  getSamplingPeriod();
+
   if (Stage==0)
     {
       if (IterationNumber>0)
@@ -1095,14 +1106,21 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
 	  /* Compute the speed */
 	  for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
 	    {
-	      CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration[i])/ getSamplingPeriod();
+	      CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration[i])/ ldt;
 	      /* Keep the new value for the legs. */
 	    }
+#if 1
+	  if (IterationNumber>1)
+	    {
+	      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity);i++)
+		CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity[i])/ ldt;
+	    }
+#endif
 	}
       else
 	{
 	  /* Compute the speed */
-	  for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
+	  for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
 	    {
 	      CurrentVelocity[i] = 0.0;
 	      /* Keep the new value for the legs. */
@@ -1111,6 +1129,7 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
 
       ODEBUG4(CurrentVelocity, "DebugDataVelocity0.dat");
       m_prev_Configuration = CurrentConfiguration;
+      m_prev_Velocity = CurrentVelocity;
     }
   else if (Stage==1)
     {
@@ -1123,12 +1142,18 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
 	      CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration1[i])/ getSamplingPeriod();
 	      /* Keep the new value for the legs. */
 	    }
-
+#if 1
+	  if (IterationNumber>1)
+	    {
+	      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity1);i++)
+		CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity1[i])/ ldt;
+	    }
+#endif 
 	}
       else
 	{
 	  /* Compute the speed */
-	  for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
+	  for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
 	    {
 	      CurrentVelocity[i] = 0.0;
 	      /* Keep the new value for the legs. */
@@ -1136,13 +1161,17 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
 	}
       ODEBUG4(CurrentVelocity, "DebugDataVelocity1.dat");
       m_prev_Configuration1 = CurrentConfiguration;
-
+      m_prev_Velocity1 = CurrentVelocity;
     }
 
-
+#if 1
   for(int i=0;i<6;i++)
     CurrentVelocity[i] = aCoMSpeed(i);
-
+#endif
+#if 1
+  for(int i=0;i<6;i++)
+    CurrentAcceleration[i] = aCoMAcc(i);
+#endif
 
   ODEBUG( "CurrentVelocity :" << endl << CurrentVelocity);
   ODEBUG4("SamplingPeriod " << getSamplingPeriod(),"LegsSpeed.dat");

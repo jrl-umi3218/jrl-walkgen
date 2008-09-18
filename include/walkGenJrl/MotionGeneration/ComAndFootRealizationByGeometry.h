@@ -78,15 +78,18 @@ namespace PatternGeneratorJRL
       Very important: This method is assume to set correctly the body angles of
       its \a HumanoidDynamicRobot and a subsequent call to the ZMP position 
       will return the associated ZMP vector.
-      @param[in] CoMPosition a 5 dimensional vector with the first dimension for position,
+      @param[in] CoMPosition a 6 dimensional vector with the first 3 dimension for position,
       and the last two for the orientation (Euler angle).
-      @param[in] aCoMSpeed a 5 dimensional vector with the first dimension for linear velocity,
+      @param[in] aCoMSpeed a 6 dimensional vector with the first 3 dimension for linear velocity,
       and the last two for the angular velocity.
-      @param[in] LeftFoot a 5 dimensional following the same convention than for \a CoMPosition.
+      @param[in] aCoMAcc a 6 dimensional vector with the first 3 dimension for linear velocity,
+      and the last two for the angular velocity.
+      @param[in] LeftFoot a 6 dimensional following the same convention than for \a CoMPosition.
       @param[in] RightFoot idem.
       @param[out] CurrentConfiguration The result is a state vector containing 
       the position which are put inside this parameter.
-      @param[out] CurrentVelocity The result is a state vector containing the speed which are put inside this parameter.x
+      @param[out] CurrentVelocity The result is a state vector containing the speed which are put inside this parameter.
+      @param[out] CurrentAcceleration The result is a state vector containing the acceleratio which are put inside this parameter.
       @param[in] IterationNumber Number of iteration.
       @param[in] Stage indicates which stage is reach by the Pattern Generator. If this is the 
       last stage, we store some information.
@@ -94,10 +97,12 @@ namespace PatternGeneratorJRL
     */
     bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) &CoMPosition,
 						 MAL_VECTOR(,double) & aCoMSpeed,
+						 MAL_VECTOR(,double) & aCoMAcc,
 						 MAL_VECTOR(,double) &LeftFoot,
 						 MAL_VECTOR(,double) &RightFoot,
 						 MAL_VECTOR(,double) & CurrentConfiguration,
 						 MAL_VECTOR(,double) & CurrentVelocity,
+						 MAL_VECTOR(,double) & CurrentAcceleration,
 						 int IterationNumber,
 						 int Stage);    
 
