@@ -72,8 +72,8 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   RESETDEBUG4("DebugDataql.txt");
   RESETDEBUG4("DebugDatadqr.txt");
   RESETDEBUG4("DebugDatadql.txt");
-  RESETDEBUG5("DebugDataDiffZMP.txt");
-  RESETDEBUG5("DebugDataCOMPC1.txt");
+  RESETDEBUG4("DebugDataDiffZMP.txt");
+  RESETDEBUG4("DebugDataCOMPC1.txt");
   RESETDEBUG4("DebugDataWaistZMP.txt");
   RESETDEBUG4("DebugDataCOMPC2.txt");
   RESETDEBUG4("DebugDataZMPMB1.txt");
@@ -87,9 +87,10 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   RESETDEBUG4("Dump.dat");
   RESETDEBUG4("DebugDataCOM_0.dat");
   RESETDEBUG4("DebugDataCOM_1.dat");
-  RESETDEBUG5("DebugConfSO.dat");
-  RESETDEBUG5("DebugConfSV.dat");
-  RESETDEBUG5("DebugConfSA.dat");
+  RESETDEBUG4("DebugConfSO.dat");
+  RESETDEBUG4("DebugConfSV.dat");
+  RESETDEBUG4("DebugConfSA.dat");
+  RESETDEBUG4("DebugDataCheckZMP1.txt");
   // Sampling period.
   m_SamplingPeriod = -1;
 
@@ -183,8 +184,6 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMPosition 
   /* Get the current acceleration vector */
   CurrentAcceleration = m_HumanoidDynamicRobot->currentVelocity();
 
-  
-
   m_ComAndFootRealization->ComputePostureForGivenCoMAndFeetPosture(aCOMPosition, aCOMSpeed, aCOMAcc,
 								   aLeftFootPosition,
 								   aRightFootPosition,
@@ -206,7 +205,7 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMPosition 
       m_HumanoidDynamicRobot->currentVelocity(CurrentVelocity);
 
       /* Update the current acceleration vector */
-      m_HumanoidDynamicRobot->currentVelocity(CurrentAcceleration);
+      //m_HumanoidDynamicRobot->currentVelocity(CurrentAcceleration);
     }
 }
 
@@ -241,7 +240,7 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 			      m_NumberOfIterations,
 			      0);
 
-  if (1)
+  if (0)
   {
     ofstream aof_dbg("DebugConfSO.dat",ofstream::app);
     for(unsigned int i=0;i<CurrentConfiguration.size();i++)
@@ -253,7 +252,7 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 
   }
 
-  if (1)
+  if (0)
   {
     ofstream aof_dbg("DebugConfSV.dat",ofstream::app);
     for(unsigned int i=0;i<CurrentVelocity.size();i++)
@@ -263,7 +262,7 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
     aof_dbg <<endl;
     aof_dbg.close();
   }
-  if (1)
+  if (0)
   {
     ofstream aof_dbg("DebugConfSA.dat",ofstream::app);
     for(unsigned int i=0;i<CurrentAcceleration.size();i++)
@@ -292,7 +291,6 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 				  CurrentAcceleration,
 				  m_NumberOfIterations - m_NL,
 				  1);
-      //      ODEBUG4("Current Configuration Stage 2: " << CurrentConfiguration,"DebugConfSO.dat");
     }
 
   // Here it is assumed that the 4x4 CoM matrix 
@@ -542,7 +540,6 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
 
 
-
   {
     ZMPPosition lZMPPos = m_FIFOZMPRefPositions[0];
     ODEBUG5(acomp.x[0]<< " "
@@ -584,13 +581,17 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteration)
 {
 
+  string sComputeZMP("ComputeZMP");
+  string sZMPtrue("true");
   // Call the  Dynamic Multi Body computation of the dynamic parameters.
+  m_HumanoidDynamicRobot->setProperty(sComputeZMP,sZMPtrue);
   m_HumanoidDynamicRobot->computeForwardKinematics();
 
   // Call the Humanoid Dynamic Multi Body robot model to
   // compute the ZMP related to the motion found by CoMAndZMPRealization.
   MAL_S3_VECTOR(,double) ZMPmultibody;
   ZMPmultibody = m_HumanoidDynamicRobot->zeroMomentumPoint();
+  ODEBUG4(ZMPmultibody[0] << " " << ZMPmultibody[1], "DebugDataCheckZMP1.txt");
   MAL_S3_VECTOR(,double) CoMmultibody;
   CoMmultibody = m_HumanoidDynamicRobot->positionCenterOfMass();
 
@@ -599,7 +600,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   aZMPpos.px = m_FIFOZMPRefPositions[0].px - ZMPmultibody[0];
   aZMPpos.py = m_FIFOZMPRefPositions[0].py - ZMPmultibody[1];
   aZMPpos.time = m_FIFOZMPRefPositions[0].time;
-  ODEBUG5(aZMPpos.px << " " << aZMPpos.py << " " 
+  ODEBUG4(aZMPpos.px << " " << aZMPpos.py << " " 
 	  << m_FIFOZMPRefPositions[0].px << " " 
 	  << m_FIFOZMPRefPositions[0].py  << " " 
 	  << ZMPmultibody[0] << " " << ZMPmultibody[1] << " "  
@@ -723,7 +724,8 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
 			      CurrentAcceleration,
 			      m_NumberOfIterations,
 			      0);
-  if (1)
+
+  if(0)
   {
     ofstream aof_dbg("DebugConfSO.dat",ofstream::out);
     for(unsigned int i=0;i<CurrentConfiguration.size();i++)
@@ -733,8 +735,8 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
     aof_dbg <<endl;
     aof_dbg.close();
   }
-
-  if (1)
+  
+  if(0)
   {
     ofstream aof_dbg("DebugConfSV.dat",ofstream::out);
     for(unsigned int i=0;i<CurrentVelocity.size();i++)
@@ -744,7 +746,8 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
     aof_dbg <<endl;
     aof_dbg.close();
   }
-  if (1)
+
+  if(0)
   {
     ofstream aof_dbg("DebugConfSA.dat",ofstream::out);
     for(unsigned int i=0;i<CurrentAcceleration.size();i++)
@@ -754,6 +757,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
     aof_dbg <<endl;
     aof_dbg.close();
   }
+
   EvaluateMultiBodyZMP(localindex);
   m_FIFOZMPRefPositions.push_back(ZMPRefPositions[localindex+1+m_NL]);
 

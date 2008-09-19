@@ -1109,13 +1109,12 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
 	      CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration[i])/ ldt;
 	      /* Keep the new value for the legs. */
 	    }
-#if 1
+
 	  if (IterationNumber>1)
 	    {
 	      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity);i++)
 		CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity[i])/ ldt;
 	    }
-#endif
 	}
       else
 	{
@@ -1142,13 +1141,11 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
 	      CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration1[i])/ getSamplingPeriod();
 	      /* Keep the new value for the legs. */
 	    }
-#if 1
 	  if (IterationNumber>1)
 	    {
 	      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity1);i++)
 		CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity1[i])/ ldt;
 	    }
-#endif 
 	}
       else
 	{
@@ -1164,14 +1161,13 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
       m_prev_Velocity1 = CurrentVelocity;
     }
 
-#if 1
+
   for(int i=0;i<6;i++)
     CurrentVelocity[i] = aCoMSpeed(i);
-#endif
-#if 1
+
   for(int i=0;i<6;i++)
     CurrentAcceleration[i] = aCoMAcc(i);
-#endif
+
 
   ODEBUG( "CurrentVelocity :" << endl << CurrentVelocity);
   ODEBUG4("SamplingPeriod " << getSamplingPeriod(),"LegsSpeed.dat");

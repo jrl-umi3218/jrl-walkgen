@@ -431,7 +431,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   m_RelativeFootPositions.push_back(RelativeFootPositions[0]);
 
 
-  if (1)
+  if (0)
     {
       ofstream dbg_aof("DebugZMPRefPos.dat",ofstream::out);
       for(unsigned int i=0;i<FinalZMPPositions.size();i++)
@@ -878,7 +878,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 			 LeftFootAbsolutePositions,
 			 RightFootAbsolutePositions);
 
-  if (1)
+  if (0)
     {
       ofstream dbg_aof("DebugZMPRefPos.dat",ofstream::app);
       for(unsigned int i=0;i<ZMPPositions.size();i++)
