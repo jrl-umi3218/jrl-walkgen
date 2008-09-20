@@ -149,6 +149,7 @@ namespace PatternGeneratorJRL
 				deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 				double Xmax,
 				COMPosition & lStartingCOMPosition,
+				MAL_S3_VECTOR(,double) &lStartingZMPPosition,
 				FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				FootAbsolutePosition & InitRightFootAbsolutePosition);
       
@@ -180,7 +181,9 @@ namespace PatternGeneratorJRL
 		     FootAbsolutePosition & InitLeftFootAbsolutePosition,
 		     FootAbsolutePosition & InitRightFootAbsolutePosition,
 		     deque<RelativeFootPosition> &RelativeFootPositions,
-		     COMPosition &lStartingCOMPosition);
+		     COMPosition &lStartingCOMPosition,
+		     MAL_S3_VECTOR(&,double) lStartingZMPPosition
+		     );
       
       /* ! \brief Methods to update the stack on-line by inserting a new foot position. 
         The foot is put right at the end of the stack. This method is supposed to be called

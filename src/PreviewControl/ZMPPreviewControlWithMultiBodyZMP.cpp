@@ -542,7 +542,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
   {
     ZMPPosition lZMPPos = m_FIFOZMPRefPositions[0];
-    ODEBUG5(acomp.x[0]<< " "
+    ODEBUG4(acomp.x[0]<< " "
 	    << acomp.y[0] <<  " " 
 	    << acomp.z[0] << " "
 	    << zmpx2 << " "
@@ -898,11 +898,13 @@ MAL_S4x4_MATRIX(,double)  ZMPPreviewControlWithMultiBodyZMP::GetFinalDesiredCOMP
 
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingState(MAL_VECTOR(&BodyAnglesInit,double),
 							     MAL_S3_VECTOR(&aStartingCOMPosition,double),
+							     MAL_S3_VECTOR(&,double) aStartingZMPPosition,
 							     FootAbsolutePosition & InitLeftFootPosition,
 							     FootAbsolutePosition & InitRightFootPosition)
 {
   int r = EvaluateStartingCoM(BodyAnglesInit,aStartingCOMPosition,
-		      InitLeftFootPosition, InitRightFootPosition);
+			      InitLeftFootPosition, InitRightFootPosition);
+  aStartingZMPPosition= m_ComAndFootRealization->GetCOGInitialAnkles();
   return r;
 }
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(MAL_VECTOR(&BodyAnglesInit,double),

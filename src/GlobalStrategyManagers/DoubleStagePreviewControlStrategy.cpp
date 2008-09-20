@@ -207,6 +207,7 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 
 int DoubleStagePreviewControlStrategy::EvaluateStartingState(MAL_VECTOR( &,double) BodyAngles,
 							     COMPosition & aStartingCOMPosition,
+							     MAL_S3_VECTOR(&,double) aStartingZMPPosition,
 							     FootAbsolutePosition & InitLeftFootPosition,
 							     FootAbsolutePosition & InitRightFootPosition)
 {
@@ -215,7 +216,9 @@ int DoubleStagePreviewControlStrategy::EvaluateStartingState(MAL_VECTOR( &,doubl
   lStartingCOMPosition(1) = aStartingCOMPosition.y[0];
   lStartingCOMPosition(2) = aStartingCOMPosition.z[0];
   
-  m_ZMPpcwmbz->EvaluateStartingState(BodyAngles,lStartingCOMPosition,
+  m_ZMPpcwmbz->EvaluateStartingState(BodyAngles,
+				     lStartingCOMPosition,
+				     aStartingZMPPosition,
 				     InitLeftFootPosition,InitRightFootPosition);
 
   aStartingCOMPosition.x[0] = lStartingCOMPosition(0);

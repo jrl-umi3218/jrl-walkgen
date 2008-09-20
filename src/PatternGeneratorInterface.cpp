@@ -587,6 +587,7 @@ namespace PatternGeneratorJRL {
 
 
   void PatternGeneratorInterface::CommonInitializationOfWalking(COMPosition  & lStartingCOMPosition,
+								MAL_S3_VECTOR(,double) & lStartingZMPPosition,
 								MAL_VECTOR(  & BodyAnglesIni,double),
 								FootAbsolutePosition & InitLeftFootAbsPos,
 								FootAbsolutePosition & InitRightFootAbsPos,
@@ -623,7 +624,9 @@ namespace PatternGeneratorJRL {
       }
 
     // Initialize consequently the ComAndFoot Realization object.
-    m_GlobalStrategyManager->EvaluateStartingState(BodyAnglesIni,lStartingCOMPosition,
+    m_GlobalStrategyManager->EvaluateStartingState(BodyAnglesIni,
+						   lStartingCOMPosition,
+						   lStartingZMPPosition,
 						   InitLeftFootAbsPos, InitRightFootAbsPos);
 
     ODEBUG("StartingCOMPosition: " << lStartingCOMPosition.x[0] 
@@ -664,6 +667,7 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterface::StartOnLineStepSequencing()
   {
     COMPosition lStartingCOMPosition;
+    MAL_S3_VECTOR(,double) lStartingZMPPosition;
     MAL_VECTOR( BodyAnglesIni,double);
 
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
@@ -678,6 +682,7 @@ namespace PatternGeneratorJRL {
 
 
     CommonInitializationOfWalking(lStartingCOMPosition,
+				  lStartingZMPPosition,
 				  BodyAnglesIni,
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,false);
@@ -699,7 +704,8 @@ namespace PatternGeneratorJRL {
 							 InitLeftFootAbsPos,
 							 InitRightFootAbsPos,
 							 lRelativeFootPositions,
-							 lStartingCOMPosition );
+							 lStartingCOMPosition,
+							 lStartingZMPPosition);
 
       }
     else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
@@ -712,7 +718,8 @@ namespace PatternGeneratorJRL {
 							   InitLeftFootAbsPos,
 							   InitRightFootAbsPos,
 							   lRelativeFootPositions,
-							   lStartingCOMPosition );
+							   lStartingCOMPosition,
+							   lStartingZMPPosition );
 	ODEBUG("After Initializing the Analytical Morisawa part. " << m_LeftFootPositions.size()
 		<< " " << m_RightFootPositions.size());
       }
@@ -755,6 +762,7 @@ namespace PatternGeneratorJRL {
   { 
     ODEBUG("PGI-Start");
     COMPosition lStartingCOMPosition;	
+    MAL_S3_VECTOR(,double) lStartingZMPPosition;
     MAL_VECTOR( BodyAnglesIni,double);
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
     struct timeval begin, end, time4, time5;
@@ -773,9 +781,11 @@ namespace PatternGeneratorJRL {
 
     deque<RelativeFootPosition> lRelativeFootPositions;
     CommonInitializationOfWalking(lStartingCOMPosition,
+				  lStartingZMPPosition,
 				  BodyAnglesIni,
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,true);
+    
     ODEBUG4( "Pass through here ","DebugGMFKW.dat" );
     lCurrentConfiguration(0) = 0.0;
     lCurrentConfiguration(1) = 0.0;
@@ -790,6 +800,7 @@ namespace PatternGeneratorJRL {
     // Create the ZMP reference.
     CreateZMPReferences(lRelativeFootPositions,
 			lStartingCOMPosition,
+			lStartingZMPPosition,
 			InitLeftFootAbsPos,
 			InitRightFootAbsPos);
 
@@ -1872,6 +1883,7 @@ namespace PatternGeneratorJRL {
 
   int PatternGeneratorInterface::CreateZMPReferences(deque<RelativeFootPosition> &lRelativeFootPositions,
 						     COMPosition &lStartingCOMPosition,
+						     MAL_S3_VECTOR(&,double) lStartingZMPPosition,
 						     FootAbsolutePosition &InitLeftFootAbsPos, 
 						     FootAbsolutePosition &InitRightFootAbsPos)
   {
@@ -1884,6 +1896,7 @@ namespace PatternGeneratorJRL {
 				      m_LeftFootPositions,
 				      m_RightFootPositions,
 				      m_Xmax, lStartingCOMPosition,
+				      lStartingZMPPosition,
 				      InitLeftFootAbsPos,
 				      InitRightFootAbsPos);      
 	//m_ZMPQP->GetComBuffer(m_COMBuffer);
@@ -1896,6 +1909,7 @@ namespace PatternGeneratorJRL {
 				     m_LeftFootPositions,
 				     m_RightFootPositions,
 				     m_Xmax, lStartingCOMPosition,
+				     lStartingZMPPosition,
 				     InitLeftFootAbsPos,
 				     InitRightFootAbsPos);
 	//	m_COMBuffer.clear();
@@ -1910,6 +1924,7 @@ namespace PatternGeneratorJRL {
 				     m_LeftFootPositions,
 				     m_RightFootPositions,
 				     m_Xmax, lStartingCOMPosition,
+				     lStartingZMPPosition,
 				     InitLeftFootAbsPos,
 				     InitRightFootAbsPos);
 

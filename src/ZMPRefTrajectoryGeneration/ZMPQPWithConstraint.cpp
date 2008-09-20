@@ -1541,6 +1541,7 @@ void ZMPQPWithConstraint::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions
 					       deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					       double Xmax,
 					       COMPosition & lStartingCOMPosition,
+					       MAL_S3_VECTOR(&,double) lStartingZMPPosition,
 					       FootAbsolutePosition & InitLeftFootAbsolutePosition,
 					       FootAbsolutePosition & InitRightFootAbsolutePosition)
 {
@@ -1554,6 +1555,7 @@ void ZMPQPWithConstraint::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions
 			       RightFootAbsolutePositions,
 			       Xmax,
 			       lStartingCOMPosition,
+			       lStartingZMPPosition,
 			       InitLeftFootAbsolutePosition,
 			       InitRightFootAbsolutePosition);
 
@@ -1624,7 +1626,8 @@ int ZMPQPWithConstraint::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 				    FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				    FootAbsolutePosition & InitRightFootAbsolutePosition,
 				    deque<RelativeFootPosition> &RelativeFootPositions,
-				    COMPosition & lStartingCOMPosition)
+				    COMPosition & lStartingCOMPosition,
+				    MAL_S3_VECTOR(&,double) lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
   return 0;

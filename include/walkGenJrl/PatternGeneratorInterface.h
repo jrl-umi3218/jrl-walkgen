@@ -156,6 +156,7 @@ namespace PatternGeneratorJRL
       @param[in] ClearStepStackHandler: Clean the stack of steps after copy.
      */
     void CommonInitializationOfWalking(COMPosition & lStartingCOMPosition,
+				       MAL_S3_VECTOR(,double) & lStartingZMPPosition,
 				       MAL_VECTOR(  & ,double) BodyAnglesIni,
 				       FootAbsolutePosition & InitLeftFootAbsPos, 
 				       FootAbsolutePosition & InitRightFootAbsPos,
@@ -629,6 +630,7 @@ namespace PatternGeneratorJRL
     */
     int CreateZMPReferences(deque<RelativeFootPosition> &lRelativeFootPositions,
 			    COMPosition &lStartingCOMPosition,
+			    MAL_S3_VECTOR(&,double) lStartingZMPPosition,
 			    FootAbsolutePosition & InitLeftFootAbsPos,
 			    FootAbsolutePosition & InitRightFootAbsPos);
     /* @} */

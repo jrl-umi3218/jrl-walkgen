@@ -110,6 +110,7 @@ namespace PatternGeneratorJRL
 					deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					double Xmax,
 					COMPosition & lStartingCOMPosition,
+					MAL_S3_VECTOR(,double) &lStartingZMPPosition,
 					FootAbsolutePosition & InitLeftFootAbsolutePosition,
 					FootAbsolutePosition & InitRightFootAbsolutePosition) =0;
       
@@ -130,7 +131,8 @@ namespace PatternGeneratorJRL
 			     FootAbsolutePosition & InitLeftFootAbsolutePosition,
 			     FootAbsolutePosition & InitRightFootAbsolutePosition,
 			     deque<RelativeFootPosition> &RelativeFootPositions,
-			     COMPosition & lStartingCOMPosition) =0 ;
+			     COMPosition & lStartingCOMPosition,
+			     MAL_S3_VECTOR(&,double) aStartingZMPPosition) =0 ;
       
       /* ! \brief Method to update the stacks on-line */
       virtual void OnLine(double time,

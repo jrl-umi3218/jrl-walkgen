@@ -205,11 +205,15 @@ namespace PatternGeneratorJRL
 
     /*! @} */
 
+
     /*! Get the current position of the waist in the COM reference frame 
       @return a 4x4 matrix which contains the pose and the position of the waist
       in the CoM reference frame.
     */
     virtual MAL_S4x4_MATRIX(,double) GetCurrentPositionofWaistInCOMFrame() = 0;
+
+    /*! \brief Get the COG of the ankles at the starting position. */
+    virtual MAL_S3_VECTOR(,double) GetCOGInitialAnkles() = 0;
     
   };
 

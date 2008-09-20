@@ -140,6 +140,7 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
 
 int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngles,
 						  COMPosition & aStartingCOMPosition,
+						  MAL_S3_VECTOR(&,double) aStartingZMPPosition,
 						  FootAbsolutePosition & InitLeftFootPosition,
 						  FootAbsolutePosition & InitRightFootPosition)
 {
@@ -156,6 +157,7 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
   aStartingCOMPosition.x[0] = lStartingCOMPosition(0);
   aStartingCOMPosition.y[0] = lStartingCOMPosition(1);
   aStartingCOMPosition.z[0] = lStartingCOMPosition(2);
+  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in   CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
   return 0;
 }
 

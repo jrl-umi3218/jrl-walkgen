@@ -241,7 +241,10 @@ namespace PatternGeneratorJRL
       in the CoM reference frame.
     */
     MAL_S4x4_MATRIX(,double) GetCurrentPositionofWaistInCOMFrame();
-      
+
+    /*! \brief Get the COG of the ankles at the starting position. */
+    virtual MAL_S3_VECTOR(,double) GetCOGInitialAnkles();
+
   private:
 
     /*! \name Objects for stepping over. 
@@ -366,6 +369,10 @@ namespace PatternGeneratorJRL
     /*! Buffer of current Upper Body motion. */
     vector<double> m_UpperBodyMotion;
 
+    /*! COG of the ankles in the waist reference frame 
+      when evaluating the initial position.
+     */
+    MAL_S3_VECTOR(,double) m_COGInitialAnkles;
   };
 
 

@@ -202,6 +202,7 @@ namespace PatternGeneratorJRL
 				      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 				      double Xmax,
 				      COMPosition & lStartingCOMPosition,
+				      MAL_S3_VECTOR(,double) & lStartingZMPPosition,
 				      FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				      FootAbsolutePosition & InitRightFootAbsolutePosition) = 0;
     
@@ -231,7 +232,8 @@ namespace PatternGeneratorJRL
 			   FootAbsolutePosition & InitLeftFootAbsolutePosition,
 			   FootAbsolutePosition & InitRightFootAbsolutePosition,
 			   std::deque<RelativeFootPosition> &RelativeFootPositions,
-			   COMPosition & lStartingCOMPosition)   = 0;
+			   COMPosition & lStartingCOMPosition,
+			   MAL_S3_VECTOR(,double) & lStartingZMPPosition)   = 0;
     
     /* ! Methods to update the stack on-line by inserting a new foot position. 
        This method is only ADDING a new step position, this is not a replacement.

@@ -516,6 +516,7 @@ namespace PatternGeneratorJRL
 						       deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 						       double Xmax,
 						       COMPosition & lStartingCOMPosition,
+						       MAL_S3_VECTOR(&,double) lStartingZMPPosition,
 						       FootAbsolutePosition & InitLeftFootAbsolutePosition,
 						       FootAbsolutePosition & InitRightFootAbsolutePosition)
   {
@@ -598,7 +599,8 @@ namespace PatternGeneratorJRL
 					    FootAbsolutePosition & InitLeftFootAbsolutePosition,
 					    FootAbsolutePosition & InitRightFootAbsolutePosition,
 					    deque<RelativeFootPosition> &RelativeFootPositions,
-					    COMPosition & lStartingCOMPosition)
+					    COMPosition & lStartingCOMPosition,
+					    MAL_S3_VECTOR(&,double) lStartingZMPPosition)
   {
     ODEBUG("Begin InitOnLine");
     m_RelativeFootPositions.clear();
