@@ -415,7 +415,7 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	    {
 	      //ref_state->angle[i]=m_CurrentStateFromPG(i+6);
 	      ref_state->angle[i] = m_CurrentStateFromPG(i+6);
-	    }	  
+	    } 	  
 
 	  ref_state->angle[30]=-m_CurrentStateFromPG(22+6);
 	  ref_state->angle[31]=m_CurrentStateFromPG(22+6);
