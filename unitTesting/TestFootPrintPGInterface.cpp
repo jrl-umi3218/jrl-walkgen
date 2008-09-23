@@ -683,7 +683,9 @@ int main(int argc, char *argv[])
 	      << finalCOMPosition.z[0] << " "
 	      << ZMPTarget(0) << " " << ZMPTarget(1) << " " 
 	      << LeftFootPosition.x  << " " << LeftFootPosition.y  << " " << LeftFootPosition.z  << " "
-	      << RightFootPosition.x << " " << RightFootPosition.y << " " << RightFootPosition.z << endl;
+	      << RightFootPosition.x << " " << RightFootPosition.y << " " << RightFootPosition.z << " " 
+	      << ZMPTarget(0)+CurrentConfiguration(0) << " " 
+	      << ZMPTarget(1)+CurrentConfiguration(1) << " " << endl;
 	  for(unsigned int k=0;k<30;k++)
 	    {
 	      aofq << CurrentConfiguration[k+6]*180/M_PI << " ";

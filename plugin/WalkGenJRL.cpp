@@ -254,8 +254,6 @@ protected:
   // Absolute acceleration
   MAL_MATRIX(,double) m_AbsLinearAcc;
  
-  // Current Waist state return by the Pattern Generator Interface.
-  COMPosition m_CurrentWaistState;
 
 };
 
@@ -417,7 +415,7 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	    {
 	      //ref_state->angle[i]=m_CurrentStateFromPG(i+6);
 	      ref_state->angle[i] = m_CurrentStateFromPG(i+6);
-	    }
+	    }	  
 
 	  ref_state->angle[30]=-m_CurrentStateFromPG(22+6);
 	  ref_state->angle[31]=m_CurrentStateFromPG(22+6);
@@ -454,21 +452,10 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	  //cout << ref_state->waistPos[2] << " "
 	  //<< m_Zc << " " << aCOMPosition.z[0] << endl;
 	  
-	  double aTQ[7],WaistAbsOrientation;
-	  m_PGI->getWaistPositionAndOrientation(aTQ,WaistAbsOrientation);
-	  //ref_state->waistPos[0] = m_CurrentWaistState.x[0];
-	  //	  ref_state->waistPos[1] = m_CurrentWaistState.y[0];
-	  //	  ref_state->waistPos[2] = m_CurrentWaistState.z[0];//m_Zc -m_DiffBetweenComAndWaist;
-
-	  ODEBUG4("Go inside 4","DebugData.txt");
-// 	  ref_state->waistPos[0] = aTQ[0];
-// 	  ref_state->waistPos[1] = aTQ[1];
-// 	  ref_state->waistPos[2] = aTQ[2];
-// 	  ref_state->waistRpy[2] = WaistAbsOrientation;
-	  ref_state->waistPos[0] = aTQ[0];
-	  ref_state->waistPos[1] = aTQ[1];
-	  ref_state->waistPos[2] = aTQ[2];
-	  ref_state->waistRpy[2] = WaistAbsOrientation;
+	  ref_state->waistPos[0] = m_CurrentStateFromPG(0);
+	  ref_state->waistPos[1] = m_CurrentStateFromPG(1);
+	  ref_state->waistPos[2] = m_CurrentStateFromPG(2);
+	  ref_state->waistRpy[2] = m_CurrentStateFromPG(5);
 
 	  //cout << ref_state->waistPos[2] << endl;
 	  ODEBUG4("Go inside 5","DebugData.txt");
@@ -478,13 +465,9 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	      double temp2;
 	      double temp3;
 	     
-	      m_CurrentWaistState.x[0] = aTQ[0];
-	      m_CurrentWaistState.y[0] = aTQ[1];
-	      m_CurrentWaistState.z[0] = aTQ[2];
-	      m_CurrentWaistState.yaw = WaistAbsOrientation;
+	      temp3 = m_CurrentStateFromPG(5);
 	      ODEBUG4("Go inside 6","DebugData.txt");
 
-	      temp3 = m_CurrentWaistState.yaw*M_PI/180.0;
 	      // This does the inverse of the transformation perform inside PGI. (use the transpose of the matrix).
 	      temp1 = m_zmptarget[0] * cos(temp3) + m_zmptarget[1] * -sin(temp3) ;
 	      temp2 = m_zmptarget[0] * sin(temp3) + m_zmptarget[1] * cos(temp3) ;
@@ -504,7 +487,6 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 
 	  ref_state->waistRpy[0] =0.0;
 	  ref_state->waistRpy[1] =0.0;
-	  //	  ref_state->waistRpy[2] =m_CurrentWaistState.theta*M_PI/180;
 	  ODEBUG4("Go inside 8","DebugData.txt");
 	  
 	  m_seq->setReferenceState(ref_state,dt);                              // send seq the next ref_state              
