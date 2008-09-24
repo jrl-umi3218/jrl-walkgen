@@ -1664,6 +1664,14 @@ int ZMPQPWithConstraint::OnLineFootChange(double time,
   return -1;
 }
 
+void ZMPQPWithConstraint::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
+					       deque<COMPosition> &FinalCOMPositions,
+					       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+					       deque<FootAbsolutePosition> &RightFootAbsolutePositions)
+{
+  
+}
+
 int ZMPQPWithConstraint::ReturnOptimalTimeToRegenerateAStep()
 {
   int r = (int)(m_PreviewControlTime/m_SamplingPeriod);

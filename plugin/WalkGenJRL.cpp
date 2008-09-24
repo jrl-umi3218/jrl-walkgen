@@ -82,6 +82,16 @@ public:
   void m_echo(istringstream &strm); 
   void m_StepSequence(istringstream &strm);
 
+  /*! \name Wrappers around CORBA interface 
+    @{
+    */
+  /*! Start stepping for the robot in an online mode.*/
+  void m_startStepping(istringstream &strm);
+
+  /*! Stop stepping for the robot in an online mode. */
+  void m_stopWalking(istringstream &strm);
+   /*! @} */ 
+
    void Matrix2Quaternion(MAL_MATRIX(,double) R,double q[4]);
 
    // Interface for hrpsys.
@@ -286,6 +296,8 @@ WalkGenJRL::WalkGenJRL(istringstream &strm)
   register_method(":readfilefromkw",(method)&WalkGenJRL:: m_ReadFileFromKineoWorks);
   register_method(":pstepseq",(method)&WalkGenJRL::m_PartialStepSequence);
   register_method(":SendStackToControl",(method)&WalkGenJRL::m_SendStackToControl);
+  register_method(":startStepping",(method)&WalkGenJRL::m_startStepping);
+  register_method(":stopWalking",(method)&WalkGenJRL::m_stopWalking);
 
   m_CurrentJointValues.resize(40);
   m_CurrentStateFromPG.resize(46);
@@ -596,11 +608,6 @@ void WalkGenJRL::setLfootPosNoWait(CORBA::Float x, CORBA::Float y, CORBA::Float 
   m_PGI->AddStepInStack(x,y,th);
 }
 
-void WalkGenJRL::stopWalking()
-  throw(CORBA::SystemException)
-{
-  // TO DO
-}
 
 void WalkGenJRL::waitArrival()
   throw(CORBA::SystemException)
@@ -613,10 +620,44 @@ void WalkGenJRL::waitArrival()
 
 }
 
+void WalkGenJRL::m_startStepping(istringstream &args)
+{
+  startStepping();
+}
+
+
 void WalkGenJRL::startStepping()
   throw(CORBA::SystemException)
 {
-  // TO DO
+  if (m_PGI!=0)
+    {
+      // TODO: Remove the hardcoding of this sequence and put it automatically
+      // inside the WPG.
+      // However this allow to start with a non-fixed sequence.
+      // A possible improvment is to add the sequence at the beginning by
+      // passing arguments.
+      istringstream strm2(":StartOnLineStepSequencing 0.0 0.105 0.0 \
+                     0.2 -0.21 0.0				    \
+                     0.2 0.21 0.0				    \
+                     0.2 -0.21 0.0 ");
+      m_PGI->ParseCmd(strm2);
+    }
+
+}
+
+void WalkGenJRL::m_stopWalking(istringstream &args)
+{
+  stopWalking();
+}
+
+void WalkGenJRL::stopWalking()
+  throw(CORBA::SystemException)
+{
+  if (m_PGI!=0)
+    {
+      istringstream strm2(":StopOnLineStepSequencing");
+      m_PGI->ParseCmd(strm2);
+    }
 }
 
 void WalkGenJRL::setWalkingVelocity(CORBA::Float dx,

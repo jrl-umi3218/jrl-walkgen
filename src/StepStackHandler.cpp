@@ -72,13 +72,14 @@ StepStackHandler::StepStackHandler(SimplePluginManager *lSPM) : SimplePlugin(lSP
   m_RelativeFootPositions.clear();
   m_TransitionFinishOnLine=false;
 
-  std::string aMethodName[7] = 
+  std::string aMethodName[8] = 
     {":walkmode",
      ":singlesupporttime",
      ":doublesupporttime",
      ":supportfoot",
      ":lastsupport",
      ":arc",
+     ":addstandardonlinestep",
      ":arccentered"};
 
   for(int i=0;i<7;i++)
@@ -100,6 +101,16 @@ StepStackHandler::~StepStackHandler()
 RelativeFootPosition StepStackHandler::ReturnBackFootPosition()
 {
   return m_RelativeFootPositions.back();
+}
+
+bool StepStackHandler::ReturnFrontFootPosition(RelativeFootPosition  &aRFP)
+{
+  if (m_RelativeFootPositions.size()>0)
+    {
+      aRFP = m_RelativeFootPositions.front();
+      return true;
+    }
+  return false;
 }
 
 int StepStackHandler::ReturnStackSize()
@@ -721,8 +732,12 @@ void StepStackHandler::StopOnLineStep()
   //  m_OnLineSteps = false;
   m_TransitionFinishOnLine=true;
 
-  m_RelativeFootPositions.clear();
+  // Correct the last support foot before cleaning up the 
+  // stack.
+  if (m_RelativeFootPositions.size()%2==0)
+    m_KeepLastCorrectSupportFoot = -m_KeepLastCorrectSupportFoot;
 
+  m_RelativeFootPositions.clear();
 
 }
 
@@ -746,7 +761,7 @@ void StepStackHandler::AddStandardOnLineStep(bool NewStep,
   if (!m_OnLineSteps)
     return;
   
-  ODEBUG3("m_KeepLastCorrectSupportFoot" << m_KeepLastCorrectSupportFoot);
+  ODEBUG("m_KeepLastCorrectSupportFoot" << m_KeepLastCorrectSupportFoot);
   if (!NewStep)
     {
       aFootPosition.sx = 0;
@@ -895,6 +910,29 @@ void StepStackHandler::CallMethod(std::string &Method, std::istringstream &strm)
   else if (Method==":lastsupport")
     {
       FinishOnTheLastCorrectSupportFoot();
+    }
+  else if (Method==":addstandardonlinestep")
+    {
+      double x,y,theta;
+
+      while(!strm.eof())
+	{
+	  
+	  if (!strm.eof())
+	    strm >> x;
+	  else break;
+	  
+	  if (!strm.eof())
+	    strm >> y;
+	  else break;
+	  
+	  if (!strm.eof())
+	    strm >> theta;
+	  else break;
+	  
+	}
+      AddStandardOnLineStep(true,x,y,theta);
+      
     }
   else if (Method==":arc")
     {

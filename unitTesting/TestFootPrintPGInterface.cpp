@@ -616,8 +616,8 @@ int main(int argc, char *argv[])
       // TurningOnTheCircleTowardsTheCenter(*aPGI);
       // TurningOnTheCircleTowardsTheCenter(aPGI);
       // StartAnalyticalOnLineWalking(*aPGI);
-      // StartOnLineWalking(*aPGI);
-      StartSimuOnLineWalking(*aPGI);
+      StartOnLineWalking(*aPGI);
+      //StartSimuOnLineWalking(*aPGI);
 
       bool ok = true;
       while(ok)
@@ -659,20 +659,23 @@ int main(int argc, char *argv[])
 	  PreviousVelocity = CurrentVelocity;
 	  PreviousAcceleration = CurrentAcceleration;
 	  
-	  if ((NbOfIt>14.43*200) && 
+	  
+	  if ((NbOfIt>5*200) && 
 	      TestChangeFoot)
 	    {
 	      FootAbsolutePosition aFAP;
-	      aFAP.x=0.55;
-	      aFAP.y=-0.095;
+	      aFAP.x=0.2;
+	      aFAP.y=0.0;
 	      gettimeofday(&beginmodif,0);
-	      aPGI->ChangeOnLineStep(15.5,aFAP);
+	      //aPGI->ChangeOnLineStep(15.5,aFAP);
+	      istringstream strm2(":parsecmd :addstandardonlinestep 0.2 0.0 0.0");
+	      aPGI->ParseCmd(strm2);
 	      gettimeofday(&endmodif,0);
 	      timemodif = endmodif.tv_sec-beginmodif.tv_sec + 0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
 	      TestChangeFoot=false;
 	    }
 
-	  if (NbOfIt>30*200) /* Stop after 30 seconds the on-line stepping */
+	  if (NbOfIt>10*200) /* Stop after 30 seconds the on-line stepping */
 	    {
 	      StopOnLineWalking(*aPGI);
 	    }

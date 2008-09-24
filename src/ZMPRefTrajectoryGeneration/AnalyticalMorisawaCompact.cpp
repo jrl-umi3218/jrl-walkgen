@@ -2121,5 +2121,12 @@ namespace PatternGeneratorJRL
     return r;
   }
         
+  void AnalyticalMorisawaCompact::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
+						       deque<COMPosition> &FinalCOMPositions,
+						       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+						       deque<FootAbsolutePosition> &RightFootAbsolutePositions)
+  {
+    
+  }
 }
 

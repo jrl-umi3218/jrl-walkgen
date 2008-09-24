@@ -198,7 +198,10 @@ namespace PatternGeneratorJRL
 				  deque<COMPosition> &FinalCOMPositions,
 				  deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 				  deque<FootAbsolutePosition> &RightFootAbsolutePositions);
-      
+
+      /*! Filter out the ZMP values and put them at the back FinalZMPPositions. */
+      void FilterOutValues(deque<ZMPPosition> &ZMPPositions,
+			   deque<ZMPPosition> &FinalZMPPositions);
       
       /*! Set the ZMP neutral position in the global coordinates system */
       void setZMPNeutralPosition(const double aZMPNeutralPosition[2])

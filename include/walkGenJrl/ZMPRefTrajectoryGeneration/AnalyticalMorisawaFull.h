@@ -165,6 +165,19 @@ namespace PatternGeneratorJRL
 			   deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 			   StepStackHandler *aStepStackHandler=0);
 
+      /*! \brief Method to stop walking.
+	@param[out] ZMPPositions: The queue of ZMP reference positions.
+	@param[out] CoMPositions: The queue of COM reference positions.
+	@param[out] FinalLeftFootAbsolutePositions: The queue of left foot absolute positions.
+	@param[out] FinalRightFootAbsolutePositions: The queue of right foot absolute positions.
+      */
+      void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
+				deque<COMPosition> &FinalCOMPositions,
+				deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+				deque<FootAbsolutePosition> &RightFootAbsolutePositions);
+
+
+
       /*! \brief Return the time at which it is optimal to regenerate a step in online mode. 
        */
       int ReturnOptimalTimeToRegenerateAStep();

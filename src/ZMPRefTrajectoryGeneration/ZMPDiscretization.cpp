@@ -498,6 +498,11 @@ void ZMPDiscretization::UpdateCurrentSupportFootPosition(RelativeFootPosition aR
   for(int k=0;k<2;k++)
     m_CurrentSupportFootPosition(k,2) += v2(k,0);
 
+  ODEBUG("v :" << v  << " "
+	  "v2 : " << v2 << " "
+	  "Orientation : " << Orientation << " "
+	  "CurrentSupportFootPosition: " << m_CurrentSupportFootPosition );
+
 }
 
 
@@ -540,8 +545,13 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   ODEBUG6(m_RelativeFootPositions[0].sx << " "  << 
 	  m_RelativeFootPositions[0].sy << " " << 
 	  m_RelativeFootPositions[0].theta,"DebugDataRFPos.txt" );
-  ODEBUG(" m_RelativeFootPositions.size: " <<  m_RelativeFootPositions.size());
-  if (m_RelativeFootPositions[1].DStime!=0.0)
+  ODEBUG(" OnLineAddFoot: m_RelativeFootPositions.size: " <<  m_RelativeFootPositions.size());
+  ODEBUG(" OnLineAddFoot: "<< endl <<
+	  " NewRelativeFootPositions.x: " <<  NewRelativeFootPosition.sx <<
+	  " NewRelativeFootPositions.y: " <<  NewRelativeFootPosition.sy <<
+	  " NewRelativeFootPositions.theta: " <<  NewRelativeFootPosition.theta
+	  );
+   if (m_RelativeFootPositions[1].DStime!=0.0)
     {	
       lTdble =m_RelativeFootPositions[1].DStime; 
       lTsingle =m_RelativeFootPositions[1].SStime; 
@@ -875,11 +885,36 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   else 
     WhoIsSupportFoot = 1;// Left
 
+  m_RelativeFootPositions.pop_front();
+
+  for(unsigned int i=0;i<ZMPPositions.size();i++)
+    {
+      COMPosition aCOMPosition;
+      if (m_PC==0)
+	aCOMPosition.z[0] = 0.0;
+      else 
+	aCOMPosition.z[0] = m_PC->GetHeightOfCoM();
+
+      aCOMPosition.z[1] = aCOMPosition.z[2] = 0.0;
+      aCOMPosition.yaw = ZMPPositions[i].theta;
+      
+      FinalCOMPositions.push_back(aCOMPosition);
+      FinalLeftFootAbsolutePositions.push_back(LeftFootAbsolutePositions[i]);
+      FinalRightFootAbsolutePositions.push_back(RightFootAbsolutePositions[i]);
+     
+    }
+  FilterOutValues(ZMPPositions,
+		  FinalZMPPositions);		  
+  
   if (EndSequence)
-    EndPhaseOfTheWalking(ZMPPositions,
-			 FinalCOMPositions,
-			 LeftFootAbsolutePositions,
-			 RightFootAbsolutePositions);
+    {
+      
+      // End Phase of the walking includes the filtering.
+      EndPhaseOfTheWalking(FinalZMPPositions,
+			   FinalCOMPositions,
+			   FinalLeftFootAbsolutePositions,
+			   FinalRightFootAbsolutePositions);
+    }
 
   if (0)
     {
@@ -891,6 +926,12 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 	}
       dbg_aof.close();
     }
+}
+
+void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
+					deque<ZMPPosition> &FinalZMPPositions)
+{
+
   // Filter out the ZMP values.
   ODEBUG("FinalZMPPositions.size()="<<FinalZMPPositions.size());
   for(unsigned int i=0;i<ZMPPositions.size();i++)
@@ -923,25 +964,13 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       aZMPPos.theta = ZMPPositions[i].theta;
       aZMPPos.time = ZMPPositions[i].time;
       aZMPPos.stepType = ZMPPositions[i].stepType;
-     
-      COMPosition aCOMPosition;
-      if (m_PC==0)
-	aCOMPosition.z[0] = 0.0;
-      else 
-	aCOMPosition.z[0] = m_PC->GetHeightOfCoM();
-
-      aCOMPosition.z[1] = aCOMPosition.z[2] = 0.0;
-      aCOMPosition.yaw = aZMPPos.theta;
-      
+           
       FinalZMPPositions.push_back(aZMPPos);
-      FinalCOMPositions.push_back(aCOMPosition);
-      FinalLeftFootAbsolutePositions.push_back(LeftFootAbsolutePositions[i]);
-      FinalRightFootAbsolutePositions.push_back(RightFootAbsolutePositions[i]);
+
 
      
     }
   ODEBUG("FinalZMPPositions.size()="<<FinalZMPPositions.size());
-  m_RelativeFootPositions.pop_front();
 }
 
 int ZMPDiscretization::OnLineFootChange(double time,
@@ -961,25 +990,30 @@ int ZMPDiscretization::ReturnOptimalTimeToRegenerateAStep()
   return 2*r;
 }
 
-void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
+void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPositions,
 					       deque<COMPosition> &FinalCOMPositions,
-					       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-					       deque<FootAbsolutePosition> &RightFootAbsolutePositions)
+					       deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+					       deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
 
 {
-  UpdateCurrentSupportFootPosition(m_RelativeFootPositions[0]);
+  deque<ZMPPosition> ZMPPositions;
+  FootAbsolutePosition LeftFootAbsolutePosition;
+  FootAbsolutePosition RightFootAbsolutePosition;
+
+  ODEBUG("m_RelativeFootPositions.size(): " << m_RelativeFootPositions.size());
+  if (m_RelativeFootPositions.size()>0)
+    UpdateCurrentSupportFootPosition(m_RelativeFootPositions[0]);
+
   double CurrentTime = 0;
   double TimeForThisFootPosition;
   // Deal with the end phase of the walking.
-  TimeForThisFootPosition = m_Tdble/2.0;
+  TimeForThisFootPosition = m_Tdble;
   double dlAddArraySize = TimeForThisFootPosition/m_SamplingPeriod;
   unsigned int AddArraySize = (unsigned int)round(dlAddArraySize);
   
-  unsigned int CurrentZMPindex;
-  unsigned int currentsize = CurrentZMPindex = ZMPPositions.size();
+  unsigned int currentsize = 0;
+  unsigned int CurrentZMPindex = 0;
   ZMPPositions.resize(currentsize+AddArraySize);
-  LeftFootAbsolutePositions.resize(currentsize+AddArraySize);
-  RightFootAbsolutePositions.resize(currentsize+AddArraySize);
   
   ODEBUG4(" GetZMPDiscretization: Step 7 " << currentsize << " " << AddArraySize,"DebugData.txt");
 
@@ -988,20 +1022,29 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
   unsigned int SizeOfEndPhase = (unsigned int)round(dSizeOfEndPhase);
   double px0,py0,delta_x,delta_y;
   double pxf=0,pyf=0;
-  px0 = ZMPPositions[CurrentZMPindex-1].px;
-  py0 = ZMPPositions[CurrentZMPindex-1].py;
+  px0 = FinalZMPPositions.back().px;
+  py0 = FinalZMPPositions.back().py;
   //  int lindex = SupportFootAbsolutePositions.size()-1;
 
   // We assume that the last positon of the ZMP
   // will the middle of the two last position
   // of the support foot.
+  ODEBUG("Cur/Prev SuppFootPos (X) : " <<m_CurrentSupportFootPosition(0,2) << " " << m_PrevCurrentSupportFootPosition(0,2));
+  ODEBUG("Cur/Prev SuppFootPos (Y) : " <<m_CurrentSupportFootPosition(1,2) << " " << m_PrevCurrentSupportFootPosition(1,2));
+
   pxf = 0.5*(m_CurrentSupportFootPosition(0,2) + m_PrevCurrentSupportFootPosition(0,2));
   pyf = 0.5*(m_CurrentSupportFootPosition(1,2) + m_PrevCurrentSupportFootPosition(1,2));
   
   delta_x = (pxf - px0)/(double)SizeOfEndPhase;
   delta_y = (pyf - py0)/(double)SizeOfEndPhase;
   
-  for(unsigned int k=0;k<SizeOfEndPhase;k++)
+  ZMPPositions[0].px = px0 + delta_x;
+  ZMPPositions[0].py = py0 + delta_y;
+  ZMPPositions[0].time = CurrentTime;
+  ZMPPositions[0].theta = FinalZMPPositions.back().theta;
+  CurrentZMPindex++;
+
+  for(unsigned int k=1;k<SizeOfEndPhase;k++)
     {
 
       // Set ZMP positions.
@@ -1027,16 +1070,20 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
       FinalCOMPositions.push_back(aCOMPosition);
 
       // Set Feet positions.
-      LeftFootAbsolutePositions[CurrentZMPindex] = 
-	LeftFootAbsolutePositions[CurrentZMPindex-1];
-      RightFootAbsolutePositions[CurrentZMPindex] = 
-	RightFootAbsolutePositions[CurrentZMPindex-1];
+      LeftFootAbsolutePosition = 
+	FinalLeftFootAbsolutePositions.back();
+      RightFootAbsolutePosition = 
+	FinalRightFootAbsolutePositions.back();
       
-      LeftFootAbsolutePositions[CurrentZMPindex].time = 
-	RightFootAbsolutePositions[CurrentZMPindex].time = CurrentTime;
+      LeftFootAbsolutePosition.time = 
+	RightFootAbsolutePosition.time = CurrentTime;
 
-      LeftFootAbsolutePositions[CurrentZMPindex].stepType = 
-	RightFootAbsolutePositions[CurrentZMPindex].stepType = 0;
+      LeftFootAbsolutePosition.stepType = 
+	RightFootAbsolutePosition.stepType = 0;
+
+      FinalLeftFootAbsolutePositions.push_back(LeftFootAbsolutePosition);
+      FinalRightFootAbsolutePositions.push_back(RightFootAbsolutePosition);
+
 
       CurrentTime += m_SamplingPeriod;
       CurrentZMPindex++;
@@ -1051,8 +1098,6 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
   
   currentsize = ZMPPositions.size();
   ZMPPositions.resize(currentsize+AddArraySize);
-  LeftFootAbsolutePositions.resize(currentsize+AddArraySize);
-  RightFootAbsolutePositions.resize(currentsize+AddArraySize);
 
   ODEBUG4(" GetZMPDiscretization: Step 8 ","DebugData.txt");
 
@@ -1080,23 +1125,26 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
       FinalCOMPositions.push_back(aCOMPosition);
 
       // Set Feet Positions
-      LeftFootAbsolutePositions[CurrentZMPindex] = 
-	LeftFootAbsolutePositions[CurrentZMPindex-1];
-      RightFootAbsolutePositions[CurrentZMPindex] = 
-	RightFootAbsolutePositions[CurrentZMPindex-1];
+      LeftFootAbsolutePosition= 
+	FinalLeftFootAbsolutePositions.back();
+      RightFootAbsolutePosition = 
+	FinalRightFootAbsolutePositions.back();
 
       
-      LeftFootAbsolutePositions[CurrentZMPindex].time = 
-	RightFootAbsolutePositions[CurrentZMPindex].time = CurrentTime;
+      LeftFootAbsolutePosition.time = 
+	RightFootAbsolutePosition.time = CurrentTime;
 	
-      LeftFootAbsolutePositions[CurrentZMPindex].stepType = 
-	RightFootAbsolutePositions[CurrentZMPindex].stepType = 0;
+      LeftFootAbsolutePosition.stepType = 
+	RightFootAbsolutePosition.stepType = 0;
       
+      FinalLeftFootAbsolutePositions.push_back(LeftFootAbsolutePosition);
+      FinalRightFootAbsolutePositions.push_back(RightFootAbsolutePosition);
+
       CurrentTime += m_SamplingPeriod;
       CurrentZMPindex++;
     }
 
   ODEBUG4(" GetZMPDiscretization: Step 9 " << ZMPPositions.size(),"DebugData.txt");
-
+  FilterOutValues(ZMPPositions,FinalZMPPositions);
 
 }

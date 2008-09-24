@@ -146,8 +146,11 @@ namespace PatternGeneratorJRL
 			   double theta, double sstime,
 			   double dstime);
 
-    /*! \brief Returns the first step of the stack. */
+    /*! \brief Returns the last step of the stack. */
     RelativeFootPosition ReturnBackFootPosition();
+
+    /*! \brief Returns the first step of the stack. */
+    bool ReturnFrontFootPosition(RelativeFootPosition &aRFP);
 
     /*! \brief Returns the size of the stack. */
     int ReturnStackSize();

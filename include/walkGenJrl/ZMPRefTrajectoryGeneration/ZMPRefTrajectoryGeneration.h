@@ -272,6 +272,18 @@ namespace PatternGeneratorJRL
 		       std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 		       std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)=0;
 
+    /*! \brief Method to stop walking.
+      @param[out] ZMPPositions: The queue of ZMP reference positions.
+      @param[out] CoMPositions: The queue of COM reference positions.
+      @param[out] FinalLeftFootAbsolutePositions: The queue of left foot absolute positions.
+      @param[out] FinalRightFootAbsolutePositions: The queue of right foot absolute positions.
+     */
+    virtual void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
+				      deque<COMPosition> &FinalCOMPositions,
+				      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+				      deque<FootAbsolutePosition> &RightFootAbsolutePositions)=0;
+
+	  
     /* ! \brief Method to change on line the landing position of a foot.
        @param[in] time : Current time.
        @param[out] FinalZMPPositions: The ZMP reference trajectory deduced from the foot
@@ -292,6 +304,7 @@ namespace PatternGeneratorJRL
 				 std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 				 std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 				 StepStackHandler * aStepStackHandler)=0;
+
 
     /*! \brief Return the time at which it is optimal to regenerate a step in online mode. 
      */

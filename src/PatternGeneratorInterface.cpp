@@ -1125,52 +1125,88 @@ namespace PatternGeneratorJRL {
 	ODEBUG("NEW STEP NEEDED" << m_InternalClock/m_SamplingPeriod << " Internal Clock :" << m_InternalClock);
 	if (m_StepStackHandler->IsOnLineSteppingOn())
 	  {
-	    // CAREFULL: we assume that this sequence will create temporary
-	    // two relative foot steps inside the StepStackHandler.
-	    // The first step in the stack is the previous one.
-	    // The second step is the new one.
+	    // CAREFULL: we assume that this sequence will create a
+	    // a new foot steps at the back of the queue handled by the StepStackHandler.
+	    // Then we have two foot steps: the last one put inside the preview,
+	    // and the new one.
 	    RelativeFootPosition lRelativeFootPositions;
 	    // Add a new step inside the stack.
 	    m_StepStackHandler->AddStandardOnLineStep(m_NewStep, m_NewStepX, m_NewStepY, m_NewTheta);
 	    m_NewStep = false;
 
-	    // Returns the newly created foot step.
-	    lRelativeFootPositions = m_StepStackHandler->ReturnBackFootPosition();
-
-	    // Remove the previous step.
+	    // Remove the first step of the queue.
 	    bool EndSequence = m_StepStackHandler->RemoveFirstStepInTheStack();
+
+	    // Returns the front foot step in the step stack handler which is not yet
+	    // in the preview control queue.
+	    bool EnoughSteps= m_StepStackHandler->ReturnFrontFootPosition(lRelativeFootPositions);
+	    if ((!EnoughSteps)&& (!EndSequence))
+	      {
+		ODEBUG3("You don't have enough steps in the step stack handler.");
+		ODEBUG3("And this is not an end sequence.");
+	      }
 
 
 	    ODEBUG("Asking a new step");
 	    
-	    // ********* WARNING THIS IS THE TIME CONSUMING PART *******************
-	    if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
+	    if (!EndSequence)
 	      {
+		// ********* WARNING THIS IS THE TIME CONSUMING PART *******************
+		if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
+		  {
+		  }
+		else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
+		  {
+		    m_ZMPD->OnLineAddFoot(lRelativeFootPositions,
+					  m_ZMPPositions,
+					  m_COMBuffer,
+					  m_LeftFootPositions,			   
+					  m_RightFootPositions,
+					  EndSequence);
+		  }
+		else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+		  {
+		    ODEBUG("Putting a new step SX: " << 
+			   lRelativeFootPositions.sx << " SY: " 
+			   << lRelativeFootPositions.sy );
+		    m_ZMPM->SetCurrentTime(m_InternalClock);
+		    m_ZMPM->OnLineAddFoot(lRelativeFootPositions,
+					  m_ZMPPositions,
+					  m_COMBuffer,
+					  m_LeftFootPositions,
+					  m_RightFootPositions,
+					  EndSequence);
+		    ODEBUG("Left and Right foot positions queues: " 
+			   << m_LeftFootPositions.size() << " " 
+			   << m_RightFootPositions.size() );
+		  }
 	      }
-	    else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
+	    else if (EndSequence)
 	      {
-		m_ZMPD->OnLineAddFoot(lRelativeFootPositions,
-				      m_ZMPPositions,
-				      m_COMBuffer,
-				      m_LeftFootPositions,			   
-				      m_RightFootPositions,
-				      EndSequence);
-	      }
-	    else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
-	      {
-		ODEBUG("Putting a new step SX: " << 
-			lRelativeFootPositions.sx << " SY: " 
-			<< lRelativeFootPositions.sy );
-		m_ZMPM->SetCurrentTime(m_InternalClock);
-		m_ZMPM->OnLineAddFoot(lRelativeFootPositions,
-				      m_ZMPPositions,
-				      m_COMBuffer,
-				      m_LeftFootPositions,
-				      m_RightFootPositions,
-				      EndSequence);
-		ODEBUG("Left and Right foot positions queues: " 
-			<< m_LeftFootPositions.size() << " " 
-			<< m_RightFootPositions.size() );
+		if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
+		  {
+		  }
+		else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
+		  {
+		    m_ZMPD->EndPhaseOfTheWalking(m_ZMPPositions,
+						 m_COMBuffer,
+						 m_LeftFootPositions,			   
+						 m_RightFootPositions);
+		  }
+		else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+		  {
+		    ODEBUG("Putting a new step SX: " << 
+			   lRelativeFootPositions.sx << " SY: " 
+			   << lRelativeFootPositions.sy );
+		    m_ZMPM->SetCurrentTime(m_InternalClock);
+		    m_ZMPM->EndPhaseOfTheWalking(m_ZMPPositions,
+						 m_COMBuffer,
+						 m_LeftFootPositions,
+						 m_RightFootPositions);
+		    ODEBUG("Left and Right foot positions queues: " 
+			   << m_LeftFootPositions.size() << " " 
+			   << m_RightFootPositions.size() );
+		  }
 	      }
 	    // ************* THIS HAS TO FIT INSIDE THE control step time  ***********
 
