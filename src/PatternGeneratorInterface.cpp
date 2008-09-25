@@ -1131,8 +1131,11 @@ namespace PatternGeneratorJRL {
 	    // and the new one.
 	    RelativeFootPosition lRelativeFootPositions;
 	    // Add a new step inside the stack.
-	    m_StepStackHandler->AddStandardOnLineStep(m_NewStep, m_NewStepX, m_NewStepY, m_NewTheta);
-	    m_NewStep = false;
+	    if (m_StepStackHandler->ReturnStackSize()<=1)
+	      {
+		m_StepStackHandler->AddStandardOnLineStep(m_NewStep, m_NewStepX, m_NewStepY, m_NewTheta);
+		m_NewStep = false;
+	      }
 
 	    // Remove the first step of the queue.
 	    bool EndSequence = m_StepStackHandler->RemoveFirstStepInTheStack();
