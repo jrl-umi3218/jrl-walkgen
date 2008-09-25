@@ -890,12 +890,22 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   for(unsigned int i=0;i<ZMPPositions.size();i++)
     {
       COMPosition aCOMPosition;
+      aCOMPosition.x[0] = 
+	aCOMPosition.x[1] = 
+	aCOMPosition.x[2] = 0.0;
+
+      aCOMPosition.y[0] = 
+	aCOMPosition.y[1] = 
+	aCOMPosition.y[2] = 0.0;
+
       if (m_PC==0)
 	aCOMPosition.z[0] = 0.0;
       else 
 	aCOMPosition.z[0] = m_PC->GetHeightOfCoM();
-
+      
+      aCOMPosition.pitch = aCOMPosition.roll = 0.0;
       aCOMPosition.z[1] = aCOMPosition.z[2] = 0.0;
+
       aCOMPosition.yaw = ZMPPositions[i].theta;
       
       FinalCOMPositions.push_back(aCOMPosition);
@@ -1041,7 +1051,9 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   ZMPPositions[0].px = px0 + delta_x;
   ZMPPositions[0].py = py0 + delta_y;
   ZMPPositions[0].time = CurrentTime;
+  
   ZMPPositions[0].theta = FinalZMPPositions.back().theta;
+  ZMPPositions[0].stepType=0;
   CurrentZMPindex++;
 
   for(unsigned int k=1;k<SizeOfEndPhase;k++)
@@ -1065,7 +1077,16 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
       else 
 	aCOMPosition.z[0] = m_PC->GetHeightOfCoM();
 
+      aCOMPosition.x[0] = 
+	aCOMPosition.x[1] = 
+	aCOMPosition.x[2] = 0.0;
+
+      aCOMPosition.y[0] = 
+	aCOMPosition.y[1] = 
+	aCOMPosition.y[2] = 0.0;
+
       aCOMPosition.z[1] = aCOMPosition.z[2] = 0.0;
+      aCOMPosition.pitch = aCOMPosition.roll = 0.0;
       aCOMPosition.yaw = ZMPPositions[CurrentZMPindex].theta;
       FinalCOMPositions.push_back(aCOMPosition);
 

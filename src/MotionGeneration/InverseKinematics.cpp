@@ -70,7 +70,7 @@ int InverseKinematics::ComputeInverseKinematicsForLegs3(MAL_S3x3_MATRIX(,double)
 							MAL_S3_VECTOR(,double) &Foot_P,
 							MAL_VECTOR(, double) &q)
 {
-  double A=m_FemurLength,B=m_TibiaLength,C,c5,q6a;
+  double A=m_FemurLength,B=m_TibiaLength,C=0,c5,q6a;
   MAL_S3_VECTOR( r,double);
   MAL_S3x3_MATRIX( rT,double);
 #if 0
@@ -83,6 +83,8 @@ int InverseKinematics::ComputeInverseKinematicsForLegs3(MAL_S3x3_MATRIX(,double)
   cout << "Dt" << Dt << endl;
 #endif
   rT= MAL_S3x3_RET_TRANSPOSE(Foot_R);
+  double ls=0;	
+
 #if 0
   cout << "rT" << rT<< endl;
   cout << "rT" << rT<< endl;
@@ -178,7 +180,7 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
   MAL_S3_VECTOR( r,double);
   MAL_S3x3_MATRIX( rT,double);
   MAL_S3x3_MATRIX( Foot_Rt,double);
-  double NormofDt=0.0;
+  double NormofDt=0.0,ls=0.0;
 
   // New part for the inverse kinematics specific to the HRP-2
   // robot. The computation of rx, ry and rz is different.
@@ -188,6 +190,7 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
   MAL_S3_VECTOR( v,double);
   double theta=0.0, psi=0.0, Cp=0.0;
   float OppSignOfDtY = Dt(1) < 0.0 ? 1.0 : -1.0;
+
 
   Foot_Rt = MAL_S3x3_RET_TRANSPOSE(Foot_R);
   v = Body_P - Foot_P;
@@ -219,7 +222,7 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
 #endif
 
   r(2) = sin(psi+theta)*Cp;
-  
+
   //  cout << "r : " << r << endl;
 #if 0
   cout << "Body_R" << Body_R<<endl;
@@ -232,7 +235,7 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
 #endif
 
 #if 0
-  cout << "rT" << rT<< endl;
+  cout << "Body_P" << rT<< endl;
   cout << "rT" << rT<< endl;
   cout << "Body_R * Dt - Foot_P" << Body_R * Dt - Foot_P << endl;
 #endif

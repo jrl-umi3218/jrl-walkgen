@@ -629,20 +629,7 @@ void WalkGenJRL::m_startStepping(istringstream &args)
 void WalkGenJRL::startStepping()
   throw(CORBA::SystemException)
 {
-  if (m_PGI!=0)
-    {
-      // TODO: Remove the hardcoding of this sequence and put it automatically
-      // inside the WPG.
-      // However this allow to start with a non-fixed sequence.
-      // A possible improvment is to add the sequence at the beginning by
-      // passing arguments.
-      istringstream strm2(":StartOnLineStepSequencing 0.0 0.105 0.0 \
-                     0.2 -0.21 0.0				    \
-                     0.2 0.21 0.0				    \
-                     0.2 -0.21 0.0 ");
-      m_PGI->ParseCmd(strm2);
-    }
-
+  m_ShouldBeRunning = true;
 }
 
 void WalkGenJRL::m_stopWalking(istringstream &args)
