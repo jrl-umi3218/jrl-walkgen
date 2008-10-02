@@ -1,7 +1,9 @@
 SOURCE_DIR = @abs_srcdir@
 BUILD_DIR = @abs_buildir@
 
-ifdef OPENHRPHOME
+ifndef OPENHRPHOME
+OPENHRPHOME=/tmp/
+endif
 
 ifndef ROBOT
 ROBOT=HRP2JRL
@@ -10,20 +12,42 @@ endif
 SYSDIR=$(OPENHRPHOME)/Controller/IOserver/sys/plugin
 
 sample:
-	cd $(SYSDIR);$(MAKE) -f @abs_builddir@/Makefile.user SOURCE_DIR=$(SOURCE_DIR) ROBOT=$(ROBOT) user_all
+	if [ -s "$(OPENHRPHOME)/Make.rules" ]; then \
+	cd $(SYSDIR);$(MAKE) -f @abs_builddir@/Makefile.user SOURCE_DIR=$(SOURCE_DIR) ROBOT=$(ROBOT) user_all; \
+	else \
+	echo "No $(OPENHRPHOME)/Make.rules"; \
+	fi
+
 sample_clean:
-	cd $(SYSDIR);$(MAKE) -f @abs_builddir@/Makefile.user SOURCE_DIR=$(SOURCE_DIR) ROBOT=$(ROBOT) user_clean
+	if [ -s "$(OPENHRPHOME)/Make.rules" ]; then \
+	cd $(SYSDIR);$(MAKE) -f @abs_builddir@/Makefile.user SOURCE_DIR=$(SOURCE_DIR) ROBOT=$(ROBOT) user_clean; \
+	else \
+	echo "No $(OPENHRPHOME)/Make.rules"; \
+	fi
+
 sample_install:
-	cd $(SYSDIR);$(MAKE) -f @abs_builddir@/Makefile.user SOURCE_DIR=$(SOURCE_DIR) ROBOT=$(ROBOT) user_install
+	if [ -s "$(OPENHRPHOME)/Make.rules" ]; then \
+	cd $(SYSDIR);$(MAKE) -f @abs_builddir@/Makefile.user SOURCE_DIR=$(SOURCE_DIR) ROBOT=$(ROBOT) user_install; \
+	else \
+	echo "No $(OPENHRPHOME)/Make.rules"; \
+	fi 
 
 echo:
-	cd $(SYSDIR);$(MAKE) -f $(SOURCE_DIR)/Makefile.echo SOURCE_DIR=$(SOURCE_DIR) ROBOT=$(ROBOT)
+	if [ -s "$(OPENHRPHOME)/Make.rules" ]; then \
+	cd $(SYSDIR);$(MAKE) -f $(SOURCE_DIR)/Makefile.echo SOURCE_DIR=$(SOURCE_DIR) ROBOT=$(ROBOT); \
+	else \
+	echo "No $(OPENHRPHOME)/Make.rules"; \
+	fi 
+
 echo_clean:
-	cd $(SYSDIR);$(MAKE) -f $(SOURCE_DIR)/Makefile.echo SOURCE_DIR=$(SOURCE_DIR) ROBOT=$(ROBOT) user_clean
+	if [ -s "$(OPENHRPHOME)/Make.rules" ]; then \
+	cd $(SYSDIR);$(MAKE) -f $(SOURCE_DIR)/Makefile.echo SOURCE_DIR=$(SOURCE_DIR) ROBOT=$(ROBOT) user_clean; \
+	else \
+	echo "No $(OPENHRPHOME)/Make.rules"; \
+	fi
 
 install:sample_install
 clean:sample_clean echo_clean
 
 all: sample
 
-endif

@@ -6,7 +6,7 @@ USER_PLUGINS = 	$(IOSRVBIN)/WalkGenJRL.$(DLLSFX)
 USER_OBJS    = 	$(IOSRVBIN)/WalkGenJRL.$(OSFX) \
 	     $(IOSRVBIN)/walkpluginJRL.$(OSFX)    
 
-user_targets:make_stubskel $(USER_PLUGINS)
+user_targets: make_stubskel $(USER_PLUGINS)
 
 #PATTERNGENERATORJRLDIR=$(OPENHRPHOME)/PatternGeneratorJRL/trunk/PatternGeneratorJRL/
 # changed PATTERNGENERATORJRLDIR
@@ -50,4 +50,6 @@ $(IOSRVBIN)/libWalkGen.so: $(BUILD_DIR)/../src/libWalkGenJRL.so
 	cp -f $(BUILD_DIR)/../src/libWalkGenJRL.so $(IOSRVBIN)
 
 user_install: 
-	cd @abs_builddir@/corba; $(MAKE) install
+	if [test -s $(OPENHRPHOME)/Make.rules]; then \
+	cd @abs_builddir@/corba; $(MAKE) install \
+	fi
