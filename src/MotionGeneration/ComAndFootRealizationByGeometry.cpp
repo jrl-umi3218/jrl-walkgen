@@ -1124,6 +1124,7 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
   /* Initialize the acceleration */
   for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentAcceleration);i++)
     {
+      CurrentVelocity[i]=0.0;
       CurrentAcceleration[i] = 0.0;
       /* Keep the new value for the legs. */
     }

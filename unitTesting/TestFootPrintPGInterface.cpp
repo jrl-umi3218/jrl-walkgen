@@ -53,7 +53,150 @@ void StraightWalking(PatternGeneratorInterface &aPGI)
 
 }
 
+void PbFlorentSeq1(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+  {
+    istringstream strm2(":stepseq 0 -0.1 0 \
+0.203885 0.194762 2.27277 \
+0.190865 -0.208919 5.07812 \
+0.209585 0.189649 5.68817 \
+0.191002 -0.208084 5.02252 \
+0.206673 0.193288 3.90856 \
+0.195084 -0.204415 2.77733 \
+0.203042 0.197162 1.75895 \
+0.198517 -0.201212 0.846647 \
+0.199977 0.200271 -0.0129191 \
+0.201539 -0.198175 -0.887889 \
+0.196723 0.203487 -1.85508 \
+0.205132 -0.194262 -2.9997 \
+0.192108 0.207836 -4.40306 \
+0.210196 -0.188306 -6.08503 \
+0.185675 0.213231 -7.85383 \
+0.215002 -0.182611 -9.1292 \
+0.183249 0.214462 -9.15803 \
+0.212975 -0.186052 -7.79003 \
+0.189799 0.208778 -5.68383 \
+0.206109 -0.194158 -3.56669 \
+0.196837 0.202638 -1.79747 \
+0.200882 -0.199409 -0.506198 \
+0.0136717 0.2 -0.00157708 \
+0 -0.2 0");
+    aPGI.ParseCmd(strm2);
+  }
+}
 
+void PbFlorentSeq2(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+  {
+    istringstream strm2(":stepseq \
+                                 0 -0.1 0 \
+				-0.0512076 0.207328 -1.15414 \
+				-0.0473172 -0.198623 -1.15414 \
+				-0.0515644 0.21034 -1.15414 \
+				-0.0475332 -0.195615 -1.15414 \
+				-0.0516395 0.203345 -1.15414 \
+				-0.0476688 -0.197615 -1.15414 \
+				-0.0517348 0.201344 -1.15414 \
+				-0.0477237 -0.199617 -1.15414 \
+				-0.0517494 0.19934 -1.15414 \
+				-0.047698 -0.201621 -1.15414 \
+				-0.0516832 0.197337 -1.15414 \
+				-0.0475915 -0.203622 -1.15414 \
+				-0.0515365 0.195339 -1.15414 \
+				-0.0474046 -0.205617 -1.15414 \
+				-0.0513094 0.193348 -1.15414 \
+				-0.0471374 -0.207603 -1.15414 \
+				-0.0510024 0.196368 -1.15414 \
+				-0.0466898 -0.214575 -1.15414 \
+				-0.0506158 0.194402 -1.15414 \
+				-0.0462637 -0.216533 -1.15414 \
+				-0.0501503 0.197453 -1.15414 \
+				-0.0456584 -0.223471 -1.15414 \
+				-0.0366673 0.212742 1.62857 \
+				-0.0360079 -0.201543 4.21944 \
+				-0.0154622 0.279811 4.21944 \
+				-0.0300936 -0.197751 4.21944 \
+				-0.00928506 0.283157 4.21944 \
+				-0.0236871 -0.199869 4.21944 \
+				-0.00231593 0.290546 4.21944 \
+				-0.0169269 -0.202959 4.21944 \
+				0.00493436 0.296941 4.21944 \
+				-0.00995958 -0.202061 4.21944 \
+				0.0119489 0.297324 4.21944 \
+				-0.00293587 -0.202195 4.21944 \
+				0.0189437 0.296673 4.21944 \
+				0.00399208 -0.203358 4.21944 \
+				0.0257673 0.295003 4.21944 \
+				0.0106743 -0.200526 4.21944 \
+				0.031904 0.287363 4.21944 \
+				0.016966 -0.203651 4.21944 \
+				0.0379487 0.283784 4.21944 \
+				0.141438 -0.192069 3.6834 \
+				0.204562 0.196453 2.64204 \
+				0.200635 -0.198747 -0.366254 \
+				0.196228 0.204108 -2.13008 \
+				0.206583 -0.192425 -3.87382 \
+				0.187966 0.211947 -6.61811 \
+				0.219749 -0.17341 -12.4824 \
+				0.146814 0.240465 -26.5643 \
+				0.247166 -0.119114 -37.1489 \
+				0.163211 0.222722 -19.7198 \
+				0.208825 -0.193706 -5.15242 \
+				0.0285368 0.200005 -0.0337318 \
+				0 -0.2 0 ");
+    aPGI.ParseCmd(strm2);
+  }
+      
+}
+
+
+void PbFlorentSeq3(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+  {
+    istringstream strm2(":stepseq \
+				0 -0.1 0 \
+				0.206454 0.189754 3.86836 \
+				0.174414 -0.222668 13.578 \
+				0.225916 0.166888 16.7012 \
+				0.173605 -0.22035 14.1845 \
+				0.215782 0.183337 9.55516 \
+				0.191335 -0.206707 4.86378 \
+				0.197278 0.205158 -1.51671 \
+				0.213124 -0.179685 -10.3377 \
+				0.0326875 0.233626 -1.98501 \
+				0.0384266 -0.200022 -1.98501 \
+				0.0290562 0.271027 -1.98501 \
+				0.0359251 -0.197685 -1.98501 \
+				0.0264753 0.273276 -1.98501 \
+				0.0332679 -0.200527 -1.98501 \
+				0.0235717 0.280338 -1.98501 \
+				0.0304676 -0.198558 -1.98501 \
+				0.0207049 0.282209 -1.98501 \
+				0.0275378 -0.201788 -1.98501 \
+				0.0175423 0.288873 -1.98501 \
+				0.0244924 -0.200224 -1.98501 \
+				0.0144446 0.29033 -1.98501 \
+				0.021346 -0.198876 -1.98501 \
+				0.0112534 0.291569 -1.98501 \
+				0.0181139 -0.202748 -1.98501 \
+				0.00781095 0.297581 -1.98501 \
+				0.0148115 -0.201847 -1.98501 \
+				0.00447927 0.298367 -1.98501 \
+				0.0114545 -0.201177 -1.98501 \
+				0.00110116 0.29892 -1.98501 \
+				0.00805928 -0.200741 -1.98501 \
+				-0.00230717 0.299239 -1.98501 \
+				0.00464196 -0.200541 -1.98501 \
+				-0.00572937 0.29932 -1.98501 \
+				0.00117482 -0.20335 -1.27115 \
+				0 0.2 0 ");
+    aPGI.ParseCmd(strm2);
+    
+  }
+}
 void TestNewPG1(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
@@ -575,7 +718,7 @@ int main(int argc, char *argv[])
   
     
   //COMPosition CurrentWaistPosition;
-  struct timeval begin,end,beginmodif,endmodif;
+  struct timeval begin,end;
   unsigned long int NbOfIt=0, NbOfItToCompute=0;
 
 
@@ -589,16 +732,22 @@ int main(int argc, char *argv[])
   aof.open("TestFGPI.dat",ofstream::out);
   double totaltime=0,maxtime=0;
   double timemodif = 0;
+  double totaltimeinplanning=0;
 
-  for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
+  for (unsigned int lNbIt=0;lNbIt<3;lNbIt++)
     {
       //StrangeStartingPosition(*aPGI);
-      /*
-      if (lNbIt==1)
-	TestNewPG1(*aPGI);
+      gettimeofday(&begin,0);
+      if (lNbIt==0)
+	PbFlorentSeq1(*aPGI);
+      else if (lNbIt==1)
+	PbFlorentSeq2(*aPGI);
       else if (lNbIt==2)
-	TestNewPG2(*aPGI);
-      */
+	PbFlorentSeq3(*aPGI);
+      gettimeofday(&end,0);
+      double ltime = end.tv_sec-begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
+      totaltimeinplanning+=ltime;
+
       // SteppingOver(*aPGI);
       //ShortStraightWalking(*aPGI);
       // CurvedWalkingPBW2(*aPGI);
@@ -616,7 +765,7 @@ int main(int argc, char *argv[])
       // TurningOnTheCircleTowardsTheCenter(*aPGI);
       // TurningOnTheCircleTowardsTheCenter(aPGI);
       // StartAnalyticalOnLineWalking(*aPGI);
-      StartOnLineWalking(*aPGI);
+      //StartOnLineWalking(*aPGI);
       //StartSimuOnLineWalking(*aPGI);
 
       bool ok = true;
@@ -659,10 +808,11 @@ int main(int argc, char *argv[])
 	  PreviousVelocity = CurrentVelocity;
 	  PreviousAcceleration = CurrentAcceleration;
 	  
-	  
+#if 0	  
 	  if ((NbOfIt>5*200) && 
 	      TestChangeFoot)
 	    {
+	      struct timeval beginmodif,endmodif;
 	      FootAbsolutePosition aFAP;
 	      aFAP.x=0.2;
 	      aFAP.y=0.0;
@@ -679,7 +829,8 @@ int main(int argc, char *argv[])
 	    {
 	      StopOnLineWalking(*aPGI);
 	    }
-
+#endif
+#if 0
 	  aof << NbOfIt*0.005 << " " 
 	      << finalCOMPosition.x[0] << " "
 	      << finalCOMPosition.y[0] << " " 
@@ -688,13 +839,17 @@ int main(int argc, char *argv[])
 	      << LeftFootPosition.x  << " " << LeftFootPosition.y  << " " << LeftFootPosition.z  << " "
 	      << RightFootPosition.x << " " << RightFootPosition.y << " " << RightFootPosition.z << " " 
 	      << ZMPTarget(0)+CurrentConfiguration(0) << " " 
-	      << ZMPTarget(1)+CurrentConfiguration(1) << " " << endl;
+	      << ZMPTarget(1)+CurrentConfiguration(1) << " "
+	      << CurrentConfiguration(0) << " " 
+	      << CurrentConfiguration(1) << " " << endl;
+#endif
+#if 0
 	  for(unsigned int k=0;k<30;k++)
 	    {
 	      aofq << CurrentConfiguration[k+6]*180/M_PI << " ";
 	    }
 	  aofq << endl;
-
+#endif
 	}
     }
   aofq.close();
@@ -705,5 +860,6 @@ int main(int argc, char *argv[])
   cout << "Number of iterations " << NbOfIt << " " << NbOfItToCompute << endl;
   cout << "Time consumption: " << (double)totaltime/(double)NbOfItToCompute << " max time: " << maxtime <<endl;
   cout << "Time for modif: " << timemodif << endl;
+  cout << "Time on ZMP ref planning (Kajita policy): " << totaltimeinplanning<< endl;
 
 }

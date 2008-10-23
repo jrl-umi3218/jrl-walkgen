@@ -40,6 +40,8 @@
 
 using namespace::PatternGeneratorJRL;
 
+#define ODEBUG3(x)  std::cout << x << endl;
+
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile <<  x << endl; DebugFile.close();}
@@ -60,7 +62,7 @@ using namespace::PatternGeneratorJRL;
 #define ODEBUG(x)  std::cout << x << endl;
 #endif
 
-#define ODEBUG3(x)  std::cout << x << endl;
+
 
 
 ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile, HumanoidSpecificities *aHS)
@@ -329,6 +331,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 {
   m_RelativeFootPositions.clear();
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
+
   double CurrentAbsTheta=0.0;
   RESETDEBUG4("ZMDInitOnLine.txt");
   ODEBUG4("ZMP::InitOnLine - Step 1 ","ZMDInitOnLine.txt");
@@ -360,8 +363,8 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   double CurrentZMPTheta=0;
   CurrentZMPTheta = (CurrentRightFootAbsPos.theta + CurrentLeftFootAbsPos.theta)/2.0;
   ODEBUG("CurrentZMPTheta at start: " << CurrentZMPTheta << " " 
-       << CurrentRightFootAbsPos.theta << " " 
-	 << CurrentLeftFootAbsPos.theta);
+	  << CurrentRightFootAbsPos.theta << " " 
+	  << CurrentLeftFootAbsPos.theta);
   if (RelativeFootPositions[0].sy < 0 )
     {
       m_vdiffsupppre(0,0) = CurrentRightFootAbsPos.x - CurrentLeftFootAbsPos.x;
@@ -392,7 +395,9 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   // Also very important for the initialization: reshape the ZMP reference for a smooth starting.
   double startingZMPREF[2] = { lStartingZMPPosition(0), lStartingZMPPosition(1)};
   double finalZMPREF[2] = {m_ZMPNeutralPosition[0],m_ZMPNeutralPosition[1]};
-
+  ODEBUG("ZMPNeutralPosition: " << m_ZMPNeutralPosition[0] << " " 
+	  << m_ZMPNeutralPosition[1] << endl 
+	  << "CurrentAbsTheta : " << CurrentAbsTheta);
   ODEBUG4("ZMP::InitOnLine - Step 4 ","ZMDInitOnLine.txt");
   for(unsigned int i=0;i<FinalZMPPositions.size();i++)
     {
@@ -413,6 +418,8 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       FinalCoMPositions[CurrentZMPindex].z[2] = 0.0;
       FinalCoMPositions[CurrentZMPindex].pitch = 0.0;
       FinalCoMPositions[CurrentZMPindex].roll = 0.0;
+      FinalCoMPositions[CurrentZMPindex].yaw = 
+	FinalZMPPositions[CurrentZMPindex].theta;
       
       // Set Left Foot positions.
       LeftFootAbsolutePositions[CurrentZMPindex] = CurrentLeftFootAbsPos;
@@ -427,6 +434,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       m_CurrentTime += m_SamplingPeriod;
       CurrentZMPindex++;
     }
+
   ODEBUG("InitOnline: FinalZMPPositions.size(): " << FinalZMPPositions.size());
   
   // The first foot when walking dynamically 

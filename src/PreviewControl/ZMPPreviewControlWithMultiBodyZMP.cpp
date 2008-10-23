@@ -75,7 +75,6 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   RESETDEBUG4("DebugDataDiffZMP.txt");
   RESETDEBUG4("DebugDataCOMPC1.txt");
   RESETDEBUG4("DebugDataWaistZMP.txt");
-  RESETDEBUG4("DebugDataCOMPC2.txt");
   RESETDEBUG4("DebugDataZMPMB1.txt");
   RESETDEBUG4("DebugDataDeltaCOM.txt");
   RESETDEBUG4("DebugDataStartingCOM.dat");
@@ -85,8 +84,6 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   RESETDEBUG4("DebugDataIKR.dat");
   RESETDEBUG4("DebugDataWP.txt");
   RESETDEBUG4("Dump.dat");
-  RESETDEBUG4("DebugDataCOM_0.dat");
-  RESETDEBUG4("DebugDataCOM_1.dat");
   RESETDEBUG4("DebugConfSO.dat");
   RESETDEBUG4("DebugConfSV.dat");
   RESETDEBUG4("DebugConfSA.dat");
@@ -182,7 +179,7 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMPosition 
   CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
 
   /* Get the current acceleration vector */
-  CurrentAcceleration = m_HumanoidDynamicRobot->currentVelocity();
+  CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
 
   m_ComAndFootRealization->ComputePostureForGivenCoMAndFeetPosture(aCOMPosition, aCOMSpeed, aCOMAcc,
 								   aLeftFootPosition,
@@ -240,38 +237,6 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 			      m_NumberOfIterations,
 			      0);
 
-  if (0)
-  {
-    ofstream aof_dbg("DebugConfSO.dat",ofstream::app);
-    for(unsigned int i=0;i<CurrentConfiguration.size();i++)
-      {
-	aof_dbg << CurrentConfiguration[i] << " ";
-      }
-    aof_dbg <<endl;
-    aof_dbg.close();
-
-  }
-
-  if (0)
-  {
-    ofstream aof_dbg("DebugConfSV.dat",ofstream::app);
-    for(unsigned int i=0;i<CurrentVelocity.size();i++)
-      {
-	aof_dbg << CurrentVelocity[i] << " ";
-      }
-    aof_dbg <<endl;
-    aof_dbg.close();
-  }
-  if (0)
-  {
-    ofstream aof_dbg("DebugConfSA.dat",ofstream::app);
-    for(unsigned int i=0;i<CurrentAcceleration.size();i++)
-      {
-	aof_dbg << CurrentAcceleration[i] << " ";
-      }
-    aof_dbg <<endl;
-    aof_dbg.close();
-  }
 
   if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
     EvaluateMultiBodyZMP(-1);
@@ -549,6 +514,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 	    << zmpy2 << " "
 	    << lZMPPos.px << " "
 	    << lZMPPos.py << " "
+	    << lZMPPos.theta << " "
 	    << acomp.x[1]<< " "
 	    << acomp.y[1] <<  " "
 	    << acomp.z[1] << " "
@@ -580,6 +546,51 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteration)
 {
+  if (0)
+  {
+    
+    MAL_VECTOR(,double) CurrentConfiguration;
+    MAL_VECTOR(,double) CurrentVelocity;
+    MAL_VECTOR(,double) CurrentAcceleration;
+    
+    /* Get the current configuration vector */
+    CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
+    
+    /* Get the current velocity vector */
+    CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
+    
+    /* Get the current acceleration vector */
+    CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
+    
+    {
+      ofstream aof_dbg("DebugConfSO.dat",ofstream::app);
+      for(unsigned int i=0;i<CurrentConfiguration.size();i++)
+	{
+	  aof_dbg << CurrentConfiguration[i] << " ";
+	}
+      aof_dbg <<endl;
+      aof_dbg.close();
+    }
+
+    {
+      ofstream aof_dbg("DebugConfSV.dat",ofstream::app);
+      for(unsigned int i=0;i<CurrentVelocity.size();i++)
+	{
+	  aof_dbg << CurrentVelocity[i] << " ";
+	}
+      aof_dbg <<endl;
+      aof_dbg.close();
+    }
+    {
+      ofstream aof_dbg("DebugConfSA.dat",ofstream::app);
+      for(unsigned int i=0;i<CurrentAcceleration.size();i++)
+	{
+	  aof_dbg << CurrentAcceleration[i] << " ";
+	}
+      aof_dbg <<endl;
+      aof_dbg.close();
+    }
+  }
 
   string sComputeZMP("ComputeZMP");
   string sZMPtrue("true");
@@ -603,6 +614,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   ODEBUG4(aZMPpos.px << " " << aZMPpos.py << " " 
 	  << m_FIFOZMPRefPositions[0].px << " " 
 	  << m_FIFOZMPRefPositions[0].py  << " " 
+	  << m_FIFOZMPRefPositions[0].theta  << " " 
 	  << ZMPmultibody[0] << " " << ZMPmultibody[1] << " "  
 	  << CoMmultibody[0] << " " << CoMmultibody[1], "DebugDataDiffZMP.txt");
   m_FIFODeltaZMPPositions.push_back(aZMPpos);
@@ -619,15 +631,16 @@ int ZMPPreviewControlWithMultiBodyZMP::Setup(deque<ZMPPosition> &ZMPRefPositions
 					     deque<FootAbsolutePosition> &LeftFootPositions,
 					     deque<FootAbsolutePosition> &RightFootPositions)
 {
+  m_NumberOfIterations = 0;
   MAL_VECTOR(,double) CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
   MAL_VECTOR(,double) CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
   MAL_VECTOR(,double) CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
+  
 
   SetupFirstPhase(ZMPRefPositions,
 		  COMPositions,
 		  LeftFootPositions,
 		  RightFootPositions);
-
   for(unsigned int i=0;i<m_NL;i++)
     SetupIterativePhase(ZMPRefPositions,
 			COMPositions,
@@ -725,38 +738,6 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
 			      m_NumberOfIterations,
 			      0);
 
-  if(0)
-  {
-    ofstream aof_dbg("DebugConfSO.dat",ofstream::out);
-    for(unsigned int i=0;i<CurrentConfiguration.size();i++)
-      {
-	aof_dbg << CurrentConfiguration[i] << " ";
-      }
-    aof_dbg <<endl;
-    aof_dbg.close();
-  }
-  
-  if(0)
-  {
-    ofstream aof_dbg("DebugConfSV.dat",ofstream::out);
-    for(unsigned int i=0;i<CurrentVelocity.size();i++)
-      {
-	aof_dbg << CurrentVelocity[i] << " ";
-      }
-    aof_dbg <<endl;
-    aof_dbg.close();
-  }
-
-  if(0)
-  {
-    ofstream aof_dbg("DebugConfSA.dat",ofstream::out);
-    for(unsigned int i=0;i<CurrentAcceleration.size();i++)
-      {
-	aof_dbg << CurrentAcceleration[i] << " ";
-      }
-    aof_dbg <<endl;
-    aof_dbg.close();
-  }
 
   EvaluateMultiBodyZMP(localindex);
   m_FIFOZMPRefPositions.push_back(ZMPRefPositions[localindex+1+m_NL]);
