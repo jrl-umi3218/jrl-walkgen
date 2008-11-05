@@ -49,6 +49,7 @@ user_clean:
 $(IOSRVBIN)/libWalkGen.so: $(BUILD_DIR)/../src/libWalkGenJRL.so
 	cp -f $(BUILD_DIR)/../src/libWalkGenJRL.so $(IOSRVBIN)
 
+
 user_install: 
 	if [test -s $(OPENHRPHOME)/Make.rules]; then \
 	cd @abs_builddir@/corba; $(MAKE) install \

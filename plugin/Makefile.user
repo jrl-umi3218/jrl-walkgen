@@ -26,6 +26,7 @@ LINK_FLAGS+=-L$(PATTERNGENERATORJRLDIR)/lib -L$(PATTERNGENERATORJRLDIR)/src -lWa
 
 
 COMMON_TARGET_H= plugin.h $(CONTROLLER)/$(CORBA_DIR)/common.h
+
 $(IOSRVBIN)/WalkGenJRL.$(DLLSFX): $(IOSRVBIN)/WalkGenJRL.$(OSFX) seqplugin.$(OSFX) dynamicsPlugin.$(OSFX)  $(IOSRVBIN)/walkpluginJRL_skel.$(OSFX) $(IOSRVBIN)/walkpluginJRL.$(OSFX)
 #$(IOSRVBIN)/libWalkGenJRL.$(DLLSFX): $(IOSRVBIN)/WalkGenJRL.$(OSFX) seqplugin.$(OSFX) dynamicsPlugin.$(OSFX)  $(IOSRVBIN)/walkpluginJRL_skel.$(OSFX) $(IOSRVBIN)/walkpluginJRL.$(OSFX)
 
@@ -46,5 +47,7 @@ user_clean:
 
 $(IOSRVBIN)/libWalkGen.so: $(SOURCE_DIR)/../src/libWalkGenJRL.so
 	cp -f $(SOURCE_DIR)/../src/libWalkGenJRL.so $(IOSRVBIN)
+
+$(IOSRVBIN)/walkpluginJRL.$(OSFX):$(SOURCE_DIR)/corba/OmniORB4/cpp/walkpluginJRL.cpp common.h
 
 user_install:$(IOSRVBIN)/libWalkGen.so 

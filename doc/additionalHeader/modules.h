@@ -1,4 +1,5 @@
-/** \mainpage 
+/** 
+\mainpage 
 \section sec_intro Introduction
 
 This library implements the Walking Pattern Generator as described by Kajita
