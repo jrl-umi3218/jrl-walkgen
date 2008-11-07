@@ -83,7 +83,6 @@ int InverseKinematics::ComputeInverseKinematicsForLegs3(MAL_S3x3_MATRIX(,double)
   cout << "Dt" << Dt << endl;
 #endif
   rT= MAL_S3x3_RET_TRANSPOSE(Foot_R);
-  double ls=0;	
 
 #if 0
   cout << "rT" << rT<< endl;
@@ -180,7 +179,7 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
   MAL_S3_VECTOR( r,double);
   MAL_S3x3_MATRIX( rT,double);
   MAL_S3x3_MATRIX( Foot_Rt,double);
-  double NormofDt=0.0,ls=0.0;
+  double NormofDt=0.0;
 
   // New part for the inverse kinematics specific to the HRP-2
   // robot. The computation of rx, ry and rz is different.

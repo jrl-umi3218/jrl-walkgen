@@ -119,7 +119,7 @@ int main(void)
   aAM.SetSamplingPeriod(ControlStep);
   int NbSteps = 3;
   int lVerboseMode = 1;
-  int NbOfIntervals=2*NbSteps+1;
+  unsigned int NbOfIntervals=2*NbSteps+1;
 
   deque<double> ZMPPositions,COGPositions;
 
@@ -175,7 +175,7 @@ int main(void)
 
   unsigned int NbIterationLimit = 2;
   struct timeval timestart, timestartit, timeend,
-    time3rdorder,timeComputeW,timePolynomial,timeTransfert,timeChangeStep;
+    time3rdorder,timePolynomial,timeTransfert,timeChangeStep;
   double Acc3rdorder=0.0,
     AccComputeW=0.0, 
     AccComputePolynomial=0.0,
@@ -253,7 +253,7 @@ int main(void)
 	  if (lVerboseMode>5)
 	    {
 	      cout << "TAMCP2: Before" << endl << "X\tY"<<endl;
-	      for(int i=0;i<(*aCTIPX.ZMPProfil).size();i++) 
+	      for(unsigned int i=0;i<(*aCTIPX.ZMPProfil).size();i++) 
 		{
 		  cout << (*aCTIPX.ZMPProfil)[i] << "\t"
 		       << (*aCTIPY.ZMPProfil)[i] << endl; 
@@ -421,8 +421,6 @@ int main(void)
   for(unsigned int i=0;i<lDeltaTj.size();i++)
     TMax+= lDeltaTj[i];
   TMax+=LocalTime;
-  double TStep=ControlStep;
-
 
   ofstream aof;
   aof.open("AnalyticalZMPCOGCompactCoeffsX.dat",ofstream::out);

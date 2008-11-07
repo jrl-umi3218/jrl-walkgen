@@ -39,7 +39,7 @@ int main(void)
   double ControlStep = 0.005;
   int NbSteps = 3;
   int lVerboseMode = 0;
-  int NbOfIntervals=2*NbSteps+1;
+  unsigned int NbOfIntervals=2*NbSteps+1;
 
   aAM.SetTSingleSupport(TS);
   aAM.SetTDoubleSupport(TD);
@@ -103,7 +103,7 @@ int main(void)
     
 
   lZMPX[0] = 0.0;
-  double lsign=-1.0;
+
   for(unsigned int i=1;i<NbOfIntervals-1;i+=2)
     {
       incZMPX+=0.2;

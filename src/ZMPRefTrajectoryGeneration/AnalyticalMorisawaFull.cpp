@@ -556,9 +556,10 @@ namespace PatternGeneratorJRL
     int *iwork = new int[SizeOfZ];
     int lsizeofx;
     int info=0;
-
-    dgesvx_("E", /* Ask for equilibration, copied to AF and factorization */
-	   "N", /* A * X = B */
+    char lE[2]="E";
+    char lN[2]="N";
+    dgesvx_(lE, /* Ask for equilibration, copied to AF and factorization */
+	   lN, /* A * X = B */
 	   &SizeOfZ, /* Size of A */
 	   &NRHS, /*Nb of columns for X et B */
 	   MAL_RET_MATRIX_DATABLOCK(tZ), /* Access to A */

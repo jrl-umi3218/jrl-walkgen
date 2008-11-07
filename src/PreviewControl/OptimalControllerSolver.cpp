@@ -110,8 +110,8 @@ logical sb02ow (double *_alphar, double * _alphai, double *_beta)
   char lp[2]="p";
   logical r = ((*_alphar <0.0) && (*_beta>0.0)) ||
     
-    ( (*_alphar>0.0) && (*_beta<0.0)) &&
-      ( fabs(*_beta) > fabs(*_alphar)*dlamch_(lp));
+    (( (*_alphar>0.0) && (*_beta<0.0)) &&
+      (( fabs(*_beta) > fabs(*_alphar)*dlamch_(lp))));
       ;
     return r;
   }
