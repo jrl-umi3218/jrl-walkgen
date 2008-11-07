@@ -289,8 +289,10 @@ namespace PatternGeneratorJRL
 	m_NeedToReset = false;
       }
     
-    dgesvx_("F", /* Specify that AF and IPIV should be used. */
-	    "N", /* A * X = B */
+    char lF[2]="F";
+    char lN[2]="N";
+    dgesvx_(lF, /* Specify that AF and IPIV should be used. */
+	    lN, /* A * X = B */
 	    &SizeOfZ, /* Size of A */
 	    &NRHS, /*Nb of columns for X et B */
 	    MAL_RET_MATRIX_DATABLOCK(tZ), /* Access to A */

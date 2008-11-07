@@ -107,9 +107,11 @@ logical sb02ox (double *_alphar, double * _alphai, double *_beta)
 */
 logical sb02ow (double *_alphar, double * _alphai, double *_beta)
 {
+  char lp[2]="p";
   logical r = ((*_alphar <0.0) && (*_beta>0.0)) ||
+    
     ( (*_alphar>0.0) && (*_beta<0.0)) &&
-      ( fabs(*_beta) > fabs(*_alphar)*dlamch_("p"));
+      ( fabs(*_beta) > fabs(*_alphar)*dlamch_(lp));
       ;
     return r;
   }
@@ -155,12 +157,14 @@ bool OptimalControllerSolver::GeneralizedSchur(MAL_MATRIX( &A,double),
   double *work = new double[lwork]; //std::vector<double> work(lwork);
   int info = 0;
   logical *bwork=new logical[2*n];
+  char lV[2]="V";
+  char lS[2]="S";
   for(int i=0;i<2*n;i++)
     bwork[i] =0;
   A = MAL_RET_TRANSPOSE(A);
   B = MAL_RET_TRANSPOSE(B);
-  dgges_ ("V", "V",
-          "S",
+  dgges_ (lV, lV,
+          lS,
          (logical (*)(...))sb02ox,
           &n,
           MAL_RET_MATRIX_DATABLOCK(A), &n,

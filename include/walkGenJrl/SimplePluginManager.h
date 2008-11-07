@@ -33,10 +33,13 @@
 #ifndef _PGI_SIMPLE_PLUGIN_MANAGER_H_
 #define _PGI_SIMPLE_PLUGIN_MANAGER_H_
 
+#include <string.h>
+
 #include <map>
 #include <iostream>
 #include <string>
 #include <sstream>
+
 
 namespace PatternGeneratorJRL
 {

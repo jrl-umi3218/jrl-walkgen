@@ -27,6 +27,9 @@ SET(CMAKE_INSTALL_PREFIX $ENV{ROBOTPKG_PATH})
 #------------------------
 OPTION(BUILD_SHARED_LIBS "Build walkGenJrl with shared libraries." ON)
 
+# where are use-specific cmake modules
+SET(CMAKE_MODULE_PATH ${${PROJECT_NAME}_SOURCE_DIR}/CMakeModules)
+
 # Check for required packages
 # -------------------------
 INCLUDE(FindPkgConfig)
@@ -46,9 +49,12 @@ ENDFOREACH(option_ldflags)
 
 SET(${PROJECT_NAME}_LDFLAGS "-L${CMAKE_PREFIX_INSTALL}/lib/ -l${PROJECT_NAME}-${PROJECT_VERSION} ${${PROJECT_NAME}_LDFLAGS}")
 
+# Check for OpenHRP
+# -----------------
+INCLUDE(${CMAKE_MODULE_PATH}/FindOpenHRP.cmake)
+
 # To deal with the headers.
 #--------------------------
-#add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(unitTesting)
 

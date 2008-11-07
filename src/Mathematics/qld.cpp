@@ -333,9 +333,10 @@ typedef doublereal E_f;	/* real function with -R not specified */
 
 /* Common Block Declarations */
 
-struct {
+typedef struct {
     doublereal eps;
-} cmache_;
+} t_cmache_;
+t_cmache_ cmache_;
 
 #define cmache_1 cmache_
 
