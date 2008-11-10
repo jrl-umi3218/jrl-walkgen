@@ -51,13 +51,21 @@ ENDFOREACH(option_ldflags)
 
 SET(${PROJECT_NAME}_LDFLAGS "-L${CMAKE_PREFIX_INSTALL}/lib/ -l${PROJECT_NAME}-${PROJECT_VERSION} ${${PROJECT_NAME}_LDFLAGS}")
 
+#-------------------------
+# Detect OmniOrb.
+#------------------------- 
+INCLUDE(${CMAKE_MODULE_PATH}/UseOmniORB4.cmake)
+MESSAGE(STATUS "omniORB4: ${OMNIORB4_DIR}")
+
 # Check for OpenHRP
 # -----------------
 INCLUDE(${CMAKE_MODULE_PATH}/FindOpenHRP.cmake)
 
+
 # To deal with the headers.
 #--------------------------
 add_subdirectory(src)
+add_subdirectory(plugin)
 add_subdirectory(unitTesting)
 
 # Prepare the documentation
