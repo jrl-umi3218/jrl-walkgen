@@ -36,15 +36,50 @@ namespace ml = maal::boost;
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 #endif
 
+
+#ifdef OPENHRP_VERSION_2
 #include "plugin.h"
-#include "bodyinfo.h"
-#include "seqplugin.h" 
+#include "dynamicsPlugin.h"
+#include "seqplugin.h"
+
+typedef robot_state sotRobotState;
+typedef motor_command sotMotorCommand;
+typedef seqplugin_ptr sotSequencePlayer_var;
+typedef seqplugin sotSequencePlayer;
+
+#define ROBOT_STATE_VAR_POS(x) x->waistPos
+#define ROBOT_STATE_VAR_ATT(x) x->waistRpy
+#endif
+
+#ifdef OPENHRP_VERSION_3
+#warning "Compiled with openhrp version 3"
+#include "Plugin_impl.h"
+#include "SequencePlayer.h"
+/*! Include for OpenHRP new dynamics library. */
+#include "Body.h"
+#include "Link.h"
+#include "LinkTraverse.h"
+#include "ModelLoaderUtil.h"
+
+typedef RobotState sotRobotState;
+typedef RobotState sotMotorCommand;
+typedef SequencePlayer_var sotSequencePlayer_var;
+typedef SequencePlayer sotSequencePlayer;
+
+#define ROBOT_STATE_VAR_POS(x) x->basePos
+#define ROBOT_STATE_VAR_ATT(x) x->baseAtt
+
+#endif
+
+#include "bodyinfo.h"	    
+
 #ifdef ORBIX
 #include <walkpluginJRL_skel.h>
 #endif
 #ifdef OMNIORB4
 #include <walkpluginJRL.h>
 #endif
+
 #include <fstream>
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
@@ -76,9 +111,9 @@ virtual public POA_walkpluginJRL, virtual public PortableServer::RefCountServant
 public: 
   WalkGenJRL(istringstream &strm);
   ~WalkGenJRL();
-  bool setup(robot_state* rs, motor_command* mc);  // phase:waiting_setup 
-  void control(robot_state* rs, motor_command* mc);// phase:active 
-  bool cleanup(robot_state* rs, motor_command* mc);// phase:waiting_cleanup  
+  bool setup(sotRobotState* rs, sotMotorCommand* mc);  // phase:waiting_setup 
+  void control(sotRobotState* rs, sotMotorCommand* mc);// phase:active 
+  bool cleanup(sotRobotState* rs, sotMotorCommand* mc);// phase:waiting_cleanup  
   void m_echo(istringstream &strm); 
   void m_StepSequence(istringstream &strm);
 
@@ -227,7 +262,7 @@ protected:
   double m_generalbuffer[3*200*120];
   int m_generalIndex, m_generalIndexmax;
   double m_zmpreeldebug[3],m_zmptarget[3];
-  seqplugin_var m_seq;
+  sotSequencePlayer_var m_seq;
   unsigned long int m_count;
 
   bool m_SetupBool;
@@ -358,10 +393,10 @@ void WalkGenJRL::m_StepSequence(istringstream &strm)
     }
 }
 
-bool WalkGenJRL::setup(robot_state *rs, motor_command *mc) 
+bool WalkGenJRL::setup(sotRobotState *rs, sotMotorCommand *mc) 
 {
   
-  m_seq = seqplugin::_narrow(manager->find("seq",""));
+  m_seq = sotSequencePlayer::_narrow(manager->find("seq",""));
   // Store the current motor command
   for(unsigned int i=0;i<DOF;i++)
     {	
@@ -376,7 +411,7 @@ bool WalkGenJRL::setup(robot_state *rs, motor_command *mc)
   return true; 				    
 }
 
-void WalkGenJRL::control(robot_state *rs, motor_command *mc) 
+void WalkGenJRL::control(sotRobotState *rs, sotMotorCommand *mc) 
 {
 	
   MAL_VECTOR_DIM(ZMPTarget,double,3);
@@ -412,7 +447,7 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
       if (rs->zmp.length()>0)
 	{
 	  for(unsigned int i=0;i<3;i++)
-	    m_zmpreel[m_ZMPIndex+i] = rs->zmp[i]+mc->waistPos[i];
+	    m_zmpreel[m_ZMPIndex+i] = rs->zmp[i]+ROBOT_STATE_VAR_POS(mc)[i];
 	  m_ZMPIndex+=3;
 	  if (m_ZMPIndex>=m_ZMPIndexmax)
 	    m_ZMPIndex = 0;
@@ -461,15 +496,13 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	  ref_state->zmp[1] = m_zmptarget[1];
 	  ref_state->zmp[2] = m_zmptarget[2];
 
-	  //cout << ref_state->waistPos[2] << " "
 	  //<< m_Zc << " " << aCOMPosition.z[0] << endl;
 	  
-	  ref_state->waistPos[0] = m_CurrentStateFromPG(0);
-	  ref_state->waistPos[1] = m_CurrentStateFromPG(1);
-	  ref_state->waistPos[2] = m_CurrentStateFromPG(2);
-	  ref_state->waistRpy[2] = m_CurrentStateFromPG(5);
+	  ROBOT_STATE_VAR_POS(ref_state)[0] = m_CurrentStateFromPG(0);
+	  ROBOT_STATE_VAR_POS(ref_state)[1] = m_CurrentStateFromPG(1);
+	  ROBOT_STATE_VAR_POS(ref_state)[2] = m_CurrentStateFromPG(2);
+	  ROBOT_STATE_VAR_ATT(ref_state)[2] = m_CurrentStateFromPG(5);
 
-	  //cout << ref_state->waistPos[2] << endl;
 	  ODEBUG4("Go inside 5","DebugData.txt");
 	  if (m_DebugMode>0)
 	    {
@@ -487,18 +520,18 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
 	      ODEBUG4( m_zmptarget[0] << " " << 
 		       m_zmptarget[1] << " " <<
 		       m_zmptarget[2] << " " <<
-		       temp1 + ref_state->waistPos[0] << " " << 
-		       temp2 + ref_state->waistPos[1] << " " << 
-		       m_zmptarget[2] + ref_state->waistPos[2] << " " << 
-		       ref_state->waistPos[0] << " " << 
-		       ref_state->waistPos[1] << " " << 
-		       ref_state->waistPos[2]  
+		       temp1 + ROBOT_STATE_VAR_POS(ref_state)[0] << " " << 
+		       temp2 + ROBOT_STATE_VAR_POS(ref_state)[1] << " " << 
+		       m_zmptarget[2] + ROBOT_STATE_VAR_POS(ref_state)[2] << " " << 
+		       ROBOT_STATE_VAR_POS(ref_state)[0] << " " << 
+		       ROBOT_STATE_VAR_POS(ref_state)[1] << " " << 
+		       ROBOT_STATE_VAR_POS(ref_state)[2]  
 		       ,"DebugZMPFinale.dat");
 	      ODEBUG4("Go inside 7","DebugData.txt");
 	    }
 
-	  ref_state->waistRpy[0] =0.0;
-	  ref_state->waistRpy[1] =0.0;
+	  ROBOT_STATE_VAR_ATT(ref_state)[0] =0.0;
+	  ROBOT_STATE_VAR_ATT(ref_state)[1] =0.0;
 	  ODEBUG4("Go inside 8","DebugData.txt");
 	  
 	  m_seq->setReferenceState(ref_state,dt);                              // send seq the next ref_state              
@@ -523,7 +556,7 @@ void WalkGenJRL::control(robot_state *rs, motor_command *mc)
     }
 }
 
-bool WalkGenJRL::cleanup(robot_state *rs,motor_command *mc) 
+bool WalkGenJRL::cleanup(sotRobotState *rs,sotMotorCommand *mc) 
 {
   return true;
 }

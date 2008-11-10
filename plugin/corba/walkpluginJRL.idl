@@ -1,6 +1,34 @@
-#include "common.idl"
+#ifndef WALKPLUGINJRL_IDL_FILE
+#define WALKPLUGINJRL_IDL_FILE
 
-interface walkpluginJRL : Plugin
+#include "HRPcontroller.idl"
+
+#if 1
+/**
+ * Position and Attitude
+ * @param	px	x coordinates
+ * @param	py	y coordinates
+ * @param	pz	z coordinates
+ * @param	qx	x axis
+ * @param	qy	y axis
+ * @param	qz	z axis
+ * @param	qw	w axis
+ */
+struct TransformQuaternion
+{
+    float px;
+    float py;
+    float pz;
+    float qx;
+    float qy;
+    float qz;
+    float qw;
+};
+
+typedef sequence<double> dsequence;
+#endif
+
+interface walkpluginJRL : OpenHRP::Plugin
 {
   /***********************************
    *
@@ -136,3 +164,4 @@ interface walkpluginJRL : Plugin
 
 };
 
+#endif /* WALKPLUGINJRL_IDL_FILE */
