@@ -1,0 +1,60 @@
+# Olivier Stasse, JRL, CNRS/AIST
+# Creation: 10/11/2008
+# History:
+#
+# Copyright CNRS/AIST
+
+# plugin name
+IF(OPENHRP_FOUND)
+
+  IF(OPENHRP_VERSION_2)
+    INCLUDE(${CMAKE_MODULE_PATH}/AddPluginForOpenHRP.cmake)
+
+    SET(COMMON_IDL_OPENHRP common.idl)
+    SET(PLUGIN_NAMESPACE "")
+    SET(DOUBLE_SEQUENCE "dsequence")
+
+    CONFIGURE_FILE(${${PROJECT_NAME}_SOURCE_DIR}/plugin/corba/walkpluginJRL.idl.cmake
+                    ${${PROJECT_NAME}_SOURCE_DIR}/plugin/corba/walkpluginJRL.idl)
+
+    SET(PLUGINNAME ${PROJECT_SOURCE_DIR}/plugin/WalkGenJRL)
+    SET(PLUGINNAME_SRC ${PROJECT_SOURCE_DIR}/plugin/WalkGenJRL.cpp)
+    SET(PLUGINNAME_IDL ${PROJECT_SOURCE_DIR}/plugin/corba/walkpluginJRL.idl)
+    SET(PLUGINNAME_PATH ${PROJECT_SOURCE_DIR}/plugin)
+    SET(PLUGINLINKS ${PROJECT_BINARY_DIR}/lib/lib${PROJECT_NAME}.so)
+    SET(PLUGINDEPS ${OPENHRP_HOME}/Controller/IOserver/sys/plugin/seqplugin.idl)
+
+    ADD_OPENHRP_PLUGIN(${PLUGINNAME} ${PLUGINNAME_SRC} ${PLUGINNAME_IDL} ${PLUGINNAME_PATH} ${PLUGINLINKS} ${PLUGINDEPS})
+    
+    
+    INSTALL(FILES ${PROJECT_SOURCE_DIR}/plugin/corba/walkpluginJRL.idl
+	    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/
+            PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE   )
+
+  ENDIF(OPENHRP_VERSION_2)
+
+  IF(OPENHRP_VERSION_3)
+    INCLUDE(${CMAKE_MODULE_PATH}/AddPluginForOpenHRP.cmake)
+
+    SET(COMMON_IDL_OPENHRP HRPcontroller.idl)	    
+    SET(PLUGIN_NAMESPACE "OpenHRP::")
+    SET(DOUBLE_SEQUENCE "dsequence")
+        
+    CONFIGURE_FILE(${${PROJECT_NAME}_SOURCE_DIR}/plugin/corba/walkpluginJRL.idl.cmake
+                    ${${PROJECT_NAME}_SOURCE_DIR}/plugin/corba/walkpluginJRL.idl)
+
+    SET(PLUGINNAME ${PROJECT_SOURCE_DIR}/plugin/WalkGenJRL)
+    SET(PLUGINNAME_SRC ${PROJECT_SOURCE_DIR}/plugin/WalkGenJRL.cpp)
+    SET(PLUGINNAME_IDL ${PROJECT_SOURCE_DIR}/plugin/corba/walkpluginJRL.idl)
+    SET(PLUGINNAME_PATH ${PROJECT_SOURCE_DIR}/plugin)
+    SET(PLUGINLINKS ${${PROJECT_NAME}_BINARY_DIR}/src/lib${PROJECT_NAME}.so)
+    SET(PLUGINDEPS ${OPENHRP_HOME}/Controller/IOserver/plugin/SequencePlayer/corba/SequencePlayer.idl)
+
+    ADD_OPENHRP_PLUGIN(${PLUGINNAME} ${PLUGINNAME_SRC} ${PLUGINNAME_IDL} ${PLUGINNAME_PATH} ${PLUGINLINKS} ${PLUGINDEPS})
+
+    INSTALL(FILES ${PROJECT_SOURCE_DIR}/plugin/corba/walkpluginJRL.idl
+	    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/
+            PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE   )
+  ENDIF(OPENHRP_VERSION_3)
+
+ENDIF(OPENHRP_FOUND)
