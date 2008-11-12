@@ -2,8 +2,9 @@
 
 Copyright (c) 2005-2006, 
 Bjorn Verrelst,
-Olivier Stasse.
-   
+Olivier Stasse,
+Francois Keith.
+
 JRL-Japan, CNRS/AIST
 
 All rights reserved.

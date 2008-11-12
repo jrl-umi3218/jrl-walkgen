@@ -1,7 +1,7 @@
 /* This object generate all the values for the foot trajectories,
 
    Copyright (c) 2007, 
-   Olivier Stasse,
+   Francois Keith, Olivier Stasse,
    
    JRL-Japan, CNRS/AIST
 

@@ -5,7 +5,8 @@
    Bjorn Verrelst
    Olivier Stasse,
    Ramzi Sellouati
-   
+   Francois Keith, 
+
    JRL-Japan, CNRS/AIST
 
    All rights reserved.

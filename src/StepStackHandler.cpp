@@ -5,7 +5,8 @@
 
    Copyright (c) 2005-2006, 
    Olivier Stasse,
-   
+   Francois Keith, 
+
    JRL-Japan, CNRS/AIST
 
    All rights reserved.

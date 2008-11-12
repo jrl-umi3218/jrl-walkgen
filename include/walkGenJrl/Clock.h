@@ -11,7 +11,7 @@
 
 
    Copyright (c) 2005-2008, 
-   @author Olivier Stasse
+   @author Olivier Stasse, Francois Keith
    
    JRL-Japan, CNRS/AIST
 

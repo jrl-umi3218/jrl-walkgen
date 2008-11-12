@@ -4,7 +4,7 @@
 
 
    Copyright (c) 2007, 
-   @author Olivier Stasse,
+   @author Francois Keith, Olivier Stasse,
 
    $Id$
    

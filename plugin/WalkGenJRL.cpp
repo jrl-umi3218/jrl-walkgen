@@ -2,7 +2,7 @@
     and the desired ZMP based on a sequence of steps.
    
     Copyright (c) 2005-2006, 
-    @author Olivier Stasse, Ramzi Sellouati, Bjorn Verrelst
+    @author Francois Keith, Olivier Stasse, Ramzi Sellouati, Bjorn Verrelst
    
     JRL-Japan, CNRS/AIST
 

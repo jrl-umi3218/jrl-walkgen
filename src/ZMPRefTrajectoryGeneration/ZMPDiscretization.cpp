@@ -4,8 +4,9 @@
 
    Copyright (c) 2005-2007, 
    Olivier Stasse,
-   Ramzi Sellouati
-   
+   Ramzi Sellouati,
+   Francois Keith.
+
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
