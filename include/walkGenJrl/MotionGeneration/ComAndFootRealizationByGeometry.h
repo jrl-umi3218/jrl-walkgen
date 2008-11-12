@@ -4,7 +4,7 @@
    relying on the inverse kinematics object.
   
    Copyright (c) 2005-2006, 
-   @author Olivier Stasse.
+   @author Francois Keith, Olivier Stasse.
    
    JRL-Japan, CNRS/AIST
 
@@ -33,6 +33,7 @@
 #ifndef _COM_AND_FOOT_REALIZATION_BY_GEOMETRY_H_
 #define _COM_AND_FOOT_REALIZATION_BY_GEOMETRY_H_
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PGTypes.h>
 #include <walkGenJrl/MotionGeneration/InverseKinematics.h>
 #include <walkGenJrl/MotionGeneration/ComAndFootRealization.h> 
@@ -56,7 +57,7 @@ namespace PatternGeneratorJRL
      parameter.
      
    */
-  class ComAndFootRealizationByGeometry: public ComAndFootRealization
+  class WALK_GEN_JRL_EXPORT ComAndFootRealizationByGeometry: public ComAndFootRealization
   {
     
   public:

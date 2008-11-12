@@ -15,7 +15,7 @@
 
 
    Copyright (c) 2005-2006, 
-   @author Olivier Stasse, Ramzi Sellouati
+   @author Olivier Stasse, Ramzi Sellouati, Francois Keith,
    
    JRL-Japan, CNRS/AIST
 
@@ -46,6 +46,7 @@
 #define _POLYNOME_H_
 
 #include <vector>
+#include <walkGenJrl/walkGenJrl_API.h>
 
 using namespace::std;
 
@@ -53,7 +54,7 @@ namespace PatternGeneratorJRL
 {
 
   /** Class for computing trajectories */
-  class Polynome
+  class WALK_GEN_JRL_EXPORT Polynome
     {
 
     public:

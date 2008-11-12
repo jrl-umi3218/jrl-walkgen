@@ -4,7 +4,7 @@
    @ingroup foottrajectorygeneration
 
    Copyright (c) 2007, 
-   @author Olivier Stasse,
+   @author Francois Keith, Olivier Stasse,
 
    $Id$
    
@@ -45,6 +45,7 @@
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
 /* Walking pattern generation related inclusions */
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PGTypes.h>
 #include <walkGenJrl/SimplePlugin.h>
 
@@ -81,7 +82,7 @@ namespace PatternGeneratorJRL
       for more precise information on the usage and sample codes. 
       
   */
-  class FootTrajectoryGenerationAbstract :public SimplePlugin
+  class WALK_GEN_JRL_EXPORT FootTrajectoryGenerationAbstract :public SimplePlugin
   {
   public:
     

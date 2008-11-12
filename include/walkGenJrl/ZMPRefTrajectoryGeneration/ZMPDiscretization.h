@@ -6,7 +6,7 @@
 
 
    Copyright (c) 2005-2006, 
-   @author Olivier Stasse,Ramzi Sellouati
+   @author Olivier Stasse,Ramzi Sellouati, Francois Keith
    
    JRL-Japan, CNRS/AIST
 
@@ -48,6 +48,7 @@ using namespace::std;
 
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/Mathematics/PolynomeFoot.h>
 #include <walkGenJrl/Mathematics/ConvexHull.h>
 #include <walkGenJrl/PGTypes.h>
@@ -66,7 +67,7 @@ namespace PatternGeneratorJRL
     the support foot. During double support phase, the ZMP is 
     on the line linking the two centers of each foot. 
   */
-  class ZMPDiscretization: public ZMPRefTrajectoryGeneration
+  class WALK_GEN_JRL_EXPORT ZMPDiscretization: public ZMPRefTrajectoryGeneration
     {
       public :
     

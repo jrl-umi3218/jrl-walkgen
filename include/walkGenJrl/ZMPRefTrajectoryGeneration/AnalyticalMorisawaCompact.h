@@ -11,7 +11,7 @@
 
 
    Copyright (c) 2007, 
-   Olivier Stasse,
+   Francios Keith, Olivier Stasse,
    
    JRL-Japan, CNRS/AIST
 
@@ -42,6 +42,7 @@
 
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/Clock.h>
 #include <walkGenJrl/Mathematics/PolynomeFoot.h>
 #include <walkGenJrl/Mathematics/ConvexHull.h>
@@ -91,7 +92,7 @@ namespace PatternGeneratorJRL
   /*! \brief Class to compute analytically in a compact form the trajectories of both the ZMP and the CoM.
     @ingroup analyticalformulation
    */
-  class AnalyticalMorisawaCompact: public AnalyticalMorisawaAbstract
+  class WALK_GEN_JRL_EXPORT AnalyticalMorisawaCompact: public AnalyticalMorisawaAbstract
     {
       
     public:

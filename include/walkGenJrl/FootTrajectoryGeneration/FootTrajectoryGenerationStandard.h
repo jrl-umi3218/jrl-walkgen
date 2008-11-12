@@ -3,7 +3,7 @@
    @ingroup foottrajectorygeneration
 
    Copyright (c) 2007, 
-   @author Olivier Stasse,
+   @author Francois Keith, Olivier Stasse,
    
    JRL-Japan, CNRS/AIST
 
@@ -35,6 +35,7 @@
 #define _FOOT_TRAJECTORY_GENERATION_STANDARD_H_
 
 /* Walking pattern generation related inclusions */
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.h>
 #include <walkGenJrl/Mathematics/PolynomeFoot.h>
 
@@ -47,7 +48,7 @@ namespace PatternGeneratorJRL
       orthogonal plan as well as the direction.For the height modification a 4th order polynome
       is used. Finally a landing and take off phase using an angular value (\f$\omega\f$).
   */
-  class FootTrajectoryGenerationStandard : public FootTrajectoryGenerationAbstract
+  class WALK_GEN_JRL_EXPORT FootTrajectoryGenerationStandard : public FootTrajectoryGenerationAbstract
   {
   public:
 

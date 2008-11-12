@@ -7,7 +7,7 @@
    ICRA 2007, 3989--3994
 
    Copyright (c) 2007, 
-   @author Olivier Stasse,
+   @author Francois Keith, Olivier Stasse,
    
    JRL-Japan, CNRS/AIST
 
@@ -38,6 +38,7 @@
 
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/Mathematics/PolynomeFoot.h>
 #include <walkGenJrl/Mathematics/ConvexHull.h>
 #include <walkGenJrl/Mathematics/AnalyticalZMPCOGTrajectory.h>
@@ -55,7 +56,7 @@ namespace PatternGeneratorJRL
     and therefore assume that 
     
    */
-  class AnalyticalMorisawaAbstract: public ZMPRefTrajectoryGeneration
+  class WALK_GEN_JRL_EXPORT AnalyticalMorisawaAbstract: public ZMPRefTrajectoryGeneration
     {
       
     public:
@@ -262,7 +263,7 @@ namespace PatternGeneratorJRL
 	this method. */
       void GetPolynomialDegrees(vector<unsigned int> &lPolynomialDegrees);
 	
-      friend std::ostream& operator <<(std::ostream &os,const AnalyticalMorisawaAbstract &obj);
+      WALK_GEN_JRL_EXPORT friend std::ostream& operator <<(std::ostream &os,const AnalyticalMorisawaAbstract &obj);
 
       /*! \brief Compute the preview control time window. */
       void ComputePreviewControlTimeWindow()

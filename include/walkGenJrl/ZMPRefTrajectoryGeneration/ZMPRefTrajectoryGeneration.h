@@ -4,7 +4,7 @@
 
    Copyright (c) 2005-2007, 
 
-   @author Olivier Stasse,
+   @author Francois Keith, Olivier Stasse,
    
    JRL-Japan, CNRS/AIST
 
@@ -39,6 +39,7 @@
 #include <string>
 //#define FULL_POLYNOME
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PGTypes.h>
 #include <walkGenJrl/SimplePlugin.h>
 
@@ -60,7 +61,7 @@ namespace PatternGeneratorJRL
 
 
   */
-  class ZMPRefTrajectoryGeneration : public SimplePlugin
+  class WALK_GEN_JRL_EXPORT ZMPRefTrajectoryGeneration : public SimplePlugin
   {
   protected:
 

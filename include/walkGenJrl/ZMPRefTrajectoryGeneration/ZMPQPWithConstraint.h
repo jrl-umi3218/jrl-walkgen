@@ -1,7 +1,7 @@
 /* This object provides the .
 
    Copyright (c) 2005-2007, 
-   Olivier Stasse,
+   Francois Keith, Olivier Stasse,
    
    JRL-Japan, CNRS/AIST
 
@@ -33,6 +33,7 @@
 
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/Mathematics/ConvexHull.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 
@@ -40,7 +41,7 @@ using namespace dynamicsJRLJapan;
 namespace PatternGeneratorJRL
 {
   class ZMPDiscretization;
-  class ZMPQPWithConstraint : public ZMPRefTrajectoryGeneration
+  class WALK_GEN_JRL_EXPORT ZMPQPWithConstraint : public ZMPRefTrajectoryGeneration
   {
     
   public:

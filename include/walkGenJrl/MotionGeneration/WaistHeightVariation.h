@@ -6,7 +6,7 @@
    of the foot, this is the object to modify.
 
    Copyright (c) 2005-2006, 
-   @author Olivier Stasse,Ramzi Sellouati
+   @author Olivier Stasse,Ramzi Sellouati, Francois Keith, 
    
    JRL-Japan, CNRS/AIST
 
@@ -42,6 +42,7 @@
 
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/Mathematics/Polynome.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #include <walkGenJrl/PreviewControl/PreviewControl.h>
@@ -53,7 +54,7 @@
 namespace PatternGeneratorJRL
 {
 
-class WaistPolynome : public Polynome
+class WALK_GEN_JRL_EXPORT WaistPolynome : public Polynome
     {
     public:
       /// Constructor:

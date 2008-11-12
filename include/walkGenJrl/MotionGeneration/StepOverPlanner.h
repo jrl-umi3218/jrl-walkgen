@@ -5,7 +5,7 @@
     of the foot, this is the object to modify.
 
     Copyright (c) 2005-2006, 
-    @author Bjorn Verrelst,Olivier Stasse
+    @author Bjorn Verrelst,Olivier Stasse, Francois Keith, 
    
     JRL-Japan, CNRS/AIST
 
@@ -50,6 +50,7 @@
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
 /*! Humanoid Walking Pattern Generator */
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PreviewControl/PreviewControl.h>
 #include <walkGenJrl/Mathematics/StepOverPolynome.h>
 #include <walkGenJrl/MotionGeneration/InverseKinematics.h>
@@ -70,7 +71,7 @@ namespace PatternGeneratorJRL
 
   /*!\ingroup steppingover 
     \brief Object to compute new foot trajectories to step over obstacle dynamically*/
-  class StepOverPlanner
+  class WALK_GEN_JRL_EXPORT StepOverPlanner
   {
   public :
      

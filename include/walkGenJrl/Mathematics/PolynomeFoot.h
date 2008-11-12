@@ -14,7 +14,7 @@
 
 
    Copyright (c) 2005-2006, 
-   @author Olivier Stasse, Ramzi Sellouati
+   @author Olivier Stasse, Ramzi Sellouati, Francois Keith
    
    JRL-Japan, CNRS/AIST
 
@@ -51,13 +51,14 @@
 #endif
 
 #include <vector>
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/Mathematics/Polynome.h>
 
 namespace PatternGeneratorJRL
 {
 
   /// Polynome used for X,Y and Theta trajectories.
-  class Polynome3 : public Polynome
+  class WALK_GEN_JRL_EXPORT Polynome3 : public Polynome
     {
     public:
       /** Constructor:
@@ -85,7 +86,7 @@ namespace PatternGeneratorJRL
     };
 
   /// Polynome used for Z trajectory.
-  class Polynome4 : public Polynome
+  class WALK_GEN_JRL_EXPORT Polynome4 : public Polynome
     {
     public:
       /** Constructor:
@@ -101,7 +102,7 @@ namespace PatternGeneratorJRL
     };
 
   /// Polynome used for X,Y and Theta trajectories.
-  class Polynome5 : public Polynome
+  class WALK_GEN_JRL_EXPORT Polynome5 : public Polynome
     {
     public:
       /** Constructor:
@@ -116,7 +117,7 @@ namespace PatternGeneratorJRL
     };
 
   /// Polynome used for Z trajectory.
-  class Polynome6 : public Polynome
+  class WALK_GEN_JRL_EXPORT Polynome6 : public Polynome
     {
     public:
       /// Constructor:

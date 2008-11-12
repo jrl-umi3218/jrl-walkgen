@@ -2,7 +2,7 @@
     \brief Polynomes object for generating foot and hip trajectories while stepping over.
     
     Copyright (c) 2005-2006, 
-    @author Bjorn Verrelst, Olivier Stasse
+    @author Bjorn Verrelst, Olivier Stasse, Francois Keith
     
     JRL-Japan, CNRS/AIST
     
@@ -38,6 +38,7 @@
 
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/Mathematics/Polynome.h>
 
 
@@ -46,7 +47,7 @@ namespace PatternGeneratorJRL
 {
   /*! @ingroup steppingover 
     @brief Polynome used for Z trajectory during stepover. */
-  class StepOverPolynomeFoot : public Polynome
+  class WALK_GEN_JRL_EXPORT StepOverPolynomeFoot : public Polynome
   {
   public:
     /*! Constructor:
@@ -66,7 +67,7 @@ namespace PatternGeneratorJRL
 
   /*! @ingroup steppingover
     @brief Polynome used for Z trajectory during stepover. */
-  class StepOverPolynomeFootZtoX : public Polynome
+  class WALK_GEN_JRL_EXPORT StepOverPolynomeFootZtoX : public Polynome
   {
   public:
     /*! Constructor:
@@ -86,7 +87,7 @@ namespace PatternGeneratorJRL
   /*! @ingroup stepping over
     @brief Polynome used for X trajectory in function of time 
     to combine with StepOverPolynomeFootZtoX.*/
-  class StepOverPolynomeFootXtoTime : public Polynome
+  class WALK_GEN_JRL_EXPORT StepOverPolynomeFootXtoTime : public Polynome
   {
   public:
     /*! Constructor:
@@ -104,7 +105,7 @@ namespace PatternGeneratorJRL
   /*! @ingroup steppingover 
     @brief Polynome for the hip trajectory. 
   */
-  class StepOverPolynomeHip4 : public Polynome
+  class WALK_GEN_JRL_EXPORT StepOverPolynomeHip4 : public Polynome
   {
   public:
     /*! Constructor:
@@ -127,7 +128,7 @@ namespace PatternGeneratorJRL
   /*! @ingroup steppingover 
     @brief spline function calculation
     class to calculate cubic splines */
-  class StepOverSpline 
+  class WALK_GEN_JRL_EXPORT StepOverSpline 
   {
   public:
     /*! Constructor: */
@@ -151,7 +152,7 @@ namespace PatternGeneratorJRL
 
   /*! @ingroup steppingover
     class to calculate Clamped Cubic splines */
-  class StepOverClampedCubicSpline 
+  class WALK_GEN_JRL_EXPORT StepOverClampedCubicSpline 
   {
   public:
     /*! Constructor: */

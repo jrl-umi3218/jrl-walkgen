@@ -5,7 +5,7 @@
 
 
    Copyright (c) 2005-2006, 
-   @author Olivier Stasse
+   @author Francois Keith, Olivier Stasse
    
    JRL-Japan, CNRS/AIST
 
@@ -39,6 +39,7 @@
 
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/SimplePlugin.h>
 #include <walkGenJrl/PGTypes.h>
 
@@ -54,7 +55,7 @@ namespace PatternGeneratorJRL
     - An on-line mode, where one step at a time is send to 
     the ZMP reference trajectory generator object. 
    */
-  class StepStackHandler : public SimplePlugin
+  class WALK_GEN_JRL_EXPORT StepStackHandler : public SimplePlugin
   {
   public:
     /*! \brief Constructor */

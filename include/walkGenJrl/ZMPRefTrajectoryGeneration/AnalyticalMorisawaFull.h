@@ -2,7 +2,7 @@
    \brief Full formulation of the analytical method to generate ZMP and COM.
 
    Copyright (c) 2007, 
-   Olivier Stasse,
+   Francois Keith, Olivier Stasse,
    
    JRL-Japan, CNRS/AIST
 
@@ -33,6 +33,7 @@
 
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/Mathematics/PolynomeFoot.h>
 #include <walkGenJrl/Mathematics/ConvexHull.h>
 #include <walkGenJrl/Mathematics/AnalyticalZMPCOGTrajectory.h>
@@ -63,7 +64,7 @@ namespace PatternGeneratorJRL
     \f}
 
    */
-  class AnalyticalMorisawaFull: public AnalyticalMorisawaAbstract
+  class WALK_GEN_JRL_EXPORT AnalyticalMorisawaFull: public AnalyticalMorisawaAbstract
     {
       
     public:

@@ -2,7 +2,7 @@
    for given CoM and foot postures.
 
    Copyright (c) 2007, 
-   @author Olivier Stasse.
+   @author Francois Keith, Olivier Stasse.
    
    JRL-Japan, CNRS/AIST
 
@@ -34,6 +34,7 @@
 #define _COM_AND_FOOT_REALIZATION_H_
 
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/SimplePlugin.h>
 #include <walkGenJrl/StepStackHandler.h>
 
@@ -55,7 +56,7 @@ namespace PatternGeneratorJRL
       preview loop of the class \a ZMPPreviewControlWithMultiBodyZMP class.
 
    */
-  class ComAndFootRealization : public SimplePlugin
+  class WALK_GEN_JRL_EXPORT ComAndFootRealization : public SimplePlugin
   {
   private:
 

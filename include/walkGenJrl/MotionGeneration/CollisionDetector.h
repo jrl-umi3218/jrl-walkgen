@@ -4,6 +4,7 @@
    of the foot, this is the object to modify.
 
    Copyright (c) 2005-2006,  JRL-Japan, CNRS/AIST
+   Francis Keith,
    Bjorn Verrelst 
 
    All rights reserved.
@@ -36,6 +37,7 @@
 
 
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <vector>
 #include <string>
 
@@ -51,7 +53,7 @@ namespace PatternGeneratorJRL
   /** @ingroup steppingover
       @brief Object to detect collisions between robot leg and obstacle
    */
-  class CollisionDetector
+  class WALK_GEN_JRL_EXPORT CollisionDetector
     {
       public :
      

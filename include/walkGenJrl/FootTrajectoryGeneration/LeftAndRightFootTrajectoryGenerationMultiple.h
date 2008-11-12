@@ -5,7 +5,7 @@
 
 
    Copyright (c) 2007, 
-   @author Olivier Stasse,
+   @author Francois Keith, Olivier Stasse,
 
    $Id$
    
@@ -41,6 +41,7 @@
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
 /* Walking Pattern Generator inclusion */
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/SimplePlugin.h>
 #include <walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.h>
 
@@ -64,7 +65,7 @@ namespace PatternGeneratorJRL
       but it could be extended for a clear separation between the two feet.
 
    */
-  class LeftAndRightFootTrajectoryGenerationMultiple : public SimplePlugin
+  class WALK_GEN_JRL_EXPORT LeftAndRightFootTrajectoryGenerationMultiple : public SimplePlugin
     {
 
     public: 

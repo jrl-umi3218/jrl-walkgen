@@ -1,6 +1,6 @@
 /* Object to perform preview control on a cart model
     Copyright (c) 2005-2006, 
-   @author Olivier Stasse, Ramzi Sellouati
+   @author Olivier Stasse, Ramzi Sellouati, Francois Keith
    
    JRL-Japan, CNRS/AIST
 
@@ -37,6 +37,7 @@
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 using namespace::std;
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PGTypes.h>
 
 namespace PatternGeneratorJRL
@@ -47,7 +48,7 @@ namespace PatternGeneratorJRL
       
       \brief Class to implement the preview control
    */
-  class PreviewControl
+  class WALK_GEN_JRL_EXPORT PreviewControl
     {
     public:
       /*! Constructor */

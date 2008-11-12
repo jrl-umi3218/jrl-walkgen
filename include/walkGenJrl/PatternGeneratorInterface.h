@@ -12,7 +12,7 @@
 
 
    Copyright (c) 2005-2006, 
-   @author Olivier Stasse
+   @author Francois Keith, Olivier Stasse
    
    JRL-Japan, CNRS/AIST
 
@@ -50,6 +50,7 @@
 
 #include <dynamicsJRLJapan/HumanoidDynamicMultiBody.h>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
 #include <walkGenJrl/PreviewControl/PreviewControl.h>
 
@@ -85,7 +86,7 @@ namespace PatternGeneratorJRL
      
       
    */
-  class PatternGeneratorInterface : public SimplePluginManager
+  class WALK_GEN_JRL_EXPORT PatternGeneratorInterface : public SimplePluginManager
   {    
   public:
     

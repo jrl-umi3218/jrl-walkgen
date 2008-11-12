@@ -2,7 +2,7 @@
    Pattern Generator Interface.
 
    Copyright (c) 2007, 
-   @author Olivier Stasse.
+   @author Francois Keith, Olivier Stasse.
    
    JRL-Japan, CNRS/AIST
 
@@ -40,6 +40,7 @@
 #include <string>
 #include <sstream>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 
 namespace PatternGeneratorJRL
 {
@@ -50,7 +51,7 @@ namespace PatternGeneratorJRL
     appropriatly.
     
   */
-  class SimplePluginManager
+  class WALK_GEN_JRL_EXPORT SimplePluginManager
   {
     
 

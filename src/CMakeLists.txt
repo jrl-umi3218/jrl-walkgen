@@ -48,6 +48,9 @@ SET(libwpg_src
 	TimeUtilsWindows.cpp
  )
 
+ SET(libwpg_headers 
+../include/${PROJECT_NAME}/walkGenJrl_API.h
+ )
 
 # Create list of headers files
 #-----------------------------

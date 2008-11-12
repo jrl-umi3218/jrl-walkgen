@@ -6,7 +6,7 @@
   @ingroup foottrajectorygeneration
 
   Copyright (c) 2007,
-  @author Olivier Stasse,
+  @author Francois Keith, Olivier Stasse,
      
   JRL-Japan, CNRS/AIST
 
@@ -36,6 +36,7 @@
 #ifndef _FOOT_TRAJECTORY_GENERATION_MULTIPLE_H_
 
 /* Walking pattern generation related inclusions */
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
 
 namespace PatternGeneratorJRL
@@ -56,7 +57,7 @@ namespace PatternGeneratorJRL
       
       
    */
-  class FootTrajectoryGenerationMultiple : public SimplePlugin
+  class WALK_GEN_JRL_EXPORT FootTrajectoryGenerationMultiple : public SimplePlugin
   {
   public :
 

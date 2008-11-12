@@ -6,7 +6,8 @@
    Copyright (c) 2005-2006, 
    @author Bjorn Verrelst,
    Olivier Stasse
-   
+   Francois Keith, 
+
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
@@ -43,6 +44,7 @@
 
 using namespace::std;
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/Mathematics/PolynomeFoot.h>
 
 
@@ -50,7 +52,7 @@ using namespace::std;
 namespace PatternGeneratorJRL
 {
    
-  class UpperBodyMotion
+  class WALK_GEN_JRL_EXPORT UpperBodyMotion
     {
       public :
     

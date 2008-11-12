@@ -4,7 +4,7 @@
   
   
   Copyright (c) 2007, 
-  @author Olivier Stasse
+  @author Francois Keith, Olivier Stasse
    
   JRL-Japan, CNRS/AIST
   
@@ -42,6 +42,7 @@
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
 
 // PG
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PGTypes.h>
 #include <walkGenJrl/SimplePlugin.h>
 #include <walkGenJrl/PreviewControl/PreviewControl.h>
@@ -59,7 +60,7 @@ namespace PatternGeneratorJRL
   Abstract interface to the object handling the global strategy
   to generate the output of the pattern generator.
   */
-  class GlobalStrategyManager : public SimplePlugin
+  class WALK_GEN_JRL_EXPORT GlobalStrategyManager : public SimplePlugin
   {
     
   public:

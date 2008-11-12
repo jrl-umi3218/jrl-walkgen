@@ -3,7 +3,8 @@
    model of the robot. The link between this partial model is given by
    an auxiliary file, and the redefinition of the virtual functions of this class.
 
-   Copyright (c) 2005-2006, 
+   Copyright (c) 2005-2006,
+   Francois Keith, 
    Olivier Stasse,
    
    JRL-Japan, CNRS/AIST
@@ -38,6 +39,7 @@
 #include <string>
 #include <vector>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #include <walkGenJrl/PreviewControl/PreviewControl.h>
 
@@ -53,7 +55,7 @@ namespace PatternGeneratorJRL
     provided by KineoWorks and transform it in 
     a proper motion for the walking pattern generator.
   */
-  class GenerateMotionFromKineoWorks
+  class WALK_GEN_JRL_EXPORT GenerateMotionFromKineoWorks
     {
     public:
 

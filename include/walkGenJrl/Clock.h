@@ -37,6 +37,9 @@
    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+#include <walkGenJrl/walkGenJrl_API.h>
+
 #ifdef UNIX
 #include <sys/time.h> 
 #endif /*UNIX*/
@@ -61,7 +64,7 @@ namespace PatternGeneratorJRL
     TotalTime() returns the time spend in total in the code measured.
     The precision is expected to be in micro-second but is OS dependent.
   */
-  class Clock
+  class WALK_GEN_JRL_EXPORT Clock
   {
   public:
 

@@ -3,7 +3,7 @@
   only foot, ZMP reference and CoM trajectories position every 5 ms.
 
   Copyright (c) 2007, 
-  @author Olivier Stasse
+  @author Francois Keith, Olivier Stasse
    
   JRL-Japan, CNRS/AIST
   
@@ -30,6 +30,7 @@
   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/SimplePlugin.h>
 #include <walkGenJrl/PGTypes.h>
 
@@ -44,7 +45,7 @@ namespace PatternGeneratorJRL
   /** @ingroup pgjrl
       Implementation of the buffers handling without preview control
   */
-  class CoMAndFootOnlyStrategy: public GlobalStrategyManager
+  class WALK_GEN_JRL_EXPORT CoMAndFootOnlyStrategy: public GlobalStrategyManager
   {
     
   public:

@@ -3,7 +3,7 @@
     @ingroup previewcontrol
 
    Copyright (c) 2005-2006, 
-   @author Olivier Stass
+   @author Francois Keith, Olivier Stass
    
    JRL-Japan, CNRS/AIST
 
@@ -33,6 +33,7 @@
 #define _OPTIMAL_CONTROLLER_SOLVER_H_
 
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <walkGenJrl/walkGenJrl_API.h>
 
 namespace PatternGeneratorJRL
 {
@@ -73,7 +74,7 @@ namespace PatternGeneratorJRL
      Alan J. Laub A Schur method for solving Algebraic Riccati Equations, IEEE Transaction on Automatic Control,
      Vol AC-24, No.6 December 1979
    */
-  class OptimalControllerSolver
+  class WALK_GEN_JRL_EXPORT OptimalControllerSolver
   {
   public:
 

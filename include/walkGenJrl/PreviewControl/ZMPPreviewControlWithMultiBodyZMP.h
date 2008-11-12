@@ -5,7 +5,7 @@
   Copyright (c) 2007 
   @author Olivier Stasse  
   Copyright (c) 2005-2006, 
-  @author Olivier Stasse, Ramzi Sellouati
+  @author Francois Keith, Olivier Stasse, Ramzi Sellouati
    
   JRL-Japan, CNRS/AIST
   
@@ -40,6 +40,7 @@
 
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PGTypes.h>
 #include <walkGenJrl/PreviewControl/PreviewControl.h>
 #include <walkGenJrl/MotionGeneration/ComAndFootRealization.h>
@@ -73,7 +74,7 @@ namespace PatternGeneratorJRL
       are performed.
       
    */
-  class ZMPPreviewControlWithMultiBodyZMP 
+  class WALK_GEN_JRL_EXPORT ZMPPreviewControlWithMultiBodyZMP 
     {
     private:
       

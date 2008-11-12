@@ -5,7 +5,7 @@
 
 
    Copyright (c) 2005-2006, 
-   @author Olivier Stasse, Ramzi Sellouati
+   @author Olivier Stasse, Ramzi Sellouati, Francois Keith, 
    
    JRL-Japan, CNRS/AIST
 
@@ -39,6 +39,7 @@
 #include <iostream>
 
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
+#include <walkGenJrl/walkGenJrl_API.h>
 using namespace dynamicsJRLJapan;
 
 namespace PatternGeneratorJRL
@@ -47,7 +48,7 @@ namespace PatternGeneratorJRL
       Some parameters are however specific to the HRP2.
       Please modify the code if needed. 
   */  
-  class InverseKinematics 
+  class WALK_GEN_JRL_EXPORT InverseKinematics 
   {
   public:
     /*! Constructor. */

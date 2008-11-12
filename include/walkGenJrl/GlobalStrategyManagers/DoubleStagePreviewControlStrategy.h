@@ -5,7 +5,7 @@
   
   
   Copyright (c) 2007, 
-  @author Olivier Stasse
+  @author Francois Keith, Olivier Stasse
    
   JRL-Japan, CNRS/AIST
   
@@ -32,6 +32,7 @@
   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/SimplePlugin.h>
 #include <walkGenJrl/GlobalStrategyManagers/GlobalStrategyManager.h>
 #include <walkGenJrl/PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
@@ -45,7 +46,7 @@ namespace PatternGeneratorJRL
       Implementation of the buffers handling for Kajita's 
       algorithm.
   */
-  class DoubleStagePreviewControlStrategy : public GlobalStrategyManager
+  class WALK_GEN_JRL_EXPORT DoubleStagePreviewControlStrategy : public GlobalStrategyManager
   {
     
   public:

@@ -2,7 +2,7 @@
   \brief Polynomial trajectory for the ZMP and the CoG
 
    Copyright (c) 2007
-   @author Olivier Stasse
+   @author Francois Keith, Olivier Stasse
    
    JRL-Japan, CNRS/AIST
 
@@ -35,6 +35,7 @@
 #include <vector>
 #include <iostream>
 
+#include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/Mathematics/Polynome.h>
 
 
@@ -45,7 +46,7 @@ namespace PatternGeneratorJRL
       based on the following formula:
       
    */
-  class AnalyticalZMPCOGTrajectory
+  class WALK_GEN_JRL_EXPORT AnalyticalZMPCOGTrajectory
     {
 
     public:
@@ -196,7 +197,7 @@ namespace PatternGeneratorJRL
       /*! \brief Returns the maximal fluctuation for the first segment of this trajectory. */
       double FluctuationMaximal();
 
-      friend std::ostream& operator <<(std::ostream &os,const AnalyticalZMPCOGTrajectory &obj);
+      WALK_GEN_JRL_EXPORT friend std::ostream& operator <<(std::ostream &os,const AnalyticalZMPCOGTrajectory &obj);
 
       /*! \brief Absolute Time reference of this trajectory. */
       double  GetAbsoluteTimeReference() const

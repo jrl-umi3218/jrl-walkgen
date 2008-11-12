@@ -11,7 +11,7 @@
 
 
    Copyright (c) 2005-2006, 
-   @author Olivier Stasse
+   @author Francois Keith, Olivier Stasse
    
    JRL-Japan, CNRS/AIST
 
@@ -41,6 +41,7 @@
 #define _CONVEX_HULL_COMPUTATION_H_
 
 #include <vector>
+#include <walkGenJrl/walkGenJrl_API.h>
 
 namespace PatternGeneratorJRL
 {
@@ -57,7 +58,7 @@ namespace PatternGeneratorJRL
   typedef std::vector<CH_Point> ConvexHullList;
 
   /*! This class compute the convex hull in 2D. */
-  class ComputeConvexHull
+  class WALK_GEN_JRL_EXPORT ComputeConvexHull
   {
   public: 
     ComputeConvexHull();
