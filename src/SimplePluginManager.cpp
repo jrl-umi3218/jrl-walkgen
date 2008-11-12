@@ -84,7 +84,7 @@ SimplePluginManager::~SimplePluginManager()
 
 void SimplePluginManager::Print( )
 { 
-  std::map<std::string, SimplePlugin * , ltstr>::iterator it_SP;
+  std::multimap<std::string, SimplePlugin * , ltstr>::iterator it_SP;
   
 
   it_SP =m_SimplePlugins.begin();

@@ -30,6 +30,7 @@
 #include <iostream>
 #include <fstream>
 #include <walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
+#include "jrlMathTools/constants.h"
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) std::cerr << "FootTrajectoryGenerationStandard :" << x << std::endl

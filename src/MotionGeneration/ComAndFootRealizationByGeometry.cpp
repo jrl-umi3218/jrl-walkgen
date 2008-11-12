@@ -1,7 +1,18 @@
 #include <iostream>
 #include <fstream>
+
+#ifdef UNIX
 #include <sys/time.h>
+#endif
+
+#ifdef WIN32
+#include <Windows.h>
+#include <walkGenJrl/TimeUtilsWindows.h>
+#endif
+
 #include <time.h>
+
+#include "jrlMathTools/constants.h"
 
 #include <dynamicsJRLJapan/HumanoidDynamicMultiBody.h>
 

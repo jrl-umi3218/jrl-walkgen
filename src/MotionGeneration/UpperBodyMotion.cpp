@@ -31,6 +31,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O
 #include <iostream>
 #include <fstream>
 #include <walkGenJrl/MotionGeneration/UpperBodyMotion.h>
+#include "jrlMathTools/constants.h"
 
 using namespace::PatternGeneratorJRL;
 

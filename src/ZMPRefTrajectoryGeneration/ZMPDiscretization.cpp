@@ -30,13 +30,22 @@
    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifdef UNIX
 #include <sys/time.h>
+#endif UNIX
+
 #include <time.h>
 #include <iostream>
 #include <fstream>
 
+#include "jrlMathTools/constants.h"
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #include <walkGenJrl/Mathematics/ConvexHull.h>
+
+#ifdef WIN32
+inline double round( double d )
+{	return floor( d + 0.5 );	}
+#endif WIN32
 
 using namespace::PatternGeneratorJRL;
 

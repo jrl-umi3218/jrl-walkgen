@@ -9,11 +9,32 @@ cmake_minimum_required(VERSION 2.6)
 enable_language(CXX)
 enable_language(Fortran)
 
+IF(WIN32)
+# Counter CMake mesures
+# When enabling fortran, Cmakes adds lib as a prefix to the library created (out of Windowsg77.cmake)
+SET(CMAKE_STATIC_LIBRARY_PREFIX "")
+SET(CMAKE_SHARED_LIBRARY_PREFIX "")
+SET(CMAKE_SHARED_MODULE_PREFIX "")
+ENDIF(WIN32)
+
+
 # Debug mode for cmake.
 SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Set version
 SET(PROJECT_VERSION 2.5.0)
+
+IF(WIN32)
+  SET(LIBDIR_KW "/LIBPATH:")
+  SET(LIBINCLUSION_KW "")
+  SET(LIBINCLUSION_EXT ".lib")
+ENDIF(WIN32)
+
+IF(UNIX)
+  SET(LIBDIR_KW "-L")
+  SET(LIBINCLUSION_KW "-l")
+  SET(LIBINCLUSION_EXT "")
+ENDIF(UNIX)
 
 # name of the project
 SET(PROJECT_NAME walkGenJrl)
@@ -40,6 +61,9 @@ SET(PROJECT_REQUIREMENTS "dynamicsJRLJapan >= 1.9.99")
 MESSAGE(STATUS "${DYNJRLJAPAN_CFLAGS}")
 
 SET(${PROJECT_NAME}_CXXFLAGS "-Wall ${${PROJECT_NAME}_CXXFLAGS}")
+IF(WIN32)
+	SET(${PROJECT_NAME}_CXXFLAGS "/D__STDC__ ${${PROJECT_NAME}_CXXFLAGS}")
+ENDIF(WIN32)
 
 FOREACH(option_cxxflags ${DYNJRLJAPAN_CFLAGS})
   SET(${PROJECT_NAME}_CXXFLAGS "${option_cxxflags} ${${PROJECT_NAME}_CXXFLAGS}")
@@ -48,6 +72,8 @@ ENDFOREACH(option_cxxflags)
 FOREACH(option_ldflags ${DYNJRLJAPAN_LDFLAGS})
   SET(${PROJECT_NAME}_LDFLAGS "${option_ldflags} ${${PROJECT_NAME}_LDFLAGS}")
 ENDFOREACH(option_ldflags)
+
+SET(${PROJECT_NAME}_src_LDFLAGS "${${PROJECT_NAME}_LDFLAGS}")
 
 SET(${PROJECT_NAME}_LDFLAGS "-L${CMAKE_PREFIX_INSTALL}/lib/ -l${PROJECT_NAME}-${PROJECT_VERSION} ${${PROJECT_NAME}_LDFLAGS}")
 

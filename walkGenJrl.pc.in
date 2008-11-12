@@ -9,5 +9,5 @@ Name: @PACKAGE_NAME@
 Description: Walk generator for humanoid robot based on preview control
 Version: @VERSION@
 Requires: @DYNAMICJRLJAP_REQD@
-Libs: -L${libdir} -lwalkGenJRL
+Libs: ${LIBDIR_KW}${libdir} ${LIBINCLUSION_KW}walkGenJRL${LIBINCLUSION_EXT}
 Cflags: -I${includedir}/walkGenJrl

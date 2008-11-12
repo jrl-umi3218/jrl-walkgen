@@ -1,9 +1,18 @@
+#ifdef UNIX
 #include <sys/time.h>
+#endif UNIX
+
+#ifdef WIN32
+#include <Windows.h>
+#include <walkGenJrl/TimeUtilsWindows.h>
+#endif
+
 #include <time.h>
 
 #include <iostream>
 #include <fstream>
 
+#include "jrlMathTools/constants.h"
 #include <walkGenJrl/Mathematics/qld.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.h>
 

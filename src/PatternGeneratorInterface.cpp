@@ -1,7 +1,18 @@
 #include <fstream>
-#include <sys/time.h>
 #include <time.h>
+	
+#ifdef UNIX
+#include <sys/time.h>
+#endif /*UNIX*/
 
+#ifdef WIN32
+#include <Windows.h>
+#include <walkGenJrl/TimeUtilsWindows.h>
+#define bzero(p, size) (void)memset((p), 0, (size))  // definition of bzero for win32
+#endif /*WIN32*/
+
+
+#include "jrlMathTools/constants.h"
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
 #define ODEBUG2(x)
