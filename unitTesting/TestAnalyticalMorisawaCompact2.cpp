@@ -8,7 +8,12 @@
 /*                                                                */
 /******************************************************************/
 #include <fstream>
+#ifdef UNIX
 #include <sys/time.h>
+#endif /*UNIX*/
+#ifdef WIN32
+inline int random() {return rand();}
+#endif /*WIN32*/
 #include <time.h>
 
 #include <walkGenJrl/Mathematics/Polynome.h>

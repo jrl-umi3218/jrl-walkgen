@@ -1,4 +1,5 @@
 #include <sstream>
+#include <jrlMathTools/constants.h>
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
 using namespace::PatternGeneratorJRL;

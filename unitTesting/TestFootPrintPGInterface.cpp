@@ -1,7 +1,12 @@
+#ifdef UNIX
 #include <sys/time.h>
+#endif /*UNIX*/
+
 #include <time.h>
 #include <sstream>
 #include <fstream>
+
+#include <jrlMathTools/constants.h>
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
 using namespace::PatternGeneratorJRL;
