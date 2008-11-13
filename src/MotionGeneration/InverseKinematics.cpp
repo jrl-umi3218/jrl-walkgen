@@ -34,7 +34,7 @@
 */
 #include <math.h>
 #include <walkGenJrl/MotionGeneration/InverseKinematics.h>
-#include "jrlMathTools/constants.h"
+#include "jrlMathTools/jrlConstants.h"
 
 
 using namespace::PatternGeneratorJRL;

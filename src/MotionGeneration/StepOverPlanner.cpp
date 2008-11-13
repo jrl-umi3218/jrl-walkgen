@@ -34,7 +34,7 @@
 //#define _DEBUG_
 #include <fstream>
 #include <walkGenJrl/MotionGeneration/StepOverPlanner.h>
-#include "jrlMathTools/constants.h"
+#include "jrlMathTools/jrlConstants.h"
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) cerr << "StepOverPlanner :" << x << endl

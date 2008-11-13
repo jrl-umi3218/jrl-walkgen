@@ -6,7 +6,7 @@
 #include <sstream>
 #include <fstream>
 
-#include <jrlMathTools/constants.h>
+#include <jrlMathTools/jrlConstants.h>
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
 using namespace::PatternGeneratorJRL;

@@ -12,7 +12,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "jrlMathTools/constants.h"
+#include "jrlMathTools/jrlConstants.h"
 #include <walkGenJrl/Mathematics/qld.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.h>
 

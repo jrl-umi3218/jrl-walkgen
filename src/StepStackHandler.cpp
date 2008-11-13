@@ -34,7 +34,7 @@
 #include <fstream>
 #include <math.h>
 
-#include "jrlMathTools/constants.h"
+#include "jrlMathTools/jrlConstants.h"
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
 #define deg2rad(x) x*M_PI/180.0

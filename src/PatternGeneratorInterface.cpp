@@ -12,7 +12,7 @@
 #endif /*WIN32*/
 
 
-#include "jrlMathTools/constants.h"
+#include "jrlMathTools/jrlConstants.h"
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
 #define ODEBUG2(x)

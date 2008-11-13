@@ -12,7 +12,7 @@
 
 #include <time.h>
 
-#include "jrlMathTools/constants.h"
+#include "jrlMathTools/jrlConstants.h"
 
 #include <dynamicsJRLJapan/HumanoidDynamicMultiBody.h>
 
