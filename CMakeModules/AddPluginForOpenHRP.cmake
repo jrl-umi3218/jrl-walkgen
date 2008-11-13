@@ -64,15 +64,22 @@ IF   ( EXISTS "${name_ofplugincorbaIDL}" )
   SET(all_sourcefiles_for_plugin ${all_sourcefiles_for_plugin} ${common_CPP})
 
   IF (OPENHRP_VERSION_3)
-    SET(IDL_FILES_FOR_OPENHRP3 
+    SET(IDL_FILES_FOR_OPENHRP
         ${OPENHRP_HOME}/Controller/IOserver/corba/HRPcontroller.idl
 	${OPENHRP_HOME}/ViewSimulator/corba/ViewSimulator.idl
 	${OPENHRP_HOME}/DynamicsSimulator/corba/DynamicsSimulator.idl
 	${OPENHRP_HOME}/ModelLoader/corba/ModelLoader.idl	
 	${OPENHRP_HOME}/CollisionDetector/corba/CollisionDetector.idl	
      )
+  ENDIF(OPENHRP_VERSION_3)
 
-    FOREACH( locidlfile ${IDL_FILES_FOR_OPENHRP3})
+  IF (OPENHRP_VERSION_2)
+    SET(IDL_FILES_FOR_OPENHRP
+        ${OPENHRP_HOME}/Controller/IOserver/sys/plugin/dynamicsPlugin.idl
+     )
+  ENDIF(OPENHRP_VERSION_2)
+
+    FOREACH( locidlfile ${IDL_FILES_FOR_OPENHRP})
 
       GET_FILENAME_COMPONENT(locIDLBaseName ${locidlfile} NAME)
       GET_FILENAME_COMPONENT(locIDLBasePath ${locidlfile} PATH)
@@ -90,7 +97,6 @@ IF   ( EXISTS "${name_ofplugincorbaIDL}" )
 
     ENDFOREACH(locidlfile)
 
-  ENDIF(OPENHRP_VERSION_3)
 
 ELSE ( EXISTS "${name_ofplugincorbaIDL}" )
   MESSAGE(STATUS "${name_ofplugincorbaIDL} empty")
@@ -113,6 +119,7 @@ ENDFOREACH(corbaplugin)
 #MESSAGE(STATUS "PluginName : ${PLUGINNAME}")
 ADD_LIBRARY(${PluginBaseName} ${all_sourcefiles_for_plugin})
 
+SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} -I${${PROJECT_NAME}_SOURCE_DIR}/include")
 SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} ${OPENHRP_CXX_FLAGS}")
 SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} -I${OPENHRP_HOME}/Controller/IOserver/robot/${ROBOT}")
 SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} -I${OPENHRP_HOME}/Controller/IOserver/include")
@@ -121,7 +128,7 @@ SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} -I${OPENHRP_HOME}/Controller
 SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} -I${OPENHRP_HOME}/Controller/IOserver/sys/plugin")
 SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} -I${WORKINGDIRIDL}")
 SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} ${${PROJECT_NAME}_CXXFLAGS}")
-SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} -I${${PROJECT_NAME}_SOURCE_DIR}/include")
+
 
 SET(openhrp_plugin_ldflags "${openhrp_plugin_ldflags}  -L${${PROJECT_NAME}_BINARY_DIR}/src")
 
@@ -137,7 +144,7 @@ GET_TARGET_PROPERTY(PluginFinalFileNameSuffix ${PluginBaseName} SUFFIX)
 SET(loc_compile_flags "${omniORB4_cflags} ${openhrp_plugin_cflags}  ${${PROJECT_NAME}_CXXFLAGS}")
 
 IF (OPENHRP_VERSION_2)
-  SET(loc_compile_flags ${loc_compile_flags} "-DOPENHRP_VERSION_2")
+  SET(loc_compile_flags "${loc_compile_flags} -DOPENHRP_VERSION_2")
 ENDIF (OPENHRP_VERSION_2)
 
 IF (OPENHRP_VERSION_3)

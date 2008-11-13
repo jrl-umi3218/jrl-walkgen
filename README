@@ -1,3 +1,5 @@
+This new version of the WPG is now Visual Studio compatible.
+
 See INSTALL for generic installation instructions.
 
 
@@ -7,9 +9,15 @@ Installation instructions specific to walkGenJrl
 This file explains how to install walkGenJrl lib. It does not compile and
 instal the plugin.
 
+************
+*For Linux.*
+************
+
 Basic Installation
 ------------------
 
+
+Old way (autoconf):
 
 To install do the following steps:
 ./autogen.sh
@@ -21,3 +29,37 @@ cd build
 
 make 
 make install
+
+
+
+New way (cmake):
+
+mkdir build
+cd build
+cmake -DCMAKE_PREFIX_INSTALL=PATH_TO_INSTALLDIR ..
+
+CMake should be 2.6 at least.
+
+It will try to find itself OpenHRP and boost, as well as the others packages.
+
+It might however failed.
+In this case, please run:
+ccmake ..
+and set the appropriate variables:
+OPENHRP3_HOME
+OPENHRP_HOME
+
+If blas and lapack needs gfortran or f2c it is very likely
+that cmake will not find it. Thus you should specify it with
+CMAKE_SHARED_LINKER_FLAGS, either with cmake:
+cmake -DCMAKE_PREFIX_INSTALL=PATH_TO_INSTALLDIR -DCMAKE_SHARED_LINKER_FLAGS=-lgfortran ..
+or with ccmake by toggling the advanced options.
+
+************
+*For VS 8. *
+************
+
+Install mingw, and make sure that all the enviroment variables
+are set up properly.
+We have tested cmake with the "NMake Makefiles" generator.
+

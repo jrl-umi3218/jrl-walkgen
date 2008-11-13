@@ -1,9 +1,9 @@
 #ifndef WALKPLUGINJRL_IDL_FILE
 #define WALKPLUGINJRL_IDL_FILE
 
-#include "HRPcontroller.idl"
+#include "common.idl"
 
-#if 1
+#if 0
 /**
  * Position and Attitude
  * @param	px	x coordinates
@@ -28,7 +28,7 @@ struct TransformQuaternion
 typedef sequence<double> dsequence;
 #endif
 
-interface walkpluginJRL : OpenHRP::Plugin
+interface walkpluginJRL : Plugin
 {
   /***********************************
    *

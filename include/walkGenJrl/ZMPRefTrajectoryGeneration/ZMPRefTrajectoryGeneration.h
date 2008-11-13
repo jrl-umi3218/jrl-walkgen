@@ -279,10 +279,10 @@ namespace PatternGeneratorJRL
       @param[out] FinalLeftFootAbsolutePositions: The queue of left foot absolute positions.
       @param[out] FinalRightFootAbsolutePositions: The queue of right foot absolute positions.
      */
-    virtual void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-				      deque<COMPosition> &FinalCOMPositions,
-				      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-				      deque<FootAbsolutePosition> &RightFootAbsolutePositions)=0;
+    virtual void EndPhaseOfTheWalking(std::deque<ZMPPosition> &ZMPPositions,
+				      std::deque<COMPosition> &FinalCOMPositions,
+				      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+				      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions)=0;
 
 	  
     /* ! \brief Method to change on line the landing position of a foot.

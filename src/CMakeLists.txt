@@ -88,10 +88,14 @@ OPTION(BUILD_SHARED_LIBS "Build walkGenJRL with shared libraries." ON)
 
 # Specify compiling options
 # -------------------------
+SET(srcfile_cxx_flags "-I${PROJECT_SOURCE_DIR}/include/")
+SET(srcfile_cxx_flags "${srcfile_cxx_flags} -I${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}")
+SET(srcfile_cxx_flags "${srcfile_cxx_flags} -I${CMAKE_INSTALL_PREFIX}/include")
+SET(srcfile_cxx_flags "${srcfile_cxx_flags} ${${PROJECT_NAME}_CXXFLAGS}")
 SET_TARGET_PROPERTIES(${PROJECT_NAME_LIB}
       		      PROPERTIES 
-	              COMPILE_FLAGS  "-I${PROJECT_SOURCE_DIR}/include/ -I${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME} ${${PROJECT_NAME}_CXXFLAGS}"
-				  LINK_FLAGS ${${PROJECT_NAME}_src_LDFLAGS}
+	              COMPILE_FLAGS  ${srcfile_cxx_flags}
+   		      LINK_FLAGS ${${PROJECT_NAME}_src_LDFLAGS}
 	             )
 			 
 				 
@@ -150,7 +154,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(OPENHRP_FOUND)
-   MESSAGE(STATUS " They will be installed")
+   #MESSAGE(STATUS " They will be installed")
    INSTALL(FILES 
         ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2Specificities.xml
         ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2LinkJointRank.xml
