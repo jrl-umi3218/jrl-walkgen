@@ -121,6 +121,9 @@ SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} -I${OPENHRP_HOME}/Controller
 SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} -I${OPENHRP_HOME}/Controller/IOserver/sys/plugin")
 SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} -I${WORKINGDIRIDL}")
 SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} ${${PROJECT_NAME}_CXXFLAGS}")
+SET(openhrp_plugin_cflags "${openhrp_plugin_cflags} -I${${PROJECT_NAME}_SOURCE_DIR}/include")
+
+SET(openhrp_plugin_ldflags "${openhrp_plugin_ldflags}  -L${${PROJECT_NAME}_BINARY_DIR}/src")
 
 
 SET(openhrp_plugin_path "${OPENHRP_HOME}/Controller/IOserver/robot/${ROBOT}/bin")
@@ -144,7 +147,7 @@ ENDIF (OPENHRP_VERSION_3)
 SET_TARGET_PROPERTIES(${PluginBaseName}
 			PROPERTIES	
 		        COMPILE_FLAGS "${loc_compile_flags}"
-			LINK_FLAGS "${omniORB4_link_FLAGS} ${PLUGINLINKS}  ${${PROJECT_NAME}_LDFLAGS}"
+			LINK_FLAGS "${omniORB4_link_FLAGS} ${PLUGINLINKS}  ${${PROJECT_NAME}_LDFLAGS} ${openhrp_plugin_ldflags}"
 			PREFIX ""
 			SUFFIX ".so"
 			LIBRARY_OUTPUT_DIRECTORY ${openhrp_plugin_path})
