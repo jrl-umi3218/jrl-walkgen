@@ -1,6 +1,6 @@
 #ifdef UNIX
 #include <sys/time.h>
-#endif UNIX
+#endif /* UNIX */
 
 #ifdef WIN32
 #include <Windows.h>
