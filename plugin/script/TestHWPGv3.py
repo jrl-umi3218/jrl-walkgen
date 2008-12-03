@@ -1,4 +1,3 @@
-# Specific to HRP-2
 import hrp
 import hstsetup
 from hrp import *
@@ -13,7 +12,7 @@ seq = SequencePlayerHelper.narrow(ms.create("seqplay","seq","-ORBconfig../../../
 seq.start()
 
 ms.load("WalkGenJRL")
-walk = ms.create("WalkGenJRL","walk","../etc/PreviewControlParameters.ini ../model/ HRP2JRLmain.wrl ../etc/HRP2Specificities.xml ../etc/HRP2LinkJointRank.xml")
+walk = ms.create("WalkGenJRL","walk","../etc/PreviewControlParameters.ini ../model/ HRP2JRLmain.wrl ../etc/HRP2SpecificitiesNormal.xml ../etc/HRP2LinkJointRank.xml")
 ms.load("hstabilizer")
 st = ms.create("hstabilizer","st","")
 

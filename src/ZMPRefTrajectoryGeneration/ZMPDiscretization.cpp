@@ -79,7 +79,9 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile, 
   : ZMPRefTrajectoryGeneration(lSPM)
 {
   m_PC = 0;
-  
+
+  m_InitializationProfile = PREV_ZMP_INIT_PROFIL;
+
   m_HS = aHS;
   m_FootTrajectoryGenerationStandard = new FootTrajectoryGenerationStandard(lSPM,m_HS);
   m_FootTrajectoryGenerationStandard->InitializeInternalDataStructures();
@@ -406,8 +408,10 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   double startingZMPREF[2] = { lStartingZMPPosition(0), lStartingZMPPosition(1)};
   double finalZMPREF[2] = {m_ZMPNeutralPosition[0],m_ZMPNeutralPosition[1]};
   ODEBUG("ZMPNeutralPosition: " << m_ZMPNeutralPosition[0] << " " 
-	  << m_ZMPNeutralPosition[1] << endl 
-	  << "CurrentAbsTheta : " << CurrentAbsTheta);
+	  << m_ZMPNeutralPosition[1] << endl <<
+	  "StartingZMPPosition(toto):" <<  lStartingZMPPosition(0) << " " << lStartingZMPPosition(1) <<endl
+	  << "CurrentAbsTheta : " << CurrentAbsTheta
+	  << "AddArraySize:"<< AddArraySize << " " << m_PreviewControlTime << " " <<m_SamplingPeriod);
   ODEBUG4("ZMP::InitOnLine - Step 4 ","ZMDInitOnLine.txt");
   for(unsigned int i=0;i<FinalZMPPositions.size();i++)
     {
@@ -1185,5 +1189,18 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
 
   ODEBUG4(" GetZMPDiscretization: Step 9 " << ZMPPositions.size(),"DebugData.txt");
   FilterOutValues(ZMPPositions,FinalZMPPositions);
+
+}
+
+void ZMPDiscretization::CallMethod(std::string &Method, std::istringstream &strm)
+{
+  if (Method==":prevzmpinitprofil")
+    {
+      m_InitializationProfile = PREV_ZMP_INIT_PROFIL;
+    }
+  else if (Method==":zeroinitprofil")
+    {
+      m_InitializationProfile = ZERO_INIT_PROFIL;
+    }
 
 }

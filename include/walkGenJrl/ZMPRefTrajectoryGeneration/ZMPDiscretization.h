@@ -274,9 +274,13 @@ namespace PatternGeneratorJRL
       /*! Object to handle the preview control (mostly to get the CoM height). */
       PreviewControl *m_PC;
 
-
+      /*! Initialization Profile */
+      int m_InitializationProfile;
 
     public:
+
+      const static int PREV_ZMP_INIT_PROFIL = 1;
+      const static int ZERO_INIT_PROFIL = 2;
       /*! \brief Get the reference to the preview control object. */
       PreviewControl * GetPreviewControl()
       { return m_PC;}
@@ -285,7 +289,9 @@ namespace PatternGeneratorJRL
       int  SetPreviewControl(PreviewControl *aPC)
       { m_PC=aPC; return 0;}
 
-      
+      /*! \brief Provide the plugin functionnality. */
+      void CallMethod(std::string &Method, std::istringstream &strm);
+
 
    };
 };

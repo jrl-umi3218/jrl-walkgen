@@ -317,6 +317,12 @@ namespace PatternGeneratorJRL
 
     /*! @}*/
 
+    /*! \brief Set the initial ZMP reference point. */
+    void setZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint);
+
+    /*! \brief Get the initial ZMP reference point. */
+    void getZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint);
+
     /*! \name System to call a given method based on registration of a method. 
       @{
      */
@@ -374,6 +380,8 @@ namespace PatternGeneratorJRL
     /*! \brief Set the maximal height of the foot trajectory. */
     void m_SetStepHeight(std::istringstream &strm);
 
+
+
     /*! @} */
 
   private:
@@ -401,6 +409,14 @@ namespace PatternGeneratorJRL
     
     /*! ZMP and CoM trajectories generation from an analytical formulation */
     AnalyticalMorisawaCompact * m_ZMPM;
+
+    /*! Specified ZMP starting point. */
+    MAL_S3_VECTOR(, double) m_ZMPInitialPoint;
+
+    /*! Boolean stating if the user has specified or not the ZMP initial point. 
+     This boolean is set to true when the user is setting the previous value.
+    Otherwise it is set to false.*/
+    bool m_ZMPInitialPointSet;
 
     /*@} */
 

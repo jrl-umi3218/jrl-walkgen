@@ -16,11 +16,15 @@
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
 #define ODEBUG2(x)
-#define ODEBUG3(x) cerr << "PatternGeneratorInterface :" << x << endl
+#define ODEBUG3B(x) cout << __FILE__ << ": " <<__FUNCTION__   \
+                        << "(#" << __LINE__ << ") :" <<  x << endl
+#define ODEBUG3(x) cout <<  x << endl
+
 #define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "PGI: " << x << endl; DebugFile.close();}
 #if 0
-#define ODEBUG(x) cerr << "PatternGeneratorInterface :" <<  x << endl
+#define ODEBUG(x) cerr << __FILE__ << ": " <<__FUNCTION__				\
+                             << "(#" << __LINE__ << ") :" <<  x << endl
 #else
 #define ODEBUG(x)
 #endif
@@ -28,7 +32,9 @@
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); \
-    DebugFile << "PGI: " << x << endl; DebugFile.close();}
+    DebugFile << __FILE__ << ": " <<__FUNCTION__				\
+                             << "(#" << __LINE__ << ") :"
+                       << x << endl; DebugFile.close();}
 #define _DEBUG_4_ACTIVATED_ 1
 #else
 #define RESETDEBUG4(y)
@@ -204,6 +210,9 @@ namespace PatternGeneratorJRL {
     m_AbsMotionTheta = 0;
     m_InternalClock = 0.0;
 
+    for(unsigned int i=0;i<3;i++)
+      m_ZMPInitialPoint(i)=0.0;
+    m_ZMPInitialPointSet = false;
   }
 
   void PatternGeneratorInterface::ObjectsInstanciation(string & HumanoidSpecificitiesFileName)
@@ -698,12 +707,18 @@ namespace PatternGeneratorJRL {
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,false);
 
-    
+    if (m_ZMPInitialPointSet)
+      {
+	for(unsigned int i=0;i<3;i++)
+	  lStartingZMPPosition(i) = m_ZMPInitialPoint(i);
+      }
+
     ODEBUG("StartOnLineStepSequencing - 3 "
 	   << lStartingCOMPosition.x[0] << " "
 	   << lRelativeFootPositions.size()
 	   );
-
+    ODEBUG("ZMPInitialPoint OnLine" << lStartingZMPPosition(0)  << " "
+	    << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
     int NbOfStepsToRemoveFromTheStack=0;
     if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
       {
@@ -807,7 +822,17 @@ namespace PatternGeneratorJRL {
     m_HumanoidDynamicRobot->currentConfiguration(lCurrentConfiguration);
 
     ODEBUG4("Size of lRelativeFootPositions :" << lRelativeFootPositions.size(),"DebugGMFKW.dat");
-    
+
+    if (m_ZMPInitialPointSet)
+      {
+	//	m_ZMPD->setZMPNeutralPosition(CurrentZMPNeutralPosition);
+	for(unsigned int i=0;i<3;i++)
+	  lStartingZMPPosition(i) = m_ZMPInitialPoint(i);
+
+      }
+    ODEBUG("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
+	     << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
+
     // Create the ZMP reference.
     CreateZMPReferences(lRelativeFootPositions,
 			lStartingCOMPosition,
@@ -884,21 +909,6 @@ namespace PatternGeneratorJRL {
     m_InternalClock = 0.0;
 
     gettimeofday(&end,0);
-    ODEBUG(endl <<
-	    "Step 1 : "<<  time1.tv_sec-begin.tv_sec +
-	   0.000001 * (time1.tv_usec -begin.tv_usec) << endl <<
-	    "Step 2 : "<<  time2.tv_sec-time1.tv_sec +
-	   0.000001 * (time2.tv_usec -time1.tv_usec) << endl <<
-		"Step 3 : "<<  time3.tv_sec-time2.tv_sec +
-	   0.000001 * (time3.tv_usec -time2.tv_usec) << endl <<
-		"Step 4 : "<<  time4.tv_sec-time3.tv_sec +
-	   0.000001 * (time4.tv_usec -time3.tv_usec) << endl <<
-		"Step 5 : "<<  time5.tv_sec-time4.tv_sec +
-	   0.000001 * (time5.tv_usec -time4.tv_usec) << endl <<
-		"Step 6 : "<<  time6.tv_sec-time5.tv_sec +
-	   0.000001 * (time6.tv_usec -time5.tv_usec) << endl <<
-		"Total time : "<< end.tv_sec-begin.tv_sec +
-	   0.000001 * (end.tv_usec -begin.tv_usec) );
   }
 
 
@@ -1236,7 +1246,7 @@ namespace PatternGeneratorJRL {
 
 	    ODEBUG("m_count " << m_count <<
 		   " m_ZMPPositions.size() " << m_ZMPPositions.size() <<
-		   " u : " << u);
+		   " u : ");
 	  }
 
 	/*
@@ -1992,6 +2002,16 @@ namespace PatternGeneratorJRL {
       }
   }
   
+  void PatternGeneratorInterface::setZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint)
+  {
+    m_ZMPInitialPoint = lZMPInitialPoint;
+    m_ZMPInitialPointSet = true;
+  }
+
+  void PatternGeneratorInterface::getZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint)
+  {
+    lZMPInitialPoint = m_ZMPInitialPoint;
+  }
 }
 
 

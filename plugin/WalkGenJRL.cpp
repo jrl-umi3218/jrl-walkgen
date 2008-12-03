@@ -465,15 +465,15 @@ void WalkGenJRL::control(sotRobotState *rs, sotMotorCommand *mc)
 	    } 	  
 
 	  ref_state->angle[30]=-m_CurrentStateFromPG(22+6);
-	  ref_state->angle[31]=m_CurrentStateFromPG(22+6);
+	  ref_state->angle[31]= m_CurrentStateFromPG(22+6);
 	  ref_state->angle[32]=-m_CurrentStateFromPG(22+6);
-	  ref_state->angle[33]=m_CurrentStateFromPG(22+6);
+	  ref_state->angle[33]= m_CurrentStateFromPG(22+6);
 	  ref_state->angle[34]=-m_CurrentStateFromPG(22+6);
 
 	  ref_state->angle[35]=-m_CurrentStateFromPG(22+6);
-	  ref_state->angle[36]=m_CurrentStateFromPG(22+6);
+	  ref_state->angle[36]= m_CurrentStateFromPG(22+6);
 	  ref_state->angle[37]=-m_CurrentStateFromPG(22+6);
-	  ref_state->angle[38]=m_CurrentStateFromPG(22+6);
+	  ref_state->angle[38]= m_CurrentStateFromPG(22+6);
 	  ref_state->angle[39]=-m_CurrentStateFromPG(22+6);
 	  ODEBUG4( m_CurrentStateFromPG(0+6)*180.0/M_PI 
 		   << " " << m_CurrentStateFromPG(1+6) *180.0/M_PI  
