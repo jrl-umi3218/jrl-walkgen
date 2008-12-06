@@ -86,6 +86,16 @@ ENDIF(WIN32)
 #------------------------
 OPTION(BUILD_SHARED_LIBS "Build walkGenJRL with shared libraries." ON)
 
+# Specify soname, version and rpath
+# ---------------------------------
+SET_TARGET_PROPERTIES(${PROJECT_NAME_LIB}
+      		      PROPERTIES 
+		      VERSION ${PROJECT_VERSION}
+		      SOVERSION ${PROJECT_VERSION}
+		      INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib
+		      INSTALL_RPATH_USE_LINK_PATH TRUE
+		      )
+
 # Specify compiling options
 # -------------------------
 SET(srcfile_cxx_flags "-I${PROJECT_SOURCE_DIR}/include/")
@@ -111,15 +121,8 @@ INSTALL(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}
 
 IF(UNIX)
 
-ADD_CUSTOM_COMMAND( TARGET ${PROJECT_NAME_LIB}
-            POST_BUILD
-	    COMMAND ${CMAKE_COMMAND} -E copy ${${PROJECT_NAME}_BINARY_DIR}/src/lib${PROJECT_NAME}.so ${${PROJECT_NAME}_BINARY_DIR}/src/lib${PROJECT_NAME}-${PROJECT_VERSION}.so 
-            COMMAND ${CMAKE_COMMAND} -E remove -f ${${PROJECT_NAME}_BINARY_DIR}/src/lib${PROJECT_NAME}.so 
-            COMMAND ${CMAKE_COMMAND} -E create_symlink lib${PROJECT_NAME}-${PROJECT_VERSION}.so  lib${PROJECT_NAME}.so 
-	    )
-
 INSTALL(FILES 
-        ${${PROJECT_NAME}_BINARY_DIR}/src/lib${PROJECT_NAME}-${PROJECT_VERSION}.so 
+        ${${PROJECT_NAME}_BINARY_DIR}/src/lib${PROJECT_NAME}.so.${PROJECT_VERSION}
         ${${PROJECT_NAME}_BINARY_DIR}/src/lib${PROJECT_NAME}.so
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE)	
