@@ -33,7 +33,7 @@
 */
 #ifdef UNIX
 #include <sys/time.h>
-#endif UNIX
+#endif /* UNIX */
 
 #include <time.h>
 #include <iostream>
@@ -46,7 +46,7 @@
 #ifdef WIN32
 inline double round( double d )
 {	return floor( d + 0.5 );	}
-#endif WIN32
+#endif /* WIN32 */
 
 using namespace::PatternGeneratorJRL;
 
@@ -411,7 +411,9 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 	  << m_ZMPNeutralPosition[1] << endl <<
 	  "StartingZMPPosition(toto):" <<  lStartingZMPPosition(0) << " " << lStartingZMPPosition(1) <<endl
 	  << "CurrentAbsTheta : " << CurrentAbsTheta
-	  << "AddArraySize:"<< AddArraySize << " " << m_PreviewControlTime << " " <<m_SamplingPeriod);
+	  << "AddArraySize:"<< AddArraySize << " " << m_PreviewControlTime << " " <<m_SamplingPeriod 
+	  << "FinalZMPref :( " <<finalZMPREF[0] 
+	  << " , " <<finalZMPREF[1] << " ) " << FinalZMPPositions.size());
   ODEBUG4("ZMP::InitOnLine - Step 4 ","ZMDInitOnLine.txt");
   for(unsigned int i=0;i<FinalZMPPositions.size();i++)
     {

@@ -822,14 +822,23 @@ namespace PatternGeneratorJRL {
     m_HumanoidDynamicRobot->currentConfiguration(lCurrentConfiguration);
 
     ODEBUG4("Size of lRelativeFootPositions :" << lRelativeFootPositions.size(),"DebugGMFKW.dat");
-
+    /*
     if (m_ZMPInitialPointSet)
       {
-	//	m_ZMPD->setZMPNeutralPosition(CurrentZMPNeutralPosition);
+	double lZMPNeutralPosition[2] = {m_ZMPInitialPoint[0],m_ZMPInitialPoint[1]};
+
+	m_ZMPD->setZMPNeutralPosition(lZMPNeutralPosition);
 	for(unsigned int i=0;i<3;i++)
 	  lStartingZMPPosition(i) = m_ZMPInitialPoint(i);
 
       }
+    else
+      {
+	double lZMPNeutralPosition[2] = { lStartingZMPPosition[0],lStartingZMPPosition[1]};
+
+	//m_ZMPD->setZMPNeutralPosition(lZMPNeutralPosition);
+      }
+    */
     ODEBUG("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
 	     << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
 

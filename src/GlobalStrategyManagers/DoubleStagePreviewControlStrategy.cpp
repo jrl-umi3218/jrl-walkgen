@@ -181,11 +181,6 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   double temp2;
   double temp3;
 
-  ODEBUG4((*m_ZMPPositions)[0].px <<  " " << 
-	  outWaistPosition.x[0] << " " <<
-	  (*m_ZMPPositions)[0].py << " " <<
-	  outWaistPosition.y[0], "ZMPRefAndWaist.dat");
-
   temp1 = (*m_ZMPPositions)[0].px - outWaistPosition.x[0];
   temp2 = (*m_ZMPPositions)[0].py - outWaistPosition.y[0];
   temp3 = finalCOMPosition.yaw*M_PI/180.0;
@@ -193,11 +188,16 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   ZMPRefPos(0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
   ZMPRefPos(1) = -sin(temp3)*temp1+cos(temp3)*temp2;
   ZMPRefPos(2) = -finalCOMPosition.z[0] - MAL_S4x4_MATRIX_ACCESS_I_J(PosOfWaistInCOMF, 2,3);
-  ODEBUG4(finalCOMPosition.z[0] << " " << PosOfWaitInCOMF[2] << " " << ZMPTarget(2,0),
-	  "DebugDataZMPTargetZ.dat");
+
+
+  ODEBUG4((*m_ZMPPositions)[0].px <<  " " << 
+	  (*m_ZMPPositions)[0].py << " " <<
+	  outWaistPosition.x[0] << " " <<
+	  outWaistPosition.y[0] << " " <<
+	  ZMPRefPos(0) << " " << ZMPRefPos(1) << " " << ZMPRefPos(2), "ZMPRefAndWaist.dat");
+
   m_ZMPPositions->pop_front();
   m_COMBuffer->pop_front();
-  ODEBUG("m_COMBuffer.size: " << m_COMBuffer->size());
   m_LeftFootPositions->pop_front();
   m_RightFootPositions->pop_front();
   
