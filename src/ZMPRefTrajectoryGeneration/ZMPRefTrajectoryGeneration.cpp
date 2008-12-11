@@ -32,7 +32,7 @@
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 
 #define ODEBUG2(x)
-#define ODEBUG3(x) cerr << "ZMPRefTrajectoryGeneration :" << x << endl
+#define ODEBUG3(x) cout << "ZMPRefTrajectoryGeneration :" << x << endl
 #define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "PGI: " << x << endl; DebugFile.close();}
 #if 0
@@ -80,7 +80,7 @@ ZMPRefTrajectoryGeneration::ZMPRefTrajectoryGeneration(SimplePluginManager *lSPM
 
 void ZMPRefTrajectoryGeneration::CallMethod(std::string & Method, std::istringstream &strm)
 {
-  ODEBUG("Method: " << Method);
+  ODEBUG("Calling me (" << this << ") with Method: " << Method);
   if (Method==":omega")
     {
       strm >> m_Omega;
@@ -88,6 +88,7 @@ void ZMPRefTrajectoryGeneration::CallMethod(std::string & Method, std::istringst
   else if (Method==":stepheight")
     {
       strm >> m_StepHeight;
+      ODEBUG("Value of stepheight " << m_StepHeight << " this:" << this);
     }
   else if (Method==":singlesupporttime")
     {

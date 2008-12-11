@@ -737,6 +737,8 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       NextTheta=m_RelativeFootPositions[1].theta;
       RelTheta = NextTheta+m_CurrentTheta;
       lStepHeight = m_StepHeight;
+      ODEBUG("lStepHeight:"<< lStepHeight <<
+	      " m_StepHeight: " << m_StepHeight << " this:" << this);
       double c,s;
       c = cos(NextTheta*M_PI/180.0);
       s = sin(NextTheta*M_PI/180.0);
@@ -1204,5 +1206,6 @@ void ZMPDiscretization::CallMethod(std::string &Method, std::istringstream &strm
     {
       m_InitializationProfile = ZERO_INIT_PROFIL;
     }
+  else ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
 
 }

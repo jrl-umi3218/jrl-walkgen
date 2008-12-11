@@ -103,7 +103,6 @@ void LeftAndRightFootTrajectoryGenerationMultiple::CallMethod(std::string & Meth
   else if (Method==":stepheight")
     {
       strm >> m_StepHeight;
-      ODEBUG(": StepHeight set to : " << m_StepHeight);
     }
   else if (Method==":singlesupporttime")
     {

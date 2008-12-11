@@ -154,7 +154,9 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
     {
       istringstream iss(aBuffer);
       SimplePlugin * aSP = CurrentPlugin->second;
-      ODEBUG("Found the method " << MethodName << " for plugin :" << aSP ); 
+      ODEBUG("Found the method " << MethodName 
+	      << " for plugin :" << aSP << endl
+	      << " Buffer: " << aBuffer); 
       if (aSP!=0)
 	{
 	  aSP->CallMethod(MethodName,iss);
