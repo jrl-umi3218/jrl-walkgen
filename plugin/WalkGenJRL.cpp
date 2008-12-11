@@ -228,17 +228,17 @@ public:
 			CORBA::Float_out omega)
     throw(CORBA::SystemException);
 
-  void getWaistAcceleration(TransformQuaternion_out aTQ)
+  void getWaistAcceleration(walkpluginJRL::JRLTransformQuaternion & aTQ)
     throw(CORBA::SystemException);
 
-  void getWaistPositionAndOrientation(TransformQuaternion_out aTQ,
-				      CORBA::Float_out Orientation)
+  void getWaistPositionAndOrientation(walkpluginJRL::JRLTransformQuaternion & aTQ,
+				      CORBA::Float & Orientation)
     throw(CORBA::SystemException);
 
-  void setWaistPositionAndOrientation(const TransformQuaternion& aTQ)
+  void setWaistPositionAndOrientation(const walkpluginJRL::JRLTransformQuaternion& aTQ)
     throw(CORBA::SystemException);
 
-  CORBA::Long getLegJointSpeed(dsequence_out dq)
+  CORBA::Long getLegJointSpeed(walkpluginJRL::JRLdsequence_out dq)
     throw(CORBA::SystemException);
 
   CORBA::Boolean isWalking() 
@@ -723,14 +723,14 @@ CORBA::Boolean WalkGenJRL::isWalking()
 }
 
 
-void WalkGenJRL::getWaistAcceleration(TransformQuaternion_out aTQ)
+void WalkGenJRL::getWaistAcceleration(walkpluginJRL::JRLTransformQuaternion & aTQ)
   throw(CORBA::SystemException)
 {
   return;
 
 }
-void WalkGenJRL::getWaistPositionAndOrientation(TransformQuaternion_out aTQ,
-							 CORBA::Float_out aOrientation)
+void WalkGenJRL::getWaistPositionAndOrientation(walkpluginJRL::JRLTransformQuaternion & aTQ,
+						CORBA::Float & aOrientation)
   throw(CORBA::SystemException)
 {
   
@@ -755,7 +755,7 @@ void WalkGenJRL::getWaistPositionAndOrientation(TransformQuaternion_out aTQ,
   aOrientation = Orientation;
 }
 
-void WalkGenJRL::setWaistPositionAndOrientation(const TransformQuaternion & aTQ)
+void WalkGenJRL::setWaistPositionAndOrientation(const walkpluginJRL::JRLTransformQuaternion & aTQ)
   throw(CORBA::SystemException)
 {
   double TQ[7];
@@ -797,7 +797,7 @@ void WalkGenJRL::m_PartialStepSequence(istringstream &strm)
     m_PGI->m_PartialStepSequence(strm);
 }
 
-CORBA::Long WalkGenJRL::getLegJointSpeed( dsequence_out dq)
+CORBA::Long WalkGenJRL::getLegJointSpeed(walkpluginJRL::JRLdsequence_out dq)
     throw(CORBA::SystemException)
 {
   // Joint velocity.
@@ -810,7 +810,7 @@ CORBA::Long WalkGenJRL::getLegJointSpeed( dsequence_out dq)
   MAL_VECTOR_RESIZE(dql,6);
 
   
-  dsequence_var adq = new dsequence;
+  walkpluginJRL::JRLdsequence_var adq = new walkpluginJRL::JRLdsequence;
   adq->length(12);
   m_PGI->GetLegJointVelocity(dqr,dql);
   for(int i=0;i<6;i++)

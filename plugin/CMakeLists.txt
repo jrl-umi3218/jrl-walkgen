@@ -38,7 +38,7 @@ IF(OPENHRP_FOUND)
 
     SET(COMMON_IDL_OPENHRP HRPcontroller.idl)	    
     SET(PLUGIN_NAMESPACE "OpenHRP::")
-    SET(DOUBLE_SEQUENCE "dsequence")
+    SET(DOUBLE_SEQUENCE "JRLdsequence")
         
     CONFIGURE_FILE(${${PROJECT_NAME}_SOURCE_DIR}/plugin/corba/walkpluginJRL.idl.cmake
                     ${${PROJECT_NAME}_SOURCE_DIR}/plugin/corba/walkpluginJRL.idl)

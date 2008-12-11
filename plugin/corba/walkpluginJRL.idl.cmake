@@ -3,19 +3,21 @@
 
 #include "${COMMON_IDL_OPENHRP}"
 
-#if ${OPENHRP_VERSION_3}
-/**
- * Position and Attitude
- * @param	px	x coordinates
- * @param	py	y coordinates
- * @param	pz	z coordinates
- * @param	qx	x axis
- * @param	qy	y axis
- * @param	qz	z axis
- * @param	qw	w axis
- */
-struct TransformQuaternion
+
+interface walkpluginJRL : ${PLUGIN_NAMESPACE}Plugin
 {
+  /**
+  * Position and Attitude
+  * @param	px	x coordinates
+  * @param	py	y coordinates
+  * @param	pz	z coordinates
+  * @param	qx	x axis
+  * @param	qy	y axis
+  * @param	qz	z axis
+  * @param	qw	w axis
+  */
+  struct JRLTransformQuaternion
+  {
     float px;
     float py;
     float pz;
@@ -23,13 +25,11 @@ struct TransformQuaternion
     float qy;
     float qz;
     float qw;
-};
+  };
+  
+  typedef sequence<double> JRLdsequence;
+ 
 
-typedef sequence<double> dsequence;
-#endif
-
-interface walkpluginJRL : ${PLUGIN_NAMESPACE}Plugin
-{
   /***********************************
    *
    *         Relative Motion
@@ -82,7 +82,7 @@ interface walkpluginJRL : ${PLUGIN_NAMESPACE}Plugin
    *
    ************************************/
   /// Get joint speed of the legs.
-  long getLegJointSpeed(out ${DOUBLE_SEQUENCE} dq);
+  long getLegJointSpeed(out JRLdsequence dq);
 
   /************************************
    *
@@ -133,7 +133,7 @@ interface walkpluginJRL : ${PLUGIN_NAMESPACE}Plugin
   // Get Waist position and orientation.
   // Returns immediately so can be used in the real-time part of a 
   // plugin
-  void getWaistPositionAndOrientation(out TransformQuaternion aTQ,
+  void getWaistPositionAndOrientation(out JRLTransformQuaternion aTQ,
 				      out float Orientation);
 
 
@@ -142,13 +142,13 @@ interface walkpluginJRL : ${PLUGIN_NAMESPACE}Plugin
   // This function just reset the absolute reference.
   // Returns immediately so can be used in the real-time part of a 
   // plugin
-  void setWaistPositionAndOrientation(in TransformQuaternion aTQ);
+  void setWaistPositionAndOrientation(in JRLTransformQuaternion aTQ);
 
   
   // Get Waist acceleration
   // Returns immediately so can be used in the real-time part of a 
   // plugin
-  void getWaistAcceleration(out TransformQuaternion aTQ);
+  void getWaistAcceleration(out JRLTransformQuaternion aTQ);
 
   boolean isWalking();
 
