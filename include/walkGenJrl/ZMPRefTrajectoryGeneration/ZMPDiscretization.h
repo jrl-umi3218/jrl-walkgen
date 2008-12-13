@@ -102,6 +102,8 @@ namespace PatternGeneratorJRL
 	  @param[in] Xmax: The maximal distance of a hand along the X axis in the waist coordinates.
 
 	  @param[in] lStartingCOMPosition: The initial position of the CoM.
+
+	  @param[in] lStartingZMPPosition: The initial position of the ZMP.
 	  
 	  @param[in] InitLeftFootAbsolutePosition: The initial position of the left foot.
 	  

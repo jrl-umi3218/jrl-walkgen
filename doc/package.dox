@@ -67,7 +67,7 @@ WARN_LOGFILE           =
 RECURSIVE              = YES
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
-EXAMPLE_PATH           = ${${PROJECT_NAME}_SOURCE_DIR}/unitTesting
+EXAMPLE_PATH           = /home/stasse/devel-src/walkGenJrl/unitTesting
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
 INPUT_FILTER           = 
@@ -159,7 +159,7 @@ SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------
 TAGFILES               = \
 
-GENERATE_TAGFILE       = ${PROJECT_NAME}.doxytag
+GENERATE_TAGFILE       = walkGenJrl.doxytag
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
 PERL_PATH              = /usr/bin/perl
@@ -177,8 +177,8 @@ SEARCHENGINE           = NO
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = "${PROJECT_NAME} library documentation"
-PROJECT_NUMBER         = ${PROJECT_VERSION}
+PROJECT_NAME           = "walkGenJrl library documentation"
+PROJECT_NUMBER         = 2.5.0
 
 #---------------------------------------------------------------------------
 # Build related configuration options
@@ -207,13 +207,13 @@ SHOW_DIRECTORIES       = NO
 #---------------------------------------------------------------------------
 FILE_PATTERNS          = *.h *.idl
 EXCLUDE_PATTERNS       = 
-INPUT                  = ${${PROJECT_NAME}_SOURCE_DIR}/include \
-                         ${${PROJECT_NAME}_SOURCE_DIR}/doc/additionalHeader
+INPUT                  = /home/stasse/devel-src/walkGenJrl/include \
+                         /home/stasse/devel-src/walkGenJrl/doc/additionalHeader
 
 #---------------------------------------------------------------------------
 # configuration options related to inserting images
 #---------------------------------------------------------------------------
-IMAGE_PATH = ${${PROJECT_NAME}_SOURCE_DIR}/doc/figures
+IMAGE_PATH = /home/stasse/devel-src/walkGenJrl/doc/figures
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
 #---------------------------------------------------------------------------
@@ -230,9 +230,9 @@ VERBATIM_HEADERS       = NO
 # configuration options related to the HTML output
 #---------------------------------------------------------------------------
 HTML_OUTPUT            = html
-HTML_STYLESHEET        = ${${PROJECT_NAME}_SOURCE_DIR}/doc/package.css
-HTML_HEADER            = ${${PROJECT_NAME}_SOURCE_DIR}/doc/header.html
-HTML_FOOTER            = ${${PROJECT_NAME}_SOURCE_DIR}/doc/footer.html
+HTML_STYLESHEET        = /home/stasse/devel-src/walkGenJrl/doc/package.css
+HTML_HEADER            = /home/stasse/devel-src/walkGenJrl/doc/header.html
+HTML_FOOTER            = /home/stasse/devel-src/walkGenJrl/doc/footer.html
 
 #---------------------------------------------------------------------------
 # configuration options related to the LaTeX output

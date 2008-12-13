@@ -245,6 +245,7 @@ namespace PatternGeneratorJRL
 	  after the second stage of control, i.e. the final value.
 	  @param[out] CurrentConfiguration: The results is a state vector containing the articular positions.
 	  @param[out] CurrentVelocity: The results is a state vector containing the speed.
+	  @param[out] CurrentAcceleration: The results is a state vector containing the acceleration.
        */
       int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 				 FootAbsolutePosition &RightFootPosition,
@@ -298,6 +299,8 @@ namespace PatternGeneratorJRL
 	@param[in] BodyAngles: 4x4 matrix of the robot's root (most of the time, the waist)
 	pose (position + orientation).
 	@param[out] aStartingCOMPosition: Returns the 3D position of the CoM for the current
+	position of the robot.
+	@param[out] aStartingZMPPosition: Returns the 3D position of the ZMP for the current
 	position of the robot.
 	@param[out] InitLeftFootPosition: Returns the position of the left foot in
 	the waist coordinates frame.
@@ -382,6 +385,8 @@ namespace PatternGeneratorJRL
 	@param[out] CurrentConfiguration: The position part of the state vector realizing the current CoM and 
 	feet position instance.
 	@param[out] CurrentVelocity: The velocity part of the state vector realizing the current CoM and
+	feet position instance.
+	@param[out] CurrentAcceleration: The acceleration part of the state vector realizing the current CoM and
 	feet position instance.
 	@param[in] localindex: Value of the index which goes from 0 to 2 * m_NL.
       */

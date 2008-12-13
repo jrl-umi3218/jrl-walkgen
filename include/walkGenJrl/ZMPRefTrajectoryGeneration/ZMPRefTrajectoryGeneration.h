@@ -189,6 +189,8 @@ namespace PatternGeneratorJRL
 	@param Xmax: Returns the maximal distance of a hand along the X axis in the waist coordinates.
 
 	@param[in] lStartingCOMPosition: The initial position of the CoM.
+
+	@param[in] lStartingZMPPosition: The initial position of the ZMP.
 	
 	@param[in] InitLeftFootAbsolutePosition: The initial position of the left foot.
 	
@@ -225,6 +227,7 @@ namespace PatternGeneratorJRL
       @param[in] InitRightFootAbsolutePosition: The initial position of the right foot.
       @param[in] RelativeFootPositions: The set of relative positions to be taken into account.
       @param[in] lStartingCOMPosition: The initial position of the CoM given as a 3D vector.
+      @param[in] lStartingZMPPosition: The initial position of the ZMP given as a 3D vector.
     */
     virtual int InitOnLine(std::deque<ZMPPosition> & ZMPPositions,
 			   std::deque<COMPosition> & CoMPositions,
@@ -275,9 +278,9 @@ namespace PatternGeneratorJRL
 
     /*! \brief Method to stop walking.
       @param[out] ZMPPositions: The queue of ZMP reference positions.
-      @param[out] CoMPositions: The queue of COM reference positions.
-      @param[out] FinalLeftFootAbsolutePositions: The queue of left foot absolute positions.
-      @param[out] FinalRightFootAbsolutePositions: The queue of right foot absolute positions.
+      @param[out] FinalCOMPositions: The queue of COM reference positions.
+      @param[out] LeftFootAbsolutePositions: The queue of left foot absolute positions.
+      @param[out] RightFootAbsolutePositions: The queue of right foot absolute positions.
      */
     virtual void EndPhaseOfTheWalking(std::deque<ZMPPosition> &ZMPPositions,
 				      std::deque<COMPosition> &FinalCOMPositions,

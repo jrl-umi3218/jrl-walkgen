@@ -86,6 +86,8 @@ namespace PatternGeneratorJRL
       pose (position + orientation).
       @param[out] aStartingCOMPosition: Returns the 3D position of the CoM for the current
       position of the robot.
+      @param[out] aStartingZMPPosition: Returns the 3D position of the ZMP for the current
+      position of the robot.
       @param[out] InitLeftFootPosition: Returns the position of the left foot in
       the waist coordinates frame.
       @param[out] InitRightFootPosition: Returns the position of the right foot

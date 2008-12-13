@@ -59,6 +59,18 @@ Bjorn Verrelst and Kazuhito Yokoi and Olivier Stasse and Hitoshi Arisumi and Bra
 "Mobility of Humanoid Robots: Stepping over Large Obstacles Dynamically",
 International Conference on Mechatronics and Automation
 
+\anchor Morisawa2007
+M. Morisawa and K. Harada and S. Kajita and S. Nakaoka and K. Fujiwara and F. Kanehiro and K. Kaneko and H. Hirukawa,
+"Experimentation of Humanoid Walking Allowing Immediate Modification of Foot Place Based on Analytical Solution",
+IEEE Int. Conf. on Robotics and Automation,
+3989--3994, 2007
+
+\anchor Wieber2006
+P.-B. Wieber
+Trajectory Free Linear Model Predictive Control for Stable Walking in the Presence of Strong Perturbations
+IEEE/RAS Int. Conf. on Humanoid Robots
+137-142, 2006
+
 
 
    \defgroup pgjrl JRL Walking Pattern Generator Library (WalkGenJRL)

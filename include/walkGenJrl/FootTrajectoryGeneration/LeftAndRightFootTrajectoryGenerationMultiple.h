@@ -91,6 +91,8 @@ namespace PatternGeneratorJRL
 	@param[out] SupportFootAbsoluteFootPositions: The set of absolute foot positions
 	corresponding to the set of relative foot positions (i.e given step by step 
 	and not every sampled control time).
+	@param[in] IgnoreFirst: Ignore the first double support phase, should be true at beginning of stepping.
+	@param[in] Continuity: Should be true if more steps should be added, false to stop stepping.
       */
       void InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 				       FootAbsolutePosition &LeftFootInitialPosition,
@@ -148,6 +150,7 @@ namespace PatternGeneratorJRL
 	where one has changed.
 	@param[in] RelativeFootPositions: The set of relative positions for the support foot.
 	@param[in] ChangedInterval: The interval where the absolute foot position has been changed.
+	@param[in] SupportFootInitialPosition: The absolute foot position of the initial step in the stack of steps.
 	@param[out] SupportFootAbsoluteFootPositions: The set of absolute foot positions
 	corresponding to the set of relative foot positions (i.e given step by step 
 	and not every sampled control time).

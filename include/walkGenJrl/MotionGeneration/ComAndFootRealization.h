@@ -60,7 +60,7 @@ namespace PatternGeneratorJRL
   {
   private:
 
-    /*! Store the dynamic robot. */
+    /*! \brief Store the dynamic robot. */
     CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot;
     
     /*! Store the height of the CoM */
@@ -108,10 +108,13 @@ namespace PatternGeneratorJRL
       and the last two for the orientation (Euler angle).
       @param CoMSpeed: a 5 dimensional vector: 3 for the linear velocity in X,Y,Z,
       and two for the angular velocity.
+      @param CoMAcc: a 5 dimensional vector: 3 for the linear acceleration in X,Y,Z,
+      and two for the angular acceleration.
       @param LeftFoot: a 5 dimensional following the same convention than for \a CoMPosition.
       @param RightFoot: idem.
       @param CurrentConfiguration: The result is a state vector containing the position which are put inside this parameter.
       @param CurrentVelocity: The result is a state vector containing the speed which are put inside this parameter.x
+      @param CurrentAcceleration: The result is a state vector containing the acceleration which are put inside this parameter.x
       @param IterationNumber: Number of iteration.
       @param Stage: indicates which stage is reach by the Pattern Generator.
     */

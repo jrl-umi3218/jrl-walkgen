@@ -588,12 +588,12 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterface::m_StepSequence(istringstream &strm)
   {
 
-    ODEBUG4("Step Sequence","DebugGMFKW.dat");
+    ODEBUG("Step Sequence");
     ofstream DebugFile;
     ReadSequenceOfSteps(strm);
-    ODEBUG4("After reading Step Sequence","DebugGMFKW.dat");
+    ODEBUG("After reading Step Sequence");
     FinishAndRealizeStepSequence();
-    ODEBUG4("After finish and realize Step Sequence","DebugGMFKW.dat");
+    ODEBUG("After finish and realize Step Sequence");
   }
 
   void PatternGeneratorInterface::EvaluateStartingCOM(MAL_VECTOR(  & Configuration,double),
@@ -795,7 +795,7 @@ namespace PatternGeneratorJRL {
 
     gettimeofday(&begin,0);
 
-    ODEBUG4("FinishAndRealizeStepSequence() - 1","DebugGMFKW.dat");
+    ODEBUG("FinishAndRealizeStepSequence() - 1");
 
     vector<double> lCurrentJointValues;
     m_ZMPD->SetZMPShift(m_ZMPShift);
@@ -803,7 +803,7 @@ namespace PatternGeneratorJRL {
     MAL_VECTOR(,double) lCurrentConfiguration;
 
     lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();  
-    ODEBUG4("lCurrent Configuration :" << lCurrentConfiguration,"DebugGMFKW.dat" );
+    ODEBUG("lCurrent Configuration :" << lCurrentConfiguration);
 
     deque<RelativeFootPosition> lRelativeFootPositions;
     CommonInitializationOfWalking(lStartingCOMPosition,
@@ -812,7 +812,7 @@ namespace PatternGeneratorJRL {
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,true);
     
-    ODEBUG4( "Pass through here ","DebugGMFKW.dat" );
+    ODEBUG( "Pass through here ");
     lCurrentConfiguration(0) = 0.0;
     lCurrentConfiguration(1) = 0.0;
     lCurrentConfiguration(2) = 0.0;
@@ -821,7 +821,7 @@ namespace PatternGeneratorJRL {
     lCurrentConfiguration(5) = 0.0;
     m_HumanoidDynamicRobot->currentConfiguration(lCurrentConfiguration);
 
-    ODEBUG4("Size of lRelativeFootPositions :" << lRelativeFootPositions.size(),"DebugGMFKW.dat");
+    ODEBUG("Size of lRelativeFootPositions :" << lRelativeFootPositions.size());
     /*
     if (m_ZMPInitialPointSet)
       {
@@ -1083,7 +1083,7 @@ namespace PatternGeneratorJRL {
 
 	return false;
       }
-
+    ODEBUG("Here");
     if (m_StepStackHandler->IsOnLineSteppingOn())
       {
 	ODEBUG("On Line Stepping: ON!");

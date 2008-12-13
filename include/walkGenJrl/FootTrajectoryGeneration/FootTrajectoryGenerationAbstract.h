@@ -108,6 +108,7 @@ namespace PatternGeneratorJRL
       of the current single support phase.
       @param ModulatedSingleSupportTime: Amount of time where the foot is flat.
       @param StepType: Type of steps (for book-keeping).
+      @param LeftOrRight: Specify if it is left (1) or right (-1).
     */
     virtual void UpdateFootPosition(std::deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
 				    std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,

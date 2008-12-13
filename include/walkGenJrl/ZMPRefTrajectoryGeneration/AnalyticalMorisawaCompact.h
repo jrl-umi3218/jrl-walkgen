@@ -139,6 +139,8 @@ namespace PatternGeneratorJRL
 	
 	@param[in] lStartingCOMPosition: The initial position of the CoM.
 
+	@param[in] lStartingZMPPosition: The initial position of the ZMP.
+
 	@param[in] InitLeftFootAbsolutePosition: The initial position of the left foot.
 	
 	@param[in] InitRightFootAbsolutePosition: The initial position of the right foot.
@@ -173,7 +175,7 @@ namespace PatternGeneratorJRL
 	@param[in] InitRightFootAbsolutePosition: The initial position of the right foot.
 	@param[in] RelativeFootPositions: The set of relative positions to be taken into account.
 	@param[in] lStartingCOMPosition: The initial position of the CoM given as a 3D vector.
-
+	@param[in] lStartingZMPPosition: The initial position of the ZMP given as a 3D vector.
       */
       int InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 		     deque<COMPosition> & CoMPositions,
@@ -226,9 +228,9 @@ namespace PatternGeneratorJRL
 			   StepStackHandler *aStepStackHandler=0);
       /*! \brief Method to stop walking.
 	@param[out] ZMPPositions: The queue of ZMP reference positions.
-	@param[out] CoMPositions: The queue of COM reference positions.
-	@param[out] FinalLeftFootAbsolutePositions: The queue of left foot absolute positions.
-	@param[out] FinalRightFootAbsolutePositions: The queue of right foot absolute positions.
+	@param[out] FinalCOMPositions: The queue of COM reference positions.
+	@param[out] LeftFootAbsolutePositions: The queue of left foot absolute positions.
+	@param[out] RightFootAbsolutePositions: The queue of right foot absolute positions.
       */
       void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
 				deque<COMPosition> &FinalCOMPositions,
@@ -335,7 +337,7 @@ namespace PatternGeneratorJRL
 	@param[out] aCTIPY: Embed the initial and final conditions
 	to generate the ZMP and CoM trajectories along the Y axis.
 	@param[in] TemporalShift : If true, this authorize the method to shift the time for the modified interval.
-
+	@param[in] aStepStackHandler: Access to the stack of steps.
 	@return : Returns an error index if the operation was not feasible. You should use
 	string error message to get the corresponding error message.
 
@@ -479,6 +481,10 @@ namespace PatternGeneratorJRL
 	the absolute initial feet positions and the queue of relative foot positions. This is not
 	a set of trajectories at each 5 ms, but the support foot absolute positions.
 	Thus the size of this queue should be the same than the relative foot positions.
+
+	@param[in] IgnoreFirstRelativeFoot: Boolean to ignore the first relative foot.
+	@param[in] DoNotPrepareLastFoot:  Boolean to not perform for the ending sequence.
+
 	
       */
       int BuildAndSolveCOMZMPForASetOfSteps(MAL_S3x3_MATRIX(& ,double) lStartingCOMPosition,
@@ -491,9 +497,9 @@ namespace PatternGeneratorJRL
 	\param IndexStep : Index of the interval to be changed. The index can be higher than
 	the size of the preview window (+1). In this case, the step available in m_AbsPosition are
 	used.
-	\param NewFootAbsPos : The absolute position of the step to be changed.
+	\param aNewFootAbsPos : The absolute position of the step to be changed.
 	\param aCTIPX : The trajectory parameters along the X axis.
-	\param aCTIPX : The trajectory parameters along the Y axis.
+	\param aCTIPY : The trajectory parameters along the Y axis.
       */
       void ChangeZMPProfil(unsigned int IndexStep,
 			   FootAbsolutePosition &aNewFootAbsPos,

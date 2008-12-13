@@ -104,6 +104,8 @@ namespace PatternGeneratorJRL
 	
 	@param[in] lStartingCOMPosition: The initial position of the CoM.
 
+	@param[in] lStartingZMPPosition: The initial position of the ZMP.
+
 	@param[in] InitLeftFootAbsolutePosition: The initial position of the left foot.
 	
 	@param[in] InitRightFootAbsolutePosition: The initial position of the right foot.
@@ -168,9 +170,9 @@ namespace PatternGeneratorJRL
 
       /*! \brief Method to stop walking.
 	@param[out] ZMPPositions: The queue of ZMP reference positions.
-	@param[out] CoMPositions: The queue of COM reference positions.
-	@param[out] FinalLeftFootAbsolutePositions: The queue of left foot absolute positions.
-	@param[out] FinalRightFootAbsolutePositions: The queue of right foot absolute positions.
+	@param[out] FinalCOMPositions: The queue of COM reference positions.
+	@param[out] LeftFootAbsolutePositions: The queue of left foot absolute positions.
+	@param[out] RightFootAbsolutePositions: The queue of right foot absolute positions.
       */
       void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
 				deque<COMPosition> &FinalCOMPositions,

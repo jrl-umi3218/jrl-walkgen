@@ -146,6 +146,8 @@ namespace PatternGeneratorJRL
     /*! Common Initialization of walking. 
       @param[out] lStartingCOMPosition: For the starting position on the articular space, returns
       the COM position.
+      @param[out] lStartingZMPPosition: For the starting position on the articular space, returns
+      the ZMP position.
       @param[out] BodyAnglesIni: Basically it is a copy of CurrentJointValues but as a vector.
       @param[out] InitLeftFootAbsPos: Returns the current absolute position of the left foot for
       the given posture of the robot.
@@ -176,6 +178,8 @@ namespace PatternGeneratorJRL
      of the waist, and then all the DOFs of your robot. 
      @param[out]  CurrentVelocity  The current velocity of the robot according to the 
      the implementation of dynamic-JRLJapan. 
+     @param[out]  CurrentAcceleration  The current acceleration of the robot according to the 
+     the implementation of dynamic-JRLJapan. 
      @param[out]  ZMPTarget  The target ZMP in the waist reference frame.
      @return True is there is still some data to send, false otherwise.
     */
@@ -189,6 +193,8 @@ namespace PatternGeneratorJRL
      the implementation of dynamic-JRLJapan. This should be first position and orientation
      of the waist, and then all the DOFs of your robot. 
      @param[out]  CurrentVelocity  The current velocity of the robot according to the 
+     the implementation of dynamic-JRLJapan. 
+     @param[out]  CurrentAcceleration  The current acceleration of the robot according to the 
      the implementation of dynamic-JRLJapan. 
      @param[out]  ZMPTarget  The target ZMP in the waist reference frame.
      @param[out] COMPosition The CoM position for this motion.
@@ -288,7 +294,7 @@ namespace PatternGeneratorJRL
      and the planar X-Y orientation in Orientation. */
     void getWaistPositionAndOrientation(double TQ[7],double &Orientation);
 
-    /*! \brief Set Waist position and Orientation */
+    /*! \brief Set Waist position and Orientation  */
     void setWaistPositionAndOrientation(double TQ[7]);
 
     /*! \brief Get Waist velocity */

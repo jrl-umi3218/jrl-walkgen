@@ -98,6 +98,8 @@ namespace PatternGeneratorJRL
 	@param[in] Xmax: The maximal distance of a hand along the X axis in the waist coordinates.
 
 	@param[in] lStartingCOMPosition: The starting position of the CoM.
+
+	@param[in] lStartingZMPPosition: The starting position of the ZMP.
 	
 	@param[in] InitLeftFootAbsolutePosition: The absolute position of the left foot.
 
@@ -163,9 +165,9 @@ namespace PatternGeneratorJRL
 
       /*! \brief Method to stop walking.
 	@param[out] ZMPPositions: The queue of ZMP reference positions.
-	@param[out] CoMPositions: The queue of COM reference positions.
-	@param[out] FinalLeftFootAbsolutePositions: The queue of left foot absolute positions.
-	@param[out] FinalRightFootAbsolutePositions: The queue of right foot absolute positions.
+	@param[out] FinalCOMPositions: The queue of COM reference positions.
+	@param[out] LeftFootAbsolutePositions: The queue of left foot absolute positions.
+	@param[out] RightFootAbsolutePositions: The queue of right foot absolute positions.
       */
       virtual void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
 				deque<COMPosition> &FinalCOMPositions,
