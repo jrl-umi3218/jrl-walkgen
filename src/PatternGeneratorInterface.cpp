@@ -104,6 +104,7 @@ namespace PatternGeneratorJRL {
     // End if Initialization
 
     m_ObstacleDetected = false;
+    m_AutoFirstStep = false;
 
     // Initialization of obstacle parameters informations.
     m_ObstaclePars.x=1.0;
@@ -285,7 +286,7 @@ namespace PatternGeneratorJRL {
 						 &m_LeftFootPositions,
 						 &m_RightFootPositions);
 
-    // Default handler :DoubleStagePreviewControl.
+    // Defa`<ult handler :DoubleStagePreviewControl.
     m_GlobalStrategyManager = m_DoubleStagePCStrategy;
 
     // End of the creation of the fundamental objects.
@@ -605,6 +606,67 @@ namespace PatternGeneratorJRL {
     lStartingCOMPosition = m_HumanoidDynamicRobot->positionCenterOfMass();
   }
 
+  // This method assumes that we still are using the ZMP
+  // someday it should go out.
+  void PatternGeneratorInterface::AutomaticallyAddFirstStep(deque<RelativeFootPosition> & lRelativeFootPositions,
+							    FootAbsolutePosition & InitLeftFootAbsPos,
+							    FootAbsolutePosition & InitRightFootAbsPos,
+							    COMPosition &lStartingCOMPosition)
+  {
+    MAL_S3x3_MATRIX(InitPos,double);
+    MAL_S3x3_MATRIX(CoMPos,double);
+
+    double coscomyaw, sincomyaw;
+    coscomyaw = cos(lStartingCOMPosition.yaw);
+    sincomyaw = sin(lStartingCOMPosition.yaw);
+    
+    CoMPos(0,0) = coscomyaw; CoMPos(0,1) = -sincomyaw; CoMPos(0,2) = lStartingCOMPosition.x[0];
+    CoMPos(1,0) = sincomyaw; CoMPos(1,1) =  coscomyaw; CoMPos(1,2) = lStartingCOMPosition.y[0];
+    CoMPos(2,0) = 0.0;       CoMPos(2,1) = 0.0;        CoMPos(2,2) = 1.0;
+
+    // First step targets the left
+    // then the robot should move towards the right.
+    double lsx,lsy,ltheta;
+    if (lRelativeFootPositions[0].sy > 0 )
+      {
+	lsx = InitRightFootAbsPos.x; lsy = InitRightFootAbsPos.y; ltheta = InitRightFootAbsPos.theta;
+      }
+    // First step targets the right
+    // then the robot should move towards the left.
+    else
+      {
+	lsx = InitLeftFootAbsPos.x; lsy = InitLeftFootAbsPos.y; ltheta = InitLeftFootAbsPos.theta;
+      }
+
+    double cosinitfoottheta, sininitfoottheta;
+    cosinitfoottheta = cos(ltheta);
+    sininitfoottheta = sin(ltheta);
+    
+    InitPos(0,0) = cosinitfoottheta; InitPos(0,1) = -sininitfoottheta; InitPos(0,2) = lsx;
+    InitPos(1,0) = sininitfoottheta; InitPos(1,1) =  cosinitfoottheta; InitPos(1,2) = lsy;
+    InitPos(2,0) = 0.0;              InitPos(2,1) = 0.0;               InitPos(2,2) = 1.0;
+    
+    ODEBUG("InitPos:" << InitPos);
+    ODEBUG("CoMPos: " << CoMPos);
+
+    MAL_S3x3_MATRIX(iCoMPos,double);
+    MAL_S3x3_INVERSE(CoMPos,iCoMPos,double);
+    MAL_S3x3_MATRIX(InitialMotion,double);
+
+    // Compute the rigid motion from the CoM to the next support foot.
+    MAL_S3x3_C_eq_A_by_B(InitialMotion,iCoMPos,InitPos);
+      
+    // Create from the rigid motion the step to be added to the list of steps.
+    RelativeFootPosition aRFP;
+    aRFP.sx = InitialMotion(0,2); aRFP.sy = InitialMotion(1,2);
+    aRFP.theta = atan2(InitialMotion(1,0),InitialMotion(0,0));
+
+    ODEBUG("lRelativeFootPositions:"<<lRelativeFootPositions.size());
+    ODEBUG("AutomaticallyAddFirstStep: "<< aRFP.sx << " " << aRFP.sy << " " <<aRFP.theta);
+
+    lRelativeFootPositions.push_front(aRFP);
+    
+  }
 
   void PatternGeneratorInterface::CommonInitializationOfWalking(COMPosition  & lStartingCOMPosition,
 								MAL_S3_VECTOR(,double) & lStartingZMPPosition,
@@ -643,11 +705,23 @@ namespace PatternGeneratorJRL {
 
       }
 
+
     // Initialize consequently the ComAndFoot Realization object.
     m_GlobalStrategyManager->EvaluateStartingState(BodyAnglesIni,
 						   lStartingCOMPosition,
 						   lStartingZMPPosition,
 						   InitLeftFootAbsPos, InitRightFootAbsPos);
+
+    // Add the first step automatically when the corresponding option is set on.
+    if (m_AutoFirstStep)
+      {
+	AutomaticallyAddFirstStep(lRelativeFootPositions,
+				  InitLeftFootAbsPos,
+				  InitRightFootAbsPos,
+				  lStartingCOMPosition);
+	if (!ClearStepStackHandler)
+	  m_StepStackHandler->PushFrontAStepInTheStack(lRelativeFootPositions[0]);
+      }
 
     ODEBUG("StartingCOMPosition: " << lStartingCOMPosition.x[0] 
 	    << " "  << lStartingCOMPosition.y[0]
@@ -706,6 +780,7 @@ namespace PatternGeneratorJRL {
 				  BodyAnglesIni,
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,false);
+
 
     if (m_ZMPInitialPointSet)
       {
@@ -822,23 +897,6 @@ namespace PatternGeneratorJRL {
     m_HumanoidDynamicRobot->currentConfiguration(lCurrentConfiguration);
 
     ODEBUG("Size of lRelativeFootPositions :" << lRelativeFootPositions.size());
-    /*
-    if (m_ZMPInitialPointSet)
-      {
-	double lZMPNeutralPosition[2] = {m_ZMPInitialPoint[0],m_ZMPInitialPoint[1]};
-
-	m_ZMPD->setZMPNeutralPosition(lZMPNeutralPosition);
-	for(unsigned int i=0;i<3;i++)
-	  lStartingZMPPosition(i) = m_ZMPInitialPoint(i);
-
-      }
-    else
-      {
-	double lZMPNeutralPosition[2] = { lStartingZMPPosition[0],lStartingZMPPosition[1]};
-
-	//m_ZMPD->setZMPNeutralPosition(lZMPNeutralPosition);
-      }
-    */
     ODEBUG("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
 	     << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
 
@@ -982,6 +1040,17 @@ namespace PatternGeneratorJRL {
 
     else if (aCmd==":SetAlgoForZmpTrajectory")
       m_SetAlgoForZMPTraj(strm);
+
+    else if (aCmd==":SetAutoFirstStep")
+      {
+	std::string lAutoFirstStep;
+	strm>> lAutoFirstStep;
+	if (lAutoFirstStep=="true")
+	  m_AutoFirstStep=true;
+	else  if (lAutoFirstStep=="false")
+	  m_AutoFirstStep=false;
+	ODEBUG("SetAutoFirstStep: " << m_AutoFirstStep);
+      }
     return 0;
   }
 
@@ -1250,8 +1319,6 @@ namespace PatternGeneratorJRL {
 	    m_ShouldBeRunning = false;
 	    UpdateAbsMotionOrNot = true;
 
-	    // Specifies the next starting ZMP position
-	    //	    m_ZMPD->setZMPNeutralPosition(CurrentZMPNeutralPosition);
 
 	    ODEBUG("m_count " << m_count <<
 		   " m_ZMPPositions.size() " << m_ZMPPositions.size() <<
@@ -1456,26 +1523,26 @@ namespace PatternGeneratorJRL {
     int lindex=0;
     if (m_FirstPrint)
       {
-	DebugFileLong << lindex++ << "-time" << "\t"                   //  1
-		      << lindex++ << "-ZMPdesiredX"<< "\t"             //  2
-		      << lindex++ << "-ZMPdesiredY"<< "\t"             //  3
-		      << lindex++ << "-ZMPMultiBodyX"<< "\t"           //  4
-		      << lindex++ << "-ZMPMultiBodyY"<< "\t"           //  5
-		      << lindex++ << "-COMrecomputedX" << "\t"         //  6
-		      << lindex++ << "-COMrecomputedY" << "\t"         //  7
-		      << lindex++ << "-COMPositionX"<< "\t"            //  8
-		      << lindex++ << "-COMPositionY"<< "\t"            //  9
-		      << lindex++ << "-COMPositionZ"<< "\t" 	       // 10
-		      << lindex++ << "-COMVelocityX"<< "\t"            // 11
-		      << lindex++ << "-COMVelocityY"<< "\t"            // 12
-		      << lindex++ << "-COMVelocityZ"<< "\t"            // 13
-		      << lindex++ << "-COMOrientation"<< "\t"          // 14
-		      << lindex++ << "-LeftFootPositionsX"<< "\t"      // 15
-		      << lindex++ << "-LeftFootPositionsY"<< "\t"      // 16
-		      << lindex++ << "-LeftFootPositionsZ"<< "\t"      // 17
-		      << lindex++ << "-RightFootPositionsX" << "\t"    // 18
-		      << lindex++ << "-RightFootPositionsY" << "\t"    // 19
-		      << lindex++ << "-RightFootPositionsZ" << "\t";   // 20
+	DebugFileLong << lindex++ << "-time" << "\t";                   //  1
+	DebugFileLong << lindex++ << "-ZMPdesiredX"<< "\t";             //  2
+	DebugFileLong << lindex++ << "-ZMPdesiredY"<< "\t";             //  3
+	DebugFileLong << lindex++ << "-ZMPMultiBodyX"<< "\t";           //  4
+	DebugFileLong << lindex++ << "-ZMPMultiBodyY"<< "\t";           //  5
+	DebugFileLong << lindex++ << "-COMrecomputedX" << "\t";         //  6
+	DebugFileLong << lindex++ << "-COMrecomputedY" << "\t";         //  7
+	DebugFileLong << lindex++ << "-COMPositionX"<< "\t";            //  8
+	DebugFileLong << lindex++ << "-COMPositionY"<< "\t";            //  9
+	DebugFileLong << lindex++ << "-COMPositionZ"<< "\t"; 	       // 10
+	DebugFileLong << lindex++ << "-COMVelocityX"<< "\t";            // 11
+	DebugFileLong << lindex++ << "-COMVelocityY"<< "\t";            // 12
+	DebugFileLong << lindex++ << "-COMVelocityZ"<< "\t";            // 13
+	DebugFileLong << lindex++ << "-COMOrientation"<< "\t";          // 14
+	DebugFileLong << lindex++ << "-LeftFootPositionsX"<< "\t";      // 15
+	DebugFileLong << lindex++ << "-LeftFootPositionsY"<< "\t";      // 16
+	DebugFileLong << lindex++ << "-LeftFootPositionsZ"<< "\t";      // 17
+	DebugFileLong << lindex++ << "-RightFootPositionsX" << "\t";    // 18
+	DebugFileLong << lindex++ << "-RightFootPositionsY" << "\t";    // 19
+	DebugFileLong << lindex++ << "-RightFootPositionsZ" << "\t";   // 20
 	// 20 cols
 
 	for(unsigned int i=0;i<6;i++)
@@ -1543,15 +1610,15 @@ namespace PatternGeneratorJRL {
 	    DebugFileLong << lindex++ << "-RightArmAngularAccelerationJoint:" << i << "\t";
 	  }
 	// 119 = 107 + 12 cols
-	DebugFileLong << lindex++ << "-WaistPositionX" << "\t"
-		      << lindex++ << "-WaistPositionY" << "\t"
-		      << lindex++ << "-WaistPositionZ" << "\t"
-		      << lindex++ << "-WaistOrientation0" << "\t"
-		      << lindex++ << "-WaistOrientation1" << "\t"
-		      << lindex++ << "-WaistOrientation2" << "\t"
-		      << lindex++ << "-RightFootPositionsOmega" << "\t"
-		      << lindex++ << "-LeftFootPositionsOmega" << "\t"
-		      << endl;
+	DebugFileLong << lindex++ << "-WaistPositionX" << "\t";
+	DebugFileLong << lindex++ << "-WaistPositionY" << "\t";
+	DebugFileLong << lindex++ << "-WaistPositionZ" << "\t";
+	DebugFileLong << lindex++ << "-WaistOrientation0" << "\t";
+	DebugFileLong << lindex++ << "-WaistOrientation1" << "\t";
+	DebugFileLong << lindex++ << "-WaistOrientation2" << "\t";
+	DebugFileLong << lindex++ << "-RightFootPositionsOmega" << "\t";
+	DebugFileLong << lindex++ << "-LeftFootPositionsOmega" << "\t";
+	DebugFileLong << endl;
 
 
 
@@ -1561,26 +1628,26 @@ namespace PatternGeneratorJRL {
       {
 	ODEBUG(m_ZMPPositions[0].px << " "  << m_ZMPPositions[0].py);
 
-	DebugFileLong << m_count *m_SamplingPeriod << "\t"
-		      << m_ZMPPositions[0].px << "\t"
-		      << m_ZMPPositions[0].py << "\t"
-		      << ZMPmultibody[0] << "\t"
-		      << ZMPmultibody[1] << "\t"
-		      << _2DMBCoM[0] << "\t"
-		      << _2DMBCoM[1] << "\t"
-		      << MAL_S4x4_MATRIX_ACCESS_I_J(FinalDesiredCOMPose, 0,3) <<  "\t"
-		      << MAL_S4x4_MATRIX_ACCESS_I_J(FinalDesiredCOMPose, 1,3) <<  "\t"
-		      << MAL_S4x4_MATRIX_ACCESS_I_J(FinalDesiredCOMPose, 2,3) <<  "\t"
-		      << WaistVelocity[0] <<  "\t"
-		      << WaistVelocity[1] <<  "\t"
-		      << WaistVelocity[2] <<  "\t"
-		      << CurrentConfiguration(3) <<  "\t"
-		      << m_LeftFootPositions[0].x <<  "\t"
-		      << m_LeftFootPositions[0].y <<  "\t"
-		      << m_LeftFootPositions[0].z <<  "\t"
-		      << m_RightFootPositions[0].x <<  "\t"
-		      << m_RightFootPositions[0].y <<  "\t"
-		      << m_RightFootPositions[0].z <<  "\t";
+	DebugFileLong << m_count *m_SamplingPeriod << "\t";
+	DebugFileLong << m_ZMPPositions[0].px << "\t";
+	DebugFileLong << m_ZMPPositions[0].py << "\t";
+	DebugFileLong << ZMPmultibody[0] << "\t";
+	DebugFileLong << ZMPmultibody[1] << "\t";
+	DebugFileLong << _2DMBCoM[0] << "\t";
+	DebugFileLong << _2DMBCoM[1] << "\t";
+	DebugFileLong << MAL_S4x4_MATRIX_ACCESS_I_J(FinalDesiredCOMPose, 0,3) <<  "\t";
+	DebugFileLong << MAL_S4x4_MATRIX_ACCESS_I_J(FinalDesiredCOMPose, 1,3) <<  "\t";
+	DebugFileLong << MAL_S4x4_MATRIX_ACCESS_I_J(FinalDesiredCOMPose, 2,3) <<  "\t";
+	DebugFileLong << WaistVelocity[0] <<  "\t";
+	DebugFileLong << WaistVelocity[1] <<  "\t";
+	DebugFileLong << WaistVelocity[2] <<  "\t";
+	DebugFileLong << CurrentConfiguration(3) <<  "\t";
+	DebugFileLong << m_LeftFootPositions[0].x <<  "\t";
+	DebugFileLong << m_LeftFootPositions[0].y <<  "\t";
+	DebugFileLong << m_LeftFootPositions[0].z <<  "\t";
+	DebugFileLong << m_RightFootPositions[0].x <<  "\t";
+	DebugFileLong << m_RightFootPositions[0].y <<  "\t";
+	DebugFileLong << m_RightFootPositions[0].z <<  "\t";
 	// 20 lines angles
 	for(unsigned int i=0;i<6;i++)
 	  {
@@ -1650,15 +1717,13 @@ namespace PatternGeneratorJRL {
 	  }
 	// 119 = 107 + 12 cols
 	double rfpo=0.0,lfpo=0.0;
-	DebugFileLong << CurrentConfiguration(0) << "\t"
-		      << CurrentConfiguration(1) << "\t"
-		      << CurrentConfiguration(2) << "\t"
-		      << CurrentConfiguration(3) << "\t"
-		      << CurrentConfiguration(4) << "\t"
-		      << CurrentConfiguration(5) << "\t"
-		      << rfpo << "\t"
-		      << lfpo
-		      << endl;
+	DebugFileLong << CurrentConfiguration(0) << "\t";
+	DebugFileLong << CurrentConfiguration(1) << "\t";
+	DebugFileLong << CurrentConfiguration(2) << "\t";
+	DebugFileLong << CurrentConfiguration(3) << "\t";
+	DebugFileLong << CurrentConfiguration(4) << "\t";
+	DebugFileLong << CurrentConfiguration(5) << "\t";
+	DebugFileLong << rfpo << "\t"<< lfpo << endl;
       }
     DebugFileLong.close();
     DebugFileUpperBody.close();

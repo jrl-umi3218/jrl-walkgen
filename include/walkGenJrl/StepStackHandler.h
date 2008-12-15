@@ -130,6 +130,7 @@ namespace PatternGeneratorJRL
 			       double NewStepY,
 			       double Theta);
 
+
     /*! \brief Returns current state for on line stepping. */
     bool IsOnLineSteppingOn();
     /*! @} */
@@ -146,6 +147,9 @@ namespace PatternGeneratorJRL
     void AddStepInTheStack(double sx, double sy,
 			   double theta, double sstime,
 			   double dstime);
+
+    /*! \brief Push a step in front of the stack. */
+    void PushFrontAStepInTheStack(RelativeFootPosition &aRFP);
 
     /*! \brief Returns the last step of the stack. */
     RelativeFootPosition ReturnBackFootPosition();

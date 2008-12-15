@@ -686,6 +686,8 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   
   ODEBUG4(" GetZMPDiscretization: Step 5 " << AddArraySize << " " ,"DebugData.txt");
   ODEBUG("SizeOf1stPhase: " << SizeOf1stPhase << "dx: " << delta_x << " dy: " << delta_y);  
+
+  // First phase of the cycle aka Double support phase. 
   for(unsigned int k=0;k<SizeOf1stPhase;k++)
     {
       
@@ -727,7 +729,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
     }
   //-- End Of First phase.
       
-  // Second Phase of the step cycle.
+  // Second Phase of the step cycle aka Single Support Phase.
       
   // Compute relative feet position for the next step.
   float lStepHeight=0;

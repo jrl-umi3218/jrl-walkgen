@@ -178,7 +178,7 @@ SEARCHENGINE           = NO
 # Project related configuration options
 #---------------------------------------------------------------------------
 PROJECT_NAME           = "walkGenJrl library documentation"
-PROJECT_NUMBER         = 2.5.0
+PROJECT_NUMBER         = 2.5.99
 
 #---------------------------------------------------------------------------
 # Build related configuration options

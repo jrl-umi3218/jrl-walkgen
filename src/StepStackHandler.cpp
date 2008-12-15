@@ -825,6 +825,11 @@ void StepStackHandler::AddStepInTheStack(double sx, double sy,
   m_RelativeFootPositions.push_back(aFootPosition);
 }
 
+void StepStackHandler::PushFrontAStepInTheStack(RelativeFootPosition &aRFP)
+{
+  m_RelativeFootPositions.push_front(aRFP);
+}
+
 // Make sure that the previous motion will finish 
 // on the last specified correct support foot.
 void StepStackHandler::FinishOnTheLastCorrectSupportFoot()

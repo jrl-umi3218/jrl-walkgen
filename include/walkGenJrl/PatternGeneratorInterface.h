@@ -550,9 +550,19 @@ namespace PatternGeneratorJRL
 
     bool m_ShouldBeRunning;
 
-    /*! To handle a new step. */
+    /*! \name To handle a new step. 
+      @{
+     */
+    
+    /*! \brief There is a new user specified step. */
     bool m_NewStep;
+    
+    /*! \brief X, Y, Theta coordinates of the new step.*/
     double m_NewStepX, m_NewStepY, m_NewTheta;
+    /*! @} */
+
+    /*! \brief Add automatically the first new step */
+    bool m_AutoFirstStep;
 
     /* ! Store the current relative state of the waist */
     COMPosition m_CurrentWaistState;
@@ -656,6 +666,12 @@ namespace PatternGeneratorJRL
 			    MAL_S3_VECTOR(&,double) lStartingZMPPosition,
 			    FootAbsolutePosition & InitLeftFootAbsPos,
 			    FootAbsolutePosition & InitRightFootAbsPos);
+
+    /*! \brief Create automatically a new step for a ZMP based stability criteria */
+    void AutomaticallyAddFirstStep(deque<RelativeFootPosition> & lRelativeFootPositions,
+				   FootAbsolutePosition & InitLeftFootAbsPos,
+				   FootAbsolutePosition & InitRightFootAbsPos,
+				   COMPosition &lStartingCOMPosition);
     /* @} */
   };
 
