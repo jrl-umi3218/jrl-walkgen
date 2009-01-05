@@ -372,8 +372,8 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   ODEBUG4("ZMP::InitOnLine - Step 2.5 ","ZMDInitOnLine.txt");
 
     // Initialize who is support foot.
-  double CurrentZMPTheta=0;
-  CurrentZMPTheta = (CurrentRightFootAbsPos.theta + CurrentLeftFootAbsPos.theta)/2.0;
+  double CurrentAbsZMPTheta=0;
+  CurrentAbsZMPTheta = (CurrentRightFootAbsPos.theta + CurrentLeftFootAbsPos.theta)/2.0;
   ODEBUG("CurrentZMPTheta at start: " << CurrentZMPTheta << " " 
 	  << CurrentRightFootAbsPos.theta << " " 
 	  << CurrentLeftFootAbsPos.theta);
@@ -381,13 +381,16 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
     {
       m_vdiffsupppre(0,0) = CurrentRightFootAbsPos.x - CurrentLeftFootAbsPos.x;
       m_vdiffsupppre(1,0) = CurrentRightFootAbsPos.y - CurrentLeftFootAbsPos.y;
-      m_CurrentTheta = CurrentRightFootAbsPos.theta - CurrentLeftFootAbsPos.theta;
+      m_AngleDiffToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentLeftFootAbsPos.theta;
+      m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentAbsZMPTheta;
     }
   else 
     {
       m_vdiffsupppre(0,0) = -CurrentRightFootAbsPos.x + CurrentLeftFootAbsPos.x;
       m_vdiffsupppre(1,0) = -CurrentRightFootAbsPos.y + CurrentLeftFootAbsPos.y;
-      m_CurrentTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
+      m_AngleDiffToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
+      m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentAbsZMPTheta;
+      
     }
 
   ODEBUG4("ZMP::InitOnLine - Step 3 ","ZMDInitOnLine.txt");
@@ -553,9 +556,11 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   deque<FootAbsolutePosition> LeftFootAbsolutePositions;
   deque<FootAbsolutePosition> RightFootAbsolutePositions;
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
+  double CurrentAbsZMPTheta=0;
 
   CurrentLeftFootAbsPos = FinalLeftFootAbsolutePositions.back();
   CurrentRightFootAbsPos = FinalRightFootAbsolutePositions.back();
+  CurrentAbsZMPTheta = FinalZMPPositions.back().theta;
 
   m_RelativeFootPositions.push_back(NewRelativeFootPosition);
   int WhoIsSupportFoot=1;
@@ -591,14 +596,16 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       WhoIsSupportFoot = -1;//Right
       m_vdiffsupppre(0,0) = CurrentRightFootAbsPos.x - CurrentLeftFootAbsPos.x;
       m_vdiffsupppre(1,0) = CurrentRightFootAbsPos.y - CurrentLeftFootAbsPos.y;
-      m_CurrentTheta = CurrentRightFootAbsPos.theta - CurrentLeftFootAbsPos.theta;
+      m_AngleDiffToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentLeftFootAbsPos.theta;
+      m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentAbsZMPTheta;
     }
   else 
     {
       WhoIsSupportFoot = 1;// Left
       m_vdiffsupppre(0,0) = -CurrentRightFootAbsPos.x + CurrentLeftFootAbsPos.x;
       m_vdiffsupppre(1,0) = -CurrentRightFootAbsPos.y + CurrentLeftFootAbsPos.y;
-      m_CurrentTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
+      m_AngleDiffToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
+      m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentAbsZMPTheta;
     }
   
   double TimeForThisFootPosition = TimeFirstPhase+ lTsingle;
@@ -733,11 +740,22 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       
   // Compute relative feet position for the next step.
   float lStepHeight=0;
-  double NextTheta=0, RelTheta=0;
+
+  // Next Theta : next relative angle between the current support foot angle
+  // and the next support foot angle.
+  double NextTheta=0;
+
+  // RelTheta : relative angle between the current angle of the
+  // flying foot and the next angle of the flying foot.
+  // RelZMPTheta : relative angle between the current angle of the
+  // zmp and the next angle of the zmp.
+  double RelTheta=0, RelZMPTheta=0;
   if (m_RelativeFootPositions.size()>1)
     {
       NextTheta=m_RelativeFootPositions[1].theta;
-      RelTheta = NextTheta+m_CurrentTheta;
+      RelTheta = NextTheta+m_AngleDiffToSupportFootTheta;
+      RelZMPTheta = NextTheta+m_AngleDiffFromZMPThetaToSupportFootTheta;
+
       lStepHeight = m_StepHeight;
       ODEBUG("lStepHeight:"<< lStepHeight <<
 	      " m_StepHeight: " << m_StepHeight << " this:" << this);
@@ -780,7 +798,8 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 
   m_vdiffsupppre = vdiffsupp;
       
-  m_CurrentTheta = NextTheta;
+  // m_AngleDiffToSupportFootTheta = NextTheta;
+  
       
   // Create the polynomes for the none-support foot.
   // Change 08/12/2005: Speed up the modification of X and Y
@@ -804,7 +823,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   
 
   //m_PolynomeZMPTheta->SetParameters(lTsingle,NextZMPTheta);
-  m_PolynomeZMPTheta->SetParameters(lTsingle,NextTheta);
+  m_PolynomeZMPTheta->SetParameters(lTsingle,RelZMPTheta);
   double dSizeOfSndPhase = lTsingle/m_SamplingPeriod;
   unsigned int SizeOfSndPhase = (unsigned int)round(dSizeOfSndPhase);
   int indexinitial = CurrentZMPindex-1;

@@ -234,7 +234,10 @@ namespace PatternGeneratorJRL
       double m_CurrentAbsTheta;
       
       /* ! Current orientation of the support foot. */
-      double m_CurrentTheta;
+      double m_AngleDiffToSupportFootTheta;
+
+      /* ! Current angle difference from the ZMP to the support foot. */
+      double m_AngleDiffFromZMPThetaToSupportFootTheta;
       
       /*! \name Handling the support foot position 
 	@{
