@@ -361,10 +361,12 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   ODEBUG4("ZMP::InitOnLine - Step 2 ","ZMDInitOnLine.txt");
   // Initialize position of the feet.  
   CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
+  CurrentLeftFootAbsPos.z = 0.0;
   CurrentLeftFootAbsPos.time = 0.0;
   
   ODEBUG4("CurrentLeftFootAbsPos.y: " << CurrentLeftFootAbsPos.y, "ZMDInitOnLine.txt");
   CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
+  CurrentRightFootAbsPos.z = 0.0;
   CurrentRightFootAbsPos.time = 0.0;
 
   // V pre is the difference between 
@@ -397,39 +399,57 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   // Initialization of the ZMP position (stable values during the Preview control time window). 
   int AddArraySize;
   {
-    double ldAddArraySize = m_PreviewControlTime/m_SamplingPeriod;
+    double ldAddArraySize = 2* m_PreviewControlTime/m_SamplingPeriod;
     AddArraySize = (int) ldAddArraySize;
   }
 
   ODEBUG(AddArraySize);
-  FinalZMPPositions.resize(AddArraySize);
+  deque<ZMPPosition> ZMPPositions;
+  ZMPPositions.resize(AddArraySize);
   FinalCoMPositions.resize(AddArraySize);
   LeftFootAbsolutePositions.resize(AddArraySize);
   RightFootAbsolutePositions.resize(AddArraySize);
   int CurrentZMPindex=0;
+
   // Also very important for the initialization: reshape the ZMP reference for a smooth starting.
-  double startingZMPREF[2] = { lStartingZMPPosition(0), lStartingZMPPosition(1)};
+  double startingZMPREF[3] = { lStartingCOMPosition.x[0], lStartingCOMPosition.y[0],lStartingZMPPosition(2)};
+  
+  // Make sure that the robot thinks it is at the position it thinks it is.
+  //double startingZMPREF[3] =  { 0.00949035, 0.00142561, lStartingZMPPosition(2)};
+
+
   double finalZMPREF[2] = {m_ZMPNeutralPosition[0],m_ZMPNeutralPosition[1]};
   ODEBUG("ZMPNeutralPosition: " << m_ZMPNeutralPosition[0] << " " 
 	  << m_ZMPNeutralPosition[1] << endl <<
-	  "StartingZMPPosition(toto):" <<  lStartingZMPPosition(0) << " " << lStartingZMPPosition(1) <<endl
-	  << "CurrentAbsTheta : " << CurrentAbsTheta
-	  << "AddArraySize:"<< AddArraySize << " " << m_PreviewControlTime << " " <<m_SamplingPeriod 
-	  << "FinalZMPref :( " <<finalZMPREF[0] 
-	  << " , " <<finalZMPREF[1] << " ) " << FinalZMPPositions.size());
+	  "StartingZMPPosition(toto):" <<  lStartingZMPPosition(0) << " " << lStartingZMPPosition(1) << " " <<
+	  lStartingZMPPosition(2) << endl
+	  << "lStartingCOMPosition: " << lStartingCOMPosition.x[0] << " " 
+	  << lStartingCOMPosition.y[0] << " "
+	  << lStartingCOMPosition.z[0] << endl
+	  << "CurrentAbsTheta : " << CurrentAbsTheta << endl
+	  << "AddArraySize:"<< AddArraySize << " " << m_PreviewControlTime << " " <<m_SamplingPeriod  << endl
+	  << "FinalZMPref :( " <<finalZMPREF[0]  
+	  << " , " <<finalZMPREF[1] << " ) " << ZMPPositions.size() <<endl
+	 << "InitRightFootAbsPos.z " << InitRightFootAbsolutePosition.z);
+  ODEBUG3( "lStartingCOMPosition: " << lStartingCOMPosition.x[0] << " " 
+	  << lStartingCOMPosition.y[0] << " "
+	   << lStartingCOMPosition.z[0] );
+	
   ODEBUG4("ZMP::InitOnLine - Step 4 ","ZMDInitOnLine.txt");
-  for(unsigned int i=0;i<FinalZMPPositions.size();i++)
+  for(unsigned int i=0;i<ZMPPositions.size();i++)
     {
-      double coef = (float)i/(float)FinalZMPPositions.size();
+      double coef = (float)i/(float)ZMPPositions.size();
+      double icoef = (float)(ZMPPositions.size() -i)/
+	(float)ZMPPositions.size();
       // Set ZMP positions.
 
       // Smooth ramp
-      FinalZMPPositions[CurrentZMPindex].px = startingZMPREF[0] + (finalZMPREF[0] - startingZMPREF[0])*coef;
-      FinalZMPPositions[CurrentZMPindex].py = startingZMPREF[1] + (finalZMPREF[1] - startingZMPREF[1])*coef;
-
-      FinalZMPPositions[CurrentZMPindex].theta = CurrentAbsTheta;
-      FinalZMPPositions[CurrentZMPindex].time = m_CurrentTime;
-      FinalZMPPositions[CurrentZMPindex].stepType = 0;
+      ZMPPositions[CurrentZMPindex].px = startingZMPREF[0] + (finalZMPREF[0] - startingZMPREF[0])*coef;
+      ZMPPositions[CurrentZMPindex].py = startingZMPREF[1] + (finalZMPREF[1] - startingZMPREF[1])*coef;
+      ZMPPositions[CurrentZMPindex].pz = (-startingZMPREF[2] + InitRightFootAbsolutePosition.z) * icoef; 
+      ZMPPositions[CurrentZMPindex].theta = CurrentAbsTheta;
+      ZMPPositions[CurrentZMPindex].time = m_CurrentTime;
+      ZMPPositions[CurrentZMPindex].stepType = 0;
 
       // Set CoM positions.
       FinalCoMPositions[CurrentZMPindex].z[0] = m_PC->GetHeightOfCoM();
@@ -438,7 +458,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       FinalCoMPositions[CurrentZMPindex].pitch = 0.0;
       FinalCoMPositions[CurrentZMPindex].roll = 0.0;
       FinalCoMPositions[CurrentZMPindex].yaw = 
-	FinalZMPPositions[CurrentZMPindex].theta;
+	ZMPPositions[CurrentZMPindex].theta;
       
       // Set Left Foot positions.
       LeftFootAbsolutePositions[CurrentZMPindex] = CurrentLeftFootAbsPos;
@@ -454,7 +474,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       CurrentZMPindex++;
     }
 
-  ODEBUG("InitOnline: FinalZMPPositions.size(): " << FinalZMPPositions.size());
+  ODEBUG("InitOnline: ZMPPositions.size(): " << ZMPPositions.size());
   
   // The first foot when walking dynamically 
   // does not leave the soil, but needs to be treated for the first phase.
@@ -464,13 +484,17 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   if (0)
     {
       ofstream dbg_aof("DebugZMPRefPos.dat",ofstream::out);
-      for(unsigned int i=0;i<FinalZMPPositions.size();i++)
+      for(unsigned int i=0;i<ZMPPositions.size();i++)
 	{
-	  dbg_aof << FinalZMPPositions[i].px << " "
-		  << FinalZMPPositions[i].py << endl;
+	  dbg_aof << ZMPPositions[i].px << " "
+		  << ZMPPositions[i].py << endl;
 	}
       dbg_aof.close();
     }
+  FilterOutValues(ZMPPositions,
+		  FinalZMPPositions,
+		  true);		  
+
   ODEBUG6("InitOnLine","DebugDataRFPos.txt" );
   for(unsigned int i=1;i<RelativeFootPositions.size();i++)
     {
@@ -700,7 +724,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       
       ZMPPositions[CurrentZMPindex].px = px0 + k*delta_x;
       ZMPPositions[CurrentZMPindex].py = py0 + k*delta_y;
-      
+      ZMPPositions[CurrentZMPindex].pz = 0;
       ZMPPositions[CurrentZMPindex].theta =theta0;
       
       
@@ -860,6 +884,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 		
       ZMPPositions[CurrentZMPindex].px = ZMPInWorldCoordinates(0);
       ZMPPositions[CurrentZMPindex].py = ZMPInWorldCoordinates(1);
+      ZMPPositions[CurrentZMPindex].pz = 0;
       ZMPPositions[CurrentZMPindex].time = m_CurrentTime;
 	
       if (DoIt)
@@ -885,6 +910,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 	
 	      ZMPPositions[CurrentZMPindex].px = ZMPPositions[CurrentZMPindex-1].px + delta_x;
 	      ZMPPositions[CurrentZMPindex].py = ZMPPositions[CurrentZMPindex-1].py + delta_y;
+	      ZMPPositions[CurrentZMPindex].pz = 0;
 	    }
 
 	}
@@ -961,7 +987,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
      
     }
   FilterOutValues(ZMPPositions,
-		  FinalZMPPositions);		  
+		  FinalZMPPositions,false);		  
   
   if (EndSequence)
     {
@@ -986,14 +1012,15 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 }
 
 void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
-					deque<ZMPPosition> &FinalZMPPositions)
+					deque<ZMPPosition> &FinalZMPPositions,
+					bool InitStep)
 {
 
   // Filter out the ZMP values.
   ODEBUG("FinalZMPPositions.size()="<<FinalZMPPositions.size());
   for(unsigned int i=0;i<ZMPPositions.size();i++)
     {
-      double ltmp[2]={0,0};
+      double ltmp[3]={0,0,0};
 
       int o= FinalZMPPositions.size()-1;
       for(unsigned int j=0;j<m_ZMPFilterWindow.size();j++)
@@ -1002,22 +1029,41 @@ void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
 	  r=i-j;
 	  if (r<0)
 	    {
-	      if (-r<o)
+	      
+	      if (InitStep)
 		{
-		  ltmp[0] += m_ZMPFilterWindow[j]*FinalZMPPositions[o+r].px;
-		  ltmp[1] += m_ZMPFilterWindow[j]*FinalZMPPositions[o+r].py;
+		  ltmp[0] += m_ZMPFilterWindow[j]*ZMPPositions[0].px;
+		  ltmp[1] += m_ZMPFilterWindow[j]*ZMPPositions[0].py;
+		  ltmp[2] += m_ZMPFilterWindow[j]*ZMPPositions[0].pz;
+		}
+	      else
+		{
+		  if (-r<o)
+		    {
+		      ltmp[0] += m_ZMPFilterWindow[j]*FinalZMPPositions[o+r].px;
+		      ltmp[1] += m_ZMPFilterWindow[j]*FinalZMPPositions[o+r].py;
+		      ltmp[2] += m_ZMPFilterWindow[j]*FinalZMPPositions[o+r].pz;
+		    }
+		  else
+		    {
+		      ltmp[0] += m_ZMPFilterWindow[j]*FinalZMPPositions[0].px;
+		      ltmp[1] += m_ZMPFilterWindow[j]*FinalZMPPositions[0].py;
+		      ltmp[2] += m_ZMPFilterWindow[j]*FinalZMPPositions[0].pz;
+		    }
 		}
 	    }
 	  else
 	    {
 	      ltmp[0] += m_ZMPFilterWindow[j]*ZMPPositions[r].px;
 	      ltmp[1] += m_ZMPFilterWindow[j]*ZMPPositions[r].py;
+	      ltmp[2] += m_ZMPFilterWindow[j]*ZMPPositions[r].pz;
 	    }
 	}
       
       ZMPPosition aZMPPos;
       aZMPPos.px = ltmp[0];
       aZMPPos.py = ltmp[1];
+      aZMPPos.pz = ltmp[2];
       aZMPPos.theta = ZMPPositions[i].theta;
       aZMPPos.time = ZMPPositions[i].time;
       aZMPPos.stepType = ZMPPositions[i].stepType;
@@ -1213,7 +1259,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
     }
 
   ODEBUG4(" GetZMPDiscretization: Step 9 " << ZMPPositions.size(),"DebugData.txt");
-  FilterOutValues(ZMPPositions,FinalZMPPositions);
+  FilterOutValues(ZMPPositions,FinalZMPPositions,false);
 
 }
 

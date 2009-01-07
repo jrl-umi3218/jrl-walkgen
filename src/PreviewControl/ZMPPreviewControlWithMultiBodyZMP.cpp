@@ -32,6 +32,8 @@
 //#define _DEBUG_
 #include <iostream>
 #include <fstream>
+
+#include <dynamicsJRLJapan/HumanoidDynamicMultiBody.h>
 #include <walkGenJrl/PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
 
 using namespace PatternGeneratorJRL;
@@ -546,7 +548,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteration)
 {
-  if (0)
+  if (1)
   {
     
     MAL_VECTOR(,double) CurrentConfiguration;
@@ -616,7 +618,9 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
 	  << m_FIFOZMPRefPositions[0].py  << " " 
 	  << m_FIFOZMPRefPositions[0].theta  << " " 
 	  << ZMPmultibody[0] << " " << ZMPmultibody[1] << " "  
-	  << CoMmultibody[0] << " " << CoMmultibody[1], "DebugDataDiffZMP.txt");
+	  << CoMmultibody[0] << " " << CoMmultibody[1] << " " 
+	  << m_FIFOCOMPositions[0].x[0] << " " << m_FIFOCOMPositions[0].y[0] << " " 
+	  << m_FIFOCOMPositions[0].x[1] << " " << m_FIFOCOMPositions[0].y[1] , "DebugDataDiffZMP.txt");
   m_FIFODeltaZMPPositions.push_back(aZMPpos);
 
   m_StartingNewSequence = false;
@@ -707,6 +711,32 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
   m_FIFOCOMPositions.clear();
   m_FIFOLeftFootPosition.clear();
   m_FIFORightFootPosition.clear();
+
+#if 1
+  MAL_VECTOR(CurrentConfiguration,double);
+  MAL_VECTOR(CurrentVelocity,double);
+  MAL_VECTOR(CurrentAcceleration,double);
+  /* Get the current configuration vector */
+  CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
+  CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
+  CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
+
+  for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentVelocity);i++)
+    {
+      CurrentVelocity[i] = CurrentAcceleration[i] = 0.0;
+    }
+  m_HumanoidDynamicRobot->currentVelocity(CurrentVelocity);
+  m_HumanoidDynamicRobot->currentAcceleration(CurrentAcceleration);
+  for(unsigned int i=0;i<4;i++)
+    {
+      string sComputeZMP("ComputeZMP");
+      string sZMPtrue("true");
+      // Call the  Dynamic Multi Body computation of the dynamic parameters.
+      m_HumanoidDynamicRobot->setProperty(sComputeZMP,sZMPtrue);
+      m_HumanoidDynamicRobot->computeForwardKinematics();
+      }
+#endif
+
 #ifdef _DEBUG_
   m_FIFOTmpZMPPosition.clear();
 #endif
@@ -894,6 +924,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(MAL_VECTOR(&BodyAngle
 							     FootAbsolutePosition & InitRightFootPosition)
 {
   ODEBUG("EvaluateStartingCOM: BodyAnglesInit :" << BodyAnglesInit);
+
   m_ComAndFootRealization->InitializationCoM(BodyAnglesInit,m_StartingCOMPosition,
 					     InitLeftFootPosition, InitRightFootPosition);  
   ODEBUG("EvaluateStartingCOM: m_StartingCOMPosition: " << m_StartingCOMPosition);

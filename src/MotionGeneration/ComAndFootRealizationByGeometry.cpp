@@ -403,7 +403,18 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 	       CurrentConfig[m_GlobalVRMLIDtoConfiguration[i]]*180/M_PI  ,
 	         "DebugDataStartingCOM.dat");
 
+    }  
+    
+    {
+      ofstream aof_dbg("DebugConfSO.dat",ofstream::app);
+      for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentConfig);i++)
+	{
+	  aof_dbg << CurrentConfig[i] << " ";
+	}
+      aof_dbg <<endl;
+      aof_dbg.close();
     }
+
 
   ODEBUG4("Size of m_GlobalVRMLIDtoConfiguration: " << m_GlobalVRMLIDtoConfiguration.size(),
 	  "DebugDataStartingCOM.dat");
@@ -417,6 +428,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   // but it is the body position which start on the ground.
 
   aDMB->setComputeCoM(true);
+  aDMB->setComputeZMP(false);
   getHumanoidDynamicRobot()->computeForwardKinematics();
 
   CurrentConfig = getHumanoidDynamicRobot()->currentConfiguration();
@@ -466,7 +478,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 
   InitRightFootPosition.x = lFootPosition[0];
   InitRightFootPosition.y = lFootPosition[1];
-  InitRightFootPosition.z = 0.0;
+  InitRightFootPosition.z = lFootPosition[2];
   ODEBUG( "InitRightFootPosition : " << InitRightFootPosition.x << " " << InitRightFootPosition.y );
   // We assume that the foot is flat on the floor...
   // Thus
@@ -510,7 +522,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 
   InitLeftFootPosition.x = lFootPosition[0];
   InitLeftFootPosition.y = lFootPosition[1];
-  InitLeftFootPosition.z = 0.0;
+  InitLeftFootPosition.z = lFootPosition[2];
   InitLeftFootPosition.theta = 0.0;
 
   ODEBUG("InitLeftFootPosition : " << InitLeftFootPosition.x << " " << InitLeftFootPosition.y );
@@ -635,7 +647,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
-  
+
   return true;
 }
 
@@ -1162,7 +1174,7 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
       else
 	{
 	  /* Compute the speed */
-	  for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
+	  for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentVelocity);i++)
 	    {
 	      CurrentVelocity[i] = 0.0;
 	      /* Keep the new value for the legs. */
@@ -1207,10 +1219,9 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
 
   for(int i=0;i<6;i++)
     CurrentVelocity[i] = aCoMSpeed(i);
-
+  
   for(int i=0;i<6;i++)
     CurrentAcceleration[i] = aCoMAcc(i);
-
 
   ODEBUG( "CurrentVelocity :" << endl << CurrentVelocity);
   ODEBUG4("SamplingPeriod " << getSamplingPeriod(),"LegsSpeed.dat");

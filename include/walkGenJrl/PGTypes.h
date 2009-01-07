@@ -73,7 +73,7 @@ namespace PatternGeneratorJRL
       direction at a certain time. */
   struct ZMPPosition_s
   { 
-    double px,py;
+    double px,py,pz;
     double theta;//For COM
     double time;
     int stepType;     //1:normal walking 2:one step before opbstacle

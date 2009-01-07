@@ -600,7 +600,13 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterface::EvaluateStartingCOM(MAL_VECTOR(  & Configuration,double),
 						      MAL_S3_VECTOR(  & lStartingCOMPosition,double))
   {
+    MAL_VECTOR(Velocity,double);
+    MAL_VECTOR_RESIZE(Velocity,MAL_VECTOR_SIZE(Configuration));
+    for(unsigned int i=0;i<MAL_VECTOR_SIZE(Configuration);i++)
+      Velocity[i] = 0.0;
+
     m_HumanoidDynamicRobot->currentConfiguration(Configuration);
+    m_HumanoidDynamicRobot->currentVelocity(Velocity);
     m_HumanoidDynamicRobot->setComputeCoM(true);
     m_HumanoidDynamicRobot->computeForwardKinematics();
     lStartingCOMPosition = m_HumanoidDynamicRobot->positionCenterOfMass();

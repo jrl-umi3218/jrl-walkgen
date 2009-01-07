@@ -739,22 +739,21 @@ int main(int argc, char *argv[])
   double timemodif = 0;
   double totaltimeinplanning=0;
 
-  for (unsigned int lNbIt=0;lNbIt<3;lNbIt++)
+  for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
     {
       //StrangeStartingPosition(*aPGI);
+      
       gettimeofday(&begin,0);
+      /*
       if (lNbIt==0)
 	PbFlorentSeq1(*aPGI);
       else if (lNbIt==1)
 	PbFlorentSeq2(*aPGI);
       else if (lNbIt==2)
 	PbFlorentSeq3(*aPGI);
-      gettimeofday(&end,0);
-      double ltime = end.tv_sec-begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
-      totaltimeinplanning+=ltime;
-
+      */
       // SteppingOver(*aPGI);
-      //ShortStraightWalking(*aPGI);
+      ShortStraightWalking(*aPGI);
       // CurvedWalkingPBW2(*aPGI);
       // KineoWorks(*aPGI);
       // StraightWalking(*aPGI);
@@ -772,7 +771,10 @@ int main(int argc, char *argv[])
       // StartAnalyticalOnLineWalking(*aPGI);
       //StartOnLineWalking(*aPGI);
       //StartSimuOnLineWalking(*aPGI);
-
+      gettimeofday(&end,0);
+      double ltime = end.tv_sec-begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
+      totaltimeinplanning+=ltime;
+      
       bool ok = true;
       while(ok)
 	{

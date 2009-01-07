@@ -83,6 +83,7 @@ DoubleStagePreviewControlStrategy::DoubleStagePreviewControlStrategy(SimplePlugi
     }
   
   RESETDEBUG4("ZMPRefAndWaist.dat");
+  RESETDEBUG4("ZMPRef.dat");
 }
 
 DoubleStagePreviewControlStrategy::~DoubleStagePreviewControlStrategy()
@@ -133,7 +134,10 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 	 << " " << (*m_ZMPPositions)[0].py
 	 << " " << (*m_ZMPPositions)[2*m_NL].px
 	 << " " << (*m_ZMPPositions)[2*m_NL].py );
-  
+  ODEBUG4( (*m_ZMPPositions)[0].px << " " << 
+	   (*m_ZMPPositions)[0].py << " " <<
+	   (*m_ZMPPositions)[0].pz,"ZMPRef.dat");
+
   ODEBUG(m_count << " before-CurrentConfiguration " << CurrentConfiguration);
   
   m_ZMPpcwmbz->OneGlobalStepOfControl((*m_LeftFootPositions)[m_NL],
@@ -187,7 +191,7 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   
   ZMPRefPos(0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
   ZMPRefPos(1) = -sin(temp3)*temp1+cos(temp3)*temp2;
-  ZMPRefPos(2) = -finalCOMPosition.z[0] - MAL_S4x4_MATRIX_ACCESS_I_J(PosOfWaistInCOMF, 2,3);
+  ZMPRefPos(2) = -finalCOMPosition.z[0] - MAL_S4x4_MATRIX_ACCESS_I_J(PosOfWaistInCOMF, 2,3) - (*m_ZMPPositions)[0].pz;
 
 
   ODEBUG4((*m_ZMPPositions)[0].px <<  " " << 

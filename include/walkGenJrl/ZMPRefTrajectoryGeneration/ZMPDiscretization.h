@@ -204,7 +204,8 @@ namespace PatternGeneratorJRL
 
       /*! Filter out the ZMP values and put them at the back FinalZMPPositions. */
       void FilterOutValues(deque<ZMPPosition> &ZMPPositions,
-			   deque<ZMPPosition> &FinalZMPPositions);
+			   deque<ZMPPosition> &FinalZMPPositions,
+			   bool InitPhase);
       
       /*! Set the ZMP neutral position in the global coordinates system */
       void setZMPNeutralPosition(const double aZMPNeutralPosition[2])
