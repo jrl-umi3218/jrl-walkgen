@@ -81,9 +81,13 @@ namespace PatternGeneratorJRL
     /*! Get the map of plugins. */
     const std::multimap<std::string, SimplePlugin *, ltstr>  & getSimplePlugins() const
       { return m_SimplePlugins;};
+
     /*! \name Register the method for which this object can be called
       by a higher parser. */
     bool RegisterMethod(std::string &MethodName, SimplePlugin *aSP);
+
+    /*! \name Unregister a plugin */
+    void UnregisterPlugin(SimplePlugin *aSP);
 
     /*! \name Call the method from the Method name. */
     bool CallMethod(std::string &MethodName, std::istringstream &istrm);

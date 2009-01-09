@@ -44,7 +44,6 @@
     DebugFile.open(y,ofstream::app); \
     DebugFile << "SimplePluginManager: " << x << endl; \
     DebugFile.close();}
-
 #else
 #define RESETDEBUG4(y) 
 #define ODEBUG4(x,y) 
@@ -69,17 +68,36 @@ using namespace PatternGeneratorJRL;
 
 SimplePluginManager::~SimplePluginManager()
 {
-  /*
-  std::map<char*, SimplePlugin * , ltstr>::iterator it_SP;
+  std::multimap<std::string, SimplePlugin * , ltstr>::iterator it_SP;
   
 
   it_SP =m_SimplePlugins.begin();
   while(it_SP!=m_SimplePlugins.end())
     {
-      delete it_SP->first;
+      it_SP->second->m_SimplePluginManager = 0;
       it_SP++;
     }
-  */
+}
+
+void SimplePluginManager::UnregisterPlugin(SimplePlugin* aSimplePlugin)
+{
+  std::multimap<std::string, SimplePlugin * , ltstr>::iterator it_SP, it_ToBeRemoved;
+
+  it_SP =m_SimplePlugins.begin();
+  while(it_SP!=m_SimplePlugins.end())
+    {
+
+      if (it_SP->second==aSimplePlugin)
+	{
+	  it_ToBeRemoved = it_SP;
+	  it_SP++;
+
+	  m_SimplePlugins.erase(it_ToBeRemoved);
+	}
+      else 
+	it_SP++;
+    }
+  
 }
 
 void SimplePluginManager::Print( )

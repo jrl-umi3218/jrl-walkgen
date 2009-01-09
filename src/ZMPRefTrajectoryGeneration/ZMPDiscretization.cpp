@@ -431,7 +431,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 	  << "FinalZMPref :( " <<finalZMPREF[0]  
 	  << " , " <<finalZMPREF[1] << " ) " << ZMPPositions.size() <<endl
 	 << "InitRightFootAbsPos.z " << InitRightFootAbsolutePosition.z);
-  ODEBUG3( "lStartingCOMPosition: " << lStartingCOMPosition.x[0] << " " 
+  ODEBUG( "lStartingCOMPosition: " << lStartingCOMPosition.x[0] << " " 
 	  << lStartingCOMPosition.y[0] << " "
 	   << lStartingCOMPosition.z[0] );
 	

@@ -52,7 +52,8 @@ namespace PatternGeneratorJRL
     
   private:
     SimplePluginManager * m_SimplePluginManager;
-
+    friend class SimplePluginManager;
+    
   public:
     
     /*! \brief Pointer towards the PGI which is handling this object. */
@@ -60,18 +61,17 @@ namespace PatternGeneratorJRL
       : m_SimplePluginManager(lSPM)    
       {};
       
-      inline virtual ~SimplePlugin() 
-	{};
-      
-      /*! \name Register the method for which this object can be called
-	by a higher parser. */
-      bool RegisterMethod(std::string &MethodName);
-      
-      /*! \name Virtual method to redispatch the method. */
-      virtual void CallMethod(std::string &Method, std::istringstream & astrm) = 0;
-      
-      /*! \name Get the simple plugin manager */
-      SimplePluginManager * getSimplePluginManager() const
+    virtual ~SimplePlugin();
+    
+    /*! \name Register the method for which this object can be called
+      by a higher parser. */
+    bool RegisterMethod(std::string &MethodName);
+    
+    /*! \name Virtual method to redispatch the method. */
+    virtual void CallMethod(std::string &Method, std::istringstream & astrm) = 0;
+    
+    /*! \name Get the simple plugin manager */
+    SimplePluginManager * getSimplePluginManager() const
       { return m_SimplePluginManager; } 
   };
 };

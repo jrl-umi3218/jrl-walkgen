@@ -37,5 +37,16 @@ using namespace std;
 using namespace PatternGeneratorJRL;
 bool SimplePlugin::RegisterMethod(string &MethodName)
 {
-  return m_SimplePluginManager->RegisterMethod(MethodName,this);
+  bool r = false;
+  if (m_SimplePluginManager!=0)
+    r = m_SimplePluginManager->RegisterMethod(MethodName,this);
+  return r;
 }
+
+SimplePlugin::~SimplePlugin()
+{
+  if (m_SimplePluginManager!=0)
+    {
+      m_SimplePluginManager->UnregisterPlugin(this);
+    }
+};
