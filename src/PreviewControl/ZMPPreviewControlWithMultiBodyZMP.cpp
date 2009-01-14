@@ -548,7 +548,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteration)
 {
-  if (1)
+  if (0)
   {
     
     MAL_VECTOR(,double) CurrentConfiguration;
@@ -563,6 +563,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
     
     /* Get the current acceleration vector */
     CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
+    
     
     {
       ofstream aof_dbg("DebugConfSO.dat",ofstream::app);
