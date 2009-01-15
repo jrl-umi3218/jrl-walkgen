@@ -404,17 +404,6 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 	         "DebugDataStartingCOM.dat");
 
     }  
-    
-    {
-      ofstream aof_dbg("DebugConfSO.dat",ofstream::app);
-      for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentConfig);i++)
-	{
-	  aof_dbg << CurrentConfig[i] << " ";
-	}
-      aof_dbg <<endl;
-      aof_dbg.close();
-    }
-
 
   ODEBUG4("Size of m_GlobalVRMLIDtoConfiguration: " << m_GlobalVRMLIDtoConfiguration.size(),
 	  "DebugDataStartingCOM.dat");
