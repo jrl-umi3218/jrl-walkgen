@@ -1425,6 +1425,7 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
 		  X[0] << " " << X[N] << " " << 
 		  lkSP << " " << T , "DebugInterpol.dat");
 	}
+
       // Simulate the dynamical system
       xk = MAL_RET_A_by_B(m_A,xk) + Buk ;
       // Modif. from Dimitar: Initially a mistake regarding the ordering.
