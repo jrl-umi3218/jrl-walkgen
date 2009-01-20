@@ -591,12 +591,13 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
     }
       
   // Build a set of linear constraint inequalities.
+  /*  
   BuildLinearConstraintInequalities(LeftFootAbsolutePositions,
 				    RightFootAbsolutePositions,
 				    QueueOfLConstraintInequalities,
 				    ConstraintOnX,
 				    ConstraintOnY);
-
+  */
   deque<LinearConstraintInequality_t *>::iterator LCI_it;
   LCI_it = QueueOfLConstraintInequalities.begin();
   while(LCI_it!=QueueOfLConstraintInequalities.end())

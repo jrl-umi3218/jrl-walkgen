@@ -54,20 +54,6 @@ namespace PatternGeneratorJRL
     /* Default destructor. */
     ~ZMPConstrainedQPFastFormulation();
     
-    /*! This method builds a set of linear constraint inequalities based
-      on the foot trajectories given as an input.
-      The result is a set Linear Constraint Inequalities. */
-    int BuildLinearConstraintInequalities(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-					  deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					  deque<LinearConstraintInequality_t *> & QueueOfLConstraintInequalities,
-					  double ConstraintOnX,
-					  double ConstraintOnY);
-    int BuildLinearConstraintInequalities2(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-					   deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					   deque<LinearConstraintInequality_t *> & QueueOfLConstraintInequalities,
-					   double ConstraintOnX,
-					   double ConstraintOnY);
-    
 
       /** Generate ZMP discreatization from a vector of foot position.
 	  ASSUME A COMPLETE MOTION FROM END TO START, and GENERATE EVERY VALUE.
@@ -253,7 +239,7 @@ namespace PatternGeneratorJRL
     /*! Return \f$\beta\f$ */
     const double & GetBeta() const;
 
-    /*! Set \f$\Beta\f$ */
+    /*! Set \f$\beta\f$ */
     void SetBeta(const double &);
     
     /*! @}*/
