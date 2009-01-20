@@ -1,3 +1,35 @@
+ /* This object generate all the values for the foot trajectories,
+   and the desired ZMP based on a sequence of steps following a QP
+   formulation and a new QP solver as proposed by Dimitrov ICRA 2009.
+
+   Copyright (c) 2009, 
+   Olivier Stasse,
+
+   JRL-Japan, CNRS/AIST
+
+   All rights reserved.
+   
+   Redistribution and use in source and binary forms, with or without modification, 
+   are permitted provided that the following conditions are met:
+   
+   * Redistributions of source code must retain the above copyright notice, 
+   this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above copyright notice, 
+   this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+   * Neither the name of the CNRS/AIST nor the names of its contributors 
+   may be used to endorse or promote products derived from this software without specific prior written permission.
+   
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
+   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
+   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
+   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
+   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
+   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifdef UNIX
 #include <sys/time.h>
 #endif /* UNIX */
@@ -57,9 +89,11 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
 					 HumanoidSpecificities *aHS) :
   ZMPRefTrajectoryGeneration(lSPM)
 {
+  m_Q = 0;
   m_HS = aHS;
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
-
+  m_2DLIPM = new LinearizedInvertedPendulum2D();
+  
   // Register method to handle
   string aMethodName[1] = 
     {":setpbwconstraint"};
@@ -78,89 +112,78 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   m_QP_T = 0.02;
   m_QP_N = 75;
 
-  MAL_MATRIX_RESIZE(m_A,6,6);
-  MAL_MATRIX_RESIZE(m_B,6,1);
-  MAL_MATRIX_RESIZE(m_C,2,6);
-
   m_SamplingPeriod = 0.005;
 
+  m_ComHeight = 0.80;
+
+  /* Initialize  the 2D LIPM */
+  m_2DLIPM->SetSimulationControlPeriod(m_QP_T);
+  m_2DLIPM->SetRobotControlPeriod(m_SamplingPeriod);
+  m_2DLIPM->SetComHeight(m_ComHeight);
 }
 
 ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
 {
   if (m_ZMPD!=0)
     delete m_ZMPD;
+  if (m_2DLIPM!=0)
+    delete m_2DLIPM;
 }
 
-int ZMPConstraintedQPFastFormulation::InitializePbConstants()
+int ZMPConstrainedQPFastFormulation::InitializeMatrixPbConstants()
 {
-  MAL_MATRIX_RESIZE(m_PPu,2*N,2*N);
-  MAL_MATRIX_RESIZE(m_VPu,2*N,2*N);
-  MAL_MATRIX_RESIZE(m_PPx,2*N,6);
-  MAL_MATRIX_RESIZE(m_VPx,2*N,6);
-  MAL_MATRIX_RESIZE(m_Id,2*N,2*N);
+  MAL_MATRIX_RESIZE(m_PPu,2*m_QP_N,2*m_QP_N);
+  MAL_MATRIX_RESIZE(m_VPu,2*m_QP_N,2*m_QP_N);
+  MAL_MATRIX_RESIZE(m_PPx,2*m_QP_N,6);
+  MAL_MATRIX_RESIZE(m_VPx,2*m_QP_N,6);
 
-  for(unsigned int i=0;i<N;i++)
+  for(unsigned int i=0;i<m_QP_N;i++)
     {
       // Compute VPx and PPx
-      m_VPx(i,0)   = 0.0;   m_VPx(i,1) =     1.0; m_VPx(i,2)   = (i+1)*T;
+      m_VPx(i,0)   = 0.0;   m_VPx(i,1) =     1.0; m_VPx(i,2)   = (i+1)*m_QP_T;
       m_VPx(i,3)   = 0.0;   m_VPx(i,4) =     0.0; m_VPx(i,5)   = 0.0;
-      m_VPx(i+N,0) = 0.0;   m_VPx(i+N,1) =   0.0; m_VPx(i+N,2) = 0.0;
-      m_VPx(i+N,3) = 0.0;   m_VPx(i+N,4) =   1.0; m_VPx(i+N,5) = (i+1)*T;
+      m_VPx(i+m_QP_N,0) = 0.0;   m_VPx(i+m_QP_N,1) =   0.0; m_VPx(i+m_QP_N,2) = 0.0;
+      m_VPx(i+m_QP_N,3) = 0.0;   m_VPx(i+m_QP_N,4) =   1.0; m_VPx(i+m_QP_N,5) = (i+1)*m_QP_T;
 
-      m_PPx(i,0) = 1.0; m_PPx(i,1)     = (i+1)*T; m_PPx(i,2) = (i+1)*(i+1)*T*T*0.5;
+      m_PPx(i,0) = 1.0; m_PPx(i,1)     = (i+1)*m_QP_T; m_PPx(i,2) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
       m_PPx(i,3) = 0.0; m_PPx(i,4)     =       0; m_PPx(i,5) = 0.;
-      m_PPx(i+N,0) = 0.0; m_PPx(i+N,1) =     0.0; m_PPx(i+N,2) = 0.0;
-      m_PPx(i+N,3) = 1.0; m_PPx(i+N,4) = (i+1)*T; m_PPx(i+N,5) = (i+1)*(i+1)*T*T*0.5;
+      m_PPx(i+m_QP_N,0) = 0.0; m_PPx(i+m_QP_N,1) =     0.0; m_PPx(i+m_QP_N,2) = 0.0;
+      m_PPx(i+m_QP_N,3) = 1.0; m_PPx(i+m_QP_N,4) = (i+1)*m_QP_T; m_PPx(i+m_QP_N,5) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
       
       
-      for(unsigned int j=0;j<N;j++)
+      for(unsigned int j=0;j<m_QP_N;j++)
 	{
 	  m_PPu(i,j)=0;
 	  
 	  if (j<=i)
 	    {
 
-	      m_VPu(i,j)= (2*(i-j)+1)*T*T*0.5 ;
-	      m_VPu(i+N,j+N)= (2*(i-j)+1)*T*T*0.5 ;
-	      m_VPu(i,j+N)=0.0;
-	      m_VPu(i+N,j)=0.0;
+	      m_VPu(i,j)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ;
+	      m_VPu(i+m_QP_N,j+m_QP_N)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ;
+	      m_VPu(i,j+m_QP_N)=0.0;
+	      m_VPu(i+m_QP_N,j)=0.0;
 
-	      m_PPu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T*T*T/6.0;
-	      m_PPu(i+N,j+N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T*T*T/6.0;
-	      m_PPu(i,j+N)=0.0;
-	      m_PPu(i+N,j)=0.0;
+
+	      m_PPu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
+	      m_PPu(i+m_QP_N,j+m_QP_N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
+	      m_PPu(i,j+m_QP_N)=0.0;
+	      m_PPu(i+m_QP_N,j)=0.0;
 
 	    }
 	  else
 	    {
 
 	      m_VPu(i,j) = 0.0;
-	      m_VPu(i+N,j+N)=0.0;
-	      m_VPu(i,j+N)=0.0;
-	      m_VPu(i+N,j)=0.0;
+	      m_VPu(i+m_QP_N,j+m_QP_N)=0.0;
+	      m_VPu(i,j+m_QP_N)=0.0;
+	      m_VPu(i+m_QP_N,j)=0.0;
 
 	      m_PPu(i,j) = 0.0;
-	      m_PPu(i+N,j+N)=0.0;
-	      m_PPu(i,j+N)=0.0;
-	      m_PPu(i+N,j)=0.0;
+	      m_PPu(i+m_QP_N,j+m_QP_N)=0.0;
+	      m_PPu(i,j+m_QP_N)=0.0;
+	      m_PPu(i+m_QP_N,j)=0.0;
 
 	    }
-
-	  // Identity.
-	  if (i==j)
-	    {
-	      Id(i,j)=1.0;Id(i+N,j+N)=1.0;
-	      Id(i+N,j)=0.0;Id(i,j+N)=0.0;
-	    }
-	  else
-	    {
-	      Id(i,j)=0.0;Id(i+N,j+N)=0.0;
-	      Id(i+N,j)=0.0;Id(i,j+N)=0.0;
-	    }
-
-	  //	  Zeros(i,j)=0.0;Zeros(i+N,j+N)=0.0;
-	  //	  Zeros(i+N,j)=0.0;Zeros(i,j+N)=0.0;
 
 	}
     }
@@ -185,605 +208,144 @@ int ZMPConstraintedQPFastFormulation::InitializePbConstants()
       aof.close();
     }
 
-}
-
-// Assuming that the points are going counter-clockwise
-// and that the foot's interior is at the left of the points.
-// The result is : A [ Zx(k), Zy(k)]' + B  >=0
-int ZMPConstrainedQPFastFormulation::ComputeLinearSystem(vector<CH_Point> aVecOfPoints, 
-					     MAL_MATRIX(&A,double),
-					     MAL_MATRIX(&B,double))
-{
-  double a,b,c;
-  unsigned int n = aVecOfPoints.size();
-  MAL_MATRIX_RESIZE(A,aVecOfPoints.size(),2);
-  MAL_MATRIX_RESIZE(B,aVecOfPoints.size(),1);
-
-  // Dump a file to display on scilab .
-  // This should be removed during real usage inside a robot.
-  if (1)
-    {
-      ofstream aof;
-      aof.open("Constraints.dat",ofstream::app);
-      for(unsigned int i=0;i<n-1;i++)
-	{
-	  aof << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
-	      << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row << endl;
-	}
-      aof << aVecOfPoints[n-1].col << " " <<  aVecOfPoints[n-1].row << " "
-	  << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row << endl;
-      aof.close();
-    }
-  
-  for(unsigned int i=0;i<n-1;i++)
-    {
-      
-      ODEBUG("(x["<< i << "],y["<<i << "]): " << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
-	     << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row );
-
-      if (fabs(aVecOfPoints[i+1].col-aVecOfPoints[i].col)>1e-7)
-	{
-	  double y1,x1,y2,x2,lmul=-1.0;
-
-	  if (aVecOfPoints[i+1].col < aVecOfPoints[i].col)
-	    {
-	      lmul=1.0;
-	      y2 = aVecOfPoints[i].row;
-	      y1 = aVecOfPoints[i+1].row;
-	      x2 = aVecOfPoints[i].col;
-	      x1 = aVecOfPoints[i+1].col;
-	    }
-	  else
-	    {
-	      y2 = aVecOfPoints[i+1].row;
-	      y1 = aVecOfPoints[i].row;
-	      x2 = aVecOfPoints[i+1].col;
-	      x1 = aVecOfPoints[i].col;
-	    }
-	  
-	  
-	  a = (y2 - y1)/(x2-x1) ;
-	  b = (aVecOfPoints[i].row - a * aVecOfPoints[i].col);
-
-	  a = lmul*a;
-	  b = lmul*b;
-	  c= -lmul;
-	  
-
-	}
-      else
-	{
-	  c = 0.0;
-	  a = -1.0;	  
-	  b = aVecOfPoints[i+1].col;
-	  if (aVecOfPoints[i+1].row < aVecOfPoints[i].row)
-	    {
-	      a=-a;
-	      b=-b;
-	    }
-	}
-      
-      
-      A(i,0) = a; A(i,1)= c;
-      B(i,0) = b;
-
-    }
-  
-  ODEBUG("(x["<< n-1 << "],y["<< n-1 << "]): " << aVecOfPoints[n-1].col << " " <<  aVecOfPoints[n-1].row << " "
-	 << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row );
-  
-  if (fabs(aVecOfPoints[0].col-aVecOfPoints[n-1].col)>1e-7)
-    {
-      double y1,x1,y2,x2,lmul=-1.0;
-      
-      if (aVecOfPoints[0].col < aVecOfPoints[n-1].col)
-	{
-	  lmul=1.0;
-	  y2 = aVecOfPoints[n-1].row;
-	  y1 = aVecOfPoints[0].row;
-	  x2 = aVecOfPoints[n-1].col;
-	  x1 = aVecOfPoints[0].col;
-	}
-      else
-	{
-	  y2 = aVecOfPoints[0].row;
-	  y1 = aVecOfPoints[n-1].row;
-	  x2 = aVecOfPoints[0].col;
-	  x1 = aVecOfPoints[n-1].col;
-	  
-	}
-      
-      
-      a = (y2 - y1)/(x2-x1) ;
-      b = (aVecOfPoints[0].row - a * aVecOfPoints[0].col);
-      
-      a = lmul*a;
-      b = lmul*b;
-      c= -lmul;
-      
-    }
-  else
-    {
-      c = 0.0;
-      a = -1.0;	  
-      b = aVecOfPoints[0].col;
-      if (aVecOfPoints[0].row < aVecOfPoints[n-1].row)
-	{
-	  a=-a;
-	  b=-b;
-	}
-    }
-
-  
-  A(n-1,0) = a; A(n-1,1)= c;
-  B(n-1,0) = b;
-  
-  
-  ODEBUG("A: " << A );
-  ODEBUG("B: " << B);
-      
   return 0;
 }
 
-int ZMPConstrainedQPFastFormulation::BuildLinearConstraintInequalities2(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-							  deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-							  deque<LinearConstraintInequality_t *> &
-							  QueueOfLConstraintInequalities,
-							  double ConstraintOnX,
-							  double ConstraintOnY)
+int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction()
 {
-  // Find the convex hull for each of the position,
-  // in order to create the corresponding trajectory.
-  ComputeConvexHull aCH;
-  double lLeftFootHalfWidth,lLeftFootHalfHeight,
-    lRightFootHalfWidth,lRightFootHalfHeight,lZ;
-  
-  // Read humanoid specificities.
-  m_HS->GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight,lZ);
-  m_HS->GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight,lZ);
-  
-  lRightFootHalfWidth *= 0.5;
-  lRightFootHalfHeight *= 0.5;
-  lLeftFootHalfWidth *= 0.5;
-  lLeftFootHalfHeight *= 0.5;
+  MAL_MATRIX(OptA,double);
 
-  lLeftFootHalfHeight -= ConstraintOnY;
-  lRightFootHalfHeight -= ConstraintOnY;
+  //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
+  MAL_MATRIX(lterm1,double);
+  lterm1 = MAL_RET_TRANSPOSE(m_PPu);
+  lterm1 = MAL_RET_A_by_B(lterm1, m_PPu);
+  lterm1 = beta * lterm1;
 
-  lLeftFootHalfWidth -= ConstraintOnX;
-  lRightFootHalfWidth -= ConstraintOnX;
+  MAL_MATRIX(lterm2,double);
+  lterm2 = MAL_RET_TRANSPOSE(m_VPu);
+  lterm2 = MAL_RET_A_by_B(lterm2,m_VPu);
+  lterm2 = alpha * lterm2;
+
+  MAL_MATRIX_RESIZE(OptA,
+		    MAL_MATRIX_NB_ROWS(lterm1),
+		    MAL_MATRIX_NB_COLS(lterm1));
+  MAL_MATRIX_SET_IDENTITY(OptA);
+  OptA = OptA + lterm1 + lterm2;
   
-  if (LeftFootAbsolutePositions.size()!=
-      RightFootAbsolutePositions.size())
-    return -1;
-  
-  int State=0; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
-  // 3: Double Support.
-  int ComputeCH=0;
-  float lx=0.0, ly=0.0;
-  float lxcoefs[4] = { 1.0, 1.0, -1.0, -1.0};
-  float lycoefs[4] = {-1.0, 1.0,  1.0, -1.0};
+  m_Q=new double[4*m_QP_N*m_QP_N]; 
 
+  // Initialization of the matrice regarding the quadratic
+  // part of the objective function.
+  memset(C,0,4*m_QP_N*m_QP_N*sizeof(double));
+  for(unsigned int i=0;i<2*m_QP_N;i++)
+    m_Q[i*2*m_QP_N+i] = 1.0;
 
-  // Going through the set of generated data for each 5 ms.
-  // from this extract a set of linear constraints.
-  for(unsigned int i=0;i<LeftFootAbsolutePositions.size();i++)
+  if (Criteria==1)
     {
-      
-      ComputeCH=0;
-      // First check if we have to compute a convex hull
-      if (i==0)
+      for(unsigned int i=0;i<2*m_QP_N;i++)
+	for(unsigned int j=0;j<2*m_QP_N;j++)
+	  m_Q[j*2*m_QP_N+i] = OptA(i,j);
+
+
+      if (0)
 	{
-	  ComputeCH = 1;
-	  State=3;
-	}
-      // Double support
-      if (LeftFootAbsolutePositions[i].stepType>=10)
-	{
-	  if (State!=3)
-	    ComputeCH=1;
-	  State =3;
-	}
-      else
-	{
-	  if (LeftFootAbsolutePositions[i].z>0)
+	  ofstream aof;
+	  char Buffer[1024];
+	  sprintf(Buffer,"C.dat");
+	  aof.open(Buffer,ofstream::out);
+	  for(unsigned int i=0;i<2*N;i++)
 	    {
-	      if (State!=2)
-		ComputeCH=1;
-	      State=2;
+	      for(unsigned int j=0;j<2*N-1;j++)
+		aof << OptA(i,j) << " ";
+	      aof << OptA(i,2*N-1);
+	      aof << endl;
 	    }
-	  else if (RightFootAbsolutePositions[i].z>0)
-	    {
-	      if (State!=1)
-		ComputeCH=1;
-	      State=1;
-	    }
+	  aof.close(); 
 	  
-	}
+	}  
 
-      if (ComputeCH)
-	{
-	  vector<CH_Point> TheConvexHull;
-	  // Check if we are in a single or double support phase,
-	  // by testing the step type. In double support phase
-	  // the value is greater than or equal to 10.
-	  if (State==3)
-	    {
-	      // In this case the convex hull 
-	      TheConvexHull.resize(4);
-
-		      
-	      if (LeftFootAbsolutePositions[i].x<RightFootAbsolutePositions[i].x)
-		{
-		  TheConvexHull[0].col= RightFootAbsolutePositions[i].x +  lRightFootHalfWidth;
-		  TheConvexHull[1].col= RightFootAbsolutePositions[i].x +  lRightFootHalfWidth;
-		  TheConvexHull[2].col= LeftFootAbsolutePositions[i].x -  lLeftFootHalfWidth;
-		  TheConvexHull[3].col= LeftFootAbsolutePositions[i].x -  lLeftFootHalfWidth;
-		  
-		}
-	      else 
-		{
-		  TheConvexHull[0].col= LeftFootAbsolutePositions[i].x +  lLeftFootHalfWidth;
-		  TheConvexHull[1].col= LeftFootAbsolutePositions[i].x +  lLeftFootHalfWidth;
-		  TheConvexHull[2].col= RightFootAbsolutePositions[i].x -  lRightFootHalfWidth;
-		  TheConvexHull[3].col= RightFootAbsolutePositions[i].x -  lRightFootHalfWidth;
-
-		}
-
-
-	      if (LeftFootAbsolutePositions[i].y<RightFootAbsolutePositions[i].y)
-		{
-		  TheConvexHull[0].row= LeftFootAbsolutePositions[i].y - lLeftFootHalfHeight;
-		  TheConvexHull[1].row= RightFootAbsolutePositions[i].y +  lRightFootHalfHeight;
-		  TheConvexHull[2].row= RightFootAbsolutePositions[i].y +  lRightFootHalfHeight;
-		  TheConvexHull[3].row= LeftFootAbsolutePositions[i].y -  lLeftFootHalfHeight;
-		  
-		}
-	      else 
-		{
-		  TheConvexHull[0].row= RightFootAbsolutePositions[i].y -  lRightFootHalfHeight;
-		  TheConvexHull[1].row= LeftFootAbsolutePositions[i].y +  lLeftFootHalfHeight;
-		  TheConvexHull[2].row= LeftFootAbsolutePositions[i].y +  lLeftFootHalfHeight;
-		  TheConvexHull[3].row= RightFootAbsolutePositions[i].y -  lRightFootHalfHeight;
-
-		}
-
-	    }
-	  // In the second case, it is necessary to compute 
-	  // the support foot.
-	  else
-	    {
-	      
-	      TheConvexHull.resize(4);
-	      
-	      // Who is support foot ?
-	      if (LeftFootAbsolutePositions[i].z < RightFootAbsolutePositions[i].z)
-		{
-		  lx=LeftFootAbsolutePositions[i].x;
-		  ly=LeftFootAbsolutePositions[i].y;
-	      
-		  for(unsigned j=0;j<4;j++)
-		    {
-		      TheConvexHull[j].col = lx + lxcoefs[j]*  lLeftFootHalfWidth;
-		      TheConvexHull[j].row = ly + lycoefs[j]*  lLeftFootHalfHeight;
-		    }
-			      
-		}
-	      else
-		{
-		  lx=RightFootAbsolutePositions[i].x;
-		  ly=RightFootAbsolutePositions[i].y;
-		  
-		  for(unsigned j=0;j<4;j++)
-		    {
-		      TheConvexHull[j].col = lx + lxcoefs[j]*  lRightFootHalfWidth;
-		      TheConvexHull[j].row = ly + lycoefs[j]*  lRightFootHalfHeight;
-		    }
-		}
-	      
-	      
-	    }
-
-	  // Linear Constraint Inequality
-	  LinearConstraintInequality_t * aLCI = new LinearConstraintInequality_t;
-	  ComputeLinearSystem(TheConvexHull,aLCI->A, aLCI->B);
-	  aLCI->StartingTime = LeftFootAbsolutePositions[i].time;
-	  if (QueueOfLConstraintInequalities.size()>0)
-	    {
-	      QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
-
-	    }
-
-	  QueueOfLConstraintInequalities.push_back(aLCI);
-	  
-	  
-	  
-	}
-      if (i==LeftFootAbsolutePositions.size()-1)
-	{
-	  if (QueueOfLConstraintInequalities.size()>0)
-	    {
-	      QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
-	    }
-	}
     }
 
-  ODEBUG("Size of the 5 ms array: "<< LeftFootAbsolutePositions.size());
-  ODEBUG("Size of the queue of Linear Constraint Inequalities " << QueueOfLConstraintInequalities.size());
+  /*! Compute constants of the linear part of the objective function. */
+  lterm1 = MAL_RET_TRANSPOSE(m_PPu);
+  lterm1 = MAL_RET_A_by_B(lterm1,m_PPx);
+  m_OptB = MAL_RET_TRANSPOSE(m_VPu);
+  m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
+  m_OptB = alpha * OptB;
+  m_OptB = m_OptB + m_Beta * lterm1;
+
+  if (0)
+  {
+    ofstream aof;
+    char Buffer[1024];
+    sprintf(Buffer,"OptB.dat");
+    aof.open(Buffer,ofstream::out);
+    for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(OptB);i++)
+      {
+	for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(OptB)-1;j++)
+	  aof << OptB(i,j) << " ";
+	aof << OptB(i,MAL_MATRIX_NB_COLS(OptB)-1);
+	aof << endl;
+      }
+    aof.close(); 
+    
+  }
   
+  m_OptC = MAL_RET_TRANSPOSE(PPu);
+  m_OptC = beta * OptC;
+  if (0)
+  {
+    ofstream aof;
+    char Buffer[1024];
+    sprintf(Buffer,"OptC.dat");
+    aof.open(Buffer,ofstream::out);
+    for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(OptC);i++)
+      {
+	for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(OptC)-1;j++)
+	  aof << OptC(i,j) << " ";
+	aof << OptC(i,MAL_MATRIX_NB_COLS(OptC)-1);
+	aof << endl;
+      }
+    aof.close(); 
+    
+  }
+
   return 0;
 }
 
-int ZMPConstrainedQPFastFormulation::BuildLinearConstraintInequalities(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-							 deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-							 deque<LinearConstraintInequality_t *> &
-							 QueueOfLConstraintInequalities,
-							 double ConstraintOnX,
-							 double ConstraintOnY)
+
+int ZMPConstraintQPFastFormulation::InitConstants()
 {
-  // Find the convex hull for each of the position,
-  // in order to create the corresponding trajectory.
-  ComputeConvexHull aCH;
-  double lLeftFootHalfWidth,lLeftFootHalfHeight,
-    lRightFootHalfWidth,lRightFootHalfHeight,lZ;
-  
-  // Read humanoid specificities.
-  m_HS->GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight,lZ);
-  m_HS->GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight,lZ);
+  int r;
+  if ((r=InitializeMatrixPbConstants())<0)
+    return r;
 
-  lRightFootHalfWidth *= 0.5;
-  lRightFootHalfHeight *= 0.5;
-  lLeftFootHalfWidth *= 0.5;
-  lLeftFootHalfHeight *= 0.5;
-  
-  lLeftFootHalfHeight -= ConstraintOnY;
-  lRightFootHalfHeight -= ConstraintOnY;
+  if ((r=BuildingConstantPartOfTheObjectiveFunction())<0)
+    return r;
 
-  lLeftFootHalfWidth -= ConstraintOnX;
-  lRightFootHalfWidth -= ConstraintOnX;
-  
-  if (LeftFootAbsolutePositions.size()!=
-      RightFootAbsolutePositions.size())
-    return -1;
-  
-  int State=0; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
-  // 3: Double Support.
-  int ComputeCH=0;
-  float lx=0.0, ly=0.0;
-  float lxcoefs[4] = { 1.0, 1.0, -1.0, -1.0};
-  float lycoefs[4] = {-1.0, 1.0,  1.0, -1.0};
-  double prev_xmin=1e7, prev_xmax=-1e7, prev_ymin=1e7, prev_ymax=-1e7;
-  RESETDEBUG4("ConstraintMax.dat");
-
-  double s_t,c_t;
-
-  // Going through the set of generated data for each 5 ms.
-  // from this extract a set of linear constraints.
-  for(unsigned int i=0;i<LeftFootAbsolutePositions.size();i++)
-    {
-      
-      ComputeCH=0;
-      // First check if we have to compute a convex hull
-      if (i==0)
-	{
-	  ComputeCH = 1;
-	  State=3;
-	}
-      // Double support
-      if (LeftFootAbsolutePositions[i].stepType>=10)
-	{
-	  if (State!=3)
-	    ComputeCH=1;
-	  State =3;
-	}
-      else
-	{
-	  
-	  if (LeftFootAbsolutePositions[i].z>0)
-	    {
-	      if (State!=2)
-		ComputeCH=1;
-	      State=2;
-	    }
-	  else if (RightFootAbsolutePositions[i].z>0)
-	    {
-	      if (State!=1)
-		ComputeCH=1;
-	      State=1;
-	    }
-	  else if ((RightFootAbsolutePositions[i].z==0.0) &&
-		   (LeftFootAbsolutePositions[i].z==0.0))
-	    {
-	      if (State!=3)
-		ComputeCH=1;
-	      State=3;
-	    } 
-
-	  
-	}
-
-      if (ComputeCH)
-	{
-	  double xmin=1e7, xmax=-1e7, ymin=1e7, ymax=-1e7;
-
-	  ODEBUG("LeftFootAbsolutePositions[" << i << " ].theta= " << 
-		  LeftFootAbsolutePositions[i].theta);
-
-	  ODEBUG("RightFootAbsolutePositions[" << i << " ].theta= " << 
-		  RightFootAbsolutePositions[i].theta);
-	      
-	  vector<CH_Point> TheConvexHull;
-	  // Check if we are in a single or double support phase,
-	  // by testing the step type. In double support phase
-	  // the value is greater than or equal to 10.
-	  // In this case, we have to compute the convex hull
-	  // of both feet.
-	  if (State==3)
-	    {
-	      vector<CH_Point> aVecOfPoints;
-	      
-	      aVecOfPoints.resize(8);
-
-	      lx=LeftFootAbsolutePositions[i].x;
-	      ly=LeftFootAbsolutePositions[i].y;
-	      
-	      s_t = sin(LeftFootAbsolutePositions[i].theta*M_PI/180.0); 
-	      c_t = cos(LeftFootAbsolutePositions[i].theta*M_PI/180.0);  
-	      for(unsigned j=0;j<4;j++)
-		{
-		  aVecOfPoints[j].col = lx + ( lxcoefs[j] * lLeftFootHalfWidth 
-					       * c_t 
-					       - lycoefs[j] * 
-					       lLeftFootHalfHeight * s_t );
-		  aVecOfPoints[j].row = ly + ( lxcoefs[j] * lLeftFootHalfWidth 
-					       * s_t 
-					       + lycoefs[j] * 
-					       lLeftFootHalfHeight * c_t );
-
-
-		  // Computes the maxima.
-		  xmin = aVecOfPoints[j].col < xmin ? aVecOfPoints[j].col : xmin;
-		  xmax = aVecOfPoints[j].col > xmax ? aVecOfPoints[j].col : xmax;
-		  ymin = aVecOfPoints[j].row < ymin ? aVecOfPoints[j].row : ymin;
-		  ymax = aVecOfPoints[j].row > ymax ? aVecOfPoints[j].row : ymax;
-		  
-		}
-	      ODEBUG("State 3-1 " << xmin << " " << xmax << " " << ymin << " " << ymax);
-	      lx=RightFootAbsolutePositions[i].x;
-	      ly=RightFootAbsolutePositions[i].y;
-
-	      
-	      s_t = sin(RightFootAbsolutePositions[i].theta*M_PI/180.0); //+
-	      c_t = cos(RightFootAbsolutePositions[i].theta*M_PI/180.0); //+ 
-	      
-	      ODEBUG("Right Foot: " << lx << " " << ly << " " << RightFootAbsolutePositions[i].theta);
-	      for(unsigned j=0;j<4;j++)
-		{
-		  aVecOfPoints[j+4].col = lx + ( lxcoefs[j] * lRightFootHalfWidth
-						 * c_t - lycoefs[j] * 
-						 lRightFootHalfHeight * s_t ); 
-		  aVecOfPoints[j+4].row = ly + ( lxcoefs[j] * lRightFootHalfWidth
-						 * s_t + lycoefs[j] * 
-						 lRightFootHalfHeight * c_t );  
-		  // Computes the maxima.
-		  xmin = aVecOfPoints[j+4].col < xmin ? aVecOfPoints[j+4].col : xmin;
-		  xmax = aVecOfPoints[j+4].col > xmax ? aVecOfPoints[j+4].col : xmax;
-		  ymin = aVecOfPoints[j+4].row < ymin ? aVecOfPoints[j+4].row : ymin;
-		  ymax = aVecOfPoints[j+4].row > ymax ? aVecOfPoints[j+4].row : ymax;
-		  
-		}
-
-	      ODEBUG("State 3-2" << xmin << " " << xmax << " " << ymin << " " << ymax);
-	      aCH.DoComputeConvexHull(aVecOfPoints,TheConvexHull);
-	    }
-	  // In the second case, it is necessary to compute 
-	  // the support foot.
-	  else
-	    {
-	      
-	      TheConvexHull.resize(4);
-	      
-	      // Who is support foot ?
-	      if (LeftFootAbsolutePositions[i].z < RightFootAbsolutePositions[i].z)
-		{
-		  lx=LeftFootAbsolutePositions[i].x;
-		  ly=LeftFootAbsolutePositions[i].y;
-		  
-		  s_t = sin(LeftFootAbsolutePositions[i].theta*M_PI/180.0); 
-		  c_t = cos(LeftFootAbsolutePositions[i].theta*M_PI/180.0);
- 		  for(unsigned j=0;j<4;j++)
-		    {
-		      TheConvexHull[j].col = lx + 
-			( lxcoefs[j] * lLeftFootHalfWidth * c_t -
-			  lycoefs[j] * lLeftFootHalfHeight * s_t ); 
-		      TheConvexHull[j].row = ly + 
-			( lxcoefs[j] * lLeftFootHalfWidth * s_t + 
-			  lycoefs[j] * lLeftFootHalfHeight * c_t ); 
-		      // Computes the maxima.
-		      xmin = TheConvexHull[j].col < xmin ? TheConvexHull[j].col : xmin;
-		      xmax = TheConvexHull[j].col > xmax ? TheConvexHull[j].col : xmax;
-		      ymin = TheConvexHull[j].row < ymin ? TheConvexHull[j].row : ymin;
-		      ymax = TheConvexHull[j].row > ymax ? TheConvexHull[j].row : ymax;
-
-		    }
-		  ODEBUG("Left support foot");
-		}
-	      else
-		{
-		  lx=RightFootAbsolutePositions[i].x;
-		  ly=RightFootAbsolutePositions[i].y;
-		  s_t = sin(RightFootAbsolutePositions[i].theta*M_PI/180.0); 
-		  c_t = cos(RightFootAbsolutePositions[i].theta*M_PI/180.0);      
-		  for(unsigned j=0;j<4;j++)
-		    {
-		      TheConvexHull[j].col = lx + ( lxcoefs[j] * 
-						    lRightFootHalfWidth * c_t -
-						    lycoefs[j] * 
-						    lRightFootHalfHeight * s_t );
-		      TheConvexHull[j].row = ly + ( lxcoefs[j] * 
-						    lRightFootHalfWidth * s_t +
-						    lycoefs[j] * 
-						    lRightFootHalfHeight * c_t ); 
-		      // Computes the maxima.
-		      xmin = TheConvexHull[j].col < xmin ? TheConvexHull[j].col : xmin;
-		      xmax = TheConvexHull[j].col > xmax ? TheConvexHull[j].col : xmax;
-		      ymin = TheConvexHull[j].row < ymin ? TheConvexHull[j].row : ymin;
-		      ymax = TheConvexHull[j].row > ymax ? TheConvexHull[j].row : ymax;
-
-		    }
-		  ODEBUG("Right support foot");
-		}
-	      ODEBUG("State !=3 " << xmin << " " << xmax << " " << ymin << " " << ymax);
-	      
-	    }
-
-	  // Linear Constraint Inequality
-	  LinearConstraintInequality_t * aLCI = new LinearConstraintInequality_t;
-	  ComputeLinearSystem(TheConvexHull,aLCI->A, aLCI->B);
-	  aLCI->StartingTime = LeftFootAbsolutePositions[i].time;
-	  if (QueueOfLConstraintInequalities.size()>0)
-	    {
-	      QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
-	      ODEBUG4( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
-		       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
-		       prev_xmin << " "  <<
-		       prev_xmax << " "  <<
-		       prev_ymin << " "  <<
-		       prev_ymax
-		       ,"ConstraintMax.dat");
-
-	    }
-	  ODEBUG("Final " << xmin << " " << xmax << " " << ymin << " " << ymax);
-	  prev_xmin = xmin; prev_xmax = xmax;
-	  prev_ymin = ymin; prev_ymax = ymax;
-
-	  QueueOfLConstraintInequalities.push_back(aLCI);
-	  
-	  
-	  
-	}
-      if (i==LeftFootAbsolutePositions.size()-1)
-	{
-	  if (QueueOfLConstraintInequalities.size()>0)
-	    {
-	      QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
-	      ODEBUG4( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
-		       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
-		       prev_xmin << " "  <<
-		       prev_xmax << " "  <<
-		       prev_ymin << " "  <<
-		       prev_ymax
-		       ,"ConstraintMax.dat");
-
-	    }
-	}
-    }
-
-  ODEBUG("Size of the 5 ms array: "<< LeftFootAbsolutePositions.size());
-  ODEBUG("Size of the queue of Linear Constraint Inequalities " << QueueOfLConstraintInequalities.size());
-  
   return 0;
 }
+
+int ZMPConstrainedQPFastFormulation::SetAlpha(const double &anAlpha)
+{
+  m_Alpha = anAlpha;
+}
+
+const double & ZMPConstrainedQPFastFormulation::GetAlpha() const
+{
+  return m_Alpha;
+}
+
+int ZMPConstrainedQPFastFormulation::SetBeta(const double &anAlpha)
+{
+  m_Beta = anAlpha;
+}
+
+const double & ZMPConstrainedQPFastFormulation::GetBeta() const
+{
+  return m_Beta;
+}
+
 
 int ZMPConstrainedQPFastFormulation::BuildMatricesPxPu(double * & Px,double * &Pu, 
 						       unsigned N, double T,
@@ -957,23 +519,15 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 							    double T,
 							    unsigned int N)
 {
-  //  double T=0.02; 
-  //double T=0.02;
-  //  unsigned int N=75; 
-  //  unsigned int N = 100;
-  //  double ComHeight=0.814;
-  double ComHeight=0.80;
   double *Px=0,*Pu=0;
   unsigned int NbOfConstraints=8*N; // Nb of constraints to be taken into account
   // for each iteration
-  MAL_VECTOR(xk,double);MAL_VECTOR(Buk,double);MAL_VECTOR(zk,double);
+
   MAL_MATRIX(vnlPx,double); MAL_MATRIX(vnlPu,double);
   MAL_MATRIX(vnlValConstraint,double);
   MAL_MATRIX(vnlX,double);MAL_MATRIX(vnlStorePx,double);
   MAL_MATRIX(vnlStoreX,double);
   MAL_VECTOR(ConstraintNb,int);
-  MAL_MATRIX(Id,double);MAL_MATRIX(OptA,double);
-  MAL_MATRIX(OptB,double);MAL_MATRIX( OptC,double);
   MAL_VECTOR(ZMPRef,double);MAL_VECTOR(OptD,double);
 
 
@@ -982,18 +536,11 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 
 
   RESETDEBUG4("DebugInterpol.dat");
-
-
-
   MAL_VECTOR_RESIZE(ZMPRef,2*N);
   
   MAL_MATRIX_RESIZE(vnlX,2*N,1);
   
-  MAL_VECTOR_RESIZE(xk,6);
-  for(unsigned int i=0;i<6;i++)
-    xk[i] = 0.0;
-  MAL_VECTOR_RESIZE(Buk,6);
-  MAL_VECTOR_RESIZE(zk,2);
+
 
   int m = NbOfConstraints;
   int me= 0;
@@ -1002,7 +549,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   int nmax = 2*N; // Size of the matrix to compute the cost function.
   int mnn = m+n+n;
 
-  double *C=new double[4*N*N]; // Objective function matrix
+
   double *D=new double[2*N];   // Constant part of the objective function
   double *XL=new double[2*N];  // Lower bound of the jerk.
   double *XU=new double[2*N];  // Upper bound of the jerk.
@@ -1010,10 +557,6 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   double Eps=1e-8 ;
   double *U = (double *)malloc( sizeof(double)*mnn); // Returns the Lagrange multipliers.;
 
-  // Initialization of the matrices
-  memset(C,0,4*N*N*sizeof(double));
-  for(unsigned int i=0;i<2*N;i++)
-    C[i*2*N+i] = 1.0;
   
   int iout=0;
   int ifail;
@@ -1023,39 +566,6 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   int liwar = n; //
   int *iwar = new int[liwar]; // The Cholesky decomposition is done internally.
 
-
-  for(int i=0;i<6;i++)
-    {
-      m_B(i,0) = 0.0;
-      m_C(0,i) = 0.0;
-      m_C(1,i) = 0.0;
-      for(int j=0;j<6;j++)
-	m_A(i,j)=0.0;
-    }
-
-  m_A(0,0) = 1.0; m_A(0,1) =   T; m_A(0,2) = T*T/2.0;
-  m_A(1,0) = 0.0; m_A(1,1) = 1.0; m_A(1,2) = T;
-  m_A(2,0) = 0.0; m_A(2,1) = 0.0; m_A(2,2) = 1.0;
-  m_A(3,3) = 1.0; m_A(3,4) =   T; m_A(3,5) = T*T/2.0;
-  m_A(4,3) = 0.0; m_A(4,4) = 1.0; m_A(4,5) = T;
-  m_A(5,3) = 0.0; m_A(5,4) = 0.0; m_A(5,5) = 1.0;
-  
-
-  m_B(0,0) = T*T*T/6.0;
-  m_B(1,0) = T*T/2.0;
-  m_B(2,0) = T;
-  m_B(3,0) = T*T*T/6.0;
-  m_B(4,0) = T*T/2.0;
-  m_B(5,0) = T;
-
-  
-  m_C(0,0) = 1.0;
-  m_C(0,1) = 0.0;
-  m_C(0,2) = -ComHeight/9.81;
-
-  m_C(1,3) = 1.0;
-  m_C(1,4) = 0.0;
-  m_C(1,5) = -ComHeight/9.81;
 
   deque<LinearConstraintInequality_t *> QueueOfLConstraintInequalities;
   
@@ -1110,92 +620,6 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 		    1+(unsigned int)lSizeMat);
 
   // pre computes the matrices needed for the optimization.
-
-  //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
-  MAL_MATRIX(lterm1,double);
-  lterm1 = MAL_RET_TRANSPOSE(PPu);
-  lterm1 = MAL_RET_A_by_B(lterm1, PPu);
-  lterm1 = beta * lterm1;
-
-  MAL_MATRIX(lterm2,double);
-  lterm2 = MAL_RET_TRANSPOSE(VPu);
-  lterm2 = MAL_RET_A_by_B(lterm2, VPu);
-  lterm2 = alpha * lterm2;
-
-  MAL_MATRIX_RESIZE(OptA,
-		    MAL_MATRIX_NB_ROWS(lterm1),
-		    MAL_MATRIX_NB_COLS(lterm1));
-  MAL_MATRIX_SET_IDENTITY(OptA);
-  OptA = OptA + lterm1 + lterm2;
-
-
-
-  if (CriteriaToMaximize==1)
-    {
-      for(unsigned int i=0;i<2*N;i++)
-	for(unsigned int j=0;j<2*N;j++)
-	  C[j*2*N+i] = OptA(i,j);
-
-      if (0)
-	{
-	  ofstream aof;
-	  char Buffer[1024];
-	  sprintf(Buffer,"C.dat");
-	  aof.open(Buffer,ofstream::out);
-	  for(unsigned int i=0;i<2*N;i++)
-	    {
-	      for(unsigned int j=0;j<2*N-1;j++)
-		aof << OptA(i,j) << " ";
-	      aof << OptA(i,2*N-1);
-	      aof << endl;
-	    }
-	  aof.close(); 
-	  
-	}
-    }
-  
-  lterm1 = MAL_RET_TRANSPOSE(PPu);
-  lterm1 = MAL_RET_A_by_B(lterm1,PPx);
-  OptB = MAL_RET_TRANSPOSE(VPu);
-  OptB = MAL_RET_A_by_B(OptB,VPx);
-  OptB = alpha * OptB;
-  OptB = OptB + beta * lterm1;
-
-  if (0)
-  {
-    ofstream aof;
-    char Buffer[1024];
-    sprintf(Buffer,"OptB.dat");
-    aof.open(Buffer,ofstream::out);
-    for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(OptB);i++)
-      {
-	for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(OptB)-1;j++)
-	  aof << OptB(i,j) << " ";
-	aof << OptB(i,MAL_MATRIX_NB_COLS(OptB)-1);
-	aof << endl;
-      }
-    aof.close(); 
-    
-  }
-  
-  OptC = MAL_RET_TRANSPOSE(PPu);
-  OptC = beta * OptC;
-  if (0)
-  {
-    ofstream aof;
-    char Buffer[1024];
-    sprintf(Buffer,"OptC.dat");
-    aof.open(Buffer,ofstream::out);
-    for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(OptC);i++)
-      {
-	for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(OptC)-1;j++)
-	  aof << OptC(i,j) << " ";
-	aof << OptC(i,MAL_MATRIX_NB_COLS(OptC)-1);
-	aof << endl;
-      }
-    aof.close(); 
-    
-  }
   
   double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
   struct timeval start,end;
@@ -1252,8 +676,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       if (CriteriaToMaximize==1)
 	{
 	  MAL_VECTOR(lterm1v,double);
-	  MAL_C_eq_A_by_B(lterm1v,OptC,ZMPRef);
-	  MAL_C_eq_A_by_B(OptD,OptB,xk);
+	  MAL_C_eq_A_by_B(lterm1v,m_OptC,ZMPRef);
+	  MAL_C_eq_A_by_B(OptD,m_OptB,xk);
 	  OptD -= lterm1v;
 	  for(unsigned int i=0;i<2*N;i++)
 	    D[i] = OptD[i];
@@ -1369,92 +793,15 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	    
 	}
       ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
-
-      // Compute the command multiply 
-      Buk[0] = X[0]*m_B(0,0);
-      Buk[1] = X[0]*m_B(1,0);
-      Buk[2] = X[0]*m_B(2,0);
       
-      Buk[3] = X[N]*m_B(3,0);
-      Buk[4] = X[N]*m_B(4,0);
-      Buk[5] = X[N]*m_B(5,0);
-
-
-      // Fill the queues with the interpolated CoM values.
-      for(int lk=0;lk<interval;lk++)
-	{
-	  
-	  COMPosition aCOMPos;
-	  double lkSP;
-	  lkSP = (lk+1) * m_SamplingPeriod;
-
-	  aCOMPos.x[0] = 
-	    xk[0] + // Position
-	    lkSP * xk[1] +  // Speed
-	    0.5 * lkSP*lkSP * xk[2] +// Acceleration 
-	    lkSP * lkSP * lkSP * X[0] /6.0; // Jerk
-
-	  aCOMPos.x[1] = 
-	    xk[1] + // Speed
-	    lkSP * xk[2] +  // Acceleration
-	    0.5 * lkSP * lkSP * X[0]; // Jerk
-
-	  aCOMPos.x[2] = 
-	    xk[2] +  // Acceleration
-	    lkSP * X[0]; // Jerk
-
-	  aCOMPos.y[0] = 
-	    xk[3] + // Position
-	    lkSP * xk[4] +  // Speed
-	    0.5 * lkSP*lkSP * xk[5] + // Acceleration 
-	    lkSP * lkSP * lkSP * X[N] /6.0; // Jerk
-
-	  aCOMPos.y[1] = 
-	    xk[4] + // Speed
-	    lkSP * xk[5] +  // Acceleration
-	    0.5 * lkSP * lkSP * X[N]; // Jerk
-
-	  aCOMPos.y[2] = 
-	    xk[5] +  // Acceleration
-	    lkSP * X[N]; // Jerk
-
-	  aCOMPos.yaw = ZMPRefPositions[li*interval+lk].theta;
-
-	  COMPositions.push_back(aCOMPos);
-
-	  // Compute ZMP position and orientation.
-	  ZMPPosition aZMPPos;
-	  aZMPPos.px = m_C(0,0) * aCOMPos.x[0] +
-	    m_C(0,1) * aCOMPos.x[1] + m_C(0,2) * aCOMPos.x[2];
-	  
-	  aZMPPos.py = m_C(0,0) * aCOMPos.y[0] +
-	    m_C(0,1) * aCOMPos.y[1] + m_C(0,2) * aCOMPos.y[2];
-
-	  aZMPPos.theta = ZMPRefPositions[li*interval+lk].theta;
-	  aZMPPos.stepType = ZMPRefPositions[li*interval+lk].stepType;
-
-	  // Put it into the stack.
-	  NewFinalZMPPositions.push_back(aZMPPos);
-	  
-	  ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
-		  aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<
-		  aCOMPos.yaw << " " <<
-		  aZMPPos.px << " " << aZMPPos.py <<  " " << aZMPPos.theta << " " << 
-		  X[0] << " " << X[N] << " " << 
-		  lkSP << " " << T , "DebugInterpol.dat");
-	}
-
-      // Simulate the dynamical system
-      xk = MAL_RET_A_by_B(m_A,xk) + Buk ;
-      // Modif. from Dimitar: Initially a mistake regarding the ordering.
-      MAL_C_eq_A_by_B(zk,m_C,xk);
-
-      ODEBUG4(xk[0] << " " << xk[1] << " " << xk[2] << " " <<
-	      xk[3] << " " << xk[4] << " " << xk[5] << " " <<
-	      X[0]  << " " << X[N]  << " " << 
-	      zk[0] << " " << zk[1] << " " << 
-	      StartingTime
-	      ,"DebugPBW.dat");
+      // Calling this method will automatically 
+      // update the NewFinalZMPPositions.
+      m_2DLIPM->Interpolation(NewFinalZMPPositions,
+			      COMPositions,
+			      ZMPRefPositions,
+			      li*interval,
+			      X[0],X[N]);
+      
       ODEBUG6("uk:" << uk,"DebugPBW.dat");
       ODEBUG6("xk:" << xk,"DebugPBW.dat");
 

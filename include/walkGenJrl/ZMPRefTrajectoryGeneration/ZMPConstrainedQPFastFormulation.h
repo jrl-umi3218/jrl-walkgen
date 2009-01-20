@@ -1,7 +1,8 @@
-/* This object provides the .
+/* This object provides the generation of ZMP and CoM trajectory
+   using a new formulation of the stability problem.
 
-   Copyright (c) 2005-2007, 
-   Francois Keith, Olivier Stasse,
+   Copyright (c) 2005-2009, 
+   Olivier Stasse,Francois Keith
    
    JRL-Japan, CNRS/AIST
 
@@ -34,6 +35,7 @@
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
 #include <walkGenJrl/walkGenJrl_API.h>
+#include <walkGenJrl/PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <walkGenJrl/Mathematics/ConvexHull.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 
@@ -41,16 +43,16 @@ using namespace dynamicsJRLJapan;
 namespace PatternGeneratorJRL
 {
   class ZMPDiscretization;
-  class WALK_GEN_JRL_EXPORT ZMPConstrainedQPFastFormulation : public ZMPConstrainedQPFastFormulation
+  class WALK_GEN_JRL_EXPORT ZMPConstrainedQPFastFormulation : public ZMPRefTrajectoryGeneration
   {
     
   public:
 
     /* Default constructor. */
-    ZMPQPWithConstraint(SimplePluginManager *lSPM, string DataFile, HumanoidSpecificities *aHS=0);
+    ZMPConstrainedQPFastFormulation(SimplePluginManager *lSPM, string DataFile, HumanoidSpecificities *aHS=0);
 
     /* Default destructor. */
-    ~ZMPQPWithConstraint();
+    ~ZMPConstrainedQPFastFormulation();
     
     /*! This method builds a set of linear constraint inequalities based
       on the foot trajectories given as an input.
@@ -122,6 +124,32 @@ namespace PatternGeneratorJRL
 					     double ConstraintOnY,
 					     double T,
 					     unsigned int N);
+
+    /*! \name Methods to build the optimization problem 
+      @{
+     */
+
+    /*! \brief Compute the constant matrices over all the instances of the problem.
+      This means \f$P_{pu}, P_{px}, P_{vs}, P_{vu}\f$.
+      The necessary parameters to build those matrices are extracted from the
+      PreviewControl link.
+    */
+    int InitializeMatrixPbConstants();
+
+    /*! \brief This method does the same once the previous method has been called
+      to compute the static part of the optimization function. 
+      Assuming that the optimization function is of the form
+      \f$ min_{u_k} \frac{1}{2} u^{\top}_k Q u_k + p^{\top}_k u_k \f$
+      this method computes \f$Q\f$, the constant part of $p^{\top}_k$. 
+      
+    */
+    int BuildingConstantPartOfTheObjectiveFunction();
+
+    /*! \brief Call the two previous methods 
+      \return A negative value in case of a problem 0 otherwise.
+     */
+    int InitConstants();
+      
     
     /*! Build the necessary matrices for the QP problem under linear inequality constraints. */
     int BuildMatricesPxPu(double * &Px, double * &Pu,
@@ -141,10 +169,14 @@ namespace PatternGeneratorJRL
     /*! This method get the COM buffer computed by the QP in off-line mode. */
     void GetComBuffer(deque<COMPosition> &aCOMBuffer);
 
-    /*! Call method to handle the plugins. */
+    /*! @} */
+
+
+    /*! Call method to handle the plugins (SimplePlugin interface) . */
     void CallMethod(std::string &Method, std::istringstream &strm);
 
-    /*! Call method to handle on-line generation of ZMP reference trajectory. @{*/
+    /*! \name Call method to handle on-line generation of ZMP reference trajectory. 
+      @{*/
         
     /*! Methods for on-line generation. (First version)
       The queues will be updated as follows:
@@ -207,32 +239,44 @@ namespace PatternGeneratorJRL
     /*! \brief Return the time at which it is optimal to regenerate a step in online mode. 
      */
     int ReturnOptimalTimeToRegenerateAStep();
-      
+
+    /*! \name Setter and getter for the objective function parameters
+      @{
+    */
+
+    /*! Return \f$\alpha\f$ */
+    const double & GetAlpha() const;
+
+    /*! Set \f$\alpha\f$ */
+    void SetAlpha(const double &);
+
+    /*! Return \f$\beta\f$ */
+    const double & GetBeta() const;
+
+    /*! Set \f$\Beta\f$ */
+    void SetBeta(const double &);
+    
+    /*! @}*/
     /* @} */
 
   protected:
     /* ! Reference on the Humanoid Specificities. */
     HumanoidSpecificities * m_HS;
 
-    /* !  Matrices for the dynamical system. 
-       @{
-     */
-    /* ! Matrix regarding the state of the CoM (pos, velocity, acceleration) */
-    MAL_MATRIX(m_A,double);
-    /* ! Vector for the command */
-    MAL_MATRIX(m_B,double);
-    /* ! Vector for the ZMP. */
-    MAL_MATRIX(m_C,double);
-    /* ! @} */
-
     /*! Uses a ZMPDiscretization scheme to get the usual Kajita heuristic. */
     ZMPDiscretization * m_ZMPD;
 
+    /*! Uses a 2D LIPM to simulate the evolution of the robot. */
+    LinearizedInvertedPendulum2D * m_2DLIPM;
+	  
     /*! Stores the generated COM positions. */
     deque<COMPosition> m_COMBuffer;
 
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;
+    
+    /*! Com height */
+    double m_ComHeight;
 
     /*! Sampling of the QP. */
     double m_QP_T;
@@ -240,19 +284,35 @@ namespace PatternGeneratorJRL
     /*! Preview window */
     unsigned int m_QP_N;
 
-    /*! \name Varaibles related to the QP
+    /*! \name Variables related to the QP
       @{ */
-    /*! Matrix relating the command and the CoM position. */
+    /*! \brief Matrix relating the command and the CoM position. */
     MAL_MATRIX(m_PPu,double);
 
-    /*! Matrix relating the command and the CoM speed. */
+    /*! \brief Matrix relating the command and the CoM speed. */
     MAL_MATRIX(m_VPu,double); 
  
-    /*! Matrix relating the CoM state and the CoM position. */
+    /*! \brief Matrix relating the CoM state and the CoM position. */
     MAL_MATRIX(m_PPx,double);
 
-    /*! Matrix relating the CoM state and the CoM speed. */
+    /*! \brief Matrix relating the CoM state and the CoM speed. */
     MAL_MATRIX(m_VPx,double);
+
+    /*! \brief Matrix of the objective function $Q$ */
+    double *m_Q;
+
+    /*! \brief Sub matrix to compute the linear part of the objective function $p^{\top}_k$. */
+    MAL_MATRIX(m_OptB,double);
+    MAL_MATRIX(m_OptC,double);
+
+    /*! \name Parameters of the objective function 
+    @{ */
+    /*! Putting weight on the ZMP ref trajectory */
+    double m_Beta;
+
+    /*! Putting weight on the jerk minimization. */
+    double m_Alpha;
+    /*! @} */
     
     /*! @} */
   };

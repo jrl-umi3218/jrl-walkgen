@@ -27,9 +27,11 @@ SET(libwpg_src
 	./PreviewControl/PreviewControl.cpp 
 	./PreviewControl/OptimalControllerSolver.cpp 
 	./PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp 
+	./PreviewControl/LinearizedInvertedPendulum2D.cpp
 	./ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp 
+	./ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaFull.cpp 
