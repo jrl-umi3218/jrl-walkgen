@@ -138,7 +138,9 @@ namespace PatternGeneratorJRL
 
       /*! Setter for the control period of the robot (for interpolation) . */
       void SetRobotControlPeriod(const double &);
-      
+
+      /*! Get state. */
+      void GetState(MAL_VECTOR(,double) &lxk);
       /*! @} */
 
     };

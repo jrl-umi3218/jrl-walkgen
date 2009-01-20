@@ -130,6 +130,11 @@ void LinearizedInvertedPendulum2D::SetRobotControlPeriod(const double & aT)
   
 }
 
+void LinearizedInvertedPendulum2D::GetState(MAL_VECTOR(,double) &lxk)
+{
+  lxk = m_xk;
+}
+
 int LinearizedInvertedPendulum2D::InitializeSystem()
 {
   if (m_T==-1.0)
