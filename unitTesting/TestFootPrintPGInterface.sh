@@ -1,2 +1,6 @@
 #!/bin/bash
-./TestFootPrintPGInterface /home/stasse/src/OpenHRP/JRL/src/PatternGeneratorJRL/src/data/PreviewControlParameters.ini /home/stasse/src/OpenHRP/etc/HRP2JRL/ HRP2JRLmain.wrl /home/stasse/src/OpenHRP/JRL/src/PatternGeneratorJRL/src/data/HRP2Specificities.xml /home/stasse/src/OpenHRP/JRL/src/PatternGeneratorJRL/src/data/HRP2LinkJointRank.xml
+export HRP2JRLDIR=${HOME}/src/OpenHRP/Controller/IOserver/robot/HRP2JRL
+export ETCDIR=${HRP2JRLDIR}/etc
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PWD}/../src/
+echo $LD_LIBRARY_PATH
+./TestFootPrintPGInterface ${ETCDIR}/PreviewControlParameters.ini ${HRP2JRLDIR}/model/ HRP2JRLmain.wrl ${ETCDIR}/HRP2Specificities.xml ${ETCDIR}/HRP2LinkJointRank.xml

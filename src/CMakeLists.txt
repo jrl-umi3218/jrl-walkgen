@@ -24,6 +24,7 @@ SET(libwpg_src
 	./Mathematics/ConvexHull.cpp 
 	./Mathematics/qld.cpp 
 	./Mathematics/AnalyticalZMPCOGTrajectory.cpp 
+	./Mathematics/FootConstraintsAsLinearSystem.cpp
 	./PreviewControl/PreviewControl.cpp 
 	./PreviewControl/OptimalControllerSolver.cpp 
 	./PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp 

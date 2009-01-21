@@ -85,14 +85,20 @@ using namespace std;
 using namespace PatternGeneratorJRL;
 
 ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginManager *lSPM, 
-					 string DataFile,
-					 HumanoidSpecificities *aHS) :
+								 string DataFile,
+								 HumanoidSpecificities *aHS) :
   ZMPRefTrajectoryGeneration(lSPM)
 {
   m_Q = 0;
-  m_HS = aHS;
+
+  /*! Getting the ZMP reference from Kajita's heuristic. */
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
+
+  /*! For simulating the linearized inverted pendulum in 2D. */
   m_2DLIPM = new LinearizedInvertedPendulum2D();
+
+  /*! For computing the stability constraints from the feet positions. */
+  m_FCALS = new FootConstraintsAsLinearSystem(lSPM,aHS);
   
   // Register method to handle
   string aMethodName[1] = 
@@ -134,6 +140,9 @@ ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
 
   if (m_2DLIPM!=0)
     delete m_2DLIPM;
+
+  if (m_FCALS!=0)
+    delete m_FCALS;
 
   if (m_Q!=0)
     delete m_Q;
@@ -520,15 +529,17 @@ int ZMPConstrainedQPFastFormulation::BuildMatricesPxPu(double * & Px,double * &P
   return 0;
 }
 
-int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-							    deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-							    deque<ZMPPosition> &ZMPRefPositions,
-							    deque<ZMPPosition> &NewFinalZMPPositions,
-							    deque<COMPosition> &COMPositions,
-							    double ConstraintOnX,
-							    double ConstraintOnY,
-							    double T,
-							    unsigned int N)
+int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> 
+									  &LeftFootAbsolutePositions,
+									  deque<FootAbsolutePosition> 
+									  &RightFootAbsolutePositions,
+									  deque<ZMPPosition> &ZMPRefPositions,
+									  deque<ZMPPosition> &NewFinalZMPPositions,
+									  deque<COMPosition> &COMPositions,
+									  double ConstraintOnX,
+									  double ConstraintOnY,
+									  double T,
+									  unsigned int N)
 {
   double *Px=0,*Pu=0;
   unsigned int NbOfConstraints=8*N; // Nb of constraints to be taken into account
@@ -549,7 +560,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   
   MAL_MATRIX_RESIZE(vnlX,2*N,1);
   
-
+  
 
   int m = NbOfConstraints;
   int me= 0;
@@ -591,13 +602,12 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
     }
       
   // Build a set of linear constraint inequalities.
-  /*  
-  BuildLinearConstraintInequalities(LeftFootAbsolutePositions,
-				    RightFootAbsolutePositions,
-				    QueueOfLConstraintInequalities,
-				    ConstraintOnX,
-				    ConstraintOnY);
-  */
+  m_FCALS->BuildLinearConstraintInequalities(LeftFootAbsolutePositions,
+					     RightFootAbsolutePositions,
+					     QueueOfLConstraintInequalities,
+					     ConstraintOnX,
+					     ConstraintOnY);
+  
   deque<LinearConstraintInequality_t *>::iterator LCI_it;
   LCI_it = QueueOfLConstraintInequalities.begin();
   while(LCI_it!=QueueOfLConstraintInequalities.end())

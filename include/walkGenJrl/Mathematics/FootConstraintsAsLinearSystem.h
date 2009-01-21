@@ -34,6 +34,20 @@
 #ifndef _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_
 #define _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_
 
+#include <vector>
+#include <deque>
+#include <string>
+#include <sstream>
+
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+
+#include <dynamicsJRLJapan/HumanoidSpecificities.h>
+
+#include <walkGenJrl/walkGenJrl_API.h>
+#include <walkGenJrl/PGTypes.h>
+#include <walkGenJrl/Mathematics/ConvexHull.h>
+#include <walkGenJrl/SimplePlugin.h>
+
 namespace PatternGeneratorJRL
 {
   /*! This class generates matrix representation of linear
@@ -46,7 +60,8 @@ namespace PatternGeneratorJRL
     public:
 
       /*! Constructor */
-      FootConstraintsAsLinearSystem();
+      FootConstraintsAsLinearSystem(SimplePluginManager *aSPM, 
+				    dynamicsJRLJapan::HumanoidSpecificities *aHS);
 
       /*! Destructor */
       ~FootConstraintsAsLinearSystem();
@@ -55,22 +70,38 @@ namespace PatternGeneratorJRL
 	set of points specified by aVecOfPoints. aVecOfPoints is supposed to represent
 	the convex hull of the robot contact points with the ground.
        */
-      int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
+      int ComputeLinearSystem(std::vector<CH_Point> aVecOfPoints,
 			      MAL_MATRIX(&A,double),
 			      MAL_MATRIX(&B,double));
 
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
 	Position.
        */
-      int BuildLinearConstraintInequalities(deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
-					    deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					    deque<LinearConstraintInequality_t *> &
+      int BuildLinearConstraintInequalities(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
+					    std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+					    std::deque<LinearConstraintInequality_t *> &
 					    QueueOfLConstraintInequalities,
 					    double ConstraintOnX,
 					    double ConstraintOnY);
 
+      /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute Position.  */
+      int BuildLinearConstraintInequalities2(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
+					     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+					     std::deque<LinearConstraintInequality_t *> &
+					     QueueOfLConstraintInequalities,
+					     double ConstraintOnX,
+					     double ConstraintOnY);
+
+      /*! Reimplement the interface of SimplePluginManager 
+	\param[in] Method: The method to be called.
+	\param[in] Args: Arguments of the methods.
+       */
+      virtual void CallMethod(std::string & Method, std::istringstream &Args);
+
     private:
-      
+
+      /* ! Reference on the Humanoid Specificities. */
+      dynamicsJRLJapan::HumanoidSpecificities * m_HS;
       
     };
 };

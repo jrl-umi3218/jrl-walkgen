@@ -36,7 +36,7 @@
 
 #include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PreviewControl/LinearizedInvertedPendulum2D.h>
-#include <walkGenJrl/Mathematics/ConvexHull.h>
+#include <walkGenJrl/Mathematics/FootConstraintsAsLinearSystem.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 
 using namespace dynamicsJRLJapan;
@@ -245,16 +245,19 @@ namespace PatternGeneratorJRL
     /*! @}*/
     /* @} */
 
-  protected:
-    /* ! Reference on the Humanoid Specificities. */
-    HumanoidSpecificities * m_HS;
+  private:
 
     /*! Uses a ZMPDiscretization scheme to get the usual Kajita heuristic. */
     ZMPDiscretization * m_ZMPD;
 
     /*! Uses a 2D LIPM to simulate the evolution of the robot. */
     LinearizedInvertedPendulum2D * m_2DLIPM;
-	  
+
+    /*! \brief Object creating Linear inequalities constraints 
+      based on the foot position. Those constraints are *NOT* the
+      one put in the QP, but they are a necessary intermediate step. */
+    FootConstraintsAsLinearSystem * m_FCALS;
+      
     /*! Stores the generated COM positions. */
     deque<COMPosition> m_COMBuffer;
 
