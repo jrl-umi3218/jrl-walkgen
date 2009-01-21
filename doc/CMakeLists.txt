@@ -19,7 +19,7 @@ CONFIGURE_FILE(${${PROJECT_NAME}_SOURCE_DIR}/doc/package.dox.cmake
 
 
 ADD_CUSTOM_COMMAND(OUTPUT ${${PROJECT_NAME}_SOURCE_DIR}/doc/html/index.html
-                   COMMAND ${DOXYGEN_EXECUTABLE} ${${PROJECT_NAME}_SOURCE_DIR}/doc/package.dox
+                   COMMAND ${DOXYGEN_EXECUTABLE} \"${${PROJECT_NAME}_SOURCE_DIR}/doc/package.dox\"
                    DEPENDS ${docfiles}
 )
 
