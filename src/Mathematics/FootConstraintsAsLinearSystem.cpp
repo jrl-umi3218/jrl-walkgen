@@ -32,6 +32,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <jrlMathTools/jrlConstants.h>
+
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
 #include <walkGenJrl/Mathematics/FootConstraintsAsLinearSystem.h>
