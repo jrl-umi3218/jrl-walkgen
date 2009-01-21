@@ -112,6 +112,10 @@ ZMPQPWithConstraint::~ZMPQPWithConstraint()
     delete m_ZMPD;
 }
 
+void ZMPQPWithConstraint::SetPreviewControl(PreviewControl *aPC)
+{
+  m_ZMPD->SetPreviewControl(aPC);
+}
 
 // Assuming that the points are going counter-clockwise
 // and that the foot's interior is at the left of the points.
@@ -1622,6 +1626,18 @@ void ZMPQPWithConstraint::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions
   
   for(unsigned int i=0;i<ZMPPositions.size();i++)
     ZMPPositions[i] = NewZMPPositions[i];
+
+  if (1)
+    {
+      ofstream aof;
+      aof.open("DebugPBWZMP.dat",ofstream::out);
+      for(unsigned int i=0;i<ZMPPositions.size();i++)
+	{
+	  aof << ZMPPositions[i].px << " " << ZMPPositions[i].py << endl;
+	}
+      aof.close();
+      
+    }
   
 }
 

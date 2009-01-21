@@ -102,7 +102,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   
   // Register method to handle
   string aMethodName[1] = 
-    {":setpbwconstraint"};
+    {":setdimitrovconstraint"};
   
   for(int i=0;i<1;i++)
     {
@@ -129,6 +129,8 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
 
   m_Alpha = 200.0;
   m_Beta = 1000.0;
+  
+  InitConstants();
 
 }
 
@@ -146,6 +148,11 @@ ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
 
   if (m_Q!=0)
     delete m_Q;
+}
+
+void ZMPConstrainedQPFastFormulation::SetPreviewControl(PreviewControl *aPC)
+{
+  m_ZMPD->SetPreviewControl(aPC);
 }
 
 int ZMPConstrainedQPFastFormulation::InitializeMatrixPbConstants()
@@ -541,6 +548,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 									  double T,
 									  unsigned int N)
 {
+
   double *Px=0,*Pu=0;
   unsigned int NbOfConstraints=8*N; // Nb of constraints to be taken into account
   // for each iteration
@@ -550,7 +558,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   MAL_MATRIX(vnlX,double);MAL_MATRIX(vnlStorePx,double);
   MAL_MATRIX(vnlStoreX,double);
   MAL_VECTOR(ConstraintNb,int);
-  MAL_VECTOR(ZMPRef,double);MAL_VECTOR(OptD,double);
+  MAL_VECTOR(ZMPRef,double);
+  MAL_VECTOR_DIM(OptD,double,2*N);
 
   int CriteriaToMaximize=1;
 
@@ -703,6 +712,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	{
 	  MAL_VECTOR(lterm1v,double);
 	  MAL_C_eq_A_by_B(lterm1v,m_OptC,ZMPRef);
+	  MAL_VECTOR_RESIZE(OptD,2*N);
 	  MAL_C_eq_A_by_B(OptD,m_OptB,xk);
 	  OptD -= lterm1v;
 	  for(unsigned int i=0;i<2*N;i++)
@@ -936,15 +946,15 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 
 
 void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
-					       deque<COMPosition> & COMPositions,
-					       deque<RelativeFootPosition> &RelativeFootPositions,
-					       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-					       deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					       double Xmax,
-					       COMPosition & lStartingCOMPosition,
-					       MAL_S3_VECTOR(&,double) lStartingZMPPosition,
-					       FootAbsolutePosition & InitLeftFootAbsolutePosition,
-					       FootAbsolutePosition & InitRightFootAbsolutePosition)
+							   deque<COMPosition> & COMPositions,
+							   deque<RelativeFootPosition> &RelativeFootPositions,
+							   deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+							   deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+							   double Xmax,
+							   COMPosition & lStartingCOMPosition,
+							   MAL_S3_VECTOR(&,double) lStartingZMPPosition,
+							   FootAbsolutePosition & InitLeftFootAbsolutePosition,
+							   FootAbsolutePosition & InitRightFootAbsolutePosition)
 {
   if (m_ZMPD==0)
     return;
@@ -961,8 +971,8 @@ void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & 
 			       InitRightFootAbsolutePosition);
 
   deque<ZMPPosition> NewZMPPositions;
-  ODEBUG("PBW algo set on");
-  ODEBUG("Size of COMBuffer: " << m_COMBuffer.size());
+  ODEBUG3("Dimitrov algo set on");
+  ODEBUG3("Size of COMBuffer: " << m_COMBuffer.size());
   m_COMBuffer.clear();
 
   BuildZMPTrajectoryFromFootTrajectory(LeftFootAbsolutePositions,
@@ -982,12 +992,24 @@ void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & 
   
   for(unsigned int i=0;i<ZMPPositions.size();i++)
     ZMPPositions[i] = NewZMPPositions[i];
+
+  if (1)
+    {
+      ofstream aof;
+      aof.open("DebugDimitrovZMP.dat",ofstream::out);
+      for(unsigned int i=0;i<ZMPPositions.size();i++)
+	{
+	  aof << ZMPPositions[i].px << " " << ZMPPositions[i].py << endl;
+	}
+      aof.close();
+      
+    }
   
 }
 
 void ZMPConstrainedQPFastFormulation::CallMethod(std::string & Method, std::istringstream &strm)
 {
-  if (Method==":setpbwconstraint")
+  if (Method==":setdimitrovconstraint")
     {
       string PBWCmd;
       strm >> PBWCmd;

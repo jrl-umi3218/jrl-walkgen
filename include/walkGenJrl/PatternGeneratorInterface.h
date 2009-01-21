@@ -56,6 +56,7 @@
 
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.h>
+#include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.h>
 
 #include <walkGenJrl/MotionGeneration/ComAndFootRealizationByGeometry.h>
@@ -412,6 +413,9 @@ namespace PatternGeneratorJRL
 
     /*! QP formulation with constraints. */
     ZMPQPWithConstraint * m_ZMPQP;
+
+    /*! QP formulation with constraints. */
+    ZMPConstrainedQPFastFormulation * m_ZMPCQPFF;
     
     /*! ZMP and CoM trajectories generation from an analytical formulation */
     AnalyticalMorisawaCompact * m_ZMPM;
@@ -585,6 +589,9 @@ namespace PatternGeneratorJRL
 
     /*! Using the analytical solution proposed by Morisawa in 2007. */
     static const int ZMPCOM_MORISAWA_2007=3;
+
+    /*! Using the QP constrained problem resolution proposed by Dimitrov in 2008. */
+    static const int ZMPCOM_DIMITROV_2008=4;
     
     /*! @} */
     /*! @} */

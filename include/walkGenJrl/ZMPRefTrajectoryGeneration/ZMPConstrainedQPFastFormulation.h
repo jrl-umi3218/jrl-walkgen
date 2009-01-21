@@ -29,8 +29,8 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _ZMPQP_WITH_CONSTRAINT_H_
-#define _ZMPQP_WITH_CONSTRAINT_H_
+#ifndef _ZMPCONSTRAINEDQPFASTFORMULATION_WITH_CONSTRAINT_H_
+#define _ZMPCONSTRAINEDQPFASTFORMULATION_WITH_CONSTRAINT_H_
 
 #include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
@@ -244,6 +244,9 @@ namespace PatternGeneratorJRL
     
     /*! @}*/
     /* @} */
+    
+    /*! Set the preview control object. */
+    void SetPreviewControl(PreviewControl *aPC);
 
   private:
 

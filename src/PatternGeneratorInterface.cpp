@@ -242,6 +242,9 @@ namespace PatternGeneratorJRL {
     // ZMP and CoM generation using the method proposed in Wieber2006.
     m_ZMPQP = new ZMPQPWithConstraint(this,"",m_HumanoidDynamicRobot->getHumanoidSpecificities());
 
+    // ZMP and CoM generation using the method proposed in Dimitrov2008.
+    m_ZMPCQPFF = new ZMPConstrainedQPFastFormulation(this,"",m_HumanoidDynamicRobot->getHumanoidSpecificities());
+
     // ZMP and CoM generation using the analytical method proposed in Morisawa2007.
     m_ZMPM = new AnalyticalMorisawaCompact(this);
     m_ZMPM->SetHumanoidSpecificities(m_HumanoidDynamicRobot->getHumanoidSpecificities());
@@ -320,6 +323,11 @@ namespace PatternGeneratorJRL {
 
     m_ZMPQP->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+    m_ZMPQP->SetPreviewControl(m_PC);
+
+    m_ZMPCQPFF->SetSamplingPeriod(m_PC->SamplingPeriod());
+    m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+    m_ZMPCQPFF->SetPreviewControl(m_PC);
     
     m_ZMPM->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPM->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
@@ -402,6 +410,9 @@ namespace PatternGeneratorJRL {
 
     if (m_ZMPQP!=0)
       delete m_ZMPQP;
+
+    if (m_ZMPCQPFF!=0)
+      delete m_ZMPCQPFF;
     ODEBUG4("Destructor: did m_ZMPQP","DebugPGI.txt");
 
     if (m_ZMPM!=0)
@@ -1064,6 +1075,7 @@ namespace PatternGeneratorJRL {
   {
     string ZMPTrajAlgo;
     strm >> ZMPTrajAlgo;
+    cout << "ZMPTrajAlgo: " << ZMPTrajAlgo<<endl;
     if (ZMPTrajAlgo=="PBW")
       {
 	m_AlgorithmforZMPCOM = ZMPCOM_WIEBER_2006;
@@ -1079,6 +1091,12 @@ namespace PatternGeneratorJRL {
 	m_AlgorithmforZMPCOM = ZMPCOM_MORISAWA_2007;
 	m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	m_CoMAndFootOnlyStrategy->SetTheLimitOfTheBuffer(m_ZMPM->ReturnOptimalTimeToRegenerateAStep());
+      }
+    else if (ZMPTrajAlgo=="Dimitrov")
+      {
+	m_AlgorithmforZMPCOM = ZMPCOM_DIMITROV_2008;
+	m_GlobalStrategyManager = m_DoubleStagePCStrategy;
+	cout << "DIMITROV" << endl;
       }
   }
 
@@ -2039,6 +2057,20 @@ namespace PatternGeneratorJRL {
 				      lStartingZMPPosition,
 				      InitLeftFootAbsPos,
 				      InitRightFootAbsPos);      
+	//m_ZMPQP->GetComBuffer(m_COMBuffer);
+      }    
+    else if (m_AlgorithmforZMPCOM==ZMPCOM_DIMITROV_2008)
+      {
+	m_COMBuffer.clear();
+	m_ZMPCQPFF->GetZMPDiscretization(m_ZMPPositions,
+					 m_COMBuffer,
+					 lRelativeFootPositions,
+					 m_LeftFootPositions,
+					 m_RightFootPositions,
+					 m_Xmax, lStartingCOMPosition,
+					 lStartingZMPPosition,
+					 InitLeftFootAbsPos,
+					 InitRightFootAbsPos);      
 	//m_ZMPQP->GetComBuffer(m_COMBuffer);
       }    
     else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)

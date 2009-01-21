@@ -210,6 +210,9 @@ namespace PatternGeneratorJRL
       
     /* @} */
 
+    /*! Set the preview control object. */
+    void SetPreviewControl(PreviewControl *aPC);
+
   protected:
     /* ! Reference on the Humanoid Specificities. */
     HumanoidSpecificities * m_HS;
