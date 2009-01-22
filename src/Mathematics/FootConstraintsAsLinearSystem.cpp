@@ -82,6 +82,7 @@ FootConstraintsAsLinearSystem::FootConstraintsAsLinearSystem(SimplePluginManager
   SimplePlugin(aSPM)
 {
   m_HS = aHS;
+  RESETDEBUG4("Constraints-FCSALS.dat");
 }
 
 FootConstraintsAsLinearSystem::~FootConstraintsAsLinearSystem()
@@ -92,8 +93,8 @@ FootConstraintsAsLinearSystem::~FootConstraintsAsLinearSystem()
 // and that the foot's interior is at the left of the points.
 // The result is : A [ Zx(k), Zy(k)]' + B  >=0
 int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPoints, 
-					     MAL_MATRIX(&A,double),
-					     MAL_MATRIX(&B,double))
+						       MAL_MATRIX(&A,double),
+						       MAL_MATRIX(&B,double))
 {
   double a,b,c;
   unsigned int n = aVecOfPoints.size();
@@ -102,10 +103,10 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
 
   // Dump a file to display on scilab .
   // This should be removed during real usage inside a robot.
-  if (1)
+  if (0)
     {
       ofstream aof;
-      aof.open("Constraints.dat",ofstream::app);
+      aof.open("Constraints-FCSALS.dat",ofstream::app);
       for(unsigned int i=0;i<n-1;i++)
 	{
 	  aof << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
@@ -227,197 +228,6 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
 }
 
 int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(deque<FootAbsolutePosition> 
-								     &LeftFootAbsolutePositions,
-								     deque<FootAbsolutePosition> 
-								     &RightFootAbsolutePositions,
-								     deque<LinearConstraintInequality_t *> &
-								     QueueOfLConstraintInequalities,
-								     double ConstraintOnX,
-								     double ConstraintOnY)
-{
-  // Find the convex hull for each of the position,
-  // in order to create the corresponding trajectory.
-  ComputeConvexHull aCH;
-  double lLeftFootHalfWidth,lLeftFootHalfHeight,
-    lRightFootHalfWidth,lRightFootHalfHeight,lZ;
-  
-  // Read humanoid specificities.
-  m_HS->GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight,lZ);
-  m_HS->GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight,lZ);
-  
-  lRightFootHalfWidth *= 0.5;
-  lRightFootHalfHeight *= 0.5;
-  lLeftFootHalfWidth *= 0.5;
-  lLeftFootHalfHeight *= 0.5;
-
-  lLeftFootHalfHeight -= ConstraintOnY;
-  lRightFootHalfHeight -= ConstraintOnY;
-
-  lLeftFootHalfWidth -= ConstraintOnX;
-  lRightFootHalfWidth -= ConstraintOnX;
-  
-  if (LeftFootAbsolutePositions.size()!=
-      RightFootAbsolutePositions.size())
-    return -1;
-  
-  int State=0; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
-  // 3: Double Support.
-  int ComputeCH=0;
-  float lx=0.0, ly=0.0;
-  float lxcoefs[4] = { 1.0, 1.0, -1.0, -1.0};
-  float lycoefs[4] = {-1.0, 1.0,  1.0, -1.0};
-
-
-  // Going through the set of generated data for each 5 ms.
-  // from this extract a set of linear constraints.
-  for(unsigned int i=0;i<LeftFootAbsolutePositions.size();i++)
-    {
-      
-      ComputeCH=0;
-      // First check if we have to compute a convex hull
-      if (i==0)
-	{
-	  ComputeCH = 1;
-	  State=3;
-	}
-      // Double support
-      if (LeftFootAbsolutePositions[i].stepType>=10)
-	{
-	  if (State!=3)
-	    ComputeCH=1;
-	  State =3;
-	}
-      else
-	{
-	  if (LeftFootAbsolutePositions[i].z>0)
-	    {
-	      if (State!=2)
-		ComputeCH=1;
-	      State=2;
-	    }
-	  else if (RightFootAbsolutePositions[i].z>0)
-	    {
-	      if (State!=1)
-		ComputeCH=1;
-	      State=1;
-	    }
-	  
-	}
-
-      if (ComputeCH)
-	{
-	  vector<CH_Point> TheConvexHull;
-	  // Check if we are in a single or double support phase,
-	  // by testing the step type. In double support phase
-	  // the value is greater than or equal to 10.
-	  if (State==3)
-	    {
-	      // In this case the convex hull 
-	      TheConvexHull.resize(4);
-
-		      
-	      if (LeftFootAbsolutePositions[i].x<RightFootAbsolutePositions[i].x)
-		{
-		  TheConvexHull[0].col= RightFootAbsolutePositions[i].x +  lRightFootHalfWidth;
-		  TheConvexHull[1].col= RightFootAbsolutePositions[i].x +  lRightFootHalfWidth;
-		  TheConvexHull[2].col= LeftFootAbsolutePositions[i].x -  lLeftFootHalfWidth;
-		  TheConvexHull[3].col= LeftFootAbsolutePositions[i].x -  lLeftFootHalfWidth;
-		  
-		}
-	      else 
-		{
-		  TheConvexHull[0].col= LeftFootAbsolutePositions[i].x +  lLeftFootHalfWidth;
-		  TheConvexHull[1].col= LeftFootAbsolutePositions[i].x +  lLeftFootHalfWidth;
-		  TheConvexHull[2].col= RightFootAbsolutePositions[i].x -  lRightFootHalfWidth;
-		  TheConvexHull[3].col= RightFootAbsolutePositions[i].x -  lRightFootHalfWidth;
-
-		}
-
-
-	      if (LeftFootAbsolutePositions[i].y<RightFootAbsolutePositions[i].y)
-		{
-		  TheConvexHull[0].row= LeftFootAbsolutePositions[i].y - lLeftFootHalfHeight;
-		  TheConvexHull[1].row= RightFootAbsolutePositions[i].y +  lRightFootHalfHeight;
-		  TheConvexHull[2].row= RightFootAbsolutePositions[i].y +  lRightFootHalfHeight;
-		  TheConvexHull[3].row= LeftFootAbsolutePositions[i].y -  lLeftFootHalfHeight;
-		  
-		}
-	      else 
-		{
-		  TheConvexHull[0].row= RightFootAbsolutePositions[i].y -  lRightFootHalfHeight;
-		  TheConvexHull[1].row= LeftFootAbsolutePositions[i].y +  lLeftFootHalfHeight;
-		  TheConvexHull[2].row= LeftFootAbsolutePositions[i].y +  lLeftFootHalfHeight;
-		  TheConvexHull[3].row= RightFootAbsolutePositions[i].y -  lRightFootHalfHeight;
-
-		}
-
-	    }
-	  // In the second case, it is necessary to compute 
-	  // the support foot.
-	  else
-	    {
-	      
-	      TheConvexHull.resize(4);
-	      
-	      // Who is support foot ?
-	      if (LeftFootAbsolutePositions[i].z < RightFootAbsolutePositions[i].z)
-		{
-		  lx=LeftFootAbsolutePositions[i].x;
-		  ly=LeftFootAbsolutePositions[i].y;
-	      
-		  for(unsigned j=0;j<4;j++)
-		    {
-		      TheConvexHull[j].col = lx + lxcoefs[j]*  lLeftFootHalfWidth;
-		      TheConvexHull[j].row = ly + lycoefs[j]*  lLeftFootHalfHeight;
-		    }
-			      
-		}
-	      else
-		{
-		  lx=RightFootAbsolutePositions[i].x;
-		  ly=RightFootAbsolutePositions[i].y;
-		  
-		  for(unsigned j=0;j<4;j++)
-		    {
-		      TheConvexHull[j].col = lx + lxcoefs[j]*  lRightFootHalfWidth;
-		      TheConvexHull[j].row = ly + lycoefs[j]*  lRightFootHalfHeight;
-		    }
-		}
-	      
-	      
-	    }
-
-	  // Linear Constraint Inequality
-	  LinearConstraintInequality_t * aLCI = new LinearConstraintInequality_t;
-	  ComputeLinearSystem(TheConvexHull,aLCI->A, aLCI->B);
-	  aLCI->StartingTime = LeftFootAbsolutePositions[i].time;
-	  if (QueueOfLConstraintInequalities.size()>0)
-	    {
-	      QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
-
-	    }
-
-	  QueueOfLConstraintInequalities.push_back(aLCI);
-	  
-	  
-	  
-	}
-      if (i==LeftFootAbsolutePositions.size()-1)
-	{
-	  if (QueueOfLConstraintInequalities.size()>0)
-	    {
-	      QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
-	    }
-	}
-    }
-
-  ODEBUG("Size of the 5 ms array: "<< LeftFootAbsolutePositions.size());
-  ODEBUG("Size of the queue of Linear Constraint Inequalities " << QueueOfLConstraintInequalities.size());
-  
-  return 0;
-}
-
-int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities2(deque<FootAbsolutePosition> 
 								      &LeftFootAbsolutePositions,
 								      deque<FootAbsolutePosition> 
 								      &RightFootAbsolutePositions,
@@ -483,21 +293,21 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities2(deque<Foot
 	}
       else
 	{
-	  
-	  if (LeftFootAbsolutePositions[i].z>0)
+	  double LiftingThreshold=0.00001;
+	  if (LeftFootAbsolutePositions[i].z>LiftingThreshold)
 	    {
 	      if (State!=2)
 		ComputeCH=1;
 	      State=2;
 	    }
-	  else if (RightFootAbsolutePositions[i].z>0)
+	  else if (RightFootAbsolutePositions[i].z>LiftingThreshold)
 	    {
 	      if (State!=1)
 		ComputeCH=1;
 	      State=1;
 	    }
-	  else if ((RightFootAbsolutePositions[i].z==0.0) &&
-		   (LeftFootAbsolutePositions[i].z==0.0))
+	  else if ((RightFootAbsolutePositions[i].z<LiftingThreshold) &&
+		   (LeftFootAbsolutePositions[i].z<LiftingThreshold))
 	    {
 	      if (State!=3)
 		ComputeCH=1;

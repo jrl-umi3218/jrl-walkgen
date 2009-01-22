@@ -65,8 +65,7 @@ namespace PatternGeneratorJRL
 	\param[in]: CX: command parameter in the forward direction.
 	\param[in]: CY: command parameter in the perpendicular direction.
        */
-      int Interpolation(std::deque<ZMPPosition> &NewFinalZMPPositions,
-			std::deque<COMPosition> &COMPositions,
+      int Interpolation(std::deque<COMPosition> &COMPositions,
 			std::deque<ZMPPosition> &ZMPRefPositions,
 			int CurrentPosition,
 			double CX, double CY);

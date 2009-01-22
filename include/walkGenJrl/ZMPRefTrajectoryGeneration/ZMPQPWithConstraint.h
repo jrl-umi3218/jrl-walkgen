@@ -1,4 +1,6 @@
-/* This object provides the .
+/* This object provides the QP formulation with constraint on the ZMP 
+   of  the preview control method developed by Kaita..
+   This formulation has been proposed by PB Wieber in Humanoids 2006.
 
    Copyright (c) 2005-2007, 
    Francois Keith, Olivier Stasse,
@@ -60,12 +62,6 @@ namespace PatternGeneratorJRL
 					  deque<LinearConstraintInequality_t *> & QueueOfLConstraintInequalities,
 					  double ConstraintOnX,
 					  double ConstraintOnY);
-    int BuildLinearConstraintInequalities2(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-					   deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					   deque<LinearConstraintInequality_t *> & QueueOfLConstraintInequalities,
-					   double ConstraintOnX,
-					   double ConstraintOnY);
-    
 
       /** Generate ZMP discreatization from a vector of foot position.
 	  ASSUME A COMPLETE MOTION FROM END TO START, and GENERATE EVERY VALUE.

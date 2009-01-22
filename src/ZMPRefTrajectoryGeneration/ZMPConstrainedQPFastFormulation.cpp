@@ -76,10 +76,10 @@
 #if 1
 #define ODEBUG(x)
 #else
-#define ODEBUG(x)  std::cout << "ZMPQPWithConstraint: " << x << endl;
+#define ODEBUG(x)  std::cout << "ZMPConstrainedQPFastFormulation: " << x << endl;
 #endif
 
-#define ODEBUG3(x)  std::cout << "ZMPQPWithConstraint: " << x << endl;
+#define ODEBUG3(x)  std::cout << "ZMPConstrainedQPFastFormulation: " << x << endl;
 
 using namespace std;
 using namespace PatternGeneratorJRL;
@@ -126,12 +126,14 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   m_2DLIPM->SetSimulationControlPeriod(m_QP_T);
   m_2DLIPM->SetRobotControlPeriod(m_SamplingPeriod);
   m_2DLIPM->SetComHeight(m_ComHeight);
+  m_2DLIPM->InitializeSystem();
 
   m_Alpha = 200.0;
   m_Beta = 1000.0;
   
   InitConstants();
 
+  RESETDEBUG4("Check2DLIPM.dat");
 }
 
 ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
@@ -541,7 +543,6 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 									  deque<FootAbsolutePosition> 
 									  &RightFootAbsolutePositions,
 									  deque<ZMPPosition> &ZMPRefPositions,
-									  deque<ZMPPosition> &NewFinalZMPPositions,
 									  deque<COMPosition> &COMPositions,
 									  double ConstraintOnX,
 									  double ConstraintOnY,
@@ -604,9 +605,6 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       RESETDEBUG4("DebugPBW_Pb.dat");
 
       ODEBUG6("A:" << m_A << endl << "B:" << m_B, "DebugPBW_Pb.dat");
-  
-
-      RESETDEBUG5("Constraints.dat");
 
     }
       
@@ -656,7 +654,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   double dinterval = T /  m_SamplingPeriod;
   int interval=(int)dinterval;
 
-  MAL_VECTOR(,double) xk;
+  MAL_VECTOR_DIM(xk,double,6);
 
   ODEBUG("0.0 " << QueueOfLConstraintInequalities.back()->EndingTime-	N*T << " " 
 	  << " T: " << T << " N: " << N << " interval " << interval);
@@ -670,6 +668,10 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       // Read the current state of the 2D Linearized Inverted Pendulum.
       m_2DLIPM->GetState(xk);
 
+      ODEBUG4(xk[0] << " " << xk[3] << " " <<
+	      xk[1] << " " << xk[4] << " " <<
+	      xk[2] << " " << xk[5] << " ", "Check2DLIPM.dat");
+	      
       // Build the related matrices.
       BuildMatricesPxPu(Px,Pu,
 			N,T,
@@ -832,8 +834,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       
       // Calling this method will automatically 
       // update the NewFinalZMPPositions.
-      m_2DLIPM->Interpolation(NewFinalZMPPositions,
-			      COMPositions,
+      m_2DLIPM->Interpolation(COMPositions,
 			      ZMPRefPositions,
 			      li*interval,
 			      X[0],X[N]);
@@ -852,35 +853,6 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
     }
-  ODEBUG("NewZMPsize: " << NewFinalZMPPositions.size());
-  // Current heuristic to complete the ZMP buffer:
-  // fill with the last correct value.
-  ZMPPosition LastZMPPos = NewFinalZMPPositions.back();
-
-  ODEBUG("N*T/m_SamplingPeriod :" << N*T/m_SamplingPeriod << " " << (int)N*T/m_SamplingPeriod);
-  double lLimit = N*T/m_SamplingPeriod;
-  int Limit = (int)lLimit;
-  
-  ODEBUG("Limit: " << Limit);
-
-  // This test is here to compensate for the discrency 
-  // between ZMPRef Position and the new one.
-  // As the parameters N and T can be different you may have one
-  // or two iterations of difference. They are compensate for here.
-  // It is assumed that NewFinalZMPPositions.size() < ZMPRefPositions.size()
-  if ((Limit + NewFinalZMPPositions.size()) != ZMPRefPositions.size())
-    Limit = ZMPRefPositions.size() - NewFinalZMPPositions.size();
-
-  ODEBUG("Limit: " << Limit);
-  for (int i=0;i< Limit;i++)
-  {
-    ZMPPosition aZMPPos;
-    aZMPPos.px = LastZMPPos.px;
-    aZMPPos.py = LastZMPPos.py;
-    aZMPPos.theta = LastZMPPos.theta;
-    aZMPPos.stepType = LastZMPPos.stepType;
-    NewFinalZMPPositions.push_back(aZMPPos);
-  }
   ODEBUG("NewZMPsize: " << NewFinalZMPPositions.size());
   if (0)
     {
@@ -970,29 +942,16 @@ void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & 
 			       InitLeftFootAbsolutePosition,
 			       InitRightFootAbsolutePosition);
 
-  deque<ZMPPosition> NewZMPPositions;
   ODEBUG3("Dimitrov algo set on");
-  ODEBUG3("Size of COMBuffer: " << m_COMBuffer.size());
-  m_COMBuffer.clear();
 
   BuildZMPTrajectoryFromFootTrajectory(LeftFootAbsolutePositions,
 				       RightFootAbsolutePositions,
 				       ZMPPositions,
-				       NewZMPPositions,
-				       m_COMBuffer,
+				       COMPositions,
 				       m_ConstraintOnX,
 				       m_ConstraintOnY,
 				       m_QP_T,
 				       m_QP_N);
-  if (ZMPPositions.size()!=NewZMPPositions.size())
-    {
-      cout << "Problem here between m_ZMPPositions and new zmp positions" << endl;
-      cout << ZMPPositions.size() << " " << NewZMPPositions.size() << endl;
-    }
-  
-  for(unsigned int i=0;i<ZMPPositions.size();i++)
-    ZMPPositions[i] = NewZMPPositions[i];
-
   if (1)
     {
       ofstream aof;
@@ -1034,13 +993,6 @@ void ZMPConstrainedQPFastFormulation::CallMethod(std::string & Method, std::istr
 
 }
 
-void ZMPConstrainedQPFastFormulation::GetComBuffer(deque<COMPosition> &aCOMBuffer)
-{
-  for(unsigned int i=0;i<m_COMBuffer.size();i++)
-    {
-      aCOMBuffer.push_back(m_COMBuffer[i]);
-    }
-}
 
 int ZMPConstrainedQPFastFormulation::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 				    deque<COMPosition> & FinalCOMPositions,

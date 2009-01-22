@@ -28,6 +28,9 @@
    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include <iostream>
+#include <fstream>
+
 #include <walkGenJrl/PreviewControl/LinearizedInvertedPendulum2D.h>
 
 #if 0
@@ -79,6 +82,7 @@ LinearizedInvertedPendulum2D::LinearizedInvertedPendulum2D()
   MAL_VECTOR_RESIZE(m_xk,6);
   MAL_VECTOR_RESIZE(m_zk,2);
 
+  RESETDEBUG4("Debug2DLIPM.dat");
 }
 
 
@@ -184,18 +188,17 @@ int LinearizedInvertedPendulum2D::InitializeSystem()
 
 
 
-int LinearizedInvertedPendulum2D::Interpolation(deque<ZMPPosition> &NewFinalZMPPositions,
-						deque<COMPosition> &COMPositions,
+int LinearizedInvertedPendulum2D::Interpolation(deque<COMPosition> &COMPositions,
 						deque<ZMPPosition> &ZMPRefPositions,
 						int CurrentPosition,
 						double CX, double CY)
 {
-
+  int lCurrentPosition = CurrentPosition;
   // Fill the queues with the interpolated CoM values.
-  for(int lk=0;lk<m_InterpolationInterval;lk++)
+  for(int lk=0;lk<m_InterpolationInterval;lk++,lCurrentPosition++)
     {
       
-      COMPosition aCOMPos;
+      COMPosition & aCOMPos = COMPositions[lCurrentPosition];
       double lkSP;
       lkSP = (lk+1) * m_SamplingPeriod;
       
@@ -229,24 +232,17 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<ZMPPosition> &NewFinalZMPP
 	m_xk[5] +  // Acceleration
 	lkSP * CY; // Jerk
       
-      aCOMPos.yaw = ZMPRefPositions[CurrentPosition+lk].theta;      
+      aCOMPos.yaw = ZMPRefPositions[lCurrentPosition].theta;      
       
-      COMPositions.push_back(aCOMPos);
-
       // Compute ZMP position and orientation.
-      ZMPPosition aZMPPos;
+      ZMPPosition & aZMPPos = ZMPRefPositions[lCurrentPosition];
       aZMPPos.px = m_C(0,0) * aCOMPos.x[0] +
 	m_C(0,1) * aCOMPos.x[1] + m_C(0,2) * aCOMPos.x[2];
       
       aZMPPos.py = m_C(0,0) * aCOMPos.y[0] +
 	m_C(0,1) * aCOMPos.y[1] + m_C(0,2) * aCOMPos.y[2];
       
-      aZMPPos.theta = ZMPRefPositions[CurrentPosition+lk].theta;
-      aZMPPos.stepType = ZMPRefPositions[CurrentPosition+lk].stepType;
-      
-      // Put it into the stack.
-      NewFinalZMPPositions.push_back(aZMPPos);
-      
+            
       ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
 	      aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<
 	      aCOMPos.yaw << " " <<
@@ -280,12 +276,15 @@ int LinearizedInvertedPendulum2D::OneIteration(double CX,double CY)
   MAL_C_eq_A_by_B(m_zk,m_C,m_xk);
 
 
-  ODEBUG4(m_xk[0] << " " << m_xk[1] << " " << m_xk[2] << " " <<
-	  m_xk[3] << " " << m_xk[4] << " " << m_xk[5] << " " <<
-	  CX  << " " << CY  << " " << 
-	  m_zk[0] << " " << m_zk[1] << " " << 
-	  StartingTime,
-	  "DebugPBW.dat");
+  ODEBUG4( m_xk[0] << " " << m_xk[1] << " " << m_xk[2] << " " <<
+	   m_xk[3] << " " << m_xk[4] << " " << m_xk[5] << " " <<
+	   CX  << " " << CY  << " " << 
+	   m_zk[0] << " " << m_zk[1] << " " << 
+	   Buk[0] << " " << Buk[1] << " " << Buk[2] << " " <<
+	   Buk[3] << " " << Buk[4] << " " << Buk[5] << " " <<
+	   m_B(0,0) << " " << m_B(1,0) << " " << m_B(2,0) << " " <<
+	   m_B(3,0) << " " << m_B(4,0) << " " << m_B(5,0) << " " ,
+	  "Debug2DLIPM.dat");
 
   
   return 0;

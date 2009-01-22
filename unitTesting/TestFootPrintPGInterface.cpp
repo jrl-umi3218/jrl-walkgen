@@ -291,7 +291,7 @@ void StraightWalkingDimitrov(PatternGeneratorInterface &aPGI)
 
   if (0)
   {
-    istringstream strm2(":setpbwconstraint XY 0.07 0.05");
+    istringstream strm2(":setdimitrovconstraint XY 0.07 0.05");
     aPGI.ParseCmd(strm2);
   }
 
@@ -759,9 +759,22 @@ int main(int argc, char *argv[])
   COMPosition finalCOMPosition;
   FootAbsolutePosition LeftFootPosition;
   FootAbsolutePosition RightFootPosition;
-  ofstream aof,aofq;
-  aofq.open("TestConfiguration.dat",ofstream::out);
-  aof.open("TestFGPI.dat",ofstream::out);
+
+  bool DebugConfiguration = false;
+  bool DebugFGPI = false;
+
+  ofstream aofq;
+  if (DebugConfiguration)
+    {
+      aofq.open("TestConfiguration.dat",ofstream::out);
+    }
+
+  ofstream aof;
+  if (DebugFGPI)
+    {
+      aof.open("TestFGPI.dat",ofstream::out);
+    }
+
   double totaltime=0,maxtime=0;
   double timemodif = 0;
   double totaltimeinplanning=0;
@@ -787,8 +800,8 @@ int main(int argc, char *argv[])
       
       // AnalyticalShortStraightWalking(*aPGI);
       // CurvedWalkingPBW(*PGI);
-      StraightWalkingPBW(*aPGI);
-      //      StraightWalkingDimitrov(*aPGI);
+      // StraightWalkingPBW(*aPGI);
+      StraightWalkingDimitrov(*aPGI);
       // Turn90DegreesWalking(aPGI);
       // TurningOnTheCircle(*aPGI); 
       
@@ -835,11 +848,12 @@ int main(int argc, char *argv[])
 	      NbOfItToCompute++;
 	    }
 
+	  /*
 	  aPGI->DebugControlLoop(PreviousConfiguration,
 				 PreviousVelocity,
 				 PreviousAcceleration,
 				 NbOfIt);
-
+	  */
 	  PreviousConfiguration = CurrentConfiguration;
 	  PreviousVelocity = CurrentVelocity;
 	  PreviousAcceleration = CurrentAcceleration;
@@ -866,36 +880,45 @@ int main(int argc, char *argv[])
 	      StopOnLineWalking(*aPGI);
 	    }
 #endif
-#if 0
-	  aof << NbOfIt*0.005 << " " 
-	      << finalCOMPosition.x[0] << " "
-	      << finalCOMPosition.y[0] << " " 
-	      << finalCOMPosition.z[0] << " "
-	      << ZMPTarget(0) << " " << ZMPTarget(1) << " " 
-	      << LeftFootPosition.x  << " " << LeftFootPosition.y  << " " << LeftFootPosition.z  << " "
-	      << RightFootPosition.x << " " << RightFootPosition.y << " " << RightFootPosition.z << " " 
-	      << ZMPTarget(0)+CurrentConfiguration(0) << " " 
-	      << ZMPTarget(1)+CurrentConfiguration(1) << " "
-	      << CurrentConfiguration(0) << " " 
-	      << CurrentConfiguration(1) << " " << endl;
-#endif
-#if 0
-	  for(unsigned int k=0;k<30;k++)
+
+	  if (DebugFGPI)
 	    {
-	      aofq << CurrentConfiguration[k+6]*180/M_PI << " ";
+	      aof << NbOfIt*0.005 << " " 
+		  << finalCOMPosition.x[0] << " "
+		  << finalCOMPosition.y[0] << " " 
+		  << finalCOMPosition.z[0] << " "
+		  << ZMPTarget(0) << " " << ZMPTarget(1) << " " 
+		  << LeftFootPosition.x  << " " << LeftFootPosition.y  << " " << LeftFootPosition.z  << " "
+		  << RightFootPosition.x << " " << RightFootPosition.y << " " << RightFootPosition.z << " " 
+		  << ZMPTarget(0)+CurrentConfiguration(0) << " " 
+		  << ZMPTarget(1)+CurrentConfiguration(1) << " "
+		  << CurrentConfiguration(0) << " " 
+		  << CurrentConfiguration(1) << " " << endl;
 	    }
-	  aofq << endl;
-#endif
+	  
+	  if (DebugConfiguration)
+	    {
+	      for(unsigned int k=0;k<30;k++)
+		{
+		  aofq << CurrentConfiguration[k+6]*180/M_PI << " ";
+		}
+	      aofq << endl;
+	    }
 	}
     }
-  aofq.close();
-  aof.close();
+  if (DebugConfiguration)
+    aofq.close();
+
+  if (DebugFGPI)
+    aof.close();
 
   delete aPGI;
 
   cout << "Number of iterations " << NbOfIt << " " << NbOfItToCompute << endl;
   cout << "Time consumption: " << (double)totaltime/(double)NbOfItToCompute << " max time: " << maxtime <<endl;
   cout << "Time for modif: " << timemodif << endl;
-  cout << "Time on ZMP ref planning (Kajita policy): " << totaltimeinplanning<< endl;
+  cout << "Time on ZMP ref planning (Kajita policy): " 
+       << totaltimeinplanning<< " " 
+       << totaltimeinplanning*4/(double)NbOfIt<< endl;
 
 }

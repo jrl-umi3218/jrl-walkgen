@@ -104,7 +104,6 @@ namespace PatternGeneratorJRL
     int BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					     deque<ZMPPosition> &ZMPRefPositions,		       
-					     deque<ZMPPosition> &NewFinalZMPPositions,
 					     deque<COMPosition> &COMPositions,
 					     double ConstraintOnX,
 					     double ConstraintOnY,
@@ -151,9 +150,6 @@ namespace PatternGeneratorJRL
     int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
 			    MAL_MATRIX(&A,double),
 			    MAL_MATRIX(&B,double));
-
-    /*! This method get the COM buffer computed by the QP in off-line mode. */
-    void GetComBuffer(deque<COMPosition> &aCOMBuffer);
 
     /*! @} */
 
@@ -261,8 +257,6 @@ namespace PatternGeneratorJRL
       one put in the QP, but they are a necessary intermediate step. */
     FootConstraintsAsLinearSystem * m_FCALS;
       
-    /*! Stores the generated COM positions. */
-    deque<COMPosition> m_COMBuffer;
 
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;
