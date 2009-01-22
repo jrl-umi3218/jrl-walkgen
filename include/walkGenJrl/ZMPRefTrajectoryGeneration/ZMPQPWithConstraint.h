@@ -116,7 +116,6 @@ namespace PatternGeneratorJRL
     int BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					     deque<ZMPPosition> &ZMPRefPositions,		       
-					     deque<ZMPPosition> &NewFinalZMPPositions,
 					     deque<COMPosition> &COMPositions,
 					     double ConstraintOnX,
 					     double ConstraintOnY,
@@ -230,9 +229,6 @@ namespace PatternGeneratorJRL
 
     /*! Uses a ZMPDiscretization scheme to get the usual Kajita heuristic. */
     ZMPDiscretization * m_ZMPD;
-
-    /*! Stores the generated COM positions. */
-    deque<COMPosition> m_COMBuffer;
 
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;

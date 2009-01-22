@@ -491,7 +491,6 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
   // from this extract a set of linear constraints.
   for(unsigned int i=0;i<LeftFootAbsolutePositions.size();i++)
     {
-      
       ComputeCH=0;
       // First check if we have to compute a convex hull
       if (i==0)
@@ -508,21 +507,21 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
 	}
       else
 	{
-	  
-	  if (LeftFootAbsolutePositions[i].z>0)
+	  double LiftingThreshold=0.00001;
+	  if (LeftFootAbsolutePositions[i].z>LiftingThreshold)
 	    {
 	      if (State!=2)
 		ComputeCH=1;
 	      State=2;
 	    }
-	  else if (RightFootAbsolutePositions[i].z>0)
+	  else if (RightFootAbsolutePositions[i].z>LiftingThreshold)
 	    {
 	      if (State!=1)
 		ComputeCH=1;
 	      State=1;
 	    }
-	  else if ((RightFootAbsolutePositions[i].z==0.0) &&
-		   (LeftFootAbsolutePositions[i].z==0.0))
+	  else if ((RightFootAbsolutePositions[i].z<LiftingThreshold) &&
+		   (LeftFootAbsolutePositions[i].z<LiftingThreshold))
 	    {
 	      if (State!=3)
 		ComputeCH=1;
@@ -531,7 +530,10 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
 
 	  
 	}
-
+      ODEBUG("LFAP.time = " << LeftFootAbsolutePositions[i].time << " " 
+	   << ComputeCH << " " 
+	   << LeftFootAbsolutePositions[i].z << " "
+	   << RightFootAbsolutePositions[i].z << " ");
       if (ComputeCH)
 	{
 	  double xmin=1e7, xmax=-1e7, ymin=1e7, ymax=-1e7;
@@ -674,7 +676,7 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
 	  if (QueueOfLConstraintInequalities.size()>0)
 	    {
 	      QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
-	      ODEBUG4( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
+	      ODEBUG6( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
 		       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
 		       prev_xmin << " "  <<
 		       prev_xmax << " "  <<
@@ -697,12 +699,12 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
 	  if (QueueOfLConstraintInequalities.size()>0)
 	    {
 	      QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
-	      ODEBUG4( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
+	      ODEBUG6( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
 		       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
 		       prev_xmin << " "  <<
 		       prev_xmax << " "  <<
 		       prev_ymin << " "  <<
-		       prev_ymax
+		       prev_ymax 
 		       ,"ConstraintMax.dat");
 
 	    }
@@ -879,7 +881,6 @@ int ZMPQPWithConstraint::BuildMatricesPxPu(double * & Px,double * &Pu,
 int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 							    deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 							    deque<ZMPPosition> &ZMPRefPositions,
-							    deque<ZMPPosition> &NewFinalZMPPositions,
 							    deque<COMPosition> &COMPositions,
 							    double ConstraintOnX,
 							    double ConstraintOnY,
@@ -1084,7 +1085,7 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
       ODEBUG6("A:" << m_A << endl << "B:" << m_B, "DebugPBW_Pb.dat");
   
 
-      RESETDEBUG5("Constraints.dat");
+      RESETDEBUG4("Constraints.dat");
 
     }
       
@@ -1094,14 +1095,16 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
 				    QueueOfLConstraintInequalities,
 				    ConstraintOnX,
 				    ConstraintOnY);
-
-  deque<LinearConstraintInequality_t *>::iterator LCI_it;
-  LCI_it = QueueOfLConstraintInequalities.begin();
-  while(LCI_it!=QueueOfLConstraintInequalities.end())
+  
+  if (0)
     {
-      //      cout << *LCI_it << endl; 
-      //      cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime << endl;
-      LCI_it++;
+      deque<LinearConstraintInequality_t *>::iterator LCI_it;
+      LCI_it = QueueOfLConstraintInequalities.begin();
+      while(LCI_it!=QueueOfLConstraintInequalities.end())
+	{
+	  cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime << endl;
+	  LCI_it++;
+	}
     }
   
   double lSizeMat = QueueOfLConstraintInequalities.back()->EndingTime/T;
@@ -1220,7 +1223,8 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
   double dinterval = T /  m_SamplingPeriod;
   int interval=(int)dinterval;
 
-  ODEBUG("0.0 " << QueueOfLConstraintInequalities.back()->EndingTime-	N*T << " " 
+  ODEBUG("Ending time: " << QueueOfLConstraintInequalities.back()->EndingTime);
+  ODEBUG("Loop: 0.0 " << QueueOfLConstraintInequalities.back()->EndingTime- N*T << " " 
 	  << " T: " << T << " N: " << N << " interval " << interval);
   for(double StartingTime=0.0;
       StartingTime<QueueOfLConstraintInequalities.back()->EndingTime-
@@ -1401,7 +1405,7 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
       for(int lk=0;lk<interval;lk++)
 	{
 	  
-	  COMPosition aCOMPos;
+	  COMPosition & aCOMPos = COMPositions[li*interval+lk];;
 	  double lkSP;
 	  lkSP = (lk+1) * m_SamplingPeriod;
 
@@ -1440,18 +1444,15 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
 	  COMPositions.push_back(aCOMPos);
 
 	  // Compute ZMP position and orientation.
-	  ZMPPosition aZMPPos;
+	  ZMPPosition & aZMPPos = ZMPRefPositions[li*interval+lk];
+
 	  aZMPPos.px = m_C(0,0) * aCOMPos.x[0] +
 	    m_C(0,1) * aCOMPos.x[1] + m_C(0,2) * aCOMPos.x[2];
 	  
 	  aZMPPos.py = m_C(0,0) * aCOMPos.y[0] +
 	    m_C(0,1) * aCOMPos.y[1] + m_C(0,2) * aCOMPos.y[2];
 
-	  aZMPPos.theta = ZMPRefPositions[li*interval+lk].theta;
-	  aZMPPos.stepType = ZMPRefPositions[li*interval+lk].stepType;
-
 	  // Put it into the stack.
-	  NewFinalZMPPositions.push_back(aZMPPos);
 	  
 	  ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
 		  aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<
@@ -1485,36 +1486,7 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
 	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
     }
-  ODEBUG("NewZMPsize: " << NewFinalZMPPositions.size());
-  // Current heuristic to complete the ZMP buffer:
-  // fill with the last correct value.
-  ZMPPosition LastZMPPos = NewFinalZMPPositions.back();
 
-  ODEBUG("N*T/m_SamplingPeriod :" << N*T/m_SamplingPeriod << " " << (int)N*T/m_SamplingPeriod);
-  double lLimit = N*T/m_SamplingPeriod;
-  int Limit = (int)lLimit;
-  
-  ODEBUG("Limit: " << Limit);
-
-  // This test is here to compensate for the discrency 
-  // between ZMPRef Position and the new one.
-  // As the parameters N and T can be different you may have one
-  // or two iterations of difference. They are compensate for here.
-  // It is assumed that NewFinalZMPPositions.size() < ZMPRefPositions.size()
-  if ((Limit + NewFinalZMPPositions.size()) != ZMPRefPositions.size())
-    Limit = ZMPRefPositions.size() - NewFinalZMPPositions.size();
-
-  ODEBUG("Limit: " << Limit);
-  for (int i=0;i< Limit;i++)
-  {
-    ZMPPosition aZMPPos;
-    aZMPPos.px = LastZMPPos.px;
-    aZMPPos.py = LastZMPPos.py;
-    aZMPPos.theta = LastZMPPos.theta;
-    aZMPPos.stepType = LastZMPPos.stepType;
-    NewFinalZMPPositions.push_back(aZMPPos);
-  }
-  ODEBUG("NewZMPsize: " << NewFinalZMPPositions.size());
   if (0)
     {
       ofstream aof;
@@ -1564,7 +1536,7 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
   free(U);
   delete iwar;
   // Clean the queue of Linear Constraint Inequalities.
-  //  deque<LinearConstraintInequality_t *>::iterator LCI_it;
+  deque<LinearConstraintInequality_t *>::iterator LCI_it;
   LCI_it = QueueOfLConstraintInequalities.begin();
   while(LCI_it!=QueueOfLConstraintInequalities.end())
     {
@@ -1604,29 +1576,16 @@ void ZMPQPWithConstraint::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions
 			       InitLeftFootAbsolutePosition,
 			       InitRightFootAbsolutePosition);
 
-  deque<ZMPPosition> NewZMPPositions;
   ODEBUG("PBW algo set on");
-  ODEBUG("Size of COMBuffer: " << m_COMBuffer.size());
-  m_COMBuffer.clear();
 
   BuildZMPTrajectoryFromFootTrajectory(LeftFootAbsolutePositions,
 				       RightFootAbsolutePositions,
 				       ZMPPositions,
-				       NewZMPPositions,
-				       m_COMBuffer,
+				       COMPositions,
 				       m_ConstraintOnX,
 				       m_ConstraintOnY,
 				       m_QP_T,
 				       m_QP_N);
-  if (ZMPPositions.size()!=NewZMPPositions.size())
-    {
-      cout << "Problem here between m_ZMPPositions and new zmp positions" << endl;
-      cout << ZMPPositions.size() << " " << NewZMPPositions.size() << endl;
-    }
-  
-  for(unsigned int i=0;i<ZMPPositions.size();i++)
-    ZMPPositions[i] = NewZMPPositions[i];
-
   if (1)
     {
       ofstream aof;
@@ -1668,13 +1627,6 @@ void ZMPQPWithConstraint::CallMethod(std::string & Method, std::istringstream &s
 
 }
 
-void ZMPQPWithConstraint::GetComBuffer(deque<COMPosition> &aCOMBuffer)
-{
-  for(unsigned int i=0;i<m_COMBuffer.size();i++)
-    {
-      aCOMBuffer.push_back(m_COMBuffer[i]);
-    }
-}
 
 int ZMPQPWithConstraint::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 				    deque<COMPosition> & FinalCOMPositions,

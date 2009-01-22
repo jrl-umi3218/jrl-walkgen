@@ -2057,7 +2057,6 @@ namespace PatternGeneratorJRL {
 				      lStartingZMPPosition,
 				      InitLeftFootAbsPos,
 				      InitRightFootAbsPos);      
-	//m_ZMPQP->GetComBuffer(m_COMBuffer);
       }    
     else if (m_AlgorithmforZMPCOM==ZMPCOM_DIMITROV_2008)
       {
@@ -2071,7 +2070,6 @@ namespace PatternGeneratorJRL {
 					 lStartingZMPPosition,
 					 InitLeftFootAbsPos,
 					 InitRightFootAbsPos);      
-	//m_ZMPQP->GetComBuffer(m_COMBuffer);
       }    
     else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
       {
@@ -2101,7 +2099,6 @@ namespace PatternGeneratorJRL {
 				     InitRightFootAbsPos);
 
 	ODEBUG("ZMPCOM_MORISAWA_2007 " << m_ZMPPositions.size() );
-	//	m_ZMPM->GetComBuffer(m_COMBuffer);
       }
     return 0;
   }

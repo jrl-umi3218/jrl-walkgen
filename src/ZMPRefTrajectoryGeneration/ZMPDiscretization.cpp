@@ -1107,7 +1107,6 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   if (m_RelativeFootPositions.size()>0)
     UpdateCurrentSupportFootPosition(m_RelativeFootPositions[0]);
 
-  double CurrentTime = 0;
   double TimeForThisFootPosition;
   // Deal with the end phase of the walking.
   TimeForThisFootPosition = m_Tdble;
@@ -1143,7 +1142,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   
   ZMPPositions[0].px = px0 + delta_x;
   ZMPPositions[0].py = py0 + delta_y;
-  ZMPPositions[0].time = CurrentTime;
+  ZMPPositions[0].time = m_CurrentTime;
   
   ZMPPositions[0].theta = FinalZMPPositions.back().theta;
   ZMPPositions[0].stepType=0;
@@ -1157,7 +1156,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
 	ZMPPositions[CurrentZMPindex-1].px + delta_x;
       ZMPPositions[CurrentZMPindex].py = 
 	ZMPPositions[CurrentZMPindex-1].py + delta_y;
-      ZMPPositions[CurrentZMPindex].time = CurrentTime;
+      ZMPPositions[CurrentZMPindex].time = m_CurrentTime;
       ZMPPositions[CurrentZMPindex].theta = 
 	ZMPPositions[CurrentZMPindex-1].theta;
 
@@ -1190,7 +1189,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
 	FinalRightFootAbsolutePositions.back();
       
       LeftFootAbsolutePosition.time = 
-	RightFootAbsolutePosition.time = CurrentTime;
+	RightFootAbsolutePosition.time = m_CurrentTime;
 
       LeftFootAbsolutePosition.stepType = 
 	RightFootAbsolutePosition.stepType = 0;
@@ -1199,7 +1198,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
       FinalRightFootAbsolutePositions.push_back(RightFootAbsolutePosition);
 
 
-      CurrentTime += m_SamplingPeriod;
+      m_CurrentTime += m_SamplingPeriod;
       CurrentZMPindex++;
 
     }
@@ -1222,7 +1221,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
       ZMPPositions[CurrentZMPindex].px = ZMPPositions[CurrentZMPindex-1].px;
       ZMPPositions[CurrentZMPindex].py = ZMPPositions[CurrentZMPindex-1].py;
       ZMPPositions[CurrentZMPindex].theta = ZMPPositions[CurrentZMPindex-1].theta;
-      ZMPPositions[CurrentZMPindex].time = CurrentTime;
+      ZMPPositions[CurrentZMPindex].time = m_CurrentTime;
 
       ZMPPositions[CurrentZMPindex].stepType = 0;
 
@@ -1246,7 +1245,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
 
       
       LeftFootAbsolutePosition.time = 
-	RightFootAbsolutePosition.time = CurrentTime;
+	RightFootAbsolutePosition.time = m_CurrentTime;
 	
       LeftFootAbsolutePosition.stepType = 
 	RightFootAbsolutePosition.stepType = 0;
@@ -1254,7 +1253,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
       FinalLeftFootAbsolutePositions.push_back(LeftFootAbsolutePosition);
       FinalRightFootAbsolutePositions.push_back(RightFootAbsolutePosition);
 
-      CurrentTime += m_SamplingPeriod;
+      m_CurrentTime += m_SamplingPeriod;
       CurrentZMPindex++;
     }
 
