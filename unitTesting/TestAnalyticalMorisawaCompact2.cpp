@@ -112,11 +112,19 @@ void OutputInAFileWithCorrections(string FileName,
 
 int main(void)
 {
+	
+  if (argc!=2)
+    {
+      cerr << " This program takes 2 arguments: " << endl;
+      cerr << "./TestAnalyticalMorisawaCompact2 PATH_TO_PC_PARAMS_FILE "<< endl;
+	  exit(-1);
+    }	
+  
   PatternGeneratorJRL::SimplePluginManager aSPM;
   PatternGeneratorJRL::AnalyticalMorisawaCompact aAM(&aSPM);
   PatternGeneratorJRL::PreviewControl aPC;
   
-  string PCFileName="/home/stasse/src/OpenHRP/JRL/src/PatternGeneratorJRL_underdev/src/data/PreviewControlParametersWithoutOffsetRemoval.ini";
+  string PCFileName=argv[1];
   aPC.ReadPrecomputedFile(PCFileName);
   aAM.SetPreviewControl(&aPC);
   double TS=0.7,TD=0.1;

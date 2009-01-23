@@ -41,6 +41,12 @@ void StraightWalking(PatternGeneratorInterface &aPGI)
 
 int main(int argc, char *argv[])
 {
+  if (argc!=6)
+    {
+      cerr << " This program takes 2 arguments: " << endl;
+      cerr << "./TestMinimal  PATH_TO_PC_PARAMS_FILE  PATH_TO_VRML_FILE  VRML_FILE_NAME  PATH_TO_SPECIFICITIES_XML PATH_TO_LINK_JOINT_RANK" << endl;
+	  exit(-1);
+    }	
 
   string PCParametersFile = argv[1];
   string VRMLPath=argv[2];
