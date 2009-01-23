@@ -796,12 +796,12 @@ int main(int argc, char *argv[])
       // ShortStraightWalking(*aPGI);
       // CurvedWalkingPBW2(*aPGI);
       // KineoWorks(*aPGI);
-      // StraightWalking(*aPGI);
+      StraightWalking(*aPGI);
       
       // AnalyticalShortStraightWalking(*aPGI);
       // CurvedWalkingPBW(*PGI);
       // StraightWalkingPBW(*aPGI);
-      StraightWalkingDimitrov(*aPGI);
+      //      StraightWalkingDimitrov(*aPGI);
       // Turn90DegreesWalking(aPGI);
       // TurningOnTheCircle(*aPGI); 
       

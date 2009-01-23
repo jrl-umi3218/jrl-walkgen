@@ -130,6 +130,9 @@ INSTALL(FILES ${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}.pc
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE
 )
 
+# Include CPack to build a beautiful package...
+INCLUDE(CPack)
+
 
 
 

@@ -44,33 +44,61 @@ namespace PatternGeneratorJRL
 {
   /*! This object provides the Cholesky decomposition of a symmetric positive-definite matrix.
    This one is especially designed for QP resolution and is designed specifically
-   to grow from a set of rows extracted from a constraint matrix.   
+   to grow from a set of rows extracted from a constraint matrix \$f{\bf A} \f$ of size \f$(m,\|u\|)\f$.   
    */  
   class WALK_GEN_JRL_EXPORT OptCholesky
     {
     
     public:
-      /*! Constructor */
-      OptCholesky();
+      /*! \brief Constructor 
+	@param[in] lNbMaxOfConstraints \f$ m \f$ the number of constraints of matrix \f$ \bf A \f$
+	@param[in] lCardU \f$ \|{\bf u}\| \f$ the size of vector \f$ {\bf u} \f$.
+       */
+      OptCholesky(unsigned int lNbMaxOfConstraints, unsigned int lCardU);
 
-      /*! Destructor */
+      /*! \brief Destructor */
       ~OptCholesky();
 
+      /*! \brief Specify the fixed constraint matrix \f${\bf A}\f$*/
+      void SetA(double * aA);
       
+      /*! \brief Add a list of active constraints
+	@param[in] lConstraints: row indexes of constraints in \f${\bf A} \f$.
+       */
+      void AddActiveConstraints(vector<unsigned int> & lConstraints);
+
+      /*! \brief Add one active constraint 
+	@param[in] lConstraints: row indexes of constraints in \f${\bf A} \f$.
+       */
+      void AddActiveConstraint(unsigned int aConstraint);
+
+
+      /*! \brief Update Cholesky computation */
+      void UpdateCholeskyMatrix();
+
+      /*! \brief  Free memory. */
+      void FreeMemory();
+
+      /*! \brief Initialization of the internal variables. */
+      void InitializeInternalVariables();
+
     private:
 
-      /*! \brief Size of the constraints, i.e. maximum number of rows for \f$ E \f$ */
-      unsigned int m_m;
+      /*! \brief Size of the constraints, i.e. maximum number of rows for \f$ E E^{\top} \f$ */
+      unsigned int m_NbMaxOfConstraints;
 
-      /*! \brief Current 
-
-      /*! \brief Size of the control vector\f$u\f$, i.e. the number of columns for \f$ E \f$ */
+      /*! \brief Size of the control vector \f$ {\bf u} \f$, i.e. the number of columns for \f$ E \f$ */
       unsigned int m_CardU;
 
-      /*! \brief Pointeur towards the initial constraint matrix \f$A\f$ of size \f$(m,\|u\|)\f$. */
+      /*! \brief Pointeur towards the initial constraint matrix \f$ {\bf A} \f$ of size \f$ (m,\|u\|) \f$. */
       double *m_A;
 
-      /*! \brief Set of active constraintes. The maximum size is  \f$m\f$*/
+      /*! \brief The cholesky decomposition result: the \f$ {\bf L} \f$ matrix. */
+      double *m_L;
+
+      /*! \brief Set of active constraintes. The maximum size is  \f$ m \f$,
+	Its size gives the size of \f$ {\bf L} \f$, and \f$ {\bf E} \f$ */
+      vector<unsigned int> m_SetActiveConstraints;
       
       
     };

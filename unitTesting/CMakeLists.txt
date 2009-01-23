@@ -23,36 +23,3 @@ SET_TARGET_PROPERTIES(TestFootPrintPGInterface
 		      LINK_FLAGS ${UNITTESTING_LDFLAGS}
 )
 ADD_DEPENDENCIES (TestFootPrintPGInterface ${PROJECT_NAME})
-
-
-ADD_EXECUTABLE(	TestRiccatiEquation TestRiccatiEquation.cpp)
-SET_TARGET_PROPERTIES( TestRiccatiEquation
-	              PROPERTIES
-	              COMPILE_FLAGS ${UNITTESTING_CXXFLAGS}
-		      LINK_FLAGS ${UNITTESTING_LDFLAGS}
-)
-ADD_DEPENDENCIES (TestRiccatiEquation ${PROJECT_NAME})
-
-ADD_EXECUTABLE(	TestMinimal TestMinimal.cpp)
-SET_TARGET_PROPERTIES( TestMinimal
-	              PROPERTIES
-	              COMPILE_FLAGS ${UNITTESTING_CXXFLAGS}
-		      LINK_FLAGS ${UNITTESTING_LDFLAGS}
-)
-ADD_DEPENDENCIES (TestMinimal ${PROJECT_NAME})
-
-ADD_EXECUTABLE(	TestAnalyticalMorisawaCompact TestAnalyticalMorisawaCompact.cpp)
-SET_TARGET_PROPERTIES(TestAnalyticalMorisawaCompact
-	              PROPERTIES
-	              COMPILE_FLAGS ${UNITTESTING_CXXFLAGS}
-		      LINK_FLAGS ${UNITTESTING_LDFLAGS}
-)
-ADD_DEPENDENCIES (TestAnalyticalMorisawaCompact ${PROJECT_NAME})
-
-ADD_EXECUTABLE(	TestAnalyticalMorisawaCompact2 TestAnalyticalMorisawaCompact2.cpp)
-SET_TARGET_PROPERTIES(TestAnalyticalMorisawaCompact2
-	              PROPERTIES
-	              COMPILE_FLAGS ${UNITTESTING_CXXFLAGS}
-		      LINK_FLAGS ${UNITTESTING_LDFLAGS}
-)
-ADD_DEPENDENCIES (TestAnalyticalMorisawaCompact2 ${PROJECT_NAME})

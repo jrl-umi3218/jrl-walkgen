@@ -18,13 +18,14 @@ SET(libwpg_src
 	./GlobalStrategyManagers/CoMAndFootOnlyStrategy.cpp 
 	./GlobalStrategyManagers/GlobalStrategyManager.cpp 
 	./GlobalStrategyManagers/DoubleStagePreviewControlStrategy.cpp 
+	./Mathematics/AnalyticalZMPCOGTrajectory.cpp 
+	./Mathematics/ConvexHull.cpp 
+	./Mathematics/FootConstraintsAsLinearSystem.cpp
+	./Mathematics/OptCholesky.cpp
 	./Mathematics/Polynome.cpp 
 	./Mathematics/PolynomeFoot.cpp 
-	./Mathematics/StepOverPolynome.cpp
-	./Mathematics/ConvexHull.cpp 
 	./Mathematics/qld.cpp 
-	./Mathematics/AnalyticalZMPCOGTrajectory.cpp 
-	./Mathematics/FootConstraintsAsLinearSystem.cpp
+	./Mathematics/StepOverPolynome.cpp
 	./PreviewControl/PreviewControl.cpp 
 	./PreviewControl/OptimalControllerSolver.cpp 
 	./PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp 
