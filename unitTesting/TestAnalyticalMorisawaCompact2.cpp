@@ -110,7 +110,7 @@ void OutputInAFileWithCorrections(string FileName,
   aof.close();
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
 	
   if (argc!=2)
