@@ -36,6 +36,8 @@ void OptCholesky::InitializeInternalVariables()
   if (m_NbMaxOfConstraints!=0)
     {
       m_L = new double [m_NbMaxOfConstraints * m_NbMaxOfConstraints];
+      for(unsigned int i=0;i<m_NbMaxOfConstraints * m_NbMaxOfConstraints;i++)
+	m_L[i]=0.0;
     }
 }
 
@@ -119,6 +121,41 @@ int OptCholesky::UpdateCholeskyMatrix()
       
     }
   
+  return 0;
+  
+}
+
+int OptCholesky::ComputeNormalCholeskyOnA()
+{
+  if (m_A==0)
+    return -1;
+  if (m_NbMaxOfConstraints!=m_CardU)
+    return -2;
+
+  double *pA = m_A;
+  for(int li=0;li<(int)m_NbMaxOfConstraints;li++)
+    {
+      for(int lj=0;lj<=li;lj++)
+	{
+	  
+	  /* Compute Li,j */
+	  
+	  double r = pA[lj];
+	  double * ptLik =m_L + li*m_NbMaxOfConstraints;
+	  double * ptLjk =m_L + lj*m_NbMaxOfConstraints;
+	  
+	  for(int lk=0;lk<lj;lk++)
+	    {
+	      r = r - (*ptLik++)  * (*ptLjk++);
+	    }
+	  if (lj!=li)
+	    m_L[li*m_NbMaxOfConstraints+lj]=r/m_L[lj*m_NbMaxOfConstraints+lj];
+	  else
+	    m_L[li*m_NbMaxOfConstraints+lj] = sqrt(r);
+
+	}
+      pA+=m_NbMaxOfConstraints;
+    }
   return 0;
   
 }

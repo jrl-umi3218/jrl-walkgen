@@ -78,6 +78,9 @@ namespace PatternGeneratorJRL
        or the current number of active constraints on \f$ {\bf A} \f$.*/
       int CurrentNumberOfRows();
 
+      /*! \brief Compute normal Cholesky decomposition on A (if possible).*/
+      int ComputeNormalCholeskyOnA();
+
       /*! \brief Returns the cholesky matrix L */
       double * GetL();
 

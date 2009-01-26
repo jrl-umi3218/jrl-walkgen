@@ -43,55 +43,129 @@
 
 using namespace std;
 
+void MatrixMatrixT(double *A,double *AAT, int lNbOfConstraints, int lCardU)
+{
+  for( int i=0;i<lNbOfConstraints;i++)
+    {
+      for(int j=0;j<lNbOfConstraints;j++)
+	{
+	  AAT[i*lNbOfConstraints+j] = 0.0;
+	  for(int k=0;k<lCardU;k++)
+	    AAT[i*lNbOfConstraints+j] += A[i*lCardU+k]*A[j*lCardU+k];
+
+	}
+    }
+}
+
+void DisplayMatrix(double *A,int rows, int columns, string name, int format)
+{
+  cout.precision(5);
+  cout.setf(ios::fixed,ios::floatfield);
+  cout << name << "=[";
+  
+  for(int i=0;i<rows;i++)
+    {
+      cout << "[";
+      for(int j=0;j<columns;j++)
+	{
+	  cout << A[i*rows+j] << " ";
+	}
+      cout << "];";
+      if (format==0) // Human readable.
+	cout << endl;
+    }
+  cout << "]"<<endl;
+  
+}
+double CheckCholeskyDecomposition(double *A, double *L, int n)
+{
+  double * LLT = new double[n*n];
+  MatrixMatrixT(L,LLT,n,n);
+
+  double distance=0.0;
+  for(int i=0;i<n;i++)
+    {
+      for(int j=0;j<n;j++)
+	{
+	  double r=A[i*n+j] - LLT[i*n+j];
+	  distance += r*r;
+	}
+    }
+
+  delete LLT;
+  distance = sqrt(distance);
+  
+  return distance;
+}
+
 int main()
 {
   PatternGeneratorJRL::OptCholesky *anOptCholesky;
 
   unsigned int lNbOfConstraints = 12;
   unsigned int lCardU = 15;
+  unsigned int verbose = 0;
+
   /* Declare the linear system */
   double * A = new double[lNbOfConstraints*lCardU];
+
   
   /* Create the object for optimized Cholesky computation */
   anOptCholesky = new PatternGeneratorJRL::OptCholesky(lNbOfConstraints,lCardU);
 
   /* Build the test matrix */
   srand(0);
-  cout.precision(5);
-  cout.setf(ios::fixed,ios::floatfield);
-  cout << "A=[";
   for(unsigned int i=0;i<lNbOfConstraints;i++)
     {
-      cout << "[";
       for(unsigned int j=0;j<lCardU;j++)
 	{
 	  A[i*lCardU+j] = (double)rand()/(double)RAND_MAX;
-	  cout << A[i*lCardU+j] << " ";
 	}
-      cout << "];";
     }
-  cout << "]"<<endl;
-  cout << "***********************************************" << endl;
+  if (verbose>1)
+    DisplayMatrix(A,lNbOfConstraints,lCardU,string("A"),0);
+
   anOptCholesky->SetA(A);
 
 
-  cout << "M=[";
   for(unsigned int i=0;i<lNbOfConstraints;i++)
     anOptCholesky->AddActiveConstraint(i);
-  cout << "]"<<endl;
-  cout << "***********************************************" << endl;
+
   double *L=0;
   L = anOptCholesky->GetL();
+  if (verbose>1)
+    DisplayMatrix(L,lNbOfConstraints,lNbOfConstraints,string("L"),0);
+       
+
+  double * AAT = new double[lNbOfConstraints*lNbOfConstraints];
+
+  MatrixMatrixT(A,AAT,lNbOfConstraints,lCardU);
+
+  if (verbose>1)
+    DisplayMatrix(AAT,lNbOfConstraints,lNbOfConstraints,string("AAT"),0);
+
+  cout << "Optimized Cholesky decomposition for QP " 
+       << CheckCholeskyDecomposition(AAT,L,lNbOfConstraints)
+       << endl;
+
+  delete anOptCholesky;
+
+  /* Create the object for normal Cholesky computation */
+  anOptCholesky = new PatternGeneratorJRL::OptCholesky(lNbOfConstraints,lNbOfConstraints);
+
+  anOptCholesky->SetA(AAT);
+
+  anOptCholesky->ComputeNormalCholeskyOnA();
+
+  L = anOptCholesky->GetL();
+  if (verbose>1)
+    DisplayMatrix(L,lNbOfConstraints,lNbOfConstraints,string("L"),0);
+
+  cout << "Normal Cholesky decomposition: " 
+       << CheckCholeskyDecomposition(AAT,L,lNbOfConstraints)
+       << endl;
+
   
-  cout << "Matrix L:" << endl;
-  for(unsigned int li=0;li<lNbOfConstraints;li++)
-    {
-      for(unsigned int lj=0;lj<lNbOfConstraints;lj++)
-	cout << L[li*lNbOfConstraints+lj] << " ";
-      cout << endl;
-    }
-  cout << "***********************************************" << endl;
-	
   delete anOptCholesky;
 
 }
