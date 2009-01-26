@@ -46,6 +46,7 @@
 namespace PatternGeneratorJRL {
 
   PatternGeneratorInterface::PatternGeneratorInterface(istringstream &strm)
+    : SimplePlugin(this)
   {
 
     ODEBUG4("Step 0","DebugPGI.txt");
@@ -214,8 +215,37 @@ namespace PatternGeneratorJRL {
     for(unsigned int i=0;i<3;i++)
       m_ZMPInitialPoint(i)=0.0;
     m_ZMPInitialPointSet = false;
+
+    RegisterPluginMethods();
   }
 
+  void PatternGeneratorInterface::RegisterPluginMethods()
+  {
+    std::string aMethodName[10] = 
+      {":LimitsFeasibility",
+       ":ZMPShiftParameters",
+       ":TimeDistributionParameters",
+       ":stepseq",
+       ":finish",
+       ":StartOnLineStepSequencing",
+       ":StopOnLineStepSequencing",
+       ":readfilefromkw",
+       ":SetAlgoForZmpTrajectory",
+       ":SetAutoFirstStep"};
+    
+    for(int i=0;i<10;i++)
+      {
+	if (!SimplePlugin::RegisterMethod(aMethodName[i]))
+	  {
+	    std::cerr << "Unable to register " << aMethodName << std::endl;
+	  }
+	else
+	  {
+	    ODEBUG("Succeed in registering " << aMethodName[i]);
+	  }
+      }
+
+  }
   void PatternGeneratorInterface::ObjectsInstanciation(string & HumanoidSpecificitiesFileName)
   {
     // Create fundamental objects to make the WPG runs.
@@ -1024,10 +1054,15 @@ namespace PatternGeneratorJRL {
     strm >> aCmd;
 
     ODEBUG("PARSECMD");
-    if (CallMethod(aCmd,strm))
+    if (SimplePluginManager::CallMethod(aCmd,strm))
       {
 	ODEBUG("Method " << aCmd << " found and handled.");
       }
+    return 0;
+  }
+  void PatternGeneratorInterface::CallMethod(string &aCmd,
+					     istringstream &strm)
+  {
 
     ODEBUG("PGI:ParseCmd: Commande: " << aCmd);
 
@@ -1068,7 +1103,6 @@ namespace PatternGeneratorJRL {
 	  m_AutoFirstStep=false;
 	ODEBUG("SetAutoFirstStep: " << m_AutoFirstStep);
       }
-    return 0;
   }
 
   void PatternGeneratorInterface::m_SetAlgoForZMPTraj(istringstream &strm)

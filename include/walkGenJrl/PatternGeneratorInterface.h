@@ -68,13 +68,13 @@
 #include <walkGenJrl/StepStackHandler.h>
 
 #include <walkGenJrl/SimplePluginManager.h>
+#include <walkGenJrl/SimplePlugin.h>
 
 #include <walkGenJrl/GlobalStrategyManagers/DoubleStagePreviewControlStrategy.h>
 #include <walkGenJrl/GlobalStrategyManagers/CoMAndFootOnlyStrategy.h>
 
 namespace PatternGeneratorJRL
 {
-  class SimplePlugin;
 
   /** @ingroup Interface
       This class is the interface between the Pattern Generator and the 
@@ -87,7 +87,8 @@ namespace PatternGeneratorJRL
      
       
    */
-  class WALK_GEN_JRL_EXPORT PatternGeneratorInterface : public SimplePluginManager
+  class WALK_GEN_JRL_EXPORT PatternGeneratorInterface : public SimplePluginManager,
+    SimplePlugin
   {    
   public:
     
@@ -649,6 +650,12 @@ namespace PatternGeneratorJRL
     
     /*! @} */
 
+    /*! \brief Reimplement the SimplePlugin interface. */
+    virtual void CallMethod(string &MethodName,
+			    istringstream &istrm);
+
+    /*! \brief Register the methods handled by the SimplePlugin part of this object. */
+    void RegisterPluginMethods();
 
   protected:
 
