@@ -9,11 +9,19 @@ OptCholesky::OptCholesky(unsigned int lNbMaxOfConstraints,
   m_A(0),
   m_L(0)
 {
-
+  if (lCardU<lNbMaxOfConstraints)
+    {
+      cout << "CardU<lNbMaxOfConstraints thus" << endl;
+      cout << "rank(A*A')<NbMaxOfConstraints" << endl;
+      cout << "It is very likely" <<endl;
+      cout << "that the matrix is *NOT* symmetric definite-positive" <<endl;
+    }
+  InitializeInternalVariables();
 }
 
 OptCholesky::~OptCholesky()
 {
+  FreeMemory();
 }
 
 void OptCholesky::FreeMemory()
@@ -36,58 +44,81 @@ void OptCholesky::SetA(double *aA)
   m_A = aA;
 }
 
-void OptCholesky::AddActiveConstraints(vector<unsigned int> & lConstraints)
+int OptCholesky::AddActiveConstraints(vector<unsigned int> & lConstraints)
 {
+  int r=0;
   for(unsigned int li=0;li<lConstraints.size();li++)
-    AddActiveConstraint(lConstraints[li]);
+    {
+      r=AddActiveConstraint(lConstraints[li]);
+      if (r<0)
+	return -li;
+    }
+  return r;
 }
 
-void OptCholesky::AddActiveConstraint(unsigned int aConstraint)
+int OptCholesky::AddActiveConstraint(unsigned int aConstraint)
 {
   /* Update set of active constraints */
   m_SetActiveConstraints.push_back(aConstraint);
-  
+
+  int r = UpdateCholeskyMatrix();
+  return r;
 }
 
-void OptCholesky::UpdateCholeskyMatrix()
+int OptCholesky::CurrentNumberOfRows()
 {
-  
+  return m_SetActiveConstraints.size();
+}
+
+double * OptCholesky::GetL()
+{
+  return m_L;
+}
+
+int OptCholesky::UpdateCholeskyMatrix()
+{
+
+  if (m_A==0)
+    return -1;
+
   double Mij=0.0;
-  unsigned IndexNewRowAKAi = m_SetActiveConstraints.size()-1;
+  unsigned int IndexNewRowAKAi = 0;
+  if (m_SetActiveConstraints.size()>0)
+    IndexNewRowAKAi = m_SetActiveConstraints.size()-1;
+  
   double *PointerArow_i = m_A +  m_CardU * 
     m_SetActiveConstraints[IndexNewRowAKAi];
 
-
-
   /* Compute Li,j */
-  for(unsigned int lj=0;lj<m_SetActiveConstraints.size();lj++)
+  for(int lj=0;lj<(int)m_SetActiveConstraints.size();lj++)
     {
 
       /* A value M(i,j) is computed once,
 	 directly from the matrix A */      
       double *Arow_i = PointerArow_i;
       double *Arow_j = m_A + m_CardU* m_SetActiveConstraints[lj];
-
-      for(unsigned int lk=0;lk<m_CardU;lk++)
+      Mij=0.0;
+      for(int lk=0;lk<(int)m_CardU;lk++)
 	{
 	  Mij+= (*Arow_i++) * (*Arow_j++);
 	}
 
       /* */
       double r = Mij;
-      double * ptLik =m_L + IndexNewRowAKAi*m_CardU;
-      double * ptLjk =m_L + lj*m_CardU;
-      for(unsigned int lk=0;lk<lj-1;lk++)
+      double * ptLik =m_L + IndexNewRowAKAi*m_NbMaxOfConstraints;
+      double * ptLjk =m_L + lj*m_NbMaxOfConstraints;
+
+      for(int lk=0;lk<lj;lk++)
 	{
 	  r = r - (*ptLik++)  * (*ptLjk++);
 	}
-      if (lj!=m_SetActiveConstraints.size()-1)
-	m_L[IndexNewRowAKAi*m_CardU+lj]=r/m_L[lj*m_CardU+lj];
+      if (lj!=(int)m_SetActiveConstraints.size()-1)
+	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj]=r/m_L[lj*m_NbMaxOfConstraints+lj];
       else
-	m_L[IndexNewRowAKAi*m_CardU+lj] = sqrt(r);
+	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj] = sqrt(r);
       
     }
   
-
+  return 0;
   
 }

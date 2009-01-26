@@ -64,23 +64,22 @@ namespace PatternGeneratorJRL
       
       /*! \brief Add a list of active constraints
 	@param[in] lConstraints: row indexes of constraints in \f${\bf A} \f$.
+	@return \f$ -i \f$ where \f$ i \f$ is the constraint for which there is a problem.
        */
-      void AddActiveConstraints(vector<unsigned int> & lConstraints);
+      int AddActiveConstraints(vector<unsigned int> & lConstraints);
 
       /*! \brief Add one active constraint 
 	@param[in] lConstraints: row indexes of constraints in \f${\bf A} \f$.
+	@return -1 if the constraint was not added, 0 otherwise.
        */
-      void AddActiveConstraint(unsigned int aConstraint);
+      int AddActiveConstraint(unsigned int aConstraint);
 
+      /*! \brief Returns the current number of rows 
+       or the current number of active constraints on \f$ {\bf A} \f$.*/
+      int CurrentNumberOfRows();
 
-      /*! \brief Update Cholesky computation */
-      void UpdateCholeskyMatrix();
-
-      /*! \brief  Free memory. */
-      void FreeMemory();
-
-      /*! \brief Initialization of the internal variables. */
-      void InitializeInternalVariables();
+      /*! \brief Returns the cholesky matrix L */
+      double * GetL();
 
     private:
 
@@ -99,6 +98,15 @@ namespace PatternGeneratorJRL
       /*! \brief Set of active constraintes. The maximum size is  \f$ m \f$,
 	Its size gives the size of \f$ {\bf L} \f$, and \f$ {\bf E} \f$ */
       vector<unsigned int> m_SetActiveConstraints;
+
+      /*! \brief Update Cholesky computation */
+      int UpdateCholeskyMatrix();
+
+      /*! \brief  Free memory. */
+      void FreeMemory();
+
+      /*! \brief Initialization of the internal variables. */
+      void InitializeInternalVariables();
       
       
     };
