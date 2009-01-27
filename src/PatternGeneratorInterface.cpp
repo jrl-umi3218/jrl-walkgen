@@ -2081,6 +2081,7 @@ namespace PatternGeneratorJRL {
   {
     if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
       {
+	ODEBUG3("ZMPCOM_WIEBER_2006 " << m_ZMPPositions.size() );
 	m_COMBuffer.clear();
 	m_ZMPQP->GetZMPDiscretization(m_ZMPPositions,
 				      m_COMBuffer,
@@ -2094,6 +2095,7 @@ namespace PatternGeneratorJRL {
       }    
     else if (m_AlgorithmforZMPCOM==ZMPCOM_DIMITROV_2008)
       {
+	ODEBUG3("ZMPCOM_DIMITROV_2008 " << m_ZMPPositions.size() );
 	m_COMBuffer.clear();
 	m_ZMPCQPFF->GetZMPDiscretization(m_ZMPPositions,
 					 m_COMBuffer,
@@ -2107,6 +2109,7 @@ namespace PatternGeneratorJRL {
       }    
     else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
       {
+	ODEBUG3("ZMPCOM_KAJITA_2003 " << m_ZMPPositions.size() );
 	m_ZMPD->GetZMPDiscretization(m_ZMPPositions,
 				     m_COMBuffer,
 				     lRelativeFootPositions,
@@ -2121,7 +2124,7 @@ namespace PatternGeneratorJRL {
       }
     else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
       {
-	ODEBUG("ZMPCOM_MORISAWA_2007");
+	ODEBUG3("ZMPCOM_MORISAWA_2007");
 	m_ZMPM->GetZMPDiscretization(m_ZMPPositions,
 				     m_COMBuffer,
 				     lRelativeFootPositions,
@@ -2132,7 +2135,7 @@ namespace PatternGeneratorJRL {
 				     InitLeftFootAbsPos,
 				     InitRightFootAbsPos);
 
-	ODEBUG("ZMPCOM_MORISAWA_2007 " << m_ZMPPositions.size() );
+	ODEBUG3("ZMPCOM_MORISAWA_2007 " << m_ZMPPositions.size() );
       }
     return 0;
   }

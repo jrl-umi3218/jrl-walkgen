@@ -90,7 +90,6 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   ZMPRefTrajectoryGeneration(lSPM)
 {
   m_Q = 0;
-  m_LQ = 0;
 
   /*! Getting the ZMP reference from Kajita's heuristic. */
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
@@ -152,8 +151,6 @@ ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
   if (m_Q!=0)
     delete m_Q;
 
-  if (m_LQ!=0)
-    delete m_LQ;
 }
 
 void ZMPConstrainedQPFastFormulation::SetPreviewControl(PreviewControl *aPC)
@@ -273,13 +270,13 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
     for(unsigned int j=0;j<m_QP_N;j++)
       localQ[i*m_QP_N+j] = OptA(i,j);
   
-  localLQ=new double[m_QP_N*m_QP_N]; 
-  localiLQ=new double[m_QP_N*m_QP_N]; 
+  double *localLQ=new double[m_QP_N*m_QP_N]; 
+  double *localiLQ=new double[m_QP_N*m_QP_N]; 
 
   OptCholesky anOCD(m_QP_N,m_QP_N);
   anOCD.SetA(localQ);
   anOCD.SetL(localLQ);
-  anOCD.SetL(localiLQ);
+  anOCD.SetiL(localiLQ);
 
   anOCD.ComputeNormalCholeskyOnA();
   anOCD.ComputeNormalCholeskyOnA();
