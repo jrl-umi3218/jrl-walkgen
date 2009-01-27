@@ -104,12 +104,13 @@ int main()
 
   unsigned int lNbOfConstraints = 12;
   unsigned int lCardU = 15;
-  unsigned int verbose = 0;
+  unsigned int verbose = 2;
 
   /* Declare the linear system */
   double * A = new double[lNbOfConstraints*lCardU];
   double * L = new double[lNbOfConstraints*lNbOfConstraints];
-  
+  double * iL = new double[lNbOfConstraints*lNbOfConstraints];
+
   /* Create the object for optimized Cholesky computation */
   anOptCholesky = new PatternGeneratorJRL::OptCholesky(lNbOfConstraints,lCardU);
 
@@ -127,7 +128,7 @@ int main()
 
   anOptCholesky->SetA(A);
   anOptCholesky->SetL(L);
-
+  anOptCholesky->SetiL(iL);
 
   for(unsigned int i=0;i<lNbOfConstraints;i++)
     anOptCholesky->AddActiveConstraint(i);
@@ -160,9 +161,12 @@ int main()
   anOptCholesky = new PatternGeneratorJRL::OptCholesky(lNbOfConstraints,lNbOfConstraints);
 
   anOptCholesky->SetA(AAT);
+  anOptCholesky->SetL(L);
+  anOptCholesky->SetiL(iL);
 
   anOptCholesky->ComputeNormalCholeskyOnA();
 
+  r = CheckCholeskyDecomposition(AAT,L,lNbOfConstraints);
   if (verbose>1)
     DisplayMatrix(L,lNbOfConstraints,lNbOfConstraints,string("L"),0);
 
@@ -174,6 +178,11 @@ int main()
       return_value = -1;
     }
   
+
+  anOptCholesky->ComputeInverseCholesky(1);
+  if (verbose>1)
+    DisplayMatrix(iL,lNbOfConstraints,lNbOfConstraints,string("iL"),0);
+
   delete anOptCholesky;
   delete [] L;
   delete [] A;

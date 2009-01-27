@@ -37,6 +37,7 @@
 #include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <walkGenJrl/Mathematics/FootConstraintsAsLinearSystem.h>
+#include <walkGenJrl/Mathematics/OptCholesky.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 
 using namespace dynamicsJRLJapan;
@@ -288,7 +289,14 @@ namespace PatternGeneratorJRL
     double *m_Q;
 
     /*! \brief Cholesky decomposition of the initial objective function $Q$ */
-    double *m_LQ;
+    MAL_MATRIX(m_LQ,double);
+
+/*! \brief Cholesky decomposition of the initial objective function $Q$ */
+    MAL_MATRIX(m_iLQ,double);
+    
+
+    /*! \brief Optimized cholesky decomposition */
+    OptCholesky * m_OptCholesky;
 
     /*! \brief Sub matrix to compute the linear part of the objective function $p^{\top}_k$. */
     MAL_MATRIX(m_OptB,double);

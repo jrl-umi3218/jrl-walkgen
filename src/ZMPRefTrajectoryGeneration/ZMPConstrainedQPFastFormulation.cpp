@@ -267,20 +267,60 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   
   m_Q=new double[4*m_QP_N*m_QP_N]; 
   
-  m_LQ=new double[m_QP_N*m_QP_N]; 
+  /*! Build cholesky matrix of the optimum */
+  double *localQ=new double[m_QP_N*m_QP_N]; 
+  for(unsigned int i=0;i<m_QP_N;i++)
+    for(unsigned int j=0;j<m_QP_N;j++)
+      localQ[i*m_QP_N+j] = OptA(i,j);
+  
+  localLQ=new double[m_QP_N*m_QP_N]; 
+  localiLQ=new double[m_QP_N*m_QP_N]; 
 
+  OptCholesky anOCD(m_QP_N,m_QP_N);
+  anOCD.SetA(localQ);
+  anOCD.SetL(localLQ);
+  anOCD.SetL(localiLQ);
 
+  anOCD.ComputeNormalCholeskyOnA();
+  anOCD.ComputeNormalCholeskyOnA();
+  anOCD.ComputeInverseCholesky(1);
+  
   // Initialization of the matrice regarding the quadratic
   // part of the objective function.
   memset(m_Q,0,4*m_QP_N*m_QP_N*sizeof(double));
   for(unsigned int i=0;i<2*m_QP_N;i++)
     m_Q[i*2*m_QP_N+i] = 1.0;
 
+  MAL_MATRIX_RESIZE(m_LQ,2*m_QP_N,2*m_QP_N);
+  MAL_MATRIX_RESIZE(m_iLQ,2*m_QP_N,2*m_QP_N);
+
   if (CriteriaToMaximize==1)
     {
       for(unsigned int i=0;i<2*m_QP_N;i++)
 	for(unsigned int j=0;j<2*m_QP_N;j++)
-	  m_Q[j*2*m_QP_N+i] = OptA(i,j);
+	  {
+	    /*! Fill m_Q */
+	    if (i==j)
+	      m_Q[j*2*m_QP_N+i] = 1;
+	    else
+	      m_Q[j*2*m_QP_N+i] = 0;
+	  }
+
+      for(unsigned int i=0;i<m_QP_N;i++)
+	{
+	  for(unsigned int j=0;j<m_QP_N;j++)
+	    {
+	      m_LQ(i,j) = localLQ[i*m_QP_N+j];
+	      m_LQ(i+m_QP_N,j+m_QP_N) = localLQ[i*m_QP_N+j];
+	      m_LQ(i,j+m_QP_N) = 0.0;
+	      m_LQ(i+m_QP_N,j) = 0.0;
+
+	      m_iLQ(i,j) = localiLQ[i*m_QP_N+j];
+	      m_iLQ(i+m_QP_N,j+m_QP_N) = localiLQ[i*m_QP_N+j];
+	      m_iLQ(i,j+m_QP_N) = 0.0;
+	      m_iLQ(i+m_QP_N,j) = 0.0;
+	    }
+	}
 
 
       if (0)
@@ -302,6 +342,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
 
     }
 
+  delete [] localLQ;
+  delete [] localiLQ;
+
   /*! Compute constants of the linear part of the objective function. */
   lterm1 = MAL_RET_TRANSPOSE(m_PPu);
   lterm1 = MAL_RET_A_by_B(lterm1,m_PPx);
@@ -309,6 +352,7 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
   m_OptB = m_Alpha * m_OptB;
   m_OptB = m_OptB + m_Beta * lterm1;
+  // 
 
   if (0)
   {

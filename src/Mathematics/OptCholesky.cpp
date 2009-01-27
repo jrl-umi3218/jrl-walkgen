@@ -7,7 +7,8 @@ OptCholesky::OptCholesky(unsigned int lNbMaxOfConstraints,
   m_NbMaxOfConstraints(lNbMaxOfConstraints),
   m_CardU(lCardU),
   m_A(0),
-  m_L(0)
+  m_L(0),
+  m_iL(0)
 {
   if (lCardU<lNbMaxOfConstraints)
     {
@@ -70,6 +71,11 @@ void OptCholesky::SetL(double *aL)
   m_L = aL;
 }
 
+void OptCholesky::SetiL(double *aiL)
+{
+  m_iL = aiL;
+}
+
 int OptCholesky::UpdateCholeskyMatrix()
 {
 
@@ -124,6 +130,7 @@ int OptCholesky::ComputeNormalCholeskyOnA()
     return -1;
   if (m_NbMaxOfConstraints!=m_CardU)
     return -2;
+  
 
   double *pA = m_A;
   for(int li=0;li<(int)m_NbMaxOfConstraints;li++)
@@ -148,6 +155,57 @@ int OptCholesky::ComputeNormalCholeskyOnA()
 
 	}
       pA+=m_NbMaxOfConstraints;
+    }
+  return 0;
+  
+}
+
+int OptCholesky::ComputeInverseCholesky(int mode)
+{
+  if (m_iL==0)
+    {
+      cout << "no mem for iL" << endl;
+      return -1;
+    }
+
+  int LocalSize =0;
+  if (mode==0)
+    LocalSize = m_SetActiveConstraints.size();
+  else
+    LocalSize = m_NbMaxOfConstraints;
+    
+  cout << "LocalSize :" << LocalSize<<endl;
+  for(int lj=LocalSize-1;lj>=0;lj--)
+    {
+      double iLljlj=0.0;
+      m_iL[lj*m_NbMaxOfConstraints+lj] = 
+	iLljlj = 1/m_L[lj*m_NbMaxOfConstraints+lj];
+
+      for(int li=lj+1;li<LocalSize;li++)
+	{
+	  
+	  /* Compute Li,j */
+	  double r = 0.0;
+	  double * ptiLik = m_iL + li*m_NbMaxOfConstraints + lj + 1;
+	  double * ptLjk  = m_L  + (lj+1)*m_NbMaxOfConstraints + lj ;
+	  
+	  for(int lk=lj+1;lk<LocalSize;lk++)
+	    {
+	      r = r + (*ptiLik++)  * (*ptLjk);
+	      ptLjk+=m_NbMaxOfConstraints;
+	      if (lj==LocalSize-3)
+		cout << *ptLjk << " ";
+	    }
+	  if (lj==LocalSize-3)
+	    cout << "r=" <<r << endl;
+		      
+	  //cout << r << endl;
+	  m_iL[li*m_NbMaxOfConstraints+lj]= -iLljlj*r;
+	  if (lj==LocalSize-3)
+	    cout << "value=" << -iLljlj *r << endl;
+		      
+
+	}
     }
   return 0;
   

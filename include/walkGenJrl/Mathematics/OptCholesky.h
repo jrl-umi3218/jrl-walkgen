@@ -81,8 +81,14 @@ namespace PatternGeneratorJRL
       /*! \brief Compute normal Cholesky decomposition on A (if possible).*/
       int ComputeNormalCholeskyOnA();
 
+      /*! \brief Compute the inverse of the Cholesky decomposition.*/
+      int ComputeInverseCholesky(int mode);
+
       /*! \brief Specify the cholesky matrix L */
       void SetL(double *aL);
+
+      /*! \brief Specify the inverse cholesky matrix L */
+      void SetiL(double *aiL);
 
     private:
 
@@ -97,6 +103,9 @@ namespace PatternGeneratorJRL
 
       /*! \brief The cholesky decomposition result: the \f$ {\bf L} \f$ matrix. */
       double *m_L;
+
+      /*! \brief The inversecholesky decomposition result: the \f$ {\bf L} \f$ matrix. */
+      double *m_iL;
 
       /*! \brief Set of active constraintes. The maximum size is  \f$ m \f$,
 	Its size gives the size of \f$ {\bf L} \f$, and \f$ {\bf E} \f$ */
