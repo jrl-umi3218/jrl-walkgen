@@ -108,7 +108,7 @@ int main()
 
   /* Declare the linear system */
   double * A = new double[lNbOfConstraints*lCardU];
-
+  double * L = new double[lNbOfConstraints*lNbOfConstraints];
   
   /* Create the object for optimized Cholesky computation */
   anOptCholesky = new PatternGeneratorJRL::OptCholesky(lNbOfConstraints,lCardU);
@@ -126,13 +126,12 @@ int main()
     DisplayMatrix(A,lNbOfConstraints,lCardU,string("A"),0);
 
   anOptCholesky->SetA(A);
+  anOptCholesky->SetL(L);
 
 
   for(unsigned int i=0;i<lNbOfConstraints;i++)
     anOptCholesky->AddActiveConstraint(i);
 
-  double *L=0;
-  L = anOptCholesky->GetL();
   if (verbose>1)
     DisplayMatrix(L,lNbOfConstraints,lNbOfConstraints,string("L"),0);
        
@@ -144,10 +143,17 @@ int main()
   if (verbose>1)
     DisplayMatrix(AAT,lNbOfConstraints,lNbOfConstraints,string("AAT"),0);
 
-  cout << "Optimized Cholesky decomposition for QP " 
-       << CheckCholeskyDecomposition(AAT,L,lNbOfConstraints)
-       << endl;
+  int return_value = 0;
 
+  double r = CheckCholeskyDecomposition(AAT,L,lNbOfConstraints);
+  if (r>1e-6)
+    {
+      cout << "Optimized Cholesky decomposition for QP pb:" 
+	   << r
+	   << endl;
+      return_value = -1;
+    }
+  
   delete anOptCholesky;
 
   /* Create the object for normal Cholesky computation */
@@ -157,15 +163,19 @@ int main()
 
   anOptCholesky->ComputeNormalCholeskyOnA();
 
-  L = anOptCholesky->GetL();
   if (verbose>1)
     DisplayMatrix(L,lNbOfConstraints,lNbOfConstraints,string("L"),0);
 
-  cout << "Normal Cholesky decomposition: " 
-       << CheckCholeskyDecomposition(AAT,L,lNbOfConstraints)
-       << endl;
-
+  if (r>1e-6)
+    {
+      cout << "Normal Cholesky decomposition pb:" 
+	   << r
+	   << endl;
+      return_value = -1;
+    }
   
   delete anOptCholesky;
-
+  delete [] L;
+  delete [] A;
+  return return_value;
 }

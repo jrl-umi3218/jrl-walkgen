@@ -287,6 +287,9 @@ namespace PatternGeneratorJRL
     /*! \brief Matrix of the objective function $Q$ */
     double *m_Q;
 
+    /*! \brief Cholesky decomposition of the initial objective function $Q$ */
+    double *m_LQ;
+
     /*! \brief Sub matrix to compute the linear part of the objective function $p^{\top}_k$. */
     MAL_MATRIX(m_OptB,double);
     MAL_MATRIX(m_OptC,double);

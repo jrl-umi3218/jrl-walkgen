@@ -81,8 +81,8 @@ namespace PatternGeneratorJRL
       /*! \brief Compute normal Cholesky decomposition on A (if possible).*/
       int ComputeNormalCholeskyOnA();
 
-      /*! \brief Returns the cholesky matrix L */
-      double * GetL();
+      /*! \brief Specify the cholesky matrix L */
+      void SetL(double *aL);
 
     private:
 

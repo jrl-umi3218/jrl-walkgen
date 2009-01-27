@@ -90,6 +90,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   ZMPRefTrajectoryGeneration(lSPM)
 {
   m_Q = 0;
+  m_LQ = 0;
 
   /*! Getting the ZMP reference from Kajita's heuristic. */
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
@@ -150,6 +151,9 @@ ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
 
   if (m_Q!=0)
     delete m_Q;
+
+  if (m_LQ!=0)
+    delete m_LQ;
 }
 
 void ZMPConstrainedQPFastFormulation::SetPreviewControl(PreviewControl *aPC)
@@ -262,6 +266,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   OptA = OptA + lterm1 + lterm2;
   
   m_Q=new double[4*m_QP_N*m_QP_N]; 
+  
+  m_LQ=new double[m_QP_N*m_QP_N]; 
+
 
   // Initialization of the matrice regarding the quadratic
   // part of the objective function.

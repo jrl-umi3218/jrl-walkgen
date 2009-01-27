@@ -21,15 +21,8 @@ OptCholesky::OptCholesky(unsigned int lNbMaxOfConstraints,
 
 OptCholesky::~OptCholesky()
 {
-  FreeMemory();
 }
 
-void OptCholesky::FreeMemory()
-{
-
-  if (m_L!=0)
-    delete [] m_L ;
-}
 
 void OptCholesky::InitializeInternalVariables()
 {
@@ -72,15 +65,15 @@ int OptCholesky::CurrentNumberOfRows()
   return m_SetActiveConstraints.size();
 }
 
-double * OptCholesky::GetL()
+void OptCholesky::SetL(double *aL)
 {
-  return m_L;
+  m_L = aL;
 }
 
 int OptCholesky::UpdateCholeskyMatrix()
 {
 
-  if (m_A==0)
+  if ((m_A==0) | (m_L==0))
     return -1;
 
   double Mij=0.0;
@@ -127,7 +120,7 @@ int OptCholesky::UpdateCholeskyMatrix()
 
 int OptCholesky::ComputeNormalCholeskyOnA()
 {
-  if (m_A==0)
+  if ((m_A==0) | (m_L==0))
     return -1;
   if (m_NbMaxOfConstraints!=m_CardU)
     return -2;
