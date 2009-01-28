@@ -314,21 +314,22 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   memset(m_Q,0,4*m_QP_N*m_QP_N*sizeof(double));
   for(unsigned int i=0;i<2*m_QP_N;i++)
     m_Q[i*2*m_QP_N+i] = 1.0;
-
+    
   MAL_MATRIX_RESIZE(m_LQ,2*m_QP_N,2*m_QP_N);
   MAL_MATRIX_RESIZE(m_iLQ,2*m_QP_N,2*m_QP_N);
 
   if (CriteriaToMaximize==1)
     {
+      /*
       for(unsigned int i=0;i<m_QP_N;i++)
 	for(unsigned int j=0;j<m_QP_N;j++)
 	  {
-	    m_Q[j*2*m_QP_N+i] = localLQ[i*m_QP_N+j];
-	    m_Q[(j+m_QP_N)*2*m_QP_N+i+m_QP_N] = localLQ[i*m_QP_N+j];
-	    m_Q[j*2*m_QP_N+i+m_QP_N] = 0.0;
-	    m_Q[(j+m_QP_N)*2*m_QP_N+i] = 0.0;
+	    m_Q[i*2*m_QP_N+j] = localLQ[i*m_QP_N+j];
+	    m_Q[(i+m_QP_N)*2*m_QP_N+j+m_QP_N] = localLQ[i*m_QP_N+j];
+	    m_Q[i*2*m_QP_N+j+m_QP_N] = 0.0;
+	    m_Q[(i+m_QP_N)*2*m_QP_N+j] = 0.0;
 	  }
-
+      */
       for(unsigned int i=0;i<m_QP_N;i++)
 	{
 	  for(unsigned int j=0;j<m_QP_N;j++)
@@ -399,7 +400,7 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   // New formulation (Dimitar08)
   m_OptB = MAL_RET_A_by_B(m_iLQ,m_OptB);
 
-  if (0)
+  if (1)
   {
     ofstream aof;
     char Buffer[1024];
@@ -421,7 +422,7 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   // New formulation (Dimitar08)
   m_OptC = MAL_RET_A_by_B(m_iLQ,m_OptC);
   
-  if (0)
+  if (1)
   {
     ofstream aof;
     char Buffer[1024];
@@ -895,7 +896,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	  for(unsigned int i=0;i<2*N;i++)
 	    D[i] = OptD[i];
 
-	  if (0)
+	  if (1)
 	    {
 	      ofstream aof;
 	      char Buffer[1024];
@@ -1014,18 +1015,18 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
        */
       memset(NewX,0,2*N*sizeof(double));
 
-      double *pm_LQ = MAL_RET_MATRIX_DATABLOCK(m_LQ);
+      double *pm_iLQ = MAL_RET_MATRIX_DATABLOCK(m_iLQ);
       double *pNewX = NewX;
 
       for(unsigned int i=0;i<2*N;i++)
 	{
 	  double *pX= X;
-	  double *pLQ = pm_LQ+i*2*N+i;
+	  double *piLQ = pm_iLQ+i*2*N+i;
 	  *pNewX = 0.0;
 	  for(unsigned int j=i;j<2*N;j++)
 	    {
-	      *pNewX+= (*pLQ) * (*pX++);
-	      pLQ+=2*N;
+	      *pNewX+= (*piLQ) * (*pX++);
+	      piLQ+=2*N;
 	    }
 	  pNewX++;
 	}
@@ -1098,13 +1099,13 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   
   /*  cout << "Size of PX: " << MAL_MATRIX_NB_ROWS(vnlStorePx) << " " 
       << MAL_MATRIX_NB_COLS(vnlStorePx) << " " << endl; */
-  delete D;
-  delete XL;
-  delete XU;
-  delete X;
+  delete [] D;
+  delete [] XL;
+  delete [] XU;
+  delete [] X;
   free(war);
   free(U);
-  delete iwar;
+  delete [] iwar;
   // Clean the queue of Linear Constraint Inequalities.
   //  deque<LinearConstraintInequality_t *>::iterator LCI_it;
   LCI_it = QueueOfLConstraintInequalities.begin();
