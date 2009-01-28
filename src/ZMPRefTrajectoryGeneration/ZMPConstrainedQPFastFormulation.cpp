@@ -1,4 +1,4 @@
- /* This object generate all the values for the foot trajectories,
+/* This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of steps following a QP
    formulation and a new QP solver as proposed by Dimitrov ICRA 2009.
 
@@ -90,7 +90,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   ZMPRefTrajectoryGeneration(lSPM)
 {
   m_Q = 0;
-
+  m_InterPu =0;
   /*! Getting the ZMP reference from Kajita's heuristic. */
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
 
@@ -281,7 +281,34 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   anOCD.ComputeNormalCholeskyOnA();
   anOCD.ComputeNormalCholeskyOnA();
   anOCD.ComputeInverseCholesky(1);
-  
+
+  if (1)
+    {
+      ofstream aof;
+      char Buffer[1024];
+      sprintf(Buffer,"localQ.dat");
+      aof.open(Buffer,ofstream::out);
+      for(unsigned int i=0;i<m_QP_N;i++)
+	{
+	  for(unsigned int j=0;j<m_QP_N;j++)
+	    aof << localQ[i*m_QP_N+j] << " ";
+	  aof<<endl;
+	}
+      aof.close(); 
+
+      sprintf(Buffer,"localLQ.dat");
+      aof.open(Buffer,ofstream::out);
+      for(unsigned int i=0;i<m_QP_N;i++)
+	{
+	  for(unsigned int j=0;j<m_QP_N;j++)
+	    aof << localLQ[i*m_QP_N+j] << " ";
+	  aof << endl;
+	}
+      aof.close(); 
+
+      
+    }  
+
   // Initialization of the matrice regarding the quadratic
   // part of the objective function.
   memset(m_Q,0,4*m_QP_N*m_QP_N*sizeof(double));
@@ -293,14 +320,13 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
 
   if (CriteriaToMaximize==1)
     {
-      for(unsigned int i=0;i<2*m_QP_N;i++)
-	for(unsigned int j=0;j<2*m_QP_N;j++)
+      for(unsigned int i=0;i<m_QP_N;i++)
+	for(unsigned int j=0;j<m_QP_N;j++)
 	  {
-	    /*! Fill m_Q */
-	    if (i==j)
-	      m_Q[j*2*m_QP_N+i] = 1;
-	    else
-	      m_Q[j*2*m_QP_N+i] = 0;
+	    m_Q[j*2*m_QP_N+i] = localLQ[i*m_QP_N+j];
+	    m_Q[(j+m_QP_N)*2*m_QP_N+i+m_QP_N] = localLQ[i*m_QP_N+j];
+	    m_Q[j*2*m_QP_N+i+m_QP_N] = 0.0;
+	    m_Q[(j+m_QP_N)*2*m_QP_N+i] = 0.0;
 	  }
 
       for(unsigned int i=0;i<m_QP_N;i++)
@@ -320,21 +346,41 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
 	}
 
 
-      if (0)
+      if (1)
 	{
 	  ofstream aof;
 	  char Buffer[1024];
-	  sprintf(Buffer,"C.dat");
+	  sprintf(Buffer,"Q.dat");
 	  aof.open(Buffer,ofstream::out);
 	  for(unsigned int i=0;i<2*m_QP_N;i++)
 	    {
-	      for(unsigned int j=0;j<2*m_QP_N-1;j++)
-		aof << OptA(i,j) << " ";
-	      aof << OptA(i,2*m_QP_N-1);
+	      for(unsigned int j=0;j<2*m_QP_N;j++)
+		aof << m_Q[i*m_QP_N*2+j] << " ";
 	      aof << endl;
 	    }
 	  aof.close(); 
-	  
+
+
+	  sprintf(Buffer,"LQ.dat");
+	  aof.open(Buffer,ofstream::out);
+	  for(unsigned int i=0;i<2*m_QP_N;i++)
+	    {
+	      for(unsigned int j=0;j<2*m_QP_N;j++)
+		aof << m_LQ(i,j) << " ";
+	      aof << endl;
+	    }
+	  aof.close(); 
+
+	  sprintf(Buffer,"iLQ.dat");
+	  aof.open(Buffer,ofstream::out);
+	  for(unsigned int i=0;i<2*m_QP_N;i++)
+	    {
+	      for(unsigned int j=0;j<2*m_QP_N;j++)
+		aof << m_iLQ(i,j) << " ";
+	      aof << endl;
+	    }
+	  aof.close(); 
+	 	  
 	}  
 
     }
@@ -349,7 +395,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
   m_OptB = m_Alpha * m_OptB;
   m_OptB = m_OptB + m_Beta * lterm1;
-  // 
+
+  // New formulation (Dimitar08)
+  m_OptB = MAL_RET_A_by_B(m_iLQ,m_OptB);
 
   if (0)
   {
@@ -370,6 +418,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   
   m_OptC = MAL_RET_TRANSPOSE(m_PPu);
   m_OptC = m_Beta * m_OptC;
+  // New formulation (Dimitar08)
+  m_OptC = MAL_RET_A_by_B(m_iLQ,m_OptC);
+  
   if (0)
   {
     ofstream aof;
@@ -424,14 +475,14 @@ const double & ZMPConstrainedQPFastFormulation::GetBeta() const
 }
 
 
-int ZMPConstrainedQPFastFormulation::BuildMatricesPxPu(double * & Px,double * &Pu, 
-						       unsigned N, double T,
-						       double StartingTime,
-						       deque<LinearConstraintInequality_t *> & 
-						       QueueOfLConstraintInequalities,
-						       double Com_Height,
-						       unsigned int &NbOfConstraints,
-						       MAL_VECTOR(& xk,double))
+int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,double * &Pu, 
+							     unsigned N, double T,
+							     double StartingTime,
+							     deque<LinearConstraintInequality_t *> & 
+							     QueueOfLConstraintInequalities,
+							     double Com_Height,
+							     unsigned int &NbOfConstraints,
+							     MAL_VECTOR(& xk,double))
 {
   // Discretize the problem.
   ODEBUG(" N:" << N << " T: " << T);
@@ -446,8 +497,11 @@ int ZMPConstrainedQPFastFormulation::BuildMatricesPxPu(double * & Px,double * &P
   if (Pu==0)
     Pu = new double[(8*N+1)*2*N];
 
+  if (m_InterPu ==0)
+    m_InterPu = new double[(8*N+1)*2*N];
+
   memset(Pu,0,(8*N+1)*2*N*sizeof(double));
-  //memset(Px,0,(8*N+1)*sizeof(double));
+  memset(m_InterPu,0,(8*N+1)*2*N*sizeof(double));
 
   deque<LinearConstraintInequality_t *>::iterator LCI_it, store_it;
   LCI_it = QueueOfLConstraintInequalities.begin();
@@ -515,10 +569,6 @@ int ZMPConstrainedQPFastFormulation::BuildMatricesPxPu(double * & Px,double * &P
 	  LCI_it++;
 	}
 
-      if (LCI_it==QueueOfLConstraintInequalities.end())
-	{
-	}
-
       // For each constraint.
       for(unsigned j=0;j<MAL_MATRIX_NB_ROWS((*LCI_it)->A);j++)
 	{
@@ -543,12 +593,12 @@ int ZMPConstrainedQPFastFormulation::BuildMatricesPxPu(double * & Px,double * &P
 	  for(unsigned k=0;k<=i;k++)
 	    {
 	      // X axis
-	      Pu[IndexConstraint+k*(NbOfConstraints+1)] = 
+	      m_InterPu[IndexConstraint+k*(NbOfConstraints+1)] = 
 		(*LCI_it)->A(j,0)*
 		((1+3*(i-k)+3*(i-k)*(i-k))*T*T*T/6.0 - T * Com_Height/9.81);
 	      
 	      // Y axis
-	      Pu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
+	      m_InterPu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
 		(*LCI_it)->A(j,1)*
 		((1+3*(i-k)+3*(i-k)*(i-k))*T*T*T/6.0 - T * Com_Height/9.81);
 		 
@@ -559,8 +609,84 @@ int ZMPConstrainedQPFastFormulation::BuildMatricesPxPu(double * & Px,double * &P
 	}
 
     }
+  if (1)
+    {
+      ofstream aof;
+      char Buffer[1024];
+      sprintf(Buffer,"InterPu_%f.dat", StartingTime);
+      aof.open(Buffer,ofstream::out);
+      for(unsigned int i=0;i<IndexConstraint;i++)
+	{
+	  for(unsigned int j=0;j<2*N;j++)
+	    aof << m_InterPu[i+j*(NbOfConstraints+1)] << " " ;
+	  aof << endl;
+	}
+      aof.close();
+      
+    }
+
+  // New Formulation:
+  // Custom multiplication by the tranpose of iLQ
+  // Pu's size is (2*N , NbOfConstraints+1)
+  // iLQ has 2 empty blocks:
+  // | C 0 |
+  // | 0 C |
+  // As we really build the transpose of Pu,
+  // we compute (Pu*iLQ')' = iLQ*Pu'
+  // for qld ...
+  // Be careful with the two stages resolution.
+
+  double *pm_iLQ = MAL_RET_MATRIX_DATABLOCK(m_iLQ);
+  // First block
+  for(unsigned int i=0;i<N;i++)
+    {
+      double *pPu= Pu+i*(NbOfConstraints+1);
+      double *psiLQ=pm_iLQ+i*2*N;
+      for(unsigned int j=0;j<NbOfConstraints+1;j++)
+	{
+
+	  *pPu=0;
+	  double *piLQ = psiLQ;
+	  double *pInterPu=m_InterPu+j;
+
+	  // Do not perform a complete
+	  // multiplication due to the triangular nature 
+	  // of iLQ (suppose to be a lower triangular matrix).
+	  for(unsigned int k=0;k<=i;k++)
+	    {
+	      *pPu += (*piLQ++) * (*pInterPu);
+	      pInterPu += (NbOfConstraints+1);
+	    }
+	  pPu++;
+	}
+    }
+  // Second block
+  for(unsigned int i=N;i<2*N;i++)
+    {
+      double *pPu= Pu+i*(NbOfConstraints+1);
+      double *psiLQ=pm_iLQ+i*2*N;
+      for(unsigned int j=0;j<NbOfConstraints+1;j++)
+	{
+
+	  *pPu=0;
+	  double *piLQ = psiLQ+N;
+	  double *pInterPu=m_InterPu+j+N*(NbOfConstraints+1);
+
+	  // Do not perform a complete
+	  // multiplication due to the triangular nature 
+	  // of iLQ (suppose to be a lower triangular matrix).
+	  for(unsigned int k=N;k<=i;k++)
+	    {
+	      *pPu += (*piLQ++) * (*pInterPu);
+	      pInterPu += (NbOfConstraints+1);
+	    }
+	  pPu++;
+	}
+    }
+  
+  
   ODEBUG6("Index Constraint :"<< IndexConstraint,Buffer);
-  if (0)
+  if (1)
     {
       ofstream aof;
       char Buffer[1024];
@@ -632,6 +758,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   double *XL=new double[2*N];  // Lower bound of the jerk.
   double *XU=new double[2*N];  // Upper bound of the jerk.
   double *X=new double[2*N];   // Solution of the system.
+  double *NewX=new double[2*N];   // Solution of the system.
   double Eps=1e-8 ;
   double *U = (double *)malloc( sizeof(double)*mnn); // Returns the Lagrange multipliers.;
 
@@ -721,13 +848,13 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	      xk[2] << " " << xk[5] << " ", "Check2DLIPM.dat");
 	      
       // Build the related matrices.
-      BuildMatricesPxPu(Px,Pu,
-			N,T,
-			StartingTime,
-			QueueOfLConstraintInequalities,
-			m_ComHeight,
-			NbOfConstraints,
-			xk);
+      BuildConstraintMatrices(Px,Pu,
+			      N,T,
+			      StartingTime,
+			      QueueOfLConstraintInequalities,
+			      m_ComHeight,
+			      NbOfConstraints,
+			      xk);
       
 
       m = NbOfConstraints;
@@ -808,19 +935,21 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	    vnlStorePx(i,li) = Px[i];
 	}
 
-      iwar[0]=1;
+      iwar[0]=0;
       ODEBUG("m: " << m);
       ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
 	      m_Q, D, Pu,Px,XL,XU,
 	      X,U,&iout, &ifail, &iprint,
 	      war, &lwar,
 	      iwar, &liwar,&Eps);
+
       if (ifail!=0)
 	{
 	  cout << "IFAIL: " << ifail << endl;
 	  return -1;
 	}
 
+      /* Constraint validation */
 
       for(int i=0; i<m;i++)
 	for(unsigned int j=0; j<2*N;j++)
@@ -878,16 +1007,43 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	    }
 	    
 	}
+      
+      /* Multiply the solution by the transpose of iLQ 
+	 because it is a triangular matrix we do a specific 
+	 multiplication.
+       */
+      memset(NewX,0,2*N*sizeof(double));
+
+      double *pm_LQ = MAL_RET_MATRIX_DATABLOCK(m_LQ);
+      double *pNewX = NewX;
+
+      for(unsigned int i=0;i<2*N;i++)
+	{
+	  double *pX= X;
+	  double *pLQ = pm_LQ+i*2*N+i;
+	  *pNewX = 0.0;
+	  for(unsigned int j=i;j<2*N;j++)
+	    {
+	      *pNewX+= (*pLQ) * (*pX++);
+	      pLQ+=2*N;
+	    }
+	  pNewX++;
+	}
+      
+      
+      /* Simulation of the Single Point Mass model 
+	 with the new command.
+       */
       ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
       
       // Calling this method will automatically 
-      // update the NewFinalZMPPositions.
+      // update the ZMPRefPositions.
       m_2DLIPM->Interpolation(COMPositions,
 			      ZMPRefPositions,
 			      li*interval,
-			      X[0],X[N]);
+			      NewX[0],NewX[N]);
 
-      m_2DLIPM->OneIteration(X[0],X[N]);
+      m_2DLIPM->OneIteration(NewX[0],NewX[N]);
       ODEBUG6("uk:" << uk,"DebugPBW.dat");
       ODEBUG6("xk:" << xk,"DebugPBW.dat");
 

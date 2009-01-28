@@ -138,14 +138,14 @@ namespace PatternGeneratorJRL
       
     
     /*! Build the necessary matrices for the QP problem under linear inequality constraints. */
-    int BuildMatricesPxPu(double * &Px, double * &Pu,
-			  unsigned N, double T,
-			  double StartingTime,
-			  deque<LinearConstraintInequality_t *> 
-			  & QueueOfLConstraintInequalities,
-			  double Com_Height,
-			  unsigned int &NbOfConstraints,
-			  MAL_VECTOR(&xk,double));
+    int BuildConstraintMatrices(double * &Px, double * &Pu,
+				unsigned N, double T,
+				double StartingTime,
+				deque<LinearConstraintInequality_t *> 
+				& QueueOfLConstraintInequalities,
+				double Com_Height,
+				unsigned int &NbOfConstraints,
+				MAL_VECTOR(&xk,double));
     
     /*! This method helps to build a linear system for constraining the ZMP. */
     int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
@@ -291,9 +291,8 @@ namespace PatternGeneratorJRL
     /*! \brief Cholesky decomposition of the initial objective function $Q$ */
     MAL_MATRIX(m_LQ,double);
 
-/*! \brief Cholesky decomposition of the initial objective function $Q$ */
+    /*! \brief Cholesky decomposition of the initial objective function $Q$ */
     MAL_MATRIX(m_iLQ,double);
-    
 
     /*! \brief Optimized cholesky decomposition */
     OptCholesky * m_OptCholesky;
@@ -310,7 +309,11 @@ namespace PatternGeneratorJRL
     /*! Putting weight on the jerk minimization. */
     double m_Alpha;
     /*! @} */
+
+    /* Temporary variables for speeding up memory allocation. */
+    double * m_InterPu;
     
+
     /*! @} */
   };
 };
