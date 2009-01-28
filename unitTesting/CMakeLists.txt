@@ -24,10 +24,10 @@ SET_TARGET_PROPERTIES(TestFootPrintPGInterface
 )
 ADD_DEPENDENCIES (TestFootPrintPGInterface ${PROJECT_NAME})
 
-ADD_EXECUTABLE(	TestOptCholesky TestOptCholesky.cpp)
-SET_TARGET_PROPERTIES(TestOptCholesky
-	              PROPERTIES
-	              COMPILE_FLAGS ${UNITTESTING_CXXFLAGS}
-		      LINK_FLAGS ${UNITTESTING_LDFLAGS}
-)
-ADD_DEPENDENCIES (TestOptCholesky ${PROJECT_NAME})
+#ADD_EXECUTABLE(	TestOptCholesky TestOptCholesky.cpp)
+#SET_TARGET_PROPERTIES(TestOptCholesky
+#	              PROPERTIES
+#	              COMPILE_FLAGS ${UNITTESTING_CXXFLAGS}
+#		      LINK_FLAGS ${UNITTESTING_LDFLAGS}
+#)
+#ADD_DEPENDENCIES (TestOptCholesky ${PROJECT_NAME})
