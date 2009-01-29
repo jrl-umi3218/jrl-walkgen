@@ -847,12 +847,11 @@ int main(int argc, char *argv[])
 	      totaltime += ltime;
 	      NbOfItToCompute++;
 	    }
-
-
+	  /*
 	  aPGI->DebugControlLoop(PreviousConfiguration,
 				 PreviousVelocity,
 				 PreviousAcceleration,
-				 NbOfIt);
+				 NbOfIt);*/
 	  PreviousConfiguration = CurrentConfiguration;
 	  PreviousVelocity = CurrentVelocity;
 	  PreviousAcceleration = CurrentAcceleration;
