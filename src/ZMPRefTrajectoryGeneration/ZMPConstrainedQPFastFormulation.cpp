@@ -90,7 +90,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   ZMPRefTrajectoryGeneration(lSPM)
 {
   m_Q = 0;
-  m_InterPu = 0;
+  m_Pu = 0;
   m_FullDebug = 0;
   m_FastFormulationMode = QLDANDLQ;
 
@@ -277,7 +277,8 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
   anOCD.ComputeNormalCholeskyOnA();
   anOCD.ComputeInverseCholesky(1);
   
-  if (m_FullDebug>0)
+  //  if (m_FullDebug>0)
+  if(1)
     {
       ofstream aof;
       char Buffer[1024];
@@ -474,6 +475,105 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   return 0;
 }
 
+int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
+{
+  if (m_Pu==0)
+    m_Pu = new double[m_QP_N*m_QP_N];
+
+  double * lInterPu=0;
+  double * ptPu=0;
+  
+  if (m_FastFormulationMode==QLDANDLQ)
+    {
+      lInterPu = new double[m_QP_N*m_QP_N];
+      memset(lInterPu,0,m_QP_N*m_QP_N*sizeof(double));
+      ptPu = lInterPu;
+    }
+  else 
+    ptPu = m_Pu;
+
+  memset(m_Pu,0,m_QP_N*m_QP_N*sizeof(double));
+
+  // Recursive multiplication of the system is applied.
+  // we keep the transpose form, i.e. Pu'.
+  for(unsigned i=0;i<m_QP_N;i++)
+    {
+
+      for(unsigned k=0;k<=i;k++)
+	{
+	  ptPu[k*m_QP_N+i] = 
+	    ((1+3*(i-k)+3*(i-k)*(i-k))*m_QP_T*m_QP_T*m_QP_T/6.0 - m_QP_T * m_ComHeight/9.81);
+	  ODEBUG("IC: " << IndexConstraint );
+	}
+    }
+  
+  // Consider QLDANDLQ formulation.
+  if (m_FastFormulationMode==QLDANDLQ)
+    {
+      // Premultiplication by LQ-1
+      // Indeed we have to provide qld transpose matrix,
+      // therefore instead of providing D*Pu*iLQ (IROS 2008 p 28)
+      // we provide its transpose:
+      // (D*Pu*iLQ')' = iLQ*Pu'*D'
+      // Be careful with the two stages resolution.
+      for(unsigned i=0;i<m_QP_N;i++)
+	{
+	
+	  for(unsigned j=0;j<m_QP_N;j++)
+	    {
+	      m_Pu[i*m_QP_N+j] = 0;
+	      for(unsigned k=0;k<m_QP_N;k++)
+		{
+		  m_Pu[i*m_QP_N+j] += m_iLQ(i,k) * ptPu[k*m_QP_N+j];
+		  ODEBUG("IC: " << IndexConstraint );
+		}
+	    }
+	}
+    }
+
+  //  if (m_FullDebug>0)
+  if(1)
+    {
+      ofstream aof;
+      char Buffer[1024];
+      sprintf(Buffer,"PuCst.dat");
+      aof.open(Buffer,ofstream::out);
+      for(unsigned int i=0;i<m_QP_N;i++)
+	{
+	  for(unsigned int j=0;j<m_QP_N;j++)
+	    aof << m_Pu[j+i*m_QP_N] << " " ;
+	  aof << endl;
+	}
+      aof.close();
+
+      sprintf(Buffer,"tmpPuCst.dat");
+      aof.open(Buffer,ofstream::out);
+      for(unsigned int i=0;i<m_QP_N;i++)
+	{
+	  for(unsigned int j=0;j<m_QP_N;j++)
+	    aof << ptPu[j+i*m_QP_N] << " " ;
+	  aof << endl;
+	}
+      aof.close();
+
+      ODEBUG3("m_iLQ:" << MAL_MATRIX_NB_ROWS(m_iLQ) << " " <<
+	      MAL_MATRIX_NB_COLS(m_iLQ) );
+      sprintf(Buffer,"tmpiLQ.dat");
+      aof.open(Buffer,ofstream::out);
+      for(unsigned int i=0;i<m_QP_N;i++)
+	{
+	  for(unsigned int j=0;j<m_QP_N;j++)
+	    aof << m_iLQ(i,j) << " " ;
+	  aof << endl;
+	}
+      aof.close();
+      
+    }
+    
+  delete [] lInterPu;
+  return 0;
+}
+
 
 int ZMPConstrainedQPFastFormulation::InitConstants()
 {
@@ -482,6 +582,9 @@ int ZMPConstrainedQPFastFormulation::InitConstants()
     return r;
 
   if ((r=BuildingConstantPartOfTheObjectiveFunction())<0)
+    return r;
+  
+  if ((r=BuildingConstantPartOfConstraintMatrices())<0)
     return r;
 
   return 0;
@@ -530,11 +633,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
   if (Pu==0)
     Pu = new double[(8*N+1)*2*N];
 
-  if (m_InterPu ==0)
-    m_InterPu = new double[(8*N+1)*2*N];
-
   memset(Pu,0,(8*N+1)*2*N*sizeof(double));
-  memset(m_InterPu,0,(8*N+1)*2*N*sizeof(double));
 
   deque<LinearConstraintInequality_t *>::iterator LCI_it, store_it;
   LCI_it = QueueOfLConstraintInequalities.begin();
@@ -624,26 +723,16 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer2);
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer3);
 
-	  
-	  double *ptPu=0;
-	  if (m_FastFormulationMode==QLDANDLQ)
-	    {
-	      ptPu= m_InterPu;
-	    }
-	  else
-	    ptPu = Pu;
 
 	  for(unsigned k=0;k<=i;k++)
 	    {
 	      // X axis
-	      ptPu[IndexConstraint+k*(NbOfConstraints+1)] = 
-		(*LCI_it)->A(j,0)*
-		((1+3*(i-k)+3*(i-k)*(i-k))*T*T*T/6.0 - T * Com_Height/9.81);
+	      Pu[IndexConstraint+k*(NbOfConstraints+1)] = 
+		(*LCI_it)->A(j,0)*m_Pu[k*N+i];
 	      
 	      // Y axis
-	      ptPu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
-		(*LCI_it)->A(j,1)*
-		((1+3*(i-k)+3*(i-k)*(i-k))*T*T*T/6.0 - T * Com_Height/9.81);
+	      Pu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
+		(*LCI_it)->A(j,1)*m_Pu[k*N+i];
 	      
 	    }
 	  ODEBUG("IC: " << IndexConstraint );
@@ -652,84 +741,6 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
 
     }
 
-  if (m_FastFormulationMode==QLDANDLQ)
-    {
-      if (m_FullDebug>0)
-	{
-	  ofstream aof;
-	  char Buffer[1024];
-	  sprintf(Buffer,"InterPu_%f.dat", StartingTime);
-	  aof.open(Buffer,ofstream::out);
-	  for(unsigned int i=0;i<IndexConstraint;i++)
-	    {
-	      for(unsigned int j=0;j<2*N;j++)
-		aof << m_InterPu[i+j*(NbOfConstraints+1)] << " " ;
-	      aof << endl;
-	    }
-	  aof.close();
-	  
-	}
-	
-      ODEBUG("Going through the fast formulation for the linear constraint...");
-      // New Formulation:
-      // Custom multiplication by the tranpose of iLQ
-      // Pu's size is (2*N , NbOfConstraints+1)
-      // iLQ has 2 empty blocks:
-      // | C 0 |
-      // | 0 C |
-      // As we really build the transpose of Pu,
-      // we compute (Pu*iLQ')' = iLQ*Pu'
-      // for qld ...
-      // Be careful with the two stages resolution.
-      double *pm_iLQ = MAL_RET_MATRIX_DATABLOCK(m_iLQ);
-      // First block
-      for(unsigned int i=0;i<N;i++)
-	{
-	  double *pPu= Pu+i*(NbOfConstraints+1);
-	  double *psiLQ=pm_iLQ+i*2*N;
-	  for(unsigned int j=0;j<NbOfConstraints+1;j++)
-	    {
-	      
-	      *pPu=0;
-	      double *piLQ = psiLQ;
-	      double *pInterPu=m_InterPu+j;
-	      
-	      // Do not perform a complete
-	      // multiplication due to the triangular nature 
-	      // of iLQ (suppose to be a lower triangular matrix).
-	      for(unsigned int k=0;k<=i;k++)
-		{
-		  *pPu += (*piLQ++) * (*pInterPu);
-		  pInterPu += (NbOfConstraints+1);
-		}
-	      pPu++;
-	    }
-	}
-      // Second block
-      for(unsigned int i=N;i<2*N;i++)
-	{
-	  double *pPu= Pu+i*(NbOfConstraints+1);
-	  double *psiLQ=pm_iLQ+i*2*N;
-	  for(unsigned int j=0;j<NbOfConstraints+1;j++)
-	    {
-	      
-	      *pPu=0;
-	      double *piLQ = psiLQ+N;
-	      double *pInterPu=m_InterPu+j+N*(NbOfConstraints+1);
-	      
-	      // Do not perform a complete
-	      // multiplication due to the triangular nature 
-	      // of iLQ (suppose to be a lower triangular matrix).
-	      for(unsigned int k=N;k<=i;k++)
-		{
-		  *pPu += (*piLQ++) * (*pInterPu);
-		  pInterPu += (NbOfConstraints+1);
-		}
-	      pPu++;
-	    }
-	}
-    }
-  
   
   ODEBUG6("Index Constraint :"<< IndexConstraint,Buffer);
   if (m_FullDebug>0)

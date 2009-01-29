@@ -154,6 +154,9 @@ namespace PatternGeneratorJRL
 				unsigned int &NbOfConstraints,
 				MAL_VECTOR(&xk,double));
 
+    /*! \brief Build the constant part of the constraint matrices. */
+    int BuildingConstantPartOfConstraintMatrices();
+
     /*! This method helps to build a linear system for constraining the ZMP. */
     int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
 			    MAL_MATRIX(&A,double),
@@ -321,8 +324,8 @@ namespace PatternGeneratorJRL
     double m_Alpha;
     /*! @} */
 
-    /* Temporary variables for speeding up memory allocation. */
-    double * m_InterPu;
+    /* Constant parts of the linear constraints. */
+    double * m_Pu;
 
     /*! \brief Debugging variable: dump everything is set to 1 */
     unsigned int m_FullDebug;
