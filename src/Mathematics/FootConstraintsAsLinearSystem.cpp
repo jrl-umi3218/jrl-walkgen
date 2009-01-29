@@ -1,7 +1,7 @@
 /** \file FootConstraintAsLinearSystem.cpp
     \brief This object build linear constraints based on feet positions.
 
-   Copyright (c) 2005-2006, 
+   Copyright (c) 2005-2009, 
    @author Olivier Stasse
    
    JRL-Japan, CNRS/AIST

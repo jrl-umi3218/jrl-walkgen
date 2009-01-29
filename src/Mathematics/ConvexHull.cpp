@@ -140,6 +140,7 @@ namespace PatternGeneratorJRL
 	it_PtinPolarCoord = ListOfPointinPolarCoord.begin();
 	while (it_PtinPolarCoord!=ListOfPointinPolarCoord.end())
 	  {
+	    bool ToBeDeleted = false;
 	    CH_Point Current = *it_PtinPolarCoord;
 	    if (CompareCBRep(Current,aVecOfPoints[i])==0.0)
 	      {
@@ -147,12 +148,16 @@ namespace PatternGeneratorJRL
 		DistanceCHRep(Current,aVecOfPoints[i],
 			      distance1, distance2);
 		if (distance1<=distance2)
-		  {
-		    ListOfPointinPolarCoord.erase(it_PtinPolarCoord);
-		  }
-		else bInsert=0;
+		  ToBeDeleted = true;
+		else 
+		  bInsert=0;
 	      }
+	    set<CH_Point, ltCH_Point>::iterator it_ToBeDeleted = it_PtinPolarCoord;
+
 	    it_PtinPolarCoord++;
+	    if(ToBeDeleted)
+	      ListOfPointinPolarCoord.erase(it_ToBeDeleted);
+	    
 	  }
 
 	if (bInsert)

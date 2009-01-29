@@ -131,6 +131,13 @@ namespace PatternGeneratorJRL
     */
     int BuildingConstantPartOfTheObjectiveFunction();
 
+    /*! Transform the matrices with LQ. */
+    int BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX(,double) &OptA);
+
+    /*! Compute the quadratic form of the objective function. */
+    int BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX(,double) &OptA);
+
+
     /*! \brief Call the two previous methods 
       \return A negative value in case of a problem 0 otherwise.
      */
@@ -146,7 +153,10 @@ namespace PatternGeneratorJRL
 				double Com_Height,
 				unsigned int &NbOfConstraints,
 				MAL_VECTOR(&xk,double));
-    
+
+    /*! \brief Build the constant part of the constraint matrices. */
+    int BuildingConstantPartOfConstraintMatrices();
+
     /*! This method helps to build a linear system for constraining the ZMP. */
     int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
 			    MAL_MATRIX(&A,double),
@@ -245,6 +255,10 @@ namespace PatternGeneratorJRL
     /*! Set the preview control object. */
     void SetPreviewControl(PreviewControl *aPC);
 
+    static const unsigned int QLD=0;
+    static const unsigned int QLDANDLQ=1;
+    static const unsigned int NEWOPTIMIZER=2;
+
   private:
 
     /*! Uses a ZMPDiscretization scheme to get the usual Kajita heuristic. */
@@ -310,8 +324,14 @@ namespace PatternGeneratorJRL
     double m_Alpha;
     /*! @} */
 
-    /* Temporary variables for speeding up memory allocation. */
-    double * m_InterPu;
+    /* Constant parts of the linear constraints. */
+    double * m_Pu;
+
+    /*! \brief Debugging variable: dump everything is set to 1 */
+    unsigned int m_FullDebug;
+
+    /*! \brief Fast formulations mode. */
+    unsigned int m_FastFormulationMode;
     
 
     /*! @} */
