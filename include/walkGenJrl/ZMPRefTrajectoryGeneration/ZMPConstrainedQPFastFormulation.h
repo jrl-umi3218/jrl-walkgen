@@ -335,6 +335,16 @@ namespace PatternGeneratorJRL
     
 
     /*! @} */
+    
+    int DumpProblem(double * Q,
+		    double * D, 
+		    double * Pu,
+		    unsigned int NbOfConstraints,
+		    double * Px,
+		    double * XL,
+		    double * XU,
+		    double Time);
+      
   };
 };
 
