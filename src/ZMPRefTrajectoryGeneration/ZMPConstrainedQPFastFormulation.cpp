@@ -277,8 +277,7 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
   anOCD.ComputeNormalCholeskyOnA();
   anOCD.ComputeInverseCholesky(1);
   
-  //  if (m_FullDebug>0)
-  if(1)
+  if (m_FullDebug>0)
     {
       ofstream aof;
       char Buffer[1024];
@@ -531,8 +530,7 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
 	}
     }
 
-  //  if (m_FullDebug>0)
-  if(1)
+  if (m_FullDebug>0)
     {
       ofstream aof;
       char Buffer[1024];
@@ -687,7 +685,10 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
       IndexConstraint += MAL_MATRIX_NB_ROWS((*LCI_it)->A);
     }  
   NbOfConstraints = IndexConstraint;
-
+  
+  MAL_MATRIX(lD,double);
+  MAL_MATRIX_RESIZE(lD,2*N,NbOfConstraints);
+  
   LCI_it = store_it;
   IndexConstraint = 0;
   ODEBUG("Starting Matrix to build the constraints. ");
@@ -723,17 +724,34 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer2);
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer3);
 
-
-	  for(unsigned k=0;k<=i;k++)
+	  lD(i,IndexConstraint) = (*LCI_it)->A(j,0);
+	  lD(i+N,IndexConstraint) = (*LCI_it)->A(j,1);
+	  if (m_FastFormulationMode==QLD)
 	    {
-	      // X axis
-	      Pu[IndexConstraint+k*(NbOfConstraints+1)] = 
-		(*LCI_it)->A(j,0)*m_Pu[k*N+i];
-	      
-	      // Y axis
-	      Pu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
-		(*LCI_it)->A(j,1)*m_Pu[k*N+i];
-	      
+	      // In this case, Pu is triangular.
+	      // so we can speed up the computation.
+	      for(unsigned k=0;k<=i;k++)
+		{
+		  // X axis
+		  Pu[IndexConstraint+k*(NbOfConstraints+1)] = 
+		    (*LCI_it)->A(j,0)*m_Pu[k*N+i];
+		  // Y axis
+		  Pu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
+		    (*LCI_it)->A(j,1)*m_Pu[k*N+i];	      
+		}
+	    }
+	  else if (m_FastFormulationMode==QLDANDLQ)
+	    {
+	      // In this case, Pu is *NOT* triangular.
+	      for(unsigned k=0;k<N;k++)
+		{
+		  // X axis
+		  Pu[IndexConstraint+k*(NbOfConstraints+1)] = 
+		    (*LCI_it)->A(j,0)*m_Pu[k*N+i];
+		  // Y axis
+		  Pu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
+		    (*LCI_it)->A(j,1)*m_Pu[k*N+i];	      
+		}
 	    }
 	  ODEBUG("IC: " << IndexConstraint );
 	  IndexConstraint++;
@@ -743,6 +761,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
 
   
   ODEBUG6("Index Constraint :"<< IndexConstraint,Buffer);
+
   if (m_FullDebug>0)
     {
       ofstream aof;
@@ -756,16 +775,112 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
 	  aof << endl;
 	}
       aof.close();
-      
-      sprintf(Buffer,"PX_%f.dat", StartingTime);
+
+      sprintf(Buffer,"PuCst_%f.dat",StartingTime);
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<IndexConstraint;i++)
+      for(unsigned int i=0;i<m_QP_N;i++)
 	{
-	  aof << Px[i] << endl ;
+	  for(unsigned int j=0;j<m_QP_N;j++)
+	    aof << m_Pu[j+i*m_QP_N] << " " ;
+	  aof << endl;
 	}
       aof.close();
+
+      sprintf(Buffer,"D_%f.dat",StartingTime);
+      aof.open(Buffer,ofstream::out);
+      for(unsigned int i=0;i<2*m_QP_N;i++)
+	{
+	  for(unsigned int j=0;j<NbOfConstraints;j++)
+	    aof << lD(i,j) << " " ;
+	  aof << endl;
+	}
+      aof.close();
+
+      if (0)
+	{
+	  sprintf(Buffer,"PX_%f.dat", StartingTime);
+	  aof.open(Buffer,ofstream::out);
+	  for(unsigned int i=0;i<IndexConstraint;i++)
+	    {
+	      aof << Px[i] << endl ;
+	    }
+	  aof.close();
+	}
     }
 
+  return 0;
+}
+
+int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
+						 double * D, 
+						 double * Pu,
+						 unsigned int NbOfConstraints,
+						 double * Px,
+						 double * XL,
+						 double * XU,
+						 double Time)
+{
+  ofstream aof;
+
+  char Buffer[1024];
+  sprintf(Buffer,"Problem_%f.dat",Time);
+  aof.open(Buffer,ofstream::out);
+
+  // Dumping Q.
+  aof << "Q:"<< endl;
+  for(unsigned int i=0;i<2*m_QP_N;i++)
+    {
+      for(unsigned int j=0;j<2*m_QP_N;j++)
+	{
+	  aof <<Q[j*m_QP_N*2+i]<< " ";
+	}
+      aof <<endl;
+    }
+
+  // Dumping D.
+  aof << "D:"<< endl;
+  for(unsigned int i=0;i<2*m_QP_N;i++)
+    {
+      aof <<D[i]<< " ";
+    }
+  aof <<endl;
+
+  // Dumping Pu.
+  aof << "Pu:"<< endl;
+  for(unsigned int i=0;i<NbOfConstraints;i++)
+    {
+      for(unsigned int j=0;j<2*m_QP_N;j++)
+	{
+	  aof << Pu[j*(NbOfConstraints+1)+i] << " ";
+	}
+      aof <<endl;
+    }
+
+  // Dumping Px.
+  aof << "Px:"<< endl;
+  for(unsigned int i=0;i<NbOfConstraints;i++)
+    {
+      aof << Px[i] << " ";
+    }
+  aof << endl;
+  
+  // Dumping XL.
+  aof << "XL:"<< endl;
+  for(unsigned int i=0;i<2*m_QP_N;i++)
+    {
+      aof << XL[i] << " ";
+    }
+  aof << endl;
+  
+  // Dumping XU.
+  aof << "XU:"<< endl;
+  for(unsigned int i=0;i<2*m_QP_N;i++)
+    {
+      aof << XU[i] << " ";
+    }
+  aof << endl;
+      
+  aof.close();
   return 0;
 }
 
@@ -996,6 +1111,9 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	iwar[0]=1;
 
       ODEBUG("m: " << m);
+      //      DumpProblem(m_Q, D, Pu, m, Px,XL,XU,StartingTime);
+		  
+		  
       ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
 	      m_Q, D, Pu,Px,XL,XU,
 	      X,U,&iout, &ifail, &iprint,
