@@ -1,3 +1,22 @@
+walkGenJrl 2.5.0 released January 30, 2009
+	
+	35. Validation with the Stack of Tasks.
+	34. Interface modification and ZMP initialization point modification
+	    for proper integration of the HWPG in SoT.
+	33. Compatibility with win32
+	32. Detect OpenHRP-3 and perform a proper install of
+	    the XML files.
+	31. Adding CMake capabilities.
+	30. Fixed bug for a proper estimation of ZMP multibody after phase 1.
+	29. Modification to have the waist position properly set when using the
+	    classical double stage preview control strategy.
+	28. Modification to start walking from various positions.
+	27. Added the installation of the idl file in the share-directory.
+	26. Fixed some namespace problems.
+	25. Fixed the problem of arms discontinuity.
+	24. Updated the plugin from ORBIX to omniorb 4.
+	23. Added Morisawa & Harada Method for real-time pattern generation (ICRA 2007)
+	
 walkGenJRL 2.4.1 released May 13, 2008
 
 	22. Added missing return statement.
