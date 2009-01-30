@@ -145,7 +145,7 @@ namespace PatternGeneratorJRL
       
     
     /*! Build the necessary matrices for the QP problem under linear inequality constraints. */
-    int BuildConstraintMatrices(double * &Px, double * &Pu,
+    int BuildConstraintMatrices(double * &Px, double * &DPu,
 				unsigned N, double T,
 				double StartingTime,
 				deque<LinearConstraintInequality_t *> 
