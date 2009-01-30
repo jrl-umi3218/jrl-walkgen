@@ -40,11 +40,10 @@ IF(UNIX)
   SET(LIBINCLUSION_KW "-l")
   SET(LIBINCLUSION_EXT "")
   SET(${PROJECT_NAME}_CXXFLAGS "-DUNIX ")
+  SET(${PROJECT_NAME}_PC_CXXFLAGS "-DUNIX")
 ENDIF(UNIX)
 
 project(${PROJECT_NAME})
-
-SET(CMAKE_INSTALL_PREFIX $ENV{ROBOTPKG_PATH})
 
 # Impose shared libraries
 #------------------------
@@ -56,11 +55,13 @@ SET(CMAKE_MODULE_PATH ${${PROJECT_NAME}_SOURCE_DIR}/CMakeModules)
 # Check for required packages
 # -------------------------
 INCLUDE(FindPkgConfig)
-pkg_check_modules(DYNJRLJAPAN REQUIRED dynamicsJRLJapan>=1.9.99 )
 
-SET(PROJECT_REQUIREMENTS "dynamicsJRLJapan >= 1.9.99")
+SET(DYNJRLJAPAN_REQUIRED_VERSION 1.10)
+pkg_check_modules(DYNJRLJAPAN REQUIRED dynamicsJRLJapan>=${DYNJRLJAPAN_REQUIRED_VERSION})
+SET(PROJECT_REQUIREMENTS "dynamicsJRLJapan >= ${DYNJRLJAPAN_REQUIRED_VERSION}")
 
-#MESSAGE(STATUS "${DYNJRLJAPAN_CFLAGS}")
+EXEC_PROGRAM(${PKG_CONFIG_EXECUTABLE} ARGS  --variable=docdir dynamicsJRLJapan
+  OUTPUT_VARIABLE _dynamicsJRLJapan_DOCDIR)
 
 SET(${PROJECT_NAME}_CXXFLAGS "-Wall ${${PROJECT_NAME}_CXXFLAGS}")
 IF(WIN32)
@@ -117,6 +118,7 @@ SET(install_pkg_prefix "\${prefix}")
 SET(install_pkg_exec_prefix "\${exec_prefix}")
 SET(install_pkg_libdir "\${libdir}")
 SET(install_pkg_include_dir "\${includedir}")
+SET(install_pkg_datarootdir "\${datarootdir}")
 
 # Install the file in the appropriate place.
 SET(install_libdir_pkgconfig ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
