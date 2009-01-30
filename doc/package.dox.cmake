@@ -158,6 +158,7 @@ SKIP_FUNCTION_MACROS   = YES
 # Configuration::additions related to external references   
 #---------------------------------------------------------------------------
 TAGFILES               = \
+	${_dynamicsJRLJapan_DOCDIR}/html/dynamicsJRLJapan.doxytag=${_dynamicsJRLJapan_DOCDIR}/html
 
 GENERATE_TAGFILE       = ${PROJECT_NAME}.doxytag
 ALLEXTERNALS           = NO
