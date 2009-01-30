@@ -101,7 +101,7 @@ INCLUDE(${CMAKE_MODULE_PATH}/FindOpenHRP.cmake)
 #--------------------------
 add_subdirectory(src)
 add_subdirectory(plugin)
-add_subdirectory(unitTesting)
+#add_subdirectory(unitTesting)
 
 # Prepare the documentation
 # -------------------------
