@@ -609,7 +609,7 @@ const double & ZMPConstrainedQPFastFormulation::GetBeta() const
 }
 
 
-int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,double * &Pu, 
+int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,double * &DPu, 
 							     unsigned N, double T,
 							     double StartingTime,
 							     deque<LinearConstraintInequality_t *> & 
@@ -628,10 +628,10 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
   if (Px==0)
     Px = new double[8*N+1];
 
-  if (Pu==0)
-    Pu = new double[(8*N+1)*2*N];
+  if (DPu==0)
+    DPu = new double[(8*N+1)*2*N];
 
-  memset(Pu,0,(8*N+1)*2*N*sizeof(double));
+  memset(DPu,0,(8*N+1)*2*N*sizeof(double));
 
   deque<LinearConstraintInequality_t *>::iterator LCI_it, store_it;
   LCI_it = QueueOfLConstraintInequalities.begin();
@@ -733,10 +733,10 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
 	      for(unsigned k=0;k<=i;k++)
 		{
 		  // X axis
-		  Pu[IndexConstraint+k*(NbOfConstraints+1)] = 
+		  DPu[IndexConstraint+k*(NbOfConstraints+1)] = 
 		    (*LCI_it)->A(j,0)*m_Pu[k*N+i];
 		  // Y axis
-		  Pu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
+		  DPu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
 		    (*LCI_it)->A(j,1)*m_Pu[k*N+i];	      
 		}
 	    }
@@ -746,10 +746,10 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
 	      for(unsigned k=0;k<N;k++)
 		{
 		  // X axis
-		  Pu[IndexConstraint+k*(NbOfConstraints+1)] = 
+		  DPu[IndexConstraint+k*(NbOfConstraints+1)] = 
 		    (*LCI_it)->A(j,0)*m_Pu[k*N+i];
 		  // Y axis
-		  Pu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
+		  DPu[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
 		    (*LCI_it)->A(j,1)*m_Pu[k*N+i];	      
 		}
 	    }
@@ -771,7 +771,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
       for(unsigned int i=0;i<IndexConstraint;i++)
 	{
 	  for(unsigned int j=0;j<2*N;j++)
-	    aof << Pu[i+j*(NbOfConstraints+1)] << " " ;
+	    aof << DPu[i+j*(NbOfConstraints+1)] << " " ;
 	  aof << endl;
 	}
       aof.close();
@@ -813,7 +813,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
 
 int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
 						 double * D, 
-						 double * Pu,
+						 double * DPu,
 						 unsigned int NbOfConstraints,
 						 double * Px,
 						 double * XL,
@@ -846,12 +846,12 @@ int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
   aof <<endl;
 
   // Dumping Pu.
-  aof << "Pu:"<< endl;
+  aof << "DPu:"<< endl;
   for(unsigned int i=0;i<NbOfConstraints;i++)
     {
       for(unsigned int j=0;j<2*m_QP_N;j++)
 	{
-	  aof << Pu[j*(NbOfConstraints+1)+i] << " ";
+	  aof << DPu[j*(NbOfConstraints+1)+i] << " ";
 	}
       aof <<endl;
     }
@@ -896,7 +896,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 									  unsigned int N)
 {
 
-  double *Px=0,*Pu=0;
+  double *Px=0,*DPu=0;
   unsigned int NbOfConstraints=8*N; // Nb of constraints to be taken into account
   // for each iteration
 
@@ -1018,7 +1018,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	      xk[2] << " " << xk[5] << " ", "Check2DLIPM.dat");
 	      
       // Build the related matrices.
-      BuildConstraintMatrices(Px,Pu,
+      BuildConstraintMatrices(Px,DPu,
 			      N,T,
 			      StartingTime,
 			      QueueOfLConstraintInequalities,
@@ -1115,7 +1115,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 		  
 		  
       ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
-	      m_Q, D, Pu,Px,XL,XU,
+	      m_Q, D, DPu,Px,XL,XU,
 	      X,U,&iout, &ifail, &iprint,
 	      war, &lwar,
 	      iwar, &liwar,&Eps);
@@ -1130,7 +1130,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 
       for(int i=0; i<m;i++)
 	for(unsigned int j=0; j<2*N;j++)
-	  vnlPu(i,j) = Pu[j*(m+1)+i];
+	  vnlPu(i,j) = DPu[j*(m+1)+i];
 
       for(unsigned int i=0; i<2*N;i++)
 	{
