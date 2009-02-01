@@ -41,9 +41,13 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
   m_iPu = iPu;
   m_Px = Px;
   m_iPuPx = 0;
+
+  m_OptCholesky = new PatternGeneratorJRL::OptCholesky(8*m_CardU,2*m_CardU);
+
+  AllocateMemoryForSolver();
 }
 
-PDLPSolver::InitializeSolver()
+void PDLPSolver::AllocateMemoryForSolver()
 {
   PrecomputeiPuPx();
   m_Uk = new double[2*m_CardU];
@@ -51,6 +55,19 @@ PDLPSolver::InitializeSolver()
 
   m_UnconstrainedDescentDirection = new double[2*m_CardU];
   memset(m_UnconstrainedDescentDirection,0,2*m_CardU*sizeof(double));
+
+  m_L = new double[4*m_CardU*m_CardU];
+  m_iL = new double[4*m_CardU*m_CardU];
+  m_d = new double[2*m_CardU];  
+  m_OptCholesky->SetL(m_L);
+  m_OptCholesky->SetL(m_iL);
+}
+
+void PLDPSolver::InitializeSolver()
+{
+  memset(m_v1,0,8*m_CardU*sizeof(double));
+  memset(m_v2,0,2*m_CardU*sizeof(double));
+  memset(m_d,0,2*m_CardU*sizeof(double));
 }
 
 PLDPSolver::~PLDPSolver()
@@ -63,6 +80,19 @@ PLDPSolver::~PLDPSolver()
 
   if (m_UnconstrainedDescentDirection!=0)
     delete [] m_UnconstrainedDescentDirection;
+
+  if (m_OptCholesy!=0)
+    delete m_OptCholesky;
+
+  if (m_v1!=0)
+    delete [] m_v1;
+
+  if (m_v2!=0)
+    delete [] m_v2;
+
+  if (m_d!=0)
+    delete [] m_d;
+
 }
 
 PLDLPSolver::PrecomputeiPuPx()
@@ -106,6 +136,27 @@ PLDPSolver::ComputeInitialSolution(double *ZMPRef,
     }
 }
 
+int PLDPSolver::ForwardSubstitution(double *LinearPartOfConstraintMatrix)
+{
+}
+
+int PLDPSolver::ComputeProjectedDescentDirection(double *LinearPartOfConstraintMatrix)
+{
+  // Compute L^{-T}
+  m_OptCholesky->ComputeInverseCholesky(0);
+  
+  for(unsigned int li=0;li<m_ActivatedConstraints.size();li++)
+    {
+      m_v1[li] = 0.0;
+      unsigned int RowCstMatrix = m_ActivatedConstraints[li];
+      for(unsigned int lj=li;lj<2*m_CardU;lj++)
+	{
+	  m_v1[li]+= m_LinearPartOfConstrainntMatrix[RowCstMatrix*2*m_CardU+lj]*
+	    m_UnconstrainedDescentDirection[lj];
+	}
+    }
+}
+
 int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 			      unsigned int NbOfConstraints,
 			      double *LinearPartOfConstraints,
@@ -113,14 +164,28 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 			      double *ZMPRef,
 			      double *XkYk)
 {
+  m_A = LinearPartOfConstraints;
+
   /* Step one : Algorithm initialization. */
   m_CstPartOfCostFunction = CstPartOfTheCostFunction;
   ComputeInitialSolution(ZMPRef,XkYk);
 
-  /* Step two : Compute descent direction. */
-  for(unsigned int i=0;i<2*m_CardU;i++)
-    m_UnconstrainedDescentDirection[i] = 
-      m_CstPartOftheCostFunction[i] -  m_Uk[i];
+  bool ContinueAlgo=true;
+
+  /*! Initialization de cholesky. */
+  m_OptCholesky->SetA(LinearPartOfConstraints);
+  m_OptCholesky->SetLToZero();
+
+  while(ContinueAlgo)
+    {
+      /* Step two : Compute descent direction. */
+      for(unsigned int i=0;i<2*m_CardU;i++)
+	 m_UnconstrainedDescentDirection[i] = 
+	  m_CstPartOftheCostFunction[i] -  m_Uk[i];
+      
+      /*! Step three: Compute the projected descent direction. */
+      
+    }
+
   
-  /*! Step three: Compute the projected descent direction. */
 }

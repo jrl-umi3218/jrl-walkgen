@@ -34,6 +34,8 @@
 
 #ifndef _PLDP_SOLVER_H_
 
+#include <walkGenJrl/Mathematics/OptCholesky.h>
+
 namespace Optimization
 {
   namespace Solver
@@ -68,6 +70,9 @@ namespace Optimization
 	    the class. */
 	  void InitializeSolver();
 
+	  /*! Allocate memory for solver. */
+	  void AllocateMemoryForSolver();
+
 	private:
 	  
 	  /*! Store the inverse of Pu. */
@@ -90,7 +95,28 @@ namespace Optimization
 	  /*! Store the unconstrained descent direction. */
 	  double *m_UnconstrainedDescentDirection;
 	  
+	  /*! Store the cholesky decomposition of EE^t. */
+	  double * m_L;
 	  
+	  /*! Store the inverse of the cholesky decomposition. */
+	  double *m_iL;
+
+	  /*! Store the projector of descent  */
+	  double *m_d;
+
+	  /*! Store some temporary variables  */
+	  double *m_v1;
+	  
+	  /*! Store the linear part of the constraints. */
+	  double * m_A;
+
+	  /*! Cholesky decomposition optimized for QP solving 
+	   ( specifically this one). */
+	  PatternGeneratorJRL::OptCholesky * m_OptCholesky;
+
+	  /*! List of activated constraints. */
+	  vector<unsigned int> m_ActivatedConstraints;
+
 	};
     };
 };
