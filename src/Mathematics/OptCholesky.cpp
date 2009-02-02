@@ -10,13 +10,6 @@ OptCholesky::OptCholesky(unsigned int lNbMaxOfConstraints,
   m_L(0),
   m_iL(0)
 {
-  if (lCardU<lNbMaxOfConstraints)
-    {
-      cout << "CardU<lNbMaxOfConstraints thus" << endl;
-      cout << "rank(A*A')<NbMaxOfConstraints" << endl;
-      cout << "It is very likely" <<endl;
-      cout << "that the matrix is *NOT* symmetric definite-positive" <<endl;
-    }
   InitializeInternalVariables();
 }
 

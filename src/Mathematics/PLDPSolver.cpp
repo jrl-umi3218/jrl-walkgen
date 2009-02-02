@@ -124,18 +124,33 @@ int PLDPSolver::PrecomputeiPuPx()
 {
   m_iPuPx = new double[2*m_CardU*6];
 
+  memset(m_iPuPx,0,2*m_CardU*6);
+
   // This should be reimplemented with a proper matrix library.
   // will be done in a second time.
-  for(unsigned int i=0;i<2*m_CardU;i++)
+  for(unsigned int i=0;i<m_CardU;i++)
     {
-      for(unsigned int j=0;j<6;j++)
+      for(unsigned int j=0;j<3;j++)
 	{
 	  m_iPuPx[i*2*m_CardU+j]= 0.0;
-	  for(unsigned int k=0;k<2*m_CardU;k++)
+	  m_iPuPx[i*2*m_CardU+j+3]= 0.0;
+	  m_iPuPx[(i+m_CardU)*2*m_CardU+j]= 0.0;
+	  m_iPuPx[(i+m_CardU)*2*m_CardU+j+3]= 0.0;
+	  for(unsigned int k=0;k<m_CardU;k++)
 	    {
 	      m_iPuPx[i*2*m_CardU+j]+= 
-		m_iPu[i*2*m_CardU+k] * 
-		m_iPu[k*2*m_CardU+j];
+		m_iPu[i*m_CardU+k] * 
+		m_Px[k*3+j];
+	      m_iPuPx[i*2*m_CardU+j+3]+= 
+		m_iPu[i*m_CardU+k] * 
+		m_Px[k*3+j];
+	      m_iPuPx[(i+m_CardU)*2*m_CardU+j]+= 
+		m_iPu[i*m_CardU+k] * 
+		m_Px[k*3+j];
+	      m_iPuPx[(i+m_CardU)*2*m_CardU+j+3]+= 
+		m_iPu[i*m_CardU+k] * 
+		m_Px[k*3+j];
+
 	    }
 	}
     }
@@ -156,8 +171,14 @@ int PLDPSolver::ComputeInitialSolution(double *ZMPRef,
       for(unsigned int j=0;j<6;j++)
 	m_Uk[i]+= m_iPuPx[i*2*m_CardU+j] *  XkYk[j];
 
-      for(unsigned int j=0;j<2*m_CardU;j++)
-	m_Uk[i]+= m_iPu[i*2*m_CardU+j] * ZMPRef[j];  
+      for(unsigned int j=0;j<6;j++)
+	m_Uk[i+m_CardU]+= m_iPuPx[i*2*m_CardU+j] *  XkYk[j];
+
+      for(unsigned int j=0;j<m_CardU;j++)
+	m_Uk[i]+= m_iPu[i*m_CardU+j] * ZMPRef[j];  
+
+      for(unsigned int j=0;j<m_CardU;j++)
+	m_Uk[i+m_CardU]+= m_iPu[i*m_CardU+j] * ZMPRef[j+m_CardU];  
       
     }
   return 0;
@@ -173,7 +194,7 @@ int PLDPSolver::ForwardSubstitution()
   for(unsigned int i=0;i<m_ActivatedConstraints.size();i++)
     {
       m_y[i] = 0.0;
-      for(unsigned int k;k<2*m_CardU;k++)
+      for(unsigned int k=0;k<2*m_CardU;k++)
 	m_y[i] += (m_v1[i] - m_L[i*m_NbMaxOfConstraints+k]*m_v1[k])/m_L[k*m_NbMaxOfConstraints+k];
     }
   return 0;
@@ -339,5 +360,5 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 	}
     }
 
-  
+  return 0;
 }

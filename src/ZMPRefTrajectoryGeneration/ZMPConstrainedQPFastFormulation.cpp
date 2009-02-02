@@ -92,7 +92,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   m_Q = 0;
   m_Pu = 0;
   m_FullDebug = 0;
-  m_FastFormulationMode = QLDANDLQ;
+  m_FastFormulationMode = PLDP;
 
   /*! Getting the ZMP reference from Kajita's heuristic. */
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
