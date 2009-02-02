@@ -172,3 +172,13 @@ IF(OPENHRP_FOUND)
    
 
 ENDIF(OPENHRP_FOUND)
+
+#
+# Install also here for backward compatibility
+#
+INSTALL(FILES 
+  ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2Specificities.xml
+  ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2LinkJointRank.xml
+  ${${PROJECT_NAME}_SOURCE_DIR}/src/data/PreviewControlParameters.ini
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/walkgenjrl
+  PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE)	
