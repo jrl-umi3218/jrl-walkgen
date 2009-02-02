@@ -102,7 +102,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
 
   /*! For computing the stability constraints from the feet positions. */
   m_FCALS = new FootConstraintsAsLinearSystem(lSPM,aHS);
-  
+
   // Register method to handle
   string aMethodName[1] = 
     {":setdimitrovconstraint"};
@@ -135,6 +135,12 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   m_Beta = 1000.0;
   
   InitConstants();
+
+  // PLDP Solver needs iPu and Px.
+  
+  m_PLDPSolver = new Optimization::Solver::PLDPSolver(m_QP_N,
+						      MAL_RET_MATRIX_DATABLOCK(m_iPu),
+						      MAL_RET_MATRIX_DATABLOCK(m_Px));
 
   RESETDEBUG4("Check2DLIPM.dat");
 }
@@ -219,6 +225,15 @@ int ZMPConstrainedQPFastFormulation::InitializeMatrixPbConstants()
 	}
     }
 
+  // Build m_Px.
+  MAL_MATRIX_RESIZE(m_Px,m_QP_N,3);
+
+  for(unsigned int li=0;li<m_QP_N;li++)
+    {
+      m_Px(li,0) = 1.0;
+      m_Px(li,1) = (double)(1+li)*m_QP_T;
+      m_Px(li,2) = (li+1)*(li+1)*m_QP_T*m_QP_T-m_ComHeight/9.81;
+    }
   if (m_FullDebug>2)
     {
       ofstream aof;
@@ -428,7 +443,8 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   m_OptC = MAL_RET_TRANSPOSE(m_PPu);
   m_OptC = m_Beta * m_OptC;
 
-  if (m_FastFormulationMode==QLDANDLQ)
+  if ((m_FastFormulationMode==QLDANDLQ) ||
+      (m_FastFormulationMode==PLDP))
     {
       BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(OptA);
     }  
@@ -482,7 +498,8 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
   double * lInterPu=0;
   double * ptPu=0;
   
-  if (m_FastFormulationMode==QLDANDLQ)
+  if ((m_FastFormulationMode==QLDANDLQ)||
+      (m_FastFormulationMode==PLDP))
     {
       lInterPu = new double[m_QP_N*m_QP_N];
       memset(lInterPu,0,m_QP_N*m_QP_N*sizeof(double));
@@ -507,7 +524,8 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
     }
   
   // Consider QLDANDLQ formulation.
-  if (m_FastFormulationMode==QLDANDLQ)
+  if ((m_FastFormulationMode==QLDANDLQ) ||
+      (m_FastFormulationMode==PLDP))
     {
       // Premultiplication by LQ-1
       // Indeed we have to provide qld transpose matrix,
@@ -527,6 +545,15 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
 		  ODEBUG("IC: " << IndexConstraint );
 		}
 	    }
+	}
+
+      if (m_FastFormulationMode==PLDP)
+	{
+	  MAL_MATRIX_DIM(m_mal_Pu,double,m_QP_N,m_QP_N);
+	  for(unsigned j=0;j<m_QP_N;j++)
+	    for(unsigned k=0;k<m_QP_N;k++)
+	      m_mal_Pu(j,k) = m_Pu[j*m_QP_N+k];
+	  MAL_INVERSE(m_mal_Pu, m_iPu, double);
 	}
     }
 
@@ -740,7 +767,8 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
 		    (*LCI_it)->A(j,1)*m_Pu[k*N+i];	      
 		}
 	    }
-	  else if (m_FastFormulationMode==QLDANDLQ)
+	  else if ((m_FastFormulationMode==QLDANDLQ)||
+		   (m_FastFormulationMode==PLDP))
 	    {
 	      // In this case, Pu is *NOT* triangular.
 	      for(unsigned k=0;k<N;k++)
@@ -896,7 +924,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 									  unsigned int N)
 {
 
-  double *Px=0,*DPu=0;
+  double *DPx=0,*DPu=0;
   unsigned int NbOfConstraints=8*N; // Nb of constraints to be taken into account
   // for each iteration
 
@@ -1018,7 +1046,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	      xk[2] << " " << xk[5] << " ", "Check2DLIPM.dat");
 	      
       // Build the related matrices.
-      BuildConstraintMatrices(Px,DPu,
+      BuildConstraintMatrices(DPx,DPu,
 			      N,T,
 			      StartingTime,
 			      QueueOfLConstraintInequalities,
@@ -1102,7 +1130,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       for(int i=0; i<m;i++)
 	{
 	  vnlPx(i,0) =
-	    vnlStorePx(i,li) = Px[i];
+	    vnlStorePx(i,li) = DPx[i];
 	}
 
       if (m_FastFormulationMode==QLDANDLQ)
@@ -1111,15 +1139,24 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	iwar[0]=1;
 
       ODEBUG("m: " << m);
-      //      DumpProblem(m_Q, D, Pu, m, Px,XL,XU,StartingTime);
+      //      DumpProblem(m_Q, D, DPu, m, DPx,XL,XU,StartingTime);
 		  
-		  
-      ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
-	      m_Q, D, DPu,Px,XL,XU,
-	      X,U,&iout, &ifail, &iprint,
-	      war, &lwar,
-	      iwar, &liwar,&Eps);
-
+		
+      if ((m_FastFormulationMode==QLDANDLQ)||
+	  (m_FastFormulationMode==QLD))
+	ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
+		m_Q, D, DPu,DPx,XL,XU,
+		X,U,&iout, &ifail, &iprint,
+		war, &lwar,
+		iwar, &liwar,&Eps);
+      else if (m_FastFormulationMode==PLDP)
+	m_PLDPSolver->SolveProblem(D,
+				   (unsigned int)m,
+				   DPu,
+				   DPx,
+				   MAL_RET_VECTOR_DATABLOCK(ZMPRef),
+				   MAL_RET_VECTOR_DATABLOCK(xk));
+      
       if (ifail!=0)
 	{
 	  cout << "IFAIL: " << ifail << endl;
@@ -1186,7 +1223,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	}
 
       double *ptX=0;
-      if (m_FastFormulationMode==QLDANDLQ)
+      if ((m_FastFormulationMode==QLDANDLQ)||
+	  (m_FastFormulationMode==PLDP))
 	{
 	  /* Multiply the solution by the transpose of iLQ 
 	     because it is a triangular matrix we do a specific 

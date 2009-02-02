@@ -90,6 +90,9 @@ namespace PatternGeneratorJRL
       /*! \brief Specify the inverse cholesky matrix L */
       void SetiL(double *aiL);
 
+      /*! \brief Set the L matrix to zero. */
+      void SetLToZero();
+
     private:
 
       /*! \brief Size of the constraints, i.e. maximum number of rows for \f$ E E^{\top} \f$ */

@@ -35,6 +35,15 @@ void OptCholesky::InitializeInternalVariables()
     }
 }
 
+void OptCholesky::SetLToZero()
+{
+  if (m_NbMaxOfConstraints!=0)
+    {
+      for(unsigned int i=0;i<m_NbMaxOfConstraints * m_NbMaxOfConstraints;i++)
+	m_L[i]=0.0;
+    }
+}
+
 void OptCholesky::SetA(double *aA)
 {
   m_A = aA;

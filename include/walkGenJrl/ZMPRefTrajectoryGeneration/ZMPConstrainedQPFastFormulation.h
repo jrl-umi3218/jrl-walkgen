@@ -38,6 +38,7 @@
 #include <walkGenJrl/PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <walkGenJrl/Mathematics/FootConstraintsAsLinearSystem.h>
 #include <walkGenJrl/Mathematics/OptCholesky.h>
+#include <walkGenJrl/Mathematics/PLDPSolver.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 
 using namespace dynamicsJRLJapan;
@@ -257,7 +258,7 @@ namespace PatternGeneratorJRL
 
     static const unsigned int QLD=0;
     static const unsigned int QLDANDLQ=1;
-    static const unsigned int NEWOPTIMIZER=2;
+    static const unsigned int PLDP=2;
 
   private:
 
@@ -327,12 +328,20 @@ namespace PatternGeneratorJRL
     /* Constant parts of the linear constraints. */
     double * m_Pu;
 
+    /* Constant parts of the linear constraints. */
+    MAL_MATRIX(m_iPu,double);
+
+    /* Constant parts of the dynamical system. */
+    MAL_MATRIX(m_Px,double);
+
     /*! \brief Debugging variable: dump everything is set to 1 */
     unsigned int m_FullDebug;
 
     /*! \brief Fast formulations mode. */
     unsigned int m_FastFormulationMode;
     
+    /*! Primal Least square Distance Problem solver */
+    Optimization::Solver::PLDPSolver * m_PLDPSolver;
 
     /*! @} */
     
