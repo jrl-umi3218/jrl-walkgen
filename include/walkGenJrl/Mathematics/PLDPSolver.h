@@ -62,9 +62,17 @@ namespace Optimization
 			    double *XkYk);
 	protected:
 	  
+	  /*! \name Initial solution methods related 
+	    @{
+	   */
 	  /*! Compute the initial solution */
-	  void ComputeInitialSolution(double *ZMPRef,
+	  int ComputeInitialSolution(double *ZMPRef,
 				      double *XkYk);
+
+	  /*! Precompite iPuPx */
+	  int PrecomputeiPuPx(); 
+	  /*! @} */
+
 
 	  /*! Initialize the internal variables of
 	    the class. */
@@ -72,6 +80,34 @@ namespace Optimization
 
 	  /*! Allocate memory for solver. */
 	  void AllocateMemoryForSolver();
+
+	  /*! \name Projected descent direction methods related 
+	    @{
+	   */
+	  /*! \brief Compute Projected descent direction. */
+	  int ComputeProjectedDescentDirection();
+
+	  /*! \brief Forward substitution. 
+	      First Phase
+	      EE^t v2 = v1 <-> LL^t v2 = v1
+	      Now solving L y = v1
+
+	   */
+	  int ForwardSubstitution();
+
+	  /*! \brief Compute v2 q (14b) in Dimitrov 2009.
+	  Second phase a
+	   Now solving
+	   LL^t v2 = v1 <-> L y = v1 with L^t v2 = y
+	   y solved with first phase.
+	   So now we are looking for v2.
+	  */
+	  int BackwardSubstitution();
+
+	  /*! @} */
+
+	  /*! Detecting violated constraints */
+	  double ComputeAlpha(vector<unsigned int> &NewActivatedConstraints);
 
 	private:
 	  
@@ -81,10 +117,8 @@ namespace Optimization
 	  /*! Store Px. */
 	  double * m_Px;
 	  
-
 	  /*! Store the inverse of Pu. */
 	  double * m_iPuPx;
-
 	  
 	  /*! Store Uk */
 	  double *m_Uk;
@@ -105,10 +139,25 @@ namespace Optimization
 	  double *m_d;
 
 	  /*! Store some temporary variables  */
-	  double *m_v1;
+	  double *m_v1, *m_v2, *m_y;
 	  
 	  /*! Store the linear part of the constraints. */
 	  double * m_A;
+
+	  /*! Store the cst part of the constraints. */
+	  double * m_b;
+
+	  /*! Store the maximum number of Constraints.
+	    It is also the dimension of L in its maximal storage
+	    form. */
+	  unsigned int m_NbMaxOfConstraints;
+
+	  /*! Store the current number of Constraints of matrix A. */
+	  unsigned int m_NbOfConstraints;
+
+	  /*! Store the size of the control vector. */
+	  unsigned int m_CardU;
+
 
 	  /*! Cholesky decomposition optimized for QP solving 
 	   ( specifically this one). */
@@ -120,4 +169,4 @@ namespace Optimization
 	};
     };
 };
-#endif _PLDPSOLVER_H_
+#endif /* _PLDPSOLVER_H_*/

@@ -41,13 +41,13 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
   m_iPu = iPu;
   m_Px = Px;
   m_iPuPx = 0;
-
-  m_OptCholesky = new PatternGeneratorJRL::OptCholesky(8*m_CardU,2*m_CardU);
+  m_NbMaxOfConstraints = 8*m_CardU;
+  m_OptCholesky = new PatternGeneratorJRL::OptCholesky(m_NbMaxOfConstraints,2*m_CardU);
 
   AllocateMemoryForSolver();
 }
 
-void PDLPSolver::AllocateMemoryForSolver()
+void PLDPSolver::AllocateMemoryForSolver()
 {
   PrecomputeiPuPx();
   m_Uk = new double[2*m_CardU];
@@ -56,8 +56,14 @@ void PDLPSolver::AllocateMemoryForSolver()
   m_UnconstrainedDescentDirection = new double[2*m_CardU];
   memset(m_UnconstrainedDescentDirection,0,2*m_CardU*sizeof(double));
 
-  m_L = new double[4*m_CardU*m_CardU];
-  m_iL = new double[4*m_CardU*m_CardU];
+  m_L = new double[m_NbMaxOfConstraints*m_NbMaxOfConstraints];
+  m_iL = new double[m_NbMaxOfConstraints*m_NbMaxOfConstraints];
+
+  m_v1 = new double[m_NbMaxOfConstraints];
+  m_v2 = new double[m_NbMaxOfConstraints];
+  m_y = new double[m_NbMaxOfConstraints];
+
+
   m_d = new double[2*m_CardU];  
   m_OptCholesky->SetL(m_L);
   m_OptCholesky->SetL(m_iL);
@@ -65,8 +71,21 @@ void PDLPSolver::AllocateMemoryForSolver()
 
 void PLDPSolver::InitializeSolver()
 {
+  // Allocation max:
+  // We assume that we might at max. 8 actives constraintes 
+  // per control time.
   memset(m_v1,0,8*m_CardU*sizeof(double));
-  memset(m_v2,0,2*m_CardU*sizeof(double));
+  // Same than v1.
+  memset(m_v2,0,8*m_CardU*sizeof(double));
+  // Same than y.
+  memset(m_y,0,8*m_CardU*sizeof(double));
+
+  // Same than L.
+  memset(m_L,0,8*m_CardU*sizeof(double));
+  // Same than iL.
+  memset(m_iL,0,8*m_CardU*sizeof(double));
+
+  // Same for the descent.
   memset(m_d,0,2*m_CardU*sizeof(double));
 }
 
@@ -81,8 +100,14 @@ PLDPSolver::~PLDPSolver()
   if (m_UnconstrainedDescentDirection!=0)
     delete [] m_UnconstrainedDescentDirection;
 
-  if (m_OptCholesy!=0)
+  if (m_OptCholesky!=0)
     delete m_OptCholesky;
+
+  if (m_L!=0)
+    delete [] m_L;
+
+  if (m_iL!=0)
+    delete [] m_iL;
 
   if (m_v1!=0)
     delete [] m_v1;
@@ -95,7 +120,7 @@ PLDPSolver::~PLDPSolver()
 
 }
 
-PLDLPSolver::PrecomputeiPuPx()
+int PLDPSolver::PrecomputeiPuPx()
 {
   m_iPuPx = new double[2*m_CardU*6];
 
@@ -106,7 +131,7 @@ PLDLPSolver::PrecomputeiPuPx()
       for(unsigned int j=0;j<6;j++)
 	{
 	  m_iPuPx[i*2*m_CardU+j]= 0.0;
-	  for(unsigned int k=0;k<2*N;k+++)
+	  for(unsigned int k=0;k<2*m_CardU;k++)
 	    {
 	      m_iPuPx[i*2*m_CardU+j]+= 
 		m_iPu[i*2*m_CardU+k] * 
@@ -114,9 +139,10 @@ PLDLPSolver::PrecomputeiPuPx()
 	    }
 	}
     }
+  return 0;
 }
 
-PLDPSolver::ComputeInitialSolution(double *ZMPRef,
+int PLDPSolver::ComputeInitialSolution(double *ZMPRef,
 				   double *XkYk)
 {
   /*! The initial solution of the problem is given by
@@ -134,29 +160,130 @@ PLDPSolver::ComputeInitialSolution(double *ZMPRef,
 	m_Uk[i]+= m_iPu[i*2*m_CardU+j] * ZMPRef[j];  
       
     }
+  return 0;
 }
 
-int PLDPSolver::ForwardSubstitution(double *LinearPartOfConstraintMatrix)
+int PLDPSolver::ForwardSubstitution()
 {
+  // Compute v2 q (14b) in Dimitrov 2009.
+  // First Phase
+  // EE^t v2 = v1 <-> LL^t v2 = v1
+  // Now solving
+  // L y = v1 
+  for(unsigned int i=0;i<m_ActivatedConstraints.size();i++)
+    {
+      m_y[i] = 0.0;
+      for(unsigned int k;k<2*m_CardU;k++)
+	m_y[i] += (m_v1[i] - m_L[i*m_NbMaxOfConstraints+k]*m_v1[k])/m_L[k*m_NbMaxOfConstraints+k];
+    }
+  return 0;
 }
 
-int PLDPSolver::ComputeProjectedDescentDirection(double *LinearPartOfConstraintMatrix)
+int PLDPSolver::BackwardSubstitution()
 {
-  // Compute L^{-T}
-  m_OptCholesky->ComputeInverseCholesky(0);
-  
+  // Compute v2 q (14b) in Dimitrov 2009.
+  // Second phase 
+  // Now solving
+  // LL^t v2 = v1 <-> L y = v1 with L^t v2 = y
+  // y solved with first phase.
+  // So now we are looking for v2.
+  unsigned SizeOfL = m_ActivatedConstraints.size();
+  for(unsigned int i=SizeOfL-1;
+      i>=0; i--)
+    {
+      m_v2[i] = 0.0;
+      for(unsigned int k=i+1;k<SizeOfL;k++)
+	m_v2[i] += (m_y[i] - m_L[i*m_NbMaxOfConstraints+k]*m_y[k]);
+      m_v2[i] = m_v2[i]/m_L[i*m_NbMaxOfConstraints+i];
+    }
+  return 0;
+}
+
+int PLDPSolver::ComputeProjectedDescentDirection()
+{
+
+  // Compute v1 eq (14a) in Dimitrov 2009
   for(unsigned int li=0;li<m_ActivatedConstraints.size();li++)
     {
       m_v1[li] = 0.0;
       unsigned int RowCstMatrix = m_ActivatedConstraints[li];
       for(unsigned int lj=li;lj<2*m_CardU;lj++)
 	{
-	  m_v1[li]+= m_LinearPartOfConstrainntMatrix[RowCstMatrix*2*m_CardU+lj]*
+	  m_v1[li]+= m_A[RowCstMatrix*2*m_CardU+lj]*
 	    m_UnconstrainedDescentDirection[lj];
 	}
     }
+
+  // Compute v2 by Forward and backward substitution.
+  // v2 = iLt iL E c 
+  ForwardSubstitution();
+  BackwardSubstitution();
+
+  // Compute d
+  // d = c - Et v2
+  for(unsigned int li=0;li<2*m_CardU;li++)
+    {
+      m_d[li] = m_UnconstrainedDescentDirection[li];
+      for(unsigned int lj=0;lj<m_ActivatedConstraints.size();lj++)
+	{
+	  unsigned int RowCstMatrix = m_ActivatedConstraints[lj];
+	  m_d[li]-= m_A[RowCstMatrix+li*m_NbOfConstraints]*
+	    m_v2[lj];
+	}
+    }
+  return 0;
 }
 
+double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints)
+{
+  double Alpha=10000000.0;
+  double *ptA = m_A;	
+  
+
+  for(unsigned li=0;li<m_NbOfConstraints;li++)
+    {
+
+      bool ConstraintFound=false;
+
+      for(unsigned int ConstraintIndex=0;
+	  ConstraintIndex<m_ActivatedConstraints.size();
+	  ConstraintIndex++)
+	{
+	  if (m_ActivatedConstraints[ConstraintIndex]==li)
+	    {
+	      ConstraintFound=true;
+	      break;
+	    }
+	}
+      if (ConstraintFound)
+	continue;
+
+      m_v1[li]=0.0;
+      for(unsigned lj=0;lj<2*m_CardU;lj++)
+	{
+	  m_v1[li]+= *ptA++ * m_d[lj];
+	}
+
+      if (m_v1[li]<0.0)
+	{
+	  double *pt2A = m_A + 2*m_CardU *li;	
+	  m_v2[li]= m_b[li];
+	  for(unsigned lj=0;lj<2*m_CardU;lj++)
+	    {
+	      m_v2[li]-= *pt2A++ * m_Uk[lj];
+	    }
+	  m_v2[li] /= m_v1[li];
+	  if (Alpha>m_v2[li])
+	    {
+	      Alpha = m_v2[li];
+	      if (Alpha<1)
+		NewActivatedConstraints.push_back(li);
+	    }
+	}
+    }
+
+  return Alpha;
+}
 int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 			      unsigned int NbOfConstraints,
 			      double *LinearPartOfConstraints,
@@ -164,9 +291,12 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 			      double *ZMPRef,
 			      double *XkYk)
 {
-  m_A = LinearPartOfConstraints;
+  vector<unsigned int> NewActivatedConstraints;
 
-  /* Step one : Algorithm initialization. */
+  m_A = LinearPartOfConstraints;
+  m_NbOfConstraints = NbOfConstraints;
+
+  /* Step zero : Algorithm initialization. */
   m_CstPartOfCostFunction = CstPartOfTheCostFunction;
   ComputeInitialSolution(ZMPRef,XkYk);
 
@@ -174,17 +304,39 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 
   /*! Initialization de cholesky. */
   m_OptCholesky->SetA(LinearPartOfConstraints);
-  m_OptCholesky->SetLToZero();
+  //  m_OptCholesky->SetLToZero();
 
+  double alpha=0.0;
   while(ContinueAlgo)
     {
-      /* Step two : Compute descent direction. */
+      /* Step one : Compute descent direction. */
       for(unsigned int i=0;i<2*m_CardU;i++)
 	 m_UnconstrainedDescentDirection[i] = 
-	  m_CstPartOftheCostFunction[i] -  m_Uk[i];
+	  m_CstPartOfCostFunction[i] -  m_Uk[i];
       
-      /*! Step three: Compute the projected descent direction. */
-      
+      /*! Step two: Compute the projected descent direction. */
+      ComputeProjectedDescentDirection();
+
+      /*! Step three : Compute alpha */
+      alpha = ComputeAlpha(NewActivatedConstraints);
+
+      if (alpha>=1.0)
+	{
+	  alpha=1.0;
+	  ContinueAlgo=false;
+	}
+
+      /*! Compute new solution. */
+      for(unsigned int i=0;i<2*m_CardU;i++)
+	{
+	  m_Uk[i] = m_Uk[i] + alpha * m_d[i];
+	}
+      if (ContinueAlgo)
+	{
+	  m_OptCholesky->AddActiveConstraints(NewActivatedConstraints);
+	  for(unsigned int i=0;i<NewActivatedConstraints.size();i++)
+	    m_ActivatedConstraints.push_back(NewActivatedConstraints[i]);
+	}
     }
 
   

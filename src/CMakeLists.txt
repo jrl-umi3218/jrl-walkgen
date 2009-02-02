@@ -24,6 +24,7 @@ SET(libwpg_src
 	./Mathematics/OptCholesky.cpp
 	./Mathematics/Polynome.cpp 
 	./Mathematics/PolynomeFoot.cpp 
+	./Mathematics/PLDPSolver.cpp 
 	./Mathematics/qld.cpp 
 	./Mathematics/StepOverPolynome.cpp
 	./PreviewControl/PreviewControl.cpp 
