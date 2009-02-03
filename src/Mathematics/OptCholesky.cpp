@@ -176,7 +176,6 @@ int OptCholesky::ComputeInverseCholesky(int mode)
   else
     LocalSize = m_NbMaxOfConstraints;
     
-  cout << "LocalSize :" << LocalSize<<endl;
   for(int lj=LocalSize-1;lj>=0;lj--)
     {
       double iLljlj=0.0;
@@ -195,16 +194,9 @@ int OptCholesky::ComputeInverseCholesky(int mode)
 	    {
 	      r = r + (*ptiLik++)  * (*ptLjk);
 	      ptLjk+=m_NbMaxOfConstraints;
-	      if (lj==LocalSize-3)
-		cout << *ptLjk << " ";
 	    }
-	  if (lj==LocalSize-3)
-	    cout << "r=" <<r << endl;
 		      
-	  //cout << r << endl;
 	  m_iL[li*m_NbMaxOfConstraints+lj]= -iLljlj*r;
-	  if (lj==LocalSize-3)
-	    cout << "value=" << -iLljlj *r << endl;
 		      
 
 	}

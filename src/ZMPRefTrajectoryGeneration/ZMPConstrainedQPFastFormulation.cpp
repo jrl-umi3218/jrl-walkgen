@@ -140,7 +140,9 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   
   m_PLDPSolver = new Optimization::Solver::PLDPSolver(m_QP_N,
 						      MAL_RET_MATRIX_DATABLOCK(m_iPu),
-						      MAL_RET_MATRIX_DATABLOCK(m_Px));
+						      MAL_RET_MATRIX_DATABLOCK(m_Px),
+						      m_Pu,
+						      MAL_RET_MATRIX_DATABLOCK(m_iLQ));
 
   RESETDEBUG4("Check2DLIPM.dat");
 }
@@ -267,7 +269,6 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
 }
 int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX(,double) &OptA)
 {
-  ODEBUG3("Go through -BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ");
 
   /*! Build cholesky matrix of the optimum 
     We copy only the upper corner of the OptA matrix
@@ -636,7 +637,7 @@ const double & ZMPConstrainedQPFastFormulation::GetBeta() const
 }
 
 
-int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,double * &DPu, 
+int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,double * &DPu, 
 							     unsigned N, double T,
 							     double StartingTime,
 							     deque<LinearConstraintInequality_t *> & 
@@ -652,8 +653,8 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
   // The memory will be bounded to 8 constraints per
   // support foot (double support case).
   // Will be probably all the time smaller.
-  if (Px==0)
-    Px = new double[8*N+1];
+  if (DPx==0)
+    DPx = new double[8*N+1];
 
   if (DPu==0)
     DPu = new double[(8*N+1)*2*N];
@@ -732,7 +733,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
       // For each constraint.
       for(unsigned j=0;j<MAL_MATRIX_NB_ROWS((*LCI_it)->A);j++)
 	{
-	  Px[IndexConstraint] = 
+	  DPx[IndexConstraint] = 
 	    // X Axis * A
 	    (xk[0] +
 	     xk[1] * T *(i+1) + 
@@ -746,7 +747,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
 	     // Constante part of the constraint
 	    + (*LCI_it)->B(j,0);
 
-	  ODEBUG6(Px[IndexConstraint] << " " << (*LCI_it)->A(j,0)  << " "
+	  ODEBUG6(DPx[IndexConstraint] << " " << (*LCI_it)->A(j,0)  << " "
 		  << (*LCI_it)->A[j][1] << " " << (*LCI_it)->B(j,0) ,Buffer);
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer2);
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer3);
@@ -794,7 +795,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
     {
       ofstream aof;
       char Buffer[1024];
-      sprintf(Buffer,"Pu_%f.dat", StartingTime);
+      sprintf(Buffer,"DPu_%f.dat", StartingTime);
       aof.open(Buffer,ofstream::out);
       for(unsigned int i=0;i<IndexConstraint;i++)
 	{
@@ -826,11 +827,11 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & Px,doubl
 
       if (0)
 	{
-	  sprintf(Buffer,"PX_%f.dat", StartingTime);
+	  sprintf(Buffer,"DPX_%f.dat", StartingTime);
 	  aof.open(Buffer,ofstream::out);
 	  for(unsigned int i=0;i<IndexConstraint;i++)
 	    {
-	      aof << Px[i] << endl ;
+	      aof << DPx[i] << endl ;
 	    }
 	  aof.close();
 	}
@@ -1041,6 +1042,9 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       // Read the current state of the 2D Linearized Inverted Pendulum.
       m_2DLIPM->GetState(xk);
 
+      ODEBUG3("State: " << xk[0] << " " << xk[3] << " " <<
+	      xk[1] << " " << xk[4] << " " <<
+	      xk[2] << " " << xk[5] << " ");
       ODEBUG4(xk[0] << " " << xk[3] << " " <<
 	      xk[1] << " " << xk[4] << " " <<
 	      xk[2] << " " << xk[5] << " ", "Check2DLIPM.dat");
@@ -1150,12 +1154,19 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 		war, &lwar,
 		iwar, &liwar,&Eps);
       else if (m_FastFormulationMode==PLDP)
-	m_PLDPSolver->SolveProblem(D,
-				   (unsigned int)m,
-				   DPu,
-				   DPx,
-				   MAL_RET_VECTOR_DATABLOCK(ZMPRef),
-				   MAL_RET_VECTOR_DATABLOCK(xk));
+	{
+	  ODEBUG3("State: " << xk[0] << " " << xk[3] << " " <<
+		  xk[1] << " " << xk[4] << " " <<
+		  xk[2] << " " << xk[5] << " ");
+	  
+	  m_PLDPSolver->SolveProblem(D,
+				     (unsigned int)m,
+				     DPu,
+				     DPx,
+				     MAL_RET_VECTOR_DATABLOCK(ZMPRef),
+				     MAL_RET_VECTOR_DATABLOCK(xk),X);
+	  ifail = 0;
+	}
       
       if (ifail!=0)
 	{
@@ -1163,16 +1174,63 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	  return -1;
 	}
 
-      /* Constraint validation */
 
+      double *ptX=0;
+      if ((m_FastFormulationMode==QLDANDLQ)||
+	  (m_FastFormulationMode==PLDP))
+	{
+	  /* Multiply the solution by the transpose of iLQ 
+	     because it is a triangular matrix we do a specific 
+	     multiplication.
+	  */
+	  memset(NewX,0,2*N*sizeof(double));
+	  
+	  double *pm_iLQ = MAL_RET_MATRIX_DATABLOCK(m_iLQ);
+	  double *pNewX = NewX;
+	  
+	  for(unsigned int i=0;i<2*N;i++)
+	    {
+	      double *pX= X+i;
+	      double *piLQ = pm_iLQ+i*2*N+i;
+	      *pNewX = 0.0;
+	      for(unsigned int j=i;j<2*N;j++)
+		{
+		  *pNewX+= (*piLQ) * (*pX++);
+		  piLQ+=2*N;
+		}
+	      pNewX++;
+	    }
+	  ptX=NewX;
+	} 
+      else
+	ptX=X;
+	  
+      /* Simulation of the Single Point Mass model 
+	 with the new command.
+      */
+      ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
+      
+      // Calling this method will automatically 
+      // update the ZMPRefPositions.
+      m_2DLIPM->Interpolation(COMPositions,
+			      ZMPRefPositions,
+			      li*interval,
+			      ptX[0],ptX[N]);
+      
+      m_2DLIPM->OneIteration(ptX[0],ptX[N]);
+
+      ODEBUG6("uk:" << uk,"DebugPBW.dat");
+      ODEBUG6("xk:" << xk,"DebugPBW.dat");
+
+      /* Constraint validation */
       for(int i=0; i<m;i++)
 	for(unsigned int j=0; j<2*N;j++)
 	  vnlPu(i,j) = DPu[j*(m+1)+i];
 
       for(unsigned int i=0; i<2*N;i++)
 	{
-	  vnlStoreX(i,li) = X[i];
-	  vnlX(i,0) = X[i];
+	  vnlStoreX(i,li) = ptX[i];
+	  vnlX(i,0) = ptX[i];
 	}
 
       vnlValConstraint = MAL_RET_A_by_B(vnlPu, vnlX)  + vnlPx;
@@ -1221,53 +1279,6 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	    }
 	    
 	}
-
-      double *ptX=0;
-      if ((m_FastFormulationMode==QLDANDLQ)||
-	  (m_FastFormulationMode==PLDP))
-	{
-	  /* Multiply the solution by the transpose of iLQ 
-	     because it is a triangular matrix we do a specific 
-	     multiplication.
-	  */
-	  memset(NewX,0,2*N*sizeof(double));
-	  
-	  double *pm_iLQ = MAL_RET_MATRIX_DATABLOCK(m_iLQ);
-	  double *pNewX = NewX;
-	  
-	  for(unsigned int i=0;i<2*N;i++)
-	    {
-	      double *pX= X+i;
-	      double *piLQ = pm_iLQ+i*2*N+i;
-	      *pNewX = 0.0;
-	      for(unsigned int j=i;j<2*N;j++)
-		{
-		  *pNewX+= (*piLQ) * (*pX++);
-		  piLQ+=2*N;
-		}
-	      pNewX++;
-	    }
-	  ptX=NewX;
-	} 
-      else
-	ptX=X;
-	  
-      /* Simulation of the Single Point Mass model 
-	 with the new command.
-      */
-      ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
-      
-      // Calling this method will automatically 
-      // update the ZMPRefPositions.
-      m_2DLIPM->Interpolation(COMPositions,
-			      ZMPRefPositions,
-			      li*interval,
-			      ptX[0],ptX[N]);
-      
-      m_2DLIPM->OneIteration(ptX[0],ptX[N]);
-
-      ODEBUG6("uk:" << uk,"DebugPBW.dat");
-      ODEBUG6("xk:" << xk,"DebugPBW.dat");
 
       // Compute CPU consumption time.
       gettimeofday(&end,0);

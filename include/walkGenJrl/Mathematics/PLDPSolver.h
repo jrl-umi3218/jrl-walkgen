@@ -48,18 +48,22 @@ namespace Optimization
 	  /*! \brief Constructor */
 	  PLDPSolver(unsigned int CardU,
 		     double * iPu,
-		     double * Px);
+		     double * Px,
+		     double * Pu,
+		     double * iLQ);
 
 	  /*! \brief Destructor */
 	  ~PLDPSolver();
 
-	  /*! \brief Solve the optimization problem */
+	  /*! \brief Solve the optimization problem 
+	   */
 	  int SolveProblem(double *CstPartOfTheCostFunction,
-			    unsigned int NbOfConstraints,
-			    double *LinearPartOfConstraints,
-			    double *CstPartOfConstraints,
-			    double *ZMPRef,
-			    double *XkYk);
+			   unsigned int NbOfConstraints,
+			   double *LinearPartOfConstraints,
+			   double *CstPartOfConstraints,
+			   double *ZMPRef,
+			   double *XkYk,
+			   double *X);
 	protected:
 	  
 	  /*! \name Initial solution methods related 
@@ -109,8 +113,15 @@ namespace Optimization
 	  /*! Detecting violated constraints */
 	  double ComputeAlpha(vector<unsigned int> &NewActivatedConstraints);
 
+	  /*! Write current ZMP ref trajectory associated with 
+	    current value of m_Vk. */
+	  void WriteCurrentZMPSolution(string filename,
+				       double *XkYk);
 	private:
 	  
+	  /*! \brief Store Pu */
+	  double *m_Pu;
+
 	  /*! Store the inverse of Pu. */
 	  double * m_iPu;
 
@@ -120,8 +131,8 @@ namespace Optimization
 	  /*! Store the inverse of Pu. */
 	  double * m_iPuPx;
 	  
-	  /*! Store Uk */
-	  double *m_Uk;
+	  /*! Store Vk */
+	  double *m_Vk;
 
 	  /*! Store the constart part of the cost function. */
 	  double *m_CstPartOfCostFunction;
@@ -134,6 +145,9 @@ namespace Optimization
 	  
 	  /*! Store the inverse of the cholesky decomposition. */
 	  double *m_iL;
+
+	  /*! Store iLQ for debuggin purposes. */
+	  double *m_iLQ;
 
 	  /*! Store the projector of descent  */
 	  double *m_d;
@@ -156,8 +170,18 @@ namespace Optimization
 	  unsigned int m_NbOfConstraints;
 
 	  /*! Store the size of the control vector. */
-	  unsigned int m_CardU;
+	  unsigned int m_CardV;
 
+	  
+	  /*! \name Debugging fields 
+	    @{
+	   */
+	  /*! Level of verbosity */
+	  unsigned int m_DebugMode;
+
+	  /*! Number of iterations */
+	  int m_ItNb;
+	  /*! @} */
 
 	  /*! Cholesky decomposition optimized for QP solving 
 	   ( specifically this one). */
