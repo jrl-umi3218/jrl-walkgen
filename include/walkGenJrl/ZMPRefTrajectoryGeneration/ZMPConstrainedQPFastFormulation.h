@@ -112,6 +112,12 @@ namespace PatternGeneratorJRL
 					     double T,
 					     unsigned int N);
 
+    /*! Prepare ZMPRef */
+    void PrepareZMPRef(MAL_VECTOR(,double) &ZMPRef, 
+		       double StartingTime,
+		       deque<LinearConstraintInequality_t *> 
+		       &QueueOfLConstraintInequalities);
+    
     /*! \name Methods to build the optimization problem 
       @{
      */

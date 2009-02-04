@@ -94,12 +94,14 @@ FootConstraintsAsLinearSystem::~FootConstraintsAsLinearSystem()
 // The result is : A [ Zx(k), Zy(k)]' + B  >=0
 int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPoints, 
 						       MAL_MATRIX(&A,double),
-						       MAL_MATRIX(&B,double))
+						       MAL_MATRIX(&B,double),
+						       MAL_VECTOR(&C,double))
 {
   double a,b,c;
   unsigned int n = aVecOfPoints.size();
   MAL_MATRIX_RESIZE(A,aVecOfPoints.size(),2);
   MAL_MATRIX_RESIZE(B,aVecOfPoints.size(),1);
+  MAL_VECTOR_RESIZE(C,3);
 
   // Dump a file to display on scilab .
   // This should be removed during real usage inside a robot.
@@ -119,7 +121,11 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
   
   for(unsigned int i=0;i<n-1;i++)
     {
-      
+      // Compute center of the convex hull.
+      C(0)+= aVecOfPoints[i].col;
+      C(1)+= aVecOfPoints[i].row;
+      C(2)=0.0;
+	
       ODEBUG("(x["<< i << "],y["<<i << "]): " << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
 	     << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row );
 
@@ -170,7 +176,11 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
       B(i,0) = b;
 
     }
-  
+
+  C(0) /= (double)aVecOfPoints.size();
+  C(1) /= (double)aVecOfPoints.size();
+  C(2) =0.0;
+
   ODEBUG("(x["<< n-1 << "],y["<< n-1 << "]): " << aVecOfPoints[n-1].col << " " <<  aVecOfPoints[n-1].row << " "
 	 << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row );
   
@@ -454,7 +464,7 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(deque<FootA
 
 	  // Linear Constraint Inequality
 	  LinearConstraintInequality_t * aLCI = new LinearConstraintInequality_t;
-	  ComputeLinearSystem(TheConvexHull,aLCI->A, aLCI->B);
+	  ComputeLinearSystem(TheConvexHull,aLCI->A, aLCI->B, aLCI->Center);
 	  aLCI->StartingTime = LeftFootAbsolutePositions[i].time;
 	  if (QueueOfLConstraintInequalities.size()>0)
 	    {

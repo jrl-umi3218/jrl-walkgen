@@ -1,14 +1,50 @@
 #include <walkGenJrl/Mathematics/OptCholesky.h>
 
+#if 0
+#define RESETDEBUG4(y) { ofstream DebugFile; \
+                         DebugFile.open(y,ofstream::out); \
+                         DebugFile.close();}
+#define ODEBUG4(x,y) { ofstream DebugFile; \
+                       DebugFile.open(y,ofstream::app); \
+                       DebugFile <<  x << endl; DebugFile.close();}
+#else
+#define RESETDEBUG4(y) 
+#define ODEBUG4(x,y) 
+#endif
+
+#define RESETDEBUG6(y) 
+#define ODEBUG6(x,y) 
+
+#define RESETDEBUG5(y) { ofstream DebugFile; \
+                         DebugFile.open(y,ofstream::out);\
+                         DebugFile.close();}
+#define ODEBUG5(x,y) { ofstream DebugFile; \
+                       DebugFile.open(y,ofstream::app); \
+                       DebugFile << x << endl; \
+                       DebugFile.close();}
+#define ODEBUG5NOE(x,y) { ofstream DebugFile; \
+                          DebugFile.open(y,ofstream::app); \
+                          DebugFile << x ; DebugFile.close();}
+#if 1
+#define ODEBUG(x)
+#else
+#define ODEBUG(x)  std::cout << "OptCholesky " << x << endl;
+#endif
+
+#define ODEBUG3(x)  std::cout << "OptCholesky " << x << endl;
+
 using namespace PatternGeneratorJRL;
 
 OptCholesky::OptCholesky(unsigned int lNbMaxOfConstraints,
-			 unsigned int lCardU):
+			 unsigned int lCardU,
+			 unsigned int lUpdateMode):
   m_NbMaxOfConstraints(lNbMaxOfConstraints),
   m_CardU(lCardU),
   m_A(0),
   m_L(0),
-  m_iL(0)
+  m_iL(0),
+  m_UpdateMode(lUpdateMode),
+  m_NbOfConstraints(0)
 {
   InitializeInternalVariables();
 }
@@ -28,18 +64,25 @@ void OptCholesky::InitializeInternalVariables()
     }
 }
 
-void OptCholesky::SetLToZero()
+void OptCholesky::SetToZero()
 {
   if (m_NbMaxOfConstraints!=0)
     {
-      for(unsigned int i=0;i<m_NbMaxOfConstraints * m_NbMaxOfConstraints;i++)
-	m_L[i]=0.0;
+      if (m_L!=0)
+	for(unsigned int i=0;i<m_NbMaxOfConstraints * m_NbMaxOfConstraints;i++)
+	  m_L[i]=0.0;
+
+      
     }
+  m_SetActiveConstraints.clear();
+
 }
 
-void OptCholesky::SetA(double *aA)
+void OptCholesky::SetA(double *aA,
+		       unsigned int lNbOfConstraints)
 {
   m_A = aA;
+  m_NbOfConstraints = lNbOfConstraints;
 }
 
 int OptCholesky::AddActiveConstraints(vector<unsigned int> & lConstraints)
@@ -59,7 +102,12 @@ int OptCholesky::AddActiveConstraint(unsigned int aConstraint)
   /* Update set of active constraints */
   m_SetActiveConstraints.push_back(aConstraint);
 
-  int r = UpdateCholeskyMatrix();
+  int r = 0;
+  if (m_UpdateMode==MODE_NORMAL)
+    UpdateCholeskyMatrixNormal();
+  else if (m_UpdateMode==MODE_FORTRAN)
+    UpdateCholeskyMatrixFortran();
+    
   return r;
 }
 
@@ -78,7 +126,7 @@ void OptCholesky::SetiL(double *aiL)
   m_iL = aiL;
 }
 
-int OptCholesky::UpdateCholeskyMatrix()
+int OptCholesky::UpdateCholeskyMatrixNormal()
 {
 
   if ((m_A==0) | (m_L==0))
@@ -126,7 +174,61 @@ int OptCholesky::UpdateCholeskyMatrix()
   
 }
 
-int OptCholesky::ComputeNormalCholeskyOnA()
+int OptCholesky::UpdateCholeskyMatrixFortran()
+{
+
+  if ((m_A==0) | (m_L==0))
+    return -1;
+
+  double Mij=0.0;
+  unsigned int IndexNewRowAKAi = 0;
+  if (m_SetActiveConstraints.size()>0)
+    IndexNewRowAKAi = m_SetActiveConstraints.size()-1;
+  
+  double *PointerArow_i = m_A +  
+    m_SetActiveConstraints[IndexNewRowAKAi];
+
+  /* Compute Li,j */
+  for(int lj=0;lj<(int)m_SetActiveConstraints.size();lj++)
+    {
+
+      /* A value M(i,j) is computed once,
+	 directly from the matrix A */      
+      double *Arow_i = PointerArow_i;
+      double *Arow_j = m_A + m_SetActiveConstraints[lj];
+      Mij=0.0;
+      for(int lk=0;lk<(int)m_CardU;lk++)
+	{
+	  Mij+= (*Arow_i) * (*Arow_j);
+	  Arow_i+= m_NbOfConstraints+1;
+	  Arow_j+= m_NbOfConstraints+1;
+	}
+
+      /* */
+      double r = Mij;
+      ODEBUG3("r: M("<< m_SetActiveConstraints[IndexNewRowAKAi] << "," 
+	      << m_SetActiveConstraints[lj] <<")="<< r);
+      double * ptLik =m_L + IndexNewRowAKAi*m_NbMaxOfConstraints;
+      double * ptLjk =m_L + lj*m_NbMaxOfConstraints;
+
+      for(int lk=0;lk<lj;lk++)
+	{
+	  r = r - (*ptLik++)  * (*ptLjk++);
+	}
+      if (lj!=(int)m_SetActiveConstraints.size()-1)
+	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj]=r/m_L[lj*m_NbMaxOfConstraints+lj];
+      else
+	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj] = sqrt(r);
+      
+      ODEBUG3("m_L(" << IndexNewRowAKAi << "," << lj << ")="
+	      << m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj] );
+    }
+  
+  return 0;
+  
+}
+
+int OptCholesky::ComputeNormalCholeskyOnANormal()
 {
   if ((m_A==0) | (m_L==0))
     return -1;
@@ -162,7 +264,7 @@ int OptCholesky::ComputeNormalCholeskyOnA()
   
 }
 
-int OptCholesky::ComputeInverseCholesky(int mode)
+int OptCholesky::ComputeInverseCholeskyNormal(int mode)
 {
   if (m_iL==0)
     {

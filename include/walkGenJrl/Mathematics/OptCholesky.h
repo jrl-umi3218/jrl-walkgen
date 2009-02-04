@@ -54,13 +54,15 @@ namespace PatternGeneratorJRL
 	@param[in] lNbMaxOfConstraints \f$ m \f$ the number of constraints of matrix \f$ \bf A \f$
 	@param[in] lCardU \f$ \|{\bf u}\| \f$ the size of vector \f$ {\bf u} \f$.
        */
-      OptCholesky(unsigned int lNbMaxOfConstraints, unsigned int lCardU);
+      OptCholesky(unsigned int lNbMaxOfConstraints, unsigned int lCardU,
+		  unsigned int mode);
 
       /*! \brief Destructor */
       ~OptCholesky();
 
       /*! \brief Specify the fixed constraint matrix \f${\bf A}\f$*/
-      void SetA(double * aA);
+      void SetA(double * aA,
+		unsigned int lNbOfConstraints);
       
       /*! \brief Add a list of active constraints
 	@param[in] lConstraints: row indexes of constraints in \f${\bf A} \f$.
@@ -79,10 +81,11 @@ namespace PatternGeneratorJRL
       int CurrentNumberOfRows();
 
       /*! \brief Compute normal Cholesky decomposition on A (if possible).*/
-      int ComputeNormalCholeskyOnA();
+      int ComputeNormalCholeskyOnANormal();
+
 
       /*! \brief Compute the inverse of the Cholesky decomposition.*/
-      int ComputeInverseCholesky(int mode);
+      int ComputeInverseCholeskyNormal(int mode);
 
       /*! \brief Specify the cholesky matrix L */
       void SetL(double *aL);
@@ -90,9 +93,16 @@ namespace PatternGeneratorJRL
       /*! \brief Specify the inverse cholesky matrix L */
       void SetiL(double *aiL);
 
-      /*! \brief Set the L matrix to zero. */
-      void SetLToZero();
+      /*! \brief Set the algorithm to zero. */
+      void SetToZero();
+      
+      /*! \brief Set Mode to update the cholesky matrix */
+      void SetMode(unsigned int mode);
 
+      /*! \brief Various mode to compute cholesky matrix. */
+      static const unsigned int MODE_NORMAL=0;
+      static const unsigned int MODE_FORTRAN=1;
+      
     private:
 
       /*! \brief Size of the constraints, i.e. maximum number of rows for \f$ E E^{\top} \f$ */
@@ -110,12 +120,22 @@ namespace PatternGeneratorJRL
       /*! \brief The inversecholesky decomposition result: the \f$ {\bf L} \f$ matrix. */
       double *m_iL;
 
+      /*! \brief Mode to update the cholesky. */
+      unsigned int m_UpdateMode;
+
+      /*! \brief Number of constraints related with matrix A. */
+      unsigned int m_NbOfConstraints;
+
       /*! \brief Set of active constraintes. The maximum size is  \f$ m \f$,
 	Its size gives the size of \f$ {\bf L} \f$, and \f$ {\bf E} \f$ */
       vector<unsigned int> m_SetActiveConstraints;
 
+
       /*! \brief Update Cholesky computation */
-      int UpdateCholeskyMatrix();
+      int UpdateCholeskyMatrixFortran();
+
+      /*! \brief Update Cholesky computation */
+      int UpdateCholeskyMatrixNormal();
 
       /*! \brief  Free memory. */
       void FreeMemory();
