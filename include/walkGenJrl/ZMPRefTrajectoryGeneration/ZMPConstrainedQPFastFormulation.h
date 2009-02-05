@@ -362,6 +362,8 @@ namespace PatternGeneratorJRL
 		    double * XU,
 		    double Time);
       
+    /*! Vector of similar constraints. */
+    vector<int> m_SimilarConstraints;
   };
 };
 

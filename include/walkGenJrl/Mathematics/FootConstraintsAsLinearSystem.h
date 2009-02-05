@@ -93,6 +93,10 @@ namespace PatternGeneratorJRL
 					     double ConstraintOnX,
 					     double ConstraintOnY);
 
+      /*! Find Similar Constraints */
+      int FindSimilarConstraints(MAL_MATRIX(&A,double),
+				 vector<int> &SimilarConstraints);
+
       /*! Reimplement the interface of SimplePluginManager 
 	\param[in] Method: The method to be called.
 	\param[in] Args: Arguments of the methods.

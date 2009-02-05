@@ -118,6 +118,7 @@ void PLDPSolver::AllocateMemoryForSolver()
   m_v2 = new double[m_NbMaxOfConstraints];
   m_y = new double[m_NbMaxOfConstraints];
 
+  m_ConstraintsValueComputed = new bool [m_NbMaxOfConstraints*2];
 
   m_d = new double[2*m_CardV];  
   m_OptCholesky->SetL(m_L);
@@ -175,6 +176,10 @@ PLDPSolver::~PLDPSolver()
 
   if (m_d!=0)
     delete [] m_d;
+  
+
+  if ( m_ConstraintsValueComputed!=0)
+    delete [] m_ConstraintsValueComputed;
 
 }
 
@@ -455,7 +460,8 @@ int PLDPSolver::ComputeProjectedDescentDirection()
   return 0;
 }
 
-double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints)
+double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints,
+				vector<int> &SimilarConstraint)
 {
   double Alpha=10000000.0;
   double *ptA = 0;
@@ -466,6 +472,9 @@ double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints)
     {
 
       bool ConstraintFound=false;
+
+      m_ConstraintsValueComputed[li] = false;
+      m_ConstraintsValueComputed[li+m_NbOfConstraints] = false;
 
       for(unsigned int ConstraintIndex=0;
 	  ConstraintIndex<m_ActivatedConstraints.size();
@@ -483,22 +492,57 @@ double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints)
       ptA = m_A + li;
 
       m_v1[li]=0.0;
-      for(unsigned lj=0;lj<2*m_CardV;lj++)
-	{
-	  m_v1[li]+= *ptA * m_d[lj];
-	  ptA+=(m_NbOfConstraints+1);
-	}
+
+      // Check if we can not reuse an already computed result   
+      {
+	bool ToBeComputed=true;
+	if (SimilarConstraint[li]!=0) 
+	  {
+	    int lindex = li+SimilarConstraint[li];
+	    if (m_ConstraintsValueComputed[lindex])
+	      {
+		m_v1[li] = -m_v1[lindex];
+		ToBeComputed=false;
+	      }
+	  }
+	
+	if(ToBeComputed)
+	  for(unsigned lj=0;lj<2*m_CardV;lj++)
+	    {
+	      m_v1[li]+= *ptA * m_d[lj];
+	      ptA+=(m_NbOfConstraints+1);
+	    }
+      }
+      
+      m_ConstraintsValueComputed[li] = true;
 
       if (m_v1[li]<0.0)
 	{
 	  double lalpha=0.0;
 	  double *pt2A = m_A + li;	
 	  m_v2[li]= -m_b[li];
-	  for(unsigned lj=0;lj<2*m_CardV;lj++)
-	    {
-	      m_v2[li]-= *pt2A * m_Vk[lj];
-	      pt2A+=(m_NbOfConstraints+1);
-	    }
+
+	  // Check if we can not reuse an already computed result
+	  {
+	    bool ToBeComputed=true;
+	    if (SimilarConstraint[li]!=0) 
+	      {
+		int lindex = li+SimilarConstraint[li];
+		if (m_ConstraintsValueComputed[lindex+m_NbOfConstraints])
+		  {
+		    m_v2[li] += -m_v2[lindex]-m_b[lindex];
+		    ToBeComputed=false;
+		  }
+	      }
+	    
+	    if(ToBeComputed)
+	      for(unsigned lj=0;lj<2*m_CardV;lj++)
+		{
+		  m_v2[li]-= *pt2A * m_Vk[lj];
+		  pt2A+=(m_NbOfConstraints+1);
+		}
+	  }
+
 	  if (m_v2[li]>0.0)
 	    {
 	      cout << "PB ON constraint "<<li<< endl;
@@ -536,7 +580,8 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 			     double *CstPartOfConstraints,
 			     double *ZMPRef,
 			     double *XkYk,
-			     double *X)
+			     double *X,
+			     vector<int> &SimilarConstraints)
 {
   static double lTime=-0.02;
   vector<unsigned int> NewActivatedConstraints;
@@ -662,7 +707,8 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
       ComputeProjectedDescentDirection();
 
       /*! Step three : Compute alpha */
-      alpha = ComputeAlpha(NewActivatedConstraints);
+      alpha = ComputeAlpha(NewActivatedConstraints,
+			   SimilarConstraints);
 
       if (alpha>=1.0)
 	{

@@ -90,6 +90,45 @@ FootConstraintsAsLinearSystem::~FootConstraintsAsLinearSystem()
 {
 }
 
+int FootConstraintsAsLinearSystem::FindSimilarConstraints(MAL_MATRIX(&A,double),
+							  vector<int> &SimilarConstraints)
+{
+
+  SimilarConstraints.resize(MAL_MATRIX_NB_ROWS(A));
+  SimilarConstraints[0] = 0;
+  SimilarConstraints[1] = 0;
+  if(MAL_MATRIX_NB_ROWS(A)==4)
+    {
+      if ((A(0,0)==-A(2,0)) &&
+	  (A(0,1)==-A(2,1)))
+	SimilarConstraints[2]=-2;
+      if ((A(1,0)==-A(3,0)) &&
+	  (A(1,1)==-A(3,1)))
+	SimilarConstraints[3]=-2;
+
+    }
+  else if(MAL_MATRIX_NB_ROWS(A)==6)
+    {
+      SimilarConstraints[2] = 0;
+      if ((A(0,0)==-A(3,0)) &&
+	  (A(0,1)==-A(3,1)))
+	SimilarConstraints[3]=-3;
+      if ((A(1,0)==-A(4,0)) &&
+	  (A(1,1)==-A(4,1)))
+	SimilarConstraints[4]=-3;
+      if ((A(2,0)==-A(5,0)) &&
+	  (A(2,1)==-A(5,1)))
+	SimilarConstraints[5]=-3;
+      
+    }
+
+  if (0)
+    for(unsigned int i=0;i<SimilarConstraints.size();i++)
+      cout << "Similar (" << i << ")=" << SimilarConstraints[i] << endl;
+
+  return 0;
+}
+
 // Assuming that the points are going counter-clockwise
 // and that the foot's interior is at the left of the points.
 // The result is : A [ Zx(k), Zy(k)]' + B  >=0
@@ -248,7 +287,6 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
       return -1;
     }
   
-  ODEBUG3(MAL_MATRIX_NB_ROWS(A));
   ODEBUG("A: " << A );
   ODEBUG("B: " << B);
       
@@ -482,7 +520,11 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(deque<FootA
 
 	  // Linear Constraint Inequality
 	  LinearConstraintInequality_t * aLCI = new LinearConstraintInequality_t;
+	  // Building those constraints.
 	  ComputeLinearSystem(TheConvexHull,aLCI->A, aLCI->B, aLCI->Center);
+	  // Finding the similar one (i.e. Ai identical).
+	  FindSimilarConstraints(aLCI->A,aLCI->SimilarConstraints);
+
 	  aLCI->StartingTime = LeftFootAbsolutePositions[i].time;
 	  if (QueueOfLConstraintInequalities.size()>0)
 	    {

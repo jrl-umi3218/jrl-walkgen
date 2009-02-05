@@ -137,7 +137,9 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   InitConstants();
 
   // PLDP Solver needs iPu and Px.
-  
+
+  m_SimilarConstraints.resize(8*m_QP_N);
+
   if (m_FastFormulationMode==PLDP)
     m_PLDPSolver = new Optimization::Solver::PLDPSolver(m_QP_N,
 							MAL_RET_MATRIX_DATABLOCK(m_iPu),
@@ -147,7 +149,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   else
     m_PLDPSolver =0;
 
-  RESETDEBUG6("Check2DLIPM.dat");
+  RESETDEBUG5("Check2DLIPM.dat");
 }
 
 ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
@@ -897,6 +899,8 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer2);
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer3);
 
+	  m_SimilarConstraints[IndexConstraint]=(*LCI_it)->SimilarConstraints[j];
+
 	  if (m_FastFormulationMode==QLD)
 	    {
 	      // In this case, Pu is triangular.
@@ -1206,7 +1210,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	      xk[1] << " " << xk[4] << " " <<
 	      xk[2] << " " << xk[5] << " ");
 
-      ODEBUG6(xk[0] << " " << xk[3] << " " <<
+      ODEBUG5(xk[0] << " " << xk[3] << " " <<
 	      xk[1] << " " << xk[4] << " " <<
 	      xk[2] << " " << xk[5] << " ", "Check2DLIPM.dat");
 	      
@@ -1306,11 +1310,12 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 		  xk[2] << " " << xk[5] << " ");
 	  
 	  ifail=m_PLDPSolver->SolveProblem(D,
-				     (unsigned int)m,
-				     DPu,
-				     DPx,
-				     MAL_RET_VECTOR_DATABLOCK(ZMPRef),
-				     MAL_RET_VECTOR_DATABLOCK(xk),X);
+					   (unsigned int)m,
+					   DPu,
+					   DPx,
+					   MAL_RET_VECTOR_DATABLOCK(ZMPRef),
+					   MAL_RET_VECTOR_DATABLOCK(xk),X,
+					   m_SimilarConstraints);
 	}
       
       if (ifail!=0)

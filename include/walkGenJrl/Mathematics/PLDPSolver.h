@@ -34,6 +34,7 @@
 
 #ifndef _PLDP_SOLVER_H_
 
+#include <vector>
 #include <walkGenJrl/Mathematics/OptCholesky.h>
 
 namespace Optimization
@@ -63,7 +64,8 @@ namespace Optimization
 			   double *CstPartOfConstraints,
 			   double *ZMPRef,
 			   double *XkYk,
-			   double *X);
+			   double *X,
+			   std::vector<int> &SimilarConstraint);
 	protected:
 	  
 	  /*! \name Initial solution methods related 
@@ -111,7 +113,8 @@ namespace Optimization
 	  /*! @} */
 
 	  /*! Detecting violated constraints */
-	  double ComputeAlpha(vector<unsigned int> &NewActivatedConstraints);
+	  double ComputeAlpha(vector<unsigned int> &NewActivatedConstraints,
+			      vector<int> &SimilarConstraint);
 
 	  /*! Write current ZMP ref trajectory associated with 
 	    current value of m_Vk. */
@@ -160,6 +163,10 @@ namespace Optimization
 
 	  /*! Store the cst part of the constraints. */
 	  double * m_b;
+
+
+	  /*! Store if the A*Vk values has been computed  */
+	  bool * m_ConstraintsValueComputed;
 
 	  /*! Store the maximum number of Constraints.
 	    It is also the dimension of L in its maximal storage
