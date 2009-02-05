@@ -66,6 +66,7 @@ void OptCholesky::InitializeInternalVariables()
 
 void OptCholesky::SetToZero()
 {
+#if 0
   if (m_NbMaxOfConstraints!=0)
     {
       if (m_L!=0)
@@ -74,6 +75,7 @@ void OptCholesky::SetToZero()
 
       
     }
+#endif
   m_SetActiveConstraints.clear();
 
 }

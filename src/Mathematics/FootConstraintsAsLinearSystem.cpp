@@ -248,6 +248,7 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
       return -1;
     }
   
+  ODEBUG3(MAL_MATRIX_NB_ROWS(A));
   ODEBUG("A: " << A );
   ODEBUG("B: " << B);
       

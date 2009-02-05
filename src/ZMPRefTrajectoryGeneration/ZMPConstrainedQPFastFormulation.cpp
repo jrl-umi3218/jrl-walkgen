@@ -147,7 +147,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   else
     m_PLDPSolver =0;
 
-  RESETDEBUG5("Check2DLIPM.dat");
+  RESETDEBUG6("Check2DLIPM.dat");
 }
 
 ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
@@ -1206,7 +1206,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	      xk[1] << " " << xk[4] << " " <<
 	      xk[2] << " " << xk[5] << " ");
 
-      ODEBUG5(xk[0] << " " << xk[3] << " " <<
+      ODEBUG6(xk[0] << " " << xk[3] << " " <<
 	      xk[1] << " " << xk[4] << " " <<
 	      xk[2] << " " << xk[5] << " ", "Check2DLIPM.dat");
 	      

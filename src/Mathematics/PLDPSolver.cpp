@@ -97,10 +97,9 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
 
   m_OptCholesky = new PatternGeneratorJRL::OptCholesky(m_NbMaxOfConstraints,2*m_CardV,
 						       OptCholesky::MODE_FORTRAN);
-  
-  m_ActivatedConstraints.clear();
-
+  RESETDEBUG5("Infos.dat");
   AllocateMemoryForSolver();
+
 }
 
 void PLDPSolver::AllocateMemoryForSolver()
@@ -127,6 +126,7 @@ void PLDPSolver::AllocateMemoryForSolver()
 
 void PLDPSolver::InitializeSolver()
 {
+#if 0
   // Allocation max:
   // We assume that we might at max. 8 actives constraintes 
   // per control time.
@@ -143,6 +143,7 @@ void PLDPSolver::InitializeSolver()
 
   // Same for the descent.
   memset(m_d,0,2*m_CardV*sizeof(double));
+#endif
   m_ActivatedConstraints.clear();
 }
 
@@ -766,7 +767,9 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
       aof.close();
 
     }
-	
+  
+
+  ODEBUG5(m_ActivatedConstraints.size() << " " << NbOfConstraints,"Infos.dat");
   return 0;
 }
 
