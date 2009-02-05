@@ -14,7 +14,8 @@
    * Redistributions of source code must retain the above copyright notice, 
    this list of conditions and the following disclaimer.
    * Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+   this list of conditions and the following disclaimer in the 
+   documentation and/or other materials provided with the distribution.
    * Neither the name of the CNRS and AIST nor the names of its contributors 
    may be used to endorse or promote products derived from this software without specific prior written permission.
    
@@ -101,11 +102,11 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
   unsigned int n = aVecOfPoints.size();
   MAL_MATRIX_RESIZE(A,aVecOfPoints.size(),2);
   MAL_MATRIX_RESIZE(B,aVecOfPoints.size(),1);
-  MAL_VECTOR_RESIZE(C,3);
+  MAL_VECTOR_RESIZE(C,2);
 
   // Dump a file to display on scilab .
   // This should be removed during real usage inside a robot.
-  if (1)
+  if (0)
     {
       ofstream aof;
       aof.open("Constraints-FCSALS.dat",ofstream::app);
@@ -124,7 +125,6 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
       // Compute center of the convex hull.
       C(0)+= aVecOfPoints[i].col;
       C(1)+= aVecOfPoints[i].row;
-      C(2)=0.0;
 	
       ODEBUG("(x["<< i << "],y["<<i << "]): " << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
 	     << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row );
@@ -177,9 +177,13 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
 
     }
 
-  C(0) /= (double)aVecOfPoints.size();
-  C(1) /= (double)aVecOfPoints.size();
-  C(2) =0.0;
+  // Compute center of the convex hull.
+  C(0)+= aVecOfPoints[n-1].col;
+  C(1)+= aVecOfPoints[n-1].row;
+
+  C(0) /= (double)n;
+  C(1) /= (double)n;
+
 
   ODEBUG("(x["<< n-1 << "],y["<< n-1 << "]): " << aVecOfPoints[n-1].col << " " <<  aVecOfPoints[n-1].row << " "
 	 << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row );
@@ -230,6 +234,19 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
   A(n-1,0) = a; A(n-1,1)= c;
   B(n-1,0) = b;
   
+  // Verification of inclusion of the center inside the polytope.
+  MAL_VECTOR_DIM(W,double,2);  
+  W = MAL_RET_A_by_B(A,C);
+
+  W(0) = W(0) + B(0,0);
+  W(1) = W(1) + B(1,0);
+
+  if ((W(0)<0) || (W(1)<0))
+    {
+      ODEBUG3("Linear system ill-computed.");
+      ODEBUG3("Stop.");
+      return -1;
+    }
   
   ODEBUG("A: " << A );
   ODEBUG("B: " << B);

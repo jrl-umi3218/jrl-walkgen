@@ -74,7 +74,7 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
 		       double *Pu,
 		       double *iLQ)
 {
-  m_DebugMode = 2;
+  m_DebugMode = 0;
 
   /* Initialize pointers */
   m_CardV = CardU;
@@ -220,7 +220,7 @@ int PLDPSolver::PrecomputeiPuPx()
 	}
       aof.close();
 
-      aof.open("iLQ.dat",ofstream::out);
+      aof.open("isLQ.dat",ofstream::out);
       for(unsigned int i=0;i<m_CardV;i++)
 	{
 	  for(unsigned int j=0;j<m_CardV;j++)
@@ -502,7 +502,7 @@ double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints)
 	    {
 	      cout << "PB ON constraint "<<li<< endl;
 	      cout << " Check current V k="<<m_ItNb<< endl;
-	      cout << " should be faisable." << endl;
+	      cout << " should be faisable : " << -m_v2[li] << endl;
 	    }
 	  lalpha = m_v2[li]/m_v1[li];
 
@@ -537,10 +537,10 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 			     double *XkYk,
 			     double *X)
 {
-  static double lTime=-0.005;
+  static double lTime=-0.02;
   vector<unsigned int> NewActivatedConstraints;
 
-  lTime+=0.005;
+  lTime+=0.02;
   InitializeSolver();
 
   m_A = LinearPartOfConstraints;
@@ -700,7 +700,7 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 
       if (ContinueAlgo)
 	{
-	  ODEBUG3("Nb of activated constraints: " << NewActivatedConstraints.size() 
+	  ODEBUG("Nb of activated constraints: " << NewActivatedConstraints.size() 
 		  << " " << lTime);
 	  m_OptCholesky->AddActiveConstraints(NewActivatedConstraints);
 	  for(unsigned int i=0;i<NewActivatedConstraints.size();i++)
@@ -723,7 +723,7 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 		  aof<<endl;
 		}
 	      aof.close();
-	      ODEBUG3("m_L(0,0)= " << m_L[0]);
+	      ODEBUG("m_L(0,0)= " << m_L[0]);
 	      sprintf(Buffer,"alpha_%02d.dat",m_ItNb);
 	      aof.open(Buffer,ofstream::out);
 	      aof << alpha << endl;

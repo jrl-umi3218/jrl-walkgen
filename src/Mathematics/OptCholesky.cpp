@@ -206,7 +206,7 @@ int OptCholesky::UpdateCholeskyMatrixFortran()
 
       /* */
       double r = Mij;
-      ODEBUG3("r: M("<< m_SetActiveConstraints[IndexNewRowAKAi] << "," 
+      ODEBUG("r: M("<< m_SetActiveConstraints[IndexNewRowAKAi] << "," 
 	      << m_SetActiveConstraints[lj] <<")="<< r);
       double * ptLik =m_L + IndexNewRowAKAi*m_NbMaxOfConstraints;
       double * ptLjk =m_L + lj*m_NbMaxOfConstraints;
@@ -220,7 +220,7 @@ int OptCholesky::UpdateCholeskyMatrixFortran()
       else
 	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj] = sqrt(r);
       
-      ODEBUG3("m_L(" << IndexNewRowAKAi << "," << lj << ")="
+      ODEBUG("m_L(" << IndexNewRowAKAi << "," << lj << ")="
 	      << m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj] );
     }
   

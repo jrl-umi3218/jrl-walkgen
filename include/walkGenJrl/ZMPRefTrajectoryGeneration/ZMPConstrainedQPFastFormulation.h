@@ -112,12 +112,6 @@ namespace PatternGeneratorJRL
 					     double T,
 					     unsigned int N);
 
-    /*! Prepare ZMPRef */
-    void PrepareZMPRef(MAL_VECTOR(,double) &ZMPRef, 
-		       double StartingTime,
-		       deque<LinearConstraintInequality_t *> 
-		       &QueueOfLConstraintInequalities);
-    
     /*! \name Methods to build the optimization problem 
       @{
      */
@@ -159,7 +153,8 @@ namespace PatternGeneratorJRL
 				& QueueOfLConstraintInequalities,
 				double Com_Height,
 				unsigned int &NbOfConstraints,
-				MAL_VECTOR(&xk,double));
+				MAL_VECTOR(&xk,double),
+				MAL_VECTOR(&ZMPRef,double));
 
     /*! \brief Build the constant part of the constraint matrices. */
     int BuildingConstantPartOfConstraintMatrices();
@@ -235,7 +230,14 @@ namespace PatternGeneratorJRL
 			      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			      deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
-
+    
+    int ValidationConstraints(double * & DPx,double * &DPu,
+			      int NbOfConstraints,
+			      deque<LinearConstraintInequality_t *> &
+			      QueueOfLConstraintInequalities,
+			      unsigned int li,
+			      double *X,
+			      double StartingTime);
     /*! \brief Return the time at which it is optimal to regenerate a step in online mode. 
      */
     int ReturnOptimalTimeToRegenerateAStep();
