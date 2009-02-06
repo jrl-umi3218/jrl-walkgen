@@ -65,7 +65,8 @@ namespace Optimization
 			   double *ZMPRef,
 			   double *XkYk,
 			   double *X,
-			   std::vector<int> &SimilarConstraint);
+			   std::vector<int> &SimilarConstraint,
+			   unsigned int NumberOfRemovedConstraints);
 	protected:
 	  
 	  /*! \name Initial solution methods related 
@@ -168,6 +169,7 @@ namespace Optimization
 	  /*! Store if the A*Vk values has been computed  */
 	  bool * m_ConstraintsValueComputed;
 
+
 	  /*! Store the maximum number of Constraints.
 	    It is also the dimension of L in its maximal storage
 	    form. */
@@ -197,6 +199,11 @@ namespace Optimization
 	  /*! List of activated constraints. */
 	  vector<unsigned int> m_ActivatedConstraints;
 
+	  /*! List of previously activated constraints. */
+	  vector<unsigned int> m_PreviouslyActivatedConstraints;
+
+	  /*! Boolean to perform a hotstart */
+	  bool m_HotStart;
 	};
     };
 };
