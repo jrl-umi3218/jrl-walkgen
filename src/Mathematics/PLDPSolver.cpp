@@ -75,7 +75,7 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
 		       double *iLQ)
 {
   m_DebugMode = 0;
-
+  m_HotStart = true;
   /* Initialize pointers */
   m_CardV = CardU;
 
@@ -91,6 +91,8 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
   m_d = 0;
   m_v1 = m_v2 = m_y = 0;
   m_A = m_b= 0;
+
+  m_ConstraintsValueComputed = 0;
 
   m_NbMaxOfConstraints = 8*m_CardV;
   m_NbOfConstraints = 0;
@@ -581,7 +583,8 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 			     double *ZMPRef,
 			     double *XkYk,
 			     double *X,
-			     vector<int> &SimilarConstraints)
+			     vector<int> &SimilarConstraints,
+			     unsigned int NumberOfRemovedConstraints)
 {
   static double lTime=-0.02;
   vector<unsigned int> NewActivatedConstraints;
@@ -601,7 +604,7 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 	  XkYk[2] << " " << XkYk[5] << " ");
   
   ComputeInitialSolution(ZMPRef,XkYk);
- 
+
 
   if (m_DebugMode>1)
     {
@@ -692,6 +695,26 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
   /*! Initialization de cholesky. */
   m_OptCholesky->SetA(LinearPartOfConstraints,m_NbOfConstraints);
   m_OptCholesky->SetToZero();
+
+  // Hot Start 
+  if (m_HotStart)
+    {
+      //      cout << "P:" ;
+      for(unsigned int i=0;i<m_PreviouslyActivatedConstraints.size();i++)
+	{
+	  int lindex=m_PreviouslyActivatedConstraints[i]-NumberOfRemovedConstraints;
+	  if (lindex>=0)
+	    m_ActivatedConstraints.push_back(lindex);
+	  
+	}
+      //cout << lindex << " " ;
+      if (m_ActivatedConstraints.size()>0)
+	m_OptCholesky->AddActiveConstraints(m_ActivatedConstraints);
+	  
+      //      cout << endl;
+      m_PreviouslyActivatedConstraints.clear();
+    }
+ 
 
   double alpha=0.0;
   m_ItNb=0;
@@ -786,6 +809,25 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
   for(unsigned int i=0;i<2*m_CardV;i++)
     X[i] = m_Vk[i];
 
+#if 0
+  cout << "A: ";
+  for( unsigned int i=0;i<m_ActivatedConstraints.size();i++)
+    cout << m_ActivatedConstraints[i] << " " ;
+  cout << endl;
+#endif
+
+  //  cout << "AR: ";
+  for( unsigned int i=0;i<m_ActivatedConstraints.size();i++)
+    {
+      //      cout << m_v2[m_ActivatedConstraints[i]]/m_v1[m_ActivatedConstraints[i]] << " ";
+      if (m_v2[m_ActivatedConstraints[i]]/m_v1[m_ActivatedConstraints[i]]<0.9)
+	{
+	  m_PreviouslyActivatedConstraints.push_back(m_ActivatedConstraints[i]);
+	  //cout << m_ActivatedConstraints[i] << " " ;
+	}
+    }
+  //  cout << endl;
+  
   if ((isnan(X[0])) ||
       (isnan(X[m_CardV])) ||
       (isinf(X[0])) ||

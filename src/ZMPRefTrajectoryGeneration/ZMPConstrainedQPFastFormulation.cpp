@@ -149,6 +149,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   else
     m_PLDPSolver =0;
 
+  RESETDEBUG6("InfosQLD.dat");
   RESETDEBUG5("Check2DLIPM.dat");
 }
 
@@ -783,7 +784,8 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
 							     double Com_Height,
 							     unsigned int &NbOfConstraints,
 							     MAL_VECTOR(& xk,double),
-							     MAL_VECTOR(& ZMPRef,double))
+							     MAL_VECTOR(& ZMPRef,double),
+							     unsigned int &NextNumberOfRemovedConstraints)
 {
   // Discretize the problem.
   ODEBUG(" N:" << N << " T: " << T);
@@ -859,6 +861,11 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
   MAL_VECTOR_DIM(lb,double,NbOfConstraints);
 
   LCI_it = store_it;
+
+  // Store the number of constraint to be generated for the first 
+  // slot of time control of the algorithm.
+  NextNumberOfRemovedConstraints = MAL_MATRIX_NB_ROWS((*LCI_it)->A);
+
   IndexConstraint = 0;
   ODEBUG("Starting Matrix to build the constraints. ");
   ODEBUG((*LCI_it)->A );
@@ -1196,6 +1203,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 
   ODEBUG3("0.0 " << QueueOfLConstraintInequalities.back()->EndingTime-	N*T << " " 
 	  << " T: " << T << " N: " << N << " interval " << interval);
+  unsigned int NumberOfRemovedConstraints =0,
+    NextNumberOfRemovedConstraints =0;
   for(double StartingTime=0.0;
       StartingTime<QueueOfLConstraintInequalities.back()->EndingTime-
 	N*T;
@@ -1222,7 +1231,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 			      m_ComHeight,
 			      NbOfConstraints,
 			      xk,
-			      ZMPRef);
+			      ZMPRef,
+			      NextNumberOfRemovedConstraints);
       
 
       m = NbOfConstraints;
@@ -1298,11 +1308,22 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 		
       if ((m_FastFormulationMode==QLDANDLQ)||
 	  (m_FastFormulationMode==QLD))
-	ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
-		m_Q, D, DPu,DPx,XL,XU,
-		X,U,&iout, &ifail, &iprint,
-		war, &lwar,
-		iwar, &liwar,&Eps);
+	{
+	  ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
+		  m_Q, D, DPu,DPx,XL,XU,
+		  X,U,&iout, &ifail, &iprint,
+		  war, &lwar,
+		  iwar, &liwar,&Eps);
+	  unsigned int NbOfActivatedConstraints = 0;
+	  for(int lk=0;lk<m;lk++)
+	    {
+	      if (U[lk]>0.0)
+		{
+		  NbOfActivatedConstraints++;
+		}
+	    }
+	  ODEBUG6(NbOfActivatedConstraints++,"InfosQLD.dat");
+	}
       else if (m_FastFormulationMode==PLDP)
 	{
 	  ODEBUG("State: " << xk[0] << " " << xk[3] << " " <<
@@ -1315,7 +1336,9 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 					   DPx,
 					   MAL_RET_VECTOR_DATABLOCK(ZMPRef),
 					   MAL_RET_VECTOR_DATABLOCK(xk),X,
-					   m_SimilarConstraints);
+					   m_SimilarConstraints,
+					   NumberOfRemovedConstraints);
+	  NumberOfRemovedConstraints = NextNumberOfRemovedConstraints;
 	}
       
       if (ifail!=0)
