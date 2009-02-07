@@ -31,6 +31,16 @@
 #include <iostream>
 #include <fstream>
 #include <walkGenJrl/Mathematics/PLDPSolver.h>
+
+#ifdef WIN32
+#include <float.h>
+#define isnan _isnan
+
+//definition of isinf for win32
+//src:  http://www.gnu.org/software/libtool/manual/autoconf/Function-Portability.html
+inline int isinf (double x){return isnan (x - x);}
+#endif
+
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; \
                          DebugFile.open(y,ofstream::out); \
@@ -826,7 +836,8 @@ void PLDPSolver::WriteCurrentZMPSolution(string filename,
   // The current solution is Vk,
   // but its graphical representation is better understood
   // when transformed in ZMP ref trajectory.
-  double lZMP[2*m_CardV];
+  int lZMP_size=2*m_CardV;
+  double* lZMP = new double [lZMP_size];
 
   ofstream aof;
   aof.open((char *)filename.c_str(),ofstream::out);
@@ -852,4 +863,5 @@ void PLDPSolver::WriteCurrentZMPSolution(string filename,
     }
 
   aof.close();
+  delete lZMP;
 }
