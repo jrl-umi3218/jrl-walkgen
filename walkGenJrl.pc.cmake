@@ -9,5 +9,5 @@ Name: ${PROJECT_NAME}
 Description: ${PROJECT_DESCRIPTION}
 Version: ${PROJECT_VERSION}
 Requires: ${PROJECT_REQUIREMENTS}
-Libs:  ${LIBDIR_KW}${install_pkg_libdir} ${LIBINCLUSION_KW}${PROJECT_NAME}
-Cflags: -I${install_pkg_include_dir} ${${PROJECT_NAME}_PC_CXXFLAGS}
+Libs:  ${LIBDIR_KW}${install_pkg_libdir} ${${PROJECT_NAME}_LDFLAGS}
+Cflags: -I${install_pkg_include_dir} ${${PROJECT_NAME}_CXXFLAGS}
