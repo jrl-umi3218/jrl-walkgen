@@ -589,7 +589,7 @@ int main(int argc, char *argv[])
   if (argc!=6)
     {
       cerr << " This program takes 5 arguments: " << endl;
-      cerr << "./TestHumanoidDynamicRobot PATH_TO_PC_PARAMS_FILE PATH_TO_VRML_FILE VRML_FILE_NAME PATH_TO_SPECIFICITIES_XML LINK_JOINT_RANK" << endl;
+      cerr << "./TestFootPrintPGInterface  PATH_TO_PC_PARAMS_FILE PATH_TO_VRML_FILE VRML_FILE_NAME PATH_TO_SPECIFICITIES_XML LINK_JOINT_RANK" << endl;
       exit(-1);
     }	
   string PCParametersFile = argv[1];
