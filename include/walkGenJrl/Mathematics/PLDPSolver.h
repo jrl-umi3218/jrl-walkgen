@@ -65,7 +65,8 @@ namespace Optimization
 			   double *ZMPRef,
 			   double *XkYk,
 			   double *X,
-			   std::vector<int> &SimilarConstraint);
+			   std::vector<int> &SimilarConstraint,
+			   unsigned int NumberOfRemovedConstraints);
 	protected:
 	  
 	  /*! \name Initial solution methods related 
@@ -109,6 +110,8 @@ namespace Optimization
 	   So now we are looking for v2.
 	  */
 	  int BackwardSubstitution();
+
+	  int BackwardSubstitution2();
 
 	  /*! @} */
 
@@ -157,6 +160,9 @@ namespace Optimization
 
 	  /*! Store some temporary variables  */
 	  double *m_v1, *m_v2, *m_y;
+
+	  /*! Store some temporary variables  */
+	  double *m_tmp1, *m_tmp2;
 	  
 	  /*! Store the linear part of the constraints. */
 	  double * m_A;
@@ -167,6 +173,7 @@ namespace Optimization
 
 	  /*! Store if the A*Vk values has been computed  */
 	  bool * m_ConstraintsValueComputed;
+
 
 	  /*! Store the maximum number of Constraints.
 	    It is also the dimension of L in its maximal storage
@@ -197,6 +204,11 @@ namespace Optimization
 	  /*! List of activated constraints. */
 	  vector<unsigned int> m_ActivatedConstraints;
 
+	  /*! List of previously activated constraints. */
+	  vector<unsigned int> m_PreviouslyActivatedConstraints;
+
+	  /*! Boolean to perform a hotstart */
+	  bool m_HotStart;
 	};
     };
 };

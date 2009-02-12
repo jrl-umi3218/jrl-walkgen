@@ -154,7 +154,8 @@ namespace PatternGeneratorJRL
 				double Com_Height,
 				unsigned int &NbOfConstraints,
 				MAL_VECTOR(&xk,double),
-				MAL_VECTOR(&ZMPRef,double));
+				MAL_VECTOR(&ZMPRef,double),
+				unsigned int &NextNumberOfRemovedConstraints);
 
     /*! \brief Build the constant part of the constraint matrices. */
     int BuildingConstantPartOfConstraintMatrices();

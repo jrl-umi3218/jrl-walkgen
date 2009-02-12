@@ -672,6 +672,14 @@ namespace PatternGeneratorJRL
     void EvaluateStartingCOM(MAL_VECTOR(  & Configuration,double),
 			     MAL_S3_VECTOR(  & lStartingCOMPosition,double));
 
+
+    /*! \brief Returns the ZMP, CoM, left foot absolute position, and right foot absolute position
+     for the initiale pose.*/
+    void EvaluateStartingState(COMPosition  & lStartingCOMPosition,
+			       MAL_S3_VECTOR(,double) & lStartingZMPPosition,
+			       FootAbsolutePosition & InitLeftFootAbsPos,
+			       FootAbsolutePosition & InitRightFootAbsPos);
+
     /*! \brief Fill the internal buffer with the appropriate information depending on the strategy. 
     The behavior of this method depends on \a m_AlgorithmforZMPCOM.
     */
