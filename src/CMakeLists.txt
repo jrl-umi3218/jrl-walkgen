@@ -75,7 +75,7 @@ SET(PROJECT_NAME_LIB ${PROJECT_NAME})
 # ---------------------------------
 IF(UNIX)
 ADD_LIBRARY(${PROJECT_NAME_LIB}
-  ${libwpg_src} ./Mathematics/jrlgesvd.f 
+  ${libwpg_src} 
   ${libwpg_headers} 
 )
 ENDIF(UNIX)
