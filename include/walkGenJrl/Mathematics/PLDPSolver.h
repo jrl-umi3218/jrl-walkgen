@@ -111,6 +111,8 @@ namespace Optimization
 	  */
 	  int BackwardSubstitution();
 
+	  int BackwardSubstitution2();
+
 	  /*! @} */
 
 	  /*! Detecting violated constraints */
@@ -158,6 +160,9 @@ namespace Optimization
 
 	  /*! Store some temporary variables  */
 	  double *m_v1, *m_v2, *m_y;
+
+	  /*! Store some temporary variables  */
+	  double *m_tmp1, *m_tmp2;
 	  
 	  /*! Store the linear part of the constraints. */
 	  double * m_A;

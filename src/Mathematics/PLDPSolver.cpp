@@ -58,11 +58,14 @@
                           DebugFile << x ; DebugFile.close();}
 #if 1
 #define ODEBUG(x)
+#define ODEBUG_NENDL(x)
 #else
 #define ODEBUG(x)  std::cout << "PLDPSolver " << x << endl;
+#define ODEBUG_NENDL(x)  std::cout << x ;
 #endif
 
 #define ODEBUG3(x)  std::cout << "PLDPSolver " << x << endl;
+#define ODEBUG3_NENDL(x)  std::cout << x ;
 
 using namespace PatternGeneratorJRL;
 using namespace Optimization::Solver;
@@ -75,7 +78,8 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
 		       double *iLQ)
 {
   m_DebugMode = 0;
-  m_HotStart = true;
+  m_HotStart = false;
+
   /* Initialize pointers */
   m_CardV = CardU;
 
@@ -90,6 +94,7 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
   m_iLQ = iLQ;
   m_d = 0;
   m_v1 = m_v2 = m_y = 0;
+  m_tmp1 = m_tmp2 = 0;
   m_A = m_b= 0;
 
   m_ConstraintsValueComputed = 0;
@@ -100,6 +105,7 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
   m_OptCholesky = new PatternGeneratorJRL::OptCholesky(m_NbMaxOfConstraints,2*m_CardV,
 						       OptCholesky::MODE_FORTRAN);
   RESETDEBUG5("Infos.dat");
+  RESETDEBUG5("ActivatedConstraints.dat");
   AllocateMemoryForSolver();
 
 }
@@ -118,6 +124,9 @@ void PLDPSolver::AllocateMemoryForSolver()
 
   m_v1 = new double[m_NbMaxOfConstraints];
   m_v2 = new double[m_NbMaxOfConstraints];
+  m_tmp1 = new double[m_NbMaxOfConstraints];
+  m_tmp2 = new double[m_NbMaxOfConstraints];
+
   m_y = new double[m_NbMaxOfConstraints];
 
   m_ConstraintsValueComputed = new bool [m_NbMaxOfConstraints*2];
@@ -175,6 +184,12 @@ PLDPSolver::~PLDPSolver()
 
   if (m_v2!=0)
     delete [] m_v2;
+
+  if (m_tmp1!=0)
+    delete [] m_tmp1;
+
+  if (m_tmp2!=0)
+    delete [] m_tmp2;
 
   if (m_d!=0)
     delete [] m_d;
@@ -302,7 +317,7 @@ int PLDPSolver::ForwardSubstitution()
   // EE^t v2 = v1 <-> LL^t v2 = v1
   // Now solving
   // L y = v1 
-  for(unsigned int i=0;i<m_ActivatedConstraints.size();i++)
+  for(unsigned int i=m_ActivatedConstraints.size()-1;i<m_ActivatedConstraints.size();i++)
     {
       m_y[i] = m_v1[i] ;
       for(unsigned int k=0;k<i;k++)
@@ -326,19 +341,62 @@ int PLDPSolver::BackwardSubstitution()
   if (SizeOfL==0)
     return 0;
   
+  ODEBUG3("BackwardSubstitution " << m_ItNb);
   for(int i=SizeOfL-1;
       i>=0; i--)
     {
+      double tmp=0.0;
       m_v2[i]= m_y[i];
       for(int k=i+1;k<(int)SizeOfL;k++)
-	m_v2[i] -=  m_L[k*m_NbMaxOfConstraints+i]*m_v2[k];
+	{
+	  if (k==(int)SizeOfL-1)
+	    tmp = m_v2[i];
+
+	  m_v2[i] -=  m_L[k*m_NbMaxOfConstraints+i]*m_v2[k];
+	}
       m_v2[i] = m_v2[i]/m_L[i*m_NbMaxOfConstraints+i];
+
+     tmp = tmp/m_L[i*m_NbMaxOfConstraints+i];
       ODEBUG("BS: m_L[i*m_NbMaxOfConstraints+i]:"<<
 	      m_L[i*m_NbMaxOfConstraints+i] << " " << m_y[i]);
-      ODEBUG("m_v2[i] = "<<m_v2[i]);
+      ODEBUG3("m_v2[" << i<< " ] = "<<m_v2[i] << " " << tmp);
     }
   return 0;
 }
+
+int PLDPSolver::BackwardSubstitution2()
+{
+  // Compute v2 q (14b) in Dimitrov 2009.
+  // Second phase 
+  // Now solving
+  // LL^t v2 = v1 <-> L y = v1 with L^t v2 = y
+  // y solved with first phase.
+  // So now we are looking for v2.
+  unsigned int SizeOfL = m_ActivatedConstraints.size();
+  if (SizeOfL==0)
+    return 0;
+  cout.precision(10);
+  ODEBUG3("BackwardSubstitution2 " << m_ItNb << " " 
+	  << m_y[SizeOfL-1] << " " 
+	  << m_L[(SizeOfL-1)*m_NbMaxOfConstraints+SizeOfL-1]);
+  double Xsolm1;
+  m_v2[SizeOfL-1] = Xsolm1 = m_y[SizeOfL-1]/m_L[(SizeOfL-1)*m_NbMaxOfConstraints+SizeOfL-1];
+  ODEBUG3("m_v2["<<SizeOfL-1 <<"]=" <<m_v2[SizeOfL-1]);
+  for(int i=SizeOfL-2;
+      i>=0; i--)
+    {
+      double prec=m_v2[i];
+      m_v2[i]= m_v2[i]- Xsolm1* m_L[(SizeOfL-1)*m_NbMaxOfConstraints+i]
+	/m_L[i*m_NbMaxOfConstraints+i];
+      ODEBUG3("m_v2[" << i << "]=" 
+	      << m_v2[i] << " " << prec << " " 
+	      << m_L[(SizeOfL-1)*m_NbMaxOfConstraints+i]<< " "
+	      << m_L[i*m_NbMaxOfConstraints+i] 
+	      );
+    }
+  return 0;
+}
+
 
 int PLDPSolver::ComputeProjectedDescentDirection()
 {
@@ -378,7 +436,8 @@ int PLDPSolver::ComputeProjectedDescentDirection()
       aof.close();
     }
   // Compute v1 eq (14a) in Dimitrov 2009
-  for(unsigned int li=0;li<m_ActivatedConstraints.size();li++)
+  ODEBUG_NENDL("m_v1(" <<m_ItNb << ")= [");
+  for(unsigned int li=m_ActivatedConstraints.size()-1;li<m_ActivatedConstraints.size();li++)
     {
       m_v1[li] = 0.0;
       unsigned int RowCstMatrix = m_ActivatedConstraints[li];
@@ -388,8 +447,9 @@ int PLDPSolver::ComputeProjectedDescentDirection()
 	  m_v1[li]+= m_A[RowCstMatrix+lj*(m_NbOfConstraints+1)]*
 	    m_UnconstrainedDescentDirection[lj];
 	}
-      ODEBUG("m_v1["<<li<<" ]="<< m_v1[li]);
+      ODEBUG_NENDL(m_v1[li]<< " ");
     }
+  ODEBUG_NENDL("]" << std::endl);
 
   if (m_DebugMode>1)
     {
@@ -493,7 +553,7 @@ double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints,
 
       ptA = m_A + li;
 
-      m_v1[li]=0.0;
+      m_tmp1[li]=0.0;
 
       // Check if we can not reuse an already computed result   
       {
@@ -503,7 +563,7 @@ double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints,
 	    int lindex = li+SimilarConstraint[li];
 	    if (m_ConstraintsValueComputed[lindex])
 	      {
-		m_v1[li] = -m_v1[lindex];
+		m_tmp1[li] = -m_tmp1[lindex];
 		ToBeComputed=false;
 	      }
 	  }
@@ -511,18 +571,18 @@ double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints,
 	if(ToBeComputed)
 	  for(unsigned lj=0;lj<2*m_CardV;lj++)
 	    {
-	      m_v1[li]+= *ptA * m_d[lj];
+	      m_tmp1[li]+= *ptA * m_d[lj];
 	      ptA+=(m_NbOfConstraints+1);
 	    }
       }
       
       m_ConstraintsValueComputed[li] = true;
 
-      if (m_v1[li]<0.0)
+      if (m_tmp1[li]<0.0)
 	{
 	  double lalpha=0.0;
 	  double *pt2A = m_A + li;	
-	  m_v2[li]= -m_b[li];
+	  m_tmp2[li]= -m_b[li];
 
 	  // Check if we can not reuse an already computed result
 	  {
@@ -532,7 +592,7 @@ double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints,
 		int lindex = li+SimilarConstraint[li];
 		if (m_ConstraintsValueComputed[lindex+m_NbOfConstraints])
 		  {
-		    m_v2[li] += -m_v2[lindex]-m_b[lindex];
+		    m_tmp2[li] += -m_tmp2[lindex]-m_b[lindex];
 		    ToBeComputed=false;
 		  }
 	      }
@@ -540,18 +600,18 @@ double PLDPSolver::ComputeAlpha(vector<unsigned int> & NewActivatedConstraints,
 	    if(ToBeComputed)
 	      for(unsigned lj=0;lj<2*m_CardV;lj++)
 		{
-		  m_v2[li]-= *pt2A * m_Vk[lj];
+		  m_tmp2[li]-= *pt2A * m_Vk[lj];
 		  pt2A+=(m_NbOfConstraints+1);
 		}
 	  }
 
-	  if (m_v2[li]>0.0)
+	  if (m_tmp2[li]>0.0)
 	    {
 	      cout << "PB ON constraint "<<li<< endl;
 	      cout << " Check current V k="<<m_ItNb<< endl;
 	      cout << " should be faisable : " << -m_v2[li] << endl;
 	    }
-	  lalpha = m_v2[li]/m_v1[li];
+	  lalpha = m_tmp2[li]/m_tmp1[li];
 
 	  if (Alpha>lalpha)
 	    {
@@ -725,7 +785,8 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
       for(unsigned int i=0;i<2*m_CardV;i++)
 	 m_UnconstrainedDescentDirection[i] = 
 	  -m_CstPartOfCostFunction[i] -  m_Vk[i];
-      
+
+
       /*! Step two: Compute the projected descent direction. */
       ComputeProjectedDescentDirection();
 
@@ -819,14 +880,39 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
   //  cout << "AR: ";
   for( unsigned int i=0;i<m_ActivatedConstraints.size();i++)
     {
-      //      cout << m_v2[m_ActivatedConstraints[i]]/m_v1[m_ActivatedConstraints[i]] << " ";
-      if (m_v2[m_ActivatedConstraints[i]]/m_v1[m_ActivatedConstraints[i]]<0.9)
+      //cout << "( " << m_ActivatedConstraints[i] << " , " << m_v2[i] << " ) ";
+       if (-m_v2[i]+m_b[m_ActivatedConstraints[i]]<-30.0)
 	{
 	  m_PreviouslyActivatedConstraints.push_back(m_ActivatedConstraints[i]);
-	  //cout << m_ActivatedConstraints[i] << " " ;
+	  // cout << m_ActivatedConstraints[i] << " " ;
 	}
     }
-  //  cout << endl;
+  //   cout << endl;
+
+  {
+    ofstream aof;
+    aof.open("ActivatedConstraints.dat",ofstream::app);
+    for(unsigned int i=0;i<320;i++)
+      {
+	bool FoundConstraint=false;
+	
+	if (i<m_NbOfConstraints)
+	  {
+	    for(unsigned int j=0;j<m_ActivatedConstraints.size();j++)
+	      if (m_ActivatedConstraints[j]==i)
+		{
+		  aof << "1 ";
+		  FoundConstraint=true;
+		  break;
+		}
+	  } 
+	if (!FoundConstraint)
+	  aof << "0 ";
+	
+      }
+    aof << endl;
+    aof.close();
+  }
   
   if ((isnan(X[0])) ||
       (isnan(X[m_CardV])) ||

@@ -653,6 +653,25 @@ namespace PatternGeneratorJRL {
     lStartingCOMPosition = m_HumanoidDynamicRobot->positionCenterOfMass();
   }
 
+  void PatternGeneratorInterface::EvaluateStartingState(COMPosition  & lStartingCOMPosition,
+							MAL_S3_VECTOR(,double) & lStartingZMPPosition,
+							FootAbsolutePosition & InitLeftFootAbsPos,
+							FootAbsolutePosition & InitRightFootAbsPos)
+  {
+    MAL_VECTOR(lBodyInit,double);    
+    MAL_VECTOR_RESIZE(lBodyInit,m_CurrentActuatedJointValues.size());
+    
+    for(unsigned int j=0; j<m_CurrentActuatedJointValues.size();j++)
+      {
+	lBodyInit(j) = m_CurrentActuatedJointValues[j];
+      }
+
+    m_GlobalStrategyManager->EvaluateStartingState(lBodyInit,
+						   lStartingCOMPosition,
+						   lStartingZMPPosition,
+						   InitLeftFootAbsPos, InitRightFootAbsPos);
+  }
+
   // This method assumes that we still are using the ZMP
   // someday it should go out.
   void PatternGeneratorInterface::AutomaticallyAddFirstStep(deque<RelativeFootPosition> & lRelativeFootPositions,
