@@ -308,6 +308,38 @@ void StraightWalkingDimitrov(PatternGeneratorInterface &aPGI)
 
 }
 
+void CurvedWalkingDimitrov(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+  {
+    istringstream strm2(":SetAlgoForZmpTrajectory Dimitrov");
+    aPGI.ParseCmd(strm2);
+  }
+
+  if (0)
+    {
+      istringstream strm2(":setpbwconstraint XY 0.07 0.05");
+      aPGI.ParseCmd(strm2);
+    }
+  
+  {
+    istringstream strm2(":stepseq 0.0 -0.105 0.0 \
+                     0.2 0.21 10.0  \
+                     0.2 -0.21 10.0 \
+                     0.2 0.21 10.0  \
+                     0.2 -0.21 10.0 \
+                     0.2 0.21 10.0 \
+                     0.2 -0.21 -10.0 \
+                     0.2 0.21 -10.0  \
+                     0.2 -0.21 -10.0 \
+                     0.2 0.21 -10.0 \
+                     0.2 -0.21 -10.0 \
+                     0.0 0.21 0.0");
+    aPGI.ParseCmd(strm2);
+  }
+
+}
+
 void CurvedWalkingPBW(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
@@ -801,7 +833,8 @@ int main(int argc, char *argv[])
       // AnalyticalShortStraightWalking(*aPGI);
       // CurvedWalkingPBW(*PGI);
       // StraightWalkingPBW(*aPGI);
-      StraightWalkingDimitrov(*aPGI);
+      //      StraightWalkingDimitrov(*aPGI);
+      CurvedWalkingDimitrov(*aPGI);
       // Turn90DegreesWalking(aPGI);
       // TurningOnTheCircle(*aPGI); 
       
