@@ -31,10 +31,20 @@
 #include <iostream>
 #include <fstream>
 
+// Time include
+#ifdef UNIX
 #include <sys/time.h>
+#endif /* UNIX */
+
+#ifdef WIN32
+#include <Windows.h>
+#include <walkGenJrl/TimeUtilsWindows.h>
+#endif /* WIN32 */
 
 #include <walkGenJrl/Mathematics/PLDPSolver.h>
 
+
+// Isnan and Isinf
 #ifdef WIN32
 #include <float.h>
 #define isnan _isnan
@@ -42,7 +52,7 @@
 //definition of isinf for win32
 //src:  http://www.gnu.org/software/libtool/manual/autoconf/Function-Portability.html
 inline int isinf (double x){return isnan (x - x);}
-#endif
+#endif /* WIN32 */
 
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; \
