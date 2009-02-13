@@ -66,7 +66,8 @@ namespace Optimization
 			   double *XkYk,
 			   double *X,
 			   std::vector<int> &SimilarConstraint,
-			   unsigned int NumberOfRemovedConstraints);
+			   unsigned int NumberOfRemovedConstraints,
+			   bool StartingSequence);
 	protected:
 	  
 	  /*! \name Initial solution methods related 
@@ -74,7 +75,8 @@ namespace Optimization
 	   */
 	  /*! Compute the initial solution */
 	  int ComputeInitialSolution(double *ZMPRef,
-				      double *XkYk);
+				     double *XkYk,
+				     bool StartingSequence);
 
 	  /*! Precompite iPuPx */
 	  int PrecomputeiPuPx(); 
@@ -111,18 +113,23 @@ namespace Optimization
 	  */
 	  int BackwardSubstitution();
 
-	  int BackwardSubstitution2();
-
 	  /*! @} */
 
 	  /*! Detecting violated constraints */
 	  double ComputeAlpha(vector<unsigned int> &NewActivatedConstraints,
 			      vector<int> &SimilarConstraint);
 
+	  /*! Store the current ZMP solution for hot start purposes. */
+	  void StoreCurrentZMPSolution(double *XkYk);
+
 	  /*! Write current ZMP ref trajectory associated with 
 	    current value of m_Vk. */
 	  void WriteCurrentZMPSolution(string filename,
 				       double *XkYk);
+
+	  /*! \name Methods related to a limited amount of computational time 
+	    @{ */
+	    
 	private:
 	  
 	  /*! \brief Store Pu */
@@ -209,6 +216,26 @@ namespace Optimization
 
 	  /*! Boolean to perform a hotstart */
 	  bool m_HotStart;
+
+	  /*! Store the current ZMP solution. */
+	  double * m_PreviousZMPSolution;
+
+	  /*! Double internal time. */
+	  double m_InternalTime;
+
+	  /*! Tolerance for zero value */
+	  double m_tol;
+
+	  /*! \name Data related to a limited amount of computational time 
+	    @{
+	   */
+	  /*! Is the algorithm limited in time. */
+	  bool m_LimitedComputationTime;
+
+	  /*! Amount of limited */
+	  double m_AmountOfLimitedComputationTime;
+	  
+	  /*! @} */
 	};
     };
 };
