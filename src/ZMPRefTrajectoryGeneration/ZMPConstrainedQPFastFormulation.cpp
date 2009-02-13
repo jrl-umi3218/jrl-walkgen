@@ -92,7 +92,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   m_Q = 0;
   m_Pu = 0;
   m_FullDebug = 0;
-  m_FastFormulationMode = PLDP;
+  m_FastFormulationMode = QLDANDLQ;
 
   /*! Getting the ZMP reference from Kajita's heuristic. */
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
@@ -149,7 +149,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   else
     m_PLDPSolver =0;
 
-  RESETDEBUG6("InfosQLD.dat");
+  RESETDEBUG5("InfosQLD.dat");
   RESETDEBUG5("Check2DLIPM.dat");
 }
 
@@ -1198,6 +1198,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   int li=0; 
   double dinterval = T /  m_SamplingPeriod;
   int interval=(int)dinterval;
+  bool StartingSequence = true;
 
   MAL_VECTOR_DIM(xk,double,6);
 
@@ -1322,7 +1323,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 		  NbOfActivatedConstraints++;
 		}
 	    }
-	  ODEBUG6(NbOfActivatedConstraints++,"InfosQLD.dat");
+	  ODEBUG5(NbOfActivatedConstraints++,"InfosQLD.dat");
 	}
       else if (m_FastFormulationMode==PLDP)
 	{
@@ -1337,7 +1338,9 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 					   MAL_RET_VECTOR_DATABLOCK(ZMPRef),
 					   MAL_RET_VECTOR_DATABLOCK(xk),X,
 					   m_SimilarConstraints,
-					   NumberOfRemovedConstraints);
+					   NumberOfRemovedConstraints,
+					   StartingSequence);
+	  StartingSequence = false;
 	  NumberOfRemovedConstraints = NextNumberOfRemovedConstraints;
 	}
       
@@ -1398,7 +1401,15 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       /* Constraint validation */
       if (0)
 	{
-
+	  if(ValidationConstraints(DPx,DPu,
+				m,
+				QueueOfLConstraintInequalities,
+				li,X,
+				   StartingTime)<0)
+	    {
+	      cout << "Something is wrong with the constraints." << endl;
+	      //   exit(-1);
+	    }
 	}
       
       if (m_FullDebug>2)
