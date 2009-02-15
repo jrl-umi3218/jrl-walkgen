@@ -911,22 +911,26 @@ MAL_S4x4_MATRIX(,double)  ZMPPreviewControlWithMultiBodyZMP::GetFinalDesiredCOMP
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingState(MAL_VECTOR(&BodyAnglesInit,double),
 							     MAL_S3_VECTOR(&aStartingCOMPosition,double),
 							     MAL_S3_VECTOR(&,double) aStartingZMPPosition,
+							     MAL_S3_VECTOR(&,double) aStartingWaistPosition,
 							     FootAbsolutePosition & InitLeftFootPosition,
 							     FootAbsolutePosition & InitRightFootPosition)
 {
   int r = EvaluateStartingCoM(BodyAnglesInit,aStartingCOMPosition,
+			      aStartingWaistPosition,
 			      InitLeftFootPosition, InitRightFootPosition);
   aStartingZMPPosition= m_ComAndFootRealization->GetCOGInitialAnkles();
   return r;
 }
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(MAL_VECTOR(&BodyAnglesInit,double),
-							     MAL_S3_VECTOR(&aStartingCOMPosition,double),
-							     FootAbsolutePosition & InitLeftFootPosition,
-							     FootAbsolutePosition & InitRightFootPosition)
+							   MAL_S3_VECTOR(&aStartingCOMPosition,double),
+							   MAL_S3_VECTOR(&,double) aStartingWaistPosition,
+							   FootAbsolutePosition & InitLeftFootPosition,
+							   FootAbsolutePosition & InitRightFootPosition)
 {
   ODEBUG("EvaluateStartingCOM: BodyAnglesInit :" << BodyAnglesInit);
 
   m_ComAndFootRealization->InitializationCoM(BodyAnglesInit,m_StartingCOMPosition,
+					     aStartingWaistPosition,
 					     InitLeftFootPosition, InitRightFootPosition);  
   ODEBUG("EvaluateStartingCOM: m_StartingCOMPosition: " << m_StartingCOMPosition);
   aStartingCOMPosition[0] = m_StartingCOMPosition[0];

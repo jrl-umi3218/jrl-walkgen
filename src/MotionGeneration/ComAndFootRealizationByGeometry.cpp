@@ -339,6 +339,7 @@ ComAndFootRealizationByGeometry::~ComAndFootRealizationByGeometry()
 */
 bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
 							MAL_S3_VECTOR(,double) & lStartingCOMPosition,
+							MAL_S3_VECTOR(,double) & lStartingWaistPosition,
 							FootAbsolutePosition & InitLeftFootPosition,
 							FootAbsolutePosition & InitRightFootPosition)
 {
@@ -637,6 +638,18 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   MAL_VECTOR_FILL(m_prev_Velocity,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
 
+  // Put in the real initial reference frame of the robot.
+  double AnklePosition[3];
+  m_HS->GetAnklePosition(-1,AnklePosition);
+
+  InitLeftFootPosition.z = 0.0;
+  InitRightFootPosition.z = 0.0;
+
+  lStartingCOMPosition[2] += WaistPosition[2];
+
+  lStartingWaistPosition(0) = WaistPosition[0];
+  lStartingWaistPosition(1) = WaistPosition[1];
+  lStartingWaistPosition(2) = WaistPosition[2];
   return true;
 }
 
@@ -1107,9 +1120,8 @@ bool ComAndFootRealizationByGeometry::ComputePostureForGivenCoMAndFeetPosture(MA
 
     }
 
-  ODEBUG( "AbsoluteWaistPosition: " << AbsoluteWaistPosition << endl
-	   << "CoMPosition: " << aCoMPosition<< endl
-	   << "ToTheHip(2) : " << ToTheHip(2) );
+  ODEBUG( "ComAndFoot: AbsoluteWaistPosition: " << AbsoluteWaistPosition << endl
+	   << "CoMPosition: " << aCoMPosition );
 
   /* Update of the configuration and velocity vector */
   for(int i=0;i<3;i++)
@@ -1261,6 +1273,7 @@ int ComAndFootRealizationByGeometry::EvaluateStartingCoM(MAL_VECTOR(&BodyAngles,
   MAL_S3_VECTOR(WaistPosition,double);
   InitializationCoM(BodyAngles,
 		    m_StartingCOMPosition,
+		    aWaistPosition,
 		    InitLeftFootPosition,
 		    InitRightFootPosition);
   aWaistPosition[0] = WaistPosition[0];
@@ -1282,6 +1295,7 @@ int ComAndFootRealizationByGeometry::EvaluateCOMForStartingPosition( MAL_VECTOR(
   MAL_S3_VECTOR(lWaistPosition,double);
   return InitializationCoM(BodyAngles,
 			   lCOMPosition,
+			   lWaistPosition,
 			   InitLeftFootPosition, InitRightFootPosition);
 
 }

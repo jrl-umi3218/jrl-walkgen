@@ -655,6 +655,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterface::EvaluateStartingState(COMPosition  & lStartingCOMPosition,
 							MAL_S3_VECTOR(,double) & lStartingZMPPosition,
+							MAL_S3_VECTOR(,double) & lStartingWaistPosition,
 							FootAbsolutePosition & InitLeftFootAbsPos,
 							FootAbsolutePosition & InitRightFootAbsPos)
   {
@@ -669,6 +670,7 @@ namespace PatternGeneratorJRL {
     m_GlobalStrategyManager->EvaluateStartingState(lBodyInit,
 						   lStartingCOMPosition,
 						   lStartingZMPPosition,
+						   lStartingWaistPosition,
 						   InitLeftFootAbsPos, InitRightFootAbsPos);
   }
 
@@ -773,9 +775,11 @@ namespace PatternGeneratorJRL {
 
 
     // Initialize consequently the ComAndFoot Realization object.
+    MAL_S3_VECTOR(lStartingWaistPosition,double);
     m_GlobalStrategyManager->EvaluateStartingState(BodyAnglesIni,
 						   lStartingCOMPosition,
 						   lStartingZMPPosition,
+						   lStartingWaistPosition,
 						   InitLeftFootAbsPos, InitRightFootAbsPos);
 
     // Add the first step automatically when the corresponding option is set on.

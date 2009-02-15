@@ -141,6 +141,7 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
 int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngles,
 						  COMPosition & aStartingCOMPosition,
 						  MAL_S3_VECTOR(&,double) aStartingZMPPosition,
+						  MAL_S3_VECTOR(&,double) lStartingWaistPosition,
 						  FootAbsolutePosition & InitLeftFootPosition,
 						  FootAbsolutePosition & InitRightFootPosition)
 {
@@ -151,6 +152,7 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
   lStartingCOMPosition(2) = aStartingCOMPosition.z[0];
 
   m_ComAndFootRealization->InitializationCoM(BodyAngles,lStartingCOMPosition,
+					     lStartingWaistPosition,
 					     InitLeftFootPosition, InitRightFootPosition);  
 
   ODEBUG("EvaluateStartingCOM: m_StartingCOMPosition: " << lStartingCOMPosition);
