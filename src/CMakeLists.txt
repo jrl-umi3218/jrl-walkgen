@@ -103,14 +103,14 @@ SET_TARGET_PROPERTIES(${PROJECT_NAME_LIB}
 
 # Specify compiling options
 # -------------------------
-SET(srcfile_cxx_flags "-I${PROJECT_SOURCE_DIR}/include/")
-SET(srcfile_cxx_flags "${srcfile_cxx_flags} -I${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}")
-SET(srcfile_cxx_flags "${srcfile_cxx_flags} -I${CMAKE_INSTALL_PREFIX}/include")
-SET(srcfile_cxx_flags "${srcfile_cxx_flags} ${${PROJECT_NAME}_CXXFLAGS}")
+SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} -I${PROJECT_SOURCE_DIR}/include/")
+SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} -I${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}")
+SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} -I${CMAKE_INSTALL_PREFIX}/include")
+SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} ${${PROJECT_NAME}_CXXFLAGS}")
 SET_TARGET_PROPERTIES(${PROJECT_NAME_LIB}
       		      PROPERTIES 
-	              COMPILE_FLAGS  ${srcfile_cxx_flags}
-   		      LINK_FLAGS ${${PROJECT_NAME}_src_LDFLAGS}
+	              COMPILE_FLAGS  ${${PROJECT_NAME}_src_CXXFLAGS}
+				  LINK_FLAGS ${${PROJECT_NAME}_src_LDFLAGS}
 	             )
 			 
 				 
