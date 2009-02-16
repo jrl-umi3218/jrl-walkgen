@@ -92,7 +92,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   m_Q = 0;
   m_Pu = 0;
   m_FullDebug = 0;
-  m_FastFormulationMode = QLDANDLQ;
+  m_FastFormulationMode = PLDP;
 
   /*! Getting the ZMP reference from Kajita's heuristic. */
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
@@ -149,8 +149,22 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   else
     m_PLDPSolver =0;
 
-  RESETDEBUG5("InfosQLD.dat");
-  RESETDEBUG5("Check2DLIPM.dat");
+  
+  if (m_FastFormulationMode==QLDANDLQ)
+    {
+      RESETDEBUG5("dtQLD.dat");
+      RESETDEBUG5("InfosQLD.dat");
+      RESETDEBUG5("Check2DLIPM_QLDANDLQ.dat");
+    }
+  
+
+  if (m_FastFormulationMode==PLDP)
+    {
+      RESETDEBUG5("dtPLDP.dat");
+      RESETDEBUG5("Check2DLIPM_PLDP.dat");
+    }
+
+
 }
 
 ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
@@ -1219,11 +1233,18 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       ODEBUG("State: " << xk[0] << " " << xk[3] << " " <<
 	      xk[1] << " " << xk[4] << " " <<
 	      xk[2] << " " << xk[5] << " ");
-
-      ODEBUG5(xk[0] << " " << xk[3] << " " <<
-	      xk[1] << " " << xk[4] << " " <<
-	      xk[2] << " " << xk[5] << " ", "Check2DLIPM.dat");
-	      
+      if (m_FastFormulationMode==QLDANDLQ)
+	{
+ 	  ODEBUG5(xk[0] << " " << xk[3] << " " <<
+		  xk[1] << " " << xk[4] << " " <<
+		  xk[2] << " " << xk[5] << " ", "Check2DLIPM_QLDANDLQ.dat");
+	}
+      else if (m_FastFormulationMode==PLDP)
+	{
+ 	  ODEBUG5(xk[0] << " " << xk[3] << " " <<
+		  xk[1] << " " << xk[4] << " " <<
+		  xk[2] << " " << xk[5] << " ", "Check2DLIPM_PLDP.dat");
+	}
       // Build the related matrices.
       BuildConstraintMatrices(DPx,DPu,
 			      N,T,
@@ -1310,11 +1331,17 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       if ((m_FastFormulationMode==QLDANDLQ)||
 	  (m_FastFormulationMode==QLD))
 	{
+	  struct timeval lbegin,lend;
+	  gettimeofday(&lbegin,0);
 	  ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
 		  m_Q, D, DPu,DPx,XL,XU,
 		  X,U,&iout, &ifail, &iprint,
 		  war, &lwar,
 		  iwar, &liwar,&Eps);
+	  gettimeofday(&lend,0);
+	  double ldt = lend.tv_sec - lbegin.tv_sec + 
+	    0.000001 * (lend.tv_usec - lbegin.tv_usec);
+
 	  unsigned int NbOfActivatedConstraints = 0;
 	  for(int lk=0;lk<m;lk++)
 	    {
@@ -1323,13 +1350,16 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 		  NbOfActivatedConstraints++;
 		}
 	    }
-	  ODEBUG5(NbOfActivatedConstraints++,"InfosQLD.dat");
+	  ODEBUG5(NbOfActivatedConstraints,"InfosQLD.dat");
+	  ODEBUG5(ldt,"dtQLD.dat");
 	}
       else if (m_FastFormulationMode==PLDP)
 	{
 	  ODEBUG("State: " << xk[0] << " " << xk[3] << " " <<
 		  xk[1] << " " << xk[4] << " " <<
 		  xk[2] << " " << xk[5] << " ");
+	  struct timeval lbegin,lend;
+	  gettimeofday(&lbegin,0);
 	  
 	  ifail=m_PLDPSolver->SolveProblem(D,
 					   (unsigned int)m,
@@ -1342,6 +1372,11 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 					   StartingSequence);
 	  StartingSequence = false;
 	  NumberOfRemovedConstraints = NextNumberOfRemovedConstraints;
+	  gettimeofday(&lend,0);
+	  double ldt = lend.tv_sec - lbegin.tv_sec + 
+	    0.000001 * (lend.tv_usec - lbegin.tv_usec);
+	  
+	  ODEBUG5(ldt,"dtPLDP.dat");
 	}
       
       if (ifail!=0)
