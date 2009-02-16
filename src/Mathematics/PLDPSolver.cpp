@@ -110,8 +110,14 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
 
   m_OptCholesky = new PatternGeneratorJRL::OptCholesky(m_NbMaxOfConstraints,2*m_CardV,
 						       OptCholesky::MODE_FORTRAN);
-  RESETDEBUG6("Infos.dat");
-  RESETDEBUG6("dt.dat");
+
+  string Buffer("InfosPLDP");
+  if (m_HotStart)
+    Buffer+="HS";
+  if (m_LimitedComputationTime)
+    Buffer+="LT";
+  Buffer+=".dat";
+  RESETDEBUG5((char*)Buffer.c_str());
   RESETDEBUG6("ActivatedConstraints.dat");
   AllocateMemoryForSolver();
 
@@ -938,18 +944,6 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 
     }
 
-  if (1)
-    {
-      struct timeval current;
-      gettimeofday(&current,0);
-      double r=(double)(current.tv_sec-begin.tv_sec) + 
-	    0.000001*(current.tv_usec-begin.tv_usec);	
-      ofstream aof;
-      aof.open("dt.dat",ofstream::app);
-      aof.precision(20);
-      aof << r << endl;
-      aof.close();
-    }
   if (0)
     {
       ofstream aof;
@@ -1014,10 +1008,17 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
     }
   
 
-  ODEBUG6(m_ActivatedConstraints.size() << " " 
+  string Buffer("InfosPLDP");
+  if (m_HotStart)
+    Buffer+="HS";
+  if (m_LimitedComputationTime)
+    Buffer+="LT";
+  Buffer+=".dat";
+
+  ODEBUG5(m_ActivatedConstraints.size() << " " 
 	  << NbOfConstraints << " " 
 	  << m_ActivatedConstraints.size() - m_PreviouslyActivatedConstraints.size() << " "
-	  << m_ItNb,"Infos.dat");
+	  << m_ItNb,(char*)Buffer.c_str());
 
   m_InternalTime += 0.02;
   return 0;
