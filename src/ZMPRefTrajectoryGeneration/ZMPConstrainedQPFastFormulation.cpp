@@ -118,8 +118,9 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   m_ConstraintOnX = 0.04;
   m_ConstraintOnY = 0.04;
   
-  m_QP_T = 0.02;
-  m_QP_N = 75;
+  //  m_QP_T = 0.02;
+  m_QP_T = 0.1;
+  m_QP_N = 16;
 
   m_SamplingPeriod = 0.005;
 
