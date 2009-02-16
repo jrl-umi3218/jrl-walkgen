@@ -31,9 +31,29 @@
 #include <iostream>
 #include <fstream>
 
+// Time include
+#ifdef UNIX
 #include <sys/time.h>
+#endif /* UNIX */
+
+#ifdef WIN32
+#include <Windows.h>
+#include <walkGenJrl/TimeUtilsWindows.h>
+#endif /* WIN32 */
 
 #include <walkGenJrl/Mathematics/PLDPSolver.h>
+
+
+// Isnan and Isinf
+#ifdef WIN32
+#include <float.h>
+#define isnan _isnan
+
+//definition of isinf for win32
+//src:  http://www.gnu.org/software/libtool/manual/autoconf/Function-Portability.html
+inline int isinf (double x){return isnan (x - x);}
+#endif /* WIN32 */
+
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; \
                          DebugFile.open(y,ofstream::out); \
@@ -117,7 +137,7 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
   if (m_LimitedComputationTime)
     Buffer+="LT";
   Buffer+=".dat";
-  RESETDEBUG5((char*)Buffer.c_str());
+  RESETDEBUG6((char*)Buffer.c_str());
   RESETDEBUG6("ActivatedConstraints.dat");
   AllocateMemoryForSolver();
 
@@ -1015,7 +1035,7 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
     Buffer+="LT";
   Buffer+=".dat";
 
-  ODEBUG5(m_ActivatedConstraints.size() << " " 
+  ODEBUG6(m_ActivatedConstraints.size() << " " 
 	  << NbOfConstraints << " " 
 	  << m_ActivatedConstraints.size() - m_PreviouslyActivatedConstraints.size() << " "
 	  << m_ItNb,(char*)Buffer.c_str());
@@ -1060,7 +1080,8 @@ void PLDPSolver::WriteCurrentZMPSolution(string filename,
   // The current solution is Vk,
   // but its graphical representation is better understood
   // when transformed in ZMP ref trajectory.
-  double lZMP[2*m_CardV];
+  int lZMP_size=2*m_CardV;
+  double* lZMP = new double [lZMP_size];
 
   ofstream aof;
   aof.open((char *)filename.c_str(),ofstream::out);
@@ -1086,4 +1107,5 @@ void PLDPSolver::WriteCurrentZMPSolution(string filename,
     }
 
   aof.close();
+  delete lZMP;
 }
