@@ -158,7 +158,7 @@ namespace PatternGeneratorJRL
     */
     virtual bool InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
 				   MAL_S3_VECTOR(,double) & lStartingCOMPosition,
-				   MAL_S3_VECTOR(,double) & lStartingWaistPosition,
+				   MAL_VECTOR(,double) & lStartingWaistPose,
 				   FootAbsolutePosition & InitLeftFootAbsPos, 
 				   FootAbsolutePosition & InitRightFootAbsPos)=0;
 

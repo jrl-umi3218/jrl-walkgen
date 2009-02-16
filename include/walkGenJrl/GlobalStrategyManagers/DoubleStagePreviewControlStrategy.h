@@ -96,7 +96,7 @@ namespace PatternGeneratorJRL
     int EvaluateStartingState(MAL_VECTOR( &,double) BodyAngles,
 			      COMPosition & aStartingCOMPosition,
 			      MAL_S3_VECTOR(& ,double) aStartingZMPPosition,
-			      MAL_S3_VECTOR(& ,double) aStartingWaistPosition,
+			      MAL_VECTOR(& ,double) aStartingWaistPose,
 			      FootAbsolutePosition & InitLeftFootPosition,
 			      FootAbsolutePosition & InitRightFootPosition);
 
