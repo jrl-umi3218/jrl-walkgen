@@ -339,12 +339,12 @@ ComAndFootRealizationByGeometry::~ComAndFootRealizationByGeometry()
 */
 bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
 							MAL_S3_VECTOR(,double) & lStartingCOMPosition,
-							MAL_S3_VECTOR(,double) & lStartingWaistPosition,
+							MAL_VECTOR(,double) & lStartingWaistPose,
 							FootAbsolutePosition & InitLeftFootPosition,
 							FootAbsolutePosition & InitRightFootPosition)
 {
 
-
+  MAL_VECTOR_RESIZE(lStartingWaistPose,6);
   if (m_InverseKinematics==0)
     {
       cerr << "ComAndFootRealizationByGeometry::InitializationUpperBody "  << endl
@@ -647,9 +647,13 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 
   lStartingCOMPosition[2] += WaistPosition[2];
 
-  lStartingWaistPosition(0) = WaistPosition[0];
-  lStartingWaistPosition(1) = WaistPosition[1];
-  lStartingWaistPosition(2) = WaistPosition[2];
+  lStartingWaistPose(0) = WaistPosition[0];
+  lStartingWaistPose(1) = WaistPosition[1];
+  lStartingWaistPose(2) = WaistPosition[2];
+  lStartingWaistPose(3) = 0.0;
+  lStartingWaistPose(4) = 0.0;
+  lStartingWaistPose(5) = 0.0;
+  
   return true;
 }
 
@@ -1266,19 +1270,16 @@ int ComAndFootRealizationByGeometry::EvaluateStartingCoM(MAL_VECTOR(&BodyAngles,
 
 int ComAndFootRealizationByGeometry::EvaluateStartingCoM(MAL_VECTOR(&BodyAngles,double),
 							 MAL_S3_VECTOR(&aStartingCOMPosition,double),
-							 MAL_S3_VECTOR(&aWaistPosition,double),
+							 MAL_VECTOR(&aWaistPose,double),
 							 FootAbsolutePosition & InitLeftFootPosition,
 							 FootAbsolutePosition & InitRightFootPosition)
 {
-  MAL_S3_VECTOR(WaistPosition,double);
+  MAL_VECTOR(WaistPose,double);
   InitializationCoM(BodyAngles,
 		    m_StartingCOMPosition,
-		    aWaistPosition,
+		    aWaistPose,
 		    InitLeftFootPosition,
 		    InitRightFootPosition);
-  aWaistPosition[0] = WaistPosition[0];
-  aWaistPosition[1] = WaistPosition[1];
-  aWaistPosition[2] = WaistPosition[2];
   aStartingCOMPosition[0] = m_StartingCOMPosition[0];
   aStartingCOMPosition[1] = m_StartingCOMPosition[1];
   aStartingCOMPosition[2] = m_StartingCOMPosition[2];
@@ -1292,10 +1293,10 @@ int ComAndFootRealizationByGeometry::EvaluateCOMForStartingPosition( MAL_VECTOR(
 								     FootAbsolutePosition & InitLeftFootPosition,
 								     FootAbsolutePosition & InitRightFootPosition)
 {
-  MAL_S3_VECTOR(lWaistPosition,double);
+  MAL_VECTOR(lWaistPose,double);
   return InitializationCoM(BodyAngles,
 			   lCOMPosition,
-			   lWaistPosition,
+			   lWaistPose,
 			   InitLeftFootPosition, InitRightFootPosition);
 
 }

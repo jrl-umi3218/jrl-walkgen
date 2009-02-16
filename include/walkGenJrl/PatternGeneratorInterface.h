@@ -393,7 +393,7 @@ namespace PatternGeneratorJRL
      for the initiale pose.*/
     void EvaluateStartingState(COMPosition  & lStartingCOMPosition,
 			       MAL_S3_VECTOR(,double) & lStartingZMPPosition,
-			       MAL_S3_VECTOR(,double) & lStartingWaistPosition,
+			       MAL_VECTOR(,double) & lStartingWaistPose,
 			       FootAbsolutePosition & InitLeftFootAbsPos,
 			       FootAbsolutePosition & InitRightFootAbsPos);
 

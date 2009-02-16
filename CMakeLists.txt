@@ -69,7 +69,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 FOREACH(option_cxxflags ${DYNJRLJAPAN_CFLAGS})
-  SET(${PROJECT_NAME}_src_CXXFLAGS "${option_cxxflags} ${${PROJECT_NAME}_src_CXXFLAGS}")
+  SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} ${option_cxxflags} ")
 ENDFOREACH(option_cxxflags)
 
 FOREACH(option_ldflags ${DYNJRLJAPAN_LDFLAGS})

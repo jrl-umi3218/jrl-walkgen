@@ -123,7 +123,7 @@ namespace PatternGeneratorJRL
     */
     bool InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
 			   MAL_S3_VECTOR(,double) & lStartingCOMPosition,
-			   MAL_S3_VECTOR(,double) & lStartingWaistPosition,
+			   MAL_VECTOR(,double) & lStartingWaistPosition,
 			   FootAbsolutePosition & InitLeftFootAbsPos, 
 			   FootAbsolutePosition & InitRightFootAbsPos);
 
@@ -174,7 +174,7 @@ namespace PatternGeneratorJRL
 
     int EvaluateStartingCoM(MAL_VECTOR(&BodyAngles,double),
 			    MAL_S3_VECTOR(&aStartingCOMPosition,double),
-			    MAL_S3_VECTOR(&aWaistPosition,double),
+			    MAL_VECTOR(&aWaistPose,double),
 			    FootAbsolutePosition & InitLeftFootPosition,
 			    FootAbsolutePosition & InitRightFootPosition);
 

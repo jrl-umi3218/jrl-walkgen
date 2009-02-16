@@ -911,7 +911,7 @@ MAL_S4x4_MATRIX(,double)  ZMPPreviewControlWithMultiBodyZMP::GetFinalDesiredCOMP
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingState(MAL_VECTOR(&BodyAnglesInit,double),
 							     MAL_S3_VECTOR(&aStartingCOMPosition,double),
 							     MAL_S3_VECTOR(&,double) aStartingZMPPosition,
-							     MAL_S3_VECTOR(&,double) aStartingWaistPosition,
+							     MAL_VECTOR(&,double) aStartingWaistPosition,
 							     FootAbsolutePosition & InitLeftFootPosition,
 							     FootAbsolutePosition & InitRightFootPosition)
 {
@@ -923,7 +923,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingState(MAL_VECTOR(&BodyAng
 }
 int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(MAL_VECTOR(&BodyAnglesInit,double),
 							   MAL_S3_VECTOR(&aStartingCOMPosition,double),
-							   MAL_S3_VECTOR(&,double) aStartingWaistPosition,
+							   MAL_VECTOR(&,double) aStartingWaistPosition,
 							   FootAbsolutePosition & InitLeftFootPosition,
 							   FootAbsolutePosition & InitRightFootPosition)
 {
