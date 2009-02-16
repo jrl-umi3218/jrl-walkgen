@@ -137,7 +137,7 @@ PLDPSolver::PLDPSolver(unsigned int CardU,
   if (m_LimitedComputationTime)
     Buffer+="LT";
   Buffer+=".dat";
-  RESETDEBUG5((char*)Buffer.c_str());
+  RESETDEBUG6((char*)Buffer.c_str());
   RESETDEBUG6("ActivatedConstraints.dat");
   AllocateMemoryForSolver();
 
@@ -1035,7 +1035,7 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
     Buffer+="LT";
   Buffer+=".dat";
 
-  ODEBUG5(m_ActivatedConstraints.size() << " " 
+  ODEBUG6(m_ActivatedConstraints.size() << " " 
 	  << NbOfConstraints << " " 
 	  << m_ActivatedConstraints.size() - m_PreviouslyActivatedConstraints.size() << " "
 	  << m_ItNb,(char*)Buffer.c_str());

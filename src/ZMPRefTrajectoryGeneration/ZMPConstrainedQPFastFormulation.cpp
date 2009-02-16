@@ -152,16 +152,16 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   
   if (m_FastFormulationMode==QLDANDLQ)
     {
-      RESETDEBUG5("dtQLD.dat");
-      RESETDEBUG5("InfosQLD.dat");
-      RESETDEBUG5("Check2DLIPM_QLDANDLQ.dat");
+      RESETDEBUG6("dtQLD.dat");
+      RESETDEBUG6("InfosQLD.dat");
+      RESETDEBUG6("Check2DLIPM_QLDANDLQ.dat");
     }
   
 
   if (m_FastFormulationMode==PLDP)
     {
-      RESETDEBUG5("dtPLDP.dat");
-      RESETDEBUG5("Check2DLIPM_PLDP.dat");
+      RESETDEBUG6("dtPLDP.dat");
+      RESETDEBUG6("Check2DLIPM_PLDP.dat");
     }
 
 
@@ -1235,13 +1235,13 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	      xk[2] << " " << xk[5] << " ");
       if (m_FastFormulationMode==QLDANDLQ)
 	{
- 	  ODEBUG5(xk[0] << " " << xk[3] << " " <<
+ 	  ODEBUG6(xk[0] << " " << xk[3] << " " <<
 		  xk[1] << " " << xk[4] << " " <<
 		  xk[2] << " " << xk[5] << " ", "Check2DLIPM_QLDANDLQ.dat");
 	}
       else if (m_FastFormulationMode==PLDP)
 	{
- 	  ODEBUG5(xk[0] << " " << xk[3] << " " <<
+ 	  ODEBUG6(xk[0] << " " << xk[3] << " " <<
 		  xk[1] << " " << xk[4] << " " <<
 		  xk[2] << " " << xk[5] << " ", "Check2DLIPM_PLDP.dat");
 	}
@@ -1350,8 +1350,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 		  NbOfActivatedConstraints++;
 		}
 	    }
-	  ODEBUG5(NbOfActivatedConstraints,"InfosQLD.dat");
-	  ODEBUG5(ldt,"dtQLD.dat");
+	  ODEBUG6(NbOfActivatedConstraints,"InfosQLD.dat");
+	  ODEBUG6(ldt,"dtQLD.dat");
 	}
       else if (m_FastFormulationMode==PLDP)
 	{
@@ -1376,7 +1376,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	  double ldt = lend.tv_sec - lbegin.tv_sec + 
 	    0.000001 * (lend.tv_usec - lbegin.tv_usec);
 	  
-	  ODEBUG5(ldt,"dtPLDP.dat");
+	  ODEBUG6(ldt,"dtPLDP.dat");
 	}
       
       if (ifail!=0)
