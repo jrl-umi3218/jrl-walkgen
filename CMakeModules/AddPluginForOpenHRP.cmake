@@ -141,7 +141,7 @@ GET_TARGET_PROPERTY(PluginFinalFileNamePrefix ${PluginBaseName} PREFIX)
 GET_TARGET_PROPERTY(PluginFinalFileNameSuffix ${PluginBaseName} SUFFIX)	              
 #MESSAGE(STATUS "Prefix: ${PluginFinalFileNamePrefix} Suffix: ${PluginFinalFileNameSuffix}")
 
-SET(loc_compile_flags "${omniORB4_cflags} ${openhrp_plugin_cflags}  ${${PROJECT_NAME}_CXXFLAGS}")
+SET(loc_compile_flags "${omniORB4_cflags} ${openhrp_plugin_cflags}  ${${PROJECT_NAME}_src_CXXFLAGS}")
 
 IF (OPENHRP_VERSION_2)
   SET(loc_compile_flags "${loc_compile_flags} -DOPENHRP_VERSION_2")
@@ -154,7 +154,7 @@ ENDIF (OPENHRP_VERSION_3)
 SET_TARGET_PROPERTIES(${PluginBaseName}
 			PROPERTIES	
 		        COMPILE_FLAGS "${loc_compile_flags}"
-			LINK_FLAGS "${omniORB4_link_FLAGS} ${PLUGINLINKS}  ${${PROJECT_NAME}_LDFLAGS} ${openhrp_plugin_ldflags}"
+			LINK_FLAGS "${omniORB4_link_FLAGS} ${PLUGINLINKS}  ${${PROJECT_NAME}_src_LDFLAGS} ${openhrp_plugin_ldflags}"
 			PREFIX ""
 			SUFFIX ".so"
 			LIBRARY_OUTPUT_DIRECTORY ${openhrp_plugin_path})
