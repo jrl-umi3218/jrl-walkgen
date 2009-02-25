@@ -59,15 +59,6 @@ namespace PatternGeneratorJRL
       
       
     /*! Compute InverseKinematics for legs. */
-    int ComputeInverseKinematicsForLegs3(MAL_S3x3_MATRIX(,double) &Body_R,
-					 MAL_S3_VECTOR(,double) &  Body_P,
-					 MAL_S3_VECTOR(,double) &Dt,
-					 MAL_S3x3_MATRIX(,double) &Foot_R,
-					 MAL_S3_VECTOR(,double) &Foot_P,
-					 MAL_VECTOR(,double) &q);
-      
-
-    /*! Compute InverseKinematics for legs. */
     int ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX( ,double)& Body_R,
 					 MAL_S3_VECTOR(,double) &Body_P,
 					 MAL_S3_VECTOR(,double) &Dt,
