@@ -101,73 +101,24 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
 
   
   //  cout << "vz: " << v(2,0) << " vy :" << v(1,0) << endl;
-#if 0
-  if (v(1)<0.0)
-    {
-      theta = atan2(v(2),-v(1));
-      r(1) = -cos(psi+theta)*Cp;
-    }
-  else 
-    {
-      theta = atan2(v(2),v(1));
-      r(1) = cos(psi+theta)*Cp;
-    }
-#else
   theta = atan2(v(2),v(1));
   
   r(1) = cos(psi+theta)*Cp;
-#endif
 
   r(2) = sin(psi+theta)*Cp;
 
-  //  cout << "r : " << r << endl;
-#if 0
-  cout << "Body_R" << Body_R<<endl;
-  cout << "Body_P" << Body_P<<endl;
-
-  cout << "Foot_R" << Foot_R<<endl;
-  cout << "Foot_P" << Foot_P<<endl;
-  
-  cout << "Dt" << Dt << endl;
-#endif
-
-#if 0
-  cout << "Body_P" << rT<< endl;
-  cout << "rT" << rT<< endl;
-  cout << "Body_R * Dt - Foot_P" << Body_R * Dt - Foot_P << endl;
-#endif
   //  r = rT * (Body_P +  Body_R * Dt - Foot_P);
   C = sqrt(r(0)*r(0)+
 	   r(1)*r(1)+
 	   r(2)*r(2));
   //C2 =sqrt(C1*C1-D*D);
   c5 = (C*C-A*A-B*B)/(2.0*A*B);
-  //cout << r(0,0) << " " << r(1,0) << " "  << r(2,0) <<" ";
-  //  cout << "C " << C << " c5 " <<c5 <<endl;
-  //  cout << C << " " ;
+
   if (c5>=m_KneeAngleBoundCos)
     {
-      //double klojo;
 
       q(3)=m_KneeAngleBound;
 
-      /*	if (c5>=m_KneeAngleBoundCos2)
-	q(3) =m_KneeAngleBound;
-	else 
-	{
-	double a,b,c,d;
-	a =  6.59620337503859;
-	b = -13.77121203051706;
-	c = 9.82223457054312;
-	d = -2.32950990645471;
-	  
-	q(3)= a+b*c5+c*c5*c5+d*c5*c5*c5;
-	  
-	}
-	  
-
-	  
-      */    
     }
   else if (c5<=-1.0)
     {
@@ -178,7 +129,6 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
       q(3)= acos(c5);
     }
   q6a = asin((A/C)*sin(M_PI- q(3)));
-  // q6b = atan2(D,C2);
 
 
   float c,s,cz,sz;
