@@ -139,6 +139,12 @@ void ComAndFootRealizationByGeometry::Initialization()
       m_AnklePositionRight[2] =   lAnklePositionRight[2];
       m_AnklePositionLeft[2]  =   lAnklePositionLeft[2];
 
+      ODEBUG3("m_AnklePositionRight: "<< m_AnklePositionRight[0] << " " <<
+	      m_AnklePositionRight[1] << " " <<
+	      m_AnklePositionRight[2] );
+      ODEBUG3("m_AnklePositionLeft: "<< m_AnklePositionLeft[0] << " " <<
+	      m_AnklePositionLeft[1] << " " <<
+	      m_AnklePositionLeft[2] );
       ODEBUG("Enter 3.0 ");
       // Update the index to change the configuration according
       // to the VRML ID.
@@ -469,7 +475,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   InitRightFootPosition.x = lFootPosition[0];
   InitRightFootPosition.y = lFootPosition[1];
   InitRightFootPosition.z = lFootPosition[2];
-  ODEBUG( "InitRightFootPosition : " << InitRightFootPosition.x << " " << InitRightFootPosition.y );
+  ODEBUG3( "InitRightFootPosition : " << InitRightFootPosition.x << " " << InitRightFootPosition.y );
   // We assume that the foot is flat on the floor...
   // Thus
   // lFootPose(0:2,0:2)=
@@ -515,7 +521,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   InitLeftFootPosition.z = lFootPosition[2];
   InitLeftFootPosition.theta = 0.0;
 
-  ODEBUG("InitLeftFootPosition : " << InitLeftFootPosition.x << " " << InitLeftFootPosition.y );
+  ODEBUG3("InitLeftFootPosition : " << InitLeftFootPosition.x << " " << InitLeftFootPosition.y );
   // We assume that the foot is flat on the floor...
   // Thus
   // lFootPose(0:2,0:2)=

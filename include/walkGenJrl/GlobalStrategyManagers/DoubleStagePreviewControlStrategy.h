@@ -128,6 +128,10 @@ namespace PatternGeneratorJRL
      */
     void SetAlgoForZMPTraj(istringstream &strm);
 
+    /*! \brief This method specifies the frame in which the ZMP is given.
+     */
+    void SetZMPFrame(istringstream &strm);
+
     /*! \brief  Prepare the buffers at the beginning of the foot positions. 
       @param[out] aZMPositions: ZMP position reference
       @param[out] aCOMBuffer: COM trajectory 
@@ -141,6 +145,9 @@ namespace PatternGeneratorJRL
 
     /*! \brief Get Waist state. */
     bool getWaistState(WaistState & aWaistState);
+
+    static const unsigned int ZMPFRAME_WAIST=0;
+    static const unsigned int ZMPFRAME_WORLD=1;
 
   protected:
     
@@ -163,6 +170,8 @@ namespace PatternGeneratorJRL
     /*! Pointer to the Preview Control object. */
     PreviewControl *m_PC;
     
+    /*! ZMP reference frame. */
+    unsigned int m_ZMPFrame;
   };
 };
 #endif /* _DOUBLE_STAGE_PREVIEW_CONTROL_STRATEGY_H_*/

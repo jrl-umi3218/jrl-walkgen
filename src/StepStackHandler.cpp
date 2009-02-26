@@ -319,7 +319,7 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
     {
       ODEBUG("SupportFoot " << SupportFoot);
       aFootPosition.sx = StepMax;
-      aFootPosition.sy = SupportFoot*0.21;
+      aFootPosition.sy = SupportFoot*0.19;
       aFootPosition.theta = OmegaStep;
 
       {
@@ -352,7 +352,7 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
 	ODEBUG(" X: " << (R+DirectionRay*SupportFoot*0.095)*s << " " << (R-DirectionRay*SupportFoot*0.095)*sp 
 		<< " " << StepMax << " " << lv(0) << " " << lv2(0) );
 	ODEBUG(" Y: " << (R+DirectionRay*SupportFoot*0.095)*c << " " << (R-DirectionRay*SupportFoot*0.095)*cp 
-		<< " " << SupportFoot*0.21 << " " << lv(1) << " " << lv2(1));
+		<< " " << SupportFoot*0.19 << " " << lv(1) << " " << lv2(1));
 
 	
 	aFootPosition.sx = lv2(0);
@@ -373,7 +373,7 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
   if (LastStep!=0.0)
     {
       aFootPosition.sx = LastStep;
-      aFootPosition.sy = SupportFoot*0.21;
+      aFootPosition.sy = SupportFoot*0.19;
       aFootPosition.theta = LastOmegaStep;
 
       {
@@ -534,7 +534,7 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
   MFNSF(0,2)=-R;
   MFNSF(1,2)=S;
   MSupportFoot=MFSF; 
-  Mtmp(1,2) = 0.21;
+  Mtmp(1,2) = 0.19;
 #if 0
   DebugFile.open("/tmp/outputNL.txt",ofstream::app);
   DebugFile << MSupportFoot(0,2) << " " 
@@ -594,7 +594,7 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
       DebugFile.close();
 #endif
       aFootPosition.sx = 0;
-      aFootPosition.sy = SupportFoot*0.21;
+      aFootPosition.sy = SupportFoot*0.19;
       aFootPosition.theta = 0;
       aFootPosition.SStime = m_SingleSupportTime;
       aFootPosition.DStime = m_DoubleSupportTime;
@@ -687,7 +687,7 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
       DebugFile.close();
 #endif
       aFootPosition.sx = 0;
-      aFootPosition.sy = SupportFoot*0.21;
+      aFootPosition.sy = SupportFoot*0.19;
       aFootPosition.theta = 0;
       aFootPosition.SStime = m_SingleSupportTime;
       aFootPosition.DStime = m_DoubleSupportTime;
@@ -767,7 +767,7 @@ void StepStackHandler::AddStandardOnLineStep(bool NewStep,
   if (!NewStep)
     {
       aFootPosition.sx = 0;
-      aFootPosition.sy = m_KeepLastCorrectSupportFoot*0.21;
+      aFootPosition.sy = m_KeepLastCorrectSupportFoot*0.19;
       aFootPosition.theta = 0;
       aFootPosition.SStime = m_SingleSupportTime;
       aFootPosition.DStime = m_DoubleSupportTime;
@@ -778,7 +778,7 @@ void StepStackHandler::AddStandardOnLineStep(bool NewStep,
     {
 
       aFootPosition.sx = NewStepX;
-      aFootPosition.sy = NewStepY + m_KeepLastCorrectSupportFoot*0.21;
+      aFootPosition.sy = NewStepY + m_KeepLastCorrectSupportFoot*0.19;
       aFootPosition.theta = NewTheta;
       aFootPosition.SStime = m_SingleSupportTime;
       aFootPosition.DStime = m_DoubleSupportTime;
@@ -836,7 +836,7 @@ void StepStackHandler::FinishOnTheLastCorrectSupportFoot()
 {
   RelativeFootPosition aFootPosition;
   aFootPosition.sx = 0;
-  aFootPosition.sy = m_KeepLastCorrectSupportFoot*0.21;
+  aFootPosition.sy = m_KeepLastCorrectSupportFoot*0.19;
   aFootPosition.theta = 0;
   aFootPosition.SStime = m_SingleSupportTime;
   aFootPosition.DStime = m_DoubleSupportTime;

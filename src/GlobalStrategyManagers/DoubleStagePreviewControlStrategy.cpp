@@ -39,7 +39,7 @@ using namespace std;
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); \
-    DebugFile << "DoubleStagePreviewControlStrategy: " << x << endl; \
+    DebugFile << "DoubleStagePreviewControlStrategy: " << x << endl;	\
     DebugFile.close();}
 #else
 #define RESETDEBUG4(y)
@@ -67,12 +67,15 @@ using namespace PatternGeneratorJRL;
 DoubleStagePreviewControlStrategy::DoubleStagePreviewControlStrategy(SimplePluginManager * aSPM)
   :GlobalStrategyManager(aSPM)
 {
+  m_ZMPFrame = ZMPFRAME_WAIST;
+
   // The object to realize the global stage of preview control.
   m_ZMPpcwmbz = new ZMPPreviewControlWithMultiBodyZMP();
 
-  unsigned int NbOfMethods=1;
-  std::string aMethodName[1] = 
-    {":SetAlgoForZmpTrajectory"};
+  unsigned int NbOfMethods=2;
+  std::string aMethodName[2] = 
+    {":SetAlgoForZmpTrajectory",
+     ":SetZMPFrame"};
   
   for(unsigned int i=0;i<NbOfMethods;i++)
     {
@@ -156,19 +159,8 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   RightFootPosition = (*m_RightFootPositions)[0];
     
   // Compute the waist position in the current motion global reference frame.
-  //     MAL_S4x4_MATRIX( FinalDesiredCOMPose,double);
-  //     FinalDesiredCOMPose = m_ZMPpcwmbz->GetFinalDesiredCOMPose();
-  //     ODEBUG3("FinalDesiredCOMPose :" << FinalDesiredCOMPose);
   MAL_S4x4_MATRIX( PosOfWaistInCOMF,double);
   PosOfWaistInCOMF = m_ZMPpcwmbz->GetCurrentPositionofWaistInCOMFrame();
-  // MAL_S4x4_MATRIX( AbsWaist,double);
-  //     MAL_S4x4_C_eq_A_by_B(AbsWaist ,FinalDesiredCOMPose , PosOfWaistInCOMF);
-  //     ODEBUG3("AbsWaist " << AbsWaist);
-  //     ODEBUG3("PosOfWaistInCOMF " << PosOfWaistInCOMF);
-  //     ODEBUG3("Configuration(0-2): " <<
-  //  	    CurrentConfiguration(0) << " " <<
-  //  	    CurrentConfiguration(1) << " " <<
-  //  	    CurrentConfiguration(2));
   
   COMPosition outWaistPosition;
   outWaistPosition = finalCOMPosition;
@@ -184,15 +176,30 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   double temp1;
   double temp2;
   double temp3;
-
-  temp1 = (*m_ZMPPositions)[0].px - outWaistPosition.x[0];
-  temp2 = (*m_ZMPPositions)[0].py - outWaistPosition.y[0];
-  temp3 = finalCOMPosition.yaw*M_PI/180.0;
   
-  ZMPRefPos(0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
-  ZMPRefPos(1) = -sin(temp3)*temp1+cos(temp3)*temp2;
-  ZMPRefPos(2) = -finalCOMPosition.z[0] - MAL_S4x4_MATRIX_ACCESS_I_J(PosOfWaistInCOMF, 2,3) - (*m_ZMPPositions)[0].pz;
+  if (m_ZMPFrame==ZMPFRAME_WAIST)
+    {
+      temp1 = (*m_ZMPPositions)[0].px - outWaistPosition.x[0];
+      temp2 = (*m_ZMPPositions)[0].py - outWaistPosition.y[0];
+      temp3 = finalCOMPosition.yaw*M_PI/180.0;
+      
+      ZMPRefPos(0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
+      ZMPRefPos(1) = -sin(temp3)*temp1+cos(temp3)*temp2;
+      ZMPRefPos(2) = -finalCOMPosition.z[0] - MAL_S4x4_MATRIX_ACCESS_I_J(PosOfWaistInCOMF, 2,3) - (*m_ZMPPositions)[0].pz;
+    }
+  else if (m_ZMPFrame==ZMPFRAME_WORLD)
+    {
+      temp1 = (*m_ZMPPositions)[0].px ;
+      temp2 = (*m_ZMPPositions)[0].py ;
+      temp3 = finalCOMPosition.yaw*M_PI/180.0;
 
+      ZMPRefPos(0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
+      ZMPRefPos(1) = -sin(temp3)*temp1+cos(temp3)*temp2;
+      ZMPRefPos(2) = 0.0;
+	      
+    }
+  else 
+    { ODEBUG3("Problem with the ZMP reference frame set to 0."); }
 
   ODEBUG4((*m_ZMPPositions)[0].px <<  " " << 
 	  (*m_ZMPPositions)[0].py << " " <<
@@ -237,9 +244,9 @@ int DoubleStagePreviewControlStrategy::EvaluateStartingState(MAL_VECTOR( &,doubl
 int DoubleStagePreviewControlStrategy::EndOfMotion()
 {
   ODEBUG("m_ZMPPositions->size()  2*m_NL+1 2*m_NL " 
-	  << m_ZMPPositions->size() << " "
-	  << 2*m_NL+1 << " " 
-	  << 2*m_NL << " " );
+	 << m_ZMPPositions->size() << " "
+	 << 2*m_NL+1 << " " 
+	 << 2*m_NL << " " );
   if (m_ZMPPositions->size()== 2*m_NL)
     return 0;
   else if (m_ZMPPositions->size()< 2*m_NL+1)
@@ -249,27 +256,42 @@ int DoubleStagePreviewControlStrategy::EndOfMotion()
 
 }
 
-  void DoubleStagePreviewControlStrategy::SetAlgoForZMPTraj(istringstream &strm)
-  {
-    string ZMPTrajAlgo;
-    strm >> ZMPTrajAlgo;
-    if (ZMPTrajAlgo=="PBW")
-      {
-	m_ZMPpcwmbz->SetStrategyForStageActivation(ZMPPreviewControlWithMultiBodyZMP::
-						   ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY);
-      }
-    else if (ZMPTrajAlgo=="Kajita")
-      {
-	m_ZMPpcwmbz->SetStrategyForStageActivation(ZMPPreviewControlWithMultiBodyZMP::
-						   ZMPCOM_TRAJECTORY_FULL);
-      }
-    else if (ZMPTrajAlgo=="Morisawa")
-      {
-	ODEBUG("Wrong Global Strategy");
-      }
+void DoubleStagePreviewControlStrategy::SetAlgoForZMPTraj(istringstream &strm)
+{
+  string ZMPTrajAlgo;
+  strm >> ZMPTrajAlgo;
+  if (ZMPTrajAlgo=="PBW")
+    {
+      m_ZMPpcwmbz->SetStrategyForStageActivation(ZMPPreviewControlWithMultiBodyZMP::
+						 ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY);
+    }
+  else if (ZMPTrajAlgo=="Kajita")
+    {
+      m_ZMPpcwmbz->SetStrategyForStageActivation(ZMPPreviewControlWithMultiBodyZMP::
+						 ZMPCOM_TRAJECTORY_FULL);
+    }
+  else if (ZMPTrajAlgo=="Morisawa")
+    {
+      ODEBUG("Wrong Global Strategy");
+    }
+  
+}
 
-  }
+void DoubleStagePreviewControlStrategy::SetZMPFrame(std::istringstream &astrm)
+{
+  string aZMPFrame;
+  astrm >> aZMPFrame;
 
+  if (aZMPFrame=="waist")
+    { 
+      m_ZMPFrame = ZMPFRAME_WAIST; 
+    }
+  else if (aZMPFrame=="world")
+    { m_ZMPFrame = ZMPFRAME_WORLD; 
+    }
+  else
+    {ODEBUG3("Mistake wrong keyword" << aZMPFrame);}
+}
 
 void DoubleStagePreviewControlStrategy::CallMethod(std::string &Method, std::istringstream &astrm)
 {
@@ -278,6 +300,10 @@ void DoubleStagePreviewControlStrategy::CallMethod(std::string &Method, std::ist
   if (Method==":SetAlgoForZmpTrajectory")
     {
       SetAlgoForZMPTraj(astrm);
+    }
+  else if (Method==":SetZMPFrame")
+    {
+      SetZMPFrame(astrm);
     }
 }
 
