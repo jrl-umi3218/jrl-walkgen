@@ -65,110 +65,6 @@ InverseKinematics::~InverseKinematics()
 {
 }
 
-int InverseKinematics::ComputeInverseKinematicsForLegs3(MAL_S3x3_MATRIX(,double) &Body_R,
-							MAL_S3_VECTOR( ,double) &Body_P,
-							MAL_S3_VECTOR( ,double) &Dt,
-							MAL_S3x3_MATRIX(,double) &Foot_R, 
-							MAL_S3_VECTOR(,double) &Foot_P,
-							MAL_VECTOR(, double) &q)
-{
-  double A=m_FemurLength,B=m_TibiaLength,C=0,c5,q6a;
-  MAL_S3_VECTOR( r,double);
-  MAL_S3x3_MATRIX( rT,double);
-#if 0
-  cout << "Body_R" << Body_R<<endl;
-  cout << "Body_P" << Body_P<<endl;
-
-  cout << "Foot_R" << Foot_R<<endl;
-  cout << "Foot_P" << Foot_P<<endl;
-  
-  cout << "Dt" << Dt << endl;
-#endif
-  rT= MAL_S3x3_RET_TRANSPOSE(Foot_R);
-
-#if 0
-  cout << "rT" << rT<< endl;
-  cout << "rT" << rT<< endl;
-  cout << "Body_R * Dt - Foot_P" << Body_R * Dt - Foot_P << endl;
-#endif
-  r = Body_P +  MAL_S3x3_RET_A_by_B(Body_R , Dt) - Foot_P;
-  r = MAL_S3x3_RET_A_by_B(rT ,r);
-	    
-  C = sqrt(r(0)*r(0)+
-	   r(1)*r(1)+
-	   r(2)*r(2));
-  //C2 =sqrt(C1*C1-D*D);
-  c5 = (C*C-A*A-B*B)/(2.0*A*B);
-  //cout << r(0,0) << " " << r(1,0) << " "  << r(2,0) <<" ";
-  //  cout << "C " << C << " c5 " <<c5 <<endl;
-  //  cout << C << " " ;
-  if (c5>=1)
-    {
-      q(3)= 0.0;
-    }
-  else if (c5<=-1.0)
-    {
-      q(3)= M_PI;
-    }
-  else 
-    {
-      q(3)= acos(c5);
-    }
-  q6a = asin((A/C)*sin(M_PI- q(3)));
-  // q6b = atan2(D,C2);
-
-
-  float c,s,cz,sz;
-
-  q(5) = atan2(r(1),r(2));
-  if (q(5)>M_PI/2.0)
-    {
-      q(5) = q(5)-M_PI;
-    }
-  else if (q(5)<-M_PI/2.0)
-    {
-      q(5)+= M_PI;
-    }
-
-  q(4) = -atan2(r(0), (r(2)<0? -1.0:1.0)*sqrt(r(1)*r(1)+r(2)*r(2) )) - q6a;
-
-  MAL_S3x3_MATRIX( R,double);
-  MAL_S3x3_MATRIX(BRt,double);
-
-  BRt = MAL_S3x3_RET_TRANSPOSE(Body_R);
-		  
-  MAL_S3x3_MATRIX(Rroll,double);
-  c = cos(-q(5));
-  s = sin(-q(5));
-
-  Rroll(0,0) = 1.0;   Rroll(0,1) = 0.0;   Rroll(0,2) = 0.0; 
-  Rroll(1,0) = 0.0;   Rroll(1,1) = c;   Rroll(1,2) = -s; 
-  Rroll(2,0) = 0.0;   Rroll(2,1) = s;   Rroll(2,2) = c; 
-
-
-  MAL_S3x3_MATRIX( Rpitch,double);
-  c = cos(-q(4)-q(3));
-  s = sin(-q(4)-q(3));
-
-  Rpitch(0,0) = c;     Rpitch(0,1) = 0;   Rpitch(0,2) = s; 
-  Rpitch(1,0) = 0.0;   Rpitch(1,1) = 1;   Rpitch(1,2) = 0; 
-  Rpitch(2,0) = -s;    Rpitch(2,1) = 0;   Rpitch(2,2) = c; 
-
-  //  cout << " BRt"  << BRt << endl;
-  R = MAL_S3x3_RET_A_by_B(BRt, Foot_R );
-  MAL_S3x3_MATRIX(Rtmp,double);
-  Rtmp = MAL_S3x3_RET_A_by_B(Rroll,Rpitch);
-  R = MAL_S3x3_RET_A_by_B(R,Rtmp);
-
-  q(0) = atan2(-R(0,1),R(1,1));
-  
-  cz = cos(q(0)); sz = sin(q(0));
-  q(1) = atan2(R(2,1), -R(0,1)*sz + R(1,1) *cz);
-  q(2) = atan2( -R(2,0), R(2,2));
-
-  //  exit(0);
-  return 0;
-}
 
 int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double) &Body_R,
 							MAL_S3_VECTOR( ,double) &Body_P,
@@ -205,73 +101,24 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
 
   
   //  cout << "vz: " << v(2,0) << " vy :" << v(1,0) << endl;
-#if 0
-  if (v(1)<0.0)
-    {
-      theta = atan2(v(2),-v(1));
-      r(1) = -cos(psi+theta)*Cp;
-    }
-  else 
-    {
-      theta = atan2(v(2),v(1));
-      r(1) = cos(psi+theta)*Cp;
-    }
-#else
   theta = atan2(v(2),v(1));
   
   r(1) = cos(psi+theta)*Cp;
-#endif
 
   r(2) = sin(psi+theta)*Cp;
 
-  //  cout << "r : " << r << endl;
-#if 0
-  cout << "Body_R" << Body_R<<endl;
-  cout << "Body_P" << Body_P<<endl;
-
-  cout << "Foot_R" << Foot_R<<endl;
-  cout << "Foot_P" << Foot_P<<endl;
-  
-  cout << "Dt" << Dt << endl;
-#endif
-
-#if 0
-  cout << "Body_P" << rT<< endl;
-  cout << "rT" << rT<< endl;
-  cout << "Body_R * Dt - Foot_P" << Body_R * Dt - Foot_P << endl;
-#endif
   //  r = rT * (Body_P +  Body_R * Dt - Foot_P);
   C = sqrt(r(0)*r(0)+
 	   r(1)*r(1)+
 	   r(2)*r(2));
   //C2 =sqrt(C1*C1-D*D);
   c5 = (C*C-A*A-B*B)/(2.0*A*B);
-  //cout << r(0,0) << " " << r(1,0) << " "  << r(2,0) <<" ";
-  //  cout << "C " << C << " c5 " <<c5 <<endl;
-  //  cout << C << " " ;
+
   if (c5>=m_KneeAngleBoundCos)
     {
-      //double klojo;
 
       q(3)=m_KneeAngleBound;
 
-      /*	if (c5>=m_KneeAngleBoundCos2)
-	q(3) =m_KneeAngleBound;
-	else 
-	{
-	double a,b,c,d;
-	a =  6.59620337503859;
-	b = -13.77121203051706;
-	c = 9.82223457054312;
-	d = -2.32950990645471;
-	  
-	q(3)= a+b*c5+c*c5*c5+d*c5*c5*c5;
-	  
-	}
-	  
-
-	  
-      */    
     }
   else if (c5<=-1.0)
     {
@@ -282,7 +129,6 @@ int InverseKinematics::ComputeInverseKinematics2ForLegs(MAL_S3x3_MATRIX(,double)
       q(3)= acos(c5);
     }
   q6a = asin((A/C)*sin(M_PI- q(3)));
-  // q6b = atan2(D,C2);
 
 
   float c,s,cz,sz;
