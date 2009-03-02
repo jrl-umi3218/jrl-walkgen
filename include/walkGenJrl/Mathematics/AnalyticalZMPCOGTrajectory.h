@@ -125,22 +125,22 @@ namespace PatternGeneratorJRL
       
       /*! \brief Set the coefficients for the sinuse and cosinues
 	function. */
-      void SetCoGHyperbolicCoefficients(vector<double> &lV,
-					vector<double> &lW);
+      void SetCoGHyperbolicCoefficients(std::vector<double> &lV,
+					std::vector<double> &lW);
       
       /*! \brief Set the starting point and the height variation. */
-      void SetStartingTimeIntervalsAndHeightVariation(vector<double> &lDeltaTj,
-						      vector<double> &lomegaj);
+      void SetStartingTimeIntervalsAndHeightVariation(std::vector<double> &lDeltaTj,
+						      std::vector<double> &lomegaj);
       
       /*! \brief Set the degree of each polynomials for the CoG
 	Remark: the size of the vector of degrees should match the number
 	of intervals.
        */
-      void SetPolynomialDegrees(vector<unsigned int> &lPolynomialDegree);
+      void SetPolynomialDegrees(std::vector<unsigned int> &lPolynomialDegree);
 
       /*! \brief Get the degree of each polynomials for the CoG.
        */
-      void GetPolynomialDegrees(vector<unsigned int> &lPolynomialDegree) const;
+      void GetPolynomialDegrees(std::vector<unsigned int> &lPolynomialDegree) const;
 
       /*! \brief Set the number of Intervals for this
 	trajectory. */
@@ -148,12 +148,12 @@ namespace PatternGeneratorJRL
             
       /*! \brief Get the coefficients for the sinuse and cosinues
 	function. */
-      void GetHyperbolicCoefficients(vector<double> &lV,
-				      vector<double> &lW) const;
+      void GetHyperbolicCoefficients(std::vector<double> &lV,
+				      std::vector<double> &lW) const;
 
       /*! \brief Get the starting point and the height variation. */
-      void GetStartingPointAndHeightVariation(vector<double> &lTj,
-					      vector<double> &lomegaj);
+      void GetStartingPointAndHeightVariation(std::vector<double> &lTj,
+					      std::vector<double> &lomegaj);
 
       /*! \brief Get the polynomial at interval j for the CoG 
 	Remark: The call to this function assume that the 
@@ -172,8 +172,8 @@ namespace PatternGeneratorJRL
 	@param lCOMZ: Profile of the height CoM for each interval.
 	@param lZMPZ: Profile of the height ZMP for each interval.
        */
-      void TransfertCoefficientsFromCOGTrajectoryToZMPOne(vector<double> &lCOMZ,
-							  vector<double> &lZMPZ);
+      void TransfertCoefficientsFromCOGTrajectoryToZMPOne(std::vector<double> &lCOMZ,
+							  std::vector<double> &lZMPZ);
 
       /*! \brief Transfert the coefficients from the COG trajectory to the ZMP. 
 	@param IntervalIndex: Number of the interval.
@@ -221,30 +221,30 @@ namespace PatternGeneratorJRL
 
       /*! List of coefficients for the hyperbolics
 	cosine function*/
-      vector<double> m_V;
+      std::vector<double> m_V;
       
       /*! List of coefficients for the hyperbolics
 	sine function*/
-      vector<double> m_W;
+      std::vector<double> m_W;
 
       /*! List of temporal starting point. */
-      vector<double> m_DeltaTj;
+      std::vector<double> m_DeltaTj;
 
       /*! List of omega, i.e. height variation along
 	the trajectory. */
-      vector<double> m_omegaj;
+      std::vector<double> m_omegaj;
       
       /*! List of reference time for the interval. */
-      vector<double> m_RefTime;
+      std::vector<double> m_RefTime;
 
       /*! List of polynomial degrees for the CoM*/
-      vector<unsigned int> m_PolynomialDegree;
+      std::vector<unsigned int> m_PolynomialDegree;
       
       /*! List of polynomials for the COG */
-      vector<Polynome *> m_ListOfCOGPolynomials;
+      std::vector<Polynome *> m_ListOfCOGPolynomials;
 
       /*! List of polynomials for the ZMP */
-      vector<Polynome *> m_ListOfZMPPolynomials;
+      std::vector<Polynome *> m_ListOfZMPPolynomials;
 
       /*! Intern method to free the polynomials */
       void FreePolynomes();

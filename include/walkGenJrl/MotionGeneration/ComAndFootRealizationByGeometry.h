@@ -338,37 +338,37 @@ namespace PatternGeneratorJRL
     deque<PatternGeneratorJRL::KWNode > m_UpperBodyPositionsBuffer;
 
     /*! Conversion between the index of the plan and the robot DOFs. */
-    vector<int> m_ConversionForUpperBodyFromLocalIndexToRobotDOFs;
+    std::vector<int> m_ConversionForUpperBodyFromLocalIndexToRobotDOFs;
         
     /*! Keep the indexes for the legs of the robot in the VRML numbering system. */
-    vector<int> m_LeftLegIndexInVRML;
-    vector<int> m_RightLegIndexInVRML;
-    vector<int> m_LeftArmIndexInVRML;
-    vector<int> m_RightArmIndexInVRML;
+    std::vector<int> m_LeftLegIndexInVRML;
+    std::vector<int> m_RightLegIndexInVRML;
+    std::vector<int> m_LeftArmIndexInVRML;
+    std::vector<int> m_RightArmIndexInVRML;
 
     /*! \name Keep the indexes into the Configuration numbering system. 
      @{
     */
     /*! \brief For the left leg, Specific for the Inverse Kinematics. */
-    vector<int> m_LeftLegIndexinConfiguration;
+    std::vector<int> m_LeftLegIndexinConfiguration;
     /*! \brief For the right leg, Specific for the Inverse Kinematics. */
-    vector<int> m_RightLegIndexinConfiguration;
+    std::vector<int> m_RightLegIndexinConfiguration;
     /*! \brief For the left arm, Specific for the Inverse Kinematics. */
-    vector<int> m_LeftArmIndexinConfiguration;
+    std::vector<int> m_LeftArmIndexinConfiguration;
     /*! \brief For the right leg, Specific for the Inverse Kinematics. */
-    vector<int> m_RightArmIndexinConfiguration;
+    std::vector<int> m_RightArmIndexinConfiguration;
     
     /*! \brief For the chest. */
-    vector<int> m_ChestIndexinConfiguration;
+    std::vector<int> m_ChestIndexinConfiguration;
 
     /*! \brief For the entire system. */
-    vector<int> m_GlobalVRMLIDtoConfiguration;
+    std::vector<int> m_GlobalVRMLIDtoConfiguration;
 
     /*! Gain factor for the arm motion heuristic. */
     double m_GainFactor;
 
     /*! Buffer of current Upper Body motion. */
-    vector<double> m_UpperBodyMotion;
+    std::vector<double> m_UpperBodyMotion;
 
     /*! COG of the ankles in the waist reference frame 
       when evaluating the initial position.

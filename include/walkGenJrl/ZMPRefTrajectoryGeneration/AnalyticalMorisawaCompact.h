@@ -68,13 +68,13 @@ namespace PatternGeneratorJRL
     double FinalCoMPos;
 
     /*! ZMP profil for the chosen axis. */
-    vector<double> * ZMPProfil; 
+    std::vector<double> * ZMPProfil; 
 
     /*! Height ZMP profil.*/
-    vector<double> * ZMPZ;
+    std::vector<double> * ZMPZ;
 
     /*! Height COM profil. */
-    vector<double> * CoMZ;
+    std::vector<double> * CoMZ;
     
   } CompactTrajectoryInstanceParameters;
 
@@ -254,7 +254,7 @@ namespace PatternGeneratorJRL
 	@param[in] lCoMZ: Profile of the CoM's height trajectory for each interval.
 	@param[in] lZMPZ: Profile of the ZMP's height trajectory for each interval.
        */
-      void BuildingTheZMatrix(vector<double> &lCoMZ, vector<double> &lZMPZ );
+      void BuildingTheZMatrix(std::vector<double> &lCoMZ, std::vector<double> &lZMPZ );
 
       /*! \brief Building the Z matrix to be inverted. */
       void BuildingTheZMatrix();
@@ -275,7 +275,7 @@ namespace PatternGeneratorJRL
        */
       void ComputeW(double InitialCoMPos,
 		    double InitialComSpeed,
-		    vector<double> &ZMPPosSequence,
+		    std::vector<double> &ZMPPosSequence,
 		    double FinalCoMPos,
 		    AnalyticalZMPCOGTrajectory &aAZCT);
 
@@ -290,8 +290,8 @@ namespace PatternGeneratorJRL
       be already initialized.
       */
       void TransfertTheCoefficientsToTrajectories(AnalyticalZMPCOGTrajectory &aAZCT,
-						  vector<double> &lCoMZ,
-						  vector<double> &lZMPZ,
+						  std::vector<double> &lCoMZ,
+						  std::vector<double> &lZMPZ,
 						  double &lZMPInit,
 						  double &lZMPEnd,
 						  bool InitializeaAZCT);

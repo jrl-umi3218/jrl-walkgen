@@ -101,10 +101,10 @@ namespace PatternGeneratorJRL
     int GetNumberOfIntervals();
 
     /*! \brief Set the time for each interval. */
-    void SetTimeIntervals(vector<double> & lDeltaTj);
+    void SetTimeIntervals(std::vector<double> & lDeltaTj);
     
     /*! \brief Get the time for each interval */
-    void GetTimeIntervals(vector<double>  & lDeltaTj);
+    void GetTimeIntervals(std::vector<double>  & lDeltaTj);
     
     /*! @} */
     
@@ -161,7 +161,7 @@ namespace PatternGeneratorJRL
   protected:
 
     /*! \brief Handle a set of object allowing the generation of the foot trajectory.*/
-    vector<FootTrajectoryGenerationStandard *> m_SetOfFootTrajectoryGenerationObjects;
+    std::vector<FootTrajectoryGenerationStandard *> m_SetOfFootTrajectoryGenerationObjects;
 
     /*! \brief Reference of humanoid specificities. */ 
     dynamicsJRLJapan::HumanoidSpecificities * m_HS;
@@ -170,13 +170,13 @@ namespace PatternGeneratorJRL
     double m_AbsoluteTimeReference;
 
     /*! \brief Set of interval times. */
-    vector<double> m_DeltaTj;
+    std::vector<double> m_DeltaTj;
 
     /*! \brief Nature of the interval. */
-    vector<int> m_NatureOfTheIntervals;
+    std::vector<int> m_NatureOfTheIntervals;
 
     /*! \brief Reference time for the polynomials. */
-    vector<double> m_RefTime;
+    std::vector<double> m_RefTime;
     
   };
 };

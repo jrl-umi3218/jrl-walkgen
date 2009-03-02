@@ -64,7 +64,7 @@ class WALK_GEN_JRL_EXPORT WaistPolynome : public Polynome
       WaistPolynome();
   
       /// Set the parameters
-	void SetParameters(MAL_VECTOR( boundCond,double), vector<double> timeDistr);
+	void SetParameters(MAL_VECTOR( boundCond,double), std::vector<double> timeDistr);
 
       /// Destructor.
       ~WaistPolynome();
@@ -95,14 +95,14 @@ class WALK_GEN_JRL_EXPORT WaistPolynome : public Polynome
       	deque<RelativeFootPosition> m_FootHolds;
 
       	MAL_MATRIX(mBoundCond,double);   
-      	vector<double> mTimeDistr;
+      	std::vector<double> mTimeDistr;
 
     
       
       	WaistPolynome *m_PolynomeHip;
 	
 	///extra COMPosition buffer calculated in ZMPMultibody class 
-	vector<COMPosition> m_ExtraCOMBuffer;
+	std::vector<COMPosition> m_ExtraCOMBuffer;
 
 	
 

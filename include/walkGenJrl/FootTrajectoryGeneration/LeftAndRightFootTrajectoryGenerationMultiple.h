@@ -178,7 +178,7 @@ namespace PatternGeneratorJRL
       dynamicsJRLJapan::HumanoidSpecificities * m_HS;
       
       /*! Set of time intervals */
-      vector<double> m_DeltaTj;
+      std::vector<double> m_DeltaTj;
 
       /*! Omega */
       double m_Omega;
@@ -194,10 +194,10 @@ namespace PatternGeneratorJRL
       
     public:
       /*! Set the intervals time */
-      void SetDeltaTj(vector<double> & aDeltaTj);
+      void SetDeltaTj(std::vector<double> & aDeltaTj);
 
       /*! Get the intervals time */
-      void GetDeltaTj(vector<double> & aDeltaTj);
+      void GetDeltaTj(std::vector<double> & aDeltaTj);
 
       /*! Set the step height */
       void SetStepHeight(double aStepHeight);

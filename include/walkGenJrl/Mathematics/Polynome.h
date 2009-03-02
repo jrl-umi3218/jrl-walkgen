@@ -71,10 +71,10 @@ namespace PatternGeneratorJRL
       double ComputeDerivative(double t);
       
       /*! Get the coefficients. */
-      void GetCoefficients(vector<double> &lCoefficients) const;
+      void GetCoefficients(std::vector<double> &lCoefficients) const;
 
       /*! Set the coefficients. */
-      void SetCoefficients(vector<double> &lCoefficients);
+      void SetCoefficients(std::vector<double> &lCoefficients);
 
       /*! Print the coefficient. */
       void print();
@@ -85,7 +85,7 @@ namespace PatternGeneratorJRL
       int m_Degree;
 
       /// Vector of coefficients.
-      vector<double> m_Coefficients;
+      std::vector<double> m_Coefficients;
     };
 };
 #endif /* _POLYNOME_H_*/

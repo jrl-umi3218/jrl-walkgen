@@ -134,7 +134,7 @@ namespace PatternGeneratorJRL
 			  MAL_VECTOR(&xk,double));
     
     /*! This method helps to build a linear system for constraining the ZMP. */
-    int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
+    int ComputeLinearSystem(std::vector<CH_Point> aVecOfPoints,
 			    MAL_MATRIX(&A,double),
 			    MAL_MATRIX(&B,double));
 

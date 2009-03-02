@@ -139,7 +139,7 @@ namespace PatternGeneratorJRL
     void SetInverseKinematics(InverseKinematics *anIK);
 
     /*! set parameters for the timedistribution of specific stepover points*/
-    void TimeDistributeFactor(vector<double> &TimeDistrFactor);
+    void TimeDistributeFactor(std::vector<double> &TimeDistrFactor);
 
     /*! set parameter which decreases the max stepover
       hipheight used during feasibility calculation*/
@@ -189,7 +189,7 @@ namespace PatternGeneratorJRL
     deque<RelativeFootPosition> m_FootHolds;
 
     MAL_MATRIX(mBoundCond,double);   
-    vector<double> mTimeDistr;
+    std::vector<double> mTimeDistr;
 
          
     StepOverPolynomeHip4 *m_PolynomeStepOverHipStep2;
@@ -338,7 +338,7 @@ namespace PatternGeneratorJRL
 		
     /*! time distribution at which the specific intermediate points
       for the stepping over splines are to be exerted*/
-    vector<double> m_TimeDistrFactor;
+    std::vector<double> m_TimeDistrFactor;
 		
     /*! Reference to the humanoid specificities.*/
     HumanoidSpecificities *m_HS;
