@@ -142,7 +142,7 @@ namespace PatternGeneratorJRL
       deque<ZMPPosition> m_FIFOTmpZMPPosition;
 	
       /*!extra COMPosition buffer calculated to give to the stepover planner  */
-      vector<COMPosition> m_ExtraCOMBuffer;
+      std::vector<COMPosition> m_ExtraCOMBuffer;
 
       /*! Difference between the CoM and the Waist 
       from the initialization phase,

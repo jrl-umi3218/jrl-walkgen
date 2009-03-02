@@ -196,7 +196,7 @@ namespace PatternGeneratorJRL
 	@param[in] lCoMZ: Profile of the CoM's height trajectory for each interval.
 	@param[in] lZMPZ: Profile of the ZMP's height trajectory for each interval.
        */
-      void BuildingTheZMatrix(vector<double> &lCoMZ, vector<double> &lZMPZ );
+      void BuildingTheZMatrix(std::vector<double> &lCoMZ, std::vector<double> &lZMPZ );
 
       /*! \brief Building the w vector. 
 	It is currently assume that all ZMP's speed will be
@@ -207,7 +207,7 @@ namespace PatternGeneratorJRL
        */
       void ComputeW(double InitialCoMPos,
 		    double InitialComSpeed,
-		    vector<double> &ZMPPosSequence,
+		    std::vector<double> &ZMPPosSequence,
 		    double FinalCoMPos,
 		    AnalyticalZMPCOGTrajectory & aAZCT);
 
@@ -222,8 +222,8 @@ namespace PatternGeneratorJRL
       of the object aAZCT, does nothing otherwise.
       */
       void TransfertTheCoefficientsToTrajectories(AnalyticalZMPCOGTrajectory &aAZCT,
-						  vector<double> &lCoMZ,
-						  vector<double> &lZMPZ,
+						  std::vector<double> &lCoMZ,
+						  std::vector<double> &lZMPZ,
 						  double &lZMPInit,
 						  double &lZMPEnd,
 						  bool InitializeaAZCT);
@@ -237,8 +237,8 @@ namespace PatternGeneratorJRL
 	@param lZMPEnd : The final value of the ZMP.
       */
       void TransfertTheCompactCoefficientsToTrajectories(AnalyticalZMPCOGTrajectory &aAZCT,
-							 vector<double> &lCoMZ, 
-							 vector<double> &lZMPZ,
+							 std::vector<double> &lCoMZ, 
+							 std::vector<double> &lZMPZ,
 							 double &lZMPInit,
 							 double &lZMPEnd);
       /*! @} */

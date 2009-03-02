@@ -166,7 +166,7 @@ namespace PatternGeneratorJRL
 				       FootAbsolutePosition & InitLeftFootAbsPos, 
 				       FootAbsolutePosition & InitRightFootAbsPos,
 				       deque<RelativeFootPosition> & lRelativeFootPositions,
-				       vector<double> & lCurrentJointValues,
+				       std::vector<double> & lCurrentJointValues,
 				       bool ClearStepStackHandler);
 
 
@@ -406,7 +406,7 @@ namespace PatternGeneratorJRL
 
     /*! Buffer needed to perform the stepping over
       obstacle. */
-    vector<double> m_ZMPShift;
+    std::vector<double> m_ZMPShift;
     
     /*! Gain factor for the default arm motion while walking. */
     double m_GainFactor;
@@ -450,10 +450,10 @@ namespace PatternGeneratorJRL
     
 
     /*! Conversion between the index of the plan and the robot DOFs. */
-    vector<int> m_ConversionForUpperBodyFromLocalIndexToRobotDOFs;
+    std::vector<int> m_ConversionForUpperBodyFromLocalIndexToRobotDOFs;
     
     /*! Current Actuated Joint values of the robot. */
-    vector<double> m_CurrentActuatedJointValues;
+    std::vector<double> m_CurrentActuatedJointValues;
 
     /*! Position of the waist: 
       Relative.*/
@@ -628,7 +628,7 @@ namespace PatternGeneratorJRL
     bool m_ObstacleDetected;	
 
     /*! Time Distribution factor */
-    vector<double> m_TimeDistrFactor;
+    std::vector<double> m_TimeDistrFactor;
 
     /*! Variable for delta feasibility limit */
     double m_DeltaFeasibilityLimit;	

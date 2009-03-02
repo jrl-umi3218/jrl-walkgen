@@ -57,7 +57,7 @@ namespace PatternGeneratorJRL
   
     /*! Set the parameters */
     void SetParameters(MAL_VECTOR(boundCond,double), 
-		       vector<double> timeDistr);
+		       std::vector<double> timeDistr);
 
     /*! Destructor. */
     ~StepOverPolynomeFoot();
@@ -77,7 +77,7 @@ namespace PatternGeneratorJRL
   
     /*! Set the parameters */
     void SetParameters(MAL_VECTOR(Zpos,double), 
-		       vector<double> Xpos);
+		       std::vector<double> Xpos);
 
     /*! Destructor. */
     ~StepOverPolynomeFootZtoX();
@@ -96,7 +96,7 @@ namespace PatternGeneratorJRL
   
     /*! Set the parameters */
     void SetParameters(MAL_VECTOR(Xbound,double), 
-		       vector<double> timedistr);
+		       std::vector<double> timedistr);
 
     /*! Destructor. */
     ~StepOverPolynomeFootXtoTime();
@@ -116,7 +116,7 @@ namespace PatternGeneratorJRL
     
     // Set the parameters
     void SetParameters(MAL_VECTOR( boundCond,double),
-		       vector<double> timeDistr);
+		       std::vector<double> timeDistr);
     
     /*! Destructor. */
     ~StepOverPolynomeHip4();

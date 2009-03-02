@@ -141,7 +141,7 @@ namespace PatternGeneratorJRL
 			deque<ZMPPosition> &ZMPPositionsY);
 
       /*! ZMP shift parameters to shift ZMP position during Single support with respect to the normal ankle position */
-      void SetZMPShift(vector<double> &ZMPShift);
+      void SetZMPShift(std::vector<double> &ZMPShift);
 	
       /*! Methods for on-line generation. (First version)
 	The queues will be updated as follows:
@@ -226,7 +226,7 @@ namespace PatternGeneratorJRL
       
       /* ! ZMP shift parameters to shift ZMP position during 
 	 Single support with respect to the normal ankle position */
-      vector<double> m_ZMPShift;
+      std::vector<double> m_ZMPShift;
       
       /*! Neutral ZMP position. */
       double m_ZMPNeutralPosition[2];
@@ -253,7 +253,7 @@ namespace PatternGeneratorJRL
       /*! @} */
 
       /* ! Window for the filtering of the ZMP positions.. */
-      vector<double> m_ZMPFilterWindow;
+      std::vector<double> m_ZMPFilterWindow;
       
       /* ! Keep a stack of two steps as a reference before sending them to the 
       external queues. */

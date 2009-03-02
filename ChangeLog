@@ -1,3 +1,7 @@
+walkGenJrl 2.5.1 released March 2, 2009
+
+	36. added std:: namespace in headers.
+	
 walkGenJrl 2.5.0 released January 30, 2009
 	
 	35. Validation with the Stack of Tasks.

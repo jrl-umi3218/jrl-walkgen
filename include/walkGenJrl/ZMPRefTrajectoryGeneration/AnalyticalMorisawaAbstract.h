@@ -194,13 +194,13 @@ namespace PatternGeneratorJRL
       int GetNumberOfIntervals();
 
       /*! Get the \f[ \omega_j \f] */
-      int GetOmegaj(vector<double> &GetOmegaj);
+      int GetOmegaj(std::vector<double> &GetOmegaj);
 
       /*! Get the \f[ \Delta T_j \f] */
-      int GetDeltaTj(vector<double> &GetDeltaTj);
+      int GetDeltaTj(std::vector<double> &GetDeltaTj);
 
       /*! Set the \f[ \Delta T_j \f] */
-      int SetDeltaTj(vector<double> &GetDeltaTj);
+      int SetDeltaTj(std::vector<double> &GetDeltaTj);
 
       /*! \name Methods for the full linear system 
 	@{ */
@@ -209,7 +209,7 @@ namespace PatternGeneratorJRL
 	@param lCoM: Profile of CoM for each interval.
 	@param lZMP: Profile of ZMP for each interval.
        */
-      virtual void BuildingTheZMatrix(vector<double> &lCoM, vector<double> &lZMP )=0;
+      virtual void BuildingTheZMatrix(std::vector<double> &lCoM, std::vector<double> &lZMP )=0;
 
       /*! \brief Building the w vector. 
 	It is currently assume that all ZMP's speed will be
@@ -226,7 +226,7 @@ namespace PatternGeneratorJRL
        */
       virtual void ComputeW(double InitialCoMPos,
 			    double InitialComSpeed,
-			    vector<double> &ZMPPosSequence,
+			    std::vector<double> &ZMPPosSequence,
 			    double FinalCoMPos,
 			    AnalyticalZMPCOGTrajectory & aAZCT) =0 ;
 
@@ -241,8 +241,8 @@ namespace PatternGeneratorJRL
 	of the object aAZCT, does nothing otherwise.
       */
       virtual void TransfertTheCoefficientsToTrajectories(AnalyticalZMPCOGTrajectory &aAZCT,
-							  vector<double> &lCoMZ,
-							  vector<double> &lZMPZ,
+							  std::vector<double> &lCoMZ,
+							  std::vector<double> &lZMPZ,
 							  double &lZMPInit,
 							  double &lZMPEnd,
 							  bool InitializeaAZCT) =0 ;
@@ -255,7 +255,7 @@ namespace PatternGeneratorJRL
       virtual bool InitializeBasicVariables()=0;
 
       /*! \brief Get the weights for the polynomials. */
-      bool GetPolynomialWeights(vector<double> &PolynomialWeights);
+      bool GetPolynomialWeights(std::vector<double> &PolynomialWeights);
 
       /*! \brief Compute the polynomial weights. */
       virtual void ComputePolynomialWeights()=0;
@@ -263,7 +263,7 @@ namespace PatternGeneratorJRL
 
       /*! \brief Get the polynomial degrees for the trajectory designed with
 	this method. */
-      void GetPolynomialDegrees(vector<unsigned int> &lPolynomialDegrees);
+      void GetPolynomialDegrees(std::vector<unsigned int> &lPolynomialDegrees);
 	
       WALK_GEN_JRL_EXPORT friend std::ostream& operator <<(std::ostream &os,const AnalyticalMorisawaAbstract &obj);
 
@@ -308,20 +308,20 @@ namespace PatternGeneratorJRL
       int m_NumberOfIntervals;
 
       /*! \brief Set of temporal intervals. */
-      vector<double> m_DeltaTj;
+      std::vector<double> m_DeltaTj;
 
       /*! \brief Set of step types: 0 single support, 1 double support*/
-      vector<unsigned int> m_StepTypes;
+      std::vector<unsigned int> m_StepTypes;
 
       /*! Vector build upon the CoM and ZMP profile along the Z axis */
-      vector<double> m_Omegaj;
+      std::vector<double> m_Omegaj;
 
       /*! \brief Set of polynomial degrees. 
 	The current strategy is to have the first and the last ones set to 4,
 	while the intermediate intervals uses a 3rd order polynomial.
 
        */
-      vector<unsigned int> m_PolynomialDegrees;
+      std::vector<unsigned int> m_PolynomialDegrees;
 	      
       /*! \name Internal Methods to compute the full linear
 	system. 

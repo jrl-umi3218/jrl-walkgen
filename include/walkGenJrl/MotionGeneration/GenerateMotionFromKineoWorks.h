@@ -48,7 +48,7 @@ namespace PatternGeneratorJRL
 
   typedef struct s_KWNode
   {
-    vector<double> Joints;
+    std::vector<double> Joints;
   } KWNode;
 
   /*! This object is in charge of reading a path
@@ -102,7 +102,7 @@ namespace PatternGeneratorJRL
 	the COM buffer which are the closest to the KWs' way points.
 	The value between two found points are linearly interpolated. */
       void ComputeUpperBodyPosition(deque< KWNode > &UpperBodyPositionsBuffer, 
-				    vector<int> &ConversionFromLocalToRobotDOFsIndex);
+				    std::vector<int> &ConversionFromLocalToRobotDOFsIndex);
 	
     protected:
 
@@ -117,13 +117,13 @@ namespace PatternGeneratorJRL
       string m_SteeringMethod;
 	
       /*! The path is a list of Nodes. */
-      vector<KWNode> m_Path;
+      std::vector<KWNode> m_Path;
 	
       /*! The list of COM position by which the robot is going 
        * Should be deduced by using CreateBufferFirstPreview and
        *  with the appropriate buffer of ZMP values.
        */
-      vector<COMPosition> m_COMBuffer;
+      std::vector<COMPosition> m_COMBuffer;
 	
 	
       /*! Link to the preview control structure in order to simulate
