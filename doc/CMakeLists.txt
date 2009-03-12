@@ -1,33 +1,35 @@
-# Olivier Stasse, JRL, CNRS/AIST
-# Creation: 31/10/2008
-# History:
+# 
+#  Copyright JRL, CNRS-AIST
 #
-# Copyright CNRS/AIST
-SET(${${PROJECT_NAME}_SOURCE_DIR}/doc/docfiles
-    ${${PROJECT_NAME}_SOURCE_DIR}/doc/header.html
-    ${${PROJECT_NAME}_SOURCE_DIR}/doc/footer.html
-    ${${PROJECT_NAME}_SOURCE_DIR}/doc/package.css
-    ${${PROJECT_NAME}_SOURCE_DIR}/doc/pictures/footer.jpg
-    ${${PROJECT_NAME}_SOURCE_DIR}/doc/additionalDoc/package.h
-    ${${PROJECT_NAME}_SOURCE_DIR}/doc/package.dox
-    )
+#  Florent Lamiraux
+# 
 
 # Configure package.dox file
-CONFIGURE_FILE(${${PROJECT_NAME}_SOURCE_DIR}/doc/package.dox.cmake
-  ${${PROJECT_NAME}_SOURCE_DIR}/doc/package.dox
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/package.dox.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/package.dox
 )
 
 
-ADD_CUSTOM_COMMAND(OUTPUT ${${PROJECT_NAME}_SOURCE_DIR}/doc/html/index.html
-                   COMMAND ${DOXYGEN_EXECUTABLE} ${${PROJECT_NAME}_SOURCE_DIR}/doc/package.dox
-                   DEPENDS ${docfiles}
+ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/html/index.html
+  COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/package.dox
+  DEPENDS ""
 )
 
-ADD_CUSTOM_TARGET(doc ALL
-                  DEPENDS ${${PROJECT_NAME}_SOURCE_DIR}/doc/html/index.html)
+ADD_CUSTOM_TARGET(documentation ALL
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/html/index.html)
 
-INSTALL(DIRECTORY ${${PROJECT_NAME}_BINARY_DIR}/doc/html
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}/)
-INSTALL(DIRECTORY ${${PROJECT_NAME}_SOURCE_DIR}/doc/pictures
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}/html/)
+#
+# Install html documentation
+#
 
+# html files
+INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME})
+
+# doxytag
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.doxytag
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}/html)
+
+# pictures
+INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pictures
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}/html)
