@@ -469,7 +469,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 	RightFootAbsolutePositions[CurrentZMPindex].time = m_CurrentTime;
 
       LeftFootAbsolutePositions[CurrentZMPindex].stepType = 
-	RightFootAbsolutePositions[CurrentZMPindex].stepType = 0;
+	RightFootAbsolutePositions[CurrentZMPindex].stepType = 10;
 	
       m_CurrentTime += m_SamplingPeriod;
       CurrentZMPindex++;
