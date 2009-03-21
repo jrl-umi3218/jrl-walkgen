@@ -34,6 +34,7 @@
 // Time include
 #ifdef UNIX
 #include <sys/time.h>
+#include <string.h>
 #endif /* UNIX */
 
 #ifdef WIN32
