@@ -1,0 +1,15 @@
+TestFootPrintPGInterface
+========================
+Various tests are present in TestFootPrintPGInterface.
+
+To run TestFootPrintPGInterface
+./TestFootPrintPGInterface /home/username/src/OpenHRP/Controller/IOserver/robot/HRP2JRL/etc/PreviewControlParameters.ini \
+/home/username/src/OpenHRP/Controller/IOserver/robot/HRP2JRL/model/ HRP2JRLmain.wrl \
+/home/username/src/OpenHRP/Controller/IOserver/robot/HRP2JRL/etc/HRP2Specificities.xml \
+/home/username/src/OpenHRP/Controller/IOserver/robot/HRP2JRL/etc/HRP2LinkJointRank.xml
+
+If DebugConfiguration is set to true, a file called TestConfiguration.dat is written on disk.
+You can use gnuplot with DisplayLeftArm.gnu and DisplayRightArm.gnu
+to check the values.
+gnuplot
+load ../../unitTesting/DisplayLeftArm.gnu
