@@ -39,7 +39,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "jrlMathTools/jrlConstants.h"
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #include <walkGenJrl/Mathematics/ConvexHull.h>
 

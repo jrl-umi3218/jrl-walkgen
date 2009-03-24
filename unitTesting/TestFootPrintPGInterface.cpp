@@ -12,7 +12,6 @@
 #include <sstream>
 #include <fstream>
 
-#include <jrlMathTools/jrlConstants.h>
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
 using namespace::PatternGeneratorJRL;

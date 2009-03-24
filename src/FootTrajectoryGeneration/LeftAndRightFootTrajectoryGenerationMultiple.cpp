@@ -32,8 +32,6 @@
    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "jrlMathTools/jrlConstants.h"
-
 #define ODEBUG2(x)
 #define ODEBUG3(x) cerr << "LeftAndRightFootTrajectoryGenerationMultiple :" << x << endl
 #define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}

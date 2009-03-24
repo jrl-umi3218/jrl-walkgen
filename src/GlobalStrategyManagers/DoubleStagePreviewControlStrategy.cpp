@@ -33,7 +33,6 @@
 */
 #include <iostream>
 #include <fstream>
-#include "jrlMathTools/jrlConstants.h"
 using namespace std;
 
 #if 0

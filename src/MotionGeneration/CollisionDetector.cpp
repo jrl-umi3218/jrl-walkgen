@@ -37,7 +37,6 @@
 #define _DEBUG_
 #include <fstream>
 #include <walkGenJrl/MotionGeneration/CollisionDetector.h>
-#include "jrlMathTools/jrlConstants.h"
 
 
 using namespace::PatternGeneratorJRL;
