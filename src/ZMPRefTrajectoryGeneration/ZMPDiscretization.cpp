@@ -39,7 +39,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "jrlMathTools/jrlConstants.h"
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #include <walkGenJrl/Mathematics/ConvexHull.h>
 
@@ -469,7 +468,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 	RightFootAbsolutePositions[CurrentZMPindex].time = m_CurrentTime;
 
       LeftFootAbsolutePositions[CurrentZMPindex].stepType = 
-	RightFootAbsolutePositions[CurrentZMPindex].stepType = 0;
+	RightFootAbsolutePositions[CurrentZMPindex].stepType = 10;
 	
       m_CurrentTime += m_SamplingPeriod;
       CurrentZMPindex++;

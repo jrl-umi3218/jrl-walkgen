@@ -43,7 +43,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "jrlMathTools/jrlConstants.h"
 #include <walkGenJrl/Mathematics/qld.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.h>
 

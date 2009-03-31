@@ -12,8 +12,6 @@
 
 #include <time.h>
 
-#include "jrlMathTools/jrlConstants.h"
-
 #include <dynamicsJRLJapan/HumanoidDynamicMultiBody.h>
 
 #include <walkGenJrl/MotionGeneration/ComAndFootRealizationByGeometry.h>

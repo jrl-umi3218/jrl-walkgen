@@ -1,12 +1,17 @@
+/* Olivier Stasse
+ * (c) 2005-2009
+ * 
+ */
+
 #ifdef UNIX
 #include <sys/time.h>
+#include <stdlib.h>
 #endif /*UNIX*/
 
 #include <time.h>
 #include <sstream>
 #include <fstream>
 
-#include <jrlMathTools/jrlConstants.h>
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
 using namespace::PatternGeneratorJRL;
@@ -616,27 +621,56 @@ void SteppingOver(PatternGeneratorInterface &aPGI)
 
 int main(int argc, char *argv[])
 {
-#if 1
+  string PCParametersFile;
+  string VRMLPath;
+  string VRMLFileName;
+  string SpecificitiesFileName;
+  string LinkJointRank;
+  string Global;
 
   if (argc!=6)
     {
-      cerr << " This program takes 5 arguments: " << endl;
-      cerr << "./TestFootPrintPGInterface  PATH_TO_PC_PARAMS_FILE PATH_TO_VRML_FILE VRML_FILE_NAME PATH_TO_SPECIFICITIES_XML LINK_JOINT_RANK" << endl;
-      exit(-1);
+      const char *openhrphome="OPENHRPHOME";
+      char *value = 0;
+      value = getenv(openhrphome);
+      if (value==0)
+	{
+	  cerr << " This program takes 5 arguments: " << endl;
+	  cerr << "./TestFootPrintPGInterface \
+                         PATH_TO_PC_PARAMS_FILE \
+                         PATH_TO_VRML_FILE \
+                         VRML_FILE_NAME \
+                         PATH_TO_SPECIFICITIES_XML \
+                         LINK_JOINT_RANK" << endl;
+  	  exit(-1);
+	}
+      else
+	{
+	  PCParametersFile = value;
+	  PCParametersFile += "Controller/IOserver/robot/HRP2JRL/etc/";
+	  PCParametersFile +="PreviewControlParameters.ini";
+	  VRMLPath=value;
+	  VRMLPath+="Controller/IOserver/robot/HRP2JRL/model/";
+	  VRMLFileName="HRP2JRLmain.wrl";
+	  SpecificitiesFileName = value;
+	  SpecificitiesFileName +="Controller/IOserver/robot/HRP2JRL/etc/";
+	  SpecificitiesFileName += "HRP2Specificities.xml";
+	  LinkJointRank = value;
+	  LinkJointRank += "Controller/IOserver/robot/HRP2JRL/etc/";
+	  LinkJointRank += "HRP2LinkJointRank.xml";
+
+	}
     }	
-  string PCParametersFile = argv[1];
-  string VRMLPath=argv[2];
-  string VRMLFileName=argv[3];
-  string SpecificitiesFileName = argv[4];
-  string LinkJointRank = argv[5];
-#else 
-  string PCParametersFile("/home/stasse/src/OpenHRP/JRL/src/PatternGeneratorJRL_underdev/src/data/PreviewControlParameters.ini");
-  string VRMLPath("/home/stasse/src/OpenHRP/etc/HRP2JRL/");
-  string VRMLFileName("HRP2JRLmain.wrl");
-  string SpecificitiesFileName("/home/stasse/src/OpenHRP/JRL/src/PatternGeneratorJRL_underdev/src/data/HRP2Specificities.xml");
-  string LinkJointRank("/home/stasse/src/OpenHRP/JRL/src/PatternGeneratorJRL_underdev/src/data/HRP2LinkJointRank.xml");
-#endif
-  string Global=PCParametersFile;
+  else 
+    {
+      PCParametersFile = argv[1];
+      VRMLPath=argv[2];
+      VRMLFileName=argv[3];
+      SpecificitiesFileName = argv[4];
+      LinkJointRank = argv[5];
+    }
+
+  Global=PCParametersFile;	  
   Global+= " ";
   Global+=VRMLPath;
   Global+= " ";
@@ -651,6 +685,7 @@ int main(int argc, char *argv[])
   PatternGeneratorInterface * aPGI;
 
   aPGI = new PatternGeneratorInterface(strm);
+  cout << "Global: " << Global << endl;
 
   //  cout << "before PGI " << endl;
   // Initial position;
@@ -792,7 +827,7 @@ int main(int argc, char *argv[])
   FootAbsolutePosition LeftFootPosition;
   FootAbsolutePosition RightFootPosition;
 
-  bool DebugConfiguration = false;
+  bool DebugConfiguration = true;
   bool DebugFGPI = false;
 
   ofstream aofq;
@@ -828,12 +863,12 @@ int main(int argc, char *argv[])
       // ShortStraightWalking(*aPGI);
       // CurvedWalkingPBW2(*aPGI);
       // KineoWorks(*aPGI);
-      //StraightWalking(*aPGI);
+      StraightWalking(*aPGI);
       
       // AnalyticalShortStraightWalking(*aPGI);
       // CurvedWalkingPBW(*PGI);
       // StraightWalkingPBW(*aPGI);
-      StraightWalkingDimitrov(*aPGI);
+      // StraightWalkingDimitrov(*aPGI);
       //CurvedWalkingDimitrov(*aPGI);
       // Turn90DegreesWalking(aPGI);
       // TurningOnTheCircle(*aPGI); 
