@@ -1593,6 +1593,9 @@ namespace PatternGeneratorJRL {
 
     ODEBUG4( m_count << " " << ZMPmultibody[0] << " " << ZMPmultibody[1],
 	     "DebugDataZMPMB1Display.txt");
+    
+    Joint * LeftFootJoint = dynamic_cast<Joint *>(m_2HumanoidDynamicRobot->leftFoot());
+    Joint * RightFootJoint = dynamic_cast<Joint *>(m_2HumanoidDynamicRobot->rightFoot());
 
     MAL_S3_VECTOR( _2DMBCoM,double);
     _2DMBCoM= m_2HumanoidDynamicRobot->getPositionCoM();
@@ -1722,12 +1725,21 @@ namespace PatternGeneratorJRL {
 	DebugFileLong << WaistVelocity[1] <<  "\t";
 	DebugFileLong << WaistVelocity[2] <<  "\t";
 	DebugFileLong << CurrentConfiguration(3) <<  "\t";
+	/*
 	DebugFileLong << m_LeftFootPositions[0].x <<  "\t";
 	DebugFileLong << m_LeftFootPositions[0].y <<  "\t";
 	DebugFileLong << m_LeftFootPositions[0].z <<  "\t";
 	DebugFileLong << m_RightFootPositions[0].x <<  "\t";
 	DebugFileLong << m_RightFootPositions[0].y <<  "\t";
 	DebugFileLong << m_RightFootPositions[0].z <<  "\t";
+	*/
+	DebugFileLong << LeftFootJoint->currentTransformation()(0,3) <<  "\t";
+	DebugFileLong << LeftFootJoint->currentTransformation()(1,3) <<  "\t";
+	DebugFileLong << LeftFootJoint->currentTransformation()(2,3) <<  "\t";
+	DebugFileLong << RightFootJoint->currentTransformation()(0,3)<<  "\t";
+	DebugFileLong << RightFootJoint->currentTransformation()(1,3) <<  "\t";
+	DebugFileLong << RightFootJoint->currentTransformation()(2,3) <<  "\t";
+
 	// 20 lines angles
 	for(unsigned int i=0;i<6;i++)
 	  {

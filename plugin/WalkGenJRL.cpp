@@ -396,6 +396,7 @@ void WalkGenJRL::m_StepSequence(istringstream &strm)
 bool WalkGenJRL::setup(sotRobotState *rs, sotMotorCommand *mc) 
 {
   
+  ODEBUG4("Setup","DebugData.txt");
   m_seq = sotSequencePlayer::_narrow(manager->find("seq",""));
   // Store the current motor command
   for(unsigned int i=0;i<DOF;i++)
@@ -490,7 +491,7 @@ void WalkGenJRL::control(sotRobotState *rs, sotMotorCommand *mc)
 	  m_zmptarget[2] = ZMPTarget(2);
 		
 
-	  ODEBUG4( ZMPTarget(0) << " " << ZMPTarget(1) << " " << ZMPTarget(2),"Debug5.dat");
+	  ODEBUG4( ZMPTarget(0) << " " << ZMPTarget(1) << " " << ZMPTarget(2),"DebugData.dat");
 	  //memcpy(ref_state->zmp.get_buffer(),m_zmptarget,sizeof(double)*3);     // just change zmp
 	  ref_state->zmp[0] = m_zmptarget[0];
 	  ref_state->zmp[1] = m_zmptarget[1];
