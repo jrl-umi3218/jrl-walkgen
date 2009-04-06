@@ -1,4 +1,4 @@
-/*! \filte ZMPPreviewControlWithMultiBodyZMP.cpp
+/*! \file ZMPPreviewControlWithMultiBodyZMP.cpp
   \brief This object generate all the values for the foot trajectories,
   and the desired ZMP based on a sequence of steps.
   
@@ -375,7 +375,12 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMPosition &finalCO
   m_FIFOTmpZMPPosition.pop_front();
 #endif
 
-  m_FIFODeltaZMPPositions.pop_front();
+  if ((m_StageStrategy==ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY)||
+      (m_StageStrategy==ZMPCOM_TRAJECTORY_FULL))
+    {
+
+      m_FIFODeltaZMPPositions.pop_front();
+    }
   m_FIFOCOMPositions.pop_front();
   m_FIFOLeftFootPosition.pop_front();
   m_FIFORightFootPosition.pop_front();

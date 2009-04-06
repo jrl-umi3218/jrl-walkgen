@@ -269,6 +269,11 @@ void DoubleStagePreviewControlStrategy::SetAlgoForZMPTraj(istringstream &strm)
       m_ZMPpcwmbz->SetStrategyForStageActivation(ZMPPreviewControlWithMultiBodyZMP::
 						 ZMPCOM_TRAJECTORY_FULL);
     }
+  else if (ZMPTrajAlgo=="KajitaOneStage")
+    {
+      m_ZMPpcwmbz->SetStrategyForStageActivation(ZMPPreviewControlWithMultiBodyZMP::
+						 ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY);
+    }
   else if (ZMPTrajAlgo=="Morisawa")
     {
       ODEBUG("Wrong Global Strategy");

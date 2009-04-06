@@ -421,6 +421,27 @@ void ShortStraightWalking(PatternGeneratorInterface &aPGI)
   }
 }
 
+void ShortStraightWalkingOneStage(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+  {
+    istringstream strm2(":SetAlgoForZmpTrajectory KajitaOneStage");
+    aPGI.ParseCmd(strm2);
+  }
+
+  {
+    istringstream strm2(":stepseq 0.0 -0.105 0.0 \
+                     0.2  0.21 0.0 \
+                     0.2 -0.21 0.0 \
+                     0.2  0.21 0.0 \
+                     0.2 -0.21 0.0 \
+                     0.2  0.21 0.0 \
+                     0.0 -0.21 0.0");
+    
+    aPGI.ParseCmd(strm2);
+  }
+}
+
 void AnalyticalShortStraightWalking(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
@@ -861,9 +882,10 @@ int main(int argc, char *argv[])
       */
       // SteppingOver(*aPGI);
       // ShortStraightWalking(*aPGI);
+      ShortStraightWalkingOneStage(*aPGI);
       // CurvedWalkingPBW2(*aPGI);
       // KineoWorks(*aPGI);
-      StraightWalking(*aPGI);
+      // StraightWalking(*aPGI);
       
       // AnalyticalShortStraightWalking(*aPGI);
       // CurvedWalkingPBW(*PGI);
@@ -915,12 +937,11 @@ int main(int argc, char *argv[])
 	      totaltime += ltime;
 	      NbOfItToCompute++;
 	    }
-	  /*
+	  
 	  aPGI->DebugControlLoop(PreviousConfiguration,
 				 PreviousVelocity,
 				 PreviousAcceleration,
 				 NbOfIt); 
-	  */
 	  PreviousConfiguration = CurrentConfiguration;
 	  PreviousVelocity = CurrentVelocity;
 	  PreviousAcceleration = CurrentAcceleration;
