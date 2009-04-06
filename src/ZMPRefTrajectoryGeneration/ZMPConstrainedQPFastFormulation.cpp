@@ -182,6 +182,11 @@ ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
   if (m_Q!=0)
     delete m_Q;
 
+  if (m_PLDPSolver!=0)
+    delete m_PLDPSolver;
+
+  if (m_Pu!=0)
+    delete m_Pu;
 }
 
 void ZMPConstrainedQPFastFormulation::SetPreviewControl(PreviewControl *aPC)
@@ -536,6 +541,7 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
 	}
       aof.close(); 
     }
+  delete [] localQ;
   delete [] localLQ;
   delete [] localiLQ;
  

@@ -51,6 +51,8 @@ OptCholesky::OptCholesky(unsigned int lNbMaxOfConstraints,
 
 OptCholesky::~OptCholesky()
 {
+  if (m_L!=0)
+    delete [] m_L;
 }
 
 
@@ -120,11 +122,15 @@ int OptCholesky::CurrentNumberOfRows()
 
 void OptCholesky::SetL(double *aL)
 {
+  if (m_L!=0)
+    delete [] m_L;
   m_L = aL;
 }
 
 void OptCholesky::SetiL(double *aiL)
 {
+  if (m_iL!=0)
+    delete [] m_iL;
   m_iL = aiL;
 }
 

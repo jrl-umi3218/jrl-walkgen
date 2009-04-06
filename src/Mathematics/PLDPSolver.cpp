@@ -234,6 +234,8 @@ PLDPSolver::~PLDPSolver()
   if (m_d!=0)
     delete [] m_d;
   
+  if (m_y!=0)
+    delete [] m_y;
 
   if ( m_ConstraintsValueComputed!=0)
     delete [] m_ConstraintsValueComputed;
