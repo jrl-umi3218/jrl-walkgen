@@ -51,19 +51,19 @@ OptCholesky::OptCholesky(unsigned int lNbMaxOfConstraints,
 
 OptCholesky::~OptCholesky()
 {
-  if (m_L!=0)
-    delete [] m_L;
 }
 
 
 void OptCholesky::InitializeInternalVariables()
 {
+  /*
   if (m_NbMaxOfConstraints!=0)
     {
       m_L = new double [m_NbMaxOfConstraints * m_NbMaxOfConstraints];
       for(unsigned int i=0;i<m_NbMaxOfConstraints * m_NbMaxOfConstraints;i++)
 	m_L[i]=0.0;
     }
+  */
 }
 
 void OptCholesky::SetToZero()
@@ -122,8 +122,6 @@ int OptCholesky::CurrentNumberOfRows()
 
 void OptCholesky::SetL(double *aL)
 {
-  if (m_L!=0)
-    delete [] m_L;
   m_L = aL;
 }
 
