@@ -1597,6 +1597,8 @@ namespace PatternGeneratorJRL {
     Joint * LeftFootJoint = dynamic_cast<Joint *>(m_2HumanoidDynamicRobot->leftFoot());
     Joint * RightFootJoint = dynamic_cast<Joint *>(m_2HumanoidDynamicRobot->rightFoot());
 
+    const matrix4d LFJcurrentTransformation = LeftFootJoint->currentTransformation();
+    const matrix4d RFJcurrentTransformation = RightFootJoint->currentTransformation();
     MAL_S3_VECTOR( _2DMBCoM,double);
     _2DMBCoM= m_2HumanoidDynamicRobot->getPositionCoM();
 
@@ -1733,12 +1735,13 @@ namespace PatternGeneratorJRL {
 	DebugFileLong << m_RightFootPositions[0].y <<  "\t";
 	DebugFileLong << m_RightFootPositions[0].z <<  "\t";
 	*/
-	DebugFileLong << LeftFootJoint->currentTransformation()(0,3) <<  "\t";
-	DebugFileLong << LeftFootJoint->currentTransformation()(1,3) <<  "\t";
-	DebugFileLong << LeftFootJoint->currentTransformation()(2,3) <<  "\t";
-	DebugFileLong << RightFootJoint->currentTransformation()(0,3)<<  "\t";
-	DebugFileLong << RightFootJoint->currentTransformation()(1,3) <<  "\t";
-	DebugFileLong << RightFootJoint->currentTransformation()(2,3) <<  "\t";
+	
+	DebugFileLong << LFJcurrentTransformation(0,3) <<  "\t";
+	DebugFileLong << LFJcurrentTransformation(1,3) <<  "\t";
+	DebugFileLong << LFJcurrentTransformation(2,3) <<  "\t";
+	DebugFileLong << RFJcurrentTransformation(0,3)<<  "\t";
+	DebugFileLong << RFJcurrentTransformation(1,3) <<  "\t";
+	DebugFileLong << RFJcurrentTransformation(2,3) <<  "\t";
 
 	// 20 lines angles
 	for(unsigned int i=0;i<6;i++)
