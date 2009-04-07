@@ -56,14 +56,6 @@ OptCholesky::~OptCholesky()
 
 void OptCholesky::InitializeInternalVariables()
 {
-  /*
-  if (m_NbMaxOfConstraints!=0)
-    {
-      m_L = new double [m_NbMaxOfConstraints * m_NbMaxOfConstraints];
-      for(unsigned int i=0;i<m_NbMaxOfConstraints * m_NbMaxOfConstraints;i++)
-	m_L[i]=0.0;
-    }
-  */
 }
 
 void OptCholesky::SetToZero()
