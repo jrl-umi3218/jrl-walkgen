@@ -1597,8 +1597,8 @@ namespace PatternGeneratorJRL {
     Joint * LeftFootJoint = dynamic_cast<Joint *>(m_2HumanoidDynamicRobot->leftFoot());
     Joint * RightFootJoint = dynamic_cast<Joint *>(m_2HumanoidDynamicRobot->rightFoot());
 
-    const matrix4d LFJcurrentTransformation = LeftFootJoint->currentTransformation();
-    const matrix4d RFJcurrentTransformation = RightFootJoint->currentTransformation();
+    matrix4d LFJcurrentTransformation = LeftFootJoint->currentTransformation();
+    matrix4d RFJcurrentTransformation = RightFootJoint->currentTransformation();
     MAL_S3_VECTOR( _2DMBCoM,double);
     _2DMBCoM= m_2HumanoidDynamicRobot->getPositionCoM();
 
