@@ -1736,12 +1736,12 @@ namespace PatternGeneratorJRL {
 	DebugFileLong << m_RightFootPositions[0].z <<  "\t";
 	*/
 	
-	DebugFileLong << LFJcurrentTransformation(0,3) <<  "\t";
-	DebugFileLong << LFJcurrentTransformation(1,3) <<  "\t";
-	DebugFileLong << LFJcurrentTransformation(2,3) <<  "\t";
-	DebugFileLong << RFJcurrentTransformation(0,3)<<  "\t";
-	DebugFileLong << RFJcurrentTransformation(1,3) <<  "\t";
-	DebugFileLong << RFJcurrentTransformation(2,3) <<  "\t";
+	DebugFileLong << MAL_S4x4_MATRIX_ACCESS_I_J(LFJcurrentTransformation,0,3) <<  "\t";
+	DebugFileLong << MAL_S4x4_MATRIX_ACCESS_I_J(LFJcurrentTransformation,1,3) <<  "\t";
+	DebugFileLong << MAL_S4x4_MATRIX_ACCESS_I_J(LFJcurrentTransformation,2,3) <<  "\t";
+	DebugFileLong << MAL_S4x4_MATRIX_ACCESS_I_J(RFJcurrentTransformation,0,3)<<  "\t";
+	DebugFileLong << MAL_S4x4_MATRIX_ACCESS_I_J(RFJcurrentTransformation,1,3) <<  "\t";
+	DebugFileLong << MAL_S4x4_MATRIX_ACCESS_I_J(RFJcurrentTransformation,2,3) <<  "\t";
 
 	// 20 lines angles
 	for(unsigned int i=0;i<6;i++)
