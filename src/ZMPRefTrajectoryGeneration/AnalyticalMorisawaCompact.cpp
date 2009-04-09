@@ -6,7 +6,7 @@
    Morisawa, Harada, Kajita, Nakaoka, Fujiwara, Kanehiro, Hirukawa, 
    ICRA 2007, 3989--39994
 
-   Copyright (c) 2007, 
+   Copyright (c) 2007-2009, 
    Olivier Stasse,
    
    JRL-Japan, CNRS/AIST
@@ -119,7 +119,7 @@ namespace PatternGeneratorJRL
     m_VerboseLevel=0;
     
     m_NewStepInTheStackOfAbsolutePosition = false;
-
+    
     
     RESETDEBUG4("Test.dat");
   }
@@ -573,6 +573,9 @@ namespace PatternGeneratorJRL
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]);
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]);
+	aCOMPos.z[0] = m_ComHeight;
+	aCOMPos.z[1] = 0.0;
+	aCOMPos.z[2] = 0.0;
 	COMPositions.push_back(aCOMPos);
 
 	/*! Feed the FootPositions. */
@@ -696,43 +699,6 @@ namespace PatternGeneratorJRL
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Test.dat");
       }
     m_UpperTimeLimitToUpdateStacks = m_CurrentTime + m_Tsingle+m_Tdble;
-#if 0
-    ODEBUG3("Interval Valid_001.dat : begin : " << m_AbsoluteTimeReference << 
-	    " end : " << m_AbsoluteTimeReference+m_PreviewControlTime);
-    RESETDEBUG4("Valid_001.dat");
-    for(double t=m_AbsoluteTimeReference; 
-	t<m_AbsoluteTimeReference+m_PreviewControlTime; 
-	t+= m_SamplingPeriod)
-      {
-	/*! Feed the ZMPPositions. */
-	ZMPPosition aZMPPos;
-        m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px);
-	m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py);
-
-	/*! Feed the COMPositions. */
-	COMPosition aCOMPos;
-	memset(&aCOMPos,0,sizeof(aCOMPos));
-	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]);
-	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]);
-
-	/*! Feed the FootPositions. */
-
-	/*! Left */
-	FootAbsolutePosition LeftFootAbsPos;
-	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos);
-	ODEBUG("Valid_001.dat|LFA.xy " << t << " | " << LeftFootAbsPos.x << " " << LeftFootAbsPos.y);
-	/*! Right */
-	FootAbsolutePosition RightFootAbsPos;
-	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos);
-	
-	ODEBUG4(t << " " << 
-		aZMPPos.px << " " << aZMPPos.py << " " << 
-		aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
-		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
-		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Valid_001.dat");
-      }
-#endif
-    
     
     ODEBUG("End of InitOnLine : Size of relative foot positions: " << m_RelativeFootPositions.size());
 
@@ -904,42 +870,6 @@ namespace PatternGeneratorJRL
 
     /* Update the time at which the stack should not be updated anymore */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_Tsingle+ m_Tdble;    
-#if 0
-    static unsigned int NbOfTests = 2;
-    char BufferFileName[1024];
-    sprintf(BufferFileName,"Valid_%03d.dat",NbOfTests++);
-    RESETDEBUG4(BufferFileName);
-    ODEBUG3(BufferFileName);
-    for(double t=m_AbsoluteTimeReference; t<m_AbsoluteTimeReference+m_PreviewControlTime; t+= 0.005)
-      {
-	/*! Feed the ZMPPositions. */
-	ZMPPosition aZMPPos;
-        m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px);
-	m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py);
-
-	/*! Feed the COMPositions. */
-	COMPosition aCOMPos;
-	memset(&aCOMPos,0,sizeof(aCOMPos));
-	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]);
-	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]);
-
-	/*! Feed the FootPositions. */
-
-	/*! Left */
-	FootAbsolutePosition LeftFootAbsPos;
-	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos);
-	ODEBUG(BufferFileName << " " << t << " | " << LeftFootAbsPos.x << " " << LeftFootAbsPos.y);
-
-	/*! Right */
-	FootAbsolutePosition RightFootAbsPos;
-	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos);
-	
-	ODEBUG4(t << " " << 
-		aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
-		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
-		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,BufferFileName);
-      }
-#endif
 
     ODEBUG("****************** End OnLineAddFoot **************************");
   }
@@ -2130,5 +2060,7 @@ namespace PatternGeneratorJRL
   {
     
   }
+
+
 }
 

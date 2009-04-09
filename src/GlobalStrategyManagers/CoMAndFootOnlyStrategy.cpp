@@ -124,7 +124,7 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
       ZMPPosition aZMPPosition = (*m_ZMPPositions)[0];
       ZMPRefPos(0) = aZMPPosition.px;
       ZMPRefPos(1) = aZMPPosition.py;
-      
+      ZMPRefPos(2) = 0;
       m_ZMPPositions->pop_front();
     }
   else
@@ -159,7 +159,8 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
   aStartingCOMPosition.x[0] = lStartingCOMPosition(0);
   aStartingCOMPosition.y[0] = lStartingCOMPosition(1);
   aStartingCOMPosition.z[0] = lStartingCOMPosition(2);
-  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in   CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
+  aStartingZMPPosition= m_ComAndFootRealization->GetCOGInitialAnkles();
+  //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in   CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
   return 0;
 }
 

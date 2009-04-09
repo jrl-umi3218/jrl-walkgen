@@ -92,6 +92,9 @@ namespace PatternGeneratorJRL
     /*! \brief Specifies if we are or not in on line mode. */
     bool m_OnLineMode;
 
+    /*! \brief Specifies Com Height. */
+    double m_ComHeight;
+
   public:
     
     /* ! \brief Default constructor */
@@ -115,7 +118,15 @@ namespace PatternGeneratorJRL
     /* ! \brief Get the foot angle on landing and taking off. */
     inline const float & GetOmega(void) const
       { return m_Omega;};
+
+    /* ! \brief Returns the Com Height. */
+    inline const float & GetComHeight() const
+    { return m_ComHeight; };
     
+    /* ! \brief Returns the Com Height. */
+    inline void SetComHeight(const float & aComHeight)
+    { m_ComHeight = aComHeight; };
+
     /* ! \brief Returns the single support time. */
     inline const float & GetTSingleSupport() const
       { return m_Tsingle; };
