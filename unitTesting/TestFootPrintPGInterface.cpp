@@ -16,6 +16,46 @@
 
 using namespace::PatternGeneratorJRL;
 
+enum Profiles  {
+  PROFIL_PB_FLORENT,                                 //  0
+  PROFIL_STEPPING_OVER,                              //  1 
+  PROFIL_SHORT_STRAIGHT_WALKING,                     //  2
+  PROFIL_SHORT_STRAIGHT_WALKING_ONE_STAGE,           //  3
+  PROFIL_CURVED_WALKING_PBW2,                        //  4
+  PROFIL_KINEOWORKS,                                 //  5
+  PROFIL_STRAIGHT_WALKING,                           //  6
+  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,          //  7
+  PROFIL_CURVED_WALKING_PBW,                         //  8
+  PROFIL_STRAIGHT_WALKING_DIMITROV,                  //  9
+  PROFIL_CURVED_WALKING_DIMITROV,                    // 10
+  PROFIL_TURN_90D,                                   // 11
+  PROFIL_TURNING_ON_THE_CIRCLE,                      // 12
+  PROFIL_TURNING_ON_THE_CIRCLE_TOWARDS_THE_CENTER,   // 13
+  PROFIL_ANALYTICAL_ONLINE_WALKING,                  // 14
+  PROFIL_ONLINE_WALKING,                             // 15
+  PROFIL_SIMU_ONLINE_WALKING                         // 16
+};
+
+string ProfilesNames[17] = {
+  "PROFIL_PB_FLORENT",                                 
+  "PROFIL_STEPPING_OVER",                              
+  "PROFIL_SHORT_STRAIGHT_WALKING",                     
+  "PROFIL_SHORT_STRAIGHT_WALKING_ONE_STAGE",           
+  "PROFIL_CURVED_WALKING_PBW2",                        
+  "PROFIL_KINEOWORKS",                                 
+  "PROFIL_STRAIGHT_WALKING",                           
+  "PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING",          
+  "PROFIL_CURVED_WALKING_PBW",                         
+  "PROFIL_STRAIGHT_WALKING_DIMITROV",                  
+  "PROFIL_CURVED_WALKING_DIMITROV",                    
+  "PROFIL_TURN_90D",                                   
+  "PROFIL_TURNING_ON_THE_CIRCLE",                      
+  "PROFIL_TURNING_ON_THE_CIRCLE_TOWARDS_THE_CENTER",   
+  "PROFIL_ANALYTICAL_ONLINE_WALKING",                  
+  "PROFIL_ONLINE_WALKING",                             
+  "PROFIL_SIMU_ONLINE_WALKING"
+};
+
 void CommonInitialization(PatternGeneratorInterface &aPGI)
 {
   const char lBuffer[9][256] =
@@ -640,8 +680,10 @@ void SteppingOver(PatternGeneratorInterface &aPGI)
     }
 }
 
+
 int main(int argc, char *argv[])
 {
+  unsigned int TestProfile=0;
   string PCParametersFile;
   string VRMLPath;
   string VRMLFileName;
@@ -649,6 +691,7 @@ int main(int argc, char *argv[])
   string LinkJointRank;
   string Global;
 
+  
   if (argc!=6)
     {
       const char *openhrphome="OPENHRPHOME";
@@ -658,12 +701,12 @@ int main(int argc, char *argv[])
 	{
 	  cerr << " This program takes 5 arguments: " << endl;
 	  cerr << "./TestFootPrintPGInterface \
-                         PATH_TO_PC_PARAMS_FILE \
-                         PATH_TO_VRML_FILE \
-                         VRML_FILE_NAME \
+                         PATH_TO_PC_PARAMS_FILE	  \
+                         PATH_TO_VRML_FILE	   \
+                         VRML_FILE_NAME		   \
                          PATH_TO_SPECIFICITIES_XML \
                          LINK_JOINT_RANK" << endl;
-  	  exit(-1);
+	  exit(-1);
 	}
       else
 	{
@@ -679,7 +722,13 @@ int main(int argc, char *argv[])
 	  LinkJointRank = value;
 	  LinkJointRank += "Controller/IOserver/robot/HRP2JRL/etc/";
 	  LinkJointRank += "HRP2LinkJointRank.xml";
-
+	  
+	  if (argc==2)
+	    {
+	      TestProfile=atoi(argv[1]);
+	      cout << "Profil: " << ProfilesNames[TestProfile] << endl;
+	    }
+	      
 	}
     }	
   else 
@@ -872,36 +921,87 @@ int main(int argc, char *argv[])
       //StrangeStartingPosition(*aPGI);
       
       gettimeofday(&begin,0);
-      /*
-      if (lNbIt==0)
-	PbFlorentSeq1(*aPGI);
-      else if (lNbIt==1)
-	PbFlorentSeq2(*aPGI);
-      else if (lNbIt==2)
-	PbFlorentSeq3(*aPGI);
-      */
-      // SteppingOver(*aPGI);
-      // ShortStraightWalking(*aPGI);
-      ShortStraightWalkingOneStage(*aPGI);
-      // CurvedWalkingPBW2(*aPGI);
-      // KineoWorks(*aPGI);
-      // StraightWalking(*aPGI);
-      
-      // AnalyticalShortStraightWalking(*aPGI);
-      // CurvedWalkingPBW(*PGI);
-      // StraightWalkingPBW(*aPGI);
-      // StraightWalkingDimitrov(*aPGI);
-      //CurvedWalkingDimitrov(*aPGI);
-      // Turn90DegreesWalking(aPGI);
-      // TurningOnTheCircle(*aPGI); 
-      
+      switch (TestProfile) 
+	{
+
+	case PROFIL_PB_FLORENT:
+	  if (lNbIt==0)
+	    PbFlorentSeq1(*aPGI);
+	  else if (lNbIt==1)
+	    PbFlorentSeq2(*aPGI);
+	  else if (lNbIt==2)
+	    PbFlorentSeq3(*aPGI);  
+	    break;
+
+	case PROFIL_STEPPING_OVER:
+	  SteppingOver(*aPGI);
+	  break;
+
+	case PROFIL_SHORT_STRAIGHT_WALKING:
+	  ShortStraightWalking(*aPGI);
+	  break;
+
+	case PROFIL_SHORT_STRAIGHT_WALKING_ONE_STAGE:
+	  ShortStraightWalking(*aPGI);
+	  break;	  
+
+	case PROFIL_CURVED_WALKING_PBW2:
+	  CurvedWalkingPBW2(*aPGI);
+	  break;
+
+	case PROFIL_KINEOWORKS:
+	  KineoWorks(*aPGI);
+	  break;
+
+	case PROFIL_STRAIGHT_WALKING:
+	  StraightWalking(*aPGI);
+	  break;
+
+	case PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING:
+	  AnalyticalShortStraightWalking(*aPGI);
+	  break;
+
+	case PROFIL_CURVED_WALKING_PBW:
+	  CurvedWalkingPBW(*aPGI);
+	  break;
+
+	case PROFIL_STRAIGHT_WALKING_DIMITROV:
+	  StraightWalkingDimitrov(*aPGI);
+	  break;
+
+	case PROFIL_CURVED_WALKING_DIMITROV:
+	  CurvedWalkingDimitrov(*aPGI);
+	  break;
+
+	case PROFIL_TURN_90D:
+	  Turn90DegreesWalking(*aPGI);
+	  break;
+
+	case PROFIL_TURNING_ON_THE_CIRCLE:
+	  TurningOnTheCircle(*aPGI);
+	  break;
+
+	case PROFIL_TURNING_ON_THE_CIRCLE_TOWARDS_THE_CENTER:
+	  TurningOnTheCircleTowardsTheCenter(*aPGI);
+	  break;
+
+	case PROFIL_ANALYTICAL_ONLINE_WALKING:
+	  StartAnalyticalOnLineWalking(*aPGI);
+	  break;
+
+	case PROFIL_ONLINE_WALKING:
+	  StartOnLineWalking(*aPGI);
+	  break;
+	  
+	case PROFIL_SIMU_ONLINE_WALKING:
+	  StartSimuOnLineWalking(*aPGI);
+
+	default:
+	  break;
+	};
 
       // Should generate the same than the one previous (but shorter to specify).
 
-      // TurningOnTheCircleTowardsTheCenter(*aPGI);
-      // TurningOnTheCircleTowardsTheCenter(aPGI);
-      // StartAnalyticalOnLineWalking(*aPGI);
-      //StartOnLineWalking(*aPGI);
       //StartSimuOnLineWalking(*aPGI);
       gettimeofday(&end,0);
       double ltime = end.tv_sec-begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
