@@ -52,7 +52,7 @@ typedef seqplugin sotSequencePlayer;
 #endif
 
 #ifdef OPENHRP_VERSION_3
-#warning "Compiled with openhrp version 3"
+
 #include "Plugin_impl.h"
 #include "SequencePlayer.h"
 /*! Include for OpenHRP new dynamics library. */
