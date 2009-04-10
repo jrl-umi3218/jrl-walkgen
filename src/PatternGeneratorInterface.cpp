@@ -1604,10 +1604,13 @@ namespace PatternGeneratorJRL {
 
 
     ofstream DebugFileLong, DebugFileUpperBody;
-    DebugFileLong.open("DebugDataLong.txt",ofstream::app);
+
     int lindex=0;
     if (m_FirstPrint)
-      {
+      {	
+	DebugFileLong.open("DebugDataLong.txt",ofstream::out);
+	DebugFileLong.close();
+	DebugFileLong.open("DebugDataLongDescription.txt",ofstream::out);
 	DebugFileLong << lindex++ << "-time" << "\t";                   //  1
 	DebugFileLong << lindex++ << "-ZMPdesiredX"<< "\t";             //  2
 	DebugFileLong << lindex++ << "-ZMPdesiredY"<< "\t";             //  3
@@ -1706,13 +1709,13 @@ namespace PatternGeneratorJRL {
 	DebugFileLong << endl;
 
 
-
 	m_FirstPrint = false;
       }
     else
       {
 	ODEBUG(m_ZMPPositions[0].px << " "  << m_ZMPPositions[0].py);
 
+	DebugFileLong.open("DebugDataLong.txt",ofstream::app);
 	DebugFileLong << m_count *m_SamplingPeriod << "\t";
 	DebugFileLong << m_ZMPPositions[0].px << "\t";
 	DebugFileLong << m_ZMPPositions[0].py << "\t";

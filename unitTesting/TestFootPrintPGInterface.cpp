@@ -61,8 +61,8 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
   const char lBuffer[9][256] =
     {":omega 0.0",
      ":stepheight 0.07",
-     ":singlesupporttime 0.7",
-     ":doublesupporttime 0.1",
+     ":singlesupporttime 0.78",
+     ":doublesupporttime 0.02",
      ":armparameters 0.5",
      ":LimitsFeasibility 0.0",
      ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
