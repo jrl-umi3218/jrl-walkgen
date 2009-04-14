@@ -532,6 +532,9 @@ namespace PatternGeneratorJRL
     lMStartingCOMPosition(0,0)= lStartingCOMPosition.x[0];
     lMStartingCOMPosition(1,0)= lStartingCOMPosition.y[0];
     lMStartingCOMPosition(2,0)= lStartingCOMPosition.z[0];
+
+    m_InitialPoseCoMHeight = lMStartingCOMPosition(2,0);
+
     for(unsigned int i=0;i<3;i++)
       {
 	for(unsigned int j=1;j<3;j++)
@@ -573,7 +576,7 @@ namespace PatternGeneratorJRL
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]);
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]);
-	aCOMPos.z[0] = m_ComHeight;
+	aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	aCOMPos.z[1] = 0.0;
 	aCOMPos.z[2] = 0.0;
 	COMPositions.push_back(aCOMPos);
@@ -618,6 +621,7 @@ namespace PatternGeneratorJRL
     lMStartingCOMPosition(0,0)= lStartingCOMPosition.x[0];
     lMStartingCOMPosition(1,0)= lStartingCOMPosition.y[0];
     lMStartingCOMPosition(2,0)= lStartingCOMPosition.z[0];
+
     for(unsigned int i=0;i<3;i++)
       {
 	for(unsigned int j=1;j<3;j++)
@@ -730,6 +734,7 @@ namespace PatternGeneratorJRL
 	    memset(&aCOMPos,0,sizeof(aCOMPos));
 	    m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,aCOMPos.x[0],lIndexInterval);
 	    m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,aCOMPos.y[0],lIndexInterval);
+	    aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	    FinalCOMPositions.push_back(aCOMPos);
 	    /*! Feed the FootPositions. */
     

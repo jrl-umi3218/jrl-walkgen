@@ -568,6 +568,9 @@ namespace PatternGeneratorJRL
       /*! Boolean value to check if there is a new step
 	in the stack. */
       bool m_NewStepInTheStackOfAbsolutePosition;
+
+      /*! Height of the initial CoM position. */
+      double m_InitialPoseCoMHeight;
     
     public:
       /*! \name Methods related to the Preview Control object used

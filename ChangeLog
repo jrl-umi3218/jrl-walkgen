@@ -1,3 +1,33 @@
+2009-04-14  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src] Adding CoM height of the initial pose.
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/
+	AnalyticalMorisawaCompact.h: Added m_InitialPoseCoMHeight attribute.
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: 
+	Now the Com Height of the initial pose is used as the height
+	reference for the CoM controller.
+
+2009-04-14  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[unitTesting] Proper profil by default (StraightWalking).
+	* unitTesting/TestFootPrintPGInterface.cpp:
+	Test unitaire by default on StraightWalking.
+
+2009-04-14  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src] Adding AngularMomentum file generation.
+	* src/PatternGeneratorInterface.cpp: 
+	DebugControlLoop has now AngularMomentum debugging facilities.
+
+2009-04-14  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[include] Fix a bad return type for ComHeight (float instead of double).
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h: Fixed a pb regarding type returned by ComHeight().	
+
+2009-04-14  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src/ZMPRefTrajectoryGeneration] Shifted the ZMP filtering.
+
 walkGenJrl 2.5.3 released March 31, 2009
 
 	39. Update file src/data/HRP2Specificities.xml.
