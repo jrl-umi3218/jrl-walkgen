@@ -1015,26 +1015,26 @@ void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
 					deque<ZMPPosition> &FinalZMPPositions,
 					bool InitStep)
 {
-
+  unsigned int lshift=2;
   // Filter out the ZMP values.
   ODEBUG("FinalZMPPositions.size()="<<FinalZMPPositions.size());
   for(unsigned int i=0;i<ZMPPositions.size();i++)
     {
       double ltmp[3]={0,0,0};
 
-      int o= FinalZMPPositions.size()-1;
+      int o= FinalZMPPositions.size()-1-lshift;
       for(unsigned int j=0;j<m_ZMPFilterWindow.size();j++)
 	{
 	  int r;
-	  r=i-j;
+	  r=i-j+lshift;
 	  if (r<0)
 	    {
 	      
 	      if (InitStep)
 		{
-		  ltmp[0] += m_ZMPFilterWindow[j]*ZMPPositions[0].px;
-		  ltmp[1] += m_ZMPFilterWindow[j]*ZMPPositions[0].py;
-		  ltmp[2] += m_ZMPFilterWindow[j]*ZMPPositions[0].pz;
+		  ltmp[0] += m_ZMPFilterWindow[j]*ZMPPositions[lshift].px;
+		  ltmp[1] += m_ZMPFilterWindow[j]*ZMPPositions[lshift].py;
+		  ltmp[2] += m_ZMPFilterWindow[j]*ZMPPositions[lshift].pz;
 		}
 	      else
 		{
