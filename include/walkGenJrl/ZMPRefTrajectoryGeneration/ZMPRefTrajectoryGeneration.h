@@ -120,7 +120,7 @@ namespace PatternGeneratorJRL
       { return m_Omega;};
 
     /* ! \brief Returns the Com Height. */
-    inline const float & GetComHeight() const
+    inline const double & GetComHeight() const
     { return m_ComHeight; };
     
     /* ! \brief Returns the Com Height. */
