@@ -91,6 +91,7 @@ namespace PatternGeneratorJRL {
     RESETDEBUG4("DebugDataIKArms.txt");
     RESETDEBUG4("DebugDataOnLine.txt");
     RESETDEBUG4("DebugDataWaistYaw.dat");
+    RESETDEBUG5("DebugDataAngularMomentum.dat");
 
     RESETDEBUG4("UpperBodyAngles.txt");
     RESETDEBUG4("DebugZMPFinale.txt");
@@ -1602,6 +1603,11 @@ namespace PatternGeneratorJRL {
     MAL_S3_VECTOR( _2DMBCoM,double);
     _2DMBCoM= m_2HumanoidDynamicRobot->getPositionCoM();
 
+    vector3d lAngularMomentum;
+    lAngularMomentum = m_2HumanoidDynamicRobot->angularMomentumWrtCoM();
+    ODEBUG5(m_count << " " << lAngularMomentum(0)
+	    << " " << lAngularMomentum(1)
+	    << " " << lAngularMomentum(2), "DebugDataAngularMomentum.dat");
 
     ofstream DebugFileLong, DebugFileUpperBody;
 
