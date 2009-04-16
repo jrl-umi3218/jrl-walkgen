@@ -1,3 +1,18 @@
+2009-04-17  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src] Adding on-line Change Next Step functionnality for Morisawa's algo.
+	* include/walkGenJrl/PatternGeneratorInterface.h: 
+	Adding ChangeOnLineStep method.
+	* src/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp: 
+	Specify the nature of interval when the interval is already known.
+	* src/FootTrajectoryGeneration/
+	LeftAndRightFootTrajectoryGenerationMultiple.cpp: 
+	Propagate the nature of the interval for the on-line part.
+	* src/PatternGeneratorInterface.cpp: 
+	Adding ChangeOnLineStep method.
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: 
+	Adding DEBUG macros.
+
 2009-04-16  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	[src/FootTrajectoryGeneration] Proper handling of step types.

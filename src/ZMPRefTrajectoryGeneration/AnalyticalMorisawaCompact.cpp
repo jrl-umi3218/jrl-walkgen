@@ -120,7 +120,6 @@ namespace PatternGeneratorJRL
     
     m_NewStepInTheStackOfAbsolutePosition = false;
     
-    
     RESETDEBUG4("Test.dat");
   }
 
@@ -1728,7 +1727,7 @@ namespace PatternGeneratorJRL
     else
       {
 	// For a proper initialization of the analytical trajectories
-	// through constraint change the Fluctuation structure has to be changed
+	// through constraint changes, the Fluctuation structure has to be changed
 	// approriatly.
 	aAZCTX.ComputeCOM(t,aFPX.CoMInit);
 	aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedInit);
@@ -1762,7 +1761,7 @@ namespace PatternGeneratorJRL
 	ODEBUG("ChangeFootLandingPosition: " << m_CurrentTime);
 	m_FeetTrajectoryGenerator->SetDeltaTj(m_DeltaTj);
 	/* Modify the feet trajectory */	
-	ODEBUG("***************** From Change Foot Landing Position ********************");
+	ODEBUG("***************** Begin Change Foot Landing Position ********************");
 	/*
 	m_FeetTrajectoryGenerator->InitializeFromRelativeSteps(m_RelativeFootPositions,
 							       InitAbsLeftFootPos,

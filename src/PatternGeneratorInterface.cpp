@@ -221,7 +221,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterface::RegisterPluginMethods()
   {
-    std::string aMethodName[10] = 
+    std::string aMethodName[11] = 
       {":LimitsFeasibility",
        ":ZMPShiftParameters",
        ":TimeDistributionParameters",
@@ -231,9 +231,10 @@ namespace PatternGeneratorJRL {
        ":StopOnLineStepSequencing",
        ":readfilefromkw",
        ":SetAlgoForZmpTrajectory",
-       ":SetAutoFirstStep"};
+       ":SetAutoFirstStep",
+       ":ChangeNextStep"};
     
-    for(int i=0;i<10;i++)
+    for(int i=0;i<11;i++)
       {
 	if (!SimplePlugin::RegisterMethod(aMethodName[i]))
 	  {
@@ -1083,13 +1084,30 @@ namespace PatternGeneratorJRL {
       }
     return 0;
   }
+  void PatternGeneratorInterface::ChangeOnLineStep(istringstream &strm)
+  {
+    if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+      {
+	FootAbsolutePosition aFAP;
+	double ltime = (double)m_ZMPM->GetTSingleSupport();
+	strm >> aFAP.x;
+	strm >> aFAP.y;
+	strm >> aFAP.theta;
+	ChangeOnLineStep(ltime,aFAP);
+      }
+  }
+					     
   void PatternGeneratorInterface::CallMethod(string &aCmd,
 					     istringstream &strm)
   {
 
     ODEBUG("PGI:ParseCmd: Commande: " << aCmd);
 
-    if (aCmd==":LimitsFeasibility")
+    if (aCmd==":ChangeNextStep")
+      {
+	ChangeOnLineStep(strm);
+      }
+    else if (aCmd==":LimitsFeasibility")
       m_SetLimitsFeasibility(strm);
 
     else if (aCmd==":ZMPShiftParameters")
@@ -1126,6 +1144,7 @@ namespace PatternGeneratorJRL {
 	  m_AutoFirstStep=false;
 	ODEBUG("SetAutoFirstStep: " << m_AutoFirstStep);
       }
+
   }
 
   void PatternGeneratorInterface::m_SetAlgoForZMPTraj(istringstream &strm)
@@ -2107,7 +2126,7 @@ namespace PatternGeneratorJRL {
     if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
       {
 	m_ZMPM->SetCurrentTime(m_InternalClock);
-	m_ZMPM->OnLineFootChange(time,
+	m_ZMPM->OnLineFootChange(m_InternalClock+time,
 				 aFootAbsolutePosition,
 				 m_ZMPPositions,
 				 m_COMBuffer,

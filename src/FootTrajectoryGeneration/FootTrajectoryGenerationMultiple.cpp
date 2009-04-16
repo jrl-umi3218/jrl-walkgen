@@ -141,6 +141,7 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
   double deltaj = t - m_AbsoluteTimeReference - m_RefTime[IndexInterval];
   ODEBUG("IndexInterval : " << IndexInterval );
   m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAll(aFootAbsolutePosition,deltaj);
+  aFootAbsolutePosition.stepType = m_NatureOfIntervals[IndexInterval];
   return true;
 }
 

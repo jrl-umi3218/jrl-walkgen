@@ -285,6 +285,13 @@ namespace PatternGeneratorJRL
     int ChangeOnLineStep(double Time, 
 			 FootAbsolutePosition &aFootAbsolutePosition);
 
+    /*! \brief Change online step.
+      See the above method for the specifications.
+      This method uses a different format with stream of strings.
+      @param[in] Time: Time information of the step. 
+      @return nothing */
+    void ChangeOnLineStep(istringstream &strm);
+
     /*! @} */
 
     /*! \name For SLAM

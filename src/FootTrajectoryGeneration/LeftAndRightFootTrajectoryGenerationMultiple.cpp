@@ -122,7 +122,6 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 	  << FootFinalPosition.x << "," << FootInitialPosition.x << "," << FootInitialPosition.dx << ")("
 	  << FootFinalPosition.y << "," << FootInitialPosition.y << "," << FootInitialPosition.dy << ")("
 	  << FootFinalPosition.z << "," << FootInitialPosition.z << "," << FootInitialPosition.dz << ")");
-
   aFTGM->SetNatureInterval(IntervalIndex,FootFinalPosition.stepType);
 
   // Init the first interval. 
@@ -293,13 +292,21 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  /*! At this stage the phase of double support is deal with */
 	  ODEBUG("Double support phase");
 	  LeftFootTmpInitPos.z = 0;
+	  LeftFootTmpInitPos.stepType=11;
+
 	  SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
 			LeftFootTmpInitPos,
 			LeftFootTmpInitPos);
+
 	  RightFootTmpInitPos.z = 0;
+	  RightFootTmpInitPos.stepType=9;
 	  SetAnInterval(IntervalIndex,m_RightFootTrajectory,
 			RightFootTmpInitPos,
 			RightFootTmpInitPos);
+	  ODEBUG("LeftFootTmpInitPos.stepType="<<LeftFootTmpInitPos.stepType);
+	  ODEBUG("RightFootTmpInitPos.stepType="<<RightFootTmpInitPos.stepType);
+	  ODEBUG("End of Double support phase");
+
 	  IntervalIndex++;
 
 	  
@@ -416,14 +423,14 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  LeftFootTmpFinalPos.dx = LeftFootTmpInitPos.dx = 0.0;
 	  LeftFootTmpFinalPos.dy = LeftFootTmpInitPos.dy =0.0;
 	  LeftFootTmpFinalPos.dz = LeftFootTmpInitPos.dz =0.0;
-	  LeftFootTmpFinalPos.stepType = 10;
+	  LeftFootTmpFinalPos.stepType = 11;
 
 	  RightFootTmpFinalPos = RightFootTmpInitPos;
 	  RightFootTmpFinalPos.z = 0.0;
 	  RightFootTmpFinalPos.dx = RightFootTmpInitPos.dx = 0.0;
 	  RightFootTmpFinalPos.dy = RightFootTmpInitPos.dy =0.0;
 	  RightFootTmpFinalPos.dz = RightFootTmpInitPos.dz =0.0;
-	  RightFootTmpFinalPos.stepType = 10;
+	  RightFootTmpFinalPos.stepType = 9;
 	  
 	}
       
@@ -431,6 +438,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	{
 	  /* Initialize properly the interval in single support phase */
 	  ODEBUG("Single support phase");
+	  ODEBUG("LeftFootTmpInitPos.stepType="<<LeftFootTmpInitPos.stepType);
+	  ODEBUG("LeftFootTmpFinalPos.stepType="<<LeftFootTmpFinalPos.stepType);
 	  SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
 			LeftFootTmpInitPos,
 			LeftFootTmpFinalPos);
@@ -448,7 +457,10 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 		 << LeftFootTmpFinalPos.dx << " , " 
 		 << LeftFootTmpFinalPos.dy << " , " 
 		 << LeftFootTmpFinalPos.dz << " ) " );
-	  
+
+	  ODEBUG("RightFootTmpInitPos.stepType="<<RightFootTmpInitPos.stepType);
+	  ODEBUG("RightFootTmpFinalPos.stepType="<<RightFootTmpFinalPos.stepType);
+	  ODEBUG("End of Single support phase");
 	  SetAnInterval(IntervalIndex,m_RightFootTrajectory,
 			RightFootTmpInitPos,
 			RightFootTmpFinalPos);
@@ -529,6 +541,8 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
       ODEBUG("Detect support foot on the left.");
       aSupportFootAbsolutePosition = LeftFootInitialPosition;      
     }  
+  aSupportFootAbsolutePosition.stepType=-1;
+  
   ComputeAbsoluteStepsFromRelativeSteps(RelativeFootPositions,
 					aSupportFootAbsolutePosition,
 					SupportFootAbsoluteFootPositions);
@@ -642,6 +656,7 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
       SupportFootAbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
       SupportFootAbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
       SupportFootAbsoluteFootPositions[i].theta = CurrentAbsTheta;
+      SupportFootAbsoluteFootPositions[i].stepType = -1;
 
     }
 }
