@@ -82,6 +82,7 @@ void FootTrajectoryGenerationMultiple::SetNumberOfIntervals(int lNumberOfInterva
       m_SetOfFootTrajectoryGenerationObjects[i] = new FootTrajectoryGenerationStandard(getSimplePluginManager(),m_HS);
       m_SetOfFootTrajectoryGenerationObjects[i]->InitializeInternalDataStructures();
     }  
+  m_NatureOfIntervals.resize(lNumberOfIntervals);
 }
   
 int FootTrajectoryGenerationMultiple::GetNumberOfIntervals()
@@ -160,6 +161,7 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
 	  if (m_SetOfFootTrajectoryGenerationObjects[j]!=0)
 	    {	      
 	      m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAll(aFootAbsolutePosition,deltaj);
+	      aFootAbsolutePosition.stepType = m_NatureOfIntervals[j];
 	    }
 	  ODEBUG("X: " << aFootAbsolutePosition.x << 
 		  " Y: " << aFootAbsolutePosition.y << 
@@ -173,6 +175,29 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
     }
   return false;
 }
+
+/*! This method specifies the nature of the interval. 
+*/
+int FootTrajectoryGenerationMultiple::SetNatureInterval(unsigned int IntervalIndex,
+							int Nature)
+{
+  if ((IntervalIndex<0) || (IntervalIndex>=m_NatureOfIntervals.size()))
+    return -1;
+  m_NatureOfIntervals[IntervalIndex] = Nature;
+  return 0;
+  
+}
+
+/*! This method returns the nature of the interval. 
+*/
+int FootTrajectoryGenerationMultiple::GetNatureInterval(unsigned int IntervalIndex)
+{
+  if ((IntervalIndex<0) || (IntervalIndex>=m_NatureOfIntervals.size()))
+    return -100;
+  
+  return  m_NatureOfIntervals[IntervalIndex];
+}
+
 
 /*! This method specifies the parameters for each of the polynome used by this
   object. In this case, as it is used for the 3rd order polynome. The polynome to

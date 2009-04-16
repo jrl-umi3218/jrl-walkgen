@@ -123,6 +123,8 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 	  << FootFinalPosition.y << "," << FootInitialPosition.y << "," << FootInitialPosition.dy << ")("
 	  << FootFinalPosition.z << "," << FootInitialPosition.z << "," << FootInitialPosition.dz << ")");
 
+  aFTGM->SetNatureInterval(IntervalIndex,FootFinalPosition.stepType);
+
   // Init the first interval. 
   // X axis.
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
@@ -380,9 +382,11 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	      RightFootTmpFinalPos.dz = 0.0;
 	      RightFootTmpFinalPos.dtheta = 0.0;
 	      RightFootTmpFinalPos.domega = 0.0;
+	      RightFootTmpFinalPos.stepType = 1;
 	      
 	      LeftFootTmpFinalPos = LeftFootTmpInitPos;
 	      LeftFootTmpFinalPos.z = 0.0;
+	      LeftFootTmpFinalPos.stepType = -1;
 	    }
 	  else
 	    {
@@ -397,9 +401,11 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	      LeftFootTmpFinalPos.dz = 0.0;
 	      LeftFootTmpFinalPos.dtheta = 0.0;
 	      LeftFootTmpFinalPos.domega = 0.0;
+	      LeftFootTmpFinalPos.stepType = 1;
 
 	      RightFootTmpFinalPos = RightFootTmpInitPos;
 	      RightFootTmpFinalPos.z = 0.0;
+	      RightFootTmpFinalPos.stepType = -1;
 	      
 	    }
 	}
@@ -410,13 +416,14 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  LeftFootTmpFinalPos.dx = LeftFootTmpInitPos.dx = 0.0;
 	  LeftFootTmpFinalPos.dy = LeftFootTmpInitPos.dy =0.0;
 	  LeftFootTmpFinalPos.dz = LeftFootTmpInitPos.dz =0.0;
-	      
+	  LeftFootTmpFinalPos.stepType = 10;
 
 	  RightFootTmpFinalPos = RightFootTmpInitPos;
 	  RightFootTmpFinalPos.z = 0.0;
 	  RightFootTmpFinalPos.dx = RightFootTmpInitPos.dx = 0.0;
 	  RightFootTmpFinalPos.dy = RightFootTmpInitPos.dy =0.0;
 	  RightFootTmpFinalPos.dz = RightFootTmpInitPos.dz =0.0;
+	  RightFootTmpFinalPos.stepType = 10;
 	  
 	}
       

@@ -457,7 +457,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y += dFY ;
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z += dFZ ;
 #endif
-  
+ 
   ODEBUG4( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift 
 	   << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )" 
 	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x << " "

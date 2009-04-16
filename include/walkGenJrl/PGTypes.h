@@ -95,7 +95,7 @@ namespace PatternGeneratorJRL
     /*! 1:normal walking 2:one step before opbstacle
       3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
       +10 if double support phase
-      (-1) if stance foot else swing foot or double support  */
+      (-1) if support foot  */
     int stepType;     
   };
   typedef struct FootAbsolutePosition_t FootAbsolutePosition;

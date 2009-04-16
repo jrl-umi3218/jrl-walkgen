@@ -1,3 +1,17 @@
+2009-04-16  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src/FootTrajectoryGeneration] Proper handling of step types.
+	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.h:
+	Adding setter and getter for handling nature of intervals .
+	* include/walkGenJrl/PGTypes.h: 
+	Fixed some wrong documention.
+	* src/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp: 
+	Specifying the nature of intervals for one foot.
+	* src/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp: 
+	Storing the nature of intervals.
+	* src/FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp: 
+	High level handling of the nature of intervals.
+
 2009-04-14  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	[src] Adding CoM height of the initial pose.

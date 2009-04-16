@@ -105,6 +105,12 @@ namespace PatternGeneratorJRL
     
     /*! \brief Get the time for each interval */
     void GetTimeIntervals(std::vector<double>  & lDeltaTj);
+
+    /*! \brief Set nature of interval */
+    int SetNatureInterval(unsigned int IntervalIndex, int Nature);
+
+    /*! \brief Get nature of interval */
+    int GetNatureInterval(unsigned int IntervalIndex);
     
     /*! @} */
     
@@ -173,7 +179,7 @@ namespace PatternGeneratorJRL
     std::vector<double> m_DeltaTj;
 
     /*! \brief Nature of the interval. */
-    std::vector<int> m_NatureOfTheIntervals;
+    std::vector<int> m_NatureOfIntervals;
 
     /*! \brief Reference time for the polynomials. */
     std::vector<double> m_RefTime;
