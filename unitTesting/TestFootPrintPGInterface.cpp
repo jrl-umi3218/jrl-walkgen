@@ -615,9 +615,14 @@ void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI)
   }
 
   {
+    istringstream strm2(":onlinechangestepframe relative");
+    aPGI.ParseCmd(strm2);
+  }
+
+  {
     istringstream strm2(":StartOnLineStepSequencing 0.0 -0.105 0.0 \
-                     0.2 0.21 0.0 \
-                     0.2 -0.21 0.0");
+                     0.0 0.19 0.0 \
+                     0.0 -0.19 0.0");
     aPGI.ParseCmd(strm2);
   }
 }
@@ -683,7 +688,8 @@ void SteppingOver(PatternGeneratorInterface &aPGI)
 
 int main(int argc, char *argv[])
 {
-  unsigned int TestProfile=PROFIL_STRAIGHT_WALKING;
+  //  unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
+  unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
   string PCParametersFile;
   string VRMLPath;
   string VRMLFileName;
@@ -725,8 +731,8 @@ int main(int argc, char *argv[])
 	  
 	  if (argc==2)
 	    {
-	      TestProfile=atoi(argv[1]);
-	      cout << "Profil: " << ProfilesNames[TestProfile] << endl;
+	      TestProfil=atoi(argv[1]);
+	      cout << "Profil: " << ProfilesNames[TestProfil] << endl;
 	    }
 	      
 	}
@@ -898,7 +904,8 @@ int main(int argc, char *argv[])
   FootAbsolutePosition RightFootPosition;
 
   bool DebugConfiguration = true;
-  bool DebugFGPI = false;
+  bool DebugFGPI = true;
+  unsigned int PGIInterface = 0;
 
   ofstream aofq;
   if (DebugConfiguration)
@@ -909,6 +916,26 @@ int main(int argc, char *argv[])
   ofstream aof;
   if (DebugFGPI)
     {
+      aof.open("TestFPGI_description.dat",ofstream::out);
+      aof << "1. Time" << std::endl
+	  << "2. Com X" << std::endl
+	  << "3. Com Y" << std::endl
+	  << "4. Com Z" << std::endl
+	  << "5. ZMP X (waist ref.)" << std::endl
+	  << "6. ZMP Y (waist ref.)" << std::endl
+	  << "7. Left Foot X" << std::endl
+	  << "8. Left Foot Y" << std::endl
+	  << "9. Left Foot Z" << std::endl
+	  << "10. Right Foot X" << std::endl
+	  << "11. Right Foot Y" << std::endl
+	  << "12. Right Foot Z" << std::endl
+	  << "13. ZMP X (world ref.)" << std::endl
+	  << "14. ZMP Y (world ref.)" << std::endl
+	  << "15. Waist X (world ref.)" << std::endl
+	  << "16. Waist Y (world ref.)" << std::endl;
+	
+	
+      aof.close();
       aof.open("TestFGPI.dat",ofstream::out);
     }
 
@@ -921,7 +948,7 @@ int main(int argc, char *argv[])
       //StrangeStartingPosition(*aPGI);
       
       gettimeofday(&begin,0);
-      switch (TestProfile) 
+      switch (TestProfil) 
 	{
 
 	case PROFIL_PB_FLORENT:
@@ -1012,20 +1039,25 @@ int main(int argc, char *argv[])
 	{
 
 	  gettimeofday(&begin,0);
-#if 1
-	  ok = aPGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
-						CurrentVelocity,
-						CurrentAcceleration,
-						ZMPTarget,
-						finalCOMPosition,
-						LeftFootPosition,
-						RightFootPosition);
-#else
-	  ok = aPGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
-						CurrentVelocity,
-						CurrentAcceleration,
-						ZMPTarget);
-#endif
+	  
+	  if (PGIInterface==0)
+	    {
+	      ok = aPGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
+						    CurrentVelocity,
+						    CurrentAcceleration,
+						    ZMPTarget,
+						    finalCOMPosition,
+						    LeftFootPosition,
+						    RightFootPosition);
+	    }
+	  else if (PGIInterface==1)
+	    {
+	      ok = aPGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
+						    CurrentVelocity,
+						    CurrentAcceleration,
+						    ZMPTarget);
+	    }
+
 	  gettimeofday(&end,0);
 	  double ltime = end.tv_sec-begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
 	  if (maxtime<ltime)
@@ -1046,28 +1078,34 @@ int main(int argc, char *argv[])
 	  PreviousVelocity = CurrentVelocity;
 	  PreviousAcceleration = CurrentAcceleration;
 	  
-#if 0	  
-	  if ((NbOfIt>5*200) && 
-	      TestChangeFoot)
+	  if (TestProfil==PROFIL_ANALYTICAL_ONLINE_WALKING)
 	    {
-	      struct timeval beginmodif,endmodif;
-	      FootAbsolutePosition aFAP;
-	      aFAP.x=0.2;
-	      aFAP.y=0.0;
-	      gettimeofday(&beginmodif,0);
-	      //aPGI->ChangeOnLineStep(15.5,aFAP);
-	      istringstream strm2(":parsecmd :addstandardonlinestep 0.2 0.0 0.0");
-	      aPGI->ParseCmd(strm2);
-	      gettimeofday(&endmodif,0);
-	      timemodif = endmodif.tv_sec-beginmodif.tv_sec + 0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
-	      TestChangeFoot=false;
+	      //if ((NbOfIt>(8.82*200)) && 
+	      if ((NbOfIt>(9.64*200)) && 
+		  TestChangeFoot)
+		{
+		  struct timeval beginmodif,endmodif;
+		  FootAbsolutePosition aFAP;
+		  //aFAP.x=0.2;
+		  //aFAP.y=-0.09;
+		  aFAP.x=0.2;
+		  aFAP.y=0.0;
+		  gettimeofday(&beginmodif,0);
+		  std::cout << "Start On line modification " << std::endl;
+		  aPGI->ChangeOnLineStep(0.8,aFAP);
+		  std::cout << "end of On line modification " << std::endl;
+		  //istringstream strm2(":parsecmd :addstandardonlinestep 0.2 0.0 0.0");
+		  //aPGI->ParseCmd(strm2);
+		  gettimeofday(&endmodif,0);
+		  timemodif = endmodif.tv_sec-beginmodif.tv_sec + 0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
+		  TestChangeFoot=false;
+		}
+	      
+	      if (NbOfIt>20*200) /* Stop after 30 seconds the on-line stepping */
+		{
+		  StopOnLineWalking(*aPGI);
+		}
 	    }
-
-	  if (NbOfIt>10*200) /* Stop after 30 seconds the on-line stepping */
-	    {
-	      StopOnLineWalking(*aPGI);
-	    }
-#endif
 
 	  if (DebugFGPI)
 	    {
