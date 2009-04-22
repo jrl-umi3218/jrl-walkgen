@@ -99,6 +99,22 @@ void Polynome4::SetParameters(double FT, double MP)
   m_Coefficients[4] = 16.0*MP/tmp;
 }
 
+void Polynome4::SetParametersWithInitPosInitSpeed(double FT,
+						  double MP,
+						  double InitPos,
+						  double InitSpeed)
+{
+  double tmp;
+  m_Coefficients[0] = InitPos;
+  m_Coefficients[1] = InitSpeed;
+  tmp = FT*FT;
+  m_Coefficients[2] = (-4.0*InitSpeed*FT - 11.0*InitPos + 16.0*MP)/tmp;
+  tmp=tmp*FT;
+  m_Coefficients[3] = ( 5.0*InitSpeed*FT + 18.0*InitPos - 32.0*MP)/tmp;
+  tmp=tmp*FT;
+  m_Coefficients[4] = (-2.0*InitSpeed*FT - 8.0 *InitPos + 16.0*MP)/tmp;
+}
+
 Polynome4::~Polynome4()
 {}
 Polynome5::Polynome5(double FT, double FP) :Polynome(5)

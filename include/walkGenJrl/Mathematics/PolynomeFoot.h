@@ -97,6 +97,16 @@ namespace PatternGeneratorJRL
       /// Set the parameters
       void SetParameters(double FT, double MP);
 
+      /*! Set the parameters such that
+	the initial position, and initial speed
+	are different from zero.
+       */
+      void SetParametersWithInitPosInitSpeed(double FT,
+					     double MP,
+					     double InitPos,
+					     double InitSpeed);
+
+
       /// Destructor.
       ~Polynome4();
     };

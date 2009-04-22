@@ -211,7 +211,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
      break;
 
    case Z_AXIS:
-     m_PolynomeZ->SetParameters(TimeInterval,FinalPosition);
+     m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
      break;
 
    case THETA_AXIS:

@@ -1,3 +1,39 @@
+2009-04-23  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src/FootTrajectoryGeneration] Fix a pb for foot generation along Z.
+	* ChangeLog: .
+	* include/walkGenJrl/Mathematics/PolynomeFoot.h: 
+	Adding a proper InitPos InitSpeed initialization.
+	* src/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp: 
+	Calling the proper InitPos InitSpeed initialization for Z.
+	* src/Mathematics/PolynomeFoot.cpp: 
+	Adding a proper InitPos InitSpeed initialization for Z.
+
+2009-04-23  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[unitTesting] Better handling of profile.
+	* ./unitTesting/TestFootPrintPGInterface.cpp:
+	Adding online relative test, plus automatic
+	on-line foot modification, plus generating description
+	profile for TestFPGI.dat.
+
+2009-04-23  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src] Adding debugging info in the stack of steps.
+	* ./src/StepStackHandler: debug info.
+
+2009-04-23  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src/ZMPRefTrajectoryGeneration] Adding relative on-line modification.
+	*  ./src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp:
+	Adding relative foot position on-line modification.
+	This modify the full preview window future. 
+	Adding a plugin functionnality to switch between
+	the previous mode and the new one.
+	* ./include/walkGenJrl/ZMPRefTrajectoryGeneration/
+	AnalyticalMorisawaCompact.h:
+	Related modification of the header.
+
 2009-04-17  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	[src] Adding on-line Change Next Step functionnality for Morisawa's algo.
