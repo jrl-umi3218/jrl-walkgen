@@ -103,6 +103,12 @@ namespace PatternGeneratorJRL
       const static int ERROR_WRONG_FOOT_TYPE = -1;
       const static int ERROR_TOO_LATE_FOR_MODIFICATION = -2;
       /*! @} */
+
+      /*! \name Constants to handle reference frame when changing the feet on-line
+	 @{ */
+      const static unsigned int ABSOLUTE_FRAME = 0;
+      const static unsigned int RELATIVE_FRAME = 1;
+      /*! @} */
       /*! Constructor */
       AnalyticalMorisawaCompact(SimplePluginManager * lSPM);
       
@@ -343,8 +349,8 @@ namespace PatternGeneratorJRL
 
       */
       int ChangeFootLandingPosition(double t,
-				    unsigned int IndexStep,
-				    FootAbsolutePosition & NewFootAbsPos,
+				    vector<unsigned int> & IndexStep,
+				    vector<FootAbsolutePosition> & NewFootAbsPos,
 				    AnalyticalZMPCOGTrajectory &aAZCTX,
 				    CompactTrajectoryInstanceParameters &aCTIPX,
 				    AnalyticalZMPCOGTrajectory &aAZCTY,
@@ -366,9 +372,9 @@ namespace PatternGeneratorJRL
 
       */
       int ChangeFootLandingPosition(double t,
-				    unsigned int IndexStep,
- 				    FootAbsolutePosition & NewFootAbsPos);
-
+				    vector<unsigned int> & IndexStep,
+ 				    vector<FootAbsolutePosition> & NewFootAbsPos);
+      
       
       /*! @} */
       
@@ -397,6 +403,16 @@ namespace PatternGeneratorJRL
       
       /*! @} */
       
+      /*! Simple plugin interfaces 
+	@{
+       */
+      /*! Register methods. */
+      void RegisterMethods();
+
+      /*! Call methods according to the arguments. */
+      void CallMethod(std::string & Method, std::istringstream &strm);
+      
+      /*! @} */
     protected:
       
 	      
@@ -501,8 +517,8 @@ namespace PatternGeneratorJRL
 	\param aCTIPX : The trajectory parameters along the X axis.
 	\param aCTIPY : The trajectory parameters along the Y axis.
       */
-      void ChangeZMPProfil(unsigned int IndexStep,
-			   FootAbsolutePosition &aNewFootAbsPos,
+      void ChangeZMPProfil(vector<unsigned int> & IndexStep,
+			   vector<FootAbsolutePosition> &aNewFootAbsPos,
 			   CompactTrajectoryInstanceParameters &aCTIPX,
 			   CompactTrajectoryInstanceParameters &aCTIPY);
       /*! @} */
@@ -572,6 +588,9 @@ namespace PatternGeneratorJRL
       /*! Height of the initial CoM position. */
       double m_InitialPoseCoMHeight;
     
+      /*! On-line change step mode */
+      unsigned int m_OnLineChangeStepMode;
+
     public:
       /*! \name Methods related to the Preview Control object used
 	by this class. @{ */
