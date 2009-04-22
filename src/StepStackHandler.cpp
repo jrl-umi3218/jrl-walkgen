@@ -759,6 +759,7 @@ void StepStackHandler::AddStandardOnLineStep(bool NewStep,
 					     double NewTheta)
 {
   RelativeFootPosition aFootPosition;
+  ODEBUG("m_OnLineSteps: "<<m_OnLineSteps);
   if (!m_OnLineSteps)
     return;
   
@@ -787,7 +788,9 @@ void StepStackHandler::AddStandardOnLineStep(bool NewStep,
 	   << aFootPosition.theta << endl;
     }      
 
+  ODEBUG("m_RelativeFootPositions:" << m_RelativeFootPositions.size());
   m_RelativeFootPositions.push_back(aFootPosition);
+  ODEBUG("m_RelativeFootPositions:" << m_RelativeFootPositions.size());
   
   m_KeepLastCorrectSupportFoot= - m_KeepLastCorrectSupportFoot;
   
