@@ -1084,7 +1084,7 @@ namespace PatternGeneratorJRL {
       }
     return 0;
   }
-  void PatternGeneratorInterface::ChangeOnLineStep(istringstream &strm)
+  void PatternGeneratorInterface::ChangeOnLineStep(istringstream &strm,double &newtime)
   {
     if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
       {
@@ -1093,7 +1093,7 @@ namespace PatternGeneratorJRL {
 	strm >> aFAP.x;
 	strm >> aFAP.y;
 	strm >> aFAP.theta;
-	ChangeOnLineStep(ltime,aFAP);
+	ChangeOnLineStep(ltime,aFAP,newtime);
       }
   }
 					     
@@ -1105,7 +1105,8 @@ namespace PatternGeneratorJRL {
 
     if (aCmd==":ChangeNextStep")
       {
-	ChangeOnLineStep(strm);
+	double nt;
+	ChangeOnLineStep(strm,nt);
       }
     else if (aCmd==":LimitsFeasibility")
       m_SetLimitsFeasibility(strm);
@@ -1151,7 +1152,7 @@ namespace PatternGeneratorJRL {
   {
     string ZMPTrajAlgo;
     strm >> ZMPTrajAlgo;
-    cout << "ZMPTrajAlgo: " << ZMPTrajAlgo<<endl;
+    ODEBUG("ZMPTrajAlgo: " << ZMPTrajAlgo);
     if (ZMPTrajAlgo=="PBW")
       {
 	m_AlgorithmforZMPCOM = ZMPCOM_WIEBER_2006;
@@ -2120,7 +2121,8 @@ namespace PatternGeneratorJRL {
 
 
   int PatternGeneratorInterface::ChangeOnLineStep(double time,
-						  FootAbsolutePosition & aFootAbsolutePosition)
+						  FootAbsolutePosition & aFootAbsolutePosition,
+						  double &newtime)
   {
     /* Compute the index of the interval which will be modified. */
     if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
@@ -2133,6 +2135,9 @@ namespace PatternGeneratorJRL {
 				 m_LeftFootPositions,
 				 m_RightFootPositions,
 				 m_StepStackHandler);
+	vector<double> lDj;
+	m_FeetTrajectoryGenerator->GetDeltaTj(lDj);
+	newtime = lDj[0];
 	return 0;
       }
     return -1;

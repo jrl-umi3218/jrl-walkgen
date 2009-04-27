@@ -283,14 +283,15 @@ namespace PatternGeneratorJRL
       to an error, 0 otherwise.
      */
     int ChangeOnLineStep(double Time, 
-			 FootAbsolutePosition &aFootAbsolutePosition);
+			 FootAbsolutePosition &aFootAbsolutePosition,
+			 double &newtime);
 
     /*! \brief Change online step.
       See the above method for the specifications.
       This method uses a different format with stream of strings.
       @param[in] Time: Time information of the step. 
       @return nothing */
-    void ChangeOnLineStep(istringstream &strm);
+    void ChangeOnLineStep(istringstream &strm,double &newtime);
 
     /*! @} */
 
@@ -639,6 +640,9 @@ namespace PatternGeneratorJRL
 
     /*! Variable for delta feasibility limit */
     double m_DeltaFeasibilityLimit;	
+
+    /*! New time for step interval  using Changing On Line Step. */
+    double m_NewNextStepInterval;
     
     /* @} */
 

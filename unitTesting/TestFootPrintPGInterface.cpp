@@ -898,6 +898,9 @@ int main(int argc, char *argv[])
 
 
   bool TestChangeFoot = true;
+  bool TestChangeFoot2 = true;
+
+  unsigned int NbStepsModified = 0;
 
   COMPosition finalCOMPosition;
   FootAbsolutePosition LeftFootPosition;
@@ -942,6 +945,7 @@ int main(int argc, char *argv[])
   double totaltime=0,maxtime=0;
   double timemodif = 0;
   double totaltimeinplanning=0;
+  double newtime=0,deltatime=0;
 
   for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
     {
@@ -1081,27 +1085,32 @@ int main(int argc, char *argv[])
 	  if (TestProfil==PROFIL_ANALYTICAL_ONLINE_WALKING)
 	    {
 	      //if ((NbOfIt>(8.82*200)) && 
-	      if ((NbOfIt>(9.64*200)) && 
+	      double triggertime = 9.64*200 + deltatime*200;
+	      if ((NbOfIt>triggertime) && 
 		  TestChangeFoot)
 		{
 		  struct timeval beginmodif,endmodif;
-		  FootAbsolutePosition aFAP;
+		  PatternGeneratorJRL::FootAbsolutePosition aFAP;
 		  //aFAP.x=0.2;
 		  //aFAP.y=-0.09;
 		  aFAP.x=0.2;
 		  aFAP.y=0.0;
 		  gettimeofday(&beginmodif,0);
-		  std::cout << "Start On line modification " << std::endl;
-		  aPGI->ChangeOnLineStep(0.8,aFAP);
-		  std::cout << "end of On line modification " << std::endl;
+		  aPGI->ChangeOnLineStep(0.805,aFAP,newtime);
+		  deltatime += newtime+0.025;
+		  std::cout << "trigger time: "<< triggertime/200.0 << std::endl;
+		  std::cout << "delta time: " << deltatime << " newtime: " << newtime << std::endl;
 		  //istringstream strm2(":parsecmd :addstandardonlinestep 0.2 0.0 0.0");
 		  //aPGI->ParseCmd(strm2);
 		  gettimeofday(&endmodif,0);
 		  timemodif = endmodif.tv_sec-beginmodif.tv_sec + 0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
-		  TestChangeFoot=false;
+		  TestChangeFoot=true;
+		  NbStepsModified++;
+		  if (NbStepsModified==10)
+		    TestChangeFoot=false;
 		}
 	      
-	      if (NbOfIt>20*200) /* Stop after 30 seconds the on-line stepping */
+	      if (NbOfIt>30*200) /* Stop after 30 seconds the on-line stepping */
 		{
 		  StopOnLineWalking(*aPGI);
 		}

@@ -566,7 +566,7 @@ namespace PatternGeneratorJRL
 	return;
       }
 
-    /*! Compute the total size of the array related with the steps. */
+    /*! Compute the total size of the array related to the steps. */
     ODEBUG("m_SampligPeriod: " << m_SamplingPeriod);
     ODEBUG("m_PreviewControlTime: " << m_PreviewControlTime);
 
@@ -1372,7 +1372,8 @@ namespace PatternGeneratorJRL
     if ((NewTj<m_Tsingle*0.5) &&
 	(IndexStep==IndexStartingInterval+1))
       {
-	ODEBUG(" NewTj : " << NewTj << " LT: " << LocalTime << " "<< reftime);
+	ODEBUG(" NewTj : " << NewTj << " LT: " << LocalTime << " "<< reftime << " " << m_DeltaTj[IndexStartingInterval]);
+	ODEBUG(" Too Late for modification");
 	return ERROR_TOO_LATE_FOR_MODIFICATION;
       }
 
@@ -1384,6 +1385,7 @@ namespace PatternGeneratorJRL
   {
 
     /* Build the new time interval. */
+    ODEBUG("New time interval 0: "<< NewTime);
     m_DeltaTj[0] = NewTime;
     m_StepTypes[0] = m_StepTypes[IndexStartingInterval];
 
@@ -1573,21 +1575,21 @@ namespace PatternGeneratorJRL
   {
     double r,r2;
     double DeltaTNew;
-    if (fabs(aFP.CoMSpeedNew)<1e-14)
+    if (fabs(aFP.CoMSpeedNew)<1e-7)
       aFP.CoMSpeedNew = 0.0;
-    if (fabs(aFP.ZMPSpeedNew)<1e-14)
+    if (fabs(aFP.ZMPSpeedNew)<1e-7)
       aFP.ZMPSpeedNew = 0.0;
-    if (fabs(aFP.CoMSpeedInit)<1e-14)
+    if (fabs(aFP.CoMSpeedInit)<1e-7)
       aFP.CoMSpeedInit = 0.0;
-    if (fabs(aFP.ZMPSpeedInit)<1e-14)
+    if (fabs(aFP.ZMPSpeedInit)<1e-7)
       aFP.ZMPSpeedInit = 0.0;
-    if (fabs(aFP.CoMInit)<1e-14)
+    if (fabs(aFP.CoMInit)<1e-7)
       aFP.CoMInit = 0.0;
-    if (fabs(aFP.ZMPInit)<1e-14)
+    if (fabs(aFP.ZMPInit)<1e-7)
       aFP.ZMPInit = 0.0;
-    if (fabs(aFP.CoMNew)<1e-14)
+    if (fabs(aFP.CoMNew)<1e-7)
       aFP.CoMNew = 0.0;
-    if (fabs(aFP.ZMPNew)<1e-14)
+    if (fabs(aFP.ZMPNew)<1e-7)
       aFP.ZMPNew = 0.0;
 
 
@@ -1596,7 +1598,7 @@ namespace PatternGeneratorJRL
     ODEBUG("m_Omagej[0]:" << m_Omegaj[0] );
 
     double rden= ( m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit) + (aFP.CoMSpeedInit - aFP.ZMPSpeedInit) );
-    if (fabs(rden)<1e-14)
+    if (fabs(rden)<1e-7)
       rden = 0.0;
     double rnum = (m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew) + (aFP.CoMSpeedNew - aFP.ZMPSpeedNew));
     ODEBUG("r= " <<rnum << " /" <<rden );
@@ -1609,10 +1611,12 @@ namespace PatternGeneratorJRL
       (m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew) + (aFP.CoMSpeedNew - aFP.ZMPSpeedNew));
       
     ODEBUG("Fluctuation: " << r );
-    if (r<=0.0)
+    if (r<0.0)
       DeltaTNew = DeltaTInit + m_Tsingle*0.5;
-    else
+    else if (r>0)
       DeltaTNew = DeltaTInit + log(r)/m_Omegaj[0];
+    else if (r==0.0)
+      DeltaTNew = DeltaTInit;
 
     ODEBUG("DeltaTInit: " << DeltaTInit << " DeltaTNew : " 
 	   << DeltaTNew << " DeltaDeltaT: " 
@@ -1671,13 +1675,14 @@ namespace PatternGeneratorJRL
 							   vector<unsigned int> & IndexStep,
 							   vector<FootAbsolutePosition> & NewFootAbsPos)
   {
-    ChangeFootLandingPosition(t,IndexStep,
-			      NewFootAbsPos,
-			      *m_AnalyticalZMPCoGTrajectoryX,
-			      m_CTIPX,
-			      *m_AnalyticalZMPCoGTrajectoryY,
-			      m_CTIPY,true);
-    return 0;
+    int r=0;
+    r=ChangeFootLandingPosition(t,IndexStep,
+				NewFootAbsPos,
+				*m_AnalyticalZMPCoGTrajectoryX,
+				m_CTIPX,
+				*m_AnalyticalZMPCoGTrajectoryY,
+				m_CTIPY,true);
+    return r;
   }
 							   
   int AnalyticalMorisawaCompact::ChangeFootLandingPosition(double t,
@@ -1705,7 +1710,10 @@ namespace PatternGeneratorJRL
 			     IndexStartingInterval,
 			     FinalTime,
 			     NewTj))<0)
-      return RetourTC;
+      {
+	ODEBUG("Time Change not possible");
+	return RetourTC;
+      }
 
     ODEBUG("LocalTime: " << LocalTime + m_AbsoluteTimeReference 
 	   << " m_AbsoluteTimeReference : " << m_AbsoluteTimeReference
@@ -1790,7 +1798,7 @@ namespace PatternGeneratorJRL
 	aAZCTY.ComputeCOMSpeed(t,aFPY.CoMSpeedInit);
 	
 	
-	TCX = m_Tsingle-m_SamplingPeriod;
+	TCMax = m_Tsingle-m_SamplingPeriod;
       }
 
 
@@ -1798,7 +1806,7 @@ namespace PatternGeneratorJRL
 
     if (TemporalShift)
       {
-	NewTimeIntervals(IndexStartingInterval,TCX); //TCMax
+	NewTimeIntervals(IndexStartingInterval,TCMax); //TCMax
       }
     else 
       {
@@ -2018,6 +2026,14 @@ namespace PatternGeneratorJRL
     if (IndexInterval==-1)
       return -1;
 
+    /* Backup data structures */
+    FootAbsolutePosition BackUpm_AbsoluteCurrentSupportFootPosition = 
+      m_AbsoluteCurrentSupportFootPosition;
+    deque<FootAbsolutePosition> BackUpm_AbsoluteSupportFootPositions = 
+      m_AbsoluteSupportFootPositions;
+    deque<RelativeFootPosition> BackUpm_RelativeFootPositions = 
+      m_RelativeFootPositions;
+
     /* Change the foot */
     unsigned int lChangedIntervalFoot = (IndexInterval-1)/2;
     if (LeftFootAbsolutePositions[0].z==0.0)
@@ -2094,14 +2110,23 @@ namespace PatternGeneratorJRL
 	
     ODEBUG("*** End Change foot position *** ");
     /* Change the foot landing position. */
-    ChangeFootLandingPosition(m_CurrentTime,
-			      IndexIntervals,
-			      NewRelFootAbsolutePositions,
-			      *m_AnalyticalZMPCoGTrajectoryX,
-			      m_CTIPX,
-			      *m_AnalyticalZMPCoGTrajectoryY,
-			      m_CTIPY,true,
-			      aStepStackHandler);
+    if (ChangeFootLandingPosition(m_CurrentTime,
+				  IndexIntervals,
+				  NewRelFootAbsolutePositions,
+				  *m_AnalyticalZMPCoGTrajectoryX,
+				  m_CTIPX,
+				  *m_AnalyticalZMPCoGTrajectoryY,
+				  m_CTIPY,true,
+				  aStepStackHandler)<0)
+      {
+	m_AbsoluteCurrentSupportFootPosition=
+	  BackUpm_AbsoluteCurrentSupportFootPosition;
+	m_AbsoluteSupportFootPositions = 
+	  BackUpm_AbsoluteSupportFootPositions;
+	m_RelativeFootPositions = 
+	  BackUpm_RelativeFootPositions;
+	return -1;
+      }
     
     //unsigned int ControlIndex = (unsigned int)((time - m_CurrentTime)/0.005);
 

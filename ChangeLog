@@ -1,3 +1,18 @@
+2009-04-27  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src] Modification of the Interface.
+	* include/walkGenJrl/PatternGeneratorInterface.h: 
+	When modifying the next step, the system change the 
+	interval time and feed it back.
+	* src/MotionGeneration/ComAndFootRealizationByGeometry.cpp: 
+	Code cleaning.
+	* src/PatternGeneratorInterface.cpp: 
+	Implementation of the new interface.
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: 
+	Give back the new time step.
+	* unitTesting/TestFootPrintPGInterface.cpp: 
+	Test of this new scheme.
+
 2009-04-23  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	[src/FootTrajectoryGeneration] Fix a pb for foot generation along Z.
