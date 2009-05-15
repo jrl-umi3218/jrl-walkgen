@@ -1,3 +1,9 @@
+2009-05-15  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[ZMPRefTrajectoryGeneration] Adding states to ZMP trajectory generation.
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h: .
+	* src/ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp: .
+
 2009-04-27  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	[src] Modification of the Interface.

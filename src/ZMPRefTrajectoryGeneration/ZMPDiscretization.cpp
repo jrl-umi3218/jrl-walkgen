@@ -72,6 +72,26 @@ using namespace::PatternGeneratorJRL;
 #endif
 
 
+OnLineState::OnLineState()
+{  
+  m_CurrentState = IDLE_STATE;
+}
+
+OnLineState::~OnLineState()
+{
+}
+
+unsigned int OnLineState::operator()() const
+{
+  return m_CurrentState;
+}
+
+OnLineState & OnLineState::operator=(unsigned int NewState)
+{
+  if ((NewState>=0) &&
+      (NewState<DOUBLE_SUPPORT_PHASE))
+    m_CurrentState = NewState;
+}
 
 
 ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile, HumanoidSpecificities *aHS)
@@ -121,31 +141,8 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile, 
   for (unsigned int i=0;i<4;i++)
     m_ZMPShift[i]=0.0;
   
-  /*
-    m_ZMPShift3Begin = 0.0;
-    m_ZMPShift4Begin = 0.02;	
-    m_ZMPShift3End  =  0.07;
-    m_ZMPShift4End  =  0.02;
-
-    ///Y direction does not work yet (bram said)!!
-
-    m_ZMPShift3BeginY = 0.00;
-    m_ZMPShift4BeginY = 0.00;	
-    m_ZMPShift3EndY  =  0.00;
-    m_ZMPShift4EndY  =  0.00;
-  */
-#if 0
-#if 0
-  m_ZMPNeutralPosition[0] = 0.00949035; // 0.015 according to Bjorn lol !
-  m_ZMPNeutralPosition[1] = 0.0;
-#else
-  m_ZMPNeutralPosition[0] = 0.00709014; // 0.015 according to Bjorn lol !
-  m_ZMPNeutralPosition[1] = 0.00381147;
-#endif
-#else
   m_ZMPNeutralPosition[0] = 0.0;
   m_ZMPNeutralPosition[1] = 0.0;
-#endif
 
   MAL_MATRIX_RESIZE(m_CurrentSupportFootPosition,3,3);
   for(int i=0;i<3;i++)
@@ -346,9 +343,6 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   double CurrentAbsTheta=0.0;
   RESETDEBUG4("ZMDInitOnLine.txt");
   ODEBUG4("ZMP::InitOnLine - Step 1 ","ZMDInitOnLine.txt");
-//   m_RelativeFootPositions.resize(RelativeFootPositions.size());
-//   for(unsigned int i=0;i<RelativeFootPositions.size();i++)
-//     m_RelativeFootPositions.push_back(RelativeFootPositions[i]);
 
   // Initialize position of the current support foot.
   m_CurrentSupportFootPosition(0,0) = 1;   m_CurrentSupportFootPosition(0,1) = 0;   m_CurrentSupportFootPosition(0,2) = 0;

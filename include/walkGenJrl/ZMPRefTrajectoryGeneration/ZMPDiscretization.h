@@ -60,6 +60,30 @@ using namespace dynamicsJRLJapan;
 namespace PatternGeneratorJRL
 {
 
+  /*! \brief This class is used to specify the current state of the 
+    ZMP trajectory generator. 
+   */
+  class OnLineState
+  {
+    static const unsigned int IDLE_STATE = 0;
+    static const unsigned int SINGLE_SUPPORT_PHASE= 1;
+    static const unsigned int DOUBLE_SUPPORT_PHASE= 2;
+    
+  public:
+    /*! \brief Default Constructor */
+    OnLineState();
+    /*! \brief Default destructor */
+    ~OnLineState();
+
+    /*! \brief Reading the state of the operator. */
+    unsigned int operator()() const;
+
+    /*! \brief Assigning a state to the object. */
+    OnLineState & operator=(unsigned int NewState);
+
+  private:
+    unsigned int m_CurrentState;
+  };
 
   /*! \brief Class to compute the trajectories of the ZMP reference trajectory 
     following Kajita's heuristic. 
