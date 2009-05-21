@@ -1250,10 +1250,13 @@ namespace PatternGeneratorJRL {
 	ODEBUG(" m_ShoulBeRunning " << m_ShouldBeRunning << endl <<
 		" m_ZMPPositions " << m_ZMPPositions.size() << endl <<
 		" 2*m_NL+1 " << 2*m_NL+1 << endl);
-
+	ODEBUG3("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
+		"m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
+		
 	return false;
       }
     ODEBUG("Here");
+
     if (m_StepStackHandler->IsOnLineSteppingOn())
       {
 	ODEBUG("On Line Stepping: ON!");
@@ -1270,6 +1273,19 @@ namespace PatternGeneratorJRL {
 			   m_RightFootPositions);
 	  }
 	else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+	  {
+	    m_ZMPM->OnLine(m_InternalClock,
+			   m_ZMPPositions,
+			   m_COMBuffer,
+			   m_LeftFootPositions,
+			   m_RightFootPositions);
+	  }
+      }
+    else 
+      /* Check if we are not in an ending phase generated on-line */
+      {
+	if ((m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007) &&
+	    (m_ZMPM->GetOnLineMode()))
 	  {
 	    m_ZMPM->OnLine(m_InternalClock,
 			   m_ZMPPositions,
@@ -1406,6 +1422,7 @@ namespace PatternGeneratorJRL {
 						 m_COMBuffer,
 						 m_LeftFootPositions,
 						 m_RightFootPositions);
+		    ODEBUG3("("<<m_InternalClock << ")");
 		    ODEBUG("Left and Right foot positions queues: " 
 			   << m_LeftFootPositions.size() << " " 
 			   << m_RightFootPositions.size() );
@@ -1416,14 +1433,19 @@ namespace PatternGeneratorJRL {
 	  }
 	else
 	  {
+
 	    //	cout << "Sorry not enough information" << endl;
 	    m_ShouldBeRunning = false;
 	    UpdateAbsMotionOrNot = true;
 
+	    if ((m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007) &&
+		(m_ZMPM->GetOnLineMode()))
+	      {
+		ODEBUG3("Hey ! ("<<m_InternalClock << ")");
+		m_ShouldBeRunning = true;	    
+	      }
 
-	    ODEBUG("m_count " << m_count <<
-		   " m_ZMPPositions.size() " << m_ZMPPositions.size() <<
-		   " u : ");
+	    ODEBUG3("Finished the walking pattern generator ("<<m_InternalClock << ")");
 	  }
 
 	/*

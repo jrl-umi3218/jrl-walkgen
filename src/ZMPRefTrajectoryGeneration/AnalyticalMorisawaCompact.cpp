@@ -106,9 +106,10 @@ namespace PatternGeneratorJRL
   AnalyticalMorisawaCompact::AnalyticalMorisawaCompact(SimplePluginManager *lSPM)
     : AnalyticalMorisawaAbstract(lSPM)
   {
-
+    
     RegisterMethods();
     ODEBUG("Constructor");
+    m_OnLineMode=false;
 
     memset(&m_CTIPX,0,sizeof(m_CTIPX));
     memset(&m_CTIPY,0,sizeof(m_CTIPY));
@@ -617,6 +618,7 @@ namespace PatternGeneratorJRL
 					    COMPosition & lStartingCOMPosition,
 					    MAL_S3_VECTOR(&,double) lStartingZMPPosition)
   {
+    m_OnLineMode = true;
     ODEBUG("Begin InitOnLine");
     m_RelativeFootPositions.clear();
 
@@ -757,6 +759,12 @@ namespace PatternGeneratorJRL
 	    m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,RightFootAbsPos,lIndexInterval);
 	    FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
 	  }
+      }
+    else 
+      {
+	/*! We reached the end of the trajectory generated 
+	 and no foot steps have been added. */
+	m_OnLineMode = false;
       }
   }
 
@@ -1986,6 +1994,27 @@ namespace PatternGeneratorJRL
 						  deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 						  StepStackHandler *aStepStackHandler)
   {
+    deque<FootAbsolutePosition> NewFeetAbsolutePosition;
+    NewFeetAbsolutePosition.push_back(aFootAbsolutePosition);
+    OnLineFootChanges(time,
+		      NewFeetAbsolutePosition,
+		      ZMPPositions,
+		      CoMPositions,
+		      LeftFootAbsolutePositions,
+		      RightFootAbsolutePositions,
+		      aStepStackHandler);
+
+  }
+
+  int AnalyticalMorisawaCompact::OnLineFootChanges(double time,
+						   deque<FootAbsolutePosition> &aFootAbsolutePosition,
+						   deque<ZMPPosition> & ZMPPositions,			     
+						   deque<COMPosition> & CoMPositions,
+						   deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+						   deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+						   StepStackHandler *aStepStackHandler)
+  {
+
     ODEBUG("****************** Begin OnLineFootChange **************************");
     int IndexInterval=-1;
     
@@ -2060,7 +2089,8 @@ namespace PatternGeneratorJRL
 	IndexIntervals.resize(1);
 	IndexIntervals[0] = IndexInterval;
 	
-	m_AbsoluteSupportFootPositions[lChangedIntervalFoot] = aFootAbsolutePosition;
+	for(unsigned int i=0;i<aFootAbsolutePosition.size();i++)
+	  m_AbsoluteSupportFootPositions[i+lChangedIntervalFoot] = aFootAbsolutePosition[i];
 
 	/* From the new foot landing position computes the new relative set of positions. */
 	m_FeetTrajectoryGenerator->ChangeRelStepsFromAbsSteps(m_RelativeFootPositions,
@@ -2068,8 +2098,9 @@ namespace PatternGeneratorJRL
 							      m_AbsoluteSupportFootPositions,
 							      lChangedIntervalFoot);
 	
-	NewRelFootAbsolutePositions.resize(1);
-	NewRelFootAbsolutePositions[0] = aFootAbsolutePosition;
+	NewRelFootAbsolutePositions.resize(aFootAbsolutePosition.size());
+	for(unsigned int i=0;i<aFootAbsolutePosition.size();i++)
+	  NewRelFootAbsolutePositions[i] = aFootAbsolutePosition[i];
       }
     else if (m_OnLineChangeStepMode==RELATIVE_FRAME)
       {
@@ -2085,12 +2116,15 @@ namespace PatternGeneratorJRL
 	    IndexIntervals[k] = j;
 	  }
 	
-	m_RelativeFootPositions[lChangedIntervalFoot].sx +=
-	  aFootAbsolutePosition.x;
-	m_RelativeFootPositions[lChangedIntervalFoot].sy +=
-	  aFootAbsolutePosition.y;
-	m_RelativeFootPositions[lChangedIntervalFoot].theta +=
-	  aFootAbsolutePosition.theta;
+	for(unsigned int i=0;i<aFootAbsolutePosition.size();i++)
+	  {
+	    m_RelativeFootPositions[lChangedIntervalFoot+i].sx +=
+	      aFootAbsolutePosition[i].x;
+	    m_RelativeFootPositions[lChangedIntervalFoot+i].sy +=
+	      aFootAbsolutePosition[i].y;
+	    m_RelativeFootPositions[lChangedIntervalFoot+i].theta +=
+	      aFootAbsolutePosition[i].theta;
+	  }
 
 	ODEBUG("lChangedInvertalFoot: " <<lChangedIntervalFoot);
 	deque<FootAbsolutePosition> lAbsoluteSupportFootPositions;
@@ -2192,12 +2226,126 @@ namespace PatternGeneratorJRL
     return r;
   }
         
-  void AnalyticalMorisawaCompact::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-						       deque<COMPosition> &FinalCOMPositions,
-						       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-						       deque<FootAbsolutePosition> &RightFootAbsolutePositions)
+  void AnalyticalMorisawaCompact::EndPhaseOfTheWalking(deque<ZMPPosition> &FinalZMPPositions,
+						       deque<COMPosition> &FinalCoMPositions,
+						       deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+						       deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
   {
+    m_OnLineMode = true;
+    bool DoNotPrepareLastFoot = false;
+    int NbSteps = m_RelativeFootPositions.size();
+    int NbOfIntervals=2*NbSteps+1;
+
+    ODEBUG3("****************** Begin EndPhaseOfTheWalking **************************");
+    // Strategy for the final CoM pos: middle of the segment
+    // between the two final steps, in order to be statically stable.
+    unsigned int lindex = m_AbsoluteSupportFootPositions.size()-1;
+    vector<double> * lZMPX;
+    double FinalCoMPosX=0.6;
+
+    vector<double> * lZMPY;
+    double FinalCoMPosY=0.0;
+
+    if (m_CTIPX.ZMPProfil!=0)
+      lZMPX = m_CTIPX.ZMPProfil;
+
+    if (DoNotPrepareLastFoot)
+      FinalCoMPosX = m_AbsoluteSupportFootPositions[lindex].x;
+    else
+      FinalCoMPosX = 0.5 *(m_AbsoluteSupportFootPositions[lindex-1].x + 
+			   m_AbsoluteSupportFootPositions[lindex].x);
     
+    unsigned int j=m_AbsoluteSupportFootPositions.size()*2+1;
+
+    if (DoNotPrepareLastFoot)
+      (*lZMPX)[j-2] = (*lZMPX)[j-1] = m_AbsoluteSupportFootPositions[lindex].x;
+    else
+      (*lZMPX)[j-2] = (*lZMPX)[j-1] = FinalCoMPosX;
+    
+    m_CTIPX.FinalCoMPos = FinalCoMPosX;
+
+        /*! Build 3rd order polynomials. */
+    for(int i=1;i<NbOfIntervals-1;i++)
+      {
+	m_AnalyticalZMPCoGTrajectoryX->Building3rdOrderPolynomial(i,(*lZMPX)[i-1],(*lZMPX)[i]);
+      }
+    
+    ComputeTrajectory(m_CTIPX,*m_AnalyticalZMPCoGTrajectoryX);
+
+    if (m_CTIPY.ZMPProfil!=0)
+      lZMPY = m_CTIPY.ZMPProfil;
+
+    if (DoNotPrepareLastFoot)
+      FinalCoMPosY = m_AbsoluteSupportFootPositions[lindex].y;
+    else
+      FinalCoMPosY = 0.5 *(m_AbsoluteSupportFootPositions[lindex-1].y + 
+			   m_AbsoluteSupportFootPositions[lindex].y);
+    ODEBUG3("FinalCoMPosY "<< FinalCoMPosY);
+    
+    if (DoNotPrepareLastFoot)
+      (*lZMPY)[j-2] = (*lZMPY)[j-1] = m_AbsoluteSupportFootPositions[lindex].y;
+    else
+      (*lZMPY)[j-2] = (*lZMPY)[j-1] = FinalCoMPosY;
+
+    for(unsigned int i=0;i<m_CTIPY.ZMPProfil->size();i++)
+      {
+	ODEBUG3("m_CTIPY.ZMPProfil["<< i << "]=" << (*m_CTIPY.ZMPProfil)[i]);
+      }
+    m_CTIPY.FinalCoMPos = FinalCoMPosY;
+
+    /*! Build 3rd order polynomials. */
+    for(int i=1;i<NbOfIntervals-1;i++)
+      {
+	m_AnalyticalZMPCoGTrajectoryY->Building3rdOrderPolynomial(i,(*lZMPY)[i-1],(*lZMPY)[i]);
+      }
+
+    ComputeTrajectory(m_CTIPY,*m_AnalyticalZMPCoGTrajectoryY);
+
+    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_PreviewControlTime;    
+    ODEBUG3("m_UpperTimeLimitToUpdateStacks:" << m_UpperTimeLimitToUpdateStacks);
+
+    unsigned int lIndexInterval,lPrevIndexInterval;
+    m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_AbsoluteTimeReference,lIndexInterval);
+    lPrevIndexInterval = lIndexInterval;
+    
+    for(double t=m_CurrentTime; t<m_CurrentTime+2*m_SamplingPeriod; t+= m_SamplingPeriod)
+      {
+	m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(t,lIndexInterval,lPrevIndexInterval);
+	
+	/*! Feed the ZMPPositions. */
+	ZMPPosition aZMPPos;
+        m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px,lIndexInterval);
+	m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py,lIndexInterval);
+	FinalZMPPositions.push_back(aZMPPos);
+
+		
+	/*! Feed the COMPositions. */
+
+	COMPosition aCOMPos;
+	memset(&aCOMPos,0,sizeof(aCOMPos));
+	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0],lIndexInterval);
+	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0],lIndexInterval);
+	FinalCoMPositions.push_back(aCOMPos);
+	/*! Feed the FootPositions. */
+
+	/*! Left */
+	FootAbsolutePosition LeftFootAbsPos;
+	memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
+	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos,lIndexInterval);
+	FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
+
+	/*! Right */
+	FootAbsolutePosition RightFootAbsPos;
+	memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
+	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos,lIndexInterval);
+	FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
+
+	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
+		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
+		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Test.dat");
+      }
+
+    ODEBUG3("****************** End of EndPhaseOfTheWalking **************************");
   }
 
   void AnalyticalMorisawaCompact::RegisterMethods()

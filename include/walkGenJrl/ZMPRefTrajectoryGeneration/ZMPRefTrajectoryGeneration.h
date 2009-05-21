@@ -342,6 +342,18 @@ namespace PatternGeneratorJRL
     { return m_CurrentTime;}
     /*! @} */
 
+    /*! \name Methods related to the on line status generation of the ZMP. 
+      @{
+     */
+    /*! \brief Returns the current status of the ZMP trajectory generator.
+      The online mode is determines internally.
+      A ZMP-generator can be still in on-line mode even the step-generator
+      is not because the ZMP-generator is generating the ending phase.
+     */
+    bool GetOnLineMode();
+    /*! @}  */
+    
+
     
   };
 };

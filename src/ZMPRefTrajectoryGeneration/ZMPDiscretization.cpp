@@ -91,6 +91,7 @@ OnLineState & OnLineState::operator=(unsigned int NewState)
   if ((NewState>=0) &&
       (NewState<DOUBLE_SUPPORT_PHASE))
     m_CurrentState = NewState;
+
 }
 
 
@@ -1125,8 +1126,10 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   // We assume that the last positon of the ZMP
   // will the middle of the two last position
   // of the support foot.
-  ODEBUG("Cur/Prev SuppFootPos (X) : " <<m_CurrentSupportFootPosition(0,2) << " " << m_PrevCurrentSupportFootPosition(0,2));
-  ODEBUG("Cur/Prev SuppFootPos (Y) : " <<m_CurrentSupportFootPosition(1,2) << " " << m_PrevCurrentSupportFootPosition(1,2));
+  ODEBUG("Cur/Prev SuppFootPos (X) : " <<m_CurrentSupportFootPosition(0,2) 
+	 << " " << m_PrevCurrentSupportFootPosition(0,2));
+  ODEBUG("Cur/Prev SuppFootPos (Y) : " <<m_CurrentSupportFootPosition(1,2) 
+	 << " " << m_PrevCurrentSupportFootPosition(1,2));
 
   pxf = 0.5*(m_CurrentSupportFootPosition(0,2) + m_PrevCurrentSupportFootPosition(0,2));
   pyf = 0.5*(m_CurrentSupportFootPosition(1,2) + m_PrevCurrentSupportFootPosition(1,2));

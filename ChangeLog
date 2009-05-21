@@ -1,3 +1,25 @@
+2009-05-21  Olivier Stasse  <<olivier.stasse@aist.go.jp>>
+
+	[src/ZMPRefTrajectoryGeneration] Nice ending phase for Morisawa's Algorithm.
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.h: 
+	Adding ending phases and multi foot modification (the latter one is NOT tested yet).
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h: 
+	Adding method to get the onlinemode of the ZMP-trajectory generator.
+	* src/PatternGeneratorInterface.cpp:
+	Implements the logic behing the online-mode.
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: 
+	Ending phase of Morisawa's method.
+	* src/ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp:
+	Code beautification.
+	* src/ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.cpp: 
+	Method to get online mode of the ZMP-generator.
+	* src/gnufiles/ComZMPX.gnu: 
+        Get the graph according to time and not according to iteratio number.
+	* src/gnufiles/ComZMPY.gnu: 
+	same as above.
+	* unitTesting/TestFootPrintPGInterface.cpp: 
+	New set of tests for Morisawa's implementation.
+
 2009-05-15  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	[ZMPRefTrajectoryGeneration] Adding states to ZMP trajectory generation.

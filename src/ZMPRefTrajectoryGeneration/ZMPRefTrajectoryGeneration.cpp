@@ -111,3 +111,8 @@ void ZMPRefTrajectoryGeneration::CallMethod(std::string & Method, std::istringst
     }
 
 };
+
+bool ZMPRefTrajectoryGeneration::GetOnLineMode()
+{
+  return m_OnLineMode;
+}

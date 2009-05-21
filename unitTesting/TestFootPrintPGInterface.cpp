@@ -1095,11 +1095,12 @@ int main(int argc, char *argv[])
 		  //aFAP.y=-0.09;
 		  aFAP.x=0.2;
 		  aFAP.y=0.0;
+		  aFAP.theta=10.0;
 		  gettimeofday(&beginmodif,0);
 		  aPGI->ChangeOnLineStep(0.805,aFAP,newtime);
 		  deltatime += newtime+0.025;
-		  std::cout << "trigger time: "<< triggertime/200.0 << std::endl;
-		  std::cout << "delta time: " << deltatime << " newtime: " << newtime << std::endl;
+		  // std::cout << "trigger time: "<< triggertime/200.0 << std::endl;
+		  // std::cout << "delta time: " << deltatime << " newtime: " << newtime << std::endl;
 		  //istringstream strm2(":parsecmd :addstandardonlinestep 0.2 0.0 0.0");
 		  //aPGI->ParseCmd(strm2);
 		  gettimeofday(&endmodif,0);

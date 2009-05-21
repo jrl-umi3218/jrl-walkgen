@@ -226,12 +226,24 @@ namespace PatternGeneratorJRL
 	 @return If the method failed it returns -1, 0 otherwise.
       */
       int OnLineFootChange(double time,
-			   FootAbsolutePosition &aFootAbsolutePosition,				
+			   FootAbsolutePosition &aFootPosition,				
 			   deque<ZMPPosition> & FinalZMPPositions,			     
 			   deque<COMPosition> & CoMPositions,
 			   deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 			   deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 			   StepStackHandler *aStepStackHandler=0);
+
+      /* ! \brief Method to change on line the landing position of several feet.
+	 @return If the method failed it returns -1, 0 otherwise.
+      */
+      int OnLineFootChanges(double time,
+			    deque<FootAbsolutePosition> &FeetPosition,				
+			    deque<ZMPPosition> & FinalZMPPositions,			     
+			    deque<COMPosition> & CoMPositions,
+			    deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+			    deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+			    StepStackHandler *aStepStackHandler=0);
+
       /*! \brief Method to stop walking.
 	@param[out] ZMPPositions: The queue of ZMP reference positions.
 	@param[out] FinalCOMPositions: The queue of COM reference positions.
