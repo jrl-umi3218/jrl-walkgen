@@ -2003,7 +2003,7 @@ namespace PatternGeneratorJRL
 		      LeftFootAbsolutePositions,
 		      RightFootAbsolutePositions,
 		      aStepStackHandler);
-
+	return 0;
   }
 
   int AnalyticalMorisawaCompact::OnLineFootChanges(double time,

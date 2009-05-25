@@ -91,7 +91,7 @@ OnLineState & OnLineState::operator=(unsigned int NewState)
   if ((NewState>=0) &&
       (NewState<DOUBLE_SUPPORT_PHASE))
     m_CurrentState = NewState;
-
+  return *this;
 }
 
 
