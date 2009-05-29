@@ -959,14 +959,15 @@ void StepStackHandler::CallMethod(std::string &Method, std::istringstream &strm)
 	  if (!strm.eof())
 	    strm >> y;
 	  else break;
-	  
+
 	  if (!strm.eof())
 	    strm >> arc_deg;
 	  else break;
 	  
-	if (!strm.eof())
-	  strm >> SupportFoot;
-	else break;
+	  if (!strm.eof())
+	    strm >> SupportFoot;
+	  else break;
+
 	}
       
       
@@ -984,8 +985,7 @@ void StepStackHandler::CallMethod(std::string &Method, std::istringstream &strm)
 	  if (!strm.eof())
 	    strm >> R;
 	  else break;
-	  
-	  
+
 	  if (!strm.eof())
 	    strm >> arc_deg;
 	  else break;
@@ -993,8 +993,7 @@ void StepStackHandler::CallMethod(std::string &Method, std::istringstream &strm)
 	  if (!strm.eof())
 	    strm >> SupportFoot;
 	  else break;
-	  
-	  
+
 	}
       ODEBUG4("m_CreateArcCenteredInStepStack 2", "DebugData.txt");
       CreateArcCenteredInStepStack(R,arc_deg,SupportFoot);

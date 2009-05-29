@@ -1,5 +1,11 @@
 2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[src] Code beautification.
+	* src/PatternGeneratorInterface.cpp: indentation.
+	* src/StepStackHandler.cpp: indentation.
+
+2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[src/Mathematics] Adding COM speed computation + removed memory leak.
 	* include/walkGenJrl/Mathematics/AnalyticalZMPCOGTrajectory.h: 
 	Added ComputeCOMSpeed.
