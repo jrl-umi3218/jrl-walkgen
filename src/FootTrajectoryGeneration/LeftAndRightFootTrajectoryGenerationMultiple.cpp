@@ -62,6 +62,7 @@ using namespace PatternGeneratorJRL;
 LeftAndRightFootTrajectoryGenerationMultiple::LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
 											   dynamicsJRLJapan::HumanoidSpecificities * lHS) : SimplePlugin(lSPM)
 {
+  m_Omega = 0.0;
   m_HS = lHS;
 
   m_LeftFootTrajectory = new FootTrajectoryGenerationMultiple(lSPM,m_HS);
@@ -245,7 +246,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
       v2(1,0) = LeftFootInitialPosition.y;
       
     }
-  ODEBUG("Support Foot : " << v2(0,0) << " " << v2(1,0) << " " << CurrentAbsTheta);
+  ODEBUG3("Support Foot : " << v2(0,0) << " " << v2(1,0) << " " << CurrentAbsTheta);
   
   // Initial Position of the current support foot.
   c = cos(CurrentAbsTheta*M_PI/180.0);
@@ -292,6 +293,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  /*! At this stage the phase of double support is deal with */
 	  ODEBUG("Double support phase");
 	  LeftFootTmpInitPos.z = 0;
+	  LeftFootTmpInitPos.dz = 0;
 	  LeftFootTmpInitPos.stepType=11;
 
 	  SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
@@ -299,6 +301,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 			LeftFootTmpInitPos);
 
 	  RightFootTmpInitPos.z = 0;
+	  RightFootTmpInitPos.dz = 0;
 	  RightFootTmpInitPos.stepType=9;
 	  SetAnInterval(IntervalIndex,m_RightFootTrajectory,
 			RightFootTmpInitPos,
@@ -329,7 +332,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 		  RelativeFootPositions[i].sx << " , " <<
 		  RelativeFootPositions[i].theta << " )");
 	}
-	      
+      
       /*! Compute Orientation matrix related to the relative orientation
 	of the support foot */
       c = cos(RelativeFootPositions[i].theta*M_PI/180.0);
@@ -339,7 +342,6 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
       
       /*! Update the orientation */	  
       CurrentAbsTheta+= RelativeFootPositions[i].theta;
-      CurrentAbsTheta = fmod(CurrentAbsTheta,180.0);
 	
       /*! Extract the current absolute orientation matrix. */
       for(int k=0;k<2;k++)
@@ -384,15 +386,18 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	      RightFootTmpFinalPos.z = m_StepHeight;
 	      RightFootTmpFinalPos.theta = CurrentAbsTheta;
 	      RightFootTmpFinalPos.omega = m_Omega;
+	      RightFootTmpFinalPos.omega2 = 0.0;
 	      RightFootTmpFinalPos.dx = 0.0;
 	      RightFootTmpFinalPos.dy = 0.0;
 	      RightFootTmpFinalPos.dz = 0.0;
 	      RightFootTmpFinalPos.dtheta = 0.0;
 	      RightFootTmpFinalPos.domega = 0.0;
+	      RightFootTmpFinalPos.domega2 = 0.0;
 	      RightFootTmpFinalPos.stepType = 1;
 	      
 	      LeftFootTmpFinalPos = LeftFootTmpInitPos;
 	      LeftFootTmpFinalPos.z = 0.0;
+	      LeftFootTmpFinalPos.dz = 0.0;
 	      LeftFootTmpFinalPos.stepType = -1;
 	    }
 	  else
@@ -403,15 +408,18 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	      LeftFootTmpFinalPos.z = m_StepHeight;
 	      LeftFootTmpFinalPos.theta = CurrentAbsTheta;
 	      LeftFootTmpFinalPos.omega = m_Omega;
+	      LeftFootTmpFinalPos.omega2 = 0.0;
 	      LeftFootTmpFinalPos.dx = 0.0;
 	      LeftFootTmpFinalPos.dy = 0.0;
 	      LeftFootTmpFinalPos.dz = 0.0;
 	      LeftFootTmpFinalPos.dtheta = 0.0;
 	      LeftFootTmpFinalPos.domega = 0.0;
+	      LeftFootTmpFinalPos.domega2 = 0.0;
 	      LeftFootTmpFinalPos.stepType = 1;
 
 	      RightFootTmpFinalPos = RightFootTmpInitPos;
 	      RightFootTmpFinalPos.z = 0.0;
+	      LeftFootTmpFinalPos.dz = 0.0;
 	      RightFootTmpFinalPos.stepType = -1;
 	      
 	    }
@@ -420,16 +428,24 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	{
 	  LeftFootTmpFinalPos = LeftFootTmpInitPos;
 	  LeftFootTmpFinalPos.z = 0.0;
+	  LeftFootTmpFinalPos.omega = 0.0;
+	  LeftFootTmpFinalPos.omega2 = 0.0;
 	  LeftFootTmpFinalPos.dx = LeftFootTmpInitPos.dx = 0.0;
 	  LeftFootTmpFinalPos.dy = LeftFootTmpInitPos.dy =0.0;
 	  LeftFootTmpFinalPos.dz = LeftFootTmpInitPos.dz =0.0;
+	  LeftFootTmpFinalPos.domega = LeftFootTmpInitPos.domega =0.0;
+	  LeftFootTmpFinalPos.domega2 = LeftFootTmpInitPos.domega2 =0.0;
 	  LeftFootTmpFinalPos.stepType = 11;
 
 	  RightFootTmpFinalPos = RightFootTmpInitPos;
 	  RightFootTmpFinalPos.z = 0.0;
+	  RightFootTmpFinalPos.omega = 0.0;
+	  RightFootTmpFinalPos.omega2 = 0.0;
 	  RightFootTmpFinalPos.dx = RightFootTmpInitPos.dx = 0.0;
 	  RightFootTmpFinalPos.dy = RightFootTmpInitPos.dy =0.0;
 	  RightFootTmpFinalPos.dz = RightFootTmpInitPos.dz =0.0;
+	  RightFootTmpFinalPos.domega = RightFootTmpInitPos.domega =0.0;
+	  RightFootTmpFinalPos.domega2 = RightFootTmpInitPos.domega2 =0.0;
 	  RightFootTmpFinalPos.stepType = 9;
 	  
 	}
@@ -495,10 +511,12 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	    for(unsigned int lk=0;lk<limitk;lk++)
 	      {
 		LeftFootTmpFinalPos.z = 0;
+		LeftFootTmpFinalPos.dz = 0;
 		SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
 			      LeftFootTmpFinalPos,
 			      LeftFootTmpFinalPos);
 		RightFootTmpFinalPos.z = 0;
+		RightFootTmpFinalPos.dz = 0;
 		SetAnInterval(IntervalIndex,m_RightFootTrajectory,
 			      RightFootTmpFinalPos,
 			      RightFootTmpFinalPos);
@@ -608,12 +626,6 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
 	       RelativeFootPositions[i].sx << " " << 
 	       RelativeFootPositions[i].sy);
       
-      ODEBUG("Double support phase -- Left: ( " << 
-	      LeftFootTmpInitPos.x << " , " << 
-	      LeftFootTmpInitPos.y << " ) " << "Right : ( " << 
-	      RightFootTmpInitPos.x << " , " << 
-	      RightFootTmpInitPos.y << " ) " );
-	      
       /*! Compute Orientation matrix related to the relative orientation
 	of the support foot */
       c = cos(RelativeFootPositions[i].theta*M_PI/180.0);
