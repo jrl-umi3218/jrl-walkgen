@@ -1,3 +1,12 @@
+2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src/Mathematics] Adding COM speed computation + removed memory leak.
+	* include/walkGenJrl/Mathematics/AnalyticalZMPCOGTrajectory.h: 
+	Added ComputeCOMSpeed.
+	* src/Mathematics/AnalyticalZMPCOGTrajectory.cpp: 
+	Implementation of ComputeCOMSpeed + fixed a memory leak
+	related to polynomials computation.
+
 2009-05-21  Olivier Stasse  <<olivier.stasse@aist.go.jp>>
 
 	[src/ZMPRefTrajectoryGeneration] Nice ending phase for Morisawa's Algorithm.

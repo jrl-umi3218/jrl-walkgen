@@ -7,6 +7,9 @@ using namespace std;
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) cerr << "AnalyticalZMPCOGTrajectory: " << x << endl
+#define ODEBUG3B(x) cout << __FILE__ << ": " <<__FUNCTION__   \
+                        << "(#" << __LINE__ << ") :" <<  x << endl
+
 #define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << x << endl; DebugFile.close();}
 #if 0
@@ -41,7 +44,7 @@ namespace PatternGeneratorJRL
 
   AnalyticalZMPCOGTrajectory::~AnalyticalZMPCOGTrajectory()
   {
-
+    FreePolynomes();
   }
 
   void AnalyticalZMPCOGTrajectory::FreePolynomes()
@@ -176,6 +179,18 @@ namespace PatternGeneratorJRL
     r = cosh(m_omegaj[j]*deltaj) * m_V[j] +
       sinh(m_omegaj[j]*deltaj) * m_W[j];
     r += m_ListOfCOGPolynomials[j]->Compute(deltaj);
+    return true;
+  }
+
+  bool AnalyticalZMPCOGTrajectory::ComputeCOMSpeed(double t, double &r, int j)
+  {
+    double deltaj=0.0;
+    deltaj = t- m_AbsoluteTimeReference - m_RefTime[j];
+	
+    r = m_omegaj[j] * sinh(m_omegaj[j]*deltaj) * m_V[j] +
+	      m_omegaj[j] * cosh(m_omegaj[j]*deltaj) * m_W[j];  
+    r += m_ListOfCOGPolynomials[j]->ComputeDerivative(deltaj);
+    ODEBUG("ComputeCOMPSeed: " << r);
     return true;
   }
 
