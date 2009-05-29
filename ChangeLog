@@ -1,5 +1,11 @@
 2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[unitTesting] Adding COM speed and other informations.
+	* unitTesting/TestFootPrintPGInterface.cpp: 
+	Nicer description of TestFGPI + COM speed + others information written.
+
+2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[src/ZMPRefTrajectoryGeneration] Fix wrong initialization and memory leak.
 	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: 
 	Wrong initialization of angles, memory leak and Com Speed.

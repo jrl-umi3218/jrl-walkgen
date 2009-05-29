@@ -1,3 +1,4 @@
+
 /* Olivier Stasse
  * (c) 2005-2009
  * 
@@ -919,24 +920,35 @@ int main(int argc, char *argv[])
   ofstream aof;
   if (DebugFGPI)
     {
-      aof.open("TestFPGI_description.dat",ofstream::out);
-      aof << "1. Time" << std::endl
-	  << "2. Com X" << std::endl
-	  << "3. Com Y" << std::endl
-	  << "4. Com Z" << std::endl
-	  << "5. ZMP X (waist ref.)" << std::endl
-	  << "6. ZMP Y (waist ref.)" << std::endl
-	  << "7. Left Foot X" << std::endl
-	  << "8. Left Foot Y" << std::endl
-	  << "9. Left Foot Z" << std::endl
-	  << "10. Right Foot X" << std::endl
-	  << "11. Right Foot Y" << std::endl
-	  << "12. Right Foot Z" << std::endl
-	  << "13. ZMP X (world ref.)" << std::endl
-	  << "14. ZMP Y (world ref.)" << std::endl
-	  << "15. Waist X (world ref.)" << std::endl
-	  << "16. Waist Y (world ref.)" << std::endl;
-	
+      aof.open("TestFGPI_description.dat",ofstream::out);
+      string Titles[25] =
+	{ "Time",
+	  "Com X",
+	  "Com Y" ,
+	  "Com Z" ,
+	  "Com dX" ,
+	  "Com dY" ,
+	  "Com dZ" ,
+	  "ZMP X (waist ref.)" ,
+	  "ZMP Y (waist ref.)" ,
+	  "Left Foot X" ,
+	  "Left Foot Y" ,
+	  "Left Foot Z" ,
+	  "Left Foot Theta" ,
+	  "Left Foot Omega" ,
+	  "Left Foot Omega2" ,
+	  "Right Foot X" ,
+	  "Right Foot Y" ,
+	  "Right Foot Z" ,
+	  "Right Foot Theta" ,
+	  "Right Foot Omega" ,
+	  "Right Foot Omega2" ,
+	  "ZMP X (world ref.)" ,
+	  "ZMP Y (world ref.)" ,
+	  "Waist X (world ref.)" ,
+	  "Waist Y (world ref.)" };
+      for(unsigned int i=0;i<25;i++)
+	aof << i+1 << ". " <<Titles[i] <<std::endl;
 	
       aof.close();
       aof.open("TestFGPI.dat",ofstream::out);
@@ -1074,47 +1086,49 @@ int main(int argc, char *argv[])
 	      NbOfItToCompute++;
 	    }
 	  
-	  aPGI->DebugControlLoop(PreviousConfiguration,
+	  /* aPGI->DebugControlLoop(PreviousConfiguration,
 				 PreviousVelocity,
 				 PreviousAcceleration,
-				 NbOfIt); 
+				 NbOfIt);  */
 	  PreviousConfiguration = CurrentConfiguration;
 	  PreviousVelocity = CurrentVelocity;
 	  PreviousAcceleration = CurrentAcceleration;
 	  
 	  if (TestProfil==PROFIL_ANALYTICAL_ONLINE_WALKING)
 	    {
-	      //if ((NbOfIt>(8.82*200)) && 
-	      double triggertime = 9.64*200 + deltatime*200;
-	      if ((NbOfIt>triggertime) && 
-		  TestChangeFoot)
-		{
-		  struct timeval beginmodif,endmodif;
-		  PatternGeneratorJRL::FootAbsolutePosition aFAP;
-		  //aFAP.x=0.2;
-		  //aFAP.y=-0.09;
-		  aFAP.x=0.2;
-		  aFAP.y=0.0;
-		  aFAP.theta=10.0;
-		  gettimeofday(&beginmodif,0);
-		  aPGI->ChangeOnLineStep(0.805,aFAP,newtime);
-		  deltatime += newtime+0.025;
-		  // std::cout << "trigger time: "<< triggertime/200.0 << std::endl;
-		  // std::cout << "delta time: " << deltatime << " newtime: " << newtime << std::endl;
-		  //istringstream strm2(":parsecmd :addstandardonlinestep 0.2 0.0 0.0");
-		  //aPGI->ParseCmd(strm2);
-		  gettimeofday(&endmodif,0);
-		  timemodif = endmodif.tv_sec-beginmodif.tv_sec + 0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
-		  TestChangeFoot=true;
-		  NbStepsModified++;
-		  if (NbStepsModified==10)
-		    TestChangeFoot=false;
-		}
-	      
 	      if (NbOfIt>30*200) /* Stop after 30 seconds the on-line stepping */
 		{
 		  StopOnLineWalking(*aPGI);
 		}
+	      else{
+		
+		//if ((NbOfIt>(8.82*200)) && 
+		double triggertime = 9.64*200 + deltatime*200;
+		if ((NbOfIt>triggertime) && 
+		    TestChangeFoot)
+		  {
+		    struct timeval beginmodif,endmodif;
+		    PatternGeneratorJRL::FootAbsolutePosition aFAP;
+		    //aFAP.x=0.2;
+		    //aFAP.y=-0.09;
+		    aFAP.x=0.24;
+		    aFAP.y=0.0;
+		    aFAP.theta=0.0;
+		    gettimeofday(&beginmodif,0);
+		    aPGI->ChangeOnLineStep(0.805,aFAP,newtime);
+		    deltatime += newtime+0.025;
+		    // std::cout << "trigger time: "<< triggertime/200.0 << std::endl;
+		    // std::cout << "delta time: " << deltatime << " newtime: " << newtime << std::endl;
+		    //istringstream strm2(":parsecmd :addstandardonlinestep 0.2 0.0 0.0");
+		    //aPGI->ParseCmd(strm2);
+		    gettimeofday(&endmodif,0);
+		    timemodif = endmodif.tv_sec-beginmodif.tv_sec + 0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
+		    TestChangeFoot=true;
+		    NbStepsModified++;
+		    if (NbStepsModified==360)
+		      TestChangeFoot=false;
+		  }
+	      }
 	    }
 
 	  if (DebugFGPI)
@@ -1123,9 +1137,16 @@ int main(int argc, char *argv[])
 		  << finalCOMPosition.x[0] << " "
 		  << finalCOMPosition.y[0] << " " 
 		  << finalCOMPosition.z[0] << " "
+		  << finalCOMPosition.x[1] << " "
+		  << finalCOMPosition.y[1] << " " 
+		  << finalCOMPosition.z[1] << " "
 		  << ZMPTarget(0) << " " << ZMPTarget(1) << " " 
-		  << LeftFootPosition.x  << " " << LeftFootPosition.y  << " " << LeftFootPosition.z  << " "
-		  << RightFootPosition.x << " " << RightFootPosition.y << " " << RightFootPosition.z << " " 
+		  << LeftFootPosition.x  << " " << LeftFootPosition.y  << " " 
+		  << LeftFootPosition.z  << " " << LeftFootPosition.theta  << " "  
+		  << LeftFootPosition.omega  << " " << LeftFootPosition.omega2  << " "
+		  << RightFootPosition.x << " " << RightFootPosition.y << " " 
+		  << RightFootPosition.z << " " << RightFootPosition.theta << " " 
+		  << RightFootPosition.omega  << " " << RightFootPosition.omega2  << " "
 		  << ZMPTarget(0)+CurrentConfiguration(0) << " " 
 		  << ZMPTarget(1)+CurrentConfiguration(1) << " "
 		  << CurrentConfiguration(0) << " " 
