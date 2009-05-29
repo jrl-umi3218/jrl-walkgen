@@ -1,5 +1,10 @@
 2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[src/ZMPRefTrajectoryGeneration] Fix an operator problem.
+	* src/ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp: .
+
+2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[unitTesting] Adding COM speed and other informations.
 	* unitTesting/TestFootPrintPGInterface.cpp: 
 	Nicer description of TestFGPI + COM speed + others information written.
