@@ -64,6 +64,10 @@ FootTrajectoryGenerationMultiple::FootTrajectoryGenerationMultiple(SimplePluginM
 
 FootTrajectoryGenerationMultiple::~FootTrajectoryGenerationMultiple()
 {
+  for(unsigned int i=0;i<m_SetOfFootTrajectoryGenerationObjects.size();i++)
+    {
+      delete m_SetOfFootTrajectoryGenerationObjects[i];
+    }
 }
 
 void FootTrajectoryGenerationMultiple::SetNumberOfIntervals(int lNumberOfIntervals)

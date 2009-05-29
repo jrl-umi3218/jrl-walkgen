@@ -1,5 +1,11 @@
 2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[src/FootTrajectoryGeneration] Fix memory leak.
+	* src/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp: 
+	Free forgotten memory blocks.
+
+2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[src] Code beautification.
 	* src/PatternGeneratorInterface.cpp: indentation.
 	* src/StepStackHandler.cpp: indentation.
