@@ -148,9 +148,28 @@ namespace PatternGeneratorJRL
     
     if (m_AnalyticalZMPCoGTrajectoryX!=0)
       delete m_AnalyticalZMPCoGTrajectoryX;
-
+    
     if (m_AnalyticalZMPCoGTrajectoryY!=0)
       delete m_AnalyticalZMPCoGTrajectoryY;
+
+    if (m_CTIPX.ZMPZ!=0)
+      delete m_CTIPX.ZMPZ;
+    
+    if (m_CTIPX.CoMZ!=0)
+      delete m_CTIPX.CoMZ;
+
+    if (m_CTIPX.ZMPProfil!=0)
+      delete m_CTIPX.ZMPProfil;
+
+    /* 
+    if (m_CTIPY.CoMZ!=0)
+      delete m_CTIPY.CoMZ;
+
+    if (m_CTIPY.ZMPZ!=0)
+      delete m_CTIPY.ZMPZ;
+    */
+    if (m_CTIPY.ZMPProfil!=0)
+      delete m_CTIPY.ZMPProfil;
   }
 
 
@@ -339,7 +358,9 @@ namespace PatternGeneratorJRL
 	ofs << endl;
 	ofs.close();
       }
-
+    
+    delete [] work ;
+    delete [] iwork ;
   }
 
  
@@ -742,7 +763,9 @@ namespace PatternGeneratorJRL
 	    COMPosition aCOMPos;
 	    memset(&aCOMPos,0,sizeof(aCOMPos));
 	    m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,aCOMPos.x[0],lIndexInterval);
+	    m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(time,aCOMPos.x[1],lIndexInterval);
 	    m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,aCOMPos.y[0],lIndexInterval);
+	    m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(time,aCOMPos.y[1],lIndexInterval);
 	    aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	    FinalCOMPositions.push_back(aCOMPos);
 	    /*! Feed the FootPositions. */
@@ -1377,10 +1400,11 @@ namespace PatternGeneratorJRL
        if this is the next step which should be changed
        and we went over half the current interval. 
      */
+    ODEBUG(" NewTj : " << NewTj << " LT: " << LocalTime << " "<< reftime << " " << m_DeltaTj[IndexStartingInterval]);
+
     if ((NewTj<m_Tsingle*0.5) &&
 	(IndexStep==IndexStartingInterval+1))
       {
-	ODEBUG(" NewTj : " << NewTj << " LT: " << LocalTime << " "<< reftime << " " << m_DeltaTj[IndexStartingInterval]);
 	ODEBUG(" Too Late for modification");
 	return ERROR_TOO_LATE_FOR_MODIFICATION;
       }
@@ -1848,7 +1872,7 @@ namespace PatternGeneratorJRL
       }
 
     /* Shift the ZMP profil, the initial 
-       and final condition. */
+       and final condition, and update the queue of foot prints. */
     ConstraintsChange(LocalTime,
 		      aFPX,aFPY,
 		      aCTIPX,aCTIPY,
@@ -1996,13 +2020,13 @@ namespace PatternGeneratorJRL
   {
     deque<FootAbsolutePosition> NewFeetAbsolutePosition;
     NewFeetAbsolutePosition.push_back(aFootAbsolutePosition);
-    OnLineFootChanges(time,
-		      NewFeetAbsolutePosition,
-		      ZMPPositions,
-		      CoMPositions,
-		      LeftFootAbsolutePositions,
-		      RightFootAbsolutePositions,
-		      aStepStackHandler);
+    return OnLineFootChanges(time,
+			     NewFeetAbsolutePosition,
+			     ZMPPositions,
+			     CoMPositions,
+			     LeftFootAbsolutePositions,
+			     RightFootAbsolutePositions,
+			     aStepStackHandler);
 
   }
 
@@ -2136,6 +2160,9 @@ namespace PatternGeneratorJRL
 	for(unsigned int j=0,k=lChangedIntervalFoot;j<NewRelFootAbsolutePositions.size();j++,k++)
 	  {
 	    NewRelFootAbsolutePositions[j] = lAbsoluteSupportFootPositions[k];
+	  }
+	for(unsigned int k=lChangedIntervalFoot;k<m_AbsoluteSupportFootPositions.size();k++)
+	  {
 	    m_AbsoluteSupportFootPositions[k] = lAbsoluteSupportFootPositions[k];
 	  }
 	
@@ -2159,6 +2186,10 @@ namespace PatternGeneratorJRL
 	  BackUpm_AbsoluteSupportFootPositions;
 	m_RelativeFootPositions = 
 	  BackUpm_RelativeFootPositions;
+	ODEBUG("Unable to change the step ( " <<  
+		aFootAbsolutePosition[0].x << " , " <<
+		aFootAbsolutePosition[0].y << " , " <<
+		aFootAbsolutePosition[0].theta << " ) ");
 	return -1;
       }
     
@@ -2231,12 +2262,15 @@ namespace PatternGeneratorJRL
 						       deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 						       deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
   {
+    /* Update the relative foot positions. */
+    m_RelativeFootPositions.pop_front();
+    
     m_OnLineMode = true;
     bool DoNotPrepareLastFoot = false;
     int NbSteps = m_RelativeFootPositions.size();
     int NbOfIntervals=2*NbSteps+1;
 
-    ODEBUG3("****************** Begin EndPhaseOfTheWalking **************************");
+    ODEBUG("****************** Begin EndPhaseOfTheWalking **************************");
     // Strategy for the final CoM pos: middle of the segment
     // between the two final steps, in order to be statically stable.
     unsigned int lindex = m_AbsoluteSupportFootPositions.size()-1;
@@ -2264,6 +2298,11 @@ namespace PatternGeneratorJRL
     
     m_CTIPX.FinalCoMPos = FinalCoMPosX;
 
+    for(unsigned int i=0;i<m_CTIPX.ZMPProfil->size();i++)
+      {
+	ODEBUG("m_CTIPX.ZMPProfil["<< i << "]=" << (*m_CTIPX.ZMPProfil)[i]);
+      }
+
         /*! Build 3rd order polynomials. */
     for(int i=1;i<NbOfIntervals-1;i++)
       {
@@ -2280,7 +2319,7 @@ namespace PatternGeneratorJRL
     else
       FinalCoMPosY = 0.5 *(m_AbsoluteSupportFootPositions[lindex-1].y + 
 			   m_AbsoluteSupportFootPositions[lindex].y);
-    ODEBUG3("FinalCoMPosY "<< FinalCoMPosY);
+    ODEBUG("FinalCoMPosY "<< FinalCoMPosY);
     
     if (DoNotPrepareLastFoot)
       (*lZMPY)[j-2] = (*lZMPY)[j-1] = m_AbsoluteSupportFootPositions[lindex].y;
@@ -2289,7 +2328,7 @@ namespace PatternGeneratorJRL
 
     for(unsigned int i=0;i<m_CTIPY.ZMPProfil->size();i++)
       {
-	ODEBUG3("m_CTIPY.ZMPProfil["<< i << "]=" << (*m_CTIPY.ZMPProfil)[i]);
+	ODEBUG("m_CTIPY.ZMPProfil["<< i << "]=" << (*m_CTIPY.ZMPProfil)[i]);
       }
     m_CTIPY.FinalCoMPos = FinalCoMPosY;
 
@@ -2302,7 +2341,7 @@ namespace PatternGeneratorJRL
     ComputeTrajectory(m_CTIPY,*m_AnalyticalZMPCoGTrajectoryY);
 
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_PreviewControlTime;    
-    ODEBUG3("m_UpperTimeLimitToUpdateStacks:" << m_UpperTimeLimitToUpdateStacks);
+    ODEBUG("m_UpperTimeLimitToUpdateStacks:" << m_UpperTimeLimitToUpdateStacks);
 
     unsigned int lIndexInterval,lPrevIndexInterval;
     m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_AbsoluteTimeReference,lIndexInterval);
@@ -2320,7 +2359,6 @@ namespace PatternGeneratorJRL
 
 		
 	/*! Feed the COMPositions. */
-
 	COMPosition aCOMPos;
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0],lIndexInterval);
@@ -2345,7 +2383,7 @@ namespace PatternGeneratorJRL
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Test.dat");
       }
 
-    ODEBUG3("****************** End of EndPhaseOfTheWalking **************************");
+    ODEBUG("****************** End of EndPhaseOfTheWalking **************************");
   }
 
   void AnalyticalMorisawaCompact::RegisterMethods()

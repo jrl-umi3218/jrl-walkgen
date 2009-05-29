@@ -1,5 +1,13 @@
 2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[src/ZMPRefTrajectoryGeneration] Fix wrong initialization and memory leak.
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: 
+	Wrong initialization of angles, memory leak and Com Speed.
+	* src/ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp: 
+	Stupid modulo computation removed.
+
+2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[src/MotionGeneration] Fixed wrong initialization of the feet.
 	* src/MotionGeneration/ComAndFootRealizationByGeometry.cpp: 
 	Proper initialization of the feet positions.

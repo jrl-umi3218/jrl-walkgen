@@ -640,7 +640,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   RightFootAbsolutePositions.resize(AddArraySize);    
   
   m_CurrentAbsTheta+= m_RelativeFootPositions[0].theta;
-  m_CurrentAbsTheta = fmod(m_CurrentAbsTheta,180);
+  //  m_CurrentAbsTheta = fmod(m_CurrentAbsTheta,180);
 
   // Computes the new ABSOLUTE position of the supporting foot .
   UpdateCurrentSupportFootPosition(m_RelativeFootPositions[0]);
