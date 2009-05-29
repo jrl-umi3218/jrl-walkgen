@@ -1,5 +1,11 @@
 2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[src/MotionGeneration] Fixed wrong initialization of the feet.
+	* src/MotionGeneration/ComAndFootRealizationByGeometry.cpp: 
+	Proper initialization of the feet positions.
+
+2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[src/FootTrajectoryGeneration] Adding ComputeCOMSpeed + proper init.
 	* src/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp: 
 	Adding ComputeCOMSpeed.

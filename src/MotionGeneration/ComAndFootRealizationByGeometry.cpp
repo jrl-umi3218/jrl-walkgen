@@ -348,6 +348,10 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 							FootAbsolutePosition & InitRightFootPosition)
 {
 
+  /* Initialize properly the left and right initial positions of the feet. */
+  memset((char *)&InitLeftFootPosition,0,sizeof(FootAbsolutePosition));
+  memset((char *)&InitRightFootPosition,0,sizeof(FootAbsolutePosition));
+  
   MAL_VECTOR_RESIZE(lStartingWaistPose,6);
   if (m_InverseKinematics==0)
     {
