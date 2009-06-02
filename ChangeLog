@@ -1,5 +1,15 @@
 2009-06-02  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[src/ZMPRefTrajectoryGeneration] Filtering Analytical Trajectory.
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/
+	FilteringAnalyticalTrajectoryByPreviewControl.h: 
+	Filter by preview control.
+	* src/ZMPRefTrajectoryGeneration/
+	FilteringAnalyticalTrajectoryByPreviewControl.cpp: 
+	New file.
+
+2009-06-02  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[src/ZMPRefTrajectoryGeneration] Preparation for filtering.
 	* include/walkGenJrl/ZMPRefTrajectoryGeneration/
 	AnalyticalMorisawaCompact.h: 
