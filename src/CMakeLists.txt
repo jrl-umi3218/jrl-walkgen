@@ -38,6 +38,7 @@ SET(libwpg_src
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaFull.cpp 
+	./ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.cpp 
 	./MotionGeneration/InverseKinematics.cpp 
 	./MotionGeneration/StepOverPlanner.cpp
 	./MotionGeneration/CollisionDetector.cpp

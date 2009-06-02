@@ -1,5 +1,17 @@
 2009-06-02  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	Script files for display and build.
+	* src/CMakeLists.txt: 
+	Adding Filtering.
+	* unitTesting/PlotZMPCOMFeetX.gnu: 
+	New - to be used with TestFGPI.dat.
+	* unitTesting/PlotZMPCOMFeetY.gnu: New.
+	* unitTesting/PlotZMPCOMFeetZ.gnu: New.
+	* unitTesting/PlotZMPCOMFeetdX.gnu: New.
+	* unitTesting/PlotZMPCOMFeetdY.gnu: New.
+
+2009-06-02  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[src/ZMPRefTrajectoryGeneration] Filtering Analytical Trajectory.
 	* include/walkGenJrl/ZMPRefTrajectoryGeneration/
 	FilteringAnalyticalTrajectoryByPreviewControl.h: 
