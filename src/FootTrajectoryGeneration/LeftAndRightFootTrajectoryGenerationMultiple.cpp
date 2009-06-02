@@ -33,7 +33,9 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #define ODEBUG2(x)
-#define ODEBUG3(x) cerr << "LeftAndRightFootTrajectoryGenerationMultiple :" << x << endl
+#define ODEBUG3(x) cerr << "LeftAndRightFootTrajectoryGenerationMultiple :" << ": " << __FUNCTION__ \
+                       << "(# " << __LINE__ << "): "<< x << endl
+
 #define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "PGI: " << x << endl; DebugFile.close();}
 #if 0
@@ -119,7 +121,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 								 FootAbsolutePosition &FootFinalPosition)
 {
 
-  ODEBUG("Set interval " << IntervalIndex << " : " << m_DeltaTj[IntervalIndex] << " X: ("
+  ODEBUG("Set interval " << IntervalIndex << "/" << m_DeltaTj.size() << " : " << m_DeltaTj[IntervalIndex] << " X: ("
 	  << FootFinalPosition.x << "," << FootInitialPosition.x << "," << FootInitialPosition.dx << ")("
 	  << FootFinalPosition.y << "," << FootInitialPosition.y << "," << FootInitialPosition.dy << ")("
 	  << FootFinalPosition.z << "," << FootInitialPosition.z << "," << FootInitialPosition.dz << ")");
@@ -246,7 +248,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
       v2(1,0) = LeftFootInitialPosition.y;
       
     }
-  ODEBUG3("Support Foot : " << v2(0,0) << " " << v2(1,0) << " " << CurrentAbsTheta);
+  ODEBUG("Support Foot : " << v2(0,0) << " " << v2(1,0) << " " << CurrentAbsTheta);
   
   // Initial Position of the current support foot.
   c = cos(CurrentAbsTheta*M_PI/180.0);
@@ -538,6 +540,39 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
       if ((!IgnoreFirst) || (i>0))
 	SupportFoot=-SupportFoot;
     }
+
+  /*! This part initializes correctly the last two intervals
+   if the system is in real-time foot modification. In this case,
+   the representation of the intervals shift from:
+  ONE DOUBLE SUPPORT STARTING PHASE - 1st foot single support phase - double support phase - 2nd foot single support phase
+  - double support phase - 3rd single support phase - ending double support phase 
+  to
+  1st foot single support phase - double support phase - 2nd foot single support phase
+  - double support phase - 3rd single support phase 
+  Two intervals are missing and should be set by default to the end position of the feet
+  if Continuity is set to true, and if the number of intervals so far is the number of
+  intervals minus 2.
+  */
+
+  if ((Continuity) && (IntervalIndex==m_DeltaTj.size()-2))
+    {
+      for(unsigned int lk=0;lk<2;lk++)
+	{
+	  LeftFootTmpFinalPos.z = 0;
+	  LeftFootTmpFinalPos.dz = 0;
+	  SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
+			LeftFootTmpFinalPos,
+			LeftFootTmpFinalPos);
+	  RightFootTmpFinalPos.z = 0;
+	  RightFootTmpFinalPos.dz = 0;
+	  SetAnInterval(IntervalIndex,m_RightFootTrajectory,
+			RightFootTmpFinalPos,
+			RightFootTmpFinalPos);
+	  IntervalIndex++;
+	}
+      
+    }
+
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::
@@ -773,9 +808,18 @@ void LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition
   ODEBUG("Left (1) or right (-1) : " <<  LeftOrRight);
 
   if (LeftOrRight==1)
-    m_LeftFootTrajectory->Compute(time,aFAP);
+    {
+      bool r = m_LeftFootTrajectory->Compute(time,aFAP);
+      if (!r)
+	{ODEBUG3("Unable to compute left foot abs pos at time " <<time);}
+    }
   else 
-    m_RightFootTrajectory->Compute(time,aFAP);
+    {
+      bool r = m_RightFootTrajectory->Compute(time,aFAP);
+      if (!r)
+	{ODEBUG3("Unable to compute right foot abs pos at time " <<time);}
+    }
+
 
 }
 

@@ -1,5 +1,14 @@
 2009-06-02  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[src/FootTrajectoryGeneration] Adding proper stopping.
+	* src/FootTrajectoryGeneration/
+	LeftAndRightFootTrajectoryGenerationMultiple.cpp: 
+	Made sure that ALL the intervals of the feet trajectories
+	are properly initialized. This was the key to have a proper
+	stop.
+
+2009-06-02  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	Script files for display and build.
 	* src/CMakeLists.txt: 
 	Adding Filtering.
