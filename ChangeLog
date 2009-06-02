@@ -1,3 +1,12 @@
+2009-06-02  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src/PreviewControl] Adding 1D method to handle vector instead of queue.
+	* include/walkGenJrl/PreviewControl/PreviewControl.h: 
+	Method declaration for OneIterationOfPreview1D (vector version).
+	* src/PreviewControl/PreviewControl.cpp: 
+	Method implementation.
+	
+
 2009-05-29  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	[src/ZMPRefTrajectoryGeneration] Fix an operator problem.

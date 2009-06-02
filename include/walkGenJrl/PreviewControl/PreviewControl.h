@@ -33,6 +33,7 @@
 #include <iostream>
 #include <string>
 #include <deque>
+#include <vector>
 
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 using namespace::std;
@@ -63,7 +64,7 @@ namespace PatternGeneratorJRL
       void ReadPrecomputedFile(string aFileName);
   
 
-      /*! One iteration of the preview control. */
+      /*! \brief One iteration of the preview control. */
       int OneIterationOfPreview(MAL_MATRIX(& x,double), 
 				MAL_MATRIX(& y,double),
 				double & sxzmp, double & syzmp,
@@ -72,7 +73,8 @@ namespace PatternGeneratorJRL
 				double & zmpx2, double & zmpy2,
 				bool Simulation);
 
-      /*! One iteration of the preview control along one axis */
+
+      /*! \brief One iteration of the preview control along one axis (using queues)*/
       int OneIterationOfPreview1D(MAL_MATRIX( &x, double), 
 				  double & sxzmp,
 				  deque<double> & ZMPPositions,
@@ -80,7 +82,22 @@ namespace PatternGeneratorJRL
 				  double & zmpx2,
 				  bool Simulation);
 
-      /*! Getter for the sampling period. */
+      /*! \brief One iteration of the preview control along one axis (using vectors) 
+	\param [in][out] x: Current state of the CoM along the axis.
+	\param [in][out] sxzmp: Summed error.
+	\param [in] ZMPPositions: Vector of ZMP reference positions.
+	\param [in] lindex: Starting index in the array of ZMP reference positions.
+	\param [out] zmpx2: Resulting ZMP value.
+	\param [in] Simulation: This should be set to false.
+       */
+      int OneIterationOfPreview1D(MAL_MATRIX( &x, double), 
+				  double & sxzmp,
+				  vector<double> & ZMPPositions,
+				  unsigned int lindex,
+				  double & zmpx2,
+				  bool Simulation);
+
+      /*! \brief Getter for the sampling period. */
       inline double SamplingPeriod() const
 	{ return m_SamplingPeriod; }
 

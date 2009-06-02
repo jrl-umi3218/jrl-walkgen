@@ -216,6 +216,49 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
   return 0;
 }
 
+int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double), 
+					    double & sxzmp,
+					    vector<double> & ZMPPositions,
+					    unsigned int lindex,
+					    double & zmpx2,
+					    bool Simulation)
+{
+
+  double ux=0.0;
+
+  MAL_MATRIX_DIM(r,double,1,1);
+
+  // Compute the command.
+  r = MAL_RET_A_by_B(m_Kx,x);
+  ux = - r(0,0) + m_Ks * sxzmp ;
+  
+  ODEBUG( "x: " << x);
+  ODEBUG(" ux phase 1: " << ux);
+  if(ZMPPositions.size()<m_SizeOfPreviewWindow)
+    {
+      cout << "You've got a problem here " << endl;
+      exit(0);
+    }
+  
+  for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
+    ux += m_F(i,0)* ZMPPositions[lindex+i];
+  ODEBUG(" ux preview window phase: " << ux );
+  x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
+   
+  zmpx2 = (MAL_RET_A_by_B(m_C,x))(0,0);
+  
+  if (Simulation)
+    {
+      sxzmp += (ZMPPositions[lindex] - zmpx2);
+    }
+  
+  ODEBUG("zmpx: " << zmpx2 );
+  ODEBUG("sxzmp: " << sxzmp);
+  ODEBUG("********");
+
+  return 0;
+}
+
 
 double PreviewControl::GetHeightOfCoM()
 {
