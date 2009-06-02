@@ -1,3 +1,9 @@
+2009-06-03  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[unitTesting] Adding script to perform valgrind check.
+	* unitTesting/TestFootPrintPGInterface.Valgrind.sh: 
+	New file - this version has the full options.
+
 2009-06-02  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	[src/FootTrajectoryGeneration] Adding proper stopping.
