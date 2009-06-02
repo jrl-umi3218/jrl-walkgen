@@ -49,6 +49,7 @@
 #include <walkGenJrl/Mathematics/AnalyticalZMPCOGTrajectory.h>
 #include <walkGenJrl/PreviewControl/PreviewControl.h>
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.h>
+#include <walkGenJrl/ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.h>
 #include <walkGenJrl/FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.h>
 
 
@@ -602,6 +603,12 @@ namespace PatternGeneratorJRL
     
       /*! On-line change step mode */
       unsigned int m_OnLineChangeStepMode;
+
+      /*! Filtering the axis through a preview control. */
+      FilteringAnalyticalTrajectoryByPreviewControl * m_FilterXaxisByPC, * m_FilterYaxisByPC;
+      
+      /*! Activate or desactivate the filtering. */
+      bool m_FilteringActivate;
 
     public:
       /*! \name Methods related to the Preview Control object used

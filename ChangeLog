@@ -1,5 +1,14 @@
 2009-06-02  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[src/ZMPRefTrajectoryGeneration] Preparation for filtering.
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/
+	AnalyticalMorisawaCompact.h: 
+	Adding FilterByPreviewControl.
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: .
+	Adding FilterByPreviewControl.
+
+2009-06-02  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[src/PreviewControl] Adding 1D method to handle vector instead of queue.
 	* include/walkGenJrl/PreviewControl/PreviewControl.h: 
 	Method declaration for OneIterationOfPreview1D (vector version).
