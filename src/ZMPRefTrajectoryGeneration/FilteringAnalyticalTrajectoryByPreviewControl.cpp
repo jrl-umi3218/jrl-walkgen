@@ -14,6 +14,8 @@
    in the root directory.
 
 */
+#include <iostream>
+#include <fstream>
 #define ODEBUG(x)
 
 #define ODEBUG3(x) cerr << "FilteringAnalyticalTrajectoryByPreviewControl" << ": " << __FUNCTION__ \
@@ -32,6 +34,7 @@ FilteringAnalyticalTrajectoryByPreviewControl::FilteringAnalyticalTrajectoryByPr
   m_StartingTime = 0.0;
   m_Duration  = 0.0;
   m_SamplingPeriod = 0.0;
+  m_Tsingle = 0.0;
 
   m_AnalyticalZMPCOGTrajectory = 0;
   m_PreviewControl = 0;
@@ -46,11 +49,12 @@ FilteringAnalyticalTrajectoryByPreviewControl::FilteringAnalyticalTrajectoryByPr
 
   m_LocalBufferIndex=0;
 
-  std::string aMethodName[2] = 
+  std::string aMethodName[3] = 
     {":samplingperiod",
-     ":previewcontroltime"};
+     ":previewcontroltime",
+     ":singlesupporttime"};
   
-  for(int i=0;i<2;i++)
+  for(int i=0;i<3;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
 	{
@@ -87,13 +91,17 @@ void FilteringAnalyticalTrajectoryByPreviewControl::SetPreviewControl(PreviewCon
 
 void FilteringAnalyticalTrajectoryByPreviewControl::Resize()
 {
-  if ((m_SamplingPeriod!=0.0) && (m_PreviewControlTime!=0.0))
+#if 0
+  if ((m_SamplingPeriod!=0.0) && 
+      (m_PreviewControlTime!=0.0) &&
+      (m_Tsingle!=0.0))
     {
-      unsigned int DataBufferSize = (unsigned int ) (m_PreviewControlTime/
+      unsigned int DataBufferSize = (unsigned int ) ((m_Tsingle +m_PreviewControlTime)/
 						     m_SamplingPeriod);
-      ODEBUG3("DataBufferSize:" << DataBufferSize);
+      ODEBUG3("m_Tsingle: " << m_Tsingle << " DataBufferSize:" << DataBufferSize);
       m_DataBuffer.resize(DataBufferSize);
     }
+#endif
 }
 
 FilteringAnalyticalTrajectoryByPreviewControl::~FilteringAnalyticalTrajectoryByPreviewControl()
@@ -118,30 +126,46 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(double Fir
   m_StartingTime = m_AnalyticalZMPCOGTrajectory->GetAbsoluteTimeReference();
   double DeltaT = m_PreviewControl->SamplingPeriod();
 
-  unsigned int SizeOfBuffer = (unsigned int)(PreviewWindowTime/DeltaT);
+  unsigned int SizeOfBuffer = (unsigned int)((DeltaTj0+PreviewWindowTime)/DeltaT);
+  ODEBUG("SizeOfBuffer: " <<SizeOfBuffer<< " Duration : "<<m_Duration);
   if (m_DataBuffer.size()!=SizeOfBuffer)
     m_DataBuffer.resize(SizeOfBuffer);
 
   unsigned int lDataBufferIndex = 0;
   double lZMP;
   double t=0;
+
+  if (0)
+    {
+      ofstream aof;
+      static unsigned int nbofmodifs = 0;
+      char Buffer[1024];
+      sprintf(Buffer,"Diff_%05d.dat",nbofmodifs++);
+      aof.open(Buffer,ofstream::out);
+    }
+  // On the interval of the newly changed first foot. 
   for( unsigned int lDataBufferIndex = 0;lDataBufferIndex<m_DataBuffer.size();t+=DeltaT,lDataBufferIndex++)
     {
       double r=0.0;
       if (t<DeltaTj0)
 	{
 	  m_AnalyticalZMPCOGTrajectory->ComputeZMP(t+m_StartingTime,lZMP);
+	  // The difference between the desired ZMP (FirstValueofZMPProfil)
+	  // and the analytical value is computed.
 	  r = FirstValueofZMPProfil - lZMP;
 	}
-
+      
       m_DataBuffer[lDataBufferIndex] = r;
-
+      // aof << r << endl;
     }
+  //aof.close();
 
   /*! Initialize the state vector used by the preview controller */
   m_ComState(0,0) = 0.0;
   m_ComState(1,0) = 0.0;
   m_ComState(2,0) = 0.0;
+  
+  m_ZMPPCValue = 0;
 
   m_LocalBufferIndex = 0;
   return true;
@@ -153,14 +177,16 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::UpdateOneStep(double t,
 								  double &CoMSpeedValue)
 {
   ODEBUG("time:" << t << " m_StartingTime: " << 
-	  m_StartingTime << " " << m_Duration + m_StartingTime);
+	  m_StartingTime << " " << m_Duration + m_StartingTime << " ( " << m_Duration << " ) "
+	  << " LBI:" << m_LocalBufferIndex);
   if ((t<m_StartingTime) || (t>m_Duration+m_StartingTime))
     return false;
 
   double lsxzmp =0.0;
   m_PreviewControl->OneIterationOfPreview1D(m_ComState,lsxzmp,m_DataBuffer,m_LocalBufferIndex,
-					    ZMPValue,false);
+					    m_ZMPPCValue,false);
   
+  ZMPValue = m_ZMPPCValue;
   CoMValue = m_ComState(0,0);
   CoMSpeedValue = m_ComState(1,0);
 
@@ -189,6 +215,15 @@ void FilteringAnalyticalTrajectoryByPreviewControl::CallMethod(std::string &Meth
       if (strm.good())
 	{
 	  strm >> m_PreviewControlTime;
+	  Resize();
+	}
+    }
+  else if (Method==":singlesupporttime")
+    {
+      std::string aws;
+      if (strm.good())
+	{
+	  strm >> m_Tsingle;
 	  Resize();
 	}
     }

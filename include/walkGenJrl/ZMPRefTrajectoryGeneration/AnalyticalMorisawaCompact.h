@@ -353,6 +353,7 @@ namespace PatternGeneratorJRL
 				    AnalyticalZMPCOGTrajectory &aAZCTY,
 				    CompactTrajectoryInstanceParameters &aCTIPY,
 				    bool TemporalShift,
+				    bool ResetFilters,
 				    StepStackHandler *aStepStackHandler=0);
 
       /*! \brief For the current time t, we will change the foot position 

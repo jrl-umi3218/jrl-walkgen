@@ -1,5 +1,25 @@
 2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[src/ZMPRefTrajectoryGeneration] Second validation for the filtering.
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/
+	AnalyticalMorisawaCompact.h: Putting back the filter
+	at the right place: during foot change and not while
+	adding foot.
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/
+	FilteringAnalyticalTrajectoryByPreviewControl.h: 
+	Adding m_Tsingle to take into account the interval
+	on which the modification applies.
+	* src/PreviewControl/PreviewControl.cpp: 
+	Addind debugging info if some properties are not	
+	well respected.
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: 
+	Implementation of above description.
+	* src/ZMPRefTrajectoryGeneration/
+	FilteringAnalyticalTrajectoryByPreviewControl.cpp: 
+	The filtering is now done properly.
+
+2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[unitTesting] putting back TestRiccatiEquation + various scripts.
 	* unitTesting/CMakeLists.txt: 
 	Adding TestRiccatiEquation.

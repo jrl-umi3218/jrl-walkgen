@@ -96,6 +96,12 @@ namespace PatternGeneratorJRL
     
     /*! \brief Sampling period. */
     double m_SamplingPeriod;
+    
+    /*! \brief Single support time. */
+    double m_Tsingle;
+
+    /*! \brief Current ZMP value of the preview control. */
+    double m_ZMPPCValue;
 
     /*! \brief Resizing the data buffer depending of the sampling period and
       preview control time. */

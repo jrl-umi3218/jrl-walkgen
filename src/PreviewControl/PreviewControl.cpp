@@ -397,10 +397,15 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
   int TestSize = ZMPPositions.size()-lindex - m_SizeOfPreviewWindow;
 
   if (TestSize>=0)
-    for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
-      ux += m_F(i,0)* ZMPPositions[lindex+i];
+    {
+      for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
+	ux += m_F(i,0)* ZMPPositions[lindex+i];
+    }
   else
     {
+      ODEBUG3("Case where TestSize<0 (lindex:" <<lindex << 
+	      " , ZMPPositions.size(): " << ZMPPositions.size() << 
+	      " , m_SizeOfPreviewWindow: " << m_SizeOfPreviewWindow);
       for(unsigned int i=lindex;i<ZMPPositions.size();i++)
 	ux += m_F(i,0)* ZMPPositions[i];
 

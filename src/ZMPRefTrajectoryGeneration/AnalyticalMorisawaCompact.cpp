@@ -756,26 +756,26 @@ namespace PatternGeneratorJRL
 	    memset(&aZMPPos,0,sizeof(aZMPPos));
 	    COMPosition aCOMPos;
 	    memset(&aCOMPos,0,sizeof(aCOMPos));
-		
+
 	    if (m_FilteringActivate)
 	      {
-		double ZmpX, ComX,ComdX;
+		double FZmpX=0, FComX=0,FComdX=0;
 		
 		// Should we filter ?
-		bool r = m_FilterXaxisByPC->UpdateOneStep(time,ZmpX, ComX, ComdX);
+		bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
 		if (r)
 		  {
+		    double FZmpY=0, FComY=0,FComdY=0;
 		    // Yes we should.
-		    double ZmpY, ComY,ComdY;
-		    bool r = m_FilterXaxisByPC->UpdateOneStep(time,ZmpY, ComY, ComdY);
+		    m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
 
 		    /*! Feed the ZMPPositions. */
-		    aZMPPos.px = ZmpX;
-		    aZMPPos.py = ZmpY;
+		    aZMPPos.px = FZmpX;
+		    aZMPPos.py = FZmpY;
 
 		    /*! Feed the COMPositions. */
-		    aCOMPos.x[0] = ComX; aCOMPos.x[1] = ComdX;
-		    aCOMPos.y[0] = ComY; aCOMPos.y[1] = ComdY;
+		    aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
+		    aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
 		  }
 	      }
 
@@ -889,7 +889,7 @@ namespace PatternGeneratorJRL
 			      *m_AnalyticalZMPCoGTrajectoryX,
 			      m_CTIPX,
 			      *m_AnalyticalZMPCoGTrajectoryY,
-			      m_CTIPY,false);
+			      m_CTIPY,false,false);
 
     /* Indicates that the step has been taken into account appropriatly
        in computing the trajectory. */
@@ -1747,7 +1747,7 @@ namespace PatternGeneratorJRL
 				*m_AnalyticalZMPCoGTrajectoryX,
 				m_CTIPX,
 				*m_AnalyticalZMPCoGTrajectoryY,
-				m_CTIPY,true);
+				m_CTIPY,true,true);
     return r;
   }
 							   
@@ -1759,6 +1759,7 @@ namespace PatternGeneratorJRL
 							   AnalyticalZMPCOGTrajectory &aAZCTY,
 							   CompactTrajectoryInstanceParameters &aCTIPY,
 							   bool TemporalShift,
+							   bool ResetFilters,
 							   StepStackHandler * aStepStackHandler)
   {
     double LocalTime = t - m_AbsoluteTimeReference;
@@ -1942,16 +1943,18 @@ namespace PatternGeneratorJRL
     ComputeTrajectory(aCTIPY,aAZCTY);
     ComputeTrajectory(aCTIPX,aAZCTX);
 
-    if (m_FilteringActivate)
+    m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(t);
+    m_AbsoluteTimeReference = t;
+
+
+    /* Reset the filters */
+    // Preparing the filtering out of the feet.
+    if (m_FilteringActivate && ResetFilters)
       {
 	m_FilterXaxisByPC->FillInWholeBuffer(aFPX.ZMPInit,m_DeltaTj[0]);
 	m_FilterYaxisByPC->FillInWholeBuffer(aFPY.ZMPInit,m_DeltaTj[0]);
       }
 
-    m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(t);
-    m_AbsoluteTimeReference = t;
-
-    /* Reset the filters */
     
     return 0;
   }
@@ -2224,7 +2227,7 @@ namespace PatternGeneratorJRL
 				  *m_AnalyticalZMPCoGTrajectoryX,
 				  m_CTIPX,
 				  *m_AnalyticalZMPCoGTrajectoryY,
-				  m_CTIPY,true,
+				  m_CTIPY,true,true,
 				  aStepStackHandler)<0)
       {
 	m_AbsoluteCurrentSupportFootPosition=
@@ -2479,7 +2482,7 @@ namespace PatternGeneratorJRL
 	    else if (aws=="deactivate")
 	      m_FilteringActivate = false;
 
-	    ODEBUG3("m_FilteringActivate: "<< m_FilteringActivate);
+	    ODEBUG("m_FilteringActivate: "<< m_FilteringActivate);
 	  }
       }
 
