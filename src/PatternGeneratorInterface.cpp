@@ -1,3 +1,15 @@
+/* \doc This object is the interface to the walking gait
+   generation rchitecture
+   Copyright (c) 2005-2009, 
+   Olivier Stasse,
+
+   JRL-Japan, CNRS/AIST
+
+   All rights reserved.
+   
+   Please look at License.txt for details on the license.
+
+*/
 #include <fstream>
 #include <time.h>
 	
@@ -281,7 +293,7 @@ namespace PatternGeneratorJRL {
     m_ZMPM->SetHumanoidSpecificities(m_HumanoidDynamicRobot->getHumanoidSpecificities());
 
     // Preview control for a 3D Linear inverse pendulum
-    m_PC = new PreviewControl();
+    m_PC = new PreviewControl(this);
 
     // Object to generate Motion from KineoWorks.
     m_GMFKW = new GenerateMotionFromKineoWorks();

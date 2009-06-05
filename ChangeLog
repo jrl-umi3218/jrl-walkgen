@@ -1,5 +1,21 @@
 2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	License scheme.
+	* include/walkGenJrl/SimplePlugin.h: 
+	License.
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/
+	AnalyticalMorisawaCompact.h: License.
+	* src/PatternGeneratorInterface.cpp: License + PreviewControl Modif.
+	* src/PreviewControl/OptimalControllerSolver.cpp: 
+	License + removed some debugging information.
+	* src/StepStackHandler.cpp: License.
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp: 
+	License.
+	* src/ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.cpp: 
+	License.
+
+2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[src/PreviewControl] Plugin, license and optimization.
 	* include/walkGenJrl/PreviewControl/PreviewControl.h: 
 	PreviewControl inherits from SimplePlugin and 
