@@ -1,5 +1,15 @@
 2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[src/ZMPRefGenerationTrajectory] Preview Filter is now a plugin.
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/
+	FilteringAnalyticalTrajectoryByPreviewControl.h: 
+	Debugged the filter and transform it as a plugin.
+	* src/ZMPRefTrajectoryGeneration/
+	FilteringAnalyticalTrajectoryByPreviewControl.cpp: 
+	Implements the interface.
+
+2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	License scheme.
 	* include/walkGenJrl/SimplePlugin.h: 
 	License.

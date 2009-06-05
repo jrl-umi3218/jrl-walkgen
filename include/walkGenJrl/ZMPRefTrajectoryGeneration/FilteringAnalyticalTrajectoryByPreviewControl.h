@@ -26,12 +26,13 @@ namespace PatternGeneratorJRL
   /*! \object This class intends to filter an analytical 
     trajectory using a preview control model. */
 
-  class WALK_GEN_JRL_EXPORT FilteringAnalyticalTrajectoryByPreviewControl
+  class WALK_GEN_JRL_EXPORT FilteringAnalyticalTrajectoryByPreviewControl : public SimplePlugin
   {
   public:
 
     /*! \brief Default constructor */
-    FilteringAnalyticalTrajectoryByPreviewControl(AnalyticalZMPCOGTrajectory * lAnalyticalZMPCOGTrajectory=0,
+    FilteringAnalyticalTrajectoryByPreviewControl(SimplePluginManager * lSPM,
+						  AnalyticalZMPCOGTrajectory * lAnalyticalZMPCOGTrajectory=0,
 						  PreviewControl * lPreviewControl=0);
 
     /*! \brief Set Analytical trajectory */
@@ -44,11 +45,11 @@ namespace PatternGeneratorJRL
       This has to be done if the analytical trajectory has been changed,
       and that the first interval has been changed.
       \param FistValueOfZMPProfil: The first value of the desired ZMP interval.
-      \param DeltaTj0: Value of the time interval on which the filter is applied.
+      \param DeltaTj0: Value of the time interval during which the filter is applied.
       \return false if a problem occured, true otherwise.
      */
-    bool FillInWholeBuffer(double DeltaTj0,
-			   double FirstValueofZMPProfil);
+    bool FillInWholeBuffer(double FirstValueofZMPProfil,
+			   double DeltaTj0 );
 
     /*! \brief Update the buffer by removing the first value in the queue,
       and adding a new one corresponding to the next control step.
@@ -56,6 +57,10 @@ namespace PatternGeneratorJRL
     \return false if a problem occured, true otherwise.
     */
     bool UpdateOneStep(double t, double &ZMPValue, double &CoMValue,double &CoMSpeedValue);
+
+    /*! \brief Overloading method of SimplePlugin */
+    virtual void CallMethod(std::string &Method,
+			    std::istringstream &astrm); 
 
     /*! \brief Default destructor */
     ~FilteringAnalyticalTrajectoryByPreviewControl();
@@ -80,9 +85,21 @@ namespace PatternGeneratorJRL
     /*! \brief State of the CoM */
     MAL_MATRIX(m_ComState,double);
 
-    /*! \brief State of the ZMP. */
-    double m_ZMP;
+    /*! \brief Starting time of the filter. */
+    double m_StartingTime;
+
+    /*! \brief Duration of the filtering. */
+    double m_Duration;
+
+    /*! \brief Preview control time. */
+    double m_PreviewControlTime;
     
+    /*! \brief Sampling period. */
+    double m_SamplingPeriod;
+
+    /*! \brief Resizing the data buffer depending of the sampling period and
+      preview control time. */
+    void Resize();
   };
 };
 #endif /* _FILTERING_ANALYTICAL_TRAJECTORY_BY_PREVIEW_CONTROL_H_ */
