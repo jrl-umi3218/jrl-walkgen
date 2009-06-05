@@ -1,30 +1,16 @@
 /* Object to perform preview control on a cart model
-    Copyright (c) 2005-2006, 
+   
+   Copyright (c) 2005-2009, 
    @author Olivier Stasse, Ramzi Sellouati, Francois Keith
    
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
    
-   Redistribution and use in source and binary forms, with or without modification, 
-   are permitted provided that the following conditions are met:
+   For more information on the license please look at License.txt 
+   in the root directory.
+
    
-   * Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-   * Neither the name of the CNRS/AIST nor the names of its contributors 
-   may be used to endorse or promote products derived from this software without specific prior written permission.
-   
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
-   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
-   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _PREVIEW_CONTROL_H_
 #define _PREVIEW_CONTROL_H_
@@ -40,6 +26,8 @@ using namespace::std;
 
 #include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PGTypes.h>
+#include <walkGenJrl/SimplePlugin.h>
+#include <walkGenJrl/PreviewControl/OptimalControllerSolver.h>
 
 namespace PatternGeneratorJRL
 {
@@ -49,16 +37,17 @@ namespace PatternGeneratorJRL
       
       \brief Class to implement the preview control
    */
-  class WALK_GEN_JRL_EXPORT PreviewControl
+  class WALK_GEN_JRL_EXPORT PreviewControl : public SimplePlugin
     {
     public:
+      
       /*! Constructor */
-      PreviewControl();
+      PreviewControl(SimplePluginManager *lSPM);
 
       /*! Destructor */
       ~PreviewControl();
 
-      /** Read the file of parameters aFileName
+      /** \brief Read the file of parameters aFileName
 	  and set the sampling period, the preview control time,
 	  Ks, Kx, and F. */
       void ReadPrecomputedFile(string aFileName);
@@ -96,29 +85,53 @@ namespace PatternGeneratorJRL
 				  unsigned int lindex,
 				  double & zmpx2,
 				  bool Simulation);
-
+      
+      /*! \name Methods to access the basic variables of the preview control.
+	@{
+      */
       /*! \brief Getter for the sampling period. */
-      inline double SamplingPeriod() const
-	{ return m_SamplingPeriod; }
-
+      double SamplingPeriod() const;
+	
       /*! Getter for the preview control time. */
-      inline double  PreviewControlTime() const
-	{ return m_PreviewControlTime; }
+      double  PreviewControlTime() const;
 
       /*! Getter for the height position of the CoM. */
-      double GetHeightOfCoM();
+      double GetHeightOfCoM() const;
 
-      /*! Overloading of << operator. */
+      /*! \brief Setter for the sampling period. */
+      void SetSamplingPeriod(double lSamplingPeriod);
+	
+      /*! \biref Setter for the preview control time. */
+      void SetPreviewControlTime(double lPreviewControlTime);
+
+      /*! Getter for the height position of the CoM. */
+      void SetHeightOfCoM(double lZc);
+      /*! \brief Indicates if the weights are coherent with the parameters. */
+      bool IsCoherent();
+
+      /*! @} */
+
+      /*! \brief Compute optimal weights.
+	\param [in] mode: with initial pos, without initial position.
+       */
+      void ComputeOptimalWeights(unsigned int mode);
+
+      /*! \brief Overloading of << operator. */
       void print();
-      
-    protected:
 
-      /*! Matrices for preview control. */
+      /*! \brief Overloading method of SimplePlugin */
+      virtual void CallMethod(std::string &Method,
+			      std::istringstream &astrm); 
+    private:
+
+      /*! \brief Matrices for preview control. */
       MAL_MATRIX(m_A,double);
       MAL_MATRIX(m_B,double);
       MAL_MATRIX(m_C,double);
 
-      /** \name Control parameters. */
+
+      /** \name Control parameters. 
+       @{ */
 
       /*! Gain on the current state of the CoM. */
       MAL_MATRIX(m_Kx,double);
@@ -142,6 +155,9 @@ namespace PatternGeneratorJRL
       /*! Height of the CoM. */
       double m_Zc;
       //@}
+
+      /*! \brief Keep track of the modification of the preview parameters. */
+      bool m_Coherent;
     };
 }
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>

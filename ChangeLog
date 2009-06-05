@@ -1,3 +1,12 @@
+2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	[src/PreviewControl] Plugin, license and optimization.
+	* include/walkGenJrl/PreviewControl/PreviewControl.h: 
+	PreviewControl inherits from SimplePlugin and 
+	is able to compute its own weights.
+	* src/PreviewControl/PreviewControl.cpp: 
+	Implements the new interface.
+
 2009-06-03  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	[unitTesting] Adding script to perform valgrind check.
