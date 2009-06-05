@@ -1,4 +1,4 @@
-/* This object generate the reference value for the
+/* This object generates the reference value for the
    ZMP based on a polynomail representation
    of the ZMP following 
    "Experimentation of Humanoid Walking Allowing Immediate
@@ -12,26 +12,10 @@
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
+
+   For more information on the license please look at License.txt 
+   in the root directory.
    
-   Redistribution and use in source and binary forms, with or without modification, 
-   are permitted provided that the following conditions are met:
-   
-   * Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-   * Neither the name of the CNRS/AIST nor the names of its contributors 
-   may be used to endorse or promote products derived from this software without specific prior written permission.
-   
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
-   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
-   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #define ODEBUG2(x)
@@ -121,18 +105,26 @@ namespace PatternGeneratorJRL
     m_NeedToReset = true;
     m_AbsoluteTimeReference = 0.0;
 
+    m_PreviewControl = new PreviewControl(lSPM);
+
     /*! Dynamic allocation of the analytical trajectories for the ZMP and the COG */
     m_AnalyticalZMPCoGTrajectoryX = new AnalyticalZMPCOGTrajectory(7);
     m_AnalyticalZMPCoGTrajectoryY = new AnalyticalZMPCOGTrajectory(7);
 
     /*! Dynamic allocation of the filters. */
-    m_FilterXaxisByPC = new FilteringAnalyticalTrajectoryByPreviewControl(m_AnalyticalZMPCoGTrajectoryX);
-    m_FilterYaxisByPC = new FilteringAnalyticalTrajectoryByPreviewControl(m_AnalyticalZMPCoGTrajectoryY);
+    m_FilterXaxisByPC = new FilteringAnalyticalTrajectoryByPreviewControl(lSPM,
+									  m_AnalyticalZMPCoGTrajectoryX,
+									  m_PreviewControl);
 
+    m_FilterYaxisByPC = new FilteringAnalyticalTrajectoryByPreviewControl(lSPM,
+									  m_AnalyticalZMPCoGTrajectoryY,
+									  m_PreviewControl);
+    
     m_VerboseLevel=0;
     
     m_NewStepInTheStackOfAbsolutePosition = false;
-    
+
+    m_FilteringActivate = true;
     RESETDEBUG4("Test.dat");
   }
 
@@ -165,15 +157,17 @@ namespace PatternGeneratorJRL
     if (m_CTIPX.ZMPProfil!=0)
       delete m_CTIPX.ZMPProfil;
 
-    /* 
-    if (m_CTIPY.CoMZ!=0)
-      delete m_CTIPY.CoMZ;
-
-    if (m_CTIPY.ZMPZ!=0)
-      delete m_CTIPY.ZMPZ;
-    */
     if (m_CTIPY.ZMPProfil!=0)
       delete m_CTIPY.ZMPProfil;
+
+    if (m_FilterXaxisByPC!=0)
+      delete m_FilterXaxisByPC;
+
+    if (m_FilterYaxisByPC!=0)
+      delete m_FilterYaxisByPC;
+
+    if (m_PreviewControl!=0)
+      delete m_PreviewControl;
   }
 
 
@@ -758,34 +752,68 @@ namespace PatternGeneratorJRL
 	if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
 	  {
 	    
-	    /*! Feed the ZMPPositions. */
 	    ZMPPosition aZMPPos;
-	    m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(time,aZMPPos.px,lIndexInterval);
-	    m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(time,aZMPPos.py,lIndexInterval);
+	    memset(&aZMPPos,0,sizeof(aZMPPos));
+	    COMPosition aCOMPos;
+	    memset(&aCOMPos,0,sizeof(aCOMPos));
+		
+	    if (m_FilteringActivate)
+	      {
+		double ZmpX, ComX,ComdX;
+		
+		// Should we filter ?
+		bool r = m_FilterXaxisByPC->UpdateOneStep(time,ZmpX, ComX, ComdX);
+		if (r)
+		  {
+		    // Yes we should.
+		    double ZmpY, ComY,ComdY;
+		    bool r = m_FilterXaxisByPC->UpdateOneStep(time,ZmpY, ComY, ComdY);
+
+		    /*! Feed the ZMPPositions. */
+		    aZMPPos.px = ZmpX;
+		    aZMPPos.py = ZmpY;
+
+		    /*! Feed the COMPositions. */
+		    aCOMPos.x[0] = ComX; aCOMPos.x[1] = ComdX;
+		    aCOMPos.y[0] = ComY; aCOMPos.y[1] = ComdY;
+		  }
+	      }
+
+	    
+	    /*! Feed the ZMPPositions. */
+	    double lZMPPosx=0.0,lZMPPosy=0.0;
+	    m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(time,lZMPPosx,lIndexInterval);
+	    aZMPPos.px += lZMPPosx;
+	    m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(time,lZMPPosy,lIndexInterval);
+	    aZMPPos.py += lZMPPosy;
 	    FinalZMPPositions.push_back(aZMPPos);
 	    
 	    /*! Feed the COMPositions. */
-	    COMPosition aCOMPos;
-	    memset(&aCOMPos,0,sizeof(aCOMPos));
-	    m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,aCOMPos.x[0],lIndexInterval);
-	    m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(time,aCOMPos.x[1],lIndexInterval);
-	    m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,aCOMPos.y[0],lIndexInterval);
-	    m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(time,aCOMPos.y[1],lIndexInterval);
+	    double lCOMPosx=0.0, lCOMPosdx=0.0;
+	    double lCOMPosy=0.0, lCOMPosdy=0.0;
+	    m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,lCOMPosx,lIndexInterval);
+	    m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(time,lCOMPosdx,lIndexInterval);
+	    m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,lCOMPosy,lIndexInterval);
+	    m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(time,lCOMPosdy,lIndexInterval);
+	    aCOMPos.x[0] += lCOMPosx; aCOMPos.x[1] += lCOMPosdx;
+	    aCOMPos.y[0] += lCOMPosy; aCOMPos.y[1] += lCOMPosdy;
 	    aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	    FinalCOMPositions.push_back(aCOMPos);
 	    /*! Feed the FootPositions. */
-    
+
+
 	    /*! Left */
 	    FootAbsolutePosition LeftFootAbsPos;
 	    memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
 	    m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,time,LeftFootAbsPos,lIndexInterval);
 	    FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
-    
+	    
 	    /*! Right */
 	    FootAbsolutePosition RightFootAbsPos;
 	    memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
 	    m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,RightFootAbsPos,lIndexInterval);
 	    FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
+
 	  }
       }
     else 
@@ -921,7 +949,7 @@ namespace PatternGeneratorJRL
     m_Clock3.IncIteration();
 
     /* Update the time at which the stack should not be updated anymore */
-    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_Tsingle+ m_Tdble;    
+    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + 1.5 * m_Tsingle+ m_Tdble;    
     ODEBUG("****************** End OnLineAddFoot **************************");
   }
 
@@ -1914,6 +1942,12 @@ namespace PatternGeneratorJRL
     ComputeTrajectory(aCTIPY,aAZCTY);
     ComputeTrajectory(aCTIPX,aAZCTX);
 
+    if (m_FilteringActivate)
+      {
+	m_FilterXaxisByPC->FillInWholeBuffer(aFPX.ZMPInit,m_DeltaTj[0]);
+	m_FilterYaxisByPC->FillInWholeBuffer(aFPY.ZMPInit,m_DeltaTj[0]);
+      }
+
     m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(t);
     m_AbsoluteTimeReference = t;
 
@@ -2148,7 +2182,7 @@ namespace PatternGeneratorJRL
 	ODEBUG("NewRelFooAbsolutePositions.resize() = " <<NewRelFootAbsolutePositions.size());
 	ODEBUG("m_RelativeFootPositions.size() = " <<m_RelativeFootPositions.size());
 	
-	for(int j=IndexInterval,k=0;j<=m_NumberOfIntervals;j++,k++)
+	for(int j=IndexInterval,k=0;k<IndexIntervals.size();j++,k++)
 	  {
 	    IndexIntervals[k] = j;
 	  }
@@ -2218,7 +2252,7 @@ namespace PatternGeneratorJRL
     CoMPositions.clear();
     LeftFootAbsolutePositions.clear();
     RightFootAbsolutePositions.clear();
-    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble;    
+    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.5 * m_Tsingle;    
     ODEBUG("m_UpperTimeLimitToUpdateStacks "<< m_UpperTimeLimitToUpdateStacks << 
 	    " m_AbsoluteTimeReference: " <<m_AbsoluteTimeReference << 
 	    " m_DeltaTj[0] " << m_DeltaTj[0] << " m_Tdble: " << m_Tdble);

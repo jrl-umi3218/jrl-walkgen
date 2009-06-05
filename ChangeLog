@@ -1,5 +1,13 @@
 2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[src] Validation of filtering in AnalyticalMorisawaCompact.
+	* src/FootTrajectoryGeneration/
+	LeftAndRightFootTrajectoryGenerationMultiple.cpp: Code beautification.
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: 
+	License + Preview control filtering.
+
+2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[src/ZMPRefGenerationTrajectory] Preview Filter is now a plugin.
 	* include/walkGenJrl/ZMPRefTrajectoryGeneration/
 	FilteringAnalyticalTrajectoryByPreviewControl.h: 
