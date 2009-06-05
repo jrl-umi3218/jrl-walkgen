@@ -59,8 +59,11 @@ string ProfilesNames[17] = {
 
 void CommonInitialization(PatternGeneratorInterface &aPGI)
 {
-  const char lBuffer[9][256] =
-    {":omega 0.0",
+  const char lBuffer[12][256] =
+    {":samplingperiod 0.005",
+     ":previewcontroltime 1.6",
+     ":comheight 0.814",
+     ":omega 0.0",
      ":stepheight 0.07",
      ":singlesupporttime 0.78",
      ":doublesupporttime 0.02",
@@ -910,6 +913,10 @@ int main(int argc, char *argv[])
   bool DebugConfiguration = true;
   bool DebugFGPI = true;
   unsigned int PGIInterface = 0;
+  
+  double TimeProfile[200*3600];
+  unsigned int TimeProfileIndex = 0;
+  unsigned int TimeProfileUpperLimit=200*600;
 
   ofstream aofq;
   if (DebugConfiguration)
@@ -955,9 +962,10 @@ int main(int argc, char *argv[])
     }
 
   double totaltime=0,maxtime=0;
-  double timemodif = 0;
+  double totaltimemodif=0, timemodif = 0;
   double totaltimeinplanning=0;
   double newtime=0,deltatime=0;
+  unsigned long int nbofmodifs=0;
 
   for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
     {
@@ -1094,6 +1102,8 @@ int main(int argc, char *argv[])
 	  PreviousVelocity = CurrentVelocity;
 	  PreviousAcceleration = CurrentAcceleration;
 	  
+	  timemodif =0;
+			      
 	  if (TestProfil==PROFIL_ANALYTICAL_ONLINE_WALKING)
 	    {
 	      if (NbOfIt>30*200) /* Stop after 30 seconds the on-line stepping */
@@ -1103,7 +1113,8 @@ int main(int argc, char *argv[])
 	      else{
 		
 		//if ((NbOfIt>(8.82*200)) && 
-		double triggertime = 9.64*200 + deltatime*200;
+		//		double triggertime = 9.64*200 + deltatime*200;
+		double triggertime = 2.44*200 + deltatime*200;
 		if ((NbOfIt>triggertime) && 
 		    TestChangeFoot)
 		  {
@@ -1111,9 +1122,9 @@ int main(int argc, char *argv[])
 		    PatternGeneratorJRL::FootAbsolutePosition aFAP;
 		    //aFAP.x=0.2;
 		    //aFAP.y=-0.09;
-		    aFAP.x=0.24;
+		    aFAP.x=0.1;
 		    aFAP.y=0.0;
-		    aFAP.theta=0.0;
+		    aFAP.theta=5.0;
 		    gettimeofday(&beginmodif,0);
 		    aPGI->ChangeOnLineStep(0.805,aFAP,newtime);
 		    deltatime += newtime+0.025;
@@ -1123,6 +1134,8 @@ int main(int argc, char *argv[])
 		    //aPGI->ParseCmd(strm2);
 		    gettimeofday(&endmodif,0);
 		    timemodif = endmodif.tv_sec-beginmodif.tv_sec + 0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
+		    totaltimemodif += timemodif;
+		    nbofmodifs++;
 		    TestChangeFoot=true;
 		    NbStepsModified++;
 		    if (NbStepsModified==360)
@@ -1130,6 +1143,10 @@ int main(int argc, char *argv[])
 		  }
 	      }
 	    }
+
+	  TimeProfile[TimeProfileIndex++] = ltime + timemodif;
+	  if (TimeProfileIndex>TimeProfileUpperLimit)
+	    TimeProfileIndex = 0;
 
 	  if (DebugFGPI)
 	    {
@@ -1163,17 +1180,26 @@ int main(int argc, char *argv[])
 	    }
 	}
     }
+
+  {
+    ofstream lProfileOutput("TimeProfile.dat",ofstream::out);
+    for(unsigned int i=0;i<TimeProfileIndex;i++)
+      lProfileOutput << TimeProfile[i] << std::endl;
+
+    lProfileOutput.close();
+  }
   if (DebugConfiguration)
     aofq.close();
 
   if (DebugFGPI)
     aof.close();
 
+  
   delete aPGI;
 
   cout << "Number of iterations " << NbOfIt << " " << NbOfItToCompute << endl;
   cout << "Time consumption: " << (double)totaltime/(double)NbOfItToCompute << " max time: " << maxtime <<endl;
-  cout << "Time for modif: " << timemodif << endl;
+  cout << "Time for modif: " << (double)totaltimemodif/(double)nbofmodifs <<  " nb of modifs: " << nbofmodifs << endl ;
   cout << "Time on ZMP ref planning (Kajita policy): " 
        << totaltimeinplanning<< " " 
        << totaltimeinplanning*4/(double)NbOfIt<< endl;

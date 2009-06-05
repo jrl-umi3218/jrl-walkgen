@@ -1,5 +1,21 @@
 2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	[unitTesting] putting back TestRiccatiEquation + various scripts.
+	* unitTesting/CMakeLists.txt: 
+	Adding TestRiccatiEquation.
+	* unitTesting/TestFootPrintPGInterface.Profiling.sh: 
+	Call cachegrind for profiling.
+	* unitTesting/TestFootPrintPGInterface.Valgrind.sh: 
+	Memory leak detection without memory stack changes.
+	* unitTesting/TestFootPrintPGInterface.Valgrind2.sh: 
+	Memory leak detection with memory stack changes.
+	* unitTesting/TestFootPrintPGInterface.cpp:	
+	Adding CPU time profiling.
+	* unitTesting/TestRiccatiEquation.cpp: 
+	Put back in business.
+
+2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	[src] Validation of filtering in AnalyticalMorisawaCompact.
 	* src/FootTrajectoryGeneration/
 	LeftAndRightFootTrajectoryGenerationMultiple.cpp: Code beautification.

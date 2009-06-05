@@ -32,3 +32,11 @@ ADD_DEPENDENCIES (TestFootPrintPGInterface ${PROJECT_NAME})
 #		      LINK_FLAGS ${UNITTESTING_LDFLAGS}
 #)
 #ADD_DEPENDENCIES (TestOptCholesky ${PROJECT_NAME})
+
+ADD_EXECUTABLE(	TestRiccatiEquation TestRiccatiEquation.cpp)
+SET_TARGET_PROPERTIES(TestRiccatiEquation
+	              PROPERTIES
+	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
+		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}
+)
+ADD_DEPENDENCIES (TestRiccatiEquation ${PROJECT_NAME})
