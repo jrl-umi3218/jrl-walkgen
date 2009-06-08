@@ -1,3 +1,17 @@
+2009-06-08  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	Modification to fix uses of Kajita's algorithm in the new structure.
+	* src/GlobalStrategyManagers/DoubleStagePreviewControlStrategy.cpp: 
+	Proper computation of ZMP in the world ref. frame + License.
+	* src/ZMPRefTrajectoryGeneration/
+	FilteringAnalyticalTrajectoryByPreviewControl.cpp: 
+	Code cleaning.
+	* src/ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp:	
+	Change the shift value (creates discontinuities if set
+	to high) + License.
+	* unitTesting/TestFootPrintPGInterface.cpp: 
+	Adding specifications while initializing the TurnOnCircle test.
+
 2009-06-05  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	[src/ZMPRefTrajectoryGeneration] Second validation for the filtering.

@@ -537,6 +537,11 @@ void TurningOnTheCircleTowardsTheCenter(PatternGeneratorInterface &aPGI)
      istringstream strm2(":arccentered 0.75 360.0 -1");
      aPGI.ParseCmd(strm2);
   }
+
+  {
+     istringstream strm2(":lastsupport");
+     aPGI.ParseCmd(strm2);
+  }
    
   {
      istringstream strm2(":finish");
@@ -548,14 +553,24 @@ void TurningOnTheCircleTowardsTheCenter(PatternGeneratorInterface &aPGI)
 void TurningOnTheCircle(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
+  
+  {
+    istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
+    aPGI.ParseCmd(strm2);
+  }
 
-   {
+  {
+    istringstream strm2(":SetZMPFrame world");
+    aPGI.ParseCmd(strm2);
+  }
+
+  {
      istringstream strm2(":supportfoot 1");
      aPGI.ParseCmd(strm2);
   }
 
   {
-     istringstream strm2(":arc 0.0 0.75 30.0 -1");
+     istringstream strm2(":arc 0.0 0.75 360.0 -1");
      aPGI.ParseCmd(strm2);
   }
   
@@ -693,7 +708,8 @@ void SteppingOver(PatternGeneratorInterface &aPGI)
 int main(int argc, char *argv[])
 {
   //  unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
-  unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
+  //unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
+  unsigned int TestProfil=PROFIL_TURNING_ON_THE_CIRCLE;
   string PCParametersFile;
   string VRMLPath;
   string VRMLFileName;
@@ -902,7 +918,6 @@ int main(int argc, char *argv[])
 
 
   bool TestChangeFoot = true;
-  bool TestChangeFoot2 = true;
 
   unsigned int NbStepsModified = 0;
 
