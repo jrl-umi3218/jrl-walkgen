@@ -291,10 +291,12 @@ namespace PatternGeneratorJRL {
   {
     // Create fundamental objects to make the WPG runs.
 
-    // INFO: This where you should instanciate your own
-    // INFO: implementation of CjrlHumanoidDynamicRobot
-    m_WorkingHumanoidRobot->setComputeZMP(true);
-    m_WorkingHumanoidRobot->setComputeBackwardDynamics(false);
+    // Minimal assumption on the dynamical system it is assume to understand those properties.
+    if (m_WorkingHumanoidRobot!=0)
+      {
+	m_WorkingHumanoidRobot->SetProperty("ComputeZMP","true");
+	m_WorkingHumanoidRobot->SetProperty("ComputeBackwardDynamics","false");
+      }
 
     // INFO: This where you should instanciate your own
     // INFO: object for Com and Foot realization.
@@ -302,8 +304,9 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization = new ComAndFootRealizationByGeometry(this);
 
     // Creates the foot trajectory generator.
-    m_FeetTrajectoryGenerator = new LeftAndRightFootTrajectoryGenerationMultiple(this,
-										 m_WorkingHumanoidRobot->getHumanoidSpecificities());
+    m_FeetTrajectoryGenerator = 
+      new LeftAndRightFootTrajectoryGenerationMultiple(this,
+						       m_WorkingHumanoidRobot->getHumanoidSpecificities());
 
     // ZMP reference and Foot trajectory planner (Preview control method from Kajita2003)
     m_ZMPD = new ZMPDiscretization(this,"",m_WorkingHumanoidRobot->getHumanoidSpecificities());
@@ -330,11 +333,11 @@ namespace PatternGeneratorJRL {
     // Object to investiguate the result of the second preview loop.
     // INFO: This where you should instanciate your own
     // INFO: implementation of CjrlHumanoidDynamicRobot
-    m_DebuggingHumanoidRobot= new HumanoidDynamicMultiBody();
-    m_DebuggingHumanoidRobot->SetHumanoidSpecificitiesFile(HumanoidSpecificitiesFileName);
-    m_DebuggingHumanoidRobot->setComputeZMP(true);
-    m_DebuggingHumanoidRobot->setComputeBackwardDynamics(false);
-    
+    if (m_DebuggingHumanoidRobot!=0)
+      {
+	m_DebuggingHumanoidRobot->SetProperty("ComputeZMP","true");
+	m_DebuggingHumanoidRobot->SetProperty("ComputeBackwardDynamics","false");
+      }
 
     // Stack of steps handler.
     m_StepStackHandler = new StepStackHandler(this);

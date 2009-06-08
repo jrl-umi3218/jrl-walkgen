@@ -1,5 +1,10 @@
 2009-06-09  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	Continuing indenpendance...
+	* src/PatternGeneratorInterface.cpp: .
+
+2009-06-09  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	Making the code independent of dynamicsJRLJapan.
 	* include/walkGenJrl/PatternGeneratorInterface.h: .
 	* src/PatternGeneratorInterface.cpp: .
