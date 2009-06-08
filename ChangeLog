@@ -1,3 +1,9 @@
+2009-06-09  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	Making the code independent of dynamicsJRLJapan.
+	* include/walkGenJrl/PatternGeneratorInterface.h: .
+	* src/PatternGeneratorInterface.cpp: .
+
 2009-06-08  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	Modification to fix uses of Kajita's algorithm in the new structure.

@@ -17,26 +17,9 @@
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
-   
-   Redistribution and use in source and binary forms, with or without modification, 
-   are permitted provided that the following conditions are met:
-   
-   * Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-   * Neither the name of the CNRS and AIST nor the names of its contributors 
-   may be used to endorse or promote products derived from this software without specific prior written permission.
-   
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
-   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
-   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   Please look at License.txt for details on the license.
+
 */
 
 
@@ -47,8 +30,6 @@
 
 
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
-
-#include <dynamicsJRLJapan/HumanoidDynamicMultiBody.h>
 
 #include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
@@ -93,10 +74,17 @@ namespace PatternGeneratorJRL
   public:
     
     /*! Constructor 
-      @param strm: Should provide the file to initialize the preview control,
+      @param[in] strm: New interface: First sequence send to the PGI's parser.
+      Previous interface: Should provide the file to initialize the preview control,
       the path to the VRML model, and the name of the file containing the VRML model.
+      @param[in]  lWorkingHumanoidDynamicRobot: Model of the robot to be used by some
+      of the algorithms (Kajita's preview control + filtering for instance).
+      @param[in] lDebuggingHumanoidDynamicRobot: Model of the robot for debugging purposes
+      (not necessary).
      */
-    PatternGeneratorInterface(std::istringstream &strm);
+    PatternGeneratorInterface(std::istringstream &strm,
+			      CjrlHumanoidDynamicRobot *lWorkingHumanoidDynamicRobot=0,
+			      CjrlHumanoidDynamicRobot *lDebuggingHumanoidDynamicRobot=0);
 
     /*! Destructor */
     ~PatternGeneratorInterface();
@@ -176,7 +164,7 @@ namespace PatternGeneratorJRL
     
     /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
      @param[out]  CurrentConfiguration The current configuration of the robot according to 
-     the implementation of dynamic-JRLJapan. This should be first position and orientation
+     the abstract description of robots. This should be first position and orientation
      of the waist, and then all the DOFs of your robot. 
      @param[out]  CurrentVelocity  The current velocity of the robot according to the 
      the implementation of dynamic-JRLJapan. 
@@ -407,6 +395,33 @@ namespace PatternGeneratorJRL
 
     /*! @} */
 
+    /*! \name Methods to handle the humanoid model used for the algorithms.
+      Those models are needed for Kajita's dynamic filter, and foot planning.
+      @{ */
+    
+    /*! \brief Specify model used for computing ZMP. 
+      There is a temporal dependency between two calls to this model.
+     */
+    void SetWorkingHumanoidDynamicRobot(CjrlHumanoidDynamicRobot * lHumanoidDynamicRobot);
+
+
+    /*! \brief Get the working humanoid model. 
+     */
+    CjrlHumanoidDynamicRobot * GetWorkingHumanoidDynamicRobot();
+
+    
+    /*! \brief Specify model used for debugging. 
+      There is a temporal dependency between two calls to this model.
+     */
+    void SetDebuggingHumanoidDynamicRobot(CjrlHumanoidDynamicRobot * lHumanoidDynamicRobot);
+
+    /*! \brief Get the debugging humanoid model. 
+     */
+    CjrlHumanoidDynamicRobot * GetDebuggingHumanoidDynamicRobot();
+    
+      
+    /*! @} */
+
   private:
 
     /*! Object to handle the stack of relative steps. */
@@ -613,7 +628,7 @@ namespace PatternGeneratorJRL
     /*! @} */
 
     /*! Humanoid Dynamic robot */
-    HumanoidDynamicMultiBody * m_HumanoidDynamicRobot, * m_2HumanoidDynamicRobot;
+    CjrlHumanoidDynamicRobot * m_WorkingHumanoidRobot, * m_DebuggingHumanoidRobot;
 
     /*! Speed of the leg. */
     MAL_VECTOR(,double) m_dqr,m_dql;
