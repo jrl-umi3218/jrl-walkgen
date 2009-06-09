@@ -1,5 +1,13 @@
 2009-06-10  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	Revert changes which should have been in humanoidspecificities branch.
+	* src/GlobalStrategyManagers/DoubleStagePreviewControlStrategy.cpp: .
+	* src/ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.cpp: .
+	* src/ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp: .
+	* unitTesting/TestFootPrintPGInterface.cpp: .
+
+2009-06-10  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	Revert commit which should have been on humanoidspecificities branch.
 	* include/walkGenJrl/PatternGeneratorInterface.h: 
 	Put back HumanoidDynamicRobot.

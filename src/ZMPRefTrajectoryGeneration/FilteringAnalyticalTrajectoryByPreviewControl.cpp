@@ -131,9 +131,18 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(double Fir
   if (m_DataBuffer.size()!=SizeOfBuffer)
     m_DataBuffer.resize(SizeOfBuffer);
 
+  unsigned int lDataBufferIndex = 0;
   double lZMP;
   double t=0;
 
+  if (0)
+    {
+      ofstream aof;
+      static unsigned int nbofmodifs = 0;
+      char Buffer[1024];
+      sprintf(Buffer,"Diff_%05d.dat",nbofmodifs++);
+      aof.open(Buffer,ofstream::out);
+    }
   // On the interval of the newly changed first foot. 
   for( unsigned int lDataBufferIndex = 0;lDataBufferIndex<m_DataBuffer.size();t+=DeltaT,lDataBufferIndex++)
     {
@@ -147,7 +156,9 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(double Fir
 	}
       
       m_DataBuffer[lDataBufferIndex] = r;
+      // aof << r << endl;
     }
+  //aof.close();
 
   /*! Initialize the state vector used by the preview controller */
   m_ComState(0,0) = 0.0;
