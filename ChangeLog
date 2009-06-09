@@ -1,5 +1,11 @@
 2009-06-09  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	Adding functionnal calls through the infamous setProperty.
+	* src/PatternGeneratorInterface.cpp: 
+	Specifying TimeStep 
+
+2009-06-09  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	First version with no direct dynamicsJRLJapan dependency. First compiled version
 	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.h: .
 	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.h: .

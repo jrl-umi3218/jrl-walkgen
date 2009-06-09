@@ -415,19 +415,14 @@ namespace PatternGeneratorJRL {
     m_GMFKW->SetPreviewControl(m_PC);
 
     
-    cout << "We have got a problem : how to specify time step in humanoid robot. " << endl;
-    /*
-    m_WorkingHumanoidRobot->SetTimeStep(m_PC->SamplingPeriod());
-    m_DebuggingHumanoidRobot->SetTimeStep(m_PC->SamplingPeriod());
-    */
-    // The link between specific Humanoid information
-    // and joint of the dynamic multi robot
-    // can be done only with the VRML file has been read (obvious isn't it ? )
+    ostringstream out;
+    out << m_PC->SamplingPeriod();
+    string aProperty("TimeStep");
+    string aValue(out.str());
+    
+    m_WorkingHumanoidRobot->setProperty(aProperty,aValue);
+    m_DebuggingHumanoidRobot->setProperty(aProperty,aValue);
 
-    /*
-    m_WorkingHumanoidRobot->LinkBetweenJointsAndEndEffectorSemantic();
-    m_DebuggingHumanoidRobot->LinkBetweenJointsAndEndEffectorSemantic();
-    */
     m_ComAndFootRealization->setHumanoidDynamicRobot(m_WorkingHumanoidRobot);
 
     m_ComAndFootRealization->SetHeightOfTheCoM(m_PC->GetHeightOfCoM());
@@ -841,7 +836,8 @@ namespace PatternGeneratorJRL {
     ODEBUG("StartingCOMPosition: " << lStartingCOMPosition.x[0] 
 	    << " "  << lStartingCOMPosition.y[0]
 	    << " "  << lStartingCOMPosition.z[0]);
-    ODEBUG4("StartingCOMPosition: " << lStartingCOMPosition.x[0] << " "  << lStartingCOMPosition.y[0],"DebugData.txt");
+    ODEBUG4("StartingCOMPosition: " << lStartingCOMPosition.x[0] 
+	    << " "  << lStartingCOMPosition.y[0],"DebugData.txt");
     // We also initialize the iteration number inside DMB.
     /* m_WorkingHumanoidRobot->ResetIterationNumber(); */
 
