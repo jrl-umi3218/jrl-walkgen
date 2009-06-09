@@ -1,5 +1,7 @@
-2009-06-09  Olivier Stasse  <olivier.stasse@aist.go.jp>
+2009-06-09 Nicolas Mansard
+	Release 2.5.4 for SOT 1.1.0.
 
+2009-06-09  Olivier Stasse  <olivier.stasse@aist.go.jp>
 	Continuing indenpendance...
 	* src/PatternGeneratorInterface.cpp: .
 
