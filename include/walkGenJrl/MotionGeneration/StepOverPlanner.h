@@ -4,33 +4,14 @@
     If you want to change the reference trajectories, and the planning
     of the foot, this is the object to modify.
 
-    Copyright (c) 2005-2006, 
+    Copyright (c) 2005-2009, 
     @author Bjorn Verrelst,Olivier Stasse, Francois Keith, 
    
     JRL-Japan, CNRS/AIST
 
     All rights reserved.
-   
-    Redistribution and use in source and binary forms, with or without modification, 
-    are permitted provided that the following conditions are met:
-   
-    * Redistributions of source code must retain the above copyright notice, 
-    this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright notice, 
-    this list of conditions and the following disclaimer in the documentation 
-    and/or other materials provided with the distribution.
-    * Neither the name of the CNRS and AIST nor the names of its contributors 
-    may be used to endorse or promote products derived from this software without specific prior written permission.
-   
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-    OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
-    OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
-    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+    Please see License.txt for details on license.
 */
 
 #ifndef _STEPOVER_PLANNER_H_
@@ -46,14 +27,13 @@
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
 /*! DynamicsJRLJapan */
-#include <dynamicsJRLJapan/DynamicMultiBody.h>
-#include <dynamicsJRLJapan/HumanoidSpecificities.h>
+#include <robotDynamics/jrlHumanoidDynamicRobot.h>
+
 
 /*! Humanoid Walking Pattern Generator */
 #include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PreviewControl/PreviewControl.h>
 #include <walkGenJrl/Mathematics/StepOverPolynome.h>
-#include <walkGenJrl/MotionGeneration/InverseKinematics.h>
 
 namespace PatternGeneratorJRL
 {
@@ -77,7 +57,7 @@ namespace PatternGeneratorJRL
      
     /*! \brief  Constructor */
     StepOverPlanner(ObstaclePar &ObstacleParameters,
-		    HumanoidSpecificities * aHS);
+		    CjrlHumanoidDynamicRobot * aHS);
 
     /*! \brief  Destructor */
     ~StepOverPlanner();
@@ -131,12 +111,6 @@ namespace PatternGeneratorJRL
 
     /*!  Set the link to the ZMP discretization model.*/
     void SetZMPDiscretization(ZMPDiscretization *aZMPDiscr);      
-
-    /*!  Set the link with the Dynamic Multi Body model.*/
-    void SetDynamicMultiBodyModel(DynamicMultiBody *aDMB);
-
-    /*!  Set the link with the inverse kinematics model.*/
-    void SetInverseKinematics(InverseKinematics *anIK);
 
     /*! set parameters for the timedistribution of specific stepover points*/
     void TimeDistributeFactor(std::vector<double> &TimeDistrFactor);
@@ -274,12 +248,6 @@ namespace PatternGeneratorJRL
     /*! Pointer to the ZMPDiscretization object. */
     ZMPDiscretization *m_ZMPDiscr;
 
-    /*! Pointer to the Dynamic Multi body model. */
-    DynamicMultiBody *m_DMB;
-
-    /*! Pointer to the Inverse Kinematics model.*/
-    InverseKinematics *m_IK;
-
     /*! Pointer to the collision detector model.*/
     CollisionDetector *m_CollDet;	
 	
@@ -341,7 +309,7 @@ namespace PatternGeneratorJRL
     std::vector<double> m_TimeDistrFactor;
 		
     /*! Reference to the humanoid specificities.*/
-    HumanoidSpecificities *m_HS;
+    CjrlHumanoidDynamicRobot *m_HS;
 		
     /*! Distance from the ankle to the soil.*/
     double m_AnkleSoilDistance;

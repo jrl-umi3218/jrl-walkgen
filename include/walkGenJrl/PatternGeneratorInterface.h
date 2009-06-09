@@ -26,11 +26,16 @@
 #ifndef _PATTERN_GENERATOR_INTERFACE_H_
 #define _PATTERN_GENERATOR_INTERFACE_H_
 
+/* System includes */
 #include <sstream>
 
-
+/* Matrix Abstract Layer includes */
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
+/* Abstract dynamic description includes */
+#include <robotDynamics/jrlHumanoidDynamicRobot.h>
+
+/* Framework */
 #include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
 #include <walkGenJrl/PreviewControl/PreviewControl.h>

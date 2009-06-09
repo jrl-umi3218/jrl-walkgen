@@ -9,29 +9,10 @@
    $Id$
    
    JRL-Japan, CNRS/AIST
-
-   All rights reserved.
    
-   Redistribution and use in source and binary forms, with or without modification, 
-   are permitted provided that the following conditions are met:
+   All right reserved.
    
-   * Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
-   and/or other materials provided with the distribution.
-   * Neither the name of the CNRS/AIST nor the names of its contributors 
-   may be used to endorse or promote products derived from this software without specific prior written permission.
-   
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
-   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
-   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   Please License.txt for license.
 */
 
 
@@ -41,8 +22,11 @@
 /* System related inclusions */
 #include <deque>
 
-/* dynamics JRL Japan related inclusions */
-#include <dynamicsJRLJapan/HumanoidSpecificities.h>
+/* Matrix Abstract Layer includes */
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+
+/* Abstract dynamics inclusions */
+#include <robotDynamics/jrlHumanoidDynamicRobot.h>
 
 /* Walking pattern generation related inclusions */
 #include <walkGenJrl/walkGenJrl_API.h>
@@ -89,7 +73,7 @@ namespace PatternGeneratorJRL
     /*! Constructor: In order to compute some appropriate strategies,
       this class needs to extract specific details from the humanoid model. */
     FootTrajectoryGenerationAbstract(SimplePluginManager *lSPM,
-				     dynamicsJRLJapan::HumanoidSpecificities *aHS) ;
+				     CjrlHumanoidDynamicRobot *aHS) ;
 
 
     /*! Default destructor. */
@@ -200,7 +184,7 @@ namespace PatternGeneratorJRL
     double m_TDouble;
 
     /*! Store a pointer to Humanoid Specificities. */
-    dynamicsJRLJapan::HumanoidSpecificities * m_HS;
+    CjrlHumanoidDynamicRobot * m_HS;
     
     /*! Omega the angle for taking off and landing. */
     double m_Omega;

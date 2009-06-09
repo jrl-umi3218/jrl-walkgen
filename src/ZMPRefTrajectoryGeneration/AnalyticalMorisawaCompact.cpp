@@ -99,7 +99,6 @@ namespace PatternGeneratorJRL
     memset(&m_CTIPY,0,sizeof(m_CTIPY));
 
     m_OnLineChangeStepMode = ABSOLUTE_FRAME;
-    m_HS = 0;
     m_FeetTrajectoryGenerator = 0;
 
     m_NeedToReset = true;
@@ -2185,7 +2184,7 @@ namespace PatternGeneratorJRL
 	ODEBUG("NewRelFooAbsolutePositions.resize() = " <<NewRelFootAbsolutePositions.size());
 	ODEBUG("m_RelativeFootPositions.size() = " <<m_RelativeFootPositions.size());
 	
-	for(int j=IndexInterval,k=0;k<IndexIntervals.size();j++,k++)
+	for(unsigned int j=IndexInterval,k=0;k<IndexIntervals.size();j++,k++)
 	  {
 	    IndexIntervals[k] = j;
 	  }

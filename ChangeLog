@@ -1,5 +1,42 @@
 2009-06-09  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	First version with no direct dynamicsJRLJapan dependency. First compiled version
+	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.h: .
+	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.h: .
+	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h: .
+	* include/walkGenJrl/FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.h: .
+	* include/walkGenJrl/Mathematics/FootConstraintsAsLinearSystem.h: .
+	* include/walkGenJrl/MotionGeneration/ComAndFootRealization.h: .
+	* include/walkGenJrl/MotionGeneration/ComAndFootRealizationByGeometry.h: .
+	* include/walkGenJrl/MotionGeneration/InverseKinematics.h: Remove.
+	* include/walkGenJrl/MotionGeneration/StepOverPlanner.h: .
+	* include/walkGenJrl/PatternGeneratorInterface.h: .
+	* include/walkGenJrl/PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h: .
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.h: .
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.h: .
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/AnalyticalMorisawaFull.h: .
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/RealTimeHarada.h: Remove.
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.h: .
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h: .
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.h: .
+	* src/CMakeLists.txt: .
+	* src/FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp: .
+	* src/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp: .
+	* src/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp: .
+	* src/FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp: .
+	* src/Mathematics/FootConstraintsAsLinearSystem.cpp: .
+	* src/MotionGeneration/ComAndFootRealizationByGeometry.cpp: .
+	* src/MotionGeneration/InverseKinematics.cpp: Remove.
+	* src/MotionGeneration/StepOverPlanner.cpp: .
+	* src/PatternGeneratorInterface.cpp: .
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: .
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaFull.cpp: .
+	* src/ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp: .
+	* src/ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp: .
+	* src/ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp: .
+
+2009-06-09  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	Continuing indenpendance...
 	* src/PatternGeneratorInterface.cpp: .
 

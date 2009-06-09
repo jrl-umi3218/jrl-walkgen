@@ -1,7 +1,7 @@
 /** This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of steps.
 
-   Copyright (c) 2005-2006, 
+   Copyright (c) 2005-2009, 
    Bjorn Verrelst
    Olivier Stasse,
    Ramzi Sellouati
@@ -10,26 +10,8 @@
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
-   
-   Redistribution and use in source and binary forms, with or without modification, 
-   are permitted provided that the following conditions are met:
-   
-   * Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-   * Neither the name of the CNRS/AIST nor the names of its contributors 
-   may be used to endorse or promote products derived from this software without specific prior written permission.
-   
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
-   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
-   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   Please see License.txt for details on license.
 */
 //#define _DEBUG_
 #include <fstream>
@@ -59,10 +41,8 @@
 using namespace::PatternGeneratorJRL;
 
 StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
-				 HumanoidSpecificities *aHS)
+				 CjrlHumanoidDynamicRobot *aHS)
 {
-
-  m_IK = new InverseKinematics(aHS);
 
   m_HS = aHS;
   // Get information specific to the humanoid.
@@ -129,7 +109,6 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
   m_ClampedCubicSplineStepOverFootOmega = new StepOverClampedCubicSpline ;
   m_ClampedCubicSplineStepOverFootOmegaImpact = new StepOverClampedCubicSpline ;		
 	
-  m_DMB = 0;
   m_PC = 0;
   m_ZMPDiscr = 0;
 	
@@ -238,8 +217,6 @@ StepOverPlanner::~StepOverPlanner()
   if (m_CollDet!=0)
     delete m_CollDet;
 
-  if (m_IK!=0)
-    delete m_IK;
 }
 
 void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition> &aFootHolds)
@@ -514,12 +491,12 @@ void StepOverPlanner::DoubleSupportFeasibility()
 			
 	
 	  // Compute the inverse kinematics.
-	  m_IK->ComputeInverseKinematics2ForLegs(Body_R,
-						 Body_P,
-						 m_Dt,
-						 Foot_R,
-						 Foot_P,
-						 LeftLegAngles);
+	  m_HS->ComputeInverseKinematicsForLegs(Body_R,
+						Body_P,
+						m_Dt,
+						Foot_R,
+						Foot_P,
+						LeftLegAngles);
 	
 	  // RIGHT FOOT //
 	  m_Dt(1) = -m_Dt(1);
@@ -546,12 +523,12 @@ void StepOverPlanner::DoubleSupportFeasibility()
 	  Body_P(1) = aCOMPosition.y[0] + ToTheHip(1);
 	  Body_P(2) = aCOMPosition.z[0] + ToTheHip(2);
 			
-	  m_IK->ComputeInverseKinematics2ForLegs(Body_R,
-						 Body_P,
-						 m_Dt,
-						 Foot_R,
-						 Foot_P,
-						 RightLegAngles);
+	  m_HS->ComputeInverseKinematicsForLegs(Body_R,
+						Body_P,
+						m_Dt,
+						Foot_R,
+						Foot_P,
+						RightLegAngles);
 	  m_Dt(1) = -m_Dt(1);
 
 			
@@ -1575,18 +1552,7 @@ void StepOverPlanner::SetZMPDiscretization(ZMPDiscretization *aZMPDiscr)
 }
 
 
-void StepOverPlanner::SetDynamicMultiBodyModel(DynamicMultiBody *aDMB)
-{
-  m_DMB = aDMB;
-  for(int i=0;i<m_DMB->NbOfLinks();i++)
-    m_DMB->Setdq(i,0.0);
 
-}
-
-void StepOverPlanner::SetInverseKinematics(InverseKinematics *anIK)
-{
-  m_IK = anIK;
-}
 
 void StepOverPlanner::TimeDistributeFactor(vector<double> &TimeDistrFactor)
 {

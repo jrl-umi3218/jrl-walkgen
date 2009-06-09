@@ -3,39 +3,20 @@
    has 6 DoFs legs. It is then a simple matter of inverse geometry,
    relying on the inverse kinematics object.
   
-   Copyright (c) 2005-2006, 
-   @author Francois Keith, Olivier Stasse.
+   Copyright (c) 2005-2009, 
+   @author  Olivier Stasse, Francois Keith.
    
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
-   
-   Redistribution and use in source and binary forms, with or without modification, 
-   are permitted provided that the following conditions are met:
-   
-   * Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-   * Neither the name of the CNRS/AIST nor the names of its contributors 
-   may be used to endorse or promote products derived from this software without specific prior written permission.
-   
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
-   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
-   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   Please look at License.txt for more information on license.
 */
 #ifndef _COM_AND_FOOT_REALIZATION_BY_GEOMETRY_H_
 #define _COM_AND_FOOT_REALIZATION_BY_GEOMETRY_H_
 
 #include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/PGTypes.h>
-#include <walkGenJrl/MotionGeneration/InverseKinematics.h>
 #include <walkGenJrl/MotionGeneration/ComAndFootRealization.h> 
 #include <walkGenJrl/MotionGeneration/StepOverPlanner.h>
 #include <walkGenJrl/MotionGeneration/WaistHeightVariation.h>
@@ -136,23 +117,6 @@ namespace PatternGeneratorJRL
 
     /* @} */
     
-
-    /*! \name Setter and getter on Inverse Kinematics 
-      @{
-     */
-    /*! Set the pointer to the inverse kinematics.*/
-    inline bool setInverseKinematics ( InverseKinematics * anInverseKinematics)
-      { m_InverseKinematics = anInverseKinematics;
-	return true;};
-
-    /*! Get the pointer to the inverse kinematics */
-    inline InverseKinematics * getInverseKinematics () const
-      { return m_InverseKinematics; };
-
-    /*! */
-    /*! @} */
-
-
     /*! Evaluate CoM for a given position.
       Assuming that the waist is at (0,0,0)
       It returns the associate initial values for the left and right foot.
@@ -265,9 +229,6 @@ namespace PatternGeneratorJRL
     /*! Pointer related to Kineoworks planner. */
     GenerateMotionFromKineoWorks * m_GMFKW;
     
-    /*! Pointer to Inverse Kinematics */
-    InverseKinematics * m_InverseKinematics;
-    
     /*! \brief Displacement between the hip and the foot. @{*/
     /*! \brief For the right foot. */
     MAL_S3_VECTOR(m_DtRight,double);
@@ -327,7 +288,7 @@ namespace PatternGeneratorJRL
     MAL_S3_VECTOR(m_ComAndWaistInRefFrame,double);
 
     /*! Link towards Humanoids specificities */
-    HumanoidSpecificities * m_HS;
+    CjrlHumanoidDynamicRobot * m_HS;
 
     /*! Maximal distance along the X axis for the hand motion */
     double m_Xmax;

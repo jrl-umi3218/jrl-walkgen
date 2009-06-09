@@ -73,7 +73,7 @@ using namespace PatternGeneratorJRL;
 
 ZMPQPWithConstraint::ZMPQPWithConstraint(SimplePluginManager *lSPM, 
 					 string DataFile,
-					 HumanoidSpecificities *aHS) :
+					 CjrlHumanoidDynamicRobot *aHS) :
   ZMPRefTrajectoryGeneration(lSPM)
 {
   m_HS = aHS;

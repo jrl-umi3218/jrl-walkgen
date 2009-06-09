@@ -24,7 +24,6 @@
 #ifndef _ANALYTICAL_MORISAWA_FULL_H_
 #define _ANALYTICAL_MORISAWA_FULL_H_
 
-#include <dynamicsJRLJapan/HumanoidSpecificities.h>
 
 #include <walkGenJrl/walkGenJrl_API.h>
 #include <walkGenJrl/Clock.h>

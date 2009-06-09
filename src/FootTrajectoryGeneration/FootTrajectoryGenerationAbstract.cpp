@@ -3,7 +3,7 @@
 using namespace PatternGeneratorJRL;
 
 FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginManager *lSPM,
-								   dynamicsJRLJapan::HumanoidSpecificities *aHS) 
+								   CjrlHumanoidDynamicRobot *aHS) 
   : SimplePlugin(lSPM)
 {
   m_Omega = 0.0;

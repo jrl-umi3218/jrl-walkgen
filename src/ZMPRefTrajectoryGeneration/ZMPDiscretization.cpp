@@ -77,7 +77,9 @@ OnLineState & OnLineState::operator=(unsigned int NewState)
 }
 
 
-ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile, HumanoidSpecificities *aHS)
+ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,
+				     string DataFile, 
+				     CjrlHumanoidDynamicRobot *aHS)
   : ZMPRefTrajectoryGeneration(lSPM)
 {
   m_PC = 0;

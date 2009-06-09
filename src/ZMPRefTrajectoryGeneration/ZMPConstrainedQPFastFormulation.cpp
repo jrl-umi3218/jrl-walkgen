@@ -85,7 +85,7 @@ using namespace PatternGeneratorJRL;
 
 ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginManager *lSPM, 
 								 string DataFile,
-								 HumanoidSpecificities *aHS) :
+								 CjrlHumanoidDynamicRobot *aHS) :
   ZMPRefTrajectoryGeneration(lSPM)
 {
   m_Q = 0;
