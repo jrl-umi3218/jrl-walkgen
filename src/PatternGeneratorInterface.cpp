@@ -56,16 +56,11 @@
 
 namespace PatternGeneratorJRL {
 
-  PatternGeneratorInterface::PatternGeneratorInterface(istringstream &strm,
-						       CjrlHumanoidDynamicRobot *lWorkingHumanoidDynamicRobot,
-						       CjrlHumanoidDynamicRobot *lDebuggingHumanoidDynamicRobot)
+  PatternGeneratorInterface::PatternGeneratorInterface(istringstream &strm)
     : SimplePlugin(this)
   {
 
     ODEBUG4("Step 0","DebugPGI.txt");
-
-    m_WorkingHumanoidRobot = lWorkingHumanoidDynamicRobot;
-    m_DebuggingHumanoidRobot = lDebuggingHumanoidDynamicRobot;
 
     // Initialization of the parameters directory and files.
     string PCParametersFileName;
@@ -158,7 +153,7 @@ namespace PatternGeneratorJRL {
 
     // Initialize (if needed) debugging actions.
     m_dt = 0.005;
-    m_DOF = m_WorkingHumanoidRobot->numberDof();
+    m_DOF = m_HumanoidDynamicRobot->numberDof();
 
     m_SamplingPeriod = m_PC->SamplingPeriod();
     m_PreviewControlTime = m_PC->PreviewControlTime();
@@ -264,39 +259,16 @@ namespace PatternGeneratorJRL {
       }
 
   }
-
-  void PatternGeneratorInterface::SetWorkingHumanoidDynamicRobot(CjrlHumanoidDynamicRobot *lHumanoidDynamicRobot)
-  {
-    m_WorkingHumanoidRobot = lHumanoidDynamicRobot;
-  }
-
-  CjrlHumanoidDynamicRobot * PatternGeneratorInterface::GetWorkingHumanoidDynamicRobot()
-  {
-    return  m_WorkingHumanoidRobot;
-  }
-
-  void PatternGeneratorInterface::SetDebbugingHumanoidDynamicRobot(CjrlHumanoidDynamicRobot *lHumanoidDynamicRobot)
-  {
-    m_DebuggingHumanoidRobot = lHumanoidDynamicRobot;
-  }
-
-  CjrlHumanoidDynamicRobot * PatternGeneratorInterface::GetDebuggingHumanoidDynamicRobot()
-  {
-    return  m_DebuggingHumanoidRobot;
-  }
-
-
-
   void PatternGeneratorInterface::ObjectsInstanciation(string & HumanoidSpecificitiesFileName)
   {
     // Create fundamental objects to make the WPG runs.
 
-    // Minimal assumption on the dynamical system it is assume to understand those properties.
-    if (m_WorkingHumanoidRobot!=0)
-      {
-	m_WorkingHumanoidRobot->SetProperty("ComputeZMP","true");
-	m_WorkingHumanoidRobot->SetProperty("ComputeBackwardDynamics","false");
-      }
+    // INFO: This where you should instanciate your own
+    // INFO: implementation of CjrlHumanoidDynamicRobot
+    m_HumanoidDynamicRobot= new HumanoidDynamicMultiBody();
+    m_HumanoidDynamicRobot->SetHumanoidSpecificitiesFile(HumanoidSpecificitiesFileName);
+    m_HumanoidDynamicRobot->setComputeZMP(true);
+    m_HumanoidDynamicRobot->setComputeBackwardDynamics(false);
 
     // INFO: This where you should instanciate your own
     // INFO: object for Com and Foot realization.
@@ -304,22 +276,21 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization = new ComAndFootRealizationByGeometry(this);
 
     // Creates the foot trajectory generator.
-    m_FeetTrajectoryGenerator = 
-      new LeftAndRightFootTrajectoryGenerationMultiple(this,
-						       m_WorkingHumanoidRobot->getHumanoidSpecificities());
+    m_FeetTrajectoryGenerator = new LeftAndRightFootTrajectoryGenerationMultiple(this,
+										 m_HumanoidDynamicRobot->getHumanoidSpecificities());
 
     // ZMP reference and Foot trajectory planner (Preview control method from Kajita2003)
-    m_ZMPD = new ZMPDiscretization(this,"",m_WorkingHumanoidRobot->getHumanoidSpecificities());
+    m_ZMPD = new ZMPDiscretization(this,"",m_HumanoidDynamicRobot->getHumanoidSpecificities());
 
     // ZMP and CoM generation using the method proposed in Wieber2006.
-    m_ZMPQP = new ZMPQPWithConstraint(this,"",m_WorkingHumanoidRobot->getHumanoidSpecificities());
+    m_ZMPQP = new ZMPQPWithConstraint(this,"",m_HumanoidDynamicRobot->getHumanoidSpecificities());
 
     // ZMP and CoM generation using the method proposed in Dimitrov2008.
-    m_ZMPCQPFF = new ZMPConstrainedQPFastFormulation(this,"",m_WorkingHumanoidRobot->getHumanoidSpecificities());
+    m_ZMPCQPFF = new ZMPConstrainedQPFastFormulation(this,"",m_HumanoidDynamicRobot->getHumanoidSpecificities());
 
     // ZMP and CoM generation using the analytical method proposed in Morisawa2007.
     m_ZMPM = new AnalyticalMorisawaCompact(this);
-    m_ZMPM->SetHumanoidSpecificities(m_WorkingHumanoidRobot->getHumanoidSpecificities());
+    m_ZMPM->SetHumanoidSpecificities(m_HumanoidDynamicRobot->getHumanoidSpecificities());
 
     // Preview control for a 3D Linear inverse pendulum
     m_PC = new PreviewControl(this);
@@ -333,18 +304,18 @@ namespace PatternGeneratorJRL {
     // Object to investiguate the result of the second preview loop.
     // INFO: This where you should instanciate your own
     // INFO: implementation of CjrlHumanoidDynamicRobot
-    if (m_DebuggingHumanoidRobot!=0)
-      {
-	m_DebuggingHumanoidRobot->SetProperty("ComputeZMP","true");
-	m_DebuggingHumanoidRobot->SetProperty("ComputeBackwardDynamics","false");
-      }
+    m_2HumanoidDynamicRobot= new HumanoidDynamicMultiBody();
+    m_2HumanoidDynamicRobot->SetHumanoidSpecificitiesFile(HumanoidSpecificitiesFileName);
+    m_2HumanoidDynamicRobot->setComputeZMP(true);
+    m_2HumanoidDynamicRobot->setComputeBackwardDynamics(false);
+    
 
     // Stack of steps handler.
     m_StepStackHandler = new StepStackHandler(this);
 
     // Stepping over planner.
     m_StOvPl = new StepOverPlanner(m_ObstaclePars,
-				   m_WorkingHumanoidRobot->getHumanoidSpecificities());
+				   m_HumanoidDynamicRobot->getHumanoidSpecificities());
 
 
     // The creation of the double stage preview control manager.
@@ -379,12 +350,12 @@ namespace PatternGeneratorJRL {
 
     // Initialize the Preview Control general object.
     m_DoubleStagePCStrategy->InitInterObjects(m_PC,
-					      m_WorkingHumanoidRobot,
+					      m_HumanoidDynamicRobot,
 					      m_ComAndFootRealization,
 					      m_StepStackHandler);
         
     m_CoMAndFootOnlyStrategy->InitInterObjects(m_PC,
-					       m_WorkingHumanoidRobot,
+					       m_HumanoidDynamicRobot,
 					       m_ComAndFootRealization,
 					       m_StepStackHandler);
 
@@ -409,24 +380,24 @@ namespace PatternGeneratorJRL {
     m_GMFKW->SetPreviewControl(m_PC);
 
     // Read the robot VRML file model.
-    m_WorkingHumanoidRobot->parserVRML(HumanoidVRMLFileDirectory,
+    m_HumanoidDynamicRobot->parserVRML(HumanoidVRMLFileDirectory,
 				       HumanoidVRMLFileName,
 				       HumanoidLinkJointRank.c_str());
 
-    m_DebuggingHumanoidRobot->parserVRML(HumanoidVRMLFileDirectory,
+    m_2HumanoidDynamicRobot->parserVRML(HumanoidVRMLFileDirectory,
 					HumanoidVRMLFileName,
 					HumanoidLinkJointRank.c_str());
 
-    m_WorkingHumanoidRobot->SetTimeStep(m_PC->SamplingPeriod());
-    m_DebuggingHumanoidRobot->SetTimeStep(m_PC->SamplingPeriod());
+    m_HumanoidDynamicRobot->SetTimeStep(m_PC->SamplingPeriod());
+    m_2HumanoidDynamicRobot->SetTimeStep(m_PC->SamplingPeriod());
 
     // The link between specific Humanoid information
     // and joint of the dynamic multi robot
     // can be done only with the VRML file has been read (obvious isn't it ? )
-    m_WorkingHumanoidRobot->LinkBetweenJointsAndEndEffectorSemantic();
-    m_DebuggingHumanoidRobot->LinkBetweenJointsAndEndEffectorSemantic();
+    m_HumanoidDynamicRobot->LinkBetweenJointsAndEndEffectorSemantic();
+    m_2HumanoidDynamicRobot->LinkBetweenJointsAndEndEffectorSemantic();
 
-    m_ComAndFootRealization->setHumanoidDynamicRobot(m_WorkingHumanoidRobot);
+    m_ComAndFootRealization->setHumanoidDynamicRobot(m_HumanoidDynamicRobot);
 
     m_ComAndFootRealization->SetHeightOfTheCoM(m_PC->GetHeightOfCoM());
 
@@ -437,7 +408,7 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization->Initialization();
 
     m_StOvPl->SetPreviewControl(m_PC);
-    m_StOvPl->SetDynamicMultiBodyModel(m_WorkingHumanoidRobot);
+    m_StOvPl->SetDynamicMultiBodyModel(m_HumanoidDynamicRobot);
     m_StOvPl->SetZMPDiscretization(m_ZMPD);
 
 
@@ -460,13 +431,13 @@ namespace PatternGeneratorJRL {
       delete m_StepStackHandler;
     ODEBUG4("Destructor: did m_StepStackHandler","DebugPGI.txt");
 
-    if (m_DebuggingHumanoidRobot!=0)
-      delete m_DebuggingHumanoidRobot;
-    ODEBUG4("Destructor: did m_DebuggingHumanoidRobot","DebugPGI.txt");
+    if (m_2HumanoidDynamicRobot!=0)
+      delete m_2HumanoidDynamicRobot;
+    ODEBUG4("Destructor: did m_2HumanoidDynamicRobot","DebugPGI.txt");
 
-    if (m_WorkingHumanoidRobot!=0)
-      delete m_WorkingHumanoidRobot;
-    ODEBUG4("Destructor: did m_WorkingHumanoidRobot","DebugPGI.txt");
+    if (m_HumanoidDynamicRobot!=0)
+      delete m_HumanoidDynamicRobot;
+    ODEBUG4("Destructor: did m_HumanoidDynamicRobot","DebugPGI.txt");
 
     if (m_GMFKW!=0)
       delete m_GMFKW;
@@ -688,11 +659,11 @@ namespace PatternGeneratorJRL {
     for(unsigned int i=0;i<MAL_VECTOR_SIZE(Configuration);i++)
       Velocity[i] = 0.0;
 
-    m_WorkingHumanoidRobot->currentConfiguration(Configuration);
-    m_WorkingHumanoidRobot->currentVelocity(Velocity);
-    m_WorkingHumanoidRobot->setComputeCoM(true);
-    m_WorkingHumanoidRobot->computeForwardKinematics();
-    lStartingCOMPosition = m_WorkingHumanoidRobot->positionCenterOfMass();
+    m_HumanoidDynamicRobot->currentConfiguration(Configuration);
+    m_HumanoidDynamicRobot->currentVelocity(Velocity);
+    m_HumanoidDynamicRobot->setComputeCoM(true);
+    m_HumanoidDynamicRobot->computeForwardKinematics();
+    lStartingCOMPosition = m_HumanoidDynamicRobot->positionCenterOfMass();
   }
 
   void PatternGeneratorInterface::EvaluateStartingState(COMPosition  & lStartingCOMPosition,
@@ -840,7 +811,7 @@ namespace PatternGeneratorJRL {
 	    << " "  << lStartingCOMPosition.z[0]);
     ODEBUG4("StartingCOMPosition: " << lStartingCOMPosition.x[0] << " "  << lStartingCOMPosition.y[0],"DebugData.txt");
     // We also initialize the iteration number inside DMB.
-    m_WorkingHumanoidRobot->ResetIterationNumber();
+    m_HumanoidDynamicRobot->ResetIterationNumber();
 
     ODEBUG4("CommonInitializationOfWalking " << BodyAnglesIni,"DebugData.txt" );
 
@@ -989,7 +960,7 @@ namespace PatternGeneratorJRL {
 
     MAL_VECTOR(,double) lCurrentConfiguration;
 
-    lCurrentConfiguration = m_WorkingHumanoidRobot->currentConfiguration();  
+    lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();  
     ODEBUG("lCurrent Configuration :" << lCurrentConfiguration);
 
     deque<RelativeFootPosition> lRelativeFootPositions;
@@ -1006,7 +977,7 @@ namespace PatternGeneratorJRL {
     lCurrentConfiguration(3) = 0.0;
     lCurrentConfiguration(4) = 0.0;
     lCurrentConfiguration(5) = 0.0;
-    m_WorkingHumanoidRobot->currentConfiguration(lCurrentConfiguration);
+    m_HumanoidDynamicRobot->currentConfiguration(lCurrentConfiguration);
 
     ODEBUG("Size of lRelativeFootPositions :" << lRelativeFootPositions.size());
     ODEBUG("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
@@ -1559,8 +1530,8 @@ namespace PatternGeneratorJRL {
 
     // Computes New Multybody ZMP.  and angular velocity of real angles
     //upperbody angles
-    //	m_DebuggingHumanoidRobot->Setq(LINKSFORUPPERBODY[0],qWaistYaw);
-    //	m_DebuggingHumanoidRobot->Setq(LINKSFORUPPERBODY[1],0.0);
+    //	m_2HumanoidDynamicRobot->Setq(LINKSFORUPPERBODY[0],qWaistYaw);
+    //	m_2HumanoidDynamicRobot->Setq(LINKSFORUPPERBODY[1],0.0);
 
     if (m_count>1)
       {
@@ -1577,8 +1548,8 @@ namespace PatternGeneratorJRL {
       }
 
 
-    //	m_DebuggingHumanoidRobot->Setdq(LINKSFORUPPERBODY[0],dqWaistYaw);
-    //	m_DebuggingHumanoidRobot->Setdq(LINKSFORUPPERBODY[1],0.0);
+    //	m_2HumanoidDynamicRobot->Setdq(LINKSFORUPPERBODY[0],dqWaistYaw);
+    //	m_2HumanoidDynamicRobot->Setdq(LINKSFORUPPERBODY[1],0.0);
 
     m_Debug_prev_qWaistYaw = qWaistYaw;
     m_Debug_prev_dqWaistYaw = dqWaistYaw;
@@ -1660,33 +1631,33 @@ namespace PatternGeneratorJRL {
     WaistAngularVelocity[1] = 0;
     WaistAngularVelocity[2] = 0;//(lCOMTheta - m_prev_Zaxis_Angle)/m_SamplingPeriod;
 
-    //m_DebuggingHumanoidRobot->ForwardVelocity(WaistPosition,WaistVelocity,WaistAngularVelocity);
+    //m_2HumanoidDynamicRobot->ForwardVelocity(WaistPosition,WaistVelocity,WaistAngularVelocity);
     ODEBUG4( WaistPosition[0] << " " << WaistPosition[1] << " " << WaistPosition[2] << " " <<
 	     WaistVelocity[0] << " " << WaistVelocity[1] << " " << WaistVelocity[2] << " ", "DebugDataWPDisplay.txt");
 
     ODEBUG4(CurrentConfiguration,"DDCC.dat");
     ODEBUG4(CurrentVelocity,"DDCV.dat");
 
-    m_DebuggingHumanoidRobot->currentConfiguration(CurrentConfiguration);
-    m_DebuggingHumanoidRobot->currentVelocity(CurrentVelocity);
-    m_DebuggingHumanoidRobot->currentAcceleration(CurrentAcceleration);
+    m_2HumanoidDynamicRobot->currentConfiguration(CurrentConfiguration);
+    m_2HumanoidDynamicRobot->currentVelocity(CurrentVelocity);
+    m_2HumanoidDynamicRobot->currentAcceleration(CurrentAcceleration);
 
-    m_DebuggingHumanoidRobot->computeForwardKinematics();
-    ZMPmultibody = m_DebuggingHumanoidRobot->zeroMomentumPoint();
+    m_2HumanoidDynamicRobot->computeForwardKinematics();
+    ZMPmultibody = m_2HumanoidDynamicRobot->zeroMomentumPoint();
 
     ODEBUG4( m_count << " " << ZMPmultibody[0] << " " << ZMPmultibody[1],
 	     "DebugDataZMPMB1Display.txt");
     
-    Joint * LeftFootJoint = dynamic_cast<Joint *>(m_DebuggingHumanoidRobot->leftFoot());
-    Joint * RightFootJoint = dynamic_cast<Joint *>(m_DebuggingHumanoidRobot->rightFoot());
+    Joint * LeftFootJoint = dynamic_cast<Joint *>(m_2HumanoidDynamicRobot->leftFoot());
+    Joint * RightFootJoint = dynamic_cast<Joint *>(m_2HumanoidDynamicRobot->rightFoot());
 
     matrix4d LFJcurrentTransformation = LeftFootJoint->currentTransformation();
     matrix4d RFJcurrentTransformation = RightFootJoint->currentTransformation();
     MAL_S3_VECTOR( _2DMBCoM,double);
-    _2DMBCoM= m_DebuggingHumanoidRobot->getPositionCoM();
+    _2DMBCoM= m_2HumanoidDynamicRobot->getPositionCoM();
 
     vector3d lAngularMomentum;
-    //    lAngularMomentum = m_DebuggingHumanoidRobot->angularMomentumWrtCoM();
+    //    lAngularMomentum = m_2HumanoidDynamicRobot->angularMomentumWrtCoM();
     ODEBUG4(m_count << " " << lAngularMomentum(0)
 	    << " " << lAngularMomentum(1)
 	    << " " << lAngularMomentum(2), "DebugDataAngularMomentum.dat");
