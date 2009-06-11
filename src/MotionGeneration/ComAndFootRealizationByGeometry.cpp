@@ -166,7 +166,7 @@ void ComAndFootRealizationByGeometry::Initialization()
       // to the VRML ID.
 
       //HumanoidDynamicMultiBody * aHDMB = (HumanoidDynamicMultiBody *)getHumanoidDynamicRobot();
-      //      aHDMB->GetJointIDInConfigurationFromVRMLID(m_GlobalVRMLIDtoConfiguration);
+      m_GlobalVRMLIDtoConfiguration = getHumanoidDynamicRobot()->getActuatedJoints();
 
       ODEBUG("After taking m_GlobalVRMLIDtoConfiguration from aHDMB " << 
 	      m_GlobalVRMLIDtoConfiguration.size());

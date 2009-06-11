@@ -1,3 +1,14 @@
+2009-06-11  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	Version which compile but segfault.
+	* src/MotionGeneration/ComAndFootRealizationByGeometry.cpp: 
+	Removed direct calls to dynamicsJRLJapan and go through the abstract
+	interface. The heaviest part to adapt.
+	* src/PatternGeneratorInterface.cpp: 
+	Small adaptation.
+	* unitTesting/TestFootPrintPGInterface.cpp: 
+	Test to create the humanoid robot model outside the PG.
+
 2009-06-09  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	Adding functionnal calls through the infamous setProperty.

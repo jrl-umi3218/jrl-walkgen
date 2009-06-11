@@ -65,6 +65,11 @@ namespace PatternGeneratorJRL {
     ODEBUG4("Step 0","DebugPGI.txt");
 
     m_WorkingHumanoidRobot = lWorkingHumanoidDynamicRobot;
+    if (m_WorkingHumanoidRobot==0)
+      {
+	ODEBUG3("Several algorithms will not be able to work with");
+	ODEBUG3("the current call of this object. ");
+      }
     m_DebuggingHumanoidRobot = lDebuggingHumanoidDynamicRobot;
 
     // Initialization of the parameters directory and files.
@@ -158,7 +163,8 @@ namespace PatternGeneratorJRL {
 
     // Initialize (if needed) debugging actions.
     m_dt = 0.005;
-    m_DOF = m_WorkingHumanoidRobot->numberDof();
+    if (m_WorkingHumanoidRobot!=0)
+      m_DOF = m_WorkingHumanoidRobot->numberDof();
 
     m_SamplingPeriod = m_PC->SamplingPeriod();
     m_PreviewControlTime = m_PC->PreviewControlTime();
@@ -420,8 +426,14 @@ namespace PatternGeneratorJRL {
     string aProperty("TimeStep");
     string aValue(out.str());
     
-    m_WorkingHumanoidRobot->setProperty(aProperty,aValue);
-    m_DebuggingHumanoidRobot->setProperty(aProperty,aValue);
+    if (m_WorkingHumanoidRobot!=0)
+      {
+	m_WorkingHumanoidRobot->setProperty(aProperty,aValue);
+      }
+    if (m_DebuggingHumanoidRobot!=0)
+      {
+	m_DebuggingHumanoidRobot->setProperty(aProperty,aValue);
+      }
 
     m_ComAndFootRealization->setHumanoidDynamicRobot(m_WorkingHumanoidRobot);
 

@@ -13,6 +13,10 @@
 #include <sstream>
 #include <fstream>
 
+
+#include "dynamicsJRLJapan/HumanoidDynamicMultiBody.h"
+#include "robotDynamics/jrlRobotDynamicsObjectConstructor.h"
+
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
 using namespace::PatternGeneratorJRL;
@@ -683,7 +687,22 @@ void KineoWorks(PatternGeneratorInterface &aPGI)
   }
   {
     
-    istringstream strm2(":stepseq 0.0 -0.105 0.0 0.0 0.2 0.21 0.0 0.0 0.2 -0.21 0.0 0.0 0.2 0.21 0.0 0.0 0.2 -0.21 0.0 0.0 0.2 0.21 0.0 -0.05 0.2 -0.21 0.0 -0.10 0.2 0.21 0.0 -0.15 0.2 -0.21 0.0 -0.2 0.2 +0.21 0.0 -0.2 0.2 -0.21 0.0 -0.2 0.2 +0.21 0.0 -0.2 0.2 -0.21 0.0 -0.15 0.2 +0.21 0.0 -0.07 0.2 -0.21 0.0 0.0 0.0 0.21 0.0 0.0");
+    istringstream strm2(":stepseq 0.0 -0.105 0.0 0.0 \
+                         0.2 0.21 0.0 0.0				     \
+                         0.2 -0.21 0.0 0.0 \
+                         0.2 0.21 0.0 0.0 \
+                         0.2 -0.21 0.0 0.0 \
+                         0.2 0.21 0.0 -0.05 \
+                         0.2 -0.21 0.0 -0.10 \
+                         0.2 0.21 0.0 -0.15 \
+                         0.2 -0.21 0.0 -0.2 \
+                         0.2 +0.21 0.0 -0.2 \
+                         0.2 -0.21 0.0 -0.2 \
+                         0.2 +0.21 0.0 -0.2 \
+                         0.2 -0.21 0.0 -0.15 \
+                         0.2 +0.21 0.0 -0.07 \
+                         0.2 -0.21 0.0 0.0 \
+                         0.0 0.21 0.0 0.0");
     aPGI.ParseCmd(strm2);
   }
 
@@ -691,10 +710,21 @@ void KineoWorks(PatternGeneratorInterface &aPGI)
 
 void SteppingOver(PatternGeneratorInterface &aPGI)
 {
-  const char lBuffer[3][256] =
+  const char lBuffer[3][1024] =
     { ":walkmode 2",
       ":UpperBodyMotionParameters -0.1 -1.0 0.0",
-      ":stepseq 0.0 -0.105 0.0 0.2 0.21 0.0 0.2 -0.21 0.0 0.2 0.21 0.0 0.2 -0.21 0.0 0.2 0.21 0.0 0.2 -0.21 0.0  0.2 0.21 0.0 0.2 -0.21 0.0 0.2 0.21 0.0 0.2 -0.21 0.0 0.0 0.21 0.0"
+      ":stepseq 0.0 -0.105 0.0 \
+                0.2  0.21 0.0 \
+                0.2 -0.21 0.0 \
+                0.2  0.21 0.0 \
+                0.2 -0.21 0.0 \
+                0.2  0.21 0.0 \
+                0.2 -0.21 0.0 \
+                0.2  0.21 0.0 \
+                0.2 -0.21 0.0 \
+                0.2  0.21 0.0 \
+                0.2 -0.21 0.0 \
+                0.0  0.21 0.0"
     };
   
   for(int i=0;i<3;i++)
@@ -766,6 +796,45 @@ int main(int argc, char *argv[])
       LinkJointRank = argv[5];
     }
 
+
+  CjrlRobotDynamicsObjectConstructor<
+  dynamicsJRLJapan::DynamicMultiBody, 
+    dynamicsJRLJapan::HumanoidDynamicMultiBody, 
+    dynamicsJRLJapan::JointFreeflyer, 
+    dynamicsJRLJapan::JointRotation,
+    dynamicsJRLJapan::JointTranslation,
+    dynamicsJRLJapan::Body> aRobotDynamicsObjectConstructor;
+  
+  CjrlHumanoidDynamicRobot * aHDR = aRobotDynamicsObjectConstructor.createhumanoidDynamicRobot();
+  
+  dynamicsJRLJapan::HumanoidDynamicMultiBody *aWorkingHDMB;
+  aWorkingHDMB = dynamic_cast<dynamicsJRLJapan::HumanoidDynamicMultiBody*>(aHDR);
+
+  if (aWorkingHDMB==0)
+    { 
+      cerr<< "Dynamic cast on HDR failed " << endl;
+      exit(-1);
+    }
+  aWorkingHDMB->parserVRML(VRMLPath,VRMLFileName,(char *)LinkJointRank.c_str());
+  cout << "Here in between" << endl;
+  aWorkingHDMB->SetHumanoidSpecificitiesFile(SpecificitiesFileName);
+  cout << " Finished the initialization"<< endl;
+
+  CjrlHumanoidDynamicRobot * aDebuggingHDR = aRobotDynamicsObjectConstructor.createhumanoidDynamicRobot();
+  
+  dynamicsJRLJapan::HumanoidDynamicMultiBody *aDebuggingHDMB;
+  aDebuggingHDMB = dynamic_cast<dynamicsJRLJapan::HumanoidDynamicMultiBody*>(aDebuggingHDR);
+
+  if (aDebuggingHDMB==0)
+    { 
+      cerr<< "Dynamic cast on HDR failed " << endl;
+      exit(-1);
+    }
+  aDebuggingHDMB->parserVRML(VRMLPath,VRMLFileName,(char *)LinkJointRank.c_str());
+  cout << "Here in between" << endl;
+  aDebuggingHDMB->SetHumanoidSpecificitiesFile(SpecificitiesFileName);
+  cout << " Finished the initialization"<< endl;
+
   Global=PCParametersFile;	  
   Global+= " ";
   Global+=VRMLPath;
@@ -775,12 +844,11 @@ int main(int argc, char *argv[])
   Global+=SpecificitiesFileName;
   Global+= " ";
   Global+=LinkJointRank;
-
   std::istringstream strm(Global);
   //("./data/PreviewControlParameters.ini ../../etc/HRP2JRL/ HRP2JRLmain.wrl ./data/HRP2Specificities.xml");
   PatternGeneratorInterface * aPGI;
 
-  aPGI = new PatternGeneratorInterface(strm);
+  aPGI = new PatternGeneratorInterface(strm,aWorkingHDMB,aDebuggingHDMB);
   cout << "Global: " << Global << endl;
 
   //  cout << "before PGI " << endl;
@@ -1148,7 +1216,8 @@ int main(int argc, char *argv[])
 		    //istringstream strm2(":parsecmd :addstandardonlinestep 0.2 0.0 0.0");
 		    //aPGI->ParseCmd(strm2);
 		    gettimeofday(&endmodif,0);
-		    timemodif = endmodif.tv_sec-beginmodif.tv_sec + 0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
+		    timemodif = endmodif.tv_sec-beginmodif.tv_sec + 
+		      0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
 		    totaltimemodif += timemodif;
 		    nbofmodifs++;
 		    TestChangeFoot=true;
@@ -1213,8 +1282,10 @@ int main(int argc, char *argv[])
   delete aPGI;
 
   cout << "Number of iterations " << NbOfIt << " " << NbOfItToCompute << endl;
-  cout << "Time consumption: " << (double)totaltime/(double)NbOfItToCompute << " max time: " << maxtime <<endl;
-  cout << "Time for modif: " << (double)totaltimemodif/(double)nbofmodifs <<  " nb of modifs: " << nbofmodifs << endl ;
+  cout << "Time consumption: " << (double)totaltime/(double)NbOfItToCompute 
+       << " max time: " << maxtime <<endl;
+  cout << "Time for modif: " << (double)totaltimemodif/(double)nbofmodifs 
+       <<  " nb of modifs: " << nbofmodifs << endl ;
   cout << "Time on ZMP ref planning (Kajita policy): " 
        << totaltimeinplanning<< " " 
        << totaltimeinplanning*4/(double)NbOfIt<< endl;
