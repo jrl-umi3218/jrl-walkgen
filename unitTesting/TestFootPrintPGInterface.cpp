@@ -897,7 +897,7 @@ int main(int argc, char *argv[])
   
     
   //COMPosition CurrentWaistPosition;
-  struct timeval begin,end;
+  struct timeval begin,end,startingtime;
   unsigned long int NbOfIt=0, NbOfItToCompute=0;
 
 
@@ -914,9 +914,10 @@ int main(int argc, char *argv[])
   bool DebugFGPI = true;
   unsigned int PGIInterface = 0;
   
-  double TimeProfile[200*3600];
+  double TimeProfile[200*620];
+  double TimeProfileTS[200*620];
   unsigned int TimeProfileIndex = 0;
-  unsigned int TimeProfileUpperLimit=200*600;
+  unsigned int TimeProfileUpperLimit=200*620;
 
   ofstream aofq;
   if (DebugConfiguration)
@@ -967,6 +968,7 @@ int main(int argc, char *argv[])
   double newtime=0,deltatime=0;
   unsigned long int nbofmodifs=0;
 
+  gettimeofday(&startingtime,0);
   for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
     {
       //StrangeStartingPosition(*aPGI);
@@ -1144,7 +1146,9 @@ int main(int argc, char *argv[])
 	      }
 	    }
 
-	  TimeProfile[TimeProfileIndex++] = ltime + timemodif;
+	  TimeProfile[TimeProfileIndex] = ltime + timemodif;
+	  TimeProfileTS[TimeProfileIndex] = begin.tv_sec + 0.000001 * begin.tv_usec;
+	  TimeProfileIndex++;
 	  if (TimeProfileIndex>TimeProfileUpperLimit)
 	    TimeProfileIndex = 0;
 
@@ -1167,7 +1171,9 @@ int main(int argc, char *argv[])
 		  << ZMPTarget(0)+CurrentConfiguration(0) << " " 
 		  << ZMPTarget(1)+CurrentConfiguration(1) << " "
 		  << CurrentConfiguration(0) << " " 
-		  << CurrentConfiguration(1) << " " << endl;
+		  << CurrentConfiguration(1) << " " 
+		  << begin.tv_sec + 0.000001 * begin.tv_usec 
+		  << endl;
 	    }
 	  
 	  if (DebugConfiguration)
@@ -1183,8 +1189,10 @@ int main(int argc, char *argv[])
 
   {
     ofstream lProfileOutput("TimeProfile.dat",ofstream::out);
+    double dST = startingtime.tv_sec + 0.000001 * startingtime.tv_usec;
     for(unsigned int i=0;i<TimeProfileIndex;i++)
-      lProfileOutput << TimeProfile[i] << std::endl;
+      lProfileOutput << " " <<	TimeProfileTS[i] - dST
+		     << " " << TimeProfile[i] << std::endl;
 
     lProfileOutput.close();
   }

@@ -1,5 +1,11 @@
 2009-06-16  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	New profiling scheme.
+	* unitTesting/TestFootPrintPGInterface.cpp: 
+	Profile not anymore by iteration number but by clock measurement.
+
+2009-06-16  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	Modification of AnalyticalPreviewControl to use new objects.
 	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp:
 	Proper initialization of Preview Control and clocks measurements .
