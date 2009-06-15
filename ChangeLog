@@ -1,5 +1,12 @@
 2009-06-16  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	Adding files to gitignore and the forgotten IDL interface.
+	* .gitignore: Removing corba related files + svn-wrapper files.
+	* plugin/corba/walkpluginJRL.idl: Added
+	for backward compatibility.
+
+2009-06-16  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	New profiling scheme.
 	* unitTesting/TestFootPrintPGInterface.cpp: 
 	Profile not anymore by iteration number but by clock measurement.
