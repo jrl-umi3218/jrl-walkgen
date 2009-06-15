@@ -105,7 +105,9 @@ namespace PatternGeneratorJRL
     m_NeedToReset = true;
     m_AbsoluteTimeReference = 0.0;
 
-    m_PreviewControl = new PreviewControl(lSPM);
+    m_PreviewControl = new PreviewControl(lSPM,
+					  OptimalControllerSolver::MODE_WITH_INITIALPOS,
+					  true);
 
     /*! Dynamic allocation of the analytical trajectories for the ZMP and the COG */
     m_AnalyticalZMPCoGTrajectoryX = new AnalyticalZMPCOGTrajectory(7);
@@ -141,6 +143,13 @@ namespace PatternGeneratorJRL
 	cout << "Part on the analytical ZMP COG trajectories and foot polynomial computation" << endl;
 	m_Clock3.Display();
       }
+
+    string Filename("Clock1.dat");
+    m_Clock1.RecordDataBuffer(Filename);
+    Filename = "Clock2.dat";
+    m_Clock2.RecordDataBuffer(Filename);
+    Filename = "Clock3.dat";
+    m_Clock3.RecordDataBuffer(Filename);
     
     if (m_AnalyticalZMPCoGTrajectoryX!=0)
       delete m_AnalyticalZMPCoGTrajectoryX;
@@ -879,7 +888,7 @@ namespace PatternGeneratorJRL
     m_NewStepInTheStackOfAbsolutePosition = true;
 
     m_Clock1.StopTiming();
-    m_Clock1.IncIteration();
+    m_Clock1.IncIteration(1);
     
     m_Clock2.StartTiming();
 
@@ -896,7 +905,7 @@ namespace PatternGeneratorJRL
     m_NewStepInTheStackOfAbsolutePosition = false;
 
     m_Clock2.StopTiming();
-    m_Clock2.IncIteration();
+    m_Clock2.IncIteration(1);
 
     m_Clock3.StartTiming();
     /*! Feed the sequence with the new trajectory. */
