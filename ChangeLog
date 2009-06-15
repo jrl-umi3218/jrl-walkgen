@@ -1,5 +1,17 @@
 2009-06-16  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	Finer control of optimal weights computation for preview control.
+	* include/walkGenJrl/PreviewControl/PreviewControl.h: 
+	When instanciated the object it is possible to decide when
+	the weights are computed. The automated mode allows to 
+	have the weights computed whenever control period, com height
+	are changed. It is therefore outside the control loop and
+	safer for the robot. 
+	* src/PreviewControl/PreviewControl.cpp: Implements
+	the above strategy.
+
+2009-06-16  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	Including date and time consumption inside Clock class.
 	* ChangeLog: UNMERGED.
 	* include/walkGenJrl/Clock.h: Adding data buffer and 

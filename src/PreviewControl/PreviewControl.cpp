@@ -40,9 +40,15 @@
 
 using namespace::PatternGeneratorJRL;
 
-PreviewControl::PreviewControl(SimplePluginManager *lSPM)
+PreviewControl::PreviewControl(SimplePluginManager *lSPM,
+			       unsigned int defaultMode,
+			       bool lAutoComputeWeights)
   : SimplePlugin(lSPM)
 {
+
+  m_AutoComputeWeights = lAutoComputeWeights;
+  m_DefaultWeightComputationMode = defaultMode;
+
   m_SamplingPeriod = 0.0;
   m_PreviewControlTime = 0.0;
   m_Zc = 0.0;
@@ -54,6 +60,8 @@ PreviewControl::PreviewControl(SimplePluginManager *lSPM)
 
   MAL_MATRIX_RESIZE(m_Kx,1,3);
   m_Ks = 0;
+
+
   ODEBUG("Identification: " << this);
   std::string aMethodName[3] = 
     {":samplingperiod",
@@ -102,6 +110,9 @@ void PreviewControl::SetSamplingPeriod(double lSamplingPeriod)
     m_Coherent = false;
 
   m_SamplingPeriod = lSamplingPeriod;
+
+  if (m_AutoComputeWeights)
+    ComputeOptimalWeights(m_DefaultWeightComputationMode);
 }
 
 void PreviewControl::SetPreviewControlTime(double lPreviewControlTime)
@@ -110,6 +121,10 @@ void PreviewControl::SetPreviewControlTime(double lPreviewControlTime)
     m_Coherent = false;
     
   m_PreviewControlTime = lPreviewControlTime;
+
+  if (m_AutoComputeWeights)
+    ComputeOptimalWeights(m_DefaultWeightComputationMode);
+
 }
 
 void PreviewControl::SetHeightOfCoM(double lHeightOfCom)
@@ -118,6 +133,10 @@ void PreviewControl::SetHeightOfCoM(double lHeightOfCom)
     m_Coherent = false;
 
   m_Zc = lHeightOfCom;
+
+  if (m_AutoComputeWeights)
+    ComputeOptimalWeights(m_DefaultWeightComputationMode);
+
 }
 
 bool PreviewControl::IsCoherent()
@@ -248,7 +267,7 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
       
       delete anOCS;
     }
-  else if (mode==OptimalControllerSolver::MODE_WITH_INITIALPOS)
+  else if (mode==OptimalControllerSolver::MODE_WITH_INITIALPOS )
     {
       anOCS = new PatternGeneratorJRL::OptimalControllerSolver(m_A,m_B,m_C,Q,R,Nl);
       

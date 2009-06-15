@@ -42,7 +42,9 @@ namespace PatternGeneratorJRL
     public:
       
       /*! Constructor */
-      PreviewControl(SimplePluginManager *lSPM);
+      PreviewControl(SimplePluginManager *lSPM,
+		     unsigned int defaultMode = OptimalControllerSolver::MODE_WITH_INITIALPOS,
+		     bool computeWeightsAutomatically = false);
 
       /*! Destructor */
       ~PreviewControl();
@@ -112,7 +114,8 @@ namespace PatternGeneratorJRL
       /*! @} */
 
       /*! \brief Compute optimal weights.
-	\param [in] mode: with initial pos, without initial position.
+	\param [in] mode: with initial pos (OptimalControllerSolver::MODE_WITH_INITIALPOS), 
+	without initial position (OptimalControllerSolver::MODE_WITHOUT_INITIALPOS).
        */
       void ComputeOptimalWeights(unsigned int mode);
 
@@ -158,6 +161,12 @@ namespace PatternGeneratorJRL
 
       /*! \brief Keep track of the modification of the preview parameters. */
       bool m_Coherent;
+
+      /*! \brief Computes weight automatically */
+      bool m_AutoComputeWeights;
+
+      /*! \brief Default Mode. */
+      unsigned int m_DefaultWeightComputationMode;
     };
 }
 #include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
