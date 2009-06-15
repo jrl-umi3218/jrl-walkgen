@@ -50,7 +50,8 @@
 #endif
 
 #include <time.h>
-
+#include <vector>
+#include <string>
 
 #ifndef _HWPG_CLOCK_H_
 #define _HWPG_CLOCK_H_
@@ -104,10 +105,16 @@ namespace PatternGeneratorJRL
     /*! \brief Display a brief description of the current status. */
     void Display();
 
+    /*! \brief Record buffer of time consumption. */
+    void RecordDataBuffer(std::string filename);
+
   private:
     
     /*! Storing begin and end timestamps. */
     struct timeval m_BeginTimeStamp, m_EndTimeStamp;
+
+    /*! Starting time of the clock. */
+    double m_StartingTime;
 
     /*! Number of iterations. */
     unsigned long int m_NbOfIterations;
@@ -117,7 +124,11 @@ namespace PatternGeneratorJRL
     
     /*! Total time. */
     double m_TotalTime;
-     
+    
+    /*! Buffer */
+    std::vector<double> m_DataBuffer;
+
+    
     
   };
 };

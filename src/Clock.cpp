@@ -7,30 +7,12 @@
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
-   
-   Redistribution and use in source and binary forms, with or without modification, 
-   are permitted provided that the following conditions are met:
-   
-   * Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-   * Neither the name of the CNRS/AIST nor the names of its contributors 
-   may be used to endorse or promote products derived from this software without specific prior written permission.
-   
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
-   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
-   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   Please see license.txt for more information on license.
 */
 
 #include <iostream>
-
+#include <fstream>
 #include <walkGenJrl/Clock.h>
 
 using namespace PatternGeneratorJRL;
@@ -38,6 +20,11 @@ using namespace PatternGeneratorJRL;
 Clock::Clock()
 {
   Reset();
+  m_DataBuffer.resize(300000);
+
+  struct timeval startingtime;
+  gettimeofday(&startingtime,0);
+  m_StartingTime = startingtime.tv_sec + 0.000001 * startingtime.tv_usec;
 }
 
 
@@ -50,6 +37,10 @@ void Clock::Reset()
   m_NbOfIterations = 0;
   m_MaximumTime = 0.0;
   m_TotalTime=0.0;
+
+  struct timeval startingtime;
+  gettimeofday(&startingtime,0);
+  m_StartingTime = startingtime.tv_sec + 0.000001 * startingtime.tv_usec;
 }
 
 void Clock::StartTiming()
@@ -67,6 +58,9 @@ void Clock::StopTiming()
   m_MaximumTime = m_MaximumTime < ltime ? ltime : m_MaximumTime;
   m_TotalTime += ltime;
 
+  m_DataBuffer[(m_NbOfIterations*2)%3000000]=m_BeginTimeStamp.tv_sec +
+    0.000001 * m_BeginTimeStamp.tv_usec - m_StartingTime;
+  m_DataBuffer[(m_NbOfIterations*2+1)%3000000]=ltime;
 }
 
 void Clock::IncIteration(int lNbOfIts)
@@ -74,6 +68,13 @@ void Clock::IncIteration(int lNbOfIts)
   m_NbOfIterations += lNbOfIts;
 }
 
+void Clock::RecordDataBuffer(std::string filename)
+{
+  std::ofstream aof(filename.c_str());
+  for(unsigned int i=0;i<2*m_NbOfIterations%300000;i+=2)
+    aof << m_DataBuffer[i]<< " " << m_DataBuffer[i+1] << std::endl;
+  aof.close();
+}
 unsigned long int Clock::NbOfIterations()
 {
   return m_NbOfIterations;
