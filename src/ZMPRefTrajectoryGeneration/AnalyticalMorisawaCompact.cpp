@@ -2194,7 +2194,7 @@ namespace PatternGeneratorJRL
 	ODEBUG("NewRelFooAbsolutePositions.resize() = " <<NewRelFootAbsolutePositions.size());
 	ODEBUG("m_RelativeFootPositions.size() = " <<m_RelativeFootPositions.size());
 	
-	for(int j=IndexInterval,k=0;k<IndexIntervals.size();j++,k++)
+	for(int j=IndexInterval,k=0;k<(int)IndexIntervals.size();j++,k++)
 	  {
 	    IndexIntervals[k] = j;
 	  }

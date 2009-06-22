@@ -342,7 +342,6 @@ t_cmache_ cmache_;
 
 /* Table of constant values */
 
-static integer c__1 = 1;
 
 /* umd */
 /*
@@ -393,21 +392,9 @@ integer *lwar, *iwar, *liwar;
 doublereal *eps1;
 #endif
 {
-    /* Format strings */
-    static char fmt_1000[] = "(/8x,\002***QL: MATRIX G WAS ENLARGED\002,i3\
-,\002-TIMES BY UNITMATRIX\002)";
-    static char fmt_1100[] = "(/8x,\002***QL: CONSTRAINT \002,i5,\002 NOT CO\
-NSISTENT TO \002,/,(10x,10i5))";
-    static char fmt_1200[] = "(/8x,\002***QL: LWAR TOO SMALL\002)";
-    static char fmt_1210[] = "(/8x,\002***QL: LIWAR TOO SMALL\002)";
-    static char fmt_1220[] = "(/8x,\002***QL: MNN TOO SMALL\002)";
-    static char fmt_1300[] = "(/8x,\002***QL: TOO MANY ITERATIONS (MORE THA\
-N\002,i6,\002)\002)";
-    static char fmt_1400[] = "(/8x,\002***QL: ACCURACY INSUFFICIENT TO ATTAI\
-N CONVERGENCE\002)";
 
     /* System generated locals */
-    integer c_dim1, c_offset, a_dim1, a_offset, i__1, i__2;
+    integer c_dim1, c_offset, a_dim1, a_offset, i__1;
 
     /* Builtin functions */
 /*    integer s_wsfe(), do_fio(), e_wsfe(); */
@@ -423,16 +410,6 @@ N CONVERGENCE\002)";
     static doublereal ten;
     static logical lql;
     static integer inw1, inw2;
-
-    /* Fortran I/O blocks */
-    static cilist io___16 = { 0, 0, 0, fmt_1000, 0 };
-    static cilist io___18 = { 0, 0, 0, fmt_1100, 0 };
-    static cilist io___19 = { 0, 0, 0, fmt_1200, 0 };
-    static cilist io___20 = { 0, 0, 0, fmt_1210, 0 };
-    static cilist io___21 = { 0, 0, 0, fmt_1220, 0 };
-    static cilist io___22 = { 0, 0, 0, fmt_1300, 0 };
-    static cilist io___23 = { 0, 0, 0, fmt_1400, 0 };
-
 
 
 

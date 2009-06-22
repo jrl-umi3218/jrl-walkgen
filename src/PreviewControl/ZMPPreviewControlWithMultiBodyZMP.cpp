@@ -456,7 +456,8 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 #endif
 
   COMPosition acomp;
-
+  acomp.yaw = 0.0;
+  acomp.pitch = 0.0;
   if ((m_StageStrategy==ZMPCOM_TRAJECTORY_FULL)
       || (m_StageStrategy==ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY))
     {
@@ -618,6 +619,9 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   ZMPPosition aZMPpos;
   aZMPpos.px = m_FIFOZMPRefPositions[0].px - ZMPmultibody[0];
   aZMPpos.py = m_FIFOZMPRefPositions[0].py - ZMPmultibody[1];
+  aZMPpos.pz = 0.0;
+  aZMPpos.theta = 0.0;
+  aZMPpos.stepType = 1;
   aZMPpos.time = m_FIFOZMPRefPositions[0].time;
   ODEBUG4(aZMPpos.px << " " << aZMPpos.py << " " 
 	  << m_FIFOZMPRefPositions[0].px << " " 

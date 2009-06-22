@@ -1,3 +1,21 @@
+2009-06-22  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	Removed all warnings i.e. -Werror compliant.
+	* src/FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp: 
+	int/uint comparison.
+	* src/Mathematics/qld.cpp: 
+	unused variables.
+	* src/PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp: 
+	int/uint comparison.
+	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: 
+	variables used on debug mode.
+	* src/ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.cpp: 
+	unused variables.
+	* src/ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp: 
+	int/uint comparison.
+	* unitTesting/TestFootPrintPGInterface.cpp: 
+	unused variables.
+
 2009-06-16  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	Adding files to gitignore and the forgotten IDL interface.

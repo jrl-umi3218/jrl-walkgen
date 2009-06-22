@@ -61,6 +61,7 @@
 
 #define RESETDEBUG6(y) 
 #define ODEBUG6(x,y) 
+#define CODEDEBUG6(x) 
 
 #define RESETDEBUG5(y) { ofstream DebugFile; \
                          DebugFile.open(y,ofstream::out);\
@@ -69,6 +70,8 @@
                        DebugFile.open(y,ofstream::app); \
                        DebugFile << x << endl; \
                        DebugFile.close();}
+#define CODEDEBUG5(x) x
+
 #define ODEBUG5NOE(x,y) { ofstream DebugFile; \
                           DebugFile.open(y,ofstream::app); \
                           DebugFile << x ; DebugFile.close();}
@@ -1345,8 +1348,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 		  war, &lwar,
 		  iwar, &liwar,&Eps);
 	  gettimeofday(&lend,0);
-	  double ldt = lend.tv_sec - lbegin.tv_sec + 
-	    0.000001 * (lend.tv_usec - lbegin.tv_usec);
+	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec + 
+		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
 
 	  unsigned int NbOfActivatedConstraints = 0;
 	  for(int lk=0;lk<m;lk++)
@@ -1379,8 +1382,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	  StartingSequence = false;
 	  NumberOfRemovedConstraints = NextNumberOfRemovedConstraints;
 	  gettimeofday(&lend,0);
-	  double ldt = lend.tv_sec - lbegin.tv_sec + 
-	    0.000001 * (lend.tv_usec - lbegin.tv_usec);
+	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec + 
+		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
 	  
 	  ODEBUG6(ldt,"dtPLDP.dat");
 	}

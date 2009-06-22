@@ -131,7 +131,6 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::FillInWholeBuffer(double Fir
   if (m_DataBuffer.size()!=SizeOfBuffer)
     m_DataBuffer.resize(SizeOfBuffer);
 
-  unsigned int lDataBufferIndex = 0;
   double lZMP;
   double t=0;
 

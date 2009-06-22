@@ -902,7 +902,6 @@ int main(int argc, char *argv[])
 
 
   bool TestChangeFoot = true;
-  bool TestChangeFoot2 = true;
 
   unsigned int NbStepsModified = 0;
 

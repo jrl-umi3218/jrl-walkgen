@@ -553,7 +553,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
   if Continuity is set to true, and if the number of intervals so far is the number of
   intervals minus 2.
   */
-  if ((Continuity) && (IntervalIndex==m_DeltaTj.size()-2))
+  if ((Continuity) && (IntervalIndex==(int)(m_DeltaTj.size()-2)))
     {
       for(unsigned int lk=0;lk<2;lk++)
 	{
