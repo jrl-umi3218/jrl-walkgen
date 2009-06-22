@@ -25,13 +25,13 @@ SET_TARGET_PROPERTIES(TestFootPrintPGInterface
 )
 ADD_DEPENDENCIES (TestFootPrintPGInterface ${PROJECT_NAME})
 
-#ADD_EXECUTABLE(	TestOptCholesky TestOptCholesky.cpp)
-#SET_TARGET_PROPERTIES(TestOptCholesky
-#	              PROPERTIES
-#	              COMPILE_FLAGS ${UNITTESTING_CXXFLAGS}
-#		      LINK_FLAGS ${UNITTESTING_LDFLAGS}
-#)
-#ADD_DEPENDENCIES (TestOptCholesky ${PROJECT_NAME})
+ADD_EXECUTABLE(	TestOptCholesky TestOptCholesky.cpp)
+SET_TARGET_PROPERTIES(TestOptCholesky
+	              PROPERTIES
+	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
+		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}
+)
+ADD_DEPENDENCIES (TestOptCholesky ${PROJECT_NAME})
 
 ADD_EXECUTABLE(	TestRiccatiEquation TestRiccatiEquation.cpp)
 SET_TARGET_PROPERTIES(TestRiccatiEquation
@@ -40,3 +40,4 @@ SET_TARGET_PROPERTIES(TestRiccatiEquation
 		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}
 )
 ADD_DEPENDENCIES (TestRiccatiEquation ${PROJECT_NAME})
+

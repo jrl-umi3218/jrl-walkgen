@@ -1,5 +1,14 @@
 2009-06-22  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
+	Reactivated test for optimal cholesky implementation.
+	* unitTesting/CMakeLists.txt: 
+	Added the file in the list of test to compile.
+	* unitTesting/TestOptCholesky.cpp: 
+	Modification to comply with the new interface to be
+	tested.
+
+2009-06-22  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
 	Removed all warnings i.e. -Werror compliant.
 	* src/FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp: 
 	int/uint comparison.
