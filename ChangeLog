@@ -1,3 +1,21 @@
+2009-06-30  Olivier Stasse  <olivier.stasse@aist.go.jp>
+
+	Changes to take into account the new Abstract Interface.
+	
+	* CMakeLists.txt: .
+	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.h: .
+	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.h: .
+	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h: .
+	* include/walkGenJrl/FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.h: .
+	* include/walkGenJrl/MotionGeneration/StepOverPlanner.h: .
+	* include/walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h: .
+	* src/CMakeLists.txt: .
+	* src/FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp: .
+	* src/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp: .
+	* src/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp: .
+	* src/FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp: .
+	* src/MotionGeneration/StepOverPlanner.cpp: .
+
 2009-06-22  Olivier Stasse  <olivier.stasse@aist.go.jp>
 
 	Reactivated test for optimal cholesky implementation.

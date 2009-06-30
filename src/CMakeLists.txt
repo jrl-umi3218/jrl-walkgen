@@ -64,7 +64,7 @@ SET(libwpg_src
 FOREACH(srcfile ${libwpg_src})
   SET(newsrcfile "")
   STRING(REGEX REPLACE "cpp$" "h" newsrcfile ${srcfile})
-  SET(libwpg_headers ../include/${PROJECT_NAME}/${newsrcfile} ${libwpg_headers})
+#  SET(libwpg_headers ../include/${PROJECT_NAME}/${newsrcfile} ${libwpg_headers})
 #   MESSAGE(STATUS "newsrcfile: " ${newsrcfile})
 ENDFOREACH(srcfile)
 
@@ -105,6 +105,7 @@ SET_TARGET_PROPERTIES(${PROJECT_NAME_LIB}
 # Specify compiling options
 # -------------------------
 SET(${PROJECT_NAME}_src_CXXFLAGS "-I${PROJECT_SOURCE_DIR}/include/ ${${PROJECT_NAME}_src_CXXFLAGS}")
+SET(${PROJECT_NAME}_src_CXXFLAGS "-I${PROJECT_SOURCE_DIR}/src/ ${${PROJECT_NAME}_src_CXXFLAGS}")
 SET(${PROJECT_NAME}_src_CXXFLAGS "-I${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME} ${${PROJECT_NAME}_src_CXXFLAGS}")
 SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} -I${CMAKE_INSTALL_PREFIX}/include")
 SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} ${${PROJECT_NAME}_CXXFLAGS}")
