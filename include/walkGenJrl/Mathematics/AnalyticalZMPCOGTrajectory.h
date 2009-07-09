@@ -265,6 +265,6 @@ namespace PatternGeneratorJRL
       double m_AbsoluteTimeReference;
     };
 
-  std::ostream& operator <<(std::ostream &os,const AnalyticalZMPCOGTrajectory &obj);
+  WALK_GEN_JRL_EXPORT std::ostream& operator <<(std::ostream &os,const AnalyticalZMPCOGTrajectory &obj);
 };
 #endif /* _ANALYTICAL_COG_H_ */
