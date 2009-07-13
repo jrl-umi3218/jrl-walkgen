@@ -31,8 +31,8 @@
 */
 
 #include <iostream>
-#include <walkGenJrl/SimplePlugin.h>
-#include <walkGenJrl/SimplePluginManager.h>
+#include <SimplePlugin.h>
+#include <SimplePluginManager.h>
 
 #if 0
 

@@ -36,7 +36,7 @@
 
 #ifdef WIN32
 #include <Windows.h>
-#include <walkGenJrl/TimeUtilsWindows.h>
+#include <TimeUtilsWindows.h>
 #endif
 
 #include <time.h>
@@ -44,8 +44,8 @@
 #include <iostream>
 #include <fstream>
 
-#include <walkGenJrl/Mathematics/qld.h>
-#include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.h>
+#include <Mathematics/qld.h>
+#include <ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.h>
 
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; \
@@ -88,7 +88,7 @@ using namespace PatternGeneratorJRL;
 
 ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginManager *lSPM, 
 								 string DataFile,
-								 HumanoidSpecificities *aHS) :
+								 CjrlHumanoidDynamicRobot *aHS) :
   ZMPRefTrajectoryGeneration(lSPM)
 {
   m_Q = 0;

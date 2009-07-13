@@ -55,7 +55,7 @@
 #define ODEBUG3(x)  std::cout << x << endl;
 
 #include <deque> 
-#include <walkGenJrl/GlobalStrategyManagers/GlobalStrategyManager.h>
+#include <GlobalStrategyManagers/GlobalStrategyManager.h>
 
 using namespace PatternGeneratorJRL;
 

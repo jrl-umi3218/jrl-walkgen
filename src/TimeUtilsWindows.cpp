@@ -1,5 +1,5 @@
 #ifdef WIN32
-#include <walkGenJrl/TimeUtilsWindows.h>
+#include <TimeUtilsWindows.h>
 
 #include < Windows.h >
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)

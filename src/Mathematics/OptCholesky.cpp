@@ -1,37 +1,19 @@
-#include <walkGenJrl/Mathematics/OptCholesky.h>
+/** \file OptCholesky.cpp
+    \brief This object performs a cholesky decomposition optimized for 
+    the problem to solved.
 
-#if 0
-#define RESETDEBUG4(y) { ofstream DebugFile; \
-                         DebugFile.open(y,ofstream::out); \
-                         DebugFile.close();}
-#define ODEBUG4(x,y) { ofstream DebugFile; \
-                       DebugFile.open(y,ofstream::app); \
-                       DebugFile <<  x << endl; DebugFile.close();}
-#else
-#define RESETDEBUG4(y) 
-#define ODEBUG4(x,y) 
-#endif
+   Copyright (c) 2009, 
+   @author Olivier Stasse
+   
+   JRL-Japan, CNRS/AIST
 
-#define RESETDEBUG6(y) 
-#define ODEBUG6(x,y) 
+   All rights reserved.
 
-#define RESETDEBUG5(y) { ofstream DebugFile; \
-                         DebugFile.open(y,ofstream::out);\
-                         DebugFile.close();}
-#define ODEBUG5(x,y) { ofstream DebugFile; \
-                       DebugFile.open(y,ofstream::app); \
-                       DebugFile << x << endl; \
-                       DebugFile.close();}
-#define ODEBUG5NOE(x,y) { ofstream DebugFile; \
-                          DebugFile.open(y,ofstream::app); \
-                          DebugFile << x ; DebugFile.close();}
-#if 1
-#define ODEBUG(x)
-#else
-#define ODEBUG(x)  std::cout << "OptCholesky " << x << endl;
-#endif
+   Please see License.txt for more details on the license.
+*/
 
-#define ODEBUG3(x)  std::cout << "OptCholesky " << x << endl;
+#include <Mathematics/OptCholesky.h>
+#include <Debug.h>
 
 using namespace PatternGeneratorJRL;
 

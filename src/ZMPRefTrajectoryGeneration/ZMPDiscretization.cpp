@@ -39,8 +39,8 @@
 #include <iostream>
 #include <fstream>
 
-#include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
-#include <walkGenJrl/Mathematics/ConvexHull.h>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
+#include <Mathematics/ConvexHull.h>
 
 #ifdef WIN32
 inline double round( double d )
@@ -95,7 +95,8 @@ OnLineState & OnLineState::operator=(unsigned int NewState)
 }
 
 
-ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile, HumanoidSpecificities *aHS)
+ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile, 
+				     CjrlHumanoidDynamicRobot *aHS)
   : ZMPRefTrajectoryGeneration(lSPM)
 {
   m_PC = 0;
@@ -103,7 +104,8 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile, 
   m_InitializationProfile = PREV_ZMP_INIT_PROFIL;
 
   m_HS = aHS;
-  m_FootTrajectoryGenerationStandard = new FootTrajectoryGenerationStandard(lSPM,m_HS);
+  CjrlFoot *lLeftFoot = m_HS->leftFoot();
+  m_FootTrajectoryGenerationStandard = new FootTrajectoryGenerationStandard(lSPM,lLeftFoot);
   m_FootTrajectoryGenerationStandard->InitializeInternalDataStructures();
 
   m_PolynomeZMPTheta = new Polynome3(0,0);

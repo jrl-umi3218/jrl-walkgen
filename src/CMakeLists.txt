@@ -37,9 +37,7 @@ SET(libwpg_src
 	./ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp 
-	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaFull.cpp 
 	./ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.cpp 
-	./MotionGeneration/InverseKinematics.cpp 
 	./MotionGeneration/StepOverPlanner.cpp
 	./MotionGeneration/CollisionDetector.cpp
 	./MotionGeneration/WaistHeightVariation.cpp
@@ -47,7 +45,7 @@ SET(libwpg_src
 	./MotionGeneration/GenerateMotionFromKineoWorks.cpp 
 	./MotionGeneration/ComAndFootRealizationByGeometry.cpp 
 	StepStackHandler.cpp 
-	PatternGeneratorInterface.cpp 
+	PatternGeneratorInterfacePrivate.cpp 
 	SimplePlugin.cpp 
 	SimplePluginManager.cpp 
 	Clock.cpp

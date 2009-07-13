@@ -59,7 +59,7 @@ using namespace std;
 
 #define ODEBUG3(x)  std::cout << x << endl;
 
-#include <walkGenJrl/GlobalStrategyManagers/DoubleStagePreviewControlStrategy.h>
+#include <GlobalStrategyManagers/DoubleStagePreviewControlStrategy.h>
 
 using namespace PatternGeneratorJRL;
 

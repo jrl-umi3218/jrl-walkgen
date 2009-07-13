@@ -35,7 +35,7 @@
 
 #ifdef WIN32
 #include <Windows.h>
-#include <walkGenJrl/TimeUtilsWindows.h>
+#include <TimeUtilsWindows.h>
 #endif
 
 #include <time.h>
@@ -43,8 +43,8 @@
 #include <iostream>
 #include <fstream>
 
-#include <walkGenJrl/Mathematics/qld.h>
-#include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.h>
+#include <Mathematics/qld.h>
+#include <ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.h>
 
 #if 0
 #define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
@@ -73,7 +73,7 @@ using namespace PatternGeneratorJRL;
 
 ZMPQPWithConstraint::ZMPQPWithConstraint(SimplePluginManager *lSPM, 
 					 string DataFile,
-					 HumanoidSpecificities *aHS) :
+					 CjrlHumanoidDynamicRobot *aHS) :
   ZMPRefTrajectoryGeneration(lSPM)
 {
   m_HS = aHS;
@@ -265,11 +265,13 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
   // in order to create the corresponding trajectory.
   ComputeConvexHull aCH;
   double lLeftFootHalfWidth,lLeftFootHalfHeight,
-    lRightFootHalfWidth,lRightFootHalfHeight,lZ;
+    lRightFootHalfWidth,lRightFootHalfHeight;
   
   // Read humanoid specificities.
-  m_HS->GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight,lZ);
-  m_HS->GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight,lZ);
+  CjrlFoot *RightFoot = m_HS->rightFoot();
+  RightFoot->getSoleSize(lRightFootHalfWidth,lRightFootHalfHeight);
+  CjrlFoot *LeftFoot = m_HS->leftFoot();
+  LeftFoot->getSoleSize(lLeftFootHalfWidth,lLeftFootHalfHeight);
 
   lRightFootHalfWidth *= 0.5;
   lRightFootHalfHeight *= 0.5;

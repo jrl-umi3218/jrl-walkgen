@@ -52,7 +52,7 @@
 
 #define ODEBUG3(x)  std::cout << "CoMAndFootOnlyStrategy:" << x << endl;
 
-#include <walkGenJrl/GlobalStrategyManagers/CoMAndFootOnlyStrategy.h>
+#include <GlobalStrategyManagers/CoMAndFootOnlyStrategy.h>
 
 using namespace PatternGeneratorJRL;
 

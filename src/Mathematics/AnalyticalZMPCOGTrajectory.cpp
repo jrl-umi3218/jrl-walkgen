@@ -1,36 +1,22 @@
+/** \file AnalyticalZMPCOGTrajectory.h
+    \brief This object deals with analytical ZMP and CoG trajectories.
+
+   Copyright (c) 2005-2006, 
+   @author Olivier Stasse
+   
+   JRL-Japan, CNRS/AIST
+
+   All rights reserved.
+
+   Please see License.txt for more details on the license.
+*/
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include <walkGenJrl/Mathematics/AnalyticalZMPCOGTrajectory.h>
+#include <Mathematics/AnalyticalZMPCOGTrajectory.h>
 
+#include <Debug.h>
 using namespace std;
-
-#define ODEBUG2(x)
-#define ODEBUG3(x) cerr << "AnalyticalZMPCOGTrajectory: " << x << endl
-#define ODEBUG3B(x) cout << __FILE__ << ": " <<__FUNCTION__   \
-                        << "(#" << __LINE__ << ") :" <<  x << endl
-
-#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << x << endl; DebugFile.close();}
-#if 0
-#define ODEBUG(x) cerr << "AnalyticalZMPCOGTrajectory: " <<  x << endl
-#else
-#define ODEBUG(x)
-#endif
-
-#if 0
-#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); \
-    DebugFile << "AnalyticalZMPCOGTrajectory: " << x << endl; DebugFile.close();}
-#define _DEBUG_4_ACTIVATED_ 1
-#else
-#define RESETDEBUG4(y)
-#define ODEBUG4(x,y)
-#endif
-
-#define ODEBUG6(x,y)
-
-using namespace::std;
 
 namespace PatternGeneratorJRL 
 {

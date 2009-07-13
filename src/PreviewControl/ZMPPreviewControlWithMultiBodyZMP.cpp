@@ -33,8 +33,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <dynamicsJRLJapan/HumanoidDynamicMultiBody.h>
-#include <walkGenJrl/PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
+#include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
 
 using namespace PatternGeneratorJRL;
 
