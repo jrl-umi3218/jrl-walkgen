@@ -160,23 +160,3 @@ IF(WIN32)
 
 ENDIF(WIN32)
 
-IF(OPENHRP_FOUND)
-   #MESSAGE(STATUS " They will be installed")
-   INSTALL(FILES 
-        ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2Specificities.xml
-        ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2LinkJointRank.xml
-	DESTINATION ${OPENHRP_HRP2_CONFIG_DIRECTORY}
-        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE)	
-   
-
-ENDIF(OPENHRP_FOUND)
-
-#
-# Install also here for backward compatibility
-#
-INSTALL(FILES 
-  ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2Specificities.xml
-  ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2LinkJointRank.xml
-  ${${PROJECT_NAME}_SOURCE_DIR}/src/data/PreviewControlParameters.ini
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/walkgenjrl
-  PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE)	
