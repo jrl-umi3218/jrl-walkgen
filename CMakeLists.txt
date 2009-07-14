@@ -7,7 +7,6 @@
 cmake_minimum_required(VERSION 2.6)
 
 enable_language(CXX)
-enable_language(Fortran)
 
 # name of the project
 SET(PROJECT_NAME walkGenJrl)
@@ -16,7 +15,6 @@ SET(PROJECT_DESCRIPTION "Humanoid Walking Pattern Generator (JRL)")
 
 IF(WIN32)
 # Counter CMake mesures
-# When enabling fortran, Cmakes adds lib as a prefix to the library created (out of Windowsg77.cmake)
 SET(CMAKE_STATIC_LIBRARY_PREFIX "")
 SET(CMAKE_SHARED_LIBRARY_PREFIX "")
 SET(CMAKE_SHARED_MODULE_PREFIX "")
