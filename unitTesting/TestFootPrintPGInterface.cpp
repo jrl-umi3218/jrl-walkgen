@@ -9,6 +9,11 @@
 #include <stdlib.h>
 #endif /*UNIX*/
 
+#ifdef WIN32
+#include <Windows.h>
+#include "TimeUtilsWindows.h"
+#endif /*WIN32*/
+
 #include <time.h>
 #include <sstream>
 #include <fstream>

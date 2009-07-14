@@ -21,7 +21,7 @@
 
 #ifdef WIN32
 #include <Windows.h>
-#include <walkGenJrl/TimeUtilsWindows.h>
+#include <TimeUtilsWindows.h>
 #endif /* WIN32 */
 
 #include <Mathematics/PLDPSolver.h>

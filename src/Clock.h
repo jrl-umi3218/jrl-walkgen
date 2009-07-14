@@ -28,7 +28,7 @@
 
 #ifdef WIN32
 #include <Windows.h>
-#include "walkGenJrl/TimeUtilsWindows.h"
+#include "TimeUtilsWindows.h"
 #endif
 
 #include <time.h>
