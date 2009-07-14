@@ -1,3 +1,16 @@
+/*! \file TimeUtilsWindows.h
+
+   Copyright (c) 2009, 
+   @author Francois Keith.
+   
+   JRL-Japan, CNRS/AIST
+
+   All rights reserved.
+
+   Please see License.txt for further information on license.   
+
+*/
+
 #ifdef WIN32
 #include <TimeUtilsWindows.h>
 

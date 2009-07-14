@@ -1658,6 +1658,80 @@ void StepOverPlanner::CreateBufferFirstPreview(deque<COMPosition> &m_COMBuffer,
   	
 }
 
+  void StepOverPlanner::m_SetObstacleParameters(istringstream &strm)
+  {
+
+    bool ReadObstacleParameters = false;
+
+    ODEBUG( "I am reading the obstacle parameters" << " ");
+
+    while(!strm.eof())
+      {
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.x;
+	    ODEBUG("obstacle position x:" << " "<< m_ObstacleParameters.x );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.y;
+	    ODEBUG( "obstacle position y:" << " "<< m_ObstacleParameters.y );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.z;
+	    ODEBUG( "obstacle position z:" << " "<< m_ObstacleParameters.z );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.theta;
+	    ODEBUG( "obstacle orientation:" << " "<< m_ObstacleParameters.theta );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.h;
+	    ODEBUG( "obstacle height:" << " "<< m_ObstacleParameters.h );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.w;
+	    ODEBUG( "obstacle width:" << " "<< m_ObstacleParameters.w );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.d;
+	    ODEBUG( "obstacle depth:" << " "<< m_ObstacleParameters.d );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    bool lObstacleDetected;
+	    strm >> lObstacleDetected;
+	    ODEBUG( "m_ObstacleDetected:" << " "<< m_ObstacleDetected );
+	    ReadObstacleParameters = true;
+	    break;
+	  }
+	else
+	  {
+	    cout << "Not enough inputs for completion of obstacle information structure!" << endl;
+	    break;
+	  }
+
+      }
+  }
 
 
 

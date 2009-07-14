@@ -17,7 +17,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <walkGenJrl/PreviewControl/OptimalControllerSolver.h>
+#include "PreviewControl/OptimalControllerSolver.h"
 
 using namespace std;
 

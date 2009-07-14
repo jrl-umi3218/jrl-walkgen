@@ -46,7 +46,7 @@
 
 using namespace PatternGeneratorJRL;
 
-ComAndFootRealizationByGeometry::ComAndFootRealizationByGeometry(PatternGeneratorInterface *aPGI)
+ComAndFootRealizationByGeometry::ComAndFootRealizationByGeometry(PatternGeneratorInterfacePrivate *aPGI)
   : ComAndFootRealization(aPGI)
 {
 

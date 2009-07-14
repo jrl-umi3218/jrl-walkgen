@@ -402,81 +402,6 @@ namespace PatternGeneratorJRL {
       delete m_CoMAndFootOnlyStrategy;
   }
 
-  void PatternGeneratorInterfacePrivate::m_SetObstacleParameters(istringstream &strm)
-  {
-
-    m_ObstacleDetected=false;
-    bool ReadObstacleParameters = false;
-
-    ODEBUG( "I am reading the obstacle parameters" << " ");
-
-    while(!strm.eof())
-      {
-	if (!strm.eof())
-	  {
-	    strm >> m_ObstaclePars.x;
-	    ODEBUG("obstacle position x:" << " "<< m_ObstaclePars.x );
-	  }
-	else
-	  break;
-	if (!strm.eof())
-	  {
-	    strm >> m_ObstaclePars.y;
-	    ODEBUG( "obstacle position y:" << " "<< m_ObstaclePars.y );
-	  }
-	else
-	  break;
-	if (!strm.eof())
-	  {
-	    strm >> m_ObstaclePars.z;
-	    ODEBUG( "obstacle position z:" << " "<< m_ObstaclePars.z );
-	  }
-	else
-	  break;
-	if (!strm.eof())
-	  {
-	    strm >> m_ObstaclePars.theta;
-	    ODEBUG( "obstacle orientation:" << " "<< m_ObstaclePars.theta );
-	  }
-	else
-	  break;
-	if (!strm.eof())
-	  {
-	    strm >> m_ObstaclePars.h;
-	    ODEBUG( "obstacle height:" << " "<< m_ObstaclePars.h );
-	  }
-	else
-	  break;
-	if (!strm.eof())
-	  {
-	    strm >> m_ObstaclePars.w;
-	    ODEBUG( "obstacle width:" << " "<< m_ObstaclePars.w );
-	  }
-	else
-	  break;
-	if (!strm.eof())
-	  {
-	    strm >> m_ObstaclePars.d;
-	    ODEBUG( "obstacle depth:" << " "<< m_ObstaclePars.d );
-	  }
-	else
-	  break;
-	if (!strm.eof())
-	  {
-	    strm >> m_ObstacleDetected;
-	    ODEBUG( "m_ObstacleDetected:" << " "<< m_ObstacleDetected );
-	    ReadObstacleParameters = true;
-	    break;
-	  }
-	else
-	  {
-	    cout << "Not enough inputs for completion of obstacle information structure!" << endl;
-	    break;
-	  }
-
-      }
-
-  }
 
   void PatternGeneratorInterfacePrivate::m_SetZMPShiftParameters(istringstream &strm)
   {
@@ -762,12 +687,6 @@ namespace PatternGeneratorJRL {
 
   }
 
-  void PatternGeneratorInterfacePrivate::m_StartOnLineStepSequencing(istringstream &strm2)
-  {
-    m_InternalClock = 0.0;
-    ReadSequenceOfSteps(strm2);
-    StartOnLineStepSequencing();
-  }
 
   void PatternGeneratorInterfacePrivate::StartOnLineStepSequencing()
   {
@@ -863,11 +782,6 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::StopOnLineStepSequencing()
   {
     m_StepStackHandler->StopOnLineStep();
-  }
-
-  void PatternGeneratorInterfacePrivate::m_StopOnLineStepSequencing(istringstream &strm2)
-  {
-    StopOnLineStepSequencing();
   }
 
   void PatternGeneratorInterfacePrivate::FinishAndRealizeStepSequence()
@@ -1064,10 +978,13 @@ namespace PatternGeneratorJRL {
       m_FinishAndRealizeStepSequence(strm);
 
     else if (aCmd==":StartOnLineStepSequencing")
-      m_StartOnLineStepSequencing(strm);
-
+      {
+	m_InternalClock = 0.0;
+	ReadSequenceOfSteps(strm);
+	StartOnLineStepSequencing();
+      }
     else if (aCmd==":StopOnLineStepSequencing")
-      m_StopOnLineStepSequencing(strm);
+      StopOnLineStepSequencing();
 
     else if (aCmd==":readfilefromkw")
       m_ReadFileFromKineoWorks(strm);
@@ -1783,6 +1700,9 @@ namespace PatternGeneratorJRL {
   {
     return new PatternGeneratorInterfacePrivate(aHDR);
   }
+
+
+  
 }
 
 
