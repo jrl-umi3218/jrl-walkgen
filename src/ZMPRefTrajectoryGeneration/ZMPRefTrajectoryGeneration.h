@@ -39,7 +39,7 @@
 #include <string>
 //#define FULL_POLYNOME
 
-#include <walkGenJrl_API.h>
+
 #include <PGTypes.h>
 #include <SimplePlugin.h>
 
@@ -61,7 +61,7 @@ namespace PatternGeneratorJRL
 
 
   */
-  class WALK_GEN_JRL_EXPORT ZMPRefTrajectoryGeneration : public SimplePlugin
+  class  ZMPRefTrajectoryGeneration : public SimplePlugin
   {
   protected:
 

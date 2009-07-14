@@ -26,7 +26,7 @@ namespace PatternGeneratorJRL
   /*! \object This class intends to filter an analytical 
     trajectory using a preview control model. */
 
-  class WALK_GEN_JRL_EXPORT FilteringAnalyticalTrajectoryByPreviewControl : public SimplePlugin
+  class  FilteringAnalyticalTrajectoryByPreviewControl : public SimplePlugin
   {
   public:
 

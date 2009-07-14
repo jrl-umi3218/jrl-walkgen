@@ -21,7 +21,7 @@
 
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
-#include <walkGenJrl_API.h>
+
 
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
@@ -222,16 +222,9 @@ namespace PatternGeneratorJRL
      */
     /*! \brief Start the creation of steps on line. */
     void StartOnLineStepSequencing();
-
-    /*! \brief Start the creation of steps on line (istringstream interface). */
-    void m_StartOnLineStepSequencing(istringstream & strm);
     
     /*! \brief Stop the creation of steps on line. */
     void StopOnLineStepSequencing();
-
-    /*! \brief Stop the creation of steps on line (istringstream interface). */
-    void m_StopOnLineStepSequencing(istringstream &strm2);
-
     
     /*! \brief Add an online step */
     void AddOnLineStep(double X, double Y, double Theta);
@@ -317,51 +310,6 @@ namespace PatternGeneratorJRL
 
     /*! @} */
 
-    /*! \name Methods to be register in hrpsys. 
-      @{
-     */
-    
-    /*! \brief Set the gain factor for the default behavior of the arm */
-    void m_SetArmParameters(std::istringstream &strm);
-
-    /*! \brief Set obstacles parameters for stepping over */
-    void m_SetObstacleParameters(std::istringstream &strm);
-
-    /*! \brief Set the shift of the ZMP height for stepping over. */
-    void m_SetZMPShiftParameters(std::istringstream &strm);
-    
-    /*! \brief Set time distribution parameters. */
-    void m_SetTimeDistrParameters(std::istringstream &strm);
-
-    /*! \brief Set upper body motion parameters. */
-    void m_SetUpperBodyMotionParameters(std::istringstream &strm);
-
-    /*! \brief Set the limits of the feasibility (stepping over parameters) */
-    void m_SetLimitsFeasibility(std::istringstream &strm);
-
-    /*! \brief Read file from Kineoworks. */
-    void m_ReadFileFromKineoWorks(std::istringstream &strm);
-
-    /*! \brief Specify a sequence of step without asking for 
-      immediate execution and end sequence. */
-    void m_PartialStepSequence(istringstream &strm);
-
-    /*! \brief This method set PBW's algorithm for ZMP trajectory planning. */
-    void m_SetAlgoForZMPTraj(istringstream &strm);
-
-    /*! \brief Interface to hrpsys to start the realization of 
-     the stacked of step sequences. */
-    void m_FinishAndRealizeStepSequence(std::istringstream &strm);
-    
-    /*! \brief Realize a sequence of steps. */
-    void m_StepSequence(std::istringstream &strm);
-
-    /*! \brief Set the angle for lift off and landing of the foot. */
-    void m_SetOmega(std::istringstream &strm);
-
-    /*! \brief Set the maximal height of the foot trajectory. */
-    void m_SetStepHeight(std::istringstream &strm);
-
 
     /*! \brief Returns the ZMP, CoM, left foot absolute position, and right foot absolute position
      for the initiale pose.*/
@@ -372,6 +320,43 @@ namespace PatternGeneratorJRL
 			       FootAbsolutePosition & InitRightFootAbsPos);
 
     /*! @} */
+
+
+  protected:
+
+    /*! \name Methods for interpreter. 
+      @{
+     */
+    
+    /*! \brief Set the shift of the ZMP height for stepping over. */
+    virtual void m_SetZMPShiftParameters(std::istringstream &strm);
+    
+    /*! \brief Set time distribution parameters. */
+    virtual void m_SetTimeDistrParameters(std::istringstream &strm);
+
+    /*! \brief Set upper body motion parameters. */
+    virtual void m_SetUpperBodyMotionParameters(std::istringstream &strm);
+
+    /*! \brief Set the limits of the feasibility (stepping over parameters) */
+    virtual void m_SetLimitsFeasibility(std::istringstream &strm);
+
+    /*! \brief Read file from Kineoworks. */
+    virtual void m_ReadFileFromKineoWorks(std::istringstream &strm);
+
+    /*! \brief Specify a sequence of step without asking for 
+      immediate execution and end sequence. */
+    virtual void m_PartialStepSequence(istringstream &strm);
+
+    /*! \brief This method set PBW's algorithm for ZMP trajectory planning. */
+    virtual void m_SetAlgoForZMPTraj(istringstream &strm);
+
+    /*! \brief Interface to hrpsys to start the realization of 
+     the stacked of step sequences. */
+    virtual void m_FinishAndRealizeStepSequence(std::istringstream &strm);
+    
+    /*! \brief Realize a sequence of steps. */
+    virtual void m_StepSequence(std::istringstream &strm);
+
 
   private:
 
@@ -673,6 +658,8 @@ namespace PatternGeneratorJRL
 				   COMPosition &lStartingCOMPosition);
     /* @} */
   };
+
+  
 
 };
 

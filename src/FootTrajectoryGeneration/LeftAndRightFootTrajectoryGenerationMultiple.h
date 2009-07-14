@@ -25,7 +25,7 @@
 #include <robotDynamics/jrlFoot.h>
 
 /* Walking Pattern Generator inclusion */
-#include <walkGenJrl_API.h>
+
 #include <SimplePlugin.h>
 #include <FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.h>
 
@@ -49,7 +49,7 @@ namespace PatternGeneratorJRL
       but it could be extended for a clear separation between the two feet.
 
    */
-  class WALK_GEN_JRL_EXPORT LeftAndRightFootTrajectoryGenerationMultiple : public SimplePlugin
+  class  LeftAndRightFootTrajectoryGenerationMultiple : public SimplePlugin
     {
 
     public: 

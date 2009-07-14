@@ -15,7 +15,7 @@
 #define _ZMPCONSTRAINEDQPFASTFORMULATION_WITH_CONSTRAINT_H_
 
 
-#include <walkGenJrl_API.h>
+
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <Mathematics/FootConstraintsAsLinearSystem.h>
 #include <Mathematics/OptCholesky.h>
@@ -25,7 +25,7 @@
 namespace PatternGeneratorJRL
 {
   class ZMPDiscretization;
-  class WALK_GEN_JRL_EXPORT ZMPConstrainedQPFastFormulation : public ZMPRefTrajectoryGeneration
+  class  ZMPConstrainedQPFastFormulation : public ZMPRefTrajectoryGeneration
   {
     
   public:

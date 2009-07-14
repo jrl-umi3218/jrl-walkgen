@@ -33,14 +33,14 @@
 #ifndef _ZMPQP_WITH_CONSTRAINT_H_
 #define _ZMPQP_WITH_CONSTRAINT_H_
 
-#include <walkGenJrl_API.h>
+
 #include <Mathematics/ConvexHull.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 
 namespace PatternGeneratorJRL
 {
   class ZMPDiscretization;
-  class WALK_GEN_JRL_EXPORT ZMPQPWithConstraint : public ZMPRefTrajectoryGeneration
+  class  ZMPQPWithConstraint : public ZMPRefTrajectoryGeneration
   {
     
   public:

@@ -29,7 +29,7 @@
 #include <robotDynamics/jrlFoot.h>
 
 /* Walking pattern generation related inclusions */
-#include <walkGenJrl_API.h>
+
 #include <PGTypes.h>
 #include <SimplePlugin.h>
 
@@ -66,7 +66,7 @@ namespace PatternGeneratorJRL
       for more precise information on the usage and sample codes. 
       
   */
-  class WALK_GEN_JRL_EXPORT FootTrajectoryGenerationAbstract :public SimplePlugin
+  class  FootTrajectoryGenerationAbstract :public SimplePlugin
   {
   public:
     

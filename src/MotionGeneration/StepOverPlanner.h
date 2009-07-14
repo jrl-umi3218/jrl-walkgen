@@ -30,7 +30,7 @@
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
 
 /*! Humanoid Walking Pattern Generator */
-#include <walkGenJrl_API.h>
+
 #include <PreviewControl/PreviewControl.h>
 #include <Mathematics/StepOverPolynome.h>
 
@@ -50,7 +50,7 @@ namespace PatternGeneratorJRL
 
   /*!\ingroup steppingover 
     \brief Object to compute new foot trajectories to step over obstacle dynamically*/
-  class WALK_GEN_JRL_EXPORT StepOverPlanner
+  class  StepOverPlanner
   {
   public :
      
@@ -146,6 +146,9 @@ namespace PatternGeneratorJRL
       double support over the obstacle */
     void DoubleSupportFeasibility();
 
+    /*! Read parameters from interpretor */
+    void m_SetObstacleParameters(istringstream &strm);
+    
     /*! Obstacles parameters. */ 
     ObstaclePar m_ObstacleParameters;
     /*! x, y, z position of obstacle in worldframe 

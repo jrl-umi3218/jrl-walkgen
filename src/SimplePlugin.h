@@ -7,9 +7,8 @@
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
-   
-   For more information on the license please look at License.txt 
-   in the root directory.
+
+   Please see License.txt for further information on license.   
    
 */
 
@@ -19,7 +18,6 @@
 #include <string>
 #include <sstream>
 
-#include <walkGenJrl/walkGenJrl_API.h>
 
 namespace PatternGeneratorJRL
 {
@@ -30,7 +28,7 @@ namespace PatternGeneratorJRL
    to populate a PGI instance to handle approprietly
    parsing from the PGI.
   */
-  class WALK_GEN_JRL_EXPORT SimplePlugin
+  class SimplePlugin
   {
     
   private:

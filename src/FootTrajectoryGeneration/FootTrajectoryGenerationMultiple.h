@@ -18,7 +18,7 @@
 #ifndef _FOOT_TRAJECTORY_GENERATION_MULTIPLE_H_
 
 /* Walking pattern generation related inclusions */
-#include <walkGenJrl_API.h>
+
 #include "FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h"
 
 namespace PatternGeneratorJRL
@@ -39,7 +39,7 @@ namespace PatternGeneratorJRL
       
       
    */
-  class WALK_GEN_JRL_EXPORT FootTrajectoryGenerationMultiple : public SimplePlugin
+  class  FootTrajectoryGenerationMultiple : public SimplePlugin
   {
   public :
 

@@ -7,6 +7,7 @@
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
+
    Please see License.txt for more information on the license.
 */
 
@@ -14,7 +15,7 @@
 #define _COM_AND_FOOT_REALIZATION_H_
 
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
-#include <walkGenJrl_API.h>
+
 #include <SimplePlugin.h>
 #include <StepStackHandler.h>
 
@@ -36,7 +37,7 @@ namespace PatternGeneratorJRL
       preview loop of the class \a ZMPPreviewControlWithMultiBodyZMP class.
 
    */
-  class WALK_GEN_JRL_EXPORT ComAndFootRealization : public SimplePlugin
+  class  ComAndFootRealization : public SimplePlugin
   {
   private:
 

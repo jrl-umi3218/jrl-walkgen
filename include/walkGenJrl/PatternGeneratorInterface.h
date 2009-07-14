@@ -3,8 +3,8 @@
     It allows to hide all the computation and hacking to the user.
 
 
-   Copyright (c) 2005-2006, 
-   @author Francois Keith, Olivier Stasse
+   Copyright (c) 2005-2009, 
+   @author  Olivier Stasse, Francois Keith
    
    JRL-Japan, CNRS/AIST
 
@@ -16,6 +16,17 @@
 
 #ifndef _PATTERN_GENERATOR_INTERFACE_H_
 #define _PATTERN_GENERATOR_INTERFACE_H_
+
+// For Windows compatibility.
+#if defined (WIN32)
+#  ifdef walkGenJrl_EXPORTS 
+#    define WALK_GEN_JRL_EXPORT __declspec(dllexport)
+#  else  
+#    define WALK_GEN_JRL_EXPORT __declspec(dllimport)
+#  endif 
+#else
+#  define WALK_GEN_JRL_EXPORT
+#endif
 
 #include <deque>
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
@@ -46,7 +57,7 @@ namespace PatternGeneratorJRL
     PatternGeneratorInterface(CjrlHumanoidDynamicRobot *aHDR) {};
 
     /*! Destructor */
-    virtual ~PatternGeneratorInterface();
+    virtual ~PatternGeneratorInterface() {};
     
     /*! \brief Function to specify steps in the stack of the walking pattern generator. 
       This method is different AddOnLineStep which is the default step add when there is no policy,
@@ -54,43 +65,6 @@ namespace PatternGeneratorJRL
      */
     virtual void AddStepInStack(double dx, double dy, double theta)=0;
     
-    /*! \name High levels function to create automatically stack of steps following specific motions. 
-      @{
-    */
-    /*! \brief This methods generate a stack of steps which make the robot follows an arc.
-      The direction of the robot is tangential to the arc.
-
-      @param[in] x: Position of the center of the circle along the X-axis.
-      @param[in] y: Position of the center of the circle along the Y-axis.
-      @param[in] R: Ray of the circle.
-      @param[in] arc_deg: Arc in degrees along which the robot walks.
-      @param[in] SupportFoot: Indicates which is the first support foot (1) Left or (-1) Right.
-     */
-    virtual void CreateArcInStepStack(  double x,
-					double y,
-					double R,
-					double arc_deg,
-					int SupportFoot)=0;
-    
-    /*! \brief This methods generate a stack of steps which make the robot follows an arc.
-      The direction of the robot is towards the center of the arc.
-      The robot is therefore expected to move sideways.
-
-      @param[in] R: Ray of the circle.
-      @param[in] arc_deg: Arc in degrees along which the robot walks.
-      @param[in] SupportFoot: Indicates which is the first support foot (1) Left or (-1) Right.
-     */
-    virtual void CreateArcCenteredInStepStack( double R,
-					       double arc_deg,
-					       int SupportFoot)=0;
-    
-    /*! \brief This specifies which foot will be used as the first support of the motion. */
-    virtual void PrepareForSupportFoot(int SupportFoot)=0;
-    
-    /*! \brief This method precomputes all the buffers necessary for walking according to the chosen strategy. */
-    virtual void FinishAndRealizeStepSequence()=0;
-    /*! @} */
-
 
     /*! Common Initialization of walking. 
       @param[out] lStartingCOMPosition: For the starting position on the articular space, returns
@@ -194,17 +168,10 @@ namespace PatternGeneratorJRL
      */
     /*! \brief Start the creation of steps on line. */
     virtual void StartOnLineStepSequencing()=0;
-
-    /*! \brief Start the creation of steps on line (istringstream interface). */
-    virtual void m_StartOnLineStepSequencing(istringstream & strm)=0;
     
     /*! \brief Stop the creation of steps on line. */
     virtual void StopOnLineStepSequencing()=0;
 
-    /*! \brief Stop the creation of steps on line (istringstream interface). */
-    virtual void m_StopOnLineStepSequencing(istringstream &strm2)=0;
-
-    
     /*! \brief Add an online step */
     virtual void AddOnLineStep(double X, double Y, double Theta)=0;
     
@@ -275,50 +242,6 @@ namespace PatternGeneratorJRL
 
     /*! @} */
 
-    /*! \name Methods to be register in hrpsys. 
-      @{
-     */
-    
-    /*! \brief Set the gain factor for the default behavior of the arm */
-    virtual void m_SetArmParameters(std::istringstream &strm)=0;
-    
-    /*! \brief Set obstacles parameters for stepping over */
-    virtual void m_SetObstacleParameters(std::istringstream &strm)=0;
-
-    /*! \brief Set the shift of the ZMP height for stepping over. */
-    virtual void m_SetZMPShiftParameters(std::istringstream &strm)=0;
-    
-    /*! \brief Set time distribution parameters. */
-    virtual void m_SetTimeDistrParameters(std::istringstream &strm)=0;
-
-    /*! \brief Set upper body motion parameters. */
-    virtual void m_SetUpperBodyMotionParameters(std::istringstream &strm)=0;
-
-    /*! \brief Set the limits of the feasibility (stepping over parameters) */
-    virtual void m_SetLimitsFeasibility(std::istringstream &strm)=0;
-
-    /*! \brief Read file from Kineoworks. */
-    virtual void m_ReadFileFromKineoWorks(std::istringstream &strm)=0;
-
-    /*! \brief Specify a sequence of step without asking for 
-      immediate execution and end sequence. */
-    virtual void m_PartialStepSequence(istringstream &strm)=0;
-
-    /*! \brief This method set PBW's algorithm for ZMP trajectory planning. */
-    virtual void m_SetAlgoForZMPTraj(istringstream &strm)=0;
-
-    /*! \brief Interface to hrpsys to start the realization of 
-     the stacked of step sequences. */
-    virtual void m_FinishAndRealizeStepSequence(std::istringstream &strm)=0;
-    
-    /*! \brief Realize a sequence of steps. */
-    virtual void m_StepSequence(std::istringstream &strm)=0;
-
-    /*! \brief Set the angle for lift off and landing of the foot. */
-    virtual void m_SetOmega(std::istringstream &strm)=0;
-
-    /*! \brief Set the maximal height of the foot trajectory. */
-    virtual void m_SetStepHeight(std::istringstream &strm)=0;
 
 
     /*! \brief Returns the ZMP, CoM, left foot absolute position, and right foot absolute position
@@ -335,9 +258,9 @@ namespace PatternGeneratorJRL
   };
 
   /*! Factory of Pattern generator interface. */
-  PatternGeneratorInterface * patternGeneratorInterfaceFactory(std::istringstream &istrm);
+  PatternGeneratorInterface * patternGeneratorInterfaceFactory(CjrlHumanoidDynamicRobot *aHDR);
 };
 
 
-#endif
+#endif /* _PATTERN_GENERATOR_INTERFACE_H_ */
 

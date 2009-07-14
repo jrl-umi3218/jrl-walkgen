@@ -24,7 +24,7 @@
 
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
 
-#include <walkGenJrl_API.h>
+
 #include <PGTypes.h>
 #include <Mathematics/ConvexHull.h>
 #include <SimplePlugin.h>
@@ -36,7 +36,7 @@ namespace PatternGeneratorJRL
    It handles a stack of constraint on a sliding mode 
    for QP solving.
    */
-  class WALK_GEN_JRL_EXPORT FootConstraintsAsLinearSystem: public SimplePlugin
+  class  FootConstraintsAsLinearSystem: public SimplePlugin
     {
     public:
 

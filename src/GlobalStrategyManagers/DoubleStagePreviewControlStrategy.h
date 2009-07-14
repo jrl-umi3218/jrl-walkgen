@@ -14,7 +14,7 @@
   Please look at License.txt for more information on license.
 */
 
-#include <walkGenJrl_API.h>
+
 #include <SimplePlugin.h>
 #include <GlobalStrategyManagers/GlobalStrategyManager.h>
 #include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
@@ -28,7 +28,7 @@ namespace PatternGeneratorJRL
       Implementation of the buffers handling for Kajita's 
       algorithm.
   */
-  class WALK_GEN_JRL_EXPORT DoubleStagePreviewControlStrategy : public GlobalStrategyManager
+  class  DoubleStagePreviewControlStrategy : public GlobalStrategyManager
   {
     
   public:

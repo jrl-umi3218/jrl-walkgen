@@ -1,12 +1,28 @@
 /*! \file TimeUtilsWindows.h
+
+   Copyright (c) 2009, 
+   @author Francois Keith.
+   
+   JRL-Japan, CNRS/AIST
+
+   All rights reserved.
+
+   Please see License.txt for further information on license.   
+
 */
 
-#include <walkGenJrl/walkGenJrl_API.h>
+
 
 #ifdef WIN32
 
 #ifndef TIME_UTILS_WINDOWS_H
 #define TIME_UTILS_WINDOWS_H
+
+#  ifdef walkGenJrl_EXPORTS 
+#    define WALK_GEN_JRL_EXPORT __declspec(dllexport)
+#  else  
+#    define WALK_GEN_JRL_EXPORT __declspec(dllimport)
+#  endif
 
 #include < time.h >
 

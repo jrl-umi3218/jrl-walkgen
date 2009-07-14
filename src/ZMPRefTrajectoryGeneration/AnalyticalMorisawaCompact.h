@@ -25,7 +25,7 @@
 #define _ANALYTICAL_MORISAWA_FULL_H_
 
 
-#include <walkGenJrl_API.h>
+
 #include <Clock.h>
 #include <Mathematics/PolynomeFoot.h>
 #include <Mathematics/ConvexHull.h>
@@ -76,7 +76,7 @@ namespace PatternGeneratorJRL
   /*! \brief Class to compute analytically in a compact form the trajectories of both the ZMP and the CoM.
     @ingroup analyticalformulation
    */
-  class WALK_GEN_JRL_EXPORT AnalyticalMorisawaCompact: public AnalyticalMorisawaAbstract
+  class  AnalyticalMorisawaCompact: public AnalyticalMorisawaAbstract
     {
       
     public:

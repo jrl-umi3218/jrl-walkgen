@@ -30,7 +30,6 @@ using namespace::std;
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
 
 /*! Framework includes */
-#include <walkGenJrl_API.h>
 #include <Mathematics/PolynomeFoot.h>
 #include <Mathematics/ConvexHull.h>
 #include <PGTypes.h>
@@ -72,7 +71,7 @@ namespace PatternGeneratorJRL
     the support foot. During double support phase, the ZMP is 
     on the line linking the two centers of each foot. 
   */
-  class WALK_GEN_JRL_EXPORT ZMPDiscretization: public ZMPRefTrajectoryGeneration
+  class  ZMPDiscretization: public ZMPRefTrajectoryGeneration
     {
       public :
     

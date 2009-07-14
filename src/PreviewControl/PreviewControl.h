@@ -10,6 +10,7 @@
    For more information on the license please look at License.txt 
    in the root directory.
 
+   Please look at License.txt for more information on license.
    
 */
 #ifndef _PREVIEW_CONTROL_H_
@@ -24,7 +25,7 @@
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 using namespace::std;
 
-#include <walkGenJrl_API.h>
+
 #include <PGTypes.h>
 #include <SimplePlugin.h>
 #include <PreviewControl/OptimalControllerSolver.h>
@@ -37,7 +38,7 @@ namespace PatternGeneratorJRL
       
       \brief Class to implement the preview control
    */
-  class WALK_GEN_JRL_EXPORT PreviewControl : public SimplePlugin
+  class  PreviewControl : public SimplePlugin
     {
     public:
       

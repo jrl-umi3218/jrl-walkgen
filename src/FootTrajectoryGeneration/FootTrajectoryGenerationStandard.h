@@ -17,7 +17,7 @@
 #define _FOOT_TRAJECTORY_GENERATION_STANDARD_H_
 
 /* Walking pattern generation related inclusions */
-#include <walkGenJrl_API.h>
+
 #include <FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.h>
 #include <Mathematics/PolynomeFoot.h>
 
@@ -30,7 +30,7 @@ namespace PatternGeneratorJRL
       orthogonal plan as well as the direction.For the height modification a 4th order polynome
       is used. Finally a landing and take off phase using an angular value (\f$\omega\f$).
   */
-  class WALK_GEN_JRL_EXPORT FootTrajectoryGenerationStandard : public FootTrajectoryGenerationAbstract
+  class  FootTrajectoryGenerationStandard : public FootTrajectoryGenerationAbstract
   {
   public:
 
