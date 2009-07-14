@@ -319,7 +319,7 @@ WalkGenJRL::WalkGenJRL(istringstream &strm)
 
   m_DebugMode = 0;
   ODEBUG4("Before creating the object.","DebugData.txt");
-  m_PGI = new PatternGeneratorInterface(strm);
+  m_PGI = patternGeneratorInterfaceFactory(0);
   ODEBUG4("After creating the object.","DebugData.txt");
 
   // Register method the hrpsys interpreter.
@@ -389,7 +389,7 @@ void WalkGenJRL::m_StepSequence(istringstream &strm)
     {
       ODEBUG4("NEW STEP SEQUENCE","DebugWalkGenJRL.txt");
       ODEBUG4("NEW STEP SEQUENCE","DebugDataIKArms.txt");
-      m_PGI->m_StepSequence(strm);
+      //m_PGI->m_StepSequence(strm);
     }
 }
 
@@ -538,15 +538,6 @@ void WalkGenJRL::control(sotRobotState *rs, sotMotorCommand *mc)
 	  m_seq->setReferenceState(ref_state,dt);                              // send seq the next ref_state              
 	}
 
-      if (m_DebugMode>0)
-	{
-	  ODEBUG4("Go inside 9","DebugData.txt");
-	  m_PGI->DebugControlLoop(m_CurrentStateFromPG,
-				  m_CurrentVelocityFromPG,
-				  m_CurrentAccelerationFromPG,
-				  m_count);
-	  ODEBUG4("Go inside 10","DebugData.txt");
-	}
       ODEBUG4(m_count << "FromPG: " << m_CurrentStateFromPG , "DebugWalkGenJRL.txt");	    
       m_count++;
     }	
@@ -587,7 +578,9 @@ void WalkGenJRL::m_ReadFileFromKineoWorks(istringstream &strm)
 {
 
   if(m_PGI!=0)
-    m_PGI->m_ReadFileFromKineoWorks(strm);
+    {
+      //m_PGI->m_ReadFileFromKineoWorks(strm);
+    }
 }
 
   
@@ -781,7 +774,7 @@ void WalkGenJRL::m_SendStackToControl(istringstream &strm)
 void WalkGenJRL::m_FinishAndRealizeStepSequence(istringstream &strm)
 {
   if (m_PGI!=0)
-    m_PGI->m_FinishAndRealizeStepSequence(strm);
+    //m_PGI->m_FinishAndRealizeStepSequence(strm);
 
   m_count = 0;
   while(m_ShouldBeRunning)
@@ -795,7 +788,9 @@ void WalkGenJRL::m_FinishAndRealizeStepSequence(istringstream &strm)
 void WalkGenJRL::m_PartialStepSequence(istringstream &strm)
 {
   if (m_PGI!=0)
-    m_PGI->m_PartialStepSequence(strm);
+    {
+      //m_PGI->m_PartialStepSequence(strm);
+    }
 }
 
 CORBA::Long WalkGenJRL::getLegJointSpeed(walkpluginJRL::JRLdsequence_out dq)

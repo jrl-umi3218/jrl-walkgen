@@ -40,7 +40,7 @@
 
 #define ODEBUG3(x) std::cout << "StepStackHandler:" << x << endl;
 
-#include <walkGenJrl/StepStackHandler.h>
+#include <StepStackHandler.h>
 
 using namespace::PatternGeneratorJRL;
 

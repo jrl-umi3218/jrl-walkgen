@@ -9,9 +9,18 @@
 #include <stdlib.h>
 #endif /*UNIX*/
 
+#ifdef WIN32
+#include <Windows.h>
+#include "TimeUtilsWindows.h"
+#endif /*WIN32*/
+
 #include <time.h>
 #include <sstream>
 #include <fstream>
+
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+
+#include <dynamicsJRLJapan/dynamicsJRLJapanFactory.h>
 
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
@@ -699,7 +708,6 @@ int main(int argc, char *argv[])
   string VRMLFileName;
   string SpecificitiesFileName;
   string LinkJointRank;
-  string Global;
 
   
   if (argc!=6)
@@ -750,22 +758,19 @@ int main(int argc, char *argv[])
       LinkJointRank = argv[5];
     }
 
-  Global=PCParametersFile;	  
-  Global+= " ";
-  Global+=VRMLPath;
-  Global+= " ";
-  Global+= VRMLFileName;
-  Global+= " ";
-  Global+=SpecificitiesFileName;
-  Global+= " ";
-  Global+=LinkJointRank;
 
-  std::istringstream strm(Global);
-  //("./data/PreviewControlParameters.ini ../../etc/HRP2JRL/ HRP2JRLmain.wrl ./data/HRP2Specificities.xml");
+  // Creating the humanoid robot.
+  dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
+  CjrlHumanoidDynamicRobot * aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
+
+  // Parsing the file.
+  string RobotFileName = VRMLPath + VRMLFileName;
+  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,LinkJointRank,SpecificitiesFileName);
+
+  // Create Pattern Generator Interface
   PatternGeneratorInterface * aPGI;
+  aPGI = patternGeneratorInterfaceFactory(aHDR);
 
-  aPGI = new PatternGeneratorInterface(strm);
-  cout << "Global: " << Global << endl;
 
   //  cout << "before PGI " << endl;
   // Initial position;

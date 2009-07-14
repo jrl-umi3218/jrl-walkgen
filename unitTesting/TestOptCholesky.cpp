@@ -20,7 +20,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <walkGenJrl/Mathematics/OptCholesky.h>
+#include "Mathematics/OptCholesky.h"
 
 using namespace std;
 

@@ -37,9 +37,7 @@ SET(libwpg_src
 	./ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp 
-	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaFull.cpp 
 	./ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.cpp 
-	./MotionGeneration/InverseKinematics.cpp 
 	./MotionGeneration/StepOverPlanner.cpp
 	./MotionGeneration/CollisionDetector.cpp
 	./MotionGeneration/WaistHeightVariation.cpp
@@ -47,16 +45,14 @@ SET(libwpg_src
 	./MotionGeneration/GenerateMotionFromKineoWorks.cpp 
 	./MotionGeneration/ComAndFootRealizationByGeometry.cpp 
 	StepStackHandler.cpp 
-	PatternGeneratorInterface.cpp 
+	PatternGeneratorInterfacePrivate.cpp 
 	SimplePlugin.cpp 
 	SimplePluginManager.cpp 
 	Clock.cpp
 	TimeUtilsWindows.cpp
  )
 
- SET(libwpg_headers 
-../include/${PROJECT_NAME}/walkGenJrl_API.h
- )
+ SET(libwpg_headers  )
 
 # Create list of headers files
 #-----------------------------
@@ -164,23 +160,3 @@ IF(WIN32)
 
 ENDIF(WIN32)
 
-IF(OPENHRP_FOUND)
-   #MESSAGE(STATUS " They will be installed")
-   INSTALL(FILES 
-        ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2Specificities.xml
-        ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2LinkJointRank.xml
-	DESTINATION ${OPENHRP_HRP2_CONFIG_DIRECTORY}
-        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE)	
-   
-
-ENDIF(OPENHRP_FOUND)
-
-#
-# Install also here for backward compatibility
-#
-INSTALL(FILES 
-  ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2Specificities.xml
-  ${${PROJECT_NAME}_SOURCE_DIR}/src/data/HRP2LinkJointRank.xml
-  ${${PROJECT_NAME}_SOURCE_DIR}/src/data/PreviewControlParameters.ini
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/walkgenjrl
-  PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE)	

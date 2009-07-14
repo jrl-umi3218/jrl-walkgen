@@ -36,7 +36,7 @@
 #define ODEBUG6(x,y)
 
 #include <fstream>
-#include <walkGenJrl/PreviewControl/PreviewControl.h>
+#include <PreviewControl/PreviewControl.h>
 
 using namespace::PatternGeneratorJRL;
 

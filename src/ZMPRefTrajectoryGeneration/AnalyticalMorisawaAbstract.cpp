@@ -42,7 +42,7 @@
 #define ODEBUG6(x,y)
 
 #include <fstream>
-#include <walkGenJrl/ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.h>
+#include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.h>
 
 typedef double doublereal;
 typedef int integer;

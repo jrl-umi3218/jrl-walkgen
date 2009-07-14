@@ -1,7 +1,7 @@
 /* This object generate all the values for the foot trajectories,
 
    Copyright (c) 2007-2009, 
-   Francois Keith, Olivier Stasse,
+   Olivier Stasse,Francois Keith 
    
    JRL-Japan, CNRS/AIST
 
@@ -11,7 +11,7 @@
 */
 #include <iostream>
 #include <fstream>
-#include <walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
+#include "FootTrajectoryGenerationStandard.h"
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) std::cerr << "FootTrajectoryGenerationStandard :" << x << std::endl
@@ -56,9 +56,9 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   /* Computes information on foot dimension 
      from humanoid specific informations. */
   double lWidth,lHeight,lDepth;
-  m_Foot->soleSize(lWidth,lHeight);
+  m_Foot->getSoleSize(lWidth,lHeight);
   vector3d AnklePosition;
-  m_Foot->anklePositionInLocalFrame(AnklePosition);
+  m_Foot->getAnklePositionInLocalFrame(AnklePosition);
   lDepth = AnklePosition[2];
 
   /*! Compute information for omega. */
@@ -72,8 +72,8 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   m_AnklePositionRight[2] = AnklePosition[2];
   
   /* Compute Left foot coordinates */
-  m_Foot->anklePositionInLocalFrame(AnklePosition);
-  m_Foot->soleSize(lWidth,lHeight);
+  m_Foot->getAnklePositionInLocalFrame(AnklePosition);
+  m_Foot->getSoleSize(lWidth,lHeight);
 
   m_AnklePositionLeft[0] = -lDepth*0.5 + AnklePosition[0];
   m_AnklePositionLeft[1] = -lWidth*0.5 + AnklePosition[1];

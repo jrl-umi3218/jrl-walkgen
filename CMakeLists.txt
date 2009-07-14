@@ -7,7 +7,6 @@
 cmake_minimum_required(VERSION 2.6)
 
 enable_language(CXX)
-enable_language(Fortran)
 
 # name of the project
 SET(PROJECT_NAME walkGenJrl)
@@ -16,7 +15,6 @@ SET(PROJECT_DESCRIPTION "Humanoid Walking Pattern Generator (JRL)")
 
 IF(WIN32)
 # Counter CMake mesures
-# When enabling fortran, Cmakes adds lib as a prefix to the library created (out of Windowsg77.cmake)
 SET(CMAKE_STATIC_LIBRARY_PREFIX "")
 SET(CMAKE_SHARED_LIBRARY_PREFIX "")
 SET(CMAKE_SHARED_MODULE_PREFIX "")
@@ -63,7 +61,12 @@ SET(PROJECT_REQUIREMENTS "dynamicsJRLJapan >= ${DYNJRLJAPAN_REQUIRED_VERSION}")
 EXEC_PROGRAM(${PKG_CONFIG_EXECUTABLE} ARGS  --variable=docdir dynamicsJRLJapan
   OUTPUT_VARIABLE _dynamicsJRLJapan_DOCDIR)
 
-SET(${PROJECT_NAME}_src_CXXFLAGS "-Wall ${${PROJECT_NAME}_src_CXXFLAGS} -I${${PROJECT_NAME}_SOURCE_DIR}")
+SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} -I${${PROJECT_NAME}_SOURCE_DIR}")
+
+IF(UNIX)
+	SET(${PROJECT_NAME}_src_CXXFLAGS "-Wall ${${PROJECT_NAME}_src_CXXFLAGS}")
+ENDIF(UNIX)
+
 IF(WIN32)
 	SET(${PROJECT_NAME}_src_CXXFLAGS "/D__STDC__ ${${PROJECT_NAME}_src_CXXFLAGS}")
 ENDIF(WIN32)

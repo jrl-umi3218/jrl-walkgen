@@ -33,12 +33,9 @@
 #include <iostream>
 #include <fstream>
 
-#include <dynamicsJRLJapan/HumanoidSpecificities.h>
-
-#include <walkGenJrl/Mathematics/FootConstraintsAsLinearSystem.h>
+#include <Mathematics/FootConstraintsAsLinearSystem.h>
 
 using namespace std;
-using namespace dynamicsJRLJapan;
 using namespace PatternGeneratorJRL;
 
 
@@ -77,7 +74,7 @@ using namespace PatternGeneratorJRL;
 
 
 FootConstraintsAsLinearSystem::FootConstraintsAsLinearSystem(SimplePluginManager *aSPM,
-							     HumanoidSpecificities *aHS) :
+							     CjrlHumanoidDynamicRobot *aHS) :
   SimplePlugin(aSPM)
 {
   m_HS = aHS;
@@ -307,8 +304,14 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(deque<FootA
     lRightFootHalfWidth,lRightFootHalfHeight,lZ;
   
   // Read humanoid specificities.
-  m_HS->GetFootSize(-1,lRightFootHalfWidth,lRightFootHalfHeight,lZ);
-  m_HS->GetFootSize(1,lLeftFootHalfWidth,lLeftFootHalfHeight,lZ);
+  CjrlFoot * lRightFoot = m_HS->rightFoot();
+  lRightFoot->getSoleSize(lRightFootHalfWidth,lRightFootHalfHeight);
+  vector3d AnklePosition;
+  lRightFoot->getAnklePositionInLocalFrame(AnklePosition);
+  lZ = AnklePosition[2];
+  CjrlFoot * lLeftFoot = m_HS->leftFoot();
+  lLeftFoot->getSoleSize(lLeftFootHalfWidth,lLeftFootHalfHeight);
+
 
   lRightFootHalfWidth *= 0.5;
   lRightFootHalfHeight *= 0.5;

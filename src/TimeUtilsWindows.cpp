@@ -1,5 +1,18 @@
+/*! \file TimeUtilsWindows.h
+
+   Copyright (c) 2009, 
+   @author Francois Keith.
+   
+   JRL-Japan, CNRS/AIST
+
+   All rights reserved.
+
+   Please see License.txt for further information on license.   
+
+*/
+
 #ifdef WIN32
-#include <walkGenJrl/TimeUtilsWindows.h>
+#include <TimeUtilsWindows.h>
 
 #include < Windows.h >
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)

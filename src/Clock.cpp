@@ -13,7 +13,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <walkGenJrl/Clock.h>
+#include <Clock.h>
 
 using namespace PatternGeneratorJRL;
 

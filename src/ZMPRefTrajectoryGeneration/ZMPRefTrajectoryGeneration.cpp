@@ -14,7 +14,7 @@
    in the root directory.
    
 */
-#include <walkGenJrl/ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
+#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) cout << "ZMPRefTrajectoryGeneration :" << x << endl

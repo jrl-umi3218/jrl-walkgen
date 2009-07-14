@@ -33,7 +33,7 @@
 #define _DEBUG_
 
 #include <fstream>
-#include <walkGenJrl/MotionGeneration/WaistHeightVariation.h>
+#include <MotionGeneration/WaistHeightVariation.h>
 
 using namespace::PatternGeneratorJRL;
 

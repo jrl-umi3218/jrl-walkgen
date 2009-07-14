@@ -18,27 +18,26 @@
 
 #include "Debug.h"
 
-#include <walkGenJrl/MotionGeneration/StepOverPlanner.h>
+#include <MotionGeneration/StepOverPlanner.h>
 
 
 using namespace::PatternGeneratorJRL;
 
 StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
-				 CjrlHumanoidDynamicRobot *m_HDR)
+				 CjrlHumanoidDynamicRobot *aHDR)
 {
 
-  m_IK = new InverseKinematics(aHS);
 
   m_HDR = aHDR;
   // Get information specific to the humanoid.
-  double lWidth,lHeight,lZ;
+  double lWidth,lHeight;
   vector3d AnklePosition;
 
   if (m_HDR!=0)
     {
-      CjrlFoot HDRFoot = m_HDR->leftFoot();
-      m_HDR->soleSize(lWidth,lHeight);
-      m_HS->anklePositionInLocalFrame(AnklePosition);
+      CjrlFoot * HDRFoot = m_HDR->leftFoot();
+      HDRFoot->getSoleSize(lWidth,lHeight);
+      HDRFoot->getAnklePositionInLocalFrame(AnklePosition);
       m_AnkleSoilDistance = AnklePosition[2];
       m_tipToAnkle = lWidth-AnklePosition[0];
       m_heelToAnkle = m_AnkleSoilDistance;	
@@ -204,8 +203,6 @@ StepOverPlanner::~StepOverPlanner()
   if (m_CollDet!=0)
     delete m_CollDet;
 
-  if (m_IK!=0)
-    delete m_IK;
 }
 
 void StepOverPlanner::CalculateFootHolds(deque<RelativeFootPosition> &aFootHolds)
@@ -480,12 +477,16 @@ void StepOverPlanner::DoubleSupportFeasibility()
 			
 	
 	  // Compute the inverse kinematics.
-	  m_IK->ComputeInverseKinematics2ForLegs(Body_R,
+	  cout << __FUNCTION__ << ":"<< __LINE__ << ": You should implement something here"
+	       << endl;
+	  /* To implement: 
+	  m_HDR->ComputeInverseKinematics2ForLegs(Body_R,
 						 Body_P,
 						 m_Dt,
 						 Foot_R,
 						 Foot_P,
 						 LeftLegAngles);
+	  */
 	
 	  // RIGHT FOOT //
 	  m_Dt(1) = -m_Dt(1);
@@ -511,13 +512,15 @@ void StepOverPlanner::DoubleSupportFeasibility()
 	  Body_P(0) = aCOMPosition.x[0] + ToTheHip(0) ;
 	  Body_P(1) = aCOMPosition.y[0] + ToTheHip(1);
 	  Body_P(2) = aCOMPosition.z[0] + ToTheHip(2);
-			
+		
+	  /*To implement: 
 	  m_IK->ComputeInverseKinematics2ForLegs(Body_R,
 						 Body_P,
 						 m_Dt,
 						 Foot_R,
 						 Foot_P,
 						 RightLegAngles);
+	  */
 	  m_Dt(1) = -m_Dt(1);
 
 			
@@ -1541,18 +1544,17 @@ void StepOverPlanner::SetZMPDiscretization(ZMPDiscretization *aZMPDiscr)
 }
 
 
-void StepOverPlanner::SetDynamicMultiBodyModel(DynamicMultiBody *aDMB)
+void StepOverPlanner::SetDynamicMultiBodyModel(CjrlDynamicRobot *aDR)
 {
-  m_DMB = aDMB;
-  for(int i=0;i<m_DMB->NbOfLinks();i++)
-    m_DMB->Setdq(i,0.0);
+  m_DMB = aDR;
+  unsigned int NbOfDofs =m_DMB->numberDof();
+  MAL_VECTOR_DIM(aCurrentVel,double,NbOfDofs); 
+  for(unsigned int i=0;i<NbOfDofs;i++)
+    aCurrentVel[i]=0.0;
+  m_DMB->currentVelocity(aCurrentVel);
 
 }
 
-void StepOverPlanner::SetInverseKinematics(InverseKinematics *anIK)
-{
-  m_IK = anIK;
-}
 
 void StepOverPlanner::TimeDistributeFactor(vector<double> &TimeDistrFactor)
 {
@@ -1656,6 +1658,80 @@ void StepOverPlanner::CreateBufferFirstPreview(deque<COMPosition> &m_COMBuffer,
   	
 }
 
+  void StepOverPlanner::m_SetObstacleParameters(istringstream &strm)
+  {
+
+    bool ReadObstacleParameters = false;
+
+    ODEBUG( "I am reading the obstacle parameters" << " ");
+
+    while(!strm.eof())
+      {
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.x;
+	    ODEBUG("obstacle position x:" << " "<< m_ObstacleParameters.x );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.y;
+	    ODEBUG( "obstacle position y:" << " "<< m_ObstacleParameters.y );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.z;
+	    ODEBUG( "obstacle position z:" << " "<< m_ObstacleParameters.z );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.theta;
+	    ODEBUG( "obstacle orientation:" << " "<< m_ObstacleParameters.theta );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.h;
+	    ODEBUG( "obstacle height:" << " "<< m_ObstacleParameters.h );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.w;
+	    ODEBUG( "obstacle width:" << " "<< m_ObstacleParameters.w );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    strm >> m_ObstacleParameters.d;
+	    ODEBUG( "obstacle depth:" << " "<< m_ObstacleParameters.d );
+	  }
+	else
+	  break;
+	if (!strm.eof())
+	  {
+	    bool lObstacleDetected;
+	    strm >> lObstacleDetected;
+	    ODEBUG( "m_ObstacleDetected:" << " "<< m_ObstacleDetected );
+	    ReadObstacleParameters = true;
+	    break;
+	  }
+	else
+	  {
+	    cout << "Not enough inputs for completion of obstacle information structure!" << endl;
+	    break;
+	  }
+
+      }
+  }
 
 
 
