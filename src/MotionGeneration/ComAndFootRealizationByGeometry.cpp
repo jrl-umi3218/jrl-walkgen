@@ -12,37 +12,9 @@
 
 #include <time.h>
 
-
+#include <Debug.h>
 #include <MotionGeneration/ComAndFootRealizationByGeometry.h>
 
-#if 0
-
-#define RESETDEBUG4(y) { ofstream DebugFile; \
-    DebugFile.open(y,ofstream::out); \
-    DebugFile.close();}
-
-#define ODEBUG4(x,y) { ofstream DebugFile; \
-    DebugFile.open(y,ofstream::app); \
-    DebugFile << "CAFRBG: " << x << endl; \
-    DebugFile.close();}
-
-#else
-#define RESETDEBUG4(y)
-#define ODEBUG4(x,y)
-#endif
-
-#define RESETDEBUG6(y)
-#define ODEBUG6(x,y)
-
-#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "CAFRBG: " << x << endl; DebugFile.close();}
-#if 1
-#define ODEBUG(x)
-#else
-#define ODEBUG(x)  std::cout << x << endl;
-#endif
-
-#define ODEBUG3(x)  std::cout << x << endl;
 
 using namespace PatternGeneratorJRL;
 
@@ -182,7 +154,7 @@ void ComAndFootRealizationByGeometry::Initialization()
   ODEBUG("Enter 5.0 ");
   // Extract the indexes of the Right leg.
 
-  std::vector<CjrlJoint *> FromRootToJoint = RightFoot->associatedAnkle()->jointsFromRootToThis();
+  std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint = RightFoot->associatedAnkle()->jointsFromRootToThis();
   std::vector<CjrlJoint *> ActuatedJoints = getHumanoidDynamicRobot()->getActuatedJoints();
 
   InitializationMaps(FromRootToJoint,ActuatedJoints,m_RightLegIndexInVRML,m_RightLegIndexinConfiguration);
@@ -196,45 +168,47 @@ void ComAndFootRealizationByGeometry::Initialization()
   CjrlJoint *Chest = getHumanoidDynamicRobot()->chest();
 
   FromRootToJoint.clear();
+  FromRootToJoint2.clear();
   FromRootToJoint = LeftHand->associatedWrist()->jointsFromRootToThis();
   std::vector<CjrlJoint *>::iterator itJoint = FromRootToJoint.begin();
+  bool startadding=false;
   while(itJoint!=FromRootToJoint.end())
     {
 
       std::vector<CjrlJoint *>::iterator current = itJoint;
-      itJoint++;
       if (FromRootToJoint.front()==Chest)
-	{
-	  FromRootToJoint.erase(current);
-	  break;
-	}
+	  startadding=true;
       else
-	FromRootToJoint.erase(current);
-
+	{
+	  if (startadding)
+	    FromRootToJoint2.push_back(*itJoint);
+	}
+      itJoint++;
+      
     }
-  InitializationMaps(FromRootToJoint,ActuatedJoints,m_LeftArmIndexInVRML,m_LeftArmIndexinConfiguration);
+  InitializationMaps(FromRootToJoint2,ActuatedJoints,m_LeftArmIndexInVRML,m_LeftArmIndexinConfiguration);
 
   // Right Arm.
   CjrlHand *RightHand = getHumanoidDynamicRobot()->rightHand();  
   FromRootToJoint.clear();
+  FromRootToJoint2.clear();
   FromRootToJoint = RightHand->associatedWrist()->jointsFromRootToThis();
   itJoint = FromRootToJoint.begin();
+  startadding=false;
   while(itJoint!=FromRootToJoint.end())
     {
       std::vector<CjrlJoint *>::iterator current = itJoint;
-      itJoint++;
       
       if (FromRootToJoint.front()==Chest)
-	{
-	  FromRootToJoint.erase(current);
-	  break;
-	}
+	startadding=true;
       else
-	FromRootToJoint.erase(current);
-
+	{
+	  if (startadding)
+	    FromRootToJoint2.push_back(*itJoint);
+	}
       itJoint++;
     }
-  InitializationMaps(FromRootToJoint,ActuatedJoints,m_RightArmIndexInVRML,m_RightArmIndexinConfiguration);
+  InitializationMaps(FromRootToJoint2,ActuatedJoints,m_RightArmIndexInVRML,m_RightArmIndexinConfiguration);
 
   FromRootToJoint.clear();
   FromRootToJoint = Chest->jointsFromRootToThis();
