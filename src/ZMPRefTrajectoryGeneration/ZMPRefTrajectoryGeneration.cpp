@@ -45,14 +45,15 @@ ZMPRefTrajectoryGeneration::ZMPRefTrajectoryGeneration(SimplePluginManager *lSPM
 {
 
   ODEBUG("Identification: " << this);
-  std::string aMethodName[5] = 
+  std::string aMethodName[6] = 
     {":omega",
      ":stepheight",
      ":singlesupporttime",
      ":doublesupporttime",
-     ":comheight"};
+     ":comheight",
+     ":samplingperiod"};
   
-  for(int i=0;i<5;i++)
+  for(int i=0;i<6;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
 	{
@@ -94,7 +95,12 @@ void ZMPRefTrajectoryGeneration::CallMethod(std::string & Method, std::istringst
       strm >> m_ComHeight;
       ODEBUG(":comheight" << m_ComHeight << " ID: " << this);
     }
-
+  else if (Method==":samplingperiod")
+    {
+      strm >> m_SamplingPeriod;
+      ODEBUG3(":samplingperiod" << m_SamplingPeriod << " ID: " << this);
+    }
+  
 };
 
 bool ZMPRefTrajectoryGeneration::GetOnLineMode()

@@ -718,6 +718,7 @@ namespace PatternGeneratorJRL
     
     ODEBUG("End of InitOnLine : Size of relative foot positions: " << m_RelativeFootPositions.size());
 
+    
     return m_RelativeFootPositions.size();
   }
 
