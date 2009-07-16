@@ -318,6 +318,7 @@ namespace PatternGeneratorJRL
     std::vector<int> m_RightLegIndexInVRML;
     std::vector<int> m_LeftArmIndexInVRML;
     std::vector<int> m_RightArmIndexInVRML;
+    std::vector<int> m_ChestIndexInVRML;
 
     /*! \name Keep the indexes into the Configuration numbering system. 
      @{

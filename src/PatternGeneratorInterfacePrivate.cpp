@@ -663,8 +663,9 @@ namespace PatternGeneratorJRL {
 	    << " "  << lStartingCOMPosition.z[0]);
     ODEBUG4("StartingCOMPosition: " << lStartingCOMPosition.x[0] << " "  << lStartingCOMPosition.y[0],"DebugData.txt");
     // We also initialize the iteration number inside DMB.
-    std::cerr << "You have to implement a reset iteration number." << endl;
-    //m_HumanoidDynamicRobot->ResetIterationNumber();
+    //std::cerr << "You have to implement a reset iteration number." << endl;
+    string aProperty("ResetIteration"),aValue("any");
+    m_HumanoidDynamicRobot->setProperty(aProperty,aValue);
 
     ODEBUG4("CommonInitializationOfWalking " << BodyAnglesIni,"DebugData.txt" );
 

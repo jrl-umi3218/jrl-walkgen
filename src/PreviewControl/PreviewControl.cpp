@@ -316,7 +316,8 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
 
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
     {
-      cout << "You've got a problem here " << endl;
+      ODEBUG3("ZMPPositions.size()<m_SizeOfPreviewWindow:" <<
+	      ZMPPositions.size()<< " " << m_SizeOfPreviewWindow);
       exit(0);
     }
   
@@ -366,7 +367,8 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
   ODEBUG(" ux phase 1: " << ux);
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
     {
-      cout << "You've got a problem here " << endl;
+      ODEBUG3("ZMPPositions.size()<m_SizeOfPreviewWindow:" <<
+	      ZMPPositions.size()<< " " << m_SizeOfPreviewWindow);
       exit(0);
     }
   
@@ -409,7 +411,8 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
   ODEBUG(" ux phase 1: " << ux);
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
     {
-      cout << "You've got a problem here " << endl;
+      ODEBUG3("ZMPPositions.size()< m_SizeOfPreviewWindow:" <<
+	      ZMPPositions.size()<< " " << m_SizeOfPreviewWindow);
       exit(0);
     }
   

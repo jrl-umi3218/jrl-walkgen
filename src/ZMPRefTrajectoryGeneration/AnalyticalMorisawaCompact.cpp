@@ -18,33 +18,7 @@
    
 */
 
-#define ODEBUG2(x)
-#define ODEBUG3(x) cerr << "AnalyticalMorisawaCompact" << ": " << __FUNCTION__ \
-                       << "(# " << __LINE__ << "): "<< x << endl
-
-//#define ODEBUG3(x) cerr << "AnalyticalMorisawaCompact :" << x << endl
-
-#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "PGI: " << x << endl; DebugFile.close();}
-#if 0
-#define ODEBUG(x) cerr << "AnalyticalMorisawaCompact" << ": " << __FUNCTION__ \
-                       << "(# " << __LINE__ << "): "<< x << endl
-#else
-#define ODEBUG(x)
-#endif
-
-#if 0
-#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); \
-    DebugFile << "PGI: " << x << endl; DebugFile.close();}
-#define _DEBUG_4_ACTIVATED_ 1
-#else
-#define RESETDEBUG4(y)
-#define ODEBUG4(x,y)
-#endif
-
-#define ODEBUG6(x,y)
-
+#include <Debug.h>
 #include <fstream>
 #include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.h>
 
@@ -2019,10 +1993,7 @@ namespace PatternGeneratorJRL
     /*! Initializing variables needed to compute the state vector */
     double lsxzmp = 0.0;    
     double lxzmp = 0.0;
-    /*
-    aAZCT.ComputeZMP(lAbsoluteTimeReference,lxzmp);
-    lxzmp = (*aCTIP.ZMPProfil)[0] - lxzmp;
-    */
+
     /*! Preview window of the ZMP ref positions */
     double PreviewWindowTime = m_PreviewControl->PreviewControlTime();
     deque<double> FIFOZMPRefPositions;
@@ -2047,7 +2018,7 @@ namespace PatternGeneratorJRL
     for(double lx=0;lx<m_DeltaTj[0]+PreviewWindowTime;lx+= m_SamplingPeriod)
       {
 	m_PreviewControl->OneIterationOfPreview1D(x,lsxzmp,FIFOZMPRefPositions,lindex,
-				      lxzmp,false);
+						  lxzmp,false);
 	ZMPTrajectory.push_back(lxzmp);
 	CoGTrajectory.push_back(x(0,0));
 	lindex++;

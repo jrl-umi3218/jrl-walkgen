@@ -211,12 +211,25 @@ void ComAndFootRealizationByGeometry::Initialization()
   InitializationMaps(FromRootToJoint2,ActuatedJoints,m_RightArmIndexInVRML,m_RightArmIndexinConfiguration);
 
   FromRootToJoint.clear();
+  FromRootToJoint2.clear();
   FromRootToJoint = Chest->jointsFromRootToThis();
-  {
-    for(unsigned int i=0;i<FromRootToJoint.size();i++)
-      m_ChestIndexinConfiguration[i]=FromRootToJoint[i]->rankInConfiguration();
+  itJoint = FromRootToJoint.begin();
+  startadding=false;
+  while(itJoint!=FromRootToJoint.end())
+    {
+      std::vector<CjrlJoint *>::iterator current = itJoint;
+      
+      if (FromRootToJoint.front()==Chest)
+	startadding=true;
+      else
+	{
+	  if (startadding)
+	    FromRootToJoint2.push_back(*itJoint);
+	}
+      itJoint++;
+    }
+  InitializationMaps(FromRootToJoint2,ActuatedJoints,m_ChestIndexInVRML,m_ChestIndexinConfiguration);
 
-  }
 
   
   ODEBUG("RightLegIndex: "
