@@ -14,29 +14,9 @@
    in the root directory.
    
 */
+#include <Debug.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 
-#define ODEBUG2(x)
-#define ODEBUG3(x) cout << "ZMPRefTrajectoryGeneration :" << x << endl
-#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "PGI: " << x << endl; DebugFile.close();}
-#if 0
-#define ODEBUG(x) cerr << "ZMPRefTrajectoryGeneration :" <<  x << endl
-#else
-#define ODEBUG(x)
-#endif
-
-#if 0
-#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); \
-    DebugFile << "PGI: " << x << endl; DebugFile.close();}
-#define _DEBUG_4_ACTIVATED_ 1
-#else
-#define RESETDEBUG4(y)
-#define ODEBUG4(x,y)
-#endif
-
-#define ODEBUG6(x,y)
 
 using namespace PatternGeneratorJRL;
 
@@ -98,7 +78,7 @@ void ZMPRefTrajectoryGeneration::CallMethod(std::string & Method, std::istringst
   else if (Method==":samplingperiod")
     {
       strm >> m_SamplingPeriod;
-      ODEBUG3(":samplingperiod" << m_SamplingPeriod << " ID: " << this);
+      ODEBUG(":samplingperiod" << m_SamplingPeriod << " ID: " << this);
     }
   
 };

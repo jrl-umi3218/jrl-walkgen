@@ -13,29 +13,7 @@
   Please see License.txt for further information on license. 
 */
 
-#if 0
-#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); \
-    DebugFile << "GlobalStrategyManager: " << x << endl; \
-    DebugFile.close();}
-#else
-#define RESETDEBUG4(y)
-#define ODEBUG4(x,y)
-#endif
-
-#define RESETDEBUG6(y)
-#define ODEBUG6(x,y)
-
-#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "GlobalStrategyManager: " << x << endl; DebugFile.close();}
-#if 1
-#define ODEBUG(x)
-#else
-#define ODEBUG(x)  std::cout << x << endl;
-#endif
-
-#define ODEBUG3(x)  std::cout << x << endl;
-
+#include <Debug.h>
 #include <deque> 
 #include <GlobalStrategyManagers/GlobalStrategyManager.h>
 

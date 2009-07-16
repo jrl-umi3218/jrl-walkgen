@@ -14,6 +14,7 @@
    
    Please see License.txt for further information on license.
 */
+#include <Debug.h>
 #include "FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.h"
 
 using namespace PatternGeneratorJRL;
@@ -26,10 +27,14 @@ FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginM
   m_Foot= aFoot;  
   m_SamplingPeriod = 0.005;
 
-  string aMethodName[4] = 
-    {":omega",":stepheight", ":singlesupporttime",":doublesupporttime"};
+  string aMethodName[5] = 
+    {":omega",
+     ":stepheight", 
+     ":singlesupporttime",
+     ":doublesupporttime",
+     ":samplingperiod"};
 
-  for (int i=0;i<4;i++)
+  for (int i=0;i<5;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
 	{
@@ -54,6 +59,12 @@ void FootTrajectoryGenerationAbstract::CallMethod(std::string &Method,
     {
       strm >> m_TDouble;
     }
+  else if (Method==":samplingperiod")
+    {
+      strm >> m_SamplingPeriod;
+      ODEBUG("Sampling period: " << m_SamplingPeriod);
+    }
+
 
 }
 

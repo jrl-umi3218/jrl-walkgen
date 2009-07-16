@@ -11,32 +11,10 @@
 */
 #include <iostream>
 #include <fstream>
+
+#include <Debug.h>
+
 #include "FootTrajectoryGenerationStandard.h"
-
-#define ODEBUG2(x)
-#define ODEBUG3(x) std::cerr << "FootTrajectoryGenerationStandard :" << x << std::endl
-#define RESETDEBUG5(y) { std::ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG5(x,y) { std::ofstream DebugFile; \
-    DebugFile.open(y,ofstream::app); \
-    DebugFile << "PGI: " << x << endl; \
-    DebugFile.close();}
-#if 0
-#define ODEBUG(x) std::cerr << "FootTrajectoryGenerationStandard :" <<  x << std::endl
-#else
-#define ODEBUG(x)
-#endif
-
-#if 0
-#define RESETDEBUG4(y) { std::ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG4(x,y) { std::ofstream DebugFile; DebugFile.open(y,ofstream::app); \
-    DebugFile << "PGI: " << x << std::endl; DebugFile.close();}
-#define _DEBUG_4_ACTIVATED_ 1
-#else
-#define RESETDEBUG4(y)
-#define ODEBUG4(x,y)
-#endif
-
-#define ODEBUG6(x,y)
 
 
 using namespace PatternGeneratorJRL;

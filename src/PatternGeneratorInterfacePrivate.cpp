@@ -189,7 +189,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()
   {
-    std::string aMethodName[11] = 
+    std::string aMethodName[12] = 
       {":LimitsFeasibility",
        ":ZMPShiftParameters",
        ":TimeDistributionParameters",
@@ -200,9 +200,10 @@ namespace PatternGeneratorJRL {
        ":readfilefromkw",
        ":SetAlgoForZmpTrajectory",
        ":SetAutoFirstStep",
-       ":ChangeNextStep"};
+       ":ChangeNextStep",
+       ":samplingperiod"};
     
-    for(int i=0;i<11;i++)
+    for(int i=0;i<12;i++)
       {
 	if (!SimplePlugin::RegisterMethod(aMethodName[i]))
 	  {
@@ -755,7 +756,6 @@ namespace PatternGeneratorJRL {
 	ODEBUG("After Initializing the Analytical Morisawa part. " << m_LeftFootPositions.size()
 		<< " " << m_RightFootPositions.size());
       }
-
     // Keep the last one to be removed at the next insertion.
     for(int i=0;i<NbOfStepsToRemoveFromTheStack-1;i++)
       m_StepStackHandler->RemoveFirstStepInTheStack();
@@ -963,6 +963,13 @@ namespace PatternGeneratorJRL {
 	double nt;
 	ChangeOnLineStep(strm,nt);
       }
+    else if (aCmd==":samplingperiod")
+      {
+	double sp;
+	strm >> sp;
+	m_SamplingPeriod = sp;
+      }
+    
     else if (aCmd==":LimitsFeasibility")
       m_SetLimitsFeasibility(strm);
 
@@ -1132,6 +1139,9 @@ namespace PatternGeneratorJRL {
 	  }
 	else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
 	  {
+	    ODEBUG("InternalClock:" <<m_InternalClock  << 
+		    " SamplingPeriod: "<<m_SamplingPeriod);
+
 	    m_ZMPM->OnLine(m_InternalClock,
 			   m_ZMPPositions,
 			   m_COMBuffer,
@@ -1194,11 +1204,13 @@ namespace PatternGeneratorJRL {
     bool UpdateAbsMotionOrNot = false;
 
     //    if ((u=(m_count - (m_ZMPPositions.size()-2*m_NL)))>=0)
+    
     if (m_GlobalStrategyManager->EndOfMotion()==GlobalStrategyManager::NEW_STEP_NEEDED)
       {
 	ODEBUG("NEW STEP NEEDED" << m_InternalClock/m_SamplingPeriod << " Internal Clock :" << m_InternalClock);
 	if (m_StepStackHandler->IsOnLineSteppingOn())
 	  {
+	    ODEBUG("Add a step");
 	    // CAREFULL: we assume that this sequence will create a
 	    // a new foot steps at the back of the queue handled by the StepStackHandler.
 	    // Then we have two foot steps: the last one put inside the preview,
@@ -1213,7 +1225,7 @@ namespace PatternGeneratorJRL {
 
 	    // Remove the first step of the queue.
 	    bool EndSequence = m_StepStackHandler->RemoveFirstStepInTheStack();
-
+	    ODEBUG("EndSequence:" <<EndSequence);
 	    // Returns the front foot step in the step stack handler which is not yet
 	    // in the preview control queue.
 	    bool EnoughSteps= m_StepStackHandler->ReturnFrontFootPosition(lRelativeFootPositions);
@@ -1260,6 +1272,7 @@ namespace PatternGeneratorJRL {
 	      }
 	    else if (EndSequence)
 	      {
+		ODEBUG("End Sequence");
 		if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
 		  {
 		  }
@@ -1618,7 +1631,7 @@ namespace PatternGeneratorJRL {
   {
     if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
       {
-	ODEBUG3("ZMPCOM_WIEBER_2006 " << m_ZMPPositions.size() );
+	ODEBUG("ZMPCOM_WIEBER_2006 " << m_ZMPPositions.size() );
 	m_COMBuffer.clear();
 	m_ZMPQP->GetZMPDiscretization(m_ZMPPositions,
 				      m_COMBuffer,
@@ -1632,7 +1645,7 @@ namespace PatternGeneratorJRL {
       }    
     else if (m_AlgorithmforZMPCOM==ZMPCOM_DIMITROV_2008)
       {
-	ODEBUG3("ZMPCOM_DIMITROV_2008 " << m_ZMPPositions.size() );
+	ODEBUG("ZMPCOM_DIMITROV_2008 " << m_ZMPPositions.size() );
 	m_COMBuffer.clear();
 	m_ZMPCQPFF->GetZMPDiscretization(m_ZMPPositions,
 					 m_COMBuffer,
@@ -1646,7 +1659,7 @@ namespace PatternGeneratorJRL {
       }    
     else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
       {
-	ODEBUG3("ZMPCOM_KAJITA_2003 " << m_ZMPPositions.size() );
+	ODEBUG("ZMPCOM_KAJITA_2003 " << m_ZMPPositions.size() );
 	m_ZMPD->GetZMPDiscretization(m_ZMPPositions,
 				     m_COMBuffer,
 				     lRelativeFootPositions,
@@ -1661,7 +1674,7 @@ namespace PatternGeneratorJRL {
       }
     else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
       {
-	ODEBUG3("ZMPCOM_MORISAWA_2007");
+	ODEBUG("ZMPCOM_MORISAWA_2007");
 	m_ZMPM->GetZMPDiscretization(m_ZMPPositions,
 				     m_COMBuffer,
 				     lRelativeFootPositions,
@@ -1672,7 +1685,7 @@ namespace PatternGeneratorJRL {
 				     InitLeftFootAbsPos,
 				     InitRightFootAbsPos);
 
-	ODEBUG3("ZMPCOM_MORISAWA_2007 " << m_ZMPPositions.size() );
+	ODEBUG("ZMPCOM_MORISAWA_2007 " << m_ZMPPositions.size() );
       }
     return 0;
   }

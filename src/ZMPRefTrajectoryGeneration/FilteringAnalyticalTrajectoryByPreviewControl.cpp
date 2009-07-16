@@ -178,7 +178,7 @@ bool FilteringAnalyticalTrajectoryByPreviewControl::UpdateOneStep(double t,
   ODEBUG("time:" << t << " m_StartingTime: " << 
 	  m_StartingTime << " " << m_Duration + m_StartingTime << " ( " << m_Duration << " ) "
 	  << " LBI:" << m_LocalBufferIndex);
-  if ((t<m_StartingTime) || (t>m_Duration+m_StartingTime))
+  if ((t<m_StartingTime) || (t>m_Duration+m_StartingTime) || (m_Duration==0.0))
     return false;
 
   double lsxzmp =0.0;

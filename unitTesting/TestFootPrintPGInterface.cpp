@@ -1093,7 +1093,7 @@ int main(int argc, char *argv[])
 	  if (maxtime<ltime)
 	    maxtime = ltime;
 	  NbOfIt++;
-
+	  
 	  if (ltime>0.000300)
 	    {
 	      totaltime += ltime;

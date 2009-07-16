@@ -730,7 +730,9 @@ namespace PatternGeneratorJRL
 					 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
   {
     unsigned int lIndexInterval;
-
+    ODEBUG("time :" <<time << 
+	    " m_UpperTimeLimitToUpdateStacks: " <<
+	    m_UpperTimeLimitToUpdateStacks);
     if (time<m_UpperTimeLimitToUpdateStacks) 
       {
 	if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))

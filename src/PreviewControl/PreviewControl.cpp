@@ -11,31 +11,10 @@
    in the root directory.
    
 */
-#define ODEBUG2(x)
-#define ODEBUG3(x) cerr << "PreviewControl" << ": " << __FUNCTION__ \
-                       << "(# " << __LINE__ << "): "<< x << endl
-
-#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "PC: " << x << endl; DebugFile.close();}
-#if 0
-#define ODEBUG(x) cerr << "PreviewControl :" <<  x << endl
-#else
-#define ODEBUG(x)
-#endif
-
-#if 0
-#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); \
-    DebugFile << "PC: " << x << endl; DebugFile.close();}
-#define _DEBUG_4_ACTIVATED_ 1
-#else
-#define RESETDEBUG4(y)
-#define ODEBUG4(x,y)
-#endif
-
-#define ODEBUG6(x,y)
 
 #include <fstream>
+#include <Debug.h>
+
 #include <PreviewControl/PreviewControl.h>
 
 using namespace::PatternGeneratorJRL;
@@ -316,7 +295,7 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
 
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
     {
-      ODEBUG3("ZMPPositions.size()<m_SizeOfPreviewWindow:" <<
+      ODEBUG("ZMPPositions.size()<m_SizeOfPreviewWindow:" <<
 	      ZMPPositions.size()<< " " << m_SizeOfPreviewWindow);
       exit(0);
     }
@@ -367,7 +346,7 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
   ODEBUG(" ux phase 1: " << ux);
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
     {
-      ODEBUG3("ZMPPositions.size()<m_SizeOfPreviewWindow:" <<
+      ODEBUG("ZMPPositions.size()<m_SizeOfPreviewWindow:" <<
 	      ZMPPositions.size()<< " " << m_SizeOfPreviewWindow);
       exit(0);
     }
@@ -411,7 +390,7 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
   ODEBUG(" ux phase 1: " << ux);
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
     {
-      ODEBUG3("ZMPPositions.size()< m_SizeOfPreviewWindow:" <<
+      ODEBUG("ZMPPositions.size()< m_SizeOfPreviewWindow:" <<
 	      ZMPPositions.size()<< " " << m_SizeOfPreviewWindow);
       exit(0);
     }
@@ -425,7 +404,7 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
     }
   else
     {
-      ODEBUG3("Case where TestSize<0 (lindex:" <<lindex << 
+      ODEBUG("Case where TestSize<0 (lindex:" <<lindex << 
 	      " , ZMPPositions.size(): " << ZMPPositions.size() << 
 	      " , m_SizeOfPreviewWindow: " << m_SizeOfPreviewWindow);
       for(unsigned int i=lindex;i<ZMPPositions.size();i++)

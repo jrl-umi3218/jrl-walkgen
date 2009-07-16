@@ -44,7 +44,11 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
 						   MAL_VECTOR(,double) & CurrentVelocity,
 						   MAL_VECTOR(,double) & CurrentAcceleration)
 {
-  ODEBUG("Begin OneGlobalStepOfControl");
+  ODEBUG("Begin OneGlobalStepOfControl " 
+	  << m_LeftFootPositions->size() << " " 
+	  << m_RightFootPositions->size() << " "
+	  << m_COMBuffer->size() << " "
+	  << m_ZMPPositions->size());
   
   /* The strategy of this class is simply to pull off values from the buffers. */
   if (m_LeftFootPositions->size()>0)
@@ -94,7 +98,11 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
       return -5;
     }
 
-  ODEBUG("End of OneGlobalStepOfControl");
+  ODEBUG("End of OneGlobalStepOfControl"
+	  << m_LeftFootPositions->size() << " " 
+	  << m_RightFootPositions->size() << " "
+	  << m_COMBuffer->size() << " "
+	  << m_ZMPPositions->size());
   return 0;
 }
 
