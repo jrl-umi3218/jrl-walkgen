@@ -258,7 +258,7 @@ namespace PatternGeneratorJRL
   };
 
   /*! Factory of Pattern generator interface. */
-  PatternGeneratorInterface * patternGeneratorInterfaceFactory(CjrlHumanoidDynamicRobot *aHDR);
+  WALK_GEN_JRL_EXPORT PatternGeneratorInterface * patternGeneratorInterfaceFactory(CjrlHumanoidDynamicRobot *aHDR);
 };
 
 

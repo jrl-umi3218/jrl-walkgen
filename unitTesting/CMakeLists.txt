@@ -25,6 +25,7 @@ SET_TARGET_PROPERTIES(TestFootPrintPGInterface
 )
 ADD_DEPENDENCIES (TestFootPrintPGInterface ${PROJECT_NAME})
 
+IF (NOT WIN32)
 ADD_EXECUTABLE(	TestOptCholesky TestOptCholesky.cpp)
 SET_TARGET_PROPERTIES(TestOptCholesky
 	              PROPERTIES
@@ -40,4 +41,5 @@ SET_TARGET_PROPERTIES(TestRiccatiEquation
 		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}
 )
 ADD_DEPENDENCIES (TestRiccatiEquation ${PROJECT_NAME})
+ENDIF (NOT WIN32)
 
