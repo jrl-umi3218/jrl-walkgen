@@ -129,34 +129,47 @@ void ComAndFootRealizationByGeometry::Initialization()
   RightFoot = getHumanoidDynamicRobot()->rightFoot();
   RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
   LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
-  
+  vector3d RightFootSoleCenter,LeftFootSoleCenter;
+  RightFoot->getSoleCenterInLocalFrame(RightFootSoleCenter);
+  LeftFoot->getSoleCenterInLocalFrame(LeftFootSoleCenter);
+
   double lWidth,lHeight,lDepth;
   lDepth = lAnklePositionRight[2];
   LeftFoot->getSoleSize(lWidth,lHeight);
-  
-  m_AnklePositionRight[0] = -lDepth*0.5 + lAnklePositionRight[0];
-  m_AnklePositionLeft[0]  = -lDepth*0.5 + lAnklePositionLeft[0];
-  m_AnklePositionRight[1] =   lWidth*0.5 - lAnklePositionRight[1];
-  m_AnklePositionLeft[1]  =  -lWidth*0.5 + lAnklePositionLeft[1];
-  m_AnklePositionRight[2] =   lAnklePositionRight[2];
-  m_AnklePositionLeft[2]  =   lAnklePositionLeft[2];
+
+  ODEBUG4("RightFootSoleCenter:"<<RightFootSoleCenter, "DebugDataStartingCOM.dat");
+  ODEBUG4("LeftFootSoleCenter:"<<LeftFootSoleCenter, "DebugDataStartingCOM.dat");
+  m_AnklePositionRight[0] = lAnklePositionRight[0] - RightFootSoleCenter[0];
+  m_AnklePositionLeft[0]  = lAnklePositionLeft[0] - LeftFootSoleCenter[0];
+  m_AnklePositionRight[1] = lAnklePositionRight[1] - RightFootSoleCenter[1];
+  m_AnklePositionLeft[1]  = lAnklePositionLeft[1] - LeftFootSoleCenter[1];
+  m_AnklePositionRight[2] = lAnklePositionRight[2] - RightFootSoleCenter[2];
+  m_AnklePositionLeft[2]  = lAnklePositionRight[2] - LeftFootSoleCenter[2];
       
-  ODEBUG("m_AnklePositionRight: "<< m_AnklePositionRight[0] << " " <<
+  ODEBUG4("m_AnklePositionRight: "<< m_AnklePositionRight[0] << " " <<
 	 m_AnklePositionRight[1] << " " <<
-	 m_AnklePositionRight[2] );
-  ODEBUG("m_AnklePositionLeft: "<< m_AnklePositionLeft[0] << " " <<
+	  m_AnklePositionRight[2],"DebugDataStartingCOM.dat");
+  ODEBUG4("m_AnklePositionLeft: "<< m_AnklePositionLeft[0] << " " <<
 	 m_AnklePositionLeft[1] << " " <<
-	 m_AnklePositionLeft[2] );
+	  m_AnklePositionLeft[2],"DebugDataStartingCOM.dat");
   ODEBUG("Enter 3.0 ");
   // Update the index to change the configuration according
   // to the VRML ID.
-  
   ODEBUG("Enter 5.0 ");
   // Extract the indexes of the Right leg.
 
   std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint = RightFoot->associatedAnkle()->jointsFromRootToThis();
   std::vector<CjrlJoint *> ActuatedJoints = getHumanoidDynamicRobot()->getActuatedJoints();
+  ODEBUG4("Size of ActuatedJoints"<<ActuatedJoints.size(),"DebugDataStartingCOM.dat");
+  // Build global map.
+  m_GlobalVRMLIDtoConfiguration.resize(ActuatedJoints.size());
+  for(unsigned int j=0;j<ActuatedJoints.size();j++)
+    {
+      m_GlobalVRMLIDtoConfiguration[j] = ActuatedJoints[j]->rankInConfiguration();
+    }
 
+
+  // Build Right and left leg map.
   InitializationMaps(FromRootToJoint,ActuatedJoints,m_RightLegIndexInVRML,m_RightLegIndexinConfiguration);
   FromRootToJoint.clear();
   FromRootToJoint = LeftFoot->associatedAnkle()->jointsFromRootToThis();
@@ -341,6 +354,8 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 
   ODEBUG4("Size of body angles ini: " << MAL_VECTOR_SIZE(BodyAnglesIni),
 	  "DebugDataStartingCOM.dat");
+  ODEBUG4("Size of m_GlobalVRMLIDtoConfiguration: " << m_GlobalVRMLIDtoConfiguration.size(),
+	  "DebugDataStartingCOM.dat");
 
   for(unsigned int i=0;i<m_GlobalVRMLIDtoConfiguration.size();i++)
     {
@@ -381,10 +396,12 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 	  << RootPosition[2] , "DebugDataStartingCOM.dat");
 
   // Initialise the right foot position.
-  matrix4d lFootPose = aDMB->rightFoot()->associatedAnkle()->currentTransformation();
-  ODEBUG( "Right Foot Ankle Pose: "
-	  << lFootPose);
-
+  CjrlFoot * RightFoot = aDMB->rightFoot();
+  matrix4d lFootPose = RightFoot->associatedAnkle()->currentTransformation();
+  vector3d RightFootSoleCenter;
+  RightFoot->getSoleCenterInLocalFrame(RightFootSoleCenter);
+  
+  ODEBUG( "RightFootSoleCenter:" <<RightFootSoleCenter);
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,0) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,0,3);
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,1) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,1,3);
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,2) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,2,3);
@@ -405,16 +422,18 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 
   ODEBUG4( "Right Foot Position: "
 	   << lFootPosition[0] << " "
-	   << lFootPosition[1],"DebugDataStartingCOM.dat");
+	   << lFootPosition[1] << " "
+	   << lFootPosition[2] ,"DebugDataStartingCOM.dat");
   ODEBUG( "Right Foot Position: "
 	  << lFootPosition[0] << " "
-	  << lFootPosition[1]);
+	  << lFootPosition[1] << " " 
+	  << lFootPosition[2]);
 
   MAL_S3_VECTOR(WaistPosition,double);
 
   WaistPosition[0] = 0.0;
   WaistPosition[1] = 0.0;
-  WaistPosition[2] = -lFootPosition[2];
+  WaistPosition[2] = -lFootPosition[2]-RightFootSoleCenter[2];
 
   InitRightFootPosition.x = lFootPosition[0];
   InitRightFootPosition.y = lFootPosition[1];
@@ -465,7 +484,10 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   InitLeftFootPosition.z = lFootPosition[2];
   InitLeftFootPosition.theta = 0.0;
 
-  ODEBUG("InitLeftFootPosition : " << InitLeftFootPosition.x << " " << InitLeftFootPosition.y );
+  ODEBUG("InitLeftFootPosition : " << InitLeftFootPosition.x 
+	 << " " << InitLeftFootPosition.y 
+
+	 << " " << InitLeftFootPosition.z );
   // We assume that the foot is flat on the floor...
   // Thus
   // lFootPose(0:2,0:2)=
@@ -481,7 +503,8 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 
   ODEBUG4( "Left Foot Position: "
 	   << lFootPosition[0] << " "
-	   << lFootPosition[1] ,"DebugDataStartingCOM.dat");
+	   << lFootPosition[1] << " "
+	   << lFootPosition[2] << " ","DebugDataStartingCOM.dat");
   ODEBUG( "Left Foot Position: "
 	  << lFootPosition[0] << " "
 	  << lFootPosition[1]);
@@ -573,16 +596,6 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 
   // RIGHT FOOT.
   // Compute the inverse kinematics.
-  cout << __FUNCTION__ << ":"<< __LINE__ << ": You should implement something here"
-       << endl;
-  /* To implement: 
-     m_InverseKinematics->ComputeInverseKinematics2ForLegs(Body_R,
-     Body_P,
-     m_DtLeft,
-     Foot_R,
-     Foot_P,
-     lql);
-  */
   ODEBUG4(lql , "DebugDataStartingCOM.dat");
 
   MAL_VECTOR_FILL(m_prev_Configuration,0.0);
@@ -605,6 +618,20 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   lStartingWaistPose(3) = 0.0;
   lStartingWaistPose(4) = 0.0;
   lStartingWaistPose(5) = 0.0;
+
+  ODEBUG4( "Init Left Foot Position: "
+	   << InitLeftFootPosition.x << " "
+	   << InitLeftFootPosition.y << " "
+	   << InitLeftFootPosition.z << " ","DebugDataStartingCOM.dat");
+  ODEBUG4( "Init Right Foot Position: "
+	   << InitRightFootPosition.x << " "
+	   << InitRightFootPosition.y << " "
+	   << InitRightFootPosition.z << " ","DebugDataStartingCOM.dat");
+  ODEBUG4( "Init Waist Position: "
+	   << WaistPosition[0] << " "
+	   << WaistPosition[1] << " "
+	   << WaistPosition[2] << " ","DebugDataStartingCOM.dat");
+  
   
   return true;
 }
