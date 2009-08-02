@@ -93,6 +93,9 @@ namespace PatternGeneratorJRL
 
     /*! \brief Get nature of interval */
     int GetNatureInterval(unsigned int IntervalIndex);
+
+    /*! \brief Display intervals time. */
+    int DisplayIntervals();
     
     /*! @} */
     

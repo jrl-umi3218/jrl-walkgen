@@ -209,3 +209,11 @@ void FootTrajectoryGenerationMultiple::CallMethod(std::string &Method,
 {
   
 }
+int FootTrajectoryGenerationMultiple::DisplayIntervals()
+{
+  for(unsigned int i=0;i<m_DeltaTj.size();i++)
+    {
+      ODEBUG3("m_DeltaTj["<<i<<"]="<<m_DeltaTj[i]);
+    }
+  return 0;
+}
