@@ -1120,7 +1120,7 @@ int main(int argc, char *argv[])
 		
 		//if ((NbOfIt>(8.82*200)) && 
 		//		double triggertime = 9.64*200 + deltatime*200;
-		double triggertime = 2.44*200 + deltatime*200;
+		double triggertime = 12.44*200 + deltatime*200;
 		if ((NbOfIt>triggertime) && 
 		    TestChangeFoot)
 		  {
