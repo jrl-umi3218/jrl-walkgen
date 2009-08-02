@@ -183,6 +183,9 @@ namespace PatternGeneratorJRL
       /*! Get the intervals time */
       void GetDeltaTj(std::vector<double> & aDeltaTj);
 
+      /*! Display intervals value for left and right feet. */
+      void DisplayIntervals();
+
       /*! Set the step height */
       void SetStepHeight(double aStepHeight);
 

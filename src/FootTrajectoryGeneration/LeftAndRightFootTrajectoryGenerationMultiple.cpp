@@ -145,6 +145,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 			    bool IgnoreFirst, bool Continuity)
 {
 
+  ODEBUG("LeftFootInitialPosition.stepType: "<< LeftFootInitialPosition.stepType
+	  << " RightFootInitialPosition.stepType: "<< RightFootInitialPosition.stepType);
   /*! Makes sure the size of the SupportFootAbsolutePositions is the same than
    the relative foot positions. */
   if (SupportFootAbsoluteFootPositions.size()!=
@@ -247,11 +249,15 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  "RightFootTmpInitPos.dy " << RightFootTmpInitPos.dy << endl << 
 	  "RightFootTmpInitPos.dz " << RightFootTmpInitPos.dz << endl );
 
+  bool FirstIntervalIsSingleSupport = true;
+  if (LeftFootInitialPosition.stepType>10)
+    FirstIntervalIsSingleSupport = false;
+
   ODEBUG("CurrentSupportFootPosition: " << CurrentSupportFootPosition);
   ODEBUG("RelativeFootPositions: " << RelativeFootPositions.size());
   for(unsigned int i=0;i<RelativeFootPositions.size();i++)
     {
-      if (i!=0)
+      if ((i!=0) || (FirstIntervalIsSingleSupport==false))
 	{
 	  /*! At this stage the phase of double support is deal with */
 	  ODEBUG("Double support phase");
@@ -808,6 +814,14 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetDeltaTj(vector<double> &aD
   if (m_RightFootTrajectory!=0)
     m_RightFootTrajectory->SetTimeIntervals(m_DeltaTj);
     
+}
+
+void LeftAndRightFootTrajectoryGenerationMultiple::DisplayIntervals()
+{
+  ODEBUG3("Left intervals");
+  m_LeftFootTrajectory->DisplayIntervals();
+  ODEBUG3("Right intervals");
+  m_RightFootTrajectory->DisplayIntervals();  
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::GetDeltaTj(vector<double> &aDeltaTj)
