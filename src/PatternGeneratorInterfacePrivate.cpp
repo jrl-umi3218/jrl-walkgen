@@ -693,6 +693,7 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::StartOnLineStepSequencing()
   {
     COMPosition lStartingCOMPosition;
+    memset(&lStartingCOMPosition,0,sizeof(COMPosition));
     MAL_S3_VECTOR(,double) lStartingZMPPosition;
     MAL_VECTOR( BodyAnglesIni,double);
 
@@ -720,9 +721,12 @@ namespace PatternGeneratorJRL {
 	  lStartingZMPPosition(i) = m_ZMPInitialPoint(i);
       }
 
+
     ODEBUG("StartOnLineStepSequencing - 3 "
-	   << lStartingCOMPosition.x[0] << " "
-	   << lRelativeFootPositions.size()
+	    << lStartingCOMPosition.x[0] << " "
+	    << lStartingCOMPosition.y[0] << " "
+	    << lStartingCOMPosition.z[0] << " "
+	    << lRelativeFootPositions.size()
 	   );
     ODEBUG("ZMPInitialPoint OnLine" << lStartingZMPPosition(0)  << " "
 	    << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
@@ -743,6 +747,7 @@ namespace PatternGeneratorJRL {
       }
     else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
       {
+	m_COMBuffer.clear();
 	m_ZMPM->SetCurrentTime(m_InternalClock);
 	NbOfStepsToRemoveFromTheStack = m_ZMPM->InitOnLine(m_ZMPPositions,
 							   m_COMBuffer,
@@ -813,6 +818,11 @@ namespace PatternGeneratorJRL {
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,true);
     
+    ODEBUG("lStartingCOMPosition: "
+	    << lStartingCOMPosition.x[0] << " "
+	    << lStartingCOMPosition.y[0] << " "
+	    << lStartingCOMPosition.z[0] );
+		
     ODEBUG( "Pass through here ");
     lCurrentConfiguration(0) = 0.0;
     lCurrentConfiguration(1) = 0.0;
@@ -825,6 +835,8 @@ namespace PatternGeneratorJRL {
     ODEBUG("Size of lRelativeFootPositions :" << lRelativeFootPositions.size());
     ODEBUG("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
 	     << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
+
+    ODEBUG("COMBuffer: " << m_COMBuffer.size() );
 
     // Create the ZMP reference.
     CreateZMPReferences(lRelativeFootPositions,
@@ -895,7 +907,7 @@ namespace PatternGeneratorJRL {
     gettimeofday(&time5,0);
 
     m_count = 0;
-    ODEBUG("FinishAndRealizeStepSequence() - 8 ");
+    ODEBUG("FinishAndRealizeStepSequence() - 8 - COMBuffer: " << m_COMBuffer.size());
 
     m_ShouldBeRunning = true;
 
@@ -1675,6 +1687,7 @@ namespace PatternGeneratorJRL {
     else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
       {
 	ODEBUG("ZMPCOM_MORISAWA_2007");
+	m_COMBuffer.clear();
 	m_ZMPM->GetZMPDiscretization(m_ZMPPositions,
 				     m_COMBuffer,
 				     lRelativeFootPositions,

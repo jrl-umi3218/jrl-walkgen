@@ -935,7 +935,7 @@ namespace PatternGeneratorJRL
     m_Clock3.IncIteration();
 
     /* Update the time at which the stack should not be updated anymore */
-    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + 1.5 * m_Tsingle+ m_Tdble;    
+    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_Tsingle+ m_Tdble;    
     ODEBUG("****************** End OnLineAddFoot **************************");
   }
 
@@ -1418,7 +1418,11 @@ namespace PatternGeneratorJRL
        if this is the next step which should be changed
        and we went over half the current interval. 
      */
-    ODEBUG(" NewTj : " << NewTj << " LT: " << LocalTime << " "<< reftime << " " << m_DeltaTj[IndexStartingInterval]);
+    ODEBUG(" NewTj : " << NewTj 
+	    << " LT: " << LocalTime 
+	    << " RT:"<< reftime 
+	    << " DTj:" << m_DeltaTj[IndexStartingInterval]
+	    << " FT:" << FinalTime);
 
     if ((NewTj<m_Tsingle*0.5) &&
 	(IndexStep==IndexStartingInterval+1))
@@ -1842,13 +1846,17 @@ namespace PatternGeneratorJRL
     else
       {
 	// For a proper initialization of the analytical trajectories
-	// through co<nstraint changes, the Fluctuation structure has to be changed
+	// through constraint changes, the Fluctuation structure has to be changed
 	// approriatly.
 	aAZCTX.ComputeCOM(t,aFPX.CoMInit);
 	aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedInit);
+	aAZCTX.ComputeZMP(t,aFPX.ZMPInit,IndexStartingInterval);
+	aAZCTX.ComputeZMPSpeed(t,aFPX.ZMPSpeedInit);
 
 	aAZCTY.ComputeCOM(t,aFPY.CoMInit);
 	aAZCTY.ComputeCOMSpeed(t,aFPY.CoMSpeedInit);
+	aAZCTY.ComputeZMP(t,aFPY.ZMPInit,IndexStartingInterval);
+	aAZCTY.ComputeZMPSpeed(t,aFPY.ZMPSpeedInit);
 	
 	
 	TCMax = m_Tsingle-m_SamplingPeriod;
@@ -1940,8 +1948,6 @@ namespace PatternGeneratorJRL
 	m_FilterXaxisByPC->FillInWholeBuffer(aFPX.ZMPInit,m_DeltaTj[0]);
 	m_FilterYaxisByPC->FillInWholeBuffer(aFPY.ZMPInit,m_DeltaTj[0]);
       }
-
-    
     return 0;
   }
 
