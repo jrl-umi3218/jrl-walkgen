@@ -1647,15 +1647,20 @@ namespace PatternGeneratorJRL
       aFP.ZMPNew = 0.0;
 
 
-    ODEBUG( aFP.CoMInit  << " " << aFP.ZMPInit << " " << aFP.CoMSpeedInit  << " " << aFP.ZMPSpeedInit ); 
-    ODEBUG( aFP.CoMNew  << " " << aFP.ZMPNew << " " << aFP.CoMSpeedNew  << " " << aFP.ZMPSpeedNew ); 
+    ODEBUG3( aFP.CoMInit  << " " << aFP.ZMPInit << " " << aFP.CoMSpeedInit  << " " << aFP.ZMPSpeedInit ); 
+    ODEBUG3( aFP.CoMNew  << " " << aFP.ZMPNew << " " << aFP.CoMSpeedNew  << " " << aFP.ZMPSpeedNew ); 
     ODEBUG("m_Omagej[0]:" << m_Omegaj[0] );
 
+    ODEBUG3("m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit)" << m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit));
+    ODEBUG3("(aFP.CoMSpeedInit - aFP.ZMPSpeedInit)" << (aFP.CoMSpeedInit - aFP.ZMPSpeedInit));
     double rden= ( m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit) + (aFP.CoMSpeedInit - aFP.ZMPSpeedInit) );
     if (fabs(rden)<1e-7)
       rden = 0.0;
+
+    ODEBUG3("m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew)" << m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew));
+    ODEBUG3("(aFP.CoMSpeedNew - aFP.ZMPSpeedNew)"<<(aFP.CoMSpeedNew - aFP.ZMPSpeedNew));
     double rnum = (m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew) + (aFP.CoMSpeedNew - aFP.ZMPSpeedNew));
-    ODEBUG("r= " <<rnum << " /" <<rden );
+    ODEBUG3("r= " <<rnum << " /" <<rden );
     if (rden==0.0)
       r=0.0;
     else r = rnum/rden;
@@ -1758,6 +1763,7 @@ namespace PatternGeneratorJRL
     int RetourTC;
 
     double Tmax,NewTj;
+    double TmaxX,TmaxY;
     FluctuationParameters aFPX,aFPY;
     double TCX, TCY, TCMax;
 
@@ -1789,7 +1795,7 @@ namespace PatternGeneratorJRL
     if ((int)IndexStep[0]<m_NumberOfIntervals)
       {
 	/* Compute the time of maximal fluctuation for the initial solution along the X axis.*/
-	Tmax = aAZCTX.FluctuationMaximal();
+	TmaxX = aAZCTX.FluctuationMaximal();
 	ODEBUG("Tmax X Init :" << Tmax );
 	aAZCTX.ComputeCOM(t,aFPX.CoMInit,IndexStartingInterval);
 	aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedInit);
@@ -1797,7 +1803,7 @@ namespace PatternGeneratorJRL
 	aAZCTX.ComputeZMPSpeed(t,aFPX.ZMPSpeedInit);
 	
 	/* Compute the time of maximal fluctuation for the initial solution along the Y axis.*/
-	Tmax = aAZCTY.FluctuationMaximal();
+	TmaxY = aAZCTY.FluctuationMaximal();
 	ODEBUG("Tmax Y Init :" << Tmax );
 	aAZCTY.ComputeCOM(t,aFPY.CoMInit,IndexStartingInterval);
 	aAZCTY.ComputeCOMSpeed(t,aFPY.CoMSpeedInit);
@@ -1825,17 +1831,31 @@ namespace PatternGeneratorJRL
 	ComputeTrajectory(aCTIPY,aAZCTY);
 	ComputeTrajectory(aCTIPX,aAZCTX);
 	
+#if 1
 	aAZCTX.ComputeCOM(t,aFPX.CoMNew,IndexStartingInterval);
 	ODEBUG( "FPX.COMInit :" << aFPX.CoMInit << " FPX.CoMNew: " << aFPX.CoMNew);
 	aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedNew);
 	aAZCTX.ComputeZMP(t,aFPX.ZMPNew,IndexStartingInterval);
-	aAZCTX.ComputeZMPSpeed(Tmax,aFPX.ZMPSpeedNew);
+	aAZCTX.ComputeZMPSpeed(t,aFPX.ZMPSpeedNew);
 	
 	aAZCTY.ComputeCOM(t,aFPY.CoMNew,IndexStartingInterval);
 	ODEBUG("FPY.COMInit :" << aFPY.CoMInit << " FPY.CoMNew: " << aFPY.CoMNew );
 	aAZCTY.ComputeCOMSpeed(t,aFPY.CoMSpeedNew);
 	aAZCTY.ComputeZMP(t,aFPY.ZMPNew,IndexStartingInterval);
 	aAZCTY.ComputeZMPSpeed(t,aFPY.ZMPSpeedNew);
+#else
+	aAZCTX.ComputeCOM(TmaxX,aFPX.CoMNew,IndexStartingInterval);
+	ODEBUG( "FPX.COMInit :" << aFPX.CoMInit << " FPX.CoMNew: " << aFPX.CoMNew);
+	aAZCTX.ComputeCOMSpeed(TmaxX,aFPX.CoMSpeedNew);
+	aAZCTX.ComputeZMP(TmaxX,aFPX.ZMPNew,IndexStartingInterval);
+	aAZCTX.ComputeZMPSpeed(TmaxX,aFPX.ZMPSpeedNew);
+	
+	aAZCTY.ComputeCOM(TmaxY,aFPY.CoMNew,IndexStartingInterval);
+	ODEBUG("FPY.COMInit :" << aFPY.CoMInit << " FPY.CoMNew: " << aFPY.CoMNew );
+	aAZCTY.ComputeCOMSpeed(TmaxY,aFPY.CoMSpeedNew);
+	aAZCTY.ComputeZMP(TmaxY,aFPY.ZMPNew,IndexStartingInterval);
+	aAZCTY.ComputeZMPSpeed(TmaxY,aFPY.ZMPSpeedNew);
+#endif
 	
 	TCX = TimeCompensationForZMPFluctuation(aFPX,NewTj);
 	TCY = TimeCompensationForZMPFluctuation(aFPY,NewTj); 

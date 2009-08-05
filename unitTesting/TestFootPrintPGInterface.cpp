@@ -66,6 +66,21 @@ string ProfilesNames[17] = {
   "PROFIL_SIMU_ONLINE_WALKING"
 };
 
+#define NBOFPREDEFONLINEFOOTSTEPS 11
+double OnLineFootSteps[NBOFPREDEFONLINEFOOTSTEPS][3]={
+  { -0.00221439, -0.00123569, -2.23518e-182},
+  { -0.000699088, -0.00170217, -4.21367e-182},
+  { -0.000208854, 0.00162538, -6.78877e-183},
+  { -0.00058683, -0.0020374, -1.2328e-182},
+  { -5.73453e-06, 0.00119127, -1.59333e-183},
+  { -0.000696306, -0.00252192, -2.88263e-183},
+  { -0.000278527, 0.000492459, -4.2968e-184},
+  { -0.000536233, -0.0021008, -7.82941e-184},
+  { -0.000191246, 0.00125745, -1.16966e-184},
+  { -0.00053683, -0.00232864, -2.08273e-184},
+  { -0.000168054, 0.00108031, -3.26998e-185}
+};
+
 void CommonInitialization(PatternGeneratorInterface &aPGI)
 {
   const char lBuffer[12][256] =
@@ -633,9 +648,15 @@ void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI)
   }
 
   {
-    istringstream strm2(":StartOnLineStepSequencing 0.0 -0.105 0.0 \
+    istringstream strm2(":SetAutoFirstStep false");
+    aPGI.ParseCmd(strm2);
+  }
+
+  {
+    istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0 \
                      0.0 0.19 0.0 \
-                     0.0 -0.19 0.0");
+                     0.0 -0.19 0.0 \
+                     0.0 0.19 0.0");
     aPGI.ParseCmd(strm2);
   }
 }
@@ -771,6 +792,7 @@ int main(int argc, char *argv[])
   PatternGeneratorInterface * aPGI;
   aPGI = patternGeneratorInterfaceFactory(aHDR);
 
+  bool conversiontoradneeded=true;
 
   //  cout << "before PGI " << endl;
   // Initial position;
@@ -833,7 +855,28 @@ int main(int argc, char *argv[])
     -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
   };
 #endif
+  // Position for  interaction
+#if 0
 
+  double dInitPos[40] = { 
+#if 1
+    -8.41612e-05, -0.000321953, -0.436642, 0.872997, -0.434218, 0.00189464,
+    -8.47913e-05, -2.10591e-05, -0.437037, 0.873512, -0.433726, 3.73681e-05, //legs
+#else
+    0.,    0.,  -0.4537856,    0.8726646,  -0.4188790,    0.,
+    0.,    0.,  -0.4537856,    0.8726646,  -0.4188790,    0.,
+#endif 
+    0.000169362, 2.98267e-18,  // chest
+    -1.34701e-10, 5.62876e-10, // head 
+
+    0.427868, -0.321049, -0.0696696, -1.90803, -0.323627, -0.0845895, 0.199999, // right arm
+    0.458665,  0.322058,  0.0772106, -1.93087,  0.324485, -0.0914427, 0.199999, // left arm
+    
+    -0.174533, 0.174533, -0.174533, 0.174533, -0.174533, // right hand
+    -0.174533, 0.174533, -0.174533, 0.174533, -0.174533  // left hand
+  };
+  conversiontoradneeded=false;
+#endif
 #if 0
 // Strange position 1
   double dInitPos[40] = 
@@ -865,8 +908,12 @@ int main(int argc, char *argv[])
   // This is a vector corresponding to the DOFs actuated of the robot.
   MAL_VECTOR_DIM(InitialPosition,double,40);
   //MAL_VECTOR_DIM(CurrentPosition,double,40);
-  for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
-    InitialPosition(i) = dInitPos[i]*M_PI/180.0;
+  if (conversiontoradneeded)
+    for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
+      InitialPosition(i) = dInitPos[i]*M_PI/180.0;
+  else
+    for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
+      InitialPosition(i) = dInitPos[i];
   aPGI->SetCurrentJointValues(InitialPosition);
 
   // Specify the walking mode: here the default one.
@@ -914,7 +961,7 @@ int main(int argc, char *argv[])
   FootAbsolutePosition LeftFootPosition;
   FootAbsolutePosition RightFootPosition;
 
-  bool DebugConfiguration = true;
+  bool DebugConfiguration = false;
   bool DebugFGPI = true;
   unsigned int PGIInterface = 0;
   
@@ -971,7 +1018,7 @@ int main(int argc, char *argv[])
   double totaltimeinplanning=0;
   double newtime=0,deltatime=0;
   unsigned long int nbofmodifs=0;
-
+  
   gettimeofday(&startingtime,0);
   for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
     {
@@ -1112,7 +1159,7 @@ int main(int argc, char *argv[])
 			      
 	  if (TestProfil==PROFIL_ANALYTICAL_ONLINE_WALKING)
 	    {
-	      if (NbOfIt>30*200) /* Stop after 30 seconds the on-line stepping */
+	      if (NbOfIt>50*200) /* Stop after 30 seconds the on-line stepping */
 		{
 		  StopOnLineWalking(*aPGI);
 		}
@@ -1120,7 +1167,9 @@ int main(int argc, char *argv[])
 		
 		//if ((NbOfIt>(8.82*200)) && 
 		//		double triggertime = 9.64*200 + deltatime*200;
-		double triggertime = 12.44*200 + deltatime*200;
+		//double triggertime = 12.44*200 + deltatime*200;
+		// double triggertime = 2.455*200 + deltatime*200;
+		double triggertime = 9.64*200 + deltatime*200;
 		if ((NbOfIt>triggertime) && 
 		    TestChangeFoot)
 		  {
@@ -1128,9 +1177,18 @@ int main(int argc, char *argv[])
 		    PatternGeneratorJRL::FootAbsolutePosition aFAP;
 		    //aFAP.x=0.2;
 		    //aFAP.y=-0.09;
-		    aFAP.x=0.1;
-		    aFAP.y=0.0;
-		    aFAP.theta=5.0;
+		    if (nbofmodifs<NBOFPREDEFONLINEFOOTSTEPS)
+		      {
+			aFAP.x = OnLineFootSteps[nbofmodifs][0];
+			aFAP.y = OnLineFootSteps[nbofmodifs][1];
+			aFAP.theta = OnLineFootSteps[nbofmodifs][2];
+		      }
+		    else
+		      {
+			aFAP.x=0.1;
+			aFAP.y=0.0;
+			aFAP.theta=5.0;
+		      }
 		    gettimeofday(&beginmodif,0);
 		    aPGI->ChangeOnLineStep(0.805,aFAP,newtime);
 		    deltatime += newtime+0.025;
@@ -1139,7 +1197,8 @@ int main(int argc, char *argv[])
 		    //istringstream strm2(":parsecmd :addstandardonlinestep 0.2 0.0 0.0");
 		    //aPGI->ParseCmd(strm2);
 		    gettimeofday(&endmodif,0);
-		    timemodif = endmodif.tv_sec-beginmodif.tv_sec + 0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
+		    timemodif = endmodif.tv_sec-beginmodif.tv_sec + 
+		      0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
 		    totaltimemodif += timemodif;
 		    nbofmodifs++;
 		    TestChangeFoot=true;
