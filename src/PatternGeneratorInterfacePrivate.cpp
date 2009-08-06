@@ -557,11 +557,11 @@ namespace PatternGeneratorJRL {
     CoMPos(1,0) = sincomyaw; CoMPos(1,1) =  coscomyaw; CoMPos(1,2) = lStartingCOMPosition.y[0];
     CoMPos(2,0) = 0.0;       CoMPos(2,1) = 0.0;        CoMPos(2,2) = 1.0;
 
-    ODEBUG3("InitLeftFoot:" <<  InitLeftFootAbsPos.x
+    ODEBUG("InitLeftFoot:" <<  InitLeftFootAbsPos.x
 	    << " " << InitLeftFootAbsPos.y
 	    << " " <<InitLeftFootAbsPos.theta);
 
-    ODEBUG3("InitRightFoot:" <<  InitRightFootAbsPos.x
+    ODEBUG("InitRightFoot:" <<  InitRightFootAbsPos.x
 	    << " " << InitRightFootAbsPos.y
 	    << " " <<InitRightFootAbsPos.theta);
 
@@ -587,8 +587,8 @@ namespace PatternGeneratorJRL {
     InitPos(1,0) = sininitfoottheta; InitPos(1,1) =  cosinitfoottheta; InitPos(1,2) = lsy;
     InitPos(2,0) = 0.0;              InitPos(2,1) = 0.0;               InitPos(2,2) = 1.0;
     
-    ODEBUG3("InitPos:" << InitPos);
-    ODEBUG3("CoMPos: " << CoMPos);
+    ODEBUG("InitPos:" << InitPos);
+    ODEBUG("CoMPos: " << CoMPos);
 
     MAL_S3x3_MATRIX(iCoMPos,double);
     MAL_S3x3_INVERSE(CoMPos,iCoMPos,double);
@@ -602,7 +602,7 @@ namespace PatternGeneratorJRL {
     memset(&aRFP,0,sizeof(aRFP));
     aRFP.sx = InitialMotion(0,2); aRFP.sy = InitialMotion(1,2);
     aRFP.theta = atan2(InitialMotion(1,0),InitialMotion(0,0));
-    ODEBUG3("Initial motion: " << InitialMotion);
+    ODEBUG("Initial motion: " << InitialMotion);
     ODEBUG("lRelativeFootPositions:"<<lRelativeFootPositions.size());
     ODEBUG("AutomaticallyAddFirstStep: "<< aRFP.sx << " " << aRFP.sy << " " <<aRFP.theta);
 
@@ -666,14 +666,14 @@ namespace PatternGeneratorJRL {
 	if (!ClearStepStackHandler)
 	  {
 	    m_StepStackHandler->PushFrontAStepInTheStack(lRelativeFootPositions[0]);
-	    ODEBUG3("Push a position in stack of steps:"<<
+	    ODEBUG("Push a position in stack of steps:"<<
 		   lRelativeFootPositions[0].sx << " " <<
 		   lRelativeFootPositions[0].sy << " " <<
 		   lRelativeFootPositions[0].theta); 
 	  }
       }
 
-    ODEBUG3("StartingCOMPosition: " << lStartingCOMPosition.x[0] 
+    ODEBUG("StartingCOMPosition: " << lStartingCOMPosition.x[0] 
 	    << " "  << lStartingCOMPosition.y[0]
 	    << " "  << lStartingCOMPosition.z[0]);
     ODEBUG4("StartingCOMPosition: " << lStartingCOMPosition.x[0] << " "  << lStartingCOMPosition.y[0],"DebugData.txt");

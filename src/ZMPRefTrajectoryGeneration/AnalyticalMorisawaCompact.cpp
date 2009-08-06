@@ -1647,20 +1647,20 @@ namespace PatternGeneratorJRL
       aFP.ZMPNew = 0.0;
 
 
-    ODEBUG3( aFP.CoMInit  << " " << aFP.ZMPInit << " " << aFP.CoMSpeedInit  << " " << aFP.ZMPSpeedInit ); 
-    ODEBUG3( aFP.CoMNew  << " " << aFP.ZMPNew << " " << aFP.CoMSpeedNew  << " " << aFP.ZMPSpeedNew ); 
+    ODEBUG( aFP.CoMInit  << " " << aFP.ZMPInit << " " << aFP.CoMSpeedInit  << " " << aFP.ZMPSpeedInit ); 
+    ODEBUG( aFP.CoMNew  << " " << aFP.ZMPNew << " " << aFP.CoMSpeedNew  << " " << aFP.ZMPSpeedNew ); 
     ODEBUG("m_Omagej[0]:" << m_Omegaj[0] );
 
-    ODEBUG3("m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit)" << m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit));
-    ODEBUG3("(aFP.CoMSpeedInit - aFP.ZMPSpeedInit)" << (aFP.CoMSpeedInit - aFP.ZMPSpeedInit));
+    ODEBUG("m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit)" << m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit));
+    ODEBUG("(aFP.CoMSpeedInit - aFP.ZMPSpeedInit)" << (aFP.CoMSpeedInit - aFP.ZMPSpeedInit));
     double rden= ( m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit) + (aFP.CoMSpeedInit - aFP.ZMPSpeedInit) );
-    if (fabs(rden)<1e-7)
+    if (fabs(rden)<1e-5)
       rden = 0.0;
 
-    ODEBUG3("m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew)" << m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew));
-    ODEBUG3("(aFP.CoMSpeedNew - aFP.ZMPSpeedNew)"<<(aFP.CoMSpeedNew - aFP.ZMPSpeedNew));
+    ODEBUG("m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew)" << m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew));
+    ODEBUG("(aFP.CoMSpeedNew - aFP.ZMPSpeedNew)"<<(aFP.CoMSpeedNew - aFP.ZMPSpeedNew));
     double rnum = (m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew) + (aFP.CoMSpeedNew - aFP.ZMPSpeedNew));
-    ODEBUG3("r= " <<rnum << " /" <<rden );
+    ODEBUG("r= " <<rnum << " /" <<rden );
     if (rden==0.0)
       r=0.0;
     else r = rnum/rden;
@@ -1758,14 +1758,14 @@ namespace PatternGeneratorJRL
 							   StepStackHandler * aStepStackHandler)
   {
     double LocalTime = t - m_AbsoluteTimeReference;
-    double FinalTime;
-    unsigned int IndexStartingInterval;
-    int RetourTC;
+    double FinalTime=0.0;
+    unsigned int IndexStartingInterval=0;
+    int RetourTC=0;
 
-    double Tmax,NewTj;
-    double TmaxX,TmaxY;
+    double NewTj=0.0;
+    double TmaxX=0.0,TmaxY=0.0;
     FluctuationParameters aFPX,aFPY;
-    double TCX, TCY, TCMax;
+    double TCX=0.0, TCY=0.0, TCMax=0.0;
 
     /* Perform First Time Change i.e. recomputing the proper Tj */
     if ((RetourTC=TimeChange(LocalTime,
@@ -1798,8 +1798,10 @@ namespace PatternGeneratorJRL
 	TmaxX = aAZCTX.FluctuationMaximal();
 	ODEBUG("Tmax X Init :" << Tmax );
 	aAZCTX.ComputeCOM(t,aFPX.CoMInit,IndexStartingInterval);
+	ODEBUG("COM X: " << aFPX.CoMInit);
 	aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedInit);
 	aAZCTX.ComputeZMP(t,aFPX.ZMPInit,IndexStartingInterval);
+	ODEBUG("ZMP X: " << aFPX.ZMPInit);
 	aAZCTX.ComputeZMPSpeed(t,aFPX.ZMPSpeedInit);
 	
 	/* Compute the time of maximal fluctuation for the initial solution along the Y axis.*/
@@ -1812,7 +1814,8 @@ namespace PatternGeneratorJRL
 	ODEBUG("ZMP Y: " << aFPY.ZMPInit);
 	aAZCTY.ComputeZMPSpeed(t,aFPY.ZMPSpeedInit);
 	
-	
+	ODEBUG("NextStep X:" << NewFootAbsPos[0].x);
+	ODEBUG("NextStep Y:" << NewFootAbsPos[0].y);
 	/* Adapt the ZMP profil of aCTPIX and aCTPIY 
 	   according to IndexStep */
 	ChangeZMPProfil(IndexStep,NewFootAbsPos,
@@ -1831,31 +1834,17 @@ namespace PatternGeneratorJRL
 	ComputeTrajectory(aCTIPY,aAZCTY);
 	ComputeTrajectory(aCTIPX,aAZCTX);
 	
-#if 1
-	aAZCTX.ComputeCOM(t,aFPX.CoMNew,IndexStartingInterval);
+	aAZCTX.ComputeCOM(t,aFPX.CoMNew);
 	ODEBUG( "FPX.COMInit :" << aFPX.CoMInit << " FPX.CoMNew: " << aFPX.CoMNew);
 	aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedNew);
-	aAZCTX.ComputeZMP(t,aFPX.ZMPNew,IndexStartingInterval);
+	aAZCTX.ComputeZMP(t,aFPX.ZMPNew);
 	aAZCTX.ComputeZMPSpeed(t,aFPX.ZMPSpeedNew);
 	
-	aAZCTY.ComputeCOM(t,aFPY.CoMNew,IndexStartingInterval);
+	aAZCTY.ComputeCOM(t,aFPY.CoMNew);
 	ODEBUG("FPY.COMInit :" << aFPY.CoMInit << " FPY.CoMNew: " << aFPY.CoMNew );
 	aAZCTY.ComputeCOMSpeed(t,aFPY.CoMSpeedNew);
-	aAZCTY.ComputeZMP(t,aFPY.ZMPNew,IndexStartingInterval);
+	aAZCTY.ComputeZMP(t,aFPY.ZMPNew);
 	aAZCTY.ComputeZMPSpeed(t,aFPY.ZMPSpeedNew);
-#else
-	aAZCTX.ComputeCOM(TmaxX,aFPX.CoMNew,IndexStartingInterval);
-	ODEBUG( "FPX.COMInit :" << aFPX.CoMInit << " FPX.CoMNew: " << aFPX.CoMNew);
-	aAZCTX.ComputeCOMSpeed(TmaxX,aFPX.CoMSpeedNew);
-	aAZCTX.ComputeZMP(TmaxX,aFPX.ZMPNew,IndexStartingInterval);
-	aAZCTX.ComputeZMPSpeed(TmaxX,aFPX.ZMPSpeedNew);
-	
-	aAZCTY.ComputeCOM(TmaxY,aFPY.CoMNew,IndexStartingInterval);
-	ODEBUG("FPY.COMInit :" << aFPY.CoMInit << " FPY.CoMNew: " << aFPY.CoMNew );
-	aAZCTY.ComputeCOMSpeed(TmaxY,aFPY.CoMSpeedNew);
-	aAZCTY.ComputeZMP(TmaxY,aFPY.ZMPNew,IndexStartingInterval);
-	aAZCTY.ComputeZMPSpeed(TmaxY,aFPY.ZMPSpeedNew);
-#endif
 	
 	TCX = TimeCompensationForZMPFluctuation(aFPX,NewTj);
 	TCY = TimeCompensationForZMPFluctuation(aFPY,NewTj); 

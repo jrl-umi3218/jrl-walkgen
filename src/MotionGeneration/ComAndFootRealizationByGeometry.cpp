@@ -54,7 +54,7 @@ ComAndFootRealizationByGeometry::ComAndFootRealizationByGeometry(PatternGenerato
   RESETDEBUG4("COMPC1.dat");
   RESETDEBUG4("DebugDataIK.dat");
   RESETDEBUG4("DebugDatamDtL.dat");
-  RESETDEBUG5("DebugDataStartingCOM.dat");
+  RESETDEBUG4("DebugDataStartingCOM.dat");
 
   RESETDEBUG4("DebugDataCOMForHeuristic.txt");
   RESETDEBUG4("DebugDataIKArms.txt");
@@ -424,7 +424,7 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 	   << lFootPosition[0] << " "
 	   << lFootPosition[1] << " "
 	   << lFootPosition[2] ,"DebugDataStartingCOM.dat");
-  ODEBUG3( "Right Foot Position: "
+  ODEBUG( "Right Foot Position: "
 	  << lFootPosition[0] << " "
 	  << lFootPosition[1] << " " 
 	  << lFootPosition[2]);
@@ -505,14 +505,14 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
 	   << lFootPosition[0] << " "
 	   << lFootPosition[1] << " "
 	   << lFootPosition[2] << " ","DebugDataStartingCOM.dat");
-  ODEBUG3( "Left Foot Position: "
+  ODEBUG( "Left Foot Position: "
 	   << lFootPosition[0] << " "
 	   << lFootPosition[1] << " "
 	   << lFootPosition[2] );
   // CoM position
 
   lStartingCOMPosition = getHumanoidDynamicRobot()->positionCenterOfMass();
-  ODEBUG5( "COM positions: "
+  ODEBUG4( "COM positions: "
 	   << lStartingCOMPosition[0] << " "
 	   << lStartingCOMPosition[1] << " "
 	   << lStartingCOMPosition[2],"DebugDataStartingCOM.dat");
@@ -620,15 +620,15 @@ bool ComAndFootRealizationByGeometry::InitializationCoM(MAL_VECTOR(,double) &Bod
   lStartingWaistPose(4) = 0.0;
   lStartingWaistPose(5) = 0.0;
 
-  ODEBUG5( "Init Left Foot Position: "
+  ODEBUG4( "Init Left Foot Position: "
 	   << InitLeftFootPosition.x << " "
 	   << InitLeftFootPosition.y << " "
 	   << InitLeftFootPosition.z << " ","DebugDataStartingCOM.dat");
-  ODEBUG5( "Init Right Foot Position: "
+  ODEBUG4( "Init Right Foot Position: "
 	   << InitRightFootPosition.x << " "
 	   << InitRightFootPosition.y << " "
 	   << InitRightFootPosition.z << " ","DebugDataStartingCOM.dat");
-  ODEBUG5( "Init Waist Position: "
+  ODEBUG4( "Init Waist Position: "
 	   << WaistPosition[0] << " "
 	   << WaistPosition[1] << " "
 	   << WaistPosition[2] << " ","DebugDataStartingCOM.dat");
