@@ -113,11 +113,14 @@ add_subdirectory(unitTesting)
 
 # Prepare the documentation
 # -------------------------
-INCLUDE(FindDoxygen)
-IF(DOXYGEN_FOUND)
-  MESSAGE(STATUS "Doxygen found")
-  add_subdirectory(doc)
-ENDIF(DOXYGEN_FOUND)
+OPTION(GENERATE_DOC 0 "Generate html documentation")
+IF (GENERATE_DOC)
+  INCLUDE(FindDoxygen)
+  IF(DOXYGEN_FOUND)
+    MESSAGE(STATUS "Doxygen found")
+	ADD_SUBDIRECTORY(doc)
+  ENDIF(DOXYGEN_FOUND)
+ENDIF (GENERATE_DOC)
 
 # Prepare description file for pkg-config.
 #-----------------------------------------
