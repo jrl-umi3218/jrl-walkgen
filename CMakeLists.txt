@@ -97,6 +97,13 @@ MESSAGE(STATUS "omniORB4: ${OMNIORB4_DIR}")
 # -----------------
 INCLUDE(${CMAKE_MODULE_PATH}/FindOpenHRP.cmake)
 
+# Optimisation flags when building with RELEASE
+#----------------------------------------------
+IF(CMAKE_BUILD_TYPE MATCHES "RELEASE")
+  IF(CMAKE_COMPILER_IS_GNUCXX)
+    SET (${PROJECT_NAME}_CXXFLAGS "-O3 -funroll-loops -frerun-loop-opt -fschedule-insns2 -frerun-cse-after-loop -falign-functions -falign-labels -falign-loops -falign-jumps -fexpensive-optimizations ${${PROJECT_NAME}_CXXFLAGS}")
+  ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+ENDIF(CMAKE_BUILD_TYPE MATCHES "RELEASE")
 
 # To deal with the headers.
 #--------------------------
