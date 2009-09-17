@@ -27,7 +27,7 @@ FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginM
   m_Foot= aFoot;  
   m_SamplingPeriod = 0.005;
 
-  string aMethodName[5] = 
+  std::string aMethodName[5] = 
     {":omega",
      ":stepheight", 
      ":singlesupporttime",

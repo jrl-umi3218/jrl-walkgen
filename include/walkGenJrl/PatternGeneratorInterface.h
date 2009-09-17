@@ -86,7 +86,7 @@ namespace PatternGeneratorJRL
 					       MAL_VECTOR(  & ,double) BodyAnglesIni,
 					       FootAbsolutePosition & InitLeftFootAbsPos, 
 					       FootAbsolutePosition & InitRightFootAbsPos,
-					       deque<RelativeFootPosition> & lRelativeFootPositions,
+						   std::deque<RelativeFootPosition> & lRelativeFootPositions,
 					       std::vector<double> & lCurrentJointValues,
 					       bool ClearStepStackHandler)=0;
 
@@ -161,7 +161,7 @@ namespace PatternGeneratorJRL
 				     MAL_VECTOR( &dql,double))=0;
 
     /*! \brief Read a sequence of steps. */
-    virtual void ReadSequenceOfSteps(istringstream &strm)=0;
+	virtual void ReadSequenceOfSteps(std::istringstream &strm)=0;
     
     /*! \name On-line steps related methods 
       @{
@@ -199,7 +199,7 @@ namespace PatternGeneratorJRL
       This method uses a different format with stream of strings.
       @param[in] Time: Time information of the step. 
       @return nothing */
-    virtual void ChangeOnLineStep(istringstream &strm,double &newtime)=0;
+	virtual void ChangeOnLineStep(std::istringstream &strm,double &newtime)=0;
 
     /*! @} */
 

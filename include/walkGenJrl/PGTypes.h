@@ -90,7 +90,7 @@ namespace PatternGeneratorJRL
     MAL_MATRIX(A,double);
     MAL_MATRIX(B,double);
     MAL_VECTOR(Center,double);
-    vector<int> SimilarConstraints;
+	std::vector<int> SimilarConstraints;
     double StartingTime, EndingTime;
   };
   typedef struct LinearConstraintInequality_s 

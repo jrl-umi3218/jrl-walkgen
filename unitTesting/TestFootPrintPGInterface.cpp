@@ -25,6 +25,7 @@
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
 using namespace::PatternGeneratorJRL;
+using namespace std;
 
 enum Profiles  {
   PROFIL_PB_FLORENT,                                 //  0
