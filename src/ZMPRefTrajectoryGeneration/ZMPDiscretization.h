@@ -217,10 +217,25 @@ namespace PatternGeneratorJRL
 	m_ZMPNeutralPosition[0] = aZMPNeutralPosition[0];
 	m_ZMPNeutralPosition[1] = aZMPNeutralPosition[1];
       }
+      
+    private:
+      
+      /*! \brief Register Methods for scripting. 
+	This method register prevzmpinitprofil, zeroinitprofil,
+	and previewcontroltime as accessible through scripting.
+       */
+      void RegisterMethodsForScripting();
 
+      /*! \brief Initialize filter */
+      void InitializeFilter();
+      
 
-   private:
+      /*! \brief Reset a data file from its name. */
+      void ResetADataFile(string &aDataFile);
 
+      /*! \brief Dump references */
+      void DumpReferences(deque<ZMPPosition> &FinalZMPPositions,
+			  deque<ZMPPosition> &ZMPPositions);
 
       /* ! ModulationSupportCoefficient coeeficient to wait a little before foot is of the ground */
       double m_ModulationSupportCoefficient;

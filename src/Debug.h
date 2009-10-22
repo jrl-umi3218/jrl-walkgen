@@ -28,19 +28,21 @@ DebugFile << __FILE__ << ":" \
 
 #define ODEBUG3_NENDL(x) std::cerr << x
 
-#if 0
+#ifdef _DEBUG_MODE_ON_
 #define ODEBUG(x) std::cerr << __FILE__ << ":" \
                             << __FUNCTION__ << "(#" \
                             << __LINE__ << "):" << x << std::endl;
 
 #define ODEBUG_NENDL(x) std::cerr << x
 
+#define ODEBUG_CODE(x) x
 #else
 #define ODEBUG(x)
 #define ODEBUG_NENDL(x) 
+#define ODEBUG_CODE(x)
 #endif
 
-#if 0
+#ifdef _DEBUG_MODE_ON_
 #define RESETDEBUG4(y) { std::ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
 #define ODEBUG4(x,y) { std::ofstream DebugFile; DebugFile.open(y,ofstream::app); \
     DebugFile << __FILE__ << ":" \

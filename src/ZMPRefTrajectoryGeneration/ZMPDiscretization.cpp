@@ -10,26 +10,9 @@
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
-   
-   Redistribution and use in source and binary forms, with or without modification, 
-   are permitted provided that the following conditions are met:
-   
-   * Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-   * Neither the name of the CNRS/AIST nor the names of its contributors 
-   may be used to endorse or promote products derived from this software without specific prior written permission.
-   
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
-   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
-   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   Please see License.txt for further information on license.            
+
 */
 #ifdef UNIX
 #include <sys/time.h>
@@ -38,6 +21,9 @@
 #include <time.h>
 #include <iostream>
 #include <fstream>
+
+#define _DEBUG_MODE_ON_
+#include <Debug.h>
 
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #include <Mathematics/ConvexHull.h>
@@ -49,27 +35,6 @@ inline double round( double d )
 
 using namespace::PatternGeneratorJRL;
 
-#define ODEBUG3(x)  std::cout << x << endl;
-
-#if 0
-#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile <<  x << endl; DebugFile.close();}
-#else
-#define RESETDEBUG4(y) 
-#define ODEBUG4(x,y) 
-#endif
-
-#define RESETDEBUG6(y) 
-#define ODEBUG6(x,y) 
-
-#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << x << endl; DebugFile.close();}
-#define ODEBUG5NOE(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << x ; DebugFile.close();}
-#if 1
-#define ODEBUG(x)
-#else
-#define ODEBUG(x)  std::cout << x << endl;
-#endif
 
 
 OnLineState::OnLineState()
@@ -116,6 +81,7 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile,
 
   m_RelativeFootPositions.clear();
 
+#if 0
   //  m_Omega = 3.0;
   //m_Omega = 1.0;
   m_Omega =0.0;
@@ -126,20 +92,12 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile,
   m_PreviewControlTime = 1.6;
   //m_StepHeight = 0.07;
   m_StepHeight = 0.12;
+#endif
 
   m_ModulationSupportCoefficient=0.9;
-    
-  if (DataFile.length()!=0)
-    {
-      std::ifstream a_iof;
-      a_iof.open(DataFile.c_str(),std::ifstream::in);
-      if (a_iof.is_open())
-	{
-	  
-	  a_iof.close();
-	}
-      
-    }
+
+  ResetADataFile(DataFile);
+
   m_ZMPShift.resize(4);
   for (unsigned int i=0;i<4;i++)
     m_ZMPShift[i]=0.0;
@@ -157,32 +115,17 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile,
 
   m_PrevCurrentSupportFootPosition = m_CurrentSupportFootPosition;
   
-  // Create the window for the filter.
-  double T=0.05; // Arbritrary from Kajita's San Matlab files.
-  int n=0;
-  double sum=0,tmp=0;
-
-  n = (int)floor(T/m_SamplingPeriod);
-  m_ZMPFilterWindow.resize(n+1);
-  for(int i=0;i<n+1;i++)
-    {
-      tmp =sin((M_PI*i)/n);
-      m_ZMPFilterWindow[i]=tmp*tmp;
-    }
-
-  for(int i=0;i<n+1;i++)
-    sum+= m_ZMPFilterWindow[i];
-
-  for(int i=0;i<n+1;i++)
-    m_ZMPFilterWindow[i]/= sum;
-
   // Prepare size of the matrix used in on-line walking
   MAL_MATRIX_RESIZE(m_vdiffsupppre,2,1);
   for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(m_vdiffsupppre);i++)
     m_vdiffsupppre(i,0) = 0.0;
 
   RESETDEBUG4("DebugDataRFPos.txt");
+  RESETDEBUG4("DebugZMPRefPos.dat");
+  RESETDEBUG4("DebugFinalZMPRefPos.dat");
 
+  // Add internal methods specific to this class.
+  RegisterMethodsForScripting();
 }
 
 ZMPDiscretization::~ZMPDiscretization()
@@ -248,6 +191,20 @@ void ZMPDiscretization::DumpFootAbsolutePosition(string aFileName,
   
 }
 
+void ZMPDiscretization::ResetADataFile(string &DataFile)
+{
+  if (DataFile.length()!=0)
+    {
+      std::ifstream a_iof;
+      a_iof.open(DataFile.c_str(),std::ifstream::in);
+      if (a_iof.is_open())
+	{
+	  
+	  a_iof.close();
+	}
+      
+    }
+}
 void ZMPDiscretization::DumpDataFiles(string ZMPFileName, string FootFileName,
 				      deque<ZMPPosition> & ZMPPositions,
 				      deque<FootAbsolutePosition> & SupportFootAbsolutePositions)
@@ -274,6 +231,29 @@ void ZMPDiscretization::DumpDataFiles(string ZMPFileName, string FootFileName,
 	}
       aof.close();
     }
+}
+
+void ZMPDiscretization::InitializeFilter()
+{
+  // Create the window for the filter.
+  double T=0.05; // Arbritrary from Kajita's San Matlab files.
+  int n=0;
+  double sum=0,tmp=0;
+  
+  n = (int)floor(T/m_SamplingPeriod);
+  m_ZMPFilterWindow.resize(n+1);
+  for(int i=0;i<n+1;i++)
+    {
+      tmp =sin((M_PI*i)/n);
+      m_ZMPFilterWindow[i]=tmp*tmp;
+    }
+
+  for(int i=0;i<n+1;i++)
+    sum+= m_ZMPFilterWindow[i];
+
+  for(int i=0;i<n+1;i++)
+    m_ZMPFilterWindow[i]/= sum;
+
 }
 
 void ZMPDiscretization::FilterZMPRef(deque<ZMPPosition> &ZMPPositionsX,
@@ -348,9 +328,12 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   ODEBUG4("ZMP::InitOnLine - Step 1 ","ZMDInitOnLine.txt");
 
   // Initialize position of the current support foot.
-  m_CurrentSupportFootPosition(0,0) = 1;   m_CurrentSupportFootPosition(0,1) = 0;   m_CurrentSupportFootPosition(0,2) = 0;
-  m_CurrentSupportFootPosition(1,0) = 0;   m_CurrentSupportFootPosition(1,1) = 1;   m_CurrentSupportFootPosition(1,2) = 0;
-  m_CurrentSupportFootPosition(2,0) = 0;   m_CurrentSupportFootPosition(2,1) = 0;   m_CurrentSupportFootPosition(2,2) = 1;
+  for(unsigned int i=0;i<3;i++)
+    for(unsigned int j=0;j<3;j++)
+      if (i==j)
+	m_CurrentSupportFootPosition(i,j) = 1.0;   
+      else
+	m_CurrentSupportFootPosition(i,j) = 0.0;   
 
   m_PrevCurrentSupportFootPosition = m_CurrentSupportFootPosition;
 
@@ -372,7 +355,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
     // Initialize who is support foot.
   double CurrentAbsZMPTheta=0;
   CurrentAbsZMPTheta = (CurrentRightFootAbsPos.theta + CurrentLeftFootAbsPos.theta)/2.0;
-  ODEBUG("CurrentZMPTheta at start: " << CurrentZMPTheta << " " 
+  ODEBUG("CurrentZMPTheta at start: " << " " 
 	  << CurrentRightFootAbsPos.theta << " " 
 	  << CurrentLeftFootAbsPos.theta);
   if (RelativeFootPositions[0].sy < 0 )
@@ -653,6 +636,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   ODEBUG("m_vdiffsupppre : " << m_vdiffsupppre); 
   double px0,py0,theta0, delta_x,delta_y;
 
+  ODEBUG("FinalZMPPositions.size() = " <<FinalZMPPositions.size());
   // Initial value to start the new ZMP profile.
   px0 = FinalZMPPositions.back().px;
   py0 = FinalZMPPositions.back().py;
@@ -672,9 +656,9 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   delta_y = (ZMPInWorldCoordinates(1) - py0)/SizeOf1stPhase;
   
   ODEBUG("delta_x :"<< delta_x << " delta_y : " << delta_y << " m_CurrentSFP: " <<
-	  m_CurrentSupportFootPosition << " ZMPInFC : " << 
-	  ZMPInFootCoordinates << " ZMPinWC : " << 
-	  ZMPInWorldCoordinates
+	 m_CurrentSupportFootPosition << " ZMPInFC : " << 
+	 ZMPInFootCoordinates << " ZMPinWC : " << 
+	 ZMPInWorldCoordinates << " px0: " << px0 << " py0:" << py0 
 	  );
   ODEBUG4("Step 4 TimeForThisFootPosition " << TimeForThisFootPosition,"DebugData.txt");  
   
@@ -808,11 +792,10 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       NextTheta=0.0;
       lStepHeight = 0.0;
     }
-#if 0
-  cout << "vrel: " << vrel(0,0) << " " << vrel(1,0) << endl;
-  cout << "vdiffsupp: " << vdiffsupp(0,0) << " " << vdiffsupp(1,0) << endl;
-  cout << "vdiffsupppre: " << vdiffsupppre(0,0) << " " << vdiffsupppre(1,0) << endl;
-#endif
+
+  ODEBUG(cout << "vrel: " << vrel(0,0) << " " << vrel(1,0));
+  ODEBUG(cout << "vdiffsupp: " << vdiffsupp(0,0) << " " << vdiffsupp(1,0));
+  ODEBUG( "vdiffsupppre: " << m_vdiffsupppre(0,0) << " " << m_vdiffsupppre(1,0));
 
   ODEBUG4(" GetZMPDiscretization: Step 6 " << ZMPPositions.size() << " " ,"DebugData.txt");
 
@@ -894,15 +877,19 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 		{	
 		  delta_x = (m_CurrentSupportFootPosition(0,2)+m_ZMPShift[1] - px02)/SizeOfSndPhase;
 		  delta_y = (m_CurrentSupportFootPosition(1,2) - py02)/SizeOfSndPhase;
-		  //delta_x = (CurrentSupportFootPosition(0,2)+m_ZMPShift3End - px02)/SizeOfSndPhase;
-		  //delta_y = (CurrentSupportFootPosition(1,2)+(WhoIsSupportFoot)*m_ZMPShift3EndY - py02)/SizeOfSndPhase;
+		  //delta_x = (CurrentSupportFootPosition(0,2)+
+		  // m_ZMPShift3End - px02)/SizeOfSndPhase;
+		  //delta_y = (CurrentSupportFootPosition(1,2)+
+		  // (WhoIsSupportFoot)*m_ZMPShift3EndY - py02)/SizeOfSndPhase;
 		}
 	      else
 		{
 		  delta_x = (m_CurrentSupportFootPosition(0,2)+m_ZMPShift[3] - px02)/SizeOfSndPhase;
 		  delta_y = (m_CurrentSupportFootPosition(1,2)- py02)/SizeOfSndPhase;
-		  //delta_x = (CurrentSupportFootPosition(0,2)+m_ZMPShift4End - px02)/SizeOfSndPhase;
-		  //delta_y = (CurrentSupportFootPosition(1,2)+(WhoIsSupportFoot)*m_ZMPShift4EndY - py02)/SizeOfSndPhase;
+		  //delta_x = (CurrentSupportFootPosition(0,2)+
+		  // m_ZMPShift4End - px02)/SizeOfSndPhase;
+		  //delta_y = (CurrentSupportFootPosition(1,2)+
+		  // (WhoIsSupportFoot)*m_ZMPShift4EndY - py02)/SizeOfSndPhase;
 		}
 	
 	      ZMPPositions[CurrentZMPindex].px = ZMPPositions[CurrentZMPindex-1].px + delta_x;
@@ -985,6 +972,8 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
     }
   FilterOutValues(ZMPPositions,
 		  FinalZMPPositions,false);		  
+
+  ODEBUG_CODE(DumpReferences(FinalZMPPositions,ZMPPositions));
   
   if (EndSequence)
     {
@@ -996,16 +985,29 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 			   FinalRightFootAbsolutePositions);
     }
 
-  if (0)
+}
+
+void ZMPDiscretization::DumpReferences(deque<ZMPPosition> & FinalZMPPositions,
+				       deque<ZMPPosition> & ZMPPositions)
+{
+ 
+
+  ofstream dbg_aof("DebugZMPRefPos.dat",ofstream::app);
+  for(unsigned int i=0;i<ZMPPositions.size();i++)
     {
-      ofstream dbg_aof("DebugZMPRefPos.dat",ofstream::app);
-      for(unsigned int i=0;i<ZMPPositions.size();i++)
-	{
-	  dbg_aof << ZMPPositions[i].px << " "
-		  << ZMPPositions[i].py << endl;
-	}
-      dbg_aof.close();
+      dbg_aof << ZMPPositions[i].px << " "
+	      << ZMPPositions[i].py << endl;
     }
+  dbg_aof.close();
+  
+  dbg_aof.open("DebugFinalZMPRefPos.dat",ofstream::app);
+  for(unsigned int i=0;i<FinalZMPPositions.size();i++)
+    {
+      dbg_aof << FinalZMPPositions[i].px << " "
+	      << FinalZMPPositions[i].py << endl;
+    }
+  dbg_aof.close();
+    
 }
 
 void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
@@ -1051,6 +1053,9 @@ void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
 	    }
 	  else
 	    {
+	      if (r>=(int)ZMPPositions.size())
+		r = ZMPPositions.size()-1;
+
 	      ltmp[0] += m_ZMPFilterWindow[j]*ZMPPositions[r].px;
 	      ltmp[1] += m_ZMPFilterWindow[j]*ZMPPositions[r].py;
 	      ltmp[2] += m_ZMPFilterWindow[j]*ZMPPositions[r].pz;
@@ -1070,6 +1075,8 @@ void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
 
      
     }
+  ODEBUG("ZMPPosition.back=( " <<ZMPPositions.back().px << " , " << ZMPPositions.back().py << " )");
+  ODEBUG("FinalZMPPosition.back=( " <<FinalZMPPositions.back().px << " , " << FinalZMPPositions.back().py << " )");
   ODEBUG("FinalZMPPositions.size()="<<FinalZMPPositions.size());
 }
 
@@ -1115,7 +1122,6 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   ZMPPositions.resize(currentsize+AddArraySize);
   
   ODEBUG4(" GetZMPDiscretization: Step 7 " << currentsize << " " << AddArraySize,"DebugData.txt");
-
 
   double dSizeOfEndPhase = m_Tdble/(2*m_SamplingPeriod);
   unsigned int SizeOfEndPhase = (unsigned int)round(dSizeOfEndPhase);
@@ -1261,6 +1267,27 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
 
 }
 
+void ZMPDiscretization::RegisterMethodsForScripting()
+{
+  std::string aMethodName[3] = 
+    {":prevzmpinitprofil",
+     ":zeroinitprofil",
+     ":previewcontroltime"};
+  
+  for(int i=0;i<3;i++)
+    {
+      if (!RegisterMethod(aMethodName[i]))
+	{
+	  std::cerr << "Unable to register " << aMethodName << std::endl;
+	}
+      else
+	{
+	  ODEBUG("Succeed in registering " << aMethodName[i]);
+	}
+
+    }
+
+}
 void ZMPDiscretization::CallMethod(std::string &Method, std::istringstream &strm)
 {
   if (Method==":prevzmpinitprofil")
@@ -1271,6 +1298,15 @@ void ZMPDiscretization::CallMethod(std::string &Method, std::istringstream &strm
     {
       m_InitializationProfile = ZERO_INIT_PROFIL;
     }
-  else ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
-
+  else if (Method==":previewcontroltime")
+    {
+      strm >> m_PreviewControlTime;
+    }
+  else if (Method==":samplingperiod")
+    {
+      strm >> m_SamplingPeriod;
+      InitializeFilter();
+    }
+  ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
+    
 }

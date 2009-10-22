@@ -348,6 +348,9 @@ namespace PatternGeneratorJRL
       when evaluating the initial position.
      */
     MAL_S3_VECTOR(,double) m_COGInitialAnkles;
+
+    /*! Store the position of the left and right shoulders. */
+    CjrlJoint *m_LeftShoulder, *m_RightShoulder;
   };
 
 
