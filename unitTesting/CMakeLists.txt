@@ -3,6 +3,9 @@
 # History:
 #
 # Copyright CNRS/AIST
+
+
+# Set Flags 
 SET (${PROJECT_NAME}_test_CXXFLAGS "-I${${PROJECT_NAME}_SOURCE_DIR}/include -I${${PROJECT_NAME}_SOURCE_DIR}/src ${${PROJECT_NAME}_src_CXXFLAGS} ")
 
 IF(UNIX)
@@ -14,8 +17,29 @@ IF(WIN32)
   SET(${PROJECT_NAME}_test_LDFLAGS "${LIBDIR_KW}${${PROJECT_NAME}_BINARY_DIR}/src  ${LIBINCLUSION_KW}${PROJECT_NAME}-${PROJECT_VERSION}${LIBINCLUSION_EXT} ${${PROJECT_NAME}_src_LDFLAGS}")
 ENDIF(WIN32)
 
+# Deal with hrp2Dynamics
+#-----------------------
+SET(_hrp2Dynamics_FOUND 0)
+SET(_hrp2Dynamics_OPTIONAL "hrp2Dynamics >= 1.1.0")
+PKG_CHECK_MODULES(_hrp2Dynamics ${_hrp2Dynamics_OPTIONAL})
+
+IF(NOT ${_hrp2Dynamics_FOUND})
+  MESSAGE(WARNING "Check that package hrp2Dynamics is installed in a directory pointed out by PKG_CONFIG_PATH.")
+ELSE(NOT ${_hrp2Dynamics_FOUND})
+  FOREACH(_ITEM ${_hrp2Dynamics_CFLAGS})
+    SET(${PROJECT_NAME}_test_CXXFLAGS  "${${PROJECT_NAME}_test_CXXFLAGS} ${_ITEM}")
+  ENDFOREACH(_ITEM)
+
+  SET(${PROJECT_NAME}_test_CXXFLAGS "${${PROJECT_NAME}_test_CXXFLAGS} -DWITH_HRP2DYNAMICS")
+
+  FOREACH(_ITEM ${_hrp2Dynamics_LDFLAGS})
+    SET(${PROJECT_NAME}_test_LDFLAGS  "${${PROJECT_NAME}_test_LDFLAGS} ${_ITEM}")
+  ENDFOREACH(_ITEM)
+
+ENDIF(NOT ${_hrp2Dynamics_FOUND})
 
 MESSAGE(STATUS "UL: ${${PROJECT_NAME}_test_LDFLAGS}  ${${PROJECT_NAME}_test_CXXFLAGS}")
+
 
 ADD_EXECUTABLE(	TestFootPrintPGInterface TestFootPrintPGInterface.cpp)
 SET_TARGET_PROPERTIES(TestFootPrintPGInterface

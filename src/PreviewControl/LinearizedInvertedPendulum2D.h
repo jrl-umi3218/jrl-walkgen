@@ -7,7 +7,7 @@
 
    All rights reserved.
 
-   Please see License.txt for further information on license.         
+   Please see License.txt for further information on license.
 */
 
 #ifndef _LINEAR_INVERTED_PENDULUM_2D_H_

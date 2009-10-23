@@ -22,6 +22,10 @@
 
 #include <dynamicsJRLJapan/dynamicsJRLJapanFactory.h>
 
+#ifdef WITH_HRP2DYNAMICS
+#include <hrp2Dynamics/hrp2OptHumanoidDynamicRobot.h>
+#endif
+
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
 using namespace::PatternGeneratorJRL;
@@ -797,8 +801,14 @@ int main(int argc, char *argv[])
 
 
   // Creating the humanoid robot.
+  CjrlHumanoidDynamicRobot * aHDR = 0;
   dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
-  CjrlHumanoidDynamicRobot * aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
+
+#ifndef WITH_HRP2DYNAMICS
+  aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
+#else
+  aHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
+#endif
 
   // Parsing the file.
   string RobotFileName = VRMLPath + VRMLFileName;

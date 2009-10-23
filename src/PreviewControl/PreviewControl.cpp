@@ -200,14 +200,14 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
   
   MAL_MATRIX(, double) lF,lK;
 
-  double Q,R;
-  Q = 1.0;
-  R = 1e-5;
+  double Q=0.0,R=0.0;
   int Nl;
   Nl = (int)(m_PreviewControlTime/T);
 
   if (mode==OptimalControllerSolver::MODE_WITHOUT_INITIALPOS)
     {
+      Q = 1.0;
+      R = 1e-6;
 
       // Build the derivated system
       MAL_MATRIX_DIM(Ax,double,4,4);
@@ -248,6 +248,9 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
     }
   else if (mode==OptimalControllerSolver::MODE_WITH_INITIALPOS )
     {
+      Q = 1.0;
+      R = 1e-5;
+
       anOCS = new PatternGeneratorJRL::OptimalControllerSolver(m_A,m_B,m_C,Q,R,Nl);
       
       anOCS->ComputeWeights(PatternGeneratorJRL::OptimalControllerSolver::MODE_WITH_INITIALPOS);
@@ -263,12 +266,14 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
   for (int i=0;i<3;i++)
     m_Kx(0,i) = lK(0,i);
 
-  ODEBUG("m_Ks: " <<m_Ks);
-  ODEBUG("m_Kx(0,0): " << m_Kx(0,0) << " " <<
+  ODEBUG3("m_Ks: " <<m_Ks);
+  ODEBUG3("m_Kx(0,0): " << m_Kx(0,0) << " " <<
 	  "m_Kx(0,1): " << m_Kx(0,1) << " " <<
 	  "m_Kx(0,2): " << m_Kx(0,2) );
   
-  
+  ODEBUG3("m_A" <<m_A);
+  ODEBUG3("m_B" <<m_B);
+  ODEBUG3("m_C" <<m_C);
   m_SizeOfPreviewWindow = (unsigned int)(m_PreviewControlTime/
 					 m_SamplingPeriod);
   MAL_MATRIX_RESIZE(m_F,m_SizeOfPreviewWindow,1);

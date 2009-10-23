@@ -9,58 +9,22 @@
 
   All rights reserved.
   
-  Redistribution and use in source and binary forms, with or without modification,
-  are permitted provided that the following conditions are met:
-  
-  * Redistributions of source code must retain the above copyright notice,
-  this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-  * Neither the name of the CNRS/AIST nor the names of its contributors
-  may be used to endorse or promote products derived from this software without specific prior written permission.
-  
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
-  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-  AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
-  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-  OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-  OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  Please see License.txt for further information on license.
 */
-//#define _DEBUG_
+
 #include <iostream>
+#include <sstream>
 #include <fstream>
+
+#include <Debug.h>
 
 #include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
 
 using namespace PatternGeneratorJRL;
 
-#if 0
-#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); \
-    DebugFile << "ZMPPCWMBZ: " << x << endl; \
-    DebugFile.close();}
-#else
-#define RESETDEBUG4(y)
-#define ODEBUG4(x,y)
-#endif
 
-#define RESETDEBUG6(y)
-#define ODEBUG6(x,y)
-
-#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "ZMPPCWMBZ: " << x << endl; DebugFile.close();}
-#if 1
-#define ODEBUG(x)
-#else
-#define ODEBUG(x)  std::cout << x << endl;
-#endif
-
-#define ODEBUG3(x)  std::cout << x << endl;
-
-ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
+ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePluginManager *lSPM)
+  : SimplePlugin(lSPM)
 {
 
   m_ComAndFootRealization = 0;
@@ -74,7 +38,7 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   RESETDEBUG4("DebugDatadqr.txt");
   RESETDEBUG4("DebugDatadql.txt");
   RESETDEBUG4("DebugDataDiffZMP.txt");
-  RESETDEBUG4("DebugDataCOMPC1.txt");
+  RESETDEBUG5("DebugDataCOMPC1.txt");
   RESETDEBUG4("DebugDataWaistZMP.txt");
   RESETDEBUG4("DebugDataZMPMB1.txt");
   RESETDEBUG4("DebugDataDeltaCOM.txt");
@@ -91,6 +55,8 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP()
   RESETDEBUG4("DebugDataCheckZMP1.txt");
   // Sampling period.
   m_SamplingPeriod = -1;
+  
+  RegisterMethods();
 
   // Initialization of the first and second preview controls.
   MAL_MATRIX_RESIZE(m_PC1x,3,1);  MAL_MATRIX_RESIZE(m_PC1y,3,1);
@@ -181,7 +147,9 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMPosition 
 
   /* Get the current acceleration vector */
   CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
-
+  ODEBUG3(aCOMPosition(0)<< " " <<
+	  aCOMPosition(1) << " " <<
+	  aCOMPosition(2) );
   m_ComAndFootRealization->ComputePostureForGivenCoMAndFeetPosture(aCOMPosition, aCOMSpeed, aCOMAcc,
 								   aLeftFootPosition,
 								   aRightFootPosition,
@@ -193,7 +161,7 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMPosition 
 
   if (StageOfTheAlgorithm==0)
     {
-      ODEBUG("StageOfTheAlgorithm=0" << CurrentConfiguration );
+      ODEBUG3("StageOfTheAlgorithm=0" << CurrentConfiguration );
       ODEBUG4(CurrentConfiguration(0) << " " << CurrentConfiguration(1) << " " << CurrentConfiguration(2) ,
 	      "DebugDataWaistZMP.txt");
       /* Update the current configuration vector */
@@ -231,6 +199,7 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[m_NL];
   FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[m_NL];
 
+  ODEBUG3("Before First CallToComAndFootRealization: " << CurrentConfiguration);
   CallToComAndFootRealization(acompos,aLeftFAP,aRightFAP,
 			      CurrentConfiguration,
 			      CurrentVelocity,
@@ -238,6 +207,10 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 			      m_NumberOfIterations,
 			      0);
 
+  ODEBUG("After First CallToComAndFootRealization: " << CurrentConfiguration);
+  ODEBUG3("1-refandfinalCOMPosition: x: " << refandfinalCOMPosition.x[0] << 
+	  " y: " << refandfinalCOMPosition.y[0] <<
+	  " z: " << refandfinalCOMPosition.z[0]);
 
   if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
     EvaluateMultiBodyZMP(-1);
@@ -246,9 +219,9 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   aRightFAP = m_FIFORightFootPosition[0];
   
   SecondStageOfControl(refandfinalCOMPosition);
-  ODEBUG4("refandfinalCOMPosition: x: " << refandfinalCOMPosition.x[0] << 
-	  " y: " << refandfinalCOMPosition.y[0] <<
-	  " z: " << refandfinalCOMPosition.z[0],"DebugData.txt" );
+  ODEBUG3("2-refandfinalCOMPosition: x: " << refandfinalCOMPosition.x[0] << 
+	 " y: " << refandfinalCOMPosition.y[0] <<
+	 " z: " << refandfinalCOMPosition.z[0]);
   if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
     {
       CallToComAndFootRealization(refandfinalCOMPosition,aLeftFAP,aRightFAP,
@@ -257,6 +230,7 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 				  CurrentAcceleration,
 				  m_NumberOfIterations - m_NL,
 				  1);
+      ODEBUG("After Second CallToComAndFootRealization: " << CurrentConfiguration);
     }
 
   // Here it is assumed that the 4x4 CoM matrix 
@@ -305,9 +279,9 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMPosition &finalCO
   // Inverse Kinematics variables.
 
   COMPosition aCOMPosition = m_FIFOCOMPositions[0];
-  ODEBUG4("aCOMPosition: x: " << aCOMPosition.x 
-	  " y: " << aCOMPosition.y
-	  " z: " << aCOMPosition.z,"DebugData.txt" );
+  ODEBUG3("aCOMPosition: x: " << aCOMPosition.x <<
+	  " y: " << aCOMPosition.y <<
+	  " z: " << aCOMPosition.z);
   FootAbsolutePosition LeftFootPosition, RightFootPosition;
 
   LeftFootPosition = m_FIFOLeftFootPosition[0];
@@ -318,7 +292,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMPosition &finalCO
   if ((m_StageStrategy==ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY)||
       (m_StageStrategy==ZMPCOM_TRAJECTORY_FULL))
     {
-      ODEBUG("Second Stage "<< m_FIFODeltaZMPPositions.size());
+      ODEBUG3("Second Stage Size of FIFODeltaZMPPositions: "<< m_FIFODeltaZMPPositions.size());
       m_PC->OneIterationOfPreview(m_Deltax,m_Deltay, m_sxDeltazmp, m_syDeltazmp,
 				  m_FIFODeltaZMPPositions,0,
 				  Deltazmpx2,Deltazmpy2,
@@ -333,11 +307,12 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMPosition &finalCO
 	}
     }
 
-  ODEBUG4(m_Deltax(0,0) << " " << m_Deltay(0,0) << " "
-	  << aCOMPosition.x[0] << " " << aCOMPosition.y[0], "DebugDataDeltaCOM.txt");
+  ODEBUG3("Delta :" << m_Deltax(0,0) << " " << m_Deltay(0,0) << " "
+	  << aCOMPosition.x[0] << " " << aCOMPosition.y[0]);
   // Update finalCOMPosition
   finalCOMPosition = aCOMPosition;
-#ifdef _DEBUG_
+
+#ifdef _DEBUG_MODE_ON_
   ofstream aof_LastZMP;
   static unsigned char FirstCall=1;
   if (FirstCall)
@@ -396,7 +371,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
   double zmpx2, zmpy2;
 
-#ifdef _DEBUG_
+#ifdef _DEBUG_MODE_ON_
   ofstream aof_CartZMP;
   static unsigned char FirstCall=1;
   if (FirstCall)
@@ -497,7 +472,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
 
   ODEBUG6("First Stage: CoM "<< m_PC1x[0][0] << " " << m_PC1y[0][0] , "DebugData.txt");
-#ifdef _DEBUG_
+#ifdef _DEBUG_MODE_ON_
   if (aof_CartZMP.is_open())
     {
       aof_CartZMP << m_FIFOZMPRefPositions[0].time << " " << zmpx2 << " " << zmpy2 << endl;
@@ -514,7 +489,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
   {
     ZMPPosition lZMPPos = m_FIFOZMPRefPositions[0];
-    ODEBUG4(acomp.x[0]<< " "
+    ODEBUG5(acomp.x[0]<< " "
 	    << acomp.y[0] <<  " " 
 	    << acomp.z[0] << " "
 	    << zmpx2 << " "
@@ -543,7 +518,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
  m_FIFORightFootPosition.push_back(RightFootPosition);
  m_FIFOLeftFootPosition.push_back(LeftFootPosition);
 
-#ifdef _DEBUG_
+#ifdef _DEBUG_MODE_ON_
   m_FIFOTmpZMPPosition.push_back(m_FIFOZMPRefPositions[0]);
 #endif
   m_FIFOZMPRefPositions.pop_front();
@@ -649,6 +624,7 @@ int ZMPPreviewControlWithMultiBodyZMP::Setup(deque<ZMPPosition> &ZMPRefPositions
   MAL_VECTOR(,double) CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
   MAL_VECTOR(,double) CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
   
+  m_PC->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 
   SetupFirstPhase(ZMPRefPositions,
 		  COMPositions,
@@ -721,7 +697,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
   m_FIFOLeftFootPosition.clear();
   m_FIFORightFootPosition.clear();
 
-#if 1
+
   MAL_VECTOR(CurrentConfiguration,double);
   MAL_VECTOR(CurrentVelocity,double);
   MAL_VECTOR(CurrentAcceleration,double);
@@ -744,9 +720,8 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
       m_HumanoidDynamicRobot->setProperty(sComputeZMP,sZMPtrue);
       m_HumanoidDynamicRobot->computeForwardKinematics();
       }
-#endif
 
-#ifdef _DEBUG_
+#ifdef _DEBUG_MODE_ON_
   m_FIFOTmpZMPPosition.clear();
 #endif
 
@@ -764,10 +739,14 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
 							   int localindex)
 {
 
-  ODEBUG("SetupIterativePhase " << localindex << " " << CurrentConfiguration );
-  ODEBUG("COMPosition["<<localindex<<"]=" << COMPositions[localindex].x[0] << " " << 
-	  COMPositions[localindex].y[0] << " " << COMPositions[localindex].z[0]);
+  ODEBUG3("SetupIterativePhase " << localindex << " " << CurrentConfiguration );
+  ODEBUG3("COMPosition["<<localindex<<"]=" << COMPositions[localindex].x[0] << " " << 
+	  COMPositions[localindex].y[0] << " " << COMPositions[localindex].z[0] <<
+	  " COMPositions.size()=" <<COMPositions.size());
   FirstStageOfControl(LeftFootPositions[localindex],RightFootPositions[localindex],COMPositions[localindex]);
+  ODEBUG3("m_FIFOCOMPositions["<<localindex<<"]=" << m_FIFOCOMPositions[localindex].x[0] << " " << 
+	  m_FIFOCOMPositions[localindex].y[0] << " " << m_FIFOCOMPositions[localindex].z[0] <<
+	  " m_FIFOCOMPositions.size()=" <<m_FIFOCOMPositions.size());
   CallToComAndFootRealization(m_FIFOCOMPositions[localindex],
 			      LeftFootPositions[localindex],
 			      RightFootPositions[localindex],
@@ -808,7 +787,7 @@ void ZMPPreviewControlWithMultiBodyZMP::CreateExtraCOMBuffer(deque<COMPosition> 
 
   //create the extra COMbuffer
 
-#ifdef _DEBUG_
+#ifdef _DEBUG_MODE_ON_
   ofstream aof_ExtraCOM;
   static unsigned char FirstCall=1;
   if (FirstCall)
@@ -846,7 +825,7 @@ void ZMPPreviewControlWithMultiBodyZMP::CreateExtraCOMBuffer(deque<COMPosition> 
       aFIFOZMPRefPositions.pop_front();
 
 
-#ifdef _DEBUG_
+#ifdef _DEBUG_MODE_ON_
       if (aof_ExtraCOM.is_open())
 	{
 	  aof_ExtraCOM << m_ExtraZMPRefBuffer[i].time << " "
@@ -860,7 +839,7 @@ void ZMPPreviewControlWithMultiBodyZMP::CreateExtraCOMBuffer(deque<COMPosition> 
   ODEBUG("ik ben hier b" << aFIFOZMPRefPositions.size() );
   ODEBUG("ik ben hier c" << m_ExtraZMPRefBuffer.size());
 
-#ifdef _DEBUG_
+#ifdef _DEBUG_MODE_ON_
   if (aof_ExtraCOM.is_open())
     {
       aof_ExtraCOM.close();
@@ -956,4 +935,73 @@ void ZMPPreviewControlWithMultiBodyZMP::SetStrategyForPCStages(int Strategy)
 int ZMPPreviewControlWithMultiBodyZMP::GetStrategyForPCStages()
 {
   return m_StageStrategy;
+}
+
+
+void ZMPPreviewControlWithMultiBodyZMP::RegisterMethods()
+{
+  std::string aMethodName[3] = 
+    {":samplingperiod",
+     ":previewcontroltime",
+     ":comheight"};
+  
+  for(int i=0;i<3;i++)
+    {
+      if (!RegisterMethod(aMethodName[i]))
+	{
+	  std::cerr << "Unable to register " << aMethodName << std::endl;
+	}
+      else
+	{
+	  ODEBUG("Succeed in registering " << aMethodName[i]);
+	}
+
+    }
+
+}
+
+void ZMPPreviewControlWithMultiBodyZMP::SetSamplingPeriod(double lSamplingPeriod)
+{
+  m_SamplingPeriod = lSamplingPeriod;
+
+  m_NL=0.0;
+  if (m_SamplingPeriod!=0.0)
+    m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+  
+}
+
+void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControlTime(double lPreviewControlTime)
+{
+  m_PreviewControlTime = lPreviewControlTime;
+
+  m_NL=0.0;
+  if (m_SamplingPeriod!=0.0)
+    m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+
+}
+
+void ZMPPreviewControlWithMultiBodyZMP::CallMethod(std::string &Method,
+						   std::istringstream &strm)
+{
+  if (Method==":samplingperiod")
+    {
+      std::string aws;
+      if (strm.good())
+	{
+	  double lSamplingPeriod;
+	  strm >> lSamplingPeriod;
+	  SetSamplingPeriod(lSamplingPeriod);
+	}
+    }
+  else if (Method==":previewcontroltime")
+    {
+      std::string aws;
+      if (strm.good())
+	{
+	  double lpreviewcontroltime;
+	  strm >> lpreviewcontroltime;
+	  SetPreviewControlTime(lpreviewcontroltime);
+	}
+    }
+
 }

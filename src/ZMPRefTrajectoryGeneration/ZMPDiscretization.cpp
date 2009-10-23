@@ -22,7 +22,6 @@
 #include <iostream>
 #include <fstream>
 
-#define _DEBUG_MODE_ON_
 #include <Debug.h>
 
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>

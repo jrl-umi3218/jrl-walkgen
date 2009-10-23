@@ -24,6 +24,7 @@
 
 
 #include <PGTypes.h>
+#include <SimplePlugin.h>
 #include <PreviewControl/PreviewControl.h>
 #include <MotionGeneration/ComAndFootRealization.h>
 
@@ -56,7 +57,7 @@ namespace PatternGeneratorJRL
       are performed.
       
    */
-  class  ZMPPreviewControlWithMultiBodyZMP 
+  class  ZMPPreviewControlWithMultiBodyZMP : public SimplePlugin
     {
     private:
       
@@ -158,6 +159,15 @@ namespace PatternGeneratorJRL
 
       /*! Sampling period. */
       double m_SamplingPeriod;
+      
+      /*! Register method. */
+      void RegisterMethods();
+
+      /*! Set the sampling period and update NL.*/
+      void SetSamplingPeriod(double lSamplingPeriod);
+      
+      /*! Set the preview control time and update NL. */
+      void SetPreviewControlTime(double lPreviewControlTime);
 
     public:
 	
@@ -176,7 +186,7 @@ namespace PatternGeneratorJRL
       
       /*! @} */
       /*! Constructor. */
-      ZMPPreviewControlWithMultiBodyZMP();
+      ZMPPreviewControlWithMultiBodyZMP(SimplePluginManager *lSPM);
 
       /*! Destroctor. */
       ~ZMPPreviewControlWithMultiBodyZMP();
@@ -480,6 +490,10 @@ namespace PatternGeneratorJRL
       /*! Get the strategy to handle the preview control stages. */
       int GetStrategyForPCStages();
 
+      /*! \brief Overloading method of SimplePlugin */
+      void CallMethod(std::string &Method,
+		      std::istringstream &astrm); 
+      
     };
 };
 #endif /* _ZMPREVIEWCONTROLWITHMULTIBODYZMP_H_ */

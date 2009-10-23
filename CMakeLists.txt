@@ -5,16 +5,17 @@
 # Copyright CNRS/AIST
 
 cmake_minimum_required(VERSION 2.6)
-
 enable_language(CXX)
 
-# name of the project
+# Name of the project
+#--------------------
 SET(PROJECT_NAME walkGenJrl)
 SET(PROJECT_CONTACT olivier.stasse@aist.go.jp)
 SET(PROJECT_DESCRIPTION "Humanoid Walking Pattern Generator (JRL)")
 
-IF(WIN32)
 # Counter CMake mesures
+#----------------------
+IF(WIN32)
 SET(CMAKE_STATIC_LIBRARY_PREFIX "")
 SET(CMAKE_SHARED_LIBRARY_PREFIX "")
 SET(CMAKE_SHARED_MODULE_PREFIX "")
@@ -22,11 +23,15 @@ ENDIF(WIN32)
 
 
 # Debug mode for cmake.
+#----------------------
 SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Set version
+#------------
 SET(PROJECT_VERSION 2.5.4)
 
+# Deal with OS specificities
+#---------------------------
 IF(WIN32)
   SET(LIBDIR_KW "/LIBPATH:")
   SET(LIBINCLUSION_KW "")
@@ -47,7 +52,8 @@ project(${PROJECT_NAME})
 #------------------------
 OPTION(BUILD_SHARED_LIBS "Build walkGenJrl with shared libraries." ON)
 
-# where are use-specific cmake modules
+# where are located specific cmake modules
+#-----------------------------------------
 SET(CMAKE_MODULE_PATH ${${PROJECT_NAME}_SOURCE_DIR}/CMakeModules)
 
 # Check for required packages
@@ -87,9 +93,9 @@ IF(WIN32)
   SET(${PROJECT_NAME}_LDFLAGS "${LIBDIR_KW}${CMAKE_PREFIX_INSTALL}/lib/ ${LIBINCLUSION_KW}${PROJECT_NAME}-${PROJECT_VERSION}${LIBINCLUSION_EXT} ${${PROJECT_NAME}_LDFLAGS}")
 ENDIF(WIN32)
 
-#-------------------------
+
 # Detect OmniOrb.
-#------------------------- 
+#----------------
 INCLUDE(${CMAKE_MODULE_PATH}/UseOmniORB4.cmake)
 MESSAGE(STATUS "omniORB4: ${OMNIORB4_DIR}")
 
@@ -124,7 +130,6 @@ ENDIF (GENERATE_DOC)
 
 # Prepare description file for pkg-config.
 #-----------------------------------------
-
 SET(install_pkg_prefix "\${prefix}")
 SET(install_pkg_exec_prefix "\${exec_prefix}")
 SET(install_pkg_libdir "\${libdir}")
@@ -132,6 +137,7 @@ SET(install_pkg_include_dir "\${includedir}")
 SET(install_pkg_datarootdir "\${datarootdir}")
 
 # Install the file in the appropriate place.
+#-------------------------------------------
 SET(install_libdir_pkgconfig ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 
 CONFIGURE_FILE(${${PROJECT_NAME}_SOURCE_DIR}/${PROJECT_NAME}.pc.cmake
@@ -143,6 +149,7 @@ INSTALL(FILES ${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}.pc
 )
 
 # Include CPack to build a beautiful package...
+#----------------------------------------------
 INCLUDE(CPack)
 
 
