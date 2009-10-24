@@ -120,8 +120,13 @@ bool OptimalControllerSolver::GeneralizedSchur(MAL_MATRIX( &A,double),
   int sdim = 0;
   int lwork = 1000+ (8*n + 16);
   double *work = new double[lwork]; //std::vector<double> work(lwork);
+  for(int i=0;i<lwork;i++)
+    work[i] = 0.0;
   int info = 0;
   logical *bwork=new logical[2*n];
+  for(int i=0;i<2*n;i++)
+    bwork[i] = 0;
+
   char lV[2]="V";
   char lS[2]="S";
   for(int i=0;i<2*n;i++)
