@@ -222,6 +222,8 @@ namespace PatternGeneratorJRL
 			    std::vector<int> &IndexInVRML,
 			    std::vector<int> &IndexinConfiguration);
 
+    /* Register methods. */
+    void RegisterMethods();
 
   private:
 

@@ -23,20 +23,13 @@ ComAndFootRealizationByGeometry(PatternGeneratorInterfacePrivate *aPGI)
   : ComAndFootRealization(aPGI)
 {
 
-  string aMethodName[2] = {":armparameters",":UpperBodyMotionParameters"};
-  for(int i=0;i<2;i++)
-    {
-      if (!RegisterMethod(aMethodName[i]))
-	{
-	  std::cerr << "Unable to register " << aMethodName << std::endl;
-	}
-    }
-
   m_WaistPlanner = 0;
   m_UpBody = 0;
   m_ZARM = -1.0;
   m_LeftShoulder = 0;
   m_RightShoulder = 0;
+						
+  RegisterMethods();
 
   for(unsigned int i=0;i<3;i++)
     m_DiffBetweenComAndWaist[i] = 0.0;
@@ -80,6 +73,21 @@ ComAndFootRealizationByGeometry(PatternGeneratorInterfacePrivate *aPGI)
   MAL_S3_VECTOR_FILL(m_COGInitialAnkles,0.0);
 }
 
+void ComAndFootRealizationByGeometry::
+RegisterMethods()
+{
+  string aMethodName[3] = {":armparameters",
+			   ":UpperBodyMotionParameters",
+			   ":samplingperiod"};
+  for(int i=0;i<3;i++)
+    {
+      if (!RegisterMethod(aMethodName[i]))
+	{
+	  std::cerr << "Unable to register " << aMethodName << std::endl;
+	}
+    }
+
+}
 void ComAndFootRealizationByGeometry::
 InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
 		   std::vector<CjrlJoint *> &ActuatedJoints,
@@ -1171,7 +1179,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
 
   if (Stage==0)
     {
-      if (IterationNumber>0)
+      if (IterationNumber>1)
 	{
 	  /* Compute the speed */
 	  for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
@@ -1180,7 +1188,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
 	      /* Keep the new value for the legs. */
 	    }
 
-	  if (IterationNumber>1)
+	  if (IterationNumber>2)
 	    {
 	      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity);i++)
 		CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity[i])/ ldt;
@@ -1203,7 +1211,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
   else if (Stage==1)
     {
 
-      if (IterationNumber>0)
+      if (IterationNumber>1)
 	{
 	  /* Compute the speed */
 	  for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
@@ -1211,7 +1219,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
 	      CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration1[i])/ getSamplingPeriod();
 	      /* Keep the new value for the legs. */
 	    }
-	  if (IterationNumber>1)
+	  if (IterationNumber>2)
 	    {
 	      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity1);i++)
 		CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity1[i])/ ldt;
@@ -1445,7 +1453,12 @@ CallMethod(string &Method, istringstream &istrm)
 	      istrm >> m_UpperBodyMotion[2];
 	    }
     }
-  
+  else if (Method==":samplingperiod")
+    {
+      double ldt;
+      istrm >> ldt;
+      setSamplingPeriod(ldt);
+    }
 }
 
 MAL_S4x4_MATRIX(,double) ComAndFootRealizationByGeometry::
