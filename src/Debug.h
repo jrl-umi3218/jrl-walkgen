@@ -25,6 +25,10 @@ DebugFile << __FILE__ << ":" \
           << __FUNCTION__ << "(#" \
           << __LINE__ << "):" << x << std::endl; \
           DebugFile.close();}
+#define ODEBUG5SIMPLE(x,y) { std::ofstream DebugFile; \
+DebugFile.open(y,ofstream::app); \
+DebugFile << x << std::endl; \
+          DebugFile.close();}
 
 #define ODEBUG3_NENDL(x) std::cerr << x
 

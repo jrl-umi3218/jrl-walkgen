@@ -37,7 +37,7 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
   RESETDEBUG4("DebugDataql.txt");
   RESETDEBUG4("DebugDatadqr.txt");
   RESETDEBUG4("DebugDatadql.txt");
-  RESETDEBUG4("DebugDataDiffZMP.txt");
+  RESETDEBUG5("DebugDataDiffZMP.txt");
   RESETDEBUG5("DebugDataCOMPC1.txt");
   RESETDEBUG4("DebugDataWaistZMP.txt");
   RESETDEBUG4("DebugDataZMPMB1.txt");
@@ -279,9 +279,9 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMPosition &finalCO
   // Inverse Kinematics variables.
 
   COMPosition aCOMPosition = m_FIFOCOMPositions[0];
-  ODEBUG3("aCOMPosition: x: " << aCOMPosition.x <<
-	  " y: " << aCOMPosition.y <<
-	  " z: " << aCOMPosition.z);
+  ODEBUG3("aCOMPosition: x: " << aCOMPosition.x[0] <<
+	  " y: " << aCOMPosition.y[0] <<
+	  " z: " << aCOMPosition.z[0]);
   FootAbsolutePosition LeftFootPosition, RightFootPosition;
 
   LeftFootPosition = m_FIFOLeftFootPosition[0];
@@ -292,7 +292,9 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMPosition &finalCO
   if ((m_StageStrategy==ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY)||
       (m_StageStrategy==ZMPCOM_TRAJECTORY_FULL))
     {
-      ODEBUG3("Second Stage Size of FIFODeltaZMPPositions: "<< m_FIFODeltaZMPPositions.size());
+      ODEBUG3("Second Stage Size of FIFODeltaZMPPositions: "<< m_FIFODeltaZMPPositions.size()
+	      << " " << m_FIFODeltaZMPPositions[0].px 
+	      << " " << m_FIFODeltaZMPPositions[0].py);
       m_PC->OneIterationOfPreview(m_Deltax,m_Deltay, m_sxDeltazmp, m_syDeltazmp,
 				  m_FIFODeltaZMPPositions,0,
 				  Deltazmpx2,Deltazmpy2,
@@ -597,7 +599,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   aZMPpos.theta = 0.0;
   aZMPpos.stepType = 1;
   aZMPpos.time = m_FIFOZMPRefPositions[0].time;
-  ODEBUG4(aZMPpos.px << " " << aZMPpos.py << " " 
+  ODEBUG5(aZMPpos.px << " " << aZMPpos.py << " " 
 	  << m_FIFOZMPRefPositions[0].px << " " 
 	  << m_FIFOZMPRefPositions[0].py  << " " 
 	  << m_FIFOZMPRefPositions[0].theta  << " " 
