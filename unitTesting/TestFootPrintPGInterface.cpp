@@ -28,79 +28,12 @@
 
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
+#include "TestFootPrintPGInterfaceData.h"
+
 using namespace::PatternGeneratorJRL;
 using namespace std;
 
-enum Profiles  {
-  PROFIL_PB_FLORENT,                                 //  0
-  PROFIL_STEPPING_OVER,                              //  1 
-  PROFIL_SHORT_STRAIGHT_WALKING,                     //  2
-  PROFIL_SHORT_STRAIGHT_WALKING_ONE_STAGE,           //  3
-  PROFIL_CURVED_WALKING_PBW2,                        //  4
-  PROFIL_KINEOWORKS,                                 //  5
-  PROFIL_STRAIGHT_WALKING,                           //  6
-  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,          //  7
-  PROFIL_CURVED_WALKING_PBW,                         //  8
-  PROFIL_STRAIGHT_WALKING_DIMITROV,                  //  9
-  PROFIL_CURVED_WALKING_DIMITROV,                    // 10
-  PROFIL_TURN_90D,                                   // 11
-  PROFIL_TURNING_ON_THE_CIRCLE,                      // 12
-  PROFIL_TURNING_ON_THE_CIRCLE_TOWARDS_THE_CENTER,   // 13
-  PROFIL_ANALYTICAL_ONLINE_WALKING,                  // 14
-  PROFIL_ONLINE_WALKING,                             // 15
-  PROFIL_SIMU_ONLINE_WALKING                         // 16
-};
 
-string ProfilesNames[17] = {
-  "PROFIL_PB_FLORENT",                                 
-  "PROFIL_STEPPING_OVER",                              
-  "PROFIL_SHORT_STRAIGHT_WALKING",                     
-  "PROFIL_SHORT_STRAIGHT_WALKING_ONE_STAGE",           
-  "PROFIL_CURVED_WALKING_PBW2",                        
-  "PROFIL_KINEOWORKS",                                 
-  "PROFIL_STRAIGHT_WALKING",                           
-  "PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING",          
-  "PROFIL_CURVED_WALKING_PBW",                         
-  "PROFIL_STRAIGHT_WALKING_DIMITROV",                  
-  "PROFIL_CURVED_WALKING_DIMITROV",                    
-  "PROFIL_TURN_90D",                                   
-  "PROFIL_TURNING_ON_THE_CIRCLE",                      
-  "PROFIL_TURNING_ON_THE_CIRCLE_TOWARDS_THE_CENTER",   
-  "PROFIL_ANALYTICAL_ONLINE_WALKING",                  
-  "PROFIL_ONLINE_WALKING",                             
-  "PROFIL_SIMU_ONLINE_WALKING"
-};
-
-#define NBOFPREDEFONLINEFOOTSTEPS 11
-#if 1
-double OnLineFootSteps[NBOFPREDEFONLINEFOOTSTEPS][3]={
-  { -0.005221439, -0.00123569, -2.23518e-182},
-  { -0.00699088, -0.00170217, -4.21367e-182},
-  { -0.00208854, 0.00162538, -6.78877e-183},
-  { -0.0058683, -0.0020374, -1.2328e-182},
-  { -0.004536, 0.00119127, -1.59333e-183},
-  { -0.00696306, -0.00252192, -2.88263e-183},
-  { -0.00278527, 0.000492459, -4.2968e-184},
-  { -0.00536233, -0.0021008, -7.82941e-184},
-  { -0.00191246, 0.00125745, -1.16966e-184},
-  { -0.0053683, -0.00232864, -2.08273e-184},
-  { -0.00168054, 0.00108031, -3.26998e-185}
-};
-#else
-double OnLineFootSteps[NBOFPREDEFONLINEFOOTSTEPS][3]={
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0}
-};
-#endif
 void CommonInitialization(PatternGeneratorInterface &aPGI)
 {
   const char lBuffer[12][256] =
@@ -819,118 +752,9 @@ int main(int argc, char *argv[])
   aPGI = patternGeneratorInterfaceFactory(aHDR);
 
   bool conversiontoradneeded=true;
-
-  //  cout << "before PGI " << endl;
-  // Initial position;
-#if 0 // With previous half-sitting value
-  double dInitPos[40] = { 
-    0.0, 0.0, -20.0, 40.0, -20.0, 0.0, 0.0, 0.0, -20.0, 40.0, -20.0, 0.0,  // legs
-
-    0.0, 0.0, -23.7, 6.6, // chest and head
-
-    27.0, -5.0, -4.0, -87.0, -4.0, -16.0, 20.0, // right arm
-    15.0,  10.0, 0.0, -20.0, 0.0, 0.0, 10.0, // left arm 
-
-    -20.0, 20.0, -20.0, 20.0, -20.0, // right hand
-    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
-  };
-#endif
-
-  // Nicolas position + New half sitting for the legs
-#if 0
-  double dInitPos[40] = { 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
-
-    0.0, 0.0, -23.7, 6.6, // chest and head
-
-    27.0, -5.0, -4.0, -87.0, -4.0, -16.0, 20.0, // right arm
-    15.0,  10.0, 0.0, -20.0, 0.0, 0.0, 10.0, // left arm 
-
-    -20.0, 20.0, -20.0, 20.0, -20.0, // right hand
-    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
-  };
-#endif
-
-  // Test to compare with previous PG.
-#if 0
-  double dInitPos[40] = { 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
-
-    0.0, 0.0, 0.0, 0.0, // chest and head
-
-    0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // right arm
-    0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // left arm 
-
-    0.0, 0.0, 0.0, 0.0, 0.0, // right hand
-    0.0, 0.0, 0.0, 0.0, 0.0  // left hand
-  };
-#endif
-
-  // Normal position - New half sitting 
-#if 0
-  double dInitPos[40] = { 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
-
-    0.0, 0.0, 0.0, 0.0, // chest and head
-
-    15.0, -10.0, 0.0, -30.0, 0.0, 0.0, 10.0, // right arm
-    15.0,  10.0, 0.0, -30.0, 0.0, 0.0, 10.0, // left arm 
-
-    -10.0, 10.0, -10.0, 10.0, -10.0  // right hand
-    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
-  };
-#endif
-  // Position for  interaction
-#if 1
-
-  double dInitPos[40] = { 
-#if 1
-    -8.41612e-05, -0.000321953, -0.436642, 0.872997, -0.434218, 0.00189464,
-    -8.47913e-05, -2.10591e-05, -0.437037, 0.873512, -0.433726, 3.73681e-05, //legs
-#else
-    0.,    0.,  -0.4537856,    0.8726646,  -0.4188790,    0.,
-    0.,    0.,  -0.4537856,    0.8726646,  -0.4188790,    0.,
-#endif 
-    0.000169362, 2.98267e-18,  // chest
-    -1.34701e-10, 5.62876e-10, // head 
-
-    0.427868, -0.321049, -0.0696696, -1.90803, -0.323627, -0.0845895, 0.199999, // right arm
-    0.458665,  0.322058,  0.0772106, -1.93087,  0.324485, -0.0914427, 0.199999, // left arm
-    
-    -0.174533, 0.174533, -0.174533, 0.174533, -0.174533, // right hand
-    -0.174533, 0.174533, -0.174533, 0.174533, -0.174533  // left hand
-  };
-  conversiontoradneeded=false;
-#endif
-#if 0
-// Strange position 1
-  double dInitPos[40] = 
-    {
-      14.323945,  -6.0363396,  -13.459409,    44.02602,  -30.566611,    6.0363396,
-      0.0000001,   7.4859801,  -27.663319,    44.65489,  -16.991579,   -7.4859801,
-      0.,    0.,    0.,    0.,    
-      12.397718,  -10.000004,    0.,  -29.618538,    0.,    0.,    10.0,
-      16.536364,   10.000004,    0.,  -29.828011,    0.,    0.,    10.0,
-
-      -10.0,  10.0, -10.0,  10,   -10.0, 
-      -10.0,  10.0, -10.0,  10.0, -10.0 
-    };
-
-  double dInitPos[40] = 
-    {
-      -7.16197, -7.69299, -16.1787, 44.5201, -28.3415,  7.69299, 
-      7.16197,   5.74946, -31.3668, 44.1057, -12.7389, -5.74946,
-
-      0., 0., 0., 0., 
-
-      12.622 , -10, 0, -29.678 , 0, 0, 10, 
-      16.7091,  10, 0, -29.7841, 0, 0, 10, 
-      
-      -10.0,  10.0, -10.0,  10,   -10.0, 
-      -10.0,  10.0, -10.0,  10.0, -10.0 
-    };
-#endif 
+  
+  double * dInitPos = InitialPoses[HALF_SITTING_2008];
+  
   // This is a vector corresponding to the DOFs actuated of the robot.
   MAL_VECTOR_DIM(InitialPosition,double,40);
   //MAL_VECTOR_DIM(CurrentPosition,double,40);
@@ -987,7 +811,7 @@ int main(int argc, char *argv[])
   FootAbsolutePosition LeftFootPosition;
   FootAbsolutePosition RightFootPosition;
 
-  bool DebugConfiguration = false;
+  bool DebugConfiguration = true;
   bool DebugFGPI = true;
   unsigned int PGIInterface = 0;
   
@@ -1000,6 +824,15 @@ int main(int argc, char *argv[])
   if (DebugConfiguration)
     {
       aofq.open("TestConfiguration.dat",ofstream::out);
+      if (aofq.is_open())
+	{
+	  for(unsigned int k=0;k<30;k++)
+	    {
+	      aofq << dInitPos[k] << " ";
+	    }
+	  aofq << endl;
+	}
+
     }
 
   ofstream aof;
