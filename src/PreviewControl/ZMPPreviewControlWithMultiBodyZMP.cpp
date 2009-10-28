@@ -609,14 +609,35 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   aZMPpos.theta = 0.0;
   aZMPpos.stepType = 1;
   aZMPpos.time = m_FIFOZMPRefPositions[0].time;
-  ODEBUG5SIMPLE(aZMPpos.px << " " << aZMPpos.py << " " 
-		<< m_FIFOZMPRefPositions[0].px << " " 
-		<< m_FIFOZMPRefPositions[0].py  << " " 
-		<< m_FIFOZMPRefPositions[0].theta  << " " 
-		<< ZMPmultibody[0] << " " << ZMPmultibody[1] << " "  
-		<< CoMmultibody[0] << " " << CoMmultibody[1] << " " 
-		<< m_FIFOCOMPositions[0].x[0] << " " << m_FIFOCOMPositions[0].y[0] << " " 
-		<< m_FIFOCOMPositions[0].x[1] << " " << m_FIFOCOMPositions[0].y[1] , "DebugDataDiffZMP.txt");
+  
+  string inProperty("Iteration");
+  string inValue("-1");
+  m_HumanoidDynamicRobot->getProperty(inProperty,inValue);
+  MAL_VECTOR(,double) CurrentConfiguration;
+  /* Get the current configuration vector */
+  CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
+
+  ODEBUG5SIMPLE(aZMPpos.px << " "                               // 1
+		<< aZMPpos.py << " "                            // 2
+		<< m_FIFOZMPRefPositions[0].px << " "           // 3
+		<< m_FIFOZMPRefPositions[0].py  << " "          // 4
+		<< m_FIFOZMPRefPositions[0].theta  << " "       // 5
+		<< ZMPmultibody[0] << " "                       // 6
+		<< ZMPmultibody[1] << " "                       // 7 
+		<< CoMmultibody[0] << " "                       // 8
+		<< CoMmultibody[1] << " "                       // 9
+		<< CoMmultibody[2] << " "                       // 10
+		<< m_FIFOCOMPositions[0].x[0] << " "            // 11
+		<< m_FIFOCOMPositions[0].y[0] << " "            // 12
+		<< m_FIFOCOMPositions[0].z[0] << " "            // 13 
+		<< m_FIFOCOMPositions[0].x[1] << " "            // 14
+		<< m_FIFOCOMPositions[0].y[1] << " "            // 15
+		<< m_FIFOCOMPositions[0].z[1] << " "            // 16
+		<< inValue << " "                               // 17
+		<< CurrentConfiguration(0) << " "               // 18
+		<< CurrentConfiguration(1) << " "               // 19
+		<< CurrentConfiguration(2) << " "               // 20
+		,"DebugDataDiffZMP.txt");
   m_FIFODeltaZMPPositions.push_back(aZMPpos);
 
   m_StartingNewSequence = false;
@@ -735,7 +756,8 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
     }
   m_HumanoidDynamicRobot->currentVelocity(CurrentVelocity);
   m_HumanoidDynamicRobot->currentAcceleration(CurrentAcceleration);
-  for(unsigned int i=0;i<4;i++)
+
+  for(unsigned int i=0;i<1;i++)
     {
       string sComputeZMP("ComputeZMP");
       string sZMPtrue("true");
@@ -743,6 +765,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
       m_HumanoidDynamicRobot->setProperty(sComputeZMP,sZMPtrue);
       m_HumanoidDynamicRobot->computeForwardKinematics();
     }
+
 
 #ifdef _DEBUG_MODE_ON_
   m_FIFOTmpZMPPosition.clear();

@@ -513,7 +513,6 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
 
   ODEBUG("InitLeftFootPosition : " << InitLeftFootPosition.x 
 	 << " " << InitLeftFootPosition.y 
-
 	 << " " << InitLeftFootPosition.z );
   // We assume that the foot is flat on the floor...
   // Thus
@@ -546,11 +545,13 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   ODEBUG( lStartingCOMPosition[0] << " "
 	  << lStartingCOMPosition[1] << " "
 	  << lStartingCOMPosition[2]);
+  // Waist Position
+
   m_DiffBetweenComAndWaist[0] =  -lStartingCOMPosition[0];
   m_DiffBetweenComAndWaist[1] =  -lStartingCOMPosition[1];
   m_DiffBetweenComAndWaist[2] =  -lStartingCOMPosition[2]
     -(GetHeightOfTheCoM() + lFootPosition[2] - lStartingCOMPosition[2]);
-  ODEBUG( m_DiffBetweenComAndWaist[0] << " " 
+  ODEBUG3( m_DiffBetweenComAndWaist[0] << " " 
 	  << m_DiffBetweenComAndWaist[1] << " " 
 	  << m_DiffBetweenComAndWaist[2]);
   // This term is usefull if
@@ -641,8 +642,6 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
 
   InitLeftFootPosition.z = 0.0;
   InitRightFootPosition.z = 0.0;
-
-  lStartingCOMPosition[2] += WaistPosition[2];
 
   lStartingWaistPose(0) = WaistPosition[0];
   lStartingWaistPose(1) = WaistPosition[1];
@@ -962,7 +961,9 @@ KinematicsForTheLegs(MAL_VECTOR(,double) & aCoMPosition,
   Body_P(1) = aCoMPosition(1) + ToTheHip(1);
   Body_P(2) = aCoMPosition(2) + ToTheHip(2);
 
-
+  ODEBUG3(aCoMPosition(2) << 
+	  " Body_P : " << Body_P  << std::endl <<
+	  " ToTheHip : " << ToTheHip);
   /* If this is the second call, (stage =1)
      it is the final desired CoM */
   if (Stage==1)

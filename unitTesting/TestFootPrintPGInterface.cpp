@@ -651,7 +651,15 @@ void KineoWorks(PatternGeneratorInterface &aPGI)
   }
   {
     
-    istringstream strm2(":stepseq 0.0 -0.105 0.0 0.0 0.2 0.21 0.0 0.0 0.2 -0.21 0.0 0.0 0.2 0.21 0.0 0.0 0.2 -0.21 0.0 0.0 0.2 0.21 0.0 -0.05 0.2 -0.21 0.0 -0.10 0.2 0.21 0.0 -0.15 0.2 -0.21 0.0 -0.2 0.2 +0.21 0.0 -0.2 0.2 -0.21 0.0 -0.2 0.2 +0.21 0.0 -0.2 0.2 -0.21 0.0 -0.15 0.2 +0.21 0.0 -0.07 0.2 -0.21 0.0 0.0 0.0 0.21 0.0 0.0");
+    istringstream strm2(":stepseq 0.0 -0.105 0.0 0.0 0.2 \
+                          0.21 0.0 0.0 0.2 -0.21 0.0 0.0 0.2 \
+                          0.21 0.0 0.0 0.2 -0.21 0.0 0.0 0.2 \
+                          0.21 0.0 -0.05 0.2 -0.21 0.0 -0.10 0.2 \
+                          0.21 0.0 -0.15 0.2 -0.21 0.0 -0.2 0.2 \
+                         +0.21 0.0 -0.2 0.2 -0.21 0.0 -0.2 0.2 \
+                         +0.21 0.0 -0.2 0.2 -0.21 0.0 -0.15 0.2 \
+                         +0.21 0.0 -0.07 0.2 -0.21 0.0 0.0 0.0 \
+                          0.21 0.0 0.0");
     aPGI.ParseCmd(strm2);
   }
 
@@ -662,7 +670,10 @@ void SteppingOver(PatternGeneratorInterface &aPGI)
   const char lBuffer[3][256] =
     { ":walkmode 2",
       ":UpperBodyMotionParameters -0.1 -1.0 0.0",
-      ":stepseq 0.0 -0.105 0.0 0.2 0.21 0.0 0.2 -0.21 0.0 0.2 0.21 0.0 0.2 -0.21 0.0 0.2 0.21 0.0 0.2 -0.21 0.0  0.2 0.21 0.0 0.2 -0.21 0.0 0.2 0.21 0.0 0.2 -0.21 0.0 0.0 0.21 0.0"
+      ":stepseq 0.0 -0.105 0.0 0.2 0.21 0.0 0.2 -0.21 0.0 0.2 \
+                0.21 0.0 0.2 -0.21 0.0 0.2 0.21 0.0 0.2 \
+               -0.21 0.0  0.2 0.21 0.0 0.2 -0.21 0.0 0.2 \
+                0.21 0.0 0.2 -0.21 0.0 0.0 0.21 0.0"
     };
   
   for(int i=0;i<3;i++)
@@ -745,7 +756,9 @@ int main(int argc, char *argv[])
 
   // Parsing the file.
   string RobotFileName = VRMLPath + VRMLFileName;
-  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,LinkJointRank,SpecificitiesFileName);
+  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,
+					 LinkJointRank,
+					 SpecificitiesFileName);
 
   // Create Pattern Generator Interface
   PatternGeneratorInterface * aPGI;
@@ -767,11 +780,8 @@ int main(int argc, char *argv[])
   aPGI->SetCurrentJointValues(InitialPosition);
 
   // Specify the walking mode: here the default one.
-  if (1)
-  {
-    istringstream strm2(":walkmode 0");
-    aPGI->ParseCmd(strm2);
-  }
+  istringstream strm2(":walkmode 0");
+  aPGI->ParseCmd(strm2);
 
   // This is a vector corresponding to ALL the DOFS of the robot:
   // free flyer + actuated DOFS.
@@ -1128,8 +1138,10 @@ int main(int argc, char *argv[])
   delete aPGI;
 
   cout << "Number of iterations " << NbOfIt << " " << NbOfItToCompute << endl;
-  cout << "Time consumption: " << (double)totaltime/(double)NbOfItToCompute << " max time: " << maxtime <<endl;
-  cout << "Time for modif: " << (double)totaltimemodif/(double)nbofmodifs <<  " nb of modifs: " << nbofmodifs << endl ;
+  cout << "Time consumption: " << (double)totaltime/(double)NbOfItToCompute 
+       << " max time: " << maxtime <<endl;
+  cout << "Time for modif: " << (double)totaltimemodif/(double)nbofmodifs 
+       <<  " nb of modifs: " << nbofmodifs << endl ;
   cout << "Time on ZMP ref planning (Kajita policy): " 
        << totaltimeinplanning<< " " 
        << totaltimeinplanning*4/(double)NbOfIt<< endl;
