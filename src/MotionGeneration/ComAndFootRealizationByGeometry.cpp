@@ -456,12 +456,14 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
 	  << lFootPosition[1] << " " 
 	  << lFootPosition[2]);
 
+  // Getting the waist position.
   MAL_S3_VECTOR(WaistPosition,double);
 
-  WaistPosition[0] = 0.0;
-  WaistPosition[1] = 0.0;
-  WaistPosition[2] = -lFootPosition[2]-RightFootSoleCenter[2];
+  WaistPosition[0] = CurrentConfig(0); // 0.0
+  WaistPosition[1] = CurrentConfig(1); // 0.0
+  WaistPosition[2] = CurrentConfig(2); //-lFootPosition[2]-RightFootSoleCenter[2];
 
+  ODEBUG3("WaistPosition: " << WaistPosition);
   InitRightFootPosition.x = lFootPosition[0];
   InitRightFootPosition.y = lFootPosition[1];
   InitRightFootPosition.z = lFootPosition[2];
@@ -545,13 +547,14 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   ODEBUG( lStartingCOMPosition[0] << " "
 	  << lStartingCOMPosition[1] << " "
 	  << lStartingCOMPosition[2]);
-  // Waist Position
 
-  m_DiffBetweenComAndWaist[0] =  -lStartingCOMPosition[0];
-  m_DiffBetweenComAndWaist[1] =  -lStartingCOMPosition[1];
-  m_DiffBetweenComAndWaist[2] =  -lStartingCOMPosition[2]
-    -(GetHeightOfTheCoM() + lFootPosition[2] - lStartingCOMPosition[2]);
-  ODEBUG3( m_DiffBetweenComAndWaist[0] << " " 
+  // Vector to go from CoM to Waist.
+  m_DiffBetweenComAndWaist[0] =  WaistPosition[0] - lStartingCOMPosition[0];
+  m_DiffBetweenComAndWaist[1] =  WaistPosition[1] - lStartingCOMPosition[1];
+  m_DiffBetweenComAndWaist[2] =  WaistPosition[2] - lStartingCOMPosition[2];
+  //    -(GetHeightOfTheCoM() + lFootPosition[2] - lStartingCOMPosition[2]);
+  ODEBUG3("lFootPosition[2]: " <<InitRightFootPosition.z);
+  ODEBUG3( "Diff between Com and Waist" << m_DiffBetweenComAndWaist[0] << " " 
 	  << m_DiffBetweenComAndWaist[1] << " " 
 	  << m_DiffBetweenComAndWaist[2]);
   // This term is usefull if
@@ -872,7 +875,8 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX(,double) & Body_R,
   Foot_P = Foot_P + Foot_Shift;
   //  Foot_P(2)-=(aCoMPosition(2) + ToTheHip(2));
   //cout << "Foot P : " << Foot_P << " Body_P : " << Body_P << " " << lDt << endl;
-
+  ODEBUG3("Body_P" << Body_P);
+  ODEBUG3("Foot_P" << Foot_P);
   // Compute the inverse kinematics.
   ODEBUG4("Body_P " << Body_P,"DebugDataIK.dat");
   ODEBUG4("Body_R " << Body_R,"DebugDataIK.dat");
@@ -1180,7 +1184,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
 
   if (Stage==0)
     {
-      if (IterationNumber>1)
+      if (IterationNumber>0)
 	{
 	  /* Compute the speed */
 	  for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
@@ -1189,7 +1193,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
 	      /* Keep the new value for the legs. */
 	    }
 
-	  if (IterationNumber>2)
+	  if (IterationNumber>1)
 	    {
 	      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity);i++)
 		CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity[i])/ ldt;
@@ -1212,7 +1216,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
   else if (Stage==1)
     {
 
-      if (IterationNumber>1)
+      if (IterationNumber>0)
 	{
 	  /* Compute the speed */
 	  for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
@@ -1220,7 +1224,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
 	      CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration1[i])/ getSamplingPeriod();
 	      /* Keep the new value for the legs. */
 	    }
-	  if (IterationNumber>2)
+	  if (IterationNumber>1)
 	    {
 	      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity1);i++)
 		CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity1[i])/ ldt;

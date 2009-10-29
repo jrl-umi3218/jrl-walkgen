@@ -838,7 +838,7 @@ int main(int argc, char *argv[])
 	{
 	  for(unsigned int k=0;k<30;k++)
 	    {
-	      aofq << dInitPos[k] << " ";
+	      aofq << dInitPos[k]*M_PI/180.0 << " ";
 	    }
 	  aofq << endl;
 	}
