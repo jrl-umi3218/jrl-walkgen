@@ -186,10 +186,13 @@ Initialization()
 
 
   // Build Right and left leg map.
+  // Remove the first element
+  FromRootToJoint.erase(FromRootToJoint.begin());
   InitializationMaps(FromRootToJoint,ActuatedJoints,
 		     m_RightLegIndexInVRML,m_RightLegIndexinConfiguration);
   FromRootToJoint.clear();
   FromRootToJoint = LeftFoot->associatedAnkle()->jointsFromRootToThis();
+  FromRootToJoint.erase(FromRootToJoint.begin());
   InitializationMaps(FromRootToJoint,ActuatedJoints,
 		     m_LeftLegIndexInVRML,m_LeftLegIndexinConfiguration);
 
@@ -463,7 +466,7 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   WaistPosition[1] = CurrentConfig(1); // 0.0
   WaistPosition[2] = CurrentConfig(2); //-lFootPosition[2]-RightFootSoleCenter[2];
 
-  ODEBUG3("WaistPosition: " << WaistPosition);
+  ODEBUG("WaistPosition: " << WaistPosition);
   InitRightFootPosition.x = lFootPosition[0];
   InitRightFootPosition.y = lFootPosition[1];
   InitRightFootPosition.z = lFootPosition[2];
@@ -553,8 +556,8 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   m_DiffBetweenComAndWaist[1] =  WaistPosition[1] - lStartingCOMPosition[1];
   m_DiffBetweenComAndWaist[2] =  WaistPosition[2] - lStartingCOMPosition[2];
   //    -(GetHeightOfTheCoM() + lFootPosition[2] - lStartingCOMPosition[2]);
-  ODEBUG3("lFootPosition[2]: " <<InitRightFootPosition.z);
-  ODEBUG3( "Diff between Com and Waist" << m_DiffBetweenComAndWaist[0] << " " 
+  ODEBUG("lFootPosition[2]: " <<InitRightFootPosition.z);
+  ODEBUG( "Diff between Com and Waist" << m_DiffBetweenComAndWaist[0] << " " 
 	  << m_DiffBetweenComAndWaist[1] << " " 
 	  << m_DiffBetweenComAndWaist[2]);
   // This term is usefull if
@@ -595,12 +598,16 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   //  cout << " " << ((Joint *)aDMB->GetJointFromVRMLID(LeftHipIndex))->getName() << endl;
   std::vector<CjrlJoint *> jointVector = aDMB->jointVector();
 
+  ODEBUG(jointVector[m_LeftLegIndexInVRML[0]] << " " <<
+	  getHumanoidDynamicRobot()->waist());
   MAL_S4x4_MATRIX(,double) lLeftHipPose = jointVector[m_LeftLegIndexInVRML[0]]->initialPosition();
 
   MAL_S3_VECTOR(LeftHip,double);
   for(int i=0;i<3;i++)
     LeftHip(i) = MAL_S4x4_MATRIX_ACCESS_I_J(lLeftHipPose, i,3);
 
+  ODEBUG( "Left Hip Position " << lLeftHipPose);
+  ODEBUG( "Left Hip Position " << LeftHip);
   ODEBUG4( "Left Hip Position: "
 	   << LeftHip[0] << " "
 	   << LeftHip[1] << " "
@@ -828,7 +835,8 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX(,double) & Body_R,
 		    MAL_VECTOR(,double) &aCoMPosition,
 		    MAL_S3_VECTOR(,double) &ToTheHip,
 		    int LeftOrRight,
-		    MAL_VECTOR(,double) &lq)
+		    MAL_VECTOR(,double) &lq,
+		    int Stage)
 {
 
   // Foot Orientation
@@ -875,10 +883,22 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX(,double) & Body_R,
   Foot_P = Foot_P + Foot_Shift;
   //  Foot_P(2)-=(aCoMPosition(2) + ToTheHip(2));
   //cout << "Foot P : " << Foot_P << " Body_P : " << Body_P << " " << lDt << endl;
-  ODEBUG3("Body_P" << Body_P);
-  ODEBUG3("Foot_P" << Foot_P);
+  ODEBUG("Body_P:" << endl << Body_P);
+  ODEBUG("Body_R:" << endl << Body_R);
+  ODEBUG("Foot_P" << Foot_P);
+  ODEBUG("Foot_R" << Foot_R);
   // Compute the inverse kinematics.
-  ODEBUG4("Body_P " << Body_P,"DebugDataIK.dat");
+  if ((LeftOrRight==1) && (Stage==0))
+    {
+      ODEBUG4SIMPLE(Body_P[0] << " " <<
+		    Body_P[1] << " " <<
+		    Body_P[2] << " " <<
+		    Foot_P[0] << " " <<
+		    Foot_P[1] << " " <<
+		    Foot_P[2] << " " 
+		    ,"DebugDataIK.dat");
+    }
+
   ODEBUG4("Body_R " << Body_R,"DebugDataIK.dat");
   ODEBUG4("Foot_P " << Foot_P,"DebugDataIK.dat");
   ODEBUG4("Foot_R " << Foot_R,"DebugDataIK.dat");
@@ -965,9 +985,9 @@ KinematicsForTheLegs(MAL_VECTOR(,double) & aCoMPosition,
   Body_P(1) = aCoMPosition(1) + ToTheHip(1);
   Body_P(2) = aCoMPosition(2) + ToTheHip(2);
 
-  ODEBUG3(aCoMPosition(2) << 
-	  " Body_P : " << Body_P  << std::endl <<
-	  " ToTheHip : " << ToTheHip);
+  ODEBUG(aCoMPosition(2) << 
+	 " Body_P : " << Body_P  << std::endl <<
+	 " ToTheHip : " << ToTheHip);
   /* If this is the second call, (stage =1)
      it is the final desired CoM */
   if (Stage==1)
@@ -997,8 +1017,8 @@ KinematicsForTheLegs(MAL_VECTOR(,double) & aCoMPosition,
 
   // Kinematics for the left leg.
   ODEBUG4("Stage " << Stage,"DebugDataIK.dat");
-  ODEBUG4("* Left Leg *","DebugDataIK.dat");
-  KinematicsForOneLeg(Body_R,Body_P,aLeftFoot,m_DtLeft,aCoMPosition,ToTheHip,1,ql);
+  ODEBUG4("* Left Lego *","DebugDataIK.dat");
+  KinematicsForOneLeg(Body_R,Body_P,aLeftFoot,m_DtLeft,aCoMPosition,ToTheHip,1,ql,Stage);
 
 
   // Kinematics for the right leg.
@@ -1008,7 +1028,7 @@ KinematicsForTheLegs(MAL_VECTOR(,double) & aCoMPosition,
   Body_P(2) = aCoMPosition(2) + ToTheHip(2);
 
   ODEBUG4("* Right Leg *","DebugDataIK.dat");
-  KinematicsForOneLeg(Body_R,Body_P,aRightFoot,m_DtRight,aCoMPosition,ToTheHip,-1,qr);
+  KinematicsForOneLeg(Body_R,Body_P,aRightFoot,m_DtRight,aCoMPosition,ToTheHip,-1,qr,Stage);
 
   ODEBUG4("**************","DebugDataIK.dat");
   /* Should compute now the Waist Position */

@@ -53,11 +53,16 @@ DebugFile << x << std::endl; \
               << __FUNCTION__ << "(#" \
               << __LINE__ << "):" << x << std::endl; \
     DebugFile.close();}
+#define ODEBUG4SIMPLE(x,y) { std::ofstream DebugFile; \
+DebugFile.open(y,ofstream::app); \
+DebugFile << x << std::endl; \
+          DebugFile.close();}
 
 #define _DEBUG_4_ACTIVATED_ 1
 #else
 #define RESETDEBUG4(y)
 #define ODEBUG4(x,y)
+#define ODEBUG4SIMPLE(x,y)
 #endif
 
 #define RESETDEBUG6(x)

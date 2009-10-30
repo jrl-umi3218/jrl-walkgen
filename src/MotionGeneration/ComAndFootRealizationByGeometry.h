@@ -180,7 +180,8 @@ namespace PatternGeneratorJRL
 			     MAL_VECTOR(,double) &aCoMPosition,
 			     MAL_S3_VECTOR(,double) &ToTheHip,
 			     int LeftOrRight,
-			     MAL_VECTOR(,double) &lq );
+			     MAL_VECTOR(,double) &lq,
+			     int Stage);
     
     /*! Compute the angles values considering two 6DOF legs for a given configuration
       of the waist and of the feet:
