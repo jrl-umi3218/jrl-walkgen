@@ -37,8 +37,8 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
   RESETDEBUG4("DebugDataql.txt");
   RESETDEBUG4("DebugDatadqr.txt");
   RESETDEBUG4("DebugDatadql.txt");
-  RESETDEBUG5("DebugDataDiffZMP.txt");
-  RESETDEBUG5("DebugDataCOMPC1.txt");
+  RESETDEBUG4("DebugDataDiffZMP.txt");
+  RESETDEBUG4("DebugDataCOMPC1.txt");
   RESETDEBUG4("DebugDataWaistZMP.txt");
   RESETDEBUG4("DebugDataZMPMB1.txt");
   RESETDEBUG4("DebugDataDeltaCOM.txt");
@@ -197,8 +197,8 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   // This call is suppose to initialize
   // correctly the current configuration, speed and acceleration.
   COMPosition acompos = m_FIFOCOMPositions[m_NL];
-  FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[m_NL];
-  FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[m_NL];
+  FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[0];
+  FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[0];
 
   ODEBUG("Before First CallToComAndFootRealization: " << CurrentConfiguration);
   CallToComAndFootRealization(acompos,aLeftFAP,aRightFAP,
@@ -501,7 +501,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
   {
     ZMPPosition lZMPPos = m_FIFOZMPRefPositions[0];
-    ODEBUG5(acomp.x[0]<< " "
+    ODEBUG4(acomp.x[0]<< " "
 	    << acomp.y[0] <<  " " 
 	    << acomp.z[0] << " "
 	    << zmpx2 << " "
@@ -617,7 +617,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   /* Get the current configuration vector */
   CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
 
-  ODEBUG5SIMPLE(aZMPpos.px << " "                               // 1
+  ODEBUG4SIMPLE(aZMPpos.px << " "                               // 1
 		<< aZMPpos.py << " "                            // 2
 		<< m_FIFOZMPRefPositions[0].px << " "           // 3
 		<< m_FIFOZMPRefPositions[0].py  << " "          // 4
@@ -634,9 +634,43 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
 		<< m_FIFOCOMPositions[0].y[1] << " "            // 15
 		<< m_FIFOCOMPositions[0].z[1] << " "            // 16
 		<< inValue << " "                               // 17
-		<< CurrentConfiguration(0) << " "               // 18
-		<< CurrentConfiguration(1) << " "               // 19
-		<< CurrentConfiguration(2) << " "               // 20
+		<< CurrentConfiguration(0) << " "               // 18 FF-0
+		<< CurrentConfiguration(1) << " "               // 19 FF-1
+		<< CurrentConfiguration(2) << " "               // 20 FF-2
+		<< CurrentConfiguration(3) << " "               // 21 FF-3
+		<< CurrentConfiguration(4) << " "               // 22 FF-4
+		<< CurrentConfiguration(5) << " "               // 23 FF-5
+		<< CurrentConfiguration(6) << " "               // 24 RLEG-0
+		<< CurrentConfiguration(7) << " "               // 25 RLEG-1
+		<< CurrentConfiguration(8) << " "               // 26 RLEG-2
+		<< CurrentConfiguration(9) << " "               // 27 RLEG-3
+		<< CurrentConfiguration(10) << " "              // 28 RLEG-4
+		<< CurrentConfiguration(11) << " "              // 29 RLEG-5
+		<< CurrentConfiguration(12) << " "              // 30 LLEG-0
+		<< CurrentConfiguration(13) << " "              // 31 LLEG-1
+		<< CurrentConfiguration(14) << " "              // 32 LLEG-2
+		<< CurrentConfiguration(15) << " "              // 33 LLEG-3
+		<< CurrentConfiguration(16) << " "              // 34 LLEG-4
+		<< CurrentConfiguration(17) << " "              // 35 LLEG-5
+		<< CurrentConfiguration(18) << " "              // 36
+		<< CurrentConfiguration(19) << " "              // 37
+		<< CurrentConfiguration(20) << " "              // 38
+		<< CurrentConfiguration(21) << " "              // 39
+		<< CurrentConfiguration(22) << " "              // 40
+		<< CurrentConfiguration(23) << " "              // 41
+		<< CurrentConfiguration(24) << " "              // 42
+		<< CurrentConfiguration(25) << " "              // 43
+		<< CurrentConfiguration(26) << " "              // 44
+		<< CurrentConfiguration(27) << " "              // 45
+		<< CurrentConfiguration(28) << " "              // 46
+		<< CurrentConfiguration(29) << " "              // 47
+		<< CurrentConfiguration(30) << " "              // 48
+		<< CurrentConfiguration(31) << " "              // 49
+		<< CurrentConfiguration(32) << " "              // 50
+		<< CurrentConfiguration(33) << " "              // 51
+		<< CurrentConfiguration(34) << " "              // 52
+		<< CurrentConfiguration(35) << " "              // 53
+		<< CurrentConfiguration(36) << " "              // 54
 		,"DebugDataDiffZMP.txt");
   m_FIFODeltaZMPPositions.push_back(aZMPpos);
 
@@ -757,7 +791,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
   m_HumanoidDynamicRobot->currentVelocity(CurrentVelocity);
   m_HumanoidDynamicRobot->currentAcceleration(CurrentAcceleration);
 
-  for(unsigned int i=0;i<1;i++)
+  for(unsigned int i=0;i<0;i++)
     {
       string sComputeZMP("ComputeZMP");
       string sZMPtrue("true");
