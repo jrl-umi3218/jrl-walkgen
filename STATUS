@@ -1,5 +1,6 @@
 STATUS:
-Validation only through TestFootPGInterface
+Morisawa:Validated through experiments and the Stack of Tasks
+Kajita:Validation of the first stage through TestFootPGInterface
 
 WalkGenJRL plugin: broken
 qt: broken
