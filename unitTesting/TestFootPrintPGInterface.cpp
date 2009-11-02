@@ -745,13 +745,15 @@ int main(int argc, char *argv[])
 
 
   // Creating the humanoid robot.
-  CjrlHumanoidDynamicRobot * aHDR = 0;
+  CjrlHumanoidDynamicRobot * aHDR = 0, * aDebugHDR = 0;
   dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
 
 #ifndef WITH_HRP2DYNAMICS
   aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
+  aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
 #else
   aHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
+  aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
 #endif
 
   // Parsing the file.
@@ -759,6 +761,11 @@ int main(int argc, char *argv[])
   dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,
 					 LinkJointRank,
 					 SpecificitiesFileName);
+
+  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aDebugHDR,RobotFileName,
+					 LinkJointRank,
+					 SpecificitiesFileName);
+
 
   // Create Pattern Generator Interface
   PatternGeneratorInterface * aPGI;
@@ -807,6 +814,16 @@ int main(int argc, char *argv[])
 
   MAL_VECTOR_DIM(ZMPTarget,double,3);
   
+  
+  string inProperty[5]={"TimeStep","ComputeAcceleration",
+			"ComputeBackwardDynamics", "ComputeZMP",
+			"ResetIteration"};
+  string inValue[5]={"0.005","false","false","true","true"};
+  
+  for(unsigned int i=0;i<5;i++)
+    aDebugHDR->setProperty(inProperty[i],
+			   inValue[i]);
+  
     
   //COMPosition CurrentWaistPosition;
   struct timeval begin,end,startingtime;
@@ -829,6 +846,9 @@ int main(int argc, char *argv[])
   double TimeProfileTS[200*620];
   unsigned int TimeProfileIndex = 0;
   unsigned int TimeProfileUpperLimit=200*620;
+
+  ofstream aofzmpmb2;
+  aofzmpmb2.open("ZMPMBSTAGE2.dat",ofstream::out);
 
   ofstream aofq;
   if (DebugConfiguration)
@@ -975,11 +995,15 @@ int main(int argc, char *argv[])
 
       // Should generate the same than the one previous (but shorter to specify).
 
-      //StartSimuOnLineWalking(*aPGI);
       gettimeofday(&end,0);
       double ltime = end.tv_sec-begin.tv_sec + 0.000001 * (end.tv_usec - begin.tv_usec);
       totaltimeinplanning+=ltime;
-      
+
+      aDebugHDR->currentConfiguration(PreviousConfiguration);	      
+      aDebugHDR->currentVelocity(PreviousVelocity);
+      aDebugHDR->currentAcceleration(PreviousAcceleration);
+      aDebugHDR->computeForwardKinematics();
+
       bool ok = true;
       while(ok)
 	{
@@ -1016,11 +1040,24 @@ int main(int argc, char *argv[])
 	      NbOfItToCompute++;
 	    }
 	  
-	  /* aPGI->DebugControlLoop(PreviousConfiguration,
-				 PreviousVelocity,
-				 PreviousAcceleration,
-				 NbOfIt);  */
-	  PreviousConfiguration = CurrentConfiguration;
+	  if (NbOfIt>3)
+	    {
+	      if (TestProfil==PROFIL_SHORT_STRAIGHT_WALKING)
+		{
+		  aDebugHDR->currentConfiguration(PreviousConfiguration);	      
+		  aDebugHDR->currentVelocity(PreviousVelocity);
+		  aDebugHDR->currentAcceleration(PreviousAcceleration);
+		  aDebugHDR->computeForwardKinematics();
+		  
+		  MAL_S3_VECTOR(,double) ZMPmultibody;
+		  ZMPmultibody = aDebugHDR->zeroMomentumPoint();
+		  if (aofzmpmb2.is_open())
+		    {
+		      aofzmpmb2 << ZMPmultibody[0] << " " << ZMPmultibody[1] << endl;
+		    }
+		}
+	    }
+	  PreviousConfiguration = CurrentConfiguration;	  
 	  PreviousVelocity = CurrentVelocity;
 	  PreviousAcceleration = CurrentAcceleration;
 	  
@@ -1118,6 +1155,9 @@ int main(int argc, char *argv[])
 	    }
 	}
     }
+
+
+  aofzmpmb2.close();
 
   {
     ofstream lProfileOutput("TimeProfile.dat",ofstream::out);
