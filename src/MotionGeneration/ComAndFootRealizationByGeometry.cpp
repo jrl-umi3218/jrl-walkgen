@@ -88,6 +88,7 @@ RegisterMethods()
     }
 
 }
+
 void ComAndFootRealizationByGeometry::
 InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
 		   std::vector<CjrlJoint *> &ActuatedJoints,
@@ -364,11 +365,9 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   CurrentConfig[4] = 0.0;
   CurrentConfig[5] = 0.0;
 
-  ODEBUG("RootPosition: " << RootPosition);
   double omega = CurrentConfig[4], theta = CurrentConfig[5];
   double c,s,co,so;
-  ODEBUG4( "omega: " << omega << " theta: " << theta ,"DebugDataStartingCOM.dat");
-  ODEBUG( "omega: " << omega << " theta: " << theta);
+
   c = cos(theta*M_PI/180.0);
   s = sin(theta*M_PI/180.0);
 
@@ -380,29 +379,13 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   Body_Rm3d(1,0) = s*co;        Body_Rm3d(1,1) =  c;      Body_Rm3d(1,2) = s*so;
   Body_Rm3d(2,0) = -so;         Body_Rm3d(2,1) = 0;       Body_Rm3d(2,2) = co;
 
-  // TODO: Update according the current state vector of the humanoid robot.
-
-  ODEBUG4("Size of body angles ini: " << MAL_VECTOR_SIZE(BodyAnglesIni),
-	  "DebugDataStartingCOM.dat");
-  ODEBUG4("Size of m_GlobalVRMLIDtoConfiguration: " << m_GlobalVRMLIDtoConfiguration.size(),
-	  "DebugDataStartingCOM.dat");
-
   for(unsigned int i=0;i<m_GlobalVRMLIDtoConfiguration.size();i++)
     {
       CurrentConfig[m_GlobalVRMLIDtoConfiguration[i]] = BodyAnglesIni[i];
-      ODEBUG4( m_GlobalVRMLIDtoConfiguration[i] << " " <<
-	       CurrentConfig[m_GlobalVRMLIDtoConfiguration[i]]*180/M_PI  ,
-	       "DebugDataStartingCOM.dat");
-
     }  
-
-  ODEBUG4("Size of m_GlobalVRMLIDtoConfiguration: " << m_GlobalVRMLIDtoConfiguration.size(),
-	  "DebugDataStartingCOM.dat");
 
   CjrlHumanoidDynamicRobot *aDMB =  getHumanoidDynamicRobot();
   aDMB->currentConfiguration(CurrentConfig);
-  ODEBUG("Configuration 1.5 stage " << CurrentConfig);
-  ODEBUG("Forward Kinematics for InitializationCoM");
 
   // Compensate for the static translation, not the WAIST position
   // but it is the body position which start on the ground.
@@ -418,12 +401,6 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   aDMB->computeForwardKinematics();
 
   CurrentConfig = aDMB->currentConfiguration();
-  ODEBUG("Configuration 2nd stage : " << CurrentConfig );
-
-  ODEBUG4("Root Position:"
-	  << RootPosition[0] << " "
-	  << RootPosition[1] << " "
-	  << RootPosition[2] , "DebugDataStartingCOM.dat");
 
   // Initialise the right foot position.
   CjrlFoot * RightFoot = aDMB->rightFoot();
@@ -431,7 +408,6 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   vector3d RightFootSoleCenter;
   RightFoot->getSoleCenterInLocalFrame(RightFootSoleCenter);
   
-  ODEBUG( "RightFootSoleCenter:" <<RightFootSoleCenter);
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,0) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,0,3);
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,1) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,1,3);
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,2) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,2,3);
@@ -450,10 +426,6 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   for(int i=0;i<3;i++)
     lFootPosition(i)  = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, i,3);
 
-  ODEBUG4( "Right Foot Position: "
-	   << lFootPosition[0] << " "
-	   << lFootPosition[1] << " "
-	   << lFootPosition[2] ,"DebugDataStartingCOM.dat");
   ODEBUG( "Right Foot Position: "
 	  << lFootPosition[0] << " "
 	  << lFootPosition[1] << " " 
@@ -464,7 +436,7 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
 
   WaistPosition[0] = CurrentConfig(0); // 0.0
   WaistPosition[1] = CurrentConfig(1); // 0.0
-  WaistPosition[2] = CurrentConfig(2); //-lFootPosition[2]-RightFootSoleCenter[2];
+  WaistPosition[2] = CurrentConfig(2) -lFootPosition[2]-RightFootSoleCenter[2];
 
   ODEBUG("WaistPosition: " << WaistPosition);
   InitRightFootPosition.x = lFootPosition[0];
@@ -550,12 +522,11 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   ODEBUG( lStartingCOMPosition[0] << " "
 	  << lStartingCOMPosition[1] << " "
 	  << lStartingCOMPosition[2]);
-
+  lStartingCOMPosition[2] +=    -lFootPosition[2]-RightFootSoleCenter[2];
   // Vector to go from CoM to Waist.
   m_DiffBetweenComAndWaist[0] =  WaistPosition[0] - lStartingCOMPosition[0];
   m_DiffBetweenComAndWaist[1] =  WaistPosition[1] - lStartingCOMPosition[1];
   m_DiffBetweenComAndWaist[2] =  WaistPosition[2] - lStartingCOMPosition[2];
-  //    -(GetHeightOfTheCoM() + lFootPosition[2] - lStartingCOMPosition[2]);
   ODEBUG("lFootPosition[2]: " <<InitRightFootPosition.z);
   ODEBUG( "Diff between Com and Waist" << m_DiffBetweenComAndWaist[0] << " " 
 	  << m_DiffBetweenComAndWaist[1] << " " 
@@ -608,43 +579,28 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
 
   ODEBUG( "Left Hip Position " << lLeftHipPose);
   ODEBUG( "Left Hip Position " << LeftHip);
-  ODEBUG4( "Left Hip Position: "
-	   << LeftHip[0] << " "
-	   << LeftHip[1] << " "
-	   << LeftHip[2],"DebugDataStartingCOM.dat" );
 
   MAL_S3_VECTOR(ToTheHip,double);
 
   ODEBUG(Body_R << endl << Foot_R );
   MAL_S3x3_C_eq_A_by_B(ToTheHip,Body_R, m_TranslationToTheLeftHip);
-  ODEBUG4("m_StaticToTheLeftHip " << m_StaticToTheLeftHip, "DebugDataStartingCOM.dat");
-  ODEBUG4("m_StaticToTheRightHip " << m_StaticToTheRightHip, "DebugDataStartingCOM.dat");
-  ODEBUG4("m_TranslationToTheLeftHip " << m_TranslationToTheLeftHip, "DebugDataStartingCOM.dat");
-  ODEBUG4( "ToTheHip " << ToTheHip , "DebugDataStartingCOM.dat");
 
   Body_P(0)= LeftHip[0];
   Body_P(1)= LeftHip[1];// LeftHip[1]
   Body_P(2)= 0.0;
 
-
-  ODEBUG4( "Body_R " << Body_R, "DebugDataStartingCOM.dat" );
-  ODEBUG4( "Body_P " << Body_P, "DebugDataStartingCOM.dat" );
   Foot_P(0) = lFootPosition[0];
   Foot_P(1) = lFootPosition[1];
   Foot_P(2) = lFootPosition[2];
   
-  ODEBUG4( "Foot_P " << Foot_P, "DebugDataStartingCOM.dat" );
-  ODEBUG4( "Foot_R " << Foot_R, "DebugDataStartingCOM.dat" );
-  ODEBUG4( "m_Dt Left : " << m_DtLeft << " Right : " << m_DtRight, "DebugDataStartingCOM.dat" );
-
-  // RIGHT FOOT.
-  // Compute the inverse kinematics.
-  ODEBUG4(lql , "DebugDataStartingCOM.dat");
-
   MAL_VECTOR_FILL(m_prev_Configuration,0.0);
   MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
+
+  // RIGHT FOOT.
+  // Compute the inverse kinematics.
+
 
   // Put in the real initial reference frame of the robot.
   vector3d AnklePosition;
@@ -660,20 +616,6 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   lStartingWaistPose(4) = 0.0;
   lStartingWaistPose(5) = 0.0;
 
-  ODEBUG4( "Init Left Foot Position: "
-	   << InitLeftFootPosition.x << " "
-	   << InitLeftFootPosition.y << " "
-	   << InitLeftFootPosition.z << " ","DebugDataStartingCOM.dat");
-  ODEBUG4( "Init Right Foot Position: "
-	   << InitRightFootPosition.x << " "
-	   << InitRightFootPosition.y << " "
-	   << InitRightFootPosition.z << " ","DebugDataStartingCOM.dat");
-  ODEBUG4( "Init Waist Position: "
-	   << WaistPosition[0] << " "
-	   << WaistPosition[1] << " "
-	   << WaistPosition[2] << " ","DebugDataStartingCOM.dat");
-  
-  
   return true;
 }
 
