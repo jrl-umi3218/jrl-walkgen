@@ -838,17 +838,20 @@ int main(int argc, char *argv[])
   FootAbsolutePosition LeftFootPosition;
   FootAbsolutePosition RightFootPosition;
 
-  bool DebugConfiguration = true;
-  bool DebugFGPI = true;
+  bool DebugConfiguration = false;
+  bool DebugFGPI = false;
+  bool DebugZMP2 = false;
   unsigned int PGIInterface = 0;
   
   double TimeProfile[200*620];
+  bool bTimeProfile=true;
   double TimeProfileTS[200*620];
   unsigned int TimeProfileIndex = 0;
   unsigned int TimeProfileUpperLimit=200*620;
 
   ofstream aofzmpmb2;
-  aofzmpmb2.open("ZMPMBSTAGE2.dat",ofstream::out);
+  if (DebugZMP2)
+    aofzmpmb2.open("ZMPMBSTAGE2.dat",ofstream::out);
 
   ofstream aofq;
   if (DebugConfiguration)
@@ -1051,9 +1054,12 @@ int main(int argc, char *argv[])
 		  
 		  MAL_S3_VECTOR(,double) ZMPmultibody;
 		  ZMPmultibody = aDebugHDR->zeroMomentumPoint();
-		  if (aofzmpmb2.is_open())
+		  if (DebugZMP2)
 		    {
-		      aofzmpmb2 << ZMPmultibody[0] << " " << ZMPmultibody[1] << endl;
+		      if (aofzmpmb2.is_open())
+			{
+			  aofzmpmb2 << ZMPmultibody[0] << " " << ZMPmultibody[1] << endl;
+			}
 		    }
 		}
 	    }
@@ -1159,6 +1165,7 @@ int main(int argc, char *argv[])
 
   aofzmpmb2.close();
 
+  if (bTimeProfile)
   {
     ofstream lProfileOutput("TimeProfile.dat",ofstream::out);
     double dST = startingtime.tv_sec + 0.000001 * startingtime.tv_usec;
@@ -1168,6 +1175,7 @@ int main(int argc, char *argv[])
 
     lProfileOutput.close();
   }
+
   if (DebugConfiguration)
     aofq.close();
 
