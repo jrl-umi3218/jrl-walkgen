@@ -33,10 +33,7 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
   m_StageStrategy = 1;
 
   RESETDEBUG4("DebugData.txt");
-  RESETDEBUG4("DebugDataqr.txt");
-  RESETDEBUG4("DebugDataql.txt");
-  RESETDEBUG4("DebugDatadqr.txt");
-  RESETDEBUG4("DebugDatadql.txt");
+  RESETDEBUG4("DebugDataqrql.txt");
   RESETDEBUG4("DebugDataDiffZMP.txt");
   RESETDEBUG4("DebugDataCOMPC1.txt");
   RESETDEBUG4("DebugDataWaistZMP.txt");
@@ -237,7 +234,13 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 		" " << refandfinalCOMPosition.z[0] <<
 		" " << aLeftFAP.x <<
 		" " << aLeftFAP.y <<
-		" " << aLeftFAP.z, "2ndStage.dat");
+		" " << aLeftFAP.z << 
+		" " << aLeftFAP.stepType << 
+		" " << aRightFAP.x <<
+		" " << aRightFAP.y <<
+		" " << aRightFAP.z << 
+		" " << aRightFAP.stepType
+		, "2ndStage.dat");
   if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
     {
       CallToComAndFootRealization(refandfinalCOMPosition,aLeftFAP,aRightFAP,
@@ -248,7 +251,7 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 				  1);
       ODEBUG("After Second CallToComAndFootRealization: " << CurrentConfiguration);
     }
-
+  ODEBUG("Current Configuration: "<< CurrentConfiguration);
   // Here it is assumed that the 4x4 CoM matrix 
   // is the orientation of the free flyer and
   // its position.
@@ -277,6 +280,20 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 3,3) = 1.0;
   ODEBUG("End of second stage");
 
+  ODEBUG4SIMPLE(CurrentConfiguration[6]<< " " <<
+		CurrentConfiguration[7]<< " " <<
+		CurrentConfiguration[8]<< " " <<
+		CurrentConfiguration[9]<< " " <<
+		CurrentConfiguration[10]<< " " <<
+		CurrentConfiguration[11]<< " " <<
+		CurrentConfiguration[12]<< " " <<
+		CurrentConfiguration[13]<< " " <<
+		CurrentConfiguration[14]<< " " <<
+		CurrentConfiguration[15]<< " " <<
+		CurrentConfiguration[16]<< " " <<
+		CurrentConfiguration[17]<< " " <<
+		CurrentConfiguration[18]<< " ",
+		"DebugDataqrql.txt");
   m_NumberOfIterations++;
   return 1;
 }
@@ -435,7 +452,6 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
       acomp.yaw = afCOMPosition.yaw;
       acomp.pitch = afCOMPosition.pitch;
-
     }
 
 
