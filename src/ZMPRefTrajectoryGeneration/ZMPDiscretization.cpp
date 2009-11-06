@@ -80,19 +80,6 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile,
 
   m_RelativeFootPositions.clear();
 
-#if 0
-  //  m_Omega = 3.0;
-  //m_Omega = 1.0;
-  m_Omega =0.0;
-  m_Tsingle = 0.78; 
-  //m_Tsingle = 0.25; // For Bjorn  m_Tdble = 0.1;
-  m_Tdble = 0.02;
-  m_SamplingPeriod = 0.005;
-  m_PreviewControlTime = 1.6;
-  //m_StepHeight = 0.07;
-  m_StepHeight = 0.12;
-#endif
-
   m_ModulationSupportCoefficient=0.9;
 
   ResetADataFile(DataFile);
@@ -377,7 +364,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   // Initialization of the ZMP position (stable values during the Preview control time window). 
   int AddArraySize;
   {
-    double ldAddArraySize = 2* m_PreviewControlTime/m_SamplingPeriod;
+    double ldAddArraySize = 2*m_PreviewControlTime/m_SamplingPeriod;
     AddArraySize = (int) ldAddArraySize;
   }
 

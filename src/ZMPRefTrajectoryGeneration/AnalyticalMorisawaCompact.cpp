@@ -1550,7 +1550,7 @@ namespace PatternGeneratorJRL
 	    deque<RelativeFootPosition> lRelativeFootPositions;
 	    aStepStackHandler->CopyRelativeFootPosition(lRelativeFootPositions,false);
 
-	    /*! Remove the first still in the stack. */
+	    /*! Remove the first step still in the stack. */
 	    lRelativeFootPositions.pop_front();
 
 	    deque<FootAbsolutePosition> lAbsoluteSupportFootPositions;
@@ -1596,14 +1596,6 @@ namespace PatternGeneratorJRL
 	
 	ODEBUG("Finished at index: j:" << j << " i:" << i << " k:" << k );
       }
-    //     for(unsigned int li=0;li<(*aCTIPX.ZMPProfil).size();li++)
-    //       {
-    // 	ODEBUG3("After - ZMPProfil along X-Y axis: " << li 
-    // 		<< " " << (*aCTIPX.ZMPProfil)[li] 
-    // 		<< " " << (*aCTIPY.ZMPProfil)[li]
-    // 		<< " " << m_DeltaTj[li] << " " << m_StepTypes[li] 
-    // 		<< " ( " << SINGLE_SUPPORT << " , " << DOUBLE_SUPPORT << " ) " );
-    //       }
     /* Compute the current value of the initial 
        and final CoM to be feed to the new system. */
     aCTIPX.InitialCoM = FPX.CoMInit;
