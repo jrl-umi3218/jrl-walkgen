@@ -94,14 +94,6 @@ IF(WIN32)
 ENDIF(WIN32)
 
 
-# Detect OmniOrb.
-#----------------
-INCLUDE(${CMAKE_MODULE_PATH}/UseOmniORB4.cmake)
-MESSAGE(STATUS "omniORB4: ${OMNIORB4_DIR}")
-
-# Check for OpenHRP
-# -----------------
-INCLUDE(${CMAKE_MODULE_PATH}/FindOpenHRP.cmake)
 
 # Optimisation flags when building with RELEASE
 #----------------------------------------------
@@ -114,7 +106,6 @@ ENDIF(CMAKE_BUILD_TYPE MATCHES "RELEASE")
 # To deal with the headers.
 #--------------------------
 add_subdirectory(src)
-add_subdirectory(plugin)
 add_subdirectory(unitTesting)
 
 # Prepare the documentation
