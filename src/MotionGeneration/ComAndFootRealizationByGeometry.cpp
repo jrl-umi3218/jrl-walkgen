@@ -41,10 +41,6 @@ ComAndFootRealizationByGeometry(PatternGeneratorInterfacePrivate *aPGI)
   MAL_VECTOR_FILL(m_prev_Velocity,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
 
-  RESETDEBUG4("DebugDataqr_0.dat");
-  RESETDEBUG4("DebugDataqr_1.dat");
-  RESETDEBUG4("DebugDataql_0.dat");
-  RESETDEBUG4("DebugDataql_1.dat");
   RESETDEBUG4("DebugDataVelocity.dat");
 
   RESETDEBUG4("LegsSpeed.dat");
@@ -929,7 +925,7 @@ KinematicsForTheLegs(MAL_VECTOR(,double) & aCoMPosition,
 
   ODEBUG(aCoMPosition(2) << 
 	 " Body_P : " << Body_P  << std::endl <<
-	 " ToTheHip : " << ToTheHip);
+	 " aLeftFoot : " << aLeftFoot);
   /* If this is the second call, (stage =1)
      it is the final desired CoM */
   if (Stage==1)
@@ -995,9 +991,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
 					int IterationNumber,
 					int Stage)
 {
-
-  ODEBUG4("CPFGCAFP: " << aLeftFoot << " " << aRightFoot ,"DebugDataIKArms.txt");
-
+  
   MAL_VECTOR(lqr,double);
   MAL_VECTOR(lql,double);
 
@@ -1011,42 +1005,6 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
 		       lql,
 		       lqr,
 		       AbsoluteWaistPosition);
-
-  // Debugging
-  if (Stage==0)
-    {
-      ODEBUG4( (1.0/M_PI)*180.0*lqr[0] << " " <<
-	       (1.0/M_PI)*180.0*lqr[1] << " " <<
-	       (1.0/M_PI)*180.0*lqr[2] << " " <<
-	       (1.0/M_PI)*180.0*lqr[3] << " " <<
-	       (1.0/M_PI)*180.0*lqr[4] << " " <<
-	       (1.0/M_PI)*180.0*lqr[5],"DebugDataqr_0.dat");
-
-      ODEBUG4( (1.0/M_PI)*180.0*lql[0] << " " <<
-	       (1.0/M_PI)*180.0*lql[1] << " " <<
-	       (1.0/M_PI)*180.0*lql[2] << " " <<
-	       (1.0/M_PI)*180.0*lql[3] << " " <<
-	       (1.0/M_PI)*180.0*lql[4] << " " <<
-	       (1.0/M_PI)*180.0*lql[5],"DebugDataql_0.dat");
-    }
-  else
-    {
-      ODEBUG4( (1.0/M_PI)*180.0*lqr[0] << " " <<
-	       (1.0/M_PI)*180.0*lqr[1] << " " <<
-	       (1.0/M_PI)*180.0*lqr[2] << " " <<
-	       (1.0/M_PI)*180.0*lqr[3] << " " <<
-	       (1.0/M_PI)*180.0*lqr[4] << " " <<
-	       (1.0/M_PI)*180.0*lqr[5],"DebugDataqr_1.dat");
-
-      ODEBUG4( (1.0/M_PI)*180.0*lql[0] << " " <<
-	       (1.0/M_PI)*180.0*lql[1] << " " <<
-	       (1.0/M_PI)*180.0*lql[2] << " " <<
-	       (1.0/M_PI)*180.0*lql[3] << " " <<
-	       (1.0/M_PI)*180.0*lql[4] << " " <<
-	       (1.0/M_PI)*180.0*lql[5],"DebugDataql_1.dat");
-      ODEBUG4(aCoMPosition(0) << " " << aCoMPosition(1),"DebugDataCOMForHeuristic.txt");
-    }
-
   /// NOW IT IS ABOUT THE UPPER BODY... ////
   MAL_VECTOR_DIM(qArmr,double,6);
   MAL_VECTOR_DIM(qArml,double,6);
@@ -1111,7 +1069,8 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
 
   ODEBUG( "ComAndFoot: AbsoluteWaistPosition: " << AbsoluteWaistPosition << endl
 	  << "CoMPosition: " << aCoMPosition );
-
+  ODEBUG("Left FootPosition: " << aLeftFoot <<
+	  " Right FootPosition: " << aRightFoot );
   /* Update of the configuration and velocity vector */
   for(int i=0;i<3;i++)
     CurrentConfiguration[i] = AbsoluteWaistPosition(i);
@@ -1177,7 +1136,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
     }
   else if (Stage==1)
     {
-
+      ODEBUG("lql: "<<lql<< " lqr: " <<lqr);
       if (IterationNumber>0)
 	{
 	  /* Compute the speed */
