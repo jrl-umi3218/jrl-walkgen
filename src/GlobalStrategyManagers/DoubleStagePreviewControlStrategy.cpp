@@ -31,10 +31,12 @@ DoubleStagePreviewControlStrategy::DoubleStagePreviewControlStrategy(SimplePlugi
   // The object to realize the global stage of preview control.
   m_ZMPpcwmbz = new ZMPPreviewControlWithMultiBodyZMP(aSPM);
 
-  unsigned int NbOfMethods=2;
-  std::string aMethodName[2] = 
+  unsigned int NbOfMethods=4;
+  std::string aMethodName[4] = 
     {":SetAlgoForZmpTrajectory",
-     ":SetZMPFrame"};
+     ":SetZMPFrame",
+     ":samplingperiod",
+     ":previewcontroltime"};
   
   for(unsigned int i=0;i<NbOfMethods;i++)
     {
@@ -102,8 +104,8 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 
   ODEBUG(m_count << " before-CurrentConfiguration " << CurrentConfiguration);
   
-  m_ZMPpcwmbz->OneGlobalStepOfControl((*m_LeftFootPositions)[m_NL],
-				      (*m_RightFootPositions)[m_NL],
+  m_ZMPpcwmbz->OneGlobalStepOfControl((*m_LeftFootPositions)[2*m_NL],
+				      (*m_RightFootPositions)[2*m_NL],
 				      (*m_ZMPPositions)[2*m_NL],
 				      finalCOMPosition,
 				      CurrentConfiguration,
@@ -160,11 +162,14 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   else 
     { ODEBUG3("Problem with the ZMP reference frame set to 0."); }
 
-  ODEBUG4((*m_ZMPPositions)[0].px <<  " " << 
-	  (*m_ZMPPositions)[0].py << " " <<
-	  outWaistPosition.x[0] << " " <<
-	  outWaistPosition.y[0] << " " <<
-	  ZMPRefPos(0) << " " << ZMPRefPos(1) << " " << ZMPRefPos(2), "ZMPRefAndWaist.dat");
+  ODEBUG4SIMPLE((*m_ZMPPositions)[0].px <<  " " << 
+		(*m_ZMPPositions)[0].py << " " <<
+		outWaistPosition.x[0] << " " <<
+		outWaistPosition.y[0] << " " <<
+		ZMPRefPos(0) << " " << ZMPRefPos(1) << " " << ZMPRefPos(2) <<
+		LeftFootPosition.stepType << " " <<
+		RightFootPosition.stepType, 
+		"ZMPRefAndWaist.dat");
 
   m_ZMPPositions->pop_front();
   m_COMBuffer->pop_front();
@@ -257,6 +262,26 @@ void DoubleStagePreviewControlStrategy::SetZMPFrame(std::istringstream &astrm)
     {ODEBUG3("Mistake wrong keyword" << aZMPFrame);}
 }
 
+void DoubleStagePreviewControlStrategy::SetSamplingPeriod(double lSamplingPeriod)
+{
+  m_SamplingPeriod = lSamplingPeriod;
+
+  m_NL=0.0;
+  if (m_SamplingPeriod!=0.0)
+    m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+  
+}
+
+void DoubleStagePreviewControlStrategy::SetPreviewControlTime(double lPreviewControlTime)
+{
+  m_PreviewControlTime = lPreviewControlTime;
+
+  m_NL=0.0;
+  if (m_SamplingPeriod!=0.0)
+    m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+
+}
+
 void DoubleStagePreviewControlStrategy::CallMethod(std::string &Method, std::istringstream &astrm)
 {
   ODEBUG("Method: " << Method);
@@ -269,6 +294,26 @@ void DoubleStagePreviewControlStrategy::CallMethod(std::string &Method, std::ist
     {
       SetZMPFrame(astrm);
     }
+  if (Method==":samplingperiod")
+    {
+      std::string aws;
+      if (astrm.good())
+	{
+	  double lSamplingPeriod;
+	  astrm >> lSamplingPeriod;
+	  SetSamplingPeriod(lSamplingPeriod);
+	}
+    }
+  else if (Method==":previewcontroltime")
+    {
+      std::string aws;
+      if (astrm.good())
+	{
+	  double lpreviewcontroltime;
+	  astrm >> lpreviewcontroltime;
+	  SetPreviewControlTime(lpreviewcontroltime);
+	}
+    }
 }
 
 void DoubleStagePreviewControlStrategy::Setup(deque<ZMPPosition> & aZMPPositions,
@@ -280,5 +325,4 @@ void DoubleStagePreviewControlStrategy::Setup(deque<ZMPPosition> & aZMPPositions
 		     aCOMBuffer,
 		     aLeftFootAbsolutePositions,
 		     aRightFootAbsolutePositions);
-  
 }

@@ -132,6 +132,12 @@ namespace PatternGeneratorJRL
     static const unsigned int ZMPFRAME_WORLD=1;
 
   protected:
+
+    /*! Set the sampling period and update NL.*/
+    void SetSamplingPeriod(double lSamplingPeriod);
+    
+    /*! Set the preview control time and update NL. */
+    void SetPreviewControlTime(double lPreviewControlTime);
     
     /*! \brief The object to be used to perform one step of control, 
       and generates the corrected CoM trajectory. */
