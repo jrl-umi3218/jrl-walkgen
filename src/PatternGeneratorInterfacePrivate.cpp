@@ -38,41 +38,6 @@ namespace PatternGeneratorJRL {
     ODEBUG4("Step 0","DebugPGI.txt");
 
     // Initialization for debugging.
-    RESETDEBUG4("DebugDataWPDisplay.txt");
-
-    RESETDEBUG4("DebugDataqrDisplay.txt");
-    RESETDEBUG4("DebugDataqlDisplay.txt");
-    RESETDEBUG4("DebugDataZMPMB1Display.txt");
-
-    RESETDEBUG4("DebugDataCOMForHeuristic.txt");
-    RESETDEBUG4("DebugDataqArmsHeuristic.txt");
-
-    RESETDEBUG4("DebugDatadqrDisplay.txt");
-    RESETDEBUG4("DebugDatadqlDisplay.txt");
-    RESETDEBUG4("DebugDataUBDisplay.txt");
-    RESETDEBUG4("DebugDatadUBDisplay.txt");
-
-    RESETDEBUG4("DebugData.txt");
-    RESETDEBUG4("DebugPGI.txt");
-    RESETDEBUG5("DebugDataLong.txt");
-    RESETDEBUG4("DebugDataZMPTargetZ.dat");
-    RESETDEBUG4("LeftLegAngle.txt");
-    RESETDEBUG4("RightLegAngle.txt");
-    ODEBUG4("Step 1","DebugPGI.txt");
-    RESETDEBUG4("DebugDataIKArms.txt");
-    RESETDEBUG4("DebugDataOnLine.txt");
-    RESETDEBUG4("DebugDataWaistYaw.dat");
-    RESETDEBUG4("DebugDataAngularMomentum.dat");
-
-    RESETDEBUG4("UpperBodyAngles.txt");
-    RESETDEBUG4("DebugZMPFinale.txt");
-
-    RESETDEBUG4("DebugGMFKW.dat");
-    RESETDEBUG4("DebugDataCOM.txt");
-
-    RESETDEBUG4("DDCC.dat");
-    RESETDEBUG4("DDCV.dat");
-    RESETDEBUG4("DebugDataWaist.dat");
     // End if Initialization
 
     m_ObstacleDetected = false;
@@ -638,7 +603,6 @@ namespace PatternGeneratorJRL {
 
     // Copy the relative foot position from the stack handler to here.
     m_StepStackHandler->CopyRelativeFootPosition(lRelativeFootPositions,ClearStepStackHandler);
-    ODEBUG4("Size of lRelativeFootPositions: " << lRelativeFootPositions.size(),"DebugData.txt");
     for(unsigned int i=0;i<lRelativeFootPositions.size();i++)
       {
 	ODEBUG(lRelativeFootPositions[i].sx << " " << 
@@ -676,13 +640,11 @@ namespace PatternGeneratorJRL {
     ODEBUG("StartingCOMPosition: " << lStartingCOMPosition.x[0] 
 	    << " "  << lStartingCOMPosition.y[0]
 	    << " "  << lStartingCOMPosition.z[0]);
-    ODEBUG4("StartingCOMPosition: " << lStartingCOMPosition.x[0] << " "  << lStartingCOMPosition.y[0],"DebugData.txt");
     // We also initialize the iteration number inside DMB.
     //std::cerr << "You have to implement a reset iteration number." << endl;
     string aProperty("ResetIteration"),aValue("any");
     m_HumanoidDynamicRobot->setProperty(aProperty,aValue);
 
-    ODEBUG4("CommonInitializationOfWalking " << BodyAnglesIni,"DebugData.txt" );
 
     if (0)
       {
@@ -783,7 +745,6 @@ namespace PatternGeneratorJRL {
     for(int j=0; j<m_DOF;j++)
       {
 	BodyAnglesIni(j) = lCurrentJointValues[j];
-	ODEBUG4(BodyAnglesIni(j),"DebugDataOnLine.txt");
       }
 
     m_GlobalStrategyManager->Setup(m_ZMPPositions,
