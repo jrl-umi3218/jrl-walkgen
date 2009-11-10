@@ -28,7 +28,7 @@ SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Set version
 #------------
-SET(PROJECT_VERSION 2.5.4)
+SET(PROJECT_VERSION 3.0.0)
 
 # Deal with OS specificities
 #---------------------------
