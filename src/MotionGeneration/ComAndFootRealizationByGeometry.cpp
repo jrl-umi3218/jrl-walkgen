@@ -848,11 +848,13 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX(,double) & Body_R,
     {
       for(unsigned int j=0;j<3;j++)
 	{
-	  BodyPose(i,j) = Body_R(i,j);
-	  FootPose(i,j) = Foot_R(i,j);
+	  MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,i,j) = 
+	    MAL_S3x3_MATRIX_ACCESS_I_J(Body_R,i,j);
+	  MAL_S4x4_MATRIX_ACCESS_I_J(FootPose,i,j) = 
+	    MAL_S3x3_MATRIX_ACCESS_I_J(Foot_R,i,j);
 	}
-      BodyPose(i,3) = Body_P(i);
-      FootPose(i,3)=Foot_P(i);
+      MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,i,3) = MAL_S3_VECTOR_ACCESS(Body_P,i);
+      MAL_S4x4_MATRIX_ACCESS_I_J(FootPose,i,3) = MAL_S3_VECTOR_ACCESS(Foot_P,i);
     }
 
 
@@ -1307,8 +1309,9 @@ ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR(,double) & qArmr,
   MAL_S4x4_MATRIX_SET_IDENTITY(jointRootPosition);
   MAL_S4x4_MATRIX_SET_IDENTITY(jointEndPosition);
   
-  jointEndPosition(0,3) = TempALeft * m_GainFactor / 0.2;
-  jointEndPosition(2,3) = m_ZARM;
+  MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,0,3) = 
+    TempALeft * m_GainFactor / 0.2;
+  MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,2,3) = m_ZARM;
   
   getHumanoidDynamicRobot()->getSpecializedInverseKinematics(*m_LeftShoulder,
 							     *getHumanoidDynamicRobot()->leftWrist(),
@@ -1320,8 +1323,8 @@ ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR(,double) & qArmr,
   ODEBUG4( "IK Left arm p:" << qArml(0)<< " " <<  qArml(1)  << " " << qArml(2)
 	   << " " << qArml(3) << "  " << qArml(4) << " " << qArml(5), "DebugDataIKArms.txt" );
 
-  jointEndPosition(0,3) = TempARight;
-  jointEndPosition(2,3) = m_ZARM;
+  MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,0,3) = TempARight;
+  MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,2,3) = m_ZARM;
   
   getHumanoidDynamicRobot()->getSpecializedInverseKinematics(*m_RightShoulder,
 							     *getHumanoidDynamicRobot()->rightWrist(),
