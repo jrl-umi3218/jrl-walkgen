@@ -110,7 +110,7 @@ add_subdirectory(unitTesting)
 
 # Prepare the documentation
 # -------------------------
-OPTION(GENERATE_DOC "Generate html documentation" OFF)
+OPTION(GENERATE_DOC "Generate html documentation" ON)
 IF (GENERATE_DOC)
   INCLUDE(FindDoxygen)
   IF(DOXYGEN_FOUND)
