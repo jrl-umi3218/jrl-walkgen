@@ -202,8 +202,15 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
 
   double Q=0.0,R=0.0;
   int Nl;
-  Nl = (int)(m_PreviewControlTime/T);
+  if (T==0.0)
+    return;
 
+  if (m_PreviewControlTime==0.0)
+    return;
+
+  Nl = (int)(m_PreviewControlTime/T);
+  
+  
   if (mode==OptimalControllerSolver::MODE_WITHOUT_INITIALPOS)
     {
       Q = 1.0;
