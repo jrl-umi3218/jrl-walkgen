@@ -28,7 +28,7 @@ SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Set version
 #------------
-SET(PROJECT_VERSION 2.5.4)
+SET(PROJECT_VERSION 3.0.0)
 
 # Deal with OS specificities
 #---------------------------
@@ -110,7 +110,7 @@ add_subdirectory(unitTesting)
 
 # Prepare the documentation
 # -------------------------
-OPTION(GENERATE_DOC "Generate html documentation" OFF)
+OPTION(GENERATE_DOC "Generate html documentation" ON)
 IF (GENERATE_DOC)
   INCLUDE(FindDoxygen)
   IF(DOXYGEN_FOUND)
