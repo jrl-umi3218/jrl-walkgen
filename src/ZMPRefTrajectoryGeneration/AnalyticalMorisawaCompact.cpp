@@ -1788,7 +1788,6 @@ namespace PatternGeneratorJRL
       {
 	/* Compute the time of maximal fluctuation for the initial solution along the X axis.*/
 	TmaxX = aAZCTX.FluctuationMaximal();
-	ODEBUG("Tmax X Init :" << Tmax );
 	aAZCTX.ComputeCOM(t,aFPX.CoMInit,IndexStartingInterval);
 	ODEBUG("COM X: " << aFPX.CoMInit);
 	aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedInit);
@@ -1798,7 +1797,6 @@ namespace PatternGeneratorJRL
 	
 	/* Compute the time of maximal fluctuation for the initial solution along the Y axis.*/
 	TmaxY = aAZCTY.FluctuationMaximal();
-	ODEBUG("Tmax Y Init :" << Tmax );
 	aAZCTY.ComputeCOM(t,aFPY.CoMInit,IndexStartingInterval);
 	aAZCTY.ComputeCOMSpeed(t,aFPY.CoMSpeedInit);
 	ODEBUG("COM Y: " << aFPY.CoMInit);

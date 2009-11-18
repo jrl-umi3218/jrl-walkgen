@@ -102,7 +102,6 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 	   (*m_ZMPPositions)[0].py << " " <<
 	   (*m_ZMPPositions)[0].pz,"ZMPRef.dat");
 
-  ODEBUG(m_count << " before-CurrentConfiguration " << CurrentConfiguration);
   
   m_ZMPpcwmbz->OneGlobalStepOfControl((*m_LeftFootPositions)[2*m_NL],
 				      (*m_RightFootPositions)[2*m_NL],

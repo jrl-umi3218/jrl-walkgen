@@ -1099,12 +1099,13 @@ namespace PatternGeneratorJRL {
     if ((!m_ShouldBeRunning) ||
 	(m_GlobalStrategyManager->EndOfMotion()<0))
       {
+	/*
 	ODEBUG(" m_ShoulBeRunning " << m_ShouldBeRunning << endl <<
 		" m_ZMPPositions " << m_ZMPPositions.size() << endl <<
 		" 2*m_NL+1 " << 2*m_NL+1 << endl);
 	ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
 	       "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
-		
+	*/
 	return false;
       }
     ODEBUG("Here");

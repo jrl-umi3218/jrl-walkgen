@@ -356,43 +356,6 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMPosition &finalCO
   // Update finalCOMPosition
   finalCOMPosition = aCOMPosition;
 
-#ifdef _DEBUG_MODE_ON_
-  ofstream aof_LastZMP;
-  static unsigned char FirstCall=1;
-  if (FirstCall)
-    {
-      aof_LastZMP.open("LastZMP_1.txt",ofstream::out);
-      FirstCall = 0;
-    }
-  else
-    {
-      aof_LastZMP.open("LastZMP_1.txt",ofstream::app);
-    }
-
-  if (aof_LastZMP.is_open())
-    {
-      aof_LastZMP << m_FIFOTmpZMPPosition[0].time << " "
-		  << m_FIFOTmpZMPPosition[0].px +  Deltazmpx2 << " "
-		  << m_FIFOTmpZMPPosition[0].py +  Deltazmpy2 << " "
-		  << aCOMPosition.x[0] << " "
-		  << aCOMPosition.y[0] << " "
-		  << aCOMPosition.z[0] << " "
-	          << m_sxDeltazmp << " "
-	          << m_syDeltazmp << " "
-		  << m_FIFODeltaZMPPositions[0].px << " "
-		  << m_FIFODeltaZMPPositions[0].py << " "
-		  << m_Deltax(0,0) << " "
-		  << m_Deltay(0,0) << " "
-		  << m_Deltax(1,0) << " "
-		  << m_Deltay(1,0) << " "
-		  << Deltazmpx2 << " "
-		  << Deltazmpy2 << " "
-		  << endl;
-      aof_LastZMP.close();
-    }
-  m_FIFOTmpZMPPosition.pop_front();
-#endif
-
   if ((m_StageStrategy==ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY)||
       (m_StageStrategy==ZMPCOM_TRAJECTORY_FULL))
     {
@@ -402,7 +365,8 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMPosition &finalCO
   m_FIFOCOMPositions.pop_front();
   m_FIFOLeftFootPosition.pop_front();
   m_FIFORightFootPosition.pop_front();
-
+  
+  ODEBUG("End");
   return 1;
 }
 
@@ -472,6 +436,8 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
 {
   string sComputeZMP("ComputeZMP");
   string sZMPtrue("true");
+
+  ODEBUG("Start EvaluateMultiBodyZMP");
   // Call the  Dynamic Multi Body computation of the dynamic parameters.
   m_HumanoidDynamicRobot->setProperty(sComputeZMP,sZMPtrue);
   m_HumanoidDynamicRobot->computeForwardKinematics();
@@ -483,7 +449,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   ODEBUG4(ZMPmultibody[0] << " " << ZMPmultibody[1], "DebugDataCheckZMP1.txt");
   MAL_S3_VECTOR(,double) CoMmultibody;
   CoMmultibody = m_HumanoidDynamicRobot->positionCenterOfMass();
-
+  ODEBUG("Stage 2");
   // Fill the delta ZMP FIFO for the second stage of the control.
   ZMPPosition aZMPpos;
   aZMPpos.px = m_FIFOZMPRefPositions[0].px - ZMPmultibody[0];
@@ -492,7 +458,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   aZMPpos.theta = 0.0;
   aZMPpos.stepType = 1;
   aZMPpos.time = m_FIFOZMPRefPositions[0].time;
-  
+  ODEBUG("Stage 3");
   string inProperty("Iteration");
   string inValue("-1");
   m_HumanoidDynamicRobot->getProperty(inProperty,inValue);
@@ -500,65 +466,10 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   /* Get the current configuration vector */
   CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
 
-  ODEBUG4SIMPLE(aZMPpos.px << " "                               // 1
-		<< aZMPpos.py << " "                            // 2
-		<< m_FIFOZMPRefPositions[0].px << " "           // 3
-		<< m_FIFOZMPRefPositions[0].py  << " "          // 4
-		<< m_FIFOZMPRefPositions[0].theta  << " "       // 5
-		<< ZMPmultibody[0] << " "                       // 6
-		<< ZMPmultibody[1] << " "                       // 7 
-		<< CoMmultibody[0] << " "                       // 8
-		<< CoMmultibody[1] << " "                       // 9
-		<< CoMmultibody[2] << " "                       // 10
-		<< m_FIFOCOMPositions[0].x[0] << " "            // 11
-		<< m_FIFOCOMPositions[0].y[0] << " "            // 12
-		<< m_FIFOCOMPositions[0].z[0] << " "            // 13 
-		<< m_FIFOCOMPositions[0].x[1] << " "            // 14
-		<< m_FIFOCOMPositions[0].y[1] << " "            // 15
-		<< m_FIFOCOMPositions[0].z[1] << " "            // 16
-		<< inValue << " "                               // 17
-		<< CurrentConfiguration(0) << " "               // 18 FF-0
-		<< CurrentConfiguration(1) << " "               // 19 FF-1
-		<< CurrentConfiguration(2) << " "               // 20 FF-2
-		<< CurrentConfiguration(3) << " "               // 21 FF-3
-		<< CurrentConfiguration(4) << " "               // 22 FF-4
-		<< CurrentConfiguration(5) << " "               // 23 FF-5
-		<< CurrentConfiguration(6) << " "               // 24 RLEG-0
-		<< CurrentConfiguration(7) << " "               // 25 RLEG-1
-		<< CurrentConfiguration(8) << " "               // 26 RLEG-2
-		<< CurrentConfiguration(9) << " "               // 27 RLEG-3
-		<< CurrentConfiguration(10) << " "              // 28 RLEG-4
-		<< CurrentConfiguration(11) << " "              // 29 RLEG-5
-		<< CurrentConfiguration(12) << " "              // 30 LLEG-0
-		<< CurrentConfiguration(13) << " "              // 31 LLEG-1
-		<< CurrentConfiguration(14) << " "              // 32 LLEG-2
-		<< CurrentConfiguration(15) << " "              // 33 LLEG-3
-		<< CurrentConfiguration(16) << " "              // 34 LLEG-4
-		<< CurrentConfiguration(17) << " "              // 35 LLEG-5
-		<< CurrentConfiguration(18) << " "              // 36
-		<< CurrentConfiguration(19) << " "              // 37
-		<< CurrentConfiguration(20) << " "              // 38
-		<< CurrentConfiguration(21) << " "              // 39
-		<< CurrentConfiguration(22) << " "              // 40
-		<< CurrentConfiguration(23) << " "              // 41
-		<< CurrentConfiguration(24) << " "              // 42
-		<< CurrentConfiguration(25) << " "              // 43
-		<< CurrentConfiguration(26) << " "              // 44
-		<< CurrentConfiguration(27) << " "              // 45
-		<< CurrentConfiguration(28) << " "              // 46
-		<< CurrentConfiguration(29) << " "              // 47
-		<< CurrentConfiguration(30) << " "              // 48
-		<< CurrentConfiguration(31) << " "              // 49
-		<< CurrentConfiguration(32) << " "              // 50
-		<< CurrentConfiguration(33) << " "              // 51
-		<< CurrentConfiguration(34) << " "              // 52
-		<< CurrentConfiguration(35) << " "              // 53
-		<< CurrentConfiguration(36) << " "              // 54
-		,"DebugDataDiffZMP.txt");
+  ODEBUG("Stage 4");
   m_FIFODeltaZMPPositions.push_back(aZMPpos);
-
   m_StartingNewSequence = false;
-
+  ODEBUG("Final");
   return 1;
 }
 
@@ -723,6 +634,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
 
 
   EvaluateMultiBodyZMP(localindex);
+
   m_FIFOZMPRefPositions.push_back(ZMPRefPositions[localindex+1+m_NL]);
 
   m_NumberOfIterations++;

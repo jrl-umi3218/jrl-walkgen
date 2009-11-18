@@ -1720,7 +1720,6 @@ void StepOverPlanner::CreateBufferFirstPreview(deque<COMPosition> &m_COMBuffer,
 	  {
 	    bool lObstacleDetected;
 	    strm >> lObstacleDetected;
-	    ODEBUG( "m_ObstacleDetected:" << " "<< m_ObstacleDetected );
 	    ReadObstacleParameters = true;
 	    break;
 	  }

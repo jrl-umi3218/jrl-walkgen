@@ -727,40 +727,6 @@ InitializationUpperBody(deque<ZMPPosition> &inZMPPositions,
   ODEBUG("inZMPPositions : " << inZMPPositions.size() << endl <<
 	 "m_COMBuffer : " << inCOMBuffer.size() << endl);
 
-
-  ODEBUG6("FinishAndRealizeStepSequence() - 7 ","DebugGMFKW.dat");
-#if _DEBUG_4_ACTIVATED_
-  ofstream DebugFile;
-  DebugFile.open("DebugDataCOMInitialization.txt",ofstream::out);
-  for(unsigned int i=0;i<inCOMBuffer.size();i++)
-    {
-
-      for(int j=0;j<3;j++)
-	{
-	  DebugFile << inCOMBuffer[i].x[j] << " ";
-	}
-
-      for(int j=0;j<3;j++)
-	{
-	  DebugFile << inCOMBuffer[i].y[j] << " ";
-	}
-
-      for(int j=0;j<3;j++)
-	{
-	  DebugFile << inCOMBuffer[i].z[j] << " ";
-	}
-
-      DebugFile << inCOMBuffer[i].omega << " "
-		<< inCOMBuffer[i].theta << " "
-		<< inCOMBuffer[i].hip;
-
-      DebugFile << endl;
-    }
-
-  DebugFile.close();
-
-#endif
-
   return true;
 
 }
@@ -1270,7 +1236,7 @@ ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR(,double) & qArmr,
 	  "Right Foot Position:" << RFP << endl <<
 	  "Left Foot Position:" << LFP << endl, "DebugDataIKArms.txt");
 
-  ODEBUG4(m_ZARM << " " << m_Xmax << " " << GainX << " " << m_GainFactor,"DebugDataIKArms.txt");
+  ODEBUG4(m_ZARM << " " << m_Xmax << " " << " " << m_GainFactor,"DebugDataIKArms.txt");
   double TempXL,TempXR,TempCos,TempSin,
     TempARight,TempALeft;
 
@@ -1293,12 +1259,10 @@ ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR(,double) & qArmr,
 
   ODEBUG4("Values: TL " << TempALeft << 
 	  " TR " << TempARight << 
-	  " "    << GainX << 
 	  " "    << m_ZARM << 
 	  " "    << m_Xmax ,"DebugDataIKArms.txt");
   ODEBUG("Values: TL " << TempALeft << 
 	 " TR " << TempARight << 
-	 " "    << GainX << 
 	 " "    << m_ZARM << 
 	 " "    << m_Xmax );
   // Compute angles using inverse kinematics and the computed hand position.

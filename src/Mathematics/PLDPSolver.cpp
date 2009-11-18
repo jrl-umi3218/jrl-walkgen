@@ -842,8 +842,7 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
 
       if (ContinueAlgo)
 	{
-	  ODEBUG("Nb of activated constraints: " << NewActivatedConstraints.size() 
-		  << " " << lTime);
+	  ODEBUG("Nb of activated constraints: " << NewActivatedConstraints.size());
 	  m_OptCholesky->AddActiveConstraints(NewActivatedConstraints);
 	  for(unsigned int i=0;i<NewActivatedConstraints.size();i++)
 	    m_ActivatedConstraints.push_back(NewActivatedConstraints[i]);

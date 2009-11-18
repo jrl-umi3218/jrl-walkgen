@@ -630,7 +630,6 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
 	{
 	  ptPu[k*m_QP_N+i] = 
 	    ((1+3*(i-k)+3*(i-k)*(i-k))*m_QP_T*m_QP_T*m_QP_T/6.0 - m_QP_T * m_ComHeight/9.81);
-	  ODEBUG("IC: " << IndexConstraint );
 	}
     }
   
@@ -654,7 +653,6 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfConstraintMatrices()
 	      for(unsigned k=0;k<m_QP_N;k++)
 		{
 		  m_Pu[i*m_QP_N+j] += m_iLQ(i,k) * ptPu[k*m_QP_N+j];
-		  ODEBUG("IC: " << IndexConstraint );
 		}
 	    }
 	}
@@ -1427,7 +1425,6 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
     }
-  ODEBUG("NewZMPsize: " << NewFinalZMPPositions.size());
   
   /*  cout << "Size of PX: " << MAL_MATRIX_NB_ROWS(vnlStorePx) << " " 
       << MAL_MATRIX_NB_COLS(vnlStorePx) << " " << endl; */
