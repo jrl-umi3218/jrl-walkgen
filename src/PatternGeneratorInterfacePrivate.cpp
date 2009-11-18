@@ -481,13 +481,14 @@ namespace PatternGeneratorJRL {
     m_HumanoidDynamicRobot->currentVelocity(Velocity);
     m_HumanoidDynamicRobot->computeForwardKinematics();
     lStartingCOMPosition = m_HumanoidDynamicRobot->positionCenterOfMass();
+
   }
 
   void PatternGeneratorInterfacePrivate::EvaluateStartingState(COMPosition  & lStartingCOMPosition,
-							MAL_S3_VECTOR(,double) & lStartingZMPPosition,
-							MAL_VECTOR(,double) & lStartingWaistPose,
-							FootAbsolutePosition & InitLeftFootAbsPos,
-							FootAbsolutePosition & InitRightFootAbsPos)
+							       MAL_S3_VECTOR(,double) & lStartingZMPPosition,
+							       MAL_VECTOR(,double) & lStartingWaistPose,
+							       FootAbsolutePosition & InitLeftFootAbsPos,
+							       FootAbsolutePosition & InitRightFootAbsPos)
   {
     MAL_VECTOR(lBodyInit,double);    
     MAL_VECTOR_RESIZE(lBodyInit,m_CurrentActuatedJointValues.size());
@@ -502,6 +503,14 @@ namespace PatternGeneratorJRL {
 						   lStartingZMPPosition,
 						   lStartingWaistPose,
 						   InitLeftFootAbsPos, InitRightFootAbsPos);
+    ostringstream osscomheightcmd;
+    osscomheightcmd << ":comheight "
+		    << lStartingCOMPosition.z[0];
+    string atmp = osscomheightcmd.str();
+    istringstream isscomheightcmd(atmp);
+    ParseCmd(isscomheightcmd);
+    cout << isscomheightcmd.str() <<endl;
+
   }
 
   // This method assumes that we still are using the ZMP
