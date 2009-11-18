@@ -33,13 +33,13 @@
 using namespace::PatternGeneratorJRL;
 using namespace std;
 
-
+//      ":comheight 0.807727",
 void CommonInitialization(PatternGeneratorInterface &aPGI)
 {
   const char lBuffer[12][256] =
     {":samplingperiod 0.005",
      ":previewcontroltime 1.6",
-     ":comheight 0.814",
+     ":comheight 0.914",
      ":omega 0.0",
      ":stepheight 0.07",
      ":singlesupporttime 0.78",
@@ -56,6 +56,20 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
       std::istringstream strm(lBuffer[i]);
       aPGI.ParseCmd(strm);
     }
+  // Evaluate current state of the robot in the PG.
+  COMPosition   lStartingCOMPosition;
+  MAL_S3_VECTOR(,double)  lStartingZMPPosition;
+  MAL_VECTOR(,double)  lStartingWaistPose;
+  FootAbsolutePosition  InitLeftFootAbsPos;
+  FootAbsolutePosition  InitRightFootAbsPos;
+
+  aPGI.EvaluateStartingState(lStartingCOMPosition,
+			     lStartingZMPPosition,
+			     lStartingWaistPose,
+			     InitLeftFootAbsPos,
+			     InitRightFootAbsPos);
+      
+
 }
 
 void StraightWalking(PatternGeneratorInterface &aPGI)
@@ -773,6 +787,7 @@ int main(int argc, char *argv[])
 
   bool conversiontoradneeded=true;
   
+  //  double * dInitPos = InitialPoses[INTERACTION_2008];
   double * dInitPos = InitialPoses[HALF_SITTING_2008];
   
   // This is a vector corresponding to the DOFs actuated of the robot.
@@ -838,9 +853,9 @@ int main(int argc, char *argv[])
   FootAbsolutePosition LeftFootPosition;
   FootAbsolutePosition RightFootPosition;
 
-  bool DebugConfiguration = false;
-  bool DebugFGPI = false;
-  bool DebugZMP2 = false;
+  bool DebugConfiguration = true;
+  bool DebugFGPI = true;
+  bool DebugZMP2 = true;
   unsigned int PGIInterface = 0;
   
   double TimeProfile[200*620];
@@ -851,7 +866,7 @@ int main(int argc, char *argv[])
 
   ofstream aofzmpmb2;
   if (DebugZMP2)
-    aofzmpmb2.open("ZMPMBSTAGE2.dat",ofstream::out);
+    aofzmpmb2.open("ZMPggMBSTAGE2.dat",ofstream::out);
 
   ofstream aofq;
   if (DebugConfiguration)
@@ -996,6 +1011,7 @@ int main(int argc, char *argv[])
 	  break;
 	};
 
+	
       // Should generate the same than the one previous (but shorter to specify).
 
       gettimeofday(&end,0);
