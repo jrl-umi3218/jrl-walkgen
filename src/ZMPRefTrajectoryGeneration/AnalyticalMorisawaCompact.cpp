@@ -46,7 +46,7 @@ extern "C"
 		     integer *, /* 19 IWORK */
 		     integer * /* 20 INFO */
                  );
-#if 0
+#if BOOST_VERSION >=104000
   extern void dgetrf_( integer * m, /* M */
 		       integer * n, /* N */
 		       doublereal * A, /* A */
