@@ -226,6 +226,7 @@ void ZMPDiscretization::InitializeFilter()
   int n=0;
   double sum=0,tmp=0;
   
+  assert(m_SamplingPeriod > 0);
   n = (int)floor(T/m_SamplingPeriod);
   m_ZMPFilterWindow.resize(n+1);
   for(int i=0;i<n+1;i++)
@@ -251,6 +252,7 @@ void ZMPDiscretization::FilterZMPRef(deque<ZMPPosition> &ZMPPositionsX,
 
   ZMPPositionsY.resize(ZMPPositionsX.size());
   // Creates window.
+  assert(m_SamplingPeriod > 0);
   n = (int)floor(T/m_SamplingPeriod);
 
   // Filter ZMPref.
@@ -364,6 +366,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   // Initialization of the ZMP position (stable values during the Preview control time window). 
   int AddArraySize;
   {
+    assert(m_SamplingPeriod > 0);
     double ldAddArraySize = 2*m_PreviewControlTime/m_SamplingPeriod;
     AddArraySize = (int) ldAddArraySize;
   }
@@ -601,6 +604,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   double TimeForThisFootPosition = TimeFirstPhase+ lTsingle;
   ODEBUG4("TimeFirstPhase: " << TimeFirstPhase << " lTsingle: " << lTsingle,"DebugData.txt");
   // Compute the size of cells to add inside the array.
+  assert(m_SamplingPeriod > 0);
   double l2AddArraySize= TimeForThisFootPosition/m_SamplingPeriod;
   int AddArraySize = (unsigned int)round(l2AddArraySize);
   ODEBUG("Added part: "<<AddArraySize << " " << l2AddArraySize << 
@@ -617,6 +621,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   UpdateCurrentSupportFootPosition(m_RelativeFootPositions[0]);
   
   // First Phase of the step cycle.
+  assert(m_SamplingPeriod > 0);
   double dSizeOf1stPhase =TimeFirstPhase/m_SamplingPeriod;
   unsigned int SizeOf1stPhase = (unsigned int)round(dSizeOf1stPhase);
   ODEBUG("m_vdiffsupppre : " << m_vdiffsupppre); 
@@ -814,6 +819,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 
   //m_PolynomeZMPTheta->SetParameters(lTsingle,NextZMPTheta);
   m_PolynomeZMPTheta->SetParameters(lTsingle,RelZMPTheta);
+  assert(m_SamplingPeriod > 0);
   double dSizeOfSndPhase = lTsingle/m_SamplingPeriod;
   unsigned int SizeOfSndPhase = (unsigned int)round(dSizeOfSndPhase);
   int indexinitial = CurrentZMPindex-1;
@@ -1079,6 +1085,7 @@ int ZMPDiscretization::OnLineFootChange(double time,
 
 int ZMPDiscretization::ReturnOptimalTimeToRegenerateAStep()
 {
+  assert(m_SamplingPeriod > 0);
   int r = (int)(m_PreviewControlTime/m_SamplingPeriod);
   return 2*r;
 }
@@ -1100,6 +1107,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   double TimeForThisFootPosition;
   // Deal with the end phase of the walking.
   TimeForThisFootPosition = m_Tdble;
+  assert(m_SamplingPeriod > 0);
   double dlAddArraySize = TimeForThisFootPosition/m_SamplingPeriod;
   unsigned int AddArraySize = (unsigned int)round(dlAddArraySize);
   
@@ -1196,6 +1204,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
 
   // Added a new phase for exhausting the preview control
   {
+    assert(m_SamplingPeriod > 0);
     double ldAddArraySize = 3.0*m_PreviewControlTime/m_SamplingPeriod;
     AddArraySize = (int)ldAddArraySize;
   }
