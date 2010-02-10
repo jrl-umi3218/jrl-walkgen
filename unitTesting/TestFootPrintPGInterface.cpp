@@ -150,7 +150,7 @@ istringstream strm2(":stepseq 0 0.1 0 \
 	-0.0540087	-0.21638	4.6646 \
 	-0.0373302	0.196611	4.6646 \
 	-0.0536928	-0.199019	4.6646 \
-	-0.0372245	0.204021	4.6646 \ 
+	-0.0372245	0.204021	4.6646 \
 	-0.0529848	-0.196642	4.6646 \
 	-0.0355124	0.2163	4.6646 \
 	-0.000858977	-0.204807	 0.0767924 \
@@ -680,23 +680,21 @@ int main(int argc, char *argv[])
   //  unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
   //  unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
   unsigned int TestProfil=PROFIL_PB_FLORENT;
-  string PCParametersFile;
   string VRMLPath;
   string VRMLFileName;
   string SpecificitiesFileName;
   string LinkJointRank;
 
   
-  if (argc!=6)
+  if (argc!=5)
     {
       const char *openhrphome="OPENHRPHOME";
       char *value = 0;
       value = getenv(openhrphome);
       if (value==0)
 	{
-	  cerr << " This program takes 5 arguments: " << endl;
+	  cerr << " This program takes 4 arguments: " << endl;
 	  cerr << "./TestFootPrintPGInterface \
-                         PATH_TO_PC_PARAMS_FILE	  \
                          PATH_TO_VRML_FILE	   \
                          VRML_FILE_NAME		   \
                          PATH_TO_SPECIFICITIES_XML \
@@ -705,9 +703,6 @@ int main(int argc, char *argv[])
 	}
       else
 	{
-	  PCParametersFile = value;
-	  PCParametersFile += "Controller/IOserver/robot/HRP2JRL/etc/";
-	  PCParametersFile +="PreviewControlParameters.ini";
 	  VRMLPath=value;
 	  VRMLPath+="Controller/IOserver/robot/HRP2JRL/model/";
 	  VRMLFileName="HRP2JRLmain.wrl";
@@ -728,11 +723,10 @@ int main(int argc, char *argv[])
     }	
   else 
     {
-      PCParametersFile = argv[1];
-      VRMLPath=argv[2];
-      VRMLFileName=argv[3];
-      SpecificitiesFileName = argv[4];
-      LinkJointRank = argv[5];
+      VRMLPath=argv[1];
+      VRMLFileName=argv[2];
+      SpecificitiesFileName = argv[3];
+      LinkJointRank = argv[4];
     }
 
 
