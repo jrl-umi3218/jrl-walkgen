@@ -216,7 +216,7 @@ namespace PatternGeneratorJRL {
     m_ZMPM->SetHumanoidSpecificities(m_HumanoidDynamicRobot);
 
     // Preview control for a 3D Linear inverse pendulum
-    m_PC = new PreviewControl(this);
+    m_PC = new PreviewControl(this,OptimalControllerSolver::MODE_WITHOUT_INITIALPOS,true);
 
     // Object to generate Motion from KineoWorks.
     m_GMFKW = new GenerateMotionFromKineoWorks();

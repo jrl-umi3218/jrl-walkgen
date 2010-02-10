@@ -677,7 +677,7 @@ void SteppingOver(PatternGeneratorInterface &aPGI)
 
 int main(int argc, char *argv[])
 {
-  //  unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
+  //unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
   //  unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
   unsigned int TestProfil=PROFIL_PB_FLORENT;
   string VRMLPath;
@@ -839,7 +839,7 @@ int main(int argc, char *argv[])
 
   ofstream aofzmpmb2;
   if (DebugZMP2)
-    aofzmpmb2.open("ZMPggMBSTAGE2.dat",ofstream::out);
+    aofzmpmb2.open("ZMPMBSTAGE2.dat",ofstream::out);
 
   ofstream aofq;
   if (DebugConfiguration)

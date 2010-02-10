@@ -30,7 +30,7 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
   m_ComAndFootRealization = 0;
   m_HumanoidDynamicRobot = 0;
 
-  m_StageStrategy = 1;
+  m_StageStrategy = ZMPCOM_TRAJECTORY_FULL;
 
   RESETDEBUG4("DebugData.txt");
   RESETDEBUG4("DebugDataqrql.txt");
@@ -199,7 +199,10 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[m_NL];
   FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[m_NL];
 
-  ODEBUG4SIMPLE(acompos.x[0] << " " <<
+  ODEBUG4SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
+		m_FIFOZMPRefPositions[0].py << " " <<
+		m_FIFOZMPRefPositions[0].pz << " " <<
+		acompos.x[0] << " " <<
 		acompos.y[0] << " " <<
 		acompos.z[0] << " " <<
 		aLeftFAP.x << " " <<
