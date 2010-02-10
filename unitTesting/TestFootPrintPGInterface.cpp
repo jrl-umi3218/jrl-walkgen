@@ -701,7 +701,8 @@ void SteppingOver(PatternGeneratorInterface &aPGI)
 int main(int argc, char *argv[])
 {
   //  unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
-  unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
+  //  unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
+  unsigned int TestProfil=PROFIL_CURVED_WALKING_DIMITROV;
   string PCParametersFile;
   string VRMLPath;
   string VRMLFileName;
