@@ -21,6 +21,7 @@ FootTrajectoryGenerationMultiple::FootTrajectoryGenerationMultiple(SimplePluginM
   : SimplePlugin(lSPM)
 {
   m_Foot = aFoot;
+  m_Sensitivity=1e-9;
 }
 
 FootTrajectoryGenerationMultiple::~FootTrajectoryGenerationMultiple()
@@ -83,7 +84,7 @@ bool FootTrajectoryGenerationMultiple::Compute(int axis, double t, double &resul
   for(unsigned int j=0;j<m_DeltaTj.size();j++)
     {
       ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<j << "]= "<< m_DeltaTj[j]);
-      if ((t>=reftime) && (t<=reftime+m_DeltaTj[j]))
+      if ((t>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
 	{
 	  double deltaj=0.0;
 	  deltaj = t-reftime;
@@ -118,7 +119,7 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
   for(unsigned int j=0;j<m_DeltaTj.size();j++)
     {
 
-      if ((t>=reftime) && (t<=reftime+m_DeltaTj[j]))
+      if ((t>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
 	{
 	  ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<j << "]= "<< m_DeltaTj[j]);
 	  double deltaj=0.0;

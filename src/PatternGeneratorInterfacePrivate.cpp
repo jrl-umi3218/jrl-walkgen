@@ -795,7 +795,7 @@ namespace PatternGeneratorJRL {
     lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();  
     ODEBUG("lCurrent Configuration :" << lCurrentConfiguration);
 
-    ODEBUG3("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
+    ODEBUG("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
 	     << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
 
     deque<RelativeFootPosition> lRelativeFootPositions;
@@ -820,7 +820,7 @@ namespace PatternGeneratorJRL {
     m_HumanoidDynamicRobot->currentConfiguration(lCurrentConfiguration);
 
     ODEBUG("Size of lRelativeFootPositions :" << lRelativeFootPositions.size());
-    ODEBUG3("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
+    ODEBUG("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
 	     << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
 
     ODEBUG("COMBuffer: " << m_COMBuffer.size() );
