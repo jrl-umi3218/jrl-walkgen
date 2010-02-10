@@ -1525,6 +1525,7 @@ void ZMPConstrainedQPFastFormulation::CallMethod(std::string & Method, std::istr
 	}
     }
 
+  ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
 }
 
 
