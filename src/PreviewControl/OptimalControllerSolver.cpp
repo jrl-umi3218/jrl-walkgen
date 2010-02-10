@@ -17,7 +17,7 @@
 #include <iostream>
 #include <PreviewControl/OptimalControllerSolver.h>
 
-
+#define _DEBUG_MODE_ON_
 #include <Debug.h>
 
 using namespace PatternGeneratorJRL;
@@ -88,9 +88,24 @@ OptimalControllerSolver::OptimalControllerSolver(MAL_MATRIX( &A, double),
 						 double Q, double R,
 						 unsigned int Nl)
 {
-  m_A = A;
-  m_b = b;
-  m_c = c;
+  MAL_MATRIX_RESIZE(m_A, MAL_MATRIX_NB_ROWS(A),
+		    MAL_MATRIX_NB_COLS(A));
+  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(A);i++)
+    for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(A);j++)
+      m_A(i,j) = A(i,j);
+
+  MAL_MATRIX_RESIZE(m_b, MAL_MATRIX_NB_ROWS(b),
+		    MAL_MATRIX_NB_COLS(b));
+  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(b);i++)
+    for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(b);j++)
+      m_b(i,j) = b(i,j);
+
+
+  MAL_MATRIX_RESIZE(m_c, MAL_MATRIX_NB_ROWS(c),
+		    MAL_MATRIX_NB_COLS(c));
+  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(c);i++)
+    for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(c);j++)
+      m_c(i,j) = c(i,j);
   
   m_Q = Q;
   m_R = R;
@@ -173,7 +188,7 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   // H is the 2n x 2n matrix
   // H = [[ A , 0 ]
   //      [-c'Qc E]]
-  
+  //  ODEBUG("m_A:" << m_A);
   // And each sub-matrix is n x n matrix.
   MAL_MATRIX(H,double);
   MAL_MATRIX(tm_b,double);
@@ -181,6 +196,8 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   // Store the transpose of m_b;
   tm_b = MAL_RET_TRANSPOSE(m_b);
 
+  cout << " ROWS(A): " << MAL_MATRIX_NB_ROWS(m_A)
+       << " COLS(A): " << MAL_MATRIX_NB_COLS(m_A) << endl;
   MAL_MATRIX_RESIZE(H,
 		    2*MAL_MATRIX_NB_ROWS(m_A),
 		    2*MAL_MATRIX_NB_COLS(m_A));

@@ -162,6 +162,11 @@ istringstream strm2(":stepseq 0 0.1 0 \
 void PbFlorentSeq2(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
+   {
+    istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
+    aPGI.ParseCmd(strm2);
+  }
+
   {
     istringstream strm2(":stepseq \
                                  0 -0.1 0 \
@@ -228,6 +233,11 @@ void PbFlorentSeq2(PatternGeneratorInterface &aPGI)
 void PbFlorentSeq3(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
+   {
+    istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
+    aPGI.ParseCmd(strm2);
+  }
+
   {
     istringstream strm2(":stepseq \
 				0 -0.1 0 \
@@ -901,7 +911,13 @@ int main(int argc, char *argv[])
   unsigned long int nbofmodifs=0;
   
   gettimeofday(&startingtime,0);
-  for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
+  // Number of sequences added.
+  int lNbItMax = 1;
+  
+  if (TestProfil==PROFIL_PB_FLORENT)
+    lNbItMax = 3;
+
+  for (unsigned int lNbIt=0;lNbIt<lNbItMax;lNbIt++)
     {
       //StrangeStartingPosition(*aPGI);
       
@@ -1067,10 +1083,6 @@ int main(int argc, char *argv[])
 		}
 	      else{
 		
-		//if ((NbOfIt>(8.82*200)) && 
-		//		double triggertime = 9.64*200 + deltatime*200;
-		//double triggertime = 12.44*200 + deltatime*200;
-		// double triggertime = 2.455*200 + deltatime*200;
 		double triggertime = 9.64*200 + deltatime*200;
 		if ((NbOfIt>triggertime) && 
 		    TestChangeFoot)
@@ -1094,10 +1106,6 @@ int main(int argc, char *argv[])
 		    gettimeofday(&beginmodif,0);
 		    aPGI->ChangeOnLineStep(0.805,aFAP,newtime);
 		    deltatime += newtime+0.025;
-		    // std::cout << "trigger time: "<< triggertime/200.0 << std::endl;
-		    // std::cout << "delta time: " << deltatime << " newtime: " << newtime << std::endl;
-		    //istringstream strm2(":parsecmd :addstandardonlinestep 0.2 0.0 0.0");
-		    //aPGI->ParseCmd(strm2);
 		    gettimeofday(&endmodif,0);
 		    timemodif = endmodif.tv_sec-beginmodif.tv_sec + 
 		      0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
