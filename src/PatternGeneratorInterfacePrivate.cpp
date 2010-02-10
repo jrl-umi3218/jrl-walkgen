@@ -1,5 +1,5 @@
 /* \doc This object is the interface to the walking gait
-   generation rchitecture
+   generation architecture
    Copyright (c) 2005-2009, 
    Olivier Stasse,
 
@@ -795,6 +795,9 @@ namespace PatternGeneratorJRL {
     lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();  
     ODEBUG("lCurrent Configuration :" << lCurrentConfiguration);
 
+    ODEBUG3("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
+	     << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
+
     deque<RelativeFootPosition> lRelativeFootPositions;
     CommonInitializationOfWalking(lStartingCOMPosition,
 				  lStartingZMPPosition,
@@ -817,7 +820,7 @@ namespace PatternGeneratorJRL {
     m_HumanoidDynamicRobot->currentConfiguration(lCurrentConfiguration);
 
     ODEBUG("Size of lRelativeFootPositions :" << lRelativeFootPositions.size());
-    ODEBUG("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
+    ODEBUG3("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
 	     << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
 
     ODEBUG("COMBuffer: " << m_COMBuffer.size() );

@@ -39,7 +39,7 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
   const char lBuffer[12][256] =
     {":samplingperiod 0.005",
      ":previewcontroltime 1.6",
-     ":comheight 0.914",
+     ":comheight 0.8078",
      ":omega 0.0",
      ":stepheight 0.07",
      ":singlesupporttime 0.78",
@@ -75,7 +75,11 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
 void StraightWalking(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
-  
+   {
+    istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
+    aPGI.ParseCmd(strm2);
+  }
+ 
   {
     istringstream strm2(":stepseq 0.0 -0.105 0.0 \
                      0.2 0.21 0.0  \
@@ -101,9 +105,15 @@ void StraightWalking(PatternGeneratorInterface &aPGI)
 void PbFlorentSeq1(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
+   {
+    istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
+    aPGI.ParseCmd(strm2);
+  }
+
   {
+    /*
     istringstream strm2(":stepseq 0 -0.1 0 \
-0.203885 0.214762 2.27277 \
+0.203885 0.214762 2.27277		   \
 0.210865 -0.208919 5.07812 \
 0.209585 0.189649 5.68817 \
 0.211002 -0.208084 5.02252 \
@@ -127,6 +137,24 @@ void PbFlorentSeq1(PatternGeneratorInterface &aPGI)
 0.200882 -0.219409 -0.506198 \
 0.0136717 0.2 -0.00157708 \
 0 -0.2 0");
+    */
+istringstream strm2(":stepseq 0 0.1 0 \
+	-0.0398822	-0.232351	4.6646 \
+	-0.0261703	0.199677	4.6646 \
+	-0.0471999	-0.256672	4.6646 \
+	-0.0305785	0.200634	4.6646 \
+	-0.0507024	-0.245393	4.6646 \
+	-0.0339626	0.197227	4.6646 \
+	-0.0527259	-0.228579	4.6646 \
+	-0.0362332	0.199282	4.6646 \
+	-0.0540087	-0.21638	4.6646 \
+	-0.0373302	0.196611	4.6646 \
+	-0.0536928	-0.199019	4.6646 \
+	-0.0372245	0.204021	4.6646 \ 
+	-0.0529848	-0.196642	4.6646 \
+	-0.0355124	0.2163	4.6646 \
+	-0.000858977	-0.204807	 0.0767924 \
+0 0.2 0");
     aPGI.ParseCmd(strm2);
   }
 }
@@ -241,57 +269,6 @@ void PbFlorentSeq3(PatternGeneratorInterface &aPGI)
     aPGI.ParseCmd(strm2);
     
   }
-}
-void TestNewPG1(PatternGeneratorInterface &aPGI)
-{
-  CommonInitialization(aPGI);
-
-  {
-    istringstream strm2(":walkmode 0");
-    aPGI.ParseCmd(strm2);
-  }
-
-  {
-    istringstream strm2(":stepseq 0.0 -0.105  0.0 \
-                                 -0.2  0.21   0.0 \
-                                 -0.2 -0.21   0.0 \
-                                 -0.2  0.21   0.0 \
-                                 -0.2 -0.21   0.0 \
-                                 -0.1  0.21 -10.0 \
-                                  0.0 -0.21 -10.0 \
-                                  0.0  0.21 -10.0 \
-                                  0.0 -0.21 -10.0 \
-                                  0.0  0.21 -10.0 \
-                                  0.0 -0.21 -10.0 \
-                                  0.0  0.21 -10.0 \
-                                  0.0 -0.21 -10.0 \
-                                  0.0  0.21 -10.0 \
-                                  0.0 -0.21   0.0");
-    aPGI.ParseCmd(strm2);
-  }
-}
-
-void TestNewPG2(PatternGeneratorInterface &aPGI)
-{
-  {
-    istringstream strm2(":stepseq 0.0 -0.105   0.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21    0.0");
-    aPGI.ParseCmd(strm2);
-  }
-
 }
 
 void StraightWalkingPBW(PatternGeneratorInterface &aPGI)
@@ -701,7 +678,8 @@ void SteppingOver(PatternGeneratorInterface &aPGI)
 int main(int argc, char *argv[])
 {
   //  unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
-  unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
+  //  unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
+  unsigned int TestProfil=PROFIL_PB_FLORENT;
   string PCParametersFile;
   string VRMLPath;
   string VRMLFileName;
@@ -766,7 +744,8 @@ int main(int argc, char *argv[])
   aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
   aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
 #else
-  aHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
+  Chrp2OptHumanoidDynamicRobot *aHRP2HDR= new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
+  aHDR = aHRP2HDR;
   aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
 #endif
 
@@ -780,7 +759,7 @@ int main(int argc, char *argv[])
 					 LinkJointRank,
 					 SpecificitiesFileName);
 
-
+  
   // Create Pattern Generator Interface
   PatternGeneratorInterface * aPGI;
   aPGI = patternGeneratorInterfaceFactory(aHDR);
@@ -1159,8 +1138,8 @@ int main(int argc, char *argv[])
 		  << RightFootPosition.x << " " << RightFootPosition.y << " " 
 		  << RightFootPosition.z << " " << RightFootPosition.theta << " " 
 		  << RightFootPosition.omega  << " " << RightFootPosition.omega2  << " "
-		  << ZMPTarget(0)+CurrentConfiguration(0) << " " 
-		  << ZMPTarget(1)+CurrentConfiguration(1) << " "
+		  << ZMPTarget(0)*cos(CurrentConfiguration(5)) - ZMPTarget(1)*sin(CurrentConfiguration(5))+CurrentConfiguration(0) << " " 
+		  << ZMPTarget(0)*sin(CurrentConfiguration(5)) + ZMPTarget(1)*cos(CurrentConfiguration(5))+CurrentConfiguration(1) << " "
 		  << CurrentConfiguration(0) << " " 
 		  << CurrentConfiguration(1) << " " 
 		  << begin.tv_sec + 0.000001 * begin.tv_usec 

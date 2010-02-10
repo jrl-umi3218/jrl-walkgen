@@ -462,7 +462,7 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,1) = 0.5 * (MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,1,3) +
 						      MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,1) );     
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,2) = 0.5 * ( MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,2,3) + 
-						       MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,1) ); 
+						       MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,2) ); 
 
   ODEBUG("COGInitialAnkle : "<<m_COGInitialAnkles);
 
