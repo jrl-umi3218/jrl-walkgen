@@ -69,7 +69,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   
   //  m_QP_T = 0.02;
   m_QP_T = 0.1;
-  m_QP_N = 16;
+  m_QP_N = 32;
 
   m_SamplingPeriod = 0.005;
 
@@ -1160,6 +1160,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
   struct timeval start,end;
   int li=0; 
+  int pi = 0;//Andrei
   double dinterval = T /  m_SamplingPeriod;
   int interval=(int)dinterval;
   bool StartingSequence = true;
@@ -1176,6 +1177,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       StartingTime+=T,li++)
     {
       gettimeofday(&start,0);
+      
+     
       
       // Read the current state of the 2D Linearized Inverted Pendulum.
       m_2DLIPM->GetState(xk);

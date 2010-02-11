@@ -308,6 +308,33 @@ void StraightWalkingPBW(PatternGeneratorInterface &aPGI)
 
 }
 
+void Andrei(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+  {
+    istringstream strm2(":SetAlgoForZmpTrajectory Andrei");
+    aPGI.ParseCmd(strm2);
+  }
+
+  if (0)
+  {
+    istringstream strm2(":setdimitrovconstraint XY 0.07 0.05");
+    aPGI.ParseCmd(strm2);
+  }
+
+  {
+    istringstream strm2(":stepseq 0.0 -0.105 0.0 \
+                     0.2 0.21 0.0  \
+                     0.2 -0.21 0.0 \
+                     0.2 0.21 0.0  \
+                     0.2 -0.21 0.0 \
+                     0.2 0.21 0.0 \
+                     0.0 -0.21 0.0");
+    aPGI.ParseCmd(strm2);
+  }
+
+}
+
 void StraightWalkingDimitrov(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
@@ -334,6 +361,8 @@ void StraightWalkingDimitrov(PatternGeneratorInterface &aPGI)
   }
 
 }
+
+
 
 void CurvedWalkingDimitrov(PatternGeneratorInterface &aPGI)
 {
@@ -690,7 +719,8 @@ int main(int argc, char *argv[])
 
   //unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
   //  unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
-  unsigned int TestProfil=PROFIL_PB_FLORENT;
+  unsigned int TestProfil=PROFIL_ANDREI;
+  string PCParametersFile;
   string VRMLPath;
   string VRMLFileName;
   string SpecificitiesFileName;
@@ -971,6 +1001,10 @@ int main(int argc, char *argv[])
 	  StraightWalkingDimitrov(*aPGI);
 	  break;
 
+	case PROFIL_ANDREI:
+		Andrei(*aPGI);
+	  break;
+	  
 	case PROFIL_CURVED_WALKING_DIMITROV:
 	  CurvedWalkingDimitrov(*aPGI);
 	  break;

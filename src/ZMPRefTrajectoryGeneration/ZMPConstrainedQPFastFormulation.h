@@ -21,6 +21,7 @@
 #include <Mathematics/OptCholesky.h>
 #include <Mathematics/PLDPSolver.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
+#include <PreviewControl/SupportState.h>
 
 namespace PatternGeneratorJRL
 {
@@ -255,6 +256,9 @@ namespace PatternGeneratorJRL
 
     /*! Uses a 2D LIPM to simulate the evolution of the robot. */
     LinearizedInvertedPendulum2D * m_2DLIPM;
+    
+    /*! Uses a Finite State Machine to simulate the evolution of the support states. */
+    SupportState * Support;
 
     /*! \brief Object creating Linear inequalities constraints 
       based on the foot position. Those constraints are *NOT* the

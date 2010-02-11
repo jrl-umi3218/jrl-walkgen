@@ -20,10 +20,11 @@ enum Profiles_t  {
   PROFIL_TURNING_ON_THE_CIRCLE_TOWARDS_THE_CENTER,   // 13
   PROFIL_ANALYTICAL_ONLINE_WALKING,                  // 14
   PROFIL_ONLINE_WALKING,                             // 15
-  PROFIL_SIMU_ONLINE_WALKING                         // 16
+  PROFIL_SIMU_ONLINE_WALKING,                        // 16
+  PROFIL_ANDREI										 // 17
 };
 
-std::string ProfilesNames[17] = {
+std::string ProfilesNames[18] = {
   "PROFIL_PB_FLORENT",                                 
   "PROFIL_STEPPING_OVER",                              
   "PROFIL_SHORT_STRAIGHT_WALKING",                     
@@ -40,7 +41,8 @@ std::string ProfilesNames[17] = {
   "PROFIL_TURNING_ON_THE_CIRCLE_TOWARDS_THE_CENTER",   
   "PROFIL_ANALYTICAL_ONLINE_WALKING",                  
   "PROFIL_ONLINE_WALKING",                             
-  "PROFIL_SIMU_ONLINE_WALKING"
+  "PROFIL_SIMU_ONLINE_WALKING",
+  "PROFIL_ANDREI"
 };
 
 enum InitialPoses_t {

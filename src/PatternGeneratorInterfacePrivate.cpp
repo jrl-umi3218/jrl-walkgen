@@ -1022,6 +1022,12 @@ namespace PatternGeneratorJRL {
 	m_GlobalStrategyManager = m_DoubleStagePCStrategy;
 	cout << "DIMITROV" << endl;
       }
+      else if (ZMPTrajAlgo=="Andrei")
+      {
+	m_AlgorithmforZMPCOM = ZMPCOM_DIMITROV_2008;
+	m_GlobalStrategyManager = m_DoubleStagePCStrategy;
+	cout << "Andrei" << endl;
+      }
   }
 
   void PatternGeneratorInterfacePrivate::m_SetUpperBodyMotionParameters(istringstream &strm)
