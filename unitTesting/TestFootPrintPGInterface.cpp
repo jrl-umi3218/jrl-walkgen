@@ -715,13 +715,13 @@ int main(int argc, char *argv[])
       else
 	{
 	  VRMLPath=value;
-	  VRMLPath+="Controller/IOserver/robot/HRP2JRL/model/";
+	  VRMLPath+="/Controller/IOserver/robot/HRP2JRL/model/";
 	  VRMLFileName="HRP2JRLmain.wrl";
 	  SpecificitiesFileName = value;
-	  SpecificitiesFileName +="Controller/IOserver/robot/HRP2JRL/etc/";
+	  SpecificitiesFileName +="/Controller/IOserver/robot/HRP2JRL/etc/";
 	  SpecificitiesFileName += "HRP2Specificities.xml";
 	  LinkJointRank = value;
-	  LinkJointRank += "Controller/IOserver/robot/HRP2JRL/etc/";
+	  LinkJointRank += "/Controller/IOserver/robot/HRP2JRL/etc/";
 	  LinkJointRank += "HRP2LinkJointRank.xml";
 	  
 	  if (argc==2)
@@ -920,7 +920,8 @@ int main(int argc, char *argv[])
   for (unsigned int lNbIt=0;lNbIt<lNbItMax;lNbIt++)
     {
       //StrangeStartingPosition(*aPGI);
-      
+      cout << "<===============================================================>"<<endl;
+      cout << "Iteration nb: " << lNbIt << endl;
       gettimeofday(&begin,0);
       switch (TestProfil) 
 	{
@@ -1158,6 +1159,9 @@ int main(int argc, char *argv[])
 	      aofq << endl;
 	    }
 	}
+
+      cout << "End of iteration " << lNbIt << endl;
+      cout << "<===============================================================>"<<endl;
     }
 
 

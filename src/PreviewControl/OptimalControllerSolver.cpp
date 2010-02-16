@@ -17,7 +17,7 @@
 #include <iostream>
 #include <PreviewControl/OptimalControllerSolver.h>
 
-#define _DEBUG_MODE_ON_
+//#define _DEBUG_MODE_ON_
 #include <Debug.h>
 
 using namespace PatternGeneratorJRL;
@@ -196,8 +196,8 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   // Store the transpose of m_b;
   tm_b = MAL_RET_TRANSPOSE(m_b);
 
-  cout << " ROWS(A): " << MAL_MATRIX_NB_ROWS(m_A)
-       << " COLS(A): " << MAL_MATRIX_NB_COLS(m_A) << endl;
+  ODEBUG(" ROWS(A): " << MAL_MATRIX_NB_ROWS(m_A)
+	 << " COLS(A): " << MAL_MATRIX_NB_COLS(m_A) );
   MAL_MATRIX_RESIZE(H,
 		    2*MAL_MATRIX_NB_ROWS(m_A),
 		    2*MAL_MATRIX_NB_COLS(m_A));
