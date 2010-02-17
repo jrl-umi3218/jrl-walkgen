@@ -27,10 +27,9 @@ CoMAndFootOnlyStrategy::~CoMAndFootOnlyStrategy()
 {
 }
 
-int CoMAndFootOnlyStrategy::InitInterObjects(PreviewControl * aPC,
-							CjrlHumanoidDynamicRobot *aHDR,
-							ComAndFootRealization * aCFR,
-							StepStackHandler * aSSH)
+int CoMAndFootOnlyStrategy::InitInterObjects(CjrlHumanoidDynamicRobot *aHDR,
+					     ComAndFootRealization * aCFR,
+					     StepStackHandler * aSSH)
 {
   m_ComAndFootRealization = aCFR;
   return 0;

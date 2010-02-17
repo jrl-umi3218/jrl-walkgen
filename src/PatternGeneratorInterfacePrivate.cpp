@@ -260,25 +260,15 @@ namespace PatternGeneratorJRL {
     m_Zc = m_PC->GetHeightOfCoM();
 
     // Initialize the Preview Control general object.
-    m_DoubleStagePCStrategy->InitInterObjects(m_PC,
-					      m_HumanoidDynamicRobot,
+    m_DoubleStagePCStrategy->InitInterObjects(m_HumanoidDynamicRobot,
 					      m_ComAndFootRealization,
 					      m_StepStackHandler);
         
-    m_CoMAndFootOnlyStrategy->InitInterObjects(m_PC,
-					       m_HumanoidDynamicRobot,
+    m_CoMAndFootOnlyStrategy->InitInterObjects(m_HumanoidDynamicRobot,
 					       m_ComAndFootRealization,
 					       m_StepStackHandler);
 
     // Initialize the ZMP trajectory generator.
-    m_ZMPD->SetSamplingPeriod(m_PC->SamplingPeriod());
-    m_ZMPD->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
-    m_ZMPD->SetPreviewControl(m_PC);
-
-    m_ZMPQP->SetSamplingPeriod(m_PC->SamplingPeriod());
-    m_ZMPQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
-    m_ZMPQP->SetPreviewControl(m_PC);
-
     m_ZMPCQPFF->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
     m_ZMPCQPFF->SetPreviewControl(m_PC);

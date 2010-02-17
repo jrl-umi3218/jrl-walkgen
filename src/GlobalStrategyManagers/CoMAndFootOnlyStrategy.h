@@ -116,8 +116,7 @@ namespace PatternGeneratorJRL
 	       deque<FootAbsolutePosition> & aRightFootAbsolutePositions);
 
     /*! \brief Initialization of the inter objects relationship. */
-    int InitInterObjects(PreviewControl * aPC,
-			 CjrlHumanoidDynamicRobot * aHDR,
+    int InitInterObjects(CjrlHumanoidDynamicRobot * aHDR,
 			 ComAndFootRealization * aCFR,
 			 StepStackHandler * aSSH);
 

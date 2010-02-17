@@ -49,9 +49,9 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
   RESETDEBUG4("DebugConfSO.dat");
   RESETDEBUG4("DebugConfSV.dat");
   RESETDEBUG4("DebugConfSA.dat");
-  RESETDEBUG5("DebugDataCheckZMP1.txt");
+  RESETDEBUG4("DebugDataCheckZMP1.txt");
   RESETDEBUG4("2ndStage.dat");
-  RESETDEBUG5("ZMPPCWMZOGSOC.dat");
+  RESETDEBUG4("ZMPPCWMZOGSOC.dat");
   // Sampling period.
   m_SamplingPeriod = -1;
   
@@ -61,7 +61,9 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
   MAL_MATRIX_RESIZE(m_PC1x,3,1);  MAL_MATRIX_RESIZE(m_PC1y,3,1);
   MAL_MATRIX_RESIZE(m_Deltax,3,1);  MAL_MATRIX_RESIZE(m_Deltay,3,1);
 
-  m_PC = 0;
+  m_PC = new PreviewControl(lSPM,
+			    OptimalControllerSolver::MODE_WITHOUT_INITIALPOS,
+			    true);
   m_StartingNewSequence = true;
 
   for(int i=0;i<4;i++)
@@ -199,7 +201,7 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[m_NL];
   FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[m_NL];
 
-  ODEBUG5SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
+  ODEBUG4SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
 		m_FIFOZMPRefPositions[0].py << " " <<
 		m_FIFOZMPRefPositions[0].pz << " " <<
 		acompos.x[0] << " " <<
@@ -388,7 +390,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
       || (m_StageStrategy==ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY))
     {
       ODEBUG("First Stage "<< m_FIFOZMPRefPositions.size());
-      ODEBUG5( m_PC1x(0,0) << " " <<
+      ODEBUG4( m_PC1x(0,0) << " " <<
 	       m_PC1x(1,0) << " " <<
 	       m_PC1x(2,0) << " " <<
 	       m_PC1y(0,0) << " " <<
@@ -524,7 +526,7 @@ int ZMPPreviewControlWithMultiBodyZMP::Setup(deque<ZMPPosition> &ZMPRefPositions
 			CurrentVelocity,
 			CurrentAcceleration,
 			i);
-  ODEBUG5("<========================================>","ZMPPCWMZOGSOC.dat");
+  ODEBUG4("<========================================>","ZMPPCWMZOGSOC.dat");
   return 0;
 }
 
@@ -641,7 +643,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
   FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[localindex];
   FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[localindex];
 
-  ODEBUG5SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
+  ODEBUG4SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
 		m_FIFOZMPRefPositions[0].py << " " <<
 		m_FIFOZMPRefPositions[0].pz << " " <<
 		acompos.x[0] << " " <<
