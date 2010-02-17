@@ -404,7 +404,6 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 				  m_sxzmp,m_syzmp,
 				  m_FIFOZMPRefPositions,0,
 				  zmpx2, zmpy2, true);
-      
       for(unsigned j=0;j<3;j++)
 	acomp.x[j] = m_PC1x(j,0);
 

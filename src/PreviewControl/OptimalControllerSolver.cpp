@@ -125,6 +125,8 @@ bool OptimalControllerSolver::GeneralizedSchur(MAL_MATRIX( &A,double),
 					       MAL_MATRIX( &L,double),
 					       MAL_MATRIX( &R,double))
 {
+  ODEBUG("A:" << A);
+  ODEBUG("B:" << A);
   int n = MAL_MATRIX_NB_ROWS(A);
   MAL_VECTOR_RESIZE(alphar,n); MAL_VECTOR_FILL(alphar,0);
   MAL_VECTOR_RESIZE(alphai,n); MAL_VECTOR_FILL(alphai,0);
@@ -172,11 +174,13 @@ bool OptimalControllerSolver::GeneralizedSchur(MAL_MATRIX( &A,double),
   delete [] work;
   delete [] bwork;
   if (info != 0) {
-    std::cout << ": info = " << info << std::endl;
+    std::cout << ": info = " << info << " n = " << n << std::endl;
     return false;
   }
   else
-    return true;
+    {
+      return true;
+    }
 
 }
 
@@ -248,7 +252,10 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   MAL_VECTOR_DIM( WI,double,2*n); // The eigenvalues ( a matrix to handle complex eigenvalues).
   MAL_VECTOR_DIM( GS,double,2*n);
 
-  GeneralizedSchur(H,E,WR,WI,GS,ZH,ZE);
+  if (!GeneralizedSchur(H,E,WR,WI,GS,ZH,ZE))
+    {
+      ODEBUG3("Something is wrong with the weights for the preview control !");
+    }
 
   ODEBUG("Hx:"<<H);
   ODEBUG("Ex:"<<E);
@@ -327,6 +334,7 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
       m_F(k,0) = Intermediate(0,0);
       Recursive = MAL_RET_A_by_B(BaseOfRecursion,Recursive);
     }
+
   
 }
 
