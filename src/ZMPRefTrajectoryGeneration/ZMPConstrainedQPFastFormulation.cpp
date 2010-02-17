@@ -139,10 +139,6 @@ ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
     delete [] m_Pu ;
 }
 
-void ZMPConstrainedQPFastFormulation::SetPreviewControl(PreviewControl *aPC)
-{
-  m_ZMPD->SetPreviewControl(aPC);
-}
 
 int ZMPConstrainedQPFastFormulation::InitializeMatrixPbConstants()
 {

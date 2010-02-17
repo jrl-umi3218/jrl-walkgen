@@ -243,8 +243,6 @@ namespace PatternGeneratorJRL
     /*! @}*/
     /* @} */
     
-    /*! Set the preview control object. */
-    void SetPreviewControl(PreviewControl *aPC);
 
     static const unsigned int QLD=0;
     static const unsigned int QLDANDLQ=1;
