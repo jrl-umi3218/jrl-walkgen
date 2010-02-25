@@ -16,6 +16,7 @@
 #include <SimplePlugin.h>
 #include <SimplePluginManager.h>
 #include <Debug.h>
+#include <assert.h>
 
 using namespace std;
 using namespace PatternGeneratorJRL;
@@ -107,7 +108,8 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
   pbuf = istrm.rdbuf();
 
   int size = pbuf->in_avail();
-  char aBuffer[32768];
+  char aBuffer[65636];
+  assert(size < 65635);
 
   memset(aBuffer,0,size+1);
   for(int i=0;i<size;i++)
