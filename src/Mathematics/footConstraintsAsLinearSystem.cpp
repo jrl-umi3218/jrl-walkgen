@@ -99,7 +99,6 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   lLeftFootHalfWidth -= ConstraintOnX;
   lRightFootHalfWidth -= ConstraintOnX;
   
-  prev_xmin=1e7, prev_xmax=-1e7, prev_ymin=1e7, prev_ymax=-1e7;
     
   RESETDEBUG5("Constraints-fCSALS.dat");
   
@@ -148,169 +147,7 @@ int footConstraintsAsLinearSystem::FindSimilarConstraints(MAL_MATRIX(&A,double),
   return 0;
 }
 
-// Assuming that the points are going counter-clockwise
-// and that the foot's interior is at the left of the points.
-// The result is : A [ Zx(k), Zy(k)]' + B  >=0
-int footConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPoints, 
-						       MAL_MATRIX(&A,double),
-						       MAL_MATRIX(&B,double),
-						       MAL_VECTOR(&C,double))
-{
-  double a,b,c;
-  unsigned int n = aVecOfPoints.size();
-  MAL_MATRIX_RESIZE(A,aVecOfPoints.size(),2);
-  MAL_MATRIX_RESIZE(B,aVecOfPoints.size(),1);
-  MAL_VECTOR_RESIZE(C,2);
 
-  // Dump a file to display on scilab .
-  // This should be removed during real usage inside a robot.
-  if (1)
-    {
-      ofstream aof;
-      aof.open("Constraints-fCSALS.dat",ofstream::app);
-      for(unsigned int i=0;i<n-1;i++)
-	{
-	  aof << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
-	      << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row << endl;
-	}
-      aof << aVecOfPoints[n-1].col << " " <<  aVecOfPoints[n-1].row << " "
-	  << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row << endl;
-      aof.close();
-    }
-  
-  for(unsigned int i=0;i<n-1;i++)
-    {
-      // Compute center of the convex hull.
-      C(0)+= aVecOfPoints[i].col;
-      C(1)+= aVecOfPoints[i].row;
-	
-      ODEBUG("(x["<< i << "],y["<<i << "]): " << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
-	     << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row );
-      
-      if (fabs(aVecOfPoints[i+1].col-aVecOfPoints[i].col)>1e-7)
-	{
-	  double y1,x1,y2,x2,lmul=-1.0;
-
-	  if (aVecOfPoints[i+1].col < aVecOfPoints[i].col)
-	    {
-	      lmul=1.0;
-	      y2 = aVecOfPoints[i].row;
-	      y1 = aVecOfPoints[i+1].row;
-	      x2 = aVecOfPoints[i].col;
-	      x1 = aVecOfPoints[i+1].col;
-	    }
-	  else
-	    {
-	      y2 = aVecOfPoints[i+1].row;
-	      y1 = aVecOfPoints[i].row;
-	      x2 = aVecOfPoints[i+1].col;
-	      x1 = aVecOfPoints[i].col;	 
-	    }
-	  
-	  
-	  a = (y2 - y1)/(x2-x1) ;
-	  b = (aVecOfPoints[i].row - a * aVecOfPoints[i].col);
-
-	  a = lmul*a;
-	  b = lmul*b;
-	  c= -lmul;
-	  
-
-	}
-      else
-	{
-	  c = 0.0;
-	  a = -1.0;	  
-	  b = aVecOfPoints[i+1].col;
-	  if (aVecOfPoints[i+1].row < aVecOfPoints[i].row)
-	    {
-	      a=-a;
-	      b=-b;
-	    }
-	}
-      
-      
-      A(i,0) = a; A(i,1)= c;
-      B(i,0) = b;
-
-    }
-
-  // Compute center of the convex hull.
-  C(0)+= aVecOfPoints[n-1].col;
-  C(1)+= aVecOfPoints[n-1].row;
-
-  C(0) /= (double)n;
-  C(1) /= (double)n;
-
-
-  ODEBUG("(x["<< n-1 << "],y["<< n-1 << "]): " << aVecOfPoints[n-1].col << " " <<  aVecOfPoints[n-1].row << " "
-	 << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row );
-  
-  if (fabs(aVecOfPoints[0].col-aVecOfPoints[n-1].col)>1e-7)
-    {
-      double y1,x1,y2,x2,lmul=-1.0;
-      
-      if (aVecOfPoints[0].col < aVecOfPoints[n-1].col)
-	{
-	  lmul=1.0;
-	  y2 = aVecOfPoints[n-1].row;
-	  y1 = aVecOfPoints[0].row;
-	  x2 = aVecOfPoints[n-1].col;
-	  x1 = aVecOfPoints[0].col;
-	}
-      else
-	{
-	  y2 = aVecOfPoints[0].row;
-	  y1 = aVecOfPoints[n-1].row;
-	  x2 = aVecOfPoints[0].col;
-	  x1 = aVecOfPoints[n-1].col;
-	  
-	}
-      
-      
-      a = (y2 - y1)/(x2-x1) ;
-      b = (aVecOfPoints[0].row - a * aVecOfPoints[0].col);
-      
-      a = lmul*a;
-      b = lmul*b;
-      c= -lmul;
-      
-    }
-  else
-    {
-      c = 0.0;
-      a = -1.0;	  
-      b = aVecOfPoints[0].col;
-      if (aVecOfPoints[0].row < aVecOfPoints[n-1].row)
-	{
-	  a=-a;
-	  b=-b;
-	}
-    }
-
-  
-  A(n-1,0) = a; A(n-1,1)= c;
-  B(n-1,0) = b;
-  
-  // Verification of inclusion of the center inside the polytope.
-  MAL_VECTOR_DIM(W,double,2);  
-  W = MAL_RET_A_by_B(A,C);
-
-  W(0) = W(0) + B(0,0);
-  W(1) = W(1) + B(1,0);
-
-  if ((W(0)<0) || (W(1)<0))
-    {
-      ODEBUG3("Linear system ill-computed.");
-      ODEBUG3("Stop.");
-      return -1;
-    }
-  
-  ODEBUG("A: " << A );
-  ODEBUG("B: " << B);
-      
-  return 0;
-}
 
 
 // Assuming that the points are going counter-clockwise
@@ -423,7 +260,6 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 
   vector<CH_Point> TheConvexHull;
 
-  double xmin=1e7, xmax=-1e7, ymin=1e7, ymax=-1e7;
   // Going through the set of generated data for each 5 ms.
   // from this extract a set of linear constraints.
   for(unsigned int i=1;i<=m_QP_N;i++)
@@ -453,12 +289,6 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 	      TheConvexHull[j].row = ly + 
 		( lxcoefs[j] * lLeftFootHalfWidth * s_t + 
 		  lycoefs[j] * lLeftFootHalfHeight * c_t ); 
-	      // Computes the maxima.
-	      xmin = TheConvexHull[j].col < xmin ? TheConvexHull[j].col : xmin;
-	      xmax = TheConvexHull[j].col > xmax ? TheConvexHull[j].col : xmax;
-	      ymin = TheConvexHull[j].row < ymin ? TheConvexHull[j].row : ymin;
-	      ymax = TheConvexHull[j].row > ymax ? TheConvexHull[j].row : ymax;
-
 	    }
 	  ODEBUG("Left support foot");
 	}
@@ -480,16 +310,10 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 					    lRightFootHalfWidth * s_t +
 					    lycoefs[j] * 
 					    lRightFootHalfHeight * c_t ); 
-	      // Computes the maxima.
-	      xmin = TheConvexHull[j].col < xmin ? TheConvexHull[j].col : xmin;
-	      xmax = TheConvexHull[j].col > xmax ? TheConvexHull[j].col : xmax;
-	      ymin = TheConvexHull[j].row < ymin ? TheConvexHull[j].row : ymin;
-	      ymax = TheConvexHull[j].row > ymax ? TheConvexHull[j].row : ymax;
 
 	    }
 	  ODEBUG("Right support foot");
 	}
-      ODEBUG("State !=3 " << xmin << " " << xmax << " " << ymin << " " << ymax);
 	      
     }
 
@@ -503,25 +327,8 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
   //FindSimilarConstraints(aLCI->A,aLCI->SimilarConstraints);
 
   //aLCI->StartingTime = LeftFootAbsolutePositions[i].time;//???What to do
-  if (QueueOfLConstraintInequalities.size()>0)
-    {
-      //QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
-      ODEBUG4( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
-	       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
-	       prev_xmin << " "  <<
-	       prev_xmax << " "  <<
-	       prev_ymin << " "  <<
-	       prev_ymax
-	       ,"ConstraintMax.dat");
-
-    }
-  ODEBUG("Final " << xmin << " " << xmax << " " << ymin << " " << ymax);
-  prev_xmin = xmin; prev_xmax = xmax;
-  prev_ymin = ymin; prev_ymax = ymax;
 
   QueueOfLConstraintInequalities.push_back(aLCI);
-	  
-
 
 ODEBUG("Size of the 5 ms array: "<< LeftFootAbsolutePositions.size());
 ODEBUG("Size of the queue of Linear Constraint Inequalities " << QueueOfLConstraintInequalities.size());
