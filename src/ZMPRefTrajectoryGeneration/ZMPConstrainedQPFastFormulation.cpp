@@ -1139,7 +1139,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 
 
   deque<LinearConstraintInequality_t *> QueueOfLConstraintInequalities;
-  deque<LinearConstraintInequality_t *> QueueOfLConstraintInequalitiesAndrei;
+  deque<LinearConstraintInequalityFreeFeet_t *> QueueOfLConstraintInequalitiesFreeFeet;
 
   if (m_FullDebug>0)
     {
@@ -1196,7 +1196,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       
       m_fCALS->buildLinearConstraintInequalities(LeftFootAbsolutePositions,
 						 RightFootAbsolutePositions,
-						 QueueOfLConstraintInequalitiesAndrei,
+						 QueueOfLConstraintInequalitiesFreeFeet,
 						 Ref,
 						 StartingTime,
 						 m_QP_N,
