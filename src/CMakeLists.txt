@@ -21,6 +21,7 @@ SET(libwpg_src
 	./Mathematics/AnalyticalZMPCOGTrajectory.cpp 
 	./Mathematics/ConvexHull.cpp 
 	./Mathematics/FootConstraintsAsLinearSystem.cpp
+	./Mathematics/footConstraintsAsLinearSystem.cpp
 	./Mathematics/OptCholesky.cpp
 	./Mathematics/Polynome.cpp 
 	./Mathematics/PolynomeFoot.cpp 
@@ -31,6 +32,7 @@ SET(libwpg_src
 	./PreviewControl/OptimalControllerSolver.cpp 
 	./PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp 
 	./PreviewControl/LinearizedInvertedPendulum2D.cpp
+	./PreviewControl/SupportState.cpp
 	./ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp 
