@@ -18,6 +18,7 @@
 
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <Mathematics/FootConstraintsAsLinearSystem.h>
+#include <Mathematics/footConstraintsAsLinearSystem.h>
 #include <Mathematics/OptCholesky.h>
 #include <Mathematics/PLDPSolver.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
@@ -258,12 +259,13 @@ namespace PatternGeneratorJRL
     LinearizedInvertedPendulum2D * m_2DLIPM;
     
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
-    SupportState * Support;
+    SupportState  * Support;
 
     /*! \brief Object creating Linear inequalities constraints 
       based on the foot position. Those constraints are *NOT* the
       one put in the QP, but they are a necessary intermediate step. */
     FootConstraintsAsLinearSystem * m_FCALS;
+    footConstraintsAsLinearSystem * m_fCALS;
       
 
     /*! Constraint on X and Y */

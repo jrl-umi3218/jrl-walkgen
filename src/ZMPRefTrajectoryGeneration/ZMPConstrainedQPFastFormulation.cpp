@@ -40,17 +40,25 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
 {
   m_Q = 0;
   m_Pu = 0;
-  m_FullDebug = 0;
+  m_FullDebug = 3;
   m_FastFormulationMode = PLDP;
 
   /*! Getting the ZMP reference from Kajita's heuristic. */
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
 
+  Support = new SupportState();
+
   /*! For simulating the linearized inverted pendulum in 2D. */
   m_2DLIPM = new LinearizedInvertedPendulum2D();
 
+  m_ConstraintOnX = 0.04;
+  m_ConstraintOnY = 0.04;
+
   /*! For computing the stability constraints from the feet positions. */
   m_FCALS = new FootConstraintsAsLinearSystem(lSPM,aHS);
+  
+  m_fCALS = new footConstraintsAsLinearSystem(lSPM,aHS,m_ConstraintOnX,m_ConstraintOnY);
+ 
 
   // Register method to handle
   string aMethodName[1] = 
@@ -64,8 +72,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
 	}
     }
 
-  m_ConstraintOnX = 0.04;
-  m_ConstraintOnY = 0.04;
+
   
   //  m_QP_T = 0.02;
   m_QP_T = 0.1;
@@ -128,6 +135,9 @@ ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
 
   if (m_FCALS!=0)
     delete m_FCALS;
+
+  if (m_fCALS!=0)
+    delete m_fCALS;
 
   if (m_Q!=0)
     delete [] m_Q;
@@ -1129,7 +1139,8 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 
 
   deque<LinearConstraintInequality_t *> QueueOfLConstraintInequalities;
-  
+  deque<LinearConstraintInequality_t *> QueueOfLConstraintInequalitiesAndrei;
+
   if (m_FullDebug>0)
     {
       RESETDEBUG4("DebugPBW.dat");
@@ -1140,12 +1151,15 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
     }
       
   // Build a set of linear constraint inequalities.
-  m_FCALS->BuildLinearConstraintInequalities(LeftFootAbsolutePositions,
+ m_FCALS->BuildLinearConstraintInequalities(LeftFootAbsolutePositions,
 					     RightFootAbsolutePositions,
 					     QueueOfLConstraintInequalities,
 					     ConstraintOnX,
 					     ConstraintOnY);
+
   
+
+
   deque<LinearConstraintInequality_t *>::iterator LCI_it;
   LCI_it = QueueOfLConstraintInequalities.begin();
   while(LCI_it!=QueueOfLConstraintInequalities.end())
@@ -1160,7 +1174,6 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
   double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
   struct timeval start,end;
   int li=0; 
-  int pi = 0;//Andrei
   double dinterval = T /  m_SamplingPeriod;
   int interval=(int)dinterval;
   bool StartingSequence = true;
@@ -1178,8 +1191,24 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
     {
       gettimeofday(&start,0);
       
+  
+      double Ref[3] = {0,0,1};//Andrei
+      
+      m_fCALS->buildLinearConstraintInequalities(LeftFootAbsolutePositions,
+						 RightFootAbsolutePositions,
+						 QueueOfLConstraintInequalitiesAndrei,
+						 Ref,
+						 StartingTime,
+						 m_QP_N,
+						 Support);
+      //-------------Andrei was testing the FSM
+      //printf("Before switch: CurrentPhase: %d CurrentFoot: %d CurrentTimeLimit: %f CurrentStepsLeft %d \n", Support->CurrentPhase, Support->CurrentFoot, Support->CurrentTimeLimit, Support->CurrentStepsLeft);
+      //Define the state of the support
      
       
+      //printf("After switch: CurrentPhase: %d CurrentFoot: %d CurrentTimeLimit: %f CurrentStepsLeft %d \n", Support->CurrentPhase, Support->CurrentFoot, Support->CurrentTimeLimit, Support->CurrentStepsLeft);
+      //-------------
+	
       // Read the current state of the 2D Linearized Inverted Pendulum.
       m_2DLIPM->GetState(xk);
 
