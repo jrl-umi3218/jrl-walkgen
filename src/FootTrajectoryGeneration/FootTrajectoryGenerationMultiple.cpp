@@ -119,7 +119,7 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
   for(unsigned int j=0;j<m_DeltaTj.size();j++)
     {
 
-      if ((t>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
+      if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
 	{
 	  ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<j << "]= "<< m_DeltaTj[j]);
 	  double deltaj=0.0;
