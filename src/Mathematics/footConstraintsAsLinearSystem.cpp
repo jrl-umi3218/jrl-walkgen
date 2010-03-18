@@ -153,14 +153,14 @@ int footConstraintsAsLinearSystem::FindSimilarConstraints(MAL_MATRIX(&A,double),
 // Assuming that the points are going counter-clockwise
 int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPoints, 
 						       MAL_MATRIX(&D,double),
-						       MAL_MATRIX(&B,double),
-						       MAL_VECTOR(&C,double))
+						       MAL_MATRIX(&Dc,double)
+						       )
 {
   double dx,dy,dc,x1,y1,x2,y2;
   unsigned int n = aVecOfPoints.size();
   MAL_MATRIX_RESIZE(D,aVecOfPoints.size(),2);
-  MAL_MATRIX_RESIZE(B,aVecOfPoints.size(),1);
-  MAL_VECTOR_RESIZE(C,2);
+  MAL_MATRIX_RESIZE(Dc,aVecOfPoints.size(),1);
+
 
   // Dump a file to display on scilab .
   // This should be removed during real usage inside a robot.
@@ -199,7 +199,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
       */
 
       D(i,0) = dx; D(i,1)= dy;
-      B(i,0) = dc;
+      Dc(i,0) = dc;
 
       //C is not filled
     }
@@ -226,7 +226,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
     */
 
     D(i,0) = dx; D(i,1)= dy;
-    B(i,0) = dc;
+    Dc(i,0) = dc;
 
     //C is not filled
   }
@@ -243,7 +243,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 								     &LeftFootAbsolutePositions,
 								     deque<FootAbsolutePosition> 
 								     &RightFootAbsolutePositions,
-								     deque<LinearConstraintInequality_t *> &
+								     deque<LinearConstraintInequalityFreeFeet_t *> &
 								     QueueOfLConstraintInequalities,
 								     double Ref[3],
 								     double StartingTime,
@@ -318,11 +318,11 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
     }
 
   // Linear Constraint Inequality
-  LinearConstraintInequality_t * aLCI = new LinearConstraintInequality_t;
+  LinearConstraintInequalityFreeFeet_t * aLCI = new LinearConstraintInequalityFreeFeet_t;
   // Building those constraints.
   //ComputeLinearSystem(TheConvexHull, aLCI->A, aLCI->B, aLCI->Center);
   //
-  computeLinearSystem(TheConvexHull, aLCI->A, aLCI->B, aLCI->Center);
+  computeLinearSystem(TheConvexHull, aLCI->D, aLCI->Dc);
   // Finding the similar one (i.e. Ai identical).
   //FindSimilarConstraints(aLCI->A,aLCI->SimilarConstraints);
 

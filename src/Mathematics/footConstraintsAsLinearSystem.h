@@ -66,15 +66,15 @@ namespace PatternGeneratorJRL
        */
       int computeLinearSystem(std::vector<CH_Point> aVecOfPoints,
 			      MAL_MATRIX(&D,double),
-			      MAL_MATRIX(&B,double),
-			      MAL_VECTOR(&C,double));
+			      MAL_MATRIX(&Dc,double)
+			      );
 
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
 	Position.
        */
       int buildLinearConstraintInequalities(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
 					    std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					    std::deque<LinearConstraintInequality_t *> &
+					    std::deque<LinearConstraintInequalityFreeFeet_t *> &
 					    QueueOfLConstraintInequalities,
 					    double Ref[3],
 					    double StartingTime,
