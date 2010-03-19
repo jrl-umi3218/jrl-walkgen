@@ -89,7 +89,7 @@ namespace PatternGeneratorJRL
     MAL_MATRIX(A,double);
     MAL_MATRIX(B,double);
     MAL_VECTOR(Center,double);
-	std::vector<int> SimilarConstraints;
+    std::vector<int> SimilarConstraints;
     double StartingTime, EndingTime;
   };
   typedef struct LinearConstraintInequality_s 
@@ -104,6 +104,15 @@ namespace PatternGeneratorJRL
   };
   typedef struct LinearConstraintInequalityFreeFeet_s 
     LinearConstraintInequalityFreeFeet_t;
+
+  //State of the feet on the ground
+  struct SupportFeet_s
+  {
+    double x,y,theta,StartTime;
+    int SupportFoot;
+  };
+  typedef struct SupportFeet_s 
+    SupportFeet_t;
 
 };
 #endif
