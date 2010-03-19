@@ -26,7 +26,7 @@ SupportState::SupportState()
 
   //Initial current state
   CurrentPhase = 0;
-  CurrentFoot = 1;
+  CurrentSupportFoot = 1;
   CurrentTimeLimit = 1000000000;
   CurrentStepsLeft = 0;
   StartSupportFoot = 1;
@@ -51,14 +51,14 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
 
   if(pi==0) {
     SupportPhase = &CurrentPhase;
-    SupportFoot = &CurrentFoot;
+    SupportFoot = &CurrentSupportFoot;
     StepNumber = 0;
     SupportStepsLeft = &CurrentStepsLeft;//to be changed
     SupportTimeLimit = &CurrentTimeLimit;
   }
   else {
     SupportPhase = &PrwPhase;
-    SupportFoot = &PrwFoot;
+    SupportFoot = &PrwSupportFoot;
     SupportStepsLeft = &PrwStepsLeft;//to be changed
     SupportTimeLimit = &PrwTimeLimit;
   }
@@ -134,7 +134,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
 void SupportState::initializePreviewedState()
 { 
   PrwPhase = CurrentPhase;
-  PrwFoot = CurrentFoot;
+  PrwSupportFoot = CurrentSupportFoot;
   PrwStepsLeft = CurrentStepsLeft;
   PrwTimeLimit = CurrentTimeLimit;
   StepNumber = 0;

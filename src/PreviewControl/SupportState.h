@@ -41,12 +41,12 @@ namespace PatternGeneratorJRL
     int StartSupportFoot;
 	
     /*! \brief Current support state */
-    int CurrentPhase, CurrentFoot, CurrentStepsLeft;
+    int CurrentPhase, CurrentSupportFoot, CurrentStepsLeft;
 
     double CurrentTimeLimit;
 	
     /*! \brief Future support state */
-    int PrwPhase, PrwFoot, PrwStepsLeft;
+    int PrwPhase, PrwSupportFoot, PrwStepsLeft;
 
     double  PrwTimeLimit;
 

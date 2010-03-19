@@ -95,6 +95,17 @@ namespace PatternGeneratorJRL
 					     double T,
 					     unsigned int N);
 
+
+    int buildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+					     deque<ZMPPosition> &ZMPRefPositions,		       
+					     deque<COMPosition> &COMPositions,
+					     double ConstraintOnX,
+					     double ConstraintOnY,
+					     double T,
+					     unsigned int N);
+
+
     /*! \name Methods to build the optimization problem 
       @{
      */
@@ -129,11 +140,22 @@ namespace PatternGeneratorJRL
       
     
     /*! Build the necessary matrices for the QP problem under linear inequality constraints. */
-    int BuildConstraintMatrices(double * &Px, double * &DPu,
+    int BuildConstraintMatrices(double * &DPx, double * &DPu,
 				unsigned N, double T,
 				double StartingTime,
 				deque<LinearConstraintInequality_t *> 
 				& QueueOfLConstraintInequalities,
+				double Com_Height,
+				unsigned int &NbOfConstraints,
+				MAL_VECTOR(&xk,double),
+				MAL_VECTOR(&ZMPRef,double),
+				unsigned int &NextNumberOfRemovedConstraints);
+
+   int buildConstraintMatrices(double * &DS, double * &DU,
+				unsigned N, double T,
+				double StartingTime,
+				deque<LinearConstraintInequalityFreeFeet_t *> 
+				& QueueOfLConstraintInequalitiesFreeFeet,
 				double Com_Height,
 				unsigned int &NbOfConstraints,
 				MAL_VECTOR(&xk,double),
@@ -269,6 +291,8 @@ namespace PatternGeneratorJRL
     FootConstraintsAsLinearSystem * m_FCALS;
     footConstraintsAsLinearSystem * m_fCALS;
       
+    /*! \brief deque of the last support feet coordinates */
+    deque<SupportFeet_t *> QueueOfSupportFeet;
 
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;
@@ -281,6 +305,8 @@ namespace PatternGeneratorJRL
     
     /*! Preview window */
     unsigned int m_QP_N;
+
+    double FPx,FPy,FPtheta;
 
     /*! \name Variables related to the QP
       @{ */

@@ -156,6 +156,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
 						       MAL_MATRIX(&Dc,double)
 						       )
 {
+  printf("entered computeLinearSystem");
   double dx,dy,dc,x1,y1,x2,y2;
   unsigned int n = aVecOfPoints.size();
   MAL_MATRIX_RESIZE(D,aVecOfPoints.size(),2);
@@ -235,6 +236,8 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
   ODEBUG("A: " << A );
   ODEBUG("B: " << B);
       
+  printf("finished computeLinearSystem");
+
   return 0;
 }
 
@@ -251,6 +254,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 								     SupportState * Support)
 {
 
+  printf("entered buildLinearConstraintInequalities");
   // 3: Double Support.
   ComputeCH=0;
   lx=0.0, ly=0.0;
@@ -273,7 +277,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 	
  
       // Which support foot ?
-      if (Support->PrwFoot == 1)//Only simple support as for now
+      if (Support->PrwSupportFoot == 1)//Only simple support as for now
 	{
 	  //should be simplified as now in a local frame
 	  lx=0.0;
@@ -333,7 +337,9 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 ODEBUG("Size of the 5 ms array: "<< LeftFootAbsolutePositions.size());
 ODEBUG("Size of the queue of Linear Constraint Inequalities " << QueueOfLConstraintInequalities.size());
   
-return 0;
+ printf("finished buildLinearConstraintInequalities");
+ 
+ return 0;
 }
 
 void footConstraintsAsLinearSystem::CallMethod(std::string &Method, std::istringstream &Args)
