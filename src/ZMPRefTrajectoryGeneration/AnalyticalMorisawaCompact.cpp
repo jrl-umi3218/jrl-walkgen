@@ -21,6 +21,7 @@
 #include <Debug.h>
 #include <fstream>
 #include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.h>
+#include <iomanip> 
 
 typedef double doublereal;
 typedef int integer;
@@ -165,6 +166,7 @@ namespace PatternGeneratorJRL
 
     
     m_DeltaTj[0]=m_Tsingle*3.0;
+	ODEBUG("Delta_J:"<< setprecision(12) << m_DeltaTj[0]);
     //m_DeltaTj[0]=m_Tsingle*1.0;
     m_StepTypes[0] = DOUBLE_SUPPORT;
     for(int i=1;i<m_NumberOfIntervals;i++)
@@ -183,12 +185,12 @@ namespace PatternGeneratorJRL
     m_DeltaTj[m_NumberOfIntervals-1]=m_Tsingle*3.0;
     m_StepTypes[m_NumberOfIntervals-1]=DOUBLE_SUPPORT;
     ComputePreviewControlTimeWindow();
-    ODEBUG("PreviewControlTime:" << m_PreviewControlTime << " " << m_Tsingle << " " << m_Tdble);
+    ODEBUG("PreviewControlTime:" << setprecision(12) << m_PreviewControlTime << " " << m_Tsingle << " " << m_Tdble);
     
     if (m_VerboseLevel>=2)
       {
 	for(int i=0;i<m_NumberOfIntervals;i++)
-	  cout << m_DeltaTj[i] << " ";
+	  cout << setprecision(12) << m_DeltaTj[i] << " ";
 	cout << endl;
       }
 
