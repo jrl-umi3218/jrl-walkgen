@@ -18,11 +18,11 @@
 
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <Mathematics/FootConstraintsAsLinearSystem.h>
-#include <Mathematics/footConstraintsAsLinearSystem.h>
+//#include <Mathematics/footConstraintsAsLinearSystem.h>
 #include <Mathematics/OptCholesky.h>
 #include <Mathematics/PLDPSolver.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
-#include <PreviewControl/SupportState.h>
+//#include <PreviewControl/SupportState.h>
 
 namespace PatternGeneratorJRL
 {
@@ -95,7 +95,7 @@ namespace PatternGeneratorJRL
 					     double T,
 					     unsigned int N);
 
-
+    /*
     int buildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					     deque<ZMPPosition> &ZMPRefPositions,		       
@@ -104,7 +104,7 @@ namespace PatternGeneratorJRL
 					     double ConstraintOnY,
 					     double T,
 					     unsigned int N);
-
+    */
 
     /*! \name Methods to build the optimization problem 
       @{
@@ -151,6 +151,7 @@ namespace PatternGeneratorJRL
 				MAL_VECTOR(&ZMPRef,double),
 				unsigned int &NextNumberOfRemovedConstraints);
 
+    /*
    int buildConstraintMatrices(double * &DS, double * &DU,
 				unsigned N, double T,
 				double StartingTime,
@@ -161,6 +162,8 @@ namespace PatternGeneratorJRL
 				MAL_VECTOR(&xk,double),
 				MAL_VECTOR(&ZMPRef,double),
 				unsigned int &NextNumberOfRemovedConstraints);
+
+    */
 
     /*! \brief Build the constant part of the constraint matrices. */
     int BuildingConstantPartOfConstraintMatrices();
@@ -283,16 +286,16 @@ namespace PatternGeneratorJRL
     LinearizedInvertedPendulum2D * m_2DLIPM;
     
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
-    SupportState  * Support;
+    //SupportState  * Support;
 
     /*! \brief Object creating Linear inequalities constraints 
       based on the foot position. Those constraints are *NOT* the
       one put in the QP, but they are a necessary intermediate step. */
     FootConstraintsAsLinearSystem * m_FCALS;
-    footConstraintsAsLinearSystem * m_fCALS;
+    //footConstraintsAsLinearSystem * m_fCALS;
       
     /*! \brief deque of the last support feet coordinates */
-    deque<SupportFeet_t *> QueueOfSupportFeet;
+    //deque<SupportFeet_t *> QueueOfSupportFeet;
 
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;
