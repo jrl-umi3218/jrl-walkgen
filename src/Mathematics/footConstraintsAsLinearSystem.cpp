@@ -77,6 +77,7 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   SimplePlugin(aSPM)
 {
 
+  printf("Entered footConstraintsAsLinearSystem \n");
   m_HS = aHS;
   // Read humanoid specificities.
   lRightFoot = m_HS->rightFoot();
@@ -101,7 +102,8 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   
     
   RESETDEBUG5("Constraints-fCSALS.dat");
-  
+ 
+  printf("Leaving footConstraintsAsLinearSystem \n");
 }
 
 footConstraintsAsLinearSystem::~footConstraintsAsLinearSystem()
