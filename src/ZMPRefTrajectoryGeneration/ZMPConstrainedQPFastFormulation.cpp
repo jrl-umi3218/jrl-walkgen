@@ -141,8 +141,8 @@ ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
   if (m_FCALS!=0)
     delete m_FCALS;
 
-  //if (m_fCALS!=0)
-  // delete m_fCALS;
+  if (m_fCALS!=0)
+    delete m_fCALS;
  
   if (m_Q!=0)
     delete [] m_Q;
