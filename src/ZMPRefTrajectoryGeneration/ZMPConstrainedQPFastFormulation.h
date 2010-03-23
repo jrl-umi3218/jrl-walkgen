@@ -18,11 +18,11 @@
 
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <Mathematics/FootConstraintsAsLinearSystem.h>
-//#include <Mathematics/footConstraintsAsLinearSystem.h>
+#include <Mathematics/footConstraintsAsLinearSystem.h>
 #include <Mathematics/OptCholesky.h>
 #include <Mathematics/PLDPSolver.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
-//#include <PreviewControl/SupportState.h>
+#include <PreviewControl/SupportState.h>
 
 namespace PatternGeneratorJRL
 {
@@ -140,7 +140,7 @@ namespace PatternGeneratorJRL
       
     
     /*! Build the necessary matrices for the QP problem under linear inequality constraints. */
-    int BuildConstraintMatrices(double * &DPx, double * &DPu,
+    int BuildConstraintMatrices(double * &Px, double * &DPu,
 				unsigned N, double T,
 				double StartingTime,
 				deque<LinearConstraintInequality_t *> 
@@ -286,16 +286,14 @@ namespace PatternGeneratorJRL
     LinearizedInvertedPendulum2D * m_2DLIPM;
     
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
-    //SupportState  * Support;
+    SupportState  * Support;
 
     /*! \brief Object creating Linear inequalities constraints 
       based on the foot position. Those constraints are *NOT* the
       one put in the QP, but they are a necessary intermediate step. */
     FootConstraintsAsLinearSystem * m_FCALS;
-    //footConstraintsAsLinearSystem * m_fCALS;
+    footConstraintsAsLinearSystem * m_fCALS;
       
-    /*! \brief deque of the last support feet coordinates */
-    //deque<SupportFeet_t *> QueueOfSupportFeet;
 
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;
@@ -309,7 +307,6 @@ namespace PatternGeneratorJRL
     /*! Preview window */
     unsigned int m_QP_N;
 
-    double FPx,FPy,FPtheta;
 
     /*! \name Variables related to the QP
       @{ */
