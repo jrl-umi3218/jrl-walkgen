@@ -83,7 +83,7 @@ namespace PatternGeneratorJRL
   };
   typedef struct FootAbsolutePosition_t FootAbsolutePosition;
 
-  /// Linear constraint.
+  // Linear constraint.
   struct LinearConstraintInequality_s
   {
     MAL_MATRIX(A,double);
@@ -94,7 +94,7 @@ namespace PatternGeneratorJRL
   };
   typedef struct LinearConstraintInequality_s 
     LinearConstraintInequality_t;
-  /*
+  
   /// Linear constraints with variable feet placement.
   struct LinearConstraintInequalityFreeFeet_s
   {
@@ -113,6 +113,6 @@ namespace PatternGeneratorJRL
   };
   typedef struct SupportFeet_s 
     SupportFeet_t;
-  */
+  
 };
 #endif

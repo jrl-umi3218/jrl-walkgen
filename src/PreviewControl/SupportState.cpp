@@ -19,6 +19,7 @@ using namespace std;
 SupportState::SupportState()
 {
 
+  printf("Entered SupportState \n");
   SSDuration = 0.8; 	  //Duration of one step
   DSDuration = 1e9;       //Duration of the DS phase
   DSSSDuration = 0.8;
@@ -36,6 +37,8 @@ SupportState::SupportState()
 
   s_FullDebug = 1;
   RESETDEBUG4("DebugSupportState.dat");
+
+  printf("Leaving SupportState \n");
 }
 
 
