@@ -54,7 +54,7 @@ namespace PatternGeneratorJRL
 
     int StepNumber;
 
-    int NumberSteps;
+    unsigned int NumberSteps;
 
 	
     /*! \brief Current support state */

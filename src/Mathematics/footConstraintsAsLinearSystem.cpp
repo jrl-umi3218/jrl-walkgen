@@ -166,21 +166,21 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
   MAL_MATRIX_RESIZE(Dc,aVecOfPoints.size(),1);
 
 
-  // // Dump a file to display on scilab .
-  // // This should be removed during real usage inside a robot.
-  // if (1)
-  //   {
-  //     ofstream aof;
-  //     aof.open("Constraints-fCSALS.dat",ofstream::app);
-  //     for(unsigned int i=0;i<n-1;i++)
-  // 	{
-  // 	  aof << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
-  // 	      << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row << endl;
-  // 	}
-  //     aof << aVecOfPoints[n-1].col << " " <<  aVecOfPoints[n-1].row << " "
-  // 	  << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row << endl;
-  //     aof.close();
-  //   }
+  // Dump a file to display on scilab .
+  // This should be removed during real usage inside a robot.
+  if (0)
+    {
+      ofstream aof;
+      aof.open("Constraints-fCSALS.dat",ofstream::app);
+      for(unsigned int i=0;i<n-1;i++)
+  	{
+  	  aof << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
+  	      << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row << endl;
+  	}
+      aof << aVecOfPoints[n-1].col << " " <<  aVecOfPoints[n-1].row << " "
+  	  << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row << endl;
+      aof.close();
+    }
   
   for(unsigned int i=0;i<n-1;i++)//first n-1 inequalities
     {
@@ -271,6 +271,9 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
   float lycoefs[4] = {-1.0, 1.0,  1.0, -1.0};
 
   vector<CH_Point> TheConvexHull;
+  
+  
+  
 
   // Going through the set of generated data for each 5 ms.
   // from this extract a set of linear constraints.
@@ -333,6 +336,10 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
       //ComputeLinearSystem(TheConvexHull, aLCI->A, aLCI->B, aLCI->Center);
       //
       computeLinearSystem(TheConvexHull, aLCI->D, aLCI->Dc);
+
+      //Selection Vector and Matrix Vc, V
+      aLCI->StepNumber = Support->StepNumber;
+
       // Finding the similar one (i.e. Ai identical).
       //FindSimilarConstraints(aLCI->A,aLCI->SimilarConstraints);
       
