@@ -16,7 +16,7 @@
 using namespace PatternGeneratorJRL;
 using namespace std;
 
-SupportState::SupportState()
+SupportState::SupportState(const double &SamplingDuration)
 {
 
   printf("Entered SupportState \n");
@@ -25,6 +25,7 @@ SupportState::SupportState()
   DSSSDuration = 0.8;
   NumberSteps = 0;
 
+  T = SamplingDuration;
   //Initial current state
   CurrentSupportPhase = 0;
   CurrentSupportFoot = 1;
@@ -85,14 +86,13 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
  
   
   //FSM
-  if(Time+eps >= *SupportTimeLimit)
+  if(Time+eps+pi*T >= *SupportTimeLimit)
     {
       //SS->DS
       if(*SupportPhase == 1  && ReferenceGiven == -1 && *SupportStepsLeft==0)
 	{
-	  //printf("SSDS in c \n");
 	  *SupportPhase = 0;	
-	  *SupportTimeLimit = Time + DSDuration;
+	  *SupportTimeLimit = Time+pi*T + DSDuration;
 	  StateChanged = 1;
 	}
       //DS->SS
@@ -100,7 +100,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
 	{
 	  *SupportPhase = 1;
 	  *SupportFoot = StartSupportFoot;
-	  *SupportTimeLimit = Time + SSDuration;
+	  *SupportTimeLimit = Time+pi*T + SSDuration;
 	  *SupportStepsLeft = NumberSteps;
 	  StateChanged = 1;
 	}
@@ -109,7 +109,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
 	{
 	  *SupportFoot = -1**SupportFoot;
 	  StateChanged = 1;
-	  *SupportTimeLimit = Time + SSDuration;
+	  *SupportTimeLimit = Time+pi*T + SSDuration;
 	  StepNumber = StepNumber+1;
 	  if (ReferenceGiven == -1)
 	    *SupportStepsLeft = *SupportStepsLeft-1;
@@ -118,7 +118,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
 
   if(pi==0)
     initializePreviewedState();
-  ODEBUG4( " " , "DebugSupportState.dat");
+
   
   if(s_FullDebug>0)
     {
@@ -126,13 +126,17 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
       aof.open("SupportStates.dat", ios::app);
       aof << "Time: "<<Time<<" CSP: "<<CurrentSupportPhase
 	  <<" CSF: "<<CurrentSupportFoot<<" CTL: "<<CurrentTimeLimit
-	  <<" PrwSP: "<<PrwSupportPhase
-	  <<" PrwSF: "<<PrwSupportFoot<<" PrwTL: "<<PrwTimeLimit;
+	  <<" CSL: "<<CurrentStepsLeft<<" PrwSP: "<<PrwSupportPhase
+	  <<" PrwSF: "<<PrwSupportFoot<<" PrwTL: "<<PrwTimeLimit
+	  <<" PrwSL: "<<PrwStepsLeft<<" *SF: "<<*SupportFoot
+	  <<" *SSL: "<<*SupportStepsLeft;
       aof << endl;
       aof.close();
     }
+
+ // ODEBUG4( " " , "DebugSupportState.dat");
+
   printf("Leaving setSupportState \n");
-  //printf("CurrentTimeLimit inside:    %f %f \n", *SupportTimeLimit, CurrentTimeLimit);
 }
 
 //Andremize: initialization only necessary when state changes

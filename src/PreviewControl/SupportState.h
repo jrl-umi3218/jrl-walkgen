@@ -21,7 +21,7 @@ namespace PatternGeneratorJRL
   {
   public:
     /*! Constructor */
-    SupportState();
+    SupportState(const double &SamplingDuration);
 	
     /*! Destructor */
     ~SupportState();
@@ -98,7 +98,10 @@ namespace PatternGeneratorJRL
 	
   private: 
 	
-    /*! \brief Support state */
+    /*! \Brief Sampling duration */
+    double T;
+
+    /*! \Brief Support state */
     int *SupportPhase, *SupportFoot, *SupportStepsLeft;
 
     double *SupportTimeLimit;
