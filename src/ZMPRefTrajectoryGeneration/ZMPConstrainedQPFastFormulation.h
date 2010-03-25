@@ -95,7 +95,8 @@ namespace PatternGeneratorJRL
 					     double T,
 					     unsigned int N);
 
-    /*
+
+    
     int buildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					     deque<ZMPPosition> &ZMPRefPositions,		       
@@ -104,7 +105,8 @@ namespace PatternGeneratorJRL
 					     double ConstraintOnY,
 					     double T,
 					     unsigned int N);
-    */
+    
+    
 
     /*! \name Methods to build the optimization problem 
       @{
@@ -151,7 +153,7 @@ namespace PatternGeneratorJRL
 				MAL_VECTOR(&ZMPRef,double),
 				unsigned int &NextNumberOfRemovedConstraints);
 
-    /*
+    
    int buildConstraintMatrices(double * &DS, double * &DU,
 				unsigned N, double T,
 				double StartingTime,
@@ -163,7 +165,7 @@ namespace PatternGeneratorJRL
 				MAL_VECTOR(&ZMPRef,double),
 				unsigned int &NextNumberOfRemovedConstraints);
 
-    */
+    
 
     /*! \brief Build the constant part of the constraint matrices. */
     int BuildingConstantPartOfConstraintMatrices();
