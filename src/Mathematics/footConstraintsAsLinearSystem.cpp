@@ -158,7 +158,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
 						       MAL_MATRIX(&Dc,double)
 						       )
 {
-  printf("entered computeLinearSystem");
+  printf("Entered computeLinearSystem \n");
   double dx,dy,dc,x1,y1,x2,y2;
   unsigned int n = aVecOfPoints.size();
   MAL_MATRIX_RESIZE(D,aVecOfPoints.size(),2);
@@ -238,7 +238,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
   ODEBUG("A: " << A );
   ODEBUG("B: " << B);
       
-  printf("finished computeLinearSystem");
+  printf("Finished computeLinearSystem \n");
 
   return 0;
 }
@@ -256,7 +256,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 								     SupportState * Support)
 {
 
-  printf("entered buildLinearConstraintInequalities");
+  printf("Entered buildLinearConstraintInequalities \n");
   // 3: Double Support.
   ComputeCH=0;
   lx=0.0, ly=0.0;
@@ -321,25 +321,27 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 	  ODEBUG("Right support foot");
 	}
 	      
+      // Linear Constraint Inequality
+      LinearConstraintInequalityFreeFeet_t * aLCI = new LinearConstraintInequalityFreeFeet_t;
+      // Building those constraints.
+      //ComputeLinearSystem(TheConvexHull, aLCI->A, aLCI->B, aLCI->Center);
+      //
+      computeLinearSystem(TheConvexHull, aLCI->D, aLCI->Dc);
+      // Finding the similar one (i.e. Ai identical).
+      //FindSimilarConstraints(aLCI->A,aLCI->SimilarConstraints);
+      
+      //aLCI->StartingTime = LeftFootAbsolutePositions[i].time;//???What to do
+      
+      QueueOfLConstraintInequalities.push_back(aLCI);
+
     }
 
-  // Linear Constraint Inequality
-  LinearConstraintInequalityFreeFeet_t * aLCI = new LinearConstraintInequalityFreeFeet_t;
-  // Building those constraints.
-  //ComputeLinearSystem(TheConvexHull, aLCI->A, aLCI->B, aLCI->Center);
-  //
-  computeLinearSystem(TheConvexHull, aLCI->D, aLCI->Dc);
-  // Finding the similar one (i.e. Ai identical).
-  //FindSimilarConstraints(aLCI->A,aLCI->SimilarConstraints);
-
-  //aLCI->StartingTime = LeftFootAbsolutePositions[i].time;//???What to do
-
-  QueueOfLConstraintInequalities.push_back(aLCI);
+  printf("Left the preview loop \n");
 
 ODEBUG("Size of the 5 ms array: "<< LeftFootAbsolutePositions.size());
 ODEBUG("Size of the queue of Linear Constraint Inequalities " << QueueOfLConstraintInequalities.size());
   
- printf("finished buildLinearConstraintInequalities");
+ printf("Leaving buildLinearConstraintInequalities \n");
  
  return 0;
 }
