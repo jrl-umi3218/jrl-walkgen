@@ -18,8 +18,8 @@ using namespace std;
 
 SupportState::SupportState(const double &SamplingDuration)
 {
+  // printf("Entered SupportState \n");
 
-  printf("Entered SupportState \n");
   SSDuration = 0.8; 	  //Duration of one step
   DSDuration = 1e9;       //Duration of the DS phase
   DSSSDuration = 0.8;
@@ -41,7 +41,7 @@ SupportState::SupportState(const double &SamplingDuration)
   RESETDEBUG4("DebugSupportState.dat");
   ofstream aof("SupportStates.dat");
 
-  printf("Leaving SupportState \n");
+  // printf("Leaving SupportState \n");
 }
 
 
@@ -52,7 +52,7 @@ SupportState::~SupportState()
 void SupportState::setSupportState(const double &Time, const int &pi,  double Ref[3])
 
 {
-  printf("Inside setSupportState \n");
+  // printf("Inside setSupportState \n");
 
   StateChanged = -1;
 
@@ -79,9 +79,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
     }
   if(ReferenceGiven == 1 && *SupportPhase == 0 && (*SupportTimeLimit-Time-eps)>DSSSDuration)
     {
-      //printf("SupportTimeLimit changed: %f", *SupportTimeLimit);
-      *SupportTimeLimit = Time+DSSSDuration;
-      //printf("    %f %f \n", *SupportTimeLimit, CurrentTimeLimit); 
+      *SupportTimeLimit = Time+DSSSDuration; 
     }
  
   
@@ -136,13 +134,13 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
 
  // ODEBUG4( " " , "DebugSupportState.dat");
 
-  printf("Leaving setSupportState \n");
+  // printf("Leaving setSupportState \n");
 }
 
 //Andremize: initialization only necessary when state changes
 void SupportState::initializePreviewedState()
 { 
-  printf("Inside initializePreviewedState \n");
+  // printf("Inside initializePreviewedState \n");
   PrwSupportPhase = CurrentSupportPhase;
   PrwSupportFoot = CurrentSupportFoot;
   PrwStepsLeft = CurrentStepsLeft;
