@@ -49,6 +49,7 @@ SupportState::~SupportState()
 void SupportState::setSupportState(const double &Time, const int &pi,  double Ref[3])
 
 {
+  printf("Inside setSupportState \n");
 
   StateChanged = -1;
 
@@ -130,12 +131,14 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
   if(pi==0)
     initializePreviewedState();
   ODEBUG4( " " , "DebugSupportState.dat");
-
+  
+  printf("Leaving setSupportState \n");
   //printf("CurrentTimeLimit inside:    %f %f \n", *SupportTimeLimit, CurrentTimeLimit);
 }
 
 void SupportState::initializePreviewedState()
 { 
+  printf("Inside initializePreviewedState \n");
   PrwPhase = CurrentPhase;
   PrwSupportFoot = CurrentSupportFoot;
   PrwStepsLeft = CurrentStepsLeft;
