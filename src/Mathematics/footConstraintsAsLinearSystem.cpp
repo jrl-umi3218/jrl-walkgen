@@ -39,7 +39,7 @@ using namespace std;
 using namespace PatternGeneratorJRL;
 
 
-#if 0
+#if 1
 #define RESETDEBUG4(y) { ofstream DebugFile; \
                          DebugFile.open(y,ofstream::out); \
                          DebugFile.close();}
@@ -77,7 +77,7 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   SimplePlugin(aSPM)
 {
 
-  printf("Entered footConstraintsAsLinearSystem \n");
+  // printf("Entered footConstraintsAsLinearSystem \n");
   m_HS = aHS;
   // Read humanoid specificities.
   lRightFoot = m_HS->rightFoot();
@@ -101,9 +101,9 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   lRightFootHalfWidth -= ConstraintOnX;
   
     
-  RESETDEBUG5("Constraints-fCSALS.dat");
+  RESETDEBUG4("Constraints-fCSALS.dat");
  
-  printf("Leaving footConstraintsAsLinearSystem \n");
+  // printf("Leaving footConstraintsAsLinearSystem \n");
 }
 
 footConstraintsAsLinearSystem::~footConstraintsAsLinearSystem()
@@ -158,30 +158,31 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
 						       MAL_MATRIX(&Dc,double)
 						       )
 {
-  printf("Entered computeLinearSystem \n");
+  // printf("Entered computeLinearSystem \n");
+
   double dx,dy,dc,x1,y1,x2,y2;
   unsigned int n = aVecOfPoints.size();
   MAL_MATRIX_RESIZE(D,aVecOfPoints.size(),2);
   MAL_MATRIX_RESIZE(Dc,aVecOfPoints.size(),1);
 
 
-  // Dump a file to display on scilab .
-  // This should be removed during real usage inside a robot.
-  if (1)
-    {
-      ofstream aof;
-      aof.open("Constraints-fCSALS.dat",ofstream::app);
-      for(unsigned int i=0;i<n-1;i++)
-	{
-	  aof << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
-	      << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row << endl;
-	}
-      aof << aVecOfPoints[n-1].col << " " <<  aVecOfPoints[n-1].row << " "
-	  << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row << endl;
-      aof.close();
-    }
+  // // Dump a file to display on scilab .
+  // // This should be removed during real usage inside a robot.
+  // if (1)
+  //   {
+  //     ofstream aof;
+  //     aof.open("Constraints-fCSALS.dat",ofstream::app);
+  //     for(unsigned int i=0;i<n-1;i++)
+  // 	{
+  // 	  aof << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
+  // 	      << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row << endl;
+  // 	}
+  //     aof << aVecOfPoints[n-1].col << " " <<  aVecOfPoints[n-1].row << " "
+  // 	  << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row << endl;
+  //     aof.close();
+  //   }
   
-  for(unsigned int i=0;i<n-2;i++)//first n-1 inequalities
+  for(unsigned int i=0;i<n-1;i++)//first n-1 inequalities
     {
       ODEBUG("(x["<< i << "],y["<<i << "]): " << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
 	     << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row );
@@ -205,6 +206,9 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
       Dc(i,0) = dc;
 
       //C is not filled
+
+    ODEBUG4("D("<<i<<",:): " <<dx<<" "<<dy,"Constraints-fCSALS.dat");
+    ODEBUG4(" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
     }
 
   {
@@ -232,13 +236,15 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
     Dc(i,0) = dc;
 
     //C is not filled
+
+    ODEBUG4("D("<<i<<",:): " <<dx<<" "<<dy,"Constraints-fCSALS.dat");
+    ODEBUG4(" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
   }
 
   
-  ODEBUG("A: " << A );
-  ODEBUG("B: " << B);
+  ODEBUG4(" \n","Constraints-fCSALS.dat");
       
-  printf("Finished computeLinearSystem \n");
+  // printf("Finished computeLinearSystem \n");
 
   return 0;
 }
@@ -249,15 +255,15 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 								     deque<FootAbsolutePosition> 
 								     &RightFootAbsolutePositions,
 								     deque<LinearConstraintInequalityFreeFeet_t *> &
-								     QueueOfLConstraintInequalities,
+								     QueueOfLConstraintInequalitiesFreeFeet,
 								     double Ref[3],
 								     double StartingTime,
 								     double m_QP_N,
 								     SupportState * Support)
 {
 
-  printf("Entered buildLinearConstraintInequalities \n");
-  // 3: Double Support.
+  // printf("Entered buildLinearConstraintInequalities \n");
+
   ComputeCH=0;
   lx=0.0, ly=0.0;
 
@@ -332,16 +338,16 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
       
       //aLCI->StartingTime = LeftFootAbsolutePositions[i].time;//???What to do
       
-      QueueOfLConstraintInequalities.push_back(aLCI);
+      QueueOfLConstraintInequalitiesFreeFeet.push_back(aLCI);
 
     }
 
-  printf("Left the preview loop \n");
+  // printf("Left the preview loop \n");
 
 ODEBUG("Size of the 5 ms array: "<< LeftFootAbsolutePositions.size());
-ODEBUG("Size of the queue of Linear Constraint Inequalities " << QueueOfLConstraintInequalities.size());
+ODEBUG("Size of the queue of Linear Constraint Inequalities " << QueueOfLConstraintInequalitiesFreeFeet.size());
   
- printf("Leaving buildLinearConstraintInequalities \n");
+ // printf("Leaving buildLinearConstraintInequalities \n");
  
  return 0;
 }
