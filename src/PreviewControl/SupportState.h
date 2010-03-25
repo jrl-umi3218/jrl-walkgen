@@ -41,12 +41,12 @@ namespace PatternGeneratorJRL
     int StartSupportFoot;
 	
     /*! \brief Current support state */
-    int CurrentPhase, CurrentSupportFoot, CurrentStepsLeft;
+    int CurrentSupportPhase, CurrentSupportFoot, CurrentStepsLeft;
 
     double CurrentTimeLimit;
 	
     /*! \brief Future support state */
-    int PrwPhase, PrwSupportFoot, PrwStepsLeft;
+    int PrwSupportPhase, PrwSupportFoot, PrwStepsLeft;
 
     double  PrwTimeLimit;
 
@@ -99,7 +99,7 @@ namespace PatternGeneratorJRL
   private: 
 	
     /*! \brief Support state */
-    int* SupportPhase, *SupportFoot, *SupportStepsLeft;
+    int *SupportPhase, *SupportFoot, *SupportStepsLeft;
 
     double *SupportTimeLimit;
     void initializePreviewedState();
@@ -107,6 +107,7 @@ namespace PatternGeneratorJRL
     int ReferenceGiven;
 
     int s_FullDebug;
+
     /*! \name Getter of variables
       @{
     */
