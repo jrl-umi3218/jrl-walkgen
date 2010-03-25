@@ -155,16 +155,18 @@ namespace PatternGeneratorJRL
 
     
    int buildConstraintMatrices(double * &DS, double * &DU,
-				unsigned N, double T,
-				double StartingTime,
-				deque<LinearConstraintInequalityFreeFeet_t *> 
-				& QueueOfLConstraintInequalitiesFreeFeet,
-				double Com_Height,
-				unsigned int &NbOfConstraints,
-				MAL_VECTOR(&xk,double),
-				MAL_VECTOR(&ZMPRef,double),
-				unsigned int &NextNumberOfRemovedConstraints);
-
+			       unsigned N, double T,
+			       double StartingTime,
+			       deque<LinearConstraintInequalityFreeFeet_t *> 
+			       & QueueOfLConstraintInequalitiesFreeFeet,
+			       deque<SupportFeet_t *> 
+			       & QueueOfSupportFeet,
+			       double Com_Height,
+			       unsigned int &NbOfConstraints,
+			       MAL_VECTOR(&xk,double),
+			       MAL_VECTOR(&ZMPRef,double),
+			       unsigned int &NextNumberOfRemovedConstraints);
+   
     
 
     /*! \brief Build the constant part of the constraint matrices. */
