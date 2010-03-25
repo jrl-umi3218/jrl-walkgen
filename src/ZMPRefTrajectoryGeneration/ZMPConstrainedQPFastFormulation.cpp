@@ -41,7 +41,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   printf("Entered ZMPConstrainedQPFastFormulation \n");
   m_Q = 0;
   m_Pu = 0;
-  m_FullDebug = 1;
+  m_FullDebug = 3;
   m_FastFormulationMode = PLDP;
 
   /*! Getting the ZMP reference from Kajita's heuristic. */
@@ -1509,9 +1509,13 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   unsigned int NumberOfRemovedConstraints =0,
     NextNumberOfRemovedConstraints =0;
 
-  printf("Inside the loop: \n");
+ //----------"Real-time" loop---------
+ //
+ //
+ //-----------------------------------
+  printf("Inside the 'Real-time' loop: \n");
  for(double StartingTime=0.0;
-      5.0;
+     StartingTime<= 2.0;
       StartingTime+=T,li++)
     {
       printf("StartingTime: %f \n", StartingTime);
@@ -1545,11 +1549,15 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
       if(Support->StateChanged == 1)
 	{
-	  printf("SupportState changed");
+	  printf("SupportState changed \n");
 	  SupportFeet_t * newSF = new SupportFeet_t;
 	  if(Support->StepNumber == 0)//SS->DS or DS->SS
 	    {
-	      SF_it = QueueOfSupportFeet.end()--;
+	      printf("StepNumber == 0 \n");
+	      SF_it = QueueOfSupportFeet.end();
+	      SF_it--;
+	      printf("(*SF_it)->SupportFoot %d \n", (*SF_it)->SupportFoot);
+	      printf("Support-CurrentSupportFoot %d \n", Support->CurrentSupportFoot);
 	      //The support foot does not change
 	      if((*SF_it)->SupportFoot != Support->CurrentSupportFoot)
 		SF_it--;
@@ -1557,6 +1565,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	      FPy = (*SF_it)->y;
 	      FPtheta = (*SF_it)->theta;
 	    }
+
 	  newSF->x = FPx; 
 	  newSF->y = FPy; 
 	  newSF->theta = FPtheta; 
@@ -1658,151 +1667,163 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       ODEBUG("m: " << m);
       //      DumpProblem(m_Q, D, DPu, m, DPx,XL,XU,StartingTime);
 
-      printf("Starting the solver \n");
-      if ((m_FastFormulationMode==QLDANDLQ)||
-	  (m_FastFormulationMode==QLD))
-	{
-	  struct timeval lbegin,lend;
-	  gettimeofday(&lbegin,0);
-	  ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
-		  m_Q, D, DPu,DPx,XL,XU,
-		  X,U,&iout, &ifail, &iprint,
-		  war, &lwar,
-		  iwar, &liwar,&Eps);
-	  gettimeofday(&lend,0);
-	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
-		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
+      //---------Solver------------
+      //
+      //
+      //---------------------------
+      // printf("Entering the solver \n");
+      // if ((m_FastFormulationMode==QLDANDLQ)||
+      // 	  (m_FastFormulationMode==QLD))
+      // 	{
+      // 	  struct timeval lbegin,lend;
+      // 	  gettimeofday(&lbegin,0);
+      // 	  ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
+      // 		  m_Q, D, DPu,DPx,XL,XU,
+      // 		  X,U,&iout, &ifail, &iprint,
+      // 		  war, &lwar,
+      // 		  iwar, &liwar,&Eps);
+      // 	  gettimeofday(&lend,0);
+      // 	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
+      // 		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
 
-	  unsigned int NbOfActivatedConstraints = 0;
-	  for(int lk=0;lk<m;lk++)
-	    {
-	      if (U[lk]>0.0)
-		{
-		  NbOfActivatedConstraints++;
-		}
-	    }
-	  ODEBUG6(NbOfActivatedConstraints,"InfosQLD.dat");
-	  ODEBUG6(ldt,"dtQLD.dat");
-	}
-      else if (m_FastFormulationMode==PLDP)
-	{
-	  ODEBUG("State: " << xk[0] << " " << xk[3] << " " <<
-		  xk[1] << " " << xk[4] << " " <<
-		  xk[2] << " " << xk[5] << " ");
-	  struct timeval lbegin,lend;
-	  gettimeofday(&lbegin,0);
+      // 	  unsigned int NbOfActivatedConstraints = 0;
+      // 	  for(int lk=0;lk<m;lk++)
+      // 	    {
+      // 	      if (U[lk]>0.0)
+      // 		{
+      // 		  NbOfActivatedConstraints++;
+      // 		}
+      // 	    }
+      // 	  ODEBUG6(NbOfActivatedConstraints,"InfosQLD.dat");
+      // 	  ODEBUG6(ldt,"dtQLD.dat");
+      // 	}
+      // else if (m_FastFormulationMode==PLDP)
+      // 	{
+      // 	  ODEBUG("State: " << xk[0] << " " << xk[3] << " " <<
+      // 		  xk[1] << " " << xk[4] << " " <<
+      // 		  xk[2] << " " << xk[5] << " ");
+      // 	  struct timeval lbegin,lend;
+      // 	  gettimeofday(&lbegin,0);
 
-	  ifail=m_PLDPSolver->SolveProblem(D,
-					   (unsigned int)m,
-					   DPu,
-					   DPx,
-					   MAL_RET_VECTOR_DATABLOCK(ZMPRef),
-					   MAL_RET_VECTOR_DATABLOCK(xk),X,
-					   m_SimilarConstraints,
-					   NumberOfRemovedConstraints,
-					   StartingSequence);
-	  StartingSequence = false;
-	  NumberOfRemovedConstraints = NextNumberOfRemovedConstraints;
-	  gettimeofday(&lend,0);
-	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
-		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
+      // 	  ifail=m_PLDPSolver->SolveProblem(D,
+      // 					   (unsigned int)m,
+      // 					   DPu,
+      // 					   DPx,
+      // 					   MAL_RET_VECTOR_DATABLOCK(ZMPRef),
+      // 					   MAL_RET_VECTOR_DATABLOCK(xk),X,
+      // 					   m_SimilarConstraints,
+      // 					   NumberOfRemovedConstraints,
+      // 					   StartingSequence);
+      // 	  StartingSequence = false;
+      // 	  NumberOfRemovedConstraints = NextNumberOfRemovedConstraints;
+      // 	  gettimeofday(&lend,0);
+      // 	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
+      // 		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
 
-	  ODEBUG6(ldt,"dtPLDP.dat");
-	}
+      // 	  ODEBUG6(ldt,"dtPLDP.dat");
+      // 	}
 
-      if (ifail!=0)
-	{
-	  cout << "IFAIL: " << ifail << " at time: " << StartingTime << endl;
-	  return -1;
-	}
+      // if (ifail!=0)
+      // 	{
+      // 	  cout << "IFAIL: " << ifail << " at time: " << StartingTime << endl;
+      // 	  return -1;
+      // 	}
+
+      // //------------------------
+      // //
+      // //
+      // //-------------------------
+
+      // double *ptX=0;
+      // if ((m_FastFormulationMode==QLDANDLQ)||
+      // 	  (m_FastFormulationMode==PLDP))
+      // 	{
+      // 	  /* Multiply the solution by the transpose of iLQ
+      // 	     because it is a triangular matrix we do a specific
+      // 	     multiplication.
+      // 	  */
+      // 	  memset(NewX,0,2*N*sizeof(double));
+
+      // 	  double *pm_iLQ = MAL_RET_MATRIX_DATABLOCK(m_iLQ);
+      // 	  double *pNewX = NewX;
+
+      // 	  for(unsigned int i=0;i<2*N;i++)
+      // 	    {
+      // 	      double *pX= X+i;
+      // 	      double *piLQ = pm_iLQ+i*2*N+i;
+      // 	      *pNewX = 0.0;
+      // 	      for(unsigned int j=i;j<2*N;j++)
+      // 		{
+      // 		  *pNewX+= (*piLQ) * (*pX++);
+      // 		  piLQ+=2*N;
+      // 		}
+      // 	      pNewX++;
+      // 	    }
+      // 	  ptX=NewX;
+      // 	}
+      // else
+      // 	ptX=X;
+
+      // /* Simulation of the Single Point Mass model
+      // 	 with the new command.
+      // */
+      // ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
+
+      // // Calling this method will automatically
+      // // update the ZMPRefPositions.
+      // m_2DLIPM->Interpolation(COMPositions,
+      // 			      ZMPRefPositions,
+      // 			      li*interval,
+      // 			      ptX[0],ptX[N]);
+
+      // m_2DLIPM->OneIteration(ptX[0],ptX[N]);
+
+      // ODEBUG6("uk:" << uk,"DebugPBW.dat");
+      // ODEBUG6("xk:" << xk,"DebugPBW.dat");
+
+      // /* Constraint validation */
+      // if (0)
+      // 	{
+      // 	  if(ValidationConstraints(DPx,DPu,
+      // 				m,
+      // 				QueueOfLConstraintInequalities,
+      // 				li,X,
+      // 				   StartingTime)<0)
+      // 	    {
+      // 	      cout << "Something is wrong with the constraints." << endl;
+      // 	      //   exit(-1);
+      // 	    }
+      // 	}
+
+      // if (m_FullDebug>2)
+      // {
+      // 	ofstream aof;
+      // 	char Buffer[1024];
+      // 	sprintf(Buffer,"X_%f.dat",StartingTime);
+      // 	aof.open(Buffer,ofstream::out);
+      // 	for(unsigned int i=0;i<2*N;i++)
+      // 	  {
+      // 	    aof << X[i] << endl;
+      // 	  }
+      // 	aof.close();
+      // }
 
 
-      double *ptX=0;
-      if ((m_FastFormulationMode==QLDANDLQ)||
-	  (m_FastFormulationMode==PLDP))
-	{
-	  /* Multiply the solution by the transpose of iLQ
-	     because it is a triangular matrix we do a specific
-	     multiplication.
-	  */
-	  memset(NewX,0,2*N*sizeof(double));
+      // // Compute CPU consumption time.
+      // gettimeofday(&end,0);
+      // CurrentCPUTime = end.tv_sec - start.tv_sec +
+      // 	0.000001 * (end.tv_usec - start.tv_usec);
+      // TotalAmountOfCPUTime += CurrentCPUTime;
+      // ODEBUG("Current Time : " << StartingTime << " " <<
+      // 	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime <<
+      // 	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
-	  double *pm_iLQ = MAL_RET_MATRIX_DATABLOCK(m_iLQ);
-	  double *pNewX = NewX;
-
-	  for(unsigned int i=0;i<2*N;i++)
-	    {
-	      double *pX= X+i;
-	      double *piLQ = pm_iLQ+i*2*N+i;
-	      *pNewX = 0.0;
-	      for(unsigned int j=i;j<2*N;j++)
-		{
-		  *pNewX+= (*piLQ) * (*pX++);
-		  piLQ+=2*N;
-		}
-	      pNewX++;
-	    }
-	  ptX=NewX;
-	}
-      else
-	ptX=X;
-
-      /* Simulation of the Single Point Mass model
-	 with the new command.
-      */
-      ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
-
-      // Calling this method will automatically
-      // update the ZMPRefPositions.
-      m_2DLIPM->Interpolation(COMPositions,
-			      ZMPRefPositions,
-			      li*interval,
-			      ptX[0],ptX[N]);
-
-      m_2DLIPM->OneIteration(ptX[0],ptX[N]);
-
-      ODEBUG6("uk:" << uk,"DebugPBW.dat");
-      ODEBUG6("xk:" << xk,"DebugPBW.dat");
-
-      /* Constraint validation */
-      if (0)
-	{
-	  if(ValidationConstraints(DPx,DPu,
-				m,
-				QueueOfLConstraintInequalities,
-				li,X,
-				   StartingTime)<0)
-	    {
-	      cout << "Something is wrong with the constraints." << endl;
-	      //   exit(-1);
-	    }
-	}
-
-      if (m_FullDebug>2)
-      {
-	ofstream aof;
-	char Buffer[1024];
-	sprintf(Buffer,"X_%f.dat",StartingTime);
-	aof.open(Buffer,ofstream::out);
-	for(unsigned int i=0;i<2*N;i++)
-	  {
-	    aof << X[i] << endl;
-	  }
-	aof.close();
-      }
-
-
-      // Compute CPU consumption time.
-      gettimeofday(&end,0);
-      CurrentCPUTime = end.tv_sec - start.tv_sec +
-	0.000001 * (end.tv_usec - start.tv_usec);
-      TotalAmountOfCPUTime += CurrentCPUTime;
-      ODEBUG("Current Time : " << StartingTime << " " <<
-	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime <<
-	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
-
-      //delete [] Ref;
+      
     }
+ //-----------------------------------
+ //
+ //
+ //----------"Real-time" loop--------
 
   /*  cout << "Size of PX: " << MAL_MATRIX_NB_ROWS(vnlStorePx) << " "
       << MAL_MATRIX_NB_COLS(vnlStorePx) << " " << endl; */
@@ -2264,6 +2285,16 @@ void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & 
 				       m_ConstraintOnY,
 				       m_QP_T,
 				       m_QP_N);
+
+ buildZMPTrajectoryFromFootTrajectory(LeftFootAbsolutePositions,
+				       RightFootAbsolutePositions,
+				       ZMPPositions,
+				       COMPositions,
+				       m_ConstraintOnX,
+				       m_ConstraintOnY,
+				       m_QP_T,
+				       m_QP_N);
+
   if (m_FullDebug>0)
     {
       ofstream aof;
