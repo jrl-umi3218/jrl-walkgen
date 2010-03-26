@@ -23,7 +23,7 @@ SupportState::SupportState(const double &SamplingDuration)
   SSDuration = 0.8; 	  //Duration of one step
   DSDuration = 1e9;       //Duration of the DS phase
   DSSSDuration = 0.8;
-  NumberSteps = 0;
+  NbOfStepsSSDS = 0;
 
   T = SamplingDuration;
   //Initial current state
@@ -99,7 +99,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
 	  *SupportPhase = 1;
 	  *SupportFoot = StartSupportFoot;
 	  *SupportTimeLimit = Time+pi*T + SSDuration;
-	  *SupportStepsLeft = NumberSteps;
+	  *SupportStepsLeft = NbOfStepsSSDS;
 	  StateChanged = 1;
 	}
       //SS->SS
@@ -111,6 +111,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
 	  StepNumber = StepNumber+1;
 	  if (ReferenceGiven == -1)
 	    *SupportStepsLeft = *SupportStepsLeft-1;
+
 	}
     }
 
@@ -122,12 +123,12 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
     {
       ofstream aof;
       aof.open("SupportStates.dat", ios::app);
-      aof << "Time: "<<Time<<" CSP: "<<CurrentSupportPhase
+      aof << "Time: "<<Time<<" PrwTime: "<<Time+pi*T<<" CSP: "<<CurrentSupportPhase
 	  <<" CSF: "<<CurrentSupportFoot<<" CTL: "<<CurrentTimeLimit
 	  <<" CSL: "<<CurrentStepsLeft<<" PrwSP: "<<PrwSupportPhase
 	  <<" PrwSF: "<<PrwSupportFoot<<" PrwTL: "<<PrwTimeLimit
 	  <<" PrwSL: "<<PrwStepsLeft<<" *SF: "<<*SupportFoot
-	  <<" *SSL: "<<*SupportStepsLeft;
+	  <<" *SSL: "<<*SupportStepsLeft<<" SN: "<<StepNumber;
       aof << endl;
       aof.close();
     }
