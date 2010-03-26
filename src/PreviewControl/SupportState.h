@@ -54,9 +54,10 @@ namespace PatternGeneratorJRL
 
     int StepNumber;
 
-    unsigned int NumberSteps;
+    //Number of steps done before DS
+    unsigned int NbOfStepsSSDS;
 
-	
+ 
     /*! \brief Current support state */
     //enum supportType {SS = 1, DS = 0} ;
     //enum footType {Left = 1, Right = -1} ;
