@@ -341,6 +341,7 @@ namespace PatternGeneratorJRL
     /*! \brief Sub matrix to compute the linear part of the objective function $p^{\top}_k$. */
     MAL_MATRIX(m_OptB,double);
     MAL_MATRIX(m_OptC,double);
+    /* MAL_MATRIX(m_OptD,double); */
 
     /*! \name Parameters of the objective function 
     @{ */

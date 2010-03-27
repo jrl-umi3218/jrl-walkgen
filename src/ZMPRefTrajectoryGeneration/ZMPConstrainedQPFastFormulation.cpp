@@ -574,6 +574,8 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   m_OptC = MAL_RET_TRANSPOSE(m_PPu);
   m_OptC = m_Beta * m_OptC;
 
+
+
   if ((m_FastFormulationMode==QLDANDLQ) ||
       (m_FastFormulationMode==PLDP))
     {
@@ -1102,10 +1104,10 @@ int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
   return 0;
 }
 
-//------------------new functions
+//------------------new functions---
 //
 //
-//-------------------------------
+//----------------------------------
 
 int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double * &DU, 
 							     unsigned N, double T,
@@ -1489,13 +1491,17 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   // for each iteration
 
   MAL_VECTOR(ZMPRef,double);
+  MAL_VECTOR(VRef,double);
   MAL_VECTOR_DIM(OptD,double,2*N);
+ 
+ 
 
   int CriteriaToMaximize=1;
 
 
   RESETDEBUG4("DebugInterpol.dat");
   MAL_VECTOR_RESIZE(ZMPRef,2*N);
+  MAL_VECTOR_RESIZE(VRef,2*N);
 
   int m = NbOfConstraints;
   int me= 0;
@@ -1505,10 +1511,6 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   int mnn = m+n+n;
 
 
-  double *D=new double[2*N];   // Constant part of the objective function
-  double *XL=new double[2*N];  // Lower bound of the jerk.
-  double *XU=new double[2*N];  // Upper bound of the jerk.
-  double *X=new double[2*N];   // Solution of the system.
   double *NewX=new double[2*N];   // Solution of the system.
   double Eps=1e-8 ;
   double *U = (double *)malloc( sizeof(double)*mnn); // Returns the Lagrange multipliers.;
@@ -1636,6 +1638,8 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       printf("Before setSupportState \n");
       Support->setSupportState(StartingTime, 0, Ref);
 
+
+
       if(Support->StateChanged == 1)
 	{
 	  printf("SupportState changed \n");
@@ -1661,7 +1665,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	  QueueOfSupportFeet.push_back(newSF);
 	}
 
-      printf("Before buildLinearConstraintInequalities \n");
+      // printf("Before buildLinearConstraintInequalities \n");
       m_fCALS->buildLinearConstraintInequalities(LeftFootAbsolutePositions,
 						 RightFootAbsolutePositions,
 						 QueueOfLConstraintInequalitiesFreeFeet,
@@ -1695,6 +1699,14 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
       // Prepare D.
       //      PrepareZMPRef(ZMPRef,StartingTime,QueueOfLConstraintInequalities);
+      
+      //Andremize
+      //Variable matrices due to variable foot step number
+      double *D=new double[2*(N+Support->StepNumber)];   // Variable part of the objective function
+      double *XL=new double[2*(N+Support->StepNumber)];  // Lower bound of the jerk.
+      double *XU=new double[2*(N+Support->StepNumber)];  // Upper bound of the jerk.
+      double *X=new double[2*(N+Support->StepNumber)];   // Solution of the system.
+      
 
       if (m_FullDebug>2)
 	{
@@ -1709,10 +1721,22 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	  aof.close();
 	}
 
+      //Andremize - has to go back where it comes from
+      MAL_MATRIX(m_OptD,double);
+      m_OptD = MAL_RET_TRANSPOSE(m_VPu);
+      m_OptD = m_Beta * m_OptD;
+
+      //Andremize - only constant velocity
+      //constant velocity for the whole preview window
+      for(unsigned int i=0;i<N;i++)
+	VRef(i) = Ref[1];
+      for(unsigned int i=N;i<2*N;i++)
+	VRef(i) = Ref[2];
+
       if (CriteriaToMaximize==1)
 	{
 	  MAL_VECTOR(lterm1v,double);
-	  MAL_C_eq_A_by_B(lterm1v,m_OptC,ZMPRef);
+	  MAL_C_eq_A_by_B(lterm1v,m_OptD,VRef);
 	  MAL_VECTOR_RESIZE(OptD,2*N);
 	  MAL_C_eq_A_by_B(OptD,m_OptB,xk);
 	  OptD -= lterm1v;
@@ -1736,11 +1760,11 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       else
 	{
 	  // Default : set D to zero.
-	  for(unsigned int i=0;i<2*N;i++)
+	  for(unsigned int i=0;i<2*N+Support->StepNumber;i++)
 	    D[i] = 0.0;
 	}
 
-      for(unsigned int i=0;i<2*N;i++)
+      for(unsigned int i=0;i<2*N+Support->StepNumber;i++)
 	{
 	  XL[i] = -1e8;
 	  XU[i] = 1e8;
@@ -1907,6 +1931,12 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       // 	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
       QueueOfLConstraintInequalitiesFreeFeet.clear();  
+
+      delete [] D;
+      delete [] XL;
+      delete [] XU;
+      delete [] X;
+      
     }
  //-----------------------------------
  //
@@ -1915,10 +1945,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
   /*  cout << "Size of PX: " << MAL_MATRIX_NB_ROWS(vnlStorePx) << " "
       << MAL_MATRIX_NB_COLS(vnlStorePx) << " " << endl; */
-  delete [] D;
-  delete [] XL;
-  delete [] XU;
-  delete [] X;
+
   free(war);
   free(U);
   delete [] iwar;
@@ -1959,7 +1986,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 //--------------------------------------
 //
 //
-//--------------------------------------
+//-----------new functions--------------
 
 
 
