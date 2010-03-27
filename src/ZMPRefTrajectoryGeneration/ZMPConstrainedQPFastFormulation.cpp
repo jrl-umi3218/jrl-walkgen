@@ -1194,7 +1194,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
       LCIFF_it++;
     }  
   NbOfConstraints = IndexConstraint;
-  IndexConstraint = 0;
+  
 
   
   MAL_MATRIX(lD,double);
@@ -1268,7 +1268,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 
   double FFPx, FFPy;
 
-
+  IndexConstraint = 0;
   ODEBUG("Starting Matrix to build the constraints. ");
   ODEBUG((*LCIFF_it)->D );
   //
@@ -1327,7 +1327,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 		  DU[IndexConstraint+k*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
 		  // Y axis
-		  DU[IndexConstraint+(k+N)*(NbOfConstraints)] = 
+		  DU[IndexConstraint+(k+N+Support->StepNumber)*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,1)*m_Pu[k*N+i];	      
 		}
 	    }
@@ -1341,23 +1341,23 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 		  DU[IndexConstraint+k*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
 		  // Y axis
-		  DU[IndexConstraint+(k+N)*(NbOfConstraints)] = 
+		  DU[IndexConstraint+(k+N+Support->StepNumber)*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,1)*m_Pu[k*N+i];	      
 		}
 	    }
 
-	  if((*LCIFF_it)->StepNumber > 0)
+	  if((*LCIFF_it)->StepNumber>0)
 	    {
-	      DU[IndexConstraint+(N+(*LCIFF_it)->StepNumber)*NbOfConstraints] = 
+	      DU[IndexConstraint+(N+(*LCIFF_it)->StepNumber-1)*NbOfConstraints] = 
 	  	-(*LCIFF_it)->D(j,0);
-	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber)*NbOfConstraints] = 
+	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-1)*NbOfConstraints] = 
 	  	-(*LCIFF_it)->D(j,1);
 	    }
 
 	  ODEBUG("IC: " << IndexConstraint );
 	  IndexConstraint++;
 	}
-
+      printf("DUindex: %d  ",N+(*LCIFF_it)->StepNumber);
       LCIFF_it++;
     }
 
@@ -1376,6 +1376,8 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
       char Buffer[1024];
       sprintf(Buffer,"DU.dat");
       aof.open(Buffer,ofstream::out);
+      aof <<" 2*N+2*Support->StepNumber: "<<2*N+2*Support->StepNumber<<" NbOfConstraints: "<<NbOfConstraints
+	  << endl;
       for(unsigned int i=0;i<NbOfConstraints;i++)
 	{
 	  for(unsigned int j=0;j<2*N+2*Support->StepNumber;j++)
@@ -1387,11 +1389,9 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
       sprintf(Buffer,"DS.dat");
       aof.open(Buffer,ofstream::out);
       for(unsigned int j=0;j<NbOfConstraints;j++)
-	aof << DS[j] << " " ;
-      aof << endl;
+	aof << DS[j] << endl; 
+      // aof << endl;
       aof.close();
-
-
 
 
       // sprintf(Buffer,"lD.dat");
@@ -1923,26 +1923,26 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
   QueueOfLConstraintInequalitiesFreeFeet.clear();  
 
-  LCI_it = QueueOfLConstraintInequalities.begin();
-  while(LCI_it!=QueueOfLConstraintInequalities.end())
-    {
-         // cout << *LCI_it << endl;
-         // cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime << endl;
-      delete *(LCI_it);
-      LCI_it++;
-    }
+  // LCI_it = QueueOfLConstraintInequalities.begin();
+  // while(LCI_it!=QueueOfLConstraintInequalities.end())
+  //   {
+  //        // cout << *LCI_it << endl;
+  //        // cout << (*LCI_it)->StartingTime << " " << (*LCI_it)->EndingTime << endl;
+  //     delete *(LCI_it);
+  //     LCI_it++;
+  //   }
   QueueOfLConstraintInequalities.clear();  
 
   
   
-  SF_it = QueueOfSupportFeet.begin();
-  while(SF_it!=QueueOfSupportFeet.end())
-    {
-      //cout << *SF_it << " "<< QueueOfSupportFeet.size() << endl;
-      //cout << (*SF_it)->SupportFoot <<  endl;
-      delete *SF_it;
-      SF_it++;
-    }
+  // SF_it = QueueOfSupportFeet.begin();
+  // while(SF_it!=QueueOfSupportFeet.end())
+  //   {
+  //     //cout << *SF_it << " "<< QueueOfSupportFeet.size() << endl;
+  //     //cout << (*SF_it)->SupportFoot <<  endl;
+  //     delete *SF_it;
+  //     SF_it++;
+  //   }
 
   QueueOfSupportFeet.clear();
 
