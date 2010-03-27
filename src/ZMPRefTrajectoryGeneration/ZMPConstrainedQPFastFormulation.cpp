@@ -41,7 +41,7 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   printf("Entered ZMPConstrainedQPFastFormulation \n");
   m_Q = 0;
   m_Pu = 0;
-  m_FullDebug = 3;
+  m_FullDebug = 1;
   m_FastFormulationMode = QLD;
 
   /*! Getting the ZMP reference from Kajita's heuristic. */
@@ -94,8 +94,8 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   m_2DLIPM->SetComHeight(m_ComHeight);
   m_2DLIPM->InitializeSystem();
 
-  m_Alpha = 200.0;
-  m_Beta = 1000.0;
+  m_Alpha = 1000000.0;
+  m_Beta = 0.0;//1000.0;
 
   InitConstants();
 
@@ -538,7 +538,7 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
 		    MAL_MATRIX_NB_ROWS(lterm1),
 		    MAL_MATRIX_NB_COLS(lterm1));
   MAL_MATRIX_SET_IDENTITY(OptA);
-  OptA = OptA + lterm1 + lterm2;
+  OptA = OptA + lterm2;// + lterm2;
 
   // Initialization of the matrice regarding the quadratic
   // part of the objective function.
@@ -1064,19 +1064,19 @@ int ZMPConstrainedQPFastFormulation::DumpProblem(double * Q,
 
   // Dumping D.
   aof << "D:"<< endl;
-  for(unsigned int i=0;i<2*m_QP_N;i++)
+  for(unsigned int i=0;i<2*(m_QP_N+Support->StepNumber);i++)
     {
       aof <<D[i]<< " ";
     }
   aof <<endl;
 
   // Dumping Pu.
-  aof << "DPu:"<< endl;
+  aof << "DPu: "<< "NbOfConstr.: " << NbOfConstraints << endl;
   for(unsigned int i=0;i<NbOfConstraints;i++)
     {
-      for(unsigned int j=0;j<2*m_QP_N;j++)
+      for(unsigned int j=0;j<2*(m_QP_N+Support->StepNumber);j++)
 	{
-	  aof << DPu[j*(NbOfConstraints+1)+i] << " ";
+	  aof << DPu[j*(NbOfConstraints)+i] << " ";
 	}
       aof <<endl;
     }
@@ -1334,6 +1334,8 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 	      // so we can speed up the computation.
 	      for(unsigned k=0;k<=i;k++)
 		{
+		  if(IndexConstraint == 1)
+		    printf("IC: %d \n",NbOfConstraints);
 		  // X axis
 		  DU[IndexConstraint+k*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
@@ -1512,7 +1514,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   int m = NbOfConstraints;
   int me= 0;
   int mmax = NbOfConstraints;
-  int n = 2*N;
+  int n;
   int nmax = 2*N; // Size of the matrix to compute the cost function.
   int mnn = m+n+n;
 
@@ -1606,6 +1608,10 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   unsigned int NumberOfRemovedConstraints =0,
     NextNumberOfRemovedConstraints =0;
 
+  //Andremize
+  //(Re)initialize the LIPM
+  m_2DLIPM->InitializeSystem();
+
  //----------"Real-time" loop---------
  //
  //
@@ -1638,7 +1644,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	}
       
   
-      double Ref[3] = {0,0,1};
+      double Ref[3] = {0.1,0,1};
  
        
       printf("Before setSupportState \n");
@@ -1695,12 +1701,15 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       			      NextNumberOfRemovedConstraints);
 
 
-      m = NbOfConstraints;
 
-      mmax = NbOfConstraints;
-      lwar = 3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
+      m = NbOfConstraints;
+      me= 0;
+      mmax = NbOfConstraints+1;
+      n = 2*(N+Support->StepNumber);
+      nmax = n; // Size of the matrix to compute the cost function.
       mnn = m+n+n;
 
+      lwar = 3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
       // Call to QLD (a linearly constrained quadratic problem solver)
 
       // Prepare D.
@@ -1708,7 +1717,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       
       //Andremize
       //Variable matrices due to variable foot step number
-      double *D=new double[2*(N+Support->StepNumber)];   // Variable part of the objective function
+      double *D=new double[2*(N+Support->StepNumber)];   // Linear part of the objective function
       double *XL=new double[2*(N+Support->StepNumber)];  // Lower bound of the jerk.
       double *XU=new double[2*(N+Support->StepNumber)];  // Upper bound of the jerk.
       double *X=new double[2*(N+Support->StepNumber)];   // Solution of the system.
@@ -1730,14 +1739,14 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       //Andremize - has to go back where it comes from
       MAL_MATRIX(m_OptD,double);
       m_OptD = MAL_RET_TRANSPOSE(m_VPu);
-      m_OptD = m_Beta * m_OptD;
+      m_OptD = m_Alpha * m_OptD;
 
       //Andremize - only constant velocity
       //constant velocity for the whole preview window
       for(unsigned int i=0;i<N;i++)
-	VRef(i) = Ref[1];
+	VRef(i) = Ref[0];
       for(unsigned int i=N;i<2*N;i++)
-	VRef(i) = Ref[2];
+	VRef(i) = Ref[1];
 
       if (CriteriaToMaximize==1)
 	{
@@ -1782,39 +1791,41 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       else
 	iwar[0]=1;
 
+  
+
       ODEBUG("m: " << m);
-      //      DumpProblem(m_Q, D, DPu, m, DPx,XL,XU,StartingTime);
+      DumpProblem(m_Q, D, DU, m, DS,XL,XU,StartingTime);
 
       //---------Solver------------
       //
       //
       //---------------------------
-      // printf("Entering the solver \n");
-      // if ((m_FastFormulationMode==QLDANDLQ)||
-      // 	  (m_FastFormulationMode==QLD))
-      // 	{
-      // 	  struct timeval lbegin,lend;
-      // 	  gettimeofday(&lbegin,0);
-      // 	  ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
-      // 		  m_Q, D, DU,DS,XL,XU,
-      // 		  X,U,&iout, &ifail, &iprint,
-      // 		  war, &lwar,
-      // 		  iwar, &liwar,&Eps);
-      // 	  gettimeofday(&lend,0);
-      // 	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
-      // 		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
+      printf("Entering the solver \n");
+      if ((m_FastFormulationMode==QLDANDLQ)||
+      	  (m_FastFormulationMode==QLD))
+      	{
+      	  struct timeval lbegin,lend;
+      	  gettimeofday(&lbegin,0);
+      	  ql0001_(&m, &me, &mmax, &n, &nmax, &mnn,
+      		  m_Q, D, DU,DS,XL,XU,
+      		  X,U,&iout, &ifail, &iprint,
+      		  war, &lwar,
+      		  iwar, &liwar,&Eps);
+      	  gettimeofday(&lend,0);
+      	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
+      		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
 
-      // 	  unsigned int NbOfActivatedConstraints = 0;
-      // 	  for(int lk=0;lk<m;lk++)
-      // 	    {
-      // 	      if (U[lk]>0.0)
-      // 		{
-      // 		  NbOfActivatedConstraints++;
-      // 		}
-      // 	    }
-      // 	  ODEBUG6(NbOfActivatedConstraints,"InfosQLD.dat");
-      // 	  ODEBUG6(ldt,"dtQLD.dat");
-      // 	}
+      	  unsigned int NbOfActivatedConstraints = 0;
+      	  for(int lk=0;lk<m;lk++)
+      	    {
+      	      if (U[lk]>0.0)
+      		{
+      		  NbOfActivatedConstraints++;
+      		}
+      	    }
+      	  ODEBUG6(NbOfActivatedConstraints,"InfosQLD.dat");
+      	  ODEBUG6(ldt,"dtQLD.dat");
+      	}
       // else if (m_FastFormulationMode==PLDP)
       // 	{
       // 	  ODEBUG("State: " << xk[0] << " " << xk[3] << " " <<
@@ -1841,63 +1852,63 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       // 	  ODEBUG6(ldt,"dtPLDP.dat");
       // 	}
 
-      // if (ifail!=0)
-      // 	{
-      // 	  cout << "IFAIL: " << ifail << " at time: " << StartingTime << endl;
-      // 	  return -1;
-      // 	}
+      if (ifail!=0)
+      	{
+      	  cout << "IFAIL: " << ifail << " at time: " << StartingTime << endl;
+      	  return -1;
+      	}
 
-      // //------------------------
-      // //
-      // //
-      // //-------------------------
+      //------------------------
+      //
+      //
+      //-------------------------
 
-      // double *ptX=0;
-      // if ((m_FastFormulationMode==QLDANDLQ)||
-      // 	  (m_FastFormulationMode==PLDP))
-      // 	{
-      // 	  /* Multiply the solution by the transpose of iLQ
-      // 	     because it is a triangular matrix we do a specific
-      // 	     multiplication.
-      // 	  */
-      // 	  memset(NewX,0,2*N*sizeof(double));
+      double *ptX=0;
+      if ((m_FastFormulationMode==QLDANDLQ)||
+      	  (m_FastFormulationMode==PLDP))
+      	{
+      	  /* Multiply the solution by the transpose of iLQ
+      	     because it is a triangular matrix we do a specific
+      	     multiplication.
+      	  */
+      	  memset(NewX,0,2*N*sizeof(double));
 
-      // 	  double *pm_iLQ = MAL_RET_MATRIX_DATABLOCK(m_iLQ);
-      // 	  double *pNewX = NewX;
+      	  double *pm_iLQ = MAL_RET_MATRIX_DATABLOCK(m_iLQ);
+      	  double *pNewX = NewX;
 
-      // 	  for(unsigned int i=0;i<2*N;i++)
-      // 	    {
-      // 	      double *pX= X+i;
-      // 	      double *piLQ = pm_iLQ+i*2*N+i;
-      // 	      *pNewX = 0.0;
-      // 	      for(unsigned int j=i;j<2*N;j++)
-      // 		{
-      // 		  *pNewX+= (*piLQ) * (*pX++);
-      // 		  piLQ+=2*N;
-      // 		}
-      // 	      pNewX++;
-      // 	    }
-      // 	  ptX=NewX;
-      // 	}
-      // else
-      // 	ptX=X;
+      	  for(unsigned int i=0;i<2*N;i++)
+      	    {
+      	      double *pX= X+i;
+      	      double *piLQ = pm_iLQ+i*2*N+i;
+      	      *pNewX = 0.0;
+      	      for(unsigned int j=i;j<2*N;j++)
+      		{
+      		  *pNewX+= (*piLQ) * (*pX++);
+      		  piLQ+=2*N;
+      		}
+      	      pNewX++;
+      	    }
+      	  ptX=NewX;
+      	}
+      else
+      	ptX=X;
 
-      // /* Simulation of the Single Point Mass model
-      // 	 with the new command.
-      // */
-      // ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
+      /* Simulation of the Single Point Mass model
+      	 with the new command.
+      */
+      ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
 
-      // // Calling this method will automatically
-      // // update the ZMPRefPositions.
-      // m_2DLIPM->Interpolation(COMPositions,
-      // 			      ZMPRefPositions,
-      // 			      li*interval,
-      // 			      ptX[0],ptX[N]);
+      // Calling this method will automatically
+      // update the ZMPRefPositions.
+      m_2DLIPM->Interpolation(COMPositions,
+      			      ZMPRefPositions,
+      			      li*interval,
+      			      ptX[0],ptX[N]);
 
-      // m_2DLIPM->OneIteration(ptX[0],ptX[N]);
+      m_2DLIPM->OneIteration(ptX[0],ptX[N]);
 
-      // ODEBUG6("uk:" << uk,"DebugPBW.dat");
-      // ODEBUG6("xk:" << xk,"DebugPBW.dat");
+      ODEBUG6("uk:" << uk,"DebugPBW.dat");
+      ODEBUG6("xk:" << xk,"DebugPBW.dat");
 
       // /* Constraint validation */
       // if (0)
@@ -1913,28 +1924,28 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       // 	    }
       // 	}
 
-      // if (m_FullDebug>2)
-      // {
-      // 	ofstream aof;
-      // 	char Buffer[1024];
-      // 	sprintf(Buffer,"X_%f.dat",StartingTime);
-      // 	aof.open(Buffer,ofstream::out);
-      // 	for(unsigned int i=0;i<2*N;i++)
-      // 	  {
-      // 	    aof << X[i] << endl;
-      // 	  }
-      // 	aof.close();
-      // }
+      if (m_FullDebug>2)
+      {
+      	ofstream aof;
+      	char Buffer[1024];
+      	sprintf(Buffer,"X_%f.dat",StartingTime);
+      	aof.open(Buffer,ofstream::out);
+      	for(unsigned int i=0;i<2*N;i++)
+      	  {
+      	    aof << X[i] << endl;
+      	  }
+      	aof.close();
+      }
 
 
-      // // Compute CPU consumption time.
-      // gettimeofday(&end,0);
-      // CurrentCPUTime = end.tv_sec - start.tv_sec +
-      // 	0.000001 * (end.tv_usec - start.tv_usec);
-      // TotalAmountOfCPUTime += CurrentCPUTime;
-      // ODEBUG("Current Time : " << StartingTime << " " <<
-      // 	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime <<
-      // 	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
+      // Compute CPU consumption time.
+      gettimeofday(&end,0);
+      CurrentCPUTime = end.tv_sec - start.tv_sec +
+      	0.000001 * (end.tv_usec - start.tv_usec);
+      TotalAmountOfCPUTime += CurrentCPUTime;
+      ODEBUG("Current Time : " << StartingTime << " " <<
+      	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime <<
+      	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
       QueueOfLConstraintInequalitiesFreeFeet.clear();  
 
