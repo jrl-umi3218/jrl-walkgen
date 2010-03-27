@@ -1334,7 +1334,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 		  DU[IndexConstraint+k*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
 		  // Y axis
-		  DU[IndexConstraint+(k+N+Support->StepNumber)*(NbOfConstraints)] = 
+		  DU[IndexConstraint+(k+N)*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,1)*m_Pu[k*N+i];	      
 		}
 	    }
@@ -1348,14 +1348,15 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 		  DU[IndexConstraint+k*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
 		  // Y axis
-		  DU[IndexConstraint+(k+N+Support->StepNumber)*(NbOfConstraints)] = 
+		  DU[IndexConstraint+(k+N)*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,1)*m_Pu[k*N+i];	      
 		}
 	    }
 
+	  //Foot variables after jerk: [dddX,dddY,FPx,FPy]
 	  if((*LCIFF_it)->StepNumber>0)
 	    {
-	      DU[IndexConstraint+(N+(*LCIFF_it)->StepNumber-1)*NbOfConstraints] = 
+	      DU[IndexConstraint+(2*N+(*LCIFF_it)->StepNumber-1)*NbOfConstraints] = 
 	  	-(*LCIFF_it)->D(j,0);
 	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-1)*NbOfConstraints] = 
 	  	-(*LCIFF_it)->D(j,1);
@@ -1784,32 +1785,32 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       //
       //
       //---------------------------
-      printf("Entering the solver \n");
-      if ((m_FastFormulationMode==QLDANDLQ)||
-      	  (m_FastFormulationMode==QLD))
-      	{
-      	  struct timeval lbegin,lend;
-      	  gettimeofday(&lbegin,0);
-      	  ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
-      		  m_Q, D, DU,DS,XL,XU,
-      		  X,U,&iout, &ifail, &iprint,
-      		  war, &lwar,
-      		  iwar, &liwar,&Eps);
-      	  gettimeofday(&lend,0);
-      	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
-      		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
+      // printf("Entering the solver \n");
+      // if ((m_FastFormulationMode==QLDANDLQ)||
+      // 	  (m_FastFormulationMode==QLD))
+      // 	{
+      // 	  struct timeval lbegin,lend;
+      // 	  gettimeofday(&lbegin,0);
+      // 	  ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
+      // 		  m_Q, D, DU,DS,XL,XU,
+      // 		  X,U,&iout, &ifail, &iprint,
+      // 		  war, &lwar,
+      // 		  iwar, &liwar,&Eps);
+      // 	  gettimeofday(&lend,0);
+      // 	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
+      // 		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
 
-      	  unsigned int NbOfActivatedConstraints = 0;
-      	  for(int lk=0;lk<m;lk++)
-      	    {
-      	      if (U[lk]>0.0)
-      		{
-      		  NbOfActivatedConstraints++;
-      		}
-      	    }
-      	  ODEBUG6(NbOfActivatedConstraints,"InfosQLD.dat");
-      	  ODEBUG6(ldt,"dtQLD.dat");
-      	}
+      // 	  unsigned int NbOfActivatedConstraints = 0;
+      // 	  for(int lk=0;lk<m;lk++)
+      // 	    {
+      // 	      if (U[lk]>0.0)
+      // 		{
+      // 		  NbOfActivatedConstraints++;
+      // 		}
+      // 	    }
+      // 	  ODEBUG6(NbOfActivatedConstraints,"InfosQLD.dat");
+      // 	  ODEBUG6(ldt,"dtQLD.dat");
+      // 	}
       // else if (m_FastFormulationMode==PLDP)
       // 	{
       // 	  ODEBUG("State: " << xk[0] << " " << xk[3] << " " <<
@@ -1836,11 +1837,11 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       // 	  ODEBUG6(ldt,"dtPLDP.dat");
       // 	}
 
-      if (ifail!=0)
-      	{
-      	  cout << "IFAIL: " << ifail << " at time: " << StartingTime << endl;
-      	  return -1;
-      	}
+      // if (ifail!=0)
+      // 	{
+      // 	  cout << "IFAIL: " << ifail << " at time: " << StartingTime << endl;
+      // 	  return -1;
+      // 	}
 
       // //------------------------
       // //
