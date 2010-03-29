@@ -171,7 +171,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
 
   // Dump a file to display on scilab .
   // This should be removed during real usage inside a robot.
-  if (1)
+  if (0)
     {
       ofstream aof;
       aof.open("Constraints-fCSALS.dat",ofstream::app);

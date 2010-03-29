@@ -94,8 +94,8 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   m_2DLIPM->SetComHeight(m_ComHeight);
   m_2DLIPM->InitializeSystem();
 
-  m_Alpha = 1000000.0;
-  m_Beta = 0.0;//1000.0;
+  m_Alpha = 0.000001;
+  m_Beta = 1;//1000.0;
 
   InitConstants();
 
@@ -528,20 +528,22 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   MAL_MATRIX(lterm2,double);
   lterm2 = MAL_RET_TRANSPOSE(m_VPu);
   lterm2 = MAL_RET_A_by_B(lterm2,m_VPu);
-  lterm2 = m_Alpha * lterm2;
+  // lterm2 = m_Alpha * lterm2;//Andremize: original pb
+  lterm2 = m_Beta*lterm2;
 
   MAL_MATRIX_RESIZE(OptA,
 		    MAL_MATRIX_NB_ROWS(lterm1),
 		    MAL_MATRIX_NB_COLS(lterm1));
   MAL_MATRIX_SET_IDENTITY(OptA);
-  OptA = OptA + lterm2;// + lterm2;//Andremize: original function modified
+  // OptA = OptA + lterm1 + lterm2;//Andremize: original problem
+  OptA = m_Alpha*OptA + lterm2;
 
   // Initialization of the matrice regarding the quadratic
   // part of the objective function.
   m_Q=new double[4*m_QP_N*m_QP_N];
   memset(m_Q,0,4*m_QP_N*m_QP_N*sizeof(double));
-  for(unsigned int i=0;i<2*m_QP_N;i++)
-    m_Q[i*2*m_QP_N+i] = 1.0;
+  // for(unsigned int i=0;i<2*m_QP_N;i++)
+  //   m_Q[i*2*m_QP_N+i] = 1.0;
 
 
   if (m_FullDebug>0)
@@ -1741,12 +1743,12 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   SupportFeet_t * aSFLeft = new SupportFeet_t;
   SupportFeet_t * aSFRight = new SupportFeet_t;
   aSFLeft->x = 0.0;
-  aSFLeft->y = 0.1;
+  aSFLeft->y = 0.0;//Andremize
   aSFLeft->theta = 0.0;
   aSFLeft->StartTime = 0.0;
   aSFLeft->SupportFoot = 1;
   aSFRight->x = 0.0;
-  aSFRight->y = -0.1;
+  aSFRight->y = 0.0;//Andremize
   aSFRight->theta = 0.0;
   aSFRight->StartTime = 0.0;
   aSFRight->SupportFoot = -1;
@@ -1918,23 +1920,28 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
 
 
-      if (m_FullDebug>2)
-	{
-	  ofstream aof;
-	  char Buffer[1024];
-	  sprintf(Buffer,"ZMPRef_%f.dat",StartingTime);
-	  aof.open(Buffer,ofstream::out);
-	  for(unsigned int i=0;i<2*N;i++)
-	    {
-	      aof << ZMPRef[i] << endl;
-	    }
-	  aof.close();
-	}
+      // if (m_FullDebug>2)
+      // 	{
+      // 	  ofstream aof;
+      // 	  char Buffer[1024];
+      // 	  sprintf(Buffer,"ZMPRef_%f.dat",StartingTime);
+      // 	  aof.open(Buffer,ofstream::out);
+      // 	  for(unsigned int i=0;i<2*N;i++)
+      // 	    {
+      // 	      aof << ZMPRef[i] << endl;
+      // 	    }
+      // 	  aof.close();
+      // 	}
+
+      m_OptB = MAL_RET_TRANSPOSE(m_VPu);
+      m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
+      m_OptB = m_Beta * m_OptB;
+      //m_OptB = m_OptB + m_Beta * lterm1;
 
       //Andremize - has to go back where it comes from
       MAL_MATRIX(m_OptD,double);
       m_OptD = MAL_RET_TRANSPOSE(m_VPu);
-      m_OptD = m_Alpha * m_OptD;
+      m_OptD = m_Beta * m_OptD;
 
       //Andremize - only constant velocity
       //constant velocity for the whole preview window
@@ -1947,17 +1954,17 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	{
 	  MAL_VECTOR(lterm1v,double);
 	  MAL_C_eq_A_by_B(lterm1v,m_OptD,VRef);
-	  MAL_VECTOR_RESIZE(OptD,2*N);
+	  MAL_VECTOR_RESIZE(OptD,2*(N+Support->StepNumber));
 	  MAL_C_eq_A_by_B(OptD,m_OptB,xk);
 	  OptD -= lterm1v;
-	  for(unsigned int i=0;i<2*N;i++)
+	  for(unsigned int i=0;i<2*(N+Support->StepNumber);i++)
 	    D[i] = OptD[i];
 
 	  if (m_FullDebug>0)
 	    {
 	      ofstream aof;
 	      char Buffer[1024];
-	      sprintf(Buffer,"D_%f.dat",StartingTime);
+	      sprintf(Buffer,"Dff_%f.dat",StartingTime);
 	      aof.open(Buffer,ofstream::out);
 	      for(unsigned int i=0;i<2*N;i++)
 		{
@@ -1986,22 +1993,20 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       else
 	iwar[0]=1;
 
-      m = NbOfConstraints;
+      m = 0;//NbOfConstraints;
       me= 0;
-      mmax = NbOfConstraints+1;
+      mmax = m+1;//NbOfConstraints+1;
       n = 2*(N+Support->StepNumber);
       nmax = n; // Size of the matrix to compute the cost function.
       mnn = m+n+n;
 
-      lwar = 3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
+      lwar = 3*nmax*nmax/2+ 10*nmax  + 2*mmax + 2000000;
 
       ODEBUG("m: " << m);
       dumpProblem(m_Q, D, DU, m, DS,XL,XU,StartingTime);
 
 
-
-
-
+ 
       //---------Solver------------
       //
       //
@@ -2016,11 +2021,12 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       		  m_Q, D, DU, DS, XL, XU,
       		  X,U,&iout, &ifail, &iprint,
       		  war, &lwar,
-      		  iwar, &liwar,&Eps);
+      		  iwar, &liwar, &Eps);
       	  gettimeofday(&lend,0);
+
       	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
       		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
-
+	  printf("Solver has finished,  \n");
       	  unsigned int NbOfActivatedConstraints = 0;
       	  for(int lk=0;lk<m;lk++)
       	    {
@@ -2117,14 +2123,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       ODEBUG6("xk:" << xk,"DebugPBW.dat");
       
 
-      if(1)
-	{
-	  if(validateConstraints(DS, DU, m, li, X)<0)
-	    {
-	      cout << "Something is wrong with the constraints." << endl;
-	      exit(-1);
-	    }
-	}
+
 
   
 
@@ -2141,6 +2140,14 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       	aof.close();
       }
 
+      if(1)
+	{
+	  if(validateConstraints(DS, DU, m, li, X)<0)
+	    {
+	      cout << "Something is wrong with the constraints." << endl;
+	      exit(-1);
+	    }
+	}
 
       // Compute CPU consumption time.
       gettimeofday(&end,0);
