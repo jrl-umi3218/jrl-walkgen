@@ -1,8 +1,8 @@
-/** \file FootConstraintAsLinearSystem.cpp
+/** \file footConstraintAsLinearSystem.cpp
     \brief This object build linear constraints based on feet positions.
 
-   Copyright (c) 2005-2009, 
-   @author Olivier Stasse
+   Copyright (c) 2005-2010, 
+   @author Andrei Herdt, Olivier Stasse
    
    JRL-Japan, CNRS/AIST
 
@@ -100,7 +100,10 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   lLeftFootHalfWidth -= ConstraintOnX;
   lRightFootHalfWidth -= ConstraintOnX;
   
-    
+  DSFeetDistance = 0.2;
+  lLeftFootHalfHeightDS = lLeftFootHalfHeight+DSFeetDistance/2.0; 
+  lRightFootHalfHeightDS = lRightFootHalfHeight+DSFeetDistance/2.0; 
+
   RESETDEBUG4("Constraints-fCSALS.dat");
  
   // printf("Leaving footConstraintsAsLinearSystem \n");
@@ -168,7 +171,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
 
   // Dump a file to display on scilab .
   // This should be removed during real usage inside a robot.
-  if (0)
+  if (1)
     {
       ofstream aof;
       aof.open("Constraints-fCSALS.dat",ofstream::app);
@@ -196,19 +199,18 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
       dy = x2-x1;
       dc = dx*x1+dy*y1;
       
-      /*symmetrical constraints cannot be achieved without knowledge of the support foot
-	dx = -1.0*dx;
-	dy = -1.0*dy;
-	dc = -1.0*dc;
-      */
-
+      //symmetrical constraints cannot be achieved without knowledge of the support foot
+      dx = -1.0*dx;
+      dy = -1.0*dy;
+      dc = -1.0*dc;
+      
       D(i,0) = dx; D(i,1)= dy;
       Dc(i,0) = dc;
-
+      
       //C is not filled
-
-    ODEBUG4("D("<<i<<",:): " <<dx<<" "<<dy,"Constraints-fCSALS.dat");
-    ODEBUG4(" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
+      
+      ODEBUG4("D("<<i<<",:): " <<dx<<" "<<dy,"Constraints-fCSALS.dat");
+      ODEBUG4(" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
     }
 
   {
@@ -226,11 +228,11 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
     dy = x2-x1;
     dc = dx*x1+dy*y1;
       
-    /*symmetrical constraints cannot be achieved without knowledge of the support foot
-      dx = -1.0*dx;
-      dy = -1.0*dy;
-      dc = -1.0*dc;
-    */
+    //symmetrical constraints cannot be achieved without knowledge of the support foot
+    dx = -1.0*dx;
+    dy = -1.0*dy;
+    dc = -1.0*dc;
+    
 
     D(i,0) = dx; D(i,1)= dy;
     Dc(i,0) = dc;
@@ -262,7 +264,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 								     SupportState * Support)
 {
 
-  // printf("Entered buildLinearConstraintInequalities \n");
+  printf("Entered buildLinearConstraintInequalities \n");
 
   ComputeCH=0;
   lx=0.0, ly=0.0;
@@ -271,9 +273,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
   float lycoefs[4] = {-1.0, 1.0,  1.0, -1.0};
 
   vector<CH_Point> TheConvexHull;
-  
-  
-  
+
 
   // Going through the set of generated data for each 5 ms.
   // from this extract a set of linear constraints.
@@ -286,49 +286,62 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
       
       TheConvexHull.resize(4);//As for now only ZMP constraints
 	
- 
-      // Which support foot ?
-      if (Support->PrwSupportFoot == 1)//Only simple support as for now
+      //Andremize: theta = 0 as for now
+      s_t = 0.0; 
+      c_t = 1.0;
+
+      double FootHalfWidth, FootHalfHeight;
+
+      //Prepare the computation of the convex hull
+      if(Support->PrwSupportPhase == 0)
 	{
-	  //should be simplified as now in a local frame
-	  lx=0.0;
-	  ly=0.0;
-		  
-	  s_t = 0.0; 
-	  c_t = 1.0;
-	  for(unsigned j=0;j<4;j++)
+	  //Andremize: theta == 0
+	  lx = 0.0;
+	  ly = (double)Support->PrwSupportFoot*DSFeetDistance/2.0;
+	  
+	  if(Support->PrwSupportFoot == 1)
 	    {
-	      TheConvexHull[j].col = lx + 
-		( lxcoefs[j] * lLeftFootHalfWidth * c_t -
-		  lycoefs[j] * lLeftFootHalfHeight * s_t ); 
-	      TheConvexHull[j].row = ly + 
-		( lxcoefs[j] * lLeftFootHalfWidth * s_t + 
-		  lycoefs[j] * lLeftFootHalfHeight * c_t ); 
+	      FootHalfWidth = lLeftFootHalfWidth;
+	      FootHalfHeight = lLeftFootHalfHeightDS;
+	    }	    
+	  else
+	    {
+	      FootHalfWidth = lRightFootHalfWidth;
+	      FootHalfHeight = lRightFootHalfHeightDS;
 	    }
-	  ODEBUG("Left support foot");
 	}
       else
-	{ 
-	  lx=0.0;
-	  ly=0.0;
-		  
-	  s_t = 0.0; 
-	  c_t = 1.0;
-		       
-	  for(unsigned j=0;j<4;j++)
+	{
+	  //Andremize: theta == 0
+	  lx = 0.0;
+	  ly = 0.0;
+	  
+	  if(Support->PrwSupportFoot == 1)
 	    {
-	      TheConvexHull[j].col = lx + ( lxcoefs[j] * 
-					    lRightFootHalfWidth * c_t -
-					    lycoefs[j] * 
-					    lRightFootHalfHeight * s_t );
-	      TheConvexHull[j].row = ly + ( lxcoefs[j] * 
-					    lRightFootHalfWidth * s_t +
-					    lycoefs[j] * 
-					    lRightFootHalfHeight * c_t ); 
-
+	      FootHalfWidth = lLeftFootHalfWidth;
+	      FootHalfHeight = lLeftFootHalfHeight;
+	    }	    
+	  else
+	    {
+	      FootHalfWidth = lRightFootHalfWidth;
+	      FootHalfHeight = lRightFootHalfHeight;
 	    }
-	  ODEBUG("Right support foot");
 	}
+      
+  
+      //Compute the convex hull
+      for(unsigned j=0;j<4;j++)
+	{
+	  TheConvexHull[j].col = lx + ( lxcoefs[j] * 
+					FootHalfWidth * c_t -
+					lycoefs[j] * 
+					FootHalfHeight * s_t );
+	  TheConvexHull[j].row = ly + ( lxcoefs[j] * 
+					FootHalfWidth * s_t +
+					lycoefs[j] * 
+					FootHalfHeight * c_t ); 
+	}
+	
 	      
       // Linear Constraint Inequality
       LinearConstraintInequalityFreeFeet_t * aLCI = new LinearConstraintInequalityFreeFeet_t;

@@ -107,8 +107,10 @@ namespace PatternGeneratorJRL
   // Find the convex hull for each of the position,
   // in order to create the corresponding trajectory.
   ComputeConvexHull aCH;
-  double lLeftFootHalfWidth,lLeftFootHalfHeight,
-    lRightFootHalfWidth,lRightFootHalfHeight,lZ;
+  double lLeftFootHalfWidth,lLeftFootHalfHeight,lLeftFootHalfHeightDS,
+    lRightFootHalfWidth,lRightFootHalfHeight,lRightFootHalfHeightDS,lZ;
+
+  double DSFeetDistance;
   
   // Read humanoid specificities.
   CjrlFoot * lRightFoot;
