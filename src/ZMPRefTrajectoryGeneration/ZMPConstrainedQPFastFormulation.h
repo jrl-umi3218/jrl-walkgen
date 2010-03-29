@@ -251,6 +251,11 @@ namespace PatternGeneratorJRL
 			      unsigned int li,
 			      double *X,
 			      double StartingTime);
+
+    int validateConstraints(double * & DS,double * &DU,
+			    int NbOfConstraints, unsigned int li,
+			    double *X);
+
     /*! \brief Return the time at which it is optimal to regenerate a step in online mode. 
      */
     int ReturnOptimalTimeToRegenerateAStep();
@@ -379,6 +384,15 @@ namespace PatternGeneratorJRL
 		    double * XU,
 		    double Time);
       
+    int dumpProblem(double * Q,
+		    double * D, 
+		    double * Pu,
+		    unsigned int NbOfConstraints,
+		    double * Px,
+		    double * XL,
+		    double * XU,
+		    double Time);
+
     /*! Vector of similar constraints. */
     vector<int> m_SimilarConstraints;
   };
