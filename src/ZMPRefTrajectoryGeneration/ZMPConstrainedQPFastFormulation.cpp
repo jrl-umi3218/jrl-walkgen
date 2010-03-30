@@ -392,7 +392,7 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
 {
   for(unsigned int i=0;i<2*m_QP_N;i++)
     for(unsigned int j=0;j<2*m_QP_N;j++)
-      m_Q[i*m_QP_N*2+j] = OptA(j,i);
+      m_Q[i*2*m_QP_N+j] = OptA(j,i);
 
   return 0;
 }
@@ -536,16 +536,20 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
   lterm2 = m_Beta*lterm2;
 
   MAL_MATRIX_RESIZE(OptA,
-		    MAL_MATRIX_NB_ROWS(lterm1),
-		    MAL_MATRIX_NB_COLS(lterm1));
+  		    MAL_MATRIX_NB_ROWS(lterm2),
+  		    MAL_MATRIX_NB_COLS(lterm2));
   MAL_MATRIX_SET_IDENTITY(OptA);
+  OptA = m_Alpha*OptA;
+
+
   // OptA = OptA + lterm1 + lterm2;//Andremize: original problem
-  OptA = m_Alpha*OptA + lterm2;
+  OptA = OptA + lterm2;
 
   // Initialization of the matrice regarding the quadratic
   // part of the objective function.
-  m_Q=new double[4*m_QP_N*m_QP_N];
-  memset(m_Q,0,4*m_QP_N*m_QP_N*sizeof(double));
+  //Andremize: size of Q is 3*Nx3*N which means that there is place for N/2 feet variables
+  m_Q=new double[4*(m_QP_N)*(m_QP_N)];
+  memset(m_Q,0,4*(m_QP_N)*(m_QP_N)*sizeof(double));
   // for(unsigned int i=0;i<2*m_QP_N;i++)
   //   m_Q[i*2*m_QP_N+i] = 1.0;
 
@@ -556,9 +560,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
       char Buffer[1024];
       sprintf(Buffer,"Q.dat");
       aof.open(Buffer,ofstream::out);
-      for(unsigned int i=0;i<2*m_QP_N;i++)
+      for(unsigned int i=0;i<2*(m_QP_N);i++)
 	{
-	  for(unsigned int j=0;j<2*m_QP_N;j++)
+	  for(unsigned int j=0;j<2*(m_QP_N);j++)
 	    aof << m_Q[i*m_QP_N*2+j] << " ";
 	  aof << endl;
 	}
@@ -1255,16 +1259,16 @@ int ZMPConstrainedQPFastFormulation::dumpProblem(double * Q,
   ofstream aof;
 
   char Buffer[1024];
-  sprintf(Buffer,"Problem_%f.dat",Time);
+  sprintf(Buffer,"ProblemFF_%f.dat",Time);
   aof.open(Buffer,ofstream::out);
 
   // Dumping Q.
   aof << "Q:"<< endl;
-  for(unsigned int i=0;i<2*m_QP_N;i++)
+  for(unsigned int i=0;i<2*(m_QP_N+Support->StepNumber);i++)
     {
-      for(unsigned int j=0;j<2*m_QP_N;j++)
+      for(unsigned int j=0;j<2*(m_QP_N+Support->StepNumber);j++)
 	{
-	  aof <<Q[j*m_QP_N*2+i]<< " ";
+	  aof <<Q[j*2*(m_QP_N+Support->StepNumber)+i]<< " ";
 	}
       aof <<endl;
     }
@@ -1298,7 +1302,7 @@ int ZMPConstrainedQPFastFormulation::dumpProblem(double * Q,
 
   // Dumping XL.
   aof << "XL:"<< endl;
-  for(unsigned int i=0;i<2*m_QP_N;i++)
+  for(unsigned int i=0;i<2*(m_QP_N+Support->StepNumber);i++)
     {
       aof << XL[i] << " ";
     }
@@ -1306,7 +1310,7 @@ int ZMPConstrainedQPFastFormulation::dumpProblem(double * Q,
 
   // Dumping XU.
   aof << "XU:"<< endl;
-  for(unsigned int i=0;i<2*m_QP_N;i++)
+  for(unsigned int i=0;i<2*(m_QP_N+Support->StepNumber);i++)
     {
       aof << XU[i] << " ";
     }
@@ -1537,7 +1541,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 	      for(unsigned k=0;k<=i;k++)
 		{
 		  if(IndexConstraint == 1)
-		    printf("IC: %d \n",NbOfConstraints);
+		    // printf("IC: %d \n",NbOfConstraints);//Andremize
 		  // X axis
 		  DU[IndexConstraint+k*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
@@ -1573,7 +1577,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 	  ODEBUG("IC: " << IndexConstraint );
 	  IndexConstraint++;
 	}
-      printf("DUindex: %d  ",N+(*LCIFF_it)->StepNumber);
+      // printf("DUindex: %d  ",N+(*LCIFF_it)->StepNumber);
       LCIFF_it++;
     }
 
@@ -1697,8 +1701,8 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
  
 
   double *DS=0,*DU=0;
-  unsigned int NbOfConstraints=4*N; // Nb of constraints to be taken into account
-  // for each iteration
+  unsigned int NbOfConstraints; // Nb of constraints are not known in advance
+  
 
   MAL_VECTOR(ZMPRef,double);
   MAL_VECTOR(VRef,double);
@@ -1713,26 +1717,25 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   MAL_VECTOR_RESIZE(ZMPRef,2*N);
   MAL_VECTOR_RESIZE(VRef,2*N);
 
-  int m = NbOfConstraints;
-  int me= 0;
-  int mmax = NbOfConstraints;
+  int m;
+  int me;
+  int mmax;
   int n;
-  int nmax = 2*N; // Size of the matrix to compute the cost function.
-  int mnn = m+n+n;
+  int nmax; // Size of the matrix to compute the cost function.
+  int mnn;
 
-
-  double *NewX=new double[2*N];   // Solution of the system.
-  double Eps=1e-8 ;
-  double *U = (double *)malloc( sizeof(double)*mnn); // Returns the Lagrange multipliers.;
-
-
+  double Eps=1e-8;
+  //double *U = (double *)malloc( sizeof(double)*mnn); // Returns the Lagrange multipliers.;
+  
   int iout=0;
   int ifail;
   int iprint=1;
-  int lwar=3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;;
-  double *war= (double *)malloc(sizeof(double)*lwar);
+  int lwar;
+  // double *war= (double *)malloc(sizeof(double)*lwar);
   int liwar = n; //
-  int *iwar = new int[liwar]; // The Cholesky decomposition is done internally.
+  // int *iwar = new int[liwar]; // The Cholesky decomposition is done internally.
+  
+
 
 
   deque<LinearConstraintInequality_t *> QueueOfLConstraintInequalities;
@@ -1906,36 +1909,63 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
 
 	
+      //-------------Prepare the data for the solver-------
+      //
+      //
+      //---------------------------------------------------
 
-      // Call to QLD (a linearly constrained quadratic problem solver)
+      m = 0;//NbOfConstraints;
+      me= 0;
+      mmax = m+1;
+      n = 2*(N+Support->StepNumber);
+      nmax = n; // Size of the matrix to compute the cost function.
+      mnn = m+n+n;
 
-      // Prepare D.
-      //      PrepareZMPRef(ZMPRef,StartingTime,QueueOfLConstraintInequalities);
-      
-
+      lwar=3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
+      liwar = n;
 
       //Andremize
       //Variable matrices due to variable foot step number
+      double *m_Qff=new double[4*(m_QP_N+Support->StepNumber)*(m_QP_N+Support->StepNumber)];  //Quadratic part of the objective function
       double *D=new double[2*(N+Support->StepNumber)];   // Linear part of the objective function
       double *XL=new double[2*(N+Support->StepNumber)];  // Lower bound of the jerk.
       double *XU=new double[2*(N+Support->StepNumber)];  // Upper bound of the jerk.
       double *X=new double[2*(N+Support->StepNumber)];   // Solution of the system.
+
+      double *NewX=new double[2*(N+Support->StepNumber)];   // Solution of the system.
+      double *U = (double *)malloc( sizeof(double)*mnn); // Returns the Lagrange multipliers.;
       
+      double *war= (double *)malloc(sizeof(double)*lwar);
+      int *iwar = new int[liwar]; // The Cholesky decomposition is done internally.
 
 
+      if (m_FastFormulationMode==QLDANDLQ)
+	iwar[0]=0;
+      else
+	iwar[0]=1;
 
-      // if (m_FullDebug>2)
-      // 	{
-      // 	  ofstream aof;
-      // 	  char Buffer[1024];
-      // 	  sprintf(Buffer,"ZMPRef_%f.dat",StartingTime);
-      // 	  aof.open(Buffer,ofstream::out);
-      // 	  for(unsigned int i=0;i<2*N;i++)
-      // 	    {
-      // 	      aof << ZMPRef[i] << endl;
-      // 	    }
-      // 	  aof.close();
-      // 	}
+      //Objective
+      //Andremize: There are constant parts which should be put in separate functions
+      MAL_MATRIX(OptA,double);
+
+      MAL_MATRIX(lterm2,double);
+      lterm2 = MAL_RET_TRANSPOSE(m_VPu);
+      lterm2 = MAL_RET_A_by_B(lterm2,m_VPu);
+      lterm2 = m_Beta*lterm2;
+
+      MAL_MATRIX_RESIZE(OptA,
+			MAL_MATRIX_NB_ROWS(lterm2),
+			MAL_MATRIX_NB_COLS(lterm2));
+      MAL_MATRIX_SET_IDENTITY(OptA);
+      OptA = m_Alpha*OptA;
+
+      OptA = OptA + lterm2;
+
+
+      memset(m_Qff,0,4*(m_QP_N+Support->StepNumber)*(m_QP_N+Support->StepNumber)*sizeof(double));
+      for(unsigned int i=0;i<2*(m_QP_N);i++)
+	for(unsigned int j=0;j<2*(m_QP_N);j++)
+	  m_Qff[i*2*(m_QP_N+Support->StepNumber)+j] = OptA(j,i);
 
       m_OptB = MAL_RET_TRANSPOSE(m_VPu);
       m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
@@ -1947,6 +1977,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       m_OptD = MAL_RET_TRANSPOSE(m_VPu);
       m_OptD = m_Beta * m_OptD;
 
+
       //Andremize - only constant velocity
       //constant velocity for the whole preview window
       for(unsigned int i=0;i<N;i++)
@@ -1954,15 +1985,16 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       for(unsigned int i=N;i<2*N;i++)
 	VRef(i) = Ref[1];
 
+      memset(D,0,2*(m_QP_N+Support->StepNumber)*sizeof(double));
       if (CriteriaToMaximize==1)
 	{
 	  MAL_VECTOR(lterm1v,double);
 	  MAL_C_eq_A_by_B(lterm1v,m_OptD,VRef);
-	  MAL_VECTOR_RESIZE(OptD,2*(N+Support->StepNumber));
+	  MAL_VECTOR_RESIZE(OptD,2*N);
 	  MAL_C_eq_A_by_B(OptD,m_OptB,xk);
 	  OptD -= lterm1v;
-	  for(unsigned int i=0;i<2*(N+Support->StepNumber);i++)
-	    D[i] = OptD[i];
+	  for(unsigned int i=0;i<2*(N);i++)
+	    D[i] = OptD(i);
 
 	  if (m_FullDebug>0)
 	    {
@@ -1970,7 +2002,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	      char Buffer[1024];
 	      sprintf(Buffer,"Dff_%f.dat",StartingTime);
 	      aof.open(Buffer,ofstream::out);
-	      for(unsigned int i=0;i<2*N;i++)
+	      for(unsigned int i=0;i<2*(N+Support->StepNumber);i++)
 		{
 		  aof << OptD[i] << endl;
 		}
@@ -1981,33 +2013,20 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       else
 	{
 	  // Default : set D to zero.
-	  for(unsigned int i=0;i<2*N+Support->StepNumber;i++)
+	  for(unsigned int i=0;i<2*(N+Support->StepNumber);i++)
 	    D[i] = 0.0;
 	}
 
-      for(unsigned int i=0;i<2*N+Support->StepNumber;i++)
+      for(unsigned int i=0;i<2*(N+Support->StepNumber);i++)
 	{
 	  XL[i] = -1e8;
 	  XU[i] = 1e8;
 	}
-      memset(X,0,2*N*sizeof(double));
+      memset(X,0,2*(N+Support->StepNumber)*sizeof(double));
 
-      if (m_FastFormulationMode==QLDANDLQ)
-	iwar[0]=0;
-      else
-	iwar[0]=1;
-
-      m = 0;//NbOfConstraints;
-      me= 0;
-      mmax = m+1;//NbOfConstraints+1;
-      n = 2*(N+Support->StepNumber);
-      nmax = n; // Size of the matrix to compute the cost function.
-      mnn = m+n+n;
-
-      lwar = 3*nmax*nmax/2+ 10*nmax  + 2*mmax + 2000000;
 
       ODEBUG("m: " << m);
-      dumpProblem(m_Q, D, DU, m, DS,XL,XU,StartingTime);
+      dumpProblem(m_Qff, D, DU, m, DS,XL,XU,StartingTime);
 
 
  
@@ -2015,14 +2034,14 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       //
       //
       //---------------------------
-      printf("Entering the solver \n");
+      // printf("Entering the solver \n");
       if ((m_FastFormulationMode==QLDANDLQ)||
       	  (m_FastFormulationMode==QLD))
       	{
       	  struct timeval lbegin,lend;
       	  gettimeofday(&lbegin,0);
       	  ql0001_(&m, &me, &mmax, &n, &nmax, &mnn,
-      		  m_Q, D, DU, DS, XL, XU,
+      		  m_Qff, D, DU, DS, XL, XU,
       		  X,U,&iout, &ifail, &iprint,
       		  war, &lwar,
       		  iwar, &liwar, &Eps);
@@ -2030,7 +2049,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
       	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
       		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
-	  printf("Solver has finished,  \n");
+	  // printf("Solver has finished,  \n");
       	  unsigned int NbOfActivatedConstraints = 0;
       	  for(int lk=0;lk<m;lk++)
       	    {
@@ -2125,10 +2144,6 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
       ODEBUG6("uk:" << uk,"DebugPBW.dat");
       ODEBUG6("xk:" << xk,"DebugPBW.dat");
-      
-
-
-
   
 
       if (m_FullDebug>2)
@@ -2164,11 +2179,16 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
       QueueOfLConstraintInequalitiesFreeFeet.clear();  
 
+      delete [] m_Qff;
       delete [] D;
       delete [] XL;
       delete [] XU;
       delete [] X;
-      
+      delete [] NewX;
+      delete [] iwar; // The Cholesky decomposition is done internally.
+  
+      free(war);
+      free(U);
     }
  //-----------------------------------
  //
@@ -2178,9 +2198,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   /*  cout << "Size of PX: " << MAL_MATRIX_NB_ROWS(vnlStorePx) << " "
       << MAL_MATRIX_NB_COLS(vnlStorePx) << " " << endl; */
 
-  free(war);
-  free(U);
-  delete [] iwar;
+
   // Clean the queue of Linear Constraint Inequalities.
   //  deque<LinearConstraintInequality_t *>::iterator LCI_it;
 
