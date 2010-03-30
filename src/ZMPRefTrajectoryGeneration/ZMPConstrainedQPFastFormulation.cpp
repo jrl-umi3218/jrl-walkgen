@@ -1278,7 +1278,7 @@ int ZMPConstrainedQPFastFormulation::dumpProblem(double * Q,
   aof <<endl;
 
   // Dumping Pu.
-  aof << "DPu: "<< "NbOfConstr.: " << NbOfConstraints << endl;
+  aof << "DU: "<< "NbOfConstr.: " << NbOfConstraints << endl;
   for(unsigned int i=0;i<NbOfConstraints;i++)
     {
       for(unsigned int j=0;j<2*(m_QP_N+Support->StepNumber);j++)
@@ -1289,7 +1289,7 @@ int ZMPConstrainedQPFastFormulation::dumpProblem(double * Q,
     }
 
   // Dumping Px.
-  aof << "Px:"<< endl;
+  aof << "DS:"<< endl;
   for(unsigned int i=0;i<NbOfConstraints;i++)
     {
       aof << Px[i] << " ";
@@ -1346,7 +1346,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
   if (DU==0)
     DU = new double[(8*N+1)*2*(N+Support->StepNumber)];
 
-  memset(DU,0,(5*N+1)*2*(N+Support->StepNumber)*sizeof(double));
+  memset(DU,0,(8*N+1)*2*(N+Support->StepNumber)*sizeof(double));
 
   
   //deque<LinearConstraintInequality_t *>::iterator LCI_it, store_it;//Olivier
@@ -1407,8 +1407,6 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
       LCIFF_it++;
     }  
   NbOfConstraints = IndexConstraint;
-  
-
   
   MAL_MATRIX(lD,double);
   MAL_MATRIX_RESIZE(lD,NbOfConstraints,2*(N+Support->StepNumber));
@@ -1522,7 +1520,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 	    * (*LCIFF_it)->D(j,1)
 	     // Constante part of the constraint
 	    + (*LCIFF_it)->Dc(j,0);
-
+	  // cout<<" Dc("<<j<<"): " <<(*LCIFF_it)->Dc(j,0)<<" DS["<<IndexConstraint<<"] :"<<DS[IndexConstraint]<<endl;
 	  ODEBUG6(DS[IndexConstraint] << " " << (*LCIFF_it)->D(j,0)  << " "
 		  << (*LCIFF_it)->D[j][1] << " " << (*LCIFF_it)->Dc(j,0) ,Buffer);
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer2);
@@ -1536,14 +1534,15 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 	      // so we can speed up the computation.
 	      for(unsigned k=0;k<=i;k++)
 		{
-		  if(IndexConstraint == 1)
-		    // printf("IC: %d \n",NbOfConstraints);//Andremize
 		  // X axis
 		  DU[IndexConstraint+k*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
+		  // cout<<" D("<<j<<",0): " <<(*LCIFF_it)->D(j,0)<<endl;
 		  // Y axis
 		  DU[IndexConstraint+(k+N)*(NbOfConstraints)] = 
-		    (*LCIFF_it)->D(j,1)*m_Pu[k*N+i];	      
+		    (*LCIFF_it)->D(j,1)*m_Pu[k*N+i];
+		  // cout<<" D("<<j<<",1): " <<(*LCIFF_it)->D(j,1)<<endl;
+		  
 		}
 	    }
 	  else if ((m_FastFormulationMode==QLDANDLQ)||
@@ -1751,7 +1750,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   aSFLeft->StartTime = 0.0;
   aSFLeft->SupportFoot = 1;
   aSFRight->x = 0.0;
-  aSFRight->y = 0.0;//Andremize
+  aSFRight->y = -0.0;//Andremize
   aSFRight->theta = 0.0;
   aSFRight->StartTime = 0.0;
   aSFRight->SupportFoot = -1;
@@ -1910,7 +1909,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       //
       //---------------------------------------------------
 
-      m = 0;//NbOfConstraints;
+      m = NbOfConstraints;
       me= 0;
       mmax = m+1;
       n = 2*(N+Support->StepNumber);
@@ -1920,20 +1919,28 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       lwar=3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
       liwar = n;
 
+      printf("here1 \n");
       //Andremize
       //Variable matrices due to variable foot step number
       double *m_Qff=new double[4*(m_QP_N+Support->StepNumber)*(m_QP_N+Support->StepNumber)];  //Quadratic part of the objective function
-      double *D=new double[2*(N+Support->StepNumber)];   // Linear part of the objective function
-      double *XL=new double[2*(N+Support->StepNumber)];  // Lower bound of the jerk.
-      double *XU=new double[2*(N+Support->StepNumber)];  // Upper bound of the jerk.
-      double *X=new double[2*(N+Support->StepNumber)];   // Solution of the system.
 
+      double *D=new double[2*(N+Support->StepNumber)];   // Linear part of the objective function
+
+      double *XL=new double[2*(N+Support->StepNumber)];  // Lower bound of the jerk.
+       printf("here2 \n");
+      double *XU=new double[2*(N+Support->StepNumber)];  // Upper bound of the jerk.
+ printf("here3 \n");
+      double *X=new double[2*(N+Support->StepNumber)];   // Solution of the system.
+ printf("here4 \n");
       double *NewX=new double[2*(N+Support->StepNumber)];   // Solution of the system.
+ printf("here5 \n");
       double *U = (double *)malloc( sizeof(double)*mnn); // Returns the Lagrange multipliers.;
-      
+       printf("here6 \n");
       double *war= (double *)malloc(sizeof(double)*lwar);
+ printf("here7 \n");
       int *iwar = new int[liwar]; // The Cholesky decomposition is done internally.
 
+      printf("here8 \n");
 
       if (m_FastFormulationMode==QLDANDLQ)
 	iwar[0]=0;
@@ -1966,7 +1973,6 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       m_OptB = MAL_RET_TRANSPOSE(m_VPu);
       m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
       m_OptB = m_Beta * m_OptB;
-      //m_OptB = m_OptB + m_Beta * lterm1;
 
       //Andremize - has to go back where it comes from
       MAL_MATRIX(m_OptD,double);
@@ -1989,7 +1995,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	  MAL_VECTOR_RESIZE(OptD,2*N);
 	  MAL_C_eq_A_by_B(OptD,m_OptB,xk);
 	  OptD -= lterm1v;
-	  for(unsigned int i=0;i<2*(N);i++)
+	  for(unsigned int i=0;i<2*N;i++)
 	    D[i] = OptD(i);
 
 	  if (m_FullDebug>0)
@@ -2022,7 +2028,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
 
       ODEBUG("m: " << m);
-      dumpProblem(m_Qff, D, DU, m, DS,XL,XU,StartingTime);
+      dumpProblem(m_Qff, D, DU, m, DS, XL, XU, StartingTime);
 
 
  
@@ -2038,9 +2044,8 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       	  gettimeofday(&lbegin,0);
       	  ql0001_(&m, &me, &mmax, &n, &nmax, &mnn,
       		  m_Qff, D, DU, DS, XL, XU,
-      		  X,U,&iout, &ifail, &iprint,
-      		  war, &lwar,
-      		  iwar, &liwar, &Eps);
+      		  X, U, &iout, &ifail, &iprint,
+      		  war, &lwar, iwar, &liwar, &Eps);
       	  gettimeofday(&lend,0);
 
       	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
@@ -2148,11 +2153,18 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       	char Buffer[1024];
       	sprintf(Buffer,"Xff_%f.dat",StartingTime);
       	aof.open(Buffer,ofstream::out);
-      	for(unsigned int i=0;i<2*N;i++)
+      	for(unsigned int i=0;i<2*(N+Support->StepNumber);i++)
       	  {
       	    aof << X[i] << endl;
       	  }
       	aof.close();
+	// sprintf(Buffer,"Uff_%f.dat",StartingTime);
+      	// aof.open(Buffer,ofstream::out);
+      	// for(unsigned int i=0;i<2*(N+Support->StepNumber);i++)
+      	//   {
+      	//     aof << U[i] << endl;
+      	//   }
+      	// aof.close();
       }
 
       if(1)
