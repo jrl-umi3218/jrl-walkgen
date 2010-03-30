@@ -22,7 +22,7 @@ SupportState::SupportState(const double &SamplingDuration)
 
   SSDuration = 0.8; 	  //Duration of one step
   DSDuration = 1e9;       //Duration of the DS phase
-  DSSSDuration = 0.8;
+  DSSSDuration = 0.4;
   NbOfStepsSSDS = 0;
 
   T = SamplingDuration;
