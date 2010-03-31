@@ -1745,12 +1745,12 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   SupportFeet_t * aSFLeft = new SupportFeet_t;
   SupportFeet_t * aSFRight = new SupportFeet_t;
   aSFLeft->x = 0.0;
-  aSFLeft->y = 0.0;//Andremize
+  aSFLeft->y = 0.1;//Andremize
   aSFLeft->theta = 0.0;
   aSFLeft->StartTime = 0.0;
   aSFLeft->SupportFoot = 1;
   aSFRight->x = 0.0;
-  aSFRight->y = -0.0;//Andremize
+  aSFRight->y = -0.1;//Andremize
   aSFRight->theta = 0.0;
   aSFRight->StartTime = 0.0;
   aSFRight->SupportFoot = -1;
@@ -1904,9 +1904,6 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       			      xk,
       			      ZMPRef,
       			      NextNumberOfRemovedConstraints);
-
-
-
 
 	
       //-------------Prepare the data for the solver-------
@@ -2231,6 +2228,9 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   //   }
 
   QueueOfSupportFeet.clear();
+
+  delete aSFLeft;
+  delete aSFRight;
 
   printf("Leaving buildZMPTrajectoryFromFeetTrajectory \n");
   return 0;
