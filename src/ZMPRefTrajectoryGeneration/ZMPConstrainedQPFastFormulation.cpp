@@ -1132,7 +1132,7 @@ int ZMPConstrainedQPFastFormulation::validateConstraints(double * & DS,double * 
   // MAL_MATRIX(vnlStoreX,double);
   MAL_VECTOR(ConstraintNb,int);
 
-  MAL_MATRIX_RESIZE(vnlX,2*m_QP_N,1);
+  MAL_MATRIX_RESIZE(vnlX,2*(m_QP_N+Support->StepNumber),1);
   // MAL_MATRIX_RESIZE(vnlStorePx,
   // 		    NbOfConstraints,
   // 		    //6*N,
@@ -1157,7 +1157,7 @@ int ZMPConstrainedQPFastFormulation::validateConstraints(double * & DS,double * 
 
 
   // ConstraintNb[li] = NbOfConstraints;
-  MAL_MATRIX_RESIZE(vnlPu,NbOfConstraints,2*m_QP_N);
+  MAL_MATRIX_RESIZE(vnlPu,NbOfConstraints,2*(m_QP_N+Support->StepNumber));
   MAL_MATRIX_RESIZE(vnlPx,NbOfConstraints,1);
 
 
@@ -1168,10 +1168,10 @@ int ZMPConstrainedQPFastFormulation::validateConstraints(double * & DS,double * 
     }
 
   for(int i=0; i<NbOfConstraints;i++)
-    for(unsigned int j=0; j<2*m_QP_N;j++)
+    for(unsigned int j=0; j<2*(m_QP_N+Support->StepNumber);j++)
       vnlPu(i,j) = DU[j*(NbOfConstraints+1)+i];
 
-  for(unsigned int i=0; i<2*m_QP_N;i++)
+  for(unsigned int i=0; i<2*(m_QP_N+Support->StepNumber);i++)
     {
       // vnlStoreX(i,li) = X[i];
       vnlX(i,0) = X[i];
@@ -1508,23 +1508,25 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
       // For each constraint.
       for(unsigned j=0;j<MAL_MATRIX_NB_ROWS((*LCIFF_it)->D);j++)
 	{
-	  
+	  cout<<" D("<<j<<",0): " <<(*LCIFF_it)->D(j,0);
+	  cout<<" D("<<j<<",1): " <<(*LCIFF_it)->D(j,1);
+	  cout<<" Dc("<<j<<"): " <<(*LCIFF_it)->Dc(j,0)<<" FFPx"<<IndexConstraint<<" :"<<FFPx<<" FFPy"<<IndexConstraint<<" :"<<FFPy;
 	  // Verification of constraints.
 	  DS[IndexConstraint] = 
 	    // X Axis * A
-	    (xk[0] * m_Px(i,0)+
-	     xk[1] * m_Px(i,1)+ 
-	     xk[2] * m_Px(i,2)-FFPx)
+	    (FFPx-xk[0] * m_Px(i,0)-
+	     xk[1] * m_Px(i,1)- 
+	     xk[2] * m_Px(i,2))
 	    * (*LCIFF_it)->D(j,0)
 	     + 
 	     // Y Axis * A
-	    ( xk[3] * m_Px(i,0)+
-	      xk[4] * m_Px(i,1)+ 
-	      xk[5] * m_Px(i,2)-FFPy)	  
+	    ( FFPy-xk[3] * m_Px(i,0)-
+	      xk[4] * m_Px(i,1)- 
+	      xk[5] * m_Px(i,2))	  
 	    * (*LCIFF_it)->D(j,1)
 	     // Constante part of the constraint
 	    + (*LCIFF_it)->Dc(j,0);
-	  // cout<<" Dc("<<j<<"): " <<(*LCIFF_it)->Dc(j,0)<<" DS["<<IndexConstraint<<"] :"<<DS[IndexConstraint]<<endl;
+	  cout<<" DS"<<IndexConstraint<<" :"<<DS[IndexConstraint]<<endl
 	  ODEBUG6(DS[IndexConstraint] << " " << (*LCIFF_it)->D(j,0)  << " "
 		  << (*LCIFF_it)->D[j][1] << " " << (*LCIFF_it)->Dc(j,0) ,Buffer);
 	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer2);
@@ -1541,12 +1543,11 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 		  // X axis
 		  DU[IndexConstraint+k*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
-		  // cout<<" D("<<j<<",0): " <<(*LCIFF_it)->D(j,0)<<endl;
+
 		  // Y axis
 		  DU[IndexConstraint+(k+N)*(NbOfConstraints)] = 
 		    (*LCIFF_it)->D(j,1)*m_Pu[k*N+i];
-		  // cout<<" D("<<j<<",1): " <<(*LCIFF_it)->D(j,1)<<endl;
-		  
+
 		}
 	    }
 	  else if ((m_FastFormulationMode==QLDANDLQ)||
@@ -2457,10 +2458,9 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 	  struct timeval lbegin,lend;
 	  gettimeofday(&lbegin,0);
 	  ql0001_(&m, &me, &mmax,&n, &nmax,&mnn,
-		  m_Q, D, DPu,DPx,XL,XU,
+		  m_Q, D, DPu, DPx,XL,XU,
 		  X,U,&iout, &ifail, &iprint,
-		  war, &lwar,
-		  iwar, &liwar,&Eps);
+		  war, &lwar, iwar, &liwar,&Eps);
 	  gettimeofday(&lend,0);
 	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec + 
 		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
