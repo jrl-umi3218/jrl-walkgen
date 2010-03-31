@@ -66,7 +66,8 @@ namespace PatternGeneratorJRL
        */
       int computeLinearSystem(std::vector<CH_Point> aVecOfPoints,
 			      MAL_MATRIX(&D,double),
-			      MAL_MATRIX(&Dc,double)
+			      MAL_MATRIX(&Dc,double),
+			      SupportState * Support
 			      );
 
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
