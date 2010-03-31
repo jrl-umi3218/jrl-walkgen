@@ -1699,7 +1699,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
  
 
-  double *DS=0,*DU=0;
+  
   unsigned int NbOfConstraints; // Nb of constraints are not known in advance
   
 
@@ -1825,6 +1825,9 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
      StartingTime<= 2.0;
       StartingTime+=T,li++)
     {
+
+      double *DS=0,*DU=0;
+      
       printf("StartingTime: %f \n", StartingTime);
       gettimeofday(&start,0);
 
@@ -1879,6 +1882,8 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	  newSF->SupportFoot = Support->CurrentSupportFoot;
 
 	  QueueOfSupportFeet.push_back(newSF);
+
+	  delete newSF;
 	}
 
       // printf("Before buildLinearConstraintInequalities \n");
@@ -1923,28 +1928,18 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       lwar=3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
       liwar = n;
 
-      printf("here1 \n");
       //Andremize
       //Variable matrices due to variable foot step number
       double *m_Qff=new double[4*(m_QP_N+Support->StepNumber)*(m_QP_N+Support->StepNumber)];  //Quadratic part of the objective function
-
       double *D=new double[2*(N+Support->StepNumber)];   // Linear part of the objective function
-
       double *XL=new double[2*(N+Support->StepNumber)];  // Lower bound of the jerk.
-       printf("here2 \n");
       double *XU=new double[2*(N+Support->StepNumber)];  // Upper bound of the jerk.
- printf("here3 \n");
       double *X=new double[2*(N+Support->StepNumber)];   // Solution of the system.
- printf("here4 \n");
       double *NewX=new double[2*(N+Support->StepNumber)];   // Solution of the system.
- printf("here5 \n");
       double *U = (double *)malloc( sizeof(double)*mnn); // Returns the Lagrange multipliers.;
-       printf("here6 \n");
-      double *war= (double *)malloc(sizeof(double)*lwar);
- printf("here7 \n");
+      // double *war= (double *)malloc(sizeof(double)*lwar);
+      double *war= new double[lwar];
       int *iwar = new int[liwar]; // The Cholesky decomposition is done internally.
-
-      printf("here8 \n");
 
       if (m_FastFormulationMode==QLDANDLQ)
 	iwar[0]=0;
@@ -2193,13 +2188,15 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
       delete [] m_Qff;
       delete [] D;
+      delete [] DS;
+      delete [] DU;
       delete [] XL;
       delete [] XU;
       delete [] X;
       delete [] NewX;
       delete [] iwar; // The Cholesky decomposition is done internally.
   
-      free(war);
+      delete []  war;
       free(U);
     }
  //-----------------------------------
