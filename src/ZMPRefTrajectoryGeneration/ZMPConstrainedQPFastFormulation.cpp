@@ -1258,6 +1258,9 @@ int ZMPConstrainedQPFastFormulation::dumpProblem(double * Q,
   sprintf(Buffer,"ProblemFF_%f.dat",Time);
   aof.open(Buffer,ofstream::out);
 
+  //Somehow this has to be done
+  NbOfConstraints++;
+
   // Dumping Q.
   aof << "Q:"<< endl;
   for(unsigned int i=0;i<2*(m_QP_N+Support->StepNumber);i++)
@@ -1537,12 +1540,12 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 	      for(unsigned k=0;k<=i;k++)
 		{
 		  // X axis
-		  DU[IndexConstraint+k*(NbOfConstraints)] = 
+		  DU[IndexConstraint+k*(NbOfConstraints+1)] = 
 		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
 
 		  // Y axis
-		  DU[IndexConstraint+(k+N)*(NbOfConstraints)] = 
-		    (*LCIFF_it)->D(j,1)*m_Pu[k*N+i];
+		  DU[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
+		    -(*LCIFF_it)->D(j,1)*m_Pu[k*N+i];
 
 		}
 	    }
@@ -1553,21 +1556,21 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 	      for(unsigned k=0;k<N;k++)
 		{
 		  // X axis
-		  DU[IndexConstraint+k*(NbOfConstraints)] = 
+		  DU[IndexConstraint+k*(NbOfConstraints+1)] = 
 		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
 		  // Y axis
-		  DU[IndexConstraint+(k+N)*(NbOfConstraints)] = 
-		    (*LCIFF_it)->D(j,1)*m_Pu[k*N+i];	      
+		  DU[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
+		    -(*LCIFF_it)->D(j,1)*m_Pu[k*N+i];	      
 		}
 	    }
 
 	  //Foot variables after jerk: [dddX,dddY,FPx,FPy]
 	  if((*LCIFF_it)->StepNumber>0)
 	    {
-	      DU[IndexConstraint+(2*N+(*LCIFF_it)->StepNumber-1)*NbOfConstraints] = 
+	      DU[IndexConstraint+(2*N+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
 	  	-(*LCIFF_it)->D(j,0);
-	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-1)*NbOfConstraints] = 
-	  	-(*LCIFF_it)->D(j,1);
+	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
+	  	(*LCIFF_it)->D(j,1);
 	    }
 
 	  ODEBUG("IC: " << IndexConstraint );
@@ -2019,7 +2022,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	}
       memset(X,0,2*(N+Support->StepNumber)*sizeof(double));
 
-
+      
       ODEBUG("m: " << m);
       dumpProblem(m_Qff, D, DU, m, DS, XL, XU, StartingTime);
 
@@ -2146,6 +2149,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       	char Buffer[1024];
       	sprintf(Buffer,"Xff_%f.dat",StartingTime);
       	aof.open(Buffer,ofstream::out);
+	aof << "State: " <<xk[0]<<" "<<xk[1]<< " " << xk[2] << " " << xk[3] << " "<<xk[4]<<" "<<xk[5]<<" "<<endl;
       	for(unsigned int i=0;i<2*(N+Support->StepNumber);i++)
       	  {
       	    aof << X[i] << endl;
@@ -2190,7 +2194,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       delete [] NewX;
       delete [] iwar; // The Cholesky decomposition is done internally.
   
-      delete []  war;
+      delete [] war;
       free(U);
     }
  //-----------------------------------
