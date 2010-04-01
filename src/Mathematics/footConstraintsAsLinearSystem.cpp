@@ -111,9 +111,18 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   lLeftFootHalfHeightDS = lLeftFootHalfHeight+DSFeetDistance/2.0; 
   lRightFootHalfHeightDS = lRightFootHalfHeight+DSFeetDistance/2.0; 
 
+  CHLeftFPosConstr.resize(5);
+  CHRightFPosConstr.resize(5);
+  
+  double CHLeftFPosConstrArrayX[] = {-0.3, -0.2, 0.0, 0.2, 0.3};
+  double CHLeftFPosConstrArrayY[] = {0.15, 0.3, 0.4, 0.3, 0.15};
+
+  double CHRightFPosConstrArrayX[] = {-0.3, -0.2, 0.0, 0.2, 0.3};
+  double CHRightFPosConstrArrayY[] = {-0.15, -0.3, 0.4, -0.3, -0.15};
+
   RESETDEBUG4("Constraints-fCSALS.dat");
  
-  // printf("Leaving footConstraintsAsLinearSystem \n");
+   printf("Leaving footConstraintsAsLinearSystem \n");
 }
 
 footConstraintsAsLinearSystem::~footConstraintsAsLinearSystem()
@@ -149,7 +158,6 @@ int footConstraintsAsLinearSystem::FindSimilarConstraints(MAL_MATRIX(&A,double),
       if ((A(2,0)==-A(5,0)) &&
 	  (A(2,1)==-A(5,1)))
 	SimilarConstraints[5]=-3;
-      
     }
 
   if (0)
@@ -265,6 +273,8 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 								     &RightFootAbsolutePositions,
 								     deque<LinearConstraintInequalityFreeFeet_t *> &
 								     QueueOfLConstraintInequalitiesFreeFeet,
+								     deque<LinearConstraintInequalityFreeFeet_t *> &
+								     QueueOfFeetPosInequalities,
 								     double Ref[3],
 								     double StartingTime,
 								     double m_QP_N,
@@ -367,7 +377,9 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 					FootHalfHeight * c_t ); 
 	}
 	
-	      
+
+	    
+      
       // Linear Constraint Inequality
       LinearConstraintInequalityFreeFeet_t * aLCI = new LinearConstraintInequalityFreeFeet_t;
       // Building those constraints.

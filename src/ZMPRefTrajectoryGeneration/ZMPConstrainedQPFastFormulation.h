@@ -159,6 +159,8 @@ namespace PatternGeneratorJRL
 			       double StartingTime,
 			       deque<LinearConstraintInequalityFreeFeet_t *> 
 			       & QueueOfLConstraintInequalitiesFreeFeet,
+			       deque<LinearConstraintInequalityFreeFeet_t *> 
+			       & QueueOfFeetPosInequalities,
 			       deque<SupportFeet_t *> 
 			       & QueueOfSupportFeet,
 			       double Com_Height,
