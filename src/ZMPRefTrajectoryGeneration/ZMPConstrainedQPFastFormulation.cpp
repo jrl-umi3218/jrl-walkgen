@@ -1422,7 +1422,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 
   MAL_VECTOR_DIM(lb,double,NbOfConstraints);
  
-  
+   
 
   // //Fixed foot positions: V*f_k
   // MAL_VECTOR_DIM(FFPx,double,N);
@@ -1907,7 +1907,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	  // delete newSF;
 	}
 
-      printf("After setSupportState \n");
+
       // printf("Before buildLinearConstraintInequalities \n");
       m_fCALS->buildLinearConstraintInequalities(LeftFootAbsolutePositions,
 						 RightFootAbsolutePositions,
@@ -2243,7 +2243,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   //     LCI_it++;
   //   }
   QueueOfLConstraintInequalities.clear();  
-
+QueueOfLConstraintInequalitiesFreeFeet.clear();  
   
   
   // SF_it = QueueOfSupportFeet.begin();
