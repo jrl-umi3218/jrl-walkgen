@@ -103,11 +103,20 @@ namespace PatternGeneratorJRL
 
     private:
 
+      void initFPConstrArrays();
+
       /* ! Reference on the Humanoid Specificities. */
       CjrlHumanoidDynamicRobot * m_HS;
       
-      std::vector<CH_Point> CHLeftFPosConstr;
-      std::vector<CH_Point> CHRightFPosConstr;
+      std::vector<CH_Point> ConvexHullFP;
+      float CHLeftFPosConstrArrayX[];
+      float CHLeftFPosConstrArrayY[];
+      
+      float CHRightFPosConstrArrayX[];
+      float CHRightFPosConstrArrayY[];
+      
+      float* CHFPosConstrArrayX; 
+      float* CHFPosConstrArrayY;
 
       // Find the convex hull for each of the position,
       // in order to create the corresponding trajectory.

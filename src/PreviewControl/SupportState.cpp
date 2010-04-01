@@ -34,7 +34,7 @@ SupportState::SupportState(const double &SamplingDuration)
   StartSupportFoot = 1;
 
   eps = 0.00000001;
-  StateChanged = -1;
+  StateChanged = 0;
 
   s_FullDebug = 1;
 
@@ -54,7 +54,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
 {
   // printf("Inside setSupportState \n");
 
-  StateChanged = -1;
+  StateChanged = 0;
 
   if(pi==0) {
     SupportPhase = &CurrentSupportPhase;
