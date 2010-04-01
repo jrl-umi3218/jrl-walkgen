@@ -1545,7 +1545,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 		{
 		  // X axis
 		  DU[IndexConstraint+k*(NbOfConstraints+1)] = 
-		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
+		    -(*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
 
 		  // Y axis
 		  DU[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
@@ -1561,7 +1561,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 		{
 		  // X axis
 		  DU[IndexConstraint+k*(NbOfConstraints+1)] = 
-		    (*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
+		    -(*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
 		  // Y axis
 		  DU[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
 		    -(*LCIFF_it)->D(j,1)*m_Pu[k*N+i];	      
@@ -1572,7 +1572,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 	  if((*LCIFF_it)->StepNumber>0)
 	    {
 	      DU[IndexConstraint+(2*N+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
-	  	-(*LCIFF_it)->D(j,0);
+	  	(*LCIFF_it)->D(j,0);
 	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
 	  	(*LCIFF_it)->D(j,1);
 	    }
@@ -1820,6 +1820,17 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   //(Re)initialize the LIPM
   m_2DLIPM->InitializeSystem();
 
+  //Constant velocity reference
+  double Ref[3] = {0.1,0,1};
+
+  //Andremize - only constant velocity
+  //constant velocity for the whole preview window
+  for(unsigned int i=0;i<N;i++)
+    VRef(i) = Ref[0];
+  for(unsigned int i=N;i<2*N;i++)
+    VRef(i) = Ref[1];
+
+
  //----------"Real-time" loop---------
  //
  //
@@ -1855,7 +1866,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	}
       
   
-      double Ref[3] = {0.1,0,1};
+
  
        
       printf("Before setSupportState \n");
@@ -1978,14 +1989,8 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       MAL_MATRIX(m_OptD,double);
       m_OptD = MAL_RET_TRANSPOSE(m_VPu);
       m_OptD = m_Beta * m_OptD;
+      
 
-
-      //Andremize - only constant velocity
-      //constant velocity for the whole preview window
-      for(unsigned int i=0;i<N;i++)
-	VRef(i) = Ref[0];
-      for(unsigned int i=N;i<2*N;i++)
-	VRef(i) = Ref[1];
 
       memset(D,0,2*(m_QP_N+Support->StepNumber)*sizeof(double));
       if (CriteriaToMaximize==1)
