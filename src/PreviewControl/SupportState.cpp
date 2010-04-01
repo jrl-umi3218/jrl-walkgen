@@ -59,9 +59,10 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
   if(pi==0) {
     SupportPhase = &CurrentSupportPhase;
     SupportFoot = &CurrentSupportFoot;
-    StepNumber = 0;
     SupportStepsLeft = &CurrentStepsLeft;//to be changed
     SupportTimeLimit = &CurrentTimeLimit;
+    StepNumber = 0;
+    SSSS = 0;
   }
   else {
     SupportPhase = &PrwSupportPhase;
@@ -108,16 +109,17 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
 	  *SupportFoot = -1**SupportFoot;
 	  StateChanged = 1;
 	  *SupportTimeLimit = Time+pi*T + SSDuration;
-	  StepNumber = StepNumber+1;
+	  StepNumber++;
+	  SSSS = 1;
 	  if (ReferenceGiven == -1)
 	    *SupportStepsLeft = *SupportStepsLeft-1;
 
 	}
     }
 
+
   if(pi==0)
     initializePreviewedState();
-
   
   if(s_FullDebug>0)
     {

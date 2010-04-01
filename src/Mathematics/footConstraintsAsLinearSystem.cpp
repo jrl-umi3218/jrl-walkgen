@@ -375,9 +375,10 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
       //
       computeLinearSystem(TheConvexHull, aLCI->D, aLCI->Dc, Support);
 
-      //Selection Vector and Matrix Vc, V
+      //For selection vectors and matrices when computing the constraints
       aLCI->StepNumber = Support->StepNumber;
 
+      // cout<<Support->StepNumber<<" "<<aLCI->StepNumber<<endl;
       // Finding the similar one (i.e. Ai identical).
       //FindSimilarConstraints(aLCI->A,aLCI->SimilarConstraints);
       

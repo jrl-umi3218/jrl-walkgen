@@ -1469,7 +1469,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
     CurSF_it--;
 
   LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin();
-  cout << "QOLCIFF.size: " << (int) QueueOfLConstraintInequalitiesFreeFeet.size() << endl;
+  // cout << "QOLCIFF.size: " << (int) QueueOfLConstraintInequalitiesFreeFeet.size() << endl;
 
   ofstream aof;//Andremize
   
@@ -1496,6 +1496,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 	{
 	  FFPx = (*CurSF_it)->x;
 	  FFPy = (*CurSF_it)->y;
+	  cout<<FFPx<<" "<<FFPy<<endl;
 	}
       else
 	{
@@ -1504,7 +1505,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 	}
       
       aof.open("FFP.dat",ios::app);
-      aof << "FFPx: "<<FFPx << " " << "FFPy: "<<FFPy  ;
+      aof << "FFPx: "<<FFPx << " " << "FFPy: "<<FFPy<<"(*LCIFF_it)->StepNumber: "<<(*LCIFF_it)->StepNumber;
       aof << endl;
       aof.close();
   
@@ -1841,6 +1842,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       StartingTime+=T,li++)
     {
 
+      printf("FPx: %f FPy %f \n",FPx,FPy);
       double *DS=0,*DU=0;
       
       printf("StartingTime: %f \n", StartingTime);
@@ -1878,7 +1880,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	{
 	  printf("SupportState changed \n");
 	  SupportFeet_t * newSF = new SupportFeet_t;
-	  if(Support->StepNumber == 0)//SS->DS or DS->SS
+	  if(Support->SSSS == 0)//SS->DS or DS->SS
 	    {
 	      SF_it = QueueOfSupportFeet.end();
 	      SF_it--;
@@ -1891,14 +1893,15 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	    }
 
 	  newSF->x = FPx; 
-	  newSF->y = FPy; 
+	  newSF->y = FPy;
+	  printf("newSF -> FPx: %f FPy %f \n",FPx,FPy);
 	  newSF->theta = FPtheta; 
 	  newSF->StartTime = StartingTime; 
 	  newSF->SupportFoot = Support->CurrentSupportFoot;
 
 	  QueueOfSupportFeet.push_back(newSF);
 
-	  delete newSF;
+	  // delete newSF;
 	}
 
       // printf("Before buildLinearConstraintInequalities \n");
@@ -2147,6 +2150,12 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       			      ptX[0],ptX[N]);
 
       m_2DLIPM->OneIteration(ptX[0],ptX[N]);
+
+      //Previewed position of the next foot
+      FPx = ptX[2*N];
+      FPy = ptX[2*N+Support->StepNumber];
+
+      printf("FPx: %f FPy %f \n",FPx,FPy);
 
       ODEBUG6("uk:" << uk,"DebugPBW.dat");
       ODEBUG6("xk:" << xk,"DebugPBW.dat");
