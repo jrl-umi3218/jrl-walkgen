@@ -43,6 +43,8 @@ namespace PatternGeneratorJRL
     /*! \brief Current support state */
     int CurrentSupportPhase, CurrentSupportFoot, CurrentStepsLeft;
 
+    int SSSS;
+
     double CurrentTimeLimit;
 	
     /*! \brief Future support state */
@@ -52,7 +54,7 @@ namespace PatternGeneratorJRL
 
     int StateChanged;
 
-    int StepNumber;
+    unsigned int StepNumber;
 
     //Number of steps done before DS
     unsigned int NbOfStepsSSDS;

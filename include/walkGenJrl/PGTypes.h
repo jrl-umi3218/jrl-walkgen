@@ -100,7 +100,7 @@ namespace PatternGeneratorJRL
   {
     MAL_MATRIX(D,double);
     MAL_MATRIX(Dc,double);
-    int StepNumber;
+    unsigned int StepNumber;
   };
   typedef struct LinearConstraintInequalityFreeFeet_s 
     LinearConstraintInequalityFreeFeet_t;
