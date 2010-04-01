@@ -1328,6 +1328,8 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 							     double StartingTime,
 							     deque<LinearConstraintInequalityFreeFeet_t *> & 
 							     QueueOfLConstraintInequalitiesFreeFeet,
+							     deque<LinearConstraintInequalityFreeFeet_t *> & 
+							     QueueOfFeetPosInequalities,
 							     deque<SupportFeet_t *> & 
 							     QueueOfSupportFeet,
 							     double Com_Height,
@@ -1744,6 +1746,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
   deque<LinearConstraintInequality_t *> QueueOfLConstraintInequalities;
   deque<LinearConstraintInequalityFreeFeet_t *> QueueOfLConstraintInequalitiesFreeFeet;
+  deque<LinearConstraintInequalityFreeFeet_t *> QueueOfFeetPosInequalities;
 
   //Queue of the actual and past support feet
   deque<SupportFeet_t *> QueueOfSupportFeet;
@@ -1904,10 +1907,12 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 	  // delete newSF;
 	}
 
+      printf("After setSupportState \n");
       // printf("Before buildLinearConstraintInequalities \n");
       m_fCALS->buildLinearConstraintInequalities(LeftFootAbsolutePositions,
 						 RightFootAbsolutePositions,
 						 QueueOfLConstraintInequalitiesFreeFeet,
+						 QueueOfFeetPosInequalities,
 						 Ref,
 						 StartingTime,
 						 m_QP_N,
@@ -1920,6 +1925,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       			      N,T,
       			      StartingTime,
       			      QueueOfLConstraintInequalitiesFreeFeet,
+			      QueueOfFeetPosInequalities,
 			      QueueOfSupportFeet,
       			      m_ComHeight,
       			      NbOfConstraints,
@@ -2201,6 +2207,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
       	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
       QueueOfLConstraintInequalitiesFreeFeet.clear();  
+      QueueOfFeetPosInequalities.clear();
 
       delete [] m_Qff;
       delete [] D;
@@ -2226,8 +2233,6 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
   // Clean the queue of Linear Constraint Inequalities.
   //  deque<LinearConstraintInequality_t *>::iterator LCI_it;
-
-  QueueOfLConstraintInequalitiesFreeFeet.clear();  
 
   // LCI_it = QueueOfLConstraintInequalities.begin();
   // while(LCI_it!=QueueOfLConstraintInequalities.end())

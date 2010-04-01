@@ -67,8 +67,7 @@ namespace PatternGeneratorJRL
       int computeLinearSystem(std::vector<CH_Point> aVecOfPoints,
 			      MAL_MATRIX(&D,double),
 			      MAL_MATRIX(&Dc,double),
-			      SupportState * Support
-			      );
+			      SupportState * Support);
 
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
 	Position.
@@ -77,6 +76,8 @@ namespace PatternGeneratorJRL
 					    std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					    std::deque<LinearConstraintInequalityFreeFeet_t *> &
 					    QueueOfLConstraintInequalities,
+					    std::deque<LinearConstraintInequalityFreeFeet_t *> &
+					    QueueOfFeetPosInequalities,
 					    double Ref[3],
 					    double StartingTime,
 					    double m_QP_N,
@@ -105,29 +106,30 @@ namespace PatternGeneratorJRL
       /* ! Reference on the Humanoid Specificities. */
       CjrlHumanoidDynamicRobot * m_HS;
       
-  // Find the convex hull for each of the position,
-  // in order to create the corresponding trajectory.
-  ComputeConvexHull aCH;
-  double lLeftFootHalfWidth,lLeftFootHalfHeight,lLeftFootHalfHeightDS,
-    lRightFootHalfWidth,lRightFootHalfHeight,lRightFootHalfHeightDS,lZ;
+      std::vector<CH_Point> CHLeftFPosConstr;
+      std::vector<CH_Point> CHRightFPosConstr;
 
-  double DSFeetDistance;
+      // Find the convex hull for each of the position,
+      // in order to create the corresponding trajectory.
+      double lLeftFootHalfWidth,lLeftFootHalfHeight,lLeftFootHalfHeightDS,
+	lRightFootHalfWidth,lRightFootHalfHeight,lRightFootHalfHeightDS,lZ;
+      
+      double DSFeetDistance;
+      
+      // Read humanoid specificities.
+      CjrlFoot * lRightFoot;
+      vector3d AnklePosition;
+      CjrlFoot * lLeftFoot;
   
-  // Read humanoid specificities.
-  CjrlFoot * lRightFoot;
-  vector3d AnklePosition;
-  CjrlFoot * lLeftFoot;
-  
-  int State; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
-  // 3: Double Support.
-  int ComputeCH;
-  float lx, ly;
-
-  double prev_xmin, prev_xmax, prev_ymin, prev_ymax;
-  
-
-  double s_t,c_t;
-
+      int State; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
+      // 3: Double Support.
+      int ComputeCH;
+      float lx, ly;
+      
+      double prev_xmin, prev_xmax, prev_ymin, prev_ymax;
+      
+      double s_t,c_t;
+      
     };
 };
 #endif /* _fOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_ */
