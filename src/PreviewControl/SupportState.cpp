@@ -43,7 +43,7 @@ SupportState::SupportState(const double &SamplingDuration)
 
   // printf("Leaving SupportState \n");
 }
-
+ 
 
 SupportState::~SupportState()
 {
@@ -83,7 +83,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
       *SupportTimeLimit = Time+DSSSDuration; 
     }
  
-  
+   
   //FSM
   if(Time+eps+pi*T >= *SupportTimeLimit)
     {

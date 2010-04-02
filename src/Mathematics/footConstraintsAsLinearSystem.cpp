@@ -103,17 +103,17 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   //Andremize: Scilab feet
   lLeftFootHalfHeight = 0.069-0.02;
   lRightFootHalfHeight = 0.069-0.02;
-
+  
   lLeftFootHalfWidth = 0.1206-0.02;
   lRightFootHalfWidth = 0.1206-0.02;
- 
+  
   DSFeetDistance = 0.2;
   lLeftFootHalfHeightDS = lLeftFootHalfHeight+DSFeetDistance/2.0; 
   lRightFootHalfHeightDS = lRightFootHalfHeight+DSFeetDistance/2.0; 
+  
+   ConvexHullFP.resize(5);
 
-  ConvexHullFP.resize(5);
-
-  initFPConstrArrays();
+  //initFPConstrArrays();
 
   RESETDEBUG4("Constraints-fCSALS.dat");
  
@@ -136,22 +136,22 @@ footConstraintsAsLinearSystem::~footConstraintsAsLinearSystem()
   //   delete [] CHFPosConstrArrayY;
 }
 
-void footConstraintsAsLinearSystem::initFPConstrArrays()
-{
+// void footConstraintsAsLinearSystem::initFPConstrArrays()
+// {
 
-  CHLeftFPosConstrArrayX[0]=-0.3;CHLeftFPosConstrArrayX[1]=-0.2;CHLeftFPosConstrArrayX[2]=0.0;
-  CHLeftFPosConstrArrayX[3]=0.2;CHLeftFPosConstrArrayX[4]=0.3;
+//   // CHLeftFPosConstrArrayX[0]=-0.3;CHLeftFPosConstrArrayX[1]=-0.2;CHLeftFPosConstrArrayX[2]=0.0;
+//   // CHLeftFPosConstrArrayX[3]=0.2;CHLeftFPosConstrArrayX[4]=0.3;
 
-  CHLeftFPosConstrArrayY[0]=0.15;CHLeftFPosConstrArrayY[1]=0.3;CHLeftFPosConstrArrayY[2]=0.4;
-  CHLeftFPosConstrArrayY[3]=0.3;CHLeftFPosConstrArrayY[4]=0.15;
+//   CHLeftFPosConstrArrayY[0]=0.15;CHLeftFPosConstrArrayY[1]=0.3;CHLeftFPosConstrArrayY[2]=0.4;
+//   CHLeftFPosConstrArrayY[3]=0.3;CHLeftFPosConstrArrayY[4]=0.15;
 
-  CHRightFPosConstrArrayX[0]=-0.3;CHRightFPosConstrArrayX[1]=-0.2;CHRightFPosConstrArrayX[2]=0.0;
-  CHRightFPosConstrArrayX[3]=0.2;CHRightFPosConstrArrayX[4]=0.3;
+//   CHRightFPosConstrArrayX[0]=-0.3;CHRightFPosConstrArrayX[1]=-0.2;CHRightFPosConstrArrayX[2]=0.0;
+//   CHRightFPosConstrArrayX[3]=0.2;CHRightFPosConstrArrayX[4]=0.3;
 
-  CHRightFPosConstrArrayY[0]=-0.15;CHRightFPosConstrArrayY[1]=-0.3;CHRightFPosConstrArrayY[2]=0.4;
-  CHRightFPosConstrArrayY[3]=-0.3;CHRightFPosConstrArrayY[4]=-0.15;
+//   CHRightFPosConstrArrayY[0]=-0.15;CHRightFPosConstrArrayY[1]=-0.3;CHRightFPosConstrArrayY[2]=0.4;
+//   CHRightFPosConstrArrayY[3]=-0.3;CHRightFPosConstrArrayY[4]=-0.15;
 
-}
+// }
 
 int footConstraintsAsLinearSystem::FindSimilarConstraints(MAL_MATRIX(&A,double),
 							  vector<int> &SimilarConstraints)
@@ -202,6 +202,9 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
 						       )
 {
   // printf("Entered computeLinearSystem \n");
+
+
+
 
   double dx,dy,dc,x1,y1,x2,y2;
   unsigned int n = aVecOfPoints.size();
@@ -319,9 +322,14 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 
   float *lxcoefs, *lycoefs;
 
+  float CHLeftFPosConstrArrayX[5] = {-0.3, -0.2, 0.0, 0.2, 0.3};
+  float CHLeftFPosConstrArrayY[5] = {0.15, 0.3, 0.4, 0.3, 0.15};
+  float CHRightFPosConstrArrayX[5] = {-0.3, -0.2, 0.0, 0.2, 0.3};
+  float CHRightFPosConstrArrayY[5] = {-0.15, -0.3, -0.4, -0.3, -0.15};
+
   vector<CH_Point> TheConvexHull;
 
-
+ 
   // Going through the set of generated data for each 5 ms.
   // from this extract a set of linear constraints.
   for(unsigned int i=1;i<=m_QP_N;i++)
@@ -401,42 +409,42 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 					FootHalfHeight * c_t ); 
 	}
 	
-      // if(Support->StateChanged && Support->StepNumber>0)
-      // 	{
-      // 	  //Andremize: theta == 0
-      // 	  lx = 0.0;
-      // 	  ly = 0.0;
-      // 	  //Andremize: Has to be the angle of the previous foot
-      // 	  s_t = 0.0;
-      // 	  c_t = 0.0;
+      if(Support->StateChanged && Support->StepNumber>0)
+      	{
+      	  //Andremize: theta == 0
+      	  lx = 0.0;
+      	  ly = 0.0;
+      	  //Andremize: Has to be the angle of the previous foot
+      	  s_t = 0.0;
+      	  c_t = 1.0;
 
-      // 	  if(Support->PrwSupportFoot == 1)
-      // 	    {
-      // 	      CHFPosConstrArrayX = CHLeftFPosConstrArrayX;
-      // 	      CHFPosConstrArrayY = CHLeftFPosConstrArrayY;
-      // 	    }
-      // 	  else
-      // 	    {
-      // 	      CHFPosConstrArrayX = CHRightFPosConstrArrayX;
-      // 	      CHFPosConstrArrayY = CHRightFPosConstrArrayY;
-      // 	    }
+      	  if(Support->PrwSupportFoot == 1)
+      	    {
+      	      CHFPosConstrArrayX = CHLeftFPosConstrArrayX;
+      	      CHFPosConstrArrayY = CHLeftFPosConstrArrayY;
+      	    }
+      	  else
+      	    {
+      	      CHFPosConstrArrayX = CHRightFPosConstrArrayX;
+      	      CHFPosConstrArrayY = CHRightFPosConstrArrayY;
+      	    }
 
-      // 	  //Andremize: The interior border does not yet depend on the angle
-      // 	  for(unsigned j=0;j<5;j++)
-      // 	    {
-      // 	      ConvexHullFP[j].col = lx + ( CHFPosConstrArrayX[j] * c_t - CHFPosConstrArrayY[j] * s_t );
-      // 	      ConvexHullFP[j].row = ly + ( CHFPosConstrArrayX[j] * s_t + CHFPosConstrArrayY[j] * c_t );
-      // 	    }
+      	  //Andremize: The interior border does not yet depend on the angle
+      	  for(unsigned j=0;j<5;j++)
+      	    {
+      	      ConvexHullFP[j].col = lx + ( CHFPosConstrArrayX[j] * c_t - CHFPosConstrArrayY[j] * s_t );
+      	      ConvexHullFP[j].row = ly + ( CHFPosConstrArrayX[j] * s_t + CHFPosConstrArrayY[j] * c_t );
+      	    }
 
-      // 	  LinearConstraintInequalityFreeFeet_t * aLCIFP = new LinearConstraintInequalityFreeFeet_t;
+      	  LinearConstraintInequalityFreeFeet_t * aLCIFP = new LinearConstraintInequalityFreeFeet_t;
 
-      // 	  computeLinearSystem(ConvexHullFP, aLCIFP->D, aLCIFP->Dc, Support);
+      	  computeLinearSystem(ConvexHullFP, aLCIFP->D, aLCIFP->Dc, Support);
 
-      // 	  aLCIFP->StepNumber = Support->StepNumber;
+      	  aLCIFP->StepNumber = Support->StepNumber;
 
-      // 	  QueueOfFeetPosInequalities.push_back(aLCIFP);
-      // 	  printf("here \n");
-      // 	}
+      	  QueueOfFeetPosInequalities.push_back(aLCIFP);
+
+      	}
       
       // Linear Constraint Inequality
       LinearConstraintInequalityFreeFeet_t * aLCI = new LinearConstraintInequalityFreeFeet_t;

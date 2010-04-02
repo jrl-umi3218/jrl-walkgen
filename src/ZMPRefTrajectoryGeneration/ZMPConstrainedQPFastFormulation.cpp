@@ -2243,7 +2243,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   //     LCI_it++;
   //   }
   QueueOfLConstraintInequalities.clear();  
-QueueOfLConstraintInequalitiesFreeFeet.clear();  
+// QueueOfLConstraintInequalitiesFreeFeet.clear();  
   
   
   // SF_it = QueueOfSupportFeet.begin();

@@ -109,11 +109,13 @@ namespace PatternGeneratorJRL
       CjrlHumanoidDynamicRobot * m_HS;
       
       std::vector<CH_Point> ConvexHullFP;
-      float CHLeftFPosConstrArrayX[];
-      float CHLeftFPosConstrArrayY[];
+
+      //Andremize: Caused memory errors when initialized in the constructor
+      /* float CHLeftFPosConstrArrayX[5]; */
+      /* float CHLeftFPosConstrArrayY[5]; */
       
-      float CHRightFPosConstrArrayX[];
-      float CHRightFPosConstrArrayY[];
+      /* float CHRightFPosConstrArrayX[5]; */
+      /* float CHRightFPosConstrArrayY[5]; */
       
       float* CHFPosConstrArrayX; 
       float* CHFPosConstrArrayY;
