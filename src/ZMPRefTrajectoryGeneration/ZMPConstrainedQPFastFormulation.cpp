@@ -1359,8 +1359,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 
   
   //deque<LinearConstraintInequality_t *>::iterator LCI_it, store_it;//Olivier
-  deque<LinearConstraintInequalityFreeFeet_t *>::iterator LCIFF_it, storeFF_it, VFF_it;
-  LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin();
+
   //LCI_it = QueueOfLConstraintInequalities.begin();//Olivier
   /*//LCI_it starts always at the beginning of the queue
   while (LCI_it!=QueueOfLConstraintInequalitiesFreeFeet.end())
@@ -1374,7 +1373,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
     }
   */
   //store_it = LCI_it;//Olivier
-  storeFF_it = LCIFF_it;
+  // storeFF_it = LCIFF_it;
   
   /*See above
   // Did not find the appropriate Linear Constraint.
@@ -1402,9 +1401,11 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
       RESETDEBUG6("FFP.dat");
     }
 
+  deque<LinearConstraintInequalityFreeFeet_t *>::iterator LCIFF_it;//, storeFF_it, VFF_it;
 
   // Is better kept for the case when the number of constraints is less predictable
   // Compute first the number of constraint.
+  LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin();
   unsigned int IndexConstraint=0;
   for(unsigned int i=0;i<N;i++)
     {
@@ -1415,7 +1416,22 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
       IndexConstraint += MAL_MATRIX_NB_ROWS((*LCIFF_it)->D);
       LCIFF_it++;
     }  
+  if(Support->StepNumber>0)
+    {
+      LCIFF_it = QueueOfFeetPosInequalities.begin();
+      for(unsigned int i=0;i<N;i++)
+	{
+	  if (LCIFF_it==QueueOfFeetPosInequalities.end())
+	    {
+	      break;
+	    }
+	  IndexConstraint += MAL_MATRIX_NB_ROWS((*LCIFF_it)->D);
+	  LCIFF_it++;
+	}  
+    }
+
   NbOfConstraints = IndexConstraint;
+  
   
   MAL_MATRIX(lD,double);
   MAL_MATRIX_RESIZE(lD,NbOfConstraints,2*(N+Support->StepNumber));
@@ -1491,7 +1507,7 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
   IndexConstraint = 0;
   ODEBUG("Starting Matrix to build the constraints. ");
   ODEBUG((*LCIFF_it)->D );
-  //
+  //ZMP constraints
   for(unsigned int i=0;i<N;i++)
     {
       if((*LCIFF_it)->StepNumber==0)
@@ -1587,6 +1603,105 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
       LCIFF_it++;
     }
 
+  //Feet position constraints
+  LCIFF_it = QueueOfFeetPosInequalities.begin();
+  for(unsigned int i=0;i<Support->StepNumber;i++)
+    {
+      if((*LCIFF_it)->StepNumber==1)
+	{
+	  FFPx = (*CurSF_it)->x;
+	  FFPy = (*CurSF_it)->y;
+	  cout<<FFPx<<" "<<FFPy<<endl;
+	}
+      else
+	{
+	  FFPx = 0.0;
+	  FFPy = 0.0;
+	}
+      
+      aof.open("FFP.dat",ios::app);
+      aof << "FFPx: "<<FFPx << " " << "FFPy: "<<FFPy<<"(*LCIFF_it)->StepNumber: "<<(*LCIFF_it)->StepNumber;
+      aof << endl;
+      aof.close();
+  
+      // For each constraint.
+      for(unsigned j=0;j<MAL_MATRIX_NB_ROWS((*LCIFF_it)->D);j++)
+	{
+	  cout<<" D("<<j<<",0): " <<(*LCIFF_it)->D(j,0);
+	  cout<<" D("<<j<<",1): " <<(*LCIFF_it)->D(j,1);
+	  cout<<" Dc("<<j<<"): " <<(*LCIFF_it)->Dc(j,0)<<" FFPx"<<IndexConstraint<<" :"<<FFPx<<" FFPy"<<IndexConstraint<<" :"<<FFPy;
+	  // Verification of constraints.
+	  DS[IndexConstraint] = 
+	    // X Axis * A
+	    FFPx * (*LCIFF_it)->D(j,0)
+	    + 
+	    // Y Axis * A
+	    FFPy * (*LCIFF_it)->D(j,1)
+	    // Constante part of the constraint
+	    + (*LCIFF_it)->Dc(j,0);
+	  cout<<" DS"<<IndexConstraint<<" :"<<DS[IndexConstraint]<<endl;
+	  //   ODEBUG6(DS[IndexConstraint] << " " << (*LCIFF_it)->D(j,0)  << " "
+	  // 	    << (*LCIFF_it)->D[j][1] << " " << (*LCIFF_it)->Dc(j,0) ,Buffer);
+	  // ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer2);
+	  // ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer3);
+
+	  //m_SimilarConstraints[IndexConstraint]=(*LCIFF_it)->SimilarConstraints[j];
+
+	  // if (m_FastFormulationMode==QLD)
+	  //   {
+	  //     // In this case, Pu is triangular.
+	  //     // so we can speed up the computation.
+	  //     for(unsigned k=0;k<=i;k++)
+	  // 	{
+	  // 	  // X axis
+	  // 	  DU[IndexConstraint+k*(NbOfConstraints+1)] = 
+	  // 	    -(*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
+
+	  // 	  // Y axis
+	  // 	  DU[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
+	  // 	    -(*LCIFF_it)->D(j,1)*m_Pu[k*N+i];
+	  // 	}
+	  //   }
+	  // else if ((m_FastFormulationMode==QLDANDLQ)||
+	  // 	   (m_FastFormulationMode==PLDP))
+	  //   {
+	  //     // In this case, Pu is *NOT* triangular.
+	  //     for(unsigned k=0;k<N;k++)
+	  // 	{
+	  // 	  // X axis
+	  // 	  DU[IndexConstraint+k*(NbOfConstraints+1)] = 
+	  // 	    -(*LCIFF_it)->D(j,0)*m_Pu[k*N+i];
+	  // 	  // Y axis
+	  // 	  DU[IndexConstraint+(k+N)*(NbOfConstraints+1)] = 
+	  // 	    -(*LCIFF_it)->D(j,1)*m_Pu[k*N+i];	      
+	  // 	}
+	  //   }
+
+	  //Foot variables after jerk: [dddX,dddY,FPx,FPy]
+	  if((*LCIFF_it)->StepNumber==1)
+	    {
+	      DU[IndexConstraint+(2*N+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
+	  	(*LCIFF_it)->D(j,0);
+	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
+	  	(*LCIFF_it)->D(j,1);
+	    }
+	  if((*LCIFF_it)->StepNumber>1)
+	    {
+	      DU[IndexConstraint+(2*N+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
+	  	(*LCIFF_it)->D(j,0);
+	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-2)*(NbOfConstraints+1)] = 
+	  	-(*LCIFF_it)->D(j,0);
+	      DU[IndexConstraint+(2*N+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
+	  	(*LCIFF_it)->D(j,1);
+	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-2)*(NbOfConstraints+1)] = 
+	  	-(*LCIFF_it)->D(j,1);
+	    }
+	  ODEBUG("IC: " << IndexConstraint );
+	  IndexConstraint++;
+	}
+      // printf("DUindex: %d  ",N+(*LCIFF_it)->StepNumber);
+      LCIFF_it++;
+    }
   
   ODEBUG6("Index Constraint :"<< IndexConstraint,Buffer);
   static double localtime = -m_QP_T;
