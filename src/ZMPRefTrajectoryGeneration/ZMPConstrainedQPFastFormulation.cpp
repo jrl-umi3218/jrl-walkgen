@@ -1681,20 +1681,20 @@ int ZMPConstrainedQPFastFormulation::buildConstraintMatrices(double * &DS,double
 	  if((*LCIFF_it)->StepNumber==1)
 	    {
 	      DU[IndexConstraint+(2*N+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
-	  	(*LCIFF_it)->D(j,0);
+	  	-(*LCIFF_it)->D(j,0);
 	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
-	  	(*LCIFF_it)->D(j,1);
+	  	-(*LCIFF_it)->D(j,1);
 	    }
 	  if((*LCIFF_it)->StepNumber>1)
 	    {
 	      DU[IndexConstraint+(2*N+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
-	  	(*LCIFF_it)->D(j,0);
-	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-2)*(NbOfConstraints+1)] = 
 	  	-(*LCIFF_it)->D(j,0);
-	      DU[IndexConstraint+(2*N+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
-	  	(*LCIFF_it)->D(j,1);
-	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-2)*(NbOfConstraints+1)] = 
+	      DU[IndexConstraint+(2*N+(*LCIFF_it)->StepNumber-2)*(NbOfConstraints+1)] = 
+	  	(*LCIFF_it)->D(j,0);
+	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = 
 	  	-(*LCIFF_it)->D(j,1);
+	      DU[IndexConstraint+(2*N+Support->StepNumber+(*LCIFF_it)->StepNumber-2)*(NbOfConstraints+1)] = 
+	  	(*LCIFF_it)->D(j,1);
 	    }
 	  ODEBUG("IC: " << IndexConstraint );
 	  IndexConstraint++;
@@ -1956,7 +1956,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
  //-----------------------------------
   printf("Inside the 'Real-time' loop: \n");
  for(double StartingTime=0.0;
-     StartingTime<= 2.0;
+     StartingTime<= 1.0;
       StartingTime+=T,li++)
     {
 

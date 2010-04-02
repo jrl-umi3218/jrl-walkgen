@@ -323,9 +323,9 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
   float *lxcoefs, *lycoefs;
 
   float CHLeftFPosConstrArrayX[5] = {-0.3, -0.2, 0.0, 0.2, 0.3};
-  float CHLeftFPosConstrArrayY[5] = {0.15, 0.3, 0.4, 0.3, 0.15};
+  float CHLeftFPosConstrArrayY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
   float CHRightFPosConstrArrayX[5] = {-0.3, -0.2, 0.0, 0.2, 0.3};
-  float CHRightFPosConstrArrayY[5] = {-0.15, -0.3, -0.4, -0.3, -0.15};
+  float CHRightFPosConstrArrayY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
 
   vector<CH_Point> TheConvexHull;
 
