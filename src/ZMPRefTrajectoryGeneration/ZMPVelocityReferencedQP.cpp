@@ -98,7 +98,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_Beta = 1;//1000.0;
 
   InitConstants();
-
+  
+  InitFeet();
   // PLDP Solver needs iPu and Px.
 
   m_SimilarConstraints.resize(8*m_QP_N);
@@ -746,6 +747,29 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfConstraintMatrices()
 
   delete [] lInterPu;
   return 0;
+}
+
+void ZMPVelocityReferencedQP::initializeFeet()
+{
+
+  //Define the initial coordinates of the feet 
+  //This might be done when creating SupportState 
+  SupportFeet_t * aSFLeft = new SupportFeet_t;
+  SupportFeet_t * aSFRight = new SupportFeet_t;
+  aSFLeft->x = 0.0;
+  aSFLeft->y = 0.1;//Andremize
+  aSFLeft->theta = 0.0;
+  aSFLeft->StartTime = 0.0;
+  aSFLeft->SupportFoot = 1;
+  aSFRight->x = 0.0;
+  aSFRight->y = -0.1;//Andremize
+  aSFRight->theta = 0.0;
+  aSFRight->StartTime = 0.0;
+  aSFRight->SupportFoot = -1;
+
+  QueueOfSupportFeet.push_back(aSFLeft);
+  QueueOfSupportFeet.push_back(aSFRight);
+
 }
 
 
@@ -1872,26 +1896,9 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
   deque<LinearConstraintInequalityFreeFeet_t *> QueueOfFeetPosInequalities;
 
   //Queue of the actual and past support feet
-  deque<SupportFeet_t *> QueueOfSupportFeet;
+  
   deque<SupportFeet_t *>::iterator SF_it;
 
-  //Define the initial coordinates of the feet 
-  //This might be done when creating SupportState 
-  SupportFeet_t * aSFLeft = new SupportFeet_t;
-  SupportFeet_t * aSFRight = new SupportFeet_t;
-  aSFLeft->x = 0.0;
-  aSFLeft->y = 0.1;//Andremize
-  aSFLeft->theta = 0.0;
-  aSFLeft->StartTime = 0.0;
-  aSFLeft->SupportFoot = 1;
-  aSFRight->x = 0.0;
-  aSFRight->y = -0.1;//Andremize
-  aSFRight->theta = 0.0;
-  aSFRight->StartTime = 0.0;
-  aSFRight->SupportFoot = -1;
-
-  QueueOfSupportFeet.push_back(aSFLeft);
-  QueueOfSupportFeet.push_back(aSFRight);
 
   double FPx, FPy, FPtheta;
   FPx = 0.0; 
