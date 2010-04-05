@@ -1005,8 +1005,8 @@ namespace PatternGeneratorJRL {
     else if (aCmd==":HerdtOnline")
       {
 	m_InternalClock = 0.0;
-	//ReadSequenceOfSteps(strm);
-	// // StartOnLineStepSequencing();
+	setReference(strm);
+	m_ZMPVRQP->Online = 1;
       }
 
     else if (aCmd==":readfilefromkw")
@@ -1130,8 +1130,8 @@ namespace PatternGeneratorJRL {
 
   {
 
-    // printf("Entered RunOneStepOfTheControlLoop \n");
     m_InternalClock+=m_SamplingPeriod;
+    
 
     if ((!m_ShouldBeRunning) ||
 	(m_GlobalStrategyManager->EndOfMotion()<0))
@@ -1143,7 +1143,7 @@ namespace PatternGeneratorJRL {
 	ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
 	       "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
 	*/
-	return false;
+	return false;//Andremize
       }
     ODEBUG("Here");
 
@@ -1188,6 +1188,17 @@ namespace PatternGeneratorJRL {
 	  }
       }
     
+    if (m_AlgorithmforZMPCOM==ZMPCOM_HERDT_2010 && m_ZMPVRQP->Online==1)
+      {
+	ODEBUG("InternalClock:" <<m_InternalClock  << 
+	       " SamplingPeriod: "<<m_SamplingPeriod);
+	
+	m_ZMPVRQP->OnLine(m_InternalClock,
+		       m_ZMPPositions,
+		       m_COMBuffer,
+		       m_LeftFootPositions,
+		       m_RightFootPositions);
+      }
 
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,
 						    RightFootPosition,
@@ -1196,7 +1207,6 @@ namespace PatternGeneratorJRL {
 						    CurrentConfiguration,
 						    CurrentVelocity,
 						    CurrentAcceleration);
-
 
     // New scheme:
     // Update the queue of ZMP ref
