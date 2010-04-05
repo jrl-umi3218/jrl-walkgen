@@ -21,8 +21,8 @@ enum Profiles_t  {
   PROFIL_ANALYTICAL_ONLINE_WALKING,                  // 14
   PROFIL_ONLINE_WALKING,                             // 15
   PROFIL_SIMU_ONLINE_WALKING,                        // 16
-  PROFIL_ANDREI,										 // 17
-  PROFIL_ANDREI_ONLINE									 // 18
+  PROFIL_HERDT,										 // 17
+  PROFIL_HERDT_ONLINE									 // 18
 };
 
 std::string ProfilesNames[19] = {
@@ -43,8 +43,8 @@ std::string ProfilesNames[19] = {
   "PROFIL_ANALYTICAL_ONLINE_WALKING",                  
   "PROFIL_ONLINE_WALKING",                             
   "PROFIL_SIMU_ONLINE_WALKING",
-  "PROFIL_ANDREI",
-  "PROFIL_ANDREI_ONLINE"
+  "PROFIL_HERDT",
+  "PROFIL_HERDT_ONLINE"
 };
 
 enum InitialPoses_t {

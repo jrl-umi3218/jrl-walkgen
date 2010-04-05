@@ -308,11 +308,11 @@ void StraightWalkingPBW(PatternGeneratorInterface &aPGI)
 
 }
 
-void Andrei(PatternGeneratorInterface &aPGI)
+void Herdt(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
   {
-    istringstream strm2(":SetAlgoForZmpTrajectory Andrei");
+    istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
     aPGI.ParseCmd(strm2);
   }
 
@@ -616,17 +616,17 @@ void StartSimuOnLineWalking(PatternGeneratorInterface &aPGI)
   }
 }
 
-void WalkingWithoutThinkingOnline(PatternGeneratorInterface &aPGI)
+void HerdtOnline(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
 
   {
-    istringstream strm2(":SetAlgoForZmpTrajectory Andrei");
+    istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
     aPGI.ParseCmd(strm2);
   }
 
   {
-    istringstream strm2(":WalkingWithoutThinkinOnline 0.1 0.0 0.0");
+    istringstream strm2(":HerdtOnline 0.1 0.0 0.0");
     aPGI.ParseCmd(strm2);
   }
 }
@@ -733,10 +733,9 @@ void SteppingOver(PatternGeneratorInterface &aPGI)
 int main(int argc, char *argv[])
 {
 
-
   //unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
   //  unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
-  unsigned int TestProfil=PROFIL_ANDREI;
+   unsigned int TestProfil=PROFIL_HERDT;
   string PCParametersFile;
   string VRMLPath;
   string VRMLFileName;
@@ -1018,12 +1017,12 @@ int main(int argc, char *argv[])
 	  StraightWalkingDimitrov(*aPGI);
 	  break;
 
-	case PROFIL_ANDREI:
-	  Andrei(*aPGI);
+	case PROFIL_HERDT:
+	  Herdt(*aPGI);
 	  break;
 	  
-	case PROFIL_ANDREI_ONLINE:
-		WalkingWithoutThinkingOnline(*aPGI);
+	case PROFIL_HERDT_ONLINE:
+		HerdtOnline(*aPGI);
 	  break;
 
 	case PROFIL_CURVED_WALKING_DIMITROV:

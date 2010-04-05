@@ -37,6 +37,7 @@ SET(libwpg_src
 	./ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp 
+	./ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp 
 	./ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.cpp 
