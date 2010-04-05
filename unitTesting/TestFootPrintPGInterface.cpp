@@ -616,6 +616,22 @@ void StartSimuOnLineWalking(PatternGeneratorInterface &aPGI)
   }
 }
 
+void WalkingWithoutThinkingOnline(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+
+  {
+    istringstream strm2(":SetAlgoForZmpTrajectory Andrei");
+    aPGI.ParseCmd(strm2);
+  }
+
+  {
+    istringstream strm2(":WalkingWithoutThinkinOnline 0.1 0.0 0.0");
+    aPGI.ParseCmd(strm2);
+  }
+}
+
+
 void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
@@ -1003,9 +1019,13 @@ int main(int argc, char *argv[])
 	  break;
 
 	case PROFIL_ANDREI:
-		Andrei(*aPGI);
+	  Andrei(*aPGI);
 	  break;
 	  
+	case PROFIL_ANDREI_ONLINE:
+		WalkingWithoutThinkingOnline(*aPGI);
+	  break;
+
 	case PROFIL_CURVED_WALKING_DIMITROV:
 	  CurvedWalkingDimitrov(*aPGI);
 	  break;
