@@ -315,12 +315,6 @@ namespace PatternGeneratorJRL {
       delete m_StepStackHandler;
     ODEBUG4("Destructor: did m_StepStackHandler","DebugPGI.txt");
 
-
-
-    if (m_HumanoidDynamicRobot!=0)
-      delete m_HumanoidDynamicRobot;
-    ODEBUG4("Destructor: did m_HumanoidDynamicRobot","DebugPGI.txt");
-
     if (m_GMFKW!=0)
       delete m_GMFKW;
     ODEBUG4("Destructor: did m_GMKFW","DebugPGI.txt");
