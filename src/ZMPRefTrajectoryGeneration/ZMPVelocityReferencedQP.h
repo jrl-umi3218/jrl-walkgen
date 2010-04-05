@@ -291,7 +291,11 @@ namespace PatternGeneratorJRL
     static const unsigned int QLDANDLQ=1;
     static const unsigned int PLDP=2;
 
+    unsigned int Online;//Andremize: Shall I keep it?
+
   private:
+
+    deque<SupportFeet_t *> QueueOfSupportFeet;
 
     /*! Uses a ZMPDiscretization scheme to get the usual Kajita heuristic. */
     ZMPDiscretization * m_ZMPD;
@@ -315,6 +319,7 @@ namespace PatternGeneratorJRL
     
     /*! Com height */
     double m_ComHeight;
+
 
     /*! Sampling of the QP. */
     double m_QP_T;
