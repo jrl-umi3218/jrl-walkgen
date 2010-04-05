@@ -113,6 +113,19 @@ namespace PatternGeneratorJRL
   };
   typedef struct SupportFeet_s 
     SupportFeet_t;
+
+  /// Structure to store the absolute reference.
+  struct ReferenceAbsoluteVelocity_t
+  { 
+    /*! m/sec or degrees/sec */
+    double x,y,z, theta; 
+
+    /*! reference values for the whole preview window */
+    MAL_VECTOR(RefVectorX,double);	
+    MAL_VECTOR(RefVectorY,double);
+    MAL_VECTOR(RefVectorTheta,double);
+  };
+  typedef struct ReferenceAbsoluteVelocity_t ReferenceAbsoluteVelocity;
   
 };
 #endif
