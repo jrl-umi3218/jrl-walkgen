@@ -31,6 +31,7 @@
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #include <ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.h>
 #include <ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.h>
+#include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.h>
 #include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.h>
 
 #include <MotionGeneration/ComAndFootRealizationByGeometry.h>
@@ -383,6 +384,9 @@ namespace PatternGeneratorJRL
 
     /*! QP formulation with constraints. */
     ZMPConstrainedQPFastFormulation * m_ZMPCQPFF;
+
+    /*! QP formulation with a velocity reference. */
+    ZMPVelocityReferencedQP * m_ZMPVRQP;
     
     /*! ZMP and CoM trajectories generation from an analytical formulation */
     AnalyticalMorisawaCompact * m_ZMPM;
@@ -560,6 +564,8 @@ namespace PatternGeneratorJRL
     /*! Using the QP constrained problem resolution proposed by Dimitrov in 2008. */
     static const int ZMPCOM_DIMITROV_2008=4;
     
+    /*! Using the velocity referenced QP proposed by Herdt in 2010. */
+    static const int ZMPCOM_HERDT_2010=5;
     /*! @} */
     /*! @} */
 

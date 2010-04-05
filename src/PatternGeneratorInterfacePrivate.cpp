@@ -154,7 +154,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()
   {
-    std::string aMethodName[12] = 
+    std::string aMethodName[13] = 
       {":LimitsFeasibility",
        ":ZMPShiftParameters",
        ":TimeDistributionParameters",
@@ -166,7 +166,8 @@ namespace PatternGeneratorJRL {
        ":SetAlgoForZmpTrajectory",
        ":SetAutoFirstStep",
        ":ChangeNextStep",
-       ":samplingperiod"};
+       ":samplingperiod",
+       ":HerdtOnline"};
     
     for(int i=0;i<12;i++)
       {
@@ -210,6 +211,9 @@ namespace PatternGeneratorJRL {
 
     // ZMP and CoM generation using the method proposed in Dimitrov2008.
     m_ZMPCQPFF = new ZMPConstrainedQPFastFormulation(this,"",m_HumanoidDynamicRobot);
+
+    // ZMP and CoM generation using the method proposed in Herdt2010.
+    m_ZMPVRQP = new ZMPVelocityReferencedQP(this,"",m_HumanoidDynamicRobot);
 
     // ZMP and CoM generation using the analytical method proposed in Morisawa2007.
     m_ZMPM = new AnalyticalMorisawaCompact(this);
@@ -283,6 +287,10 @@ namespace PatternGeneratorJRL {
     m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
     m_ZMPCQPFF->SetPreviewControl(m_PC);
     
+    m_ZMPVRQP->SetSamplingPeriod(m_PC->SamplingPeriod());
+    m_ZMPVRQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+    m_ZMPVRQP->SetPreviewControl(m_PC);
+
     m_ZMPM->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPM->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
     m_ZMPM->SetFeetTrajectoryGenerator(m_FeetTrajectoryGenerator);
@@ -350,6 +358,10 @@ namespace PatternGeneratorJRL {
     if (m_ZMPCQPFF!=0)
       delete m_ZMPCQPFF;
     ODEBUG4("Destructor: did m_ZMPQP","DebugPGI.txt");
+
+    if (m_ZMPVRQP!=0)
+      delete m_ZMPVRQP;
+    ODEBUG4("Destructor: did m_ZMPVRQP","DebugPGI.txt");
 
     if (m_ZMPM!=0)
       delete m_ZMPM;
@@ -990,6 +1002,13 @@ namespace PatternGeneratorJRL {
     else if (aCmd==":StopOnLineStepSequencing")
       StopOnLineStepSequencing();
 
+    else if (aCmd==":Herdt")
+      {
+	m_InternalClock = 0.0;
+	ReadSequenceOfSteps(strm);
+	StartOnLineStepSequencing();
+      }
+
     else if (aCmd==":readfilefromkw")
       m_ReadFileFromKineoWorks(strm);
 
@@ -1036,11 +1055,11 @@ namespace PatternGeneratorJRL {
 	m_GlobalStrategyManager = m_DoubleStagePCStrategy;
 	cout << "DIMITROV" << endl;
       }
-      else if (ZMPTrajAlgo=="Andrei")
+      else if (ZMPTrajAlgo=="Herdt")
       {
-	m_AlgorithmforZMPCOM = ZMPCOM_DIMITROV_2008;
+	m_AlgorithmforZMPCOM = ZMPCOM_HERDT_2010;
 	m_GlobalStrategyManager = m_DoubleStagePCStrategy;
-	cout << "Andrei" << endl;
+	cout << "Herdt" << endl;
       }
   }
 
@@ -1109,6 +1128,7 @@ namespace PatternGeneratorJRL {
 
   {
 
+    printf("Entered RunOneStepOfTheControlLoop \n");
     m_InternalClock+=m_SamplingPeriod;
 
     if ((!m_ShouldBeRunning) ||
@@ -1175,7 +1195,7 @@ namespace PatternGeneratorJRL {
 						    CurrentVelocity,
 						    CurrentAcceleration);
 
-    
+
     // New scheme:
     // Update the queue of ZMP ref
     m_count++;
