@@ -266,6 +266,9 @@ namespace PatternGeneratorJRL
       @{
     */
 
+    /*! Set the velocity reference */
+    void setReference(istringstream &strm);
+
     /*! Return \f$\alpha\f$ */
     const double & GetAlpha() const;
 
@@ -305,7 +308,8 @@ namespace PatternGeneratorJRL
     FootConstraintsAsLinearSystem * m_FCALS;
     footConstraintsAsLinearSystem * m_fCALS;
       
-
+    ReferenceAbsoluteVelocity RefVel;
+    
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;
     

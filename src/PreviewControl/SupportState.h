@@ -27,7 +27,7 @@ namespace PatternGeneratorJRL
     ~SupportState();
 	
     /*! \brief Initialize the previewed state. */
-    void setSupportState(const double &Time, const int &pi,  double Ref[3]);
+    void setSupportState(const double &Time, const int &pi,  const ReferenceAbsoluteVelocity & RefVel);
 	
 
 	

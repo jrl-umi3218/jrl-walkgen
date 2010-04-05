@@ -303,7 +303,7 @@ namespace PatternGeneratorJRL
     FootConstraintsAsLinearSystem * m_FCALS;
     footConstraintsAsLinearSystem * m_fCALS;
       
-
+    ReferenceAbsoluteVelocity RefVel;
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;
     
