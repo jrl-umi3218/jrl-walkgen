@@ -78,7 +78,7 @@ namespace PatternGeneratorJRL
 					    QueueOfLConstraintInequalities,
 					    std::deque<LinearConstraintInequalityFreeFeet_t *> &
 					    QueueOfFeetPosInequalities,
-					    double Ref[3],
+					    ReferenceAbsoluteVelocity & RefVel,
 					    double StartingTime,
 					    double m_QP_N,
 					    SupportState * Support);

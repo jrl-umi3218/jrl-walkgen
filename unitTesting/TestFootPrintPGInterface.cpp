@@ -323,7 +323,13 @@ void StraightWalkingPBW(PatternGeneratorInterface &aPGI)
 
 void Herdt(PatternGeneratorInterface &aPGI)
 {
-  CommonInitialization(aPGI);
+  CommonInitialization(aPGI);  
+
+  {
+    istringstream strm2(":setreference  0.1 0.0 0.0");
+    aPGI.ParseCmd(strm2);
+  }
+
   {
     istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
     aPGI.ParseCmd(strm2);
@@ -334,6 +340,7 @@ void Herdt(PatternGeneratorInterface &aPGI)
     istringstream strm2(":setdimitrovconstraint XY 0.07 0.05");
     aPGI.ParseCmd(strm2);
   }
+
 
   {
     istringstream strm2(":stepseq 0.0 -0.105 0.0 \
@@ -1032,7 +1039,7 @@ int main(int argc, char *argv[])
 	  break;
 	  
 	case PROFIL_HERDT_ONLINE:
-		HerdtOnline(*aPGI);
+	  HerdtOnline(*aPGI);
 	  break;
 
 	case PROFIL_CURVED_WALKING_DIMITROV:

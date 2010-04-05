@@ -1940,14 +1940,16 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
   m_2DLIPM->InitializeSystem();
 
   //Constant velocity reference
-  double Ref[3] = {0.1,0,1};
-
+  // double Ref[3] = {0.1,0,1};
+  ReferenceAbsoluteVelocity RefVel;
+  RefVel.x = 0.1;
+  RefVel.y = 0.0;
   //Andremize - only constant velocity
   //constant velocity for the whole preview window
   for(unsigned int i=0;i<N;i++)
-    VRef(i) = Ref[0];
+    VRef(i) = RefVel.x;
   for(unsigned int i=N;i<2*N;i++)
-    VRef(i) = Ref[1];
+    VRef(i) = RefVel.y;
 
 
  //----------"Real-time" loop---------
@@ -1989,7 +1991,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 
  
        
-      Support->setSupportState(StartingTime, 0, Ref);
+      Support->setSupportState(StartingTime, 0, RefVel);
 
 
 
@@ -2027,7 +2029,7 @@ int ZMPConstrainedQPFastFormulation::buildZMPTrajectoryFromFootTrajectory(deque<
 						 RightFootAbsolutePositions,
 						 QueueOfLConstraintInequalitiesFreeFeet,
 						 QueueOfFeetPosInequalities,
-						 Ref,
+						 RefVel,
 						 StartingTime,
 						 m_QP_N,
 						 Support);

@@ -218,6 +218,9 @@ namespace PatternGeneratorJRL
     /*! \brief Read a sequence of steps. */
     void ReadSequenceOfSteps(istringstream &strm);
     
+    /*! \brief Read a velocity reference. */
+    void setReference(istringstream &strm);
+
     /*! \name On-line steps related methods 
       @{
      */

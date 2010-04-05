@@ -302,7 +302,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 								     QueueOfLConstraintInequalitiesFreeFeet,
 								     deque<LinearConstraintInequalityFreeFeet_t *> &
 								     QueueOfFeetPosInequalities,
-								     double Ref[3],
+								     ReferenceAbsoluteVelocity & RefVel,
 								     double StartingTime,
 								     double m_QP_N,
 								     SupportState * Support)
@@ -335,7 +335,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
   for(unsigned int i=1;i<=m_QP_N;i++)
     {
       
-      Support->setSupportState(StartingTime, i, Ref);
+      Support->setSupportState(StartingTime, i, RefVel);
 
       ComputeCH=0;
       

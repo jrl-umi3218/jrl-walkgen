@@ -49,7 +49,7 @@ SupportState::~SupportState()
 {
 }
 
-void SupportState::setSupportState(const double &Time, const int &pi,  double Ref[3])
+void SupportState::setSupportState(const double &Time, const int &pi,  const ReferenceAbsoluteVelocity & RefVel)
 
 {
   // printf("Inside setSupportState \n");
@@ -73,11 +73,9 @@ void SupportState::setSupportState(const double &Time, const int &pi,  double Re
 
   
   ReferenceGiven = -1;
-  for(int i = 0; i<3; i++)
-    {
-      if(fabs(Ref[i])>0)
-	ReferenceGiven = 1;
-    }
+  if(fabs(RefVel.x)>0||fabs(RefVel.y)>0)//Andremize
+    ReferenceGiven = 1;
+    
   if(ReferenceGiven == 1 && *SupportPhase == 0 && (*SupportTimeLimit-Time-eps)>DSSSDuration)
     {
       *SupportTimeLimit = Time+DSSSDuration; 

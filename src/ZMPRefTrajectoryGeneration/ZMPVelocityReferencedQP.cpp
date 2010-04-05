@@ -41,7 +41,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   printf("Entered ZMPVelocityReferencedQP \n");
   m_Q = 0;
   m_Pu = 0;
-  m_FullDebug = 0;
+  m_FullDebug =3;
   m_FastFormulationMode = QLD;
 
   /*! Getting the ZMP reference from Kajita's heuristic. */
@@ -163,6 +163,14 @@ void ZMPVelocityReferencedQP::SetPreviewControl(PreviewControl *aPC)
 {
   m_ZMPD->SetPreviewControl(aPC);
 }
+
+void ZMPVelocityReferencedQP::setReference(istringstream &strm)
+{
+  strm >> RefVel.x;
+  strm >> RefVel.y;
+  strm >> RefVel.theta;
+}
+
 
 int ZMPVelocityReferencedQP::InitializeMatrixPbConstants()
 {
@@ -1940,14 +1948,14 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
   m_2DLIPM->InitializeSystem();
 
   //Constant velocity reference
-  double Ref[3] = {0.1,0,1};
+  // double Ref[3] = {0.1,0,1};
 
   //Andremize - only constant velocity
   //constant velocity for the whole preview window
   for(unsigned int i=0;i<N;i++)
-    VRef(i) = Ref[0];
+    VRef(i) = RefVel.x;
   for(unsigned int i=N;i<2*N;i++)
-    VRef(i) = Ref[1];
+    VRef(i) = RefVel.y;
 
 
  //----------"Real-time" loop---------
@@ -1985,12 +1993,8 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
 		  xk[2] << " " << xk[5] << " ", "Check2DLIPM_PLDP.dat");
 	}
       
-  
-
- 
        
-      Support->setSupportState(StartingTime, 0, Ref);
-
+      Support->setSupportState(StartingTime, 0, RefVel);
 
 
       if(Support->StateChanged == 1)
@@ -2027,7 +2031,7 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
 						 RightFootAbsolutePositions,
 						 QueueOfLConstraintInequalitiesFreeFeet,
 						 QueueOfFeetPosInequalities,
-						 Ref,
+						 RefVel,
 						 StartingTime,
 						 m_QP_N,
 						 Support);
