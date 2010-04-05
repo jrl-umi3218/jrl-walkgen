@@ -28,7 +28,7 @@ SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Set version
 #------------
-SET(PROJECT_VERSION 3.0.0)
+SET(PROJECT_VERSION 3.0.2.99)
 
 # Deal with OS specificities
 #---------------------------
@@ -60,12 +60,12 @@ SET(CMAKE_MODULE_PATH ${${PROJECT_NAME}_SOURCE_DIR}/CMakeModules)
 # -------------------------
 INCLUDE(FindPkgConfig)
 
-SET(DYNJRLJAPAN_REQUIRED_VERSION 1.15)
-pkg_check_modules(DYNJRLJAPAN REQUIRED dynamicsJRLJapan>=${DYNJRLJAPAN_REQUIRED_VERSION})
-SET(PROJECT_REQUIREMENTS "dynamicsJRLJapan >= ${DYNJRLJAPAN_REQUIRED_VERSION}")
+SET(ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION 1.15)
+pkg_check_modules(ABSTRACTROBOTDYNAMICS REQUIRED abstractRobotDynamics>=${ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION})
+SET(PROJECT_REQUIREMENTS "abstractRobotDynamics >= ${ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION}")
 
-EXEC_PROGRAM(${PKG_CONFIG_EXECUTABLE} ARGS  --variable=docdir dynamicsJRLJapan
-  OUTPUT_VARIABLE _dynamicsJRLJapan_DOCDIR)
+EXEC_PROGRAM(${PKG_CONFIG_EXECUTABLE} ARGS  --variable=docdir abstractRobotDynamics
+  OUTPUT_VARIABLE _abstractRobotDynamics_DOCDIR)
 
 SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} -I${${PROJECT_NAME}_SOURCE_DIR}")
 
@@ -78,11 +78,11 @@ IF(WIN32)
 	SET(${PROJECT_NAME}_src_CXXFLAGS "/D__STDC__ ${${PROJECT_NAME}_src_CXXFLAGS} ${WIN32_CXXFLAGS}")
 ENDIF(WIN32)
 
-FOREACH(option_cxxflags ${DYNJRLJAPAN_CFLAGS})
+FOREACH(option_cxxflags ${ABSTRACTROBOTDYNAMICS_CFLAGS})
   SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} ${option_cxxflags} ")
 ENDFOREACH(option_cxxflags)
 
-FOREACH(option_ldflags ${DYNJRLJAPAN_LDFLAGS})
+FOREACH(option_ldflags ${ABSTRACTROBOTDYNAMICS_LDFLAGS})
   SET(${PROJECT_NAME}_src_LDFLAGS "${option_ldflags} ${${PROJECT_NAME}_src_LDFLAGS}")
 ENDFOREACH(option_ldflags)
 
@@ -107,7 +107,6 @@ ENDIF(CMAKE_BUILD_TYPE MATCHES "RELEASE")
 # To deal with the headers.
 #--------------------------
 add_subdirectory(src)
-add_subdirectory(unitTesting)
 
 # Prepare the documentation
 # -------------------------
