@@ -140,6 +140,9 @@ namespace PatternGeneratorJRL
      */
     int InitConstants();
       
+    void initFeet();
+
+
     
     /*! Build the necessary matrices for the QP problem under linear inequality constraints. */
     int BuildConstraintMatrices(double * &Px, double * &DPu,
@@ -188,13 +191,13 @@ namespace PatternGeneratorJRL
     /*! \name Call method to handle on-line generation of ZMP reference trajectory. 
       @{*/
         
-    /*! Methods for on-line generation. (First version)
+    /*! Methods for on-line generation. (First version!)
       The queues will be updated as follows:
       - The first values necessary to start walking will be inserted.
       - The initial positions of the feet will be taken into account
       according to InitLeftFootAbsolutePosition and InitRightFootAbsolutePosition.
-      - The RelativeFootPositions stack will be taken into account,
-      - The starting COM Position.
+      - The RelativeFootPositions stack will NOT be taken into account,
+      - The starting COM Position will NOT be taken into account.
       Returns the number of steps which has been completely put inside 
       the queue of ZMP, and foot positions.
     */
@@ -207,7 +210,26 @@ namespace PatternGeneratorJRL
 		   deque<RelativeFootPosition> &RelativeFootPositions,
 		   COMPosition & lStartingCOMPosition,
 		   MAL_S3_VECTOR(,double) & lStartingZMPPosition);
-    
+
+    /* /\*! Methods for on-line generation. (First version!) */
+    /*   The queues will be updated as follows: */
+    /*   - The first values necessary to start walking will be inserted. */
+    /*   - The initial positions of the feet will be taken into account */
+    /*   according to InitLeftFootAbsolutePosition and InitRightFootAbsolutePosition. */
+    /*   - The RelativeFootPositions stack will NOT be taken into account, */
+    /*   - The starting COM Position will NOT be taken into account. */
+    /*   Returns the number of steps which has been completely put inside  */
+    /*   the queue of ZMP, and foot positions. */
+    /* *\/ */
+    /* int InitOnLine(deque<ZMPPosition> & FinalZMPPositions, */
+    /* 		   deque<COMPosition> & CoMPositions,		    */
+    /* 		   deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions, */
+    /* 		   deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions, */
+    /* 		   FootAbsolutePosition & InitLeftFootAbsolutePosition, */
+    /* 		   FootAbsolutePosition & InitRightFootAbsolutePosition, */
+    /* 		   COMPosition & lStartingCOMPosition, */
+    /* 		   MAL_S3_VECTOR(,double) & lStartingZMPPosition); */
+
     /* ! Methods to update the stack on-line by inserting a new foot position. */
     void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
 		       deque<ZMPPosition> & FinalZMPPositions,		
@@ -222,6 +244,15 @@ namespace PatternGeneratorJRL
 		deque<COMPosition> & CoMPositions,			     
 		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
+
+    /* void OnLine(double time, */
+    /* 		COMPosition aCOMState, */
+    /* 		ZMPPosition aZMPState, */
+    /* 		deque<ZMPPosition> & FinalZMPPositions, */
+    /* 		deque<COMPosition> & FinalCOMPositions, */
+    /* 		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions, */
+    /* 		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions); */
+
 
     /* ! \brief Method to change on line the landing position of a foot.
        @return If the method failed it returns -1, 0 otherwise.
@@ -295,7 +326,14 @@ namespace PatternGeneratorJRL
 
   private:
 
+    double m_FPx, m_FPy, m_FPtheta;
+    double m_StartTime;
+
+    double m_UpperTimeLimitToUpdate;
+
     deque<SupportFeet_t *> QueueOfSupportFeet;
+
+    double m_TimeBuffer;
 
     /*! Uses a ZMPDiscretization scheme to get the usual Kajita heuristic. */
     ZMPDiscretization * m_ZMPD;
