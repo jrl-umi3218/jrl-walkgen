@@ -23,20 +23,20 @@ SupportState::SupportState(const double &SamplingDuration)
   SSDuration = 0.8; 	  //Duration of one step
   DSDuration = 1e9;       //Duration of the DS phase
   DSSSDuration = 0.4;
-  NbOfStepsSSDS = 0;
+  NbOfStepsSSDS = 1;
 
   T = SamplingDuration;
   //Initial current state
   CurrentSupportPhase = 0;
   CurrentSupportFoot = 1;
   CurrentTimeLimit = 1000000000;
-  CurrentStepsLeft = 0;
+  CurrentStepsLeft = 1;
   StartSupportFoot = 1;
 
   eps = 0.00000001;
   StateChanged = 0;
 
-  s_FullDebug = 1;
+  s_FullDebug = 3;
 
   RESETDEBUG4("DebugSupportState.dat");
   ofstream aof("SupportStates.dat");
@@ -111,7 +111,6 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
 	  SSSS = 1;
 	  if (ReferenceGiven == -1)
 	    *SupportStepsLeft = *SupportStepsLeft-1;
-
 	}
     }
 
