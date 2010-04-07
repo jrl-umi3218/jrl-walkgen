@@ -168,7 +168,7 @@ namespace PatternGeneratorJRL {
        ":ChangeNextStep",
        ":samplingperiod",
        ":HerdtOnline",
-      ":setreference"};
+       ":setreference"};
     
     for(int i=0;i<14;i++)
       {
@@ -459,6 +459,39 @@ namespace PatternGeneratorJRL {
     // Read the data inside strm.
     m_ZMPVRQP->setReference(strm);
     
+  }
+
+  void PatternGeneratorInterfacePrivate::initOnlineHerdt()
+  {
+
+    COMPosition lStartingCOMPosition;
+    memset(&lStartingCOMPosition,0,sizeof(COMPosition));
+    MAL_S3_VECTOR(,double) lStartingZMPPosition;
+    MAL_VECTOR( BodyAnglesIni,double);
+
+    FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
+    memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
+    memset(&InitRightFootAbsPos,0,sizeof(InitRightFootAbsPos));
+    
+    vector<double> lCurrentJointValues;
+    MAL_VECTOR(lStartingWaistPose,double);
+
+    EvaluateStartingState(lStartingCOMPosition,
+			  lStartingZMPPosition,
+			  lStartingWaistPose,
+			  InitLeftFootAbsPos,
+			  InitRightFootAbsPos);
+    
+    deque<RelativeFootPosition> RelativeFootPositions;
+      m_ZMPVRQP->InitOnLine(m_ZMPPositions,
+			    m_COMBuffer,
+			    m_LeftFootPositions,
+			    m_RightFootPositions,
+			    InitLeftFootAbsPos,
+			    InitRightFootAbsPos,
+			    RelativeFootPositions,
+			    lStartingCOMPosition,
+			    lStartingZMPPosition);
   }
 
   void PatternGeneratorInterfacePrivate::m_StepSequence(istringstream &strm)
@@ -998,7 +1031,8 @@ namespace PatternGeneratorJRL {
 
     else if (aCmd==":setreference")
       {
-	m_InternalClock = 0.0;
+	printf("setreference \n");
+	//m_InternalClock = 0.0;
 	setReference(strm);
       }
 
@@ -1007,6 +1041,8 @@ namespace PatternGeneratorJRL {
 	m_InternalClock = 0.0;
 	setReference(strm);
 	m_ZMPVRQP->Online = 1;
+	initOnlineHerdt();
+	printf("Online \n");
       }
 
     else if (aCmd==":readfilefromkw")
@@ -1060,7 +1096,7 @@ namespace PatternGeneratorJRL {
       {
 	// m_AlgorithmforZMPCOM = ZMPCOM_DIMITROV_2008;
 	m_AlgorithmforZMPCOM = ZMPCOM_HERDT_2010;
-	m_GlobalStrategyManager = m_DoubleStagePCStrategy;
+	m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	cout << "Herdt" << endl;
       }
   }
@@ -1143,7 +1179,7 @@ namespace PatternGeneratorJRL {
 	ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
 	       "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
 	*/
-	return false;//Andremize
+	//return false;//Andremize
       }
     ODEBUG("Here");
 
@@ -1192,12 +1228,13 @@ namespace PatternGeneratorJRL {
       {
 	ODEBUG("InternalClock:" <<m_InternalClock  << 
 	       " SamplingPeriod: "<<m_SamplingPeriod);
-	
+
+
 	m_ZMPVRQP->OnLine(m_InternalClock,
-		       m_ZMPPositions,
-		       m_COMBuffer,
-		       m_LeftFootPositions,
-		       m_RightFootPositions);
+			  m_ZMPPositions,
+			  m_COMBuffer,
+			  m_LeftFootPositions,
+			  m_RightFootPositions);
       }
 
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,

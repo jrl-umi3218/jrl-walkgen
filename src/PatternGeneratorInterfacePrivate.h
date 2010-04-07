@@ -221,6 +221,9 @@ namespace PatternGeneratorJRL
     /*! \brief Read a velocity reference. */
     void setReference(istringstream &strm);
 
+    /*! \brief Initialize online mode of Herdt. */
+    void initOnlineHerdt();
+
     /*! \name On-line steps related methods 
       @{
      */
