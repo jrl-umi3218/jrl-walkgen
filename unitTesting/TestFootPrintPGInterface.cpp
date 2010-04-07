@@ -342,6 +342,14 @@ void Herdt(PatternGeneratorInterface &aPGI)
 
 }
 
+void Herdt_Stop(PatternGeneratorInterface &aPGI)
+{
+  {
+    istringstream strm2(":setreference  0.0 0.0 0.0");
+    aPGI.ParseCmd(strm2);
+  }
+}
+
 void StraightWalkingDimitrov(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
@@ -739,10 +747,11 @@ void SteppingOver(PatternGeneratorInterface &aPGI)
 
 int main(int argc, char *argv[])
 {
+  // unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
+  // unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
+   unsigned int TestProfil=PROFIL_HERDT_ONLINE;
+  //unsigned int TestProfil = PROFIL_STRAIGHT_WALKING_DIMITROV;
 
-  //unsigned int TestProfil=PROFIL_STRAIGHT_WALKING;
-  //  unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
-   unsigned int TestProfil=PROFIL_HERDT;
   string PCParametersFile;
   string VRMLPath;
   string VRMLFileName;
@@ -1179,6 +1188,17 @@ int main(int argc, char *argv[])
 		      TestChangeFoot=false;
 		  }
 	      }
+	    }
+
+		      
+	  if (TestProfil==PROFIL_HERDT_ONLINE)
+	    {
+	      if (NbOfIt>5*200) /* Stop after 5 seconds the on-line stepping */
+		{
+		  Herdt_Stop(*aPGI);
+		  if(NbOfIt > 7*200)
+		    ok=false;
+		}
 	    }
 
 	  TimeProfile[TimeProfileIndex] = ltime + timemodif;
