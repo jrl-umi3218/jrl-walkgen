@@ -13,6 +13,8 @@
 SET(libwpg_src
 	./FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp 
 	./FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp 
+	./FootTrajectoryGeneration/footTrajectoryGenerationAbstract.cpp 
+	./FootTrajectoryGeneration/footTrajectoryGenerationStandard.cpp 
 	./FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp 
 	./FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp 
 	./GlobalStrategyManagers/CoMAndFootOnlyStrategy.cpp 

@@ -23,6 +23,7 @@
 /* #include <Mathematics/PLDPSolver.h> */
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 #include <PreviewControl/SupportState.h>
+#include <FootTrajectoryGeneration/footTrajectoryGenerationStandard.h>
 
 namespace PatternGeneratorJRL
 {
@@ -247,7 +248,7 @@ namespace PatternGeneratorJRL
 
     /* void OnLine(double time, */
     /* 		COMPosition aCOMState, */
-    /* 		ZMPPosition aZMPState, */
+   /* 		ZMPPosition aZMPState, */
     /* 		deque<ZMPPosition> & FinalZMPPositions, */
     /* 		deque<COMPosition> & FinalCOMPositions, */
     /* 		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions, */
@@ -300,6 +301,9 @@ namespace PatternGeneratorJRL
     /*! Set the velocity reference */
     void setReference(istringstream &strm);
 
+    void interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+			 deque<FootAbsolutePosition> &RightFootAbsolutePositions);
+
     /*! Return \f$\alpha\f$ */
     const double & GetAlpha() const;
 
@@ -342,7 +346,7 @@ namespace PatternGeneratorJRL
     LinearizedInvertedPendulum2D * m_2DLIPM;
     
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
-    SupportState  * Support;
+    SupportState * Support;
 
     /*! \brief Object creating Linear inequalities constraints 
       based on the foot position. Those constraints are *NOT* the
@@ -350,6 +354,8 @@ namespace PatternGeneratorJRL
     FootConstraintsAsLinearSystem * m_FCALS;
     footConstraintsAsLinearSystem * m_fCALS;
       
+    footTrajectoryGenerationStandard * m_FTGS;
+
     ReferenceAbsoluteVelocity RefVel;
     
     /*! Constraint on X and Y */

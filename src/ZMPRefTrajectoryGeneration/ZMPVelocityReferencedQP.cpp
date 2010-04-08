@@ -55,7 +55,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
   
   /*! For computing the stability constraints from the feet positions. */
- 
   m_ConstraintOnX = 0.04;
   m_ConstraintOnY = 0.04;
   m_fCALS = new footConstraintsAsLinearSystem(lSPM,aHS,m_ConstraintOnX,m_ConstraintOnY);
@@ -64,6 +63,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_UpperTimeLimitToUpdate = 0.0;
   m_TimeBuffer = 0.040;
  
+  m_FTGS = new footTrajectoryGenerationStandard(lSPM,aHS->leftFoot());
+  m_FTGS->InitializeInternalDataStructures();
 
   // Register method to handle
   string aMethodName[1] =
@@ -158,6 +159,9 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
   if (m_Pu!=0)
     delete [] m_Pu ;
 
+  if (m_FTGS!=0)
+    delete m_FTGS;
+
   printf("Leaving ~ZMPVelocityReferencedQP \n");
 }
 
@@ -171,6 +175,13 @@ void ZMPVelocityReferencedQP::setReference(istringstream &strm)
   strm >> RefVel.x;
   strm >> RefVel.y;
   strm >> RefVel.theta;
+}
+
+void ZMPVelocityReferencedQP::interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+					      deque<FootAbsolutePosition> &RightFootAbsolutePositions)
+{
+
+  printf("To be implemented \n");
 }
 
 
@@ -3060,14 +3071,15 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	}
       
        
-      Support->setSupportState(time, 0, RefVel);
-
+      Support->setSupportState(time+m_TimeBuffer, 0, RefVel);
+      unsigned int CurrentSStateChanged = Support->StateChanged;//Andremize to be moved to StateMachine
+      unsigned int CurrentSSSS = Support->SSSS;
 
       if(Support->StateChanged == 1)
 	{
 	  // printf("SupportState changed \n");
 	  SupportFeet_t * newSF = new SupportFeet_t;
-	  if(Support->SSSS == 0)//SS->DS or DS->SS
+	  if(CurrentSSSS == 0)//SS->DS or DS->SS
 	    {
 	      SF_it = QueueOfSupportFeet.end();
 	      SF_it--;
@@ -3083,7 +3095,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  newSF->y = m_FPy;
 	  printf("newSF -> FPx: %f FPy %f time %f \n",m_FPx,m_FPy,time);
 	  newSF->theta = m_FPtheta; 
-	  newSF->StartTime = time; 
+	  newSF->StartTime = time+m_TimeBuffer; 
 	  newSF->SupportFoot = Support->CurrentSupportFoot;
 
 	  QueueOfSupportFeet.push_back(newSF);
@@ -3092,14 +3104,14 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 
       //Andremize unnecessary variables
-      deque< FootAbsolutePosition> LeftFootAbsolutePositions, RightFootAbsolutePositions;
+      //deque< FootAbsolutePosition> LeftFootAbsolutePositions, RightFootAbsolutePositions;
       // printf("Before buildLinearConstraintInequalities \n");
-      m_fCALS->buildLinearConstraintInequalities(LeftFootAbsolutePositions,
-						 RightFootAbsolutePositions,
+      m_fCALS->buildLinearConstraintInequalities(FinalLeftFootAbsolutePositions,
+						 FinalRightFootAbsolutePositions,
 						 QueueOfLConstraintInequalitiesFreeFeet,
 						 QueueOfFeetPosInequalities,
 						 RefVel,
-						 time,
+						 time+m_TimeBuffer,
 						 m_QP_N,
 						 Support);
 
@@ -3108,7 +3120,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       // printf("buildConstraintMatrices");
       buildConstraintMatrices(DS,DU,
       			      m_QP_N,m_QP_T,
-      			      time,
+      			      time+m_TimeBuffer,
       			      QueueOfLConstraintInequalitiesFreeFeet,
 			      QueueOfFeetPosInequalities,
 			      QueueOfSupportFeet,
@@ -3202,7 +3214,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	    {
 	      ofstream aof;
 	      char Buffer[1024];
-	      sprintf(Buffer,"Dff_%f.dat",time);
+	      sprintf(Buffer,"Dff_%f.dat",time+m_TimeBuffer);
 	      aof.open(Buffer,ofstream::out);
 	      for(unsigned int i=0;i<2*(m_QP_N+Support->StepNumber);i++)
 		{
@@ -3228,9 +3240,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       
       ODEBUG("m: " << m);
-      dumpProblem(m_Qff, D, DU, m, DS, XL, XU, time);
+      dumpProblem(m_Qff, D, DU, m, DS, XL, XU, time+m_TimeBuffer);
 
- 
+      double ldt;
       //---------Solver------------
       //
       //
@@ -3247,9 +3259,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       		  war, &lwar, iwar, &liwar, &Eps);
       	  gettimeofday(&lend,0);
 
-      	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
+      	  CODEDEBUG6(ldt = lend.tv_sec - lbegin.tv_sec +
       		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
-	  // printf("Solver has finished,  \n");
+	   printf("Solver has finished,  \n");
       	  unsigned int NbOfActivatedConstraints = 0;
       	  for(int lk=0;lk<m;lk++)
       	    {
@@ -3333,14 +3345,18 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       */
       ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
 
+      printf("Getting serious now \n");
       
       FinalCOMPositions.resize(int((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalZMPPositions.resize(int((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
-      cout<<(int) FinalZMPPositions.size()<<endl;
+      FinalLeftFootAbsolutePositions.resize(int((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
+      FinalRightFootAbsolutePositions.resize(int((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
+
+      unsigned int CurrentIndex = (unsigned int)(m_TimeBuffer/m_SamplingPeriod)-(unsigned int)(ldt/m_SamplingPeriod);
       // update the ZMP and COM positions.
       m_2DLIPM->Interpolation(FinalCOMPositions,
       			      FinalZMPPositions,
-      			      (int)(m_TimeBuffer/m_SamplingPeriod),
+      			      CurrentIndex,
       			      ptX[0],ptX[m_QP_N]);
 
       m_2DLIPM->OneIteration(ptX[0],ptX[m_QP_N]);
@@ -3349,15 +3365,92 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       m_FPx = ptX[2*m_QP_N];
       m_FPy = ptX[2*m_QP_N+Support->StepNumber];
 
+      double LocalTime = (time+m_TimeBuffer)-(Support->CurrentTimeLimit-Support->SSDuration);
       // printf("FPx: %f FPy %f \n",FPx,FPy);
-
-
+      
+      printf("Before interpolation \n");
+      double StepHeight = 0.12;
+      if(Support->CurrentSupportPhase == 1 && time+m_TimeBuffer+3.0/2.0*m_QP_T < Support->CurrentTimeLimit)
+	{
+	  double ModulationSupportCoefficient = 0.9;
+	  double ModulatedSingleSupportTime = (Support->SSDuration-m_QP_T) * ModulationSupportCoefficient;
+	  double EndOfLiftOff = ((Support->SSDuration-m_QP_T)-ModulatedSingleSupportTime)*0.5;
+	  
+	  cout<<"ModulatedSingleSupportTime:"<<ModulatedSingleSupportTime<<endl;
+	  cout<<"Support->SSDuration-m_QP_T"<<Support->SSDuration-m_QP_T<<endl;
+	  cout<<"EndOfLiftOff:"<<EndOfLiftOff<<endl;
+	  cout<<"Last position left: "<<FinalLeftFootAbsolutePositions[CurrentIndex-1].x<<endl;
+	  cout<<"Last velocity left: "<<FinalLeftFootAbsolutePositions[CurrentIndex-1].dx<<endl;
+	  cout<<"Last position right: "<<FinalRightFootAbsolutePositions[CurrentIndex-1].x<<endl;
+	  cout<<"Last velocity right: "<<FinalRightFootAbsolutePositions[CurrentIndex-1].dx<<endl;
+	  cout<<"Desired position: X: "<<m_FPx<<"Y: "<<m_FPy<<endl;
+	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::X_AXIS,
+						    ModulatedSingleSupportTime-LocalTime,m_FPx,
+						    FinalLeftFootAbsolutePositions[CurrentIndex-1].x,
+						    FinalLeftFootAbsolutePositions[CurrentIndex-1].dx);
+	  m_FTGS->SetParameters(footTrajectoryGenerationStandard::Y_AXIS,
+				ModulatedSingleSupportTime,m_FPy);
+	  m_FTGS->SetParameters(footTrajectoryGenerationStandard::Z_AXIS,
+				ModulatedSingleSupportTime,StepHeight);
+	  m_FTGS->SetParameters(footTrajectoryGenerationStandard::THETA_AXIS,
+				ModulatedSingleSupportTime,0.0);
+	  m_FTGS->SetParameters(footTrajectoryGenerationStandard::OMEGA_AXIS,
+				EndOfLiftOff,0.0);
+	  m_FTGS->SetParameters(footTrajectoryGenerationStandard::OMEGA2_AXIS,
+				ModulatedSingleSupportTime,2.0*0.0);
+	  printf("After parametrization SP == 1 \n");
+	  for(unsigned int k = 0; k<(unsigned int)(m_QP_T/m_SamplingPeriod);k++)
+	    {
+	      if (Support->CurrentSupportFoot==1)
+		{
+		  m_FTGS->UpdateFootPosition(FinalLeftFootAbsolutePositions,
+					     FinalRightFootAbsolutePositions,
+					     CurrentIndex+k,LocalTime+(k+1)*m_SamplingPeriod,
+					     ModulatedSingleSupportTime,
+					     1, -1);
+		}
+	      else
+		{
+		  m_FTGS->UpdateFootPosition(FinalRightFootAbsolutePositions,
+					     FinalLeftFootAbsolutePositions,
+					     CurrentIndex+k,LocalTime+(k+1)*m_SamplingPeriod,
+					     ModulatedSingleSupportTime,
+					     1, 1);
+		}
+	      FinalLeftFootAbsolutePositions[CurrentIndex+k].time = 
+		FinalRightFootAbsolutePositions[CurrentIndex+k].time = time+m_TimeBuffer+k*m_SamplingPeriod;
+	      cout<<"LFx: "<<FinalLeftFootAbsolutePositions[CurrentIndex+k].x<<"LFy: "<<FinalLeftFootAbsolutePositions[CurrentIndex+k].y<<"LFz: "<<FinalLeftFootAbsolutePositions[CurrentIndex+k].z<<endl;
+	      cout<<"RFx: "<<FinalRightFootAbsolutePositions[CurrentIndex+k].x<<"RFy: "<<FinalRightFootAbsolutePositions[CurrentIndex+k].y<<"RFz: "<<FinalRightFootAbsolutePositions[CurrentIndex+k].z<<endl;
+	    }
+	}
+      else if (Support->CurrentSupportPhase == 0 || time+m_TimeBuffer+3.0/2.0*m_QP_T > Support->CurrentTimeLimit)
+	{
+	  printf("After parametrization SP == 0 \n");
+	  for(unsigned int k = 0; k<(unsigned int)(m_QP_T/m_SamplingPeriod);k++)
+	    {
+	      //cout<<"CurrentIndex+k"<<CurrentIndex+k<<FinalRightFootAbsolutePositions.size()<<endl;
+	      FinalRightFootAbsolutePositions[CurrentIndex+k]=FinalRightFootAbsolutePositions[CurrentIndex+k-1];
+	      //cout<<"CurrentIndex+k"<<CurrentIndex+k<<endl;
+	      FinalLeftFootAbsolutePositions[CurrentIndex+k]=FinalLeftFootAbsolutePositions[CurrentIndex+k-1];
+	      //cout<<"CurrentIndex+k"<<CurrentIndex+k<<endl;
+	      FinalLeftFootAbsolutePositions[CurrentIndex+k].time = 
+		FinalRightFootAbsolutePositions[CurrentIndex+k].time = time+m_TimeBuffer+k*m_SamplingPeriod;
+	      //cout<<"CurrentIndex+k"<<CurrentIndex+k<<endl;
+	      FinalLeftFootAbsolutePositions[CurrentIndex+k].stepType = 
+		FinalRightFootAbsolutePositions[CurrentIndex+k].stepType = 10;
+	      //cout<<"CurrentIndex+k"<<CurrentIndex+k<<endl;
+	      cout<<"LFx: "<<FinalLeftFootAbsolutePositions[CurrentIndex+k].x<<"LFy: "<<FinalLeftFootAbsolutePositions[CurrentIndex+k].y<<"LFz: "<<FinalLeftFootAbsolutePositions[CurrentIndex+k].z<<endl;
+	      cout<<"RFx: "<<FinalRightFootAbsolutePositions[CurrentIndex+k].x<<"RFy: "<<FinalRightFootAbsolutePositions[CurrentIndex+k].y<<"RFz: "<<FinalRightFootAbsolutePositions[CurrentIndex+k].z<<endl;
+	    }
+	}
+      printf("After interpolation \n");
+      
       if(m_UpperTimeLimitToUpdate==0.0)
 	m_UpperTimeLimitToUpdate = time+m_QP_T;
       else
 	m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+m_QP_T;
 
-
+      
       ODEBUG6("uk:" << uk,"DebugPBW.dat");
       ODEBUG6("xk:" << xk,"DebugPBW.dat");
   
@@ -3421,7 +3514,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
     }
 
- printf("Leaving online \n");
+ // printf("Leaving online \n");
  //-----------------------------------
  //
  //
