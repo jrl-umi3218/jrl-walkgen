@@ -329,7 +329,10 @@ void Herdt(PatternGeneratorInterface &aPGI)
     istringstream strm2(":setreference  0.1 0.0 0.0");
     aPGI.ParseCmd(strm2);
   }
-
+  {
+    istringstream strm2(":singlesupporttime 0.7");
+    aPGI.ParseCmd(strm2);
+  }
   {
     istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
     aPGI.ParseCmd(strm2);
@@ -651,8 +654,12 @@ void HerdtOnline(PatternGeneratorInterface &aPGI)
   {
     istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
     aPGI.ParseCmd(strm2);
-  }
 
+  }
+  {
+    istringstream strm2(":singlesupporttime 0.7");
+    aPGI.ParseCmd(strm2);
+  }
   {
     istringstream strm2(":HerdtOnline 0.1 0.0 0.0");
     aPGI.ParseCmd(strm2);

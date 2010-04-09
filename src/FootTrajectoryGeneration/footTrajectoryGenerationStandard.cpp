@@ -258,97 +258,129 @@ double footTrajectoryGenerationStandard::Compute(unsigned int PolynomeIndex, dou
 
 void footTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
 							  deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
-							  int CurrentAbsoluteIndex,  
-							  double LocalTime, 
+							  int StartIndex, int k,
+							  double LocalInterpolationStartTime,
 							  double ModulatedSingleSupportTime,
 							  int StepType, int LeftOrRight)
 {
   // unsigned int k = CurrentAbsoluteIndex - IndexInitial;
   // Local time
-  // double LocalTime = k*m_SamplingPeriod;
-  unsigned int IndexInitial = CurrentAbsoluteIndex-1;
+  double InterpolationTime = k*m_SamplingPeriod;
+  int CurrentAbsoluteIndex = k+StartIndex;
+  // unsigned int IndexInitial = CurrentAbsoluteIndex-1;
   double EndOfLiftOff = (m_TSingle-ModulatedSingleSupportTime)*0.5;
   double StartLanding = EndOfLiftOff + ModulatedSingleSupportTime;
 
   // The foot support does not move.
   SupportFootAbsolutePositions[CurrentAbsoluteIndex] = 
-    SupportFootAbsolutePositions[CurrentAbsoluteIndex-1];
+    SupportFootAbsolutePositions[StartIndex-1];
 
   SupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = (-1)*StepType;
 
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = StepType;
-  cout<<"LocalTime: "<<LocalTime<<endl;
-  if (LocalTime < EndOfLiftOff)
+  // cout<<"LocalInterpolationStartTime+InterpolationTime: "<<LocalInterpolationStartTime+InterpolationTime;
+  if (LocalInterpolationStartTime +InterpolationTime <= EndOfLiftOff || LocalInterpolationStartTime +InterpolationTime >= StartLanding)
     {
       // Do not modify x, y and theta while liftoff.
+      // cout<<"no change"<<endl;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x = 
-	NoneSupportFootAbsolutePositions[IndexInitial].x;
+	NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].x;
 
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
-	NoneSupportFootAbsolutePositions[IndexInitial].y;
+	NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].y;
        
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
-	NoneSupportFootAbsolutePositions[IndexInitial].theta;
+	NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].theta;
     }
-  else if (LocalTime < StartLanding)
+  else if (LocalInterpolationStartTime < EndOfLiftOff && LocalInterpolationStartTime +InterpolationTime > EndOfLiftOff)
     {
+      // cout<<"rest changes"<<endl;
       // DO MODIFY x, y and theta the remaining time.
+      // x, dx
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x = 
-	m_PolynomeX->Compute(LocalTime - EndOfLiftOff) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].x;
-
+	m_PolynomeX->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
+	// NoneSupportFootAbsolutePositions[StartIndex-1].x;
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dx = 
+	m_PolynomeX->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
+	// NoneSupportFootAbsolutePositions[StartIndex-1].dx;
+      //y, dy
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
-	m_PolynomeY->Compute(LocalTime - EndOfLiftOff) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].y;
-
+	m_PolynomeY->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);//  + 
+	// NoneSupportFootAbsolutePositions[StartIndex-1].y;
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy = 
+	m_PolynomeY->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff); // + 
+	// NoneSupportFootAbsolutePositions[StartIndex-1].dy;
+      //theta, dtheta
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
-	m_PolynomeTheta->Compute(LocalTime - EndOfLiftOff) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].theta;
-	  
+	m_PolynomeTheta->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// + 
+	//NoneSupportFootAbsolutePositions[StartIndex].theta;
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dtheta = 
+	m_PolynomeTheta->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
+	// +NoneSupportFootAbsolutePositions[StartIndex].dtheta;
     }
   else 
     {
-      // Do not modify x, y and theta while landing.
+      // cout<<"all changes";
+      // DO MODIFY x, y and theta all the time.
+      // x, dx
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x = 
-	m_PolynomeX->Compute(ModulatedSingleSupportTime) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].x;
-       
+	m_PolynomeX->Compute(InterpolationTime);
+      //+NoneSupportFootAbsolutePositions[StartIndex-1].x;
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dx = 
+	m_PolynomeX->ComputeDerivative(InterpolationTime);
+      //+NoneSupportFootAbsolutePositions[StartIndex-1].dx;
+      //y, dy
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
-	m_PolynomeY->Compute(ModulatedSingleSupportTime) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].y;
-
+	m_PolynomeY->Compute(InterpolationTime);
+      //+NoneSupportFootAbsolutePositions[StartIndex].y;
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy = 
+	m_PolynomeY->Compute(InterpolationTime);
+      //+NoneSupportFootAbsolutePositions[StartIndex].dy;
+      //theta, dtheta
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
-	m_PolynomeTheta->Compute(ModulatedSingleSupportTime) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].theta;
+	m_PolynomeTheta->Compute( InterpolationTime );
+      // +NoneSupportFootAbsolutePositions[StartIndex].theta;
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dtheta = 
+	m_PolynomeTheta->Compute(InterpolationTime);
+      // + NoneSupportFootAbsolutePositions[StartIndex].dtheta;
     }
 
-  
-
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = 
-    m_PolynomeZ->Compute(LocalTime) + 
-    NoneSupportFootAbsolutePositions[IndexInitial].z;
+    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime)+
+    m_AnklePositionRight[2];
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = 
+    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime)+
+    m_AnklePositionRight[2];
   
   bool ProtectionNeeded=false;
 
   // Treat Omega with the following strategy:
   // First treat the lift-off.
-  if (LocalTime<EndOfLiftOff)
+  if (LocalInterpolationStartTime+InterpolationTime<EndOfLiftOff)
     {
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
-	m_PolynomeOmega->Compute(LocalTime) ;      
+	m_PolynomeOmega->Compute(InterpolationTime); // + 
+    // NoneSupportFootAbsolutePositions[StartIndex-1].omega; 
+      
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].domega = 
+	m_PolynomeOmega->Compute(InterpolationTime);//  + 
+    // NoneSupportFootAbsolutePositions[StartIndex-1].domega;  
+      
       ProtectionNeeded=true;
     }
   // Prepare for the landing.
-  else if (LocalTime<StartLanding)
+  else if (LocalInterpolationStartTime+InterpolationTime<StartLanding)
     {
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
-	m_Omega - m_PolynomeOmega2->Compute(LocalTime-EndOfLiftOff);
+	m_Omega - m_PolynomeOmega2->Compute(LocalInterpolationStartTime+InterpolationTime-EndOfLiftOff)-
+	NoneSupportFootAbsolutePositions[StartIndex-1].omega2;
     }
   // Realize the landing.
   else 
     {
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
-	m_PolynomeOmega->Compute(LocalTime - StartLanding)  - m_Omega;
+	m_PolynomeOmega->Compute(LocalInterpolationStartTime+InterpolationTime - StartLanding) + 
+	NoneSupportFootAbsolutePositions[StartIndex-1].omega - m_Omega;
       ProtectionNeeded=true;
     }
   double dFX=0,dFY=0,dFZ=0;

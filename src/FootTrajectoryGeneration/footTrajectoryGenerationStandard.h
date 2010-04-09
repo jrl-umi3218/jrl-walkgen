@@ -80,10 +80,10 @@ namespace PatternGeneratorJRL
     */
    virtual void UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
 				   deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
-				   int CurrentAbsoluteIndex,  
-				   double LocalTime,
+				   int StartIndex, int k,
+				   double LocalInterpolationStartTime,
 				   double ModulatedSingleSupportTime,
-				   int StepType,int LeftOrRight);
+				   int StepType, int LeftOrRight);
    
    /*! Initialize internal data structures.
      In this specific case, it is in charge of creating the polynomial structures.
