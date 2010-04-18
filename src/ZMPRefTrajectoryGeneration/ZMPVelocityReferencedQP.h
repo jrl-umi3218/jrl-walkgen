@@ -1,8 +1,8 @@
 /* This object provides the generation of ZMP and CoM trajectory
    using a new formulation of the stability problem.
 
-   Copyright (c) 2005-2009, 
-   Olivier Stasse,Francois Keith
+   Copyright (c) 2005-2010, 
+   Andrei Herdt, Olivier Stasse, Francois Keith
    
    JRL-Japan, CNRS/AIST
 
@@ -87,14 +87,14 @@ namespace PatternGeneratorJRL
 
     /*! This method is a new way of computing the ZMP trajectory from
       foot trajectory. */
-    int BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					     deque<ZMPPosition> &ZMPRefPositions,		       
-					     deque<COMPosition> &COMPositions,
-					     double ConstraintOnX,
-					     double ConstraintOnY,
-					     double T,
-					     unsigned int N);
+    /* int BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions, */
+    /* 					     deque<FootAbsolutePosition> &RightFootAbsolutePositions, */
+    /* 					     deque<ZMPPosition> &ZMPRefPositions,		        */
+    /* 					     deque<COMPosition> &COMPositions, */
+    /* 					     double ConstraintOnX, */
+    /* 					     double ConstraintOnY, */
+    /* 					     double T, */
+    /* 					     unsigned int N); */
 
 
     
@@ -146,16 +146,16 @@ namespace PatternGeneratorJRL
 
     
     /*! Build the necessary matrices for the QP problem under linear inequality constraints. */
-    int BuildConstraintMatrices(double * &Px, double * &DPu,
-				unsigned N, double T,
-				double StartingTime,
-				deque<LinearConstraintInequality_t *> 
-				& QueueOfLConstraintInequalities,
-				double Com_Height,
-				unsigned int &NbOfConstraints,
-				MAL_VECTOR(&xk,double),
-				MAL_VECTOR(&ZMPRef,double),
-				unsigned int &NextNumberOfRemovedConstraints);
+    /* int BuildConstraintMatrices(double * &Px, double * &DPu, */
+    /* 				unsigned N, double T, */
+    /* 				double StartingTime, */
+    /* 				deque<LinearConstraintInequality_t *>  */
+    /* 				& QueueOfLConstraintInequalities, */
+    /* 				double Com_Height, */
+    /* 				unsigned int &NbOfConstraints, */
+    /* 				MAL_VECTOR(&xk,double), */
+    /* 				MAL_VECTOR(&ZMPRef,double), */
+    /* 				unsigned int &NextNumberOfRemovedConstraints); */
 
     
    int buildConstraintMatrices(double * &DS, double * &DU,
