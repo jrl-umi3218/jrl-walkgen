@@ -22,6 +22,16 @@ using namespace PatternGeneratorJRL;
 
 ZMPRefTrajectoryGeneration::ZMPRefTrajectoryGeneration(SimplePluginManager *lSPM)
   : SimplePlugin(lSPM)
+  , m_Tsingle(0.)
+  , m_Tdble(0.)
+  , m_SamplingPeriod(0.)
+  , m_ModulationSupportCoefficient(0.)
+  , m_Omega(0.)
+  , m_PreviewControlTime(0.)
+  , m_StepHeight(0.)
+  , m_CurrentTime(0.)
+  , m_OnLineMode(false)
+  , m_ComHeight(0.)
 {
 
   ODEBUG("Identification: " << this);
