@@ -70,6 +70,7 @@ int main()
   for(int i=0;i<3;i++)
     {
       Ax(0,i+1) = tmpA(0,i);
+	  Ax(i+1,0) = 0.;
       for(int j=0;j<3;j++)
 	Ax(i+1,j+1) = A(i,j);
     }
@@ -84,7 +85,10 @@ int main()
 
   cout << "bx: " << endl << bx << endl;
 
-  cx(0,0) =1.0;
+  cx(0,0) =1.0;   
+  cx(0,1) =0.0;
+  cx(0,2) =0.0;
+  cx(0,3) =0.0;
   cout << "cx: " << endl << cx << endl;
   
 
