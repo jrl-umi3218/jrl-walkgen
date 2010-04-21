@@ -70,19 +70,10 @@ SET(PROJECT_NAME_LIB ${PROJECT_NAME})
 
 # Add main target: walkGenJRL
 # ---------------------------------
-IF(UNIX)
 ADD_LIBRARY(${PROJECT_NAME_LIB}
   ${libwpg_src} 
   ${libwpg_headers} 
 )
-ENDIF(UNIX)
-IF(WIN32)
-ADD_LIBRARY(${PROJECT_NAME_LIB}
-  ${libwpg_src} 
-  ${libwpg_headers} 
-)
-ENDIF(WIN32)
-
 
 # Impose shared libraries
 #------------------------
