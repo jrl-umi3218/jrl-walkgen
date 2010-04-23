@@ -84,7 +84,8 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
   m_PC = aPC;
   m_SamplingPeriod = m_PC->SamplingPeriod();
   m_PreviewControlTime = m_PC->PreviewControlTime();
-  m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+  // m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+  m_NL = (unsigned int)(0.040/m_SamplingPeriod);
 }
 
 void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMPosition &acomp,
@@ -193,7 +194,6 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
   ODEBUG("FirstStage " << CurrentConfiguration);
   ODEBUG("LFP : " << LeftFootPosition.x<< " " << LeftFootPosition.y << " " << LeftFootPosition.z);
   ODEBUG("RFP : " << RightFootPosition.x<< " " << RightFootPosition.y << " " << RightFootPosition.z);
-  
   FirstStageOfControl(LeftFootPosition,RightFootPosition,refandfinalCOMPosition);
   // This call is suppose to initialize
   // correctly the current configuration, speed and acceleration.
@@ -221,7 +221,6 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 			      CurrentAcceleration,
 			      m_NumberOfIterations,
 			      0);
-
   ODEBUG("After First CallToComAndFootRealization: " << CurrentConfiguration);
   ODEBUG("1-refandfinalCOMPosition: x: " << refandfinalCOMPosition.x[0] << 
 	 " y: " << refandfinalCOMPosition.y[0] <<
@@ -256,6 +255,7 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 				  1);
       ODEBUG("After Second CallToComAndFootRealization: " << CurrentConfiguration);
     }
+
   ODEBUG("Current Configuration: "<< CurrentConfiguration);
   // Here it is assumed that the 4x4 CoM matrix 
   // is the orientation of the free flyer and
@@ -547,17 +547,18 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
 
   m_StartingNewSequence = true;
 
+  cout<<"Before fill the fifo: "<<m_NL<<" "<<ZMPRefPositions.size()<<endl;
   // Fill the Fifo
-  m_FIFOZMPRefPositions.resize(m_NL);
-  m_FIFOLeftFootPosition.resize(m_NL);
-  m_FIFORightFootPosition.resize(m_NL);
+  m_FIFOZMPRefPositions.resize(ZMPRefPositions.size());
+  m_FIFOLeftFootPosition.resize(ZMPRefPositions.size());
+  m_FIFORightFootPosition.resize(ZMPRefPositions.size());
   for(unsigned int i=0;i<m_NL;i++)
     {
       m_FIFOZMPRefPositions[i] = ZMPRefPositions[i];
       m_FIFOLeftFootPosition[i] = LeftFootPositions[i];
       m_FIFORightFootPosition[i] = RightFootPositions[i];
     }
-
+  cout<<"After fill the fifo"<<endl;
   ODEBUG6("After EvaluateCOM","DebugData.txt");
 
   ODEBUG6("Beginning of Setup 1 ","DebugData.txt");
@@ -763,6 +764,7 @@ void ZMPPreviewControlWithMultiBodyZMP::CreateExtraCOMBuffer(deque<COMPosition> 
 
 void ZMPPreviewControlWithMultiBodyZMP::UpdateTheZMPRefQueue(ZMPPosition NewZMPRefPos)
 {
+  printf("UpdateThezMPRefQueue \n");
   m_FIFOZMPRefPositions.push_back(NewZMPRefPos);
 }
 
@@ -876,7 +878,8 @@ void ZMPPreviewControlWithMultiBodyZMP::SetSamplingPeriod(double lSamplingPeriod
 
   m_NL=0.0;
   if (m_SamplingPeriod!=0.0)
-    m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+    m_NL = (unsigned int)(0.040/m_SamplingPeriod);
+    // m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
   
 }
 
@@ -886,7 +889,8 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControlTime(double lPreviewCon
 
   m_NL=0.0;
   if (m_SamplingPeriod!=0.0)
-    m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+    m_NL = (unsigned int)(0.040/m_SamplingPeriod); 
+    // m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
 
 }
 

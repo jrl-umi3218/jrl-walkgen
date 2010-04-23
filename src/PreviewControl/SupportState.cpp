@@ -36,10 +36,10 @@ SupportState::SupportState(const double &SamplingDuration)
   eps = 0.00000001;
   StateChanged = 0;
 
-  s_FullDebug = 3;
+  s_FullDebug = 0;
 
-  RESETDEBUG4("DebugSupportState.dat");
-  ofstream aof("SupportStates.dat");
+  // RESETDEBUG4("DebugSupportState.dat");
+  // ofstream aof("SupportStates.dat");
 
   // printf("Leaving SupportState \n");
 }
@@ -118,19 +118,19 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
   if(pi==0)
     initializePreviewedState();
   
-  if(s_FullDebug>0)
-    {
-      ofstream aof;
-      aof.open("SupportStates.dat", ios::app);
-      aof << "Time: "<<Time<<" PrwTime: "<<Time+pi*T<<" CSP: "<<CurrentSupportPhase
-	  <<" CSF: "<<CurrentSupportFoot<<" CTL: "<<CurrentTimeLimit
-	  <<" CSL: "<<CurrentStepsLeft<<" PrwSP: "<<PrwSupportPhase
-	  <<" PrwSF: "<<PrwSupportFoot<<" PrwTL: "<<PrwTimeLimit
-	  <<" PrwSL: "<<PrwStepsLeft<<" *SF: "<<*SupportFoot
-	  <<" *SSL: "<<*SupportStepsLeft<<" SN: "<<StepNumber;
-      aof << endl;
-      aof.close();
-    }
+  // if(s_FullDebug>0)
+  //   {
+  //     ofstream aof;
+  //     aof.open("SupportStates.dat", ios::app);
+  //     aof << "Time: "<<Time<<" PrwTime: "<<Time+pi*T<<" CSP: "<<CurrentSupportPhase
+  // 	  <<" CSF: "<<CurrentSupportFoot<<" CTL: "<<CurrentTimeLimit
+  // 	  <<" CSL: "<<CurrentStepsLeft<<" PrwSP: "<<PrwSupportPhase
+  // 	  <<" PrwSF: "<<PrwSupportFoot<<" PrwTL: "<<PrwTimeLimit
+  // 	  <<" PrwSL: "<<PrwStepsLeft<<" *SF: "<<*SupportFoot
+  // 	  <<" *SSL: "<<*SupportStepsLeft<<" SN: "<<StepNumber;
+  //     aof << endl;
+  //     aof.close();
+  //   }
 
  // ODEBUG4( " " , "DebugSupportState.dat");
 

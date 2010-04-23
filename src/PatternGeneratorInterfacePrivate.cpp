@@ -6,13 +6,13 @@
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
-   
+
    Please look at License.txt for details on the license.
 
 */
 #include <fstream>
 #include <time.h>
-	
+
 #ifdef UNIX
 #include <sys/time.h>
 #endif /*UNIX*/
@@ -154,7 +154,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()
   {
-    std::string aMethodName[14] = 
+    std::string aMethodName[14] =
       {":LimitsFeasibility",
        ":ZMPShiftParameters",
        ":TimeDistributionParameters",
@@ -169,7 +169,7 @@ namespace PatternGeneratorJRL {
        ":samplingperiod",
        ":HerdtOnline",
        ":setreference"};
-    
+
     for(int i=0;i<14;i++)
       {
 	if (!SimplePlugin::RegisterMethod(aMethodName[i]))
@@ -192,7 +192,7 @@ namespace PatternGeneratorJRL {
       string inValue[2]={"true","false"};
       for(unsigned int i=0;i<2;i++)
 	m_HumanoidDynamicRobot->setProperty(inProperty[i],inValue[i]);
-      
+
     }
 
     // INFO: This where you should instanciate your own
@@ -245,7 +245,7 @@ namespace PatternGeneratorJRL {
 						&m_LeftFootPositions,
 						&m_RightFootPositions);
 
-    
+
     m_CoMAndFootOnlyStrategy = new CoMAndFootOnlyStrategy(this);
     m_CoMAndFootOnlyStrategy->SetBufferPositions(&m_ZMPPositions,
 						 &m_COMBuffer,
@@ -268,7 +268,6 @@ namespace PatternGeneratorJRL {
     m_DoubleStagePCStrategy->InitInterObjects(m_HumanoidDynamicRobot,
 					      m_ComAndFootRealization,
 					      m_StepStackHandler);
-        
     m_CoMAndFootOnlyStrategy->InitInterObjects(m_HumanoidDynamicRobot,
 					       m_ComAndFootRealization,
 					       m_StepStackHandler);
@@ -276,8 +275,8 @@ namespace PatternGeneratorJRL {
     // Initialize the ZMP trajectory generator.
     m_ZMPCQPFF->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
-    
     m_ZMPVRQP->SetSamplingPeriod(m_PC->SamplingPeriod());
+
     m_ZMPVRQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
     m_ZMPVRQP->SetPreviewControl(m_PC);
 
@@ -289,7 +288,7 @@ namespace PatternGeneratorJRL {
     m_GMFKW->SetPreviewControl(m_PC);
 
     // Read the robot VRML file model.
-    
+
     m_ComAndFootRealization->setHumanoidDynamicRobot(m_HumanoidDynamicRobot);
 
     m_ComAndFootRealization->SetHeightOfTheCoM(m_PC->GetHeightOfCoM());
@@ -307,7 +306,7 @@ namespace PatternGeneratorJRL {
 
     m_StepStackHandler->SetStepOverPlanner(m_StOvPl);
     m_StepStackHandler->SetWalkMode(0);
-    // End of the initialization of the fundamental object. 
+    // End of the initialization of the fundamental object.
   }
 
   PatternGeneratorInterfacePrivate::~PatternGeneratorInterfacePrivate()
@@ -410,11 +409,11 @@ namespace PatternGeneratorJRL {
 	else break;
       }
   }
-  
+
   void PatternGeneratorInterfacePrivate::ReadSequenceOfSteps(istringstream &strm)
   {
     // Read the data inside strm.
-    
+
 
     switch (m_StepStackHandler->GetWalkMode())
       {
@@ -458,7 +457,6 @@ namespace PatternGeneratorJRL {
   {
     // Read the data inside strm.
     m_ZMPVRQP->setReference(strm);
-    
   }
 
   void PatternGeneratorInterfacePrivate::initOnlineHerdt()
@@ -472,7 +470,7 @@ namespace PatternGeneratorJRL {
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
     memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
     memset(&InitRightFootAbsPos,0,sizeof(InitRightFootAbsPos));
-    
+
     vector<double> lCurrentJointValues;
     MAL_VECTOR(lStartingWaistPose,double);
 
@@ -481,17 +479,36 @@ namespace PatternGeneratorJRL {
 			  lStartingWaistPose,
 			  InitLeftFootAbsPos,
 			  InitRightFootAbsPos);
-    
+
     deque<RelativeFootPosition> RelativeFootPositions;
-      m_ZMPVRQP->InitOnLine(m_ZMPPositions,
-			    m_COMBuffer,
-			    m_LeftFootPositions,
-			    m_RightFootPositions,
-			    InitLeftFootAbsPos,
-			    InitRightFootAbsPos,
-			    RelativeFootPositions,
-			    lStartingCOMPosition,
-			    lStartingZMPPosition);
+    m_ZMPVRQP->SetCurrentTime(m_InternalClock);
+
+
+    m_ZMPVRQP->InitOnLine(m_ZMPPositions,
+			  m_COMBuffer,
+			  m_LeftFootPositions,
+			  m_RightFootPositions,
+			  InitLeftFootAbsPos,
+			  InitRightFootAbsPos,
+			  RelativeFootPositions,
+			  lStartingCOMPosition,
+			  lStartingZMPPosition);
+
+    // // Initialization of the first preview.
+    //   printf("lCurrent \n");
+    // for(int j=0; j<m_DOF;j++)
+    //   {
+    // 	cout<<m_CurrentActuatedJointValues[j]<<endl;
+    // 	BodyAnglesIni(j) = m_CurrentActuatedJointValues[j];
+    //   }
+
+
+    m_GlobalStrategyManager->Setup(m_ZMPPositions,
+				   m_COMBuffer,
+				   m_LeftFootPositions,
+				   m_RightFootPositions);
+
+    m_ShouldBeRunning=true;
   }
 
   void PatternGeneratorInterfacePrivate::m_StepSequence(istringstream &strm)
@@ -526,9 +543,9 @@ namespace PatternGeneratorJRL {
 							       FootAbsolutePosition & InitLeftFootAbsPos,
 							       FootAbsolutePosition & InitRightFootAbsPos)
   {
-    MAL_VECTOR(lBodyInit,double);    
+    MAL_VECTOR(lBodyInit,double);
     MAL_VECTOR_RESIZE(lBodyInit,m_CurrentActuatedJointValues.size());
-    
+
     for(unsigned int j=0; j<m_CurrentActuatedJointValues.size();j++)
       {
 	lBodyInit(j) = m_CurrentActuatedJointValues[j];
@@ -562,7 +579,7 @@ namespace PatternGeneratorJRL {
     double coscomyaw, sincomyaw;
     coscomyaw = cos(lStartingCOMPosition.yaw);
     sincomyaw = sin(lStartingCOMPosition.yaw);
-    
+
     CoMPos(0,0) = coscomyaw; CoMPos(0,1) = -sincomyaw; CoMPos(0,2) = lStartingCOMPosition.x[0];
     CoMPos(1,0) = sincomyaw; CoMPos(1,1) =  coscomyaw; CoMPos(1,2) = lStartingCOMPosition.y[0];
     CoMPos(2,0) = 0.0;       CoMPos(2,1) = 0.0;        CoMPos(2,2) = 1.0;
@@ -592,11 +609,11 @@ namespace PatternGeneratorJRL {
     double cosinitfoottheta, sininitfoottheta;
     cosinitfoottheta = cos(ltheta);
     sininitfoottheta = sin(ltheta);
-    
+
     InitPos(0,0) = cosinitfoottheta; InitPos(0,1) = -sininitfoottheta; InitPos(0,2) = lsx;
     InitPos(1,0) = sininitfoottheta; InitPos(1,1) =  cosinitfoottheta; InitPos(1,2) = lsy;
     InitPos(2,0) = 0.0;              InitPos(2,1) = 0.0;               InitPos(2,2) = 1.0;
-    
+
     ODEBUG("InitPos:" << InitPos);
     ODEBUG("CoMPos: " << CoMPos);
 
@@ -606,7 +623,7 @@ namespace PatternGeneratorJRL {
 
     // Compute the rigid motion from the CoM to the next support foot.
     MAL_S3x3_C_eq_A_by_B(InitialMotion,iCoMPos,InitPos);
-      
+
     // Create from the rigid motion the step to be added to the list of steps.
     RelativeFootPosition aRFP;
     memset(&aRFP,0,sizeof(aRFP));
@@ -617,7 +634,7 @@ namespace PatternGeneratorJRL {
     ODEBUG("AutomaticallyAddFirstStep: "<< aRFP.sx << " " << aRFP.sy << " " <<aRFP.theta);
 
     lRelativeFootPositions.push_front(aRFP);
-    
+
   }
 
   void PatternGeneratorInterfacePrivate::CommonInitializationOfWalking(COMPosition  & lStartingCOMPosition,
@@ -650,8 +667,8 @@ namespace PatternGeneratorJRL {
     m_StepStackHandler->CopyRelativeFootPosition(lRelativeFootPositions,ClearStepStackHandler);
     for(unsigned int i=0;i<lRelativeFootPositions.size();i++)
       {
-	ODEBUG(lRelativeFootPositions[i].sx << " " << 
-		lRelativeFootPositions[i].sy << " " <<  
+	ODEBUG(lRelativeFootPositions[i].sx << " " <<
+		lRelativeFootPositions[i].sy << " " <<
 		lRelativeFootPositions[i].theta );
 
       }
@@ -678,11 +695,11 @@ namespace PatternGeneratorJRL {
 	    ODEBUG("Push a position in stack of steps:"<<
 		   lRelativeFootPositions[0].sx << " " <<
 		   lRelativeFootPositions[0].sy << " " <<
-		   lRelativeFootPositions[0].theta); 
+		   lRelativeFootPositions[0].theta);
 	  }
       }
 
-    ODEBUG("StartingCOMPosition: " << lStartingCOMPosition.x[0] 
+    ODEBUG("StartingCOMPosition: " << lStartingCOMPosition.x[0]
 	    << " "  << lStartingCOMPosition.y[0]
 	    << " "  << lStartingCOMPosition.z[0]);
     // We also initialize the iteration number inside DMB.
@@ -721,7 +738,7 @@ namespace PatternGeneratorJRL {
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
     memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
     memset(&InitRightFootAbsPos,0,sizeof(InitRightFootAbsPos));
-    
+
     deque<RelativeFootPosition> lRelativeFootPositions;
     vector<double> lCurrentJointValues;
 
@@ -755,6 +772,7 @@ namespace PatternGeneratorJRL {
     if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
       {
 	ODEBUG("ZMPCOM KAJITA 2003 - 2 ");
+
 	NbOfStepsToRemoveFromTheStack=m_ZMPD->InitOnLine(m_ZMPPositions,
 							 m_COMBuffer,
 							 m_LeftFootPositions,
@@ -770,6 +788,7 @@ namespace PatternGeneratorJRL {
       {
 	m_COMBuffer.clear();
 	m_ZMPM->SetCurrentTime(m_InternalClock);
+
 	NbOfStepsToRemoveFromTheStack = m_ZMPM->InitOnLine(m_ZMPPositions,
 							   m_COMBuffer,
 							   m_LeftFootPositions,
@@ -779,6 +798,7 @@ namespace PatternGeneratorJRL {
 							   lRelativeFootPositions,
 							   lStartingCOMPosition,
 							   lStartingZMPPosition );
+
 	ODEBUG("After Initializing the Analytical Morisawa part. " << m_LeftFootPositions.size()
 		<< " " << m_RightFootPositions.size());
       }
@@ -811,9 +831,9 @@ namespace PatternGeneratorJRL {
   }
 
   void PatternGeneratorInterfacePrivate::FinishAndRealizeStepSequence()
-  { 
+  {
     ODEBUG("PGI-Start");
-    COMPosition lStartingCOMPosition;	
+    COMPosition lStartingCOMPosition;
     MAL_S3_VECTOR(,double) lStartingZMPPosition;
     MAL_VECTOR( BodyAnglesIni,double);
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
@@ -828,11 +848,9 @@ namespace PatternGeneratorJRL {
 
     MAL_VECTOR(,double) lCurrentConfiguration;
 
-    lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();  
+    lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
     ODEBUG("lCurrent Configuration :" << lCurrentConfiguration);
 
-    ODEBUG("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
-	     << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
 
     deque<RelativeFootPosition> lRelativeFootPositions;
     CommonInitializationOfWalking(lStartingCOMPosition,
@@ -840,12 +858,12 @@ namespace PatternGeneratorJRL {
 				  BodyAnglesIni,
 				  InitLeftFootAbsPos, InitRightFootAbsPos,
 				  lRelativeFootPositions,lCurrentJointValues,true);
-    
+
     ODEBUG("lStartingCOMPosition: "
 	    << lStartingCOMPosition.x[0] << " "
 	    << lStartingCOMPosition.y[0] << " "
 	    << lStartingCOMPosition.z[0] );
-		
+
     ODEBUG( "Pass through here ");
     lCurrentConfiguration(0) = 0.0;
     lCurrentConfiguration(1) = 0.0;
@@ -986,7 +1004,7 @@ namespace PatternGeneratorJRL {
 	ChangeOnLineStep(ltime,aFAP,newtime);
       }
   }
-					     
+
   void PatternGeneratorInterfacePrivate::CallMethod(string &aCmd,
 					     istringstream &strm)
   {
@@ -1004,7 +1022,7 @@ namespace PatternGeneratorJRL {
 	strm >> sp;
 	m_SamplingPeriod = sp;
       }
-    
+
     else if (aCmd==":LimitsFeasibility")
       m_SetLimitsFeasibility(strm);
 
@@ -1031,7 +1049,6 @@ namespace PatternGeneratorJRL {
 
     else if (aCmd==":setreference")
       {
-	printf("setreference \n");
 	//m_InternalClock = 0.0;
 	setReference(strm);
       }
@@ -1096,6 +1113,7 @@ namespace PatternGeneratorJRL {
       {
 	// m_AlgorithmforZMPCOM = ZMPCOM_DIMITROV_2008;
 	m_AlgorithmforZMPCOM = ZMPCOM_HERDT_2010;
+	// m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	cout << "Herdt" << endl;
       }
@@ -1126,7 +1144,7 @@ namespace PatternGeneratorJRL {
 				      finalCOMPosition,
 				      LeftFootPosition,
 				      RightFootPosition);
-    
+
   }
 
   bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(FootAbsolutePosition &LeftFootPosition,
@@ -1160,14 +1178,14 @@ namespace PatternGeneratorJRL {
 							     MAL_VECTOR(,double) & CurrentAcceleration,
 							     MAL_VECTOR( &ZMPTarget,double),
 							     COMPosition &finalCOMPosition,
-							     FootAbsolutePosition &LeftFootPosition, 
+							     FootAbsolutePosition &LeftFootPosition,
 							     FootAbsolutePosition &RightFootPosition )
 
 
   {
 
     m_InternalClock+=m_SamplingPeriod;
-    
+
 
     if ((!m_ShouldBeRunning) ||
 	(m_GlobalStrategyManager->EndOfMotion()<0))
@@ -1179,7 +1197,7 @@ namespace PatternGeneratorJRL {
 	ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
 	       "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
 	*/
-	//return false;//Andremize
+	//	return false;//Andremize
       }
     ODEBUG("Here");
 
@@ -1195,12 +1213,12 @@ namespace PatternGeneratorJRL {
 	    m_ZMPD->OnLine(m_InternalClock,
 			   m_ZMPPositions,
 			   m_COMBuffer,
-			   m_LeftFootPositions,			   
+			   m_LeftFootPositions,
 			   m_RightFootPositions);
 	  }
 	else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
 	  {
-	    ODEBUG("InternalClock:" <<m_InternalClock  << 
+	    ODEBUG("InternalClock:" <<m_InternalClock  <<
 		    " SamplingPeriod: "<<m_SamplingPeriod);
 
 	    m_ZMPM->OnLine(m_InternalClock,
@@ -1210,7 +1228,7 @@ namespace PatternGeneratorJRL {
 			   m_RightFootPositions);
 	  }
       }
-    else 
+    else
       /* Check if we are not in an ending phase generated on-line */
       {
 	if ((m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007) &&
@@ -1223,19 +1241,21 @@ namespace PatternGeneratorJRL {
 			   m_RightFootPositions);
 	  }
       }
-    
+
     if (m_AlgorithmforZMPCOM==ZMPCOM_HERDT_2010 && m_ZMPVRQP->Online==1)
       {
-	ODEBUG("InternalClock:" <<m_InternalClock  << 
+	ODEBUG("InternalClock:" <<m_InternalClock  <<
 	       " SamplingPeriod: "<<m_SamplingPeriod);
 
-
+	// cout<<"size before online"<<m_ZMPPositions.size()<<endl;
 	m_ZMPVRQP->OnLine(m_InternalClock,
 			  m_ZMPPositions,
 			  m_COMBuffer,
 			  m_LeftFootPositions,
 			  m_RightFootPositions);
+	// cout<<"size after online"<<m_ZMPPositions.size()<<endl;
       }
+
 
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,
 						    RightFootPosition,
@@ -1248,8 +1268,8 @@ namespace PatternGeneratorJRL {
     // New scheme:
     // Update the queue of ZMP ref
     m_count++;
-    
-    // Update the waist state, it is assumed that the waist is the free flyer 
+
+    // Update the waist state, it is assumed that the waist is the free flyer
     // Depending on the strategy used to generate the CoM trajectory
     // this can be empty.
 
@@ -1264,19 +1284,30 @@ namespace PatternGeneratorJRL {
     m_CurrentWaistState.y[1]  = CurrentVelocity[1];
     m_CurrentWaistState.z[1]  = CurrentVelocity[2];
 
-    ODEBUG4("CurrentWaistState: " 
-	    << m_CurrentWaistState.x[0] << " " 
-	    << m_CurrentWaistState.y[0] << " " 
+    ODEBUG4("CurrentWaistState: "
+	    << m_CurrentWaistState.x[0] << " "
+	    << m_CurrentWaistState.y[0] << " "
 	    << m_CurrentWaistState.z[0] << " "
 	    << m_CurrentWaistState.roll << " "
 	    << m_CurrentWaistState.pitch << " "
 	    << m_CurrentWaistState.yaw,
 	    "DebugDataWaist.dat" );
+//
+//    ofstream aof;
+//    aof.open("waist.txt", ofstream::app);
+//    aof << m_CurrentWaistState.x[0] << " "
+//	<< m_CurrentWaistState.y[0] << " "
+//	<< m_CurrentWaistState.z[0] << " "
+//	<< m_CurrentWaistState.roll << " "
+//	<< m_CurrentWaistState.pitch << " "
+//	<< m_CurrentWaistState.yaw
+//	<< endl;
+//    aof.close();
 
     bool UpdateAbsMotionOrNot = false;
 
     //    if ((u=(m_count - (m_ZMPPositions.size()-2*m_NL)))>=0)
-    
+
     if (m_GlobalStrategyManager->EndOfMotion()==GlobalStrategyManager::NEW_STEP_NEEDED)
       {
 	ODEBUG("NEW STEP NEEDED" << m_InternalClock/m_SamplingPeriod << " Internal Clock :" << m_InternalClock);
@@ -1309,7 +1340,7 @@ namespace PatternGeneratorJRL {
 
 
 	    ODEBUG("Asking a new step");
-	    
+
 	    if (!EndSequence)
 	      {
 		// ********* WARNING THIS IS THE TIME CONSUMING PART *******************
@@ -1318,17 +1349,19 @@ namespace PatternGeneratorJRL {
 		  }
 		else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
 		  {
+
 		    m_ZMPD->OnLineAddFoot(lRelativeFootPositions,
 					  m_ZMPPositions,
 					  m_COMBuffer,
-					  m_LeftFootPositions,			   
+					  m_LeftFootPositions,
 					  m_RightFootPositions,
 					  EndSequence);
+
 		  }
 		else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
 		  {
-		    ODEBUG("Putting a new step SX: " << 
-			   lRelativeFootPositions.sx << " SY: " 
+		    ODEBUG("Putting a new step SX: " <<
+			   lRelativeFootPositions.sx << " SY: "
 			   << lRelativeFootPositions.sy );
 		    m_ZMPM->SetCurrentTime(m_InternalClock);
 		    m_ZMPM->OnLineAddFoot(lRelativeFootPositions,
@@ -1337,8 +1370,8 @@ namespace PatternGeneratorJRL {
 					  m_LeftFootPositions,
 					  m_RightFootPositions,
 					  EndSequence);
-		    ODEBUG("Left and Right foot positions queues: " 
-			   << m_LeftFootPositions.size() << " " 
+		    ODEBUG("Left and Right foot positions queues: "
+			   << m_LeftFootPositions.size() << " "
 			   << m_RightFootPositions.size() );
 		  }
 	      }
@@ -1352,13 +1385,13 @@ namespace PatternGeneratorJRL {
 		  {
 		    m_ZMPD->EndPhaseOfTheWalking(m_ZMPPositions,
 						 m_COMBuffer,
-						 m_LeftFootPositions,			   
+						 m_LeftFootPositions,
 						 m_RightFootPositions);
 		  }
 		else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
 		  {
-		    ODEBUG("Putting a new step SX: " << 
-			   lRelativeFootPositions.sx << " SY: " 
+		    ODEBUG("Putting a new step SX: " <<
+			   lRelativeFootPositions.sx << " SY: "
 			   << lRelativeFootPositions.sy );
 		    m_ZMPM->SetCurrentTime(m_InternalClock);
 		    m_ZMPM->EndPhaseOfTheWalking(m_ZMPPositions,
@@ -1366,8 +1399,8 @@ namespace PatternGeneratorJRL {
 						 m_LeftFootPositions,
 						 m_RightFootPositions);
 		    ODEBUG("("<<m_InternalClock << ")");
-		    ODEBUG("Left and Right foot positions queues: " 
-			   << m_LeftFootPositions.size() << " " 
+		    ODEBUG("Left and Right foot positions queues: "
+			   << m_LeftFootPositions.size() << " "
 			   << m_RightFootPositions.size() );
 		  }
 	      }
@@ -1384,7 +1417,7 @@ namespace PatternGeneratorJRL {
 	    if ((m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007) &&
 		(m_ZMPM->GetOnLineMode()))
 	      {
-		m_ShouldBeRunning = true;	    
+		m_ShouldBeRunning = true;
 	      }
 
 	    ODEBUG("Finished the walking pattern generator ("<<m_InternalClock << ")");
@@ -1698,7 +1731,7 @@ namespace PatternGeneratorJRL {
   int PatternGeneratorInterfacePrivate::CreateZMPReferences(deque<RelativeFootPosition> &lRelativeFootPositions,
 						     COMPosition &lStartingCOMPosition,
 						     MAL_S3_VECTOR(&,double) lStartingZMPPosition,
-						     FootAbsolutePosition &InitLeftFootAbsPos, 
+						     FootAbsolutePosition &InitLeftFootAbsPos,
 						     FootAbsolutePosition &InitRightFootAbsPos)
   {
     if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
@@ -1713,8 +1746,8 @@ namespace PatternGeneratorJRL {
 				      m_Xmax, lStartingCOMPosition,
 				      lStartingZMPPosition,
 				      InitLeftFootAbsPos,
-				      InitRightFootAbsPos);      
-      }    
+				      InitRightFootAbsPos);
+      }
     // else if (m_AlgorithmforZMPCOM==ZMPCOM_DIMITROV_2008)
     //   {
     // 	ODEBUG("ZMPCOM_DIMITROV_2008 " << m_ZMPPositions.size() );
@@ -1727,9 +1760,9 @@ namespace PatternGeneratorJRL {
     // 					 m_Xmax, lStartingCOMPosition,
     // 					 lStartingZMPPosition,
     // 					 InitLeftFootAbsPos,
-    // 					 InitRightFootAbsPos);      
-    //   } 
-    
+    // 					 InitRightFootAbsPos);
+    //   }
+
     else if (m_AlgorithmforZMPCOM==ZMPCOM_HERDT_2010)
       {
 	ODEBUG("ZMPCOM_HERDT_2010 " << m_ZMPPositions.size() );
@@ -1742,8 +1775,8 @@ namespace PatternGeneratorJRL {
 					 m_Xmax, lStartingCOMPosition,
 					 lStartingZMPPosition,
 					 InitLeftFootAbsPos,
-					 InitRightFootAbsPos);      
-      }    
+					 InitRightFootAbsPos);
+      }
     else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
       {
 	ODEBUG("ZMPCOM_KAJITA_2003 " << m_ZMPPositions.size() );
@@ -1777,7 +1810,7 @@ namespace PatternGeneratorJRL {
       }
     return 0;
   }
-  
+
   void PatternGeneratorInterfacePrivate::AddStepInStack(double dx, double dy, double theta)
   {
     if (m_StepStackHandler!=0)
@@ -1785,7 +1818,7 @@ namespace PatternGeneratorJRL {
 	m_StepStackHandler->AddStepInTheStack(dx,dy,theta,m_TSsupport, m_TDsupport);
       }
   }
-  
+
   void PatternGeneratorInterfacePrivate::setZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint)
   {
     m_ZMPInitialPoint = lZMPInitialPoint;
@@ -1804,7 +1837,7 @@ namespace PatternGeneratorJRL {
   }
 
 
-  
+
 }
 
 
