@@ -1,32 +1,32 @@
 /** \file footConstraintAsLinearSystem.cpp
     \brief This object build linear constraints based on feet positions.
 
-   Copyright (c) 2005-2010, 
+   Copyright (c) 2005-2010,
    @author Andrei Herdt, Olivier Stasse
-   
+
    JRL-Japan, CNRS/AIST
 
    All rights reserved.
-   
-   Redistribution and use in source and binary forms, with or without modification, 
+
+   Redistribution and use in source and binary forms, with or without modification,
    are permitted provided that the following conditions are met:
-   
-   * Redistributions of source code must retain the above copyright notice, 
+
+   * Redistributions of source code must retain the above copyright notice,
    this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the 
+   * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   * Neither the name of the CNRS and AIST nor the names of its contributors 
+   * Neither the name of the CNRS and AIST nor the names of its contributors
    may be used to endorse or promote products derived from this software without specific prior written permission.
-   
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
-   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS 
-   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -47,12 +47,12 @@ using namespace PatternGeneratorJRL;
                        DebugFile.open(y,ofstream::app); \
                        DebugFile <<  x << endl; DebugFile.close();}
 #else
-#define RESETDEBUG4(y) 
-#define ODEBUG4(x,y) 
+#define RESETDEBUG4(y)
+#define ODEBUG4(x,y)
 #endif
 
-#define RESETDEBUG6(y) 
-#define ODEBUG6(x,y) 
+#define RESETDEBUG6(y)
+#define ODEBUG6(x,y)
 
 #define RESETDEBUG5(y) { ofstream DebugFile; \
                          DebugFile.open(y,ofstream::out);\
@@ -88,37 +88,37 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   lLeftFoot = m_HS->leftFoot();
   lLeftFoot->getSoleSize(lLeftFootHalfWidth,lLeftFootHalfHeight);
 
- 
+
   lRightFootHalfWidth *= 0.5;
   lRightFootHalfHeight *= 0.5;
   lLeftFootHalfWidth *= 0.5;
   lLeftFootHalfHeight *= 0.5;
-  
+
   // lLeftFootHalfHeight -= ConstraintOnY;
   // lRightFootHalfHeight -= ConstraintOnY;
 
   // lLeftFootHalfWidth -= ConstraintOnX;
   // lRightFootHalfWidth -= ConstraintOnX;
-   
+
   //Andremize: Scilab feet
   lLeftFootHalfHeight = 0.069-0.02;
   lRightFootHalfHeight = 0.069-0.02;
-  
+
   lLeftFootHalfWidth = 0.1206-0.02;
   lRightFootHalfWidth = 0.1206-0.02;
-  
+
   DSFeetDistance = 0.2;
-  lLeftFootHalfHeightDS = lLeftFootHalfHeight+DSFeetDistance/2.0; 
-  lRightFootHalfHeightDS = lRightFootHalfHeight+DSFeetDistance/2.0; 
-  
+  lLeftFootHalfHeightDS = lLeftFootHalfHeight+DSFeetDistance/2.0;
+  lRightFootHalfHeightDS = lRightFootHalfHeight+DSFeetDistance/2.0;
+
    ConvexHullFP.resize(5);
 
   //initFPConstrArrays();
 
   RESETDEBUG4("Constraints-fCSALS.dat");
- 
-   printf("Leaving footConstraintsAsLinearSystem \n");
-}  
+
+//   printf("Leaving footConstraintsAsLinearSystem \n");
+}
 
 footConstraintsAsLinearSystem::~footConstraintsAsLinearSystem()
 {
@@ -195,7 +195,7 @@ int footConstraintsAsLinearSystem::FindSimilarConstraints(MAL_MATRIX(&A,double),
 
 
 // Assuming that the points are going counter-clockwise
-int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPoints, 
+int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPoints,
 						       MAL_MATRIX(&D,double),
 						       MAL_MATRIX(&Dc,double),
 						       SupportState * Support
@@ -227,7 +227,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
   	  << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row << endl;
       aof.close();
     }
-  
+
   for(unsigned int i=0;i<n-1;i++)//first n-1 inequalities
     {
       ODEBUG("(x["<< i << "],y["<<i << "]): " << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
@@ -241,23 +241,23 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
       dx = y1-y2;
       dy = x2-x1;
       dc = dx*x1+dy*y1;
-      
-      //symmetrical constraints 
+
+      //symmetrical constraints
       dx = (double)Support->PrwSupportFoot*dx;
       dy = (double)Support->PrwSupportFoot*dy;
       dc = (double)Support->PrwSupportFoot*dc;
-      
+
       D(i,0) = dx; D(i,1)= dy;
       Dc(i,0) = dc;
-      
+
       //C is not filled
-      
+
       ODEBUG4("D("<<i<<",:): " <<dx<<" "<<dy<<" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
       // ODEBUG4(" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
     }
 
   {
-    //Last inequality 
+    //Last inequality
     unsigned int i = n-1;
     ODEBUG("(x["<< i << "],y["<<i << "]): " << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
 	   << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row );
@@ -270,7 +270,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
     dx = y1-y2;
     dy = x2-x1;
     dc = dx*x1+dy*y1;
-      
+
     //symmetrical constraints cannot be achieved without knowledge of the support foot
     dx = (double)Support->PrwSupportFoot*dx;
     dy = (double)Support->PrwSupportFoot*dy;
@@ -285,18 +285,18 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
     // ODEBUG4(" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
   }
 
-  
+
   ODEBUG4(" \n","Constraints-fCSALS.dat");
-      
+
   // printf("Finished computeLinearSystem \n");
 
   return 0;
 }
 
 
-int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootAbsolutePosition> 
+int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootAbsolutePosition>
 								     &LeftFootAbsolutePositions,
-								     deque<FootAbsolutePosition> 
+								     deque<FootAbsolutePosition>
 								     &RightFootAbsolutePositions,
 								     deque<LinearConstraintInequalityFreeFeet_t *> &
 								     QueueOfLConstraintInequalitiesFreeFeet,
@@ -308,17 +308,17 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 								     SupportState * Support)
 {
 
-  printf("Entered buildLinearConstraintInequalities \n");
+//  printf("Entered buildLinearConstraintInequalities \n");
 
   // ComputeCH=0;
   // lx=0.0, ly=0.0;
 
-  //For symmetrical constraints: The points of the left foot are counted clockwise. 
+  //For symmetrical constraints: The points of the left foot are counted clockwise.
   //The
   float lxcoefsRight[4] = { 1.0, 1.0, -1.0, -1.0};
   float lycoefsRight[4] = {-1.0, 1.0,  1.0, -1.0};
   float lxcoefsLeft[4] = { 1.0, 1.0, -1.0, -1.0};
-  float lycoefsLeft[4] = { 1.0, -1.0, -1.0, 1.0};  
+  float lycoefsLeft[4] = { 1.0, -1.0, -1.0, 1.0};
 
   float *lxcoefs, *lycoefs;
 
@@ -329,20 +329,20 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 
   vector<CH_Point> TheConvexHull;
 
- 
+
   // Going through the set of generated data for each 5 ms.
   // from this extract a set of linear constraints.
   for(unsigned int i=1;i<=m_QP_N;i++)
     {
-      
+
       Support->setSupportState(StartingTime, i, RefVel);
 
       ComputeCH=0;
-      
+
       TheConvexHull.resize(4);//As for now only ZMP constraints
-	
+
       //Andremize: theta = 0 as for now
-      s_t = 0.0; 
+      s_t = 0.0;
       c_t = 1.0;
 
       double FootHalfWidth, FootHalfHeight;
@@ -353,7 +353,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 	  //Andremize: theta == 0
 	  lx = 0.0;
 	  ly = -(double)Support->PrwSupportFoot*DSFeetDistance/2.0;
-	  
+
 	  if(Support->PrwSupportFoot == 1)
 	    {
 	      FootHalfWidth = lLeftFootHalfWidth;
@@ -361,7 +361,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 
 	      lxcoefs = lxcoefsLeft;
 	      lycoefs = lycoefsLeft;
-	    }	    
+	    }
 	  else
 	    {
 	      FootHalfWidth = lRightFootHalfWidth;
@@ -376,7 +376,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 	  //Andremize: theta == 0
 	  lx = 0.0;
 	  ly = 0.0;
-	  
+
 	  if(Support->PrwSupportFoot == 1)
 	    {
 	      FootHalfWidth = lLeftFootHalfWidth;
@@ -384,7 +384,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 
 	      lxcoefs = lxcoefsLeft;
 	      lycoefs = lycoefsLeft;
-	    }	    
+	    }
 	  else
 	    {
 	      FootHalfWidth = lRightFootHalfWidth;
@@ -394,21 +394,21 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 	      lycoefs = lycoefsRight;
 	    }
 	}
-      
-  
+
+
       //Compute the convex hull
       for(unsigned j=0;j<4;j++)
 	{
-	  TheConvexHull[j].col = lx + ( lxcoefs[j] * 
+	  TheConvexHull[j].col = lx + ( lxcoefs[j] *
 					FootHalfWidth * c_t -
-					lycoefs[j] * 
+					lycoefs[j] *
 					FootHalfHeight * s_t );
-	  TheConvexHull[j].row = ly + ( lxcoefs[j] * 
+	  TheConvexHull[j].row = ly + ( lxcoefs[j] *
 					FootHalfWidth * s_t +
-					lycoefs[j] * 
-					FootHalfHeight * c_t ); 
+					lycoefs[j] *
+					FootHalfHeight * c_t );
 	}
-	
+
       if(Support->StateChanged && Support->StepNumber>0)
       	{
       	  //Andremize: theta == 0
@@ -445,7 +445,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
       	  QueueOfFeetPosInequalities.push_back(aLCIFP);
 
       	}
-      
+
       // Linear Constraint Inequality
       LinearConstraintInequalityFreeFeet_t * aLCI = new LinearConstraintInequalityFreeFeet_t;
 
@@ -461,9 +461,9 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
       // cout<<Support->StepNumber<<" "<<aLCI->StepNumber<<endl;
       // Finding the similar one (i.e. Ai identical).
       //FindSimilarConstraints(aLCI->A,aLCI->SimilarConstraints);
-      
+
       //aLCI->StartingTime = LeftFootAbsolutePositions[i].time;//???What to do
-      
+
       QueueOfLConstraintInequalitiesFreeFeet.push_back(aLCI);
 
     }
@@ -472,9 +472,9 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque<FootA
 
 ODEBUG("Size of the 5 ms array: "<< LeftFootAbsolutePositions.size());
 ODEBUG("Size of the queue of Linear Constraint Inequalities " << QueueOfLConstraintInequalitiesFreeFeet.size());
-  
+
  // printf("Leaving buildLinearConstraintInequalities \n");
- 
+
  return 0;
 }
 
