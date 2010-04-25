@@ -39,6 +39,18 @@ namespace PatternGeneratorJRL
   };
   typedef struct COMPosition_s COMPosition;
   typedef struct COMPosition_s WaistState;
+
+  //TODO 0: Maybe COMPosition_s should be replaced by COMState_s
+  /// Structure to store the COM state computed by the preview control.
+    struct COMState_s
+    {
+      double x[3],y[3],z[3];
+      double yaw[3]; // aka theta
+      double pitch[3]; // aka omega
+      double roll[3]; // aka hip
+    };
+    typedef struct COMState_s COMState;
+
   /** Structure to store each foot position when the user is specifying 
       a sequence of relative positions. */
   struct RelativeFootPosition_s
