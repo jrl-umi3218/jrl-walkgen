@@ -40,6 +40,7 @@ SET(libwpg_src
 	./ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.cpp 
+	./ZMPRefTrajectoryGeneration/OrientationsPreview.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp 
 	./ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.cpp 
