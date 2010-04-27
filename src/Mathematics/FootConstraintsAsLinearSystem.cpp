@@ -78,7 +78,7 @@ FootConstraintsAsLinearSystem::FootConstraintsAsLinearSystem(SimplePluginManager
   SimplePlugin(aSPM)
 {
   m_HS = aHS;
-  RESETDEBUG5("Constraints-FCSALS.dat");
+  //RESETDEBUG5("Constraints-FCSALS.dat");
 }
 
 FootConstraintsAsLinearSystem::~FootConstraintsAsLinearSystem()
@@ -140,7 +140,7 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
 
   // Dump a file to display on scilab .
   // This should be removed during real usage inside a robot.
-  if (1)
+  if (0)
     {
       ofstream aof;
       aof.open("Constraints-FCSALS.dat",ofstream::app);

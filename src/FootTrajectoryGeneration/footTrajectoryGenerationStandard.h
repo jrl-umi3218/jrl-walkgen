@@ -141,6 +141,7 @@ namespace PatternGeneratorJRL
    */
 
    /*! @} */
+   //TODO : made public but was private before
       /*! \brief Position of the ankle in the left foot. */
    MAL_S3_VECTOR(m_AnklePositionLeft,double);
 

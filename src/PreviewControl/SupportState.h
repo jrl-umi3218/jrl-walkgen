@@ -21,7 +21,7 @@ namespace PatternGeneratorJRL
   {
   public:
     /*! Constructor */
-    SupportState(const double &SamplingDuration);
+    SupportState(const double &SamplingPeriod);
 	
     /*! Destructor */
     ~SupportState();
@@ -35,7 +35,7 @@ namespace PatternGeneratorJRL
     double eps;
 	
     /*! \brief constants for the durations in the support phases */
-    double DSDuration, SSDuration, DSSSDuration;
+    double DSDuration, SSPeriod, DSSSDuration;
 
     /*! \brief First support foot */
     int StartSupportFoot;
@@ -102,7 +102,7 @@ namespace PatternGeneratorJRL
   private: 
 	
     /*! \Brief Sampling duration */
-    double T;
+    double m_T;
 
     /*! \Brief Support state */
     int *SupportPhase, *SupportFoot, *SupportStepsLeft;

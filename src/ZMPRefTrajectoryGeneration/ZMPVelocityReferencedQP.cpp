@@ -41,7 +41,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   // printf("Entered ZMPVelocityReferencedQP \n");
   m_Q = 0;
   m_Pu = 0;
-  m_FullDebug =1;
+  m_FullDebug =0;
   m_FastFormulationMode = QLD;
 
   m_QP_T = 0.1;
@@ -74,6 +74,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   /* Initialize the FSM */
   Support = new SupportState(m_QP_T);
 
+  /* Orientations preview algorithm*/
+  m_OP = new OrientationsPreview(m_QP_T, m_QP_N, Support->SSPeriod);
 
   // if (m_FastFormulationMode==PLDP)
   //   m_PLDPSolverHerdt = new Optimization::Solver::PLDPSolver(m_QP_N,
@@ -101,8 +103,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   // PLDP Solver needs iPu and Px.
 
   m_SimilarConstraints.resize(8*m_QP_N);
-
-
 
 
   // Register method to handle
@@ -175,7 +175,7 @@ void ZMPVelocityReferencedQP::setReference(istringstream &strm)
 {
   strm >> RefVel.x;
   strm >> RefVel.y;
-  strm >> RefVel.theta;
+  strm >> RefVel.dYaw;
 }
 
 void ZMPVelocityReferencedQP::interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
@@ -1449,8 +1449,6 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
   FPy = 0.0;
   FPtheta = 0.0;
 
-
-
   // if (m_FullDebug>0)
   //   {
   //     RESETDEBUG4("DebugPBW.dat");
@@ -1461,13 +1459,6 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
   //     ofstream aof("FFP.dat");//Andremize
   //     aof.open("LCIFF.dat");
   //   }
-
-  // Build a set of linear constraint inequalities.
-  m_FCALS->BuildLinearConstraintInequalities(LeftFootAbsolutePositions,
-					     RightFootAbsolutePositions,
-					     QueueOfLConstraintInequalities,
-					     ConstraintOnX,
-					     ConstraintOnY);
 
   deque<LinearConstraintInequality_t *>::iterator LCI_it;
   LCI_it = QueueOfLConstraintInequalities.begin();
@@ -1495,9 +1486,6 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
   //Andremize
   //(Re)initialize the LIPM
   m_2DLIPM->InitializeSystem();
-
-  //Constant velocity reference
-  // double Ref[3] = {0.1,0,1};
 
   //Andremize - only constant velocity
   //constant velocity for the whole preview window
@@ -1592,8 +1580,8 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
       			      N,T,
       			      StartingTime,
       			      QueueOfLConstraintInequalitiesFreeFeet,
-			      QueueOfFeetPosInequalities,
-			      QueueOfSupportFeet,
+      			      QueueOfFeetPosInequalities,
+      			      QueueOfSupportFeet,
       			      m_ComHeight,
       			      NbOfConstraints,
       			      xk,
@@ -1630,9 +1618,9 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
       int *iwar = new int[liwar]; // The Cholesky decomposition is done internally.
 
       if (m_FastFormulationMode==QLDANDLQ)
-	iwar[0]=0;
+    	  iwar[0]=0;
       else
-	iwar[0]=1;
+    	  iwar[0]=1;
 
       //Objective
       //Andremize: There are constant parts which should be put in separate functions
@@ -1709,7 +1697,8 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
 
 
       ODEBUG("m: " << m);
-      dumpProblem(m_Qff, D, DU, m, DS, XL, XU, StartingTime);
+      if(m_FullDebug>2)
+    	  dumpProblem(m_Qff, D, DU, m, DS, XL, XU, StartingTime);
 
 
 
@@ -1855,7 +1844,7 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
       	// aof.close();
       }
 
-      if(1)
+      if(m_FullDebug>2)
 	{
 	  if(validateConstraints(DS, DU, m, li, X)<0)
 	    {
@@ -1983,122 +1972,122 @@ void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstrea
 }
 
 int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-					deque<COMPosition> & FinalCoMPositions,
-					deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-					deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
-					FootAbsolutePosition & InitLeftFootAbsolutePosition,
-					FootAbsolutePosition & InitRightFootAbsolutePosition,
-					deque<RelativeFootPosition> &RelativeFootPositions,
-					COMPosition & lStartingCOMPosition,
-					MAL_S3_VECTOR(,double) & lStartingZMPPosition)
+		deque<COMPosition> & FinalCoMPositions,
+		deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+		deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
+		FootAbsolutePosition & InitLeftFootAbsolutePosition,
+		FootAbsolutePosition & InitRightFootAbsolutePosition,
+		deque<RelativeFootPosition> &RelativeFootPositions,
+		COMPosition & lStartingCOMPosition,
+		MAL_S3_VECTOR(,double) & lStartingZMPPosition)
 {
-  // COMPosition aCOMPos;
-  // ZMPPosition aZMPPos;
+	// COMPosition aCOMPos;
+	// ZMPPosition aZMPPos;
 
-  FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
+	FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
 
-  // CjrlFoot aFoot;
-  // aFoot=aHS->leftFoot();
-  // vector3d AnklePosition;
-  // aFoot->getAnklePositionInLocalFrame(AnklePosition);
-
-
-
-  ODEBUG4("ZMP::InitOnLine - Step 2 ","ZMDInitOnLine.txt");
-  // Initialize position of the feet.
-  CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
-  CurrentLeftFootAbsPos.z = m_FTGS->m_AnklePositionLeft[2];
-  CurrentLeftFootAbsPos.time = 0.0;
-
-  ODEBUG4("CurrentLeftFootAbsPos.y: " << CurrentLeftFootAbsPos.y, "ZMDInitOnLine.txt");
-  CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
-  CurrentRightFootAbsPos.z =m_FTGS->m_AnklePositionRight[2];
-  CurrentRightFootAbsPos.time = 0.0;
-
-  // V pre is the difference between
-  // the current support position and the precedent.
-  ODEBUG4("ZMP::InitOnLine - Step 2.5 ","ZMDInitOnLine.txt");
+	// CjrlFoot aFoot;
+	// aFoot=aHS->leftFoot();
+	// vector3d AnklePosition;
+	// aFoot->getAnklePositionInLocalFrame(AnklePosition);
 
 
 
-  int AddArraySize;
-  {
-    assert(m_SamplingPeriod > 0);
-    double ldAddArraySize = m_TimeBuffer/m_SamplingPeriod;
-    AddArraySize = (int) ldAddArraySize;
-  }
+	ODEBUG4("ZMP::InitOnLine - Step 2 ","ZMDInitOnLine.txt");
+	// Initialize position of the feet.
+	CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
+	CurrentLeftFootAbsPos.z = m_FTGS->m_AnklePositionLeft[2];
+	CurrentLeftFootAbsPos.time = 0.0;
 
-  cout<<"AddArraySize:"<<AddArraySize<<endl;
-  ODEBUG(AddArraySize);
-  FinalZMPPositions.resize(AddArraySize);
-  FinalCoMPositions.resize(AddArraySize);
-  FinalLeftFootAbsolutePositions.resize(AddArraySize);
-  FinalRightFootAbsolutePositions.resize(AddArraySize);
-  int CurrentZMPindex=0;
+	ODEBUG4("CurrentLeftFootAbsPos.y: " << CurrentLeftFootAbsPos.y, "ZMDInitOnLine.txt");
+	CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
+	CurrentRightFootAbsPos.z =m_FTGS->m_AnklePositionRight[2];
+	CurrentRightFootAbsPos.time = 0.0;
 
-  //Andremize
-  if(m_FullDebug>0)
-    {
-      //Feet coordinates for plot in scilab
-      ofstream aoffeet;
-      aoffeet.open("Feet.dat",ios::out);
-      aoffeet<<"#Time    "<<"LeftX    "<<"LeftY    "<<"LeftZ    "<<"RightX    "<<"RightY    "<<"RightZ    "<<endl;
-      aoffeet.close();
-    }
-
-  for(unsigned int i=0;i<FinalZMPPositions.size();i++)
-    {
-
-      // Smooth ramp
-      // ZMPPositions[CurrentZMPindex].px =0.0;
-      // ZMPPositions[CurrentZMPindex].py = 0.0;
-      // ZMPPositions[CurrentZMPindex].pz = 0.0;
-      // ZMPPositions[CurrentZMPindex].theta = 0.0;
-      FinalZMPPositions[CurrentZMPindex].time = m_CurrentTime;
-      FinalZMPPositions[CurrentZMPindex].stepType = 0;
-
-      // Set CoM positions.
-      FinalCoMPositions[CurrentZMPindex].z[0] = m_ComHeight;
-      // FinalCoMPositions[CurrentZMPindex].z[1] = 0.0;
-      // FinalCoMPositions[CurrentZMPindex].z[2] = 0.0;
-      // FinalCoMPositions[CurrentZMPindex].pitch = 0.0;
-      // FinalCoMPositions[CurrentZMPindex].roll = 0.0;
-      // FinalCoMPositions[CurrentZMPindex].yaw = 0.0;
-
-      // Set Left Foot positions.
-      FinalLeftFootAbsolutePositions[CurrentZMPindex] = CurrentLeftFootAbsPos;
-      FinalRightFootAbsolutePositions[CurrentZMPindex] = CurrentRightFootAbsPos;
-
-      FinalLeftFootAbsolutePositions[CurrentZMPindex].time =
-	FinalRightFootAbsolutePositions[CurrentZMPindex].time = m_CurrentTime;
-
-      FinalLeftFootAbsolutePositions[CurrentZMPindex].stepType =
-	FinalRightFootAbsolutePositions[CurrentZMPindex].stepType = 10;
+	// V pre is the difference between
+	// the current support position and the precedent.
+	ODEBUG4("ZMP::InitOnLine - Step 2.5 ","ZMDInitOnLine.txt");
 
 
 
-
-      if(m_FullDebug>0)
+	int AddArraySize;
 	{
-	  //Feet coordinates for plot in scilab
-	  ofstream aoffeet;
-	  aoffeet.open("Feet.dat",ios::app);
-	  aoffeet<<FinalLeftFootAbsolutePositions[CurrentZMPindex].time<<"    "
-		 <<FinalLeftFootAbsolutePositions[CurrentZMPindex].x<<"    "
-		 <<FinalLeftFootAbsolutePositions[CurrentZMPindex].y<<"    "
-		 <<FinalLeftFootAbsolutePositions[CurrentZMPindex].z<<"    "
-		 <<FinalRightFootAbsolutePositions[CurrentZMPindex].x<<"    "
-		 <<FinalRightFootAbsolutePositions[CurrentZMPindex].y<<"    "
-		 <<FinalRightFootAbsolutePositions[CurrentZMPindex].z<<"    "<<endl;
-	  aoffeet.close();
+		assert(m_SamplingPeriod > 0);
+		double ldAddArraySize = m_TimeBuffer/m_SamplingPeriod;
+		AddArraySize = (int) ldAddArraySize;
 	}
 
-      m_CurrentTime += m_SamplingPeriod;
-      CurrentZMPindex++;
+	cout<<"AddArraySize:"<<AddArraySize<<endl;
+	ODEBUG(AddArraySize);
+	FinalZMPPositions.resize(AddArraySize);
+	FinalCoMPositions.resize(AddArraySize);
+	FinalLeftFootAbsolutePositions.resize(AddArraySize);
+	FinalRightFootAbsolutePositions.resize(AddArraySize);
+	int CurrentZMPindex=0;
 
-    }
+	//Andremize
+	if(m_FullDebug>0)
+	{
+		//Feet coordinates for plot in scilab
+		ofstream aoffeet;
+		aoffeet.open("Feet.dat",ios::out);
+		aoffeet<<"#Time    "<<"LeftX    "<<"LeftY    "<<"LeftZ    "<<"RightX    "<<"RightY    "<<"RightZ    "<<endl;
+		aoffeet.close();
+	}
 
-  return 0;
+	for(unsigned int i=0;i<FinalZMPPositions.size();i++)
+	{
+
+		// Smooth ramp
+		// ZMPPositions[CurrentZMPindex].px =0.0;
+		// ZMPPositions[CurrentZMPindex].py = 0.0;
+		// ZMPPositions[CurrentZMPindex].pz = 0.0;
+		// ZMPPositions[CurrentZMPindex].theta = 0.0;
+		FinalZMPPositions[CurrentZMPindex].time = m_CurrentTime;
+		FinalZMPPositions[CurrentZMPindex].stepType = 0;
+
+		// Set CoM positions.
+		FinalCoMPositions[CurrentZMPindex].z[0] = m_ComHeight;
+		// FinalCoMPositions[CurrentZMPindex].z[1] = 0.0;
+		// FinalCoMPositions[CurrentZMPindex].z[2] = 0.0;
+		// FinalCoMPositions[CurrentZMPindex].pitch = 0.0;
+		// FinalCoMPositions[CurrentZMPindex].roll = 0.0;
+		// FinalCoMPositions[CurrentZMPindex].yaw = 0.0;
+
+		// Set Left Foot positions.
+		FinalLeftFootAbsolutePositions[CurrentZMPindex] = CurrentLeftFootAbsPos;
+		FinalRightFootAbsolutePositions[CurrentZMPindex] = CurrentRightFootAbsPos;
+
+		FinalLeftFootAbsolutePositions[CurrentZMPindex].time =
+				FinalRightFootAbsolutePositions[CurrentZMPindex].time = m_CurrentTime;
+
+		FinalLeftFootAbsolutePositions[CurrentZMPindex].stepType =
+				FinalRightFootAbsolutePositions[CurrentZMPindex].stepType = 10;
+
+
+
+
+		if(m_FullDebug>0)
+		{
+			//Feet coordinates for plot in scilab
+			ofstream aoffeet;
+			aoffeet.open("Feet.dat",ios::app);
+			aoffeet<<FinalLeftFootAbsolutePositions[CurrentZMPindex].time<<"    "
+					<<FinalLeftFootAbsolutePositions[CurrentZMPindex].x<<"    "
+					<<FinalLeftFootAbsolutePositions[CurrentZMPindex].y<<"    "
+					<<FinalLeftFootAbsolutePositions[CurrentZMPindex].z<<"    "
+					<<FinalRightFootAbsolutePositions[CurrentZMPindex].x<<"    "
+					<<FinalRightFootAbsolutePositions[CurrentZMPindex].y<<"    "
+					<<FinalRightFootAbsolutePositions[CurrentZMPindex].z<<"    "<<endl;
+			aoffeet.close();
+		}
+
+		m_CurrentTime += m_SamplingPeriod;
+		CurrentZMPindex++;
+
+	}
+
+	return 0;
 }
 
 void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
@@ -2191,6 +2180,15 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       // printf("StartingTime: %f \n", StartingTime);
       gettimeofday(&start,0);
+
+      m_OP->verifyAccelerationOfHipJoint(RefVel, m_AngVelTrunkConst,
+      		m_TrunkState, Support);
+
+      m_OP->previewOrientations(time, PreviewedSupportAngles, m_AngVelTrunkConst,
+    		  m_PreviewedTrunkAngle, m_TrunkState, Support,
+    		  FinalLeftFootAbsolutePositions, FinalRightFootAbsolutePositions);
+
+
 
       // Read the current state of the 2D Linearized Inverted Pendulum.
       m_2DLIPM->GetState(xk);
@@ -2382,7 +2380,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 
       ODEBUG("m: " << m);
-      dumpProblem(m_Qff, D, DU, m, DS, XL, XU, time+m_TimeBuffer);
+      if(m_FullDebug>2)
+    	  dumpProblem(m_Qff, D, DU, m, DS, XL, XU, time+m_TimeBuffer);
 
       double ldt;
       //---------Solver------------
@@ -2507,7 +2506,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       m_FPx = ptX[2*m_QP_N];
       m_FPy = ptX[2*m_QP_N+Support->StepNumber];
 
-      if (1)
+      if (m_FullDebug>2)
 	{
 	  ofstream aof;
 	  char Buffer[1024];
@@ -2534,7 +2533,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	}
 
 
-      double LocalInterpolationStartTime = (time+m_TimeBuffer)-(Support->CurrentTimeLimit-Support->SSDuration);
+      double LocalInterpolationStartTime = (time+m_TimeBuffer)-(Support->CurrentTimeLimit-Support->SSPeriod);
       // printf("FPx: %f FPy %f \n",FPx,FPy);
 
       // printf("Before interpolation \n");
@@ -2543,14 +2542,14 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	{
 	  //determine coefficients of interpolation polynom
 	  double ModulationSupportCoefficient = 0.9;
-	  double ModulatedSingleSupportTime = (Support->SSDuration-m_QP_T) * ModulationSupportCoefficient;
-	  double EndOfLiftOff = ((Support->SSDuration-m_QP_T)-ModulatedSingleSupportTime)*0.5;
+	  double ModulatedSingleSupportTime = (Support->SSPeriod-m_QP_T) * ModulationSupportCoefficient;
+	  double EndOfLiftOff = ((Support->SSPeriod-m_QP_T)-ModulatedSingleSupportTime)*0.5;
 	  double InterpolationTimePassed = 0.0;
 	  if(LocalInterpolationStartTime>EndOfLiftOff)
 	    InterpolationTimePassed = LocalInterpolationStartTime-EndOfLiftOff;
 
 	  // cout<<"ModulatedSingleSupportTime:"<<ModulatedSingleSupportTime<<endl;
-	  // cout<<"Support->SSDuration-m_QP_T"<<Support->SSDuration-m_QP_T<<endl;
+	  // cout<<"Support->SSPeriod-m_QP_T"<<Support->SSPeriod-m_QP_T<<endl;
 	  // cout<<"EndOfLiftOff:"<<EndOfLiftOff<<endl;
 	  // cout<<"Last position left: "<<FinalLeftFootAbsolutePositions[CurrentIndex-1].x<<endl;
 	  // cout<<"Last velocity left: "<<FinalLeftFootAbsolutePositions[CurrentIndex-1].dx<<endl;
@@ -2578,7 +2577,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 						    LastSwingFootPosition.y,
 						    LastSwingFootPosition.dy);
 	  if(CurrentSStateChanged==1)
-	    m_FTGS->SetParameters(footTrajectoryGenerationStandard::Z_AXIS, Support->SSDuration-m_QP_T,StepHeight);
+	    m_FTGS->SetParameters(footTrajectoryGenerationStandard::Z_AXIS, Support->SSPeriod-m_QP_T,StepHeight);
 
 	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::THETA_AXIS,
 						    ModulatedSingleSupportTime-InterpolationTimePassed,0.0,
