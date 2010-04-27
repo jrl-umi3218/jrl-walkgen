@@ -114,8 +114,9 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
    ConvexHullFP.resize(5);
 
   //initFPConstrArrays();
-
-  RESETDEBUG4("Constraints-fCSALS.dat");
+   //TODO 0: find another condition
+   if(0)
+	   RESETDEBUG4("Constraints-fCSALS.dat");
 
 //   printf("Leaving footConstraintsAsLinearSystem \n");
 }
@@ -214,7 +215,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
 
   // Dump a file to display on scilab .
   // This should be removed during real usage inside a robot.
-  if (1)
+  if (0)
     {
       ofstream aof;
       aof.open("Constraints-fCSALS.dat",ofstream::app);
@@ -252,7 +253,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
 
       //C is not filled
 
-      ODEBUG4("D("<<i<<",:): " <<dx<<" "<<dy<<" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
+      //ODEBUG4("D("<<i<<",:): " <<dx<<" "<<dy<<" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
       // ODEBUG4(" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
     }
 
@@ -281,12 +282,12 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
 
     //C is not filled
 
-    ODEBUG4("D("<<i<<",:): " <<dx<<" "<<dy<<" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
+    //ODEBUG4("D("<<i<<",:): " <<dx<<" "<<dy<<" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
     // ODEBUG4(" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
   }
 
 
-  ODEBUG4(" \n","Constraints-fCSALS.dat");
+  //ODEBUG4(" \n","Constraints-fCSALS.dat");
 
   // printf("Finished computeLinearSystem \n");
 

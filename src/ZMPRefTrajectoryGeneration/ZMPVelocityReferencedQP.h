@@ -17,13 +17,14 @@
 
 
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
-#include <Mathematics/FootConstraintsAsLinearSystem.h>
 #include <Mathematics/footConstraintsAsLinearSystem.h>
 #include <Mathematics/OptCholesky.h>
 /* #include <Mathematics/PLDPSolver.h> */
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 #include <PreviewControl/SupportState.h>
 #include <FootTrajectoryGeneration/footTrajectoryGenerationStandard.h>
+#include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
+
 
 namespace PatternGeneratorJRL
 {
@@ -348,10 +349,12 @@ namespace PatternGeneratorJRL
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
     SupportState * Support;
 
+    /*! Uses a Finite State Machine to simulate the evolution of the support states. */
+    OrientationsPreview * m_OP;
+
     /*! \brief Object creating Linear inequalities constraints 
       based on the foot position. Those constraints are *NOT* the
       one put in the QP, but they are a necessary intermediate step. */
-    FootConstraintsAsLinearSystem * m_FCALS;
     footConstraintsAsLinearSystem * m_fCALS;
       
     footTrajectoryGenerationStandard * m_FTGS;
@@ -363,6 +366,15 @@ namespace PatternGeneratorJRL
     
     /*! Com height */
     double m_ComHeight;
+
+    /*! State of the trunk after one sampling period */
+    double m_AngVelTrunkConst, m_PreviewedTrunkAngle;
+
+    /*! Orientations of the feet previewed over the whole horizon length*/
+    deque<double> PreviewedSupportAngles;
+
+    /*! Current state of the trunk */
+    COMState_t m_TrunkState;
 
 
     /*! Sampling of the QP. */
@@ -430,16 +442,6 @@ namespace PatternGeneratorJRL
     /* /\*! Primal Least square Distance Problem solver *\/ */
     /* Optimization::Solver::PLDPSolver * m_PLDPSolverHerdt; */
 
-    /*! @} */
-    
-    int DumpProblem(double * Q,
-		    double * D, 
-		    double * Pu,
-		    unsigned int NbOfConstraints,
-		    double * Px,
-		    double * XL,
-		    double * XU,
-		    double Time);
       
     int dumpProblem(double * Q,
 		    double * D, 

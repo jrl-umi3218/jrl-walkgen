@@ -40,7 +40,7 @@ namespace PatternGeneratorJRL
   typedef struct COMPosition_s COMPosition;
   typedef struct COMPosition_s WaistState;
 
-  //TODO 0: Maybe COMPosition_s should be replaced by COMState_s
+  //TODO 0: Maybe COMPosition_s should/could be replaced by COMState_s
   /// Structure to store the COM state computed by the preview control.
     struct COMState_s
     {
@@ -49,7 +49,7 @@ namespace PatternGeneratorJRL
       double pitch[3]; // aka omega
       double roll[3]; // aka hip
     };
-    typedef struct COMState_s COMState;
+    typedef struct COMState_s COMState_t;
 
   /** Structure to store each foot position when the user is specifying 
       a sequence of relative positions. */
@@ -78,6 +78,7 @@ namespace PatternGeneratorJRL
   };
   typedef struct ZMPPosition_s ZMPPosition;
 
+  //TODO 0: FootAbsolutePosition_t does not contain the acceleration
   /// Structure to store the absolute foot position.
   struct FootAbsolutePosition_t
   { 
@@ -130,7 +131,7 @@ namespace PatternGeneratorJRL
   struct ReferenceAbsoluteVelocity_t
   { 
     /*! m/sec or degrees/sec */
-    double x,y,z, theta; 
+    double x,y,z, dYaw;
 
     /*! reference values for the whole preview window */
     MAL_VECTOR(RefVectorX,double);	

@@ -1,4 +1,4 @@
-/*
+/* TODO 3: Restructure the class
  *  setSupportState.cpp
  *  
  *
@@ -16,16 +16,16 @@
 using namespace PatternGeneratorJRL;
 using namespace std;
 
-SupportState::SupportState(const double &SamplingDuration)
+SupportState::SupportState(const double &SamplingPeriod)
 {
   // printf("Entered SupportState \n");
 
-  SSDuration = 0.8; 	  //Duration of one step
+  SSPeriod = 0.8; 	  //Duration of one step
   DSDuration = 1e9;       //Duration of the DS phase
   DSSSDuration = 0.4;
   NbOfStepsSSDS = 1;
 
-  T = SamplingDuration;
+  m_T = SamplingPeriod;
   //Initial current state
   CurrentSupportPhase = 0;
   CurrentSupportFoot = 1;
@@ -83,13 +83,13 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
  
    
   //FSM
-  if(Time+eps+pi*T >= *SupportTimeLimit)
+  if(Time+eps+pi*m_T >= *SupportTimeLimit)
     {
       //SS->DS
       if(*SupportPhase == 1  && ReferenceGiven == -1 && *SupportStepsLeft==0)
 	{
 	  *SupportPhase = 0;	
-	  *SupportTimeLimit = Time+pi*T + DSDuration;
+	  *SupportTimeLimit = Time+pi*m_T + DSDuration;
 	  StateChanged = 1;
 	}
       //DS->SS
@@ -97,7 +97,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
 	{
 	  *SupportPhase = 1;
 	  *SupportFoot = StartSupportFoot;
-	  *SupportTimeLimit = Time+pi*T + SSDuration;
+	  *SupportTimeLimit = Time+pi*m_T + SSPeriod;
 	  *SupportStepsLeft = NbOfStepsSSDS;
 	  StateChanged = 1;
 	}
@@ -106,7 +106,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
 	{
 	  *SupportFoot = -1**SupportFoot;
 	  StateChanged = 1;
-	  *SupportTimeLimit = Time+pi*T + SSDuration;
+	  *SupportTimeLimit = Time+pi*m_T + SSPeriod;
 	  StepNumber++;
 	  SSSS = 1;
 	  if (ReferenceGiven == -1)
@@ -122,7 +122,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
   //   {
   //     ofstream aof;
   //     aof.open("SupportStates.dat", ios::app);
-  //     aof << "Time: "<<Time<<" PrwTime: "<<Time+pi*T<<" CSP: "<<CurrentSupportPhase
+  //     aof << "Time: "<<Time<<" PrwTime: "<<Time+pi*m_T<<" CSP: "<<CurrentSupportPhase
   // 	  <<" CSF: "<<CurrentSupportFoot<<" CTL: "<<CurrentTimeLimit
   // 	  <<" CSL: "<<CurrentStepsLeft<<" PrwSP: "<<PrwSupportPhase
   // 	  <<" PrwSF: "<<PrwSupportFoot<<" PrwTL: "<<PrwTimeLimit

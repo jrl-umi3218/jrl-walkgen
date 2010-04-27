@@ -8,6 +8,8 @@
 #ifndef ORIENTATIONSPREVIEW_H_
 #define ORIENTATIONSPREVIEW_H_
 
+
+
 /*! STL includes */
 #include <deque>
 
@@ -26,13 +28,15 @@ public:
 			const double & SSPeriod);
 	~OrientationsPreview();
 
-	void previewOrientations(double Time,
-			std::deque<double> PreviewedSupportAngles,
-			double AngVelTrunk, double PreviewedTrunkAngle,
-			COMState_t TrunkState, SupportState Support,
+	void previewOrientations(double &Time,
+			std::deque<double> &PreviewedSupportAngles,
+			double &AngVelTrunkConst, double &PreviewedTrunkAngle,
+			COMState_t &TrunkState, SupportState * Support,
 			std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			std::deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
+	void verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref, double &AngVelTrunkConst,
+			const COMState_t &TrunkState, const SupportState * Support);
 	//TODO 0: Unused variables in OrientationsPreview.h
 	//	double* CurAngVelCoH, double* TrunkAngle, double* TimeLimit, double* Time,
 	//	int* SupportPhase, int* SupportFoot, double* SupportAngle, double* RightFootAngle, double* LeftFootAngle,
@@ -41,7 +45,10 @@ public:
 
 private:
 	/*! Angular limitations of the hip joints*/
-	double m_lLimitHipLeft, m_uLimitHipLeft, m_lLimitHipRight, m_uLimitHipRight;
+	double m_lLimitLeftHipYaw, m_uLimitLeftHipYaw, m_lLimitRightHipYaw, m_uLimitRightHipYaw;
+
+	/*! Maximal acceleration of a hip joint*/
+	double m_uaLimitHipYaw;
 
 	/*! Upper crossing angle limit between the feet*/
 	double m_uLimitFeet;
@@ -57,6 +64,11 @@ private:
 
 	/*! Time between two samplings*/
 	double m_T;
+
+
+
+
+	unsigned int m_FullDebug;
 
 
 };
