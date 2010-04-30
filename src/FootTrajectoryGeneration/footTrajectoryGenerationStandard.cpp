@@ -262,7 +262,8 @@ void footTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 							  double LocalInterpolationStartTime,
 							  double ModulatedSingleSupportTime,
 							  int StepType, int LeftOrRight)
-{
+{//TODO 0:Update foot position needs to be verified and cleaned
+
   // unsigned int k = CurrentAbsoluteIndex - IndexInitial;
   // Local time
   double InterpolationTime = k*m_SamplingPeriod;
@@ -308,14 +309,14 @@ void footTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 	m_PolynomeY->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);//  + 
 	// NoneSupportFootAbsolutePositions[StartIndex-1].y;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy = 
-	m_PolynomeY->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff); // + 
+	m_PolynomeY->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff); // +
 	// NoneSupportFootAbsolutePositions[StartIndex-1].dy;
       //theta, dtheta
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
 	m_PolynomeTheta->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// + 
 	//NoneSupportFootAbsolutePositions[StartIndex].theta;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dtheta = 
-	m_PolynomeTheta->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
+	m_PolynomeTheta->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
 	// +NoneSupportFootAbsolutePositions[StartIndex].dtheta;
     }
   else 
@@ -334,14 +335,14 @@ void footTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 	m_PolynomeY->Compute(InterpolationTime);
       //+NoneSupportFootAbsolutePositions[StartIndex].y;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy = 
-	m_PolynomeY->Compute(InterpolationTime);
+	m_PolynomeY->ComputeDerivative(InterpolationTime);
       //+NoneSupportFootAbsolutePositions[StartIndex].dy;
       //theta, dtheta
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
 	m_PolynomeTheta->Compute( InterpolationTime );
       // +NoneSupportFootAbsolutePositions[StartIndex].theta;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dtheta = 
-	m_PolynomeTheta->Compute(InterpolationTime);
+	m_PolynomeTheta->ComputeDerivative(InterpolationTime);
       // + NoneSupportFootAbsolutePositions[StartIndex].dtheta;
     }
 
