@@ -29,21 +29,17 @@ public:
 	~OrientationsPreview();
 
 	void previewOrientations(double &Time,
-			std::deque<double> &PreviewedSupportAngles,
-			double &AngVelTrunkConst, double &PreviewedTrunkAngle,
-			COMState_t &TrunkState, SupportState * Support,
+			double *PreviewedSupportAngles,
+			double &AngVelTrunkConst, double &PreviewedTrunkAngleT,
+			const COMState_t &TrunkState, const SupportState * Support,
+			std::deque<SupportFeet_t *> &QueueOfSupportFeet,
 			std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			std::deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
 	void verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref, double &AngVelTrunkConst,
 			const COMState_t &TrunkState, const SupportState * Support);
-	//TODO 0: Unused variables in OrientationsPreview.h
-	//	double* CurAngVelCoH, double* TrunkAngle, double* TimeLimit, double* Time,
-	//	int* SupportPhase, int* SupportFoot, double* SupportAngle, double* RightFootAngle, double* LeftFootAngle,
-	//	/*Outside*/double* T, double* MaxIntAngleTrunk, double* MaxExtAngleTrunk, double* SSDuration, double* N, double* MaxAngVelFoot,
-	//	double* MaxIntAngleFeet);
 
-private:
+private://TODO 2: There are too many members the should maybe be moved to .cpp
 	/*! Angular limitations of the hip joints*/
 	double m_lLimitLeftHipYaw, m_uLimitLeftHipYaw, m_lLimitRightHipYaw, m_uLimitRightHipYaw;
 
@@ -65,11 +61,50 @@ private:
 	/*! Time between two samplings*/
 	double m_T;
 
+	//Polynomial coefficients
+	double m_a, m_b, m_c, m_d, m_e;
 
+	//Rotation sense of the trunks angular velocity and acceleration
+	double m_signRotVelTrunk, m_signRotAccTrunk;
+
+	//Time period between now and the end of the support phase
+	double m_SupportTimePassed;
+
+	bool m_TrunkVelOK, m_TrunkAngleOK;
+
+	/*! In case of double support the next support angle is fixed*/
+	unsigned int m_FirstPreviewedFoot;
+
+	/*! Trunkangle at the end of the current support phase*/
+	double m_PreviewedTrunkAngleEnd;
+
+	const static double M_EPS = 0.00000001;
+
+	/*! The angles of the support and non-support foot*/
+	double m_PreviewedMovingAngle, m_PreviewedSupportAngle;
+
+	double m_PreviewedRightFootAngle, m_PreviewedLeftFootAngle;
+
+	double m_PreviousSupportAngle;
+
+	double m_CurrentSupportAngle;
+
+	double m_MeanFootVelDifference;
+
+	/*! Which foot is on the ground in the preview period*/
+	int m_PreviewedSupportFoot;
 
 
 	unsigned int m_FullDebug;
 
+
+	bool verifyAngleOfHipJoint(double &AngVelTrunkConst,
+			double &PreviewedTrunkAngleT, const SupportState * Support,
+			const COMState_t &TrunkState, double CurrentSupportFootAngle,
+			unsigned int StepNumber);
+
+	void verifyVelocityOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref, double &AngVelTrunkConst,
+			const COMState_t &TrunkState, const SupportState * Support);
 
 };
 };
