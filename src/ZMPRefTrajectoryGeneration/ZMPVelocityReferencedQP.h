@@ -74,17 +74,17 @@ namespace PatternGeneratorJRL
 	  @param[in] InitRightFootAbsolutePosition: The initial position of the right foot.
 
 	  
-	   */
+       */
     void GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
-			      deque<COMPosition> & CoMPositions,
-			      deque<RelativeFootPosition> &RelativeFootPositions,
-			      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-			      deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-			      double Xmax,
-			      COMPosition & lStartingCOMPosition,
-			      MAL_S3_VECTOR(,double) & lStartingZMPPosition,
-			      FootAbsolutePosition & InitLeftFootAbsolutePosition,
-			      FootAbsolutePosition & InitRightFootAbsolutePosition);
+    		deque<COMPosition> & CoMPositions,
+    		deque<RelativeFootPosition> &RelativeFootPositions,
+    		deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+    		deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+    		double Xmax,
+    		COMPosition & lStartingCOMPosition,
+    		MAL_S3_VECTOR(,double) & lStartingZMPPosition,
+    		FootAbsolutePosition & InitLeftFootAbsolutePosition,
+    		FootAbsolutePosition & InitRightFootAbsolutePosition);
 
     /*! This method is a new way of computing the ZMP trajectory from
       foot trajectory. */
@@ -100,13 +100,13 @@ namespace PatternGeneratorJRL
 
     
     int buildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					     deque<ZMPPosition> &ZMPRefPositions,		       
-					     deque<COMPosition> &COMPositions,
-					     double ConstraintOnX,
-					     double ConstraintOnY,
-					     double T,
-					     unsigned int N);
+    		deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+    		deque<ZMPPosition> &ZMPRefPositions,
+    		deque<COMPosition> &COMPositions,
+    		double ConstraintOnX,
+    		double ConstraintOnY,
+    		double T,
+    		unsigned int N);
     
     
 
@@ -143,8 +143,6 @@ namespace PatternGeneratorJRL
     int InitConstants();
       
     void initFeet();
-
-
     
     /*! Build the necessary matrices for the QP problem under linear inequality constraints. */
     /* int BuildConstraintMatrices(double * &Px, double * &DPu, */
@@ -158,23 +156,20 @@ namespace PatternGeneratorJRL
     /* 				MAL_VECTOR(&ZMPRef,double), */
     /* 				unsigned int &NextNumberOfRemovedConstraints); */
 
-    
-   int buildConstraintMatrices(double * &DS, double * &DU,
-			       unsigned N, double T,
-			       double StartingTime,
-			       deque<LinearConstraintInequalityFreeFeet_t *> 
-			       & QueueOfLConstraintInequalitiesFreeFeet,
-			       deque<LinearConstraintInequalityFreeFeet_t *> 
-			       & QueueOfFeetPosInequalities,
-			       deque<SupportFeet_t *> 
-			       & QueueOfSupportFeet,
-			       double Com_Height,
-			       unsigned int &NbOfConstraints,
-			       MAL_VECTOR(&xk,double),
-			       MAL_VECTOR(&ZMPRef,double),
-			       unsigned int &NextNumberOfRemovedConstraints);
-   
-    
+
+    int buildConstraintMatrices(double * &DS, double * &DU,
+    		unsigned N, double T,
+    		double StartingTime,
+    		deque<LinearConstraintInequalityFreeFeet_t *>    & QueueOfLConstraintInequalitiesFreeFeet,
+    		deque<LinearConstraintInequalityFreeFeet_t *>    & QueueOfFeetPosInequalities,
+    		deque<SupportFeet_t *>    & QueueOfSupportFeet,
+    		double Com_Height,
+    		unsigned int &NbOfConstraints,
+    		MAL_VECTOR(&xk,double),
+    		MAL_VECTOR(&ZMPRef,double),
+    		unsigned int &NextNumberOfRemovedConstraints);
+
+
 
     /*! \brief Build the constant part of the constraint matrices. */
     int BuildingConstantPartOfConstraintMatrices();
@@ -234,11 +229,11 @@ namespace PatternGeneratorJRL
 
     /* ! Methods to update the stack on-line by inserting a new foot position. */
     void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-		       deque<ZMPPosition> & FinalZMPPositions,		
-		       deque<COMPosition> & CoMPositions,			     
-		       deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-		       deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-		       bool EndSequence);
+    		deque<ZMPPosition> & FinalZMPPositions,
+    		deque<COMPosition> & CoMPositions,
+    		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+    		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+    		bool EndSequence);
 
     /* ! \brief Method to update the stacks on-line */
     void OnLine(double time,
@@ -368,14 +363,15 @@ namespace PatternGeneratorJRL
     double m_ComHeight;
 
     /*! State of the trunk after one sampling period */
-    double m_AngVelTrunkConst, m_PreviewedTrunkAngle;
+    double m_AngVelTrunkConst, m_PreviewedTrunkAngleT;
 
     /*! Orientations of the feet previewed over the whole horizon length*/
     deque<double> PreviewedSupportAngles;
 
     /*! Current state of the trunk */
     COMState_t m_TrunkState;
-
+    deque<COMState_t> m_QueueOfTrunkStates;
+    double m_a, m_TrunkPolCoeffB, m_c, m_d, m_TrunkPolCoeffE;
 
     /*! Sampling of the QP. */
     double m_QP_T;
@@ -383,6 +379,8 @@ namespace PatternGeneratorJRL
     /*! Preview window */
     unsigned int m_QP_N;
 
+    /*! Orientations of the previewed support feet */
+    double * m_PreviewedSupportAngles;
 
     /*! \name Variables related to the QP
       @{ */

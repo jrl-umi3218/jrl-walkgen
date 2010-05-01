@@ -103,8 +103,10 @@ private://TODO 2: There are too many members the should maybe be moved to .cpp
 			const COMState_t &TrunkState, double CurrentSupportFootAngle,
 			unsigned int StepNumber);
 
-	void verifyVelocityOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref, double &AngVelTrunkConst,
-			const COMState_t &TrunkState, const SupportState * Support);
+	void verifyVelocityOfHipJoint(double &AngVelTrunkConst,
+			const double &PreviewedSupportFoot, const unsigned int &StepNumber,
+			const SupportState * Support,
+			const double &CurrentRightFootAngle, const double &CurrentLeftFootAngle);
 
 };
 };
