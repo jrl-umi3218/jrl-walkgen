@@ -68,19 +68,29 @@ void OrientationsPreview::previewOrientations(double &Time,
 {
 	//TODO 2: Replace AngVelTrunkConst by TrunkStateT
 
+	deque<FootAbsolutePosition>::iterator lF_it, rF_it;
+	lF_it = LeftFootAbsolutePositions.end();
+	lF_it--;
+	rF_it = RightFootAbsolutePositions.end();
+	rF_it--;
+
 	if(m_FullDebug>2)
 	{
 		ofstream aof;
 		aof.open("previewOrientations.dat",ofstream::app);
 		aof<<endl<<endl;
-		aof<<"Time: "<<Time<<endl;
+		aof<<"Time: "<<Time<<" LeftFootAbsolutePositions[0].theta: "<<LeftFootAbsolutePositions[0].theta<<
+				" RightFootAbsolutePositions[0].theta: "<<RightFootAbsolutePositions[0].theta
+				<<" Last LeftFootAbsolutePosition: "<<lF_it->theta<<
+				" Last RightFootAbsolutePosition: "<<rF_it->theta<<endl;
 		aof.close();
 	}
-
 
 	m_TrunkVelOK = false;
 	m_FirstPreviewedFoot = 0;
 	//PreviewedTrunkAngleT = 0;
+
+	double CurrentLeftFootAngle, CurrentRightFootAngle;
 
 	m_signRotVelTrunk = (AngVelTrunkConst < 0.0)?-1.0:1.0;
 
@@ -93,6 +103,7 @@ void OrientationsPreview::previewOrientations(double &Time,
 		if (Support->CurrentSupportFoot == 1)
 		{//TODO 2: Too many variables
 			m_CurrentSupportAngle = LeftFootAbsolutePositions[0].theta;
+
 			//m_PreviewedSupportAngle = RightFootAbsolutePositions[0].theta;
 		}
 		else
@@ -100,6 +111,7 @@ void OrientationsPreview::previewOrientations(double &Time,
 			m_CurrentSupportAngle = RightFootAbsolutePositions[0].theta;
 			//m_PreviewedSupportAngle = LeftFootAbsolutePositions[0].theta;
 		}
+
 
 
 		if(Support->CurrentSupportPhase != 0)
@@ -154,6 +166,7 @@ void OrientationsPreview::previewOrientations(double &Time,
 		{
 			m_SupportTimePassed = Support->CurrentTimeLimit+m_SSPeriod-Time;
 			m_FirstPreviewedFoot = 1;
+			PreviewedSupportAngles[0] = m_CurrentSupportAngle;
 			PreviewedTrunkAngleT = m_PreviewedTrunkAngleEnd = TrunkState.yaw[0];
 		}
 
@@ -163,9 +176,9 @@ void OrientationsPreview::previewOrientations(double &Time,
 		{
 			ofstream aof;
 			aof.open("previewOrientations.dat",ofstream::app);
-//			aof<<"fabs(AngVelTrunkConst-TrunkState.yaw[1]): "<<fabs(AngVelTrunkConst-TrunkState.yaw[1])<<" PreviewedTrunkAngleT: "<<PreviewedTrunkAngleT<<
-//					" m_d "<<m_d<<" m_e "<<m_e<<" 1/3*c*m_T*m_T*m_T "<<1.0/3.0*m_d*m_T*m_T*m_T<<" 1/4*m_e*m_T*m_T*m_T*m_T: "
-//					<<1.0/4.0*m_e*m_T*m_T*m_T*m_T<<endl;
+			//			aof<<"fabs(AngVelTrunkConst-TrunkState.yaw[1]): "<<fabs(AngVelTrunkConst-TrunkState.yaw[1])<<" PreviewedTrunkAngleT: "<<PreviewedTrunkAngleT<<
+			//					" m_d "<<m_d<<" m_e "<<m_e<<" 1/3*c*m_T*m_T*m_T "<<1.0/3.0*m_d*m_T*m_T*m_T<<" 1/4*m_e*m_T*m_T*m_T*m_T: "
+			//					<<1.0/4.0*m_e*m_T*m_T*m_T*m_T<<endl;
 			aof<<" PreviewedTrunkAngleT: "<<PreviewedTrunkAngleT<<
 					" m_PreviewedTrunkAngleEnd: "<<m_PreviewedTrunkAngleEnd<<endl;
 			aof.close();
@@ -173,6 +186,7 @@ void OrientationsPreview::previewOrientations(double &Time,
 
 		m_PreviousSupportAngle = m_CurrentSupportAngle;
 		m_PreviewedSupportFoot = Support->CurrentSupportFoot;
+
 
 		if(m_FullDebug>2)
 		{
@@ -183,6 +197,10 @@ void OrientationsPreview::previewOrientations(double &Time,
 			aof.close();
 		}
 
+		CurrentLeftFootAngle = lF_it->theta;
+		CurrentRightFootAngle = rF_it->theta;
+
+		//Preview
 		for(StepNumber = m_FirstPreviewedFoot; StepNumber <= (int)ceil((m_N+1)*m_T/Support->SSPeriod); StepNumber++)
 		{
 			m_PreviewedSupportFoot = -m_PreviewedSupportFoot;
@@ -198,7 +216,9 @@ void OrientationsPreview::previewOrientations(double &Time,
 				aof.close();
 			}
 
-			//Verify the angle to avoid self-collision:
+			//verifyVelocityOfHipJoint(Ref, AngVelTrunkConst, TrunkState, Support, StepNumber);
+
+			//Check the feet angles to avoid self-collision:
 			if ((double)m_PreviewedSupportFoot*(m_PreviousSupportAngle-m_PreviewedSupportAngle)-M_EPS > m_uLimitFeet)
 			{
 				m_PreviewedSupportAngle = m_PreviousSupportAngle+(double)m_signRotVelTrunk*m_uLimitFeet;
@@ -233,7 +253,7 @@ void OrientationsPreview::previewOrientations(double &Time,
 			if(!m_TrunkAngleOK)
 				break;
 			else
-				PreviewedSupportAngles[StepNumber-m_FirstPreviewedFoot] = m_PreviewedSupportAngle;
+				PreviewedSupportAngles[StepNumber] = m_PreviewedSupportAngle;
 
 
 			if(m_FullDebug>2)
@@ -251,6 +271,11 @@ void OrientationsPreview::previewOrientations(double &Time,
 			//Prepare for the next step
 			m_PreviewedTrunkAngleEnd = m_PreviewedTrunkAngleEnd + m_SSPeriod*AngVelTrunkConst;
 			m_PreviousSupportAngle = m_PreviewedSupportAngle;
+
+			if(m_PreviewedSupportFoot == 1)
+				CurrentLeftFootAngle = m_PreviewedSupportAngle;
+			else
+				CurrentRightFootAngle = m_PreviewedSupportAngle;
 
 			m_TrunkVelOK = true;
 		}
@@ -334,25 +359,36 @@ bool OrientationsPreview::verifyAngleOfHipJoint(double &AngVelTrunkConst,
 }
 
 
-void OrientationsPreview::verifyVelocityOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref, double &AngVelTrunkConst,
-		const COMState_t &TrunkState, const SupportState * Support)
+void OrientationsPreview::verifyVelocityOfHipJoint(double &AngVelTrunkConst,
+		const double &PreviewedSupportFoot, const unsigned int &StepNumber,
+		const SupportState * Support,
+		const double &CurrentRightFootAngle, const double &CurrentLeftFootAngle)
 {
-	cout<<"To be implemented "<<endl;
-	/*
-	//	 //verify the necessary, max., relative foot velocity
-////						 printf("SupportAngleBefore: %f \n", SupportAngleBefore);
-//	 m_MeanFootVelDifference = (m_PreviewedMovingAngle-SupportAngleBefore)/(*SSDuration-*T);
-//	 printf("AngVelFoot,MaxAngVelFoot: %f %f \n", AngVelFoot, *MaxAngVelFoot);
-//	 //If necessary reduce the velocity to the maximum
-//	 if (3.0/2.0*fabs(AngVelFoot) > *MaxAngVelFoot) {
-//		 ////printf('feet velocity reduced');
-//		 AngVelFoot = 2.0/3.0*(double)signAngVelCoH * *MaxAngVelFoot;
-//		 //Compute the resulting angle
-//		 PrwSupportAngle = SupportAngleBefore+AngVelFoot*(*SSDuration-*T);
-//		 printf("maximal velocity \n");
-//		 printf("angle before: %f \n", SupportAngleBefore);
-//	 }
-	 */
+	double CurrentAngle;
+	if(PreviewedSupportFoot==1)
+		CurrentAngle = CurrentLeftFootAngle;
+	else
+		CurrentAngle = CurrentRightFootAngle;
+
+	//To be implemented
+	//For the
+	if(StepNumber>0 && Support->CurrentSupportPhase==1)
+	{
+		//verify the necessary, maximal, relative foot velocity
+		m_MeanFootVelDifference = (m_PreviewedSupportAngle-CurrentAngle)/(m_SSPeriod-m_T);
+		//If necessary reduce the velocity to the maximum
+		if (3.0/2.0*fabs(m_MeanFootVelDifference) > m_uvLimitFoot)
+		{
+			m_MeanFootVelDifference = 2.0/3.0*(double)m_signRotVelTrunk * m_uvLimitFoot;
+			//Compute the resulting angle
+			m_PreviewedSupportAngle = CurrentAngle+m_MeanFootVelDifference*(m_SSPeriod-m_T);
+		}
+	}
+//	else if(StepNumber==0 && Support->CurrentSupportPhase==1 || StepNumber==1 && Support->CurrentSupportPhase==0)
+//	{
+//
+//		m_PreviewedSupportAngle =
+//	}
 
 }
 
