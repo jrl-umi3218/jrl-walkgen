@@ -58,7 +58,7 @@ OrientationsPreview::~OrientationsPreview() {
 }
 
 
-void OrientationsPreview::previewOrientations(double &Time,
+void OrientationsPreview::previewOrientations(const double &Time,
 		double *PreviewedSupportAngles,
 		double &AngVelTrunkConst, double &PreviewedTrunkAngleT,
 		const COMState_t &TrunkState, const SupportState * Support,
@@ -90,7 +90,7 @@ void OrientationsPreview::previewOrientations(double &Time,
 	m_FirstPreviewedFoot = 0;
 	//PreviewedTrunkAngleT = 0;
 
-	double CurrentLeftFootAngle, CurrentRightFootAngle;
+	double CurrentLeftFootAngle, CurrentRightFootAngle, CurrentLeftFootVelocity, CurrentRightFootVelocity;
 
 	m_signRotVelTrunk = (AngVelTrunkConst < 0.0)?-1.0:1.0;
 
@@ -199,6 +199,8 @@ void OrientationsPreview::previewOrientations(double &Time,
 
 		CurrentLeftFootAngle = lF_it->theta;
 		CurrentRightFootAngle = rF_it->theta;
+		CurrentLeftFootVelocity = lF_it->dtheta;
+		CurrentRightFootVelocity = rF_it->dtheta;
 
 		//Preview
 		for(StepNumber = m_FirstPreviewedFoot; StepNumber <= (int)ceil((m_N+1)*m_T/Support->SSPeriod); StepNumber++)
@@ -215,6 +217,11 @@ void OrientationsPreview::previewOrientations(double &Time,
 						" AngVelTrunkConst "<<AngVelTrunkConst<<endl;
 				aof.close();
 			}
+
+			verifyVelocityOfHipJoint(Time, AngVelTrunkConst,
+					m_PreviewedSupportFoot, StepNumber, Support,
+					CurrentRightFootAngle, CurrentLeftFootAngle,
+					CurrentLeftFootVelocity, CurrentRightFootVelocity);
 
 			//verifyVelocityOfHipJoint(Ref, AngVelTrunkConst, TrunkState, Support, StepNumber);
 
@@ -359,10 +366,12 @@ bool OrientationsPreview::verifyAngleOfHipJoint(double &AngVelTrunkConst,
 }
 
 
-void OrientationsPreview::verifyVelocityOfHipJoint(double &AngVelTrunkConst,
+void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time, double &AngVelTrunkConst,
 		const double &PreviewedSupportFoot, const unsigned int &StepNumber,
 		const SupportState * Support,
-		const double &CurrentRightFootAngle, const double &CurrentLeftFootAngle)
+		const double &CurrentRightFootAngle, const double &CurrentLeftFootAngle,
+		const double &CurrentLeftFootVelocity,
+		const double &CurrentRightFootVelocity)
 {
 	double CurrentAngle;
 	if(PreviewedSupportFoot==1)
@@ -370,6 +379,7 @@ void OrientationsPreview::verifyVelocityOfHipJoint(double &AngVelTrunkConst,
 	else
 		CurrentAngle = CurrentRightFootAngle;
 
+	double a,b,c,d,T;
 	//To be implemented
 	//For the
 	if(StepNumber>0 && Support->CurrentSupportPhase==1)
@@ -384,15 +394,36 @@ void OrientationsPreview::verifyVelocityOfHipJoint(double &AngVelTrunkConst,
 			m_PreviewedSupportAngle = CurrentAngle+m_MeanFootVelDifference*(m_SSPeriod-m_T);
 		}
 	}
-//	else if(StepNumber==0 && Support->CurrentSupportPhase==1 || StepNumber==1 && Support->CurrentSupportPhase==0)
-//	{
-//
-//		m_PreviewedSupportAngle =
-//	}
+	else if(StepNumber==0 && Support->CurrentSupportPhase==1 || StepNumber==1 && Support->CurrentSupportPhase==0)
+	{
+
+		T = Support->CurrentTimeLimit-Time-m_T;
+		//Previewed polynome
+		a = CurrentAngle;
+		if(PreviewedSupportFoot==1)
+			b = CurrentLeftFootVelocity;
+		else
+			b = CurrentRightFootVelocity;
+		c = (3.0*m_PreviewedSupportAngle-3.0*a-2.0*b*T)/(T*T);
+		d = (-b*T+2*a-2*m_PreviewedSupportAngle)/(T*T*T);
+
+		//maximal speed violated
+		if(df(a,b,c,d,T)>m_uvLimitFoot)
+		{
+			a = 0;
+			b = b;
+			c = -1.0/(2.0*T)*(2.0*b-2.0*m_uvLimitFoot+2.0*sqrt(m_uvLimitFoot*m_uvLimitFoot-b*m_uvLimitFoot));
+			d = (-2.0*c-b/T)/(3.0*T);
+			m_PreviewedSupportAngle = f(a,b,c,d,T);
+		}
+//		f(0) = 0, df(0)=v0, df(1/3*c/d)=vmax, df(T)=0
+//		a = 0, b = v0, c = -1/(2*T)*(2*v0-2*vmax+2*sqrt(vmax^2-vo*vmax), d = (-2*c-v0/T)/(3*T);
+	}
 
 }
 
-
+double OrientationsPreview::f(double a,double b,double c,double d,double x){return a+b*x+c*x*x+d*x*x*x;}
+double OrientationsPreview::df(double a,double b,double c,double d,double x){return b+2*c*x+3.0*d*x*x;}
 
 
 

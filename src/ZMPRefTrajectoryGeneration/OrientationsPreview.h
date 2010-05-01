@@ -28,7 +28,7 @@ public:
 			const double & SSPeriod);
 	~OrientationsPreview();
 
-	void previewOrientations(double &Time,
+	void previewOrientations(const double &Time,
 			double *PreviewedSupportAngles,
 			double &AngVelTrunkConst, double &PreviewedTrunkAngleT,
 			const COMState_t &TrunkState, const SupportState * Support,
@@ -103,10 +103,16 @@ private://TODO 2: There are too many members the should maybe be moved to .cpp
 			const COMState_t &TrunkState, double CurrentSupportFootAngle,
 			unsigned int StepNumber);
 
-	void verifyVelocityOfHipJoint(double &AngVelTrunkConst,
+	void verifyVelocityOfHipJoint(const double &Time, double &AngVelTrunkConst,
 			const double &PreviewedSupportFoot, const unsigned int &StepNumber,
 			const SupportState * Support,
-			const double &CurrentRightFootAngle, const double &CurrentLeftFootAngle);
+			const double &CurrentRightFootAngle, const double &CurrentLeftFootAngle,
+			const double &CurrentLeftFootVelocity,
+			const double &CurrentRightFootVelocity);
+
+	double f(double a,double b,double c,double d,double x);
+
+	double df(double a,double b,double c,double d,double x);
 
 };
 };
