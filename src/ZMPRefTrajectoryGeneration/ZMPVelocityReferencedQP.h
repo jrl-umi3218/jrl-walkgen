@@ -164,10 +164,8 @@ namespace PatternGeneratorJRL
     		deque<LinearConstraintInequalityFreeFeet_t *>    & QueueOfFeetPosInequalities,
     		deque<SupportFeet_t *>    & QueueOfSupportFeet,
     		double Com_Height,
-    		unsigned int &NbOfConstraints,
-    		MAL_VECTOR(&xk,double),
-    		MAL_VECTOR(&ZMPRef,double),
-    		unsigned int &NextNumberOfRemovedConstraints);
+    		int &NbOfConstraints,
+    		MAL_VECTOR(&xk,double));
 
 
 
@@ -342,7 +340,7 @@ namespace PatternGeneratorJRL
     LinearizedInvertedPendulum2D * m_2DLIPM;
     
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
-    SupportState * Support;
+    SupportState * m_Support;
 
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
     OrientationsPreview * m_OP;
@@ -383,6 +381,18 @@ namespace PatternGeneratorJRL
 
     /*! Orientations of the previewed support feet */
     double * m_PreviewedSupportAngles;
+
+    struct Problem_s
+    {
+    	int m, me, mmax, n, nmax, mnn;
+    	double *Q, *D, *DU, *DS, *XL, *XU, *X, *NewX, *U, *war;//For COM
+    	int *iwar;
+    	int iout, ifail, iprint, lwar, liwar;
+    	double Eps;
+    };
+    typedef struct Problem_s Problem;
+
+    Problem m_Pb;
 
     /*! \name Variables related to the QP
       @{ */
@@ -442,7 +452,10 @@ namespace PatternGeneratorJRL
     /* /\*! Primal Least square Distance Problem solver *\/ */
     /* Optimization::Solver::PLDPSolver * m_PLDPSolverHerdt; */
 
-      
+    void initializeProblem(int NbOfConstraints, int NbOfEqConstraints);
+
+    void setProblem(int &CriteriaToMaximize, MAL_VECTOR(& xk,double));
+
     int dumpProblem(double * Q,
 		    double * D, 
 		    double * Pu,
