@@ -31,16 +31,16 @@ public:
 
 	void previewOrientations(const double &Time,
 			double *PreviewedSupportAngles,
-			double &AngVelTrunkConst, double &PreviewedTrunkAngleT,
-			const COMState_t &TrunkState, const SupportState * Support,
-			std::deque<SupportFeet_t *> &QueueOfSupportFeet,
+			const COMState_t &TrunkState, COMState_t &TrunkStateT,
+			const SupportState * Support,
 			std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			std::deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
-	void verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref, double &AngVelTrunkConst,
-			const COMState_t &TrunkState, const SupportState * Support);
+	void verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref,
+			const COMState_t &TrunkState, COMState_t &TrunkStateT,
+			 const SupportState * Support);
 
-private://TODO 2: There are too many members the should maybe be moved to .cpp
+private:
 	/*! Angular limitations of the hip joints*/
 	double m_lLimitLeftHipYaw, m_uLimitLeftHipYaw, m_lLimitRightHipYaw, m_uLimitRightHipYaw;
 
@@ -99,12 +99,12 @@ private://TODO 2: There are too many members the should maybe be moved to .cpp
 	unsigned int m_FullDebug;
 
 
-	bool verifyAngleOfHipJoint(double &AngVelTrunkConst,
-			double &PreviewedTrunkAngleT, const SupportState * Support,
-			const COMState_t &TrunkState, double CurrentSupportFootAngle,
+	bool verifyAngleOfHipJoint(const SupportState * Support,
+			const COMState_t &TrunkState, COMState_t &TrunkStateT,
+			double CurrentSupportFootAngle,
 			unsigned int StepNumber);
 
-	void verifyVelocityOfHipJoint(const double &Time, double &AngVelTrunkConst,
+	void verifyVelocityOfHipJoint(const double &Time, COMState_t &TrunkStateT,
 			const double &PreviewedSupportFoot, const unsigned int &StepNumber,
 			const SupportState * Support,
 			const double &CurrentRightFootAngle, const double &CurrentLeftFootAngle,

@@ -74,7 +74,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 	Support = new SupportState(m_QP_T);
 
 	/* Orientations preview algorithm*/
-	m_OP = new OrientationsPreview(m_QP_T, m_QP_N, Support->SSPeriod);
+	m_OP = new OrientationsPreview(m_QP_T, m_QP_N, Support->SSPeriod, aHS->rootJoint());
 
 	m_TrunkState.yaw[0]=m_TrunkState.yaw[1]=m_TrunkState.yaw[2]=0.0;
 
@@ -2182,11 +2182,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		// printf("StartingTime: %f \n", StartingTime);
 		gettimeofday(&start,0);
 
-		m_OP->verifyAccelerationOfHipJoint(RefVel, m_AngVelTrunkConst,
+		m_OP->verifyAccelerationOfHipJoint(RefVel, m_TrunkStateT,
 				m_TrunkState, Support);
 
-		m_OP->previewOrientations(time, m_PreviewedSupportAngles, m_AngVelTrunkConst,
-				m_PreviewedTrunkAngleT, m_TrunkState, Support, QueueOfSupportFeet,
+		m_OP->previewOrientations(time, m_PreviewedSupportAngles, m_TrunkState, m_TrunkStateT, Support,
 				FinalLeftFootAbsolutePositions, FinalRightFootAbsolutePositions);
 
 		// Read the current state of the 2D Linearized Inverted Pendulum.
@@ -2604,7 +2603,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 			//Set parameters for trunk interpolation
 
-			m_c = 3.0*(m_AngVelTrunkConst-m_TrunkState.yaw[1])/(m_QP_T*m_QP_T);
+			m_c = 3.0*(m_TrunkStateT.yaw[1]-m_TrunkState.yaw[1])/(m_QP_T*m_QP_T);
 			m_d = -2.0*m_c/(3.0*m_QP_T);
 			m_a =  m_TrunkState.yaw[1];
 
@@ -2619,7 +2618,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 			{
 				tT = k*m_SamplingPeriod;
 				//interpolate the orientation of the trunk
-				if(fabs(m_AngVelTrunkConst-m_TrunkState.yaw[1])-0.000001 > 0)
+				if(fabs(m_TrunkStateT.yaw[1]-m_TrunkState.yaw[1])-0.000001 > 0)
 				{
 					m_TrunkState.yaw[0] = (((1.0/4.0*m_d*tT+1.0/3.0*m_c)*
 							tT)*tT+m_a)*tT+Theta;
@@ -2630,7 +2629,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				}
 				else
 				{
-					m_TrunkState.yaw[0] += m_SamplingPeriod*m_AngVelTrunkConst;
+					m_TrunkState.yaw[0] += m_SamplingPeriod*m_TrunkStateT.yaw[1];
 
 					m_QueueOfTrunkStates.push_back(m_TrunkState);
 				}
@@ -2723,8 +2722,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		else
 			m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+m_QP_T;
 
-		cout<<m_TrunkState.yaw[0]<<"   "<<m_PreviewedTrunkAngleT;
-//		m_TrunkState.yaw[0] = m_PreviewedTrunkAngleT;
+		//cout<<m_TrunkState.yaw[0]<<"   "<<m_TrunkStateT.yaw[0];
+//		m_TrunkState.yaw[0] = m_TrunkStateT.yaw[0];
 //		m_TrunkState.yaw[1] = m_AngVelTrunkConst;
 
 		ODEBUG6("uk:" << uk,"DebugPBW.dat");

@@ -55,19 +55,16 @@ OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
 }
 
 OrientationsPreview::~OrientationsPreview() {
-	// TODO Auto-generated destructor stub
 }
 
 
 void OrientationsPreview::previewOrientations(const double &Time,
 		double *PreviewedSupportAngles,
-		double &AngVelTrunkConst, double &PreviewedTrunkAngleT,
-		const COMState_t &TrunkState, const SupportState * Support,
-		deque<SupportFeet_t *> &QueueOfSupportFeet,
+		const COMState_t &TrunkState, COMState_t &TrunkStateT,
+		const SupportState * Support,
 		deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 		deque<FootAbsolutePosition> &RightFootAbsolutePositions)
 {
-	//TODO 2: Replace AngVelTrunkConst by TrunkStateT
 
 	deque<FootAbsolutePosition>::iterator lF_it, rF_it;
 	lF_it = LeftFootAbsolutePositions.end();
@@ -93,7 +90,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 
 	double CurrentLeftFootAngle, CurrentRightFootAngle, CurrentLeftFootVelocity, CurrentRightFootVelocity;
 
-	m_signRotVelTrunk = (AngVelTrunkConst < 0.0)?-1.0:1.0;
+	m_signRotVelTrunk = (TrunkStateT.yaw[1] < 0.0)?-1.0:1.0;
 
 	unsigned int StepNumber = 0;
 
@@ -102,7 +99,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 
 		//Initialize the preview loop
 		if (Support->CurrentSupportFoot == 1)
-		{//TODO 2: Too many variables
+		{
 			m_CurrentSupportAngle = LeftFootAbsolutePositions[0].theta;
 
 			//m_PreviewedSupportAngle = RightFootAbsolutePositions[0].theta;
@@ -121,45 +118,44 @@ void OrientationsPreview::previewOrientations(const double &Time,
 			while(!m_TrunkAngleOK)
 			{
 				//(Re)Compute the trunk angle at the end of the acceleration phase
-				if (fabs(AngVelTrunkConst-TrunkState.yaw[1]) > M_EPS)
+				if (fabs(TrunkStateT.yaw[1]-TrunkState.yaw[1]) > M_EPS)
 				{
 					m_a = TrunkState.yaw[0];
 					m_b = TrunkState.yaw[1];
 					m_c = 0.0;
-					m_d = 3.0*(AngVelTrunkConst-TrunkState.yaw[1]) / (m_T*m_T);
+					m_d = 3.0*(TrunkStateT.yaw[1]-TrunkState.yaw[1]) / (m_T*m_T);
 					m_e = -2.0*m_d/(3.0*m_T);
-					PreviewedTrunkAngleT = m_a + m_b*m_T+1.0/2.0*m_c*m_T*m_T+1.0/3.0*m_d*m_T*m_T*m_T+1.0/4.0*m_e*m_T*m_T*m_T*m_T;
+					TrunkStateT.yaw[0] = m_a + m_b*m_T+1.0/2.0*m_c*m_T*m_T+1.0/3.0*m_d*m_T*m_T*m_T+1.0/4.0*m_e*m_T*m_T*m_T*m_T;
 
 					if(m_FullDebug>2)
 					{
 						ofstream aof;
 						aof.open("previewOrientations.dat",ofstream::app);
-						aof<<" Trunk accelerated because AngVelTrunkConst = "<<AngVelTrunkConst<<" TrunkState.yaw[1] = "<<TrunkState.yaw[1]<<endl;
+						aof<<" Trunk accelerated because TrunkStateT.yaw[1] = "<<TrunkStateT.yaw[1]<<" TrunkState.yaw[1] = "<<TrunkState.yaw[1]<<endl;
 						aof.close();
 					}
 				}
 				else
 				{
-					PreviewedTrunkAngleT = TrunkState.yaw[0] + TrunkState.yaw[1]*m_T;
+					TrunkStateT.yaw[0] = TrunkState.yaw[0] + TrunkState.yaw[1]*m_T;
 
 					if(m_FullDebug>2)
 					{
 						ofstream aof;
 						aof.open("previewOrientations.dat",ofstream::app);
-						aof<<" Trunk velocity constant because AngVelTrunkConst = "<<AngVelTrunkConst<<" TrunkState.yaw[1] = "<<TrunkState.yaw[1]<<endl;
+						aof<<" Trunk velocity constant because TrunkStateT.yaw[1] = "<<TrunkStateT.yaw[1]<<" TrunkState.yaw[1] = "<<TrunkState.yaw[1]<<endl;
 						aof.close();
 					}
 
 				}
 				//Compute the trunk angle at the end of the support phase
 				m_SupportTimePassed = Support->CurrentTimeLimit-Time;
-				m_PreviewedTrunkAngleEnd = PreviewedTrunkAngleT + AngVelTrunkConst*(m_SupportTimePassed-m_T);
+				m_PreviewedTrunkAngleEnd = TrunkStateT.yaw[0] + TrunkStateT.yaw[1]*(m_SupportTimePassed-m_T);
 
 
 				//Verify the angle between the support foot and the trunk at the end of the current support period
-				m_TrunkAngleOK = verifyAngleOfHipJoint(AngVelTrunkConst,
-						PreviewedTrunkAngleT, Support,
-						TrunkState, m_CurrentSupportAngle, StepNumber);
+				m_TrunkAngleOK = verifyAngleOfHipJoint(
+						Support, TrunkState, TrunkStateT, m_CurrentSupportAngle, StepNumber);
 			}
 
 		}
@@ -168,19 +164,17 @@ void OrientationsPreview::previewOrientations(const double &Time,
 			m_SupportTimePassed = Support->CurrentTimeLimit+m_SSPeriod-Time;
 			m_FirstPreviewedFoot = 1;
 			PreviewedSupportAngles[0] = m_CurrentSupportAngle;
-			PreviewedTrunkAngleT = m_PreviewedTrunkAngleEnd = TrunkState.yaw[0];
+			TrunkStateT.yaw[0] = m_PreviewedTrunkAngleEnd = TrunkState.yaw[0];
 		}
-
-		//TODO : SupportState can replace some of the native members
 
 		if(m_FullDebug>2)
 		{
 			ofstream aof;
 			aof.open("previewOrientations.dat",ofstream::app);
-			//			aof<<"fabs(AngVelTrunkConst-TrunkState.yaw[1]): "<<fabs(AngVelTrunkConst-TrunkState.yaw[1])<<" PreviewedTrunkAngleT: "<<PreviewedTrunkAngleT<<
+			//			aof<<"fabs(TrunkStateT.yaw[1]-TrunkState.yaw[1]): "<<fabs(TrunkStateT.yaw[1]-TrunkState.yaw[1])<<" TrunkStateT.yaw[0]: "<<TrunkStateT.yaw[0]<<
 			//					" m_d "<<m_d<<" m_e "<<m_e<<" 1/3*c*m_T*m_T*m_T "<<1.0/3.0*m_d*m_T*m_T*m_T<<" 1/4*m_e*m_T*m_T*m_T*m_T: "
 			//					<<1.0/4.0*m_e*m_T*m_T*m_T*m_T<<endl;
-			aof<<" PreviewedTrunkAngleT: "<<PreviewedTrunkAngleT<<
+			aof<<" TrunkStateT.yaw[0]: "<<TrunkStateT.yaw[0]<<
 					" m_PreviewedTrunkAngleEnd: "<<m_PreviewedTrunkAngleEnd<<endl;
 			aof.close();
 		}
@@ -208,23 +202,23 @@ void OrientationsPreview::previewOrientations(const double &Time,
 		{
 			m_PreviewedSupportFoot = -m_PreviewedSupportFoot;
 			//compute the optimal support orientation
-			m_PreviewedSupportAngle = m_PreviewedTrunkAngleEnd + AngVelTrunkConst*m_SSPeriod/2.0;
+			m_PreviewedSupportAngle = m_PreviewedTrunkAngleEnd + TrunkStateT.yaw[1]*m_SSPeriod/2.0;
 
 			if(m_FullDebug>2)
 			{
 				ofstream aof;
 				aof.open("previewOrientations.dat",ofstream::app);
 				aof<<"PreviewedTrunkAngleEnd: "<<m_PreviewedTrunkAngleEnd<<
-						" AngVelTrunkConst "<<AngVelTrunkConst<<endl;
+						" TrunkStateT.yaw[1] "<<TrunkStateT.yaw[1]<<endl;
 				aof.close();
 			}
 
-			verifyVelocityOfHipJoint(Time, AngVelTrunkConst,
+			verifyVelocityOfHipJoint(Time, TrunkStateT,
 					m_PreviewedSupportFoot, StepNumber, Support,
 					CurrentRightFootAngle, CurrentLeftFootAngle,
 					CurrentLeftFootVelocity, CurrentRightFootVelocity);
 
-			//verifyVelocityOfHipJoint(Ref, AngVelTrunkConst, TrunkState, Support, StepNumber);
+			//verifyVelocityOfHipJoint(Ref, TrunkStateT.yaw[1], TrunkState, Support, StepNumber);
 
 			//Check the feet angles to avoid self-collision:
 			if ((double)m_PreviewedSupportFoot*(m_PreviousSupportAngle-m_PreviewedSupportAngle)-M_EPS > m_uLimitFeet)
@@ -255,9 +249,9 @@ void OrientationsPreview::previewOrientations(const double &Time,
 				}
 			}
 
-			m_TrunkAngleOK = verifyAngleOfHipJoint(AngVelTrunkConst,
-					PreviewedTrunkAngleT, Support,
-					TrunkState, m_CurrentSupportAngle, StepNumber);
+			m_TrunkAngleOK = verifyAngleOfHipJoint(
+					Support, TrunkState, TrunkStateT,
+					m_CurrentSupportAngle, StepNumber);
 			if(!m_TrunkAngleOK)
 				break;
 			else
@@ -277,7 +271,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 
 
 			//Prepare for the next step
-			m_PreviewedTrunkAngleEnd = m_PreviewedTrunkAngleEnd + m_SSPeriod*AngVelTrunkConst;
+			m_PreviewedTrunkAngleEnd = m_PreviewedTrunkAngleEnd + m_SSPeriod*TrunkStateT.yaw[1];
 			m_PreviousSupportAngle = m_PreviewedSupportAngle;
 
 			if(m_PreviewedSupportFoot == 1)
@@ -290,8 +284,8 @@ void OrientationsPreview::previewOrientations(const double &Time,
 	}
 }
 
-void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref, double &AngVelTrunkConst,
-		const COMState_t &TrunkState, const SupportState * Support)
+void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref,
+		const COMState_t &TrunkState, COMState_t &TrunkStateT, const SupportState * Support)
 {
 	if(Support->CurrentSupportPhase!=0)
 	{
@@ -299,14 +293,14 @@ void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVe
 		if(fabs(Ref.dYaw-TrunkState.yaw[1]) > 2.0/3.0*m_T*m_uaLimitHipYaw)
 		{
 			double signRotAccTrunk = (Ref.dYaw-TrunkState.yaw[1] < 0.0)?-1.0:1.0;
-			AngVelTrunkConst = TrunkState.yaw[1] + signRotAccTrunk * 2.0/3.0*m_T* m_uaLimitHipYaw;
+			TrunkStateT.yaw[1] = TrunkState.yaw[1] + signRotAccTrunk * 2.0/3.0*m_T* m_uaLimitHipYaw;
 
 
 			if(m_FullDebug>2)
 			{
 				ofstream aof;
 				aof.open("verifyAccelerationOfHipJoint.dat",ofstream::app);
-				aof<<" AngVelTrunkConst: "<<AngVelTrunkConst <<" "
+				aof<<" TrunkStateT.yaw[1]: "<<TrunkStateT.yaw[1] <<" "
 						<<" Ref.dYaw: "<<Ref.dYaw <<" "
 						<<" m_signRotAccTrunk: "<<m_signRotAccTrunk <<" "
 						<<" 2.0/3.0*m_T* m_uaLimitHipYaw: "<<2.0/3.0*m_T* m_uaLimitHipYaw <<" "
@@ -315,21 +309,21 @@ void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVe
 			}
 		}
 		else
-			AngVelTrunkConst = Ref.dYaw;
+			TrunkStateT.yaw[1] = Ref.dYaw;
 
 	}
 	else//No rotations in a double support phase
 	{
-		AngVelTrunkConst = 0.0;
+		TrunkStateT.yaw[1] = 0.0;
 	}
 }
 
 
-bool OrientationsPreview::verifyAngleOfHipJoint(double &AngVelTrunkConst,
-		double &PreviewedTrunkAngleT, const SupportState * Support,
-		const COMState_t &TrunkState, double CurrentSupportFootAngle,
+bool OrientationsPreview::verifyAngleOfHipJoint(const SupportState * Support,
+		const COMState_t &TrunkState, COMState_t &TrunkStateT,
+		double CurrentSupportFootAngle,
 		unsigned int StepNumber)
-{//TODO 2: The current support angle is taken from QueueOfSupportFeet which should be replaced by QueueOfSupportStates
+{
 
 	//Which limitation is relevant in the current situation?
 	double uJointLimit, lJointLimit, JointLimit;
@@ -343,18 +337,18 @@ bool OrientationsPreview::verifyAngleOfHipJoint(double &AngVelTrunkConst,
 		uJointLimit = m_uLimitRightHipYaw;
 		lJointLimit = m_lLimitRightHipYaw;
 	}
-	JointLimit = (AngVelTrunkConst < 0.0)?lJointLimit:uJointLimit;
+	JointLimit = (TrunkStateT.yaw[1] < 0.0)?lJointLimit:uJointLimit;
 
 
 	if (fabs(m_PreviewedTrunkAngleEnd - CurrentSupportFootAngle)>fabs(JointLimit))
 	{
-		AngVelTrunkConst = (CurrentSupportFootAngle+JointLimit-TrunkState.yaw[0]-TrunkState.yaw[1]*m_T/2.0)/(m_SupportTimePassed+StepNumber*m_SSPeriod-m_T/2.0);
+		TrunkStateT.yaw[1] = (CurrentSupportFootAngle+JointLimit-TrunkState.yaw[0]-TrunkState.yaw[1]*m_T/2.0)/(m_SupportTimePassed+StepNumber*m_SSPeriod-m_T/2.0);
 
 		if(m_FullDebug>2)
 		{
 			ofstream aof;
 			aof.open("previewOrientations.dat",ofstream::app);
-			aof<<"Limitation reached - new AngVelTrunkConst :"<<AngVelTrunkConst<<endl;
+			aof<<"Limitation reached - new TrunkStateT.yaw[1] :"<<TrunkStateT.yaw[1]<<endl;
 			aof.close();
 		}
 		return false;
@@ -367,7 +361,7 @@ bool OrientationsPreview::verifyAngleOfHipJoint(double &AngVelTrunkConst,
 }
 
 
-void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time, double &AngVelTrunkConst,
+void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time, COMState_t &TrunkStateT,
 		const double &PreviewedSupportFoot, const unsigned int &StepNumber,
 		const SupportState * Support,
 		const double &CurrentRightFootAngle, const double &CurrentLeftFootAngle,
