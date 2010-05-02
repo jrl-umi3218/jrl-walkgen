@@ -17,19 +17,20 @@ using namespace PatternGeneratorJRL;
 using namespace std;
 
 OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
-		const unsigned int & SamplingsPreviewed, const double & SSPeriod)
+		const unsigned int & SamplingsPreviewed, const double & SSPeriod,
+		 CjrlJoint *aRootJoint)
 {
 	m_T = SamplingPeriod;
 	m_N = SamplingsPreviewed;
 	m_SSPeriod = SSPeriod;
 
-	//TODO 1: Angular and velocity bounds of the Hip joint should be read from the aHDR object.
-	m_lLimitLeftHipYaw = -30.0/180.0*M_PI;
-	m_uLimitLeftHipYaw  = 45.0/180.0*M_PI;
-	m_lLimitRightHipYaw = -45.0/180.0*M_PI;
-	m_uLimitRightHipYaw = 30.0/180.0*M_PI;
 
-	m_uvLimitFoot = 3.54108;
+	m_lLimitLeftHipYaw = aRootJoint->childJoint(1)->lowerBound(0);//-30.0/180.0*M_PI;
+	m_uLimitLeftHipYaw  = aRootJoint->childJoint(1)->upperBound(0);//45.0/180.0*M_PI;
+	m_lLimitRightHipYaw = aRootJoint->childJoint(0)->lowerBound(0);//-45.0/180.0*M_PI;
+	m_uLimitRightHipYaw = aRootJoint->childJoint(0)->upperBound(0);//30.0/180.0*M_PI;
+
+	m_uvLimitFoot = fabs(aRootJoint->childJoint(0)->upperVelocityBound(0));
 
 	//Acceleration limit not given by HRP2JRLmain.wrl
 	m_uaLimitHipYaw = 0.1;
@@ -408,7 +409,7 @@ void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time, double &A
 		d = (-b*T+2*a-2*m_PreviewedSupportAngle)/(T*T*T);
 
 		//maximal speed violated
-		if(df(a,b,c,d,T)>m_uvLimitFoot)
+		if(df(a,b,c,d,-1.0/3.0*c/d)>m_uvLimitFoot)
 		{
 			a = 0;
 			b = b;
@@ -416,8 +417,6 @@ void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time, double &A
 			d = (-2.0*c-b/T)/(3.0*T);
 			m_PreviewedSupportAngle = f(a,b,c,d,T);
 		}
-//		f(0) = 0, df(0)=v0, df(1/3*c/d)=vmax, df(T)=0
-//		a = 0, b = v0, c = -1/(2*T)*(2*v0-2*vmax+2*sqrt(vmax^2-vo*vmax), d = (-2*c-v0/T)/(3*T);
 	}
 
 }
