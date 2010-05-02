@@ -18,14 +18,15 @@
 
 /*! Framework includes */
 #include <walkGenJrl/PGTypes.h>
+#include <robotDynamics/jrlFoot.h>
 
 namespace PatternGeneratorJRL
 {
 class OrientationsPreview {
 public:
 	OrientationsPreview(const double & SamplingPeriod,
-			const unsigned int & SamplingsPreviewed,
-			const double & SSPeriod);
+			const unsigned int & SamplingsPreviewed, const double & SSPeriod,
+			 CjrlJoint *aLeg);
 	~OrientationsPreview();
 
 	void previewOrientations(const double &Time,
