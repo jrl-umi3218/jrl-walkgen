@@ -362,15 +362,17 @@ namespace PatternGeneratorJRL
     /*! Com height */
     double m_ComHeight;
 
-    /*! State of the trunk after one sampling period */
-    double m_AngVelTrunkConst, m_PreviewedTrunkAngleT;
+//    /*! State of the trunk after one sampling period */
+//    double m_AngVelTrunkConst, m_PreviewedTrunkAngleT;
 
     /*! Orientations of the feet previewed over the whole horizon length*/
     deque<double> PreviewedSupportAngles;
 
     /*! Current state of the trunk */
-    COMState_t m_TrunkState;
+    COMState_t m_TrunkState, m_TrunkStateT;
+
     deque<COMState_t> m_QueueOfTrunkStates;
+
     double m_a, m_TrunkPolCoeffB, m_c, m_d, m_TrunkPolCoeffE;
 
     /*! Sampling of the QP. */
