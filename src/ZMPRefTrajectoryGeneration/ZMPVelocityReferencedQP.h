@@ -164,7 +164,7 @@ namespace PatternGeneratorJRL
     		deque<LinearConstraintInequalityFreeFeet_t *>    & QueueOfFeetPosInequalities,
     		deque<SupportFeet_t *>    & QueueOfSupportFeet,
     		double Com_Height,
-    		int &NbOfConstraints,
+    		unsigned int &NbOfConstraints,
     		MAL_VECTOR(&xk,double));
 
 
@@ -452,14 +452,14 @@ namespace PatternGeneratorJRL
     /* /\*! Primal Least square Distance Problem solver *\/ */
     /* Optimization::Solver::PLDPSolver * m_PLDPSolverHerdt; */
 
-    void initializeProblem(int NbOfConstraints, int NbOfEqConstraints);
+    void initializeProblem();
 
-    void setProblem(int &CriteriaToMaximize, MAL_VECTOR(& xk,double));
+    void setProblem(int NbOfConstraints, int NbOfEqConstraints, int &CriteriaToMaximize, MAL_VECTOR(& xk,double));
 
     int dumpProblem(double * Q,
 		    double * D, 
 		    double * Pu,
-		    unsigned int NbOfConstraints,
+		    int NbOfConstraints,
 		    double * Px,
 		    double * XL,
 		    double * XU,
