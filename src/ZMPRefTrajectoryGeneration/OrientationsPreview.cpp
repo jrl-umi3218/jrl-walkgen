@@ -38,7 +38,6 @@ OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
 	m_uLimitFeet = 5.0/180.0*M_PI;
 
 
-
 	m_FullDebug = 3;
 
 	//TODO 1: How does ODEBUG/RESETDEBUG get activated?
@@ -55,11 +54,12 @@ OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
 }
 
 OrientationsPreview::~OrientationsPreview() {
+	cout<<"Leaving ~OrientationsPreview()"<<endl;
 }
 
 
 void OrientationsPreview::previewOrientations(const double &Time,
-		double *PreviewedSupportAngles,
+		deque<double> &PreviewedSupportAngles,
 		const COMState_t &TrunkState, COMState_t &TrunkStateT,
 		const SupportState * Support,
 		deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
@@ -163,7 +163,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 		{
 			m_SupportTimePassed = Support->CurrentTimeLimit+m_SSPeriod-Time;
 			m_FirstPreviewedFoot = 1;
-			PreviewedSupportAngles[0] = m_CurrentSupportAngle;
+			PreviewedSupportAngles.push_back(m_CurrentSupportAngle);
 			TrunkStateT.yaw[0] = m_PreviewedTrunkAngleEnd = TrunkState.yaw[0];
 		}
 
@@ -243,7 +243,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 				{
 					ofstream aof;
 					aof.open("previewOrientations.dat",ofstream::app);
-					aof<<"Angle too big for ds phase - m_PreviewedSupportAngle: "<<m_PreviewedSupportAngle
+					aof<<"Angle too big for DS phase - m_PreviewedSupportAngle: "<<m_PreviewedSupportAngle
 							<<" m_PreviousSupportAngle: "<<m_PreviousSupportAngle<<endl;
 					aof.close();
 				}
@@ -252,10 +252,12 @@ void OrientationsPreview::previewOrientations(const double &Time,
 			m_TrunkAngleOK = verifyAngleOfHipJoint(
 					Support, TrunkState, TrunkStateT,
 					m_CurrentSupportAngle, StepNumber);
-			if(!m_TrunkAngleOK)
+			if(!m_TrunkAngleOK){
+				PreviewedSupportAngles.clear();
 				break;
+			}
 			else
-				PreviewedSupportAngles[StepNumber] = m_PreviewedSupportAngle;
+				PreviewedSupportAngles.push_back(m_PreviewedSupportAngle);
 
 
 			if(m_FullDebug>2)
@@ -389,7 +391,7 @@ void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time, COMState_
 			m_PreviewedSupportAngle = CurrentAngle+m_MeanFootVelDifference*(m_SSPeriod-m_T);
 		}
 	}
-	else if(StepNumber==0 && Support->CurrentSupportPhase==1 || StepNumber==1 && Support->CurrentSupportPhase==0)
+	else if((StepNumber==0 && Support->CurrentSupportPhase==1) || (StepNumber==1 && Support->CurrentSupportPhase==0))
 	{
 
 		T = Support->CurrentTimeLimit-Time-m_T;

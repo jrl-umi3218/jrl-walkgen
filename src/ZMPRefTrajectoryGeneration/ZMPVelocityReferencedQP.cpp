@@ -78,8 +78,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
 	m_TrunkState.yaw[0]=m_TrunkState.yaw[1]=m_TrunkState.yaw[2]=0.0;
 
-	m_PreviewedSupportAngles = new double[(int)ceil((m_QP_N+1)*m_QP_T/m_Support->SSPeriod)];
-	memset(m_PreviewedSupportAngles,0,(int)ceil((m_QP_N+1)*m_QP_T/m_Support->SSPeriod)*sizeof(double));
+//	m_PreviewedSupportAngles = new double[(int)ceil((m_QP_N+1)*m_QP_T/m_Support->SSPeriod)];
+//	memset(m_PreviewedSupportAngles,0,(int)ceil((m_QP_N+1)*m_QP_T/m_Support->SSPeriod)*sizeof(double));
 
 
 
@@ -163,17 +163,22 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 	if (m_fCALS!=0)
 		delete m_fCALS;
 
+	if (m_FTGS!=0)
+			delete m_FTGS;
+
 	if (m_Q!=0)
 		delete [] m_Q;
 
+//	if (m_PreviewedSupportAngles!=0)
+//		delete [] m_PreviewedSupportAngles;
+
 	if (m_OP!=0)
-			delete m_OP;
+		delete m_OP;
 
-	if (m_PreviewedSupportAngles!=0)
-		delete [] m_PreviewedSupportAngles;
 
-//	if (m_Pb!=0)
-//			delete m_Pb;
+
+	//if (m_Pb!=0)
+	//		delete m_Pb;
 
 	// if (m_PLDPSolverHerdt!=0)
 	//   delete m_PLDPSolverHerdt;
@@ -181,8 +186,6 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 	if (m_Pu!=0)
 		delete [] m_Pu ;
 
-	if (m_FTGS!=0)
-		delete m_FTGS;
 
 //	printf("Leaving ~ZMPVelocityReferencedQP \n");
 }
@@ -670,6 +673,9 @@ void ZMPVelocityReferencedQP::initFeet()
 
 	QueueOfSupportFeet.push_back(aSFLeft);
 	QueueOfSupportFeet.push_back(aSFRight);
+
+	//delete aSFLeft;
+	//delete aSFRight;
 
 }
 
@@ -1572,13 +1578,11 @@ unsigned int N)
 
 		// printf("Before buildLinearConstraintInequalities \n");
 		m_fCALS->buildLinearConstraintInequalities(LeftFootAbsolutePositions,
-				RightFootAbsolutePositions,
-				QueueOfLConstraintInequalitiesFreeFeet,
-				QueueOfFeetPosInequalities,
-				RefVel,
+				RightFootAbsolutePositions, QueueOfLConstraintInequalitiesFreeFeet,
+				QueueOfFeetPosInequalities, RefVel,
 				StartingTime,
 				m_QP_N,
-				m_Support);
+				m_Support,m_PreviewedSupportAngles);
 
 
 
@@ -1994,23 +1998,20 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 
 	FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
 
-	// CjrlFoot aFoot;
-	// aFoot=aHS->leftFoot();
-	// vector3d AnklePosition;
-	// aFoot->getAnklePositionInLocalFrame(AnklePosition);
-
-
 
 	ODEBUG4("ZMP::InitOnLine - Step 2 ","ZMDInitOnLine.txt");
 	// Initialize position of the feet.
 	CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
 	CurrentLeftFootAbsPos.z = m_FTGS->m_AnklePositionLeft[2];
 	CurrentLeftFootAbsPos.time = 0.0;
+	CurrentLeftFootAbsPos.theta = 0.0;
+
 
 	ODEBUG4("CurrentLeftFootAbsPos.y: " << CurrentLeftFootAbsPos.y, "ZMDInitOnLine.txt");
 	CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
 	CurrentRightFootAbsPos.z =m_FTGS->m_AnklePositionRight[2];
 	CurrentRightFootAbsPos.time = 0.0;
+	CurrentRightFootAbsPos.theta = 0.0;
 
 	// V pre is the difference between
 	// the current m_Support position and the precedent.
@@ -2240,23 +2241,17 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 		int CriteriaToMaximize=1;
 
-
 		deque<LinearConstraintInequality_t *> QueueOfLConstraintInequalities;
 		deque<LinearConstraintInequalityFreeFeet_t *> QueueOfLConstraintInequalitiesFreeFeet;
 		deque<LinearConstraintInequalityFreeFeet_t *> QueueOfFeetPosInequalities;
 
-
-
-		// pre computes the matrices needed for the optimization.
-
+		// pre compute the matrices needed for the optimization.
 		double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
 		struct timeval start,end;
 		int li=0;
 		double dinterval = m_QP_T /  m_SamplingPeriod;
 		int interval=(int)dinterval;
 		bool StartingSequence = true;
-
-
 
 		unsigned int NumberOfRemovedConstraints =0;
 
@@ -2278,57 +2273,50 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		// Read the current state of the 2D Linearized Inverted Pendulum.
 		m_2DLIPM->GetState(xk);
 
-		ODEBUG("State: " << xk[0] << " " << xk[3] << " " <<
-				xk[1] << " " << xk[4] << " " <<
-				xk[2] << " " << xk[5] << " ");
-		if (m_FastFormulationMode==QLDANDLQ)
-		{
-			ODEBUG6(xk[0] << " " << xk[3] << " " <<
-					xk[1] << " " << xk[4] << " " <<
-					xk[2] << " " << xk[5] << " ", "Check2DLIPM_QLDANDLQ.dat");
-		}
-		else if (m_FastFormulationMode==PLDP)
-		{
-			ODEBUG6(xk[0] << " " << xk[3] << " " <<
-					xk[1] << " " << xk[4] << " " <<
-					xk[2] << " " << xk[5] << " ", "Check2DLIPM_PLDP.dat");
-		}
-
-
+		//TODO : Add a get function to read the state
 		m_Support->setSupportState(time+m_TimeBuffer, 0, RefVel);
-		unsigned int CurrentSStateChanged = m_Support->StateChanged;//Andremize to be moved to StateMachine
-		unsigned int CurrentSSSS = m_Support->SSSS;
 
 
 		if(m_Support->StateChanged == 1)
 		{
-			deque<SupportFeet_t *>::iterator SF_it;
+//			deque<SupportFeet_t *>::iterator SF_it;
+			deque<FootAbsolutePosition>::iterator FAP_it;
 			SupportFeet_t * newSF = new SupportFeet_t;
-			if(CurrentSSSS == 0)//SS->DS or DS->SS
+//			if(m_Support->SSSS == 0)//SS->DS or DS->SS
+//			{
+//				SF_it = QueueOfSupportFeet.end();
+//				SF_it--;
+//				//The m_Support foot does not change
+//				if((*SF_it)->SupportFoot != m_Support->CurrentSupportFoot)
+//					SF_it--;
+//				m_FPx = (*SF_it)->x;
+//				m_FPy = (*SF_it)->y;
+//				m_FPtheta = (*SF_it)->theta;
+//			}
+//			else
+//			{
+			if(m_Support->CurrentSupportFoot==1)
 			{
-				SF_it = QueueOfSupportFeet.end();
-				SF_it--;
-				//The m_Support foot does not change
-				if((*SF_it)->SupportFoot != m_Support->CurrentSupportFoot)
-					SF_it--;
-				m_FPx = (*SF_it)->x;
-				m_FPy = (*SF_it)->y;
-				m_FPtheta = (*SF_it)->theta;
+				FAP_it = FinalLeftFootAbsolutePositions.end();
+				FAP_it--;
 			}
+			else
+			{
+				FAP_it = FinalRightFootAbsolutePositions.end();
+				FAP_it--;
+			}
+//			}
 
-			newSF->x = m_FPx;
-			newSF->y = m_FPy;
-			// // printf("newSF -> FPx: %f FPy %f time %f \n",m_FPx,m_FPy,time);
-			newSF->theta = m_FPtheta;
+			newSF->x = FAP_it->x;
+			newSF->y = FAP_it->y;
+			newSF->theta = FAP_it->theta;
 			newSF->StartTime = time+m_TimeBuffer;
 			newSF->SupportFoot = m_Support->CurrentSupportFoot;
 
 			QueueOfSupportFeet.push_back(newSF);
-
 		}
 
 
-		//Andremize unnecessary variables
 		m_fCALS->buildLinearConstraintInequalities(FinalLeftFootAbsolutePositions,
 				FinalRightFootAbsolutePositions,
 				QueueOfLConstraintInequalitiesFreeFeet,
@@ -2336,12 +2324,11 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				RefVel,
 				time+m_TimeBuffer,
 				m_QP_N,
-				m_Support);
+				m_Support, m_PreviewedSupportAngles);
 
-		//Problem m_Pb;
+
 		initializeProblem();
 
-		// printf("buildConstraintMatrices");
 		buildConstraintMatrices(m_Pb.DS,m_Pb.DU,
 				m_QP_N,m_QP_T,
 				time+m_TimeBuffer,
@@ -2351,12 +2338,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				m_ComHeight,
 				NbOfConstraints,
 				xk);
-
-		//-------------Prepare the data for the solver-------
-		//
-		//
-		//---------------------------------------------------
-
 
 
 		setProblem(NbOfConstraints, 0, CriteriaToMaximize, xk);
@@ -2376,7 +2357,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 		if(m_FullDebug>2)
 			dumpProblem(m_Pb.Q, m_Pb.D, m_Pb.DU, m_Pb.m, m_Pb.DS, m_Pb.XL, m_Pb.XU, time+m_TimeBuffer);
-		//dumpProblem(m_Qff, D, DU, m, DS, XL, XU, time+m_TimeBuffer);
+
 		double ldt;
 		//---------Solver------------
 		//
@@ -2388,17 +2369,11 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		{
 			struct timeval lbegin,lend;
 			gettimeofday(&lbegin,0);
-//			ql0001_(&m, &me, &mmax, &n, &nmax, &mnn,
-//					m_Qff, D, DU, DS, XL, XU,
-//					X, U, &iout, &ifail, &iprint,
-//					war, &lwar, iwar, &liwar, &Eps);
-			gettimeofday(&lend,0);
-			//cout<<" X: "<<*X<<endl;
-
 			ql0001_(&m_Pb.m, &m_Pb.me, &m_Pb.mmax, &m_Pb.n, &m_Pb.nmax, &m_Pb.mnn,
 					m_Pb.Q, m_Pb.D, m_Pb.DU, m_Pb.DS, m_Pb.XL, m_Pb.XU,
 					m_Pb.X, m_Pb.U, &m_Pb.iout, &m_Pb.ifail, &m_Pb.iprint,
 					m_Pb.war, &m_Pb.lwar, m_Pb.iwar, &m_Pb.liwar, &m_Pb.Eps);
+			gettimeofday(&lend,0);
 
 			CODEDEBUG6(ldt = lend.tv_sec - lbegin.tv_sec +
 					0.000001 * (lend.tv_usec - lbegin.tv_usec););
@@ -2567,7 +2542,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 					LastSwingFootPosition.y,
 					LastSwingFootPosition.dy);
 
-			if(CurrentSStateChanged==1)
+			if(m_Support->StateChanged==1)
 				m_FTGS->SetParameters(footTrajectoryGenerationStandard::Z_AXIS, m_Support->SSPeriod-m_QP_T,StepHeight);
 
 			m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::THETA_AXIS,

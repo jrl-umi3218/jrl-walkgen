@@ -364,7 +364,7 @@ namespace PatternGeneratorJRL
 //    double m_AngVelTrunkConst, m_PreviewedTrunkAngleT;
 
     /*! Orientations of the feet previewed over the whole horizon length*/
-    deque<double> PreviewedSupportAngles;
+    //deque<double> PreviewedSupportAngles;
 
     /*! Current state of the trunk */
     COMState_t m_TrunkState, m_TrunkStateT;
@@ -380,7 +380,7 @@ namespace PatternGeneratorJRL
     unsigned int m_QP_N;
 
     /*! Orientations of the previewed support feet */
-    double * m_PreviewedSupportAngles;
+    deque<double> m_PreviewedSupportAngles;
 
     struct Problem_s
     {
