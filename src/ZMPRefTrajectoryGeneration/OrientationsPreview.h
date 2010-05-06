@@ -18,7 +18,7 @@
 
 /*! Framework includes */
 #include <walkGenJrl/PGTypes.h>
-#include <robotDynamics/jrlFoot.h>
+#include <dynamicsJRLJapan/dynamicsJRLJapanFactory.h>
 
 namespace PatternGeneratorJRL
 {
@@ -30,7 +30,7 @@ public:
 	~OrientationsPreview();
 
 	void previewOrientations(const double &Time,
-			double *PreviewedSupportAngles,
+			std::deque<double> &PreviewedSupportAngles,
 			const COMState_t &TrunkState, COMState_t &TrunkStateT,
 			const SupportState * Support,
 			std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
