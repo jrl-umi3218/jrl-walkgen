@@ -73,20 +73,20 @@ namespace PatternGeneratorJRL
 	Position.
        */
       int buildLinearConstraintInequalities(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
-					    std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					    std::deque<LinearConstraintInequalityFreeFeet_t *> &
-					    QueueOfLConstraintInequalities,
-					    std::deque<LinearConstraintInequalityFreeFeet_t *> &
-					    QueueOfFeetPosInequalities,
-					    ReferenceAbsoluteVelocity & RefVel,
-					    double StartingTime,
-					    double m_QP_N,
-					    SupportState * Support);
+    		  std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+    		  std::deque<LinearConstraintInequalityFreeFeet_t> &
+    		  QueueOfLConstraintInequalities,
+    		  std::deque<LinearConstraintInequalityFreeFeet_t> &
+    		  QueueOfFeetPosInequalities,
+    		  ReferenceAbsoluteVelocity & RefVel,
+    		  double StartingTime,
+    		  double m_QP_N,
+    		  SupportState * Support, std::deque<double> &PreviewedSupportAngles);
 
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute Position.  */
       int BuildLinearConstraintInequalities2(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
 					     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					     std::deque<LinearConstraintInequality_t *> &
+					     std::deque<LinearConstraintInequality_t> &
 					     QueueOfLConstraintInequalities,
 					     double ConstraintOnX,
 					     double ConstraintOnY);
@@ -141,6 +141,7 @@ namespace PatternGeneratorJRL
       
       double s_t,c_t;
       
+      unsigned int m_FullDebug;
     };
 };
 #endif /* _fOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_ */

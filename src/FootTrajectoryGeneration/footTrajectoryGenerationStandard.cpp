@@ -266,7 +266,7 @@ void footTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 
   // unsigned int k = CurrentAbsoluteIndex - IndexInitial;
   // Local time
-  double InterpolationTime = k*m_SamplingPeriod;
+  double InterpolationTime = (double)k*m_SamplingPeriod;
   int CurrentAbsoluteIndex = k+StartIndex;
   // unsigned int IndexInitial = CurrentAbsoluteIndex-1;
   double EndOfLiftOff = (m_TSingle-ModulatedSingleSupportTime)*0.5;

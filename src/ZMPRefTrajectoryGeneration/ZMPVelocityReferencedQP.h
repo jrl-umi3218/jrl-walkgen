@@ -106,7 +106,7 @@ namespace PatternGeneratorJRL
     		double ConstraintOnX,
     		double ConstraintOnY,
     		double T,
-    		unsigned int N);
+    		 int N);
     
     
 
@@ -158,13 +158,13 @@ namespace PatternGeneratorJRL
 
 
     int buildConstraintMatrices(double * &DS, double * &DU,
-    		unsigned N, double T,
+    		int N, double T,
     		double StartingTime,
-    		deque<LinearConstraintInequalityFreeFeet_t *>    & QueueOfLConstraintInequalitiesFreeFeet,
-    		deque<LinearConstraintInequalityFreeFeet_t *>    & QueueOfFeetPosInequalities,
-    		deque<SupportFeet_t *>    & QueueOfSupportFeet,
+    		deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfLConstraintInequalitiesFreeFeet,
+    		deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfFeetPosInequalities,
+    		deque<SupportFeet_t>    & QueueOfSupportFeet,
     		double Com_Height,
-    		unsigned int &NbOfConstraints,
+    		 int &NbOfConstraints,
     		MAL_VECTOR(&xk,double));
 
 
@@ -276,12 +276,12 @@ namespace PatternGeneratorJRL
 			      int NbOfConstraints,
 			      deque<LinearConstraintInequality_t *> &
 			      QueueOfLConstraintInequalities,
-			      unsigned int li,
+			       int li,
 			      double *X,
 			      double StartingTime);
 
     int validateConstraints(double * & DS,double * &DU,
-			    int NbOfConstraints, unsigned int li,
+			    int NbOfConstraints,  int li,
 			    double *X);
 
     /*! \brief Return the time at which it is optimal to regenerate a step in online mode. 
@@ -329,7 +329,7 @@ namespace PatternGeneratorJRL
 
     double m_UpperTimeLimitToUpdate;
 
-    deque<SupportFeet_t *> QueueOfSupportFeet;
+    deque<SupportFeet_t> QueueOfSupportFeet;
 
     double m_TimeBuffer;
 
@@ -377,7 +377,7 @@ namespace PatternGeneratorJRL
     double m_QP_T;
     
     /*! Preview window */
-    unsigned int m_QP_N;
+    int m_QP_N;
 
     /*! Orientations of the previewed support feet */
     deque<double> m_PreviewedSupportAngles;
