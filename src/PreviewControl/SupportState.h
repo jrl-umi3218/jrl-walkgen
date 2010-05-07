@@ -54,7 +54,7 @@ namespace PatternGeneratorJRL
 
     int StateChanged;
 
-    unsigned int StepNumber;
+    int StepNumber;
 
     //Number of steps done before DS
     unsigned int NbOfStepsSSDS;

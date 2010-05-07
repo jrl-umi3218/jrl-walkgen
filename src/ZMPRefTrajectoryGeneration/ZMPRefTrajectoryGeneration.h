@@ -234,6 +234,9 @@ namespace PatternGeneratorJRL
 			   COMPosition & lStartingCOMPosition,
 			   MAL_S3_VECTOR(,double) & lStartingZMPPosition)   = 0;
     
+
+
+
     /* ! Methods to update the stack on-line by inserting a new foot position. 
        This method is only ADDING a new step position, this is not a replacement.
        It is assumed that the removal of the foot is done outside this method.
