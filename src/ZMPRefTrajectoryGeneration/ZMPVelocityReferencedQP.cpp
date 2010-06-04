@@ -41,7 +41,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   // printf("Entered ZMPVelocityReferencedQP \n");
   m_Q = 0;
   m_Pu = 0;
-  m_FullDebug =3;
+  m_FullDebug =0;
   m_FastFormulationMode = QLD;
 
   m_QP_T = 0.1;

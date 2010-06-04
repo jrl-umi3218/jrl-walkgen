@@ -135,8 +135,8 @@ namespace PatternGeneratorJRL {
     m_FirstRead = true;
     ODEBUG4("Step 5","DebugPGI.txt");
 
-    RESETDEBUG5("DebugHerdt.txt");
-    RESETDEBUG5("DebugDataCoMZMP.dat");
+    //RESETDEBUG5("DebugHerdt.txt");
+    //RESETDEBUG5("DebugDataCoMZMP.dat");
     m_NewStepX = 0.0;
     m_NewStepY = 0.0;
     m_NewTheta = 0.0;
@@ -1060,7 +1060,7 @@ namespace PatternGeneratorJRL {
 	setReference(strm);
 	m_ZMPVRQP->Online = 1;
 	initOnlineHerdt();
-	ODEBUG5("InitOnLine","DebugHerdt.txt");
+	//ODEBUG5("InitOnLine","DebugHerdt.txt");
       }
 
     else if (aCmd==":readfilefromkw")
@@ -1283,20 +1283,20 @@ namespace PatternGeneratorJRL {
     m_CurrentWaistState.y[1]  = CurrentVelocity[1];
     m_CurrentWaistState.z[1]  = CurrentVelocity[2];
 
-    ODEBUG5("CurrentWaistState: "
-	    << m_CurrentWaistState.x[0] << " "
-	    << m_CurrentWaistState.y[0] << " "
-	    << m_CurrentWaistState.z[0] << " "
-	    << m_CurrentWaistState.roll << " "
-	    << m_CurrentWaistState.pitch << " "
-	    << m_CurrentWaistState.yaw,
-	    "DebugDataWaist.dat" );
-    ODEBUG5(":  "	
-	    << finalCOMPosition.z[0] << " "
-	    << m_CurrentWaistState.z[0] << " "
-	    << LeftFootPosition.z << " "
-	    << ZMPTarget(2) << " ",
-	    "DebugDataCoMZMP.dat" );
+    //ODEBUG5("CurrentWaistState: "
+	//    << m_CurrentWaistState.x[0] << " "
+	//   << m_CurrentWaistState.y[0] << " "
+	//    << m_CurrentWaistState.z[0] << " "
+	//    << m_CurrentWaistState.roll << " "
+	//    << m_CurrentWaistState.pitch << " "
+	//    << m_CurrentWaistState.yaw,
+	//    "DebugDataWaist.dat" );
+    //ODEBUG5(":  "	
+	//   << finalCOMPosition.z[0] << " "
+	//   << m_CurrentWaistState.z[0] << " "
+	//    << LeftFootPosition.z << " "
+	//    << ZMPTarget(2) << " ",
+	//    "DebugDataCoMZMP.dat" );
 //
 //    ofstream aof;
 //    aof.open("waist.txt", ofstream::app);
