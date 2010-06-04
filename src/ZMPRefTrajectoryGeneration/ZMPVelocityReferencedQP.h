@@ -312,9 +312,7 @@ namespace PatternGeneratorJRL
     
     /*! @}*/
     /* @} */
-    
-    /*! Set the preview control object. */
-    void SetPreviewControl(PreviewControl *aPC);
+    ReferenceAbsoluteVelocity RefVel;
 
     static const unsigned int QLD=0;
     static const unsigned int QLDANDLQ=1;
@@ -352,7 +350,7 @@ namespace PatternGeneratorJRL
       
     footTrajectoryGenerationStandard * m_FTGS;
 
-    ReferenceAbsoluteVelocity RefVel;
+    
     
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;

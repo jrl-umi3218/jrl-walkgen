@@ -25,7 +25,6 @@
 
 
 #include <PatternGeneratorInterfacePrivate.h>
-
 #include <Debug.h>
 
 namespace PatternGeneratorJRL {
@@ -136,6 +135,8 @@ namespace PatternGeneratorJRL {
     m_FirstRead = true;
     ODEBUG4("Step 5","DebugPGI.txt");
 
+    RESETDEBUG5("DebugHerdt.txt");
+    RESETDEBUG5("DebugDataCoMZMP.dat");
     m_NewStepX = 0.0;
     m_NewStepY = 0.0;
     m_NewTheta = 0.0;
@@ -211,7 +212,7 @@ namespace PatternGeneratorJRL {
     m_ZMPQP = new ZMPQPWithConstraint(this,"",m_HumanoidDynamicRobot);
 
      // ZMP and CoM generation using the method proposed in Dimitrov2008.
-    m_ZMPCQPFF = new ZMPConstrainedQPFastFormulation(this,"",m_HumanoidDynamicRobot);
+    //m_ZMPCQPFF = new ZMPConstrainedQPFastFormulation(this,"",m_HumanoidDynamicRobot);
 
     // ZMP and CoM generation using the method proposed in Herdt2010.
     m_ZMPVRQP = new ZMPVelocityReferencedQP(this,"",m_HumanoidDynamicRobot);
@@ -226,7 +227,7 @@ namespace PatternGeneratorJRL {
     // Object to generate Motion from KineoWorks.
     m_GMFKW = new GenerateMotionFromKineoWorks();
 
-    // Object to have a Dynamic multibody robot model.
+    // Object to h ave a Dynamic multibody robot model.
     // for the second preview loop.
 
 
@@ -273,12 +274,11 @@ namespace PatternGeneratorJRL {
 					       m_StepStackHandler);
 
     // Initialize the ZMP trajectory generator.
-    m_ZMPCQPFF->SetSamplingPeriod(m_PC->SamplingPeriod());
-    m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+    //m_ZMPCQPFF->SetSamplingPeriod(m_PC->SamplingPeriod());
+    //m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
     m_ZMPVRQP->SetSamplingPeriod(m_PC->SamplingPeriod());
 
     m_ZMPVRQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
-    m_ZMPVRQP->SetPreviewControl(m_PC);
 
     m_ZMPM->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPM->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
@@ -338,9 +338,9 @@ namespace PatternGeneratorJRL {
     if (m_ZMPQP!=0)
       delete m_ZMPQP;
 
-    if (m_ZMPCQPFF!=0)
-      delete m_ZMPCQPFF;
-    ODEBUG4("Destructor: did m_ZMPQP","DebugPGI.txt");
+    //if (m_ZMPCQPFF!=0)
+    //  delete m_ZMPCQPFF;
+    //ODEBUG4("Destructor: did m_ZMPQP","DebugPGI.txt");
 
     if (m_ZMPVRQP!=0)
       delete m_ZMPVRQP;
@@ -456,6 +456,7 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::setReference(istringstream &strm)
   {
     // Read the data inside strm.
+    cout<<"setReference called"<<endl;
     m_ZMPVRQP->setReference(strm);
   }
 
@@ -1059,7 +1060,7 @@ namespace PatternGeneratorJRL {
 	setReference(strm);
 	m_ZMPVRQP->Online = 1;
 	initOnlineHerdt();
-	printf("Online \n");
+	ODEBUG5("InitOnLine","DebugHerdt.txt");
       }
 
     else if (aCmd==":readfilefromkw")
@@ -1111,9 +1112,7 @@ namespace PatternGeneratorJRL {
       }
       else if (ZMPTrajAlgo=="Herdt")
       {
-	// m_AlgorithmforZMPCOM = ZMPCOM_DIMITROV_2008;
 	m_AlgorithmforZMPCOM = ZMPCOM_HERDT_2010;
-	// m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	cout << "Herdt" << endl;
       }
@@ -1197,7 +1196,7 @@ namespace PatternGeneratorJRL {
 	ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
 	       "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
 	*/
-	//	return false;//Andremize
+	return false;
       }
     ODEBUG("Here");
 
@@ -1284,7 +1283,7 @@ namespace PatternGeneratorJRL {
     m_CurrentWaistState.y[1]  = CurrentVelocity[1];
     m_CurrentWaistState.z[1]  = CurrentVelocity[2];
 
-    ODEBUG4("CurrentWaistState: "
+    ODEBUG5("CurrentWaistState: "
 	    << m_CurrentWaistState.x[0] << " "
 	    << m_CurrentWaistState.y[0] << " "
 	    << m_CurrentWaistState.z[0] << " "
@@ -1292,6 +1291,12 @@ namespace PatternGeneratorJRL {
 	    << m_CurrentWaistState.pitch << " "
 	    << m_CurrentWaistState.yaw,
 	    "DebugDataWaist.dat" );
+    ODEBUG5(":  "	
+	    << finalCOMPosition.z[0] << " "
+	    << m_CurrentWaistState.z[0] << " "
+	    << LeftFootPosition.z << " "
+	    << ZMPTarget(2) << " ",
+	    "DebugDataCoMZMP.dat" );
 //
 //    ofstream aof;
 //    aof.open("waist.txt", ofstream::app);

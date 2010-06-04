@@ -107,6 +107,7 @@ ENDIF(CMAKE_BUILD_TYPE MATCHES "RELEASE")
 # To deal with the headers.
 #--------------------------
 add_subdirectory(src)
+add_subdirectory(unitTesting)
 
 # Prepare the documentation
 # -------------------------

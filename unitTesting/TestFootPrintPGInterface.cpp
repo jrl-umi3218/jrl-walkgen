@@ -37,13 +37,13 @@ using namespace std;
 void CommonInitialization(PatternGeneratorInterface &aPGI)
 {
   const char lBuffer[12][256] =
-    {":samplingperiod 0.005",
+    {":comheight 0.8078",
+     ":samplingperiod 0.005",
      ":previewcontroltime 1.6",
-     ":comheight 0.8078",
      ":omega 0.0",
      ":stepheight 0.07",
-     ":singlesupporttime 0.78",
-     ":doublesupporttime 0.02",
+     ":singlesupporttime 0.7",
+     ":doublesupporttime 0.1",
      ":armparameters 0.5",
      ":LimitsFeasibility 0.0",
      ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
@@ -784,13 +784,13 @@ int main(int argc, char *argv[])
       else
 	{
 	  VRMLPath=value;
-	  VRMLPath+="/Controller/IOserver/robot/HRP2JRL/model/";
+	  //VRMLPath+="/Controller/IOserver/robot/HRP2JRL/model/";
 	  VRMLFileName="HRP2JRLmain.wrl";
 	  SpecificitiesFileName = value;
-	  SpecificitiesFileName +="/Controller/IOserver/robot/HRP2JRL/etc/";
-	  SpecificitiesFileName += "HRP2Specificities.xml";
+	  //SpecificitiesFileName +="/Controller/IOserver/robot/HRP2JRL/etc/";
+	  SpecificitiesFileName += "/HRP2Specificities.xml";
 	  LinkJointRank = value;
-	  LinkJointRank += "/Controller/IOserver/robot/HRP2JRL/etc/";
+	  //LinkJointRank += "/Controller/IOserver/robot/HRP2JRL/etc/";
 	  LinkJointRank += "HRP2LinkJointRank.xml";
 	  
 	  if (argc==2)
