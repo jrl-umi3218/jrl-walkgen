@@ -347,11 +347,11 @@ void footTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
     }
 
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = 
-    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime)+
-    m_AnklePositionRight[2];
+    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+  //m_AnklePositionRight[2];
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = 
-    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime)+
-    m_AnklePositionRight[2];
+    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+  //m_AnklePositionRight[2];
   
   bool ProtectionNeeded=false;
 
