@@ -41,7 +41,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   // printf("Entered ZMPVelocityReferencedQP \n");
   m_Q = 0;
   m_Pu = 0;
-  m_FullDebug =0;
+  m_FullDebug = 3;
   m_FastFormulationMode = QLD;
 
   m_QP_T = 0.1;
@@ -98,7 +98,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_2DLIPM->SetComHeight(m_ComHeight);
   m_2DLIPM->InitializeSystem();
 
-  m_Alpha = 0.0001;
+  m_Alpha = 0.000001;
   m_Beta = 1;
 
   InitConstants();
@@ -140,9 +140,12 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
       ofstream aof;
       aof.open("Trunk.dat",ofstream::out);
       aof.close();
+      aof.open("time.dat",ofstream::out);
+      aof.close();
     }
 
-
+  //Feet distance in the DS phase
+  m_FeetDistanceDS = 0.2;
   // printf("Leaving ZMPVelocityReferencedQP \n");
 }
 
@@ -1097,9 +1100,9 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
   for( int i=0;i<N;i++)
     {
       if((LCIFF_it)->StepNumber==0)
-	{
+	{//c'est pas bon ca
 	  FFPx = CurSF_it->x;
-	  FFPy = (CurSF_it)->y;
+	  FFPy = CurSF_it->y;
 	  // cout<<FFPx<<" "<<FFPy<<endl;
 	}
       else
@@ -1115,7 +1118,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
 
       // For each constraint.
 
-      for(int j=0;j<MAL_MATRIX_NB_ROWS((LCIFF_it)->D);j++)
+      for(int j=0;j<MAL_MATRIX_NB_ROWS(LCIFF_it->D);j++)
 	{
 	  // cout<<" D("<<j<<",0): " <<(LCIFF_it)->D(j,0);
 	  // cout<<" D("<<j<<",1): " <<(LCIFF_it)->D(j,1);
@@ -1197,10 +1200,10 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
   LCIFF_it = QueueOfFeetPosInequalities.begin();
   for( int i=0;i<m_Support->StepNumber;i++)
     {
-      if((LCIFF_it)->StepNumber==1)
+      if(LCIFF_it->StepNumber==1)
 	{
-	  FFPx = (CurSF_it)->x;
-	  FFPy = (CurSF_it)->y;
+	  FFPx = CurSF_it->x;
+	  FFPy = CurSF_it->y;
 	  //cout<<FFPx<<" "<<FFPy<<endl;
 	}
       else
@@ -1273,9 +1276,9 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
 	  if((LCIFF_it)->StepNumber==1)
 	    {
 	      m_Pb.DU[IndexConstraint+(2*N+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] =
-		-(LCIFF_it)->D(j,0);
-	      m_Pb.DU[IndexConstraint+(2*N+m_Support->StepNumber+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] =
-		-(LCIFF_it)->D(j,1);
+		-LCIFF_it->D(j,0);
+	      m_Pb.DU[IndexConstraint+(2*N+m_Support->StepNumber+LCIFF_it->StepNumber-1)*(NbOfConstraints+1)] =
+		-LCIFF_it->D(j,1);
 	    }
 	  if((LCIFF_it)->StepNumber>1)
 	    {
@@ -2222,7 +2225,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
 {
 
-  if(time > m_UpperTimeLimitToUpdate )
+  if(time > m_UpperTimeLimitToUpdate)
     {
       int NbOfConstraints; // Nb of constraints are not known in advance
 
@@ -2468,9 +2471,23 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       m_2DLIPM->OneIteration(ptX[0],ptX[m_QP_N]);
 
+
       //Previewed position of the next foot
-      m_FPx = ptX[2*m_QP_N];
-      m_FPy = ptX[2*m_QP_N+m_Support->StepNumber];
+      if(m_Support->CurrentStepsLeft>0)
+	{
+	  m_FPx = ptX[2*m_QP_N];
+	  m_FPy = ptX[2*m_QP_N+m_Support->StepNumber];
+	}
+      else
+	{
+	  deque<SupportFeet_t>::iterator CurSF_it;
+	  CurSF_it = QueueOfSupportFeet.end();
+	  CurSF_it--;
+	  while(CurSF_it->SupportFoot!=m_Support->CurrentSupportFoot)
+	    CurSF_it--;
+	  m_FPx = CurSF_it->x + double(CurSF_it->SupportFoot)*sin(CurSF_it->theta)*m_FeetDistanceDS;
+	  m_FPy = CurSF_it->y - double(CurSF_it->SupportFoot)*cos(CurSF_it->theta)*m_FeetDistanceDS; 
+	}
 
       if (m_FullDebug>2)
 	{
@@ -2478,8 +2495,16 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  char Buffer[1024];
 	  sprintf(Buffer,"Xff_%f.dat",time);
 	  aof.open(Buffer,ofstream::out);
-	  aof << "State: " <<xk[0]<<" "<<xk[1]<< " " << xk[2] << " " << xk[3] << " "<<xk[4]<<" "<<xk[5]<<" "<<endl;
-	  for(int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
+	  //aof << "State: " <<xk[0]<<" "<<xk[1]<< " " << xk[2] << " " << xk[3] << " "<<xk[4]<<" "<<xk[5]<<" "<<endl;
+	  for(int i=0;i<m_QP_N;i++)
+	    {
+	      aof << m_Pb.X[i] << endl;
+	    }
+	  aof.close();
+	  sprintf(Buffer,"Yff_%f.dat",time);
+	  aof.open(Buffer,ofstream::out);
+	  //aof << "State: " <<xk[0]<<" "<<xk[1]<< " " << xk[2] << " " << xk[3] << " "<<xk[4]<<" "<<xk[5]<<" "<<endl;
+	  for(int i=m_QP_N+m_Support->StepNumber;i<2*(m_QP_N+m_Support->StepNumber);i++)
 	    {
 	      aof << m_Pb.X[i] << endl;
 	    }
