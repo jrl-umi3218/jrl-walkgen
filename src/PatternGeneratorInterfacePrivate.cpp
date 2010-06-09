@@ -1299,7 +1299,7 @@ namespace PatternGeneratorJRL {
 	//    "DebugDataCoMZMP.dat" );
 //
 //    ofstream aof;
-//    aof.open("waist.txt", ofstream::app);
+//    aof.open("waistAndrei.dat", ofstream::app);
 //    aof << m_CurrentWaistState.x[0] << " "
 //	<< m_CurrentWaistState.y[0] << " "
 //	<< m_CurrentWaistState.z[0] << " "
@@ -1307,8 +1307,12 @@ namespace PatternGeneratorJRL {
 //	<< m_CurrentWaistState.pitch << " "
 //	<< m_CurrentWaistState.yaw
 //	<< endl;
+//       aof.close();
+//    aof.open("COMFoot.dat", ofstream::app);
+//    aof << finalCOMPosition.y[0] << " "
+//	<< LeftFootPosition.y 
+//	<< endl;
 //    aof.close();
-
     bool UpdateAbsMotionOrNot = false;
 
     //    if ((u=(m_count - (m_ZMPPositions.size()-2*m_NL)))>=0)

@@ -322,6 +322,8 @@ namespace PatternGeneratorJRL
 
   private:
 
+    double m_FeetDistanceDS;
+
     double m_FPx, m_FPy, m_FPtheta;
     double m_StartTime;
 

@@ -41,7 +41,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   // printf("Entered ZMPVelocityReferencedQP \n");
   m_Q = 0;
   m_Pu = 0;
-  m_FullDebug = 3;
+  m_FullDebug = 0;
   m_FastFormulationMode = QLD;
 
   m_QP_T = 0.1;
@@ -98,7 +98,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_2DLIPM->SetComHeight(m_ComHeight);
   m_2DLIPM->InitializeSystem();
 
-  m_Alpha = 0.000001;
+  m_Alpha = 0.00001;
   m_Beta = 1;
 
   InitConstants();
@@ -2225,7 +2225,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
 {
 
-  if(time > m_UpperTimeLimitToUpdate)
+  if(time + 0.00001 > m_UpperTimeLimitToUpdate)
     {
       int NbOfConstraints; // Nb of constraints are not known in advance
 
@@ -2259,7 +2259,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       m_OP->verifyAccelerationOfHipJoint(RefVel, m_TrunkState,
 					 m_TrunkStateT, m_Support);
 
-      m_OP->previewOrientations(time, m_PreviewedSupportAngles, m_TrunkState, m_TrunkStateT, m_Support,
+      m_OP->previewOrientations(time+m_TimeBuffer, m_PreviewedSupportAngles, m_TrunkState, m_TrunkStateT, m_Support,
 				FinalLeftFootAbsolutePositions, FinalRightFootAbsolutePositions);
 
       // Read the current state of the 2D Linearized Inverted Pendulum.
@@ -2475,11 +2475,14 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       //Previewed position of the next foot
       if(m_Support->CurrentStepsLeft>0)
 	{
-	  m_FPx = ptX[2*m_QP_N];
-	  m_FPy = ptX[2*m_QP_N+m_Support->StepNumber];
+	  if(fabs(ptX[2*m_QP_N])-0.00001>0.0)
+	    {
+	      m_FPx = ptX[2*m_QP_N];
+	      m_FPy = ptX[2*m_QP_N+m_Support->StepNumber];
+	    }
 	}
       else
-	{
+	{//The solver isn't responsible for the feet positions anymore
 	  deque<SupportFeet_t>::iterator CurSF_it;
 	  CurSF_it = QueueOfSupportFeet.end();
 	  CurSF_it--;
@@ -2514,7 +2517,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  aof << FinalCOMPositions[CurrentIndex].x[0]<<" "<< FinalCOMPositions[CurrentIndex].y[0]<< FinalCOMPositions[CurrentIndex].z[0] << endl;
 
 	  aof.close();
-
+	  aof.open("CurrentIndex.dat",ofstream::app);
+	  aof<<CurrentIndex<<endl;
+	  aof.close();
 	}
 
       //TODO :Jumps of 5ms
@@ -2522,14 +2527,15 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	{
 	  ofstream aof;
 	  aof.open("time.dat",ios::app);
-	  aof<<time<<endl;
+	  aof<<time<<" "<<m_UpperTimeLimitToUpdate<<endl;
 	}
 
-      double LocalInterpolationStartTime = (time+m_TimeBuffer)-(m_Support->CurrentTimeLimit-m_Support->SSPeriod);
+      double LocalInterpolationTime = (time+m_TimeBuffer)-(m_Support->CurrentTimeLimit-m_Support->SSPeriod);
       // printf("FPx: %f FPy %f \n",FPx,FPy);
 
       // printf("Before interpolation \n");
       double StepHeight = 0.05;
+      //
       if(m_Support->CurrentSupportPhase == 1 && time+m_TimeBuffer+3.0/2.0*m_QP_T < m_Support->CurrentTimeLimit)
 	{
 	  //determine coefficients of interpolation polynom
@@ -2537,18 +2543,14 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  double ModulatedSingleSupportTime = (m_Support->SSPeriod-m_QP_T) * ModulationSupportCoefficient;
 	  double EndOfLiftOff = ((m_Support->SSPeriod-m_QP_T)-ModulatedSingleSupportTime)*0.5;
 	  double InterpolationTimePassed = 0.0;
-	  if(LocalInterpolationStartTime>EndOfLiftOff)
-	    InterpolationTimePassed = LocalInterpolationStartTime-EndOfLiftOff;
-
+	  if(LocalInterpolationTime>EndOfLiftOff)
+	    InterpolationTimePassed = LocalInterpolationTime-EndOfLiftOff;
 
 	  FootAbsolutePosition LastSwingFootPosition;
 
 	  if(m_Support->CurrentSupportFoot==1)
 	    {
 	      LastSwingFootPosition = FinalRightFootAbsolutePositions[CurrentIndex];
-	      //				cout<<"FinalRightFootAbsolutePositions.size(): "<<FinalRightFootAbsolutePositions.size()<<endl;
-	      //				cout<<"CurrentIndex-1: "<<CurrentIndex-1<<endl;
-	      //				cout<<"LastSwingFootPosition.x: "<<LastSwingFootPosition.x<<endl;
 	    }
 	  else
 	    {
@@ -2568,7 +2570,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	    m_FTGS->SetParameters(footTrajectoryGenerationStandard::Z_AXIS, m_Support->SSPeriod-m_QP_T,StepHeight);
 
 	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::THETA_AXIS,
-						    ModulatedSingleSupportTime-InterpolationTimePassed,m_PreviewedSupportAngles[0],
+						    ModulatedSingleSupportTime-InterpolationTimePassed, 
+						    m_PreviewedSupportAngles[0],
 						    LastSwingFootPosition.theta,
 						    LastSwingFootPosition.dtheta);
 	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::OMEGA_AXIS,
@@ -2626,7 +2629,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		  m_FTGS->UpdateFootPosition(FinalLeftFootAbsolutePositions,
 					     FinalRightFootAbsolutePositions,
 					     CurrentIndex,k,
-					     LocalInterpolationStartTime,
+					     LocalInterpolationTime,
 					     ModulatedSingleSupportTime,
 					     StepType, -1);
 		}
@@ -2635,7 +2638,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		  m_FTGS->UpdateFootPosition(FinalRightFootAbsolutePositions,
 					     FinalLeftFootAbsolutePositions,
 					     CurrentIndex,k,
-					     LocalInterpolationStartTime,
+					     LocalInterpolationTime,
 					     ModulatedSingleSupportTime,
 					     StepType, 1);
 		}

@@ -12,6 +12,9 @@
    in the root directory.
 
 */
+
+//#define _DEBUG_MODE_ON_
+
 #include <iostream>
 #include <fstream>
 
@@ -25,7 +28,7 @@ LinearizedInvertedPendulum2D::LinearizedInvertedPendulum2D()
 {
   m_T =-1.0;
   m_ComHeight = -1.0;
-  m_SamplingPeriod = -1.0;
+  m_SamplingPeriod = -1.0; 
   m_InterpolationInterval = -1;
   MAL_MATRIX_RESIZE(m_A,6,6);
   MAL_MATRIX_RESIZE(m_B,6,1);
