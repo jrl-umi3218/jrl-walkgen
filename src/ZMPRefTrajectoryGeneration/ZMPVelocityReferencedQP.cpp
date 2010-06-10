@@ -41,7 +41,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   // printf("Entered ZMPVelocityReferencedQP \n");
   m_Q = 0;
   m_Pu = 0;
-  m_FullDebug = 0;
+  m_FullDebug = 3;
   m_FastFormulationMode = QLD;
 
   m_QP_T = 0.1;
@@ -99,7 +99,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_2DLIPM->InitializeSystem();
 
   m_Alpha = 0.00001;
-  m_Beta = 1;
+  m_Beta = 1.0;
+  m_Gamma =0.0;//0.000001;
 
   InitConstants();
 
@@ -208,96 +209,207 @@ void ZMPVelocityReferencedQP::interpolateFeet(deque<FootAbsolutePosition> &LeftF
   printf("To be implemented \n");
 }
 
-
 int ZMPVelocityReferencedQP::InitializeMatrixPbConstants()
 {
-  MAL_MATRIX_RESIZE(m_PPu,2*m_QP_N,2*m_QP_N);
-  MAL_MATRIX_RESIZE(m_VPu,2*m_QP_N,2*m_QP_N);
-  MAL_MATRIX_RESIZE(m_PPx,2*m_QP_N,6);
-  MAL_MATRIX_RESIZE(m_VPx,2*m_QP_N,6);
+	MAL_MATRIX_RESIZE(m_PPu,2*m_QP_N,2*m_QP_N);
+	MAL_MATRIX_RESIZE(m_PZu,m_QP_N,m_QP_N);
+	MAL_MATRIX_RESIZE(m_VPu,2*m_QP_N,2*m_QP_N);
+	MAL_MATRIX_RESIZE(m_PPx,2*m_QP_N,6);
+	MAL_MATRIX_RESIZE(m_PZx,m_QP_N,3);
+	MAL_MATRIX_RESIZE(m_VPx,2*m_QP_N,6);
 
-  for( int i=0;i<m_QP_N;i++)
-    {
-      // Compute VPx and PPx
-      m_VPx(i,0)   = 0.0;   m_VPx(i,1) =     1.0; m_VPx(i,2)   = (i+1)*m_QP_T;
-      m_VPx(i,3)   = 0.0;   m_VPx(i,4) =     0.0; m_VPx(i,5)   = 0.0;
-      m_VPx(i+m_QP_N,0) = 0.0;   m_VPx(i+m_QP_N,1) =   0.0; m_VPx(i+m_QP_N,2) = 0.0;
-      m_VPx(i+m_QP_N,3) = 0.0;   m_VPx(i+m_QP_N,4) =   1.0; m_VPx(i+m_QP_N,5) = (i+1)*m_QP_T;
-
-      m_PPx(i,0) = 1.0; m_PPx(i,1)     = (i+1)*m_QP_T; m_PPx(i,2) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
-      m_PPx(i,3) = 0.0; m_PPx(i,4)     =       0; m_PPx(i,5) = 0.;
-      m_PPx(i+m_QP_N,0) = 0.0; m_PPx(i+m_QP_N,1) =     0.0; m_PPx(i+m_QP_N,2) = 0.0;
-      m_PPx(i+m_QP_N,3) = 1.0; m_PPx(i+m_QP_N,4) = (i+1)*m_QP_T; m_PPx(i+m_QP_N,5) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
-
-
-      for( int j=0;j<m_QP_N;j++)
+	for( int i=0;i<m_QP_N;i++)
 	{
-	  m_PPu(i,j)=0;
+		// Compute VPx and PPx
+		m_VPx(i,0)   = 0.0;   m_VPx(i,1) =     1.0; m_VPx(i,2)   = (i+1)*m_QP_T;
+		m_VPx(i,3)   = 0.0;   m_VPx(i,4) =     0.0; m_VPx(i,5)   = 0.0;
+		m_VPx(i+m_QP_N,0) = 0.0;   m_VPx(i+m_QP_N,1) =   0.0; m_VPx(i+m_QP_N,2) = 0.0;
+		m_VPx(i+m_QP_N,3) = 0.0;   m_VPx(i+m_QP_N,4) =   1.0; m_VPx(i+m_QP_N,5) = (i+1)*m_QP_T;
 
-	  if (j<=i)
-	    {
+		m_PPx(i,0) = 1.0; m_PPx(i,1)     = (i+1)*m_QP_T; m_PPx(i,2) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
+		m_PPx(i,3) = 0.0; m_PPx(i,4)     =       0; m_PPx(i,5) = 0.;
+		m_PPx(i+m_QP_N,0) = 0.0; m_PPx(i+m_QP_N,1) =     0.0; m_PPx(i+m_QP_N,2) = 0.0;
+		m_PPx(i+m_QP_N,3) = 1.0; m_PPx(i+m_QP_N,4) = (i+1)*m_QP_T; m_PPx(i+m_QP_N,5) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
+		//TODO: + or - m_ComHeight/9.81
+		m_PZx(i,0) = 1.0; m_PZx(i,1)     = (i+1)*m_QP_T; m_PZx(i,2) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5-m_ComHeight/9.81;
+		//m_PZx(i,3) = 0.0; m_PZx(i,4)     =       0; m_PZx(i,5) = 0.;
+		//		m_PZx(i+m_QP_N,0) = 0.0; m_PZx(i+m_QP_N,1) =     0.0; m_PZx(i+m_QP_N,2) = 0.0;
+		//		m_PZx(i+m_QP_N,3) = 1.0; m_PZx(i+m_QP_N,4) = (i+1)*m_QP_T; m_PZx(i+m_QP_N,5) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5+m_ComHeight/9.81;
 
-	      m_VPu(i,j)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ;
-	      m_VPu(i+m_QP_N,j+m_QP_N)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ;
-	      m_VPu(i,j+m_QP_N)=0.0;
-	      m_VPu(i+m_QP_N,j)=0.0;
+
+		for( int j=0;j<m_QP_N;j++)
+		{
+			m_PPu(i,j)=0;
+			m_PZu(i,j)=0;
+
+			if (j<=i)
+			{
+
+				m_VPu(i,j)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ;
+				m_VPu(i+m_QP_N,j+m_QP_N)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ;
+				m_VPu(i,j+m_QP_N)=0.0;
+				m_VPu(i+m_QP_N,j)=0.0;
 
 
-	      m_PPu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
-	      m_PPu(i+m_QP_N,j+m_QP_N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
-	      m_PPu(i,j+m_QP_N)=0.0;
-	      m_PPu(i+m_QP_N,j)=0.0;
+				m_PPu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
+				m_PPu(i+m_QP_N,j+m_QP_N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
+				m_PPu(i,j+m_QP_N)=0.0;
+				m_PPu(i+m_QP_N,j)=0.0;
 
-	    }
-	  else
-	    {
+				m_PZu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0 - m_QP_T*m_ComHeight/9.81;
+				//m_PZu(i+m_QP_N,j+m_QP_N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0 + m_QP_T*m_ComHeight/9.81;
+				//m_PZu(i,j+m_QP_N)=0.0;
+				//m_PZu(i+m_QP_N,j)=0.0;
+			}
+			else
+			{
 
-	      m_VPu(i,j) = 0.0;
-	      m_VPu(i+m_QP_N,j+m_QP_N)=0.0;
-	      m_VPu(i,j+m_QP_N)=0.0;
-	      m_VPu(i+m_QP_N,j)=0.0;
+				m_VPu(i,j) = 0.0;
+				m_VPu(i+m_QP_N,j+m_QP_N)=0.0;
+				m_VPu(i,j+m_QP_N)=0.0;
+				m_VPu(i+m_QP_N,j)=0.0;
 
-	      m_PPu(i,j) = 0.0;
-	      m_PPu(i+m_QP_N,j+m_QP_N)=0.0;
-	      m_PPu(i,j+m_QP_N)=0.0;
-	      m_PPu(i+m_QP_N,j)=0.0;
+				m_PPu(i,j) = 0.0;
+				m_PPu(i+m_QP_N,j+m_QP_N)=0.0;
+				m_PPu(i,j+m_QP_N)=0.0;
+				m_PPu(i+m_QP_N,j)=0.0;
 
-	    }
+				m_PZu(i,j) = 0.0;
+				//m_PZu(i+m_QP_N,j+m_QP_N)=0.0;
+				//m_PZu(i,j+m_QP_N)=0.0;
+				//m_PZu(i+m_QP_N,j)=0.0;
+			}
 
+		}
 	}
-    }
 
-  // Build m_Px.
-  MAL_MATRIX_RESIZE(m_Px,m_QP_N,3);
+	// Build m_Px.
+	MAL_MATRIX_RESIZE(m_Px,m_QP_N,3);
 
-  for( int li=0;li<m_QP_N;li++)
-    {
-      m_Px(li,0) = 1.0;
-      m_Px(li,1) = (double)(1.0+li)*m_QP_T;
-      m_Px(li,2) = (li+1.0)*(li+1.0)*m_QP_T*m_QP_T*0.5-m_ComHeight/9.81;
-    }
-  if (m_FullDebug>2)
-    {
-      ofstream aof;
-      aof.open("VPx.dat");
-      aof << m_VPx;
-      aof.close();
+	for( int li=0;li<m_QP_N;li++)
+	{
+		m_Px(li,0) = 1.0;
+		m_Px(li,1) = (double)(1.0+li)*m_QP_T;
+		m_Px(li,2) = (li+1.0)*(li+1.0)*m_QP_T*m_QP_T*0.5-m_ComHeight/9.81;
+	}
+	if (m_FullDebug>2)
+	{
+		ofstream aof;
+		aof.open("VPx.dat");
+		aof << m_VPx;
+		aof.close();
 
-      aof.open("m_PPx.dat");
-      aof << m_PPx;
-      aof.close();
+		aof.open("m_PPx.dat");
+		aof << m_PPx;
+		aof.close();
 
-      aof.open("VPu.dat");
-      aof << m_VPu;
-      aof.close();
+		aof.open("VPu.dat");
+		aof << m_VPu;
+		aof.close();
 
-      aof.open("PPu.dat");
-      aof << m_PPu;
-      aof.close();
-    }
+		aof.open("PPu.dat");
+		aof << m_PPu;
+		aof.close();
 
-  return 0;
+		aof.open("PZu.dat");
+		aof << m_PZu;
+		aof.close();
+	}
+
+	return 0;
 }
+
+// int ZMPVelocityReferencedQP::InitializeMatrixPbConstants()
+// {
+//   MAL_MATRIX_RESIZE(m_PPu,2*m_QP_N,2*m_QP_N);
+//   MAL_MATRIX_RESIZE(m_PZu,m_QP_N,m_QP_N);
+//   MAL_MATRIX_RESIZE(m_VPu,2*m_QP_N,2*m_QP_N);
+//   MAL_MATRIX_RESIZE(m_PPx,2*m_QP_N,6);
+//   MAL_MATRIX_RESIZE(m_PZx,2*m_QP_N,6);
+//   MAL_MATRIX_RESIZE(m_VPx,2*m_QP_N,6);
+
+//   for( int i=0;i<m_QP_N;i++)
+//     {
+//       // Compute VPx and PPx
+//       m_VPx(i,0)   = 0.0;   m_VPx(i,1) =     1.0; m_VPx(i,2)   = (i+1)*m_QP_T;
+//       m_VPx(i,3)   = 0.0;   m_VPx(i,4) =     0.0; m_VPx(i,5)   = 0.0;
+//       m_VPx(i+m_QP_N,0) = 0.0;   m_VPx(i+m_QP_N,1) =   0.0; m_VPx(i+m_QP_N,2) = 0.0;
+//       m_VPx(i+m_QP_N,3) = 0.0;   m_VPx(i+m_QP_N,4) =   1.0; m_VPx(i+m_QP_N,5) = (i+1)*m_QP_T;
+
+//       m_PPx(i,0) = 1.0; m_PPx(i,1)     = (i+1)*m_QP_T; m_PPx(i,2) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
+//       m_PPx(i,3) = 0.0; m_PPx(i,4)     =       0; m_PPx(i,5) = 0.;
+//       m_PPx(i+m_QP_N,0) = 0.0; m_PPx(i+m_QP_N,1) =     0.0; m_PPx(i+m_QP_N,2) = 0.0;
+//       m_PPx(i+m_QP_N,3) = 1.0; m_PPx(i+m_QP_N,4) = (i+1)*m_QP_T; m_PPx(i+m_QP_N,5) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
+
+
+//       for( int j=0;j<m_QP_N;j++)
+// 	{
+// 	  m_PPu(i,j)=0;
+
+// 	  if (j<=i)
+// 	    {
+
+// 	      m_VPu(i,j)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ;
+// 	      m_VPu(i+m_QP_N,j+m_QP_N)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ;
+// 	      m_VPu(i,j+m_QP_N)=0.0;
+// 	      m_VPu(i+m_QP_N,j)=0.0;
+
+
+// 	      m_PPu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
+// 	      m_PPu(i+m_QP_N,j+m_QP_N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
+// 	      m_PPu(i,j+m_QP_N)=0.0;
+// 	      m_PPu(i+m_QP_N,j)=0.0;
+
+// 	    }
+// 	  else
+// 	    {
+
+// 	      m_VPu(i,j) = 0.0;
+// 	      m_VPu(i+m_QP_N,j+m_QP_N)=0.0;
+// 	      m_VPu(i,j+m_QP_N)=0.0;
+// 	      m_VPu(i+m_QP_N,j)=0.0;
+
+// 	      m_PPu(i,j) = 0.0;
+// 	      m_PPu(i+m_QP_N,j+m_QP_N)=0.0;
+// 	      m_PPu(i,j+m_QP_N)=0.0;
+// 	      m_PPu(i+m_QP_N,j)=0.0;
+
+// 	    }
+
+// 	}
+//     }
+
+//   // Build m_Px.
+//   MAL_MATRIX_RESIZE(m_Px,m_QP_N,3);
+
+//   for( int li=0;li<m_QP_N;li++)
+//     {
+//       m_Px(li,0) = 1.0;
+//       m_Px(li,1) = (double)(1.0+li)*m_QP_T;
+//       m_Px(li,2) = (li+1.0)*(li+1.0)*m_QP_T*m_QP_T*0.5-m_ComHeight/9.81;
+//     }
+//   if (m_FullDebug>2)
+//     {
+//       ofstream aof;
+//       aof.open("VPx.dat");
+//       aof << m_VPx;
+//       aof.close();
+
+//       aof.open("m_PPx.dat");
+//       aof << m_PPx;
+//       aof.close();
+
+//       aof.open("VPu.dat");
+//       aof << m_VPu;
+//       aof.close();
+
+//       aof.open("PPu.dat");
+//       aof << m_PPu;
+//       aof.close();
+//     }
+
+//   return 0;
+// }
 
 
 int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX(,double) &OptA)
@@ -2120,103 +2232,322 @@ void ZMPVelocityReferencedQP::initializeProblem()
 
 }
 
-
-void ZMPVelocityReferencedQP::setProblem(int NbOfConstraints,  int NbOfEqConstraints, int &CriteriaToMaximize, MAL_VECTOR(& xk,double))
+void ZMPVelocityReferencedQP::setProblem(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
+		deque<SupportFeet_t> &QueueOfSupportFeet,
+		int NbOfConstraints, int NbOfEqConstraints, int & CriteriaToMaximize, MAL_VECTOR(& xk,double))
 {
-  m_Pb.m=NbOfConstraints;
-  m_Pb.me=NbOfEqConstraints;
-  m_Pb.mmax=m_Pb.m+1;
-  m_Pb.n=2*(m_QP_N+m_Support->StepNumber);
-  m_Pb.nmax=m_Pb.n;
-  m_Pb.mnn=m_Pb.m+2*m_Pb.n;
+	m_Pb.m=NbOfConstraints;
+	m_Pb.me=NbOfEqConstraints;
+	m_Pb.mmax=m_Pb.m+1;
+	m_Pb.n=2*(m_QP_N+m_Support->StepNumber);
+	m_Pb.nmax=m_Pb.n;
+	m_Pb.mnn=m_Pb.m+2*m_Pb.n;
 
-  m_Pb.iout=0;
-  m_Pb.iprint=1;
-  m_Pb.lwar=3*m_Pb.nmax*m_Pb.nmax/2+ 10*m_Pb.nmax  + 2*m_Pb.mmax + 20000;
-  m_Pb.liwar=m_Pb.n;
-  m_Pb.Eps=1e-8;
+	m_Pb.iout=0;
+	m_Pb.iprint=1;
+	m_Pb.lwar=3*m_Pb.nmax*m_Pb.nmax/2+ 10*m_Pb.nmax  + 2*m_Pb.mmax + 20000;
+	m_Pb.liwar=m_Pb.n;
+	m_Pb.Eps=1e-8;
 
-  m_Pb.war= new double[m_Pb.lwar];
-  m_Pb.iwar = new int[m_Pb.liwar]; // The Cholesky decomposition is done internally.
+	m_Pb.war= new double[m_Pb.lwar];
+	m_Pb.iwar = new int[m_Pb.liwar]; // The Cholesky decomposition is done internally.
 
-  if (m_FastFormulationMode==QLDANDLQ)
-    m_Pb.iwar[0]=0;
-  else
-    m_Pb.iwar[0]=1;
+	if (m_FastFormulationMode==QLDANDLQ)
+		m_Pb.iwar[0]=0;
+	else
+		m_Pb.iwar[0]=1;
 
-  m_Pb.U = (double *)malloc( sizeof(double)*m_Pb.mnn); // Returns the Lagrange multipliers.;
-
-
-  MAL_MATRIX(OptA,double);
-  MAL_VECTOR(VRef,double);
-  MAL_MATRIX(lterm2,double);
-  MAL_VECTOR_DIM(OptD,double,2*m_QP_N);
-  MAL_VECTOR_RESIZE(VRef,2*m_QP_N);
-
-  lterm2 = MAL_RET_TRANSPOSE(m_VPu);
-  lterm2 = MAL_RET_A_by_B(lterm2,m_VPu);
-  lterm2 = m_Beta*lterm2;
-
-  MAL_MATRIX_RESIZE(OptA,
-		    MAL_MATRIX_NB_ROWS(lterm2),
-		    MAL_MATRIX_NB_COLS(lterm2));
-  MAL_MATRIX_SET_IDENTITY(OptA);
-  OptA = m_Alpha*OptA;
-
-  OptA = OptA + lterm2;
+	m_Pb.U = (double *)malloc( sizeof(double)*m_Pb.mnn); // Returns the Lagrange multipliers.;
 
 
-  memset(m_Pb.Q,0,4*(m_QP_N+m_Support->StepNumber)*(m_QP_N+m_Support->StepNumber)*sizeof(double));
-  for( int i=0;i<2*(m_QP_N);i++)
-    for( int j=0;j<2*(m_QP_N);j++)
-      m_Pb.Q[i*2*(m_QP_N+m_Support->StepNumber)+j] = OptA(j,i);
-
-  m_OptB = MAL_RET_TRANSPOSE(m_VPu);
-  m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
-  m_OptB = m_Beta * m_OptB;
-
-  //TODO 2: The matrices of the value function have to go back where they come from
-  //MAL_MATRIX(m_OptD,double);
-  m_OptD = MAL_RET_TRANSPOSE(m_VPu);
-  m_OptD = m_Beta * m_OptD;
-
-  //Andremize - only constant velocity
-  //constant velocity for the whole preview window
-  for( int i=0;i<m_QP_N;i++)
-    VRef(i) = RefVel.x;
-  for( int i=m_QP_N;i<2*m_QP_N;i++)
-    VRef(i) = RefVel.y;
-
-  memset(m_Pb.D,0,2*(m_QP_N+m_Support->StepNumber)*sizeof(double));
-  if (CriteriaToMaximize==1)
-    {
-      MAL_VECTOR(lterm1v,double);
-      MAL_C_eq_A_by_B(lterm1v,m_OptD,VRef);
-      MAL_VECTOR_RESIZE(OptD,2*m_QP_N);
-      MAL_C_eq_A_by_B(OptD,m_OptB,xk);
-      OptD -= lterm1v;
-
-      for( int i=0;i<2*m_QP_N;i++)
-	m_Pb.D[i] = OptD(i);
+	MAL_MATRIX(OptA,double);
+	MAL_VECTOR(VRef,double);
+	MAL_MATRIX(ltermVel,double);
+	MAL_VECTOR_DIM(OptD,double,2*m_QP_N);
+	MAL_VECTOR_RESIZE(VRef,2*m_QP_N);
 
 
 
-    }
-  else
-    {
-      // Default : set D to zero.
-      for( int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
-	m_Pb.D[i] = 0.0;
-    }
+	//ZMP -------------------------------
+	//Q
+	MAL_MATRIX(ltermPZuPZu,double);
+	MAL_MATRIX(ltermPZuU,double);
+	MAL_MATRIX(ltermUU,double);
+	MAL_VECTOR_RESIZE(m_Uc,m_QP_N);
+	deque<LinearConstraintInequalityFreeFeet_t>::iterator LCIFF_it;//, storeFF_it, VFF_it;
+	LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin();
 
-  for( int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
-    {
-      m_Pb.XL[i] = -1e8;
-      m_Pb.XU[i] = 1e8;
-    }
-  memset(m_Pb.X,0,2*(m_QP_N+m_Support->StepNumber)*sizeof(double));
+	ltermPZuPZu = MAL_RET_TRANSPOSE(m_PZu);
+	ltermPZuPZu = MAL_RET_A_by_B(ltermPZuPZu,m_PZu);
+	ltermPZuPZu = m_Gamma*ltermPZuPZu;
+
+	if(m_Support->StepNumber>0)
+		MAL_MATRIX_RESIZE(m_U,m_QP_N,m_Support->StepNumber);
+	for(int i=0;i<m_QP_N;i++)
+	{
+		if(LCIFF_it->StepNumber>0)
+			m_U(i,LCIFF_it->StepNumber-1) = 1.0;
+		else
+			m_Uc(i) = 1.0;
+		LCIFF_it++;
+	}
+
+	ltermPZuU = MAL_RET_TRANSPOSE(m_PZu);
+	ltermPZuU = MAL_RET_A_by_B(ltermPZuU,m_U);
+	ltermPZuU = m_Gamma*ltermPZuU;
+	ltermUU = MAL_RET_TRANSPOSE(m_U);
+	ltermUU = MAL_RET_A_by_B(ltermUU,m_U);
+	ltermUU = m_Gamma*ltermUU;
+
+	//pT
+	deque<SupportFeet_t>::iterator SF_it;//, storeFF_it, VFF_it;
+	SF_it = QueueOfSupportFeet.end();
+	SF_it--;
+	//pTx
+	MAL_VECTOR(lterm1ZMPx,double);
+	MAL_VECTOR(lterm2ZMPx,double);
+
+	MAL_VECTOR(xkT,double);
+	MAL_VECTOR_RESIZE(xkT,3);
+	for(int i=0;i<3;i++)
+		xkT(i)=xk(i);
+
+	MAL_C_eq_A_by_B(lterm1ZMPx,m_PZx,xkT);
+	lterm2ZMPx = m_Uc*SF_it->x;
+
+	//m_Uc = MAL_C_eq_A_by_B(lterm2ZMPx,m_Uc,SF_it->x);
+
+	lterm1ZMPx -= lterm2ZMPx;
+	lterm1ZMPx = MAL_RET_TRANSPOSE(lterm1ZMPx);
+	MAL_VECTOR(lterm3ZMPx,double);
+	lterm3ZMPx = MAL_RET_A_by_B(lterm1ZMPx,m_PZu);
+	lterm3ZMPx = m_Gamma*lterm3ZMPx;
+	MAL_VECTOR(lterm4ZMPx,double);
+	lterm4ZMPx = MAL_RET_A_by_B(lterm1ZMPx,m_U);
+	lterm4ZMPx = -m_Gamma*lterm4ZMPx;
+
+	//pTy
+	MAL_VECTOR(lterm1ZMPy,double);
+	MAL_VECTOR(lterm2ZMPy,double);
+
+	MAL_VECTOR(ykT,double);
+	MAL_VECTOR_RESIZE(ykT,3);
+	for(int i=0;i<3;i++)
+		ykT(i)=xk(3+i);
+
+	MAL_C_eq_A_by_B(lterm1ZMPy,m_PZx,ykT);
+        lterm2ZMPy = m_Uc*SF_it->y;
+
+	lterm1ZMPy -= lterm2ZMPy;
+	lterm1ZMPy = MAL_RET_TRANSPOSE(lterm1ZMPy);
+	MAL_VECTOR(lterm3ZMPy,double);
+	lterm3ZMPy = MAL_RET_A_by_B(lterm1ZMPy,m_PZu);
+	lterm3ZMPy = m_Gamma*lterm3ZMPy;
+	MAL_VECTOR(lterm4ZMPy,double);
+	lterm4ZMPy = MAL_RET_A_by_B(lterm1ZMPy,m_U);
+	lterm4ZMPy = -m_Gamma*lterm4ZMPy;
+	//---------------------------ZMP
+
+	//Velocity----
+	ltermVel = MAL_RET_TRANSPOSE(m_VPu);
+	ltermVel = MAL_RET_A_by_B(ltermVel,m_VPu);
+	ltermVel = m_Beta*ltermVel;
+	//----Velocity
+
+	MAL_MATRIX_RESIZE(OptA,
+			MAL_MATRIX_NB_ROWS(ltermVel),
+			MAL_MATRIX_NB_COLS(ltermVel));
+	MAL_MATRIX_SET_IDENTITY(OptA);
+	OptA = m_Alpha*OptA;
+
+	OptA = OptA + ltermVel;
+
+	//m_Pb.Q------------------------
+	memset(m_Pb.Q,0,4*(m_QP_N+m_Support->StepNumber)*(m_QP_N+m_Support->StepNumber)*sizeof(double));
+	for( int i=0;i<2*m_QP_N;i++)
+		for( int j=0;j<2*m_QP_N;j++)
+			m_Pb.Q[i*2*(m_QP_N+m_Support->StepNumber)+j] = OptA(j,i);
+	//ZMP----
+	for( int i=0;i<m_QP_N;i++)
+	{
+		for( int j=0;j<m_QP_N;j++)
+		{
+			m_Pb.Q[i*2*(m_QP_N+m_Support->StepNumber)+j] -= ltermPZuPZu(i,j);
+			m_Pb.Q[(m_QP_N+i)*2*(m_QP_N+m_Support->StepNumber)+m_QP_N+j] -= ltermPZuPZu(i,j);
+		}
+	}
+	if(m_Support->StepNumber>0)
+	{
+		for( int i=0;i<m_QP_N;i++)
+		{
+			for( int j=0;j<m_Support->StepNumber;j++)
+			{
+				m_Pb.Q[i*2*(m_QP_N+m_Support->StepNumber)+2*m_QP_N+j] -= ltermPZuU(i,j);
+				m_Pb.Q[(m_QP_N+i)*2*(m_QP_N+m_Support->StepNumber)+2*m_QP_N+m_Support->StepNumber+j] -= ltermPZuU(i,j);
+				m_Pb.Q[(2*m_QP_N+j)*2*(m_QP_N+m_Support->StepNumber)+i] -= ltermPZuU(i,j);
+				m_Pb.Q[(2*m_QP_N+m_Support->StepNumber+j)*2*(m_QP_N+m_Support->StepNumber)+m_QP_N+i] -= ltermPZuU(i,j);
+			}
+		}
+		for( int i=0;i<m_Support->StepNumber;i++)
+		{
+			for( int j=0;j<m_Support->StepNumber;j++)
+			{
+				m_Pb.Q[(2*m_QP_N+i)*2*(m_QP_N+m_Support->StepNumber)+2*m_QP_N+j] += ltermUU(i,j);
+				m_Pb.Q[(2*m_QP_N+m_Support->StepNumber+i)*2*(m_QP_N+m_Support->StepNumber)+2*m_QP_N+m_Support->StepNumber+j] += ltermUU(i,j);
+			}
+		}
+	}
+	//cout<<"m_Support->StepNumber"<<m_Support->StepNumber<<endl;
+	//----ZMP
+
+	//Andremize - only constant velocity
+	//constant velocity for the whole preview window
+	for( int i=0;i<m_QP_N;i++)
+		VRef(i) = RefVel.x;
+	for( int i=m_QP_N;i<2*m_QP_N;i++)
+		VRef(i) = RefVel.y;
+
+	m_OptB = MAL_RET_TRANSPOSE(m_VPu);
+	m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
+	m_OptB = m_Beta * m_OptB;
+
+	//TODO 2: The matrices of the value function have to go back where they come from
+	//MAL_MATRIX(m_OptD,double);
+	m_OptD = MAL_RET_TRANSPOSE(m_VPu);
+	m_OptD = m_Beta * m_OptD;
+
+	//m_Pb.D---------------
+	memset(m_Pb.D,0,2*(m_QP_N+m_Support->StepNumber)*sizeof(double));
+
+	//velocity
+	MAL_VECTOR(lterm1v,double);
+	MAL_C_eq_A_by_B(lterm1v,m_OptD,VRef);
+	MAL_VECTOR_RESIZE(OptD,2*m_QP_N);
+	MAL_C_eq_A_by_B(OptD,m_OptB,xk);
+	OptD -= lterm1v;
+
+	for( int i=0;i<2*m_QP_N;i++)
+	  m_Pb.D[i] += 2*OptD(i);
+
+
+	//zmp
+	for( int i=0;i<m_QP_N;i++)
+	  {
+	   m_Pb.D[i] += 2*lterm3ZMPx(i);
+	   m_Pb.D[m_QP_N+i] += 2*lterm3ZMPy(i);
+	  }
+	for( int i=0;i<m_Support->StepNumber;i++)
+	  {
+	   m_Pb.D[2*m_QP_N+i] += 2*lterm4ZMPx(i);
+	   m_Pb.D[2*m_QP_N+m_Support->StepNumber+i] += 2*lterm4ZMPy(i);
+	  }
+	//----------m_Pb.D
+	for( int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
+	{
+		m_Pb.XL[i] = -1e8;
+		m_Pb.XU[i] = 1e8;
+	}
+	memset(m_Pb.X,0,2*(m_QP_N+m_Support->StepNumber)*sizeof(double));
 
 }
+
+// void ZMPVelocityReferencedQP::setProblem(int NbOfConstraints,  int NbOfEqConstraints, int &CriteriaToMaximize, MAL_VECTOR(& xk,double))
+// {
+//   m_Pb.m=NbOfConstraints;
+//   m_Pb.me=NbOfEqConstraints;
+//   m_Pb.mmax=m_Pb.m+1;
+//   m_Pb.n=2*(m_QP_N+m_Support->StepNumber);
+//   m_Pb.nmax=m_Pb.n;
+//   m_Pb.mnn=m_Pb.m+2*m_Pb.n;
+
+//   m_Pb.iout=0;
+//   m_Pb.
+//     iprint=1;
+//   m_Pb.lwar=3*m_Pb.nmax*m_Pb.nmax/2+ 10*m_Pb.nmax  + 2*m_Pb.mmax + 20000;
+//   m_Pb.liwar=m_Pb.n;
+//   m_Pb.Eps=1e-8;
+
+//   m_Pb.war= new double[m_Pb.lwar];
+//   m_Pb.iwar = new int[m_Pb.liwar]; // The Cholesky decomposition is done internally.
+
+//   if (m_FastFormulationMode==QLDANDLQ)
+//     m_Pb.iwar[0]=0;
+//   else
+//     m_Pb.iwar[0]=1;
+
+//   m_Pb.U = (double *)malloc( sizeof(double)*m_Pb.mnn); // Returns the Lagrange multipliers.;
+
+
+//   MAL_MATRIX(OptA,double);
+//   MAL_VECTOR(VRef,double);
+//   MAL_MATRIX(lterm2,double);
+//   MAL_VECTOR_DIM(OptD,double,2*m_QP_N);
+//   MAL_VECTOR_RESIZE(VRef,2*m_QP_N);
+
+//   lterm2 = MAL_RET_TRANSPOSE(m_VPu);
+//   lterm2 = MAL_RET_A_by_B(lterm2,m_VPu);
+//   lterm2 = m_Beta*lterm2;
+
+//   MAL_MATRIX_RESIZE(OptA,
+// 		    MAL_MATRIX_NB_ROWS(lterm2),
+// 		    MAL_MATRIX_NB_COLS(lterm2));
+//   MAL_MATRIX_SET_IDENTITY(OptA);
+//   OptA = m_Alpha*OptA;
+
+//   OptA = OptA + lterm2;
+
+
+//   memset(m_Pb.Q,0,4*(m_QP_N+m_Support->StepNumber)*(m_QP_N+m_Support->StepNumber)*sizeof(double));
+//   for( int i=0;i<2*(m_QP_N);i++)
+//     for( int j=0;j<2*(m_QP_N);j++)
+//       m_Pb.Q[i*2*(m_QP_N+m_Support->StepNumber)+j] = OptA(j,i);
+
+//   m_OptB = MAL_RET_TRANSPOSE(m_VPu);
+//   m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
+//   m_OptB = m_Beta * m_OptB;
+
+//   //TODO 2: The matrices of the value function have to go back where they come from
+//   //MAL_MATRIX(m_OptD,double);
+//   m_OptD = MAL_RET_TRANSPOSE(m_VPu);
+//   m_OptD = m_Beta * m_OptD;
+
+//   //Andremize - only constant velocity
+//   //constant velocity for the whole preview window
+//   for( int i=0;i<m_QP_N;i++)
+//     VRef(i) = RefVel.x;
+//   for( int i=m_QP_N;i<2*m_QP_N;i++)
+//     VRef(i) = RefVel.y;
+
+//   memset(m_Pb.D,0,2*(m_QP_N+m_Support->StepNumber)*sizeof(double));
+//   if (CriteriaToMaximize==1)
+//     {
+//       MAL_VECTOR(lterm1v,double);
+//       MAL_C_eq_A_by_B(lterm1v,m_OptD,VRef);
+//       MAL_VECTOR_RESIZE(OptD,2*m_QP_N);
+//       MAL_C_eq_A_by_B(OptD,m_OptB,xk);
+//       OptD -= lterm1v;
+
+//       for( int i=0;i<2*m_QP_N;i++)
+// 	m_Pb.D[i] = OptD(i);
+
+
+
+//     }
+//   else
+//     {
+//       // Default : set D to zero.
+//       for( int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
+// 	m_Pb.D[i] = 0.0;
+//     }
+
+//   for( int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
+//     {
+//       m_Pb.XL[i] = -1e8;
+//       m_Pb.XU[i] = 1e8;
+//     }
+//   memset(m_Pb.X,0,2*(m_QP_N+m_Support->StepNumber)*sizeof(double));
+
+// }
 
 void ZMPVelocityReferencedQP::OnLine(double time,
 				     deque<ZMPPosition> & FinalZMPPositions,
@@ -2331,8 +2662,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 			      NbOfConstraints,
 			      xk);
 
-
-      setProblem(NbOfConstraints, 0, CriteriaToMaximize, xk);
+      setProblem(QueueOfLConstraintInequalitiesFreeFeet, QueueOfSupportFeet,
+				NbOfConstraints, 0, CriteriaToMaximize, xk);
+      // setProblem(NbOfConstraints, 0, CriteriaToMaximize, xk);
 
       if (m_FullDebug>0)
 	{
@@ -2453,7 +2785,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       */
       ODEBUG("X[0] " << X[0] << " X[N] :" << X[N]);
 
-      // printf("Getting serious now \n");
+   
 
       FinalCOMPositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalZMPPositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
