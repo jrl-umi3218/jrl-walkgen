@@ -345,7 +345,6 @@ void Herdt(PatternGeneratorInterface &aPGI)
 
 }
 
-<<<<<<< HEAD:unitTesting/TestFootPrintPGInterface.cpp
 void Herdt(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);  
