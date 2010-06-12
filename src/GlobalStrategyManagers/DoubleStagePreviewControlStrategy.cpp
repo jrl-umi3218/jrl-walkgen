@@ -57,16 +57,10 @@ DoubleStagePreviewControlStrategy::~DoubleStagePreviewControlStrategy()
 }
 
 
-int DoubleStagePreviewControlStrategy::InitInterObjects(PreviewControl * aPC,
-							CjrlHumanoidDynamicRobot *aHDR,
+int DoubleStagePreviewControlStrategy::InitInterObjects(CjrlHumanoidDynamicRobot *aHDR,
 							ComAndFootRealization * aCFR,
 							StepStackHandler * aSSH)
 {
-  m_ZMPpcwmbz->SetPreviewControl(aPC);
-  m_PC = aPC;
-  m_SamplingPeriod = m_PC->SamplingPeriod();
-  m_PreviewControlTime = m_PC->PreviewControlTime();
-  m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
   setHumanoidDynamicRobot(aHDR);
   m_ZMPpcwmbz->setHumanoidDynamicRobot(m_HumanoidDynamicRobot);
   m_ZMPpcwmbz->setComAndFootRealization(aCFR);

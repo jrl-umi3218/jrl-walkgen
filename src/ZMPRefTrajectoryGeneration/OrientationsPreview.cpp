@@ -38,7 +38,7 @@ OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
 	m_uLimitFeet = 5.0/180.0*M_PI;
 
 
-	m_FullDebug = 3;
+	m_FullDebug = 0;
 
 	//TODO 1: How does ODEBUG/RESETDEBUG get activated?
 	if(m_FullDebug>2)

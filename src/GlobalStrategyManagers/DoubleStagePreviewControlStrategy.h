@@ -87,8 +87,7 @@ namespace PatternGeneratorJRL
     { m_StepStackHandler = aSSH; }
 
     /*! \brief Initialization of the inter objects relationship. */
-    int InitInterObjects(PreviewControl * aPC,
-			 CjrlHumanoidDynamicRobot * aHDR,
+    int InitInterObjects(CjrlHumanoidDynamicRobot * aHDR,
 			 ComAndFootRealization * aCFR,
 			 StepStackHandler * aSSH);
     
@@ -154,10 +153,7 @@ namespace PatternGeneratorJRL
 
     /*! \brief The time of the preview control */
     double m_PreviewControlTime;
-    
-    /*! Pointer to the Preview Control object. */
-    PreviewControl *m_PC;
-    
+        
     /*! ZMP reference frame. */
     unsigned int m_ZMPFrame;
   };

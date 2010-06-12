@@ -27,10 +27,9 @@ CoMAndFootOnlyStrategy::~CoMAndFootOnlyStrategy()
 {
 }
 
-int CoMAndFootOnlyStrategy::InitInterObjects(PreviewControl * aPC,
-							CjrlHumanoidDynamicRobot *aHDR,
-							ComAndFootRealization * aCFR,
-							StepStackHandler * aSSH)
+int CoMAndFootOnlyStrategy::InitInterObjects(CjrlHumanoidDynamicRobot *aHDR,
+					     ComAndFootRealization * aCFR,
+					     StepStackHandler * aSSH)
 {
   m_ComAndFootRealization = aCFR;
   return 0;
@@ -129,6 +128,7 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
   aStartingCOMPosition.y[0] = lStartingCOMPosition(1);
   aStartingCOMPosition.z[0] = lStartingCOMPosition(2);
   aStartingZMPPosition= m_ComAndFootRealization->GetCOGInitialAnkles();
+
   //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in   CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
   return 0;
 }

@@ -159,10 +159,6 @@ ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
   printf("Leaving ~ZMPConstrainedQPFastFormulation \n");
 }
 
-void ZMPConstrainedQPFastFormulation::SetPreviewControl(PreviewControl *aPC)
-{
-  m_ZMPD->SetPreviewControl(aPC);
-}
 
 int ZMPConstrainedQPFastFormulation::InitializeMatrixPbConstants()
 {

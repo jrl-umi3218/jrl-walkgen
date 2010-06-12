@@ -101,11 +101,11 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   // lRightFootHalfWidth -= ConstraintOnX;
 
   //Andremize: Scilab feet
-  lLeftFootHalfHeight = 0.069-0.02;
-  lRightFootHalfHeight = 0.069-0.02;
+  lLeftFootHalfHeight = 0.069-0.054;
+  lRightFootHalfHeight = 0.069-0.054;
 
-  lLeftFootHalfWidth = 0.1206-0.02;
-  lRightFootHalfWidth = 0.1206-0.02;
+  lLeftFootHalfWidth = 0.1206-0.0906;
+  lRightFootHalfWidth = 0.1206-0.0906;
 
   DSFeetDistance = 0.2;
   lLeftFootHalfHeightDS = lLeftFootHalfHeight+DSFeetDistance/2.0;
@@ -118,7 +118,7 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
    if(0)
 	   RESETDEBUG4("Constraints-fCSALS.dat");
 
-   m_FullDebug = 3;
+   m_FullDebug = 0;
 
    	//TODO 1: How does ODEBUG/RESETDEBUG get activated?
    	if(m_FullDebug>2)

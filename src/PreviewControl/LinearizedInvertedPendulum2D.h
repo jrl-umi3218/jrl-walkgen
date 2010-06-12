@@ -13,6 +13,7 @@
 #ifndef _LINEAR_INVERTED_PENDULUM_2D_H_
 #define _LINEAR_INVERTED_PENDULUM_2D_H_
 
+
 /*! STL includes */
 #include <deque>
 

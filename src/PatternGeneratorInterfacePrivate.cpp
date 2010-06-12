@@ -1,6 +1,6 @@
 /* \doc This object is the interface to the walking gait
-   generation rchitecture
-   Copyright (c) 2005-2009,
+   generation architecture
+   Copyright (c) 2005-2009, 
    Olivier Stasse,
 
    JRL-Japan, CNRS/AIST
@@ -25,7 +25,6 @@
 
 
 #include <PatternGeneratorInterfacePrivate.h>
-
 #include <Debug.h>
 
 namespace PatternGeneratorJRL {
@@ -136,6 +135,8 @@ namespace PatternGeneratorJRL {
     m_FirstRead = true;
     ODEBUG4("Step 5","DebugPGI.txt");
 
+    //RESETDEBUG5("DebugHerdt.txt");
+    //RESETDEBUG5("DebugDataCoMZMP.dat");
     m_NewStepX = 0.0;
     m_NewStepY = 0.0;
     m_NewTheta = 0.0;
@@ -216,17 +217,20 @@ namespace PatternGeneratorJRL {
     // ZMP and CoM generation using the method proposed in Herdt2010.
     m_ZMPVRQP = new ZMPVelocityReferencedQP(this,"",m_HumanoidDynamicRobot);
 
+    // ZMP and CoM generation using the method proposed in Herdt2010.
+    m_ZMPVRQP = new ZMPVelocityReferencedQP(this,"",m_HumanoidDynamicRobot);
+
     // ZMP and CoM generation using the analytical method proposed in Morisawa2007.
     m_ZMPM = new AnalyticalMorisawaCompact(this);
     m_ZMPM->SetHumanoidSpecificities(m_HumanoidDynamicRobot);
 
     // Preview control for a 3D Linear inverse pendulum
-    m_PC = new PreviewControl(this);
+    m_PC = new PreviewControl(this,OptimalControllerSolver::MODE_WITHOUT_INITIALPOS,true);
 
     // Object to generate Motion from KineoWorks.
     m_GMFKW = new GenerateMotionFromKineoWorks();
 
-    // Object to have a Dynamic multibody robot model.
+    // Object to h ave a Dynamic multibody robot model.
     // for the second preview loop.
 
 
@@ -265,8 +269,7 @@ namespace PatternGeneratorJRL {
     m_Zc = m_PC->GetHeightOfCoM();
 
     // Initialize the Preview Control general object.
-    m_DoubleStagePCStrategy->InitInterObjects(m_PC,
-					      m_HumanoidDynamicRobot,
+    m_DoubleStagePCStrategy->InitInterObjects(m_HumanoidDynamicRobot,
 					      m_ComAndFootRealization,
 					      m_StepStackHandler);
 
@@ -292,6 +295,11 @@ namespace PatternGeneratorJRL {
 
     m_ZMPVRQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
     m_ZMPVRQP->SetPreviewControl(m_PC);
+    //m_ZMPCQPFF->SetSamplingPeriod(m_PC->SamplingPeriod());
+    //m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+    m_ZMPVRQP->SetSamplingPeriod(m_PC->SamplingPeriod());
+
+    m_ZMPVRQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
 
     m_ZMPM->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPM->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
@@ -336,12 +344,6 @@ namespace PatternGeneratorJRL {
       delete m_StepStackHandler;
     ODEBUG4("Destructor: did m_StepStackHandler","DebugPGI.txt");
 
-
-
-    if (m_HumanoidDynamicRobot!=0)
-      delete m_HumanoidDynamicRobot;
-    ODEBUG4("Destructor: did m_HumanoidDynamicRobot","DebugPGI.txt");
-
     if (m_GMFKW!=0)
       delete m_GMFKW;
     ODEBUG4("Destructor: did m_GMKFW","DebugPGI.txt");
@@ -357,9 +359,13 @@ namespace PatternGeneratorJRL {
     if (m_ZMPQP!=0)
       delete m_ZMPQP;
 
-    if (m_ZMPCQPFF!=0)
-      delete m_ZMPCQPFF;
-    ODEBUG4("Destructor: did m_ZMPQP","DebugPGI.txt");
+    //if (m_ZMPCQPFF!=0)
+    //  delete m_ZMPCQPFF;
+    //ODEBUG4("Destructor: did m_ZMPQP","DebugPGI.txt");
+
+    if (m_ZMPVRQP!=0)
+      delete m_ZMPVRQP;
+    ODEBUG4("Destructor: did m_ZMPVRQP","DebugPGI.txt");
 
     if (m_ZMPVRQP!=0)
       delete m_ZMPVRQP;
@@ -1079,6 +1085,7 @@ namespace PatternGeneratorJRL {
 	m_ZMPVRQP->Online = 1;
 	initOnlineHerdt();
 	printf("Online \n");
+	//ODEBUG5("InitOnLine","DebugHerdt.txt");
       }
 
     else if (aCmd==":readfilefromkw")
@@ -1314,6 +1321,23 @@ namespace PatternGeneratorJRL {
 //
 //    ofstream aof;
 //    aof.open("waist.txt", ofstream::app);
+    //ODEBUG5("CurrentWaistState: "
+	//    << m_CurrentWaistState.x[0] << " "
+	//   << m_CurrentWaistState.y[0] << " "
+	//    << m_CurrentWaistState.z[0] << " "
+	//    << m_CurrentWaistState.roll << " "
+	//    << m_CurrentWaistState.pitch << " "
+	//    << m_CurrentWaistState.yaw,
+	//    "DebugDataWaist.dat" );
+    //ODEBUG5(":  "	
+	//   << finalCOMPosition.z[0] << " "
+	//   << m_CurrentWaistState.z[0] << " "
+	//    << LeftFootPosition.z << " "
+	//    << ZMPTarget(2) << " ",
+	//    "DebugDataCoMZMP.dat" );
+//
+//    ofstream aof;
+//    aof.open("waistAndrei.dat", ofstream::app);
 //    aof << m_CurrentWaistState.x[0] << " "
 //	<< m_CurrentWaistState.y[0] << " "
 //	<< m_CurrentWaistState.z[0] << " "
@@ -1323,6 +1347,12 @@ namespace PatternGeneratorJRL {
 //	<< endl;
 //    aof.close();
 
+//       aof.close();
+//    aof.open("COMFoot.dat", ofstream::app);
+//    aof << finalCOMPosition.y[0] << " "
+//	<< LeftFootPosition.y 
+//	<< endl;
+//    aof.close();
     bool UpdateAbsMotionOrNot = false;
 
     //    if ((u=(m_count - (m_ZMPPositions.size()-2*m_NL)))>=0)

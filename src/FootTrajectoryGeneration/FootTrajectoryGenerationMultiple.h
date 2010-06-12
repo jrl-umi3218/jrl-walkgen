@@ -169,6 +169,9 @@ namespace PatternGeneratorJRL
     /*! \brief Reference time for the polynomials. */
     std::vector<double> m_RefTime;
     
+    /*! \brief Sensitivity to numerical unstability when using time. */
+    double m_Sensitivity;
+
   };
 };
 #endif /* _FOOT_TRAJECTORY_GENERATION_MULTIPLE_H_ */

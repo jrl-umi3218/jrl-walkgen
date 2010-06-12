@@ -50,10 +50,10 @@ namespace PatternGeneratorJRL
   protected:
 
     /* ! \brief Time for single support. */
-    float m_Tsingle;
+    double m_Tsingle;
     
     /* ! \brief Time for double support. */
-    float m_Tdble;
+    double m_Tdble;
     
     /* ! \brief Sampling period */
     double m_SamplingPeriod;
@@ -62,13 +62,13 @@ namespace PatternGeneratorJRL
     double m_ModulationSupportCoefficient;
     
     /* ! \brief The foot orientation for the lift off and the landing */
-    float m_Omega;
+    double m_Omega;
     
     /* ! \brief Preview control window in second. */
-    float m_PreviewControlTime;
+    double m_PreviewControlTime;
     
     /* ! \brief Step height for the walking pattern. */
-    float m_StepHeight;
+    double m_StepHeight;
 
     /* ! \brief Current time in the control loop (in seconds). */
     double m_CurrentTime;
@@ -88,19 +88,19 @@ namespace PatternGeneratorJRL
     virtual ~ZMPRefTrajectoryGeneration() {};
     
     /* ! \brief Set the Preview control time window. */
-    inline void SetTimeWindowPreviewControl(const float & aTW)
+    inline void SetTimeWindowPreviewControl(const double & aTW)
       { m_PreviewControlTime = aTW;};
     
     /* ! \brief Get the preview control time window. */
-    inline const float & GetTimeWindowPreviewControl( ) const
+    inline const double & GetTimeWindowPreviewControl( ) const
       { return m_PreviewControlTime; };
     
     /* ! \brief Set for the foot angle on landing and taking off. */
-    inline void SetOmega(const float & anOmega) 
+    inline void SetOmega(const double & anOmega) 
       { m_Omega = anOmega;};
     
     /* ! \brief Get the foot angle on landing and taking off. */
-    inline const float & GetOmega(void) const
+    inline const double & GetOmega(void) const
       { return m_Omega;};
 
     /* ! \brief Returns the Com Height. */
@@ -108,39 +108,39 @@ namespace PatternGeneratorJRL
     { return m_ComHeight; };
     
     /* ! \brief Returns the Com Height. */
-    inline void SetComHeight(const float & aComHeight)
+    inline void SetComHeight(const double & aComHeight)
     { m_ComHeight = aComHeight; };
 
     /* ! \brief Returns the single support time. */
-    inline const float & GetTSingleSupport() const
+    inline const double & GetTSingleSupport() const
       { return m_Tsingle; };
     
     /* ! \brief Set the single support time. */
-    inline void SetTSingleSupport(const float & aTSingleSupport)
+    inline void SetTSingleSupport(const double & aTSingleSupport)
       { m_Tsingle = aTSingleSupport; };
     
     /* ! \brief Returns the double support time. */
-    inline const float & GetTDoubleSupport() const
+    inline const double & GetTDoubleSupport() const
       {return m_Tdble;};
     
     /* ! \brief Set the double support time. */
-    inline void SetTDoubleSupport(const float & aTdble)
+    inline void SetTDoubleSupport(const double & aTdble)
       { m_Tdble = aTdble;};
 
     /* ! \brief Get the sampling period for the control, set to 0.005 by default. */
-    inline const float & GetSamplingPeriod() const
+    inline const double & GetSamplingPeriod() const
       { return m_SamplingPeriod; };
 
     /* ! \brief Set the sampling period for the control. */
-    inline void SetSamplingPeriod(const float &aSamplingPeriod)
+    inline void SetSamplingPeriod(const double &aSamplingPeriod)
       { m_SamplingPeriod = aSamplingPeriod;};
     
     /* ! \brief Returns the step height. */
-    inline const float & GetStepHeight() const
+    inline const double & GetStepHeight() const
       { return m_StepHeight;};
     
     /* ! \brief Specify the step height. */
-    inline void SetStepHeight(const float & aSSH)
+    inline void SetStepHeight(const double & aSSH)
       { m_StepHeight = aSSH;};
     
     /* ! \brief Returns the ModulationSupportCoefficient. */

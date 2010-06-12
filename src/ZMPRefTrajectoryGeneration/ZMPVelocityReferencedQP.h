@@ -312,9 +312,7 @@ namespace PatternGeneratorJRL
     
     /*! @}*/
     /* @} */
-    
-    /*! Set the preview control object. */
-    void SetPreviewControl(PreviewControl *aPC);
+    ReferenceAbsoluteVelocity RefVel;
 
     static const unsigned int QLD=0;
     static const unsigned int QLDANDLQ=1;
@@ -323,6 +321,8 @@ namespace PatternGeneratorJRL
     unsigned int Online;//Andremize: Shall I keep it?
 
   private:
+
+    double m_FeetDistanceDS;
 
     double m_FPx, m_FPy, m_FPtheta;
     double m_StartTime;
@@ -352,7 +352,7 @@ namespace PatternGeneratorJRL
       
     footTrajectoryGenerationStandard * m_FTGS;
 
-    ReferenceAbsoluteVelocity RefVel;
+    
     
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;
@@ -399,14 +399,26 @@ namespace PatternGeneratorJRL
     /*! \brief Matrix relating the command and the CoM position. */
     MAL_MATRIX(m_PPu,double);
 
+    /*! \brief Matrix relating the command and the ZMP position. */
+    MAL_MATRIX(m_PZu,double);
+
     /*! \brief Matrix relating the command and the CoM speed. */
     MAL_MATRIX(m_VPu,double); 
  
     /*! \brief Matrix relating the CoM state and the CoM position. */
     MAL_MATRIX(m_PPx,double);
 
+    /*! \brief Matrix relating the CoM state and the ZMP position. */
+    MAL_MATRIX(m_PZx,double);
+
     /*! \brief Matrix relating the CoM state and the CoM speed. */
     MAL_MATRIX(m_VPx,double);
+
+    /*! \brief Selection matrix for the previewed feet positions. */
+    MAL_MATRIX(m_U,double);
+
+    /*! \brief Selection matrix for the support feet. */
+    MAL_VECTOR(m_Uc,double);
 
     /*! \brief Matrix of the objective function $Q$ */
     double *m_Q;
@@ -427,12 +439,15 @@ namespace PatternGeneratorJRL
 
     /*! \name Parameters of the objective function 
     @{ */
-    /*! Putting weight on the ZMP ref trajectory */
+    /*! Putting weight on the velocity */
     double m_Beta;
 
     /*! Putting weight on the jerk minimization. */
     double m_Alpha;
     /*! @} */
+
+    /*! Putting weight on the ZMP */
+    double m_Gamma;
 
     /* Constant parts of the linear constraints. */
     double * m_Pu;
@@ -454,8 +469,9 @@ namespace PatternGeneratorJRL
 
     void initializeProblem();
 
-    void setProblem(int NbOfConstraints, int NbOfEqConstraints, int &CriteriaToMaximize, MAL_VECTOR(& xk,double));
-
+    /* void setProblem(int NbOfConstraints, int NbOfEqConstraints, int &CriteriaToMaximize, MAL_VECTOR(& xk,double)); */
+    void setProblem(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, deque<SupportFeet_t> & QueueOfSupportFeet,
+    		int NbOfConstraints, int NbOfEqConstraints, int & CriteriaToMaximize, MAL_VECTOR(& xk,double));
     int dumpProblem(double * Q,
 		    double * D, 
 		    double * Pu,

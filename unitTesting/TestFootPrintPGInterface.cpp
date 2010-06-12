@@ -37,13 +37,13 @@ using namespace std;
 void CommonInitialization(PatternGeneratorInterface &aPGI)
 {
   const char lBuffer[12][256] =
-    {":samplingperiod 0.005",
+    {":comheight 0.8078",
+     ":samplingperiod 0.005",
      ":previewcontroltime 1.6",
-     ":comheight 0.914",
      ":omega 0.0",
      ":stepheight 0.07",
-     ":singlesupporttime 0.78",
-     ":doublesupporttime 0.02",
+     ":singlesupporttime 0.7",
+     ":doublesupporttime 0.1",
      ":armparameters 0.5",
      ":LimitsFeasibility 0.0",
      ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
@@ -75,7 +75,11 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
 void StraightWalking(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
-  
+   {
+    istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
+    aPGI.ParseCmd(strm2);
+  }
+ 
   {
     istringstream strm2(":stepseq 0.0 -0.105 0.0 \
                      0.2 0.21 0.0  \
@@ -101,9 +105,15 @@ void StraightWalking(PatternGeneratorInterface &aPGI)
 void PbFlorentSeq1(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
+   {
+    istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
+    aPGI.ParseCmd(strm2);
+  }
+
   {
+    /*
     istringstream strm2(":stepseq 0 -0.1 0 \
-0.203885 0.214762 2.27277 \
+0.203885 0.214762 2.27277		   \
 0.210865 -0.208919 5.07812 \
 0.209585 0.189649 5.68817 \
 0.211002 -0.208084 5.02252 \
@@ -127,6 +137,24 @@ void PbFlorentSeq1(PatternGeneratorInterface &aPGI)
 0.200882 -0.219409 -0.506198 \
 0.0136717 0.2 -0.00157708 \
 0 -0.2 0");
+    */
+istringstream strm2(":stepseq 0 0.1 0 \
+	-0.0398822	-0.232351	4.6646 \
+	-0.0261703	0.199677	4.6646 \
+	-0.0471999	-0.256672	4.6646 \
+	-0.0305785	0.200634	4.6646 \
+	-0.0507024	-0.245393	4.6646 \
+	-0.0339626	0.197227	4.6646 \
+	-0.0527259	-0.228579	4.6646 \
+	-0.0362332	0.199282	4.6646 \
+	-0.0540087	-0.21638	4.6646 \
+	-0.0373302	0.196611	4.6646 \
+	-0.0536928	-0.199019	4.6646 \
+	-0.0372245	0.204021	4.6646 \
+	-0.0529848	-0.196642	4.6646 \
+	-0.0355124	0.2163	4.6646 \
+	-0.000858977	-0.204807	 0.0767924 \
+0 0.2 0");
     aPGI.ParseCmd(strm2);
   }
 }
@@ -134,6 +162,11 @@ void PbFlorentSeq1(PatternGeneratorInterface &aPGI)
 void PbFlorentSeq2(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
+   {
+    istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
+    aPGI.ParseCmd(strm2);
+  }
+
   {
     istringstream strm2(":stepseq \
                                  0 -0.1 0 \
@@ -200,6 +233,11 @@ void PbFlorentSeq2(PatternGeneratorInterface &aPGI)
 void PbFlorentSeq3(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
+   {
+    istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
+    aPGI.ParseCmd(strm2);
+  }
+
   {
     istringstream strm2(":stepseq \
 				0 -0.1 0 \
@@ -242,57 +280,6 @@ void PbFlorentSeq3(PatternGeneratorInterface &aPGI)
     
   }
 }
-void TestNewPG1(PatternGeneratorInterface &aPGI)
-{
-  CommonInitialization(aPGI);
-
-  {
-    istringstream strm2(":walkmode 0");
-    aPGI.ParseCmd(strm2);
-  }
-
-  {
-    istringstream strm2(":stepseq 0.0 -0.105  0.0 \
-                                 -0.2  0.21   0.0 \
-                                 -0.2 -0.21   0.0 \
-                                 -0.2  0.21   0.0 \
-                                 -0.2 -0.21   0.0 \
-                                 -0.1  0.21 -10.0 \
-                                  0.0 -0.21 -10.0 \
-                                  0.0  0.21 -10.0 \
-                                  0.0 -0.21 -10.0 \
-                                  0.0  0.21 -10.0 \
-                                  0.0 -0.21 -10.0 \
-                                  0.0  0.21 -10.0 \
-                                  0.0 -0.21 -10.0 \
-                                  0.0  0.21 -10.0 \
-                                  0.0 -0.21   0.0");
-    aPGI.ParseCmd(strm2);
-  }
-}
-
-void TestNewPG2(PatternGeneratorInterface &aPGI)
-{
-  {
-    istringstream strm2(":stepseq 0.0 -0.105   0.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21  -10.0 \
-                                  0.0  0.21  -10.0 \
-                                  0.0 -0.21    0.0");
-    aPGI.ParseCmd(strm2);
-  }
-
-}
 
 void StraightWalkingPBW(PatternGeneratorInterface &aPGI)
 {
@@ -321,6 +308,44 @@ void StraightWalkingPBW(PatternGeneratorInterface &aPGI)
 
 }
 
+void Herdt(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);  
+
+  {
+    istringstream strm2(":setreference  0.1 0.0 0.0");
+    aPGI.ParseCmd(strm2);
+  }
+  {
+    istringstream strm2(":singlesupporttime 0.7");
+    aPGI.ParseCmd(strm2);
+  }
+  {
+    istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
+    aPGI.ParseCmd(strm2);
+  }
+
+  if (0)
+  {
+    istringstream strm2(":setdimitrovconstraint XY 0.07 0.05");
+    aPGI.ParseCmd(strm2);
+  }
+
+
+  {
+    istringstream strm2(":stepseq 0.0 -0.105 0.0 \
+                     0.2 0.21 0.0  \
+                     0.2 -0.21 0.0 \
+                     0.2 0.21 0.0  \
+                     0.2 -0.21 0.0 \
+                     0.2 0.21 0.0 \
+                     0.0 -0.21 0.0");
+    aPGI.ParseCmd(strm2);
+  }
+
+}
+
+<<<<<<< HEAD:unitTesting/TestFootPrintPGInterface.cpp
 void Herdt(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);  
@@ -771,6 +796,7 @@ int main(int argc, char *argv[])
   // unsigned int TestProfil=PROFIL_ANALYTICAL_ONLINE_WALKING;
    unsigned int TestProfil=PROFIL_HERDT_ONLINE;
   //unsigned int TestProfil = PROFIL_STRAIGHT_WALKING_DIMITROV;
+
   string PCParametersFile;
   string VRMLPath;
   string VRMLFileName;
@@ -778,16 +804,15 @@ int main(int argc, char *argv[])
   string LinkJointRank;
 
   
-  if (argc!=6)
+  if (argc!=5)
     {
       const char *openhrphome="OPENHRPHOME";
       char *value = 0;
       value = getenv(openhrphome);
       if (value==0)
 	{
-	  cerr << " This program takes 5 arguments: " << endl;
+	  cerr << " This program takes 4 arguments: " << endl;
 	  cerr << "./TestFootPrintPGInterface \
-                         PATH_TO_PC_PARAMS_FILE	  \
                          PATH_TO_VRML_FILE	   \
                          VRML_FILE_NAME		   \
                          PATH_TO_SPECIFICITIES_XML \
@@ -796,17 +821,14 @@ int main(int argc, char *argv[])
 	}
       else
 	{
-	  PCParametersFile = value;
-	  PCParametersFile += "Controller/IOserver/robot/HRP2JRL/etc/";
-	  PCParametersFile +="PreviewControlParameters.ini";
 	  VRMLPath=value;
-	  VRMLPath+="Controller/IOserver/robot/HRP2JRL/model/";
+	  //VRMLPath+="/Controller/IOserver/robot/HRP2JRL/model/";
 	  VRMLFileName="HRP2JRLmain.wrl";
 	  SpecificitiesFileName = value;
-	  SpecificitiesFileName +="Controller/IOserver/robot/HRP2JRL/etc/";
-	  SpecificitiesFileName += "HRP2Specificities.xml";
+	  //SpecificitiesFileName +="/Controller/IOserver/robot/HRP2JRL/etc/";
+	  SpecificitiesFileName += "/HRP2Specificities.xml";
 	  LinkJointRank = value;
-	  LinkJointRank += "Controller/IOserver/robot/HRP2JRL/etc/";
+	  //LinkJointRank += "/Controller/IOserver/robot/HRP2JRL/etc/";
 	  LinkJointRank += "HRP2LinkJointRank.xml";
 	  
 	  if (argc==2)
@@ -819,11 +841,10 @@ int main(int argc, char *argv[])
     }	
   else 
     {
-      PCParametersFile = argv[1];
-      VRMLPath=argv[2];
-      VRMLFileName=argv[3];
-      SpecificitiesFileName = argv[4];
-      LinkJointRank = argv[5];
+      VRMLPath=argv[1];
+      VRMLFileName=argv[2];
+      SpecificitiesFileName = argv[3];
+      LinkJointRank = argv[4];
     }
 
 
@@ -835,7 +856,8 @@ int main(int argc, char *argv[])
   aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
   aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
 #else
-  aHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
+  Chrp2OptHumanoidDynamicRobot *aHRP2HDR= new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
+  aHDR = aHRP2HDR;
   aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
 #endif
 
@@ -849,7 +871,7 @@ int main(int argc, char *argv[])
 					 LinkJointRank,
 					 SpecificitiesFileName);
 
-
+  
   // Create Pattern Generator Interface
   PatternGeneratorInterface * aPGI;
   aPGI = patternGeneratorInterfaceFactory(aHDR);
@@ -935,7 +957,7 @@ int main(int argc, char *argv[])
 
   ofstream aofzmpmb2;
   if (DebugZMP2)
-    aofzmpmb2.open("ZMPggMBSTAGE2.dat",ofstream::out);
+    aofzmpmb2.open("ZMPMBSTAGE2.dat",ofstream::out);
 
   ofstream aofq;
   if (DebugConfiguration)
@@ -996,10 +1018,17 @@ int main(int argc, char *argv[])
   unsigned long int nbofmodifs=0;
   
   gettimeofday(&startingtime,0);
-  for (unsigned int lNbIt=0;lNbIt<1;lNbIt++)
+  // Number of sequences added.
+  int lNbItMax = 1;
+  
+  if (TestProfil==PROFIL_PB_FLORENT)
+    lNbItMax = 3;
+
+  for (unsigned int lNbIt=0;lNbIt<lNbItMax;lNbIt++)
     {
       //StrangeStartingPosition(*aPGI);
-      
+      cout << "<===============================================================>"<<endl;
+      cout << "Iteration nb: " << lNbIt << endl;
       gettimeofday(&begin,0);
       switch (TestProfil) 
 	{
@@ -1170,10 +1199,6 @@ int main(int argc, char *argv[])
 		}
 	      else{
 		
-		//if ((NbOfIt>(8.82*200)) && 
-		//		double triggertime = 9.64*200 + deltatime*200;
-		//double triggertime = 12.44*200 + deltatime*200;
-		// double triggertime = 2.455*200 + deltatime*200;
 		double triggertime = 9.64*200 + deltatime*200;
 		if ((NbOfIt>triggertime) && 
 		    TestChangeFoot)
@@ -1197,10 +1222,6 @@ int main(int argc, char *argv[])
 		    gettimeofday(&beginmodif,0);
 		    aPGI->ChangeOnLineStep(0.805,aFAP,newtime);
 		    deltatime += newtime+0.025;
-		    // std::cout << "trigger time: "<< triggertime/200.0 << std::endl;
-		    // std::cout << "delta time: " << deltatime << " newtime: " << newtime << std::endl;
-		    //istringstream strm2(":parsecmd :addstandardonlinestep 0.2 0.0 0.0");
-		    //aPGI->ParseCmd(strm2);
 		    gettimeofday(&endmodif,0);
 		    timemodif = endmodif.tv_sec-beginmodif.tv_sec + 
 		      0.000001 * (endmodif.tv_usec - beginmodif.tv_usec);
@@ -1247,8 +1268,8 @@ int main(int argc, char *argv[])
 		  << RightFootPosition.x << " " << RightFootPosition.y << " " 
 		  << RightFootPosition.z << " " << RightFootPosition.theta << " " 
 		  << RightFootPosition.omega  << " " << RightFootPosition.omega2  << " "
-		  << ZMPTarget(0)+CurrentConfiguration(0) << " " 
-		  << ZMPTarget(1)+CurrentConfiguration(1) << " "
+		  << ZMPTarget(0)*cos(CurrentConfiguration(5)) - ZMPTarget(1)*sin(CurrentConfiguration(5))+CurrentConfiguration(0) << " " 
+		  << ZMPTarget(0)*sin(CurrentConfiguration(5)) + ZMPTarget(1)*cos(CurrentConfiguration(5))+CurrentConfiguration(1) << " "
 		  << CurrentConfiguration(0) << " " 
 		  << CurrentConfiguration(1) << " " 
 		  << begin.tv_sec + 0.000001 * begin.tv_usec 
@@ -1264,6 +1285,9 @@ int main(int argc, char *argv[])
 	      aofq << endl;
 	    }
 	}
+
+      cout << "End of iteration " << lNbIt << endl;
+      cout << "<===============================================================>"<<endl;
     }
 
 

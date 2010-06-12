@@ -13,6 +13,7 @@
 */
 
 #include <fstream>
+//#define _DEBUG_MODE_ON_
 #include <Debug.h>
 
 #include <PreviewControl/PreviewControl.h>
@@ -213,11 +214,13 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
   
   if (mode==OptimalControllerSolver::MODE_WITHOUT_INITIALPOS)
     {
+      ODEBUG("COMPUTATION WITHOUT INITIALPOS !");
       Q = 1.0;
       R = 1e-6;
 
       // Build the derivated system
       MAL_MATRIX_DIM(Ax,double,4,4);
+      MAL_MATRIX_FILL(Ax,0.0);
       MAL_MATRIX(tmpA,double);
       MAL_MATRIX_DIM(bx,double,4,1);
       MAL_MATRIX(tmpb,double);
@@ -243,6 +246,12 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
 
       cx(0,0) =1.0;
 
+      ODEBUG("Ax:" << Ax);
+      ODEBUG("bx:" << bx);
+      ODEBUG("cx:" << cx);
+      ODEBUG("Q:" << Q);
+      ODEBUG("R:" << R);
+      ODEBUG("Nl:" << Nl);
       anOCS = new PatternGeneratorJRL::OptimalControllerSolver(Ax,bx,cx,Q,R,Nl);
       
       anOCS->ComputeWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
@@ -261,7 +270,7 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
     {
       Q = 1.0;
       R = 1e-5;
-
+      ODEBUG("COMPUTATION WITH INITIALPOS !");
       anOCS = new PatternGeneratorJRL::OptimalControllerSolver(m_A,m_B,m_C,Q,R,Nl);
       
       anOCS->ComputeWeights(PatternGeneratorJRL::OptimalControllerSolver::MODE_WITH_INITIALPOS);

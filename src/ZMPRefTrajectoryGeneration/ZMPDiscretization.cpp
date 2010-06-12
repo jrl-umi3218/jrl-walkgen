@@ -63,7 +63,6 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile,
 				     CjrlHumanoidDynamicRobot *aHS)
   : ZMPRefTrajectoryGeneration(lSPM)
 {
-  m_PC = 0;
 
   m_InitializationProfile = PREV_ZMP_INIT_PROFIL;
 
@@ -421,7 +420,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       ZMPPositions[CurrentZMPindex].stepType = 0;
 
       // Set CoM positions.
-      FinalCoMPositions[CurrentZMPindex].z[0] = m_PC->GetHeightOfCoM();
+      FinalCoMPositions[CurrentZMPindex].z[0] = m_ComHeight;
       FinalCoMPositions[CurrentZMPindex].z[1] = 0.0;
       FinalCoMPositions[CurrentZMPindex].z[2] = 0.0;
       FinalCoMPositions[CurrentZMPindex].pitch = 0.0;
@@ -947,10 +946,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 	aCOMPosition.y[1] = 
 	aCOMPosition.y[2] = 0.0;
 
-      if (m_PC==0)
-	aCOMPosition.z[0] = 0.0;
-      else 
-	aCOMPosition.z[0] = m_PC->GetHeightOfCoM();
+      aCOMPosition.z[0] = m_ComHeight;
       
       aCOMPosition.pitch = aCOMPosition.roll = 0.0;
       aCOMPosition.z[1] = aCOMPosition.z[2] = 0.0;
@@ -1163,10 +1159,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
 
       // Set CoM Positions.
       COMPosition aCOMPosition;
-      if (m_PC==0)
-	aCOMPosition.z[0] = 0.0;
-      else 
-	aCOMPosition.z[0] = m_PC->GetHeightOfCoM();
+      aCOMPosition.z[0] = m_ComHeight;
 
       aCOMPosition.x[0] = 
 	aCOMPosition.x[1] = 
@@ -1228,10 +1221,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
 
       // Set CoM Positions.
       COMPosition aCOMPosition;
-      if (m_PC==0)
-	aCOMPosition.z[0] = 0.0;
-      else 
-	aCOMPosition.z[0] = m_PC->GetHeightOfCoM();
+      aCOMPosition.z[0] = m_ComHeight;
 
       aCOMPosition.z[1] = aCOMPosition.z[2] = 0.0;
       aCOMPosition.yaw = ZMPPositions[CurrentZMPindex].theta;

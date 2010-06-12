@@ -13,11 +13,14 @@
 */
 
 #include <iostream>
+
+using namespace std;
 #include <SimplePlugin.h>
 #include <SimplePluginManager.h>
 #include <Debug.h>
+#include <assert.h>
 
-using namespace std;
+
 using namespace PatternGeneratorJRL;
 
 
@@ -99,20 +102,21 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
        CurrentPlugin != RangeOfPlugins.second;++NbPlugins,
 	 ++CurrentPlugin);
   
-  ODEBUG("Size of SimplePlugins: " << m_SimplePlugins.size() 
-	  << " Found for " << MethodName << " : " << NbPlugins);
+  ODEBUG4("Size of SimplePlugins: " << m_SimplePlugins.size() 
+	  << " Found for " << MethodName << " : " << NbPlugins, "PgDebug.txt");
   bool FoundAPlugin = false;
 
   stringbuf *pbuf;
   pbuf = istrm.rdbuf();
 
   int size = pbuf->in_avail();
-  char aBuffer[32768];
+  char aBuffer[65636];
+  assert(size < 65635);
 
   memset(aBuffer,0,size+1);
   for(int i=0;i<size;i++)
     aBuffer[i] = (char)pbuf->sbumpc();
-  ODEBUG(aBuffer);
+  ODEBUG4(aBuffer,"PgDebug.txt");
   
   pbuf->pubsetbuf(aBuffer,size);
 
@@ -122,9 +126,9 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
     {
       istringstream iss(aBuffer);
       SimplePlugin * aSP = CurrentPlugin->second;
-      ODEBUG("Found the method " << MethodName 
+      ODEBUG4("Found the method " << MethodName 
 	      << " for plugin :" << aSP << endl
-	      << " Buffer: " << aBuffer); 
+	      << " Buffer: " << aBuffer,"PgDebug.txt"); 
       if (aSP!=0)
 	{
 	  aSP->CallMethod(MethodName,iss);
