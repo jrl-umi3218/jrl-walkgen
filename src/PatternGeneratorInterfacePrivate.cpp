@@ -169,7 +169,7 @@ namespace PatternGeneratorJRL {
        ":ChangeNextStep",
        ":samplingperiod",
        ":HerdtOnline",
-       ":setreference"};
+       ":setVelReference"};
 
     for(int i=0;i<14;i++)
       {
@@ -273,19 +273,18 @@ namespace PatternGeneratorJRL {
 					      m_ComAndFootRealization,
 					      m_StepStackHandler);
 
-    m_CoMAndFootOnlyStrategy->InitInterObjects(m_PC,
-					       m_HumanoidDynamicRobot,
+    m_CoMAndFootOnlyStrategy->InitInterObjects(m_HumanoidDynamicRobot,
 					       m_ComAndFootRealization,
 					       m_StepStackHandler);
 
     // Initialize the ZMP trajectory generator.
     m_ZMPD->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPD->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
-    m_ZMPD->SetPreviewControl(m_PC);
+    //m_ZMPD->SetPreviewControl(m_PC);
 
     m_ZMPQP->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
-    m_ZMPQP->SetPreviewControl(m_PC);
+    //m_ZMPQP->SetPreviewControl(m_PC);
 
     m_ZMPCQPFF->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
@@ -294,7 +293,7 @@ namespace PatternGeneratorJRL {
     m_ZMPVRQP->SetSamplingPeriod(m_PC->SamplingPeriod());
 
     m_ZMPVRQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
-    m_ZMPVRQP->SetPreviewControl(m_PC);
+    //m_ZMPVRQP->SetPreviewControl(m_PC);
     //m_ZMPCQPFF->SetSamplingPeriod(m_PC->SamplingPeriod());
     //m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
     m_ZMPVRQP->SetSamplingPeriod(m_PC->SamplingPeriod());
@@ -478,10 +477,10 @@ namespace PatternGeneratorJRL {
 
   }
 
-  void PatternGeneratorInterfacePrivate::setReference(istringstream &strm)
+  void PatternGeneratorInterfacePrivate::setVelReference(istringstream &strm)
   {
     // Read the data inside strm.
-    m_ZMPVRQP->setReference(strm);
+    m_ZMPVRQP->setVelReference(strm);
   }
 
   void PatternGeneratorInterfacePrivate::initOnlineHerdt()
@@ -1072,16 +1071,16 @@ namespace PatternGeneratorJRL {
     else if (aCmd==":StopOnLineStepSequencing")
       StopOnLineStepSequencing();
 
-    else if (aCmd==":setreference")
+    else if (aCmd==":setVelReference")
       {
 	//m_InternalClock = 0.0;
-	setReference(strm);
+	setVelReference(strm);
       }
 
     else if (aCmd==":HerdtOnline")
       {
 	m_InternalClock = 0.0;
-	setReference(strm);
+	setVelReference(strm);
 	m_ZMPVRQP->Online = 1;
 	initOnlineHerdt();
 	printf("Online \n");

@@ -293,7 +293,7 @@ namespace PatternGeneratorJRL
     */
 
     /*! Set the velocity reference */
-    void setReference(istringstream &strm);
+    void setVelReference(istringstream &strm);
 
     void interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			 deque<FootAbsolutePosition> &RightFootAbsolutePositions);

@@ -345,43 +345,6 @@ void Herdt(PatternGeneratorInterface &aPGI)
 
 }
 
-void Herdt(PatternGeneratorInterface &aPGI)
-{
-  CommonInitialization(aPGI);  
-
-  {
-    istringstream strm2(":setreference  0.1 0.0 0.0");
-    aPGI.ParseCmd(strm2);
-  }
-  {
-    istringstream strm2(":singlesupporttime 0.7");
-    aPGI.ParseCmd(strm2);
-  }
-  {
-    istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
-    aPGI.ParseCmd(strm2);
-  }
-
-  if (0)
-  {
-    istringstream strm2(":setdimitrovconstraint XY 0.07 0.05");
-    aPGI.ParseCmd(strm2);
-  }
-
-
-  {
-    istringstream strm2(":stepseq 0.0 -0.105 0.0 \
-                     0.2 0.21 0.0  \
-                     0.2 -0.21 0.0 \
-                     0.2 0.21 0.0  \
-                     0.2 -0.21 0.0 \
-                     0.2 0.21 0.0 \
-                     0.0 -0.21 0.0");
-    aPGI.ParseCmd(strm2);
-  }
-
-}
-
 void Herdt_Stop(PatternGeneratorInterface &aPGI)
 {
   {

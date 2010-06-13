@@ -18,11 +18,9 @@
 
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <Mathematics/FootConstraintsAsLinearSystem.h>
-#include <Mathematics/footConstraintsAsLinearSystem.h>
 #include <Mathematics/OptCholesky.h>
 #include <Mathematics/PLDPSolver.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
-#include <PreviewControl/SupportState.h>
 
 namespace PatternGeneratorJRL
 {
@@ -95,19 +93,6 @@ namespace PatternGeneratorJRL
 					     double T,
 					     unsigned int N);
 
-
-    
-    int buildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					     deque<ZMPPosition> &ZMPRefPositions,		       
-					     deque<COMPosition> &COMPositions,
-					     double ConstraintOnX,
-					     double ConstraintOnY,
-					     double T,
-					     unsigned int N);
-    
-    
-
     /*! \name Methods to build the optimization problem 
       @{
      */
@@ -152,24 +137,6 @@ namespace PatternGeneratorJRL
 				MAL_VECTOR(&xk,double),
 				MAL_VECTOR(&ZMPRef,double),
 				unsigned int &NextNumberOfRemovedConstraints);
-
-    
-   int buildConstraintMatrices(double * &DS, double * &DU,
-			       unsigned N, double T,
-			       double StartingTime,
-			       deque<LinearConstraintInequalityFreeFeet_t *> 
-			       & QueueOfLConstraintInequalitiesFreeFeet,
-			       deque<LinearConstraintInequalityFreeFeet_t *> 
-			       & QueueOfFeetPosInequalities,
-			       deque<SupportFeet_t *> 
-			       & QueueOfSupportFeet,
-			       double Com_Height,
-			       unsigned int &NbOfConstraints,
-			       MAL_VECTOR(&xk,double),
-			       MAL_VECTOR(&ZMPRef,double),
-			       unsigned int &NextNumberOfRemovedConstraints);
-   
-    
 
     /*! \brief Build the constant part of the constraint matrices. */
     int BuildingConstantPartOfConstraintMatrices();
@@ -253,11 +220,6 @@ namespace PatternGeneratorJRL
 			      unsigned int li,
 			      double *X,
 			      double StartingTime);
-
-    int validateConstraints(double * & DS,double * &DU,
-			    int NbOfConstraints, unsigned int li,
-			    double *X);
-
     /*! \brief Return the time at which it is optimal to regenerate a step in online mode. 
      */
     int ReturnOptimalTimeToRegenerateAStep();
@@ -281,6 +243,8 @@ namespace PatternGeneratorJRL
     /*! @}*/
     /* @} */
     
+    /*! Set the preview control object. */
+    void SetPreviewControl(PreviewControl *aPC);
 
     static const unsigned int QLD=0;
     static const unsigned int QLDANDLQ=1;
@@ -293,17 +257,13 @@ namespace PatternGeneratorJRL
 
     /*! Uses a 2D LIPM to simulate the evolution of the robot. */
     LinearizedInvertedPendulum2D * m_2DLIPM;
-    
-    /*! Uses a Finite State Machine to simulate the evolution of the support states. */
-    SupportState  * Support;
 
     /*! \brief Object creating Linear inequalities constraints 
       based on the foot position. Those constraints are *NOT* the
       one put in the QP, but they are a necessary intermediate step. */
     FootConstraintsAsLinearSystem * m_FCALS;
-    footConstraintsAsLinearSystem * m_fCALS;
       
-    ReferenceAbsoluteVelocity RefVel;
+
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;
     
@@ -315,7 +275,6 @@ namespace PatternGeneratorJRL
     
     /*! Preview window */
     unsigned int m_QP_N;
-
 
     /*! \name Variables related to the QP
       @{ */
@@ -346,7 +305,6 @@ namespace PatternGeneratorJRL
     /*! \brief Sub matrix to compute the linear part of the objective function $p^{\top}_k$. */
     MAL_MATRIX(m_OptB,double);
     MAL_MATRIX(m_OptC,double);
-    MAL_MATRIX(m_OptD,double); 
 
     /*! \name Parameters of the objective function 
     @{ */
@@ -386,15 +344,6 @@ namespace PatternGeneratorJRL
 		    double * XU,
 		    double Time);
       
-    int dumpProblem(double * Q,
-		    double * D, 
-		    double * Pu,
-		    unsigned int NbOfConstraints,
-		    double * Px,
-		    double * XL,
-		    double * XU,
-		    double Time);
-
     /*! Vector of similar constraints. */
     vector<int> m_SimilarConstraints;
   };

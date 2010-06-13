@@ -197,7 +197,7 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 }
 
 
-void ZMPVelocityReferencedQP::setReference(istringstream &strm)
+void ZMPVelocityReferencedQP::setVelReference(istringstream &strm)
 {
   strm >> RefVel.x;
   strm >> RefVel.y;
@@ -3146,6 +3146,6 @@ int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep()
 {
   int r = (int)(m_PreviewControlTime/m_SamplingPeriod);
   return 2*r;
-s}
+}
 
 
