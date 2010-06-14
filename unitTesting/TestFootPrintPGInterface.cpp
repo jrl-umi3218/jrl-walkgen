@@ -313,7 +313,7 @@ void Herdt(PatternGeneratorInterface &aPGI)
   CommonInitialization(aPGI);  
 
   {
-    istringstream strm2(":setreference  0.1 0.0 0.0");
+    istringstream strm2(":setVelReference  0.2 0.0 0.0");
     aPGI.ParseCmd(strm2);
   }
   {
@@ -348,7 +348,7 @@ void Herdt(PatternGeneratorInterface &aPGI)
 void Herdt_Stop(PatternGeneratorInterface &aPGI)
 {
   {
-    istringstream strm2(":setreference  0.0 0.0 0.0");
+    istringstream strm2(":setVelReference  0.0 0.0 0.0");
     aPGI.ParseCmd(strm2);
   }
 }
@@ -648,7 +648,7 @@ void HerdtOnline(PatternGeneratorInterface &aPGI)
     aPGI.ParseCmd(strm2);
   }
   {
-    istringstream strm2(":HerdtOnline 0.1 0.0 0.0");
+    istringstream strm2(":HerdtOnline 0.2 0.0 0.0");
     aPGI.ParseCmd(strm2);
   }
 }
@@ -1200,10 +1200,10 @@ int main(int argc, char *argv[])
 		      
 	  if (TestProfil==PROFIL_HERDT_ONLINE)
 	    {
-	      if (NbOfIt>5*200) /* Stop after 5 seconds the on-line stepping */
+	      if (NbOfIt>3*200) /* Stop after 3 seconds the on-line stepping */
 		{
 		  Herdt_Stop(*aPGI);
-		  if(NbOfIt > 7*200)
+		  if(NbOfIt > 5*200)
 		    ok=false;
 		}
 	    }

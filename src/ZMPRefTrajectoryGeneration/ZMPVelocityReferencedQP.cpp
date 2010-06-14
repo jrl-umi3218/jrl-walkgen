@@ -836,8 +836,7 @@ const double & ZMPVelocityReferencedQP::GetBeta() const
 
 int ZMPVelocityReferencedQP::validateConstraints(double * & DS,double * &DU,
 						 int NbOfConstraints,  int li,
-						 double *X
-						 )
+						 double *X, double time)
 {
   // double lSizeMat = QueueOfLConstraintInequalities.back()->EndingTime/m_QP_T;
   MAL_MATRIX(vnlPx,double); MAL_MATRIX(vnlPu,double);
@@ -906,7 +905,7 @@ int ZMPVelocityReferencedQP::validateConstraints(double * & DS,double * &DU,
       int pbOnCurrent=0;
       if (vnlValConstraint(i,0)<-1e-8)
 	{
-	  ODEBUG3("Problem during validation of the constraint: ");
+	  ODEBUG3("Problem during validation of the constraints at time: "<<time);
 	  ODEBUG3("  constraint " << i << " is not positive");
 	  ODEBUG3(vnlValConstraint(i,0));
 	  pbOnCurrent = 1;
@@ -968,19 +967,20 @@ int ZMPVelocityReferencedQP::dumpProblem(double * Q,
 					 double * Px,
 					 double * XL,
 					 double * XU,
+					 MAL_VECTOR(& xk,double),
 					 double Time)
 {
   ofstream aof;
 
   char Buffer[1024];
-  sprintf(Buffer,"ProblemFF_%f.dat",Time);
+  sprintf(Buffer,"/tmp/ProblemFF_%f.dat",Time);
   aof.open(Buffer,ofstream::out);
 
   //Somehow this has to be done
   NbOfConstraints++;
 
   // Dumping Q.
-  aof << "Q:"<< endl;
+  aof << endl << "Q:"<< endl;
   for( int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
     {
       for( int j=0;j<2*(m_QP_N+m_Support->StepNumber);j++)
@@ -991,7 +991,7 @@ int ZMPVelocityReferencedQP::dumpProblem(double * Q,
     }
 
   // Dumping D.
-  aof << "D:"<< endl;
+  aof << endl <<"D: "<< "RefVel: "<< RefVel.x << " "<< RefVel.y << "xk: "<<xk<< endl;
   for( int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
     {
       aof <<D[i]<< " ";
@@ -1000,7 +1000,7 @@ int ZMPVelocityReferencedQP::dumpProblem(double * Q,
 
   // Dumping Pu.
   //	cout<<"NbOfConstraints in dumpProblem: "<<NbOfConstraints<<endl;
-  //	aof << "DU: "<< "NbOfConstr.: " << NbOfConstraints << endl;
+  aof << "DU: "<< "NbOfConstr.: " << NbOfConstraints << endl;
   for(int i=0;i<NbOfConstraints;i++)
     {
       for( int j=0;j<2*(m_QP_N+m_Support->StepNumber);j++)
@@ -1011,7 +1011,7 @@ int ZMPVelocityReferencedQP::dumpProblem(double * Q,
     }
 
   // Dumping Px.
-  aof << "DS:"<< endl;
+  aof << endl<<"DS:"<< endl;
   for(int i=0;i<NbOfConstraints;i++)
     {
       aof << Px[i] << " ";
@@ -1019,7 +1019,7 @@ int ZMPVelocityReferencedQP::dumpProblem(double * Q,
   aof << endl;
 
   // Dumping XL.
-  aof << "XL:"<< endl;
+  aof << endl << "XL:"<< endl;
   for( int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
     {
       aof << XL[i] << " ";
@@ -1027,7 +1027,7 @@ int ZMPVelocityReferencedQP::dumpProblem(double * Q,
   aof << endl;
 
   // Dumping XU.
-  aof << "XU:"<< endl;
+  aof << endl << "XU:"<< endl;
   for( int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
     {
       aof << XU[i] << " ";
@@ -1117,21 +1117,16 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
 	{
 	  break;
 	}
-      IndexConstraint += MAL_MATRIX_NB_ROWS((LCIFF_it)->D);
+      IndexConstraint += MAL_MATRIX_NB_ROWS(LCIFF_it->D);
       LCIFF_it++;
     }
   if(m_Support->StepNumber>0)
     {
       LCIFF_it = QueueOfFeetPosInequalities.begin();
-      for( int i=0;i<m_QP_N;i++)
-	{
-	  if (LCIFF_it==QueueOfFeetPosInequalities.end())
-	    {
-	      break;
-	    }
-	  IndexConstraint += MAL_MATRIX_NB_ROWS((LCIFF_it)->D);
-	  LCIFF_it++;
-	}
+
+	  IndexConstraint += double(m_Support->StepNumber)*  MAL_MATRIX_NB_ROWS(LCIFF_it->D);
+
+
     }
 
   NbOfConstraints = IndexConstraint;
@@ -1219,7 +1214,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
 	{//c'est pas bon ca
 	  FFPx = CurSF_it->x;
 	  FFPy = CurSF_it->y;
-	  // cout<<FFPx<<" "<<FFPy<<endl;
+	   //cout<<"FFPx, FFPy"<<FFPx<<" "<<FFPy<<endl;
 	}
       else
 	{
@@ -1298,10 +1293,8 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
 	  //Foot variables after jerk: [dddX,dddY,FPx,FPy]
 	  if((LCIFF_it)->StepNumber>0)
 	    {
-	      DU[IndexConstraint+(2*N+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] =
-		(LCIFF_it)->D(j,0);
-	      DU[IndexConstraint+(2*N+m_Support->StepNumber+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] =
-		(LCIFF_it)->D(j,1);
+	      DU[IndexConstraint+(2*N+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = LCIFF_it->D(j,0);
+	      DU[IndexConstraint+(2*N+m_Support->StepNumber+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = LCIFF_it->D(j,1);
 	    }
 
 	  ODEBUG("IC: " << IndexConstraint );
@@ -1336,7 +1329,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
 
 
       // For each constraint.
-      for(int j=0;j<MAL_MATRIX_NB_ROWS((LCIFF_it)->D);j++)
+      for(int j=0;j<MAL_MATRIX_NB_ROWS(LCIFF_it->D);j++)
 	{
 	  // cout<<" D("<<j<<",0): " <<(LCIFF_it)->D(j,0);
 	  // cout<<" D("<<j<<",1): " <<(LCIFF_it)->D(j,1);
@@ -1344,12 +1337,12 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
 	  // Verification of constraints.
 	  m_Pb.DS[IndexConstraint] =
 	    // X Axis * A
-	    FFPx * (LCIFF_it)->D(j,0)
+	    FFPx * LCIFF_it->D(j,0)
 	    +
 	    // Y Axis * A
-	    FFPy * (LCIFF_it)->D(j,1)
+	    FFPy * LCIFF_it->D(j,1)
 	    // Constante part of the constraint
-	    + (LCIFF_it)->Dc(j,0);
+	    + LCIFF_it->Dc(j,0);
 	  // cout<<" m_Pb.DS"<<IndexConstraint<<" :"<<DS[IndexConstraint]<<endl;
 	  //   ODEBUG6(DS[IndexConstraint] << " " << (LCIFF_it)->D(j,0)  << " "
 	  // 	    << (LCIFF_it)->D[j][1] << " " << (LCIFF_it)->Dc(j,0) ,Buffer);
@@ -1435,7 +1428,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
       for( int i=0;i<NbOfConstraints;i++)
 	{
 	  for( int j=0;j<2*N+2*m_Support->StepNumber;j++)
-	    aof << DU[j*(NbOfConstraints)+i] << " " ;
+	    aof << DU[j*NbOfConstraints+i] << " " ;
 	  aof << endl;
 	}
       aof.close();
@@ -1786,7 +1779,7 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
 	    {
 	      ofstream aof;
 	      char Buffer[1024];
-	      sprintf(Buffer,"Dff_%f.dat",StartingTime);
+	      sprintf(Buffer,"/tmp/Dff_%f.dat",StartingTime);
 	      aof.open(Buffer,ofstream::out);
 	      for( int i=0;i<2*(N+m_Support->StepNumber);i++)
 		{
@@ -1813,7 +1806,7 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
 
       ODEBUG("m: " << m);
       if(m_FullDebug>2)
-	dumpProblem(m_Qff, D, DU, m, DS, XL, XU, StartingTime);
+	dumpProblem(m_Qff, D, DU, m, DS, XL, XU, xk, StartingTime);
 
 
       //---------Solver------------
@@ -1946,7 +1939,7 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
 	{
 	  ofstream aof;
 	  char Buffer[1024];
-	  sprintf(Buffer,"Xff_%f.dat",StartingTime);
+	  sprintf(Buffer,"/tmp/Xff_%f.dat",StartingTime);
 	  aof.open(Buffer,ofstream::out);
 	  aof << "State: " <<xk[0]<<" "<<xk[1]<< " " << xk[2] << " " << xk[3] << " "<<xk[4]<<" "<<xk[5]<<" "<<endl;
 	  for( int i=0;i<2*(N+m_Support->StepNumber);i++)
@@ -1963,14 +1956,14 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
 	  // aof.close();
 	}
 
-      if(m_FullDebug>2)
-	{
-	  if(validateConstraints(DS, DU, m, li, X)<0)
-	    {
-	      cout << "Something is wrong with the constraints." << endl;
-	      exit(-1);
-	    }
-	}
+//      if(0)
+//	{
+//	  if(validateConstraints(DS, DU, m, li, X, time)<0)
+//	    {
+//	      cout << "Something is wrong with the constraints." << endl;
+//	      exit(-1);
+//	    }
+//	}
 
       // Compute CPU consumption time.
       gettimeofday(&end,0);
@@ -2365,7 +2358,7 @@ void ZMPVelocityReferencedQP::setProblem(deque<LinearConstraintInequalityFreeFee
 
 	OptA = OptA + ltermVel;
 
-	//m_Pb.Q------------------------
+	//m_Pb.Q--
 	memset(m_Pb.Q,0,4*(m_QP_N+m_Support->StepNumber)*(m_QP_N+m_Support->StepNumber)*sizeof(double));
 	for( int i=0;i<2*m_QP_N;i++)
 		for( int j=0;j<2*m_QP_N;j++)
@@ -2419,7 +2412,7 @@ void ZMPVelocityReferencedQP::setProblem(deque<LinearConstraintInequalityFreeFee
 	m_OptD = MAL_RET_TRANSPOSE(m_VPu);
 	m_OptD = m_Beta * m_OptD;
 
-	//m_Pb.D---------------
+	//m_Pb.D-
 	memset(m_Pb.D,0,2*(m_QP_N+m_Support->StepNumber)*sizeof(double));
 
 	//velocity
@@ -2430,19 +2423,19 @@ void ZMPVelocityReferencedQP::setProblem(deque<LinearConstraintInequalityFreeFee
 	OptD -= lterm1v;
 
 	for( int i=0;i<2*m_QP_N;i++)
-	  m_Pb.D[i] += 2*OptD(i);
+	  m_Pb.D[i] += OptD(i);
 
 
 	//zmp
 	for( int i=0;i<m_QP_N;i++)
 	  {
-	   m_Pb.D[i] += 2*lterm3ZMPx(i);
-	   m_Pb.D[m_QP_N+i] += 2*lterm3ZMPy(i);
+	   m_Pb.D[i] += lterm3ZMPx(i);
+	   m_Pb.D[m_QP_N+i] += lterm3ZMPy(i);
 	  }
 	for( int i=0;i<m_Support->StepNumber;i++)
 	  {
-	   m_Pb.D[2*m_QP_N+i] += 2*lterm4ZMPx(i);
-	   m_Pb.D[2*m_QP_N+m_Support->StepNumber+i] += 2*lterm4ZMPy(i);
+	   m_Pb.D[2*m_QP_N+i] += lterm4ZMPx(i);
+	   m_Pb.D[2*m_QP_N+m_Support->StepNumber+i] += lterm4ZMPy(i);
 	  }
 	//----------m_Pb.D
 	for( int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
@@ -2669,21 +2662,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				NbOfConstraints, 0, CriteriaToMaximize, xk);
       // setProblem(NbOfConstraints, 0, CriteriaToMaximize, xk);
 
-      if (m_FullDebug>0)
-	{
-	  ofstream aof;
-	  char Buffer[1024];
-	  sprintf(Buffer,"Dff_%f.dat",time+m_TimeBuffer);
-	  aof.open(Buffer,ofstream::out);
-	  for( int i=0;i<2*m_QP_N;i++)
-	    {
-	      aof << m_Pb.D[i] << endl;
-	    }
-	  aof.close();
-	}
 
       if(m_FullDebug>2)
-	dumpProblem(m_Pb.Q, m_Pb.D, m_Pb.DU, m_Pb.m, m_Pb.DS, m_Pb.XL, m_Pb.XU, time+m_TimeBuffer);
+    	  dumpProblem(m_Pb.Q, m_Pb.D, m_Pb.DU, m_Pb.m, m_Pb.DS, m_Pb.XL, m_Pb.XU, xk, time+m_TimeBuffer);
 
       double ldt = 0.0;
       //---------Solver------------
@@ -2831,15 +2812,15 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	{
 	  ofstream aof;
 	  char Buffer[1024];
-	  sprintf(Buffer,"Xff_%f.dat",time);
+	  sprintf(Buffer,"/tmp/Xff_%f.dat",time);
 	  aof.open(Buffer,ofstream::out);
-	  //aof << "State: " <<xk[0]<<" "<<xk[1]<< " " << xk[2] << " " << xk[3] << " "<<xk[4]<<" "<<xk[5]<<" "<<endl;
+
 	  for(int i=0;i<m_QP_N;i++)
 	    {
 	      aof << m_Pb.X[i] << endl;
 	    }
 	  aof.close();
-	  sprintf(Buffer,"Yff_%f.dat",time);
+	  sprintf(Buffer,"/tmp/Yff_%f.dat",time);
 	  aof.open(Buffer,ofstream::out);
 	  //aof << "State: " <<xk[0]<<" "<<xk[1]<< " " << xk[2] << " " << xk[3] << " "<<xk[4]<<" "<<xk[5]<<" "<<endl;
 	  for(int i=m_QP_N+m_Support->StepNumber;i<2*(m_QP_N+m_Support->StepNumber);i++)
@@ -2847,12 +2828,12 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	      aof << m_Pb.X[i] << endl;
 	    }
 	  aof.close();
-	  aof.open("comHeight.dat",ofstream::app);
+	  aof.open("/tmp/comHeight.dat",ofstream::app);
 
 	  aof << FinalCOMPositions[CurrentIndex].x[0]<<" "<< FinalCOMPositions[CurrentIndex].y[0]<< FinalCOMPositions[CurrentIndex].z[0] << endl;
 
 	  aof.close();
-	  aof.open("CurrentIndex.dat",ofstream::app);
+	  aof.open("/tmp/CurrentIndex.dat",ofstream::app);
 	  aof<<CurrentIndex<<endl;
 	  aof.close();
 	}
@@ -2861,7 +2842,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       if(m_FullDebug>2)
 	{
 	  ofstream aof;
-	  aof.open("time.dat",ios::app);
+	  aof.open("/tmp/time.dat",ios::app);
 	  aof<<time<<" "<<m_UpperTimeLimitToUpdate<<endl;
 	}
 
@@ -2955,7 +2936,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	      if(m_FullDebug>2)
 		{
 		  ofstream aof;
-		  aof.open("Trunk.dat",ofstream::app);
+		  aof.open("/tmp/Trunk.dat",ofstream::app);
 		  aof<<time+k*m_SamplingPeriod<<" "<<m_TrunkState.yaw[0]<<" "<<m_TrunkState.yaw[1]<<" "<<m_TrunkState.yaw[2]<<endl;
 		  aof.close();
 		}
@@ -2983,7 +2964,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	      if(m_FullDebug>0)
 		{
 		  ofstream aoffeet;
-		  aoffeet.open("Feet.dat",ios::app);
+		  aoffeet.open("/tmp/Feet.dat",ios::app);
 		  aoffeet<<time+m_TimeBuffer+k*m_SamplingPeriod<<"    "
 			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].x<<"    "
 			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].y<<"    "
@@ -3023,7 +3004,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	      if(m_FullDebug>0)
 		{
 		  ofstream aoffeet;
-		  aoffeet.open("Feet.dat",ios::app);
+		  aoffeet.open("/tmp/Feet.dat",ios::app);
 		  aoffeet<<time+m_TimeBuffer+k*m_SamplingPeriod<<"    "
 			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].x<<"    "
 			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].y<<"    "
@@ -3057,9 +3038,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	{
 	  ofstream aof;
 	  char Buffer[1024];
-	  sprintf(Buffer,"Xff_%f.dat",time);
+	  sprintf(Buffer,"/tmp/Xff_%f.dat",time);
 	  aof.open(Buffer,ofstream::out);
-	  aof << "State: " <<xk[0]<<" "<<xk[1]<< " " << xk[2] << " " << xk[3] << " "<<xk[4]<<" "<<xk[5]<<" "<<endl;
+	  //aof << "State: " <<xk[0]<<" "<<xk[1]<< " " << xk[2] << " " << xk[3] << " "<<xk[4]<<" "<<xk[5]<<" "<<endl;
 	  for( int i=0;i<2*(m_QP_N+m_Support->StepNumber);i++)
 	    {
 	      aof << m_Pb.X[i] << endl;
@@ -3074,9 +3055,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  // aof.close();
 	}
 
-      if(0)
+      if(m_FullDebug>2)
 	{
-	  if(validateConstraints(m_Pb.DS, m_Pb.DU, m_Pb.m, li, m_Pb.X)<0)
+	  if(validateConstraints(m_Pb.DS, m_Pb.DU, m_Pb.m, li, m_Pb.X, time)<0)
 	    {
 	      cout << "Something is wrong with the constraints." << endl;
 	      exit(-1);

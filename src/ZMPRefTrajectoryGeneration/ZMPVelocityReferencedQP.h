@@ -282,7 +282,7 @@ namespace PatternGeneratorJRL
 
     int validateConstraints(double * & DS,double * &DU,
 			    int NbOfConstraints,  int li,
-			    double *X);
+			    double *X, double time);
 
     /*! \brief Return the time at which it is optimal to regenerate a step in online mode. 
      */
@@ -479,7 +479,9 @@ namespace PatternGeneratorJRL
 		    double * Px,
 		    double * XL,
 		    double * XU,
-		    double Time);
+		    MAL_VECTOR(& xk,double),
+		    double Time
+		    );
 
     /*! Vector of similar constraints. */
     vector<int> m_SimilarConstraints;

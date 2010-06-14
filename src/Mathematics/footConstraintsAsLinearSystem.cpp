@@ -101,11 +101,11 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   // lRightFootHalfWidth -= ConstraintOnX;
 
   //Andremize: Scilab feet
-  lLeftFootHalfHeight = 0.069-0.054;
-  lRightFootHalfHeight = 0.069-0.054;
+  lLeftFootHalfHeight = 0.069-0.02;
+  lRightFootHalfHeight = 0.069-0.02;
 
-  lLeftFootHalfWidth = 0.1206-0.0906;
-  lRightFootHalfWidth = 0.1206-0.0906;
+  lLeftFootHalfWidth = 0.1206-0.02;
+  lRightFootHalfWidth = 0.1206-0.02;
 
   DSFeetDistance = 0.2;
   lLeftFootHalfHeightDS = lLeftFootHalfHeight+DSFeetDistance/2.0;
