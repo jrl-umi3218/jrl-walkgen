@@ -471,7 +471,7 @@ namespace PatternGeneratorJRL
 
     /* void setProblem(int NbOfConstraints, int NbOfEqConstraints, int &CriteriaToMaximize, MAL_VECTOR(& xk,double)); */
     void setProblem(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, deque<SupportFeet_t> & QueueOfSupportFeet,
-    		int NbOfConstraints, int NbOfEqConstraints, int & CriteriaToMaximize, MAL_VECTOR(& xk,double));
+    		int NbOfConstraints, int NbOfEqConstraints, int & CriteriaToMaximize, MAL_VECTOR(& xk,double), double time);
     int dumpProblem(double * Q,
 		    double * D, 
 		    double * Pu,

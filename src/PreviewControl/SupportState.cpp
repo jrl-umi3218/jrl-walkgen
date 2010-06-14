@@ -23,7 +23,7 @@ SupportState::SupportState(const double &SamplingPeriod)
   SSPeriod = 0.8; 	  //Duration of one step
   DSDuration = 1e9;       //Duration of the DS phase
   DSSSDuration = 0.4;
-  NbOfStepsSSDS = 2;
+  NbOfStepsSSDS = 1;
 
   m_T = SamplingPeriod;
   //Initial current state

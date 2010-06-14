@@ -102,7 +102,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
   m_Alpha = 0.00001;
   m_Beta = 1.0;
-  m_Gamma =0.0;//0.000001;
+  m_Gamma = 0.00001;
 
   InitConstants();
 
@@ -2230,7 +2230,7 @@ void ZMPVelocityReferencedQP::initializeProblem()
 
 void ZMPVelocityReferencedQP::setProblem(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
 		deque<SupportFeet_t> &QueueOfSupportFeet,
-		int NbOfConstraints, int NbOfEqConstraints, int & CriteriaToMaximize, MAL_VECTOR(& xk,double))
+		int NbOfConstraints, int NbOfEqConstraints, int & CriteriaToMaximize, MAL_VECTOR(& xk,double), double time)
 {
 	m_Pb.m=NbOfConstraints;
 	m_Pb.me=NbOfEqConstraints;
@@ -2278,7 +2278,15 @@ void ZMPVelocityReferencedQP::setProblem(deque<LinearConstraintInequalityFreeFee
 	ltermPZuPZu = m_Gamma*ltermPZuPZu;
 
 	if(m_Support->StepNumber>0)
+	{
 		MAL_MATRIX_RESIZE(m_U,m_QP_N,m_Support->StepNumber);
+		for(int i=0;i<m_QP_N;i++)
+			for(int j=0;j<m_Support->StepNumber;j++)
+				m_U(i,j) = 0.0;
+	}
+	for(int i=0;i<m_QP_N;i++)
+		m_Uc(i) = 0.0;
+
 	for(int i=0;i<m_QP_N;i++)
 	{
 		if(LCIFF_it->StepNumber>0)
@@ -2286,6 +2294,16 @@ void ZMPVelocityReferencedQP::setProblem(deque<LinearConstraintInequalityFreeFee
 		else
 			m_Uc(i) = 1.0;
 		LCIFF_it++;
+	}
+
+    if (m_FullDebug>2)
+	{
+	  ofstream aof;
+	  char Buffer[1024];
+	  sprintf(Buffer,"/tmp/m_U_%f.dat",time);
+	  aof.open(Buffer,ofstream::out);
+	  aof<<m_U<<endl;
+	  aof.close();
 	}
 
 	ltermPZuU = MAL_RET_TRANSPOSE(m_PZu);
@@ -2332,7 +2350,7 @@ void ZMPVelocityReferencedQP::setProblem(deque<LinearConstraintInequalityFreeFee
 		ykT(i)=xk(3+i);
 
 	MAL_C_eq_A_by_B(lterm1ZMPy,m_PZx,ykT);
-        lterm2ZMPy = m_Uc*SF_it->y;
+	lterm2ZMPy = m_Uc*SF_it->y;
 
 	lterm1ZMPy -= lterm2ZMPy;
 	lterm1ZMPy = MAL_RET_TRANSPOSE(lterm1ZMPy);
@@ -2560,6 +2578,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       int CriteriaToMaximize=1;
 
+
       deque<LinearConstraintInequality_t> QueueOfLConstraintInequalities;
       deque<LinearConstraintInequalityFreeFeet_t> QueueOfLConstraintInequalitiesFreeFeet;
       deque<LinearConstraintInequalityFreeFeet_t> QueueOfFeetPosInequalities;
@@ -2659,7 +2678,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 			      xk);
 
       setProblem(QueueOfLConstraintInequalitiesFreeFeet, QueueOfSupportFeet,
-				NbOfConstraints, 0, CriteriaToMaximize, xk);
+				NbOfConstraints, 0, CriteriaToMaximize, xk, time);
       // setProblem(NbOfConstraints, 0, CriteriaToMaximize, xk);
 
 
@@ -2685,7 +2704,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 	  ldt = lend.tv_sec - lbegin.tv_sec +
 	    0.000001 * (lend.tv_usec - lbegin.tv_usec);
-	  // printf("Solver has finished,  \n");
+
 	  int NbOfActivatedConstraints = 0;
 	  for(int lk=0;lk<m_Pb.m;lk++)
 	    {
