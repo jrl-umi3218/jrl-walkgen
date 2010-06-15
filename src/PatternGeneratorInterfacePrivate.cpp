@@ -1222,7 +1222,7 @@ namespace PatternGeneratorJRL {
 	ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
 	       "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
 	*/
-	//	return false;//Andremize
+		return false;//Andremize
       }
     ODEBUG("Here");
 

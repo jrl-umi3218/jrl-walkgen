@@ -38,15 +38,15 @@ OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
 	m_uLimitFeet = 5.0/180.0*M_PI;
 
 
-	m_FullDebug = 0;
+	m_FullDebug = 3;
 
 	//TODO 1: How does ODEBUG/RESETDEBUG get activated?
 	if(m_FullDebug>2)
 	{
 		ofstream aof;
-		aof.open("previewOrientations.dat",ofstream::out);
+		aof.open("/tmp/previewOrientations.dat",ofstream::out);
 		aof.close();
-		aof.open("verifyAccelerationOfHipJoint.dat",ofstream::out);
+		aof.open("/tmp/verifyAccelerationOfHipJoint.dat",ofstream::out);
 		aof.close();
 	}
 
@@ -75,7 +75,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 	if(m_FullDebug>2)
 	{
 		ofstream aof;
-		aof.open("previewOrientations.dat",ofstream::app);
+		aof.open("/tmp/previewOrientations.dat",ofstream::app);
 		aof<<endl<<endl;
 		aof<<"Time: "<<Time<<" LeftFootAbsolutePositions[0].theta: "<<LeftFootAbsolutePositions[0].theta<<
 				" RightFootAbsolutePositions[0].theta: "<<RightFootAbsolutePositions[0].theta
@@ -130,7 +130,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 					if(m_FullDebug>2)
 					{
 						ofstream aof;
-						aof.open("previewOrientations.dat",ofstream::app);
+						aof.open("/tmp/previewOrientations.dat",ofstream::app);
 						aof<<" Trunk accelerated because TrunkStateT.yaw[1] = "<<TrunkStateT.yaw[1]<<" TrunkState.yaw[1] = "<<TrunkState.yaw[1]<<endl;
 						aof.close();
 					}
@@ -142,7 +142,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 					if(m_FullDebug>2)
 					{
 						ofstream aof;
-						aof.open("previewOrientations.dat",ofstream::app);
+						aof.open("/tmp/previewOrientations.dat",ofstream::app);
 						aof<<" Trunk velocity constant because TrunkStateT.yaw[1] = "<<TrunkStateT.yaw[1]<<" TrunkState.yaw[1] = "<<TrunkState.yaw[1]<<endl;
 						aof.close();
 					}
@@ -170,7 +170,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 		if(m_FullDebug>2)
 		{
 			ofstream aof;
-			aof.open("previewOrientations.dat",ofstream::app);
+			aof.open("/tmp/previewOrientations.dat",ofstream::app);
 			//			aof<<"fabs(TrunkStateT.yaw[1]-TrunkState.yaw[1]): "<<fabs(TrunkStateT.yaw[1]-TrunkState.yaw[1])<<" TrunkStateT.yaw[0]: "<<TrunkStateT.yaw[0]<<
 			//					" m_d "<<m_d<<" m_e "<<m_e<<" 1/3*c*m_T*m_T*m_T "<<1.0/3.0*m_d*m_T*m_T*m_T<<" 1/4*m_e*m_T*m_T*m_T*m_T: "
 			//					<<1.0/4.0*m_e*m_T*m_T*m_T*m_T<<endl;
@@ -186,7 +186,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 		if(m_FullDebug>2)
 		{
 			ofstream aof;
-			aof.open("previewOrientations.dat",ofstream::app);
+			aof.open("/tmp/previewOrientations.dat",ofstream::app);
 			aof<<"Preview loop initialized: "<<" m_PreviewedSupportFoot: "<<m_PreviewedSupportFoot<<
 					" m_PreviousSupportAngle: "<<m_PreviousSupportAngle<<endl;
 			aof.close();
@@ -207,7 +207,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 			if(m_FullDebug>2)
 			{
 				ofstream aof;
-				aof.open("previewOrientations.dat",ofstream::app);
+				aof.open("/tmp/previewOrientations.dat",ofstream::app);
 				aof<<"PreviewedTrunkAngleEnd: "<<m_PreviewedTrunkAngleEnd<<
 						" TrunkStateT.yaw[1] "<<TrunkStateT.yaw[1]<<endl;
 				aof.close();
@@ -228,7 +228,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 				if(m_FullDebug>2)
 				{
 					ofstream aof;
-					aof.open("previewOrientations.dat",ofstream::app);
+					aof.open("/tmp/previewOrientations.dat",ofstream::app);
 					aof<<"Self collision occured - m_PreviewedSupportAngle: "<<m_PreviewedSupportAngle
 							<<" m_PreviousSupportAngle: "<<m_PreviousSupportAngle<<endl;
 					aof.close();
@@ -242,7 +242,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 				if(m_FullDebug>2)
 				{
 					ofstream aof;
-					aof.open("previewOrientations.dat",ofstream::app);
+					aof.open("/tmp/previewOrientations.dat",ofstream::app);
 					aof<<"Angle too big for DS phase - m_PreviewedSupportAngle: "<<m_PreviewedSupportAngle
 							<<" m_PreviousSupportAngle: "<<m_PreviousSupportAngle<<endl;
 					aof.close();
@@ -263,7 +263,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 			if(m_FullDebug>2)
 			{
 				ofstream aof;
-				aof.open("previewOrientations.dat",ofstream::app);
+				aof.open("/tmp/previewOrientations.dat",ofstream::app);
 				aof<<"PreviewedSupportAngles: "<<PreviewedSupportAngles[StepNumber-m_FirstPreviewedFoot]<<
 						" StepNumber "<<StepNumber<<
 						" m_FirstPreviewedFoot "<<m_FirstPreviewedFoot<<endl;
@@ -301,7 +301,7 @@ void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVe
 			if(m_FullDebug>2)
 			{
 				ofstream aof;
-				aof.open("verifyAccelerationOfHipJoint.dat",ofstream::app);
+				aof.open("/tmp/verifyAccelerationOfHipJoint.dat",ofstream::app);
 				aof<<" TrunkStateT.yaw[1]: "<<TrunkStateT.yaw[1] <<" "
 						<<" Ref.dYaw: "<<Ref.dYaw <<" "
 						<<" m_signRotAccTrunk: "<<m_signRotAccTrunk <<" "
@@ -349,7 +349,7 @@ bool OrientationsPreview::verifyAngleOfHipJoint(const SupportState * Support,
 		if(m_FullDebug>2)
 		{
 			ofstream aof;
-			aof.open("previewOrientations.dat",ofstream::app);
+			aof.open("/tmp/previewOrientations.dat",ofstream::app);
 			aof<<"Limitation reached - new TrunkStateT.yaw[1] :"<<TrunkStateT.yaw[1]<<endl;
 			aof.close();
 		}
