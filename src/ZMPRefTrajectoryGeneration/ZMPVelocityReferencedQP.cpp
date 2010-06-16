@@ -43,7 +43,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   // printf("Entered ZMPVelocityReferencedQP \n"); 
   m_Q = 0; 
   m_Pu = 0; 
-  m_FullDebug = 0; 
+  m_FullDebug = 3; 
   m_FastFormulationMode = QLD; 
  
   m_QP_T = 0.1; 
@@ -102,7 +102,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
  
   m_Alpha = 0.00001; 
   m_Beta = 1.0; 
-  m_Gamma = 0.00001; 
+  m_Gamma = 0.000001; 
  
   InitConstants(); 
  
@@ -144,6 +144,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
       aof.open("Trunk.dat",ofstream::out); 
       aof.close(); 
       aof.open("time.dat",ofstream::out); 
+      aof.close(); 
+      aof.open("/tmp/FootPositionsT.dat",ofstream::out); 
       aof.close(); 
     } 
  
@@ -1929,10 +1931,8 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
       FPx = ptX[2*N]; 
       FPy = ptX[2*N+m_Support->StepNumber]; 
  
-      // printf("FPx: %f FPy %f \n",FPx,FPy); 
- 
-      ODEBUG6("uk:" << uk,"DebugPBW.dat"); 
-      ODEBUG6("xk:" << xk,"DebugPBW.dat"); 
+      
+// printf("FPx: %f FPy %f \n",FPx,FPy); 
  
  
       if (m_FullDebug>2) 
@@ -2828,10 +2828,16 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  m_FPx = CurSF_it->x + double(CurSF_it->SupportFoot)*sin(CurSF_it->theta)*m_FeetDistanceDS; 
 	  m_FPy = CurSF_it->y - double(CurSF_it->SupportFoot)*cos(CurSF_it->theta)*m_FeetDistanceDS;  
 	} 
+
+
  
       if (m_FullDebug>2) 
 	{ 
 	  ofstream aof; 
+
+	  aof.open("/tmp/FootPositionsT.dat",ofstream::app);
+	  aof<<" "<<m_FPx<<" "<<m_FPy<<endl;
+	  aof.close();
 	  char Buffer[1024]; 
 	  sprintf(Buffer,"/tmp/Xff_%f.dat",time); 
 	  aof.open(Buffer,ofstream::out); 

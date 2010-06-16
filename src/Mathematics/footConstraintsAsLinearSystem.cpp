@@ -118,16 +118,18 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
    if(0)
 	   RESETDEBUG4("Constraints-fCSALS.dat");
 
-   m_FullDebug = 0;
+   m_FullDebug = 3;
 
-   	//TODO 1: How does ODEBUG/RESETDEBUG get activated?
-   	if(m_FullDebug>2)
-   	{
-   		ofstream aof;
-   		aof.open("/tmp/SupportOrientations.dat",ofstream::out);
-   		aof.close();
-   	}
-//   printf("Leaving footConstraintsAsLinearSystem \n");
+   //TODO 1: How does ODEBUG/RESETDEBUG get activated?
+   if(m_FullDebug>2)
+     {
+       ofstream aof;
+       aof.open("/tmp/SupportOrientations.dat",ofstream::out);
+       aof.close();
+       aof.open("/tmp/ConvexHull.dat",ofstream::out);
+       aof.close();
+     }
+   //   printf("Leaving footConstraintsAsLinearSystem \n");
 }
 
 footConstraintsAsLinearSystem::~footConstraintsAsLinearSystem()
@@ -221,22 +223,6 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
   MAL_MATRIX_RESIZE(D,aVecOfPoints.size(),2);
   MAL_MATRIX_RESIZE(Dc,aVecOfPoints.size(),1);
 
-
-  // Dump a file to display on scilab .
-  // This should be removed during real usage inside a robot.
-  if (0)
-    {
-      ofstream aof;
-      aof.open("/tmp/Constraints-fCSALS.dat",ofstream::app);
-      for(unsigned int i=0;i<n-1;i++)
-  	{
-  	  aof << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
-  	      << aVecOfPoints[i+1].col << " "  << aVecOfPoints[i+1].row << endl;
-  	}
-      aof << aVecOfPoints[n-1].col << " " <<  aVecOfPoints[n-1].row << " "
-  	  << aVecOfPoints[0].col << " "  << aVecOfPoints[0].row << endl;
-      aof.close();
-    }
 
   for(unsigned int i=0;i<n-1;i++)//first n-1 inequalities
     {
@@ -441,15 +427,23 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque< Foot
 		//Compute the convex hull
 		for(unsigned j=0;j<4;j++)
 		{
-			TheConvexHull[j].col = lx + ( lxcoefs[j] *
-					FootHalfWidth * c_t -
-					lycoefs[j] *
-					FootHalfHeight * s_t );
-			TheConvexHull[j].row = ly + ( lxcoefs[j] *
-					FootHalfWidth * s_t +
-					lycoefs[j] *
-					FootHalfHeight * c_t );
+			TheConvexHull[j].col = (lx+lxcoefs[j]*FootHalfWidth)*c_t -
+					(ly+lycoefs[j]*FootHalfHeight)*s_t;
+			TheConvexHull[j].row = (lx+lxcoefs[j]*FootHalfWidth)*s_t +
+					(ly+lycoefs[j]*FootHalfHeight)*c_t;
+
+		if(m_FullDebug>2 & i==1)
+		  {
+		    
+		    ofstream aof;
+		    aof.open("/tmp/ConvexHull.dat",ofstream::app);
+		    aof<<TheConvexHull[j].col<<" "<<TheConvexHull[j].row<<" "<<endl;
+		    aof.close();
+		  }
+		  
 		}
+
+
 
 		//foot positionning constraints
 		if(Support->StateChanged && Support->StepNumber>0)
