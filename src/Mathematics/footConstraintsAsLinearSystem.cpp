@@ -124,7 +124,7 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
    	if(m_FullDebug>2)
    	{
    		ofstream aof;
-   		aof.open("SupportOrientations.dat",ofstream::out);
+   		aof.open("/tmp/SupportOrientations.dat",ofstream::out);
    		aof.close();
    	}
 //   printf("Leaving footConstraintsAsLinearSystem \n");
@@ -227,7 +227,7 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
   if (0)
     {
       ofstream aof;
-      aof.open("Constraints-fCSALS.dat",ofstream::app);
+      aof.open("/tmp/Constraints-fCSALS.dat",ofstream::app);
       for(unsigned int i=0;i<n-1;i++)
   	{
   	  aof << aVecOfPoints[i].col << " " <<  aVecOfPoints[i].row << " "
@@ -351,14 +351,14 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque< Foot
 		FAP_it--;
 	}
 
-	s_t = sin(FAP_it->theta);
-	c_t = cos(FAP_it->theta);
+	s_t = sin(FAP_it->theta*M_PI/180.0);
+	c_t = cos(FAP_it->theta*M_PI/180.0);
 
 	if(m_FullDebug>2)
    	{
    		ofstream aof;
-   		aof.open("SupportOrientations.dat",ofstream::app);
-   		aof<<endl<<"Time: "<<StartingTime<<" CurrentSupAngle "<<FAP_it->theta;
+   		aof.open("/tmp/SupportOrientations.dat",ofstream::app);
+   		aof<<endl<<"Time: "<<StartingTime<<" CurrentSupAngle "<<FAP_it->theta*M_PI/180.0;
    		aof.close();
    	}
 
@@ -381,7 +381,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque< Foot
 			if(m_FullDebug>2)
 			{
 				ofstream aof;
-				aof.open("SupportOrientations.dat",ofstream::app);
+				aof.open("/tmp/SupportOrientations.dat",ofstream::app);
 				aof<<" PreviewedAngle: "<<PreviewedSupportAngles[Support->StepNumber-1];
 				aof.close();
 			}
@@ -461,14 +461,14 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque< Foot
 
 			if(Support->StepNumber==1)
 			{
-				s_t = sin(FAP_it->theta);
-				c_t = cos(FAP_it->theta);
+				s_t = sin(FAP_it->theta*M_PI/180.0);
+				c_t = cos(FAP_it->theta*M_PI/180.0);
 
 				if(m_FullDebug>2)
 				{
 					ofstream aof;
-					aof.open("SupportOrientations.dat",ofstream::app);
-					aof<<" AngleFootConstraints: "<<FAP_it->theta;
+					aof.open("/tmp/SupportOrientations.dat",ofstream::app);
+					aof<<" AngleFootConstraints: "<<FAP_it->theta*M_PI/180.0;
 					aof.close();
 				}
 			}
@@ -480,7 +480,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque< Foot
 				if(m_FullDebug>2)
 				{
 					ofstream aof;
-					aof.open("SupportOrientations.dat",ofstream::app);
+					aof.open("/tmp/SupportOrientations.dat",ofstream::app);
 					aof<<" AngleFootConstraints: "<<PreviewedSupportAngles[Support->StepNumber-2];
 					aof.close();
 				}

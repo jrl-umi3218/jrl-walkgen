@@ -38,7 +38,7 @@ OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
 	m_uLimitFeet = 5.0/180.0*M_PI;
 
 
-	m_FullDebug = 3;
+	m_FullDebug = 0;
 
 	//TODO 1: How does ODEBUG/RESETDEBUG get activated?
 	if(m_FullDebug>2)
@@ -77,10 +77,10 @@ void OrientationsPreview::previewOrientations(const double &Time,
 		ofstream aof;
 		aof.open("/tmp/previewOrientations.dat",ofstream::app);
 		aof<<endl<<endl;
-		aof<<"Time: "<<Time<<" LeftFootAbsolutePositions[0].theta: "<<LeftFootAbsolutePositions[0].theta<<
-				" RightFootAbsolutePositions[0].theta: "<<RightFootAbsolutePositions[0].theta
-				<<" Last LeftFootAbsolutePosition: "<<lF_it->theta<<
-				" Last RightFootAbsolutePosition: "<<rF_it->theta<<endl;
+		aof<<"Time: "<<Time<<" LeftFootAbsolutePositions[0].theta*M_PI/180.0: "<<LeftFootAbsolutePositions[0].theta*M_PI/180.0<<
+				" RightFootAbsolutePositions[0].theta*M_PI/180.0: "<<RightFootAbsolutePositions[0].theta*M_PI/180.0
+				<<" Last LeftFootAbsolutePosition: "<<lF_it->theta*M_PI/180.0<<
+				" Last RightFootAbsolutePosition: "<<rF_it->theta*M_PI/180.0<<endl;
 		aof.close();
 	}
 
@@ -100,14 +100,14 @@ void OrientationsPreview::previewOrientations(const double &Time,
 		//Initialize the preview loop
 		if (Support->CurrentSupportFoot == 1)
 		{
-			m_CurrentSupportAngle = LeftFootAbsolutePositions[0].theta;
+			m_CurrentSupportAngle = LeftFootAbsolutePositions[0].theta*M_PI/180.0;
 
-			//m_PreviewedSupportAngle = RightFootAbsolutePositions[0].theta;
+			//m_PreviewedSupportAngle = RightFootAbsolutePositions[0].theta*M_PI/180.0;
 		}
 		else
 		{
-			m_CurrentSupportAngle = RightFootAbsolutePositions[0].theta;
-			//m_PreviewedSupportAngle = LeftFootAbsolutePositions[0].theta;
+			m_CurrentSupportAngle = RightFootAbsolutePositions[0].theta*M_PI/180.0;
+			//m_PreviewedSupportAngle = LeftFootAbsolutePositions[0].theta*M_PI/180.0;
 		}
 
 
@@ -192,10 +192,10 @@ void OrientationsPreview::previewOrientations(const double &Time,
 			aof.close();
 		}
 
-		CurrentLeftFootAngle = lF_it->theta;
-		CurrentRightFootAngle = rF_it->theta;
-		CurrentLeftFootVelocity = lF_it->dtheta;
-		CurrentRightFootVelocity = rF_it->dtheta;
+		CurrentLeftFootAngle = lF_it->theta*M_PI/180.0;
+		CurrentRightFootAngle = rF_it->theta*M_PI/180.0;
+		CurrentLeftFootVelocity = lF_it->dtheta*M_PI/180.0;
+		CurrentRightFootVelocity = rF_it->dtheta*M_PI/180.0;
 
 		//Preview
 		for(StepNumber = m_FirstPreviewedFoot; StepNumber <= (int)ceil((m_N+1)*m_T/Support->SSPeriod); StepNumber++)
