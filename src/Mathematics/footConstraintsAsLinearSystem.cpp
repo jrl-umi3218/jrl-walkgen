@@ -118,7 +118,7 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
    if(0)
 	   RESETDEBUG4("Constraints-fCSALS.dat");
 
-   m_FullDebug = 3;
+   m_FullDebug = 0;
 
    //TODO 1: How does ODEBUG/RESETDEBUG get activated?
    if(m_FullDebug>2)
