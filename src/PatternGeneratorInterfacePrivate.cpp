@@ -1751,7 +1751,13 @@ namespace PatternGeneratorJRL {
     dy = m_AbsLinearVelocity(1);
     omega = m_AbsAngularVelocity(2);
   }
-
+  
+  void PatternGeneratorInterfacePrivate::setVelocityReference(double x,
+							      double y,
+							      double yaw)
+  {
+    m_ZMPVRQP->setVelReference(x,y,yaw);
+  }
 
   int PatternGeneratorInterfacePrivate::ChangeOnLineStep(double time,
 						  FootAbsolutePosition & aFootAbsolutePosition,

@@ -328,6 +328,18 @@ namespace PatternGeneratorJRL
 
     /*! @} */
 
+    /*! \brief Set velocity reference
+      This method is only supported by Herdt's algorithm.
+      Currently only a 3D speed is supported:
+      \param x: Velocity along the saggital plane.
+      \param y: Velocity along the perpendicular plane.
+      \param yaw: Angular velocity in the x-y plane.
+       */
+    void setVelocityReference(double x,
+			      double y,
+			      double yaw);
+    
+
 
   protected:
 

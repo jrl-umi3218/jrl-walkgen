@@ -206,6 +206,15 @@ void ZMPVelocityReferencedQP::setVelReference(istringstream &strm)
   strm >> RefVel.dYaw; 
 } 
  
+void ZMPVelocityReferencedQP::setVelReference(double x,
+					      double y,
+					      double yaw)
+{
+  RefVel.x = x;
+  RefVel.y = y;
+  RefVel.dYaw = yaw;
+}
+
 void ZMPVelocityReferencedQP::interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions, 
 					      deque<FootAbsolutePosition> &RightFootAbsolutePositions) 
 { 
