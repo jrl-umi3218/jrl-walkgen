@@ -22,7 +22,7 @@ SupportState::SupportState(const double &SamplingPeriod)
 
   SSPeriod = 0.8; 	  //Duration of one step
   DSDuration = 1e9;       //Duration of the DS phase
-  DSSSDuration = 0.4;
+  DSSSDuration = 0.8;
   NbOfStepsSSDS = 2;
 
   m_T = SamplingPeriod;
@@ -96,7 +96,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
       else if(*SupportPhase == 0 && ReferenceGiven == 1)
 	{
 	  *SupportPhase = 1;
-	  *SupportFoot = StartSupportFoot;
+	  //*SupportFoot = CurrentSupportFoot;//StartSupportFoot;
 	  *SupportTimeLimit = Time+pi*m_T + SSPeriod;
 	  *SupportStepsLeft = NbOfStepsSSDS;
 	  StateChanged = 1;
