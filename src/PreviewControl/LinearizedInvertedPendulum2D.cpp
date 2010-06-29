@@ -150,9 +150,14 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMPosition> &COMPositions
 {
   int lCurrentPosition = CurrentPosition;
   // Fill the queues with the interpolated CoM values.
-  for(int lk=0;lk<m_InterpolationInterval;lk++,lCurrentPosition++)
+  
+  int limsup = m_InterpolationInterval < COMPositions.size() ? 
+    m_InterpolationInterval : COMPositions.size();
+  limsup = limsup - lCurrentPosition;
+  
+  for(int lk=0;lk<limsup;lk++,lCurrentPosition++)
     {
-      
+      ODEBUG3("lCurrentPosition: "<< lCurrentPosition);
       COMPosition & aCOMPos = COMPositions[lCurrentPosition];
       double lkSP;
       lkSP = (lk+1) * m_SamplingPeriod;

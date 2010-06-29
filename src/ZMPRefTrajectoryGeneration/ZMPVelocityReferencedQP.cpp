@@ -2806,10 +2806,21 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       FinalLeftFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod)); 
       FinalRightFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod)); 
  
-      int CurrentIndex = (int)(m_TimeBuffer/m_SamplingPeriod)-(int)(ldt/m_SamplingPeriod)-1; 
-      //cout<<"ldt: "<<ldt<<"(int)(ldt/m_SamplingPeriod): "<<(int)(ldt/m_SamplingPeriod)<<"(ldt/m_SamplingPeriod): "<<(ldt/m_SamplingPeriod)<<endl; 
+      int CurrentIndex = (int)(m_TimeBuffer/m_SamplingPeriod)
+	//-(int)(ldt/m_SamplingPeriod)-1 <- This part is supposed to be equal to zero.
+	; 
+      ODEBUG3("m_TimeBuffer: "<< m_TimeBuffer << 
+	      " m_SamplingPeriod: "<< m_SamplingPeriod << 
+	      " ldt: " << ldt);
+      ODEBUG3("ldt: "<<ldt<<
+	     "(int)(ldt/m_SamplingPeriod): "<<(int)(ldt/m_SamplingPeriod)<<
+	     "(ldt/m_SamplingPeriod): "<<(ldt/m_SamplingPeriod)); 
       // update the ZMP and COM positions. 
-      //cout<<"m_TimeBuffer/m_SamplingPeriod: "<<m_TimeBuffer/m_SamplingPeriod<<"(int)(m_TimeBuffer/m_SamplingPeriod): "<<(int)(m_TimeBuffer/m_SamplingPeriod)<<endl; 
+      ODEBUG3("m_TimeBuffer/m_SamplingPeriod: "<<
+	     m_TimeBuffer/m_SamplingPeriod<<
+	     "(int)(m_TimeBuffer/m_SamplingPeriod): "<<
+	     (int)(m_TimeBuffer/m_SamplingPeriod)); 
+
       m_2DLIPM->Interpolation(FinalCOMPositions, 
 			      FinalZMPPositions, 
 			      CurrentIndex, 

@@ -81,11 +81,19 @@ footConstraintsAsLinearSystem::footConstraintsAsLinearSystem(SimplePluginManager
   m_HS = aHS;
   // Read humanoid specificities.
   lRightFoot = m_HS->rightFoot();
-
+  if (lRightFoot==0)
+    {
+      cerr << "Problem with the reading of the right foot"<< endl;
+    }
   lRightFoot->getSoleSize(lRightFootHalfWidth,lRightFootHalfHeight);
   lRightFoot->getAnklePositionInLocalFrame(AnklePosition);
   lZ = AnklePosition[2];
   lLeftFoot = m_HS->leftFoot();
+  if (lRightFoot==0)
+    {
+      cerr << "Problem with the reading of the left foot"<< endl;
+    }
+    
   lLeftFoot->getSoleSize(lLeftFootHalfWidth,lLeftFootHalfHeight);
 
 
