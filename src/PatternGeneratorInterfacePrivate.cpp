@@ -1140,6 +1140,7 @@ namespace PatternGeneratorJRL {
 	m_AlgorithmforZMPCOM = ZMPCOM_HERDT_2010;
 	// m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
+	m_CoMAndFootOnlyStrategy->SetTheLimitOfTheBuffer(0);
 	cout << "Herdt" << endl;
       }
   }

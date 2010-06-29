@@ -1094,7 +1094,6 @@ int main(int argc, char *argv[])
       bool ok = true;
       while(ok)
 	{
-
 	  gettimeofday(&begin,0);
 	  
 	  if (PGIInterface==0)

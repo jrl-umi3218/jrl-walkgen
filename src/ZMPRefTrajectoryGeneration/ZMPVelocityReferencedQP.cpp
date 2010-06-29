@@ -1,8 +1,9 @@
 /* This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of steps following a QP 
-   formulation and a new QP solver as proposed by Dimitrov ICRA 2009. 
+   formulation and a new QP solver as proposed by Herdt Advanced Robotics 2010. 
  
-   Copyright (c) 2009, 
+   Copyright (c) 2010, 
+   Andrei Herdt,
    Olivier Stasse, 
  
    JRL-Japan, CNRS/AIST 
@@ -1428,7 +1429,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
  
   if (0) 
     { 
-      ODEBUG3("localtime: " <<localtime); 
+      ODEBUG("localtime: " <<localtime); 
       ofstream aof; 
  
       char Buffer[1024]; 
@@ -2054,7 +2055,6 @@ void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ZMPPosit
 			       InitRightFootAbsolutePosition); 
  
  
-  ODEBUG3("Dimitrov algo set on"); 
  
  
   buildZMPTrajectoryFromFootTrajectory(LeftFootAbsolutePositions, 
@@ -2809,14 +2809,14 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       int CurrentIndex = (int)(m_TimeBuffer/m_SamplingPeriod)
 	//-(int)(ldt/m_SamplingPeriod)-1 <- This part is supposed to be equal to zero.
 	; 
-      ODEBUG3("m_TimeBuffer: "<< m_TimeBuffer << 
+      ODEBUG("m_TimeBuffer: "<< m_TimeBuffer << 
 	      " m_SamplingPeriod: "<< m_SamplingPeriod << 
 	      " ldt: " << ldt);
-      ODEBUG3("ldt: "<<ldt<<
+      ODEBUG("ldt: "<<ldt<<
 	     "(int)(ldt/m_SamplingPeriod): "<<(int)(ldt/m_SamplingPeriod)<<
 	     "(ldt/m_SamplingPeriod): "<<(ldt/m_SamplingPeriod)); 
       // update the ZMP and COM positions. 
-      ODEBUG3("m_TimeBuffer/m_SamplingPeriod: "<<
+      ODEBUG("m_TimeBuffer/m_SamplingPeriod: "<<
 	     m_TimeBuffer/m_SamplingPeriod<<
 	     "(int)(m_TimeBuffer/m_SamplingPeriod): "<<
 	     (int)(m_TimeBuffer/m_SamplingPeriod)); 

@@ -157,7 +157,7 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMPosition> &COMPositions
   
   for(int lk=0;lk<limsup;lk++,lCurrentPosition++)
     {
-      ODEBUG3("lCurrentPosition: "<< lCurrentPosition);
+      ODEBUG("lCurrentPosition: "<< lCurrentPosition);
       COMPosition & aCOMPos = COMPositions[lCurrentPosition];
       double lkSP;
       lkSP = (lk+1) * m_SamplingPeriod;
