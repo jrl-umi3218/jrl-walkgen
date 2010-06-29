@@ -34,9 +34,20 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   /* Computes information on foot dimension 
      from humanoid specific informations. */
   double lWidth,lHeight,lDepth;
-  m_Foot->getSoleSize(lWidth,lHeight);
+  if (m_Foot!=0)
+    m_Foot->getSoleSize(lWidth,lHeight);
+  else
+    {
+      cerr << "Pb no ref Foot." << endl;
+    }
   vector3d AnklePosition;
-  m_Foot->getAnklePositionInLocalFrame(AnklePosition);
+  if (m_Foot!=0)
+    m_Foot->getAnklePositionInLocalFrame(AnklePosition);
+  else
+    {
+      cerr << "Pb no ref Foot." << endl;
+    }
+
   lDepth = AnklePosition[2];
 
   /*! Compute information for omega. */
@@ -50,8 +61,15 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   m_AnklePositionRight[2] = AnklePosition[2];
   
   /* Compute Left foot coordinates */
-  m_Foot->getAnklePositionInLocalFrame(AnklePosition);
-  m_Foot->getSoleSize(lWidth,lHeight);
+  if (m_Foot!=0)
+    {
+      m_Foot->getAnklePositionInLocalFrame(AnklePosition);
+      m_Foot->getSoleSize(lWidth,lHeight);
+    }
+  else
+    {
+      cerr << "Pb no ref Foot." << endl;
+    }
 
   m_AnklePositionLeft[0] = -lDepth*0.5 + AnklePosition[0];
   m_AnklePositionLeft[1] = -lWidth*0.5 + AnklePosition[1];
