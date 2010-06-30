@@ -94,6 +94,9 @@ void OrientationsPreview::previewOrientations(const double &Time,
 
 	unsigned int StepNumber = 0;
 
+	PreviewedSupportAngles.clear();
+ 
+
 	while(!m_TrunkVelOK)
 	{
 
