@@ -12,6 +12,20 @@
 */
 #include <iostream>
 #include <fstream>
+#include <exception>
+
+#define LTHROW(x) \
+  { \
+    class Exception: public std::exception \
+    { \
+      virtual const char * what() const throw() \
+      {  \
+        return x; \
+      } \
+    }; \
+  \
+  Exception almsg; \
+  throw almsg; }
 
 #define ODEBUG2(x)
 #define ODEBUG3(x) std::cerr << __FILE__ << ":" \

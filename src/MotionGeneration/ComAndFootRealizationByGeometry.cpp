@@ -137,9 +137,17 @@ Initialization()
   vector3d lAnklePositionRight,lAnklePositionLeft;
   CjrlFoot *LeftFoot, *RightFoot;
   LeftFoot = getHumanoidDynamicRobot()->leftFoot();
+  if (LeftFoot==0)
+    LTHROW("No left foot");
+
   RightFoot = getHumanoidDynamicRobot()->rightFoot();
+  if (RightFoot==0)
+    LTHROW("No right foot");
+    
   RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
   LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
+
+
   vector3d RightFootSoleCenter,LeftFootSoleCenter;
   RightFoot->getSoleCenterInLocalFrame(RightFootSoleCenter);
   LeftFoot->getSoleCenterInLocalFrame(LeftFootSoleCenter);
@@ -168,7 +176,9 @@ Initialization()
   // to the VRML ID.
   ODEBUG("Enter 5.0 ");
   // Extract the indexes of the Right leg.
-
+  
+  if (RightFoot->associatedAnkle()==0)
+    LTHROW("No right ankle");
   std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint = 
     RightFoot->associatedAnkle()->jointsFromRootToThis();
   std::vector<CjrlJoint *> ActuatedJoints = 
@@ -562,7 +572,7 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   // For now we assume that the position of the hip is given
   // by the first joint of HRP2Specificities.xml
   // Get the associate pose.
-  //  cout << " " << ((Joint *)aDMB->GetJointFromVRMLID(LeftHipIndex))->getName() << endl;
+  ODEBUG(" " << ((Joint *)aDMB->GetJointFromVRMLID(LeftHipIndex))->getName());
   std::vector<CjrlJoint *> jointVector = aDMB->jointVector();
 
   ODEBUG(jointVector[m_LeftLegIndexInVRML[0]] << " " <<
@@ -786,7 +796,6 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX(,double) & Body_R,
 
   Foot_P = Foot_P + Foot_Shift;
   //  Foot_P(2)-=(aCoMPosition(2) + ToTheHip(2));
-  //cout << "Foot P : " << Foot_P << " Body_P : " << Body_P << " " << lDt << endl;
   ODEBUG("Body_P:" << endl << Body_P);
   ODEBUG("Body_R:" << endl << Body_R);
   ODEBUG("Foot_P" << Foot_P);
