@@ -1605,7 +1605,7 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
   int li=0; 
   double dinterval = T /  m_SamplingPeriod; 
   int interval=(int)dinterval; 
-  bool StartingSequence = true; 
+  //  bool StartingSequence = true; 
  
   MAL_VECTOR_DIM(xk,double,6); 
  
@@ -2807,7 +2807,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       FinalRightFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod)); 
  
       int CurrentIndex = (int)(m_TimeBuffer/m_SamplingPeriod)
-	-(int)(ldt/m_SamplingPeriod)-1 //<- This part is supposed to be equal to zero.
+	-1
+	//	-(int)(ldt/m_SamplingPeriod)-1 //<- This part is supposed to be equal to zero.
 	; 
       ODEBUG("m_TimeBuffer: "<< m_TimeBuffer << 
 	      " m_SamplingPeriod: "<< m_SamplingPeriod << 
