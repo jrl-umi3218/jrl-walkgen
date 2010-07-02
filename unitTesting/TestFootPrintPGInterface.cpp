@@ -882,7 +882,6 @@ int main(int argc, char *argv[])
 
   MAL_VECTOR_DIM(ZMPTarget,double,3);
   
-  
   string inProperty[5]={"TimeStep","ComputeAcceleration",
 			"ComputeBackwardDynamics", "ComputeZMP",
 			"ResetIteration"};
@@ -906,9 +905,10 @@ int main(int argc, char *argv[])
   FootAbsolutePosition LeftFootPosition;
   FootAbsolutePosition RightFootPosition;
 
-  bool DebugConfiguration = true;
+
   bool DebugFGPI = true;
   bool DebugZMP2 = true;
+  bool DebugConfiguration = false;
   unsigned int PGIInterface = 0;
   
   double TimeProfile[200*620];
@@ -981,7 +981,7 @@ int main(int argc, char *argv[])
   
   gettimeofday(&startingtime,0);
   // Number of sequences added.
-  int lNbItMax = 1;
+  unsigned int lNbItMax = 1;
   
   if (TestProfil==PROFIL_PB_FLORENT)
     lNbItMax = 3;

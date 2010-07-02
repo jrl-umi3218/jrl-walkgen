@@ -41,7 +41,9 @@ ENDIF(NOT ${_hrp2Dynamics_FOUND})
 MESSAGE(STATUS "UL: ${${PROJECT_NAME}_test_LDFLAGS}  ${${PROJECT_NAME}_test_CXXFLAGS}")
 
 
-ADD_EXECUTABLE(	TestFootPrintPGInterface TestFootPrintPGInterface.cpp)
+ADD_EXECUTABLE(	TestFootPrintPGInterface 
+  TestFootPrintPGInterfaceData.cpp
+  TestFootPrintPGInterface.cpp)
 SET_TARGET_PROPERTIES(TestFootPrintPGInterface
 	              PROPERTIES
 	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
@@ -69,4 +71,15 @@ SET_TARGET_PROPERTIES(TestRiccatiEquation
 	              PROPERTIES
 	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
 		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}
+)
+
+ADD_EXECUTABLE( TestHerdt2010
+  TestHerdt2010.cpp
+  TestFootPrintPGInterfaceData.cpp
+  CommonTools.cpp
+)
+SET_TARGET_PROPERTIES( TestHerdt2010
+	              PROPERTIES
+	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
+		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}  
 )
