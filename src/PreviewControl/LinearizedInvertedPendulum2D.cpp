@@ -1,7 +1,9 @@
  /* This object simulate a 2D Linearized Inverted Pendulum
     with a control at the jerk level.
 
-   Copyright (c) 2009, 
+   Copyright (c) 2010, 
+   Andrei Herdt 
+   Copyright (c) 2009
    Olivier Stasse,
 
    JRL-Japan, CNRS/AIST
@@ -150,12 +152,8 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMPosition> &COMPositions
 {
   int lCurrentPosition = CurrentPosition;
   // Fill the queues with the interpolated CoM values.
-  
-  int limsup = m_InterpolationInterval < COMPositions.size() ? 
-    m_InterpolationInterval : COMPositions.size();
-  limsup = limsup - lCurrentPosition;
-  
-  for(int lk=0;lk<limsup;lk++,lCurrentPosition++)
+    
+  for(int lk=0;lk<m_InterpolationInterval;lk++,lCurrentPosition++)
     {
       ODEBUG("lCurrentPosition: "<< lCurrentPosition);
       COMPosition & aCOMPos = COMPositions[lCurrentPosition];
