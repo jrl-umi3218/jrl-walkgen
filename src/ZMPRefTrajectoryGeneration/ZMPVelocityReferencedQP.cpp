@@ -639,9 +639,9 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
       char Buffer[1024]; 
       sprintf(Buffer,"OptB.dat"); 
       aof.open(Buffer,ofstream::out); 
-      for( int i=0;i<MAL_MATRIX_NB_ROWS(m_OptB);i++) 
+      for( unsigned int i=0;i<MAL_MATRIX_NB_ROWS(m_OptB);i++) 
 	{ 
-	  for( int j=0;j<MAL_MATRIX_NB_COLS(m_OptB)-1;j++) 
+	  for( unsigned int j=0;j<MAL_MATRIX_NB_COLS(m_OptB)-1;j++) 
 	    aof << m_OptB(i,j) << " "; 
 	  aof << m_OptB(i,MAL_MATRIX_NB_COLS(m_OptB)-1); 
 	  aof << endl; 
@@ -656,9 +656,9 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
       char Buffer[1024]; 
       sprintf(Buffer,"OptC.dat"); 
       aof.open(Buffer,ofstream::out); 
-      for( int i=0;i<MAL_MATRIX_NB_ROWS(m_OptC);i++) 
+      for( unsigned int i=0;i<MAL_MATRIX_NB_ROWS(m_OptC);i++) 
 	{ 
-	  for( int j=0;j<MAL_MATRIX_NB_COLS(m_OptC)-1;j++) 
+	  for( unsigned int j=0;j<MAL_MATRIX_NB_COLS(m_OptC)-1;j++) 
 	    aof << m_OptC(i,j) << " "; 
 	  aof << m_OptC(i,MAL_MATRIX_NB_COLS(m_OptC)-1); 
 	  aof << endl; 
@@ -1241,7 +1241,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
  
       // For each constraint. 
  
-      for(int j=0;j<MAL_MATRIX_NB_ROWS(LCIFF_it->D);j++) 
+      for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(LCIFF_it->D);j++) 
 	{ 
 	  // cout<<" D("<<j<<",0): " <<(LCIFF_it)->D(j,0); 
 	  // cout<<" D("<<j<<",1): " <<(LCIFF_it)->D(j,1); 
@@ -1341,7 +1341,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
  
  
       // For each constraint. 
-      for(int j=0;j<MAL_MATRIX_NB_ROWS(LCIFF_it->D);j++) 
+      for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(LCIFF_it->D);j++) 
 	{ 
 	  // cout<<" D("<<j<<",0): " <<(LCIFF_it)->D(j,0); 
 	  // cout<<" D("<<j<<",1): " <<(LCIFF_it)->D(j,1); 
@@ -2807,7 +2807,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       FinalRightFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod)); 
  
       int CurrentIndex = (int)(m_TimeBuffer/m_SamplingPeriod)
-	//-(int)(ldt/m_SamplingPeriod)-1 <- This part is supposed to be equal to zero.
+	-(int)(ldt/m_SamplingPeriod)-1 //<- This part is supposed to be equal to zero.
 	; 
       ODEBUG("m_TimeBuffer: "<< m_TimeBuffer << 
 	      " m_SamplingPeriod: "<< m_SamplingPeriod << 
