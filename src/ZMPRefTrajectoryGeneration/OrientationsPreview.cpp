@@ -16,6 +16,8 @@
 using namespace PatternGeneratorJRL;
 using namespace std;
 
+const double OrientationsPreview::M_EPS = 0.00000001;
+
 OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
 		const unsigned int & SamplingsPreviewed, const double & SSPeriod,
 		 CjrlJoint *aRootJoint)
