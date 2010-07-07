@@ -17,12 +17,12 @@
 
 
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
-#include <Mathematics/footConstraintsAsLinearSystem.h>
+#include <Mathematics/FootConstraintsAsLinearSystemForVelRef.h>
 #include <Mathematics/OptCholesky.h>
 /* #include <Mathematics/PLDPSolver.h> */
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 #include <PreviewControl/SupportState.h>
-#include <FootTrajectoryGeneration/footTrajectoryGenerationStandard.h>
+#include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
 
 
@@ -351,9 +351,9 @@ namespace PatternGeneratorJRL
     /*! \brief Object creating Linear inequalities constraints 
       based on the foot position. Those constraints are *NOT* the
       one put in the QP, but they are a necessary intermediate step. */
-    footConstraintsAsLinearSystem * m_fCALS;
+    FootConstraintsAsLinearSystemForVelRef * m_fCALS;
       
-    footTrajectoryGenerationStandard * m_FTGS;
+    FootTrajectoryGenerationStandard * m_FTGS;
 
     
     

@@ -13,8 +13,6 @@
 SET(libwpg_src
 	./FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp 
 	./FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp 
-	./FootTrajectoryGeneration/footTrajectoryGenerationAbstract.cpp 
-	./FootTrajectoryGeneration/footTrajectoryGenerationStandard.cpp 
 	./FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp 
 	./FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp 
 	./GlobalStrategyManagers/CoMAndFootOnlyStrategy.cpp 
@@ -23,7 +21,7 @@ SET(libwpg_src
 	./Mathematics/AnalyticalZMPCOGTrajectory.cpp 
 	./Mathematics/ConvexHull.cpp 
 	./Mathematics/FootConstraintsAsLinearSystem.cpp
-	./Mathematics/footConstraintsAsLinearSystem.cpp
+	./Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
 	./Mathematics/OptCholesky.cpp
 	./Mathematics/Polynome.cpp 
 	./Mathematics/PolynomeFoot.cpp 

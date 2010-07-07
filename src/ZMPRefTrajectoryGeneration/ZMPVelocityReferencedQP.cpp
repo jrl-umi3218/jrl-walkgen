@@ -64,13 +64,13 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   /*! For computing the stability constraints from the feet positions. */ 
   m_ConstraintOnX = 0.04; 
   m_ConstraintOnY = 0.04; 
-  m_fCALS = new footConstraintsAsLinearSystem(lSPM,aHS,m_ConstraintOnX,m_ConstraintOnY); 
+  m_fCALS = new FootConstraintsAsLinearSystemForVelRef(lSPM,aHS,m_ConstraintOnX,m_ConstraintOnY); 
  
   m_StartTime = 0.0; 
   m_UpperTimeLimitToUpdate = 0.0; 
   m_TimeBuffer = 0.040; 
  
-  m_FTGS = new footTrajectoryGenerationStandard(lSPM,aHS->leftFoot()); 
+  m_FTGS = new FootTrajectoryGenerationStandard(lSPM,aHS->leftFoot()); 
   m_FTGS->InitializeInternalDataStructures(); 
  
   /* Initialize the FSM */ 
@@ -1611,7 +1611,7 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
  
   //ODEBUG3("0.0 " << QueueOfLConstraintInequalities.back().EndingTime-	N*T << " " 
   //		<< " T: " << T << " N: " << N << " interval " << interval); 
-  int NumberOfRemovedConstraints =0; 
+  //  int NumberOfRemovedConstraints =0; 
  
   //Andremize 
   //(Re)initialize the LIPM 
@@ -2070,7 +2070,7 @@ void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ZMPPosit
     { 
       ofstream aof; 
       aof.open("DebugDimitrovZMP.dat",ofstream::out); 
-      for( int i=0;i<ZMPPositions.size();i++) 
+      for( unsigned int i=0;i<ZMPPositions.size();i++) 
 	{ 
 	  aof << ZMPPositions[i].px << " " << ZMPPositions[i].py << endl; 
 	} 
@@ -2152,7 +2152,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       aoffeet.close(); 
     } 
  
-  for( int i=0;i<FinalZMPPositions.size();i++) 
+  for( unsigned int i=0;i<FinalZMPPositions.size();i++) 
     { 
  
       // Smooth ramp 
@@ -2598,11 +2598,11 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0; 
       struct timeval start,end; 
       int li=0; 
-      double dinterval = m_QP_T /  m_SamplingPeriod; 
-      int interval=(int)dinterval; 
-      bool StartingSequence = true; 
+      //      double dinterval = m_QP_T /  m_SamplingPeriod; 
+      //int interval=(int)dinterval; 
+      //bool StartingSequence = true; 
  
-      int NumberOfRemovedConstraints =0; 
+      //int NumberOfRemovedConstraints =0; 
  
       //----------"Real-time" loop--------- 
       // 
@@ -2921,28 +2921,28 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	      LastSwingFootPosition = FinalLeftFootAbsolutePositions[CurrentIndex]; 
 	    } 
 	  //Set parameters for current polynomial 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::X_AXIS, 
+	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::X_AXIS, 
 						    ModulatedSingleSupportTime-InterpolationTimePassed,m_FPx, 
 						    LastSwingFootPosition.x, 
 						    LastSwingFootPosition.dx); 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::Y_AXIS, 
+	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Y_AXIS, 
 						    ModulatedSingleSupportTime-InterpolationTimePassed,m_FPy, 
 						    LastSwingFootPosition.y, 
 						    LastSwingFootPosition.dy); 
  
 	  if(m_Support->StateChanged==1) 
-	    m_FTGS->SetParameters(footTrajectoryGenerationStandard::Z_AXIS, m_Support->SSPeriod-m_QP_T,StepHeight); 
+	    m_FTGS->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_Support->SSPeriod-m_QP_T,StepHeight); 
  
-	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::THETA_AXIS, 
+	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::THETA_AXIS, 
 						    ModulatedSingleSupportTime-InterpolationTimePassed,  
 						    m_PreviewedSupportAngles[0]*180.0/M_PI, 
 						    LastSwingFootPosition.theta, 
 						    LastSwingFootPosition.dtheta); 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::OMEGA_AXIS, 
+	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA_AXIS, 
 						    ModulatedSingleSupportTime-InterpolationTimePassed,0.0*180.0/M_PI, 
 						    LastSwingFootPosition.omega, 
 						    LastSwingFootPosition.domega); 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::OMEGA2_AXIS, 
+	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA2_AXIS, 
 						    ModulatedSingleSupportTime-InterpolationTimePassed,2*0.0*180.0/M_PI, 
 						    LastSwingFootPosition.omega2, 
 						    LastSwingFootPosition.domega2); 
@@ -2956,8 +2956,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
  
 	  double tT; 
 	  double Theta = m_TrunkState.yaw[0]; 
-	  double dTheta = m_TrunkState.yaw[1]; 
-	  double ddTheta = m_TrunkState.yaw[2]; 
+	  //double dTheta = m_TrunkState.yaw[1]; 
+	  //double ddTheta = m_TrunkState.yaw[2]; 
 	  int StepType = 1; 
  
 	  //Interpolate the 
