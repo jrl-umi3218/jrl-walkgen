@@ -1553,20 +1553,20 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
   MAL_VECTOR_RESIZE(ZMPRef,2*N); 
   MAL_VECTOR_RESIZE(VRef,2*N); 
  
-  int m; 
-  int me; 
-  int mmax; 
-  int n; 
-  int nmax; // Size of the matrix to compute the cost function. 
-  int mnn; 
+  int m(0); 
+  int me(0); 
+  int mmax(0); 
+  int n(0); 
+  int nmax(0); // Size of the matrix to compute the cost function. 
+  int mnn(0); 
  
   double Eps=1e-8; 
   //double *U = (double *)malloc( sizeof(double)*mnn); // Returns the Lagrange multipliers.; 
  
   int iout=0; 
-  int ifail; 
+  int ifail(0); 
   int iprint=1; 
-  int lwar; 
+  int lwar(0); 
   // double *war= (double *)malloc(sizeof(double)*lwar); 
   int liwar = n; // 
   // int *iwar = new int[liwar]; // The Cholesky decomposition is done internally. 
