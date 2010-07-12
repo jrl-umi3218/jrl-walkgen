@@ -83,3 +83,20 @@ SET_TARGET_PROPERTIES( TestHerdt2010
 	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
 		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}  
 )
+
+# Add examples
+
+SET(${PROJECT_NAME}_EXAMPLES 
+  TestFootPrintPGInterfaceData.cpp
+  TestFootPrintPGInterfaceData.h
+  TestFootPrintPGInterface.cpp
+  TestHerdt2010.cpp
+  CommonTools.cpp
+  CommonTools.h
+  examples.CMakeList
+  )
+
+INSTALL(FILES ${${PROJECT_NAME}_EXAMPLES}
+  DESTINATION examples/${PROJECT_NAME}/
+  PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE )
+
