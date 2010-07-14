@@ -350,7 +350,7 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 
       //Andremize: theta = 0 as for now
 
-      if(Support->StateChanged && Support->StepNumber>0)
+      if(Support->m_StateChanged && Support->StepNumber>0)
 	{
 	  s_t = sin(PreviewedSupportAngles[Support->StepNumber-1]);
 	  c_t = cos(PreviewedSupportAngles[Support->StepNumber-1]);
@@ -437,7 +437,7 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 
 
       //foot positionning constraints
-      if(Support->StateChanged && Support->StepNumber>0)
+      if(Support->m_StateChanged && Support->StepNumber>0)
 	{
 	  //Andremize: theta == 0
 	  lx = 0.0;

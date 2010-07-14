@@ -2779,7 +2779,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 						     m_Pb.DS, 
 						     MAL_RET_VECTOR_DATABLOCK(xk),m_Pb.X, 
 						     NumberOfRemovedConstraints, NbRemovedFootCstr,
-						     StartingSequence, (unsigned int)m_Support->StepNumber, 
+						     StartingSequence, 
+						     (unsigned int)m_Support->StepNumber, 
 						     CurrentStateChanged, time); 
 	  StartingSequence = false; 
 	  //NumberOfRemovedConstraints = NextNumberOfRemovedConstraints; 
