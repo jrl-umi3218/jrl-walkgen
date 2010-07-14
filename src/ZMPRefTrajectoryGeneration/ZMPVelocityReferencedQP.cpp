@@ -1528,7 +1528,7 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
 { 
  
  
-  int NbOfConstraints; // Nb of constraints are not known in advance 
+  int NbOfConstraints=0; // Nb of constraints are not known in advance 
  
  
  
@@ -2613,7 +2613,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
  
   if(time + 0.00001 > m_UpperTimeLimitToUpdate) 
     { 
-      int NbOfConstraints; // Nb of constraints are not known in advance 
+      int NbOfConstraints=0; // Nb of constraints are not known in advance 
  
       MAL_VECTOR_DIM(xk,double,6); 
  
@@ -2627,10 +2627,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       // pre compute the matrices needed for the optimization. 
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0; 
       struct timeval start,end; 
-      int li=0; 
+      //int li=0; 
       //      double dinterval = m_QP_T /  m_SamplingPeriod; 
       //int interval=(int)dinterval; 
-      //bool StartingSequence = true; 
+      bool StartingSequence = true; 
  
       //int NumberOfRemovedConstraints =0; 
  
@@ -2974,7 +2974,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 						    LastSwingFootPosition.dy); 
  
 	  if(m_Support->m_StateChanged==true) 
-	    m_FTGS->SetParameters(footTrajectoryGenerationStandard::Z_AXIS, m_Support->SSPeriod-m_QP_T,StepHeight); 
+	    m_FTGS->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_Support->SSPeriod-m_QP_T,StepHeight); 
  
 	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::THETA_AXIS, 
 						    ModulatedSingleSupportTime-InterpolationTimePassed,  
