@@ -28,3 +28,4 @@ plugin/walkpluginJRLSK.cc
 build/
 ,svn-log
 +committed/
+*~
