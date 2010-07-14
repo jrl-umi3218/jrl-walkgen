@@ -18,12 +18,10 @@ using namespace std;
 
 SupportState::SupportState(const double &SamplingPeriod)
 {
-  // printf("Entered SupportState \n");
-
   SSPeriod = 0.8; 	  //Duration of one step
   DSDuration = 1e9;       //Duration of the DS phase
   DSSSDuration = 0.8;
-  NbOfStepsSSDS = 2;
+  NbOfStepsSSDS = 200;
 
   m_T = SamplingPeriod;
   //Initial current state
@@ -34,14 +32,13 @@ SupportState::SupportState(const double &SamplingPeriod)
   StartSupportFoot = 1;
 
   eps = 0.00000001;
-  StateChanged = 0;
+  m_StateChanged = false;
 
-  s_FullDebug = 0;
+  m_FullDebug = 0;
 
   // RESETDEBUG4("DebugSupportState.dat");
   // ofstream aof("SupportStates.dat");
 
-  // printf("Leaving SupportState \n");
 }
  
 
@@ -52,9 +49,8 @@ SupportState::~SupportState()
 void SupportState::setSupportState(const double &Time, const int &pi,  const ReferenceAbsoluteVelocity & RefVel)
 
 {
-  // printf("Inside setSupportState \n");
 
-  StateChanged = 0;
+  m_StateChanged = false;
 
   if(pi==0) {
     SupportPhase = &CurrentSupportPhase;
@@ -90,7 +86,7 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
 	{
 	  *SupportPhase = 0;	
 	  *SupportTimeLimit = Time+pi*m_T + DSDuration;
-	  StateChanged = 1;
+	  m_StateChanged = true;
 	}
       //DS->SS
       else if(*SupportPhase == 0 && ReferenceGiven == 1)
@@ -99,13 +95,13 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
 	  //*SupportFoot = CurrentSupportFoot;//StartSupportFoot;
 	  *SupportTimeLimit = Time+pi*m_T + SSPeriod;
 	  *SupportStepsLeft = NbOfStepsSSDS;
-	  StateChanged = 1;
+	  m_StateChanged = true;
 	}
       //SS->SS
       else if(*SupportPhase == 1 && *SupportStepsLeft>0 || *SupportStepsLeft==0 && ReferenceGiven == 1)
 	{
 	  *SupportFoot = -1**SupportFoot;
-	  StateChanged = 1;
+	  m_StateChanged = true;
 	  *SupportTimeLimit = Time+pi*m_T + SSPeriod;
 	  StepNumber++;
 	  SSSS = 1;
@@ -117,30 +113,29 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
 
   if(pi==0)
     initializePreviewedState();
+
   
-  // if(s_FullDebug>0)
-  //   {
-  //     ofstream aof;
-  //     aof.open("SupportStates.dat", ios::app);
-  //     aof << "Time: "<<Time<<" PrwTime: "<<Time+pi*m_T<<" CSP: "<<CurrentSupportPhase
-  // 	  <<" CSF: "<<CurrentSupportFoot<<" CTL: "<<CurrentTimeLimit
-  // 	  <<" CSL: "<<CurrentStepsLeft<<" PrwSP: "<<PrwSupportPhase
-  // 	  <<" PrwSF: "<<PrwSupportFoot<<" PrwTL: "<<PrwTimeLimit
-  // 	  <<" PrwSL: "<<PrwStepsLeft<<" *SF: "<<*SupportFoot
-  // 	  <<" *SSL: "<<*SupportStepsLeft<<" SN: "<<StepNumber;
-  //     aof << endl;
-  //     aof.close();
-  //   }
+  if(m_FullDebug>0)
+    {
+      ofstream aof;
+      aof.open("SupportStates.dat", ios::app);
+      aof << "Time: "<<Time<<" PrwTime: "<<Time+pi*m_T<<" CSP: "<<CurrentSupportPhase
+  	  <<" CSF: "<<CurrentSupportFoot<<" CTL: "<<CurrentTimeLimit
+  	  <<" CSL: "<<CurrentStepsLeft<<" PrwSP: "<<PrwSupportPhase
+  	  <<" PrwSF: "<<PrwSupportFoot<<" PrwTL: "<<PrwTimeLimit
+  	  <<" PrwSL: "<<PrwStepsLeft<<" *SF: "<<*SupportFoot
+  	  <<" *SSL: "<<*SupportStepsLeft<<" SN: "<<StepNumber;
+      aof << endl;
+      aof.close();
+    }
 
  // ODEBUG4( " " , "DebugSupportState.dat");
 
-  // printf("Leaving setSupportState \n");
 }
 
 //Andremize: initialization only necessary when state changes
 void SupportState::initializePreviewedState()
 { 
-  // printf("Inside initializePreviewedState \n");
   PrwSupportPhase = CurrentSupportPhase;
   PrwSupportFoot = CurrentSupportFoot;
   PrwStepsLeft = CurrentStepsLeft;

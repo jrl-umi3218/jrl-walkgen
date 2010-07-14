@@ -63,6 +63,7 @@ void OptCholesky::SetA(double *aA,
   m_NbOfConstraints = lNbOfConstraints;
 }
 
+
 int OptCholesky::AddActiveConstraints(vector<unsigned int> & lConstraints)
 {
   int r=0;
@@ -127,7 +128,7 @@ int OptCholesky::UpdateCholeskyMatrixNormal()
       /* A value M(i,j) is computed once,
 	 directly from the matrix A */      
       double *Arow_i = PointerArow_i;
-      double *Arow_j = m_A + m_CardU* m_SetActiveConstraints[lj];
+      double *Arow_j = m_A + m_CardU * m_SetActiveConstraints[lj];
       Mij=0.0;
       for(int lk=0;lk<(int)m_CardU;lk++)
 	{

@@ -299,14 +299,15 @@ int footConstraintsAsLinearSystem::computeLinearSystem(vector<CH_Point> aVecOfPo
 
 
 int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
-		deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-		deque<LinearConstraintInequalityFreeFeet_t> &
-		QueueOfLConstraintInequalitiesFreeFeet,
-		deque<LinearConstraintInequalityFreeFeet_t> &
-		QueueOfFeetPosInequalities,
-		ReferenceAbsoluteVelocity & RefVel,
-		double StartingTime, double m_QP_N,
-		SupportState * Support, deque<double> &PreviewedSupportAngles)
+								     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+								     deque<LinearConstraintInequalityFreeFeet_t> &
+								     QueueOfLConstraintInequalitiesFreeFeet,
+								     deque<LinearConstraintInequalityFreeFeet_t> &
+								     QueueOfFeetPosInequalities,
+								     ReferenceAbsoluteVelocity & RefVel,
+								     double StartingTime, double m_QP_N,
+								     SupportState * Support, deque<double> &PreviewedSupportAngles,
+								     int & NbOfConstraints)
 {
 
 	//  printf("Entered buildLinearConstraintInequalities \n");
@@ -367,7 +368,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque< Foot
 
 		//Andremize: theta = 0 as for now
 
-		if(Support->StateChanged && Support->StepNumber>0)
+		if(Support->m_StateChanged && Support->StepNumber>0)
 		{
 			s_t = sin(PreviewedSupportAngles[Support->StepNumber-1]);
 			c_t = cos(PreviewedSupportAngles[Support->StepNumber-1]);
@@ -454,7 +455,7 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque< Foot
 
 
 		//foot positionning constraints
-		if(Support->StateChanged && Support->StepNumber>0)
+		if(Support->m_StateChanged && Support->StepNumber>0)
 		{
 			//Andremize: theta == 0
 			lx = 0.0;
@@ -533,6 +534,31 @@ int footConstraintsAsLinearSystem::buildLinearConstraintInequalities(deque< Foot
 		//aLCI->StartingTime = LeftFootAbsolutePositions[i].time;//???What to do
 
 		QueueOfLConstraintInequalitiesFreeFeet.push_back(aLCI);
+
+ 
+		//Determine the number of constraints 
+		deque<LinearConstraintInequalityFreeFeet_t>::iterator LCIFF_it;
+		LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin(); 
+		int IndexConstraint=0; 
+		for( int i=0;i<m_QP_N;i++) 
+		  { 
+		    if (LCIFF_it==QueueOfLConstraintInequalitiesFreeFeet.end()) 
+		      { 
+			break; 
+		      } 
+		    IndexConstraint += MAL_MATRIX_NB_ROWS(LCIFF_it->D); 
+		    LCIFF_it++; 
+		  } 
+		
+		if(Support->StepNumber>0) 
+		  { 
+		    LCIFF_it = QueueOfFeetPosInequalities.begin(); 
+		    
+		    IndexConstraint += double(Support->StepNumber)*  MAL_MATRIX_NB_ROWS(LCIFF_it->D); 
+		  } 
+		
+		NbOfConstraints = IndexConstraint; 
+
 
 	}
 

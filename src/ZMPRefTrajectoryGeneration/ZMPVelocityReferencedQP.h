@@ -19,8 +19,8 @@
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <Mathematics/footConstraintsAsLinearSystem.h>
 #include <Mathematics/OptCholesky.h>
-/* #include <Mathematics/PLDPSolver.h> */
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
+#include <Mathematics/PLDPSolverHerdt.h> 
 #include <PreviewControl/SupportState.h>
 #include <FootTrajectoryGeneration/footTrajectoryGenerationStandard.h>
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
@@ -144,33 +144,23 @@ namespace PatternGeneratorJRL
       
     void initFeet();
     
-    /*! Build the necessary matrices for the QP problem under linear inequality constraints. */
-    /* int BuildConstraintMatrices(double * &Px, double * &DPu, */
-    /* 				unsigned N, double T, */
-    /* 				double StartingTime, */
-    /* 				deque<LinearConstraintInequality_t *>  */
-    /* 				& QueueOfLConstraintInequalities, */
-    /* 				double Com_Height, */
-    /* 				unsigned int &NbOfConstraints, */
-    /* 				MAL_VECTOR(&xk,double), */
-    /* 				MAL_VECTOR(&ZMPRef,double), */
-    /* 				unsigned int &NextNumberOfRemovedConstraints); */
-
 
     int buildConstraintMatrices(double * &DS, double * &DU,
-    		int N, double T,
-    		double StartingTime,
-    		deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfLConstraintInequalitiesFreeFeet,
-    		deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfFeetPosInequalities,
-    		deque<SupportFeet_t>    & QueueOfSupportFeet,
-    		double Com_Height,
-    		 int &NbOfConstraints,
-    		MAL_VECTOR(&xk,double));
+				double T,
+				double StartingTime,
+				deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfLConstraintInequalitiesFreeFeet,
+				deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfFeetPosInequalities,
+				deque<SupportFeet_t>    & QueueOfSupportFeet,
+				double Com_Height,
+				int NbOfConstraints,
+				MAL_VECTOR(&xk,double));
 
 
 
     /*! \brief Build the constant part of the constraint matrices. */
     int BuildingConstantPartOfConstraintMatrices();
+
+    int buildConstraintMatricesPLDPHerdt();
 
     /*! This method helps to build a linear system for constraining the ZMP. */
     int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
@@ -320,6 +310,7 @@ namespace PatternGeneratorJRL
     static const unsigned int QLD=0;
     static const unsigned int QLDANDLQ=1;
     static const unsigned int PLDP=2;
+    static const unsigned int PLDPHerdt = 3;
 
     unsigned int Online;//Andremize: Shall I keep it?
 
@@ -467,14 +458,18 @@ namespace PatternGeneratorJRL
     /*! \brief Fast formulations mode. */
     unsigned int m_FastFormulationMode;
     
-    /* /\*! Primal Least square Distance Problem solver *\/ */
-    /* Optimization::Solver::PLDPSolver * m_PLDPSolverHerdt; */
+    //! Primal Least square Distance Problem solver *\/ */
+    Optimization::Solver::PLDPSolverHerdt * m_PLDPSolverHerdt; 
 
     void initializeProblem();
 
+    void computeCholeskyOfQ(double * OptA);
+
     /* void setProblem(int NbOfConstraints, int NbOfEqConstraints, int &CriteriaToMaximize, MAL_VECTOR(& xk,double)); */
-    void setProblem(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, deque<SupportFeet_t> & QueueOfSupportFeet,
-    		int NbOfConstraints, int NbOfEqConstraints, int & CriteriaToMaximize, MAL_VECTOR(& xk,double), double time);
+    void computeObjective(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, 
+		    deque<SupportFeet_t> & QueueOfSupportFeet,
+		    int NbOfConstraints, int NbOfEqConstraints, 
+		    int & CriteriaToMaximize, MAL_VECTOR(& xk,double), double time);
     int dumpProblem(double * Q,
 		    double * D, 
 		    double * Pu,
@@ -487,7 +482,7 @@ namespace PatternGeneratorJRL
 		    );
 
     /*! Vector of similar constraints. */
-    vector<int> m_SimilarConstraints;
+    //vector<int> m_SimilarConstraints;
   };
 };
 

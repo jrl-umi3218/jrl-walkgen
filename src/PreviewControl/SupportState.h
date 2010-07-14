@@ -52,7 +52,7 @@ namespace PatternGeneratorJRL
 
     double  PrwTimeLimit;
 
-    int StateChanged;
+    bool m_StateChanged;
 
     int StepNumber;
 
@@ -112,7 +112,7 @@ namespace PatternGeneratorJRL
 
     int ReferenceGiven;
 
-    int s_FullDebug;
+    int m_FullDebug;
 
     /*! \name Getter of variables
       @{
