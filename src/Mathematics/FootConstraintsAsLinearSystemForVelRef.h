@@ -37,18 +37,18 @@ namespace PatternGeneratorJRL
    It handles a stack of constraint on a sliding mode 
    for QP solving.
    */
-  class  footConstraintsAsLinearSystem: public SimplePlugin
+  class  FootConstraintsAsLinearSystemForVelRef: public SimplePlugin
     {
     public:
 
       /*! Constructor */
-      footConstraintsAsLinearSystem(SimplePluginManager *aSPM, 
+      FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM, 
 				    CjrlHumanoidDynamicRobot *aHS,
 				    double ConstraintOnX,
 				    double ConstraintOnY);
 
       /*! Destructor */
-      ~footConstraintsAsLinearSystem();
+      ~FootConstraintsAsLinearSystemForVelRef();
 
       /*! Compute the linear system \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the 
 	set of points specified by aVecOfPoints. aVecOfPoints is supposed to represent

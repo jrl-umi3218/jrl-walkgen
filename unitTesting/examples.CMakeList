@@ -1,0 +1,96 @@
+# Olivier Stasse,  JRL, CNRS/AIST
+# Creation: 11/07/2010
+# History:
+#
+# Copyright CNRS/AIST
+
+cmake_minimum_required(VERSION 2.6)
+
+enable_language(CXX)
+
+ENABLE_TESTING()
+
+# Debug mode for cmake.
+SET(CMAKE_VERBOSE_MAKEFILE ON)
+SET(PROJECT_NAME "wpg-examples")
+
+project(${PROJECT_NAME})
+
+# Check for required packages
+# ---------------------------
+INCLUDE(FindPkgConfig)
+
+
+# --- MATRIXABSTRACTLAYER -------------------------------------
+SET(_MatrixAbstractLayer_FOUND 0)
+SET(_MatrixAbstractLayer_REQUIRED "MatrixAbstractLayer >= 1.8.0")
+PKG_CHECK_MODULES(_MatrixAbstractLayer REQUIRED ${_MatrixAbstractLayer_REQUIRED})
+
+IF(NOT ${_MatrixAbstractLayer_FOUND})
+  MESSAGE(FATAL_ERROR "Check that package MatrixAbstractLayer is installed in a directory pointed out by PKG_CONFIG_PATH.")
+ENDIF(NOT ${_MatrixAbstractLayer_FOUND})
+
+SET(${PROJECT_NAME}_CXX_FLAGS "${${PROJECT_NAME}_CXX_FLAGS} ${_MatrixAbstractLayer_CFLAGS}") 
+SET(${PROJECT_NAME}_LINK_FLAGS "${${PROJECT_NAME}_LINK_FLAGS} ${_MatrixAbstractLayer_LDFLAGS}")
+
+# --- DYNAMICSJRLJAPAN ---------------------------------------
+SET(_dynamicsJRLJapan_FOUND 0)
+SET(_dynamicsJRLJapan_REQUIRED "dynamicsJRLJapan >= 1.16.1")
+PKG_CHECK_MODULES(_dynamicsJRLJapan ${_dynamicsJRLJapan_REQUIRED})
+
+SET(${PROJECT_NAME}_CXX_FLAGS "${${PROJECT_NAME}_CXX_FLAGS} ${_dynamicsJRLJapan_CFLAGS}") 
+SET(${PROJECT_NAME}_LINK_FLAGS "${${PROJECT_NAME}_LINK_FLAGS} ${_dynamicsJRLJapan_LDFLAGS}")
+
+# --- WALKGENJRL ---------------------------------------
+SET(_walkGenJrl_FOUND 0)
+SET(_walkGenJrl_REQUIRED "walkGenJrl >= 1.16.1")
+PKG_CHECK_MODULES(_walkGenJrl ${_walkGenJrl_REQUIRED})
+
+SET(${PROJECT_NAME}_CXX_FLAGS "${${PROJECT_NAME}_CXX_FLAGS} ${_walkGenJrl_CFLAGS}") 
+SET(${PROJECT_NAME}_LINK_FLAGS "${${PROJECT_NAME}_LINK_FLAGS} ${_walkGenJrl_LDFLAGS}")
+
+# -------------------------------------------------------------------
+# --- UTILS ---------------------------------------------------------
+# -------------------------------------------------------------------
+MACRO(LIST2STRING _VAR_ARG _LIST_ARG)
+  SET(${_VAR_ARG})
+  SET(_FIRST_STEP 1)
+  FOREACH(_ITEM ${ARGV})
+     IF(_FIRST_STEP)
+	SET(_FIRST_STEP 0)
+     ELSE(_FIRST_STEP)
+           SET (${_VAR_ARG} "${${_VAR_ARG}} ${_ITEM}")
+     ENDIF(_FIRST_STEP)
+  ENDFOREACH(_ITEM)
+ENDMACRO(LIST2STRING)
+
+LIST2STRING( PCF ${${PROJECT_NAME}_CXX_FLAGS})
+LIST2STRING( PLF ${${PROJECT_NAME}_LINK_FLAGS})
+
+MESSAGE(STATUS "Compilation time: ${${PROJECT_NAME}_CXX_FLAGS}")
+MESSAGE(STATUS "Linking time: ${PLF}")  
+
+# --- TARGETS
+ADD_EXECUTABLE( TestHerdt2010
+  TestHerdt2010.cpp
+  TestFootPrintPGInterfaceData.cpp
+  CommonTools.cpp
+  CommonTools.h
+)
+SET_TARGET_PROPERTIES( TestHerdt2010
+	              PROPERTIES
+	              COMPILE_FLAGS ${PCF}
+		      LINK_FLAGS ${PLF}  
+)
+
+ADD_EXECUTABLE(	TestFootPrintPGInterface 
+  TestFootPrintPGInterfaceData.cpp
+  TestFootPrintPGInterface.cpp)
+
+SET_TARGET_PROPERTIES(TestFootPrintPGInterface
+	              PROPERTIES
+	              COMPILE_FLAGS ${PCF}
+		      LINK_FLAGS ${PLF}
+)
+
+

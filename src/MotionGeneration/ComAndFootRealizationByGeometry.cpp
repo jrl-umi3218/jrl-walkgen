@@ -465,7 +465,7 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   // Initialise the left foot position.
   lFootPose = getHumanoidDynamicRobot()->leftFoot()->associatedAnkle()->currentTransformation();
   ODEBUG( "Left Foot Ankle Pose: " 
-	  << lFootPose);
+	   << lFootPose);
 
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,0) = 0.5 * (MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,0,3) +
 						      MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,0) );     
@@ -495,8 +495,8 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   InitLeftFootPosition.theta = 0.0;
 
   ODEBUG("InitLeftFootPosition : " << InitLeftFootPosition.x 
-	 << " " << InitLeftFootPosition.y 
-	 << " " << InitLeftFootPosition.z );
+	  << " " << InitLeftFootPosition.y 
+	  << " " << InitLeftFootPosition.z );
   // We assume that the foot is flat on the floor...
   // Thus
   // lFootPose(0:2,0:2)=
@@ -572,7 +572,6 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   // For now we assume that the position of the hip is given
   // by the first joint of HRP2Specificities.xml
   // Get the associate pose.
-  ODEBUG(" " << ((Joint *)aDMB->GetJointFromVRMLID(LeftHipIndex))->getName());
   std::vector<CjrlJoint *> jointVector = aDMB->jointVector();
 
   ODEBUG(jointVector[m_LeftLegIndexInVRML[0]] << " " <<

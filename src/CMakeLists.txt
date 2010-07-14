@@ -13,8 +13,6 @@
 SET(libwpg_src
 	./FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp 
 	./FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp 
-	./FootTrajectoryGeneration/footTrajectoryGenerationAbstract.cpp 
-	./FootTrajectoryGeneration/footTrajectoryGenerationStandard.cpp 
 	./FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp 
 	./FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp 
 	./GlobalStrategyManagers/CoMAndFootOnlyStrategy.cpp 
@@ -23,7 +21,7 @@ SET(libwpg_src
 	./Mathematics/AnalyticalZMPCOGTrajectory.cpp 
 	./Mathematics/ConvexHull.cpp 
 	./Mathematics/FootConstraintsAsLinearSystem.cpp
-	./Mathematics/footConstraintsAsLinearSystem.cpp
+	./Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
 	./Mathematics/OptCholesky.cpp
 	./Mathematics/Polynome.cpp 
 	./Mathematics/PolynomeFoot.cpp 
@@ -92,7 +90,7 @@ SET_TARGET_PROPERTIES(${PROJECT_NAME_LIB}
       		      PROPERTIES 
 		      VERSION ${PROJECT_VERSION}
 		      SOVERSION ${PROJECT_VERSION}
-		      INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib
+		      INSTALL_RPATH lib
 		      INSTALL_RPATH_USE_LINK_PATH TRUE
 		      )
 
@@ -117,7 +115,7 @@ SET(${PROJECT_NAME}_HEADERS ${libwpg_headers})
 # -------------
 MESSAGE(STATUS "Source directory: ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}")
 INSTALL(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME} 
-	DESTINATION ${CMAKE_INSTALL_PREFIX}/include/
+	DESTINATION include/
 	FILES_MATCHING PATTERN "*.h" )
 
 IF(UNIX)
@@ -125,7 +123,7 @@ IF(UNIX)
 INSTALL(FILES 
         ${${PROJECT_NAME}_BINARY_DIR}/src/lib${PROJECT_NAME}.so.${PROJECT_VERSION}
         ${${PROJECT_NAME}_BINARY_DIR}/src/lib${PROJECT_NAME}.so
-	DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+	DESTINATION lib
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE)	
 
 ENDIF(UNIX)
@@ -148,7 +146,7 @@ IF(WIN32)
 			${${PROJECT_NAME}_BINARY_DIR}/src/${PROJECT_NAME}-${PROJECT_VERSION}.${lib_extension}
 			${${PROJECT_NAME}_BINARY_DIR}/src/${PROJECT_NAME}.${lib_extension}
 		
-			DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+			DESTINATION lib
 				PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE
 		)	
 

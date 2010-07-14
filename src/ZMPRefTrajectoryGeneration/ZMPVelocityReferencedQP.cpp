@@ -64,13 +64,13 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   /*! For computing the stability constraints from the feet positions. */ 
   m_ConstraintOnX = 0.04; 
   m_ConstraintOnY = 0.04; 
-  m_fCALS = new footConstraintsAsLinearSystem(lSPM,aHS,m_ConstraintOnX,m_ConstraintOnY); 
+  m_fCALS = new FootConstraintsAsLinearSystemForVelRef(lSPM,aHS,m_ConstraintOnX,m_ConstraintOnY); 
  
   //m_StartTime = 0.0; 
   m_UpperTimeLimitToUpdate = 0.0; 
   m_TimeBuffer = 0.040; 
  
-  m_FTGS = new footTrajectoryGenerationStandard(lSPM,aHS->leftFoot()); 
+  m_FTGS = new FootTrajectoryGenerationStandard(lSPM,aHS->leftFoot()); 
   m_FTGS->InitializeInternalDataStructures(); 
  
   /* Initialize the FSM */ 
@@ -1545,20 +1545,20 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
   MAL_VECTOR_RESIZE(ZMPRef,2*N); 
   MAL_VECTOR_RESIZE(VRef,2*N); 
  
-  int m; 
-  int me; 
-  int mmax; 
-  int n; 
-  int nmax; // Size of the matrix to compute the cost function. 
-  int mnn; 
+  int m(0); 
+  int me(0); 
+  int mmax(0); 
+  int n(0); 
+  int nmax(0); // Size of the matrix to compute the cost function. 
+  int mnn(0); 
  
   double Eps=1e-8; 
   //double *U = (double *)malloc( sizeof(double)*mnn); // Returns the Lagrange multipliers.; 
  
   int iout=0; 
-  int ifail; 
+  int ifail(0); 
   int iprint=1; 
-  int lwar; 
+  int lwar(0); 
   // double *war= (double *)malloc(sizeof(double)*lwar); 
   int liwar = n; // 
   // int *iwar = new int[liwar]; // The Cholesky decomposition is done internally. 
@@ -2146,7 +2146,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       aoffeet.close(); 
     } 
  
-  for(unsigned int i=0;i<FinalZMPPositions.size();i++) 
+  for( unsigned int i=0;i<FinalZMPPositions.size();i++) 
     { 
  
       // Smooth ramp 
@@ -2628,11 +2628,13 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0; 
       struct timeval start,end; 
       int li=0; 
-      double dinterval = m_QP_T /  m_SamplingPeriod; 
-      int interval=(int)dinterval; 
-      bool StartingSequence = true; 
+      //      double dinterval = m_QP_T /  m_SamplingPeriod; 
+      //int interval=(int)dinterval; 
+      //bool StartingSequence = true; 
  
-//----------"Real-time" loop--------- 
+      //int NumberOfRemovedConstraints =0; 
+ 
+      //----------"Real-time" loop--------- 
       // 
       // 
       //----------------------------------- 
@@ -2961,11 +2963,11 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	      LastSwingFootPosition = FinalLeftFootAbsolutePositions[CurrentIndex]; 
 	    } 
 	  //Set parameters for current polynomial 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::X_AXIS, 
+	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::X_AXIS, 
 						    ModulatedSingleSupportTime-InterpolationTimePassed,m_FPx, 
 						    LastSwingFootPosition.x, 
 						    LastSwingFootPosition.dx); 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::Y_AXIS, 
+	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Y_AXIS, 
 						    ModulatedSingleSupportTime-InterpolationTimePassed,m_FPy, 
 						    LastSwingFootPosition.y, 
 						    LastSwingFootPosition.dy); 
@@ -2973,16 +2975,16 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  if(m_Support->m_StateChanged==true) 
 	    m_FTGS->SetParameters(footTrajectoryGenerationStandard::Z_AXIS, m_Support->SSPeriod-m_QP_T,StepHeight); 
  
-	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::THETA_AXIS, 
+	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::THETA_AXIS, 
 						    ModulatedSingleSupportTime-InterpolationTimePassed,  
 						    m_PreviewedSupportAngles[0]*180.0/M_PI, 
 						    LastSwingFootPosition.theta, 
 						    LastSwingFootPosition.dtheta); 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::OMEGA_AXIS, 
+	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA_AXIS, 
 						    ModulatedSingleSupportTime-InterpolationTimePassed,0.0*180.0/M_PI, 
 						    LastSwingFootPosition.omega, 
 						    LastSwingFootPosition.domega); 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(footTrajectoryGenerationStandard::OMEGA2_AXIS, 
+	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA2_AXIS, 
 						    ModulatedSingleSupportTime-InterpolationTimePassed,2*0.0*180.0/M_PI, 
 						    LastSwingFootPosition.omega2, 
 						    LastSwingFootPosition.domega2); 

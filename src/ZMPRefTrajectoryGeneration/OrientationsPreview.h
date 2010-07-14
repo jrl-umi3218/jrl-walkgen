@@ -79,7 +79,7 @@ private:
 	/*! Trunkangle at the end of the current support phase*/
 	double m_PreviewedTrunkAngleEnd;
 
-	const static double M_EPS = 0.00000001;
+	const static double M_EPS;
 
 	/*! The angles of the support and non-support foot*/
 	double m_PreviewedMovingAngle, m_PreviewedSupportAngle;
