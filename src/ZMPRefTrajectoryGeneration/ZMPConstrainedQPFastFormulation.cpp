@@ -1391,9 +1391,9 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       if (0)
 	{
 	  if(ValidationConstraints(DPx,DPu,
-				m,
-				QueueOfLConstraintInequalities,
-				li,X,
+				   m,
+				   QueueOfLConstraintInequalities,
+				   li,X,
 				   StartingTime)<0)
 	    {
 	      cout << "Something is wrong with the constraints." << endl;
