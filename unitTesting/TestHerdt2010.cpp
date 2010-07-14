@@ -68,7 +68,7 @@ void HerdtOnline(PatternGeneratorInterface &aPGI)
     aPGI.ParseCmd(strm2);
   }
   {
-    istringstream strm2(":HerdtOnline 0.2 0.0 0.0");
+    istringstream strm2(":HerdtOnline 0.2 0.0 0.1");
     aPGI.ParseCmd(strm2);
   }
 }
@@ -141,11 +141,12 @@ int main(int argc, char *argv[])
   if (DebugFGPI)
     {
       aof.open("TestFGPI_description.dat",ofstream::out);
-      string Titles[25] =
+      string Titles[26] =
 	{ "Time",
 	  "Com X",
 	  "Com Y" ,
 	  "Com Z" ,
+	  "Com Yaw",
 	  "Com dX" ,
 	  "Com dY" ,
 	  "Com dZ" ,
@@ -167,7 +168,7 @@ int main(int argc, char *argv[])
 	  "ZMP Y (world ref.)" ,
 	  "Waist X (world ref.)" ,
 	  "Waist Y (world ref.)" };
-      for(unsigned int i=0;i<25;i++)
+      for(unsigned int i=0;i<26;i++)
 	aof << i+1 << ". " <<Titles[i] <<std::endl;
 	
       aof.close();
@@ -278,6 +279,7 @@ int main(int argc, char *argv[])
 		  << finalCOMPosition.x[0] << " "
 		  << finalCOMPosition.y[0] << " " 
 		  << finalCOMPosition.z[0] << " "
+		  << finalCOMPosition.yaw << " "
 		  << finalCOMPosition.x[1] << " "
 		  << finalCOMPosition.y[1] << " " 
 		  << finalCOMPosition.z[1] << " "
@@ -288,8 +290,12 @@ int main(int argc, char *argv[])
 		  << RightFootPosition.x << " " << RightFootPosition.y << " " 
 		  << RightFootPosition.z << " " << RightFootPosition.theta << " " 
 		  << RightFootPosition.omega  << " " << RightFootPosition.omega2  << " "
-		  << ZMPTarget(0)*cos(CurrentConfiguration(5)) - ZMPTarget(1)*sin(CurrentConfiguration(5))+CurrentConfiguration(0) << " " 
-		  << ZMPTarget(0)*sin(CurrentConfiguration(5)) + ZMPTarget(1)*cos(CurrentConfiguration(5))+CurrentConfiguration(1) << " "
+		  << ZMPTarget(0)*cos(CurrentConfiguration(5)) - 
+		ZMPTarget(1)*sin(CurrentConfiguration(5))
+		+CurrentConfiguration(0) << " " 
+		  << ZMPTarget(0)*sin(CurrentConfiguration(5)) + 
+		ZMPTarget(1)*cos(CurrentConfiguration(5))
+		+CurrentConfiguration(1) << " "
 		  << CurrentConfiguration(0) << " " 
 		  << CurrentConfiguration(1) << " " 
 		  << begin.tv_sec + 0.000001 * begin.tv_usec 
