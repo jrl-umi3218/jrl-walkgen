@@ -366,10 +366,6 @@ namespace PatternGeneratorJRL {
       delete m_ZMPVRQP;
     ODEBUG4("Destructor: did m_ZMPVRQP","DebugPGI.txt");
 
-    if (m_ZMPVRQP!=0)
-      delete m_ZMPVRQP;
-    ODEBUG4("Destructor: did m_ZMPVRQP","DebugPGI.txt");
-
     if (m_ZMPM!=0)
       delete m_ZMPM;
     ODEBUG4("Destructor: did m_ZMPM","DebugPGI.txt");
