@@ -156,15 +156,17 @@ ADD_CUSTOM_TARGET(uninstall
 #---------------
 # Package target
 #---------------
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "walkGenJrl")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "walkGenJrl - Walking Pattern Generator for LIPM-like humanoid robots")
 set(CPACK_PACKAGE_VENDOR "JRL CNRS/AIST")
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README)
 set(CPACK_PACKAGE_CONTACT "Olivier Stasse (olivier.stasse@aist.go.jp)")
 set(
 CPACK_SOURCE_PACKAGE_FILE_NAME
-"walkgenjrl-${PROJECT_VERSION}"
+"walkgenjrl-src-${PROJECT_VERSION}"
 CACHE INTERNAL "tarball basename"
 )
+set(CPACK_PACKAGE_NAME "walkgenjrl")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "dynamicsjrljapan (>=1.17.0)")
 set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_GENERATOR DEB)
 
