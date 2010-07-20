@@ -44,7 +44,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   // printf("Entered ZMPVelocityReferencedQP \n"); 
   m_Q = 0; 
   m_Pu = 0; 
-  m_FullDebug = 3; 
+  m_FullDebug = -10; 
   m_FastFormulationMode = QLD; 
  
   m_QP_T = 0.1; 
@@ -425,7 +425,7 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_M
       m_Q[i*2*m_QP_N+j] = OptA(j,i); 
  
   return 0; 
-} 
+}  
 int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX(,double) &OptA) 
 { 
  
@@ -1466,9 +1466,8 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
       //      exit(0); 
     } 
  
-  //  if (m_FullDebug>0) 
-  if (1) 
-    { 
+  if (m_FullDebug>0) 
+      { 
  
       ofstream aof; 
       char Buffer[1024]; 
