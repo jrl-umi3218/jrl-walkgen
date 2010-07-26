@@ -104,10 +104,11 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
  
  
   // Register method to handle 
-  string aMethodName[1] = 
-    {":previewcontroltime"}; 
+  string aMethodName[2] = 
+    {":previewcontroltime",
+     ":numberstepsbeforestop"}; 
  
-  for(int i=0;i<1;i++) 
+  for(int i=0;i<2;i++) 
     { 
       if (!RegisterMethod(aMethodName[i])) 
 	{ 
@@ -2080,7 +2081,10 @@ void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstrea
     { 
       strm >> m_PreviewControlTime; 
     } 
- 
+  if (Method==":numberstepsbeforestop") 
+    { 
+      strm >> m_Support->NbOfStepsSSDS;
+    }
  
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm); 
 } 
