@@ -453,7 +453,7 @@ namespace PatternGeneratorJRL
     MAL_MATRIX(m_Px,double);
 
     /*! \brief Debugging variable: dump everything is set to 1 */
-    unsigned int m_FullDebug;
+    int m_FullDebug;
 
     /*! \brief Fast formulations mode. */
     unsigned int m_FastFormulationMode;

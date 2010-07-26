@@ -1196,12 +1196,12 @@ namespace PatternGeneratorJRL {
 
 
   bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
-							     MAL_VECTOR(,double) & CurrentVelocity,
-							     MAL_VECTOR(,double) & CurrentAcceleration,
-							     MAL_VECTOR( &ZMPTarget,double),
-							     COMPosition &finalCOMPosition,
-							     FootAbsolutePosition &LeftFootPosition,
-							     FootAbsolutePosition &RightFootPosition )
+								    MAL_VECTOR(,double) & CurrentVelocity,
+								    MAL_VECTOR(,double) & CurrentAcceleration,
+								    MAL_VECTOR( &ZMPTarget,double),
+								    COMPosition &finalCOMPosition,
+								    FootAbsolutePosition &LeftFootPosition,
+								    FootAbsolutePosition &RightFootPosition )
 
 
   {

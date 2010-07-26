@@ -136,7 +136,8 @@ void OrientationsPreview::previewOrientations(const double &Time,
 		    {
 		      ofstream aof;
 		      aof.open("/tmp/previewOrientations.dat",ofstream::app);
-		      aof<<" Trunk accelerated because TrunkStateT.yaw[1] = "<<TrunkStateT.yaw[1]<<" TrunkState.yaw[1] = "<<TrunkState.yaw[1]<<endl;
+		      aof<<" Trunk accelerated because TrunkStateT.yaw[1] = "<<TrunkStateT.yaw[1]
+			 <<" TrunkState.yaw[1] = "<<TrunkState.yaw[1]<<endl;
 		      aof.close();
 		    }
 		}
@@ -148,7 +149,8 @@ void OrientationsPreview::previewOrientations(const double &Time,
 		    {
 		      ofstream aof;
 		      aof.open("/tmp/previewOrientations.dat",ofstream::app);
-		      aof<<" Trunk velocity constant because TrunkStateT.yaw[1] = "<<TrunkStateT.yaw[1]<<" TrunkState.yaw[1] = "<<TrunkState.yaw[1]<<endl;
+		      aof<<" Trunk velocity constant because TrunkStateT.yaw[1] = "<<TrunkStateT.yaw[1]
+			 <<" TrunkState.yaw[1] = "<<TrunkState.yaw[1]<<endl;
 		      aof.close();
 		    }
 
@@ -176,8 +178,10 @@ void OrientationsPreview::previewOrientations(const double &Time,
 	{
 	  ofstream aof;
 	  aof.open("/tmp/previewOrientations.dat",ofstream::app);
-	  //			aof<<"fabs(TrunkStateT.yaw[1]-TrunkState.yaw[1]): "<<fabs(TrunkStateT.yaw[1]-TrunkState.yaw[1])<<" TrunkStateT.yaw[0]: "<<TrunkStateT.yaw[0]<<
-	  //					" m_d "<<m_d<<" m_e "<<m_e<<" 1/3*c*m_T*m_T*m_T "<<1.0/3.0*m_d*m_T*m_T*m_T<<" 1/4*m_e*m_T*m_T*m_T*m_T: "
+	  //			aof<<"fabs(TrunkStateT.yaw[1]-TrunkState.yaw[1]): "
+	  // <<fabs(TrunkStateT.yaw[1]-TrunkState.yaw[1])<<" TrunkStateT.yaw[0]: "<<TrunkStateT.yaw[0]<<
+	  //					" m_d "<<m_d<<" m_e "<<m_e<<" 1/3*c*m_T*m_T*m_T "
+	  // <<1.0/3.0*m_d*m_T*m_T*m_T<<" 1/4*m_e*m_T*m_T*m_T*m_T: "
 	  //					<<1.0/4.0*m_e*m_T*m_T*m_T*m_T<<endl;
 	  aof<<" TrunkStateT.yaw[0]: "<<TrunkStateT.yaw[0]<<
 	    " m_PreviewedTrunkAngleEnd: "<<m_PreviewedTrunkAngleEnd<<endl;
