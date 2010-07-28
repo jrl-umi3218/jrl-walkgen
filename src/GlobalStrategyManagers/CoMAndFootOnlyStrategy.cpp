@@ -38,7 +38,7 @@ int CoMAndFootOnlyStrategy::InitInterObjects(CjrlHumanoidDynamicRobot *aHDR,
 int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 						   FootAbsolutePosition &RightFootPosition,
 						   MAL_VECTOR(,double) & ZMPRefPos,
-						   COMPosition & finalCOMPosition,
+						   COMState & finalCOMPosition,
 						   MAL_VECTOR(,double) & CurrentConfiguration,
 						   MAL_VECTOR(,double) & CurrentVelocity,
 						   MAL_VECTOR(,double) & CurrentAcceleration)
@@ -107,26 +107,26 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
 
 
 int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngles,
-						  COMPosition & aStartingCOMPosition,
+						  COMState & aStartingCOMState,
 						  MAL_S3_VECTOR(&,double) aStartingZMPPosition,
 						  MAL_VECTOR(&,double) lStartingWaistPose,
 						  FootAbsolutePosition & InitLeftFootPosition,
 						  FootAbsolutePosition & InitRightFootPosition)
 {
-  MAL_S3_VECTOR(lStartingCOMPosition,double);
+  MAL_S3_VECTOR(lStartingCOMState,double);
 
-  lStartingCOMPosition(0) = aStartingCOMPosition.x[0];
-  lStartingCOMPosition(1) = aStartingCOMPosition.y[0];
-  lStartingCOMPosition(2) = aStartingCOMPosition.z[0];
+  lStartingCOMState(0) = aStartingCOMState.x[0];
+  lStartingCOMState(1) = aStartingCOMState.y[0];
+  lStartingCOMState(2) = aStartingCOMState.z[0];
 
-  m_ComAndFootRealization->InitializationCoM(BodyAngles,lStartingCOMPosition,
+  m_ComAndFootRealization->InitializationCoM(BodyAngles,lStartingCOMState,
 					     lStartingWaistPose,
 					     InitLeftFootPosition, InitRightFootPosition);  
 
-  ODEBUG("EvaluateStartingCOM: m_StartingCOMPosition: " << lStartingCOMPosition);
-  aStartingCOMPosition.x[0] = lStartingCOMPosition(0);
-  aStartingCOMPosition.y[0] = lStartingCOMPosition(1);
-  aStartingCOMPosition.z[0] = lStartingCOMPosition(2);
+  ODEBUG("EvaluateStartingCOM: m_StartingCOMState: " << lStartingCOMState);
+  aStartingCOMState.x[0] = lStartingCOMState(0);
+  aStartingCOMState.y[0] = lStartingCOMState(1);
+  aStartingCOMState.z[0] = lStartingCOMState(2);
   aStartingZMPPosition= m_ComAndFootRealization->GetCOGInitialAnkles();
 
   //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in   CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
@@ -167,7 +167,7 @@ int CoMAndFootOnlyStrategy::EndOfMotion()
 }
 
 void CoMAndFootOnlyStrategy::Setup(deque<ZMPPosition> &aZMPPositions,
-				   deque<COMPosition> &aCOMBuffer,
+				   deque<COMState> &aCOMBuffer,
 				   deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
 				   deque<FootAbsolutePosition> & aRightFootAbsolutePositions)
 {

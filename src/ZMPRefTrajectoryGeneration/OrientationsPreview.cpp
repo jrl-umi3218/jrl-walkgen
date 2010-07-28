@@ -62,7 +62,8 @@ OrientationsPreview::~OrientationsPreview() {
 
 void OrientationsPreview::previewOrientations(const double &Time,
 					      deque<double> &PreviewedSupportAngles,
-					      const COMState_t &TrunkState, COMState_t &TrunkStateT,
+					      const COMState &TrunkState, 
+					      COMState &TrunkStateT,
 					      const SupportState * Support,
 					      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					      deque<FootAbsolutePosition> &RightFootAbsolutePositions)
@@ -298,7 +299,9 @@ void OrientationsPreview::previewOrientations(const double &Time,
 }
 
 void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref,
-						       const COMState_t &TrunkState, COMState_t &TrunkStateT, const SupportState * Support)
+						       const COMState &TrunkState, 
+						       COMState &TrunkStateT, 
+						       const SupportState * Support)
 {
   if(Support->CurrentSupportPhase!=0)
     {
@@ -333,7 +336,7 @@ void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVe
 
 
 bool OrientationsPreview::verifyAngleOfHipJoint(const SupportState * Support,
-						const COMState_t &TrunkState, COMState_t &TrunkStateT,
+						const COMState &TrunkState, COMState &TrunkStateT,
 						double CurrentSupportFootAngle,
 						unsigned int StepNumber)
 {
@@ -374,10 +377,13 @@ bool OrientationsPreview::verifyAngleOfHipJoint(const SupportState * Support,
 }
 
 
-void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time, COMState_t &TrunkStateT,
-						   const double &PreviewedSupportFoot, const unsigned int &StepNumber,
+void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time, 
+						   COMState &TrunkStateT,
+						   const double &PreviewedSupportFoot, 
+						   const unsigned int &StepNumber,
 						   const SupportState * Support,
-						   const double &CurrentRightFootAngle, const double &CurrentLeftFootAngle,
+						   const double &CurrentRightFootAngle, 
+						   const double &CurrentLeftFootAngle,
 						   const double &CurrentLeftFootVelocity,
 						   const double &CurrentRightFootVelocity)
 {

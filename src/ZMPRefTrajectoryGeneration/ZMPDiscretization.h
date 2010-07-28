@@ -89,7 +89,7 @@ namespace PatternGeneratorJRL
 	  Those are absolute position in the world reference frame. The origin is the initial
 	  position of the robot. The relative foot position specified are added.
 
-	  @param[out] CoMPositions: Returns the COM reference values for the overall motion.
+	  @param[out] CoMStates: Returns the COM reference values for the overall motion.
 	  Those are absolute position in the world reference frame. The origin is the initial
 	  position of the robot. The relative foot position specified are added.
 
@@ -105,7 +105,7 @@ namespace PatternGeneratorJRL
 	  	  
 	  @param[in] Xmax: The maximal distance of a hand along the X axis in the waist coordinates.
 
-	  @param[in] lStartingCOMPosition: The initial position of the CoM.
+	  @param[in] lStartingCOMState: The initial position of the CoM.
 
 	  @param[in] lStartingZMPPosition: The initial position of the ZMP.
 	  
@@ -115,12 +115,12 @@ namespace PatternGeneratorJRL
 
 	   */
       void GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
-				deque<COMPosition> & CoMPositions,
+				deque<COMState> & CoMStates,
 				deque<RelativeFootPosition> &RelativeFootPositions,
 				deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 				deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 				double Xmax,
-				COMPosition & lStartingCOMPosition,
+				COMState & lStartingCOMState,
 				MAL_S3_VECTOR(,double) & lStartingZMPPosition,
 				FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				FootAbsolutePosition & InitRightFootAbsolutePosition);
@@ -158,26 +158,26 @@ namespace PatternGeneratorJRL
 	the queue of ZMP, and foot positions.
        */
       int InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-		     deque<COMPosition> & CoMPositions,
+		     deque<COMState> & CoMStates,
                      deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
 		     deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
 		     FootAbsolutePosition & InitLeftFootAbsolutePosition,
 		     FootAbsolutePosition & InitRightFootAbsolutePosition,
 		     deque<RelativeFootPosition> &RelativeFootPositions,
-		     COMPosition & lStartingCOMPosition,
+		     COMState & lStartingCOMState,
 		     MAL_S3_VECTOR(,double) & lStartingZMPPosition );
       
       /*! \brief  Methods to update the stacks on-line. */
       void OnLine(double time,
 		  deque<ZMPPosition> & FinalZMPPositions,					     
-		  deque<COMPosition> & CoMPositions,
+		  deque<COMState> & CoMStates,
 		  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 		  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
       /*! \brief  Methods to update the stack on-line by inserting a new foot position. */
       void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
 			 deque<ZMPPosition> & FinalZMPPositions,					     
-			 deque<COMPosition> & CoMPositions,
+			 deque<COMState> & CoMStates,
 			 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 			 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 			 bool EndSequence);
@@ -188,7 +188,7 @@ namespace PatternGeneratorJRL
       int OnLineFootChange(double time,
 			   FootAbsolutePosition &aFootAbsolutePosition,
 			   deque<ZMPPosition> & FinalZMPPositions,			     
-			   deque<COMPosition> & CoMPositions,
+			   deque<COMState> & CoMStates,
 			   deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 			   deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 			   StepStackHandler * aStepStackHandler=0);
@@ -202,7 +202,7 @@ namespace PatternGeneratorJRL
 
       /// End phase of the walking.
       void EndPhaseOfTheWalking(  deque<ZMPPosition> &ZMPPositions,
-				  deque<COMPosition> &FinalCOMPositions,
+				  deque<COMState> &FinalCOMStates,
 				  deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 				  deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 

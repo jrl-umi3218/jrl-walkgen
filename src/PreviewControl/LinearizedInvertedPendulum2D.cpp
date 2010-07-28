@@ -145,7 +145,7 @@ int LinearizedInvertedPendulum2D::InitializeSystem()
 
 
 
-int LinearizedInvertedPendulum2D::Interpolation(deque<COMPosition> &COMPositions,
+int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
 						deque<ZMPPosition> &ZMPRefPositions,
 						int CurrentPosition,
 						double CX, double CY)
@@ -156,7 +156,7 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMPosition> &COMPositions
   for(int lk=0;lk<m_InterpolationInterval;lk++,lCurrentPosition++)
     {
       ODEBUG("lCurrentPosition: "<< lCurrentPosition);
-      COMPosition & aCOMPos = COMPositions[lCurrentPosition];
+      COMState & aCOMPos = COMStates[lCurrentPosition];
       double lkSP;
       lkSP = (lk+1) * m_SamplingPeriod;
       
@@ -190,7 +190,7 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMPosition> &COMPositions
 	m_xk[5] +  // Acceleration
 	lkSP * CY; // Jerk
       
-      aCOMPos.yaw = ZMPRefPositions[lCurrentPosition].theta;      
+      aCOMPos.yaw[0] = ZMPRefPositions[lCurrentPosition].theta;      
       
       aCOMPos.z[0] = m_ComHeight;
 

@@ -166,7 +166,7 @@ namespace PatternGeneratorJRL
 	Those are absolute position in the world reference frame. The origin is the initial
 	position of the robot. The relative foot position specified are added.
 	
-	@param[out] CoMPositions: Returns the COM reference values for the overall motion.
+	@param[out] COMStates: Returns the COM reference values for the overall motion.
 	Those are absolute position in the world reference frame. The origin is the initial
 	position of the robot. The relative foot position specified are added.
 	
@@ -183,7 +183,7 @@ namespace PatternGeneratorJRL
 	
 	@param Xmax: Returns the maximal distance of a hand along the X axis in the waist coordinates.
 
-	@param[in] lStartingCOMPosition: The initial position of the CoM.
+	@param[in] lStartingCOMState: The initial position of the CoM.
 
 	@param[in] lStartingZMPPosition: The initial position of the ZMP.
 	
@@ -194,12 +194,12 @@ namespace PatternGeneratorJRL
 
     */
     virtual void GetZMPDiscretization(std::deque<ZMPPosition> & ZMPPositions,
-				      std::deque<COMPosition> & CoMPositions,
+				      std::deque<COMState> & COMStates,
 				      std::deque<RelativeFootPosition> &RelativeFootPositions,
 				      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 				      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 				      double Xmax,
-				      COMPosition & lStartingCOMPosition,
+				      COMState & lStartingCOMState,
 				      MAL_S3_VECTOR(,double) & lStartingZMPPosition,
 				      FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				      FootAbsolutePosition & InitRightFootAbsolutePosition) = 0;
@@ -215,23 +215,23 @@ namespace PatternGeneratorJRL
       the queue of ZMP, and foot positions.
       
       @param[out] ZMPPositions: The queue of ZMP reference positions.
-      @param[out] CoMPositions: The queue of COM reference positions.
+      @param[out] COMStates: The queue of COM reference positions.
       @param[out] FinalLeftFootAbsolutePositions: The queue of left foot absolute positions.
       @param[out] FinalRightFootAbsolutePositions: The queue of right foot absolute positions.
       @param[in] InitLeftFootAbsolutePosition: The initial position of the left foot.
       @param[in] InitRightFootAbsolutePosition: The initial position of the right foot.
       @param[in] RelativeFootPositions: The set of relative positions to be taken into account.
-      @param[in] lStartingCOMPosition: The initial position of the CoM given as a 3D vector.
+      @param[in] lStartingCOMState: The initial position of the CoM given as a 3D vector.
       @param[in] lStartingZMPPosition: The initial position of the ZMP given as a 3D vector.
     */
     virtual int InitOnLine(std::deque<ZMPPosition> & ZMPPositions,
-			   std::deque<COMPosition> & CoMPositions,
+			   std::deque<COMState> & COMStates,
 			   std::deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
 			   std::deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
 			   FootAbsolutePosition & InitLeftFootAbsolutePosition,
 			   FootAbsolutePosition & InitRightFootAbsolutePosition,
 			   std::deque<RelativeFootPosition> &RelativeFootPositions,
-			   COMPosition & lStartingCOMPosition,
+			   COMState & lStartingCOMState,
 			   MAL_S3_VECTOR(,double) & lStartingZMPPosition)   = 0;
     
 
@@ -250,7 +250,7 @@ namespace PatternGeneratorJRL
      */
     virtual void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
 			       std::deque<ZMPPosition> & FinalZMPPositions,					     
-			       std::deque<COMPosition> & CoMPositions,
+			       std::deque<COMState> & COMStates,
 			       std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 			       std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 			       bool EndSequence) = 0;
@@ -259,7 +259,7 @@ namespace PatternGeneratorJRL
        @param[in] time : Current time.
        @param[out] FinalZMPPositions: The ZMP reference trajectory deduced from the foot
        position.
-       @param[out] CoMPositions: The CoM reference trajectory deduced from the foot
+       @param[out] COMStates: The CoM reference trajectory deduced from the foot
        position.
        @param[out] FinalLeftFootAbsolutePositions: The left foot absolute trajectory obtained
        from the new foot positions.
@@ -270,18 +270,18 @@ namespace PatternGeneratorJRL
      */
     virtual void OnLine(double time,
 		       std::deque<ZMPPosition> & FinalZMPPositions,			     
-		       std::deque<COMPosition> & CoMPositions,
+		       std::deque<COMState> & COMStates,
 		       std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 		       std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)=0;
 
     /*! \brief Method to stop walking.
       @param[out] ZMPPositions: The queue of ZMP reference positions.
-      @param[out] FinalCOMPositions: The queue of COM reference positions.
+      @param[out] FinalCOMStates: The queue of COM reference positions.
       @param[out] LeftFootAbsolutePositions: The queue of left foot absolute positions.
       @param[out] RightFootAbsolutePositions: The queue of right foot absolute positions.
      */
     virtual void EndPhaseOfTheWalking(std::deque<ZMPPosition> &ZMPPositions,
-				      std::deque<COMPosition> &FinalCOMPositions,
+				      std::deque<COMState> &FinalCOMStates,
 				      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 				      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions)=0;
 
@@ -290,7 +290,7 @@ namespace PatternGeneratorJRL
        @param[in] time : Current time.
        @param[out] FinalZMPPositions: The ZMP reference trajectory deduced from the foot
        position.
-       @param[out] CoMPositions: The CoM reference trajectory deduced from the foot
+       @param[out] COMStates: The CoM reference trajectory deduced from the foot
        position.
        @param[out] FinalLeftFootAbsolutePositions: The left foot absolute trajectory obtained
        from the new foot positions.
@@ -302,7 +302,7 @@ namespace PatternGeneratorJRL
     virtual int OnLineFootChange(double time,
 				 FootAbsolutePosition &aFootAbsolutePosition,
 				 std::deque<ZMPPosition> & FinalZMPPositions,			     
-				 std::deque<COMPosition> & CoMPositions,
+				 std::deque<COMState> & COMStates,
 				 std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 				 std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 				 StepStackHandler * aStepStackHandler)=0;

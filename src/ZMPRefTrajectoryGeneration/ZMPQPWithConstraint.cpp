@@ -1,6 +1,6 @@
  /* This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of steps following a QP
-   formulation as proposed by PB Wiebder, Humanoids 2006.
+   formulation as proposed by PB Wieber, Humanoids 2006.
 
    Copyright (c) 2005-2009, 
    Olivier Stasse,
@@ -652,7 +652,7 @@ int ZMPQPWithConstraint::BuildMatricesPxPu(double * & Px,double * &Pu,
 int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 							    deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 							    deque<ZMPPosition> &ZMPRefPositions,
-							    deque<COMPosition> &COMPositions,
+							    deque<COMState> &COMStates,
 							    double ConstraintOnX,
 							    double ConstraintOnY,
 							    double T,
@@ -1176,7 +1176,7 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
       for(int lk=0;lk<interval;lk++)
 	{
 	  
-	  COMPosition & aCOMPos = COMPositions[li*interval+lk];;
+	  COMState & aCOMPos = COMStates[li*interval+lk];;
 	  double lkSP;
 	  lkSP = (lk+1) * m_SamplingPeriod;
 
@@ -1210,9 +1210,9 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
 	    xk[5] +  // Acceleration
 	    lkSP * X[N]; // Jerk
 
-	  aCOMPos.yaw = ZMPRefPositions[li*interval+lk].theta;
+	  aCOMPos.yaw[0] = ZMPRefPositions[li*interval+lk].theta;
 
-	  COMPositions.push_back(aCOMPos);
+	  COMStates.push_back(aCOMPos);
 
 	  // Compute ZMP position and orientation.
 	  ZMPPosition & aZMPPos = ZMPRefPositions[li*interval+lk];
@@ -1323,12 +1323,12 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
 
 
 void ZMPQPWithConstraint::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
-					       deque<COMPosition> & COMPositions,
+					       deque<COMState> & COMStates,
 					       deque<RelativeFootPosition> &RelativeFootPositions,
 					       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					       deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					       double Xmax,
-					       COMPosition & lStartingCOMPosition,
+					       COMState & lStartingCOMState,
 					       MAL_S3_VECTOR(&,double) lStartingZMPPosition,
 					       FootAbsolutePosition & InitLeftFootAbsolutePosition,
 					       FootAbsolutePosition & InitRightFootAbsolutePosition)
@@ -1337,12 +1337,12 @@ void ZMPQPWithConstraint::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions
     return;
   
   m_ZMPD->GetZMPDiscretization(ZMPPositions,
-			       COMPositions,
+			       COMStates,
 			       RelativeFootPositions,
 			       LeftFootAbsolutePositions,
 			       RightFootAbsolutePositions,
 			       Xmax,
-			       lStartingCOMPosition,
+			       lStartingCOMState,
 			       lStartingZMPPosition,
 			       InitLeftFootAbsolutePosition,
 			       InitRightFootAbsolutePosition);
@@ -1352,7 +1352,7 @@ void ZMPQPWithConstraint::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions
   BuildZMPTrajectoryFromFootTrajectory(LeftFootAbsolutePositions,
 				       RightFootAbsolutePositions,
 				       ZMPPositions,
-				       COMPositions,
+				       COMStates,
 				       m_ConstraintOnX,
 				       m_ConstraintOnY,
 				       m_QP_T,
@@ -1400,13 +1400,13 @@ void ZMPQPWithConstraint::CallMethod(std::string & Method, std::istringstream &s
 
 
 int ZMPQPWithConstraint::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-				    deque<COMPosition> & FinalCOMPositions,
+				    deque<COMState> & FinalCOMStates,
 				    deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
 				    deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
 				    FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				    FootAbsolutePosition & InitRightFootAbsolutePosition,
 				    deque<RelativeFootPosition> &RelativeFootPositions,
-				    COMPosition & lStartingCOMPosition,
+				    COMState & lStartingCOMState,
 				    MAL_S3_VECTOR(&,double) lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
@@ -1415,7 +1415,7 @@ int ZMPQPWithConstraint::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 
 void ZMPQPWithConstraint::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
 					deque<ZMPPosition> & FinalZMPPositions,	
-					deque<COMPosition> & FinalCOMPositions,
+					deque<COMState> & FinalCOMStates,
 					deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 					deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 					bool EndSequence)
@@ -1425,7 +1425,7 @@ void ZMPQPWithConstraint::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPo
 
 void ZMPQPWithConstraint::OnLine(double time,
 				 deque<ZMPPosition> & FinalZMPPositions,				     
-				 deque<COMPosition> & FinalCOMPositions,
+				 deque<COMState> & FinalCOMStates,
 				 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 				 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
 {
@@ -1435,7 +1435,7 @@ void ZMPQPWithConstraint::OnLine(double time,
 int ZMPQPWithConstraint::OnLineFootChange(double time,
 					  FootAbsolutePosition &aFootAbsolutePosition,
 					  deque<ZMPPosition> & FinalZMPPositions,			     
-					  deque<COMPosition> & CoMPositions,
+					  deque<COMState> & CoMStates,
 					  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 					  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 					  StepStackHandler  *aStepStackHandler)
@@ -1445,7 +1445,7 @@ int ZMPQPWithConstraint::OnLineFootChange(double time,
 }
 
 void ZMPQPWithConstraint::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-					       deque<COMPosition> &FinalCOMPositions,
+					       deque<COMState> &FinalCOMStates,
 					       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					       deque<FootAbsolutePosition> &RightFootAbsolutePositions)
 {

@@ -41,14 +41,14 @@ namespace PatternGeneratorJRL
 
       /*! \brief Interpolation during a simulation period with control parameters.
 	\param[out]: NewFinalZMPPositions: queue of ZMP positions interpolated.
-	\param[out]: COMPositions: queue of COM positions interpolated.
+	\param[out]: COMStates: queue of COM positions interpolated.
 	\param[in]: ZMPRefPositions: Reference positions of ZMP (Kajita's heuristic every 5 ms).
 	\param[in]: CurrentPosition: index of the current position of the ZMP reference
 	(this allow to propagate some parameters define by a heuristic to the CoM positions).
 	\param[in]: CX: command parameter in the forward direction.
 	\param[in]: CY: command parameter in the perpendicular direction.
        */
-      int Interpolation(std::deque<COMPosition> &COMPositions,
+      int Interpolation(std::deque<COMState> &COMStates,
 			std::deque<ZMPPosition> &ZMPRefPositions,
 			int CurrentPosition,
 			double CX, double CY);

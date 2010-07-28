@@ -1520,7 +1520,7 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
 								  deque<FootAbsolutePosition> 
 								  &RightFootAbsolutePositions, 
 								  deque<ZMPPosition> &ZMPRefPositions, 
-								  deque<COMPosition> &COMPositions, 
+								  deque<COMState> &COMStates, 
 								  double ConstraintOnX, 
 								  double ConstraintOnY, 
 								  double T, 
@@ -1924,7 +1924,7 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
  
       // Calling this method will automatically 
       // update the ZMPRefPositions. 
-      m_2DLIPM->Interpolation(COMPositions, 
+      m_2DLIPM->Interpolation(COMStates, 
 			      ZMPRefPositions, 
 			      li*interval, 
 			      ptX[0],ptX[N]); 
@@ -2021,12 +2021,12 @@ int ZMPVelocityReferencedQP::buildZMPTrajectoryFromFootTrajectory(deque<FootAbso
  
  
 void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions, 
-						   deque<COMPosition> & COMPositions, 
+						   deque<COMState> & COMStates, 
 						   deque<RelativeFootPosition> &RelativeFootPositions, 
 						   deque<FootAbsolutePosition> &LeftFootAbsolutePositions, 
 						   deque<FootAbsolutePosition> &RightFootAbsolutePositions, 
 						   double Xmax, 
-						   COMPosition & lStartingCOMPosition, 
+						   COMState & lStartingCOMState, 
 						   MAL_S3_VECTOR(&,double) lStartingZMPPosition, 
 						   FootAbsolutePosition & InitLeftFootAbsolutePosition, 
 						   FootAbsolutePosition & InitRightFootAbsolutePosition) 
@@ -2038,12 +2038,12 @@ void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ZMPPosit
   //printf("Entered GetZMPDiscretization \n"); 
  
   m_ZMPD->GetZMPDiscretization(ZMPPositions, 
-			       COMPositions, 
+			       COMStates, 
 			       RelativeFootPositions, 
 			       LeftFootAbsolutePositions, 
 			       RightFootAbsolutePositions, 
 			       Xmax, 
-			       lStartingCOMPosition, 
+			       lStartingCOMState, 
 			       lStartingZMPPosition, 
 			       InitLeftFootAbsolutePosition, 
 			       InitRightFootAbsolutePosition); 
@@ -2054,7 +2054,7 @@ void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ZMPPosit
   buildZMPTrajectoryFromFootTrajectory(LeftFootAbsolutePositions, 
 				       RightFootAbsolutePositions, 
 				       ZMPPositions, 
-				       COMPositions, 
+				       COMStates, 
 				       m_ConstraintOnX, 
 				       m_ConstraintOnY, 
 				       m_QP_T, 
@@ -2089,16 +2089,16 @@ void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstrea
 } 
  
 int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions, 
-					deque<COMPosition> & FinalCoMPositions, 
+					deque<COMState> & FinalCoMPositions, 
 					deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions, 
 					deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions, 
 					FootAbsolutePosition & InitLeftFootAbsolutePosition, 
 					FootAbsolutePosition & InitRightFootAbsolutePosition, 
 					deque<RelativeFootPosition> &RelativeFootPositions, 
-					COMPosition & lStartingCOMPosition, 
+					COMState & lStartingCOMState, 
 					MAL_S3_VECTOR(,double) & lStartingZMPPosition) 
 { 
-  // COMPosition aCOMPos; 
+  // COMState aCOMPos; 
   // ZMPPosition aZMPPos; 
  
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos; 
@@ -2164,9 +2164,9 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       FinalCoMPositions[CurrentZMPindex].z[0] = m_ComHeight; 
       FinalCoMPositions[CurrentZMPindex].z[1] = 0.0; 
       FinalCoMPositions[CurrentZMPindex].z[2] = 0.0; 
-      FinalCoMPositions[CurrentZMPindex].pitch = 0.0; 
-      FinalCoMPositions[CurrentZMPindex].roll = 0.0; 
-      FinalCoMPositions[CurrentZMPindex].yaw = 0.0; 
+      FinalCoMPositions[CurrentZMPindex].pitch[0] = 0.0; 
+      FinalCoMPositions[CurrentZMPindex].roll[0] = 0.0; 
+      FinalCoMPositions[CurrentZMPindex].yaw[0] = 0.0; 
  
       // Set Left Foot positions. 
       FinalLeftFootAbsolutePositions[CurrentZMPindex] = CurrentLeftFootAbsPos; 
@@ -2207,7 +2207,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
  
 void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition, 
 					    deque<ZMPPosition> & FinalZMPPositions, 
-					    deque<COMPosition> & FinalCOMPositions, 
+					    deque<COMState> & FinalCOMStates, 
 					    deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions, 
 					    deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions, 
 					    bool EndSequence) 
@@ -2609,7 +2609,7 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
  
 void ZMPVelocityReferencedQP::OnLine(double time, 
 				     deque<ZMPPosition> & FinalZMPPositions, 
-				     deque<COMPosition> & FinalCOMPositions, 
+				     deque<COMState> & FinalCOMStates, 
 				     deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions, 
 				     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions) 
 { 
@@ -2847,7 +2847,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
  
     
  
-      FinalCOMPositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod)); 
+      FinalCOMStates.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod)); 
       FinalZMPPositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod)); 
       FinalLeftFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod)); 
       FinalRightFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod)); 
@@ -2868,7 +2868,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	     "(int)(m_TimeBuffer/m_SamplingPeriod): "<<
 	     (int)(m_TimeBuffer/m_SamplingPeriod)); 
 
-      m_2DLIPM->Interpolation(FinalCOMPositions, 
+      m_2DLIPM->Interpolation(FinalCOMStates, 
 			      FinalZMPPositions, 
 			      CurrentIndex, 
 			      ptX[0],ptX[m_QP_N]); 
@@ -2929,10 +2929,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  aof.close(); 
 	  aof.open("/tmp/comHeight.dat",ofstream::app); 
  
-	  aof << FinalCOMPositions[CurrentIndex].x[0]<<" "
-	      << FinalCOMPositions[CurrentIndex].y[0]<< " " 
-	      << FinalCOMPositions[CurrentIndex].z[0] << " "
-	      << FinalCOMPositions[CurrentIndex].roll <<  endl; 
+	  aof << FinalCOMStates[CurrentIndex].x[0]<<" "
+	      << FinalCOMStates[CurrentIndex].y[0]<< " " 
+	      << FinalCOMStates[CurrentIndex].z[0] << " "
+	      << FinalCOMStates[CurrentIndex].roll <<  endl; 
  
 	  aof.close(); 
 	  aof.open("/tmp/CurrentIndex.dat",ofstream::app); 
@@ -3014,7 +3014,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  //double ddTheta = m_TrunkState.yaw[2]; 
 	  int StepType = 1; 
 
-	  FinalCOMPositions[CurrentIndex].yaw = m_TrunkState.yaw[0]; 
+	  FinalCOMStates[CurrentIndex].yaw[0] = m_TrunkState.yaw[0]; 
 	  //Interpolate the 
 	  for(int k = 1; k<=(int)(m_QP_T/m_SamplingPeriod);k++) 
 	    { 
@@ -3035,7 +3035,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 		  m_QueueOfTrunkStates.push_back(m_TrunkState);
 		}
-	      FinalCOMPositions[CurrentIndex+k].yaw = m_TrunkState.yaw[0];
+	      FinalCOMStates[CurrentIndex+k].yaw[0] = m_TrunkState.yaw[0];
 	      if(m_FullDebug>2)
 		{
 		  ofstream aof;
@@ -3090,7 +3090,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  // printf("After parametrization SP == 0 \n"); 
 	  for(int k = 0; k<=(int)(m_QP_T/m_SamplingPeriod);k++) 
 	    { 
-	      FinalCOMPositions[CurrentIndex+k].yaw = m_TrunkState.yaw[0];
+	      FinalCOMStates[CurrentIndex+k].yaw[0] = m_TrunkState.yaw[0];
 
 	      // cout<<"CurrentIndex+k"<<CurrentIndex+k<<FinalRightFootAbsolutePositions.size(); 
 	      // cout<<" x ,y:"<<FinalRightFootAbsolutePositions[CurrentIndex+k-1].x<< 
@@ -3212,7 +3212,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 int ZMPVelocityReferencedQP::OnLineFootChange(double time, 
 					      FootAbsolutePosition &aFootAbsolutePosition, 
 					      deque<ZMPPosition> & FinalZMPPositions, 
-					      deque<COMPosition> & CoMPositions, 
+					      deque<COMState> & CoMPositions, 
 					      deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions, 
 					      deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions, 
 					      StepStackHandler  *aStepStackHandler) 
@@ -3222,7 +3222,7 @@ int ZMPVelocityReferencedQP::OnLineFootChange(double time,
 } 
  
 void ZMPVelocityReferencedQP::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions, 
-						   deque<COMPosition> &FinalCOMPositions, 
+						   deque<COMState> &FinalCOMStates, 
 						   deque<FootAbsolutePosition> &LeftFootAbsolutePositions, 
 						   deque<FootAbsolutePosition> &RightFootAbsolutePositions) 
 { 

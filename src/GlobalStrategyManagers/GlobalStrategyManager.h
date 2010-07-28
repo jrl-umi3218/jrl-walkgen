@@ -67,7 +67,7 @@ namespace PatternGeneratorJRL
       @param[out] LeftFootPosition: The position of the Left Foot position.
       @param[out] RightFootPosition: The position of the Right Foot position.
       @param[out] ZMPRefPos: The ZMP position to be feed to the controller.
-      @param[out] COMPosition: returns position, velocity and acceleration of the CoM.
+      @param[out] aCOMState: returns position, velocity and acceleration of the CoM.
       @param[out] CurrentConfiguration: The results is a state vector containing the articular positions.
       @param[out] CurrentVelocity: The results is a state vector containing the speed.
       @param[out] CurrentAcceleration: The results is a state vector containing the acceleration.
@@ -75,7 +75,7 @@ namespace PatternGeneratorJRL
     virtual int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 				       FootAbsolutePosition &RightFootPosition,
 				       MAL_VECTOR(,double) & ZMPRefPos,
-				       COMPosition & COMPosition,
+				       COMState & aCOMState,
 				       MAL_VECTOR(,double) & CurrentConfiguration,
 				       MAL_VECTOR(,double) & CurrentVelocity,
 				       MAL_VECTOR(,double) & CurrentAcceleration)=0;
@@ -98,7 +98,7 @@ namespace PatternGeneratorJRL
       in the waist coordinates frame.
     */
     virtual int EvaluateStartingState(MAL_VECTOR( &,double) BodyAngles,
-				      COMPosition & aStartingCOMPosition,
+				      COMState & aStartingCOMState,
 				      MAL_S3_VECTOR(& ,double) aStartingZMPPosition,
 				      MAL_VECTOR(& ,double) aStartingWaistPose,
 				      FootAbsolutePosition & InitLeftFootPosition,
@@ -121,13 +121,13 @@ namespace PatternGeneratorJRL
       \param[in] aRightFootAbsolutePositions: Absolute frame positions buffer of the right foot.
     */
     void SetBufferPositions(deque<ZMPPosition> * aZMPositions,
-			    deque<COMPosition> * aCOMBuffer,
+			    deque<COMState> * aCOMBuffer,
 			    deque<FootAbsolutePosition> *aLeftFootAbsolutePositions,
 			    deque<FootAbsolutePosition> *aRightFootAbsolutePositions );
 
     /*! Prepare the buffers at the beginning of the foot positions. */
     virtual void Setup(deque<ZMPPosition> & aZMPositions,
-		       deque<COMPosition> & aCOMBuffer,
+		       deque<COMState> & aCOMBuffer,
 		       deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
 		       deque<FootAbsolutePosition> & aRightFootAbsolutePositions )=0;
       
@@ -141,7 +141,7 @@ namespace PatternGeneratorJRL
     deque<ZMPPosition> * m_ZMPPositions;
 
     /*! Buffer for the COM position. */
-    deque<COMPosition> * m_COMBuffer;
+    deque<COMState> * m_COMBuffer;
 
     /*! Buffer of absolute foot position. */
     deque<FootAbsolutePosition> * m_LeftFootPositions, *m_RightFootPositions;

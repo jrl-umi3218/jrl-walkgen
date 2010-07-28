@@ -81,7 +81,7 @@ namespace PatternGeneratorJRL
 	@param[in] lCurrentJointValues: The vector of articular values in classical C++ style.
 	@param[in] ClearStepStackHandler: Clean the stack of steps after copy.
       */
-      virtual void CommonInitializationOfWalking(COMPosition & lStartingCOMPosition,
+      virtual void CommonInitializationOfWalking(COMState & lStartingCOMState,
 						 MAL_S3_VECTOR(,double) & lStartingZMPPosition,
 						 MAL_VECTOR(  & ,double) BodyAnglesIni,
 						 FootAbsolutePosition & InitLeftFootAbsPos, 
@@ -132,6 +132,30 @@ namespace PatternGeneratorJRL
 					      COMPosition &COMPosition,
 					      FootAbsolutePosition &LeftFootPosition,
 					      FootAbsolutePosition &RightFootPosition)=0;
+
+      /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
+	@param[out]  CurrentConfiguration The current configuration of the robot according to 
+	the implementation of dynamic-JRLJapan. This should be first position and orientation
+	of the waist, and then all the DOFs of your robot. 
+	@param[out]  CurrentVelocity  The current velocity of the robot according to the 
+	the implementation of dynamic-JRLJapan. 
+	@param[out]  CurrentAcceleration  The current acceleration of the robot according to the 
+	the implementation of dynamic-JRLJapan. 
+	@param[out]  ZMPTarget  The target ZMP in the waist reference frame.
+	@param[out] COMState The CoM state (up to the acceleration) for this motion.
+	@param[out] LeftFootPosition: Absolute position of the left foot.
+	@param[out] RightFootPosition: Absolute position of the right foot.
+	@return True is there is still some data to send, false otherwise.
+      */
+      virtual bool RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
+					      MAL_VECTOR(,double) & CurrentVelocity,
+					      MAL_VECTOR(,double) & CurrentAcceleration,
+					      MAL_VECTOR(,double) &ZMPTarget,
+					      COMState &COMState,
+					      FootAbsolutePosition &LeftFootPosition,
+					      FootAbsolutePosition &RightFootPosition)=0;
+
+
 
       /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
 	@param[out] LeftFootPosition: Absolute position of the left foot.
@@ -246,7 +270,7 @@ namespace PatternGeneratorJRL
 
       /*! \brief Returns the ZMP, CoM, left foot absolute position, and right foot absolute position
 	for the initiale pose.*/
-      virtual void EvaluateStartingState(COMPosition  & lStartingCOMPosition,
+      virtual void EvaluateStartingState(COMState  & lStartingCOMState,
 					 MAL_S3_VECTOR(,double) & lStartingZMPPosition,
 					 MAL_VECTOR(,double) & lStartingWaistPose,
 					 FootAbsolutePosition & InitLeftFootAbsPos,

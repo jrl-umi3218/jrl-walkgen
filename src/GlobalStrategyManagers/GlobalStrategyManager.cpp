@@ -27,7 +27,7 @@ GlobalStrategyManager::GlobalStrategyManager(SimplePluginManager *aPluginManager
   
   
 void GlobalStrategyManager::SetBufferPositions(deque<ZMPPosition> * aZMPPositions,
-					       deque<COMPosition> * aCOMBuffer,
+					       deque<COMState> * aCOMBuffer,
 					       deque<FootAbsolutePosition> *aLeftFootAbsolutePositions,
 					       deque<FootAbsolutePosition> *aRightFootAbsolutePositions )
 {

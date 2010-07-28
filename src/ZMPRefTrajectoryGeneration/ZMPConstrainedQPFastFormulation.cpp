@@ -1086,7 +1086,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 									  deque<FootAbsolutePosition> 
 									  &RightFootAbsolutePositions,
 									  deque<ZMPPosition> &ZMPRefPositions,
-									  deque<COMPosition> &COMPositions,
+									  deque<COMState> &COMStates,
 									  double ConstraintOnX,
 									  double ConstraintOnY,
 									  double T,
@@ -1377,7 +1377,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       
       // Calling this method will automatically 
       // update the ZMPRefPositions.
-      m_2DLIPM->Interpolation(COMPositions,
+      m_2DLIPM->Interpolation(COMStates,
 			      ZMPRefPositions,
 			      li*interval,
 			      ptX[0],ptX[N]);
@@ -1452,12 +1452,12 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
 
 
 void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
-							   deque<COMPosition> & COMPositions,
+							   deque<COMState> & COMStates,
 							   deque<RelativeFootPosition> &RelativeFootPositions,
 							   deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 							   deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 							   double Xmax,
-							   COMPosition & lStartingCOMPosition,
+							   COMState & lStartingCOMState,
 							   MAL_S3_VECTOR(&,double) lStartingZMPPosition,
 							   FootAbsolutePosition & InitLeftFootAbsolutePosition,
 							   FootAbsolutePosition & InitRightFootAbsolutePosition)
@@ -1466,12 +1466,12 @@ void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & 
     return;
   
   m_ZMPD->GetZMPDiscretization(ZMPPositions,
-			       COMPositions,
+			       COMStates,
 			       RelativeFootPositions,
 			       LeftFootAbsolutePositions,
 			       RightFootAbsolutePositions,
 			       Xmax,
-			       lStartingCOMPosition,
+			       lStartingCOMState,
 			       lStartingZMPPosition,
 			       InitLeftFootAbsolutePosition,
 			       InitRightFootAbsolutePosition);
@@ -1481,7 +1481,7 @@ void ZMPConstrainedQPFastFormulation::GetZMPDiscretization(deque<ZMPPosition> & 
   BuildZMPTrajectoryFromFootTrajectory(LeftFootAbsolutePositions,
 				       RightFootAbsolutePositions,
 				       ZMPPositions,
-				       COMPositions,
+				       COMStates,
 				       m_ConstraintOnX,
 				       m_ConstraintOnY,
 				       m_QP_T,
@@ -1530,13 +1530,13 @@ void ZMPConstrainedQPFastFormulation::CallMethod(std::string & Method, std::istr
 
 
 int ZMPConstrainedQPFastFormulation::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-				    deque<COMPosition> & FinalCOMPositions,
+				    deque<COMState> & FinalCOMStates,
 				    deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
 				    deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
 				    FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				    FootAbsolutePosition & InitRightFootAbsolutePosition,
 				    deque<RelativeFootPosition> &RelativeFootPositions,
-				    COMPosition & lStartingCOMPosition,
+				    COMState & lStartingCOMState,
 				    MAL_S3_VECTOR(&,double) lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
@@ -1545,7 +1545,7 @@ int ZMPConstrainedQPFastFormulation::InitOnLine(deque<ZMPPosition> & FinalZMPPos
 
 void ZMPConstrainedQPFastFormulation::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
 					deque<ZMPPosition> & FinalZMPPositions,	
-					deque<COMPosition> & FinalCOMPositions,
+					deque<COMState> & FinalCOMStates,
 					deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 					deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 					bool EndSequence)
@@ -1555,7 +1555,7 @@ void ZMPConstrainedQPFastFormulation::OnLineAddFoot(RelativeFootPosition & NewRe
 
 void ZMPConstrainedQPFastFormulation::OnLine(double time,
 				 deque<ZMPPosition> & FinalZMPPositions,				     
-				 deque<COMPosition> & FinalCOMPositions,
+				 deque<COMState> & FinalCOMStates,
 				 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 				 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
 {
@@ -1565,7 +1565,7 @@ void ZMPConstrainedQPFastFormulation::OnLine(double time,
 int ZMPConstrainedQPFastFormulation::OnLineFootChange(double time,
 					  FootAbsolutePosition &aFootAbsolutePosition,
 					  deque<ZMPPosition> & FinalZMPPositions,			     
-					  deque<COMPosition> & CoMPositions,
+					  deque<COMState> & CoMPositions,
 					  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 					  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 					  StepStackHandler  *aStepStackHandler)
@@ -1575,7 +1575,7 @@ int ZMPConstrainedQPFastFormulation::OnLineFootChange(double time,
 }
 
 void ZMPConstrainedQPFastFormulation::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-					       deque<COMPosition> &FinalCOMPositions,
+					       deque<COMState> &FinalCOMStates,
 					       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					       deque<FootAbsolutePosition> &RightFootAbsolutePositions)
 {

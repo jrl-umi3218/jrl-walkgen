@@ -66,7 +66,7 @@ namespace PatternGeneratorJRL
     void CalculateFootHolds(deque<RelativeFootPosition> &FootHolds);
 	
     /*! \brief Call for polynomial planning of both steps during the obstacle stepover */
-    void PolyPlanner(deque<COMPosition> &aCOMBuffer, 
+    void PolyPlanner(deque<COMState> &aCOMBuffer, 
 		     deque<FootAbsolutePosition> & aLeftFootBuffer, 
 		     deque<FootAbsolutePosition> & aRightFootBuffer,
 		     deque<ZMPPosition> & aZMPPositions);
@@ -83,12 +83,12 @@ namespace PatternGeneratorJRL
 	
 
     /*! this sets the extra COM buffer calculated in the ZMPMultybody class*/
-    void SetExtraBuffer(deque<COMPosition> aExtraCOMBuffer, 
+    void SetExtraBuffer(deque<COMState> aExtraCOMBuffer, 
 			deque<FootAbsolutePosition> aExtraRightFootBuffer, 
 			deque<FootAbsolutePosition> aExtraLeftFootBuffer);
 
     /*! this gets the extra COM buPreviewControlffer calculated in the ZMPMultybody class*/
-    void GetExtraBuffer(deque<COMPosition> &aExtraCOMBuffer, 
+    void GetExtraBuffer(deque<COMState> &aExtraCOMBuffer, 
 			deque<FootAbsolutePosition> &aExtraRightFootBuffer, 
 			deque<FootAbsolutePosition> &aExtraLeftFootBuffer);
 
@@ -123,7 +123,7 @@ namespace PatternGeneratorJRL
     void SetDeltaStepOverCOMHeightMax(double aDeltaStepOverCOMHeightMax);
 
     /*!  create the complete COM and ZMP buffer by the first preview round. */
-    void CreateBufferFirstPreview(deque<COMPosition> &m_COMBuffer,
+    void CreateBufferFirstPreview(deque<COMState> &m_COMBuffer,
 				  deque<ZMPPosition> &m_ZMPBuffer, 
 				  deque<ZMPPosition> &m_ZMPRefBuffer);
 
@@ -182,8 +182,8 @@ namespace PatternGeneratorJRL
     StepOverClampedCubicSpline *m_ClampedCubicSplineStepOverFootOmega;
     StepOverClampedCubicSpline *m_ClampedCubicSplineStepOverFootOmegaImpact;
 	
-    /*! Extra COMPosition buffer calculated in ZMPMultibody class  */
-    deque<COMPosition> m_ExtraCOMBuffer;
+    /*! Extra COMState buffer calculated in ZMPMultibody class  */
+    deque<COMState> m_ExtraCOMBuffer;
 	
     /*! Extra foot buffers with the same lenght as extra COM buffer
       and representing the two stpes over the obstacle */
@@ -192,7 +192,7 @@ namespace PatternGeneratorJRL
 	  
 	  
     /*! Buffers for first preview */
-    deque<COMPosition> m_COMBuffer;
+    deque<COMState> m_COMBuffer;
     deque<ZMPPosition> m_ZMPBuffer;
 	
     /*! Buffer of complete foot course to be changed  */
@@ -286,7 +286,7 @@ namespace PatternGeneratorJRL
     deque<ZMPPosition> m_FIFODeltaZMPPositions;
 
     /*! Fifo for the COM reference.*/
-    deque<COMPosition> m_FIFOCOMPositions;
+    deque<COMState> m_FIFOCOMStates;
       
     /*! Fifo for the positionning of the left foot.*/
     deque<FootAbsolutePosition> m_FIFOLeftFootPosition;

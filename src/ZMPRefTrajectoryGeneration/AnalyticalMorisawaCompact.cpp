@@ -347,7 +347,7 @@ namespace PatternGeneratorJRL
   }
 
  
-  int AnalyticalMorisawaCompact::BuildAndSolveCOMZMPForASetOfSteps(MAL_S3x3_MATRIX(& lStartingCOMPosition,double),
+  int AnalyticalMorisawaCompact::BuildAndSolveCOMZMPForASetOfSteps(MAL_S3x3_MATRIX(& lStartingCOMState,double),
 								   FootAbsolutePosition &LeftFootInitialPosition,
 								   FootAbsolutePosition &RightFootInitialPosition,
 								   bool IgnoreFirstRelativeFoot,
@@ -380,7 +380,7 @@ namespace PatternGeneratorJRL
     lZMPZ->resize(NbOfIntervals);
     for(int i=0;i<NbOfIntervals;i++)
       {
-	(*lCoMZ)[i] = lStartingCOMPosition(2,0); 
+	(*lCoMZ)[i] = lStartingCOMState(2,0); 
 	(*lZMPZ)[i] = 0.0;
       }
 
@@ -423,16 +423,16 @@ namespace PatternGeneratorJRL
 	
     lZMPY->resize(NbOfIntervals);
   
-    (*lZMPX)[0] = lStartingCOMPosition(0,0); 
-    (*lZMPY)[0] = lStartingCOMPosition(1,0);
+    (*lZMPX)[0] = lStartingCOMState(0,0); 
+    (*lZMPY)[0] = lStartingCOMState(1,0);
     ODEBUG(" m_CTIPY COM : " << (*lZMPY)[0]);
 
     /*! Extract the set of initial conditions relevant for 
       computing the analytical trajectories. */
     InitialCoMX = (*lZMPX)[0];
-    InitialCoMSpeedX = lStartingCOMPosition(0,1);
+    InitialCoMSpeedX = lStartingCOMState(0,1);
     InitialCoMY = (*lZMPY)[0];
-    InitialCoMSpeedY = lStartingCOMPosition(1,1);
+    InitialCoMSpeedY = lStartingCOMState(1,1);
     
     /*! Extract the set of absolute coordinates for the foot position. */
     if (m_FeetTrajectoryGenerator!=0)
@@ -524,12 +524,12 @@ namespace PatternGeneratorJRL
   }
 
   void AnalyticalMorisawaCompact::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
-						       deque<COMPosition> & COMPositions,
+						       deque<COMState> & COMStates,
 						       deque<RelativeFootPosition> &RelativeFootPositions,
 						       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 						       deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 						       double Xmax,
-						       COMPosition & lStartingCOMPosition,
+						       COMState & lStartingCOMState,
 						       MAL_S3_VECTOR(&,double) lStartingZMPPosition,
 						       FootAbsolutePosition & InitLeftFootAbsolutePosition,
 						       FootAbsolutePosition & InitRightFootAbsolutePosition)
@@ -539,22 +539,22 @@ namespace PatternGeneratorJRL
     /* This part computes the CoM and ZMP trajectory giving the foot position information. 
        It also creates the analytical feet trajectories.
      */
-    MAL_S3x3_MATRIX(lMStartingCOMPosition,double);
+    MAL_S3x3_MATRIX(lMStartingCOMState,double);
 
-    lMStartingCOMPosition(0,0)= lStartingCOMPosition.x[0];
-    lMStartingCOMPosition(1,0)= lStartingCOMPosition.y[0];
-    lMStartingCOMPosition(2,0)= lStartingCOMPosition.z[0];
+    lMStartingCOMState(0,0)= lStartingCOMState.x[0];
+    lMStartingCOMState(1,0)= lStartingCOMState.y[0];
+    lMStartingCOMState(2,0)= lStartingCOMState.z[0];
 
-    m_InitialPoseCoMHeight = lMStartingCOMPosition(2,0);
+    m_InitialPoseCoMHeight = lMStartingCOMState(2,0);
 
     for(unsigned int i=0;i<3;i++)
       {
 	for(unsigned int j=1;j<3;j++)
-	  lMStartingCOMPosition(i,j)= 0.0;
+	  lMStartingCOMState(i,j)= 0.0;
       }
     
     int r=0;
-    if ((r=BuildAndSolveCOMZMPForASetOfSteps(lMStartingCOMPosition,
+    if ((r=BuildAndSolveCOMZMPForASetOfSteps(lMStartingCOMState,
 					     InitLeftFootAbsolutePosition,
 					     InitRightFootAbsolutePosition,
 					     true,false))<0)
@@ -583,15 +583,15 @@ namespace PatternGeneratorJRL
 	m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py);
 	ZMPPositions.push_back(aZMPPos);
 
-	/*! Feed the COMPositions. */
-	COMPosition aCOMPos;
+	/*! Feed the COMStates. */
+	COMState aCOMPos;
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]);
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]);
 	aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	aCOMPos.z[1] = 0.0;
 	aCOMPos.z[2] = 0.0;
-	COMPositions.push_back(aCOMPos);
+	COMStates.push_back(aCOMPos);
 
 	/*! Feed the FootPositions. */
 
@@ -613,13 +613,13 @@ namespace PatternGeneratorJRL
   }
 
   int AnalyticalMorisawaCompact::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-					    deque<COMPosition> & CoMPositions,
+					    deque<COMState> & CoMPositions,
 					    deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
 					    deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
 					    FootAbsolutePosition & InitLeftFootAbsolutePosition,
 					    FootAbsolutePosition & InitRightFootAbsolutePosition,
 					    deque<RelativeFootPosition> &RelativeFootPositions,
-					    COMPosition & lStartingCOMPosition,
+					    COMState & lStartingCOMState,
 					    MAL_S3_VECTOR(&,double) lStartingZMPPosition)
   {
     m_OnLineMode = true;
@@ -629,16 +629,16 @@ namespace PatternGeneratorJRL
     unsigned int r = RelativeFootPositions.size();
     unsigned int maxrelsteps = r < 3 ? r : 3;
     ODEBUG("Number of relative steps: "<< maxrelsteps);
-    MAL_S3x3_MATRIX(lMStartingCOMPosition,double);
+    MAL_S3x3_MATRIX(lMStartingCOMState,double);
 
-    lMStartingCOMPosition(0,0)= lStartingCOMPosition.x[0];
-    lMStartingCOMPosition(1,0)= lStartingCOMPosition.y[0];
-    lMStartingCOMPosition(2,0)= lStartingCOMPosition.z[0];
+    lMStartingCOMState(0,0)= lStartingCOMState.x[0];
+    lMStartingCOMState(1,0)= lStartingCOMState.y[0];
+    lMStartingCOMState(2,0)= lStartingCOMState.z[0];
 
     for(unsigned int i=0;i<3;i++)
       {
 	for(unsigned int j=1;j<3;j++)
-	  lMStartingCOMPosition(i,j)= 0.0;
+	  lMStartingCOMState(i,j)= 0.0;
       }
     
     for(unsigned int i=0;i< maxrelsteps;i++)
@@ -659,7 +659,7 @@ namespace PatternGeneratorJRL
     /* This part computes the CoM and ZMP trajectory giving the foot position information. 
        It also creates the analytical feet trajectories.
      */
-    if (BuildAndSolveCOMZMPForASetOfSteps(lMStartingCOMPosition,
+    if (BuildAndSolveCOMZMPForASetOfSteps(lMStartingCOMState,
 					  InitLeftFootAbsolutePosition,
 					  InitRightFootAbsolutePosition,
 					  true,true)<0)
@@ -691,8 +691,8 @@ namespace PatternGeneratorJRL
 	m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py);
 	FinalZMPPositions.push_back(aZMPPos);
 
-	/*! Feed the COMPositions. */
-	COMPosition aCOMPos;
+	/*! Feed the COMStates. */
+	COMState aCOMPos;
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]);
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]);
@@ -727,7 +727,7 @@ namespace PatternGeneratorJRL
 
   void AnalyticalMorisawaCompact::OnLine(double time,
 					 deque<ZMPPosition> & FinalZMPPositions,				     
-					 deque<COMPosition> & FinalCOMPositions,
+					 deque<COMState> & FinalCOMStates,
 					 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 					 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
   {
@@ -742,7 +742,7 @@ namespace PatternGeneratorJRL
 	    
 	    ZMPPosition aZMPPos;
 	    memset(&aZMPPos,0,sizeof(aZMPPos));
-	    COMPosition aCOMPos;
+	    COMState aCOMPos;
 	    memset(&aCOMPos,0,sizeof(aCOMPos));
 
 	    if (m_FilteringActivate)
@@ -761,7 +761,7 @@ namespace PatternGeneratorJRL
 		    aZMPPos.px = FZmpX;
 		    aZMPPos.py = FZmpY;
 
-		    /*! Feed the COMPositions. */
+		    /*! Feed the COMStates. */
 		    aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
 		    aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
 		  }
@@ -776,7 +776,7 @@ namespace PatternGeneratorJRL
 	    aZMPPos.py += lZMPPosy;
 	    FinalZMPPositions.push_back(aZMPPos);
 	    
-	    /*! Feed the COMPositions. */
+	    /*! Feed the COMStates. */
 	    double lCOMPosx=0.0, lCOMPosdx=0.0;
 	    double lCOMPosy=0.0, lCOMPosdy=0.0;
 	    m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,lCOMPosx,lIndexInterval);
@@ -786,7 +786,7 @@ namespace PatternGeneratorJRL
 	    aCOMPos.x[0] += lCOMPosx; aCOMPos.x[1] += lCOMPosdx;
 	    aCOMPos.y[0] += lCOMPosy; aCOMPos.y[1] += lCOMPosdy;
 	    aCOMPos.z[0] = m_InitialPoseCoMHeight;
-	    FinalCOMPositions.push_back(aCOMPos);
+	    FinalCOMStates.push_back(aCOMPos);
 	    /*! Feed the FootPositions. */
 
 
@@ -814,7 +814,7 @@ namespace PatternGeneratorJRL
 
   void AnalyticalMorisawaCompact::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
 						deque<ZMPPosition> & FinalZMPPositions,				     
-						deque<COMPosition> & FinalCoMPositions,				     
+						deque<COMState> & FinalCoMPositions,				     
 						deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 						deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 						bool EndSequence)
@@ -908,9 +908,9 @@ namespace PatternGeneratorJRL
 	FinalZMPPositions.push_back(aZMPPos);
 
 		
-	/*! Feed the COMPositions. */
+	/*! Feed the COMStates. */
 
-	COMPosition aCOMPos;
+	COMState aCOMPos;
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0],lIndexInterval);
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0],lIndexInterval);
@@ -2052,7 +2052,7 @@ namespace PatternGeneratorJRL
   int AnalyticalMorisawaCompact::OnLineFootChange(double time,
 						  FootAbsolutePosition &aFootAbsolutePosition,
 						  deque<ZMPPosition> & ZMPPositions,			     
-						  deque<COMPosition> & CoMPositions,
+						  deque<COMState> & CoMPositions,
 						  deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 						  deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 						  StepStackHandler *aStepStackHandler)
@@ -2072,7 +2072,7 @@ namespace PatternGeneratorJRL
   int AnalyticalMorisawaCompact::OnLineFootChanges(double time,
 						   deque<FootAbsolutePosition> &aFootAbsolutePosition,
 						   deque<ZMPPosition> & ZMPPositions,			     
-						   deque<COMPosition> & CoMPositions,
+						   deque<COMState> & CoMPositions,
 						   deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 						   deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 						   StepStackHandler *aStepStackHandler)
@@ -2258,8 +2258,8 @@ namespace PatternGeneratorJRL
 	m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py);
 	ZMPPositions.push_back(aZMPPos);
 
-	/*! Feed the COMPositions. */
-	COMPosition aCOMPos;
+	/*! Feed the COMStates. */
+	COMState aCOMPos;
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]);
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]);
@@ -2298,7 +2298,7 @@ namespace PatternGeneratorJRL
   }
         
   void AnalyticalMorisawaCompact::EndPhaseOfTheWalking(deque<ZMPPosition> &FinalZMPPositions,
-						       deque<COMPosition> &FinalCoMPositions,
+						       deque<COMState> &FinalCoMPositions,
 						       deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 						       deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
   {
@@ -2398,8 +2398,8 @@ namespace PatternGeneratorJRL
 	FinalZMPPositions.push_back(aZMPPos);
 
 		
-	/*! Feed the COMPositions. */
-	COMPosition aCOMPos;
+	/*! Feed the COMStates. */
+	COMState aCOMPos;
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0],lIndexInterval);
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0],lIndexInterval);

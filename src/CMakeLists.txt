@@ -54,6 +54,7 @@ SET(libwpg_src
 	SimplePlugin.cpp 
 	SimplePluginManager.cpp 
 	Clock.cpp
+	PGTypes.cpp
 	TimeUtilsWindows.cpp
  )
 

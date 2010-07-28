@@ -45,7 +45,7 @@ namespace PatternGeneratorJRL
       @param[out] RightFootPosition: The position of the Right Foot position.
       @param[out] ZMPRefPos: The ZMP position to be feed to the controller, in the waist 
       frame reference.
-      @param[out] COMPosition: returns position, velocity and acceleration of the CoM.
+      @param[out] COMState: returns position, velocity and acceleration of the CoM.
       @param[out] CurrentConfiguration: The results is a state vector containing the articular positions.
       @param[out] CurrentVelocity: The results is a state vector containing the speed.
       @param[out] CurrentAcceleration: The results is a state vector containing the acceleration.
@@ -53,7 +53,7 @@ namespace PatternGeneratorJRL
     int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 			       FootAbsolutePosition &RightFootPosition,
 			       MAL_VECTOR(,double) & ZMPRefPos,
-			       COMPosition & COMPosition,
+			       COMState & COMState,
 			       MAL_VECTOR(,double) & CurrentConfiguration,
 			       MAL_VECTOR(,double) & CurrentVelocity,
 			       MAL_VECTOR(,double) & CurrentAcceleration);
@@ -61,12 +61,12 @@ namespace PatternGeneratorJRL
 
     
     /*! Computes the COM of the robot with the Joint values given in BodyAngles,
-      velocities set to zero, and returns the values of the COM in aStaringCOMPosition.
+      velocities set to zero, and returns the values of the COM in aStaringCOMState.
       Assuming that the waist is at (0,0,0)
       it returns the associate initial values for the left and right foot.
       @param[in] BodyAngles: 4x4 matrix of the robot's root (most of the time, the waist)
       pose (position + orientation).
-      @param[out] aStartingCOMPosition: Returns the 3D position of the CoM for the current
+      @param[out] aStartingCOMState: Returns the 3D position of the CoM for the current
       position of the robot.
       @param[out] aStartingZMPPosition: Returns the 3D position of the ZMP for the current
       position of the robot.
@@ -76,7 +76,7 @@ namespace PatternGeneratorJRL
       in the waist coordinates frame.
     */
     int EvaluateStartingState(MAL_VECTOR( &,double) BodyAngles,
-			      COMPosition & aStartingCOMPosition,
+			      COMState & aStartingCOMState,
 			      MAL_S3_VECTOR(& ,double) aStartingZMPPosition,
 			      MAL_VECTOR(& ,double) aStartingWaistPose,
 			      FootAbsolutePosition & InitLeftFootPosition,
@@ -120,7 +120,7 @@ namespace PatternGeneratorJRL
       @param[out] aRightFootAbsolutePositions: Trajectory of absolute positions for the right foot.
      */
     void Setup(deque<ZMPPosition> & aZMPositions,
-	       deque<COMPosition> & aCOMBuffer,
+	       deque<COMState> & aCOMBuffer,
 	       deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
 	       deque<FootAbsolutePosition> & aRightFootAbsolutePositions );
 
@@ -146,7 +146,7 @@ namespace PatternGeneratorJRL
     StepStackHandler *m_StepStackHandler;
 
     /*! \brief Keep the waist position using a CoM position data structure . */
-    COMPosition m_CurrentWaistState;
+    COMState m_CurrentWaistState;
 
     /*! \brief The size of the preview control window */
     unsigned int m_NL;

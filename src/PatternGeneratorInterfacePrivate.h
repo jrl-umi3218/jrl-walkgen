@@ -136,7 +136,7 @@ namespace PatternGeneratorJRL
       @param[in] lCurrentJointValues: The vector of articular values in classical C++ style.
       @param[in] ClearStepStackHandler: Clean the stack of steps after copy.
      */
-    void CommonInitializationOfWalking(COMPosition & lStartingCOMPosition,
+    void CommonInitializationOfWalking(COMState & lStartingCOMState,
 				       MAL_S3_VECTOR(,double) & lStartingZMPPosition,
 				       MAL_VECTOR(  & ,double) BodyAnglesIni,
 				       FootAbsolutePosition & InitLeftFootAbsPos, 
@@ -175,7 +175,7 @@ namespace PatternGeneratorJRL
      @param[out]  CurrentAcceleration  The current acceleration of the robot according to the 
      the implementation of dynamic-JRLJapan. 
      @param[out]  ZMPTarget  The target ZMP in the waist reference frame.
-     @param[out] COMPosition The CoM position for this motion.
+     @param[out] COMState The CoM state for this motion.
      @param[out] LeftFootPosition: Absolute position of the left foot.
      @param[out] RightFootPosition: Absolute position of the right foot.
      @return True is there is still some data to send, false otherwise.
@@ -184,9 +184,32 @@ namespace PatternGeneratorJRL
 				    MAL_VECTOR(,double) & CurrentVelocity,
 				    MAL_VECTOR(,double) & CurrentAcceleration,
 				    MAL_VECTOR(,double) &ZMPTarget,
-				    COMPosition &COMPosition,
+				    COMState &COMState,
 				    FootAbsolutePosition &LeftFootPosition,
 				    FootAbsolutePosition &RightFootPosition);
+
+    /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
+     @param[out]  CurrentConfiguration The current configuration of the robot according to 
+     the implementation of dynamic-JRLJapan. This should be first position and orientation
+     of the waist, and then all the DOFs of your robot. 
+     @param[out]  CurrentVelocity  The current velocity of the robot according to the 
+     the implementation of dynamic-JRLJapan. 
+     @param[out]  CurrentAcceleration  The current acceleration of the robot according to the 
+     the implementation of dynamic-JRLJapan. 
+     @param[out]  ZMPTarget  The target ZMP in the waist reference frame.
+     @param[out] aCOMPosition The CoM position for this motion.
+     @param[out] LeftFootPosition: Absolute position of the left foot.
+     @param[out] RightFootPosition: Absolute position of the right foot.
+     @return True is there is still some data to send, false otherwise.
+    */
+    bool RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
+				    MAL_VECTOR(,double) & CurrentVelocity,
+				    MAL_VECTOR(,double) & CurrentAcceleration,
+				    MAL_VECTOR(,double) &ZMPTarget,
+				    COMPosition &aCOMPosition,
+				    FootAbsolutePosition &LeftFootPosition,
+				    FootAbsolutePosition &RightFootPosition);
+
 
     /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
       @param[out] LeftFootPosition: Absolute position of the left foot.
@@ -320,7 +343,7 @@ namespace PatternGeneratorJRL
 
     /*! \brief Returns the ZMP, CoM, left foot absolute position, and right foot absolute position
      for the initiale pose.*/
-    void EvaluateStartingState(COMPosition  & lStartingCOMPosition,
+    void EvaluateStartingState(COMState  & lStartingCOMState,
 			       MAL_S3_VECTOR(,double) & lStartingZMPPosition,
 			       MAL_VECTOR(,double) & lStartingWaistPose,
 			       FootAbsolutePosition & InitLeftFootAbsPos,
@@ -558,7 +581,7 @@ namespace PatternGeneratorJRL
     bool m_AutoFirstStep;
 
     /* ! Store the current relative state of the waist */
-    COMPosition m_CurrentWaistState;
+    COMState m_CurrentWaistState;
     
     /* ! current time period for the control */
     double m_dt;
@@ -639,7 +662,7 @@ namespace PatternGeneratorJRL
     deque<FootAbsolutePosition> m_LeftFootPositions, m_RightFootPositions;
     
     /*! Buffer for the COM position. */
-    deque<COMPosition> m_COMBuffer;
+    deque<COMState> m_COMBuffer;
     
     /*! @} */
 
@@ -670,7 +693,7 @@ namespace PatternGeneratorJRL
     The behavior of this method depends on \a m_AlgorithmforZMPCOM.
     */
     int CreateZMPReferences(deque<RelativeFootPosition> &lRelativeFootPositions,
-			    COMPosition &lStartingCOMPosition,
+			    COMState &lStartingCOMState,
 			    MAL_S3_VECTOR(&,double) lStartingZMPPosition,
 			    FootAbsolutePosition & InitLeftFootAbsPos,
 			    FootAbsolutePosition & InitRightFootAbsPos);
@@ -679,7 +702,7 @@ namespace PatternGeneratorJRL
     void AutomaticallyAddFirstStep(deque<RelativeFootPosition> & lRelativeFootPositions,
 				   FootAbsolutePosition & InitLeftFootAbsPos,
 				   FootAbsolutePosition & InitRightFootAbsPos,
-				   COMPosition &lStartingCOMPosition);
+				   COMState &lStartingCOMState);
     /* @} */
   };
 

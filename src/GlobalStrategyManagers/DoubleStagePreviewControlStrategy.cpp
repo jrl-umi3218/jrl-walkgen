@@ -71,7 +71,7 @@ int DoubleStagePreviewControlStrategy::InitInterObjects(CjrlHumanoidDynamicRobot
 int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 							      FootAbsolutePosition &RightFootPosition,
 							      MAL_VECTOR(,double) & ZMPRefPos,
-							      COMPosition & finalCOMPosition,
+							      COMState & finalCOMState,
 							      MAL_VECTOR(,double) & CurrentConfiguration,
 							      MAL_VECTOR(,double) & CurrentVelocity,
 							      MAL_VECTOR(,double) & CurrentAcceleration)
@@ -82,11 +82,11 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   if ((m_StepStackHandler->GetWalkMode()==0) ||
       (m_StepStackHandler->GetWalkMode()==4))
     {
-      (*m_COMBuffer)[m_NL].yaw = (*m_ZMPPositions)[m_NL].theta;
+      (*m_COMBuffer)[m_NL].yaw[0] = (*m_ZMPPositions)[m_NL].theta;
     }
 
-  //    COMPositionFromPC1 = m_COMBuffer[m_NL];
-  finalCOMPosition =  (*m_COMBuffer)[m_NL];
+  //    COMStateFromPC1 = m_COMBuffer[m_NL];
+  finalCOMState =  (*m_COMBuffer)[m_NL];
   
   ODEBUG("ZMP : " << (*m_ZMPPositions)[0].px
 	 << " " << (*m_ZMPPositions)[0].py
@@ -100,14 +100,14 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   m_ZMPpcwmbz->OneGlobalStepOfControl((*m_LeftFootPositions)[2*m_NL],
 				      (*m_RightFootPositions)[2*m_NL],
 				      (*m_ZMPPositions)[2*m_NL],
-				      finalCOMPosition,
+				      finalCOMState,
 				      CurrentConfiguration,
 				      CurrentVelocity,
 				      CurrentAcceleration);
-  ODEBUG4("finalCOMPosition:" <<finalCOMPosition.x[0] << " " 
-	  << finalCOMPosition.y[0] ,"DebugData.txt");
+  ODEBUG4("finalCOMState:" <<finalCOMState.x[0] << " " 
+	  << finalCOMState.y[0] ,"DebugData.txt");
   
-  (*m_COMBuffer)[0] = finalCOMPosition;
+  (*m_COMBuffer)[0] = finalCOMState;
   
   LeftFootPosition = (*m_LeftFootPositions)[0];
   RightFootPosition = (*m_RightFootPositions)[0];
@@ -116,8 +116,8 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   MAL_S4x4_MATRIX( PosOfWaistInCOMF,double);
   PosOfWaistInCOMF = m_ZMPpcwmbz->GetCurrentPositionofWaistInCOMFrame();
   
-  COMPosition outWaistPosition;
-  outWaistPosition = finalCOMPosition;
+  COMState outWaistPosition;
+  outWaistPosition = finalCOMState;
   outWaistPosition.x[0] =  CurrentConfiguration(0);
   outWaistPosition.y[0] =  CurrentConfiguration(1);
   outWaistPosition.z[0] =  CurrentConfiguration(2);
@@ -135,17 +135,17 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
     {
       temp1 = (*m_ZMPPositions)[0].px - outWaistPosition.x[0];
       temp2 = (*m_ZMPPositions)[0].py - outWaistPosition.y[0];
-      temp3 = finalCOMPosition.yaw*M_PI/180.0;
+      temp3 = finalCOMState.yaw[0]*M_PI/180.0;
       
       ZMPRefPos(0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
       ZMPRefPos(1) = -sin(temp3)*temp1+cos(temp3)*temp2;
-      ZMPRefPos(2) = -finalCOMPosition.z[0] - MAL_S4x4_MATRIX_ACCESS_I_J(PosOfWaistInCOMF, 2,3) - (*m_ZMPPositions)[0].pz;
+      ZMPRefPos(2) = -finalCOMState.z[0] - MAL_S4x4_MATRIX_ACCESS_I_J(PosOfWaistInCOMF, 2,3) - (*m_ZMPPositions)[0].pz;
     }
   else if (m_ZMPFrame==ZMPFRAME_WORLD)
     {
       temp1 = (*m_ZMPPositions)[0].px ;
       temp2 = (*m_ZMPPositions)[0].py ;
-      temp3 = finalCOMPosition.yaw*M_PI/180.0;
+      temp3 = finalCOMState.yaw[0]*M_PI/180.0;
 
       ZMPRefPos(0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
       ZMPRefPos(1) = -sin(temp3)*temp1+cos(temp3)*temp2;
@@ -175,26 +175,26 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 }
 
 int DoubleStagePreviewControlStrategy::EvaluateStartingState(MAL_VECTOR( &,double) BodyAngles,
-							     COMPosition & aStartingCOMPosition,
+							     COMState & aStartingCOMState,
 							     MAL_S3_VECTOR(&,double) aStartingZMPPosition,
 							     MAL_VECTOR(&,double) aStartingWaistPose,
 							     FootAbsolutePosition & InitLeftFootPosition,
 							     FootAbsolutePosition & InitRightFootPosition)
 {
-  MAL_S3_VECTOR(lStartingCOMPosition,double);
-  lStartingCOMPosition(0) = aStartingCOMPosition.x[0];
-  lStartingCOMPosition(1) = aStartingCOMPosition.y[0];
-  lStartingCOMPosition(2) = aStartingCOMPosition.z[0];
+  MAL_S3_VECTOR(lStartingCOMState,double);
+  lStartingCOMState(0) = aStartingCOMState.x[0];
+  lStartingCOMState(1) = aStartingCOMState.y[0];
+  lStartingCOMState(2) = aStartingCOMState.z[0];
   
   m_ZMPpcwmbz->EvaluateStartingState(BodyAngles,
-				     lStartingCOMPosition,
+				     lStartingCOMState,
 				     aStartingZMPPosition,
 				     aStartingWaistPose,
 				     InitLeftFootPosition,InitRightFootPosition);
 
-  aStartingCOMPosition.x[0] = lStartingCOMPosition(0);
-  aStartingCOMPosition.y[0] = lStartingCOMPosition(1);
-  aStartingCOMPosition.z[0] = lStartingCOMPosition(2);
+  aStartingCOMState.x[0] = lStartingCOMState(0);
+  aStartingCOMState.y[0] = lStartingCOMState(1);
+  aStartingCOMState.z[0] = lStartingCOMState(2);
   return 0;
 }
 
@@ -310,7 +310,7 @@ void DoubleStagePreviewControlStrategy::CallMethod(std::string &Method, std::ist
 }
 
 void DoubleStagePreviewControlStrategy::Setup(deque<ZMPPosition> & aZMPPositions,
-					      deque<COMPosition> & aCOMBuffer,
+					      deque<COMState> & aCOMBuffer,
 					      deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
 					      deque<FootAbsolutePosition> & aRightFootAbsolutePositions)
 {

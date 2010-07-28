@@ -96,7 +96,7 @@ namespace PatternGeneratorJRL
       deque<ZMPPosition> m_FIFODeltaZMPPositions;
 
       /*! Fifo for the COM reference. */
-      deque<COMPosition> m_FIFOCOMPositions;
+      deque<COMState> m_FIFOCOMStates;
 
       /*! Fifo for the positionning of the left foot. */
       deque<FootAbsolutePosition> m_FIFOLeftFootPosition;
@@ -124,8 +124,8 @@ namespace PatternGeneratorJRL
       /*! Keep the ZMP reference. */
       deque<ZMPPosition> m_FIFOTmpZMPPosition;
 	
-      /*!extra COMPosition buffer calculated to give to the stepover planner  */
-      std::vector<COMPosition> m_ExtraCOMBuffer;
+      /*!extra COMState buffer calculated to give to the stepover planner  */
+      std::vector<COMState> m_ExtraCOMBuffer;
 
       /*! Difference between the CoM and the Waist 
       from the initialization phase,
@@ -133,7 +133,7 @@ namespace PatternGeneratorJRL
       MAL_S3_VECTOR(,double) m_DiffBetweenComAndWaist;
 
       /*! COM Starting position. */
-      MAL_S3_VECTOR(,double) m_StartingCOMPosition;
+      MAL_S3_VECTOR(,double) m_StartingCOMState;
 
       /*! Final COM pose. */
       MAL_S4x4_MATRIX(,double) m_FinalDesiredCOMPose;
@@ -233,7 +233,7 @@ namespace PatternGeneratorJRL
 	  @param[in] LeftFootPosition: The position of the k+NL Left Foot position.
 	  @param[in] RightFootPosition: The position of the k+NL Right Foot position.
 	  @param[in] NewZMPRefPos: The ZMP position at k + 2*NL.
-	  @param[out] finalCOMPosition: returns position, velocity and acceleration of the CoM 
+	  @param[out] finalCOMState: returns position, velocity and acceleration of the CoM 
 	  after the second stage of control, i.e. the final value.
 	  @param[out] CurrentConfiguration: The results is a state vector containing the articular positions.
 	  @param[out] CurrentVelocity: The results is a state vector containing the speed.
@@ -242,7 +242,7 @@ namespace PatternGeneratorJRL
       int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 				 FootAbsolutePosition &RightFootPosition,
 				 ZMPPosition &NewZMPRefPos,
-				 COMPosition & finalCOMPosition,
+				 COMState & finalCOMState,
 				 MAL_VECTOR(,double) & CurrentConfiguration,
 				 MAL_VECTOR(,double) & CurrentVelocity,
 				 MAL_VECTOR(,double) & CurrentAcceleration);
@@ -251,18 +251,18 @@ namespace PatternGeneratorJRL
       /*! First stage of the control, 
 	i.e.preview control on the CART model with delayed step parameters,
 	Inverse Kinematics, and ZMP calculated with the multi body model.
-	aCOMPosition will be updated with the new value of the COM computed by
+	aCOMState will be updated with the new value of the COM computed by
 	the card model.
 	@param[in] LeftFootPosition: The position of the k+NL Left Foot position.
 	@param[in] RightFootPosition: The position of the k+NL Right Foot position.
-	@param[in] afCOMPosition: A COM position of reference, in this context,
+	@param[in] afCOMState: A COM position of reference, in this context,
 	this will be the height of the waist.
 
 	@return If an error occurs returns a negative integer, 0 otherwise.
       */
       int FirstStageOfControl(FootAbsolutePosition &LeftFootPosition,
 			      FootAbsolutePosition &RightFootPosition,
-			      COMPosition &afCOMPosition);
+			      COMState &afCOMState);
       
       /*! This methods is used only to update the queue of ZMP difference
 	for the second stage of control. Also it does not return
@@ -282,15 +282,15 @@ namespace PatternGeneratorJRL
 	@param[out] refandfinal: The final position of the CoM.
 	@return If an error occurs returns a negative integer, 0 otherwise.
       */
-      int SecondStageOfControl(COMPosition &refandfinal);
+      int SecondStageOfControl(COMState &refandfinal);
 
       /*! Compute the COM of the robot with the Joint values given in BodyAngles,
-	velocities set to zero, and returns the values of the COM in aStaringCOMPosition.
+	velocities set to zero, and returns the values of the COM in aStaringCOMState.
 	Assuming that the waist is at (0,0,0)
 	it returns the associate initial values for the left and right foot.
 	@param[in] BodyAngles: 4x4 matrix of the robot's root (most of the time, the waist)
 	pose (position + orientation).
-	@param[out] aStartingCOMPosition: Returns the 3D position of the CoM for the current
+	@param[out] aStartingCOMState: Returns the 3D position of the CoM for the current
 	position of the robot.
 	@param[out] aStartingZMPPosition: Returns the 3D position of the ZMP for the current
 	position of the robot.
@@ -300,25 +300,25 @@ namespace PatternGeneratorJRL
 	in the waist coordinates frame.
       */
       int EvaluateStartingState(MAL_VECTOR( &,double) BodyAngles,
-				MAL_S3_VECTOR( &,double) aStartingCOMPosition,
+				MAL_S3_VECTOR( &,double) aStartingCOMState,
 				MAL_S3_VECTOR( &,double) aStartingZMPPosition,
 				MAL_VECTOR( &,double) aStartingWaistPose,
 				FootAbsolutePosition & InitLeftFootPosition,
 				FootAbsolutePosition & InitRightFootPosition);
 
       /*! Compute the COM of the robot with the Joint values given in BodyAngles,
-	velocities set to zero, and returns the values of the COM in aStaringCOMPosition.
+	velocities set to zero, and returns the values of the COM in aStaringCOMState.
 	Assuming that the waist is at (0,0,0)
 	it returns the associate initial values for the left and right foot.
 	@param BodyAngles: Vector of the joint values for the robot.
-	@param[out] aStartingCOMPosition: Position of the CoM.
+	@param[out] aStartingCOMState: Position of the CoM.
 	@param[out] aWaistPosition: Position of the Waist.
 	@param[out] InitLeftFootPosition: Position of the left foot in the waist coordinates frame.
 	@param[out] InitRightFootPosition: Position of the right foot in the waist coordinates
 	frame.
       */
       int EvaluateStartingCoM(MAL_MATRIX( &,double) BodyAngles,
-			      MAL_S3_VECTOR( &,double) aStartingCOMPosition,
+			      MAL_S3_VECTOR( &,double) aStartingCOMState,
 			      MAL_VECTOR( &,double) aWaistPose,
 			      FootAbsolutePosition & InitLeftFootPosition,
 			      FootAbsolutePosition & InitRightFootPosition);
@@ -331,7 +331,7 @@ namespace PatternGeneratorJRL
       /*! Setup (Frontal Global), compute internally all the steps to get NL ZMP multibody values.
 	
 	@param[in] ZMPRefPositions: FIFO of the ZMP reference values.
-	@param[out] COMPositions: FIFO of the COM reference positions 
+	@param[out] COMStates: FIFO of the COM reference positions 
 	   (here only the height position is taken into account).
 	@param[in] LeftFootPositions: FIFO of the left foot positions computed by
 	ZMPDiscretization (the object creating the ZMP and foot reference 
@@ -340,7 +340,7 @@ namespace PatternGeneratorJRL
 	right foot.
        */
       int Setup(deque<ZMPPosition> &ZMPRefPositions,
-		deque<COMPosition> &COMPositions,
+		deque<COMState> &COMStates,
 		deque<FootAbsolutePosition> &LeftFootPositions,
 		deque<FootAbsolutePosition> &RightFootPositions);
 
@@ -348,7 +348,7 @@ namespace PatternGeneratorJRL
 	of ZMPPreviewControlWithMultiBodyZMP for the setup phase.
 
        	@param[in] ZMPRefPositions: FIFO of the ZMP reference values.
-	@param[in] COMPositions: FIFO of the COM reference positions 
+	@param[in] COMStates: FIFO of the COM reference positions 
 	   (here only the height position is taken into account).
 	@param[in] LeftFootPositions: FIFO of the left foot positions computed by
 	ZMPDiscretization (the object creating the ZMP and foot reference 
@@ -357,7 +357,7 @@ namespace PatternGeneratorJRL
 	right foot.
       */
       int SetupFirstPhase(deque<ZMPPosition> &ZMPRefPositions,
-			  deque<COMPosition> &COMPositions,
+			  deque<COMState> &COMStates,
 			  deque<FootAbsolutePosition> &LeftFootPositions,
 			  deque<FootAbsolutePosition> &RightFootPositions);
 
@@ -368,7 +368,7 @@ namespace PatternGeneratorJRL
 	to the value of the COM.
 
 	@param[in] ZMPRefPositions: FIFO of the ZMP reference values.
-	@param[out] COMPositions: FIFO of the COM reference positions 
+	@param[out] COMStates: FIFO of the COM reference positions 
 	   (here only the height position is taken into account).
 	@param[in] LeftFootPositions: FIFO of the left foot positions computed by
 	ZMPDiscretization (the object creating the ZMP and foot reference 
@@ -384,7 +384,7 @@ namespace PatternGeneratorJRL
 	@param[in] localindex: Value of the index which goes from 0 to 2 * m_NL.
       */
       int SetupIterativePhase(deque<ZMPPosition> &ZMPRefPositions,
-			      deque<COMPosition> &COMPositions,
+			      deque<COMState> &COMStates,
 			      deque<FootAbsolutePosition> &LeftFootPositions,
 			      deque<FootAbsolutePosition> &RightFootPositions,
 			      MAL_VECTOR(,double) &CurrentConfiguration,
@@ -401,20 +401,20 @@ namespace PatternGeneratorJRL
 	first preview control).
 	@param[out] ExtraZMPRefBuffer: Extra FIFO for the ZMP ref positions.
       */
-      void CreateExtraCOMBuffer(deque<COMPosition> &ExtraCOMBuffer,
+      void CreateExtraCOMBuffer(deque<COMState> &ExtraCOMBuffer,
 				deque<ZMPPosition> &ExtraZMPBuffer,
 				deque<ZMPPosition> &ExtraZMPRefBuffer);
       
       /*! Evaluate Starting CoM for a given position.
 	@param[in] BodyAnglesInit: The state vector used to compute the CoM.
-	@param[out] aStartingCOMPosition: The CoM of the position specified.
+	@param[out] aStartingCOMState: The CoM of the position specified.
 	@param[out] InitLeftFootPosition: Position of the InitLeftFootPosition in the same
 	reference frame than the waist.
 	@param[out] InitRightFootPosition: Position of the InitRightFootPosition
 	in the same reference frame than the waist 
        */
       int EvaluateStartingCoM(MAL_VECTOR(&,double) BodyAnglesInit,
-			      MAL_S3_VECTOR(&,double) aStartingCOMPosition,
+			      MAL_S3_VECTOR(&,double) aStartingCOMState,
 			      MAL_VECTOR(&,double) aStartingWaistPosition,
 			      FootAbsolutePosition & InitLeftFootPosition,
 			      FootAbsolutePosition & InitRightFootPosition);
@@ -431,7 +431,7 @@ namespace PatternGeneratorJRL
       MAL_S4x4_MATRIX(,double) GetCurrentPositionofWaistInCOMFrame();
 
       /*! Returns the last element of the COM FIFO in the first stage of control */
-      COMPosition GetLastCOMFromFirstStage();
+      COMState GetLastCOMFromFirstStage();
 
       /*! Update the queue of ZMP reference value. */
       void UpdateTheZMPRefQueue(ZMPPosition NewZMPRefPos);
@@ -458,7 +458,7 @@ namespace PatternGeneratorJRL
 	@param[in] StageOfTheAlgorithm: Indicates if this is the second stage of 
 	the preview control or the first one.
       */
-      void CallToComAndFootRealization(COMPosition &acomp,
+      void CallToComAndFootRealization(COMState &acomp,
 				       FootAbsolutePosition &aLeftFAP,
 				       FootAbsolutePosition &aRightFAP,
 				       MAL_VECTOR(,double) & CurrentConfiguration,

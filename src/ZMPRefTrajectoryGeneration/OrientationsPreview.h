@@ -31,13 +31,13 @@ namespace PatternGeneratorJRL
 
     void previewOrientations(const double &Time,
 			     std::deque<double> &PreviewedSupportAngles,
-			     const COMState_t &TrunkState, COMState_t &TrunkStateT,
+			     const COMState &TrunkState, COMState &TrunkStateT,
 			     const SupportState * Support,
 			     std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
     void verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref,
-				      const COMState_t &TrunkState, COMState_t &TrunkStateT,
+				      const COMState &TrunkState, COMState &TrunkStateT,
 				      const SupportState * Support);
 
   private:
@@ -100,11 +100,11 @@ namespace PatternGeneratorJRL
 
 
     bool verifyAngleOfHipJoint(const SupportState * Support,
-			       const COMState_t &TrunkState, COMState_t &TrunkStateT,
+			       const COMState &TrunkState, COMState &TrunkStateT,
 			       double CurrentSupportFootAngle,
 			       unsigned int StepNumber);
 
-    void verifyVelocityOfHipJoint(const double &Time, COMState_t &TrunkStateT,
+    void verifyVelocityOfHipJoint(const double &Time, COMState &TrunkStateT,
 				  const double &PreviewedSupportFoot, const unsigned int &StepNumber,
 				  const SupportState * Support,
 				  const double &CurrentRightFootAngle, const double &CurrentLeftFootAngle,

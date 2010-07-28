@@ -59,7 +59,8 @@ OnLineState & OnLineState::operator=(unsigned int NewState)
 }
 
 
-ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,string DataFile, 
+ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,
+				     string DataFile, 
 				     CjrlHumanoidDynamicRobot *aHS)
   : ZMPRefTrajectoryGeneration(lSPM)
 {
@@ -124,33 +125,33 @@ ZMPDiscretization::~ZMPDiscretization()
 
 
 void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositions,
-					     deque<COMPosition> & FinalCOMPositions,
+					     deque<COMState> & FinalCOMStates,
 					     deque<RelativeFootPosition> &RelativeFootPositions,
 					     deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					     double Xmax,
-					     COMPosition & lStartingCOMPosition,
+					     COMState & lStartingCOMState,
 					     MAL_S3_VECTOR(,double) & lStartingZMPPosition,
 					     FootAbsolutePosition & InitLeftFootAbsolutePosition,
 					     FootAbsolutePosition & InitRightFootAbsolutePosition)
 {
   
   InitOnLine(FinalZMPPositions,
-	     FinalCOMPositions,
+	     FinalCOMStates,
 	     LeftFootAbsolutePositions,
 	     RightFootAbsolutePositions,
 	     InitLeftFootAbsolutePosition,
 	     InitRightFootAbsolutePosition,
 	     RelativeFootPositions,
-	     lStartingCOMPosition,
+	     lStartingCOMState,
 	     lStartingZMPPosition);
 
   EndPhaseOfTheWalking(FinalZMPPositions,
-		       FinalCOMPositions,
+		       FinalCOMStates,
 		       LeftFootAbsolutePositions,
 		       RightFootAbsolutePositions);
 
-  FinalCOMPositions.resize(FinalZMPPositions.size());
+  FinalCOMStates.resize(FinalZMPPositions.size());
 }
 
 void ZMPDiscretization::DumpFootAbsolutePosition(string aFileName,
@@ -298,13 +299,13 @@ void ZMPDiscretization::SetZMPShift(vector<double> &ZMPShift)
 
 /* Initialiazation of the on-line stacks. */
 int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,					     
-				  deque<COMPosition> & FinalCoMPositions,
+				  deque<COMState> & FinalCoMStates,
 				  deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 				  deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 				  FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				  FootAbsolutePosition & InitRightFootAbsolutePosition,
 				  deque<RelativeFootPosition> &RelativeFootPositions,
-				  COMPosition & lStartingCOMPosition,
+				  COMState & lStartingCOMState,
 				  MAL_S3_VECTOR(,double) & lStartingZMPPosition)
 {
   m_RelativeFootPositions.clear();
@@ -373,13 +374,13 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   ODEBUG(AddArraySize);
   deque<ZMPPosition> ZMPPositions;
   ZMPPositions.resize(AddArraySize);
-  FinalCoMPositions.resize(AddArraySize);
+  FinalCoMStates.resize(AddArraySize);
   LeftFootAbsolutePositions.resize(AddArraySize);
   RightFootAbsolutePositions.resize(AddArraySize);
   int CurrentZMPindex=0;
 
   // Also very important for the initialization: reshape the ZMP reference for a smooth starting.
-  //  double startingZMPREF[3] = { lStartingCOMPosition.x[0], lStartingCOMPosition.y[0],lStartingZMPPosition(2)};
+  //  double startingZMPREF[3] = { lStartingCOMState.x[0], lStartingCOMState.y[0],lStartingZMPPosition(2)};
   double startingZMPREF[3] = { 0.0, 0.0,lStartingZMPPosition(2)};
   
   // Make sure that the robot thinks it is at the position it thinks it is.
@@ -391,17 +392,17 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 	  << m_ZMPNeutralPosition[1] << endl <<
 	  "StartingZMPPosition(toto):" <<  lStartingZMPPosition(0) << " " << lStartingZMPPosition(1) << " " <<
 	  lStartingZMPPosition(2) << endl
-	  << "lStartingCOMPosition: " << lStartingCOMPosition.x[0] << " " 
-	  << lStartingCOMPosition.y[0] << " "
-	  << lStartingCOMPosition.z[0] << endl
+	  << "lStartingCOMState: " << lStartingCOMState.x[0] << " " 
+	  << lStartingCOMState.y[0] << " "
+	  << lStartingCOMState.z[0] << endl
 	  << "CurrentAbsTheta : " << CurrentAbsTheta << endl
 	  << "AddArraySize:"<< AddArraySize << " " << m_PreviewControlTime << " " <<m_SamplingPeriod  << endl
 	  << "FinalZMPref :( " <<finalZMPREF[0]  
 	  << " , " <<finalZMPREF[1] << " ) " << ZMPPositions.size() <<endl
 	 << "InitRightFootAbsPos.z " << InitRightFootAbsolutePosition.z);
-  ODEBUG( "lStartingCOMPosition: " << lStartingCOMPosition.x[0] << " " 
-	  << lStartingCOMPosition.y[0] << " "
-	   << lStartingCOMPosition.z[0] );
+  ODEBUG( "lStartingCOMState: " << lStartingCOMState.x[0] << " " 
+	  << lStartingCOMState.y[0] << " "
+	   << lStartingCOMState.z[0] );
 	
   ODEBUG4("ZMP::InitOnLine - Step 4 ","ZMDInitOnLine.txt");
   for(unsigned int i=0;i<ZMPPositions.size();i++)
@@ -420,20 +421,32 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       ZMPPositions[CurrentZMPindex].stepType = 0;
 
       // Set CoM positions.
-      FinalCoMPositions[CurrentZMPindex].z[0] = m_ComHeight;
-      FinalCoMPositions[CurrentZMPindex].z[1] = 0.0;
-      FinalCoMPositions[CurrentZMPindex].z[2] = 0.0;
-      FinalCoMPositions[CurrentZMPindex].pitch = 0.0;
-      FinalCoMPositions[CurrentZMPindex].roll = 0.0;
-      FinalCoMPositions[CurrentZMPindex].yaw = 
+      FinalCoMStates[CurrentZMPindex].z[0] = m_ComHeight;
+      FinalCoMStates[CurrentZMPindex].z[1] = 0.0;
+      FinalCoMStates[CurrentZMPindex].z[2] = 0.0;
+
+      FinalCoMStates[CurrentZMPindex].pitch[0] = 
+	FinalCoMStates[CurrentZMPindex].pitch[1] = 
+	FinalCoMStates[CurrentZMPindex].pitch[2] = 0.0;
+
+      FinalCoMStates[CurrentZMPindex].roll[0] = 
+	FinalCoMStates[CurrentZMPindex].roll[1] = 
+	FinalCoMStates[CurrentZMPindex].roll[2] = 0.0;
+
+      FinalCoMStates[CurrentZMPindex].yaw[0] = 
 	ZMPPositions[CurrentZMPindex].theta;
+      FinalCoMStates[CurrentZMPindex].yaw[1] = 
+	FinalCoMStates[CurrentZMPindex].yaw[2] = 0.0;
       
       // Set Left Foot positions.
-      LeftFootAbsolutePositions[CurrentZMPindex] = CurrentLeftFootAbsPos;
-      RightFootAbsolutePositions[CurrentZMPindex] = CurrentRightFootAbsPos;
+      LeftFootAbsolutePositions[CurrentZMPindex] = 
+	CurrentLeftFootAbsPos;
+      RightFootAbsolutePositions[CurrentZMPindex] = 
+	CurrentRightFootAbsPos;
 
       LeftFootAbsolutePositions[CurrentZMPindex].time = 
-	RightFootAbsolutePositions[CurrentZMPindex].time = m_CurrentTime;
+	RightFootAbsolutePositions[CurrentZMPindex].time = 
+	m_CurrentTime;
 
       LeftFootAbsolutePositions[CurrentZMPindex].stepType = 
 	RightFootAbsolutePositions[CurrentZMPindex].stepType = 10;
@@ -468,7 +481,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
     {
       OnLineAddFoot(RelativeFootPositions[i],
 		    FinalZMPPositions,
-		    FinalCoMPositions,
+		    FinalCoMStates,
 		    LeftFootAbsolutePositions,
 		    RightFootAbsolutePositions,
 		    false);
@@ -527,7 +540,7 @@ void ZMPDiscretization::UpdateCurrentSupportFootPosition(RelativeFootPosition aR
 
 void ZMPDiscretization::OnLine(double time,
 				    deque<ZMPPosition> & FinalZMPPositions,				     
-				    deque<COMPosition> & FinalCOMPositions,
+				    deque<COMState> & FinalCOMStates,
 				    deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 				    deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
 {
@@ -539,7 +552,7 @@ void ZMPDiscretization::OnLine(double time,
    state of the relative steps stack. */
 void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
 				      deque<ZMPPosition> & FinalZMPPositions,					     
-				      deque<COMPosition> & FinalCOMPositions,
+				      deque<COMState> & FinalCOMStates,
 				      deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 				      deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 				      bool EndSequence)
@@ -937,23 +950,31 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 
   for(unsigned int i=0;i<ZMPPositions.size();i++)
     {
-      COMPosition aCOMPosition;
-      aCOMPosition.x[0] = 
-	aCOMPosition.x[1] = 
-	aCOMPosition.x[2] = 0.0;
+      COMState aCOMState;
+      aCOMState.x[0] = 
+	aCOMState.x[1] = 
+	aCOMState.x[2] = 0.0;
 
-      aCOMPosition.y[0] = 
-	aCOMPosition.y[1] = 
-	aCOMPosition.y[2] = 0.0;
+      aCOMState.y[0] = 
+	aCOMState.y[1] = 
+	aCOMState.y[2] = 0.0;
 
-      aCOMPosition.z[0] = m_ComHeight;
+      aCOMState.z[0] = m_ComHeight;
       
-      aCOMPosition.pitch = aCOMPosition.roll = 0.0;
-      aCOMPosition.z[1] = aCOMPosition.z[2] = 0.0;
-
-      aCOMPosition.yaw = ZMPPositions[i].theta;
+      aCOMState.pitch[0] = 
+	aCOMState.pitch[1] =
+	aCOMState.pitch[2] =
+	aCOMState.roll[0] =
+	aCOMState.roll[1] = 
+	aCOMState.roll[2] = 
+	aCOMState.yaw[1] =
+	aCOMState.yaw[2] = 0.0;
       
-      FinalCOMPositions.push_back(aCOMPosition);
+      aCOMState.z[1] = aCOMState.z[2] = 0.0;
+
+      aCOMState.yaw[0] = ZMPPositions[i].theta;
+      
+      FinalCOMStates.push_back(aCOMState);
       FinalLeftFootAbsolutePositions.push_back(LeftFootAbsolutePositions[i]);
       FinalRightFootAbsolutePositions.push_back(RightFootAbsolutePositions[i]);
      
@@ -968,7 +989,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       
       // End Phase of the walking includes the filtering.
       EndPhaseOfTheWalking(FinalZMPPositions,
-			   FinalCOMPositions,
+			   FinalCOMStates,
 			   FinalLeftFootAbsolutePositions,
 			   FinalRightFootAbsolutePositions);
     }
@@ -1071,7 +1092,7 @@ void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
 int ZMPDiscretization::OnLineFootChange(double time,
 					FootAbsolutePosition &aFootAbsolutePosition,
 					deque<ZMPPosition> & FinalZMPPositions,			     
-					deque<COMPosition> & CoMPositions,
+					deque<COMState> & CoMStates,
 					deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 					deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 					StepStackHandler *aStepStackHandler)
@@ -1087,7 +1108,7 @@ int ZMPDiscretization::ReturnOptimalTimeToRegenerateAStep()
 }
 
 void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPositions,
-					       deque<COMPosition> &FinalCOMPositions,
+					       deque<COMState> &FinalCOMStates,
 					       deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 					       deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
 
@@ -1158,21 +1179,12 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
       ZMPPositions[CurrentZMPindex].stepType =0; 
 
       // Set CoM Positions.
-      COMPosition aCOMPosition;
-      aCOMPosition.z[0] = m_ComHeight;
+      COMState aCOMState;
 
-      aCOMPosition.x[0] = 
-	aCOMPosition.x[1] = 
-	aCOMPosition.x[2] = 0.0;
+      aCOMState.z[0] = m_ComHeight;
+      aCOMState.yaw[0] = ZMPPositions[CurrentZMPindex].theta;
 
-      aCOMPosition.y[0] = 
-	aCOMPosition.y[1] = 
-	aCOMPosition.y[2] = 0.0;
-
-      aCOMPosition.z[1] = aCOMPosition.z[2] = 0.0;
-      aCOMPosition.pitch = aCOMPosition.roll = 0.0;
-      aCOMPosition.yaw = ZMPPositions[CurrentZMPindex].theta;
-      FinalCOMPositions.push_back(aCOMPosition);
+      FinalCOMStates.push_back(aCOMState);
 
       // Set Feet positions.
       LeftFootAbsolutePosition = 
@@ -1220,12 +1232,12 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
 
 
       // Set CoM Positions.
-      COMPosition aCOMPosition;
-      aCOMPosition.z[0] = m_ComHeight;
+      COMState aCOMState;
+      aCOMState.z[0] = m_ComHeight;
 
-      aCOMPosition.z[1] = aCOMPosition.z[2] = 0.0;
-      aCOMPosition.yaw = ZMPPositions[CurrentZMPindex].theta;
-      FinalCOMPositions.push_back(aCOMPosition);
+      aCOMState.z[1] = aCOMState.z[2] = 0.0;
+      aCOMState.yaw[0] = ZMPPositions[CurrentZMPindex].theta;
+      FinalCOMStates.push_back(aCOMState);
 
       // Set Feet Positions
       LeftFootAbsolutePosition= 
