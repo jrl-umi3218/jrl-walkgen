@@ -363,6 +363,14 @@ namespace PatternGeneratorJRL
 			      double yaw);
     
 
+    /*! @} */
+
+    /*! \brief Set additive acceleration to the state
+      \param x: Additive acceleration therm along the saggital plane.
+      \param y: Additive acceleration therm along the perpendicular plane.
+       */
+    void perturbAcceleration(double x,
+			      double y);
 
   protected:
 

@@ -288,6 +288,11 @@ namespace PatternGeneratorJRL
       virtual void setVelocityReference(double x,
 					double y,
 					double yaw)=0;
+      /*! \brief Set velocity reference
+	\param x: Additive acceleration along the saggital plane.
+	\param y: Additive acceleration along the lateral plane.
+       */
+      virtual void perturbAcceleration(double x, double y)=0;
 
     };
 

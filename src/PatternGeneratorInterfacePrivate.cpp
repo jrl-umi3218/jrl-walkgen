@@ -1743,6 +1743,12 @@ namespace PatternGeneratorJRL {
     m_ZMPVRQP->setVelReference(x,y,yaw);
   }
 
+  void PatternGeneratorInterfacePrivate::perturbAcceleration(double x,
+							      double y)
+  {
+    m_ZMPVRQP->perturbAcceleration(x,y);
+  }
+
   int PatternGeneratorInterfacePrivate::ChangeOnLineStep(double time,
 							 FootAbsolutePosition & aFootAbsolutePosition,
 							 double &newtime)
