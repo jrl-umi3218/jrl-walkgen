@@ -83,6 +83,7 @@ SET_TARGET_PROPERTIES( TestHerdt2010
 	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
 		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}  
 )
+ADD_DEPENDENCIES (TestHerdt2010 ${PROJECT_NAME})
 
 # Add examples
 
