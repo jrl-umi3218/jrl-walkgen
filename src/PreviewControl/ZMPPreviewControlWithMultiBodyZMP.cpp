@@ -384,8 +384,8 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
 
   double zmpx2, zmpy2;
   COMState acomp;
-  acomp.yaw = 0.0;
-  acomp.pitch = 0.0;
+  acomp.yaw[0] = 0.0;
+  acomp.pitch[0] = 0.0;
   if ((m_StageStrategy==ZMPCOM_TRAJECTORY_FULL)
       || (m_StageStrategy==ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY))
     {
@@ -413,8 +413,14 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
       for(unsigned j=0;j<3;j++)
 	acomp.z[j] = afCOMState.z[j];
 
-      acomp.yaw = afCOMState.yaw;
-      acomp.pitch = afCOMState.pitch;
+      for(unsigned j=0;j<3;j++)
+	acomp.yaw[j] = afCOMState.yaw[j];
+
+      for(unsigned j=0;j<3;j++)
+	acomp.pitch[j] = afCOMState.pitch[j];
+
+      for(unsigned j=0;j<3;j++)
+	acomp.roll[j] = afCOMState.roll[j];
 
     }
   else  if (m_StageStrategy==ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY)
@@ -428,8 +434,11 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
       for(unsigned j=0;j<3;j++)
 	acomp.z[j] = afCOMState.z[j];
 
-      acomp.yaw = afCOMState.yaw;
-      acomp.pitch = afCOMState.pitch;
+      for(unsigned j=0;j<3;j++)
+	acomp.yaw[j] = afCOMState.yaw[j];
+      
+      for(unsigned j=0;j<3;j++)
+	acomp.pitch[j] = afCOMState.pitch[j];
     }
 
 
@@ -731,7 +740,7 @@ void ZMPPreviewControlWithMultiBodyZMP::CreateExtraCOMBuffer(deque<COMState> &m_
       m_ExtraZMPBuffer[i].px=aZmpx2;
       m_ExtraZMPBuffer[i].py=aZmpy2;
 
-      m_ExtraCOMBuffer[i].yaw = m_ExtraZMPRefBuffer[i].theta;
+      m_ExtraCOMBuffer[i].yaw[0] = m_ExtraZMPRefBuffer[i].theta;
 
       aFIFOZMPRefPositions.pop_front();
 

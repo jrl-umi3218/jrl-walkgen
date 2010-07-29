@@ -57,7 +57,7 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
       aPGI.ParseCmd(strm);
     }
   // Evaluate current state of the robot in the PG.
-  COMPosition   lStartingCOMPosition;
+  COMState   lStartingCOMPosition;
   MAL_S3_VECTOR(,double)  lStartingZMPPosition;
   MAL_VECTOR(,double)  lStartingWaistPose;
   FootAbsolutePosition  InitLeftFootAbsPos;

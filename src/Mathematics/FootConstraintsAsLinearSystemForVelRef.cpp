@@ -19,42 +19,15 @@
 using namespace std;
 using namespace PatternGeneratorJRL;
 
-
-#if 1
-#define RESETDEBUG4(y) { ofstream DebugFile;	\
-    DebugFile.open(y,ofstream::out);		\
-    DebugFile.close();}
-#define ODEBUG4(x,y) { ofstream DebugFile;		\
-    DebugFile.open(y,ofstream::app);			\
-    DebugFile <<  x << endl; DebugFile.close();}
-#else
-#define RESETDEBUG4(y)
-#define ODEBUG4(x,y)
-#endif
-
-#define RESETDEBUG6(y)
-#define ODEBUG6(x,y)
-
-#define RESETDEBUG5(y) { ofstream DebugFile;	\
-    DebugFile.open(y,ofstream::out);		\
-    DebugFile.close();}
-#define ODEBUG5(x,y) { ofstream DebugFile;	\
-    DebugFile.open(y,ofstream::app);		\
-    DebugFile << x << endl;			\
-    DebugFile.close();}
-#define ODEBUG5NOE(x,y) { ofstream DebugFile;	\
-    DebugFile.open(y,ofstream::app);		\
-    DebugFile << x ; DebugFile.close();}
-#if 1
-#define ODEBUG(x)
-#else
-#define ODEBUG(x)  std::cout << "FootConstraintAsLinearSystem: " << x << endl;
-#endif
-
-#define ODEBUG3(x)  std::cout << "FootConstraintAsLinearSystem: " << x << endl;
+#include <Debug.h>
 
 
-FootConstraintsAsLinearSystemForVelRef::FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM, CjrlHumanoidDynamicRobot *aHS, double ConstraintOnX, double ConstraintOnY) :
+
+FootConstraintsAsLinearSystemForVelRef::
+FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM, 
+				       CjrlHumanoidDynamicRobot *aHS, 
+				       double ConstraintOnX, 
+				       double ConstraintOnY) :
   SimplePlugin(aSPM)
 {
 
@@ -121,7 +94,8 @@ FootConstraintsAsLinearSystemForVelRef::FootConstraintsAsLinearSystemForVelRef(S
   //   printf("Leaving FootConstraintsAsLinearSystemForVelRef \n");
 }
 
-FootConstraintsAsLinearSystemForVelRef::~FootConstraintsAsLinearSystemForVelRef()
+FootConstraintsAsLinearSystemForVelRef::
+~FootConstraintsAsLinearSystemForVelRef()
 {
   // if (CHLeftFPosConstrArrayX!=0)
   //   delete [] CHLeftFPosConstrArrayX;
