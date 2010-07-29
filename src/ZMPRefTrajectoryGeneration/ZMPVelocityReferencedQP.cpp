@@ -144,6 +144,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   //Feet distance in the DS phase 
   m_FeetDistanceDS = 0.2; 
   // printf("Leaving ZMPVelocityReferencedQP \n"); 
+
+  m_PerturbationOccured = false;
 } 
  
 ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP() 
@@ -205,6 +207,16 @@ void ZMPVelocityReferencedQP::setVelReference(double x,
   RefVel.x = x;
   RefVel.y = y;
   RefVel.dYaw = yaw;
+}
+
+void ZMPVelocityReferencedQP::perturbAcceleration(double x,double y)
+{
+  MAL_VECTOR_RESIZE(m_Perturbation,6);
+
+  m_Perturbation(2) = x;
+  m_Perturbation(5) = y;
+  m_PerturbationOccured = true;
+
 }
 
 void ZMPVelocityReferencedQP::interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions, 
@@ -2658,7 +2670,15 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				FinalRightFootAbsolutePositions); 
 
       // Read the current state of the 2D Linearized Inverted Pendulum. 
-      m_2DLIPM->GetState(xk); 
+      m_2DLIPM->GetState(xk);
+
+      if(m_PerturbationOccured == true)
+	{
+	  xk(2) = xk(2)+m_Perturbation(2);
+	  xk(5) = xk(5)+m_Perturbation(5);
+	  m_PerturbationOccured = false;
+	}
+	
 
       //TODO : Add a get function to read the state 
       m_Support->setSupportState(time+m_TimeBuffer, 0, RefVel); 

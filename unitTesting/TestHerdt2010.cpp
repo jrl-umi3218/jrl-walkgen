@@ -68,7 +68,7 @@ void HerdtOnline(PatternGeneratorInterface &aPGI)
     aPGI.ParseCmd(strm2);
   }
   {
-    istringstream strm2(":HerdtOnline 0.2 0.0 0.1");
+    istringstream strm2(":HerdtOnline 0.2 0.0 0.0");
     aPGI.ParseCmd(strm2);
   }
   {
@@ -263,11 +263,16 @@ int main(int argc, char *argv[])
 	  timemodif =0;
 	  if (TestProfil==PROFIL_HERDT_ONLINE)
 	    {
-	      if (NbOfIt>3*200) /* Stop after 3 seconds the on-line stepping */
+	      if (NbOfIt>11*200) /* 200 iterations per second */
 		{
 		  Herdt_Stop(*aPGI);
 		  if(NbOfIt > 10*200)
 		    ok=false;
+		}
+
+	      if (NbOfIt>3*200 & NbOfIt<6*200) /*  */
+		{
+		  aPGI->perturbAcceleration(0.2,0.0);
 		}
 	    }
 

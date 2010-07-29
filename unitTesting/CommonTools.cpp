@@ -205,13 +205,13 @@ void getOptions(int argc,
 	{
 	  VRMLPath=value;
 	  //VRMLPath+="/Controller/IOserver/robot/HRP2JRL/model/";
-	  VRMLFileName="HRP2JRLmain.wrl";
+	  VRMLFileName="/HRP2JRLmain.wrl";
 	  SpecificitiesFileName = value;
 	  //SpecificitiesFileName +="/Controller/IOserver/robot/HRP2JRL/etc/";
 	  SpecificitiesFileName += "/HRP2Specificities.xml";
 	  LinkJointRank = value;
 	  //LinkJointRank += "/Controller/IOserver/robot/HRP2JRL/etc/";
-	  LinkJointRank += "HRP2LinkJointRank.xml";
+	  LinkJointRank += "/HRP2LinkJointRank.xml";
 	  
 	  if (argc==2)
 	    {
