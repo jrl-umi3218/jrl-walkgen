@@ -23,6 +23,17 @@
 #ifndef _PATTERN_GENERATOR_TYPES_H_
 #define  _PATTERN_GENERATOR_TYPES_H_
 
+// For Windows compatibility.
+#if defined (WIN32)
+#  ifdef walkGenJrl_EXPORTS 
+#    define WALK_GEN_JRL_EXPORT __declspec(dllexport)
+#  else  
+#    define WALK_GEN_JRL_EXPORT __declspec(dllimport)
+#  endif 
+#else
+#  define WALK_GEN_JRL_EXPORT
+#endif
+
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
 
 namespace PatternGeneratorJRL
@@ -30,7 +41,7 @@ namespace PatternGeneratorJRL
   struct COMState_s;
 
   /// Structure to store the COM position computed by the preview control. 
-  struct COMPosition_s
+  struct WALK_GEN_JRL_EXPORT COMPosition_s
   {
     double x[3],y[3]; 
     double z[3];    	
@@ -47,7 +58,7 @@ namespace PatternGeneratorJRL
 
   //TODO 0: Maybe COMPosition_s should/could be replaced by COMState_s
   /// Structure to store the COM state computed by the preview control.
-  struct COMState_s
+  struct WALK_GEN_JRL_EXPORT COMState_s
   {
     double x[3],y[3],z[3];
     double yaw[3]; // aka theta
