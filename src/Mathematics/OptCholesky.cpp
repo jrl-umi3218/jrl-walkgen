@@ -71,7 +71,7 @@ int OptCholesky::AddActiveConstraints(vector<unsigned int> & lConstraints)
     {
       r=AddActiveConstraint(lConstraints[li]);
       if (r<0)
-	return -li;
+	return -((int)(li));
     }
   return r;
 }

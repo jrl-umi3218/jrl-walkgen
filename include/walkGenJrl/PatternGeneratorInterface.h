@@ -17,17 +17,6 @@
 #ifndef _PATTERN_GENERATOR_INTERFACE_H_
 #define _PATTERN_GENERATOR_INTERFACE_H_
 
-// For Windows compatibility.
-#if defined (WIN32)
-#  ifdef walkGenJrl_EXPORTS 
-#    define WALK_GEN_JRL_EXPORT __declspec(dllexport)
-#  else  
-#    define WALK_GEN_JRL_EXPORT __declspec(dllimport)
-#  endif 
-#else
-#  define WALK_GEN_JRL_EXPORT
-#endif
-
 #include <deque>
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
 #include <walkGenJrl/PGTypes.h>

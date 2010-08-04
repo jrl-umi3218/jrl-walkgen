@@ -18,12 +18,6 @@
 #ifndef TIME_UTILS_WINDOWS_H
 #define TIME_UTILS_WINDOWS_H
 
-#  ifdef walkGenJrl_EXPORTS 
-#    define WALK_GEN_JRL_EXPORT __declspec(dllexport)
-#  else  
-#    define WALK_GEN_JRL_EXPORT __declspec(dllimport)
-#  endif
-
 #include < time.h >
 
 struct timezone 
@@ -32,7 +26,7 @@ struct timezone
   int  tz_dsttime;     /* type of dst correction */
 };
 
-int WALK_GEN_JRL_EXPORT gettimeofday(struct timeval *tv, struct timezone *tz);
+int gettimeofday(struct timeval *tv, struct timezone *tz);
 
 #endif /*TIME_UTILS_WINDOWS_H*/
 
