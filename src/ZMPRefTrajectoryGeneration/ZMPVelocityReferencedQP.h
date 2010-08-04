@@ -289,7 +289,9 @@ namespace PatternGeneratorJRL
     void setVelReference(double x,double y, double yaw);
 
     /*! Set the velocity reference from external reference */
-    void perturbAcceleration(double x,double y);
+    void setCoMPerturbationForce(double x,double y);
+
+    void setCoMPerturbationForce(istringstream &strm);
 
     void interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			 deque<FootAbsolutePosition> &RightFootAbsolutePositions);
@@ -319,6 +321,7 @@ namespace PatternGeneratorJRL
 
   private:
 
+    double m_RobotMass;
     bool m_PerturbationOccured;
     double m_FeetDistanceDS;
 
@@ -369,7 +372,7 @@ namespace PatternGeneratorJRL
 
     deque<COMState> m_QueueOfTrunkStates;
 
-    MAL_VECTOR(m_Perturbation,double);
+    MAL_VECTOR(m_PerturbationAcceleration,double);
 
     double m_a, m_TrunkPolCoeffB, m_c, m_d, m_TrunkPolCoeffE;
 

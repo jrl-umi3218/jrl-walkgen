@@ -270,9 +270,9 @@ int main(int argc, char *argv[])
 		    ok=false;
 		}
 
-	      if (NbOfIt>3*200 & NbOfIt<6*200) /*  */
+	      if (NbOfIt>2.5*200 & NbOfIt<2.75*200) /*  */
 		{
-		  aPGI->perturbAcceleration(0.2,0.0);
+		  aPGI->setCoMPerturbationForce(50,0.0);
 		}
 	    }
 

@@ -78,7 +78,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
  
   /* Orientations preview algorithm*/ 
   m_OP = new OrientationsPreview(m_QP_T, m_QP_N, m_Support->SSPeriod, aHS->rootJoint()); 
- 
+
+  m_RobotMass = aHS->mass();
   m_TrunkState.yaw[0]=m_TrunkState.yaw[1]=m_TrunkState.yaw[2]=0.0; 
  
   InitConstants(); 
@@ -209,12 +210,23 @@ void ZMPVelocityReferencedQP::setVelReference(double x,
   RefVel.dYaw = yaw;
 }
 
-void ZMPVelocityReferencedQP::perturbAcceleration(double x,double y)
+void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
 {
-  MAL_VECTOR_RESIZE(m_Perturbation,6);
+  MAL_VECTOR_RESIZE(m_PerturbationAcceleration,6);
 
-  m_Perturbation(2) = x;
-  m_Perturbation(5) = y;
+  strm >> m_PerturbationAcceleration(2);
+  strm >> m_PerturbationAcceleration(5);
+  m_PerturbationAcceleration(2) = m_PerturbationAcceleration(2)/m_RobotMass;
+  m_PerturbationAcceleration(5) = m_PerturbationAcceleration(5)/m_RobotMass;
+  m_PerturbationOccured = true;
+}
+
+void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x,double y)
+{
+  MAL_VECTOR_RESIZE(m_PerturbationAcceleration,6);
+
+  m_PerturbationAcceleration(2) = x/m_RobotMass;
+  m_PerturbationAcceleration(5) = y/m_RobotMass;
   m_PerturbationOccured = true;
 
 }
@@ -2143,7 +2155,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
     AddArraySize = (int) ldAddArraySize; 
   } 
  
-  cout<<"AddArraySize:"<<AddArraySize<<endl; 
+  //cout<<"AddArraySize:"<<AddArraySize<<endl; 
   ODEBUG(AddArraySize); 
   FinalZMPPositions.resize(AddArraySize); 
   FinalCoMPositions.resize(AddArraySize); 
@@ -2165,20 +2177,26 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
     { 
  
       // Smooth ramp 
-      FinalZMPPositions[CurrentZMPindex].px =0.0; 
-      FinalZMPPositions[CurrentZMPindex].py = 0.0; 
-      FinalZMPPositions[CurrentZMPindex].pz = 0.0; 
+      FinalZMPPositions[CurrentZMPindex].px =lStartingZMPPosition(0); 
+      FinalZMPPositions[CurrentZMPindex].py = lStartingZMPPosition(1); 
+      FinalZMPPositions[CurrentZMPindex].pz = lStartingZMPPosition(2); 
+      cout<<"zmpx: "<<lStartingZMPPosition(0)<<endl;
+//       FinalZMPPositions[CurrentZMPindex].px =0.0; 
+//       FinalZMPPositions[CurrentZMPindex].py = 0.0; 
+//       FinalZMPPositions[CurrentZMPindex].pz = 0.0; 
       FinalZMPPositions[CurrentZMPindex].theta = 0.0; 
       FinalZMPPositions[CurrentZMPindex].time = m_CurrentTime; 
       FinalZMPPositions[CurrentZMPindex].stepType = 0; 
  
       // Set CoM positions. 
-      FinalCoMPositions[CurrentZMPindex].z[0] = m_ComHeight; 
-      FinalCoMPositions[CurrentZMPindex].z[1] = 0.0; 
-      FinalCoMPositions[CurrentZMPindex].z[2] = 0.0; 
-      FinalCoMPositions[CurrentZMPindex].pitch[0] = 0.0; 
-      FinalCoMPositions[CurrentZMPindex].roll[0] = 0.0; 
-      FinalCoMPositions[CurrentZMPindex].yaw[0] = 0.0; 
+      FinalCoMPositions[CurrentZMPindex] = lStartingCOMState;
+      cout<<"comx: "<<lStartingCOMState.x[0]<<endl;
+      //FinalCoMPositions[CurrentZMPindex].z[0] = m_ComHeight; 
+      //FinalCoMPositions[CurrentZMPindex].z[1] = 0.0; 
+      //FinalCoMPositions[CurrentZMPindex].z[2] = 0.0; 
+      //FinalCoMPositions[CurrentZMPindex].pitch[0] = 0.0; 
+      //FinalCoMPositions[CurrentZMPindex].roll[0] = 0.0; 
+      //FinalCoMPositions[CurrentZMPindex].yaw[0] = 0.0; 
  
       // Set Left Foot positions. 
       FinalLeftFootAbsolutePositions[CurrentZMPindex] = CurrentLeftFootAbsPos; 
@@ -2190,8 +2208,8 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       FinalLeftFootAbsolutePositions[CurrentZMPindex].stepType = 
 	FinalRightFootAbsolutePositions[CurrentZMPindex].stepType = 10; 
  
- 
- 
+
+
       if(m_FullDebug>0) 
 	{ 
 	  //Feet coordinates for plot in scilab 
@@ -2213,7 +2231,22 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       CurrentZMPindex++; 
  
     } 
- 
+
+  MAL_VECTOR_DIM(xk,double,6); 
+  
+  xk[0] = lStartingCOMState.x[0];
+  xk[1] = lStartingCOMState.x[1];
+  xk[2] = lStartingCOMState.x[2];
+  xk[3] = lStartingCOMState.y[0];
+  xk[4] = lStartingCOMState.y[1];
+  xk[5] = lStartingCOMState.y[2];
+  
+  m_2DLIPM->setState(xk);
+  
+  m_2DLIPM->GetState(xk);
+  cout<<"xk:"<<xk[0]<<" "<<xk[1]<<" "<<xk[2]<<" "<<
+    xk[3]<<" "<<xk[4]<<" "<<xk[5]<<" "<<endl;
+      
   return 0; 
 } 
  
@@ -2674,11 +2707,12 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       if(m_PerturbationOccured == true)
 	{
-	  xk(2) = xk(2)+m_Perturbation(2);
-	  xk(5) = xk(5)+m_Perturbation(5);
+	  xk(2) = xk(2)+m_PerturbationAcceleration(2);
+	  xk(5) = xk(5)+m_PerturbationAcceleration(5);
 	  m_PerturbationOccured = false;
 	}
 	
+      m_2DLIPM->setState(xk);
 
       //TODO : Add a get function to read the state 
       m_Support->setSupportState(time+m_TimeBuffer, 0, RefVel); 

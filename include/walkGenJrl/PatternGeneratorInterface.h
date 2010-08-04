@@ -292,7 +292,7 @@ namespace PatternGeneratorJRL
 	\param x: Additive acceleration along the saggital plane.
 	\param y: Additive acceleration along the lateral plane.
        */
-      virtual void perturbAcceleration(double x, double y)=0;
+      virtual void setCoMPerturbationForce(double x, double y)=0;
 
     };
 

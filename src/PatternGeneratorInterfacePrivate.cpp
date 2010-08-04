@@ -155,7 +155,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()
   {
-    std::string aMethodName[14] =
+    std::string aMethodName[15] =
       {":LimitsFeasibility",
        ":ZMPShiftParameters",
        ":TimeDistributionParameters",
@@ -169,9 +169,10 @@ namespace PatternGeneratorJRL {
        ":ChangeNextStep",
        ":samplingperiod",
        ":HerdtOnline",
-       ":setVelReference"};
+       ":setVelReference",
+       ":setCoMPerturbationForce"};
 
-    for(int i=0;i<14;i++)
+    for(int i=0;i<15;i++)
       {
 	if (!SimplePlugin::RegisterMethod(aMethodName[i]))
 	  {
@@ -478,6 +479,13 @@ namespace PatternGeneratorJRL {
     // Read the data inside strm.
     m_ZMPVRQP->setVelReference(strm);
   }
+ 
+  void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(istringstream &strm)
+  {
+    // Read the data inside strm.
+    m_ZMPVRQP->setCoMPerturbationForce(strm);
+  }
+
 
   void PatternGeneratorInterfacePrivate::initOnlineHerdt()
   {
@@ -1081,6 +1089,10 @@ namespace PatternGeneratorJRL {
 	initOnlineHerdt();
 	printf("Online \n");
 	//ODEBUG5("InitOnLine","DebugHerdt.txt");
+      }
+    else if (aCmd==":setCoMPerturbationForce")
+      {
+	setCoMPerturbationForce(strm);
       }
 
     else if (aCmd==":readfilefromkw")
@@ -1743,10 +1755,10 @@ namespace PatternGeneratorJRL {
     m_ZMPVRQP->setVelReference(x,y,yaw);
   }
 
-  void PatternGeneratorInterfacePrivate::perturbAcceleration(double x,
+  void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(double x,
 							      double y)
   {
-    m_ZMPVRQP->perturbAcceleration(x,y);
+    m_ZMPVRQP->setCoMPerturbationForce(x,y);
   }
 
   int PatternGeneratorInterfacePrivate::ChangeOnLineStep(double time,

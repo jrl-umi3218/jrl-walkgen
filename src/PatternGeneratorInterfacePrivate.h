@@ -241,6 +241,9 @@ namespace PatternGeneratorJRL
     /*! \brief Read a velocity reference. */
     void setVelReference(istringstream &strm);
 
+    /*! \brief Read a perturbation force on the com. */
+    void setCoMPerturbationForce(istringstream &strm);
+
     /*! \brief Initialize online mode of Herdt. */
     void initOnlineHerdt();
 
@@ -369,7 +372,7 @@ namespace PatternGeneratorJRL
       \param x: Additive acceleration therm along the saggital plane.
       \param y: Additive acceleration therm along the perpendicular plane.
        */
-    void perturbAcceleration(double x,
+    void setCoMPerturbationForce(double x,
 			      double y);
 
   protected:
