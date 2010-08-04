@@ -96,6 +96,13 @@ void LinearizedInvertedPendulum2D::GetState(MAL_VECTOR(,double) &lxk)
   lxk = m_xk;
 }
 
+
+void LinearizedInvertedPendulum2D::setState(MAL_VECTOR(,double) lxk)
+{
+  m_xk = lxk;
+}
+
+
 int LinearizedInvertedPendulum2D::InitializeSystem()
 {
   if (m_T==-1.0)
@@ -137,8 +144,8 @@ int LinearizedInvertedPendulum2D::InitializeSystem()
   m_C(1,4) = 0.0;
   m_C(1,5) = -m_ComHeight/9.81;
 
-  for(unsigned int i=0;i<6;i++)
-    m_xk[i] = 0.0;
+  //for(unsigned int i=0;i<6;i++)
+  //  m_xk[i] = 0.0;
   
   return 0;
 }

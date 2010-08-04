@@ -123,6 +123,9 @@ namespace PatternGeneratorJRL
 
       /*! Get state. */
       void GetState(MAL_VECTOR(,double) &lxk);
+
+      /*! Get state. */
+      void setState(MAL_VECTOR(,double) lxk);
       /*! @} */
 
     };
