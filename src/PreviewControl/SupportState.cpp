@@ -98,7 +98,8 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
 	  m_StateChanged = true;
 	}
       //SS->SS
-      else if(*SupportPhase == 1 && *SupportStepsLeft>0 || *SupportStepsLeft==0 && ReferenceGiven == 1)
+      else if(((*SupportPhase == 1) && (*SupportStepsLeft>0)) || 
+	      ((*SupportStepsLeft==0) && (ReferenceGiven == 1)))
 	{
 	  *SupportFoot = -1**SupportFoot;
 	  m_StateChanged = true;
