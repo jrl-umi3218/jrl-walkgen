@@ -397,7 +397,7 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 	  TheConvexHull[j].row = (lx+lxcoefs[j]*FootHalfWidth)*s_t +
 	    (ly+lycoefs[j]*FootHalfHeight)*c_t;
 
-	  if(m_FullDebug>2 & i==1)
+	  if((m_FullDebug>2) && (i==1))
 	    {
 		    
 	      ofstream aof;

@@ -270,7 +270,7 @@ int main(int argc, char *argv[])
 		    ok=false;
 		}
 
-	      if (NbOfIt>2.5*200 & NbOfIt<2.75*200) /*  */
+	      if ((NbOfIt>2.5*200) && (NbOfIt<2.75*200)) /*  */
 		{
 		  aPGI->setCoMPerturbationForce(50,0.0);
 		}
