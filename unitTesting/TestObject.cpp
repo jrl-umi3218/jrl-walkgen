@@ -72,10 +72,10 @@ namespace PatternGeneratorJRL
 
       if (m_DebugHDR!=0)
 	delete m_DebugHDR;
-
+      
       if (m_PGI!=0)
 	delete m_PGI;
-
+	    
     }
 
     void TestObject::prepareDebugFiles()
@@ -140,7 +140,6 @@ namespace PatternGeneratorJRL
     {
       if (m_DebugFGPI)
 	{
-	  cout << "Record in debug files" << endl;
 	  ofstream aof;            
 	  string aFileName;
 	  aFileName = m_TestName;
@@ -219,7 +218,6 @@ namespace PatternGeneratorJRL
 
 	      if (m_PGIInterface==0)
 		{
-		  cout << "PGInterface 0 " << endl;
 		  ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
 							 m_CurrentVelocity,
 							 m_CurrentAcceleration,
@@ -230,7 +228,6 @@ namespace PatternGeneratorJRL
 		}
 	      else if (m_PGIInterface==1)
 		{
-		  cout << "PGInterface 1 " << endl;
 		  ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
 							 m_CurrentVelocity,
 							 m_CurrentAcceleration,

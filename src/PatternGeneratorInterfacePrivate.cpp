@@ -334,27 +334,27 @@ namespace PatternGeneratorJRL {
   {
 
 
-    ODEBUG4("Destructor: Start","DebugPGI.txt");
+    ODEBUG5("Destructor: Start","DebugPGI.txt");
 
     if (m_StOvPl!=0)
       delete m_StOvPl;
-    ODEBUG4("Destructor: did m_StOvPl","DebugPGI.txt");
+    ODEBUG5("Destructor: did m_StOvPl","DebugPGI.txt");
 
     if (m_StepStackHandler!=0)
       delete m_StepStackHandler;
-    ODEBUG4("Destructor: did m_StepStackHandler","DebugPGI.txt");
+    ODEBUG5("Destructor: did m_StepStackHandler","DebugPGI.txt");
 
     if (m_GMFKW!=0)
       delete m_GMFKW;
-    ODEBUG4("Destructor: did m_GMKFW","DebugPGI.txt");
+    ODEBUG5("Destructor: did m_GMKFW","DebugPGI.txt");
 
     if (m_PC!=0)
       delete m_PC;
-    ODEBUG4("Destructor: did m_PC","DebugPGI.txt");
+    ODEBUG5("Destructor: did m_PC","DebugPGI.txt");
 
     if (m_ZMPD!=0)
       delete m_ZMPD;
-    ODEBUG4("Destructor: did m_ZMPD","DebugPGI.txt");
+    ODEBUG5("Destructor: did m_ZMPD","DebugPGI.txt");
 
     if (m_ZMPQP!=0)
       delete m_ZMPQP;
@@ -365,11 +365,11 @@ namespace PatternGeneratorJRL {
 
     if (m_ZMPVRQP!=0)
       delete m_ZMPVRQP;
-    ODEBUG4("Destructor: did m_ZMPVRQP","DebugPGI.txt");
+    ODEBUG5("Destructor: did m_ZMPVRQP","DebugPGI.txt");
 
     if (m_ZMPM!=0)
       delete m_ZMPM;
-    ODEBUG4("Destructor: did m_ZMPM","DebugPGI.txt");
+    ODEBUG5("Destructor: did m_ZMPM","DebugPGI.txt");
 
     if (m_ComAndFootRealization!=0)
       delete m_ComAndFootRealization;
@@ -382,6 +382,8 @@ namespace PatternGeneratorJRL {
 
     if (m_CoMAndFootOnlyStrategy!=0)
       delete m_CoMAndFootOnlyStrategy;
+
+
   }
 
 
@@ -1217,9 +1219,9 @@ namespace PatternGeneratorJRL {
 								    FootAbsolutePosition &LeftFootPosition,
 								    FootAbsolutePosition &RightFootPosition )
   {
-
+    bool r=false;
     COMState aCOMState;
-    RunOneStepOfTheControlLoop(CurrentConfiguration,
+    r=RunOneStepOfTheControlLoop(CurrentConfiguration,
 			       CurrentVelocity,
 			       CurrentAcceleration,
 			       ZMPTarget,
@@ -1227,7 +1229,7 @@ namespace PatternGeneratorJRL {
 			       LeftFootPosition,
 			       RightFootPosition);
     finalCOMPosition = aCOMState;
-    return true;
+    return r;
   }
 
   bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,

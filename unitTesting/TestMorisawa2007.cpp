@@ -83,9 +83,9 @@ protected:
       istringstream strm2(":stepseq 0.0 -0.105 0.0 \
                      0.2  0.21 0.0		   \
                      0.2 -0.21 0.0		   \
-                     0.2  0.21 0.0 \
-                     0.2 -0.21 0.0 \
-                     0.2  0.21 0.0		\
+                     0.2  0.21 0.0                 \
+                     0.2 -0.21 0.0                 \
+                     0.2  0.21 0.0		   \
                      0.0 -0.21 0.0");
       aPGI.ParseCmd(strm2);
     }
@@ -94,7 +94,7 @@ protected:
 
   void chooseTestProfile()
   {
-    cout << "Entered chooseTestProfile()" << endl;
+
     switch(m_TestProfile)
       {
       case PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING:
@@ -108,19 +108,17 @@ protected:
 	throw("No correct test profile");
 	break;
       }
-    cout << "Output of chooseTestProfile() " << endl;
   }
 
   void generateEvent()
   {
     unsigned int StoppingTime = 50*200;
-    unsigned int r = 100*m_OneStep.NbOfIt/StoppingTime;
-    if (r%StoppingTime==1)
-      {
-	cout << "Progress " << r << "\%" << "\r";
-	cout.flush();
-      }
+    double r = 100.0*(double)m_OneStep.NbOfIt/(double)StoppingTime;
 
+    if (m_OneStep.NbOfIt%500==0)
+      {
+	cout << "Progress " << r << "\% : " << m_OneStep.NbOfIt << "/" << StoppingTime << "\r";
+      }
 
     if (m_OneStep.NbOfIt>StoppingTime) /* Stop after 30 seconds the on-line stepping */
       {
@@ -162,7 +160,7 @@ int main(int argc, char *argv[])
   std::string TestName("TestMorisawa2007");
   TestMorisawa2007 aTM2007(argc,argv,
 			   TestName,
-			   PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING);
+			   PROFIL_ANALYTICAL_ONLINE_WALKING);
   
   try 
     {
