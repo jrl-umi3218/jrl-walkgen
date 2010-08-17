@@ -1,11 +1,18 @@
-/* Olivier Stasse
- * (c) 2005-2009
+/* \file This file tests A. Herdt's walking algorithm for
+ * automatic foot placement giving an instantaneous CoM velocity reference.
+ *
+ * Olivier Stasse
+ * 
+ * (c) 2010, JRL, UMI 3218/CRT, CNRS/AIST.
+ *
+ * Please refer to License.txt for more information on the license.
  * 
  */
 
 #include "CommonTools.h"
 
 using namespace::PatternGeneratorJRL;
+using namespace::PatternGeneratorJRL::TestSuite;
 using namespace std;
 
 void Herdt(PatternGeneratorInterface &aPGI)
@@ -114,7 +121,6 @@ int main(int argc, char *argv[])
   istringstream strm2(":walkmode 0");
   aPGI->ParseCmd(strm2);
 
-  
   MAL_VECTOR_DIM(ZMPTarget,double,3);
     
   //COMPosition CurrentWaistPosition;

@@ -56,7 +56,7 @@ OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
 }
 
 OrientationsPreview::~OrientationsPreview() {
-  cout<<"Leaving ~OrientationsPreview()"<<endl;
+  //  cout<<"Leaving ~OrientationsPreview()"<<endl;
 }
 
 

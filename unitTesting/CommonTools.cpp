@@ -14,7 +14,7 @@
 #include "TimeUtilsWindows.h"
 #endif /*WIN32*/
 
-#include <time.h>
+
 #include <sstream>
 #include <fstream>
 
@@ -30,8 +30,11 @@
 
 #include "TestFootPrintPGInterfaceData.h"
 
-using namespace::PatternGeneratorJRL;
 using namespace std;
+
+namespace PatternGeneratorJRL {
+namespace TestSuite {
+
 
 //      ":comheight 0.807727",
 void CommonInitialization(PatternGeneratorInterface &aPGI)
@@ -229,3 +232,8 @@ void getOptions(int argc,
       LinkJointRank = argv[4];
     }
 }
+
+
+
+}; /* End of TestSuite namespace */
+}; /* End of PatternGeneratorJRL namespace */

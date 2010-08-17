@@ -4,8 +4,9 @@
 #
 # Copyright CNRS/AIST
 
-
-# Set Flags 
+#############
+# Set Flags #
+#############
 SET (${PROJECT_NAME}_test_CXXFLAGS "-I${${PROJECT_NAME}_SOURCE_DIR}/include -I${${PROJECT_NAME}_SOURCE_DIR}/src ${${PROJECT_NAME}_src_CXXFLAGS} ")
 
 IF(UNIX)
@@ -17,8 +18,9 @@ IF(WIN32)
   SET(${PROJECT_NAME}_test_LDFLAGS "${LIBDIR_KW}${${PROJECT_NAME}_BINARY_DIR}/src  ${LIBINCLUSION_KW}${PROJECT_NAME}-${PROJECT_VERSION}${LIBINCLUSION_EXT} ${${PROJECT_NAME}_src_LDFLAGS}")
 ENDIF(WIN32)
 
-# Deal with hrp2Dynamics
-#-----------------------
+##########################
+# Deal with hrp2Dynamics #
+##########################
 SET(_hrp2Dynamics_FOUND 0)
 SET(_hrp2Dynamics_OPTIONAL "hrp2Dynamics >= 1.1.0")
 PKG_CHECK_MODULES(_hrp2Dynamics ${_hrp2Dynamics_OPTIONAL})
@@ -40,6 +42,9 @@ ENDIF(NOT ${_hrp2Dynamics_FOUND})
 
 MESSAGE(STATUS "UL: ${${PROJECT_NAME}_test_LDFLAGS}  ${${PROJECT_NAME}_test_CXXFLAGS}")
 
+################
+# Generic test #
+################
 
 ADD_EXECUTABLE(	TestFootPrintPGInterface 
   ../src/TimeUtilsWindows.cpp
@@ -52,8 +57,9 @@ SET_TARGET_PROPERTIES(TestFootPrintPGInterface
 )
 ADD_DEPENDENCIES (TestFootPrintPGInterface ${PROJECT_NAME})
 
-#include_directories("../include" "../src")
-
+#########################
+# Test Optimal Cholesky #
+#########################
 ADD_EXECUTABLE(	TestOptCholesky 
 	TestOptCholesky.cpp 
 	../src/Mathematics/OptCholesky.cpp
@@ -64,6 +70,10 @@ SET_TARGET_PROPERTIES(TestOptCholesky
 		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}
 )
 
+#########################
+# Test Ricatti Equation #
+#########################
+
 ADD_EXECUTABLE(	TestRiccatiEquation 
 	TestRiccatiEquation.cpp 
 	../src/PreviewControl/OptimalControllerSolver.cpp 
@@ -73,6 +83,27 @@ SET_TARGET_PROPERTIES(TestRiccatiEquation
 	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
 		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}
 )
+######################
+# Test Morisawa 2007 #
+######################
+ADD_EXECUTABLE( TestMorisawa2007
+  ../src/TimeUtilsWindows.cpp
+  TestMorisawa2007.cpp
+  TestFootPrintPGInterfaceData.cpp
+  CommonTools.cpp
+  TestObject.cpp
+  ClockCPUTime.cpp
+)
+SET_TARGET_PROPERTIES( TestMorisawa2007
+	              PROPERTIES
+	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
+		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}  
+)
+ADD_DEPENDENCIES (TestMorisawa2007 ${PROJECT_NAME})
+
+###################
+# Test Herdt 2010 #
+###################
 
 ADD_EXECUTABLE( TestHerdt2010
   ../src/TimeUtilsWindows.cpp
@@ -87,8 +118,9 @@ SET_TARGET_PROPERTIES( TestHerdt2010
 )
 ADD_DEPENDENCIES (TestHerdt2010 ${PROJECT_NAME})
 
-# Add examples
-
+#####################
+# Add user examples #
+#####################
 SET(${PROJECT_NAME}_EXAMPLES 
   TestFootPrintPGInterfaceData.cpp
   TestFootPrintPGInterfaceData.h
