@@ -52,13 +52,13 @@ namespace PatternGeneratorJRL
     double FinalCoMPos;
 
     /*! ZMP profil for the chosen axis. */
-    std::vector<double> * ZMPProfil; 
+    std::vector<double> ZMPProfil; 
 
     /*! Height ZMP profil.*/
-    std::vector<double> * ZMPZ;
+    std::vector<double> ZMPZ;
 
     /*! Height COM profil. */
-    std::vector<double> * CoMZ;
+    std::vector<double> CoMZ;
     
   } CompactTrajectoryInstanceParameters;
 

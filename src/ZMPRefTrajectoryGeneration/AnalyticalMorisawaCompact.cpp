@@ -125,33 +125,47 @@ namespace PatternGeneratorJRL
     m_Clock2.RecordDataBuffer(Filename);
     Filename = "Clock3.dat";
     m_Clock3.RecordDataBuffer(Filename);
-    
+
     if (m_AnalyticalZMPCoGTrajectoryX!=0)
       delete m_AnalyticalZMPCoGTrajectoryX;
+    ODEBUG5("Destructor: did AnalyticalZMPCoGTrajectoryX","DebugPGI.txt");    
     
     if (m_AnalyticalZMPCoGTrajectoryY!=0)
       delete m_AnalyticalZMPCoGTrajectoryY;
+    ODEBUG5("Destructor: did AnalyticalZMPCoGTrajectoryY","DebugPGI.txt");    
 
+    /*
     if (m_CTIPX.ZMPZ!=0)
       delete m_CTIPX.ZMPZ;
+    ODEBUG5("Destructor: did CTIPX ZMPZ","DebugPGI.txt");    
     
     if (m_CTIPX.CoMZ!=0)
       delete m_CTIPX.CoMZ;
+    ODEBUG5("Destructor: did CTIPX CoMZ","DebugPGI.txt");    
 
     if (m_CTIPX.ZMPProfil!=0)
       delete m_CTIPX.ZMPProfil;
+    ODEBUG5("Destructor: did CTIPX ZMPProfil","DebugPGI.txt");    
 
     if (m_CTIPY.ZMPProfil!=0)
       delete m_CTIPY.ZMPProfil;
+    ODEBUG5("Destructor: did CTIPY ZMPProfil","DebugPGI.txt");    
 
+    */
     if (m_FilterXaxisByPC!=0)
       delete m_FilterXaxisByPC;
+
+    ODEBUG5("Destructor: did FilterXaxisByPC","DebugPGI.txt");    
 
     if (m_FilterYaxisByPC!=0)
       delete m_FilterYaxisByPC;
 
+    ODEBUG5("Destructor: did FilterYaxisByPC","DebugPGI.txt");    
+
     if (m_PreviewControl!=0)
       delete m_PreviewControl;
+
+    ODEBUG5("Destructor: did PreviewControl","DebugPGI.txt");    
   }
 
 
@@ -366,15 +380,20 @@ namespace PatternGeneratorJRL
     
     vector<double> * lCoMZ;
     vector<double> * lZMPZ;
+    /*
     if (m_CTIPX.CoMZ!=0)
       lCoMZ = m_CTIPX.CoMZ;
     else 
       lCoMZ = new vector<double>;
+    */
+    lCoMZ = & m_CTIPX.CoMZ;
 
-    if (m_CTIPX.ZMPZ!=0)
+    /* if (m_CTIPX.ZMPZ!=0)
       lZMPZ = m_CTIPX.ZMPZ;
     else
       lZMPZ = new vector<double>;
+    */
+    lZMPZ = & m_CTIPX.ZMPZ;
 
     lCoMZ->resize(NbOfIntervals);
     lZMPZ->resize(NbOfIntervals);
@@ -404,10 +423,13 @@ namespace PatternGeneratorJRL
     double InitialCoMSpeedX=0.0;
     double FinalCoMPosX=0.6;
     vector<double> * lZMPX;
+    /*
     if (m_CTIPX.ZMPProfil!=0)
       lZMPX = m_CTIPX.ZMPProfil;
     else
       lZMPX = new vector<double>;
+    */
+    lZMPX = &m_CTIPX.ZMPProfil;
 
     ODEBUG("NbOfIntervals: " << NbOfIntervals);
     lZMPX->resize(NbOfIntervals);
@@ -416,10 +438,13 @@ namespace PatternGeneratorJRL
     double InitialCoMSpeedY=0.0;
     double FinalCoMPosY=0.0;
     vector<double> * lZMPY;
+    /*
     if (m_CTIPY.ZMPProfil!=0)
       lZMPY = m_CTIPY.ZMPProfil;
     else
       lZMPY = new vector<double>;
+    */
+    lZMPY = &m_CTIPY.ZMPProfil;
 	
     lZMPY->resize(NbOfIntervals);
   
@@ -504,18 +529,18 @@ namespace PatternGeneratorJRL
     m_CTIPX.InitialCoM = InitialCoMX;
     m_CTIPX.InitialCoMSpeed = InitialCoMSpeedX;
     m_CTIPX.FinalCoMPos = FinalCoMPosX;
-    m_CTIPX.ZMPProfil = lZMPX;
-    m_CTIPX.ZMPZ = lZMPZ;
-    m_CTIPX.CoMZ = lCoMZ;
+    //    m_CTIPX.ZMPProfil = lZMPX;
+    //    m_CTIPX.ZMPZ = lZMPZ;
+    //    m_CTIPX.CoMZ = lCoMZ;
     ComputeTrajectory(m_CTIPX,*m_AnalyticalZMPCoGTrajectoryX);
 	  
     // Block for Y trajectory.
     m_CTIPY.InitialCoM = InitialCoMY;
     m_CTIPY.InitialCoMSpeed = InitialCoMSpeedY;
     m_CTIPY.FinalCoMPos = FinalCoMPosY;
-    m_CTIPY.ZMPProfil = lZMPY;
-    m_CTIPY.ZMPZ = lZMPZ;
-    m_CTIPY.CoMZ = lCoMZ;
+    //    m_CTIPY.ZMPProfil = lZMPY;
+    //    m_CTIPY.ZMPZ = lZMPZ;
+    //    m_CTIPY.CoMZ = lCoMZ;
     ComputeTrajectory(m_CTIPY,*m_AnalyticalZMPCoGTrajectoryY);
 
     
@@ -823,7 +848,7 @@ namespace PatternGeneratorJRL
 
     vector<unsigned int> IndexLastZMPProfil;
     IndexLastZMPProfil.resize(1);
-    IndexLastZMPProfil[0] = m_CTIPX.ZMPProfil->size();//m_CTIPX.ZMPProfil->size()-2;
+    IndexLastZMPProfil[0] = m_CTIPX.ZMPProfil.size();//m_CTIPX.ZMPProfil->size()-2;
 
     // The strategy is simple: we trigger a false modification of the last
     // step and call change landing position, just after updating the stack
@@ -1366,15 +1391,15 @@ namespace PatternGeneratorJRL
   {
     ComputeW(aCTIP.InitialCoM,
 	     aCTIP.InitialCoMSpeed,
-	     *aCTIP.ZMPProfil,
+	     aCTIP.ZMPProfil,
 	     aCTIP.FinalCoMPos,
 	     aAZCT);
     ComputePolynomialWeights2();
     TransfertTheCoefficientsToTrajectories(aAZCT,
-					   *aCTIP.CoMZ,
-					   *aCTIP.ZMPZ,
-					   (*aCTIP.ZMPProfil)[0], 
-					   (*aCTIP.ZMPProfil)[m_NumberOfIntervals-1],
+					   aCTIP.CoMZ,
+					   aCTIP.ZMPZ,
+					   aCTIP.ZMPProfil[0], 
+					   aCTIP.ZMPProfil[m_NumberOfIntervals-1],
 					   false);  
     
   }
@@ -1482,13 +1507,13 @@ namespace PatternGeneratorJRL
 	for(i=IndexStartingInterval,j=0;i<m_NumberOfIntervals;i++,j++)
 	  {
 	    /* Shift the ZMP profil */
-	    (*aCTIPX.ZMPProfil)[j] = (*aCTIPX.ZMPProfil)[i];
-	    (*aCTIPY.ZMPProfil)[j] = (*aCTIPY.ZMPProfil)[i];
+	    aCTIPX.ZMPProfil[j] = aCTIPX.ZMPProfil[i];
+	    aCTIPY.ZMPProfil[j] = aCTIPY.ZMPProfil[i];
 	  }
 	ODEBUG("ConstraintsChange: " << j << " " 
 		<< m_AbsoluteSupportFootPositions.size()  << " "
-		<< (*aCTIPX.ZMPProfil).size() << " " 
-		<< (*aCTIPY.ZMPProfil).size()  );
+		<< aCTIPX.ZMPProfil.size() << " " 
+		<< aCTIPY.ZMPProfil.size()  );
 		    
 	/* Add value from the provided steps stack. 
 	   BE CAREFUL: There is a modification on the initial value
@@ -1508,16 +1533,16 @@ namespace PatternGeneratorJRL
 	ODEBUG("Starting value for k:" << k);
 	for(;
 	    (k < m_AbsoluteSupportFootPositions.size()) &&
-	      (j< m_CTIPX.ZMPProfil->size());k++,j+=2)
+	      (j< m_CTIPX.ZMPProfil.size());k++,j+=2)
 	  {
 		    
-	    (*aCTIPX.ZMPProfil)[j] = m_AbsoluteSupportFootPositions[k].x;
-	    (*aCTIPY.ZMPProfil)[j] = m_AbsoluteSupportFootPositions[k].y;
+	    aCTIPX.ZMPProfil[j] = m_AbsoluteSupportFootPositions[k].x;
+	    aCTIPY.ZMPProfil[j] = m_AbsoluteSupportFootPositions[k].y;
 	    
-	    if ((j+1)<m_CTIPX.ZMPProfil->size())
+	    if ((j+1)<m_CTIPX.ZMPProfil.size())
 	      {
-		(*aCTIPX.ZMPProfil)[j+1] = m_AbsoluteSupportFootPositions[k].x;
-		(*aCTIPY.ZMPProfil)[j+1] = m_AbsoluteSupportFootPositions[k].y;
+		aCTIPX.ZMPProfil[j+1] = m_AbsoluteSupportFootPositions[k].x;
+		aCTIPY.ZMPProfil[j+1] = m_AbsoluteSupportFootPositions[k].y;
 	      }
 
 	  }
@@ -1528,7 +1553,7 @@ namespace PatternGeneratorJRL
 	  {
 	    ODEBUG("Start the generation of steps");
 	    /* Compute the number of steps needed. */
-	    int NeededSteps = (aCTIPX.ZMPProfil->size()-j+1)/2;
+	    int NeededSteps = (aCTIPX.ZMPProfil.size()-j+1)/2;
 	    int r;
 
 	    /* Test if there is enough step in the stack of. 
@@ -1562,16 +1587,16 @@ namespace PatternGeneratorJRL
 									     lAbsoluteSupportFootPositions);
 	    
 	    /* Add the necessary absolute support foot positions. */
-	    for(int li=0;(li<NeededSteps)&& (j< m_CTIPX.ZMPProfil->size());li++)
+	    for(int li=0;(li<NeededSteps)&& (j< m_CTIPX.ZMPProfil.size());li++)
 	      {
 		
-		(*aCTIPX.ZMPProfil)[j] = lAbsoluteSupportFootPositions[li].x;
-		(*aCTIPY.ZMPProfil)[j] = lAbsoluteSupportFootPositions[li].y;
+		aCTIPX.ZMPProfil[j] = lAbsoluteSupportFootPositions[li].x;
+		aCTIPY.ZMPProfil[j] = lAbsoluteSupportFootPositions[li].y;
 		
-		if ((j+1)<m_CTIPX.ZMPProfil->size())
+		if ((j+1)<m_CTIPX.ZMPProfil.size())
 		  {
-		    (*aCTIPX.ZMPProfil)[j+1] = lAbsoluteSupportFootPositions[li].x;
-		    (*aCTIPY.ZMPProfil)[j+1] = lAbsoluteSupportFootPositions[li].y;
+		    aCTIPX.ZMPProfil[j+1] = lAbsoluteSupportFootPositions[li].x;
+		    aCTIPY.ZMPProfil[j+1] = lAbsoluteSupportFootPositions[li].y;
 		  }		
 	      }
 
@@ -1602,14 +1627,14 @@ namespace PatternGeneratorJRL
        and final CoM to be feed to the new system. */
     aCTIPX.InitialCoM = FPX.CoMInit;
     aCTIPX.InitialCoMSpeed = FPX.CoMSpeedInit;
-    aCTIPX.FinalCoMPos = (*aCTIPX.ZMPProfil)[m_NumberOfIntervals-1];
+    aCTIPX.FinalCoMPos = aCTIPX.ZMPProfil[m_NumberOfIntervals-1];
     ODEBUG("InitialCoMPos " << aCTIPX.InitialCoM << 
 	    " InitialCoMSpeed " << aCTIPX.InitialCoMSpeed << 
 	    " FinalCoMPos " << aCTIPX.FinalCoMPos
 	    );
     aCTIPY.InitialCoM = FPY.CoMInit;
     aCTIPY.InitialCoMSpeed = FPY.CoMSpeedInit;
-    aCTIPY.FinalCoMPos = (*aCTIPY.ZMPProfil)[m_NumberOfIntervals-1];
+    aCTIPY.FinalCoMPos = aCTIPY.ZMPProfil[m_NumberOfIntervals-1];
     ODEBUG("InitialCoM " << aCTIPY.InitialCoM << 
 	    " InitialCoMSpeed " << aCTIPY.InitialCoMSpeed << 
 	    " FinalCoMPos " << aCTIPY.FinalCoMPos
@@ -1702,15 +1727,15 @@ namespace PatternGeneratorJRL
 		<< NewFootAbsPos.size() << " " 
 		<< NewFootAbsPos[lIndexForFootPrintInterval].x<< " " 
 		<< NewFootAbsPos[lIndexForFootPrintInterval].y );
-	if (lIndexStep<aCTIPX.ZMPProfil->size())
+	if (lIndexStep<aCTIPX.ZMPProfil.size())
 	  {
-	    (*aCTIPX.ZMPProfil)[lIndexStep] = NewFootAbsPos[lIndexForFootPrintInterval].x;
-	    (*aCTIPY.ZMPProfil)[lIndexStep] = NewFootAbsPos[lIndexForFootPrintInterval].y;
+	    aCTIPX.ZMPProfil[lIndexStep] = NewFootAbsPos[lIndexForFootPrintInterval].x;
+	    aCTIPY.ZMPProfil[lIndexStep] = NewFootAbsPos[lIndexForFootPrintInterval].y;
 	  }
-	if (lIndexStep<aCTIPX.ZMPProfil->size()-1)
+	if (lIndexStep<aCTIPX.ZMPProfil.size()-1)
 	  {
-	    (*aCTIPX.ZMPProfil)[lIndexStep+1] = NewFootAbsPos[lIndexForFootPrintInterval].x;
-	    (*aCTIPY.ZMPProfil)[lIndexStep+1] = NewFootAbsPos[lIndexForFootPrintInterval].y;
+	    aCTIPX.ZMPProfil[lIndexStep+1] = NewFootAbsPos[lIndexForFootPrintInterval].x;
+	    aCTIPY.ZMPProfil[lIndexStep+1] = NewFootAbsPos[lIndexForFootPrintInterval].y;
 	  }
 	
 	
@@ -1816,10 +1841,10 @@ namespace PatternGeneratorJRL
 	/* Recompute the coefficient of the ZMP/COG trajectories objects. */
 	for(int i=1;i<m_NumberOfIntervals-1;i++)
 	  {
-	    aAZCTX.Building3rdOrderPolynomial(i,(*aCTIPX.ZMPProfil)[i-1],(*aCTIPX.ZMPProfil)[i]);
-	    aAZCTY.Building3rdOrderPolynomial(i,(*aCTIPY.ZMPProfil)[i-1],(*aCTIPY.ZMPProfil)[i]);
-	    ODEBUG( (*aCTIPX.ZMPProfil)[i-1] << " " << (*aCTIPX.ZMPProfil)[i] << " " << 
-		    (*aCTIPY.ZMPProfil)[i-1] << " " << (*aCTIPY.ZMPProfil)[i]);
+	    aAZCTX.Building3rdOrderPolynomial(i,aCTIPX.ZMPProfil[i-1],aCTIPX.ZMPProfil[i]);
+	    aAZCTY.Building3rdOrderPolynomial(i,aCTIPY.ZMPProfil[i-1],aCTIPY.ZMPProfil[i]);
+	    ODEBUG( aCTIPX.ZMPProfil[i-1] << " " << aCTIPX.ZMPProfil[i] << " " << 
+		    aCTIPY.ZMPProfil[i-1] << " " << aCTIPY.ZMPProfil[i]);
 	  }
 	
 	/* Compute the trajectories */
@@ -1922,8 +1947,8 @@ namespace PatternGeneratorJRL
     /* Recompute the coefficient of the ZMP/COG trajectories objects. */
     for(int i=1;i<m_NumberOfIntervals-1;i++)
       {
-	aAZCTX.Building3rdOrderPolynomial(i,(*aCTIPX.ZMPProfil)[i-1],(*aCTIPX.ZMPProfil)[i]);
-	aAZCTY.Building3rdOrderPolynomial(i,(*aCTIPY.ZMPProfil)[i-1],(*aCTIPY.ZMPProfil)[i]);
+	aAZCTX.Building3rdOrderPolynomial(i,aCTIPX.ZMPProfil[i-1],aCTIPX.ZMPProfil[i]);
+	aAZCTY.Building3rdOrderPolynomial(i,aCTIPY.ZMPProfil[i-1],aCTIPY.ZMPProfil[i]);
       }
 
     ODEBUG("ChangeFootLandingPosition: SetAbsoluteTimeReference to t:" << t);
@@ -2015,7 +2040,7 @@ namespace PatternGeneratorJRL
 	  {
 	    double lZMP;
 	    aAZCT.ComputeZMP(lAbsoluteTimeReference+lx,lZMP);
-	    r = (*aCTIP.ZMPProfil)[0] - lZMP;
+	    r = aCTIP.ZMPProfil[0] - lZMP;
 	  }
 	
 	FIFOZMPRefPositions.push_back(r);
@@ -2320,8 +2345,7 @@ namespace PatternGeneratorJRL
     vector<double> * lZMPY=0;
     double FinalCoMPosY=0.0;
 
-    if (m_CTIPX.ZMPProfil!=0)
-      lZMPX = m_CTIPX.ZMPProfil;
+    lZMPX = &m_CTIPX.ZMPProfil;
 
     if (DoNotPrepareLastFoot)
       FinalCoMPosX = m_AbsoluteSupportFootPositions[lindex].x;
@@ -2338,9 +2362,9 @@ namespace PatternGeneratorJRL
     
     m_CTIPX.FinalCoMPos = FinalCoMPosX;
 
-    for(unsigned int i=0;i<m_CTIPX.ZMPProfil->size();i++)
+    for(unsigned int i=0;i<m_CTIPX.ZMPProfil.size();i++)
       {
-	ODEBUG("m_CTIPX.ZMPProfil["<< i << "]=" << (*m_CTIPX.ZMPProfil)[i]);
+	ODEBUG("m_CTIPX.ZMPProfil["<< i << "]=" << m_CTIPX.ZMPProfil[i]);
       }
 
         /*! Build 3rd order polynomials. */
@@ -2351,8 +2375,7 @@ namespace PatternGeneratorJRL
     
     ComputeTrajectory(m_CTIPX,*m_AnalyticalZMPCoGTrajectoryX);
 
-    if (m_CTIPY.ZMPProfil!=0)
-      lZMPY = m_CTIPY.ZMPProfil;
+    lZMPY = &m_CTIPY.ZMPProfil;
 
     if (DoNotPrepareLastFoot)
       FinalCoMPosY = m_AbsoluteSupportFootPositions[lindex].y;
@@ -2366,7 +2389,7 @@ namespace PatternGeneratorJRL
     else
       (*lZMPY)[j-2] = (*lZMPY)[j-1] = FinalCoMPosY;
 
-    for(unsigned int i=0;i<m_CTIPY.ZMPProfil->size();i++)
+    for(unsigned int i=0;i<m_CTIPY.ZMPProfil.size();i++)
       {
 	ODEBUG("m_CTIPY.ZMPProfil["<< i << "]=" << (*m_CTIPY.ZMPProfil)[i]);
       }
