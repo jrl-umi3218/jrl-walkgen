@@ -254,7 +254,7 @@ namespace PatternGeneratorJRL
 	  
 	    }
 
-	  os << "End of iteration " << lNbIt << endl;
+	  os << endl << "End of iteration " << lNbIt << endl;
 	  os << "<===============================================================>"<<endl;
 	}
       

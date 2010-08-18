@@ -49,6 +49,7 @@ MESSAGE(STATUS "UL: ${${PROJECT_NAME}_test_LDFLAGS}  ${${PROJECT_NAME}_test_CXXF
 ADD_EXECUTABLE(	TestFootPrintPGInterface 
   ../src/TimeUtilsWindows.cpp
   TestFootPrintPGInterfaceData.cpp
+  CommonTools.cpp
   TestFootPrintPGInterface.cpp)
 SET_TARGET_PROPERTIES(TestFootPrintPGInterface
 	              PROPERTIES
@@ -89,7 +90,6 @@ SET_TARGET_PROPERTIES(TestRiccatiEquation
 ADD_EXECUTABLE( TestMorisawa2007
   ../src/TimeUtilsWindows.cpp
   TestMorisawa2007.cpp
-  TestFootPrintPGInterfaceData.cpp
   CommonTools.cpp
   TestObject.cpp
   ClockCPUTime.cpp
@@ -108,7 +108,6 @@ ADD_DEPENDENCIES (TestMorisawa2007 ${PROJECT_NAME})
 ADD_EXECUTABLE( TestHerdt2010
   ../src/TimeUtilsWindows.cpp
   TestHerdt2010.cpp
-  TestFootPrintPGInterfaceData.cpp
   CommonTools.cpp
 )
 SET_TARGET_PROPERTIES( TestHerdt2010

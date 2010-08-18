@@ -35,6 +35,95 @@ using namespace std;
 namespace PatternGeneratorJRL {
 namespace TestSuite {
 
+double InitialPoses[7][40] = {
+
+  // 1- With previous half-sitting value
+  { 
+    0.0, 0.0, -20.0, 40.0, -20.0, 0.0, 0.0, 0.0, -20.0, 40.0, -20.0, 0.0,  // legs
+
+    0.0, 0.0, -23.7, 6.6, // chest and head
+
+    27.0, -5.0, -4.0, -87.0, -4.0, -16.0, 20.0, // right arm
+    15.0,  10.0, 0.0, -20.0, 0.0, 0.0, 10.0, // left arm 
+
+    -20.0, 20.0, -20.0, 20.0, -20.0, // right hand
+    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
+  },
+  // 2- Nicolas position + New half sitting for the legs
+  { 
+    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
+
+    0.0, 0.0, -23.7, 6.6, // chest and head
+
+    27.0, -5.0, -4.0, -87.0, -4.0, -16.0, 20.0, // right arm
+    15.0,  10.0, 0.0, -20.0, 0.0, 0.0, 10.0, // left arm 
+
+    -20.0, 20.0, -20.0, 20.0, -20.0, // right hand
+    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
+  },
+  // 3- Test for comparison with PG v1.x
+  { 
+    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
+
+    0.0, 0.0, 0.0, 0.0, // chest and head
+
+    0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // right arm
+    0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // left arm 
+
+    0.0, 0.0, 0.0, 0.0, 0.0, // right hand
+    0.0, 0.0, 0.0, 0.0, 0.0  // left hand
+  },
+  // 4- New Half sitting
+  { 
+    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 
+    0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
+
+    0.0, 0.0, 0.0, 0.0, // chest and head
+
+    15.0, -10.0, 0.0, -30.0, 0.0, 0.0, 10.0, // right arm
+    15.0,  10.0, 0.0, -30.0, 0.0, 0.0, 10.0, // left arm 
+
+    -10.0, 10.0, -10.0, 10.0, -10.0,  // right hand
+    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
+  },
+  // 5- Position for interaction
+  {
+    0.0 ,  0.0 , -26.0 ,  50.0 , -24 ,   0.0,  
+    0.0 ,  0.0 , -26.0 ,  50.0 , -24 ,   0.0 , // legs
+    0.0 ,  0.0 ,  // chest
+    0.0 ,  0.0 , // head 
+
+    10.0, -18.0, 0.0, -100.0, -18.0, 0.0, 10.0, // right arm  
+    10.0,  18.0, 0.0, -100.0,  18.0, 0.0, 10.0, 
+    -10.000004 ,  10.000004 , -10.000004 ,  10.000004 , -10.000004 , // right hand 
+    -10.000004 ,  10.000004 , -10.000004 ,  10.000004 , -10.000004 // left hand
+  },
+  // 6- Initial position for model building 1,
+  {
+    14.323945,  -6.0363396,  -13.459409,    44.02602,  -30.566611,    6.0363396,
+    0.0000001,   7.4859801,  -27.663319,    44.65489,  -16.991579,   -7.4859801,
+    0.,    0.,    0.,    0.,    
+    12.397718,  -10.000004,    0.,  -29.618538,    0.,    0.,    10.0,
+    16.536364,   10.000004,    0.,  -29.828011,    0.,    0.,    10.0,
+    
+    -10.0,  10.0, -10.0,  10,   -10.0, 
+    -10.0,  10.0, -10.0,  10.0, -10.0 
+  },
+  // 7- Initial position for model buiding 2
+  {
+    -7.16197, -7.69299, -16.1787, 44.5201, -28.3415,  7.69299, 
+    7.16197,   5.74946, -31.3668, 44.1057, -12.7389, -5.74946,
+    
+    0., 0., 0., 0., 
+    
+    12.622 , -10, 0, -29.678 , 0, 0, 10, 
+    16.7091,  10, 0, -29.7841, 0, 0, 10, 
+    
+    -10.0,  10.0, -10.0,  10,   -10.0, 
+    -10.0,  10.0, -10.0,  10.0, -10.0 
+  }
+
+};
 
 //      ":comheight 0.807727",
 void CommonInitialization(PatternGeneratorInterface &aPGI)
@@ -45,8 +134,8 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
      ":previewcontroltime 1.6",
      ":omega 0.0",
      ":stepheight 0.07",
-     ":singlesupporttime 0.7",
-     ":doublesupporttime 0.1",
+     ":singlesupporttime 0.78",
+     ":doublesupporttime 0.02",
      ":armparameters 0.5",
      ":LimitsFeasibility 0.0",
      ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
@@ -215,13 +304,7 @@ void getOptions(int argc,
 	  LinkJointRank = value;
 	  //LinkJointRank += "/Controller/IOserver/robot/HRP2JRL/etc/";
 	  LinkJointRank += "/HRP2LinkJointRank.xml";
-	  
-	  if (argc==2)
-	    {
-	      TestProfil=atoi(argv[1]);
-	      cout << "Profil: " << ProfilesNames[TestProfil] << endl;
-	    }
-	      
+	  	      
 	}
     }	
   else 

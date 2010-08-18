@@ -98,6 +98,9 @@ namespace PatternGeneratorJRL
       m_modificationtime = end.tv_sec - m_begin.tv_sec 
 	+ 0.000001 * (end.tv_usec - m_begin.tv_usec);
 
+      if (m_modificationtime> 0.0005)
+	m_nbofmodifs++;
+
       m_totalmodificationtime += m_modificationtime;
     }
     
@@ -117,6 +120,7 @@ namespace PatternGeneratorJRL
     void ClockCPUTime::writeBuffer(string &aFileName)
     {
       ofstream lProfileOutput(aFileName.c_str(),ofstream::out);
+      // Shift all the measurement to the origin.
       double dST = m_startingtime.tv_sec + 0.000001 * m_startingtime.tv_usec;
       for(unsigned int i=0;i<m_TimeProfileIndex;i++)
 	lProfileOutput << " " << m_TimeProfileTS[i] - dST
@@ -127,20 +131,34 @@ namespace PatternGeneratorJRL
     }
 
     void ClockCPUTime::displayStatistics(ostream &os,
-					  struct OneStep &OneStep)
+					 struct OneStep &OneStep)
     {
-        os << "Number of iterations " << OneStep.NbOfIt << " " << m_NbOfItToCompute << endl;
-	os << "Time consumption: " << (double)m_totaltime/(double)m_NbOfItToCompute 
-	     << " max time: " << m_maxtime << endl;
-	os << "Time for modif: " << (double)m_totalmodificationtime/(double)m_nbofmodifs 
-	     <<  " nb of modifs: " << m_nbofmodifs << endl ;
-	os << "Time on ZMP ref planning " 
-	   << m_totaltimeinplanning << " " << endl;
-	if ((double)OneStep.NbOfIt!=0)
-	  {
-	    os << m_totaltimeinplanning*4/(double)OneStep.NbOfIt<< endl;
-	  }
+      
+      os << " === " << endl;
+      os << "Number of iterations " << OneStep.NbOfIt << endl
+	 << "Number of iterations above 300 us:" << m_NbOfItToCompute << endl;
+      if (m_NbOfItToCompute!=0)
+	os << "Mean time consumption for one iteration above 300 us: " 
+	   << (double)m_totaltime/(double)m_NbOfItToCompute 
+	   << " (s) " << endl
+	   << "Maximum time consumption for one iteration: " 
+	   << m_maxtime << " (s) " << endl;
+      else
+	os << "No iteration above 300 us realized." << endl
+	   << "The computation were done off-line or there is a problem." << endl;
 
+      os << " === " << endl;
+      if (m_nbofmodifs!=0)
+	os << "Mean time for modifications: " 
+	   << (double)m_totalmodificationtime/(double)m_nbofmodifs 
+	   << " (s) " << endl
+	   <<  "Number of modifications: " << m_nbofmodifs << endl ;
+      else 
+	os << "No modifications" << endl;
+      
+      os << "Time on ZMP reference planning " 
+	 << m_totaltimeinplanning << " (s) " << endl;
+      
     }
     
   };

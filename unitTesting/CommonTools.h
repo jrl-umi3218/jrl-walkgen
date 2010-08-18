@@ -28,7 +28,6 @@
 
 #include <walkGenJrl/PatternGeneratorInterface.h>
 
-#include "TestFootPrintPGInterfaceData.h"
 #include "ClockCPUTime.h"
 
 #ifndef _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_

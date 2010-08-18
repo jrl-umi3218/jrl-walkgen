@@ -11,11 +11,32 @@
 
 #include "CommonTools.h"
 #include "TestObject.h"
-#include "TestFootPrintPGInterfaceData.h"
 
 using namespace::PatternGeneratorJRL;
 using namespace::PatternGeneratorJRL::TestSuite;
 using namespace std;
+
+enum Profiles_t {
+  PROFIL_ANALYTICAL_ONLINE_WALKING,                 // 1 
+  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING          //  2
+};
+
+#define NBOFPREDEFONLINEFOOTSTEPS 11
+
+
+double OnLineFootSteps[NBOFPREDEFONLINEFOOTSTEPS][3]={
+  { 0.05, 0.0, 0.0},
+  { 0.05, 0.0, 0.0},
+  { 0.05, 0.0, 0.0},
+  { 0.05, 0.0, 0.0},
+  { 0.05, 0.0, 0.0},
+  { 0.05, 0.0, 0.0},
+  { 0.05, 0.0, 0.0},
+  { 0.05, 0.0, 0.0},
+  { 0.05, 0.0, 0.0},
+  { 0.05, 0.0, 0.0},
+  { 0.05, 0.0, 0.0}
+};
 
 class TestMorisawa2007: public TestObject
 {
@@ -81,12 +102,12 @@ protected:
     
     {
       istringstream strm2(":stepseq 0.0 -0.105 0.0 \
-                     0.2  0.21 0.0		   \
-                     0.2 -0.21 0.0		   \
-                     0.2  0.21 0.0                 \
-                     0.2 -0.21 0.0                 \
-                     0.2  0.21 0.0		   \
-                     0.0 -0.21 0.0");
+                     0.2  0.19 0.0		   \
+                     0.2 -0.19 0.0		   \
+                     0.2  0.19 0.0                 \
+                     0.2 -0.19 0.0                 \
+                     0.2  0.19 0.0		   \
+                     0.0 -0.19 0.0");
       aPGI.ParseCmd(strm2);
     }
     
@@ -115,16 +136,18 @@ protected:
     unsigned int StoppingTime = 50*200;
     double r = 100.0*(double)m_OneStep.NbOfIt/(double)StoppingTime;
 
-    if (m_OneStep.NbOfIt%500==0)
-      {
-	cout << "Progress " << r << "\% : " << m_OneStep.NbOfIt << "/" << StoppingTime << "\r";
-      }
 
     if (m_OneStep.NbOfIt>StoppingTime) /* Stop after 30 seconds the on-line stepping */
       {
 	StopOnLineWalking(*m_PGI);
       }
     else{
+      if (m_OneStep.NbOfIt%200==0)
+	{
+	  cout << "Progress " << r << "\% : " << m_OneStep.NbOfIt << "/" << StoppingTime << "\r";
+	  cout.flush();
+	}
+
       double triggertime = 9.64*200 + m_deltatime*200;
       if ((m_OneStep.NbOfIt>triggertime) && 
 	  m_TestChangeFoot)
@@ -155,23 +178,30 @@ protected:
 
 };
 
-int main(int argc, char *argv[])
+int PerformTests(int argc, char *argv[])
 {
-  std::string TestName("TestMorisawa2007");
-  TestMorisawa2007 aTM2007(argc,argv,
-			   TestName,
-			   PROFIL_ANALYTICAL_ONLINE_WALKING);
-  
-  try 
+  std::string TestNames[2] = { "TestMorisawa2007OnLine",
+			       "TestMorisawa2007ShortWalk"};
+  int TestProfiles[2] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
+			  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING};
+
+  for (unsigned int i=0;i<2;i++)
     {
-      aTM2007.doTest(std::cout);
-    }
-  catch (const char * astr)
-    {
-      cerr << "Failed on following error " << astr << std::endl;
-      return -1;
+        TestMorisawa2007 aTM2007(argc,argv,
+				 TestNames[i],
+				 TestProfiles[i]);
+	try 
+	  { aTM2007.doTest(std::cout); }
+	catch (const char * astr)
+	  { cerr << "Failed on following error " << astr << std::endl;
+	    return -1; }
     }
   return 0;
+}
+
+int main(int argc, char *argv[])
+{
+  return PerformTests(argc,argv);
 }
 
 

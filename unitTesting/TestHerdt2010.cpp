@@ -8,7 +8,7 @@
  * Please refer to License.txt for more information on the license.
  * 
  */
-
+#include "TestFootPrintPGInterfaceData.h"
 #include "CommonTools.h"
 
 using namespace::PatternGeneratorJRL;
