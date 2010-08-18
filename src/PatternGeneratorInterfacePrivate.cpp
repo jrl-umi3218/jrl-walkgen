@@ -334,27 +334,27 @@ namespace PatternGeneratorJRL {
   {
 
 
-    ODEBUG5("Destructor: Start","DebugPGI.txt");
+    ODEBUG4("Destructor: Start","DebugPGI.txt");
 
     if (m_StOvPl!=0)
       delete m_StOvPl;
-    ODEBUG5("Destructor: did m_StOvPl","DebugPGI.txt");
+    ODEBUG4("Destructor: did m_StOvPl","DebugPGI.txt");
 
     if (m_StepStackHandler!=0)
       delete m_StepStackHandler;
-    ODEBUG5("Destructor: did m_StepStackHandler","DebugPGI.txt");
+    ODEBUG4("Destructor: did m_StepStackHandler","DebugPGI.txt");
 
     if (m_GMFKW!=0)
       delete m_GMFKW;
-    ODEBUG5("Destructor: did m_GMKFW","DebugPGI.txt");
+    ODEBUG4("Destructor: did m_GMKFW","DebugPGI.txt");
 
     if (m_PC!=0)
       delete m_PC;
-    ODEBUG5("Destructor: did m_PC","DebugPGI.txt");
+    ODEBUG4("Destructor: did m_PC","DebugPGI.txt");
 
     if (m_ZMPD!=0)
       delete m_ZMPD;
-    ODEBUG5("Destructor: did m_ZMPD","DebugPGI.txt");
+    ODEBUG4("Destructor: did m_ZMPD","DebugPGI.txt");
 
     if (m_ZMPQP!=0)
       delete m_ZMPQP;
@@ -365,11 +365,11 @@ namespace PatternGeneratorJRL {
 
     if (m_ZMPVRQP!=0)
       delete m_ZMPVRQP;
-    ODEBUG5("Destructor: did m_ZMPVRQP","DebugPGI.txt");
+    ODEBUG4("Destructor: did m_ZMPVRQP","DebugPGI.txt");
 
     if (m_ZMPM!=0)
       delete m_ZMPM;
-    ODEBUG5("Destructor: did m_ZMPM","DebugPGI.txt");
+    ODEBUG4("Destructor: did m_ZMPM","DebugPGI.txt");
 
     if (m_ComAndFootRealization!=0)
       delete m_ComAndFootRealization;
@@ -1090,7 +1090,7 @@ namespace PatternGeneratorJRL {
 	m_ZMPVRQP->Online = 1;
 	initOnlineHerdt();
 	printf("Online \n");
-	//ODEBUG5("InitOnLine","DebugHerdt.txt");
+	//ODEBUG4("InitOnLine","DebugHerdt.txt");
       }
     else if (aCmd==":setCoMPerturbationForce")
       {
@@ -1385,7 +1385,8 @@ namespace PatternGeneratorJRL {
 	      }
 
 
-	    ODEBUG("Asking a new step");
+	    ODEBUG(" EnoughSteps: " << EnoughSteps << endl <<
+		    " EndSequence:" << EndSequence << endl);
 
 	    if (!EndSequence)
 	      {
@@ -1780,6 +1781,7 @@ namespace PatternGeneratorJRL {
 				 m_StepStackHandler);
 	vector<double> lDj;
 	m_FeetTrajectoryGenerator->GetDeltaTj(lDj);
+	ODEBUG("lDj[0] = " << lDj[0]);
 	newtime = lDj[0];
 	return 0;
       }
