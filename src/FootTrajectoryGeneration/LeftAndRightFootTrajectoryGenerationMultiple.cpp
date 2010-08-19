@@ -682,7 +682,7 @@ ChangeRelStepsFromAbsSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 {
   if (ChangedInterval>=SupportFootAbsoluteFootPositions.size())
     {
-      ODEBUG3("Pb: ChangedInterval is after the size of absolute foot stack.");
+      LTHROW("Pb: ChangedInterval is after the size of absolute foot stack.");
       return; 
     }
 
@@ -777,13 +777,17 @@ void LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition
     {
       bool r = m_LeftFootTrajectory->Compute(time,aFAP);
       if (!r)
-	{ODEBUG3("Unable to compute left foot abs pos at time " <<time);}
+	{ODEBUG3("Unable to compute left foot abs pos at time " <<time);
+	  LTHROW("Pb in computing absolute foot position");
+	}
     }
   else 
     {
       bool r = m_RightFootTrajectory->Compute(time,aFAP);
       if (!r)
-	{ODEBUG3("Unable to compute right foot abs pos at time " <<time);}
+	{ODEBUG3("Unable to compute right foot abs pos at time " <<time);
+	  LTHROW("Pb in computing absolute foot position");
+	}
     }
 
 

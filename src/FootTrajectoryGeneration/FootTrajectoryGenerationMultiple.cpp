@@ -129,9 +129,9 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
 	  
   for(unsigned int j=0;j<m_DeltaTj.size();j++)
     {
-	  ODEBUG("t: " << t << " reftime :" << setprecision(12) << reftime <<
-	  		" Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j] 
-	  		<<" max limit: " << setprecision(12) << (reftime+m_DeltaTj[j]+m_Sensitivity) );
+      ODEBUG("t: " << t << " reftime :" << setprecision(12) << reftime <<
+	     " Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j] 
+	     <<" max limit: " << setprecision(12) << (reftime+m_DeltaTj[j]+m_Sensitivity) );
 
       if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
 	{
@@ -153,7 +153,11 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
       
       reftime+=m_DeltaTj[j];
     }
-    ODEBUG("reftime :" << reftime );
+  ODEBUG(" reftime :" << reftime <<
+	  " m_AbsoluteReferenceTime" << m_AbsoluteTimeReference);
+  ODEBUG("t: " << setprecision(12) << t << " reftime :" << reftime << 
+	  " m_Sensitivity: "<< m_Sensitivity  <<" m_DeltaTj.size(): "<< m_DeltaTj.size() );
+
   return false;
 }
 
