@@ -181,13 +181,18 @@ namespace PatternGeneratorJRL
     m_DeltaTj[m_NumberOfIntervals-1]=m_Tsingle*3.0;
     m_StepTypes[m_NumberOfIntervals-1]=DOUBLE_SUPPORT;
     ComputePreviewControlTimeWindow();
-    ODEBUG("PreviewControlTime:" << setprecision(12) << m_PreviewControlTime << " " << m_Tsingle << " " << m_Tdble);
+    ODEBUG("PreviewControlTime:" << setprecision(12) << m_PreviewControlTime << 
+	   " " << m_Tsingle << " " << m_Tdble);
     
     if (m_VerboseLevel>=2)
       {
+	double total=0;
 	for(int i=0;i<m_NumberOfIntervals;i++)
-	  cout << setprecision(12) << m_DeltaTj[i] << " ";
-	cout << endl;
+	  {
+	    cout << setprecision(12) << m_DeltaTj[i] << " ";
+	    total+= m_DeltaTj[i];
+	  }
+	cout << " total: " << total <<endl;
       }
 
     // Specify the degrees corresponding to the given interval.
@@ -568,7 +573,8 @@ namespace PatternGeneratorJRL
       }
 
     /*! Set the current time reference for the analytical trajectory. */
-    m_AbsoluteTimeReference = m_CurrentTime-m_Tsingle*2;
+    double TimeShift =  m_Tsingle*2;
+    m_AbsoluteTimeReference = m_CurrentTime-TimeShift;
     m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
@@ -578,7 +584,9 @@ namespace PatternGeneratorJRL
     ODEBUG("m_PreviewControlTime: " << m_PreviewControlTime);
 
     /*! Fill in the stack of references */
-    for(double t=0.0; t<m_PreviewControlTime; t+= 0.005)
+    for(double t=m_CurrentTime; 
+	t<m_CurrentTime+m_PreviewControlTime-TimeShift; 
+	t+= m_SamplingPeriod)
       {
 	/*! Feed the ZMPPositions. */
 	ZMPPosition aZMPPos;
@@ -612,6 +620,14 @@ namespace PatternGeneratorJRL
 		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Test.dat");
       }
+
+    m_UpperTimeLimitToUpdateStacks = m_CurrentTime;
+    for(int i=0;i<m_NumberOfIntervals;i++)
+      {
+	m_UpperTimeLimitToUpdateStacks += m_DeltaTj[i];
+      }
+    ODEBUG("m_UpperTimeLimitToUpdateStacks" <<
+	    m_UpperTimeLimitToUpdateStacks);
 
   }
 
@@ -2474,6 +2490,15 @@ namespace PatternGeneratorJRL
       }
 
     ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
+  }
+
+  void AnalyticalMorisawaCompact::PropagateAbsoluteReferenceTime(double x)
+  {
+    ODEBUG("Set Propagate Absolute Reference Time: " << x);
+    m_AbsoluteTimeReference = x;
+    m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(x);
+    m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(x);
+    m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(x);
   }
 }
 

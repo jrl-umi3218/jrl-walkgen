@@ -575,23 +575,23 @@ namespace PatternGeneratorJRL
       double m_UpperTimeLimitToUpdateStacks;
       /*! @} */
 
-      /*! Clocks for code measurement in OnLine()*/
+      /*! \brief Clocks for code measurement in OnLine()*/
       Clock m_Clock1, m_Clock2, m_Clock3, m_Clock4;
 
-      /*! Boolean value to check if there is a new step
+      /*! \brief Boolean value to check if there is a new step
 	in the stack. */
       bool m_NewStepInTheStackOfAbsolutePosition;
 
-      /*! Height of the initial CoM position. */
+      /*! \brief Height of the initial CoM position. */
       double m_InitialPoseCoMHeight;
     
-      /*! On-line change step mode */
+      /*! \brief On-line change step mode */
       unsigned int m_OnLineChangeStepMode;
 
-      /*! Filtering the axis through a preview control. */
+      /*! \brief Filtering the axis through a preview control. */
       FilteringAnalyticalTrajectoryByPreviewControl * m_FilterXaxisByPC, * m_FilterYaxisByPC;
       
-      /*! Activate or desactivate the filtering. */
+      /*! \brief Activate or desactivate the filtering. */
       bool m_FilteringActivate;
 
     public:
@@ -604,6 +604,8 @@ namespace PatternGeneratorJRL
       PreviewControl * GetPreviewControl();
       /*! @} */
       
+      /*! \brief Propagate Absolute Reference Time */
+      void PropagateAbsoluteReferenceTime(double x);
 
     };
 };

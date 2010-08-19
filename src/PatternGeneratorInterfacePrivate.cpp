@@ -1411,6 +1411,7 @@ namespace PatternGeneratorJRL {
 			   lRelativeFootPositions.sx << " SY: "
 			   << lRelativeFootPositions.sy );
 		    m_ZMPM->SetCurrentTime(m_InternalClock);
+		    m_ZMPM->PropagateAbsoluteReferenceTime(m_InternalClock);
 		    m_ZMPM->OnLineAddFoot(lRelativeFootPositions,
 					  m_ZMPPositions,
 					  m_COMBuffer,
@@ -1441,6 +1442,7 @@ namespace PatternGeneratorJRL {
 			   lRelativeFootPositions.sx << " SY: "
 			   << lRelativeFootPositions.sy );
 		    m_ZMPM->SetCurrentTime(m_InternalClock);
+		    m_ZMPM->PropagateAbsoluteReferenceTime(m_InternalClock);
 		    m_ZMPM->EndPhaseOfTheWalking(m_ZMPPositions,
 						 m_COMBuffer,
 						 m_LeftFootPositions,
@@ -1842,7 +1844,7 @@ namespace PatternGeneratorJRL {
     else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
       {
 	ODEBUG("ZMPCOM_KAJITA_2003 " << m_ZMPPositions.size() );
-	m_ZMPM->SetCurrentTime(m_InternalClock);
+	m_ZMPD->SetCurrentTime(m_InternalClock);
 	m_ZMPD->GetZMPDiscretization(m_ZMPPositions,
 				     m_COMBuffer,
 				     lRelativeFootPositions,
