@@ -134,24 +134,6 @@ namespace PatternGeneratorJRL
       delete m_AnalyticalZMPCoGTrajectoryY;
     ODEBUG4("Destructor: did AnalyticalZMPCoGTrajectoryY","DebugPGI.txt");    
 
-    /*
-    if (m_CTIPX.ZMPZ!=0)
-      delete m_CTIPX.ZMPZ;
-    ODEBUG4("Destructor: did CTIPX ZMPZ","DebugPGI.txt");    
-    
-    if (m_CTIPX.CoMZ!=0)
-      delete m_CTIPX.CoMZ;
-    ODEBUG4("Destructor: did CTIPX CoMZ","DebugPGI.txt");    
-
-    if (m_CTIPX.ZMPProfil!=0)
-      delete m_CTIPX.ZMPProfil;
-    ODEBUG4("Destructor: did CTIPX ZMPProfil","DebugPGI.txt");    
-
-    if (m_CTIPY.ZMPProfil!=0)
-      delete m_CTIPY.ZMPProfil;
-    ODEBUG4("Destructor: did CTIPY ZMPProfil","DebugPGI.txt");    
-
-    */
     if (m_FilterXaxisByPC!=0)
       delete m_FilterXaxisByPC;
 
@@ -380,19 +362,8 @@ namespace PatternGeneratorJRL
     
     vector<double> * lCoMZ;
     vector<double> * lZMPZ;
-    /*
-    if (m_CTIPX.CoMZ!=0)
-      lCoMZ = m_CTIPX.CoMZ;
-    else 
-      lCoMZ = new vector<double>;
-    */
-    lCoMZ = & m_CTIPX.CoMZ;
 
-    /* if (m_CTIPX.ZMPZ!=0)
-      lZMPZ = m_CTIPX.ZMPZ;
-    else
-      lZMPZ = new vector<double>;
-    */
+    lCoMZ = & m_CTIPX.CoMZ;
     lZMPZ = & m_CTIPX.ZMPZ;
 
     lCoMZ->resize(NbOfIntervals);
@@ -596,10 +567,17 @@ namespace PatternGeneratorJRL
 	return;
       }
 
+    /*! Set the current time reference for the analytical trajectory. */
+    m_AbsoluteTimeReference = m_CurrentTime-m_Tsingle*2;
+    m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
+    m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
+    m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
+
     /*! Compute the total size of the array related to the steps. */
     ODEBUG("m_SampligPeriod: " << m_SamplingPeriod);
     ODEBUG("m_PreviewControlTime: " << m_PreviewControlTime);
 
+    /*! Fill in the stack of references */
     for(double t=0.0; t<m_PreviewControlTime; t+= 0.005)
       {
 	/*! Feed the ZMPPositions. */
@@ -1913,13 +1891,6 @@ namespace PatternGeneratorJRL
 
 	/* Modify the feet trajectory */	
 	ODEBUG("***************** Begin Change Foot Landing Position ********************");
-	/*
-	m_FeetTrajectoryGenerator->InitializeFromRelativeSteps(m_RelativeFootPositions,
-							       InitAbsLeftFootPos,
-							       InitAbsRightFootPos,
-							       m_AbsoluteSupportFootPositions,
-							       false,true);
-	*/
 	m_FeetTrajectoryGenerator->ComputeAbsoluteStepsFromRelativeSteps(m_RelativeFootPositions,
 									 InitAbsLeftFootPos,
 									 InitAbsRightFootPos,
@@ -2369,9 +2340,7 @@ namespace PatternGeneratorJRL
 
     /*! Build 3rd order polynomials. */
     for(int i=1;i<NbOfIntervals-1;i++)
-      {
-	m_AnalyticalZMPCoGTrajectoryX->Building3rdOrderPolynomial(i,(*lZMPX)[i-1],(*lZMPX)[i]);
-      }
+      {	m_AnalyticalZMPCoGTrajectoryX->Building3rdOrderPolynomial(i,(*lZMPX)[i-1],(*lZMPX)[i]); }
     
     ComputeTrajectory(m_CTIPX,*m_AnalyticalZMPCoGTrajectoryX);
 
@@ -2392,9 +2361,7 @@ namespace PatternGeneratorJRL
 
     /*! Build 3rd order polynomials. */
     for(int i=1;i<NbOfIntervals-1;i++)
-      {
-	m_AnalyticalZMPCoGTrajectoryY->Building3rdOrderPolynomial(i,(*lZMPY)[i-1],(*lZMPY)[i]);
-      }
+      {	m_AnalyticalZMPCoGTrajectoryY->Building3rdOrderPolynomial(i,(*lZMPY)[i-1],(*lZMPY)[i]); }
 
     ComputeTrajectory(m_CTIPY,*m_AnalyticalZMPCoGTrajectoryY);
 
@@ -2404,7 +2371,14 @@ namespace PatternGeneratorJRL
     unsigned int lIndexInterval,lPrevIndexInterval;
     m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_AbsoluteTimeReference,lIndexInterval);
     lPrevIndexInterval = lIndexInterval;
-    
+
+    /*! Set the time reference for the new trajectory. */
+    m_AbsoluteTimeReference = m_CurrentTime;
+    m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
+    m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
+    m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
+
+    /*! Fill in the stacks: minimal strategy only 1 reference. */
     for(double t=m_CurrentTime; t<=m_CurrentTime+2*m_SamplingPeriod; t+= m_SamplingPeriod)
       {
 	m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(t,lIndexInterval,lPrevIndexInterval);

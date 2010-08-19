@@ -1798,6 +1798,7 @@ namespace PatternGeneratorJRL {
       {
 	ODEBUG("ZMPCOM_WIEBER_2006 " << m_ZMPPositions.size() );
 	m_COMBuffer.clear();
+	m_ZMPM->SetCurrentTime(m_InternalClock);
 	m_ZMPQP->GetZMPDiscretization(m_ZMPPositions,
 				      m_COMBuffer,
 				      lRelativeFootPositions,
@@ -1827,6 +1828,7 @@ namespace PatternGeneratorJRL {
       {
 	ODEBUG("ZMPCOM_HERDT_2010 " << m_ZMPPositions.size() );
 	m_COMBuffer.clear();
+	m_ZMPM->SetCurrentTime(m_InternalClock);
 	m_ZMPVRQP->GetZMPDiscretization(m_ZMPPositions,
 					m_COMBuffer,
 					lRelativeFootPositions,
@@ -1840,6 +1842,7 @@ namespace PatternGeneratorJRL {
     else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
       {
 	ODEBUG("ZMPCOM_KAJITA_2003 " << m_ZMPPositions.size() );
+	m_ZMPM->SetCurrentTime(m_InternalClock);
 	m_ZMPD->GetZMPDiscretization(m_ZMPPositions,
 				     m_COMBuffer,
 				     lRelativeFootPositions,
@@ -1856,6 +1859,7 @@ namespace PatternGeneratorJRL {
       {
 	ODEBUG("ZMPCOM_MORISAWA_2007");
 	m_COMBuffer.clear();
+	m_ZMPM->SetCurrentTime(m_InternalClock);
 	m_ZMPM->GetZMPDiscretization(m_ZMPPositions,
 				     m_COMBuffer,
 				     lRelativeFootPositions,
