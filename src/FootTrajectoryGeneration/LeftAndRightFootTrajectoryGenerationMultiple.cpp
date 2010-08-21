@@ -766,7 +766,7 @@ ChangeRelStepsFromAbsSteps(deque<RelativeFootPosition> &RelativeFootPositions,
   ODEBUG("Changed intervals : " << ChangedInterval-1 << " " << ChangedInterval << " " << ChangedInterval + 1);
 }
 
-void LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition(int LeftOrRight,
+bool LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition(int LeftOrRight,
 										 double time,
 										 FootAbsolutePosition & aFAP)
 {
@@ -780,6 +780,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition
 	{ODEBUG3("Unable to compute left foot abs pos at time " <<time);
 	  LTHROW("Pb in computing absolute foot position");
 	}
+      return r;
     }
   else 
     {
@@ -788,24 +789,26 @@ void LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition
 	{ODEBUG3("Unable to compute right foot abs pos at time " <<time);
 	  LTHROW("Pb in computing absolute foot position");
 	}
+      return r;
     }
 
-
+  return false;
 }
 
-void LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition(int LeftOrRight,
+bool LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition(int LeftOrRight,
 										 double time,
 										 FootAbsolutePosition & aFAP,
 										 unsigned int IndexInterval)
 {
 
   ODEBUG(this << " " << m_LeftFootTrajectory << " " << m_RightFootTrajectory);
-
+  
   if (LeftOrRight==1)
-    m_LeftFootTrajectory->Compute(time,aFAP,IndexInterval);
+    return m_LeftFootTrajectory->Compute(time,aFAP,IndexInterval);
   else 
-    m_RightFootTrajectory->Compute(time,aFAP,IndexInterval);
-
+    return m_RightFootTrajectory->Compute(time,aFAP,IndexInterval);
+  
+  return false;
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::SetDeltaTj(vector<double> &aDeltaTj)

@@ -102,7 +102,7 @@ namespace PatternGeneratorJRL
     m_NewStepInTheStackOfAbsolutePosition = false;
 
     m_FilteringActivate = true;
-    RESETDEBUG4("Test.dat");
+    RESETDEBUG5("Test.dat");
   }
 
 
@@ -597,8 +597,17 @@ namespace PatternGeneratorJRL
 	/*! Feed the COMStates. */
 	COMState aCOMPos;
 	memset(&aCOMPos,0,sizeof(aCOMPos));
-	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]);
-	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]);
+	if (!m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]))
+	  {	  
+	    ODEBUG3("Pb at  t= " <<t);
+	    LTHROW("Unable to compute COM along X-axis in GetZMPDiscretization");
+	  }
+	
+	if (!m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]))
+	  {
+	    ODEBUG3("Pb at  t= " <<t);
+	    LTHROW("Unable to compute COM along Y-axis in GetZMPDiscretization");
+	  }
 	aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	aCOMPos.z[1] = 0.0;
 	aCOMPos.z[2] = 0.0;
@@ -616,7 +625,7 @@ namespace PatternGeneratorJRL
 	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos);
 	RightFootAbsolutePositions.push_back(RightFootAbsPos);
 
-	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
+	ODEBUG5(aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
 		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Test.dat");
       }
@@ -2401,8 +2410,12 @@ namespace PatternGeneratorJRL
 	
 	/*! Feed the ZMPPositions. */
 	ZMPPosition aZMPPos;
-        m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px,lIndexInterval);
-	m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py,lIndexInterval);
+        if (!m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px,lIndexInterval))
+	  LTHROW("Unable to compute ZMP along X-Axis in EndPhaseOfWalking");
+	  
+	if (!m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py,lIndexInterval))
+	  LTHROW("Unable to compute ZMP along Y-Axis in EndPhaseOfWalking");
+
 	FinalZMPPositions.push_back(aZMPPos);
 
 		
@@ -2410,9 +2423,9 @@ namespace PatternGeneratorJRL
 	COMState aCOMPos;
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	if (!m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0],lIndexInterval))
-	  { ODEBUG3("COM out of bound along X axis.");}
+	  { LTHROW("COM out of bound along X axis.");}
 	if (!m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0],lIndexInterval))
-	  { ODEBUG3("COM out of bound along Y axis.");}
+	  { LTHROW("COM out of bound along Y axis.");}
 
 	FinalCoMPositions.push_back(aCOMPos);
 	/*! Feed the FootPositions. */
@@ -2420,14 +2433,17 @@ namespace PatternGeneratorJRL
 	/*! Left */
 	FootAbsolutePosition LeftFootAbsPos;
 	memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
-	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos,lIndexInterval);
+	if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos,lIndexInterval))
+	  { LTHROW("Unable to compute left foot position in EndPhaseOfWalking");}
 	FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
 
 	/*! Right */
 	FootAbsolutePosition RightFootAbsPos;
 	memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
-	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos,lIndexInterval);
+	if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos,lIndexInterval))
+	  { LTHROW("Unable to compute right foot position in EndPhaseOfWalking");}
 	FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
+	  
 
 	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " << 
 		aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 

@@ -91,7 +91,7 @@ namespace PatternGeneratorJRL
 	@param[out] aFootAbsolutePosition: The data structure to be filled with the information
 	\f$ (x,y,z,\omega, \omega_2, \theta) \f$.
       */
-      void ComputeAnAbsoluteFootPosition(int LeftOrRight, double time, FootAbsolutePosition & aFootAbsolutePosition);
+      bool ComputeAnAbsoluteFootPosition(int LeftOrRight, double time, FootAbsolutePosition & aFootAbsolutePosition);
 
       /*! \brief Method to compute the absolute position of the foot.
 	@param[in] LeftOrRight: -1 indicates the right foot, 1 indicates the left foot.
@@ -102,7 +102,7 @@ namespace PatternGeneratorJRL
 	@param[in] IndexInterval: On which interval to compute the foot position.
 	
       */
-      void ComputeAnAbsoluteFootPosition(int LeftOrRight, double time, FootAbsolutePosition & aFootAbsolutePosition,
+      bool ComputeAnAbsoluteFootPosition(int LeftOrRight, double time, FootAbsolutePosition & aFootAbsolutePosition,
 					 unsigned int IndexInterval);
 
 
