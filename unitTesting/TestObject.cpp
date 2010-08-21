@@ -243,14 +243,17 @@ namespace PatternGeneratorJRL
 	      m_PreviousAcceleration = m_CurrentAcceleration;
 	  
 	      /*! Call the reimplemented method to generate events. */
-	      m_clock.startModification();
-	      generateEvent();
-	      m_clock.stopModification();
-	  
-	      m_clock.fillInStatistics();
-
-	      /*! Fill the debug files with appropriate information. */
-	      fillInDebugFiles();
+	      if (ok)
+		{
+		  m_clock.startModification();
+		  generateEvent();
+		  m_clock.stopModification();
+		  
+		  m_clock.fillInStatistics();
+		  
+		  /*! Fill the debug files with appropriate information. */
+		  fillInDebugFiles();
+		}
 	  
 	    }
 
