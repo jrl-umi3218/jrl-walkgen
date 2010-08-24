@@ -149,7 +149,7 @@ protected:
     else{
       if (m_OneStep.NbOfIt%200==0)
 	{
-	  cout << "Progress " << r << "\% : " << m_OneStep.NbOfIt << "/" << StoppingTime << "\r";
+	  cout << "Progress " << (unsigned int)r << "\%"<< "\r";
 	  cout.flush();
 	}
 
@@ -196,7 +196,15 @@ int PerformTests(int argc, char *argv[])
 				 TestNames[i],
 				 TestProfiles[i]);
 	try 
-	  { aTM2007.doTest(std::cout); }
+	  { 
+	    if (!aTM2007.doTest(std::cout))
+	      {
+		cout << "Failed test " << i << endl;
+		return -1;
+	      }
+	    else
+	      cout << "Passed test " << i << endl;
+	  }
 	catch (const char * astr)
 	  { cerr << "Failed on following error " << astr << std::endl;
 	    return -1; }

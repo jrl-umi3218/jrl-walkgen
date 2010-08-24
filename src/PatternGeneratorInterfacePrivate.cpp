@@ -1244,7 +1244,6 @@ namespace PatternGeneratorJRL {
 
     m_InternalClock+=m_SamplingPeriod;
 
-
     if ((!m_ShouldBeRunning) ||
 	(m_GlobalStrategyManager->EndOfMotion()<0))
       {
@@ -1441,8 +1440,7 @@ namespace PatternGeneratorJRL {
 		    ODEBUG("Putting a new step SX: " <<
 			   lRelativeFootPositions.sx << " SY: "
 			   << lRelativeFootPositions.sy );
-		    //m_ZMPM->SetCurrentTime(m_InternalClock);
-		    // m_ZMPM->PropagateAbsoluteReferenceTime(m_InternalClock);
+		    m_ZMPM->SetCurrentTime(m_InternalClock);
 		    m_ZMPM->EndPhaseOfTheWalking(m_ZMPPositions,
 						 m_COMBuffer,
 						 m_LeftFootPositions,
@@ -1472,12 +1470,6 @@ namespace PatternGeneratorJRL {
 	    ODEBUG("Finished the walking pattern generator ("<<m_InternalClock << ")");
 	  }
 
-	/*
-	  ODEBUG3("CurrentActuatedJointValues at the end: " );
-	  for(unsigned int i=0;i<m_CurrentActuatedJointValues.size();i++)
-	  cout << m_CurrentActuatedJointValues[i] << " " ;
-	  cout << endl;
-	*/
 	ODEBUG4("*** TAG *** " , "DebugDataIK.dat");
 
       }

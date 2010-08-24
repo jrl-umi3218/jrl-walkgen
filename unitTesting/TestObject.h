@@ -49,8 +49,8 @@ namespace PatternGeneratorJRL
       ~TestObject();
   
       /*! \brief Perform test. */
-      void doTest(std::ostream &os);
-
+      bool doTest(std::ostream &os);
+      
     protected:
 
       /*! \brief Choose which test to perform. */
@@ -118,6 +118,9 @@ namespace PatternGeneratorJRL
       /*! \brief Fill in the debug files with the appropriate
 	information */
       void fillInDebugFiles();
+
+      /*! \brief Compare debug files with references. */
+      bool compareDebugFiles();
 
       /*! @} */
 

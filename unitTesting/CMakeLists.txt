@@ -87,6 +87,13 @@ SET_TARGET_PROPERTIES(TestRiccatiEquation
 ######################
 # Test Morisawa 2007 #
 ######################
+CONFIGURE_FILE(${${PROJECT_NAME}_SOURCE_DIR}/unitTesting/TestMorisawa2007OnLineTestFGPI.datref
+		 ${${PROJECT_NAME}_BINARY_DIR}/unitTesting/TestMorisawa2007OnLineTestFGPI.datref)
+
+CONFIGURE_FILE(${${PROJECT_NAME}_SOURCE_DIR}/unitTesting/TestMorisawa2007ShortWalkTestFGPI.datref
+		 ${${PROJECT_NAME}_BINARY_DIR}/unitTesting/TestMorisawa2007ShortWalkTestFGPI.datref)
+
+
 ADD_EXECUTABLE( TestMorisawa2007
   ../src/TimeUtilsWindows.cpp
   TestMorisawa2007.cpp
@@ -100,6 +107,8 @@ SET_TARGET_PROPERTIES( TestMorisawa2007
 		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}  
 )
 ADD_DEPENDENCIES (TestMorisawa2007 ${PROJECT_NAME})
+
+#ADD_TEST(TestMorisawa2007 TestMorisawa2007)
 
 ###################
 # Test Herdt 2010 #

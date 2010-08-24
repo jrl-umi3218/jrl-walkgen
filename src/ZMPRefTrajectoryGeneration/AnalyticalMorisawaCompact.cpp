@@ -69,6 +69,7 @@ namespace PatternGeneratorJRL
     RegisterMethods();
     ODEBUG("Constructor");
     m_OnLineMode=false;
+    m_EndPhase = false;
 
     memset(&m_CTIPX,0,sizeof(m_CTIPX));
     memset(&m_CTIPY,0,sizeof(m_CTIPY));
@@ -102,7 +103,7 @@ namespace PatternGeneratorJRL
     m_NewStepInTheStackOfAbsolutePosition = false;
 
     m_FilteringActivate = true;
-    RESETDEBUG5("Test.dat");
+    RESETDEBUG4("Test.dat");
   }
 
 
@@ -625,7 +626,7 @@ namespace PatternGeneratorJRL
 	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos);
 	RightFootAbsolutePositions.push_back(RightFootAbsPos);
 
-	ODEBUG5(aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
+	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
 		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Test.dat");
       }
@@ -827,6 +828,16 @@ namespace PatternGeneratorJRL
 	    m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,RightFootAbsPos,lIndexInterval);
 	    FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
 
+	    if (m_EndPhase)
+	      {
+		ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " << 
+			aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
+			LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
+			RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " <<
+			time,
+			"Test.dat");
+
+	      }
 	  }
       }
     else 
@@ -2326,13 +2337,14 @@ namespace PatternGeneratorJRL
 						       deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 						       deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
   {
-    /* Update the relative and absolute foot positions. */
-    m_RelativeFootPositions.pop_front();
 
     m_OnLineMode = true;
     bool DoNotPrepareLastFoot = false;
     int NbSteps = m_RelativeFootPositions.size();
     int NbOfIntervals=2*NbSteps+1;
+
+    /* Update the relative and absolute foot positions. */
+    m_RelativeFootPositions.pop_front();
 
     ODEBUG("****************** Begin EndPhaseOfTheWalking **************************");
     // Strategy for the final CoM pos: middle of the segment
@@ -2454,6 +2466,7 @@ namespace PatternGeneratorJRL
 		m_SamplingPeriod,"Test.dat");
       }
 
+    m_EndPhase=true;
     ODEBUG("****************** End of EndPhaseOfTheWalking **************************");
   }
 

@@ -182,7 +182,51 @@ namespace PatternGeneratorJRL
 	}
     }
 
-    void TestObject::doTest(ostream &os)
+
+    bool TestObject::compareDebugFiles( )
+    {
+      bool SameFile= false;
+      if (m_DebugFGPI)
+	{
+	  SameFile = true;
+	  ifstream alif;            
+	  string aFileName;
+	  aFileName = m_TestName;
+	  aFileName += "TestFGPI.dat";	  
+	  alif.open(aFileName.c_str(),ifstream::in);
+
+	  ifstream arif;            
+	  aFileName = m_TestName;
+	  aFileName += "TestFGPI.datref";	  
+	  arif.open(aFileName.c_str(),ifstream::in);
+	  
+	  // Time
+	  double LocalInput[70], ReferenceInput[70];
+
+	  while ((!alif.eof()) ||
+		 (!arif.eof()))
+	    {
+	      for (unsigned int i=0;i<70;i++)
+		alif >> LocalInput[i];
+
+	      for (unsigned int i=0;i<70;i++)
+		arif >> ReferenceInput[i];
+
+	      for (unsigned int i=0;i<70;i++)
+		{
+		  if  (LocalInput[i]!=
+		       ReferenceInput[i])
+		    return false;
+		}
+	    }
+
+	  alif.close();
+	  arif.close();
+	}
+      return SameFile;
+    }
+
+    bool TestObject::doTest(ostream &os)
     {
 
       // Set time reference. 
@@ -266,6 +310,8 @@ namespace PatternGeneratorJRL
       m_clock.writeBuffer(lProfileOutput);
       m_clock.displayStatistics(os,m_OneStep);
 
+      // Compare debugging files 
+      return compareDebugFiles();
     }
 
   };

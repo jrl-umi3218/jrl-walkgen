@@ -594,6 +594,9 @@ namespace PatternGeneratorJRL
       /*! \brief Activate or desactivate the filtering. */
       bool m_FilteringActivate;
 
+      /*! \brief End phase */
+      bool m_EndPhase;
+
     public:
       /*! \name Methods related to the Preview Control object used
 	by this class. @{ */
