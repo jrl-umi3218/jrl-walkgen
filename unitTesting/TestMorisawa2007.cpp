@@ -136,7 +136,7 @@ protected:
     if (m_TestProfile==PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING)
       return;
 
-    unsigned int StoppingTime = 50*200;
+    unsigned int StoppingTime = 70*200;
     
 
     double r = 100.0*(double)m_OneStep.NbOfIt/(double)StoppingTime;

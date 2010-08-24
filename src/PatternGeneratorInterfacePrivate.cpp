@@ -1441,8 +1441,8 @@ namespace PatternGeneratorJRL {
 		    ODEBUG("Putting a new step SX: " <<
 			   lRelativeFootPositions.sx << " SY: "
 			   << lRelativeFootPositions.sy );
-		    m_ZMPM->SetCurrentTime(m_InternalClock);
-		    m_ZMPM->PropagateAbsoluteReferenceTime(m_InternalClock);
+		    //m_ZMPM->SetCurrentTime(m_InternalClock);
+		    // m_ZMPM->PropagateAbsoluteReferenceTime(m_InternalClock);
 		    m_ZMPM->EndPhaseOfTheWalking(m_ZMPPositions,
 						 m_COMBuffer,
 						 m_LeftFootPositions,

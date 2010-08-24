@@ -2133,10 +2133,10 @@ namespace PatternGeneratorJRL
        a shift is done to chose the earliest double support interval. */
     if (m_StepTypes[IndexInterval]!=DOUBLE_SUPPORT)
       {
-	/*
+	
 	if (IndexInterval!=0)
 	  IndexInterval-=1;
-	  else*/
+	else
 	  IndexInterval+=1;
       }
 
@@ -2398,10 +2398,12 @@ namespace PatternGeneratorJRL
     lPrevIndexInterval = lIndexInterval;
 
     /*! Set the time reference for the new trajectory. */
+    /*
     m_AbsoluteTimeReference = m_CurrentTime;
     m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
+    */
 
     /*! Fill in the stacks: minimal strategy only 1 reference. */
     for(double t=m_CurrentTime; t<=m_CurrentTime+2*m_SamplingPeriod; t+= m_SamplingPeriod)
