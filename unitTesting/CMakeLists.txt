@@ -4,6 +4,8 @@
 #
 # Copyright CNRS/AIST
 
+include(CTest)
+
 #############
 # Set Flags #
 #############
@@ -42,6 +44,21 @@ ENDIF(NOT ${_hrp2Dynamics_FOUND})
 
 MESSAGE(STATUS "UL: ${${PROJECT_NAME}_test_LDFLAGS}  ${${PROJECT_NAME}_test_CXXFLAGS}")
 
+##############################
+# Deal with dynamicsJRLJapan #
+##############################
+SET(_dynamicsJRLJapan_FOUND 0)
+SET(_dynamicsJRLJapan_OPTIONAL "dynamicsJRLJapan >= 1.19.0")
+PKG_CHECK_MODULES(_dynamicsJRLJapan ${_dynamicsJRLJapan_OPTIONAL})
+
+IF(NOT ${_dynamicsJRLJapan_FOUND})
+  MESSAGE(WARNING "Check that package dynamicsJRLJapan is installed in a directory pointed out by PKG_CONFIG_PATH.")
+ELSE(NOT ${_dynamicsJRLJapan_FOUND})
+  EXEC_PROGRAM(${PKG_CONFIG_EXECUTABLE} ARGS  --variable=datarootdir dynamicsJRLJapan
+    OUTPUT_VARIABLE _dynamicsJRLJapan_DATADIR)
+ENDIF(NOT ${_dynamicsJRLJapan_FOUND})
+
+MESSAGE(STATUS "dynamicsJRLJapan_DATADIR:" ${_dynamicsJRLJapan_DATADIR})
 ################
 # Generic test #
 ################
@@ -108,7 +125,14 @@ SET_TARGET_PROPERTIES( TestMorisawa2007
 )
 ADD_DEPENDENCIES (TestMorisawa2007 ${PROJECT_NAME})
 
-#ADD_TEST(TestMorisawa2007 TestMorisawa2007)
+set (samplemodelpath ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/ )
+set (samplespec ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/sampleSpecificities.xml)
+set (sampleljr ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/sampleLinkJointRank.xml)
+
+MESSAGE(STATUS "Sample specificities:" ${samplespec})
+MESSAGE(STATUS "Sample link joint rank:" ${sampleljr})
+
+ADD_TEST(TestMorisawa2007 TestMorisawa2007 ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr})
 
 ###################
 # Test Herdt 2010 #

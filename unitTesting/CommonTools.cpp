@@ -175,10 +175,12 @@ void CreateAndInitializeHumanoidRobot(string &RobotFileName,
   //CjrlHumanoidDynamicRobot * aHDR = 0, * aDebugHDR = 0;
   dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
 
-#ifndef WITH_HRP2DYNAMICS
   aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
   aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
-#else
+
+#ifdef WITH_HRP2DYNAMICS
+  delete aHDR;
+  delete aDebugHDR;
   Chrp2OptHumanoidDynamicRobot *aHRP2HDR= new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
   aHDR = aHRP2HDR;
   aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
@@ -278,6 +280,7 @@ void getOptions(int argc,
 		string &LinkJointRank,
 		unsigned int &TestProfil)
 {
+  std::cout << "argc:" << argc << std::endl;
   if (argc!=5)
     {
       const char *openhrphome="OPENHRPHOME";

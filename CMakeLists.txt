@@ -6,7 +6,7 @@
 
 cmake_minimum_required(VERSION 2.6)
 enable_language(CXX)
-
+enable_testing()
 # Name of the project
 #--------------------
 SET(PROJECT_NAME walkGenJrl)
@@ -64,6 +64,7 @@ SET(CMAKE_MODULE_PATH ${${PROJECT_NAME}_SOURCE_DIR}/CMakeModules)
 # -------------------------
 INCLUDE(FindPkgConfig)
 
+# Look for abstract robot dynamics.
 SET(ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION 1.15)
 pkg_check_modules(ABSTRACTROBOTDYNAMICS REQUIRED abstractRobotDynamics>=${ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION})
 SET(PROJECT_REQUIREMENTS "abstractRobotDynamics >= ${ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION}")
