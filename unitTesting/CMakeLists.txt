@@ -128,11 +128,12 @@ ADD_DEPENDENCIES (TestMorisawa2007 ${PROJECT_NAME})
 set (samplemodelpath ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/ )
 set (samplespec ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/sampleSpecificities.xml)
 set (sampleljr ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/sampleLinkJointRank.xml)
+set (sampleinitconfig ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/sampleInitConfig.dat)
 
 MESSAGE(STATUS "Sample specificities:" ${samplespec})
 MESSAGE(STATUS "Sample link joint rank:" ${sampleljr})
 
-ADD_TEST(TestMorisawa2007 TestMorisawa2007 ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr})
+ADD_TEST(TestMorisawa2007 TestMorisawa2007 ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 
 ###################
 # Test Herdt 2010 #
