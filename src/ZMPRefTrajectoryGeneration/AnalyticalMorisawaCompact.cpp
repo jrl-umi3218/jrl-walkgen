@@ -400,12 +400,6 @@ namespace PatternGeneratorJRL
     double InitialCoMSpeedX=0.0;
     double FinalCoMPosX=0.6;
     vector<double> * lZMPX=0;
-    /*
-    if (m_CTIPX.ZMPProfil!=0)
-      lZMPX = m_CTIPX.ZMPProfil;
-    else
-      lZMPX = new vector<double>;
-    */
     lZMPX = &m_CTIPX.ZMPProfil;
 
     ODEBUG("NbOfIntervals: " << NbOfIntervals);
@@ -415,12 +409,6 @@ namespace PatternGeneratorJRL
     double InitialCoMSpeedY=0.0;
     double FinalCoMPosY=0.0;
     vector<double> * lZMPY=0;
-    /*
-    if (m_CTIPY.ZMPProfil!=0)
-      lZMPY = m_CTIPY.ZMPProfil;
-    else
-      lZMPY = new vector<double>;
-    */
     lZMPY = &m_CTIPY.ZMPProfil;
 	
     lZMPY->resize(NbOfIntervals);
@@ -442,6 +430,16 @@ namespace PatternGeneratorJRL
 	ODEBUG("Initialize Feet Trajectory Generator " << m_RelativeFootPositions.size());
 	m_FeetTrajectoryGenerator->SetDeltaTj(m_DeltaTj);
 
+	ODEBUG("LeftFootInitialPosition :" << 
+		LeftFootInitialPosition.x << " " <<
+		LeftFootInitialPosition.y << " " <<
+		LeftFootInitialPosition.theta);
+
+	ODEBUG("RightFootInitialPosition :" << 
+		RightFootInitialPosition.x << " " <<
+		RightFootInitialPosition.y << " " <<
+		RightFootInitialPosition.theta);
+	
 	m_FeetTrajectoryGenerator->InitializeFromRelativeSteps(m_RelativeFootPositions,
 							       LeftFootInitialPosition,
 							       RightFootInitialPosition,
@@ -453,9 +451,11 @@ namespace PatternGeneratorJRL
 	  {
 	    (*lZMPX)[j] = m_AbsoluteSupportFootPositions[i].x;
 	    (*lZMPX)[j+1] = m_AbsoluteSupportFootPositions[i].x;
-
+	    
 	    (*lZMPY)[j] = m_AbsoluteSupportFootPositions[i].y;
 	    (*lZMPY)[j+1] = m_AbsoluteSupportFootPositions[i].y;	    
+	    ODEBUG("Interval ["<< j <<"]=("<< (*lZMPX)[j] << "," << (*lZMPY)[j] << ")");
+	    ODEBUG("Interval ["<< j+1 <<"]=("<< (*lZMPX)[j+1] << "," << (*lZMPY)[j+1] << ")");
 	  }
 
 								 
@@ -1512,7 +1512,7 @@ namespace PatternGeneratorJRL
 						    unsigned int IndexStartingInterval,
 						    StepStackHandler *aStepStackHandler)
   {
-    ODEBUG("ConstraintsChange: " << IndexStartingInterval << " " << aCTIPX.ZMPProfil->size());
+    ODEBUG("ConstraintsChange: " << IndexStartingInterval << " " << aCTIPX.ZMPProfil.size());
 
     if (IndexStartingInterval!=0)
       {
@@ -1734,7 +1734,16 @@ namespace PatternGeneratorJRL
     for(unsigned int i=0;i<IndexStep.size();i++)
       {
 	unsigned int lIndexStep=IndexStep[i];
-	unsigned int lIndexForFootPrintInterval = i/2;
+	unsigned int lIndexForFootPrintInterval = 0;
+
+	if (IndexStep.size()==NewFootAbsPos.size()*2)
+	  lIndexForFootPrintInterval = i/2;
+	else 
+	  {
+	    lIndexForFootPrintInterval = i/2;
+	    if (lIndexForFootPrintInterval>=NewFootAbsPos.size())
+	      lIndexForFootPrintInterval=NewFootAbsPos.size()-1;
+	  }
 
 	ODEBUG("ZMPProfil To be modified: " << lIndexStep<< " " 
 		<< m_NumberOfIntervals-1<< " " 
