@@ -42,6 +42,7 @@ namespace PatternGeneratorJRL
 		    std::string &VRMLFileName,
 		    std::string &SpecificitiesFileName,
 		    std::string &LinkJointRank,
+		    std::string &InitConfig,
 		    unsigned int &TestProfil);
     
     void CommonInitialization(PatternGeneratorJRL::PatternGeneratorInterface &aPGI);
@@ -49,6 +50,7 @@ namespace PatternGeneratorJRL
     void CreateAndInitializeHumanoidRobot(std::string &RobotFileName,
 					  std::string &LinkJointRank,
 					  std::string &SpecificitiesFileName,
+					  std::string &InitConfig,
 					  CjrlHumanoidDynamicRobot *& aHDR,
 					  CjrlHumanoidDynamicRobot *& aDebugHDR,
 					  PatternGeneratorJRL::PatternGeneratorInterface *&aPGI);

@@ -93,6 +93,7 @@ int main(int argc, char *argv[])
   string VRMLFileName;
   string SpecificitiesFileName;
   string LinkJointRank;
+  string InitConfig;
 
   MAL_VECTOR_DIM(CurrentConfiguration,double,46);
   MAL_VECTOR_DIM(CurrentVelocity,double,46);
@@ -104,6 +105,7 @@ int main(int argc, char *argv[])
   getOptions(argc,argv,
 	     VRMLPath, VRMLFileName,
 	     SpecificitiesFileName, LinkJointRank,
+	     InitConfig,
 	     TestProfil);
   // Humanoids
   CjrlHumanoidDynamicRobot * aHDR = 0, * aDebugHDR = 0;
@@ -114,7 +116,7 @@ int main(int argc, char *argv[])
   string RobotFileName = VRMLPath + VRMLFileName;
   CreateAndInitializeHumanoidRobot(RobotFileName,
 				   SpecificitiesFileName,
-				   LinkJointRank,
+				   LinkJointRank, InitConfig,
 				   aHDR, aDebugHDR, aPGI);
 
   // Specify the walking mode: here the default one.

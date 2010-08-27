@@ -1,4 +1,3 @@
-
 /* Olivier Stasse
  * (c) 2005-2009
  * 
@@ -35,95 +34,6 @@ using namespace std;
 namespace PatternGeneratorJRL {
 namespace TestSuite {
 
-double InitialPoses[7][40] = {
-
-  // 1- With previous half-sitting value
-  { 
-    0.0, 0.0, -20.0, 40.0, -20.0, 0.0, 0.0, 0.0, -20.0, 40.0, -20.0, 0.0,  // legs
-
-    0.0, 0.0, -23.7, 6.6, // chest and head
-
-    27.0, -5.0, -4.0, -87.0, -4.0, -16.0, 20.0, // right arm
-    15.0,  10.0, 0.0, -20.0, 0.0, 0.0, 10.0, // left arm 
-
-    -20.0, 20.0, -20.0, 20.0, -20.0, // right hand
-    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
-  },
-  // 2- Nicolas position + New half sitting for the legs
-  { 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
-
-    0.0, 0.0, -23.7, 6.6, // chest and head
-
-    27.0, -5.0, -4.0, -87.0, -4.0, -16.0, 20.0, // right arm
-    15.0,  10.0, 0.0, -20.0, 0.0, 0.0, 10.0, // left arm 
-
-    -20.0, 20.0, -20.0, 20.0, -20.0, // right hand
-    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
-  },
-  // 3- Test for comparison with PG v1.x
-  { 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
-
-    0.0, 0.0, 0.0, 0.0, // chest and head
-
-    0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // right arm
-    0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // left arm 
-
-    0.0, 0.0, 0.0, 0.0, 0.0, // right hand
-    0.0, 0.0, 0.0, 0.0, 0.0  // left hand
-  },
-  // 4- New Half sitting
-  { 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0, 
-    0.0, 0.0, -26.0, 50.0, -24.0, 0.0,  // legs
-
-    0.0, 0.0, 0.0, 0.0, // chest and head
-
-    15.0, -10.0, 0.0, -30.0, 0.0, 0.0, 10.0, // right arm
-    15.0,  10.0, 0.0, -30.0, 0.0, 0.0, 10.0, // left arm 
-
-    -10.0, 10.0, -10.0, 10.0, -10.0,  // right hand
-    -10.0, 10.0, -10.0, 10.0, -10.0  // left hand
-  },
-  // 5- Position for interaction
-  {
-    0.0 ,  0.0 , -26.0 ,  50.0 , -24 ,   0.0,  
-    0.0 ,  0.0 , -26.0 ,  50.0 , -24 ,   0.0 , // legs
-    0.0 ,  0.0 ,  // chest
-    0.0 ,  0.0 , // head 
-
-    10.0, -18.0, 0.0, -100.0, -18.0, 0.0, 10.0, // right arm  
-    10.0,  18.0, 0.0, -100.0,  18.0, 0.0, 10.0, 
-    -10.000004 ,  10.000004 , -10.000004 ,  10.000004 , -10.000004 , // right hand 
-    -10.000004 ,  10.000004 , -10.000004 ,  10.000004 , -10.000004 // left hand
-  },
-  // 6- Initial position for model building 1,
-  {
-    14.323945,  -6.0363396,  -13.459409,    44.02602,  -30.566611,    6.0363396,
-    0.0000001,   7.4859801,  -27.663319,    44.65489,  -16.991579,   -7.4859801,
-    0.,    0.,    0.,    0.,    
-    12.397718,  -10.000004,    0.,  -29.618538,    0.,    0.,    10.0,
-    16.536364,   10.000004,    0.,  -29.828011,    0.,    0.,    10.0,
-    
-    -10.0,  10.0, -10.0,  10,   -10.0, 
-    -10.0,  10.0, -10.0,  10.0, -10.0 
-  },
-  // 7- Initial position for model buiding 2
-  {
-    -7.16197, -7.69299, -16.1787, 44.5201, -28.3415,  7.69299, 
-    7.16197,   5.74946, -31.3668, 44.1057, -12.7389, -5.74946,
-    
-    0., 0., 0., 0., 
-    
-    12.622 , -10, 0, -29.678 , 0, 0, 10, 
-    16.7091,  10, 0, -29.7841, 0, 0, 10, 
-    
-    -10.0,  10.0, -10.0,  10,   -10.0, 
-    -10.0,  10.0, -10.0,  10.0, -10.0 
-  }
-
-};
 
 //      ":comheight 0.807727",
 void CommonInitialization(PatternGeneratorInterface &aPGI)
@@ -167,6 +77,7 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
 void CreateAndInitializeHumanoidRobot(string &RobotFileName,
 				      string &SpecificitiesFileName,
 				      string &LinkJointRank,
+				      string &InitConfig,
 				      CjrlHumanoidDynamicRobot * & aHDR,
 				      CjrlHumanoidDynamicRobot * & aDebugHDR,
 				      PatternGeneratorInterface * & aPGI)
@@ -178,12 +89,14 @@ void CreateAndInitializeHumanoidRobot(string &RobotFileName,
   aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
   aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
 
+#if 0
 #ifdef WITH_HRP2DYNAMICS
   delete aHDR;
   delete aDebugHDR;
   Chrp2OptHumanoidDynamicRobot *aHRP2HDR= new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
   aHDR = aHRP2HDR;
   aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
+#endif
 #endif
 
   // Parsing the file.
@@ -202,8 +115,23 @@ void CreateAndInitializeHumanoidRobot(string &RobotFileName,
   bool conversiontoradneeded=true;
   
   //  double * dInitPos = InitialPoses[INTERACTION_2008];
-  double * dInitPos = InitialPoses[HALF_SITTING_2008];
+  unsigned int lNbDofs = aHDR->numberDof() ;
+  cout << "Nb of DOFs: " <<  lNbDofs << endl;
 
+  vector<CjrlJoint *> actuatedJoints = aHDR->getActuatedJoints();
+  unsigned int lNbActuatedJoints = actuatedJoints.size();
+  
+  double * dInitPos = new double[lNbActuatedJoints];
+
+  ifstream aif;
+  aif.open((char *)InitConfig.c_str(),ifstream::in);
+  if (aif.is_open())
+    {
+      for(unsigned int i=0;i<lNbActuatedJoints;i++)
+	aif >> dInitPos[i];
+    }
+  aif.close();
+  
   bool DebugConfiguration = true;
   ofstream aofq;
   if (DebugConfiguration)
@@ -220,8 +148,9 @@ void CreateAndInitializeHumanoidRobot(string &RobotFileName,
 
     }
   
+
   // This is a vector corresponding to the DOFs actuated of the robot.
-  MAL_VECTOR_DIM(InitialPosition,double,40);
+  MAL_VECTOR_DIM(InitialPosition,double,lNbActuatedJoints);
   //MAL_VECTOR_DIM(CurrentPosition,double,40);
   if (conversiontoradneeded)
     for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
@@ -237,12 +166,12 @@ void CreateAndInitializeHumanoidRobot(string &RobotFileName,
 
   // This is a vector corresponding to ALL the DOFS of the robot:
   // free flyer + actuated DOFS.
-  MAL_VECTOR_DIM(CurrentConfiguration,double,46);
-  MAL_VECTOR_DIM(CurrentVelocity,double,46);
-  MAL_VECTOR_DIM(CurrentAcceleration,double,46);
-  MAL_VECTOR_DIM(PreviousConfiguration,double,46) ;
-  MAL_VECTOR_DIM(PreviousVelocity,double,46);
-  MAL_VECTOR_DIM(PreviousAcceleration,double,46);
+  MAL_VECTOR_DIM(CurrentConfiguration,double,lNbDofs);
+  MAL_VECTOR_DIM(CurrentVelocity,double,lNbDofs);
+  MAL_VECTOR_DIM(CurrentAcceleration,double,lNbDofs);
+  MAL_VECTOR_DIM(PreviousConfiguration,double,lNbDofs) ;
+  MAL_VECTOR_DIM(PreviousVelocity,double,lNbDofs);
+  MAL_VECTOR_DIM(PreviousAcceleration,double,lNbDofs);
   for(int i=0;i<6;i++)
     {
       PreviousConfiguration[i] = 
@@ -250,7 +179,7 @@ void CreateAndInitializeHumanoidRobot(string &RobotFileName,
 	PreviousAcceleration[i] = 0.0;
     }
 
-  for(int i=6;i<46;i++)
+  for(unsigned int i=6;i<lNbDofs;i++)
     {
       PreviousConfiguration[i] = InitialPosition[i-6];
       PreviousVelocity[i] = 
@@ -278,37 +207,19 @@ void getOptions(int argc,
 		string &VRMLFileName,
 		string &SpecificitiesFileName,
 		string &LinkJointRank,
+		string &InitConfig,
 		unsigned int &TestProfil)
 {
   std::cout << "argc:" << argc << std::endl;
-  if (argc!=5)
+  if (argc!=6)
     {
-      const char *openhrphome="OPENHRPHOME";
-      char *value = 0;
-      value = getenv(openhrphome);
-      if (value==0)
-	{
-	  cerr << " This program takes 4 arguments: " << endl;
-	  cerr << "./TestFootPrintPGInterface \
+      cerr << " This program takes 4 arguments: " << endl;
+      cerr << "./TestFootPrintPGInterface \
                          PATH_TO_VRML_FILE	   \
                          VRML_FILE_NAME		   \
                          PATH_TO_SPECIFICITIES_XML \
                          LINK_JOINT_RANK" << endl;
-	  exit(-1);
-	}
-      else
-	{
-	  VRMLPath=value;
-	  //VRMLPath+="/Controller/IOserver/robot/HRP2JRL/model/";
-	  VRMLFileName="/HRP2JRLmain.wrl";
-	  SpecificitiesFileName = value;
-	  //SpecificitiesFileName +="/Controller/IOserver/robot/HRP2JRL/etc/";
-	  SpecificitiesFileName += "/HRP2Specificities.xml";
-	  LinkJointRank = value;
-	  //LinkJointRank += "/Controller/IOserver/robot/HRP2JRL/etc/";
-	  LinkJointRank += "/HRP2LinkJointRank.xml";
-	  	      
-	}
+      exit(-1);
     }	
   else 
     {
@@ -316,6 +227,7 @@ void getOptions(int argc,
       VRMLFileName=argv[2];
       SpecificitiesFileName = argv[3];
       LinkJointRank = argv[4];
+      InitConfig = argv[5];
     }
 }
 

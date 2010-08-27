@@ -35,12 +35,15 @@ namespace PatternGeneratorJRL
 	and their rank in the robot's state vector */
       string LinkJointRank;
 
+      string InitConfig;
+
       /*! Extract options and fill in members. */
       getOptions(argc,argv,
 		 VRMLPath, 
 		 VRMLFileName,
 		 SpecificitiesFileName, 
 		 LinkJointRank,
+		 InitConfig,
 		 m_TestProfile);
 
       // Instanciate and initialize.
@@ -48,6 +51,7 @@ namespace PatternGeneratorJRL
       CreateAndInitializeHumanoidRobot(RobotFileName,
 				       SpecificitiesFileName,
 				       LinkJointRank,
+				       InitConfig,
 				       m_HDR, m_DebugHDR, m_PGI);
 
       // Specify the walking mode: here the default one.

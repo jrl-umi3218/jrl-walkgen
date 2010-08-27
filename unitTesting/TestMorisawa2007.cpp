@@ -185,6 +185,7 @@ protected:
 
 int PerformTests(int argc, char *argv[])
 {
+
   std::string TestNames[2] = { "TestMorisawa2007OnLine",
 			       "TestMorisawa2007ShortWalk"};
   int TestProfiles[2] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
