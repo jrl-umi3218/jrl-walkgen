@@ -180,7 +180,6 @@ namespace PatternGeneratorJRL
 	    +m_CurrentConfiguration(1) << " "
 	      << m_CurrentConfiguration(0) << " " 
 	      << m_CurrentConfiguration(1) << " " 
-	      << m_clock.getStartOneIteration()
 	      << endl;
 	  aof.close();
 	}
