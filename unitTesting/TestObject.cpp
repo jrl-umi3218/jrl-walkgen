@@ -12,6 +12,15 @@ namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
+
+    double filterprecision(double adb)
+    {
+      if (fabs(adb)<1e-8)
+	return 0.0;
+      return adb;
+    }
+
+
     TestObject::TestObject(int argc, char *argv[], 
 			   string &aTestName,
 			   int lPGIInterface)
@@ -150,36 +159,36 @@ namespace PatternGeneratorJRL
 	  aFileName += "TestFGPI.dat";	  
 	  aof.open(aFileName.c_str(),ofstream::app);
 
-	  aof << m_OneStep.NbOfIt*0.005 << " " 
-	      << m_OneStep.finalCOMPosition.x[0] << " "
-	      << m_OneStep.finalCOMPosition.y[0] << " " 
-	      << m_OneStep.finalCOMPosition.z[0] << " "
-	      << m_OneStep.finalCOMPosition.yaw << " "
-	      << m_OneStep.finalCOMPosition.x[1] << " "
-	      << m_OneStep.finalCOMPosition.y[1] << " " 
-	      << m_OneStep.finalCOMPosition.z[1] << " "
-	      << m_OneStep.ZMPTarget(0) << " " 
-	      << m_OneStep.ZMPTarget(1) << " " 
-	      << m_OneStep.LeftFootPosition.x  << " " 
-	      << m_OneStep.LeftFootPosition.y  << " " 
-	      << m_OneStep.LeftFootPosition.z  << " " 
-	      << m_OneStep.LeftFootPosition.theta  << " "  
-	      << m_OneStep.LeftFootPosition.omega  << " " 
-	      << m_OneStep.LeftFootPosition.omega2  << " "
-	      << m_OneStep.RightFootPosition.x << " " 
-	      << m_OneStep.RightFootPosition.y << " " 
-	      << m_OneStep.RightFootPosition.z << " " 
-	      << m_OneStep.RightFootPosition.theta << " " 
-	      << m_OneStep.RightFootPosition.omega  << " " 
-	      << m_OneStep.RightFootPosition.omega2  << " "
-	      << m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) - 
+	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " " 
+	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "
+	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " " 
+	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "
+	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "
+	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "
+	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " " 
+	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "
+	      << filterprecision(m_OneStep.ZMPTarget(0) ) << " " 
+	      << filterprecision(m_OneStep.ZMPTarget(1) ) << " " 
+	      << filterprecision(m_OneStep.LeftFootPosition.x  ) << " " 
+	      << filterprecision(m_OneStep.LeftFootPosition.y  ) << " " 
+	      << filterprecision(m_OneStep.LeftFootPosition.z  ) << " " 
+	      << filterprecision(m_OneStep.LeftFootPosition.theta  ) << " "  
+	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " " 
+	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "
+	      << filterprecision(m_OneStep.RightFootPosition.x ) << " " 
+	      << filterprecision(m_OneStep.RightFootPosition.y ) << " " 
+	      << filterprecision(m_OneStep.RightFootPosition.z ) << " " 
+	      << filterprecision(m_OneStep.RightFootPosition.theta ) << " " 
+	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " " 
+	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "
+	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) - 
 	    m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
-	    +m_CurrentConfiguration(0) << " " 
-	      << m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) + 
+	    +m_CurrentConfiguration(0) ) << " " 
+	      << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) + 
 	    m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
-	    +m_CurrentConfiguration(1) << " "
-	      << m_CurrentConfiguration(0) << " " 
-	      << m_CurrentConfiguration(1) << " " 
+	    +m_CurrentConfiguration(1) ) << " "
+	      << filterprecision(m_CurrentConfiguration(0) ) << " " 
+	      << filterprecision(m_CurrentConfiguration(1) ) << " " 
 	      << endl;
 	  aof.close();
 	}
