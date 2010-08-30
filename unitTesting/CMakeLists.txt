@@ -48,7 +48,7 @@ MESSAGE(STATUS "UL: ${${PROJECT_NAME}_test_LDFLAGS}  ${${PROJECT_NAME}_test_CXXF
 # Deal with dynamicsJRLJapan #
 ##############################
 SET(_dynamicsJRLJapan_FOUND 0)
-SET(_dynamicsJRLJapan_OPTIONAL "dynamicsJRLJapan >= 1.19.0")
+SET(_dynamicsJRLJapan_OPTIONAL "dynamicsJRLJapan >= 1.19.1")
 PKG_CHECK_MODULES(_dynamicsJRLJapan ${_dynamicsJRLJapan_OPTIONAL})
 
 IF(NOT ${_dynamicsJRLJapan_FOUND})
