@@ -18,7 +18,7 @@
 
 /*! Framework includes */
 #include <walkGenJrl/PGTypes.h>
-#include <dynamicsJRLJapan/dynamicsJRLJapanFactory.h>
+#include <robotDynamics/jrlJoint.h>
 
 namespace PatternGeneratorJRL
 {
