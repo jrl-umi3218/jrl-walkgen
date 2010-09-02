@@ -17,7 +17,7 @@ IF(UNIX)
 ENDIF(UNIX)
 
 IF(WIN32)
-  SET(${PROJECT_NAME}_test_LDFLAGS "${LIBDIR_KW}${${PROJECT_NAME}_BINARY_DIR}/src  ${LIBINCLUSION_KW}${PROJECT_NAME}-${PROJECT_VERSION}${LIBINCLUSION_EXT} ${${PROJECT_NAME}_src_LDFLAGS}")
+   SET(${PROJECT_NAME}_test_LDFLAGS " ")
 ENDIF(WIN32)
 
 ##########################
@@ -73,6 +73,7 @@ SET_TARGET_PROPERTIES(TestFootPrintPGInterface
 	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
 		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}
 )
+target_link_libraries (TestFootPrintPGInterface ${PROJECT_NAME})
 ADD_DEPENDENCIES (TestFootPrintPGInterface ${PROJECT_NAME})
 
 #########################
@@ -123,6 +124,7 @@ SET_TARGET_PROPERTIES( TestMorisawa2007
 	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
 		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}  
 )
+target_link_libraries (TestMorisawa2007 ${PROJECT_NAME})
 ADD_DEPENDENCIES (TestMorisawa2007 ${PROJECT_NAME})
 
 set (samplemodelpath ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/ )
@@ -149,6 +151,7 @@ SET_TARGET_PROPERTIES( TestHerdt2010
 	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
 		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}  
 )
+target_link_libraries (TestHerdt2010 ${PROJECT_NAME})
 ADD_DEPENDENCIES (TestHerdt2010 ${PROJECT_NAME})
 
 #####################
