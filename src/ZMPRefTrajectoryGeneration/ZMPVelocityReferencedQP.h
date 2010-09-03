@@ -39,7 +39,7 @@ namespace PatternGeneratorJRL
 				    CjrlHumanoidDynamicRobot *aHS=0);
 
     /* Default destructor. */
-    ~ZMPVelocityReferencedQP();
+    virtual ~ZMPVelocityReferencedQP();
     
 
       /** Generate ZMP discreatization from a vector of foot position.
@@ -319,7 +319,7 @@ namespace PatternGeneratorJRL
 
     unsigned int Online;//Andremize: Shall I keep it?
 
-  private:
+  protected:
 
     double m_RobotMass;
     bool m_PerturbationOccured;
