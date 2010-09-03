@@ -218,9 +218,6 @@ namespace PatternGeneratorJRL {
     // ZMP and CoM generation using the method proposed in Herdt2010.
     m_ZMPVRQP = new ZMPVelocityReferencedQP(this,"",m_HumanoidDynamicRobot);
 
-    // ZMP and CoM generation using the method proposed in Herdt2010.
-    m_ZMPVRQP = new ZMPVelocityReferencedQP(this,"",m_HumanoidDynamicRobot);
-
     // ZMP and CoM generation using the analytical method proposed in Morisawa2007.
     m_ZMPM = new AnalyticalMorisawaCompact(this);
     m_ZMPM->SetHumanoidSpecificities(m_HumanoidDynamicRobot);
