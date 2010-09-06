@@ -48,7 +48,7 @@ namespace PatternGeneratorJRL
 				    double ConstraintOnY);
 
       /*! Destructor */
-      ~FootConstraintsAsLinearSystemForVelRef();
+      virtual ~FootConstraintsAsLinearSystemForVelRef();
 
       /*! Compute the linear system \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the 
 	set of points specified by aVecOfPoints. aVecOfPoints is supposed to represent
@@ -72,7 +72,7 @@ namespace PatternGeneratorJRL
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
 	Position.
        */
-      int buildLinearConstraintInequalities(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
+     virtual int buildLinearConstraintInequalities(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
 					    std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					    std::deque<LinearConstraintInequalityFreeFeet_t> &
 					    QueueOfLConstraintInequalities,
