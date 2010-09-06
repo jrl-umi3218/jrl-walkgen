@@ -15,6 +15,7 @@
 */
 
 #ifndef _PLDP_SOLVER_H_HERDT
+#define _PLDP_SOLVER_H_HERDT
 
 #include <vector>
 #include <deque>
