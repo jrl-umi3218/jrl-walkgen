@@ -49,6 +49,13 @@ namespace PatternGeneratorJRL
 		
 		/*true is on CoM velocity reference mode false is on foosteps mode*/
 		void SetVelocityMode(bool);
+
+		virtual void OnLine(double time,
+		deque<ZMPPosition> & FinalZMPPositions,		
+		deque<COMState> & CoMStates,			     
+		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
+
 		
 	protected:
 		std::deque<RelativeFootPosition> stepPos_;
