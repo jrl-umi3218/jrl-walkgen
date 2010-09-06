@@ -224,7 +224,7 @@ namespace PatternGeneratorJRL
     		bool EndSequence);
 
     /* ! \brief Method to update the stacks on-line */
-    void OnLine(double time,
+    virtual void OnLine(double time,
 		deque<ZMPPosition> & FinalZMPPositions,		
 		deque<COMState> & CoMStates,			     
 		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
