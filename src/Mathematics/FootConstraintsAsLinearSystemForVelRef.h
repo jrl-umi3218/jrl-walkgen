@@ -102,7 +102,7 @@ namespace PatternGeneratorJRL
        */
       virtual void CallMethod(std::string & Method, std::istringstream &Args);
 
-    private:
+    protected:
 
       void initFPConstrArrays();
 
