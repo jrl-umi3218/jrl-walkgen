@@ -78,8 +78,9 @@ FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM,
   //initFPConstrArrays();
   //TODO 0: find another condition
   if(0)
+  {
     RESETDEBUG4("Constraints-fCSALS.dat");
-
+  }
   m_FullDebug = 0;
 
   //TODO 1: How does ODEBUG/RESETDEBUG get activated?
@@ -408,11 +409,11 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 		  
 	}
 
-
-
       //foot positionning constraints
       if(Support->m_StateChanged && Support->StepNumber>0)
 	{
+
+		
 	  //Andremize: theta == 0
 	  lx = 0.0;
 	  ly = 0.0;
@@ -443,7 +444,7 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 		  aof<<" AngleFootConstraints: "<<PreviewedSupportAngles[Support->StepNumber-2];
 		  aof.close();
 		}
-	    }
+	    }//Left foot or rigth foot support
 	  if(Support->PrwSupportFoot == 1)
 	    {
 	      CHFPosConstrArrayX = CHLeftFPosConstrArrayX;
