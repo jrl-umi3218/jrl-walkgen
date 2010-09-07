@@ -78,6 +78,9 @@ namespace PatternGeneratorJRL
 					    SupportState * Support, std::deque<double> &PreviewedSupportAngles,
 					    int & NbOfConstraints);
 
+	protected :
+		 std::vector<CH_Point> ConvexHullFPRef;
+
     
     };
 };
