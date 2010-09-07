@@ -22,6 +22,7 @@ SET(libwpg_src
 	./Mathematics/ConvexHull.cpp 
 	./Mathematics/FootConstraintsAsLinearSystem.cpp
 	./Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
+	./Mathematics/FootConstraintsAsLinearSystemForStepPos.cpp
 	./Mathematics/OptCholesky.cpp
 	./Mathematics/Polynome.cpp 
 	./Mathematics/PolynomeFoot.cpp 
@@ -39,6 +40,7 @@ SET(libwpg_src
 	./ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.cpp 
+	./ZMPRefTrajectoryGeneration/OnlineStepPositionTrajectoryGeneration.cpp
 	./ZMPRefTrajectoryGeneration/OrientationsPreview.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp 
 	./ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp 
