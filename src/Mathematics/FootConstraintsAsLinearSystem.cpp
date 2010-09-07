@@ -331,9 +331,9 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(deque<FootA
   int State=0; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
   // 3: Double Support.
   int ComputeCH=0;
-  float lx=0.0, ly=0.0;
-  float lxcoefs[4] = { 1.0, 1.0, -1.0, -1.0};
-  float lycoefs[4] = {-1.0, 1.0,  1.0, -1.0};
+  double lx=0.0, ly=0.0;
+  double lxcoefs[4] = { 1.0, 1.0, -1.0, -1.0};
+  double lycoefs[4] = {-1.0, 1.0,  1.0, -1.0};
   double prev_xmin=1e7, prev_xmax=-1e7, prev_ymin=1e7, prev_ymax=-1e7;
   RESETDEBUG4("ConstraintMax.dat");
 

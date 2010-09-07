@@ -274,17 +274,17 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 
   //For symmetrical constraints: The points of the left foot are counted clockwise.
   //The
-  float lxcoefsRight[4] = { 1.0, 1.0, -1.0, -1.0};
-  float lycoefsRight[4] = {-1.0, 1.0,  1.0, -1.0};
-  float lxcoefsLeft[4] = { 1.0, 1.0, -1.0, -1.0};
-  float lycoefsLeft[4] = { 1.0, -1.0, -1.0, 1.0};
+  double lxcoefsRight[4] = { 1.0, 1.0, -1.0, -1.0};
+  double lycoefsRight[4] = {-1.0, 1.0,  1.0, -1.0};
+  double lxcoefsLeft[4] = { 1.0, 1.0, -1.0, -1.0};
+  double lycoefsLeft[4] = { 1.0, -1.0, -1.0, 1.0};
 
-  float *lxcoefs, *lycoefs;
+  double *lxcoefs, *lycoefs;
 
-  float CHLeftFPosConstrArrayX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
-  float CHLeftFPosConstrArrayY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
-  float CHRightFPosConstrArrayX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
-  float CHRightFPosConstrArrayY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
+  double CHLeftFPosConstrArrayX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
+  double CHLeftFPosConstrArrayY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
+  double CHRightFPosConstrArrayX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
+  double CHRightFPosConstrArrayY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
 
   vector<CH_Point> TheConvexHull;
 

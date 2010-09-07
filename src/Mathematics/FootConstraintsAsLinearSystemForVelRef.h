@@ -110,16 +110,18 @@ namespace PatternGeneratorJRL
       CjrlHumanoidDynamicRobot * m_HS;
       
       std::vector<CH_Point> ConvexHullFP;
+	  
+
 
       //Andremize: Caused memory errors when initialized in the constructor
-      /* float CHLeftFPosConstrArrayX[5]; */
-      /* float CHLeftFPosConstrArrayY[5]; */
+      /* double CHLeftFPosConstrArrayX[5]; */
+      /* double CHLeftFPosConstrArrayY[5]; */
       
-      /* float CHRightFPosConstrArrayX[5]; */
-      /* float CHRightFPosConstrArrayY[5]; */
+      /* double CHRightFPosConstrArrayX[5]; */
+      /* double CHRightFPosConstrArrayY[5]; */
       
-      float* CHFPosConstrArrayX; 
-      float* CHFPosConstrArrayY;
+      double* CHFPosConstrArrayX; 
+      double* CHFPosConstrArrayY;
 
       // Find the convex hull for each of the position,
       // in order to create the corresponding trajectory.
@@ -136,7 +138,7 @@ namespace PatternGeneratorJRL
       int State; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
       // 3: Double Support.
       int ComputeCH;
-      float lx, ly;
+      double lx, ly;
       
       double prev_xmin, prev_xmax, prev_ymin, prev_ymax;
       
