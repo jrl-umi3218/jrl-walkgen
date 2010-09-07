@@ -306,7 +306,7 @@ namespace PatternGeneratorJRL
     const double & GetBeta() const;
 
     /*! Set \f$\beta\f$ */
-    void SetBeta(const double &);
+    virtual void SetBeta(const double &);
     
     /*! @}*/
     /* @} */

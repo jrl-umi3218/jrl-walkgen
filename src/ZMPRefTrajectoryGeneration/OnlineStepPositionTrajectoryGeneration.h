@@ -17,13 +17,15 @@ Please see Licence.txt for details on the license.
 #include <deque>
 
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
-#include <Mathematics/FootConstraintsAsLinearSystemForVelRef.h>
+#include <Mathematics/FootConstraintsAsLinearSystemForStepPos.h>
 #include <Mathematics/OptCholesky.h>
 #include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.h>
 #include <Mathematics/PLDPSolverHerdt.h> 
 #include <PreviewControl/SupportState.h>
 #include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
+
+
 
 
 namespace PatternGeneratorJRL
@@ -56,13 +58,22 @@ namespace PatternGeneratorJRL
 		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
+    /*! Reimplement the interface of SimplePluginManager 
+	\param[in] Method: The method to be called.
+	\param[in] Args: Arguments of the methods.
+       */
+      virtual void CallMethod(std::string & Method, std::istringstream &Args);
+
+
 		
 	protected:
-		std::deque<RelativeFootPosition> stepPos_;
+		RelativeFootPositionQueue stepPos_;
 
 		bool velocityMode_;
 
 		double m_BetaCache_;
+
+		FootConstraintsAsLinearSystemForStepPos m_fCALS_FP;
 
 	};
 };
