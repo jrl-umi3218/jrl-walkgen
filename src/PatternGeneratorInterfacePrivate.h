@@ -33,6 +33,8 @@
 #include <ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.h>
 #include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.h>
 #include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.h>
+#include <ZMPRefTrajectoryGeneration/OnlineStepPositionTrajectoryGeneration.h>
+
 
 #include <MotionGeneration/ComAndFootRealizationByGeometry.h>
 #include <MotionGeneration/GenerateMotionFromKineoWorks.h>
@@ -241,11 +243,18 @@ namespace PatternGeneratorJRL
     /*! \brief Read a velocity reference. */
     void setVelReference(istringstream &strm);
 
+	    /*! \brief Read a velocity reference For Herdt+StepPos */
+    void setVelReferenceStepPos(istringstream &strm);
+
+
     /*! \brief Read a perturbation force on the com. */
     void setCoMPerturbationForce(istringstream &strm);
 
     /*! \brief Initialize online mode of Herdt. */
     void initOnlineHerdt();
+
+	/*! \brief Initialize online mode of Herdt+StepPos. */
+    void initOnlineHerdtStepPos();
 
     /*! \brief Read a sequence of steps. */
     void ReadSequenceOfSteps(istringstream &strm);
@@ -364,7 +373,15 @@ namespace PatternGeneratorJRL
     void setVelocityReference(double x,
 			      double y,
 			      double yaw);
-    
+
+/*! \brief Set velocity reference
+      This method is only supported by Herdt's +StepPos.
+        */
+     void setVelocityReferenceStepPos(double x,
+			      double y,
+			      double yaw);
+
+
 
     /*! @} */
 
@@ -439,6 +456,9 @@ namespace PatternGeneratorJRL
     
     /*! QP formulation with a velocity reference. */
     ZMPVelocityReferencedQP * m_ZMPVRQP;
+
+	/*Herdt+StepPosReference*/
+	OnlineStepPositionTrajectoryGeneration * m_OSPTG; 
 
     /*! ZMP and CoM trajectories generation from an analytical formulation */
     AnalyticalMorisawaCompact * m_ZMPM;
@@ -620,6 +640,13 @@ namespace PatternGeneratorJRL
     static const int ZMPCOM_HERDT_2010=5;
     /*! @} */
     /*! @} */
+
+	/*! Using the velocity referenced QP proposed by Herdt + StepPos. */
+    static const int ZMPCOM_HERDT_STEPPOS=6;
+    /*! @} */
+    /*! @} */
+
+	
 
     /*! Humanoid Dynamic robot */
     CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot, * m_2HumanoidDynamicRobot;

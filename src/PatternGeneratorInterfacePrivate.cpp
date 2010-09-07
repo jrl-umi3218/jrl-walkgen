@@ -155,7 +155,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()
   {
-    std::string aMethodName[15] =
+    std::string aMethodName[17] =
       {":LimitsFeasibility",
        ":ZMPShiftParameters",
        ":TimeDistributionParameters",
@@ -169,10 +169,12 @@ namespace PatternGeneratorJRL {
        ":ChangeNextStep",
        ":samplingperiod",
        ":HerdtOnline",
+	   ":HerdtOnlineStepPos",
        ":setVelReference",
+	   ":setVelReferenceStepPos",
        ":setCoMPerturbationForce"};
 
-    for(int i=0;i<15;i++)
+    for(int i=0;i<17;i++)
       {
 	if (!SimplePlugin::RegisterMethod(aMethodName[i]))
 	  {
@@ -217,6 +219,9 @@ namespace PatternGeneratorJRL {
 
     // ZMP and CoM generation using the method proposed in Herdt2010.
     m_ZMPVRQP = new ZMPVelocityReferencedQP(this,"",m_HumanoidDynamicRobot);
+
+	// ZMP and CoM generation using the method proposed in Herdt2010 + Step positions constraints mode.
+    m_OSPTG = new OnlineStepPositionTrajectoryGeneration(this,"",m_HumanoidDynamicRobot);
 
     // ZMP and CoM generation using the analytical method proposed in Morisawa2007.
     m_ZMPM = new AnalyticalMorisawaCompact(this);
@@ -298,6 +303,16 @@ namespace PatternGeneratorJRL {
 
     m_ZMPVRQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
 
+	m_OSPTG->SetSamplingPeriod(m_PC->SamplingPeriod());
+
+    m_OSPTG->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+    //m_OSPTG->SetPreviewControl(m_PC);
+    //m_OSPTG->SetSamplingPeriod(m_PC->SamplingPeriod());
+    //m_OSPTG->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+    m_OSPTG->SetSamplingPeriod(m_PC->SamplingPeriod());
+
+    m_OSPTG->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
+
     m_ZMPM->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPM->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
     m_ZMPM->SetFeetTrajectoryGenerator(m_FeetTrajectoryGenerator);
@@ -363,6 +378,12 @@ namespace PatternGeneratorJRL {
     if (m_ZMPVRQP!=0)
       delete m_ZMPVRQP;
     ODEBUG4("Destructor: did m_ZMPVRQP","DebugPGI.txt");
+
+	if (m_OSPTG!=0)
+      delete m_OSPTG;
+    ODEBUG4("Destructor: did m_OSPTG","DebugPGI.txt");
+
+	
 
     if (m_ZMPM!=0)
       delete m_ZMPM;
@@ -478,7 +499,14 @@ namespace PatternGeneratorJRL {
     // Read the data inside strm.
     m_ZMPVRQP->setVelReference(strm);
   }
+
+   void PatternGeneratorInterfacePrivate::setVelReferenceStepPos(istringstream &strm)
+  {
+    // Read the data inside strm.
+	  m_OSPTG->setVelReference(strm);
+  }
  
+
   void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(istringstream &strm)
   {
     // Read the data inside strm.
@@ -537,6 +565,60 @@ namespace PatternGeneratorJRL {
 
     m_ShouldBeRunning=true;
   }
+
+
+void PatternGeneratorInterfacePrivate::initOnlineHerdtStepPos()
+  {
+
+    COMState lStartingCOMState;
+    memset(&lStartingCOMState,0,sizeof(COMState));
+    MAL_S3_VECTOR(,double) lStartingZMPPosition;
+    MAL_VECTOR( BodyAnglesIni,double);
+
+    FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
+    memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
+    memset(&InitRightFootAbsPos,0,sizeof(InitRightFootAbsPos));
+
+    vector<double> lCurrentJointValues;
+    MAL_VECTOR(lStartingWaistPose,double);
+
+    EvaluateStartingState(lStartingCOMState,
+			  lStartingZMPPosition,
+			  lStartingWaistPose,
+			  InitLeftFootAbsPos,
+			  InitRightFootAbsPos);
+
+    deque<RelativeFootPosition> RelativeFootPositions;
+    m_OSPTG->SetCurrentTime(m_InternalClock);
+
+
+    m_OSPTG->InitOnLine(m_ZMPPositions,
+			  m_COMBuffer,
+			  m_LeftFootPositions,
+			  m_RightFootPositions,
+			  InitLeftFootAbsPos,
+			  InitRightFootAbsPos,
+			  RelativeFootPositions,
+			  lStartingCOMState,
+			  lStartingZMPPosition);
+
+    // // Initialization of the first preview.
+    //   printf("lCurrent \n");
+    // for(int j=0; j<m_DOF;j++)
+    //   {
+    // 	cout<<m_CurrentActuatedJointValues[j]<<endl;
+    // 	BodyAnglesIni(j) = m_CurrentActuatedJointValues[j];
+    //   }
+
+
+    m_GlobalStrategyManager->Setup(m_ZMPPositions,
+				   m_COMBuffer,
+				   m_LeftFootPositions,
+				   m_RightFootPositions);
+
+    m_ShouldBeRunning=true;
+  }
+
 
   void PatternGeneratorInterfacePrivate::m_StepSequence(istringstream &strm)
   {
@@ -1079,6 +1161,11 @@ namespace PatternGeneratorJRL {
 	//m_InternalClock = 0.0;
 	setVelReference(strm);
       }
+	else if (aCmd==":setVelReferenceStepPos")
+      {
+	//m_InternalClock = 0.0;
+		  setVelReferenceStepPos(strm);
+      }
 
     else if (aCmd==":HerdtOnline")
       {
@@ -1086,6 +1173,15 @@ namespace PatternGeneratorJRL {
 	setVelReference(strm);
 	m_ZMPVRQP->Online = 1;
 	initOnlineHerdt();
+	printf("Online \n");
+	//ODEBUG4("InitOnLine","DebugHerdt.txt");
+      }
+	 else if (aCmd==":HerdtOnlineStepPos")
+      {
+	m_InternalClock = 0.0;
+	setVelReferenceStepPos(strm);
+	m_OSPTG->Online = 1;
+	initOnlineHerdtStepPos();
 	printf("Online \n");
 	//ODEBUG4("InitOnLine","DebugHerdt.txt");
       }
@@ -1149,6 +1245,15 @@ namespace PatternGeneratorJRL {
 	m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	m_CoMAndFootOnlyStrategy->SetTheLimitOfTheBuffer(0);
 	cout << "Herdt" << endl;
+      }
+	else if (ZMPTrajAlgo=="HerdtStepPos")
+      {
+	// m_AlgorithmforZMPCOM = ZMPCOM_DIMITROV_2008;
+	m_AlgorithmforZMPCOM = ZMPCOM_HERDT_STEPPOS;
+	// m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
+	m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
+	m_CoMAndFootOnlyStrategy->SetTheLimitOfTheBuffer(0);
+	cout << "HerdtStepPos" << endl;
       }
   }
 
@@ -1309,6 +1414,21 @@ namespace PatternGeneratorJRL {
 			  m_RightFootPositions);
 	// cout<<"size after online"<<m_ZMPPositions.size()<<endl;
       }
+
+	if (m_AlgorithmforZMPCOM==ZMPCOM_HERDT_STEPPOS && m_OSPTG->Online==1)
+      {
+	ODEBUG("InternalClock:" <<m_InternalClock  <<
+	       " SamplingPeriod: "<<m_SamplingPeriod);
+
+	// cout<<"size before online"<<m_ZMPPositions.size()<<endl;
+	m_OSPTG->OnLine(m_InternalClock,
+			  m_ZMPPositions,
+			  m_COMBuffer,
+			  m_LeftFootPositions,
+			  m_RightFootPositions);
+	// cout<<"size after online"<<m_ZMPPositions.size()<<endl;
+      }
+
 
 
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,
@@ -1749,6 +1869,13 @@ namespace PatternGeneratorJRL {
     m_ZMPVRQP->setVelReference(x,y,yaw);
   }
 
+   void PatternGeneratorInterfacePrivate::setVelocityReferenceStepPos(double x,
+							      double y,
+							      double yaw)
+  {
+    m_OSPTG->setVelReference(x,y,yaw);
+  }
+
   void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(double x,
 							      double y)
   {
@@ -1821,6 +1948,21 @@ namespace PatternGeneratorJRL {
 	m_COMBuffer.clear();
 	m_ZMPM->SetCurrentTime(m_InternalClock);
 	m_ZMPVRQP->GetZMPDiscretization(m_ZMPPositions,
+					m_COMBuffer,
+					lRelativeFootPositions,
+					m_LeftFootPositions,
+					m_RightFootPositions,
+					m_Xmax, lStartingCOMState,
+					lStartingZMPPosition,
+					InitLeftFootAbsPos,
+					InitRightFootAbsPos);
+      }
+	else if (m_AlgorithmforZMPCOM==ZMPCOM_HERDT_STEPPOS)
+      {
+	ODEBUG("ZMPCOM_HERDT_2010 " << m_ZMPPositions.size() );
+	m_COMBuffer.clear();
+	m_ZMPM->SetCurrentTime(m_InternalClock);
+	m_OSPTG->GetZMPDiscretization(m_ZMPPositions,
 					m_COMBuffer,
 					lRelativeFootPositions,
 					m_LeftFootPositions,
