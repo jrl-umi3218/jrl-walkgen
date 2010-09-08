@@ -14,6 +14,8 @@
 #ifndef _PATTERN_GENERATOR_TYPES_H_
 #define  _PATTERN_GENERATOR_TYPES_H_
 
+#include <deque>
+
 // For Windows compatibility.
 #if defined (WIN32)
 #  ifdef walkGenJrl_EXPORTS 
@@ -26,6 +28,7 @@
 #endif
 
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+
 
 namespace PatternGeneratorJRL
 {
@@ -69,8 +72,8 @@ namespace PatternGeneratorJRL
   struct RelativeFootPosition_s
   { 
     double sx,sy,theta;
-    float SStime;
-    float DStime;
+    double SStime;
+    double DStime;
     int stepType;     //1:normal walking 2:one step before opbstacle
                       //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
     double DeviationHipHeight;      
@@ -152,6 +155,8 @@ namespace PatternGeneratorJRL
     MAL_VECTOR(RefVectorTheta,double);
   };
   typedef struct ReferenceAbsoluteVelocity_t ReferenceAbsoluteVelocity;
+
+  typedef std::deque<RelativeFootPosition> RelativeFootPositionQueue;
   
 };
 #endif
