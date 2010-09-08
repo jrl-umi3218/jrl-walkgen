@@ -2,7 +2,7 @@
 \brief This object build linear constraints based on feet positions.
 
 Copyright (c) 2005-2010,
-@author Andrei Herdt, Olivier Stasse
+@author Andrei Herdt, Olivier Stasse, Mehdi Benallegue
 
 JRL-Japan, CNRS/AIST
 
@@ -68,7 +68,7 @@ int FootConstraintsAsLinearSystemForStepPos::buildLinearConstraintInequalities(d
 
 	double *lxcoefs, *lycoefs;
 
-	double squareD=0.01 ;//the radius of the square centered in zero
+	double squareD=0.02 ;//the radius of the square centered in zero
 	// a square of squareD millimeters centered on zero.
 	double CHFLeftPosConstrArrayX[4] = {squareD,  squareD,  -squareD, -squareD};
 	double CHFLeftPosConstrArrayY[4] = {squareD, -squareD,  -squareD,  squareD};
@@ -267,7 +267,7 @@ int FootConstraintsAsLinearSystemForStepPos::buildLinearConstraintInequalities(d
 				ConvexHullFPRef[j].row = ly + ( (RefPos[Support->StepNumber-1].sx+ CHFPosConstrArrayX[j]) * s_t + (RefPos[Support->StepNumber-1].sy+ stepLateral+CHFPosConstrArrayY[j] )* c_t );
 			}
 
-			if (i==0)//the step is now over, so we remove the queue's head
+			if (i==1)//the step is now over, so we remove the queue's head
 			{
 				removeQueueHead=true;
 
@@ -284,8 +284,10 @@ int FootConstraintsAsLinearSystemForStepPos::buildLinearConstraintInequalities(d
 		}
 
 		if (removeQueueHead)
+		{
 			RefPos.pop_front();
-
+			removeQueueHead=false;
+		}
 		// Linear Constraint Inequality
 		LinearConstraintInequalityFreeFeet_t aLCI;
 
