@@ -123,12 +123,20 @@ int main(int argc, char *argv[])
 	
 	if (argc!=6)
     {
+
+	  cerr << " This program takes 4 arguments: " << endl;
+      cerr << "./TestFootPrintPGInterface \
+                         PATH_TO_VRML_FILE	   \
+                         VRML_FILE_NAME		   \
+                         PATH_TO_SPECIFICITIES_XML \
+                         LINK_JOINT_RANK" << endl;
+      exit(-1);
 	  
-	  VRMLPath="C:/Mehdi/Projects/hrp2_10/data/";
-	  VRMLFileName="HRP2JRLmainSmall.wrl";
-	  SpecificitiesFileName ="C:/Mehdi/Projects/hrp2_10/data/HRP2SpecificitiesSmall.xml";
-      LinkJointRank	="C:/Mehdi/Projects/hrp2_10/data/HRP2LinkJointRankSmall.xml"; 
-      InitConfig="C:/Mehdi/Projects/hrp2_10/data/HRP2JRLInitConfigSmall.dat";
+	  //VRMLPath="C:/Mehdi/Projects/hrp2_10/data/";
+	  //VRMLFileName="HRP2JRLmainSmall.wrl";
+	  //SpecificitiesFileName ="C:/Mehdi/Projects/hrp2_10/data/HRP2SpecificitiesSmall.xml";
+	  //LinkJointRank	="C:/Mehdi/Projects/hrp2_10/data/HRP2LinkJointRankSmall.xml"; 
+	  //InitConfig="C:/Mehdi/Projects/hrp2_10/data/HRP2JRLInitConfigSmall.dat";
     }	
   else 
     {
