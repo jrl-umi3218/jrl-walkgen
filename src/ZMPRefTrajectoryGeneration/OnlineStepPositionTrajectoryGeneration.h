@@ -2,7 +2,7 @@
 using a new formulation of the stability problem.
 
 Copyright (c) 2005-2010, 
-Andrei Herdt, Olivier Stasse, Francois Keith, Mehdi Benallegue
+Mehdi Benallegue, Andrei Herdt, Olivier Stasse, Francois Keith, Mehdi Benallegue
 
 JRL-Japan, CNRS/AIST
 

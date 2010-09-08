@@ -2,7 +2,7 @@
 \brief This object build linear constraints based on feet positions.
 
 Copyright (c) 2005-2010,
-@author Andrei Herdt, Olivier Stasse, Mehdi Benallegue
+@author Mehdi Benallegue, Andrei Herdt, Olivier Stasse, Mehdi Benallegue
 
 JRL-Japan, CNRS/AIST
 

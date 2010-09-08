@@ -1,7 +1,7 @@
 /* \file This file tests A. Herdt's walking algorithm for
 * automatic foot placement giving an instantaneous CoM velocity reference.
 *
-* Olivier Stasse
+* Olivier Stasse, Mehdi Benallegue
 * 
 * (c) 2010, JRL, UMI 3218/CRT, CNRS/AIST.
 *

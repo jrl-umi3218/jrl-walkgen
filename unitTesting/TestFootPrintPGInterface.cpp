@@ -1,5 +1,5 @@
 
-/* Olivier Stasse
+/* Olivier Stasse, edited by Mehdi Benallegue
  * (c) 2005-2009
  * 
  */
