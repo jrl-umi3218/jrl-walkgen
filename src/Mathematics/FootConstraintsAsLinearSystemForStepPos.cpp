@@ -75,17 +75,8 @@ int FootConstraintsAsLinearSystemForStepPos::buildLinearConstraintInequalities(d
 	double CHFRightPosConstrArrayX[4] = {squareD, -squareD, -squareD,  squareD};
 	double CHFRightPosConstrArrayY[4] = {squareD,  squareD, -squareD, -squareD};
 
-	double CHFLeftPosConstrArrayXT[3] = {0		,  squareD,  -squareD};
-	double CHFLeftPosConstrArrayYT[3] = {squareD, -squareD,  -squareD};
-	double CHFRightPosConstrArrayXT[3] = {0,	  -squareD,   squareD};
-	double CHFRightPosConstrArrayYT[3] = {squareD,-squareD,  -squareD};
-
-	bool triangleShape=false;
-	int vertexNumber;
-	if (triangleShape)
-		vertexNumber=3;
-	else
-		vertexNumber=4;
+	
+	int vertexNumber=4;
 
 	vector<CH_Point> TheConvexHull;
 
@@ -252,31 +243,16 @@ int FootConstraintsAsLinearSystemForStepPos::buildLinearConstraintInequalities(d
 			double stepLateral;
 			if(Support->PrwSupportFoot == 1)
 			{
-				if (triangleShape)
-				{
-					CHFPosConstrArrayX=CHFLeftPosConstrArrayXT;
-					CHFPosConstrArrayY=CHFLeftPosConstrArrayYT;
-				}
-				else
-				{
-					CHFPosConstrArrayX=CHFLeftPosConstrArrayX;
-					CHFPosConstrArrayY=CHFLeftPosConstrArrayY;
-				}
+				CHFPosConstrArrayX=CHFLeftPosConstrArrayX;
+				CHFPosConstrArrayY=CHFLeftPosConstrArrayY;
+				
 				stepLateral = stepWidth;
 			}
 			else
 			{
-				if (triangleShape)
-				{
-					CHFPosConstrArrayX=CHFRightPosConstrArrayXT;
-					CHFPosConstrArrayY=CHFRightPosConstrArrayYT;
-				}
-				else
-				{
-
-					CHFPosConstrArrayX=CHFRightPosConstrArrayX;
-					CHFPosConstrArrayY=CHFRightPosConstrArrayY;
-				}
+				CHFPosConstrArrayX=CHFRightPosConstrArrayX;
+				CHFPosConstrArrayY=CHFRightPosConstrArrayY;
+				
 				stepLateral = -stepWidth;
 			}
 
