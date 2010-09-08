@@ -154,6 +154,23 @@ SET_TARGET_PROPERTIES( TestHerdt2010
 target_link_libraries (TestHerdt2010 ${PROJECT_NAME})
 ADD_DEPENDENCIES (TestHerdt2010 ${PROJECT_NAME})
 
+#########################
+# Test TestHerdtStepPos #
+#########################
+
+ADD_EXECUTABLE( TestHerdtStepPos
+  ../src/TimeUtilsWindows.cpp
+  TestHerdtStepPos.cpp
+  CommonTools.cpp
+)
+SET_TARGET_PROPERTIES( TestHerdtStepPos
+	              PROPERTIES
+	              COMPILE_FLAGS ${${PROJECT_NAME}_test_CXXFLAGS}
+		      LINK_FLAGS ${${PROJECT_NAME}_test_LDFLAGS}  
+)
+target_link_libraries (TestHerdtStepPos ${PROJECT_NAME})
+ADD_DEPENDENCIES (TestHerdtStepPos ${PROJECT_NAME})
+
 #####################
 # Add user examples #
 #####################

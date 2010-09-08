@@ -746,6 +746,26 @@ void HerdtOnline(PatternGeneratorInterface &aPGI)
 }
 
 
+void HerdtOnlineStepPos(PatternGeneratorInterface &aPGI)
+{
+  CommonInitialization(aPGI);
+
+  {
+    istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
+    aPGI.ParseCmd(strm2);
+
+  }
+  {
+    istringstream strm2(":singlesupporttime 0.7");
+    aPGI.ParseCmd(strm2);
+  }
+  {
+    istringstream strm2(":HerdtOnlineStepPos 0.2 0.0 0.0");
+    aPGI.ParseCmd(strm2);
+  }
+}
+
+
 void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI)
 {
   CommonInitialization(aPGI);
