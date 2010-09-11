@@ -21,7 +21,7 @@ using namespace PatternGeneratorJRL;
 
 #include <Debug.h>
 
-
+const int vertexNumber=4;
 
 FootConstraintsAsLinearSystemForStepPos::
 FootConstraintsAsLinearSystemForStepPos(SimplePluginManager *aSPM, 
@@ -30,7 +30,7 @@ FootConstraintsAsLinearSystemForStepPos(SimplePluginManager *aSPM,
 										double ConstraintOnY) :
 FootConstraintsAsLinearSystemForVelRef(aSPM,aHS,ConstraintOnX,ConstraintOnY)
 {
-	ConvexHullFPRef.resize(4);
+	ConvexHullFPRef.resize(vertexNumber);
 }
 
 FootConstraintsAsLinearSystemForStepPos::
@@ -68,15 +68,16 @@ int FootConstraintsAsLinearSystemForStepPos::buildLinearConstraintInequalities(d
 
 	double *lxcoefs, *lycoefs;
 
-	double squareD=0.02 ;//the radius of the square centered in zero
-	// a square of squareD millimeters centered on zero.
-	double CHFLeftPosConstrArrayX[4] = {squareD,  squareD,  -squareD, -squareD};
-	double CHFLeftPosConstrArrayY[4] = {squareD, -squareD,  -squareD,  squareD};
-	double CHFRightPosConstrArrayX[4] = {squareD, -squareD, -squareD,  squareD};
-	double CHFRightPosConstrArrayY[4] = {squareD,  squareD, -squareD, -squareD};
+	
+	
+	double squareD=0.02;//the radius of the square centered in zero
+	// a square of squareD meters centered on zero.
+	double CHFLeftPosConstrArrayX[vertexNumber] = {squareD,  squareD,  -squareD, -squareD};
+	double CHFLeftPosConstrArrayY[vertexNumber] = {squareD, -squareD,  -squareD,  squareD};
+	double CHFRightPosConstrArrayX[vertexNumber] = {squareD, -squareD, -squareD,  squareD};
+	double CHFRightPosConstrArrayY[vertexNumber] = {squareD,  squareD, -squareD, -squareD};
 
 	
-	int vertexNumber=4;
 
 	vector<CH_Point> TheConvexHull;
 
@@ -201,6 +202,7 @@ int FootConstraintsAsLinearSystemForStepPos::buildLinearConstraintInequalities(d
 
 		}
 
+		
 		//foot positionning constraints
 		if(Support->m_StateChanged && Support->StepNumber>0)
 		{
@@ -236,12 +238,12 @@ int FootConstraintsAsLinearSystemForStepPos::buildLinearConstraintInequalities(d
 					aof<<" AngleFootConstraints: "<<PreviewedSupportAngles[Support->StepNumber-2];
 					aof.close();
 				}
-			}//Left foot or rigth foot support
+			}
 
 			double* CHFPosConstrArrayX; 
 			double* CHFPosConstrArrayY;
 			double stepLateral;
-			if(Support->PrwSupportFoot == 1)
+			if(Support->PrwSupportFoot == 1)//Left foot or rigth foot support
 			{
 				CHFPosConstrArrayX=CHFLeftPosConstrArrayX;
 				CHFPosConstrArrayY=CHFLeftPosConstrArrayY;
