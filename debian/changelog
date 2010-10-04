@@ -1,3 +1,9 @@
+jrl-walkgen (1.0.0.99-1ubuntu1) lucid; urgency=low
+
+  * Add missing dependencies (jrl-dynamics and abstract-robot-dynamics).
+
+ -- Thomas Moulard <thomas.moulard@gmail.com>  Mon, 04 Oct 2010 16:44:52 +0200
+
 jrl-walkgen (1.0.0.99-1) lucid; urgency=low
 
   * Initial work.
