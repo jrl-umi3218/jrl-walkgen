@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Olivier Stasse
  *
@@ -106,26 +106,26 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_RESIZE(m_PreviousConfiguration, m_HDR->numberDof());
       MAL_VECTOR_RESIZE(m_PreviousVelocity, m_HDR->numberDof());
       MAL_VECTOR_RESIZE(m_PreviousAcceleration, m_HDR->numberDof());
-      
+
     }
 
     TestObject::~TestObject()
     {
-  
+
       if (m_HDR!=0)
 	delete m_HDR;
 
       if (m_DebugHDR!=0)
 	delete m_DebugHDR;
-      
+
       if (m_PGI!=0)
 	delete m_PGI;
-	    
+
     }
 
     void TestObject::prepareDebugFiles()
     {
-  
+
       if (m_DebugZMP2)
 	{
 	  ofstream aofzmpmb2;
@@ -133,14 +133,14 @@ namespace PatternGeneratorJRL
 	  aFileName += "ZMPMBSTAGE2.dat";
 	  aofzmpmb2.open(aFileName.c_str(),ofstream::out);
 	}
-  
-  
+
+
       if (m_DebugFGPI)
 	{
 	  ofstream aof;
 	  string aFileName = m_TestName;
 	  aFileName += "TestFGPI_description.dat";
-	  
+
 	  aof.open(aFileName.c_str(),ofstream::out);
 	  string Titles[26] =
 	    { "Time",
@@ -171,9 +171,9 @@ namespace PatternGeneratorJRL
 	      "Waist Y (world ref.)" };
 	  for(unsigned int i=0;i<26;i++)
 	    aof << i+1 << ". " <<Titles[i] <<std::endl;
-	
+
 	  aof.close();
-	  
+
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI.dat";
 	  aof.open(aFileName.c_str(),ofstream::out);
@@ -185,42 +185,42 @@ namespace PatternGeneratorJRL
     {
       if (m_DebugFGPI)
 	{
-	  ofstream aof;            
+	  ofstream aof;
 	  string aFileName;
 	  aFileName = m_TestName;
-	  aFileName += "TestFGPI.dat";	  
+	  aFileName += "TestFGPI.dat";
 	  aof.open(aFileName.c_str(),ofstream::app);
 
-	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " " 
+	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " " 
+	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "
 	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "
 	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " " 
+	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "
 	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "
-	      << filterprecision(m_OneStep.ZMPTarget(0) ) << " " 
-	      << filterprecision(m_OneStep.ZMPTarget(1) ) << " " 
-	      << filterprecision(m_OneStep.LeftFootPosition.x  ) << " " 
-	      << filterprecision(m_OneStep.LeftFootPosition.y  ) << " " 
-	      << filterprecision(m_OneStep.LeftFootPosition.z  ) << " " 
-	      << filterprecision(m_OneStep.LeftFootPosition.theta  ) << " "  
-	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " " 
+	      << filterprecision(m_OneStep.ZMPTarget(0) ) << " "
+	      << filterprecision(m_OneStep.ZMPTarget(1) ) << " "
+	      << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "
+	      << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "
+	      << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "
+	      << filterprecision(m_OneStep.LeftFootPosition.theta  ) << " "
+	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "
 	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.x ) << " " 
-	      << filterprecision(m_OneStep.RightFootPosition.y ) << " " 
-	      << filterprecision(m_OneStep.RightFootPosition.z ) << " " 
-	      << filterprecision(m_OneStep.RightFootPosition.theta ) << " " 
-	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " " 
+	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "
+	      << filterprecision(m_OneStep.RightFootPosition.y ) << " "
+	      << filterprecision(m_OneStep.RightFootPosition.z ) << " "
+	      << filterprecision(m_OneStep.RightFootPosition.theta ) << " "
+	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "
 	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "
-	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) - 
+	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
 	    m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
-	    +m_CurrentConfiguration(0) ) << " " 
-	      << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) + 
+	    +m_CurrentConfiguration(0) ) << " "
+	      << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
 	    m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
 	    +m_CurrentConfiguration(1) ) << " "
-	      << filterprecision(m_CurrentConfiguration(0) ) << " " 
-	      << filterprecision(m_CurrentConfiguration(1) ) << " " 
+	      << filterprecision(m_CurrentConfiguration(0) ) << " "
+	      << filterprecision(m_CurrentConfiguration(1) ) << " "
 	      << endl;
 	  aof.close();
 	}
@@ -233,17 +233,17 @@ namespace PatternGeneratorJRL
       if (m_DebugFGPI)
 	{
 	  SameFile = true;
-	  ifstream alif;            
+	  ifstream alif;
 	  string aFileName;
 	  aFileName = m_TestName;
-	  aFileName += "TestFGPI.dat";	  
+	  aFileName += "TestFGPI.dat";
 	  alif.open(aFileName.c_str(),ifstream::in);
 
-	  ifstream arif;            
+	  ifstream arif;
 	  aFileName = m_TestName;
-	  aFileName += "TestFGPI.datref";	  
+	  aFileName += "TestFGPI.datref";
 	  arif.open(aFileName.c_str(),ifstream::in);
-	  
+
 	  // Time
 	  double LocalInput[70], ReferenceInput[70];
 
@@ -273,12 +273,12 @@ namespace PatternGeneratorJRL
     bool TestObject::doTest(ostream &os)
     {
 
-      // Set time reference. 
+      // Set time reference.
       m_clock.startingDate();
 
       /*! Open and reset appropriatly the debug files. */
       prepareDebugFiles();
-    
+
       for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
 	{
 	  os << "<===============================================================>"<<endl;
@@ -288,12 +288,12 @@ namespace PatternGeneratorJRL
 
 	  /*! According to test profile initialize the current profile. */
 	  chooseTestProfile();
-	
+
 	  m_clock.endPlanning();
 
 	  if (m_DebugHDR!=0)
 	    {
-	      m_DebugHDR->currentConfiguration(m_PreviousConfiguration);	      
+	      m_DebugHDR->currentConfiguration(m_PreviousConfiguration);
 	      m_DebugHDR->currentVelocity(m_PreviousVelocity);
 	      m_DebugHDR->currentAcceleration(m_PreviousAcceleration);
 	      m_DebugHDR->computeForwardKinematics();
@@ -323,38 +323,38 @@ namespace PatternGeneratorJRL
 		}
 
 	      m_OneStep.NbOfIt++;
-	  
+
 	      m_clock.stopOneIteration();
 
-	      m_PreviousConfiguration = m_CurrentConfiguration;	  
+	      m_PreviousConfiguration = m_CurrentConfiguration;
 	      m_PreviousVelocity = m_CurrentVelocity;
 	      m_PreviousAcceleration = m_CurrentAcceleration;
-	  
+
 	      /*! Call the reimplemented method to generate events. */
 	      if (ok)
 		{
 		  m_clock.startModification();
 		  generateEvent();
 		  m_clock.stopModification();
-		  
+
 		  m_clock.fillInStatistics();
-		  
+
 		  /*! Fill the debug files with appropriate information. */
 		  fillInDebugFiles();
 		}
-	  
+
 	    }
 
 	  os << endl << "End of iteration " << lNbIt << endl;
 	  os << "<===============================================================>"<<endl;
 	}
-      
+
       string lProfileOutput= m_TestName;
       lProfileOutput +="TimeProfile.dat";
       m_clock.writeBuffer(lProfileOutput);
       m_clock.displayStatistics(os,m_OneStep);
 
-      // Compare debugging files 
+      // Compare debugging files
       return compareDebugFiles();
     }
 

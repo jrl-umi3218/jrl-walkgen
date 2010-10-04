@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Olivier Stasse
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file This file tests M. Morisawa's walking algorithm for
@@ -33,7 +33,7 @@ using namespace::PatternGeneratorJRL::TestSuite;
 using namespace std;
 
 enum Profiles_t {
-  PROFIL_ANALYTICAL_ONLINE_WALKING,                 // 1 
+  PROFIL_ANALYTICAL_ONLINE_WALKING,                 // 1
   PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING          //  2
 };
 
@@ -71,28 +71,28 @@ public:
     m_NbStepsModified = 0;
     m_deltatime = 0;
   };
-  
+
 protected:
 
   void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI)
   {
     CommonInitialization(aPGI);
-    
+
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
       aPGI.ParseCmd(strm2);
     }
-    
+
     {
       istringstream strm2(":onlinechangestepframe relative");
       aPGI.ParseCmd(strm2);
     }
-    
+
     {
       istringstream strm2(":SetAutoFirstStep false");
       aPGI.ParseCmd(strm2);
     }
-    
+
     {
       istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0 \
                      0.0 0.19 0.0				     \
@@ -115,7 +115,7 @@ protected:
       istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
       aPGI.ParseCmd(strm2);
     }
-    
+
     {
       istringstream strm2(":stepseq 0.0 -0.105 0.0 \
                      0.2  0.19 0.0		   \
@@ -126,7 +126,7 @@ protected:
                      0.0 -0.19 0.0");
       aPGI.ParseCmd(strm2);
     }
-    
+
   }
 
   void chooseTestProfile()
@@ -137,7 +137,7 @@ protected:
       case PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING:
 	AnalyticalShortStraightWalking(*m_PGI);
 	break;
-	
+
       case PROFIL_ANALYTICAL_ONLINE_WALKING:
 	StartAnalyticalOnLineWalking(*m_PGI);
 	break;
@@ -153,7 +153,7 @@ protected:
       return;
 
     unsigned int StoppingTime = 70*200;
-    
+
 
     double r = 100.0*(double)m_OneStep.NbOfIt/(double)StoppingTime;
 
@@ -170,7 +170,7 @@ protected:
 	}
 
       double triggertime = 9.64*200 + m_deltatime*200;
-      if ((m_OneStep.NbOfIt>triggertime) && 
+      if ((m_OneStep.NbOfIt>triggertime) &&
 	  m_TestChangeFoot)
 	{
 	  PatternGeneratorJRL::FootAbsolutePosition aFAP;
@@ -212,8 +212,8 @@ int PerformTests(int argc, char *argv[])
         TestMorisawa2007 aTM2007(argc,argv,
 				 TestNames[i],
 				 TestProfiles[i]);
-	try 
-	  { 
+	try
+	  {
 	    if (!aTM2007.doTest(std::cout))
 	      {
 		cout << "Failed test " << i << endl;
