@@ -1,0 +1,207 @@
+# Copyright 2010, Olivier Stasse, JRL, CNRS/AIST
+#
+# This file is part of jrl-walkgen.
+# jrl-walkgen is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public License
+# as published by the Free Software Foundation, either version 3 of
+# the License, or (at your option) any later version.
+#
+# jrl-walkgen is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Lesser Public License for more details.  You should have
+# received a copy of the GNU Lesser General Public License along with
+# jrl-walkgen. If not, see <http://www.gnu.org/licenses/>.
+
+cmake_minimum_required(VERSION 2.6)
+enable_language(CXX)
+enable_testing()
+
+# Name of the project
+#--------------------
+SET(PROJECT_NAME walkGenJrl)
+SET(PROJECT_CONTACT olivier.stasse@aist.go.jp)
+SET(PROJECT_DESCRIPTION "Humanoid Walking Pattern Generator (JRL)")
+
+# Counter CMake mesures
+#----------------------
+IF(WIN32)
+SET(CMAKE_STATIC_LIBRARY_PREFIX "")
+SET(CMAKE_SHARED_LIBRARY_PREFIX "")
+SET(CMAKE_SHARED_MODULE_PREFIX "")
+ENDIF(WIN32)
+
+
+# Debug mode for cmake.
+#----------------------
+SET(CMAKE_VERBOSE_MAKEFILE ON)
+
+# Set version
+#------------
+set(CPACK_PACKAGE_VERSION_MAJOR 3)
+set(CPACK_PACKAGE_VERSION_MINOR 1)
+set(CPACK_PACKAGE_VERSION_PATCH 1)
+
+SET(PROJECT_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}.99)
+
+# Deal with OS specificities
+#---------------------------
+IF(WIN32)
+  SET(LIBDIR_KW "/LIBPATH:")
+  SET(LIBINCLUSION_KW "")
+  SET(LIBINCLUSION_EXT ".lib")
+ENDIF(WIN32)
+
+IF(UNIX)
+  SET(LIBDIR_KW "-L")
+  SET(LIBDIR_RP "-Wl,-R")
+  SET(LIBINCLUSION_KW "-l")
+  SET(LIBINCLUSION_EXT "")
+  SET(${PROJECT_NAME}_CXXFLAGS "-DUNIX ")
+ENDIF(UNIX)
+
+project(${PROJECT_NAME})
+
+# Impose shared libraries
+#------------------------
+OPTION(BUILD_SHARED_LIBS "Build walkGenJrl with shared libraries." ON)
+
+# where are located specific cmake modules
+#-----------------------------------------
+SET(CMAKE_MODULE_PATH ${${PROJECT_NAME}_SOURCE_DIR}/CMakeModules)
+
+# Check for required packages
+# -------------------------
+INCLUDE(FindPkgConfig)
+
+# Look for abstract robot dynamics.
+SET(ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION 1.15)
+pkg_check_modules(ABSTRACTROBOTDYNAMICS REQUIRED abstractRobotDynamics>=${ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION})
+SET(PROJECT_REQUIREMENTS "abstractRobotDynamics >= ${ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION}")
+
+EXEC_PROGRAM(${PKG_CONFIG_EXECUTABLE} ARGS  --variable=docdir abstractRobotDynamics
+  OUTPUT_VARIABLE _abstractRobotDynamics_DOCDIR)
+
+SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} -I${${PROJECT_NAME}_SOURCE_DIR}")
+
+IF(UNIX)
+	SET(${PROJECT_NAME}_src_CXXFLAGS "-Wall ${${PROJECT_NAME}_src_CXXFLAGS}")
+ENDIF(UNIX)
+
+IF(WIN32)
+	SET(WIN32_CXXFLAGS "-D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE  /wd4250 /wd4251 /wd4996")
+	SET(WIN32_CXXFLAGS "${WIN32_CXXFLAGS} /wd4244 /wd4305") # warning:  double to float conversion
+	SET(WIN32_CXXFLAGS "${WIN32_CXXFLAGS} /wd4275")			# warning: non-dll interface used in dynJRLJapan
+	SET(${PROJECT_NAME}_src_CXXFLAGS "/D__STDC__ ${${PROJECT_NAME}_src_CXXFLAGS} ${WIN32_CXXFLAGS}")
+ENDIF(WIN32)
+
+FOREACH(option_cxxflags ${ABSTRACTROBOTDYNAMICS_CFLAGS})
+  SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} ${option_cxxflags} ")
+ENDFOREACH(option_cxxflags)
+
+FOREACH(option_ldflags ${ABSTRACTROBOTDYNAMICS_LDFLAGS})
+  SET(${PROJECT_NAME}_src_LDFLAGS "${option_ldflags} ${${PROJECT_NAME}_src_LDFLAGS}")
+ENDFOREACH(option_ldflags)
+
+IF(UNIX)
+  SET(${PROJECT_NAME}_LDFLAGS "${LIBDIR_KW}${CMAKE_PREFIX_INSTALL}/lib/ ${LIBINCLUSION_KW}${PROJECT_NAME} ${${PROJECT_NAME}_LDFLAGS}")
+ENDIF(UNIX)
+
+IF(WIN32)
+  SET(${PROJECT_NAME}_LDFLAGS "${LIBDIR_KW}${CMAKE_PREFIX_INSTALL}/lib/ ${LIBINCLUSION_KW}${PROJECT_NAME}${LIBINCLUSION_EXT} ${${PROJECT_NAME}_LDFLAGS}")
+ENDIF(WIN32)
+
+
+
+# Optimisation flags when building with RELEASE
+#----------------------------------------------
+IF(CMAKE_BUILD_TYPE MATCHES "RELEASE")
+  IF(CMAKE_COMPILER_IS_GNUCXX)
+    SET (${PROJECT_NAME}_CXXFLAGS "-O3 -funroll-loops -frerun-loop-opt -fschedule-insns2 -frerun-cse-after-loop -falign-functions -falign-labels -falign-loops -falign-jumps -fexpensive-optimizations ${${PROJECT_NAME}_CXXFLAGS}")
+  ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+ENDIF(CMAKE_BUILD_TYPE MATCHES "RELEASE")
+
+# To deal with the headers.
+#--------------------------
+add_subdirectory(src)
+add_subdirectory(unitTesting)
+
+# Prepare the documentation
+# -------------------------
+OPTION(GENERATE_DOC "Generate html documentation" ON)
+IF (GENERATE_DOC)
+  INCLUDE(FindDoxygen)
+  IF(DOXYGEN_FOUND)
+    MESSAGE(STATUS "Doxygen found")
+	ADD_SUBDIRECTORY(doc)
+  ENDIF(DOXYGEN_FOUND)
+ENDIF (GENERATE_DOC)
+
+# Prepare description file for pkg-config.
+#-----------------------------------------
+SET(install_pkg_prefix "\${prefix}")
+SET(install_pkg_exec_prefix "\${exec_prefix}")
+SET(install_pkg_libdir "\${libdir}")
+SET(install_pkg_include_dir "\${includedir}")
+SET(install_pkg_datarootdir "\${datarootdir}")
+
+# Install the file in the appropriate place.
+#-------------------------------------------
+SET(install_libdir_pkgconfig lib/pkgconfig)
+
+CONFIGURE_FILE(${${PROJECT_NAME}_SOURCE_DIR}/${PROJECT_NAME}.pc.cmake
+		 ${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}.pc )
+
+INSTALL(FILES ${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}.pc
+	DESTINATION ${install_libdir_pkgconfig}	
+        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE
+)
+
+# Uninstall target
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+  IMMEDIATE @ONLY)
+
+ADD_CUSTOM_TARGET(uninstall
+  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+
+#---------------
+# Package target
+#---------------
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "walkGenJrl - Walking Pattern Generator for LIPM-like humanoid robots")
+set(CPACK_PACKAGE_VENDOR "JRL CNRS/AIST")
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
+set(CPACK_PACKAGE_CONTACT "Olivier Stasse (olivier.stasse@aist.go.jp)")
+set(
+CPACK_SOURCE_PACKAGE_FILE_NAME
+"walkgenjrl-src-${PROJECT_VERSION}"
+CACHE INTERNAL "tarball basename"
+)
+set(CPACK_PACKAGE_NAME "walkgenjrl")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "dynamicsjrljapan (>=1.17.0)")
+set(CPACK_SOURCE_GENERATOR "TGZ")
+set(CPACK_GENERATOR DEB)
+
+# The following components are regex's to match anywhere (unless anchored)
+# in absolute path + filename to find files or directories to be excluded
+# from source tarball.
+set(CPACK_SOURCE_IGNORE_FILES
+"~$"
+"^${PROJECT_SOURCE_DIR}/build/"
+"^${PROJECT_SOURCE_DIR}/.git/"
+)
+
+set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/openrobots")
+#message("CPACK_SOURCE_IGNORE_FILES = ${CPACK_SOURCE_IGNORE_FILES}")
+include(CPack)
+
+
+
+
+
+
+
+
+
+

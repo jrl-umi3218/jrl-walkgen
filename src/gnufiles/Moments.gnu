@@ -1,0 +1,1 @@
+plot "DebugDataZMPMB1.txt" u 5 w l t "Px", "DebugDataZMPMB1.txt" u 6 w l t "Py", "DebugDataZMPMB1.txt" u 7 w l t "Pz",  "DebugDataZMPMB1.txt" u 8 w l t "Lx", "DebugDataZMPMB1.txt" u 9 w l t "Ly", "DebugDataZMPMB1.txt" u 10 w l t "Lz"

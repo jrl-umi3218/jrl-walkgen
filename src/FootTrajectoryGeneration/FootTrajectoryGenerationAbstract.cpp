@@ -1,0 +1,103 @@
+/*
+ * Copyright 2008, 2009, 2010, 
+ *
+ * Francois Keith
+ * Olivier Stasse
+ *
+ * JRL, CNRS/AIST
+ *
+ * This file is part of walkGenJrl.
+ * walkGenJrl is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * walkGenJrl is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Research carried out within the scope of the 
+ *  Joint Japanese-French Robotics Laboratory (JRL)
+ */
+
+/*!\file FootTrajectoryGenerationAbstract.h
+   \brief This class determinate how it s generate all the values for the foot trajectories.
+
+   @ingroup foottrajectorygeneration
+*/
+#include <Debug.h>
+#include "FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.h"
+
+using namespace PatternGeneratorJRL;
+
+FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginManager *lSPM,
+								   CjrlFoot *aFoot) 
+  : SimplePlugin(lSPM)
+{
+  m_Omega = 0.0;
+  m_Foot= aFoot;  
+  m_SamplingPeriod = 0.005;
+
+  std::string aMethodName[5] = 
+    {":omega",
+     ":stepheight", 
+     ":singlesupporttime",
+     ":doublesupporttime",
+     ":samplingperiod"};
+
+  for (int i=0;i<5;i++)
+    {
+      if (!RegisterMethod(aMethodName[i]))
+	{
+	  std::cerr << "Unable to register " << aMethodName << std::endl;
+	}
+    }
+
+}
+
+void FootTrajectoryGenerationAbstract::CallMethod(std::string &Method,
+					     std::istringstream &strm)
+{
+  if (Method==":omega")
+    {
+      strm >> m_Omega;
+    }
+  else if (Method==":singlesupporttime")
+    {
+      strm >> m_TSingle;
+    }
+  else if (Method==":doublesupporttime")
+    {
+      strm >> m_TDouble;
+    }
+  else if (Method==":samplingperiod")
+    {
+      strm >> m_SamplingPeriod;
+      ODEBUG("Sampling period: " << m_SamplingPeriod);
+    }
+
+
+}
+
+void FootTrajectoryGenerationAbstract::UpdateFootPosition(std::deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
+							  std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
+							  int CurrentAbsoluteIndex,  
+							  int IndexInitial, 
+							  double ModulatedSingleSupportTime,
+							  int StepType, int LeftOrRight)
+{
+  LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-1: To be implemented ");
+}
+
+void FootTrajectoryGenerationAbstract::UpdateFootPosition(std::deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
+							  std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
+							  int StartIndex, int k,
+							  double LocalInterpolationStartTime,
+							  double ModulatedSingleSupportTime,
+							  int StepType, int LeftOrRight)
+{
+  LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-2: To be implemented ");
+}

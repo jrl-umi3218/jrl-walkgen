@@ -1,0 +1,14 @@
+                                                                -*- outline -*-
+
+New in X.Y, XXXX-YY-ZZ:
+* FIXME
+
+New in 3.0, 2009-11-15:
+* Add OpenHRP-3 compatibility.
+* Reorganize package to increase modularity.
+
+New in 2.1, 2007-07-14:
+* Now compatible with different linear algebra libraries through an
+  abstraction layer.
+* Add a new untested analytical method based on Morisawa.
+  tested.

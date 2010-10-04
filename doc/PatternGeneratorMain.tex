@@ -1,0 +1,54 @@
+\documentclass[11pt,a4paper,english,french,twoside]{book}
+\usepackage{isolatin1}
+\usepackage[T1]{fontenc}
+\usepackage{epsfig,a4}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{amsmath,amscd,amssymb}
+%\usepackage{$STYLESEXPORT/Doc_Type_LL}
+%$
+\usepackage{makeidx}
+\usepackage[latin1]{inputenc}
+\usepackage{graphics}
+\usepackage{pslatex}
+\usepackage{verbatim}
+\usepackage{wrapfig}
+\usepackage{epsfig}
+\usepackage{subfigure}
+\usepackage{ecltree}
+\usepackage{hyperref}
+\usepackage{color}
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+\vspace*{1cm}
+\Huge
+\epsfig{file=./figures/banner,width=\linewidth}
+{\bf \huge Documentation on the JRL's Pattern generator\\
+%{\large Title still undecided}\\
+}
+\vspace*{0.5cm}
+{\large \bf 
+Olivier Stasse, Ramzi Sellouati\\
+\vspace*{0.5cm}
+\normalsize{
+Joint Japanese French Robotics Laboratory (JRL)\\
+CNRS, AIST \\
+}
+}
+%\epsfig{file=./figures/logoJRL}
+\end{center}
+
+\end{titlepage}
+
+\setcounter{tocdepth}{3}
+\tableofcontents
+
+\include{PatternGenerator}
+
+\bibliographystyle{IEEEbib}
+\bibliography{pgbib.bib}
+
+\end{document}
