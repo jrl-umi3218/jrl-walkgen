@@ -1,3 +1,9 @@
+jrl-walkgen (1.0.0.99-3) lucid; urgency=low
+
+  * Add missing lapack dependency.
+
+ -- Thomas Moulard <thomas.moulard@gmail.com>  Mon, 04 Oct 2010 17:01:43 +0200
+
 jrl-walkgen (1.0.0.99-2) lucid; urgency=low
 
   * Add missing dependencies (jrl-dynamics and abstract-robot-dynamics).

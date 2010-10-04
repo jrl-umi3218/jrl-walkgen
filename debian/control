@@ -7,6 +7,7 @@ Build-Depends: debhelper (>= 7.0.50~), cmake (>= 2.6),
 	       perl (>= 5.10.1),
 	       libboost-dev (>= 1.33.1),
 	       libboost-thread-dev (>= 1.33.1),
+	       liblapack-dev (>= 1.2),
 	       libjrl-dynamics-dev (>= 1.5.1.99),
 	       libabstract-robot-dynamics-dev (>= 1.16.0.99)
 Standards-Version: 3.8.4
@@ -18,7 +19,7 @@ Section: libs
 Package: libjrl-walkgen-dev
 Section: libdevel
 Architecture: any
-Depends: libboost-dev (>= 1.33.1), libboost-thread-dev (>= 1.33.1), libjrl-dynamics-dev (>= 1.5.1.99), libabstract-robot-dynamics-dev (>= 1.16.0.99), libjrl-walkgen3.1.1.99 (= ${binary:Version}), ${misc:Depends}
+Depends: libboost-dev (>= 1.33.1), libboost-thread-dev (>= 1.33.1), libjrl-dynamics-dev (>= 1.5.1.99), libabstract-robot-dynamics-dev (>= 1.16.0.99), liblapack-dev (>= 1.2), libjrl-walkgen3.1.1.99 (= ${binary:Version}), ${misc:Depends}
 Suggests: libjrl-walkgen-doc
 Description: the JRL walking pattern generator development package
  The JRL walking pattern generator generates a whole-body movement
