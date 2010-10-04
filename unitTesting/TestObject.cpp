@@ -18,12 +18,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file Abstract Object test aim at testing various walking algorithms
  * Olivier Stasse
  */
+
+#include <fstream>
 
 #include "TestObject.h"
 
@@ -42,7 +44,7 @@ namespace PatternGeneratorJRL
     }
 
 
-    TestObject::TestObject(int argc, char *argv[], 
+    TestObject::TestObject(int argc, char *argv[],
 			   string &aTestName,
 			   int lPGIInterface)
     {
@@ -69,15 +71,24 @@ namespace PatternGeneratorJRL
 
       /*! Extract options and fill in members. */
       getOptions(argc,argv,
-		 VRMLPath, 
+		 VRMLPath,
 		 VRMLFileName,
-		 SpecificitiesFileName, 
+		 SpecificitiesFileName,
 		 LinkJointRank,
 		 InitConfig,
 		 m_TestProfile);
 
       // Instanciate and initialize.
       string RobotFileName = VRMLPath + VRMLFileName;
+
+      bool fileExist = false;
+      {
+	std::ofstream file (RobotFileName.c_str ());
+	fileExist = !file.fail ();
+      }
+      if (!fileExist)
+	throw std::string ("failed to open robot model");
+
       CreateAndInitializeHumanoidRobot(RobotFileName,
 				       SpecificitiesFileName,
 				       LinkJointRank,

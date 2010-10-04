@@ -231,7 +231,15 @@ int PerformTests(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-  return PerformTests(argc,argv);
+  try
+    {
+      return PerformTests(argc,argv);
+    }
+  catch (const std::string& msg)
+    {
+      std::cerr << msg << std::endl;
+    }
+  return 1;
 }
 
 
