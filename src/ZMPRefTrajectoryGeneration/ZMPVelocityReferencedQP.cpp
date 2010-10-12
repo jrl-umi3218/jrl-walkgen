@@ -362,99 +362,6 @@ int ZMPVelocityReferencedQP::InitializeMatrixPbConstants()
   return 0; 
 } 
  
-
-// int ZMPVelocityReferencedQP::InitializeMatrixPbConstants() 
-// { 
-//   MAL_MATRIX_RESIZE(m_PPu,2*m_QP_N,2*m_QP_N); 
-//   MAL_MATRIX_RESIZE(m_PZu,m_QP_N,m_QP_N); 
-//   MAL_MATRIX_RESIZE(m_VPu,2*m_QP_N,2*m_QP_N); 
-//   MAL_MATRIX_RESIZE(m_PPx,2*m_QP_N,6); 
-//   MAL_MATRIX_RESIZE(m_PZx,2*m_QP_N,6); 
-//   MAL_MATRIX_RESIZE(m_VPx,2*m_QP_N,6); 
- 
-//   for( int i=0;i<m_QP_N;i++) 
-//     { 
-//       // Compute VPx and PPx 
-//       m_VPx(i,0)   = 0.0;   m_VPx(i,1) =     1.0; m_VPx(i,2)   = (i+1)*m_QP_T; 
-//       m_VPx(i,3)   = 0.0;   m_VPx(i,4) =     0.0; m_VPx(i,5)   = 0.0; 
-//       m_VPx(i+m_QP_N,0) = 0.0;   m_VPx(i+m_QP_N,1) =   0.0; m_VPx(i+m_QP_N,2) = 0.0; 
-//       m_VPx(i+m_QP_N,3) = 0.0;   m_VPx(i+m_QP_N,4) =   1.0; m_VPx(i+m_QP_N,5) = (i+1)*m_QP_T; 
- 
-//       m_PPx(i,0) = 1.0; m_PPx(i,1)     = (i+1)*m_QP_T; m_PPx(i,2) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5; 
-//       m_PPx(i,3) = 0.0; m_PPx(i,4)     =       0; m_PPx(i,5) = 0.; 
-//       m_PPx(i+m_QP_N,0) = 0.0; m_PPx(i+m_QP_N,1) =     0.0; m_PPx(i+m_QP_N,2) = 0.0; 
-//       m_PPx(i+m_QP_N,3) = 1.0; m_PPx(i+m_QP_N,4) = (i+1)*m_QP_T; m_PPx(i+m_QP_N,5) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5; 
- 
- 
-//       for( int j=0;j<m_QP_N;j++) 
-// 	{ 
-// 	  m_PPu(i,j)=0; 
- 
-// 	  if (j<=i) 
-// 	    { 
- 
-// 	      m_VPu(i,j)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ; 
-// 	      m_VPu(i+m_QP_N,j+m_QP_N)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ; 
-// 	      m_VPu(i,j+m_QP_N)=0.0; 
-// 	      m_VPu(i+m_QP_N,j)=0.0; 
- 
- 
-// 	      m_PPu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0; 
-// 	      m_PPu(i+m_QP_N,j+m_QP_N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0; 
-// 	      m_PPu(i,j+m_QP_N)=0.0; 
-// 	      m_PPu(i+m_QP_N,j)=0.0; 
- 
-// 	    } 
-// 	  else 
-// 	    { 
- 
-// 	      m_VPu(i,j) = 0.0; 
-// 	      m_VPu(i+m_QP_N,j+m_QP_N)=0.0; 
-// 	      m_VPu(i,j+m_QP_N)=0.0; 
-// 	      m_VPu(i+m_QP_N,j)=0.0; 
- 
-// 	      m_PPu(i,j) = 0.0; 
-// 	      m_PPu(i+m_QP_N,j+m_QP_N)=0.0; 
-// 	      m_PPu(i,j+m_QP_N)=0.0; 
-// 	      m_PPu(i+m_QP_N,j)=0.0; 
- 
-// 	    } 
- 
-// 	} 
-//     } 
- 
-//   // Build m_Px. 
-//   MAL_MATRIX_RESIZE(m_Px,m_QP_N,3); 
- 
-//   for( int li=0;li<m_QP_N;li++) 
-//     { 
-//       m_Px(li,0) = 1.0; 
-//       m_Px(li,1) = (double)(1.0+li)*m_QP_T; 
-//       m_Px(li,2) = (li+1.0)*(li+1.0)*m_QP_T*m_QP_T*0.5-m_ComHeight/9.81; 
-//     } 
-//   if (m_FullDebug>2) 
-//     { 
-//       ofstream aof; 
-//       aof.open("VPx.dat"); 
-//       aof << m_VPx; 
-//       aof.close(); 
- 
-//       aof.open("m_PPx.dat"); 
-//       aof << m_PPx; 
-//       aof.close(); 
- 
-//       aof.open("VPu.dat"); 
-//       aof << m_VPu; 
-//       aof.close(); 
- 
-//       aof.open("PPu.dat"); 
-//       aof << m_PPu; 
-//       aof.close(); 
-//     } 
- 
-//   return 0; 
-// } 
- 
  
 int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX(,double) &OptA) 
 { 
@@ -547,13 +454,7 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(
 	} 
     } 
  
- 
-  // New formulation (Dimitar08) 
-  //m_OptB = MAL_RET_A_by_B(m_iLQ,m_OptB); 
- 
-  // New formulation (Dimitar08) 
-  //m_OptC = MAL_RET_A_by_B(m_iLQ,m_OptC); 
- 
+  
   if (m_FullDebug>0) 
     { 
       ofstream aof; 
@@ -1013,28 +914,6 @@ int ZMPVelocityReferencedQP::validateConstraints(double * & DS,double * &DU,
   MAL_VECTOR(ConstraintNb,int); 
  
   MAL_MATRIX_RESIZE(vnlX,2*(m_QP_N+m_Support->StepNumber),1); 
-  // MAL_MATRIX_RESIZE(vnlStorePx, 
-  // 		    NbOfConstraints, 
-  // 		    //6*N, 
-  // 		    1+(unsigned int)lSizeMat); 
- 
-  // for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(vnlStorePx);i++) 
-  //   { 
-  //     for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(vnlStorePx);j++) 
-  // 	{ 
-  // 	  vnlStorePx(i,j) =0.0; 
-  // 	} 
-  //   } 
-  // MAL_MATRIX_RESIZE(vnlStoreX, 
-  // 		    2*m_QP_N,1+(unsigned int)lSizeMat); 
- 
-  // // for(unsigned int i=0;i<2*m_QP_N;i++) 
-  // //   vnlStoreX(i,0) = 0.0; 
- 
-  // MAL_VECTOR_RESIZE(ConstraintNb, 
-  // 		    1+(unsigned int)lSizeMat); 
- 
- 
  
   // ConstraintNb[li] = NbOfConstraints; 
   MAL_MATRIX_RESIZE(vnlPu,NbOfConstraints,2*(m_QP_N+m_Support->StepNumber)); 
@@ -1087,43 +966,6 @@ int ZMPVelocityReferencedQP::validateConstraints(double * & DS,double * &DU,
  
     } 
  
-  // if (m_FullDebug>2) 
-  //   { 
-  //     ofstream aof; 
-  //     aof.open("StorePx.dat",ofstream::out); 
- 
-  //     for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(vnlStorePx);i++) 
-  // 	{ 
-  // 	  for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(vnlStorePx);j++) 
-  // 	    { 
-  // 	      aof << vnlStorePx(i,j) << " "; 
-  // 	    } 
-  // 	  aof << endl; 
-  // 	} 
-  //     aof.close(); 
- 
- 
-  //     char lBuffer[1024]; 
-  //     sprintf(lBuffer,"StoreX.dat"); 
-  //     aof.open(lBuffer,ofstream::out); 
- 
-  //     for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(vnlStoreX);i++) 
-  // 	{ 
-  // 	  for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(vnlStoreX);j++) 
-  // 	    { 
-  // 	      aof << vnlStoreX(i,j) << " "; 
-  // 	    } 
-  // 	  aof << endl; 
-  // 	} 
-  //     aof.close(); 
- 
-  //     aof.open("Cnb.dat",ofstream::out); 
-  //     for(unsigned int i=0;i<MAL_VECTOR_SIZE(ConstraintNb);i++) 
-  // 	{ 
-  // 	  aof << ConstraintNb[i]<<endl; 
-  // 	} 
-  //     aof.close(); 
-  //   } 
   return 0; 
 } 
  
@@ -1239,52 +1081,6 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
       RESETDEBUG6("FFP.dat"); 
     } 
  
-
-  //MAL_MATRIX(lD,double); 
-  //MAL_MATRIX_RESIZE(lD,NbOfConstraints,2*(m_QP_N+m_Support->StepNumber)); 
- 
-  //MAL_VECTOR_DIM(lb,double,NbOfConstraints); 
- 
- 
- 
-  // //Fixed foot positions: V*f_k 
-  // MAL_VECTOR_DIM(FFPx,double,N); 
-  // MAL_VECTOR_DIM(FFPy,double,N); 
- 
-  // VFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin(); 
- 
-  // //Current support foot 
-  // deque<SupportFeet_t>::iterator CurSF_it; 
-  // CurSF_it = QueueOfSupportFeet.end(); 
-  // CurSF_it--; 
-  // for(unsigned int i=0;i<N;i++) 
-  //   { 
-  //     if((*VFF_it)->StepNumber==0) 
-  // 	{ 
-  // 	  FFPx(i) = (CurSF_it)->x; 
-  // 	  FFPy(i) = (CurSF_it)->y; 
-  // 	} 
-  //     else 
-  // 	{ 
-  // 	  FFPx(i) = 0.0; 
-  // 	  FFPy(i) = 0.0; 
-  // 	} 
-  //     // ODEBUG6("FFPx:" << FFPx(i) << " " << "FFPy:" << FFPy(i), "FFP.dat"); 
-  //   } 
- 
- 
-  // aof.open("FFP.dat",ios::app); 
-  // for(unsigned int j=0;j<N;j++) 
-  // 	aof << "FFPx: "<<FFPx[j] << " " << "FFPy: "<<FFPy[j] << " "<<endl ; 
-  // aof << endl; 
-  // aof.close(); 
- 
-  // Store the number of constraint to be generated for the first 
-  // slot of time control of the algorithm. 
-  //NextNumberOfRemovedConstraints = MAL_MATRIX_NB_ROWS((LCIFF_it)->D);//Andrei 
- 
- 
- 
   //Current support foot 
   deque<LinearConstraintInequalityFreeFeet_t>::iterator LCIFF_it;
   deque<SupportFeet_t>::iterator CurSF_it; 
@@ -1295,7 +1091,6 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
  
   LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin(); 
 
- 
  
   double FFPx, FFPy; 
  
@@ -1471,26 +1266,6 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
       // aof << endl; 
       aof.close(); 
  
- 
-      // sprintf(Buffer,"lD.dat"); 
-      // aof.open(Buffer,ofstream::out); 
-      // ODEBUG3(MAL_MATRIX_NB_ROWS(lD) << " " << MAL_MATRIX_NB_COLS(lD) << " " ); 
-      // for(unsigned int lj=0;lj<MAL_MATRIX_NB_ROWS(lD);lj++) 
-      // 	{ 
-      // 	  for(unsigned int k=0;k<MAL_MATRIX_NB_COLS(lD);k++) 
-      // 	    aof << lD(lj,k) << " " ; 
-      // 	  aof << endl; 
-      // 	} 
-      // aof.close(); 
- 
-      // sprintf(Buffer,"lb.dat"); 
-      // aof.open(Buffer,ofstream::out); 
-      // for(unsigned int j=0;j<IndexConstraint;j++) 
-      // 	aof << lb(j) << " " ; 
-      // aof << endl; 
-      // aof.close(); 
- 
-      //      exit(0); 
     } 
  
   if (m_FullDebug>0) 
@@ -1508,16 +1283,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
 	} 
       aof.close(); 
  
-      //       sprintf(Buffer,"D_%f.dat",StartingTime); 
-      //       aof.open(Buffer,ofstream::out); 
-      //       for( int i=0;i<2*m_QP_N;i++) 
-      // 	{ 
-      // 	  for( int j=0;j<NbOfConstraints;j++) 
-      // 	    aof << lD(i,j) << " " ; 
-      // 	  aof << endl; 
-      // 	} 
-      //       aof.close(); 
- 
+
       if (0) 
 	{ 
 	  sprintf(Buffer,"DPX_%f.dat", StartingTime); 
@@ -1620,9 +1386,6 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       FinalZMPPositions[CurrentZMPindex].px =lStartingZMPPosition(0); 
       FinalZMPPositions[CurrentZMPindex].py = lStartingZMPPosition(1); 
       FinalZMPPositions[CurrentZMPindex].pz = lStartingZMPPosition(2); 
-//       FinalZMPPositions[CurrentZMPindex].px =0.0; 
-//       FinalZMPPositions[CurrentZMPindex].py = 0.0; 
-//       FinalZMPPositions[CurrentZMPindex].pz = 0.0; 
       FinalZMPPositions[CurrentZMPindex].theta = 0.0; 
       FinalZMPPositions[CurrentZMPindex].time = m_CurrentTime; 
       FinalZMPPositions[CurrentZMPindex].stepType = 0; 
@@ -2658,3 +2421,54 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 } 
  
  
+void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions, 
+						   deque<COMState> & COMStates, 
+						   deque<RelativeFootPosition> &RelativeFootPositions, 
+						   deque<FootAbsolutePosition> &LeftFootAbsolutePositions, 
+						   deque<FootAbsolutePosition> &RightFootAbsolutePositions, 
+						   double Xmax, 
+						   COMState & lStartingCOMState, 
+						   MAL_S3_VECTOR(&,double) lStartingZMPPosition, 
+						   FootAbsolutePosition & InitLeftFootAbsolutePosition, 
+						   FootAbsolutePosition & InitRightFootAbsolutePosition) 
+{
+}
+
+ 
+void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition, 
+					    deque<ZMPPosition> & FinalZMPPositions, 
+					    deque<COMState> & FinalCOMStates, 
+					    deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions, 
+					    deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions, 
+					    bool EndSequence) 
+{ 
+  cout << "To be implemented" << endl; 
+} 
+ 
+int ZMPVelocityReferencedQP::OnLineFootChange(double time, 
+					      FootAbsolutePosition &aFootAbsolutePosition, 
+					      deque<ZMPPosition> & FinalZMPPositions, 
+					      deque<COMState> & CoMPositions, 
+					      deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions, 
+					      deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions, 
+					      StepStackHandler  *aStepStackHandler) 
+{ 
+  cout << "To be implemented" << endl; 
+  return -1; 
+} 
+ 
+void ZMPVelocityReferencedQP::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions, 
+						   deque<COMState> &FinalCOMStates, 
+						   deque<FootAbsolutePosition> &LeftFootAbsolutePositions, 
+						   deque<FootAbsolutePosition> &RightFootAbsolutePositions) 
+{ 
+ 
+} 
+ 
+int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep() 
+{ 
+  int r = (int)(m_PreviewControlTime/m_SamplingPeriod); 
+  return 2*r; 
+} 
+ 
+

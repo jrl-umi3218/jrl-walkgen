@@ -240,8 +240,8 @@ namespace PatternGeneratorJRL
     /*! Com height */
     double m_ComHeight;
 
-//    /*! State of the trunk after one sampling period */
-//    double m_AngVelTrunkConst, m_PreviewedTrunkAngleT;
+    //    /*! State of the trunk after one sampling period */
+    //    double m_AngVelTrunkConst, m_PreviewedTrunkAngleT;
 
     /*! Orientations of the feet previewed over the whole horizon length*/
     //deque<double> PreviewedSupportAngles;
@@ -372,6 +372,46 @@ namespace PatternGeneratorJRL
 
     /*! Vector of similar constraints. */
     //vector<int> m_SimilarConstraints;
+
+  public:
+
+    /*! Methods to comply with the initial interface of ZMPRefTrajectoryGeneration. 
+      TODO: Change the internal structure to make those methods not mandatory
+      for compiling.
+     */
+
+    void GetZMPDiscretization(std::deque<ZMPPosition> & ZMPPositions,
+			      std::deque<COMState> & COMStates,
+			      std::deque<RelativeFootPosition> &RelativeFootPositions,
+			      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+			      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+			      double Xmax,
+			      COMState & lStartingCOMState,
+			      MAL_S3_VECTOR(,double) & lStartingZMPPosition,
+			      FootAbsolutePosition & InitLeftFootAbsolutePosition,
+			      FootAbsolutePosition & InitRightFootAbsolutePosition);
+
+    void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
+		       std::deque<ZMPPosition> & FinalZMPPositions,					     
+		       std::deque<COMState> & COMStates,
+		       std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+		       std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+		       bool EndSequence);
+	
+    int OnLineFootChange(double time, 
+			 FootAbsolutePosition &aFootAbsolutePosition, 
+			 deque<ZMPPosition> & FinalZMPPositions, 
+			 deque<COMState> & CoMPositions, 
+			 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions, 
+			 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions, 
+			 StepStackHandler  *aStepStackHandler);
+      
+    void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions, 
+			      deque<COMState> &FinalCOMStates, 
+			      deque<FootAbsolutePosition> &LeftFootAbsolutePositions, 
+			      deque<FootAbsolutePosition> &RightFootAbsolutePositions);
+
+    int ReturnOptimalTimeToRegenerateAStep();
   };
 };
 
