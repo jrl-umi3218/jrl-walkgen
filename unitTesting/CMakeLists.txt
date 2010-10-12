@@ -36,9 +36,10 @@ SET(_hrp2Dynamics_FOUND 0)
 SET(_hrp2Dynamics_OPTIONAL "hrp2Dynamics >= 1.1.0")
 PKG_CHECK_MODULES(_hrp2Dynamics ${_hrp2Dynamics_OPTIONAL})
 
-IF(NOT ${_hrp2Dynamics_FOUND})
+IF(NOT _hrp2Dynamics_FOUND)
   MESSAGE(WARNING "Check that package hrp2Dynamics is installed in a directory pointed out by PKG_CONFIG_PATH.")
-ELSE(NOT ${_hrp2Dynamics_FOUND})
+ELSE(NOT _hrp2Dynamics_FOUND)
+  MESSAGE(WARNING "HRP2 Dynamics FOUND !:" ${_hrp2Dynamics_FOUND})
   FOREACH(_ITEM ${_hrp2Dynamics_CFLAGS})
     SET(${PROJECT_NAME}_test_CXXFLAGS  "${${PROJECT_NAME}_test_CXXFLAGS} ${_ITEM}")
   ENDFOREACH(_ITEM)
@@ -49,7 +50,7 @@ ELSE(NOT ${_hrp2Dynamics_FOUND})
     SET(${PROJECT_NAME}_test_LDFLAGS  "${${PROJECT_NAME}_test_LDFLAGS} ${_ITEM}")
   ENDFOREACH(_ITEM)
 
-ENDIF(NOT ${_hrp2Dynamics_FOUND})
+ENDIF(NOT _hrp2Dynamics_FOUND)
 
 MESSAGE(STATUS "UL: ${${PROJECT_NAME}_test_LDFLAGS}  ${${PROJECT_NAME}_test_CXXFLAGS}")
 
@@ -60,12 +61,24 @@ SET(_dynamicsJRLJapan_FOUND 0)
 SET(_dynamicsJRLJapan_OPTIONAL "dynamicsJRLJapan >= 1.19.1")
 PKG_CHECK_MODULES(_dynamicsJRLJapan ${_dynamicsJRLJapan_OPTIONAL})
 
-IF(NOT ${_dynamicsJRLJapan_FOUND})
+IF(NOT _dynamicsJRLJapan_FOUND)
   MESSAGE(WARNING "Check that package dynamicsJRLJapan is installed in a directory pointed out by PKG_CONFIG_PATH.")
-ELSE(NOT ${_dynamicsJRLJapan_FOUND})
+ELSE(NOT _dynamicsJRLJapan_FOUND)
   EXEC_PROGRAM(${PKG_CONFIG_EXECUTABLE} ARGS  --variable=datarootdir dynamicsJRLJapan
     OUTPUT_VARIABLE _dynamicsJRLJapan_DATADIR)
-ENDIF(NOT ${_dynamicsJRLJapan_FOUND})
+  
+  IF(NOT _hrp2Dynamics_FOUND)
+    FOREACH(_ITEM ${_dynamicsJRLJapan_CFLAGS})
+      SET(${PROJECT_NAME}_test_CXXFLAGS  "${${PROJECT_NAME}_test_CXXFLAGS} ${_ITEM}")
+    ENDFOREACH(_ITEM)
+
+    FOREACH(_ITEM ${_dynamicsJRLJapan_LDFLAGS})
+      SET(${PROJECT_NAME}_test_LDFLAGS  "${${PROJECT_NAME}_test_LDFLAGS} ${_ITEM}")
+    ENDFOREACH(_ITEM)
+
+  ENDIF(NOT _hrp2Dynamics_FOUND)
+  
+ENDIF(NOT _dynamicsJRLJapan_FOUND)
 
 MESSAGE(STATUS "dynamicsJRLJapan_DATADIR:" ${_dynamicsJRLJapan_DATADIR})
 ################
