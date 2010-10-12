@@ -1,3 +1,10 @@
+jrl-walkgen (1.0.0.99-4) lucid; urgency=low
+
+  * Fixing test compilation when closed-source hrp2-dynamics package is
+    not available.
+
+ -- Thomas Moulard <thomas.moulard@gmail.com>  Tue, 12 Oct 2010 23:30:18 +0200
+
 jrl-walkgen (1.0.0.99-3) lucid; urgency=low
 
   * Add missing lapack dependency.
