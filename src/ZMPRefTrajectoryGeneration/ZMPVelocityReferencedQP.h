@@ -359,6 +359,13 @@ namespace PatternGeneratorJRL
 		    int & CriteriaToMaximize, MAL_VECTOR(& xk,double), double time);
 
 
+    void interpolateTrunkState(double time, int CurrentIndex,
+    		deque<COMState> & FinalCOMStates);
+
+    void interpolateFeetPositions(double time, int CurrentIndex,
+    				     deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+    				     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
+
     int dumpProblem(double * Q,
 		    double * D, 
 		    double * Pu,

@@ -1831,6 +1831,193 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
   memset(m_Pb.X,0,2*(m_QP_N+m_Support->StepNumber)*sizeof(double)); 
 } 
  
+void ZMPVelocityReferencedQP::interpolateTrunkState(double time, int CurrentIndex,
+		deque<COMState> & FinalCOMStates)
+{
+	if(m_Support->CurrentSupportPhase == 1 && time+m_TimeBuffer+3.0/2.0*m_QP_T < m_Support->CurrentTimeLimit)
+	{
+		//Set parameters for trunk interpolation
+
+		m_c = 3.0*(m_TrunkStateT.yaw[1]-m_TrunkState.yaw[1])/(m_QP_T*m_QP_T);
+		m_d = -2.0*m_c/(3.0*m_QP_T);
+		m_a =  m_TrunkState.yaw[1];
+
+
+		double tT;
+		double Theta = m_TrunkState.yaw[0];
+		//double dTheta = m_TrunkState.yaw[1];
+		//double ddTheta = m_TrunkState.yaw[2];
+
+		FinalCOMStates[CurrentIndex].yaw[0] = m_TrunkState.yaw[0];
+		//Interpolate the
+		for(int k = 1; k<=(int)(m_QP_T/m_SamplingPeriod);k++)
+		{
+			tT = (double)k*m_SamplingPeriod;
+			//interpolate the orientation of the trunk
+			if(fabs(m_TrunkStateT.yaw[1]-m_TrunkState.yaw[1])-0.000001 > 0)
+			{
+				m_TrunkState.yaw[0] = (((1.0/4.0*m_d*tT+1.0/3.0*m_c)*
+						tT)*tT+m_a)*tT+Theta;
+				m_TrunkState.yaw[1] = ((m_d*tT+m_c)*tT)*tT+m_a;
+				m_TrunkState.yaw[2] = (3.0*m_d*tT+2.0*m_c)*tT;
+
+				m_QueueOfTrunkStates.push_back(m_TrunkState);
+			}
+			else
+			{
+				m_TrunkState.yaw[0] += m_SamplingPeriod*m_TrunkStateT.yaw[1];
+
+				m_QueueOfTrunkStates.push_back(m_TrunkState);
+			}
+			FinalCOMStates[CurrentIndex+k].yaw[0] = m_TrunkState.yaw[0];
+			if(m_FullDebug>2)
+			{
+				ofstream aof;
+				aof.open("/tmp/Trunk.dat",ofstream::app);
+				aof<<time+k*m_SamplingPeriod<<" "<<m_TrunkState.yaw[0]<<" "<<m_TrunkState.yaw[1]<<" "<<m_TrunkState.yaw[2]<<endl;
+				aof.close();
+			}
+		}
+	}
+	else if (m_Support->CurrentSupportPhase == 0 || time+m_TimeBuffer+3.0/2.0*m_QP_T > m_Support->CurrentTimeLimit)
+	{
+		for(int k = 0; k<=(int)(m_QP_T/m_SamplingPeriod);k++)
+		{
+			FinalCOMStates[CurrentIndex+k].yaw[0] = m_TrunkState.yaw[0];
+		}
+	}
+}
+
+
+void ZMPVelocityReferencedQP::interpolateFeetPositions(double time, int CurrentIndex,
+		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
+{
+	double LocalInterpolationTime = (time+m_TimeBuffer)-(m_Support->CurrentTimeLimit-m_Support->SSPeriod);
+
+	double StepHeight = 0.05;
+	int StepType = 1;
+
+	if(m_Support->CurrentSupportPhase == 1 && time+m_TimeBuffer+3.0/2.0*m_QP_T < m_Support->CurrentTimeLimit)
+	{
+		//determine coefficients of interpolation polynom
+		double ModulationSupportCoefficient = 0.9;
+		double ModulatedSingleSupportTime = (m_Support->SSPeriod-m_QP_T) * ModulationSupportCoefficient;
+		double EndOfLiftOff = ((m_Support->SSPeriod-m_QP_T)-ModulatedSingleSupportTime)*0.5;
+		double InterpolationTimePassed = 0.0;
+		if(LocalInterpolationTime>EndOfLiftOff)
+			InterpolationTimePassed = LocalInterpolationTime-EndOfLiftOff;
+
+		FootAbsolutePosition LastSwingFootPosition;
+
+		if(m_Support->CurrentSupportFoot==1)
+		{
+			LastSwingFootPosition = FinalRightFootAbsolutePositions[CurrentIndex];
+		}
+		else
+		{
+			LastSwingFootPosition = FinalLeftFootAbsolutePositions[CurrentIndex];
+		}
+		//Set parameters for current polynomial
+		m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::X_AXIS,
+				ModulatedSingleSupportTime-InterpolationTimePassed,m_FPx,
+				LastSwingFootPosition.x,
+				LastSwingFootPosition.dx);
+		m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Y_AXIS,
+				ModulatedSingleSupportTime-InterpolationTimePassed,m_FPy,
+				LastSwingFootPosition.y,
+				LastSwingFootPosition.dy);
+
+		if(m_Support->m_StateChanged==true)
+			m_FTGS->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_Support->SSPeriod-m_QP_T,StepHeight);
+
+		m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::THETA_AXIS,
+				ModulatedSingleSupportTime-InterpolationTimePassed,
+				m_PreviewedSupportAngles[0]*180.0/M_PI,
+				LastSwingFootPosition.theta,
+				LastSwingFootPosition.dtheta);
+		m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA_AXIS,
+				ModulatedSingleSupportTime-InterpolationTimePassed,0.0*180.0/M_PI,
+				LastSwingFootPosition.omega,
+				LastSwingFootPosition.domega);
+		m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA2_AXIS,
+				ModulatedSingleSupportTime-InterpolationTimePassed,2*0.0*180.0/M_PI,
+				LastSwingFootPosition.omega2,
+				LastSwingFootPosition.domega2);
+
+		for(int k = 1; k<=(int)(m_QP_T/m_SamplingPeriod);k++)
+		{
+			if (m_Support->CurrentSupportFoot==1)
+			{
+				m_FTGS->UpdateFootPosition(FinalLeftFootAbsolutePositions,
+						FinalRightFootAbsolutePositions,
+						CurrentIndex,k,
+						LocalInterpolationTime,
+						ModulatedSingleSupportTime,
+						StepType, -1);
+			}
+			else
+			{
+				m_FTGS->UpdateFootPosition(FinalRightFootAbsolutePositions,
+						FinalLeftFootAbsolutePositions,
+						CurrentIndex,k,
+						LocalInterpolationTime,
+						ModulatedSingleSupportTime,
+						StepType, 1);
+			}
+			FinalLeftFootAbsolutePositions[CurrentIndex+k].time =
+					FinalRightFootAbsolutePositions[CurrentIndex+k].time = time+m_TimeBuffer+k*m_SamplingPeriod;
+
+
+			if(m_FullDebug>0)
+			{
+				ofstream aoffeet;
+				aoffeet.open("/tmp/Feet.dat",ios::app);
+				aoffeet<<time+m_TimeBuffer+k*m_SamplingPeriod<<"    "
+						<<FinalLeftFootAbsolutePositions[CurrentIndex+k].x<<"    "
+						<<FinalLeftFootAbsolutePositions[CurrentIndex+k].y<<"    "
+						<<FinalLeftFootAbsolutePositions[CurrentIndex+k].z<<"    "
+						<<FinalLeftFootAbsolutePositions[CurrentIndex+k].stepType<<"    "
+						<<FinalRightFootAbsolutePositions[CurrentIndex+k].x<<"    "
+						<<FinalRightFootAbsolutePositions[CurrentIndex+k].y<<"    "
+						<<FinalRightFootAbsolutePositions[CurrentIndex+k].z<<"    "
+						<<FinalRightFootAbsolutePositions[CurrentIndex+k].stepType<<"    "
+						<<endl;
+				aoffeet.close();
+			}
+
+		}
+	}
+	else if (m_Support->CurrentSupportPhase == 0 || time+m_TimeBuffer+3.0/2.0*m_QP_T > m_Support->CurrentTimeLimit)
+	{
+		for(int k = 0; k<=(int)(m_QP_T/m_SamplingPeriod);k++)
+		{
+			FinalRightFootAbsolutePositions[CurrentIndex+k]=FinalRightFootAbsolutePositions[CurrentIndex+k-1];
+			FinalLeftFootAbsolutePositions[CurrentIndex+k]=FinalLeftFootAbsolutePositions[CurrentIndex+k-1];
+			FinalLeftFootAbsolutePositions[CurrentIndex+k].time =
+					FinalRightFootAbsolutePositions[CurrentIndex+k].time = time+m_TimeBuffer+k*m_SamplingPeriod;
+			FinalLeftFootAbsolutePositions[CurrentIndex+k].stepType =
+					FinalRightFootAbsolutePositions[CurrentIndex+k].stepType = 10;
+
+			if(m_FullDebug>0)
+			{
+				ofstream aoffeet;
+				aoffeet.open("/tmp/Feet.dat",ios::app);
+				aoffeet<<time+m_TimeBuffer+k*m_SamplingPeriod<<"    "
+						<<FinalLeftFootAbsolutePositions[CurrentIndex+k].x<<"    "
+						<<FinalLeftFootAbsolutePositions[CurrentIndex+k].y<<"    "
+						<<FinalLeftFootAbsolutePositions[CurrentIndex+k].z<<"    "
+						<<FinalLeftFootAbsolutePositions[CurrentIndex+k].stepType<<"    "
+						<<FinalRightFootAbsolutePositions[CurrentIndex+k].x<<"    "
+						<<FinalRightFootAbsolutePositions[CurrentIndex+k].y<<"    "
+						<<FinalRightFootAbsolutePositions[CurrentIndex+k].z<<"    "
+						<<FinalRightFootAbsolutePositions[CurrentIndex+k].stepType<<"    "
+						<<endl;
+				aoffeet.close();
+			}
+		}
+	}
+}
 
  
 void ZMPVelocityReferencedQP::OnLine(double time, 
@@ -2083,6 +2270,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       FinalLeftFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod)); 
       FinalRightFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod)); 
  
+      //TODO: The variable CurrentIndex might be obsolete as it introduces a buffer which might be unnecessary.
       int CurrentIndex = (int)(m_TimeBuffer/m_SamplingPeriod)
 	-1
 	//	-(int)(ldt/m_SamplingPeriod)-1 //<- This part is supposed to be equal to zero.
@@ -2178,172 +2366,13 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  aof<<time<<" "<<m_UpperTimeLimitToUpdate<<endl; 
 	} 
  
-      double LocalInterpolationTime = (time+m_TimeBuffer)-(m_Support->CurrentTimeLimit-m_Support->SSPeriod); 
+      interpolateTrunkState(time, CurrentIndex,
+          		FinalCOMStates);
 
-      double StepHeight = 0.05; 
+      interpolateFeetPositions(time, CurrentIndex,
+    		  FinalLeftFootAbsolutePositions,
+    		  FinalRightFootAbsolutePositions);
 
-      if(m_Support->CurrentSupportPhase == 1 && time+m_TimeBuffer+3.0/2.0*m_QP_T < m_Support->CurrentTimeLimit) 
-	{ 
-	  //determine coefficients of interpolation polynom 
-	  double ModulationSupportCoefficient = 0.9; 
-	  double ModulatedSingleSupportTime = (m_Support->SSPeriod-m_QP_T) * ModulationSupportCoefficient; 
-	  double EndOfLiftOff = ((m_Support->SSPeriod-m_QP_T)-ModulatedSingleSupportTime)*0.5; 
-	  double InterpolationTimePassed = 0.0; 
-	  if(LocalInterpolationTime>EndOfLiftOff) 
-	    InterpolationTimePassed = LocalInterpolationTime-EndOfLiftOff; 
- 
-	  FootAbsolutePosition LastSwingFootPosition; 
- 
-	  if(m_Support->CurrentSupportFoot==1) 
-	    { 
-	      LastSwingFootPosition = FinalRightFootAbsolutePositions[CurrentIndex]; 
-	    } 
-	  else 
-	    { 
-	      LastSwingFootPosition = FinalLeftFootAbsolutePositions[CurrentIndex]; 
-	    } 
-	  //Set parameters for current polynomial 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::X_AXIS, 
-						    ModulatedSingleSupportTime-InterpolationTimePassed,m_FPx, 
-						    LastSwingFootPosition.x, 
-						    LastSwingFootPosition.dx); 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Y_AXIS, 
-						    ModulatedSingleSupportTime-InterpolationTimePassed,m_FPy, 
-						    LastSwingFootPosition.y, 
-						    LastSwingFootPosition.dy); 
- 
-	  if(m_Support->m_StateChanged==true) 
-	    m_FTGS->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_Support->SSPeriod-m_QP_T,StepHeight); 
- 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::THETA_AXIS, 
-						    ModulatedSingleSupportTime-InterpolationTimePassed,  
-						    m_PreviewedSupportAngles[0]*180.0/M_PI, 
-						    LastSwingFootPosition.theta, 
-						    LastSwingFootPosition.dtheta); 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA_AXIS, 
-						    ModulatedSingleSupportTime-InterpolationTimePassed,0.0*180.0/M_PI, 
-						    LastSwingFootPosition.omega, 
-						    LastSwingFootPosition.domega); 
-	  m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA2_AXIS, 
-						    ModulatedSingleSupportTime-InterpolationTimePassed,2*0.0*180.0/M_PI, 
-						    LastSwingFootPosition.omega2, 
-						    LastSwingFootPosition.domega2); 
- 
-	  //Set parameters for trunk interpolation 
- 
-	  m_c = 3.0*(m_TrunkStateT.yaw[1]-m_TrunkState.yaw[1])/(m_QP_T*m_QP_T); 
-	  m_d = -2.0*m_c/(3.0*m_QP_T); 
-	  m_a =  m_TrunkState.yaw[1]; 
- 
- 
-	  double tT; 
-	  double Theta = m_TrunkState.yaw[0]; 
-	  //double dTheta = m_TrunkState.yaw[1]; 
-	  //double ddTheta = m_TrunkState.yaw[2]; 
-	  int StepType = 1; 
-
-	  FinalCOMStates[CurrentIndex].yaw[0] = m_TrunkState.yaw[0]; 
-	  //Interpolate the 
-	  for(int k = 1; k<=(int)(m_QP_T/m_SamplingPeriod);k++) 
-	    { 
-	      tT = (double)k*m_SamplingPeriod; 
-	      //interpolate the orientation of the trunk 
-	      if(fabs(m_TrunkStateT.yaw[1]-m_TrunkState.yaw[1])-0.000001 > 0) 
-		{ 
-		  m_TrunkState.yaw[0] = (((1.0/4.0*m_d*tT+1.0/3.0*m_c)* 
-					  tT)*tT+m_a)*tT+Theta; 
-		  m_TrunkState.yaw[1] = ((m_d*tT+m_c)*tT)*tT+m_a; 
-		  m_TrunkState.yaw[2] = (3.0*m_d*tT+2.0*m_c)*tT; 
- 
-		  m_QueueOfTrunkStates.push_back(m_TrunkState); 
-		} 
-	      else 
-		{ 
-		  m_TrunkState.yaw[0] += m_SamplingPeriod*m_TrunkStateT.yaw[1]; 
-
-		  m_QueueOfTrunkStates.push_back(m_TrunkState);
-		}
-	      FinalCOMStates[CurrentIndex+k].yaw[0] = m_TrunkState.yaw[0];
-	      if(m_FullDebug>2)
-		{
-		  ofstream aof;
-		  aof.open("/tmp/Trunk.dat",ofstream::app);
-		  aof<<time+k*m_SamplingPeriod<<" "<<m_TrunkState.yaw[0]<<" "<<m_TrunkState.yaw[1]<<" "<<m_TrunkState.yaw[2]<<endl; 
-		  aof.close();
-		}
-
-	      if (m_Support->CurrentSupportFoot==1)
-		{
-		  m_FTGS->UpdateFootPosition(FinalLeftFootAbsolutePositions,
-					     FinalRightFootAbsolutePositions,
-					     CurrentIndex,k,
-					     LocalInterpolationTime,
-					     ModulatedSingleSupportTime,
-					     StepType, -1);
-		} 
-	      else 
-		{ 
-		  m_FTGS->UpdateFootPosition(FinalRightFootAbsolutePositions, 
-					     FinalLeftFootAbsolutePositions, 
-					     CurrentIndex,k, 
-					     LocalInterpolationTime, 
-					     ModulatedSingleSupportTime, 
-					     StepType, 1); 
-		} 
-	      FinalLeftFootAbsolutePositions[CurrentIndex+k].time = 
-		FinalRightFootAbsolutePositions[CurrentIndex+k].time = time+m_TimeBuffer+k*m_SamplingPeriod; 
- 
-	      
-	      if(m_FullDebug>0) 
-		{ 
-		  ofstream aoffeet; 
-		  aoffeet.open("/tmp/Feet.dat",ios::app); 
-		  aoffeet<<time+m_TimeBuffer+k*m_SamplingPeriod<<"    " 
-			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].x<<"    " 
-			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].y<<"    " 
-			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].z<<"    " 
-			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].stepType<<"    " 
-			 <<FinalRightFootAbsolutePositions[CurrentIndex+k].x<<"    " 
-			 <<FinalRightFootAbsolutePositions[CurrentIndex+k].y<<"    " 
-			 <<FinalRightFootAbsolutePositions[CurrentIndex+k].z<<"    " 
-			 <<FinalRightFootAbsolutePositions[CurrentIndex+k].stepType<<"    " 
-			 <<endl; 
-		  aoffeet.close(); 
-		} 
- 
-	    } 
-	} 
-      else if (m_Support->CurrentSupportPhase == 0 || time+m_TimeBuffer+3.0/2.0*m_QP_T > m_Support->CurrentTimeLimit) 
-	{
-	  for(int k = 0; k<=(int)(m_QP_T/m_SamplingPeriod);k++) 
-	    { 
-		  FinalCOMStates[CurrentIndex+k].yaw[0] = m_TrunkState.yaw[0];
-
-			  FinalRightFootAbsolutePositions[CurrentIndex+k]=FinalRightFootAbsolutePositions[CurrentIndex+k-1];
-	      FinalLeftFootAbsolutePositions[CurrentIndex+k]=FinalLeftFootAbsolutePositions[CurrentIndex+k-1]; 
-	      FinalLeftFootAbsolutePositions[CurrentIndex+k].time = 
-		FinalRightFootAbsolutePositions[CurrentIndex+k].time = time+m_TimeBuffer+k*m_SamplingPeriod; 
-	      FinalLeftFootAbsolutePositions[CurrentIndex+k].stepType = 
-		FinalRightFootAbsolutePositions[CurrentIndex+k].stepType = 10; 
-
-	      if(m_FullDebug>0) 
-		{ 
-		  ofstream aoffeet; 
-		  aoffeet.open("/tmp/Feet.dat",ios::app); 
-		  aoffeet<<time+m_TimeBuffer+k*m_SamplingPeriod<<"    " 
-			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].x<<"    " 
-			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].y<<"    " 
-			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].z<<"    " 
-			 <<FinalLeftFootAbsolutePositions[CurrentIndex+k].stepType<<"    " 
-			 <<FinalRightFootAbsolutePositions[CurrentIndex+k].x<<"    " 
-			 <<FinalRightFootAbsolutePositions[CurrentIndex+k].y<<"    " 
-			 <<FinalRightFootAbsolutePositions[CurrentIndex+k].z<<"    " 
-			 <<FinalRightFootAbsolutePositions[CurrentIndex+k].stepType<<"    " 
-			 <<endl; 
-		  aoffeet.close(); 
-		} 
-	    } 
-	} 
  
       if(m_UpperTimeLimitToUpdate==0.0) 
 	m_UpperTimeLimitToUpdate = time+m_QP_T; 
