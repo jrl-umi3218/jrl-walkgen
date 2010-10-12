@@ -73,71 +73,25 @@ namespace PatternGeneratorJRL
     unsigned int NbOfStepsSSDS;
 
  
-    /*! \brief Current support state */
-    //enum supportType {SS = 1, DS = 0} ;
-    //enum footType {Left = 1, Right = -1} ;
-	
-	
-    /*! \brief Support state transitions */
-    //enum transitionType {SSDS, DSSS, SSSS, ZERO};
-	
-    /*! \brief Start time of the previewed support state. */
-    //double PreviewedStateStartTime;
-	
-    /*! \brief Previewed support state */
-    //int PreviewedStepsLeft;
-    //int PreviewedStepNumber;
-	
-    /* ! \brief Vector of previewed angles  */
-    //MAL_VECTOR(PreviewedAngles,double);
-	
-    /* ! \brief Translational velocity references  */
-    //double TransVelRefX;
-    //double TransVelRefY;
-	
-	
-	
-    /*! \name Internal state methods. 
-      @{
-    */
-    /* ! \brief Finite state machine  *//*
-       void switchState(int &SupportPhase,
-       int &SupportFoot,
-       int &StepsLeft,
-       double &SupportDuration,
-       int &StepNumber,
-       //MAL_VECTOR(,double) &PreviewedAngles,
-       //const double AngVelTrunk,
-       const double TransVelRefX,
-       const double TransVelRefY);
-					*/
-	
   private: 
 	
     /*! \Brief Sampling duration */
     double m_T;
 
     /*! \Brief Support state */
-    int *SupportPhase, *SupportFoot, *SupportStepsLeft;
+    int *m_SupportPhase, *m_SupportFoot, *m_SupportStepsLeft;
 
-    double *SupportTimeLimit;
+    double *m_SupportTimeLimit;
     void initializePreviewedState();
 
     int ReferenceGiven;
 
     int m_FullDebug;
 
-    /*! \name Getter of variables
-      @{
-    */
-    /*! Getter for the support phase */
-    //	const int & SupportState::getSupportPhase () const;
+
+    ///*! Getter for the support state */
+    //const void SupportState::getSupportState () const;
 	
-    /*! Getter for the support foot */
-    //	const int & SupportState::getSupportFoot () const;
-	
-    /*! Getter for the step number */
-    //	const int & SupportState::getStepNumber () const;
     
   };
 };

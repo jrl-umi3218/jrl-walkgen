@@ -55,9 +55,6 @@ SupportState::SupportState(const double &SamplingPeriod)
 
   m_FullDebug = 0;
 
-  // RESETDEBUG4("DebugSupportState.dat");
-  // ofstream aof("SupportStates.dat");
-
 }
  
 
@@ -72,61 +69,60 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
   m_StateChanged = false;
 
   if(pi==0) {
-    SupportPhase = &CurrentSupportPhase;
-    SupportFoot = &CurrentSupportFoot;
-    SupportStepsLeft = &CurrentStepsLeft;//to be changed
-    SupportTimeLimit = &CurrentTimeLimit;
+    m_SupportPhase = &CurrentSupportPhase;
+    m_SupportFoot = &CurrentSupportFoot;
+    m_SupportStepsLeft = &CurrentStepsLeft;
+    m_SupportTimeLimit = &CurrentTimeLimit;
     StepNumber = 0;
     SSSS = 0;
   }
   else {
-    SupportPhase = &PrwSupportPhase;
-    SupportFoot = &PrwSupportFoot;
-    SupportStepsLeft = &PrwStepsLeft;//to be changed
-    SupportTimeLimit = &PrwTimeLimit;
+    m_SupportPhase = &PrwSupportPhase;
+    m_SupportFoot = &PrwSupportFoot;
+    m_SupportStepsLeft = &PrwStepsLeft;
+    m_SupportTimeLimit = &PrwTimeLimit;
   }
 
   
   ReferenceGiven = -1;
-  if(fabs(RefVel.x)>0||fabs(RefVel.y)>0)//Andremize
+  if(fabs(RefVel.x)>0||fabs(RefVel.y)>0)
     ReferenceGiven = 1;
     
-  if(ReferenceGiven == 1 && *SupportPhase == 0 && (*SupportTimeLimit-Time-eps)>DSSSDuration)
+  if(ReferenceGiven == 1 && *m_SupportPhase == 0 && (*m_SupportTimeLimit-Time-eps)>DSSSDuration)
     {
-      *SupportTimeLimit = Time+DSSSDuration; 
+      *m_SupportTimeLimit = Time+DSSSDuration;
     }
  
    
   //FSM
-  if(Time+eps+pi*m_T >= *SupportTimeLimit)
+  if(Time+eps+pi*m_T >= *m_SupportTimeLimit)
     {
       //SS->DS
-      if(*SupportPhase == 1  && ReferenceGiven == -1 && *SupportStepsLeft==0)
+      if(*m_SupportPhase == 1  && ReferenceGiven == -1 && *m_SupportStepsLeft==0)
 	{
-	  *SupportPhase = 0;	
-	  *SupportTimeLimit = Time+pi*m_T + DSDuration;
+	  *m_SupportPhase = 0;
+	  *m_SupportTimeLimit = Time+pi*m_T + DSDuration;
 	  m_StateChanged = true;
 	}
       //DS->SS
-      else if(*SupportPhase == 0 && ReferenceGiven == 1)
+      else if(*m_SupportPhase == 0 && ReferenceGiven == 1)
 	{
-	  *SupportPhase = 1;
-	  //*SupportFoot = CurrentSupportFoot;//StartSupportFoot;
-	  *SupportTimeLimit = Time+pi*m_T + SSPeriod;
-	  *SupportStepsLeft = NbOfStepsSSDS;
+	  *m_SupportPhase = 1;
+	  *m_SupportTimeLimit = Time+pi*m_T + SSPeriod;
+	  *m_SupportStepsLeft = NbOfStepsSSDS;
 	  m_StateChanged = true;
 	}
       //SS->SS
-      else if(((*SupportPhase == 1) && (*SupportStepsLeft>0)) || 
-	      ((*SupportStepsLeft==0) && (ReferenceGiven == 1)))
+      else if(((*m_SupportPhase == 1) && (*m_SupportStepsLeft>0)) ||
+	      ((*m_SupportStepsLeft==0) && (ReferenceGiven == 1)))
 	{
-	  *SupportFoot = -1**SupportFoot;
+	  *m_SupportFoot = -1**m_SupportFoot;
 	  m_StateChanged = true;
-	  *SupportTimeLimit = Time+pi*m_T + SSPeriod;
+	  *m_SupportTimeLimit = Time+pi*m_T + SSPeriod;
 	  StepNumber++;
 	  SSSS = 1;
 	  if (ReferenceGiven == -1)
-	    *SupportStepsLeft = *SupportStepsLeft-1;
+	    *m_SupportStepsLeft = *m_SupportStepsLeft-1;
 	}
     }
 
@@ -143,17 +139,14 @@ void SupportState::setSupportState(const double &Time, const int &pi,  const Ref
   	  <<" CSF: "<<CurrentSupportFoot<<" CTL: "<<CurrentTimeLimit
   	  <<" CSL: "<<CurrentStepsLeft<<" PrwSP: "<<PrwSupportPhase
   	  <<" PrwSF: "<<PrwSupportFoot<<" PrwTL: "<<PrwTimeLimit
-  	  <<" PrwSL: "<<PrwStepsLeft<<" *SF: "<<*SupportFoot
-  	  <<" *SSL: "<<*SupportStepsLeft<<" SN: "<<StepNumber;
+  	  <<" PrwSL: "<<PrwStepsLeft<<" *SF: "<<*m_SupportFoot
+  	  <<" *SSL: "<<*m_SupportStepsLeft<<" SN: "<<StepNumber;
       aof << endl;
       aof.close();
     }
 
- // ODEBUG4( " " , "DebugSupportState.dat");
-
 }
 
-//Andremize: initialization only necessary when state changes
 void SupportState::initializePreviewedState()
 { 
   PrwSupportPhase = CurrentSupportPhase;

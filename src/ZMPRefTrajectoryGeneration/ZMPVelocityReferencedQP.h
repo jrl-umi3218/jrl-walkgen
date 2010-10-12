@@ -264,6 +264,7 @@ namespace PatternGeneratorJRL
     /*! Orientations of the previewed support feet */
     deque<double> m_PreviewedSupportAngles;
 
+    //Final optimization problem
     struct Problem_s
     {
     	int m, me, mmax, n, nmax, mnn;
@@ -275,6 +276,17 @@ namespace PatternGeneratorJRL
     typedef struct Problem_s Problem;
 
     Problem m_Pb;
+
+    // State of the support
+    struct SupportState_s
+    {
+    	int Phase, Foot, StepsLeft;
+    	double TimeLimit;
+    };
+    typedef struct SupportState_s SupportState_t;
+
+    SupportState_t m_CurrentSupport;
+
 
     /*! \name Variables related to the QP
       @{ */
