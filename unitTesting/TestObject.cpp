@@ -83,7 +83,7 @@ namespace PatternGeneratorJRL
 
       bool fileExist = false;
       {
-	std::ofstream file (RobotFileName.c_str ());
+	std::ifstream file (RobotFileName.c_str ());
 	fileExist = !file.fail ();
       }
       if (!fileExist)
@@ -190,7 +190,8 @@ namespace PatternGeneratorJRL
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI.dat";
 	  aof.open(aFileName.c_str(),ofstream::app);
-
+	  aof.precision(8);
+	  aof.setf(ios::scientific, ios::floatfield);
 	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "
 	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "
