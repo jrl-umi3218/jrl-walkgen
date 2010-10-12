@@ -55,7 +55,6 @@ namespace PatternGeneratorJRL {
 namespace TestSuite {
 
 
-//      ":comheight 0.807727",
 void CommonInitialization(PatternGeneratorInterface &aPGI)
 {
   const char lBuffer[12][256] =
