@@ -38,7 +38,7 @@
 #include <Mathematics/OptCholesky.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 #include <Mathematics/PLDPSolverHerdt.h> 
-#include <PreviewControl/SupportState.h>
+#include <PreviewControl/SupportFSM.h>
 #include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
 
@@ -198,8 +198,6 @@ namespace PatternGeneratorJRL
     static const unsigned int PLDP=2;
     static const unsigned int PLDPHerdt = 3;
 
-    unsigned int Online;//Andremize: Shall I keep it?
-
   private:
 
     double m_RobotMass;
@@ -222,7 +220,7 @@ namespace PatternGeneratorJRL
     LinearizedInvertedPendulum2D * m_2DLIPM;
     
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
-    SupportState * m_Support;
+    SupportFSM * m_SupportFSM;
 
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
     OrientationsPreview * m_OP;
@@ -239,12 +237,6 @@ namespace PatternGeneratorJRL
     
     /*! Com height */
     double m_ComHeight;
-
-    //    /*! State of the trunk after one sampling period */
-    //    double m_AngVelTrunkConst, m_PreviewedTrunkAngleT;
-
-    /*! Orientations of the feet previewed over the whole horizon length*/
-    //deque<double> PreviewedSupportAngles;
 
     /*! Current state of the trunk */
     COMState m_TrunkState, m_TrunkStateT;
@@ -277,15 +269,7 @@ namespace PatternGeneratorJRL
 
     Problem m_Pb;
 
-    // State of the support
-    struct SupportState_s
-    {
-    	int Phase, Foot, StepsLeft;
-    	double TimeLimit;
-    };
-    typedef struct SupportState_s SupportState_t;
-
-    SupportState_t m_CurrentSupport;
+    SupportState_t m_CurrentSupport, m_PrwSupport;
 
 
     /*! \name Variables related to the QP
@@ -388,9 +372,6 @@ namespace PatternGeneratorJRL
 		    MAL_VECTOR(& xk,double),
 		    double Time
 		    );
-
-    /*! Vector of similar constraints. */
-    //vector<int> m_SimilarConstraints;
 
   public:
 

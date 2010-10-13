@@ -47,8 +47,6 @@ FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM,
 				       double ConstraintOnY) :
   SimplePlugin(aSPM)
 {
-
-  // printf("Entered FootConstraintsAsLinearSystemForVelRef \n");
   m_HS = aHS;
   // Read humanoid specificities.
   lRightFoot = m_HS->rightFoot();
@@ -103,24 +101,13 @@ FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM,
       aof.open("/tmp/ConvexHull.dat",ofstream::out);
       aof.close();
     }
-  //   printf("Leaving FootConstraintsAsLinearSystemForVelRef \n");
+
 }
 
 FootConstraintsAsLinearSystemForVelRef::
 ~FootConstraintsAsLinearSystemForVelRef()
 {
-  // if (CHLeftFPosConstrArrayX!=0)
-  //   delete [] CHLeftFPosConstrArrayX;
-  // if (CHLeftFPosConstrArrayY!=0)
-  //   delete [] CHLeftFPosConstrArrayY;
-  // if (CHRightFPosConstrArrayX!=0)
-  //   delete [] CHRightFPosConstrArrayX;
-  // if (CHRightFPosConstrArrayY!=0)
-  //   delete [] CHRightFPosConstrArrayY;
-  //  if (CHFPosConstrArrayX!=0)
-  //   delete [] CHFPosConstrArrayX;
-  // if (CHFPosConstrArrayY!=0)
-  //   delete [] CHFPosConstrArrayY;
+
 }
 
 
@@ -169,13 +156,8 @@ int FootConstraintsAsLinearSystemForVelRef::FindSimilarConstraints(MAL_MATRIX(&A
 int FootConstraintsAsLinearSystemForVelRef::computeLinearSystem(vector<CH_Point> aVecOfPoints,
 						       MAL_MATRIX(&D,double),
 						       MAL_MATRIX(&Dc,double),
-						       SupportState * Support
-						       )
+						       SupportState_t PrwSupport)
 {
-  // printf("Entered computeLinearSystem \n");
-
-
-
 
   double dx,dy,dc,x1,y1,x2,y2;
   unsigned int n = aVecOfPoints.size();
@@ -198,17 +180,12 @@ int FootConstraintsAsLinearSystemForVelRef::computeLinearSystem(vector<CH_Point>
       dc = dx*x1+dy*y1;
 
       //symmetrical constraints
-      dx = (double)Support->PrwSupportFoot*dx;
-      dy = (double)Support->PrwSupportFoot*dy;
-      dc = (double)Support->PrwSupportFoot*dc;
+      dx = (double)PrwSupport.Foot*dx;
+      dy = (double)PrwSupport.Foot*dy;
+      dc = (double)PrwSupport.Foot*dc;
 
       D(i,0) = dx; D(i,1)= dy;
       Dc(i,0) = dc;
-
-      //C is not filled
-
-      //ODEBUG4("D("<<i<<",:): " <<dx<<" "<<dy<<" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
-      // ODEBUG4(" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
     }
 
   {
@@ -227,23 +204,13 @@ int FootConstraintsAsLinearSystemForVelRef::computeLinearSystem(vector<CH_Point>
     dc = dx*x1+dy*y1;
 
     //symmetrical constraints cannot be achieved without knowledge of the support foot
-    dx = (double)Support->PrwSupportFoot*dx;
-    dy = (double)Support->PrwSupportFoot*dy;
-    dc = (double)Support->PrwSupportFoot*dc;
+    dx = (double)PrwSupport.Foot*dx;
+    dy = (double)PrwSupport.Foot*dy;
+    dc = (double)PrwSupport.Foot*dc;
 
     D(i,0) = dx; D(i,1)= dy;
     Dc(i,0) = dc;
-
-    //C is not filled
-
-    //ODEBUG4("D("<<i<<",:): " <<dx<<" "<<dy<<" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
-    // ODEBUG4(" Dc("<<i<<"): " << dc,"Constraints-fCSALS.dat");
   }
-
-
-  //ODEBUG4(" \n","Constraints-fCSALS.dat");
-
-  // printf("Finished computeLinearSystem \n");
 
   return 0;
 }
@@ -257,15 +224,10 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 								     QueueOfFeetPosInequalities,
 								     ReferenceAbsoluteVelocity & RefVel,
 								     double StartingTime, double m_QP_N,
-								     SupportState * Support, 
+								     SupportFSM * SupportFSM, SupportState_t CurrentSupport, SupportState_t & PrwSupport,
 								     deque<double> &PreviewedSupportAngles,
 								     int & NbOfConstraints)
 {
-
-  //  printf("Entered buildLinearConstraintInequalities \n");
-
-  // ComputeCH=0;
-  // lx=0.0, ly=0.0;
 
   //For symmetrical constraints: The points of the left foot are counted clockwise.
   //The
@@ -287,7 +249,7 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
   deque<FootAbsolutePosition>::iterator FAP_it;
 
 
-  if(Support->CurrentSupportFoot==1)
+  if(CurrentSupport.Foot==1)
     {
       FAP_it = LeftFootAbsolutePositions.end();
       FAP_it--;
@@ -309,27 +271,34 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
       aof.close();
     }
 
+  //initialize the previewed support state before previewing
+  PrwSupport.Phase  = CurrentSupport.Phase;
+  PrwSupport.Foot  = CurrentSupport.Foot;
+  PrwSupport.StepsLeft  = CurrentSupport.StepsLeft;
+  PrwSupport.TimeLimit = CurrentSupport.TimeLimit;
+  PrwSupport.StepNumber  = 0;
+
   for(unsigned int i=1;i<=m_QP_N;i++)
     {
 
-      Support->setSupportState(StartingTime, i, RefVel);
+      SupportFSM->setSupportState(StartingTime, i, PrwSupport, RefVel);
 
       ComputeCH=0;
 
       TheConvexHull.resize(4);//As for now only ZMP constraints
 
-      //Andremize: theta = 0 as for now
+      //TODO: theta = 0 as for now
 
-      if(Support->m_StateChanged && Support->StepNumber>0)
+      if(PrwSupport.StateChanged && PrwSupport.StepNumber>0)
 	{
-	  s_t = sin(PreviewedSupportAngles[Support->StepNumber-1]);
-	  c_t = cos(PreviewedSupportAngles[Support->StepNumber-1]);
+	  s_t = sin(PreviewedSupportAngles[PrwSupport.StepNumber-1]);
+	  c_t = cos(PreviewedSupportAngles[PrwSupport.StepNumber-1]);
 
 	  if(m_FullDebug>2)
 	    {
 	      ofstream aof;
 	      aof.open("/tmp/SupportOrientations.dat",ofstream::app);
-	      aof<<" PreviewedAngle: "<<PreviewedSupportAngles[Support->StepNumber-1];
+	      aof<<" PreviewedAngle: "<<PreviewedSupportAngles[PrwSupport.StepNumber-1];
 	      aof.close();
 	    }
 	}
@@ -337,13 +306,13 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
       double FootHalfWidth, FootHalfHeight;
 
       //Prepare the computation of the convex hull
-      if(Support->PrwSupportPhase == 0)
+      if(PrwSupport.Phase == 0)
 	{
-	  //Andremize: theta == 0
+	  //TODO: theta = 0
 	  lx = 0.0;
-	  ly = -(double)Support->PrwSupportFoot*DSFeetDistance/2.0;
+	  ly = -(double)PrwSupport.Foot*DSFeetDistance/2.0;
 
-	  if(Support->PrwSupportFoot == 1)
+	  if(PrwSupport.Foot == 1)
 	    {
 	      FootHalfWidth = lLeftFootHalfWidth;
 	      FootHalfHeight = lLeftFootHalfHeightDS;
@@ -362,11 +331,11 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 	}
       else
 	{
-	  //Andremize: theta == 0
+	  //TODO: theta = 0
 	  lx = 0.0;
 	  ly = 0.0;
 
-	  if(Support->PrwSupportFoot == 1)
+	  if(PrwSupport.Foot == 1)
 	    {
 	      FootHalfWidth = lLeftFootHalfWidth;
 	      FootHalfHeight = lLeftFootHalfHeight;
@@ -383,7 +352,6 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 	      lycoefs = lycoefsRight;
 	    }
 	}
-
 
       //Compute the convex hull
       for(unsigned j=0;j<4;j++)
@@ -404,17 +372,15 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 		  
 	}
 
-
-
       //foot positionning constraints
-      if(Support->m_StateChanged && Support->StepNumber>0)
+      if(PrwSupport.StateChanged && PrwSupport.StepNumber>0)
 	{
-	  //Andremize: theta == 0
+	  //TODO: theta == 0
 	  lx = 0.0;
 	  ly = 0.0;
-	  //Andremize: Has to be the angle of the previous foot
+	  //TODO: Has to be the angle of the previous foot
 
-	  if(Support->StepNumber==1)
+	  if(PrwSupport.StepNumber==1)
 	    {
 	      s_t = sin(FAP_it->theta*M_PI/180.0);
 	      c_t = cos(FAP_it->theta*M_PI/180.0);
@@ -429,18 +395,18 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 	    }
 	  else
 	    {
-	      s_t = sin(PreviewedSupportAngles[Support->StepNumber-2]);
-	      c_t = cos(PreviewedSupportAngles[Support->StepNumber-2]);
+	      s_t = sin(PreviewedSupportAngles[PrwSupport.StepNumber-2]);
+	      c_t = cos(PreviewedSupportAngles[PrwSupport.StepNumber-2]);
 
 	      if(m_FullDebug>2)
 		{
 		  ofstream aof;
 		  aof.open("/tmp/SupportOrientations.dat",ofstream::app);
-		  aof<<" AngleFootConstraints: "<<PreviewedSupportAngles[Support->StepNumber-2];
+		  aof<<" AngleFootConstraints: "<<PreviewedSupportAngles[PrwSupport.StepNumber-2];
 		  aof.close();
 		}
 	    }
-	  if(Support->PrwSupportFoot == 1)
+	  if(PrwSupport.Foot == 1)
 	    {
 	      CHFPosConstrArrayX = CHLeftFPosConstrArrayX;
 	      CHFPosConstrArrayY = CHLeftFPosConstrArrayY;
@@ -451,7 +417,7 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 	      CHFPosConstrArrayY = CHRightFPosConstrArrayY;
 	    }
 
-	  //Andremize: The interior border does not yet depend on the angle
+	  //TODO: The interior border does not yet depend on the angle
 	  for(unsigned j=0;j<5;j++)
 	    {
 	      ConvexHullFP[j].col = lx + ( CHFPosConstrArrayX[j] * c_t - CHFPosConstrArrayY[j] * s_t );
@@ -460,9 +426,9 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 
 	  LinearConstraintInequalityFreeFeet_t aLCIFP;
 
-	  computeLinearSystem(ConvexHullFP, aLCIFP.D, aLCIFP.Dc, Support);
+	  computeLinearSystem(ConvexHullFP, aLCIFP.D, aLCIFP.Dc, PrwSupport);
 
-	  aLCIFP.StepNumber = Support->StepNumber;
+	  aLCIFP.StepNumber = PrwSupport.StepNumber;
 
 	  QueueOfFeetPosInequalities.push_back(aLCIFP);
 
@@ -471,19 +437,11 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
       // Linear Constraint Inequality
       LinearConstraintInequalityFreeFeet_t aLCI;
       
-
-      // Building those constraints.
-      //ComputeLinearSystem(TheConvexHull, aLCI->A, aLCI->B, aLCI->Center);
-      //
-      computeLinearSystem(TheConvexHull, aLCI.D, aLCI.Dc, Support);
+      // Building those constraints
+      computeLinearSystem(TheConvexHull, aLCI.D, aLCI.Dc, PrwSupport);
 
       //For selection vectors and matrices when computing the constraints
-      aLCI.StepNumber = Support->StepNumber;
-
-      // Finding the similar one (i.e. Ai identical).
-      //FindSimilarConstraints(aLCI->A,aLCI->SimilarConstraints);
-
-      //aLCI->StartingTime = LeftFootAbsolutePositions[i].time;//???What to do
+      aLCI.StepNumber = PrwSupport.StepNumber;
 
       QueueOfLConstraintInequalitiesFreeFeet.push_back(aLCI);
 
@@ -501,11 +459,11 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 	  LCIFF_it++; 
 	} 
 		
-      if(Support->StepNumber>0) 
+      if(PrwSupport.StepNumber>0)
 	{ 
 	  LCIFF_it = QueueOfFeetPosInequalities.begin(); 
 		    
-	  IndexConstraint += double(Support->StepNumber)*  MAL_MATRIX_NB_ROWS(LCIFF_it->D); 
+	  IndexConstraint += double(PrwSupport.StepNumber)*MAL_MATRIX_NB_ROWS(LCIFF_it->D);
 	} 
 		
       NbOfConstraints = IndexConstraint; 
@@ -515,9 +473,6 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 
   ODEBUG("Size of the 5 ms array: "<< LeftFootAbsolutePositions.size());
   ODEBUG("Size of the queue of Linear Constraint Inequalities " << QueueOfLConstraintInequalitiesFreeFeet.size());
-
-  // printf("Leaving buildLinearConstraintInequalities \n");
-
   return 0;
 }
 
