@@ -1108,7 +1108,6 @@ namespace PatternGeneratorJRL {
       {
 	m_InternalClock = 0.0;
 	setVelReference(strm);
-	m_ZMPVRQP->Online = 1;
 	initOnlineHerdt();
 	printf("Online \n");
 	//ODEBUG4("InitOnLine","DebugHerdt.txt");
@@ -1320,18 +1319,16 @@ namespace PatternGeneratorJRL {
 	  }
       }
 
-    if (m_AlgorithmforZMPCOM==ZMPCOM_HERDT_2010 && m_ZMPVRQP->Online==1)
+    if (m_AlgorithmforZMPCOM==ZMPCOM_HERDT_2010)
       {
 	ODEBUG("InternalClock:" <<m_InternalClock  <<
 	       " SamplingPeriod: "<<m_SamplingPeriod);
 
-	// cout<<"size before online"<<m_ZMPPositions.size()<<endl;
 	m_ZMPVRQP->OnLine(m_InternalClock,
 			  m_ZMPPositions,
 			  m_COMBuffer,
 			  m_LeftFootPositions,
 			  m_RightFootPositions);
-	// cout<<"size after online"<<m_ZMPPositions.size()<<endl;
       }
 
 
