@@ -40,7 +40,7 @@ SET(libwpg_src
 	./PreviewControl/OptimalControllerSolver.cpp 
 	./PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp 
 	./PreviewControl/LinearizedInvertedPendulum2D.cpp
-	./PreviewControl/SupportFSM.cpp
+	./PreviewControl/SupportState.cpp
 	./ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp 
 	./ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp 
