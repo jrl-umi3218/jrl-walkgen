@@ -64,6 +64,23 @@ namespace PatternGeneratorJRL
        */
       virtual void CallMethod(std::string & Method, std::istringstream &Args);
 
+	  /*! Caution, this overload doesn't aim the same goal as the virtual interface, but to change any step
+		in the steps stack, the number of the step to change is set in the aFootAbsolutePosition.stepType*
+	  */
+	  virtual int OnLineFootChange(double time,
+				 FootAbsolutePosition &aFootAbsolutePosition,
+				 std::deque<ZMPPosition> & FinalZMPPositions,			     
+				 std::deque<COMState> & COMStates,
+				 std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+				 std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+				 StepStackHandler * aStepStackHandler);
+
+	  virtual void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
+			       std::deque<ZMPPosition> & FinalZMPPositions,					     
+			       std::deque<COMState> & COMStates,
+			       std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+			       std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+			       bool EndSequence);
 
 		
 	protected:

@@ -759,3 +759,44 @@ void OnlineStepPositionTrajectoryGeneration::OnLine(double time,
  
 } 
  
+
+int OnlineStepPositionTrajectoryGeneration::OnLineFootChange(double time,
+				 FootAbsolutePosition &aFootAbsolutePosition,
+				 std::deque<ZMPPosition> & FinalZMPPositions,			     
+				 std::deque<COMState> & COMStates,
+				 std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+				 std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+				 StepStackHandler * aStepStackHandler)
+{
+	RelativeFootPosition r;
+	r.sx=aFootAbsolutePosition.x;
+	r.sy=aFootAbsolutePosition.y;
+	r.theta=aFootAbsolutePosition.theta;
+	
+
+	if ((unsigned)aFootAbsolutePosition.stepType>=stepPos_.size())
+	{	
+		stepPos_.push_back(r);;
+	}
+	else
+	{
+		stepPos_[(unsigned)aFootAbsolutePosition.stepType]=r;
+	}
+
+	return 0;
+
+}
+
+void OnlineStepPositionTrajectoryGeneration::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
+			       std::deque<ZMPPosition> & FinalZMPPositions,					     
+			       std::deque<COMState> & COMStates,
+			       std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+			       std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+			       bool EndSequence)
+{
+	
+
+	stepPos_.push_back(NewRelativeFootPosition);
+	
+	
+}
