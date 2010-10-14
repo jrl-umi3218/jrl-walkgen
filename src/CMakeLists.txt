@@ -5,6 +5,9 @@
 # Copyright CNRS/AIST
 
 
+# In case of cutomization, the file Customize.cmake can be created
+#---------------------------
+INCLUDE ("Customize.cmake" OPTIONAL)
 
 # Create the library "walkGenJRL" 
 
