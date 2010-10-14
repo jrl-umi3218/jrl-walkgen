@@ -55,13 +55,13 @@ namespace PatternGeneratorJRL
     void previewOrientations(const double &Time,
 			     std::deque<double> &PreviewedSupportAngles,
 			     const COMState &TrunkState, COMState &TrunkStateT,
-			     const SupportFSM * SupportFSM, SupportState_t CurrentSupport,
+			     const SupportState * Support,
 			     std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
     void verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref,
 				      const COMState &TrunkState, COMState &TrunkStateT,
-				      SupportState_t CurrentSupport);
+				      const SupportState * Support);
 
   private:
     /*! Angular limitations of the hip joints*/
@@ -122,14 +122,14 @@ namespace PatternGeneratorJRL
     unsigned int m_FullDebug;
 
 
-    bool verifyAngleOfHipJoint(SupportState_t CurrentSupport,
+    bool verifyAngleOfHipJoint(const SupportState * Support,
 			       const COMState &TrunkState, COMState &TrunkStateT,
 			       double CurrentSupportFootAngle,
 			       unsigned int StepNumber);
 
     void verifyVelocityOfHipJoint(const double &Time, COMState &TrunkStateT,
 				  const double &PreviewedSupportFoot, const unsigned int &StepNumber,
-				  SupportState_t CurrentSupport,
+				  const SupportState * Support,
 				  const double &CurrentRightFootAngle, const double &CurrentLeftFootAngle,
 				  const double &CurrentLeftFootVelocity,
 				  const double &CurrentRightFootVelocity);

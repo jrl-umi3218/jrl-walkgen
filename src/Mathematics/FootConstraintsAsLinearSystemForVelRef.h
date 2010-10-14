@@ -84,7 +84,7 @@ namespace PatternGeneratorJRL
       int computeLinearSystem(std::vector<CH_Point> aVecOfPoints,
 			      MAL_MATRIX(&D,double),
 			      MAL_MATRIX(&Dc,double),
-			      SupportState_t PrwSupport);
+			      SupportState * Support);
 
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
 	Position.
@@ -98,8 +98,7 @@ namespace PatternGeneratorJRL
 					    ReferenceAbsoluteVelocity & RefVel,
 					    double StartingTime,
 					    double m_QP_N,
-					    SupportFSM * SupportFSM, SupportState_t CurrentSupport, SupportState_t & PrwSupport,
-					    std::deque<double> &PreviewedSupportAngles,
+					    SupportState * Support, std::deque<double> &PreviewedSupportAngles,
 					    int & NbOfConstraints);
 
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute Position.  */
@@ -128,6 +127,13 @@ namespace PatternGeneratorJRL
       CjrlHumanoidDynamicRobot * m_HS;
       
       std::vector<CH_Point> ConvexHullFP;
+
+      //Andremize: Caused memory errors when initialized in the constructor
+      /* float CHLeftFPosConstrArrayX[5]; */
+      /* float CHLeftFPosConstrArrayY[5]; */
+      
+      /* float CHRightFPosConstrArrayX[5]; */
+      /* float CHRightFPosConstrArrayY[5]; */
       
       float* CHFPosConstrArrayX; 
       float* CHFPosConstrArrayY;

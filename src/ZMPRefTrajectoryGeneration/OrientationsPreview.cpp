@@ -74,9 +74,11 @@ OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
       aof.close();
     }
 
+  //	RESETDEBUG4("OrientationsPreview.dat");
 }
 
 OrientationsPreview::~OrientationsPreview() {
+  //  cout<<"Leaving ~OrientationsPreview()"<<endl;
 }
 
 
@@ -84,7 +86,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 					      deque<double> &PreviewedSupportAngles,
 					      const COMState &TrunkState, 
 					      COMState &TrunkStateT,
-					      const SupportFSM * SupportFSM ,SupportState_t CurrentSupport,
+					      const SupportState * Support,
 					      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					      deque<FootAbsolutePosition> &RightFootAbsolutePositions)
 {
@@ -124,7 +126,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
     {
 
       //Initialize the preview loop
-      if (CurrentSupport.Foot == 1)
+      if (Support->CurrentSupportFoot == 1)
 	{
 	  m_CurrentSupportAngle = LeftFootAbsolutePositions[0].theta*M_PI/180.0;
 
@@ -138,7 +140,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 
 
 
-      if(CurrentSupport.Phase != 0)
+      if(Support->CurrentSupportPhase != 0)
 	{
 	  m_TrunkAngleOK = false;
 	  while(!m_TrunkAngleOK)
@@ -177,18 +179,19 @@ void OrientationsPreview::previewOrientations(const double &Time,
 
 		}
 	      //Compute the trunk angle at the end of the support phase
-	      m_SupportTimePassed = CurrentSupport.TimeLimit-Time;
+	      m_SupportTimePassed = Support->CurrentTimeLimit-Time;
 	      m_PreviewedTrunkAngleEnd = TrunkStateT.yaw[0] + TrunkStateT.yaw[1]*(m_SupportTimePassed-m_T);
 
 
 	      //Verify the angle between the support foot and the trunk at the end of the current support period
-	      m_TrunkAngleOK = verifyAngleOfHipJoint(CurrentSupport, TrunkState, TrunkStateT, m_CurrentSupportAngle, StepNumber);
+	      m_TrunkAngleOK = verifyAngleOfHipJoint(
+						     Support, TrunkState, TrunkStateT, m_CurrentSupportAngle, StepNumber);
 	    }
 
 	}
       else//The trunk does not rotate in the DS phase
 	{
-	  m_SupportTimePassed = CurrentSupport.TimeLimit+m_SSPeriod-Time;
+	  m_SupportTimePassed = Support->CurrentTimeLimit+m_SSPeriod-Time;
 	  m_FirstPreviewedFoot = 1;
 	  PreviewedSupportAngles.push_back(m_CurrentSupportAngle);
 	  TrunkStateT.yaw[0] = m_PreviewedTrunkAngleEnd = TrunkState.yaw[0];
@@ -209,7 +212,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 	}
 
       m_PreviousSupportAngle = m_CurrentSupportAngle;
-      m_PreviewedSupportFoot = CurrentSupport.Foot;
+      m_PreviewedSupportFoot = Support->CurrentSupportFoot;
 
 
       if(m_FullDebug>2)
@@ -228,7 +231,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 
       //Preview
       for(StepNumber = m_FirstPreviewedFoot; 
-	  StepNumber <= (unsigned int)((int)ceil((m_N+1)*m_T/SupportFSM->m_SSPeriod));
+	  StepNumber <= (unsigned int)((int)ceil((m_N+1)*m_T/Support->SSPeriod)); 
 	  StepNumber++)
 	{
 	  m_PreviewedSupportFoot = -m_PreviewedSupportFoot;
@@ -245,9 +248,11 @@ void OrientationsPreview::previewOrientations(const double &Time,
 	    }
 
 	  verifyVelocityOfHipJoint(Time, TrunkStateT,
-				   m_PreviewedSupportFoot, StepNumber, CurrentSupport,
+				   m_PreviewedSupportFoot, StepNumber, Support,
 				   CurrentRightFootAngle, CurrentLeftFootAngle,
 				   CurrentLeftFootVelocity, CurrentRightFootVelocity);
+
+	  //verifyVelocityOfHipJoint(Ref, TrunkStateT.yaw[1], TrunkState, Support, StepNumber);
 
 	  //Check the feet angles to avoid self-collision:
 	  if ((double)m_PreviewedSupportFoot*(m_PreviousSupportAngle-m_PreviewedSupportAngle)-M_EPS > m_uLimitFeet)
@@ -279,7 +284,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 	    }
 
 	  m_TrunkAngleOK = verifyAngleOfHipJoint(
-						 CurrentSupport, TrunkState, TrunkStateT,
+						 Support, TrunkState, TrunkStateT,
 						 m_CurrentSupportAngle, StepNumber);
 	  if(!m_TrunkAngleOK){
 	    PreviewedSupportAngles.clear();
@@ -318,9 +323,9 @@ void OrientationsPreview::previewOrientations(const double &Time,
 void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref,
 						       const COMState &TrunkState, 
 						       COMState &TrunkStateT, 
-						       SupportState_t CurrentSupport)
+						       const SupportState * Support)
 {
-  if(CurrentSupport.Phase!=0)
+  if(Support->CurrentSupportPhase!=0)
     {
       //Verify change in velocity against the maximal acceleration
       if(fabs(Ref.dYaw-TrunkState.yaw[1]) > 2.0/3.0*m_T*m_uaLimitHipYaw)
@@ -352,7 +357,7 @@ void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVe
 }
 
 
-bool OrientationsPreview::verifyAngleOfHipJoint(SupportState_t CurrentSupport,
+bool OrientationsPreview::verifyAngleOfHipJoint(const SupportState * Support,
 						const COMState &TrunkState, COMState &TrunkStateT,
 						double CurrentSupportFootAngle,
 						unsigned int StepNumber)
@@ -360,7 +365,7 @@ bool OrientationsPreview::verifyAngleOfHipJoint(SupportState_t CurrentSupport,
 
   //Which limitation is relevant in the current situation?
   double uJointLimit, lJointLimit, JointLimit;
-  if(CurrentSupport.Foot == 1)
+  if(Support->CurrentSupportFoot == 1)
     {
       uJointLimit = m_uLimitLeftHipYaw;
       lJointLimit = m_lLimitLeftHipYaw;
@@ -398,7 +403,7 @@ void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time,
 						   COMState &TrunkStateT,
 						   const double &PreviewedSupportFoot, 
 						   const unsigned int &StepNumber,
-						   SupportState_t CurrentSupport,
+						   const SupportState * Support,
 						   const double &CurrentRightFootAngle, 
 						   const double &CurrentLeftFootAngle,
 						   const double &CurrentLeftFootVelocity,
@@ -413,7 +418,7 @@ void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time,
   double a,b,c,d,T;
   //To be implemented
   //For the
-  if(StepNumber>0 && CurrentSupport.Phase==1)
+  if(StepNumber>0 && Support->CurrentSupportPhase==1)
     {
       //verify the necessary, maximal, relative foot velocity
       m_MeanFootVelDifference = (m_PreviewedSupportAngle-CurrentAngle)/(m_SSPeriod-m_T);
@@ -425,10 +430,10 @@ void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time,
 	  m_PreviewedSupportAngle = CurrentAngle+m_MeanFootVelDifference*(m_SSPeriod-m_T);
 	}
     }
-  else if((StepNumber==0 && CurrentSupport.Phase==1) || (StepNumber==1 && CurrentSupport.Phase==0))
+  else if((StepNumber==0 && Support->CurrentSupportPhase==1) || (StepNumber==1 && Support->CurrentSupportPhase==0))
     {
 
-      T = CurrentSupport.TimeLimit-Time-m_T;
+      T = Support->CurrentTimeLimit-Time-m_T;
       //Previewed polynome
       a = CurrentAngle;
       if(PreviewedSupportFoot==1)
