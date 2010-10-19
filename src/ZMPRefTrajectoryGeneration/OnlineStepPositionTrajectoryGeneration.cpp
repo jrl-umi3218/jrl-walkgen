@@ -113,7 +113,7 @@ void OnlineStepPositionTrajectoryGeneration::CallMethod(std::string & Method, st
 	{
 		int b;
 		strm>> b; 
-		SetVelocityMode(b);
+		SetVelocityMode(bool(b));
 	} 
 	else if (Method==":setstepspositions") 
     { 
@@ -122,15 +122,16 @@ void OnlineStepPositionTrajectoryGeneration::CallMethod(std::string & Method, st
 		strm>>p.sy;
 		strm>>p.theta;
 
-		stepPos_.clear();
-		
-
-		while (!strm.eof()) 
+		if (!strm.eof())
 		{
-			stepPos_.push_back(p);
-			strm>>p.sx;
-			strm>>p.sy;
-			strm>>p.theta;
+			stepPos_.clear();
+			 
+			do{
+				stepPos_.push_back(p);
+				strm>>p.sx;
+				strm>>p.sy;
+				strm>>p.theta;
+			}while (!strm.eof());
 		}
 	  
       
