@@ -82,6 +82,15 @@ namespace PatternGeneratorJRL
 			       std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 			       bool EndSequence);
 
+	  virtual int buildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+    		deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+    		deque<ZMPPosition> &ZMPRefPositions,
+    		deque<COMState> &COMStates,
+    		double ConstraintOnX,
+    		double ConstraintOnY,
+    		double T,
+    		 int N);
+
 		
 	protected:
 		RelativeFootPositionQueue stepPos_;
