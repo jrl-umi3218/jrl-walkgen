@@ -99,7 +99,7 @@ namespace PatternGeneratorJRL
 
 
     
-    int buildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+    virtual int buildZMPTrajectoryFromFootTrajectory(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
     		deque<FootAbsolutePosition> &RightFootAbsolutePositions,
     		deque<ZMPPosition> &ZMPRefPositions,
     		deque<COMState> &COMStates,
