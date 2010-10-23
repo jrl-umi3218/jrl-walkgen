@@ -195,16 +195,8 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 	if (m_Q!=0)
 		delete [] m_Q;
 
-	//	if (m_PreviewedSupportAngles!=0)
-	//		delete [] m_PreviewedSupportAngles;
-
 	if (m_OP!=0)
 		delete m_OP;
-
-
-
-	//if (m_Pb!=0)
-	//		delete m_Pb;
 
 	if (m_PLDPSolverHerdt!=0)
 		delete m_PLDPSolverHerdt;
@@ -1069,8 +1061,6 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
 
 	// Discretize the problem.
 	ODEBUG(" N:" << m_QP_N << " T: " << T);
-
-
 
 	if (m_FullDebug>2)
 	{ 
@@ -2034,12 +2024,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		// pre compute the matrices needed for the optimization.
 		double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
 		struct timeval start,end;
-		//int li=0;
-		//      double dinterval = m_QP_T /  m_SamplingPeriod;
-		//int interval=(int)dinterval;
-		bool StartingSequence = true;
 
-		//int NumberOfRemovedConstraints =0;
+		bool StartingSequence = true;
 
 		//----------"Real-time" loop---------
 		//
@@ -2047,8 +2033,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		//-----------------------------------
 		gettimeofday(&start,0);
 
+
 		m_OP->verifyAccelerationOfHipJoint(RefVel, m_TrunkState,
 				m_TrunkStateT, m_CurrentSupport);
+
 
 		m_OP->previewOrientations(time+m_TimeBuffer,
 				m_PreviewedSupportAngles, 
@@ -2058,24 +2046,27 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				FinalLeftFootAbsolutePositions, 
 				FinalRightFootAbsolutePositions); 
 
+
 		// Read the current state of the 2D Linearized Inverted Pendulum.
 		m_2DLIPM->GetState(xk);
 
+
+		//Apply external forces
 		if(m_PerturbationOccured == true)
 		{
 			xk(2) = xk(2)+m_PerturbationAcceleration(2);
 			xk(5) = xk(5)+m_PerturbationAcceleration(5);
 			m_PerturbationOccured = false;
 		}
-
 		m_2DLIPM->setState(xk);
+
 
 		//TODO : Add a get function to read the state
 		m_SupportFSM->setSupportState(time+m_TimeBuffer, 0, m_CurrentSupport, RefVel);
 
+
 		//      //TODO : Temporary solution for the pldp solver. See above
 		//      bool CurrentStateChanged = m_SupportFSM->m_StateChanged;
-
 		if (m_FullDebug>2)
 		{
 			ofstream aof;
@@ -2089,12 +2080,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		}
 
 
-
-
 		//Add a new support foot to the support feet history deque
 		if(m_CurrentSupport.StateChanged == true)
 		{
-
 			deque<FootAbsolutePosition>::iterator FAP_it;
 			SupportFeet_t newSF;
 			if(m_CurrentSupport.Foot==1)
@@ -2107,7 +2095,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				FAP_it = FinalRightFootAbsolutePositions.end();
 				FAP_it--;
 			}
-
 
 			newSF.x = FAP_it->x;
 			newSF.y = FAP_it->y;
@@ -2132,8 +2119,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 		initializeProblem();
 
+
 		computeObjective(QueueOfLConstraintInequalitiesFreeFeet, QueueOfSupportFeet,
 				NbOfConstraints, 0, CriteriaToMaximize, xk, time);
+
 
 		if(m_FastFormulationMode == PLDPHerdt)
 		{
@@ -2151,9 +2140,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				m_ComHeight,
 				NbOfConstraints,
 				xk);
-
 		if(m_FullDebug>2)
 			dumpProblem(m_Pb.Q, m_Pb.D, m_Pb.DU, m_Pb.m, m_Pb.DS, m_Pb.XL, m_Pb.XU, xk, time+m_TimeBuffer);
+
 
 		double ldt = 0.0;
 		//---------Solver------------
@@ -2222,17 +2211,11 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 			// 	  ODEBUG6(ldt,"/tmp/dtPLDP.dat");
 		}
-
 		if (m_Pb.ifail!=0)
 		{ 
 			cout << "IFAIL: " << m_Pb.ifail << " at time: " << time << endl;
 			//return -1;
 		} 
-
-		//------------------------
-		//
-		//
-		//-------------------------
 
 		double *ptX=0;
 		if ((m_FastFormulationMode==QLDANDLQ)||
@@ -2252,7 +2235,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				double *pX= m_Pb.X+i;
 				double *piLQ = pm_iLQ+i*2*(m_QP_N+m_PrwSupport.StepNumber)+i;
 				*pNewX = 0.0;
-				for( int j=i;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
+				for(int j=i;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
 				{
 					*pNewX+= (*piLQ) * (*pX++);
 					piLQ+=2*(m_QP_N+m_PrwSupport.StepNumber);
@@ -2263,6 +2246,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		}
 		else
 			ptX=m_Pb.X;
+		//------------------------
+		//
+		//
+		//-------------------------
 
 
 		FinalCOMStates.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
@@ -2287,25 +2274,29 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				"(int)(m_TimeBuffer/m_SamplingPeriod): "<<
 				(int)(m_TimeBuffer/m_SamplingPeriod));
 
+
 		m_2DLIPM->Interpolation(FinalCOMStates,
 				FinalZMPPositions,
 				CurrentIndex,
 				ptX[0],ptX[m_QP_N]);
-
 		m_2DLIPM->OneIteration(ptX[0],ptX[m_QP_N]);
 
 
-		//Previewed position of the next foot
+		//The robot is supposed to stop always with the feet aligned in the lateral plane.
 		if(m_CurrentSupport.StepsLeft>0)
 		{
-			if(fabs(ptX[2*m_QP_N])-0.00001>0.0)
+			if(fabs(ptX[2*m_QP_N])-0.00001<0.0)
 			{
+				cout<<"Previewed foot position zero at time: "<<time<<endl;
+			}
+			else if (m_CurrentSupport.TimeLimit-time-m_QP_T/2.0>0)
+			{//The landing position is yet determined by the solver because the robot finds himself still in the single support phase
 				m_FPx = ptX[2*m_QP_N];
 				m_FPy = ptX[2*m_QP_N+m_PrwSupport.StepNumber];
 			}
 		}
 		else
-		{//TODO:The solver isn't responsible for the feet positions anymore
+		{//The solver isn't responsible for the feet positions anymore
 			deque<SupportFeet_t>::iterator CurSF_it;
 			CurSF_it = QueueOfSupportFeet.end();
 			CurSF_it--;
@@ -2366,9 +2357,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 			aof<<time<<" "<<m_UpperTimeLimitToUpdate<<endl;
 		}
 
+
 		interpolateTrunkState(time, CurrentIndex,
 				FinalCOMStates);
-
 		interpolateFeetPositions(time, CurrentIndex,
 				FinalLeftFootAbsolutePositions,
 				FinalRightFootAbsolutePositions);
@@ -2430,10 +2421,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		delete [] m_Pb.war;
 		free(m_Pb.U);
 
-
-
-	} 
-
+	}
 	//-----------------------------------
 	//
 	//

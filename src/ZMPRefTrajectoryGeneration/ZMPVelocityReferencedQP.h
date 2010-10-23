@@ -222,7 +222,7 @@ namespace PatternGeneratorJRL
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
     SupportFSM * m_SupportFSM;
 
-    /*! Uses a Finite State Machine to simulate the evolution of the support states. */
+    /*! Deecoupled optimization problem to compute the evolution of feet angles. */
     OrientationsPreview * m_OP;
 
     /*! \brief Object creating Linear inequalities constraints 
@@ -238,14 +238,15 @@ namespace PatternGeneratorJRL
     /*! Com height */
     double m_ComHeight;
 
-    /*! Current state of the trunk */
+    /*! Current state of the trunk and the trunk state after m_QP_T*/
     COMState m_TrunkState, m_TrunkStateT;
 
     deque<COMState> m_QueueOfTrunkStates;
 
-    MAL_VECTOR(m_PerturbationAcceleration,double);
-
     double m_a, m_TrunkPolCoeffB, m_c, m_d, m_TrunkPolCoeffE;
+
+	//Additional term on the acceleration of the CoM
+    MAL_VECTOR(m_PerturbationAcceleration,double);
 
     /*! Sampling of the QP. */
     double m_QP_T;
@@ -270,7 +271,6 @@ namespace PatternGeneratorJRL
     Problem m_Pb;
 
     SupportState_t m_CurrentSupport, m_PrwSupport;
-
 
     /*! \name Variables related to the QP
       @{ */
