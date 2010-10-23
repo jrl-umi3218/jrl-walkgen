@@ -45,7 +45,7 @@
 #include <PGTypes.h>
 #include <Mathematics/ConvexHull.h>
 #include <SimplePlugin.h>
-#include <PreviewControl/SupportState.h>
+#include <PreviewControl/SupportFSM.h>
 
 namespace PatternGeneratorJRL
 {

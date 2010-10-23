@@ -37,7 +37,7 @@
 #include <deque>
 
 /*! Framework includes */
-#include <PreviewControl/SupportState.h>
+#include <PreviewControl/SupportFSM.h>
 
 /*! Framework includes */
 #include <walkGenJrl/PGTypes.h>
