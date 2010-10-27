@@ -45,6 +45,7 @@
 
 namespace PatternGeneratorJRL
 {
+
   class ZMPDiscretization;
   class  ZMPVelocityReferencedQP : public ZMPRefTrajectoryGeneration
   {

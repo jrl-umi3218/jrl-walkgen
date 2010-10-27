@@ -43,12 +43,14 @@
 
 
 #include <PGTypes.h>
+#include <privatepgtypes.h>
 #include <Mathematics/ConvexHull.h>
 #include <SimplePlugin.h>
 #include <PreviewControl/SupportFSM.h>
 
 namespace PatternGeneratorJRL
 {
+  
   /*! This class generates matrix representation of linear
    constraint based on foot position.
    It handles a stack of constraint on a sliding mode 
