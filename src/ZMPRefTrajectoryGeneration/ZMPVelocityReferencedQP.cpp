@@ -25,11 +25,11 @@
  */
 
 /*! This object generate all the values for the foot trajectories,
-   and the desired ZMP based on a sequence of steps following a QP
-   formulation and a new QP solver as proposed by Herdt Advanced Robotics 2010.
+  and the desired ZMP based on a sequence of steps following a QP
+  formulation and a new QP solver as proposed by Herdt Advanced Robotics 2010.
 
-   Andrei Herdt,
-   Olivier Stasse,
+  Andrei Herdt,
+  Olivier Stasse,
 */
 
 
@@ -203,7 +203,9 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 
   if (m_Pu!=0)
     delete [] m_Pu ;
+
 }
+
 
 void ZMPVelocityReferencedQP::setVelReference(istringstream &strm)
 {
@@ -320,6 +322,7 @@ int ZMPVelocityReferencedQP::InitializeMatrixPbConstants()
 	      //m_PZu(i,j+m_QP_N)=0.0;
 	      //m_PZu(i+m_QP_N,j)=0.0;
 	    }
+
 	}
     }
 
@@ -666,7 +669,6 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfConstraintMatrices()
       ofstream aof;
       char Buffer[1024];
       sprintf(Buffer,"/tmp/PuCst.dat");
-
       aof.open(Buffer,ofstream::out);
       for( int i=0;i<m_QP_N;i++)
 	{
@@ -724,7 +726,9 @@ int ZMPVelocityReferencedQP::buildConstraintMatricesPLDPHerdt()
   else
     ptPu = m_Pu;
 
+
   memset(m_Pu,0,2*(m_QP_N+m_PrwSupport.StepNumber)*2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
+
 
   // Recursive multiplication of the system is applied.
   // we keep the transpose form, i.e. Pu'.
@@ -890,6 +894,8 @@ const double & ZMPVelocityReferencedQP::GetBeta() const
 {
   return m_Beta;
 }
+
+
 
 //------------------new functions---
 //
@@ -1086,7 +1092,6 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
 
   double FFPx, FFPy;
 
->>>>>>> topic/vel-ref-gen-cleaning-restructuring
   int IndexConstraint = 0;
   ODEBUG("Starting Matrix to build the constraints. ");
   ODEBUG((LCIFF_it)->D );
@@ -1292,23 +1297,6 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
   return 0;
 }
 
-//--------------------------------------
-//
-//
-//-----------new functions--------------
-void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &strm)
-{
-  if (Method==":previewcontroltime")
-    {
-      strm >> m_PreviewControlTime;
-    }
-  if (Method==":numberstepsbeforestop")
-    {
-      strm >> m_Support->NbOfStepsSSDS;
-    }
-
-  ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
-}
 
 
 //--------------------------------------
@@ -2076,28 +2064,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       //TODO : Add a get function to read the state
       m_SupportFSM->setSupportState(time+m_TimeBuffer, 0, m_CurrentSupport, RefVel);
 
-	  deque<FootAbsolutePosition>::iterator FAP_it;
-	  SupportFeet_t newSF;
-	  if(m_Support->CurrentSupportFoot==1)
-	    {
-	      FAP_it = FinalLeftFootAbsolutePositions.end();
-	      FAP_it--;
-	    }
-	  else
-	    {
-	      FAP_it = FinalRightFootAbsolutePositions.end();
-	      FAP_it--;
-	    }
-
-
-	  newSF.x = FAP_it->x;
-	  newSF.y = FAP_it->y;
-	  newSF.theta = FAP_it->theta*M_PI/180.0;
-	  newSF.StartTime = time+m_TimeBuffer;
-	  newSF.SupportFoot = m_Support->CurrentSupportFoot;
-
-	  QueueOfSupportFeet.push_back(newSF);
-	}
 
       //      //TODO : Temporary solution for the pldp solver. See above
       //      bool CurrentStateChanged = m_SupportFSM->m_StateChanged;
@@ -2113,15 +2079,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  aof.close();
 	}
 
-      m_fCALS->buildLinearConstraintInequalities(FinalLeftFootAbsolutePositions,
-						 FinalRightFootAbsolutePositions,
-						 QueueOfLConstraintInequalitiesFreeFeet,
-						 QueueOfFeetPosInequalities,
-						 RefVel,
-						 time+m_TimeBuffer,
-						 m_QP_N,
-						 m_Support, m_PreviewedSupportAngles,
-						 NbOfConstraints);
 
       //Add a new support foot to the support feet history deque
       if(m_CurrentSupport.StateChanged == true)
@@ -2173,8 +2130,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  buildConstraintMatricesPLDPHerdt();
 	}
 
-      interpolateTrunkState(time, CurrentIndex,
-          		FinalCOMStates);
 
       buildConstraintMatrices(m_Pb.DS,m_Pb.DU,
 			      m_QP_T,
@@ -2402,14 +2357,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  aof<<time<<" "<<m_UpperTimeLimitToUpdate<<endl;
 	}
 
-      if(m_FullDebug>2)
-	{
-	  //if(validateConstraints(m_Pb.DS, m_Pb.DU, m_Pb.m, li, m_Pb.X, time)<0)
-	  //  {
-	  //    cout << "Something is wrong with the constraints." << endl;
-	  //    exit(-1);
-	  //  }
-	}
 
       interpolateTrunkState(time, CurrentIndex,
 			    FinalCOMStates);
