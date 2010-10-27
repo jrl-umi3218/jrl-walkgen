@@ -168,6 +168,15 @@ namespace PatternGeneratorJRL
     MAL_VECTOR(RefVectorTheta,double);
   };
   typedef struct ReferenceAbsoluteVelocity_t ReferenceAbsoluteVelocity;
-  
+
+  // State of the support
+  struct SupportState_s
+  {
+       int Phase, Foot, StepsLeft, StepNumber;
+       bool SSSS, StateChanged;
+       double TimeLimit;
+  };
+  typedef struct SupportState_s SupportState_t;
+ 
 };
 #endif
