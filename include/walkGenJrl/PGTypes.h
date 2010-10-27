@@ -25,7 +25,7 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file PGTypes.h
-    \brief Defines basic types for the Humanoid Walking Pattern Generator.
+  \brief Defines basic types for the Humanoid Walking Pattern Generator.
 */
 #ifndef _PATTERN_GENERATOR_TYPES_H_
 #define  _PATTERN_GENERATOR_TYPES_H_
@@ -90,7 +90,7 @@ namespace PatternGeneratorJRL
     int stepType;     //1:normal walking 2:one step before opbstacle
                       //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
     double DeviationHipHeight;
-   };
+  };
   typedef struct RelativeFootPosition_s RelativeFootPosition;
 
   /** Structure to store each of the ZMP value, with a given
@@ -102,8 +102,8 @@ namespace PatternGeneratorJRL
     double time;
     int stepType;     //1:normal walking 2:one step before opbstacle
                       //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
-			//+10 if duoble support phase
-			//*(-1) if right foot stance else left foot stance
+    //+10 if duoble support phase
+    //*(-1) if right foot stance else left foot stance
   };
   typedef struct ZMPPosition_s ZMPPosition;
 
@@ -172,9 +172,9 @@ namespace PatternGeneratorJRL
   // State of the support
   struct SupportState_s
   {
-       int Phase, Foot, StepsLeft, StepNumber;
-       bool SSSS, StateChanged;
-       double TimeLimit;
+    int Phase, Foot, StepsLeft, StepNumber;
+    bool SSSS, StateChanged;
+    double TimeLimit;
   };
   typedef struct SupportState_s SupportState_t;
 
