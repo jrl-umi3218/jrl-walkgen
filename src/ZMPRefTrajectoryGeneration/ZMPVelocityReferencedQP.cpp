@@ -2472,8 +2472,6 @@ void ZMPVelocityReferencedQP::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositi
 						   deque<FootAbsolutePosition> &RightFootAbsolutePositions)
 {
   cout << "To be implemented" << endl;
-  return -1;
-
 }
 
 int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep()
