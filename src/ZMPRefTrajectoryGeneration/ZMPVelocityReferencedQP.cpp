@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Andrei Herdt
  * Francois Keith
@@ -20,45 +20,45 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
 /*! This object generate all the values for the foot trajectories,
-   and the desired ZMP based on a sequence of steps following a QP 
-   formulation and a new QP solver as proposed by Herdt Advanced Robotics 2010. 
+   and the desired ZMP based on a sequence of steps following a QP
+   formulation and a new QP solver as proposed by Herdt Advanced Robotics 2010.
 
    Andrei Herdt,
-   Olivier Stasse, 
+   Olivier Stasse,
  */
 
 
-#ifdef UNIX 
-#include <sys/time.h> 
-#endif /* UNIX */ 
+#ifdef UNIX
+#include <sys/time.h>
+#endif /* UNIX */
 
-#ifdef WIN32 
-#include <Windows.h> 
-#include <TimeUtilsWindows.h> 
-#endif 
+#ifdef WIN32
+#include <Windows.h>
+#include <TimeUtilsWindows.h>
+#endif
 
-#include <time.h> 
+#include <time.h>
 
-#include <iostream> 
-#include <fstream> 
+#include <iostream>
+#include <fstream>
 
-#include <Mathematics/qld.h> 
-#include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.h> 
+#include <Mathematics/qld.h>
+#include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.h>
 
-#include <Debug.h> 
-using namespace std; 
-using namespace PatternGeneratorJRL; 
+#include <Debug.h>
+using namespace std;
+using namespace PatternGeneratorJRL;
 
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
     string DataFile,
     CjrlHumanoidDynamicRobot *aHS) :
     ZMPRefTrajectoryGeneration(lSPM)
-{ 
+{
 
   m_Q = 0;
   m_Pu = 0;
@@ -172,10 +172,10 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_FeetDistanceDS = 0.2;
 
   m_PerturbationOccured = false;
-} 
+}
 
-ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP() 
-{ 
+ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
+{
 
   if (m_ZMPD!=0)
     delete m_ZMPD;
@@ -207,12 +207,12 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 }
 
 
-void ZMPVelocityReferencedQP::setVelReference(istringstream &strm) 
-{ 
+void ZMPVelocityReferencedQP::setVelReference(istringstream &strm)
+{
   strm >> RefVel.x;
   strm >> RefVel.y;
   strm >> RefVel.dYaw;
-} 
+}
 
 void ZMPVelocityReferencedQP::setVelReference(double x,
     double y,
@@ -244,15 +244,15 @@ void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x,double y)
 
 }
 
-void ZMPVelocityReferencedQP::interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions, 
+void ZMPVelocityReferencedQP::interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
     deque<FootAbsolutePosition> &RightFootAbsolutePositions)
-{ 
+{
 
   printf("To be implemented \n");
-} 
+}
 
-int ZMPVelocityReferencedQP::InitializeMatrixPbConstants() 
-{ 
+int ZMPVelocityReferencedQP::InitializeMatrixPbConstants()
+{
   MAL_MATRIX_RESIZE(m_PPu,2*m_QP_N,2*m_QP_N);
   MAL_MATRIX_RESIZE(m_PZu,m_QP_N,m_QP_N);
   MAL_MATRIX_RESIZE(m_VPu,2*m_QP_N,2*m_QP_N);
@@ -360,23 +360,23 @@ int ZMPVelocityReferencedQP::InitializeMatrixPbConstants()
     }
 
   return 0;
-} 
+}
 
 
-int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX(,double) &OptA) 
-{ 
+int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX(,double) &OptA)
+{
   for( int i=0;i<2*m_QP_N;i++)
     for( int j=0;j<2*m_QP_N;j++)
       m_Q[i*2*m_QP_N+j] = OptA(j,i);
 
   return 0;
-}  
-int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX(,double) &OptA) 
-{ 
+}
+int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX(,double) &OptA)
+{
 
   /*! Build cholesky matrix of the optimum
-    We copy only the upper corner of the OptA matrix 
-    because we know its specific structure. 
+    We copy only the upper corner of the OptA matrix
+    because we know its specific structure.
    */
   double *localQ=new double[m_QP_N*m_QP_N];
   for( int i=0;i<m_QP_N;i++)
@@ -597,10 +597,10 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
     }
 
   return 0;
-} 
+}
 
-int ZMPVelocityReferencedQP::BuildingConstantPartOfConstraintMatrices() 
-{ 
+int ZMPVelocityReferencedQP::BuildingConstantPartOfConstraintMatrices()
+{
   if (m_Pu==0)
     m_Pu = new double[m_QP_N*m_QP_N];
 
@@ -706,11 +706,11 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfConstraintMatrices()
 
   delete [] lInterPu;
   return 0;
-} 
+}
 
 
-int ZMPVelocityReferencedQP::buildConstraintMatricesPLDPHerdt() 
-{ 
+int ZMPVelocityReferencedQP::buildConstraintMatricesPLDPHerdt()
+{
   m_Pu = new double[2*(m_QP_N+m_PrwSupport.StepNumber)*2*(m_QP_N+m_PrwSupport.StepNumber)];
 
   double * lInterPu=0;
@@ -832,10 +832,10 @@ int ZMPVelocityReferencedQP::buildConstraintMatricesPLDPHerdt()
 
   delete [] lInterPu;
   return 0;
-} 
+}
 
-void ZMPVelocityReferencedQP::initFeet() 
-{ 
+void ZMPVelocityReferencedQP::initFeet()
+{
 
   //Define the initial coordinates of the feet
   //This might be done when creating SupportState
@@ -855,11 +855,11 @@ void ZMPVelocityReferencedQP::initFeet()
   QueueOfSupportFeet.push_back(aSFLeft);
   QueueOfSupportFeet.push_back(aSFRight);
 
-} 
+}
 
 
-int ZMPVelocityReferencedQP::InitConstants() 
-{ 
+int ZMPVelocityReferencedQP::InitConstants()
+{
   int r;
   if ((r=InitializeMatrixPbConstants())<0)
     return r;
@@ -873,39 +873,39 @@ int ZMPVelocityReferencedQP::InitConstants()
     }
 
   return 0;
-} 
+}
 
-void ZMPVelocityReferencedQP::SetAlpha(const double &anAlpha) 
-{ 
+void ZMPVelocityReferencedQP::SetAlpha(const double &anAlpha)
+{
   m_Alpha = anAlpha;
-} 
+}
 
-const double & ZMPVelocityReferencedQP::GetAlpha() const 
-{ 
+const double & ZMPVelocityReferencedQP::GetAlpha() const
+{
   return m_Alpha;
-} 
+}
 
-void ZMPVelocityReferencedQP::SetBeta(const double &anAlpha) 
-{ 
+void ZMPVelocityReferencedQP::SetBeta(const double &anAlpha)
+{
   m_Beta = anAlpha;
-} 
+}
 
-const double & ZMPVelocityReferencedQP::GetBeta() const 
-{ 
+const double & ZMPVelocityReferencedQP::GetBeta() const
+{
   return m_Beta;
-} 
+}
 
 
 
-//------------------new functions--- 
-// 
-// 
-//---------------------------------- 
+//------------------new functions---
+//
+//
+//----------------------------------
 
-int ZMPVelocityReferencedQP::validateConstraints(double * & DS,double * &DU, 
+int ZMPVelocityReferencedQP::validateConstraints(double * & DS,double * &DU,
     int NbOfConstraints,  int li,
     double *X, double time)
-{ 
+{
   // double lSizeMat = QueueOfLConstraintInequalities.back()->EndingTime/m_QP_T;
   MAL_MATRIX(vnlPx,double); MAL_MATRIX(vnlPu,double);
   MAL_MATRIX(vnlValConstraint,double);
@@ -967,7 +967,7 @@ int ZMPVelocityReferencedQP::validateConstraints(double * & DS,double * &DU,
     }
 
   return 0;
-} 
+}
 
 int ZMPVelocityReferencedQP::dumpProblem(double * Q,
     double * D,
@@ -978,7 +978,7 @@ int ZMPVelocityReferencedQP::dumpProblem(double * Q,
     double * XU,
     MAL_VECTOR(& xk,double),
     double Time)
-{ 
+{
   ofstream aof;
 
   char Buffer[1024];
@@ -1295,16 +1295,16 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &DS,double * &DU,
     }
 
   return 0;
-} 
+}
 
 
 
-//-------------------------------------- 
-// 
-// 
+//--------------------------------------
+//
+//
 //-----------new functions--------------
-void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &strm) 
-{ 
+void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &strm)
+{
   if (Method==":previewcontroltime")
     {
     strm >> m_PreviewControlTime;
@@ -1315,9 +1315,9 @@ void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstrea
     }
 
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
-} 
+}
 
-int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions, 
+int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
     deque<COMState> & FinalCoMPositions,
     deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
     deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
@@ -1326,7 +1326,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
     deque<RelativeFootPosition> &RelativeFootPositions,
     COMState & lStartingCOMState,
     MAL_S3_VECTOR(,double) & lStartingZMPPosition)
-{ 
+{
 
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
 
@@ -1436,11 +1436,11 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   m_2DLIPM->GetState(xk);
 
   return 0;
-} 
+}
 
 
-void ZMPVelocityReferencedQP::initializeProblem() 
-{ 
+void ZMPVelocityReferencedQP::initializeProblem()
+{
 
   m_Pb.DS = new double[(8*m_QP_N+1)*2*(m_QP_N+m_PrwSupport.StepNumber)];
 
@@ -1455,14 +1455,14 @@ void ZMPVelocityReferencedQP::initializeProblem()
   m_Pb.X=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];   // Solution of the system.
   m_Pb.NewX=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];   // Solution of the system.
 
-} 
+}
 
-void ZMPVelocityReferencedQP::computeCholeskyOfQ(double * OptA) 
-{ 
+void ZMPVelocityReferencedQP::computeCholeskyOfQ(double * OptA)
+{
 
   /*! Build cholesky matrix of the optimum
-    We copy only the upper corner of the OptA matrix 
-    because we know its specific structure. 
+    We copy only the upper corner of the OptA matrix
+    because we know its specific structure.
    */
   double *localQ=new double[2*(m_QP_N+m_PrwSupport.StepNumber)*2*(m_QP_N+m_PrwSupport.StepNumber)];
   for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
@@ -1812,7 +1812,7 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
     m_Pb.XU[i] = 1e8;
     }
   memset(m_Pb.X,0,2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
-} 
+}
 
 void ZMPVelocityReferencedQP::interpolateTrunkState(double time, int CurrentIndex,
     deque<COMState> & FinalCOMStates)
@@ -2001,12 +2001,12 @@ void ZMPVelocityReferencedQP::interpolateFeetPositions(double time, int CurrentI
 }
 
 
-void ZMPVelocityReferencedQP::OnLine(double time, 
+void ZMPVelocityReferencedQP::OnLine(double time,
     deque<ZMPPosition> & FinalZMPPositions,
     deque<COMState> & FinalCOMStates,
     deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
-{ 
+{
 
   if(time + 0.00001 > m_UpperTimeLimitToUpdate)
     {
@@ -2222,8 +2222,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
         (m_FastFormulationMode==PLDPHerdt))
       {
       /* Multiply the solution by the transpose of iLQ
-      	     because it is a triangular matrix we do a specific 
-      	     multiplication. 
+      	     because it is a triangular matrix we do a specific
+      	     multiplication.
        */
       memset(m_Pb.NewX,0,2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
 
@@ -2427,10 +2427,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
   //
   //----------"Real-time" loop--------
 
-} 
+}
 
 
-void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions, 
+void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
     deque<COMState> & COMStates,
     deque<RelativeFootPosition> &RelativeFootPositions,
     deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
@@ -2444,40 +2444,40 @@ void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ZMPPosit
 }
 
 
-void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition, 
+void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
     deque<ZMPPosition> & FinalZMPPositions,
     deque<COMState> & FinalCOMStates,
     deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
     bool EndSequence)
-{ 
+{
   cout << "To be implemented" << endl;
-} 
+}
 
-int ZMPVelocityReferencedQP::OnLineFootChange(double time, 
+int ZMPVelocityReferencedQP::OnLineFootChange(double time,
     FootAbsolutePosition &aFootAbsolutePosition,
     deque<ZMPPosition> & FinalZMPPositions,
     deque<COMState> & CoMPositions,
     deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
     StepStackHandler  *aStepStackHandler)
-{ 
+{
   cout << "To be implemented" << endl;
   return -1;
-} 
+}
 
-void ZMPVelocityReferencedQP::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions, 
+void ZMPVelocityReferencedQP::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
     deque<COMState> &FinalCOMStates,
     deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
     deque<FootAbsolutePosition> &RightFootAbsolutePositions)
-{ 
+{
 
-} 
+}
 
-int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep() 
-{ 
+int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep()
+{
   int r = (int)(m_PreviewControlTime/m_SamplingPeriod);
   return 2*r;
-} 
+}
 
 

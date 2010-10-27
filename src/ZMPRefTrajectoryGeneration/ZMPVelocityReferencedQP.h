@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Medhi    Benallegue
  * Andrei   Herdt
@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! This object provides the generation of ZMP and CoM trajectory
@@ -37,7 +37,7 @@
 #include <Mathematics/FootConstraintsAsLinearSystemForVelRef.h>
 #include <Mathematics/OptCholesky.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
-#include <Mathematics/PLDPSolverHerdt.h> 
+#include <Mathematics/PLDPSolverHerdt.h>
 #include <PreviewControl/SupportFSM.h>
 #include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
@@ -52,14 +52,14 @@ namespace PatternGeneratorJRL
   public:
 
     /* Default constructor. */
-    ZMPVelocityReferencedQP(SimplePluginManager *lSPM, string DataFile, 
+    ZMPVelocityReferencedQP(SimplePluginManager *lSPM, string DataFile,
         CjrlHumanoidDynamicRobot *aHS=0);
 
     /* Default destructor. */
     ~ZMPVelocityReferencedQP();
 
 
-    /*! \name Methods to build the optimization problem 
+    /*! \name Methods to build the optimization problem
       @{
      */
 
@@ -71,10 +71,10 @@ namespace PatternGeneratorJRL
     int InitializeMatrixPbConstants();
 
     /*! \brief This method does the same once the previous method has been called
-      to compute the static part of the optimization function. 
+      to compute the static part of the optimization function.
       Assuming that the optimization function is of the form
       \f$ min_{u_k} \frac{1}{2} u^{\top}_k Q u_k + p^{\top}_k u_k \f$
-      this method computes \f$Q\f$, the constant part of $p^{\top}_k$. 
+      this method computes \f$Q\f$, the constant part of $p^{\top}_k$.
 
      */
     int BuildingConstantPartOfTheObjectiveFunction();
@@ -86,7 +86,7 @@ namespace PatternGeneratorJRL
     int BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX(,double) &OptA);
 
 
-    /*! \brief Call the two previous methods 
+    /*! \brief Call the two previous methods
       \return A negative value in case of a problem 0 otherwise.
      */
     int InitConstants();
@@ -122,7 +122,7 @@ namespace PatternGeneratorJRL
     /*! Call method to handle the plugins (SimplePlugin interface) . */
     void CallMethod(std::string &Method, std::istringstream &strm);
 
-    /*! \name Call method to handle on-line generation of ZMP reference trajectory. 
+    /*! \name Call method to handle on-line generation of ZMP reference trajectory.
       @{*/
 
     /*! Methods for on-line generation. (First version!)
@@ -132,7 +132,7 @@ namespace PatternGeneratorJRL
       according to InitLeftFootAbsolutePosition and InitRightFootAbsolutePosition.
       - The RelativeFootPositions stack will NOT be taken into account,
       - The starting COM Position will NOT be taken into account.
-      Returns the number of steps which has been completely put inside 
+      Returns the number of steps which has been completely put inside
       the queue of ZMP, and foot positions.
      */
     int InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
@@ -225,7 +225,7 @@ namespace PatternGeneratorJRL
     /*! Deecoupled optimization problem to compute the evolution of feet angles. */
     OrientationsPreview * m_OP;
 
-    /*! \brief Object creating Linear inequalities constraints 
+    /*! \brief Object creating Linear inequalities constraints
       based on the foot position. Those constraints are *NOT* the
       one put in the QP, but they are a necessary intermediate step. */
     FootConstraintsAsLinearSystemForVelRef * m_fCALS;
@@ -281,7 +281,7 @@ namespace PatternGeneratorJRL
     MAL_MATRIX(m_PZu,double);
 
     /*! \brief Matrix relating the command and the CoM speed. */
-    MAL_MATRIX(m_VPu,double); 
+    MAL_MATRIX(m_VPu,double);
 
     /*! \brief Matrix relating the CoM state and the CoM position. */
     MAL_MATRIX(m_PPx,double);
@@ -313,9 +313,9 @@ namespace PatternGeneratorJRL
     /*! \brief Sub matrix to compute the linear part of the objective function $p^{\top}_k$. */
     MAL_MATRIX(m_OptB,double);
     MAL_MATRIX(m_OptC,double);
-    MAL_MATRIX(m_OptD,double); 
+    MAL_MATRIX(m_OptD,double);
 
-    /*! \name Parameters of the objective function 
+    /*! \name Parameters of the objective function
     @{ */
     /*! Putting weight on the velocity */
     double m_Beta;
@@ -343,13 +343,13 @@ namespace PatternGeneratorJRL
     unsigned int m_FastFormulationMode;
 
     //! Primal Least square Distance Problem solver *\/ */
-    Optimization::Solver::PLDPSolverHerdt * m_PLDPSolverHerdt; 
+    Optimization::Solver::PLDPSolverHerdt * m_PLDPSolverHerdt;
 
     void initializeProblem();
 
     void computeCholeskyOfQ(double * OptA);
 
-    void computeObjective(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, 
+    void computeObjective(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
         deque<SupportFeet_t> & QueueOfSupportFeet,
         int NbOfConstraints, int NbOfEqConstraints,
         int & CriteriaToMaximize, MAL_VECTOR(& xk,double), double time);
@@ -375,7 +375,7 @@ namespace PatternGeneratorJRL
 
   public:
 
-    /*! Methods to comply with the initial interface of ZMPRefTrajectoryGeneration. 
+    /*! Methods to comply with the initial interface of ZMPRefTrajectoryGeneration.
       TODO: Change the internal structure to make those methods not mandatory
       for compiling.
      */
@@ -398,7 +398,7 @@ namespace PatternGeneratorJRL
         std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
         bool EndSequence);
 
-    int OnLineFootChange(double time, 
+    int OnLineFootChange(double time,
         FootAbsolutePosition &aFootAbsolutePosition,
         deque<ZMPPosition> & FinalZMPPositions,
         deque<COMState> & CoMPositions,
@@ -406,7 +406,7 @@ namespace PatternGeneratorJRL
         deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
         StepStackHandler  *aStepStackHandler);
 
-    void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions, 
+    void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
         deque<COMState> &FinalCOMStates,
         deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
         deque<FootAbsolutePosition> &RightFootAbsolutePositions);
