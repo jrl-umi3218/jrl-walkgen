@@ -29,8 +29,8 @@
    It handles a stack of constraint on a sliding mode 
    for QP solving. */
 
-#ifndef _fOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_
-#define _fOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_
+#ifndef _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_
+#define _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_
 
 #include <vector>
 #include <deque>
@@ -156,4 +156,4 @@ namespace PatternGeneratorJRL
       unsigned int m_FullDebug;
     };
 };
-#endif /* _fOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_ */
+#endif /* _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_ */
