@@ -1,10 +1,10 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Mehdi      Benallegue
  * Andrei     Herdt
  * Olivier    Stasse
- * 
+ *
  *
  * JRL, CNRS/AIST
  *
@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /** \file FootConstraintAsLinearSystemForVelRef.cpp
@@ -41,9 +41,9 @@ using namespace PatternGeneratorJRL;
 
 
 FootConstraintsAsLinearSystemForVelRef::
-FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM, 
-				       CjrlHumanoidDynamicRobot *aHS, 
-				       double ConstraintOnX, 
+FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM,
+				       CjrlHumanoidDynamicRobot *aHS,
+				       double ConstraintOnX,
 				       double ConstraintOnY) :
   SimplePlugin(aSPM)
 {
@@ -62,7 +62,7 @@ FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM,
     {
       cerr << "Problem with the reading of the left foot"<< endl;
     }
-    
+
   lLeftFoot->getSoleSize(lLeftFootHalfWidth,lLeftFootHalfHeight);
 
 
@@ -363,13 +363,13 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 
 	  if((m_FullDebug>2) && (i==1))
 	    {
-		    
+
 	      ofstream aof;
 	      aof.open("/tmp/ConvexHull.dat",ofstream::app);
 	      aof<<TheConvexHull[j].col<<" "<<TheConvexHull[j].row<<" "<<endl;
 	      aof.close();
 	    }
-		  
+
 	}
 
       //foot positionning constraints
@@ -445,28 +445,28 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 
       QueueOfLConstraintInequalitiesFreeFeet.push_back(aLCI);
 
-      //Determine the number of constraints 
+      //Determine the number of constraints
       deque<LinearConstraintInequalityFreeFeet_t>::iterator LCIFF_it;
-      LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin(); 
-      int IndexConstraint=0; 
-      for( int i=0;i<m_QP_N;i++) 
-	{ 
-	  if (LCIFF_it==QueueOfLConstraintInequalitiesFreeFeet.end()) 
-	    { 
-	      break; 
-	    } 
-	  IndexConstraint += MAL_MATRIX_NB_ROWS(LCIFF_it->D); 
-	  LCIFF_it++; 
-	} 
-		
-      if(PrwSupport.StepNumber>0) 
-	{ 
-	  LCIFF_it = QueueOfFeetPosInequalities.begin(); 
-		    
-	  IndexConstraint += double(PrwSupport.StepNumber)*MAL_MATRIX_NB_ROWS(LCIFF_it->D); 
-	} 
-		
-      NbOfConstraints = IndexConstraint; 
+      LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin();
+      int IndexConstraint=0;
+      for( int i=0;i<m_QP_N;i++)
+	{
+	  if (LCIFF_it==QueueOfLConstraintInequalitiesFreeFeet.end())
+	    {
+	      break;
+	    }
+	  IndexConstraint += MAL_MATRIX_NB_ROWS(LCIFF_it->D);
+	  LCIFF_it++;
+	}
+
+      if(PrwSupport.StepNumber>0)
+	{
+	  LCIFF_it = QueueOfFeetPosInequalities.begin();
+
+	  IndexConstraint += double(PrwSupport.StepNumber)*MAL_MATRIX_NB_ROWS(LCIFF_it->D);
+	}
+
+      NbOfConstraints = IndexConstraint;
 
    }
 
