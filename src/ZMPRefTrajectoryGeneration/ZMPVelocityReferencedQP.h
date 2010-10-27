@@ -25,7 +25,7 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! This object provides the generation of ZMP and CoM trajectory
-   using a new formulation of the stability problem.
+  using a new formulation of the stability problem.
 */
 
 #ifndef _ZMPVELOCITYREFERENCEDQP_WITH_CONSTRAINT_H_
@@ -38,7 +38,7 @@
 #include <Mathematics/OptCholesky.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 #include <Mathematics/PLDPSolverHerdt.h>
-#include <PreviewControl/SupportState.h>
+#include <PreviewControl/SupportFSM.h>
 #include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
 
@@ -61,7 +61,7 @@ namespace PatternGeneratorJRL
 
     /*! \name Methods to build the optimization problem
       @{
-     */
+    */
 
     /*! \brief Compute the constant matrices over all the instances of the problem.
       This means \f$P_{pu}, P_{px}, P_{vs}, P_{vu}\f$.
@@ -88,7 +88,7 @@ namespace PatternGeneratorJRL
 
     /*! \brief Call the two previous methods
       \return A negative value in case of a problem 0 otherwise.
-     */
+    */
     int InitConstants();
 
     void initFeet();
@@ -224,7 +224,7 @@ namespace PatternGeneratorJRL
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
     SupportState * m_Support;
 
-    /*! Uses a Finite State Machine to simulate the evolution of the support states. */
+    /*! Deecoupled optimization problem to compute the evolution of feet angles. */
     OrientationsPreview * m_OP;
 
     /*! \brief Object creating Linear inequalities constraints
@@ -246,14 +246,15 @@ namespace PatternGeneratorJRL
     /*! Orientations of the feet previewed over the whole horizon length*/
     //deque<double> PreviewedSupportAngles;
 
-    /*! Current state of the trunk */
+    /*! Current state of the trunk and the trunk state after m_QP_T*/
     COMState m_TrunkState, m_TrunkStateT;
 
     deque<COMState> m_QueueOfTrunkStates;
 
-    MAL_VECTOR(m_PerturbationAcceleration,double);
-
     double m_a, m_TrunkPolCoeffB, m_c, m_d, m_TrunkPolCoeffE;
+
+    //Additional term on the acceleration of the CoM
+    MAL_VECTOR(m_PerturbationAcceleration,double);
 
     /*! Sampling of the QP. */
     double m_QP_T;
@@ -267,11 +268,11 @@ namespace PatternGeneratorJRL
     //Final optimization problem
     struct Problem_s
     {
-    	int m, me, mmax, n, nmax, mnn;
-    	double *Q, *D, *DU, *DS, *XL, *XU, *X, *NewX, *U, *war;//For COM
-    	int *iwar;
-    	int iout, ifail, iprint, lwar, liwar;
-    	double Eps;
+      int m, me, mmax, n, nmax, mnn;
+      double *Q, *D, *DU, *DS, *XL, *XU, *X, *NewX, *U, *war;//For COM
+      int *iwar;
+      int iout, ifail, iprint, lwar, liwar;
+      double Eps;
     };
     typedef struct Problem_s Problem;
 
@@ -286,7 +287,6 @@ namespace PatternGeneratorJRL
     typedef struct SupportState_s SupportState_t;
 
     SupportState_t m_CurrentSupport;
-
 
     /*! \name Variables related to the QP
       @{ */
@@ -333,6 +333,7 @@ namespace PatternGeneratorJRL
 
     /*! \name Parameters of the objective function
     @{ */
+
     /*! Putting weight on the velocity */
     double m_Beta;
 
@@ -366,17 +367,16 @@ namespace PatternGeneratorJRL
     void computeCholeskyOfQ(double * OptA);
 
     void computeObjective(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
-		    deque<SupportFeet_t> & QueueOfSupportFeet,
-		    int NbOfConstraints, int NbOfEqConstraints,
-		    int & CriteriaToMaximize, MAL_VECTOR(& xk,double), double time);
-
+			  deque<SupportFeet_t> & QueueOfSupportFeet,
+			  int NbOfConstraints, int NbOfEqConstraints,
+			  int & CriteriaToMaximize, MAL_VECTOR(& xk,double), double time);
 
     void interpolateTrunkState(double time, int CurrentIndex,
-    		deque<COMState> & FinalCOMStates);
+			       deque<COMState> & FinalCOMStates);
 
     void interpolateFeetPositions(double time, int CurrentIndex,
-    				     deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-    				     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
+				  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+				  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
     int dumpProblem(double * Q,
 		    double * D,
@@ -397,7 +397,7 @@ namespace PatternGeneratorJRL
     /*! Methods to comply with the initial interface of ZMPRefTrajectoryGeneration.
       TODO: Change the internal structure to make those methods not mandatory
       for compiling.
-     */
+    */
 
     void GetZMPDiscretization(std::deque<ZMPPosition> & ZMPPositions,
 			      std::deque<COMState> & COMStates,
