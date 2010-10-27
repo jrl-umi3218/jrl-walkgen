@@ -55,13 +55,13 @@ namespace PatternGeneratorJRL
     void previewOrientations(const double &Time,
 			     std::deque<double> &PreviewedSupportAngles,
 			     const COMState &TrunkState, COMState &TrunkStateT,
-			     const SupportState * Support,
+			     SupportState_t CurrentSupport,
 			     std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
     void verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref,
 				      const COMState &TrunkState, COMState &TrunkStateT,
-				      const SupportState * Support);
+				      SupportState_t CurrentSupport);
 
   private:
     /*! Angular limitations of the hip joints*/
