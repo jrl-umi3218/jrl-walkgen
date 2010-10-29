@@ -932,7 +932,11 @@ int main(int argc, char *argv[])
   aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
   aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
 #else
+# ifdef WIN32
+#pragma message ( " -- !!! -- Warning : Compiled with HRP2DYNAMICS !" )
+# else
 #warning "Compiled with HRP2DYNAMICS !"
+# endif
   Chrp2OptHumanoidDynamicRobot *aHRP2HDR= new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
   aHDR = aHRP2HDR;
   aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
