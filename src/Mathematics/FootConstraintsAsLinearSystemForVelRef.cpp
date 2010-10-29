@@ -73,11 +73,11 @@ FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM,
 
 
   //TODO: Scilab feet
-  lLeftFootHalfHeight = 0.069-0.059;
+  /*  lLeftFootHalfHeight = 0.069-0.059;
   lRightFootHalfHeight = 0.069-0.059;
 
   lLeftFootHalfWidth = 0.1206-0.1006;
-  lRightFootHalfWidth = 0.1206-0.1006;
+  lRightFootHalfWidth = 0.1206-0.1006; */
 
   DSFeetDistance = 0.2;
   lLeftFootHalfHeightDS = lLeftFootHalfHeight+DSFeetDistance/2.0;
