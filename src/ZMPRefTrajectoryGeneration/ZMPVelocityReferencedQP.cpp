@@ -60,8 +60,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   ZMPRefTrajectoryGeneration(lSPM)
 {
 
-  m_EndPhaseOfWalking = false;
-
   m_Q = 0;
   m_Pu = 0;
   m_FullDebug = -10;
@@ -1333,7 +1331,6 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
 
   // Set the internal state of the ZMPRefTrajectory object.
-  m_EndPhaseOfWalking = false;
   m_OnLineMode = true;
 
   ODEBUG4("ZMP::InitOnLine - Step 2 ","ZMDInitOnLine.txt");
@@ -2013,14 +2010,11 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
 {
 
+  if (!m_OnLineMode)
+    return;
+
   if(time + 0.00001 > m_UpperTimeLimitToUpdate)
     {
-
-      if (m_EndPhaseOfWalking)
-	{
-	  m_OnLineMode = false;
-	  return;
-	}
 
       int NbOfConstraints=0; // Nb of constraints are not known in advance
 
@@ -2318,7 +2312,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  m_FPy = CurSF_it->y - double(CurSF_it->SupportFoot)*cos(CurSF_it->theta)*m_FeetDistanceDS;
 
 	  // Specify that we are in the ending phase.
-	  m_EndPhaseOfWalking = true;
+	  m_OnLineMode = false;
 	}
 
 

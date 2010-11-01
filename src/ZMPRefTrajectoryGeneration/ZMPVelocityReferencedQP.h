@@ -244,9 +244,6 @@ namespace PatternGeneratorJRL
 
     deque<COMState> m_QueueOfTrunkStates;
 
-    /*! Specify if the algorithm is in the end phase of walking. */
-    bool m_EndPhaseOfWalking;
-
     double m_a, m_TrunkPolCoeffB, m_c, m_d, m_TrunkPolCoeffE;
 
     //Additional term on the acceleration of the CoM
