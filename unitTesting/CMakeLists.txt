@@ -163,6 +163,9 @@ ADD_TEST(TestMorisawa2007 TestMorisawa2007 ${samplemodelpath} sample.wrl ${sampl
 # Test Herdt 2010 #
 ###################
 
+CONFIGURE_FILE(${${PROJECT_NAME}_SOURCE_DIR}/unitTesting/TestHerdt2010OnLineTestFGPI.datref
+		 ${${PROJECT_NAME}_BINARY_DIR}/unitTesting/TestHerdt2010OnLineTestFGPI.datref)
+
 ADD_EXECUTABLE( TestHerdt2010
   ../src/TimeUtilsWindows.cpp
   TestHerdt2010.cpp
