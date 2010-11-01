@@ -60,6 +60,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   ZMPRefTrajectoryGeneration(lSPM)
 {
 
+  m_EndPhaseOfWalking = false;
+
   m_Q = 0;
   m_Pu = 0;
   m_FullDebug = -10;
@@ -1330,6 +1332,9 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
 
+  // Set the internal state of the ZMPRefTrajectory object.
+  m_EndPhaseOfWalking = false;
+  m_OnLineMode = true;
 
   ODEBUG4("ZMP::InitOnLine - Step 2 ","ZMDInitOnLine.txt");
   // Initialize position of the feet.
@@ -2010,6 +2015,13 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
   if(time + 0.00001 > m_UpperTimeLimitToUpdate)
     {
+
+      if (m_EndPhaseOfWalking)
+	{
+	  m_OnLineMode = false;
+	  return;
+	}
+
       int NbOfConstraints=0; // Nb of constraints are not known in advance
 
       MAL_VECTOR_DIM(xk,double,6);
@@ -2304,6 +2316,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	    CurSF_it--;
 	  m_FPx = CurSF_it->x + double(CurSF_it->SupportFoot)*sin(CurSF_it->theta)*m_FeetDistanceDS;
 	  m_FPy = CurSF_it->y - double(CurSF_it->SupportFoot)*cos(CurSF_it->theta)*m_FeetDistanceDS;
+
+	  // Specify that we are in the ending phase.
+	  m_EndPhaseOfWalking = true;
 	}
 
 
@@ -2369,7 +2384,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	m_UpperTimeLimitToUpdate = time+m_QP_T;
       else
 	m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+m_QP_T;
-
+    
       ODEBUG6("uk:" << uk,"/tmp/DebugPBW.dat");
       ODEBUG6("xk:" << xk,"/tmp/DebugPBW.dat");
 
