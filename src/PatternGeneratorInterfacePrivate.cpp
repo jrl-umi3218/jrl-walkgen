@@ -513,6 +513,9 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::initOnlineHerdt()
   {
 
+    // TODO : The common part has to be shared,
+    // and the specific part send back to the algorithm implementation.
+
     COMState lStartingCOMState;
     memset(&lStartingCOMState,0,sizeof(COMState));
     MAL_S3_VECTOR(,double) lStartingZMPPosition;
@@ -544,15 +547,6 @@ namespace PatternGeneratorJRL {
 			  RelativeFootPositions,
 			  lStartingCOMState,
 			  lStartingZMPPosition);
-
-    // // Initialization of the first preview.
-    //   printf("lCurrent \n");
-    // for(int j=0; j<m_DOF;j++)
-    //   {
-    // 	cout<<m_CurrentActuatedJointValues[j]<<endl;
-    // 	BodyAnglesIni(j) = m_CurrentActuatedJointValues[j];
-    //   }
-
 
     m_GlobalStrategyManager->Setup(m_ZMPPositions,
 				   m_COMBuffer,
