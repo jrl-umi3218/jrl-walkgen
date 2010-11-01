@@ -47,41 +47,33 @@ FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM,
 				       double ConstraintOnY) :
   SimplePlugin(aSPM)
 {
+  double lHalfHeightInit,lHalfWidthInit;
+
   m_HS = aHS;
   // Read humanoid specificities.
-  lRightFoot = m_HS->rightFoot();
-  if (lRightFoot==0)
+  m_RightFoot = m_HS->rightFoot();
+  if (m_RightFoot==0)
     {
       cerr << "Problem with the reading of the right foot"<< endl;
     }
-  lRightFoot->getSoleSize(lRightFootHalfWidth,lRightFootHalfHeight);
-  lRightFoot->getAnklePositionInLocalFrame(AnklePosition);
-  lZ = AnklePosition[2];
-  lLeftFoot = m_HS->leftFoot();
-  if (lRightFoot==0)
+  m_RightFoot->getSoleSize(lHalfWidthInit,lHalfHeightInit);
+
+  m_RightFootSize.setHalfSizeInit(lHalfWidthInit,lHalfHeightInit);
+  m_RightFootSize.setConstraints(ConstraintOnX,ConstraintOnY);
+  m_RightFoot->getAnklePositionInLocalFrame(AnklePosition);
+  m_Z = AnklePosition[2];
+  m_LeftFoot = m_HS->leftFoot();
+  if (m_RightFoot==0)
     {
       cerr << "Problem with the reading of the left foot"<< endl;
     }
 
-  lLeftFoot->getSoleSize(lLeftFootHalfWidth,lLeftFootHalfHeight);
-
-
-  lRightFootHalfWidth *= 0.5;
-  lRightFootHalfHeight *= 0.5;
-  lLeftFootHalfWidth *= 0.5;
-  lLeftFootHalfHeight *= 0.5;
-
-
-  //TODO: Scilab feet
-  /*  lLeftFootHalfHeight = 0.069-0.059;
-  lRightFootHalfHeight = 0.069-0.059;
-
-  lLeftFootHalfWidth = 0.1206-0.1006;
-  lRightFootHalfWidth = 0.1206-0.1006; */
-
+  m_LeftFoot->getSoleSize(lHalfWidthInit,lHalfHeightInit);
+  m_LeftFootSize.setHalfSizeInit(lHalfWidthInit,lHalfHeightInit);
+  m_LeftFootSize.setConstraints(ConstraintOnX,ConstraintOnY);
+  
   DSFeetDistance = 0.2;
-  lLeftFootHalfHeightDS = lLeftFootHalfHeight+DSFeetDistance/2.0;
-  lRightFootHalfHeightDS = lRightFootHalfHeight+DSFeetDistance/2.0;
+
 
   ConvexHullFP.resize(5);
 
@@ -314,16 +306,16 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 
 	  if(PrwSupport.Foot == 1)
 	    {
-	      FootHalfWidth = lLeftFootHalfWidth;
-	      FootHalfHeight = lLeftFootHalfHeightDS;
+	      FootHalfWidth = m_LeftFootSize.getHalfWidth();
+	      FootHalfHeight = m_LeftFootSize.getHalfHeightDS();
 
 	      lxcoefs = lxcoefsLeft;
 	      lycoefs = lycoefsLeft;
 	    }
 	  else
 	    {
-	      FootHalfWidth = lRightFootHalfWidth;
-	      FootHalfHeight = lRightFootHalfHeightDS;
+	      FootHalfWidth = m_RightFootSize.getHalfWidth();
+	      FootHalfHeight = m_RightFootSize.getHalfHeightDS();
 
 	      lxcoefs = lxcoefsRight;
 	      lycoefs = lycoefsRight;
@@ -337,16 +329,16 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 
 	  if(PrwSupport.Foot == 1)
 	    {
-	      FootHalfWidth = lLeftFootHalfWidth;
-	      FootHalfHeight = lLeftFootHalfHeight;
+	      FootHalfWidth = m_LeftFootSize.getHalfWidth();
+	      FootHalfHeight = m_LeftFootSize.getHalfHeight();
 
 	      lxcoefs = lxcoefsLeft;
 	      lycoefs = lycoefsLeft;
 	    }
 	  else
 	    {
-	      FootHalfWidth = lRightFootHalfWidth;
-	      FootHalfHeight = lRightFootHalfHeight;
+	      FootHalfWidth = m_RightFootSize.getHalfWidth();
+	      FootHalfHeight = m_RightFootSize.getHalfHeight();
 
 	      lxcoefs = lxcoefsRight;
 	      lycoefs = lycoefsRight;
@@ -478,5 +470,21 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 
 void FootConstraintsAsLinearSystemForVelRef::CallMethod(std::string &Method, std::istringstream &Args)
 {
-  // TO BE EXTENDED.
+  if (Method==":setfeetconstraint")
+    {
+      string lCmd;
+      Args >> lCmd;
+      if (lCmd=="XY")
+	{
+	  Args >> m_ConstraintOnX;
+	  Args >> m_ConstraintOnY;
+
+	  m_RightFootSize.setConstraints(m_ConstraintOnX, m_ConstraintOnY);
+	  m_LeftFootSize.setConstraints(m_ConstraintOnX, m_ConstraintOnY);
+	  cout << "Constraint On X: " << m_ConstraintOnX
+	       << " Constraint On Y: " << m_ConstraintOnY << endl;
+	}
+
+    }
+  
 }

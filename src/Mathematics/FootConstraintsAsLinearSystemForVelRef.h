@@ -45,12 +45,13 @@
 #include <PGTypes.h>
 #include <privatepgtypes.h>
 #include <Mathematics/ConvexHull.h>
+#include <Mathematics/FootHalfSize.hh>
 #include <SimplePlugin.h>
 #include <PreviewControl/SupportFSM.h>
 
 namespace PatternGeneratorJRL
 {
-  
+
   /*! This class generates matrix representation of linear
    constraint based on foot position.
    It handles a stack of constraint on a sliding mode 
@@ -136,15 +137,15 @@ namespace PatternGeneratorJRL
 
       // Find the convex hull for each of the position,
       // in order to create the corresponding trajectory.
-      double lLeftFootHalfWidth,lLeftFootHalfHeight,lLeftFootHalfHeightDS,
-	lRightFootHalfWidth,lRightFootHalfHeight,lRightFootHalfHeightDS,lZ;
+      FootHalfSize m_LeftFootSize, m_RightFootSize;
+      double m_Z;
       
       double DSFeetDistance;
       
       // Read humanoid specificities.
-      CjrlFoot * lRightFoot;
+      CjrlFoot * m_RightFoot;
       vector3d AnklePosition;
-      CjrlFoot * lLeftFoot;
+      CjrlFoot * m_LeftFoot;
   
       int State; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
       // 3: Double Support.
@@ -156,6 +157,12 @@ namespace PatternGeneratorJRL
       double s_t,c_t;
       
       unsigned int m_FullDebug;
+
+      /*! \brief Additional constraints on the feet size.
+	m_ConstraintOnX  is removed from the length of the feet along the X-axis.
+	m_ConstraintOnY  is removed from the length of the feet along the Y-axis.
+       */
+      double m_ConstraintOnX, m_ConstraintOnY;
     };
 };
 #endif /* _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_ */
