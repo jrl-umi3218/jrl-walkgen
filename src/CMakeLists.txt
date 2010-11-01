@@ -29,6 +29,7 @@ SET(libwpg_src
 	./Mathematics/ConvexHull.cpp 
 	./Mathematics/FootConstraintsAsLinearSystem.cpp
 	./Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
+	./Mathematics/FootHalfSize.cpp
 	./Mathematics/OptCholesky.cpp
 	./Mathematics/Polynome.cpp 
 	./Mathematics/PolynomeFoot.cpp 
