@@ -167,6 +167,8 @@ ADD_EXECUTABLE( TestHerdt2010
   ../src/TimeUtilsWindows.cpp
   TestHerdt2010.cpp
   CommonTools.cpp
+  TestObject.cpp
+  ClockCPUTime.cpp
 )
 SET_TARGET_PROPERTIES( TestHerdt2010
 	              PROPERTIES
@@ -175,6 +177,8 @@ SET_TARGET_PROPERTIES( TestHerdt2010
 )
 target_link_libraries (TestHerdt2010 ${PROJECT_NAME})
 ADD_DEPENDENCIES (TestHerdt2010 ${PROJECT_NAME})
+
+ADD_TEST(TestHerdt2010 TestHerdt2010 ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 
 #####################
 # Add user examples #
