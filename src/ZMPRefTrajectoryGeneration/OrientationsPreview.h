@@ -40,7 +40,7 @@
 #include <PreviewControl/SupportFSM.h>
 
 /*! Framework includes */
-#include <walkGenJrl/PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 #include <robotDynamics/jrlJoint.h>
 
 namespace PatternGeneratorJRL

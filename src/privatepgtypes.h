@@ -21,7 +21,7 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/*! \file PGTypes.h
+/*! \file privatepgtypes.h
   \brief Defines basic types for the Humanoid Walking Pattern Generator.
 */
 

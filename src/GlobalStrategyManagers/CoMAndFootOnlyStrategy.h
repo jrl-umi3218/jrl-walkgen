@@ -27,7 +27,7 @@
 */
 
 #include <SimplePlugin.h>
-#include <PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 
 #include <MotionGeneration/ComAndFootRealization.h>
 #include <GlobalStrategyManagers/GlobalStrategyManager.h>

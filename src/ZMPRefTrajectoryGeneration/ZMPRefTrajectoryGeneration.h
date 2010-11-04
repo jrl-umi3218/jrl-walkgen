@@ -29,14 +29,14 @@
 #ifndef _ZMPREF_TRAJ_GEN_H_
 #define _ZMPREF_TRAJ_GEN_H_
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 #include <deque>
 #include <string>
 //#define FULL_POLYNOME
 
 
-#include <PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 #include <SimplePlugin.h>
 
 namespace PatternGeneratorJRL

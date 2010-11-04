@@ -36,12 +36,12 @@
 #include <string>
 #include <sstream>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
 
 
-#include <PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 #include <Mathematics/ConvexHull.h>
 #include <SimplePlugin.h>
 

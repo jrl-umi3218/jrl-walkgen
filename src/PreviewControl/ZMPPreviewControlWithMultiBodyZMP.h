@@ -34,11 +34,11 @@
 
 #include <deque>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 
 
-#include <PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 #include <SimplePlugin.h>
 #include <PreviewControl/PreviewControl.h>
 #include <MotionGeneration/ComAndFootRealization.h>

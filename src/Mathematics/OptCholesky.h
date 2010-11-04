@@ -34,7 +34,7 @@
 #include <vector>
 
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 using namespace::std;
 

@@ -27,7 +27,7 @@
 #define _FILTERING_ANALYTICAL_TRAJECTORY_BY_PREVIEW_CONTROL_H_
 
 /*! Local framework include */
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 #include <Mathematics/AnalyticalZMPCOGTrajectory.h>
 #include <PreviewControl/PreviewControl.h>
 

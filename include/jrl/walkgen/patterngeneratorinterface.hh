@@ -36,7 +36,7 @@
 
 #include <deque>
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>
-#include <walkGenJrl/PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 
 namespace PatternGeneratorJRL
 {

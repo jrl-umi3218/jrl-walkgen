@@ -41,7 +41,7 @@
 #  define WALK_GEN_JRL_EXPORT
 #endif
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 namespace PatternGeneratorJRL
 {

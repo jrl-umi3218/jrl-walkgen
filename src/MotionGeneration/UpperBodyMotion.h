@@ -30,7 +30,7 @@
 #ifndef _UPPER_BODY_MOTION_
 #define _UPPER_BODY_MOTION_
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 #include <vector>
 #include <string>

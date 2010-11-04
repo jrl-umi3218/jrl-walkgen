@@ -39,11 +39,11 @@
 
 #include <ostream>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
-#include <dynamicsJRLJapan/dynamicsJRLJapanFactory.h>
+#include <jrl/dynamics/dynamicsfactory.hh>
 
-#include <walkGenJrl/PatternGeneratorInterface.h>
+#include <jrl/walkgen/patterngeneratorinterface.hh>
 
 #include "CommonTools.h"
 #include "ClockCPUTime.h"

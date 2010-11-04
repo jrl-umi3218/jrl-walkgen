@@ -33,7 +33,7 @@
 
 #include <vector>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 
 #include <Mathematics/Polynome.h>

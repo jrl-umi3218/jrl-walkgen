@@ -41,7 +41,7 @@
 #include <deque>
 
 /*! MAL */
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 /*! Abstract Interface for dynamic robot. */
 #include <robotDynamics/jrlHumanoidDynamicRobot.h>

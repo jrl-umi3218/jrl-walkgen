@@ -45,7 +45,7 @@
 #endif /*WIN32*/
 
 
-#include <PatternGeneratorInterfacePrivate.h>
+#include <patterngeneratorinterfaceprivate.hh>
 #include <Debug.h>
 
 namespace PatternGeneratorJRL {

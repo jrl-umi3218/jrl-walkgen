@@ -33,11 +33,11 @@
 
 #include <deque>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 
 #include <SimplePlugin.h>
-#include <walkGenJrl/PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 
 namespace PatternGeneratorJRL
 {

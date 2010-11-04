@@ -172,8 +172,8 @@ Initialization()
 
 
   vector3d RightFootSoleCenter,LeftFootSoleCenter;
-  RightFoot->getSoleCenterInLocalFrame(RightFootSoleCenter);
-  LeftFoot->getSoleCenterInLocalFrame(LeftFootSoleCenter);
+  RightFoot->getProjectionCenterLocalFrameInSole(RightFootSoleCenter);
+  LeftFoot->getProjectionCenterLocalFrameInSole(LeftFootSoleCenter);
 
   double lWidth,lHeight,lDepth;
   lDepth = lAnklePositionRight[2];
@@ -435,7 +435,7 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   CjrlFoot * RightFoot = aDMB->rightFoot();
   matrix4d lFootPose = RightFoot->associatedAnkle()->currentTransformation();
   vector3d RightFootSoleCenter;
-  RightFoot->getSoleCenterInLocalFrame(RightFootSoleCenter);
+  RightFoot->getProjectionCenterLocalFrameInSole(RightFootSoleCenter);
   
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,0) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,0,3);
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,1) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,1,3);

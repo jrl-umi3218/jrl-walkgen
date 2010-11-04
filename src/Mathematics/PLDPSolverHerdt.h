@@ -34,7 +34,7 @@
 #include <vector>
 #include <deque>
 #include <Mathematics/OptCholesky.h>
-#include <walkGenJrl/PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 
 namespace Optimization
 {
