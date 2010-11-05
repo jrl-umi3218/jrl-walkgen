@@ -15,7 +15,7 @@
 
 SET(BUILD_DIR ${CMAKE_BINARY_DIR}/doc)
 
-SET(DOCDIR share/doc/${PROJECT_NAME})
+SET(DOCDIR share/doc/jrl/walkgen)
 SET(HTMLDIR ${DOCDIR}/html)
 
 # Add `doc' target.

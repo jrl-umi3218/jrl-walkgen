@@ -39,7 +39,7 @@
 
 #include <jrl/mal/matrixabstractlayer.hh>
 
-#include <abstract-robot-dynamics/jrlHumanoidDynamicRobot.h>
+#include <abstract-robot-dynamics/jrlhumanoiddynamicrobot.hh>
 
 
 #include <jrl/walkgen/pgtypes.hh>

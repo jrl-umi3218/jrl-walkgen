@@ -19,7 +19,7 @@ enable_testing()
 
 # Name of the project
 #--------------------
-SET(PROJECT_NAME walkGenJrl)
+SET(PROJECT_NAME jrl-walkgen)
 SET(PROJECT_CONTACT olivier.stasse@aist.go.jp)
 SET(PROJECT_DESCRIPTION "Humanoid Walking Pattern Generator (JRL)")
 
@@ -76,11 +76,11 @@ INCLUDE(FindPkgConfig)
 
 # Look for abstract robot dynamics.
 SET(ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION 1.15)
-pkg_check_modules(ABSTRACTROBOTDYNAMICS REQUIRED abstractRobotDynamics>=${ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION})
+pkg_check_modules(ABSTRACTROBOTDYNAMICS REQUIRED abstract-robot-dynamics>=${ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION})
 SET(PROJECT_REQUIREMENTS "abstractRobotDynamics >= ${ABSTRACTROBOTDYNAMICS_REQUIRED_VERSION}")
 
-EXEC_PROGRAM(${PKG_CONFIG_EXECUTABLE} ARGS  --variable=docdir abstractRobotDynamics
-  OUTPUT_VARIABLE _abstractRobotDynamics_DOCDIR)
+EXEC_PROGRAM(${PKG_CONFIG_EXECUTABLE} ARGS  --variable=docdir abstract-robot-dynamics
+  OUTPUT_VARIABLE _abstract-robot-dynamics_DOCDIR)
 
 SET(${PROJECT_NAME}_src_CXXFLAGS "${${PROJECT_NAME}_src_CXXFLAGS} -I${${PROJECT_NAME}_SOURCE_DIR}")
 

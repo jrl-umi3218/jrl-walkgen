@@ -39,7 +39,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 /* dynamics JRL Japan related inclusions */
-#include <abstract-robot-dynamics/jrlFoot.h>
+#include <abstract-robot-dynamics/jrlfoot.hh>
 
 /* Walking pattern generation related inclusions */
 

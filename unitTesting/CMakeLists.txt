@@ -58,13 +58,13 @@ MESSAGE(STATUS "UL: ${${PROJECT_NAME}_test_LDFLAGS}  ${${PROJECT_NAME}_test_CXXF
 # Deal with dynamicsJRLJapan #
 ##############################
 SET(_dynamicsJRLJapan_FOUND 0)
-SET(_dynamicsJRLJapan_OPTIONAL "dynamicsJRLJapan >= 1.19.1")
+SET(_dynamicsJRLJapan_OPTIONAL "jrl-dynamics >= 1.19.1")
 PKG_CHECK_MODULES(_dynamicsJRLJapan ${_dynamicsJRLJapan_OPTIONAL})
 
 IF(NOT _dynamicsJRLJapan_FOUND)
-  MESSAGE(WARNING "Check that package dynamicsJRLJapan is installed in a directory pointed out by PKG_CONFIG_PATH.")
+  MESSAGE(WARNING "Check that package jrl-dynamics is installed in a directory pointed out by PKG_CONFIG_PATH.")
 ELSE(NOT _dynamicsJRLJapan_FOUND)
-  EXEC_PROGRAM(${PKG_CONFIG_EXECUTABLE} ARGS  --variable=datarootdir dynamicsJRLJapan
+  EXEC_PROGRAM(${PKG_CONFIG_EXECUTABLE} ARGS  --variable=datarootdir jrl-dynamics
     OUTPUT_VARIABLE _dynamicsJRLJapan_DATADIR)
   
   IF(NOT _hrp2Dynamics_FOUND)
@@ -149,10 +149,10 @@ SET_TARGET_PROPERTIES( TestMorisawa2007
 target_link_libraries (TestMorisawa2007 ${PROJECT_NAME})
 ADD_DEPENDENCIES (TestMorisawa2007 ${PROJECT_NAME})
 
-set (samplemodelpath ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/ )
-set (samplespec ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/sampleSpecificities.xml)
-set (sampleljr ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/sampleLinkJointRank.xml)
-set (sampleinitconfig ${_dynamicsJRLJapan_DATADIR}/examples/dynamicsJRLJapan/data/sampleInitConfig.dat)
+set (samplemodelpath ${_dynamicsJRLJapan_DATADIR}/examples/jrl/dynamics/data/ )
+set (samplespec ${_dynamicsJRLJapan_DATADIR}/examples/jrl/dynamics/data/sampleSpecificities.xml)
+set (sampleljr ${_dynamicsJRLJapan_DATADIR}/examples/jrl/dynamics/data/sampleLinkJointRank.xml)
+set (sampleinitconfig ${_dynamicsJRLJapan_DATADIR}/examples/jrl/dynamics/data/sampleInitConfig.dat)
 
 MESSAGE(STATUS "Sample specificities:" ${samplespec})
 MESSAGE(STATUS "Sample link joint rank:" ${sampleljr})
@@ -197,6 +197,6 @@ SET(${PROJECT_NAME}_EXAMPLES
   )
 
 INSTALL(FILES ${${PROJECT_NAME}_EXAMPLES}
-  DESTINATION share/examples/${PROJECT_NAME}/
+  DESTINATION share/examples/jrl/walkgen/
   PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE )
 
