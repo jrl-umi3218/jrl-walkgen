@@ -44,7 +44,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 /*! Abstract Interface for dynamic robot. */
-#include <robotDynamics/jrlHumanoidDynamicRobot.h>
+#include <abstract-robot-dynamics/jrlHumanoidDynamicRobot.h>
 
 /*! Humanoid Walking Pattern Generator */
 

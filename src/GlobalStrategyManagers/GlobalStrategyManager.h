@@ -33,7 +33,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 // Dynamics
-#include <robotDynamics/jrlHumanoidDynamicRobot.h>
+#include <abstract-robot-dynamics/jrlHumanoidDynamicRobot.h>
 
 // PG
 

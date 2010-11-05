@@ -35,7 +35,7 @@
 #define _PATTERN_GENERATOR_INTERFACE_H_
 
 #include <deque>
-#include <robotDynamics/jrlHumanoidDynamicRobot.h>
+#include <abstract-robot-dynamics/jrlHumanoidDynamicRobot.h>
 #include <jrl/walkgen/pgtypes.hh>
 
 namespace PatternGeneratorJRL

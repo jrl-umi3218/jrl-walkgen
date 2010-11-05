@@ -41,7 +41,7 @@
 
 /*! Framework includes */
 #include <jrl/walkgen/pgtypes.hh>
-#include <robotDynamics/jrlJoint.h>
+#include <abstract-robot-dynamics/jrlJoint.h>
 
 namespace PatternGeneratorJRL
 {

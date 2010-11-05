@@ -1313,6 +1313,11 @@ void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstrea
     {
       strm >> m_SupportFSM->m_NbOfStepsSSDS;
     }
+  if (Method==":comheight")
+    {
+      strm >> m_ComHeight;
+      m_2DLIPM->SetComHeight(m_ComHeight);
+    }
 
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
 }
@@ -1380,7 +1385,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
     {
 
       // Smooth ramp
-      FinalZMPPositions[CurrentZMPindex].px =lStartingZMPPosition(0);
+      FinalZMPPositions[CurrentZMPindex].px = lStartingZMPPosition(0);
       FinalZMPPositions[CurrentZMPindex].py = lStartingZMPPosition(1);
       FinalZMPPositions[CurrentZMPindex].pz = lStartingZMPPosition(2);
       FinalZMPPositions[CurrentZMPindex].theta = 0.0;
@@ -1389,7 +1394,6 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 
       // Set CoM positions.
       FinalCoMPositions[CurrentZMPindex] = lStartingCOMState;
-
       // Set Left Foot positions.
       FinalLeftFootAbsolutePositions[CurrentZMPindex] = CurrentLeftFootAbsPos;
       FinalRightFootAbsolutePositions[CurrentZMPindex] = CurrentRightFootAbsPos;

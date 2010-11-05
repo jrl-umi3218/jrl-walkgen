@@ -170,23 +170,16 @@ Initialization()
   RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
   LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
 
-
-  vector3d RightFootSoleCenter,LeftFootSoleCenter;
-  RightFoot->getProjectionCenterLocalFrameInSole(RightFootSoleCenter);
-  LeftFoot->getProjectionCenterLocalFrameInSole(LeftFootSoleCenter);
-
   double lWidth,lHeight,lDepth;
   lDepth = lAnklePositionRight[2];
   LeftFoot->getSoleSize(lWidth,lHeight);
 
-  ODEBUG4("RightFootSoleCenter:"<<RightFootSoleCenter, "DebugDataStartingCOM.dat");
-  ODEBUG4("LeftFootSoleCenter:"<<LeftFootSoleCenter, "DebugDataStartingCOM.dat");
-  m_AnklePositionRight[0] = lAnklePositionRight[0] - RightFootSoleCenter[0];
-  m_AnklePositionLeft[0]  = lAnklePositionLeft[0] - LeftFootSoleCenter[0];
-  m_AnklePositionRight[1] = lAnklePositionRight[1] - RightFootSoleCenter[1];
-  m_AnklePositionLeft[1]  = lAnklePositionLeft[1] - LeftFootSoleCenter[1];
-  m_AnklePositionRight[2] = lAnklePositionRight[2] - RightFootSoleCenter[2];
-  m_AnklePositionLeft[2]  = lAnklePositionRight[2] - LeftFootSoleCenter[2];
+  m_AnklePositionRight[0] = lAnklePositionRight[0];
+  m_AnklePositionLeft[0]  = lAnklePositionLeft[0];
+  m_AnklePositionRight[1] = lAnklePositionRight[1];
+  m_AnklePositionLeft[1]  = lAnklePositionLeft[1];
+  m_AnklePositionRight[2] = lAnklePositionRight[2];
+  m_AnklePositionLeft[2]  = lAnklePositionRight[2];
       
   ODEBUG4("m_AnklePositionRight: "<< m_AnklePositionRight[0] << " " <<
 	 m_AnklePositionRight[1] << " " <<
@@ -434,8 +427,6 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   // Initialise the right foot position.
   CjrlFoot * RightFoot = aDMB->rightFoot();
   matrix4d lFootPose = RightFoot->associatedAnkle()->currentTransformation();
-  vector3d RightFootSoleCenter;
-  RightFoot->getProjectionCenterLocalFrameInSole(RightFootSoleCenter);
   
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,0) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,0,3);
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,1) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,1,3);
@@ -465,7 +456,7 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
 
   WaistPosition[0] = CurrentConfig(0); // 0.0
   WaistPosition[1] = CurrentConfig(1); // 0.0
-  WaistPosition[2] = CurrentConfig(2) -lFootPosition[2]-RightFootSoleCenter[2];
+  WaistPosition[2] = CurrentConfig(2) -lFootPosition[2];
 
   ODEBUG("WaistPosition: " << WaistPosition);
   InitRightFootPosition.x = lFootPosition[0];
@@ -551,7 +542,7 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   ODEBUG( lStartingCOMPosition[0] << " "
 	  << lStartingCOMPosition[1] << " "
 	  << lStartingCOMPosition[2]);
-  lStartingCOMPosition[2] +=    -lFootPosition[2]-RightFootSoleCenter[2];
+  lStartingCOMPosition[2] +=    -lFootPosition[2];
   // Vector to go from CoM to Waist.
   m_DiffBetweenComAndWaist[0] =  WaistPosition[0] - lStartingCOMPosition[0];
   m_DiffBetweenComAndWaist[1] =  WaistPosition[1] - lStartingCOMPosition[1];

@@ -33,7 +33,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 /* abstractRobotDynamics inclusion */
-#include <robotDynamics/jrlFoot.h>
+#include <abstract-robot-dynamics/jrlFoot.h>
 
 /* Walking Pattern Generator inclusion */
 
