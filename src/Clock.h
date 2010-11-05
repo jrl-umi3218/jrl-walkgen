@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Francois Keith
  * Olivier Stasse
@@ -19,31 +19,26 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
 /*! \file Clock.h
     \brief Defines an object for measuring the time spend in some code part.
 */
-
-
-
-#ifdef UNIX
-#include <sys/time.h> 
-#endif /*UNIX*/
-
-#ifdef WIN32
-#include <Windows.h>
-#include "TimeUtilsWindows.h"
-#endif
-
-#include <time.h>
-#include <vector>
-#include <string>
-
 #ifndef _HWPG_CLOCK_H_
-#define _HWPG_CLOCK_H_
+# define _HWPG_CLOCK_H_
+# include <time.h>
+# include <vector>
+# include <string>
+
+# include "portability/gettimeofday.hh"
+
+# ifdef WIN32
+#  include <Windows.h>
+# endif
+
+
 namespace PatternGeneratorJRL
 {
   /*! \brief Measure time spend in some code.
@@ -69,7 +64,7 @@ namespace PatternGeneratorJRL
 
     /*! \brief End Timing. */
     void StopTiming();
-    
+
     /*! \brief Increment Iteration by specifying the number of iterations*/
     void IncIteration(int lNbOfIts=1);
 
@@ -98,7 +93,7 @@ namespace PatternGeneratorJRL
     void RecordDataBuffer(std::string filename);
 
   private:
-    
+
     /*! Storing begin and end timestamps. */
     struct timeval m_BeginTimeStamp, m_EndTimeStamp;
 
@@ -110,15 +105,12 @@ namespace PatternGeneratorJRL
 
     /*! Maximum time. */
     double m_MaximumTime;
-    
+
     /*! Total time. */
     double m_TotalTime;
-    
+
     /*! Buffer */
     std::vector<double> m_DataBuffer;
-
-    
-    
   };
 };
 #endif /* _HWPG_CLOCK_H_ */

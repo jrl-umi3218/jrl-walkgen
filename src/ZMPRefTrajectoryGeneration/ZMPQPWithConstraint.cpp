@@ -26,14 +26,12 @@
 /* This object generate all the values for the foot trajectories,
   and the desired ZMP based on a sequence of steps following a QP
   formulation as proposed by PB Wieber, Humanoids 2006. */
-#ifdef UNIX
-#include <sys/time.h>
-#endif /* UNIX */
+
+#include "portability/gettimeofday.hh"
 
 #ifdef WIN32
-#include <Windows.h>
-#include <TimeUtilsWindows.h>
-#endif
+# include <Windows.h>
+#endif /* WIN32 */
 
 #include <time.h>
 

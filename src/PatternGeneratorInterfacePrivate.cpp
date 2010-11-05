@@ -34,14 +34,15 @@
 #include <fstream>
 #include <time.h>
 
-#ifdef UNIX
-#include <sys/time.h>
-#endif /*UNIX*/
+#include "portability/gettimeofday.hh"
+#include "portability/bzero.hh"
 
 #ifdef WIN32
-#include <Windows.h>
-#include <TimeUtilsWindows.h>
-#define bzero(p, size) (void)memset((p), 0, (size))  // definition of bzero for win32
+# include <Windows.h>
+#endif /* WIN32 */
+
+#ifdef WIN32
+# include <Windows.h>
 #endif /*WIN32*/
 
 

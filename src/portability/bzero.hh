@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, 2009, 2010, 
+ * Copyright 2008, 2009, 2010,
  *
  * Francois Keith
  * Olivier Stasse
@@ -19,26 +19,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/*! \file TimeUtilsWindows.h */
-#ifdef WIN32
 
-#ifndef TIME_UTILS_WINDOWS_H
-#define TIME_UTILS_WINDOWS_H
-
-#include < time.h >
-
-struct timezone 
-{
-  int  tz_minuteswest; /* minutes W of Greenwich */
-  int  tz_dsttime;     /* type of dst correction */
-};
-
-int gettimeofday(struct timeval *tv, struct timezone *tz);
-
-#endif /*TIME_UTILS_WINDOWS_H*/
-
-#endif /*WIN32*/
-
+#ifndef JRL_WALKGEN_PORTABILITY_BZERO_HH
+# define JRL_WALKGEN_PORTABILITY_BZERO_HH
+# ifdef WIN32
+#  define bzero(p, size) (void)memset((p), 0, (size))
+# else
+#  include <strings.h>
+# endif //! WIN32
+#endif //! JRL_WALKGEN_PORTABILITY_BZERO_HH
