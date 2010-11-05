@@ -43,11 +43,14 @@ ADD_REQUIRED_DEPENDENCY("hrp2-dynamics >= 1.1.0")
 # Add aggressive optimization flags in release mode.
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET (CMAKE_CXX_FLAGS_RELEASE
-    "-O3 -funroll-loops -frerun-loop-opt -fschedule-insns2"
-    "-frerun-cse-after-loop -falign-functions -falign-labels"
-    "-falign-loops -falign-jumps -fexpensive-optimizations")
+    "-O3 -funroll-loops -frerun-loop-opt -fschedule-insns2")
+  SET (CMAKE_CXX_FLAGS_RELEASE
+    "${CMAKE_CXX_FLAGS_RELEASE} -frerun-cse-after-loop -falign-functions")
+  SET (CMAKE_CXX_FLAGS_RELEASE
+    "${CMAKE_CXX_FLAGS_RELEASE} -falign-labels -falign-loops -falign-jumps")
+  SET (CMAKE_CXX_FLAGS_RELEASE
+    "${CMAKE_CXX_FLAGS_RELEASE} -fexpensive-optimizations")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
-
 
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(tests)
