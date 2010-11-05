@@ -29,7 +29,7 @@
 #ifndef _COM_AND_FOOT_REALIZATION_H_
 #define _COM_AND_FOOT_REALIZATION_H_
 
-#include <abstract-robot-dynamics/jrlhumanoiddynamicrobot.hh>
+#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 
 #include <SimplePlugin.h>
 #include <StepStackHandler.h>
