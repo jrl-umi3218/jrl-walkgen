@@ -26,15 +26,11 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
-#ifdef UNIX
-#include <sys/time.h>
-#include <stdlib.h>
-#endif /*UNIX*/
+#include "portability/gettimeofday.hh"
 
 #ifdef WIN32
-#include <Windows.h>
-#include "TimeUtilsWindows.h"
-#endif /*WIN32*/
+# include <Windows.h>
+#endif /* WIN32 */
 
 #include <time.h>
 #include <sstream>

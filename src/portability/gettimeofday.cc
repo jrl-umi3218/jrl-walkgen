@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, 2009, 2010, 
+ * Copyright 2008, 2009, 2010,
  *
  * Francois   Keith
  * Olivier    Stasse
@@ -19,20 +19,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/*! \file TimeUtilsWindows.h */
-
 #ifdef WIN32
-#include <TimeUtilsWindows.h>
+# include <TimeUtilsWindows.h>
 
-#include < Windows.h >
-#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
-#else
-#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
-#endif
+# include <Windows.h>
+# if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#  define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
+# else
+#  define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
+# endif
 
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
@@ -50,7 +48,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
       /*converting file time to unix epoch*/
       tmpres /= 10;  /*convert into microseconds*/
-      tmpres -= DELTA_EPOCH_IN_MICROSECS; 
+      tmpres -= DELTA_EPOCH_IN_MICROSECS;
       tv->tv_sec = (long)(tmpres / 1000000UL);
       tv->tv_usec = (long)(tmpres % 1000000UL);
     }

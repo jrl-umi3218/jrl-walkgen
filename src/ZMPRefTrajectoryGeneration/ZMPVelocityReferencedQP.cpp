@@ -32,15 +32,11 @@
   Olivier Stasse,
 */
 
-
-#ifdef UNIX
-#include <sys/time.h>
-#endif /* UNIX */
+#include "portability/gettimeofday.hh"
 
 #ifdef WIN32
-#include <Windows.h>
-#include <TimeUtilsWindows.h>
-#endif
+# include <Windows.h>
+#endif /* WIN32 */
 
 #include <time.h>
 
