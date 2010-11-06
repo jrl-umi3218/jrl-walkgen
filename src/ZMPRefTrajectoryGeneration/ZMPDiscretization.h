@@ -45,7 +45,7 @@
 using namespace::std;
 
 /*! Abstract robot dynamics includes */
-#include <abstract-robot-dynamics/jrlhumanoiddynamicrobot.hh>
+#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 
 /*! Framework includes */
 #include <Mathematics/PolynomeFoot.h>
