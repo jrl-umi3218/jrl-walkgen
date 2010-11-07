@@ -30,14 +30,14 @@
 /*! JRL inclusion */
 
 // MAL 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 // Dynamics
-#include <robotDynamics/jrlHumanoidDynamicRobot.h>
+#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 
 // PG
 
-#include <PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 #include <SimplePlugin.h>
 #include <PreviewControl/PreviewControl.h>
 

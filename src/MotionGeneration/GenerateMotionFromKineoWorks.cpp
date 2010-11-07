@@ -31,7 +31,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 #include <PreviewControl/PreviewControl.h>
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>

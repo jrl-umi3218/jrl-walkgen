@@ -171,7 +171,7 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
   int lCurrentPosition = CurrentPosition;
   // Fill the queues with the interpolated CoM values.
     
-  for(int lk=0;lk<m_InterpolationInterval;lk++,lCurrentPosition++)
+  for(int lk=0;lk<=m_InterpolationInterval;lk++,lCurrentPosition++)
     {
       ODEBUG("lCurrentPosition: "<< lCurrentPosition);
       COMState & aCOMPos = COMStates[lCurrentPosition];

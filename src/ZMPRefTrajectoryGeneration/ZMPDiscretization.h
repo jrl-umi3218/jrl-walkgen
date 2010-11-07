@@ -36,7 +36,7 @@
 #ifndef _ZMP_DISCRETIZATION_H_
 #define _ZMP_DISCRETIZATION_H_
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 /*! System includes */
 #include <deque>
@@ -45,12 +45,12 @@
 using namespace::std;
 
 /*! Abstract robot dynamics includes */
-#include <robotDynamics/jrlHumanoidDynamicRobot.h>
+#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 
 /*! Framework includes */
 #include <Mathematics/PolynomeFoot.h>
 #include <Mathematics/ConvexHull.h>
-#include <PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 #include <PreviewControl/PreviewControl.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 #include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>

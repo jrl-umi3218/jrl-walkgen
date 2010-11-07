@@ -29,26 +29,29 @@
    It handles a stack of constraint on a sliding mode 
    for QP solving. */
 
-#ifndef _fOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_
-#define _fOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_
+#ifndef _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_
+#define _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_
 
 #include <vector>
 #include <deque>
 #include <string>
 #include <sstream>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
-#include <robotDynamics/jrlHumanoidDynamicRobot.h>
+#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 
 
-#include <PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
+#include <privatepgtypes.h>
 #include <Mathematics/ConvexHull.h>
+#include <Mathematics/FootHalfSize.hh>
 #include <SimplePlugin.h>
-#include <PreviewControl/SupportState.h>
+#include <PreviewControl/SupportFSM.h>
 
 namespace PatternGeneratorJRL
 {
+
   /*! This class generates matrix representation of linear
    constraint based on foot position.
    It handles a stack of constraint on a sliding mode 
@@ -84,7 +87,7 @@ namespace PatternGeneratorJRL
       int computeLinearSystem(std::vector<CH_Point> aVecOfPoints,
 			      MAL_MATRIX(&D,double),
 			      MAL_MATRIX(&Dc,double),
-			      SupportState * Support);
+			      SupportState_t PrwSupport);
 
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
 	Position.
@@ -98,7 +101,8 @@ namespace PatternGeneratorJRL
 					    ReferenceAbsoluteVelocity & RefVel,
 					    double StartingTime,
 					    double m_QP_N,
-					    SupportState * Support, std::deque<double> &PreviewedSupportAngles,
+					    SupportFSM * SupportFSM, SupportState_t CurrentSupport, SupportState_t & PrwSupport,
+					    std::deque<double> &PreviewedSupportAngles,
 					    int & NbOfConstraints);
 
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute Position.  */
@@ -127,28 +131,21 @@ namespace PatternGeneratorJRL
       CjrlHumanoidDynamicRobot * m_HS;
       
       std::vector<CH_Point> ConvexHullFP;
-
-      //Andremize: Caused memory errors when initialized in the constructor
-      /* float CHLeftFPosConstrArrayX[5]; */
-      /* float CHLeftFPosConstrArrayY[5]; */
-      
-      /* float CHRightFPosConstrArrayX[5]; */
-      /* float CHRightFPosConstrArrayY[5]; */
       
       float* CHFPosConstrArrayX; 
       float* CHFPosConstrArrayY;
 
       // Find the convex hull for each of the position,
       // in order to create the corresponding trajectory.
-      double lLeftFootHalfWidth,lLeftFootHalfHeight,lLeftFootHalfHeightDS,
-	lRightFootHalfWidth,lRightFootHalfHeight,lRightFootHalfHeightDS,lZ;
+      FootHalfSize m_LeftFootSize, m_RightFootSize;
+      double m_Z;
       
       double DSFeetDistance;
       
       // Read humanoid specificities.
-      CjrlFoot * lRightFoot;
+      CjrlFoot * m_RightFoot;
       vector3d AnklePosition;
-      CjrlFoot * lLeftFoot;
+      CjrlFoot * m_LeftFoot;
   
       int State; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
       // 3: Double Support.
@@ -160,6 +157,12 @@ namespace PatternGeneratorJRL
       double s_t,c_t;
       
       unsigned int m_FullDebug;
+
+      /*! \brief Additional constraints on the feet size.
+	m_ConstraintOnX  is removed from the length of the feet along the X-axis.
+	m_ConstraintOnY  is removed from the length of the feet along the Y-axis.
+       */
+      double m_ConstraintOnX, m_ConstraintOnY;
     };
 };
-#endif /* _fOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_ */
+#endif /* _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_ */

@@ -31,7 +31,7 @@
 #define _COM_AND_FOOT_REALIZATION_BY_GEOMETRY_H_
 
 
-#include <PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 #include <MotionGeneration/ComAndFootRealization.h> 
 #include <MotionGeneration/StepOverPlanner.h>
 #include <MotionGeneration/WaistHeightVariation.h>

@@ -37,15 +37,15 @@
 #include <sstream>
 #include <fstream>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
-#include <dynamicsJRLJapan/dynamicsJRLJapanFactory.h>
+#include <jrl/dynamics/dynamicsfactory.hh>
 
 #ifdef WITH_HRP2DYNAMICS
 #include <hrp2Dynamics/hrp2OptHumanoidDynamicRobot.h>
 #endif
 
-#include <walkGenJrl/PatternGeneratorInterface.h>
+#include <jrl/walkgen/patterngeneratorinterface.hh>
 
 #include "TestFootPrintPGInterfaceData.h"
 
@@ -90,6 +90,28 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
 			     InitLeftFootAbsPos,
 			     InitRightFootAbsPos);
       
+  cout << "Starting COM Position: " 
+       << lStartingCOMPosition.x[0] << " "
+       << lStartingCOMPosition.y[0] << " "
+       << lStartingCOMPosition.z[0] << endl;
+
+  cout << "Starting Left Foot Pos: " 
+       << InitLeftFootAbsPos.x << " "
+       << InitLeftFootAbsPos.y << " "
+       << InitLeftFootAbsPos.z << " " 
+       << InitLeftFootAbsPos.theta<< " "
+       << InitLeftFootAbsPos.omega << " "
+       << InitLeftFootAbsPos.omega2 << " " 
+       << endl;
+
+  cout << "Starting Right Foot Pos: " 
+       << InitRightFootAbsPos.x << " "
+       << InitRightFootAbsPos.y << " "
+       << InitRightFootAbsPos.z << " " 
+       << InitRightFootAbsPos.theta<< " "
+       << InitRightFootAbsPos.omega << " "
+       << InitRightFootAbsPos.omega2 << " " 
+       << endl;
 
 }
 

@@ -28,9 +28,12 @@
  */
 /* This object generate all the values for the foot trajectories,
    and the desired ZMP based on a sequence of steps. */
-#ifdef UNIX
-#include <sys/time.h>
-#endif /* UNIX */
+
+#include "portability/gettimeofday.hh"
+
+#ifdef WIN32
+# include <Windows.h>
+#endif /* WIN32 */
 
 #include <time.h>
 #include <iostream>

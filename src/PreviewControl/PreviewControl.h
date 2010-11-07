@@ -34,11 +34,11 @@
 #include <deque>
 #include <vector>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 using namespace::std;
 
 
-#include <PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 #include <SimplePlugin.h>
 #include <PreviewControl/OptimalControllerSolver.h>
 

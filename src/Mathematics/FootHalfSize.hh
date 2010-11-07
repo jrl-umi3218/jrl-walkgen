@@ -1,9 +1,8 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2010, 
  *
- * Florent Lamiraux
- * Mathieu Poirier
- * Olivier Stasse
+ * Olivier    Stasse
+ * 
  *
  * JRL, CNRS/AIST
  *
@@ -23,50 +22,48 @@
  *  Research carried out within the scope of the 
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/** @doc This object is in charge of dealing with the upper body 
-    motion of the robot.
-*/
 
-#ifndef _UPPER_BODY_MOTION_
-#define _UPPER_BODY_MOTION_
-
-#include <jrl/mal/matrixabstractlayer.hh>
-
-#include <vector>
-#include <string>
-//#define FULL_POLYNOME
-
-using namespace::std;
-
-
-#include <Mathematics/PolynomeFoot.h>
-
-
+#ifndef _FOOT_HALF_SIZE_H_
+#define _FOOT_HALF_SIZE_H_
 
 namespace PatternGeneratorJRL
 {
-   
-  class  UpperBodyMotion
-    {
-      public :
+  
+  /*! This class handles the size and the constraints related to the feet
+   */
+  class FootHalfSize 
+  {
+  public:
+    FootHalfSize();
+    ~FootHalfSize();
     
-      /// Constructor
-      UpperBodyMotion();
+    void setHalfSizeInit(double lHalfWidth,
+			 double lHalfHeight);
 
-      /// Destructor
-      ~UpperBodyMotion();
-      
-      void GenerateDataFile(string aFileName, int LenghtDataArray);
-
-      void ReadDataFile(string aFileName, MAL_MATRIX(&UpperBodyAngles,double));
-      
-      void WriteDataFile(string aFileName, MAL_MATRIX(&UpperBodyAngles,double));
-	
+    void setConstraints(double OnX,
+			double OnY);
     
-   protected:
+  protected:
+    void updateHalfHeightDS();
+    void updateHalfSize();
 
+  private:
 
-     
-   };
+    double m_HalfHeight;
+    double m_HalfWidth;
+    double m_HalfHeightDS;
+    double m_HalfHeightInit;
+    double m_HalfWidthInit;
+
+    double m_ConstraintsOnX;
+    double m_ConstraintsOnY;
+
+  public:
+    
+    double getHalfHeight() const;
+    double getHalfWidth() const;
+    double getHalfHeightDS() const;
+  };
 };
-#endif /* _UPPER_BODY_MOTION_*/
+
+#endif /*  _FOOT_HALF_SIZE_H_*/

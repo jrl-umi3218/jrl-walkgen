@@ -2,6 +2,7 @@
  * Copyright 2010, 
  *
  * Andrei  Herdt
+ * Olivier Stasse
  *
  * JRL, CNRS/AIST
  *
@@ -23,77 +24,47 @@
  */
 /* This object provides the finite state machine to determine the support parameters. */
 
-#ifndef _SUPPORT_STATE_
-#define _SUPPORT_STATE_
+#ifndef _SUPPORT_FSM_
+#define _SUPPORT_FSM_
 
-#include <walkGenJrl/PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
+#include <privatepgtypes.h>
 
 namespace PatternGeneratorJRL
 {
-  class  SupportState
+  class  SupportFSM
   {
   public:
     /*! Constructor */
-    SupportState(const double &SamplingPeriod);
+    SupportFSM(const double &SamplingPeriod);
 	
     /*! Destructor */
-    ~SupportState();
+    ~SupportFSM();
 	
     /*! \brief Initialize the previewed state. */
-    void setSupportState(const double &Time, const int &pi,  const ReferenceAbsoluteVelocity & RefVel);
-	
-
+    void setSupportState(const double &Time, const int &pi,
+    		SupportState_t & Support, const ReferenceAbsoluteVelocity & RefVel);
 	
     ///*! \brief Numerical precision */
-    double eps;
+    double m_eps;
 	
     /*! \brief constants for the durations in the support phases */
-    double DSDuration, SSPeriod, DSSSDuration;
-
-    /*! \brief First support foot */
-    int StartSupportFoot;
-	
-    /*! \brief Current support state */
-    int CurrentSupportPhase, CurrentSupportFoot, CurrentStepsLeft;
-
-    int SSSS;
-
-    double CurrentTimeLimit;
-	
-    /*! \brief Future support state */
-    int PrwSupportPhase, PrwSupportFoot, PrwStepsLeft;
-
-    double  PrwTimeLimit;
-
-    bool m_StateChanged;
-
-    int StepNumber;
+    double m_DSDuration, m_SSPeriod, m_DSSSDuration;
 
     //Number of steps done before DS
-    unsigned int NbOfStepsSSDS;
-
+    unsigned int m_NbOfStepsSSDS;
  
   private: 
 	
     /*! \Brief Sampling duration */
     double m_T;
 
-    /*! \Brief Support state */
-    int *m_SupportPhase, *m_SupportFoot, *m_SupportStepsLeft;
 
-    double *m_SupportTimeLimit;
-    void initializePreviewedState();
-
-    int ReferenceGiven;
+    bool m_ReferenceGiven;
 
     int m_FullDebug;
 
-
-    ///*! Getter for the support state */
-    //const void SupportState::getSupportState () const;
-	
-    
   };
 };
 
-#endif /* _SUPPORT_STATE_ */
+#endif /* _SUPPORT_FSM_ */

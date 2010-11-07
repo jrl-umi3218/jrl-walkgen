@@ -30,7 +30,7 @@
 #ifndef _OPTIMAL_CONTROLLER_SOLVER_H_
 #define _OPTIMAL_CONTROLLER_SOLVER_H_
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 
 namespace PatternGeneratorJRL

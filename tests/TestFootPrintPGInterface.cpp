@@ -26,29 +26,25 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
-#ifdef UNIX
-#include <sys/time.h>
-#include <stdlib.h>
-#endif /*UNIX*/
+#include "portability/gettimeofday.hh"
 
 #ifdef WIN32
-#include <Windows.h>
-#include "TimeUtilsWindows.h"
-#endif /*WIN32*/
+# include <Windows.h>
+#endif /* WIN32 */
 
 #include <time.h>
 #include <sstream>
 #include <fstream>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
-#include <dynamicsJRLJapan/dynamicsJRLJapanFactory.h>
+#include <jrl/dynamics/dynamicsfactory.hh>
 
 #ifdef WITH_HRP2DYNAMICS
 #include <hrp2Dynamics/hrp2OptHumanoidDynamicRobot.h>
 #endif
 
-#include <walkGenJrl/PatternGeneratorInterface.h>
+#include <jrl/walkgen/patterngeneratorinterface.hh>
 
 #include "TestFootPrintPGInterfaceData.h"
 

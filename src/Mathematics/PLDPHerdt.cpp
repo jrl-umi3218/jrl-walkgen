@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Andrei Herdt
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file PLDPSolver.cpp
@@ -26,16 +26,12 @@
 */
 #include <iostream>
 #include <fstream>
+#include <cstring>
 
-// Time include
-#ifdef UNIX
-#include <sys/time.h>
-#include <string.h>
-#endif /* UNIX */
+#include "portability/gettimeofday.hh"
 
 #ifdef WIN32
-#include <Windows.h>
-#include <TimeUtilsWindows.h>
+# include <Windows.h>
 #endif /* WIN32 */
 
 #include <Mathematics/PLDPSolverHerdt.h>
@@ -116,7 +112,7 @@ void PLDPSolverHerdt::AllocateMemoryForSolver(unsigned int NumberSteps)
 {
 
   PrecomputeiPuPx(NumberSteps);
-      
+
   m_Vk = new double[2*(m_CardV+NumberSteps)];
   memset(m_Vk,0,2*(m_CardV+NumberSteps)*sizeof(double));
 
@@ -138,7 +134,7 @@ void PLDPSolverHerdt::AllocateMemoryForSolver(unsigned int NumberSteps)
 
   m_ConstraintsValueComputed = new bool [m_NbMaxOfConstraints*2];
 
-  m_d = new double[2*(m_CardV+NumberSteps)];  
+  m_d = new double[2*(m_CardV+NumberSteps)];
   m_OptCholesky->SetL(m_L);
   m_OptCholesky->SetiL(m_iL);
 }
@@ -147,7 +143,7 @@ void PLDPSolverHerdt::InitializeSolver(unsigned int NumberSteps)
 {
 #if 0
   // Allocation max:
-  // We assume that we might at max. 8 actives constraintes 
+  // We assume that we might at max. 8 actives constraintes
   // per control time.
   memset(m_v1,0,m_NbMaxOfConstraints*sizeof(double));
   // Same than v1.
@@ -203,7 +199,7 @@ PLDPSolverHerdt::~PLDPSolverHerdt()
 
   if (m_d!=0)
     delete [] m_d;
-  
+
   if (m_y!=0)
     delete [] m_y;
 
@@ -267,7 +263,7 @@ int PLDPSolverHerdt::PrecomputeiPuPx(unsigned int NumberSteps)
       aof.close();
 
     }
-  
+
   // This should be reimplemented with a proper matrix library.
   // will be done in a second time.
   for(unsigned int i=0;i<(m_CardV);i++)
@@ -280,12 +276,12 @@ int PLDPSolverHerdt::PrecomputeiPuPx(unsigned int NumberSteps)
 	  m_iPuPx[(i+(m_CardV))*6+j+3]= 0.0;
 	  for(unsigned int k=0;k<m_CardV;k++)
 	    {
-	      double tmp = m_iPu[k*(2*m_CardV+2*NumberSteps)+i] * 
+	      double tmp = m_iPu[k*(2*m_CardV+2*NumberSteps)+i] *
 		m_Px[k*3+j];
 
 	      m_iPuPx[i*6+j]+= tmp;
 	      //	      m_iPuPx[i*6+j+3]+= tmp;
-	      //	      m_iPuPx[(i+m_CardV)*6+j]+= tmp; 
+	      //	      m_iPuPx[(i+m_CardV)*6+j]+= tmp;
 	      m_iPuPx[(i+(m_CardV))*6+j+3]+= tmp;
 
 	    }
@@ -296,26 +292,26 @@ int PLDPSolverHerdt::PrecomputeiPuPx(unsigned int NumberSteps)
 
 
 
-int PLDPSolverHerdt::ComputeInitialSolution(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, 
-				       deque<SupportFeet_t> & QueueOfSupportFeet, unsigned int NumberSteps,	
+int PLDPSolverHerdt::ComputeInitialSolution(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
+				       deque<SupportFeet_t> & QueueOfSupportFeet, unsigned int NumberSteps,
 				       double *XkYk)
 {
   /*! The initial solution of the problem is given by identical zmp and feet positions that are lying inside the feasible zones defined by the constraints on the feet placements.
-    U0 = -iPu * Px [Xkt Ykt]t + iPu * InitialZMP 
+    U0 = -iPu * Px [Xkt Ykt]t + iPu * InitialZMP
   */
-  
+
   deque<LinearConstraintInequalityFreeFeet_t>::iterator LCIFF_it;
   LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin();
-  
+
   //Current support foot coordinates
   deque<SupportFeet_t>::iterator CurSF_it;
-  CurSF_it = QueueOfSupportFeet.end(); 
-  CurSF_it--; 
-  
+  CurSF_it = QueueOfSupportFeet.end();
+  CurSF_it--;
+
   int StepNumber = 0;
   int SupportFoot = CurSF_it->SupportFoot;
-  
-  
+
+
   for(unsigned int i=0;i<m_CardV;i++)
     {
       //Change of the previewed support foot
@@ -338,7 +334,7 @@ int PLDPSolverHerdt::ComputeInitialSolution(deque<LinearConstraintInequalityFree
       //Initial feet positions
       m_InitialZMPSolution[2*m_CardV+StepNumber-1] = m_InitialZMPSolution[i];
       m_InitialZMPSolution[2*m_CardV+NumberSteps+StepNumber-1] = m_InitialZMPSolution[m_CardV+i];
-      
+
       LCIFF_it++;
     }
 
@@ -348,27 +344,27 @@ int PLDPSolverHerdt::ComputeInitialSolution(deque<LinearConstraintInequalityFree
       m_Vk[i+m_CardV] = 0.0;
       for(unsigned int j=0;j<3;j++)
 	m_Vk[i]-= m_iPuPx[i*6+j] *  XkYk[j];
-	  
+
       for(unsigned int j=3;j<6;j++)
 	m_Vk[i+m_CardV]-= m_iPuPx[(i+m_CardV)*6+j] *  XkYk[j];
-	  
+
       for(unsigned int j=0;j<m_CardV;j++)
-	m_Vk[i]+= m_iPu[j*(2*m_CardV+2*NumberSteps)+i] * m_InitialZMPSolution[j];  
-	  
+	m_Vk[i]+= m_iPu[j*(2*m_CardV+2*NumberSteps)+i] * m_InitialZMPSolution[j];
+
       for(unsigned int j=0;j<m_CardV;j++)
-	m_Vk[i+m_CardV]+= m_iPu[j*(2*m_CardV+2*NumberSteps)+i] * m_InitialZMPSolution[j+m_CardV];  
+	m_Vk[i+m_CardV]+= m_iPu[j*(2*m_CardV+2*NumberSteps)+i] * m_InitialZMPSolution[j+m_CardV];
 
     }
- 
+
    for(unsigned int i=0;i<NumberSteps;i++)
     {
       m_Vk[2*m_CardV+i] = 0.0;
       m_Vk[2*m_CardV+NumberSteps+i] = 0.0;
-	  
+
       for(unsigned int j=0;j<NumberSteps;j++)
 	{
-	  m_Vk[2*m_CardV+i]+= m_iPu[(2*m_CardV+i)*(2*m_CardV+2*NumberSteps)+m_CardV+j] * m_InitialZMPSolution[j+2*m_CardV];  
-	  m_Vk[2*m_CardV+NumberSteps+i]+= m_iPu[(2*m_CardV+NumberSteps+i)*(2*m_CardV+2*NumberSteps)+m_CardV+NumberSteps+j] * m_InitialZMPSolution[j+NumberSteps+2*m_CardV];   
+	  m_Vk[2*m_CardV+i]+= m_iPu[(2*m_CardV+i)*(2*m_CardV+2*NumberSteps)+m_CardV+j] * m_InitialZMPSolution[j+2*m_CardV];
+	  m_Vk[2*m_CardV+NumberSteps+i]+= m_iPu[(2*m_CardV+NumberSteps+i)*(2*m_CardV+2*NumberSteps)+m_CardV+NumberSteps+j] * m_InitialZMPSolution[j+NumberSteps+2*m_CardV];
 	}
 
     }
@@ -391,7 +387,7 @@ int PLDPSolverHerdt::ForwardSubstitution()
   // First Phase
   // EE^t v2 = v1 <-> LL^t v2 = v1
   // Now solving
-  // L y = v1 
+  // L y = v1
   unsigned int startIndex=0;
   /*
   if ((m_HotStart==false) ||
@@ -413,7 +409,7 @@ int PLDPSolverHerdt::ForwardSubstitution()
 int PLDPSolverHerdt::BackwardSubstitution()
 {
   // Compute v2 q (14b) in Dimitrov 2009.
-  // Second phase 
+  // Second phase
   // Now solving
   // LL^t v2 = v1 <-> L y = v1 with L^t v2 = y
   // y solved with first phase.
@@ -421,7 +417,7 @@ int PLDPSolverHerdt::BackwardSubstitution()
   unsigned int SizeOfL = m_ActivatedConstraints.size();
   if (SizeOfL==0)
     return 0;
-  
+
   ODEBUG("BackwardSubstitution " << m_ItNb);
   for(int i=SizeOfL-1;
       i>=0; i--)
@@ -518,7 +514,7 @@ int PLDPSolverHerdt::ComputeProjectedDescentDirection(unsigned int NumberSteps)
     }
 
   // Compute v2 by Forward and backward substitution.
-  // v2 = iLt iL E c 
+  // v2 = iLt iL E c
   // LtL v2 = c
   // Lt y =c
   ForwardSubstitution();
@@ -533,7 +529,7 @@ int PLDPSolverHerdt::ComputeProjectedDescentDirection(unsigned int NumberSteps)
       aof.close();
 
     }
-  
+
   // Solve L v2 = y
   BackwardSubstitution();
 
@@ -611,10 +607,10 @@ double PLDPSolverHerdt::ComputeAlpha(vector<unsigned int> & NewActivatedConstrai
 
       m_tmp1[li]=0.0;
 
-      //Check if we can not reuse an already computed result   
+      //Check if we can not reuse an already computed result
       {
 	bool ToBeComputed=true;
-// 	if (SimilarConstraint[li]!=0) 
+// 	if (SimilarConstraint[li]!=0)
 // 	  {
 // 	    int lindex = li+SimilarConstraint[li];
 // 	    if (m_ConstraintsValueComputed[lindex])
@@ -623,7 +619,7 @@ double PLDPSolverHerdt::ComputeAlpha(vector<unsigned int> & NewActivatedConstrai
 // 		ToBeComputed=false;
 // 	      }
 // 	  }
-	
+
 	if(ToBeComputed)
 	  for(unsigned lj=0;lj<2*(m_CardV+NumberSteps);lj++)
 	    {
@@ -631,18 +627,18 @@ double PLDPSolverHerdt::ComputeAlpha(vector<unsigned int> & NewActivatedConstrai
 	      ptA+=(m_NbOfConstraints+1);
 	    }
       }
-      
+
       m_ConstraintsValueComputed[li] = true;
 
       if (m_tmp1[li]<0.0)
 	{
 	  double lalpha=0.0;
-	  double *pt2A = m_A + li;	
+	  double *pt2A = m_A + li;
 	  m_tmp2[li]= -m_b[li];
 	  // Check if we can not reuse an already computed result
 	  {
 	    bool ToBeComputed=true;
-// 	    if (SimilarConstraint[li]!=0) 
+// 	    if (SimilarConstraint[li]!=0)
 // 	      {
 // 		int lindex = li+SimilarConstraint[li];
 // 		if (m_ConstraintsValueComputed[lindex+m_NbOfConstraints])
@@ -651,7 +647,7 @@ double PLDPSolverHerdt::ComputeAlpha(vector<unsigned int> & NewActivatedConstrai
 // 		    ToBeComputed=false;
 // 		  }
 // 	      }
-	    
+
 	    if(ToBeComputed)
 	      for(unsigned lj=0;lj<2*(m_CardV+NumberSteps);lj++)
 		{
@@ -674,11 +670,11 @@ double PLDPSolverHerdt::ComputeAlpha(vector<unsigned int> & NewActivatedConstrai
 	  if (Alpha>lalpha)
 	    {
 	      ODEBUG3("m_v2[li] : "<< m_v2[li] <<
-		      " m_v1[li] : " << m_v1[li] << " " 
+		      " m_v1[li] : " << m_v1[li] << " "
 		      " lalpha: "<< lalpha << " "
 		      " Constraint " << li << " of "
 		      << m_NbOfConstraints << " constraints.");
-		  
+
 	      Alpha = lalpha;
 	      if (Alpha<1)
 		{
@@ -694,7 +690,7 @@ double PLDPSolverHerdt::ComputeAlpha(vector<unsigned int> & NewActivatedConstrai
 
   return Alpha;
 }
-int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, 
+int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
 			     deque<SupportFeet_t> & QueueOfSupportFeet,
 			     double *CstPartOfTheCostFunction,
 			     unsigned int NbOfConstraints,
@@ -708,7 +704,7 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
   vector<unsigned int> NewActivatedConstraints;
   if (StartingSequence)
     m_InternalTime = 0.0;
-      
+
   AllocateMemoryForSolver(NumberSteps);
   InitializeSolver(NumberSteps);
 
@@ -722,10 +718,10 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
   ODEBUG("State: " << XkYk[0] << " " << XkYk[3] << " " <<
 	  XkYk[1] << " " << XkYk[4] << " " <<
 	  XkYk[2] << " " << XkYk[5] << " ");
-  
+
   ComputeInitialSolution(QueueOfLConstraintInequalitiesFreeFeet,
 			 QueueOfSupportFeet, NumberSteps, XkYk);
-  
+
   ODEBUG("DebugMode:"<<m_DebugMode);
 
   if (m_DebugMode>1)
@@ -804,7 +800,7 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
 
   gettimeofday(&begin,0);
 
-  // Hot Start 
+  // Hot Start
   if (m_HotStart)
     {
       unsigned int lindex,IndexFootCstr;
@@ -831,9 +827,9 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
       if(m_ActivatedConstraints.size()>0)
 	m_OptCholesky->AddActiveConstraints(m_ActivatedConstraints);
     }
-  
+
   m_PreviouslyActivatedConstraints.clear();
-   
+
   double alpha=0.0;
   m_ItNb=0;
   while(ContinueAlgo)
@@ -841,7 +837,7 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
       ODEBUG("Iteration Number:" << m_ItNb);
       /* Step one : Compute descent direction. */
       for(unsigned int i=0;i<2*(m_CardV+NumberSteps);i++)
-	 m_UnconstrainedDescentDirection[i] = 
+	 m_UnconstrainedDescentDirection[i] =
 	  -m_CstPartOfCostFunction[i] -  m_Vk[i];
 
       /*! Step two: Compute the projected descent direction. */
@@ -852,9 +848,9 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
 
       if (m_DebugMode>1)
 	{
-	  
+
 	  ODEBUG("Alpha:" <<alpha);
-	  
+
 	  ofstream aof;
 	  char Buffer[1024];
 	  sprintf(Buffer,"U_%.3f_%02d.dat",m_InternalTime,m_ItNb);
@@ -930,10 +926,10 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
 	{
 	  struct timeval current;
 	  gettimeofday(&current,0);
-	  double r=(double)(current.tv_sec-begin.tv_sec) + 
+	  double r=(double)(current.tv_sec-begin.tv_sec) +
 	    0.000001*(current.tv_usec-begin.tv_usec);
 	  if (r> m_AmountOfLimitedComputationTime)
-	    {	      
+	    {
 	      ContinueAlgo=false;
 	    }
 	}
@@ -957,10 +953,10 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
 	      //cout << m_ActivatedConstraints[i] << " " ;
 	    }
 	}
-      
-      cout << (int)m_ActivatedConstraints.size() - (int)m_PreviouslyActivatedConstraints.size() <<  " " 
+
+      cout << (int)m_ActivatedConstraints.size() - (int)m_PreviouslyActivatedConstraints.size() <<  " "
 	   << m_PreviouslyActivatedConstraints.size() << endl;
-      cout << endl; 
+      cout << endl;
       //StoreCurrentZMPSolution(XkYk);
 
     }
@@ -972,7 +968,7 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
       for(unsigned int i=0;i<320;i++)
       {
 	bool FoundConstraint=false;
-	
+
 	if (i<m_NbOfConstraints)
 	  {
 	    for(unsigned int j=0;j<m_ActivatedConstraints.size();j++)
@@ -982,22 +978,22 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
 		  FoundConstraint=true;
 		  break;
 		}
-	  } 
+	  }
 	if (!FoundConstraint)
 	  aof << "0 ";
-	
+
       }
       aof << endl;
       aof.close();
     }
-  
+
   if ((isnan(X[0])) ||
       (isnan(X[m_CardV])) ||
       (isinf(X[0])) ||
-      (isinf(X[m_CardV])) 
+      (isinf(X[m_CardV]))
       )
     {
-      cout << "Nan or inf value " << X[0]<< " " << X[m_CardV] 
+      cout << "Nan or inf value " << X[0]<< " " << X[m_CardV]
 	   << " at iteration " << m_ItNb -1 <<endl;
       return -1;
     }
@@ -1027,7 +1023,7 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
       aof.close();
 
     }
-  
+
 
   string Buffer("InfosPLDP");
   if (m_HotStart)
@@ -1036,8 +1032,8 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
     Buffer+="LT";
   Buffer+=".dat";
 
-  ODEBUG6(m_ActivatedConstraints.size() << " " 
-	  << NbOfConstraints << " " 
+  ODEBUG6(m_ActivatedConstraints.size() << " "
+	  << NbOfConstraints << " "
 	  << m_ActivatedConstraints.size() - m_PreviouslyActivatedConstraints.size() << " "
 	  << m_ItNb,(char*)Buffer.c_str());
 
@@ -1051,7 +1047,7 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
 //   // The current solution is Vk,
 //   // but its graphical representation is better understood
 //   // when transformed in ZMP ref trajectory.
-	  
+
 //   for(unsigned int i=0;i<m_CardV;i++)
 //     {
 //       m_InitialZMPSolution[i] = 0.0; // X axis
@@ -1087,7 +1083,7 @@ void PLDPSolverHerdt::WriteCurrentZMPSolution(string filename,
   ofstream aof;
   aof.open((char *)filename.c_str(),ofstream::out);
 
-	  
+
   for(unsigned int i=0;i<m_CardV;i++)
     {
       lZMP[i] = 0.0; // X axis

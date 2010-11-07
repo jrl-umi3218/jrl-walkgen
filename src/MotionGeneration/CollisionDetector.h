@@ -35,7 +35,7 @@
 
 
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 #include <vector>
 #include <string>

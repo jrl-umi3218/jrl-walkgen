@@ -35,11 +35,11 @@
 
 #include <sstream>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 
 
-#include <walkGenJrl/PatternGeneratorInterface.h>
+#include <jrl/walkgen/patterngeneratorinterface.hh>
 
 #include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
 #include <PreviewControl/PreviewControl.h>

@@ -41,10 +41,10 @@
 #include <deque>
 
 /*! MAL */
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 /*! Abstract Interface for dynamic robot. */
-#include <robotDynamics/jrlHumanoidDynamicRobot.h>
+#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 
 /*! Humanoid Walking Pattern Generator */
 

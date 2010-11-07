@@ -36,7 +36,7 @@
 
 /*! Framework includes */
 
-#include <walkGenJrl/PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 
 namespace PatternGeneratorJRL
 {

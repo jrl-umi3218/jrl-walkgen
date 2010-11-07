@@ -34,18 +34,19 @@
 #include <fstream>
 #include <time.h>
 
-#ifdef UNIX
-#include <sys/time.h>
-#endif /*UNIX*/
+#include "portability/gettimeofday.hh"
+#include "portability/bzero.hh"
 
 #ifdef WIN32
-#include <Windows.h>
-#include <TimeUtilsWindows.h>
-#define bzero(p, size) (void)memset((p), 0, (size))  // definition of bzero for win32
+# include <Windows.h>
+#endif /* WIN32 */
+
+#ifdef WIN32
+# include <Windows.h>
 #endif /*WIN32*/
 
 
-#include <PatternGeneratorInterfacePrivate.h>
+#include <patterngeneratorinterfaceprivate.hh>
 #include <Debug.h>
 
 namespace PatternGeneratorJRL {
@@ -513,6 +514,9 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::initOnlineHerdt()
   {
 
+    // TODO : The common part has to be shared,
+    // and the specific part send back to the algorithm implementation.
+
     COMState lStartingCOMState;
     memset(&lStartingCOMState,0,sizeof(COMState));
     MAL_S3_VECTOR(,double) lStartingZMPPosition;
@@ -544,15 +548,6 @@ namespace PatternGeneratorJRL {
 			  RelativeFootPositions,
 			  lStartingCOMState,
 			  lStartingZMPPosition);
-
-    // // Initialization of the first preview.
-    //   printf("lCurrent \n");
-    // for(int j=0; j<m_DOF;j++)
-    //   {
-    // 	cout<<m_CurrentActuatedJointValues[j]<<endl;
-    // 	BodyAnglesIni(j) = m_CurrentActuatedJointValues[j];
-    //   }
-
 
     m_GlobalStrategyManager->Setup(m_ZMPPositions,
 				   m_COMBuffer,
@@ -1108,7 +1103,6 @@ namespace PatternGeneratorJRL {
       {
 	m_InternalClock = 0.0;
 	setVelReference(strm);
-	m_ZMPVRQP->Online = 1;
 	initOnlineHerdt();
 	printf("Online \n");
 	//ODEBUG4("InitOnLine","DebugHerdt.txt");
@@ -1320,18 +1314,16 @@ namespace PatternGeneratorJRL {
 	  }
       }
 
-    if (m_AlgorithmforZMPCOM==ZMPCOM_HERDT_2010 && m_ZMPVRQP->Online==1)
+    if (m_AlgorithmforZMPCOM==ZMPCOM_HERDT_2010)
       {
 	ODEBUG("InternalClock:" <<m_InternalClock  <<
 	       " SamplingPeriod: "<<m_SamplingPeriod);
 
-	// cout<<"size before online"<<m_ZMPPositions.size()<<endl;
 	m_ZMPVRQP->OnLine(m_InternalClock,
 			  m_ZMPPositions,
 			  m_COMBuffer,
 			  m_LeftFootPositions,
 			  m_RightFootPositions);
-	// cout<<"size after online"<<m_ZMPPositions.size()<<endl;
       }
 
 

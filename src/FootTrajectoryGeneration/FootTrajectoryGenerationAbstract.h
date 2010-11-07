@@ -36,14 +36,14 @@
 #include <deque>
 
 /*! MatrixAbstractLayer */
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
 /* dynamics JRL Japan related inclusions */
-#include <robotDynamics/jrlFoot.h>
+#include <abstract-robot-dynamics/foot.hh>
 
 /* Walking pattern generation related inclusions */
 
-#include <PGTypes.h>
+#include <jrl/walkgen/pgtypes.hh>
 #include <SimplePlugin.h>
 
 namespace PatternGeneratorJRL
