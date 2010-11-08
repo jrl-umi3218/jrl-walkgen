@@ -68,6 +68,6 @@ SET(SOURCES
   portability/gettimeofday.cc
   )
 
-ADD_LIBRARY(jrl-walkgen ${SOURCES})
+ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
 INSTALL(TARGETS jrl-walkgen DESTINATION lib)
