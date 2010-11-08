@@ -37,8 +37,7 @@ ADD_REQUIRED_DEPENDENCY("jrl-mal >= 1.9.0")
 ADD_REQUIRED_DEPENDENCY("abstract-robot-dynamics >= 1.15")
 ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
 
-
-ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.1.0")
+ADD_REQUIRED_DEPENDENCY("hrp2-dynamics >= 1.1.0")
 
 # Add aggressive optimization flags in release mode.
 IF(CMAKE_COMPILER_IS_GNUCXX)
