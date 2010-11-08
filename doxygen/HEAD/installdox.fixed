@@ -21,22 +21,22 @@ while ( @ARGV ) {
           $subst{$1} = $2;
         } else {
           print STDERR "Unknown tag file $1 given with option -l\n";
-          &usage();
+          
         }
       } else {
         print STDERR "Argument $_ is invalid for option -l\n";
-        &usage();
+        
       }
     }
     elsif ( /^q/ ) {
       $quiet = 1;
     }
     elsif ( /^\?|^h/ ) {
-      &usage();
+      
     }
     else {
       print STDERR "Illegal option -$_\n";
-      &usage();
+      
     }
   }
   else {
@@ -49,7 +49,7 @@ foreach $sub (keys %subst)
   if ( $subst{$sub} eq "" ) 
   {
     print STDERR "No substitute given for tag file `$sub'\n";
-    &usage();
+    
   }
   elsif ( ! $quiet && $sub ne "_doc" && $sub ne "_cgi" )
   {
