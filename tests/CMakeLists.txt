@@ -17,6 +17,7 @@ INCLUDE(CTest)
 
 # Import jrl-mal flags.
 INCLUDE_DIRECTORIES(${JRL_MAL_INCLUDEDIR})
+LINK_DIRECTORIES(${JRL_DYNAMICS_LIBRARY_DIRS})
 
 # Make sure private headers can be used.
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Olivier Stasse
  *
@@ -18,23 +18,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file Class to measure CPU computation time  */
 
 #ifndef _CLOCK_CPUTIME_PATTERN_GERENATOR_UTESTING_H_
-#define _CLOCK_CPUTIME_PATTERN_GERENATOR_UTESTING_H_
+# define _CLOCK_CPUTIME_PATTERN_GERENATOR_UTESTING_H_
+
+# include "portability/gettimeofday.hh"
 
 /* System includes */
 #ifdef UNIX
-#include <sys/time.h>
-#include <stdlib.h>
+# include <stdlib.h>
 #endif /*UNIX*/
 
 #ifdef WIN32
-#include <Windows.h>
-#include "TimeUtilsWindows.h"
+# include <Windows.h>
 #endif /*WIN32*/
 
 #include <time.h>
@@ -46,7 +46,7 @@
 namespace PatternGeneratorJRL {
 
   namespace TestSuite {
-    
+
     /*! \brief Clock class for computation timing */
     class ClockCPUTime
     {
@@ -57,7 +57,7 @@ namespace PatternGeneratorJRL {
       /*! \name Measure starting date */
       void startingDate();
 
-      /*! \name Methods related to off-line trajectories generation 
+      /*! \name Methods related to off-line trajectories generation
        @{ */
       void startPlanning();
       void endPlanning();
@@ -70,7 +70,7 @@ namespace PatternGeneratorJRL {
       /*! \brief Returns the date at which startOneIteration was called. */
       double getStartOneIteration();
       /*! @} */
-      
+
       /*! \name Methods related to on-line modification
 	@{ */
       void startModification();
@@ -80,7 +80,7 @@ namespace PatternGeneratorJRL {
 
       /*! \name Update data buffer regarding time statistics. */
       void fillInStatistics();
-      
+
       /*! \brief Write buffers of timestamps and time consumtion
 	in file aFileName */
       void writeBuffer(std::string &aFileName);
@@ -88,19 +88,19 @@ namespace PatternGeneratorJRL {
       /*! \brief Display mean time, max time, and nb of modifications. */
       void displayStatistics(std::ostream &os,
 			     OneStep &aStep);
-      
+
       /*! \brief Reset all counters */
       void Reset();
 
     private:
 
-      /*! \brief Date at the measurement started, 
+      /*! \brief Date at the measurement started,
 	i.e. the global reference */
       struct timeval m_startingtime;
-      
+
       /*! \brief Date at which current computation started */
       struct timeval m_begin;
-      
+
       /*! \brief The time spend in planning. */
       double m_totaltimeinplanning;
 
@@ -115,7 +115,7 @@ namespace PatternGeneratorJRL {
 
       /*! \brief Total time spend in handling modification during the test. */
       double m_totalmodificationtime;
-      
+
       /*! \brief Number of modification done. */
       unsigned long int m_nbofmodifs;
 

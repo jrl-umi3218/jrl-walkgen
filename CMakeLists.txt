@@ -51,7 +51,12 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
     "${CMAKE_CXX_FLAGS_RELEASE} -fexpensive-optimizations")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
+SET(${PROJECT_NAME}_HEADERS
+  include/jrl/walkgen/patterngeneratorinterface.hh
+  include/jrl/walkgen/pgtypes.hh
+)
+
 ADD_SUBDIRECTORY(src)
-#ADD_SUBDIRECTORY(tests)
+ADD_SUBDIRECTORY(tests)
 
 SETUP_PROJECT_FINALIZE()
