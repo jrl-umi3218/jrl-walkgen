@@ -165,7 +165,7 @@ protected:
     else{
       if (m_OneStep.NbOfIt%200==0)
 	{
-	  cout << "Progress " << (unsigned int)r << "p"<< "\r";
+	  cout << "Progress " << (unsigned int)r << " "<< "\r";
 	  cout.flush();
 	}
 
