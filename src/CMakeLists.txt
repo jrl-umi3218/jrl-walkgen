@@ -13,9 +13,6 @@
 # received a copy of the GNU Lesser General Public License along with
 # jrl-walkgen. If not, see <http://www.gnu.org/licenses/>.
 
-# Import jrl-mal flags.
-INCLUDE_DIRECTORIES(${JRL_MAL_INCLUDEDIR})
-
 # Make sure to find Debug.h
 INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src)
 
@@ -69,6 +66,7 @@ SET(SOURCES
   )
 
 ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES})
-TARGET_LINK_LIBRARIES(jrl-walkgen ${LAPACK_LIBRARIES})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
 INSTALL(TARGETS jrl-walkgen DESTINATION lib)
+
+PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-mal)
