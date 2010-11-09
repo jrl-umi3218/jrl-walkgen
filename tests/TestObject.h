@@ -34,7 +34,7 @@
 
 #ifdef WIN32
 #include <Windows.h>
-#include "TimeUtilsWindows.h"
+#include "portability/gettimeofday.hh"
 #endif /*WIN32*/
 
 #include <ostream>

@@ -23,7 +23,7 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 #ifdef WIN32
-# include <TimeUtilsWindows.h>
+# include "gettimeofday.hh"
 
 # include <Windows.h>
 # if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
