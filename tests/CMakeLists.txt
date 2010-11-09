@@ -52,6 +52,8 @@ ADD_EXECUTABLE(TestRiccatiEquation
   ../src/PreviewControl/OptimalControllerSolver.cpp
   )
 
+TARGET_LINK_LIBRARIES(TestRiccatiEquation ${LAPACK_LIBRARIES})
+
 ######################
 # Test Morisawa 2007 #
 ######################

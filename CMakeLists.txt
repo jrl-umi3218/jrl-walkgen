@@ -17,6 +17,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 INCLUDE(cmake/base.cmake)
+INCLUDE(cmake/lapack.cmake)
 
 SET(PROJECT_NAME jrl-walkgen)
 SET(PROJECT_VERSION 3.1.1.99)
@@ -36,6 +37,8 @@ ADD_REQUIRED_DEPENDENCY("abstract-robot-dynamics >= 1.15")
 ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
 
 ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.1.0")
+
+SEARCH_FOR_LAPACK()
 
 # Add aggressive optimization flags in release mode.
 IF(CMAKE_COMPILER_IS_GNUCXX)
