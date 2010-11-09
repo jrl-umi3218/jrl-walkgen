@@ -46,4 +46,4 @@ SimplePlugin::~SimplePlugin()
     {
       m_SimplePluginManager->UnregisterPlugin(this);
     }
-};
+}

@@ -749,7 +749,7 @@ void StepOverPlanner::PolyPlanner(deque<COMState> &aCOMBuffer,
 #endif	
  
   //return 1;*/	
-};
+}
 
 
 void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOverFootBuffer)
@@ -1063,7 +1063,7 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
       aStepOverFootBuffer[i+aStart].z = m_ClampedCubicSplineStepOverFootZ->GetValueSpline(TimeIntervalsZ,LocalTime)+aStepOverFootBuffer[aStart].z;	
     }
 
-};
+}
 
 void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOverFootBuffer)
 {
@@ -1341,7 +1341,7 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
 	+aStepOverFootBuffer[aStart].z;	
     }
 
-};
+}
 
 
 
