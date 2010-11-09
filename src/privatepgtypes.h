@@ -28,16 +28,6 @@
 #ifndef _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_
 #define  _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_
 
-// For Windows compatibility.
-#if defined (WIN32)
-#  ifdef walkGenJrl_EXPORTS
-#    define WALK_GEN_JRL_EXPORT __declspec(dllexport)
-#  else
-#    define WALK_GEN_JRL_EXPORT __declspec(dllimport)
-#  endif
-#else
-#  define WALK_GEN_JRL_EXPORT
-#endif
 namespace PatternGeneratorJRL
 {
 

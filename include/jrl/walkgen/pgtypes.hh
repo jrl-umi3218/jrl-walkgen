@@ -32,7 +32,7 @@
 
 // For Windows compatibility.
 #if defined (WIN32)
-#  ifdef walkGenJrl_EXPORTS
+#  ifdef jrl_walkgen_EXPORTS
 #    define WALK_GEN_JRL_EXPORT __declspec(dllexport)
 #  else
 #    define WALK_GEN_JRL_EXPORT __declspec(dllimport)
