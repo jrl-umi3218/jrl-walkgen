@@ -16,7 +16,7 @@
 INCLUDE(CTest)
 
 # Import jrl-mal flags.
-INCLUDE_DIRECTORIES(${JRL_MAL_INCLUDEDIR})
+ADD_DEFINITIONS(${JRL_MAL_CFLAGS})
 LINK_DIRECTORIES(${JRL_DYNAMICS_LIBRARY_DIRS})
 
 # Make sure private headers can be used.
@@ -71,15 +71,16 @@ TARGET_LINK_LIBRARIES(TestMorisawa2007 ${PROJECT_NAME})
 TARGET_LINK_LIBRARIES(TestMorisawa2007 ${JRL_DYNAMICS_LIBRARIES})
 ADD_DEPENDENCIES(TestMorisawa2007 ${PROJECT_NAME})
 
-SET(samplemodelpath ${DYNAMICSJRLJAPAN_DATADIR}/examples/jrl/dynamics/data/)
+MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_DATAROOTDIR})
+SET(samplemodelpath ${JRL_DYNAMICS_DATAROOTDIR}/examples/data/)
 SET(samplespec
-  ${DYNAMICSJRLJAPAN_DATADIR}/examples/jrl/dynamics/data/sampleSpecificities.xml
+  ${JRL_DYNAMICS_DATAROOTDIR}/examples/data/sampleSpecificities.xml
   )
 SET(sampleljr
-  ${DYNAMICSJRLJAPAN_DATADIR}/examples/jrl/dynamics/data/sampleLinkJointRank.xml
+  ${JRL_DYNAMICS_DATAROOTDIR}/examples/data/sampleLinkJointRank.xml
   )
 SET(sampleinitconfig
-  ${DYNAMICSJRLJAPAN_DATADIR}/examples/jrl/dynamics/data/sampleInitConfig.dat)
+  ${JRL_DYNAMICS_DATAROOTDIR}/examples/data/sampleInitConfig.dat)
 
 LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
 
@@ -121,5 +122,5 @@ SET(EXAMPLES_SOURCES
   )
 
 INSTALL(FILES ${EXAMPLES_SOURCES}
-  DESTINATION share/examples/jrl/walkgen/
+  DESTINATION share/jrl/dynamics/examples/
   PERMISSIONS OWNER_READ GROUP_READ WORLD_READ OWNER_WRITE OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE )

@@ -211,7 +211,8 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
       aCOMPos.yaw[0] = ZMPRefPositions[lCurrentPosition].theta;      
       
       aCOMPos.z[0] = m_ComHeight;
-
+      aCOMPos.z[1] = 0;
+      aCOMPos.z[2] = 0;
       // Compute ZMP position and orientation.
       ZMPPosition & aZMPPos = ZMPRefPositions[lCurrentPosition];
       aZMPPos.px = m_C(0,0) * aCOMPos.x[0] +
