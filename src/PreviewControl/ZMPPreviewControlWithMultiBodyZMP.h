@@ -164,7 +164,7 @@ namespace PatternGeneratorJRL
       CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot;
 
       /*! Number of iterations. */
-      unsigned long long int m_NumberOfIterations;
+      unsigned long int m_NumberOfIterations;
 
       /*! Pointer to the Preview Control object. */
       PreviewControl *m_PC;

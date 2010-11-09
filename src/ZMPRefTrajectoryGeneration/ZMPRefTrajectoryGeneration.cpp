@@ -66,7 +66,7 @@ ZMPRefTrajectoryGeneration::ZMPRefTrajectoryGeneration(SimplePluginManager *lSPM
 	}
 
     }
-};
+}
 
 
 void ZMPRefTrajectoryGeneration::CallMethod(std::string & Method, std::istringstream &strm)
@@ -102,7 +102,7 @@ void ZMPRefTrajectoryGeneration::CallMethod(std::string & Method, std::istringst
       ODEBUG(":samplingperiod" << m_SamplingPeriod << " ID: " << this);
     }
   
-};
+}
 
 bool ZMPRefTrajectoryGeneration::GetOnLineMode()
 {
