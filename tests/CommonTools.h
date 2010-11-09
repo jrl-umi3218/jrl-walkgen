@@ -93,6 +93,6 @@ namespace PatternGeneratorJRL
       }
     };    
 
-  }; /* end of TestSuite namespace */
-}; /* end of PatternGeneratorJRL namespace */
+  } /* end of TestSuite namespace */
+} /* end of PatternGeneratorJRL namespace */
 #endif /* _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_*/

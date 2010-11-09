@@ -274,5 +274,5 @@ void getOptions(int argc,
 
 
 
-}; /* End of TestSuite namespace */
-}; /* End of PatternGeneratorJRL namespace */
+} /* End of TestSuite namespace */
+} /* End of PatternGeneratorJRL namespace */

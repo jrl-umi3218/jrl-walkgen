@@ -39,7 +39,7 @@ namespace PatternGeneratorJRL
 
     ClockCPUTime::~ClockCPUTime()
     {
-    };
+    }
 
     void ClockCPUTime::Reset()
     {
@@ -54,7 +54,7 @@ namespace PatternGeneratorJRL
       m_totalmodificationtime = 0.0;
       m_NbOfItToCompute = 0;
       m_nbofmodifs = 0;
-    };
+    }
 
     void ClockCPUTime::startingDate()
     {
@@ -64,7 +64,7 @@ namespace PatternGeneratorJRL
     void ClockCPUTime::startPlanning()
     {
       gettimeofday(&m_begin,0);
-    };
+    }
 
     void ClockCPUTime::endPlanning()
     {
@@ -75,7 +75,7 @@ namespace PatternGeneratorJRL
 	+ 0.000001 * (end.tv_usec - m_begin.tv_usec);
       m_totaltimeinplanning+=ltime;
 
-    };
+    }
 
     void ClockCPUTime::startOneIteration()
     {
@@ -180,5 +180,5 @@ namespace PatternGeneratorJRL
       
     }
     
-  };
-};
+  }
+}

@@ -137,6 +137,6 @@ namespace PatternGeneratorJRL {
       /*! \brief Nb of iteration really computed */
       unsigned long int m_NbOfItToCompute;
     };
-  };
-};
+  }
+}
 #endif /* _CLOCK_CPUTIME_PATTERN_GERENATOR_UTESTING_H_ */

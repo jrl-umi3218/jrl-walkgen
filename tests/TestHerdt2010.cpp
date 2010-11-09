@@ -33,7 +33,7 @@ using namespace::PatternGeneratorJRL::TestSuite;
 using namespace std;
 
 enum Profiles_t {
-  PROFIL_HERDT_ONLINE_WALKING,                 // 1
+  PROFIL_HERDT_ONLINE_WALKING                 // 1
 };
 
 class TestHerdt2010: public TestObject
