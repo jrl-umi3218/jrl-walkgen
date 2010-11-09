@@ -414,7 +414,7 @@ namespace PatternGeneratorJRL
 
     int ReturnOptimalTimeToRegenerateAStep();
   };
-};
+}
 
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #endif /* _ZMPQP_WITH_CONSTRAINT_H_ */

@@ -145,5 +145,5 @@ namespace PatternGeneratorJRL
     /*! Set the position of the buffer size limit. */
     unsigned m_BufferSizeLimit;
   };
-};
+}
 #endif /* _COM_AND_FOOT_ONLY_STRATEGY_H_ */

@@ -127,6 +127,6 @@ class  WaistPolynome : public Polynome
       	bool m_StartingNewSequence;
 };
 
-};
+}
 
 #endif /*_WAISTHEIGHT_VARIATION_H_ */

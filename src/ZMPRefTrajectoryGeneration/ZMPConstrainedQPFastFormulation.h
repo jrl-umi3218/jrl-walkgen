@@ -361,7 +361,7 @@ namespace PatternGeneratorJRL
     /*! Vector of similar constraints. */
     vector<int> m_SimilarConstraints;
   };
-};
+}
 
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #endif /* _ZMPQP_WITH_CONSTRAINT_H_ */

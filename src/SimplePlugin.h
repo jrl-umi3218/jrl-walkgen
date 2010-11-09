@@ -70,6 +70,6 @@ namespace PatternGeneratorJRL
     SimplePluginManager * getSimplePluginManager() const
       { return m_SimplePluginManager; } 
   };
-};
+}
 #include <SimplePluginManager.h>
 #endif /* _PGI_SIMPLE_PLUGIN_H_ */

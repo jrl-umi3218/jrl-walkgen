@@ -169,5 +169,5 @@ namespace PatternGeneratorJRL
     /*! ZMP reference frame. */
     unsigned int m_ZMPFrame;
   };
-};
+}
 #endif /* _DOUBLE_STAGE_PREVIEW_CONTROL_STRATEGY_H_*/

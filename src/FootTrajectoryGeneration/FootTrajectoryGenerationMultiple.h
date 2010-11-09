@@ -189,5 +189,5 @@ namespace PatternGeneratorJRL
     double m_Sensitivity;
 
   };
-};
+}
 #endif /* _FOOT_TRAJECTORY_GENERATION_MULTIPLE_H_ */

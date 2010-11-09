@@ -327,6 +327,6 @@ namespace PatternGeneratorJRL
 
 
    };
-};
+}
 #include <PreviewControl/PreviewControl.h>
 #endif /* _FOOT_PRINT_H_*/

@@ -623,5 +623,5 @@ namespace PatternGeneratorJRL
       void PropagateAbsoluteReferenceTime(double x);
 
     };
-};
+}
 #endif

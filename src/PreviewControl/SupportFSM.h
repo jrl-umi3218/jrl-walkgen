@@ -65,6 +65,6 @@ namespace PatternGeneratorJRL
     int m_FullDebug;
 
   };
-};
+}
 
 #endif /* _SUPPORT_FSM_ */

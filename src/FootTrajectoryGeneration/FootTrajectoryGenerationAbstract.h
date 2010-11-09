@@ -211,6 +211,6 @@ namespace PatternGeneratorJRL
   };
   
   
-};
+}
 #endif /* _FOOT_TRAJECTORY_GENERATION_ABSTRACT_H_ */
 

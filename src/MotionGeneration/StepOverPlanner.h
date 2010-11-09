@@ -343,7 +343,7 @@ namespace PatternGeneratorJRL
 
   };
 
-};
+}
 
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #include <MotionGeneration/CollisionDetector.h>

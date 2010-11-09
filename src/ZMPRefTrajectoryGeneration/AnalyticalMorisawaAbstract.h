@@ -385,5 +385,5 @@ namespace PatternGeneratorJRL
       void SetHumanoidSpecificities(CjrlHumanoidDynamicRobot *aHS)
         {  m_HS = aHS;   };
     };
-};
+}
 #endif

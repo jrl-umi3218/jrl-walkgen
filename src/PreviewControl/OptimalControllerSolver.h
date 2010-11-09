@@ -254,5 +254,5 @@ namespace PatternGeneratorJRL
   \until MODE_WITH_INITIALPOS
   
   */
-};
+}
 #endif /* _OPTIMAL_CONTROLLER_SOLVER_H_ */

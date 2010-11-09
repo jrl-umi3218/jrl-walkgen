@@ -372,5 +372,5 @@ namespace PatternGeneratorJRL
   };
 
 
-};
+}
 #endif 

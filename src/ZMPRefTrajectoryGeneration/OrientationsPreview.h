@@ -139,5 +139,5 @@ namespace PatternGeneratorJRL
     double df(double a,double b,double c,double d,double x);
 
   };
-};
+}
 #endif /* ORIENTATIONSPREVIEW_H_ */

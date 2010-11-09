@@ -235,6 +235,6 @@ namespace Optimization
 	  
 	  /*! @} */
 	};
-    };
-};
+    }
+}
 #endif /* _PLDPSOLVER_H_*/

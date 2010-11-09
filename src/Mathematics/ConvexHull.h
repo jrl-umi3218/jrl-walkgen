@@ -58,5 +58,5 @@ namespace PatternGeneratorJRL
 		      std::vector<CH_Point> &TheConvexHull);
     
   };
-};
+}
 #endif

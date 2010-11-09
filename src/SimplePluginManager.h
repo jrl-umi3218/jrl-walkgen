@@ -93,7 +93,7 @@ namespace PatternGeneratorJRL
     void Print();
     
   };
-};
+}
 
 #include <SimplePlugin.h>
 

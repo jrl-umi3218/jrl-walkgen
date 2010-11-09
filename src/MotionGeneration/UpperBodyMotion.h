@@ -68,5 +68,5 @@ namespace PatternGeneratorJRL
 
      
    };
-};
+}
 #endif /* _UPPER_BODY_MOTION_*/

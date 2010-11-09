@@ -211,6 +211,6 @@ namespace PatternGeneratorJRL
     bool m_TransitionFinishOnLine;
   };
 
-};
+}
 #include <MotionGeneration/StepOverPlanner.h>
 #endif /* _FOOT_PRINT_H_*/

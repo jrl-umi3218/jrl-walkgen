@@ -73,5 +73,5 @@ namespace PatternGeneratorJRL
       /// Vector of coefficients.
       std::vector<double> m_Coefficients;
     };
-};
+}
 #endif /* _POLYNOME_H_*/

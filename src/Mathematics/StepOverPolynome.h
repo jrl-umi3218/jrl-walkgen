@@ -173,6 +173,6 @@ namespace PatternGeneratorJRL
     
   };
   
-};
+}
 
 #endif /* _STEPOVER_POLYNOME_H_ */

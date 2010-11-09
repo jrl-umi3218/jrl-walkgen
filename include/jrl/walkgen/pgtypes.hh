@@ -169,5 +169,5 @@ namespace PatternGeneratorJRL
   };
   typedef struct ReferenceAbsoluteVelocity_t ReferenceAbsoluteVelocity;
 
-};
+}
 #endif

@@ -143,7 +143,7 @@ namespace PatternGeneratorJRL
       
       
     };
-};
+}
 
 
 #endif /* _CHOLESKY_DEC_H_ */

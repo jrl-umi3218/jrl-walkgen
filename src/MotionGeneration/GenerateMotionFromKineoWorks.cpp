@@ -382,4 +382,4 @@ namespace PatternGeneratorJRL
       }
   }
 	
-};
+}

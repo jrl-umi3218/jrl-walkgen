@@ -112,5 +112,5 @@ namespace PatternGeneratorJRL
     /*! Buffer */
     std::vector<double> m_DataBuffer;
   };
-};
+}
 #endif /* _HWPG_CLOCK_H_ */

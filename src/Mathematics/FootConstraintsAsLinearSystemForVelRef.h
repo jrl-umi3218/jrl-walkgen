@@ -164,5 +164,5 @@ namespace PatternGeneratorJRL
        */
       double m_ConstraintOnX, m_ConstraintOnY;
     };
-};
+}
 #endif /* _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_ */

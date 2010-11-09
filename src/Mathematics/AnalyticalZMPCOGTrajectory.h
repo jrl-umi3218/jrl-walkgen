@@ -262,5 +262,5 @@ namespace PatternGeneratorJRL
     };
 
   std::ostream& operator <<(std::ostream &os,const AnalyticalZMPCOGTrajectory &obj);
-};
+}
 #endif /* _ANALYTICAL_COG_H_ */

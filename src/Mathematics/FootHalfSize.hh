@@ -64,6 +64,6 @@ namespace PatternGeneratorJRL
     double getHalfWidth() const;
     double getHalfHeightDS() const;
   };
-};
+}
 
 #endif /*  _FOOT_HALF_SIZE_H_*/

@@ -117,5 +117,5 @@ namespace PatternGeneratorJRL
       preview control time. */
     void Resize();
   };
-};
+}
 #endif /* _FILTERING_ANALYTICAL_TRAJECTORY_BY_PREVIEW_CONTROL_H_ */

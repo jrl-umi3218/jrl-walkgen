@@ -355,7 +355,7 @@ namespace PatternGeneratorJRL
 
     
   };
-};
+}
 
 #include <StepStackHandler.h>
 #endif /* _ZMPREF_TRAJ_GEN_H_ */

@@ -178,7 +178,7 @@ void WaistHeightVariation::PolyPlanner(deque<COMPosition> &aCOMBuffer,
 #endif	
  
   //return 1;*/	
-};
+}
 
 
 

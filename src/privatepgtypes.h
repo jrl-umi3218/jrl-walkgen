@@ -39,6 +39,6 @@ namespace PatternGeneratorJRL
     double TimeLimit;
   };
   typedef struct SupportState_s SupportState_t;
-};
+}
 
 #endif /* _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_ */

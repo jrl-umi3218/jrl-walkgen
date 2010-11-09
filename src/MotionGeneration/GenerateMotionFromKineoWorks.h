@@ -139,5 +139,5 @@ namespace PatternGeneratorJRL
     };
 
 
-};
+}
 #endif /* _GENERATE_MOTION_FROM_KINEOWORKS_H_ */

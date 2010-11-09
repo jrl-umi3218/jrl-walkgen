@@ -510,5 +510,5 @@ namespace PatternGeneratorJRL
 		      std::istringstream &astrm); 
       
     };
-};
+}
 #endif /* _ZMPREVIEWCONTROLWITHMULTIBODYZMP_H_ */

@@ -546,5 +546,5 @@ namespace PatternGeneratorJRL
     return os;
   }
 
-};
+}
 

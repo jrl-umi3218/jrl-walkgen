@@ -106,5 +106,5 @@ namespace PatternGeneratorJRL
       CjrlHumanoidDynamicRobot * m_HS;
       
     };
-};
+}
 #endif /* _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_H_ */

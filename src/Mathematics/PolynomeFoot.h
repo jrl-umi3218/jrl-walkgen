@@ -128,5 +128,5 @@ namespace PatternGeneratorJRL
       ~Polynome6();
     };
 
-};
+}
 #endif /* _POLYNOME_FOOT_H_ */

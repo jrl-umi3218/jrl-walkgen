@@ -186,5 +186,5 @@ namespace PatternGeneratorJRL
     /** @} */
 
   };
-};
+}
 #endif /* _GLOBAL_STRATEGY_MANAGER_H_ */

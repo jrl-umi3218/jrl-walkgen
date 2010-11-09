@@ -146,5 +146,5 @@ namespace PatternGeneratorJRL
       /*! @} */
 
     };
-};
+}
 #endif /* _LINEAR_INVERTED_PENDULUM_2D_H_ */

@@ -735,7 +735,7 @@ namespace PatternGeneratorJRL
 
   
 
-};
+}
 
 
 #endif

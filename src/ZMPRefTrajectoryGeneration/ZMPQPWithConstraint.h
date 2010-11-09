@@ -227,7 +227,7 @@ namespace PatternGeneratorJRL
     unsigned int m_QP_N;
 
   };
-};
+}
 
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
 #endif /* _ZMPQP_WITH_CONSTRAINT_H_ */
