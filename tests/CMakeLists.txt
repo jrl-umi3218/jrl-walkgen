@@ -52,7 +52,7 @@ ADD_EXECUTABLE(TestRiccatiEquation
   ../src/PreviewControl/OptimalControllerSolver.cpp
   )
 
-TARGET_LINK_LIBRARIES(TestRiccatiEquation ${LAPACK_LIBRARIES})
+PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
 
 ######################
 # Test Morisawa 2007 #
