@@ -16,6 +16,11 @@
 # Make sure to find Debug.h
 INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src)
 
+# add flag to compile qld.cc
+IF(WIN32)
+ADD_DEFINITIONS("/D __STDC__")
+ENDIF(WIN32)
+
 SET(SOURCES
   FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
