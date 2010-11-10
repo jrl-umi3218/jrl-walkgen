@@ -16,31 +16,38 @@
 # Requires at least CMake 2.6 to configure the package.
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+# Includes from jrl-cmaketools
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/lapack.cmake)
 
+# Define properties of the project
 SET(PROJECT_NAME jrl-walkgen)
 SET(PROJECT_VERSION 3.1.1.99)
 SET(PROJECT_DESCRIPTION "Walking pattern generator for Humanoids")
 SET(PROJECT_URL "")
 
+
 SET(CXX_DISABLE_WERROR True)
 
+# Initialize generic properties of the project
 SETUP_PROJECT()
 
+# Handle OS specificities 
 INCLUDE(CheckIncludeFiles)
 CHECK_INCLUDE_FILES("sys/time.h" SYS_TIME_H)
 IF(SYS_TIME_H)
 ADD_DEFINITIONS("-DHAVE_SYS_TIME_H")
 ENDIF(SYS_TIME_H)
 
+# Define dependencies
+
+# Required dependencies
 ADD_REQUIRED_DEPENDENCY("jrl-mal >= 1.9.0")
 ADD_REQUIRED_DEPENDENCY("abstract-robot-dynamics >= 1.15")
 ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
 
+# Optional ones.
 ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.1.0")
-
-SEARCH_FOR_LAPACK()
 
 # Add aggressive optimization flags in release mode.
 IF(CMAKE_COMPILER_IS_GNUCXX)
@@ -54,12 +61,18 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
     "${CMAKE_CXX_FLAGS_RELEASE} -fexpensive-optimizations")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
+# Define the set of headers to be exported
 SET(${PROJECT_NAME}_HEADERS
   include/jrl/walkgen/patterngeneratorinterface.hh
   include/jrl/walkgen/pgtypes.hh
 )
 
+# Define subdirectories to explore for cmake
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(tests)
 
+# Generate dependency to jrl-walkgen in pc file
+PKG_CONFIG_APPEND_LIBS("jrl-walkgen")
+
+# Ask to generate the final steps.
 SETUP_PROJECT_FINALIZE()
