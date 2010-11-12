@@ -40,7 +40,10 @@ namespace PatternGeneratorJRL
     {
       if (fabs(adb)<1e-8)
 	return 0.0;
-      return adb;
+	    
+      double ladb2 = adb * 1e8;
+      double lintadb2 = trunc(ladb2);
+      return lintadb2/1e8;
     }
 
 
