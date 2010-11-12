@@ -86,11 +86,11 @@ namespace PatternGeneratorJRL
     */
     virtual int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 				       FootAbsolutePosition &RightFootPosition,
-				       MAL_VECTOR(,double) & ZMPRefPos,
+				       MAL_VECTOR_TYPE(double) & ZMPRefPos,
 				       COMState & aCOMState,
-				       MAL_VECTOR(,double) & CurrentConfiguration,
-				       MAL_VECTOR(,double) & CurrentVelocity,
-				       MAL_VECTOR(,double) & CurrentAcceleration)=0;
+				       MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+				       MAL_VECTOR_TYPE(double) & CurrentVelocity,
+				       MAL_VECTOR_TYPE(double) & CurrentAcceleration)=0;
 
 
     
@@ -175,8 +175,8 @@ namespace PatternGeneratorJRL
     /*! \name Setter and getter for the jrlHumanoidDynamicRobot object. */
     /*! @param[in] aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
-    inline  bool setHumanoidDynamicRobot(const CjrlHumanoidDynamicRobot *aHumanoidDynamicRobot)
-      { m_HumanoidDynamicRobot = (CjrlHumanoidDynamicRobot *)aHumanoidDynamicRobot;
+    inline  bool setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot *aHumanoidDynamicRobot)
+      { m_HumanoidDynamicRobot = aHumanoidDynamicRobot;
 	return true;}
     
     /*! \brief Returns the object able to compute the dynamic parameters of the robot. */

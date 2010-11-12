@@ -168,8 +168,8 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
     }
   // Evaluate current state of the robot in the PG.
   COMState   lStartingCOMPosition;
-  MAL_S3_VECTOR(,double)  lStartingZMPPosition;
-  MAL_VECTOR(,double)  lStartingWaistPose;
+  MAL_S3_VECTOR_TYPE(double)  lStartingZMPPosition;
+  MAL_VECTOR_TYPE(double)  lStartingWaistPose;
   FootAbsolutePosition  InitLeftFootAbsPos;
   FootAbsolutePosition  InitRightFootAbsPos;
 
@@ -1250,7 +1250,7 @@ int main(int argc, char *argv[])
 		  aDebugHDR->currentAcceleration(PreviousAcceleration);
 		  aDebugHDR->computeForwardKinematics();
 		  
-		  MAL_S3_VECTOR(,double) ZMPmultibody;
+		  MAL_S3_VECTOR_TYPE(double) ZMPmultibody;
 		  ZMPmultibody = aDebugHDR->zeroMomentumPoint();
 		  if (DebugZMP2)
 		    {

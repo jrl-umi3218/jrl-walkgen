@@ -114,14 +114,14 @@ namespace PatternGeneratorJRL
       @param IterationNumber: Number of iteration.
       @param Stage: indicates which stage is reach by the Pattern Generator.
     */
-    virtual bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) &CoMPosition,
-							 MAL_VECTOR(,double) &CoMSpeed,
-							 MAL_VECTOR(,double) &CoMAcc,
-							 MAL_VECTOR(,double) &LeftFoot,
-							 MAL_VECTOR(,double) &RightFoot,
-							 MAL_VECTOR(,double) &CurrentConfiguration,
-							 MAL_VECTOR(,double) &CurrentVelocity,
-							 MAL_VECTOR(,double) &CurrentAcceleration,
+    virtual bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) &CoMPosition,
+							 MAL_VECTOR_TYPE(double) &CoMSpeed,
+							 MAL_VECTOR_TYPE(double) &CoMAcc,
+							 MAL_VECTOR_TYPE(double) &LeftFoot,
+							 MAL_VECTOR_TYPE(double) &RightFoot,
+							 MAL_VECTOR_TYPE(double) &CurrentConfiguration,
+							 MAL_VECTOR_TYPE(double) &CurrentVelocity,
+							 MAL_VECTOR_TYPE(double) &CurrentAcceleration,
 							 int IterationNumber,
 							 int Stage) =0;
 
@@ -132,8 +132,8 @@ namespace PatternGeneratorJRL
     
     /*! @param aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
-    inline  virtual bool setHumanoidDynamicRobot(const CjrlHumanoidDynamicRobot *aHumanoidDynamicRobot)
-    { m_HumanoidDynamicRobot = (CjrlHumanoidDynamicRobot *)aHumanoidDynamicRobot;
+    inline  virtual bool setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot *aHumanoidDynamicRobot)
+    { m_HumanoidDynamicRobot = aHumanoidDynamicRobot;
       return true;}
 
     /*! Returns the object able to compute dynamic parametersof the robot. */
@@ -152,9 +152,9 @@ namespace PatternGeneratorJRL
       IMPORTANT: The jrlHumanoidDynamicRobot must have been properly set up.
       
     */
-    virtual bool InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
-				   MAL_S3_VECTOR(,double) & lStartingCOMPosition,
-				   MAL_VECTOR(,double) & lStartingWaistPose,
+    virtual bool InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
+				   MAL_S3_VECTOR_TYPE(double) & lStartingCOMPosition,
+				   MAL_VECTOR_TYPE(double) & lStartingWaistPose,
 				   FootAbsolutePosition & InitLeftFootAbsPos, 
 				   FootAbsolutePosition & InitRightFootAbsPos)=0;
 
@@ -211,10 +211,10 @@ namespace PatternGeneratorJRL
       @return a 4x4 matrix which contains the pose and the position of the waist
       in the CoM reference frame.
     */
-    virtual MAL_S4x4_MATRIX(,double) GetCurrentPositionofWaistInCOMFrame() = 0;
+    virtual MAL_S4x4_MATRIX_TYPE(double) GetCurrentPositionofWaistInCOMFrame() = 0;
 
     /*! \brief Get the COG of the ankles at the starting position. */
-    virtual MAL_S3_VECTOR(,double) GetCOGInitialAnkles() = 0;
+    virtual MAL_S3_VECTOR_TYPE(double) GetCOGInitialAnkles() = 0;
     
   };
 

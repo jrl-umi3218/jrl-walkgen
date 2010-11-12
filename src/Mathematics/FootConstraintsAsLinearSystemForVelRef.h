@@ -130,31 +130,30 @@ namespace PatternGeneratorJRL
       /* ! Reference on the Humanoid Specificities. */
       CjrlHumanoidDynamicRobot * m_HS;
       
-      std::vector<CH_Point> ConvexHullFP;
+      std::vector<CH_Point> m_ConvexHullFP;
       
-      float* CHFPosConstrArrayX; 
-      float* CHFPosConstrArrayY;
+      double* m_CHFPosConstrArrayX; 
+      double* m_CHFPosConstrArrayY;
 
       // Find the convex hull for each of the position,
       // in order to create the corresponding trajectory.
       FootHalfSize m_LeftFootSize, m_RightFootSize;
       double m_Z;
       
-      double DSFeetDistance;
+      double m_DSFeetDistance;
       
       // Read humanoid specificities.
       CjrlFoot * m_RightFoot;
-      vector3d AnklePosition;
       CjrlFoot * m_LeftFoot;
   
       int State; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
       // 3: Double Support.
       int ComputeCH;
-      float lx, ly;
+      double m_x, m_y;
       
-      double prev_xmin, prev_xmax, prev_ymin, prev_ymax;
+      //      double m_prev_xmin, m_prev_xmax, m_prev_ymin, m_prev_ymax;
       
-      double s_t,c_t;
+      //      double s_t,c_t;
       
       unsigned int m_FullDebug;
 

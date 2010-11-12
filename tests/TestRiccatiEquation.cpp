@@ -39,7 +39,7 @@ int main()
   MAL_MATRIX_DIM(A,double,3,3);
   MAL_MATRIX_DIM(b,double,3,1);
   MAL_MATRIX_DIM(c,double,1,3);
-  MAL_MATRIX(, double) lF;
+  MAL_MATRIX_TYPE( double) lF;
 
   /* Declare the weights for the function */
   ofstream aof;

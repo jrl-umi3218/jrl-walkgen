@@ -39,7 +39,7 @@ namespace PatternGeneratorJRL
   {
     bool operator() (const CH_Point & s1, const CH_Point &s2)
     {
-      float x1,x2,y1,y2;
+      double x1,x2,y1,y2;
       x1 = s1.col - HRP2CIO_GlobalP0.col;
       x2 = s2.col - HRP2CIO_GlobalP0.col;
       y1 = s1.row - HRP2CIO_GlobalP0.row;
@@ -50,9 +50,9 @@ namespace PatternGeneratorJRL
   };
 
   void DistanceCHRep(CH_Point & s1,CH_Point & s2,
-		     float & distance1, float &distance2)
+		     double & distance1, double &distance2)
   {
-    float x1,x2,y1,y2;
+    double x1,x2,y1,y2;
     x1 = s1.col - HRP2CIO_GlobalP0.col;
     x2 = s2.col - HRP2CIO_GlobalP0.col;
     y1 = s1.row - HRP2CIO_GlobalP0.row;
@@ -63,9 +63,9 @@ namespace PatternGeneratorJRL
     
   }
 
-  float CompareCBRep(CH_Point & s1,CH_Point &s2)
+  double CompareCBRep(CH_Point & s1,CH_Point &s2)
   {
-    float x1,x2,y1,y2;
+    double x1,x2,y1,y2;
     x1 = s1.col - HRP2CIO_GlobalP0.col;
     x2 = s2.col - HRP2CIO_GlobalP0.col;
     y1 = s1.row - HRP2CIO_GlobalP0.row;
@@ -120,7 +120,7 @@ namespace PatternGeneratorJRL
 	    CH_Point Current = *it_PtinPolarCoord;
 	    if (CompareCBRep(Current,aVecOfPoints[i])==0.0)
 	      {
-		float distance1, distance2;
+		double distance1, distance2;
 		DistanceCHRep(Current,aVecOfPoints[i],
 			      distance1, distance2);
 		if (distance1<=distance2)
@@ -164,7 +164,7 @@ namespace PatternGeneratorJRL
       {
 	CH_Point pi = *it_LPPC;
 	unsigned char ok=0;
-	float x1,x2,y1,y2;
+	double x1,x2,y1,y2;
 	CH_Point s1;
 	CH_Point s2;
 

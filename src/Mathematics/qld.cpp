@@ -377,8 +377,8 @@ compliance.
 #ifdef __STDC__
 int ql0001_(int *m,int *me,int *mmax,int *n,int *nmax,int *mnn,
             double *c,double *d,double *a,double *b,double *xl,
-            double *xu,double *x,double *u,int *iout,int *ifail,
-            int *iprint,double *war,int *lwar,int *iwar,int *liwar,
+            double *xu,double *x,double *u,int * /* iout*/,int *ifail,
+            int * /* iprint */,double *war,int *lwar,int *iwar,int *liwar,
             double *eps1)
 #else
 /* Subroutine */ 
@@ -619,7 +619,7 @@ compliance.
 */
 #ifdef __STDC__
 int ql0002_(integer *n,integer *m,integer *meq,integer *mmax,
-            integer *mn,integer *mnn,integer *nmax,
+            integer * mn ,integer * /* mnn */,integer *nmax,
             logical *lql,
             doublereal *a,doublereal *b,doublereal *grad,
             doublereal *g,doublereal *xl,doublereal *xu,doublereal *x,
@@ -627,7 +627,7 @@ int ql0002_(integer *n,integer *m,integer *meq,integer *mmax,
             doublereal *vsmall,
             integer *info,
             doublereal *diag, doublereal *w,
-            integer *lw)
+            integer */* lw */)
 #else
 /* Subroutine */ int ql0002_(n, m, meq, mmax, mn, mnn, nmax, lql, a, b, grad, 
 	g, xl, xu, x, nact, iact, maxit, vsmall, info, diag, w, lw)

@@ -181,7 +181,7 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
 int FootTrajectoryGenerationMultiple::SetNatureInterval(unsigned int IntervalIndex,
 							int Nature)
 {
-  if ((IntervalIndex<0) || (IntervalIndex>=m_NatureOfIntervals.size()))
+  if (IntervalIndex>=m_NatureOfIntervals.size())
     return -1;
   m_NatureOfIntervals[IntervalIndex] = Nature;
   return 0;
@@ -192,7 +192,7 @@ int FootTrajectoryGenerationMultiple::SetNatureInterval(unsigned int IntervalInd
 */
 int FootTrajectoryGenerationMultiple::GetNatureInterval(unsigned int IntervalIndex)
 {
-  if ((IntervalIndex<0) || (IntervalIndex>=m_NatureOfIntervals.size()))
+  if (IntervalIndex>=m_NatureOfIntervals.size())
     return -100;
   
   return  m_NatureOfIntervals[IntervalIndex];
@@ -215,7 +215,7 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 									double InitPosition,
 									double InitSpeed)
 {
-  if ((IntervalIndex<0) || (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size()))
+  if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
     return -1;
 
 
@@ -238,8 +238,8 @@ void FootTrajectoryGenerationMultiple::SetAbsoluteTimeReference(double lAbsolute
   m_AbsoluteTimeReference = lAbsoluteTimeReference;
 }
 
-void FootTrajectoryGenerationMultiple::CallMethod(std::string &Method,
-						  std::istringstream &strm)
+void FootTrajectoryGenerationMultiple::CallMethod(std::string &, //Method,
+						  std::istringstream & ) //strm)
 {
   
 }

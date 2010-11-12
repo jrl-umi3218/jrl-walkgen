@@ -263,9 +263,9 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
   int State=0; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
   // 3: Double Support.
   int ComputeCH=0;
-  float lx=0.0, ly=0.0;
-  float lxcoefs[4] = { 1.0, 1.0, -1.0, -1.0};
-  float lycoefs[4] = {-1.0, 1.0,  1.0, -1.0};
+  double lx=0.0, ly=0.0;
+  double lxcoefs[4] = { 1.0, 1.0, -1.0, -1.0};
+  double lycoefs[4] = {-1.0, 1.0,  1.0, -1.0};
   double prev_xmin=1e7, prev_xmax=-1e7, prev_ymin=1e7, prev_ymax=-1e7;
   RESETDEBUG4("ConstraintMax.dat");
 
@@ -1412,55 +1412,55 @@ void ZMPQPWithConstraint::CallMethod(std::string & Method, std::istringstream &s
 }
 
 
-int ZMPQPWithConstraint::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-				    deque<COMState> & FinalCOMStates,
-				    deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-				    deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
-				    FootAbsolutePosition & InitLeftFootAbsolutePosition,
-				    FootAbsolutePosition & InitRightFootAbsolutePosition,
-				    deque<RelativeFootPosition> &RelativeFootPositions,
-				    COMState & lStartingCOMState,
-				    MAL_S3_VECTOR(&,double) lStartingZMPPosition)
+int ZMPQPWithConstraint::InitOnLine(deque<ZMPPosition> & ,         // FinalZMPPositions,
+				    deque<COMState> & ,            // FinalCOMStates,
+				    deque<FootAbsolutePosition> & ,// FinalLeftFootAbsolutePositions,
+				    deque<FootAbsolutePosition> & ,// FinalRightFootAbsolutePositions,
+				    FootAbsolutePosition & ,       // InitLeftFootAbsolutePosition,
+				    FootAbsolutePosition & ,       // InitRightFootAbsolutePosition,
+				    deque<RelativeFootPosition> &, // RelativeFootPositions,
+				    COMState & ,                   // lStartingCOMState,
+				    MAL_S3_VECTOR(&,double) )      // lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
   return 0;
 }
 
-void ZMPQPWithConstraint::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-					deque<ZMPPosition> & FinalZMPPositions,	
-					deque<COMState> & FinalCOMStates,
-					deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-					deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-					bool EndSequence)
+void ZMPQPWithConstraint::OnLineAddFoot(RelativeFootPosition & ,       // NewRelativeFootPosition,
+					deque<ZMPPosition> & ,         // FinalZMPPositions,	
+					deque<COMState> & ,            // FinalCOMStates,
+					deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
+					deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
+					bool )                         // EndSequence)
 {
   cout << "To be implemented" << endl;
 }
 
-void ZMPQPWithConstraint::OnLine(double time,
-				 deque<ZMPPosition> & FinalZMPPositions,				     
-				 deque<COMState> & FinalCOMStates,
-				 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-				 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
+void ZMPQPWithConstraint::OnLine(double ,                              // time,
+				 deque<ZMPPosition> & ,                // FinalZMPPositions,				     
+				 deque<COMState> & ,                   // FinalCOMStates,
+				 deque<FootAbsolutePosition> & ,       // FinalLeftFootAbsolutePositions,
+				 deque<FootAbsolutePosition> & )       // FinalRightFootAbsolutePositions)
 {
   cout << "To be implemented" << endl;
 }
 
-int ZMPQPWithConstraint::OnLineFootChange(double time,
-					  FootAbsolutePosition &aFootAbsolutePosition,
-					  deque<ZMPPosition> & FinalZMPPositions,			     
-					  deque<COMState> & CoMStates,
-					  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-					  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-					  StepStackHandler  *aStepStackHandler)
+int ZMPQPWithConstraint::OnLineFootChange(double ,                        // time,
+					  FootAbsolutePosition & ,        // aFootAbsolutePosition,
+					  deque<ZMPPosition> & ,          // FinalZMPPositions,			     
+					  deque<COMState> & ,             // CoMStates,
+					  deque<FootAbsolutePosition> & , // FinalLeftFootAbsolutePositions,
+					  deque<FootAbsolutePosition> & , // FinalRightFootAbsolutePositions,
+					  StepStackHandler  * )           // aStepStackHandler)
 {
   cout << "To be implemented" << endl;
   return -1;
 }
 
-void ZMPQPWithConstraint::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-					       deque<COMState> &FinalCOMStates,
-					       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-					       deque<FootAbsolutePosition> &RightFootAbsolutePositions)
+void ZMPQPWithConstraint::EndPhaseOfTheWalking(deque<ZMPPosition> & ,          // ZMPPositions,
+					       deque<COMState> & ,             // FinalCOMStates,
+					       deque<FootAbsolutePosition> &,  // LeftFootAbsolutePositions,
+					       deque<FootAbsolutePosition> & ) // RightFootAbsolutePositions)
 {
   
 }

@@ -310,7 +310,7 @@ int OnlineStepPositionTrajectoryGeneration::InitializeMatrixPbConstants()
 // } 
  
  
-int OnlineStepPositionTrajectoryGeneration::BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX(,double) &OptA) 
+int OnlineStepPositionTrajectoryGeneration::BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX_TYPE(double) &OptA) 
 { 
   for( int i=0;i<2*m_QP_N;i++) 
     for( int j=0;j<2*m_QP_N;j++) 
@@ -318,7 +318,7 @@ int OnlineStepPositionTrajectoryGeneration::BuildingConstantPartOfTheObjectiveFu
  
   return 0; 
 }  
-int OnlineStepPositionTrajectoryGeneration::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX(,double) &OptA) 
+int OnlineStepPositionTrajectoryGeneration::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX_TYPE(double) &OptA) 
 { 
  
   /*! Build cholesky matrix of the optimum 
@@ -1987,7 +1987,7 @@ int OnlineStepPositionTrajectoryGeneration::InitOnLine(deque<ZMPPosition> & Fina
 					FootAbsolutePosition & InitRightFootAbsolutePosition, 
 					deque<RelativeFootPosition> &RelativeFootPositions, 
 					COMState & lStartingCOMState, 
-					MAL_S3_VECTOR(,double) & lStartingZMPPosition) 
+					MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition) 
 { 
   // COMState aCOMPos; 
   // ZMPPosition aZMPPos; 

@@ -69,11 +69,11 @@ namespace PatternGeneratorJRL
     */
     int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 			       FootAbsolutePosition &RightFootPosition,
-			       MAL_VECTOR(,double) & ZMPRefPos,
+			       MAL_VECTOR_TYPE(double) & ZMPRefPos,
 			       COMState & finalCOMState,
-			       MAL_VECTOR(,double) & CurrentConfiguration,
-			       MAL_VECTOR(,double) & CurrentVelocity,
-			       MAL_VECTOR(,double) & CurrentAcceleration);
+			       MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+			       MAL_VECTOR_TYPE(double) & CurrentVelocity,
+			       MAL_VECTOR_TYPE(double) & CurrentAcceleration);
     
 
     

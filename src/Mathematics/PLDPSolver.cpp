@@ -1046,7 +1046,7 @@ void PLDPSolver::WriteCurrentZMPSolution(string filename,
   double* lZMP = new double [lZMP_size];
 
   ofstream aof;
-  aof.open((char *)filename.c_str(),ofstream::out);
+  aof.open(filename.c_str(),ofstream::out);
 
 
   for(unsigned int i=0;i<m_CardV;i++)

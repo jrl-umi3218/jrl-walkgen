@@ -139,10 +139,10 @@ namespace PatternGeneratorJRL
       void SetRobotControlPeriod(const double &);
 
       /*! Get state. */
-      void GetState(MAL_VECTOR(,double) &lxk);
+      void GetState(MAL_VECTOR_TYPE(double) &lxk);
 
       /*! Get state. */
-      void setState(MAL_VECTOR(,double) lxk);
+      void setState(MAL_VECTOR_TYPE(double) lxk);
       /*! @} */
 
     };

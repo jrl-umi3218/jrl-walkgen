@@ -92,14 +92,14 @@ namespace PatternGeneratorJRL
       last stage, we store some information.
       
     */
-    bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) &CoMPosition,
-						 MAL_VECTOR(,double) & aCoMSpeed,
-						 MAL_VECTOR(,double) & aCoMAcc,
-						 MAL_VECTOR(,double) &LeftFoot,
-						 MAL_VECTOR(,double) &RightFoot,
-						 MAL_VECTOR(,double) & CurrentConfiguration,
-						 MAL_VECTOR(,double) & CurrentVelocity,
-						 MAL_VECTOR(,double) & CurrentAcceleration,
+    bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) &CoMPosition,
+						 MAL_VECTOR_TYPE(double) & aCoMSpeed,
+						 MAL_VECTOR_TYPE(double) & aCoMAcc,
+						 MAL_VECTOR_TYPE(double) &LeftFoot,
+						 MAL_VECTOR_TYPE(double) &RightFoot,
+						 MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+						 MAL_VECTOR_TYPE(double) & CurrentVelocity,
+						 MAL_VECTOR_TYPE(double) & CurrentAcceleration,
 						 int IterationNumber,
 						 int Stage);    
 
@@ -117,9 +117,9 @@ namespace PatternGeneratorJRL
       IMPORTANT: The jrlHumanoidDynamicRobot must have been properly set up.
       
     */
-    bool InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
-			   MAL_S3_VECTOR(,double) & lStartingCOMPosition,
-			   MAL_VECTOR(,double) & lStartingWaistPosition,
+    bool InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
+			   MAL_S3_VECTOR_TYPE(double) & lStartingCOMPosition,
+			   MAL_VECTOR_TYPE(double) & lStartingWaistPosition,
 			   FootAbsolutePosition & InitLeftFootAbsPos, 
 			   FootAbsolutePosition & InitRightFootAbsPos);
 
@@ -149,8 +149,8 @@ namespace PatternGeneratorJRL
       Assuming that the waist is at (0,0,0)
       It returns the associate initial values for the left and right foot.*/
 
-    int EvaluateStartingCoM(MAL_VECTOR(,double) &BodyAngles,
-			    MAL_S3_VECTOR(,double) & aStartingCOMPosition,
+    int EvaluateStartingCoM(MAL_VECTOR_TYPE(double) &BodyAngles,
+			    MAL_S3_VECTOR_TYPE(double) & aStartingCOMPosition,
 			    FootAbsolutePosition & InitLeftFootPosition,
 			    FootAbsolutePosition & InitRightFootPosition);
 
@@ -161,21 +161,21 @@ namespace PatternGeneratorJRL
 			    FootAbsolutePosition & InitRightFootPosition);
 
     /*! Method to compute the heuristic for the arms. */
-    void ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR(,double) & qArmr, 
-						   MAL_VECTOR(,double) & qArml,
-						   MAL_VECTOR(,double) & aCOMPosition,
-						   MAL_VECTOR(,double) & RFP,
-						   MAL_VECTOR(,double) &  LFP);
+    void ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR_TYPE(double) & qArmr, 
+						   MAL_VECTOR_TYPE(double) & qArml,
+						   MAL_VECTOR_TYPE(double) & aCOMPosition,
+						   MAL_VECTOR_TYPE(double) & RFP,
+						   MAL_VECTOR_TYPE(double) &  LFP);
 
     /*! This method returns the final COM pose matrix after the second stage of control. */
-    MAL_MATRIX(,double) GetFinalDesiredCOMPose();
+    MAL_MATRIX_TYPE(double) GetFinalDesiredCOMPose();
 
     /*! Returns the position of the Waist in the the COM Frame . */
-    void GetCurrentPositionofWaistInCOMFrame(MAL_VECTOR(,double) & CurPosWICF_homogeneous);
+    void GetCurrentPositionofWaistInCOMFrame(MAL_VECTOR_TYPE(double) & CurPosWICF_homogeneous);
 
 
     /*! Reimplementation of the setter of the HumanoidDynamicRobot. */
-    bool setHumanoidDynamicRobot(const CjrlHumanoidDynamicRobot * aHumanoidDynamicRobot);
+    bool setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot * aHumanoidDynamicRobot);
 
     /*! Compute the angles values considering a 6DOF leg for a given configuration
       of the waist and the foot of the leg:
@@ -188,14 +188,14 @@ namespace PatternGeneratorJRL
       @param[in] LeftOrRight: -1 for the right leg, 1 for the left.
       @param[out] lq : Values of the leg which realize the position asked for.
      */
-    bool KinematicsForOneLeg(MAL_S3x3_MATRIX(,double) & Body_R,
-			     MAL_S3_VECTOR(,double) & Body_P,
-			     MAL_VECTOR(,double) &aFoot,
-			     MAL_S3_VECTOR(,double) &lDt,
-			     MAL_VECTOR(,double) &aCoMPosition,
-			     MAL_S3_VECTOR(,double) &ToTheHip,
+    bool KinematicsForOneLeg(MAL_S3x3_MATRIX_TYPE(double) & Body_R,
+			     MAL_S3_VECTOR_TYPE(double) & Body_P,
+			     MAL_VECTOR_TYPE(double) &aFoot,
+			     MAL_S3_VECTOR_TYPE(double) &lDt,
+			     MAL_VECTOR_TYPE(double) &aCoMPosition,
+			     MAL_S3_VECTOR_TYPE(double) &ToTheHip,
 			     int LeftOrRight,
-			     MAL_VECTOR(,double) &lq,
+			     MAL_VECTOR_TYPE(double) &lq,
 			     int Stage);
     
     /*! Compute the angles values considering two 6DOF legs for a given configuration
@@ -208,13 +208,13 @@ namespace PatternGeneratorJRL
       @param qr: Angles for the right leg to achieve the positions.
       @param AbsoluteWaistPosition: The waist position.
      */
-    bool KinematicsForTheLegs(MAL_VECTOR(,double) & aCoMPosition,
-			      MAL_VECTOR(,double) & aLeftFoot,
-			      MAL_VECTOR(,double) & aRightFoot,
+    bool KinematicsForTheLegs(MAL_VECTOR_TYPE(double) & aCoMPosition,
+			      MAL_VECTOR_TYPE(double) & aLeftFoot,
+			      MAL_VECTOR_TYPE(double) & aRightFoot,
 			      int Stage,
-			      MAL_VECTOR(,double) & ql,
-			      MAL_VECTOR(,double) & qr,
-			      MAL_S3_VECTOR(,double) & AbsoluteWaistPosition);
+			      MAL_VECTOR_TYPE(double) & ql,
+			      MAL_VECTOR_TYPE(double) & qr,
+			      MAL_S3_VECTOR_TYPE(double) & AbsoluteWaistPosition);
 
     /*! \brief Implement the Plugin part to receive information from 
       PatternGeneratorInterface.
@@ -225,10 +225,10 @@ namespace PatternGeneratorJRL
       @return a 4x4 matrix which contains the pose and the position of the waist
       in the CoM reference frame.
     */
-    MAL_S4x4_MATRIX(,double) GetCurrentPositionofWaistInCOMFrame();
+    MAL_S4x4_MATRIX_TYPE(double) GetCurrentPositionofWaistInCOMFrame();
 
     /*! \brief Get the COG of the ankles at the starting position. */
-    virtual MAL_S3_VECTOR(,double) GetCOGInitialAnkles();
+    virtual MAL_S3_VECTOR_TYPE(double) GetCOGInitialAnkles();
 
   protected:
     
@@ -365,7 +365,7 @@ namespace PatternGeneratorJRL
     /*! COG of the ankles in the waist reference frame 
       when evaluating the initial position.
      */
-    MAL_S3_VECTOR(,double) m_COGInitialAnkles;
+    MAL_S3_VECTOR_TYPE(double) m_COGInitialAnkles;
 
     /*! Store the position of the left and right shoulders. */
     CjrlJoint *m_LeftShoulder, *m_RightShoulder;

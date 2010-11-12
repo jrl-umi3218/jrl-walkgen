@@ -181,7 +181,7 @@ namespace PatternGeneratorJRL
     //this is the rotationmatrix from world frame to obstacle frame
     MAL_S3x3_MATRIX(m_ObstacleRotInv,double); 
        
-    float m_StepOverStepLenght,m_StepOverHipHeight;
+    double m_StepOverStepLenght,m_StepOverHipHeight;
 	
     deque<RelativeFootPosition> m_FootHolds;
 
@@ -232,9 +232,9 @@ namespace PatternGeneratorJRL
     unsigned int m_ExtraBufferLength;
       
     double m_ModulationSupportCoefficient;
-    float m_Tsingle,m_TsingleStepOver; 
-    float m_Tdble,m_TdbleStepOver;
-    float m_TdbleStepOverBeforeAfter,m_TsingleStepOverBeforeAfter;
+    double m_Tsingle,m_TsingleStepOver; 
+    double m_Tdble,m_TdbleStepOver;
+    double m_TdbleStepOverBeforeAfter,m_TsingleStepOverBeforeAfter;
       
       
     double m_tipToAnkle;

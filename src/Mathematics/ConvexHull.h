@@ -38,7 +38,7 @@ namespace PatternGeneratorJRL
   */
   typedef struct 
   {
-    float col,row;  /* col: x, row : y */
+    double col,row;  /* col: x, row : y */
   } CH_Point;
   
   typedef std::vector<CH_Point> ConvexHullList;

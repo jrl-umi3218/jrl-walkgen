@@ -153,7 +153,7 @@ namespace PatternGeneratorJRL
       @param[in] ClearStepStackHandler: Clean the stack of steps after copy.
      */
     void CommonInitializationOfWalking(COMState & lStartingCOMState,
-				       MAL_S3_VECTOR(,double) & lStartingZMPPosition,
+				       MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
 				       MAL_VECTOR(  & ,double) BodyAnglesIni,
 				       FootAbsolutePosition & InitLeftFootAbsPos, 
 				       FootAbsolutePosition & InitRightFootAbsPos,
@@ -177,10 +177,10 @@ namespace PatternGeneratorJRL
      @param[out]  ZMPTarget  The target ZMP in the waist reference frame.
      @return True is there is still some data to send, false otherwise.
     */
-    bool RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
-				    MAL_VECTOR(,double) & CurrentVelocity,
-				    MAL_VECTOR(,double) & CurrentAcceleration,
-				    MAL_VECTOR(,double) & ZMPTarget);
+    bool RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+				    MAL_VECTOR_TYPE(double) & CurrentVelocity,
+				    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+				    MAL_VECTOR_TYPE(double) & ZMPTarget);
 
     /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
      @param[out]  CurrentConfiguration The current configuration of the robot according to 
@@ -196,10 +196,10 @@ namespace PatternGeneratorJRL
      @param[out] RightFootPosition: Absolute position of the right foot.
      @return True is there is still some data to send, false otherwise.
     */
-    bool RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
-				    MAL_VECTOR(,double) & CurrentVelocity,
-				    MAL_VECTOR(,double) & CurrentAcceleration,
-				    MAL_VECTOR(,double) &ZMPTarget,
+    bool RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+				    MAL_VECTOR_TYPE(double) & CurrentVelocity,
+				    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+				    MAL_VECTOR_TYPE(double) &ZMPTarget,
 				    COMState &COMState,
 				    FootAbsolutePosition &LeftFootPosition,
 				    FootAbsolutePosition &RightFootPosition);
@@ -218,10 +218,10 @@ namespace PatternGeneratorJRL
      @param[out] RightFootPosition: Absolute position of the right foot.
      @return True is there is still some data to send, false otherwise.
     */
-    bool RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
-				    MAL_VECTOR(,double) & CurrentVelocity,
-				    MAL_VECTOR(,double) & CurrentAcceleration,
-				    MAL_VECTOR(,double) &ZMPTarget,
+    bool RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+				    MAL_VECTOR_TYPE(double) & CurrentVelocity,
+				    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+				    MAL_VECTOR_TYPE(double) &ZMPTarget,
 				    COMPosition &aCOMPosition,
 				    FootAbsolutePosition &LeftFootPosition,
 				    FootAbsolutePosition &RightFootPosition);
@@ -363,8 +363,8 @@ namespace PatternGeneratorJRL
     /*! \brief Returns the ZMP, CoM, left foot absolute position, and right foot absolute position
      for the initiale pose.*/
     void EvaluateStartingState(COMState  & lStartingCOMState,
-			       MAL_S3_VECTOR(,double) & lStartingZMPPosition,
-			       MAL_VECTOR(,double) & lStartingWaistPose,
+			       MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+			       MAL_VECTOR_TYPE(double) & lStartingWaistPose,
 			       FootAbsolutePosition & InitLeftFootAbsPos,
 			       FootAbsolutePosition & InitRightFootAbsPos);
 
@@ -460,7 +460,7 @@ namespace PatternGeneratorJRL
     AnalyticalMorisawaCompact * m_ZMPM;
 
     /*! Specified ZMP starting point. */
-    MAL_S3_VECTOR(, double) m_ZMPInitialPoint;
+    MAL_S3_VECTOR_TYPE( double) m_ZMPInitialPoint;
 
     /*! Boolean stating if the user has specified or not the ZMP initial point. 
      This boolean is set to true when the user is setting the previous value.
@@ -556,7 +556,7 @@ namespace PatternGeneratorJRL
 
     /*! Store the local Single support time,
       and the Double support time. */
-    float m_TSsupport, m_TDsupport;
+    double m_TSsupport, m_TDsupport;
 
     /*! Height of the CoM. */
     double m_Zc;
@@ -588,7 +588,7 @@ namespace PatternGeneratorJRL
     MAL_VECTOR( m_Debug_prev_ql_RefState,double);
 
     double m_Debug_prev_qWaistYaw, m_Debug_prev_dqWaistYaw;
-    MAL_S3_VECTOR(,double) m_Debug_prev_P, m_Debug_prev_L;
+    MAL_S3_VECTOR_TYPE(double) m_Debug_prev_P, m_Debug_prev_L;
     bool m_FirstPrint, m_FirstRead;
 
     bool m_ShouldBeRunning;
@@ -641,7 +641,7 @@ namespace PatternGeneratorJRL
     CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot, * m_2HumanoidDynamicRobot;
 
     /*! Speed of the leg. */
-    MAL_VECTOR(,double) m_dqr,m_dql;
+    MAL_VECTOR_TYPE(double) m_dqr,m_dql;
 
     /*! Objet to realize the generate the posture for given CoM
       and feet positions. */

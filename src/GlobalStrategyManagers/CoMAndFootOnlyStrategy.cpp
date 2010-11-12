@@ -45,9 +45,9 @@ CoMAndFootOnlyStrategy::~CoMAndFootOnlyStrategy()
 {
 }
 
-int CoMAndFootOnlyStrategy::InitInterObjects(CjrlHumanoidDynamicRobot *aHDR,
+int CoMAndFootOnlyStrategy::InitInterObjects(CjrlHumanoidDynamicRobot * /* aHDR */,
 					     ComAndFootRealization * aCFR,
-					     StepStackHandler * aSSH)
+					     StepStackHandler * /* aSSH */)
 {
   m_ComAndFootRealization = aCFR;
   return 0;
@@ -55,11 +55,11 @@ int CoMAndFootOnlyStrategy::InitInterObjects(CjrlHumanoidDynamicRobot *aHDR,
 
 int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 						   FootAbsolutePosition &RightFootPosition,
-						   MAL_VECTOR(,double) & ZMPRefPos,
+						   MAL_VECTOR_TYPE(double) & ZMPRefPos,
 						   COMState & finalCOMPosition,
-						   MAL_VECTOR(,double) & CurrentConfiguration,
-						   MAL_VECTOR(,double) & CurrentVelocity,
-						   MAL_VECTOR(,double) & CurrentAcceleration)
+						   MAL_VECTOR_TYPE(double) & ,//CurrentConfiguration,
+						   MAL_VECTOR_TYPE(double) & ,//CurrentVelocity,
+						   MAL_VECTOR_TYPE(double) & )//CurrentAcceleration)
 {
   ODEBUG("Begin OneGlobalStepOfControl " 
 	  << m_LeftFootPositions->size() << " " 
@@ -184,14 +184,15 @@ int CoMAndFootOnlyStrategy::EndOfMotion()
   return 0;
 }
 
-void CoMAndFootOnlyStrategy::Setup(deque<ZMPPosition> &aZMPPositions,
-				   deque<COMState> &aCOMBuffer,
-				   deque<FootAbsolutePosition> & aLeftFootAbsolutePositions,
-				   deque<FootAbsolutePosition> & aRightFootAbsolutePositions)
+void CoMAndFootOnlyStrategy::Setup(deque<ZMPPosition> &,          // aZMPPositions,
+				   deque<COMState> &,             // aCOMBuffer,
+				   deque<FootAbsolutePosition> &, // aLeftFootAbsolutePositions,
+				   deque<FootAbsolutePosition> &) // aRightFootAbsolutePositions)
 {
 }
 
-void CoMAndFootOnlyStrategy::CallMethod(std::string &Method, std::istringstream &astrm)
+void CoMAndFootOnlyStrategy::CallMethod(std::string &,//Method, 
+					std::istringstream &)// astrm)
 {
 }
 

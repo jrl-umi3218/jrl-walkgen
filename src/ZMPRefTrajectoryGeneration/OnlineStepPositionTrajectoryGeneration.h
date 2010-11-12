@@ -96,7 +96,7 @@ namespace PatternGeneratorJRL
     		deque<FootAbsolutePosition> &RightFootAbsolutePositions,
     		double Xmax,
     		COMState & lStartingCOMState,
-    		MAL_S3_VECTOR(,double) & lStartingZMPPosition,
+    		MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
     		FootAbsolutePosition & InitLeftFootAbsolutePosition,
     		FootAbsolutePosition & InitRightFootAbsolutePosition);
 
@@ -145,10 +145,10 @@ namespace PatternGeneratorJRL
     int BuildingConstantPartOfTheObjectiveFunction();
 
     /*! Transform the matrices with LQ. */
-    int BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX(,double) &OptA);
+    int BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX_TYPE(double) &OptA);
 
     /*! Compute the quadratic form of the objective function. */
-    int BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX(,double) &OptA);
+    int BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX_TYPE(double) &OptA);
 
 
     /*! \brief Call the two previous methods 
@@ -208,7 +208,7 @@ namespace PatternGeneratorJRL
 		   FootAbsolutePosition & InitRightFootAbsolutePosition,
 		   deque<RelativeFootPosition> &RelativeFootPositions,
 		   COMState & lStartingCOMState,
-		   MAL_S3_VECTOR(,double) & lStartingZMPPosition);
+		   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
 
     /* /\*! Methods for on-line generation. (First version!) */
     /*   The queues will be updated as follows: */
@@ -227,7 +227,7 @@ namespace PatternGeneratorJRL
     /* 		   FootAbsolutePosition & InitLeftFootAbsolutePosition, */
     /* 		   FootAbsolutePosition & InitRightFootAbsolutePosition, */
     /* 		   COMState & lStartingCOMState, */
-    /* 		   MAL_S3_VECTOR(,double) & lStartingZMPPosition); */
+    /* 		   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition); */
 
     /* ! Methods to update the stack on-line by inserting a new foot position. */
     void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,

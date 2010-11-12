@@ -145,13 +145,13 @@ namespace PatternGeneratorJRL
       /*! Difference between the CoM and the Waist 
       from the initialization phase,
       i.e. not reevaluated while walking. */
-      MAL_S3_VECTOR(,double) m_DiffBetweenComAndWaist;
+      MAL_S3_VECTOR_TYPE(double) m_DiffBetweenComAndWaist;
 
       /*! COM Starting position. */
-      MAL_S3_VECTOR(,double) m_StartingCOMState;
+      MAL_S3_VECTOR_TYPE(double) m_StartingCOMState;
 
       /*! Final COM pose. */
-      MAL_S4x4_MATRIX(,double) m_FinalDesiredCOMPose;
+      MAL_S4x4_MATRIX_TYPE(double) m_FinalDesiredCOMPose;
       
       
       /*! Store the distance between the ankle and the soil. */
@@ -258,9 +258,9 @@ namespace PatternGeneratorJRL
 				 FootAbsolutePosition &RightFootPosition,
 				 ZMPPosition &NewZMPRefPos,
 				 COMState & finalCOMState,
-				 MAL_VECTOR(,double) & CurrentConfiguration,
-				 MAL_VECTOR(,double) & CurrentVelocity,
-				 MAL_VECTOR(,double) & CurrentAcceleration);
+				 MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+				 MAL_VECTOR_TYPE(double) & CurrentVelocity,
+				 MAL_VECTOR_TYPE(double) & CurrentAcceleration);
 
 	
       /*! First stage of the control, 
@@ -402,9 +402,9 @@ namespace PatternGeneratorJRL
 			      deque<COMState> &COMStates,
 			      deque<FootAbsolutePosition> &LeftFootPositions,
 			      deque<FootAbsolutePosition> &RightFootPositions,
-			      MAL_VECTOR(,double) &CurrentConfiguration,
-			      MAL_VECTOR(,double) & CurrentVelocity,
-			      MAL_VECTOR(,double) & CurrentAcceleration,
+			      MAL_VECTOR_TYPE(double) &CurrentConfiguration,
+			      MAL_VECTOR_TYPE(double) & CurrentVelocity,
+			      MAL_VECTOR_TYPE(double) & CurrentAcceleration,
 			      int localindex);
       
       
@@ -436,14 +436,14 @@ namespace PatternGeneratorJRL
 
       /*! This method returns the final COM pose matrix after the second stage of control. 
        @return A 4x4 matrix of double which includes the desired final CoM position and orientation.*/
-      MAL_S4x4_MATRIX(,double) GetFinalDesiredCOMPose();
+      MAL_S4x4_MATRIX_TYPE(double) GetFinalDesiredCOMPose();
 
       /*! This method returns the current waist position in the COM reference 
 	frame. This can be used with the previous method to get the final Waist 
 	position.
 	@return A 4x4 matrix of double which includes the desired final Waist in the CoM 
 	phase position and orientation.*/
-      MAL_S4x4_MATRIX(,double) GetCurrentPositionofWaistInCOMFrame();
+      MAL_S4x4_MATRIX_TYPE(double) GetCurrentPositionofWaistInCOMFrame();
 
       /*! Returns the last element of the COM FIFO in the first stage of control */
       COMState GetLastCOMFromFirstStage();
@@ -476,9 +476,9 @@ namespace PatternGeneratorJRL
       void CallToComAndFootRealization(COMState &acomp,
 				       FootAbsolutePosition &aLeftFAP,
 				       FootAbsolutePosition &aRightFAP,
-				       MAL_VECTOR(,double) & CurrentConfiguration,
-				       MAL_VECTOR(,double) & CurrentVelocity,
-				       MAL_VECTOR(,double) & CurrentAcceleration,
+				       MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+				       MAL_VECTOR_TYPE(double) & CurrentVelocity,
+				       MAL_VECTOR_TYPE(double) & CurrentAcceleration,
 				       int IterationNumber,
 				       int StageOfTheAlgorithm);
 
@@ -490,8 +490,8 @@ namespace PatternGeneratorJRL
       /*! \name Setter and getter for the jrlHumanoidDynamicRobot object. */
       /*! @param[in] aHumanoidDynamicRobot: an object able to compute dynamic parameters
 	of the robot. */
-      inline  bool setHumanoidDynamicRobot(const CjrlHumanoidDynamicRobot *aHumanoidDynamicRobot)
-      { m_HumanoidDynamicRobot = (CjrlHumanoidDynamicRobot *)aHumanoidDynamicRobot;
+      inline  bool setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot *aHumanoidDynamicRobot)
+      { m_HumanoidDynamicRobot = aHumanoidDynamicRobot;
 	return true;}
       
       /*! Returns the object able to compute the dynamic parameters

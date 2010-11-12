@@ -214,7 +214,7 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
   m_C(0,2) = -m_Zc/9.81;
   ODEBUG(" m_Zc: " << m_Zc << " " << m_C(0,2));
   
-  MAL_MATRIX(, double) lF,lK;
+  MAL_MATRIX_TYPE( double) lF,lK;
 
   double Q=0.0,R=0.0;
   int Nl;

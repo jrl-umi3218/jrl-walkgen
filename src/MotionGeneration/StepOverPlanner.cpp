@@ -366,7 +366,7 @@ void StepOverPlanner::DoubleSupportFeasibility()
   MAL_S3_VECTOR(Body_P,double);
   MAL_S3x3_MATRIX(Foot_R,double); 
   MAL_S3_VECTOR(Foot_P,double);
-  float c,s,co,so;
+  double c,s,co,so;
   MAL_S3_VECTOR(ToTheHip,double);
   MAL_VECTOR_DIM(LeftLegAngles,double,6);
   MAL_VECTOR_DIM(RightLegAngles,double,6); 

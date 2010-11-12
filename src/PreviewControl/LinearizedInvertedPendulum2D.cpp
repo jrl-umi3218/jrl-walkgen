@@ -102,13 +102,13 @@ void LinearizedInvertedPendulum2D::SetRobotControlPeriod(const double & aT)
   
 }
 
-void LinearizedInvertedPendulum2D::GetState(MAL_VECTOR(,double) &lxk)
+void LinearizedInvertedPendulum2D::GetState(MAL_VECTOR_TYPE(double) &lxk)
 {
   lxk = m_xk;
 }
 
 
-void LinearizedInvertedPendulum2D::setState(MAL_VECTOR(,double) lxk)
+void LinearizedInvertedPendulum2D::setState(MAL_VECTOR_TYPE(double) lxk)
 {
   m_xk = lxk;
 }

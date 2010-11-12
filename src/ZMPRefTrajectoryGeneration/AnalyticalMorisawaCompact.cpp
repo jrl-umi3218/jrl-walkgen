@@ -230,7 +230,7 @@ namespace PatternGeneratorJRL
 
   void AnalyticalMorisawaCompact::ComputePolynomialWeights()
   {
-    MAL_MATRIX(,double) iZ;
+    MAL_MATRIX_TYPE(double) iZ;
     MAL_INVERSE(m_Z,iZ,double);
 
     // Compute the weights.
@@ -273,17 +273,17 @@ namespace PatternGeneratorJRL
     
     char EQUED='N';
 
-    MAL_MATRIX(,double) tZ;
+    MAL_MATRIX_TYPE(double) tZ;
     tZ = MAL_RET_TRANSPOSE(m_Z);
     
 
-    MAL_VECTOR(,double) lR;
+    MAL_VECTOR_TYPE(double) lR;
     MAL_VECTOR_RESIZE(lR,SizeOfZ);
-    MAL_VECTOR(,double) lC;
+    MAL_VECTOR_TYPE(double) lC;
     MAL_VECTOR_RESIZE( lC,SizeOfZ);
 
     MAL_VECTOR_RESIZE(m_y,SizeOfZ);
-    //MAL_VECTOR(,double) m_X;
+    //MAL_VECTOR_TYPE(double) m_X;
     //b    MAL_VECTOR_RESIZE(m_X,SizeOfZ);
     LDA =  SizeOfZ;
     LDAF = SizeOfZ;
@@ -291,7 +291,7 @@ namespace PatternGeneratorJRL
 
     double lRCOND;
 
-    MAL_VECTOR(,double) lFERR, lBERR;
+    MAL_VECTOR_TYPE(double) lFERR, lBERR;
     MAL_VECTOR_RESIZE(lFERR,SizeOfZ);
     MAL_VECTOR_RESIZE(lBERR,SizeOfZ);
 
@@ -543,9 +543,9 @@ namespace PatternGeneratorJRL
 						       deque<RelativeFootPosition> &RelativeFootPositions,
 						       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 						       deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-						       double Xmax,
+						       double ,
 						       COMState & lStartingCOMState,
-						       MAL_S3_VECTOR(&,double) lStartingZMPPosition,
+						       MAL_S3_VECTOR(&,double) ,
 						       FootAbsolutePosition & InitLeftFootAbsolutePosition,
 						       FootAbsolutePosition & InitRightFootAbsolutePosition)
   {
@@ -662,7 +662,7 @@ namespace PatternGeneratorJRL
 					    FootAbsolutePosition & InitRightFootAbsolutePosition,
 					    deque<RelativeFootPosition> &RelativeFootPositions,
 					    COMState & lStartingCOMState,
-					    MAL_S3_VECTOR(&,double) lStartingZMPPosition)
+					    MAL_S3_VECTOR(&,double))
   {
     m_OnLineMode = true;
     ODEBUG("Begin InitOnLine");
@@ -866,7 +866,7 @@ namespace PatternGeneratorJRL
 						deque<COMState> & FinalCoMPositions,				     
 						deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 						deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-						bool EndSequence)
+						bool )
   {
     ODEBUG("****************** Begin OnLineAddFoot **************************");
 
@@ -1349,7 +1349,7 @@ namespace PatternGeneratorJRL
 									 vector<double> &lZMPZ,
 									 double &lZMPInit,
 									 double &lZMPEnd,
-									 bool InitializeAZCT)
+									 bool )
   {
     vector<double> lV;
     vector<double> lW;
@@ -1517,7 +1517,7 @@ namespace PatternGeneratorJRL
 
   }
 
-  void AnalyticalMorisawaCompact::ConstraintsChange(double LocalTime,
+  void AnalyticalMorisawaCompact::ConstraintsChange(double ,
 						    FluctuationParameters FPX,
 						    FluctuationParameters FPY,
 						    CompactTrajectoryInstanceParameters &aCTIPX,

@@ -85,8 +85,8 @@ namespace PatternGeneratorJRL
   struct RelativeFootPosition_s
   {
     double sx,sy,theta;
-    float SStime;
-    float DStime;
+    double SStime;
+    double DStime;
     int stepType;     //1:normal walking 2:one step before opbstacle
                       //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
     double DeviationHipHeight;

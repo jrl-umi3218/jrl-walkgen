@@ -514,7 +514,7 @@ namespace PatternGeneratorJRL {
 
     COMState lStartingCOMState;
     memset(&lStartingCOMState,0,sizeof(COMState));
-    MAL_S3_VECTOR(,double) lStartingZMPPosition;
+    MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
     MAL_VECTOR( BodyAnglesIni,double);
 
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
@@ -579,8 +579,8 @@ namespace PatternGeneratorJRL {
   }
 
   void PatternGeneratorInterfacePrivate::EvaluateStartingState(COMState  & lStartingCOMState,
-							       MAL_S3_VECTOR(,double) & lStartingZMPPosition,
-							       MAL_VECTOR(,double) & lStartingWaistPose,
+							       MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+							       MAL_VECTOR_TYPE(double) & lStartingWaistPose,
 							       FootAbsolutePosition & InitLeftFootAbsPos,
 							       FootAbsolutePosition & InitRightFootAbsPos)
   {
@@ -679,7 +679,7 @@ namespace PatternGeneratorJRL {
   }
 
   void PatternGeneratorInterfacePrivate::CommonInitializationOfWalking(COMState  & lStartingCOMState,
-								       MAL_S3_VECTOR(,double) & lStartingZMPPosition,
+								       MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
 								       MAL_VECTOR(  & BodyAnglesIni,double),
 								       FootAbsolutePosition & InitLeftFootAbsPos,
 								       FootAbsolutePosition & InitRightFootAbsPos,
@@ -773,7 +773,7 @@ namespace PatternGeneratorJRL {
   {
     COMState lStartingCOMState;
     memset(&lStartingCOMState,0,sizeof(COMState));
-    MAL_S3_VECTOR(,double) lStartingZMPPosition;
+    MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
     MAL_VECTOR( BodyAnglesIni,double);
 
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
@@ -875,7 +875,7 @@ namespace PatternGeneratorJRL {
   {
     ODEBUG("PGI-Start");
     COMState lStartingCOMState;
-    MAL_S3_VECTOR(,double) lStartingZMPPosition;
+    MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
     MAL_VECTOR( BodyAnglesIni,double);
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
     struct timeval begin, end, time4, time5;
@@ -887,7 +887,7 @@ namespace PatternGeneratorJRL {
     vector<double> lCurrentJointValues;
     m_ZMPD->SetZMPShift(m_ZMPShift);
 
-    MAL_VECTOR(,double) lCurrentConfiguration;
+    MAL_VECTOR_TYPE(double) lCurrentConfiguration;
 
     lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
     ODEBUG("lCurrent Configuration :" << lCurrentConfiguration);
@@ -1175,9 +1175,9 @@ namespace PatternGeneratorJRL {
 
 
 
-  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
-								    MAL_VECTOR(,double) & CurrentVelocity,
-								    MAL_VECTOR(,double) & CurrentAcceleration,
+  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+								    MAL_VECTOR_TYPE(double) & CurrentVelocity,
+								    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
 								    MAL_VECTOR( &ZMPTarget,double))
   {
     COMState finalCOMState;
@@ -1198,9 +1198,9 @@ namespace PatternGeneratorJRL {
 								    ZMPPosition &ZMPRefPos,
 								    COMPosition &COMRefPos)
   {
-    MAL_VECTOR(,double)  CurrentConfiguration;
-    MAL_VECTOR(,double)  CurrentVelocity;
-    MAL_VECTOR(,double)  CurrentAcceleration;
+    MAL_VECTOR_TYPE(double)  CurrentConfiguration;
+    MAL_VECTOR_TYPE(double)  CurrentVelocity;
+    MAL_VECTOR_TYPE(double)  CurrentAcceleration;
     MAL_VECTOR( ZMPTarget,double);
     COMState aCOMRefState;
     bool r=false;
@@ -1221,9 +1221,9 @@ namespace PatternGeneratorJRL {
   }
 
 
-  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
-								    MAL_VECTOR(,double) & CurrentVelocity,
-								    MAL_VECTOR(,double) & CurrentAcceleration,
+  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+								    MAL_VECTOR_TYPE(double) & CurrentVelocity,
+								    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
 								    MAL_VECTOR( &ZMPTarget,double),
 								    COMPosition &finalCOMPosition,
 								    FootAbsolutePosition &LeftFootPosition,
@@ -1242,9 +1242,9 @@ namespace PatternGeneratorJRL {
     return r;
   }
 
-  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR(,double) & CurrentConfiguration,
-								    MAL_VECTOR(,double) & CurrentVelocity,
-								    MAL_VECTOR(,double) & CurrentAcceleration,
+  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+								    MAL_VECTOR_TYPE(double) & CurrentVelocity,
+								    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
 								    MAL_VECTOR( &ZMPTarget,double),
 								    COMState &finalCOMState,
 								    FootAbsolutePosition &LeftFootPosition,

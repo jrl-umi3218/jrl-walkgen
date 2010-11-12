@@ -150,7 +150,7 @@ ZMPConstrainedQPFastFormulation::~ZMPConstrainedQPFastFormulation()
     delete [] m_Pu ;
 }
 
-void ZMPConstrainedQPFastFormulation::SetPreviewControl(PreviewControl *aPC)
+void ZMPConstrainedQPFastFormulation::SetPreviewControl(PreviewControl *)
 {
   //m_ZMPD->SetPreviewControl(aPC);
 }
@@ -379,7 +379,7 @@ int ZMPConstrainedQPFastFormulation::ValidationConstraints(double * & DPx,double
     }
   return 0;
 }
-int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX(,double) &OptA)
+int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX_TYPE(double) &OptA)
 {
   for(unsigned int i=0;i<2*m_QP_N;i++)
     for(unsigned int j=0;j<2*m_QP_N;j++)
@@ -387,7 +387,7 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
   
   return 0;
 }
-int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX(,double) &OptA)
+int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX_TYPE(double) &OptA)
 {
 
   /*! Build cholesky matrix of the optimum 
@@ -760,7 +760,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
 							     double StartingTime,
 							     deque<LinearConstraintInequality_t *> & 
 							     QueueOfLConstraintInequalities,
-							     double Com_Height,
+							     double , //Com_Height,
 							     unsigned int &NbOfConstraints,
 							     MAL_VECTOR(& xk,double),
 							     MAL_VECTOR(& ZMPRef,double),
@@ -1540,55 +1540,55 @@ void ZMPConstrainedQPFastFormulation::CallMethod(std::string & Method, std::istr
 }
 
 
-int ZMPConstrainedQPFastFormulation::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-				    deque<COMState> & FinalCOMStates,
-				    deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-				    deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
-				    FootAbsolutePosition & InitLeftFootAbsolutePosition,
-				    FootAbsolutePosition & InitRightFootAbsolutePosition,
-				    deque<RelativeFootPosition> &RelativeFootPositions,
-				    COMState & lStartingCOMState,
-				    MAL_S3_VECTOR(&,double) lStartingZMPPosition)
+int ZMPConstrainedQPFastFormulation::InitOnLine(deque<ZMPPosition> &,          // FinalZMPPositions,
+						deque<COMState> &,             // FinalCOMStates,
+						deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
+						deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
+						FootAbsolutePosition & ,       // InitLeftFootAbsolutePosition,
+						FootAbsolutePosition & ,       // InitRightFootAbsolutePosition,
+						deque<RelativeFootPosition> &, // RelativeFootPositions,
+						COMState & ,                   // lStartingCOMState,
+						MAL_S3_VECTOR(&,double) )      // lStartingZMPPosition)
 {
   cout << "To be implemented" << endl;
   return 0;
 }
 
-void ZMPConstrainedQPFastFormulation::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-					deque<ZMPPosition> & FinalZMPPositions,	
-					deque<COMState> & FinalCOMStates,
-					deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-					deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-					bool EndSequence)
+void ZMPConstrainedQPFastFormulation::OnLineAddFoot(RelativeFootPosition & ,         // NewRelativeFootPosition,
+						    deque<ZMPPosition> & ,           // FinalZMPPositions,	
+						    deque<COMState> & ,              // FinalCOMStates,
+						    deque<FootAbsolutePosition> &,   // FinalLeftFootAbsolutePositions,
+						    deque<FootAbsolutePosition> &,   // FinalRightFootAbsolutePositions,
+						    bool )                           // EndSequence)
 {
   cout << "To be implemented" << endl;
 }
 
-void ZMPConstrainedQPFastFormulation::OnLine(double time,
-				 deque<ZMPPosition> & FinalZMPPositions,				     
-				 deque<COMState> & FinalCOMStates,
-				 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-				 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
+void ZMPConstrainedQPFastFormulation::OnLine(double ,                                // time,
+					     deque<ZMPPosition> & ,                  // FinalZMPPositions,				     
+					     deque<COMState> & ,                     // FinalCOMStates,
+					     deque<FootAbsolutePosition> &,          // FinalLeftFootAbsolutePositions,
+					     deque<FootAbsolutePosition> & )         // FinalRightFootAbsolutePositions)
 {
   cout << "To be implemented" << endl;
 }
 
-int ZMPConstrainedQPFastFormulation::OnLineFootChange(double time,
-					  FootAbsolutePosition &aFootAbsolutePosition,
-					  deque<ZMPPosition> & FinalZMPPositions,			     
-					  deque<COMState> & CoMPositions,
-					  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-					  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-					  StepStackHandler  *aStepStackHandler)
+int ZMPConstrainedQPFastFormulation::OnLineFootChange(double ,                       // time,
+						      FootAbsolutePosition & ,       // aFootAbsolutePosition,
+						      deque<ZMPPosition> & ,         // FinalZMPPositions,			     
+						      deque<COMState> & ,            // CoMPositions,
+						      deque<FootAbsolutePosition> &, // FinalLeftFootAbsolutePositions,
+						      deque<FootAbsolutePosition> &, // FinalRightFootAbsolutePositions,
+						      StepStackHandler  *)           // aStepStackHandler)
 {
   cout << "To be implemented" << endl;
   return -1;
 }
 
-void ZMPConstrainedQPFastFormulation::EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-					       deque<COMState> &FinalCOMStates,
-					       deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-					       deque<FootAbsolutePosition> &RightFootAbsolutePositions)
+void ZMPConstrainedQPFastFormulation::EndPhaseOfTheWalking(deque<ZMPPosition> &,           // ZMPPositions,
+							   deque<COMState> &,              // FinalCOMStates,
+							   deque<FootAbsolutePosition> &,  // LeftFootAbsolutePositions,
+							   deque<FootAbsolutePosition> & ) // RightFootAbsolutePositions)
 {
   
 }

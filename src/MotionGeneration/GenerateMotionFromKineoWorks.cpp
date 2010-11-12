@@ -56,7 +56,7 @@ namespace PatternGeneratorJRL
   {
     std::ifstream aif;
 
-    aif.open((char *)aFileName.c_str(),std::ifstream::in);
+    aif.open(aFileName.c_str(),std::ifstream::in);
     if (aif.is_open())
       {
 	aif >> m_NbOfDOFsFromKW;
@@ -80,7 +80,7 @@ namespace PatternGeneratorJRL
   {
     std::ifstream aif;	
 
-    aif.open((char *)aFileName.c_str(),std::ifstream::in);
+    aif.open(aFileName.c_str(),std::ifstream::in);
     if (aif.is_open())
       {
 	string atmp;
@@ -141,7 +141,7 @@ namespace PatternGeneratorJRL
 	      string FirstJt = atmp.substr(1,atmp.length()-1);
 	      KWNode aNode;
 	      aNode.Joints.resize(m_NbOfDOFsFromKW);
-	      aNode.Joints[0] = atof((char *)FirstJt.c_str());
+	      aNode.Joints[0] = atof(FirstJt.c_str());
 	      for(int j=1;j<m_NbOfDOFsFromKW;j++)
 		{
 		  aif >> aNode.Joints[j];

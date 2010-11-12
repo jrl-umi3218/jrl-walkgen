@@ -34,25 +34,7 @@
 #define deg2rad(x) x*M_PI/180.0
 #define rad2deg(x) x*180.0/M_PI
 
-#if 0
-#define ODEBUG4(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "StepStackHandler: " << x << endl; DebugFile.close();}
-#define RESETDEBUG4(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#else
-#define ODEBUG4(x,y) 
-#define RESETDEBUG4(y)
-#endif
-
-#define RESETDEBUG5(y) { ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}
-#define ODEBUG5(x,y) { ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile << "SSH: " << x << endl; DebugFile.close();}
-
-#if 1
-#define ODEBUG(x)
-#else
-#define ODEBUG(x)  std::cout << x << endl;
-#endif
-
-#define ODEBUG3(x) std::cout << "StepStackHandler:" << x << endl;
-
+#include <Debug.h>
 #include <StepStackHandler.h>
 
 using namespace::PatternGeneratorJRL;

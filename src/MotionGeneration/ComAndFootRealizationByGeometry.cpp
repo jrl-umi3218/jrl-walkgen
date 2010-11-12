@@ -345,9 +345,9 @@ ComAndFootRealizationByGeometry::~ComAndFootRealizationByGeometry()
   which is suppose to be constant for the all duration of the motion.
 */
 bool ComAndFootRealizationByGeometry::
-InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
-		  MAL_S3_VECTOR(,double) & lStartingCOMPosition,
-		  MAL_VECTOR(,double) & lStartingWaistPose,
+InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
+		  MAL_S3_VECTOR_TYPE(double) & lStartingCOMPosition,
+		  MAL_VECTOR_TYPE(double) & lStartingWaistPose,
 		  FootAbsolutePosition & InitLeftFootPosition,
 		  FootAbsolutePosition & InitRightFootPosition)
 {
@@ -358,9 +358,9 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   
   MAL_VECTOR_RESIZE(lStartingWaistPose,6);
 
-  MAL_VECTOR(,double) CurrentConfig = 
+  MAL_VECTOR_TYPE(double) CurrentConfig = 
     getHumanoidDynamicRobot()->currentConfiguration();
-  MAL_VECTOR(,double) CurrentVelocity = 
+  MAL_VECTOR_TYPE(double) CurrentVelocity = 
     getHumanoidDynamicRobot()->currentVelocity();
 
   // Update the velocity.
@@ -429,7 +429,7 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,1) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,1,3);
   MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,2) = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,2,3);
   // Add the translation from the joint to the center of the foot.
-  MAL_S4x4_MATRIX(,double) RightFootTranslation;
+  MAL_S4x4_MATRIX_TYPE(double) RightFootTranslation;
   MAL_S4x4_MATRIX_SET_IDENTITY(RightFootTranslation);
 
   for(unsigned int i=0;i<3;i++)
@@ -488,7 +488,7 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
   ODEBUG("COGInitialAnkle : "<<m_COGInitialAnkles);
 
   // Add the translation from the joint to the center of the foot.
-  MAL_S4x4_MATRIX(,double) LeftFootTranslation;
+  MAL_S4x4_MATRIX_TYPE(double) LeftFootTranslation;
   MAL_S4x4_MATRIX_SET_IDENTITY(LeftFootTranslation);
 
   for(unsigned int i=0;i<3;i++)
@@ -587,7 +587,7 @@ InitializationCoM(MAL_VECTOR(,double) &BodyAnglesIni,
 
   ODEBUG(jointVector[m_LeftLegIndexInVRML[0]] << " " <<
 	  getHumanoidDynamicRobot()->waist());
-  MAL_S4x4_MATRIX(,double) lLeftHipPose = jointVector[m_LeftLegIndexInVRML[0]]->initialPosition();
+  MAL_S4x4_MATRIX_TYPE(double) lLeftHipPose = jointVector[m_LeftLegIndexInVRML[0]]->initialPosition();
 
   MAL_S3_VECTOR(LeftHip,double);
   for(int i=0;i<3;i++)
@@ -715,7 +715,7 @@ InitializationUpperBody(deque<ZMPPosition> &inZMPPositions,
 	{
 	  m_UpperBodyPositionsBuffer[i].Joints.resize(UpperBodyJointNb);
 
-	  MAL_VECTOR(,double) currentConfiguration;
+	  MAL_VECTOR_TYPE(double) currentConfiguration;
 	  currentConfiguration = getHumanoidDynamicRobot()->currentConfiguration();
 
 	  if (i==0)
@@ -752,14 +752,14 @@ InitializationUpperBody(deque<ZMPPosition> &inZMPPositions,
 }
 
 bool ComAndFootRealizationByGeometry::
-KinematicsForOneLeg(MAL_S3x3_MATRIX(,double) & Body_R,
-		    MAL_S3_VECTOR(,double) & Body_P,
-		    MAL_VECTOR(,double) &aFoot,
-		    MAL_S3_VECTOR(,double) &lDt,
-		    MAL_VECTOR(,double) &aCoMPosition,
-		    MAL_S3_VECTOR(,double) &ToTheHip,
+KinematicsForOneLeg(MAL_S3x3_MATRIX_TYPE(double) & Body_R,
+		    MAL_S3_VECTOR_TYPE(double) & Body_P,
+		    MAL_VECTOR_TYPE(double) &aFoot,
+		    MAL_S3_VECTOR_TYPE(double) &, // lDt,
+		    MAL_VECTOR_TYPE(double) &,    // aCoMPosition,
+		    MAL_S3_VECTOR_TYPE(double) &, // ToTheHip,
 		    int LeftOrRight,
-		    MAL_VECTOR(,double) &lq,
+		    MAL_VECTOR_TYPE(double) &lq,
 		    int Stage)
 {
 
@@ -853,18 +853,18 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX(,double) & Body_R,
 }
 
 bool ComAndFootRealizationByGeometry::
-KinematicsForTheLegs(MAL_VECTOR(,double) & aCoMPosition,
-		     MAL_VECTOR(,double) & aLeftFoot,
-		     MAL_VECTOR(,double) & aRightFoot,
+KinematicsForTheLegs(MAL_VECTOR_TYPE(double) & aCoMPosition,
+		     MAL_VECTOR_TYPE(double) & aLeftFoot,
+		     MAL_VECTOR_TYPE(double) & aRightFoot,
 		     int Stage,
-		     MAL_VECTOR(,double) & ql,
-		     MAL_VECTOR(,double) & qr,
-		     MAL_S3_VECTOR(,double) & AbsoluteWaistPosition )
+		     MAL_VECTOR_TYPE(double) & ql,
+		     MAL_VECTOR_TYPE(double) & qr,
+		     MAL_S3_VECTOR_TYPE(double) & AbsoluteWaistPosition )
 
 {
 
   // Body attitude
-  MAL_S3x3_MATRIX(,double) Body_R;
+  MAL_S3x3_MATRIX_TYPE(double) Body_R;
   // Body position
   MAL_S3_VECTOR(Body_P,double);
   // To the hip
@@ -937,7 +937,9 @@ KinematicsForTheLegs(MAL_VECTOR(,double) & aCoMPosition,
       ODEBUG4(Body_P ,"DebugDataBodyP1.dat");
     }
   else
-    ODEBUG4(Body_P ,"DebugDataBodyP0.dat");
+    {
+      ODEBUG4(Body_P ,"DebugDataBodyP0.dat");
+    }
 
 
   // Kinematics for the left leg.
@@ -967,14 +969,14 @@ KinematicsForTheLegs(MAL_VECTOR(,double) & aCoMPosition,
 }
 
 bool ComAndFootRealizationByGeometry::
-ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR(,double) & aCoMPosition,
-					MAL_VECTOR(,double) & aCoMSpeed,
-					MAL_VECTOR(,double) & aCoMAcc,
-					MAL_VECTOR(,double) & aLeftFoot,
-					MAL_VECTOR(,double) & aRightFoot,
-					MAL_VECTOR(,double) & CurrentConfiguration,
-					MAL_VECTOR(,double) & CurrentVelocity,
-					MAL_VECTOR(,double) & CurrentAcceleration,
+ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) & aCoMPosition,
+					MAL_VECTOR_TYPE(double) & aCoMSpeed,
+					MAL_VECTOR_TYPE(double) & aCoMAcc,
+					MAL_VECTOR_TYPE(double) & aLeftFoot,
+					MAL_VECTOR_TYPE(double) & aRightFoot,
+					MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+					MAL_VECTOR_TYPE(double) & CurrentVelocity,
+					MAL_VECTOR_TYPE(double) & CurrentAcceleration,
 					int IterationNumber,
 					int Stage)
 {
@@ -1222,7 +1224,8 @@ EvaluateStartingCoM(MAL_VECTOR(&BodyAngles,double),
 
 int ComAndFootRealizationByGeometry::
 EvaluateCOMForStartingPosition( MAL_VECTOR( &BodyAngles,double),
-				double omega, double theta,
+				double , // omega, 
+				double , // theta,
 				MAL_S3_VECTOR( &lCOMPosition,double),
 				FootAbsolutePosition & InitLeftFootPosition,
 				FootAbsolutePosition & InitRightFootPosition)
@@ -1237,7 +1240,7 @@ EvaluateCOMForStartingPosition( MAL_VECTOR( &BodyAngles,double),
 
 
 void ComAndFootRealizationByGeometry::
-GetCurrentPositionofWaistInCOMFrame(MAL_VECTOR(,double) &CurPosWICF_homogeneous)
+GetCurrentPositionofWaistInCOMFrame(MAL_VECTOR_TYPE(double) &CurPosWICF_homogeneous)
 {
   for(int i=0;i<3;i++)
     CurPosWICF_homogeneous[i] = m_DiffBetweenComAndWaist[i];
@@ -1246,11 +1249,11 @@ GetCurrentPositionofWaistInCOMFrame(MAL_VECTOR(,double) &CurPosWICF_homogeneous)
 }
 
 void ComAndFootRealizationByGeometry::
-ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR(,double) & qArmr,
-					  MAL_VECTOR(,double) & qArml,
-					  MAL_VECTOR(,double) & aCOMPosition,
-					  MAL_VECTOR(,double) & RFP,
-					  MAL_VECTOR(,double) & LFP)
+ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR_TYPE(double) & qArmr,
+					  MAL_VECTOR_TYPE(double) & qArml,
+					  MAL_VECTOR_TYPE(double) & aCOMPosition,
+					  MAL_VECTOR_TYPE(double) & RFP,
+					  MAL_VECTOR_TYPE(double) & LFP)
 {
   
   ODEBUG4("aCOMPosition:" << aCOMPosition << endl <<
@@ -1324,10 +1327,10 @@ ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR(,double) & qArmr,
 }
 
 bool ComAndFootRealizationByGeometry::
-setHumanoidDynamicRobot(const CjrlHumanoidDynamicRobot * aHumanoidDynamicRobot)
+setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot * aHumanoidDynamicRobot)
 {
   ComAndFootRealization::setHumanoidDynamicRobot(aHumanoidDynamicRobot);
-  const CjrlHumanoidDynamicRobot *aHDMB =  aHumanoidDynamicRobot;
+  CjrlHumanoidDynamicRobot *aHDMB =  aHumanoidDynamicRobot;
 
   MAL_VECTOR_RESIZE(m_prev_Configuration,aHDMB->numberDof());
   MAL_VECTOR_RESIZE(m_prev_Configuration1,aHDMB->numberDof());
@@ -1373,10 +1376,10 @@ CallMethod(string &Method, istringstream &istrm)
     }
 }
 
-MAL_S4x4_MATRIX(,double) ComAndFootRealizationByGeometry::
+MAL_S4x4_MATRIX_TYPE(double) ComAndFootRealizationByGeometry::
 GetCurrentPositionofWaistInCOMFrame()
 {
-  MAL_S4x4_MATRIX(,double) P;
+  MAL_S4x4_MATRIX_TYPE(double) P;
 
   MAL_S4x4_MATRIX_SET_IDENTITY(P);
   MAL_S4x4_MATRIX_ACCESS_I_J(P, 0,3) = m_DiffBetweenComAndWaist[0];
@@ -1386,7 +1389,7 @@ GetCurrentPositionofWaistInCOMFrame()
   return P;
 }
 
-MAL_S3_VECTOR(,double) ComAndFootRealizationByGeometry::GetCOGInitialAnkles()
+MAL_S3_VECTOR_TYPE(double) ComAndFootRealizationByGeometry::GetCOGInitialAnkles()
 {
   
   return m_COGInitialAnkles;

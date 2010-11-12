@@ -69,8 +69,7 @@ unsigned int OnLineState::operator()() const
 
 OnLineState & OnLineState::operator=(unsigned int NewState)
 {
-  if ((NewState>=0) &&
-      (NewState<DOUBLE_SUPPORT_PHASE))
+  if (NewState<DOUBLE_SUPPORT_PHASE)
     m_CurrentState = NewState;
   return *this;
 }
@@ -146,9 +145,9 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 					     deque<RelativeFootPosition> &RelativeFootPositions,
 					     deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					     double Xmax,
+					     double , //Xmax,
 					     COMState & lStartingCOMState,
-					     MAL_S3_VECTOR(,double) & lStartingZMPPosition,
+					     MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
 					     FootAbsolutePosition & InitLeftFootAbsolutePosition,
 					     FootAbsolutePosition & InitRightFootAbsolutePosition)
 {
@@ -322,8 +321,8 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 				  FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				  FootAbsolutePosition & InitRightFootAbsolutePosition,
 				  deque<RelativeFootPosition> &RelativeFootPositions,
-				  COMState & lStartingCOMState,
-				  MAL_S3_VECTOR(,double) & lStartingZMPPosition)
+				  COMState &, // lStartingCOMState,
+				  MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
 {
   m_RelativeFootPositions.clear();
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
@@ -424,9 +423,9 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   ODEBUG4("ZMP::InitOnLine - Step 4 ","ZMDInitOnLine.txt");
   for(unsigned int i=0;i<ZMPPositions.size();i++)
     {
-      double coef = (float)i/(float)ZMPPositions.size();
-      double icoef = (float)(ZMPPositions.size() -i)/
-	(float)ZMPPositions.size();
+      double coef = (double)i/(double)ZMPPositions.size();
+      double icoef = (double)(ZMPPositions.size() -i)/
+	(double)ZMPPositions.size();
       // Set ZMP positions.
 
       // Smooth ramp
@@ -555,11 +554,11 @@ void ZMPDiscretization::UpdateCurrentSupportFootPosition(RelativeFootPosition aR
 }
 
 
-void ZMPDiscretization::OnLine(double time,
-				    deque<ZMPPosition> & FinalZMPPositions,				     
-				    deque<COMState> & FinalCOMStates,
-				    deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-				    deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
+void ZMPDiscretization::OnLine(double, // time,
+			       deque<ZMPPosition> & ,// FinalZMPPositions,				     
+			       deque<COMState> & , //FinalCOMStates,
+			       deque<FootAbsolutePosition> &,//FinalLeftFootAbsolutePositions,
+			       deque<FootAbsolutePosition> &)//FinalRightFootAbsolutePositions)
 {
   /* Does nothing... */
 }
@@ -764,7 +763,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   // Second Phase of the step cycle aka Single Support Phase.
       
   // Compute relative feet position for the next step.
-  float lStepHeight=0;
+  double lStepHeight=0;
 
   // Next Theta : next relative angle between the current support foot angle
   // and the next support foot angle.
@@ -1106,13 +1105,13 @@ void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
   ODEBUG("FinalZMPPositions.size()="<<FinalZMPPositions.size());
 }
 
-int ZMPDiscretization::OnLineFootChange(double time,
-					FootAbsolutePosition &aFootAbsolutePosition,
-					deque<ZMPPosition> & FinalZMPPositions,			     
-					deque<COMState> & CoMStates,
-					deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-					deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-					StepStackHandler *aStepStackHandler)
+int ZMPDiscretization::OnLineFootChange(double ,//time,
+					FootAbsolutePosition & ,//aFootAbsolutePosition,
+					deque<ZMPPosition> & ,//FinalZMPPositions,			     
+					deque<COMState> & ,//CoMStates,
+					deque<FootAbsolutePosition> & ,//FinalLeftFootAbsolutePositions,
+					deque<FootAbsolutePosition> & ,//FinalRightFootAbsolutePositions,
+					StepStackHandler * )//aStepStackHandler)
 {
   return -1;
 }

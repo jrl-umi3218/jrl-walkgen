@@ -111,9 +111,9 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMState &acomp,
 								    FootAbsolutePosition &aLeftFAP,
 								    FootAbsolutePosition &aRightFAP,
-								    MAL_VECTOR(,double) &CurrentConfiguration,
-								    MAL_VECTOR(,double) &CurrentVelocity,
-								    MAL_VECTOR(,double) &CurrentAcceleration,
+								    MAL_VECTOR_TYPE(double) &CurrentConfiguration,
+								    MAL_VECTOR_TYPE(double) &CurrentVelocity,
+								    MAL_VECTOR_TYPE(double) &CurrentAcceleration,
 								    int IterationNumber,
 								    int StageOfTheAlgorithm)
 {
@@ -202,11 +202,11 @@ void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMState &ac
    m_ComAndFootRealization */
 int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 							      FootAbsolutePosition &RightFootPosition,
-							      ZMPPosition &NewZMPRefPos,
+							      ZMPPosition &, //NewZMPRefPos,
 							      COMState &refandfinalCOMState,
-							      MAL_VECTOR(,double) & CurrentConfiguration,
-							      MAL_VECTOR(,double) & CurrentVelocity,
-							      MAL_VECTOR(,double) & CurrentAcceleration)
+							      MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+							      MAL_VECTOR_TYPE(double) & CurrentVelocity,
+							      MAL_VECTOR_TYPE(double) & CurrentAcceleration)
 {
 
   //  m_FIFOZMPRefPositions.push_back(NewZMPRefPos);
@@ -475,7 +475,7 @@ int ZMPPreviewControlWithMultiBodyZMP::FirstStageOfControl( FootAbsolutePosition
   return 1;
 }
 
-int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteration)
+int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int /* StartingIteration */)
 {
   string sComputeZMP("ComputeZMP");
   string sZMPtrue("true");
@@ -487,10 +487,10 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
 
   // Call the Humanoid Dynamic Multi Body robot model to
   // compute the ZMP related to the motion found by CoMAndZMPRealization.
-  MAL_S3_VECTOR(,double) ZMPmultibody;
+  MAL_S3_VECTOR_TYPE(double) ZMPmultibody;
   ZMPmultibody = m_HumanoidDynamicRobot->zeroMomentumPoint();
   ODEBUG4(ZMPmultibody[0] << " " << ZMPmultibody[1], "DebugDataCheckZMP1.txt");
-  MAL_S3_VECTOR(,double) CoMmultibody;
+  MAL_S3_VECTOR_TYPE(double) CoMmultibody;
   CoMmultibody = m_HumanoidDynamicRobot->positionCenterOfMass();
   ODEBUG("Stage 2");
   // Fill the delta ZMP FIFO for the second stage of the control.
@@ -505,7 +505,7 @@ int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int StartingIteratio
   string inProperty("Iteration");
   string inValue("-1");
   m_HumanoidDynamicRobot->getProperty(inProperty,inValue);
-  MAL_VECTOR(,double) CurrentConfiguration;
+  MAL_VECTOR_TYPE(double) CurrentConfiguration;
   /* Get the current configuration vector */
   CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
 
@@ -524,9 +524,9 @@ int ZMPPreviewControlWithMultiBodyZMP::Setup(deque<ZMPPosition> &ZMPRefPositions
 					     deque<FootAbsolutePosition> &RightFootPositions)
 {
   m_NumberOfIterations = 0;
-  MAL_VECTOR(,double) CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
-  MAL_VECTOR(,double) CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
-  MAL_VECTOR(,double) CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
+  MAL_VECTOR_TYPE(double) CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
+  MAL_VECTOR_TYPE(double) CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
+  MAL_VECTOR_TYPE(double) CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
   
   m_PC->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 
@@ -559,7 +559,7 @@ int ZMPPreviewControlWithMultiBodyZMP::Setup(deque<ZMPPosition> &ZMPRefPositions
 }
 
 int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRefPositions,
-						       deque<COMState> &COMStates,
+						       deque<COMState> &, //COMStates,
 						       deque<FootAbsolutePosition> &LeftFootPositions,
 						       deque<FootAbsolutePosition> &RightFootPositions)
 {
@@ -632,16 +632,6 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupFirstPhase(deque<ZMPPosition> &ZMPRe
   m_HumanoidDynamicRobot->currentVelocity(CurrentVelocity);
   m_HumanoidDynamicRobot->currentAcceleration(CurrentAcceleration);
 
-  for(unsigned int i=0;i<0;i++)
-    {
-      string sComputeZMP("ComputeZMP");
-      string sZMPtrue("true");
-      // Call the  Dynamic Multi Body computation of the dynamic parameters.
-      m_HumanoidDynamicRobot->setProperty(sComputeZMP,sZMPtrue);
-      m_HumanoidDynamicRobot->computeForwardKinematics();
-    }
-
-
 #ifdef _DEBUG_MODE_ON_
   m_FIFOTmpZMPPosition.clear();
 #endif
@@ -654,9 +644,9 @@ int ZMPPreviewControlWithMultiBodyZMP::SetupIterativePhase(deque<ZMPPosition> &Z
 							   deque<COMState> &COMStates,
 							   deque<FootAbsolutePosition> &LeftFootPositions,
 							   deque<FootAbsolutePosition> &RightFootPositions,
-							   MAL_VECTOR(,double) & CurrentConfiguration,
-							   MAL_VECTOR(,double) & CurrentVelocity,
-							   MAL_VECTOR(,double) & CurrentAcceleration,
+							   MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+							   MAL_VECTOR_TYPE(double) & CurrentVelocity,
+							   MAL_VECTOR_TYPE(double) & CurrentAcceleration,
 							   int localindex)
 {
 
@@ -822,15 +812,15 @@ int ZMPPreviewControlWithMultiBodyZMP::GetStrategyForStageActivation()
 }
 
 // TODO : Compute the position of the waist inside the COM Frame.
-MAL_S4x4_MATRIX(,double) ZMPPreviewControlWithMultiBodyZMP::GetCurrentPositionofWaistInCOMFrame()
+MAL_S4x4_MATRIX_TYPE(double) ZMPPreviewControlWithMultiBodyZMP::GetCurrentPositionofWaistInCOMFrame()
 {
-  MAL_S4x4_MATRIX(,double) PosOfWaistInCoMFrame;
+  MAL_S4x4_MATRIX_TYPE(double) PosOfWaistInCoMFrame;
   PosOfWaistInCoMFrame = m_ComAndFootRealization->GetCurrentPositionofWaistInCOMFrame();
   //  cerr << " Should implement: ZMPPreviewControlWithMultiBodyZMP::GetCurrentPositionOfWaistInCOMFrame()" << endl;
   return PosOfWaistInCoMFrame;
 }
 
-MAL_S4x4_MATRIX(,double)  ZMPPreviewControlWithMultiBodyZMP::GetFinalDesiredCOMPose()
+MAL_S4x4_MATRIX_TYPE(double)  ZMPPreviewControlWithMultiBodyZMP::GetFinalDesiredCOMPose()
 {
    return m_FinalDesiredCOMPose;
 }

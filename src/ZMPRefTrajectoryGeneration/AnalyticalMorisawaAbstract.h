@@ -108,7 +108,7 @@ namespace PatternGeneratorJRL
 					deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					double Xmax,
 					COMState & lStartingCOMState,
-					MAL_S3_VECTOR(,double) &lStartingZMPPosition,
+					MAL_S3_VECTOR_TYPE(double) &lStartingZMPPosition,
 					FootAbsolutePosition & InitLeftFootAbsolutePosition,
 					FootAbsolutePosition & InitRightFootAbsolutePosition) =0;
       
@@ -279,14 +279,14 @@ namespace PatternGeneratorJRL
 
       /*! One of the most important matrix which stores all the temporal
 	relationship between the intervals. */
-      MAL_MATRIX(,double) m_Z;
+      MAL_MATRIX_TYPE(double) m_Z;
 
 
       /*! The matrix used to specify the conditions of the intervals. */
-      MAL_VECTOR(,double) m_w;
+      MAL_VECTOR_TYPE(double) m_w;
 
       /*! The matrix used to store the solution of the linear equation. */
-      MAL_VECTOR(,double) m_y;
+      MAL_VECTOR_TYPE(double) m_y;
 
       /*! @} */
       

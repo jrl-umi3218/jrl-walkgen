@@ -83,7 +83,7 @@ logical sb02ox (double *_alphar, double * _alphai, double *_beta)
    The function value SB02OW is set to true for a stable eigenvalue
      and to false, otherwise.
 */
-logical sb02ow (double *_alphar, double * _alphai, double *_beta)
+logical sb02ow (double *_alphar, double * /* _alphai */, double *_beta)
 {
   char lp[2]="p";
   logical r = ((*_alphar <0.0) && (*_beta>0.0)) ||

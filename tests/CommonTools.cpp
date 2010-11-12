@@ -79,8 +79,8 @@ void CommonInitialization(PatternGeneratorInterface &aPGI)
     }
   // Evaluate current state of the robot in the PG.
   COMState   lStartingCOMPosition;
-  MAL_S3_VECTOR(,double)  lStartingZMPPosition;
-  MAL_VECTOR(,double)  lStartingWaistPose;
+  MAL_S3_VECTOR_TYPE(double)  lStartingZMPPosition;
+  MAL_VECTOR_TYPE(double)  lStartingWaistPose;
   FootAbsolutePosition  InitLeftFootAbsPos;
   FootAbsolutePosition  InitRightFootAbsPos;
 
@@ -165,7 +165,7 @@ void CreateAndInitializeHumanoidRobot(string &RobotFileName,
   double * dInitPos = new double[lNbActuatedJoints];
 
   ifstream aif;
-  aif.open((char *)InitConfig.c_str(),ifstream::in);
+  aif.open(InitConfig.c_str(),ifstream::in);
   if (aif.is_open())
     {
       for(unsigned int i=0;i<lNbActuatedJoints;i++)
@@ -249,7 +249,7 @@ void getOptions(int argc,
 		string &SpecificitiesFileName,
 		string &LinkJointRank,
 		string &InitConfig,
-		unsigned int &TestProfil)
+		unsigned int &) // TestProfil)
 {
   std::cout << "argc:" << argc << std::endl;
   if (argc!=6)

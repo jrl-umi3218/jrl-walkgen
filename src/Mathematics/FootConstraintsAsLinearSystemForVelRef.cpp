@@ -60,6 +60,7 @@ FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM,
 
   m_RightFootSize.setHalfSizeInit(lHalfWidthInit,lHalfHeightInit);
   m_RightFootSize.setConstraints(ConstraintOnX,ConstraintOnY);
+  vector3d AnklePosition;
   m_RightFoot->getAnklePositionInLocalFrame(AnklePosition);
   m_Z = AnklePosition[2];
   m_LeftFoot = m_HS->leftFoot();
@@ -72,15 +73,17 @@ FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM,
   m_LeftFootSize.setHalfSizeInit(lHalfWidthInit,lHalfHeightInit);
   m_LeftFootSize.setConstraints(ConstraintOnX,ConstraintOnY);
   
-  DSFeetDistance = 0.2;
+  m_DSFeetDistance = 0.2;
 
 
-  ConvexHullFP.resize(5);
+  m_ConvexHullFP.resize(5);
 
   //initFPConstrArrays();
   //TODO 0: find another condition
   if(0)
-    RESETDEBUG4("Constraints-fCSALS.dat");
+    {
+      RESETDEBUG4("Constraints-fCSALS.dat");
+    }
 
   m_FullDebug = 0;
 
@@ -223,19 +226,22 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 
   //For symmetrical constraints: The points of the left foot are counted clockwise.
   //The
-  float lxcoefsRight[4] = { 1.0, 1.0, -1.0, -1.0};
-  float lycoefsRight[4] = {-1.0, 1.0,  1.0, -1.0};
-  float lxcoefsLeft[4] = { 1.0, 1.0, -1.0, -1.0};
-  float lycoefsLeft[4] = { 1.0, -1.0, -1.0, 1.0};
+  double lxcoefsRight[4] = { 1.0, 1.0, -1.0, -1.0};
+  double lycoefsRight[4] = {-1.0, 1.0,  1.0, -1.0};
+  double lxcoefsLeft[4] = { 1.0, 1.0, -1.0, -1.0};
+  double lycoefsLeft[4] = { 1.0, -1.0, -1.0, 1.0};
 
-  float *lxcoefs, *lycoefs;
+  double *lxcoefs, *lycoefs;
 
-  float CHLeftFPosConstrArrayX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
-  float CHLeftFPosConstrArrayY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
-  float CHRightFPosConstrArrayX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
-  float CHRightFPosConstrArrayY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
+  double CHLeftFPosConstrArrayX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
+  double CHLeftFPosConstrArrayY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
+  double CHRightFPosConstrArrayX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
+  double CHRightFPosConstrArrayY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
 
   vector<CH_Point> TheConvexHull;
+
+  double s_t=0,c_t=0;
+  double lx = 0.0,ly =0.0;
 
   //determine the current support angle
   deque<FootAbsolutePosition>::iterator FAP_it;
@@ -302,7 +308,7 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 	{
 	  //TODO: theta = 0
 	  lx = 0.0;
-	  ly = -(double)PrwSupport.Foot*DSFeetDistance/2.0;
+	  ly = -(double)PrwSupport.Foot*m_DSFeetDistance/2.0;
 
 	  if(PrwSupport.Foot == 1)
 	    {
@@ -400,25 +406,25 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 	    }
 	  if(PrwSupport.Foot == 1)
 	    {
-	      CHFPosConstrArrayX = CHLeftFPosConstrArrayX;
-	      CHFPosConstrArrayY = CHLeftFPosConstrArrayY;
+	      m_CHFPosConstrArrayX = CHLeftFPosConstrArrayX;
+	      m_CHFPosConstrArrayY = CHLeftFPosConstrArrayY;
 	    }
 	  else
 	    {
-	      CHFPosConstrArrayX = CHRightFPosConstrArrayX;
-	      CHFPosConstrArrayY = CHRightFPosConstrArrayY;
+	      m_CHFPosConstrArrayX = CHRightFPosConstrArrayX;
+	      m_CHFPosConstrArrayY = CHRightFPosConstrArrayY;
 	    }
 
 	  //TODO: The interior border does not yet depend on the angle
 	  for(unsigned j=0;j<5;j++)
 	    {
-	      ConvexHullFP[j].col = lx + ( CHFPosConstrArrayX[j] * c_t - CHFPosConstrArrayY[j] * s_t );
-	      ConvexHullFP[j].row = ly + ( CHFPosConstrArrayX[j] * s_t + CHFPosConstrArrayY[j] * c_t );
+	      m_ConvexHullFP[j].col = lx + ( m_CHFPosConstrArrayX[j] * c_t - m_CHFPosConstrArrayY[j] * s_t );
+	      m_ConvexHullFP[j].row = ly + ( m_CHFPosConstrArrayX[j] * s_t + m_CHFPosConstrArrayY[j] * c_t );
 	    }
 
 	  LinearConstraintInequalityFreeFeet_t aLCIFP;
 
-	  computeLinearSystem(ConvexHullFP, aLCIFP.D, aLCIFP.Dc, PrwSupport);
+	  computeLinearSystem(m_ConvexHullFP, aLCIFP.D, aLCIFP.Dc, PrwSupport);
 
 	  aLCIFP.StepNumber = PrwSupport.StepNumber;
 
@@ -455,7 +461,7 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 	{
 	  LCIFF_it = QueueOfFeetPosInequalities.begin();
 
-	  IndexConstraint += double(PrwSupport.StepNumber)*MAL_MATRIX_NB_ROWS(LCIFF_it->D);
+	  IndexConstraint += PrwSupport.StepNumber*MAL_MATRIX_NB_ROWS(LCIFF_it->D);
 	}
 
       NbOfConstraints = IndexConstraint;

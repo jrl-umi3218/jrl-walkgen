@@ -395,7 +395,7 @@ bool OrientationsPreview::verifyAngleOfHipJoint(SupportState_t CurrentSupport,
 
 
 void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time, 
-						   COMState &TrunkStateT,
+						   COMState &,
 						   const double &PreviewedSupportFoot, 
 						   const unsigned int &StepNumber,
 						   SupportState_t CurrentSupport,
@@ -452,7 +452,7 @@ void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time,
 }
 
 double OrientationsPreview::f(double a,double b,double c,double d,double x){return a+b*x+c*x*x+d*x*x*x;}
-double OrientationsPreview::df(double a,double b,double c,double d,double x){return b+2*c*x+3.0*d*x*x;}
+double OrientationsPreview::df(double ,double b,double c,double d,double x){return b+2*c*x+3.0*d*x*x;}
 
 
 

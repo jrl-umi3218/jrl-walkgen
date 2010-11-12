@@ -293,7 +293,8 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 							  int CurrentAbsoluteIndex,  
 							  int IndexInitial, 
 							  double ModulatedSingleSupportTime,
-							  int StepType, int LeftOrRight)
+							  int StepType, 
+							  int /* LeftOrRight */)
 {
   unsigned int k = CurrentAbsoluteIndex - IndexInitial;
   // Local time
@@ -470,7 +471,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 							  int StartIndex, int k,
 							  double LocalInterpolationStartTime,
 							  double ModulatedSingleSupportTime,
-							  int StepType, int LeftOrRight)
+							  int StepType, int /* LeftOrRight */)
 {//TODO 0:Update foot position needs to be verified and cleaned
 
   // unsigned int k = CurrentAbsoluteIndex - IndexInitial;

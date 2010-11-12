@@ -154,7 +154,7 @@ namespace PatternGeneratorJRL
 				deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 				double Xmax,
 				COMState & lStartingCOMState,
-				MAL_S3_VECTOR(,double) &lStartingZMPPosition,
+				MAL_S3_VECTOR_TYPE(double) &lStartingZMPPosition,
 				FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				FootAbsolutePosition & InitRightFootAbsolutePosition);
       
@@ -533,10 +533,10 @@ namespace PatternGeneratorJRL
       /*! @} */
 
       /*! \brief LU decomposition of the Z matrix. */
-      MAL_MATRIX(,double) m_AF;
+      MAL_MATRIX_TYPE(double) m_AF;
 
       /*! \brief Pivots of the Z matrix LU decomposition. */
-      MAL_VECTOR(,int) m_IPIV;
+      MAL_VECTOR_TYPE(int) m_IPIV;
 
       /*! \brief Boolean on the need to reset to the
 	precomputed Z matrix LU decomposition */

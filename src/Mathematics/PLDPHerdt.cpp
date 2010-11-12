@@ -139,7 +139,7 @@ void PLDPSolverHerdt::AllocateMemoryForSolver(unsigned int NumberSteps)
   m_OptCholesky->SetiL(m_iL);
 }
 
-void PLDPSolverHerdt::InitializeSolver(unsigned int NumberSteps)
+void PLDPSolverHerdt::InitializeSolver(unsigned int /* NumberSteps*/ )
 {
 #if 0
   // Allocation max:
@@ -815,10 +815,9 @@ int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & 
 	    {
 	      IndexFootCstr = m_PreviouslyActivatedConstraints[i]-NbRemovedFootCstr;
 	    }
-	  if (lindex>=0)
-	    {
-	      m_ActivatedConstraints.push_back(lindex);
-	    }
+
+	  m_ActivatedConstraints.push_back(lindex);
+
 	  if(IndexFootCstr>=4*m_CardV)
 	    {
 	      m_ActivatedConstraints.push_back(IndexFootCstr);
@@ -1081,7 +1080,7 @@ void PLDPSolverHerdt::WriteCurrentZMPSolution(string filename,
   double* lZMP = new double [lZMP_size];
 
   ofstream aof;
-  aof.open((char *)filename.c_str(),ofstream::out);
+  aof.open(filename.c_str(),ofstream::out);
 
 
   for(unsigned int i=0;i<m_CardV;i++)
