@@ -32,7 +32,6 @@ SET(CXX_DISABLE_WERROR True)
 
 # Initialize generic properties of the project
 SETUP_PROJECT()
-SETUP_PROJECT_CPACK()
 
 # Handle OS specificities 
 INCLUDE(CheckIncludeFiles)
@@ -78,3 +77,4 @@ PKG_CONFIG_APPEND_LIBS("jrl-walkgen")
 
 # Ask to generate the final steps.
 SETUP_PROJECT_FINALIZE()
+SETUP_PROJECT_CPACK()
