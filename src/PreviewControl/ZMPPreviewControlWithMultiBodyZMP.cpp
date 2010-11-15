@@ -895,7 +895,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetSamplingPeriod(double lSamplingPeriod
 {
   m_SamplingPeriod = lSamplingPeriod;
 
-  m_NL=0.0;
+  m_NL=0;
   if (m_SamplingPeriod!=0.0)
     m_NL = (unsigned int)(0.040/m_SamplingPeriod);
     // m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
@@ -906,7 +906,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControlTime(double lPreviewCon
 {
   m_PreviewControlTime = lPreviewControlTime;
 
-  m_NL=0.0;
+  m_NL=0;
   if (m_SamplingPeriod!=0.0)
     m_NL = (unsigned int)(0.040/m_SamplingPeriod); 
     // m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
