@@ -19,6 +19,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 # Includes from jrl-cmaketools
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/lapack.cmake)
+INCLUDE(cmake/cpack.cmake)
 
 # Define properties of the project
 SET(PROJECT_NAME jrl-walkgen)
@@ -31,6 +32,7 @@ SET(CXX_DISABLE_WERROR True)
 
 # Initialize generic properties of the project
 SETUP_PROJECT()
+SETUP_PROJECT_CPACK()
 
 # Handle OS specificities 
 INCLUDE(CheckIncludeFiles)
