@@ -26,6 +26,8 @@
 #include <Mathematics/FootHalfSize.hh>
 
 using namespace PatternGeneratorJRL;
+#include <iostream>
+using namespace std;
 
 FootHalfSize::FootHalfSize()
 {
@@ -63,7 +65,6 @@ void FootHalfSize::updateHalfSize()
 
   m_HalfWidth -= m_ConstraintsOnX;
   m_HalfHeight -= m_ConstraintsOnY;
-  
 }
 
 void FootHalfSize::updateHalfHeightDS()
@@ -76,7 +77,7 @@ void FootHalfSize::updateHalfHeightDS()
 void FootHalfSize::setConstraints(double OnX, double OnY)
 {
   m_ConstraintsOnX = OnX;
-  m_ConstraintsOnX = OnY;
+  m_ConstraintsOnY = OnY;
 
   updateHalfSize();
   updateHalfHeightDS();

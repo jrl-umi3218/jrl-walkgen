@@ -97,6 +97,17 @@ FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM,
       aof.close();
     }
 
+  // Register method to handle
+    string aMethodName[] =
+      {":setfeetconstraint"};
+
+    for(int i=0;i<1;i++)
+      {
+        if (!RegisterMethod(aMethodName[i]))
+      {
+        std::cerr << "Unable to register " << aMethodName << std::endl;
+      }
+      }
 }
 
 FootConstraintsAsLinearSystemForVelRef::
@@ -480,17 +491,18 @@ void FootConstraintsAsLinearSystemForVelRef::CallMethod(std::string &Method, std
     {
       string lCmd;
       Args >> lCmd;
+
       if (lCmd=="XY")
+
 	{
+
 	  Args >> m_ConstraintOnX;
 	  Args >> m_ConstraintOnY;
 
 	  m_RightFootSize.setConstraints(m_ConstraintOnX, m_ConstraintOnY);
 	  m_LeftFootSize.setConstraints(m_ConstraintOnX, m_ConstraintOnY);
-	  cout << "Constraint On X: " << m_ConstraintOnX
-	       << " Constraint On Y: " << m_ConstraintOnY << endl;
+
 	}
 
     }
-  
 }
