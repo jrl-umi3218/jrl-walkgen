@@ -94,4 +94,5 @@ DebugFile << x << std::endl; \
 
 #define RESETDEBUG6(x)
 #define ODEBUG6(x,y)
+#define ODEBUG6SIMPLE(x,y)
 #define CODEDEBUG6(x)
