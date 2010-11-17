@@ -23,7 +23,6 @@ INCLUDE(cmake/cpack.cmake)
 
 # Define properties of the project
 SET(PROJECT_NAME jrl-walkgen)
-SET(PROJECT_VERSION 3.1.1.99)
 SET(PROJECT_DESCRIPTION "Walking pattern generator for Humanoids")
 SET(PROJECT_URL "")
 
