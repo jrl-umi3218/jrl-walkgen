@@ -312,6 +312,7 @@ namespace PatternGeneratorJRL
     OptCholesky * m_OptCholesky;
 
     /*! \brief Sub matrix to compute the linear part of the objective function $p^{\top}_k$. */
+    MAL_MATRIX(m_OptA,double);
     MAL_MATRIX(m_OptB,double);
     MAL_MATRIX(m_OptC,double);
     MAL_MATRIX(m_OptD,double);

@@ -68,6 +68,11 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
   m_ComHeight = 0.814;
 
+  //Gains
+  m_Alpha = 0.00001;//Jerk
+  m_Beta = 1.0; //Velocity
+  m_Gamma = 0.000001; //ZMP
+
   /*! Getting the ZMP reference from Kajita's heuristic. */
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
 
@@ -117,11 +122,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_2DLIPM->SetComHeight(m_ComHeight);
   m_2DLIPM->InitializeSystem();
 
-  //Gains
-  m_Alpha = 0.00001;//Jerk
-  m_Beta = 1.0; //Velocity
-  m_Gamma = 0.000001; //ZMP
-
 
 
   initFeet();
@@ -139,6 +139,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 	}
     }
 
+  RESETDEBUG5("/tmp/mainloop.dat");
+  RESETDEBUG5("/tmp/computeObjective.dat");
   if (m_FastFormulationMode==QLDANDLQ)
     {
       RESETDEBUG6("/tmp/dtQLD.dat");
@@ -509,6 +511,8 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
 
   // OptA = OptA + lterm1 + lterm2;//TODO:: original problem
   OptA = OptA + lterm2;
+  
+  m_OptA = OptA;
 
   // Initialization of the matrice regarding the quadratic
   // part of the objective function.
@@ -1583,6 +1587,10 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
 					       int & , // CriteriaToMaximize, 
 					       MAL_VECTOR(& xk,double), double time)
 {
+
+  struct timeval start,step1, step2, step3, step4;
+
+  gettimeofday(&start,0);
   m_Pb.m=NbOfConstraints;
   m_Pb.me=NbOfEqConstraints;
   m_Pb.mmax=m_Pb.m+1;
@@ -1607,12 +1615,11 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
   m_Pb.U = (double *)malloc( sizeof(double)*(unsigned int)m_Pb.mnn); // Returns the Lagrange multipliers.;
 
 
-  MAL_MATRIX(OptA,double);
   MAL_VECTOR(VRef,double);
   MAL_MATRIX(ltermVel,double);
   MAL_VECTOR_DIM(OptD,double,2*m_QP_N);
   MAL_VECTOR_RESIZE(VRef,2*m_QP_N);
-
+  gettimeofday(&step1,0);
 
 
   //ZMP -------------------------------
@@ -1663,7 +1670,7 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
   ltermUU = MAL_RET_TRANSPOSE(m_U);
   ltermUU = MAL_RET_A_by_B(ltermUU,m_U);
   ltermUU = m_Gamma*ltermUU;
-
+  gettimeofday(&step2,0);
   //pT
   deque<SupportFeet_t>::iterator SF_it;//, storeFF_it, VFF_it;
   SF_it = QueueOfSupportFeet.end();
@@ -1712,28 +1719,11 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
   lterm4ZMPy = MAL_RET_A_by_B(lterm1ZMPy,m_U);
   lterm4ZMPy = -m_Gamma*lterm4ZMPy;
   //---------------------------ZMP
-
-  //Velocity
-  ltermVel = MAL_RET_TRANSPOSE(m_VPu);
-  ltermVel = MAL_RET_A_by_B(ltermVel,m_VPu);
-  ltermVel = m_Beta*ltermVel;
-
-  MAL_MATRIX_RESIZE(OptA,
-		    MAL_MATRIX_NB_ROWS(ltermVel),
-		    MAL_MATRIX_NB_COLS(ltermVel));
-  MAL_MATRIX_SET_IDENTITY(OptA);
-
-  //Jerk
-  OptA = m_Alpha*OptA;
-
-  //Final function
-  OptA = OptA + ltermVel;
-
   //m_Pb.Q--
   memset(m_Pb.Q,0,4*(m_QP_N+m_PrwSupport.StepNumber)*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
   for( int i=0;i<2*m_QP_N;i++)
     for( int j=0;j<2*m_QP_N;j++)
-      m_Pb.Q[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] = OptA(j,i);
+      m_Pb.Q[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] = m_OptA(j,i);
   //ZMP----
   for( int i=0;i<m_QP_N;i++)
     {
@@ -1764,9 +1754,8 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
 	    }
 	}
     }
-
   //----ZMP
-
+  gettimeofday(&step3,0);
   //TODO: - only constant velocity
   //constant velocity for the whole preview window
   for( int i=0;i<m_QP_N;i++)
@@ -1817,6 +1806,27 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
       m_Pb.XU[i] = 1e8;
     }
   memset(m_Pb.X,0,2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
+
+  gettimeofday(&step4,0);  
+  {
+    double CPUstep1 = step1.tv_sec - start.tv_sec +
+      0.000001 * (step1.tv_usec - start.tv_usec);
+    
+    double CPUstep2 = step2.tv_sec - step1.tv_sec +
+      0.000001 * (step2.tv_usec - step1.tv_usec);
+    
+    double CPUstep3 = step3.tv_sec - step2.tv_sec +
+      0.000001 * (step3.tv_usec - step2.tv_usec);
+    
+    double CPUstep4 = step4.tv_sec - step3.tv_sec +
+      0.000001 * (step4.tv_usec - step3.tv_usec);
+    
+    ODEBUG5SIMPLE(CPUstep1 << " " <<
+		  CPUstep2 << " " <<
+		  CPUstep3 << " " <<
+		  CPUstep4 , "/tmp/computeObjective.dat");
+  }
+
 }
 
 void ZMPVelocityReferencedQP::interpolateTrunkState(double time, int CurrentIndex,
@@ -1872,6 +1882,8 @@ void ZMPVelocityReferencedQP::interpolateTrunkState(double time, int CurrentInde
 	  FinalCOMStates[CurrentIndex+k].yaw[0] = m_TrunkState.yaw[0];
 	}
     }
+  
+
 }
 
 
@@ -2032,7 +2044,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       // pre compute the matrices needed for the optimization.
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
-      struct timeval start,end;
+      struct timeval start,step1, step2, step3, step4, end;
 
       bool StartingSequence = true;
 
@@ -2125,13 +2137,14 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 						 m_SupportFSM, m_CurrentSupport, m_PrwSupport, m_PreviewedSupportAngles,
 						 NbOfConstraints);
 
+      gettimeofday(&step1,0);
 
       initializeProblem();
 
 
       computeObjective(QueueOfLConstraintInequalitiesFreeFeet, QueueOfSupportFeet,
 		       NbOfConstraints, 0, CriteriaToMaximize, xk, time);
-
+      gettimeofday(&step2,0);
 
       if(m_FastFormulationMode == PLDPHerdt)
 	{
@@ -2260,7 +2273,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       //
       //-------------------------
 
-
+      gettimeofday(&step3,0);
       FinalCOMStates.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalZMPPositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalLeftFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
@@ -2368,7 +2381,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  aof.open("/tmp/time.dat",ios::app);
 	  aof<<time<<" "<<m_UpperTimeLimitToUpdate<<endl;
 	}
-
+      gettimeofday(&step4,0);
 
       interpolateTrunkState(time, CurrentIndex,
 			    FinalCOMStates);
@@ -2413,6 +2426,29 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       CurrentCPUTime = end.tv_sec - start.tv_sec +
         0.000001 * (end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
+
+      {
+	double CPUstep1 = step1.tv_sec - start.tv_sec +
+	  0.000001 * (step1.tv_usec - start.tv_usec);
+
+	double CPUstep2 = step2.tv_sec - step1.tv_sec +
+	  0.000001 * (step2.tv_usec - step1.tv_usec);
+
+	double CPUstep3 = step3.tv_sec - step2.tv_sec +
+	  0.000001 * (step3.tv_usec - step2.tv_usec);
+
+	double CPUstep4 = step4.tv_sec - step3.tv_sec +
+	  0.000001 * (step4.tv_usec - step3.tv_usec);
+	
+	ODEBUG5SIMPLE(time << " " << 
+		      CurrentCPUTime << " " << 
+		      CPUstep1 << " " <<
+		      CPUstep2 << " " <<
+		      CPUstep3 << " " <<
+		      CPUstep4 << " " <<
+		      TotalAmountOfCPUTime, "/tmp/mainloop.dat");
+      }
+
       ODEBUG("Current Time : " <<time << " " <<
 	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - time <<
 	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
