@@ -50,6 +50,116 @@
 using namespace std;
 using namespace PatternGeneratorJRL;
 
+Problem_s::Problem_s():
+  m(0),me(0),mmax(0), n(0), nmax(0), mnn(0),
+  Q(0),D(0),DU(0),DS(0),XL(0),X(0), NewX(0),
+  U(0),war(0), iwar(0),
+  iout(0),ifail(0), iprint(0),
+  lwar(0), liwar(0),
+  Eps(0)
+{
+
+}
+Problem_s::~Problem_s()
+{
+  ReleaseMemory();
+}
+
+void Problem_s::ReleaseMemory()
+{
+  if (Q!=0)
+    delete [] Q;
+
+  if (D!=0)
+    delete [] D;
+
+  if (DS!=0)
+    delete [] DS;
+
+  if (DU!=0)
+    delete [] DU;
+
+  if (XL!=0)
+    delete [] XL;
+  
+  if (XU!=0) 
+    delete [] XU;
+
+  if (X!=0)
+    delete [] X;
+
+  if (NewX!=0)
+    delete [] NewX;
+
+  if (iwar!=0)
+    delete [] iwar;
+  
+  if (war!=0)
+    delete [] war;
+
+  if (U!=0)
+    free(U);
+}
+
+void Problem_s::AllocateMemory()
+{
+  war= new double[lwar];
+  iwar = new int[liwar]; // The Cholesky decomposition is done internally.
+
+  U = (double *)malloc( sizeof(double)*(unsigned int)mnn); // Returns the Lagrange multipliers.;
+
+  DS = new double[(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)];
+
+  DU = new double[(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)];
+
+
+  Q=new double[4*(m_QP_N+m_stepNumber)*(m_QP_N+m_stepNumber)];  //Quadratic part of the objective function
+  D=new double[2*(m_QP_N+m_stepNumber)];   // Linear part of the objective function
+  XL=new double[2*(m_QP_N+m_stepNumber)];  // Lower bound of the jerk.
+  XU=new double[2*(m_QP_N+m_stepNumber)];  // Upper bound of the jerk.
+  X=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the system.
+  NewX=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the system.
+
+
+}
+
+void Problem_s::setDimensions(int NbOfConstraints,
+			      int NbOfEqConstraints,
+			      int QP_N,
+			      int StepNumber)
+{
+  bool reallocationNeeded = true;
+
+
+  // If all the dimensions are less than
+  // the current ones no need to reallocate.
+  if ((NbOfConstraints <= m) &&
+      (StepNumber <= m_stepNumber) &&
+      (QP_N <= m_QP_N))
+    reallocationNeeded = false;
+  m_stepNumber = StepNumber;
+  m_QP_N = QP_N;
+  m=NbOfConstraints;
+  me=NbOfEqConstraints;
+  mmax=m+1;
+  n=2*(m_QP_N+StepNumber);
+  nmax=n;
+  mnn=m+2*n;
+
+  iout=0;
+  iprint=1;
+  lwar=3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
+  liwar=n;
+  Eps=1e-8;
+  
+  if(reallocationNeeded)
+    {
+      ReleaseMemory();
+      AllocateMemory();
+    }
+}
+
+
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 						 string DataFile,
 						 CjrlHumanoidDynamicRobot *aHS) :
@@ -1450,19 +1560,19 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 void ZMPVelocityReferencedQP::initializeProblem()
 {
 
-  m_Pb.DS = new double[(8*m_QP_N+1)*2*(m_QP_N+m_PrwSupport.StepNumber)];
+  /*  m_Pb.DS = new double[(8*m_QP_N+1)*2*(m_QP_N+m_PrwSupport.StepNumber)];
 
   m_Pb.DU = new double[(8*m_QP_N+1)*2*(m_QP_N+m_PrwSupport.StepNumber)];
-
+  */
   memset(m_Pb.DU,0,(8*m_QP_N+1)*2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
-
+  /*
   m_Pb.Q=new double[4*(m_QP_N+m_PrwSupport.StepNumber)*(m_QP_N+m_PrwSupport.StepNumber)];  //Quadratic part of the objective function
   m_Pb.D=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];   // Linear part of the objective function
   m_Pb.XL=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];  // Lower bound of the jerk.
   m_Pb.XU=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];  // Upper bound of the jerk.
   m_Pb.X=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];   // Solution of the system.
   m_Pb.NewX=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];   // Solution of the system.
-
+  */
 }
 
 void ZMPVelocityReferencedQP::computeCholeskyOfQ(double * OptA)
@@ -1590,36 +1700,25 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
 
   struct timeval start,step1, step2, step3, step4;
 
-  gettimeofday(&start,0);
-  m_Pb.m=NbOfConstraints;
-  m_Pb.me=NbOfEqConstraints;
-  m_Pb.mmax=m_Pb.m+1;
-  m_Pb.n=2*(m_QP_N+m_PrwSupport.StepNumber);
-  m_Pb.nmax=m_Pb.n;
-  m_Pb.mnn=m_Pb.m+2*m_Pb.n;
 
-  m_Pb.iout=0;
-  m_Pb.iprint=1;
-  m_Pb.lwar=3*m_Pb.nmax*m_Pb.nmax/2+ 10*m_Pb.nmax  + 2*m_Pb.mmax + 20000;
-  m_Pb.liwar=m_Pb.n;
-  m_Pb.Eps=1e-8;
+  //  gettimeofday(&start,0);
 
-  m_Pb.war= new double[m_Pb.lwar];
-  m_Pb.iwar = new int[m_Pb.liwar]; // The Cholesky decomposition is done internally.
+  m_Pb.setDimensions(NbOfConstraints,
+		     NbOfEqConstraints,
+		     m_QP_N,
+		     m_PrwSupport.StepNumber);
+  initializeProblem();
 
   if (m_FastFormulationMode==QLDANDLQ)
     m_Pb.iwar[0]=0;
   else
     m_Pb.iwar[0]=1;
 
-  m_Pb.U = (double *)malloc( sizeof(double)*(unsigned int)m_Pb.mnn); // Returns the Lagrange multipliers.;
-
-
   MAL_VECTOR(VRef,double);
   MAL_MATRIX(ltermVel,double);
   MAL_VECTOR_DIM(OptD,double,2*m_QP_N);
   MAL_VECTOR_RESIZE(VRef,2*m_QP_N);
-  gettimeofday(&step1,0);
+  //  gettimeofday(&step1,0);
 
 
   //ZMP -------------------------------
@@ -1670,7 +1769,7 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
   ltermUU = MAL_RET_TRANSPOSE(m_U);
   ltermUU = MAL_RET_A_by_B(ltermUU,m_U);
   ltermUU = m_Gamma*ltermUU;
-  gettimeofday(&step2,0);
+  //  gettimeofday(&step2,0);
   //pT
   deque<SupportFeet_t>::iterator SF_it;//, storeFF_it, VFF_it;
   SF_it = QueueOfSupportFeet.end();
@@ -1755,7 +1854,7 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
 	}
     }
   //----ZMP
-  gettimeofday(&step3,0);
+  //  gettimeofday(&step3,0);
   //TODO: - only constant velocity
   //constant velocity for the whole preview window
   for( int i=0;i<m_QP_N;i++)
@@ -1807,8 +1906,9 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
     }
   memset(m_Pb.X,0,2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
 
-  gettimeofday(&step4,0);  
+  if (0)
   {
+    gettimeofday(&step4,0);  
     double CPUstep1 = step1.tv_sec - start.tv_sec +
       0.000001 * (step1.tv_usec - start.tv_usec);
     
@@ -1821,7 +1921,7 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
     double CPUstep4 = step4.tv_sec - step3.tv_sec +
       0.000001 * (step4.tv_usec - step3.tv_usec);
     
-    ODEBUG5SIMPLE(CPUstep1 << " " <<
+    ODEBUG6SIMPLE(CPUstep1 << " " <<
 		  CPUstep2 << " " <<
 		  CPUstep3 << " " <<
 		  CPUstep4 , "/tmp/computeObjective.dat");
@@ -2137,14 +2237,11 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 						 m_SupportFSM, m_CurrentSupport, m_PrwSupport, m_PreviewedSupportAngles,
 						 NbOfConstraints);
 
-      gettimeofday(&step1,0);
-
-      initializeProblem();
-
+      //      gettimeofday(&step1,0);
 
       computeObjective(QueueOfLConstraintInequalitiesFreeFeet, QueueOfSupportFeet,
 		       NbOfConstraints, 0, CriteriaToMaximize, xk, time);
-      gettimeofday(&step2,0);
+      //      gettimeofday(&step2,0);
 
       if(m_FastFormulationMode == PLDPHerdt)
 	{
@@ -2273,7 +2370,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       //
       //-------------------------
 
-      gettimeofday(&step3,0);
+      //      gettimeofday(&step3,0);
       FinalCOMStates.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalZMPPositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalLeftFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
@@ -2381,7 +2478,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  aof.open("/tmp/time.dat",ios::app);
 	  aof<<time<<" "<<m_UpperTimeLimitToUpdate<<endl;
 	}
-      gettimeofday(&step4,0);
+      //      gettimeofday(&step4,0);
 
       interpolateTrunkState(time, CurrentIndex,
 			    FinalCOMStates);
@@ -2427,6 +2524,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
         0.000001 * (end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
 
+      if (0)
       {
 	double CPUstep1 = step1.tv_sec - start.tv_sec +
 	  0.000001 * (step1.tv_usec - start.tv_usec);
@@ -2439,6 +2537,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 	double CPUstep4 = step4.tv_sec - step3.tv_sec +
 	  0.000001 * (step4.tv_usec - step3.tv_usec);
+
+	double CPUstep5 = end.tv_sec - step4.tv_sec +
+	  0.000001 * (end.tv_usec - step4.tv_usec);
 	
 	ODEBUG5SIMPLE(time << " " << 
 		      CurrentCPUTime << " " << 
@@ -2446,6 +2547,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		      CPUstep2 << " " <<
 		      CPUstep3 << " " <<
 		      CPUstep4 << " " <<
+		      CPUstep5 << " " <<
 		      TotalAmountOfCPUTime, "/tmp/mainloop.dat");
       }
 
@@ -2456,7 +2558,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       QueueOfLConstraintInequalitiesFreeFeet.clear();
       QueueOfFeetPosInequalities.clear();
 
-      delete [] m_Pb.Q;
+      /*      delete [] m_Pb.Q;
       delete [] m_Pb.D;
       delete [] m_Pb.DS;
       delete [] m_Pb.DU;
@@ -2468,7 +2570,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       delete [] m_Pb.war;
       free(m_Pb.U);
-
+      */
     }
   //-----------------------------------
   //

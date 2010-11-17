@@ -46,6 +46,50 @@
 namespace PatternGeneratorJRL
 {
 
+  //Final optimization problem
+  struct Problem_s
+  {
+    int m, me, mmax, n, nmax, mnn;
+    double *Q, *D, *DU, *DS, *XL, *XU, *X, *NewX, *U, *war;//For COM
+    int *iwar;
+    int iout, ifail, iprint, lwar, liwar;
+    double Eps;
+
+    /// Initialize by default an empty problem.
+    Problem_s();
+
+    /// Release the memory at the end only.
+    ~Problem_s();
+
+    /// Set the dimensions of the problem.
+    /// This method has an internal logic to 
+    /// allocate the memory. It is done only
+    /// when the problem gets bigger. When it shrinks
+    /// down the memory is kept to avoid overhead.
+    void setDimensions(int NbOfConstraints,
+		       int NbOfEqConstraints,
+		       int StepNumber,
+		       int QP_N);
+
+  protected:
+
+    /// The method doing the real job of releasing the memory.
+    void ReleaseMemory();
+
+    /// The method allocating the memory.
+    /// Called when setting the dimensions of the problem.
+    void AllocateMemory();
+
+  private:
+    /// Previous set of step number considered.
+    int m_stepNumber;
+
+    /// Previous size of the preview.
+    int m_QP_N;
+
+  };
+  typedef struct Problem_s Problem;
+
   class ZMPDiscretization;
   class  ZMPVelocityReferencedQP : public ZMPRefTrajectoryGeneration
   {
@@ -259,16 +303,6 @@ namespace PatternGeneratorJRL
     deque<double> m_PreviewedSupportAngles;
 
     //Final optimization problem
-    struct Problem_s
-    {
-      int m, me, mmax, n, nmax, mnn;
-      double *Q, *D, *DU, *DS, *XL, *XU, *X, *NewX, *U, *war;//For COM
-      int *iwar;
-      int iout, ifail, iprint, lwar, liwar;
-      double Eps;
-    };
-    typedef struct Problem_s Problem;
-
     Problem m_Pb;
 
     SupportState_t m_CurrentSupport, m_PrwSupport;
