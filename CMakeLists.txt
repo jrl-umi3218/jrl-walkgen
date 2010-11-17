@@ -53,14 +53,19 @@ ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.1.0")
 # Add aggressive optimization flags in release mode.
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET (CMAKE_CXX_FLAGS_RELEASE
-    "-O3 -funroll-loops -frerun-loop-opt -fschedule-insns2")
-  SET (CMAKE_CXX_FLAGS_RELEASE
-    "${CMAKE_CXX_FLAGS_RELEASE} -frerun-cse-after-loop -falign-functions")
-  SET (CMAKE_CXX_FLAGS_RELEASE
-    "${CMAKE_CXX_FLAGS_RELEASE} -falign-labels -falign-loops -falign-jumps")
-  SET (CMAKE_CXX_FLAGS_RELEASE
-    "${CMAKE_CXX_FLAGS_RELEASE} -fexpensive-optimizations")
+    "-O2 -DNDEBUG")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+
+#IF(CMAKE_COMPILER_IS_GNUCXX)
+#  SET (CMAKE_CXX_FLAGS_RELEASE
+#    "-O3 -funroll-loops -frerun-loop-opt -fschedule-insns2")
+#  SET (CMAKE_CXX_FLAGS_RELEASE
+#    "${CMAKE_CXX_FLAGS_RELEASE} -frerun-cse-after-loop -falign-functions")
+#  SET (CMAKE_CXX_FLAGS_RELEASE
+#    "${CMAKE_CXX_FLAGS_RELEASE} -falign-labels -falign-loops -falign-jumps")
+#  SET (CMAKE_CXX_FLAGS_RELEASE
+#    "${CMAKE_CXX_FLAGS_RELEASE} -fexpensive-optimizations")
+#ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 # Define the set of headers to be exported
 SET(${PROJECT_NAME}_HEADERS
