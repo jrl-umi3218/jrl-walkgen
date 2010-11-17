@@ -616,12 +616,14 @@ namespace PatternGeneratorJRL
 	    ODEBUG3("Pb at  t= " <<t);
 	    LTHROW("Unable to compute COM along X-axis in GetZMPDiscretization");
 	  }
-	
+	m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(t,aCOMPos.x[1]);
 	if (!m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]))
 	  {
 	    ODEBUG3("Pb at  t= " <<t);
 	    LTHROW("Unable to compute COM along Y-axis in GetZMPDiscretization");
 	  }
+	m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1]);
+
 	aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	aCOMPos.z[1] = 0.0;
 	aCOMPos.z[2] = 0.0;
@@ -676,6 +678,8 @@ namespace PatternGeneratorJRL
     lMStartingCOMState(0,0)= lStartingCOMState.x[0];
     lMStartingCOMState(1,0)= lStartingCOMState.y[0];
     lMStartingCOMState(2,0)= lStartingCOMState.z[0];
+    
+    m_InitialPoseCoMHeight = lStartingCOMState.z[0];
 
     for(unsigned int i=0;i<3;i++)
       {
@@ -734,7 +738,10 @@ namespace PatternGeneratorJRL
 	COMState aCOMPos;
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]);
+	m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(t,aCOMPos.x[1]);
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]);
+	m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1]);
+	aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	CoMPositions.push_back(aCOMPos);
 
 	/*! Feed the FootPositions. */
@@ -963,7 +970,10 @@ namespace PatternGeneratorJRL
 	COMState aCOMPos;
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0],lIndexInterval);
+	m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(t,aCOMPos.x[1],lIndexInterval);
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0],lIndexInterval);
+	m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1],lIndexInterval);
+	aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	FinalCoMPositions.push_back(aCOMPos);
 	/*! Feed the FootPositions. */
 
@@ -2319,7 +2329,10 @@ namespace PatternGeneratorJRL
 	COMState aCOMPos;
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]);
+	m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(t,aCOMPos.x[1]);
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]);
+	m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1]);
+	aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	CoMPositions.push_back(aCOMPos);
 
 	/*! Feed the FootPositions. */
@@ -2460,9 +2473,11 @@ namespace PatternGeneratorJRL
 	memset(&aCOMPos,0,sizeof(aCOMPos));
 	if (!m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0],lIndexInterval))
 	  { LTHROW("COM out of bound along X axis.");}
+	m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(t,aCOMPos.x[1],lIndexInterval);
 	if (!m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0],lIndexInterval))
 	  { LTHROW("COM out of bound along Y axis.");}
-
+	m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1],lIndexInterval);
+	aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	FinalCoMPositions.push_back(aCOMPos);
 	/*! Feed the FootPositions. */
 
