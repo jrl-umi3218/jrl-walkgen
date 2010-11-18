@@ -50,114 +50,6 @@
 using namespace std;
 using namespace PatternGeneratorJRL;
 
-Problem_s::Problem_s():
-  m(0),me(0),mmax(0), n(0), nmax(0), mnn(0),
-  Q(0),D(0),DU(0),DS(0),XL(0),X(0), NewX(0),
-  U(0),war(0), iwar(0),
-  iout(0),ifail(0), iprint(0),
-  lwar(0), liwar(0),
-  Eps(0)
-{
-
-}
-Problem_s::~Problem_s()
-{
-  ReleaseMemory();
-}
-
-void Problem_s::ReleaseMemory()
-{
-  if (Q!=0)
-    delete [] Q;
-
-  if (D!=0)
-    delete [] D;
-
-  if (DS!=0)
-    delete [] DS;
-
-  if (DU!=0)
-    delete [] DU;
-
-  if (XL!=0)
-    delete [] XL;
-  
-  if (XU!=0) 
-    delete [] XU;
-
-  if (X!=0)
-    delete [] X;
-
-  if (NewX!=0)
-    delete [] NewX;
-
-  if (iwar!=0)
-    delete [] iwar;
-  
-  if (war!=0)
-    delete [] war;
-
-  if (U!=0)
-    free(U);
-}
-
-void Problem_s::AllocateMemory()
-{
-  war= new double[lwar];
-  iwar = new int[liwar]; // The Cholesky decomposition is done internally.
-
-  U = (double *)malloc( sizeof(double)*(unsigned int)mnn); // Returns the Lagrange multipliers.;
-
-  DS = new double[(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)];
-
-  DU = new double[(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)];
-
-
-  Q=new double[4*(m_QP_N+m_stepNumber)*(m_QP_N+m_stepNumber)];  //Quadratic part of the objective function
-  D=new double[2*(m_QP_N+m_stepNumber)];   // Linear part of the objective function
-  XL=new double[2*(m_QP_N+m_stepNumber)];  // Lower bound of the jerk.
-  XU=new double[2*(m_QP_N+m_stepNumber)];  // Upper bound of the jerk.
-  X=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the system.
-  NewX=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the system.
-
-
-}
-
-void Problem_s::setDimensions(int NbOfConstraints,
-			      int NbOfEqConstraints,
-			      int QP_N,
-			      int StepNumber)
-{
-  bool reallocationNeeded = true;
-
-
-  // If all the dimensions are less than
-  // the current ones no need to reallocate.
-  if ((NbOfConstraints <= m) &&
-      (StepNumber <= m_stepNumber) &&
-      (QP_N <= m_QP_N))
-    reallocationNeeded = false;
-  m_stepNumber = StepNumber;
-  m_QP_N = QP_N;
-  m=NbOfConstraints;
-  me=NbOfEqConstraints;
-  mmax=m+1;
-  n=2*(m_QP_N+StepNumber);
-  nmax=n;
-  mnn=m+2*n;
-
-  iout=0;
-  iprint=1;
-  lwar=3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
-  liwar=n;
-  Eps=1e-8;
-  
-  if(reallocationNeeded)
-    {
-      ReleaseMemory();
-      AllocateMemory();
-    }
-}
 
 
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
@@ -1010,81 +902,7 @@ const double & ZMPVelocityReferencedQP::GetBeta() const
 //
 //----------------------------------
 
-int ZMPVelocityReferencedQP::validateConstraints(double * & DS,double * &DU,
-						 int NbOfConstraints,  int li,
-						 double *X, double time)
-{
-  // double lSizeMat = QueueOfLConstraintInequalities.back()->EndingTime/m_QP_T;
-  MAL_MATRIX(vnlPx,double); MAL_MATRIX(vnlPu,double);
-  MAL_MATRIX(vnlValConstraint,double);
-  MAL_MATRIX(vnlX,double);// MAL_MATRIX(vnlStorePx,double);
-  // MAL_MATRIX(vnlStoreX,double);
-  MAL_VECTOR(ConstraintNb,int);
-
-  MAL_MATRIX_RESIZE(vnlX,2*(m_QP_N+m_PrwSupport.StepNumber),1);
-
-  // ConstraintNb[li] = NbOfConstraints;
-  MAL_MATRIX_RESIZE(vnlPu,NbOfConstraints,2*(m_QP_N+m_PrwSupport.StepNumber));
-  MAL_MATRIX_RESIZE(vnlPx,NbOfConstraints,1);
-
-
-  for(int i=0; i<NbOfConstraints;i++)
-    {
-      vnlPx(i,0) = DS[i];
-      // vnlStorePx(i,li) = DS[i];
-    }
-
-  for(int i=0; i<NbOfConstraints;i++)
-    for( int j=0; j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
-      vnlPu(i,j) = DU[j*(NbOfConstraints+1)+i];
-
-  for( int i=0; i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
-    {
-      // vnlStoreX(i,li) = X[i];
-      vnlX(i,0) = X[i];
-    }
-
-  vnlValConstraint = MAL_RET_A_by_B(vnlPu, vnlX)  + vnlPx;
-
-  if (MAL_MATRIX_NB_COLS(vnlValConstraint)!=1)
-    {
-      cout << "Problem during validation of the constraints matrix: " << endl;
-      cout << "   size for the columns different from 1" << endl;
-      return -1;
-    }
-
-
-  for(int i=0;i<NbOfConstraints;i++)
-    {
-      int pbOnCurrent=0;
-      if (vnlValConstraint(i,0)<-1e-8)
-	{
-	  ODEBUG3("Problem during validation of the constraints at time: "<<time);
-	  ODEBUG3("  constraint " << i << " is not positive");
-	  ODEBUG3(vnlValConstraint(i,0));
-	  pbOnCurrent = 1;
-	}
-
-      if (pbOnCurrent)
-	{
-	  ODEBUG3("PbonCurrent: " << pbOnCurrent << " " << li
-		  << " Contrainte " << i);
-	  return -1;
-	}
-
-    }
-
-  return 0;
-}
-
-int ZMPVelocityReferencedQP::dumpProblem(double * Q,
-					 double * D,
-					 double * DPu,
-					 int NbOfConstraints,
-					 double * Px,
-					 double * XL,
-					 double * XU,
-					 MAL_VECTOR(& xk,double),
+int ZMPVelocityReferencedQP::dumpProblem(MAL_VECTOR(& xk,double),
 					 double Time)
 {
   ofstream aof;
@@ -1093,64 +911,10 @@ int ZMPVelocityReferencedQP::dumpProblem(double * Q,
   sprintf(Buffer,"/tmp/ProblemFF_%f.dat",Time);
   aof.open(Buffer,ofstream::out);
 
-  //Somehow this has to be done
-  NbOfConstraints++;
-
-  // Dumping Q.
-  aof << endl << "Q:"<< endl;
-  for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
-    {
-      for( int j=0;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
-	{
-	  aof <<Q[j*2*(m_QP_N+m_PrwSupport.StepNumber)+i]<< " ";
-	}
-      aof <<endl;
-    }
-
   // Dumping D.
   aof << endl <<"D: "<< "RefVel: "<< RefVel.x << " "<< RefVel.y << "xk: "<<xk<< endl;
-  for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
-    {
-      aof <<D[i]<< " ";
-    }
-  aof <<endl;
-
-  // Dumping Pu.
-  aof << "DU: "<< "NbOfConstr.: " << NbOfConstraints << endl;
-  for(int i=0;i<NbOfConstraints;i++)
-    {
-      for( int j=0;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
-	{
-	  aof << DPu[j*(NbOfConstraints)+i] << " ";
-	}
-      aof <<endl;
-    }
-
-  // Dumping Px.
-  aof << endl<<"DS:"<< endl;
-  for(int i=0;i<NbOfConstraints;i++)
-    {
-      aof << Px[i] << " ";
-    }
-  aof << endl;
-
-  // Dumping XL.
-  aof << endl << "XL:"<< endl;
-  for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
-    {
-      aof << XL[i] << " ";
-    }
-  aof << endl;
-
-  // Dumping XU.
-  aof << endl << "XU:"<< endl;
-  for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
-    {
-      aof << XU[i] << " ";
-    }
-  aof << endl;
-
-  aof.close();
+  m_Pb.dumpProblem(aof);
+  
   return 0;
 }
 
@@ -1173,7 +937,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
   ODEBUG(" N:" << m_QP_N << " T: " << T);
 
   if (m_FullDebug>2)
-    {
+   {
       char Buffer[1024];
       sprintf(Buffer,"/tmp/PXD_%f.dat", StartingTime);
       RESETDEBUG4(Buffer);
@@ -1348,36 +1112,12 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
 
   ODEBUG("IndexConstraint:"<<IndexConstraint << " localTime :" << localtime);
 
-
-  if (0)
-    {
-      ODEBUG("localtime: " <<localtime);
-      ofstream aof;
-
-      char Buffer[1024];
-      sprintf(Buffer,"/tmp/DU.dat");
-      aof.open(Buffer,ofstream::out);
-      aof <<" 2*N+2*m_PrwSupport.StepNumber: "<<2*m_QP_N+2*m_PrwSupport.StepNumber<<" NbOfConstraints: "<<NbOfConstraints
-	  << endl;
-      for( int i=0;i<NbOfConstraints;i++)
-	{
-	  for( int j=0;j<2*m_QP_N+2*m_PrwSupport.StepNumber;j++)
-	    aof << DU[j*NbOfConstraints+i] << " " ;
-	  aof << endl;
-	}
-      aof.close();
-
-      sprintf(Buffer,"/tmp/m_Pb.DS.dat");
-      aof.open(Buffer,ofstream::out);
-      for( int j=0;j<NbOfConstraints;j++)
-	aof << m_Pb.DS[j] << endl;
-      // aof << endl;
-      aof.close();
-
-    }
-
   if (m_FullDebug>0)
     {
+      
+      ODEBUG("localtime: " <<localtime);
+      m_Pb.dumpMatrix("/tmp/DU.dat",Problem_s::MATRIX_DU);
+      m_Pb.dumpVector("/tmp/m_Pb.DS.dat", Problem_s::VECTOR_DS);
 
       ofstream aof;
       char Buffer[1024];
@@ -1390,18 +1130,10 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
 	  aof << endl;
 	}
       aof.close();
-
-
-      if (0)
-	{
-	  sprintf(Buffer,"/tmp/DPX_%f.dat", StartingTime);
-	  aof.open(Buffer,ofstream::out);
-	  for( int i=0;i<IndexConstraint;i++)
-	    {
-	      aof << m_Pb.DS[i] << endl ;
-	    }
-	  aof.close();
-	}
+      
+      sprintf(Buffer,"/tmp/DPX_%f.dat", StartingTime);
+	  
+      m_Pb.dumpMatrix(Buffer,Problem_s::VECTOR_DS);
     }
 
   return 0;
@@ -1447,6 +1179,8 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 
   // Set the internal state of the ZMPRefTrajectory object.
   m_OnLineMode = true;
+  m_EndingPhase = false;
+  m_TimeToStopOnLineMode = -1.0;
 
   ODEBUG4("ZMP::InitOnLine - Step 2 ","ZMDInitOnLine.txt");
   // Initialize position of the feet.
@@ -1555,23 +1289,6 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 }
 
 
-void ZMPVelocityReferencedQP::initializeProblem()
-{
-
-  /*  m_Pb.DS = new double[(8*m_QP_N+1)*2*(m_QP_N+m_PrwSupport.StepNumber)];
-
-  m_Pb.DU = new double[(8*m_QP_N+1)*2*(m_QP_N+m_PrwSupport.StepNumber)];
-  */
-  memset(m_Pb.DU,0,(8*m_QP_N+1)*2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
-  /*
-  m_Pb.Q=new double[4*(m_QP_N+m_PrwSupport.StepNumber)*(m_QP_N+m_PrwSupport.StepNumber)];  //Quadratic part of the objective function
-  m_Pb.D=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];   // Linear part of the objective function
-  m_Pb.XL=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];  // Lower bound of the jerk.
-  m_Pb.XU=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];  // Upper bound of the jerk.
-  m_Pb.X=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];   // Solution of the system.
-  m_Pb.NewX=new double[2*(m_QP_N+m_PrwSupport.StepNumber)];   // Solution of the system.
-  */
-}
 
 void ZMPVelocityReferencedQP::computeCholeskyOfQ(double * OptA)
 {
@@ -1701,7 +1418,7 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
 		     NbOfEqConstraints,
 		     m_QP_N,
 		     m_PrwSupport.StepNumber);
-  initializeProblem();
+  m_Pb.initializeProblem();
 
   if (m_FastFormulationMode==QLDANDLQ)
     m_Pb.iwar[0]=0;
@@ -2095,8 +1812,15 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				     deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
 {
 
+  // If on-line mode not activated we go out.
   if (!m_OnLineMode)
     return;
+
+  // Testing if we are reaching the end of the online mode.
+  if ((m_EndingPhase) &&
+      (time>=m_TimeToStopOnLineMode))
+    m_OnLineMode = false;
+
 
   if(time + 0.00001 > m_UpperTimeLimitToUpdate)
     {
@@ -2227,7 +1951,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 			      NbOfConstraints,
 			      xk);
       if(m_FullDebug>2)
-	dumpProblem(m_Pb.Q, m_Pb.D, m_Pb.DU, m_Pb.m, m_Pb.DS, m_Pb.XL, m_Pb.XU, xk, time+m_TimeBuffer);
+	dumpProblem( xk, time+m_TimeBuffer);
 
 
       double ldt = 0.0;
@@ -2391,7 +2115,11 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  m_FPy = CurSF_it->y - double(CurSF_it->SupportFoot)*cos(CurSF_it->theta)*m_FeetDistanceDS;
 
 	  // Specify that we are in the ending phase.
-	  m_OnLineMode = false;
+	  if (m_EndingPhase==false)
+	    // This should be done only during the transition EndingPhase=false -> EndingPhase=true
+	    m_TimeToStopOnLineMode = m_UpperTimeLimitToUpdate+m_QP_T * m_QP_N;
+	  m_EndingPhase = true;
+	  
 	}
 
 
@@ -2451,12 +2179,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 			       FinalLeftFootAbsolutePositions,
 			       FinalRightFootAbsolutePositions);
 
-
-      if(m_UpperTimeLimitToUpdate==0.0)
-	m_UpperTimeLimitToUpdate = time+m_QP_T;
-      else
-	m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+m_QP_T;
-    
+      m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+m_QP_T;
       ODEBUG6("uk:" << uk,"/tmp/DebugPBW.dat");
       ODEBUG6("xk:" << xk,"/tmp/DebugPBW.dat");
 
@@ -2474,14 +2197,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  aof.close();
 	}
 
-      if(m_FullDebug>2)
-	{
-	  //if(validateConstraints(m_Pb.DS, m_Pb.DU, m_Pb.m, li, m_Pb.X, time)<0)
-	  //  {
-	  //    cout << "Something is wrong with the constraints." << endl;
-	  //    exit(-1);
-	  //  }
-	}
 
       // Compute CPU consumption time.
       gettimeofday(&end,0);
