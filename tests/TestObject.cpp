@@ -38,12 +38,12 @@ namespace PatternGeneratorJRL
 
     double filterprecision(double adb)
     {
-      if (fabs(adb)<1e-8)
+      if (fabs(adb)<1e-7)
 	return 0.0;
 	    
-      double ladb2 = adb * 1e8;
+      double ladb2 = adb * 1e7;
       double lintadb2 = trunc(ladb2);
-      return lintadb2/1e8;
+      return lintadb2/1e7;
     }
 
 
