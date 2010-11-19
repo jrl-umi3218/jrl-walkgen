@@ -45,6 +45,7 @@ namespace PatternGeneratorJRL
     {
       m_totaltimeinplanning = 0.0;
       m_currenttime = 0.0;
+      m_totaltime = 0.0;
       m_TimeProfileIndex = 0;
       m_TimeProfile.resize(200*620);
       m_TimeProfileTS.resize(200*620);
