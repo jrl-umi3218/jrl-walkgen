@@ -33,8 +33,10 @@
 namespace PatternGeneratorJRL
 {
 
-  //Final optimization problem
-  struct Problem_s
+  /*! \brief Final optimization problem to handle velocity reference.
+    This object store a standardized optimization quadratic problem.
+   */
+  struct ProblemVelRef_s
   {
     int m, me, mmax, n, nmax, mnn;
     double *Q, *D, *DU, *DS, *XL, *XU, *X, *NewX, *U, *war;//For COM
@@ -43,10 +45,10 @@ namespace PatternGeneratorJRL
     double Eps;
 
     /// \brief Initialize by default an empty problem.
-    Problem_s();
+    ProblemVelRef_s();
 
     /// \brief Release the memory at the end only.
-    ~Problem_s();
+    ~ProblemVelRef_s();
 
     /// \brief Set the dimensions of the problem.
     /// This method has an internal logic to 
@@ -97,6 +99,6 @@ namespace PatternGeneratorJRL
     int m_QP_N;
 
   };
-  typedef struct Problem_s Problem;
+  typedef struct ProblemVelRef_s Problem;
 }
 #endif /* _PROBLEM_VEL_REF_H_ */

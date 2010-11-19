@@ -58,9 +58,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   ZMPRefTrajectoryGeneration(lSPM)
 {
 
-  m_Q = 0;
   m_Pu = 0;
-  m_FullDebug = -10;
+  m_FullDebug = 10;
   m_FastFormulationMode = QLD;
 
   m_QP_T = 0.1;
@@ -124,8 +123,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_2DLIPM->SetComHeight(m_ComHeight);
   m_2DLIPM->InitializeSystem();
 
-
-
   initFeet();
 
   // Register method to handle
@@ -140,31 +137,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 	  std::cerr << "Unable to register " << aMethodName << std::endl;
 	}
     }
-
-  if (m_FastFormulationMode==QLDANDLQ)
-    {
-      RESETDEBUG6("/tmp/dtQLD.dat");
-      RESETDEBUG6("/tmp/InfosQLD.dat");
-      RESETDEBUG6("/tmp/Check2DLIPM_QLDANDLQ.dat");
-    }
-
-
-  if (m_FastFormulationMode==PLDP)
-    {
-      RESETDEBUG6("/tmp/dtPLDP.dat");
-      RESETDEBUG6("/tmp/Check2DLIPM_PLDP.dat");
-    }
-
-  if(m_FullDebug>2)
-    {
-      ofstream aof;
-      aof.open("/tmp/Trunk.dat",ofstream::out);
-      aof.close();
-      aof.open("/tmp/time.dat",ofstream::out);
-      aof.close();
-      aof.open("/tmp/FootPositionsT.dat",ofstream::out);
-      aof.close();
-    }
+  
+  // Debug point.
+  debugConstructor();
 
   //Feet distance in the DS phase
   m_FeetDistanceDS = 0.2;
@@ -189,9 +164,6 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 
   if (m_FTGS!=0)
     delete m_FTGS;
-
-  if (m_Q!=0)
-    delete [] m_Q;
 
   if (m_OP!=0)
     delete m_OP;
@@ -360,131 +332,6 @@ int ZMPVelocityReferencedQP::InitializeMatrixPbConstants()
   return 0;
 }
 
-
-int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX_TYPE(double) &OptA)
-{
-  for( int i=0;i<2*m_QP_N;i++)
-    for( int j=0;j<2*m_QP_N;j++)
-      m_Q[i*2*m_QP_N+j] = OptA(j,i);
-
-  return 0;
-}
-int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX_TYPE(double) &OptA)
-{
-
-  /*! Build cholesky matrix of the optimum
-    We copy only the upper corner of the OptA matrix
-    because we know its specific structure.
-  */
-  double *localQ=new double[m_QP_N*m_QP_N];
-  for( int i=0;i<m_QP_N;i++)
-    for( int j=0;j<m_QP_N;j++)
-      localQ[i*m_QP_N+j] = OptA(i,j);
-
-  double *localLQ=new double[m_QP_N*m_QP_N];
-  double *localiLQ=new double[m_QP_N*m_QP_N];
-
-  memset(localLQ,0,m_QP_N*m_QP_N*sizeof(double));
-  memset(localiLQ,0,m_QP_N*m_QP_N*sizeof(double));
-
-  OptCholesky anOCD(m_QP_N,m_QP_N,OptCholesky::MODE_NORMAL);
-  anOCD.SetA(localQ,m_QP_N);
-  anOCD.SetL(localLQ);
-  anOCD.SetiL(localiLQ);
-
-  anOCD.ComputeNormalCholeskyOnANormal();
-  anOCD.ComputeInverseCholeskyNormal(1);
-
-  if (m_FullDebug>0)
-    {
-      ofstream aof;
-      char Buffer[1024];
-      sprintf(Buffer,"/tmp/localQ.dat");
-      aof.open(Buffer,ofstream::out);
-      for( int i=0;i<m_QP_N;i++)
-	{
-	  for( int j=0;j<m_QP_N;j++)
-	    aof << localQ[i*m_QP_N+j] << " ";
-	  aof<<endl;
-	}
-      aof.close();
-
-      sprintf(Buffer,"/tmp/localLQ.dat");
-      aof.open(Buffer,ofstream::out);
-      for( int i=0;i<m_QP_N;i++)
-	{
-	  for( int j=0;j<m_QP_N;j++)
-	    aof << localLQ[i*m_QP_N+j] << " ";
-	  aof << endl;
-	}
-      aof.close();
-
-      sprintf(Buffer,"/tmp/localiLQ.dat");
-      aof.open(Buffer,ofstream::out);
-      for( int i=0;i<m_QP_N;i++)
-	{
-	  for( int j=0;j<m_QP_N;j++)
-	    aof << localiLQ[i*m_QP_N+j] << " ";
-	  aof << endl;
-	}
-      aof.close();
-
-    }
-
-
-  MAL_MATRIX_RESIZE(m_LQ,2*m_QP_N,2*m_QP_N);
-  MAL_MATRIX_RESIZE(m_iLQ,2*m_QP_N,2*m_QP_N);
-
-
-  for( int i=0;i<m_QP_N;i++)
-    {
-      for( int j=0;j<m_QP_N;j++)
-	{
-	  m_LQ(i,j) = localLQ[i*m_QP_N+j];
-	  m_LQ(i+m_QP_N,j+m_QP_N) = localLQ[i*m_QP_N+j];
-	  m_LQ(i,j+m_QP_N) = 0.0;
-	  m_LQ(i+m_QP_N,j) = 0.0;
-
-	  m_iLQ(i,j) = localiLQ[i*m_QP_N+j];
-	  m_iLQ(i+m_QP_N,j+m_QP_N) = localiLQ[i*m_QP_N+j];
-	  m_iLQ(i,j+m_QP_N) = 0.0;
-	  m_iLQ(i+m_QP_N,j) = 0.0;
-	}
-    }
-
-
-  if (m_FullDebug>0)
-    {
-      ofstream aof;
-      char Buffer[1024];
-
-      sprintf(Buffer,"/tmp/LQ.dat");
-      aof.open(Buffer,ofstream::out);
-      for( int i=0;i<2*m_QP_N;i++)
-	{
-	  for( int j=0;j<2*m_QP_N;j++)
-	    aof << m_LQ(i,j) << " ";
-	  aof << endl;
-	}
-      aof.close();
-
-      sprintf(Buffer,"/tmp/iLQ.dat");
-      aof.open(Buffer,ofstream::out);
-      for( int i=0;i<2*m_QP_N;i++)
-	{
-	  for( int j=0;j<2*m_QP_N;j++)
-	    aof << m_iLQ(i,j) << " ";
-	  aof << endl;
-	}
-      aof.close();
-    }
-  delete [] localQ;
-  delete [] localLQ;
-  delete [] localiLQ;
-
-  return 0;
-}
-
 int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
 {
 
@@ -517,26 +364,6 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
   // Initialization of the matrice regarding the quadratic
   // part of the objective function.
   //TODO:: size of Q is 3*Nx3*N which means that there is place for N/2 feet variables
-  m_Q=new double[4*(m_QP_N)*(m_QP_N)];
-  memset(m_Q,0,4*(m_QP_N)*(m_QP_N)*sizeof(double));
-  // for( int i=0;i<2*m_QP_N;i++)
-  //   m_Q[i*2*m_QP_N+i] = 1.0;
-
-
-  if (m_FullDebug>0)
-    {
-      ofstream aof;
-      char Buffer[1024];
-      sprintf(Buffer,"/tmp/Q.dat");
-      aof.open(Buffer,ofstream::out);
-      for( int i=0;i<2*(m_QP_N);i++)
-	{
-	  for( int j=0;j<2*(m_QP_N);j++)
-	    aof << m_Q[i*m_QP_N*2+j] << " ";
-	  aof << endl;
-	}
-      aof.close();
-    }
 
   /*! Compute constants of the linear part of the objective function. */
   lterm1 = MAL_RET_TRANSPOSE(m_PPu);
@@ -548,18 +375,6 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
 
   m_OptC = MAL_RET_TRANSPOSE(m_PPu);
   m_OptC = m_Beta * m_OptC;
-
-
-
-  if ((m_FastFormulationMode==QLDANDLQ) ||
-      (m_FastFormulationMode==PLDP))
-    {
-      //BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(OptA);
-    }
-  else
-    {
-      BuildingConstantPartOfTheObjectiveFunctionQLD(OptA);
-    }
 
 
   if (m_FullDebug>0)
@@ -1116,8 +931,8 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
     {
       
       ODEBUG("localtime: " <<localtime);
-      m_Pb.dumpMatrix("/tmp/DU.dat",Problem_s::MATRIX_DU);
-      m_Pb.dumpVector("/tmp/m_Pb.DS.dat", Problem_s::VECTOR_DS);
+      m_Pb.dumpMatrix("/tmp/DU.dat",ProblemVelRef_s::MATRIX_DU);
+      m_Pb.dumpVector("/tmp/m_Pb.DS.dat", ProblemVelRef_s::VECTOR_DS);
 
       ofstream aof;
       char Buffer[1024];
@@ -1132,8 +947,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
       aof.close();
       
       sprintf(Buffer,"/tmp/DPX_%f.dat", StartingTime);
-	  
-      m_Pb.dumpMatrix(Buffer,Problem_s::VECTOR_DS);
+      m_Pb.dumpMatrix(Buffer,ProblemVelRef_s::VECTOR_DS);
     }
 
   return 0;
@@ -2116,8 +1930,12 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 	  // Specify that we are in the ending phase.
 	  if (m_EndingPhase==false)
-	    // This should be done only during the transition EndingPhase=false -> EndingPhase=true
-	    m_TimeToStopOnLineMode = m_UpperTimeLimitToUpdate+m_QP_T * m_QP_N;
+	    {
+	      // This should be done only during the transition EndingPhase=false -> EndingPhase=true
+	      m_TimeToStopOnLineMode = m_UpperTimeLimitToUpdate+m_QP_T * m_QP_N;
+	      // Set the ZMP reference as very important.
+	      // It suppose to work because Gamma appears only during the non-constant 
+	    }
 	  m_EndingPhase = true;
 	  
 	}

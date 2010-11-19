@@ -235,6 +235,7 @@ namespace PatternGeneratorJRL
       one put in the QP, but they are a necessary intermediate step. */
     FootConstraintsAsLinearSystemForVelRef * m_fCALS;
 
+    /*! \brief Standard polynomial trajectories for the feet. */
     FootTrajectoryGenerationStandard * m_FTGS;
 
     /*! Constraint on X and Y */
@@ -294,7 +295,7 @@ namespace PatternGeneratorJRL
     MAL_VECTOR(m_Uc,double);
 
     /*! \brief Matrix of the objective function $Q$ */
-    double *m_Q;
+    //    double *m_Q;
 
     /*! \brief Cholesky decomposition of the initial objective function $Q$ */
     MAL_MATRIX(m_LQ,double);
@@ -311,6 +312,11 @@ namespace PatternGeneratorJRL
     MAL_MATRIX(m_OptC,double);
     MAL_MATRIX(m_OptD,double);
 
+    enum MatrixType  { M_PPU, M_PZU, M_VPU, M_PPX,
+			M_PZX, M_VPX, M_U, 
+			M_LQ, M_ILQ};
+    enum VectorType  {m_UC,M_OPTA, M_OPTB,	M_OPTC, M_OPTD };
+      
     /*! \name Parameters of the objective function
       @{ */
     /*! Putting weight on the velocity */
@@ -358,9 +364,22 @@ namespace PatternGeneratorJRL
 				  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 				  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
+    /*! \name Debugging related methods 
+     @{*/
+    /*! \brief Dump the instance of the quadratic problem for one iteration. */
     int dumpProblem(MAL_VECTOR(& xk,double),
 		    double Time);
 
+    /*! \brief Debugging point for the constructor. */
+    void debugConstructor();
+
+    /*! \brief Dumping matrix specified by MatrixID in aos. */
+    void debugMatrix(ostream & aos, enum MatrixType MatrixID);
+
+    /*! \brief Dumping matrix specified by MatrixID in file named filename. */
+    void debugMatrix(const char *filename, enum MatrixType MatrixID);
+    /*! @} */
+    
   public:
 
     /*! Methods to comply with the initial interface of ZMPRefTrajectoryGeneration.
