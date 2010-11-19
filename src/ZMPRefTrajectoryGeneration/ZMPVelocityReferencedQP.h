@@ -81,13 +81,6 @@ namespace PatternGeneratorJRL
     */
     int BuildingConstantPartOfTheObjectiveFunction();
 
-    /*! Transform the matrices with LQ. */
-    int BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX_TYPE(double) &OptA);
-
-    /*! Compute the quadratic form of the objective function. */
-    int BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX_TYPE(double) &OptA);
-
-
     /*! \brief Call the two previous methods
       \return A negative value in case of a problem 0 otherwise.
     */

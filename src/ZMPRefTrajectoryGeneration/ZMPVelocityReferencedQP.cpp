@@ -59,7 +59,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 {
 
   m_Pu = 0;
-  m_FullDebug = 10;
+  m_FullDebug = -10;
   m_FastFormulationMode = QLD;
 
   m_QP_T = 0.1;
