@@ -263,7 +263,7 @@ namespace PatternGeneratorJRL
 	      for (unsigned int i=0;i<70;i++)
 		{
 		  if  (fabs(LocalInput[i]-
-			    ReferenceInput[i])>1e-8)
+			    ReferenceInput[i])>=1e-6)
 		    return false;
 		}
 	    }
