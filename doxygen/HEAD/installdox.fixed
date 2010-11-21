@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-%subst = ( "abstract-robot-dynamics.doxytag", "", "jrl-mal.doxytag", "");
+%subst = ( "abstract-robot-dynamics.doxytag", "", "jrl-mal.doxytag", "", "jrl-dynamics.doxytag", "");
 $quiet   = 0;
 
 if (open(F,"search.cfg"))

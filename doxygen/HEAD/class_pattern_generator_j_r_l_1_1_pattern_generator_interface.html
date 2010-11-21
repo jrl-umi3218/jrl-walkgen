@@ -45,11 +45,11 @@
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#ae6b9c82ded94e2ffab4c4da67dec1ead">PatternGeneratorInterface</a> (<a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="class_cjrl_humanoid_dynamic_robot.html">CjrlHumanoidDynamicRobot</a> *aHDR)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#a04eeb597a6e72b2aee6c403219eaf5e1">PatternGeneratorInterface</a> (CjrlHumanoidDynamicRobot *)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#aad9b7d659484cda7cc50f8b705991da5">~PatternGeneratorInterface</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#af84dc7eaa5182afb707ef526ed1395ae">AddStepInStack</a> (double dx, double dy, double theta)=0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to specify steps in the stack of the walking pattern generator. This method is different AddOnLineStep which is the default step add when there is no policy, or no step available.  <a href="#af84dc7eaa5182afb707ef526ed1395ae"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#aba560c08aece94fb1d09a7f830fcb00f">CommonInitializationOfWalking</a> (<a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_state__s.html">COMState</a> &amp;lStartingCOMState, MAL_S3_VECTOR(, double)&amp;lStartingZMPPosition, MAL_VECTOR(&amp;, double) BodyAnglesIni, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;InitLeftFootAbsPos, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;InitRightFootAbsPos, std::deque&lt; <a class="el" href="struct_pattern_generator_j_r_l_1_1_relative_foot_position__s.html">RelativeFootPosition</a> &gt; &amp;lRelativeFootPositions, std::vector&lt; double &gt; &amp;lCurrentJointValues, bool ClearStepStackHandler)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#a4be831fc9105361a9476cfa8b4fac28f">CommonInitializationOfWalking</a> (<a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_state__s.html">COMState</a> &amp;lStartingCOMState, MAL_S3_VECTOR_TYPE(double)&amp;lStartingZMPPosition, MAL_VECTOR(&amp;, double) BodyAnglesIni, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;InitLeftFootAbsPos, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;InitRightFootAbsPos, std::deque&lt; <a class="el" href="struct_pattern_generator_j_r_l_1_1_relative_foot_position__s.html">RelativeFootPosition</a> &gt; &amp;lRelativeFootPositions, std::vector&lt; double &gt; &amp;lCurrentJointValues, bool ClearStepStackHandler)=0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#a25ddcdc020cf8a71acb0e89d1a79ff14">SetCurrentJointValues</a> (MAL_VECTOR(&amp;lCurrentJointValues, double))=0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#a087428fd1c299438ce1890dd870b6744">GetWalkMode</a> ()=0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the walking mode.  <a href="#a087428fd1c299438ce1890dd870b6744"></a><br/></td></tr>
@@ -61,19 +61,19 @@ Public Member Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the initial ZMP reference point.  <a href="#a07229869e12172af1ea9071206b1dd16"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#a6a9b0e0135455123ded5195a42d7df5f">getZMPInitialPoint</a> (MAL_S3_VECTOR(&amp;, double) lZMPInitialPoint)=0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the initial ZMP reference point.  <a href="#a6a9b0e0135455123ded5195a42d7df5f"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#ac3ad2a227d1bc5d26ec942a10d53d667">EvaluateStartingState</a> (<a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_state__s.html">COMState</a> &amp;lStartingCOMState, MAL_S3_VECTOR(, double)&amp;lStartingZMPPosition, MAL_VECTOR(, double)&amp;lStartingWaistPose, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;InitLeftFootAbsPos, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;InitRightFootAbsPos)=0</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the ZMP, CoM, left foot absolute position, and right foot absolute position for the initiale pose.  <a href="#ac3ad2a227d1bc5d26ec942a10d53d667"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#ae024dc4932de801dc1f5263c2ec9cfa1">EvaluateStartingState</a> (<a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_state__s.html">COMState</a> &amp;lStartingCOMState, MAL_S3_VECTOR_TYPE(double)&amp;lStartingZMPPosition, MAL_VECTOR_TYPE(double)&amp;lStartingWaistPose, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;InitLeftFootAbsPos, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;InitRightFootAbsPos)=0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the ZMP, CoM, left foot absolute position, and right foot absolute position for the initiale pose.  <a href="#ae024dc4932de801dc1f5263c2ec9cfa1"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#a2ba8b0daac72fce0a86c948c3029b0f8">setVelocityReference</a> (double x, double y, double yaw)=0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set velocity reference This method is only supported by Herdt's algorithm. Currently only a 3D speed is supported:  <a href="#a2ba8b0daac72fce0a86c948c3029b0f8"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#a52d6d2209372ab6b3208e33533d9d9d7">setCoMPerturbationForce</a> (double x, double y)=0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set velocity reference.  <a href="#a52d6d2209372ab6b3208e33533d9d9d7"></a><br/></td></tr>
 <tr><td colspan="2"><div class="groupHeader">Methods for the control part.</div></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#a21d926cb08dacc6ac7d9a7823260b74a">RunOneStepOfTheControlLoop</a> (MAL_VECTOR(, double)&amp;CurrentConfiguration, MAL_VECTOR(, double)&amp;CurrentVelocity, MAL_VECTOR(, double)&amp;CurrentAcceleration, MAL_VECTOR(, double)&amp;ZMPTarget)=0</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Run One Step of the global control loop aka The Main Method To Be Used.  <a href="#a21d926cb08dacc6ac7d9a7823260b74a"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#ab0af54f85e51cdc14b513523dbd706ff">RunOneStepOfTheControlLoop</a> (MAL_VECTOR(, double)&amp;CurrentConfiguration, MAL_VECTOR(, double)&amp;CurrentVelocity, MAL_VECTOR(, double)&amp;CurrentAcceleration, MAL_VECTOR(, double)&amp;ZMPTarget, <a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_position__s.html">COMPosition</a> &amp;<a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_position__s.html">COMPosition</a>, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;LeftFootPosition, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;RightFootPosition)=0</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Run One Step of the global control loop aka The Main Method To Be Used.  <a href="#ab0af54f85e51cdc14b513523dbd706ff"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#ae3eb8d2501a5f74cfd73edcfb308e8d3">RunOneStepOfTheControlLoop</a> (MAL_VECTOR(, double)&amp;CurrentConfiguration, MAL_VECTOR(, double)&amp;CurrentVelocity, MAL_VECTOR(, double)&amp;CurrentAcceleration, MAL_VECTOR(, double)&amp;ZMPTarget, <a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_state__s.html">COMState</a> &amp;<a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_state__s.html">COMState</a>, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;LeftFootPosition, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;RightFootPosition)=0</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Run One Step of the global control loop aka The Main Method To Be Used.  <a href="#ae3eb8d2501a5f74cfd73edcfb308e8d3"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#abb65c58084fc1fff0207a8f152bf1b64">RunOneStepOfTheControlLoop</a> (MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget)=0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Run One Step of the global control loop aka The Main Method To Be Used.  <a href="#abb65c58084fc1fff0207a8f152bf1b64"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#ad71cd45c61eeec9f87d363d141755651">RunOneStepOfTheControlLoop</a> (MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget, <a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_position__s.html">COMPosition</a> &amp;<a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_position__s.html">COMPosition</a>, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;LeftFootPosition, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;RightFootPosition)=0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Run One Step of the global control loop aka The Main Method To Be Used.  <a href="#ad71cd45c61eeec9f87d363d141755651"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#a7344dd6df12bbea867e22388d77b019c">RunOneStepOfTheControlLoop</a> (MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget, <a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_state__s.html">COMState</a> &amp;<a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_state__s.html">COMState</a>, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;LeftFootPosition, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;RightFootPosition)=0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Run One Step of the global control loop aka The Main Method To Be Used.  <a href="#a7344dd6df12bbea867e22388d77b019c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#a880c9c046b926382a904172e8d9b6ac9">RunOneStepOfTheControlLoop</a> (<a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;LeftFootPosition, <a class="el" href="struct_pattern_generator_j_r_l_1_1_foot_absolute_position__t.html">FootAbsolutePosition</a> &amp;RightFootPosition, <a class="el" href="struct_pattern_generator_j_r_l_1_1_z_m_p_position__s.html">ZMPPosition</a> &amp;ZMPRefPos, <a class="el" href="struct_pattern_generator_j_r_l_1_1_c_o_m_position__s.html">COMPosition</a> &amp;COMRefPos)=0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Run One Step of the global control loop aka The Main Method To Be Used.  <a href="#a880c9c046b926382a904172e8d9b6ac9"></a><br/></td></tr>
 <tr><td colspan="2"><div class="groupHeader">On-line steps related methods</div></td></tr>
@@ -107,15 +107,15 @@ Public Member Functions</h2></td></tr>
 <p>In addition to the classical setter and getter for various parameters there is the possibility to pass commands a string of stream to the method <em><a class="el" href="class_pattern_generator_j_r_l_1_1_pattern_generator_interface.html#a1271409b40b19f86db2b35d75a2eeb01" title="Parse a command (to be used out of a plugin) and call all objects which registered the method...">ParseCmd()</a></em>.</p>
 <p>There is a set of functionnalities directly supported by the API: </p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ae6b9c82ded94e2ffab4c4da67dec1ead"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::PatternGeneratorInterface" ref="ae6b9c82ded94e2ffab4c4da67dec1ead" args="(CjrlHumanoidDynamicRobot *aHDR)" -->
+<a class="anchor" id="a04eeb597a6e72b2aee6c403219eaf5e1"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::PatternGeneratorInterface" ref="a04eeb597a6e72b2aee6c403219eaf5e1" args="(CjrlHumanoidDynamicRobot *)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">PatternGeneratorJRL::PatternGeneratorInterface::PatternGeneratorInterface </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="class_cjrl_humanoid_dynamic_robot.html">CjrlHumanoidDynamicRobot</a> *&#160;</td>
-          <td class="paramname"> <em>aHDR</em>&#160;)</td>
+          <td class="paramtype">CjrlHumanoidDynamicRobot *&#160;</td>
+          <td class="paramname">&#160;)</td>
           <td><code> [inline]</code></td>
         </tr>
       </table>
@@ -299,7 +299,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aba560c08aece94fb1d09a7f830fcb00f"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::CommonInitializationOfWalking" ref="aba560c08aece94fb1d09a7f830fcb00f" args="(COMState &amp;lStartingCOMState, MAL_S3_VECTOR(, double)&amp;lStartingZMPPosition, MAL_VECTOR(&amp;, double) BodyAnglesIni, FootAbsolutePosition &amp;InitLeftFootAbsPos, FootAbsolutePosition &amp;InitRightFootAbsPos, std::deque&lt; RelativeFootPosition &gt; &amp;lRelativeFootPositions, std::vector&lt; double &gt; &amp;lCurrentJointValues, bool ClearStepStackHandler)=0" -->
+<a class="anchor" id="a4be831fc9105361a9476cfa8b4fac28f"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::CommonInitializationOfWalking" ref="a4be831fc9105361a9476cfa8b4fac28f" args="(COMState &amp;lStartingCOMState, MAL_S3_VECTOR_TYPE(double)&amp;lStartingZMPPosition, MAL_VECTOR(&amp;, double) BodyAnglesIni, FootAbsolutePosition &amp;InitLeftFootAbsPos, FootAbsolutePosition &amp;InitRightFootAbsPos, std::deque&lt; RelativeFootPosition &gt; &amp;lRelativeFootPositions, std::vector&lt; double &gt; &amp;lCurrentJointValues, bool ClearStepStackHandler)=0" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -312,7 +312,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_S3_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_S3_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>lStartingZMPPosition</em>, </td>
         </tr>
         <tr>
@@ -376,7 +376,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ac3ad2a227d1bc5d26ec942a10d53d667"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::EvaluateStartingState" ref="ac3ad2a227d1bc5d26ec942a10d53d667" args="(COMState &amp;lStartingCOMState, MAL_S3_VECTOR(, double)&amp;lStartingZMPPosition, MAL_VECTOR(, double)&amp;lStartingWaistPose, FootAbsolutePosition &amp;InitLeftFootAbsPos, FootAbsolutePosition &amp;InitRightFootAbsPos)=0" -->
+<a class="anchor" id="ae024dc4932de801dc1f5263c2ec9cfa1"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::EvaluateStartingState" ref="ae024dc4932de801dc1f5263c2ec9cfa1" args="(COMState &amp;lStartingCOMState, MAL_S3_VECTOR_TYPE(double)&amp;lStartingZMPPosition, MAL_VECTOR_TYPE(double)&amp;lStartingWaistPose, FootAbsolutePosition &amp;InitLeftFootAbsPos, FootAbsolutePosition &amp;InitRightFootAbsPos)=0" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -389,13 +389,13 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_S3_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_S3_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>lStartingZMPPosition</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>lStartingWaistPose</em>, </td>
         </tr>
         <tr>
@@ -610,32 +610,32 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab0af54f85e51cdc14b513523dbd706ff"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop" ref="ab0af54f85e51cdc14b513523dbd706ff" args="(MAL_VECTOR(, double)&amp;CurrentConfiguration, MAL_VECTOR(, double)&amp;CurrentVelocity, MAL_VECTOR(, double)&amp;CurrentAcceleration, MAL_VECTOR(, double)&amp;ZMPTarget, COMPosition &amp;COMPosition, FootAbsolutePosition &amp;LeftFootPosition, FootAbsolutePosition &amp;RightFootPosition)=0" -->
+<a class="anchor" id="ad71cd45c61eeec9f87d363d141755651"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop" ref="ad71cd45c61eeec9f87d363d141755651" args="(MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget, COMPosition &amp;COMPosition, FootAbsolutePosition &amp;LeftFootPosition, FootAbsolutePosition &amp;RightFootPosition)=0" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">virtual bool PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop </td>
           <td>(</td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>CurrentConfiguration</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>CurrentVelocity</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>CurrentAcceleration</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>ZMPTarget</em>, </td>
         </tr>
         <tr>
@@ -682,32 +682,32 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ae3eb8d2501a5f74cfd73edcfb308e8d3"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop" ref="ae3eb8d2501a5f74cfd73edcfb308e8d3" args="(MAL_VECTOR(, double)&amp;CurrentConfiguration, MAL_VECTOR(, double)&amp;CurrentVelocity, MAL_VECTOR(, double)&amp;CurrentAcceleration, MAL_VECTOR(, double)&amp;ZMPTarget, COMState &amp;COMState, FootAbsolutePosition &amp;LeftFootPosition, FootAbsolutePosition &amp;RightFootPosition)=0" -->
+<a class="anchor" id="a7344dd6df12bbea867e22388d77b019c"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop" ref="a7344dd6df12bbea867e22388d77b019c" args="(MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget, COMState &amp;COMState, FootAbsolutePosition &amp;LeftFootPosition, FootAbsolutePosition &amp;RightFootPosition)=0" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">virtual bool PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop </td>
           <td>(</td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>CurrentConfiguration</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>CurrentVelocity</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>CurrentAcceleration</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>ZMPTarget</em>, </td>
         </tr>
         <tr>
@@ -754,32 +754,32 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a21d926cb08dacc6ac7d9a7823260b74a"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop" ref="a21d926cb08dacc6ac7d9a7823260b74a" args="(MAL_VECTOR(, double)&amp;CurrentConfiguration, MAL_VECTOR(, double)&amp;CurrentVelocity, MAL_VECTOR(, double)&amp;CurrentAcceleration, MAL_VECTOR(, double)&amp;ZMPTarget)=0" -->
+<a class="anchor" id="abb65c58084fc1fff0207a8f152bf1b64"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop" ref="abb65c58084fc1fff0207a8f152bf1b64" args="(MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget)=0" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">virtual bool PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop </td>
           <td>(</td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>CurrentConfiguration</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>CurrentVelocity</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>CurrentAcceleration</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">MAL_VECTOR(, double)&amp;&#160;</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&#160;</td>
           <td class="paramname"> <em>ZMPTarget</em>&#160;</td>
         </tr>
         <tr>
