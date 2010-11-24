@@ -1,3 +1,21 @@
 <map id="G" name="G">
-<area shape="rect" href="$pgtypes_8hh.html" title="jrl/walkgen/pgtypes.hh" alt="" coords="480,84,643,111"/>
+<area shape="rect" href="abstract&#45;robot&#45;dynamics.doxytag$humanoid&#45;dynamic&#45;robot_8hh.html" title="abstract&#45;robot&#45;dynamics/humanoid&#45;dynamic&#45;robot.hh" alt="" coords="773,84,1139,111"/>
+<area shape="rect" href="$pgtypes_8hh.html" title="jrl/walkgen/pgtypes.hh" alt="" coords="1608,84,1771,111"/>
+<area shape="rect" href="abstract&#45;robot&#45;dynamics.doxytag$fwd_8hh.html" title="abstract&#45;robot&#45;dynamics/fwd.hh" alt="" coords="604,394,828,420"/>
+<area shape="rect" href="abstract&#45;robot&#45;dynamics.doxytag$dynamic&#45;robot_8hh.html" title="abstract&#45;robot&#45;dynamics/dynamic&#45;robot.hh" alt="" coords="519,162,815,188"/>
+<area shape="rect" href="abstract&#45;robot&#45;dynamics.doxytag$hand_8hh.html" title="abstract&#45;robot&#45;dynamics/hand.hh" alt="" coords="839,162,1073,188"/>
+<area shape="rect" href="abstract&#45;robot&#45;dynamics.doxytag$foot_8hh.html" title="abstract&#45;robot&#45;dynamics/foot.hh" alt="" coords="268,162,495,188"/>
+<area shape="rect" href="abstract&#45;robot&#45;dynamics.doxytag$joint_8hh.html" title="abstract&#45;robot&#45;dynamics/joint.hh" alt="" coords="461,239,691,266"/>
+<area shape="rect" href="abstract&#45;robot&#45;dynamics.doxytag$rigid&#45;acceleration_8hh.html" title="abstract&#45;robot&#45;dynamics/rigid&#45;acceleration.hh" alt="" coords="100,316,412,343"/>
+<area shape="rect" href="abstract&#45;robot&#45;dynamics.doxytag$rigid&#45;velocity_8hh.html" title="abstract&#45;robot&#45;dynamics/rigid&#45;velocity.hh" alt="" coords="436,316,716,343"/>
+<area shape="rect" href="abstract&#45;robot&#45;dynamics.doxytag$body_8hh.html" title="abstract&#45;robot&#45;dynamics/body.hh" alt="" coords="740,316,972,343"/>
+<area shape="rect" href="jrl&#45;mal.doxytag$matrixabstractlayer_8hh.html" title="jrl/mal/matrixabstractlayer.hh" alt="" coords="2031,162,2239,188"/>
+<area shape="rect" href="jrl&#45;mal.doxytag$matrixabstractlayerdoc_8hh.html" title="jrl/mal/matrixabstractlayerdoc.hh" alt="" coords="1489,239,1721,266"/>
+<area shape="rect" href="jrl&#45;mal.doxytag$matrixabstractlayersmall_8hh.html" title="jrl/mal/matrixabstractlayersmall.hh" alt="" coords="1745,239,1988,266"/>
+<area shape="rect" href="jrl&#45;mal.doxytag$matrixabstractlayerboost_8hh.html" title="jrl/mal/matrixabstractlayerboost.hh" alt="" coords="2092,316,2337,343"/>
+<area shape="rect" href="jrl&#45;mal.doxytag$matrixabstractlayervector3jrlmath_8hh.html" title="jrl/mal/matrixabstractlayervector3jrlmath.hh" alt="" coords="2332,239,2633,266"/>
+<area shape="rect" href="jrl&#45;mal.doxytag$matrixabstractlayervector4jrlmath_8hh.html" title="jrl/mal/matrixabstractlayervector4jrlmath.hh" alt="" coords="2657,239,2959,266"/>
+<area shape="rect" href="jrl&#45;mal.doxytag$matrixabstractlayermatrix3x3jrlmath_8hh.html" title="jrl/mal/matrixabstractlayermatrix3x3jrlmath.hh" alt="" coords="2983,239,3300,266"/>
+<area shape="rect" href="jrl&#45;mal.doxytag$matrixabstractlayermatrix4x4jrlmath_8hh.html" title="jrl/mal/matrixabstractlayermatrix4x4jrlmath.hh" alt="" coords="1148,239,1465,266"/>
+<area shape="rect" href="jrl&#45;mal.doxytag$matrixabstractlayercheck_8hh.html" title="jrl/mal/matrixabstractlayercheck.hh" alt="" coords="2012,239,2257,266"/>
 </map>
