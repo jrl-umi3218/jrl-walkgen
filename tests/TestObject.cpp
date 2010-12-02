@@ -31,6 +31,13 @@
 
 using namespace std;
 
+#ifdef WIN32
+double trunc (double x)
+{
+  return x < 0 ? ceil (x) : 0 < x ? floor (x) : x;
+}
+#endif /* WIN32 */
+
 namespace PatternGeneratorJRL
 {
   namespace TestSuite
