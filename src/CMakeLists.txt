@@ -56,7 +56,7 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp
   ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.cpp
-  ZMPRefTrajectoryGeneration/problem-vel-ref.cpp
+  ZMPRefTrajectoryGeneration/qp-problem.cpp
   MotionGeneration/StepOverPlanner.cpp
   MotionGeneration/CollisionDetector.cpp
   MotionGeneration/WaistHeightVariation.cpp
