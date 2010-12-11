@@ -42,7 +42,7 @@ using namespace PatternGeneratorJRL;
 
 QPProblem_s::QPProblem_s():
   m(0),me(0),mmax(0), n(0), nmax(0), mnn(0),
-  Q(0),D(0),DU(0),DS(0),XL(0),X(0),XU(0), NewX(0),
+  Q(0),D(0),DU(0),DS(0),XL(0),XU(0),X(0),NewX(0),
   U(0),war(0), iwar(0),
   iout(0),ifail(0), iprint(0),
   lwar(0), liwar(0),
