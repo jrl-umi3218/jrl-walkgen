@@ -41,7 +41,7 @@
 #include <PreviewControl/SupportFSM.h>
 #include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
-#include <ZMPRefTrajectoryGeneration/problem-vel-ref.hh>
+#include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -257,7 +257,7 @@ namespace PatternGeneratorJRL
     deque<double> m_PreviewedSupportAngles;
 
     //Final optimization problem
-    Problem m_Pb;
+    QPProblem m_Pb;
 
     SupportState_t m_CurrentSupport, m_PrwSupport;
 
