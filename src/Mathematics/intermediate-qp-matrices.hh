@@ -31,6 +31,7 @@
 //# include <boost/numeric/ublas/matrix.hpp>
 //# include <boost/numeric/ublas/vector.hpp>
 #include <jrl/mal/matrixabstractlayer.hh>
+
 #include <privatepgtypes.h>
 
 
@@ -41,13 +42,44 @@ namespace PatternGeneratorJRL
   class  IntermedQPMat
   {
     //
-    //Public constants
+    //Public types
     //
   public:
     const static int MEAN_VELOCITY = 0;
     const static int INSTANT_VELOCITY = 1;
-    const static int FOOT_CENTERING = 2;
+    const static int COP_CENTERING = 2;
     const static int JERK = 3;
+
+
+    /// \name Standardized least square elements
+    /// \{
+    /// \brief Standard form: \f$ Q = \alpha M1^{\top}M2, p = \alpha U^{\top}(S*c-ref) \f$
+    struct standard_ls_form_s
+    {
+      double weight;
+      /// \brief Matrix of the quadratic part
+      MAL_MATRIX(U,double);
+      MAL_MATRIX(UT,double);
+      MAL_MATRIX(V,double);
+      MAL_MATRIX(VT,double);
+
+      /// \brief Reference
+      MAL_VECTOR(Sc_x,double);
+      MAL_VECTOR(Sc_y,double);
+
+      /// \brief Reference
+      MAL_VECTOR(ref_x,double);
+      MAL_VECTOR(ref_y,double);
+
+      /// \brief Final products (the ones that are added to the final QP)
+      MAL_MATRIX(weightM1TM2,double);
+      MAL_VECTOR(weightM1TV1,double);
+
+      /// \brief Number of previewed steps
+      int nSt;
+    };
+    typedef standard_ls_form_s standard_ls_form_t;
+    /// \}
 
     //
     //Public methods
@@ -59,69 +91,74 @@ namespace PatternGeneratorJRL
     ~IntermedQPMat();
     /// \}
 
-    /// \brief Get matrices corresponding to the desired Least Squares term
-    void getLSTerm(ObjectiveTerm_t LST, int ObjectiveType);
-	
-    //
-    //Private methods
-    //
-  private:
-
-    /// \brief \f$ M1 = \alpha M2^{\top}M3 \f$
-    void weightedTransProd(MAL_MATRIX (&M1, double), double alpha, MAL_MATRIX (&M2, double), MAL_MATRIX (&M3, double));
-	  
-    /// \brief \f$ M1 = \alpa M2^{\top}V \f$
-    void weightedTransProd(MAL_MATRIX (&M1, double), double alpha, MAL_MATRIX (&M2, double), MAL_VECTOR (&V, double));  
-	  
-    /// \brief \f$ M1 = \alpa M2^{\top}M3V \f$
-    void weightedTransProd(MAL_MATRIX (&M1, double), double alpha, MAL_VECTOR (&M2, double), MAL_VECTOR (&M3, double), MAL_VECTOR (&V, double));    
-	  
+    /// \brief Get matrices in the standard Least Squares form:
+    /// \f$ Q = \alpha U^{\top}U, p = \alpha U^{\top}(S*c-ref) \f$
+    void getTermMatrices(standard_ls_form_t & TMat, int ObjectiveType);
 	  
     //
     //Private members
     //
   private:
 
-	  
-    /// \brief Current state of the point mass model.
-    MAL_VECTOR(m_xk,double);
-	  
-    /// \brief Matrix relating the command and the CoM position.
-    MAL_MATRIX(m_Up,double);
+    /// \name Least square objective's dependent elements
+    /// \{
+    struct invariant_objective_part_s
+    {
+      double weight;
+      /// \brief Matrix of the quadratic part
+      MAL_MATRIX(U,double);
+      MAL_MATRIX(UT,double);
 
-    /// \brief Matrix relating the command and the ZMP position.
-    MAL_MATRIX(m_Uz,double);
+      /// \brief Matrix of the linear part
+      MAL_MATRIX(S,double);
+    };
+    typedef invariant_objective_part_s invariant_objective_part_t;
+    /// \}
+    invariant_objective_part_t
+      m_MeanVelocity,
+      m_InstantVelocity,
+      m_COPCentering,
+      m_Jerk;
 
-    /// \brief Matrix relating the command and the CoM speed.
-    MAL_MATRIX(m_Uv,double);
+    /// \name QP elements that are objective independent
+    /// \{
+    struct variant_objective_part_s
+    {
+      /// reference values for the whole preview window
+      MAL_VECTOR(RefX,double);
+      MAL_VECTOR(RefY,double);
+      MAL_VECTOR(RefTheta,double);
 
-    /// \brief Matrix relating the CoM state and the CoM position.
-    MAL_MATRIX(m_Sp,double);
+      /// \brief State of the Center of Mass
+      MAL_VECTOR(CoMX,double);
+      MAL_VECTOR(CoMY,double);
+      MAL_VECTOR(CoMZ,double);
 
-    /// \brief Matrix relating the CoM state and the ZMP position.
-    MAL_MATRIX(m_Sz,double);
+      /// \brief Selection matrix for the previewed and current feet positions.
+      MAL_MATRIX(V,double);
+      MAL_MATRIX(VT,double);
+      MAL_VECTOR(Vc,double);
 
-    /// \brief Matrix relating the CoM state and the CoM speed.
-    MAL_MATRIX(m_Sv,double);
+      /// \brief Current support foot position
+      double fx, fy;
 
-    /// \brief Selection matrix for the previewed feet positions.
-    MAL_MATRIX(m_U,double);
+      /// \brief Number of free steps in the preview window
+      int NbStepsPrw;
+      /// \}
+    };
+    typedef variant_objective_part_s variant_objective_part_t;
+    /// \}
+    variant_objective_part_t m_StateMatrices;
 
-    /// \brief Selection matrix for the support feet.
-    MAL_VECTOR(m_Uc,double);
 
-    /// \brief Cholesky decomposition of the initial objective function $Q$ 
+    /// \brief Cholesky decomposition of the initial objective function $Q$
     MAL_MATRIX(m_LQ,double);
-
-    /// \brief Cholesky decomposition of the initial objective function $Q$ 
+    /// \brief Cholesky decomposition of the initial objective function $Q$
     MAL_MATRIX(m_iLQ,double);
-
-    /// \brief Constant part of the constraint matrices. 
+    /// \brief Constant part of the constraint matrices.
     MAL_MATRIX(m_iDu,double);
-	  
     /// \brief Constant part of the constraint matrices.
     MAL_MATRIX(m_Ds,double);
-
     /// \brief Sub matrices to compute the linear part of the objective function $p^{\top}_k$.
     MAL_MATRIX(m_OptA,double);
     MAL_MATRIX(m_OptB,double);
@@ -132,7 +169,7 @@ namespace PatternGeneratorJRL
     enum MatrixType  { M_UP, M_UZ, M_UV, M_SP,
 		       M_SZ, M_SV, M_U,
 		       M_LQ, M_ILQ};
-    enum VectorType  { m_UC,M_OPTA, M_OPTB, M_OPTC, M_OPTD };
+    enum VectorType  { M_UC,M_OPTA, M_OPTB, M_OPTC, M_OPTD };
 
 
   };
