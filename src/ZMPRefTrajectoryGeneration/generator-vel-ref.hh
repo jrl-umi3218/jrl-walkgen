@@ -122,7 +122,7 @@ namespace PatternGeneratorJRL
     /// \brief Compute the objective matrices of a quadratic optimization problem
     ///
     /// \param Pb
-    void computeObjective(QPProblem & Pb, IntermedQPMat & QPMat, std::deque<SupportState_t> PrwSupStates);
+    void updateObjective(QPProblem & Pb, IntermedQPMat & QPMatrices, std::deque<SupportState_t> PrwSupStates);
 
     /// \brief Infitialize constant parts of the objective
     /// \return A negative value in case of a problem 0 otherwise.
@@ -141,7 +141,6 @@ namespace PatternGeneratorJRL
     /// \param 2DLIPM
     void setCoMPerturbationForce(std::istringstream & strm,
 				 LinearizedInvertedPendulum2D & CoM);
-	  
 
     //
     //Private methods
@@ -149,8 +148,15 @@ namespace PatternGeneratorJRL
   private:
 
     /// \brief Compute the Least Squares objective term and add it to the optimization problem
-    void addLeastSquaresTerm(ObjectiveTerm_t & type, QPProblem & Pb, int NbSt);
-	  
+    void updateLSObjTerm(IntermedQPMat & QPMatrices, double * Q, double * p,
+        IntermedQPMat::standard_ls_form_t LSMat, int ObjectiveType);
+
+    /// \brief Add the computed matrix to the final optimization problem in array form
+    void addTerm(MAL_MATRIX (&Mat, double), double * QPMat, int row, int col, int nrows, int ncols);
+
+    /// \brief Add the computed vector to the final optimization problem in array form
+    void addTerm(MAL_VECTOR (&Vec, double), double * QPVec, int index, int nelem);
+
     /// \brief Build the constant part of the constraint matrices.
     int buildConstantPartOfConstraintMatrices();
 
@@ -168,7 +174,13 @@ namespace PatternGeneratorJRL
     ///  PreviewControl link.
     int initializeMatrixPbConstants();
 	  
-	  
+    void updateMatrices(IntermedQPMat & QPMatrices,
+        const LinearizedInvertedPendulum2D & CoM,
+        const std::deque<SupportState_t> PrwSupportStates,
+        const ReferenceAbsoluteVelocity_t & RefVel,
+        const COMState & Trunk,
+        const std::deque<SupportFeet_t> & QueueOfSupportFeet);
+
     /// \name Debugging related methods
     /// @{
     /// \brief Dump the instance of the quadratic problem for one iteration. */
@@ -181,18 +193,26 @@ namespace PatternGeneratorJRL
     //Private members
     //
   private:
+
+    const static int MEAN_VELOCITY = 0;
+    const static int INSTANT_VELOCITY = 1;
+    const static int COP_CENTERING = 2;
+    const static int JERK = 3;
 	  
-    /// \brief Current and previewed support states. 
+    /// \brief The current and the previewed support state.
     SupportState_t m_CurrentSupport, m_PrwSupport;
+
+    /// \brief Future support states
+    std::deque<SupportState_t> m_PrwSupStates;
 	  
     /// \brief Current state of the trunk and the trunk state after m_QP_T
     COMState m_TrunkState, m_TrunkStateT;
 	  
-    /// Velocity reference (constant)
+    /// \brief Velocity reference (constant)
     ReferenceAbsoluteVelocity m_RefVel;
 	  
-    std::deque<LinearConstraintInequalityFreeFeet_t> m_ConstraintInequalitiesDeque;
-    std::deque<LinearConstraintInequalityFreeFeet_t> m_FeetPosInequalitiesDeque;
+    /// \brief Inequality constraints
+    std::deque<LinearConstraintInequalityFreeFeet_t> m_LinearInequalities;
 	  
     /// \brief History of support states
     std::deque<SupportFeet_t> m_SupportFeetDeque;
@@ -223,22 +243,7 @@ namespace PatternGeneratorJRL
 
 
     /// \name Variables related to the QP
-    /// @{ 
-	  
-    /// \name Weights on objective functions
-    /// @{ 
-    /// \brief Weight on the instant-velocity term in the objective
-    double m_Beta;
-	  
-    /// \brief Weight on the jerk term in the objective.
-    double m_Alpha;
-	  
-    /// \brief Weight on the ZMP term in the objective.
-    double m_Gamma;
-	  
-    /// \brief Weight on the average-velocity term in the objective
-    double m_Delta;
-    /// @}
+    /// @{
 	  
     /// \brief Sampling of the QP. 
     double m_QP_T;
