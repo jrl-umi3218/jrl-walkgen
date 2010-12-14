@@ -323,9 +323,9 @@ void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVe
   if(CurrentSupport.Phase!=0)
     {
       //Verify change in velocity against the maximal acceleration
-      if(fabs(Ref.dYaw-TrunkState.yaw[1]) > 2.0/3.0*m_T*m_uaLimitHipYaw)
+      if(fabs(Ref.yaw-TrunkState.yaw[1]) > 2.0/3.0*m_T*m_uaLimitHipYaw)
 	{
-	  double signRotAccTrunk = (Ref.dYaw-TrunkState.yaw[1] < 0.0)?-1.0:1.0;
+	  double signRotAccTrunk = (Ref.yaw-TrunkState.yaw[1] < 0.0)?-1.0:1.0;
 	  TrunkStateT.yaw[1] = TrunkState.yaw[1] + signRotAccTrunk * 2.0/3.0*m_T* m_uaLimitHipYaw;
 
 
@@ -334,7 +334,7 @@ void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVe
 	      ofstream aof;
 	      aof.open("/tmp/verifyAccelerationOfHipJoint.dat",ofstream::app);
 	      aof<<" TrunkStateT.yaw[1]: "<<TrunkStateT.yaw[1] <<" "
-		 <<" Ref.dYaw: "<<Ref.dYaw <<" "
+		 <<" Ref.yaw: "<<Ref.yaw <<" "
 		 <<" m_signRotAccTrunk: "<<m_signRotAccTrunk <<" "
 		 <<" 2.0/3.0*m_T* m_uaLimitHipYaw: "<<2.0/3.0*m_T* m_uaLimitHipYaw <<" "
 		 <<endl;
@@ -342,7 +342,7 @@ void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVe
 	    }
 	}
       else
-	TrunkStateT.yaw[1] = Ref.dYaw;
+	TrunkStateT.yaw[1] = Ref.yaw;
 
     }
   else//No rotations in a double support phase
