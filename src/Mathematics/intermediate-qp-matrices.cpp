@@ -49,42 +49,53 @@ IntermedQPMat::~IntermedQPMat()
 void 
 IntermedQPMat::getTermMatrices(standard_ls_form_t & TMat, int ObjectiveType)
 {
-
   TMat.nSt = m_StateMatrices.NbStepsPrw;
 
   switch(ObjectiveType)
-  {
-  case MEAN_VELOCITY:
-    TMat.U = m_MeanVelocity.U;
-    TMat.UT = m_MeanVelocity.UT;
-    TMat.Sc_x = MAL_RET_A_by_B(m_MeanVelocity.S,m_StateMatrices.RefX);
-    TMat.weight = m_MeanVelocity.weight;
-    TMat.ref_x = m_StateMatrices.RefX;
-    TMat.ref_y = m_StateMatrices.RefY;
-  case INSTANT_VELOCITY:
-    TMat.U = m_InstantVelocity.U;
-    TMat.UT = m_InstantVelocity.UT;
-    TMat.Sc_x = MAL_RET_A_by_B(m_InstantVelocity.S,m_StateMatrices.RefX);
-    TMat.weight = m_InstantVelocity.weight;
-    TMat.ref_x = m_StateMatrices.RefX;
-    TMat.ref_y = m_StateMatrices.RefY;
-  case COP_CENTERING:
-    TMat.U = m_COPCentering.U;
-    TMat.UT = m_COPCentering.UT;
-    TMat.V = m_StateMatrices.V;
-    TMat.VT = m_StateMatrices.VT;
-    TMat.Sc_x = MAL_RET_A_by_B(m_COPCentering.S,m_StateMatrices.RefX);
-    TMat.weight = m_COPCentering.weight;
-    TMat.ref_x = m_StateMatrices.Vc*m_StateMatrices.fx;
-    TMat.ref_y = m_StateMatrices.Vc*m_StateMatrices.fy;
-  case JERK:
-    TMat.U = m_Jerk.U;
-    TMat.UT = m_Jerk.UT;
-    TMat.Sc_x = MAL_RET_A_by_B(m_Jerk.S,m_StateMatrices.RefX);
-    TMat.weight = m_Jerk.weight;
-    TMat.ref_x = 0.0*m_StateMatrices.RefX;
-    TMat.ref_y = 0.0*m_StateMatrices.RefY;
-  }
+    {
+    case MEAN_VELOCITY:
+      TMat.U = m_MeanVelocity.U;
+      TMat.UT = m_MeanVelocity.UT;
+      TMat.Sc_x = MAL_RET_A_by_B(m_MeanVelocity.S,m_StateMatrices.CoM.x);
+      TMat.Sc_x = MAL_RET_A_by_B(m_MeanVelocity.S,m_StateMatrices.CoM.y);
+      TMat.weight = m_MeanVelocity.weight;
+      TMat.ref_x = m_StateMatrices.RefX;
+      TMat.ref_y = m_StateMatrices.RefY;
+    case INSTANT_VELOCITY:
+      TMat.U = m_InstantVelocity.U;
+      TMat.UT = m_InstantVelocity.UT;
+      TMat.Sc_x = MAL_RET_A_by_B(m_InstantVelocity.S,m_StateMatrices.CoM.x);
+      TMat.Sc_y = MAL_RET_A_by_B(m_InstantVelocity.S,m_StateMatrices.CoM.y);
+      TMat.weight = m_InstantVelocity.weight;
+      TMat.ref_x = m_StateMatrices.RefX;
+      TMat.ref_y = m_StateMatrices.RefY;
+    case COP_CENTERING:
+      TMat.U = m_COPCentering.U;
+      TMat.UT = m_COPCentering.UT;
+      TMat.V = m_StateMatrices.V;
+      TMat.VT = m_StateMatrices.VT;
+      TMat.Sc_x = MAL_RET_A_by_B(m_COPCentering.S,m_StateMatrices.CoM.x);
+      TMat.Sc_x = MAL_RET_A_by_B(m_COPCentering.S,m_StateMatrices.CoM.y);
+      TMat.weight = m_COPCentering.weight;
+      TMat.ref_x = m_StateMatrices.Vc*m_StateMatrices.fx;
+      TMat.ref_y = m_StateMatrices.Vc*m_StateMatrices.fy;
+    case JERK:
+      TMat.U = m_Jerk.U;
+      TMat.UT = m_Jerk.UT;
+      TMat.Sc_x = MAL_RET_A_by_B(m_Jerk.S,m_StateMatrices.CoM.x);
+      TMat.Sc_x = MAL_RET_A_by_B(m_Jerk.S,m_StateMatrices.CoM.y);
+      TMat.weight = m_Jerk.weight;
+      TMat.ref_x = 0.0*m_StateMatrices.RefX;
+      TMat.ref_y = 0.0*m_StateMatrices.RefY;
+    }
 }
 
-	  
+
+com_t IntermedQPMat::operator ()() const
+{
+  return m_StateMatrices.CoM;
+}
+void IntermedQPMat::operator ()( com_t CoM )
+{
+  m_StateMatrices.CoM = CoM;
+}

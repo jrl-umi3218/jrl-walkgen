@@ -50,7 +50,6 @@ namespace PatternGeneratorJRL
     const static int COP_CENTERING = 2;
     const static int JERK = 3;
 
-
     /// \name Standardized least square elements
     /// \{
     /// \brief Standard form: \f$ Q = \alpha M1^{\top}M2, p = \alpha U^{\top}(S*c-ref) \f$
@@ -81,6 +80,7 @@ namespace PatternGeneratorJRL
     typedef standard_ls_form_s standard_ls_form_t;
     /// \}
 
+
     //
     //Public methods
     //
@@ -94,7 +94,12 @@ namespace PatternGeneratorJRL
     /// \brief Get matrices in the standard Least Squares form:
     /// \f$ Q = \alpha U^{\top}U, p = \alpha U^{\top}(S*c-ref) \f$
     void getTermMatrices(standard_ls_form_t & TMat, int ObjectiveType);
-	  
+
+    /// \brief Accessors for the CoM
+    com_t operator ()() const;
+    void operator ()( com_t CoM );
+
+
     //
     //Private members
     //
@@ -115,24 +120,23 @@ namespace PatternGeneratorJRL
     typedef invariant_objective_part_s invariant_objective_part_t;
     /// \}
     invariant_objective_part_t
-      m_MeanVelocity,
+    m_MeanVelocity,
       m_InstantVelocity,
       m_COPCentering,
       m_Jerk;
 
+
     /// \name QP elements that are objective independent
     /// \{
-    struct variant_objective_part_s
+    struct variant_obj_mat_s
     {
-      /// reference values for the whole preview window
+      /// \brief reference values for the whole preview window
       MAL_VECTOR(RefX,double);
       MAL_VECTOR(RefY,double);
       MAL_VECTOR(RefTheta,double);
 
       /// \brief State of the Center of Mass
-      MAL_VECTOR(CoMX,double);
-      MAL_VECTOR(CoMY,double);
-      MAL_VECTOR(CoMZ,double);
+      com_t CoM;
 
       /// \brief Selection matrix for the previewed and current feet positions.
       MAL_MATRIX(V,double);
@@ -146,9 +150,9 @@ namespace PatternGeneratorJRL
       int NbStepsPrw;
       /// \}
     };
-    typedef variant_objective_part_s variant_objective_part_t;
+    typedef variant_obj_mat_s variant_obj_mat_t;
     /// \}
-    variant_objective_part_t m_StateMatrices;
+    variant_obj_mat_t m_StateMatrices;
 
 
     /// \brief Cholesky decomposition of the initial objective function $Q$
