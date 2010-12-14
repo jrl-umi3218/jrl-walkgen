@@ -1,6 +1,7 @@
 /*
  * Copyright 2010,
  *
+ * Andrei Herdt
  * Olivier  Stasse
  *
  * JRL, CNRS/AIST
@@ -28,10 +29,12 @@
 #ifndef _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_
 #define  _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_
 
+#include <jrl/mal/matrixabstractlayer.hh>
+
 namespace PatternGeneratorJRL
 {
 
-  // State of the support
+  // Support state of the robot at a certain point in time
   struct SupportState_s
   {
     int Phase, Foot, StepsLeft, StepNumber;
@@ -39,6 +42,21 @@ namespace PatternGeneratorJRL
     double TimeLimit;
   };
   typedef struct SupportState_s SupportState_t;
+
+  // Support state of the robot at a certain point in time
+  struct com_s
+  {
+    MAL_VECTOR(x,double);
+    MAL_VECTOR(y,double);
+    MAL_VECTOR(z,double);
+
+    struct com_s & operator=(const com_s &aCS);
+
+    void reset();
+
+    com_s();
+  };
+  typedef struct com_s com_t;
 }
 
 #endif /* _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_ */
