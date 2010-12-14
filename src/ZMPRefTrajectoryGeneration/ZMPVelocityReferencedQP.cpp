@@ -76,8 +76,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   /*! Getting the ZMP reference from Kajita's heuristic. */
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
 
-  /*! For simulating the linearized inverted pendulum in 2D. */
-  m_2DLIPM = new LinearizedInvertedPendulum2D();
+//  /*! For simulating the linearized inverted pendulum in 2D. */
+//  m_CoM = new LinearizedInvertedPendulum2D();
 
 
   /*! For computing the stability constraints from the feet positions. */
@@ -117,10 +117,10 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_PLDPSolverHerdt = 0;
 
   /* Initialize  the 2D LIPM */
-  m_2DLIPM->SetSimulationControlPeriod(m_QP_T);
-  m_2DLIPM->SetRobotControlPeriod(m_SamplingPeriod);
-  m_2DLIPM->SetComHeight(m_ComHeight);
-  m_2DLIPM->InitializeSystem();
+  m_CoM.SetSimulationControlPeriod(m_QP_T);
+  m_CoM.SetRobotControlPeriod(m_SamplingPeriod);
+  m_CoM.SetComHeight(m_ComHeight);
+  m_CoM.InitializeSystem();
 
   initFeet();
 
@@ -152,9 +152,6 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
   if (m_ZMPD!=0)
     delete m_ZMPD;
 
-  if (m_2DLIPM!=0)
-    delete m_2DLIPM;
-
   if (m_SupportFSM!=0)
     delete m_SupportFSM;
 
@@ -180,7 +177,7 @@ void ZMPVelocityReferencedQP::setVelReference(istringstream &strm)
 {
   strm >> RefVel.x;
   strm >> RefVel.y;
-  strm >> RefVel.dYaw;
+  strm >> RefVel.yaw;
 }
 
 void ZMPVelocityReferencedQP::setVelReference(double x,
@@ -189,7 +186,7 @@ void ZMPVelocityReferencedQP::setVelReference(double x,
 {
   RefVel.x = x;
   RefVel.y = y;
-  RefVel.dYaw = yaw;
+  RefVel.yaw = yaw;
 }
 
 void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
@@ -971,7 +968,7 @@ void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstrea
   if (Method==":comheight")
     {
       strm >> m_ComHeight;
-      m_2DLIPM->SetComHeight(m_ComHeight);
+      m_CoM.SetComHeight(m_ComHeight);
     }
 
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
@@ -1085,18 +1082,16 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 
     }
 
-  MAL_VECTOR_DIM(xk,double,6);
+  com_t CoM;
 
-  xk[0] = lStartingCOMState.x[0];
-  xk[1] = lStartingCOMState.x[1];
-  xk[2] = lStartingCOMState.x[2];
-  xk[3] = lStartingCOMState.y[0];
-  xk[4] = lStartingCOMState.y[1];
-  xk[5] = lStartingCOMState.y[2];
+  CoM.x[0] = lStartingCOMState.x[0];
+  CoM.x[1] = lStartingCOMState.x[1];
+  CoM.x[2] = lStartingCOMState.x[2];
+  CoM.y[0] = lStartingCOMState.y[0];
+  CoM.y[1] = lStartingCOMState.y[1];
+  CoM.y[2] = lStartingCOMState.y[2];
 
-  m_2DLIPM->setState(xk);
-
-  m_2DLIPM->GetState(xk);
+  m_CoM(CoM);
 
   return 0;
 }
@@ -1676,7 +1671,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 
       // Read the current state of the 2D Linearized Inverted Pendulum.
-      m_2DLIPM->GetState(xk);
+      m_CoM.GetState(xk);
 
 
       //Apply external forces
@@ -1686,7 +1681,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  xk(5) = xk(5)+m_PerturbationAcceleration(5);
 	  m_PerturbationOccured = false;
 	}
-      m_2DLIPM->setState(xk);
+      m_CoM.setState(xk);
 
 
       //TODO : Add a get function to read the state
@@ -1896,11 +1891,11 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	     (int)(m_TimeBuffer/m_SamplingPeriod));
 
 
-      m_2DLIPM->Interpolation(FinalCOMStates,
+      m_CoM.Interpolation(FinalCOMStates,
 			      FinalZMPPositions,
 			      CurrentIndex,
 			      ptX[0],ptX[m_QP_N]);
-      m_2DLIPM->OneIteration(ptX[0],ptX[m_QP_N]);
+      m_CoM.OneIteration(ptX[0],ptX[m_QP_N]);
 
 
       //The robot is supposed to stop always with the feet aligned in the lateral plane.
