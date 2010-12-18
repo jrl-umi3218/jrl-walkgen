@@ -76,4 +76,6 @@ ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
 INSTALL(TARGETS jrl-walkgen DESTINATION lib)
 
+PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen abstract-robot-dynamics)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-mal)
+PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-dynamics)
