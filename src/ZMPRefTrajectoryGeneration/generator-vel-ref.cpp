@@ -52,9 +52,12 @@ GeneratorVelRef::CallMethod(std::string &Method, std::istringstream &strm)
 
 	
 void 
-GeneratorVelRef::setPonderation(double alpha, double beta, double gamma, double delta)
+GeneratorVelRef::setPonderation( IntermedQPMat Matrices, double weight, int aObjectiveType)
 {
-  //TODO:	
+
+  IntermedQPMat::objective_variant_t & Objective = Matrices( aObjectiveType );
+  Objective.weight = weight;
+
 }
 
 
@@ -73,9 +76,61 @@ GeneratorVelRef::setReference(double dx, double dy, double dyaw)
 
 
 void 
-GeneratorVelRef::buildConstantPartOfObjective(QPProblem & Pb)
+GeneratorVelRef::initializeProblem(QPProblem & Pb, IntermedQPMat Matrices)
 {
-  //TODO:
+
+  IntermedQPMat::objective_variant_t InstVel = Matrices( INSTANT_VELOCITY );
+  initializeMatrices( InstVel );
+  IntermedQPMat::objective_variant_t COPCent = Matrices( COP_CENTERING );
+  initializeMatrices( COPCent );
+  IntermedQPMat::objective_variant_t Jerk = Matrices( JERK );
+  initializeMatrices( Jerk );
+
+}
+
+
+void
+GeneratorVelRef::initializeMatrices( IntermedQPMat::objective_variant_t & Objective)
+{
+
+  MAL_MATRIX_RESIZE(Objective.U,m_N,m_N);
+  MAL_MATRIX_RESIZE(Objective.UT,m_N,m_N);
+  MAL_MATRIX_RESIZE(Objective.S,m_N,3);
+
+  switch(Objective.type)
+  {
+    case MEAN_VELOCITY || INSTANT_VELOCITY:
+    for(int i=0;i<m_N;i++)
+      {
+        Objective.S(i,0) = 0.0; Objective.S(i,1) = 1.0; Objective.S(i,2) = (i+1)*m_T_Prw;
+        for(int j=0;j<m_N;j++)
+            if (j<=i)
+              Objective.U(i,j) = (2*(i-j)+1)*m_T_Prw*m_T_Prw*0.5 ;
+            else
+                Objective.U(i,j) = 0.0;
+      }
+    case COP_CENTERING:
+      for(int i=0;i<m_N;i++)
+        {
+          Objective.S(i,0) = 1.0; Objective.S(i,1) = (i+1)*m_T_Prw; Objective.S(i,2) = (i+1)*(i+1)*m_T_Prw*m_T_Prw*0.5-m_CoMHeight/9.81;
+          for(int j=0;j<m_N;j++)
+              if (j<=i)
+                  Objective.U(i,j) = (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_T_Prw*m_T_Prw*m_T_Prw/6.0 - m_T_Prw*m_CoMHeight/9.81;
+              else
+                  Objective.U(i,j) = 0.0;
+        }
+    case JERK:
+      for(int i=0;i<m_N;i++)
+        {
+          Objective.S(i,0) = 0.0; Objective.S(i,1) = 0.0; Objective.S(i,2) = 0.0;
+          for(int j=0;j<m_N;j++)
+              if (j==i)
+                  Objective.U(i,j) = 1.0;
+              else
+                  Objective.U(i,j) = 0.0;
+        }
+  }
+
 }
 
 
@@ -118,91 +173,134 @@ GeneratorVelRef::generateFeetPosConstraints (CjrlFoot & Foot,
 
 
 void 
-GeneratorVelRef::updateObjective(QPProblem & Pb, IntermedQPMat & QPMatrices, std::deque<SupportState_t> PrwSupStates)
+GeneratorVelRef::buildInvariantProblemPart(QPProblem & Pb, IntermedQPMat & Matrices)
 {
 
-IntermedQPMat::standard_ls_form_t LSMat;
+  const IntermedQPMat::objective_variant_t & Jerk = Matrices(JERK);
+  updateProblem(Pb.Q, Jerk);
 
-QPMatrices.getTermMatrices(LSMat, IntermedQPMat::INSTANT_VELOCITY);
-updateLSObjTerm(QPMatrices, Pb.Q, Pb.D, LSMat, INSTANT_VELOCITY);
+  const IntermedQPMat::objective_variant_t & InstVel = Matrices(INSTANT_VELOCITY);
+  updateProblem(Pb.Q, InstVel);
 
-QPMatrices.getTermMatrices(LSMat, IntermedQPMat::COP_CENTERING);
-updateLSObjTerm(QPMatrices, Pb.Q, Pb.D, LSMat, COP_CENTERING);
-
-QPMatrices.getTermMatrices(LSMat, IntermedQPMat::JERK);
-updateLSObjTerm(QPMatrices, Pb.Q, Pb.D, LSMat, JERK);
+  const IntermedQPMat::objective_variant_t & COPCent = Matrices(COP_CENTERING);
+  updateProblem(Pb.Q, COPCent);
 
 }
 
 
-int 
-GeneratorVelRef::initConstants(QPProblem & Pb)
+void
+GeneratorVelRef::updateProblem(QPProblem & Pb, IntermedQPMat & Matrices)
 {
-  //TODO:
-}
 
+  const IntermedQPMat::objective_variant_t & InstVel = Matrices(INSTANT_VELOCITY);
+  const IntermedQPMat::state_variant_t & State = Matrices();
+  updateProblem(Pb.Q, Pb.D, InstVel, State);
 
-void 
-GeneratorVelRef::setCoMPerturbationForce(double Fx, double Fy, 
-					 LinearizedInvertedPendulum2D & CoM)
-{
-  //TODO:
-}
-	  
+  const IntermedQPMat::objective_variant_t & COPCent = Matrices(COP_CENTERING);
+  updateProblem(Pb.Q, Pb.D, COPCent, State);
 
-void 
-GeneratorVelRef::setCoMPerturbationForce(std::istringstream &strm,
-					 LinearizedInvertedPendulum2D & CoM)
-{
-  //TODO:
 }
 	  
 
 void
-GeneratorVelRef::updateLSObjTerm(IntermedQPMat & QPMatrices, double * Q, double *p,
-    IntermedQPMat::standard_ls_form_t LSMat, int ObjectiveType)
+GeneratorVelRef::updateProblem(double * Q, const IntermedQPMat::objective_variant_t & Objective)
 {
 
+  // Final scaled products that are added to the QP
+  MAL_MATRIX(weightMTM,double);
+
   // Quadratic part of the objective
-  switch(ObjectiveType)
+    computeTerm(weightMTM, Objective.weight, Objective.UT, Objective.U);
+    addTerm(weightMTM, Q, 0, 0, m_N, m_N);
+    addTerm(weightMTM, Q, m_N, m_N, m_N, m_N);
+
+}
+
+
+void
+GeneratorVelRef::updateProblem(double * Q, double *p,
+    const IntermedQPMat::objective_variant_t & Objective,
+    const IntermedQPMat::state_variant_t & State)
+{
+
+  //Intermediate vector
+  MAL_VECTOR(MV,double);
+
+  // Final scaled products that are added to the QP
+  MAL_MATRIX(weightMTM,double);
+  MAL_VECTOR(weightMTV,double);
+
+  // Quadratic part of the Objective
+  switch(Objective.type)
   {
   case COP_CENTERING:
-    LSMat.weightM1TM2 = -LSMat.weight*MAL_RET_A_by_B(LSMat.UT,LSMat.V);
-    addTerm(LSMat.weightM1TM2, Q, 0, 2*m_QP_N, m_QP_N, LSMat.nSt);
-    addTerm(LSMat.weightM1TM2, Q, m_QP_N, 2*m_QP_N+LSMat.nSt, m_QP_N, LSMat.nSt);
+    // Quadratic part of the objective
+    computeTerm(weightMTM, -Objective.weight, Objective.UT, State.V);
+    addTerm(weightMTM, Q, 0, 2*m_N, m_N, State.NbStepsPrw);
+    addTerm(weightMTM, Q, m_N, 2*m_N+State.NbStepsPrw, m_N, State.NbStepsPrw);
+    computeTerm(weightMTM, -Objective.weight, State.VT, Objective.U);
+    addTerm(weightMTM, Q, 2*m_N, 0, State.NbStepsPrw, m_N);
+    addTerm(weightMTM, Q, 2*m_N+State.NbStepsPrw, m_N, State.NbStepsPrw, m_N);
+    computeTerm(weightMTM, Objective.weight, State.VT, State.V);
+    addTerm(weightMTM, Q, 2*m_N, 2*m_N, State.NbStepsPrw, State.NbStepsPrw);
+    addTerm(weightMTM, Q, 2*m_N+State.NbStepsPrw, 2*m_N+State.NbStepsPrw, State.NbStepsPrw, State.NbStepsPrw);
 
-    LSMat.weightM1TM2 = -LSMat.weight*MAL_RET_A_by_B(LSMat.VT,LSMat.U);
-    addTerm(LSMat.weightM1TM2, Q, 2*m_QP_N, 0, LSMat.nSt, m_QP_N);
-    addTerm(LSMat.weightM1TM2, Q, 2*m_QP_N+LSMat.nSt, m_QP_N, LSMat.nSt, m_QP_N);
-
-    LSMat.weightM1TM2 = LSMat.weight*MAL_RET_A_by_B(LSMat.VT,LSMat.V);
-    addTerm(LSMat.weightM1TM2, Q, 2*m_QP_N, 2*m_QP_N, LSMat.nSt, LSMat.nSt);
-    addTerm(LSMat.weightM1TM2, Q, 2*m_QP_N+LSMat.nSt, 2*m_QP_N+LSMat.nSt, LSMat.nSt, LSMat.nSt);
+    // Linear part of the objective
+    computeTerm(weightMTV, -Objective.weight, State.VT, MV, Objective.S, State.CoM.x);
+    addTerm(weightMTV, p, 2*m_N, State.NbStepsPrw);
+    computeTerm(weightMTV, -Objective.weight, State.VT, MV, Objective.S, State.CoM.y);
+    addTerm(weightMTV, p, 2*m_N+State.NbStepsPrw, State.NbStepsPrw);
+    computeTerm(weightMTV, Objective.weight,Objective.UT,State.Vc,State.fx);
+    addTerm(weightMTV, p, 2*m_N, State.NbStepsPrw);
+    computeTerm(weightMTV, Objective.weight,Objective.UT,State.Vc,State.fx);
+    addTerm(weightMTV, p, 2*m_N+State.NbStepsPrw, State.NbStepsPrw);
+  case INSTANT_VELOCITY:
+    // Linear part of the objective
+    computeTerm(weightMTV, Objective.weight,Objective.UT, MV, Objective.S, State.CoM.x);
+    addTerm(weightMTV, p, 0, m_N);
+    computeTerm(weightMTV, Objective.weight,Objective.UT, MV, Objective.S, State.CoM.y);
+    addTerm(weightMTV, p, m_N, m_N);
+    computeTerm(weightMTV, -Objective.weight,Objective.UT, State.RefX);
+    addTerm(weightMTV, p, 0, m_N);
+    computeTerm(weightMTV, -Objective.weight,Objective.UT, State.RefY);
+    addTerm(weightMTV, p, m_N, m_N);
   }
 
-  // Linear part of the objective
-  LSMat.weightM1TV1 = LSMat.weight*MAL_RET_A_by_B(LSMat.UT,LSMat.Sc_x);
-  addTerm(LSMat.weightM1TV1, p, 0, m_QP_N);
-  LSMat.weightM1TV1 = LSMat.weight*MAL_RET_A_by_B(LSMat.UT,LSMat.Sc_y);
-  addTerm(LSMat.weightM1TV1, p, m_QP_N, m_QP_N);
-  LSMat.weightM1TV1 = -LSMat.weight*MAL_RET_A_by_B(LSMat.UT,LSMat.ref_x);
-  addTerm(LSMat.weightM1TV1, p, 0, m_QP_N);
-  LSMat.weightM1TV1 = -LSMat.weight*MAL_RET_A_by_B(LSMat.UT,LSMat.ref_y);
-  addTerm(LSMat.weightM1TV1, p, m_QP_N, m_QP_N);
+}
 
-  switch(ObjectiveType)
-  {
-  case COP_CENTERING:
-    LSMat.weightM1TV1 = -LSMat.weight*MAL_RET_A_by_B(LSMat.VT,LSMat.Sc_x);
-    addTerm(LSMat.weightM1TV1, p, 2*m_QP_N, LSMat.nSt);
-    LSMat.weightM1TV1 = -LSMat.weight*MAL_RET_A_by_B(LSMat.VT,LSMat.Sc_y);
-    addTerm(LSMat.weightM1TV1, p, 2*m_QP_N+LSMat.nSt, LSMat.nSt);
-    LSMat.weightM1TV1 = LSMat.weight*MAL_RET_A_by_B(LSMat.UT,LSMat.ref_x);
-    addTerm(LSMat.weightM1TV1, p, 2*m_QP_N, LSMat.nSt);
-    LSMat.weightM1TV1 = LSMat.weight*MAL_RET_A_by_B(LSMat.UT,LSMat.ref_y);
-    addTerm(LSMat.weightM1TV1, p, 2*m_QP_N+LSMat.nSt, LSMat.nSt);
-  }
 
+void
+GeneratorVelRef::computeTerm(MAL_MATRIX (&weightMM, double), const double & weight,
+    const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double))
+{
+  weightMM = weight*MAL_RET_A_by_B(M1,M2);
+}
+
+
+void
+GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double), const double weight,
+    const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double))
+{
+   weightMV = weight*MAL_RET_A_by_B(M,V);
+}
+
+
+void
+GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double),
+    const double weight, const MAL_MATRIX (&M, double),
+    const MAL_VECTOR (&V, double), const double scalar)
+{
+   weightMV = weight*scalar*MAL_RET_A_by_B(M,V);
+}
+
+
+void
+GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double),
+    const double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
+    const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double))
+{
+   V1 = MAL_RET_A_by_B(M2,V2);
+   weightMV = weight*MAL_RET_A_by_B(M1,V1);
 }
 
 
@@ -211,7 +309,7 @@ GeneratorVelRef::addTerm(MAL_MATRIX (&Mat, double), double * QPMat, int row, int
 {
   for(int i = row;i < row+nrows; i++)
     for(int j = col;j < col+ncols; j++)
-      QPMat[i+j*2*(m_QP_N+m_PrwSupport.StepNumber)] = Mat(i,j);
+      QPMat[i+j*2*(m_N+m_PrwSupport.StepNumber)] = Mat(i,j);
 }
 
 
@@ -241,20 +339,6 @@ int
 GeneratorVelRef::initializeMatrixPbConstants()
 {
   //TODO:
-}
-
-
-void
-GeneratorVelRef::updateMatrices(IntermedQPMat & QPMatrices,
-        const LinearizedInvertedPendulum2D & CoM,
-        const std::deque<SupportState_t> PrwSupportStates,
-        const ReferenceAbsoluteVelocity_t & RefVel,
-        const COMState & Trunk,
-        const std::deque<SupportFeet_t> & QueueOfSupportFeet)
-{
-
-
-
 }
 
 	  

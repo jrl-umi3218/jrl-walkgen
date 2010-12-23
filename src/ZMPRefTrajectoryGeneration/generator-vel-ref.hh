@@ -64,7 +64,7 @@ namespace PatternGeneratorJRL
     /// \param beta
     /// \param gamma
     /// \param delta
-    void setPonderation(double alpha, double beta, double gamma, double delta);
+    void setPonderation( IntermedQPMat Matrices, double weight, int objective );
 
     /// \brief Set the velocity reference from string
     ///
@@ -78,8 +78,16 @@ namespace PatternGeneratorJRL
     /// \param dyaw
     void setReference(double dx, double dy, double dyaw);
 
-    /// \brief Build constant parts of the objective
-    void buildConstantPartOfObjective(QPProblem & Pb);
+    /// \brief Initialize the optimization programm
+    ///
+    /// \param Pb
+    /// \param Matrices
+    void initializeProblem(QPProblem & Pb, IntermedQPMat Matrices);
+
+    /// \brief Initialize objective matrices
+    ///
+    /// \param Objective
+    void initializeMatrices( IntermedQPMat::objective_variant_t & Objective);
 
     /// \brief Add one equality constraint to the queue of constraints
     ///
@@ -119,37 +127,50 @@ namespace PatternGeneratorJRL
 				     SupportState_t &,
 				     QPProblem & Pb);
 
-    /// \brief Compute the objective matrices of a quadratic optimization problem
+    /// \brief Build the constant part of the objective
     ///
     /// \param Pb
-    void updateObjective(QPProblem & Pb, IntermedQPMat & QPMatrices, std::deque<SupportState_t> PrwSupStates);
+    void buildInvariantProblemPart(QPProblem & Pb, IntermedQPMat & Matrices);
+
+    /// \brief Compute the objective matrices
+    ///
+    /// \param Pb
+    void updateProblem(QPProblem & Pb, IntermedQPMat & Matrices);
 
     /// \brief Infitialize constant parts of the objective
-    /// \return A negative value in case of a problem 0 otherwise.
-    int initConstants(QPProblem & Pb);
+    void initMatrices( IntermedQPMat::objective_variant_t & Matrix, int objective);
 	  
-    /// \brief Set the perturbation force on the CoM from external reference
-    ///
-    /// \param Fx
-    /// \param Fy
-    /// \param 2DLIPM
-    void setCoMPerturbationForce(double Fx, double Fy, LinearizedInvertedPendulum2D & CoM);
-	  
-    /// \brief Set the perturbation force on the CoM from string
-    ///
-    /// \param strm
-    /// \param 2DLIPM
-    void setCoMPerturbationForce(std::istringstream & strm,
-				 LinearizedInvertedPendulum2D & CoM);
 
     //
     //Private methods
     //
   private:
 
-    /// \brief Compute the Least Squares objective term and add it to the optimization problem
-    void updateLSObjTerm(IntermedQPMat & QPMatrices, double * Q, double * p,
-        IntermedQPMat::standard_ls_form_t LSMat, int ObjectiveType);
+    /// \brief Compute a Least Squares objective term and add it to the optimization problem
+    void updateProblem(double * Q, double *p,
+        const IntermedQPMat::objective_variant_t & Objective,
+        const IntermedQPMat::state_variant_t & State);
+
+    /// \brief Compute a quadratic Least Squares objective term and add it to the optimization problem
+    void updateProblem(double * Q, const IntermedQPMat::objective_variant_t & Objective);
+
+    /// \brief Scaled product\f$ weight*M*M \f$
+    void computeTerm(MAL_MATRIX (&weightMM, double),
+        const double & weight, const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
+
+    /// \brief Scaled product \f$ weight*M*V \f$
+    void computeTerm(MAL_VECTOR (&weightMV, double),
+        const double weight, const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double));
+
+    /// \brief Scaled product \f$ weight*M*V*scalar \f$
+    void computeTerm(MAL_VECTOR (&weightMV, double),
+        const double weight, const MAL_MATRIX (&M, double),
+        const MAL_VECTOR (&V, double), const double scalar);
+
+    /// \brief Scaled product \f$ weight*M*M*V \f$
+    void computeTerm(MAL_VECTOR (&weightMV, double),
+        const double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
+        const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
 
     /// \brief Add the computed matrix to the final optimization problem in array form
     void addTerm(MAL_MATRIX (&Mat, double), double * QPMat, int row, int col, int nrows, int ncols);
@@ -173,13 +194,7 @@ namespace PatternGeneratorJRL
     ///  The necessary parameters to build those matrices are extracted from the
     ///  PreviewControl link.
     int initializeMatrixPbConstants();
-	  
-    void updateMatrices(IntermedQPMat & QPMatrices,
-        const LinearizedInvertedPendulum2D & CoM,
-        const std::deque<SupportState_t> PrwSupportStates,
-        const ReferenceAbsoluteVelocity_t & RefVel,
-        const COMState & Trunk,
-        const std::deque<SupportFeet_t> & QueueOfSupportFeet);
+
 
     /// \name Debugging related methods
     /// @{
@@ -251,7 +266,6 @@ namespace PatternGeneratorJRL
     /// \brief Number of previewed samples 
     int m_QP_N;
 
-	  
     /// \brief Constant part of the constraint matrices. 
     double * m_Pu;
     /// @} 
