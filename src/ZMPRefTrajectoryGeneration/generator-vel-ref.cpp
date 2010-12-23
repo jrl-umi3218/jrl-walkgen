@@ -52,7 +52,7 @@ GeneratorVelRef::CallMethod(std::string &Method, std::istringstream &strm)
 
 	
 void 
-GeneratorVelRef::setPonderation( IntermedQPMat Matrices, double weight, int aObjectiveType)
+GeneratorVelRef::setPonderation( IntermedQPMat Matrices, double weight, const int aObjectiveType)
 {
 
   IntermedQPMat::objective_variant_t & Objective = Matrices( aObjectiveType );
@@ -79,11 +79,11 @@ void
 GeneratorVelRef::initializeProblem(QPProblem & Pb, IntermedQPMat Matrices)
 {
 
-  IntermedQPMat::objective_variant_t InstVel = Matrices( INSTANT_VELOCITY );
+  IntermedQPMat::objective_variant_t & InstVel = Matrices( IntermedQPMat::INSTANT_VELOCITY );
   initializeMatrices( InstVel );
-  IntermedQPMat::objective_variant_t COPCent = Matrices( COP_CENTERING );
+  IntermedQPMat::objective_variant_t & COPCent = Matrices( IntermedQPMat::COP_CENTERING );
   initializeMatrices( COPCent );
-  IntermedQPMat::objective_variant_t Jerk = Matrices( JERK );
+  IntermedQPMat::objective_variant_t & Jerk = Matrices( IntermedQPMat::JERK );
   initializeMatrices( Jerk );
 
 }
@@ -99,7 +99,7 @@ GeneratorVelRef::initializeMatrices( IntermedQPMat::objective_variant_t & Object
 
   switch(Objective.type)
   {
-    case MEAN_VELOCITY || INSTANT_VELOCITY:
+    case IntermedQPMat::MEAN_VELOCITY || IntermedQPMat::INSTANT_VELOCITY:
     for(int i=0;i<m_N;i++)
       {
         Objective.S(i,0) = 0.0; Objective.S(i,1) = 1.0; Objective.S(i,2) = (i+1)*m_T_Prw;
@@ -109,7 +109,7 @@ GeneratorVelRef::initializeMatrices( IntermedQPMat::objective_variant_t & Object
             else
                 Objective.U(i,j) = 0.0;
       }
-    case COP_CENTERING:
+    case IntermedQPMat::COP_CENTERING:
       for(int i=0;i<m_N;i++)
         {
           Objective.S(i,0) = 1.0; Objective.S(i,1) = (i+1)*m_T_Prw; Objective.S(i,2) = (i+1)*(i+1)*m_T_Prw*m_T_Prw*0.5-m_CoMHeight/9.81;
@@ -119,7 +119,7 @@ GeneratorVelRef::initializeMatrices( IntermedQPMat::objective_variant_t & Object
               else
                   Objective.U(i,j) = 0.0;
         }
-    case JERK:
+    case IntermedQPMat::JERK:
       for(int i=0;i<m_N;i++)
         {
           Objective.S(i,0) = 0.0; Objective.S(i,1) = 0.0; Objective.S(i,2) = 0.0;
@@ -176,13 +176,13 @@ void
 GeneratorVelRef::buildInvariantProblemPart(QPProblem & Pb, IntermedQPMat & Matrices)
 {
 
-  const IntermedQPMat::objective_variant_t & Jerk = Matrices(JERK);
+  const IntermedQPMat::objective_variant_t & Jerk = Matrices(IntermedQPMat::JERK);
   updateProblem(Pb.Q, Jerk);
 
-  const IntermedQPMat::objective_variant_t & InstVel = Matrices(INSTANT_VELOCITY);
+  const IntermedQPMat::objective_variant_t & InstVel = Matrices(IntermedQPMat::INSTANT_VELOCITY);
   updateProblem(Pb.Q, InstVel);
 
-  const IntermedQPMat::objective_variant_t & COPCent = Matrices(COP_CENTERING);
+  const IntermedQPMat::objective_variant_t & COPCent = Matrices(IntermedQPMat::COP_CENTERING);
   updateProblem(Pb.Q, COPCent);
 
 }
@@ -192,11 +192,11 @@ void
 GeneratorVelRef::updateProblem(QPProblem & Pb, IntermedQPMat & Matrices)
 {
 
-  const IntermedQPMat::objective_variant_t & InstVel = Matrices(INSTANT_VELOCITY);
+  const IntermedQPMat::objective_variant_t & InstVel = Matrices(IntermedQPMat::INSTANT_VELOCITY);
   const IntermedQPMat::state_variant_t & State = Matrices();
   updateProblem(Pb.Q, Pb.D, InstVel, State);
 
-  const IntermedQPMat::objective_variant_t & COPCent = Matrices(COP_CENTERING);
+  const IntermedQPMat::objective_variant_t & COPCent = Matrices(IntermedQPMat::COP_CENTERING);
   updateProblem(Pb.Q, Pb.D, COPCent, State);
 
 }
@@ -233,7 +233,7 @@ GeneratorVelRef::updateProblem(double * Q, double *p,
   // Quadratic part of the Objective
   switch(Objective.type)
   {
-  case COP_CENTERING:
+  case IntermedQPMat::COP_CENTERING:
     // Quadratic part of the objective
     computeTerm(weightMTM, -Objective.weight, Objective.UT, State.V);
     addTerm(weightMTM, Q, 0, 2*m_N, m_N, State.NbStepsPrw);
@@ -254,7 +254,7 @@ GeneratorVelRef::updateProblem(double * Q, double *p,
     addTerm(weightMTV, p, 2*m_N, State.NbStepsPrw);
     computeTerm(weightMTV, Objective.weight,Objective.UT,State.Vc,State.fx);
     addTerm(weightMTV, p, 2*m_N+State.NbStepsPrw, State.NbStepsPrw);
-  case INSTANT_VELOCITY:
+  case IntermedQPMat::INSTANT_VELOCITY:
     // Linear part of the objective
     computeTerm(weightMTV, Objective.weight,Objective.UT, MV, Objective.S, State.CoM.x);
     addTerm(weightMTV, p, 0, m_N);
