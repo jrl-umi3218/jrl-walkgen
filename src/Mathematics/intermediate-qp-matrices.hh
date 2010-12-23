@@ -45,90 +45,10 @@ namespace PatternGeneratorJRL
     //Public types
     //
   public:
-    const static int MEAN_VELOCITY = 0;
-    const static int INSTANT_VELOCITY = 1;
-    const static int COP_CENTERING = 2;
-    const static int JERK = 3;
-
-    /// \name Standardized least square elements
-    /// \{
-    /// \brief Standard form: \f$ Q = \alpha M1^{\top}M2, p = \alpha U^{\top}(S*c-ref) \f$
-    struct standard_ls_form_s
-    {
-      double weight;
-      /// \brief Matrix of the quadratic part
-      MAL_MATRIX(U,double);
-      MAL_MATRIX(UT,double);
-      MAL_MATRIX(V,double);
-      MAL_MATRIX(VT,double);
-
-      /// \brief Reference
-      MAL_VECTOR(Sc_x,double);
-      MAL_VECTOR(Sc_y,double);
-
-      /// \brief Reference
-      MAL_VECTOR(ref_x,double);
-      MAL_VECTOR(ref_y,double);
-
-      /// \brief Final products (the ones that are added to the final QP)
-      MAL_MATRIX(weightM1TM2,double);
-      MAL_VECTOR(weightM1TV1,double);
-
-      /// \brief Number of previewed steps
-      int nSt;
-    };
-    typedef standard_ls_form_s standard_ls_form_t;
-    /// \}
-
-
-    //
-    //Public methods
-    //
-  public:
-    /// \name Constructors and destructors.
-    /// \{
-    IntermedQPMat();
-    ~IntermedQPMat();
-    /// \}
-
-    /// \brief Get matrices in the standard Least Squares form:
-    /// \f$ Q = \alpha U^{\top}U, p = \alpha U^{\top}(S*c-ref) \f$
-    void getTermMatrices(standard_ls_form_t & TMat, int ObjectiveType);
-
-    /// \brief Accessors for the CoM
-    com_t operator ()() const;
-    void operator ()( com_t CoM );
-
-
-    //
-    //Private members
-    //
-  private:
-
-    /// \name Least square objective's dependent elements
-    /// \{
-    struct invariant_objective_part_s
-    {
-      double weight;
-      /// \brief Matrix of the quadratic part
-      MAL_MATRIX(U,double);
-      MAL_MATRIX(UT,double);
-
-      /// \brief Matrix of the linear part
-      MAL_MATRIX(S,double);
-    };
-    typedef invariant_objective_part_s invariant_objective_part_t;
-    /// \}
-    invariant_objective_part_t
-    m_MeanVelocity,
-      m_InstantVelocity,
-      m_COPCentering,
-      m_Jerk;
-
 
     /// \name QP elements that are objective independent
     /// \{
-    struct variant_obj_mat_s
+    struct state_variant_s
     {
       /// \brief reference values for the whole preview window
       MAL_VECTOR(RefX,double);
@@ -150,10 +70,70 @@ namespace PatternGeneratorJRL
       int NbStepsPrw;
       /// \}
     };
-    typedef variant_obj_mat_s variant_obj_mat_t;
+    typedef state_variant_s state_variant_t;
     /// \}
-    variant_obj_mat_t m_StateMatrices;
 
+    /// \name Least square objective's dependent elements
+    /// \{
+    struct objective_variant_s
+    {
+      double weight;
+      /// \brief Matrix of the quadratic part
+      MAL_MATRIX(U,double);
+      MAL_MATRIX(UT,double);
+
+      /// \brief Matrix of the linear part
+      MAL_MATRIX(S,double);
+
+      /// \brief Minimization objective
+      int type;
+
+    };
+    typedef objective_variant_s objective_variant_t;
+    /// \}
+
+
+    //
+    //Public methods
+    //
+  public:
+    /// \name Constructors and destructors.
+    /// \{
+    IntermedQPMat();
+    ~IntermedQPMat();
+    /// \}
+
+    /// \brief Accessors to the state matrices
+    inline state_variant_t const & operator ()() const
+    { return m_StateMatrices; };
+
+    /// \brief Accessors to the objective dependent matrices
+    objective_variant_t const & operator ()( int aObjectiveType ) const;
+    objective_variant_t & operator ()( int aObjectiveType );
+
+    /// \brief Accessors to the Center of Mass
+    //inline com_t const & operator ()()
+    //{ return m_StateMatrices.CoM; };
+    void operator ()( com_t CoM )
+    { m_StateMatrices.CoM = CoM; };
+
+    /// \brief Printers
+    void printObjective( int ObjectiveType, std::ostream &aos );
+    void printState( std::ostream &aos );
+
+
+    //
+    //Private members
+    //
+  private:
+
+    objective_variant_t
+      m_MeanVelocity,
+      m_InstantVelocity,
+      m_COPCentering,
+      m_Jerk;
+
+    state_variant_t m_StateMatrices;
 
     /// \brief Cholesky decomposition of the initial objective function $Q$
     MAL_MATRIX(m_LQ,double);
@@ -168,12 +148,6 @@ namespace PatternGeneratorJRL
     MAL_MATRIX(m_OptB,double);
     MAL_MATRIX(m_OptC,double);
     MAL_MATRIX(m_OptD,double);
-
-	  
-    enum MatrixType  { M_UP, M_UZ, M_UV, M_SP,
-		       M_SZ, M_SV, M_U,
-		       M_LQ, M_ILQ};
-    enum VectorType  { M_UC,M_OPTA, M_OPTB, M_OPTC, M_OPTD };
 
 
   };

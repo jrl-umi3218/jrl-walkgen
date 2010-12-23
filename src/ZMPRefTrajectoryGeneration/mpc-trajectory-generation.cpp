@@ -35,8 +35,8 @@ MPCTrajectoryGeneration::MPCTrajectoryGeneration(SimplePluginManager *lSPM)
   : SimplePlugin(lSPM)
   , m_Tsingle(0.)
   , m_Tdble(0.)
-  , m_SamplingPeriodControl(0.)
-  , m_SamplingPeriodPreview(0.)
+  , m_T_Ctr(0.)
+  , m_T_Prw(0.)
   , m_PreviewControlTime(0.)
   , m_StepHeight(0.)
   , m_CurrentTime(0.)
@@ -99,8 +99,8 @@ void MPCTrajectoryGeneration::CallMethod(std::string & Method, std::istringstrea
     }
   else if (Method==":samplingperiod")
     {
-      strm >> m_SamplingPeriodPreview;
-      ODEBUG(":samplingperiod" << m_SamplingPeriodPreview << " ID: " << this);
+      strm >> m_T_Prw;
+      ODEBUG(":samplingperiod" << m_T_Prw << " ID: " << this);
     }
   
 }

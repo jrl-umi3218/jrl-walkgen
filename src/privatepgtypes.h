@@ -57,6 +57,12 @@ namespace PatternGeneratorJRL
     com_s();
   };
   typedef struct com_s com_t;
+
+  const static int MEAN_VELOCITY = 0;
+  const static int INSTANT_VELOCITY = 1;
+  const static int COP_CENTERING = 2;
+  const static int JERK = 3;
+
 }
 
 #endif /* _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_ */

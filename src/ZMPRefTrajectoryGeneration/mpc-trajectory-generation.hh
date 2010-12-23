@@ -57,10 +57,13 @@ namespace PatternGeneratorJRL
      double m_Tdble;
 
      /// \brief Sampling periods control and preview
-     double m_SamplingPeriodControl, m_SamplingPeriodPreview;
+     double m_T_Ctr, m_T_Prw;
 
      /* ! \brief Preview control window in second. */
      double m_PreviewControlTime;
+
+     /// \brief Size of the preview window (Nb. of samplings)
+     int m_N;
 
      /* ! \brief Step height for the walking pattern. */
      double m_StepHeight;
@@ -140,20 +143,28 @@ namespace PatternGeneratorJRL
 		
     /// \brief Get the sampling period for the control, set to 0.005 by default. */
     inline const double & getSamplingPeriodControl() const
-    { return m_SamplingPeriodControl; };
+    { return m_T_Ctr; };
 		
     /// \brief Set the sampling period for the control. */
     inline void setSamplingPeriodControl(const double &aSamplingPeriod)
-    { m_SamplingPeriodControl = aSamplingPeriod;};
+    { m_T_Ctr = aSamplingPeriod;};
 		
     /// \brief Get the sampling period for the preview, set to 0.100 by default.
     inline const double & getSamplingPeriodPreview() const
-    { return m_SamplingPeriodPreview; };
+    { return m_T_Prw; };
 		
     /// \brief Set the sampling period for the preview. */
     inline void setSamplingPeriodPreview(const double &aSamplingPeriod)
-    { m_SamplingPeriodPreview = aSamplingPeriod;};
+    { m_T_Prw = aSamplingPeriod;};
 		
+    /// \brief Get the sampling period for the preview, set to 0.100 by default.
+    inline const double & getNbPrwSamplings() const
+    { return m_N; };
+
+    /// \brief Set the sampling period for the preview. */
+    inline void setNbPrwSamplings(const int &NbSamplings)
+    { m_N = NbSamplings;};
+
     /// \brief Set the security margin for the zmp
     ///
     /// \param Margin
