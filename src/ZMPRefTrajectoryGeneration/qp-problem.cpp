@@ -110,7 +110,31 @@ void QPProblem_s::AllocateMemory()
   X=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the problem.
   NewX=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the problem.
 
+}
 
+
+void
+QPProblem_s::resize(double * array, int size)
+{
+  if (array!=0)
+    delete [] array;
+  array = new double[size];
+}
+
+
+void
+QPProblem_s::resize(int * array, int size)
+{
+  if (array!=0)
+    delete [] array;
+  array = new int[size];
+}
+
+
+void
+QPProblem_s::setNbVariables(int NbVariables)
+{
+  m_NbVariables = NbVariables;
 }
 
 void QPProblem_s::setDimensions(int NbOfConstraints,
@@ -123,6 +147,7 @@ void QPProblem_s::setDimensions(int NbOfConstraints,
 
   // If all the dimensions are less than
   // the current ones no need to reallocate.
+  // TODO: Should not be necessary to reallocate that often
   if ((NbOfConstraints <= m) &&
       (StepNumber <= m_stepNumber) &&
       (QP_N <= m_QP_N))

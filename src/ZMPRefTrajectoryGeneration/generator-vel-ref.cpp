@@ -176,7 +176,7 @@ GeneratorVelRef::generateFeetPosConstraints (CjrlFoot & Foot,
 
 
 void 
-GeneratorVelRef::buildInvariantProblemPart(QPProblem & Pb, IntermedQPMat & Matrices)
+GeneratorVelRef::buildInvariantPart(QPProblem & Pb, IntermedQPMat & Matrices)
 {
 
   const IntermedQPMat::objective_variant_t & Jerk = Matrices(IntermedQPMat::JERK);
@@ -314,7 +314,7 @@ GeneratorVelRef::addTerm(MAL_MATRIX (&Mat, double), double * QPMat, int row, int
 {
   for(int i = row;i < row+nrows; i++)
     for(int j = col;j < col+ncols; j++)
-      QPMat[i+j*2*(m_N+m_PrwSupport.StepNumber)] = Mat(i,j);
+      QPMat[i+j*m_NbVariables] = Mat(i,j);
 }
 
 
