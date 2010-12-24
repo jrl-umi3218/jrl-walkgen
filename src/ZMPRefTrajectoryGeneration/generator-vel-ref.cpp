@@ -52,7 +52,7 @@ GeneratorVelRef::CallMethod(std::string &Method, std::istringstream &strm)
 
 	
 void 
-GeneratorVelRef::setPonderation( IntermedQPMat Matrices, double weight, const int aObjectiveType)
+GeneratorVelRef::setPonderation( IntermedQPMat & Matrices, double weight, const int aObjectiveType)
 {
 
   IntermedQPMat::objective_variant_t & Objective = Matrices( aObjectiveType );

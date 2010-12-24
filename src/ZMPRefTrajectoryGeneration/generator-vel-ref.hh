@@ -64,7 +64,7 @@ namespace PatternGeneratorJRL
     /// \param beta
     /// \param gamma
     /// \param delta
-    void setPonderation( IntermedQPMat Matrices, double weight, int objective );
+    void setPonderation( IntermedQPMat & Matrices, double weight, int objective );
 
     /// \brief Set the velocity reference from string
     ///
