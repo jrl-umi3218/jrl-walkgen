@@ -64,8 +64,8 @@ namespace PatternGeneratorJRL
 		       int QP_N);
     
     /// \brief Reallocate array
-    void resize(double * array, int size);
-    void resize(int * array, int size);
+    int resize(double * array, int size);
+    int resize(int * array, int size);
 
     /// \brief Dump on disk a problem.
     void dumpProblem(const char *filename);
