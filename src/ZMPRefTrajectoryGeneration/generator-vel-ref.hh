@@ -82,12 +82,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param Pb
     /// \param Matrices
-    void initializeProblem(QPProblem & Pb, IntermedQPMat Matrices);
-
-    /// \brief Initialize objective matrices
-    ///
-    /// \param Objective
-    void initializeMatrices( IntermedQPMat::objective_variant_t & Objective);
+    void initialize(IntermedQPMat & Matrices);
 
     /// \brief Add one equality constraint to the queue of constraints
     ///
@@ -145,6 +140,11 @@ namespace PatternGeneratorJRL
     //Private methods
     //
   private:
+
+    /// \brief Initialize objective matrices
+    ///
+    /// \param Objective
+    void initializeMatrices( IntermedQPMat::objective_variant_t & Objective);
 
     /// \brief Compute a Least Squares objective term and add it to the optimization problem
     void updateProblem(double * Q, double *p,

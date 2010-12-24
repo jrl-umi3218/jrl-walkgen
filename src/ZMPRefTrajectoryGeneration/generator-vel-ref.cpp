@@ -76,7 +76,7 @@ GeneratorVelRef::setReference(double dx, double dy, double dyaw)
 
 
 void 
-GeneratorVelRef::initializeProblem(QPProblem & Pb, IntermedQPMat Matrices)
+GeneratorVelRef::initialize(IntermedQPMat & Matrices)
 {
 
   IntermedQPMat::objective_variant_t & InstVel = Matrices( IntermedQPMat::INSTANT_VELOCITY );
@@ -105,30 +105,33 @@ GeneratorVelRef::initializeMatrices( IntermedQPMat::objective_variant_t & Object
         Objective.S(i,0) = 0.0; Objective.S(i,1) = 1.0; Objective.S(i,2) = (i+1)*m_T_Prw;
         for(int j=0;j<m_N;j++)
             if (j<=i)
-              Objective.U(i,j) = (2*(i-j)+1)*m_T_Prw*m_T_Prw*0.5 ;
+              Objective.U(i,j) = Objective.UT(j,i) = (2*(i-j)+1)*m_T_Prw*m_T_Prw*0.5 ;
             else
-                Objective.U(i,j) = 0.0;
+                Objective.U(i,j) = Objective.UT(j,i) = 0.0;
       }
+    break;
     case IntermedQPMat::COP_CENTERING:
       for(int i=0;i<m_N;i++)
         {
           Objective.S(i,0) = 1.0; Objective.S(i,1) = (i+1)*m_T_Prw; Objective.S(i,2) = (i+1)*(i+1)*m_T_Prw*m_T_Prw*0.5-m_CoMHeight/9.81;
           for(int j=0;j<m_N;j++)
               if (j<=i)
-                  Objective.U(i,j) = (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_T_Prw*m_T_Prw*m_T_Prw/6.0 - m_T_Prw*m_CoMHeight/9.81;
+                  Objective.U(i,j) = Objective.UT(j,i) = (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_T_Prw*m_T_Prw*m_T_Prw/6.0 - m_T_Prw*m_CoMHeight/9.81;
               else
-                  Objective.U(i,j) = 0.0;
+                  Objective.U(i,j) = Objective.UT(j,i) = 0.0;
         }
+      break;
     case IntermedQPMat::JERK:
       for(int i=0;i<m_N;i++)
         {
           Objective.S(i,0) = 0.0; Objective.S(i,1) = 0.0; Objective.S(i,2) = 0.0;
           for(int j=0;j<m_N;j++)
               if (j==i)
-                  Objective.U(i,j) = 1.0;
+                  Objective.U(i,j) = Objective.UT(j,i) = 1.0;
               else
-                  Objective.U(i,j) = 0.0;
+                  Objective.U(i,j) = Objective.UT(j,i) = 0.0;
         }
+      break;
   }
 
 }
@@ -254,6 +257,7 @@ GeneratorVelRef::updateProblem(double * Q, double *p,
     addTerm(weightMTV, p, 2*m_N, State.NbStepsPrw);
     computeTerm(weightMTV, Objective.weight,Objective.UT,State.Vc,State.fx);
     addTerm(weightMTV, p, 2*m_N+State.NbStepsPrw, State.NbStepsPrw);
+    break;
   case IntermedQPMat::INSTANT_VELOCITY:
     // Linear part of the objective
     computeTerm(weightMTV, Objective.weight,Objective.UT, MV, Objective.S, State.CoM.x);
@@ -264,6 +268,7 @@ GeneratorVelRef::updateProblem(double * Q, double *p,
     addTerm(weightMTV, p, 0, m_N);
     computeTerm(weightMTV, -Objective.weight,Objective.UT, State.RefY);
     addTerm(weightMTV, p, m_N, m_N);
+    break;
   }
 
 }

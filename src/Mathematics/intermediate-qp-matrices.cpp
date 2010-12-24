@@ -84,41 +84,43 @@ IntermedQPMat::operator ()( const int aObjectiveType )
 }
 
 
-void IntermedQPMat::printObjective( const int ObjectiveType, std::ostream &aos )
+void
+IntermedQPMat::printObjective( const int ObjectiveType, std::ostream &aos )
 {
   IntermedQPMat::objective_variant_t objective;
   switch(ObjectiveType)
     {
     case INSTANT_VELOCITY:
       objective = m_InstantVelocity;
-      aos << "Instant velocity - " <<ObjectiveType<<" : "<<std::endl;
+      break;
     case JERK:
       objective = m_Jerk;
-      aos << "Jerk: " <<std::endl;
-      aos << "Instant velocity: - " <<ObjectiveType<<" : "<<std::endl;
+      break;
     case COP_CENTERING:
       objective = m_COPCentering;
-      aos << "COP centering: " <<std::endl;
-      aos << "Instant velocity: - " <<ObjectiveType<<" : "<<std::endl;
+      break;
     }
+
   aos << "Ponderation: " << std::endl;
-  aos << objective.weight << std::endl;
+  aos << objective.weight << std::endl<< std::endl;
   aos << "U: " << std::endl;
-  aos << objective.U << std::endl;
+  aos << objective.U << std::endl<< std::endl;
   aos << "trans(U): " << std::endl;
-  aos << objective.UT << std::endl;
+  aos << objective.UT << std::endl<< std::endl;
   aos << "S: " << std::endl;
-  aos << objective.S << std::endl;
+  aos << objective.S << std::endl<< std::endl;
 }
 
 
-void IntermedQPMat::printState( std::ostream &aos )
+void
+IntermedQPMat::printState( std::ostream &aos )
 {
 
 }
 
 
-void IntermedQPMat::printObjective(const char * filename,
+void
+IntermedQPMat::printObjective(const char * filename,
                           const int type)
 {
   std::ofstream aof;
@@ -128,7 +130,8 @@ void IntermedQPMat::printObjective(const char * filename,
 }
 
 
-void IntermedQPMat::printState(const char * filename)
+void
+IntermedQPMat::printState(const char * filename)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
