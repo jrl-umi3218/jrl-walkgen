@@ -48,7 +48,9 @@ QPProblem_s::QPProblem_s():
   U(0),war(0), iwar(0),
   iout(0),ifail(0), iprint(0),
   lwar(0), liwar(0),
-  Eps(0)
+  Eps(0),
+  m_NbVariables(0), m_NbConstraints(0),
+  m_ReallocMarginVar(0), m_ReallocMarginConstr(0)
 {
 
 }
@@ -73,8 +75,8 @@ void QPProblem_s::ReleaseMemory()
 
   if (XL!=0)
     delete [] XL;
-  
-  if (XU!=0) 
+
+  if (XU!=0)
     delete [] XU;
 
   if (X!=0)
@@ -85,7 +87,7 @@ void QPProblem_s::ReleaseMemory()
 
   if (iwar!=0)
     delete [] iwar;
-  
+
   if (war!=0)
     delete [] war;
 
@@ -93,37 +95,48 @@ void QPProblem_s::ReleaseMemory()
     delete [] U;
 }
 
-void QPProblem_s::AllocateMemory()
+
+void
+QPProblem_s::resizeAll(const int & NbVariables, const int & NbConstraints)
 {
-  war= new double[lwar];
-  iwar = new int[liwar]; // The Cholesky decomposition is done internally.
 
-  U = new double[mnn];
+  resize(war,2*lwar,3*NbVariables*NbVariables/2+ 10*NbVariables  + 2*(NbConstraints+1) + 20000);
+  resize(iwar,2*liwar,2*NbVariables); // The Cholesky decomposition is done internally.
 
-  DS = new double[(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)];
-  DU = new double[(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)];
+  resize(U,2*mnn,2*(NbConstraints+2*NbVariables));
 
-  Q=new double[4*(m_QP_N+m_stepNumber)*(m_QP_N+m_stepNumber)];  //Quadratic part of the objective function
-  D=new double[2*(m_QP_N+m_stepNumber)];   // Linear part of the objective function
+  resize(DS,2*m,2*NbConstraints);
+  resize(DU,2*m*n,2*NbVariables*NbConstraints);
+  initialize(DS,2*NbConstraints);
+  //initialize(DU,2*NbVariables*NbConstraints);
 
-  XL=new double[2*(m_QP_N+m_stepNumber)];  // Lower bound on the solution.
-  XU=new double[2*(m_QP_N+m_stepNumber)];  // Upper bound on the solution.
+  resize(Q,2*n*n,2*NbVariables*NbVariables);  //Quadratic part of the objective function
+  resize(D,2*n,2*NbVariables);   // Linear part of the objective function
+  //initialize(Q,2*NbVariables*NbVariables);
+  //initialize(D,2*NbVariables);
 
-  X=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the problem.
-  NewX=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the problem.
+  resize(XL,2*n,2*NbVariables);  // Lower bound on the solution.
+  resize(XU,2*n,2*NbVariables);  // Upper bound on the solution.
+
+  resize(X,2*n,2*NbVariables);  // Solution of the problem.
+  resize(NewX,2*n,2*NbVariables);  // Solution of the problem.
 
 }
 
 
 int
-QPProblem_s::resize(double * array, int size)
+QPProblem_s::resize(double *& array, const int & old_size, const int & new_size)
 {
-  if (array!=0)
-    delete [] array;
 
   try
   {
-    array = new double[size];
+    double * NewArray = new double[new_size];
+    for(int i = 0; i < old_size; i++)
+      NewArray[i] = array[i];
+
+    if (array!=0)
+      delete [] array;
+    array = NewArray;
   }
   catch (std::bad_alloc& ba)
   {
@@ -131,18 +144,23 @@ QPProblem_s::resize(double * array, int size)
   }
 
   return 0;
+
 }
 
 
 int
-QPProblem_s::resize(int * array, int size)
+QPProblem_s::resize(int *& array, const int & old_size, const int & new_size)
 {
-  if (array!=0)
-    delete [] array;
 
   try
   {
-    array = new int[size];
+    int * NewArray = new int[new_size];
+    for(int i = 0; i < old_size; i++)
+      NewArray[i] = array[i];
+
+    if (array!=0)
+      delete [] array;
+    array = NewArray;
   }
   catch (std::bad_alloc& ba)
   {
@@ -150,59 +168,57 @@ QPProblem_s::resize(int * array, int size)
   }
 
   return 0;
+
 }
 
 
 void
-QPProblem_s::setNbVariables(int NbVariables)
+QPProblem_s::setDimensions(const int & NbVariables,
+    const int & NbConstraints,
+    const int & NbEqConstraints)
 {
-  m_NbVariables = NbVariables;
-}
-
-void QPProblem_s::setDimensions(int NbOfConstraints,
-			      int NbOfEqConstraints,
-			      int QP_N,
-			      int StepNumber)
-{
-  bool reallocationNeeded = true;
-
 
   // If all the dimensions are less than
   // the current ones no need to reallocate.
-  // TODO: Should not be necessary to reallocate that often
-  if ((NbOfConstraints <= m) &&
-      (StepNumber <= m_stepNumber) &&
-      (QP_N <= m_QP_N))
-    reallocationNeeded = false;
-  m_stepNumber = StepNumber;
-  m_QP_N = QP_N;
-  m=NbOfConstraints;
-  me=NbOfEqConstraints;
-  mmax=m+1;
-  n=2*(m_QP_N+StepNumber);
-  nmax=n;
-  mnn=m+2*n;
-
-  iout=0;
-  iprint=1;
-  lwar=3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
-  liwar=n;
-  Eps=1e-8;
-  
-  if(reallocationNeeded)
+  if (NbVariables > m_ReallocMarginVar)
     {
-      ReleaseMemory();
-      AllocateMemory();
+      m_ReallocMarginVar = 2*NbVariables;
+      resizeAll(NbVariables, NbConstraints);
     }
+  if (NbConstraints > m_ReallocMarginConstr)
+    {
+      m_ReallocMarginConstr = 2*NbConstraints;
+      resize(DS,2*m,2*NbVariables*NbConstraints);
+      initialize(DS,2*NbVariables*NbConstraints);
+      resize(DU,2*m*n,2*NbVariables*NbConstraints);
+      initialize(DU,2*NbVariables*NbConstraints);
+    }
+
+  m = m_NbConstraints = NbConstraints;
+  me = NbEqConstraints;
+  mmax = m+1;
+  n = m_NbVariables = NbVariables;
+  nmax = n;
+  mnn = m+2*n;
+
+  iout = 0;
+  iprint = 1;
+  lwar = 3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
+  liwar = n;
+  Eps = 1e-8;
+  
 }
 
-void QPProblem_s::initializeProblem()
+
+void
+QPProblem_s::initialize(double * array, const int & size)
 {
-
-  memset(DU,0,(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)*sizeof(double));
+  memset(array,0,size*sizeof(double));
 }
 
-void QPProblem_s::solve(int solver)
+
+void
+QPProblem_s::solve(const int solver)
 {
   switch(solver)
     {
@@ -214,27 +230,49 @@ void QPProblem_s::solve(int solver)
     }
 }
 
-void QPProblem_s::dumpMatrix(std::ostream & aos,
-			   int type)
+
+void
+QPProblem_s::printSolverParameters(std::ostream & aos)
+{
+  aos << "m: " << m << std::endl
+      << "me: " << me << std::endl
+      << "mmax: " << mmax << std::endl
+      << "n: " << n << std::endl
+      << "nmax: " << nmax << std::endl
+      << "mnn: " << mnn << std::endl
+      << "iout: " << iout << std::endl
+      << "iprint: " << iprint << std::endl
+      << "lwar: " << lwar << std::endl
+      << "liwar: " << liwar << std::endl
+      << "Eps: " << Eps << std::endl;
+}
+
+
+void
+QPProblem_s::dumpMatrix(std::ostream & aos,
+			   const int type)
 {
 
   int lnbrows=0, lnbcols=0;
   double *aMatrix=0;
+  std::string Name;
   switch(type)
     {
     case MATRIX_Q:
-      lnbrows = lnbcols = (m_QP_N+m_stepNumber)*2 ;
+      lnbrows = lnbcols = m_NbVariables ;
       aMatrix = Q;
+      Name = "Q";
       break;
 
     case MATRIX_DU:
-      lnbrows = m; // NbOfConstraints.
-      lnbcols = (m_QP_N+m_stepNumber)*2;
+      lnbrows = m;
+      lnbcols = m_NbVariables;
       aMatrix = DU;
+      Name = "DU";
       break;
     }
 
-  aos << "["<<lnbcols << ","<< lnbrows << "]" << std::endl;
+  aos << Name <<"["<<lnbrows<< ","<< lnbcols << "]" << std::endl;
   
   for(int i=0;i<lnbrows;i++)
     {
@@ -242,47 +280,58 @@ void QPProblem_s::dumpMatrix(std::ostream & aos,
 	aos << aMatrix[j*lnbrows+i] << " ";
       aos << std::endl;
     }
+  aos << std::endl;
 }
 
-void QPProblem_s::dumpVector(std::ostream & aos,
-			   int type)
+
+void
+QPProblem_s::dumpVector(std::ostream & aos,
+			   const int type)
 {
 
   int lsize=0;
   double *aVector=0;
+  std::string Name;
   switch(type)
     {
     case VECTOR_D:
-      lsize=2*(m_QP_N+m_stepNumber) ;
+      lsize=m_NbVariables ;
       aVector = D;
+      Name = "D";
       break;
 
     case VECTOR_XL:
-      lsize=2*(m_QP_N+m_stepNumber) ;
+      lsize=m_NbVariables ;
       aVector = XL;
+      Name = "XL";
       break;
 
     case VECTOR_XU:
-      lsize=2*(m_QP_N+m_stepNumber) ;
+      lsize=m_NbVariables;
       aVector = XU;
+      Name = "XU";
       break;
 
     case VECTOR_DS:
       lsize= m;
       aVector = DS;
+      Name = "DS";
       break;
     }
 
+  aos << Name <<"["<< lsize << "]" << std::endl;
   for(int i=0;i<lsize;i++)
     {
       aos << aVector[i] << " ";
     }
-  aos << std::endl;
+  aos << std::endl << std::endl;
 	
 }
 
-void QPProblem_s::dumpVector(const char * filename,
-			   int type)
+
+void
+QPProblem_s::dumpVector(const char * filename,
+			   const int type)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
@@ -291,8 +340,9 @@ void QPProblem_s::dumpVector(const char * filename,
 }
 
 
-void QPProblem_s::dumpMatrix(const char * filename,
-			   int type)
+void
+QPProblem_s::dumpMatrix(const char * filename,
+			   const int type)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
@@ -300,19 +350,23 @@ void QPProblem_s::dumpMatrix(const char * filename,
   aof.close();
 }
 
-void QPProblem_s::dumpProblem(std::ostream &aos)
+
+void
+QPProblem_s::dumpProblem(std::ostream &aos)
 {
   dumpMatrix(aos,MATRIX_Q);
   dumpMatrix(aos,MATRIX_DU);
   
   dumpVector(aos,VECTOR_D);
-  dumpVector(aos,VECTOR_DL);  
   dumpVector(aos,VECTOR_XL);
   dumpVector(aos,VECTOR_XU);
   dumpVector(aos,VECTOR_DS);
-
+  printSolverParameters(aos);
 }
-void QPProblem_s::dumpProblem(const char * filename)
+
+
+void
+QPProblem_s::dumpProblem(const char * filename)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
