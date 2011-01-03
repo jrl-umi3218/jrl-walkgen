@@ -87,7 +87,7 @@ namespace PatternGeneratorJRL
       int computeLinearSystem(std::vector<CH_Point> aVecOfPoints,
 			      MAL_MATRIX(&D,double),
 			      MAL_MATRIX(&Dc,double),
-			      SupportState_t PrwSupport);
+			      support_state_t PrwSupport);
 
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
 	Position.
@@ -98,10 +98,10 @@ namespace PatternGeneratorJRL
 					    QueueOfLConstraintInequalities,
 					    std::deque<LinearConstraintInequalityFreeFeet_t> &
 					    QueueOfFeetPosInequalities,
-					    ReferenceAbsoluteVelocity & RefVel,
+					    reference_t & RefVel,
 					    double StartingTime,
 					    double m_QP_N,
-					    SupportFSM * SupportFSM, SupportState_t CurrentSupport, SupportState_t & PrwSupport,
+					    SupportFSM * SupportFSM, support_state_t CurrentSupport, support_state_t & PrwSupport,
 					    std::deque<double> &PreviewedSupportAngles,
 					    int & NbOfConstraints);
 
