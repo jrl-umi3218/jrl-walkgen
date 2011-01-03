@@ -46,8 +46,8 @@ namespace PatternGeneratorJRL
     double filterprecision(double adb)
     {
       if (fabs(adb)<1e-7)
-	return 0.0;
-	    
+        return 0.0;
+
       double ladb2 = adb * 1e7;
       double lintadb2 = trunc(ladb2);
       return lintadb2/1e7;
@@ -55,8 +55,8 @@ namespace PatternGeneratorJRL
 
 
     TestObject::TestObject(int argc, char *argv[],
-			   string &aTestName,
-			   int lPGIInterface)
+        string &aTestName,
+        int lPGIInterface)
     {
       m_TestName = aTestName;
       m_PGIInterface = lPGIInterface;
@@ -81,28 +81,28 @@ namespace PatternGeneratorJRL
 
       /*! Extract options and fill in members. */
       getOptions(argc,argv,
-		 VRMLPath,
-		 VRMLFileName,
-		 SpecificitiesFileName,
-		 LinkJointRank,
-		 InitConfig,
-		 m_TestProfile);
+          VRMLPath,
+          VRMLFileName,
+          SpecificitiesFileName,
+          LinkJointRank,
+          InitConfig,
+          m_TestProfile);
 
       // Instanciate and initialize.
       string RobotFileName = VRMLPath + VRMLFileName;
 
       bool fileExist = false;
       {
-	std::ifstream file (RobotFileName.c_str ());
-	fileExist = !file.fail ();
+        std::ifstream file (RobotFileName.c_str ());
+        fileExist = !file.fail ();
       }
       if (!fileExist)
-	throw std::string ("failed to open robot model");
+        throw std::string ("failed to open robot model");
 
       CreateAndInitializeHumanoidRobot(RobotFileName,
-				       SpecificitiesFileName,
-				       LinkJointRank,
-				       InitConfig,
+          SpecificitiesFileName,
+          LinkJointRank,
+          InitConfig,
 				       m_HDR, m_DebugHDR, m_PGI);
 
       // Specify the walking mode: here the default one.
@@ -123,13 +123,13 @@ namespace PatternGeneratorJRL
     {
 
       if (m_HDR!=0)
-	delete m_HDR;
+        delete m_HDR;
 
       if (m_DebugHDR!=0)
-	delete m_DebugHDR;
+        delete m_DebugHDR;
 
       if (m_PGI!=0)
-	delete m_PGI;
+        delete m_PGI;
 
     }
 
@@ -137,23 +137,23 @@ namespace PatternGeneratorJRL
     {
 
       if (m_DebugZMP2)
-	{
+        {
 	  ofstream aofzmpmb2;
 	  string aFileName = m_TestName;
 	  aFileName += "ZMPMBSTAGE2.dat";
 	  aofzmpmb2.open(aFileName.c_str(),ofstream::out);
-	}
+        }
 
 
       if (m_DebugFGPI)
-	{
+        {
 	  ofstream aof;
 	  string aFileName = m_TestName;
 	  aFileName += "TestFGPI_description.dat";
 
 	  aof.open(aFileName.c_str(),ofstream::out);
 	  string Titles[26] =
-	    { "Time",
+            { "Time",
 	      "Com X",
 	      "Com Y" ,
 	      "Com Z" ,
@@ -188,13 +188,13 @@ namespace PatternGeneratorJRL
 	  aFileName += "TestFGPI.dat";
 	  aof.open(aFileName.c_str(),ofstream::out);
 	  aof.close();
-	}
+        }
     }
 
     void TestObject::fillInDebugFiles( )
     {
       if (m_DebugFGPI)
-	{
+        {
 	  ofstream aof;
 	  string aFileName;
 	  aFileName = m_TestName;
@@ -225,16 +225,16 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "
 	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "
 	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
-	    m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
-	    +m_CurrentConfiguration(0) ) << " "
+				 m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
+				 +m_CurrentConfiguration(0) ) << " "
 	      << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
-	    m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
-	    +m_CurrentConfiguration(1) ) << " "
+				 m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
+				 +m_CurrentConfiguration(1) ) << " "
 	      << filterprecision(m_CurrentConfiguration(0) ) << " "
 	      << filterprecision(m_CurrentConfiguration(1) ) << " "
 	      << endl;
 	  aof.close();
-	}
+        }
     }
 
 
@@ -242,7 +242,7 @@ namespace PatternGeneratorJRL
     {
       bool SameFile= false;
       if (m_DebugFGPI)
-	{
+        {
 	  SameFile = true;
 	  ifstream alif;
 	  string aFileName;
@@ -270,14 +270,18 @@ namespace PatternGeneratorJRL
 	      for (unsigned int i=0;i<70;i++)
 		{
 		  if  (fabs(LocalInput[i]-
-			    ReferenceInput[i])>=1e-6)
-		    return false;
+			    ReferenceInput[i])>=1e-5)
+		    {
+		      cout<<"... failed with: "<< "LocalInput["<<i<<"]: "<<LocalInput[i]<<
+			" ReferenceInput["<<i<<"]: "<<ReferenceInput[i]<<endl;
+		      return false;
+		    }
 		}
 	    }
 
 	  alif.close();
 	  arif.close();
-	}
+        }
       return SameFile;
     }
 
@@ -291,9 +295,9 @@ namespace PatternGeneratorJRL
       prepareDebugFiles();
 
       for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
-	{
+        {
 	  os << "<===============================================================>"<<endl;
-	  os << "Iteration nb: " << lNbIt << endl;
+	  os << "Test iteration nb: " << lNbIt+1 << endl;
 
 	  m_clock.startPlanning();
 
@@ -356,9 +360,9 @@ namespace PatternGeneratorJRL
 
 	    }
 
-	  os << endl << "End of iteration " << lNbIt << endl;
+	  os << endl << "End of test iteration " << lNbIt+1 << endl;
 	  os << "<===============================================================>"<<endl;
-	}
+        }
 
       string lProfileOutput= m_TestName;
       lProfileOutput +="TimeProfile.dat";
