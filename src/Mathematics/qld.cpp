@@ -627,7 +627,7 @@ int ql0002_(integer *n,integer *m,integer *meq,integer *mmax,
             doublereal *vsmall,
             integer *info,
             doublereal *diag, doublereal *w,
-            integer */* lw */)
+            integer * /* lw */)
 #else
 /* Subroutine */ int ql0002_(n, m, meq, mmax, mn, mnn, nmax, lql, a, b, grad, 
 	g, xl, xu, x, nact, iact, maxit, vsmall, info, diag, w, lw)
