@@ -43,10 +43,7 @@ namespace PatternGeneratorJRL
 	
     /*! \brief Initialize the previewed state. */
     void setSupportState(const double &Time, const int &pi,
-    		SupportState_t & Support, const ReferenceAbsoluteVelocity & RefVel);
-	
-    ///*! \brief Numerical precision */
-    double m_eps;
+    		support_state_t & Support, const reference_t & Ref);
 	
     /*! \brief constants for the durations in the support phases */
     double m_DSDuration, m_SSPeriod, m_DSSSDuration;
@@ -55,7 +52,7 @@ namespace PatternGeneratorJRL
     unsigned int m_NbOfStepsSSDS;
  
   private: 
-	
+
     /*! \Brief Sampling duration */
     double m_T;
 

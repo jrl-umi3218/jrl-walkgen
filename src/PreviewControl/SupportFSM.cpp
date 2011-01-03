@@ -45,35 +45,35 @@ SupportFSM::SupportFSM(const double &SamplingPeriod)
 
   m_T = SamplingPeriod;
 
-  m_eps = 0.00000001;
-
   m_FullDebug = 0;
 
 }
- 
+
 
 SupportFSM::~SupportFSM()
 {
 }
 
 void SupportFSM::setSupportState(const double &Time, const int &pi,
-		SupportState_t & Support, const ReferenceAbsoluteVelocity & RefVel)
+				 support_state_t & Support, const reference_t & vel_ref)
 {
 
+  double eps = 1e-6;
+
   Support.StateChanged = false;
-  
+
   m_ReferenceGiven = false;
-  if(fabs(RefVel.x)>0||fabs(RefVel.y)>0)
-	  m_ReferenceGiven = true;
-    
-  if(m_ReferenceGiven == true && Support.Phase == 0 && (Support.TimeLimit-Time-m_eps)>m_DSSSDuration)
+  if(fabs(vel_ref.local.x)>eps||fabs(vel_ref.local.y)>eps||fabs(vel_ref.local.yaw)>eps)
+    m_ReferenceGiven = true;
+
+  if(m_ReferenceGiven == true && Support.Phase == 0 && (Support.TimeLimit-Time-eps)>m_DSSSDuration)
     {
       Support.TimeLimit = Time+m_DSSSDuration;
     }
- 
-   
+
+
   //FSM
-  if(Time+m_eps+pi*m_T >= Support.TimeLimit)
+  if(Time+eps+pi*m_T >= Support.TimeLimit)
     {
       //SS->DS
       if(Support.Phase == 1  && m_ReferenceGiven == false && Support.StepsLeft==0)
@@ -103,15 +103,15 @@ void SupportFSM::setSupportState(const double &Time, const int &pi,
 	    Support.StepsLeft = Support.StepsLeft-1;
 	}
     }
-  
+
   if(m_FullDebug>0)
     {
       ofstream aof;
       aof.open("SupportStates.dat", ios::app);
       aof << "Time: "<<Time<<" PrwTime: "<<Time+pi*m_T
-  	  <<" CSF: "<<Support.Foot<<" CTL: "<<Support.TimeLimit
-  	  <<" SL: "<<Support.StepsLeft<<" *SF: "<<Support.Foot
-  	  <<" SN: "<<Support.StepNumber;
+	  <<" CSF: "<<Support.Foot<<" CTL: "<<Support.TimeLimit
+	  <<" SL: "<<Support.StepsLeft<<" *SF: "<<Support.Foot
+	  <<" SN: "<<Support.StepNumber;
       aof << endl;
       aof.close();
     }

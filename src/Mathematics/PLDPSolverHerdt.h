@@ -35,6 +35,7 @@
 #include <deque>
 #include <Mathematics/OptCholesky.h>
 #include <jrl/walkgen/pgtypes.hh>
+#include <privatepgtypes.h>
 
 namespace Optimization
 {
@@ -58,7 +59,7 @@ namespace Optimization
 	  /*! \brief Solve the optimization problem 
 	   */
 	  int SolveProblem(std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, 
-			   std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet,
+			   std::deque<PatternGeneratorJRL::supportfoot_t> & QueueOfSupportFeet,
 			   double *CstPartOfTheCostFunction,
 			   unsigned int NbOfConstraints,
 			   double *LinearPartOfConstraints,
@@ -74,7 +75,7 @@ namespace Optimization
 	   */
 	  /*! Compute the initial solution */
 	  int ComputeInitialSolution(std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, 
-				     std::deque<PatternGeneratorJRL::SupportFeet_t> & QueueOfSupportFeet, unsigned int NumberSteps,
+				     std::deque<PatternGeneratorJRL::supportfoot_t> & QueueOfSupportFeet, unsigned int NumberSteps,
 				     double *XkYk);
 
 	  /*! Precompite iPuPx */
