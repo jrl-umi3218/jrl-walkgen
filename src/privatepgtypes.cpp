@@ -56,4 +56,43 @@ namespace PatternGeneratorJRL
     reset();
   }
 
+  struct trunk_s & trunk_t::operator=(const trunk_s &aTS)
+  {
+    for(unsigned int i=0;i<3;i++)
+      {
+        x[i] = aTS.x[i];
+        y[i] = aTS.y[i];
+        z[i] = aTS.z[i];
+
+        yaw[i] = aTS.yaw[i];
+        pitch[i] = aTS.pitch[i];
+        roll[i] = aTS.roll[i];
+      };
+    return *this;
+  }
+
+  void trunk_t::reset()
+  {
+    for(unsigned int i=0;i<3;i++)
+      {
+        MAL_VECTOR_RESIZE(x,3);
+        MAL_VECTOR_RESIZE(y,3);
+        MAL_VECTOR_RESIZE(z,3);
+        MAL_VECTOR_RESIZE(yaw,3);
+        MAL_VECTOR_RESIZE(pitch,3);
+        MAL_VECTOR_RESIZE(roll,3);
+        x[i] = 0.0;
+        y[i] = 0.0;
+        z[i] = 0.0;
+        yaw[i] = 0.0;
+        pitch[i] = 0.0;
+        roll[i] = 0.0;
+      }
+  }
+
+  trunk_s::trunk_s()
+  {
+    reset();
+  }
+
 }
