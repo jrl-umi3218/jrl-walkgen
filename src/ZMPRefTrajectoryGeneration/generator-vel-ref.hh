@@ -71,12 +71,19 @@ namespace PatternGeneratorJRL
     /// \param strm velocity reference string
     void setReference(std::istringstream &strm);
 
-    /// \brief Set the velocity reference from external reference
+    /// \brief Preview support state for the whole preview period
     ///
-    /// \param dx
-    /// \param dy
-    /// \param dyaw
-    void setReference(double dx, double dy, double dyaw);
+    /// \param FSM
+    /// \param deqSupportStates
+    void preview(IntermedQPMat Matrices,
+		 SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates);
+
+    /// \brief Set the global reference from the local one and the orientation of the trunk frame
+    /// for the whole preview window
+    ///
+    /// \param Matrices
+    /// \param TrunkStateT State of the trunk at the end of the acceleration phase
+    void computeGlobalReference(IntermedQPMat & Matrices, COMState TrunkStateT);
 
     /// \brief Initialize the optimization programm
     ///
@@ -107,7 +114,7 @@ namespace PatternGeneratorJRL
     void generateZMPConstraints (CjrlFoot & Foot,
 				 std::deque < double > & PreviewedSupportAngles,
 				 SupportFSM & FSM,
-				 SupportState_t & CurrentSupportState,
+				 support_state_t & CurrentSupportState,
 				 QPProblem & Pb);
 
     /// \brief Generate a queue of inequality constraints on the feet positions for the whole preview window
@@ -117,9 +124,9 @@ namespace PatternGeneratorJRL
     /// \param SupportFSM
     /// \param CurrentSupportState
     void generateFeetPosConstraints (CjrlFoot & Foot,
-        std::deque < double > & PreviewedSupportAngles,
+				     std::deque < double > & PreviewedSupportAngles,
 				     SupportFSM & ,
-				     SupportState_t &,
+				     support_state_t &,
 				     QPProblem & Pb);
 
     /// \brief Build the constant part of the objective
@@ -130,7 +137,8 @@ namespace PatternGeneratorJRL
     /// \brief Compute the objective matrices
     ///
     /// \param Pb
-    void updateProblem(QPProblem & Pb, IntermedQPMat & Matrices);
+    void updateProblem(QPProblem & Pb, IntermedQPMat & Matrices,
+		       std::deque<support_state_t> deqSupportStates);
 
     /// \brief Infitialize constant parts of the objective
     void initMatrices( IntermedQPMat::objective_variant_t & Matrix, int objective);
@@ -146,31 +154,31 @@ namespace PatternGeneratorJRL
     /// \param Objective
     void initializeMatrices( IntermedQPMat::objective_variant_t & Objective);
 
-    /// \brief Compute a Least Squares objective term and add it to the optimization problem
-    void updateProblem(double * Q, double *p,
-        const IntermedQPMat::objective_variant_t & Objective,
-        const IntermedQPMat::state_variant_t & State);
-
-    /// \brief Compute a quadratic Least Squares objective term and add it to the optimization problem
-    void updateProblem(double * Q, const IntermedQPMat::objective_variant_t & Objective);
+    //    /// \brief Compute a Least Squares objective term and add it to the optimization problem
+    //    void updateProblem(double *& Q, double *& p,
+    //        const IntermedQPMat::objective_variant_t & Objective,
+    //        const IntermedQPMat::state_variant_t & State);
+    //
+    //    /// \brief Compute a quadratic Least Squares objective term and add it to the optimization problem
+    //    void updateProblem(double *& Q, const IntermedQPMat::objective_variant_t & Objective);
 
     /// \brief Scaled product\f$ weight*M*M \f$
     void computeTerm(MAL_MATRIX (&weightMM, double),
-        const double & weight, const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
+		     const double & weight, const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
 
     /// \brief Scaled product \f$ weight*M*V \f$
     void computeTerm(MAL_VECTOR (&weightMV, double),
-        const double weight, const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double));
+		     const double weight, const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double));
 
     /// \brief Scaled product \f$ weight*M*V*scalar \f$
     void computeTerm(MAL_VECTOR (&weightMV, double),
-        const double weight, const MAL_MATRIX (&M, double),
-        const MAL_VECTOR (&V, double), const double scalar);
+		     const double weight, const MAL_MATRIX (&M, double),
+		     const MAL_VECTOR (&V, double), const double scalar);
 
     /// \brief Scaled product \f$ weight*M*M*V \f$
     void computeTerm(MAL_VECTOR (&weightMV, double),
-        const double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
-        const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
+		     const double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
+		     const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
 
     /// \brief Add the computed matrix to the final optimization problem in array form
     void addTerm(MAL_MATRIX (&Mat, double), double * target, int row, int col, int nrows, int ncols);
@@ -210,22 +218,22 @@ namespace PatternGeneratorJRL
   private:
 	  
     /// \brief The current and the previewed support state.
-    SupportState_t m_CurrentSupport, m_PrwSupport;
+    support_state_t m_CurrentSupport, m_PrwSupport;
 
     /// \brief Future support states
-    std::deque<SupportState_t> m_PrwSupStates;
+    std::deque<support_state_t> m_PrwSupStates;
 	  
     /// \brief Current state of the trunk and the trunk state after m_QP_T
     COMState m_TrunkState, m_TrunkStateT;
 	  
     /// \brief Velocity reference (constant)
-    ReferenceAbsoluteVelocity m_RefVel;
+    reference_t m_Ref;
 	  
     /// \brief Inequality constraints
     std::deque<LinearConstraintInequalityFreeFeet_t> m_LinearInequalities;
 	  
     /// \brief History of support states
-    std::deque<SupportFeet_t> m_SupportFeetDeque;
+    std::deque<supportfoot_t> m_SupportFeetDeque;
 	  
     /// \brief Previewed trunk states 
     std::deque<COMState> m_TrunkStatesDeque;
