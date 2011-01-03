@@ -56,13 +56,14 @@ namespace PatternGeneratorJRL
     /// \{
     struct state_variant_s
     {
-      /// \brief reference values for the whole preview window
-      MAL_VECTOR(RefX,double);
-      MAL_VECTOR(RefY,double);
-      MAL_VECTOR(RefTheta,double);
+      /// \brief Reference
+      reference_t Ref;
 
       /// \brief State of the Center of Mass
       com_t CoM;
+
+      /// \brief TrunkState
+      trunk_t Trunk;
 
       /// \brief Selection matrix for the previewed and current feet positions.
       MAL_MATRIX(V,double);
@@ -70,10 +71,8 @@ namespace PatternGeneratorJRL
       MAL_VECTOR(Vc,double);
 
       /// \brief Current support foot position
-      double fx, fy;
+      supportfoot_t SupportFoot;
 
-      /// \brief Number of free steps in the preview window
-      int NbStepsPrw;
       /// \}
     };
     typedef state_variant_s state_variant_t;
@@ -110,26 +109,38 @@ namespace PatternGeneratorJRL
     /// \}
 
     /// \brief Accessors to the state matrices
-    inline state_variant_t const & operator ()() const
+    inline state_variant_t const & State() const
     { return m_StateMatrices; };
 
     /// \brief Accessors to the objective dependent matrices
-    objective_variant_t const & operator ()( const int aObjectiveType ) const;
-    objective_variant_t & operator ()( const int aObjectiveType );
+    objective_variant_t const & Objective( const int aObjectiveType ) const;
+    objective_variant_t & Objective( const int aObjectiveType );
 
     /// \brief Accessors to the Center of Mass
-    //inline com_t const & operator ()()
-    //{ return m_StateMatrices.CoM; };
-    void operator ()( com_t CoM )
+    inline com_t const & CoM() const
+    { return m_StateMatrices.CoM; };
+    inline void CoM( const com_t & CoM )
     { m_StateMatrices.CoM = CoM; };
 
-    /// \brief Printers
-    void printObjective( const int ObjectiveType, std::ostream &aos );
-    void printState( std::ostream &aos );
-    void printObjective(const char * filename, const int Objectivetype);
-    void printState(const char * filename);
+    /// \brief Accessors to the reference
+    inline reference_t const & Reference() const
+    { return m_StateMatrices.Ref; };
+    inline reference_t & Reference()
+    { return m_StateMatrices.Ref; };
+    inline void Reference( reference_t & Ref )
+    { m_StateMatrices.Ref = Ref; };
 
+    /// \brief Accessors to the Center of Mass
+    inline supportfoot_t const & SupportFoot() const
+    { return m_StateMatrices.SupportFoot; };
+    inline void SupportFoot( const supportfoot_t & SupportFoot )
+    { m_StateMatrices.SupportFoot = SupportFoot; };
 
+    /// \brief Dumping
+    void dumpObjective( const int ObjectiveType, std::ostream &aos );
+    void dumpState( std::ostream &aos );
+    void dumpObjective(const char * filename, const int Objectivetype);
+    void dumpState(const char * filename);
 
     //
     //Private members
