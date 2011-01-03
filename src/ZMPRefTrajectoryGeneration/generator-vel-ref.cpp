@@ -47,7 +47,7 @@ GeneratorVelRef::~GeneratorVelRef()
 void
 GeneratorVelRef::CallMethod(std::string &Method, std::istringstream &strm)
 {
-  GeneratorVelRef::CallMethod(Method,strm);
+  //GeneratorVelRef::CallMethod(Method,strm);
 }
 
 	
@@ -55,7 +55,7 @@ void
 GeneratorVelRef::setPonderation( IntermedQPMat & Matrices, double weight, const int aObjectiveType)
 {
 
-  IntermedQPMat::objective_variant_t & Objective = Matrices( aObjectiveType );
+  IntermedQPMat::objective_variant_t & Objective = Matrices.Objective( aObjectiveType );
   Objective.weight = weight;
 
 }
@@ -67,11 +67,50 @@ GeneratorVelRef::setReference(std::istringstream &strm)
   //TODO:
 }
 	
+
+void
+GeneratorVelRef::preview(IntermedQPMat Matrices,
+			 SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates)
+{
+
+  const support_state_t & CurrentSupport = deqSupportStates[0];
+  support_state_t PreviewedSupport;
+
+  //initialize the previewed support state before previewing
+  PreviewedSupport.Phase  = CurrentSupport.Phase;
+  PreviewedSupport.Foot  = CurrentSupport.Foot;
+  PreviewedSupport.StepsLeft  = CurrentSupport.StepsLeft;
+  PreviewedSupport.TimeLimit = CurrentSupport.TimeLimit;
+  PreviewedSupport.StepNumber  = 0;
+
+  const reference_t & RefVel = Matrices.Reference();
+  for(int i=1;i<=m_N;i++)
+    {
+      FSM->setSupportState(m_CurrentTime, i, PreviewedSupport, RefVel);
+
+      deqSupportStates.push_back(PreviewedSupport);
+    }
+
+}
+
 	
 void 
-GeneratorVelRef::setReference(double dx, double dy, double dyaw)
+GeneratorVelRef::computeGlobalReference(IntermedQPMat & Matrices, COMState TrunkStateT)
 {
-  //TODO:
+
+  reference_t & Ref = Matrices.Reference();
+
+  MAL_VECTOR_RESIZE(Ref.global.X,m_N);
+  MAL_VECTOR_RESIZE(Ref.global.Y,m_N);
+
+  for( int i=0;i<m_N;i++)
+    {
+      Ref.global.X(i) = Ref.local.x*cos(TrunkStateT.yaw[0]+TrunkStateT.yaw[1]*i*m_T_Prw)-
+	Ref.local.y*sin(TrunkStateT.yaw[0]+TrunkStateT.yaw[1]*i*m_T_Prw);
+      Ref.global.Y(i) = Ref.local.y*cos(TrunkStateT.yaw[0]+TrunkStateT.yaw[1]*i*m_T_Prw)+
+	Ref.local.x*sin(TrunkStateT.yaw[0]+TrunkStateT.yaw[1]*i*m_T_Prw);
+    }
+
 }
 
 
@@ -79,11 +118,11 @@ void
 GeneratorVelRef::initialize(IntermedQPMat & Matrices)
 {
 
-  IntermedQPMat::objective_variant_t & InstVel = Matrices( IntermedQPMat::INSTANT_VELOCITY );
+  IntermedQPMat::objective_variant_t & InstVel = Matrices.Objective( IntermedQPMat::INSTANT_VELOCITY );
   initializeMatrices( InstVel );
-  IntermedQPMat::objective_variant_t & COPCent = Matrices( IntermedQPMat::COP_CENTERING );
+  IntermedQPMat::objective_variant_t & COPCent = Matrices.Objective( IntermedQPMat::COP_CENTERING );
   initializeMatrices( COPCent );
-  IntermedQPMat::objective_variant_t & Jerk = Matrices( IntermedQPMat::JERK );
+  IntermedQPMat::objective_variant_t & Jerk = Matrices.Objective( IntermedQPMat::JERK );
   initializeMatrices( Jerk );
 
 }
@@ -98,41 +137,44 @@ GeneratorVelRef::initializeMatrices( IntermedQPMat::objective_variant_t & Object
   MAL_MATRIX_RESIZE(Objective.S,m_N,3);
 
   switch(Objective.type)
-  {
+    {
     case IntermedQPMat::MEAN_VELOCITY || IntermedQPMat::INSTANT_VELOCITY:
-    for(int i=0;i<m_N;i++)
-      {
-        Objective.S(i,0) = 0.0; Objective.S(i,1) = 1.0; Objective.S(i,2) = (i+1)*m_T_Prw;
-        for(int j=0;j<m_N;j++)
+      for(int i=0;i<m_N;i++)
+	{
+	  Objective.S(i,0) = 0.0; Objective.S(i,1) = 1.0; Objective.S(i,2) = (i+1)*m_T_Prw;
+	  for(int j=0;j<m_N;j++)
             if (j<=i)
               Objective.U(i,j) = Objective.UT(j,i) = (2*(i-j)+1)*m_T_Prw*m_T_Prw*0.5 ;
             else
-                Objective.U(i,j) = Objective.UT(j,i) = 0.0;
-      }
-    break;
+	      Objective.U(i,j) = Objective.UT(j,i) = 0.0;
+	}
+      break;
+
     case IntermedQPMat::COP_CENTERING:
       for(int i=0;i<m_N;i++)
         {
           Objective.S(i,0) = 1.0; Objective.S(i,1) = (i+1)*m_T_Prw; Objective.S(i,2) = (i+1)*(i+1)*m_T_Prw*m_T_Prw*0.5-m_CoMHeight/9.81;
           for(int j=0;j<m_N;j++)
-              if (j<=i)
-                  Objective.U(i,j) = Objective.UT(j,i) = (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_T_Prw*m_T_Prw*m_T_Prw/6.0 - m_T_Prw*m_CoMHeight/9.81;
-              else
-                  Objective.U(i,j) = Objective.UT(j,i) = 0.0;
+	    if (j<=i)
+	      Objective.U(i,j) = Objective.UT(j,i) = (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_T_Prw*m_T_Prw*m_T_Prw/6.0 - m_T_Prw*m_CoMHeight/9.81;
+	    else
+	      Objective.U(i,j) = Objective.UT(j,i) = 0.0;
         }
       break;
+
     case IntermedQPMat::JERK:
       for(int i=0;i<m_N;i++)
         {
           Objective.S(i,0) = 0.0; Objective.S(i,1) = 0.0; Objective.S(i,2) = 0.0;
           for(int j=0;j<m_N;j++)
-              if (j==i)
-                  Objective.U(i,j) = Objective.UT(j,i) = 1.0;
-              else
-                  Objective.U(i,j) = Objective.UT(j,i) = 0.0;
+	    if (j==i)
+	      Objective.U(i,j) = Objective.UT(j,i) = 1.0;
+	    else
+	      Objective.U(i,j) = Objective.UT(j,i) = 0.0;
         }
       break;
-  }
+
+    }
 
 }
 
@@ -157,7 +199,7 @@ void
 GeneratorVelRef::generateZMPConstraints (CjrlFoot & Foot,
 					 std::deque < double > & PreviewedSupportAngles,
 					 SupportFSM & FSM,
-					 SupportState_t & CurrentSupportState,
+					 support_state_t & CurrentSupportState,
 					 QPProblem & Pb)
 {
   //TODO:
@@ -168,7 +210,7 @@ void
 GeneratorVelRef::generateFeetPosConstraints (CjrlFoot & Foot,
 					     std::deque < double > & PreviewedSupportAngles,
 					     SupportFSM & ,
-					     SupportState_t &,
+					     support_state_t &,
 					     QPProblem & Pb)
 {
   //TODO:
@@ -179,51 +221,30 @@ void
 GeneratorVelRef::buildInvariantPart(QPProblem & Pb, IntermedQPMat & Matrices)
 {
 
-  const IntermedQPMat::objective_variant_t & Jerk = Matrices(IntermedQPMat::JERK);
-  updateProblem(Pb.Q, Jerk);
-
-  const IntermedQPMat::objective_variant_t & InstVel = Matrices(IntermedQPMat::INSTANT_VELOCITY);
-  updateProblem(Pb.Q, InstVel);
-
-  const IntermedQPMat::objective_variant_t & COPCent = Matrices(IntermedQPMat::COP_CENTERING);
-  updateProblem(Pb.Q, COPCent);
-
-}
-
-
-void
-GeneratorVelRef::updateProblem(QPProblem & Pb, IntermedQPMat & Matrices)
-{
-
-  const IntermedQPMat::objective_variant_t & InstVel = Matrices(IntermedQPMat::INSTANT_VELOCITY);
-  const IntermedQPMat::state_variant_t & State = Matrices();
-  updateProblem(Pb.Q, Pb.D, InstVel, State);
-
-  const IntermedQPMat::objective_variant_t & COPCent = Matrices(IntermedQPMat::COP_CENTERING);
-  updateProblem(Pb.Q, Pb.D, COPCent, State);
-
-}
-	  
-
-void
-GeneratorVelRef::updateProblem(double * Q, const IntermedQPMat::objective_variant_t & Objective)
-{
-
-  // Final scaled products that are added to the QP
   MAL_MATRIX(weightMTM,double);
 
-  // Quadratic part of the objective
-    computeTerm(weightMTM, Objective.weight, Objective.UT, Objective.U);
-    addTerm(weightMTM, Q, 0, 0, m_N, m_N);
-    addTerm(weightMTM, Q, m_N, m_N, m_N, m_N);
+  const IntermedQPMat::objective_variant_t & Jerk = Matrices.Objective(IntermedQPMat::JERK);
+  // Final scaled products that are added to the QP
+  computeTerm(weightMTM, Jerk.weight, Jerk.UT, Jerk.U);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 0, 0);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, m_N, m_N);
+
+  const IntermedQPMat::objective_variant_t & InstVel = Matrices.Objective(IntermedQPMat::INSTANT_VELOCITY);
+  computeTerm(weightMTM, InstVel.weight, InstVel.UT, InstVel.U);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 0, 0);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, m_N, m_N);
+
+  const IntermedQPMat::objective_variant_t & COPCent = Matrices.Objective(IntermedQPMat::COP_CENTERING);
+  computeTerm(weightMTM, COPCent.weight, COPCent.UT, COPCent.U);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 0, 0);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, m_N, m_N);
 
 }
 
 
 void
-GeneratorVelRef::updateProblem(double * Q, double *p,
-    const IntermedQPMat::objective_variant_t & Objective,
-    const IntermedQPMat::state_variant_t & State)
+GeneratorVelRef::updateProblem(QPProblem & Pb, IntermedQPMat & Matrices,
+			       std::deque<support_state_t> deqSupportStates)
 {
 
   //Intermediate vector
@@ -233,50 +254,45 @@ GeneratorVelRef::updateProblem(double * Q, double *p,
   MAL_MATRIX(weightMTM,double);
   MAL_VECTOR(weightMTV,double);
 
-  // Quadratic part of the Objective
-  switch(Objective.type)
-  {
-  case IntermedQPMat::COP_CENTERING:
-    // Quadratic part of the objective
-    computeTerm(weightMTM, -Objective.weight, Objective.UT, State.V);
-    addTerm(weightMTM, Q, 0, 2*m_N, m_N, State.NbStepsPrw);
-    addTerm(weightMTM, Q, m_N, 2*m_N+State.NbStepsPrw, m_N, State.NbStepsPrw);
-    computeTerm(weightMTM, -Objective.weight, State.VT, Objective.U);
-    addTerm(weightMTM, Q, 2*m_N, 0, State.NbStepsPrw, m_N);
-    addTerm(weightMTM, Q, 2*m_N+State.NbStepsPrw, m_N, State.NbStepsPrw, m_N);
-    computeTerm(weightMTM, Objective.weight, State.VT, State.V);
-    addTerm(weightMTM, Q, 2*m_N, 2*m_N, State.NbStepsPrw, State.NbStepsPrw);
-    addTerm(weightMTM, Q, 2*m_N+State.NbStepsPrw, 2*m_N+State.NbStepsPrw, State.NbStepsPrw, State.NbStepsPrw);
+  const IntermedQPMat::state_variant_t & State = Matrices.State();
 
-    // Linear part of the objective
-    computeTerm(weightMTV, -Objective.weight, State.VT, MV, Objective.S, State.CoM.x);
-    addTerm(weightMTV, p, 2*m_N, State.NbStepsPrw);
-    computeTerm(weightMTV, -Objective.weight, State.VT, MV, Objective.S, State.CoM.y);
-    addTerm(weightMTV, p, 2*m_N+State.NbStepsPrw, State.NbStepsPrw);
-    computeTerm(weightMTV, Objective.weight,Objective.UT,State.Vc,State.fx);
-    addTerm(weightMTV, p, 2*m_N, State.NbStepsPrw);
-    computeTerm(weightMTV, Objective.weight,Objective.UT,State.Vc,State.fx);
-    addTerm(weightMTV, p, 2*m_N+State.NbStepsPrw, State.NbStepsPrw);
-    break;
-  case IntermedQPMat::INSTANT_VELOCITY:
-    // Linear part of the objective
-    computeTerm(weightMTV, Objective.weight,Objective.UT, MV, Objective.S, State.CoM.x);
-    addTerm(weightMTV, p, 0, m_N);
-    computeTerm(weightMTV, Objective.weight,Objective.UT, MV, Objective.S, State.CoM.y);
-    addTerm(weightMTV, p, m_N, m_N);
-    computeTerm(weightMTV, -Objective.weight,Objective.UT, State.RefX);
-    addTerm(weightMTV, p, 0, m_N);
-    computeTerm(weightMTV, -Objective.weight,Objective.UT, State.RefY);
-    addTerm(weightMTV, p, m_N, m_N);
-    break;
-  }
+  const IntermedQPMat::objective_variant_t & InstVel = Matrices.Objective(IntermedQPMat::INSTANT_VELOCITY);
+  computeTerm(weightMTV, InstVel.weight, InstVel.UT, MV, InstVel.S, State.CoM.x);
+  Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 0);
+  computeTerm(weightMTV, InstVel.weight, InstVel.UT, MV, InstVel.S, State.CoM.y);
+  Pb.addTerm(weightMTV, QPProblem::VECTOR_D, m_N);
+  computeTerm(weightMTV, -InstVel.weight, InstVel.UT, State.Ref.global.X);
+  Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 0);
+  computeTerm(weightMTV, -InstVel.weight, InstVel.UT, State.Ref.global.Y);
+  Pb.addTerm(weightMTV, QPProblem::VECTOR_D, m_N);
+
+  const IntermedQPMat::objective_variant_t & COPCent = Matrices.Objective(IntermedQPMat::COP_CENTERING);
+  computeTerm(weightMTM, -COPCent.weight, COPCent.UT, State.V);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 0, 2*m_N);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, m_N, 2*m_N+deqSupportStates[m_N].StepNumber);
+  computeTerm(weightMTM, -COPCent.weight, State.VT, COPCent.U);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 2*m_N, 0);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 2*m_N+deqSupportStates[m_N].StepNumber, m_N);
+  computeTerm(weightMTM, COPCent.weight, State.VT, State.V);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 2*m_N, 2*m_N);
+  Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 2*m_N+deqSupportStates[m_N].StepNumber, 2*m_N+deqSupportStates[m_N].StepNumber);
+
+  // Linear part of the objective
+  computeTerm(weightMTV, -COPCent.weight, State.VT, MV, COPCent.S, State.CoM.x);
+  Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 2*m_N);
+  computeTerm(weightMTV, -COPCent.weight, State.VT, MV, COPCent.S, State.CoM.y);
+  Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 2*m_N+deqSupportStates[m_N].StepNumber);
+  computeTerm(weightMTV, COPCent.weight, COPCent.UT, State.Vc, State.SupportFoot.x);
+  Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 2*m_N);
+  computeTerm(weightMTV, COPCent.weight, COPCent.UT, State.Vc, State.SupportFoot.y);
+  Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 2*m_N+deqSupportStates[m_N].StepNumber);
 
 }
 
 
 void
 GeneratorVelRef::computeTerm(MAL_MATRIX (&weightMM, double), const double & weight,
-    const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double))
+			     const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double))
 {
   weightMM = weight*MAL_RET_A_by_B(M1,M2);
 }
@@ -284,37 +300,41 @@ GeneratorVelRef::computeTerm(MAL_MATRIX (&weightMM, double), const double & weig
 
 void
 GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double), const double weight,
-    const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double))
+			     const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double))
 {
-   weightMV = weight*MAL_RET_A_by_B(M,V);
+  weightMV = weight*MAL_RET_A_by_B(M,V);
 }
 
 
 void
 GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double),
-    const double weight, const MAL_MATRIX (&M, double),
-    const MAL_VECTOR (&V, double), const double scalar)
+			     const double weight, const MAL_MATRIX (&M, double),
+			     const MAL_VECTOR (&V, double), const double scalar)
 {
-   weightMV = weight*scalar*MAL_RET_A_by_B(M,V);
+  weightMV = weight*scalar*MAL_RET_A_by_B(M,V);
 }
 
 
 void
 GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double),
-    const double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
-    const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double))
+			     const double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
+			     const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double))
 {
-   V1 = MAL_RET_A_by_B(M2,V2);
-   weightMV = weight*MAL_RET_A_by_B(M1,V1);
+  V1 = MAL_RET_A_by_B(M2,V2);
+  weightMV = weight*MAL_RET_A_by_B(M1,V1);
 }
 
 
 void
-GeneratorVelRef::addTerm(MAL_MATRIX (&Mat, double), double * target, int row, int col, int nrows, int ncols)
+GeneratorVelRef::addTerm(MAL_MATRIX(&Mat, double), double * target, int row, int col, int nrows, int ncols)
 {
   for(int i = 0;i < nrows; i++)
-    for(int j = 0;j < ncols; j++)
-      target[row+i+(col+j)*m_NbVariables] = Mat(i,j);
+    {
+      for(int j = 0;j < ncols; j++)
+	{
+	  target[row+i+(col+j)*m_NbVariables] = Mat(i,j);
+	}
+    }
 }
 
 
@@ -322,7 +342,7 @@ void
 GeneratorVelRef::addTerm(MAL_VECTOR (&Vec, double), double * target, int index, int nelem)
 {
   for(int i = index;i < nelem; i++)
-      target[i] = Vec(i);
+    target[i] = Vec(i);
 }
 
 
