@@ -68,8 +68,7 @@ namespace PatternGeneratorJRL
     /// \name array
     /// \name old_size
     /// \name new_size
-    int resize(double * &array, const int & old_size, const int & new_size);
-    int resize(int * &array, const int & old_size, const int & new_size);
+    template <class type> int resize(type * &array, const int & old_size, const int & new_size);
 
     /// \brief Add a matrix to the final optimization problem in array form
     ///
@@ -103,8 +102,7 @@ namespace PatternGeneratorJRL
     /// \brief Initialize array
     /// \param array
     /// \param size
-    void initialize(double * array, const int & size);
-    void initialize(int * array, const int & size);
+    template <class type> void initialize(type * array, type value, const int & size);
 
     /// \brief Solve the problem
     void solve(const int solver);
