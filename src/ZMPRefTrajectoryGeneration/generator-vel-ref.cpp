@@ -100,11 +100,17 @@ GeneratorVelRef::generateSelectionMatrices(IntermedQPMat & Matrices,
 
   IntermedQPMat::state_variant_t & State = Matrices.State();
   const int & NbPrwSteps = deqSupportStates.back().StepNumber;
+
   MAL_VECTOR_RESIZE(State.Vc,m_N);
+  State.Vc.clear();
   MAL_MATRIX_RESIZE(State.V,m_N,NbPrwSteps);
+  MAL_MATRIX_CLEAR(State.V);
+  MAL_MATRIX_RESIZE(State.VT,NbPrwSteps,m_N);
+  MAL_MATRIX_CLEAR(State.VT);
 
   std::deque<support_state_t>::iterator SS_it;
-  SS_it = deqSupportStates.begin();
+  SS_it = deqSupportStates.begin();//points at the cur. sup. st.
+
   SS_it++;
   for(int i=0;i<m_N;i++)
     {
@@ -125,7 +131,9 @@ GeneratorVelRef::computeGlobalReference(IntermedQPMat & Matrices, COMState Trunk
   reference_t & Ref = Matrices.Reference();
 
   MAL_VECTOR_RESIZE(Ref.global.X,m_N);
+  Ref.global.X.clear();
   MAL_VECTOR_RESIZE(Ref.global.Y,m_N);
+  Ref.global.Y.clear();
 
   for( int i=0;i<m_N;i++)
     {
@@ -157,8 +165,11 @@ GeneratorVelRef::initializeMatrices( IntermedQPMat::objective_variant_t & Object
 {
 
   MAL_MATRIX_RESIZE(Objective.U,m_N,m_N);
+  MAL_MATRIX_CLEAR(Objective.U);
   MAL_MATRIX_RESIZE(Objective.UT,m_N,m_N);
+  MAL_MATRIX_CLEAR(Objective.UT);
   MAL_MATRIX_RESIZE(Objective.S,m_N,3);
+  MAL_MATRIX_CLEAR(Objective.S);
 
   switch(Objective.type)
     {
@@ -300,7 +311,6 @@ GeneratorVelRef::updateProblem(QPProblem & Pb, IntermedQPMat & Matrices,
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 2*m_N, 2*m_N);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 2*m_N+deqSupportStates[m_N].StepNumber, 2*m_N+deqSupportStates[m_N].StepNumber);
 
-  // Linear part of the objective
   computeTerm(weightMTV, -COPCent.weight, State.VT, MV, COPCent.S, State.CoM.x);
   Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 2*m_N);
   computeTerm(weightMTV, -COPCent.weight, State.VT, MV, COPCent.S, State.CoM.y);
