@@ -102,7 +102,7 @@ namespace PatternGeneratorJRL
     /// \brief Initialize array
     /// \param array
     /// \param size
-    template <class type> void initialize(type * array, type value, const int & size);
+    template <class type> void initialize(type * array, const int & size, type value);
 
     /// \brief Solve the problem
     void solve(const int solver);
