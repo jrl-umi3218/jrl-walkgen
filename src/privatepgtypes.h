@@ -30,6 +30,7 @@
 #define  _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_
 
 #include <jrl/mal/matrixabstractlayer.hh>
+#include <boost/numeric/ublas/matrix_sparse.hpp>
 
 namespace PatternGeneratorJRL
 {
@@ -114,7 +115,7 @@ namespace PatternGeneratorJRL
 
   struct solution_s
   {
-    /// \brief whole solution array
+    /// \brief Whole solution array
     double * array;
 
     struct vector_s
@@ -129,10 +130,13 @@ namespace PatternGeneratorJRL
 
     vector_t jerk, footpos;
 
+    /// \brief Lagrange multipliers
+    MAL_VECTOR(lambda,double);
+
   };
   typedef struct solution_s solution_t;
 
-  /// \brief Linear constraints with free foot placement.
+  /// \brief Linear inequality with free foot placement.
   struct linear_inequality_ff_s
   {
     MAL_MATRIX(D,double);
@@ -141,6 +145,15 @@ namespace PatternGeneratorJRL
   };
   typedef struct linear_inequality_ff_s
     linear_inequality_ff_t;
+
+  /// \brief Linear constraints
+  struct linear_constraint_s
+  {
+    ublas::compressed_vector<double> A;
+    double b;
+  };
+  typedef struct linear_constraint_s
+  linear_constraint_t;
 
 }
 
