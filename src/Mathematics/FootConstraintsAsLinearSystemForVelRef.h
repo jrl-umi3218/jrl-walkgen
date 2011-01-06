@@ -52,116 +52,167 @@
 namespace PatternGeneratorJRL
 {
 
-  /*! This class generates matrix representation of linear
-   constraint based on foot position.
-   It handles a stack of constraint on a sliding mode 
-   for QP solving.
-   */
-  class  FootConstraintsAsLinearSystemForVelRef: public SimplePlugin
-    {
-    public:
+  /// \brief Generate a stack of inequality constraints for the whole preview window.
+  class FootConstraintsAsLinearSystemForVelRef:public SimplePlugin
+  {
 
-      /*! Constructor */
-      FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM, 
-				    CjrlHumanoidDynamicRobot *aHS,
-				    double ConstraintOnX,
-				    double ConstraintOnY);
+    //
+    // Public member functions
+    //
+  public:
 
-      /*! Destructor */
-      ~FootConstraintsAsLinearSystemForVelRef();
+    /// \name Constructors and destructors.
+    /// \{
+    FootConstraintsAsLinearSystemForVelRef (SimplePluginManager * aSPM,
+                                            CjrlHumanoidDynamicRobot * aHS);
+    ~FootConstraintsAsLinearSystemForVelRef ();
+    /// \}
 
-      /*! Compute the linear system \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the 
-	set of points specified by aVecOfPoints. aVecOfPoints is supposed to represent
-	the convex hull of the robot contact points with the ground.
-       */
-      int ComputeLinearSystem(std::vector<CH_Point> aVecOfPoints,
-			      MAL_MATRIX(&A,double),
-			      MAL_MATRIX(&B,double),
-			      MAL_VECTOR(&C,double));
+    /// \brief Build a queue of inequalities
+    ///
+    /// \param LeftFootAbsolutePositions used to get the current position of the left foot
+    /// \param RightFootAbsolutePositions used to get the current position of the right foot
+    /// \param ZMPInequalitiesDeque constraints on the ZMP relative to the foot centers
+    /// \param FeetPosInequalitiesDeque constraints on the feet placements relative to previous foot placements
+    /// \param RefVel the velocity reference
+    /// \param CurrentTime
+    /// \param QP_N number of instants in the preview horizon
+    /// \param SupportFSM the finite state machine for the preview of support states
+    /// \param CurrentSupport
+    /// \param PrwSupport output of SupportFSM
+    /// \param PreviewedSupportAngles deque of support orientations previewed previously
+    /// \param NbOfConstraints total number of previewed constraints
+    int buildConstraintInequalities (std::deque < FootAbsolutePosition >
+                                     &LeftFootAbsolutePositions,
+                                     std::deque < FootAbsolutePosition >
+                                     &RightFootAbsolutePositions,
+                                     std::deque <
+                                     LinearConstraintInequalityFreeFeet_t >
+                                     &ZMPInequalitiesDeque,
+                                     std::deque <
+                                     LinearConstraintInequalityFreeFeet_t >
+                                     &FeetPosInequalitiesDeque,
+                                     reference_t & RefVel,
+                                     double CurrentTime, double QP_N,
+                                     SupportFSM * SupportFSM,
+                                     support_state_t & CurrentSupport,
+                                     support_state_t & PrwSupport,
+                                     std::deque <
+                                     double >&PreviewedSupportAngles,
+                                     int &NbOfConstraints);
 
-      /*! Compute the linear system \f${\bf D}{\bf x} \geq {\bf b}\f$ associated with the 
-	set of points specified by aVecOfPoints. aVecOfPoints is supposed can represent
-	either the convex hull of the robot contact points with the ground or the constraints on the 
-	placement of the feet.
-       */
-      int computeLinearSystem(std::vector<CH_Point> aVecOfPoints,
-			      MAL_MATRIX(&D,double),
-			      MAL_MATRIX(&Dc,double),
-			      support_state_t PrwSupport);
+    /// \brief Reimplement the interface of SimplePluginManager
+    ///
+    /// \param[in] Method: The method to be called.
+    /// \param[in] Args: Arguments of the methods.
+    virtual void CallMethod (std::string & Method, std::istringstream & Args);
 
-      /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
-	Position.
-       */
-      int buildLinearConstraintInequalities(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
-					    std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					    std::deque<LinearConstraintInequalityFreeFeet_t> &
-					    QueueOfLConstraintInequalities,
-					    std::deque<LinearConstraintInequalityFreeFeet_t> &
-					    QueueOfFeetPosInequalities,
-					    reference_t & RefVel,
-					    double StartingTime,
-					    double m_QP_N,
-					    SupportFSM * SupportFSM, support_state_t CurrentSupport, support_state_t & PrwSupport,
-					    std::deque<double> &PreviewedSupportAngles,
-					    int & NbOfConstraints);
+    //
+    // Private member functions
+    //
+  private:
 
-      /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute Position.  */
-      int BuildLinearConstraintInequalities2(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
-					     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-					     std::deque<LinearConstraintInequality_t> &
-					     QueueOfLConstraintInequalities,
-					     double ConstraintOnX,
-					     double ConstraintOnY);
+    /// \brief Initialize
+    void initFPConstrArrays ();
 
-      /*! Find Similar Constraints */
-      int FindSimilarConstraints(MAL_MATRIX(&A,double),
-				 std::vector<int> &SimilarConstraints);
+    /// \brief Initialize the convex hulls for the constraints
+    ///
+    /// \return 0
+    int initConvexHulls ();
 
-      /*! Reimplement the interface of SimplePluginManager 
-	\param[in] Method: The method to be called.
-	\param[in] Args: Arguments of the methods.
-       */
-      virtual void CallMethod(std::string & Method, std::istringstream &Args);
+    /// \brief Define the dimensions of the feet
+    ///
+    /// \param aHS object of the robot
+    /// \return 0
+    int setFeetDimensions (CjrlHumanoidDynamicRobot * aHS);
 
-    private:
+    /// \brief Initialize the constraint hulls
+    ///
+    /// return 0
+    int initFeetConstraints ();
 
-      void initFPConstrArrays();
+    /// \brief Adapt vertices to the support foot and its orientation
+    ///
+    /// \param ZMPConstrVertices vertices of the ZMP convex hull
+    /// \param FeetPosConstrVertices vertices of the foot position convex hull
+    /// \param ZMPConvHullOrientation
+    /// \param FeetPosConvHullOrientation
+    /// \param PrwSupport previewed support state
+    /// \return 0
+    int setVertices (std::vector < CH_Point > &ZMPConstrVertices,
+                     std::vector < CH_Point > &FeetPosConstrVertices,
+                     double ZMPConvHullOrientation,
+                     double FeetPosConvHullOrientation,
+                     support_state_t & PrwSupport);
 
-      /* ! Reference on the Humanoid Specificities. */
+    /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
+    /// convex hull specified by a vector of points.
+    ///
+    /// \param aVecOfPoints a vector of vertices
+    /// \param D left hand side of the inequalities
+    /// \param Dc right hand side of the inequalities
+    /// \param PrwSupport previewed support state
+    /// \return 0
+    int computeLinearSystem (std::vector < CH_Point > aVecOfPoints,
+                             MAL_MATRIX (&D, double),
+                             MAL_MATRIX (&Dc, double),
+                             support_state_t & PrwSupport);
+
+    //
+    // Private members
+    //
+  private:
+    /// \brief Reference to the Humanoid Specificities.
       CjrlHumanoidDynamicRobot * m_HS;
-      
-      std::vector<CH_Point> m_ConvexHullFP;
-      
-      double* m_CHFPosConstrArrayX; 
-      double* m_CHFPosConstrArrayY;
 
-      // Find the convex hull for each of the position,
-      // in order to create the corresponding trajectory.
-      FootHalfSize m_LeftFootSize, m_RightFootSize;
-      double m_Z;
-      
-      double m_DSFeetDistance;
-      
-      // Read humanoid specificities.
-      CjrlFoot * m_RightFoot;
-      CjrlFoot * m_LeftFoot;
-  
-      int State; // State for the system 0:start, 1: Right Support Foot, 2: Left Support Foot,
-      // 3: Double Support.
-      int ComputeCH;
-      double m_x, m_y;
-      
-      //      double m_prev_xmin, m_prev_xmax, m_prev_ymin, m_prev_ymax;
-      
-      //      double s_t,c_t;
-      
-      unsigned int m_FullDebug;
+    /// \brief convex hull
+      std::vector < CH_Point > m_ConvexHullVertices;
 
-      /*! \brief Additional constraints on the feet size.
-	m_ConstraintOnX  is removed from the length of the feet along the X-axis.
-	m_ConstraintOnY  is removed from the length of the feet along the Y-axis.
-       */
-      double m_ConstraintOnX, m_ConstraintOnY;
-    };
+
+    /// \brief Vertices defining the constraints on the feet positions
+    double *m_FPosConstrVerticesX;
+    double *m_FPosConstrVerticesY;
+    double m_LeftFPosConstrVerticesX[5];
+    double m_RightFPosConstrVerticesX[5];
+    double m_LeftFPosConstrVerticesY[5];
+    double m_RightFPosConstrVerticesY[5];
+
+    /// \brief Vertices defining the constraints on the zmp positions
+    double *m_ZMPConstrVerticesX;
+    double *m_ZMPConstrVerticesY;
+    double m_LeftZMPConstrVerticesX[4];
+    double m_RightZMPConstrVerticesX[4];
+    double m_LeftZMPConstrVerticesY[4];
+    double m_RightZMPConstrVerticesY[4];
+    double m_LeftDSZMPConstrVerticesX[4];
+    double m_RightDSZMPConstrVerticesX[4];
+    double m_LeftDSZMPConstrVerticesY[4];
+    double m_RightDSZMPConstrVerticesY[4];
+
+    /// \brief Some coefficients
+    ///
+    /// For symmetrical constraints: The points of the left foot are counted clockwise.
+    double *m_lxcoefsRight;
+    double *m_lycoefsRight;
+    double *m_lxcoefsLeft;
+    double *m_lycoefsLeft;
+
+    /// \brief Half foot size
+    FootHalfSize m_LeftFootSize, m_RightFootSize;
+
+    /// \brief Security margins (default 40 cm)
+    double m_SecurityMarginX;
+    double m_SecurityMarginY;
+
+    /// \brief Distance between the feet in the double support phase
+    double m_DSFeetDistance;
+
+    /// \brief Foot specificities.
+    CjrlFoot *m_RightFoot;
+    CjrlFoot *m_LeftFoot;
+
+    unsigned int m_FullDebug;
+
+  };
 }
-#endif /* _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_ */
+#endif                          /* _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_ */
