@@ -676,9 +676,9 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
 						     double * &DU,
 						     double , 
 						     double StartingTime,
-						     deque<LinearConstraintInequalityFreeFeet_t> &
+						     deque<linear_inequality_ff_t> &
 						     QueueOfLConstraintInequalitiesFreeFeet,
-						     deque<LinearConstraintInequalityFreeFeet_t> &
+						     deque<linear_inequality_ff_t> &
 						     QueueOfFeetPosInequalities,
 						     deque<supportfoot_t> &
 						     QueueOfSupportFeet,
@@ -691,7 +691,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
   m_Pb.initialize(m_Pb.DS,2*(m_QP_N+m_PrwSupport.StepNumber),0.0);
 
   //Current support foot
-  deque<LinearConstraintInequalityFreeFeet_t>::iterator LCIFF_it;
+  deque<linear_inequality_ff_t>::iterator LCIFF_it;
   deque<supportfoot_t>::iterator CurSF_it;
   CurSF_it = QueueOfSupportFeet.end();
   CurSF_it--;
@@ -1250,8 +1250,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 
       deque<LinearConstraintInequality_t> QueueOfLConstraintInequalities;
-      deque<LinearConstraintInequalityFreeFeet_t> QueueOfLConstraintInequalitiesFreeFeet;
-      deque<LinearConstraintInequalityFreeFeet_t> QueueOfFeetPosInequalities;
+      deque<linear_inequality_ff_t> QueueOfLConstraintInequalitiesFreeFeet;
+      deque<linear_inequality_ff_t> QueueOfFeetPosInequalities;
 
       // pre compute the matrices needed for the optimization.
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;

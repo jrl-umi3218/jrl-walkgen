@@ -277,8 +277,8 @@ FootConstraintsAsLinearSystemForVelRef::computeLinearSystem( vector<CH_Point> & 
 int
 FootConstraintsAsLinearSystemForVelRef::buildConstraintInequalities( deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
                                                                      deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-                                                                     deque<LinearConstraintInequalityFreeFeet_t> & ZMPInequalitiesDeque,
-                                                                     deque<LinearConstraintInequalityFreeFeet_t> & FeetPosInequalitiesDeque,
+                                                                     deque<linear_inequality_ff_t> & ZMPInequalitiesDeque,
+                                                                     deque<linear_inequality_ff_t> & FeetPosInequalitiesDeque,
                                                                      reference_t & RefVel, double StartingTime, double QP_N,
                                                                      SupportFSM * SupportFSM, support_state_t & CurrentSupport, support_state_t & PrwSupport,
                                                                      deque<double> &PreviewedSupportAngles, int & NbConstraints )
@@ -348,14 +348,14 @@ FootConstraintsAsLinearSystemForVelRef::buildConstraintInequalities( deque< Foot
           setVertices( ZMPConstrVertices, FeetPosConstrVertices,
                        ZMPConvHullOrientation, FPConvHullOrientation, PrwSupport );
 
-          LinearConstraintInequalityFreeFeet_t aLCIFP;
+          linear_inequality_ff_t aLCIFP;
           computeLinearSystem( FeetPosConstrVertices, aLCIFP.D, aLCIFP.Dc, PrwSupport );
           aLCIFP.StepNumber = PrwSupport.StepNumber;
           FeetPosInequalitiesDeque.push_back( aLCIFP );
           NbConstraints += MAL_MATRIX_NB_ROWS( aLCIFP.D );
         }
 
-      LinearConstraintInequalityFreeFeet_t aLCI;
+      linear_inequality_ff_t aLCI;
       computeLinearSystem( ZMPConstrVertices, aLCI.D, aLCI.Dc, PrwSupport );
       aLCI.StepNumber = PrwSupport.StepNumber;
       ZMPInequalitiesDeque.push_back( aLCI );

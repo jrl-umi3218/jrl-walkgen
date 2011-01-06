@@ -132,6 +132,16 @@ namespace PatternGeneratorJRL
   };
   typedef struct solution_s solution_t;
 
+  /// \brief Linear constraints with free foot placement.
+  struct linear_inequality_ff_s
+  {
+    MAL_MATRIX(D,double);
+    MAL_MATRIX(Dc,double);
+    int StepNumber;
+  };
+  typedef struct linear_inequality_ff_s
+    linear_inequality_ff_t;
+
 }
 
 #endif /* _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_ */

@@ -58,7 +58,7 @@ namespace Optimization
 
 	  /*! \brief Solve the optimization problem 
 	   */
-	  int SolveProblem(std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, 
+	  int SolveProblem(std::deque<PatternGeneratorJRL::linear_inequality_ff_t> & QueueOfLConstraintInequalitiesFreeFeet,
 			   std::deque<PatternGeneratorJRL::supportfoot_t> & QueueOfSupportFeet,
 			   double *CstPartOfTheCostFunction,
 			   unsigned int NbOfConstraints,
@@ -74,7 +74,7 @@ namespace Optimization
 	    @{
 	   */
 	  /*! Compute the initial solution */
-	  int ComputeInitialSolution(std::deque<PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet, 
+	  int ComputeInitialSolution(std::deque<PatternGeneratorJRL::linear_inequality_ff_t> & QueueOfLConstraintInequalitiesFreeFeet,
 				     std::deque<PatternGeneratorJRL::supportfoot_t> & QueueOfSupportFeet, unsigned int NumberSteps,
 				     double *XkYk);
 
