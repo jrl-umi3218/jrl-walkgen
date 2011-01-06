@@ -87,10 +87,10 @@ namespace PatternGeneratorJRL
                                      std::deque < FootAbsolutePosition >
                                      &RightFootAbsolutePositions,
                                      std::deque <
-                                     LinearConstraintInequalityFreeFeet_t >
+                                     linear_inequality_ff_t >
                                      &ZMPInequalitiesDeque,
                                      std::deque <
-                                     LinearConstraintInequalityFreeFeet_t >
+                                     linear_inequality_ff_t >
                                      &FeetPosInequalitiesDeque,
                                      reference_t & RefVel,
                                      double CurrentTime, double QP_N,

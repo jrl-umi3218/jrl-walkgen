@@ -105,14 +105,14 @@ namespace PatternGeneratorJRL
     ///
     /// \param DU
     /// \param DS
-    void addEqConstraint(std::deque<LinearConstraintInequalityFreeFeet_t> ConstraintsDeque,
+    void addEqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
 			 MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double));
 	  
     /// \brief Add one inequality constraint to the queue of constraints
     ///
     /// \param DU
     /// \param DS
-    void addIneqConstraint(std::deque<LinearConstraintInequalityFreeFeet_t> ConstraintsDeque,
+    void addIneqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
 			   MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double));
 
     /// \brief Generate a queue of inequality constraints on the ZMP for the whole preview window
@@ -141,8 +141,8 @@ namespace PatternGeneratorJRL
 
     void buildConstraintInequalities( std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
         std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-        std::deque<LinearConstraintInequalityFreeFeet_t> & ZMPInequalitiesDeque,
-        std::deque<LinearConstraintInequalityFreeFeet_t> & FeetPosInequalitiesDeque,
+        std::deque<linear_inequality_ff_t> & ZMPInequalitiesDeque,
+        std::deque<linear_inequality_ff_t> & FeetPosInequalitiesDeque,
         std::deque<support_state_t> & deqSupportStates,
         std::deque<double> &PreviewedSupportAngles, int & NbConstraints,
         FootConstraintsAsLinearSystemForVelRef * FCALS);
@@ -248,7 +248,7 @@ namespace PatternGeneratorJRL
     reference_t m_Ref;
 	  
     /// \brief Inequality constraints
-    std::deque<LinearConstraintInequalityFreeFeet_t> m_LinearInequalities;
+    std::deque<linear_inequality_ff_t> m_LinearInequalities;
 	  
     /// \brief History of support states
     std::deque<supportfoot_t> m_SupportFeetDeque;
