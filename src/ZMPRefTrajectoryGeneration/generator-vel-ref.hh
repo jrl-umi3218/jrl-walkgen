@@ -31,12 +31,15 @@
 
 #include <ZMPRefTrajectoryGeneration/mpc-trajectory-generation.hh>
 
-#include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 #include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 #include <PreviewControl/SupportFSM.h>
-#include <privatepgtypes.h>
-#include <Mathematics/intermediate-qp-matrices.hh>
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
+#include <Mathematics/intermediate-qp-matrices.hh>
+#include <Mathematics/FootConstraintsAsLinearSystemForVelRef.h>
+
+#include <privatepgtypes.h>
+
 
 namespace PatternGeneratorJRL
 {
@@ -60,10 +63,9 @@ namespace PatternGeneratorJRL
 
     /// \brief Set the weights on the objective terms
     ///
-    /// \param alpha
-    /// \param beta
-    /// \param gamma
-    /// \param delta
+    /// \param Matrices
+    /// \param weight
+    /// \param objective
     void setPonderation( IntermedQPMat & Matrices, double weight, int objective );
 
     /// \brief Set the velocity reference from string
@@ -73,6 +75,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Preview support state for the whole preview period
     ///
+    /// \param Matrices
     /// \param FSM
     /// \param deqSupportStates
     void preview(IntermedQPMat Matrices,
@@ -135,6 +138,14 @@ namespace PatternGeneratorJRL
 				     SupportFSM & ,
 				     support_state_t &,
 				     QPProblem & Pb);
+
+    void buildConstraintInequalities( std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
+        std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+        std::deque<LinearConstraintInequalityFreeFeet_t> & ZMPInequalitiesDeque,
+        std::deque<LinearConstraintInequalityFreeFeet_t> & FeetPosInequalitiesDeque,
+        std::deque<support_state_t> & deqSupportStates,
+        std::deque<double> &PreviewedSupportAngles, int & NbConstraints,
+        FootConstraintsAsLinearSystemForVelRef * FCALS);
 
     /// \brief Build the constant part of the objective
     ///
