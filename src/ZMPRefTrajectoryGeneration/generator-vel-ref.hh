@@ -115,30 +115,39 @@ namespace PatternGeneratorJRL
     void addIneqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
 			   MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double));
 
-    /// \brief Generate a queue of inequality constraints on the ZMP for the whole preview window
+    /// \brief Generate a queue of inequalities with respect to the centers of the feet
     ///
-    /// \param CjrlFoot
-    /// \param PreviewedSupportAngles
-    /// \param SupportFSM
-    /// \param CurrentSupportState
-    void generateZMPConstraints (CjrlFoot & Foot,
-				 std::deque < double > & PreviewedSupportAngles,
-				 SupportFSM & FSM,
-				 support_state_t & CurrentSupportState,
-				 QPProblem & Pb);
+    /// \param[out] deqZMPInequalities
+    /// \param[in] FCALS
+    /// \param[in] AbsoluteLeftFootPositions
+    /// \param[in] AbsoluteRightFootPositions
+    /// \param[in] deqSupportStates
+    /// \param[in] PreviewedSupportAngles
+    /// \param[in] NbConstraints
+    void generateIneqCOP(std::deque<linear_inequality_ff_t> & deqZMPInequalities,
+        FootConstraintsAsLinearSystemForVelRef * FCALS,
+        std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
+        std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+        std::deque<support_state_t> & deqSupportStates,
+        std::deque<double> & PreviewedSupportAngles, int & NbConstraints);
 
     /// \brief Generate a queue of inequality constraints on the feet positions for the whole preview window
     ///
-    /// \param Foot
-    /// \param PreviewedSupportAngles
-    /// \param SupportFSM
-    /// \param CurrentSupportState
-    void generateFeetPosConstraints (CjrlFoot & Foot,
-				     std::deque < double > & PreviewedSupportAngles,
-				     SupportFSM & ,
-				     support_state_t &,
-				     QPProblem & Pb);
+    /// \param[out] deqFeetInequalities
+    /// \param[in] FCALS
+    /// \param[in] AbsoluteLeftFootPositions
+    /// \param[in] AbsoluteRightFootPositions
+    /// \param[in] deqSupportStates
+    /// \param[in] PreviewedSupportAngles
+    /// \param[in] NbConstraints
+    void generateIneqFeet(std::deque<linear_inequality_ff_t> & deqFeetInequalities,
+        FootConstraintsAsLinearSystemForVelRef * FCALS,
+        std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
+        std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+        std::deque<support_state_t> & deqSupportStates,
+        std::deque<double> & PreviewedSupportAngles, int & NbConstraints);
 
+    /// \brief Deprecated method
     void buildConstraintInequalities( std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
         std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
         std::deque<linear_inequality_ff_t> & ZMPInequalitiesDeque,
@@ -149,7 +158,8 @@ namespace PatternGeneratorJRL
 
     /// \brief Build the constant part of the objective
     ///
-    /// \param Pb
+    /// \param[in] Pb
+    /// \param[in] Matrices
     void buildInvariantPart(QPProblem & Pb, IntermedQPMat & Matrices);
 
     /// \brief Compute the objective matrices
