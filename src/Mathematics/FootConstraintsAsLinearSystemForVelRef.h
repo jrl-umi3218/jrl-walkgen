@@ -57,6 +57,13 @@ namespace PatternGeneratorJRL
   {
 
     //
+    // Public types
+    //
+  public:
+    const static int ZMP_CONSTRAINTS = 0;
+    const static int FOOT_CONSTRAINTS = 1;
+
+    //
     // Public member functions
     //
   public:
@@ -77,11 +84,10 @@ namespace PatternGeneratorJRL
     /// \param FeetPosConvHullOrientation
     /// \param PrwSupport previewed support state
     /// \return 0
-    int setVertices( convex_hull_t & ZMPConstrVertices,
-		     convex_hull_t & FeetPosConstrVertices,
-		     double & ZMPConvHullAngle,
-		     double & FeetPosConvHullAngle,
-		     support_state_t & PrwSupport);
+    int setVertices( convex_hull_t & ConvexHull,
+        double & Orientation,
+        support_state_t & PrwSupport,
+        const int constraints_type);
 
     /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
     /// convex hull specified by a vector of points.
@@ -137,23 +143,17 @@ namespace PatternGeneratorJRL
     double *m_FPosConstrVerticesX;
     double *m_FPosConstrVerticesY;
 
-    struct foot_pos_edges_s
-    {
-      convex_hull_t left, right;
-    };
-
-    struct foot_pos_edges_s m_FootPosCstr;
-
-    struct zmp_pos_edges_s
+    struct edges_s
     {
       convex_hull_t
-      leftSS,
-	rightSS,
-	rightDS,
-	leftDS;
+        leftSS,
+        rightSS,
+        rightDS,
+        leftDS;
     };
 
-    struct zmp_pos_edges_s m_ZMPPosCstr;
+    struct edges_s m_FootPosEdges, m_ZMPPosEdges;
+
 
 
     /// \brief Some coefficients

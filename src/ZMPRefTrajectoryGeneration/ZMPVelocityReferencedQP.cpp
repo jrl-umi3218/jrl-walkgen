@@ -1388,8 +1388,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 			      xk);
 
 
-      //if(time>0.0)
-        //m_OnLineMode = false;
+//      if(time>0.0)
+//        m_OnLineMode = false;
 
       double ldt = 0.0;
       if ((m_FastFormulationMode==QLDANDLQ)||
