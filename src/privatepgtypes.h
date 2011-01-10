@@ -31,6 +31,7 @@
 
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
 
 namespace PatternGeneratorJRL
 {
@@ -186,6 +187,27 @@ namespace PatternGeneratorJRL
 
   };
   typedef struct convex_hull_s convex_hull_t;
+
+
+  /// \brief Linear inequalities set
+  struct linear_inequality_s
+  {
+    struct coordinate_s
+    {
+      boost_ublas::compressed_matrix<double, boost_ublas::column_major> D;
+    };
+    struct coordinate_s x, y;
+
+    boost_ublas::vector<double> dc;
+
+    int type;
+
+    void clear();
+  };
+  typedef struct linear_inequality_s
+    linear_inequality_t;
+
+
 }
 
 #endif /* _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_ */
