@@ -1,5 +1,5 @@
 /*
- * Copyright 2010,
+ * Copyright 2011,
  *
  * Andrei   Herdt
  * Olivier  Stasse
@@ -22,93 +22,158 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/*! This object provides intermediate elements and operations for the construction of a QP.
+/*! Custom (value based) container providing intermediate elements for the construction of a QP.
  */
-
-
 
 #include <Mathematics/intermediate-qp-matrices.hh>
 
+using namespace std;
 using namespace PatternGeneratorJRL;
-
 
 
 IntermedQPMat::IntermedQPMat()
 {
 
   m_MeanVelocity.type = MEAN_VELOCITY;
+  m_Velocity.type = VELOCITY;
+  m_MeanVelocity.dyn = & m_Velocity;
+
   m_InstantVelocity.type = INSTANT_VELOCITY;
+  m_InstantVelocity.dyn = & m_Velocity;
+
   m_COPCentering.type = COP_CENTERING;
+  m_CoP.type = COP;
+  m_COPCentering.dyn = & m_CoP;
+
+  m_JerkMin.type = JERK_MIN;
   m_Jerk.type = JERK;
+  m_JerkMin.dyn = & m_Jerk;
+
+  m_Position.type = POSITION;
+  m_Acceleration.type = ACCELERATION;
+
+  m_IneqCoP.type = INEQ_COP;
+  m_IneqCoM.type = INEQ_COM;
+  m_IneqFeet.type = INEQ_FEET;
 
 }
 
 
 IntermedQPMat::~IntermedQPMat()
 {
-  //TODO:
 }
 
 
 IntermedQPMat::objective_variant_t const &
-IntermedQPMat::Objective( const int aObjectiveType ) const
+IntermedQPMat::Objective( const int type ) const
 {
-  switch(aObjectiveType)
-  {
+  switch(type)
+    {
     case MEAN_VELOCITY:
       return m_MeanVelocity;
     case INSTANT_VELOCITY:
       return m_InstantVelocity;
     case COP_CENTERING:
       return m_COPCentering;
-    case JERK:
-      return m_Jerk;
-  }
+    case JERK_MIN:
+      return m_JerkMin;
+    }
+}
+IntermedQPMat::objective_variant_t &
+IntermedQPMat::Objective( const int type )
+{
+  switch(type)
+    {
+    case MEAN_VELOCITY:
+      return m_MeanVelocity;
+    case INSTANT_VELOCITY:
+      return m_InstantVelocity;
+    case COP_CENTERING:
+      return m_COPCentering;
+    case JERK_MIN:
+      return m_JerkMin;
+    }
 }
 
 
-IntermedQPMat::objective_variant_t &
-IntermedQPMat::Objective( const int aObjectiveType )
+IntermedQPMat::dynamics_t const &
+IntermedQPMat::Dynamics( const int type ) const
 {
-  switch(aObjectiveType)
-  {
-    case MEAN_VELOCITY:
-      return m_MeanVelocity;
-    case INSTANT_VELOCITY:
-      return m_InstantVelocity;
-    case COP_CENTERING:
-      return m_COPCentering;
+  switch(type)
+    {
+    case VELOCITY:
+      return m_Velocity;
+    case COP:
+      return m_CoP;
     case JERK:
       return m_Jerk;
-  }
+    }
+}
+IntermedQPMat::dynamics_t &
+IntermedQPMat::Dynamics( const int type )
+{
+  switch(type)
+    {
+    case VELOCITY:
+      return m_Velocity;
+    case COP:
+      return m_CoP;
+    case JERK:
+      return m_Jerk;
+    }
+}
+
+
+linear_inequality_t const &
+IntermedQPMat::Inequalities( const int type ) const
+{
+  switch(type)
+    {
+    case INEQ_COP:
+      return m_IneqCoP;
+    case INEQ_COM:
+      return m_IneqCoM;
+    case INEQ_FEET:
+      return m_IneqFeet;
+    }
+}
+linear_inequality_t &
+IntermedQPMat::Inequalities( const int type )
+{
+  switch(type)
+    {
+    case INEQ_COP:
+      m_IneqCoP.clear();
+      return m_IneqCoP;
+    case INEQ_COM:
+      m_IneqCoM.clear();
+      return m_IneqCoM;
+    case INEQ_FEET:
+      m_IneqCoM.clear();
+      return m_IneqFeet;
+    }
 }
 
 
 void
 IntermedQPMat::dumpObjective( const int aObjectiveType, std::ostream &aos )
 {
-  IntermedQPMat::objective_variant_t objective;
+
   switch(aObjectiveType)
     {
     case INSTANT_VELOCITY:
-      objective = m_InstantVelocity;
+      m_InstantVelocity.print(aos);
       break;
-    case JERK:
-      objective = m_Jerk;
+
+    case JERK_MIN:
+      m_JerkMin.print(aos);
       break;
+
     case COP_CENTERING:
-      objective = m_COPCentering;
+      m_COPCentering.print(aos);
       break;
     }
 
-  aos << "Ponderation: " << std::endl;
-  aos << objective.weight << std::endl<< std::endl;
-  aos << "U: " << std::endl;
-  aos << objective.U << std::endl<< std::endl;
-  aos << "trans(U): " << std::endl;
-  aos << objective.UT << std::endl<< std::endl;
-  aos << "S: " << std::endl;
-  aos << objective.S << std::endl<< std::endl;
 }
 
 
@@ -121,7 +186,7 @@ IntermedQPMat::dumpState( std::ostream &aos )
 
 void
 IntermedQPMat::dumpObjective(const char * filename,
-                          const int type)
+			     const int type)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
@@ -139,4 +204,30 @@ IntermedQPMat::dumpState(const char * filename)
   aof.close();
 }
 
+std::ostream&
+IntermedQPMat::objective_variant_s::print (std::ostream& o) const
+{
+  o   << endl
+      << "weight: " << weight << endl
+      << "U: " << dyn->U << endl << endl
+      << "UT: " << dyn->UT << endl<< endl
+      << "S: " << dyn->S << endl;
+
+  return o ;
+}
+
+void
+IntermedQPMat::objective_variant_s::dump(const char * filename) const
+{
+  std::ofstream aof;
+  aof.open(filename,std::ofstream::out);
+  print(aof);
+  aof.close();
+}
+
+std::ostream&
+operator << (std::ostream& o, const IntermedQPMat::objective_variant_s& r)
+{
+  return r.print(o);
+}
 
