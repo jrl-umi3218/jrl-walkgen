@@ -102,6 +102,10 @@ namespace PatternGeneratorJRL
                              MAL_MATRIX (&Dc, double),
                              support_state_t & PrwSupport);
 
+    int computeLinearSystem (convex_hull_t & ConvexHull,
+        double * D_x, double * D_y, double * d,
+        support_state_t & PrwSupport);
+
     /// \brief Reimplement the interface of SimplePluginManager
     ///
     /// \param[in] Method: The method to be called.
