@@ -120,28 +120,84 @@ QPProblem_s::resizeAll(const int & NbVariables, const int & NbConstraints)
 }
 
 
-template <class type>
-int
-QPProblem_s::resize(type *& array, const int & old_size, const int & new_size)
+void QPProblem_s::clear(const int type)
 {
 
-  try
+  double * array;
+  int array_size;
+  switch(type)
     {
-      type * NewArray = new type[new_size];
-      initialize(NewArray, new_size, (type)0);
-      for(int i = 0; i < old_size; i++)
-	NewArray[i] = array[i];
-
-      if (array!=0)
-	delete [] array;
-      array = NewArray;
+    case MATRIX_Q:
+      array = Q;
+      array_size = n*n;
+      break;
+    case MATRIX_DU:
+      array = DU;
+      array_size = mmax*n;
+      break;
+    case VECTOR_D:
+      array = D;
+      array_size = n;
+      break;
+    case VECTOR_DS:
+      array = DS;
+      array_size = mmax;
+      break;
+    case VECTOR_XL:
+      array = XL;
+      array_size = n;
+      break;
+    case VECTOR_XU:
+      array = XU;
+      array_size = n;
+      break;
     }
-  catch (std::bad_alloc& ba)
+
+  std::fill_n(array,array_size,0);
+
+}
+
+
+void QPProblem_s::clear(const int type,
+			const int & row, const int & col,
+			const int & nb_rows, const int & nb_cols)
+{
+
+  double * array;
+  int
+    max_rows, max_cols,
+    n_rows,n_cols;
+
+  switch(type)
     {
-      std::cerr << "bad_alloc caught: " << ba.what() << std::endl;
+    case MATRIX_Q:
+      array = Q;
+      max_rows = n_rows = n;
+      max_cols = n;
+      break;
+
+    case MATRIX_DU:
+      array = DU;
+      max_rows = m;
+      max_cols = n;
+      n_rows = mmax;
+      n_cols = n;
+      break;
     }
 
-  return 0;
+  if(row + nb_rows > max_rows || col + nb_cols > max_cols)
+    {
+      //throw sth. like:
+      std::cout<<"Matrix "<<type<<" bounds violated in clear(): "<<std::endl<<
+        "max_rows: "<<max_rows<<std::endl<<
+        "max_cols: "<<max_cols<<std::endl<<
+        "req. cols: "<<row + nb_rows<<
+        "req. rows: "<<col + nb_cols<<std::endl;
+    }
+
+  for(unsigned int i = row;i < row+nb_rows; i++)
+    for(unsigned int j = col;j < nb_cols; j++)
+      array[row+i+(col+j)*n_rows] = 0.0;
 
 }
 
@@ -182,14 +238,6 @@ QPProblem_s::setDimensions(const int & NbVariables,
 }
 
 
-template <class type>
-void
-QPProblem_s::initialize(type * array, const int & size, type value)
-{
-  std::fill_n(array,size,value);
-}
-
-
 void
 QPProblem_s::solve(const int solver)
 {
@@ -205,48 +253,57 @@ QPProblem_s::solve(const int solver)
 
 
 void
-QPProblem_s::addTerm(const MAL_MATRIX (&Mat, double), const int target,
+QPProblem_s::addTerm(const MAL_MATRIX (&Mat, double), const int type,
 		     const int row, const int col)
 {
 
-  double * aArray;
-  int max_rows, max_cols;
+  double * array;
+  int
+    max_rows, max_cols,
+    n_rows,n_cols;
 
-  switch(target)
+  switch(type)
     {
     case MATRIX_Q:
-      aArray = Q;
-      max_rows = n;
+      array = Q;
+      max_rows = n_rows = n;
       max_cols = n;
       break;
 
     case MATRIX_DU:
-      aArray = DU;
+      array = DU;
       max_rows = m;
       max_cols = n;
+      n_rows = mmax;
+      n_cols = n;
       break;
     }
 
-  if(row >= max_rows || col >= max_cols)
+  if(row + Mat.size1() > max_rows || col + Mat.size2() > max_cols)
     {
-      //throw sth.
+      //throw sth. like:
+      std::cout<<"Matrix "<<type<<" bounds violated in addTerm: "<<std::endl<<
+        " max_rows: "<<max_rows<<std::endl<<
+        " max_cols: "<<max_cols<<std::endl<<
+        " req. cols: "<<row + Mat.size1()<<std::endl<<
+        " req. rows: "<<col + Mat.size2()<<std::endl;
     }
 
   for(unsigned int i = 0;i < MAL_MATRIX_NB_ROWS(Mat); i++)
     for(unsigned int j = 0;j < MAL_MATRIX_NB_COLS(Mat); j++)
-      aArray[row+i+(col+j)*n] += Mat(i,j);
+      array[row+i+(col+j)*n_rows] += Mat(i,j);
 
 }
 
 
-void QPProblem_s::addTerm(const MAL_VECTOR (&Vec, double), const int target,
+void QPProblem_s::addTerm(const MAL_VECTOR (&Vec, double), const int type,
 			  const int row)
 {
 
   double * aArray;
   int max_rows;
 
-  switch(target)
+  switch(type)
     {
     case VECTOR_D:
       aArray = D;
@@ -265,17 +322,21 @@ void QPProblem_s::addTerm(const MAL_VECTOR (&Vec, double), const int target,
 
     case VECTOR_DS:
       aArray = DS;
-      max_rows = n;
+      max_rows = mmax;
       break;
     }
 
-  if(row >= max_rows)
+  if(row + Vec.size() > max_rows)
     {
-      //throw sth.
+      //throw sth. like:
+      std::cout<<"Vector "<<type<<" bounds violated in addTerm: "<<std::endl<<
+        "max_rows: "<<max_rows<<std::endl<<
+        "required: "<<row + Vec.size()<<std::endl;
     }
 
-  for(unsigned int i = 0;i < MAL_VECTOR_SIZE(Vec); i++)
+  for(unsigned int i = 0;i < Vec.size(); i++)
     aArray[row+i] += Vec(i);
+
 
 }
 
@@ -298,13 +359,13 @@ QPProblem_s::dumpSolverParameters(std::ostream & aos)
 
 
 void
-QPProblem_s::dump(const int array, std::ostream & aos)
+QPProblem_s::dump(const int type, std::ostream & aos)
 {
 
   int lnbrows=0, lnbcols=0;
   double * aArray=0;
   std::string Name;
-  switch(array)
+  switch(type)
     {
     case MATRIX_Q:
       lnbrows = lnbcols = n ;
@@ -361,11 +422,11 @@ QPProblem_s::dump(const int array, std::ostream & aos)
 
 
 void
-QPProblem_s::dump(const int array, const char * filename)
+QPProblem_s::dump(const int type, const char * filename)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
-  dump(array,aof);
+  dump(type,aof);
   aof.close();
 }
 
@@ -374,12 +435,13 @@ void
 QPProblem_s::dumpProblem(std::ostream &aos)
 {
   dump(MATRIX_Q,aos);
-  dump(MATRIX_DU,aos);
-  
   dump(VECTOR_D,aos);
+
+  dump(MATRIX_DU,aos);
+  dump(VECTOR_DS,aos);
+
   dump(VECTOR_XL,aos);
   dump(VECTOR_XU,aos);
-  dump(VECTOR_DS,aos);
 
   dumpSolverParameters(aos);
 }
