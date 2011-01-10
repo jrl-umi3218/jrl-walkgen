@@ -105,18 +105,6 @@ void LinearizedInvertedPendulum2D::SetRobotControlPeriod(const double & aT)
 }
 
 
-com_t LinearizedInvertedPendulum2D::operator ()() const
-{
-  return m_CoM;
-}
-
-
-void LinearizedInvertedPendulum2D::operator ()( com_t CoM )
-{
-  m_CoM = CoM;
-}
-
-
 void LinearizedInvertedPendulum2D::GetState(MAL_VECTOR_TYPE(double) &lxk)
 {
   //For compability reasons
