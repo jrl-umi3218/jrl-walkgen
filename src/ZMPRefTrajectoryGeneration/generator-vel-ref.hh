@@ -63,55 +63,55 @@ namespace PatternGeneratorJRL
 
     /// \brief Set the weights on the objective terms
     ///
-    /// \param Matrices
-    /// \param weight
-    /// \param objective
+    /// \param[in] Matrices
+    /// \param[in] weight
+    /// \param[in] objective
     void setPonderation( IntermedQPMat & Matrices, double weight, int objective );
 
     /// \brief Set the velocity reference from string
     ///
-    /// \param strm velocity reference string
+    /// \param[in] strm velocity reference string
     void setReference(std::istringstream &strm);
 
     /// \brief Preview support state for the whole preview period
     ///
-    /// \param Matrices
-    /// \param FSM
-    /// \param deqSupportStates
-    void preview(IntermedQPMat Matrices,
-		 SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates);
+    /// \param[in] Matrices
+    /// \param[in] FSM
+    /// \param[out] deqSupportStates
+    void previewSupportStates(IntermedQPMat & Matrices,
+			      SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates);
 
     /// \brief Compute the selection matrices
     ///
-    /// \param Matrices
-    /// \param deqSupportStates
+    /// \param[in] Matrices
+    /// \param[in] deqSupportStates
     void generateSelectionMatrices(IntermedQPMat & Matrices,
-        std::deque<support_state_t> & deqSupportStates);
+				   std::deque<support_state_t> & deqSupportStates);
 
     /// \brief Set the global reference from the local one and the orientation of the trunk frame
     /// for the whole preview window
     ///
-    /// \param Matrices
-    /// \param TrunkStateT State of the trunk at the end of the acceleration phase
+    /// \param[in] Matrices
+    /// \param[in] TrunkStateT State of the trunk at the end of the acceleration phase
     void computeGlobalReference(IntermedQPMat & Matrices, COMState TrunkStateT);
 
     /// \brief Initialize the optimization programm
     ///
-    /// \param Pb
-    /// \param Matrices
+    /// \param[in] Pb
+    /// \param[in] Matrices
     void initialize(IntermedQPMat & Matrices);
 
     /// \brief Add one equality constraint to the queue of constraints
     ///
-    /// \param DU
-    /// \param DS
+    /// \param[in] DU
+    /// \param[in] DS
     void addEqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
 			 MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double));
 	  
     /// \brief Add one inequality constraint to the queue of constraints
     ///
-    /// \param DU
-    /// \param DS
+    /// \param[in] DU
+    /// \param[in] DS
     void addIneqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
 			   MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double));
 
@@ -124,37 +124,51 @@ namespace PatternGeneratorJRL
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
     /// \param[in] NbConstraints
-    void generateIneqCOP(std::deque<linear_inequality_ff_t> & deqZMPInequalities,
-        FootConstraintsAsLinearSystemForVelRef * FCALS,
-        std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-        std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
-        std::deque<support_state_t> & deqSupportStates,
-        std::deque<double> & PreviewedSupportAngles, int & NbConstraints);
+    void buildInequalitiesCoP(std::deque<linear_inequality_ff_t> & deqZMPInequalities,
+			      FootConstraintsAsLinearSystemForVelRef * FCALS,
+			      std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
+			      std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+			      std::deque<support_state_t> & deqSupportStates,
+			      std::deque<double> & PreviewedSupportAngles, int & NbConstraints);
 
-    /// \brief Generate a queue of inequality constraints on the feet positions for the whole preview window
+    void buildInequalitiesCoP(linear_inequality_t & Inequalities,
+			      FootConstraintsAsLinearSystemForVelRef * FCALS,
+			      std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
+			      std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+			      std::deque<support_state_t> & deqSupportStates,
+			      std::deque<double> & PreviewedSupportAngles);
+
+    /// \brief Generate a queue of inequality constraints on the feet positions with respect to another footposition
     ///
-    /// \param[out] deqFeetInequalities
+    /// \param[out] Inequalities
     /// \param[in] FCALS
     /// \param[in] AbsoluteLeftFootPositions
     /// \param[in] AbsoluteRightFootPositions
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
     /// \param[in] NbConstraints
-    void generateIneqFeet(std::deque<linear_inequality_ff_t> & deqFeetInequalities,
-        FootConstraintsAsLinearSystemForVelRef * FCALS,
-        std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-        std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
-        std::deque<support_state_t> & deqSupportStates,
-        std::deque<double> & PreviewedSupportAngles, int & NbConstraints);
+      void buildInequalitiesFeet(linear_inequality_t & Inequalities,
+			       FootConstraintsAsLinearSystemForVelRef * FCALS,
+			       std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
+			       std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+			       std::deque<support_state_t> & deqSupportStates,
+			       std::deque<double> & PreviewedSupportAngles);
 
-    /// \brief Deprecated method
-    void buildConstraintInequalities( std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
-        std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-        std::deque<linear_inequality_ff_t> & ZMPInequalitiesDeque,
-        std::deque<linear_inequality_ff_t> & FeetPosInequalitiesDeque,
-        std::deque<support_state_t> & deqSupportStates,
-        std::deque<double> &PreviewedSupportAngles, int & NbConstraints,
-        FootConstraintsAsLinearSystemForVelRef * FCALS);
+    void buildConstraintsCoP(linear_inequality_t & IneqCoP,
+			     IntermedQPMat::dynamics_t CoP,
+			     IntermedQPMat::state_variant_t & State,
+			     int & NbStepsPreviewed, QPProblem & Pb);
+
+    void buildConstraintsFeet(linear_inequality_t & IneqFeet,
+			      IntermedQPMat::state_variant_t & State,
+			      int & NbStepsPreviewed, QPProblem & Pb);
+
+    void buildConstraints(IntermedQPMat & Matrices, QPProblem & Pb,
+			  FootConstraintsAsLinearSystemForVelRef * FCALS,
+			  std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
+			  std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+			  std::deque<support_state_t> & deqSupportStates,
+			  std::deque<double> & PreviewedSupportAngles);
 
     /// \brief Build the constant part of the objective
     ///
@@ -164,12 +178,11 @@ namespace PatternGeneratorJRL
 
     /// \brief Compute the objective matrices
     ///
-    /// \param Pb
+    /// \param[in] Pb
+    /// \param[in] Matrices
+    /// \param[in] deqSupportStates
     void updateProblem(QPProblem & Pb, IntermedQPMat & Matrices,
-		       std::deque<support_state_t> deqSupportStates);
-
-    /// \brief Infitialize constant parts of the objective
-    void initMatrices( IntermedQPMat::objective_variant_t & Matrix, int objective);
+		       std::deque<support_state_t> & deqSupportStates);
 	  
 
     //
@@ -179,20 +192,21 @@ namespace PatternGeneratorJRL
 
     /// \brief Initialize objective matrices
     ///
-    /// \param Objective
-    void initializeMatrices( IntermedQPMat::objective_variant_t & Objective);
+    /// \param[in] Objective
+    void initializeMatrices( IntermedQPMat::dynamics_t & Objective);
 
-    //    /// \brief Compute a Least Squares objective term and add it to the optimization problem
-    //    void updateProblem(double *& Q, double *& p,
-    //        const IntermedQPMat::objective_variant_t & Objective,
-    //        const IntermedQPMat::state_variant_t & State);
-    //
-    //    /// \brief Compute a quadratic Least Squares objective term and add it to the optimization problem
-    //    void updateProblem(double *& Q, const IntermedQPMat::objective_variant_t & Objective);
+    /// \brief Initialize inequality matrices
+    ///
+    /// \param[in] Objective
+    void initializeMatrices( linear_inequality_t & Inequalities);
 
     /// \brief Scaled product\f$ weight*M*M \f$
     void computeTerm(MAL_MATRIX (&weightMM, double),
 		     const double & weight, const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
+
+    /// \brief Scaled product\f$ M*M \f$
+    void computeTerm(MAL_MATRIX (&MM, double),
+		     const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
 
     /// \brief Scaled product \f$ weight*M*V \f$
     void computeTerm(MAL_VECTOR (&weightMV, double),
