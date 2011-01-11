@@ -54,10 +54,10 @@ GeneratorVelRef::CallMethod(std::string &Method, std::istringstream &strm)
 
 	
 void 
-GeneratorVelRef::setPonderation( IntermedQPMat & Matrices, double weight, const int aObjectiveType)
+GeneratorVelRef::setPonderation( IntermedQPMat & Matrices, double weight, int type)
 {
 
-  IntermedQPMat::objective_variant_t & Objective = Matrices.Objective( aObjectiveType );
+  IntermedQPMat::objective_variant_t & Objective = Matrices.Objective( type );
   Objective.weight = weight;
 
 }
@@ -124,7 +124,7 @@ GeneratorVelRef::generateSelectionMatrices(IntermedQPMat & Matrices,
 	  State.V(i,SS_it->StepNumber-1) = State.VT(SS_it->StepNumber-1,i) = 1.0;
 	  if(SS_it->StepNumber==1)
 	    {
-	      State.Vc_f(0) = -1.0;
+	      State.Vc_f(0) = 1.0;
 	      State.V_f(0,0) = 1.0;
 	    }
 	  else if(SS_it->StepNumber>1)
@@ -142,7 +142,7 @@ GeneratorVelRef::generateSelectionMatrices(IntermedQPMat & Matrices,
 
 
 void 
-GeneratorVelRef::computeGlobalReference(IntermedQPMat & Matrices, COMState TrunkStateT)
+GeneratorVelRef::computeGlobalReference(IntermedQPMat & Matrices, COMState & TrunkStateT)
 {
 
   reference_t & Ref = Matrices.Reference();
@@ -268,56 +268,6 @@ GeneratorVelRef::addIneqConstraint(std::deque<linear_inequality_ff_t> Constraint
 {
   //TODO:
 }
-	  
-
-void 
-GeneratorVelRef::buildInequalitiesCoP(std::deque<linear_inequality_ff_t> & deqZMPInequalities,
-				      FootConstraintsAsLinearSystemForVelRef * FCALS,
-				      std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-				      std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
-				      std::deque<support_state_t> & deqSupportStates,
-				      std::deque<double> & PreviewedSupportAngles, int & NbConstraints)
-{
-
-  convex_hull_t ZMPFeasibilityEdges;
-
-  support_state_t & CurrentSupport = deqSupportStates.front();
-
-  double CurrentSupportAngle;
-  //define the current support angle
-  if( CurrentSupport.Foot==1 )
-    CurrentSupportAngle = AbsoluteLeftFootPositions.back().theta*M_PI/180.0;
-  else
-    CurrentSupportAngle = AbsoluteRightFootPositions.back().theta*M_PI/180.0;
-
-  FCALS->setVertices( ZMPFeasibilityEdges,
-		      CurrentSupportAngle, CurrentSupport,
-		      FootConstraintsAsLinearSystemForVelRef::ZMP_CONSTRAINTS);
-
-  double SupportAngle = CurrentSupportAngle;
-  //set constraints for the whole preview window
-  for( int i=1;i<=m_N;i++ )
-    {
-      support_state_t & PrwSupport = deqSupportStates[i];
-
-      if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 )
-        SupportAngle = PreviewedSupportAngles[PrwSupport.StepNumber-1];
-
-      if( PrwSupport.StateChanged )
-        FCALS->setVertices( ZMPFeasibilityEdges,
-			    SupportAngle, PrwSupport,
-			    FootConstraintsAsLinearSystemForVelRef::ZMP_CONSTRAINTS);
-
-      linear_inequality_ff_t aLCI;
-      FCALS->computeLinearSystem( ZMPFeasibilityEdges, aLCI.D, aLCI.Dc, PrwSupport );
-      aLCI.StepNumber = PrwSupport.StepNumber;
-
-      deqZMPInequalities.push_back( aLCI );
-      NbConstraints += MAL_MATRIX_NB_ROWS( aLCI.D );
-
-    }
-
-}
 
 
 void 
@@ -396,18 +346,14 @@ GeneratorVelRef::buildInequalitiesFeet(linear_inequality_t & Inequalities,
   //set constraints for the whole preview window
   double SupportAngle = CurrentSupportAngle;
 
+  // Arrays for the generated set of inequalities
   const int NbEdges = 5;
   double D_x[NbEdges] = {0.0, 0.0, 0.0, 0.0, 0.0};
   double D_y[NbEdges] = {0.0, 0.0, 0.0, 0.0, 0.0};
   double dc[NbEdges] = {0.0, 0.0, 0.0, 0.0, 0.0};
 
   int NbStepsPreviewed = deqSupportStates.back().StepNumber;
-  Inequalities.x.D.resize(NbEdges*NbStepsPreviewed,NbStepsPreviewed,NbEdges*NbStepsPreviewed);
-  Inequalities.x.D.clear();
-  Inequalities.y.D.resize(NbEdges*NbStepsPreviewed,NbStepsPreviewed,NbEdges*NbStepsPreviewed);
-  Inequalities.y.D.clear();
-  Inequalities.dc.resize(NbEdges*NbStepsPreviewed,NbEdges*NbStepsPreviewed);
-  Inequalities.dc.clear();
+  Inequalities.resize(NbEdges*NbStepsPreviewed,NbStepsPreviewed, false);
 
   int nb_step = 0;
   for( int i=1;i<=m_N;i++ )
@@ -449,28 +395,32 @@ void
 GeneratorVelRef::buildConstraintsCoP(linear_inequality_t & IneqCoP,
 				     IntermedQPMat::dynamics_t CoP,
 				     IntermedQPMat::state_variant_t & State,
-				     int & NbStepsPreviewed, QPProblem & Pb)
+				     int NbStepsPreviewed, QPProblem & Pb)
 {
 
   int NbInequalities = IneqCoP.dc.size();
   boost_ublas::matrix<double> MM(NbInequalities,m_N,false);
 
+  // -D*U
   computeTerm(MM,-1.0,IneqCoP.x.D,CoP.U);
   Pb.addTerm(MM,QPProblem::MATRIX_DU,0,0);
   computeTerm(MM,-1.0,IneqCoP.y.D,CoP.U);
   Pb.addTerm(MM,QPProblem::MATRIX_DU,0,m_N);
 
+  // +D*V
   computeTerm(MM,1.0,IneqCoP.x.D,State.V);
   Pb.addTerm(MM,QPProblem::MATRIX_DU,0,2*m_N);
   computeTerm(MM,1.0,IneqCoP.y.D,State.V);
   Pb.addTerm(MM,QPProblem::MATRIX_DU,0,2*m_N+NbStepsPreviewed);
 
   //constant part
+  // +dc
   Pb.addTerm(IneqCoP.dc,QPProblem::VECTOR_DS,0);
 
   boost_ublas::vector<double> MV(NbInequalities,false);
   boost_ublas::matrix<double> MM2(NbInequalities,3,false);
 
+  // -D*S_z*x
   computeTerm(MM2,1.0,IneqCoP.x.D,CoP.S);
   computeTerm(MV,-1.0,MM2,State.CoM.x);
   Pb.addTerm(MV,QPProblem::VECTOR_DS,0);
@@ -478,9 +428,9 @@ GeneratorVelRef::buildConstraintsCoP(linear_inequality_t & IneqCoP,
   computeTerm(MV,-1.0,MM2,State.CoM.y);
   Pb.addTerm(MV,QPProblem::VECTOR_DS,0);
 
+  // +D*Vc*FP
   computeTerm(MV, State.SupportFoot.x, IneqCoP.x.D, State.Vc);
   Pb.addTerm(MV,QPProblem::VECTOR_DS,0);
-  MV.clear();
   computeTerm(MV, State.SupportFoot.y, IneqCoP.y.D, State.Vc);
   Pb.addTerm(MV,QPProblem::VECTOR_DS,0);
 
@@ -490,19 +440,23 @@ GeneratorVelRef::buildConstraintsCoP(linear_inequality_t & IneqCoP,
 void
 GeneratorVelRef::buildConstraintsFeet(linear_inequality_t & IneqFeet,
 				      IntermedQPMat::state_variant_t & State,
-				      int & NbStepsPreviewed, QPProblem & Pb)
+				      int NbStepsPreviewed, QPProblem & Pb)
 {
 
   const int & NbConstraints = IneqFeet.dc.size();
 
   boost_ublas::matrix<double> MM(NbConstraints,NbStepsPreviewed,false);
 
+  // -D*V_f
   computeTerm(MM,-1.0,IneqFeet.x.D,State.V_f);
   Pb.addTerm(MM,QPProblem::MATRIX_DU,4*m_N,2*m_N);
   computeTerm(MM,-1.0,IneqFeet.y.D,State.V_f);
   Pb.addTerm(MM,QPProblem::MATRIX_DU,4*m_N,2*m_N+NbStepsPreviewed);
 
+  // +dc
   Pb.addTerm(IneqFeet.dc,QPProblem::VECTOR_DS,4*m_N);
+
+  // +D*Vc_f*FP
   boost_ublas::vector<double> MV(NbConstraints*NbStepsPreviewed,false);
   computeTerm(MV, State.SupportFoot.x, IneqFeet.x.D, State.Vc_f);
   Pb.addTerm(MV,QPProblem::VECTOR_DS,4*m_N);
@@ -554,16 +508,19 @@ GeneratorVelRef::buildInvariantPart(QPProblem & Pb, IntermedQPMat & Matrices)
   boost_ublas::matrix<double> weightMTM(m_N,m_N,false);
 
   //Constant terms in the Hessian
-  const IntermedQPMat::objective_variant_t & Jerk = Matrices.Objective(IntermedQPMat::JERK);
+  // +a*U'*U
+  const IntermedQPMat::objective_variant_t & Jerk = Matrices.Objective(IntermedQPMat::JERK_MIN);
   computeTerm(weightMTM, Jerk.weight, Jerk.dyn->UT, Jerk.dyn->U);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 0, 0);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, m_N, m_N);
 
+  // +a*U'*U
   const IntermedQPMat::objective_variant_t & InstVel = Matrices.Objective(IntermedQPMat::INSTANT_VELOCITY);
   computeTerm(weightMTM, InstVel.weight, InstVel.dyn->UT, InstVel.dyn->U);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 0, 0);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, m_N, m_N);
 
+  // +a*U'*U
   const IntermedQPMat::objective_variant_t & COPCent = Matrices.Objective(IntermedQPMat::COP_CENTERING);
   computeTerm(weightMTM, COPCent.weight, COPCent.dyn->UT, COPCent.dyn->U);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 0, 0);
@@ -584,43 +541,47 @@ GeneratorVelRef::updateProblem(QPProblem & Pb, IntermedQPMat & Matrices,
   MAL_MATRIX(weightMTM,double);
   MAL_VECTOR(weightMTV,double);
 
-  double NbStepsPreviewed = deqSupportStates[m_N].StepNumber;
+  const int NbStepsPreviewed = deqSupportStates[m_N].StepNumber;
 
   const IntermedQPMat::state_variant_t & State = Matrices.State();
 
   // Instant velocity terms
-  // Linear part
   const IntermedQPMat::objective_variant_t & InstVel = Matrices.Objective(IntermedQPMat::INSTANT_VELOCITY);
+  // Linear part
+  // +a*U'*S*x
   computeTerm(weightMTV, InstVel.weight, InstVel.dyn->UT, MV, InstVel.dyn->S, State.CoM.x);
   Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 0);
   computeTerm(weightMTV, InstVel.weight, InstVel.dyn->UT, MV, InstVel.dyn->S, State.CoM.y);
   Pb.addTerm(weightMTV, QPProblem::VECTOR_D, m_N);
+  // +a*U'*ref
   computeTerm(weightMTV, -InstVel.weight, InstVel.dyn->UT, State.Ref.global.X);
   Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 0);
   computeTerm(weightMTV, -InstVel.weight, InstVel.dyn->UT, State.Ref.global.Y);
   Pb.addTerm(weightMTV, QPProblem::VECTOR_D, m_N);
 
   // COP - centering terms
-  // Hessian
   const IntermedQPMat::objective_variant_t & COPCent = Matrices.Objective(IntermedQPMat::COP_CENTERING);
+  // Hessian
+  // -a*U'*V
   computeTerm(weightMTM, -COPCent.weight, COPCent.dyn->UT, State.V);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 0, 2*m_N);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, m_N, 2*m_N+NbStepsPreviewed);
-
+  // -a*V*U
   computeTerm(weightMTM, -COPCent.weight, State.VT, COPCent.dyn->U);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 2*m_N, 0);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 2*m_N+NbStepsPreviewed, m_N);
-
+  //+a*V'*V
   computeTerm(weightMTM, COPCent.weight, State.VT, State.V);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 2*m_N, 2*m_N);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 2*m_N+NbStepsPreviewed, 2*m_N+NbStepsPreviewed);
 
   //Linear part
+  // -a*V'*S*x
   computeTerm(weightMTV, -COPCent.weight, State.VT, MV, COPCent.dyn->S, State.CoM.x);
   Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 2*m_N);
   computeTerm(weightMTV, -COPCent.weight, State.VT, MV, COPCent.dyn->S, State.CoM.y);
   Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 2*m_N+NbStepsPreviewed);
-
+  // +a*V'*Vc*x
   computeTerm(weightMTV, COPCent.weight, State.VT, State.Vc, State.SupportFoot.x);
   Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 2*m_N);
   computeTerm(weightMTV, COPCent.weight, State.VT, State.Vc, State.SupportFoot.y);
@@ -630,7 +591,7 @@ GeneratorVelRef::updateProblem(QPProblem & Pb, IntermedQPMat & Matrices,
 
 
 void
-GeneratorVelRef::computeTerm(MAL_MATRIX (&weightMM, double), const double & weight,
+GeneratorVelRef::computeTerm(MAL_MATRIX (&weightMM, double), double weight,
 			     const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double))
 {
   weightMM = weight*MAL_RET_A_by_B(M1,M2);
@@ -643,7 +604,7 @@ GeneratorVelRef::computeTerm(MAL_MATRIX (&MM, double),
 }
 
 void
-GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double), const double weight,
+GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double), double weight,
 			     const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double))
 {
   weightMV = weight*MAL_RET_A_by_B(M,V);
@@ -652,8 +613,8 @@ GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double), const double weight
 
 void
 GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double),
-			     const double weight, const MAL_MATRIX (&M, double),
-			     const MAL_VECTOR (&V, double), const double scalar)
+			     double weight, const MAL_MATRIX (&M, double),
+			     const MAL_VECTOR (&V, double), double scalar)
 {
   weightMV = weight*scalar*MAL_RET_A_by_B(M,V);
 }
@@ -661,32 +622,11 @@ GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double),
 
 void
 GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double),
-			     const double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
+			     double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
 			     const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double))
 {
   V1 = MAL_RET_A_by_B(M2,V2);
   weightMV = weight*MAL_RET_A_by_B(M1,V1);
-}
-
-
-void
-GeneratorVelRef::addTerm(MAL_MATRIX(&Mat, double), double * target, int row, int col, int nrows, int ncols)
-{
-  for(int i = 0;i < nrows; i++)
-    {
-      for(int j = 0;j < ncols; j++)
-	{
-	  target[row+i+(col+j)*m_NbVariables] = Mat(i,j);
-	}
-    }
-}
-
-
-void
-GeneratorVelRef::addTerm(MAL_VECTOR (&Vec, double), double * target, int index, int nelem)
-{
-  for(int i = index;i < nelem; i++)
-    target[i] = Vec(i);
 }
 
 
@@ -706,14 +646,6 @@ GeneratorVelRef::buildConstantPartOfTheObjectiveFunction()
 
 int 
 GeneratorVelRef::initializeMatrixPbConstants()
-{
-  //TODO:
-}
-
-	  
-int 
-GeneratorVelRef::dumpProblem(MAL_VECTOR(& xk,double),
-			     double Time)
 {
   //TODO:
 }
