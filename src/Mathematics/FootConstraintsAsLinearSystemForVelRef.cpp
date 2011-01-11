@@ -158,22 +158,22 @@ FootConstraintsAsLinearSystemForVelRef::setFeetDimensions( CjrlHumanoidDynamicRo
 
 int
 FootConstraintsAsLinearSystemForVelRef::setVertices( convex_hull_t & ConvexHull,
-						     double & Orientation,
-						     support_state_t & PrwSupport,
-						     const int constraints_type)
+						     double Orientation,
+						     const support_state_t & PrwSupport,
+						     int constraints_type)
 {
 
   edges_s * conv_hulls;
   switch(constraints_type)
-  {
-  case ZMP_CONSTRAINTS:
-    conv_hulls = & m_ZMPPosEdges;
-    break;
-  case FOOT_CONSTRAINTS:
-    conv_hulls = & m_FootPosEdges;
-    break;
+    {
+    case ZMP_CONSTRAINTS:
+      conv_hulls = & m_ZMPPosEdges;
+      break;
+    case FOOT_CONSTRAINTS:
+      conv_hulls = & m_FootPosEdges;
+      break;
 
-  }
+    }
   //Prepare the computation of the convex hull
   if( PrwSupport.Foot == 1 )
     {
@@ -199,10 +199,10 @@ FootConstraintsAsLinearSystemForVelRef::setVertices( convex_hull_t & ConvexHull,
 
 
 int
-FootConstraintsAsLinearSystemForVelRef::computeLinearSystem( convex_hull_t & ConvexHull,
+FootConstraintsAsLinearSystemForVelRef::computeLinearSystem( const convex_hull_t & ConvexHull,
                                                              MAL_MATRIX(&D,double),
                                                              MAL_MATRIX(&Dc,double),
-                                                             support_state_t & PrwSupport )
+                                                             const support_state_t & PrwSupport )
 {
 
   double dx,dy,dc,x1,y1,x2,y2;
@@ -259,9 +259,9 @@ FootConstraintsAsLinearSystemForVelRef::computeLinearSystem( convex_hull_t & Con
 
 
 int
-FootConstraintsAsLinearSystemForVelRef::computeLinearSystem (convex_hull_t & ConvexHull,
-    double * D_x, double * D_y, double * d,
-    support_state_t & PrwSupport)
+FootConstraintsAsLinearSystemForVelRef::computeLinearSystem (const convex_hull_t & ConvexHull,
+							     double * D_x, double * D_y, double * d,
+							     const support_state_t & PrwSupport)
 {
 
   double dx,dy,dc,x1,y1,x2,y2;
