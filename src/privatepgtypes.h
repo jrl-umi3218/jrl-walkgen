@@ -36,7 +36,7 @@
 namespace PatternGeneratorJRL
 {
 
-  // Support state of the robot at a certain point in time
+  /// \brief Support state of the robot at a certain point in time
   struct support_state_s
   {
     int Phase, Foot, StepsLeft, StepNumber;
@@ -51,7 +51,7 @@ namespace PatternGeneratorJRL
   };
   typedef struct support_state_s support_state_t;
 
-  // Support state of the robot at a certain point in time
+  /// \brief Support state of the robot at a certain point in time
   struct com_s
   {
     MAL_VECTOR(x,double);
@@ -114,6 +114,7 @@ namespace PatternGeneratorJRL
   };
   typedef struct reference_s reference_t;
 
+  /// \brief Solution
   struct solution_s
   {
     /// \brief Whole solution array
@@ -166,14 +167,14 @@ namespace PatternGeneratorJRL
     /// \brief Rotate the points around the origin by angle
     ///
     /// \param[in] angle
-    void rotate(const double & angle);
+    void rotate( double angle );
 
     /// \brief Resize members to the desired number of points
     ///
     /// \param[in] size
-    void resize(const int & size);
+    void resize( int size );
 
-    /// \brief Set the point values
+    /// \brief Set the vectors from arrays
     ///
     /// \param[in] X
     /// \param[in] Y
@@ -182,7 +183,7 @@ namespace PatternGeneratorJRL
     /// \brief Set all points to zero
     void reset();
 
-    convex_hull_s(const int & size);
+    convex_hull_s( int size );
     convex_hull_s();
 
   };
@@ -200,9 +201,14 @@ namespace PatternGeneratorJRL
 
     boost_ublas::vector<double> dc;
 
+    /// \brief Classifier
     int type;
 
+    /// \brief Fill all elements with zeros
     void clear();
+
+    /// \brief Resize all elements
+    void resize( int n_rows, int n_cols, bool preserve );
   };
   typedef struct linear_inequality_s
     linear_inequality_t;

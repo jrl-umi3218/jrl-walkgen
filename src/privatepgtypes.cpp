@@ -129,7 +129,7 @@ namespace PatternGeneratorJRL
 
 
   void
-  convex_hull_t::rotate(const double & angle)
+  convex_hull_t::rotate( double angle )
   {
 
       double c_a = cos(angle);
@@ -143,7 +143,7 @@ namespace PatternGeneratorJRL
 
   }
 
-  convex_hull_s::convex_hull_s(const int & size)
+  convex_hull_s::convex_hull_s( int size )
   {
     resize(size);
     reset();
@@ -162,7 +162,7 @@ namespace PatternGeneratorJRL
   }
 
   void
-  convex_hull_t::resize(const int & size)
+  convex_hull_t::resize( int size )
     {
       X.resize(size);
       Y.resize(size);
@@ -178,11 +178,20 @@ namespace PatternGeneratorJRL
         }
     }
 
-  void linear_inequality_t::clear()
+  void
+  linear_inequality_t::clear()
   {
     x.D.clear();
     y.D.clear();
     dc.clear();
+  }
+
+  void
+  linear_inequality_t::resize( int n_rows, int n_cols, bool preserve )
+  {
+    x.D.resize(n_rows, n_cols, preserve);
+    y.D.resize(n_rows, n_cols, preserve);
+    dc.resize(n_rows, preserve);
   }
 
 }
