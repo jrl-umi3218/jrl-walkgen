@@ -57,63 +57,54 @@ QPProblem_s::QPProblem_s():
 QPProblem_s::~QPProblem_s()
 {
 
-  ReleaseMemory();
+  releaseMemory();
 }
 
-void QPProblem_s::ReleaseMemory()
+void QPProblem_s::releaseMemory()
 {
   if (Q!=0)
     delete [] Q;
-
   if (D!=0)
     delete [] D;
-
   if (DS!=0)
     delete [] DS;
-
   if (DU!=0)
     delete [] DU;
-
   if (XL!=0)
     delete [] XL;
-
   if (XU!=0)
     delete [] XU;
-
   if (X!=0)
     delete [] X;
-
   if (iwar!=0)
     delete [] iwar;
-
   if (war!=0)
     delete [] war;
-
   if (U!=0)
     delete [] U;
 }
 
 
 void
-QPProblem_s::resizeAll( int NbVariables, int NbConstraints)
+QPProblem_s::resizeAll( int nb_variables, int nb_constraints)
 {
 
-  resize(Q,2*n*n,2*NbVariables*NbVariables);  //Quadratic part of the objective function
-  resize(D,2*n,2*NbVariables);   // Linear part of the objective function
+  resize(Q,2*n*n,2*nb_variables*nb_variables);  //Quadratic part of the objective function
+  resize(D,2*n,2*nb_variables);   // Linear part of the objective function
 
-  resize(DS,2*m,2*NbConstraints);
-  resize(DU,2*m*n,2*NbVariables*NbConstraints);
+  resize(DS,2*m,2*nb_constraints);
+  resize(DU,2*m*n,2*nb_variables*nb_constraints);
 
-  resize(XL,2*n,2*NbVariables);  // Lower bound on the solution.
-  initialize(XL,2*NbVariables,-1e8);
-  resize(XU,2*n,2*NbVariables);  // Upper bound on the solution.
-  initialize(XU,2*NbVariables,1e8);
+  resize(XL,2*n,2*nb_variables);  // Lower bound on the solution.
+  initialize(XL,2*nb_variables,-1e8);
+  resize(XU,2*n,2*nb_variables);  // Upper bound on the solution.
+  initialize(XU,2*nb_variables,1e8);
 
-  resize(X,2*n,2*NbVariables);  // Solution of the problem.
-  resize(U,2*mnn,2*(NbConstraints+2*NbVariables));
+  resize(X,2*n,2*nb_variables);  // Solution of the problem.
+  resize(U,2*mnn,2*(nb_constraints+2*nb_variables));
 
-  resize(war,2*lwar,2*(3*NbVariables*NbVariables/2+ 10*NbVariables  + 2*(NbConstraints+1) + 20000));
-  resize(iwar,2*liwar,2*NbVariables); // The Cholesky decomposition is done internally.
+  resize(war,2*lwar,2*(3*nb_variables*nb_variables/2+ 10*nb_variables  + 2*(nb_constraints+1) + 20000));
+  resize(iwar,2*liwar,2*nb_variables); // The Cholesky decomposition is done internally.
 
 
 }
@@ -322,28 +313,28 @@ void QPProblem_s::addTerm( const MAL_VECTOR (&Vec, double), int type,
 			   unsigned int row )
 {
 
-  double * aArray;
+  double * array;
   unsigned int max_rows;
 
   switch(type)
     {
     case VECTOR_D:
-      aArray = D;
+      array = D;
       max_rows = n;
       break;
 
     case VECTOR_XL:
-      aArray = XL;
+      array = XL;
       max_rows = n;
       break;
 
     case VECTOR_XU:
-      aArray = XU;
+      array = XU;
       max_rows = n;
       break;
 
     case VECTOR_DS:
-      aArray = DS;
+      array = DS;
       max_rows = mmax;
       break;
     }
@@ -357,7 +348,7 @@ void QPProblem_s::addTerm( const MAL_VECTOR (&Vec, double), int type,
     }
 
   for(unsigned int i = 0;i < Vec.size(); i++)
-    aArray[row+i] += Vec(i);
+    array[row+i] += Vec(i);
 
 }
 
@@ -416,48 +407,48 @@ QPProblem_s::dump( int type, std::ostream & aos)
 {
 
   int lnbrows=0, lnbcols=0;
-  double * aArray=0;
+  double * array=0;
   std::string Name;
   switch(type)
     {
     case MATRIX_Q:
       lnbrows = lnbcols = n ;
-      aArray = Q;
+      array = Q;
       Name = "Q";
       break;
 
     case MATRIX_DU:
       lnbrows = mmax;
       lnbcols = n;
-      aArray = DU;
+      array = DU;
       Name = "DU";
       break;
 
     case VECTOR_D:
       lnbrows = n;
       lnbcols = 1 ;
-      aArray = D;
+      array = D;
       Name = "D";
       break;
 
     case VECTOR_XL:
       lnbrows = n;
       lnbcols = 1;
-      aArray = XL;
+      array = XL;
       Name = "XL";
       break;
 
     case VECTOR_XU:
       lnbrows = n;
       lnbcols=1;
-      aArray = XU;
+      array = XU;
       Name = "XU";
       break;
 
     case VECTOR_DS:
       lnbrows = m;
       lnbcols= 1;
-      aArray = DS;
+      array = DS;
       Name = "DS";
       break;
     }
@@ -467,7 +458,7 @@ QPProblem_s::dump( int type, std::ostream & aos)
   for(int i=0;i<lnbrows;i++)
     {
       for(int j=0;j<lnbcols;j++)
-	aos << aArray[i+j*lnbrows] << " ";
+	aos << array[i+j*lnbrows] << " ";
       aos << std::endl;
     }
   aos << std::endl;
