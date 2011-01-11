@@ -1010,23 +1010,18 @@ void ZMPVelocityReferencedQP::OnLine(double time,
                          4*m_QP_N+5*m_PrwSupport.StepNumber,
                          0);
 
-      if (m_FastFormulationMode==QLDANDLQ)
-        m_Pb.iwar[0]=0;
-      else
-        m_Pb.iwar[0]=1;
 
-
-      m_Pb.initialize(m_Pb.Q,2*(m_QP_N + m_PrwSupport.StepNumber)*2*(m_QP_N + m_PrwSupport.StepNumber),0.0);
+      m_Pb.clear(QPProblem::MATRIX_Q);
       m_GenVR->buildInvariantPart(m_Pb, m_Matrices);
 
 
-      m_Pb.initialize(m_Pb.D,2*(m_QP_N + m_PrwSupport.StepNumber),0.0);
+      m_Pb.clear(QPProblem::VECTOR_D);
       m_GenVR->updateProblem(m_Pb, m_Matrices, deqPrwSupportStates);
 
 
       if(m_FastFormulationMode == PLDPHerdt)
 	{
-	  computeCholeskyOfQ(m_Pb.Q);
+	  //computeCholeskyOfQ(m_Pb.Q);
 	  buildConstraintMatricesPLDPHerdt();
 	}
 
@@ -1038,9 +1033,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
           deqPrwSupportStates,
           m_PreviewedSupportAngles);
 
-      //m_Pb.dumpProblem("/tmp/Problem.dat");
-
-//      if(time>3.0)
+//      if(time>1.0)
 //        m_OnLineMode = false;
 
       double ldt = 0.0;
@@ -1050,88 +1043,89 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  struct timeval lbegin,lend;
 	  gettimeofday(&lbegin,0);
 
-          //m_Pb.dumpProblem("/tmp/Problem.dat");
+//          m_Pb.dumpProblem("/tmp/Problem.dat");
 
-	  m_Pb.solve( QPProblem_s::QLD );
+	  m_Pb.solve( QPProblem_s::QLD , m_Result );
 
 	  gettimeofday(&lend,0);
 
 	  ldt = lend.tv_sec - lbegin.tv_sec +
 	    0.000001 * (lend.tv_usec - lbegin.tv_usec);
 
+	  // To be replaced by the solution object
 	  int NbOfActivatedConstraints = 0;
-	  for(int lk=0;lk<m_Pb.m;lk++)
+	  for(int lk=0;lk<m_Result.NbConstraints;lk++)
 	    {
-	      if (m_Pb.U[lk]>0.0)
+	      if (m_Result.vecConstrLagr[lk]>0.0)
 		{
 		  NbOfActivatedConstraints++;
 		}
 	    }
 	}
-      else if (m_FastFormulationMode==PLDPHerdt)
+//      else if (m_FastFormulationMode==PLDPHerdt)
+//	{
+//	  struct timeval lbegin,lend;
+//	  gettimeofday(&lbegin,0);
+//
+//
+//	  if(m_PLDPSolverHerdt==0)
+//	    m_PLDPSolverHerdt = new Optimization::Solver::PLDPSolverHerdt((unsigned int)m_QP_N,
+//									  MAL_RET_MATRIX_DATABLOCK(m_iPu),
+//									  MAL_RET_MATRIX_DATABLOCK(m_Px),
+//									  m_Pu,
+//									  MAL_RET_MATRIX_DATABLOCK(m_iLQ));
+//
+//
+//	  unsigned int NumberOfRemovedConstraints = 4; unsigned int NbRemovedFootCstr = 5;
+//
+////	  m_Pb.ifail=m_PLDPSolverHerdt->SolveProblem(QueueOfLConstraintInequalitiesFreeFeet, QueueOfSupportFeet,
+////						     m_Pb.D,
+////						     (unsigned int)m_Pb.m,
+////						     m_Pb.DU,
+////						     m_Pb.DS,
+////						     MAL_RET_VECTOR_DATABLOCK(xk),m_Pb.X,
+////						     NumberOfRemovedConstraints, NbRemovedFootCstr,
+////						     StartingSequence,
+////						     (unsigned int)m_PrwSupport.StepNumber,
+////						     m_CurrentSupport.StateChanged, time);
+//	  StartingSequence = false;
+//	  gettimeofday(&lend,0);
+//	}
+      if (m_Result.Fail!=0)
 	{
-	  struct timeval lbegin,lend;
-	  gettimeofday(&lbegin,0);
-
-
-	  if(m_PLDPSolverHerdt==0)
-	    m_PLDPSolverHerdt = new Optimization::Solver::PLDPSolverHerdt((unsigned int)m_QP_N,
-									  MAL_RET_MATRIX_DATABLOCK(m_iPu),
-									  MAL_RET_MATRIX_DATABLOCK(m_Px),
-									  m_Pu,
-									  MAL_RET_MATRIX_DATABLOCK(m_iLQ));
-
-
-	  unsigned int NumberOfRemovedConstraints = 4; unsigned int NbRemovedFootCstr = 5;
-
-	  m_Pb.ifail=m_PLDPSolverHerdt->SolveProblem(QueueOfLConstraintInequalitiesFreeFeet, QueueOfSupportFeet,
-						     m_Pb.D,
-						     (unsigned int)m_Pb.m,
-						     m_Pb.DU,
-						     m_Pb.DS,
-						     MAL_RET_VECTOR_DATABLOCK(xk),m_Pb.X,
-						     NumberOfRemovedConstraints, NbRemovedFootCstr,
-						     StartingSequence,
-						     (unsigned int)m_PrwSupport.StepNumber,
-						     m_CurrentSupport.StateChanged, time);
-	  StartingSequence = false;
-	  gettimeofday(&lend,0);
-	}
-      if (m_Pb.ifail!=0)
-	{
-	  cout << "IFAIL: " << m_Pb.ifail << " at time: " << time << endl;
+	  cout << "IFAIL: " << m_Result.Fail << " at time: " << time << endl;
 	  //return -1;
 	}
 
-      double *ptX=0;
-      if ((m_FastFormulationMode==QLDANDLQ)||
-	  (m_FastFormulationMode==PLDPHerdt))
-	{
-	  /* Multiply the solution by the transpose of iLQ
-      	     because it is a triangular matrix we do a specific
-      	     multiplication.
-	  */
-	  memset(m_Pb.NewX,0,2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
-
-	  double *pm_iLQ = MAL_RET_MATRIX_DATABLOCK(m_iLQ);
-	  double *pNewX = m_Pb.NewX;
-
-	  for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
-	    {
-	      double *pX= m_Pb.X+i;
-	      double *piLQ = pm_iLQ+i*2*(m_QP_N+m_PrwSupport.StepNumber)+i;
-	      *pNewX = 0.0;
-	      for(int j=i;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
-		{
-		  *pNewX+= (*piLQ) * (*pX++);
-		  piLQ+=2*(m_QP_N+m_PrwSupport.StepNumber);
-		}
-	      pNewX++;
-	    }
-	  ptX=m_Pb.NewX;
-	}
-      else
-	ptX=m_Pb.X;
+      //double *ptX=0;
+//      if ((m_FastFormulationMode==QLDANDLQ)||
+//	  (m_FastFormulationMode==PLDPHerdt))
+//	{
+//	  /* Multiply the solution by the transpose of iLQ
+//      	     because it is a triangular matrix we do a specific
+//      	     multiplication.
+//	  */
+//	  //memset(m_Result.arrSolution,0,2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
+//
+//	  double *pm_iLQ = MAL_RET_MATRIX_DATABLOCK(m_iLQ);
+//	  double *pNewX = m_Result.arrSolution;
+//
+//	  for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
+//	    {
+//	      double *pX= m_Result.arrSolution+i;
+//	      double *piLQ = pm_iLQ+i*2*(m_QP_N+m_PrwSupport.StepNumber)+i;
+//	      *pNewX = 0.0;
+//	      for(int j=i;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
+//		{
+//		  *pNewX+= (*piLQ) * (*pX++);
+//		  piLQ+=2*(m_QP_N+m_PrwSupport.StepNumber);
+//		}
+//	      pNewX++;
+//	    }
+//	  ptX=m_Result.arrSolution;
+//	}
+//      else
+	//ptX=m_Result.arrSolution;
 
 
       FinalCOMStates.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
@@ -1145,21 +1139,21 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       m_CoM.Interpolation(FinalCOMStates,
 			      FinalZMPPositions,
 			      CurrentIndex,
-			      ptX[0],ptX[m_QP_N]);
-      m_Matrices.CoM(m_CoM.OneIteration(ptX[0],ptX[m_QP_N]));
+			      m_Result.vecSolution[0],m_Result.vecSolution[m_QP_N]);
+      m_Matrices.CoM(m_CoM.OneIteration(m_Result.vecSolution[0],m_Result.vecSolution[m_QP_N]));
 
 
       //The robot is supposed to stop always with the feet aligned in the lateral plane.
       if(m_CurrentSupport.StepsLeft>0)
 	{
-	  if(fabs(ptX[2*m_QP_N])-0.00001<0.0)
+	  if(fabs(m_Result.vecSolution[2*m_QP_N])-0.00001<0.0)
 	    {
 	      cout<<"Previewed foot position zero at time: "<<time<<endl;
 	    }
 	  else if (m_CurrentSupport.TimeLimit-time-m_QP_T/2.0>0)
 	    {//The landing position is yet determined by the solver because the robot finds himself still in the single support phase
-	      m_FPx = ptX[2*m_QP_N];
-	      m_FPy = ptX[2*m_QP_N+m_PrwSupport.StepNumber];
+	      m_FPx = m_Result.vecSolution[2*m_QP_N];
+	      m_FPy = m_Result.vecSolution[2*m_QP_N+m_PrwSupport.StepNumber];
 	    }
 	}
       else

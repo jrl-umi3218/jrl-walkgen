@@ -211,7 +211,9 @@ namespace PatternGeneratorJRL
     deque<double> m_PreviewedSupportAngles;
 
     //Final optimization problem
-    QPProblem m_Pb, m_Pb2;
+    QPProblem m_Pb;
+
+    QPProblem_s::solution_t m_Result;
 
     support_state_t m_CurrentSupport, m_PrwSupport;
 
