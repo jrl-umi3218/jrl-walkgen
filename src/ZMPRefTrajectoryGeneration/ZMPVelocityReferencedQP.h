@@ -63,19 +63,8 @@ namespace PatternGeneratorJRL
     /* Default destructor. */
     ~ZMPVelocityReferencedQP();
 
-    /*! \brief Call the two previous methods
-      \return A negative value in case of a problem 0 otherwise.
-    */
-    int InitConstants();
 
     void initFeet();
-
-
-    /*! \brief Build the constant part of the constraint matrices. */
-    int BuildingConstantPartOfConstraintMatrices();
-
-    int buildConstraintMatricesPLDPHerdt();
-
 
 
     /*! Call method to handle the plugins (SimplePlugin interface) . */
@@ -232,10 +221,6 @@ namespace PatternGeneratorJRL
     MAL_MATRIX(m_OptC,double);
     MAL_MATRIX(m_OptD,double);
 
-
-    /* Constant parts of the linear constraints. */
-    double * m_Pu;
-
     /* Constant parts of the linear constraints. */
     MAL_MATRIX(m_iPu,double);
 
@@ -248,12 +233,9 @@ namespace PatternGeneratorJRL
     /*! \brief Fast formulations mode. */
     unsigned int m_FastFormulationMode;
 
-    //! Primal Least square Distance Problem solver *\/ */
-    Optimization::Solver::PLDPSolverHerdt * m_PLDPSolverHerdt;
+    bool m_InvariantPartInitialized;
 
     void initializeProblem();
-
-    void computeCholeskyOfQ(double * OptA);
 
 
     void interpolateTrunkState(double time, int CurrentIndex,

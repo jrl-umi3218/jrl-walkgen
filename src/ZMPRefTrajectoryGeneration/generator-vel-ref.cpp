@@ -505,6 +505,8 @@ void
 GeneratorVelRef::buildInvariantPart(QPProblem & Pb, IntermedQPMat & Matrices)
 {
 
+  Pb.clear(QPProblem::MATRIX_Q);
+
   boost_ublas::matrix<double> weightMTM(m_N,m_N,false);
 
   //Constant terms in the Hessian
@@ -533,6 +535,8 @@ void
 GeneratorVelRef::updateProblem(QPProblem & Pb, IntermedQPMat & Matrices,
 			       std::deque<support_state_t> & deqSupportStates)
 {
+
+  Pb.clear(QPProblem::VECTOR_D);
 
   //Intermediate vector
   MAL_VECTOR(MV,double);
