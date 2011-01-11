@@ -116,8 +116,22 @@ namespace PatternGeneratorJRL
     ~QPProblem_s();
 
     /// \brief Set the number of optimization parameters.
-    inline void setNbVariables( int NbVariables )
-    { m_NbVariables = NbVariables;};
+    ///
+    /// \param nb_variables
+    inline void setNbVariables( int nb_variables )
+    { m_NbVariables = n = nb_variables;};
+
+    /// \brief Set the number of optimization parameters.
+    ///
+    /// \param nb_variables
+    inline void setNbEqConstraints( int nb_eq_constraints )
+    { m_NbEqConstraints = me = nb_eq_constraints;};
+
+    /// \brief Set the number of optimization parameters.
+    ///
+    /// \param nb_variables
+    inline void setNbConstraints( int nb_constraints )
+    { m_NbVariables = n = nb_constraints;};
 
     /// \brief Set the dimensions of the problem.
     /// This method has an internal logic to 
@@ -171,6 +185,8 @@ namespace PatternGeneratorJRL
     void addTerm(const MAL_VECTOR (&Vec, double), int type,
 		 unsigned int row);
 
+    /// \name Dumping functions
+    /// \{
     /// \brief Print of disk the parameters that are passed to the solver
     void dumpSolverParameters(std::ostream & aos);
 
@@ -184,27 +200,35 @@ namespace PatternGeneratorJRL
     /// \param filename
     void dump( int type, const char *filename);
     void dump( int type, std::ostream &);
+    /// \}
 
     /// \brief Initialize array
     ///
-    /// \param array
-    /// \param size
+    /// \param[out] array
+    /// \param[in] size
     template <class type> void initialize(type * array, int size, type value)
     { std::fill_n(array,size,value); }
 
     /// \brief Initialize whole array
     ///
-    /// \param type
-    void clear(const int type);
+    /// \param[in] type
+    void clear( int type );
 
     /// \brief Initialize block of matrix-array
     ///
-    /// \param type
+    /// \param[in] type
+    /// \param[in] row
+    /// \param[in] col
+    /// \param[in] nb_rows
+    /// \param[in] nb_cols
     void clear( int type,
 	        int row, int col,
 	        int nb_rows, int nb_cols);
 
     /// \brief Solve the problem
+    ///
+    /// \param[in] solver
+    /// \param[out] result
     void solve( int solver, solution_t & result);
 
     //
@@ -212,30 +236,38 @@ namespace PatternGeneratorJRL
     //
   protected:
 
-    /// The method doing the real job of releasing the memory.
-    void ReleaseMemory();
+    /// \brief Relese memory.
+    void releaseMemory();
 
-    /// The method allocating the memory.
+    /// \brief Allocate memory.
     /// Called when setting the dimensions of the problem.
-    void resizeAll( int NbVariables, int NbConstraints);
+    ///
+    /// \param nb_variables
+    /// \param nb_constraints
+    void resizeAll( int nb_variables, int nb_constraints);
 
     //
     //Private members
     //
   private:
 
-    /// \brief QLD parameters
+    /// \name ql-parameters
+    /// \{
     int m, me, mmax, n, nmax, mnn;
-    double *Q, *D, *DU, *DS, *XL, *XU, *X, *U, *war;//For COM
+    double *Q, *D, *DU, *DS, *XL, *XU, *X, *U, *war;
     int *iwar;
     int iout, ifail, iprint, lwar, liwar;
     double Eps;
+    /// \}
 
     /// \brief Number of optimization parameters
     int m_NbVariables;
 
-    /// \brief Number of optimization parameters
+    /// \brief Total number of constraints
     int m_NbConstraints;
+
+    /// \brief Number of equality constraints
+    int m_NbEqConstraints;
 
     /// \brief Reallocation margins
     int m_ReallocMarginVar, m_ReallocMarginConstr;
