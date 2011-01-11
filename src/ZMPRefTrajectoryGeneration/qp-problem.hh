@@ -38,11 +38,11 @@ namespace PatternGeneratorJRL
   */
   struct QPProblem_s
   {
-    int m, me, mmax, n, nmax, mnn;
-    double *Q, *D, *DU, *DS, *XL, *XU, *X, *NewX, *U, *war;//For COM
-    int *iwar;
-    int iout, ifail, iprint, lwar, liwar;
-    double Eps;
+
+    //
+    // Public types
+    //
+  public:
 
     const static int MATRIX_Q=0;
     const static int MATRIX_DU=1;
@@ -54,9 +54,60 @@ namespace PatternGeneratorJRL
     const static int QLD=10;
     const static int PLDP=11;
 
+
+    /// \brief Solution
+    struct solution_s
+    {
+
+      /// \brief Size of the solution array
+      int NbVariables;
+
+      /// \brief Number of constraints (lagrange multipliers)
+      int NbConstraints;
+
+      /// \name qld-output
+      /// \{
+      /// \brief SHOWS THE TERMINATION REASON.
+      ///   IFAIL = 0 :   SUCCESSFUL RETURN.
+      ///   IFAIL = 1 :   TOO MANY ITERATIONS (MORE THAN 40*(N+M)).
+      ///   IFAIL = 2 :   ACCURACY INSUFFICIENT TO SATISFY CONVERGENCE
+      ///                 CRITERION.
+      ///   IFAIL = 5 :   LENGTH OF A WORKING ARRAY IS TOO SHORT.
+      ///   IFAIL > 10 :  THE CONSTRAINTS ARE INCONSISTENT.
+      int Fail;
+
+      /// \brief OUTPUT CONTROL.
+      ///   IPRINT = 0 :  NO OUTPUT OF QL0001.
+      ///   IPRINT > 0 :  BRIEF OUTPUT IN ERROR CASES.
+      int Print;
+      /// \}
+
+      /// \brief Solution vector
+      boost_ublas::vector<double> vecSolution;
+
+      /// \name Splitted lagrange multipliers sets
+      /// \{
+      /// \brief Lagrange multipliers of the constraints
+      boost_ublas::vector<double> vecConstrLagr;
+      /// \brief Lagrange multipliers of the lower bounds
+      boost_ublas::vector<double> vecLBoundsLagr;
+      /// \brief Lagrange multipliers of the upper bounds
+      boost_ublas::vector<double> vecUBoundsLagr;
+      /// \}
+
+      void resize( int nb_variables, int nb_constraints );
+
+      void dump( const char *filename );
+      void print( std::ostream & aos);
+
+    };
+    typedef struct solution_s solution_t;
+
+
     //
     //Public methods
     //
+  public:
 
     /// \brief Initialize by default an empty problem.
     QPProblem_s();
@@ -65,42 +116,43 @@ namespace PatternGeneratorJRL
     ~QPProblem_s();
 
     /// \brief Set the number of optimization parameters.
-    inline void setNbVariables(const int & NbVariables)
+    inline void setNbVariables( int NbVariables )
     { m_NbVariables = NbVariables;};
 
     /// \brief Set the dimensions of the problem.
     /// This method has an internal logic to 
-    /// allocate the memory. It is done only
-    /// when the problem gets bigger. When it shrinks
-    /// down the memory is kept to avoid overhead.
-    void setDimensions(const int & NbVariables,
-		       const int & NbConstraints,
-		       const int & NbEqConstraints);
+    /// allocate the memory.
+    ///
+    /// \param[in] nb_variables
+    /// \param[in] nb_constraints
+    /// \param[in] nb_eq_constraints
+    void setDimensions( int nb_variables,
+        int nb_constraints,
+        int nb_eq_constraints );
     
     /// \brief Reallocate array
     ///
-    /// \name array
-    /// \name old_size
-    /// \name new_size
-        template <class type>
-        int resize(type * &array, const int & old_size, const int & new_size)
-        { 
-	  try 
-	    { 
-	      type * NewArray = new type[new_size];
-	      initialize(NewArray, new_size, (type)0);
-	      for(int i = 0; i < old_size; i++)
-		{
-		  NewArray[i] = array[i]; std::cout<<NewArray[i]<<" xx ";
-		}
-	      std::cout<<std::endl;
-	      if (array!=0)
-		delete [] array;
-	      array = NewArray; 
-	    }
-	  catch (std::bad_alloc& ba)
-	    {std::cerr << "bad_alloc caught: " << ba.what() << std::endl; }
-	  return 0;}
+    /// \param[in] array
+    /// \param[in] old_size
+    /// \param[in] new_size
+    template <class type>
+    int resize( type * &array, int old_size, int new_size )
+    {
+      try
+      {
+        type * NewArray = new type[new_size];
+        initialize(NewArray, new_size, (type)0);
+        for(int i = 0; i < old_size; i++)
+          {
+          NewArray[i] = array[i];
+          }
+        if (array!=0)
+          delete [] array;
+        array = NewArray;
+      }
+      catch (std::bad_alloc& ba)
+      {std::cerr << "bad_alloc caught: " << ba.what() << std::endl; }
+      return 0;}
 
 
     /// \brief Add a matrix to the final optimization problem in array form
@@ -109,15 +161,15 @@ namespace PatternGeneratorJRL
     /// \param target Target matrix
     /// \param row First row inside the target
     /// \param col First column inside the target
-    void addTerm(const MAL_MATRIX (&Mat, double), const int type,
-		 const int row, const int col);
+    void addTerm(const MAL_MATRIX (&Mat, double), int type,
+		 int row, int col);
     /// \brief Add a vector to the final optimization problem in array form
     ///
     /// \param Mat Added vector
     /// \param target Target vector type
     /// \param row First row inside the target
-    void addTerm(const MAL_VECTOR (&Vec, double), const int type,
-		 const int row);
+    void addTerm(const MAL_VECTOR (&Vec, double), int type,
+		 int row);
 
     /// \brief Print of disk the parameters that are passed to the solver
     void dumpSolverParameters(std::ostream & aos);
@@ -130,14 +182,14 @@ namespace PatternGeneratorJRL
     ///
     /// \param type
     /// \param filename
-    void dump(const int type, const char *filename);
-    void dump(const int type, std::ostream &);
+    void dump( int type, const char *filename);
+    void dump( int type, std::ostream &);
 
     /// \brief Initialize array
     ///
     /// \param array
     /// \param size
-    template <class type> void initialize(type * array, const int & size, type value)
+    template <class type> void initialize(type * array, int size, type value)
     { std::fill_n(array,size,value); }
 
     /// \brief Initialize whole array
@@ -148,12 +200,12 @@ namespace PatternGeneratorJRL
     /// \brief Initialize block of matrix-array
     ///
     /// \param type
-    void clear(const int type,
-	       const int & row, const int & col,
-	       const int & nb_rows, const int & nb_cols);
+    void clear( int type,
+	        int row, int col,
+	        int nb_rows, int nb_cols);
 
     /// \brief Solve the problem
-    void solve(const int solver);
+    void solve( int solver, solution_t & result);
 
     //
     //Protected methods
@@ -165,12 +217,19 @@ namespace PatternGeneratorJRL
 
     /// The method allocating the memory.
     /// Called when setting the dimensions of the problem.
-    void resizeAll(const int & NbVariables, const int & NbConstraints);
+    void resizeAll( int NbVariables, int NbConstraints);
 
     //
     //Private members
     //
   private:
+
+    /// \brief QLD parameters
+    int m, me, mmax, n, nmax, mnn;
+    double *Q, *D, *DU, *DS, *XL, *XU, *X, *U, *war;//For COM
+    int *iwar;
+    int iout, ifail, iprint, lwar, liwar;
+    double Eps;
 
     /// \brief Number of optimization parameters
     int m_NbVariables;

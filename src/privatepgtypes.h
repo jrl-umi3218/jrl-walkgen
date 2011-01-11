@@ -114,30 +114,6 @@ namespace PatternGeneratorJRL
   };
   typedef struct reference_s reference_t;
 
-  /// \brief Solution
-  struct solution_s
-  {
-    /// \brief Whole solution array
-    double * array;
-
-    struct vector_s
-    {
-      MAL_VECTOR(X,double);
-      MAL_VECTOR(Y,double);
-
-      /// \brief First and last elements of vector in array
-      int first, last;
-    };
-    typedef struct vector_s vector_t;
-
-    vector_t jerk, footpos;
-
-    /// \brief Lagrange multipliers
-    MAL_VECTOR(lambda,double);
-
-  };
-  typedef struct solution_s solution_t;
-
   /// \brief Linear inequality with free foot placement.
   struct linear_inequality_ff_s
   {
