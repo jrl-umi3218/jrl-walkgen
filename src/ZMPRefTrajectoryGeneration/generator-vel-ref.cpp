@@ -33,8 +33,7 @@ using namespace std;
 using namespace PatternGeneratorJRL;
 
 
-GeneratorVelRef::GeneratorVelRef(SimplePluginManager *lSPM, std::string DataFile,
-				 CjrlHumanoidDynamicRobot *aHS) : MPCTrajectoryGeneration(lSPM)
+GeneratorVelRef::GeneratorVelRef(SimplePluginManager *lSPM ) : MPCTrajectoryGeneration(lSPM)
 {
   //TODO:
 }
@@ -46,11 +45,11 @@ GeneratorVelRef::~GeneratorVelRef()
 }
 
 	
-void
-GeneratorVelRef::CallMethod(std::string &Method, std::istringstream &strm)
-{
-  //GeneratorVelRef::CallMethod(Method,strm);
-}
+//void
+//GeneratorVelRef::CallMethod(std::string &Method, std::istringstream &strm)
+//{
+//  //GeneratorVelRef::CallMethod(Method,strm);
+//}
 
 	
 void 
@@ -254,20 +253,20 @@ GeneratorVelRef::initializeMatrices( IntermedQPMat::dynamics_t & Dynamics)
 }
 
 
-void 
-GeneratorVelRef::addEqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
-				 MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double))
-{
-  //TODO:
-}
+//void
+//GeneratorVelRef::addEqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
+//				 MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double))
+//{
+//  //TODO:
+//}
 	  
 
-void
-GeneratorVelRef::addIneqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
-				   MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double))
-{
-  //TODO:
-}
+//void
+//GeneratorVelRef::addIneqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
+//				   MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double))
+//{
+//  //TODO:
+//}
 
 
 void 
@@ -634,22 +633,22 @@ GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double),
 }
 
 
-int 
-GeneratorVelRef::buildConstantPartOfConstraintMatrices()
-{
-  //TODO:
-}
+//int
+//GeneratorVelRef::buildConstantPartOfConstraintMatrices()
+//{
+//  //TODO:
+//}
 
 	
-int 
-GeneratorVelRef::buildConstantPartOfTheObjectiveFunction()
-{
-  //TODO:
-}
+//int
+//GeneratorVelRef::buildConstantPartOfTheObjectiveFunction()
+//{
+//  //TODO:
+//}
 
 
-int 
-GeneratorVelRef::initializeMatrixPbConstants()
-{
-  //TODO:
-}
+//int
+//GeneratorVelRef::initializeMatrixPbConstants()
+//{
+//  //TODO:
+//}

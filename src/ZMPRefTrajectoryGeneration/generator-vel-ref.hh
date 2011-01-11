@@ -53,13 +53,12 @@ namespace PatternGeneratorJRL
   public:
     /// \name Constructors and destructors.
     /// \{
-    GeneratorVelRef(SimplePluginManager *lSPM, std::string DataFile,
-		    CjrlHumanoidDynamicRobot *aHS=0);
+    GeneratorVelRef( SimplePluginManager *lSPM );
     ~GeneratorVelRef();
     /// \}
 
-    /// \brief Call method to handle the plugins (SimplePlugin interface).
-    void CallMethod(std::string &Method, std::istringstream &strm);
+//    /// \brief Call method to handle the plugins (SimplePlugin interface).
+//    void CallMethod(std::string &Method, std::istringstream &strm);
 
     /// \brief Set the weights on the objective terms
     ///
@@ -101,19 +100,19 @@ namespace PatternGeneratorJRL
     /// \param[in] Matrices
     void initialize(IntermedQPMat & Matrices);
 
-    /// \brief Add one equality constraint to the queue of constraints
-    ///
-    /// \param[in] DU
-    /// \param[in] DS
-    void addEqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
-			 MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double));
-	  
-    /// \brief Add one inequality constraint to the queue of constraints
-    ///
-    /// \param[in] DU
-    /// \param[in] DS
-    void addIneqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
-			   MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double));
+//    /// \brief Add one equality constraint to the queue of constraints
+//    ///
+//    /// \param[in] DU
+//    /// \param[in] DS
+//    void addEqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
+//			 MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double));
+//
+//    /// \brief Add one inequality constraint to the queue of constraints
+//    ///
+//    /// \param[in] DU
+//    /// \param[in] DS
+//    void addIneqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
+//			   MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double));
 
     /// \brief Generate a queue of inequalities with respect to the centers of the feet
     ///
@@ -214,22 +213,22 @@ namespace PatternGeneratorJRL
 		     double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
 		     const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
 
-    /// \brief Build the constant part of the constraint matrices.
-    int buildConstantPartOfConstraintMatrices();
-
-    /// \brief This method does the same once the previous method has been called
-    ///  to compute the static part of the optimization function.
-    ///  Assuming that the optimization function is of the form
-    ///  \f$ min_{u_k} \frac{1}{2} u^{\top}_k Q u_k + p^{\top}_k u_k \f$
-    ///  this method computes \f$Q\f$, the constant part of $p^{\top}_k$.
-    int buildConstantPartOfTheObjectiveFunction();
-
-
-    /// \brief Compute constant matrices over all the instances of the problem, i.e.
-    ///  \f$P_{pu}, P_{px}, P_{vs}, P_{vu}\f$.
-    ///  The necessary parameters to build those matrices are extracted from the
-    ///  PreviewControl link.
-    int initializeMatrixPbConstants();
+//    /// \brief Build the constant part of the constraint matrices.
+//    int buildConstantPartOfConstraintMatrices();
+//
+//    /// \brief This method does the same once the previous method has been called
+//    ///  to compute the static part of the optimization function.
+//    ///  Assuming that the optimization function is of the form
+//    ///  \f$ min_{u_k} \frac{1}{2} u^{\top}_k Q u_k + p^{\top}_k u_k \f$
+//    ///  this method computes \f$Q\f$, the constant part of $p^{\top}_k$.
+//    int buildConstantPartOfTheObjectiveFunction();
+//
+//
+//    /// \brief Compute constant matrices over all the instances of the problem, i.e.
+//    ///  \f$P_{pu}, P_{px}, P_{vs}, P_{vu}\f$.
+//    ///  The necessary parameters to build those matrices are extracted from the
+//    ///  PreviewControl link.
+//    int initializeMatrixPbConstants();
 
 
     /// \name Debugging related methods
