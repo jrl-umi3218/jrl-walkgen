@@ -107,6 +107,26 @@ ADD_DEPENDENCIES(TestHerdt2010 ${PROJECT_NAME})
 
 ADD_TEST(TestHerdt2010 TestHerdt2010
   ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+  
+##################################
+# Test Herdt With Step Positions #
+##################################
+CONFIG_FILES_CMAKE(TestHerdtStepPosOnLineTestFGPI.datref)
+
+ADD_EXECUTABLE(TestHerdtStepPos
+  ../src/portability/gettimeofday.cc
+  TestHerdtStepPos.cpp
+  CommonTools.cpp
+  TestObject.cpp
+  ClockCPUTime.cpp
+  )
+
+TARGET_LINK_LIBRARIES(TestHerdtStepPos ${PROJECT_NAME})
+PKG_CONFIG_USE_DEPENDENCY(TestHerdtStepPos jrl-dynamics)
+ADD_DEPENDENCIES(TestHerdtStepPos ${PROJECT_NAME})
+
+ADD_TEST(TestHerdtStepPos TestHerdtStepPos
+  ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 
 #####################
 # Add user examples #
