@@ -635,11 +635,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       m_PrwSupport = deqPrwSupportStates.back();
 
 
-
-      int NbVariables = 2*(m_QP_N + m_PrwSupport.StepNumber);
-      int NbOfConstraints = 4*m_QP_N + 5*m_PrwSupport.StepNumber;
-      m_Pb.setDimensions( NbVariables, NbOfConstraints, 0 );
-
       m_GenVR->buildInvariantPart(m_Pb, m_Matrices);
 
       m_GenVR->updateProblem(m_Pb, m_Matrices, deqPrwSupportStates);
@@ -650,7 +645,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
           FinalRightFootAbsolutePositions,
           deqPrwSupportStates,
           m_PreviewedSupportAngles);
-
 
 
       if ((m_FastFormulationMode==QLDANDLQ)||
