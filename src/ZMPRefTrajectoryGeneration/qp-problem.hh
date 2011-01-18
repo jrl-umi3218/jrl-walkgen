@@ -96,11 +96,15 @@ namespace PatternGeneratorJRL
       boost_ublas::vector<double> vecUBoundsLagr;
       /// \}
 
+      /// \brief Resize solution containers
       void resize( int nb_variables, int nb_constraints );
 
+      /// \name Dumping
+      /// \{
+      /// \brief Dump solution
       void dump( const char *filename );
       void print( std::ostream & aos);
-
+      /// \}
     };
     typedef struct solution_s solution_t;
 
@@ -120,30 +124,20 @@ namespace PatternGeneratorJRL
     ///
     /// \param nb_variables
     void setNbVariables( int nb_variables )
-    { m_NbVariables = nb_variables;};
+    { nbvariables_ = nb_variables;};
 
     /// \brief Set the number of optimization parameters.
     ///
     /// \param nb_eq_constraints
     inline void setNbEqConstraints( int nb_eq_constraints )
-    { m_NbEqConstraints = nb_eq_constraints;};
+    { nbeqconstraints_ = nb_eq_constraints;};
 
     /// \brief Set the number of optimization parameters.
     ///
     /// \param nb_constraints
     inline void setNbConstraints( int nb_constraints )
-    { m_NbConstraints = nb_constraints;};
+    { nbconstraints_ = nb_constraints;};
 
-    /// \brief Set the dimensions of the problem.
-    /// This method has an internal logic to 
-    /// allocate the memory.
-    ///
-    /// \param[in] nb_variables
-    /// \param[in] nb_constraints
-    /// \param[in] nb_eq_constraints
-    void setDimensions( int nb_variables,
-        int nb_constraints,
-        int nb_eq_constraints );
     
     /// \brief Reallocate array
     ///
@@ -178,6 +172,7 @@ namespace PatternGeneratorJRL
     /// \param col First column inside the target
     void addTerm(const MAL_MATRIX (&Mat, double), int type,
 		 int row, int col);
+
     /// \brief Add a vector to the final optimization problem in array form
     ///
     /// \param Mat Added vector
@@ -186,48 +181,23 @@ namespace PatternGeneratorJRL
     void addTerm(const MAL_VECTOR (&Vec, double), int type,
 		 int row);
 
-    /// \name Dumping functions
-    /// \{
-    /// \brief Print of disk the parameters that are passed to the solver
-    void dumpSolverParameters(std::ostream & aos);
-
     /// \brief Dump on disk a problem.
     void dumpProblem(const char *filename);
-    void dumpProblem(std::ostream &);
 
     /// \brief Dump on disk an array.
     ///
     /// \param type
     /// \param filename
     void dump( int type, const char *filename);
-    void dump( int type, std::ostream & aos);
     /// \}
 
-    /// \brief Initialize array
-    ///
-    /// \param[out] array
-    /// \param[in] size
-    template <class type> void initialize(type * array, int size, type value)
-    { std::fill_n(array,size,value); }
-
-    /// \brief Initialize arrays
+    /// \brief Initialize set of arrays
     void clear( );
 
     /// \brief Initialize whole array
     ///
     /// \param[in] type
     void clear( int type );
-
-    /// \brief Initialize block of matrix-array
-    ///
-    /// \param[in] type
-    /// \param[in] row
-    /// \param[in] col
-    /// \param[in] nb_rows
-    /// \param[in] nb_cols
-    void clear( int type,
-	        int row, int col,
-	        int nb_rows, int nb_cols);
 
     /// \brief Solve the problem
     ///
@@ -250,6 +220,20 @@ namespace PatternGeneratorJRL
     /// \param[in] nb_constraints
     void resizeAll();
 
+    //
+    // Private methods
+    //
+  private:
+
+    /// \name Dumping functions
+    /// \{
+    /// \brief Print on disk the parameters that are passed to the solver
+    void dumpSolverParameters(std::ostream & aos);
+    /// \brief Print array
+    void dump( int type, std::ostream & aos);
+    /// \brief Print problem
+    void dumpProblem(std::ostream &);
+    /// \}
     //
     //Private types
     //
@@ -348,13 +332,13 @@ namespace PatternGeneratorJRL
     /// \}
 
     /// \brief Number of optimization parameters
-    int m_NbVariables;
+    int nbvariables_;
 
     /// \brief Total number of constraints
-    int m_NbConstraints;
+    int nbconstraints_;
 
     /// \brief Number of equality constraints
-    int m_NbEqConstraints;
+    int nbeqconstraints_;
 
     /// \brief Reallocation margins
     int m_ReallocMarginVar, m_ReallocMarginConstr;
