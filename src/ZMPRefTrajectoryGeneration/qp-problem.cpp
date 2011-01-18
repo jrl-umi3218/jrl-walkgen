@@ -47,7 +47,7 @@ QPProblem_s::QPProblem_s():
   iout(0),ifail(0), iprint(0),
   lwar(0), liwar(0),
   Eps(0),
-  m_NbVariables(0), m_NbConstraints(0),
+  m_NbVariables(0), m_NbConstraints(0),m_NbEqConstraints(0),
   m_ReallocMarginVar(0), m_ReallocMarginConstr(0),
   scale_factor_(2)
 {
@@ -338,6 +338,7 @@ QPProblem_s::addTerm( const MAL_MATRIX (&Mat, double), int type,
       {
         pArray_s->array_[row+i+(col+j)*pArray_s->nrows_] += Mat(i,j);
       }
+
 }
 
 
@@ -379,14 +380,17 @@ void QPProblem_s::addTerm( const MAL_VECTOR (&Vec, double), int type,
         "required: "<<row + Vec.size()<<std::endl;
     }
 
-  if(m_NbVariables > D_.ncols_ )
+  if(m_NbVariables > D_.nrows_ )
     {
       resizeAll();
     }
 
-
+  boost_ublas::vector<double>::const_iterator VecIt = Vec.begin();
   for( int i = 0; i < Vec.size(); i++ )
-    pArray_s->array_[row+i] += Vec(i);
+  {
+    pArray_s->array_[row+i] += *VecIt;
+    VecIt++;
+  }
 
 }
 
