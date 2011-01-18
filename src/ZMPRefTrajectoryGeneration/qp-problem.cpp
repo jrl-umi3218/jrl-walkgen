@@ -90,8 +90,6 @@ void
 QPProblem_s::clear( int type )
 {
 
-  double * array;
-  int array_size;
   switch(type)
     {
     case MATRIX_Q:
@@ -188,13 +186,13 @@ QPProblem_s::addTerm( const MAL_MATRIX (&Mat, double), int type,
     {
     case MATRIX_Q:
       pArray_s = &Q_;
-      nbvariables_ = (col+Mat.size2()>nbvariables_) ? col+Mat.size2() : nbvariables_;
+      nbvariables_ = (col+(int)Mat.size2()>nbvariables_) ? col+(int)Mat.size2() : nbvariables_;
       break;
 
     case MATRIX_DU:
       pArray_s = &DU_;
-      nbconstraints_ = (row+Mat.size1()>nbconstraints_) ? row+Mat.size1() : nbconstraints_;
-      nbvariables_ = (col+Mat.size2()>nbvariables_) ? col+Mat.size2() : nbvariables_;
+      nbconstraints_ = (row+(int)Mat.size1()>nbconstraints_) ? row+(int)Mat.size1() : nbconstraints_;
+      nbvariables_ = (col+(int)Mat.size2()>nbvariables_) ? col+(int)Mat.size2() : nbvariables_;
       break;
     }
 
@@ -212,8 +210,8 @@ QPProblem_s::addTerm( const MAL_MATRIX (&Mat, double), int type,
       war_.resize(2*(3*nbvariables_*nbvariables_/2+10*nbvariables_+2*(nbconstraints_+1)+20000), 1,true);
     }
 
-  for( int i = 0;i < MAL_MATRIX_NB_ROWS(Mat); i++)
-    for( int j = 0;j < MAL_MATRIX_NB_COLS(Mat); j++)
+  for( int i = 0;i < (int)MAL_MATRIX_NB_ROWS(Mat); i++)
+    for( int j = 0;j < (int)MAL_MATRIX_NB_COLS(Mat); j++)
       {
         pArray_s->array_[row+i+(col+j)*pArray_s->nrows_] += Mat(i,j);
       }
@@ -232,22 +230,22 @@ void QPProblem_s::addTerm( const MAL_VECTOR (&Vec, double), int type,
     {
     case VECTOR_D:
       pArray_s = &D_;
-      nbvariables_ = (row+Vec.size()>nbvariables_) ? row+Vec.size() : nbvariables_;
+      nbvariables_ = (row+(int)Vec.size()>nbvariables_) ? row+(int)Vec.size() : nbvariables_;
       break;
 
     case VECTOR_XL:
       pArray_s = &XL_;
-      nbvariables_ = (row+Vec.size()>nbvariables_) ? row+Vec.size() : nbvariables_;
+      nbvariables_ = (row+(int)Vec.size()>nbvariables_) ? row+(int)Vec.size() : nbvariables_;
       break;
 
     case VECTOR_XU:
       pArray_s = &XU_;
-      nbvariables_ = (row+Vec.size()>nbvariables_) ? row+Vec.size() : nbvariables_;
+      nbvariables_ = (row+(int)Vec.size()>nbvariables_) ? row+(int)Vec.size() : nbvariables_;
       break;
 
     case VECTOR_DS:
       pArray_s = &DS_;
-      nbconstraints_ = (row+Vec.size()>nbconstraints_) ? row+Vec.size() : nbconstraints_;
+      nbconstraints_ = (row+(int)Vec.size()>nbconstraints_) ? row+(int)Vec.size() : nbconstraints_;
       break;
     }
 
@@ -257,7 +255,7 @@ void QPProblem_s::addTerm( const MAL_VECTOR (&Vec, double), int type,
     }
 
   boost_ublas::vector<double>::const_iterator VecIt = Vec.begin();
-  for( int i = 0; i < Vec.size(); i++ )
+  for( int i = 0; i < (int)Vec.size(); i++ )
   {
     pArray_s->array_[row+i] += *VecIt;
     VecIt++;
