@@ -53,7 +53,7 @@ GeneratorVelRef::~GeneratorVelRef()
 
 	
 void 
-GeneratorVelRef::setPonderation( IntermedQPMat & Matrices, double weight, int type)
+GeneratorVelRef::setPonderation( IntermedQPMat & Matrices, double weight, int type) const
 {
 
   IntermedQPMat::objective_variant_t & Objective = Matrices.Objective( type );
@@ -63,7 +63,7 @@ GeneratorVelRef::setPonderation( IntermedQPMat & Matrices, double weight, int ty
 
 
 void 
-GeneratorVelRef::setReference(std::istringstream &strm)
+GeneratorVelRef::setReference(std::istringstream &strm) const
 {
   //TODO:
 }
@@ -71,7 +71,7 @@ GeneratorVelRef::setReference(std::istringstream &strm)
 
 void
 GeneratorVelRef::previewSupportStates(IntermedQPMat & Matrices,
-				      SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates)
+				      const SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates) const
 {
 
   //initialize the previewed support state before previewing
@@ -93,7 +93,7 @@ GeneratorVelRef::previewSupportStates(IntermedQPMat & Matrices,
 
 void
 GeneratorVelRef::generateSelectionMatrices(IntermedQPMat & Matrices,
-					   std::deque<support_state_t> & deqSupportStates)
+					   const std::deque<support_state_t> & deqSupportStates) const
 {
 
   IntermedQPMat::state_variant_t & State = Matrices.State();
@@ -112,7 +112,7 @@ GeneratorVelRef::generateSelectionMatrices(IntermedQPMat & Matrices,
   State.V_f.clear();
 
 
-  std::deque<support_state_t>::iterator SS_it;
+  std::deque<support_state_t>::const_iterator SS_it;
   SS_it = deqSupportStates.begin();//points at the cur. sup. st.
 
   SS_it++;
@@ -141,7 +141,7 @@ GeneratorVelRef::generateSelectionMatrices(IntermedQPMat & Matrices,
 
 
 void 
-GeneratorVelRef::computeGlobalReference(IntermedQPMat & Matrices, COMState & TrunkStateT)
+GeneratorVelRef::computeGlobalReference(IntermedQPMat & Matrices, const COMState & TrunkStateT) const
 {
 
   reference_t & Ref = Matrices.Reference();
@@ -163,7 +163,7 @@ GeneratorVelRef::computeGlobalReference(IntermedQPMat & Matrices, COMState & Tru
 
 
 void 
-GeneratorVelRef::initialize(IntermedQPMat & Matrices)
+GeneratorVelRef::initialize(IntermedQPMat & Matrices) const
 {
 
   IntermedQPMat::dynamics_t & Velocity = Matrices.Dynamics( IntermedQPMat::VELOCITY );
@@ -180,7 +180,7 @@ GeneratorVelRef::initialize(IntermedQPMat & Matrices)
 
 
 void
-GeneratorVelRef::initializeMatrices( linear_inequality_t & Inequalities)
+GeneratorVelRef::initializeMatrices( linear_inequality_t & Inequalities) const
 {
   switch(Inequalities.type)
     {
@@ -199,7 +199,7 @@ GeneratorVelRef::initializeMatrices( linear_inequality_t & Inequalities)
 
 
 void
-GeneratorVelRef::initializeMatrices( IntermedQPMat::dynamics_t & Dynamics)
+GeneratorVelRef::initializeMatrices( IntermedQPMat::dynamics_t & Dynamics) const
 {
 
   bool preserve = true;
@@ -272,13 +272,13 @@ GeneratorVelRef::initializeMatrices( IntermedQPMat::dynamics_t & Dynamics)
 void 
 GeneratorVelRef::buildInequalitiesCoP(linear_inequality_t & Inequalities,
 				      FootConstraintsAsLinearSystemForVelRef * FCALS,
-				      std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-				      std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
-				      std::deque<support_state_t> & deqSupportStates,
-				      std::deque<double> & PreviewedSupportAngles)
+				      const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
+				      const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+				      const std::deque<support_state_t> & deqSupportStates,
+				      const std::deque<double> & PreviewedSupportAngles) const
 {
 
-  support_state_t & CurrentSupport = deqSupportStates.front();
+  const support_state_t & CurrentSupport = deqSupportStates.front();
   double CurrentSupportAngle;
   if( CurrentSupport.Foot==1 )
     CurrentSupportAngle = AbsoluteLeftFootPositions.back().theta*M_PI/180.0;
@@ -298,7 +298,7 @@ GeneratorVelRef::buildInequalitiesCoP(linear_inequality_t & Inequalities,
   double dc[nEdges] = {0.0, 0.0, 0.0, 0.0};
   for( int i=1;i<=m_N;i++ )
     {
-      support_state_t & PrwSupport = deqSupportStates[i];
+      const support_state_t & PrwSupport = deqSupportStates[i];
 
       if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 )
         SupportAngle = PreviewedSupportAngles[PrwSupport.StepNumber-1];
@@ -326,13 +326,13 @@ GeneratorVelRef::buildInequalitiesCoP(linear_inequality_t & Inequalities,
 void
 GeneratorVelRef::buildInequalitiesFeet(linear_inequality_t & Inequalities,
 				       FootConstraintsAsLinearSystemForVelRef * FCALS,
-				       std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-				       std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
-				       std::deque<support_state_t> & deqSupportStates,
-				       std::deque<double> & PreviewedSupportAngles)
+				       const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
+				       const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+				       const std::deque<support_state_t> & deqSupportStates,
+				       const std::deque<double> & PreviewedSupportAngles) const
 {
 
-  support_state_t & CurrentSupport = deqSupportStates.front();
+  const support_state_t & CurrentSupport = deqSupportStates.front();
 
   double CurrentSupportAngle;
   if( CurrentSupport.Foot==1 )
@@ -358,7 +358,7 @@ GeneratorVelRef::buildInequalitiesFeet(linear_inequality_t & Inequalities,
   for( int i=1;i<=m_N;i++ )
     {
 
-      support_state_t & PrwSupport = deqSupportStates[i];
+      const support_state_t & PrwSupport = deqSupportStates[i];
 
       //foot positioning constraints
       if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 && PrwSupport.Phase != 0)
@@ -391,9 +391,9 @@ GeneratorVelRef::buildInequalitiesFeet(linear_inequality_t & Inequalities,
 
 
 void
-GeneratorVelRef::buildConstraintsCoP(linear_inequality_t & IneqCoP,
-				     IntermedQPMat::dynamics_t CoP,
-				     IntermedQPMat::state_variant_t & State,
+GeneratorVelRef::buildConstraintsCoP(const linear_inequality_t & IneqCoP,
+				     const IntermedQPMat::dynamics_t & CoP,
+				     const IntermedQPMat::state_variant_t & State,
 				     int NbStepsPreviewed, QPProblem & Pb)
 {
 
@@ -437,8 +437,8 @@ GeneratorVelRef::buildConstraintsCoP(linear_inequality_t & IneqCoP,
 
 
 void
-GeneratorVelRef::buildConstraintsFeet(linear_inequality_t & IneqFeet,
-				      IntermedQPMat::state_variant_t & State,
+GeneratorVelRef::buildConstraintsFeet(const linear_inequality_t & IneqFeet,
+				      const IntermedQPMat::state_variant_t & State,
 				      int NbStepsPreviewed, QPProblem & Pb)
 {
 
@@ -468,10 +468,10 @@ GeneratorVelRef::buildConstraintsFeet(linear_inequality_t & IneqFeet,
 void
 GeneratorVelRef::buildConstraints(IntermedQPMat & Matrices, QPProblem & Pb,
 				  FootConstraintsAsLinearSystemForVelRef * FCALS,
-				  std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-				  std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
-				  std::deque<support_state_t> & deqSupportStates,
-				  std::deque<double> & PreviewedSupportAngles)
+				  const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
+				  const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+				  const std::deque<support_state_t> & deqSupportStates,
+				  const std::deque<double> & PreviewedSupportAngles)
 {
 
   //CoP constraints
@@ -480,8 +480,8 @@ GeneratorVelRef::buildConstraints(IntermedQPMat & Matrices, QPProblem & Pb,
 		       AbsoluteLeftFootPositions, AbsoluteRightFootPositions,
 		       deqSupportStates, PreviewedSupportAngles);
 
-  IntermedQPMat::dynamics_t & CoP = Matrices.Dynamics(IntermedQPMat::COP);
-  IntermedQPMat::state_variant_t & State = Matrices.State();
+  const IntermedQPMat::dynamics_t & CoP = Matrices.Dynamics(IntermedQPMat::COP);
+  const IntermedQPMat::state_variant_t & State = Matrices.State();
   int NbStepsPreviewed = deqSupportStates.back().StepNumber;
   buildConstraintsCoP(IneqCoP, CoP, State, NbStepsPreviewed, Pb);
 
@@ -497,7 +497,7 @@ GeneratorVelRef::buildConstraints(IntermedQPMat & Matrices, QPProblem & Pb,
 
 
 void 
-GeneratorVelRef::buildInvariantPart(QPProblem & Pb, IntermedQPMat & Matrices)
+GeneratorVelRef::buildInvariantPart(QPProblem & Pb, const IntermedQPMat & Matrices)
 {
 
   boost_ublas::matrix<double> weightMTM(m_N,m_N,false);
@@ -525,8 +525,8 @@ GeneratorVelRef::buildInvariantPart(QPProblem & Pb, IntermedQPMat & Matrices)
 
 
 void
-GeneratorVelRef::updateProblem(QPProblem & Pb, IntermedQPMat & Matrices,
-			       std::deque<support_state_t> & deqSupportStates)
+GeneratorVelRef::updateProblem(QPProblem & Pb, const IntermedQPMat & Matrices,
+			       const std::deque<support_state_t> & deqSupportStates)
 {
 
   Pb.clear(QPProblem::VECTOR_D);
@@ -625,24 +625,3 @@ GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double),
   V1 = MAL_RET_A_by_B(M2,V2);
   weightMV = weight*MAL_RET_A_by_B(M1,V1);
 }
-
-
-//int
-//GeneratorVelRef::buildConstantPartOfConstraintMatrices()
-//{
-//  //TODO:
-//}
-
-	
-//int
-//GeneratorVelRef::buildConstantPartOfTheObjectiveFunction()
-//{
-//  //TODO:
-//}
-
-
-//int
-//GeneratorVelRef::initializeMatrixPbConstants()
-//{
-//  //TODO:
-//}
