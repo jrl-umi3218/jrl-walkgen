@@ -99,7 +99,7 @@ namespace PatternGeneratorJRL
     int computeLinearSystem (const convex_hull_t & ConvexHull,
                              MAL_MATRIX (&D, double),
                              MAL_MATRIX (&Dc, double),
-                             const support_state_t & PrwSupport);
+                             const support_state_t & PrwSupport) const;
 
     /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
     /// convex hull specified by a vector of points.
@@ -112,7 +112,7 @@ namespace PatternGeneratorJRL
     /// \return 0
     int computeLinearSystem (const convex_hull_t & ConvexHull,
 			     double * D_x, double * D_y, double * d,
-			     const support_state_t & PrwSupport);
+			     const support_state_t & PrwSupport) const;
 
     /// \brief Reimplement the interface of SimplePluginManager
     ///
@@ -137,7 +137,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param aHS object of the robot
     /// \return 0
-    int setFeetDimensions (CjrlHumanoidDynamicRobot * aHS);
+    int setFeetDimensions ( CjrlHumanoidDynamicRobot * aHS );
 
     /// \brief Initialize the constraint hulls
     ///
