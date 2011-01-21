@@ -41,6 +41,9 @@
 #  define WALK_GEN_JRL_EXPORT
 #endif
 
+
+#include <deque>
+
 #include <jrl/mal/matrixabstractlayer.hh>
 
 namespace PatternGeneratorJRL
@@ -137,6 +140,6 @@ namespace PatternGeneratorJRL
   typedef struct LinearConstraintInequality_s
     LinearConstraintInequality_t;
 
-
+	typedef  std::deque<RelativeFootPosition> RelativeFootPositionQueue;
 }
 #endif
