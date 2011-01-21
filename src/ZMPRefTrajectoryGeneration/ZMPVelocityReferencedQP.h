@@ -132,6 +132,12 @@ namespace PatternGeneratorJRL
     static const unsigned int PLDP=2;
     static const unsigned int PLDPHerdt = 3;
 
+  protected:
+
+	GeneratorVelRef * m_GenVR;
+
+	IntermedQPMat m_Matrices;
+
   private:
 
     double m_RobotMass;
@@ -162,9 +168,9 @@ namespace PatternGeneratorJRL
     /*! Deecoupled optimization problem to compute the evolution of feet angles. */
     OrientationsPreview * m_OP;
 
-    GeneratorVelRef * m_GenVR;
+   
 
-    IntermedQPMat m_Matrices;
+   
 
     /*! \brief Object creating Linear inequalities constraints
       based on the foot position. Those constraints are *NOT* the
