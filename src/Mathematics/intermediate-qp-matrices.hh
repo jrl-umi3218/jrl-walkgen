@@ -102,6 +102,9 @@ namespace PatternGeneratorJRL
       boost_ublas::matrix<double> V_f;
       /// \}
 
+      /// \brief Current support state
+      support_state_t SupportState;
+
       /// \brief Current support foot position
       supportfoot_t SupportFoot;
 
@@ -114,11 +117,13 @@ namespace PatternGeneratorJRL
     /// \{
     struct objective_variant_s
     {
+      /// \brief Ponderation
       double weight;
 
+      /// \brief Dynamics
       dynamics_t * dyn;
 
-      /// \brief Minimization objective
+      /// \brief Minimization objective type
       int type;
 
       std::ostream& print (std::ostream& o) const;
@@ -147,16 +152,16 @@ namespace PatternGeneratorJRL
     { return m_StateMatrices; };
 
     /// \brief Accessors to the objective dependent matrices
-    objective_variant_t const & Objective( const int type ) const;
-    objective_variant_t & Objective( const int type );
+    objective_variant_t const & Objective( int type ) const;
+    objective_variant_t & Objective( int type );
 
     /// \brief Accessors to the dynamics
-    dynamics_t const & Dynamics( const int type ) const;
-    dynamics_t & Dynamics( const int type );
+    dynamics_t const & Dynamics( int type ) const;
+    dynamics_t & Dynamics( int type );
 
     /// \brief Accessors to the inequalities
-    linear_inequality_t const & Inequalities( const int type ) const;
-    linear_inequality_t & Inequalities( const int type );
+    linear_inequality_t const & Inequalities( int type ) const;
+    linear_inequality_t & Inequalities( int type );
 
     /// \brief Accessors to the Center of Mass
     inline com_t const & CoM() const
@@ -172,11 +177,20 @@ namespace PatternGeneratorJRL
     inline void Reference( const reference_t & Ref )
     { m_StateMatrices.Ref = Ref; };
 
-    /// \brief Accessors to the Center of Mass
+    /// \brief Accessors to the support foot position
     inline supportfoot_t const & SupportFoot() const
     { return m_StateMatrices.SupportFoot; };
     inline void SupportFoot( const supportfoot_t & SupportFoot )
     { m_StateMatrices.SupportFoot = SupportFoot; };
+    /// \}
+
+    /// \brief Accessors to the current support state
+    inline support_state_t const & SupportState() const
+    { return m_StateMatrices.SupportState; };
+    inline support_state_t & SupportState()
+    { return m_StateMatrices.SupportState; };
+    inline void SupportState( const support_state_t & SupportState )
+    { m_StateMatrices.SupportState = SupportState; };
     /// \}
 
     /// \name Displaying
@@ -194,23 +208,23 @@ namespace PatternGeneratorJRL
   private:
 
     objective_variant_t
-    m_MeanVelocity,
+      m_MeanVelocity,
       m_InstantVelocity,
       m_COPCentering,
       m_JerkMin;
 
     state_variant_t
-    m_StateMatrices;
+      m_StateMatrices;
 
     dynamics_t
-    m_Position,
+      m_Position,
       m_Velocity,
       m_Acceleration,
       m_Jerk,
       m_CoP;
 
     linear_inequality_t
-    m_IneqCoP,
+      m_IneqCoP,
       m_IneqCoM,
       m_IneqFeet;
 

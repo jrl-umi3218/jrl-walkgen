@@ -85,6 +85,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_CurrentSupport.StepsLeft = 1;
   m_CurrentSupport.SSSS = false;
   m_CurrentSupport.StateChanged = false;
+
+  m_Matrices.SupportState(m_CurrentSupport);
+
   m_SupportFSM = new SupportFSM(0.1);
 
   /* Orientations preview algorithm*/
@@ -220,7 +223,7 @@ ZMPVelocityReferencedQP::initFeet()
   aSFLeft.StartTime = 0.0;
   aSFLeft.SupportFoot = 1;
   aSFRight.x = 0.0;
-  aSFRight.y = -0.1;//TODO:
+  aSFRight.y = -0.1;
   aSFRight.theta = 0.0;
   aSFRight.StartTime = 0.0;
   aSFRight.SupportFoot = -1;
@@ -367,9 +370,10 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 
 void
 ZMPVelocityReferencedQP::interpolateTrunkState(double time, int CurrentIndex,
+                                                    const support_state_t & CurrentSupport,
 						    deque<COMState> & FinalCOMStates)
 {
-  if(m_CurrentSupport.Phase == 1 && time+m_TimeBuffer+3.0/2.0*m_QP_T < m_CurrentSupport.TimeLimit)
+  if(CurrentSupport.Phase == 1 && time+m_TimeBuffer+3.0/2.0*m_QP_T < CurrentSupport.TimeLimit)
     {
       //Set parameters for trunk interpolation
       m_c = 3.0*(m_TrunkStateT.yaw[1]-m_TrunkState.yaw[1])/(m_QP_T*m_QP_T);
@@ -412,7 +416,7 @@ ZMPVelocityReferencedQP::interpolateTrunkState(double time, int CurrentIndex,
 	    }
 	}
     }
-  else if (m_CurrentSupport.Phase == 0 || time+m_TimeBuffer+3.0/2.0*m_QP_T > m_CurrentSupport.TimeLimit)
+  else if (CurrentSupport.Phase == 0 || time+m_TimeBuffer+3.0/2.0*m_QP_T > CurrentSupport.TimeLimit)
     {
       for(int k = 0; k<=(int)(m_QP_T/m_SamplingPeriod);k++)
 	{
@@ -425,15 +429,17 @@ ZMPVelocityReferencedQP::interpolateTrunkState(double time, int CurrentIndex,
 
 
 void ZMPVelocityReferencedQP::interpolateFeetPositions(double time, int CurrentIndex,
+                                                       const support_state_t & CurrentSupport,
+                                                       const deque<double> & PreviewedSupportAngles,
 						       deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 						       deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
 {
-  double LocalInterpolationTime = (time+m_TimeBuffer)-(m_CurrentSupport.TimeLimit-m_SupportFSM->m_SSPeriod);
+  double LocalInterpolationTime = (time+m_TimeBuffer)-(CurrentSupport.TimeLimit-m_SupportFSM->m_SSPeriod);
 
   double StepHeight = 0.05;
   int StepType = 1;
 
-  if(m_CurrentSupport.Phase == 1 && time+m_TimeBuffer+3.0/2.0*m_QP_T < m_CurrentSupport.TimeLimit)
+  if(CurrentSupport.Phase == 1 && time+m_TimeBuffer+3.0/2.0*m_QP_T < CurrentSupport.TimeLimit)
     {
       //determine coefficients of interpolation polynom
       double ModulationSupportCoefficient = 0.9;
@@ -445,7 +451,7 @@ void ZMPVelocityReferencedQP::interpolateFeetPositions(double time, int CurrentI
 
       FootAbsolutePosition LastSwingFootPosition;
 
-      if(m_CurrentSupport.Foot==1)
+      if(CurrentSupport.Foot==1)
 	{
 	  LastSwingFootPosition = FinalRightFootAbsolutePositions[CurrentIndex];
 	}
@@ -463,12 +469,12 @@ void ZMPVelocityReferencedQP::interpolateFeetPositions(double time, int CurrentI
 						LastSwingFootPosition.y,
 						LastSwingFootPosition.dy);
 
-      if(m_CurrentSupport.StateChanged==true)
+      if(CurrentSupport.StateChanged==true)
 	m_FTGS->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_SupportFSM->m_SSPeriod-m_QP_T,StepHeight);
 
       m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::THETA_AXIS,
 						ModulatedSingleSupportTime-InterpolationTimePassed,
-						m_PreviewedSupportAngles[0]*180.0/M_PI,
+						PreviewedSupportAngles[0]*180.0/M_PI,
 						LastSwingFootPosition.theta,
 						LastSwingFootPosition.dtheta);
       m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA_AXIS,
@@ -482,7 +488,7 @@ void ZMPVelocityReferencedQP::interpolateFeetPositions(double time, int CurrentI
 
       for(int k = 1; k<=(int)(m_QP_T/m_SamplingPeriod);k++)
 	{
-	  if (m_CurrentSupport.Foot==1)
+	  if (CurrentSupport.Foot==1)
 	    {
 	      m_FTGS->UpdateFootPosition(FinalLeftFootAbsolutePositions,
 					 FinalRightFootAbsolutePositions,
@@ -523,7 +529,7 @@ void ZMPVelocityReferencedQP::interpolateFeetPositions(double time, int CurrentI
 
 	}
     }
-  else if (m_CurrentSupport.Phase == 0 || time+m_TimeBuffer+3.0/2.0*m_QP_T > m_CurrentSupport.TimeLimit)
+  else if (CurrentSupport.Phase == 0 || time+m_TimeBuffer+3.0/2.0*m_QP_T > CurrentSupport.TimeLimit)
     {
       for(int k = 0; k<=(int)(m_QP_T/m_SamplingPeriod);k++)
 	{
@@ -572,81 +578,98 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       (time>=m_TimeToStopOnLineMode))
     { m_OnLineMode = false; }
 
+
+  // Apply external forces if occured
+  if(m_PerturbationOccured == true)
+    {
+      com_t com = m_CoM();
+      com.x(2) = com.x(2)+m_PerturbationAcceleration(2);
+      com.y(2) = com.y(2)+m_PerturbationAcceleration(5);
+      m_PerturbationOccured = false;
+      m_CoM(com);
+    }
+
+
   if(time + 0.00001 > m_UpperTimeLimitToUpdate)
     {
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
       struct timeval start,end;
       gettimeofday(&start,0);
 
+
+      // UPDATE DATA:
+      // ------------
+      m_Matrices.Reference(m_VelRef);
+      m_GenVR->setCurrentTime(time+m_TimeBuffer);
+
+
+      // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
+      // ----------------------------------------------------
+      deque<support_state_t> deqPrwSupportStates;
+      m_GenVR->previewSupportStates(m_Matrices, m_SupportFSM, deqPrwSupportStates);
+      const support_state_t CurrentSupport = deqPrwSupportStates.front();
+
+
+      //Add a new support foot to the support feet history deque
+      if(CurrentSupport.StateChanged == true)
+        {
+          FootAbsolutePosition FAP;
+          supportfoot_t newSF;
+          if(CurrentSupport.Foot==1)
+            FAP = FinalLeftFootAbsolutePositions.back();
+          else
+            FAP = FinalRightFootAbsolutePositions.back();
+          newSF.x = FAP.x;
+          newSF.y = FAP.y;
+          newSF.theta = FAP.theta*M_PI/180.0;
+          newSF.StartTime = m_CurrentTime;
+          newSF.SupportFoot = CurrentSupport.Foot;
+          QueueOfSupportFeet.push_back(newSF);
+          m_Matrices.SupportFoot(newSF);
+        }
+
+
+      // DEFINE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
+      // -----------------------------------------------------
+      deque<double> PreviewedSupportAngles;
       m_OP->verifyAccelerationOfHipJoint(m_VelRef, m_TrunkState,
-					 m_TrunkStateT, m_CurrentSupport);
+					 m_TrunkStateT, CurrentSupport);
       m_OP->previewOrientations(time+m_TimeBuffer,
-				m_PreviewedSupportAngles,
+				PreviewedSupportAngles,
 				m_TrunkState,
 				m_TrunkStateT,
-				m_SupportFSM, m_CurrentSupport,
+				m_SupportFSM, CurrentSupport,
 				FinalLeftFootAbsolutePositions,
 				FinalRightFootAbsolutePositions);
 
+
+      // COMPUTE REFERENCE IN THE GLOBAL FRAME:
+      // --------------------------------------
       m_GenVR->computeGlobalReference(m_Matrices, m_TrunkStateT);
 
-      //Apply external forces
-      if(m_PerturbationOccured == true)
-	{
-          com_t com = m_CoM();
-	  com.x(2) = com.x(2)+m_PerturbationAcceleration(2);
-	  com.y(2) = com.y(2)+m_PerturbationAcceleration(5);
-	  m_PerturbationOccured = false;
-	  m_CoM(com);
-	}
 
-      m_SupportFSM->setSupportState(time+m_TimeBuffer, 0, m_CurrentSupport, m_VelRef);
-
-      //Add a new support foot to the support feet history deque
-      if(m_CurrentSupport.StateChanged == true)
-	{
-	  FootAbsolutePosition FAP;
-	  supportfoot_t newSF;
-	  if(m_CurrentSupport.Foot==1)
-	    FAP = FinalLeftFootAbsolutePositions.back();
-	  else
-	    FAP = FinalRightFootAbsolutePositions.back();
-
-	  newSF.x = FAP.x;
-	  newSF.y = FAP.y;
-	  newSF.theta = FAP.theta*M_PI/180.0;
-	  newSF.StartTime = time+m_TimeBuffer;
-	  newSF.SupportFoot = m_CurrentSupport.Foot;
-
-	  QueueOfSupportFeet.push_back(newSF);
-
-	  m_Matrices.SupportFoot(newSF);
-	}
-
-      deque<support_state_t> deqPrwSupportStates;
-      deqPrwSupportStates.push_back(m_CurrentSupport);
-
-      m_GenVR->setCurrentTime(time+m_TimeBuffer);
-      m_Matrices.Reference(m_VelRef);
-
-      m_GenVR->computeGlobalReference(m_Matrices, m_TrunkStateT);
-      m_GenVR->previewSupportStates(m_Matrices, m_SupportFSM, deqPrwSupportStates);
-
-      m_PrwSupport = deqPrwSupportStates.back();
-
-
+      // BUILD CONSTANT PART OF THE PROBLEM:
+      // -----------------------------------
       m_GenVR->buildInvariantPart(m_Pb, m_Matrices);
 
+
+      // BUILD VARIANT PART OF THE OPTIMIZATION PROBLEM:
+      // -------------------------------------------------
       m_GenVR->updateProblem(m_Pb, m_Matrices, deqPrwSupportStates);
 
+
+      // BUILD CONSTRAINTS:
+      // ------------------
       m_GenVR->buildConstraints(m_Matrices, m_Pb,
           m_fCALS,
           FinalLeftFootAbsolutePositions,
           FinalRightFootAbsolutePositions,
           deqPrwSupportStates,
-          m_PreviewedSupportAngles);
+          PreviewedSupportAngles);
 
 
+      // SOLVE PROBLEM:
+      // --------------
       if ((m_FastFormulationMode==QLDANDLQ)||
 	  (m_FastFormulationMode==QLD))
 	{
@@ -656,13 +679,13 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	}
 
 
+      // INTERPOLATE THE NEXT COMPUTED COM STATE:
+      // ----------------------------------------
       FinalCOMStates.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalZMPPositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalLeftFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalRightFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
-
       int CurrentIndex = (int)(m_TimeBuffer/m_SamplingPeriod)-1;
-
       m_CoM.Interpolation(FinalCOMStates,
 			      FinalZMPPositions,
 			      CurrentIndex,
@@ -670,17 +693,19 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       m_Matrices.CoM(m_CoM.OneIteration(m_Result.vecSolution[0],m_Result.vecSolution[m_QP_N]));
 
 
+      // INTERPOLATE THE COMPUTED FEET POSITIONS:
+      // ----------------------------------------
       //The robot is supposed to stop always with the feet aligned in the lateral plane.
-      if(m_CurrentSupport.StepsLeft>0)
+      if(CurrentSupport.StepsLeft>0)
 	{
 	  if(fabs(m_Result.vecSolution[2*m_QP_N])-0.00001<0.0)
 	    {
 	      cout<<"Previewed foot position zero at time: "<<time<<endl;
 	    }
-	  else if (m_CurrentSupport.TimeLimit-time-m_QP_T/2.0>0)
+	  else if (CurrentSupport.TimeLimit-time-m_QP_T/2.0>0)
 	    {//The landing position is yet determined by the solver because the robot finds himself still in the single support phase
 	      m_FPx = m_Result.vecSolution[2*m_QP_N];
-	      m_FPy = m_Result.vecSolution[2*m_QP_N+m_PrwSupport.StepNumber];
+	      m_FPy = m_Result.vecSolution[2*m_QP_N+deqPrwSupportStates.back().StepNumber];
 	    }
 	}
       else
@@ -688,7 +713,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  deque<supportfoot_t>::iterator CurSF_it;
 	  CurSF_it = QueueOfSupportFeet.end();
 	  CurSF_it--;
-	  while(CurSF_it->SupportFoot!=m_CurrentSupport.Foot)
+	  while(CurSF_it->SupportFoot!=CurrentSupport.Foot)
 	    CurSF_it--;
 	  m_FPx = CurSF_it->x + double(CurSF_it->SupportFoot)*sin(CurSF_it->theta)*m_FeetDistanceDS;
 	  m_FPy = CurSF_it->y - double(CurSF_it->SupportFoot)*cos(CurSF_it->theta)*m_FeetDistanceDS;
@@ -702,23 +727,23 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	      // It suppose to work because Gamma appears only during the non-constant 
 	    }
 	  m_EndingPhase = true;
-	  
 	}
 
       interpolateTrunkState(time, CurrentIndex,
+                            CurrentSupport,
 			    FinalCOMStates);
       interpolateFeetPositions(time, CurrentIndex,
+                               CurrentSupport,
+                               PreviewedSupportAngles,
 			       FinalLeftFootAbsolutePositions,
 			       FinalRightFootAbsolutePositions);
 
 
 
-
-
-
-
-
       m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+m_QP_T;
+
+
+
 
       // Compute CPU consumption time.
       gettimeofday(&end,0);

@@ -43,7 +43,7 @@ namespace PatternGeneratorJRL
 	
     /*! \brief Initialize the previewed state. */
     void setSupportState(const double &Time, const int &pi,
-    		support_state_t & Support, const reference_t & Ref);
+    		support_state_t & Support, const reference_t & Ref) const;
 	
     /*! \brief constants for the durations in the support phases */
     double m_DSDuration, m_SSPeriod, m_DSSSDuration;
@@ -55,9 +55,6 @@ namespace PatternGeneratorJRL
 
     /*! \Brief Sampling duration */
     double m_T;
-
-
-    bool m_ReferenceGiven;
 
     int m_FullDebug;
 

@@ -22,9 +22,6 @@
  *  Research carried out within the scope of the 
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/* TODO 3: Restructure the class
- *  setSupportState.cpp
- */
 
 #include <iostream>
 #include <fstream>
@@ -45,8 +42,6 @@ SupportFSM::SupportFSM(const double &SamplingPeriod)
 
   m_T = SamplingPeriod;
 
-  m_FullDebug = 0;
-
 }
 
 
@@ -55,18 +50,18 @@ SupportFSM::~SupportFSM()
 }
 
 void SupportFSM::setSupportState(const double &Time, const int &pi,
-				 support_state_t & Support, const reference_t & vel_ref)
+				 support_state_t & Support, const reference_t & vel_ref) const
 {
 
   double eps = 1e-6;
 
   Support.StateChanged = false;
 
-  m_ReferenceGiven = false;
+  bool ReferenceGiven = false;
   if(fabs(vel_ref.local.x)>eps||fabs(vel_ref.local.y)>eps||fabs(vel_ref.local.yaw)>eps)
-    m_ReferenceGiven = true;
+    ReferenceGiven = true;
 
-  if(m_ReferenceGiven == true && Support.Phase == 0 && (Support.TimeLimit-Time-eps)>m_DSSSDuration)
+  if(ReferenceGiven == true && Support.Phase == 0 && (Support.TimeLimit-Time-eps)>m_DSSSDuration)
     {
       Support.TimeLimit = Time+m_DSSSDuration;
     }
@@ -76,14 +71,14 @@ void SupportFSM::setSupportState(const double &Time, const int &pi,
   if(Time+eps+pi*m_T >= Support.TimeLimit)
     {
       //SS->DS
-      if(Support.Phase == 1  && m_ReferenceGiven == false && Support.StepsLeft==0)
+      if(Support.Phase == 1  && ReferenceGiven == false && Support.StepsLeft==0)
 	{
 	  Support.Phase = 0;
 	  Support.TimeLimit = Time+pi*m_T + m_DSDuration;
 	  Support.StateChanged = true;
 	}
       //DS->SS
-      else if(Support.Phase == 0 && m_ReferenceGiven == true)
+      else if(Support.Phase == 0 && ReferenceGiven == true)
 	{
 	  Support.Phase = 1;
 	  Support.TimeLimit = Time+pi*m_T + m_SSPeriod;
@@ -92,28 +87,16 @@ void SupportFSM::setSupportState(const double &Time, const int &pi,
 	}
       //SS->SS
       else if(((Support.Phase == 1) && (Support.StepsLeft>0)) ||
-	      ((Support.StepsLeft==0) && (m_ReferenceGiven == true)))
+	      ((Support.StepsLeft==0) && (ReferenceGiven == true)))
 	{
 	  Support.Foot = -1*Support.Foot;
 	  Support.StateChanged = true;
 	  Support.TimeLimit = Time+pi*m_T + m_SSPeriod;
 	  Support.StepNumber++;
 	  Support.SSSS = 1;
-	  if (m_ReferenceGiven == false)
+	  if (ReferenceGiven == false)
 	    Support.StepsLeft = Support.StepsLeft-1;
 	}
-    }
-
-  if(m_FullDebug>0)
-    {
-      ofstream aof;
-      aof.open("SupportStates.dat", ios::app);
-      aof << "Time: "<<Time<<" PrwTime: "<<Time+pi*m_T
-	  <<" CSF: "<<Support.Foot<<" CTL: "<<Support.TimeLimit
-	  <<" SL: "<<Support.StepsLeft<<" *SF: "<<Support.Foot
-	  <<" SN: "<<Support.StepNumber;
-      aof << endl;
-      aof.close();
     }
 
 }

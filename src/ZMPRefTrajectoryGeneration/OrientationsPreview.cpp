@@ -115,28 +115,19 @@ void OrientationsPreview::previewOrientations(const double &Time,
 
   m_signRotVelTrunk = (TrunkStateT.yaw[1] < 0.0)?-1.0:1.0;
 
-  unsigned int StepNumber = 0;
-
-  PreviewedSupportAngles.clear();
- 
+  unsigned StepNumber = 0;
 
   while(!m_TrunkVelOK)
     {
-
       //Initialize the preview loop
       if (CurrentSupport.Foot == 1)
 	{
 	  m_CurrentSupportAngle = LeftFootAbsolutePositions[0].theta*M_PI/180.0;
-
-	  //m_PreviewedSupportAngle = RightFootAbsolutePositions[0].theta*M_PI/180.0;
 	}
       else
 	{
 	  m_CurrentSupportAngle = RightFootAbsolutePositions[0].theta*M_PI/180.0;
-	  //m_PreviewedSupportAngle = LeftFootAbsolutePositions[0].theta*M_PI/180.0;
 	}
-
-
 
       if(CurrentSupport.Phase != 0)
 	{
