@@ -111,7 +111,7 @@ ADD_TEST(TestHerdt2010 TestHerdt2010
 ##################################
 # Test Herdt With Step Positions #
 ##################################
-CONFIG_FILES_CMAKE(TestHerdtStepPosOnLineTestFGPI.datref)
+#CONFIG_FILES_CMAKE(TestHerdtStepPosOnLineTestFGPI.datref)
 
 ADD_EXECUTABLE(TestHerdtStepPos
   ../src/portability/gettimeofday.cc
