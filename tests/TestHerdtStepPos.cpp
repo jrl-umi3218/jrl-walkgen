@@ -34,14 +34,15 @@ using namespace std;
 
 enum Profiles_t {
   PROFIL_HERDT_ONLINE_WALKING                 // 1
+  ,PROFIL_HERDT_STEP_POS_ONLINE_WALKING
 };
 
-class TestHerdt2010: public TestObject
+class TestHerdtStepPos: public TestObject
 {
 
 private:
 public:
-  TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
+  TestHerdtStepPos(int argc, char *argv[], string &aString, int TestProfile):
     TestObject(argc,argv,aString)
   {
     m_TestProfile = TestProfile;
@@ -57,7 +58,7 @@ protected:
     CommonInitialization(aPGI);
 
     {
-      istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
+      istringstream strm2(":SetAlgoForZmpTrajectory HerdtStepPos");
       aPGI.ParseCmd(strm2);
 
     }
@@ -66,7 +67,7 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":HerdtOnline 0.2 0.0 0.0");
+      istringstream strm2(":HerdtOnlineStepPos 0.2 0.0 0.0");
       aPGI.ParseCmd(strm2);
     }
     {
@@ -91,6 +92,8 @@ protected:
 
       case PROFIL_HERDT_ONLINE_WALKING:
 	startOnLineWalking(*m_PGI);
+		case PROFIL_HERDT_STEP_POS_ONLINE_WALKING:
+	startOnLineWalking(*m_PGI);
 	break;
       default:
 	throw("No correct test profile");
@@ -113,12 +116,12 @@ int PerformTests(int argc, char *argv[])
 {
 
   const unsigned int NbTests = 1;
-  std::string TestNames[NbTests] = { "TestHerdt2010OnLine" };
-  int TestProfiles[NbTests] = { PROFIL_HERDT_ONLINE_WALKING };
+  std::string TestNames[NbTests] = { "TestHerdtStepPosOnLine" };
+  int TestProfiles[NbTests] = { PROFIL_HERDT_STEP_POS_ONLINE_WALKING };
 
   for (unsigned int i=0;i<NbTests;i++)
     {
-      TestHerdt2010 aTH2010(argc,argv,
+      TestHerdtStepPos aTH2010(argc,argv,
 			    TestNames[i],
 			    TestProfiles[i]);
       try
