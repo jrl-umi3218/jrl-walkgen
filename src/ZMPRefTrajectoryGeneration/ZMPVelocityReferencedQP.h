@@ -196,9 +196,6 @@ namespace PatternGeneratorJRL
     /*! Preview window */
     int m_QP_N;
 
-    /*! Orientations of the previewed support feet */
-    deque<double> m_PreviewedSupportAngles;
-
     //Final optimization problem
     QPProblem m_Pb;
 
@@ -239,9 +236,12 @@ namespace PatternGeneratorJRL
 
 
     void interpolateTrunkState(double time, int CurrentIndex,
+                               const support_state_t & CurrentSupport,
 			       deque<COMState> & FinalCOMStates);
 
     void interpolateFeetPositions(double time, int CurrentIndex,
+                                  const support_state_t & CurrentSupport,
+                                  const deque<double> & PreviewedSupportAngles,
 				  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 				  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
