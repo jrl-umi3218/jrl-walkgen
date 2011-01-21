@@ -65,7 +65,14 @@ namespace PatternGeneratorJRL
     /// \param[out] Matrices
     /// \param[in] weight
     /// \param[in] objective
-    void setPonderation( IntermedQPMat & Matrices, double weight, int objective );
+    void setPonderation( IntermedQPMat & Matrices, double weight, int objective ) const;
+
+	    /// \brief get the weights on the objective terms
+    ///
+    /// \param[in] Matrices
+    /// \param[in] objective
+    double getPonderation(const IntermedQPMat & Matrices, int objective ) const;
+
 
     /// \brief Set the velocity reference from string
     ///
