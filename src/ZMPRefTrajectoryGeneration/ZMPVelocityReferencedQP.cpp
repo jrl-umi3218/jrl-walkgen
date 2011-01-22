@@ -78,20 +78,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_FTGS = new FootTrajectoryGenerationStandard(lSPM,aHS->leftFoot());
   m_FTGS->InitializeInternalDataStructures();
 
-  //Initialize the support state
-  support_state_t CurrentSupport;
-  CurrentSupport.Phase = 0;
-  CurrentSupport.Foot = 1;
-  CurrentSupport.TimeLimit = 1000000000;
-  CurrentSupport.StepsLeft = 1;
-  CurrentSupport.StateChanged = false;
-  CurrentSupport.x = 0.0;
-  CurrentSupport.y = 0.1;
-  CurrentSupport.yaw = 0.0;
-  CurrentSupport.StartTime = 0.0;
-
-  m_Matrices.SupportState(CurrentSupport);
-
   m_SupportFSM = new SupportFSM(0.1);
 
   /* Orientations preview algorithm*/
@@ -124,7 +110,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
   m_PerturbationOccured = false;
 
-
   m_GenVR = new GeneratorVelRef(lSPM );
 
   m_GenVR->setNbPrwSamplings(16);
@@ -133,10 +118,10 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_GenVR->setNbVariables(32);
   m_GenVR->setComHeight(0.814);
 
-  m_GenVR->initialize(m_Matrices);
-  m_GenVR->setPonderation(m_Matrices, 1.0, IntermedQPMat::INSTANT_VELOCITY);
-  m_GenVR->setPonderation(m_Matrices, 0.000001, IntermedQPMat::COP_CENTERING);
-  m_GenVR->setPonderation(m_Matrices, 0.00001, IntermedQPMat::JERK_MIN);
+  m_GenVR->initializeMatrices();
+  m_GenVR->setPonderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
+  m_GenVR->setPonderation( 0.000001, IntermedQPMat::COP_CENTERING );
+  m_GenVR->setPonderation( 0.00001, IntermedQPMat::JERK_MIN );
 
   m_InvariantPartInitialized = false;
 
@@ -338,7 +323,6 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM.y[2] = lStartingCOMState.y[2];
 
   m_CoM(CoM);
-  m_Matrices.CoM(m_CoM());
 
   return 0;
 }
@@ -575,14 +559,15 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       // UPDATE DATA:
       // ------------
-      m_Matrices.Reference(m_VelRef);
+      m_GenVR->setReference(m_VelRef);
       m_GenVR->setCurrentTime(time+m_TimeBuffer);
+      m_GenVR->setCoM(m_CoM());
 
 
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
       // ----------------------------------------------------
       deque<support_state_t> PrwSupportStates_deq;
-      m_GenVR->previewSupportStates(m_Matrices, m_SupportFSM, PrwSupportStates_deq);
+      m_GenVR->previewSupportStates(m_SupportFSM, PrwSupportStates_deq);
 
 
       // DETERMINE CURRENT SUPPORT POSITION:
@@ -600,7 +585,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
           CurrentSupport.y = FAP.y;
           CurrentSupport.yaw = FAP.theta*M_PI/180.0;
           CurrentSupport.StartTime = m_CurrentTime;
-          m_Matrices.SupportState(CurrentSupport);
+          m_GenVR->setSupportState( CurrentSupport );
         }
 
 
@@ -620,27 +605,27 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:
       // --------------------------------------
-      m_GenVR->computeGlobalReference(m_Matrices, m_TrunkStateT);
+      m_GenVR->computeGlobalReference( m_TrunkStateT );
 
 
       // BUILD CONSTANT PART OF THE OBJECTIVE:
       // -------------------------------------
-      m_GenVR->buildInvariantPart(m_Pb, m_Matrices);
+      m_GenVR->buildInvariantPart( m_Pb );
 
 
       // BUILD VARIANT PART OF THE OBJECTIVE:
       // ------------------------------------
-      m_GenVR->updateProblem(m_Pb, m_Matrices, PrwSupportStates_deq);
+      m_GenVR->updateProblem( m_Pb, PrwSupportStates_deq );
 
 
       // BUILD CONSTRAINTS:
       // ------------------
-      m_GenVR->buildConstraints(m_Matrices, m_Pb,
+      m_GenVR->buildConstraints( m_Pb,
           m_fCALS,
           FinalLeftFootTraj_deq,
           FinalRightFootTraj_deq,
           PrwSupportStates_deq,
-          PreviewedSupportAngles_deq);
+          PreviewedSupportAngles_deq );
 
 
       // SOLVE PROBLEM:
@@ -660,7 +645,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 			      FinalZMPTraj_deq,
 			      CurrentIndex,
 			      Result.vecSolution[0],Result.vecSolution[m_QP_N]);
-      m_Matrices.CoM(m_CoM.OneIteration(Result.vecSolution[0],Result.vecSolution[m_QP_N]));
+      m_CoM.OneIteration(Result.vecSolution[0],Result.vecSolution[m_QP_N]);
 
 
       // INTERPOLATE THE COMPUTED FEET POSITIONS:

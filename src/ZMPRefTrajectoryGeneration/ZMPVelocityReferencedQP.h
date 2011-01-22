@@ -143,8 +143,6 @@ namespace PatternGeneratorJRL
 
     double m_UpperTimeLimitToUpdate;
 
-    deque<supportfoot_t> QueueOfSupportFeet;
-
     double m_TimeBuffer;
 
     /*! Uses a ZMPDiscretization scheme to get the usual Kajita heuristic. */
@@ -160,8 +158,6 @@ namespace PatternGeneratorJRL
     OrientationsPreview * m_OP;
 
     GeneratorVelRef * m_GenVR;
-
-    IntermedQPMat m_Matrices;
 
     /*! \brief Object creating Linear inequalities constraints
       based on the foot position. Those constraints are *NOT* the
