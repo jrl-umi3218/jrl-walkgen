@@ -644,22 +644,22 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       m_CoM.Interpolation(FinalCOMTraj_deq,
 			      FinalZMPTraj_deq,
 			      CurrentIndex,
-			      Result.vecSolution[0],Result.vecSolution[m_QP_N]);
-      m_CoM.OneIteration(Result.vecSolution[0],Result.vecSolution[m_QP_N]);
+			      Result.Solution_vec[0],Result.Solution_vec[m_QP_N]);
+      m_CoM.OneIteration(Result.Solution_vec[0],Result.Solution_vec[m_QP_N]);
 
 
       // INTERPOLATE THE COMPUTED FEET POSITIONS:
       // ----------------------------------------
       if(CurrentSupport.StepsLeft>0)
 	{
-	  if(fabs(Result.vecSolution[2*m_QP_N])-0.00001<0.0)
+	  if(fabs(Result.Solution_vec[2*m_QP_N])-0.00001<0.0)
 	    {
 	      cout<<"Previewed foot position zero at time: "<<time<<endl;
 	    }
 	  else if (CurrentSupport.TimeLimit-time-m_QP_T/2.0>0)
 	    {//The landing position is yet determined by the solver because the robot finds himself still in the single support phase
-	      m_FPx = Result.vecSolution[2*m_QP_N];
-	      m_FPy = Result.vecSolution[2*m_QP_N+PrwSupportStates_deq.back().StepNumber];
+	      m_FPx = Result.Solution_vec[2*m_QP_N];
+	      m_FPy = Result.Solution_vec[2*m_QP_N+PrwSupportStates_deq.back().StepNumber];
 	    }
 	}
       else

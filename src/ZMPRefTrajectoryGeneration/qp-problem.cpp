@@ -153,13 +153,13 @@ QPProblem_s::solve( int solver, solution_t & result )
 
       for(int i = 0; i < n; i++)
         {
-          result.vecSolution(i) = X_.array_[i];
-          result.vecLBoundsLagr(i) = U_.array_[m+i];
-          result.vecUBoundsLagr(i) = U_.array_[m+n+i];
+          result.Solution_vec(i) = X_.array_[i];
+          result.LBoundsLagr_vec(i) = U_.array_[m+i];
+          result.UBoundsLagr_vec(i) = U_.array_[m+n+i];
         }
       for(int i = 0; i < m; i++)
         {
-          result.vecConstrLagr(i) = U_.array_[i];
+          result.ConstrLagr_vec(i) = U_.array_[i];
         }
 
       result.Fail = ifail;
@@ -270,10 +270,10 @@ QPProblem_s::solution_t::resize( int size_sol, int size_constr )
   NbVariables = size_sol;
   NbConstraints = size_constr;
 
-  vecSolution.resize(size_sol, false);
-  vecConstrLagr.resize(size_constr, false);
-  vecLBoundsLagr.resize(size_sol, false);
-  vecUBoundsLagr.resize(size_sol, false);
+  Solution_vec.resize(size_sol, false);
+  ConstrLagr_vec.resize(size_constr, false);
+  LBoundsLagr_vec.resize(size_sol, false);
+  UBoundsLagr_vec.resize(size_sol, false);
 }
 
 
@@ -293,7 +293,7 @@ QPProblem_s::solution_t::print(std::ostream & aos)
   aos << "Arrays:" << std::endl
       << "Solution: ";
    for(int i = 0; i < NbVariables; i++)
-     {aos<<vecSolution[i]<<" ";}; aos<<std::endl;
+     {aos<<Solution_vec[i]<<" ";}; aos<<std::endl;
 }
 
 
