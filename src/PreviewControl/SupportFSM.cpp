@@ -93,7 +93,6 @@ void SupportFSM::setSupportState(const double &Time, const int &pi,
 	  Support.StateChanged = true;
 	  Support.TimeLimit = Time+pi*m_T + m_SSPeriod;
 	  Support.StepNumber++;
-	  Support.SSSS = 1;
 	  if (ReferenceGiven == false)
 	    Support.StepsLeft = Support.StepsLeft-1;
 	}

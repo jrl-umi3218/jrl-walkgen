@@ -29,28 +29,32 @@ namespace PatternGeneratorJRL
 
   struct support_state_s & support_state_t::operator =(const support_state_s & aSS)
   {
-    for(unsigned int i=0;i<3;i++)
-      {
-        Phase  = aSS.Phase;
-        Foot  = aSS.Foot;
-        StepsLeft  = aSS.StepsLeft;
-        TimeLimit = aSS.TimeLimit;
-        StepNumber  = aSS.StepNumber;
-      };
+    Phase  = aSS.Phase;
+    Foot  = aSS.Foot;
+    StepsLeft  = aSS.StepsLeft;
+    TimeLimit = aSS.TimeLimit;
+    StepNumber  = aSS.StepNumber;
+    StateChanged = aSS.StateChanged;
+    StartTime = aSS.StartTime;
+    x = aSS.x;
+    y = aSS.y;
+    yaw = aSS.yaw;
+
     return *this;
   }
 
   void support_state_t::reset()
   {
-    for(int i=0;i<3;i++)
-      {
-        Phase  = 0;
-        Foot  = 0;
-        StepsLeft  = 0;
-        TimeLimit = 0.0;
-        StepNumber  = 0;
-        SSSS = StateChanged = false;
-      }
+    Phase  = 0;
+    Foot  = 0;
+    StepsLeft  = 0;
+    TimeLimit = 0.0;
+    StepNumber  = 0;
+    StateChanged = false;
+    StartTime = 0.0;
+    x = 0.0;
+    y = 0.0;
+    yaw = 0.0;
   }
 
   support_state_s::support_state_s()
@@ -132,15 +136,14 @@ namespace PatternGeneratorJRL
   convex_hull_t::rotate( double angle )
   {
 
-      double c_a = cos(angle);
-      double s_a = sin(angle);
+    double c_a = cos(angle);
+    double s_a = sin(angle);
 
-      for( unsigned int j=0;j<X.size();j++ )
-        {
-          X[j] = ( X[j]*c_a - Y[j]*s_a );
-          Y[j] = ( X[j]*s_a + Y[j]*c_a );
-        }
-
+    for( int j=0;j<X.size();j++ )
+      {
+	X[j] = ( X[j]*c_a - Y[j]*s_a );
+	Y[j] = ( X[j]*s_a + Y[j]*c_a );
+      }
   }
 
   convex_hull_s::convex_hull_s( int size )
@@ -170,13 +173,13 @@ namespace PatternGeneratorJRL
 
   void
   convex_hull_t::set(const double * arrayX, const double * arrayY)
-    {
-      for(unsigned int i=0;i<X.size();i++)
-        {
-          X[i] = arrayX[i];
-          Y[i] = arrayY[i];
-        }
-    }
+  {
+    for(int i=0;i<X.size();i++)
+      {
+	X[i] = arrayX[i];
+	Y[i] = arrayY[i];
+      }
+  }
 
   void
   linear_inequality_t::clear()
