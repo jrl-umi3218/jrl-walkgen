@@ -103,6 +103,14 @@ namespace PatternGeneratorJRL
   };
   typedef struct trunk_s trunk_t;
 
+  //State of the feet on the ground
+  struct supportfoot_s
+  {
+    double x,y,theta,StartTime;
+    int SupportFoot;
+  };
+  typedef struct supportfoot_s
+    supportfoot_t;
 
   /// Absolute reference.
   struct reference_s
