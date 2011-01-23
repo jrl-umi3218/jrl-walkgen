@@ -66,6 +66,10 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
+      istringstream strm2(":doublesupporttime 0.1");
+      aPGI.ParseCmd(strm2);
+    }
+    {
       istringstream strm2(":HerdtOnline 0.2 0.0 0.0");
       aPGI.ParseCmd(strm2);
     }
