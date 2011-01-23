@@ -54,6 +54,9 @@ namespace PatternGeneratorJRL
   class  ZMPVelocityReferencedQP : public ZMPRefTrajectoryGeneration
   {
 
+    //
+    // Public methods:
+    //
   public:
 
     /* Default constructor. */
@@ -104,10 +107,8 @@ namespace PatternGeneratorJRL
 			    double *X, double time);
 
 
-    /*! \name Setter and getter for the objective function parameters
-      @{
-    */
-
+    /// \name Accessors
+    /// \{
     /*! Set the velocity reference */
     void setVelReference(istringstream &strm);
 
@@ -118,16 +119,9 @@ namespace PatternGeneratorJRL
     void setCoMPerturbationForce(double x,double y);
 
     void setCoMPerturbationForce(istringstream &strm);
-
-    void interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-			 deque<FootAbsolutePosition> &RightFootAbsolutePositions);
+    /// \}
 
     reference_t m_VelRef;
-
-    static const unsigned int QLD=0;
-    static const unsigned int QLDANDLQ=1;
-    static const unsigned int PLDP=2;
-    static const unsigned int PLDPHerdt = 3;
 
   private:
 
@@ -167,18 +161,8 @@ namespace PatternGeneratorJRL
     /*! \brief Standard polynomial trajectories for the feet. */
     OnLineFootTrajectoryGeneration * OFTG_;
 
-    /*! Constraint on X and Y */
-    double m_ConstraintOnX, m_ConstraintOnY;
-
     /*! Com height */
     double m_ComHeight;
-
-    /*! Current state of the trunk and the trunk state after m_QP_T*/
-    COMState m_TrunkState, m_TrunkStateT;
-
-    deque<COMState> m_QueueOfTrunkStates;
-
-    double m_a, m_TrunkPolCoeffB, m_c, m_d, m_TrunkPolCoeffE;
 
     //Additional term on the acceleration of the CoM
     MAL_VECTOR(m_PerturbationAcceleration,double);
@@ -192,48 +176,11 @@ namespace PatternGeneratorJRL
     //Final optimization problem
     QPProblem m_Pb;
 
-
-    /*! \brief Cholesky decomposition of the initial objective function $Q$ */
-    MAL_MATRIX(m_LQ,double);
-
-    /*! \brief Cholesky decomposition of the initial objective function $Q$ */
-    MAL_MATRIX(m_iLQ,double);
-
-    /*! \brief Optimized cholesky decomposition */
-    OptCholesky * m_OptCholesky;
-
-    /*! \brief Sub matrix to compute the linear part of the objective function $p^{\top}_k$. */
-    MAL_MATRIX(m_OptA,double);
-    MAL_MATRIX(m_OptB,double);
-    MAL_MATRIX(m_OptC,double);
-    MAL_MATRIX(m_OptD,double);
-
-    /* Constant parts of the linear constraints. */
-    MAL_MATRIX(m_iPu,double);
-
-    /* Constant parts of the dynamical system. */
-    MAL_MATRIX(m_Px,double);
-
     /*! \brief Debugging variable: dump everything is set to 1 */
     int m_FullDebug;
 
     /*! \brief Fast formulations mode. */
-    unsigned int m_FastFormulationMode;
-
-    bool m_InvariantPartInitialized;
-
-    void initializeProblem();
-
-
-    void interpolateTrunkState(double time, int CurrentIndex,
-                               const support_state_t & CurrentSupport,
-			       deque<COMState> & FinalCOMTraj_deq);
-
-    void interpolateFeetPositions(double time, int CurrentIndex,
-                                  const support_state_t & CurrentSupport,
-                                  const deque<double> & PreviewedSupportAngles_deq,
-                                  deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-                                  deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
+    unsigned m_FastFormulationMode;
 
     
   public:
