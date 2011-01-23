@@ -84,7 +84,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 					      deque<double> &PreviewedSupportAngles,
 					      const COMState &TrunkState, 
 					      COMState &TrunkStateT,
-					      const SupportFSM * SupportFSM ,support_state_t CurrentSupport,
+					      double StepDuration ,support_state_t CurrentSupport,
 					      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					      deque<FootAbsolutePosition> &RightFootAbsolutePositions)
 {
@@ -219,7 +219,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 
       //Preview
       for(StepNumber = m_FirstPreviewedFoot; 
-	  StepNumber <= (unsigned int)((int)ceil((m_N+1)*m_T/SupportFSM->m_SSPeriod));
+	  StepNumber <= (unsigned int)((int)ceil((m_N+1)*m_T/StepDuration));
 	  StepNumber++)
 	{
 	  m_PreviewedSupportFoot = -m_PreviewedSupportFoot;
