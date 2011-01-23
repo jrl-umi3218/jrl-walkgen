@@ -153,7 +153,7 @@ GeneratorVelRef::generateSelectionMatrices( const std::deque<support_state_t> & 
 
 
 void 
-GeneratorVelRef::computeGlobalReference(const COMState & TrunkStateT)
+GeneratorVelRef::computeGlobalReference(const deque<COMState> & TrunkStates_deq)
 {
 
   reference_t & Ref = Matrices_.Reference();
@@ -165,10 +165,10 @@ GeneratorVelRef::computeGlobalReference(const COMState & TrunkStateT)
 
   for( int i=0;i<m_N;i++)
     {
-      Ref.global.X(i) = Ref.local.x*cos(TrunkStateT.yaw[0]+TrunkStateT.yaw[1]*i*m_T_Prw)-
-	Ref.local.y*sin(TrunkStateT.yaw[0]+TrunkStateT.yaw[1]*i*m_T_Prw);
-      Ref.global.Y(i) = Ref.local.y*cos(TrunkStateT.yaw[0]+TrunkStateT.yaw[1]*i*m_T_Prw)+
-	Ref.local.x*sin(TrunkStateT.yaw[0]+TrunkStateT.yaw[1]*i*m_T_Prw);
+      Ref.global.X(i) = Ref.local.x*cos(TrunkStates_deq[(int)(i+1)*m_T_Prw/m_T_Ctr].yaw[0])-
+	Ref.local.y*sin(TrunkStates_deq[(int)(i+1)*m_T_Prw/m_T_Ctr].yaw[0]);
+      Ref.global.Y(i) = Ref.local.y*cos(TrunkStates_deq[(int)(i+1)*m_T_Prw/m_T_Ctr].yaw[0])+
+	Ref.local.x*sin(TrunkStates_deq[(int)(i+1)*m_T_Prw/m_T_Ctr].yaw[0]);
     }
 
 }
