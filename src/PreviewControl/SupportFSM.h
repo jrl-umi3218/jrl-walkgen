@@ -52,29 +52,29 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors
     /// \{
-    inline double const step_period() const
+    inline double StepPeriod() const
     { return StepPeriod_; };
-    inline void step_period( const double StepPeriod )
+    inline void StepPeriod( const double StepPeriod )
     { StepPeriod_ = StepPeriod; };
 
-    inline double const ds_period() const
+    inline double DSPeriod() const
     { return DSPeriod_; };
-    inline void ds_period( const double DSPeriod )
+    inline void DSPeriod( const double DSPeriod )
     { DSPeriod_ = DSPeriod; };
 
-    inline double const ds_ss_period() const
+    inline double DSSSPeriod() const
     { return DSSSPeriod_; };
-    inline void ds_ss_period( const double DSSSPeriod )
+    inline void DSSSPeriod( const double DSSSPeriod )
     { DSSSPeriod_ = DSSSPeriod; };
 
-    inline unsigned const nb_steps_ss_ds() const
+    inline unsigned NBStepsSSDS() const
     { return NbStepsSSDS_; };
-    inline void nb_steps_ss_ds( const unsigned NbStepsSSDS )
+    inline void NbStepsSSDS( const unsigned NbStepsSSDS )
     { NbStepsSSDS_ = NbStepsSSDS; };
 
-    inline double const sampling_period() const
+    inline double SamplingPeriod() const
     { return T_; };
-    inline void sampling_period( const double T )
+    inline void SamplingPeriod( const double T )
     { T_ = T; };
     /// \}
  
