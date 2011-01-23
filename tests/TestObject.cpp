@@ -179,7 +179,7 @@ namespace PatternGeneratorJRL
 	      "ZMP Y (world ref.)" ,
 	      "Waist X (world ref.)" ,
 	      "Waist Y (world ref.)" };
-	  for(unsigned int i=0;i<26;i++)
+	  for(unsigned i=0;i<26;i++)
 	    aof << i+1 << ". " <<Titles[i] <<std::endl;
 
 	  aof.close();
@@ -261,13 +261,13 @@ namespace PatternGeneratorJRL
 	  while ((!alif.eof()) ||
 		 (!arif.eof()))
 	    {
-	      for (unsigned int i=0;i<70;i++)
+	      for (unsigned i=0;i<70;i++)
 		alif >> LocalInput[i];
 
-	      for (unsigned int i=0;i<70;i++)
+	      for (unsigned i=0;i<70;i++)
 		arif >> ReferenceInput[i];
 
-	      for (unsigned int i=0;i<70;i++)
+	      for (unsigned i=0;i<70;i++)
 		{
 		  if  (fabs(LocalInput[i]-
 			    ReferenceInput[i])>=1e-5)
@@ -294,7 +294,7 @@ namespace PatternGeneratorJRL
       /*! Open and reset appropriatly the debug files. */
       prepareDebugFiles();
 
-      for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
+      for (unsigned lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
         {
 	  os << "<===============================================================>"<<endl;
 	  os << "Test iteration nb: " << lNbIt+1 << endl;
