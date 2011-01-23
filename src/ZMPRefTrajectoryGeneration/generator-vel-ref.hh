@@ -98,7 +98,7 @@ namespace PatternGeneratorJRL
     /// for the whole preview window
     ///
     /// \param[in] TrunkStateT State of the trunk at the end of the acceleration phase
-    void computeGlobalReference( const COMState & TrunkStateT );
+    void computeGlobalReference( const std::deque<COMState> & TrunkStates_deq );
 
     /// \brief Initialize intermediate matrices
     ///
