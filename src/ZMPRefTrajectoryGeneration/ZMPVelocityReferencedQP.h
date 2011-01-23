@@ -39,7 +39,7 @@
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 #include <Mathematics/PLDPSolverHerdt.h>
 #include <PreviewControl/SupportFSM.h>
-#include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
+#include <FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.h>
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 #include <privatepgtypes.h>
@@ -152,7 +152,7 @@ namespace PatternGeneratorJRL
     LinearizedInvertedPendulum2D m_CoM;
 
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
-    SupportFSM * m_SupportFSM;
+    SupportFSM * SupportFSM_;
 
     /*! Deecoupled optimization problem to compute the evolution of feet angles. */
     OrientationsPreview * m_OP;
@@ -165,7 +165,7 @@ namespace PatternGeneratorJRL
     FootConstraintsAsLinearSystemForVelRef * m_fCALS;
 
     /*! \brief Standard polynomial trajectories for the feet. */
-    FootTrajectoryGenerationStandard * m_FTGS;
+    OnLineFootTrajectoryGeneration * OFTG_;
 
     /*! Constraint on X and Y */
     double m_ConstraintOnX, m_ConstraintOnY;
@@ -232,8 +232,8 @@ namespace PatternGeneratorJRL
     void interpolateFeetPositions(double time, int CurrentIndex,
                                   const support_state_t & CurrentSupport,
                                   const deque<double> & PreviewedSupportAngles_deq,
-				  deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-				  deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
+                                  deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+                                  deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
 
     
   public:
