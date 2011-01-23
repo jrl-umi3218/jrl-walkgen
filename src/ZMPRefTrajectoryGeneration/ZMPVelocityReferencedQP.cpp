@@ -57,8 +57,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
   m_TimeBuffer = 0.040;
 
-  m_FastFormulationMode = QLD;
-
   m_QP_T = 0.1;
   m_QP_N = 16;
 
@@ -77,24 +75,30 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   OFTG_ = new OnLineFootTrajectoryGeneration(lSPM,aHS->leftFoot());
   OFTG_->InitializeInternalDataStructures();
   OFTG_->SetSingleSupportTime(0.7);
-  OFTG_->SetDoubleSupportTime(0.1);
-  OFTG_->qp_sampling_period(0.1);
+  OFTG_->SetDoubleSupportTime(m_QP_T);
+  OFTG_->qp_sampling_period(m_QP_T);
 
   SupportFSM_ = new SupportFSM();
-  SupportFSM_->step_period(0.8);
-  SupportFSM_->ds_period(1e9);
-  SupportFSM_->ds_ss_period(0.8);
-  SupportFSM_->nb_steps_ss_ds(200);
-  SupportFSM_->sampling_period(0.1);
+  SupportFSM_->StepPeriod(0.8);
+  SupportFSM_->DSPeriod(1e9);
+  SupportFSM_->DSSSPeriod(0.8);
+  SupportFSM_->NbStepsSSDS(200);
+  SupportFSM_->SamplingPeriod(m_QP_T);
 
   /* Orientations preview algorithm*/
-  m_OP = new OrientationsPreview(0.1, 16, SupportFSM_->step_period(), aHS->rootJoint());
+  m_OP = new OrientationsPreview(aHS->rootJoint());
+  m_OP->SamplingPeriod(m_QP_T);
+  m_OP->NbSamplingsPreviewed(m_QP_N);
+  m_OP->SSLength(SupportFSM_->StepPeriod());
+  COMState CurrentTrunkState;
+  m_OP->CurrentTrunkState(CurrentTrunkState);
+
 
   m_RobotMass = aHS->mass();
-  m_TrunkState.yaw[0]=m_TrunkState.yaw[1]=m_TrunkState.yaw[2]=0.0;
+
 
   /// Initialize  the 2D LIPM
-  m_CoM.SetSimulationControlPeriod(0.1);
+  m_CoM.SetSimulationControlPeriod(m_QP_T);
   m_CoM.SetRobotControlPeriod(0.005);
   m_CoM.SetComHeight(0.814);
   m_CoM.InitializeSystem();
@@ -119,10 +123,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
   m_GenVR = new GeneratorVelRef(lSPM );
 
-  m_GenVR->setNbPrwSamplings(16);
-  m_GenVR->setSamplingPeriodPreview(0.1);
+  m_GenVR->setNbPrwSamplings(m_QP_N);
+  m_GenVR->setSamplingPeriodPreview(m_QP_T);
 
-  m_GenVR->setNbVariables(32);
   m_GenVR->setComHeight(0.814);
 
   m_GenVR->initializeMatrices();
@@ -130,7 +133,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_GenVR->setPonderation( 0.000001, IntermedQPMat::COP_CENTERING );
   m_GenVR->setPonderation( 0.00001, IntermedQPMat::JERK_MIN );
 
-  m_InvariantPartInitialized = false;
 
 }
 
@@ -195,13 +197,6 @@ void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x,double y)
 
 }
 
-void ZMPVelocityReferencedQP::interpolateFeet(deque<FootAbsolutePosition> &,
-					      deque<FootAbsolutePosition> &)
-{
-
-  printf("To be implemented \n");
-}
-
 
 void
 ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &strm)
@@ -214,7 +209,7 @@ ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &st
     {
       unsigned NbStepsSSDS;
       strm >> NbStepsSSDS;
-      SupportFSM_->nb_steps_ss_ds(NbStepsSSDS);
+      SupportFSM_->NbStepsSSDS(NbStepsSSDS);
     }
   if (Method==":comheight")
     {
@@ -319,59 +314,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
 
 void
-ZMPVelocityReferencedQP::interpolateTrunkState(double time, int CurrentIndex,
-                                                    const support_state_t & CurrentSupport,
-						    deque<COMState> & FinalCOMTraj_deq)
-{
-  if(CurrentSupport.Phase == 1 && time+m_TimeBuffer+3.0/2.0*m_QP_T < CurrentSupport.TimeLimit)
-    {
-      //Set parameters for trunk interpolation
-      m_c = 3.0*(m_TrunkStateT.yaw[1]-m_TrunkState.yaw[1])/(m_QP_T*m_QP_T);
-      m_d = -2.0*m_c/(3.0*m_QP_T);
-      m_a =  m_TrunkState.yaw[1];
-
-      double tT;
-      double Theta = m_TrunkState.yaw[0];
-      //double dTheta = m_TrunkState.yaw[1];
-      //double ddTheta = m_TrunkState.yaw[2];
-
-      FinalCOMTraj_deq[CurrentIndex].yaw[0] = m_TrunkState.yaw[0];
-      //Interpolate the
-      for(int k = 1; k<=(int)(m_QP_T/m_SamplingPeriod);k++)
-	{
-	  tT = (double)k*m_SamplingPeriod;
-	  //interpolate the orientation of the trunk
-	  if(fabs(m_TrunkStateT.yaw[1]-m_TrunkState.yaw[1])-0.000001 > 0)
-	    {
-	      m_TrunkState.yaw[0] = (((1.0/4.0*m_d*tT+1.0/3.0*m_c)*
-				      tT)*tT+m_a)*tT+Theta;
-	      m_TrunkState.yaw[1] = ((m_d*tT+m_c)*tT)*tT+m_a;
-	      m_TrunkState.yaw[2] = (3.0*m_d*tT+2.0*m_c)*tT;
-
-	      m_QueueOfTrunkStates.push_back(m_TrunkState);
-	    }
-	  else
-	    {
-	      m_TrunkState.yaw[0] += m_SamplingPeriod*m_TrunkStateT.yaw[1];
-
-	      m_QueueOfTrunkStates.push_back(m_TrunkState);
-	    }
-	  FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = m_TrunkState.yaw[0];
-	}
-    }
-  else if (CurrentSupport.Phase == 0 || time+m_TimeBuffer+3.0/2.0*m_QP_T > CurrentSupport.TimeLimit)
-    {
-      for(int k = 0; k<=(int)(m_QP_T/m_SamplingPeriod);k++)
-	{
-	  FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = m_TrunkState.yaw[0];
-	}
-    }
-  
-}
-
-
-
-void ZMPVelocityReferencedQP::OnLine(double time,
+ZMPVelocityReferencedQP::OnLine(double time,
 				     deque<ZMPPosition> & FinalZMPTraj_deq,
 				     deque<COMState> & FinalCOMTraj_deq,
 				     deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
@@ -442,20 +385,16 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       // DEFINE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // -----------------------------------------------------
       deque<double> PreviewedSupportAngles_deq;
-      m_OP->verifyAccelerationOfHipJoint(m_VelRef, m_TrunkState,
-					 m_TrunkStateT, CurrentSupport);
-      m_OP->previewOrientations(time+m_TimeBuffer,
-				PreviewedSupportAngles_deq,
-				m_TrunkState,
-				m_TrunkStateT,
-				SupportFSM_->step_period(), CurrentSupport,
-				FinalLeftFootTraj_deq,
-				FinalRightFootTraj_deq);
+      m_OP->preview_orientations(time+m_TimeBuffer,
+                                m_VelRef,
+				SupportFSM_->StepPeriod(), CurrentSupport,
+				FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
+	                        PreviewedSupportAngles_deq);
 
 
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:
       // --------------------------------------
-      m_GenVR->computeGlobalReference( m_TrunkStateT );
+      m_GenVR->computeGlobalReference( FinalCOMTraj_deq );
 
 
       // BUILD CONSTANT PART OF THE OBJECTIVE:
@@ -529,7 +468,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  m_EndingPhase = true;
 	}
 
-      interpolateTrunkState(time, CurrentIndex,
+      m_OP->interpolate_trunk_orientation(time+m_TimeBuffer, CurrentIndex,
+                            m_SamplingPeriod,
                             CurrentSupport,
 			    FinalCOMTraj_deq);
       OFTG_->interpolateFeetPositions(time+m_TimeBuffer, CurrentIndex,
