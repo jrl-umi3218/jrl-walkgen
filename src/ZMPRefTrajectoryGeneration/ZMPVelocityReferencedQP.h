@@ -138,7 +138,7 @@ namespace PatternGeneratorJRL
 
 	IntermedQPMat m_Matrices;
 
-  private:
+  //private:
 
     double m_RobotMass;
     bool m_PerturbationOccured;
