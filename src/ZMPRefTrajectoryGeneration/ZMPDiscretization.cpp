@@ -404,21 +404,21 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 
 
   double finalZMPREF[2] = {m_ZMPNeutralPosition[0],m_ZMPNeutralPosition[1]};
-  ODEBUG("ZMPNeutralPosition: " << m_ZMPNeutralPosition[0] << " " 
-	  << m_ZMPNeutralPosition[1] << endl <<
-	  "StartingZMPPosition(toto):" <<  lStartingZMPPosition(0) << " " << lStartingZMPPosition(1) << " " <<
-	  lStartingZMPPosition(2) << endl
-	  << "lStartingCOMState: " << lStartingCOMState.x[0] << " " 
-	  << lStartingCOMState.y[0] << " "
-	  << lStartingCOMState.z[0] << endl
-	  << "CurrentAbsTheta : " << CurrentAbsTheta << endl
-	  << "AddArraySize:"<< AddArraySize << " " << m_PreviewControlTime << " " <<m_SamplingPeriod  << endl
-	  << "FinalZMPref :( " <<finalZMPREF[0]  
-	  << " , " <<finalZMPREF[1] << " ) " << ZMPPositions.size() <<endl
-	 << "InitRightFootAbsPos.z " << InitRightFootAbsolutePosition.z);
-  ODEBUG( "lStartingCOMState: " << lStartingCOMState.x[0] << " " 
-	  << lStartingCOMState.y[0] << " "
-	   << lStartingCOMState.z[0] );
+  //ODEBUG("ZMPNeutralPosition: " << m_ZMPNeutralPosition[0] << " " 
+	 // << m_ZMPNeutralPosition[1] << endl <<
+	 // "StartingZMPPosition(toto):" <<  lStartingZMPPosition(0) << " " << lStartingZMPPosition(1) << " " <<
+	 // lStartingZMPPosition(2) << endl
+	 // << "lStartingCOMState: " << lStartingCOMState.x[0] << " " 
+	 // << lStartingCOMState.y[0] << " "
+	 // << lStartingCOMState.z[0] << endl
+	 // << "CurrentAbsTheta : " << CurrentAbsTheta << endl
+	 // << "AddArraySize:"<< AddArraySize << " " << m_PreviewControlTime << " " <<m_SamplingPeriod  << endl
+	 // << "FinalZMPref :( " <<finalZMPREF[0]  
+	 // << " , " <<finalZMPREF[1] << " ) " << ZMPPositions.size() <<endl
+	 //<< "InitRightFootAbsPos.z " << InitRightFootAbsolutePosition.z);
+  //ODEBUG( "lStartingCOMState: " << lStartingCOMState.x[0] << " " 
+	 // << lStartingCOMState.y[0] << " "
+	 //  << lStartingCOMState.z[0] );   //lStartingCOMState NOT defined
 	
   ODEBUG4("ZMP::InitOnLine - Step 4 ","ZMDInitOnLine.txt");
   for(unsigned int i=0;i<ZMPPositions.size();i++)

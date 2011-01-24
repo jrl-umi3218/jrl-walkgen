@@ -95,7 +95,7 @@ void MPCTrajectoryGeneration::CallMethod(std::string & Method, std::istringstrea
   else if (Method==":comheight")
     {
       strm >> m_CoMHeight;
-      ODEBUG(":comheight" << m_ComHeight << " ID: " << this);
+      ODEBUG(":comheight" << m_CoMHeight << " ID: " << this);
     }
   else if (Method==":samplingperiod")
     {

@@ -246,15 +246,15 @@ com_t LinearizedInvertedPendulum2D::OneIteration(double ux, double uy)
   //MAL_C_eq_A_by_B(m_zk,m_C,m_xk);
 
 
-  ODEBUG4( m_xk[0] << " " << m_xk[1] << " " << m_xk[2] << " " <<
-	   m_xk[3] << " " << m_xk[4] << " " << m_xk[5] << " " <<
-	   CX  << " " << CY  << " " <<
-	   m_zk[0] << " " << m_zk[1] << " " <<
-	   Buk[0] << " " << Buk[1] << " " << Buk[2] << " " <<
-	   Buk[3] << " " << Buk[4] << " " << Buk[5] << " " <<
-	   m_B(0,0) << " " << m_B(1,0) << " " << m_B(2,0) << " " <<
-	   m_B(3,0) << " " << m_B(4,0) << " " << m_B(5,0) << " " ,
-	   "Debug2DLIPM.dat");
+  //ODEBUG4( m_xk[0] << " " << m_xk[1] << " " << m_xk[2] << " " <<
+	 //  m_xk[3] << " " << m_xk[4] << " " << m_xk[5] << " " <<
+	 //  CX  << " " << CY  << " " <<
+	 //  m_zk[0] << " " << m_zk[1] << " " <<
+	 //  Buk[0] << " " << Buk[1] << " " << Buk[2] << " " <<
+	 //  Buk[3] << " " << Buk[4] << " " << Buk[5] << " " <<
+	 //  m_B(0,0) << " " << m_B(1,0) << " " << m_B(2,0) << " " <<
+	 //  m_B(3,0) << " " << m_B(4,0) << " " << m_B(5,0) << " " ,
+	 //  "Debug2DLIPM.dat"); // CX, CY, Bun Not defined
 
   
   return m_CoM;

@@ -825,7 +825,7 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX_TYPE(double) & Body_R,
   ODEBUG4("Body_R " << Body_R,"DebugDataIK.dat");
   ODEBUG4("Foot_P " << Foot_P,"DebugDataIK.dat");
   ODEBUG4("Foot_R " << Foot_R,"DebugDataIK.dat");
-  ODEBUG4("lDt " << lDt,"DebugDataIK.dat");
+  //ODEBUG4("lDt " << lDt,"DebugDataIK.dat");//lDt not defined
 
   // Homogeneous matrix
   matrix4d BodyPose,FootPose;
