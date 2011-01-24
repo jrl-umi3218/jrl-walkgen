@@ -55,26 +55,6 @@ namespace PatternGeneratorJRL
     /*! Default destructor. */
     virtual ~OnLineFootTrajectoryGeneration();
 
-    /// Compute the position of the swinging and the stance foot.
-    /// Use polynomial of 3rd order for the X-axis, Y-axis,
-    /// orientation in the X-Z axis, and orientation in the X-Y axis.
-    /// Use a 4th order polynome for the Z-axis.
-    ///
-    /// \param SupportFootTraj_deq: Queue of positions for the support foot.
-    /// Set the foot position at index CurrentAbsoluteIndex of the queue.
-    /// \param StanceFootTraj_deq: Queue of absolute position for the swinging
-    /// foot. Set the foot position at index NoneSupportFootAbsolutePositions of the queue.
-    /// \param StartIndex: Index in the queues of the foot position to be set.
-    /// \param k: Current sampling
-    /// \param UnlockedSwingPeriod: Amount of time where the swinging foot can move horizontally.
-    /// \param StepType: Type of steps (for book-keeping).
-    /// \param LeftOrRight: Specify if it is left (1) or right (-1).
-   virtual void UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootTraj_deq,
-				   deque<FootAbsolutePosition> &StanceFootTraj_deq,
-				   int StartIndex, int k,
-				   double LocalInterpolationStartTime,
-				   double UnlockedSwingPeriod,
-				   int StepType, int LeftOrRight);
 
    /// Interpolate piece of feet trajectories
    ///
@@ -87,7 +67,7 @@ namespace PatternGeneratorJRL
    /// Set the foot position at index CurrentAbsoluteIndex of the queue.
    /// \param[out] StanceFootTraj_deq Queue of absolute position for the swinging
    /// foot. Set the foot position at index NoneSupportFootAbsolutePositions of the queue.
-   virtual void interpolateFeetPositions(double time, int CurrentIndex,
+   virtual void interpolate_feet_positions(double time, int CurrentIndex,
                                  const support_state_t & CurrentSupport,
                                  double FPx, double FPy,
                                  const deque<double> & PreviewedSupportAngles_deq,
@@ -96,19 +76,62 @@ namespace PatternGeneratorJRL
 
    /// \name Accessors
    /// \{
-   inline double qp_sampling_period() const
+   inline double QPSamplingPeriod() const
    { return QP_T_; };
-   inline void qp_sampling_period( const double QP_T )
+   inline void QPSamplingPeriod( double QP_T )
    { QP_T_ = QP_T; };
+   inline double FeetDistance() const
+   { return FeetDistanceDS_; };
+   inline void FeetDistance( double FeetDistance )
+   { FeetDistanceDS_ = FeetDistance; };
    /// \}
 
    //
-   // Private members
+   // Protected methods:
    //
-  private:
+  protected:
+
+   /// \brief Check if the solution should be used as is and
+   /// propose alternative if not.
+   ///
+   /// \param[out] X Solution
+   /// \param[out] Y Solution
+   /// \param[in] CurrentSupport Support state
+   virtual void check_solution(double X, double Y,
+       const support_state_t & CurrentSupport, double CurrentTime);
+
+
+   /// \brief Compute the position of the swinging and the stance foot.
+   /// Use polynomial of 3rd order for the X-axis, Y-axis,
+   /// orientation in the X-Z axis, and orientation in the X-Y axis.
+   /// Use a 4th order polynome for the Z-axis.
+   ///
+   /// \param SupportFootTraj_deq: Queue of positions for the support foot.
+   /// Set the foot position at index CurrentAbsoluteIndex of the queue.
+   /// \param StanceFootTraj_deq: Queue of absolute position for the swinging
+   /// foot. Set the foot position at index NoneSupportFootAbsolutePositions of the queue.
+   /// \param StartIndex: Index in the queues of the foot position to be set.
+   /// \param k: Current sampling
+   /// \param UnlockedSwingPeriod: Amount of time where the swinging foot can move horizontally.
+   /// \param StepType: Type of steps (for book-keeping).
+   /// \param LeftOrRight: Specify if it is left (1) or right (-1).
+  virtual void UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootTraj_deq,
+                                  deque<FootAbsolutePosition> &StanceFootTraj_deq,
+                                  int StartIndex, int k,
+                                  double LocalInterpolationStartTime,
+                                  double UnlockedSwingPeriod,
+                                  int StepType, int LeftOrRight);
+
+   //
+   // Protected members
+   //
+  protected:
 
    /// \brief Sampling period of the QP
    double QP_T_;
+
+   /// \brief Distance between feet centers in ds phase
+   double FeetDistanceDS_;
   };
   
 }
