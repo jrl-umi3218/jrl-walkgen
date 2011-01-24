@@ -29,8 +29,8 @@
    It handles a stack of constraint on a sliding mode 
    for QP solving. */
 
-#ifndef _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_
-#define _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_
+#ifndef _RELATIVE_FEET_INEQUALITIES_
+#define _RELATIVE_FEET_INEQUALITIES_
 
 #include <vector>
 #include <deque>
@@ -178,4 +178,4 @@ namespace PatternGeneratorJRL
 
   };
 }
-#endif                          /* _FOOT_CONSTRAINTS_AS_LINEAR_SYSTEM_FOR_VEL_REF_H_ */
+#endif                          /* _RELATIVE_FEET_INEQUALITIES_ */

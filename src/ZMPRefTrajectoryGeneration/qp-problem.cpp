@@ -58,18 +58,18 @@ QPProblem_s::QPProblem_s():
 QPProblem_s::~QPProblem_s()
 {
 
-  releaseMemory();
+  release_memory();
 }
 
 
 void
-QPProblem_s::releaseMemory()
+QPProblem_s::release_memory()
 {
 }
 
 
 void
-QPProblem_s::resizeAll()
+QPProblem_s::resize_all()
 {
   Q_.resize(2*nbvariables_, 2*nbvariables_,true);
   D_.resize(2*nbvariables_, 1,true);
@@ -176,7 +176,7 @@ QPProblem_s::solve( int solver, solution_t & result )
 
 
 void
-QPProblem_s::addTerm( const MAL_MATRIX (&Mat, double), int type,
+QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), int type,
 		       int row,  int col )
 {
 
@@ -198,7 +198,7 @@ QPProblem_s::addTerm( const MAL_MATRIX (&Mat, double), int type,
 
   if(nbvariables_ > pArray_s->ncols_ )
     {
-      resizeAll();
+      resize_all();
     }
 
   if( nbconstraints_ > DU_.nrows_-1 )
@@ -219,7 +219,7 @@ QPProblem_s::addTerm( const MAL_MATRIX (&Mat, double), int type,
 }
 
 
-void QPProblem_s::addTerm( const MAL_VECTOR (&Vec, double), int type,
+void QPProblem_s::add_term( const MAL_VECTOR (&Vec, double), int type,
 			    int row )
 {
 
@@ -251,7 +251,7 @@ void QPProblem_s::addTerm( const MAL_VECTOR (&Vec, double), int type,
 
   if(nbvariables_ > D_.nrows_ )
     {
-      resizeAll();
+      resize_all();
     }
 
   boost_ublas::vector<double>::const_iterator VecIt = Vec.begin();
@@ -298,7 +298,7 @@ QPProblem_s::solution_t::print(std::ostream & aos)
 
 
 void
-QPProblem_s::dumpSolverParameters(std::ostream & aos)
+QPProblem_s::dump_solver_parameters(std::ostream & aos)
 {
   aos << "m: " << m << std::endl
       << "me: " << me << std::endl
@@ -388,7 +388,7 @@ QPProblem_s::dump( int type, const char * filename)
 
 
 void
-QPProblem_s::dumpProblem(std::ostream &aos)
+QPProblem_s::dump_problem(std::ostream &aos)
 {
   dump(MATRIX_Q,aos);
   dump(VECTOR_D,aos);
@@ -399,7 +399,7 @@ QPProblem_s::dumpProblem(std::ostream &aos)
   dump(VECTOR_XL,aos);
   dump(VECTOR_XU,aos);
 
-  dumpSolverParameters(aos);
+  dump_solver_parameters(aos);
 }
 
 
@@ -408,6 +408,6 @@ QPProblem_s::dumpProblem(const char * filename)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
-  dumpProblem(aof);
+  dump_problem(aof);
   aof.close();
 }

@@ -165,7 +165,7 @@ namespace PatternGeneratorJRL
     /// \param type Target matrix type
     /// \param row First row inside the target
     /// \param col First column inside the target
-    void addTerm(const MAL_MATRIX (&Mat, double), int type,
+    void add_term(const MAL_MATRIX (&Mat, double), int type,
 		 int row, int col);
 
     /// \brief Add a vector to the final optimization problem in array form
@@ -173,7 +173,7 @@ namespace PatternGeneratorJRL
     /// \param Mat Added vector
     /// \param ype Target vector type
     /// \param row First row inside the target
-    void addTerm(const MAL_VECTOR (&Vec, double), int type,
+    void add_term(const MAL_VECTOR (&Vec, double), int type,
 		 int row);
 
     /// \brief Dump on disk a problem.
@@ -207,21 +207,21 @@ namespace PatternGeneratorJRL
   private:
 
     /// \brief Release memory.
-    void releaseMemory();
+    void release_memory();
 
     /// \brief Allocate memory.
     /// Called when setting the dimensions of the problem.
     ///
-    void resizeAll();
+    void resize_all();
 
     /// \name Dumping functions
     /// \{
     /// \brief Print on disk the parameters that are passed to the solver
-    void dumpSolverParameters(std::ostream & aos);
+    void dump_solver_parameters(std::ostream & aos);
     /// \brief Print array
     void dump( int type, std::ostream & aos);
     /// \brief Print problem
-    void dumpProblem(std::ostream &);
+    void dump_problem(std::ostream &);
     /// \}
 
     //
