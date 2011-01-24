@@ -360,7 +360,7 @@ namespace PatternGeneratorJRL
     /*! \brief Object creating Linear inequalities constraints 
       based on the foot position. Those constraints are *NOT* the
       one put in the QP, but they are a necessary intermediate step. */
-    FootConstraintsAsLinearSystemForVelRef * m_fCALS;
+    RelativeFeetInequalities * m_fCALS;
       
     FootTrajectoryGenerationStandard * m_FTGS;
 

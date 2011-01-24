@@ -283,7 +283,7 @@ GeneratorVelRef::initializeMatrices( IntermedQPMat::dynamics_t & Dynamics)
 
 void 
 GeneratorVelRef::buildInequalitiesCoP(linear_inequality_t & Inequalities,
-				      FootConstraintsAsLinearSystemForVelRef * FCALS,
+				      RelativeFeetInequalities * FCALS,
 				      const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
 				      const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
 				      const std::deque<support_state_t> & SupportStates_deq,
@@ -300,7 +300,7 @@ GeneratorVelRef::buildInequalitiesCoP(linear_inequality_t & Inequalities,
   FCALS->setVertices( ZMPFeasibilityEdges,
 		      CurrentSupportAngle,
 		      CurrentSupport,
-		      FootConstraintsAsLinearSystemForVelRef::ZMP_CONSTRAINTS);
+		      RelativeFeetInequalities::ZMP_CONSTRAINTS);
 
   //set constraints for the whole preview window
   double SupportAngle = CurrentSupportAngle;
@@ -319,7 +319,7 @@ GeneratorVelRef::buildInequalitiesCoP(linear_inequality_t & Inequalities,
         FCALS->setVertices( ZMPFeasibilityEdges,
 			    SupportAngle,
 			    PrwSupport,
-			    FootConstraintsAsLinearSystemForVelRef::ZMP_CONSTRAINTS);
+			    RelativeFeetInequalities::ZMP_CONSTRAINTS);
 
       FCALS->computeLinearSystem( ZMPFeasibilityEdges, D_x, D_y, dc, PrwSupport );
 
@@ -337,7 +337,7 @@ GeneratorVelRef::buildInequalitiesCoP(linear_inequality_t & Inequalities,
 
 void
 GeneratorVelRef::buildInequalitiesFeet(linear_inequality_t & Inequalities,
-				       FootConstraintsAsLinearSystemForVelRef * FCALS,
+				       RelativeFeetInequalities * FCALS,
 				       const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
 				       const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
 				       const std::deque<support_state_t> & SupportStates_deq,
@@ -385,7 +385,7 @@ GeneratorVelRef::buildInequalitiesFeet(linear_inequality_t & Inequalities,
 
 	  FCALS->setVertices( FootFeasibilityEdges,
 			      SupportAngle, PrwSupport,
-			      FootConstraintsAsLinearSystemForVelRef::FOOT_CONSTRAINTS);
+			      RelativeFeetInequalities::FOOT_CONSTRAINTS);
 
 	  FCALS->computeLinearSystem( FootFeasibilityEdges, D_x, D_y, dc, PrwSupport );
 
@@ -479,7 +479,7 @@ GeneratorVelRef::buildConstraintsFeet(const linear_inequality_t & IneqFeet,
 
 void
 GeneratorVelRef::buildConstraints( QPProblem & Pb,
-				  FootConstraintsAsLinearSystemForVelRef * FCALS,
+				  RelativeFeetInequalities * FCALS,
 				  const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
 				  const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
 				  const std::deque<support_state_t> & SupportStates_deq,
