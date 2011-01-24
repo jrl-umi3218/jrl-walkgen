@@ -33,7 +33,7 @@ SET(SOURCES
   Mathematics/AnalyticalZMPCOGTrajectory.cpp
   Mathematics/ConvexHull.cpp
   Mathematics/FootConstraintsAsLinearSystem.cpp
-  Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
+  Mathematics/relative-feet-inequalities.cpp
   Mathematics/FootHalfSize.cpp
   Mathematics/OptCholesky.cpp
   Mathematics/Polynome.cpp

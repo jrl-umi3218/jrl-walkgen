@@ -47,7 +47,7 @@ namespace PatternGeneratorJRL
     ~SupportFSM();
 
     /// \brief Initialize the previewed state.
-    void setSupportState(const double &Time, const int &pi,
+    void set_support_state(const double &Time, const int &pi,
                 support_state_t & Support, const reference_t & Ref) const;
 
     /// \name Accessors
