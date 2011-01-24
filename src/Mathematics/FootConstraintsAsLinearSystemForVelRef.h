@@ -53,7 +53,7 @@ namespace PatternGeneratorJRL
 {
 
   /// \brief Generate a stack of inequalities relative to feet centers for the whole preview window.
-  class FootConstraintsAsLinearSystemForVelRef:public SimplePlugin
+  class RelativeFeetInequalities:public SimplePlugin
   {
 
     //
@@ -70,9 +70,9 @@ namespace PatternGeneratorJRL
 
     /// \name Constructors and destructors.
     /// \{
-    FootConstraintsAsLinearSystemForVelRef (SimplePluginManager * aSPM,
+    RelativeFeetInequalities (SimplePluginManager * aSPM,
                                             CjrlHumanoidDynamicRobot * aHS);
-    ~FootConstraintsAsLinearSystemForVelRef ();
+    ~RelativeFeetInequalities ();
     /// \}
 
 
