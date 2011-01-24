@@ -82,7 +82,6 @@ protected:
   void startTurningLeft(PatternGeneratorInterface &aPGI)
   {
     {
-      cout<<"startTurningLeft"<<endl;
       istringstream strm2(":setVelReference  0.2 0.0 0.1");
       aPGI.ParseCmd(strm2);
     }
