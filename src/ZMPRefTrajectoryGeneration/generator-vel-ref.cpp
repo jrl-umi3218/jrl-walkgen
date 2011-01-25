@@ -75,10 +75,10 @@ GeneratorVelRef::Ponderation( double weight, int type)
 }
 
 double  
-GeneratorVelRef::getPonderation(const IntermedQPMat & Matrices, int type) const
+GeneratorVelRef::getPonderation( int type) const
 {
 
- const IntermedQPMat::objective_variant_t & Objective = Matrices.Objective( type );
+ const IntermedQPMat::objective_variant_t & Objective = Matrices_.Objective( type );
   return Objective.weight;
 
 }

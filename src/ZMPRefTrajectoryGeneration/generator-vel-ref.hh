@@ -69,14 +69,6 @@ namespace PatternGeneratorJRL
 
     /// \brief Set the global reference from the local one and the orientation of the trunk frame
     /// for the whole preview window
-        /// \brief get the weights on the objective terms
-    ///
-    /// \param[in] Matrices
-    /// \param[in] objective
-    double getPonderation(const IntermedQPMat & Matrices, int objective ) const;
-
-
-    /// \brief Set the velocity reference from string
     ///
     /// \param[in] TrunkStateT State of the trunk at the end of the acceleration phase
     void compute_global_reference( const std::deque<COMState> & TrunkStates_deq );
@@ -116,6 +108,13 @@ namespace PatternGeneratorJRL
     /// \param[in] weight
     /// \param[in] objective
     void Ponderation(double weight, int objective );
+
+	 /// \brief get the weights on the objective terms
+    ///
+    /// \param[in] Matrices
+    /// \param[in] objective
+    double getPonderation(int objective ) const;
+
 
     /// \nam Inline accessors
     /// \{
