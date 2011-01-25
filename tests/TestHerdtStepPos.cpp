@@ -67,6 +67,10 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
+	      istringstream strm2(":doublesupporttime 0.1");
+      aPGI.ParseCmd(strm2);
+    }
+    {
       istringstream strm2(":HerdtOnlineStepPos 0.2 0.0 0.0");
       aPGI.ParseCmd(strm2);
     }
@@ -75,7 +79,21 @@ protected:
       aPGI.ParseCmd(strm2);
     }
   }
-
+  
+ void startTurningLeft(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.2 0.0 0.1");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void startTurningRight(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.2 0.0 -0.1");
+      aPGI.ParseCmd(strm2);
+    }
+  }
   void stopOnLineWalking(PatternGeneratorInterface &aPGI)
   {
     {
@@ -103,11 +121,22 @@ protected:
 
   void generateEvent()
   {
-    unsigned int StoppingTime = 11*200;
+        unsigned TurningLeftTime = 5*200;
+    unsigned TurningRightTime = 10*200;
+    unsigned StoppingTime = 15*200;
+
+    if (m_OneStep.NbOfIt>TurningLeftTime)
+      {
+      startTurningLeft(*m_PGI);
+      }
+    if (m_OneStep.NbOfIt>TurningRightTime)
+      {
+      startTurningRight(*m_PGI);
+      }
 
     if (m_OneStep.NbOfIt>StoppingTime) 
       {
-	stopOnLineWalking(*m_PGI);
+		stopOnLineWalking(*m_PGI);
       }
   }
 };
@@ -115,11 +144,11 @@ protected:
 int PerformTests(int argc, char *argv[])
 {
 
-  const unsigned int NbTests = 1;
+  const unsigned NbTests = 1;
   std::string TestNames[NbTests] = { "TestHerdtStepPosOnLine" };
   int TestProfiles[NbTests] = { PROFIL_HERDT_STEP_POS_ONLINE_WALKING };
 
-  for (unsigned int i=0;i<NbTests;i++)
+  for (unsigned i=0;i<NbTests;i++)
     {
       TestHerdtStepPos aTH2010(argc,argv,
 			    TestNames[i],

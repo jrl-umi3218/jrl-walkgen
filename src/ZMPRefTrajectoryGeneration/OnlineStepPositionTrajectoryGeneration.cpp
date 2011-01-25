@@ -50,9 +50,8 @@ removeQueueHead(false)
 	stepPos_.push_back(p);
 
 
-	SetVelocityMode(false);
-
-
+	//SetVelocityMode(false);
+	
 	// Register method to handle 
 	string aMethodName[2] = 
 	{":setstepspositions",
@@ -95,8 +94,8 @@ void OnlineStepPositionTrajectoryGeneration::SetVelocityMode(bool b)
 		velocityMode_=b;
 		if (b=false)
 			m_BetaCache_=0;
-		double tmp=m_GenVR->getPonderation(m_Matrices, IntermedQPMat::INSTANT_VELOCITY);
-		m_GenVR->setPonderation(m_Matrices, m_BetaCache_, IntermedQPMat::INSTANT_VELOCITY);
+		double tmp=VRQPGenerator_->getPonderation( IntermedQPMat::INSTANT_VELOCITY);
+		VRQPGenerator_->Ponderation(m_BetaCache_, IntermedQPMat::INSTANT_VELOCITY);
 		m_BetaCache_=tmp;
 	}
 }
@@ -139,17 +138,17 @@ void OnlineStepPositionTrajectoryGeneration::CallMethod(std::string & Method, st
 
 
 void OnlineStepPositionTrajectoryGeneration::OnLine(double time, 
-													deque<ZMPPosition> & FinalZMPPositions, 
-													deque<COMState> & FinalCOMStates, 
-													deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions, 
-													deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions) 
+													deque<ZMPPosition> & FinalZMPTraj_deq, 
+													deque<COMState> & FinalCOMTraj_deq, 
+													deque<FootAbsolutePosition> &FinalLeftFootTraj_deq, 
+													deque<FootAbsolutePosition> &FinalRightFootTraj_deq) 
 {
 
 	if (velocityMode_)
 	{
 		
 		//Calling the Parent overload of Online
-		ZMPVelocityReferencedQP::OnLine(time,FinalZMPPositions,FinalCOMStates,FinalLeftFootAbsolutePositions, FinalRightFootAbsolutePositions);
+		ZMPVelocityReferencedQP::OnLine(time,FinalZMPTraj_deq,FinalCOMTraj_deq,FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
 		
 		
 
@@ -158,205 +157,162 @@ void OnlineStepPositionTrajectoryGeneration::OnLine(double time,
 	//else = StepPos Mode
 	else
 	{
-		
-  // If on-line mode not activated we go out.
-  if (!m_OnLineMode)
-    { return; }
+		// If on-line mode not activated we go out.
+		if (!m_OnLineMode)
+		{ return; }
 
-  // Testing if we are reaching the end of the online mode.
-  if ((m_EndingPhase) &&
-      (time>=m_TimeToStopOnLineMode))
-    { m_OnLineMode = false; }
-
-
-  // Apply external forces if occured
-  if(m_PerturbationOccured == true)
-    {
-      com_t com = m_CoM();
-      com.x(2) = com.x(2)+m_PerturbationAcceleration(2);
-      com.y(2) = com.y(2)+m_PerturbationAcceleration(5);
-      m_PerturbationOccured = false;
-      m_CoM(com);
-    }
+		// Testing if we are reaching the end of the online mode.
+		if ((m_EndingPhase) &&
+			(time>=m_TimeToStopOnLineMode))
+		{ m_OnLineMode = false; }
 
 
-  if(time + 0.00001 > m_UpperTimeLimitToUpdate)
-    {
+		// Apply external forces if occured
+		if(PerturbationOccured_ == true)
+		{
+			com_t com = CoM_();
+			com.x(2) = com.x(2)+PerturbationAcceleration_(2);
+			com.y(2) = com.y(2)+PerturbationAcceleration_(5);
+			PerturbationOccured_ = false;
+			CoM_(com);
+		}
 
-      double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
-      struct timeval start,end;
-      gettimeofday(&start,0);
-
-
-      // UPDATE DATA:
-      // ------------
-      m_Matrices.Reference(m_VelRef);
-      m_GenVR->setCurrentTime(time+m_TimeBuffer);
-
-
-      // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
-      // ----------------------------------------------------
-      deque<support_state_t> deqPrwSupportStates;
-      m_GenVR->previewSupportStates(m_Matrices, m_SupportFSM, deqPrwSupportStates);
-      const support_state_t CurrentSupport = deqPrwSupportStates.front();
-
-	  
-
-	  { //DEBUG
-		  std::ofstream DebugFile,DebugFile2; 
-		  DebugFile.open("QueueOfSupportFeet.dat",ofstream::app); 
-		  DebugFile << time<<' '<<QueueOfSupportFeet[QueueOfSupportFeet.size()-1].SupportFoot<<std::endl; 
-		  DebugFile.close();
-		  DebugFile2.open("deqPrwSupportStates.dat",ofstream::app); 
-		  DebugFile2 << time<<"  "<<deqPrwSupportStates.size()<<' ';
-		  for (int i=0;i<deqPrwSupportStates.size();++i)
-			  DebugFile2<<'_'<<deqPrwSupportStates[i].StepNumber;
-		  DebugFile2 <<std::endl;
-		  DebugFile2.close();
-	  }
+		// UPDATE WALKING TRAJECTORIES:
+		// --------------------
+		if(time + 0.00001 > m_UpperTimeLimitToUpdate)
+		{
+			double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
+			struct timeval start,end;
+			gettimeofday(&start,0);
 
 
-      //Add a new support foot to the support feet history deque
-      if(CurrentSupport.StateChanged == true)
-        {
-          FootAbsolutePosition FAP;
-          supportfoot_t newSF;
-          if(CurrentSupport.Foot==1)
-            FAP = FinalLeftFootAbsolutePositions.back();
-          else
-            FAP = FinalRightFootAbsolutePositions.back();
-          newSF.x = FAP.x;
-          newSF.y = FAP.y;
-          newSF.theta = FAP.theta*M_PI/180.0;
-          newSF.StartTime = m_CurrentTime;
-          newSF.SupportFoot = CurrentSupport.Foot;
-          QueueOfSupportFeet.push_back(newSF);
-          m_Matrices.SupportFoot(newSF);
-        }
+			// UPDATE INTERNAL DATA:
+			// ---------------------
+			VRQPGenerator_->Reference(VelRef_);
+			VRQPGenerator_->setCurrentTime(time+TimeBuffer_);
+			VRQPGenerator_->CoM(CoM_());
 
 
-      // DEFINE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
-      // -----------------------------------------------------
-      deque<double> PreviewedSupportAngles;
-      m_OP->verifyAccelerationOfHipJoint(m_VelRef, m_TrunkState,
-					 m_TrunkStateT, CurrentSupport);
-      m_OP->previewOrientations(time+m_TimeBuffer,
-				PreviewedSupportAngles,
-				m_TrunkState,
-				m_TrunkStateT,
-				m_SupportFSM, CurrentSupport,
-				FinalLeftFootAbsolutePositions,
-				FinalRightFootAbsolutePositions);
+			// PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
+			// ----------------------------------------------------
+			deque<support_state_t> PrwSupportStates_deq;
+			VRQPGenerator_->preview_support_states(SupportFSM_, PrwSupportStates_deq);
 
 
-      // COMPUTE REFERENCE IN THE GLOBAL FRAME:
-      // --------------------------------------
-      m_GenVR->computeGlobalReference(m_Matrices, m_TrunkStateT);
+			// DETERMINE CURRENT SUPPORT POSITION:
+			// -----------------------------------
+			support_state_t CurrentSupport = PrwSupportStates_deq.front();
+			//Add a new support foot to the support feet history deque
+			if(CurrentSupport.StateChanged == true)
+			{
+				FootAbsolutePosition FAP;
+				if(CurrentSupport.Foot==1)
+					FAP = FinalLeftFootTraj_deq.back();
+				else
+					FAP = FinalRightFootTraj_deq.back();
+				CurrentSupport.x = FAP.x;
+				CurrentSupport.y = FAP.y;
+				CurrentSupport.yaw = FAP.theta*M_PI/180.0;
+				CurrentSupport.StartTime = m_CurrentTime;
+				VRQPGenerator_->SupportState( CurrentSupport );
+			}
 
 
-      // BUILD CONSTANT PART OF THE PROBLEM:
-      // -----------------------------------
-      m_GenVR->buildInvariantPart(m_Pb, m_Matrices);
+			// COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
+			// ------------------------------------------------------
+			deque<double> PreviewedSupportAngles_deq;
+			OrientPrw_->preview_orientations(time+TimeBuffer_,
+				VelRef_,
+				SupportFSM_->StepPeriod(), CurrentSupport,
+				FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
+				PreviewedSupportAngles_deq);
 
 
-      // BUILD VARIANT PART OF THE OPTIMIZATION PROBLEM:
-      // -------------------------------------------------
-      m_GenVR->updateProblem(m_Pb, m_Matrices, deqPrwSupportStates);
+			// COMPUTE REFERENCE IN THE GLOBAL FRAME:
+			// --------------------------------------
+			VRQPGenerator_->compute_global_reference( FinalCOMTraj_deq );
 
 
-      // BUILD CONSTRAINTS:
-      // ------------------
-      m_GenVR->buildConstraints(m_Matrices, m_Pb,
-          m_fCALS,
-          FinalLeftFootAbsolutePositions,
-          FinalRightFootAbsolutePositions,
-          deqPrwSupportStates,
-          PreviewedSupportAngles);
+			// BUILD CONSTANT PART OF THE OBJECTIVE:
+			// -------------------------------------
+			VRQPGenerator_->build_invariant_part( Problem_ );
 
 
-      // SOLVE PROBLEM:
-      // --------------
-      if ((m_FastFormulationMode==QLDANDLQ)||
-	  (m_FastFormulationMode==QLD))
-	{
-
-	  m_Pb.solve( QPProblem_s::QLD , m_Result );
-
-	}
+			// BUILD VARIANT PART OF THE OBJECTIVE:
+			// ------------------------------------
+			VRQPGenerator_->update_problem( Problem_, PrwSupportStates_deq );
 
 
-      // INTERPOLATE THE NEXT COMPUTED COM STATE:
-      // ----------------------------------------
-      FinalCOMStates.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
-      FinalZMPPositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
-      FinalLeftFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
-      FinalRightFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
-      int CurrentIndex = (int)(m_TimeBuffer/m_SamplingPeriod)-1;
-      m_CoM.Interpolation(FinalCOMStates,
-			      FinalZMPPositions,
-			      CurrentIndex,
-			      m_Result.vecSolution[0],m_Result.vecSolution[m_QP_N]);
-      m_Matrices.CoM(m_CoM.OneIteration(m_Result.vecSolution[0],m_Result.vecSolution[m_QP_N]));
+			// BUILD CONSTRAINTS:
+			// ------------------
+			VRQPGenerator_->build_constraints( Problem_,
+				RFC_,
+				FinalLeftFootTraj_deq,
+				FinalRightFootTraj_deq,
+				PrwSupportStates_deq,
+				PreviewedSupportAngles_deq );
 
 
-      // INTERPOLATE THE COMPUTED FEET POSITIONS:
-      // ----------------------------------------
-      //The robot is supposed to stop always with the feet aligned in the lateral plane.
-      if(CurrentSupport.StepsLeft>0)
-	{
-	  if(fabs(m_Result.vecSolution[2*m_QP_N])-0.00001<0.0)
-	    {
-	      cout<<"Previewed foot position zero at time: "<<time<<endl;
-	    }
-	  else if (CurrentSupport.TimeLimit-time-m_QP_T/2.0>0)
-	    {//The landing position is yet determined by the solver because the robot finds himself still in the single support phase
-	      m_FPx = m_Result.vecSolution[2*m_QP_N];
-	      m_FPy = m_Result.vecSolution[2*m_QP_N+deqPrwSupportStates.back().StepNumber];
-	    }
-	}
-      else
-	{//The solver isn't responsible for the feet positions anymore
-	  deque<supportfoot_t>::iterator CurSF_it;
-	  CurSF_it = QueueOfSupportFeet.end();
-	  CurSF_it--;
-	  while(CurSF_it->SupportFoot!=CurrentSupport.Foot)
-	    CurSF_it--;
-	  m_FPx = CurSF_it->x + double(CurSF_it->SupportFoot)*sin(CurSF_it->theta)*m_FeetDistanceDS;
-	  m_FPy = CurSF_it->y - double(CurSF_it->SupportFoot)*cos(CurSF_it->theta)*m_FeetDistanceDS;
+			// SOLVE PROBLEM:
+			// --------------
+			QPProblem_s::solution_t Result;
+			Problem_.solve( QPProblem_s::QLD , Result );
 
-	  // Specify that we are in the ending phase.
-	  if (m_EndingPhase==false)
-	    {
-	      // This should be done only during the transition EndingPhase=false -> EndingPhase=true
-	      m_TimeToStopOnLineMode = m_UpperTimeLimitToUpdate+m_QP_T * m_QP_N;
-	      // Set the ZMP reference as very important.
-	      // It suppose to work because Gamma appears only during the non-constant 
-	    }
-	  m_EndingPhase = true;
-	}
 
-      interpolateTrunkState(time, CurrentIndex,
-                            CurrentSupport,
-			    FinalCOMStates);
-      interpolateFeetPositions(time, CurrentIndex,
-                               CurrentSupport,
-                               PreviewedSupportAngles,
-			       FinalLeftFootAbsolutePositions,
-			       FinalRightFootAbsolutePositions);
+			// INTERPOLATE THE NEXT COMPUTED COM STATE:
+			// ----------------------------------------
+			FinalCOMTraj_deq.resize((int)((QP_T_+TimeBuffer_)/m_SamplingPeriod));
+			FinalZMPTraj_deq.resize((int)((QP_T_+TimeBuffer_)/m_SamplingPeriod));
+			FinalLeftFootTraj_deq.resize((int)((QP_T_+TimeBuffer_)/m_SamplingPeriod));
+			FinalRightFootTraj_deq.resize((int)((QP_T_+TimeBuffer_)/m_SamplingPeriod));
+			int CurrentIndex = (int)(TimeBuffer_/m_SamplingPeriod)-1;
+			CoM_.Interpolation(FinalCOMTraj_deq,
+				FinalZMPTraj_deq,
+				CurrentIndex,
+				Result.Solution_vec[0],Result.Solution_vec[QP_N_]);
+			CoM_.OneIteration(Result.Solution_vec[0],Result.Solution_vec[QP_N_]);
+
+
+			// COMPUTE ORIENTATION OF TRUNK:
+			// -----------------------------
+			OrientPrw_->interpolate_trunk_orientation(time+TimeBuffer_, CurrentIndex,
+				m_SamplingPeriod,
+				CurrentSupport,
+				FinalCOMTraj_deq);
+
+
+			// INTERPOLATE THE COMPUTED FEET POSITIONS:
+			// ----------------------------------------
+			unsigned NumberStepsPrwd = PrwSupportStates_deq.back().StepNumber;
+			OFTG_->interpolate_feet_positions(time+TimeBuffer_,
+				CurrentIndex, CurrentSupport,
+				Result.Solution_vec[2*QP_N_], Result.Solution_vec[2*QP_N_+NumberStepsPrwd],
+				PreviewedSupportAngles_deq,
+				FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
 
 
 
-      m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+m_QP_T;
+			if(CurrentSupport.StepsLeft == 0)
+				m_EndingPhase = true;
+			// Specify that we are in the ending phase.
+			if (m_EndingPhase==false)
+			{
+				// This should be done only during the transition EndingPhase=false -> EndingPhase=true
+				m_TimeToStopOnLineMode = m_UpperTimeLimitToUpdate+QP_T_ * QP_N_;
+				// Set the ZMP reference as very important.
+				// It suppose to work because Gamma appears only during the non-constant
+			}
 
 
+			m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+QP_T_;
 
+			// Compute CPU consumption time.
+			gettimeofday(&end,0);
+			CurrentCPUTime = end.tv_sec - start.tv_sec +
+				0.000001 * (end.tv_usec - start.tv_usec);
+			TotalAmountOfCPUTime += CurrentCPUTime;
+		}
 
-      // Compute CPU consumption time.
-      gettimeofday(&end,0);
-      CurrentCPUTime = end.tv_sec - start.tv_sec +
-        0.000001 * (end.tv_usec - start.tv_usec);
-      TotalAmountOfCPUTime += CurrentCPUTime;
-    }
 
 	}
 

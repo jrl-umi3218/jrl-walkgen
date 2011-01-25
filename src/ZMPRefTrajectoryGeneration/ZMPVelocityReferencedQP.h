@@ -125,11 +125,7 @@ namespace PatternGeneratorJRL
 
   protected:
 
-	GeneratorVelRef * m_GenVR;
-
-	IntermedQPMat m_Matrices;
-
-  //private:
+	 //private:
 
     double m_RobotMass;
     bool PerturbationOccured_;
