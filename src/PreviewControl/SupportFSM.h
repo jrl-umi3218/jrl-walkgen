@@ -22,7 +22,7 @@
  *  Research carried out within the scope of the 
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/* This object provides the finite state machine to determine the support parameters. */
+
 
 #ifndef _SUPPORT_FSM_
 #define _SUPPORT_FSM_
@@ -32,31 +32,68 @@
 
 namespace PatternGeneratorJRL
 {
+  /// \brief Finite state machine to determine the support parameters.
   class  SupportFSM
   {
-  public:
-    /*! Constructor */
-    SupportFSM(const double &SamplingPeriod);
-	
-    /*! Destructor */
-    ~SupportFSM();
-	
-    /*! \brief Initialize the previewed state. */
-    void setSupportState(const double &Time, const int &pi,
-    		support_state_t & Support, const reference_t & Ref) const;
-	
-    /*! \brief constants for the durations in the support phases */
-    double m_DSDuration, m_SSPeriod, m_DSSSDuration;
 
-    //Number of steps done before DS
-    unsigned int m_NbOfStepsSSDS;
+    //
+    // Public methods:
+    //
+  public:
+    /// \brief Constructor
+    SupportFSM();
+
+    /// \brief Destructor
+    ~SupportFSM();
+
+    /// \brief Initialize the previewed state.
+    void set_support_state(const double &Time, const int &pi,
+                support_state_t & Support, const reference_t & Ref) const;
+
+    /// \name Accessors
+    /// \{
+    inline double StepPeriod() const
+    { return StepPeriod_; };
+    inline void StepPeriod( const double StepPeriod )
+    { StepPeriod_ = StepPeriod; };
+
+    inline double DSPeriod() const
+    { return DSPeriod_; };
+    inline void DSPeriod( const double DSPeriod )
+    { DSPeriod_ = DSPeriod; };
+
+    inline double DSSSPeriod() const
+    { return DSSSPeriod_; };
+    inline void DSSSPeriod( const double DSSSPeriod )
+    { DSSSPeriod_ = DSSSPeriod; };
+
+    inline unsigned NBStepsSSDS() const
+    { return NbStepsSSDS_; };
+    inline void NbStepsSSDS( const unsigned NbStepsSSDS )
+    { NbStepsSSDS_ = NbStepsSSDS; };
+
+    inline double SamplingPeriod() const
+    { return T_; };
+    inline void SamplingPeriod( const double T )
+    { T_ = T; };
+    /// \}
  
+    //
+    // Private members:
+    //
   private: 
 
-    /*! \Brief Sampling duration */
-    double m_T;
+    /// \brief Number of steps done before DS
+    unsigned NbStepsSSDS_;
+    /// \brief Length of a double support phase
+    double DSPeriod_;
+    /// \brief Length of a step
+    double StepPeriod_;
+    /// \brief Duration of the transition ds -> ss
+    double DSSSPeriod_;
 
-    int m_FullDebug;
+    /// \Brief Sampling period
+    double T_;
 
   };
 }

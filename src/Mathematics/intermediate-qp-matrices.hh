@@ -22,8 +22,7 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/*! Custom (value based) container providing intermediate elements for the construction of a QP.
- */
+
 
 #ifndef INTERMEDQPMAT_HH_
 #define INTERMEDQPMAT_HH_
@@ -37,7 +36,7 @@
 
 namespace PatternGeneratorJRL
 {
-
+  /// \brief Custom (value based) container providing intermediate elements for the construction of a QP.
   class  IntermedQPMat
   {
     //
@@ -66,6 +65,7 @@ namespace PatternGeneratorJRL
     {
       /// \brief Matrix of the quadratic part
       boost_ublas::matrix<double> U;
+      /// \brief Transpose of U
       boost_ublas::matrix<double> UT;
 
       /// \brief Matrix of the linear part
@@ -79,6 +79,8 @@ namespace PatternGeneratorJRL
     /// \{
     struct state_variant_s
     {
+      /// \brief Objective independent QP elements
+
       /// \brief Reference
       reference_t Ref;
 
@@ -88,11 +90,9 @@ namespace PatternGeneratorJRL
       /// \brief TrunkState
       trunk_t Trunk;
 
-      /// \name Selection matrices
-      /// \{
-      ///
       /// \brief Selection matrix for the previewed feet positions
       boost_ublas::matrix<double> V;
+      /// \brief Transpose of V
       boost_ublas::matrix<double> VT;
       /// \brief Selection matrix for the current feet position
       boost_ublas::vector<double> Vc;
@@ -100,15 +100,10 @@ namespace PatternGeneratorJRL
       boost_ublas::vector<double> Vc_f;
       /// \brief Selection matrix for relative feet positions
       boost_ublas::matrix<double> V_f;
-      /// \}
 
       /// \brief Current support state
       support_state_t SupportState;
 
-      /// \brief Current support foot position
-      supportfoot_t SupportFoot;
-
-      /// \}
     };
     typedef state_variant_s state_variant_t;
     /// \}
@@ -145,31 +140,27 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors
     /// \{
-    /// \brief Accessors to the state matrices
+    /// \brief Getter and setter
+
     inline state_variant_t const & State() const
     { return m_StateMatrices; };
     inline state_variant_t & State()
     { return m_StateMatrices; };
 
-    /// \brief Accessors to the objective dependent matrices
     objective_variant_t const & Objective( int type ) const;
     objective_variant_t & Objective( int type );
 
-    /// \brief Accessors to the dynamics
     dynamics_t const & Dynamics( int type ) const;
     dynamics_t & Dynamics( int type );
 
-    /// \brief Accessors to the inequalities
     linear_inequality_t const & Inequalities( int type ) const;
     linear_inequality_t & Inequalities( int type );
 
-    /// \brief Accessors to the Center of Mass
     inline com_t const & CoM() const
     { return m_StateMatrices.CoM; };
     inline void CoM( const com_t & CoM )
     { m_StateMatrices.CoM = CoM; };
 
-    /// \brief Accessors to the reference
     inline reference_t const & Reference() const
     { return m_StateMatrices.Ref; };
     inline reference_t & Reference()
@@ -177,14 +168,6 @@ namespace PatternGeneratorJRL
     inline void Reference( const reference_t & Ref )
     { m_StateMatrices.Ref = Ref; };
 
-    /// \brief Accessors to the support foot position
-    inline supportfoot_t const & SupportFoot() const
-    { return m_StateMatrices.SupportFoot; };
-    inline void SupportFoot( const supportfoot_t & SupportFoot )
-    { m_StateMatrices.SupportFoot = SupportFoot; };
-    /// \}
-
-    /// \brief Accessors to the current support state
     inline support_state_t const & SupportState() const
     { return m_StateMatrices.SupportState; };
     inline support_state_t & SupportState()

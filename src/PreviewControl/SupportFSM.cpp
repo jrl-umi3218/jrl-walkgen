@@ -32,15 +32,8 @@
 using namespace PatternGeneratorJRL;
 using namespace std;
 
-SupportFSM::SupportFSM(const double &SamplingPeriod)
+SupportFSM::SupportFSM()
 {
-  m_SSPeriod = 0.8; 	  //Duration of one step
-  m_DSDuration = 1e9;       //Duration of the DS phase
-  m_DSSSDuration = 0.8;
-  //TODO: setNumberOfStepsSSDS
-  m_NbOfStepsSSDS = 200;
-
-  m_T = SamplingPeriod;
 
 }
 
@@ -49,8 +42,8 @@ SupportFSM::~SupportFSM()
 {
 }
 
-void SupportFSM::setSupportState(const double &Time, const int &pi,
-				 support_state_t & Support, const reference_t & vel_ref) const
+void SupportFSM::set_support_state(const double &Time, const int &pi,
+				 support_state_t & Support, const reference_t & Ref) const
 {
 
   double eps = 1e-6;
@@ -58,31 +51,31 @@ void SupportFSM::setSupportState(const double &Time, const int &pi,
   Support.StateChanged = false;
 
   bool ReferenceGiven = false;
-  if(fabs(vel_ref.local.x)>eps||fabs(vel_ref.local.y)>eps||fabs(vel_ref.local.yaw)>eps)
+  if(fabs(Ref.local.x)>eps||fabs(Ref.local.y)>eps||fabs(Ref.local.yaw)>eps)
     ReferenceGiven = true;
 
-  if(ReferenceGiven == true && Support.Phase == 0 && (Support.TimeLimit-Time-eps)>m_DSSSDuration)
+  if(ReferenceGiven == true && Support.Phase == 0 && (Support.TimeLimit-Time-eps)>DSSSPeriod_)
     {
-      Support.TimeLimit = Time+m_DSSSDuration;
+      Support.TimeLimit = Time+DSSSPeriod_;
     }
 
 
   //FSM
-  if(Time+eps+pi*m_T >= Support.TimeLimit)
+  if(Time+eps+pi*T_ >= Support.TimeLimit)
     {
       //SS->DS
       if(Support.Phase == 1  && ReferenceGiven == false && Support.StepsLeft==0)
 	{
 	  Support.Phase = 0;
-	  Support.TimeLimit = Time+pi*m_T + m_DSDuration;
+	  Support.TimeLimit = Time+pi*T_ + DSPeriod_;
 	  Support.StateChanged = true;
 	}
       //DS->SS
       else if(Support.Phase == 0 && ReferenceGiven == true)
 	{
 	  Support.Phase = 1;
-	  Support.TimeLimit = Time+pi*m_T + m_SSPeriod;
-	  Support.StepsLeft = m_NbOfStepsSSDS;
+	  Support.TimeLimit = Time+pi*T_ + StepPeriod_;
+	  Support.StepsLeft = NbStepsSSDS_;
 	  Support.StateChanged = true;
 	}
       //SS->SS
@@ -91,9 +84,8 @@ void SupportFSM::setSupportState(const double &Time, const int &pi,
 	{
 	  Support.Foot = -1*Support.Foot;
 	  Support.StateChanged = true;
-	  Support.TimeLimit = Time+pi*m_T + m_SSPeriod;
+	  Support.TimeLimit = Time+pi*T_ + StepPeriod_;
 	  Support.StepNumber++;
-	  Support.SSSS = 1;
 	  if (ReferenceGiven == false)
 	    Support.StepsLeft = Support.StepsLeft-1;
 	}

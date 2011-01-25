@@ -200,6 +200,8 @@ void OnlineStepPositionTrajectoryGeneration::OnLine(double time,
       m_GenVR->previewSupportStates(m_Matrices, m_SupportFSM, deqPrwSupportStates);
       const support_state_t CurrentSupport = deqPrwSupportStates.front();
 
+	  
+
 	  { //DEBUG
 		  std::ofstream DebugFile,DebugFile2; 
 		  DebugFile.open("QueueOfSupportFeet.dat",ofstream::app); 

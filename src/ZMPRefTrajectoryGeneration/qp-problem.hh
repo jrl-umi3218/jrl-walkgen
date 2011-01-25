@@ -66,8 +66,6 @@ namespace PatternGeneratorJRL
       /// \brief Number of constraints (lagrange multipliers)
       int NbConstraints;
 
-      /// \name qld-output
-      /// \{
       /// \brief SHOWS THE TERMINATION REASON.
       ///   IFAIL = 0 :   SUCCESSFUL RETURN.
       ///   IFAIL = 1 :   TOO MANY ITERATIONS (MORE THAN 40*(N+M)).
@@ -81,30 +79,27 @@ namespace PatternGeneratorJRL
       ///   IPRINT = 0 :  NO OUTPUT OF QL0001.
       ///   IPRINT > 0 :  BRIEF OUTPUT IN ERROR CASES.
       int Print;
-      /// \}
 
       /// \brief Solution vector
-      boost_ublas::vector<double> vecSolution;
+      boost_ublas::vector<double> Solution_vec;
 
-      /// \name Splitted lagrange multipliers sets
-      /// \{
       /// \brief Lagrange multipliers of the constraints
-      boost_ublas::vector<double> vecConstrLagr;
+      boost_ublas::vector<double> ConstrLagr_vec;
       /// \brief Lagrange multipliers of the lower bounds
-      boost_ublas::vector<double> vecLBoundsLagr;
+      boost_ublas::vector<double> LBoundsLagr_vec;
       /// \brief Lagrange multipliers of the upper bounds
-      boost_ublas::vector<double> vecUBoundsLagr;
-      /// \}
+      boost_ublas::vector<double> UBoundsLagr_vec;
 
       /// \brief Resize solution containers
       void resize( int nb_variables, int nb_constraints );
 
-      /// \name Dumping
-      /// \{
       /// \brief Dump solution
+      /// \param filename
       void dump( const char *filename );
+      /// \brief Print solution
+      /// \param aos
       void print( std::ostream & aos);
-      /// \}
+
     };
     typedef struct solution_s solution_t;
 
@@ -126,13 +121,13 @@ namespace PatternGeneratorJRL
     void setNbVariables( int nb_variables )
     { nbvariables_ = nb_variables;};
 
-    /// \brief Set the number of optimization parameters.
+    /// \brief Set the number of equality constraints.
     ///
     /// \param nb_eq_constraints
     inline void setNbEqConstraints( int nb_eq_constraints )
     { nbeqconstraints_ = nb_eq_constraints;};
 
-    /// \brief Set the number of optimization parameters.
+    /// \brief Set the total number of constraints.
     ///
     /// \param nb_constraints
     inline void setNbConstraints( int nb_constraints )
@@ -170,7 +165,7 @@ namespace PatternGeneratorJRL
     /// \param type Target matrix type
     /// \param row First row inside the target
     /// \param col First column inside the target
-    void addTerm(const MAL_MATRIX (&Mat, double), int type,
+    void add_term(const MAL_MATRIX (&Mat, double), int type,
 		 int row, int col);
 
     /// \brief Add a vector to the final optimization problem in array form
@@ -178,7 +173,7 @@ namespace PatternGeneratorJRL
     /// \param Mat Added vector
     /// \param ype Target vector type
     /// \param row First row inside the target
-    void addTerm(const MAL_VECTOR (&Vec, double), int type,
+    void add_term(const MAL_VECTOR (&Vec, double), int type,
 		 int row);
 
     /// \brief Dump on disk a problem.
@@ -205,35 +200,30 @@ namespace PatternGeneratorJRL
     /// \param[out] result
     void solve( int solver, solution_t & result);
 
-    //
-    //Protected methods
-    //
-  protected:
-
-    /// \brief Relese memory.
-    void releaseMemory();
-
-    /// \brief Allocate memory.
-    /// Called when setting the dimensions of the problem.
-    ///
-    /// \param[in] nb_variables
-    /// \param[in] nb_constraints
-    void resizeAll();
 
     //
     // Private methods
     //
   private:
 
+    /// \brief Release memory.
+    void release_memory();
+
+    /// \brief Allocate memory.
+    /// Called when setting the dimensions of the problem.
+    ///
+    void resize_all();
+
     /// \name Dumping functions
     /// \{
     /// \brief Print on disk the parameters that are passed to the solver
-    void dumpSolverParameters(std::ostream & aos);
+    void dump_solver_parameters(std::ostream & aos);
     /// \brief Print array
     void dump( int type, std::ostream & aos);
     /// \brief Print problem
-    void dumpProblem(std::ostream &);
+    void dump_problem(std::ostream &);
     /// \}
+
     //
     //Private types
     //

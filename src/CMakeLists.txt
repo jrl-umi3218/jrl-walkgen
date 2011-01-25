@@ -24,6 +24,7 @@ ENDIF(WIN32)
 SET(SOURCES
   FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
+  FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp
   FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp
   GlobalStrategyManagers/CoMAndFootOnlyStrategy.cpp
@@ -32,7 +33,7 @@ SET(SOURCES
   Mathematics/AnalyticalZMPCOGTrajectory.cpp
   Mathematics/ConvexHull.cpp
   Mathematics/FootConstraintsAsLinearSystem.cpp
-  Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
+  Mathematics/relative-feet-inequalities.cpp
   Mathematics/FootHalfSize.cpp
   Mathematics/OptCholesky.cpp
   Mathematics/Polynome.cpp

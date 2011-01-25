@@ -39,9 +39,27 @@ namespace PatternGeneratorJRL
   /// \brief Support state of the robot at a certain point in time
   struct support_state_s
   {
-    int Phase, Foot, StepsLeft, StepNumber;
-    bool SSSS, StateChanged;
+    const static int DS=0;
+    const static int SS=1;
+    const static int LEFT=2;
+    const static int RIGHT=-2;
+
+    /// \brief Support phase
+    int Phase;
+    /// \brief Support foot
+    int Foot;
+    /// \brief Number steps left before double support
+    int StepsLeft;
+    /// \brief Number of step previewed
+    int StepNumber;
+    /// \brief (true) -> New single support state
+    bool StateChanged;
+    /// \brief Time until StateChanged == true
     double TimeLimit;
+    /// \brief start time
+    double StartTime;
+    /// \brief Position and orientation on a plane
+    double x,y,yaw;
 
     struct support_state_s & operator = (const support_state_s &aSS);
 
@@ -171,7 +189,7 @@ namespace PatternGeneratorJRL
   {
     struct coordinate_s
     {
-      boost_ublas::compressed_matrix<double, boost_ublas::column_major> D;
+      boost_ublas::compressed_matrix<double, boost_ublas::row_major> D;
     };
     struct coordinate_s x, y;
 
