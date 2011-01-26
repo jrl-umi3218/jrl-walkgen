@@ -103,7 +103,17 @@ namespace PatternGeneratorJRL
 	  */
 	  virtual int AddStepPosition(const RelativeFootPosition & r);
 
-	
+	  /// \name Accessors
+	  /// \{
+	  /*! Set the velocity reference from external reference */
+	  virtual void setVelReference(double dx,double dy, double dyaw);
+	  	  
+	  /*! Set the velocity reference from string */
+	  inline virtual void setVelReference(istringstream &strm)
+	  {ZMPVelocityReferencedQP::setVelReference(strm);}
+	  
+	  /// \}
+
 		
 	protected:
 
@@ -112,7 +122,8 @@ namespace PatternGeneratorJRL
 
 		bool velocityMode_;
 
-		double m_BetaCache_;
+		double betaCache_;
+		double yawCache_;
 
 		//FootConstraintsAsLinearSystemForStepPos m_fCALS_FP;
 
