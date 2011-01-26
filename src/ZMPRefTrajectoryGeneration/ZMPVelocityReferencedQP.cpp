@@ -144,9 +144,11 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 
 void ZMPVelocityReferencedQP::setVelReference(istringstream &strm)
 {
-  strm >> VelRef_.local.x;
-  strm >> VelRef_.local.y;
-  strm >> VelRef_.local.yaw;
+  double dx,dy,dyaw;
+  strm >> dx;
+  strm >> dy;
+  strm >> dyaw;
+  setVelReference(dx,dy,dyaw);
 }
 
 void ZMPVelocityReferencedQP::setVelReference(double dx,
@@ -156,6 +158,15 @@ void ZMPVelocityReferencedQP::setVelReference(double dx,
   VelRef_.local.x = dx;
   VelRef_.local.y = dy;
   VelRef_.local.yaw = dyaw;
+}
+
+void ZMPVelocityReferencedQP::getVelReference(double &dx,
+					      double &dy,
+					      double &dyaw)const
+{
+   dx = VelRef_.local.x;
+   dy = VelRef_.local.y;
+   dyaw = VelRef_.local.yaw;
 }
 
 void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
