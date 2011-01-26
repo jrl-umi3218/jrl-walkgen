@@ -21,9 +21,9 @@ See License.txt for more information on license.
 #ifdef WIN32
 # include <Windows.h>
 #endif /* WIN32 */
- 
+
 #include <time.h> 
- 
+
 #include <iostream> 
 #include <fstream> 
 
@@ -41,7 +41,8 @@ ZMPVelocityReferencedQP(lSPM,DataFile,aHS),/*m_fCALS_FP(lSPM,aHS,m_ConstraintOnX
 removeQueueHead(false)
 { 
 	velocityMode_=true;
-	m_BetaCache_=0;
+	betaCache_=0;
+	yawCache_=0;
 	RelativeFootPosition p;
 	p.sx=0;
 	p.sy=0;
@@ -50,8 +51,8 @@ removeQueueHead(false)
 	stepPos_.push_back(p);
 
 
-	//SetVelocityMode(false);
-	
+	SetVelocityMode(false);
+
 	// Register method to handle 
 	string aMethodName[2] = 
 	{":setstepspositions",
@@ -92,11 +93,18 @@ void OnlineStepPositionTrajectoryGeneration::SetVelocityMode(bool b)
 	if (velocityMode_!=b)
 	{
 		velocityMode_=b;
-		if (b=false)
-			m_BetaCache_=0;
-		double tmp=VRQPGenerator_->getPonderation( IntermedQPMat::INSTANT_VELOCITY);
-		VRQPGenerator_->Ponderation(m_BetaCache_, IntermedQPMat::INSTANT_VELOCITY);
-		m_BetaCache_=tmp;
+		if (b==false)
+		{
+			betaCache_=0;
+			yawCache_=0;
+		}	
+		double beta=VRQPGenerator_->getPonderation( IntermedQPMat::INSTANT_VELOCITY);
+		double dx,dy,dyaw;
+		getVelReference(dx,dy,dyaw);
+		VRQPGenerator_->Ponderation(betaCache_, IntermedQPMat::INSTANT_VELOCITY);
+		setVelReference(dx,dy,yawCache_);
+		betaCache_=beta;
+		yawCache_=dyaw;
 	}
 }
 
@@ -146,11 +154,11 @@ void OnlineStepPositionTrajectoryGeneration::OnLine(double time,
 
 	if (velocityMode_)
 	{
-		
+
 		//Calling the Parent overload of Online
 		ZMPVelocityReferencedQP::OnLine(time,FinalZMPTraj_deq,FinalCOMTraj_deq,FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
-		
-		
+
+
 
 		return;
 	}
@@ -313,7 +321,6 @@ void OnlineStepPositionTrajectoryGeneration::OnLine(double time,
 			TotalAmountOfCPUTime += CurrentCPUTime;
 		}
 
-
 	}
 
 } 
@@ -336,14 +343,14 @@ int OnlineStepPositionTrajectoryGeneration::OnLineFootChange(double time,
 	r.theta=aFootAbsolutePosition.theta;
 
 	return ChangeStepPosition(r,(unsigned)aFootAbsolutePosition.stepType);
-	 
+
 
 }
 
- int OnlineStepPositionTrajectoryGeneration::ChangeStepPosition(const RelativeFootPosition & r,
-				unsigned stepNumber)
+int OnlineStepPositionTrajectoryGeneration::ChangeStepPosition(const RelativeFootPosition & r,
+															   unsigned stepNumber)
 {
-	
+
 	if (stepNumber>=stepPos_.size())
 	{	
 		stepPos_.push_back(r);
@@ -355,7 +362,7 @@ int OnlineStepPositionTrajectoryGeneration::OnLineFootChange(double time,
 		return stepNumber;
 	}
 
-	
+
 }
 
 void OnlineStepPositionTrajectoryGeneration::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
@@ -367,21 +374,35 @@ void OnlineStepPositionTrajectoryGeneration::OnLineAddFoot(RelativeFootPosition 
 {
 
 	AddStepPosition(NewRelativeFootPosition);
-	
+
 
 
 }
 
+void OnlineStepPositionTrajectoryGeneration::setVelReference(double dx, double dy, double dyaw)
+{
+	if (velocityMode_)
+	{
+		ZMPVelocityReferencedQP::setVelReference(dx,dy,dyaw);
+	}
+	else
+	{
+		yawCache_=dyaw;
+		ZMPVelocityReferencedQP::setVelReference(dx,dy,0);
+	}
 
- int OnlineStepPositionTrajectoryGeneration::AddStepPosition(const RelativeFootPosition & r)
+}
+
+
+int OnlineStepPositionTrajectoryGeneration::AddStepPosition(const RelativeFootPosition & r)
 {
 	stepPos_.push_back(r);
 	return stepPos_.size();
-	
+
 }
 
-
- //void OnlineStepPositionTrajectoryGeneration::OnLine(double time, 
+//Commented--------------------------------------------------------
+//void OnlineStepPositionTrajectoryGeneration::OnLine(double time, 
 //													deque<ZMPPosition> & FinalZMPPositions, 
 //													deque<COMState> & FinalCOMStates, 
 //													deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions, 
