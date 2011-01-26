@@ -113,7 +113,10 @@ namespace PatternGeneratorJRL
     void setVelReference(istringstream &strm);
 
     /*! Set the velocity reference from external reference */
-    void setVelReference(double dx,double dy, double dyaw);
+    virtual void setVelReference(double dx,double dy, double dyaw);
+	
+	/*! get the velocity reference from external reference */
+    void getVelReference(double &dx,double &dy, double &dyaw)const;
 
     /*! Set the velocity reference from external reference */
     void setCoMPerturbationForce(double x,double y);
