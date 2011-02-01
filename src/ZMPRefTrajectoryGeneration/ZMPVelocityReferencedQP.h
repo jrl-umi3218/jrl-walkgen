@@ -1,7 +1,7 @@
 /*
  * Copyright 2010,
  *
- * Medhi    Benallegue
+ * Mehdi    Benallegue
  * Andrei   Herdt
  * Francois Keith
  * Olivier  Stasse
@@ -176,9 +176,14 @@ namespace PatternGeneratorJRL
     /*! \brief Fast formulations mode. */
     unsigned m_FastFormulationMode;
 
-    
+
+	/*! \brief Forbidden operators/constructors (not implemented). */
+    ZMPVelocityReferencedQP operator=(const ZMPVelocityReferencedQP&);
+	ZMPVelocityReferencedQP(const ZMPVelocityReferencedQP&);
+
   public:
 
+	  
     /*! Methods to comply with the initial interface of ZMPRefTrajectoryGeneration.
       TODO: Change the internal structure to make those methods not mandatory
       for compiling.
