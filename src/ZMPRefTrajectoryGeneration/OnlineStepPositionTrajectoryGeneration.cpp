@@ -30,28 +30,44 @@ See License.txt for more information on license.
 #include <Mathematics/qld.h> 
 #include <ZMPRefTrajectoryGeneration/OnlineStepPositionTrajectoryGeneration.h> 
 
+
+
+
 #include <Debug.h> 
 using namespace std; 
 using namespace PatternGeneratorJRL; 
 
-OnlineStepPositionTrajectoryGeneration::OnlineStepPositionTrajectoryGeneration(SimplePluginManager *lSPM,
+OnlineStepPositionTrajectoryGeneration::OnlineStepPositionTrajectoryGeneration(SimplePluginManager* lSPM,
 																			   string DataFile, 
-																			   CjrlHumanoidDynamicRobot *aHS) : 
-ZMPVelocityReferencedQP(lSPM,DataFile,aHS),/*m_fCALS_FP(lSPM,aHS,m_ConstraintOnX,m_ConstraintOnY),*/
-removeQueueHead(false)
+																			   CjrlHumanoidDynamicRobot* aHS) : 
+ZMPVelocityReferencedQP(lSPM,DataFile,aHS)/*m_fCALS_FP(lSPM,aHS,m_ConstraintOnX,m_ConstraintOnY),*/
 { 
 	velocityMode_=true;
 	betaCache_=0;
 	yawCache_=0;
-	RelativeFootPosition p;
-	p.sx=0;
-	p.sy=0;
+	RelativeStepPosition p;
+	p.x=0;
+	p.y=0;
 	p.theta=0;
+
+	
+	
+	VRQPGeneratorCopy_=new GeneratorStepPos(*VRQPGenerator_);
+
+	
+	//Pointer exchange
+	if (VRQPGenerator_!=0x0)
+	{
+		delete VRQPGenerator_;
+		VRQPGenerator_=VRQPGeneratorCopy_;
+	}
 
 	stepPos_.push_back(p);
 
 
 	SetVelocityMode(false);
+
+	
 
 	// Register method to handle 
 	string aMethodName[2] = 
@@ -74,7 +90,7 @@ OnlineStepPositionTrajectoryGeneration::~OnlineStepPositionTrajectoryGeneration(
 
 } 
 
-void OnlineStepPositionTrajectoryGeneration::SetStepsPositions(const std::deque<RelativeFootPosition>& s)
+void OnlineStepPositionTrajectoryGeneration::SetStepsPositions(const RelativeStepPositionQueue& s)
 {
 	if (s.size()>0)
 		stepPos_=s;
@@ -83,7 +99,7 @@ void OnlineStepPositionTrajectoryGeneration::SetStepsPositions(const std::deque<
 
 }
 
-const std::deque<RelativeFootPosition> &OnlineStepPositionTrajectoryGeneration::GetStepsPositions() const
+const RelativeStepPositionQueue &OnlineStepPositionTrajectoryGeneration::GetStepsPositions() const
 {
 	return stepPos_;
 }
@@ -101,11 +117,13 @@ void OnlineStepPositionTrajectoryGeneration::SetVelocityMode(bool b)
 		double beta=VRQPGenerator_->getPonderation( IntermedQPMat::INSTANT_VELOCITY);
 		double dx,dy,dyaw;
 		getVelReference(dx,dy,dyaw);
-		VRQPGenerator_->Ponderation(betaCache_, IntermedQPMat::INSTANT_VELOCITY);
+		VRQPGeneratorCopy_->explicitPonderation(betaCache_, IntermedQPMat::INSTANT_VELOCITY);
 		setVelReference(dx,dy,yawCache_);
 		betaCache_=beta;
 		yawCache_=dyaw;
+		VRQPGeneratorCopy_->setVelocityMode(b);
 	}
+	
 }
 
 
@@ -120,9 +138,9 @@ void OnlineStepPositionTrajectoryGeneration::CallMethod(std::string & Method, st
 	} 
 	else if (Method==":setstepspositions") 
 	{ 
-		RelativeFootPosition p;
-		strm>>p.sx;
-		strm>>p.sy;
+		RelativeStepPosition p;
+		strm>>p.x;
+		strm>>p.y;
 		strm>>p.theta;
 
 		if (!strm.eof())
@@ -131,8 +149,8 @@ void OnlineStepPositionTrajectoryGeneration::CallMethod(std::string & Method, st
 
 			do{
 				stepPos_.push_back(p);
-				strm>>p.sx;
-				strm>>p.sy;
+				strm>>p.x;
+				strm>>p.y;
 				strm>>p.theta;
 			}while (!strm.eof());
 		}
@@ -157,13 +175,10 @@ void OnlineStepPositionTrajectoryGeneration::OnLine(double time,
 
 		//Calling the Parent overload of Online
 		ZMPVelocityReferencedQP::OnLine(time,FinalZMPTraj_deq,FinalCOMTraj_deq,FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
-
-
-
 		return;
 	}
-	//else = StepPos Mode
-	else
+	
+	else//  StepPosMode
 	{
 		// If on-line mode not activated we go out.
 		if (!m_OnLineMode)
@@ -337,9 +352,9 @@ int OnlineStepPositionTrajectoryGeneration::OnLineFootChange(double time,
 															 std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 															 StepStackHandler * aStepStackHandler)
 {
-	RelativeFootPosition r;
-	r.sx=aFootAbsolutePosition.x;
-	r.sy=aFootAbsolutePosition.y;
+	RelativeStepPosition r;
+	r.x=aFootAbsolutePosition.x;
+	r.y=aFootAbsolutePosition.y;
 	r.theta=aFootAbsolutePosition.theta;
 
 	return ChangeStepPosition(r,(unsigned)aFootAbsolutePosition.stepType);
@@ -347,7 +362,7 @@ int OnlineStepPositionTrajectoryGeneration::OnLineFootChange(double time,
 
 }
 
-int OnlineStepPositionTrajectoryGeneration::ChangeStepPosition(const RelativeFootPosition & r,
+int OnlineStepPositionTrajectoryGeneration::ChangeStepPosition(const RelativeStepPosition & r,
 															   unsigned stepNumber)
 {
 
@@ -372,8 +387,13 @@ void OnlineStepPositionTrajectoryGeneration::OnLineAddFoot(RelativeFootPosition 
 														   std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 														   bool EndSequence)
 {
+	RelativeStepPosition NewRelativeStepPosition;
 
-	AddStepPosition(NewRelativeFootPosition);
+	NewRelativeStepPosition.x=NewRelativeFootPosition.sx;
+	NewRelativeStepPosition.y=NewRelativeFootPosition.sy;
+	NewRelativeStepPosition.theta=NewRelativeFootPosition.theta;
+
+	AddStepPosition(NewRelativeStepPosition);
 
 
 
@@ -394,7 +414,7 @@ void OnlineStepPositionTrajectoryGeneration::setVelReference(double dx, double d
 }
 
 
-int OnlineStepPositionTrajectoryGeneration::AddStepPosition(const RelativeFootPosition & r)
+int OnlineStepPositionTrajectoryGeneration::AddStepPosition(const RelativeStepPosition & r)
 {
 	stepPos_.push_back(r);
 	return stepPos_.size();

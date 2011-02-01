@@ -25,8 +25,7 @@ Please see Licence.txt for details on the license.
 //#include <PreviewControl/SupportState.h>
 #include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
-
-
+#include <ZMPRefTrajectoryGeneration/generator-step-pos.hh>
 
 
 namespace PatternGeneratorJRL
@@ -44,9 +43,9 @@ namespace PatternGeneratorJRL
 		/* Default destructor. */
 		virtual ~OnlineStepPositionTrajectoryGeneration();
 
-		const std::deque<RelativeFootPosition>& GetStepsPositions() const;
+		const RelativeStepPositionQueue& GetStepsPositions() const;
 		
-		void SetStepsPositions(const std::deque<RelativeFootPosition>&);
+		void SetStepsPositions(const RelativeStepPositionQueue&);
 
 		//void SetBeta(const double &);
 		
@@ -82,7 +81,7 @@ namespace PatternGeneratorJRL
 		\param[in] r: The relative position of the new step.
 		\param[in] stepNumber: the number of the step to change.
 	  */
-	  virtual int ChangeStepPosition(const RelativeFootPosition & r,
+	  virtual int ChangeStepPosition(const RelativeStepPosition & r,
 				unsigned stepNumber);
 
 	   /*! add a step position 
@@ -101,7 +100,7 @@ namespace PatternGeneratorJRL
 		\param[in] r: The relative position of the new step.
 		
 	  */
-	  virtual int AddStepPosition(const RelativeFootPosition & r);
+	  virtual int AddStepPosition(const RelativeStepPosition & r);
 
 	  /// \name Accessors
 	  /// \{
@@ -111,19 +110,24 @@ namespace PatternGeneratorJRL
 	  /*! Set the velocity reference from string */
 	  inline virtual void setVelReference(istringstream &strm)
 	  {ZMPVelocityReferencedQP::setVelReference(strm);}
+
+	 
+
 	  
 	  /// \}
 
 		
 	protected:
 
-		RelativeFootPositionQueue stepPos_;
-		bool removeQueueHead;
+		RelativeStepPositionQueue stepPos_;
+		//bool removeQueueHead;
 
 		bool velocityMode_;
 
 		double betaCache_;
 		double yawCache_;
+
+		GeneratorStepPos* VRQPGeneratorCopy_;
 
 		//FootConstraintsAsLinearSystemForStepPos m_fCALS_FP;
 
