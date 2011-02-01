@@ -96,6 +96,18 @@ namespace PatternGeneratorJRL
   };
   typedef struct RelativeFootPosition_s RelativeFootPosition;
 
+   /** Structure to store each STEP position when the user is specifying
+      a sequence of relative positions for stepping motions. */
+  struct StepPosition_s
+  {
+    double x,y,theta;    
+  };
+  typedef struct StepPosition_s StepPosition;
+
+  /**Two structures inherited from StepPosition in order to define relative and absolute step positions*/
+  struct RelativeStepPosition:public StepPosition{};
+  struct AbsoluteStepPosition:public StepPosition{};
+
   /** Structure to store each of the ZMP value, with a given
       direction at a certain time. */
   struct ZMPPosition_s
@@ -140,6 +152,6 @@ namespace PatternGeneratorJRL
   typedef struct LinearConstraintInequality_s
     LinearConstraintInequality_t;
 
-	typedef  std::deque<RelativeFootPosition> RelativeFootPositionQueue;
+	typedef  std::deque<RelativeStepPosition> RelativeStepPositionQueue;
 }
 #endif
