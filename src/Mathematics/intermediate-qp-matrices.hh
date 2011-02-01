@@ -123,6 +123,25 @@ namespace PatternGeneratorJRL
 
       std::ostream& print (std::ostream& o) const;
       void dump(const char * filename) const;
+	  
+	  //constructor 
+	  objective_variant_s()
+	  {
+		  dyn=0;
+	  }
+	  //copy constructor
+	  objective_variant_s(const objective_variant_s& o)
+		  :weight(o.weight),type(o.type)
+	  {
+		  if (o.dyn!=0x0)
+		  {
+			  dyn= new dynamics_t(*o.dyn);
+		  }
+		  else
+		  {
+			  dyn=0;
+		  }
+	  }
 
     };
     typedef objective_variant_s objective_variant_t;
