@@ -34,6 +34,7 @@ SET(SOURCES
   Mathematics/ConvexHull.cpp
   Mathematics/FootConstraintsAsLinearSystem.cpp
   Mathematics/relative-feet-inequalities.cpp
+  Mathematics/relative-feet-equalities.cpp
   Mathematics/FootHalfSize.cpp
   Mathematics/OptCholesky.cpp
   Mathematics/Polynome.cpp
@@ -60,6 +61,7 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.cpp
   ZMPRefTrajectoryGeneration/qp-problem.cpp
   ZMPRefTrajectoryGeneration/generator-vel-ref.cpp
+  ZMPRefTrajectoryGeneration/generator-step-pos.cpp
   ZMPRefTrajectoryGeneration/mpc-trajectory-generation.cpp
   MotionGeneration/StepOverPlanner.cpp
   MotionGeneration/CollisionDetector.cpp
