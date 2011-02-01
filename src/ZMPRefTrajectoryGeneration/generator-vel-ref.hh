@@ -55,7 +55,7 @@ namespace PatternGeneratorJRL
     /// \name Constructors and destructors.
     /// \{
     GeneratorVelRef( SimplePluginManager *lSPM );
-    ~GeneratorVelRef();
+    virtual ~GeneratorVelRef();
     /// \}
 
 //    /// \brief Call method to handle the plugins (SimplePlugin interface).
@@ -85,7 +85,7 @@ namespace PatternGeneratorJRL
     /// \param[in] AbsoluteRightFootPositions
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
-    void build_constraints( QPProblem & Pb,
+    virtual void build_constraints( QPProblem & Pb,
 			  RelativeFeetInequalities * RFI,
 			  const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
 			  const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
@@ -107,7 +107,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] weight
     /// \param[in] objective
-    void Ponderation(double weight, int objective );
+    virtual void Ponderation(double weight, int objective );
 
 	 /// \brief get the weights on the objective terms
     ///
