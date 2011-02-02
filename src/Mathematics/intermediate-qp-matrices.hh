@@ -1,6 +1,7 @@
 /*
  * Copyright 2011,
  *
+ * Mehdi	Benallegue
  * Olivier  Stasse
  * Andrei   Herdt
  *
@@ -55,10 +56,11 @@ namespace PatternGeneratorJRL
     const static int JERK = 13;
     const static int COP = 14;
 
-    const static int INEQ_COP = 20;
+    
+	const static int INEQ_COP = 20;
     const static int INEQ_COM = 21;
     const static int INEQ_FEET = 22;
-
+	const static int EQ_STEP_POS = 23;
     /// \name Matrices defining the evolution
     /// \{
     struct dynamics_s
@@ -226,6 +228,7 @@ namespace PatternGeneratorJRL
       m_CoP;
 
     linear_inequality_t
+	  m_EqStepPos,
       m_IneqCoP,
       m_IneqCoM,
       m_IneqFeet;

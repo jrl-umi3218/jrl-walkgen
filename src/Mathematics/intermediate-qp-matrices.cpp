@@ -1,6 +1,7 @@
 /*
  * Copyright 2011,
  *
+ * Mehdi	Benallegue
  * Andrei   Herdt
  * Olivier  Stasse
  *
@@ -129,6 +130,8 @@ IntermedQPMat::Inequalities( const int type ) const
 {
   switch(type)
     {
+    case EQ_STEP_POS:
+	  return m_EqStepPos;
     case INEQ_COP:
       return m_IneqCoP;
     case INEQ_COM:
@@ -142,6 +145,9 @@ IntermedQPMat::Inequalities( const int type )
 {
   switch(type)
     {
+	case EQ_STEP_POS:
+	  m_EqStepPos.clear();
+	  return m_EqStepPos;
     case INEQ_COP:
       m_IneqCoP.clear();
       return m_IneqCoP;
