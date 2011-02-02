@@ -59,6 +59,28 @@ namespace PatternGeneratorJRL
 			  const std::deque<support_state_t> & deqSupportStates,
 			  const std::deque<double> & PreviewedSupportAngles);
 
+	  
+	/*! \brief Add a step position 
+		\param[in] r: The relative position of the new step.
+		
+	  */
+	  virtual int AddStepPosition(const RelativeStepPosition & r);
+
+
+
+	 /*! \brief Change a step position 
+		\param[in] r: The relative position of the new step.
+		\param[in] stepNumber: the number of the step to change.
+	  */
+	int ChangeStepPosition(const RelativeStepPosition & r,
+				unsigned stepNumber);
+
+
+	const RelativeStepPositionQueue& GetStepsPositions() const;
+
+	void Initialization();
+
+	void SetStepsPositions(const RelativeStepPositionQueue& s);
 
 	/// \brief set the velocity mode / step pos mode
     ///
@@ -100,12 +122,10 @@ namespace PatternGeneratorJRL
     /// \param[in] PreviewedSupportAngles
 	/// \param[in] stepPos
       int build_equalities_step_pos(linear_inequality_t & equalities,
-                               RelativeFeetInequalities * FCALS,
                                const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
                                const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
                                const std::deque<support_state_t> & deqSupportStates,
-                               const std::deque<double> & PreviewedSupportAngles,
-							   RelativeStepPositionQueue& stepPos) const;
+                               const std::deque<double> & PreviewedSupportAngles);
 
 	  /// \brief Handling methods for the plugin mecanism.
 	  virtual void CallMethod( std::string &Method, std::istringstream &Args );
@@ -114,6 +134,8 @@ namespace PatternGeneratorJRL
   protected:
 	  bool velocityMode_;
 	  RelativeFeetEqualities rfe_;
+
+	  RelativeStepPositionQueue stepPos_;
   };
 }
 
