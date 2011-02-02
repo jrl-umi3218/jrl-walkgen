@@ -60,8 +60,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   QP_N_ = 16;
   m_SamplingPeriod = 0.005;
   PerturbationOccured_ = false;
-  m_UpperTimeLimitToUpdate = 0.0;
-  m_RobotMass = aHS->mass();
+  UpperTimeLimitToUpdate_ = 0.0;
+  RobotMass_ = aHS->mass();
   //Feet distance in the DS phase
 
 
@@ -97,9 +97,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   CoM_.InitializeSystem();
 
   VRQPGenerator_ = new GeneratorVelRef(lSPM );
-  VRQPGenerator_->setNbPrwSamplings(QP_N_);
-  VRQPGenerator_->setSamplingPeriodPreview(QP_T_);
-  VRQPGenerator_->setComHeight(0.814);
+  VRQPGenerator_->NbPrwSamplings(QP_N_);
+  VRQPGenerator_->SamplingPeriodPreview(QP_T_);
+  VRQPGenerator_->ComHeight(0.814);
   VRQPGenerator_->initialize_matrices();
   VRQPGenerator_->Ponderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
   VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::COP_CENTERING );
@@ -175,8 +175,8 @@ void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
 
   strm >> PerturbationAcceleration_(2);
   strm >> PerturbationAcceleration_(5);
-  PerturbationAcceleration_(2) = PerturbationAcceleration_(2)/m_RobotMass;
-  PerturbationAcceleration_(5) = PerturbationAcceleration_(5)/m_RobotMass;
+  PerturbationAcceleration_(2) = PerturbationAcceleration_(2)/RobotMass_;
+  PerturbationAcceleration_(5) = PerturbationAcceleration_(5)/RobotMass_;
   PerturbationOccured_ = true;
 }
 
@@ -184,8 +184,8 @@ void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x,double y)
 {
   MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
 
-  PerturbationAcceleration_(2) = x/m_RobotMass;
-  PerturbationAcceleration_(5) = y/m_RobotMass;
+  PerturbationAcceleration_(2) = x/RobotMass_;
+  PerturbationAcceleration_(5) = y/RobotMass_;
   PerturbationOccured_ = true;
 
 }
@@ -225,8 +225,8 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
   // Set the internal state of the ZMPRefTrajectory object.
   m_OnLineMode = true;
-  m_EndingPhase = false;
-  m_TimeToStopOnLineMode = -1.0;
+  EndingPhase_ = false;
+  TimeToStopOnLineMode_ = -1.0;
 
   // Initialize position of the feet.
   CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
@@ -284,15 +284,15 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
     }
 
+  // INITIALIZE CENTER OF MASS:
+  // --------------------------
   com_t CoM;
-
   CoM.x[0] = lStartingCOMState.x[0];
   CoM.x[1] = lStartingCOMState.x[1];
   CoM.x[2] = lStartingCOMState.x[2];
   CoM.y[0] = lStartingCOMState.y[0];
   CoM.y[1] = lStartingCOMState.y[1];
   CoM.y[2] = lStartingCOMState.y[2];
-
   CoM_(CoM);
 
   return 0;
@@ -312,8 +312,8 @@ ZMPVelocityReferencedQP::OnLine(double time,
     { return; }
 
   // Testing if we are reaching the end of the online mode.
-  if ((m_EndingPhase) &&
-      (time>=m_TimeToStopOnLineMode))
+  if ((EndingPhase_) &&
+      (time>=TimeToStopOnLineMode_))
     { m_OnLineMode = false; }
 
 
@@ -328,8 +328,8 @@ ZMPVelocityReferencedQP::OnLine(double time,
     }
 
   // UPDATE WALKING TRAJECTORIES:
-  // --------------------
-  if(time + 0.00001 > m_UpperTimeLimitToUpdate)
+  // ----------------------------
+  if(time + 0.00001 > UpperTimeLimitToUpdate_)
     {
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
       struct timeval start,end;
@@ -339,7 +339,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // UPDATE INTERNAL DATA:
       // ---------------------
       VRQPGenerator_->Reference(VelRef_);
-      VRQPGenerator_->setCurrentTime(time+TimeBuffer_);
+      VRQPGenerator_->CurrentTime(time+TimeBuffer_);
       VRQPGenerator_->CoM(CoM_());
 
 
@@ -443,18 +443,18 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
 
       if(CurrentSupport.StepsLeft == 0)
-        m_EndingPhase = true;
+        EndingPhase_ = true;
       // Specify that we are in the ending phase.
-      if (m_EndingPhase==false)
+      if (EndingPhase_==false)
         {
           // This should be done only during the transition EndingPhase=false -> EndingPhase=true
-          m_TimeToStopOnLineMode = m_UpperTimeLimitToUpdate+QP_T_ * QP_N_;
+          TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
           // Set the ZMP reference as very important.
           // It suppose to work because Gamma appears only during the non-constant
         }
 
 
-      m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+QP_T_;
+      UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_+QP_T_;
 
       // Compute CPU consumption time.
       gettimeofday(&end,0);

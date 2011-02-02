@@ -1,5 +1,5 @@
 /*
- * Copyright 2010,
+ * Copyright 2011,
  *
  * Medhi    Benallegue
  * Andrei   Herdt
@@ -34,9 +34,9 @@
 namespace PatternGeneratorJRL
 {
 
-  /*! \brief Final optimization problem.
-    This object stores and solves a quadratic problem with linear constraints.
-  */
+  /// \brief Final optimization problem.
+  /// Store and solve a quadratic problem with linear constraints.
+  ///
   struct QPProblem_s
   {
 
@@ -118,20 +118,20 @@ namespace PatternGeneratorJRL
     /// \brief Set the number of optimization parameters.
     ///
     /// \param nb_variables
-    void setNbVariables( int nb_variables )
-    { nbvariables_ = nb_variables;};
+    void set_nb_variabless( int NbVariables )
+    { NbVariables_ = NbVariables;};
 
     /// \brief Set the number of equality constraints.
     ///
     /// \param nb_eq_constraints
-    inline void setNbEqConstraints( int nb_eq_constraints )
-    { nbeqconstraints_ = nb_eq_constraints;};
+    inline void set_nb_eq_constraints( int NbEqConstraints )
+    { NbEqConstraints_ = NbEqConstraints;};
 
     /// \brief Set the total number of constraints.
     ///
     /// \param nb_constraints
-    inline void setNbConstraints( int nb_constraints )
-    { nbconstraints_ = nb_constraints;};
+    inline void set_nb_constraints( int NbConstraints )
+    { NbConstraints_ = NbConstraints;};
 
     
     /// \brief Reallocate array
@@ -139,24 +139,8 @@ namespace PatternGeneratorJRL
     /// \param[in] array
     /// \param[in] old_size
     /// \param[in] new_size
-    template <class type>
-    int resize( type * &array, int old_size, int new_size )
-    {
-      try
-      {
-        type * NewArray = new type[new_size];
-        initialize(NewArray, new_size, (type)0);
-        for(int i = 0; i < old_size; i++)
-          {
-            NewArray[i] = array[i];
-          }
-        if (array!=0)
-          delete [] array;
-        array = NewArray;
-      }
-      catch (std::bad_alloc& ba)
-      {std::cerr << "bad_alloc caught: " << ba.what() << std::endl; }
-      return 0;}
+    template <typename type>
+    int resize( type * &array, int old_size, int new_size );
 
 
     /// \brief Add a matrix to the final optimization problem in array form
@@ -230,7 +214,7 @@ namespace PatternGeneratorJRL
   private:
 
     /// \brief Handle matrices/vectors in array form
-    template<class type>
+    template<typename type>
     struct array_s
     {
       type * array_;
@@ -256,9 +240,9 @@ namespace PatternGeneratorJRL
         try {
           type * NewArray = new type[nrows*ncols];
           fill(NewArray, nrows*ncols, (type)0);
-            for(int i = 0; i < nrows; i++)
-              for(int j = 0; j < ncols; j++)
-                NewArray[i+nrows*j] = array_[i+nrows_*j];
+          for(int i = 0; i < nrows; i++)
+            for(int j = 0; j < ncols; j++)
+              NewArray[i+nrows*j] = array_[i+nrows_*j];
           if (final_array!=0)
             delete [] final_array;
 
@@ -314,35 +298,23 @@ namespace PatternGeneratorJRL
 
     /// \name ql-parameters
     /// \{
-    int m, me, mmax, n, nmax, mnn;
+    int m_, me_, mmax_, n_, nmax_, mnn_;
     array_s<double> Q_, Q_dense_, D_, DU_, DU_dense_, DS_, XL_, XU_, X_, U_, war_;
     array_s<int> iwar_;
-    int iout, ifail, iprint, lwar, liwar;
-    double Eps;
+    int iout_, ifail_, iprint_, lwar_, liwar_;
+    double Eps_;
     /// \}
 
     /// \brief Number of optimization parameters
-    int nbvariables_;
+    int NbVariables_;
 
     /// \brief Total number of constraints
-    int nbconstraints_;
+    int NbConstraints_;
 
     /// \brief Number of equality constraints
-    int nbeqconstraints_;
-
-    /// \brief Reallocation margins
-    int m_ReallocMarginVar, m_ReallocMarginConstr;
-
-//    /// \brief Primal Least square Distance Problem solver
-//    Optimization::Solver::PLDPSolverHerdt * m_PLDPSolverHerdt;
-
-    int scale_factor_;
-
-    /// \brief Maximal number of variables
-    int max_var_;
-    /// \brief Maximal number of constraints
-    int max_constr_;
+    int NbEqConstraints_;
   };
   typedef struct QPProblem_s QPProblem;
 }
+#include <ZMPRefTrajectoryGeneration/qp-problem.hxx>
 #endif /* _QP_PROBLEM_H_ */
