@@ -80,8 +80,8 @@ RelativeFeetEqualities::setVertice(RelativeStepPosition& StepOut,
 	double c_a = cos(Orientation);
 	double s_a = sin(Orientation);
 
-	StepOut.x = ( (StepIn.x+zero)*c_a - StepIn.y*s_a );
-	StepOut.y = ( (StepIn.x+zero)*s_a + StepIn.y*c_a );
+	StepOut.x = ( StepIn.x*c_a - (StepIn.y+zero)*s_a );
+	StepOut.y = ( StepIn.x*s_a + (StepIn.y+zero)*c_a );
 	StepOut.theta = StepIn.theta+Orientation;
 	return 0;
 
