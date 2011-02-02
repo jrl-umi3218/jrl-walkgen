@@ -97,7 +97,7 @@ namespace PatternGeneratorJRL
    /// \param[out] X Solution
    /// \param[out] Y Solution
    /// \param[in] CurrentSupport Support state
-   virtual void check_solution(double X, double Y,
+   virtual void check_solution(double & X, double & Y,
        const support_state_t & CurrentSupport, double CurrentTime);
 
 
