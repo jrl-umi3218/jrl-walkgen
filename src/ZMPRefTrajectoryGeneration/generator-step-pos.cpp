@@ -165,7 +165,7 @@ GeneratorStepPos::build_equalities_step_pos(linear_inequality_t & equalities,
 
 	int nb_step = 0;
 	RelativeStepPosition rsp;
-	for( int i=1;i<=m_N;i++ )
+	for( int i=1;i<=N_;i++ )
 	{
 
 		const support_state_t & PrwSupport = SupportStates_deq[i];
@@ -220,19 +220,19 @@ GeneratorStepPos::build_constraints_step_pos(const linear_inequality_t & eqSteps
 
   // -D*V_f
   compute_term(MM,-1.0,eqSteps.x.D,State.V_f);
-  Pb.add_term(MM,QPProblem::MATRIX_DU,4*m_N,2*m_N);
+  Pb.add_term(MM,QPProblem::MATRIX_DU,4*N_,2*N_);
   compute_term(MM,-1.0,eqSteps.y.D,State.V_f);
-  Pb.add_term(MM,QPProblem::MATRIX_DU,4*m_N,2*m_N+NbStepsPreviewed);
+  Pb.add_term(MM,QPProblem::MATRIX_DU,4*N_,2*N_+NbStepsPreviewed);
 
   // +dc
-  Pb.add_term(eqSteps.dc,QPProblem::VECTOR_DS,4*m_N);
+  Pb.add_term(eqSteps.dc,QPProblem::VECTOR_DS,4*N_);
 
   // +D*Vc_f*FP
   boost_ublas::vector<double> MV(NbConstraints*NbStepsPreviewed,false);
   compute_term(MV, State.SupportState.x, eqSteps.x.D, State.Vc_f);
-  Pb.add_term(MV,QPProblem::VECTOR_DS,4*m_N);
+  Pb.add_term(MV,QPProblem::VECTOR_DS,4*N_);
   compute_term(MV, State.SupportState.y, eqSteps.y.D, State.Vc_f);
-  Pb.add_term(MV,QPProblem::VECTOR_DS,4*m_N);
+  Pb.add_term(MV,QPProblem::VECTOR_DS,4*N_);
 
 }
 
