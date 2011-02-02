@@ -35,11 +35,16 @@ namespace PatternGeneratorJRL
   /// \brief Finite state machine to determine the support parameters.
   class  SupportFSM
   {
+  public:
+	//Epsilon to detect zero velocity reference
+	static const double eps;
 
     //
     // Public methods:
     //
   public:
+
+	    
     /// \brief Constructor
     SupportFSM();
 
@@ -77,6 +82,8 @@ namespace PatternGeneratorJRL
     inline void SamplingPeriod( const double T )
     { T_ = T; };
     /// \}
+	
+	
  
     //
     // Private members:

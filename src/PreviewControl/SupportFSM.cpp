@@ -32,6 +32,8 @@
 using namespace PatternGeneratorJRL;
 using namespace std;
 
+const double SupportFSM::eps= 1e-6;
+
 SupportFSM::SupportFSM()
 {
 
@@ -46,7 +48,7 @@ void SupportFSM::set_support_state(const double &Time, const int &pi,
 				 support_state_t & Support, const reference_t & Ref) const
 {
 
-  double eps = 1e-6;
+  
 
   Support.StateChanged = false;
 
