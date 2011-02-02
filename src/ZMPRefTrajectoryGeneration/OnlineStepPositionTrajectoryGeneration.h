@@ -119,7 +119,7 @@ namespace PatternGeneratorJRL
 		
 	protected:
 
-		RelativeStepPositionQueue stepPos_;
+		
 		//bool removeQueueHead;
 
 		bool velocityMode_;
