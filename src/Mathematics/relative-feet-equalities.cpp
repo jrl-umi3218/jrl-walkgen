@@ -44,7 +44,7 @@ RelativeFeetEqualities::RelativeFeetEqualities( )
  
 {
 
-	stepWidth_ = 0.19;//meters	
+	stepWidth_ = 0.195;//meters	
 
 	
 }
@@ -74,7 +74,7 @@ RelativeFeetEqualities::setVertice(RelativeStepPosition& StepOut,
 		parity=-1;
 	}
 
-	double zero=parity*stepWidth_/2;
+	double zero=parity*stepWidth_;
 
 	// rotate(Orientation);
 	double c_a = cos(Orientation);
