@@ -47,14 +47,19 @@ ZMPVelocityReferencedQP(lSPM,DataFile,aHS)/*m_fCALS_FP(lSPM,aHS,m_ConstraintOnX,
 	yawCache_=0;
 	
 	
-	VRQPGeneratorCopy_=new GeneratorStepPos(*VRQPGenerator_);
-
+	
 	
 	//Pointer exchange
 	if (VRQPGenerator_!=0x0)
 	{
+		VRQPGeneratorCopy_=new GeneratorStepPos(*VRQPGenerator_);
 		delete VRQPGenerator_;
 		VRQPGenerator_=VRQPGeneratorCopy_;
+	}
+	else
+	{
+		std::string s="Error creating OnlineStepPositionTrajectoryGeneration VRQPGenerator_ is null";
+		throw std::runtime_error(s);
 	}
 
 	
