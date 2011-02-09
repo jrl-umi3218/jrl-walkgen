@@ -79,7 +79,7 @@ OrientationsPreview::preview_orientations(double Time,
   // In case of double support the next support angle is fixed
   // ds -> FirstFootPreviewed == 0
   // ss -> FirstFootPreviewed == 1
-  double FirstFootPreviewed = 0;
+  unsigned FirstFootPreviewed = 0;
 
   m_signRotVelTrunk = (TrunkStateT_.yaw[1] < 0.0)?-1.0:1.0;
 
