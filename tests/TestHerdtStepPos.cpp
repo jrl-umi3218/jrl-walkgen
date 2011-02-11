@@ -57,6 +57,20 @@ protected:
   {
     CommonInitialization(aPGI);
 
+	{
+
+		istringstream strm2(":setstepspositions   \
+							  0.1	0.0	 0.0  \
+							  0.2	0.0	 0.0  \
+							 -0.2	0.0	 0.0  \
+							 -0.1	0.0	 0.0  \
+							  0.2	0.0	 0.0  \
+							  0.2	0.0	 0.0  \
+							  0.2	0.0	 0.0  \
+							  0.3	0.0	 0.0  \
+							  0.35	0.0	 0.0");
+		aPGI.ParseCmd(strm2);
+	}
     {
       istringstream strm2(":SetAlgoForZmpTrajectory HerdtStepPos");
       aPGI.ParseCmd(strm2);
