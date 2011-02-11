@@ -51,11 +51,13 @@ void GeneratorStepPos::Initialization()
 {
 	velocityMode_=true;
 
-	// Register method to handle
-	string aMethodName[2] =
-	{":setstepswidth",":setstepspositions"};
+	const int methodsNumber=3;
 
-	for(int i=0;i<2;i++)
+	// Register method to handle
+	string aMethodName[methodsNumber] =
+	{":setstepswidth",":setstepspositions",":addstepposition"};
+
+	for(int i=0;i<methodsNumber;i++)
 	{
 		if (!RegisterMethod(aMethodName[i]))
 		{
@@ -122,12 +124,11 @@ GeneratorStepPos::build_constraints( QPProblem & Pb,
 		const IntermedQPMat::dynamics_t & CoP = Matrices_.Dynamics(IntermedQPMat::COP);
 		build_constraints_cop(IneqCoP, CoP, State, NbStepsPreviewed, Pb);
 
-		//Feet constraints
+		////Feet constraints
 		//linear_inequality_t & IneqFeet = Matrices_.Inequalities(IntermedQPMat::INEQ_FEET);
 		//build_inequalities_feet(IneqFeet, RFI,
 		//	AbsoluteLeftFootPositions, AbsoluteRightFootPositions,
 		//	SupportStates_deq, PreviewedSupportAngles);
-
 		//build_constraints_feet(IneqFeet, State, NbStepsPreviewed, Pb);
 	}
 }
@@ -184,20 +185,20 @@ GeneratorStepPos::build_equalities_step_pos(linear_inequality_t & equalities,
 			rfe_.setVertice(rsp,stepPos_[CurrentSupport.StepNumber],PrwSupport,SupportAngle);
 
 			equalities.x.D.push_back((PrwSupport.StepNumber-1)*4, (PrwSupport.StepNumber-1), 1);
-			//equalities.y.D.push_back((PrwSupport.StepNumber-1)*4, (PrwSupport.StepNumber-1), 0);
+			equalities.y.D.push_back((PrwSupport.StepNumber-1)*4, (PrwSupport.StepNumber-1), 0);
 			equalities.dc((PrwSupport.StepNumber-1)*4) =rsp.x ;
 			
 			equalities.x.D.push_back((PrwSupport.StepNumber-1)*4+1, (PrwSupport.StepNumber-1), -1);
-			//equalities.y.D.push_back((PrwSupport.StepNumber-1)*4+1, (PrwSupport.StepNumber-1), 0);
-			equalities.dc((PrwSupport.StepNumber-1)*4+1) =-(rsp.x-0.000001) ;
+			equalities.y.D.push_back((PrwSupport.StepNumber-1)*4+1, (PrwSupport.StepNumber-1), 0);
+			equalities.dc((PrwSupport.StepNumber-1)*4+1) =-(rsp.x-0.00001) ;
 
-			//equalities.x.D.push_back((PrwSupport.StepNumber-1)*4+2, (PrwSupport.StepNumber-1), 0);
+			equalities.x.D.push_back((PrwSupport.StepNumber-1)*4+2, (PrwSupport.StepNumber-1), 0);
 			equalities.y.D.push_back((PrwSupport.StepNumber-1)*4+2, (PrwSupport.StepNumber-1), 1);
 			equalities.dc((PrwSupport.StepNumber-1)*4+2) =rsp.y ;
 
-			//equalities.x.D.push_back((PrwSupport.StepNumber-1)*4+3, (PrwSupport.StepNumber-1), 0);
+			equalities.x.D.push_back((PrwSupport.StepNumber-1)*4+3, (PrwSupport.StepNumber-1), 0);
 			equalities.y.D.push_back((PrwSupport.StepNumber-1)*4+3, (PrwSupport.StepNumber-1), -1);
-			equalities.dc((PrwSupport.StepNumber-1)*4+3) =-(rsp.y-0.000001) ;
+			equalities.dc((PrwSupport.StepNumber-1)*4+3) =-(rsp.y-0.00001) ;
 			
 			nb_step++;
 		}
@@ -302,25 +303,33 @@ GeneratorStepPos::CallMethod( std::string &Method, std::istringstream &Args )
 	else if (Method==":setstepspositions") 
 	{ 
 		RelativeStepPosition p;
+		RelativeStepPositionQueue stepPos;
+
+		while (!Args.eof())
+		{
+			Args>>p.x;
+			Args>>p.y;
+			Args>>p.theta;
+			stepPos.push_back(p);
+
+		}
+
+		SetStepsPositions(stepPos);
+
+
+
+	}
+	else if (Method==":addstepposition") 
+	{ 
+		RelativeStepPosition p;
 		Args>>p.x;
 		Args>>p.y;
 		Args>>p.theta;
 
 		if (!Args.eof())
 		{
-			RelativeStepPositionQueue stepPos;
-
-			do{
-				stepPos.push_back(p);
-				Args>>p.x;
-				Args>>p.y;
-				Args>>p.theta;
-			}while (!Args.eof());
-
-			SetStepsPositions(stepPos);
+			AddStepPosition(p);
 		}
-
-
 	}
 	else
 	{
