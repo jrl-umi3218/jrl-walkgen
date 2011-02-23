@@ -117,6 +117,7 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_RESIZE(m_PreviousVelocity, m_HDR->numberDof());
       MAL_VECTOR_RESIZE(m_PreviousAcceleration, m_HDR->numberDof());
 
+      m_NbOfStoredVariables = 0;
     }
 
     TestObject::~TestObject()
@@ -202,38 +203,39 @@ namespace PatternGeneratorJRL
 	  aof.open(aFileName.c_str(),ofstream::app);
 	  aof.precision(8);
 	  aof.setf(ios::scientific, ios::floatfield);
-	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "
-	      << filterprecision(m_OneStep.ZMPTarget(0) ) << " "
-	      << filterprecision(m_OneStep.ZMPTarget(1) ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.theta  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.y ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.z ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.theta ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "
+	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "                            // 1
+	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
+	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
+	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
+	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "                    // 5
+	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
+	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
+	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
+	      << filterprecision(m_OneStep.ZMPTarget(0) ) << " "                            // 9
+	      << filterprecision(m_OneStep.ZMPTarget(1) ) << " "                            // 10
+	      << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "                     // 11
+	      << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "                     // 12
+	      << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "                     // 13
+	      << filterprecision(m_OneStep.LeftFootPosition.theta  ) << " "                 // 14
+	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 15
+	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 16
+	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 17
+	      << filterprecision(m_OneStep.RightFootPosition.y ) << " "                     // 18
+	      << filterprecision(m_OneStep.RightFootPosition.z ) << " "                     // 19
+	      << filterprecision(m_OneStep.RightFootPosition.theta ) << " "                 // 20
+	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 21
+	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 22
 	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
 				 m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
-				 +m_CurrentConfiguration(0) ) << " "
+				 +m_CurrentConfiguration(0) ) << " "                        // 23
 	      << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
 				 m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
-				 +m_CurrentConfiguration(1) ) << " "
-	      << filterprecision(m_CurrentConfiguration(0) ) << " "
-	      << filterprecision(m_CurrentConfiguration(1) ) << " "
+				 +m_CurrentConfiguration(1) ) << " "                        // 24
+	      << filterprecision(m_CurrentConfiguration(0) ) << " "                         // 25
+	      << filterprecision(m_CurrentConfiguration(1) ) << " "                         // 26
 	      << endl;
 	  aof.close();
+	  m_NbOfStoredVariables = 26;
         }
     }
 
@@ -256,27 +258,33 @@ namespace PatternGeneratorJRL
 	  arif.open(aFileName.c_str(),ifstream::in);
 
 	  // Time
-	  double LocalInput[70], ReferenceInput[70];
-
+	  vector<double> LocalInput;
+	  LocalInput.resize(m_NbOfStoredVariables); 
+	  vector<double> ReferenceInput;
+	  ReferenceInput.resize(m_NbOfStoredVariables);
+	  unsigned int LineNumber=0;
 	  while ((!alif.eof()) ||
 		 (!arif.eof()))
 	    {
-	      for (unsigned int i=0;i<70;i++)
+	      for (unsigned int i=0;i<m_NbOfStoredVariables;i++)
 		alif >> LocalInput[i];
 
-	      for (unsigned int i=0;i<70;i++)
+	      for (unsigned int i=0;i<m_NbOfStoredVariables;i++)
 		arif >> ReferenceInput[i];
 
-	      for (unsigned int i=0;i<70;i++)
+	      for (unsigned int i=0;i<m_NbOfStoredVariables;i++)
 		{
 		  if  (fabs(LocalInput[i]-
 			    ReferenceInput[i])>=1e-5)
 		    {
-		      cout<<"... failed with: "<< "LocalInput["<<i<<"]: "<<LocalInput[i]<<
-			" ReferenceInput["<<i<<"]: "<<ReferenceInput[i]<<endl;
+		      cout << " LineNumber: " << LineNumber
+			  << " ... failed with: "
+			  << "LocalInput["<<i<<"]: "<<LocalInput[i]
+			  << " ReferenceInput["<<i<<"]: "<<ReferenceInput[i]<<endl;
 		      return false;
 		    }
 		}
+	      LineNumber++;
 	    }
 
 	  alif.close();

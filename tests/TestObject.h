@@ -162,6 +162,9 @@ namespace PatternGeneratorJRL
 
       /*! \brief Patten Generator Interface. */
       int m_PGIInterface;
+
+      /*! \brief Nb of variables store into the debug files.*/
+      unsigned int m_NbOfStoredVariables;
     };
 
     
