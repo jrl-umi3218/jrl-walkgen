@@ -163,7 +163,7 @@ namespace PatternGeneratorJRL {
       unsigned int lNbActuatedJoints = actuatedJoints.size();
   
       double * dInitPos = new double[lNbActuatedJoints];
-      for(int i=0;i<lNbActuatedJoints;i++)
+      for(unsigned int i=0;i<lNbActuatedJoints;i++)
         dInitPos[i] = 0.0;
 
       ifstream aif;
