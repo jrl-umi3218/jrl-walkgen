@@ -163,7 +163,7 @@ FootConstraintsAsLinearSystemForVelRef::setVertices( convex_hull_t & ConvexHull,
 						     int constraints_type)
 {
 
-  edges_s * conv_hulls;
+  edges_s * conv_hulls=0;
   switch(constraints_type)
     {
     case ZMP_CONSTRAINTS:

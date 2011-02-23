@@ -57,8 +57,6 @@ namespace PatternGeneratorJRL
     ~GeneratorVelRef();
     /// \}
 
-//    /// \brief Call method to handle the plugins (SimplePlugin interface).
-//    void CallMethod(std::string &Method, std::istringstream &strm);
 
     /// \brief Set the weights on the objective terms
     ///
@@ -67,10 +65,6 @@ namespace PatternGeneratorJRL
     /// \param[in] objective
     void setPonderation( IntermedQPMat & Matrices, double weight, int objective );
 
-    /// \brief Set the velocity reference from string
-    ///
-    /// \param[in] strm velocity reference string
-    void setReference(std::istringstream &strm);
 
     /// \brief Preview support state for the whole preview period
     ///
