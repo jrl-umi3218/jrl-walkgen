@@ -1,0 +1,5 @@
+<map id="G" name="G">
+<area shape="rect" href="$a00011.html" title="PatternGeneratorJRL::IntermedQPMat::dynamics_s" alt="" coords="5,116,347,143"/>
+<area shape="rect" href="$a00023.html" title="PatternGeneratorJRL::IntermedQPMat::objective_variant_s" alt="" coords="420,161,807,188"/>
+<area shape="rect" href="$a00030.html" title="PatternGeneratorJRL::IntermedQPMat::state_variant_s" alt="" coords="432,225,795,252"/>
+</map>

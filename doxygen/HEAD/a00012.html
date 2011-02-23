@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: patterngeneratorinterface.hh File Reference</title>
+<title>jrl-walkgen: PatternGeneratorJRL::FootAbsolutePosition_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -10,44 +10,235 @@
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
-      <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="globals.html"><span>File&nbsp;Members</span></a></li>
+      <li><a href="annotated.html"><span>Class&nbsp;List</span></a></li>
+      <li><a href="classes.html"><span>Class&nbsp;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&nbsp;Hierarchy</span></a></li>
+      <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
+  </div>
+  <div class="navpath"><a class="el" href="a00098.html">PatternGeneratorJRL</a>::<a class="el" href="a00012.html">FootAbsolutePosition_t</a>
   </div>
 </div>
 <div class="contents">
-<h1>patterngeneratorinterface.hh File Reference</h1><code>#include &lt;deque&gt;</code><br/>
-<code>#include &lt;<a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="a00017.html">abstract-robot-dynamics/humanoid-dynamic-robot.hh</a>&gt;</code><br/>
-<code>#include &lt;<a class="el" href="a00012.html">jrl/walkgen/pgtypes.hh</a>&gt;</code><br/>
-<code>#include &lt;<a class="elRef" doxygen="jrl-mal.doxytag:" href="a00018.html">jrl/mal/matrixabstractlayer.hh</a>&gt;</code><br/>
-<div class="dynheader">
-Include dependency graph for patterngeneratorinterface.hh:</div>
-<div class="dynsection">
-<div class="center"><img src="a00016.png" border="0" usemap="#patterngeneratorinterface_8hh_map" alt=""/></div>
-<map name="patterngeneratorinterface_8hh_map" id="patterngeneratorinterface_8hh">
-<area shape="rect" doxygen="abstract-robot-dynamics.doxytag:" href="a00017.html" title="abstract&#45;robot&#45;dynamics/humanoid&#45;dynamic&#45;robot.hh" alt="" coords="91,84,456,111"/><area shape="rect" doxygen="jrl-mal.doxytag:" href="a00018.html" title="jrl/mal/matrixabstractlayer.hh" alt="" coords="504,84,712,111"/><area shape="rect" doxygen="abstract-robot-dynamics.doxytag:" href="a00015.html" title="abstract&#45;robot&#45;dynamics/fwd.hh" alt="" coords="100,316,324,343"/><area shape="rect" doxygen="abstract-robot-dynamics.doxytag:" href="a00019.html" title="abstract&#45;robot&#45;dynamics/joint.hh" alt="" coords="195,161,424,188"/><area shape="rect" doxygen="abstract-robot-dynamics.doxytag:" href="a00020.html" title="abstract&#45;robot&#45;dynamics/rigid&#45;acceleration.hh" alt="" coords="153,239,465,265"/><area shape="rect" doxygen="abstract-robot-dynamics.doxytag:" href="a00021.html" title="abstract&#45;robot&#45;dynamics/rigid&#45;velocity.hh" alt="" coords="489,239,769,265"/><area shape="rect" doxygen="abstract-robot-dynamics.doxytag:" href="a00012.html" title="abstract&#45;robot&#45;dynamics/body.hh" alt="" coords="793,239,1025,265"/><area shape="rect" doxygen="jrl-mal.doxytag:" href="a00019.html" title="jrl/mal/matrixabstractlayerboost.hh" alt="" coords="485,161,731,188"/></map>
-</div>
-<div class="dynheader">
-This graph shows which files directly or indirectly include this file:</div>
-<div class="dynsection">
-<div class="center"><img src="a00017.png" border="0" usemap="#patterngeneratorinterface_8hhdep_map" alt=""/></div>
-</div>
+<h1>PatternGeneratorJRL::FootAbsolutePosition_t Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::FootAbsolutePosition_t" -->
+<p>Structure to store the absolute foot position.  
+<a href="#_details">More...</a></p>
+
+<p><code>#include &lt;jrl/walkgen/pgtypes.hh&gt;</code></p>
+
+<p><a href="a00221.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
-<tr><td colspan="2"><h2>Classes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html">PatternGeneratorJRL::PatternGeneratorInterface</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">This class is the interface between the Pattern Generator and the external world.  <a href="a00007.html#_details">More...</a><br/></td></tr>
-<tr><td colspan="2"><h2>Namespaces</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">namespace &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00014.html">PatternGeneratorJRL</a></td></tr>
-<tr><td colspan="2"><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">WALK_GEN_JRL_EXPORT <br class="typebreak"/>
-PatternGeneratorInterface *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00014.html#a25af9873ebaa29e7e641aa98d33b2a62">PatternGeneratorJRL::patternGeneratorInterfaceFactory</a> (<a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="a00006.html">CjrlHumanoidDynamicRobot</a> *aHDR)</td></tr>
+<tr><td colspan="2"><h2>Public Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#a7b1ce5e58369b9098d97e9afac0d5d73">x</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#a9e5fd3aef356fcb019ef455173b397ac">y</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#a650dd392699698e9ae1589b295f10ad0">z</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#af59b8dfc3e2b1eb5ab0f5d31f086fee4">theta</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#a3ad1d03958d0c9847bd3bc5931de10db">omega</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#ad17ffddf84d6084d5a02a1a2f3711fe8">omega2</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#a23e54359e89009f83f8cf5004442f09e">dx</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#a54fc6913e1ee37a83f66c84cc553ffdb">dy</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#ab14aaa8f8468bdae0cbfcab3d684bf47">dz</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#ac2fd64b58df7010f9b41fa47e60ac64e">dtheta</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#a5e36f98109f4e7181298f13f7cc0d1c6">domega</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#a120e32ab441f514419c8e33c9ee54527">domega2</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#a27e4395cfd6c644f5bfa0d60fa650b33">time</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html#a2f1a72e87a2f181f00b007556066e44d">stepType</a></td></tr>
 </table>
+<hr/><a name="_details"></a><h2>Detailed Description</h2>
+<p>Structure to store the absolute foot position. </p>
+<hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="a5e36f98109f4e7181298f13f7cc0d1c6"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::domega" ref="a5e36f98109f4e7181298f13f7cc0d1c6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#a5e36f98109f4e7181298f13f7cc0d1c6">PatternGeneratorJRL::FootAbsolutePosition_t::domega</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a120e32ab441f514419c8e33c9ee54527"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::domega2" ref="a120e32ab441f514419c8e33c9ee54527" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#a120e32ab441f514419c8e33c9ee54527">PatternGeneratorJRL::FootAbsolutePosition_t::domega2</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac2fd64b58df7010f9b41fa47e60ac64e"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::dtheta" ref="ac2fd64b58df7010f9b41fa47e60ac64e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#ac2fd64b58df7010f9b41fa47e60ac64e">PatternGeneratorJRL::FootAbsolutePosition_t::dtheta</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a23e54359e89009f83f8cf5004442f09e"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::dx" ref="a23e54359e89009f83f8cf5004442f09e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#a23e54359e89009f83f8cf5004442f09e">PatternGeneratorJRL::FootAbsolutePosition_t::dx</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Speed of the foot. </p>
+
+</div>
+</div>
+<a class="anchor" id="a54fc6913e1ee37a83f66c84cc553ffdb"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::dy" ref="a54fc6913e1ee37a83f66c84cc553ffdb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#a54fc6913e1ee37a83f66c84cc553ffdb">PatternGeneratorJRL::FootAbsolutePosition_t::dy</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab14aaa8f8468bdae0cbfcab3d684bf47"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::dz" ref="ab14aaa8f8468bdae0cbfcab3d684bf47" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#ab14aaa8f8468bdae0cbfcab3d684bf47">PatternGeneratorJRL::FootAbsolutePosition_t::dz</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3ad1d03958d0c9847bd3bc5931de10db"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::omega" ref="a3ad1d03958d0c9847bd3bc5931de10db" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#a3ad1d03958d0c9847bd3bc5931de10db">PatternGeneratorJRL::FootAbsolutePosition_t::omega</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad17ffddf84d6084d5a02a1a2f3711fe8"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::omega2" ref="ad17ffddf84d6084d5a02a1a2f3711fe8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#ad17ffddf84d6084d5a02a1a2f3711fe8">PatternGeneratorJRL::FootAbsolutePosition_t::omega2</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2f1a72e87a2f181f00b007556066e44d"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::stepType" ref="a2f1a72e87a2f181f00b007556066e44d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="a00012.html#a2f1a72e87a2f181f00b007556066e44d">PatternGeneratorJRL::FootAbsolutePosition_t::stepType</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>1:normal walking 2:one step before opbstacle 3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle +10 if double support phase (-1) if support foot </p>
+
+</div>
+</div>
+<a class="anchor" id="af59b8dfc3e2b1eb5ab0f5d31f086fee4"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::theta" ref="af59b8dfc3e2b1eb5ab0f5d31f086fee4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#af59b8dfc3e2b1eb5ab0f5d31f086fee4">PatternGeneratorJRL::FootAbsolutePosition_t::theta</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a27e4395cfd6c644f5bfa0d60fa650b33"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::time" ref="a27e4395cfd6c644f5bfa0d60fa650b33" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#a27e4395cfd6c644f5bfa0d60fa650b33">PatternGeneratorJRL::FootAbsolutePosition_t::time</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Time at which this position should be reached. </p>
+
+</div>
+</div>
+<a class="anchor" id="a7b1ce5e58369b9098d97e9afac0d5d73"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::x" ref="a7b1ce5e58369b9098d97e9afac0d5d73" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#a7b1ce5e58369b9098d97e9afac0d5d73">PatternGeneratorJRL::FootAbsolutePosition_t::x</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>px, py in meters, theta in DEGREES. </p>
+
+</div>
+</div>
+<a class="anchor" id="a9e5fd3aef356fcb019ef455173b397ac"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::y" ref="a9e5fd3aef356fcb019ef455173b397ac" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#a9e5fd3aef356fcb019ef455173b397ac">PatternGeneratorJRL::FootAbsolutePosition_t::y</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a650dd392699698e9ae1589b295f10ad0"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition_t::z" ref="a650dd392699698e9ae1589b295f10ad0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00012.html#a650dd392699698e9ae1589b295f10ad0">PatternGeneratorJRL::FootAbsolutePosition_t::z</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
 </div>
 </body>
 </html>

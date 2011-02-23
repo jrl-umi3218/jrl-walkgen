@@ -1,0 +1,13 @@
+<map id="G" name="G">
+<area shape="rect" href="$a00073.html" title="PLDPHerdt.cpp" alt="" coords="5,84,123,111"/>
+<area shape="rect" href="$a00074.html" title="This file implements the optimized QP solver proposed by Dimitar 2009." alt="" coords="147,84,267,111"/>
+<area shape="rect" href="$a00041.html" title="ComAndFootRealizationByGeometry.cpp" alt="" coords="291,84,568,111"/>
+<area shape="rect" href="$a00053.html" title="generator&#45;vel&#45;ref.cpp" alt="" coords="592,84,747,111"/>
+<area shape="rect" href="$a00064.html" title="OnlineStepPositionTrajectoryGeneration.cpp" alt="" coords="771,84,1069,111"/>
+<area shape="rect" href="$a00080.html" title="qp&#45;problem.cpp" alt="" coords="1093,84,1216,111"/>
+<area shape="rect" href="$a00090.html" title="ZMPConstrainedQPFastFormulation.cpp" alt="" coords="1240,84,1515,111"/>
+<area shape="rect" href="$a00091.html" title="ZMPDiscretization.cpp" alt="" coords="1539,84,1701,111"/>
+<area shape="rect" href="$a00093.html" title="ZMPQPWithConstraint.cpp" alt="" coords="1725,84,1912,111"/>
+<area shape="rect" href="$a00095.html" title="ZMPVelocityReferencedQP.cpp" alt="" coords="1936,84,2149,111"/>
+<area shape="rect" href="$a00096.html" title="ZMPVelocityReferencedQPDebug.cpp" alt="" coords="2173,84,2429,111"/>
+</map>

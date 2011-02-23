@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: PatternGeneratorJRL::ZMPPosition_s Struct Reference</title>
+<title>jrl-walkgen: PatternGeneratorJRL::IntermedQPMat::dynamics_s Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -18,107 +18,89 @@
     <ul>
       <li><a href="annotated.html"><span>Class&nbsp;List</span></a></li>
       <li><a href="classes.html"><span>Class&nbsp;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&nbsp;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
   </div>
-  <div class="navpath"><a class="el" href="a00014.html">PatternGeneratorJRL</a>::<a class="el" href="a00011.html">ZMPPosition_s</a>
+  <div class="navpath"><a class="el" href="a00098.html">PatternGeneratorJRL</a>::<a class="el" href="a00017.html">IntermedQPMat</a>::<a class="el" href="a00011.html">dynamics_s</a>
   </div>
 </div>
 <div class="contents">
-<h1>PatternGeneratorJRL::ZMPPosition_s Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::ZMPPosition_s" -->
-<p>Structure to store each of the ZMP value, with a given direction at a certain time.  
-<a href="#_details">More...</a></p>
+<h1>PatternGeneratorJRL::IntermedQPMat::dynamics_s Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::IntermedQPMat::dynamics_s" -->
+<p><code>#include &lt;/home/buildbot/devel-src/tools/pkg-dev-mng/Testing/Buildbot/slaves/jrlserver/jrlserverubuntu/build-jrl-walkgen-jrlmt-master/pkgsrc/src/Mathematics/intermediate-qp-matrices.hh&gt;</code></p>
 
-<p><code>#include &lt;jrl/walkgen/pgtypes.hh&gt;</code></p>
-
-<p><a href="a00023.html">List of all members.</a></p>
+<p><a href="a00228.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td colspan="2"><h2>Public Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00011.html#ae18fe62e07d2b5e10fcb891eebd4e4df">px</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00011.html#a88976213ca424ea4b08bf5c32d843924">py</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00011.html#a23f6b83344cea9e26694e1f834d52b77">pz</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00011.html#acc9f3b7d21056251d94dc0e0a9b1459b">theta</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00011.html#a39f2d78ad89097d35e6c927923839ed6">time</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00011.html#ac7a7d427ebb8ab6b97ffeb018d661392">stepType</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::matrix&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00011.html#a445bfecd099f0b9779673d1952e25d4c">U</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Matrix of the quadratic part.  <a href="#a445bfecd099f0b9779673d1952e25d4c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::matrix&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00011.html#a73e77b4297ac0ac6d633d9edfad61ba4">UT</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::matrix&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00011.html#a42b0aaa2f27d470d690234902d301394">S</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Matrix of the linear part.  <a href="#a42b0aaa2f27d470d690234902d301394"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00011.html#a6562f81558cf0bf57f524773180ebe2e">type</a></td></tr>
 </table>
-<hr/><a name="_details"></a><h2>Detailed Description</h2>
-<p>Structure to store each of the ZMP value, with a given direction at a certain time. </p>
 <hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="ae18fe62e07d2b5e10fcb891eebd4e4df"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::px" ref="ae18fe62e07d2b5e10fcb891eebd4e4df" args="" -->
+<a class="anchor" id="a42b0aaa2f27d470d690234902d301394"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::dynamics_s::S" ref="a42b0aaa2f27d470d690234902d301394" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="a00011.html#ae18fe62e07d2b5e10fcb891eebd4e4df">PatternGeneratorJRL::ZMPPosition_s::px</a></td>
+          <td class="memname">boost_ublas::matrix&lt;double&gt; <a class="el" href="a00011.html#a42b0aaa2f27d470d690234902d301394">PatternGeneratorJRL::IntermedQPMat::dynamics_s::S</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Matrix of the linear part. </p>
+
+<p>Referenced by <a class="el" href="a00053_source.html#l00386">PatternGeneratorJRL::GeneratorVelRef::buildConstraintsCoP()</a>, and <a class="el" href="a00058_source.html#l00223">PatternGeneratorJRL::IntermedQPMat::objective_variant_s::print()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a88976213ca424ea4b08bf5c32d843924"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::py" ref="a88976213ca424ea4b08bf5c32d843924" args="" -->
+<a class="anchor" id="a6562f81558cf0bf57f524773180ebe2e"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::dynamics_s::type" ref="a6562f81558cf0bf57f524773180ebe2e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="a00011.html#a88976213ca424ea4b08bf5c32d843924">PatternGeneratorJRL::ZMPPosition_s::py</a></td>
+          <td class="memname">int <a class="el" href="a00011.html#a6562f81558cf0bf57f524773180ebe2e">PatternGeneratorJRL::IntermedQPMat::dynamics_s::type</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00058_source.html#l00034">PatternGeneratorJRL::IntermedQPMat::IntermedQPMat()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a23f6b83344cea9e26694e1f834d52b77"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::pz" ref="a23f6b83344cea9e26694e1f834d52b77" args="" -->
+<a class="anchor" id="a445bfecd099f0b9779673d1952e25d4c"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::dynamics_s::U" ref="a445bfecd099f0b9779673d1952e25d4c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="a00011.html#a23f6b83344cea9e26694e1f834d52b77">PatternGeneratorJRL::ZMPPosition_s::pz</a></td>
+          <td class="memname">boost_ublas::matrix&lt;double&gt; <a class="el" href="a00011.html#a445bfecd099f0b9779673d1952e25d4c">PatternGeneratorJRL::IntermedQPMat::dynamics_s::U</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Matrix of the quadratic part. </p>
+
+<p>Referenced by <a class="el" href="a00053_source.html#l00386">PatternGeneratorJRL::GeneratorVelRef::buildConstraintsCoP()</a>, and <a class="el" href="a00058_source.html#l00223">PatternGeneratorJRL::IntermedQPMat::objective_variant_s::print()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="ac7a7d427ebb8ab6b97ffeb018d661392"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::stepType" ref="ac7a7d427ebb8ab6b97ffeb018d661392" args="" -->
+<a class="anchor" id="a73e77b4297ac0ac6d633d9edfad61ba4"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::dynamics_s::UT" ref="a73e77b4297ac0ac6d633d9edfad61ba4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="a00011.html#ac7a7d427ebb8ab6b97ffeb018d661392">PatternGeneratorJRL::ZMPPosition_s::stepType</a></td>
+          <td class="memname">boost_ublas::matrix&lt;double&gt; <a class="el" href="a00011.html#a73e77b4297ac0ac6d633d9edfad61ba4">PatternGeneratorJRL::IntermedQPMat::dynamics_s::UT</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-</div>
-</div>
-<a class="anchor" id="acc9f3b7d21056251d94dc0e0a9b1459b"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::theta" ref="acc9f3b7d21056251d94dc0e0a9b1459b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double <a class="el" href="a00011.html#acc9f3b7d21056251d94dc0e0a9b1459b">PatternGeneratorJRL::ZMPPosition_s::theta</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a39f2d78ad89097d35e6c927923839ed6"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::time" ref="a39f2d78ad89097d35e6c927923839ed6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double <a class="el" href="a00011.html#a39f2d78ad89097d35e6c927923839ed6">PatternGeneratorJRL::ZMPPosition_s::time</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
+<p>Referenced by <a class="el" href="a00058_source.html#l00223">PatternGeneratorJRL::IntermedQPMat::objective_variant_s::print()</a>.</p>
 
 </div>
 </div>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: PatternGeneratorJRL::RelativeFootPosition_s Struct Reference</title>
+<title>jrl-walkgen: PatternGeneratorJRL::COMState_s Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -18,121 +18,186 @@
     <ul>
       <li><a href="annotated.html"><span>Class&nbsp;List</span></a></li>
       <li><a href="classes.html"><span>Class&nbsp;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&nbsp;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
   </div>
-  <div class="navpath"><a class="el" href="a00014.html">PatternGeneratorJRL</a>::<a class="el" href="a00009.html">RelativeFootPosition_s</a>
+  <div class="navpath"><a class="el" href="a00098.html">PatternGeneratorJRL</a>::<a class="el" href="a00009.html">COMState_s</a>
   </div>
 </div>
 <div class="contents">
-<h1>PatternGeneratorJRL::RelativeFootPosition_s Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::RelativeFootPosition_s" -->
-<p>Structure to store each foot position when the user is specifying a sequence of relative positions.  
+<h1>PatternGeneratorJRL::COMState_s Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::COMState_s" -->
+<p>Structure to store the COM state computed by the preview control.  
 <a href="#_details">More...</a></p>
 
 <p><code>#include &lt;jrl/walkgen/pgtypes.hh&gt;</code></p>
 
-<p><a href="a00022.html">List of all members.</a></p>
+<p><a href="a00218.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="a00009.html">COMState_s</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a0cf7d0ae7762a8874bcda4bf4c22b1f4">operator=</a> (const <a class="el" href="a00008.html">COMPosition_s</a> &amp;aCS)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a77690019834fa8ed58c2b4b9c9967108">reset</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a4daf9aabc048a053f24d3e57a9885624">COMState_s</a> ()</td></tr>
 <tr><td colspan="2"><h2>Public Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#ac91c2ed40391091c7a2d17c31e0a46e9">sx</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a8f64b3496ee71d1720bccbf3d60e3791">sy</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#ac75ecc818555da8762e15d6a5bb67636">theta</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#ac163984877822862ee4ae0bcb10968e6">SStime</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#ac032e3d645d3566c5c12f8f5123ccf2e">DStime</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a16076a1c54dd52229f73e13c2fe3490a">stepType</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a7fad71fa614dc7ea76735e535e737213">DeviationHipHeight</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a0dd434df4d84bd306c99d845cdfdf961">x</a> [3]</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a45c02c923ff1602a14ed3fec3bd0ce8e">y</a> [3]</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a5fd3343408f1dcc6ac44e68da388c78a">z</a> [3]</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a5bc6376d7bdb3b911b62908482a62c28">yaw</a> [3]</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a0866a2365fda4a2c9c2ac1bbe7235a01">pitch</a> [3]</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00009.html#a870414a3f5139a94324580e9ffab61a0">roll</a> [3]</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
-<p>Structure to store each foot position when the user is specifying a sequence of relative positions. </p>
+<p>Structure to store the COM state computed by the preview control. </p>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a4daf9aabc048a053f24d3e57a9885624"></a><!-- doxytag: member="PatternGeneratorJRL::COMState_s::COMState_s" ref="a4daf9aabc048a053f24d3e57a9885624" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">PatternGeneratorJRL::COMState_s::COMState_s </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00071_source.html#l00056">reset()</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a0cf7d0ae7762a8874bcda4bf4c22b1f4"></a><!-- doxytag: member="PatternGeneratorJRL::COMState_s::operator=" ref="a0cf7d0ae7762a8874bcda4bf4c22b1f4" args="(const COMPosition_s &amp;aCS)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct <a class="el" href="a00009.html">COMState_s</a> &amp; PatternGeneratorJRL::COMState::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="a00008.html">COMPosition_s</a> &amp;&nbsp;</td>
+          <td class="paramname"> <em>aCS</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [read]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00072_source.html#l00056">PatternGeneratorJRL::COMPosition_s::pitch</a>, <a class="el" href="a00072_source.html#l00071">pitch</a>, <a class="el" href="a00072_source.html#l00057">PatternGeneratorJRL::COMPosition_s::roll</a>, <a class="el" href="a00072_source.html#l00072">roll</a>, <a class="el" href="a00072_source.html#l00053">PatternGeneratorJRL::COMPosition_s::x</a>, <a class="el" href="a00072_source.html#l00069">x</a>, <a class="el" href="a00072_source.html#l00053">PatternGeneratorJRL::COMPosition_s::y</a>, <a class="el" href="a00072_source.html#l00069">y</a>, <a class="el" href="a00072_source.html#l00055">PatternGeneratorJRL::COMPosition_s::yaw</a>, <a class="el" href="a00072_source.html#l00070">yaw</a>, <a class="el" href="a00072_source.html#l00054">PatternGeneratorJRL::COMPosition_s::z</a>, and <a class="el" href="a00072_source.html#l00069">z</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a77690019834fa8ed58c2b4b9c9967108"></a><!-- doxytag: member="PatternGeneratorJRL::COMState_s::reset" ref="a77690019834fa8ed58c2b4b9c9967108" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::COMState::reset </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00072_source.html#l00071">pitch</a>, <a class="el" href="a00072_source.html#l00072">roll</a>, <a class="el" href="a00072_source.html#l00069">x</a>, <a class="el" href="a00072_source.html#l00069">y</a>, and <a class="el" href="a00072_source.html#l00070">yaw</a>.</p>
+
+<p>Referenced by <a class="el" href="a00071_source.html#l00065">COMState_s()</a>.</p>
+
+</div>
+</div>
 <hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="a7fad71fa614dc7ea76735e535e737213"></a><!-- doxytag: member="PatternGeneratorJRL::RelativeFootPosition_s::DeviationHipHeight" ref="a7fad71fa614dc7ea76735e535e737213" args="" -->
+<a class="anchor" id="a0866a2365fda4a2c9c2ac1bbe7235a01"></a><!-- doxytag: member="PatternGeneratorJRL::COMState_s::pitch" ref="a0866a2365fda4a2c9c2ac1bbe7235a01" args="[3]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="a00009.html#a7fad71fa614dc7ea76735e535e737213">PatternGeneratorJRL::RelativeFootPosition_s::DeviationHipHeight</a></td>
+          <td class="memname">double <a class="el" href="a00009.html#a0866a2365fda4a2c9c2ac1bbe7235a01">PatternGeneratorJRL::COMState_s::pitch</a>[3]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00071_source.html#l00042">operator=()</a>, <a class="el" href="a00071_source.html#l00028">PatternGeneratorJRL::COMPosition_s::operator=()</a>, and <a class="el" href="a00071_source.html#l00056">reset()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="ac032e3d645d3566c5c12f8f5123ccf2e"></a><!-- doxytag: member="PatternGeneratorJRL::RelativeFootPosition_s::DStime" ref="ac032e3d645d3566c5c12f8f5123ccf2e" args="" -->
+<a class="anchor" id="a870414a3f5139a94324580e9ffab61a0"></a><!-- doxytag: member="PatternGeneratorJRL::COMState_s::roll" ref="a870414a3f5139a94324580e9ffab61a0" args="[3]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="a00009.html#ac032e3d645d3566c5c12f8f5123ccf2e">PatternGeneratorJRL::RelativeFootPosition_s::DStime</a></td>
+          <td class="memname">double <a class="el" href="a00009.html#a870414a3f5139a94324580e9ffab61a0">PatternGeneratorJRL::COMState_s::roll</a>[3]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00071_source.html#l00042">operator=()</a>, <a class="el" href="a00071_source.html#l00028">PatternGeneratorJRL::COMPosition_s::operator=()</a>, and <a class="el" href="a00071_source.html#l00056">reset()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="ac163984877822862ee4ae0bcb10968e6"></a><!-- doxytag: member="PatternGeneratorJRL::RelativeFootPosition_s::SStime" ref="ac163984877822862ee4ae0bcb10968e6" args="" -->
+<a class="anchor" id="a0dd434df4d84bd306c99d845cdfdf961"></a><!-- doxytag: member="PatternGeneratorJRL::COMState_s::x" ref="a0dd434df4d84bd306c99d845cdfdf961" args="[3]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="a00009.html#ac163984877822862ee4ae0bcb10968e6">PatternGeneratorJRL::RelativeFootPosition_s::SStime</a></td>
+          <td class="memname">double <a class="el" href="a00009.html#a0dd434df4d84bd306c99d845cdfdf961">PatternGeneratorJRL::COMState_s::x</a>[3]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00071_source.html#l00042">operator=()</a>, <a class="el" href="a00071_source.html#l00028">PatternGeneratorJRL::COMPosition_s::operator=()</a>, and <a class="el" href="a00071_source.html#l00056">reset()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a16076a1c54dd52229f73e13c2fe3490a"></a><!-- doxytag: member="PatternGeneratorJRL::RelativeFootPosition_s::stepType" ref="a16076a1c54dd52229f73e13c2fe3490a" args="" -->
+<a class="anchor" id="a45c02c923ff1602a14ed3fec3bd0ce8e"></a><!-- doxytag: member="PatternGeneratorJRL::COMState_s::y" ref="a45c02c923ff1602a14ed3fec3bd0ce8e" args="[3]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int <a class="el" href="a00009.html#a16076a1c54dd52229f73e13c2fe3490a">PatternGeneratorJRL::RelativeFootPosition_s::stepType</a></td>
+          <td class="memname">double <a class="el" href="a00009.html#a45c02c923ff1602a14ed3fec3bd0ce8e">PatternGeneratorJRL::COMState_s::y</a>[3]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00071_source.html#l00042">operator=()</a>, <a class="el" href="a00071_source.html#l00028">PatternGeneratorJRL::COMPosition_s::operator=()</a>, and <a class="el" href="a00071_source.html#l00056">reset()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="ac91c2ed40391091c7a2d17c31e0a46e9"></a><!-- doxytag: member="PatternGeneratorJRL::RelativeFootPosition_s::sx" ref="ac91c2ed40391091c7a2d17c31e0a46e9" args="" -->
+<a class="anchor" id="a5bc6376d7bdb3b911b62908482a62c28"></a><!-- doxytag: member="PatternGeneratorJRL::COMState_s::yaw" ref="a5bc6376d7bdb3b911b62908482a62c28" args="[3]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="a00009.html#ac91c2ed40391091c7a2d17c31e0a46e9">PatternGeneratorJRL::RelativeFootPosition_s::sx</a></td>
+          <td class="memname">double <a class="el" href="a00009.html#a5bc6376d7bdb3b911b62908482a62c28">PatternGeneratorJRL::COMState_s::yaw</a>[3]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00053_source.html#l00136">PatternGeneratorJRL::GeneratorVelRef::computeGlobalReference()</a>, <a class="el" href="a00071_source.html#l00042">operator=()</a>, <a class="el" href="a00071_source.html#l00028">PatternGeneratorJRL::COMPosition_s::operator=()</a>, and <a class="el" href="a00071_source.html#l00056">reset()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a8f64b3496ee71d1720bccbf3d60e3791"></a><!-- doxytag: member="PatternGeneratorJRL::RelativeFootPosition_s::sy" ref="a8f64b3496ee71d1720bccbf3d60e3791" args="" -->
+<a class="anchor" id="a5fd3343408f1dcc6ac44e68da388c78a"></a><!-- doxytag: member="PatternGeneratorJRL::COMState_s::z" ref="a5fd3343408f1dcc6ac44e68da388c78a" args="[3]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="a00009.html#a8f64b3496ee71d1720bccbf3d60e3791">PatternGeneratorJRL::RelativeFootPosition_s::sy</a></td>
+          <td class="memname">double <a class="el" href="a00009.html#a5fd3343408f1dcc6ac44e68da388c78a">PatternGeneratorJRL::COMState_s::z</a>[3]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-</div>
-</div>
-<a class="anchor" id="ac75ecc818555da8762e15d6a5bb67636"></a><!-- doxytag: member="PatternGeneratorJRL::RelativeFootPosition_s::theta" ref="ac75ecc818555da8762e15d6a5bb67636" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double <a class="el" href="a00009.html#ac75ecc818555da8762e15d6a5bb67636">PatternGeneratorJRL::RelativeFootPosition_s::theta</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
+<p>Referenced by <a class="el" href="a00071_source.html#l00042">operator=()</a>, and <a class="el" href="a00071_source.html#l00028">PatternGeneratorJRL::COMPosition_s::operator=()</a>.</p>
 
 </div>
 </div>

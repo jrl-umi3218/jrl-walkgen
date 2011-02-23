@@ -1,0 +1,16 @@
+<map id="G" name="G">
+<area shape="rect" href="$a00056.html" title="portability/gettimeofday.hh" alt="" coords="776,84,968,111"/>
+<area shape="rect" href="$a00054.html" title="ZMPRefTrajectoryGeneration/generator&#45;vel&#45;ref.hh" alt="" coords="992,84,1323,111"/>
+<area shape="rect" href="$a00063.html" title="ZMPRefTrajectoryGeneration/mpc&#45;trajectory&#45;generation.hh" alt="" coords="87,161,479,188"/>
+<area shape="rect" href="abstract-robot-dynamics.doxytag$a00021.html" title="abstract&#45;robot&#45;dynamics/humanoid&#45;dynamic&#45;robot.hh" alt="" coords="1777,161,2143,188"/>
+<area shape="rect" href="$a00081.html" title="ZMPRefTrajectoryGeneration/qp&#45;problem.hh" alt="" coords="503,161,801,188"/>
+<area shape="rect" href="$a00059.html" title="Mathematics/intermediate&#45;qp&#45;matrices.hh" alt="" coords="876,161,1167,188"/>
+<area shape="rect" href="jrl-mal.doxytag$a00018.html" title="jrl/mal/matrixabstractlayer.hh" alt="" coords="431,316,639,343"/>
+<area shape="rect" href="$a00072.html" title="jrl/walkgen/pgtypes.hh" alt="" coords="144,239,307,265"/>
+<area shape="rect" href="jrl-mal.doxytag$a00019.html" title="jrl/mal/matrixabstractlayerboost.hh" alt="" coords="412,393,657,420"/>
+<area shape="rect" href="abstract-robot-dynamics.doxytag$a00019.html" title="abstract&#45;robot&#45;dynamics/fwd.hh" alt="" coords="1611,393,1835,420"/>
+<area shape="rect" href="abstract-robot-dynamics.doxytag$a00023.html" title="abstract&#45;robot&#45;dynamics/joint.hh" alt="" coords="1604,239,1833,265"/>
+<area shape="rect" href="abstract-robot-dynamics.doxytag$a00024.html" title="abstract&#45;robot&#45;dynamics/rigid&#45;acceleration.hh" alt="" coords="1267,316,1579,343"/>
+<area shape="rect" href="abstract-robot-dynamics.doxytag$a00025.html" title="abstract&#45;robot&#45;dynamics/rigid&#45;velocity.hh" alt="" coords="1883,316,2163,343"/>
+<area shape="rect" href="abstract-robot-dynamics.doxytag$a00014.html" title="abstract&#45;robot&#45;dynamics/body.hh" alt="" coords="1603,316,1835,343"/>
+</map>

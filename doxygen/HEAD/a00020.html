@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: Member List</title>
+<title>jrl-walkgen: PatternGeneratorJRL::MPCTrajectoryGeneration Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -18,19 +18,977 @@
     <ul>
       <li><a href="annotated.html"><span>Class&nbsp;List</span></a></li>
       <li><a href="classes.html"><span>Class&nbsp;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&nbsp;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
   </div>
+  <div class="navpath"><a class="el" href="a00098.html">PatternGeneratorJRL</a>::<a class="el" href="a00020.html">MPCTrajectoryGeneration</a>
+  </div>
 </div>
 <div class="contents">
-<h1>PatternGeneratorJRL::COMPosition_s Member List</h1>This is the complete list of members for <a class="el" href="a00002.html">PatternGeneratorJRL::COMPosition_s</a>, including all inherited members.<table>
-  <tr class="memlist"><td><a class="el" href="a00002.html#a8ac70bba77cb465e4a91fa82b7314860">operator=</a>(const COMState_s &amp;aCS)</td><td><a class="el" href="a00002.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00002.html#a9c348212235d7d5b04555e281cc31443">pitch</a></td><td><a class="el" href="a00002.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00002.html#ac5380565a81edcb041e825c5a5a84b17">roll</a></td><td><a class="el" href="a00002.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00002.html#af6750f8e4562651d16dcb79a74c24f66">x</a></td><td><a class="el" href="a00002.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00002.html#a2f308984a0f4fb51589e2c89f16b7497">y</a></td><td><a class="el" href="a00002.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00002.html#aa4b7d099b1927795134a40d402e35b9c">yaw</a></td><td><a class="el" href="a00002.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00002.html#a3274e52a140566b720d8bb89b124a30b">z</a></td><td><a class="el" href="a00002.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-</table></div>
+<h1>PatternGeneratorJRL::MPCTrajectoryGeneration Class Reference</h1><!-- doxytag: class="PatternGeneratorJRL::MPCTrajectoryGeneration" -->
+<p><code>#include &lt;/home/buildbot/devel-src/tools/pkg-dev-mng/Testing/Buildbot/slaves/jrlserver/jrlserverubuntu/build-jrl-walkgen-jrlmt-master/pkgsrc/src/ZMPRefTrajectoryGeneration/mpc-trajectory-generation.hh&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for PatternGeneratorJRL::MPCTrajectoryGeneration:</div>
+<div class="dynsection">
+<div class="center"><img src="a00238.png" border="0" usemap="#_pattern_generator_j_r_l_1_1_m_p_c_trajectory_generation_inherit__map" alt="Inheritance graph"/></div>
+<map name="_pattern_generator_j_r_l_1_1_m_p_c_trajectory_generation_inherit__map" id="_pattern_generator_j_r_l_1_1_m_p_c_trajectory_generation_inherit__map">
+<area shape="rect" href="a00014.html" title="PatternGeneratorJRL::GeneratorVelRef" alt="" coords="33,84,295,111"/></map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+
+<p><a href="a00239.html">List of all members.</a></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#aec096bf0b524b080ff28cc833e4356a5">MPCTrajectoryGeneration</a> (SimplePluginManager *lSPM)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Default constructor.  <a href="#aec096bf0b524b080ff28cc833e4356a5"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a5ad9ba414c4da071dfecaab86709fc5d">~MPCTrajectoryGeneration</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Default destructor.  <a href="#a5ad9ba414c4da071dfecaab86709fc5d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a8eb156228c2f9b74ab0d862d42c74724">setCurrentTime</a> (const double &amp;aTime)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a5dff4a7e143def1558c30bac9ffd0b2a">getCurrentTime</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a47dbe012c46a7cb444c3488a1c6dccfa">setPreviewLength</a> (const double &amp;aPP)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the length of the preview window.  <a href="#a47dbe012c46a7cb444c3488a1c6dccfa"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#aeff180f69dc233dfb7d79fb1a972af65">getPreviewLength</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the preview control time window.  <a href="#aeff180f69dc233dfb7d79fb1a972af65"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ad44b64232b284b67e82c2dbd2c20cc02">getComHeight</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Return the Com Height.  <a href="#ad44b64232b284b67e82c2dbd2c20cc02"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#aa5e210543d44b7c55f128ee5492194d3">setComHeight</a> (const double &amp;aComHeight)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Return the Com Height.  <a href="#aa5e210543d44b7c55f128ee5492194d3"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a75040aeea9de67d7c95bde7581ec82e0">getTSingleSupport</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Return the single support time.  <a href="#a75040aeea9de67d7c95bde7581ec82e0"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#accdc134e083343d46e5665f8fb14052c">setTSingleSupport</a> (const double &amp;aTSingleSupport)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the single support time.  <a href="#accdc134e083343d46e5665f8fb14052c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a620a2ef5a7979aaaa3528a7d83b3eb89">getTDoubleSupport</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Return the double support time.  <a href="#a620a2ef5a7979aaaa3528a7d83b3eb89"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#adaf791d486f8d897bdf749a81ecbb9b9">setTDoubleSupport</a> (const double &amp;aTdble)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the double support time. */.  <a href="#adaf791d486f8d897bdf749a81ecbb9b9"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#adf7e98c326c06c3e9afa7673e0a420d8">getSamplingPeriodControl</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the sampling period for the control, set to 0.005 by default. */.  <a href="#adf7e98c326c06c3e9afa7673e0a420d8"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a7ed7715b6f2086c29e6808ed36f88314">setSamplingPeriodControl</a> (const double &amp;aSamplingPeriod)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the sampling period for the control. */.  <a href="#a7ed7715b6f2086c29e6808ed36f88314"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a740a75256d8a78d952fc3b6cd72e211e">getSamplingPeriodPreview</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the sampling period for the preview, set to 0.100 by default.  <a href="#a740a75256d8a78d952fc3b6cd72e211e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ad468cd43e8048d89115140bfd204a823">setSamplingPeriodPreview</a> (const double &amp;aSamplingPeriod)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the sampling period for the preview.  <a href="#ad468cd43e8048d89115140bfd204a823"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const int &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a05d40363544717829e5411db29356099">getNbPrwSamplings</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the sampling period for the preview, set to 0.100 by default.  <a href="#a05d40363544717829e5411db29356099"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ab3e7a353d29ef34d7ee85b5f58b617bb">setNbPrwSamplings</a> (const int &amp;NbSamplings)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the sampling period for the preview.  <a href="#ab3e7a353d29ef34d7ee85b5f58b617bb"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a31751c86e5c2d726474f1f9916e8209c">setNbVariables</a> (const int &amp;NbVariables)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the number of optimization parameters.  <a href="#a31751c86e5c2d726474f1f9916e8209c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const int &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a3567c343ff6c34d968a4f040a82b770f">getNbVariables</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the number of optimization parameters.  <a href="#a3567c343ff6c34d968a4f040a82b770f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a59bc378fc416af23a1b8afa61b53ae3b">setSecurityMargin</a> (const double &amp;Margin)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the security margin for the zmp.  <a href="#a59bc378fc416af23a1b8afa61b53ae3b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a864f6817673afc7ff29760325bb7cf7b">CallMethod</a> (std::string &amp;Method, std::istringstream &amp;strm)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Handling methods for the plugin mecanism.  <a href="#a864f6817673afc7ff29760325bb7cf7b"></a><br/></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Methods related to the generation of feet trajectories.</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrp382f749650bec5e904b1fcd90e625371"></a>Returns the step height.</p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a4d9dec5081235f4d51033511a0f50683">getStepHeight</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#afea7e49b7b09719061c46448476829fa">setStepHeight</a> (const double &amp;aSSH)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Specify the step height.  <a href="#afea7e49b7b09719061c46448476829fa"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a2a1a82abf04a7c81177638d58d3296ea">getModulationSupportCoefficient</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the ModulationSupportCoefficient.  <a href="#a2a1a82abf04a7c81177638d58d3296ea"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ae8dfabee09dc968b058ded7c5460a4c0">setModulationSupportCoefficient</a> (const double &amp;af)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Specify the modulation support coefficient.  <a href="#ae8dfabee09dc968b058ded7c5460a4c0"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#addf1fbffe4e3146dca6761bb805951c4">setOmega</a> (const double &amp;anOmega)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the pitch angle of foot when landing and taking off.  <a href="#addf1fbffe4e3146dca6761bb805951c4"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a80727374256be42751f5fe71d5b55d17">getOmega</a> (void) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the pitch angle of foot when landing and taking off.  <a href="#a80727374256be42751f5fe71d5b55d17"></a><br/></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Methods related to the on line status generation of the ZMP.</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrp0c3642f0693e788c26eb7116d3c9ca31"></a> </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a9edbaa0042c322a083eb85c361be92eb">GetOnLineMode</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the current status of the ZMP trajectory generator. The online mode is determines internally. A ZMP-generator can be still in on-line mode even the step-generator is not because the ZMP-generator is generating the ending phase.  <a href="#a9edbaa0042c322a083eb85c361be92eb"></a><br/></td></tr>
+<tr><td colspan="2"><h2>Protected Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ab7e353b2c0bee67a62a3ffea91048fb7">m_Tsingle</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a312aa127f9aabaa49eeac2146d58e1c2">m_Tdble</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a0b47afa8af6dda0f16f6c31e36876c13">m_T_Ctr</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sampling periods control and preview.  <a href="#a0b47afa8af6dda0f16f6c31e36876c13"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a768e2414cb74b386eeaebaaffd47baf9">m_T_Prw</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#aae3fb269c11ad211d4fe4f7650eca03a">m_PreviewControlTime</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#aac27ad56ef4c82851b748368066bcc1a">m_N</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Size of the preview window (Nb. of samplings).  <a href="#aac27ad56ef4c82851b748368066bcc1a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a322c0c502809ad56cffb4d8a3b33058b">m_NbVariables</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Number of variables.  <a href="#a322c0c502809ad56cffb4d8a3b33058b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ac8638e9b6051c5cda7b50b3b46605a64">m_StepHeight</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a7a82704b66c1459bcfa63df4ba54df1d">m_CurrentTime</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#add148f5bd591f9dfe1048c687e197b3a">m_OnLineMode</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Specifies if we are or not in on line mode.  <a href="#add148f5bd591f9dfe1048c687e197b3a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ade58d197d4b9c19da7315813325d99f1">m_CoMHeight</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Specifies Com Height.  <a href="#ade58d197d4b9c19da7315813325d99f1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a5b593a0c0ac13148a4a761abb3d176c9">m_SecurityMargin</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Security margins for the ZMP.  <a href="#a5b593a0c0ac13148a4a761abb3d176c9"></a><br/></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Members related to the generation of feet trajectories.</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrpeb0975012197d530ea0891f0b428d1ce"></a>ModulationSupportCoefficient coeeficient to wait a little before foot is of the ground </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a74a341dea42d3b360c5a9193ffeee412">m_ModulationSupportCoefficient</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#aecf32f466d1c87f4212f6137eeb019ea">m_Omega</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The foot orientation for the lift off and the landing.  <a href="#aecf32f466d1c87f4212f6137eeb019ea"></a><br/></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>Detailed Description</h2>
+<p>This class defines an abstract interface to generate low-dimensional walking trajectories (CoM/CdP/Feet). </p>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="aec096bf0b524b080ff28cc833e4356a5"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::MPCTrajectoryGeneration" ref="aec096bf0b524b080ff28cc833e4356a5" args="(SimplePluginManager *lSPM)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MPCTrajectoryGeneration::MPCTrajectoryGeneration </td>
+          <td>(</td>
+          <td class="paramtype">SimplePluginManager *&nbsp;</td>
+          <td class="paramname"> <em>lSPM</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Default constructor. </p>
+
+<p>References <a class="el" href="a00089_source.html#l00040">ODEBUG</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5ad9ba414c4da071dfecaab86709fc5d"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::~MPCTrajectoryGeneration" ref="a5ad9ba414c4da071dfecaab86709fc5d" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual PatternGeneratorJRL::MPCTrajectoryGeneration::~MPCTrajectoryGeneration </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Default destructor. </p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a864f6817673afc7ff29760325bb7cf7b"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::CallMethod" ref="a864f6817673afc7ff29760325bb7cf7b" args="(std::string &amp;Method, std::istringstream &amp;strm)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MPCTrajectoryGeneration::CallMethod </td>
+          <td>(</td>
+          <td class="paramtype">std::string &amp;&nbsp;</td>
+          <td class="paramname"> <em>Method</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::istringstream &amp;&nbsp;</td>
+          <td class="paramname"> <em>strm</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Handling methods for the plugin mecanism. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00081">m_CoMHeight</a>, <a class="el" href="a00063_source.html#l00092">m_Omega</a>, <a class="el" href="a00063_source.html#l00072">m_StepHeight</a>, <a class="el" href="a00063_source.html#l00060">m_T_Prw</a>, <a class="el" href="a00063_source.html#l00057">m_Tdble</a>, <a class="el" href="a00063_source.html#l00054">m_Tsingle</a>, and <a class="el" href="a00089_source.html#l00040">ODEBUG</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad44b64232b284b67e82c2dbd2c20cc02"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getComHeight" ref="ad44b64232b284b67e82c2dbd2c20cc02" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double&amp; PatternGeneratorJRL::MPCTrajectoryGeneration::getComHeight </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Return the Com Height. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00081">m_CoMHeight</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5dff4a7e143def1558c30bac9ffd0b2a"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getCurrentTime" ref="a5dff4a7e143def1558c30bac9ffd0b2a" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double PatternGeneratorJRL::MPCTrajectoryGeneration::getCurrentTime </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the current time. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00075">m_CurrentTime</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2a1a82abf04a7c81177638d58d3296ea"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getModulationSupportCoefficient" ref="a2a1a82abf04a7c81177638d58d3296ea" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double&amp; PatternGeneratorJRL::MPCTrajectoryGeneration::getModulationSupportCoefficient </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Returns the ModulationSupportCoefficient. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00089">m_ModulationSupportCoefficient</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a05d40363544717829e5411db29356099"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getNbPrwSamplings" ref="a05d40363544717829e5411db29356099" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int&amp; PatternGeneratorJRL::MPCTrajectoryGeneration::getNbPrwSamplings </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Get the sampling period for the preview, set to 0.100 by default. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00066">m_N</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3567c343ff6c34d968a4f040a82b770f"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getNbVariables" ref="a3567c343ff6c34d968a4f040a82b770f" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int&amp; PatternGeneratorJRL::MPCTrajectoryGeneration::getNbVariables </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the number of optimization parameters. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00069">m_NbVariables</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a80727374256be42751f5fe71d5b55d17"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getOmega" ref="a80727374256be42751f5fe71d5b55d17" args="(void) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double&amp; PatternGeneratorJRL::MPCTrajectoryGeneration::getOmega </td>
+          <td>(</td>
+          <td class="paramtype">void&nbsp;</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Get the pitch angle of foot when landing and taking off. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00092">m_Omega</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9edbaa0042c322a083eb85c361be92eb"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::GetOnLineMode" ref="a9edbaa0042c322a083eb85c361be92eb" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MPCTrajectoryGeneration::GetOnLineMode </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Returns the current status of the ZMP trajectory generator. The online mode is determines internally. A ZMP-generator can be still in on-line mode even the step-generator is not because the ZMP-generator is generating the ending phase. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00078">m_OnLineMode</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aeff180f69dc233dfb7d79fb1a972af65"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getPreviewLength" ref="aeff180f69dc233dfb7d79fb1a972af65" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double&amp; PatternGeneratorJRL::MPCTrajectoryGeneration::getPreviewLength </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Get the preview control time window. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00063">m_PreviewControlTime</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="adf7e98c326c06c3e9afa7673e0a420d8"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getSamplingPeriodControl" ref="adf7e98c326c06c3e9afa7673e0a420d8" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double&amp; PatternGeneratorJRL::MPCTrajectoryGeneration::getSamplingPeriodControl </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Get the sampling period for the control, set to 0.005 by default. */. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00060">m_T_Ctr</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a740a75256d8a78d952fc3b6cd72e211e"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getSamplingPeriodPreview" ref="a740a75256d8a78d952fc3b6cd72e211e" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double&amp; PatternGeneratorJRL::MPCTrajectoryGeneration::getSamplingPeriodPreview </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Get the sampling period for the preview, set to 0.100 by default. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00060">m_T_Prw</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4d9dec5081235f4d51033511a0f50683"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getStepHeight" ref="a4d9dec5081235f4d51033511a0f50683" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double&amp; PatternGeneratorJRL::MPCTrajectoryGeneration::getStepHeight </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00063_source.html#l00072">m_StepHeight</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a620a2ef5a7979aaaa3528a7d83b3eb89"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getTDoubleSupport" ref="a620a2ef5a7979aaaa3528a7d83b3eb89" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double&amp; PatternGeneratorJRL::MPCTrajectoryGeneration::getTDoubleSupport </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Return the double support time. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00057">m_Tdble</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a75040aeea9de67d7c95bde7581ec82e0"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::getTSingleSupport" ref="a75040aeea9de67d7c95bde7581ec82e0" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double&amp; PatternGeneratorJRL::MPCTrajectoryGeneration::getTSingleSupport </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Return the single support time. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00054">m_Tsingle</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa5e210543d44b7c55f128ee5492194d3"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setComHeight" ref="aa5e210543d44b7c55f128ee5492194d3" args="(const double &amp;aComHeight)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setComHeight </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>aComHeight</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Return the Com Height. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00081">m_CoMHeight</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8eb156228c2f9b74ab0d862d42c74724"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setCurrentTime" ref="a8eb156228c2f9b74ab0d862d42c74724" args="(const double &amp;aTime)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setCurrentTime </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>aTime</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Set the current time. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00075">m_CurrentTime</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae8dfabee09dc968b058ded7c5460a4c0"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setModulationSupportCoefficient" ref="ae8dfabee09dc968b058ded7c5460a4c0" args="(const double &amp;af)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setModulationSupportCoefficient </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>af</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Specify the modulation support coefficient. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00089">m_ModulationSupportCoefficient</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab3e7a353d29ef34d7ee85b5f58b617bb"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setNbPrwSamplings" ref="ab3e7a353d29ef34d7ee85b5f58b617bb" args="(const int &amp;NbSamplings)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setNbPrwSamplings </td>
+          <td>(</td>
+          <td class="paramtype">const int &amp;&nbsp;</td>
+          <td class="paramname"> <em>NbSamplings</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the sampling period for the preview. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00066">m_N</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a31751c86e5c2d726474f1f9916e8209c"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setNbVariables" ref="a31751c86e5c2d726474f1f9916e8209c" args="(const int &amp;NbVariables)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setNbVariables </td>
+          <td>(</td>
+          <td class="paramtype">const int &amp;&nbsp;</td>
+          <td class="paramname"> <em>NbVariables</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the number of optimization parameters. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00069">m_NbVariables</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="addf1fbffe4e3146dca6761bb805951c4"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setOmega" ref="addf1fbffe4e3146dca6761bb805951c4" args="(const double &amp;anOmega)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setOmega </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>anOmega</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the pitch angle of foot when landing and taking off. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00092">m_Omega</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a47dbe012c46a7cb444c3488a1c6dccfa"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setPreviewLength" ref="a47dbe012c46a7cb444c3488a1c6dccfa" args="(const double &amp;aPP)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setPreviewLength </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>aPP</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the length of the preview window. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00063">m_PreviewControlTime</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7ed7715b6f2086c29e6808ed36f88314"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setSamplingPeriodControl" ref="a7ed7715b6f2086c29e6808ed36f88314" args="(const double &amp;aSamplingPeriod)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setSamplingPeriodControl </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>aSamplingPeriod</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the sampling period for the control. */. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00060">m_T_Ctr</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad468cd43e8048d89115140bfd204a823"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setSamplingPeriodPreview" ref="ad468cd43e8048d89115140bfd204a823" args="(const double &amp;aSamplingPeriod)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setSamplingPeriodPreview </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>aSamplingPeriod</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the sampling period for the preview. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00060">m_T_Prw</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a59bc378fc416af23a1b8afa61b53ae3b"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setSecurityMargin" ref="a59bc378fc416af23a1b8afa61b53ae3b" args="(const double &amp;Margin)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setSecurityMargin </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>Margin</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the security margin for the zmp. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Margin</em>&nbsp;</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="a00063_source.html#l00084">m_SecurityMargin</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="afea7e49b7b09719061c46448476829fa"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setStepHeight" ref="afea7e49b7b09719061c46448476829fa" args="(const double &amp;aSSH)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setStepHeight </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>aSSH</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Specify the step height. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00072">m_StepHeight</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="adaf791d486f8d897bdf749a81ecbb9b9"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setTDoubleSupport" ref="adaf791d486f8d897bdf749a81ecbb9b9" args="(const double &amp;aTdble)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setTDoubleSupport </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>aTdble</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the double support time. */. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00057">m_Tdble</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="accdc134e083343d46e5665f8fb14052c"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::setTSingleSupport" ref="accdc134e083343d46e5665f8fb14052c" args="(const double &amp;aTSingleSupport)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::MPCTrajectoryGeneration::setTSingleSupport </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>aTSingleSupport</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the single support time. </p>
+
+<p>References <a class="el" href="a00063_source.html#l00054">m_Tsingle</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="ade58d197d4b9c19da7315813325d99f1"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_CoMHeight" ref="ade58d197d4b9c19da7315813325d99f1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00020.html#ade58d197d4b9c19da7315813325d99f1">PatternGeneratorJRL::MPCTrajectoryGeneration::m_CoMHeight</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Specifies Com Height. </p>
+
+<p>Referenced by <a class="el" href="a00062_source.html#l00073">CallMethod()</a>, <a class="el" href="a00063_source.html#l00124">getComHeight()</a>, and <a class="el" href="a00063_source.html#l00128">setComHeight()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7a82704b66c1459bcfa63df4ba54df1d"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_CurrentTime" ref="a7a82704b66c1459bcfa63df4ba54df1d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00020.html#a7a82704b66c1459bcfa63df4ba54df1d">PatternGeneratorJRL::MPCTrajectoryGeneration::m_CurrentTime</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00063_source.html#l00112">getCurrentTime()</a>, <a class="el" href="a00053_source.html#l00065">PatternGeneratorJRL::GeneratorVelRef::previewSupportStates()</a>, and <a class="el" href="a00063_source.html#l00108">setCurrentTime()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a74a341dea42d3b360c5a9193ffeee412"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_ModulationSupportCoefficient" ref="a74a341dea42d3b360c5a9193ffeee412" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00020.html#a74a341dea42d3b360c5a9193ffeee412">PatternGeneratorJRL::MPCTrajectoryGeneration::m_ModulationSupportCoefficient</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00063_source.html#l00197">getModulationSupportCoefficient()</a>, and <a class="el" href="a00063_source.html#l00203">setModulationSupportCoefficient()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aac27ad56ef4c82851b748368066bcc1a"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_N" ref="aac27ad56ef4c82851b748368066bcc1a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="a00020.html#aac27ad56ef4c82851b748368066bcc1a">PatternGeneratorJRL::MPCTrajectoryGeneration::m_N</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Size of the preview window (Nb. of samplings). </p>
+
+<p>Referenced by <a class="el" href="a00053_source.html#l00136">PatternGeneratorJRL::GeneratorVelRef::computeGlobalReference()</a>, <a class="el" href="a00053_source.html#l00087">PatternGeneratorJRL::GeneratorVelRef::generateSelectionMatrices()</a>, <a class="el" href="a00063_source.html#l00164">getNbPrwSamplings()</a>, <a class="el" href="a00053_source.html#l00065">PatternGeneratorJRL::GeneratorVelRef::previewSupportStates()</a>, and <a class="el" href="a00063_source.html#l00168">setNbPrwSamplings()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a322c0c502809ad56cffb4d8a3b33058b"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_NbVariables" ref="a322c0c502809ad56cffb4d8a3b33058b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="a00020.html#a322c0c502809ad56cffb4d8a3b33058b">PatternGeneratorJRL::MPCTrajectoryGeneration::m_NbVariables</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Number of variables. </p>
+
+<p>Referenced by <a class="el" href="a00063_source.html#l00176">getNbVariables()</a>, and <a class="el" href="a00063_source.html#l00172">setNbVariables()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aecf32f466d1c87f4212f6137eeb019ea"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_Omega" ref="aecf32f466d1c87f4212f6137eeb019ea" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00020.html#aecf32f466d1c87f4212f6137eeb019ea">PatternGeneratorJRL::MPCTrajectoryGeneration::m_Omega</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>The foot orientation for the lift off and the landing. </p>
+
+<p>Referenced by <a class="el" href="a00062_source.html#l00073">CallMethod()</a>, <a class="el" href="a00063_source.html#l00213">getOmega()</a>, and <a class="el" href="a00063_source.html#l00209">setOmega()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="add148f5bd591f9dfe1048c687e197b3a"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_OnLineMode" ref="add148f5bd591f9dfe1048c687e197b3a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="a00020.html#add148f5bd591f9dfe1048c687e197b3a">PatternGeneratorJRL::MPCTrajectoryGeneration::m_OnLineMode</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Specifies if we are or not in on line mode. </p>
+
+<p>Referenced by <a class="el" href="a00062_source.html#l00108">GetOnLineMode()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aae3fb269c11ad211d4fe4f7650eca03a"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_PreviewControlTime" ref="aae3fb269c11ad211d4fe4f7650eca03a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00020.html#aae3fb269c11ad211d4fe4f7650eca03a">PatternGeneratorJRL::MPCTrajectoryGeneration::m_PreviewControlTime</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00063_source.html#l00120">getPreviewLength()</a>, and <a class="el" href="a00063_source.html#l00116">setPreviewLength()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5b593a0c0ac13148a4a761abb3d176c9"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_SecurityMargin" ref="a5b593a0c0ac13148a4a761abb3d176c9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00020.html#a5b593a0c0ac13148a4a761abb3d176c9">PatternGeneratorJRL::MPCTrajectoryGeneration::m_SecurityMargin</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Security margins for the ZMP. </p>
+
+<p>Referenced by <a class="el" href="a00063_source.html#l00182">setSecurityMargin()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac8638e9b6051c5cda7b50b3b46605a64"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_StepHeight" ref="ac8638e9b6051c5cda7b50b3b46605a64" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00020.html#ac8638e9b6051c5cda7b50b3b46605a64">PatternGeneratorJRL::MPCTrajectoryGeneration::m_StepHeight</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00062_source.html#l00073">CallMethod()</a>, <a class="el" href="a00063_source.html#l00189">getStepHeight()</a>, and <a class="el" href="a00063_source.html#l00193">setStepHeight()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0b47afa8af6dda0f16f6c31e36876c13"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_T_Ctr" ref="a0b47afa8af6dda0f16f6c31e36876c13" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00020.html#a0b47afa8af6dda0f16f6c31e36876c13">PatternGeneratorJRL::MPCTrajectoryGeneration::m_T_Ctr</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Sampling periods control and preview. </p>
+
+<p>Referenced by <a class="el" href="a00063_source.html#l00148">getSamplingPeriodControl()</a>, and <a class="el" href="a00063_source.html#l00152">setSamplingPeriodControl()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a768e2414cb74b386eeaebaaffd47baf9"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_T_Prw" ref="a768e2414cb74b386eeaebaaffd47baf9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00020.html#a768e2414cb74b386eeaebaaffd47baf9">PatternGeneratorJRL::MPCTrajectoryGeneration::m_T_Prw</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00062_source.html#l00073">CallMethod()</a>, <a class="el" href="a00053_source.html#l00136">PatternGeneratorJRL::GeneratorVelRef::computeGlobalReference()</a>, <a class="el" href="a00063_source.html#l00156">getSamplingPeriodPreview()</a>, and <a class="el" href="a00063_source.html#l00160">setSamplingPeriodPreview()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a312aa127f9aabaa49eeac2146d58e1c2"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_Tdble" ref="a312aa127f9aabaa49eeac2146d58e1c2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00020.html#a312aa127f9aabaa49eeac2146d58e1c2">PatternGeneratorJRL::MPCTrajectoryGeneration::m_Tdble</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00062_source.html#l00073">CallMethod()</a>, <a class="el" href="a00063_source.html#l00140">getTDoubleSupport()</a>, and <a class="el" href="a00063_source.html#l00144">setTDoubleSupport()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab7e353b2c0bee67a62a3ffea91048fb7"></a><!-- doxytag: member="PatternGeneratorJRL::MPCTrajectoryGeneration::m_Tsingle" ref="ab7e353b2c0bee67a62a3ffea91048fb7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="a00020.html#ab7e353b2c0bee67a62a3ffea91048fb7">PatternGeneratorJRL::MPCTrajectoryGeneration::m_Tsingle</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00062_source.html#l00073">CallMethod()</a>, <a class="el" href="a00063_source.html#l00132">getTSingleSupport()</a>, and <a class="el" href="a00063_source.html#l00136">setTSingleSupport()</a>.</p>
+
+</div>
+</div>
+</div>
 </body>
 </html>
