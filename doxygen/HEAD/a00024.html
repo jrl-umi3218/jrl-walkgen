@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: olist Struct Reference</title>
+<title>jrl-walkgen: PatternGeneratorJRL::IntermedQPMat Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,6 +9,7 @@
   <div class="tabs">
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -22,137 +23,772 @@
       <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
   </div>
+  <div class="navpath"><a class="el" href="a00111.html">PatternGeneratorJRL</a>::<a class="el" href="a00024.html">IntermedQPMat</a>
+  </div>
 </div>
 <div class="contents">
-<h1>olist Struct Reference</h1><!-- doxytag: class="olist" -->
-<p><a href="a00184.html">List of all members.</a></p>
+<h1>PatternGeneratorJRL::IntermedQPMat Class Reference</h1><!-- doxytag: class="PatternGeneratorJRL::IntermedQPMat" -->
+<p>Custom (value based) container providing intermediate elements for the construction of a QP.  
+<a href="#_details">More...</a></p>
+
+<p><code>#include &lt;/home/buildbot/devel-src/tools/pkg-dev-mng/Testing/Buildbot/slaves/jrlserver/jrlserverubuntu/build-jrl-walkgen-jrlmt-master/pkgsrc/src/Mathematics/intermediate-qp-matrices.hh&gt;</code></p>
+<div class="dynheader">
+Collaboration diagram for PatternGeneratorJRL::IntermedQPMat:</div>
+<div class="dynsection">
+<div class="center"><img src="a00251.png" border="0" usemap="#_pattern_generator_j_r_l_1_1_intermed_q_p_mat_coll__map" alt="Collaboration graph"/></div>
+<map name="_pattern_generator_j_r_l_1_1_intermed_q_p_mat_coll__map" id="_pattern_generator_j_r_l_1_1_intermed_q_p_mat_coll__map">
+<area shape="rect" href="a00018.html" title="PatternGeneratorJRL::IntermedQPMat::dynamics_s" alt="" coords="5,116,347,143"/><area shape="rect" href="a00030.html" title="PatternGeneratorJRL::IntermedQPMat::objective_variant_s" alt="" coords="420,161,807,188"/><area shape="rect" href="a00038.html" title="PatternGeneratorJRL::IntermedQPMat::state_variant_s" alt="" coords="432,225,795,252"/></map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+
+<p><a href="a00252.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
-<tr><td colspan="2"><h2>Public Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00079.html#ad489592c06fec6c24859ec8d6e4ba1d9">flag</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#acb7f3c45380f7965c9ab177c228ed936">oerr</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00079.html#a3fd01dc27cf01b050363e4910b85969f">ftnint</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#af4443a6a577bfe9292cbf741c24c6e79">ounit</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a6af6060865be898dfc66c0fd6630d545">ofnm</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00079.html#a01bfec060022e3e8708a1fd2a62c2d6d">ftnlen</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a497ca7ef9c2e42d5cd30c847fdbd3f10">ofnmlen</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a2cf08ac4e1e2fc9e6f21299df3f1d2e6">osta</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#ad27927ac817bff0dbfa00d07f3e3e2d2">oacc</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#abe3c8fd2be6dc58be3157e2e0f48cf6a">ofm</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00079.html#a3fd01dc27cf01b050363e4910b85969f">ftnint</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a4c83b168f7afdd6c81a7843193c5755e">orl</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a6b914b4f6d4df1f377d40c964bd71625">oblnk</a></td></tr>
+<tr><td colspan="2"><h2>Classes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00018.html">dynamics_s</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html">objective_variant_s</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00038.html">state_variant_s</a></td></tr>
+<tr><td colspan="2"><h2>Public Types</h2></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Matrices defining the evolution</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrpfeebf2fcfa6eed84a1d2fd1bd20fc15c"></a> </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="a00018.html">dynamics_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#ad23e790945d39fe22c82d381b86bf318">dynamics_t</a></td></tr>
+<tr><td colspan="2"><div class="groupHeader">QP elements that are objective independent</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrp4394bce10e0dab93cfb4f09f61798d0f"></a> </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="a00038.html">state_variant_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a32960eeb00f5b0a81affa7512150945f">state_variant_t</a></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Least square objective's dependent elements</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrpf7fbfe70015b97ae63290cd46b861eb9"></a> </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="a00030.html">objective_variant_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a30cd3ed7969ab709e6506700aeac30c1">objective_variant_t</a></td></tr>
+<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Constructors and destructors.</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrpffbd4ccce33c2a79363887d67c117f8a"></a> </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a7ba4249ab405c6f17afff50fa040222d">IntermedQPMat</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#ae051929c3ee3d1354cffadc9c5d48f35">~IntermedQPMat</a> ()</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Accessors</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrp04cb611d2bf0c8edd5b113799b30e174"></a>Getter and setter </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00038.html">state_variant_t</a> const &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#aaac48662e9b4da28c551bafcc648e1fe">State</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00038.html">state_variant_t</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a522a837232521225cb11619349f17023">State</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00030.html">objective_variant_t</a> const &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a2d2d4347828d8aa8fd45519b2d03e207">Objective</a> (int type) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00030.html">objective_variant_t</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a4e8ea48e5bfa69128fca02521028b237">Objective</a> (int type)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00018.html">dynamics_t</a> const &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#aec2ae7493fbb38075eea83f7a231cdc5">Dynamics</a> (int type) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00018.html">dynamics_t</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a245fa0538a489a4b3f2632426b4238ed">Dynamics</a> (int type)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">linear_inequality_t const &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#ae7da04d669bd65e729219d51842dc1db">Inequalities</a> (int type) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">linear_inequality_t &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#ac53ec720ca449005193f984c74b99852">Inequalities</a> (int type)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">com_t const &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a2edba7373ef1a38d87ad5e0b94511097">CoM</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#ac57c453b6edb890a243e9f0cd1c5682a">CoM</a> (const com_t &amp;CoM)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">reference_t const &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a0ca4df4c3ab71d1dbb21f8cf3db47be9">Reference</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">reference_t &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#ac66965b06dad06a94f781f44a37be7d0">Reference</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a1e7ec0fb11c7db0e3768ab31324f3b02">Reference</a> (const reference_t &amp;Ref)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">support_state_t const &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a682badb1949f8e5e511174ecee7d48fe">SupportState</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">support_state_t &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a1db753d7ec3d8cfeeec118620ce53feb">SupportState</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#acc77063be172404e49b7cff9835ca0e5">SupportState</a> (const support_state_t &amp;SupportState)</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Displaying</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrpeab2b4237a7cd89c309119e35f62d168"></a>Dump objective matrices </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#abf1091a1fed38fd800eb2db3f21757c7">dumpObjective</a> (const int ObjectiveType, std::ostream &amp;aos)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#afa10239a99dee27b0c7630e6d135c91f">dumpState</a> (std::ostream &amp;aos)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a902fb9cdc600a49448bbbea192b251eb">dumpObjective</a> (const char *filename, const int Objectivetype)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a9e3c582c85683b51e9f7a7c888a1d58f">dumpState</a> (const char *filename)</td></tr>
+<tr><td colspan="2"><h2>Static Public Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#acaa212a0c42f0600071632555625239b">MEAN_VELOCITY</a> = 0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#abf09d97a4693d2cee89788961ca7f1ef">INSTANT_VELOCITY</a> = 1</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a2eda07d6e9cbba207a9eb5f43955ace7">COP_CENTERING</a> = 2</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a5679e00a4c94f55c4510e480e62b4646">JERK_MIN</a> = 3</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#aae077e71590d550a2b6a9eb9ff003ce5">POSITION</a> = 10</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#aa24652c469e5b3bf2568bdadde540d46">VELOCITY</a> = 11</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#aa7914720b2b12f086c7b3eb933a43a01">ACCELERATION</a> = 12</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a02f28e2acb133fa83ff89971ac8f1f3e">JERK</a> = 13</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a85fb00c20c5557834f3ba3c9b29ed43e">COP</a> = 14</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#ad583d1eb5d75b332ff0ead366c84f297">INEQ_COP</a> = 20</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#ad8f2145f3dae2cf61acd3e39502274e4">INEQ_COM</a> = 21</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00024.html#a4a39589c599e91865204034681c771e7">INEQ_FEET</a> = 22</td></tr>
 </table>
+<hr/><a name="_details"></a><h2>Detailed Description</h2>
+<p>Custom (value based) container providing intermediate elements for the construction of a QP. </p>
+<hr/><h2>Member Typedef Documentation</h2>
+<a class="anchor" id="ad23e790945d39fe22c82d381b86bf318"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::dynamics_t" ref="ad23e790945d39fe22c82d381b86bf318" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="a00018.html">dynamics_s</a> <a class="el" href="a00018.html">PatternGeneratorJRL::IntermedQPMat::dynamics_t</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a30cd3ed7969ab709e6506700aeac30c1"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::objective_variant_t" ref="a30cd3ed7969ab709e6506700aeac30c1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="a00030.html">objective_variant_s</a> <a class="el" href="a00030.html">PatternGeneratorJRL::IntermedQPMat::objective_variant_t</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a32960eeb00f5b0a81affa7512150945f"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::state_variant_t" ref="a32960eeb00f5b0a81affa7512150945f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="a00038.html">state_variant_s</a> <a class="el" href="a00038.html">PatternGeneratorJRL::IntermedQPMat::state_variant_t</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a7ba4249ab405c6f17afff50fa040222d"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::IntermedQPMat" ref="a7ba4249ab405c6f17afff50fa040222d" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">IntermedQPMat::IntermedQPMat </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00054">ACCELERATION</a>, <a class="el" href="a00067_source.html#l00056">COP</a>, <a class="el" href="a00067_source.html#l00049">COP_CENTERING</a>, <a class="el" href="a00067_source.html#l00119">PatternGeneratorJRL::IntermedQPMat::objective_variant_s::dyn</a>, <a class="el" href="a00067_source.html#l00059">INEQ_COM</a>, <a class="el" href="a00067_source.html#l00058">INEQ_COP</a>, <a class="el" href="a00067_source.html#l00060">INEQ_FEET</a>, <a class="el" href="a00067_source.html#l00048">INSTANT_VELOCITY</a>, <a class="el" href="a00067_source.html#l00055">JERK</a>, <a class="el" href="a00067_source.html#l00050">JERK_MIN</a>, <a class="el" href="a00067_source.html#l00047">MEAN_VELOCITY</a>, <a class="el" href="a00067_source.html#l00052">POSITION</a>, <a class="el" href="a00067_source.html#l00074">PatternGeneratorJRL::IntermedQPMat::dynamics_s::type</a>, <a class="el" href="a00067_source.html#l00122">PatternGeneratorJRL::IntermedQPMat::objective_variant_s::type</a>, and <a class="el" href="a00067_source.html#l00053">VELOCITY</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae051929c3ee3d1354cffadc9c5d48f35"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::~IntermedQPMat" ref="ae051929c3ee3d1354cffadc9c5d48f35" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">IntermedQPMat::~IntermedQPMat </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="ac57c453b6edb890a243e9f0cd1c5682a"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::CoM" ref="ac57c453b6edb890a243e9f0cd1c5682a" args="(const com_t &amp;CoM)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::IntermedQPMat::CoM </td>
+          <td>(</td>
+          <td class="paramtype">const com_t &amp;&nbsp;</td>
+          <td class="paramname"> <em>CoM</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00088">PatternGeneratorJRL::IntermedQPMat::state_variant_s::CoM</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2edba7373ef1a38d87ad5e0b94511097"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::CoM" ref="a2edba7373ef1a38d87ad5e0b94511097" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">com_t const&amp; PatternGeneratorJRL::IntermedQPMat::CoM </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00088">PatternGeneratorJRL::IntermedQPMat::state_variant_s::CoM</a>.</p>
+
+<p>Referenced by <a class="el" href="a00061_source.html#l00116">PatternGeneratorJRL::GeneratorVelRef::CoM()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a902fb9cdc600a49448bbbea192b251eb"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::dumpObjective" ref="a902fb9cdc600a49448bbbea192b251eb" args="(const char *filename, const int Objectivetype)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IntermedQPMat::dumpObjective </td>
+          <td>(</td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>filename</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&nbsp;</td>
+          <td class="paramname"> <em>Objectivetype</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00066_source.html#l00173">dumpObjective()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="abf1091a1fed38fd800eb2db3f21757c7"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::dumpObjective" ref="abf1091a1fed38fd800eb2db3f21757c7" args="(const int ObjectiveType, std::ostream &amp;aos)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IntermedQPMat::dumpObjective </td>
+          <td>(</td>
+          <td class="paramtype">const int&nbsp;</td>
+          <td class="paramname"> <em>ObjectiveType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::ostream &amp;&nbsp;</td>
+          <td class="paramname"> <em>aos</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00049">COP_CENTERING</a>, <a class="el" href="a00067_source.html#l00048">INSTANT_VELOCITY</a>, <a class="el" href="a00067_source.html#l00050">JERK_MIN</a>, and <a class="el" href="a00066_source.html#l00223">PatternGeneratorJRL::IntermedQPMat::objective_variant_s::print()</a>.</p>
+
+<p>Referenced by <a class="el" href="a00066_source.html#l00203">dumpObjective()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9e3c582c85683b51e9f7a7c888a1d58f"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::dumpState" ref="a9e3c582c85683b51e9f7a7c888a1d58f" args="(const char *filename)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IntermedQPMat::dumpState </td>
+          <td>(</td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>filename</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00066_source.html#l00195">dumpState()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="afa10239a99dee27b0c7630e6d135c91f"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::dumpState" ref="afa10239a99dee27b0c7630e6d135c91f" args="(std::ostream &amp;aos)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IntermedQPMat::dumpState </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&nbsp;</td>
+          <td class="paramname"> <em>aos</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00066_source.html#l00214">dumpState()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a245fa0538a489a4b3f2632426b4238ed"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::Dynamics" ref="a245fa0538a489a4b3f2632426b4238ed" args="(int type)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="a00018.html">IntermedQPMat::dynamics_t</a> &amp; IntermedQPMat::Dynamics </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>type</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p><p>Default behavior return velocity. </p>
+</p>
+
+<p>References <a class="el" href="a00067_source.html#l00056">COP</a>, <a class="el" href="a00067_source.html#l00055">JERK</a>, and <a class="el" href="a00067_source.html#l00053">VELOCITY</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aec2ae7493fbb38075eea83f7a231cdc5"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::Dynamics" ref="aec2ae7493fbb38075eea83f7a231cdc5" args="(int type) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="a00018.html">IntermedQPMat::dynamics_t</a> const &amp; IntermedQPMat::Dynamics </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>type</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00056">COP</a>, <a class="el" href="a00067_source.html#l00055">JERK</a>, and <a class="el" href="a00067_source.html#l00053">VELOCITY</a>.</p>
+
+<p>Referenced by <a class="el" href="a00060_source.html#l00464">PatternGeneratorJRL::GeneratorVelRef::build_constraints()</a>, and <a class="el" href="a00060_source.html#l00177">PatternGeneratorJRL::GeneratorVelRef::initialize_matrices()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac53ec720ca449005193f984c74b99852"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::Inequalities" ref="ac53ec720ca449005193f984c74b99852" args="(int type)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">linear_inequality_t &amp; IntermedQPMat::Inequalities </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>type</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00059">INEQ_COM</a>, <a class="el" href="a00067_source.html#l00058">INEQ_COP</a>, and <a class="el" href="a00067_source.html#l00060">INEQ_FEET</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae7da04d669bd65e729219d51842dc1db"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::Inequalities" ref="ae7da04d669bd65e729219d51842dc1db" args="(int type) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">linear_inequality_t const &amp; IntermedQPMat::Inequalities </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>type</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00059">INEQ_COM</a>, <a class="el" href="a00067_source.html#l00058">INEQ_COP</a>, and <a class="el" href="a00067_source.html#l00060">INEQ_FEET</a>.</p>
+
+<p>Referenced by <a class="el" href="a00060_source.html#l00464">PatternGeneratorJRL::GeneratorVelRef::build_constraints()</a>, and <a class="el" href="a00060_source.html#l00177">PatternGeneratorJRL::GeneratorVelRef::initialize_matrices()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4e8ea48e5bfa69128fca02521028b237"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::Objective" ref="a4e8ea48e5bfa69128fca02521028b237" args="(int type)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="a00030.html">IntermedQPMat::objective_variant_t</a> &amp; IntermedQPMat::Objective </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>type</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00049">COP_CENTERING</a>, <a class="el" href="a00067_source.html#l00048">INSTANT_VELOCITY</a>, <a class="el" href="a00067_source.html#l00050">JERK_MIN</a>, and <a class="el" href="a00067_source.html#l00047">MEAN_VELOCITY</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2d2d4347828d8aa8fd45519b2d03e207"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::Objective" ref="a2d2d4347828d8aa8fd45519b2d03e207" args="(int type) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="a00030.html">IntermedQPMat::objective_variant_t</a> const &amp; IntermedQPMat::Objective </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>type</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00049">COP_CENTERING</a>, <a class="el" href="a00067_source.html#l00048">INSTANT_VELOCITY</a>, <a class="el" href="a00067_source.html#l00050">JERK_MIN</a>, and <a class="el" href="a00067_source.html#l00047">MEAN_VELOCITY</a>.</p>
+
+<p>Referenced by <a class="el" href="a00060_source.html#l00495">PatternGeneratorJRL::GeneratorVelRef::build_invariant_part()</a>, <a class="el" href="a00060_source.html#l00069">PatternGeneratorJRL::GeneratorVelRef::Ponderation()</a>, and <a class="el" href="a00060_source.html#l00523">PatternGeneratorJRL::GeneratorVelRef::update_problem()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1e7ec0fb11c7db0e3768ab31324f3b02"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::Reference" ref="a1e7ec0fb11c7db0e3768ab31324f3b02" args="(const reference_t &amp;Ref)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::IntermedQPMat::Reference </td>
+          <td>(</td>
+          <td class="paramtype">const reference_t &amp;&nbsp;</td>
+          <td class="paramname"> <em>Ref</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00085">PatternGeneratorJRL::IntermedQPMat::state_variant_s::Ref</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac66965b06dad06a94f781f44a37be7d0"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::Reference" ref="ac66965b06dad06a94f781f44a37be7d0" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">reference_t&amp; PatternGeneratorJRL::IntermedQPMat::Reference </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00085">PatternGeneratorJRL::IntermedQPMat::state_variant_s::Ref</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0ca4df4c3ab71d1dbb21f8cf3db47be9"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::Reference" ref="a0ca4df4c3ab71d1dbb21f8cf3db47be9" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">reference_t const&amp; PatternGeneratorJRL::IntermedQPMat::Reference </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00085">PatternGeneratorJRL::IntermedQPMat::state_variant_s::Ref</a>.</p>
+
+<p>Referenced by <a class="el" href="a00060_source.html#l00155">PatternGeneratorJRL::GeneratorVelRef::compute_global_reference()</a>, <a class="el" href="a00060_source.html#l00078">PatternGeneratorJRL::GeneratorVelRef::preview_support_states()</a>, and <a class="el" href="a00061_source.html#l00112">PatternGeneratorJRL::GeneratorVelRef::Reference()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a522a837232521225cb11619349f17023"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::State" ref="a522a837232521225cb11619349f17023" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="a00038.html">state_variant_t</a>&amp; PatternGeneratorJRL::IntermedQPMat::State </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aaac48662e9b4da28c551bafcc648e1fe"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::State" ref="aaac48662e9b4da28c551bafcc648e1fe" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="a00038.html">state_variant_t</a> const&amp; PatternGeneratorJRL::IntermedQPMat::State </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00060_source.html#l00464">PatternGeneratorJRL::GeneratorVelRef::build_constraints()</a>, <a class="el" href="a00060_source.html#l00107">PatternGeneratorJRL::GeneratorVelRef::generate_selection_matrices()</a>, and <a class="el" href="a00060_source.html#l00523">PatternGeneratorJRL::GeneratorVelRef::update_problem()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="acc77063be172404e49b7cff9835ca0e5"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::SupportState" ref="acc77063be172404e49b7cff9835ca0e5" args="(const support_state_t &amp;SupportState)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::IntermedQPMat::SupportState </td>
+          <td>(</td>
+          <td class="paramtype">const support_state_t &amp;&nbsp;</td>
+          <td class="paramname"> <em>SupportState</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00105">PatternGeneratorJRL::IntermedQPMat::state_variant_s::SupportState</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1db753d7ec3d8cfeeec118620ce53feb"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::SupportState" ref="a1db753d7ec3d8cfeeec118620ce53feb" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">support_state_t&amp; PatternGeneratorJRL::IntermedQPMat::SupportState </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00105">PatternGeneratorJRL::IntermedQPMat::state_variant_s::SupportState</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a682badb1949f8e5e511174ecee7d48fe"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::SupportState" ref="a682badb1949f8e5e511174ecee7d48fe" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">support_state_t const&amp; PatternGeneratorJRL::IntermedQPMat::SupportState </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00105">PatternGeneratorJRL::IntermedQPMat::state_variant_s::SupportState</a>.</p>
+
+<p>Referenced by <a class="el" href="a00060_source.html#l00036">PatternGeneratorJRL::GeneratorVelRef::GeneratorVelRef()</a>, <a class="el" href="a00060_source.html#l00078">PatternGeneratorJRL::GeneratorVelRef::preview_support_states()</a>, and <a class="el" href="a00061_source.html#l00114">PatternGeneratorJRL::GeneratorVelRef::SupportState()</a>.</p>
+
+</div>
+</div>
 <hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="ad27927ac817bff0dbfa00d07f3e3e2d2"></a><!-- doxytag: member="olist::oacc" ref="ad27927ac817bff0dbfa00d07f3e3e2d2" args="" -->
+<a class="anchor" id="aa7914720b2b12f086c7b3eb933a43a01"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::ACCELERATION" ref="aa7914720b2b12f086c7b3eb933a43a01" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* <a class="el" href="a00024.html#ad27927ac817bff0dbfa00d07f3e3e2d2">olist::oacc</a></td>
+          <td class="memname">const int <a class="el" href="a00024.html#aa7914720b2b12f086c7b3eb933a43a01">PatternGeneratorJRL::IntermedQPMat::ACCELERATION</a> = 12<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a6b914b4f6d4df1f377d40c964bd71625"></a><!-- doxytag: member="olist::oblnk" ref="a6b914b4f6d4df1f377d40c964bd71625" args="" -->
+<a class="anchor" id="a85fb00c20c5557834f3ba3c9b29ed43e"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::COP" ref="a85fb00c20c5557834f3ba3c9b29ed43e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* <a class="el" href="a00024.html#a6b914b4f6d4df1f377d40c964bd71625">olist::oblnk</a></td>
+          <td class="memname">const int <a class="el" href="a00024.html#a85fb00c20c5557834f3ba3c9b29ed43e">PatternGeneratorJRL::IntermedQPMat::COP</a> = 14<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00060_source.html#l00464">PatternGeneratorJRL::GeneratorVelRef::build_constraints()</a>, <a class="el" href="a00066_source.html#l00104">Dynamics()</a>, <a class="el" href="a00060_source.html#l00177">PatternGeneratorJRL::GeneratorVelRef::initialize_matrices()</a>, and <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="acb7f3c45380f7965c9ab177c228ed936"></a><!-- doxytag: member="olist::oerr" ref="acb7f3c45380f7965c9ab177c228ed936" args="" -->
+<a class="anchor" id="a2eda07d6e9cbba207a9eb5f43955ace7"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::COP_CENTERING" ref="a2eda07d6e9cbba207a9eb5f43955ace7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="a00079.html#ad489592c06fec6c24859ec8d6e4ba1d9">flag</a> <a class="el" href="a00024.html#acb7f3c45380f7965c9ab177c228ed936">olist::oerr</a></td>
+          <td class="memname">const int <a class="el" href="a00024.html#a2eda07d6e9cbba207a9eb5f43955ace7">PatternGeneratorJRL::IntermedQPMat::COP_CENTERING</a> = 2<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00060_source.html#l00495">PatternGeneratorJRL::GeneratorVelRef::build_invariant_part()</a>, <a class="el" href="a00066_source.html#l00173">dumpObjective()</a>, <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>, <a class="el" href="a00066_source.html#l00068">Objective()</a>, and <a class="el" href="a00060_source.html#l00523">PatternGeneratorJRL::GeneratorVelRef::update_problem()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="abe3c8fd2be6dc58be3157e2e0f48cf6a"></a><!-- doxytag: member="olist::ofm" ref="abe3c8fd2be6dc58be3157e2e0f48cf6a" args="" -->
+<a class="anchor" id="ad8f2145f3dae2cf61acd3e39502274e4"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::INEQ_COM" ref="ad8f2145f3dae2cf61acd3e39502274e4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* <a class="el" href="a00024.html#abe3c8fd2be6dc58be3157e2e0f48cf6a">olist::ofm</a></td>
+          <td class="memname">const int <a class="el" href="a00024.html#ad8f2145f3dae2cf61acd3e39502274e4">PatternGeneratorJRL::IntermedQPMat::INEQ_COM</a> = 21<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00066_source.html#l00136">Inequalities()</a>, and <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a6af6060865be898dfc66c0fd6630d545"></a><!-- doxytag: member="olist::ofnm" ref="a6af6060865be898dfc66c0fd6630d545" args="" -->
+<a class="anchor" id="ad583d1eb5d75b332ff0ead366c84f297"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::INEQ_COP" ref="ad583d1eb5d75b332ff0ead366c84f297" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* <a class="el" href="a00024.html#a6af6060865be898dfc66c0fd6630d545">olist::ofnm</a></td>
+          <td class="memname">const int <a class="el" href="a00024.html#ad583d1eb5d75b332ff0ead366c84f297">PatternGeneratorJRL::IntermedQPMat::INEQ_COP</a> = 20<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00060_source.html#l00464">PatternGeneratorJRL::GeneratorVelRef::build_constraints()</a>, <a class="el" href="a00066_source.html#l00136">Inequalities()</a>, <a class="el" href="a00060_source.html#l00177">PatternGeneratorJRL::GeneratorVelRef::initialize_matrices()</a>, and <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a497ca7ef9c2e42d5cd30c847fdbd3f10"></a><!-- doxytag: member="olist::ofnmlen" ref="a497ca7ef9c2e42d5cd30c847fdbd3f10" args="" -->
+<a class="anchor" id="a4a39589c599e91865204034681c771e7"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::INEQ_FEET" ref="a4a39589c599e91865204034681c771e7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="a00079.html#a01bfec060022e3e8708a1fd2a62c2d6d">ftnlen</a> <a class="el" href="a00024.html#a497ca7ef9c2e42d5cd30c847fdbd3f10">olist::ofnmlen</a></td>
+          <td class="memname">const int <a class="el" href="a00024.html#a4a39589c599e91865204034681c771e7">PatternGeneratorJRL::IntermedQPMat::INEQ_FEET</a> = 22<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00060_source.html#l00464">PatternGeneratorJRL::GeneratorVelRef::build_constraints()</a>, <a class="el" href="a00066_source.html#l00136">Inequalities()</a>, and <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a4c83b168f7afdd6c81a7843193c5755e"></a><!-- doxytag: member="olist::orl" ref="a4c83b168f7afdd6c81a7843193c5755e" args="" -->
+<a class="anchor" id="abf09d97a4693d2cee89788961ca7f1ef"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::INSTANT_VELOCITY" ref="abf09d97a4693d2cee89788961ca7f1ef" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="a00079.html#a3fd01dc27cf01b050363e4910b85969f">ftnint</a> <a class="el" href="a00024.html#a4c83b168f7afdd6c81a7843193c5755e">olist::orl</a></td>
+          <td class="memname">const int <a class="el" href="a00024.html#abf09d97a4693d2cee89788961ca7f1ef">PatternGeneratorJRL::IntermedQPMat::INSTANT_VELOCITY</a> = 1<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00060_source.html#l00495">PatternGeneratorJRL::GeneratorVelRef::build_invariant_part()</a>, <a class="el" href="a00066_source.html#l00173">dumpObjective()</a>, <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>, <a class="el" href="a00066_source.html#l00068">Objective()</a>, and <a class="el" href="a00060_source.html#l00523">PatternGeneratorJRL::GeneratorVelRef::update_problem()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a2cf08ac4e1e2fc9e6f21299df3f1d2e6"></a><!-- doxytag: member="olist::osta" ref="a2cf08ac4e1e2fc9e6f21299df3f1d2e6" args="" -->
+<a class="anchor" id="a02f28e2acb133fa83ff89971ac8f1f3e"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::JERK" ref="a02f28e2acb133fa83ff89971ac8f1f3e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* <a class="el" href="a00024.html#a2cf08ac4e1e2fc9e6f21299df3f1d2e6">olist::osta</a></td>
+          <td class="memname">const int <a class="el" href="a00024.html#a02f28e2acb133fa83ff89971ac8f1f3e">PatternGeneratorJRL::IntermedQPMat::JERK</a> = 13<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00066_source.html#l00104">Dynamics()</a>, <a class="el" href="a00060_source.html#l00177">PatternGeneratorJRL::GeneratorVelRef::initialize_matrices()</a>, and <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="af4443a6a577bfe9292cbf741c24c6e79"></a><!-- doxytag: member="olist::ounit" ref="af4443a6a577bfe9292cbf741c24c6e79" args="" -->
+<a class="anchor" id="a5679e00a4c94f55c4510e480e62b4646"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::JERK_MIN" ref="a5679e00a4c94f55c4510e480e62b4646" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="a00079.html#a3fd01dc27cf01b050363e4910b85969f">ftnint</a> <a class="el" href="a00024.html#af4443a6a577bfe9292cbf741c24c6e79">olist::ounit</a></td>
+          <td class="memname">const int <a class="el" href="a00024.html#a5679e00a4c94f55c4510e480e62b4646">PatternGeneratorJRL::IntermedQPMat::JERK_MIN</a> = 3<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00060_source.html#l00495">PatternGeneratorJRL::GeneratorVelRef::build_invariant_part()</a>, <a class="el" href="a00066_source.html#l00173">dumpObjective()</a>, <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>, and <a class="el" href="a00066_source.html#l00068">Objective()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="acaa212a0c42f0600071632555625239b"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::MEAN_VELOCITY" ref="acaa212a0c42f0600071632555625239b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int <a class="el" href="a00024.html#acaa212a0c42f0600071632555625239b">PatternGeneratorJRL::IntermedQPMat::MEAN_VELOCITY</a> = 0<code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>, and <a class="el" href="a00066_source.html#l00068">Objective()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aae077e71590d550a2b6a9eb9ff003ce5"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::POSITION" ref="aae077e71590d550a2b6a9eb9ff003ce5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int <a class="el" href="a00024.html#aae077e71590d550a2b6a9eb9ff003ce5">PatternGeneratorJRL::IntermedQPMat::POSITION</a> = 10<code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa24652c469e5b3bf2568bdadde540d46"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::VELOCITY" ref="aa24652c469e5b3bf2568bdadde540d46" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int <a class="el" href="a00024.html#aa24652c469e5b3bf2568bdadde540d46">PatternGeneratorJRL::IntermedQPMat::VELOCITY</a> = 11<code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00066_source.html#l00104">Dynamics()</a>, <a class="el" href="a00060_source.html#l00177">PatternGeneratorJRL::GeneratorVelRef::initialize_matrices()</a>, and <a class="el" href="a00066_source.html#l00034">IntermedQPMat()</a>.</p>
 
 </div>
 </div>

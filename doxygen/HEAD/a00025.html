@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: PatternGeneratorJRL::PatternGeneratorInterface Class Reference</title>
+<title>jrl-walkgen: PatternGeneratorJRL::LinearConstraintInequality_s Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,6 +9,7 @@
   <div class="tabs">
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -22,1091 +23,148 @@
       <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
   </div>
-  <div class="navpath"><a class="el" href="a00098.html">PatternGeneratorJRL</a>::<a class="el" href="a00025.html">PatternGeneratorInterface</a>
+  <div class="navpath"><a class="el" href="a00111.html">PatternGeneratorJRL</a>::<a class="el" href="a00025.html">LinearConstraintInequality_s</a>
   </div>
 </div>
 <div class="contents">
-<h1>PatternGeneratorJRL::PatternGeneratorInterface Class Reference</h1><!-- doxytag: class="PatternGeneratorJRL::PatternGeneratorInterface" -->
-<p>This class is the interface between the Pattern Generator and the external world.  
-<a href="#_details">More...</a></p>
-
-<p><code>#include &lt;jrl/walkgen/patterngeneratorinterface.hh&gt;</code></p>
+<h1>PatternGeneratorJRL::LinearConstraintInequality_s Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::LinearConstraintInequality_s" -->
+<p><code>#include &lt;jrl/walkgen/pgtypes.hh&gt;</code></p>
 <div class="dynheader">
-Inheritance diagram for PatternGeneratorJRL::PatternGeneratorInterface:</div>
+Collaboration diagram for PatternGeneratorJRL::LinearConstraintInequality_s:</div>
 <div class="dynsection">
-<div class="center"><img src="a00215.png" border="0" usemap="#_pattern_generator_j_r_l_1_1_pattern_generator_interface_inherit__map" alt="Inheritance graph"/></div>
-<map name="_pattern_generator_j_r_l_1_1_pattern_generator_interface_inherit__map" id="_pattern_generator_j_r_l_1_1_pattern_generator_interface_inherit__map">
-<area shape="rect" href="a00026.html" title="This class is the interface between the Pattern Generator and the external world..." alt="" coords="5,84,373,111"/></map>
+<div class="center"><img src="a00247.png" border="0" usemap="#_pattern_generator_j_r_l_1_1_linear_constraint_inequality__s_coll__map" alt="Collaboration graph"/></div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 
-<p><a href="a00216.html">List of all members.</a></p>
+<p><a href="a00248.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a04eeb597a6e72b2aee6c403219eaf5e1">PatternGeneratorInterface</a> (<a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="a00008.html">CjrlHumanoidDynamicRobot</a> *)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#aad9b7d659484cda7cc50f8b705991da5">~PatternGeneratorInterface</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#af84dc7eaa5182afb707ef526ed1395ae">AddStepInStack</a> (double dx, double dy, double theta)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Function to specify steps in the stack of the walking pattern generator. This method is different AddOnLineStep which is the default step add when there is no policy, or no step available.  <a href="#af84dc7eaa5182afb707ef526ed1395ae"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a4be831fc9105361a9476cfa8b4fac28f">CommonInitializationOfWalking</a> (<a class="el" href="a00009.html">COMState</a> &amp;lStartingCOMState, MAL_S3_VECTOR_TYPE(double)&amp;lStartingZMPPosition, MAL_VECTOR(&amp;, double) BodyAnglesIni, <a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;InitLeftFootAbsPos, <a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;InitRightFootAbsPos, std::deque&lt; <a class="el" href="a00028.html">RelativeFootPosition</a> &gt; &amp;lRelativeFootPositions, std::vector&lt; double &gt; &amp;lCurrentJointValues, bool ClearStepStackHandler)=0</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a25ddcdc020cf8a71acb0e89d1a79ff14">SetCurrentJointValues</a> (MAL_VECTOR(&amp;lCurrentJointValues, double))=0</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a087428fd1c299438ce1890dd870b6744">GetWalkMode</a> ()=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the walking mode.  <a href="#a087428fd1c299438ce1890dd870b6744"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a660e55f4ad0249799d6b8f525dbbfe3a">GetLegJointVelocity</a> (MAL_VECTOR(&amp;dqr, double), MAL_VECTOR(&amp;dql, double))=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the leg joint velocity.  <a href="#a660e55f4ad0249799d6b8f525dbbfe3a"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a21574238c4f0f73981bc59ee849187c0">ReadSequenceOfSteps</a> (std::istringstream &amp;strm)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Read a sequence of steps.  <a href="#a21574238c4f0f73981bc59ee849187c0"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a07229869e12172af1ea9071206b1dd16">setZMPInitialPoint</a> (MAL_S3_VECTOR(&amp;, double) lZMPInitialPoint)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the initial ZMP reference point.  <a href="#a07229869e12172af1ea9071206b1dd16"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a6a9b0e0135455123ded5195a42d7df5f">getZMPInitialPoint</a> (MAL_S3_VECTOR(&amp;, double) lZMPInitialPoint)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the initial ZMP reference point.  <a href="#a6a9b0e0135455123ded5195a42d7df5f"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#ae024dc4932de801dc1f5263c2ec9cfa1">EvaluateStartingState</a> (<a class="el" href="a00009.html">COMState</a> &amp;lStartingCOMState, MAL_S3_VECTOR_TYPE(double)&amp;lStartingZMPPosition, MAL_VECTOR_TYPE(double)&amp;lStartingWaistPose, <a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;InitLeftFootAbsPos, <a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;InitRightFootAbsPos)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the ZMP, CoM, left foot absolute position, and right foot absolute position for the initiale pose.  <a href="#ae024dc4932de801dc1f5263c2ec9cfa1"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a2ba8b0daac72fce0a86c948c3029b0f8">setVelocityReference</a> (double <a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>, double y, double yaw)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set velocity reference This method is only supported by Herdt's algorithm. Currently only a 3D speed is supported:  <a href="#a2ba8b0daac72fce0a86c948c3029b0f8"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a52d6d2209372ab6b3208e33533d9d9d7">setCoMPerturbationForce</a> (double <a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>, double y)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set velocity reference.  <a href="#a52d6d2209372ab6b3208e33533d9d9d7"></a><br/></td></tr>
-<tr><td colspan="2"><div class="groupHeader">Methods for the control part.</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrpc7926ba997531e963f37a32e33c91932"></a> </p>
-</div></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#abb65c58084fc1fff0207a8f152bf1b64">RunOneStepOfTheControlLoop</a> (MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Run One Step of the global control loop aka The Main Method To Be Used.  <a href="#abb65c58084fc1fff0207a8f152bf1b64"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#ad71cd45c61eeec9f87d363d141755651">RunOneStepOfTheControlLoop</a> (MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget, <a class="el" href="a00008.html">COMPosition</a> &amp;<a class="el" href="a00008.html">COMPosition</a>, <a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;LeftFootPosition, <a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;RightFootPosition)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Run One Step of the global control loop aka The Main Method To Be Used.  <a href="#ad71cd45c61eeec9f87d363d141755651"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a7344dd6df12bbea867e22388d77b019c">RunOneStepOfTheControlLoop</a> (MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget, <a class="el" href="a00009.html">COMState</a> &amp;<a class="el" href="a00009.html">COMState</a>, <a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;LeftFootPosition, <a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;RightFootPosition)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Run One Step of the global control loop aka The Main Method To Be Used.  <a href="#a7344dd6df12bbea867e22388d77b019c"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a880c9c046b926382a904172e8d9b6ac9">RunOneStepOfTheControlLoop</a> (<a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;LeftFootPosition, <a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;RightFootPosition, <a class="el" href="a00033.html">ZMPPosition</a> &amp;ZMPRefPos, <a class="el" href="a00008.html">COMPosition</a> &amp;COMRefPos)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Run One Step of the global control loop aka The Main Method To Be Used.  <a href="#a880c9c046b926382a904172e8d9b6ac9"></a><br/></td></tr>
-<tr><td colspan="2"><div class="groupHeader">On-line steps related methods</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrp412f91167c881a3f1188ccec167d531b"></a> </p>
-</div></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a162e350fba3e8da7861b25cf60c0d7f9">StartOnLineStepSequencing</a> ()=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Start the creation of steps on line.  <a href="#a162e350fba3e8da7861b25cf60c0d7f9"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a7a2bf53e4a38f4e79ab054ba42832e00">StopOnLineStepSequencing</a> ()=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Stop the creation of steps on line.  <a href="#a7a2bf53e4a38f4e79ab054ba42832e00"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#ab520362ee06344805856054849ab0c8a">AddOnLineStep</a> (double X, double Y, double Theta)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Add an online step.  <a href="#ab520362ee06344805856054849ab0c8a"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#addc7c89915cd4c76ec8956ee91c92312">ChangeOnLineStep</a> (double Time, <a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;aFootAbsolutePosition, double &amp;newtime)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Change online step. The strategy is the following: the step in single support phase at time t has its landing position changed to <img class="formulaInl" alt="$ (X,Y,\theta) $" src="form_0.png"/> in absolute coordinates (i.e. in the world reference frame of the free flyer of the robot). For stability reason there is no guarantee that this method can realized the operation. Please see the documentation of the walking pattern generator algorithm used.  <a href="#addc7c89915cd4c76ec8956ee91c92312"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#aaea6635b35d078df40392b16ef01bf7f">ChangeOnLineStep</a> (std::istringstream &amp;strm, double &amp;newtime)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Change online step. See the above method for the specifications. This method uses a different format with stream of strings.  <a href="#aaea6635b35d078df40392b16ef01bf7f"></a><br/></td></tr>
-<tr><td colspan="2"><div class="groupHeader">For internal odometry.</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrp92f2a9dd8551588228ad5bcc08c4462a"></a> </p>
-</div></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#ae2a733421661ba2a9fef03e57b737d94">UpdateAbsolutePosition</a> (bool UpdateAbsMotionOrNot)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Update the current waist absolute position.  <a href="#ae2a733421661ba2a9fef03e57b737d94"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a15946bfb2d84a6d8089ad8ec60178acb">getWaistPositionAndOrientation</a> (double TQ[7], double &amp;Orientation)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the waist position and orientation as a quaternion, and the planar X-Y orientation in Orientation.  <a href="#a15946bfb2d84a6d8089ad8ec60178acb"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a533b132373b574388f76684a3af308b1">setWaistPositionAndOrientation</a> (double TQ[7])=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set Waist position and Orientation.  <a href="#a533b132373b574388f76684a3af308b1"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#aa47042b7dd57918aca503ebdc58b978d">getWaistVelocity</a> (double &amp;dx, double &amp;dy, double &amp;omega)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get Waist velocity.  <a href="#aa47042b7dd57918aca503ebdc58b978d"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a038f8e18c6002bd513c4bb5de0c87d00">getWaistPositionMatrix</a> (MAL_S4x4_MATRIX(&amp;lWaistAbsPos, double))=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">An other method to get the waist position using a matrix.  <a href="#a038f8e18c6002bd513c4bb5de0c87d00"></a><br/></td></tr>
-<tr><td colspan="2"><div class="groupHeader">System to call a given method based on registration of a method.</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrp47f8a523c2b28bc614cd38674d4429c7"></a> </p>
-</div></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a1271409b40b19f86db2b35d75a2eeb01">ParseCmd</a> (std::istringstream &amp;strm)=0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Parse a command (to be used out of a plugin) and call all objects which registered the method.  <a href="#a1271409b40b19f86db2b35d75a2eeb01"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#addccf4a4bc3dd738e5bbf737623838fc">MAL_MATRIX</a> (A, double)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#ac3e5b13304312d8553e01082e42fcb2d">MAL_MATRIX</a> (B, double)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a97580910296bddecc5d6560c683c3580">MAL_VECTOR</a> (Center, double)</td></tr>
+<tr><td colspan="2"><h2>Public Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#a01eb4ceae7739a1f20ccbf42793936e5">SimilarConstraints</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#ab19a6b35ecbae39908226b7dd1b4324d">StartingTime</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00025.html#aeda45cab1ff4fbe09a7133f6b4fe33d2">EndingTime</a></td></tr>
 </table>
-<hr/><a name="_details"></a><h2>Detailed Description</h2>
-<p>This class is the interface between the Pattern Generator and the external world. </p>
-<p>In addition to the classical setter and getter for various parameters there is the possibility to pass commands a string of stream to the method <em><a class="el" href="a00025.html#a1271409b40b19f86db2b35d75a2eeb01" title="Parse a command (to be used out of a plugin) and call all objects which registered...">ParseCmd()</a></em>.</p>
-<p>There is a set of functionnalities directly supported by the API: </p>
-<hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a04eeb597a6e72b2aee6c403219eaf5e1"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::PatternGeneratorInterface" ref="a04eeb597a6e72b2aee6c403219eaf5e1" args="(CjrlHumanoidDynamicRobot *)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">PatternGeneratorJRL::PatternGeneratorInterface::PatternGeneratorInterface </td>
-          <td>(</td>
-          <td class="paramtype"><a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="a00008.html">CjrlHumanoidDynamicRobot</a> *&nbsp;</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Constructor </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>strm,:</em>&nbsp;</td><td>Should provide the file to initialize the preview control, the path to the VRML model, and the name of the file containing the VRML model. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="aad9b7d659484cda7cc50f8b705991da5"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::~PatternGeneratorInterface" ref="aad9b7d659484cda7cc50f8b705991da5" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual PatternGeneratorJRL::PatternGeneratorInterface::~PatternGeneratorInterface </td>
-          <td>(</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [inline, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Destructor </p>
-
-</div>
-</div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="ab520362ee06344805856054849ab0c8a"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::AddOnLineStep" ref="ab520362ee06344805856054849ab0c8a" args="(double X, double Y, double Theta)=0" -->
+<a class="anchor" id="ac3e5b13304312d8553e01082e42fcb2d"></a><!-- doxytag: member="PatternGeneratorJRL::LinearConstraintInequality_s::MAL_MATRIX" ref="ac3e5b13304312d8553e01082e42fcb2d" args="(B, double)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::AddOnLineStep </td>
+          <td class="memname">PatternGeneratorJRL::LinearConstraintInequality_s::MAL_MATRIX </td>
           <td>(</td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>X</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>Y</em>, </td>
+          <td class="paramtype">B&nbsp;</td>
+          <td class="paramname">, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>Theta</em></td><td>&nbsp;</td>
+          <td class="paramname"></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
+          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Add an online step. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#a449c5387197aca26290d11c96195caab">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
 </div>
 </div>
-<a class="anchor" id="af84dc7eaa5182afb707ef526ed1395ae"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::AddStepInStack" ref="af84dc7eaa5182afb707ef526ed1395ae" args="(double dx, double dy, double theta)=0" -->
+<a class="anchor" id="addccf4a4bc3dd738e5bbf737623838fc"></a><!-- doxytag: member="PatternGeneratorJRL::LinearConstraintInequality_s::MAL_MATRIX" ref="addccf4a4bc3dd738e5bbf737623838fc" args="(A, double)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::AddStepInStack </td>
+          <td class="memname">PatternGeneratorJRL::LinearConstraintInequality_s::MAL_MATRIX </td>
           <td>(</td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>dx</em>, </td>
+          <td class="paramtype">A&nbsp;</td>
+          <td class="paramname">, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>dy</em>, </td>
+          <td class="paramname"></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a97580910296bddecc5d6560c683c3580"></a><!-- doxytag: member="PatternGeneratorJRL::LinearConstraintInequality_s::MAL_VECTOR" ref="a97580910296bddecc5d6560c683c3580" args="(Center, double)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">PatternGeneratorJRL::LinearConstraintInequality_s::MAL_VECTOR </td>
+          <td>(</td>
+          <td class="paramtype">Center&nbsp;</td>
+          <td class="paramname">, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>theta</em></td><td>&nbsp;</td>
+          <td class="paramname"></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
+          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Function to specify steps in the stack of the walking pattern generator. This method is different AddOnLineStep which is the default step add when there is no policy, or no step available. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#a978b77b032715184b9b242834c77a68b">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
 </div>
 </div>
-<a class="anchor" id="aaea6635b35d078df40392b16ef01bf7f"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::ChangeOnLineStep" ref="aaea6635b35d078df40392b16ef01bf7f" args="(std::istringstream &amp;strm, double &amp;newtime)=0" -->
+<hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="aeda45cab1ff4fbe09a7133f6b4fe33d2"></a><!-- doxytag: member="PatternGeneratorJRL::LinearConstraintInequality_s::EndingTime" ref="aeda45cab1ff4fbe09a7133f6b4fe33d2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::ChangeOnLineStep </td>
-          <td>(</td>
-          <td class="paramtype">std::istringstream &amp;&nbsp;</td>
-          <td class="paramname"> <em>strm</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double &amp;&nbsp;</td>
-          <td class="paramname"> <em>newtime</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
+          <td class="memname">double <a class="el" href="a00025.html#aeda45cab1ff4fbe09a7133f6b4fe33d2">PatternGeneratorJRL::LinearConstraintInequality_s::EndingTime</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Change online step. See the above method for the specifications. This method uses a different format with stream of strings. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Time,:</em>&nbsp;</td><td>Time information of the step. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>nothing </dd></dl>
-
 </div>
 </div>
-<a class="anchor" id="addc7c89915cd4c76ec8956ee91c92312"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::ChangeOnLineStep" ref="addc7c89915cd4c76ec8956ee91c92312" args="(double Time, FootAbsolutePosition &amp;aFootAbsolutePosition, double &amp;newtime)=0" -->
+<a class="anchor" id="a01eb4ceae7739a1f20ccbf42793936e5"></a><!-- doxytag: member="PatternGeneratorJRL::LinearConstraintInequality_s::SimilarConstraints" ref="a01eb4ceae7739a1f20ccbf42793936e5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual int PatternGeneratorJRL::PatternGeneratorInterface::ChangeOnLineStep </td>
-          <td>(</td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>Time</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>aFootAbsolutePosition</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double &amp;&nbsp;</td>
-          <td class="paramname"> <em>newtime</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
+          <td class="memname">std::vector&lt;int&gt; <a class="el" href="a00025.html#a01eb4ceae7739a1f20ccbf42793936e5">PatternGeneratorJRL::LinearConstraintInequality_s::SimilarConstraints</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Change online step. The strategy is the following: the step in single support phase at time t has its landing position changed to <img class="formulaInl" alt="$ (X,Y,\theta) $" src="form_0.png"/> in absolute coordinates (i.e. in the world reference frame of the free flyer of the robot). For stability reason there is no guarantee that this method can realized the operation. Please see the documentation of the walking pattern generator algorithm used. </p>
-<p>If the time falls during a double support phase, the next single support phase is chosen.</p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Time,:</em>&nbsp;</td><td>Time information of the step. </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>aFootAbsolutePosition,:</em>&nbsp;</td><td>Absolute position of the foot. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>If the operation failed the method returns a negative number related to an error, 0 otherwise. </dd></dl>
-
-<p>Implemented in <a class="el" href="a00026.html#a556e976d725cc33088a6a3decf664b43">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
 </div>
 </div>
-<a class="anchor" id="a4be831fc9105361a9476cfa8b4fac28f"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::CommonInitializationOfWalking" ref="a4be831fc9105361a9476cfa8b4fac28f" args="(COMState &amp;lStartingCOMState, MAL_S3_VECTOR_TYPE(double)&amp;lStartingZMPPosition, MAL_VECTOR(&amp;, double) BodyAnglesIni, FootAbsolutePosition &amp;InitLeftFootAbsPos, FootAbsolutePosition &amp;InitRightFootAbsPos, std::deque&lt; RelativeFootPosition &gt; &amp;lRelativeFootPositions, std::vector&lt; double &gt; &amp;lCurrentJointValues, bool ClearStepStackHandler)=0" -->
+<a class="anchor" id="ab19a6b35ecbae39908226b7dd1b4324d"></a><!-- doxytag: member="PatternGeneratorJRL::LinearConstraintInequality_s::StartingTime" ref="ab19a6b35ecbae39908226b7dd1b4324d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::CommonInitializationOfWalking </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="a00009.html">COMState</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>lStartingCOMState</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_S3_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>lStartingZMPPosition</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR(&amp;, double)&nbsp;</td>
-          <td class="paramname"> <em>BodyAnglesIni</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>InitLeftFootAbsPos</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>InitRightFootAbsPos</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::deque&lt; <a class="el" href="a00028.html">RelativeFootPosition</a> &gt; &amp;&nbsp;</td>
-          <td class="paramname"> <em>lRelativeFootPositions</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; double &gt; &amp;&nbsp;</td>
-          <td class="paramname"> <em>lCurrentJointValues</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&nbsp;</td>
-          <td class="paramname"> <em>ClearStepStackHandler</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
+          <td class="memname">double <a class="el" href="a00025.html#ab19a6b35ecbae39908226b7dd1b4324d">PatternGeneratorJRL::LinearConstraintInequality_s::StartingTime</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>Common Initialization of walking. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>lStartingCOMPosition,:</em>&nbsp;</td><td>For the starting position on the articular space, returns the COM position. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>lStartingZMPPosition,:</em>&nbsp;</td><td>For the starting position on the articular space, returns the ZMP position. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>BodyAnglesIni,:</em>&nbsp;</td><td>Basically it is a copy of CurrentJointValues but as a vector. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>InitLeftFootAbsPos,:</em>&nbsp;</td><td>Returns the current absolute position of the left foot for the given posture of the robot. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>InitRightFootAbsPos,:</em>&nbsp;</td><td>Returns the current absolute position of the right foot for the given posture of the robot. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>lRelativeFootPositions,:</em>&nbsp;</td><td>List of relative positions for the support foot still in the stack of steps. </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>lCurrentJointValues,:</em>&nbsp;</td><td>The vector of articular values in classical C++ style. </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>ClearStepStackHandler,:</em>&nbsp;</td><td>Clean the stack of steps after copy. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="ae024dc4932de801dc1f5263c2ec9cfa1"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::EvaluateStartingState" ref="ae024dc4932de801dc1f5263c2ec9cfa1" args="(COMState &amp;lStartingCOMState, MAL_S3_VECTOR_TYPE(double)&amp;lStartingZMPPosition, MAL_VECTOR_TYPE(double)&amp;lStartingWaistPose, FootAbsolutePosition &amp;InitLeftFootAbsPos, FootAbsolutePosition &amp;InitRightFootAbsPos)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::EvaluateStartingState </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="a00009.html">COMState</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>lStartingCOMState</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_S3_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>lStartingZMPPosition</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>lStartingWaistPose</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>InitLeftFootAbsPos</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>InitRightFootAbsPos</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Returns the ZMP, CoM, left foot absolute position, and right foot absolute position for the initiale pose. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#aad834af881df6e7d2f10c3333abc0185">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a660e55f4ad0249799d6b8f525dbbfe3a"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::GetLegJointVelocity" ref="a660e55f4ad0249799d6b8f525dbbfe3a" args="(MAL_VECTOR(&amp;dqr, double), MAL_VECTOR(&amp;dql, double))=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::GetLegJointVelocity </td>
-          <td>(</td>
-          <td class="paramtype">MAL_VECTOR &amp;,&nbsp;</td>
-          <td class="paramname"> <em>double</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR &amp;,&nbsp;</td>
-          <td class="paramname"> <em>double</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Get the leg joint velocity. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#abd7c6fe31054791f6fb3a3aec901ced3">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a15946bfb2d84a6d8089ad8ec60178acb"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::getWaistPositionAndOrientation" ref="a15946bfb2d84a6d8089ad8ec60178acb" args="(double TQ[7], double &amp;Orientation)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::getWaistPositionAndOrientation </td>
-          <td>(</td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>TQ</em>[7], </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double &amp;&nbsp;</td>
-          <td class="paramname"> <em>Orientation</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Get the waist position and orientation as a quaternion, and the planar X-Y orientation in Orientation. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#a639c693012f2406706e14c322975da0f">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a038f8e18c6002bd513c4bb5de0c87d00"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::getWaistPositionMatrix" ref="a038f8e18c6002bd513c4bb5de0c87d00" args="(MAL_S4x4_MATRIX(&amp;lWaistAbsPos, double))=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::getWaistPositionMatrix </td>
-          <td>(</td>
-          <td class="paramtype">MAL_S4x4_MATRIX &amp;,&nbsp;</td>
-          <td class="paramname"> <em>double</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>An other method to get the waist position using a matrix. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#a732630e1f4c8486212ce522344b385e1">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aa47042b7dd57918aca503ebdc58b978d"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::getWaistVelocity" ref="aa47042b7dd57918aca503ebdc58b978d" args="(double &amp;dx, double &amp;dy, double &amp;omega)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::getWaistVelocity </td>
-          <td>(</td>
-          <td class="paramtype">double &amp;&nbsp;</td>
-          <td class="paramname"> <em>dx</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double &amp;&nbsp;</td>
-          <td class="paramname"> <em>dy</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double &amp;&nbsp;</td>
-          <td class="paramname"> <em>omega</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Get Waist velocity. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#a328db351f1493eb28accfa63e4ae3aba">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a087428fd1c299438ce1890dd870b6744"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::GetWalkMode" ref="a087428fd1c299438ce1890dd870b6744" args="()=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual int PatternGeneratorJRL::PatternGeneratorInterface::GetWalkMode </td>
-          <td>(</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Returns the walking mode. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#a8532dd768b2931b46feb5e8ece88d3e6">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a6a9b0e0135455123ded5195a42d7df5f"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::getZMPInitialPoint" ref="a6a9b0e0135455123ded5195a42d7df5f" args="(MAL_S3_VECTOR(&amp;, double) lZMPInitialPoint)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::getZMPInitialPoint </td>
-          <td>(</td>
-          <td class="paramtype">MAL_S3_VECTOR(&amp;, double)&nbsp;</td>
-          <td class="paramname"> <em>lZMPInitialPoint</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Get the initial ZMP reference point. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#ab86a9ec627f4e3c594614fb3abe3167f">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a1271409b40b19f86db2b35d75a2eeb01"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::ParseCmd" ref="a1271409b40b19f86db2b35d75a2eeb01" args="(std::istringstream &amp;strm)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual int PatternGeneratorJRL::PatternGeneratorInterface::ParseCmd </td>
-          <td>(</td>
-          <td class="paramtype">std::istringstream &amp;&nbsp;</td>
-          <td class="paramname"> <em>strm</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Parse a command (to be used out of a plugin) and call all objects which registered the method. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#a43d5ad8f83f5cee74170c6808c1ac79d">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a21574238c4f0f73981bc59ee849187c0"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::ReadSequenceOfSteps" ref="a21574238c4f0f73981bc59ee849187c0" args="(std::istringstream &amp;strm)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::ReadSequenceOfSteps </td>
-          <td>(</td>
-          <td class="paramtype">std::istringstream &amp;&nbsp;</td>
-          <td class="paramname"> <em>strm</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Read a sequence of steps. </p>
-
-</div>
-</div>
-<a class="anchor" id="a880c9c046b926382a904172e8d9b6ac9"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop" ref="a880c9c046b926382a904172e8d9b6ac9" args="(FootAbsolutePosition &amp;LeftFootPosition, FootAbsolutePosition &amp;RightFootPosition, ZMPPosition &amp;ZMPRefPos, COMPosition &amp;COMRefPos)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>LeftFootPosition</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>RightFootPosition</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00033.html">ZMPPosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>ZMPRefPos</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00008.html">COMPosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>COMRefPos</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Run One Step of the global control loop aka The Main Method To Be Used. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>LeftFootPosition,:</em>&nbsp;</td><td>Absolute position of the left foot. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>RightFootPosition,:</em>&nbsp;</td><td>Absolute position of the right foot. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>ZMPRefPos,:</em>&nbsp;</td><td>ZMP position new reference </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>COMRefPos,:</em>&nbsp;</td><td>COM position new reference. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>True is there is still some data to send, false otherwise. </dd></dl>
-
-<p>Implemented in <a class="el" href="a00026.html#a87fd147679b0d5531a1f6d79c17987f7">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a7344dd6df12bbea867e22388d77b019c"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop" ref="a7344dd6df12bbea867e22388d77b019c" args="(MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget, COMState &amp;COMState, FootAbsolutePosition &amp;LeftFootPosition, FootAbsolutePosition &amp;RightFootPosition)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop </td>
-          <td>(</td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>CurrentConfiguration</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>CurrentVelocity</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>CurrentAcceleration</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>ZMPTarget</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00009.html">COMState</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>COMState</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>LeftFootPosition</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>RightFootPosition</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Run One Step of the global control loop aka The Main Method To Be Used. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>CurrentConfiguration</em>&nbsp;</td><td>The current configuration of the robot according to the implementation of dynamic-JRLJapan. This should be first position and orientation of the waist, and then all the DOFs of your robot. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>CurrentVelocity</em>&nbsp;</td><td>The current velocity of the robot according to the the implementation of dynamic-JRLJapan. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>CurrentAcceleration</em>&nbsp;</td><td>The current acceleration of the robot according to the the implementation of dynamic-JRLJapan. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>ZMPTarget</em>&nbsp;</td><td>The target ZMP in the waist reference frame. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>COMState</em>&nbsp;</td><td>The CoM state (up to the acceleration) for this motion. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>LeftFootPosition,:</em>&nbsp;</td><td>Absolute position of the left foot. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>RightFootPosition,:</em>&nbsp;</td><td>Absolute position of the right foot. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>True is there is still some data to send, false otherwise. </dd></dl>
-
-<p>Implemented in <a class="el" href="a00026.html#acec675c3ba8b1049a4ecdfad440848db">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ad71cd45c61eeec9f87d363d141755651"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop" ref="ad71cd45c61eeec9f87d363d141755651" args="(MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget, COMPosition &amp;COMPosition, FootAbsolutePosition &amp;LeftFootPosition, FootAbsolutePosition &amp;RightFootPosition)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop </td>
-          <td>(</td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>CurrentConfiguration</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>CurrentVelocity</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>CurrentAcceleration</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>ZMPTarget</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00008.html">COMPosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>COMPosition</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>LeftFootPosition</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="a00012.html">FootAbsolutePosition</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>RightFootPosition</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Run One Step of the global control loop aka The Main Method To Be Used. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>CurrentConfiguration</em>&nbsp;</td><td>The current configuration of the robot according to the implementation of dynamic-JRLJapan. This should be first position and orientation of the waist, and then all the DOFs of your robot. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>CurrentVelocity</em>&nbsp;</td><td>The current velocity of the robot according to the the implementation of dynamic-JRLJapan. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>CurrentAcceleration</em>&nbsp;</td><td>The current acceleration of the robot according to the the implementation of dynamic-JRLJapan. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>ZMPTarget</em>&nbsp;</td><td>The target ZMP in the waist reference frame. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>COMPosition</em>&nbsp;</td><td>The CoM position for this motion. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>LeftFootPosition,:</em>&nbsp;</td><td>Absolute position of the left foot. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>RightFootPosition,:</em>&nbsp;</td><td>Absolute position of the right foot. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>True is there is still some data to send, false otherwise. </dd></dl>
-
-<p>Implemented in <a class="el" href="a00026.html#ae2344ad0294f7a1336838a6cd271680c">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="abb65c58084fc1fff0207a8f152bf1b64"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop" ref="abb65c58084fc1fff0207a8f152bf1b64" args="(MAL_VECTOR_TYPE(double)&amp;CurrentConfiguration, MAL_VECTOR_TYPE(double)&amp;CurrentVelocity, MAL_VECTOR_TYPE(double)&amp;CurrentAcceleration, MAL_VECTOR_TYPE(double)&amp;ZMPTarget)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool PatternGeneratorJRL::PatternGeneratorInterface::RunOneStepOfTheControlLoop </td>
-          <td>(</td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>CurrentConfiguration</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>CurrentVelocity</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>CurrentAcceleration</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
-          <td class="paramname"> <em>ZMPTarget</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Run One Step of the global control loop aka The Main Method To Be Used. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>CurrentConfiguration</em>&nbsp;</td><td>The current configuration of the robot according to the implementation of dynamic-JRLJapan. This should be first position and orientation of the waist, and then all the DOFs of your robot. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>CurrentVelocity</em>&nbsp;</td><td>The current velocity of the robot according to the the implementation of dynamic-JRLJapan. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>CurrentAcceleration</em>&nbsp;</td><td>The current acceleration of the robot according to the the implementation of dynamic-JRLJapan. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>ZMPTarget</em>&nbsp;</td><td>The target ZMP in the waist reference frame. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>True is there is still some data to send, false otherwise. </dd></dl>
-
-<p>Implemented in <a class="el" href="a00026.html#a1f8064c14344c0fdd50fb4bfd8ed40cd">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a52d6d2209372ab6b3208e33533d9d9d7"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::setCoMPerturbationForce" ref="a52d6d2209372ab6b3208e33533d9d9d7" args="(double x, double y)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::setCoMPerturbationForce </td>
-          <td>(</td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>y</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Set velocity reference. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>x,:</em>&nbsp;</td><td>Additive acceleration along the saggital plane. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>y,:</em>&nbsp;</td><td>Additive acceleration along the lateral plane. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="a00026.html#ab5716714084d3469c8a6490cce3fcbb6">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a25ddcdc020cf8a71acb0e89d1a79ff14"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::SetCurrentJointValues" ref="a25ddcdc020cf8a71acb0e89d1a79ff14" args="(MAL_VECTOR(&amp;lCurrentJointValues, double))=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::SetCurrentJointValues </td>
-          <td>(</td>
-          <td class="paramtype">MAL_VECTOR &amp;,&nbsp;</td>
-          <td class="paramname"> <em>double</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Set the current joint values of the robot. This method is used to properly initialize the pattern generator. It also updates the state of the robot if other control mechanisms modifies the upper body part and if this should be taken into account into the pattern generator in the second loop of control. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#af404319fe54e7fb9142a4d8ad34a4d04">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a2ba8b0daac72fce0a86c948c3029b0f8"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::setVelocityReference" ref="a2ba8b0daac72fce0a86c948c3029b0f8" args="(double x, double y, double yaw)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::setVelocityReference </td>
-          <td>(</td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>y</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>yaw</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Set velocity reference This method is only supported by Herdt's algorithm. Currently only a 3D speed is supported: </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>x,:</em>&nbsp;</td><td>Velocity along the saggital plane. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>y,:</em>&nbsp;</td><td>Velocity along the perpendicular plane. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>yaw,:</em>&nbsp;</td><td>Angular velocity in the x-y plane. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="a00026.html#a6512aa39c202b1b93655acb2f82f7386">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a533b132373b574388f76684a3af308b1"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::setWaistPositionAndOrientation" ref="a533b132373b574388f76684a3af308b1" args="(double TQ[7])=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::setWaistPositionAndOrientation </td>
-          <td>(</td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>TQ</em>[7]</td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Set Waist position and Orientation. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#adf2b017fb1db04a84485cd96f1f74d2c">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a07229869e12172af1ea9071206b1dd16"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::setZMPInitialPoint" ref="a07229869e12172af1ea9071206b1dd16" args="(MAL_S3_VECTOR(&amp;, double) lZMPInitialPoint)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::setZMPInitialPoint </td>
-          <td>(</td>
-          <td class="paramtype">MAL_S3_VECTOR(&amp;, double)&nbsp;</td>
-          <td class="paramname"> <em>lZMPInitialPoint</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Set the initial ZMP reference point. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#a4edbad0c8eaef4c26c416a00b3a9a42b">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a162e350fba3e8da7861b25cf60c0d7f9"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::StartOnLineStepSequencing" ref="a162e350fba3e8da7861b25cf60c0d7f9" args="()=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::StartOnLineStepSequencing </td>
-          <td>(</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Start the creation of steps on line. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#a8411c816bc480b6c89ab09908953647b">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a7a2bf53e4a38f4e79ab054ba42832e00"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::StopOnLineStepSequencing" ref="a7a2bf53e4a38f4e79ab054ba42832e00" args="()=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::StopOnLineStepSequencing </td>
-          <td>(</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Stop the creation of steps on line. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#a96a267c2a65391778bf511ef7ed99769">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ae2a733421661ba2a9fef03e57b737d94"></a><!-- doxytag: member="PatternGeneratorJRL::PatternGeneratorInterface::UpdateAbsolutePosition" ref="ae2a733421661ba2a9fef03e57b737d94" args="(bool UpdateAbsMotionOrNot)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PatternGeneratorJRL::PatternGeneratorInterface::UpdateAbsolutePosition </td>
-          <td>(</td>
-          <td class="paramtype">bool&nbsp;</td>
-          <td class="paramname"> <em>UpdateAbsMotionOrNot</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Update the current waist absolute position. </p>
-
-<p>Implemented in <a class="el" href="a00026.html#a4cf4e25bb9850d01549121eea975baf9">PatternGeneratorJRL::PatternGeneratorInterfacePrivate</a>.</p>
 
 </div>
 </div>

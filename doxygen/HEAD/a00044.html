@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: FilteringAnalyticalTrajectoryByPreviewControl.cpp File Reference</title>
+<title>jrl-walkgen: AnalyticalZMPCOGTrajectory.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,6 +9,7 @@
   <div class="tabs">
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -22,58 +23,22 @@
   </div>
 </div>
 <div class="contents">
-<h1>FilteringAnalyticalTrajectoryByPreviewControl.cpp File Reference</h1><code>#include &lt;iostream&gt;</code><br/>
+<h1>AnalyticalZMPCOGTrajectory.cpp File Reference</h1><code>#include &lt;iostream&gt;</code><br/>
 <code>#include &lt;fstream&gt;</code><br/>
-<code>#include &lt;ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.h&gt;</code><br/>
+<code>#include &lt;math.h&gt;</code><br/>
+<code>#include &lt;Mathematics/AnalyticalZMPCOGTrajectory.h&gt;</code><br/>
+<code>#include &lt;Debug.h&gt;</code><br/>
 <div class="dynheader">
-Include dependency graph for FilteringAnalyticalTrajectoryByPreviewControl.cpp:</div>
+Include dependency graph for AnalyticalZMPCOGTrajectory.cpp:</div>
 <div class="dynsection">
-<div class="center"><img src="a00111.png" border="0" usemap="#_filtering_analytical_trajectory_by_preview_control_8cpp_map" alt=""/></div>
+<div class="center"><img src="a00122.png" border="0" usemap="#_analytical_z_m_p_c_o_g_trajectory_8cpp_map" alt=""/></div>
 </div>
 <table border="0" cellpadding="0" cellspacing="0">
-<tr><td colspan="2"><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00044.html#aaf4d03d258e4c69a9000091fb85e3058">ODEBUG</a>(<a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00044.html#aa817bd80d733edaa1c456bfc1176839a">ODEBUG3</a>(<a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>)</td></tr>
+<tr><td colspan="2"><h2>Namespaces</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">namespace &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00111.html">PatternGeneratorJRL</a></td></tr>
+<tr><td colspan="2"><h2>Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00111.html#a0146a5833f11423eeeb8394b1787aa8a">PatternGeneratorJRL::operator&lt;&lt;</a> (ostream &amp;os, const AnalyticalZMPCOGTrajectory &amp;obj)</td></tr>
 </table>
-<hr/><h2>Define Documentation</h2>
-<a class="anchor" id="aaf4d03d258e4c69a9000091fb85e3058"></a><!-- doxytag: member="FilteringAnalyticalTrajectoryByPreviewControl.cpp::ODEBUG" ref="aaf4d03d258e4c69a9000091fb85e3058" args="(x)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ODEBUG</td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>&nbsp;</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa817bd80d733edaa1c456bfc1176839a"></a><!-- doxytag: member="FilteringAnalyticalTrajectoryByPreviewControl.cpp::ODEBUG3" ref="aa817bd80d733edaa1c456bfc1176839a" args="(x)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ODEBUG3</td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>&nbsp;</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment">cerr &lt;&lt; <span class="stringliteral">&quot;FilteringAnalyticalTrajectoryByPreviewControl&quot;</span> &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; __FUNCTION__ \
-                       &lt;&lt; <span class="stringliteral">&quot;(# &quot;</span> &lt;&lt; __LINE__ &lt;&lt; <span class="stringliteral">&quot;): &quot;</span>&lt;&lt; <a class="code" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a> &lt;&lt; endl
-</pre></div>
-</div>
-</div>
 </div>
 </body>
 </html>

@@ -1,3 +1,11 @@
 <map id="G" name="G">
-<area shape="rect" href="$a00056.html" title="portability/gettimeofday.hh" alt="" coords="5,84,197,111"/>
+<area shape="rect" href="$a00094.html" title="relative&#45;feet&#45;inequalities.hh" alt="" coords="316,84,511,111"/>
+<area shape="rect" href="$a00080.html" title="patterngeneratorinterfaceprivate.hh" alt="" coords="13,84,264,111"/>
+<area shape="rect" href="$a00081.html" title="PGTypes.cpp" alt="" coords="535,84,636,111"/>
+<area shape="rect" href="$a00072.html" title="mpc&#45;trajectory&#45;generation.hh" alt="" coords="660,84,868,111"/>
+<area shape="rect" href="$a00093.html" title="relative&#45;feet&#45;inequalities.cpp" alt="" coords="312,161,515,188"/>
+<area shape="rect" href="$a00061.html" title="generator&#45;vel&#45;ref.hh" alt="" coords="539,161,685,188"/>
+<area shape="rect" href="$a00060.html" title="generator&#45;vel&#45;ref.cpp" alt="" coords="535,239,689,265"/>
+<area shape="rect" href="$a00079.html" title="PatternGeneratorInterfacePrivate.cpp" alt="" coords="5,161,264,188"/>
+<area shape="rect" href="$a00071.html" title="mpc&#45;trajectory&#45;generation.cpp" alt="" coords="709,161,925,188"/>
 </map>

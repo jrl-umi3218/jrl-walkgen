@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: icilist Struct Reference</title>
+<title>jrl-walkgen: PatternGeneratorJRL::COMPosition_s Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,6 +9,7 @@
   <div class="tabs">
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -22,95 +23,139 @@
       <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
   </div>
+  <div class="navpath"><a class="el" href="a00111.html">PatternGeneratorJRL</a>::<a class="el" href="a00015.html">COMPosition_s</a>
+  </div>
 </div>
 <div class="contents">
-<h1>icilist Struct Reference</h1><!-- doxytag: class="icilist" -->
-<p><a href="a00178.html">List of all members.</a></p>
+<h1>PatternGeneratorJRL::COMPosition_s Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::COMPosition_s" -->
+<p>Structure to store the COM position computed by the preview control.  
+<a href="#_details">More...</a></p>
+
+<p><code>#include &lt;jrl/walkgen/pgtypes.hh&gt;</code></p>
+
+<p><a href="a00242.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="a00015.html">COMPosition_s</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#a7c498fa404d761cae4fe982b2c35c494">operator=</a> (const <a class="el" href="a00016.html">COMState_s</a> &amp;aCS)</td></tr>
 <tr><td colspan="2"><h2>Public Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00079.html#ad489592c06fec6c24859ec8d6e4ba1d9">flag</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#aee2f6c57bb6df08adfc9d62a185f999a">icierr</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#a4da4c2525fa8e39989ddc28f99b86b13">iciunit</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00079.html#ad489592c06fec6c24859ec8d6e4ba1d9">flag</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#a598f4d4f880c560238c7a32f5dcb3e51">iciend</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#a3689b68768a386cbcc460eb2632118e9">icifmt</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00079.html#a3fd01dc27cf01b050363e4910b85969f">ftnint</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#ac6025ddf8b1ade5cb73d607dd2d30501">icirlen</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00079.html#a3fd01dc27cf01b050363e4910b85969f">ftnint</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#a6e4cb8719f1c76ee87273671448da892">icirnum</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#af6750f8e4562651d16dcb79a74c24f66">x</a> [3]</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#a2f308984a0f4fb51589e2c89f16b7497">y</a> [3]</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#a3274e52a140566b720d8bb89b124a30b">z</a> [3]</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#aa4b7d099b1927795134a40d402e35b9c">yaw</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#a9c348212235d7d5b04555e281cc31443">pitch</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html#ac5380565a81edcb041e825c5a5a84b17">roll</a></td></tr>
 </table>
+<hr/><a name="_details"></a><h2>Detailed Description</h2>
+<p>Structure to store the COM position computed by the preview control. </p>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a7c498fa404d761cae4fe982b2c35c494"></a><!-- doxytag: member="PatternGeneratorJRL::COMPosition_s::operator=" ref="a7c498fa404d761cae4fe982b2c35c494" args="(const COMState_s &amp;aCS)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct <a class="el" href="a00015.html">COMPosition_s</a> &amp; PatternGeneratorJRL::COMPosition::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="a00016.html">COMState_s</a> &amp;&nbsp;</td>
+          <td class="paramname"> <em>aCS</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [read]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00082_source.html#l00071">PatternGeneratorJRL::COMState_s::pitch</a>, <a class="el" href="a00082_source.html#l00056">pitch</a>, <a class="el" href="a00082_source.html#l00072">PatternGeneratorJRL::COMState_s::roll</a>, <a class="el" href="a00082_source.html#l00057">roll</a>, <a class="el" href="a00082_source.html#l00069">PatternGeneratorJRL::COMState_s::x</a>, <a class="el" href="a00082_source.html#l00053">x</a>, <a class="el" href="a00082_source.html#l00069">PatternGeneratorJRL::COMState_s::y</a>, <a class="el" href="a00082_source.html#l00053">y</a>, <a class="el" href="a00082_source.html#l00070">PatternGeneratorJRL::COMState_s::yaw</a>, <a class="el" href="a00082_source.html#l00055">yaw</a>, <a class="el" href="a00082_source.html#l00069">PatternGeneratorJRL::COMState_s::z</a>, and <a class="el" href="a00082_source.html#l00054">z</a>.</p>
+
+</div>
+</div>
 <hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="a598f4d4f880c560238c7a32f5dcb3e51"></a><!-- doxytag: member="icilist::iciend" ref="a598f4d4f880c560238c7a32f5dcb3e51" args="" -->
+<a class="anchor" id="a9c348212235d7d5b04555e281cc31443"></a><!-- doxytag: member="PatternGeneratorJRL::COMPosition_s::pitch" ref="a9c348212235d7d5b04555e281cc31443" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="a00079.html#ad489592c06fec6c24859ec8d6e4ba1d9">flag</a> <a class="el" href="a00015.html#a598f4d4f880c560238c7a32f5dcb3e51">icilist::iciend</a></td>
+          <td class="memname">double <a class="el" href="a00015.html#a9c348212235d7d5b04555e281cc31443">PatternGeneratorJRL::COMPosition_s::pitch</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00081_source.html#l00042">PatternGeneratorJRL::COMState_s::operator=()</a>, and <a class="el" href="a00081_source.html#l00028">operator=()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="aee2f6c57bb6df08adfc9d62a185f999a"></a><!-- doxytag: member="icilist::icierr" ref="aee2f6c57bb6df08adfc9d62a185f999a" args="" -->
+<a class="anchor" id="ac5380565a81edcb041e825c5a5a84b17"></a><!-- doxytag: member="PatternGeneratorJRL::COMPosition_s::roll" ref="ac5380565a81edcb041e825c5a5a84b17" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="a00079.html#ad489592c06fec6c24859ec8d6e4ba1d9">flag</a> <a class="el" href="a00015.html#aee2f6c57bb6df08adfc9d62a185f999a">icilist::icierr</a></td>
+          <td class="memname">double <a class="el" href="a00015.html#ac5380565a81edcb041e825c5a5a84b17">PatternGeneratorJRL::COMPosition_s::roll</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00081_source.html#l00042">PatternGeneratorJRL::COMState_s::operator=()</a>, and <a class="el" href="a00081_source.html#l00028">operator=()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a3689b68768a386cbcc460eb2632118e9"></a><!-- doxytag: member="icilist::icifmt" ref="a3689b68768a386cbcc460eb2632118e9" args="" -->
+<a class="anchor" id="af6750f8e4562651d16dcb79a74c24f66"></a><!-- doxytag: member="PatternGeneratorJRL::COMPosition_s::x" ref="af6750f8e4562651d16dcb79a74c24f66" args="[3]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* <a class="el" href="a00015.html#a3689b68768a386cbcc460eb2632118e9">icilist::icifmt</a></td>
+          <td class="memname">double <a class="el" href="a00015.html#af6750f8e4562651d16dcb79a74c24f66">PatternGeneratorJRL::COMPosition_s::x</a>[3]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00081_source.html#l00042">PatternGeneratorJRL::COMState_s::operator=()</a>, and <a class="el" href="a00081_source.html#l00028">operator=()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="ac6025ddf8b1ade5cb73d607dd2d30501"></a><!-- doxytag: member="icilist::icirlen" ref="ac6025ddf8b1ade5cb73d607dd2d30501" args="" -->
+<a class="anchor" id="a2f308984a0f4fb51589e2c89f16b7497"></a><!-- doxytag: member="PatternGeneratorJRL::COMPosition_s::y" ref="a2f308984a0f4fb51589e2c89f16b7497" args="[3]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="a00079.html#a3fd01dc27cf01b050363e4910b85969f">ftnint</a> <a class="el" href="a00015.html#ac6025ddf8b1ade5cb73d607dd2d30501">icilist::icirlen</a></td>
+          <td class="memname">double <a class="el" href="a00015.html#a2f308984a0f4fb51589e2c89f16b7497">PatternGeneratorJRL::COMPosition_s::y</a>[3]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00081_source.html#l00042">PatternGeneratorJRL::COMState_s::operator=()</a>, and <a class="el" href="a00081_source.html#l00028">operator=()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a6e4cb8719f1c76ee87273671448da892"></a><!-- doxytag: member="icilist::icirnum" ref="a6e4cb8719f1c76ee87273671448da892" args="" -->
+<a class="anchor" id="aa4b7d099b1927795134a40d402e35b9c"></a><!-- doxytag: member="PatternGeneratorJRL::COMPosition_s::yaw" ref="aa4b7d099b1927795134a40d402e35b9c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="a00079.html#a3fd01dc27cf01b050363e4910b85969f">ftnint</a> <a class="el" href="a00015.html#a6e4cb8719f1c76ee87273671448da892">icilist::icirnum</a></td>
+          <td class="memname">double <a class="el" href="a00015.html#aa4b7d099b1927795134a40d402e35b9c">PatternGeneratorJRL::COMPosition_s::yaw</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00081_source.html#l00042">PatternGeneratorJRL::COMState_s::operator=()</a>, and <a class="el" href="a00081_source.html#l00028">operator=()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a4da4c2525fa8e39989ddc28f99b86b13"></a><!-- doxytag: member="icilist::iciunit" ref="a4da4c2525fa8e39989ddc28f99b86b13" args="" -->
+<a class="anchor" id="a3274e52a140566b720d8bb89b124a30b"></a><!-- doxytag: member="PatternGeneratorJRL::COMPosition_s::z" ref="a3274e52a140566b720d8bb89b124a30b" args="[3]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* <a class="el" href="a00015.html#a4da4c2525fa8e39989ddc28f99b86b13">icilist::iciunit</a></td>
+          <td class="memname">double <a class="el" href="a00015.html#a3274e52a140566b720d8bb89b124a30b">PatternGeneratorJRL::COMPosition_s::z</a>[3]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00081_source.html#l00042">PatternGeneratorJRL::COMState_s::operator=()</a>, and <a class="el" href="a00081_source.html#l00028">operator=()</a>.</p>
 
 </div>
 </div>

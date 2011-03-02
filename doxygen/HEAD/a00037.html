@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: bzero.hh File Reference</title>
+<title>jrl-walkgen: PatternGeneratorJRL::QPProblem_s::solution_s Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,27 +9,290 @@
   <div class="tabs">
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
-      <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="globals.html"><span>File&nbsp;Members</span></a></li>
+      <li><a href="annotated.html"><span>Class&nbsp;List</span></a></li>
+      <li><a href="classes.html"><span>Class&nbsp;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&nbsp;Hierarchy</span></a></li>
+      <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
+  </div>
+  <div class="navpath"><a class="el" href="a00111.html">PatternGeneratorJRL</a>::<a class="el" href="a00034.html">QPProblem_s</a>::<a class="el" href="a00037.html">solution_s</a>
   </div>
 </div>
 <div class="contents">
-<h1>bzero.hh File Reference</h1><code>#include &lt;strings.h&gt;</code><br/>
-<div class="dynheader">
-Include dependency graph for bzero.hh:</div>
-<div class="dynsection">
-<div class="center"><img src="a00104.png" border="0" usemap="#bzero_8hh_map" alt=""/></div>
-</div>
+<h1>PatternGeneratorJRL::QPProblem_s::solution_s Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::QPProblem_s::solution_s" -->
+<p>Solution.  
+<a href="#_details">More...</a></p>
+
+<p><code>#include &lt;/home/buildbot/devel-src/tools/pkg-dev-mng/Testing/Buildbot/slaves/jrlserver/jrlserverubuntu/build-jrl-walkgen-jrlmt-master/pkgsrc/src/ZMPRefTrajectoryGeneration/qp-problem.hh&gt;</code></p>
+
+<p><a href="a00269.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a6d5932890d90b7fe328bce63d093702e">resize</a> (int nb_variables, int nb_constraints)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Resize solution containers.  <a href="#a6d5932890d90b7fe328bce63d093702e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#ae4d497a79e1c4e2921f1720b993399c1">dump</a> (const char *filename)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Dump solution.  <a href="#ae4d497a79e1c4e2921f1720b993399c1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a89e353bd46ff87bdb50becaa2f7ae123">print</a> (std::ostream &amp;aos)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Print solution.  <a href="#a89e353bd46ff87bdb50becaa2f7ae123"></a><br/></td></tr>
+<tr><td colspan="2"><h2>Public Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a4ce6b15df8432a3e21ed51e5d7fa6a9e">NbVariables</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Size of the solution array.  <a href="#a4ce6b15df8432a3e21ed51e5d7fa6a9e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#aec254e83fec9fd6ebe0f8abfc850006a">NbConstraints</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Number of constraints (lagrange multipliers).  <a href="#aec254e83fec9fd6ebe0f8abfc850006a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#af298b327177acb439e78faa8a42a4f63">Fail</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">SHOWS THE TERMINATION REASON.  <a href="#af298b327177acb439e78faa8a42a4f63"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a4f6ad8624edd35fe12ede97961da268d">Print</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">OUTPUT CONTROL.  <a href="#a4f6ad8624edd35fe12ede97961da268d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::vector&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a8805ffbe97ca4cfb1bd54dd1eba6178d">Solution_vec</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Solution vector.  <a href="#a8805ffbe97ca4cfb1bd54dd1eba6178d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::vector&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a209230c488bf0eead0e314d8dc875de3">ConstrLagr_vec</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Lagrange multipliers of the constraints.  <a href="#a209230c488bf0eead0e314d8dc875de3"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::vector&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a1b2d73129da1fcb5f80972c501d790c1">LBoundsLagr_vec</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Lagrange multipliers of the lower bounds.  <a href="#a1b2d73129da1fcb5f80972c501d790c1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::vector&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a8da7bd3687efd83d7d75c11ecd54cbc7">UBoundsLagr_vec</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Lagrange multipliers of the upper bounds.  <a href="#a8da7bd3687efd83d7d75c11ecd54cbc7"></a><br/></td></tr>
 </table>
+<hr/><a name="_details"></a><h2>Detailed Description</h2>
+<p>Solution. </p>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="ae4d497a79e1c4e2921f1720b993399c1"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_s::dump" ref="ae4d497a79e1c4e2921f1720b993399c1" args="(const char *filename)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QPProblem_s::solution_t::dump </td>
+          <td>(</td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>filename</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Dump solution. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>filename</em>&nbsp;</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="a00090_source.html#l00324">print()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a89e353bd46ff87bdb50becaa2f7ae123"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_s::print" ref="a89e353bd46ff87bdb50becaa2f7ae123" args="(std::ostream &amp;aos)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QPProblem_s::solution_t::print </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&nbsp;</td>
+          <td class="paramname"> <em>aos</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Print solution. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>aos</em>&nbsp;</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="a00091_source.html#l00064">NbVariables</a>, and <a class="el" href="a00091_source.html#l00084">Solution_vec</a>.</p>
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00314">dump()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6d5932890d90b7fe328bce63d093702e"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_s::resize" ref="a6d5932890d90b7fe328bce63d093702e" args="(int nb_variables, int nb_constraints)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QPProblem_s::solution_t::resize </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>nb_variables</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>nb_constraints</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Resize solution containers. </p>
+
+<p>References <a class="el" href="a00091_source.html#l00087">ConstrLagr_vec</a>, <a class="el" href="a00091_source.html#l00089">LBoundsLagr_vec</a>, <a class="el" href="a00091_source.html#l00067">NbConstraints</a>, <a class="el" href="a00091_source.html#l00064">NbVariables</a>, <a class="el" href="a00091_source.html#l00084">Solution_vec</a>, and <a class="el" href="a00091_source.html#l00091">UBoundsLagr_vec</a>.</p>
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00129">PatternGeneratorJRL::QPProblem_s::solve()</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="a209230c488bf0eead0e314d8dc875de3"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_s::ConstrLagr_vec" ref="a209230c488bf0eead0e314d8dc875de3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost_ublas::vector&lt;double&gt; <a class="el" href="a00037.html#a209230c488bf0eead0e314d8dc875de3">PatternGeneratorJRL::QPProblem_s::solution_s::ConstrLagr_vec</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Lagrange multipliers of the constraints. </p>
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00301">resize()</a>, and <a class="el" href="a00090_source.html#l00129">PatternGeneratorJRL::QPProblem_s::solve()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af298b327177acb439e78faa8a42a4f63"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_s::Fail" ref="af298b327177acb439e78faa8a42a4f63" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="a00037.html#af298b327177acb439e78faa8a42a4f63">PatternGeneratorJRL::QPProblem_s::solution_s::Fail</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>SHOWS THE TERMINATION REASON. </p>
+<p>IFAIL = 0 : SUCCESSFUL RETURN. IFAIL = 1 : TOO MANY ITERATIONS (MORE THAN 40*(N+M)). IFAIL = 2 : ACCURACY INSUFFICIENT TO SATISFY CONVERGENCE CRITERION. IFAIL = 5 : LENGTH OF A WORKING ARRAY IS TOO SHORT. IFAIL &gt; 10 : THE CONSTRAINTS ARE INCONSISTENT. </p>
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00129">PatternGeneratorJRL::QPProblem_s::solve()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1b2d73129da1fcb5f80972c501d790c1"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_s::LBoundsLagr_vec" ref="a1b2d73129da1fcb5f80972c501d790c1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost_ublas::vector&lt;double&gt; <a class="el" href="a00037.html#a1b2d73129da1fcb5f80972c501d790c1">PatternGeneratorJRL::QPProblem_s::solution_s::LBoundsLagr_vec</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Lagrange multipliers of the lower bounds. </p>
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00301">resize()</a>, and <a class="el" href="a00090_source.html#l00129">PatternGeneratorJRL::QPProblem_s::solve()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aec254e83fec9fd6ebe0f8abfc850006a"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_s::NbConstraints" ref="aec254e83fec9fd6ebe0f8abfc850006a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="a00037.html#aec254e83fec9fd6ebe0f8abfc850006a">PatternGeneratorJRL::QPProblem_s::solution_s::NbConstraints</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Number of constraints (lagrange multipliers). </p>
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00301">resize()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4ce6b15df8432a3e21ed51e5d7fa6a9e"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_s::NbVariables" ref="a4ce6b15df8432a3e21ed51e5d7fa6a9e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="a00037.html#a4ce6b15df8432a3e21ed51e5d7fa6a9e">PatternGeneratorJRL::QPProblem_s::solution_s::NbVariables</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Size of the solution array. </p>
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00324">print()</a>, and <a class="el" href="a00090_source.html#l00301">resize()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4f6ad8624edd35fe12ede97961da268d"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_s::Print" ref="a4f6ad8624edd35fe12ede97961da268d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="a00037.html#a4f6ad8624edd35fe12ede97961da268d">PatternGeneratorJRL::QPProblem_s::solution_s::Print</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>OUTPUT CONTROL. </p>
+<p>IPRINT = 0 : NO OUTPUT OF QL0001. IPRINT &gt; 0 : BRIEF OUTPUT IN ERROR CASES. </p>
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00129">PatternGeneratorJRL::QPProblem_s::solve()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8805ffbe97ca4cfb1bd54dd1eba6178d"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_s::Solution_vec" ref="a8805ffbe97ca4cfb1bd54dd1eba6178d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost_ublas::vector&lt;double&gt; <a class="el" href="a00037.html#a8805ffbe97ca4cfb1bd54dd1eba6178d">PatternGeneratorJRL::QPProblem_s::solution_s::Solution_vec</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Solution vector. </p>
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00324">print()</a>, <a class="el" href="a00090_source.html#l00301">resize()</a>, and <a class="el" href="a00090_source.html#l00129">PatternGeneratorJRL::QPProblem_s::solve()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8da7bd3687efd83d7d75c11ecd54cbc7"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_s::UBoundsLagr_vec" ref="a8da7bd3687efd83d7d75c11ecd54cbc7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost_ublas::vector&lt;double&gt; <a class="el" href="a00037.html#a8da7bd3687efd83d7d75c11ecd54cbc7">PatternGeneratorJRL::QPProblem_s::solution_s::UBoundsLagr_vec</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Lagrange multipliers of the upper bounds. </p>
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00301">resize()</a>, and <a class="el" href="a00090_source.html#l00129">PatternGeneratorJRL::QPProblem_s::solve()</a>.</p>
+
+</div>
+</div>
 </div>
 </body>
 </html>

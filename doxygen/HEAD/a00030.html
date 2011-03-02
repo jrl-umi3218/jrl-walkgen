@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: PatternGeneratorJRL::IntermedQPMat::state_variant_s Struct Reference</title>
+<title>jrl-walkgen: PatternGeneratorJRL::IntermedQPMat::objective_variant_s Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,6 +9,7 @@
   <div class="tabs">
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -22,181 +23,125 @@
       <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
   </div>
-  <div class="navpath"><a class="el" href="a00098.html">PatternGeneratorJRL</a>::<a class="el" href="a00017.html">IntermedQPMat</a>::<a class="el" href="a00030.html">state_variant_s</a>
+  <div class="navpath"><a class="el" href="a00111.html">PatternGeneratorJRL</a>::<a class="el" href="a00024.html">IntermedQPMat</a>::<a class="el" href="a00030.html">objective_variant_s</a>
   </div>
 </div>
 <div class="contents">
-<h1>PatternGeneratorJRL::IntermedQPMat::state_variant_s Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::IntermedQPMat::state_variant_s" -->
+<h1>PatternGeneratorJRL::IntermedQPMat::objective_variant_s Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::IntermedQPMat::objective_variant_s" -->
 <p><code>#include &lt;/home/buildbot/devel-src/tools/pkg-dev-mng/Testing/Buildbot/slaves/jrlserver/jrlserverubuntu/build-jrl-walkgen-jrlmt-master/pkgsrc/src/Mathematics/intermediate-qp-matrices.hh&gt;</code></p>
+<div class="dynheader">
+Collaboration diagram for PatternGeneratorJRL::IntermedQPMat::objective_variant_s:</div>
+<div class="dynsection">
+<div class="center"><img src="a00254.png" border="0" usemap="#_pattern_generator_j_r_l_1_1_intermed_q_p_mat_1_1objective__variant__s_coll__map" alt="Collaboration graph"/></div>
+<map name="_pattern_generator_j_r_l_1_1_intermed_q_p_mat_1_1objective__variant__s_coll__map" id="_pattern_generator_j_r_l_1_1_intermed_q_p_mat_1_1objective__variant__s_coll__map">
+<area shape="rect" href="a00018.html" title="PatternGeneratorJRL::IntermedQPMat::dynamics_s" alt="" coords="28,7,369,33"/></map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 
-<p><a href="a00231.html">List of all members.</a></p>
+<p><a href="a00255.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#a3388c036a6ed29a0b8498225e461f0da">print</a> (std::ostream &amp;o) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#a34a8def77e75405aec1c8f12a940ec4f">dump</a> (const char *filename) const </td></tr>
 <tr><td colspan="2"><h2>Public Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">reference_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#ad596d41acb1e844727190f5ece741b43">Ref</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reference.  <a href="#ad596d41acb1e844727190f5ece741b43"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">com_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#ada49d9fe1c0bde8ecfe8a64dc1cc43c9">CoM</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">State of the Center of Mass.  <a href="#ada49d9fe1c0bde8ecfe8a64dc1cc43c9"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">trunk_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#abd76109e3289ed365e4ca3eaac8a37cb">Trunk</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">TrunkState.  <a href="#abd76109e3289ed365e4ca3eaac8a37cb"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">supportfoot_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#ab732440cbe1974c99a2641ec92a96a1f">SupportFoot</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Current support foot position.  <a href="#ab732440cbe1974c99a2641ec92a96a1f"></a><br/></td></tr>
-<tr><td colspan="2"><div class="groupHeader">Selection matrices</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrp9b8c21f3d2b62caa1626b7491f8daf68"></a>Selection matrix for the previewed feet positions </p>
-</div></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::matrix&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#a126419538b0390b1b88243e516028d89">V</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::matrix&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#a487a73fc224e06ef9da9284aaf0f455a">VT</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::vector&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#acb5fb4b943d90f21e8be5db65758e22f">Vc</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Selection matrix for the current feet position.  <a href="#acb5fb4b943d90f21e8be5db65758e22f"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::vector&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#a615ede96af8dd8f44c2def413359e4ed">Vc_f</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Selection matrix for the current foot position.  <a href="#a615ede96af8dd8f44c2def413359e4ed"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">boost_ublas::matrix&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#ac94710e00499230f077bdf74b7f19a16">V_f</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Selection matrix for relative feet positions.  <a href="#ac94710e00499230f077bdf74b7f19a16"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#a50cec7444e686a928936b175950075a1">weight</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Ponderation.  <a href="#a50cec7444e686a928936b175950075a1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="a00018.html">dynamics_t</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#a29bc3c4ba40526cd3193264e42c3ca12">dyn</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Dynamics.  <a href="#a29bc3c4ba40526cd3193264e42c3ca12"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00030.html#a3f87cc808343d3eb8d3b73f7c02920d4">type</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Minimization objective type.  <a href="#a3f87cc808343d3eb8d3b73f7c02920d4"></a><br/></td></tr>
 </table>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a34a8def77e75405aec1c8f12a940ec4f"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::objective_variant_s::dump" ref="a34a8def77e75405aec1c8f12a940ec4f" args="(const char *filename) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IntermedQPMat::objective_variant_s::dump </td>
+          <td>(</td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>filename</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00066_source.html#l00223">print()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3388c036a6ed29a0b8498225e461f0da"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::objective_variant_s::print" ref="a3388c036a6ed29a0b8498225e461f0da" args="(std::ostream &amp;o) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; IntermedQPMat::objective_variant_s::print </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&nbsp;</td>
+          <td class="paramname"> <em>o</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>References <a class="el" href="a00067_source.html#l00119">dyn</a>, <a class="el" href="a00067_source.html#l00072">PatternGeneratorJRL::IntermedQPMat::dynamics_s::S</a>, <a class="el" href="a00067_source.html#l00067">PatternGeneratorJRL::IntermedQPMat::dynamics_s::U</a>, <a class="el" href="a00067_source.html#l00069">PatternGeneratorJRL::IntermedQPMat::dynamics_s::UT</a>, and <a class="el" href="a00067_source.html#l00116">weight</a>.</p>
+
+<p>Referenced by <a class="el" href="a00066_source.html#l00235">dump()</a>, <a class="el" href="a00066_source.html#l00173">PatternGeneratorJRL::IntermedQPMat::dumpObjective()</a>, and <a class="el" href="a00066_source.html#l00244">PatternGeneratorJRL::operator&lt;&lt;()</a>.</p>
+
+</div>
+</div>
 <hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="ada49d9fe1c0bde8ecfe8a64dc1cc43c9"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::state_variant_s::CoM" ref="ada49d9fe1c0bde8ecfe8a64dc1cc43c9" args="" -->
+<a class="anchor" id="a29bc3c4ba40526cd3193264e42c3ca12"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::objective_variant_s::dyn" ref="a29bc3c4ba40526cd3193264e42c3ca12" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">com_t <a class="el" href="a00030.html#ada49d9fe1c0bde8ecfe8a64dc1cc43c9">PatternGeneratorJRL::IntermedQPMat::state_variant_s::CoM</a></td>
+          <td class="memname"><a class="el" href="a00018.html">dynamics_t</a>* <a class="el" href="a00030.html#a29bc3c4ba40526cd3193264e42c3ca12">PatternGeneratorJRL::IntermedQPMat::objective_variant_s::dyn</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>State of the Center of Mass. </p>
+<p>Dynamics. </p>
 
-<p>Referenced by <a class="el" href="a00053_source.html#l00386">PatternGeneratorJRL::GeneratorVelRef::buildConstraintsCoP()</a>, <a class="el" href="a00059_source.html#l00162">PatternGeneratorJRL::IntermedQPMat::CoM()</a>, and <a class="el" href="a00053_source.html#l00520">PatternGeneratorJRL::GeneratorVelRef::updateProblem()</a>.</p>
+<p>Referenced by <a class="el" href="a00060_source.html#l00495">PatternGeneratorJRL::GeneratorVelRef::build_invariant_part()</a>, <a class="el" href="a00066_source.html#l00034">PatternGeneratorJRL::IntermedQPMat::IntermedQPMat()</a>, <a class="el" href="a00066_source.html#l00223">print()</a>, and <a class="el" href="a00060_source.html#l00523">PatternGeneratorJRL::GeneratorVelRef::update_problem()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ad596d41acb1e844727190f5ece741b43"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::state_variant_s::Ref" ref="ad596d41acb1e844727190f5ece741b43" args="" -->
+<a class="anchor" id="a3f87cc808343d3eb8d3b73f7c02920d4"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::objective_variant_s::type" ref="a3f87cc808343d3eb8d3b73f7c02920d4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">reference_t <a class="el" href="a00030.html#ad596d41acb1e844727190f5ece741b43">PatternGeneratorJRL::IntermedQPMat::state_variant_s::Ref</a></td>
+          <td class="memname">int <a class="el" href="a00030.html#a3f87cc808343d3eb8d3b73f7c02920d4">PatternGeneratorJRL::IntermedQPMat::objective_variant_s::type</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Reference. </p>
+<p>Minimization objective type. </p>
 
-<p>Referenced by <a class="el" href="a00059_source.html#l00168">PatternGeneratorJRL::IntermedQPMat::Reference()</a>, and <a class="el" href="a00053_source.html#l00520">PatternGeneratorJRL::GeneratorVelRef::updateProblem()</a>.</p>
+<p>Referenced by <a class="el" href="a00066_source.html#l00034">PatternGeneratorJRL::IntermedQPMat::IntermedQPMat()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab732440cbe1974c99a2641ec92a96a1f"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::state_variant_s::SupportFoot" ref="ab732440cbe1974c99a2641ec92a96a1f" args="" -->
+<a class="anchor" id="a50cec7444e686a928936b175950075a1"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::objective_variant_s::weight" ref="a50cec7444e686a928936b175950075a1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">supportfoot_t <a class="el" href="a00030.html#ab732440cbe1974c99a2641ec92a96a1f">PatternGeneratorJRL::IntermedQPMat::state_variant_s::SupportFoot</a></td>
+          <td class="memname">double <a class="el" href="a00030.html#a50cec7444e686a928936b175950075a1">PatternGeneratorJRL::IntermedQPMat::objective_variant_s::weight</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Current support foot position. </p>
+<p>Ponderation. </p>
 
-<p>Referenced by <a class="el" href="a00053_source.html#l00386">PatternGeneratorJRL::GeneratorVelRef::buildConstraintsCoP()</a>, <a class="el" href="a00053_source.html#l00432">PatternGeneratorJRL::GeneratorVelRef::buildConstraintsFeet()</a>, <a class="el" href="a00059_source.html#l00176">PatternGeneratorJRL::IntermedQPMat::SupportFoot()</a>, and <a class="el" href="a00053_source.html#l00520">PatternGeneratorJRL::GeneratorVelRef::updateProblem()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="abd76109e3289ed365e4ca3eaac8a37cb"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::state_variant_s::Trunk" ref="abd76109e3289ed365e4ca3eaac8a37cb" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">trunk_t <a class="el" href="a00030.html#abd76109e3289ed365e4ca3eaac8a37cb">PatternGeneratorJRL::IntermedQPMat::state_variant_s::Trunk</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>TrunkState. </p>
-
-</div>
-</div>
-<a class="anchor" id="a126419538b0390b1b88243e516028d89"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::state_variant_s::V" ref="a126419538b0390b1b88243e516028d89" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boost_ublas::matrix&lt;double&gt; <a class="el" href="a00030.html#a126419538b0390b1b88243e516028d89">PatternGeneratorJRL::IntermedQPMat::state_variant_s::V</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Referenced by <a class="el" href="a00053_source.html#l00386">PatternGeneratorJRL::GeneratorVelRef::buildConstraintsCoP()</a>, <a class="el" href="a00053_source.html#l00087">PatternGeneratorJRL::GeneratorVelRef::generateSelectionMatrices()</a>, and <a class="el" href="a00053_source.html#l00520">PatternGeneratorJRL::GeneratorVelRef::updateProblem()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ac94710e00499230f077bdf74b7f19a16"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::state_variant_s::V_f" ref="ac94710e00499230f077bdf74b7f19a16" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boost_ublas::matrix&lt;double&gt; <a class="el" href="a00030.html#ac94710e00499230f077bdf74b7f19a16">PatternGeneratorJRL::IntermedQPMat::state_variant_s::V_f</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Selection matrix for relative feet positions. </p>
-
-<p>Referenced by <a class="el" href="a00053_source.html#l00432">PatternGeneratorJRL::GeneratorVelRef::buildConstraintsFeet()</a>, and <a class="el" href="a00053_source.html#l00087">PatternGeneratorJRL::GeneratorVelRef::generateSelectionMatrices()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="acb5fb4b943d90f21e8be5db65758e22f"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::state_variant_s::Vc" ref="acb5fb4b943d90f21e8be5db65758e22f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boost_ublas::vector&lt;double&gt; <a class="el" href="a00030.html#acb5fb4b943d90f21e8be5db65758e22f">PatternGeneratorJRL::IntermedQPMat::state_variant_s::Vc</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Selection matrix for the current feet position. </p>
-
-<p>Referenced by <a class="el" href="a00053_source.html#l00386">PatternGeneratorJRL::GeneratorVelRef::buildConstraintsCoP()</a>, <a class="el" href="a00053_source.html#l00087">PatternGeneratorJRL::GeneratorVelRef::generateSelectionMatrices()</a>, and <a class="el" href="a00053_source.html#l00520">PatternGeneratorJRL::GeneratorVelRef::updateProblem()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a615ede96af8dd8f44c2def413359e4ed"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::state_variant_s::Vc_f" ref="a615ede96af8dd8f44c2def413359e4ed" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boost_ublas::vector&lt;double&gt; <a class="el" href="a00030.html#a615ede96af8dd8f44c2def413359e4ed">PatternGeneratorJRL::IntermedQPMat::state_variant_s::Vc_f</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Selection matrix for the current foot position. </p>
-
-<p>Referenced by <a class="el" href="a00053_source.html#l00432">PatternGeneratorJRL::GeneratorVelRef::buildConstraintsFeet()</a>, and <a class="el" href="a00053_source.html#l00087">PatternGeneratorJRL::GeneratorVelRef::generateSelectionMatrices()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a487a73fc224e06ef9da9284aaf0f455a"></a><!-- doxytag: member="PatternGeneratorJRL::IntermedQPMat::state_variant_s::VT" ref="a487a73fc224e06ef9da9284aaf0f455a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boost_ublas::matrix&lt;double&gt; <a class="el" href="a00030.html#a487a73fc224e06ef9da9284aaf0f455a">PatternGeneratorJRL::IntermedQPMat::state_variant_s::VT</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Referenced by <a class="el" href="a00053_source.html#l00087">PatternGeneratorJRL::GeneratorVelRef::generateSelectionMatrices()</a>, and <a class="el" href="a00053_source.html#l00520">PatternGeneratorJRL::GeneratorVelRef::updateProblem()</a>.</p>
+<p>Referenced by <a class="el" href="a00060_source.html#l00495">PatternGeneratorJRL::GeneratorVelRef::build_invariant_part()</a>, <a class="el" href="a00060_source.html#l00069">PatternGeneratorJRL::GeneratorVelRef::Ponderation()</a>, <a class="el" href="a00066_source.html#l00223">print()</a>, and <a class="el" href="a00060_source.html#l00523">PatternGeneratorJRL::GeneratorVelRef::update_problem()</a>.</p>
 
 </div>
 </div>

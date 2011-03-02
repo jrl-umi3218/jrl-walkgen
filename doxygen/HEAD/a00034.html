@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: AnalyticalMorisawaAbstract.cpp File Reference</title>
+<title>jrl-walkgen: PatternGeneratorJRL::QPProblem_s Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,53 +9,107 @@
   <div class="tabs">
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
-      <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="globals.html"><span>File&nbsp;Members</span></a></li>
+      <li><a href="annotated.html"><span>Class&nbsp;List</span></a></li>
+      <li><a href="classes.html"><span>Class&nbsp;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&nbsp;Hierarchy</span></a></li>
+      <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
+  </div>
+  <div class="navpath"><a class="el" href="a00111.html">PatternGeneratorJRL</a>::<a class="el" href="a00034.html">QPProblem_s</a>
   </div>
 </div>
 <div class="contents">
-<h1>AnalyticalMorisawaAbstract.cpp File Reference</h1><code>#include &lt;fstream&gt;</code><br/>
-<code>#include &lt;ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.h&gt;</code><br/>
+<h1>PatternGeneratorJRL::QPProblem_s Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::QPProblem_s" -->
+<p>Final optimization problem.  
+<a href="#_details">More...</a></p>
+
+<p><code>#include &lt;/home/buildbot/devel-src/tools/pkg-dev-mng/Testing/Buildbot/slaves/jrlserver/jrlserverubuntu/build-jrl-walkgen-jrlmt-master/pkgsrc/src/ZMPRefTrajectoryGeneration/qp-problem.hh&gt;</code></p>
 <div class="dynheader">
-Include dependency graph for AnalyticalMorisawaAbstract.cpp:</div>
+Collaboration diagram for PatternGeneratorJRL::QPProblem_s:</div>
 <div class="dynsection">
-<div class="center"><img src="a00101.png" border="0" usemap="#_analytical_morisawa_abstract_8cpp_map" alt=""/></div>
-</div>
+<div class="center"><img src="a00267.png" border="0" usemap="#_pattern_generator_j_r_l_1_1_q_p_problem__s_coll__map" alt="Collaboration graph"/></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+
+<p><a href="a00268.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
-<tr><td colspan="2"><h2>Namespaces</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">namespace &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00098.html">PatternGeneratorJRL</a></td></tr>
-<tr><td colspan="2"><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#aed8fad5914337014377da4ddb6748a51">ODEBUG2</a>(<a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#aa817bd80d733edaa1c456bfc1176839a">ODEBUG3</a>(<a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>)&nbsp;&nbsp;&nbsp;cerr &lt;&lt; &quot;AnalyticalMorisawa :&quot; &lt;&lt; x &lt;&lt; endl</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a21c1d78f673b7009cd9882d0cd26c70f">RESETDEBUG5</a>(y)&nbsp;&nbsp;&nbsp;{ ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a42ae5d86e530749c9c099238d1360ca8">ODEBUG5</a>(<a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>, y)&nbsp;&nbsp;&nbsp;{ ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile &lt;&lt; &quot;PGI: &quot; &lt;&lt; x &lt;&lt; endl; DebugFile.close();}</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#aaf4d03d258e4c69a9000091fb85e3058">ODEBUG</a>(<a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a7f0bd96ef13f9a3950b044041155f4aa">RESETDEBUG4</a>(y)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#ac46d45db1d8f7a982cef807e8dc94292">ODEBUG4</a>(<a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>, y)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a27451f0c8d2b9c5cf0c3bc75bf947311">ODEBUG6</a>(<a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>, y)</td></tr>
-<tr><td colspan="2"><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a1e69afaa4e6077b67397e6c36454b97a">doublereal</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a3b6ee100a473e8866bcea6d1fc4041d9">integer</a></td></tr>
-<tr><td colspan="2"><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00098.html#aea8843b2d5384e6292b6ddd01d870731">PatternGeneratorJRL::operator&lt;&lt;</a> (std::ostream &amp;os, const AnalyticalMorisawaAbstract &amp;obj)</td></tr>
+<tr><td colspan="2"><h2>Classes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><b>array_s</b></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Handle matrices/vectors in array form. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html">solution_s</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Solution.  <a href="a00037.html#_details">More...</a><br/></td></tr>
+<tr><td colspan="2"><h2>Public Types</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="a00037.html">solution_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a133314996f155d26bc2b2e6a7676d400">solution_t</a></td></tr>
+<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#af2386b1f207ed2a226b67244c1d1cf52">QPProblem_s</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initialize by default an empty problem.  <a href="#af2386b1f207ed2a226b67244c1d1cf52"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a53a7008c3f2dbf3533e2d7c533d75c09">~QPProblem_s</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Release the memory at the end only.  <a href="#a53a7008c3f2dbf3533e2d7c533d75c09"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a43e04705b8effdfbe32544f2928108f1">set_nb_variabless</a> (int NbVariables)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the number of optimization parameters.  <a href="#a43e04705b8effdfbe32544f2928108f1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#af1a1b0f21cc98279b066662de5534d50">set_nb_eq_constraints</a> (int NbEqConstraints)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the number of equality constraints.  <a href="#af1a1b0f21cc98279b066662de5534d50"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#aaceea1527c50f5e71d680030c7ae698a">set_nb_constraints</a> (int NbConstraints)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set the total number of constraints.  <a href="#aaceea1527c50f5e71d680030c7ae698a"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;typename type &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">int&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00034.html#a42641cd80662b00382c1240eb5281706">resize</a> (type *&amp;array, int old_size, int new_size)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reallocate array.  <a href="#a42641cd80662b00382c1240eb5281706"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a83f26d83852a2961118cd06d36e122c0">add_term</a> (const MAL_MATRIX(&amp;Mat, double), int type, int row, int col)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Add a matrix to the final optimization problem in array form.  <a href="#a83f26d83852a2961118cd06d36e122c0"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a896669e9e4cf8b2c867d04b726bedcc7">add_term</a> (const MAL_VECTOR(&amp;Vec, double), int type, int row)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Add a vector to the final optimization problem in array form.  <a href="#a896669e9e4cf8b2c867d04b726bedcc7"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a328aeed15ac7a30938021c9ae39403cb">dumpProblem</a> (const char *filename)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Dump on disk a problem.  <a href="#a328aeed15ac7a30938021c9ae39403cb"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a34ad4d0234621460874850c1c04a3f52">dump</a> (int type, const char *filename)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Dump on disk an array.  <a href="#a34ad4d0234621460874850c1c04a3f52"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#ad01f1b02413d37fe519e0e8508085da4">clear</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initialize set of arrays.  <a href="#ad01f1b02413d37fe519e0e8508085da4"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a0b9ec961e52759e014fdf2ad403008d4">clear</a> (int type)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initialize whole array.  <a href="#a0b9ec961e52759e014fdf2ad403008d4"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#ab5e073aa743d028a7b09e3f91891fa32">solve</a> (int solver, <a class="el" href="a00037.html">solution_t</a> &amp;result)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Solve the problem.  <a href="#ab5e073aa743d028a7b09e3f91891fa32"></a><br/></td></tr>
+<tr><td colspan="2"><h2>Static Public Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#ad1221d05b6b02169a359a41453dd772f">MATRIX_Q</a> = 0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#ab040ff4d9bcf39d54f1a307cd472e1b3">MATRIX_DU</a> = 1</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a633ba4cb32752e595a0d508ddd7bf145">VECTOR_D</a> = 2</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a9d1afaa86d72ff8ef78c4cb782285f48">VECTOR_DS</a> = 3</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#adb21d2e602394a44bd1fddba0d279016">VECTOR_XL</a> = 4</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a8fd28e54f3a916df46a77ab214a1a5df">VECTOR_XU</a> = 5</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#a8c657d764bdaf688cb0369e6a9902998">QLD</a> = 10</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static const int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00034.html#ad4ef092cbdb246270279a7fea95750e2">PLDP</a> = 11</td></tr>
 </table>
-<hr/><h2>Define Documentation</h2>
-<a class="anchor" id="aaf4d03d258e4c69a9000091fb85e3058"></a><!-- doxytag: member="AnalyticalMorisawaAbstract.cpp::ODEBUG" ref="aaf4d03d258e4c69a9000091fb85e3058" args="(x)" -->
+<hr/><a name="_details"></a><h2>Detailed Description</h2>
+<p>Final optimization problem. </p>
+<p>Store and solve a quadratic problem with linear constraints. </p>
+<hr/><h2>Member Typedef Documentation</h2>
+<a class="anchor" id="a133314996f155d26bc2b2e6a7676d400"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solution_t" ref="a133314996f155d26bc2b2e6a7676d400" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ODEBUG</td>
+          <td class="memname">typedef struct <a class="el" href="a00037.html">solution_s</a> <a class="el" href="a00037.html">PatternGeneratorJRL::QPProblem_s::solution_t</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="af2386b1f207ed2a226b67244c1d1cf52"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::QPProblem_s" ref="af2386b1f207ed2a226b67244c1d1cf52" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QPProblem_s::QPProblem_s </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>&nbsp;</td>
           <td class="paramname"></td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -64,16 +118,17 @@ Include dependency graph for AnalyticalMorisawaAbstract.cpp:</div>
 </div>
 <div class="memdoc">
 
+<p>Initialize by default an empty problem. </p>
+
 </div>
 </div>
-<a class="anchor" id="aed8fad5914337014377da4ddb6748a51"></a><!-- doxytag: member="AnalyticalMorisawaAbstract.cpp::ODEBUG2" ref="aed8fad5914337014377da4ddb6748a51" args="(x)" -->
+<a class="anchor" id="a53a7008c3f2dbf3533e2d7c533d75c09"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::~QPProblem_s" ref="a53a7008c3f2dbf3533e2d7c533d75c09" args="()" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ODEBUG2</td>
+          <td class="memname">QPProblem_s::~QPProblem_s </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>&nbsp;</td>
           <td class="paramname"></td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -82,87 +137,145 @@ Include dependency graph for AnalyticalMorisawaAbstract.cpp:</div>
 </div>
 <div class="memdoc">
 
-</div>
-</div>
-<a class="anchor" id="aa817bd80d733edaa1c456bfc1176839a"></a><!-- doxytag: member="AnalyticalMorisawaAbstract.cpp::ODEBUG3" ref="aa817bd80d733edaa1c456bfc1176839a" args="(x)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ODEBUG3</td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>&nbsp;</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;cerr &lt;&lt; &quot;AnalyticalMorisawa :&quot; &lt;&lt; x &lt;&lt; endl</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
+<p>Release the memory at the end only. </p>
 
 </div>
 </div>
-<a class="anchor" id="ac46d45db1d8f7a982cef807e8dc94292"></a><!-- doxytag: member="AnalyticalMorisawaAbstract.cpp::ODEBUG4" ref="ac46d45db1d8f7a982cef807e8dc94292" args="(x, y)" -->
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a896669e9e4cf8b2c867d04b726bedcc7"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::add_term" ref="a896669e9e4cf8b2c867d04b726bedcc7" args="(const MAL_VECTOR(&amp;Vec, double), int type, int row)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ODEBUG4</td>
+          <td class="memname">void QPProblem_s::add_term </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>, </td>
+          <td class="paramtype">const MAL_VECTOR &amp;,&nbsp;</td>
+          <td class="paramname"> <em>double</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">y&nbsp;</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Referenced by <a class="el" href="a00069_source.html#l00041">PatternGeneratorJRL::PatternGeneratorInterfacePrivate::PatternGeneratorInterfacePrivate()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a42ae5d86e530749c9c099238d1360ca8"></a><!-- doxytag: member="AnalyticalMorisawaAbstract.cpp::ODEBUG5" ref="a42ae5d86e530749c9c099238d1360ca8" args="(x, y)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ODEBUG5</td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>, </td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>type</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">y&nbsp;</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;{ ofstream DebugFile; DebugFile.open(y,ofstream::app); DebugFile &lt;&lt; &quot;PGI: &quot; &lt;&lt; x &lt;&lt; endl; DebugFile.close();}</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>row</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Add a vector to the final optimization problem in array form. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Mat</em>&nbsp;</td><td>Added vector </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ype</em>&nbsp;</td><td>Target vector type </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>row</em>&nbsp;</td><td>First row inside the target </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="a00091_source.html#l00050">VECTOR_D</a>, <a class="el" href="a00091_source.html#l00051">VECTOR_DS</a>, <a class="el" href="a00091_source.html#l00052">VECTOR_XL</a>, and <a class="el" href="a00091_source.html#l00053">VECTOR_XU</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a27451f0c8d2b9c5cf0c3bc75bf947311"></a><!-- doxytag: member="AnalyticalMorisawaAbstract.cpp::ODEBUG6" ref="a27451f0c8d2b9c5cf0c3bc75bf947311" args="(x, y)" -->
+<a class="anchor" id="a83f26d83852a2961118cd06d36e122c0"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::add_term" ref="a83f26d83852a2961118cd06d36e122c0" args="(const MAL_MATRIX(&amp;Mat, double), int type, int row, int col)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ODEBUG6</td>
+          <td class="memname">void QPProblem_s::add_term </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="a00079.html#a79a192c395d44140a39a1b88ae025063">x</a>, </td>
+          <td class="paramtype">const MAL_MATRIX &amp;,&nbsp;</td>
+          <td class="paramname"> <em>double</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">y&nbsp;</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>col</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Add a matrix to the final optimization problem in array form. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Mat</em>&nbsp;</td><td>Added matrix </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>type</em>&nbsp;</td><td>Target matrix type </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>row</em>&nbsp;</td><td>First row inside the target </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>col</em>&nbsp;</td><td>First column inside the target </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#ac4cdf90245da28c5403fee0254ced977">MAL_MATRIX_NB_COLS</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a6e012b239f2bc5dfddf89de7dd90a9a3">MAL_MATRIX_NB_ROWS</a>, <a class="el" href="a00091_source.html#l00049">MATRIX_DU</a>, and <a class="el" href="a00091_source.html#l00048">MATRIX_Q</a>.</p>
+
+<p>Referenced by <a class="el" href="a00060_source.html#l00389">PatternGeneratorJRL::GeneratorVelRef::build_constraints_cop()</a>, <a class="el" href="a00060_source.html#l00435">PatternGeneratorJRL::GeneratorVelRef::build_constraints_feet()</a>, <a class="el" href="a00060_source.html#l00495">PatternGeneratorJRL::GeneratorVelRef::build_invariant_part()</a>, and <a class="el" href="a00060_source.html#l00523">PatternGeneratorJRL::GeneratorVelRef::update_problem()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0b9ec961e52759e014fdf2ad403008d4"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::clear" ref="a0b9ec961e52759e014fdf2ad403008d4" args="(int type)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QPProblem_s::clear </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>type</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Initialize whole array. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>type</em>&nbsp;</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="a00091_source.html#l00049">MATRIX_DU</a>, <a class="el" href="a00091_source.html#l00048">MATRIX_Q</a>, <a class="el" href="a00091_source.html#l00050">VECTOR_D</a>, <a class="el" href="a00091_source.html#l00051">VECTOR_DS</a>, <a class="el" href="a00091_source.html#l00052">VECTOR_XL</a>, and <a class="el" href="a00091_source.html#l00053">VECTOR_XU</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad01f1b02413d37fe519e0e8508085da4"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::clear" ref="ad01f1b02413d37fe519e0e8508085da4" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::QPProblem_s::clear </td>
+          <td>(</td>
           <td class="paramname"></td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -171,17 +284,57 @@ Include dependency graph for AnalyticalMorisawaAbstract.cpp:</div>
 </div>
 <div class="memdoc">
 
+<p>Initialize set of arrays. </p>
+
+<p>Referenced by <a class="el" href="a00060_source.html#l00523">PatternGeneratorJRL::GeneratorVelRef::update_problem()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a7f0bd96ef13f9a3950b044041155f4aa"></a><!-- doxytag: member="AnalyticalMorisawaAbstract.cpp::RESETDEBUG4" ref="a7f0bd96ef13f9a3950b044041155f4aa" args="(y)" -->
+<a class="anchor" id="a34ad4d0234621460874850c1c04a3f52"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::dump" ref="a34ad4d0234621460874850c1c04a3f52" args="(int type, const char *filename)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define RESETDEBUG4</td>
+          <td class="memname">void QPProblem_s::dump </td>
           <td>(</td>
-          <td class="paramtype">y&nbsp;</td>
-          <td class="paramname"></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>filename</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Dump on disk an array. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>type</em>&nbsp;</td><td></td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>filename</em>&nbsp;</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a328aeed15ac7a30938021c9ae39403cb"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::dumpProblem" ref="a328aeed15ac7a30938021c9ae39403cb" args="(const char *filename)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QPProblem_s::dumpProblem </td>
+          <td>(</td>
+          <td class="paramtype">const char *&nbsp;</td>
+          <td class="paramname"> <em>filename</em></td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
         </tr>
@@ -189,19 +342,208 @@ Include dependency graph for AnalyticalMorisawaAbstract.cpp:</div>
 </div>
 <div class="memdoc">
 
+<p>Dump on disk a problem. </p>
+
 </div>
 </div>
-<a class="anchor" id="a21c1d78f673b7009cd9882d0cd26c70f"></a><!-- doxytag: member="AnalyticalMorisawaAbstract.cpp::RESETDEBUG5" ref="a21c1d78f673b7009cd9882d0cd26c70f" args="(y)" -->
+<a class="anchor" id="a42641cd80662b00382c1240eb5281706"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::resize" ref="a42641cd80662b00382c1240eb5281706" args="(type *&amp;array, int old_size, int new_size)" -->
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename type &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">#define RESETDEBUG5</td>
+          <td class="memname">int PatternGeneratorJRL::QPProblem_s::resize </td>
           <td>(</td>
-          <td class="paramtype">y&nbsp;</td>
-          <td class="paramname"></td>
+          <td class="paramtype">type *&amp;&nbsp;</td>
+          <td class="paramname"> <em>array</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>old_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>new_size</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Reallocate array. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>array</em>&nbsp;</td><td></td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>old_size</em>&nbsp;</td><td></td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>new_size</em>&nbsp;</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="aaceea1527c50f5e71d680030c7ae698a"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::set_nb_constraints" ref="aaceea1527c50f5e71d680030c7ae698a" args="(int NbConstraints)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::QPProblem_s::set_nb_constraints </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>NbConstraints</em></td>
           <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;{ ofstream DebugFile; DebugFile.open(y,ofstream::out); DebugFile.close();}</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the total number of constraints. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>nb_constraints</em>&nbsp;</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="af1a1b0f21cc98279b066662de5534d50"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::set_nb_eq_constraints" ref="af1a1b0f21cc98279b066662de5534d50" args="(int NbEqConstraints)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::QPProblem_s::set_nb_eq_constraints </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>NbEqConstraints</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the number of equality constraints. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>nb_eq_constraints</em>&nbsp;</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a43e04705b8effdfbe32544f2928108f1"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::set_nb_variabless" ref="a43e04705b8effdfbe32544f2928108f1" args="(int NbVariables)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PatternGeneratorJRL::QPProblem_s::set_nb_variabless </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>NbVariables</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the number of optimization parameters. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>nb_variables</em>&nbsp;</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ab5e073aa743d028a7b09e3f91891fa32"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::solve" ref="ab5e073aa743d028a7b09e3f91891fa32" args="(int solver, solution_t &amp;result)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QPProblem_s::solve </td>
+          <td>(</td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>solver</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="a00037.html">solution_t</a> &amp;&nbsp;</td>
+          <td class="paramname"> <em>result</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Solve the problem. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>solver</em>&nbsp;</td><td></td></tr>
+    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>result</em>&nbsp;</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="a00091_source.html#l00087">PatternGeneratorJRL::QPProblem_s::solution_s::ConstrLagr_vec</a>, <a class="el" href="a00091_source.html#l00076">PatternGeneratorJRL::QPProblem_s::solution_s::Fail</a>, <a class="el" href="a00091_source.html#l00089">PatternGeneratorJRL::QPProblem_s::solution_s::LBoundsLagr_vec</a>, <a class="el" href="a00091_source.html#l00081">PatternGeneratorJRL::QPProblem_s::solution_s::Print</a>, <a class="el" href="a00089.html#ac0cc57fc527360f863c7d0e77ea4e4a9">ql0001_()</a>, <a class="el" href="a00091_source.html#l00055">QLD</a>, <a class="el" href="a00090_source.html#l00301">PatternGeneratorJRL::QPProblem_s::solution_s::resize()</a>, <a class="el" href="a00091_source.html#l00084">PatternGeneratorJRL::QPProblem_s::solution_s::Solution_vec</a>, and <a class="el" href="a00091_source.html#l00091">PatternGeneratorJRL::QPProblem_s::solution_s::UBoundsLagr_vec</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="ab040ff4d9bcf39d54f1a307cd472e1b3"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::MATRIX_DU" ref="ab040ff4d9bcf39d54f1a307cd472e1b3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int <a class="el" href="a00034.html#ab040ff4d9bcf39d54f1a307cd472e1b3">PatternGeneratorJRL::QPProblem_s::MATRIX_DU</a> = 1<code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00190">add_term()</a>, <a class="el" href="a00060_source.html#l00389">PatternGeneratorJRL::GeneratorVelRef::build_constraints_cop()</a>, <a class="el" href="a00060_source.html#l00435">PatternGeneratorJRL::GeneratorVelRef::build_constraints_feet()</a>, and <a class="el" href="a00090_source.html#l00100">clear()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad1221d05b6b02169a359a41453dd772f"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::MATRIX_Q" ref="ad1221d05b6b02169a359a41453dd772f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int <a class="el" href="a00034.html#ad1221d05b6b02169a359a41453dd772f">PatternGeneratorJRL::QPProblem_s::MATRIX_Q</a> = 0<code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00190">add_term()</a>, <a class="el" href="a00060_source.html#l00495">PatternGeneratorJRL::GeneratorVelRef::build_invariant_part()</a>, <a class="el" href="a00090_source.html#l00100">clear()</a>, and <a class="el" href="a00060_source.html#l00523">PatternGeneratorJRL::GeneratorVelRef::update_problem()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad4ef092cbdb246270279a7fea95750e2"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::PLDP" ref="ad4ef092cbdb246270279a7fea95750e2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int <a class="el" href="a00034.html#ad4ef092cbdb246270279a7fea95750e2">PatternGeneratorJRL::QPProblem_s::PLDP</a> = 11<code> [static]</code></td>
         </tr>
       </table>
 </div>
@@ -209,30 +551,78 @@ Include dependency graph for AnalyticalMorisawaAbstract.cpp:</div>
 
 </div>
 </div>
-<hr/><h2>Typedef Documentation</h2>
-<a class="anchor" id="a1e69afaa4e6077b67397e6c36454b97a"></a><!-- doxytag: member="AnalyticalMorisawaAbstract.cpp::doublereal" ref="a1e69afaa4e6077b67397e6c36454b97a" args="" -->
+<a class="anchor" id="a8c657d764bdaf688cb0369e6a9902998"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::QLD" ref="a8c657d764bdaf688cb0369e6a9902998" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef double <a class="el" href="a00035.html#a1e69afaa4e6077b67397e6c36454b97a">doublereal</a></td>
+          <td class="memname">const int <a class="el" href="a00034.html#a8c657d764bdaf688cb0369e6a9902998">PatternGeneratorJRL::QPProblem_s::QLD</a> = 10<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Referenced by <a class="el" href="a00090_source.html#l00129">solve()</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a3b6ee100a473e8866bcea6d1fc4041d9"></a><!-- doxytag: member="AnalyticalMorisawaAbstract.cpp::integer" ref="a3b6ee100a473e8866bcea6d1fc4041d9" args="" -->
+<a class="anchor" id="a633ba4cb32752e595a0d508ddd7bf145"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::VECTOR_D" ref="a633ba4cb32752e595a0d508ddd7bf145" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef int <a class="el" href="a00035.html#a3b6ee100a473e8866bcea6d1fc4041d9">integer</a></td>
+          <td class="memname">const int <a class="el" href="a00034.html#a633ba4cb32752e595a0d508ddd7bf145">PatternGeneratorJRL::QPProblem_s::VECTOR_D</a> = 2<code> [static]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00256">add_term()</a>, <a class="el" href="a00090_source.html#l00100">clear()</a>, and <a class="el" href="a00060_source.html#l00523">PatternGeneratorJRL::GeneratorVelRef::update_problem()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9d1afaa86d72ff8ef78c4cb782285f48"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::VECTOR_DS" ref="a9d1afaa86d72ff8ef78c4cb782285f48" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int <a class="el" href="a00034.html#a9d1afaa86d72ff8ef78c4cb782285f48">PatternGeneratorJRL::QPProblem_s::VECTOR_DS</a> = 3<code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00256">add_term()</a>, <a class="el" href="a00060_source.html#l00389">PatternGeneratorJRL::GeneratorVelRef::build_constraints_cop()</a>, <a class="el" href="a00060_source.html#l00435">PatternGeneratorJRL::GeneratorVelRef::build_constraints_feet()</a>, and <a class="el" href="a00090_source.html#l00100">clear()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="adb21d2e602394a44bd1fddba0d279016"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::VECTOR_XL" ref="adb21d2e602394a44bd1fddba0d279016" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int <a class="el" href="a00034.html#adb21d2e602394a44bd1fddba0d279016">PatternGeneratorJRL::QPProblem_s::VECTOR_XL</a> = 4<code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00256">add_term()</a>, and <a class="el" href="a00090_source.html#l00100">clear()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8fd28e54f3a916df46a77ab214a1a5df"></a><!-- doxytag: member="PatternGeneratorJRL::QPProblem_s::VECTOR_XU" ref="a8fd28e54f3a916df46a77ab214a1a5df" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int <a class="el" href="a00034.html#a8fd28e54f3a916df46a77ab214a1a5df">PatternGeneratorJRL::QPProblem_s::VECTOR_XU</a> = 5<code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Referenced by <a class="el" href="a00090_source.html#l00256">add_term()</a>, and <a class="el" href="a00090_source.html#l00100">clear()</a>.</p>
 
 </div>
 </div>
