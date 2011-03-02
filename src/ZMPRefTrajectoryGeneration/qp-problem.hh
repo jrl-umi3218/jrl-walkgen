@@ -221,6 +221,7 @@ namespace PatternGeneratorJRL
 
       int id_;
       int nrows_, ncols_;
+      unsigned int memsize_;
 
       void fill( type value)
       { std::fill_n(array_, nrows_*ncols_, value); }
@@ -235,18 +236,24 @@ namespace PatternGeneratorJRL
       /// \param[in] ncols Size of the new array
       /// \param[in] preserve Preserve old values
       /// \return 0
-      int stick_together(type *& final_array, int nrows, int ncols)
+      int stick_together(struct array_s<type> & final_array, 
+			 int nrows, int ncols)
       {
         try {
-          type * NewArray = new type[nrows*ncols];
+	  type * NewArray = 0;
+	  if ((final_array.memsize_>nrows*ncols) ||
+	      (final_array.array_==0))
+	    {
+	      final_array.array_ = new type[nrows*ncols];
+	      final_array.memsize_ = nrows*ncols;
+	    }
+	  NewArray = final_array.array_;
+	  
           fill(NewArray, nrows*ncols, (type)0);
           for(int i = 0; i < nrows; i++)
             for(int j = 0; j < ncols; j++)
               NewArray[i+nrows*j] = array_[i+nrows_*j];
-          if (final_array!=0)
-            delete [] final_array;
 
-          final_array = NewArray;
           nrows_ = nrows;
           ncols_ = ncols;
         }
@@ -265,18 +272,30 @@ namespace PatternGeneratorJRL
       int resize(int nrows, int ncols, bool preserve)
       {
         try {
+	  bool b_reallocate = false;
+	  type * NewArray = 0;
+	  if (nrows*ncols>memsize_)
+	    {
+	      NewArray = new type[nrows*ncols];
+	      memsize_ = nrows*ncols;
+	      b_reallocate = true;
+	      std::cout << "memsize_ " << memsize_ << std::endl;
+	    }
+	  else NewArray = array_;
 
-          type * NewArray = new type[nrows*ncols];
-          fill(NewArray, nrows*ncols, (type)0);
-          if ((preserve) && 
+	  fill(NewArray, nrows*ncols, (type)0);
+	  if ((preserve) && 
 	      (array_!=0) ) {
-            for(int i = 0; i < nrows_; i++)
-              for(int j = 0; j < ncols_; j++)
-                NewArray[i+nrows*j] = array_[i+nrows_*j]; }
-          if (array_!=0)
-            delete [] array_;
+	    for(int i = 0; i < nrows_; i++)
+	      for(int j = 0; j < ncols_; j++)
+		NewArray[i+nrows*j] = array_[i+nrows_*j]; }
 
-          array_ = NewArray;
+	  if ((array_!=0) && b_reallocate)
+	    {
+	      delete [] array_;
+	    }
+	  array_ = NewArray;
+	  
           nrows_ = nrows;
           ncols_ = ncols;
         }
@@ -287,7 +306,7 @@ namespace PatternGeneratorJRL
       }
 
       array_s():
-        array_(0),id_(0),nrows_(0),ncols_(0){
+        array_(0),id_(0),nrows_(0),ncols_(0), memsize_(0){
       };
       ~array_s()
       {  if (array_!=0) delete [] array_;};
