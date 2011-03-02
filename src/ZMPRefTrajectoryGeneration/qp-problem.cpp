@@ -47,9 +47,25 @@ QPProblem_s::QPProblem_s():
   iout_(0),ifail_(0), iprint_(0),
   lwar_(0), liwar_(0),
   Eps_(0),
-  NbVariables_(0), NbConstraints_(0),NbEqConstraints_(0)
+  NbVariables_(36), NbConstraints_(74),NbEqConstraints_(0)
 {
+  NbVariables_ = 36;
+  NbConstraints_ = 74;
 
+  m_ = NbConstraints_;
+  me_ = NbEqConstraints_;
+  mmax_ = m_+1;
+  n_ = NbVariables_;
+  nmax_ = n_;
+  mnn_ = m_+2*n_;
+  
+  iout_ = 0;
+  iprint_ = 1;
+  lwar_ = 3*nmax_*nmax_/2+ 10*nmax_  + 2*mmax_ + 20000;
+  liwar_ = n_;
+  Eps_ = 1e-8;
+
+  resize_all();
 }
 
 
@@ -207,9 +223,21 @@ QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), int type,
       break;
     }
 
-  std::cout << "NbVariables_:" << NbVariables_
+  /*  std::cout << "NbVariables_:" << NbVariables_
 	    << " NbConstraints_:" << NbConstraints_ 
-	    << std::endl;
+	    << " NbEqConstraints_: " << NbEqConstraints_
+	    << " m_ :"     << m_
+	    << " me_:"     << me_
+	    << " mmax_: "  << mmax_
+	    << " n_:"      << n_
+	    << " nmax_: "  << nmax_
+	    << " mnn_: "   << mnn_ 
+	    << " lwar_:"   << lwar_
+	    << " liwar_ :" << liwar_ 
+	    << std::endl; */
+  if (NbEqConstraints_>0)
+    std::cout << "NbEqConstraints:" << NbEqConstraints_<< std::endl;
+
   if (NbVariables_ > pArray_s->ncols_ )
     {
       resize_all();
