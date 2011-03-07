@@ -279,7 +279,6 @@ namespace PatternGeneratorJRL
 	      NewArray = new type[nrows*ncols];
 	      memsize_ = nrows*ncols;
 	      b_reallocate = true;
-	      std::cout << "memsize_ " << memsize_ << std::endl;
 	    }
 	  else NewArray = array_;
 
