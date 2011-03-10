@@ -66,21 +66,12 @@ GeneratorVelRef::previewSupportStates(IntermedQPMat & Matrices,
 				      const SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates) const
 {
 
-
-  // INITIALIZE QEUE OF SUPPORT STATES:
-  // ----------------------------------
-  const reference_t & RefVel = Matrices.Reference();
-  support_state_t & CurrentSupport = Matrices.SupportState();
-  FSM->setSupportState(m_CurrentTime, 0, CurrentSupport, RefVel);
-  deqSupportStates.push_back(CurrentSupport);
-
-
-  // PREVIEW SUPPORT STATES:
-  // -----------------------
   //initialize the previewed support state before previewing
+  const support_state_t & CurrentSupport = deqSupportStates.front();
   support_state_t PreviewedSupport = CurrentSupport;
   PreviewedSupport.StepNumber  = 0;
 
+  const reference_t & RefVel = Matrices.Reference();
   for(int i=1;i<=m_N;i++)
     {
       FSM->setSupportState(m_CurrentTime, i, PreviewedSupport, RefVel);
