@@ -240,9 +240,6 @@ namespace PatternGeneratorJRL
     /// \brief Reallocation margins
     int m_ReallocMarginVar, m_ReallocMarginConstr;
 
-//    /// \brief Primal Least square Distance Problem solver
-//    Optimization::Solver::PLDPSolverHerdt * m_PLDPSolverHerdt;
-
   };
   typedef struct QPProblem_s QPProblem;
 }
