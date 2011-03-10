@@ -135,7 +135,7 @@ namespace PatternGeneratorJRL
       double c_a = cos(angle);
       double s_a = sin(angle);
 
-      for( unsigned int j=0;j<X.size();j++ )
+      for( int j=0;j<X.size();j++ )
         {
           X[j] = ( X[j]*c_a - Y[j]*s_a );
           Y[j] = ( X[j]*s_a + Y[j]*c_a );
@@ -171,7 +171,7 @@ namespace PatternGeneratorJRL
   void
   convex_hull_t::set(const double * arrayX, const double * arrayY)
     {
-      for(unsigned int i=0;i<X.size();i++)
+      for(int i=0;i<X.size();i++)
         {
           X[i] = arrayX[i];
           Y[i] = arrayY[i];

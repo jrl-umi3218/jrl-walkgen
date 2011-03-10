@@ -59,7 +59,15 @@ GeneratorVelRef::setPonderation( IntermedQPMat & Matrices, double weight, int ty
   IntermedQPMat::objective_variant_t & Objective = Matrices.Objective( type );
   Objective.weight = weight;
 
-}	
+}
+
+
+void 
+GeneratorVelRef::setReference(std::istringstream &strm)
+{
+  //TODO:
+}
+	
 
 void
 GeneratorVelRef::previewSupportStates(IntermedQPMat & Matrices,
