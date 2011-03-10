@@ -68,6 +68,11 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
   m_ComHeight = 0.814;
 
+  //Gains
+  m_Alpha = 0.00001;//Jerk
+  m_Beta = 1.0; //Velocity
+  m_Gamma = 0.000001; //ZMP
+
   /*! Getting the ZMP reference from Kajita's heuristic. */
   m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
 
@@ -131,6 +136,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 	  std::cerr << "Unable to register " << aMethodName << std::endl;
 	}
     }
+  
+  // Debug point.
+  debugConstructor();
 
   //Feet distance in the DS phase
   m_FeetDistanceDS = 0.2;
@@ -144,13 +152,25 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_GenVR->setSamplingPeriodPreview(0.1);
 
   m_GenVR->setNbVariables(32);
-  m_GenVR->setComHeight(m_ComHeight);
+
+  //m_Pb.setNbVariables(m_GenVR->getNbVariables());
 
   m_GenVR->initialize(m_Matrices);
-  m_GenVR->setPonderation(m_Matrices, 1.0, IntermedQPMat::INSTANT_VELOCITY);
-  m_GenVR->setPonderation(m_Matrices, 0.000001, IntermedQPMat::COP_CENTERING);
-  m_GenVR->setPonderation(m_Matrices, 0.00001, IntermedQPMat::JERK_MIN);
+  m_GenVR->setPonderation(m_Matrices, m_Beta, IntermedQPMat::INSTANT_VELOCITY);
+  m_GenVR->setPonderation(m_Matrices, m_Gamma, IntermedQPMat::COP_CENTERING);
+  m_GenVR->setPonderation(m_Matrices, m_Alpha, IntermedQPMat::JERK);
 
+  m_Matrices.dumpObjective("/tmp/InstantVelocity.dat", IntermedQPMat::INSTANT_VELOCITY);
+  m_Matrices.dumpObjective("/tmp/COPCentering.dat", IntermedQPMat::COP_CENTERING);
+  m_Matrices.dumpObjective("/tmp/Jerk.dat", IntermedQPMat::JERK);
+
+//  m_Pb.setDimensions(2*m_QP_N,
+//                     0,
+//                     0);
+//
+//  m_GenVR->buildInvariantPart(m_Pb, m_Matrices);
+//
+//  m_Pb.dumpProblem("/tmp/PB.dat");
 }
 
 ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
@@ -225,6 +245,117 @@ void ZMPVelocityReferencedQP::interpolateFeet(deque<FootAbsolutePosition> &,
 {
 
   printf("To be implemented \n");
+}
+
+int ZMPVelocityReferencedQP::InitializeMatrixPbConstants()
+{
+  MAL_MATRIX_RESIZE(m_PPu,2*m_QP_N,2*m_QP_N);
+  MAL_MATRIX_RESIZE(m_PZu,m_QP_N,m_QP_N);
+  MAL_MATRIX_RESIZE(m_VPu,2*m_QP_N,2*m_QP_N);
+  MAL_MATRIX_RESIZE(m_PPx,2*m_QP_N,6);
+  MAL_MATRIX_RESIZE(m_PZx,m_QP_N,3);
+  MAL_MATRIX_RESIZE(m_VPx,2*m_QP_N,6);
+
+  for( int i=0;i<m_QP_N;i++)
+    {
+      // Compute VPx and PPx
+      m_VPx(i,0)   = 0.0;   m_VPx(i,1) =     1.0; m_VPx(i,2)   = (i+1)*m_QP_T;
+      m_VPx(i,3)   = 0.0;   m_VPx(i,4) =     0.0; m_VPx(i,5)   = 0.0;
+      m_VPx(i+m_QP_N,0) = 0.0;   m_VPx(i+m_QP_N,1) =   0.0; m_VPx(i+m_QP_N,2) = 0.0;
+      m_VPx(i+m_QP_N,3) = 0.0;   m_VPx(i+m_QP_N,4) =   1.0; m_VPx(i+m_QP_N,5) = (i+1)*m_QP_T;
+
+      m_PPx(i,0) = 1.0; m_PPx(i,1)     = (i+1)*m_QP_T; m_PPx(i,2) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
+      m_PPx(i,3) = 0.0; m_PPx(i,4)     =       0; m_PPx(i,5) = 0.;
+      m_PPx(i+m_QP_N,0) = 0.0; m_PPx(i+m_QP_N,1) =     0.0; m_PPx(i+m_QP_N,2) = 0.0;
+      m_PPx(i+m_QP_N,3) = 1.0; m_PPx(i+m_QP_N,4) = (i+1)*m_QP_T; m_PPx(i+m_QP_N,5) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5;
+
+      //TODO: + or - m_ComHeight/9.81
+      m_PZx(i,0) = 1.0; m_PZx(i,1)     = (i+1)*m_QP_T; m_PZx(i,2) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5-m_ComHeight/9.81;
+      //m_PZx(i,3) = 0.0; m_PZx(i,4)     =       0; m_PZx(i,5) = 0.;
+      //		m_PZx(i+m_QP_N,0) = 0.0; m_PZx(i+m_QP_N,1) =     0.0; m_PZx(i+m_QP_N,2) = 0.0;
+      //		m_PZx(i+m_QP_N,3) = 1.0; m_PZx(i+m_QP_N,4) = (i+1)*m_QP_T; m_PZx(i+m_QP_N,5) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5+m_ComHeight/9.81;
+
+
+      for( int j=0;j<m_QP_N;j++)
+	{
+	  m_PPu(i,j)=0;
+	  m_PZu(i,j)=0;
+
+	  if (j<=i)
+	    {
+
+	      m_VPu(i,j)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ;
+	      m_VPu(i+m_QP_N,j+m_QP_N)= (2*(i-j)+1)*m_QP_T*m_QP_T*0.5 ;
+	      m_VPu(i,j+m_QP_N)=0.0;
+	      m_VPu(i+m_QP_N,j)=0.0;
+
+
+	      m_PPu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
+	      m_PPu(i+m_QP_N,j+m_QP_N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0;
+	      m_PPu(i,j+m_QP_N)=0.0;
+	      m_PPu(i+m_QP_N,j)=0.0;
+
+	      m_PZu(i,j)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0 - m_QP_T*m_ComHeight/9.81;
+	      //m_PZu(i+m_QP_N,j+m_QP_N)= (1 + 3*(i-j) + 3*(i-j)*(i-j)) * m_QP_T*m_QP_T*m_QP_T/6.0 + m_QP_T*m_ComHeight/9.81;
+	      //m_PZu(i,j+m_QP_N)=0.0;
+	      //m_PZu(i+m_QP_N,j)=0.0;
+	    }
+	  else
+	    {
+
+	      m_VPu(i,j) = 0.0;
+	      m_VPu(i+m_QP_N,j+m_QP_N)=0.0;
+	      m_VPu(i,j+m_QP_N)=0.0;
+	      m_VPu(i+m_QP_N,j)=0.0;
+
+	      m_PPu(i,j) = 0.0;
+	      m_PPu(i+m_QP_N,j+m_QP_N)=0.0;
+	      m_PPu(i,j+m_QP_N)=0.0;
+	      m_PPu(i+m_QP_N,j)=0.0;
+
+	      m_PZu(i,j) = 0.0;
+	      //m_PZu(i+m_QP_N,j+m_QP_N)=0.0;
+	      //m_PZu(i,j+m_QP_N)=0.0;
+	      //m_PZu(i+m_QP_N,j)=0.0;
+	    }
+
+	}
+    }
+
+  // Build m_Px.
+  MAL_MATRIX_RESIZE(m_Px,m_QP_N,3);
+
+  for( int li=0;li<m_QP_N;li++)
+    {
+      m_Px(li,0) = 1.0;
+      m_Px(li,1) = (double)(1.0+li)*m_QP_T;
+      m_Px(li,2) = (li+1.0)*(li+1.0)*m_QP_T*m_QP_T*0.5-m_ComHeight/9.81;
+    }
+  if (m_FullDebug>2)
+    {
+      ofstream aof;
+      aof.open("/tmp/VPx.dat");
+      aof << m_VPx;
+      aof.close();
+
+      aof.open("/tmp/m_PPx.dat");
+      aof << m_PPx;
+      aof.close();
+
+      aof.open("/tmp/VPu.dat");
+      aof << m_VPu;
+      aof.close();
+
+      aof.open("/tmp/PPu.dat");
+      aof << m_PPu;
+      aof.close();
+
+      aof.open("/tmp/PZu.dat");
+      aof << m_PZu;
+      aof.close();
+    }
+
+  return 0;
 }
 
 
@@ -482,7 +613,6 @@ void ZMPVelocityReferencedQP::initFeet()
   aSFRight.SupportFoot = -1;
 
   QueueOfSupportFeet.push_back(aSFLeft);
-  m_Matrices.SupportFoot(aSFLeft);
   QueueOfSupportFeet.push_back(aSFRight);
 
 }
@@ -491,6 +621,8 @@ void ZMPVelocityReferencedQP::initFeet()
 int ZMPVelocityReferencedQP::InitConstants()
 {
   int r;
+  if ((r=InitializeMatrixPbConstants())<0)
+    return r;
   if(m_FastFormulationMode != PLDPHerdt)
       if ((r=BuildingConstantPartOfConstraintMatrices())<0)
 	return r;
@@ -498,7 +630,223 @@ int ZMPVelocityReferencedQP::InitConstants()
   return 0;
 }
 
+void ZMPVelocityReferencedQP::SetAlpha(const double &anAlpha)
+{
+  m_Alpha = anAlpha;
+}
 
+const double & ZMPVelocityReferencedQP::GetAlpha() const
+{
+  return m_Alpha;
+}
+
+void ZMPVelocityReferencedQP::SetBeta(const double &anAlpha)
+{
+  m_Beta = anAlpha;
+}
+
+const double & ZMPVelocityReferencedQP::GetBeta() const
+{
+  return m_Beta;
+}
+
+
+
+//------------------new functions---
+//
+//
+//----------------------------------
+
+int ZMPVelocityReferencedQP::dumpProblem(MAL_VECTOR(& xk,double),
+					 double Time)
+{
+  ofstream aof;
+
+  char Buffer[1024];
+  sprintf(Buffer,"/tmp/ProblemFF_%f.dat",Time);
+  aof.open(Buffer,ofstream::out);
+
+  // Dumping D.
+  m_Pb.dumpProblem(aof);
+  
+  return 0;
+}
+
+int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
+						     double * &DU,
+						     double , 
+						     double StartingTime,
+						     deque<linear_inequality_ff_t> &
+						     QueueOfLConstraintInequalitiesFreeFeet,
+						     deque<linear_inequality_ff_t> &
+						     QueueOfFeetPosInequalities,
+						     deque<supportfoot_t> &
+						     QueueOfSupportFeet,
+						     double ,
+						     int NbOfConstraints,
+						     MAL_VECTOR(& xk,double))
+{
+
+  m_Pb.initialize(DU,NbOfConstraints*2*(m_QP_N+m_PrwSupport.StepNumber),0.0);
+  m_Pb.initialize(m_Pb.DS,2*(m_QP_N+m_PrwSupport.StepNumber),0.0);
+
+  //Current support foot
+  deque<linear_inequality_ff_t>::iterator LCIFF_it;
+  deque<supportfoot_t>::iterator CurSF_it;
+  CurSF_it = QueueOfSupportFeet.end();
+  CurSF_it--;
+  while(CurSF_it->SupportFoot!=m_CurrentSupport.Foot)
+    CurSF_it--;
+
+  LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin();
+
+
+  double FFPx, FFPy;
+
+  int IndexConstraint = 0;
+
+  //ZMP constraints
+  for( int i=0;i<m_QP_N;i++)
+    {
+      if(LCIFF_it->StepNumber==0)
+	{//c'est pas bon ca
+	  FFPx = CurSF_it->x;
+	  FFPy = CurSF_it->y;
+	}
+      else
+	{
+	  FFPx = 0.0;
+	  FFPy = 0.0;
+	}
+
+      // For each constraint.
+      for(int j=0;j<MAL_MATRIX_NB_ROWS(LCIFF_it->D);j++)
+	{
+	  m_Pb.DS[IndexConstraint] =
+	    // X Axis * A
+	    (FFPx-xk[0] * m_Px(i,0)-
+	     xk[1] * m_Px(i,1)-
+	     xk[2] * m_Px(i,2))
+	    * LCIFF_it->D(j,0)
+	    +
+	    // Y Axis * A
+	     (FFPy-xk[3] * m_Px(i,0)-
+	      xk[4] * m_Px(i,1)-
+	      xk[5] * m_Px(i,2))
+	    * LCIFF_it->D(j,1)
+	    // Constante part of the constraint
+	    + LCIFF_it->Dc(j,0);
+
+	  if (m_FastFormulationMode==QLD)
+	    {
+	      // In this case, Pu is triangular.
+	      // so we can speed up the computation.
+
+	      for(int k=0;k<=i;k++)
+		{
+		  // X axis
+		  DU[IndexConstraint+k*(NbOfConstraints+1)] =
+		    -(LCIFF_it)->D(j,0)*m_Pu[k*m_QP_N+i];
+
+		  // Y axis
+		  DU[IndexConstraint+(k+m_QP_N)*(NbOfConstraints+1)] =
+		    -(LCIFF_it)->D(j,1)*m_Pu[k*m_QP_N+i];
+		}
+
+	    }
+	  else if ((m_FastFormulationMode==QLDANDLQ)||
+		   (m_FastFormulationMode==PLDPHerdt))
+	    {
+	      // In this case, Pu is *NOT* triangular.
+	      for(int k=0;k<m_QP_N;k++)
+		{
+		  // X axis
+		  DU[IndexConstraint+k*(NbOfConstraints+1)] =
+		    -(LCIFF_it)->D(j,0)*m_Pu[k*2*(m_QP_N+m_PrwSupport.StepNumber)+i];
+		  // Y axis
+		  DU[IndexConstraint+(k+m_QP_N)*(NbOfConstraints+1)] =
+		    -(LCIFF_it)->D(j,1)*m_Pu[k*2*(m_QP_N+m_PrwSupport.StepNumber)+i];
+		}
+	    }
+
+	  //Feet variables after jerk: [dddX,dddY,FPx,FPy]
+	  if(LCIFF_it->StepNumber>0)
+	    {
+	      DU[IndexConstraint+(2*m_QP_N+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = LCIFF_it->D(j,0);
+	      DU[IndexConstraint+(2*m_QP_N+m_PrwSupport.StepNumber+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = LCIFF_it->D(j,1);
+	    }
+	  IndexConstraint++;
+	}
+      LCIFF_it++;
+    }
+
+
+  //Feet position constraints
+  LCIFF_it = QueueOfFeetPosInequalities.begin();
+  for( int i=0;i<m_PrwSupport.StepNumber;i++)
+    {
+      if(LCIFF_it->StepNumber==1)
+	{
+	  FFPx = CurSF_it->x;
+	  FFPy = CurSF_it->y;
+	}
+      else
+	{
+	  FFPx = 0.0;
+	  FFPy = 0.0;
+	}
+
+
+      // For each constraint.
+      for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(LCIFF_it->D);j++)
+	{
+	  m_Pb.DS[IndexConstraint] =
+	    // X Axis * A
+	    FFPx * LCIFF_it->D(j,0)
+	    +
+	    // Y Axis * A
+	    FFPy * LCIFF_it->D(j,1)
+	    // Constante part of the constraint
+	    + LCIFF_it->Dc(j,0);
+
+
+	  //Foot variables after jerk: [dddX,dddY,FPx,FPy]
+	  if((LCIFF_it)->StepNumber==1)
+	    {
+	      m_Pb.DU[IndexConstraint+(2*m_QP_N+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] =
+		-LCIFF_it->D(j,0);
+	      m_Pb.DU[IndexConstraint+(2*m_QP_N+m_PrwSupport.StepNumber+LCIFF_it->StepNumber-1)*(NbOfConstraints+1)] =
+		-LCIFF_it->D(j,1);
+	    }
+	  if((LCIFF_it)->StepNumber>1)
+	    {
+	      m_Pb.DU[IndexConstraint+(2*m_QP_N+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] =
+		-(LCIFF_it)->D(j,0);
+	      m_Pb.DU[IndexConstraint+(2*m_QP_N+(LCIFF_it)->StepNumber-2)*(NbOfConstraints+1)] =
+		(LCIFF_it)->D(j,0);
+	      m_Pb.DU[IndexConstraint+(2*m_QP_N+m_PrwSupport.StepNumber+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] =
+		-(LCIFF_it)->D(j,1);
+	      m_Pb.DU[IndexConstraint+(2*m_QP_N+m_PrwSupport.StepNumber+(LCIFF_it)->StepNumber-2)*(NbOfConstraints+1)] =
+		(LCIFF_it)->D(j,1);
+	    }
+	  IndexConstraint++;
+	}
+
+      LCIFF_it++;
+    }
+
+  static double localtime = -m_QP_T;
+  localtime+=m_QP_T;
+
+  return 0;
+}
+
+
+
+//--------------------------------------
+//
+//
+//-----------new functions--------------
 void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &strm)
 {
   if (Method==":previewcontroltime")
@@ -623,7 +971,6 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   CoM.y[2] = lStartingCOMState.y[2];
 
   m_CoM(CoM);
-  m_Matrices.CoM(m_CoM());
 
   return 0;
 }
@@ -891,6 +1238,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       (time>=m_TimeToStopOnLineMode))
     m_OnLineMode = false;
 
+
   if(time + 0.00001 > m_UpperTimeLimitToUpdate)
     {
 
@@ -914,8 +1262,11 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       gettimeofday(&start,0);
 
+
       m_OP->verifyAccelerationOfHipJoint(m_VelRef, m_TrunkState,
 					 m_TrunkStateT, m_CurrentSupport);
+
+
       m_OP->previewOrientations(time+m_TimeBuffer,
 				m_PreviewedSupportAngles,
 				m_TrunkState,
@@ -924,11 +1275,11 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				FinalLeftFootAbsolutePositions,
 				FinalRightFootAbsolutePositions);
 
+
       // Read the current state of the 2D Linearized Inverted Pendulum.
       m_CoM.GetState(xk);
 
       m_GenVR->computeGlobalReference(m_Matrices, m_TrunkStateT);
-
 
       //Apply external forces
       if(m_PerturbationOccured == true)
@@ -936,9 +1287,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  xk(2) = xk(2)+m_PerturbationAcceleration(2);
 	  xk(5) = xk(5)+m_PerturbationAcceleration(5);
 	  m_PerturbationOccured = false;
-	  m_CoM.setState(xk);
 	}
-
+      m_CoM.setState(xk);
 
       m_SupportFSM->setSupportState(time+m_TimeBuffer, 0, m_CurrentSupport, m_VelRef);
 
@@ -966,48 +1316,43 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  newSF.SupportFoot = m_CurrentSupport.Foot;
 
 	  QueueOfSupportFeet.push_back(newSF);
-	  m_Matrices.SupportFoot(newSF);
 	}
 
-
       deque<support_state_t> deqPrwSupportStates;
-
       deqPrwSupportStates.push_back(m_CurrentSupport);
-
 
       m_GenVR->setCurrentTime(time+m_TimeBuffer);
       m_Matrices.Reference(m_VelRef);
 
       m_GenVR->computeGlobalReference(m_Matrices, m_TrunkStateT);
 
-      m_GenVR->previewSupportStates(m_Matrices, m_SupportFSM, deqPrwSupportStates);
+      m_GenVR->preview(m_Matrices, m_SupportFSM, deqPrwSupportStates);
 
       m_PrwSupport = deqPrwSupportStates.back();
+      m_GenVR->generateSelectionMatrices(m_Matrices, deqPrwSupportStates);
 
 
+      m_GenVR->generateIneqFeet(QueueOfFeetPosInequalities,
+          m_fCALS,
+          FinalLeftFootAbsolutePositions,
+                FinalRightFootAbsolutePositions,
+                deqPrwSupportStates,
+                m_PreviewedSupportAngles, NbOfConstraints);
 
+      m_GenVR->generateIneqCOP(QueueOfLConstraintInequalitiesFreeFeet,
+          m_fCALS,
+          FinalLeftFootAbsolutePositions,
+                FinalRightFootAbsolutePositions,
+                deqPrwSupportStates,
+                m_PreviewedSupportAngles, NbOfConstraints);
 
-//      double ldt1,ldt2;
-//      struct timeval lbegin,lbegin2,lend,lend2;
-//      gettimeofday(&lbegin,0);
-//
-//
-//      gettimeofday(&lend,0);
-
-//
-//      gettimeofday(&lend2,0);
-//
-//      ldt1 = lend.tv_sec - lbegin.tv_sec +
-//        0.000000001 * (lend.tv_usec - lbegin.tv_usec);
-//      ldt2 = lend2.tv_sec - lbegin2.tv_sec +
-//        0.000000001 * (lend2.tv_usec - lbegin2.tv_usec);
-//      cout<<"ldt1<<:"<<ldt1<<endl;
-//      cout<<"ldt2<<:"<<ldt2<<endl;
-//      cout<<"ldt1-ldt2<<:"<<ldt1-ldt2<<endl;
-
+      deque<supportfoot_t>::iterator SF_it;//, storeFF_it, VFF_it;
+      SF_it = QueueOfSupportFeet.end();
+      SF_it--;
+      m_Matrices.SupportFoot(*SF_it);
 
       m_Pb.setDimensions(2*(m_QP_N + m_PrwSupport.StepNumber),
-                         4*m_QP_N+5*m_PrwSupport.StepNumber,
+                         NbOfConstraints,
                          0);
 
       if (m_FastFormulationMode==QLDANDLQ)
@@ -1015,10 +1360,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       else
         m_Pb.iwar[0]=1;
 
-
       m_Pb.initialize(m_Pb.Q,2*(m_QP_N + m_PrwSupport.StepNumber)*2*(m_QP_N + m_PrwSupport.StepNumber),0.0);
       m_GenVR->buildInvariantPart(m_Pb, m_Matrices);
-
 
       m_Pb.initialize(m_Pb.D,2*(m_QP_N + m_PrwSupport.StepNumber),0.0);
       m_GenVR->updateProblem(m_Pb, m_Matrices, deqPrwSupportStates);
@@ -1031,16 +1374,18 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	}
 
 
-      m_GenVR->buildConstraints(m_Matrices, m_Pb,
-          m_fCALS,
-          FinalLeftFootAbsolutePositions,
-          FinalRightFootAbsolutePositions,
-          deqPrwSupportStates,
-          m_PreviewedSupportAngles);
+      buildConstraintMatrices(m_Pb.DS,m_Pb.DU,
+			      m_QP_T,
+			      time+m_TimeBuffer,
+			      QueueOfLConstraintInequalitiesFreeFeet,
+			      QueueOfFeetPosInequalities,
+			      QueueOfSupportFeet,
+			      m_ComHeight,
+			      NbOfConstraints,
+			      xk);
 
-      //m_Pb.dumpProblem("/tmp/Problem.dat");
 
-//      if(time>3.0)
+//      if(time>0.0)
 //        m_OnLineMode = false;
 
       double ldt = 0.0;
@@ -1050,7 +1395,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	  struct timeval lbegin,lend;
 	  gettimeofday(&lbegin,0);
 
-          //m_Pb.dumpProblem("/tmp/Problem.dat");
+          m_Pb.dumpProblem("/tmp/Problem.dat");
 
 	  m_Pb.solve( QPProblem_s::QLD );
 
@@ -1148,7 +1493,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 			      ptX[0],ptX[m_QP_N]);
       m_Matrices.CoM(m_CoM.OneIteration(ptX[0],ptX[m_QP_N]));
 
-
       //The robot is supposed to stop always with the feet aligned in the lateral plane.
       if(m_CurrentSupport.StepsLeft>0)
 	{
@@ -1185,18 +1529,15 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	}
 
 
-
       interpolateTrunkState(time, CurrentIndex,
 			    FinalCOMStates);
-
-
       interpolateFeetPositions(time, CurrentIndex,
 			       FinalLeftFootAbsolutePositions,
 			       FinalRightFootAbsolutePositions);
 
-
-
       m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+m_QP_T;
+      ODEBUG6("uk:" << uk,"/tmp/DebugPBW.dat");
+      ODEBUG6("xk:" << xk,"/tmp/DebugPBW.dat");
 
 
       // Compute CPU consumption time.
@@ -1205,6 +1546,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
         0.000001 * (end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
 
+
+      ODEBUG("Current Time : " <<time << " " <<
+	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - time <<
+	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
       QueueOfLConstraintInequalitiesFreeFeet.clear();
       QueueOfFeetPosInequalities.clear();

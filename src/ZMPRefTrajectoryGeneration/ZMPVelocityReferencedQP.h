@@ -63,6 +63,18 @@ namespace PatternGeneratorJRL
     /* Default destructor. */
     ~ZMPVelocityReferencedQP();
 
+
+    /*! \name Methods to build the optimization problem
+      @{
+    */
+
+    /*! \brief Compute the constant matrices over all the instances of the problem.
+      This means \f$P_{pu}, P_{px}, P_{vs}, P_{vu}\f$.
+      The necessary parameters to build those matrices are extracted from the
+      PreviewControl link.
+    */
+    int InitializeMatrixPbConstants();
+
     /*! \brief Call the two previous methods
       \return A negative value in case of a problem 0 otherwise.
     */
@@ -71,11 +83,29 @@ namespace PatternGeneratorJRL
     void initFeet();
 
 
+    int buildConstraintMatrices(double * &DS, double * &DU,
+				double T,
+				double StartingTime,
+				deque<linear_inequality_ff_t>    & QueueOfLConstraintInequalitiesFreeFeet,
+				deque<linear_inequality_ff_t>    & QueueOfFeetPosInequalities,
+				deque<supportfoot_t>    & QueueOfSupportFeet,
+				double Com_Height,
+				int NbOfConstraints,
+				MAL_VECTOR(&xk,double));
+
+
+
     /*! \brief Build the constant part of the constraint matrices. */
     int BuildingConstantPartOfConstraintMatrices();
 
     int buildConstraintMatricesPLDPHerdt();
 
+    /*! This method helps to build a linear system for constraining the ZMP. */
+    int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
+			    MAL_MATRIX(&A,double),
+			    MAL_MATRIX(&B,double));
+
+    /*! @} */
 
 
     /*! Call method to handle the plugins (SimplePlugin interface) . */
@@ -136,6 +166,20 @@ namespace PatternGeneratorJRL
     void interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			 deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
+    /*! Return \f$\alpha\f$ */
+    const double & GetAlpha() const;
+
+    /*! Set \f$\alpha\f$ */
+    void SetAlpha(const double &);
+
+    /*! Return \f$\beta\f$ */
+    const double & GetBeta() const;
+
+    /*! Set \f$\beta\f$ */
+    void SetBeta(const double &);
+
+    /*! @}*/
+    /* @} */
     reference_t m_VelRef;
 
     static const unsigned int QLD=0;
@@ -211,9 +255,38 @@ namespace PatternGeneratorJRL
     deque<double> m_PreviewedSupportAngles;
 
     //Final optimization problem
-    QPProblem m_Pb, m_Pb2;
+    QPProblem m_Pb;
 
     support_state_t m_CurrentSupport, m_PrwSupport;
+
+    /*! \name Variables related to the QP
+      @{ */
+    /*! \brief Matrix relating the command and the CoM position. */
+    MAL_MATRIX(m_PPu,double);
+
+    /*! \brief Matrix relating the command and the ZMP position. */
+    MAL_MATRIX(m_PZu,double);
+
+    /*! \brief Matrix relating the command and the CoM speed. */
+    MAL_MATRIX(m_VPu,double);
+
+    /*! \brief Matrix relating the CoM state and the CoM position. */
+    MAL_MATRIX(m_PPx,double);
+
+    /*! \brief Matrix relating the CoM state and the ZMP position. */
+    MAL_MATRIX(m_PZx,double);
+
+    /*! \brief Matrix relating the CoM state and the CoM speed. */
+    MAL_MATRIX(m_VPx,double);
+
+    /*! \brief Selection matrix for the previewed feet positions. */
+    MAL_MATRIX(m_U,double);
+
+    /*! \brief Selection matrix for the support feet. */
+    MAL_VECTOR(m_Uc,double);
+
+    /*! \brief Matrix of the objective function $Q$ */
+    //    double *m_Q;
 
     /*! \brief Cholesky decomposition of the initial objective function $Q$ */
     MAL_MATRIX(m_LQ,double);
@@ -230,6 +303,22 @@ namespace PatternGeneratorJRL
     MAL_MATRIX(m_OptC,double);
     MAL_MATRIX(m_OptD,double);
 
+    enum MatrixType  { M_PPU, M_PZU, M_VPU, M_PPX,
+			M_PZX, M_VPX, M_U, 
+			M_LQ, M_ILQ};
+    enum VectorType  {m_UC,M_OPTA, M_OPTB,	M_OPTC, M_OPTD };
+      
+    /*! \name Parameters of the objective function
+      @{ */
+    /*! Putting weight on the velocity */
+    double m_Beta;
+
+    /*! Putting weight on the jerk minimization. */
+    double m_Alpha;
+    /*! @} */
+
+    /*! Putting weight on the ZMP */
+    double m_Gamma;
 
     /* Constant parts of the linear constraints. */
     double * m_Pu;
@@ -261,6 +350,21 @@ namespace PatternGeneratorJRL
 				  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 				  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
+    /*! \name Debugging related methods 
+     @{*/
+    /*! \brief Dump the instance of the quadratic problem for one iteration. */
+    int dumpProblem(MAL_VECTOR(& xk,double),
+		    double Time);
+
+    /*! \brief Debugging point for the constructor. */
+    void debugConstructor();
+
+    /*! \brief Dumping matrix specified by MatrixID in aos. */
+    void debugMatrix(ostream & aos, enum MatrixType MatrixID);
+
+    /*! \brief Dumping matrix specified by MatrixID in file named filename. */
+    void debugMatrix(const char *filename, enum MatrixType MatrixID);
+    /*! @} */
     
   public:
 
