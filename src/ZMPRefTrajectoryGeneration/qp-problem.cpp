@@ -107,9 +107,9 @@ QPProblem_s::resizeAll(const int & NbVariables, const int & NbConstraints)
   resize(DU,2*m*n,2*NbVariables*NbConstraints);
 
   resize(XL,2*n,2*NbVariables);  // Lower bound on the solution.
-  initialize(XL,2*NbVariables,-1e8);
+  initialize(XL,-1e8,2*NbVariables);
   resize(XU,2*n,2*NbVariables);  // Upper bound on the solution.
-  initialize(XU,2*NbVariables,1e8);
+  initialize(XU,1e8,2*NbVariables);
 
   resize(X,2*n,2*NbVariables);  // Solution of the problem.
   resize(NewX,2*n,2*NbVariables);  // Solution of the problem.
@@ -128,7 +128,7 @@ QPProblem_s::resize(type *& array, const int & old_size, const int & new_size)
   try
     {
       type * NewArray = new type[new_size];
-      initialize(NewArray, new_size, (type)0);
+      initialize(NewArray,(type)0,new_size);
       for(int i = 0; i < old_size; i++)
 	NewArray[i] = array[i];
 
@@ -184,9 +184,13 @@ QPProblem_s::setDimensions(const int & NbVariables,
 
 template <class type>
 void
-QPProblem_s::initialize(type * array, const int & size, type value)
+QPProblem_s::initialize(type * array, type value, const int & size)
 {
-  std::fill_n(array,size,value);
+  for(int i = 0; i<size; i++)
+    {
+      *array = value;
+      array++;
+    }
 }
 
 
