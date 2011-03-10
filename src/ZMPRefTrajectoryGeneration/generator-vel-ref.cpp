@@ -28,7 +28,6 @@
 
 #include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
 
-using namespace std;
 using namespace PatternGeneratorJRL;
 
 
@@ -250,90 +249,6 @@ GeneratorVelRef::generateFeetPosConstraints (CjrlFoot & Foot,
 					     QPProblem & Pb)
 {
   //TODO:
-}
-
-
-void
-GeneratorVelRef::buildConstraintInequalities( std::deque< FootAbsolutePosition> & LeftFootAbsolutePositions,
-    std::deque<FootAbsolutePosition> & RightFootAbsolutePositions,
-    std::deque<LinearConstraintInequalityFreeFeet_t> & ZMPInequalitiesDeque,
-    std::deque<LinearConstraintInequalityFreeFeet_t> & FeetPosInequalitiesDeque,
-    std::deque<support_state_t> & deqSupportStates,
-    std::deque<double> & PreviewedSupportAngles, int & NbConstraints,
-    FootConstraintsAsLinearSystemForVelRef * FCALS)
-{
-
-  std::vector<CH_Point> ZMPConstrVertices;
-  ZMPConstrVertices.resize(4);
-  std::vector<CH_Point> FeetPosConstrVertices;
-  FeetPosConstrVertices.resize(5);
-
-  //determine the current support angle
-  std::deque<FootAbsolutePosition>::iterator FAP_it;
-
-  support_state_t & CurrentSupport = deqSupportStates.front();
-
-  //define the current support angle
-  if( CurrentSupport.Foot==1 )
-    {
-      FAP_it = LeftFootAbsolutePositions.end();
-      FAP_it--;
-    }
-  else
-    {
-      FAP_it = RightFootAbsolutePositions.end();
-      FAP_it--;
-    }
-  double CurrentSupportAngle = FAP_it->theta*M_PI/180.0;
-
-  double ZMPConvHullOrientation = CurrentSupportAngle;
-  double FPConvHullOrientation = CurrentSupportAngle;
-
-  //set current constraints
-  FCALS->setVertices( ZMPConstrVertices, FeetPosConstrVertices,
-               ZMPConvHullOrientation, FPConvHullOrientation,
-               CurrentSupport );
-
-
-  //set constraints for the whole preview window
-  for( int i=1;i<=m_N;i++ )
-    {
-
-      support_state_t & PrwSupport = deqSupportStates[i];
-      if( PrwSupport.StateChanged )
-        FCALS->setVertices( ZMPConstrVertices, FeetPosConstrVertices,
-                     ZMPConvHullOrientation, FPConvHullOrientation, PrwSupport );
-
-      if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 )
-          FPConvHullOrientation = PreviewedSupportAngles[PrwSupport.StepNumber-1];
-
-      //foot positioning constraints
-      if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 && PrwSupport.Phase != 0)
-        {
-          ZMPConvHullOrientation = PreviewedSupportAngles[PrwSupport.StepNumber-1];
-
-          if( PrwSupport.StepNumber == 1 )
-              FPConvHullOrientation = CurrentSupportAngle;
-          else
-              FPConvHullOrientation = PreviewedSupportAngles[PrwSupport.StepNumber-2];
-
-          FCALS->setVertices( ZMPConstrVertices, FeetPosConstrVertices,
-                       ZMPConvHullOrientation, FPConvHullOrientation, PrwSupport );
-
-          LinearConstraintInequalityFreeFeet_t aLCIFP;
-          FCALS->computeLinearSystem( FeetPosConstrVertices, aLCIFP.D, aLCIFP.Dc, PrwSupport );
-          aLCIFP.StepNumber = PrwSupport.StepNumber;
-          FeetPosInequalitiesDeque.push_back( aLCIFP );
-          NbConstraints += MAL_MATRIX_NB_ROWS( aLCIFP.D );
-        }
-
-      LinearConstraintInequalityFreeFeet_t aLCI;
-      FCALS->computeLinearSystem( ZMPConstrVertices, aLCI.D, aLCI.Dc, PrwSupport );
-      aLCI.StepNumber = PrwSupport.StepNumber;
-      ZMPInequalitiesDeque.push_back( aLCI );
-      NbConstraints += MAL_MATRIX_NB_ROWS( aLCI.D );
-    }
-
 }
 
 
