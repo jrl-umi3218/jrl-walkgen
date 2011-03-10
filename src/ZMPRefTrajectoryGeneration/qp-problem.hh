@@ -66,6 +66,8 @@ namespace PatternGeneratorJRL
       /// \brief Number of constraints (lagrange multipliers)
       int NbConstraints;
 
+      /// \name qld-output
+      /// \{
       /// \brief SHOWS THE TERMINATION REASON.
       ///   IFAIL = 0 :   SUCCESSFUL RETURN.
       ///   IFAIL = 1 :   TOO MANY ITERATIONS (MORE THAN 40*(N+M)).
@@ -79,27 +81,30 @@ namespace PatternGeneratorJRL
       ///   IPRINT = 0 :  NO OUTPUT OF QL0001.
       ///   IPRINT > 0 :  BRIEF OUTPUT IN ERROR CASES.
       int Print;
+      /// \}
 
       /// \brief Solution vector
-      boost_ublas::vector<double> Solution_vec;
+      boost_ublas::vector<double> vecSolution;
 
+      /// \name Splitted lagrange multipliers sets
+      /// \{
       /// \brief Lagrange multipliers of the constraints
-      boost_ublas::vector<double> ConstrLagr_vec;
+      boost_ublas::vector<double> vecConstrLagr;
       /// \brief Lagrange multipliers of the lower bounds
-      boost_ublas::vector<double> LBoundsLagr_vec;
+      boost_ublas::vector<double> vecLBoundsLagr;
       /// \brief Lagrange multipliers of the upper bounds
-      boost_ublas::vector<double> UBoundsLagr_vec;
+      boost_ublas::vector<double> vecUBoundsLagr;
+      /// \}
 
       /// \brief Resize solution containers
       void resize( int nb_variables, int nb_constraints );
 
+      /// \name Dumping
+      /// \{
       /// \brief Dump solution
-      /// \param filename
       void dump( const char *filename );
-      /// \brief Print solution
-      /// \param aos
       void print( std::ostream & aos);
-
+      /// \}
     };
     typedef struct solution_s solution_t;
 
@@ -121,13 +126,13 @@ namespace PatternGeneratorJRL
     void setNbVariables( int nb_variables )
     { nbvariables_ = nb_variables;};
 
-    /// \brief Set the number of equality constraints.
+    /// \brief Set the number of optimization parameters.
     ///
     /// \param nb_eq_constraints
     inline void setNbEqConstraints( int nb_eq_constraints )
     { nbeqconstraints_ = nb_eq_constraints;};
 
-    /// \brief Set the total number of constraints.
+    /// \brief Set the number of optimization parameters.
     ///
     /// \param nb_constraints
     inline void setNbConstraints( int nb_constraints )
@@ -200,19 +205,25 @@ namespace PatternGeneratorJRL
     /// \param[out] result
     void solve( int solver, solution_t & result);
 
-
     //
-    // Private methods
+    //Protected methods
     //
-  private:
+  protected:
 
-    /// \brief Release memory.
+    /// \brief Relese memory.
     void releaseMemory();
 
     /// \brief Allocate memory.
     /// Called when setting the dimensions of the problem.
     ///
+    /// \param[in] nb_variables
+    /// \param[in] nb_constraints
     void resizeAll();
+
+    //
+    // Private methods
+    //
+  private:
 
     /// \name Dumping functions
     /// \{
@@ -223,7 +234,6 @@ namespace PatternGeneratorJRL
     /// \brief Print problem
     void dumpProblem(std::ostream &);
     /// \}
-
     //
     //Private types
     //

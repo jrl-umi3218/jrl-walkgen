@@ -22,7 +22,7 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/*! \brief Custom (value based) container providing intermediate elements for the construction of a QP.
+/*! Custom (value based) container providing intermediate elements for the construction of a QP.
  */
 
 #include <Mathematics/intermediate-qp-matrices.hh>

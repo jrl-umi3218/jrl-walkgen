@@ -44,7 +44,6 @@
 namespace PatternGeneratorJRL
 {
  
-  /// \brief Generate optimization problem as proposed in Herdt2010IROS
   class  GeneratorVelRef : public MPCTrajectoryGeneration
   {
 
@@ -59,15 +58,16 @@ namespace PatternGeneratorJRL
     /// \}
 
 
-    /// \brief Set the weights on an objective term
+    /// \brief Set the weights on the objective terms
     ///
+    /// \param[out] Matrices
     /// \param[in] weight
     /// \param[in] objective
     void setPonderation(double weight, int objective );
 
     /// \brief Set the velocity reference from string
     ///
-    /// \param[in] Ref Reference
+    /// \param[in] strm velocity reference string
     inline void setReference(const reference_t & Ref)
     {  Matrices_.Reference(Ref); };
 
@@ -85,23 +85,27 @@ namespace PatternGeneratorJRL
 
     /// \brief Preview support state for the whole preview period
     ///
+    /// \param[in] Matrices
     /// \param[in] FSM
     /// \param[out] deqSupportStates
     void previewSupportStates( const SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates );
 
     /// \brief Compute the selection matrices
     ///
+    /// \param[out] Matrices
     /// \param[in] deqSupportStates
     void generateSelectionMatrices( const std::deque<support_state_t> & deqSupportStates);
 
     /// \brief Set the global reference from the local one and the orientation of the trunk frame
     /// for the whole preview window
     ///
+    /// \param[out] Matrices
     /// \param[in] TrunkStateT State of the trunk at the end of the acceleration phase
     void computeGlobalReference( const COMState & TrunkStateT );
 
-    /// \brief Initialize intermediate matrices
+    /// \brief Initialize the optimization programm
     ///
+    /// \param[out] Matrices
     void initializeMatrices();
 
 //    /// \brief Add one equality constraint to the queue of constraints
@@ -134,7 +138,7 @@ namespace PatternGeneratorJRL
 			      const std::deque<double> & PreviewedSupportAngles) const;
 
     /// \brief Generate a queue of inequality constraints on
-    /// the feet positions with respect to previous foot positions
+    /// the feet positions with respect to previous footpositions
     ///
     /// \param[out] Inequalities
     /// \param[in] FCALS
@@ -174,6 +178,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Compute constraints
     ///
+    /// \param[in] Matrices
     /// \param[in] Pb
     /// \param[in] FCALS
     /// \param[in] AbsoluteLeftFootPositions
@@ -190,11 +195,13 @@ namespace PatternGeneratorJRL
     /// \brief Build the constant part of the objective
     ///
     /// \param[in] Pb
+    /// \param[in] Matrices
     void buildInvariantPart(QPProblem & Pb);
 
     /// \brief Compute the objective matrices
     ///
     /// \param[in] Pb
+    /// \param[in] Matrices
     /// \param[in] deqSupportStates
     void updateProblem(QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq);
 	  
@@ -204,7 +211,7 @@ namespace PatternGeneratorJRL
     //
   private:
 
-    /// \brief Initialize intermediate matrices
+    /// \brief Initialize objective matrices
     ///
     /// \param[in] Objective
     void initializeMatrices( IntermedQPMat::dynamics_t & Objective);
