@@ -37,8 +37,6 @@
 #include <iostream>
 #include <fstream>
 
-#include <exception>
-
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 using namespace PatternGeneratorJRL;
 
@@ -115,41 +113,21 @@ void QPProblem_s::AllocateMemory()
 }
 
 
-int
+void
 QPProblem_s::resize(double * array, int size)
 {
   if (array!=0)
     delete [] array;
-
-  try
-  {
-    array = new double[size];
-  }
-  catch (std::bad_alloc& ba)
-  {
-    std::cerr << "bad_alloc caught: " << ba.what() << std::endl;
-  }
-
-  return 0;
+  array = new double[size];
 }
 
 
-int
+void
 QPProblem_s::resize(int * array, int size)
 {
   if (array!=0)
     delete [] array;
-
-  try
-  {
-    array = new int[size];
-  }
-  catch (std::bad_alloc& ba)
-  {
-    std::cerr << "bad_alloc caught: " << ba.what() << std::endl;
-  }
-
-  return 0;
+  array = new int[size];
 }
 
 
