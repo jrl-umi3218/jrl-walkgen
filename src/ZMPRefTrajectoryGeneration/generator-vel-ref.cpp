@@ -216,7 +216,7 @@ GeneratorVelRef::initializeMatrices( IntermedQPMat::objective_variant_t & Object
 
 
 void 
-GeneratorVelRef::addEqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
+GeneratorVelRef::addEqConstraint(std::deque<LinearConstraintInequalityFreeFeet_t> ConstraintsDeque,
 				 MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double))
 {
   //TODO:
@@ -224,7 +224,7 @@ GeneratorVelRef::addEqConstraint(std::deque<linear_inequality_ff_t> ConstraintsD
 	  
 
 void
-GeneratorVelRef::addIneqConstraint(std::deque<linear_inequality_ff_t> ConstraintsDeque,
+GeneratorVelRef::addIneqConstraint(std::deque<LinearConstraintInequalityFreeFeet_t> ConstraintsDeque,
 				   MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double))
 {
   //TODO:
@@ -256,8 +256,8 @@ GeneratorVelRef::generateFeetPosConstraints (CjrlFoot & Foot,
 void
 GeneratorVelRef::buildConstraintInequalities( std::deque< FootAbsolutePosition> & LeftFootAbsolutePositions,
     std::deque<FootAbsolutePosition> & RightFootAbsolutePositions,
-    std::deque<linear_inequality_ff_t> & ZMPInequalitiesDeque,
-    std::deque<linear_inequality_ff_t> & FeetPosInequalitiesDeque,
+    std::deque<LinearConstraintInequalityFreeFeet_t> & ZMPInequalitiesDeque,
+    std::deque<LinearConstraintInequalityFreeFeet_t> & FeetPosInequalitiesDeque,
     std::deque<support_state_t> & deqSupportStates,
     std::deque<double> & PreviewedSupportAngles, int & NbConstraints,
     FootConstraintsAsLinearSystemForVelRef * FCALS)
@@ -320,14 +320,14 @@ GeneratorVelRef::buildConstraintInequalities( std::deque< FootAbsolutePosition> 
           FCALS->setVertices( ZMPConstrVertices, FeetPosConstrVertices,
                        ZMPConvHullOrientation, FPConvHullOrientation, PrwSupport );
 
-          linear_inequality_ff_t aLCIFP;
+          LinearConstraintInequalityFreeFeet_t aLCIFP;
           FCALS->computeLinearSystem( FeetPosConstrVertices, aLCIFP.D, aLCIFP.Dc, PrwSupport );
           aLCIFP.StepNumber = PrwSupport.StepNumber;
           FeetPosInequalitiesDeque.push_back( aLCIFP );
           NbConstraints += MAL_MATRIX_NB_ROWS( aLCIFP.D );
         }
 
-      linear_inequality_ff_t aLCI;
+      LinearConstraintInequalityFreeFeet_t aLCI;
       FCALS->computeLinearSystem( ZMPConstrVertices, aLCI.D, aLCI.Dc, PrwSupport );
       aLCI.StepNumber = PrwSupport.StepNumber;
       ZMPInequalitiesDeque.push_back( aLCI );

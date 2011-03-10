@@ -292,7 +292,7 @@ int PLDPSolverHerdt::PrecomputeiPuPx(unsigned int NumberSteps)
 
 
 
-int PLDPSolverHerdt::ComputeInitialSolution(deque<linear_inequality_ff_t> & QueueOfLConstraintInequalitiesFreeFeet,
+int PLDPSolverHerdt::ComputeInitialSolution(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
 				       deque<supportfoot_t> & QueueOfSupportFeet, unsigned int NumberSteps,
 				       double *XkYk)
 {
@@ -300,7 +300,7 @@ int PLDPSolverHerdt::ComputeInitialSolution(deque<linear_inequality_ff_t> & Queu
     U0 = -iPu * Px [Xkt Ykt]t + iPu * InitialZMP
   */
 
-  deque<linear_inequality_ff_t>::iterator LCIFF_it;
+  deque<LinearConstraintInequalityFreeFeet_t>::iterator LCIFF_it;
   LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin();
 
   //Current support foot coordinates
@@ -690,7 +690,7 @@ double PLDPSolverHerdt::ComputeAlpha(vector<unsigned int> & NewActivatedConstrai
 
   return Alpha;
 }
-int PLDPSolverHerdt::SolveProblem(deque<linear_inequality_ff_t> & QueueOfLConstraintInequalitiesFreeFeet,
+int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
 			     deque<supportfoot_t> & QueueOfSupportFeet,
 			     double *CstPartOfTheCostFunction,
 			     unsigned int NbOfConstraints,
