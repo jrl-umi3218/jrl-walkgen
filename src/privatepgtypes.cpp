@@ -27,38 +27,6 @@
 namespace PatternGeneratorJRL
 {
 
-  struct support_state_s & support_state_t::operator =(const support_state_s & aSS)
-  {
-    for(unsigned int i=0;i<3;i++)
-      {
-        Phase  = aSS.Phase;
-        Foot  = aSS.Foot;
-        StepsLeft  = aSS.StepsLeft;
-        TimeLimit = aSS.TimeLimit;
-        StepNumber  = aSS.StepNumber;
-      };
-    return *this;
-  }
-
-  void support_state_t::reset()
-  {
-    for(int i=0;i<3;i++)
-      {
-        Phase  = 0;
-        Foot  = 0;
-        StepsLeft  = 0;
-        TimeLimit = 0.0;
-        StepNumber  = 0;
-        SSSS = StateChanged = false;
-      }
-  }
-
-  support_state_s::support_state_s()
-  {
-    reset();
-  }
-
-
   struct com_s & com_t::operator=(const com_s &aCS)
   {
     for(unsigned int i=0;i<3;i++)

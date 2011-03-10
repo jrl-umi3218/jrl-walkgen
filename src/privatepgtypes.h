@@ -40,12 +40,6 @@ namespace PatternGeneratorJRL
     int Phase, Foot, StepsLeft, StepNumber;
     bool SSSS, StateChanged;
     double TimeLimit;
-
-    struct support_state_s & operator = (const support_state_s &aSS);
-
-    void reset();
-
-    support_state_s();
   };
   typedef struct support_state_s support_state_t;
 
@@ -111,26 +105,6 @@ namespace PatternGeneratorJRL
 
   };
   typedef struct reference_s reference_t;
-
-  struct solution_s
-  {
-    /// \brief whole solution array
-    double * array;
-
-    struct vector_s
-    {
-      MAL_VECTOR(X,double);
-      MAL_VECTOR(Y,double);
-
-      /// \brief First and last elements of vector in array
-      int first, last;
-    };
-    typedef struct vector_s vector_t;
-
-    vector_t jerk, footpos;
-
-  };
-  typedef struct solution_s solution_t;
 
 }
 
