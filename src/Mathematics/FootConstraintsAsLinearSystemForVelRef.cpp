@@ -40,7 +40,7 @@ using namespace PatternGeneratorJRL;
 
 
 
-RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
+FootConstraintsAsLinearSystemForVelRef::FootConstraintsAsLinearSystemForVelRef( SimplePluginManager *aSPM,
                                                                                 CjrlHumanoidDynamicRobot *aHS ) :
   SimplePlugin(aSPM)
 {
@@ -66,7 +66,7 @@ RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
     }
 }
 
-RelativeFeetInequalities::~RelativeFeetInequalities()
+FootConstraintsAsLinearSystemForVelRef::~FootConstraintsAsLinearSystemForVelRef()
 {
 
 }
@@ -74,7 +74,7 @@ RelativeFeetInequalities::~RelativeFeetInequalities()
 
 
 int
-RelativeFeetInequalities::initConvexHulls()
+FootConstraintsAsLinearSystemForVelRef::initConvexHulls()
 {
 
   double lxcoefsRight[4] = { 1.0, 1.0, -1.0, -1.0};
@@ -123,7 +123,7 @@ RelativeFeetInequalities::initConvexHulls()
 
 
 int
-RelativeFeetInequalities::setFeetDimensions( CjrlHumanoidDynamicRobot *aHS )
+FootConstraintsAsLinearSystemForVelRef::setFeetDimensions( CjrlHumanoidDynamicRobot *aHS )
 {
 
   // Read feet specificities.
@@ -156,7 +156,7 @@ RelativeFeetInequalities::setFeetDimensions( CjrlHumanoidDynamicRobot *aHS )
 
 
 int
-RelativeFeetInequalities::setVertices( convex_hull_t & ConvexHull,
+FootConstraintsAsLinearSystemForVelRef::setVertices( convex_hull_t & ConvexHull,
 						     double Orientation,
 						     const support_state_t & PrwSupport,
 						     int constraints_type)
@@ -199,7 +199,7 @@ RelativeFeetInequalities::setVertices( convex_hull_t & ConvexHull,
 
 
 int
-RelativeFeetInequalities::computeLinearSystem( const convex_hull_t & ConvexHull,
+FootConstraintsAsLinearSystemForVelRef::computeLinearSystem( const convex_hull_t & ConvexHull,
                                                              MAL_MATRIX(&D,double),
                                                              MAL_MATRIX(&Dc,double),
                                                              const support_state_t & PrwSupport ) const
@@ -259,7 +259,7 @@ RelativeFeetInequalities::computeLinearSystem( const convex_hull_t & ConvexHull,
 
 
 int
-RelativeFeetInequalities::computeLinearSystem (const convex_hull_t & ConvexHull,
+FootConstraintsAsLinearSystemForVelRef::computeLinearSystem (const convex_hull_t & ConvexHull,
 							     double * D_x, double * D_y, double * d,
 							     const support_state_t & PrwSupport) const
 {
@@ -315,7 +315,7 @@ RelativeFeetInequalities::computeLinearSystem (const convex_hull_t & ConvexHull,
 
 
 void
-RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &Args )
+FootConstraintsAsLinearSystemForVelRef::CallMethod( std::string &Method, std::istringstream &Args )
 {
 
   if ( Method==":setfeetconstraint" )

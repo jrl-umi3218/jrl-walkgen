@@ -66,7 +66,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
 
   // For computing the equilibrium constraints from the feet positions.
-  RFC_ = new RelativeFeetInequalities(lSPM,aHS);
+  RFC_ = new FootConstraintsAsLinearSystemForVelRef(lSPM,aHS);
 
   OFTG_ = new OnLineFootTrajectoryGeneration(lSPM,aHS->leftFoot());
   OFTG_->InitializeInternalDataStructures();
@@ -316,8 +316,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       CoM_(com);
     }
 
-  // UPDATE WALKING TRAJECTORIES:
-  // --------------------
+
   if(time + 0.00001 > m_UpperTimeLimitToUpdate)
     {
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
@@ -325,8 +324,8 @@ ZMPVelocityReferencedQP::OnLine(double time,
       gettimeofday(&start,0);
 
 
-      // UPDATE INTERNAL DATA:
-      // ---------------------
+      // UPDATE DATA:
+      // ------------
       VRQPGenerator_->setReference(VelRef_);
       VRQPGenerator_->setCurrentTime(time+TimeBuffer_);
       VRQPGenerator_->setCoM(CoM_());
@@ -431,8 +430,15 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
 
 
+
+
+      m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+QP_T_;
+
+
       if(CurrentSupport.StepsLeft == 0)
         m_EndingPhase = true;
+
+
       // Specify that we are in the ending phase.
       if (m_EndingPhase==false)
         {
@@ -442,8 +448,6 @@ ZMPVelocityReferencedQP::OnLine(double time,
           // It suppose to work because Gamma appears only during the non-constant
         }
 
-
-      m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+QP_T_;
 
       // Compute CPU consumption time.
       gettimeofday(&end,0);

@@ -150,7 +150,7 @@ namespace PatternGeneratorJRL
     GeneratorVelRef * VRQPGenerator_;
 
     /// \brief Object creating linear inequalities relative to feet centers.
-    RelativeFeetInequalities * RFC_;
+    FootConstraintsAsLinearSystemForVelRef * RFC_;
 
     /// \brief Standard polynomial trajectories for the feet.
     OnLineFootTrajectoryGeneration * OFTG_;

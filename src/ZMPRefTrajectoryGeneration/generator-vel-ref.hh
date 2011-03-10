@@ -127,7 +127,7 @@ namespace PatternGeneratorJRL
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
     void buildInequalitiesCoP(linear_inequality_t & Inequalities,
-			      RelativeFeetInequalities * FCALS,
+			      FootConstraintsAsLinearSystemForVelRef * FCALS,
 			      const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
 			      const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
 			      const std::deque<support_state_t> & deqSupportStates,
@@ -143,7 +143,7 @@ namespace PatternGeneratorJRL
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
       void buildInequalitiesFeet(linear_inequality_t & Inequalities,
-			       RelativeFeetInequalities * FCALS,
+			       FootConstraintsAsLinearSystemForVelRef * FCALS,
 			       const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
 			       const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
 			       const std::deque<support_state_t> & deqSupportStates,
@@ -181,7 +181,7 @@ namespace PatternGeneratorJRL
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
     void buildConstraints( QPProblem & Pb,
-			  RelativeFeetInequalities * FCALS,
+			  FootConstraintsAsLinearSystemForVelRef * FCALS,
 			  const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
 			  const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
 			  const std::deque<support_state_t> & deqSupportStates,
