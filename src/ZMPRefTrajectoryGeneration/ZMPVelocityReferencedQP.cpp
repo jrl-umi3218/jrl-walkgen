@@ -43,6 +43,7 @@
 #include <iostream>
 #include <fstream>
 
+#include <Mathematics/qld.h>
 #include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.h>
 
 #include <Debug.h>
@@ -930,8 +931,8 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
     {
       
       ODEBUG("localtime: " <<localtime);
-      m_Pb.dumpMatrix("/tmp/DU.dat",QPProblem_s::MATRIX_DU);
-      m_Pb.dumpVector("/tmp/m_Pb.DS.dat", QPProblem_s::VECTOR_DS);
+      m_Pb.dumpMatrix("/tmp/DU.dat",ProblemVelRef_s::MATRIX_DU);
+      m_Pb.dumpVector("/tmp/m_Pb.DS.dat", ProblemVelRef_s::VECTOR_DS);
 
       ofstream aof;
       char Buffer[1024];
@@ -946,7 +947,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
       aof.close();
       
       sprintf(Buffer,"/tmp/DPX_%f.dat", StartingTime);
-      m_Pb.dumpMatrix(Buffer,QPProblem_s::VECTOR_DS);
+      m_Pb.dumpMatrix(Buffer,ProblemVelRef_s::VECTOR_DS);
     }
 
   return 0;
@@ -1777,9 +1778,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	{
 	  struct timeval lbegin,lend;
 	  gettimeofday(&lbegin,0);
-
-	  m_Pb.solve( QPProblem_s::QLD );
-
+	  ql0001_(&m_Pb.m, &m_Pb.me, &m_Pb.mmax, &m_Pb.n, &m_Pb.nmax, &m_Pb.mnn,
+		  m_Pb.Q, m_Pb.D, m_Pb.DU, m_Pb.DS, m_Pb.XL, m_Pb.XU,
+		  m_Pb.X, m_Pb.U, &m_Pb.iout, &m_Pb.ifail, &m_Pb.iprint,
+		  m_Pb.war, &m_Pb.lwar, m_Pb.iwar, &m_Pb.liwar, &m_Pb.Eps);
 	  gettimeofday(&lend,0);
 
 	  ldt = lend.tv_sec - lbegin.tv_sec +

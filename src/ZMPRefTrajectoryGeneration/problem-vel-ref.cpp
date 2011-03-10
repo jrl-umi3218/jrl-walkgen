@@ -37,10 +37,10 @@
 #include <iostream>
 #include <fstream>
 
-#include <ZMPRefTrajectoryGeneration/qp-problem.hh>
+#include <ZMPRefTrajectoryGeneration/problem-vel-ref.hh>
 using namespace PatternGeneratorJRL;
 
-QPProblem_s::QPProblem_s():
+ProblemVelRef_s::ProblemVelRef_s():
   m(0),me(0),mmax(0), n(0), nmax(0), mnn(0),
   Q(0),D(0),DU(0),DS(0),XL(0),X(0),XU(0), NewX(0),
   U(0),war(0), iwar(0),
@@ -50,12 +50,12 @@ QPProblem_s::QPProblem_s():
 {
 
 }
-QPProblem_s::~QPProblem_s()
+ProblemVelRef_s::~ProblemVelRef_s()
 {
   ReleaseMemory();
 }
 
-void QPProblem_s::ReleaseMemory()
+void ProblemVelRef_s::ReleaseMemory()
 {
   if (Q!=0)
     delete [] Q;
@@ -91,7 +91,7 @@ void QPProblem_s::ReleaseMemory()
     free(U);
 }
 
-void QPProblem_s::AllocateMemory()
+void ProblemVelRef_s::AllocateMemory()
 {
   war= new double[lwar];
   iwar = new int[liwar]; // The Cholesky decomposition is done internally.
@@ -113,7 +113,7 @@ void QPProblem_s::AllocateMemory()
 
 }
 
-void QPProblem_s::setDimensions(int NbOfConstraints,
+void ProblemVelRef_s::setDimensions(int NbOfConstraints,
 			      int NbOfEqConstraints,
 			      int QP_N,
 			      int StepNumber)
@@ -149,25 +149,13 @@ void QPProblem_s::setDimensions(int NbOfConstraints,
     }
 }
 
-void QPProblem_s::initializeProblem()
+void ProblemVelRef_s::initializeProblem()
 {
 
   memset(DU,0,(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)*sizeof(double));
 }
 
-void QPProblem_s::solve(int solver)
-{
-  switch(solver)
-    {
-    case QLD:
-      ql0001_(&m, &me, &mmax, &n, &nmax, &mnn,
-              Q, D, DU, DS, XL, XU,
-              X, U, &iout, &ifail, &iprint,
-              war, &lwar, iwar, &liwar, &Eps);
-    }
-}
-
-void QPProblem_s::dumpMatrix(std::ostream & aos,
+void ProblemVelRef_s::dumpMatrix(std::ostream & aos,
 			   int type)
 {
 
@@ -197,7 +185,7 @@ void QPProblem_s::dumpMatrix(std::ostream & aos,
     }
 }
 
-void QPProblem_s::dumpVector(std::ostream & aos,
+void ProblemVelRef_s::dumpVector(std::ostream & aos,
 			   int type)
 {
 
@@ -235,7 +223,7 @@ void QPProblem_s::dumpVector(std::ostream & aos,
 	
 }
 
-void QPProblem_s::dumpVector(const char * filename,
+void ProblemVelRef_s::dumpVector(const char * filename,
 			   int type)
 {
   std::ofstream aof;
@@ -245,7 +233,7 @@ void QPProblem_s::dumpVector(const char * filename,
 }
 
 
-void QPProblem_s::dumpMatrix(const char * filename,
+void ProblemVelRef_s::dumpMatrix(const char * filename,
 			   int type)
 {
   std::ofstream aof;
@@ -254,7 +242,7 @@ void QPProblem_s::dumpMatrix(const char * filename,
   aof.close();
 }
 
-void QPProblem_s::dumpProblem(std::ostream &aos)
+void ProblemVelRef_s::dumpProblem(std::ostream &aos)
 {
   dumpMatrix(aos,MATRIX_Q);
   dumpMatrix(aos,MATRIX_DU);
@@ -266,7 +254,7 @@ void QPProblem_s::dumpProblem(std::ostream &aos)
   dumpVector(aos,VECTOR_DS);
 
 }
-void QPProblem_s::dumpProblem(const char * filename)
+void ProblemVelRef_s::dumpProblem(const char * filename)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);

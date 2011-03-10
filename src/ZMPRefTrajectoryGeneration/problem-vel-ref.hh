@@ -24,11 +24,11 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-#ifndef _QP_PROBLEM_H_
-#define _QP_PROBLEM_H_
+#ifndef _PROBLEM_VEL_REF_H_
+#define _PROBLEM_VEL_REF_H_
 
 #include <jrl/mal/matrixabstractlayer.hh>
-#include <Mathematics/qld.h>
+
 
 namespace PatternGeneratorJRL
 {
@@ -36,7 +36,7 @@ namespace PatternGeneratorJRL
   /*! \brief Final optimization problem to handle velocity reference.
     This object store a standardized optimization quadratic problem.
    */
-  struct QPProblem_s
+  struct ProblemVelRef_s
   {
     int m, me, mmax, n, nmax, mnn;
     double *Q, *D, *DU, *DS, *XL, *XU, *X, *NewX, *U, *war;//For COM
@@ -45,10 +45,10 @@ namespace PatternGeneratorJRL
     double Eps;
 
     /// \brief Initialize by default an empty problem.
-    QPProblem_s();
+    ProblemVelRef_s();
 
     /// \brief Release the memory at the end only.
-    ~QPProblem_s();
+    ~ProblemVelRef_s();
 
     /// \brief Set the dimensions of the problem.
     /// This method has an internal logic to 
@@ -74,10 +74,6 @@ namespace PatternGeneratorJRL
     /// \brief Initialize the problem
     void initializeProblem();
 
-    /// \brief Solve the problem
-    void solve(int solver);
-
-
     const static int MATRIX_Q=0;
     const static int MATRIX_DU=1;
     const static int VECTOR_D=2;
@@ -86,10 +82,6 @@ namespace PatternGeneratorJRL
     const static int VECTOR_XU=5;
     const static int VECTOR_DS=6;
     
-    const static int QLD=7;
-    const static int PLDP=8;
-
-
   protected:
 
     /// The method doing the real job of releasing the memory.
@@ -107,6 +99,6 @@ namespace PatternGeneratorJRL
     int m_QP_N;
 
   };
-  typedef struct QPProblem_s QPProblem;
+  typedef struct ProblemVelRef_s Problem;
 }
-#endif /* _QP_PROBLEM_H_ */
+#endif /* _PROBLEM_VEL_REF_H_ */
