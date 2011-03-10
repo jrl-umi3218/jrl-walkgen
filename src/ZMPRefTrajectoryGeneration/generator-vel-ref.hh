@@ -63,7 +63,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Set the weights on the objective terms
     ///
-    /// \param[out] Matrices
+    /// \param[in] Matrices
     /// \param[in] weight
     /// \param[in] objective
     void setPonderation( IntermedQPMat & Matrices, double weight, int objective );
@@ -93,7 +93,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Matrices
     /// \param[in] TrunkStateT State of the trunk at the end of the acceleration phase
-    void computeGlobalReference(IntermedQPMat & Matrices, COMState & TrunkStateT);
+    void computeGlobalReference(IntermedQPMat & Matrices, COMState TrunkStateT);
 
     /// \brief Initialize the optimization programm
     ///
@@ -117,12 +117,20 @@ namespace PatternGeneratorJRL
 
     /// \brief Generate a queue of inequalities with respect to the centers of the feet
     ///
-    /// \param[out] Inequalities
+    /// \param[out] deqZMPInequalities
     /// \param[in] FCALS
     /// \param[in] AbsoluteLeftFootPositions
     /// \param[in] AbsoluteRightFootPositions
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
+    /// \param[in] NbConstraints
+    void buildInequalitiesCoP(std::deque<linear_inequality_ff_t> & deqZMPInequalities,
+			      FootConstraintsAsLinearSystemForVelRef * FCALS,
+			      std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
+			      std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+			      std::deque<support_state_t> & deqSupportStates,
+			      std::deque<double> & PreviewedSupportAngles, int & NbConstraints);
+
     void buildInequalitiesCoP(linear_inequality_t & Inequalities,
 			      FootConstraintsAsLinearSystemForVelRef * FCALS,
 			      std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
@@ -130,8 +138,7 @@ namespace PatternGeneratorJRL
 			      std::deque<support_state_t> & deqSupportStates,
 			      std::deque<double> & PreviewedSupportAngles);
 
-    /// \brief Generate a queue of inequality constraints on
-    /// the feet positions with respect to previous footpositions
+    /// \brief Generate a queue of inequality constraints on the feet positions with respect to another footposition
     ///
     /// \param[out] Inequalities
     /// \param[in] FCALS
@@ -139,6 +146,7 @@ namespace PatternGeneratorJRL
     /// \param[in] AbsoluteRightFootPositions
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
+    /// \param[in] NbConstraints
       void buildInequalitiesFeet(linear_inequality_t & Inequalities,
 			       FootConstraintsAsLinearSystemForVelRef * FCALS,
 			       std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
@@ -149,11 +157,11 @@ namespace PatternGeneratorJRL
     void buildConstraintsCoP(linear_inequality_t & IneqCoP,
 			     IntermedQPMat::dynamics_t CoP,
 			     IntermedQPMat::state_variant_t & State,
-			     int NbStepsPreviewed, QPProblem & Pb);
+			     int & NbStepsPreviewed, QPProblem & Pb);
 
     void buildConstraintsFeet(linear_inequality_t & IneqFeet,
 			      IntermedQPMat::state_variant_t & State,
-			      int NbStepsPreviewed, QPProblem & Pb);
+			      int & NbStepsPreviewed, QPProblem & Pb);
 
     void buildConstraints(IntermedQPMat & Matrices, QPProblem & Pb,
 			  FootConstraintsAsLinearSystemForVelRef * FCALS,
@@ -194,7 +202,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Scaled product\f$ weight*M*M \f$
     void computeTerm(MAL_MATRIX (&weightMM, double),
-		     double weight, const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
+		     const double & weight, const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
 
     /// \brief Scaled product\f$ M*M \f$
     void computeTerm(MAL_MATRIX (&MM, double),
@@ -202,17 +210,23 @@ namespace PatternGeneratorJRL
 
     /// \brief Scaled product \f$ weight*M*V \f$
     void computeTerm(MAL_VECTOR (&weightMV, double),
-		     double weight, const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double));
+		     const double weight, const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double));
 
     /// \brief Scaled product \f$ weight*M*V*scalar \f$
     void computeTerm(MAL_VECTOR (&weightMV, double),
-		     double weight, const MAL_MATRIX (&M, double),
+		     const double weight, const MAL_MATRIX (&M, double),
 		     const MAL_VECTOR (&V, double), const double scalar);
 
     /// \brief Scaled product \f$ weight*M*M*V \f$
     void computeTerm(MAL_VECTOR (&weightMV, double),
-		     double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
+		     const double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
 		     const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
+
+    /// \brief Add the computed matrix to the final optimization problem in array form
+    void addTerm(MAL_MATRIX (&Mat, double), double * target, int row, int col, int nrows, int ncols);
+
+    /// \brief Add the computed vector to the final optimization problem in array form
+    void addTerm(MAL_VECTOR (&Vec, double), double * target, int index, int nelem);
 
     /// \brief Build the constant part of the constraint matrices.
     int buildConstantPartOfConstraintMatrices();
