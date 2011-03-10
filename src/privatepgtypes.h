@@ -35,13 +35,13 @@ namespace PatternGeneratorJRL
 {
 
   // Support state of the robot at a certain point in time
-  struct support_state_s
+  struct SupportState_s
   {
     int Phase, Foot, StepsLeft, StepNumber;
     bool SSSS, StateChanged;
     double TimeLimit;
   };
-  typedef struct support_state_s support_state_t;
+  typedef struct SupportState_s SupportState_t;
 
   // Support state of the robot at a certain point in time
   struct com_s
@@ -58,53 +58,10 @@ namespace PatternGeneratorJRL
   };
   typedef struct com_s com_t;
 
-  // Support state of the robot at a certain point in time
-  struct trunk_s
-  {
-    MAL_VECTOR(x,double);
-    MAL_VECTOR(y,double);
-    MAL_VECTOR(z,double);
-
-    MAL_VECTOR(yaw,double);
-    MAL_VECTOR(pitch,double);
-    MAL_VECTOR(roll,double);
-
-    struct trunk_s & operator=(const trunk_s &aTS);
-
-    void reset();
-
-    trunk_s();
-  };
-  typedef struct trunk_s trunk_t;
-
-  //State of the feet on the ground
-  struct supportfoot_s
-  {
-    double x,y,theta,StartTime;
-    int SupportFoot;
-  };
-  typedef struct supportfoot_s
-    supportfoot_t;
-
-  /// Absolute reference.
-  struct reference_s
-  {
-    struct frame_s
-    {
-      /// \brief Constant reference
-      double x,y, yaw;
-
-      /// \brief Reference vectors
-      MAL_VECTOR(X,double);
-      MAL_VECTOR(Y,double);
-      MAL_VECTOR(YAW,double);
-    };
-    typedef struct frame_s frame_t;
-
-    frame_t global, local;
-
-  };
-  typedef struct reference_s reference_t;
+  const static int MEAN_VELOCITY = 0;
+  const static int INSTANT_VELOCITY = 1;
+  const static int COP_CENTERING = 2;
+  const static int JERK = 3;
 
 }
 
