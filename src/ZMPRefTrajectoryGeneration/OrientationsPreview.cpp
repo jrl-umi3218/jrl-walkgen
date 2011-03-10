@@ -84,7 +84,7 @@ void OrientationsPreview::previewOrientations(const double &Time,
 					      deque<double> &PreviewedSupportAngles,
 					      const COMState &TrunkState, 
 					      COMState &TrunkStateT,
-					      const SupportFSM * SupportFSM ,support_state_t CurrentSupport,
+					      const SupportFSM * SupportFSM ,SupportState_t CurrentSupport,
 					      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 					      deque<FootAbsolutePosition> &RightFootAbsolutePositions)
 {
@@ -315,17 +315,17 @@ void OrientationsPreview::previewOrientations(const double &Time,
     }
 }
 
-void OrientationsPreview::verifyAccelerationOfHipJoint(const reference_t &Ref,
+void OrientationsPreview::verifyAccelerationOfHipJoint(const ReferenceAbsoluteVelocity_t &Ref,
 						       const COMState &TrunkState, 
 						       COMState &TrunkStateT, 
-						       support_state_t CurrentSupport)
+						       SupportState_t CurrentSupport)
 {
   if(CurrentSupport.Phase!=0)
     {
       //Verify change in velocity against the maximal acceleration
-      if(fabs(Ref.local.yaw-TrunkState.yaw[1]) > 2.0/3.0*m_T*m_uaLimitHipYaw)
+      if(fabs(Ref.yaw-TrunkState.yaw[1]) > 2.0/3.0*m_T*m_uaLimitHipYaw)
 	{
-	  double signRotAccTrunk = (Ref.local.yaw-TrunkState.yaw[1] < 0.0)?-1.0:1.0;
+	  double signRotAccTrunk = (Ref.yaw-TrunkState.yaw[1] < 0.0)?-1.0:1.0;
 	  TrunkStateT.yaw[1] = TrunkState.yaw[1] + signRotAccTrunk * 2.0/3.0*m_T* m_uaLimitHipYaw;
 
 
@@ -334,7 +334,7 @@ void OrientationsPreview::verifyAccelerationOfHipJoint(const reference_t &Ref,
 	      ofstream aof;
 	      aof.open("/tmp/verifyAccelerationOfHipJoint.dat",ofstream::app);
 	      aof<<" TrunkStateT.yaw[1]: "<<TrunkStateT.yaw[1] <<" "
-		 <<" Ref.local.yaw: "<<Ref.local.yaw <<" "
+		 <<" Ref.yaw: "<<Ref.yaw <<" "
 		 <<" m_signRotAccTrunk: "<<m_signRotAccTrunk <<" "
 		 <<" 2.0/3.0*m_T* m_uaLimitHipYaw: "<<2.0/3.0*m_T* m_uaLimitHipYaw <<" "
 		 <<endl;
@@ -342,7 +342,7 @@ void OrientationsPreview::verifyAccelerationOfHipJoint(const reference_t &Ref,
 	    }
 	}
       else
-	TrunkStateT.yaw[1] = Ref.local.yaw;
+	TrunkStateT.yaw[1] = Ref.yaw;
 
     }
   else//No rotations in a double support phase
@@ -352,7 +352,7 @@ void OrientationsPreview::verifyAccelerationOfHipJoint(const reference_t &Ref,
 }
 
 
-bool OrientationsPreview::verifyAngleOfHipJoint(support_state_t CurrentSupport,
+bool OrientationsPreview::verifyAngleOfHipJoint(SupportState_t CurrentSupport,
 						const COMState &TrunkState, COMState &TrunkStateT,
 						double CurrentSupportFootAngle,
 						unsigned int StepNumber)
@@ -398,7 +398,7 @@ void OrientationsPreview::verifyVelocityOfHipJoint(const double &Time,
 						   COMState &,
 						   const double &PreviewedSupportFoot, 
 						   const unsigned int &StepNumber,
-						   support_state_t CurrentSupport,
+						   SupportState_t CurrentSupport,
 						   const double &CurrentRightFootAngle, 
 						   const double &CurrentLeftFootAngle,
 						   const double &CurrentLeftFootVelocity,

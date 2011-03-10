@@ -293,7 +293,7 @@ int PLDPSolverHerdt::PrecomputeiPuPx(unsigned int NumberSteps)
 
 
 int PLDPSolverHerdt::ComputeInitialSolution(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
-				       deque<supportfoot_t> & QueueOfSupportFeet, unsigned int NumberSteps,
+				       deque<SupportFeet_t> & QueueOfSupportFeet, unsigned int NumberSteps,
 				       double *XkYk)
 {
   /*! The initial solution of the problem is given by identical zmp and feet positions that are lying inside the feasible zones defined by the constraints on the feet placements.
@@ -304,7 +304,7 @@ int PLDPSolverHerdt::ComputeInitialSolution(deque<LinearConstraintInequalityFree
   LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin();
 
   //Current support foot coordinates
-  deque<supportfoot_t>::iterator CurSF_it;
+  deque<SupportFeet_t>::iterator CurSF_it;
   CurSF_it = QueueOfSupportFeet.end();
   CurSF_it--;
 
@@ -691,7 +691,7 @@ double PLDPSolverHerdt::ComputeAlpha(vector<unsigned int> & NewActivatedConstrai
   return Alpha;
 }
 int PLDPSolverHerdt::SolveProblem(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
-			     deque<supportfoot_t> & QueueOfSupportFeet,
+			     deque<SupportFeet_t> & QueueOfSupportFeet,
 			     double *CstPartOfTheCostFunction,
 			     unsigned int NbOfConstraints,
 			     double *LinearPartOfConstraints,

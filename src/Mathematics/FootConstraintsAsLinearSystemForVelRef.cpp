@@ -162,7 +162,7 @@ int FootConstraintsAsLinearSystemForVelRef::FindSimilarConstraints(MAL_MATRIX(&A
 int FootConstraintsAsLinearSystemForVelRef::computeLinearSystem(vector<CH_Point> aVecOfPoints,
 						       MAL_MATRIX(&D,double),
 						       MAL_MATRIX(&Dc,double),
-						       support_state_t PrwSupport)
+						       SupportState_t PrwSupport)
 {
 
   double dx,dy,dc,x1,y1,x2,y2;
@@ -228,9 +228,9 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
 								     QueueOfLConstraintInequalitiesFreeFeet,
 								     deque<LinearConstraintInequalityFreeFeet_t> &
 								     QueueOfFeetPosInequalities,
-								     reference_t & RefVel,
+								     ReferenceAbsoluteVelocity & RefVel,
 								     double StartingTime, double m_QP_N,
-								     SupportFSM * SupportFSM, support_state_t CurrentSupport, support_state_t & PrwSupport,
+								     SupportFSM * SupportFSM, SupportState_t CurrentSupport, SupportState_t & PrwSupport,
 								     deque<double> &PreviewedSupportAngles,
 								     int & NbOfConstraints)
 {
