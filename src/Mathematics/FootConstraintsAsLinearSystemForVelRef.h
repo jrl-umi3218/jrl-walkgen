@@ -101,33 +101,6 @@ namespace PatternGeneratorJRL
                                      double >&PreviewedSupportAngles,
                                      int &NbOfConstraints);
 
-    /// \brief Adapt vertices to the support foot and its orientation
-    ///
-    /// \param ZMPConstrVertices vertices of the ZMP convex hull
-    /// \param FeetPosConstrVertices vertices of the foot position convex hull
-    /// \param ZMPConvHullOrientation
-    /// \param FeetPosConvHullOrientation
-    /// \param PrwSupport previewed support state
-    /// \return 0
-    int setVertices (std::vector < CH_Point > & ZMPConstrVertices,
-                     std::vector < CH_Point > & FeetPosConstrVertices,
-                     double & ZMPConvHullOrientation,
-                     double & FeetPosConvHullOrientation,
-                     support_state_t & PrwSupport);
-
-    /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
-    /// convex hull specified by a vector of points.
-    ///
-    /// \param aVecOfPoints a vector of vertices
-    /// \param D left hand side of the inequalities
-    /// \param Dc right hand side of the inequalities
-    /// \param PrwSupport previewed support state
-    /// \return 0
-    int computeLinearSystem (std::vector < CH_Point > & aVecOfPoints,
-                             MAL_MATRIX (&D, double),
-                             MAL_MATRIX (&Dc, double),
-                             support_state_t & PrwSupport);
-
     /// \brief Reimplement the interface of SimplePluginManager
     ///
     /// \param[in] Method: The method to be called.
@@ -157,6 +130,33 @@ namespace PatternGeneratorJRL
     ///
     /// return 0
     int initFeetConstraints ();
+
+    /// \brief Adapt vertices to the support foot and its orientation
+    ///
+    /// \param ZMPConstrVertices vertices of the ZMP convex hull
+    /// \param FeetPosConstrVertices vertices of the foot position convex hull
+    /// \param ZMPConvHullOrientation
+    /// \param FeetPosConvHullOrientation
+    /// \param PrwSupport previewed support state
+    /// \return 0
+    int setVertices (std::vector < CH_Point > &ZMPConstrVertices,
+                     std::vector < CH_Point > &FeetPosConstrVertices,
+                     double ZMPConvHullOrientation,
+                     double FeetPosConvHullOrientation,
+                     support_state_t & PrwSupport);
+
+    /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
+    /// convex hull specified by a vector of points.
+    ///
+    /// \param aVecOfPoints a vector of vertices
+    /// \param D left hand side of the inequalities
+    /// \param Dc right hand side of the inequalities
+    /// \param PrwSupport previewed support state
+    /// \return 0
+    int computeLinearSystem (std::vector < CH_Point > aVecOfPoints,
+                             MAL_MATRIX (&D, double),
+                             MAL_MATRIX (&Dc, double),
+                             support_state_t & PrwSupport);
 
     //
     // Private members

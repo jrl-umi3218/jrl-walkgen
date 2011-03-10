@@ -151,8 +151,8 @@ FootConstraintsAsLinearSystemForVelRef::setFeetDimensions( CjrlHumanoidDynamicRo
 int
 FootConstraintsAsLinearSystemForVelRef::setVertices( std::vector<CH_Point> & ZMPConstrVertices,
                                                      std::vector<CH_Point> & FeetPosConstrVertices,
-                                                     double & ZMPConvHullAngle,
-                                                     double & FeetPosConvHullAngle,
+                                                     double ZMPConvHullAngle,
+                                                     double FeetPosConvHullAngle,
                                                      support_state_t & PrwSupport)
 {
 
@@ -215,7 +215,7 @@ FootConstraintsAsLinearSystemForVelRef::setVertices( std::vector<CH_Point> & ZMP
 
 
 int
-FootConstraintsAsLinearSystemForVelRef::computeLinearSystem( vector<CH_Point> & aVecOfPoints,
+FootConstraintsAsLinearSystemForVelRef::computeLinearSystem( vector<CH_Point> aVecOfPoints,
                                                              MAL_MATRIX(&D,double),
                                                              MAL_MATRIX(&Dc,double),
                                                              support_state_t & PrwSupport )
@@ -308,6 +308,7 @@ FootConstraintsAsLinearSystemForVelRef::buildConstraintInequalities( deque< Foot
     }
   double CurrentSupportAngle = FAP_it->theta*M_PI/180.0;
 
+
   //initialize the previewed support state before previewing
   PrwSupport.Phase  = CurrentSupport.Phase;
   PrwSupport.Foot  = CurrentSupport.Foot;
@@ -336,6 +337,7 @@ FootConstraintsAsLinearSystemForVelRef::buildConstraintInequalities( deque< Foot
           FPConvHullOrientation = PreviewedSupportAngles[PrwSupport.StepNumber-1];
 
       //foot positioning constraints
+      //
       if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 && PrwSupport.Phase != 0)
         {
           ZMPConvHullOrientation = PreviewedSupportAngles[PrwSupport.StepNumber-1];
