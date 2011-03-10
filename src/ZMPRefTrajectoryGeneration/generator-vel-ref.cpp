@@ -542,8 +542,7 @@ GeneratorVelRef::updateProblem(QPProblem & Pb, const std::deque<support_state_t>
   Pb.clear(QPProblem::VECTOR_D);
 
   //Intermediate vector
-  boost_ublas::vector<double> MV(m_N);
-  MV.clear();
+  MAL_VECTOR(MV,double);
 
   // Final scaled products that are added to the QP
   MAL_MATRIX(weightMTM,double);
@@ -604,8 +603,6 @@ GeneratorVelRef::computeTerm(MAL_MATRIX (&weightMM, double), double weight,
 {
   weightMM = weight*MAL_RET_A_by_B(M1,M2);
 }
-
-
 void
 GeneratorVelRef::computeTerm(MAL_MATRIX (&MM, double),
                              const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double))
