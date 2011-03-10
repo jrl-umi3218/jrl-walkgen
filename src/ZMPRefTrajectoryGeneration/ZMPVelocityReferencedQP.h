@@ -34,7 +34,7 @@
 
 
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
-#include <Mathematics/relative-feet-inequalities.hh>
+#include <Mathematics/FootConstraintsAsLinearSystemForVelRef.h>
 #include <Mathematics/OptCholesky.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
 #include <Mathematics/PLDPSolverHerdt.h>

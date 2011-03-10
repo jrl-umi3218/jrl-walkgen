@@ -42,7 +42,7 @@ SupportFSM::~SupportFSM()
 {
 }
 
-void SupportFSM::set_support_state(const double &Time, const int &pi,
+void SupportFSM::setSupportState(const double &Time, const int &pi,
 				 support_state_t & Support, const reference_t & Ref) const
 {
 

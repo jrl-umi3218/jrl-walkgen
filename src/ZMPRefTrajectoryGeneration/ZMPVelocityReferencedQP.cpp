@@ -100,10 +100,10 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   VRQPGenerator_->setNbPrwSamplings(QP_N_);
   VRQPGenerator_->setSamplingPeriodPreview(QP_T_);
   VRQPGenerator_->setComHeight(0.814);
-  VRQPGenerator_->initialize_matrices();
-  VRQPGenerator_->Ponderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
-  VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::COP_CENTERING );
-  VRQPGenerator_->Ponderation( 0.00001, IntermedQPMat::JERK_MIN );
+  VRQPGenerator_->initializeMatrices();
+  VRQPGenerator_->setPonderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
+  VRQPGenerator_->setPonderation( 0.000001, IntermedQPMat::COP_CENTERING );
+  VRQPGenerator_->setPonderation( 0.00001, IntermedQPMat::JERK_MIN );
 
 
   // Register method to handle
@@ -327,15 +327,15 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
       // UPDATE INTERNAL DATA:
       // ---------------------
-      VRQPGenerator_->Reference(VelRef_);
+      VRQPGenerator_->setReference(VelRef_);
       VRQPGenerator_->setCurrentTime(time+TimeBuffer_);
-      VRQPGenerator_->CoM(CoM_());
+      VRQPGenerator_->setCoM(CoM_());
 
 
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
       // ----------------------------------------------------
       deque<support_state_t> PrwSupportStates_deq;
-      VRQPGenerator_->preview_support_states(SupportFSM_, PrwSupportStates_deq);
+      VRQPGenerator_->previewSupportStates(SupportFSM_, PrwSupportStates_deq);
 
 
       // DETERMINE CURRENT SUPPORT POSITION:
@@ -353,7 +353,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
           CurrentSupport.y = FAP.y;
           CurrentSupport.yaw = FAP.theta*M_PI/180.0;
           CurrentSupport.StartTime = m_CurrentTime;
-          VRQPGenerator_->SupportState( CurrentSupport );
+          VRQPGenerator_->setSupportState( CurrentSupport );
         }
 
 
@@ -369,22 +369,22 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:
       // --------------------------------------
-      VRQPGenerator_->compute_global_reference( FinalCOMTraj_deq );
+      VRQPGenerator_->computeGlobalReference( FinalCOMTraj_deq );
 
 
       // BUILD CONSTANT PART OF THE OBJECTIVE:
       // -------------------------------------
-      VRQPGenerator_->build_invariant_part( Problem_ );
+      VRQPGenerator_->buildInvariantPart( Problem_ );
 
 
       // BUILD VARIANT PART OF THE OBJECTIVE:
       // ------------------------------------
-      VRQPGenerator_->update_problem( Problem_, PrwSupportStates_deq );
+      VRQPGenerator_->updateProblem( Problem_, PrwSupportStates_deq );
 
 
       // BUILD CONSTRAINTS:
       // ------------------
-      VRQPGenerator_->build_constraints( Problem_,
+      VRQPGenerator_->buildConstraints( Problem_,
           RFC_,
           FinalLeftFootTraj_deq,
           FinalRightFootTraj_deq,

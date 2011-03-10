@@ -31,7 +31,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <Mathematics/relative-feet-inequalities.hh>
+#include <Mathematics/FootConstraintsAsLinearSystemForVelRef.h>
 
 using namespace std;
 using namespace PatternGeneratorJRL;
