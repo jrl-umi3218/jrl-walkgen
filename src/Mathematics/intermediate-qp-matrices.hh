@@ -111,8 +111,6 @@ namespace PatternGeneratorJRL
     /// \brief Accessors to the state matrices
     inline state_variant_t const & State() const
     { return m_StateMatrices; };
-    inline state_variant_t & State()
-    { return m_StateMatrices; };
 
     /// \brief Accessors to the objective dependent matrices
     objective_variant_t const & Objective( const int aObjectiveType ) const;
@@ -129,7 +127,7 @@ namespace PatternGeneratorJRL
     { return m_StateMatrices.Ref; };
     inline reference_t & Reference()
     { return m_StateMatrices.Ref; };
-    inline void Reference( const reference_t & Ref )
+    inline void Reference( reference_t & Ref )
     { m_StateMatrices.Ref = Ref; };
 
     /// \brief Accessors to the Center of Mass
