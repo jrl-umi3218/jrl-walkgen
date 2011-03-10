@@ -36,7 +36,7 @@ using namespace PatternGeneratorJRL;
 
 IntermedQPMat::IntermedQPMat()
 {
-
+  //TODO:
 }
 
 
@@ -47,44 +47,32 @@ IntermedQPMat::~IntermedQPMat()
 
 
 void 
-IntermedQPMat::getTermMatrices(standard_ls_form_t & TMat, int ObjectiveType)
+IntermedQPMat::getLSTerm(ObjectiveTerm_t LST, int ObjectiveType)
 {
-
-  TMat.nSt = m_StateMatrices.NbStepsPrw;
-
-  switch(ObjectiveType)
-  {
-  case MEAN_VELOCITY:
-    TMat.U = m_MeanVelocity.U;
-    TMat.UT = m_MeanVelocity.UT;
-    TMat.Sc_x = MAL_RET_A_by_B(m_MeanVelocity.S,m_StateMatrices.RefX);
-    TMat.weight = m_MeanVelocity.weight;
-    TMat.ref_x = m_StateMatrices.RefX;
-    TMat.ref_y = m_StateMatrices.RefY;
-  case INSTANT_VELOCITY:
-    TMat.U = m_InstantVelocity.U;
-    TMat.UT = m_InstantVelocity.UT;
-    TMat.Sc_x = MAL_RET_A_by_B(m_InstantVelocity.S,m_StateMatrices.RefX);
-    TMat.weight = m_InstantVelocity.weight;
-    TMat.ref_x = m_StateMatrices.RefX;
-    TMat.ref_y = m_StateMatrices.RefY;
-  case COP_CENTERING:
-    TMat.U = m_COPCentering.U;
-    TMat.UT = m_COPCentering.UT;
-    TMat.V = m_StateMatrices.V;
-    TMat.VT = m_StateMatrices.VT;
-    TMat.Sc_x = MAL_RET_A_by_B(m_COPCentering.S,m_StateMatrices.RefX);
-    TMat.weight = m_COPCentering.weight;
-    TMat.ref_x = m_StateMatrices.Vc*m_StateMatrices.fx;
-    TMat.ref_y = m_StateMatrices.Vc*m_StateMatrices.fy;
-  case JERK:
-    TMat.U = m_Jerk.U;
-    TMat.UT = m_Jerk.UT;
-    TMat.Sc_x = MAL_RET_A_by_B(m_Jerk.S,m_StateMatrices.RefX);
-    TMat.weight = m_Jerk.weight;
-    TMat.ref_x = 0.0*m_StateMatrices.RefX;
-    TMat.ref_y = 0.0*m_StateMatrices.RefY;
-  }
+  //TODO:
 }
+	  
+	
+//
+//Private methods
+//
+void 
+IntermedQPMat::weightedTransProd(MAL_MATRIX (&M1, double), double alpha, MAL_MATRIX (&M2, double), MAL_MATRIX (&M3, double))
+{
+  //TODO:
+}
+	  
 
+void 
+IntermedQPMat::weightedTransProd(MAL_MATRIX (&M1, double), double alpha, MAL_MATRIX (&M2, double), MAL_VECTOR (&V, double))
+{
+  //TODO:
+}
+	  
+
+void 
+IntermedQPMat::weightedTransProd(MAL_MATRIX (&M1, double), double alpha, MAL_VECTOR (&M2, double), MAL_VECTOR (&M3, double), MAL_VECTOR (&V, double))
+{
+  //TODO:
+}
 	  
