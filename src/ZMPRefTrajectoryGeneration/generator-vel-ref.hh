@@ -173,10 +173,10 @@ namespace PatternGeneratorJRL
         const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
 
     /// \brief Add the computed matrix to the final optimization problem in array form
-    void addTerm(MAL_MATRIX (&Mat, double), double * target, int row, int col, int nrows, int ncols);
+    void addTerm(MAL_MATRIX (&Mat, double), double * QPMat, int row, int col, int nrows, int ncols);
 
     /// \brief Add the computed vector to the final optimization problem in array form
-    void addTerm(MAL_VECTOR (&Vec, double), double * target, int index, int nelem);
+    void addTerm(MAL_VECTOR (&Vec, double), double * QPVec, int index, int nelem);
 
     /// \brief Build the constant part of the constraint matrices.
     int buildConstantPartOfConstraintMatrices();

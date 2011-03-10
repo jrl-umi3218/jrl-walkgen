@@ -310,19 +310,19 @@ GeneratorVelRef::computeTerm(MAL_VECTOR (&weightMV, double),
 
 
 void
-GeneratorVelRef::addTerm(MAL_MATRIX (&Mat, double), double * target, int row, int col, int nrows, int ncols)
+GeneratorVelRef::addTerm(MAL_MATRIX (&Mat, double), double * QPMat, int row, int col, int nrows, int ncols)
 {
-  for(int i = 0;i < nrows; i++)
-    for(int j = 0;j < ncols; j++)
-      target[row+i+(col+j)*m_NbVariables] = Mat(i,j);
+  for(int i = row;i < row+nrows; i++)
+    for(int j = col;j < col+ncols; j++)
+      QPMat[i+j*m_NbVariables] = Mat(i,j);
 }
 
 
 void
-GeneratorVelRef::addTerm(MAL_VECTOR (&Vec, double), double * target, int index, int nelem)
+GeneratorVelRef::addTerm(MAL_VECTOR (&Vec, double), double * QPVec, int index, int nelem)
 {
   for(int i = index;i < nelem; i++)
-      target[i] = Vec(i);
+      QPVec[i] = Vec(i);
 }
 
 

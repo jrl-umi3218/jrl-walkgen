@@ -50,48 +50,48 @@ namespace PatternGeneratorJRL
     /// \brief Release the memory at the end only.
     ~QPProblem_s();
 
-    /// \brief Set the number of optimization parameters.
-    inline void setNbVariables(const int & NbVariables)
-    { m_NbVariables = NbVariables;};
+    /// \brief Set the number of optimization variables
+    void setNbVariables(int NbVariables);
 
     /// \brief Set the dimensions of the problem.
     /// This method has an internal logic to 
     /// allocate the memory. It is done only
     /// when the problem gets bigger. When it shrinks
     /// down the memory is kept to avoid overhead.
-    void setDimensions(const int & NbVariables,
-        const int & NbConstraints,
-	const int & NbEqConstraints);
+    void setDimensions(int NbOfConstraints,
+		       int NbOfEqConstraints,
+		       int StepNumber,
+		       int QP_N);
     
     /// \brief Reallocate array
-    int resize(double * &array, const int & old_size, const int & new_size);
-    int resize(int * &array, const int & old_size, const int & new_size);
-
-    void printSolverParameters(std::ostream & aos);
+    int resize(double * array, int size);
+    int resize(int * array, int size);
 
     /// \brief Dump on disk a problem.
     void dumpProblem(const char *filename);
     void dumpProblem(std::ostream &);
 
     /// \brief Dump on disk a matrix defined by type.
-    void dumpMatrix(const char *filename, const int type);
-    void dumpMatrix(std::ostream &, const int type);
+    void dumpMatrix(const char *filename,int type);
+    void dumpMatrix(std::ostream &, int type);
     /// \brief Dump on disk a vector defined by type.
-    void dumpVector(const char *filename, const int type);
-    void dumpVector(std::ostream &, const int type);
+    void dumpVector(const char *filename,int type);
+    void dumpVector(std::ostream &,int type);
 
-    void initialize(double * array, const int & size);
+    /// \brief Initialize the problem
+    void initializeProblem();
 
     /// \brief Solve the problem
-    void solve(const int solver);
+    void solve(int solver);
 
 
     const static int MATRIX_Q=0;
     const static int MATRIX_DU=1;
     const static int VECTOR_D=2;
-    const static int VECTOR_DS=3;
+    const static int VECTOR_DL=3;
     const static int VECTOR_XL=4;
     const static int VECTOR_XU=5;
+    const static int VECTOR_DS=6;
     
     const static int QLD=7;
     const static int PLDP=8;
@@ -104,18 +104,17 @@ namespace PatternGeneratorJRL
 
     /// The method allocating the memory.
     /// Called when setting the dimensions of the problem.
-    void resizeAll(const int & NbVariables, const int & NbConstraints);
+    void AllocateMemory();
 
   private:
-
-    /// \brief Number of optimization parameters
+    /// Previous set of step number considered.
     int m_NbVariables;
 
-    /// \brief Number of optimization parameters
-    int m_NbConstraints;
+    /// Previous set of step number considered.
+    int m_stepNumber;
 
-    /// \brief Reallocation margins
-    int m_ReallocMarginVar, m_ReallocMarginConstr;
+    /// Previous size of the preview.
+    int m_QP_N;
 
   };
   typedef struct QPProblem_s QPProblem;
