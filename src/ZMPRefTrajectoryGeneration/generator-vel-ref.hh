@@ -125,7 +125,7 @@ namespace PatternGeneratorJRL
     /// \brief Build the constant part of the objective
     ///
     /// \param Pb
-    void buildInvariantPart(QPProblem & Pb, IntermedQPMat & Matrices);
+    void buildInvariantProblemPart(QPProblem & Pb, IntermedQPMat & Matrices);
 
     /// \brief Compute the objective matrices
     ///
@@ -254,6 +254,12 @@ namespace PatternGeneratorJRL
 
     /// \name Variables related to the QP
     /// @{
+	  
+    /// \brief Sampling of the QP. 
+    double m_QP_T;
+	  
+    /// \brief Number of previewed samples 
+    int m_QP_N;
 
     /// \brief Constant part of the constraint matrices. 
     double * m_Pu;

@@ -65,9 +65,6 @@ namespace PatternGeneratorJRL
      /// \brief Size of the preview window (Nb. of samplings)
      int m_N;
 
-     /// \brief Number of variables
-     int m_NbVariables;
-
      /* ! \brief Step height for the walking pattern. */
      double m_StepHeight;
 
@@ -120,15 +117,15 @@ namespace PatternGeneratorJRL
     inline const double & getPreviewLength( ) const
     { return m_PreviewControlTime; };
 		
-    /// \brief Return the Com Height.
+    /// \brief Returns the Com Height.
     inline const double & getComHeight() const
     { return m_CoMHeight; };
 		
-    /// \brief Return the Com Height.
+    /// \brief Returns the Com Height. 
     inline void setComHeight(const double & aComHeight)
     { m_CoMHeight = aComHeight; };
 		
-    /// \brief Return the single support time.
+    /// \brief Returns the single support time. 
     inline const double & getTSingleSupport() const
     { return m_Tsingle; };
 		
@@ -136,7 +133,7 @@ namespace PatternGeneratorJRL
     inline void setTSingleSupport(const double & aTSingleSupport)
     { m_Tsingle = aTSingleSupport; };
 		
-    /// \brief Return the double support time.
+    /// \brief Returns the double support time.
     inline const double & getTDoubleSupport() const
     {return m_Tdble;};
 		
@@ -156,25 +153,17 @@ namespace PatternGeneratorJRL
     inline const double & getSamplingPeriodPreview() const
     { return m_T_Prw; };
 		
-    /// \brief Set the sampling period for the preview.
+    /// \brief Set the sampling period for the preview. */
     inline void setSamplingPeriodPreview(const double &aSamplingPeriod)
     { m_T_Prw = aSamplingPeriod;};
 		
     /// \brief Get the sampling period for the preview, set to 0.100 by default.
-    inline const int & getNbPrwSamplings() const
+    inline const double & getNbPrwSamplings() const
     { return m_N; };
 
-    /// \brief Set the sampling period for the preview.
+    /// \brief Set the sampling period for the preview. */
     inline void setNbPrwSamplings(const int &NbSamplings)
     { m_N = NbSamplings;};
-
-    /// \brief Set the number of optimization parameters.
-    inline void setNbVariables(const int &NbVariables)
-    { m_NbVariables = NbVariables;};
-
-    /// \brief Set the number of optimization parameters.
-    inline const int & getNbVariables() const
-    { return m_NbVariables;};
 
     /// \brief Set the security margin for the zmp
     ///

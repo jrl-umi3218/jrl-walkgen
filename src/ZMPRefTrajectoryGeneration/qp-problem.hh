@@ -50,9 +50,6 @@ namespace PatternGeneratorJRL
     /// \brief Release the memory at the end only.
     ~QPProblem_s();
 
-    /// \brief Set the number of optimization variables
-    void setNbVariables(int NbVariables);
-
     /// \brief Set the dimensions of the problem.
     /// This method has an internal logic to 
     /// allocate the memory. It is done only
@@ -63,10 +60,6 @@ namespace PatternGeneratorJRL
 		       int StepNumber,
 		       int QP_N);
     
-    /// \brief Reallocate array
-    void resize(double * array, int size);
-    void resize(int * array, int size);
-
     /// \brief Dump on disk a problem.
     void dumpProblem(const char *filename);
     void dumpProblem(std::ostream &);
@@ -107,9 +100,6 @@ namespace PatternGeneratorJRL
     void AllocateMemory();
 
   private:
-    /// Previous set of step number considered.
-    int m_NbVariables;
-
     /// Previous set of step number considered.
     int m_stepNumber;
 
