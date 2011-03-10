@@ -105,6 +105,9 @@ namespace PatternGeneratorJRL
       /// \brief Current support state
       support_state_t SupportState;
 
+      /// \brief Current support foot position
+      supportfoot_t SupportFoot;
+
       /// \}
     };
     typedef state_variant_s state_variant_t;
@@ -173,6 +176,13 @@ namespace PatternGeneratorJRL
     { return m_StateMatrices.Ref; };
     inline void Reference( const reference_t & Ref )
     { m_StateMatrices.Ref = Ref; };
+
+    /// \brief Accessors to the support foot position
+    inline supportfoot_t const & SupportFoot() const
+    { return m_StateMatrices.SupportFoot; };
+    inline void SupportFoot( const supportfoot_t & SupportFoot )
+    { m_StateMatrices.SupportFoot = SupportFoot; };
+    /// \}
 
     /// \brief Accessors to the current support state
     inline support_state_t const & SupportState() const
