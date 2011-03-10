@@ -64,35 +64,22 @@ QPProblem_s::release_memory()
 {
 }
 
+
 void
 QPProblem_s::resize_all()
 {
-  bool ok=false;
-
-  if ((NbConstraints_>0) && (NbVariables_>0)) 
-    {
-      DU_.resize(2*NbConstraints_, 2*NbVariables_,true);
-      ok=true;
-    }
-
-  if (NbVariables_>0)
-    {
-      Q_.resize(2*NbVariables_, 2*NbVariables_,true);
-      D_.resize(2*NbVariables_, 1,true);
-      XL_.resize(2*NbVariables_, 1,true);
-      XL_.fill(-1e8);
-      XU_.resize(2*NbVariables_, 1,true);
-      XU_.fill(1e8); 
-      X_.resize(2*NbVariables_, 1,true);
-      iwar_.resize(2*NbVariables_, 1,true);
-      ok=true;
-    }
-
-  if (ok)
-    {
-      U_.resize(2*(NbConstraints_+2*NbVariables_), 1,true);
-      war_.resize(2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000), 1,true);
-    }
+  Q_.resize(2*NbVariables_, 2*NbVariables_,true);
+  D_.resize(2*NbVariables_, 1,true);
+  DU_.resize(2*NbConstraints_, 2*NbVariables_,true);
+  DS_.resize(2*NbConstraints_, 1,true);
+  XL_.resize(2*NbVariables_, 1,true);
+  XL_.fill(-1e8);
+  XU_.resize(2*NbVariables_, 1,true);
+  XU_.fill(1e8);
+  U_.resize(2*(NbConstraints_+2*NbVariables_), 1,true);
+  X_.resize(2*NbVariables_, 1,true);
+  war_.resize(2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000), 1,true);
+  iwar_.resize(2*NbVariables_, 1,true);
 }
 
 
@@ -132,28 +119,27 @@ QPProblem_s::solve( int solver, solution_t & result )
     {
     case QLD:
 
-      m_ = NbConstraints_;
-      me_ = NbEqConstraints_;
-      mmax_ = m_+1;
-      n_ = NbVariables_;
-      nmax_ = n_;
-      mnn_ = m_+2*n_;
+       m_ = NbConstraints_;
+       me_ = NbEqConstraints_;
+       mmax_ = m_+1;
+       n_ = NbVariables_;
+       nmax_ = n_;
+       mnn_ = m_+2*n_;
 
-      iout_ = 0;
-      iprint_ = 1;
-      lwar_ = 3*nmax_*nmax_/2+ 10*nmax_  + 2*mmax_ + 20000;
-      liwar_ = n_;
-      Eps_ = 1e-8;
+       iout_ = 0;
+       iprint_ = 1;
+       lwar_ = 3*nmax_*nmax_/2+ 10*nmax_  + 2*mmax_ + 20000;
+       liwar_ = n_;
+       Eps_ = 1e-8;
 
-      //      if (m_FastFormulationMode==QLDANDLQ)
-      //        m_Pb.iwar_.array_[0]=0;
-      //      else
-      iwar_.array_[0]=1;
+       //      if (m_FastFormulationMode==QLDANDLQ)
+        //        m_Pb.iwar_.array_[0]=0;
+        //      else
+       iwar_.array_[0]=1;
 
-      Q_.stick_together(Q_dense_.array_,n_,n_);
-      DU_.stick_together(DU_dense_.array_,mmax_,n_);
+       Q_.stick_together(Q_dense_.array_,n_,n_);
+       DU_.stick_together(DU_dense_.array_,mmax_,n_);
 
-      
       ql0001_(&m_, &me_, &mmax_, &n_, &nmax_, &mnn_,
               Q_dense_.array_, D_.array_, DU_dense_.array_, DS_.array_, XL_.array_, XU_.array_,
               X_.array_, U_.array_, &iout_, &ifail_, &iprint_,
@@ -207,48 +193,25 @@ QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), int type,
       break;
     }
 
-  std::cout << "NbVariables_:" << NbVariables_
-	    << " NbConstraints_:" << NbConstraints_ 
-	    << std::endl;
-  if (NbVariables_ > pArray_s->ncols_ )
+  if(NbVariables_ > pArray_s->ncols_ )
     {
       resize_all();
     }
-  if (( NbConstraints_ > DU_.nrows_) &&
-      (NbConstraints_>0))
+
+  if( NbConstraints_ > DU_.nrows_-1 )
     {
-      if (NbVariables_>0)
-	{
-	  DU_.resize(2*NbConstraints_, 2*NbVariables_,true);
-	}
-    }
-  
-  if ((NbConstraints_ > DS_.nrows_ ) &&
-      (NbConstraints_>0))
-    {
+      DU_.resize(2*NbConstraints_, 2*NbVariables_,true);
       DS_.resize(2*NbConstraints_,1,true);
-    }
-  
-  unsigned long int Usize = 2*(NbConstraints_+2*NbVariables_);
-  if (Usize>U_.nrows_)
-    {
-      U_.resize(Usize, 1,true);
-    }
-  
-  unsigned long int warsize = 2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000);
-  
-  if (warsize> war_.nrows_)
-    {
-      war_.resize(warsize, 1,true);
+
+      U_.resize(2*(NbConstraints_+2*NbVariables_), 1,true);
+      war_.resize(2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000), 1,true);
     }
 
-  double * p = pArray_s->array_;
   for( int i = 0;i < (int)MAL_MATRIX_NB_ROWS(Mat); i++)
     for( int j = 0;j < (int)MAL_MATRIX_NB_COLS(Mat); j++)
       {
-        p[row+i+(col+j)*pArray_s->nrows_] += Mat(i,j);
+        pArray_s->array_[row+i+(col+j)*pArray_s->nrows_] += Mat(i,j);
       }
-
 
 }
 
@@ -258,6 +221,7 @@ void QPProblem_s::add_term( const MAL_VECTOR (&Vec, double), int type,
 {
 
   array_s<double> * pArray_s = 0;
+
 
   switch(type)
     {
@@ -282,17 +246,17 @@ void QPProblem_s::add_term( const MAL_VECTOR (&Vec, double), int type,
       break;
     }
 
-  if((NbVariables_ > D_.nrows_ ) && (NbVariables_>0))
+  if(NbVariables_ > D_.nrows_ )
     {
       resize_all();
     }
 
   boost_ublas::vector<double>::const_iterator VecIt = Vec.begin();
   for( int i = 0; i < (int)Vec.size(); i++ )
-    {
-      pArray_s->array_[row+i] += *VecIt;
-      VecIt++;
-    }
+  {
+    pArray_s->array_[row+i] += *VecIt;
+    VecIt++;
+  }
 
 }
 
@@ -325,8 +289,8 @@ QPProblem_s::solution_t::print(std::ostream & aos)
 {
   aos << "Arrays:" << std::endl
       << "Solution: ";
-  for(int i = 0; i < NbVariables; i++)
-    {aos<<Solution_vec[i]<<" ";}; aos<<std::endl;
+   for(int i = 0; i < NbVariables; i++)
+     {aos<<Solution_vec[i]<<" ";}; aos<<std::endl;
 }
 
 

@@ -265,11 +265,9 @@ namespace PatternGeneratorJRL
       int resize(int nrows, int ncols, bool preserve)
       {
         try {
-
           type * NewArray = new type[nrows*ncols];
           fill(NewArray, nrows*ncols, (type)0);
-          if ((preserve) && 
-	      (array_!=0) ) {
+          if(preserve) {
             for(int i = 0; i < nrows_; i++)
               for(int j = 0; j < ncols_; j++)
                 NewArray[i+nrows*j] = array_[i+nrows_*j]; }
