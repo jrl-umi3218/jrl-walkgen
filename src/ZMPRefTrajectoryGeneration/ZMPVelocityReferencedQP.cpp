@@ -687,8 +687,28 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
 						     MAL_VECTOR(& xk,double))
 {
 
+  // Discretize the problem.
+  ODEBUG(" N:" << m_QP_N << " T: " << T);
+
   m_Pb.initialize(DU,NbOfConstraints*2*(m_QP_N+m_PrwSupport.StepNumber),0.0);
   m_Pb.initialize(m_Pb.DS,2*(m_QP_N+m_PrwSupport.StepNumber),0.0);
+
+  if (m_FullDebug>2)
+   {
+      char Buffer[1024];
+      sprintf(Buffer,"/tmp/PXD_%f.dat", StartingTime);
+      RESETDEBUG4(Buffer);
+      ODEBUG6("xk:" << xk << " Starting time: " <<StartingTime ,Buffer );
+      char Buffer2[1024];
+      sprintf(Buffer2,"/tmp/PXxD_%f.dat", StartingTime);
+      RESETDEBUG4(Buffer2);
+
+      char Buffer3[1024];
+      sprintf(Buffer3,"/tmp/PXyD_%f.dat", StartingTime);
+      RESETDEBUG4(Buffer3);
+
+      RESETDEBUG6("/tmp/FFP.dat");
+    }
 
   //Current support foot
   deque<LinearConstraintInequalityFreeFeet_t>::iterator LCIFF_it;
@@ -704,7 +724,8 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
   double FFPx, FFPy;
 
   int IndexConstraint = 0;
-
+  ODEBUG("Starting Matrix to build the constraints. ");
+  ODEBUG((LCIFF_it)->D );
   //ZMP constraints
   for( int i=0;i<m_QP_N;i++)
     {
@@ -720,7 +741,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
 	}
 
       // For each constraint.
-      for(int j=0;j<MAL_MATRIX_NB_ROWS(LCIFF_it->D);j++)
+      for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(LCIFF_it->D);j++)
 	{
 	  m_Pb.DS[IndexConstraint] =
 	    // X Axis * A
@@ -736,6 +757,11 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
 	    * LCIFF_it->D(j,1)
 	    // Constante part of the constraint
 	    + LCIFF_it->Dc(j,0);
+
+	  ODEBUG6(m_Pb.DS[IndexConstraint] << " " << (LCIFF_it)->D(j,0)  << " "
+		  << (LCIFF_it)->D[j][1] << " " << (LCIFF_it)->Dc(j,0) ,Buffer);
+	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer2);
+	  ODEBUG6(1 << " " <<    T *(i+1) << " " <<    (i+1)*(i+1)*T*T/2 - Com_Height/9.81,Buffer3);
 
 	  if (m_FastFormulationMode==QLD)
 	    {
@@ -775,6 +801,8 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
 	      DU[IndexConstraint+(2*m_QP_N+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = LCIFF_it->D(j,0);
 	      DU[IndexConstraint+(2*m_QP_N+m_PrwSupport.StepNumber+(LCIFF_it)->StepNumber-1)*(NbOfConstraints+1)] = LCIFF_it->D(j,1);
 	    }
+
+	  ODEBUG("IC: " << IndexConstraint );
 	  IndexConstraint++;
 	}
       LCIFF_it++;
@@ -829,14 +857,41 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
 	      m_Pb.DU[IndexConstraint+(2*m_QP_N+m_PrwSupport.StepNumber+(LCIFF_it)->StepNumber-2)*(NbOfConstraints+1)] =
 		(LCIFF_it)->D(j,1);
 	    }
+	  ODEBUG("IC: " << IndexConstraint );
 	  IndexConstraint++;
 	}
 
       LCIFF_it++;
     }
 
+  ODEBUG6("Index Constraint :"<< IndexConstraint,Buffer);
   static double localtime = -m_QP_T;
   localtime+=m_QP_T;
+
+  ODEBUG("IndexConstraint:"<<IndexConstraint << " localTime :" << localtime);
+
+  if (m_FullDebug>0)
+    {
+      
+      ODEBUG("localtime: " <<localtime);
+      m_Pb.dump(QPProblem_s::MATRIX_DU, "/tmp/DU.dat");
+      m_Pb.dump(QPProblem_s::VECTOR_DS, "/tmp/m_Pb.DS.dat");
+
+      ofstream aof;
+      char Buffer[1024];
+      sprintf(Buffer,"/tmp/PuCst_%f.dat",StartingTime);
+      aof.open(Buffer,ofstream::out);
+      for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
+	{
+	  for( int j=0;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
+	    //aof << m_Pu[j+i*2*(m_QP_N+m_PrwSupport.StepNumber)] << " " ;
+	  aof << endl;
+	}
+      aof.close();
+      
+      sprintf(Buffer,"/tmp/DPX_%f.dat", StartingTime);
+      m_Pb.dump(QPProblem_s::VECTOR_DS,Buffer);
+    }
 
   return 0;
 }
@@ -884,6 +939,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   m_EndingPhase = false;
   m_TimeToStopOnLineMode = -1.0;
 
+  ODEBUG4("ZMP::InitOnLine - Step 2 ","ZMDInitOnLine.txt");
   // Initialize position of the feet.
   CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
   CurrentLeftFootAbsPos.z = 0.0;//m_FTGS->m_AnklePositionLeft[2];
@@ -891,13 +947,16 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   CurrentLeftFootAbsPos.theta = 0.0;
 
 
+  ODEBUG4("CurrentLeftFootAbsPos.y: " << CurrentLeftFootAbsPos.y, "ZMDInitOnLine.txt");
   CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
   CurrentRightFootAbsPos.z = 0.0;//m_FTGS->m_AnklePositionRight[2];
   CurrentRightFootAbsPos.time = 0.0;
   CurrentRightFootAbsPos.theta = 0.0;
 
+  cout <<"InitRightFootAbsolutePosition:"<<InitRightFootAbsolutePosition.y<<endl;
   // V pre is the difference between
   // the current m_SupportFSM position and the precedent.
+  ODEBUG4("ZMP::InitOnLine - Step 2.5 ","ZMDInitOnLine.txt");
 
 
   int AddArraySize;
@@ -907,12 +966,22 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
     AddArraySize = (int) ldAddArraySize;
   }
 
+  ODEBUG(AddArraySize);
   FinalZMPPositions.resize(AddArraySize);
   FinalCoMPositions.resize(AddArraySize);
   FinalLeftFootAbsolutePositions.resize(AddArraySize);
   FinalRightFootAbsolutePositions.resize(AddArraySize);
   int CurrentZMPindex=0;
 
+  //TODO:
+  if(m_FullDebug>0)
+    {
+      //Feet coordinates for plot in scilab
+      ofstream aoffeet;
+      aoffeet.open("/tmp/Feet.dat",ios::out);
+      aoffeet<<"#Time    "<<"LeftX    "<<"LeftY    "<<"LeftZ    "<<"RightX    "<<"RightY    "<<"RightZ    "<<endl;
+      aoffeet.close();
+    }
 
   for( unsigned int i=0;i<FinalZMPPositions.size();i++)
     {
@@ -1003,6 +1072,42 @@ void ZMPVelocityReferencedQP::computeCholeskyOfQ(double * OptA)
   anOCD.ComputeNormalCholeskyOnANormal();
   anOCD.ComputeInverseCholeskyNormal(1);
 
+  if (m_FullDebug>0)
+    {
+      ofstream aof;
+      char Buffer[1024];
+      sprintf(Buffer,"/tmp/localQ.dat");
+      aof.open(Buffer,ofstream::out);
+      for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
+	{
+	  for( int j=0;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
+	    aof << localQ[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] << " ";
+	  aof<<endl;
+	}
+      aof.close();
+
+      sprintf(Buffer,"/tmp/localLQ.dat");
+      aof.open(Buffer,ofstream::out);
+      for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
+	{
+	  for( int j=0;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
+	    aof << localLQ[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] << " ";
+	  aof << endl;
+	}
+      aof.close();
+
+      sprintf(Buffer,"/tmp/localiLQ.dat");
+      aof.open(Buffer,ofstream::out);
+      for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
+	{
+	  for( int j=0;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
+	    aof << localiLQ[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] << " ";
+	  aof << endl;
+	}
+      aof.close();
+
+    }
+
 
   MAL_MATRIX_RESIZE(m_LQ,2*(m_QP_N+m_PrwSupport.StepNumber),2*(m_QP_N+m_PrwSupport.StepNumber));
   MAL_MATRIX_RESIZE(m_iLQ,2*(m_QP_N+m_PrwSupport.StepNumber),2*(m_QP_N+m_PrwSupport.StepNumber));
@@ -1025,7 +1130,31 @@ void ZMPVelocityReferencedQP::computeCholeskyOfQ(double * OptA)
 	}
     }
 
+  if (m_FullDebug>0)
+    {
+      ofstream aof;
+      char Buffer[1024];
 
+      sprintf(Buffer,"/tmp/LQ.dat");
+      aof.open(Buffer,ofstream::out);
+      for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
+	{
+	  for( int j=0;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
+	    aof << m_LQ(i,j) << " ";
+	  aof << endl;
+	}
+      aof.close();
+
+      sprintf(Buffer,"/tmp/iLQ.dat");
+      aof.open(Buffer,ofstream::out);
+      for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
+	{
+	  for( int j=0;j<2*(m_QP_N+m_PrwSupport.StepNumber);j++)
+	    aof << m_iLQ(i,j) << " ";
+	  aof << endl;
+	}
+      aof.close();
+    }
   delete [] localQ;
   delete [] localLQ;
   delete [] localiLQ;
@@ -1259,7 +1388,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       bool StartingSequence = true;
 
-
+      //----------"Real-time" loop---------
+      //
+      //
+      //-----------------------------------
       gettimeofday(&start,0);
 
 
@@ -1290,7 +1422,23 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	}
       m_CoM.setState(xk);
 
+      //TODO : Add a get function to read the state
       m_SupportFSM->setSupportState(time+m_TimeBuffer, 0, m_CurrentSupport, m_VelRef);
+
+
+      //      //TODO : Temporary solution for the pldp solver. See above
+      //      bool CurrentStateChanged = m_SupportFSM->m_StateChanged;
+      if (m_FullDebug>2)
+	{
+	  ofstream aof;
+	  char Buffer[1024];
+	  sprintf(Buffer,"/tmp/m_CurrentSupport_%f.dat",time);
+	  aof.open(Buffer,ofstream::out);
+	  aof<<"Phase: "<<m_CurrentSupport.Phase<<" Foot: "<<m_CurrentSupport.Foot<<
+	    " TimeLimit: "<<m_CurrentSupport.TimeLimit<<" StepNumber: "<<m_CurrentSupport.StepNumber<<
+	    " SSSS: "<<m_CurrentSupport.SSSS<<" StateChanged: "<<m_CurrentSupport.StateChanged<<endl;
+	  aof.close();
+	}
 
 
       //Add a new support foot to the support feet history deque
@@ -1379,7 +1527,16 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 			      xk);
 
 
+
+      if(m_FullDebug>2)
+	dumpProblem( xk, time+m_TimeBuffer);
+
+
       double ldt = 0.0;
+      //---------Solver------------
+      //
+      //
+      //---------------------------
       if ((m_FastFormulationMode==QLDANDLQ)||
 	  (m_FastFormulationMode==QLD))
 	{
@@ -1403,9 +1560,14 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 		  NbOfActivatedConstraints++;
 		}
 	    }
+	  ODEBUG6(NbOfActivatedConstraints,"/tmp/InfosQLD.dat");
+	  ODEBUG6(ldt,"/tmp/dtQLD.dat");
 	}
       else if (m_FastFormulationMode==PLDPHerdt)
 	{
+	  ODEBUG("State: " << xk[0] << " " << xk[3] << " " <<
+		 xk[1] << " " << xk[4] << " " <<
+		 xk[2] << " " << xk[5] << " ");
 	  struct timeval lbegin,lend;
 	  gettimeofday(&lbegin,0);
 
@@ -1431,7 +1593,12 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 						     (unsigned int)m_PrwSupport.StepNumber,
 						     m_CurrentSupport.StateChanged, time);
 	  StartingSequence = false;
+	  //NumberOfRemovedConstraints = NextNumberOfRemovedConstraints;
 	  gettimeofday(&lend,0);
+	  // 	  CODEDEBUG6(double ldt = lend.tv_sec - lbegin.tv_sec +
+	  // 		     0.000001 * (lend.tv_usec - lbegin.tv_usec););
+
+	  // 	  ODEBUG6(ldt,"/tmp/dtPLDP.dat");
 	}
       if (m_Pb.ifail!=0)
 	{
@@ -1468,7 +1635,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	}
       else
 	ptX=m_Pb.X;
-
+      //------------------------
+      //
+      //
+      //-------------------------
 
       FinalCOMStates.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalZMPPositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
@@ -1476,7 +1646,22 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       FinalRightFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
 
       //TODO: The variable CurrentIndex might be obsolete as it introduces a buffer which might be unnecessary.
-      int CurrentIndex = (int)(m_TimeBuffer/m_SamplingPeriod)-1;
+      int CurrentIndex = (int)(m_TimeBuffer/m_SamplingPeriod)
+	-1
+	//	-(int)(ldt/m_SamplingPeriod)-1 //<- This part is supposed to be equal to zero.
+	;
+      ODEBUG("m_TimeBuffer: "<< m_TimeBuffer <<
+	     " m_SamplingPeriod: "<< m_SamplingPeriod <<
+	     " ldt: " << ldt);
+      ODEBUG("ldt: "<<ldt<<
+	     "(int)(ldt/m_SamplingPeriod): "<<(int)(ldt/m_SamplingPeriod)<<
+	     "(ldt/m_SamplingPeriod): "<<(ldt/m_SamplingPeriod));
+      // update the ZMP and COM positions.
+      ODEBUG("m_TimeBuffer/m_SamplingPeriod: "<<
+	     m_TimeBuffer/m_SamplingPeriod<<
+	     "(int)(m_TimeBuffer/m_SamplingPeriod): "<<
+	     (int)(m_TimeBuffer/m_SamplingPeriod));
+
 
       m_CoM.Interpolation(FinalCOMStates,
 			      FinalZMPPositions,
@@ -1520,6 +1705,56 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	}
 
 
+      if (m_FullDebug>2)
+	{
+	  ofstream aof;
+
+	  aof.open("/tmp/FootPositionsT.dat",ofstream::app);
+	  aof<<" "<<m_FPx<<" "<<m_FPy<<endl;
+	  aof.close();
+	  char Buffer[1024];
+	  if(m_FastFormulationMode == PLDPHerdt)
+	    sprintf(Buffer,"/tmp/PLDPXff_%f.dat",time);
+	  else
+	    sprintf(Buffer,"/tmp/Xff_%f.dat",time);
+	  aof.open(Buffer,ofstream::out);
+
+	  for(int i=0;i<m_QP_N;i++)
+	    {
+	      aof << ptX[i] << endl;
+	    }
+	  aof.close();
+	  if(m_FastFormulationMode == PLDPHerdt)
+	    sprintf(Buffer,"/tmp/PLDPYff_%f.dat",time);
+	  else
+	    sprintf(Buffer,"/tmp/Yff_%f.dat",time);
+	  aof.open(Buffer,ofstream::out);
+	  for(int i=m_QP_N+m_PrwSupport.StepNumber;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
+	    {
+	      aof << ptX[i] << endl;
+	    }
+	  aof.close();
+	  aof.open("/tmp/comHeight.dat",ofstream::app);
+
+	  aof << FinalCOMStates[CurrentIndex].x[0]<<" "
+	      << FinalCOMStates[CurrentIndex].y[0]<< " "
+	      << FinalCOMStates[CurrentIndex].z[0] << " "
+	      << FinalCOMStates[CurrentIndex].roll <<  endl;
+
+	  aof.close();
+	  aof.open("/tmp/CurrentIndex.dat",ofstream::app);
+	  aof<<CurrentIndex<<endl;
+	  aof.close();
+	}
+
+      //TODO :Jumps of 5ms
+      if(m_FullDebug>2)
+	{
+	  ofstream aof;
+	  aof.open("/tmp/time.dat",ios::app);
+	  aof<<time<<" "<<m_UpperTimeLimitToUpdate<<endl;
+	}
+
       interpolateTrunkState(time, CurrentIndex,
 			    FinalCOMStates);
       interpolateFeetPositions(time, CurrentIndex,
@@ -1529,6 +1764,20 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+m_QP_T;
       ODEBUG6("uk:" << uk,"/tmp/DebugPBW.dat");
       ODEBUG6("xk:" << xk,"/tmp/DebugPBW.dat");
+
+
+      if (m_FullDebug>0)
+	{
+	  ofstream aof;
+	  char Buffer[1024];
+	  sprintf(Buffer,"/tmp/XffHerdt_%f.dat",time);
+	  aof.open(Buffer,ofstream::out);
+	  for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
+	    {
+	      aof << m_Pb.X[i] << endl;
+	    }
+	  aof.close();
+	}
 
 
       // Compute CPU consumption time.
@@ -1546,6 +1795,10 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       QueueOfFeetPosInequalities.clear();
 
     }
+  //-----------------------------------
+  //
+  //
+  //----------"Real-time" loop--------
 
 }
 
