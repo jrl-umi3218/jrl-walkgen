@@ -51,7 +51,7 @@ IntermedQPMat::~IntermedQPMat()
 
 
 IntermedQPMat::objective_variant_t const &
-IntermedQPMat::Objective( const int aObjectiveType ) const
+IntermedQPMat::operator ()( const int aObjectiveType ) const
 {
   switch(aObjectiveType)
   {
@@ -68,7 +68,7 @@ IntermedQPMat::Objective( const int aObjectiveType ) const
 
 
 IntermedQPMat::objective_variant_t &
-IntermedQPMat::Objective( const int aObjectiveType )
+IntermedQPMat::operator ()( const int aObjectiveType )
 {
   switch(aObjectiveType)
   {
@@ -85,7 +85,7 @@ IntermedQPMat::Objective( const int aObjectiveType )
 
 
 void
-IntermedQPMat::dumpObjective( const int aObjectiveType, std::ostream &aos )
+IntermedQPMat::printObjective( const int aObjectiveType, std::ostream &aos )
 {
   IntermedQPMat::objective_variant_t objective;
   switch(aObjectiveType)
@@ -113,29 +113,29 @@ IntermedQPMat::dumpObjective( const int aObjectiveType, std::ostream &aos )
 
 
 void
-IntermedQPMat::dumpState( std::ostream &aos )
+IntermedQPMat::printState( std::ostream &aos )
 {
 
 }
 
 
 void
-IntermedQPMat::dumpObjective(const char * filename,
+IntermedQPMat::printObjective(const char * filename,
                           const int type)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
-  dumpObjective(type,aof);
+  printObjective(type,aof);
   aof.close();
 }
 
 
 void
-IntermedQPMat::dumpState(const char * filename)
+IntermedQPMat::printState(const char * filename)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
-  dumpState(aof);
+  printState(aof);
   aof.close();
 }
 
