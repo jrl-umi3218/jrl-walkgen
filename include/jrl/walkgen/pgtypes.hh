@@ -147,5 +147,23 @@ namespace PatternGeneratorJRL
   typedef struct LinearConstraintInequalityFreeFeet_s
     LinearConstraintInequalityFreeFeet_t;
 
+  //State of the feet on the ground
+  struct SupportFeet_s
+  {
+    double x,y,theta,StartTime;
+    int SupportFoot;
+  };
+  typedef struct SupportFeet_s
+    SupportFeet_t;
+
+  /// \brief Velocity reference in absolute frame.
+  struct ReferenceAbsoluteVelocity_t
+  {
+    /// m/sec or degrees/sec
+    double x,y,z,yaw;
+
+  };
+  typedef struct ReferenceAbsoluteVelocity_t ReferenceAbsoluteVelocity;
+
 }
 #endif
