@@ -88,7 +88,7 @@ void QPProblem_s::ReleaseMemory()
     delete [] war;
 
   if (U!=0)
-    delete [] U;
+    free(U);
 }
 
 void QPProblem_s::AllocateMemory()
@@ -96,7 +96,7 @@ void QPProblem_s::AllocateMemory()
   war= new double[lwar];
   iwar = new int[liwar]; // The Cholesky decomposition is done internally.
 
-  U = new double[mnn];
+  U = (double *)malloc( sizeof(double)*(unsigned int)mnn); // Returns the Lagrange multipliers.;
 
   DS = new double[(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)];
 
