@@ -163,8 +163,7 @@ FootConstraintsAsLinearSystemForVelRef::setVertices( convex_hull_t & ConvexHull,
 						     int constraints_type)
 {
 
-  edges_s * conv_hulls = 0;
-
+  edges_s * conv_hulls=0;
   switch(constraints_type)
     {
     case ZMP_CONSTRAINTS:
@@ -203,16 +202,16 @@ int
 FootConstraintsAsLinearSystemForVelRef::computeLinearSystem( const convex_hull_t & ConvexHull,
                                                              MAL_MATRIX(&D,double),
                                                              MAL_MATRIX(&Dc,double),
-                                                             const support_state_t & PrwSupport ) const
+                                                             const support_state_t & PrwSupport )
 {
 
   double dx,dy,dc,x1,y1,x2,y2;
-  unsigned n = ConvexHull.X.size();
+  unsigned int n = ConvexHull.X.size();
   MAL_MATRIX_RESIZE( D,ConvexHull.X.size(),2 );
   MAL_MATRIX_RESIZE( Dc,ConvexHull.X.size(),1 );
 
 
-  for( unsigned i=0;i<n-1;i++ )//first n-1 inequalities
+  for( unsigned int i=0;i<n-1;i++ )//first n-1 inequalities
     {
       y1 = ConvexHull.Y[i];
       y2 = ConvexHull.Y[i+1];
@@ -234,7 +233,7 @@ FootConstraintsAsLinearSystemForVelRef::computeLinearSystem( const convex_hull_t
 
   {
     //Last inequality
-    unsigned i = n-1;
+    unsigned int i = n-1;
 
     y1 = ConvexHull.Y[i];
     y2 = ConvexHull.Y[0];
@@ -262,13 +261,13 @@ FootConstraintsAsLinearSystemForVelRef::computeLinearSystem( const convex_hull_t
 int
 FootConstraintsAsLinearSystemForVelRef::computeLinearSystem (const convex_hull_t & ConvexHull,
 							     double * D_x, double * D_y, double * d,
-							     const support_state_t & PrwSupport) const
+							     const support_state_t & PrwSupport)
 {
 
   double dx,dy,dc,x1,y1,x2,y2;
-  unsigned nrows = ConvexHull.X.size();
+  unsigned int nrows = ConvexHull.X.size();
 
-  for( unsigned i=0;i<nrows-1;i++ )//first n-1 inequalities
+  for( unsigned int i=0;i<nrows-1;i++ )//first n-1 inequalities
     {
       y1 = ConvexHull.Y[i];
       y2 = ConvexHull.Y[i+1];
@@ -290,7 +289,7 @@ FootConstraintsAsLinearSystemForVelRef::computeLinearSystem (const convex_hull_t
 
   {
     //Last inequality
-    unsigned i = nrows-1;
+    unsigned int i = nrows-1;
 
     y1 = ConvexHull.Y[i];
     y2 = ConvexHull.Y[0];

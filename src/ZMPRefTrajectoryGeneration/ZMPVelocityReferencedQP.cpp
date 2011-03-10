@@ -220,7 +220,7 @@ ZMPVelocityReferencedQP::initFeet()
   aSFLeft.StartTime = 0.0;
   aSFLeft.SupportFoot = 1;
   aSFRight.x = 0.0;
-  aSFRight.y = -0.1;
+  aSFRight.y = -0.1;//TODO:
   aSFRight.theta = 0.0;
   aSFRight.StartTime = 0.0;
   aSFRight.SupportFoot = -1;
@@ -655,6 +655,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 	}
 
+
       FinalCOMStates.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalZMPPositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
       FinalLeftFootAbsolutePositions.resize((int)((m_QP_T+m_TimeBuffer)/m_SamplingPeriod));
@@ -709,6 +710,12 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       interpolateFeetPositions(time, CurrentIndex,
 			       FinalLeftFootAbsolutePositions,
 			       FinalRightFootAbsolutePositions);
+
+
+
+
+
+
 
 
       m_UpperTimeLimitToUpdate = m_UpperTimeLimitToUpdate+m_QP_T;

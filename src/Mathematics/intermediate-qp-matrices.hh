@@ -114,13 +114,11 @@ namespace PatternGeneratorJRL
     /// \{
     struct objective_variant_s
     {
-      /// \brief Ponderation
       double weight;
 
-      /// \brief Dynamics
       dynamics_t * dyn;
 
-      /// \brief Minimization objective type
+      /// \brief Minimization objective
       int type;
 
       std::ostream& print (std::ostream& o) const;
@@ -149,16 +147,16 @@ namespace PatternGeneratorJRL
     { return m_StateMatrices; };
 
     /// \brief Accessors to the objective dependent matrices
-    objective_variant_t const & Objective( int type ) const;
-    objective_variant_t & Objective( int type );
+    objective_variant_t const & Objective( const int type ) const;
+    objective_variant_t & Objective( const int type );
 
     /// \brief Accessors to the dynamics
-    dynamics_t const & Dynamics( int type ) const;
-    dynamics_t & Dynamics( int type );
+    dynamics_t const & Dynamics( const int type ) const;
+    dynamics_t & Dynamics( const int type );
 
     /// \brief Accessors to the inequalities
-    linear_inequality_t const & Inequalities( int type ) const;
-    linear_inequality_t & Inequalities( int type );
+    linear_inequality_t const & Inequalities( const int type ) const;
+    linear_inequality_t & Inequalities( const int type );
 
     /// \brief Accessors to the Center of Mass
     inline com_t const & CoM() const
