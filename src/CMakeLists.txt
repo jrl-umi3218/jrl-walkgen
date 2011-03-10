@@ -41,7 +41,6 @@ SET(SOURCES
   Mathematics/PLDPHerdt.cpp
   Mathematics/qld.cpp
   Mathematics/StepOverPolynome.cpp
-  Mathematics/intermediate-qp-matrices.cpp
   PreviewControl/PreviewControl.cpp
   PreviewControl/OptimalControllerSolver.cpp
   PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp
