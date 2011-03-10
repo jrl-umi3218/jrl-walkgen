@@ -24,7 +24,6 @@ ENDIF(WIN32)
 SET(SOURCES
   FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
-  FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp
   FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp
   GlobalStrategyManagers/CoMAndFootOnlyStrategy.cpp

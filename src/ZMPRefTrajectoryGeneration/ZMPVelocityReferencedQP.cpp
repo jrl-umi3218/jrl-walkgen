@@ -57,6 +57,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
   m_TimeBuffer = 0.040;
 
+  m_FullDebug = 0;
   m_FastFormulationMode = QLD;
 
   m_QP_T = 0.1;
@@ -74,21 +75,13 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   // For computing the equilibrium constraints from the feet positions.
   m_fCALS = new FootConstraintsAsLinearSystemForVelRef(lSPM,aHS);
 
-  OFTG_ = new OnLineFootTrajectoryGeneration(lSPM,aHS->leftFoot());
-  OFTG_->InitializeInternalDataStructures();
-  OFTG_->SetSingleSupportTime(0.7);
-  OFTG_->SetDoubleSupportTime(0.1);
-  OFTG_->qp_sampling_period(0.1);
+  m_FTGS = new FootTrajectoryGenerationStandard(lSPM,aHS->leftFoot());
+  m_FTGS->InitializeInternalDataStructures();
 
-  SupportFSM_ = new SupportFSM();
-  SupportFSM_->step_period(0.8);
-  SupportFSM_->ds_period(1e9);
-  SupportFSM_->ds_ss_period(0.8);
-  SupportFSM_->nb_steps_ss_ds(200);
-  SupportFSM_->sampling_period(0.1);
+  m_SupportFSM = new SupportFSM(0.1);
 
   /* Orientations preview algorithm*/
-  m_OP = new OrientationsPreview(0.1, 16, SupportFSM_->step_period(), aHS->rootJoint());
+  m_OP = new OrientationsPreview(0.1, 16, m_SupportFSM->m_SSPeriod, aHS->rootJoint());
 
   m_RobotMass = aHS->mass();
   m_TrunkState.yaw[0]=m_TrunkState.yaw[1]=m_TrunkState.yaw[2]=0.0;
@@ -143,14 +136,14 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
   if (m_ZMPD!=0)
     delete m_ZMPD;
 
-  if (SupportFSM_!=0)
-    delete SupportFSM_;
+  if (m_SupportFSM!=0)
+    delete m_SupportFSM;
 
   if (m_fCALS!=0)
     delete m_fCALS;
 
-  if (OFTG_!=0)
-    delete OFTG_;
+  if (m_FTGS!=0)
+    delete m_FTGS;
 
   if (m_OP!=0)
     delete m_OP;
@@ -212,9 +205,7 @@ ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &st
     }
   if (Method==":numberstepsbeforestop")
     {
-      unsigned NbStepsSSDS;
-      strm >> NbStepsSSDS;
-      SupportFSM_->nb_steps_ss_ds(NbStepsSSDS);
+      strm >> m_SupportFSM->m_NbOfStepsSSDS;
     }
   if (Method==":comheight")
     {
@@ -247,18 +238,18 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
   // Initialize position of the feet.
   CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
-  CurrentLeftFootAbsPos.z = 0.0;//OFTG_->m_AnklePositionLeft[2];
+  CurrentLeftFootAbsPos.z = 0.0;//m_FTGS->m_AnklePositionLeft[2];
   CurrentLeftFootAbsPos.time = 0.0;
   CurrentLeftFootAbsPos.theta = 0.0;
 
 
   CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
-  CurrentRightFootAbsPos.z = 0.0;//OFTG_->m_AnklePositionRight[2];
+  CurrentRightFootAbsPos.z = 0.0;//m_FTGS->m_AnklePositionRight[2];
   CurrentRightFootAbsPos.time = 0.0;
   CurrentRightFootAbsPos.theta = 0.0;
 
   // V pre is the difference between
-  // the current SupportFSM_ position and the precedent.
+  // the current m_SupportFSM position and the precedent.
 
 
   int AddArraySize;
@@ -297,6 +288,25 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
       FinalLeftFootTraj_deq[CurrentZMPindex].stepType =
         FinalRightFootTraj_deq[CurrentZMPindex].stepType = 10;
+
+
+
+      if(m_FullDebug>0)
+	{
+	  //Feet coordinates for plot in scilab
+	  ofstream aoffeet;
+	  aoffeet.open("/tmp/Feet.dat",ios::app);
+	  aoffeet<<FinalLeftFootTraj_deq[CurrentZMPindex].time<<"    "
+		 <<FinalLeftFootTraj_deq[CurrentZMPindex].x<<"    "
+		 <<FinalLeftFootTraj_deq[CurrentZMPindex].y<<"    "
+		 <<FinalLeftFootTraj_deq[CurrentZMPindex].z<<"    "
+		 <<FinalLeftFootTraj_deq[CurrentZMPindex].stepType<<"    "
+		 <<FinalRightFootTraj_deq[CurrentZMPindex].x<<"    "
+		 <<FinalRightFootTraj_deq[CurrentZMPindex].y<<"    "
+		 <<FinalRightFootTraj_deq[CurrentZMPindex].z<<"    "
+		 <<FinalRightFootTraj_deq[CurrentZMPindex].stepType<<"    "<<endl;
+	  aoffeet.close();
+	}
 
       m_CurrentTime += m_SamplingPeriod;
       CurrentZMPindex++;
@@ -357,6 +367,13 @@ ZMPVelocityReferencedQP::interpolateTrunkState(double time, int CurrentIndex,
 	      m_QueueOfTrunkStates.push_back(m_TrunkState);
 	    }
 	  FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = m_TrunkState.yaw[0];
+	  if(m_FullDebug>2)
+	    {
+	      ofstream aof;
+	      aof.open("/tmp/Trunk.dat",ofstream::app);
+	      aof<<time+k*m_SamplingPeriod<<" "<<m_TrunkState.yaw[0]<<" "<<m_TrunkState.yaw[1]<<" "<<m_TrunkState.yaw[2]<<endl;
+	      aof.close();
+	    }
 	}
     }
   else if (CurrentSupport.Phase == 0 || time+m_TimeBuffer+3.0/2.0*m_QP_T > CurrentSupport.TimeLimit)
@@ -367,8 +384,141 @@ ZMPVelocityReferencedQP::interpolateTrunkState(double time, int CurrentIndex,
 	}
     }
   
+
 }
 
+
+void ZMPVelocityReferencedQP::interpolateFeetPositions(double time, int CurrentIndex,
+                                                       const support_state_t & CurrentSupport,
+                                                       const deque<double> & PreviewedSupportAngles_deq,
+						       deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+						       deque<FootAbsolutePosition> &FinalRightFootTraj_deq)
+{
+  double LocalInterpolationTime = (time+m_TimeBuffer)-(CurrentSupport.TimeLimit-m_SupportFSM->m_SSPeriod);
+
+  double StepHeight = 0.05;
+  int StepType = 1;
+
+  if(CurrentSupport.Phase == 1 && time+m_TimeBuffer+3.0/2.0*m_QP_T < CurrentSupport.TimeLimit)
+    {
+      //determine coefficients of interpolation polynom
+      double ModulationSupportCoefficient = 0.9;
+      double ModulatedSingleSupportTime = (m_SupportFSM->m_SSPeriod-m_QP_T) * ModulationSupportCoefficient;
+      double EndOfLiftOff = ((m_SupportFSM->m_SSPeriod-m_QP_T)-ModulatedSingleSupportTime)*0.5;
+      double InterpolationTimePassed = 0.0;
+      if(LocalInterpolationTime>EndOfLiftOff)
+	InterpolationTimePassed = LocalInterpolationTime-EndOfLiftOff;
+
+      FootAbsolutePosition LastSwingFootPosition;
+
+      if(CurrentSupport.Foot==1)
+	{
+	  LastSwingFootPosition = FinalRightFootTraj_deq[CurrentIndex];
+	}
+      else
+	{
+	  LastSwingFootPosition = FinalLeftFootTraj_deq[CurrentIndex];
+	}
+      //Set parameters for current polynomial
+      m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::X_AXIS,
+						ModulatedSingleSupportTime-InterpolationTimePassed,m_FPx,
+						LastSwingFootPosition.x,
+						LastSwingFootPosition.dx);
+      m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Y_AXIS,
+						ModulatedSingleSupportTime-InterpolationTimePassed,m_FPy,
+						LastSwingFootPosition.y,
+						LastSwingFootPosition.dy);
+
+      if(CurrentSupport.StateChanged==true)
+	m_FTGS->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_SupportFSM->m_SSPeriod-m_QP_T,StepHeight);
+
+      m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::THETA_AXIS,
+						ModulatedSingleSupportTime-InterpolationTimePassed,
+						PreviewedSupportAngles_deq[0]*180.0/M_PI,
+						LastSwingFootPosition.theta,
+						LastSwingFootPosition.dtheta);
+      m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA_AXIS,
+						ModulatedSingleSupportTime-InterpolationTimePassed,0.0*180.0/M_PI,
+						LastSwingFootPosition.omega,
+						LastSwingFootPosition.domega);
+      m_FTGS->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA2_AXIS,
+						ModulatedSingleSupportTime-InterpolationTimePassed,2*0.0*180.0/M_PI,
+						LastSwingFootPosition.omega2,
+						LastSwingFootPosition.domega2);
+
+      for(int k = 1; k<=(int)(m_QP_T/m_SamplingPeriod);k++)
+	{
+	  if (CurrentSupport.Foot==1)
+	    {
+	      m_FTGS->UpdateFootPosition(FinalLeftFootTraj_deq,
+					 FinalRightFootTraj_deq,
+					 CurrentIndex,k,
+					 LocalInterpolationTime,
+					 ModulatedSingleSupportTime,
+					 StepType, -1);
+	    }
+	  else
+	    {
+	      m_FTGS->UpdateFootPosition(FinalRightFootTraj_deq,
+					 FinalLeftFootTraj_deq,
+					 CurrentIndex,k,
+					 LocalInterpolationTime,
+					 ModulatedSingleSupportTime,
+					 StepType, 1);
+	    }
+	  FinalLeftFootTraj_deq[CurrentIndex+k].time =
+	    FinalRightFootTraj_deq[CurrentIndex+k].time = time+m_TimeBuffer+k*m_SamplingPeriod;
+
+
+	  if(m_FullDebug>0)
+	    {
+	      ofstream aoffeet;
+	      aoffeet.open("/tmp/Feet.dat",ios::app);
+	      aoffeet<<time+m_TimeBuffer+k*m_SamplingPeriod<<"    "
+		     <<FinalLeftFootTraj_deq[CurrentIndex+k].x<<"    "
+		     <<FinalLeftFootTraj_deq[CurrentIndex+k].y<<"    "
+		     <<FinalLeftFootTraj_deq[CurrentIndex+k].z<<"    "
+		     <<FinalLeftFootTraj_deq[CurrentIndex+k].stepType<<"    "
+		     <<FinalRightFootTraj_deq[CurrentIndex+k].x<<"    "
+		     <<FinalRightFootTraj_deq[CurrentIndex+k].y<<"    "
+		     <<FinalRightFootTraj_deq[CurrentIndex+k].z<<"    "
+		     <<FinalRightFootTraj_deq[CurrentIndex+k].stepType<<"    "
+		     <<endl;
+	      aoffeet.close();
+	    }
+
+	}
+    }
+  else if (CurrentSupport.Phase == 0 || time+m_TimeBuffer+3.0/2.0*m_QP_T > CurrentSupport.TimeLimit)
+    {
+      for(int k = 0; k<=(int)(m_QP_T/m_SamplingPeriod);k++)
+	{
+	  FinalRightFootTraj_deq[CurrentIndex+k]=FinalRightFootTraj_deq[CurrentIndex+k-1];
+	  FinalLeftFootTraj_deq[CurrentIndex+k]=FinalLeftFootTraj_deq[CurrentIndex+k-1];
+	  FinalLeftFootTraj_deq[CurrentIndex+k].time =
+	    FinalRightFootTraj_deq[CurrentIndex+k].time = time+m_TimeBuffer+k*m_SamplingPeriod;
+	  FinalLeftFootTraj_deq[CurrentIndex+k].stepType =
+	    FinalRightFootTraj_deq[CurrentIndex+k].stepType = 10;
+
+	  if(m_FullDebug>0)
+	    {
+	      ofstream aoffeet;
+	      aoffeet.open("/tmp/Feet.dat",ios::app);
+	      aoffeet<<time+m_TimeBuffer+k*m_SamplingPeriod<<"    "
+		     <<FinalLeftFootTraj_deq[CurrentIndex+k].x<<"    "
+		     <<FinalLeftFootTraj_deq[CurrentIndex+k].y<<"    "
+		     <<FinalLeftFootTraj_deq[CurrentIndex+k].z<<"    "
+		     <<FinalLeftFootTraj_deq[CurrentIndex+k].stepType<<"    "
+		     <<FinalRightFootTraj_deq[CurrentIndex+k].x<<"    "
+		     <<FinalRightFootTraj_deq[CurrentIndex+k].y<<"    "
+		     <<FinalRightFootTraj_deq[CurrentIndex+k].z<<"    "
+		     <<FinalRightFootTraj_deq[CurrentIndex+k].stepType<<"    "
+		     <<endl;
+	      aoffeet.close();
+	    }
+	}
+    }
+}
 
 
 void ZMPVelocityReferencedQP::OnLine(double time,
@@ -417,7 +567,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
       // ----------------------------------------------------
       deque<support_state_t> PrwSupportStates_deq;
-      m_GenVR->previewSupportStates(SupportFSM_, PrwSupportStates_deq);
+      m_GenVR->previewSupportStates(m_SupportFSM, PrwSupportStates_deq);
 
 
       // DETERMINE CURRENT SUPPORT POSITION:
@@ -448,7 +598,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 				PreviewedSupportAngles_deq,
 				m_TrunkState,
 				m_TrunkStateT,
-				SupportFSM_->step_period(), CurrentSupport,
+				m_SupportFSM, CurrentSupport,
 				FinalLeftFootTraj_deq,
 				FinalRightFootTraj_deq);
 
@@ -532,9 +682,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       interpolateTrunkState(time, CurrentIndex,
                             CurrentSupport,
 			    FinalCOMTraj_deq);
-      OFTG_->interpolateFeetPositions(time+m_TimeBuffer, CurrentIndex,
+      interpolateFeetPositions(time, CurrentIndex,
                                CurrentSupport,
-                               m_FPx, m_FPy,
                                PreviewedSupportAngles_deq,
 			       FinalLeftFootTraj_deq,
 			       FinalRightFootTraj_deq);

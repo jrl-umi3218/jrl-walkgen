@@ -114,6 +114,12 @@ namespace PatternGeneratorJRL
 				    double ModulatedSingleSupportTime,
 				    int StepType, int LeftOrRight);
 
+    virtual void UpdateFootPosition(std::deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
+				    std::deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
+				    int StartIndex, int k,
+				    double LocalInterpolationStartTime,
+				    double ModulatedSingleSupportTime,
+				    int StepType, int LeftOrRight);
 
     /*! Initialize internal data structures. */
     virtual void InitializeInternalDataStructures()=0;

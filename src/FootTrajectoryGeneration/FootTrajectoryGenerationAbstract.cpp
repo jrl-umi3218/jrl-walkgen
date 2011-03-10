@@ -92,3 +92,15 @@ void FootTrajectoryGenerationAbstract::UpdateFootPosition(std::deque<FootAbsolut
 {
   LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-1: To be implemented ");
 }
+
+void FootTrajectoryGenerationAbstract::UpdateFootPosition(std::deque<FootAbsolutePosition> & ,//SupportFootAbsolutePositions,
+							  std::deque<FootAbsolutePosition> & ,//NoneSupportFootAbsolutePositions,
+							  int , // StartIndex, 
+							  int , //k,
+							  double , //LocalInterpolationStartTime,
+							  double , //ModulatedSingleSupportTime,
+							  int , //StepType, 
+							  int ) //LeftOrRight)
+{
+  LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-2: To be implemented ");
+}
