@@ -83,7 +83,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   /*! For computing the stability constraints from the feet positions. */
   m_ConstraintOnX = 0.04;
   m_ConstraintOnY = 0.04;
-  m_fCALS = new FootConstraintsAsLinearSystemForVelRef(lSPM,aHS);
+  m_fCALS = new FootConstraintsAsLinearSystemForVelRef(lSPM,aHS,m_ConstraintOnX,m_ConstraintOnY);
 
   //m_StartTime = 0.0;
   m_UpperTimeLimitToUpdate = 0.0;
@@ -1330,7 +1330,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
       m_GenVR->generateSelectionMatrices(m_Matrices, deqPrwSupportStates);
 
-      m_fCALS->buildConstraintInequalities(FinalLeftFootAbsolutePositions,
+      m_fCALS->buildLinearConstraintInequalities(FinalLeftFootAbsolutePositions,
 						 FinalRightFootAbsolutePositions,
 						 QueueOfLConstraintInequalitiesFreeFeet,
 						 QueueOfFeetPosInequalities,
