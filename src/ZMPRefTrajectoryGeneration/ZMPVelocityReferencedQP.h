@@ -351,6 +351,11 @@ namespace PatternGeneratorJRL
 
     void computeCholeskyOfQ(double * OptA);
 
+    void computeObjective(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
+			  deque<supportfoot_t> & QueueOfSupportFeet,
+			  int NbOfConstraints, int NbOfEqConstraints,
+			  int & CriteriaToMaximize, MAL_VECTOR(& xk,double), double time);
+
 
     void interpolateTrunkState(double time, int CurrentIndex,
 			       deque<COMState> & FinalCOMStates);
