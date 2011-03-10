@@ -27,7 +27,8 @@
 
 
 
-#include <Mathematics/intermediate-qp-matrices.hh>
+#include <Mathematics/intermediate-qp-matrices.hh> //TODO: Merge with ZMPVelocityReferencedQPDebug.cpp
+
 
 using namespace PatternGeneratorJRL;
 
@@ -51,7 +52,7 @@ IntermedQPMat::~IntermedQPMat()
 
 
 IntermedQPMat::objective_variant_t const &
-IntermedQPMat::operator ()( const int aObjectiveType ) const
+IntermedQPMat::operator ()( int aObjectiveType ) const
 {
   switch(aObjectiveType)
   {
@@ -68,7 +69,7 @@ IntermedQPMat::operator ()( const int aObjectiveType ) const
 
 
 IntermedQPMat::objective_variant_t &
-IntermedQPMat::operator ()( const int aObjectiveType )
+IntermedQPMat::operator ()( int aObjectiveType )
 {
   switch(aObjectiveType)
   {
@@ -84,56 +85,15 @@ IntermedQPMat::operator ()( const int aObjectiveType )
 }
 
 
-void IntermedQPMat::printObjective( const int ObjectiveType, std::ostream &aos )
+void IntermedQPMat::printObjective( int ObjectiveType, std::ostream &aos )
 {
-  IntermedQPMat::objective_variant_t objective;
-  switch(ObjectiveType)
-    {
-    case INSTANT_VELOCITY:
-      objective = m_InstantVelocity;
-      aos << "Instant velocity - " <<ObjectiveType<<" : "<<std::endl;
-    case JERK:
-      objective = m_Jerk;
-      aos << "Jerk: " <<std::endl;
-      aos << "Instant velocity: - " <<ObjectiveType<<" : "<<std::endl;
-    case COP_CENTERING:
-      objective = m_COPCentering;
-      aos << "COP centering: " <<std::endl;
-      aos << "Instant velocity: - " <<ObjectiveType<<" : "<<std::endl;
-    }
-  aos << "Ponderation: " << std::endl;
-  aos << objective.weight << std::endl;
-  aos << "U: " << std::endl;
-  aos << objective.U << std::endl;
-  aos << "trans(U): " << std::endl;
-  aos << objective.UT << std::endl;
-  aos << "S: " << std::endl;
-  aos << objective.S << std::endl;
+
 }
 
 
 void IntermedQPMat::printState( std::ostream &aos )
 {
 
-}
-
-
-void IntermedQPMat::printObjective(const char * filename,
-                          const int type)
-{
-  std::ofstream aof;
-  aof.open(filename,std::ofstream::out);
-  printObjective(type,aof);
-  aof.close();
-}
-
-
-void IntermedQPMat::printState(const char * filename)
-{
-  std::ofstream aof;
-  aof.open(filename,std::ofstream::out);
-  printState(aof);
-  aof.close();
 }
 
 

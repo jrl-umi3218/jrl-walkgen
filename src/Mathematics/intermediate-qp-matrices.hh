@@ -31,10 +31,9 @@
 //# include <boost/numeric/ublas/matrix.hpp>
 //# include <boost/numeric/ublas/vector.hpp>
 #include <jrl/mal/matrixabstractlayer.hh>
+
 #include <privatepgtypes.h>
 
-#include <iostream>
-#include <fstream>
 
 namespace PatternGeneratorJRL
 {
@@ -46,11 +45,6 @@ namespace PatternGeneratorJRL
     //Public types
     //
   public:
-
-    const static int MEAN_VELOCITY = 0;
-    const static int INSTANT_VELOCITY = 1;
-    const static int COP_CENTERING = 2;
-    const static int JERK = 3;
 
     /// \name QP elements that are objective independent
     /// \{
@@ -114,8 +108,8 @@ namespace PatternGeneratorJRL
     { return m_StateMatrices; };
 
     /// \brief Accessors to the objective dependent matrices
-    objective_variant_t const & operator ()( const int aObjectiveType ) const;
-    objective_variant_t & operator ()( const int aObjectiveType );
+    objective_variant_t const & operator ()( int aObjectiveType ) const;
+    objective_variant_t & operator ()( int aObjectiveType );
 
     /// \brief Accessors to the Center of Mass
     //inline com_t const & operator ()()
@@ -124,11 +118,8 @@ namespace PatternGeneratorJRL
     { m_StateMatrices.CoM = CoM; };
 
     /// \brief Printers
-    void printObjective( const int ObjectiveType, std::ostream &aos );
+    void printObjective( int ObjectiveType, std::ostream &aos );
     void printState( std::ostream &aos );
-    void printObjective(const char * filename, const int Objectivetype);
-    void printState(const char * filename);
-
 
 
     //
@@ -157,6 +148,7 @@ namespace PatternGeneratorJRL
     MAL_MATRIX(m_OptB,double);
     MAL_MATRIX(m_OptC,double);
     MAL_MATRIX(m_OptD,double);
+
 
   };
 }

@@ -208,6 +208,11 @@ namespace PatternGeneratorJRL
     //Private members
     //
   private:
+
+    const static int MEAN_VELOCITY = 0;
+    const static int INSTANT_VELOCITY = 1;
+    const static int COP_CENTERING = 2;
+    const static int JERK = 3;
 	  
     /// \brief The current and the previewed support state.
     SupportState_t m_CurrentSupport, m_PrwSupport;
