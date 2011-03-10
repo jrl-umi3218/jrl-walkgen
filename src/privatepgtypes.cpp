@@ -178,11 +178,4 @@ namespace PatternGeneratorJRL
         }
     }
 
-  void linear_inequality_t::clear()
-  {
-    x.D.clear();
-    y.D.clear();
-    dc.clear();
-  }
-
 }
