@@ -99,16 +99,16 @@ void QPProblem_s::AllocateMemory()
   U = new double[mnn];
 
   DS = new double[(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)];
+
   DU = new double[(8*m_QP_N+1)*2*(m_QP_N+m_stepNumber)];
+
 
   Q=new double[4*(m_QP_N+m_stepNumber)*(m_QP_N+m_stepNumber)];  //Quadratic part of the objective function
   D=new double[2*(m_QP_N+m_stepNumber)];   // Linear part of the objective function
-
-  XL=new double[2*(m_QP_N+m_stepNumber)];  // Lower bound on the solution.
-  XU=new double[2*(m_QP_N+m_stepNumber)];  // Upper bound on the solution.
-
-  X=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the problem.
-  NewX=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the problem.
+  XL=new double[2*(m_QP_N+m_stepNumber)];  // Lower bound of the jerk.
+  XU=new double[2*(m_QP_N+m_stepNumber)];  // Upper bound of the jerk.
+  X=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the system.
+  NewX=new double[2*(m_QP_N+m_stepNumber)];   // Solution of the system.
 
 
 }
@@ -205,6 +205,7 @@ void QPProblem_s::dumpVector(std::ostream & aos,
   double *aVector=0;
   switch(type)
     {
+
     case VECTOR_D:
       lsize=2*(m_QP_N+m_stepNumber) ;
       aVector = D;
