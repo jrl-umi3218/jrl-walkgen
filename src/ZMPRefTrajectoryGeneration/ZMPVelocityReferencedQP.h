@@ -43,8 +43,6 @@
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 #include <privatepgtypes.h>
-#include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
-#include <Mathematics/intermediate-qp-matrices.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -97,7 +95,7 @@ namespace PatternGeneratorJRL
 				double StartingTime,
 				deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfLConstraintInequalitiesFreeFeet,
 				deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfFeetPosInequalities,
-				deque<supportfoot_t>    & QueueOfSupportFeet,
+				deque<SupportFeet_t>    & QueueOfSupportFeet,
 				double Com_Height,
 				int NbOfConstraints,
 				MAL_VECTOR(&xk,double));
@@ -165,7 +163,7 @@ namespace PatternGeneratorJRL
     void setVelReference(istringstream &strm);
 
     /*! Set the velocity reference from external reference */
-    void setVelReference(double dx,double dy, double dyaw);
+    void setVelReference(double x,double y, double yaw);
 
     /*! Set the velocity reference from external reference */
     void setCoMPerturbationForce(double x,double y);
@@ -189,7 +187,7 @@ namespace PatternGeneratorJRL
 
     /*! @}*/
     /* @} */
-    reference_t m_VelRef;
+    ReferenceAbsoluteVelocity RefVel;
 
     static const unsigned int QLD=0;
     static const unsigned int QLDANDLQ=1;
@@ -210,7 +208,7 @@ namespace PatternGeneratorJRL
 
     double m_UpperTimeLimitToUpdate;
 
-    deque<supportfoot_t> QueueOfSupportFeet;
+    deque<SupportFeet_t> QueueOfSupportFeet;
 
     double m_TimeBuffer;
 
@@ -225,10 +223,6 @@ namespace PatternGeneratorJRL
 
     /*! Deecoupled optimization problem to compute the evolution of feet angles. */
     OrientationsPreview * m_OP;
-
-    GeneratorVelRef * m_GenVR;
-
-    IntermedQPMat m_Matrices;
 
     /*! \brief Object creating Linear inequalities constraints
       based on the foot position. Those constraints are *NOT* the
@@ -266,7 +260,7 @@ namespace PatternGeneratorJRL
     //Final optimization problem
     QPProblem m_Pb;
 
-    support_state_t m_CurrentSupport, m_PrwSupport;
+    SupportState_t m_CurrentSupport, m_PrwSupport;
 
     /*! \name Variables related to the QP
       @{ */
@@ -352,7 +346,7 @@ namespace PatternGeneratorJRL
     void computeCholeskyOfQ(double * OptA);
 
     void computeObjective(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
-			  deque<supportfoot_t> & QueueOfSupportFeet,
+			  deque<SupportFeet_t> & QueueOfSupportFeet,
 			  int NbOfConstraints, int NbOfEqConstraints,
 			  int & CriteriaToMaximize, MAL_VECTOR(& xk,double), double time);
 
