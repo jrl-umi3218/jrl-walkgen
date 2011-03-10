@@ -46,20 +46,20 @@ public:
   {
     m_TestProfile = TestProfile;
   };
-
+  
 protected:
 
+  
 
-
-
+  
   void startOnLineWalking(PatternGeneratorInterface &aPGI)
   {
     CommonInitialization(aPGI);
-
+    
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
       aPGI.ParseCmd(strm2);
-
+      
     }
     {
       istringstream strm2(":singlesupporttime 0.7");
@@ -85,7 +85,7 @@ protected:
 
   void chooseTestProfile()
   {
-
+    
     switch(m_TestProfile)
       {
 
@@ -97,7 +97,7 @@ protected:
 	break;
       }
   }
-
+  
   void generateEvent()
   {
     unsigned int StoppingTime = 11*200;
@@ -112,11 +112,10 @@ protected:
 int PerformTests(int argc, char *argv[])
 {
 
-  const unsigned int NbTests = 1;
-  std::string TestNames[NbTests] = { "TestHerdt2010OnLine" };
-  int TestProfiles[NbTests] = { PROFIL_HERDT_ONLINE_WALKING };
+  std::string TestNames[1] = { "TestHerdt2010OnLine"};
+  int TestProfiles[1] = { PROFIL_HERDT_ONLINE_WALKING};
 
-  for (unsigned int i=0;i<NbTests;i++)
+  for (unsigned int i=0;i<1;i++)
     {
       TestHerdt2010 aTH2010(argc,argv,
 			    TestNames[i],
@@ -125,11 +124,11 @@ int PerformTests(int argc, char *argv[])
 	{
 	  if (!aTH2010.doTest(std::cout))
 	    {
-	      cout << "Test nb. " << i+1 <<" (of " << NbTests <<" test(s)) failed!!!"<< endl;
+	      cout << "Failed test " << i << endl;
 	      return -1;
 	    }
 	  else
-	    cout << "Test nb. " << i+1 <<" (of " << NbTests <<" test(s)) passed."<< endl;
+	    cout << "Passed test " << i << endl;
 	}
       catch (const char * astr)
 	{ cerr << "Failed on following error " << astr << std::endl;
