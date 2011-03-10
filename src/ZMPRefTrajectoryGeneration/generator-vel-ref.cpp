@@ -73,9 +73,10 @@ GeneratorVelRef::preview(IntermedQPMat Matrices,
 			 SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates)
 {
 
-  //initialize the previewed support state before previewing
   const support_state_t & CurrentSupport = deqSupportStates[0];
   support_state_t PreviewedSupport;
+
+  //initialize the previewed support state before previewing
   PreviewedSupport.Phase  = CurrentSupport.Phase;
   PreviewedSupport.Foot  = CurrentSupport.Foot;
   PreviewedSupport.StepsLeft  = CurrentSupport.StepsLeft;
@@ -92,32 +93,7 @@ GeneratorVelRef::preview(IntermedQPMat Matrices,
 
 }
 
-
-void
-GeneratorVelRef::generateSelectionMatrices(IntermedQPMat & Matrices,
-    std::deque<support_state_t> & deqSupportStates)
-{
-
-  IntermedQPMat::state_variant_t & State = Matrices.State();
-  const int & NbPrwSteps = deqSupportStates.back().StepNumber;
-  MAL_VECTOR_RESIZE(State.Vc,m_N);
-  MAL_MATRIX_RESIZE(State.V,m_N,NbPrwSteps);
-
-  std::deque<support_state_t>::iterator SS_it;
-  SS_it = deqSupportStates.begin();
-  SS_it++;
-  for(int i=0;i<m_N;i++)
-    {
-    if(SS_it->StepNumber>0)
-      State.V(i,SS_it->StepNumber-1) = State.VT(SS_it->StepNumber-1,i) = 1.0;
-    else
-      State.Vc(i) = 1.0;
-    SS_it++;
-    }
-
-}
-
-
+	
 void 
 GeneratorVelRef::computeGlobalReference(IntermedQPMat & Matrices, COMState TrunkStateT)
 {
@@ -248,6 +224,7 @@ GeneratorVelRef::buildInvariantPart(QPProblem & Pb, IntermedQPMat & Matrices)
   MAL_MATRIX(weightMTM,double);
 
   const IntermedQPMat::objective_variant_t & Jerk = Matrices.Objective(IntermedQPMat::JERK);
+  // Final scaled products that are added to the QP
   computeTerm(weightMTM, Jerk.weight, Jerk.UT, Jerk.U);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, 0, 0);
   Pb.addTerm(weightMTM, QPProblem::MATRIX_Q, m_N, m_N);

@@ -78,13 +78,6 @@ namespace PatternGeneratorJRL
     void preview(IntermedQPMat Matrices,
 		 SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates);
 
-    /// \brief Compute the selection matrices
-    ///
-    /// \param Matrices
-    /// \param deqSupportStates
-    void generateSelectionMatrices(IntermedQPMat & Matrices,
-        std::deque<support_state_t> & deqSupportStates);
-
     /// \brief Set the global reference from the local one and the orientation of the trunk frame
     /// for the whole preview window
     ///
@@ -111,7 +104,7 @@ namespace PatternGeneratorJRL
     /// \param DS
     void addIneqConstraint(std::deque<LinearConstraintInequalityFreeFeet_t> ConstraintsDeque,
 			   MAL_MATRIX (&DU, double), MAL_MATRIX (&DS, double));
-
+	  
     /// \brief Generate a queue of inequality constraints on the ZMP for the whole preview window
     ///
     /// \param CjrlFoot
