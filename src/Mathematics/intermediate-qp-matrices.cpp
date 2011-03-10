@@ -37,11 +37,6 @@ using namespace PatternGeneratorJRL;
 IntermedQPMat::IntermedQPMat()
 {
 
-  m_MeanVelocity.type = MEAN_VELOCITY;
-  m_InstantVelocity.type = INSTANT_VELOCITY;
-  m_COPCentering.type = COP_CENTERING;
-  m_Jerk.type = JERK;
-
 }
 
 
@@ -51,49 +46,56 @@ IntermedQPMat::~IntermedQPMat()
 }
 
 
-IntermedQPMat::objective_variant_t const &
-IntermedQPMat::operator ()( int aObjectiveType ) const
+void 
+IntermedQPMat::getTermMatrices(standard_ls_form_t & TMat, int ObjectiveType)
 {
-  switch(aObjectiveType)
-  {
+  TMat.nSt = m_StateMatrices.NbStepsPrw;
+
+  switch(ObjectiveType)
+    {
     case MEAN_VELOCITY:
-      return m_MeanVelocity;
+      TMat.U = m_MeanVelocity.U;
+      TMat.UT = m_MeanVelocity.UT;
+      TMat.Sc_x = MAL_RET_A_by_B(m_MeanVelocity.S,m_StateMatrices.CoM.x);
+      TMat.Sc_x = MAL_RET_A_by_B(m_MeanVelocity.S,m_StateMatrices.CoM.y);
+      TMat.weight = m_MeanVelocity.weight;
+      TMat.ref_x = m_StateMatrices.RefX;
+      TMat.ref_y = m_StateMatrices.RefY;
     case INSTANT_VELOCITY:
-      return m_InstantVelocity;
+      TMat.U = m_InstantVelocity.U;
+      TMat.UT = m_InstantVelocity.UT;
+      TMat.Sc_x = MAL_RET_A_by_B(m_InstantVelocity.S,m_StateMatrices.CoM.x);
+      TMat.Sc_y = MAL_RET_A_by_B(m_InstantVelocity.S,m_StateMatrices.CoM.y);
+      TMat.weight = m_InstantVelocity.weight;
+      TMat.ref_x = m_StateMatrices.RefX;
+      TMat.ref_y = m_StateMatrices.RefY;
     case COP_CENTERING:
-      return m_COPCentering;
+      TMat.U = m_COPCentering.U;
+      TMat.UT = m_COPCentering.UT;
+      TMat.V = m_StateMatrices.V;
+      TMat.VT = m_StateMatrices.VT;
+      TMat.Sc_x = MAL_RET_A_by_B(m_COPCentering.S,m_StateMatrices.CoM.x);
+      TMat.Sc_x = MAL_RET_A_by_B(m_COPCentering.S,m_StateMatrices.CoM.y);
+      TMat.weight = m_COPCentering.weight;
+      TMat.ref_x = m_StateMatrices.Vc*m_StateMatrices.fx;
+      TMat.ref_y = m_StateMatrices.Vc*m_StateMatrices.fy;
     case JERK:
-      return m_Jerk;
-  }
+      TMat.U = m_Jerk.U;
+      TMat.UT = m_Jerk.UT;
+      TMat.Sc_x = MAL_RET_A_by_B(m_Jerk.S,m_StateMatrices.CoM.x);
+      TMat.Sc_x = MAL_RET_A_by_B(m_Jerk.S,m_StateMatrices.CoM.y);
+      TMat.weight = m_Jerk.weight;
+      TMat.ref_x = 0.0*m_StateMatrices.RefX;
+      TMat.ref_y = 0.0*m_StateMatrices.RefY;
+    }
 }
 
 
-IntermedQPMat::objective_variant_t &
-IntermedQPMat::operator ()( int aObjectiveType )
+com_t IntermedQPMat::operator ()() const
 {
-  switch(aObjectiveType)
-  {
-    case MEAN_VELOCITY:
-      return m_MeanVelocity;
-    case INSTANT_VELOCITY:
-      return m_InstantVelocity;
-    case COP_CENTERING:
-      return m_COPCentering;
-    case JERK:
-      return m_Jerk;
-  }
+  return m_StateMatrices.CoM;
 }
-
-
-void IntermedQPMat::printObjective( int ObjectiveType, std::ostream &aos )
+void IntermedQPMat::operator ()( com_t CoM )
 {
-
+  m_StateMatrices.CoM = CoM;
 }
-
-
-void IntermedQPMat::printState( std::ostream &aos )
-{
-
-}
-
-
