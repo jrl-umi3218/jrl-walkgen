@@ -166,8 +166,9 @@ QPProblem_s::solve( int solver, solution_t & result )
       //      else
       iwar_.array_[0]=1;
 
-      Q_.stick_together(Q_dense_,n_,n_);
-      DU_.stick_together(DU_dense_,mmax_,n_);
+      Q_.stick_together(Q_dense_.array_,n_,n_);
+      DU_.stick_together(DU_dense_.array_,mmax_,n_);
+
       
       ql0001_(&m_, &me_, &mmax_, &n_, &nmax_, &mnn_,
               Q_dense_.array_, D_.array_, DU_dense_.array_, DS_.array_, XL_.array_, XU_.array_,
@@ -175,6 +176,7 @@ QPProblem_s::solve( int solver, solution_t & result )
               war_.array_, &lwar_, iwar_.array_, &liwar_, &Eps_);
 
       result.resize(n_,m_);
+
 
       for(int i = 0; i < n_; i++)
         {
@@ -221,6 +223,20 @@ QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), int type,
       break;
     }
 
+  /*  std::cout << "NbVariables_:" << NbVariables_
+	    << " NbConstraints_:" << NbConstraints_ 
+	    << " NbEqConstraints_: " << NbEqConstraints_
+	    << " m_ :"     << m_
+	    << " me_:"     << me_
+	    << " mmax_: "  << mmax_
+	    << " n_:"      << n_
+	    << " nmax_: "  << nmax_
+	    << " mnn_: "   << mnn_ 
+	    << " lwar_:"   << lwar_
+	    << " liwar_ :" << liwar_ 
+	    << std::endl; */
+  if (NbEqConstraints_>0)
+    std::cout << "NbEqConstraints:" << NbEqConstraints_<< std::endl;
 
   if (NbVariables_ > pArray_s->ncols_ )
     {
@@ -241,13 +257,13 @@ QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), int type,
       DS_.resize(2*NbConstraints_,1,true);
     }
   
-  int Usize = 2*(NbConstraints_+2*NbVariables_);
+  unsigned long int Usize = 2*(NbConstraints_+2*NbVariables_);
   if (Usize>U_.nrows_)
     {
       U_.resize(Usize, 1,true);
     }
   
-  int warsize = 2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000);
+  unsigned long int warsize = 2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000);
   
   if (warsize> war_.nrows_)
     {
