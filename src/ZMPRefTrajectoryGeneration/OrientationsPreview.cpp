@@ -42,8 +42,20 @@ OrientationsPreview::OrientationsPreview( CjrlJoint *aRootJoint)
 
   m_lLimitLeftHipYaw = aRootJoint->childJoint(1)->lowerBound(0);//-30.0/180.0*M_PI;
   m_uLimitLeftHipYaw  = aRootJoint->childJoint(1)->upperBound(0);//45.0/180.0*M_PI;
+  if (m_lLimitLeftHipYaw==  m_uLimitLeftHipYaw)
+    {
+      m_lLimitLeftHipYaw = -30.0/180.0*M_PI;
+      m_uLimitLeftHipYaw = 45.0/180.0*M_PI;
+    }
+
   m_lLimitRightHipYaw = aRootJoint->childJoint(0)->lowerBound(0);//-45.0/180.0*M_PI;
   m_uLimitRightHipYaw = aRootJoint->childJoint(0)->upperBound(0);//30.0/180.0*M_PI;
+  if (m_lLimitRightHipYaw==  m_uLimitRightHipYaw)
+    {
+      m_lLimitRightHipYaw = -30.0/180.0*M_PI;
+      m_uLimitRightHipYaw = 45.0/180.0*M_PI;
+    }
+    
 
   m_uvLimitFoot = fabs(aRootJoint->childJoint(0)->upperVelocityBound(0));
 
@@ -147,7 +159,7 @@ OrientationsPreview::preview_orientations(double Time,
 
       // Preview of orientations:
       // -----------------------.
-      for(StepNumber = FirstFootPreviewed;
+      for(StepNumber = (unsigned) FirstFootPreviewed;
 	  StepNumber <= (unsigned)((int)ceil((m_N+1)*m_T/StepDuration));
 	  StepNumber++)
 	{
@@ -201,7 +213,7 @@ OrientationsPreview::verify_acceleration_hip_joint(const reference_t &Ref,
 {
   if(CurrentSupport.Phase!=0)
       //Verify change in velocity against the maximal acceleration
-      if(fabs(Ref.local.yaw-TrunkState_.yaw[1]) > 2.0/3.0*m_T*m_uaLimitHipYaw)
+    if(fabs(Ref.local.yaw-TrunkState_.yaw[1]) > 2.0/3.0*m_T*m_uaLimitHipYaw)
 	{
 	  double signRotAccTrunk = (Ref.local.yaw-TrunkState_.yaw[1] < 0.0)?-1.0:1.0;
 	  TrunkStateT_.yaw[1] = TrunkState_.yaw[1] + signRotAccTrunk * 2.0/3.0*m_T* m_uaLimitHipYaw;
@@ -317,6 +329,7 @@ OrientationsPreview::interpolate_trunk_orientation(double time, int CurrentIndex
       double Theta = TrunkState_.yaw[0];
 
       FinalCOMTraj_deq[CurrentIndex].yaw[0] = TrunkState_.yaw[0];
+      FinalCOMTraj_deq[CurrentIndex].yaw[1] = TrunkState_.yaw[1];
       //Interpolate the
       for(int k = 1; k<=(int)(m_T/NewSamplingPeriod);k++)
         {
@@ -334,6 +347,7 @@ OrientationsPreview::interpolate_trunk_orientation(double time, int CurrentIndex
               TrunkState_.yaw[0] += NewSamplingPeriod*TrunkStateT_.yaw[1];
             }
           FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = TrunkState_.yaw[0];
+	  FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkState_.yaw[1];
         }
     }
   else if (CurrentSupport.Phase == 0 || time+3.0/2.0*m_T > CurrentSupport.TimeLimit)
@@ -341,6 +355,7 @@ OrientationsPreview::interpolate_trunk_orientation(double time, int CurrentIndex
       for(int k = 0; k<=(int)(m_T/NewSamplingPeriod);k++)
         {
           FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = TrunkState_.yaw[0];
+	  FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkState_.yaw[1];
         }
     }
 
