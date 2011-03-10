@@ -62,7 +62,7 @@ namespace PatternGeneratorJRL
 
     /// \name Matrices defining the evolution
     /// \{
-    struct dynamics_s
+    struct dynamics_t
     {
       /// \brief Matrix of the quadratic part
       boost_ublas::matrix<double> U;
@@ -73,7 +73,6 @@ namespace PatternGeneratorJRL
 
       int type;
     };
-    typedef dynamics_s dynamics_t;
 
     /// \name QP elements that are objective independent
     /// \{
@@ -90,7 +89,6 @@ namespace PatternGeneratorJRL
 
       /// \name Selection matrices
       /// \{
-      ///
       /// \brief Selection matrix for the previewed feet positions
       boost_ublas::matrix<double> V;
       boost_ublas::matrix<double> VT;
@@ -116,7 +114,7 @@ namespace PatternGeneratorJRL
     {
       double weight;
 
-      dynamics_t * dyn;
+      struct dynamics_t * dyn;
 
       /// \brief Minimization objective
       int type;
@@ -138,8 +136,6 @@ namespace PatternGeneratorJRL
     ~IntermedQPMat();
     /// \}
 
-    /// \name Accessors
-    /// \{
     /// \brief Accessors to the state matrices
     inline state_variant_t const & State() const
     { return m_StateMatrices; };
@@ -177,16 +173,12 @@ namespace PatternGeneratorJRL
     { return m_StateMatrices.SupportFoot; };
     inline void SupportFoot( const supportfoot_t & SupportFoot )
     { m_StateMatrices.SupportFoot = SupportFoot; };
-    /// \}
 
-    /// \name Displaying
-    /// \{
-    /// \brief Dump objective matrices
+    /// \brief Dumping
     void dumpObjective( const int ObjectiveType, std::ostream &aos );
     void dumpState( std::ostream &aos );
     void dumpObjective(const char * filename, const int Objectivetype);
     void dumpState(const char * filename);
-    /// \}
 
     //
     //Private members

@@ -44,7 +44,7 @@ using namespace PatternGeneratorJRL;
 
 QPProblem_s::QPProblem_s():
   m(0),me(0),mmax(0), n(0), nmax(0), mnn(0),
-  Q(0),D(0),DU(0),DS(0),XL(0),XU(0),X(0),
+  Q(0),D(0),DU(0),DS(0),XL(0),XU(0),X(0),NewX(0),
   U(0),war(0), iwar(0),
   iout(0),ifail(0), iprint(0),
   lwar(0), liwar(0),
@@ -56,7 +56,6 @@ QPProblem_s::QPProblem_s():
 }
 QPProblem_s::~QPProblem_s()
 {
-
   ReleaseMemory();
 }
 
@@ -83,6 +82,9 @@ void QPProblem_s::ReleaseMemory()
   if (X!=0)
     delete [] X;
 
+  if (NewX!=0)
+    delete [] NewX;
+
   if (iwar!=0)
     delete [] iwar;
 
@@ -95,7 +97,7 @@ void QPProblem_s::ReleaseMemory()
 
 
 void
-QPProblem_s::resizeAll( int NbVariables, int NbConstraints)
+QPProblem_s::resizeAll(const int & NbVariables, const int & NbConstraints)
 {
 
   resize(Q,2*n*n,2*NbVariables*NbVariables);  //Quadratic part of the objective function
@@ -110,16 +112,15 @@ QPProblem_s::resizeAll( int NbVariables, int NbConstraints)
   initialize(XU,2*NbVariables,1e8);
 
   resize(X,2*n,2*NbVariables);  // Solution of the problem.
+  resize(NewX,2*n,2*NbVariables);  // Solution of the problem.
   resize(U,2*mnn,2*(NbConstraints+2*NbVariables));
 
   resize(war,2*lwar,2*(3*NbVariables*NbVariables/2+ 10*NbVariables  + 2*(NbConstraints+1) + 20000));
   resize(iwar,2*liwar,2*NbVariables); // The Cholesky decomposition is done internally.
-
-
 }
 
 
-void QPProblem_s::clear( int type )
+void QPProblem_s::clear(const int type)
 {
 
   double * array;
@@ -157,9 +158,9 @@ void QPProblem_s::clear( int type )
 }
 
 
-void QPProblem_s::clear( int type,
-			 int row, int col,
-			 int nb_rows, int nb_cols )
+void QPProblem_s::clear(const int type,
+			const int & row, const int & col,
+			const int & nb_rows, const int & nb_cols)
 {
 
   double * array;
@@ -202,29 +203,29 @@ void QPProblem_s::clear( int type,
 
 
 void
-QPProblem_s::setDimensions( int nb_variables,
-			    int nb_constraints,
-			    int nb_eq_constraints )
+QPProblem_s::setDimensions(const int & NbVariables,
+			   const int & NbConstraints,
+			   const int & NbEqConstraints)
 {
 
   // If all the dimensions are less than
   // the current ones no need to reallocate.
-  if (nb_variables > m_ReallocMarginVar)
+  if (NbVariables > m_ReallocMarginVar)
     {
-      m_ReallocMarginVar = 2*nb_variables;
-      resizeAll(nb_variables, nb_constraints);
+      m_ReallocMarginVar = 2*NbVariables;
+      resizeAll(NbVariables, NbConstraints);
     }
-  if (nb_constraints > m_ReallocMarginConstr)
+  if (NbConstraints > m_ReallocMarginConstr)
     {
-      m_ReallocMarginConstr = 2*nb_constraints;
-      resize(DS,2*m,2*nb_constraints);
-      resize(DU,2*m*n,2*nb_variables*nb_constraints);
+      m_ReallocMarginConstr = 2*NbConstraints;
+      resize(DS,2*m,2*NbConstraints);
+      resize(DU,2*m*n,2*NbVariables*NbConstraints);
     }
 
-  m = m_NbConstraints = nb_constraints;
-  me = nb_eq_constraints;
+  m = m_NbConstraints = NbConstraints;
+  me = NbEqConstraints;
   mmax = m+1;
-  n = m_NbVariables = nb_variables;
+  n = m_NbVariables = NbVariables;
   nmax = n;
   mnn = m+2*n;
 
@@ -234,16 +235,11 @@ QPProblem_s::setDimensions( int nb_variables,
   liwar = n;
   Eps = 1e-8;
   
-  //      if (m_FastFormulationMode==QLDANDLQ)
-   //        m_Pb.iwar[0]=0;
-   //      else
-  iwar[0]=1;
-
 }
 
 
 void
-QPProblem_s::solve( int solver, solution_t & result )
+QPProblem_s::solve(const int solver)
 {
   switch(solver)
     {
@@ -252,31 +248,13 @@ QPProblem_s::solve( int solver, solution_t & result )
               Q, D, DU, DS, XL, XU,
               X, U, &iout, &ifail, &iprint,
               war, &lwar, iwar, &liwar, &Eps);
-
-      result.resize(n,m);
-
-
-      for(int i = 0; i < n; i++)
-        {
-          result.vecSolution(i) = X[i];
-          result.vecLBoundsLagr(i) = U[m+i];
-          result.vecUBoundsLagr(i) = U[m+n+i];
-        }
-      for(int i = 0; i < m; i++)
-        {
-          result.vecConstrLagr(i) = U[i];
-        }
-
-      result.Fail = ifail;
-      result.Print = iprint;
-
     }
 }
 
 
 void
-QPProblem_s::addTerm( const MAL_MATRIX (&Mat, double), int type,
-		      int row, int col )
+QPProblem_s::addTerm(const MAL_MATRIX (&Mat, double), const int type,
+		     const int row, const int col)
 {
 
   double * array;
@@ -318,8 +296,8 @@ QPProblem_s::addTerm( const MAL_MATRIX (&Mat, double), int type,
 }
 
 
-void QPProblem_s::addTerm( const MAL_VECTOR (&Vec, double), int type,
-			   int row )
+void QPProblem_s::addTerm(const MAL_VECTOR (&Vec, double), const int type,
+			  const int row)
 {
 
   double * aArray;
@@ -359,38 +337,7 @@ void QPProblem_s::addTerm( const MAL_VECTOR (&Vec, double), int type,
   for(unsigned int i = 0;i < Vec.size(); i++)
     aArray[row+i] += Vec(i);
 
-}
 
-void
-QPProblem_s::solution_t::resize( int size_sol, int size_constr )
-{
-  NbVariables = size_sol;
-  NbConstraints = size_constr;
-
-  vecSolution.resize(size_sol, false);
-  vecConstrLagr.resize(size_constr, false);
-  vecLBoundsLagr.resize(size_sol, false);
-  vecUBoundsLagr.resize(size_sol, false);
-}
-
-
-void
-QPProblem_s::solution_t::dump(const char * filename)
-{
-  std::ofstream aof;
-  aof.open(filename,std::ofstream::out);
-  print(aof);
-  aof.close();
-}
-
-
-void
-QPProblem_s::solution_t::print(std::ostream & aos)
-{
-  aos << "Arrays:" << std::endl
-      << "Solution: ";
-   for(int i = 0; i < NbVariables; i++)
-     {aos<<vecSolution[i]<<" ";}; aos<<std::endl;
 }
 
 
@@ -412,7 +359,7 @@ QPProblem_s::dumpSolverParameters(std::ostream & aos)
 
 
 void
-QPProblem_s::dump( int type, std::ostream & aos)
+QPProblem_s::dump(const int type, std::ostream & aos)
 {
 
   int lnbrows=0, lnbcols=0;
@@ -475,7 +422,7 @@ QPProblem_s::dump( int type, std::ostream & aos)
 
 
 void
-QPProblem_s::dump( int type, const char * filename)
+QPProblem_s::dump(const int type, const char * filename)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
