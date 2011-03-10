@@ -1331,20 +1331,23 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       m_PrwSupport = deqPrwSupportStates.back();
       m_GenVR->generateSelectionMatrices(m_Matrices, deqPrwSupportStates);
 
+//      m_fCALS->buildConstraintInequalities(FinalLeftFootAbsolutePositions,
+//						 FinalRightFootAbsolutePositions,
+//						 QueueOfLConstraintInequalitiesFreeFeet,
+//						 QueueOfFeetPosInequalities,
+//						 m_VelRef,
+//						 time+m_TimeBuffer,
+//						 m_QP_N,
+//						 m_SupportFSM, m_CurrentSupport, m_PrwSupport, m_PreviewedSupportAngles,
+//						 NbOfConstraints);
 
-      m_GenVR->generateIneqFeet(QueueOfFeetPosInequalities,
-          m_fCALS,
-          FinalLeftFootAbsolutePositions,
-                FinalRightFootAbsolutePositions,
-                deqPrwSupportStates,
-                m_PreviewedSupportAngles, NbOfConstraints);
-
-      m_GenVR->generateIneqCOP(QueueOfLConstraintInequalitiesFreeFeet,
-          m_fCALS,
-          FinalLeftFootAbsolutePositions,
-                FinalRightFootAbsolutePositions,
-                deqPrwSupportStates,
-                m_PreviewedSupportAngles, NbOfConstraints);
+      m_GenVR->buildConstraintInequalities(FinalLeftFootAbsolutePositions,
+          FinalRightFootAbsolutePositions,
+          QueueOfLConstraintInequalitiesFreeFeet,
+          QueueOfFeetPosInequalities,
+          deqPrwSupportStates,
+          m_PreviewedSupportAngles, NbOfConstraints,
+          m_fCALS);
 
       deque<supportfoot_t>::iterator SF_it;//, storeFF_it, VFF_it;
       SF_it = QueueOfSupportFeet.end();

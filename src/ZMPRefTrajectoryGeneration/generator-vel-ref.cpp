@@ -232,107 +232,24 @@ GeneratorVelRef::addIneqConstraint(std::deque<linear_inequality_ff_t> Constraint
 	  
 
 void 
-GeneratorVelRef::generateIneqCOP(std::deque<linear_inequality_ff_t> & deqZMPInequalities,
-    FootConstraintsAsLinearSystemForVelRef * FCALS,
-    std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-    std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
-    std::deque<support_state_t> & deqSupportStates,
-    std::deque<double> & PreviewedSupportAngles, int & NbConstraints)
+GeneratorVelRef::generateZMPConstraints (CjrlFoot & Foot,
+					 std::deque < double > & PreviewedSupportAngles,
+					 SupportFSM & FSM,
+					 support_state_t & CurrentSupportState,
+					 QPProblem & Pb)
 {
-  convex_hull_t ZMPFeasibilityEdges;
-
-  support_state_t & CurrentSupport = deqSupportStates.front();
-
-  double CurrentSupportAngle;
-  //define the current support angle
-  if( CurrentSupport.Foot==1 )
-    CurrentSupportAngle = AbsoluteLeftFootPositions.back().theta*M_PI/180.0;
-  else
-    CurrentSupportAngle = AbsoluteRightFootPositions.back().theta*M_PI/180.0;
-
-  FCALS->setVertices( ZMPFeasibilityEdges,
-               CurrentSupportAngle,
-               CurrentSupport,
-               FootConstraintsAsLinearSystemForVelRef::ZMP_CONSTRAINTS);
-
-  double SupportAngle = CurrentSupportAngle;
-  //set constraints for the whole preview window
-  for( int i=1;i<=m_N;i++ )
-    {
-      support_state_t & PrwSupport = deqSupportStates[i];
-
-      if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 )
-        SupportAngle = PreviewedSupportAngles[PrwSupport.StepNumber-1];
-
-      if( PrwSupport.StateChanged )
-        FCALS->setVertices( ZMPFeasibilityEdges,
-                     SupportAngle,
-                     PrwSupport,
-                     FootConstraintsAsLinearSystemForVelRef::ZMP_CONSTRAINTS);
-
-      linear_inequality_ff_t aLCI;
-      FCALS->computeLinearSystem( ZMPFeasibilityEdges, aLCI.D, aLCI.Dc, PrwSupport );
-      aLCI.StepNumber = PrwSupport.StepNumber;
-
-      deqZMPInequalities.push_back( aLCI );
-      NbConstraints += MAL_MATRIX_NB_ROWS( aLCI.D );
-    }
+  //TODO:
 }
 
 
 void 
-GeneratorVelRef::generateIneqFeet(std::deque<linear_inequality_ff_t> & deqFeetInequalities,
-    FootConstraintsAsLinearSystemForVelRef * FCALS,
-    std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-    std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
-    std::deque<support_state_t> & deqSupportStates,
-    std::deque<double> & PreviewedSupportAngles, int & NbConstraints)
+GeneratorVelRef::generateFeetPosConstraints (CjrlFoot & Foot,
+					     std::deque < double > & PreviewedSupportAngles,
+					     SupportFSM & ,
+					     support_state_t &,
+					     QPProblem & Pb)
 {
-  convex_hull_t FootFeasibilityEdges;
-
-  support_state_t & CurrentSupport = deqSupportStates.front();
-
-  double CurrentSupportAngle;
-  //define the current support angle
-  if( CurrentSupport.Foot==1 )
-    CurrentSupportAngle = AbsoluteLeftFootPositions.back().theta*M_PI/180.0;
-  else
-    CurrentSupportAngle = AbsoluteRightFootPositions.back().theta*M_PI/180.0;
-
-  //set current constraints
-  FCALS->setVertices( FootFeasibilityEdges,
-               CurrentSupportAngle,
-               CurrentSupport,
-               FootConstraintsAsLinearSystemForVelRef::FOOT_CONSTRAINTS);
-
-  double SupportAngle = CurrentSupportAngle;
-  //set constraints for the whole preview window
-  for( int i=1;i<=m_N;i++ )
-    {
-      support_state_t & PrwSupport = deqSupportStates[i];
-
-      //foot positioning constraints
-      if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 && PrwSupport.Phase != 0)
-        {
-          SupportAngle = PreviewedSupportAngles[PrwSupport.StepNumber-1];
-
-          if( PrwSupport.StepNumber == 1 )
-              SupportAngle = CurrentSupportAngle;
-          else
-              SupportAngle = PreviewedSupportAngles[PrwSupport.StepNumber-2];
-
-          FCALS->setVertices( FootFeasibilityEdges,
-                       SupportAngle,
-                       PrwSupport,
-                       FootConstraintsAsLinearSystemForVelRef::FOOT_CONSTRAINTS);
-
-          linear_inequality_ff_t aLCIFP;
-          FCALS->computeLinearSystem( FootFeasibilityEdges, aLCIFP.D, aLCIFP.Dc, PrwSupport );
-          aLCIFP.StepNumber = PrwSupport.StepNumber;
-          deqFeetInequalities.push_back( aLCIFP );
-          NbConstraints += MAL_MATRIX_NB_ROWS( aLCIFP.D );
-        }
-    }
+  //TODO:
 }
 
 
@@ -349,14 +266,23 @@ GeneratorVelRef::buildConstraintInequalities( std::deque< FootAbsolutePosition> 
   convex_hull_t ZMPFeasibilityEdges;
   convex_hull_t FootFeasibilityEdges;
 
+  //determine the current support angle
+  std::deque<FootAbsolutePosition>::iterator FAP_it;
+
   support_state_t & CurrentSupport = deqSupportStates.front();
 
-  double CurrentSupportAngle;
   //define the current support angle
   if( CurrentSupport.Foot==1 )
-    CurrentSupportAngle = LeftFootAbsolutePositions.back().theta*M_PI/180.0;
+    {
+      FAP_it = LeftFootAbsolutePositions.end();
+      FAP_it--;
+    }
   else
-    CurrentSupportAngle = RightFootAbsolutePositions.back().theta*M_PI/180.0;
+    {
+      FAP_it = RightFootAbsolutePositions.end();
+      FAP_it--;
+    }
+  double CurrentSupportAngle = FAP_it->theta*M_PI/180.0;
 
   //set current constraints
   FCALS->setVertices( FootFeasibilityEdges,
