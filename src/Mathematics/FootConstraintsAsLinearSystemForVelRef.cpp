@@ -258,62 +258,6 @@ FootConstraintsAsLinearSystemForVelRef::computeLinearSystem( convex_hull_t & Con
 }
 
 
-int
-FootConstraintsAsLinearSystemForVelRef::computeLinearSystem (convex_hull_t & ConvexHull,
-    double * D_x, double * D_y, double * d,
-    support_state_t & PrwSupport)
-{
-
-  double dx,dy,dc,x1,y1,x2,y2;
-  unsigned int nrows = ConvexHull.X.size();
-
-  for( unsigned int i=0;i<nrows-1;i++ )//first n-1 inequalities
-    {
-      y1 = ConvexHull.Y[i];
-      y2 = ConvexHull.Y[i+1];
-      x1 = ConvexHull.X[i];
-      x2 = ConvexHull.X[i+1];
-
-      dx = y1-y2;
-      dy = x2-x1;
-      dc = dx*x1+dy*y1;
-
-      //symmetrical constraints
-      dx = (double)PrwSupport.Foot*dx;
-      dy = (double)PrwSupport.Foot*dy;
-      dc = (double)PrwSupport.Foot*dc;
-
-      D_x[i] = dx; D_y[i]= dy;
-      d[i] = dc;
-    }
-
-  {
-    //Last inequality
-    unsigned int i = nrows-1;
-
-    y1 = ConvexHull.Y[i];
-    y2 = ConvexHull.Y[0];
-    x1 = ConvexHull.X[i];
-    x2 = ConvexHull.X[0];
-
-    dx = y1-y2;
-    dy = x2-x1;
-    dc = dx*x1+dy*y1;
-
-    //for symmetrical constraints
-    dx = (double)PrwSupport.Foot*dx;
-    dy = (double)PrwSupport.Foot*dy;
-    dc = (double)PrwSupport.Foot*dc;
-
-    D_x[i] = dx; D_y[i]= dy;
-    d[i] = dc;
-  }
-
-  return 0;
-
-}
-
-
 void
 FootConstraintsAsLinearSystemForVelRef::CallMethod( std::string &Method, std::istringstream &Args )
 {
