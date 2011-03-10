@@ -189,7 +189,7 @@ namespace PatternGeneratorJRL
   {
     struct coordinate_s
     {
-      boost_ublas::compressed_matrix<double, boost_ublas::row_major> D;
+      boost_ublas::compressed_matrix<double, boost_ublas::column_major> D;
     };
     struct coordinate_s x, y;
 
