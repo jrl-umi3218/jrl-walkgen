@@ -55,7 +55,7 @@ namespace PatternGeneratorJRL
     void previewOrientations(const double &Time,
 			     std::deque<double> &PreviewedSupportAngles,
 			     const COMState &TrunkState, COMState &TrunkStateT,
-			     double StepDuration, support_state_t CurrentSupport,
+			     const SupportFSM * SupportFSM, support_state_t CurrentSupport,
 			     std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
