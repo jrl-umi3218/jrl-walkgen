@@ -229,7 +229,7 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
 
 
 void
-OnLineFootTrajectoryGeneration::check_solution(double & X, double & Y,
+OnLineFootTrajectoryGeneration::check_solution(double X, double Y,
     const support_state_t & CurrentSupport, double CurrentTime)
 {
    if(CurrentSupport.StepsLeft>0)
@@ -288,7 +288,6 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double time, int Curr
         {
           LastSwingFootPosition = FinalLeftFootTraj_deq[CurrentIndex];
         }
-
       //Set parameters for current polynomial
       SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::X_AXIS,
                                                 UnlockedSwingPeriod-InterpolationTimePassed,FPx,

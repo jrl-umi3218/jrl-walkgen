@@ -437,7 +437,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       if (EndingPhase_==false)
         {
           // This should be done only during the transition EndingPhase=false -> EndingPhase=true
-          TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
+          TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_+QP_T_ * QP_N_;
           // Set the ZMP reference as very important.
           // It suppose to work because Gamma appears only during the non-constant
         }
