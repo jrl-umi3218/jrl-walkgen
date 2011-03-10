@@ -83,38 +83,34 @@ FootConstraintsAsLinearSystemForVelRef::initConvexHulls()
   double m_lxcoefsLeft[4] = { 1.0, 1.0, -1.0, -1.0};
   double m_lycoefsLeft[4] = { 1.0, -1.0, -1.0, 1.0};
 
-  m_FootPosEdges.leftDS.resize(5);
-  m_FootPosEdges.leftSS.resize(5);
+  m_FootPosCstr.left.resize(5);
   double LeftFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
   double LeftFPosEdgesY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
-  m_FootPosEdges.leftDS.set(LeftFPosEdgesX,LeftFPosEdgesY);
-  m_FootPosEdges.leftSS.set(LeftFPosEdgesX,LeftFPosEdgesY);
+  m_FootPosCstr.left.set(LeftFPosEdgesX,LeftFPosEdgesY);
 
-  m_FootPosEdges.rightDS.resize(5);
-  m_FootPosEdges.rightSS.resize(5);
+  m_FootPosCstr.right.resize(5);
   double RightFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
   double RightFPosEdgesY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
-  m_FootPosEdges.rightDS.set(RightFPosEdgesX,RightFPosEdgesY);
-  m_FootPosEdges.rightSS.set(RightFPosEdgesX,RightFPosEdgesY);
+  m_FootPosCstr.right.set(RightFPosEdgesX,RightFPosEdgesY);
 
-  m_ZMPPosEdges.leftDS.resize(4);
-  m_ZMPPosEdges.leftSS.resize(4);
-  m_ZMPPosEdges.rightDS.resize(4);
-  m_ZMPPosEdges.rightSS.resize(4);
+  m_ZMPPosCstr.leftDS.resize(4);
+  m_ZMPPosCstr.leftSS.resize(4);
+  m_ZMPPosCstr.rightDS.resize(4);
+  m_ZMPPosCstr.rightSS.resize(4);
   for( unsigned j=0;j<4;j++ )
     {
       //Left single support phase
-      m_ZMPPosEdges.leftSS.X[j] = m_lxcoefsLeft[j]*m_LeftFootSize.getHalfWidth();
-      m_ZMPPosEdges.leftSS.Y[j] = m_lycoefsLeft[j]*m_LeftFootSize.getHalfHeight();
+      m_ZMPPosCstr.leftSS.X[j] = m_lxcoefsLeft[j]*m_LeftFootSize.getHalfWidth();
+      m_ZMPPosCstr.leftSS.Y[j] = m_lycoefsLeft[j]*m_LeftFootSize.getHalfHeight();
       //Right single support phase
-      m_ZMPPosEdges.rightSS.X[j] = m_lxcoefsRight[j]*m_RightFootSize.getHalfWidth();
-      m_ZMPPosEdges.rightSS.Y[j] = m_lycoefsRight[j]*m_RightFootSize.getHalfHeight();
+      m_ZMPPosCstr.rightSS.X[j] = m_lxcoefsRight[j]*m_RightFootSize.getHalfWidth();
+      m_ZMPPosCstr.rightSS.Y[j] = m_lycoefsRight[j]*m_RightFootSize.getHalfHeight();
       //Left DS phase
-      m_ZMPPosEdges.leftDS.X[j] = m_lxcoefsLeft[j]*m_LeftFootSize.getHalfWidth();
-      m_ZMPPosEdges.leftDS.Y[j] = m_lycoefsLeft[j]*m_LeftFootSize.getHalfHeightDS()-m_DSFeetDistance/2.0;
+      m_ZMPPosCstr.leftDS.X[j] = m_lxcoefsLeft[j]*m_LeftFootSize.getHalfWidth();
+      m_ZMPPosCstr.leftDS.Y[j] = m_lycoefsLeft[j]*m_LeftFootSize.getHalfHeightDS()-m_DSFeetDistance/2.0;
       //Right DS phase
-      m_ZMPPosEdges.rightDS.X[j] = m_lxcoefsRight[j]*m_RightFootSize.getHalfWidth();
-      m_ZMPPosEdges.rightDS.Y[j] = m_lycoefsRight[j]*m_RightFootSize.getHalfHeightDS()+m_DSFeetDistance/2.0;
+      m_ZMPPosCstr.rightDS.X[j] = m_lxcoefsRight[j]*m_RightFootSize.getHalfWidth();
+      m_ZMPPosCstr.rightDS.Y[j] = m_lycoefsRight[j]*m_RightFootSize.getHalfHeightDS()+m_DSFeetDistance/2.0;
     }
 
   return 0;
@@ -157,40 +153,33 @@ FootConstraintsAsLinearSystemForVelRef::setFeetDimensions( CjrlHumanoidDynamicRo
 
 
 int
-FootConstraintsAsLinearSystemForVelRef::setVertices( convex_hull_t & ConvexHull,
-						     double & Orientation,
-						     support_state_t & PrwSupport,
-						     const int constraints_type)
+FootConstraintsAsLinearSystemForVelRef::setVertices( convex_hull_t & ZMPConstrVertices,
+						     convex_hull_t & FeetPosConstrVertices,
+						     double & ZMPConvHullAngle,
+						     double & FeetPosConvHullAngle,
+						     support_state_t & PrwSupport)
 {
 
-  edges_s * conv_hulls;
-  switch(constraints_type)
-  {
-  case ZMP_CONSTRAINTS:
-    conv_hulls = & m_ZMPPosEdges;
-    break;
-  case FOOT_CONSTRAINTS:
-    conv_hulls = & m_FootPosEdges;
-    break;
-
-  }
   //Prepare the computation of the convex hull
   if( PrwSupport.Foot == 1 )
     {
+      FeetPosConstrVertices = m_FootPosCstr.left;
       if( PrwSupport.Phase == 0 )
-        ConvexHull = conv_hulls->leftDS;
+	ZMPConstrVertices = m_ZMPPosCstr.leftDS;
       else
-        ConvexHull = conv_hulls->leftSS;
+	ZMPConstrVertices = m_ZMPPosCstr.leftSS;
     }
   else
     {
+      FeetPosConstrVertices = m_FootPosCstr.right;
       if( PrwSupport.Phase == 0 )
-        ConvexHull = conv_hulls->rightDS;
+	ZMPConstrVertices = m_ZMPPosCstr.rightDS;
       else
-        ConvexHull = conv_hulls->rightSS;
+	ZMPConstrVertices = m_ZMPPosCstr.rightSS;
     }
 
-  ConvexHull.rotate(Orientation);
+  ZMPConstrVertices.rotate(ZMPConvHullAngle);
+  FeetPosConstrVertices.rotate(FeetPosConvHullAngle);
 
   return 0;
 
