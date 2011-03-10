@@ -149,43 +149,12 @@ namespace PatternGeneratorJRL
   /// \brief Linear constraints
   struct linear_constraint_s
   {
-    boost_ublas::compressed_vector<double> A;
+    ublas::compressed_vector<double> A;
     double b;
   };
   typedef struct linear_constraint_s
   linear_constraint_t;
 
-  /// \brief Set of 2-dimensional point
-  struct convex_hull_s
-  {
-
-    MAL_VECTOR(X,double);
-    MAL_VECTOR(Y,double);
-
-    /// \brief Rotate the points around the origin by angle
-    ///
-    /// \param[in] angle
-    void rotate(const double & angle);
-
-    /// \brief Resize members to the desired number of points
-    ///
-    /// \param[in] size
-    void resize(const int & size);
-
-    /// \brief Set the point values
-    ///
-    /// \param[in] X
-    /// \param[in] Y
-    void set(const double * arrayX, const double * arrayY);
-
-    /// \brief Set all points to zero
-    void reset();
-
-    convex_hull_s(const int & size);
-    convex_hull_s();
-
-  };
-  typedef struct convex_hull_s convex_hull_t;
 }
 
 #endif /* _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_ */
