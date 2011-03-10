@@ -63,50 +63,34 @@ namespace PatternGeneratorJRL
     /// \param[out] Matrices
     /// \param[in] weight
     /// \param[in] objective
-    void setPonderation(double weight, int objective );
-
-    /// \brief Set the velocity reference from string
-    ///
-    /// \param[in] strm velocity reference string
-    inline void setReference(const reference_t & Ref)
-    {  Matrices_.Reference(Ref); };
-
-    /// \brief Set the support state
-    ///
-    /// \param[in] SupportState
-    inline void setSupportState(const support_state_t & SupportState)
-    { Matrices_.SupportState(SupportState); };
-
-    /// \brief Set the center of mass state
-    ///
-    /// \param[in] CoM
-    inline void setCoM(const com_t & CoM)
-    { Matrices_.CoM(CoM); };
+    void setPonderation( IntermedQPMat & Matrices, double weight, int objective ) const;
 
     /// \brief Preview support state for the whole preview period
     ///
     /// \param[in] Matrices
     /// \param[in] FSM
     /// \param[out] deqSupportStates
-    void previewSupportStates( const SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates );
+    void previewSupportStates(IntermedQPMat & Matrices,
+			      const SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates) const;
 
     /// \brief Compute the selection matrices
     ///
     /// \param[out] Matrices
     /// \param[in] deqSupportStates
-    void generateSelectionMatrices( const std::deque<support_state_t> & deqSupportStates);
+    void generateSelectionMatrices( IntermedQPMat & Matrices,
+				   const std::deque<support_state_t> & deqSupportStates) const;
 
     /// \brief Set the global reference from the local one and the orientation of the trunk frame
     /// for the whole preview window
     ///
     /// \param[out] Matrices
     /// \param[in] TrunkStateT State of the trunk at the end of the acceleration phase
-    void computeGlobalReference( const COMState & TrunkStateT );
+    void computeGlobalReference(IntermedQPMat & Matrices, const COMState & TrunkStateT) const;
 
     /// \brief Initialize the optimization programm
     ///
     /// \param[out] Matrices
-    void initializeMatrices();
+    void initialize(IntermedQPMat & Matrices) const;
 
 //    /// \brief Add one equality constraint to the queue of constraints
 //    ///
@@ -185,7 +169,7 @@ namespace PatternGeneratorJRL
     /// \param[in] AbsoluteRightFootPositions
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
-    void buildConstraints( QPProblem & Pb,
+    void buildConstraints(IntermedQPMat & Matrices, QPProblem & Pb,
 			  FootConstraintsAsLinearSystemForVelRef * FCALS,
 			  const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
 			  const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
@@ -196,14 +180,15 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Pb
     /// \param[in] Matrices
-    void buildInvariantPart(QPProblem & Pb);
+    void buildInvariantPart(QPProblem & Pb, const IntermedQPMat & Matrices);
 
     /// \brief Compute the objective matrices
     ///
     /// \param[in] Pb
     /// \param[in] Matrices
     /// \param[in] deqSupportStates
-    void updateProblem(QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq);
+    void updateProblem(QPProblem & Pb, const IntermedQPMat & Matrices,
+		       const std::deque<support_state_t> & deqSupportStates);
 	  
 
     //
@@ -214,12 +199,12 @@ namespace PatternGeneratorJRL
     /// \brief Initialize objective matrices
     ///
     /// \param[in] Objective
-    void initializeMatrices( IntermedQPMat::dynamics_t & Objective);
+    void initializeMatrices( IntermedQPMat::dynamics_t & Objective) const;
 
     /// \brief Initialize inequality matrices
     ///
     /// \param[in] Objective
-    void initializeMatrices( linear_inequality_t & Inequalities);
+    void initializeMatrices( linear_inequality_t & Inequalities) const;
 
     /// \brief Scaled product\f$ weight*M*M \f$
     void computeTerm(MAL_MATRIX (&weightMM, double),
@@ -248,8 +233,6 @@ namespace PatternGeneratorJRL
     //Private members
     //
   private:
-
-    IntermedQPMat Matrices_;
 
 
   };
