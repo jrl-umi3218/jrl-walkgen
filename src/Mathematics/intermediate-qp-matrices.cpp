@@ -78,8 +78,6 @@ IntermedQPMat::Objective( const int type ) const
     case JERK_MIN:
       return m_JerkMin;
     }
-  /* Default behavior return Mean velocity. */
-  return m_MeanVelocity;
 }
 IntermedQPMat::objective_variant_t &
 IntermedQPMat::Objective( const int type )
@@ -95,8 +93,6 @@ IntermedQPMat::Objective( const int type )
     case JERK_MIN:
       return m_JerkMin;
     }
-  /* Default behavior return Mean velocity. */
-  return m_MeanVelocity;
 }
 
 
@@ -112,8 +108,6 @@ IntermedQPMat::Dynamics( const int type ) const
     case JERK:
       return m_Jerk;
     }
-  /* Default behavior return velocity. */
-  return m_Velocity;
 }
 IntermedQPMat::dynamics_t &
 IntermedQPMat::Dynamics( const int type )
@@ -127,8 +121,6 @@ IntermedQPMat::Dynamics( const int type )
     case JERK:
       return m_Jerk;
     }
-  /*! Default behavior return velocity. */
-  return m_Velocity;
 }
 
 
@@ -144,10 +136,7 @@ IntermedQPMat::Inequalities( const int type ) const
     case INEQ_FEET:
       return m_IneqFeet;
     }
-  /* Default behavior return an inequality on CoP */
-  return m_IneqCoP;
 }
-
 linear_inequality_t &
 IntermedQPMat::Inequalities( const int type )
 {
@@ -160,12 +149,9 @@ IntermedQPMat::Inequalities( const int type )
       m_IneqCoM.clear();
       return m_IneqCoM;
     case INEQ_FEET:
-      m_IneqFeet.clear();
+      m_IneqCoM.clear();
       return m_IneqFeet;
     }
-  /* Default behavior return an inequality on CoP */
-  m_IneqCoP.clear();
-  return m_IneqCoP;
 }
 
 
@@ -194,8 +180,7 @@ IntermedQPMat::dumpObjective( const int aObjectiveType, std::ostream &aos )
 void
 IntermedQPMat::dumpState( std::ostream &aos )
 {
-  aos << "dumpState" << std::endl;
-  aos << "=========" << std::endl;
+
 }
 
 
