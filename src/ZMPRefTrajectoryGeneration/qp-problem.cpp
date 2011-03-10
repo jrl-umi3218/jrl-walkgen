@@ -100,35 +100,66 @@ void
 QPProblem_s::resizeAll(const int & NbVariables, const int & NbConstraints)
 {
 
-  resize(Q,2*n*n,2*NbVariables*NbVariables);  //Quadratic part of the objective function
-  resize(D,2*n,2*NbVariables);   // Linear part of the objective function
+  resize(war,2*lwar,2*(3*NbVariables*NbVariables/2+ 10*NbVariables  + 2*(NbConstraints+1) + 20000));
+  initialize(war,2*(3*NbVariables*NbVariables/2+ 10*NbVariables  + 2*(NbConstraints+1) + 20000));
+  resize(iwar,2*liwar,2*NbVariables); // The Cholesky decomposition is done internally.
+  initialize(iwar,2*NbVariables);
+  resize(U,2*mnn,2*(NbConstraints+2*NbVariables));
+  initialize(U,2*(NbConstraints+2*NbVariables));
 
   resize(DS,2*m,2*NbConstraints);
+  initialize(DS,2*NbConstraints);
   resize(DU,2*m*n,2*NbVariables*NbConstraints);
+  initialize(DU,2*NbVariables*NbConstraints);
+
+  resize(Q,2*n*n,2*NbVariables*NbVariables);  //Quadratic part of the objective function
+  initialize(Q,2*NbVariables*NbVariables);
+  resize(D,2*n,2*NbVariables);   // Linear part of the objective function
+  initialize(D,2*NbVariables);
 
   resize(XL,2*n,2*NbVariables);  // Lower bound on the solution.
-  initialize(XL,-1e8,2*NbVariables);
+  initialize(XL,2*NbVariables);
   resize(XU,2*n,2*NbVariables);  // Upper bound on the solution.
-  initialize(XU,1e8,2*NbVariables);
-
+  initialize(XU,2*NbVariables);
   resize(X,2*n,2*NbVariables);  // Solution of the problem.
+  initialize(X,2*NbVariables);
   resize(NewX,2*n,2*NbVariables);  // Solution of the problem.
-  resize(U,2*mnn,2*(NbConstraints+2*NbVariables));
+  initialize(NewX,2*NbVariables);
 
-  resize(war,2*lwar,2*(3*NbVariables*NbVariables/2+ 10*NbVariables  + 2*(NbConstraints+1) + 20000));
-  resize(iwar,2*liwar,2*NbVariables); // The Cholesky decomposition is done internally.
 }
 
 
-template <class type>
 int
-QPProblem_s::resize(type *& array, const int & old_size, const int & new_size)
+QPProblem_s::resize(double *& array, const int & old_size, const int & new_size)
 {
 
   try
     {
-      type * NewArray = new type[new_size];
-      initialize(NewArray,(type)0,new_size);
+      double * NewArray = new double[new_size];
+      for(int i = 0; i < old_size; i++)
+	NewArray[i] = array[i];
+
+      if (array!=0)
+	delete [] array;
+      array = NewArray;
+    }
+  catch (std::bad_alloc& ba)
+    {
+      std::cerr << "bad_alloc caught: " << ba.what() << std::endl;
+    }
+
+  return 0;
+
+}
+
+
+int
+QPProblem_s::resize(int *& array, const int & old_size, const int & new_size)
+{
+
+  try
+    {
+      int * NewArray = new int[new_size];
       for(int i = 0; i < old_size; i++)
 	NewArray[i] = array[i];
 
@@ -163,7 +194,9 @@ QPProblem_s::setDimensions(const int & NbVariables,
     {
       m_ReallocMarginConstr = 2*NbConstraints;
       resize(DS,2*m,2*NbConstraints);
+      initialize(DS,2*NbConstraints);
       resize(DU,2*m*n,2*NbVariables*NbConstraints);
+      initialize(DU,2*NbVariables*NbConstraints);
     }
 
   m = m_NbConstraints = NbConstraints;
@@ -182,15 +215,17 @@ QPProblem_s::setDimensions(const int & NbVariables,
 }
 
 
-template <class type>
 void
-QPProblem_s::initialize(type * array, type value, const int & size)
+QPProblem_s::initialize(double * array, const int & size)
 {
-  for(int i = 0; i<size; i++)
-    {
-      *array = value;
-      array++;
-    }
+  memset(array,0,size*sizeof(double));
+}
+
+
+void
+QPProblem_s::initialize(int * array, const int & size)
+{
+  memset(array,0,size*sizeof(int));
 }
 
 
