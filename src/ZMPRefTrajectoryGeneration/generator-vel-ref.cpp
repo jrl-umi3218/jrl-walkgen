@@ -429,9 +429,9 @@ GeneratorVelRef::buildConstraintsCoP(const linear_inequality_t & IneqCoP,
   Pb.addTerm(MV,QPProblem::VECTOR_DS,0);
 
   // +D*Vc*FP
-  computeTerm(MV, State.SupportState.x, IneqCoP.x.D, State.Vc);
+  computeTerm(MV, State.SupportFoot.x, IneqCoP.x.D, State.Vc);
   Pb.addTerm(MV,QPProblem::VECTOR_DS,0);
-  computeTerm(MV, State.SupportState.y, IneqCoP.y.D, State.Vc);
+  computeTerm(MV, State.SupportFoot.y, IneqCoP.y.D, State.Vc);
   Pb.addTerm(MV,QPProblem::VECTOR_DS,0);
 
 }
@@ -458,9 +458,9 @@ GeneratorVelRef::buildConstraintsFeet(const linear_inequality_t & IneqFeet,
 
   // +D*Vc_f*FP
   boost_ublas::vector<double> MV(NbConstraints*NbStepsPreviewed,false);
-  computeTerm(MV, State.SupportState.x, IneqFeet.x.D, State.Vc_f);
+  computeTerm(MV, State.SupportFoot.x, IneqFeet.x.D, State.Vc_f);
   Pb.addTerm(MV,QPProblem::VECTOR_DS,4*m_N);
-  computeTerm(MV, State.SupportState.y, IneqFeet.y.D, State.Vc_f);
+  computeTerm(MV, State.SupportFoot.y, IneqFeet.y.D, State.Vc_f);
   Pb.addTerm(MV,QPProblem::VECTOR_DS,4*m_N);
 
 }
@@ -580,9 +580,9 @@ GeneratorVelRef::updateProblem(QPProblem & Pb, const IntermedQPMat & Matrices,
   computeTerm(weightMTV, -COPCent.weight, State.VT, MV, COPCent.dyn->S, State.CoM.y);
   Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 2*m_N+NbStepsPreviewed);
   // +a*V'*Vc*x
-  computeTerm(weightMTV, COPCent.weight, State.VT, State.Vc, State.SupportState.x);
+  computeTerm(weightMTV, COPCent.weight, State.VT, State.Vc, State.SupportFoot.x);
   Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 2*m_N);
-  computeTerm(weightMTV, COPCent.weight, State.VT, State.Vc, State.SupportState.y);
+  computeTerm(weightMTV, COPCent.weight, State.VT, State.Vc, State.SupportFoot.y);
   Pb.addTerm(weightMTV, QPProblem::VECTOR_D, 2*m_N+NbStepsPreviewed);
 
 }

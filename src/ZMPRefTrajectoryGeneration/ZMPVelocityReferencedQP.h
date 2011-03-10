@@ -64,6 +64,9 @@ namespace PatternGeneratorJRL
     ~ZMPVelocityReferencedQP();
 
 
+    void initFeet();
+
+
     /*! Call method to handle the plugins (SimplePlugin interface) . */
     void CallMethod(std::string &Method, std::istringstream &strm);
 
@@ -82,8 +85,8 @@ namespace PatternGeneratorJRL
     */
     int InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 		   deque<COMState> & CoMStates,
-		   deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-		   deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+		   deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+		   deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
 		   FootAbsolutePosition & InitLeftFootAbsolutePosition,
 		   FootAbsolutePosition & InitRightFootAbsolutePosition,
 		   deque<RelativeFootPosition> &RelativeFootPositions,
@@ -95,8 +98,8 @@ namespace PatternGeneratorJRL
     void OnLine(double time,
 		deque<ZMPPosition> & FinalZMPPositions,
 		deque<COMState> & CoMStates,
-		deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-		deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
+		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
 
     int validateConstraints(double * & DS,double * &DU,
@@ -196,6 +199,9 @@ namespace PatternGeneratorJRL
     //Final optimization problem
     QPProblem m_Pb;
 
+    QPProblem_s::solution_t m_Result;
+
+    support_state_t m_CurrentSupport, m_PrwSupport;
 
     /*! \brief Cholesky decomposition of the initial objective function $Q$ */
     MAL_MATRIX(m_LQ,double);
@@ -231,13 +237,13 @@ namespace PatternGeneratorJRL
 
     void interpolateTrunkState(double time, int CurrentIndex,
                                const support_state_t & CurrentSupport,
-			       deque<COMState> & FinalCOMTraj_deq);
+			       deque<COMState> & FinalCOMStates);
 
     void interpolateFeetPositions(double time, int CurrentIndex,
                                   const support_state_t & CurrentSupport,
-                                  const deque<double> & PreviewedSupportAngles_deq,
-				  deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-				  deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
+                                  const deque<double> & PreviewedSupportAngles,
+				  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+				  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
     
   public:
@@ -261,20 +267,20 @@ namespace PatternGeneratorJRL
     void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
 		       std::deque<ZMPPosition> & FinalZMPPositions,
 		       std::deque<COMState> & COMStates,
-		       std::deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-		       std::deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
+		       std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+		       std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 		       bool EndSequence);
 
     int OnLineFootChange(double time,
 			 FootAbsolutePosition &aFootAbsolutePosition,
 			 deque<ZMPPosition> & FinalZMPPositions,
 			 deque<COMState> & CoMPositions,
-			 deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-			 deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
+			 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+			 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 			 StepStackHandler  *aStepStackHandler);
 
     void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-			      deque<COMState> &FinalCOMTraj_deq,
+			      deque<COMState> &FinalCOMStates,
 			      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			      deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
