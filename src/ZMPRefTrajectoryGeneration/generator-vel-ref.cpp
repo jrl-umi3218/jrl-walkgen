@@ -474,8 +474,11 @@ GeneratorVelRef::buildConstraints(IntermedQPMat & Matrices, QPProblem & Pb,
 				  std::deque<double> & PreviewedSupportAngles)
 {
 
-  //CoP constraints
+  Pb.clear(QPProblem::MATRIX_DU);
+  Pb.clear(QPProblem::VECTOR_DS);
+
   linear_inequality_t & IneqCoP = Matrices.Inequalities(IntermedQPMat::INEQ_COP);
+
   buildInequalitiesCoP(IneqCoP, FCALS,
 		       AbsoluteLeftFootPositions, AbsoluteRightFootPositions,
 		       deqSupportStates, PreviewedSupportAngles);
@@ -483,10 +486,11 @@ GeneratorVelRef::buildConstraints(IntermedQPMat & Matrices, QPProblem & Pb,
   IntermedQPMat::dynamics_t & CoP = Matrices.Dynamics(IntermedQPMat::COP);
   IntermedQPMat::state_variant_t & State = Matrices.State();
   int NbStepsPreviewed = deqSupportStates.back().StepNumber;
+
   buildConstraintsCoP(IneqCoP, CoP, State, NbStepsPreviewed, Pb);
 
-  //Feet constraints
   linear_inequality_t & IneqFeet = Matrices.Inequalities(IntermedQPMat::INEQ_FEET);
+
   buildInequalitiesFeet(IneqFeet, FCALS,
 			AbsoluteLeftFootPositions, AbsoluteRightFootPositions,
 			deqSupportStates, PreviewedSupportAngles);
@@ -499,6 +503,8 @@ GeneratorVelRef::buildConstraints(IntermedQPMat & Matrices, QPProblem & Pb,
 void 
 GeneratorVelRef::buildInvariantPart(QPProblem & Pb, IntermedQPMat & Matrices)
 {
+
+  Pb.clear(QPProblem::MATRIX_Q);
 
   boost_ublas::matrix<double> weightMTM(m_N,m_N,false);
 
