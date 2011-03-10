@@ -42,7 +42,6 @@
 #include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
-#include <privatepgtypes.h>
 
 namespace PatternGeneratorJRL
 {
@@ -216,7 +215,7 @@ namespace PatternGeneratorJRL
     ZMPDiscretization * m_ZMPD;
 
     /*! Uses a 2D LIPM to simulate the evolution of the robot. */
-    LinearizedInvertedPendulum2D m_CoM;
+    LinearizedInvertedPendulum2D * m_2DLIPM;
 
     /*! Uses a Finite State Machine to simulate the evolution of the support states. */
     SupportFSM * m_SupportFSM;
