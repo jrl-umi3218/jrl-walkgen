@@ -263,8 +263,10 @@ GeneratorVelRef::buildConstraintInequalities( std::deque< FootAbsolutePosition> 
     FootConstraintsAsLinearSystemForVelRef * FCALS)
 {
 
-  convex_hull_t ZMPFeasibilityEdges;
-  convex_hull_t FeetFeasibilityEdges;
+  std::vector<CH_Point> ZMPConstrVertices;
+  ZMPConstrVertices.resize(4);
+  std::vector<CH_Point> FeetPosConstrVertices;
+  FeetPosConstrVertices.resize(5);
 
   //determine the current support angle
   std::deque<FootAbsolutePosition>::iterator FAP_it;
@@ -288,9 +290,10 @@ GeneratorVelRef::buildConstraintInequalities( std::deque< FootAbsolutePosition> 
   double FPConvHullOrientation = CurrentSupportAngle;
 
   //set current constraints
-  FCALS->setVertices( ZMPFeasibilityEdges, FeetFeasibilityEdges,
+  FCALS->setVertices( ZMPConstrVertices, FeetPosConstrVertices,
                ZMPConvHullOrientation, FPConvHullOrientation,
                CurrentSupport );
+
 
   //set constraints for the whole preview window
   for( int i=1;i<=m_N;i++ )
@@ -298,7 +301,7 @@ GeneratorVelRef::buildConstraintInequalities( std::deque< FootAbsolutePosition> 
 
       support_state_t & PrwSupport = deqSupportStates[i];
       if( PrwSupport.StateChanged )
-        FCALS->setVertices( ZMPFeasibilityEdges, FeetFeasibilityEdges,
+        FCALS->setVertices( ZMPConstrVertices, FeetPosConstrVertices,
                      ZMPConvHullOrientation, FPConvHullOrientation, PrwSupport );
 
       if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 )
@@ -314,18 +317,18 @@ GeneratorVelRef::buildConstraintInequalities( std::deque< FootAbsolutePosition> 
           else
               FPConvHullOrientation = PreviewedSupportAngles[PrwSupport.StepNumber-2];
 
-          FCALS->setVertices( ZMPFeasibilityEdges, FeetFeasibilityEdges,
+          FCALS->setVertices( ZMPConstrVertices, FeetPosConstrVertices,
                        ZMPConvHullOrientation, FPConvHullOrientation, PrwSupport );
 
           linear_inequality_ff_t aLCIFP;
-          FCALS->computeLinearSystem( FeetFeasibilityEdges, aLCIFP.D, aLCIFP.Dc, PrwSupport );
+          FCALS->computeLinearSystem( FeetPosConstrVertices, aLCIFP.D, aLCIFP.Dc, PrwSupport );
           aLCIFP.StepNumber = PrwSupport.StepNumber;
           FeetPosInequalitiesDeque.push_back( aLCIFP );
           NbConstraints += MAL_MATRIX_NB_ROWS( aLCIFP.D );
         }
 
       linear_inequality_ff_t aLCI;
-      FCALS->computeLinearSystem( ZMPFeasibilityEdges, aLCI.D, aLCI.Dc, PrwSupport );
+      FCALS->computeLinearSystem( ZMPConstrVertices, aLCI.D, aLCI.Dc, PrwSupport );
       aLCI.StepNumber = PrwSupport.StepNumber;
       ZMPInequalitiesDeque.push_back( aLCI );
       NbConstraints += MAL_MATRIX_NB_ROWS( aLCI.D );

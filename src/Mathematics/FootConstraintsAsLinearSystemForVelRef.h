@@ -68,6 +68,38 @@ namespace PatternGeneratorJRL
     ~FootConstraintsAsLinearSystemForVelRef ();
     /// \}
 
+    /// \brief Build a queue of inequalities
+    ///
+    /// \param LeftFootAbsolutePositions used to get the current position of the left foot
+    /// \param RightFootAbsolutePositions used to get the current position of the right foot
+    /// \param ZMPInequalitiesDeque constraints on the ZMP relative to the foot centers
+    /// \param FeetPosInequalitiesDeque constraints on the feet placements relative to previous foot placements
+    /// \param RefVel the velocity reference
+    /// \param CurrentTime
+    /// \param QP_N number of instants in the preview horizon
+    /// \param SupportFSM the finite state machine for the preview of support states
+    /// \param CurrentSupport
+    /// \param PrwSupport output of SupportFSM
+    /// \param PreviewedSupportAngles deque of support orientations previewed previously
+    /// \param NbOfConstraints total number of previewed constraints
+    int buildConstraintInequalities (std::deque < FootAbsolutePosition >
+                                     &LeftFootAbsolutePositions,
+                                     std::deque < FootAbsolutePosition >
+                                     &RightFootAbsolutePositions,
+                                     std::deque <
+                                     linear_inequality_ff_t >
+                                     &ZMPInequalitiesDeque,
+                                     std::deque <
+                                     linear_inequality_ff_t >
+                                     &FeetPosInequalitiesDeque,
+                                     reference_t & RefVel,
+                                     double CurrentTime, double QP_N,
+                                     SupportFSM * SupportFSM,
+                                     support_state_t & CurrentSupport,
+                                     support_state_t & PrwSupport,
+                                     std::deque <
+                                     double >&PreviewedSupportAngles,
+                                     int &NbOfConstraints);
 
     /// \brief Adapt vertices to the support foot and its orientation
     ///
@@ -77,11 +109,11 @@ namespace PatternGeneratorJRL
     /// \param FeetPosConvHullOrientation
     /// \param PrwSupport previewed support state
     /// \return 0
-    int setVertices( convex_hull_t & ZMPConstrVertices,
-		     convex_hull_t & FeetPosConstrVertices,
-		     double & ZMPConvHullAngle,
-		     double & FeetPosConvHullAngle,
-		     support_state_t & PrwSupport);
+    int setVertices (std::vector < CH_Point > & ZMPConstrVertices,
+                     std::vector < CH_Point > & FeetPosConstrVertices,
+                     double & ZMPConvHullOrientation,
+                     double & FeetPosConvHullOrientation,
+                     support_state_t & PrwSupport);
 
     /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
     /// convex hull specified by a vector of points.
@@ -91,7 +123,7 @@ namespace PatternGeneratorJRL
     /// \param Dc right hand side of the inequalities
     /// \param PrwSupport previewed support state
     /// \return 0
-    int computeLinearSystem (convex_hull_t & ConvexHull,
+    int computeLinearSystem (std::vector < CH_Point > & aVecOfPoints,
                              MAL_MATRIX (&D, double),
                              MAL_MATRIX (&Dc, double),
                              support_state_t & PrwSupport);
@@ -131,30 +163,31 @@ namespace PatternGeneratorJRL
     //
   private:
     /// \brief Reference to the Humanoid Specificities.
-    CjrlHumanoidDynamicRobot * m_HS;
+      CjrlHumanoidDynamicRobot * m_HS;
+
+    /// \brief convex hull
+      std::vector < CH_Point > m_ConvexHullVertices;
+
 
     /// \brief Vertices defining the constraints on the feet positions
     double *m_FPosConstrVerticesX;
     double *m_FPosConstrVerticesY;
+    double m_LeftFPosConstrVerticesX[5];
+    double m_RightFPosConstrVerticesX[5];
+    double m_LeftFPosConstrVerticesY[5];
+    double m_RightFPosConstrVerticesY[5];
 
-    struct foot_pos_edges_s
-    {
-      convex_hull_t left, right;
-    };
-
-    struct foot_pos_edges_s m_FootPosCstr;
-
-    struct zmp_pos_edges_s
-    {
-      convex_hull_t
-      leftSS,
-	rightSS,
-	rightDS,
-	leftDS;
-    };
-
-    struct zmp_pos_edges_s m_ZMPPosCstr;
-
+    /// \brief Vertices defining the constraints on the zmp positions
+    double *m_ZMPConstrVerticesX;
+    double *m_ZMPConstrVerticesY;
+    double m_LeftZMPConstrVerticesX[4];
+    double m_RightZMPConstrVerticesX[4];
+    double m_LeftZMPConstrVerticesY[4];
+    double m_RightZMPConstrVerticesY[4];
+    double m_LeftDSZMPConstrVerticesX[4];
+    double m_RightDSZMPConstrVerticesX[4];
+    double m_LeftDSZMPConstrVerticesY[4];
+    double m_RightDSZMPConstrVerticesY[4];
 
     /// \brief Some coefficients
     ///
@@ -174,7 +207,11 @@ namespace PatternGeneratorJRL
     /// \brief Distance between the feet in the double support phase
     double m_DSFeetDistance;
 
-    CjrlFoot * m_RightFoot, * m_LeftFoot;
+    /// \brief Foot specificities.
+    CjrlFoot *m_RightFoot;
+    CjrlFoot *m_LeftFoot;
+
+    unsigned int m_FullDebug;
 
   };
 }
