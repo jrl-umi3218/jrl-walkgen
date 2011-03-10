@@ -229,39 +229,13 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
 
 
 void
-OnLineFootTrajectoryGeneration::check_solution(double X, double Y,
-    const support_state_t & CurrentSupport, double CurrentTime)
-{
-   if(CurrentSupport.StepsLeft>0)
-     {
-       if(fabs(X)-0.00001<0.0)
-         {
-           cout<<"Previewed foot x-position zero at time: "<<CurrentTime<<endl;
-         }
-       else if (CurrentSupport.TimeLimit-CurrentTime-QP_T_/2.0>0)
-         {//The landing position is yet determined by the solver because the robot finds himself still in the single support phase
-           //do nothing
-         }
-     }
-   else
-     {//The solver isn't responsible for the feet positions anymore
-      //The robot is supposed to stop always with the feet aligned in the lateral plane.
-       X = CurrentSupport.x + double(CurrentSupport.Foot)*sin(CurrentSupport.yaw)*FeetDistanceDS_;
-       Y = CurrentSupport.y - double(CurrentSupport.Foot)*cos(CurrentSupport.yaw)*FeetDistanceDS_;
-     }
-}
-
-
-void
-OnLineFootTrajectoryGeneration::interpolate_feet_positions(double time, int CurrentIndex,
+OnLineFootTrajectoryGeneration::interpolateFeetPositions(double time, int CurrentIndex,
                                                        const support_state_t & CurrentSupport,
                                                        double FPx, double FPy,
                                                        const deque<double> & PreviewedSupportAngles_deq,
                                                        deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
                                                        deque<FootAbsolutePosition> &FinalRightFootTraj_deq)
 {
-
-  check_solution( FPx, FPy, CurrentSupport, time);
 
   double LocalInterpolationTime = time-(CurrentSupport.TimeLimit-(m_TDouble+m_TSingle));
 

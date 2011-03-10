@@ -121,52 +121,63 @@ namespace PatternGeneratorJRL
     void setCoMPerturbationForce(istringstream &strm);
     /// \}
 
-    reference_t VelRef_;
+    reference_t m_VelRef;
 
   private:
 
     double m_RobotMass;
-    bool PerturbationOccured_;
+    bool m_PerturbationOccured;
+    double m_FeetDistanceDS;
     
     bool m_EndingPhase;
     double m_TimeToStopOnLineMode;
 
+    double m_FPx, m_FPy, m_FPtheta;
     double m_StartTime;
 
     double m_UpperTimeLimitToUpdate;
 
-    double TimeBuffer_;
+    double m_TimeBuffer;
 
-    /// \brief 2D LIPM to simulate the evolution of the robot.
-    LinearizedInvertedPendulum2D CoM_;
+    /*! Uses a ZMPDiscretization scheme to get the usual Kajita heuristic. */
+    ZMPDiscretization * m_ZMPD;
 
-    /// \brief Finite State Machine to simulate the evolution of the support states.
+    /*! Uses a 2D LIPM to simulate the evolution of the robot. */
+    LinearizedInvertedPendulum2D m_CoM;
+
+    /*! Uses a Finite State Machine to simulate the evolution of the support states. */
     SupportFSM * SupportFSM_;
 
-    /// \brief Deecoupled optimization problem to compute the evolution of feet angles.
-    OrientationsPreview * OrientPrw_;
+    /*! Deecoupled optimization problem to compute the evolution of feet angles. */
+    OrientationsPreview * m_OP;
 
-    /// \brief Generator of QP problem
-    GeneratorVelRef * VRQPGenerator_;
+    GeneratorVelRef * m_GenVR;
 
-    /// \brief Object creating linear inequalities relative to feet centers.
-    FootConstraintsAsLinearSystemForVelRef * RFC_;
+    /*! \brief Object creating Linear inequalities constraints
+      based on the foot position. Those constraints are *NOT* the
+      one put in the QP, but they are a necessary intermediate step. */
+    FootConstraintsAsLinearSystemForVelRef * m_fCALS;
 
-    /// \brief Standard polynomial trajectories for the feet.
+    /*! \brief Standard polynomial trajectories for the feet. */
     OnLineFootTrajectoryGeneration * OFTG_;
 
-    /// \brief Final optimization problem
-    QPProblem Problem_;
+    /*! Com height */
+    double m_ComHeight;
 
-    /// \brief Additional term on the acceleration of the CoM
-    MAL_VECTOR(PerturbationAcceleration_,double);
+    //Additional term on the acceleration of the CoM
+    MAL_VECTOR(m_PerturbationAcceleration,double);
 
-    /// \brief QP-sampling period
-    double QP_T_;
+    /*! Sampling of the QP. */
+    double m_QP_T;
 
-    /// \brief Nb samlings inside preview window
-    int QP_N_;
+    /*! Preview window */
+    int m_QP_N;
 
+    //Final optimization problem
+    QPProblem m_Pb;
+
+    /*! \brief Debugging variable: dump everything is set to 1 */
+    int m_FullDebug;
 
     /*! \brief Fast formulations mode. */
     unsigned m_FastFormulationMode;

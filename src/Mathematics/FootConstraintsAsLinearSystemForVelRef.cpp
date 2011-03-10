@@ -45,9 +45,10 @@ FootConstraintsAsLinearSystemForVelRef::FootConstraintsAsLinearSystemForVelRef( 
   SimplePlugin(aSPM)
 {
 
-  DSFeetDistance_ = 0.2;
-  SecurityMarginX_ = 0.04;
-  SecurityMarginY_ = 0.04;
+  //TODO: Hard coded values
+  m_DSFeetDistance = 0.2;
+  m_SecurityMarginX = 0.04;
+  m_SecurityMarginY = 0.04;
 
   setFeetDimensions( aHS );
 
@@ -77,43 +78,43 @@ int
 FootConstraintsAsLinearSystemForVelRef::initConvexHulls()
 {
 
-  double lxcoefsRight[4] = { 1.0, 1.0, -1.0, -1.0};
-  double lycoefsRight[4] = {-1.0, 1.0,  1.0, -1.0};
-  double lxcoefsLeft[4] = { 1.0, 1.0, -1.0, -1.0};
-  double lycoefsLeft[4] = { 1.0, -1.0, -1.0, 1.0};
+  double m_lxcoefsRight[4] = { 1.0, 1.0, -1.0, -1.0};
+  double m_lycoefsRight[4] = {-1.0, 1.0,  1.0, -1.0};
+  double m_lxcoefsLeft[4] = { 1.0, 1.0, -1.0, -1.0};
+  double m_lycoefsLeft[4] = { 1.0, -1.0, -1.0, 1.0};
 
-  FootPosEdges_.leftDS.resize(5);
-  FootPosEdges_.leftSS.resize(5);
+  m_FootPosEdges.leftDS.resize(5);
+  m_FootPosEdges.leftSS.resize(5);
   double LeftFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
   double LeftFPosEdgesY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
-  FootPosEdges_.leftDS.set(LeftFPosEdgesX,LeftFPosEdgesY);
-  FootPosEdges_.leftSS.set(LeftFPosEdgesX,LeftFPosEdgesY);
+  m_FootPosEdges.leftDS.set(LeftFPosEdgesX,LeftFPosEdgesY);
+  m_FootPosEdges.leftSS.set(LeftFPosEdgesX,LeftFPosEdgesY);
 
-  FootPosEdges_.rightDS.resize(5);
-  FootPosEdges_.rightSS.resize(5);
+  m_FootPosEdges.rightDS.resize(5);
+  m_FootPosEdges.rightSS.resize(5);
   double RightFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
   double RightFPosEdgesY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
-  FootPosEdges_.rightDS.set(RightFPosEdgesX,RightFPosEdgesY);
-  FootPosEdges_.rightSS.set(RightFPosEdgesX,RightFPosEdgesY);
+  m_FootPosEdges.rightDS.set(RightFPosEdgesX,RightFPosEdgesY);
+  m_FootPosEdges.rightSS.set(RightFPosEdgesX,RightFPosEdgesY);
 
-  ZMPPosEdges_.leftDS.resize(4);
-  ZMPPosEdges_.leftSS.resize(4);
-  ZMPPosEdges_.rightDS.resize(4);
-  ZMPPosEdges_.rightSS.resize(4);
+  m_ZMPPosEdges.leftDS.resize(4);
+  m_ZMPPosEdges.leftSS.resize(4);
+  m_ZMPPosEdges.rightDS.resize(4);
+  m_ZMPPosEdges.rightSS.resize(4);
   for( unsigned j=0;j<4;j++ )
     {
       //Left single support phase
-      ZMPPosEdges_.leftSS.X[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
-      ZMPPosEdges_.leftSS.Y[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeight();
+      m_ZMPPosEdges.leftSS.X[j] = m_lxcoefsLeft[j]*m_LeftFootSize.getHalfWidth();
+      m_ZMPPosEdges.leftSS.Y[j] = m_lycoefsLeft[j]*m_LeftFootSize.getHalfHeight();
       //Right single support phase
-      ZMPPosEdges_.rightSS.X[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
-      ZMPPosEdges_.rightSS.Y[j] = lycoefsRight[j]*RightFootSize_.getHalfHeight();
+      m_ZMPPosEdges.rightSS.X[j] = m_lxcoefsRight[j]*m_RightFootSize.getHalfWidth();
+      m_ZMPPosEdges.rightSS.Y[j] = m_lycoefsRight[j]*m_RightFootSize.getHalfHeight();
       //Left DS phase
-      ZMPPosEdges_.leftDS.X[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
-      ZMPPosEdges_.leftDS.Y[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeightDS()-DSFeetDistance_/2.0;
+      m_ZMPPosEdges.leftDS.X[j] = m_lxcoefsLeft[j]*m_LeftFootSize.getHalfWidth();
+      m_ZMPPosEdges.leftDS.Y[j] = m_lycoefsLeft[j]*m_LeftFootSize.getHalfHeightDS()-m_DSFeetDistance/2.0;
       //Right DS phase
-      ZMPPosEdges_.rightDS.X[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
-      ZMPPosEdges_.rightDS.Y[j] = lycoefsRight[j]*RightFootSize_.getHalfHeightDS()+DSFeetDistance_/2.0;
+      m_ZMPPosEdges.rightDS.X[j] = m_lxcoefsRight[j]*m_RightFootSize.getHalfWidth();
+      m_ZMPPosEdges.rightDS.Y[j] = m_lycoefsRight[j]*m_RightFootSize.getHalfHeightDS()+m_DSFeetDistance/2.0;
     }
 
   return 0;
@@ -128,26 +129,26 @@ FootConstraintsAsLinearSystemForVelRef::setFeetDimensions( CjrlHumanoidDynamicRo
 
   // Read feet specificities.
   double lHalfHeightInit,lHalfWidthInit;
-  CjrlFoot * RightFoot = aHS->rightFoot();
-  if (RightFoot==0)
+  m_RightFoot = aHS->rightFoot();
+  if (m_RightFoot==0)
     {
       cerr << "Problem with the reading of the right foot"<< endl;
       return 0;
     }
-  RightFoot->getSoleSize( lHalfWidthInit,lHalfHeightInit );
+  m_RightFoot->getSoleSize( lHalfWidthInit,lHalfHeightInit );
 
-  CjrlFoot * LeftFoot = aHS->leftFoot();
-  if (RightFoot==0)
+  m_LeftFoot = aHS->leftFoot();
+  if (m_RightFoot==0)
     {
       cerr << "Problem while reading of the left foot"<< endl;
       return 0;
     }
-  LeftFoot->getSoleSize( lHalfWidthInit,lHalfHeightInit );
+  m_LeftFoot->getSoleSize( lHalfWidthInit,lHalfHeightInit );
 
-  LeftFootSize_.setHalfSizeInit( lHalfWidthInit,lHalfHeightInit );
-  LeftFootSize_.setConstraints( SecurityMarginX_,SecurityMarginY_ );
-  RightFootSize_.setHalfSizeInit( lHalfWidthInit,lHalfHeightInit );
-  RightFootSize_.setConstraints( SecurityMarginX_,SecurityMarginY_ );
+  m_LeftFootSize.setHalfSizeInit( lHalfWidthInit,lHalfHeightInit );
+  m_LeftFootSize.setConstraints( m_SecurityMarginX,m_SecurityMarginY );
+  m_RightFootSize.setHalfSizeInit( lHalfWidthInit,lHalfHeightInit );
+  m_RightFootSize.setConstraints( m_SecurityMarginX,m_SecurityMarginY );
 
   return 0;
 
@@ -167,10 +168,10 @@ FootConstraintsAsLinearSystemForVelRef::setVertices( convex_hull_t & ConvexHull,
   switch(constraints_type)
     {
     case ZMP_CONSTRAINTS:
-      conv_hulls = & ZMPPosEdges_;
+      conv_hulls = & m_ZMPPosEdges;
       break;
     case FOOT_CONSTRAINTS:
-      conv_hulls = & FootPosEdges_;
+      conv_hulls = & m_FootPosEdges;
       break;
 
     }
@@ -325,13 +326,13 @@ FootConstraintsAsLinearSystemForVelRef::CallMethod( std::string &Method, std::is
 
       if (lCmd=="XY")
         {
-          Args >> SecurityMarginX_;
-          Args >> SecurityMarginY_;
+          Args >> m_SecurityMarginX;
+          Args >> m_SecurityMarginY;
 
-          RightFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_ );
-          LeftFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_ );
-          cout << "Security margin On X: " << SecurityMarginX_
-               << " Security margin On Y: " << SecurityMarginX_ << endl;
+          m_RightFootSize.setConstraints( m_SecurityMarginX, m_SecurityMarginY );
+          m_LeftFootSize.setConstraints( m_SecurityMarginX, m_SecurityMarginY );
+          cout << "Security margin On X: " << m_SecurityMarginX
+               << " Security margin On Y: " << m_SecurityMarginX << endl;
         }
     }
 

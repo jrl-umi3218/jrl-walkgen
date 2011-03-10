@@ -52,7 +52,7 @@
 namespace PatternGeneratorJRL
 {
 
-  /// \brief Generate a stack of inequalities relative to feet centers for the whole preview window.
+  /// \brief Generate a stack of inequality constraints for the whole preview window.
   class FootConstraintsAsLinearSystemForVelRef:public SimplePlugin
   {
 
@@ -148,7 +148,6 @@ namespace PatternGeneratorJRL
     // Private members
     //
   private:
-
     /// \brief Reference to the Humanoid Specificities.
     CjrlHumanoidDynamicRobot * m_HS;
 
@@ -159,22 +158,35 @@ namespace PatternGeneratorJRL
     struct edges_s
     {
       convex_hull_t
-        leftSS,
+      leftSS,
         rightSS,
         rightDS,
         leftDS;
     };
-    struct edges_s FootPosEdges_, ZMPPosEdges_;
+
+    struct edges_s m_FootPosEdges, m_ZMPPosEdges;
+
+
+
+    /// \brief Some coefficients
+    ///
+    /// For symmetrical constraints: The points of the left foot are counted clockwise.
+    double *m_lxcoefsRight;
+    double *m_lycoefsRight;
+    double *m_lxcoefsLeft;
+    double *m_lycoefsLeft;
 
     /// \brief Half foot size
-    FootHalfSize LeftFootSize_, RightFootSize_;
+    FootHalfSize m_LeftFootSize, m_RightFootSize;
 
     /// \brief Security margins (default 40 cm)
-    double SecurityMarginX_;
-    double SecurityMarginY_;
+    double m_SecurityMarginX;
+    double m_SecurityMarginY;
 
     /// \brief Distance between the feet in the double support phase
-    double DSFeetDistance_;
+    double m_DSFeetDistance;
+
+    CjrlFoot * m_RightFoot, * m_LeftFoot;
 
   };
 }
