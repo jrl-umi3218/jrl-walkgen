@@ -47,7 +47,7 @@ QPProblem_s::QPProblem_s():
   iout(0),ifail(0), iprint(0),
   lwar(0), liwar(0),
   Eps(0),
-  nbvariables_(0), nbconstraints_(0),nbeqconstraints_(0),
+  m_NbVariables(0), m_NbConstraints(0),m_NbEqConstraints(0),
   m_ReallocMarginVar(0), m_ReallocMarginConstr(0),
   scale_factor_(2)
 {
@@ -68,21 +68,47 @@ QPProblem_s::releaseMemory()
 }
 
 
+//void setNbVariables( int nb_variables )
+//{ if(nb_variables*m_NbConstraints > Q_.size_)
+//  {
+//    bool preserve = true;
+//    Q_.resize(2*nb_variables*nb_variables, nb_variables, nb_variables, preserve);
+//    D_.resize(2*nb_variables, nb_variables, preserve);
+//
+//    DS_.resize(2*m_NbConstraints,2*nb_constraints);
+//    resize(DU_.array_,2*m*n,2*nb_variables*nb_constraints);
+//
+//    resize(XL_.array_,2*n,2*nb_variables);  // Lower bound on the solution.
+//    initialize(XL_.array_,2*nb_variables,-1e8);
+//    resize(XU_.array_,2*n,2*nb_variables);  // Upper bound on the solution.
+//    initialize(XU_.array_,2*nb_variables,1e8);
+//
+//    resize(X_.array_,2*n,2*nb_variables);  // Solution of the problem.
+//    resize(U_.array_,2*mnn,2*(nb_constraints+2*nb_variables));
+//
+//    resize(war_.array_,2*lwar,2*(3*nb_variables*nb_variables/2+ 10*nb_variables  + 2*(nb_constraints+1) + 20000));
+//    resize(iwar_.array_,2*liwar,2*nb_variables); // The Cholesky decomposition is done internally.
+//
+//    m_NbVariables = n = nb_variables;
+//  }
+//}
+
+
 void
 QPProblem_s::resizeAll()
 {
-  Q_.resize(2*nbvariables_, 2*nbvariables_,true);
-  D_.resize(2*nbvariables_, 1,true);
-  DU_.resize(2*nbconstraints_, 2*nbvariables_,true);
-  DS_.resize(2*nbconstraints_, 1,true);
-  XL_.resize(2*nbvariables_, 1,true);
+  Q_.resize(2*m_NbVariables, 2*m_NbVariables,true);
+  D_.resize(2*m_NbVariables, 1,true);
+  DU_.resize(2*m_NbConstraints, 2*m_NbVariables,true);
+  DS_.resize(2*m_NbConstraints, 1,true);
+  XL_.resize(2*m_NbVariables, 1,true);
   XL_.fill(-1e8);
-  XU_.resize(2*nbvariables_, 1,true);
+  XU_.resize(2*m_NbVariables, 1,true);
   XU_.fill(1e8);
-  U_.resize(2*(nbconstraints_+2*nbvariables_), 1,true);
-  X_.resize(2*nbvariables_, 1,true);
-  war_.resize(2*(3*nbvariables_*nbvariables_/2+10*nbvariables_+2*(nbconstraints_+1)+20000), 1,true);
-  iwar_.resize(2*nbvariables_, 1,true);
+  U_.resize(2*(m_NbConstraints+2*m_NbVariables), 1,true);
+  X_.resize(2*m_NbVariables, 1,true);
+  war_.resize(2*(3*m_NbVariables*m_NbVariables/2+10*m_NbVariables+2*(m_NbConstraints+1)+20000), 1,true);
+  iwar_.resize(2*m_NbVariables, 1,true);
 }
 
 
@@ -117,6 +143,91 @@ QPProblem_s::clear( int type )
 }
 
 
+void QPProblem_s::clear( int type,
+			 int row, int col,
+			 int nb_rows, int nb_cols )
+{
+
+  double * array;
+  int
+    max_rows, max_cols,
+    n_rows,n_cols;
+
+  switch(type)
+    {
+    case MATRIX_Q:
+      array = Q_.array_;
+      max_rows = n_rows = n;
+      max_cols = n;
+      break;
+
+    case MATRIX_DU:
+      array = DU_.array_;
+      max_rows = m_NbConstraints;
+      max_cols = m_NbVariables;
+      n_rows = m_NbConstraints+1;
+      n_cols = m_NbVariables;
+      break;
+    }
+
+  if(row + nb_rows > max_rows || col + nb_cols > max_cols)
+    {
+      //throw sth. like:
+      std::cout<<"Matrix "<<type<<" bounds violated in clear(): "<<std::endl<<
+        "max_rows: "<<max_rows<<std::endl<<
+        "max_cols: "<<max_cols<<std::endl<<
+        "req. cols: "<<row + nb_rows<<
+        "req. rows: "<<col + nb_cols<<std::endl;
+    }
+
+  for( int i = row;i < row+nb_rows; i++)
+    for( int j = col;j < nb_cols; j++)
+      array[row+i+(col+j)*n_rows] = 0.0;
+
+}
+
+
+void
+QPProblem_s::setDimensions( int nb_variables,
+			    int nb_constraints,
+			    int nb_eq_constraints )
+{
+//
+//  // If all the dimensions are less than
+//  // the current ones no need to reallocate.
+//  if (nb_variables > m_ReallocMarginVar)
+//    {
+//      m_ReallocMarginVar = 2*nb_variables;
+//      resizeAll(nb_variables, nb_constraints);
+//    }
+//  if (nb_constraints > m_ReallocMarginConstr)
+//    {
+//      m_ReallocMarginConstr = 2*nb_constraints;
+//      resize(DS_.array_,2*m,2*nb_constraints);
+//      resize(DU_.array_,2*m*n,2*nb_variables*nb_constraints);
+//    }
+//
+//  m = m_NbConstraints = nb_constraints;
+//  me = nb_eq_constraints;
+//  mmax = m+1;
+//  n = m_NbVariables = nb_variables;
+//  nmax = n;
+//  mnn = m+2*n;
+//
+//  iout = 0;
+//  iprint = 1;
+//  lwar = 3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
+//  liwar = n;
+//  Eps = 1e-8;
+//
+//  //      if (m_FastFormulationMode==QLDANDLQ)
+//   //        m_Pb.iwar_.array_[0]=0;
+//   //      else
+//  iwar_.array_[0]=1;
+
+}
+
+
 void
 QPProblem_s::solve( int solver, solution_t & result )
 {
@@ -124,10 +235,10 @@ QPProblem_s::solve( int solver, solution_t & result )
     {
     case QLD:
 
-       m = nbconstraints_;
-       me = nbeqconstraints_;
+       m = m_NbConstraints;
+       me = m_NbEqConstraints;
        mmax = m+1;
-       n = nbvariables_;
+       n = m_NbVariables;
        nmax = n;
        mnn = m+2*n;
 
@@ -188,28 +299,38 @@ QPProblem_s::addTerm( const MAL_MATRIX (&Mat, double), int type,
     {
     case MATRIX_Q:
       pArray_s = &Q_;
-      nbvariables_ = (col+Mat.size2()>nbvariables_) ? col+Mat.size2() : nbvariables_;
+      m_NbVariables = (col+Mat.size2()>m_NbVariables) ? col+Mat.size2() : m_NbVariables;
       break;
 
     case MATRIX_DU:
       pArray_s = &DU_;
-      nbconstraints_ = (row+Mat.size1()>nbconstraints_) ? row+Mat.size1() : nbconstraints_;
-      nbvariables_ = (col+Mat.size2()>nbvariables_) ? col+Mat.size2() : nbvariables_;
+      m_NbConstraints = (row+Mat.size1()>m_NbConstraints) ? row+Mat.size1() : m_NbConstraints;
+      m_NbVariables = (col+Mat.size2()>m_NbVariables) ? col+Mat.size2() : m_NbVariables;
       break;
     }
 
-  if(nbvariables_ > pArray_s->ncols_ )
+  if(row + Mat.size1() > pArray_s->nrows_ || col + Mat.size2() > pArray_s->ncols_ )
+    {
+      //throw sth. like:
+      std::cout<<"Matrix "<<pArray_s->id_<<" bounds violated in addTerm: "<<std::endl<<
+        " max_rows: "<<pArray_s->nrows_<<std::endl<<
+        " max_cols: "<<pArray_s->ncols_<<std::endl<<
+        " req. cols: "<<row + Mat.size1()<<std::endl<<
+        " req. rows: "<<col + Mat.size2()<<std::endl;
+    }
+
+  if(m_NbVariables > pArray_s->ncols_ )
     {
       resizeAll();
     }
 
-  if( nbconstraints_ > DU_.nrows_-1 )
+  if( m_NbConstraints > DU_.nrows_-1 )
     {
-      DU_.resize(2*nbconstraints_, 2*nbvariables_,true);
-      DS_.resize(2*nbconstraints_,1,true);
+      DU_.resize(2*m_NbConstraints, 2*m_NbVariables,true);
+      DS_.resize(2*m_NbConstraints,1,true);
 
-      U_.resize(2*(nbconstraints_+2*nbvariables_), 1,true);
-      war_.resize(2*(3*nbvariables_*nbvariables_/2+10*nbvariables_+2*(nbconstraints_+1)+20000), 1,true);
+      U_.resize(2*(m_NbConstraints+2*m_NbVariables), 1,true);
+      war_.resize(2*(3*m_NbVariables*m_NbVariables/2+10*m_NbVariables+2*(m_NbConstraints+1)+20000), 1,true);
     }
 
   for( int i = 0;i < MAL_MATRIX_NB_ROWS(Mat); i++)
@@ -232,26 +353,34 @@ void QPProblem_s::addTerm( const MAL_VECTOR (&Vec, double), int type,
     {
     case VECTOR_D:
       pArray_s = &D_;
-      nbvariables_ = (row+Vec.size()>nbvariables_) ? row+Vec.size() : nbvariables_;
+      m_NbVariables = (row+Vec.size()>m_NbVariables) ? row+Vec.size() : m_NbVariables;
       break;
 
     case VECTOR_XL:
       pArray_s = &XL_;
-      nbvariables_ = (row+Vec.size()>nbvariables_) ? row+Vec.size() : nbvariables_;
+      m_NbVariables = (row+Vec.size()>m_NbVariables) ? row+Vec.size() : m_NbVariables;
       break;
 
     case VECTOR_XU:
       pArray_s = &XU_;
-      nbvariables_ = (row+Vec.size()>nbvariables_) ? row+Vec.size() : nbvariables_;
+      m_NbVariables = (row+Vec.size()>m_NbVariables) ? row+Vec.size() : m_NbVariables;
       break;
 
     case VECTOR_DS:
       pArray_s = &DS_;
-      nbconstraints_ = (row+Vec.size()>nbconstraints_) ? row+Vec.size() : nbconstraints_;
+      m_NbConstraints = (row+Vec.size()>m_NbConstraints) ? row+Vec.size() : m_NbConstraints;
       break;
     }
 
-  if(nbvariables_ > D_.nrows_ )
+  if(row + Vec.size() > pArray_s->nrows_)
+    {
+      //throw sth. like:
+      std::cout<<"Vector "<<pArray_s->id_<<" bounds violated in addTerm: "<<std::endl<<
+        "max_rows: "<<pArray_s->nrows_<<std::endl<<
+        "required: "<<row + Vec.size()<<std::endl;
+    }
+
+  if(m_NbVariables > D_.nrows_ )
     {
       resizeAll();
     }
@@ -326,41 +455,41 @@ QPProblem_s::dump( int type, std::ostream & aos)
   switch(type)
     {
     case MATRIX_Q:
-      lnbrows = lnbcols = nbvariables_ ;
+      lnbrows = lnbcols = m_NbVariables ;
       array = Q_dense_.array_;
       Name = "Q";
       break;
 
     case MATRIX_DU:
-      lnbrows = nbconstraints_+1;
-      lnbcols = nbvariables_;
+      lnbrows = m_NbConstraints+1;
+      lnbcols = m_NbVariables;
       array = DU_dense_.array_;
       Name = "DU";
       break;
 
     case VECTOR_D:
-      lnbrows = nbvariables_;
+      lnbrows = m_NbVariables;
       lnbcols = 1 ;
       array = D_.array_;
       Name = "D";
       break;
 
     case VECTOR_XL:
-      lnbrows = nbvariables_;
+      lnbrows = m_NbVariables;
       lnbcols = 1;
       array = XL_.array_;
       Name = "XL";
       break;
 
     case VECTOR_XU:
-      lnbrows = nbvariables_;
+      lnbrows = m_NbVariables;
       lnbcols=1;
       array = XU_.array_;
       Name = "XU";
       break;
 
     case VECTOR_DS:
-      lnbrows = nbconstraints_+1;
+      lnbrows = m_NbConstraints+1;
       lnbcols= 1;
       array = DS_.array_;
       Name = "DS";
