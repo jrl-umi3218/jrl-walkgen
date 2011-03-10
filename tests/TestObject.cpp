@@ -180,7 +180,7 @@ namespace PatternGeneratorJRL
 	      "ZMP Y (world ref.)" ,
 	      "Waist X (world ref.)" ,
 	      "Waist Y (world ref.)" };
-	  for(unsigned i=0;i<26;i++)
+	  for(unsigned int i=0;i<26;i++)
 	    aof << i+1 << ". " <<Titles[i] <<std::endl;
 
 	  aof.close();
@@ -302,7 +302,7 @@ namespace PatternGeneratorJRL
       /*! Open and reset appropriatly the debug files. */
       prepareDebugFiles();
 
-      for (unsigned lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
+      for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
         {
 	  os << "<===============================================================>"<<endl;
 	  os << "Test iteration nb: " << lNbIt+1 << endl;
