@@ -33,18 +33,18 @@ using namespace PatternGeneratorJRL;
 
 MPCTrajectoryGeneration::MPCTrajectoryGeneration(SimplePluginManager *lSPM)
   : SimplePlugin(lSPM)
-  , Tsingle_(0.)
-  , Tdble_(0.)
-  , T_Ctr_(0.)
-  , T_Prw_(0.)
-  , PreviewControlTime_(0.)
-  , StepHeight_(0.)
-  , CurrentTime_(0.)
-  , OnLineMode_(false)
-  , CoMHeight_(0.)
-  , SecurityMargin_(0.)
-  , ModulationSupportCoefficient_(0.)
-  , Omega_(0.)
+  , m_Tsingle(0.)
+  , m_Tdble(0.)
+  , m_T_Ctr(0.)
+  , m_T_Prw(0.)
+  , m_PreviewControlTime(0.)
+  , m_StepHeight(0.)
+  , m_CurrentTime(0.)
+  , m_OnLineMode(false)
+  , m_CoMHeight(0.)
+  , m_SecurityMargin(0.)
+  , m_ModulationSupportCoefficient(0.)
+  , m_Omega(0.)
 {
 
   std::string aMethodName[6] = 
@@ -75,37 +75,37 @@ void MPCTrajectoryGeneration::CallMethod(std::string & Method, std::istringstrea
   ODEBUG("Calling me (" << this << ") with Method: " << Method);
   if (Method==":omega")
     {
-      strm >> Omega_;
+      strm >> m_Omega;
     }
   else if (Method==":stepheight")
     {
-      strm >> StepHeight_;
-      ODEBUG("Value of stepheight " << StepHeight_ << " this:" << this);
+      strm >> m_StepHeight;
+      ODEBUG("Value of stepheight " << m_StepHeight << " this:" << this);
     }
   else if (Method==":singlesupporttime")
     {
-      strm >> Tsingle_;
-      ODEBUG(":singlesupporttime " << Tsingle_ << " ID: " << this);
+      strm >> m_Tsingle;
+      ODEBUG(":singlesupporttime " << m_Tsingle << " ID: " << this);
     }
   else if (Method==":doublesupporttime")
     {
-      strm >> Tdble_;
-      ODEBUG(":doublesupporttime " << Tdble_ << " ID: " << this);
+      strm >> m_Tdble;
+      ODEBUG(":doublesupporttime " << m_Tdble << " ID: " << this);
     }
   else if (Method==":comheight")
     {
-      strm >> CoMHeight_;
+      strm >> m_CoMHeight;
       ODEBUG(":comheight" << m_ComHeight << " ID: " << this);
     }
   else if (Method==":samplingperiod")
     {
-      strm >> T_Prw_;
-      ODEBUG(":samplingperiod" << T_Prw_ << " ID: " << this);
+      strm >> m_T_Prw;
+      ODEBUG(":samplingperiod" << m_T_Prw << " ID: " << this);
     }
   
 }
 
 bool MPCTrajectoryGeneration::GetOnLineMode()
 {
-  return OnLineMode_;
+  return m_OnLineMode;
 }

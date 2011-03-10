@@ -125,13 +125,15 @@ namespace PatternGeneratorJRL
 
   private:
 
-    double RobotMass_;
+    double m_RobotMass;
     bool PerturbationOccured_;
     
-    bool EndingPhase_;
-    double TimeToStopOnLineMode_;
+    bool m_EndingPhase;
+    double m_TimeToStopOnLineMode;
 
-    double UpperTimeLimitToUpdate_;
+    double m_StartTime;
+
+    double m_UpperTimeLimitToUpdate;
 
     double TimeBuffer_;
 

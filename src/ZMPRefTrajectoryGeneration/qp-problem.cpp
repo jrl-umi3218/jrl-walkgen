@@ -43,11 +43,13 @@
 using namespace PatternGeneratorJRL;
 
 QPProblem_s::QPProblem_s():
-  m_(0),me_(0),mmax_(0), n_(0), nmax_(0), mnn_(0),
-  iout_(0),ifail_(0), iprint_(0),
-  lwar_(0), liwar_(0),
-  Eps_(0),
-  NbVariables_(0), NbConstraints_(0),NbEqConstraints_(0)
+  m(0),me(0),mmax(0), n(0), nmax(0), mnn(0),
+  iout(0),ifail(0), iprint(0),
+  lwar(0), liwar(0),
+  Eps(0),
+  nbvariables_(0), nbconstraints_(0),nbeqconstraints_(0),
+  m_ReallocMarginVar(0), m_ReallocMarginConstr(0),
+  scale_factor_(2)
 {
 
 }
@@ -55,6 +57,7 @@ QPProblem_s::QPProblem_s():
 
 QPProblem_s::~QPProblem_s()
 {
+
   release_memory();
 }
 
@@ -68,18 +71,18 @@ QPProblem_s::release_memory()
 void
 QPProblem_s::resize_all()
 {
-  Q_.resize(2*NbVariables_, 2*NbVariables_,true);
-  D_.resize(2*NbVariables_, 1,true);
-  DU_.resize(2*NbConstraints_, 2*NbVariables_,true);
-  DS_.resize(2*NbConstraints_, 1,true);
-  XL_.resize(2*NbVariables_, 1,true);
+  Q_.resize(2*nbvariables_, 2*nbvariables_,true);
+  D_.resize(2*nbvariables_, 1,true);
+  DU_.resize(2*nbconstraints_, 2*nbvariables_,true);
+  DS_.resize(2*nbconstraints_, 1,true);
+  XL_.resize(2*nbvariables_, 1,true);
   XL_.fill(-1e8);
-  XU_.resize(2*NbVariables_, 1,true);
+  XU_.resize(2*nbvariables_, 1,true);
   XU_.fill(1e8);
-  U_.resize(2*(NbConstraints_+2*NbVariables_), 1,true);
-  X_.resize(2*NbVariables_, 1,true);
-  war_.resize(2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000), 1,true);
-  iwar_.resize(2*NbVariables_, 1,true);
+  U_.resize(2*(nbconstraints_+2*nbvariables_), 1,true);
+  X_.resize(2*nbvariables_, 1,true);
+  war_.resize(2*(3*nbvariables_*nbvariables_/2+10*nbvariables_+2*(nbconstraints_+1)+20000), 1,true);
+  iwar_.resize(2*nbvariables_, 1,true);
 }
 
 
@@ -119,48 +122,48 @@ QPProblem_s::solve( int solver, solution_t & result )
     {
     case QLD:
 
-       m_ = NbConstraints_;
-       me_ = NbEqConstraints_;
-       mmax_ = m_+1;
-       n_ = NbVariables_;
-       nmax_ = n_;
-       mnn_ = m_+2*n_;
+       m = nbconstraints_;
+       me = nbeqconstraints_;
+       mmax = m+1;
+       n = nbvariables_;
+       nmax = n;
+       mnn = m+2*n;
 
-       iout_ = 0;
-       iprint_ = 1;
-       lwar_ = 3*nmax_*nmax_/2+ 10*nmax_  + 2*mmax_ + 20000;
-       liwar_ = n_;
-       Eps_ = 1e-8;
+       iout = 0;
+       iprint = 1;
+       lwar = 3*nmax*nmax/2+ 10*nmax  + 2*mmax + 20000;
+       liwar = n;
+       Eps = 1e-8;
 
        //      if (m_FastFormulationMode==QLDANDLQ)
         //        m_Pb.iwar_.array_[0]=0;
         //      else
        iwar_.array_[0]=1;
 
-       Q_.stick_together(Q_dense_.array_,n_,n_);
-       DU_.stick_together(DU_dense_.array_,mmax_,n_);
+       Q_.stick_together(Q_dense_.array_,n,n);
+       DU_.stick_together(DU_dense_.array_,mmax,n);
 
-      ql0001_(&m_, &me_, &mmax_, &n_, &nmax_, &mnn_,
+      ql0001_(&m, &me, &mmax, &n, &nmax, &mnn,
               Q_dense_.array_, D_.array_, DU_dense_.array_, DS_.array_, XL_.array_, XU_.array_,
-              X_.array_, U_.array_, &iout_, &ifail_, &iprint_,
-              war_.array_, &lwar_, iwar_.array_, &liwar_, &Eps_);
+              X_.array_, U_.array_, &iout, &ifail, &iprint,
+              war_.array_, &lwar, iwar_.array_, &liwar, &Eps);
 
-      result.resize(n_,m_);
+      result.resize(n,m);
 
 
-      for(int i = 0; i < n_; i++)
+      for(int i = 0; i < n; i++)
         {
           result.Solution_vec(i) = X_.array_[i];
-          result.LBoundsLagr_vec(i) = U_.array_[m_+i];
-          result.UBoundsLagr_vec(i) = U_.array_[m_+n_+i];
+          result.LBoundsLagr_vec(i) = U_.array_[m+i];
+          result.UBoundsLagr_vec(i) = U_.array_[m+n+i];
         }
-      for(int i = 0; i < m_; i++)
+      for(int i = 0; i < m; i++)
         {
           result.ConstrLagr_vec(i) = U_.array_[i];
         }
 
-      result.Fail = ifail_;
-      result.Print = iprint_;
+      result.Fail = ifail;
+      result.Print = iprint;
 
     }
 
@@ -183,28 +186,28 @@ QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), int type,
     {
     case MATRIX_Q:
       pArray_s = &Q_;
-      NbVariables_ = (col+(int)Mat.size2()>NbVariables_) ? col+(int)Mat.size2() : NbVariables_;
+      nbvariables_ = (col+(int)Mat.size2()>nbvariables_) ? col+(int)Mat.size2() : nbvariables_;
       break;
 
     case MATRIX_DU:
       pArray_s = &DU_;
-      NbConstraints_ = (row+(int)Mat.size1()>NbConstraints_) ? row+(int)Mat.size1() : NbConstraints_;
-      NbVariables_ = (col+(int)Mat.size2()>NbVariables_) ? col+(int)Mat.size2() : NbVariables_;
+      nbconstraints_ = (row+(int)Mat.size1()>nbconstraints_) ? row+(int)Mat.size1() : nbconstraints_;
+      nbvariables_ = (col+(int)Mat.size2()>nbvariables_) ? col+(int)Mat.size2() : nbvariables_;
       break;
     }
 
-  if(NbVariables_ > pArray_s->ncols_ )
+  if(nbvariables_ > pArray_s->ncols_ )
     {
       resize_all();
     }
 
-  if( NbConstraints_ > DU_.nrows_-1 )
+  if( nbconstraints_ > DU_.nrows_-1 )
     {
-      DU_.resize(2*NbConstraints_, 2*NbVariables_,true);
-      DS_.resize(2*NbConstraints_,1,true);
+      DU_.resize(2*nbconstraints_, 2*nbvariables_,true);
+      DS_.resize(2*nbconstraints_,1,true);
 
-      U_.resize(2*(NbConstraints_+2*NbVariables_), 1,true);
-      war_.resize(2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000), 1,true);
+      U_.resize(2*(nbconstraints_+2*nbvariables_), 1,true);
+      war_.resize(2*(3*nbvariables_*nbvariables_/2+10*nbvariables_+2*(nbconstraints_+1)+20000), 1,true);
     }
 
   for( int i = 0;i < (int)MAL_MATRIX_NB_ROWS(Mat); i++)
@@ -227,26 +230,26 @@ void QPProblem_s::add_term( const MAL_VECTOR (&Vec, double), int type,
     {
     case VECTOR_D:
       pArray_s = &D_;
-      NbVariables_ = (row+(int)Vec.size()>NbVariables_) ? row+(int)Vec.size() : NbVariables_;
+      nbvariables_ = (row+(int)Vec.size()>nbvariables_) ? row+(int)Vec.size() : nbvariables_;
       break;
 
     case VECTOR_XL:
       pArray_s = &XL_;
-      NbVariables_ = (row+(int)Vec.size()>NbVariables_) ? row+(int)Vec.size() : NbVariables_;
+      nbvariables_ = (row+(int)Vec.size()>nbvariables_) ? row+(int)Vec.size() : nbvariables_;
       break;
 
     case VECTOR_XU:
       pArray_s = &XU_;
-      NbVariables_ = (row+(int)Vec.size()>NbVariables_) ? row+(int)Vec.size() : NbVariables_;
+      nbvariables_ = (row+(int)Vec.size()>nbvariables_) ? row+(int)Vec.size() : nbvariables_;
       break;
 
     case VECTOR_DS:
       pArray_s = &DS_;
-      NbConstraints_ = (row+(int)Vec.size()>NbConstraints_) ? row+(int)Vec.size() : NbConstraints_;
+      nbconstraints_ = (row+(int)Vec.size()>nbconstraints_) ? row+(int)Vec.size() : nbconstraints_;
       break;
     }
 
-  if(NbVariables_ > D_.nrows_ )
+  if(nbvariables_ > D_.nrows_ )
     {
       resize_all();
     }
@@ -297,17 +300,17 @@ QPProblem_s::solution_t::print(std::ostream & aos)
 void
 QPProblem_s::dump_solver_parameters(std::ostream & aos)
 {
-  aos << "m: " << m_ << std::endl
-      << "me: " << me_ << std::endl
-      << "mmax: " << mmax_ << std::endl
-      << "n: " << n_ << std::endl
-      << "nmax: " << nmax_ << std::endl
-      << "mnn: " << mnn_ << std::endl
-      << "iout: " << iout_ << std::endl
-      << "iprint: " << iprint_ << std::endl
-      << "lwar: " << lwar_ << std::endl
-      << "liwar: " << liwar_ << std::endl
-      << "Eps: " << Eps_ << std::endl;
+  aos << "m: " << m << std::endl
+      << "me: " << me << std::endl
+      << "mmax: " << mmax << std::endl
+      << "n: " << n << std::endl
+      << "nmax: " << nmax << std::endl
+      << "mnn: " << mnn << std::endl
+      << "iout: " << iout << std::endl
+      << "iprint: " << iprint << std::endl
+      << "lwar: " << lwar << std::endl
+      << "liwar: " << liwar << std::endl
+      << "Eps: " << Eps << std::endl;
 }
 
 
@@ -321,41 +324,41 @@ QPProblem_s::dump( int type, std::ostream & aos)
   switch(type)
     {
     case MATRIX_Q:
-      lnbrows = lnbcols = NbVariables_ ;
+      lnbrows = lnbcols = nbvariables_ ;
       array = Q_dense_.array_;
       Name = "Q";
       break;
 
     case MATRIX_DU:
-      lnbrows = NbConstraints_+1;
-      lnbcols = NbVariables_;
+      lnbrows = nbconstraints_+1;
+      lnbcols = nbvariables_;
       array = DU_dense_.array_;
       Name = "DU";
       break;
 
     case VECTOR_D:
-      lnbrows = NbVariables_;
+      lnbrows = nbvariables_;
       lnbcols = 1 ;
       array = D_.array_;
       Name = "D";
       break;
 
     case VECTOR_XL:
-      lnbrows = NbVariables_;
+      lnbrows = nbvariables_;
       lnbcols = 1;
       array = XL_.array_;
       Name = "XL";
       break;
 
     case VECTOR_XU:
-      lnbrows = NbVariables_;
+      lnbrows = nbvariables_;
       lnbcols=1;
       array = XU_.array_;
       Name = "XU";
       break;
 
     case VECTOR_DS:
-      lnbrows = NbConstraints_+1;
+      lnbrows = nbconstraints_+1;
       lnbcols= 1;
       array = DS_.array_;
       Name = "DS";

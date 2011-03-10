@@ -51,45 +51,45 @@ namespace PatternGeneratorJRL
    protected:
 
      /* ! \brief Time for single support. */
-     double Tsingle_;
+     double m_Tsingle;
 
      /* ! \brief Time for double support. */
-     double Tdble_;
+     double m_Tdble;
 
      /// \brief Sampling periods control and preview
-     double T_Ctr_, T_Prw_;
+     double m_T_Ctr, m_T_Prw;
 
      /* ! \brief Preview control window in second. */
-     double PreviewControlTime_;
+     double m_PreviewControlTime;
 
      /// \brief Size of the preview window (Nb. of samplings)
-     int N_;
+     int m_N;
 
      /// \brief Number of variables
-     int NbVariables_;
+     int m_NbVariables;
 
      /* ! \brief Step height for the walking pattern. */
-     double StepHeight_;
+     double m_StepHeight;
 
      /* ! \brief Current time in the control loop (in seconds). */
-     double CurrentTime_;
+     double m_CurrentTime;
 
      /*! \brief Specifies if we are or not in on line mode. */
-     bool OnLineMode_;
+     bool m_OnLineMode;
 
-     /// \brief CoM height.
-     double CoMHeight_;
+     /*! \brief Specifies Com Height. */
+     double m_CoMHeight;
 
      /// \brief Security margins for the ZMP
-     double SecurityMargin_;
+     double m_SecurityMargin;
 
      /// \name Members related to the generation of feet trajectories.
      /// @{
      /// \brief ModulationSupportCoefficient coeeficient to wait a little before foot is of the ground
-     double ModulationSupportCoefficient_;
+     double m_ModulationSupportCoefficient;
 
      /// \brief The foot orientation for the lift off and the landing
-     double Omega_;
+     double m_Omega;
      /// @}
 
 
@@ -105,113 +105,113 @@ namespace PatternGeneratorJRL
     virtual ~MPCTrajectoryGeneration() {};
 				
     /*! Set the current time. */
-    void CurrentTime(double Time)
-    { CurrentTime_ = Time;}
+    void setCurrentTime(const double & aTime)
+    { m_CurrentTime = aTime;}
 		
     /*! Get the current time. */
-    double CurrentTime()
-    { return CurrentTime_;}
+    double getCurrentTime()
+    { return m_CurrentTime;}
 		
     /// \brief Set the length of the preview window. 
-    inline void PreviewLength(double aPP)
-    { PreviewControlTime_ = aPP;};
+    inline void setPreviewLength(const double & aPP)
+    { m_PreviewControlTime = aPP;};
 		
     /// \brief Get the preview control time window.
-    inline const double & PreviewLength( ) const
-    { return PreviewControlTime_; };
+    inline const double & getPreviewLength( ) const
+    { return m_PreviewControlTime; };
 		
     /// \brief Return the Com Height.
-    inline const double & ComHeight() const
-    { return CoMHeight_; };
+    inline const double & getComHeight() const
+    { return m_CoMHeight; };
 		
     /// \brief Return the Com Height.
-    inline void ComHeight(double ComHeight)
-    { CoMHeight_ = ComHeight; };
+    inline void setComHeight(const double & aComHeight)
+    { m_CoMHeight = aComHeight; };
 		
     /// \brief Return the single support time.
-    inline const double & TSingleSupport() const
-    { return Tsingle_; };
+    inline const double & getTSingleSupport() const
+    { return m_Tsingle; };
 		
     /// \brief Set the single support time.
-    inline void TSingleSupport(double TSingleSupport)
-    { Tsingle_ = TSingleSupport; };
+    inline void setTSingleSupport(const double & aTSingleSupport)
+    { m_Tsingle = aTSingleSupport; };
 		
     /// \brief Return the double support time.
-    inline const double & TDoubleSupport() const
-    {return Tdble_;};
+    inline const double & getTDoubleSupport() const
+    {return m_Tdble;};
 		
     /// \brief Set the double support time. */
-    inline void TDoubleSupport(double Tdble)
-    { Tdble_ = Tdble;};
+    inline void setTDoubleSupport(const double & aTdble)
+    { m_Tdble = aTdble;};
 		
     /// \brief Get the sampling period for the control, set to 0.005 by default. */
-    inline const double & SamplingPeriodControl() const
-    { return T_Ctr_; };
+    inline const double & getSamplingPeriodControl() const
+    { return m_T_Ctr; };
 		
     /// \brief Set the sampling period for the control. */
-    inline void SamplingPeriodControl(double SamplingPeriod)
-    { T_Ctr_ = SamplingPeriod;};
+    inline void setSamplingPeriodControl(const double &aSamplingPeriod)
+    { m_T_Ctr = aSamplingPeriod;};
 		
     /// \brief Get the sampling period for the preview, set to 0.100 by default.
-    inline const double & SamplingPeriodPreview() const
-    { return T_Prw_; };
+    inline const double & getSamplingPeriodPreview() const
+    { return m_T_Prw; };
 		
     /// \brief Set the sampling period for the preview.
-    inline void SamplingPeriodPreview(double SamplingPeriod)
-    { T_Prw_ = SamplingPeriod;};
+    inline void setSamplingPeriodPreview(const double &aSamplingPeriod)
+    { m_T_Prw = aSamplingPeriod;};
 		
     /// \brief Get the sampling period for the preview, set to 0.100 by default.
-    inline const int & NbPrwSamplings() const
-    { return N_; };
+    inline const int & getNbPrwSamplings() const
+    { return m_N; };
 
     /// \brief Set the sampling period for the preview.
-    inline void NbPrwSamplings(int NbSamplings)
-    { N_ = NbSamplings;};
+    inline void setNbPrwSamplings(const int &NbSamplings)
+    { m_N = NbSamplings;};
 
     /// \brief Set the number of optimization parameters.
-    inline void NbVariables(int NbVariables)
-    { NbVariables_ = NbVariables;};
+    inline void setNbVariables(const int &NbVariables)
+    { m_NbVariables = NbVariables;};
 
     /// \brief Set the number of optimization parameters.
-    inline const int & NbVariables() const
-    { return NbVariables_;};
+    inline const int & getNbVariables() const
+    { return m_NbVariables;};
 
     /// \brief Set the security margin for the zmp
     ///
     /// \param Margin
-    inline void SecurityMargin(double Margin)
-    {SecurityMargin_ = Margin; };
+    inline void setSecurityMargin(const double & Margin)
+    {m_SecurityMargin = Margin; };
 		
 		
     /// \name Methods related to the generation of feet trajectories.
     /// @{
     /// \brief Returns the step height.
-    inline const double & StepHeight() const
-    { return StepHeight_;};
+    inline const double & getStepHeight() const
+    { return m_StepHeight;};
 		
     /// \brief Specify the step height. 
-    inline void StepHeight(double aSSH)
-    { StepHeight_ = aSSH;};
+    inline void setStepHeight(const double & aSSH)
+    { m_StepHeight = aSSH;};
 		
     /// \brief Returns the ModulationSupportCoefficient. 
-    inline const double &ModulationSupportCoefficient() const
+    inline const double &getModulationSupportCoefficient() const
     {
-      return ModulationSupportCoefficient_;
+      return m_ModulationSupportCoefficient;
     }
 		
     /// \brief Specify the modulation support coefficient. 
-    inline void  ModulationSupportCoefficient(double af)
+    inline void  setModulationSupportCoefficient(const double &af)
     {
-      ModulationSupportCoefficient_ = af;
+      m_ModulationSupportCoefficient = af;
     }
 		
     /// \brief Set the pitch angle of foot when landing and taking off.
-    inline void setOmega(double anOmega)
-    { Omega_ = anOmega;};
+    inline void setOmega(const double & anOmega) 
+    { m_Omega = anOmega;};
 		
     /// \brief Get the pitch angle of foot when landing and taking off. 
     inline const double & getOmega(void) const
-    { return Omega_;};
+    { return m_Omega;};
     /// @}
 		
 		
