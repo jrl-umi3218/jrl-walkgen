@@ -162,14 +162,14 @@ namespace PatternGeneratorJRL
     /// \param row First row inside the target
     /// \param col First column inside the target
     void addTerm(const MAL_MATRIX (&Mat, double), int type,
-		 unsigned int row, unsigned int col);
+		 int row, int col);
     /// \brief Add a vector to the final optimization problem in array form
     ///
     /// \param Mat Added vector
     /// \param target Target vector type
     /// \param row First row inside the target
     void addTerm(const MAL_VECTOR (&Vec, double), int type,
-		 unsigned int row);
+		 int row);
 
     /// \brief Print of disk the parameters that are passed to the solver
     void dumpSolverParameters(std::ostream & aos);

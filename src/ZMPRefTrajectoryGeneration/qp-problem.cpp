@@ -194,8 +194,8 @@ void QPProblem_s::clear( int type,
         "req. rows: "<<col + nb_cols<<std::endl;
     }
 
-  for( int i = row;i < row+nb_rows; i++)
-    for( int j = col;j < nb_cols; j++)
+  for(unsigned int i = row;i < row+nb_rows; i++)
+    for(unsigned int j = col;j < nb_cols; j++)
       array[row+i+(col+j)*n_rows] = 0.0;
 
 }
@@ -276,11 +276,11 @@ QPProblem_s::solve( int solver, solution_t & result )
 
 void
 QPProblem_s::addTerm( const MAL_MATRIX (&Mat, double), int type,
-		      unsigned int row, unsigned int col )
+		      int row, int col )
 {
 
   double * array;
-  unsigned int
+  int
     max_rows, max_cols,
     n_rows,n_cols;
 
@@ -319,11 +319,11 @@ QPProblem_s::addTerm( const MAL_MATRIX (&Mat, double), int type,
 
 
 void QPProblem_s::addTerm( const MAL_VECTOR (&Vec, double), int type,
-			   unsigned int row )
+			   int row )
 {
 
   double * aArray;
-  unsigned int max_rows;
+  int max_rows;
 
   switch(type)
     {

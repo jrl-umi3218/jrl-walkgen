@@ -120,7 +120,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_PerturbationOccured = false;
 
 
-  m_GenVR = new GeneratorVelRef(lSPM );
+  m_GenVR = new GeneratorVelRef(lSPM, DataFile, aHS);
 
   m_GenVR->setNbPrwSamplings(16);
   m_GenVR->setSamplingPeriodPreview(0.1);
