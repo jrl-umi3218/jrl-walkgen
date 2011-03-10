@@ -358,6 +358,87 @@ int ZMPVelocityReferencedQP::InitializeMatrixPbConstants()
   return 0;
 }
 
+int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
+{
+
+  MAL_MATRIX(OptA,double);
+
+  //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
+  MAL_MATRIX(lterm1,double);
+  lterm1 = MAL_RET_TRANSPOSE(m_PPu);
+  lterm1 = MAL_RET_A_by_B(lterm1, m_PPu);
+  lterm1 = m_Beta * lterm1;
+
+  MAL_MATRIX(lterm2,double);
+  lterm2 = MAL_RET_TRANSPOSE(m_VPu);
+  lterm2 = MAL_RET_A_by_B(lterm2,m_VPu);
+  // lterm2 = m_Alpha * lterm2;//TODO:: original pb
+  lterm2 = m_Beta*lterm2;
+
+  MAL_MATRIX_RESIZE(OptA,
+		    MAL_MATRIX_NB_ROWS(lterm2),
+		    MAL_MATRIX_NB_COLS(lterm2));
+  MAL_MATRIX_SET_IDENTITY(OptA);
+  OptA = m_Alpha*OptA;
+
+
+  // OptA = OptA + lterm1 + lterm2;//TODO:: original problem
+  OptA = OptA + lterm2;
+
+  m_OptA = OptA;
+
+  // Initialization of the matrice regarding the quadratic
+  // part of the objective function.
+  //TODO:: size of Q is 3*Nx3*N which means that there is place for N/2 feet variables
+
+  /*! Compute constants of the linear part of the objective function. */
+  lterm1 = MAL_RET_TRANSPOSE(m_PPu);
+  lterm1 = MAL_RET_A_by_B(lterm1,m_PPx);
+  m_OptB = MAL_RET_TRANSPOSE(m_VPu);
+  m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
+  m_OptB = m_Alpha * m_OptB;
+  m_OptB = m_OptB + m_Beta * lterm1;
+
+  m_OptC = MAL_RET_TRANSPOSE(m_PPu);
+  m_OptC = m_Beta * m_OptC;
+
+
+  if (m_FullDebug>0)
+    {
+      ofstream aof;
+      char Buffer[1024];
+      sprintf(Buffer,"/tmp/OptB.dat");
+      aof.open(Buffer,ofstream::out);
+      for( unsigned int i=0;i<MAL_MATRIX_NB_ROWS(m_OptB);i++)
+	{
+	  for( unsigned int j=0;j<MAL_MATRIX_NB_COLS(m_OptB)-1;j++)
+	    aof << m_OptB(i,j) << " ";
+	  aof << m_OptB(i,MAL_MATRIX_NB_COLS(m_OptB)-1);
+	  aof << endl;
+	}
+      aof.close();
+
+    }
+
+  if (m_FullDebug>0)
+    {
+      ofstream aof;
+      char Buffer[1024];
+      sprintf(Buffer,"/tmp/OptC.dat");
+      aof.open(Buffer,ofstream::out);
+      for( unsigned int i=0;i<MAL_MATRIX_NB_ROWS(m_OptC);i++)
+	{
+	  for( unsigned int j=0;j<MAL_MATRIX_NB_COLS(m_OptC)-1;j++)
+	    aof << m_OptC(i,j) << " ";
+	  aof << m_OptC(i,MAL_MATRIX_NB_COLS(m_OptC)-1);
+	  aof << endl;
+	}
+      aof.close();
+
+    }
+
+  return 0;
+}
 
 int ZMPVelocityReferencedQP::BuildingConstantPartOfConstraintMatrices()
 {
@@ -624,8 +705,13 @@ int ZMPVelocityReferencedQP::InitConstants()
   if ((r=InitializeMatrixPbConstants())<0)
     return r;
   if(m_FastFormulationMode != PLDPHerdt)
+    {
+      if ((r=BuildingConstantPartOfTheObjectiveFunction())<0)
+	return r;
+
       if ((r=BuildingConstantPartOfConstraintMatrices())<0)
 	return r;
+    }
 
   return 0;
 }
@@ -690,8 +776,8 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
   // Discretize the problem.
   ODEBUG(" N:" << m_QP_N << " T: " << T);
 
-  m_Pb.initialize(DU,NbOfConstraints*2*(m_QP_N+m_PrwSupport.StepNumber),0.0);
-  m_Pb.initialize(m_Pb.DS,2*(m_QP_N+m_PrwSupport.StepNumber),0.0);
+  m_Pb.initialize(DU,0.0,NbOfConstraints*2*(m_QP_N+m_PrwSupport.StepNumber));
+  m_Pb.initialize(m_Pb.DS,0.0,2*(m_QP_N+m_PrwSupport.StepNumber));
 
   if (m_FullDebug>2)
    {
@@ -1502,12 +1588,14 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       else
         m_Pb.iwar[0]=1;
 
-      m_Pb.initialize(m_Pb.Q,2*(m_QP_N + m_PrwSupport.StepNumber)*2*(m_QP_N + m_PrwSupport.StepNumber),0.0);
+      m_Pb.initialize(m_Pb.Q,0.0,2*(m_QP_N + m_PrwSupport.StepNumber)*2*(m_QP_N + m_PrwSupport.StepNumber));
       m_GenVR->buildInvariantPart(m_Pb, m_Matrices);
 
-      m_Pb.initialize(m_Pb.D,2*(m_QP_N + m_PrwSupport.StepNumber),0.0);
+      m_Pb.initialize(m_Pb.D,0.0,2*(m_QP_N + m_PrwSupport.StepNumber));
       m_GenVR->updateProblem(m_Pb, m_Matrices, deqPrwSupportStates);
 
+      //if(time>0.1)
+        //m_OnLineMode = false;
 
       if(m_FastFormulationMode == PLDPHerdt)
 	{

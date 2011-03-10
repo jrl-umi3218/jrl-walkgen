@@ -75,6 +75,15 @@ namespace PatternGeneratorJRL
     */
     int InitializeMatrixPbConstants();
 
+    /*! \brief This method does the same once the previous method has been called
+      to compute the static part of the optimization function.
+      Assuming that the optimization function is of the form
+      \f$ min_{u_k} \frac{1}{2} u^{\top}_k Q u_k + p^{\top}_k u_k \f$
+      this method computes \f$Q\f$, the constant part of $p^{\top}_k$.
+
+    */
+    int BuildingConstantPartOfTheObjectiveFunction();
+
     /*! \brief Call the two previous methods
       \return A negative value in case of a problem 0 otherwise.
     */
