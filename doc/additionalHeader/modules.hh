@@ -40,7 +40,7 @@ implemented uses the single point mass model. If the masses of your robot
 legs and arms are too important to be ignored it is very likely that
 none of the algorithms will give a feasible pair of CoM-ZMP trajectories.
 
-The first available algorithm is the preview algorithm as formulated in \ref Kajita2003 and \ref Kajita2005. 
+The first available algorithm is the preview algorithm \ref Kajita2003 and \ref Kajita2005. 
 This algorithm  is real-time if you do not change the foot-prints inside the preview 
 window. 
 If you do want to perform this modification you should see \ref Morisawa2007.
@@ -57,12 +57,6 @@ A new algorithm able to take a reference velocity of the CoM is also provided.
 Its description can be found in \ref Herdt2010. This problem is currently solved
 using ql written by Pr. Schittkowski (\ref Schittkowski2007 ). We thank him for
 letting us distribute his code in our LGPL code.
-
-\section Documentation
-The documentation is divided in the following sections:
-<ul>
- <li> \subpage Installing</li>
-</ul>
 
 \section References
 \anchor Kajita2003
