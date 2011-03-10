@@ -85,10 +85,10 @@ IntermedQPMat::operator ()( const int aObjectiveType )
 
 
 void
-IntermedQPMat::printObjective( const int aObjectiveType, std::ostream &aos )
+IntermedQPMat::printObjective( const int ObjectiveType, std::ostream &aos )
 {
   IntermedQPMat::objective_variant_t objective;
-  switch(aObjectiveType)
+  switch(ObjectiveType)
     {
     case INSTANT_VELOCITY:
       objective = m_InstantVelocity;
