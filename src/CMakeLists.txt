@@ -72,7 +72,6 @@ SET(SOURCES
   SimplePluginManager.cpp
   Clock.cpp
   PGTypes.cpp
-  privatepgtypes.cpp
   portability/gettimeofday.cc
   )
 
