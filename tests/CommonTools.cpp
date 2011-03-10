@@ -163,8 +163,6 @@ namespace PatternGeneratorJRL {
       unsigned int lNbActuatedJoints = actuatedJoints.size();
   
       double * dInitPos = new double[lNbActuatedJoints];
-      for(int i=0;i<lNbActuatedJoints;i++)
-        dInitPos[i] = 0.0;
 
       ifstream aif;
       aif.open(InitConfig.c_str(),ifstream::in);
@@ -241,7 +239,6 @@ namespace PatternGeneratorJRL {
 	aDebugHDR->setProperty(inProperty[i],
 			       inValue[i]);
 
-      delete [] dInitPos;
   
     }
 
