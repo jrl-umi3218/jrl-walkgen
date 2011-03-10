@@ -110,7 +110,6 @@ namespace PatternGeneratorJRL
     /*! \brief State of the LIPM at the \f$k\f$ eme iteration
       \f$ x_k = [ c_x \dot{c}_x \ddot{c}_x c_y \dot{c}_y \ddot{c}_y\f$ */
     MAL_VECTOR(m_xk,double);
-
     com_t m_CoM;
 
     /* ! \brief Vector of ZMP  */
@@ -142,12 +141,10 @@ namespace PatternGeneratorJRL
     void SetRobotControlPeriod(const double &);
 
     /// \brief Accessor
-    inline const com_t operator ()() const
-    {return m_CoM;};
+    com_t operator ()() const;
 
     /// \brief Accessor
-    inline void operator ()( com_t CoM )
-    {m_CoM = CoM;};
+    void operator ()( com_t CoM );
 
     /*! Get state. */
     void GetState(MAL_VECTOR_TYPE(double) &lxk);
