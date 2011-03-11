@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: PatternGeneratorJRL::FootHalfSize Class Reference</title>
+<title>jrl-walkgen: PatternGeneratorJRL::ZMPPosition_s Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,7 +9,6 @@
   <div class="tabs">
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -19,44 +18,38 @@
     <ul>
       <li><a href="annotated.html"><span>Class&nbsp;List</span></a></li>
       <li><a href="classes.html"><span>Class&nbsp;Index</span></a></li>
-      <li><a href="hierarchy.html"><span>Class&nbsp;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
   </div>
-  <div class="navpath"><a class="el" href="a00111.html">PatternGeneratorJRL</a>::<a class="el" href="a00020.html">FootHalfSize</a>
+  <div class="navpath"><a class="el" href="a00023.html">PatternGeneratorJRL</a>::<a class="el" href="a00020.html">ZMPPosition_s</a>
   </div>
 </div>
 <div class="contents">
-<h1>PatternGeneratorJRL::FootHalfSize Class Reference</h1><!-- doxytag: class="PatternGeneratorJRL::FootHalfSize" -->
-<p><code>#include &lt;/home/buildbot/devel-src/tools/pkg-dev-mng/Testing/Buildbot/slaves/jrlserver/jrlserverubuntu/build-jrl-walkgen-jrlmt-master/pkgsrc/src/Mathematics/FootHalfSize.hh&gt;</code></p>
+<h1>PatternGeneratorJRL::ZMPPosition_s Struct Reference</h1><!-- doxytag: class="PatternGeneratorJRL::ZMPPosition_s" -->
+<p>Structure to store each of the ZMP value, with a given direction at a certain time.  
+<a href="#_details">More...</a></p>
 
-<p><a href="a00250.html">List of all members.</a></p>
+<p><code>#include &lt;jrl/walkgen/pgtypes.hh&gt;</code></p>
+
+<p><a href="a00032.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
-<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ac0a9e543bd49a96707a1af0047dde404">FootHalfSize</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a933ffbcbbdb79ccf583634e3ac0df063">~FootHalfSize</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#afae4a277c9c308fc706035f8f483c35a">setHalfSizeInit</a> (double lHalfWidth, double lHalfHeight)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#af27b54d5d84cdd668ba98f36e0f69071">setConstraints</a> (double OnX, double OnY)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#aa02d791b7a275d5cd5c11bac1bef7eeb">getHalfHeight</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ab141855107b809e70e3659d03e9a5253">getHalfWidth</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ae6d37fd5b9c075d1e58f3539ba3d4958">getHalfHeightDS</a> () const </td></tr>
-<tr><td colspan="2"><h2>Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a5adadd99212866293c9183b50946a6f9">updateHalfHeightDS</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ae54787b0f6785fa8804536c39888062a">updateHalfSize</a> ()</td></tr>
+<tr><td colspan="2"><h2>Public Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ae18fe62e07d2b5e10fcb891eebd4e4df">px</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a88976213ca424ea4b08bf5c32d843924">py</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a23f6b83344cea9e26694e1f834d52b77">pz</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#acc9f3b7d21056251d94dc0e0a9b1459b">theta</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#a39f2d78ad89097d35e6c927923839ed6">time</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html#ac7a7d427ebb8ab6b97ffeb018d661392">stepType</a></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
-<p>This class handles the size and the constraints related to the feet </p>
-<hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ac0a9e543bd49a96707a1af0047dde404"></a><!-- doxytag: member="PatternGeneratorJRL::FootHalfSize::FootHalfSize" ref="ac0a9e543bd49a96707a1af0047dde404" args="()" -->
+<p>Structure to store each of the ZMP value, with a given direction at a certain time. </p>
+<hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="ae18fe62e07d2b5e10fcb891eebd4e4df"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::px" ref="ae18fe62e07d2b5e10fcb891eebd4e4df" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">FootHalfSize::FootHalfSize </td>
-          <td>(</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">double <a class="el" href="a00020.html#ae18fe62e07d2b5e10fcb891eebd4e4df">PatternGeneratorJRL::ZMPPosition_s::px</a></td>
         </tr>
       </table>
 </div>
@@ -64,16 +57,12 @@
 
 </div>
 </div>
-<a class="anchor" id="a933ffbcbbdb79ccf583634e3ac0df063"></a><!-- doxytag: member="PatternGeneratorJRL::FootHalfSize::~FootHalfSize" ref="a933ffbcbbdb79ccf583634e3ac0df063" args="()" -->
+<a class="anchor" id="a88976213ca424ea4b08bf5c32d843924"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::py" ref="a88976213ca424ea4b08bf5c32d843924" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">FootHalfSize::~FootHalfSize </td>
-          <td>(</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">double <a class="el" href="a00020.html#a88976213ca424ea4b08bf5c32d843924">PatternGeneratorJRL::ZMPPosition_s::py</a></td>
         </tr>
       </table>
 </div>
@@ -81,17 +70,12 @@
 
 </div>
 </div>
-<hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="aa02d791b7a275d5cd5c11bac1bef7eeb"></a><!-- doxytag: member="PatternGeneratorJRL::FootHalfSize::getHalfHeight" ref="aa02d791b7a275d5cd5c11bac1bef7eeb" args="() const " -->
+<a class="anchor" id="a23f6b83344cea9e26694e1f834d52b77"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::pz" ref="a23f6b83344cea9e26694e1f834d52b77" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double FootHalfSize::getHalfHeight </td>
-          <td>(</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const</td>
+          <td class="memname">double <a class="el" href="a00020.html#a23f6b83344cea9e26694e1f834d52b77">PatternGeneratorJRL::ZMPPosition_s::pz</a></td>
         </tr>
       </table>
 </div>
@@ -99,16 +83,12 @@
 
 </div>
 </div>
-<a class="anchor" id="ae6d37fd5b9c075d1e58f3539ba3d4958"></a><!-- doxytag: member="PatternGeneratorJRL::FootHalfSize::getHalfHeightDS" ref="ae6d37fd5b9c075d1e58f3539ba3d4958" args="() const " -->
+<a class="anchor" id="ac7a7d427ebb8ab6b97ffeb018d661392"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::stepType" ref="ac7a7d427ebb8ab6b97ffeb018d661392" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double FootHalfSize::getHalfHeightDS </td>
-          <td>(</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const</td>
+          <td class="memname">int <a class="el" href="a00020.html#ac7a7d427ebb8ab6b97ffeb018d661392">PatternGeneratorJRL::ZMPPosition_s::stepType</a></td>
         </tr>
       </table>
 </div>
@@ -116,16 +96,12 @@
 
 </div>
 </div>
-<a class="anchor" id="ab141855107b809e70e3659d03e9a5253"></a><!-- doxytag: member="PatternGeneratorJRL::FootHalfSize::getHalfWidth" ref="ab141855107b809e70e3659d03e9a5253" args="() const " -->
+<a class="anchor" id="acc9f3b7d21056251d94dc0e0a9b1459b"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::theta" ref="acc9f3b7d21056251d94dc0e0a9b1459b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double FootHalfSize::getHalfWidth </td>
-          <td>(</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const</td>
+          <td class="memname">double <a class="el" href="a00020.html#acc9f3b7d21056251d94dc0e0a9b1459b">PatternGeneratorJRL::ZMPPosition_s::theta</a></td>
         </tr>
       </table>
 </div>
@@ -133,101 +109,16 @@
 
 </div>
 </div>
-<a class="anchor" id="af27b54d5d84cdd668ba98f36e0f69071"></a><!-- doxytag: member="PatternGeneratorJRL::FootHalfSize::setConstraints" ref="af27b54d5d84cdd668ba98f36e0f69071" args="(double OnX, double OnY)" -->
+<a class="anchor" id="a39f2d78ad89097d35e6c927923839ed6"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition_s::time" ref="a39f2d78ad89097d35e6c927923839ed6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void FootHalfSize::setConstraints </td>
-          <td>(</td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>OnX</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>OnY</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">double <a class="el" href="a00020.html#a39f2d78ad89097d35e6c927923839ed6">PatternGeneratorJRL::ZMPPosition_s::time</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-
-<p>References <a class="el" href="a00054_source.html#l00070">updateHalfHeightDS()</a>, and <a class="el" href="a00054_source.html#l00061">updateHalfSize()</a>.</p>
-
-<p>Referenced by <a class="el" href="a00093_source.html#l00318">PatternGeneratorJRL::RelativeFeetInequalities::CallMethod()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="afae4a277c9c308fc706035f8f483c35a"></a><!-- doxytag: member="PatternGeneratorJRL::FootHalfSize::setHalfSizeInit" ref="afae4a277c9c308fc706035f8f483c35a" args="(double lHalfWidth, double lHalfHeight)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void FootHalfSize::setHalfSizeInit </td>
-          <td>(</td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>lHalfWidth</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>lHalfHeight</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>References <a class="el" href="a00054_source.html#l00070">updateHalfHeightDS()</a>, and <a class="el" href="a00054_source.html#l00061">updateHalfSize()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a5adadd99212866293c9183b50946a6f9"></a><!-- doxytag: member="PatternGeneratorJRL::FootHalfSize::updateHalfHeightDS" ref="a5adadd99212866293c9183b50946a6f9" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void FootHalfSize::updateHalfHeightDS </td>
-          <td>(</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Referenced by <a class="el" href="a00054_source.html#l00077">setConstraints()</a>, and <a class="el" href="a00054_source.html#l00051">setHalfSizeInit()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ae54787b0f6785fa8804536c39888062a"></a><!-- doxytag: member="PatternGeneratorJRL::FootHalfSize::updateHalfSize" ref="ae54787b0f6785fa8804536c39888062a" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void FootHalfSize::updateHalfSize </td>
-          <td>(</td>
-          <td class="paramname"></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Referenced by <a class="el" href="a00054_source.html#l00077">setConstraints()</a>, and <a class="el" href="a00054_source.html#l00051">setHalfSizeInit()</a>.</p>
 
 </div>
 </div>
