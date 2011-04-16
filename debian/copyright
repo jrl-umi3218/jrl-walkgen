@@ -1,12 +1,14 @@
 This work was packaged for Debian by:
 
     Thomas Moulard <thomas.moulard@gmail.com> on Wed, 29 Sep 2010 19:57:00 +0200
+    Olivier Stasse <olivier.stasse@gmail.com> on Sat, 16 Apr 2010 14:51:00 +0900
 
-It was downloaded from <not yet available>
+It was downloaded from git@github.com:jrl-umi3218.com/jrl-walkgen
 
 Upstream Author(s):
 
     Thomas Moulard <thomas.moulard@gmail.com>
+    Olivier Stasse <olivier.stasse@gmail.com>
 
 Copyright:
 
@@ -19,5 +21,6 @@ License:
 The Debian packaging is:
 
     Copyright (C) 2010 Thomas Moulard <thomas.moulard@gmail.com>
+    Copyright (C) 2010 Olivier Stasse <olivier.stasse@gmail.com>	
     and is licensed under the GPL version 3,
     see `/usr/share/common-licenses/GPL-3'.

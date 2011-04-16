@@ -5,5 +5,5 @@ Abstract: Doxygen documentation of jrl-walkgen.
 Section: Programming
 
 Format: HTML
-Index: /usr/share/doc/walkGenJrl/html/index.html
-Files: /usr/share/doc/walkGenJrl/html/*.html
+Index: /opt/openrobots/share/doc/jrl-walkgen/html/index.html
+Files: /opt/openrobots/doc/jrl-walkgen/html/*.html
