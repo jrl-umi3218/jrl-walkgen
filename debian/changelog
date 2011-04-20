@@ -1,3 +1,27 @@
+jrl-walkgen (3.1.4-5) lucid; urgency=low
+
+  * Put back the correct line for dh_shlibdeps
+
+ -- olivier-stasse <olivier.stasse@aist.go.jp>  Sun, 17 Apr 2011 18:46:54 +0900
+
+jrl-walkgen (3.1.4-4) lucid; urgency=low
+
+  * Ask for generation of dh_shlibdeps.
+
+ -- olivier-stasse <olivier.stasse@aist.go.jp>  Sun, 17 Apr 2011 18:13:21 +0900
+
+jrl-walkgen (3.1.4-3) lucid; urgency=low
+
+  * Fix pb on dpkg-shlibdeps
+
+ -- olivier-stasse <olivier.stasse@aist.go.jp>  Sun, 17 Apr 2011 16:56:04 +0900
+
+jrl-walkgen (3.1.4-2) lucid; urgency=low
+
+  * Fix pb of dependency nb with libboost-dev
+
+ -- olivier-stasse <olivier.stasse@aist.go.jp>  Sun, 17 Apr 2011 06:27:13 +0900
+
 jrl-walkgen (3.1.4-1) lucid; urgency=low
 
   * Fixing debian files for testing launchpad binary generation.

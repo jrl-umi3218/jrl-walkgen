@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 7.0.50~), cmake (>= 2.6),
 	       pkg-config (>= 0.22),
 	       perl (>= 5.10.1),
 	       libboost-dev (>= 1.33.1),
-	       libboost-thread-dev (>= 1.40.1),
+	       libboost-thread-dev (>= 1.40.0),
 	       liblapack-dev (>= 1.2),
 	       libjrl-dynamics-dev (>= 1.9.3),
 	       libabstract-robot-dynamics-dev (>= 1.16.2)
@@ -19,7 +19,7 @@ Homepage:http://github.com/jrl-umi3218/jrl-walkgen
 Package: libjrl-walkgen-dev
 Section: libdevel
 Architecture: any
-Depends: libboost-dev (>= 1.33.1), libboost-thread-dev (>= 1.33.1), libjrl-dynamics-dev (>= 1.9.3), libabstract-robot-dynamics-dev (>= 1.16.2), liblapack-dev (>= 1.2), libjrl-walkgen3.1.2 (= ${binary:Version}), ${misc:Depends}
+Depends: libboost-dev (>= 1.33.1), libboost-thread-dev (>= 1.33.1), libjrl-dynamics-dev (>= 1.9.3), libabstract-robot-dynamics-dev (>= 1.16.2), liblapack-dev (>= 1.2), libjrl-walkgen3.1.4 (= ${binary:Version}), ${misc:Depends}
 Suggests: libjrl-walkgen-doc
 Description: the JRL walking pattern generator development package
  The JRL walking pattern generator generates a whole-body movement
@@ -29,7 +29,7 @@ Description: the JRL walking pattern generator development package
  This package contains development files (headers and pkg-config file).
 
 
-Package: libjrl-walkgen3.1.2
+Package: libjrl-walkgen3.1.4
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: the JRL walking pattern generator C++ library
