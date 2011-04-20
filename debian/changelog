@@ -1,3 +1,9 @@
+jrl-walkgen (3.1.4-6) lucid; urgency=low
+
+  * Correct shlibs.
+
+ -- olivier-stasse <olivier.stasse@aist.go.jp>  Thu, 21 Apr 2011 04:52:34 +0900
+
 jrl-walkgen (3.1.4-5) lucid; urgency=low
 
   * Put back the correct line for dh_shlibdeps
