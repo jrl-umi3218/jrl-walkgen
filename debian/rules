@@ -21,6 +21,6 @@ override_dh_auto_configure:
 	dh_auto_configure -- -DCMAKE_BUILD_TYPE=RELEASE -DGENERATE_DOC=ON -DCMAKE_INSTALL_PREFIX=/opt/openrobots
 
 override_dh_shlibdeps:
-	LD_LIBRARY_PATH=/opt/openrobots/lib:/usr/lib/libfakeroot/:/usr/lib64/libfakeroot:/usr/lib32/libfakeroot && dpkg-shlibdeps --
+	LD_LIBRARY_PATH=/opt/openrobots/lib:/usr/lib/libfakeroot/:/usr/lib64/libfakeroot:/usr/lib32/libfakeroot && dh_shlibdeps --
 %:
 	dh  $@
