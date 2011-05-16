@@ -35,7 +35,7 @@
 
 #include <deque>
 
-#include <PreviewControl/SupportFSM.h>
+#include <privatepgtypes.h>
 #include <jrl/walkgen/pgtypes.hh>
 #include <abstract-robot-dynamics/joint.hh>
 
@@ -56,6 +56,9 @@ namespace PatternGeneratorJRL
     /// \}
 
     /// \brief Preview feet orientations inside the preview window
+    /// The orientations of the feet are adapted to the previewed orientation of the hip.
+    /// The resulting velocities accelerations and orientations are verified against the limits.
+    /// If the constraints can not be satisfied the rotational velocity of the trunk is reduced
     ///
     /// \param[in] Time
     /// \param[in] Ref
@@ -70,9 +73,9 @@ namespace PatternGeneratorJRL
 			     double StepDuration, const support_state_t & CurrentSupport,
 			     std::deque<FootAbsolutePosition> & LeftFootAbsolutePositions,
 			     std::deque<FootAbsolutePosition> & RightFootAbsolutePositions,
-                             std::deque<double> &PreviewedSupportAngles);
+                             std::deque<double> & PreviewedSupportAngles);
 
-    /// \brief Interpolate orientation of the trunk
+    /// \brief Interpolate previewed orientation of the trunk
     ///
     /// \param[in] time
     /// \param[in] CurrentIndex
@@ -97,13 +100,13 @@ namespace PatternGeneratorJRL
     inline void SSLength( double SSPeriod)
     { SSPeriod_ = SSPeriod; };
     inline double SamplingPeriod() const
-    { return m_T; };
+    { return T_; };
     inline void SamplingPeriod( double SamplingPeriod)
-    { m_T = SamplingPeriod; };
+    { T_ = SamplingPeriod; };
     inline double NbSamplingsPreviewed() const
-    { return m_N; };
+    { return N_; };
     inline void NbSamplingsPreviewed( double SamplingsPreviewed)
-    { m_N = SamplingsPreviewed; };
+    { N_ = SamplingsPreviewed; };
     /// \}
 
     //
@@ -111,7 +114,9 @@ namespace PatternGeneratorJRL
     //
   private:
 
-    /// \brief Verify and eventually reduce the acceleration of the hip joint
+    /// \brief Verify and eventually reduce the maximal acceleration of the hip joint necessary to attain the velocity reference in one sampling T_.
+    /// The verification is based on the supposition that the final joint trajectory is composed by
+    /// a fourth-order polynomial acceleration phase inside T_ and a constant velocity phase for the rest of the preview horizon.
     ///
     /// \param[in] Ref Reference
     /// \param[in] TrunkState Current trunk state
@@ -121,6 +126,8 @@ namespace PatternGeneratorJRL
                                       const support_state_t & CurrentSupport);
 
     /// \brief Verify velocity of hip joint
+    /// The velocity is verified only between previewed supports.
+    /// The verification is based on the supposition that the final joint trajectory is a third-order polynomial.
     ///
     /// \param[in] Time
     /// \param[in] TrunkStateT
@@ -132,10 +139,10 @@ namespace PatternGeneratorJRL
     /// \param[in] CurrentLeftFootAngle
     /// \param[in] CurrentLeftFootVelocity
     /// \param[in] CurrentRightFootVelocity
-    void verify_velocity_hip_joint(double Time, COMState &TrunkStateT,
+    void verify_velocity_hip_joint(double Time,
                                   double PreviewedSupportFoot,
                                   double PreviewedSupportAngle, unsigned StepNumber,
-                                  support_state_t CurrentSupport,
+                                  const support_state_t & CurrentSupport,
                                   double CurrentRightFootAngle, double CurrentLeftFootAngle,
                                   double CurrentLeftFootVelocity,
                                   double CurrentRightFootVelocity);
@@ -149,9 +156,9 @@ namespace PatternGeneratorJRL
     /// \param[in] CurrentSupportAngle
     /// \param[in] StepNumber
     /// \return AngleOK
-    bool verify_angle_hip_joint(support_state_t CurrentSupport,
+    bool verify_angle_hip_joint(const support_state_t & CurrentSupport,
                                double PreviewedTrunkAngleEnd,
-                               const COMState &TrunkState, COMState &TrunkStateT,
+                               const COMState & TrunkState, COMState & TrunkStateT,
                                double CurrentSupportFootAngle,
                                unsigned StepNumber);
 
@@ -167,34 +174,34 @@ namespace PatternGeneratorJRL
   private:
 
     /// \brief Angular limitations of the hip joints
-    double m_lLimitLeftHipYaw, m_uLimitLeftHipYaw, m_lLimitRightHipYaw, m_uLimitRightHipYaw;
+    double lLimitLeftHipYaw_, uLimitLeftHipYaw_, lLimitRightHipYaw_, uLimitRightHipYaw_;
 
     /// \brief Maximal acceleration of a hip joint
-    double m_uaLimitHipYaw;
+    double uaLimitHipYaw_;
 
     /// \brief Upper crossing angle limit between the feet
-    double m_uLimitFeet;
+    double uLimitFeet_;
 
     /// \brief Maximal velocity of a foot
-    double m_uvLimitFoot;
+    double uvLimitFoot_;
 
     /// \brief Single-support duration
     double SSPeriod_;
 
     /// \brief Number of sampling in a preview window
-    double m_N;
+    double N_;
 
     /// \brief Time between two samplings
-    double m_T;
+    double T_;
 
     /// \brief Rotation sense of the trunks angular velocity and acceleration
-    double m_signRotVelTrunk, m_signRotAccTrunk;
+    double signRotVelTrunk_, signRotAccTrunk_;
 
     /// \brief
-    double m_SupportTimePassed;
+    double SupportTimePassed_;
 
-    /// \brief
-    const static double M_EPS;
+    /// \brief Numerical precision
+    const static double EPS_;
 
     /// \brief Current trunk state
     COMState TrunkState_;
