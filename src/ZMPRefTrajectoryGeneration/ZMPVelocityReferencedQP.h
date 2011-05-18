@@ -45,6 +45,7 @@
 #include <privatepgtypes.h>
 #include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>
+#include <jrl/walkgen/pgtypes.hh>
 
 namespace PatternGeneratorJRL
 {

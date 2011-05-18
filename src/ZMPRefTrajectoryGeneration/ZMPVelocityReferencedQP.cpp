@@ -93,7 +93,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   /// Initialize  the 2D LIPM
   CoM_.SetSimulationControlPeriod(QP_T_);
   CoM_.SetRobotControlPeriod(0.005);
-  CoM_.SetComHeight(0.814);
   CoM_.InitializeSystem();
 
   VRQPGenerator_ = new GeneratorVelRef(lSPM );
@@ -282,6 +281,11 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM.y[0] = lStartingCOMState.y[0];
   CoM.y[1] = lStartingCOMState.y[1];
   CoM.y[2] = lStartingCOMState.y[2];
+  CoM.z[0] = lStartingCOMState.z[0];
+  CoM.z[1] = lStartingCOMState.z[1];
+  CoM.z[2] = lStartingCOMState.z[2];
+  CoM_.SetComHeight(lStartingCOMState.z[0]);
+  CoM_.InitializeSystem();
   CoM_(CoM);
 
   return 0;
