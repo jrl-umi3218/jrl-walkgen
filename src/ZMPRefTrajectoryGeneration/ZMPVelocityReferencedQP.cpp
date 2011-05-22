@@ -735,7 +735,7 @@ int ZMPVelocityReferencedQP::dumpProblem(MAL_VECTOR(& xk,double),
 
 int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
 						     double * &DU,
-						     double , 
+						     double T, 
 						     double StartingTime,
 						     deque<LinearConstraintInequalityFreeFeet_t> &
 						     QueueOfLConstraintInequalitiesFreeFeet,
@@ -2024,7 +2024,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 
       ODEBUG("Current Time : " <<time << " " <<
-	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - time <<
+	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back().EndingTime - time <<
 	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
       QueueOfLConstraintInequalitiesFreeFeet.clear();

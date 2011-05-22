@@ -755,9 +755,9 @@ bool ComAndFootRealizationByGeometry::
 KinematicsForOneLeg(MAL_S3x3_MATRIX_TYPE(double) & Body_R,
 		    MAL_S3_VECTOR_TYPE(double) & Body_P,
 		    MAL_VECTOR_TYPE(double) &aFoot,
-		    MAL_S3_VECTOR_TYPE(double) &, // lDt,
-		    MAL_VECTOR_TYPE(double) &,    // aCoMPosition,
-		    MAL_S3_VECTOR_TYPE(double) &, // ToTheHip,
+		    MAL_S3_VECTOR_TYPE(double) & lDt,
+		    MAL_VECTOR_TYPE(double) &  aCoMPosition,
+		    MAL_S3_VECTOR_TYPE(double) & ToTheHip,
 		    int LeftOrRight,
 		    MAL_VECTOR_TYPE(double) &lq,
 		    int Stage)

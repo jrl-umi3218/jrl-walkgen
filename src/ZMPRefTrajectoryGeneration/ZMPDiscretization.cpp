@@ -321,7 +321,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 				  FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				  FootAbsolutePosition & InitRightFootAbsolutePosition,
 				  deque<RelativeFootPosition> &RelativeFootPositions,
-				  COMState &, // lStartingCOMState,
+				  COMState & lStartingCOMState,
 				  MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
 {
   m_RelativeFootPositions.clear();
