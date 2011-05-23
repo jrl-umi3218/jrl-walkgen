@@ -476,7 +476,7 @@ namespace PatternGeneratorJRL
     ODEBUG(" ====== CoM ====== ");
     for(unsigned int lj=0;lj<m_DeltaTj.size();lj++)
       {
-	ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<j << "]= "<< m_DeltaTj[j]);
+	ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<lj << "]= "<< m_DeltaTj[lj]);
 	if ((t>=reftime) && (t<=reftime+m_DeltaTj[lj]))
 	  {
 	    j = lj;
