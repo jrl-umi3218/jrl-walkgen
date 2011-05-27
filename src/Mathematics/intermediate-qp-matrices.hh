@@ -100,7 +100,6 @@ namespace PatternGeneratorJRL
       boost_ublas::vector<double> Vc_f;
       /// \brief Selection matrix for relative feet positions
       boost_ublas::matrix<double> V_f;
-
       /// \brief Current support state
       support_state_t SupportState;
 

@@ -105,7 +105,9 @@ IntermedQPMat::Dynamics( const int type ) const
 {
   switch(type)
     {
-    case VELOCITY:
+   case POSITION:
+	  return m_Position;
+   case VELOCITY:
       return m_Velocity;
     case COP:
       return m_CoP;
@@ -120,6 +122,8 @@ IntermedQPMat::Dynamics( const int type )
 {
   switch(type)
     {
+    case POSITION:
+	  return m_Position;
     case VELOCITY:
       return m_Velocity;
     case COP:
