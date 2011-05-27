@@ -37,6 +37,7 @@
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <Mathematics/intermediate-qp-matrices.hh>
 #include <Mathematics/relative-feet-inequalities.hh>
+#include <ZMPRefTrajectoryGeneration/door.hh>
 
 #include <privatepgtypes.h>
 
@@ -89,6 +90,10 @@ namespace PatternGeneratorJRL
 			  const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
 			  const std::deque<support_state_t> & deqSupportStates,
 			  const std::deque<double> & PreviewedSupportAngles);
+
+    /// \brief Generate door constraints
+    void build_constraints_door(double Time, double DesVelDoor,
+			      Door & Door, const std::deque<support_state_t> & SupportStates_deq, QPProblem & Pb);
 
     /// \brief Build the constant part of the objective
     ///
