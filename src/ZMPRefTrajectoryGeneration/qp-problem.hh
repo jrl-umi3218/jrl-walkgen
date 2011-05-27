@@ -118,7 +118,7 @@ namespace PatternGeneratorJRL
     /// \brief Set the number of optimization parameters.
     ///
     /// \param nb_variables
-    void set_nb_variabless( int NbVariables )
+    void set_nb_variables( int NbVariables )
     { NbVariables_ = NbVariables;};
 
     /// \brief Set the number of equality constraints.
@@ -132,8 +132,13 @@ namespace PatternGeneratorJRL
     /// \param nb_constraints
     inline void set_nb_constraints( int NbConstraints )
     { NbConstraints_ = NbConstraints;};
-
     
+    /// \brief Get the total number of constraints.
+    ///
+    /// \param nb_constraints
+    inline int NbConstraints()
+    { return NbConstraints_;};
+
     /// \brief Reallocate array
     ///
     /// \param[in] array
@@ -236,12 +241,12 @@ namespace PatternGeneratorJRL
       /// \param[in] ncols Size of the new array
       /// \param[in] preserve Preserve old values
       /// \return 0
-      int stick_together(struct array_s<type> & final_array, 
+      int stick_together(struct array_s<type> & final_array,
 			 int nrows, int ncols)
       {
         try {
 	  type * NewArray = 0;
-	  if ((final_array.memsize_>nrows*ncols) ||
+	  if ((final_array.memsize_<nrows*ncols) ||
 	      (final_array.array_==0))
 	    {
 	      final_array.array_ = new type[nrows*ncols];
