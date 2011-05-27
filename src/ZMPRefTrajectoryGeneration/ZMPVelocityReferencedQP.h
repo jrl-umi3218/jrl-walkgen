@@ -45,6 +45,7 @@
 #include <privatepgtypes.h>
 #include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>
+#include <ZMPRefTrajectoryGeneration/door.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -155,6 +156,9 @@ namespace PatternGeneratorJRL
 
     /// \brief Final optimization problem
     QPProblem Problem_;
+
+    /// \brief Door
+    Door Door_;
 
     /// \brief Additional term on the acceleration of the CoM
     MAL_VECTOR(PerturbationAcceleration_,double);
