@@ -9,6 +9,7 @@
 #define DOOR_HH_
 
 #include <jrl/mal/matrixabstractlayer.hh>
+#include <cmath>
 
 class Door
 {

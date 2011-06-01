@@ -46,6 +46,7 @@
 #include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>
 #include <ZMPRefTrajectoryGeneration/door.hh>
+#include <cmath>
 
 namespace PatternGeneratorJRL
 {

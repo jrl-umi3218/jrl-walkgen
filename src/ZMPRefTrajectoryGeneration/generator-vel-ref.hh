@@ -40,7 +40,7 @@
 #include <ZMPRefTrajectoryGeneration/door.hh>
 
 #include <privatepgtypes.h>
-
+#include <cmath>
 
 namespace PatternGeneratorJRL
 {

@@ -62,10 +62,10 @@ Door::build_door_matrix(double Time, double DesVelDoor, int N, boost_ublas::matr
 
 Door::frame_s::frame_s()
 {
-	Orientation_ = -3.14/2.0;
+	Orientation_ = -M_PI/2.0;
 	dOrientation_ = 0.0;
 	ddOrientation_ = 0.0;
-	Position_[X] = 0.55;
+	Position_[X] = 2;
 	Position_[Y] = 0.5;
 	Position_[Z] = 0.0;
 }

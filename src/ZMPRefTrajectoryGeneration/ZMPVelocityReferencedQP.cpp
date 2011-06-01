@@ -105,7 +105,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::COP_CENTERING );
   VRQPGenerator_->Ponderation( 0.00001, IntermedQPMat::JERK_MIN );
 
-  Door_.initialize(-3.14/2);
+  Door_.initialize(-M_PI/2.00);
 
   // Register method to handle
   string aMethodName[2] =
@@ -404,6 +404,14 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // --------------
       QPProblem_s::solution_t Result;
       Problem_.solve( QPProblem_s::QLD , Result );
+      Problem_.set_nb_constraints( 0 );
+      cout<<"time:"<<time<<endl;
+      for(int i=0;i<PrwSupportStates_deq.back().StepNumber;i++)
+      {
+          cout<<"X"<<i<<":"<<Result.Solution_vec(2*QP_N_+i)<<endl;
+          cout<<"Y"<<i<<":"<<Result.Solution_vec(2*QP_N_+PrwSupportStates_deq.back().StepNumber+i)<<endl;
+      }
+
 
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
