@@ -762,8 +762,7 @@ namespace PatternGeneratorJRL
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Test.dat");
       }
 
-    m_UpperTimeLimitToUpdateStacks = m_CurrentTime + m_Tsingle+m_Tdble;
-    
+    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.25 * m_Tsingle;    
     ODEBUG("End of InitOnLine : Size of relative foot positions: " << m_RelativeFootPositions.size());
 
     
@@ -934,7 +933,7 @@ namespace PatternGeneratorJRL
 			      *m_AnalyticalZMPCoGTrajectoryX,
 			      m_CTIPX,
 			      *m_AnalyticalZMPCoGTrajectoryY,
-			      m_CTIPY,false,false);
+			      m_CTIPY,true,false);
 
     /* Indicates that the step has been taken into account appropriatly
        in computing the trajectory. */
@@ -953,7 +952,6 @@ namespace PatternGeneratorJRL
     /* Current strategy : add 2 values, and update at each iteration the stack.
        When the limit is reached, and the stack exhausted this method is called again.
      */
-    //    for(double t=m_AbsoluteTimeReference; t<m_AbsoluteTimeReference+m_Tsingle+m_Tdble; t+= 0.005)
     for(double t=m_AbsoluteTimeReference; t<m_AbsoluteTimeReference+2*m_SamplingPeriod; t+= m_SamplingPeriod)
       {
 	m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(t,lIndexInterval,lPrevIndexInterval);
@@ -997,9 +995,7 @@ namespace PatternGeneratorJRL
     m_Clock3.IncIteration();
 
     /* Update the time at which the stack should not be updated anymore */
-    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_Tsingle+ m_Tdble;    
-	
-
+    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.25 * m_Tsingle;    
     ODEBUG("****************** End OnLineAddFoot **************************");
   }
 
@@ -2169,7 +2165,7 @@ namespace PatternGeneratorJRL
 	     << "m_AbsoluteTimeReference : " << m_AbsoluteTimeReference << endl
 	     << "m_AbsoluteTimeReference + sum of DTj: " << TimeReference;
 	LTHROW("The time reference is not in the preview window ");
-	//return -1;
+	return -1;
       }
 
     /* If the interval detected is not a double support interval,
@@ -2182,7 +2178,11 @@ namespace PatternGeneratorJRL
 	else
 	  IndexInterval+=1;
       }
-
+    else
+      {
+	ODEBUG("Already on a DOUBLE_SUPPORT PHASE:" << IndexInterval);
+      }
+      
     if (IndexInterval==-1)
       return -1;
 
@@ -2312,7 +2312,7 @@ namespace PatternGeneratorJRL
     CoMPositions.clear();
     LeftFootAbsolutePositions.clear();
     RightFootAbsolutePositions.clear();
-    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.5 * m_Tsingle;    
+    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.25 * m_Tsingle;    
     ODEBUG("m_UpperTimeLimitToUpdateStacks "<< m_UpperTimeLimitToUpdateStacks << 
 	    " m_AbsoluteTimeReference: " <<m_AbsoluteTimeReference << 
 	    " m_DeltaTj[0] " << m_DeltaTj[0] << " m_Tdble: " << m_Tdble);
@@ -2362,7 +2362,6 @@ namespace PatternGeneratorJRL
    */
   int AnalyticalMorisawaCompact::ReturnOptimalTimeToRegenerateAStep()
   {
-    //    int r = 1+(int)((4 * m_Tsingle + m_Tdble) / m_SamplingPeriod);
     int r=1;
     return r;
   }
@@ -2443,14 +2442,6 @@ namespace PatternGeneratorJRL
     unsigned int lIndexInterval,lPrevIndexInterval;
     m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_AbsoluteTimeReference,lIndexInterval);
     lPrevIndexInterval = lIndexInterval;
-
-    /*! Set the time reference for the new trajectory. */
-    /*
-    m_AbsoluteTimeReference = m_CurrentTime;
-    m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
-    m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
-    m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
-    */
 
     /*! Fill in the stacks: minimal strategy only 1 reference. */
     for(double t=m_CurrentTime; t<=m_CurrentTime+2*m_SamplingPeriod; t+= m_SamplingPeriod)
