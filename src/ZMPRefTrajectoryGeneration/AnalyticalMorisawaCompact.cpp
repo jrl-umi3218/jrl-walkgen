@@ -89,7 +89,8 @@ namespace PatternGeneratorJRL
 
     m_OnLineChangeStepMode = ABSOLUTE_FRAME;
     m_HS = 0;
-    m_FeetTrajectoryGenerator = 0;
+    m_FeetTrajectoryGenerator = 
+      m_BackUpm_FeetTrajectoryGenerator = 0;
 
     m_NeedToReset = true;
     m_AbsoluteTimeReference = 0.0;
@@ -161,6 +162,8 @@ namespace PatternGeneratorJRL
     if (m_PreviewControl!=0)
       delete m_PreviewControl;
 
+    if (m_BackUpm_FeetTrajectoryGenerator!=0)
+      delete m_BackUpm_FeetTrajectoryGenerator;
     ODEBUG4("Destructor: did PreviewControl","DebugPGI.txt");    
   }
 
@@ -2104,6 +2107,11 @@ namespace PatternGeneratorJRL
 							     aFeetTrajectoryGenerator)
   {
     m_FeetTrajectoryGenerator = aFeetTrajectoryGenerator;
+    if (m_BackUpm_FeetTrajectoryGenerator==0)
+      m_BackUpm_FeetTrajectoryGenerator=
+	new LeftAndRightFootTrajectoryGenerationMultiple(m_FeetTrajectoryGenerator->getSimplePluginManager(),
+							 m_FeetTrajectoryGenerator->getFoot());
+
   }
 
   LeftAndRightFootTrajectoryGenerationMultiple * AnalyticalMorisawaCompact::GetFeetTrajectoryGenerator()
@@ -2193,7 +2201,8 @@ namespace PatternGeneratorJRL
       m_AbsoluteSupportFootPositions;
     deque<RelativeFootPosition> BackUpm_RelativeFootPositions = 
       m_RelativeFootPositions;
-
+    *m_BackUpm_FeetTrajectoryGenerator = *m_FeetTrajectoryGenerator;
+	
     /* Change the foot */
     unsigned int lChangedIntervalFoot = (IndexInterval-1)/2;
     ODEBUG("lChangedIntervalFoot:" <<lChangedIntervalFoot);
@@ -2296,6 +2305,8 @@ namespace PatternGeneratorJRL
 	  BackUpm_AbsoluteSupportFootPositions;
 	m_RelativeFootPositions = 
 	  BackUpm_RelativeFootPositions;
+	//       	*m_FeetTrajectoryGenerator = 
+	//	  *m_BackUpm_FeetTrajectoryGenerator;
 	ODEBUG("Unable to change the step ( " <<  
 		aFootAbsolutePosition[0].x << " , " <<
 		aFootAbsolutePosition[0].y << " , " <<

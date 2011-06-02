@@ -557,10 +557,11 @@ namespace PatternGeneratorJRL
 
       /*! \brief Foot Trajectory Generator */
       LeftAndRightFootTrajectoryGenerationMultiple * m_FeetTrajectoryGenerator;
+      LeftAndRightFootTrajectoryGenerationMultiple * m_BackUpm_FeetTrajectoryGenerator;
       /*! @} */
 
       /*! @} */
-      
+
 
       /*! \brief Stores the relative foot positions currently in the buffer */
       deque<RelativeFootPosition> m_RelativeFootPositions;

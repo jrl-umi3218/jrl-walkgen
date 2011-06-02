@@ -94,10 +94,7 @@ protected:
     }
 
     {
-      istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0 \
-                     0.0 0.19 0.0				     \
-                     0.0 -0.19 0.0				     \
-                     0.0 0.19 0.0");
+      istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0 0.0 0.19 0.0 0.0 -0.19 0.0 0.0 0.19 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -169,7 +166,7 @@ protected:
 	  cout.flush();
 	}
 
-      double triggertime = 9.64*200 + m_deltatime*200;
+      double triggertime = 9.7*200 + m_deltatime*200;
       if ((m_OneStep.NbOfIt>triggertime) &&
 	  m_TestChangeFoot)
 	{
@@ -187,16 +184,32 @@ protected:
 	      aFAP.theta=5.0;
 	    }
 	  double newtime;
-	  m_PGI->ChangeOnLineStep(0.805,aFAP,newtime);
-	  m_deltatime += newtime+0.025;
-	  m_TestChangeFoot=true;
-	  m_NbStepsModified++;
-	  if (m_NbStepsModified==360)
-	    m_TestChangeFoot=false;
+	  bool stepHandledCorrectly=true;
+	  try 
+	    {
+	      m_PGI->ChangeOnLineStep(0.805,aFAP,newtime);
+	    }
+	  catch(...)
+	    {
+	      cerr << "Step not well handled." << endl;
+	      stepHandledCorrectly=false;
+	    }
+	  if (stepHandledCorrectly)
+	    {
+	      m_deltatime += newtime+0.025;
+	      m_TestChangeFoot=true;
+	      m_NbStepsModified++;
+	      if (m_NbStepsModified==360)
+		m_TestChangeFoot=false;
+	    }
+	  else 
+	    {
+	      m_deltatime += 0.025;
+	    }
 	}
     }
   };
-
+    
 };
 
 int PerformTests(int argc, char *argv[])

@@ -58,6 +58,20 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
 
 }
 
+ CjrlFoot* LeftAndRightFootTrajectoryGenerationMultiple::getFoot() const
+{
+  return m_Foot;
+}
+LeftAndRightFootTrajectoryGenerationMultiple::
+LeftAndRightFootTrajectoryGenerationMultiple(const LeftAndRightFootTrajectoryGenerationMultiple & aLRFTGM):
+  SimplePlugin(aLRFTGM.getSimplePluginManager())
+  
+{
+  LeftAndRightFootTrajectoryGenerationMultiple (aLRFTGM.getSimplePluginManager(),
+						aLRFTGM.getFoot());
+  *this = aLRFTGM;
+}
+
 LeftAndRightFootTrajectoryGenerationMultiple::~LeftAndRightFootTrajectoryGenerationMultiple()
 {
 
@@ -845,7 +859,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::DisplayIntervals()
   m_RightFootTrajectory->DisplayIntervals();  
 }
 
-void LeftAndRightFootTrajectoryGenerationMultiple::GetDeltaTj(vector<double> &aDeltaTj)
+void LeftAndRightFootTrajectoryGenerationMultiple::GetDeltaTj(vector<double> &aDeltaTj) const
 {
   aDeltaTj = m_DeltaTj;
 }
@@ -855,12 +869,12 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetStepHeight(double aStepHei
   m_StepHeight = aStepHeight;
 }
 
-double LeftAndRightFootTrajectoryGenerationMultiple::GetStepHeight()
+double LeftAndRightFootTrajectoryGenerationMultiple::GetStepHeight() const
 {
   return m_StepHeight;
 }
 
-double LeftAndRightFootTrajectoryGenerationMultiple::GetAbsoluteTimeReference()
+double LeftAndRightFootTrajectoryGenerationMultiple::GetAbsoluteTimeReference() const
 {
   double res=0.0;
   double LeftATR=0.0,RightATR=0.0;
@@ -882,4 +896,35 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAbsoluteTimeReference(doub
     m_LeftFootTrajectory->SetAbsoluteTimeReference(anATR);
   if (m_RightFootTrajectory!=0)
     m_RightFootTrajectory->SetAbsoluteTimeReference(anATR);
+}
+
+LeftAndRightFootTrajectoryGenerationMultiple & 
+LeftAndRightFootTrajectoryGenerationMultiple::operator=
+(const LeftAndRightFootTrajectoryGenerationMultiple & aLRFTGM) 
+{
+  ODEBUG("Went through this.");
+  if (this == &aLRFTGM)
+    return *this;
+
+  SetAbsoluteTimeReference(aLRFTGM.GetAbsoluteTimeReference());
+  SetStepHeight(aLRFTGM.GetStepHeight());
+  aLRFTGM.GetDeltaTj(m_DeltaTj);
+
+  *m_LeftFootTrajectory = *(aLRFTGM.getLeftFootTrajectory());
+  *m_RightFootTrajectory = *(aLRFTGM.getRightFootTrajectory());
+
+  m_Foot = aLRFTGM.getFoot();
+  
+  return *this;
+
+}
+
+FootTrajectoryGenerationMultiple * LeftAndRightFootTrajectoryGenerationMultiple::getLeftFootTrajectory() const
+{
+  return m_LeftFootTrajectory;
+}
+
+FootTrajectoryGenerationMultiple * LeftAndRightFootTrajectoryGenerationMultiple::getRightFootTrajectory() const
+{
+  return m_RightFootTrajectory;
 }

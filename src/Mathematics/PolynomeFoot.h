@@ -67,8 +67,16 @@ namespace PatternGeneratorJRL
 					     double InitPos,
 					     double InitSpeed);
 
+      void GetParametersWithInitPosInitSpeed(double &FT,
+					     double &FP,
+					     double &InitPos,
+					     double &InitSpeed);
       /// Destructor.
       ~Polynome3();
+      
+    private:
+      /*! Store final time and final position. */
+      double m_FT, m_FP;
     };
 
   /// Polynome used for Z trajectory.
@@ -93,8 +101,19 @@ namespace PatternGeneratorJRL
 					     double InitSpeed);
 
 
+      /*! Get the parameters */
+      void GetParametersWithInitPosInitSpeed(double &FT,
+					     double &MP,
+					     double &InitPos,
+					     double &InitSpeed);
+
       /// Destructor.
       ~Polynome4();
+      
+    private:
+      /*! Store final time and middle position. */
+      double m_FT, m_MP;
+      
     };
 
   /// Polynome used for X,Y and Theta trajectories.

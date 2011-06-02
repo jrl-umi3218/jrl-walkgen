@@ -144,6 +144,21 @@ namespace PatternGeneratorJRL
 					 double InitPosition,
 					 double InitSpeed);
 
+   /*! This method get the parameters for each of the polynome used by this
+     object. In this case, as it is used for the 3rd order polynome. The polynome to
+     which those parameters are set is specified with PolynomeIndex. 
+     @param[in] AxisReference: Set to which axis the parameters will be applied. 
+     @param[in] TimeInterval: Set the time base of the polynome.
+     @param[in] FinalPosition: Set the final position of the polynome at TimeInterval.
+     @param[in] InitPosition: Initial position when computing the polynome at t=0.0.
+     @param[in] InitSpeed: Initial speed when computing the polynome at t=0.0.
+   */
+   int GetParametersWithInitPosInitSpeed(int AxisReference,
+					 double &TimeInterval,
+					 double &FinalPosition,
+					 double &InitPosition,
+					 double &InitSpeed);
+
    /*! Fill an absolute foot position structure for a given time. */
    double ComputeAll(FootAbsolutePosition & aFootAbsolutePosition,
 		     double Time);

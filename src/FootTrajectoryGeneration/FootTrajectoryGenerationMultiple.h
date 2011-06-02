@@ -6,18 +6,18 @@
  *
  * JRL, CNRS/AIST
  *
- * This file is part of walkGenJrl.
- * walkGenJrl is free software: you can redistribute it and/or modify
+ * This file is part of jrl-walkgen.
+ * jrl-walkgen is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * walkGenJrl is distributed in the hope that it will be useful,
+ * jrl-walkgen is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
  * You should have received a copy of the GNU Lesser General Public License
- * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
+ * along with jrl-walkgen.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Research carried out within the scope of the 
  *  Joint Japanese-French Robotics Laboratory (JRL)
@@ -96,19 +96,19 @@ namespace PatternGeneratorJRL
     void SetNumberOfIntervals(int lNumberOfIntervals);
 
     /*! \brief Get number of intervals. */
-    int GetNumberOfIntervals();
+    int GetNumberOfIntervals() const;
 
     /*! \brief Set the time for each interval. */
     void SetTimeIntervals(std::vector<double> & lDeltaTj);
     
     /*! \brief Get the time for each interval */
-    void GetTimeIntervals(std::vector<double>  & lDeltaTj);
+    void GetTimeIntervals(std::vector<double>  & lDeltaTj) const;
 
     /*! \brief Set nature of interval */
     int SetNatureInterval(unsigned int IntervalIndex, int Nature);
 
     /*! \brief Get nature of interval */
-    int GetNatureInterval(unsigned int IntervalIndex);
+    int GetNatureInterval(unsigned int IntervalIndex) const;
 
     /*! \brief Display intervals time. */
     int DisplayIntervals();
@@ -152,18 +152,36 @@ namespace PatternGeneratorJRL
 					 double InitPosition,
 					 double InitSpeed);
 
+    /*! This method gets the parameters for each of the polynome used by this
+      object. In this case, as it is used for the 3rd order polynome. The polynome to
+      which those parameters are set is specified with PolynomeIndex. 
+      @param PolynomeIndex: Set to which axis the parameters will be applied. 
+      @param AxisReference: Index to the axis to be used.
+      @param TimeInterval: Set the time base of the polynome.
+      @param FinalPosition: Set the final position of the polynome at TimeInterval.
+      @param InitPosition: Initial position when computing the polynome at t= m_AbsoluteTimeReference.
+      @param InitSpeed: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
+    */
+   int GetParametersWithInitPosInitSpeed(unsigned int PolynomeIndex,
+					 int AxisReference,
+					 double &TimeInterval,
+					 double &FinalPosition,
+					 double &InitPosition,
+					 double &InitSpeed);
+
    /*! \name Methods related to the Absolute Time Reference. 
      This time specifies the beginning of the trajectory. 
      @{ */
 
    /*! Returns the time when the trajectory starts. */
-   double GetAbsoluteTimeReference();
+   double GetAbsoluteTimeReference() const;
 
    /*! Set the time when the trajectory starts.  */
    void SetAbsoluteTimeReference(double lAbsoluteTimeReference);
 
    /*! @} */
    
+   FootTrajectoryGenerationMultiple & operator=(const FootTrajectoryGenerationMultiple & aFTGM);
 
   protected:
 

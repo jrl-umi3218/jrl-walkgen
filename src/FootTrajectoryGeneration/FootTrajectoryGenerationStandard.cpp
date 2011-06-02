@@ -226,6 +226,47 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
  return 0;
 }
 
+int FootTrajectoryGenerationStandard::GetParametersWithInitPosInitSpeed(int PolynomeIndex,
+									double &TimeInterval,
+									double &FinalPosition,
+									double &InitPosition,
+									double &InitSpeed)
+{
+ switch (PolynomeIndex)
+   {
+     
+   case X_AXIS:
+     ODEBUG("Initspeed: " << InitSpeed << " ");
+     m_PolynomeX->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+     
+   case Y_AXIS:
+     m_PolynomeY->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   case Z_AXIS:
+     m_PolynomeZ->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   case THETA_AXIS:
+     m_PolynomeTheta->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   case OMEGA_AXIS:
+     m_PolynomeOmega->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   case OMEGA2_AXIS:
+     m_PolynomeOmega2->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   default:
+     return -1;
+     break;
+   }
+ return 0;
+}
+
 double FootTrajectoryGenerationStandard::ComputeAll(FootAbsolutePosition & aFootAbsolutePosition,
 						    double Time)
 {

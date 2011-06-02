@@ -67,7 +67,7 @@ void FootTrajectoryGenerationMultiple::SetNumberOfIntervals(int lNumberOfInterva
   m_NatureOfIntervals.resize(lNumberOfIntervals);
 }
   
-int FootTrajectoryGenerationMultiple::GetNumberOfIntervals()
+int FootTrajectoryGenerationMultiple::GetNumberOfIntervals() const
 {
   return m_SetOfFootTrajectoryGenerationObjects.size();
 }
@@ -88,7 +88,7 @@ void FootTrajectoryGenerationMultiple::SetTimeIntervals(vector<double> &lDeltaTj
   
 }
 
-void FootTrajectoryGenerationMultiple::GetTimeIntervals(vector<double> &lDeltaTj)
+void FootTrajectoryGenerationMultiple::GetTimeIntervals(vector<double> &lDeltaTj) const
 {
   lDeltaTj = m_DeltaTj;
 }
@@ -190,7 +190,7 @@ int FootTrajectoryGenerationMultiple::SetNatureInterval(unsigned int IntervalInd
 
 /*! This method returns the nature of the interval. 
 */
-int FootTrajectoryGenerationMultiple::GetNatureInterval(unsigned int IntervalIndex)
+int FootTrajectoryGenerationMultiple::GetNatureInterval(unsigned int IntervalIndex) const
 {
   if (IntervalIndex>=m_NatureOfIntervals.size())
     return -100;
@@ -227,8 +227,35 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
   return 0;
 }
 
+/*! This method get the parameters for each of the polynome used by this
+  object. In this case, as it is used for the 3rd order polynome. The polynome to
+  which those parameters are set is specified with PolynomeIndex. 
+  @param PolynomeIndex: Set to which axis the parameters will be applied. 
+  @param TimeInterval: Set the time base of the polynome.
+  @param Position: Set the final position of the polynome at TimeInterval.
+  @param InitPosition: Initial position when computing the polynome at t=0.0.
+  @param InitSpeed: Initial speed when computing the polynome at t=0.0.
+*/
+int FootTrajectoryGenerationMultiple::GetParametersWithInitPosInitSpeed(unsigned int IntervalIndex,
+									int AxisReference,
+									double &TimeInterval,
+									double &FinalPosition,
+									double &InitPosition,
+									double &InitSpeed)
+{
+  if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
+    return -1;
 
-double FootTrajectoryGenerationMultiple::GetAbsoluteTimeReference()
+
+  m_SetOfFootTrajectoryGenerationObjects[IntervalIndex]->GetParametersWithInitPosInitSpeed(AxisReference,
+											   TimeInterval,
+											   FinalPosition,
+											   InitPosition,
+											   InitSpeed);
+  return 0;
+}
+
+double FootTrajectoryGenerationMultiple::GetAbsoluteTimeReference() const
 {
   return m_AbsoluteTimeReference;
 }
@@ -243,6 +270,7 @@ void FootTrajectoryGenerationMultiple::CallMethod(std::string &, //Method,
 {
   
 }
+
 int FootTrajectoryGenerationMultiple::DisplayIntervals()
 {
   for(unsigned int i=0;i<m_DeltaTj.size();i++)
@@ -251,3 +279,37 @@ int FootTrajectoryGenerationMultiple::DisplayIntervals()
     }
   return 0;
 }
+
+FootTrajectoryGenerationMultiple & 
+FootTrajectoryGenerationMultiple::operator=
+(const FootTrajectoryGenerationMultiple & aFTGM)
+{
+
+  /* Specify the number of intervals. */
+  SetNumberOfIntervals(aFTGM.GetNumberOfIntervals());
+
+  /* Copy time interval */
+  std::vector<double> lDeltaTj;
+  aFTGM.GetTimeIntervals(lDeltaTj);
+  SetTimeIntervals(lDeltaTj);
+
+  /* Copy nature of intervals */
+  for(unsigned int li=0;li<lDeltaTj.size();li++)
+    SetNatureInterval(li,aFTGM.GetNatureInterval(li));
+
+  /* Set absolute time reference */
+  SetAbsoluteTimeReference(aFTGM.GetAbsoluteTimeReference());
+
+  /* Copy the parameters */
+  for(unsigned int li=0;li<lDeltaTj.size();li++)
+    {
+      double TI, FP, IP, IS;
+      for(unsigned int lk=0;lk<6;lk++)
+	{
+	  GetParametersWithInitPosInitSpeed(li,lk,TI,FP,IP,IS);
+	  SetParametersWithInitPosInitSpeed(li,lk,TI,FP,IP,IS);
+	}
+    }
+  return *this;
+}
+

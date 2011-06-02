@@ -68,6 +68,9 @@ namespace PatternGeneratorJRL
       LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager * lSPM,
 						   CjrlFoot * inFoot);
 
+      /*! \brief Copy constructor. */
+      LeftAndRightFootTrajectoryGenerationMultiple(const LeftAndRightFootTrajectoryGenerationMultiple &);
+      
       /*! \brief Memory release. */
       ~LeftAndRightFootTrajectoryGenerationMultiple();
 
@@ -154,6 +157,9 @@ namespace PatternGeneratorJRL
 				      FootAbsolutePosition &SupportFootInitialPosition,
 				      deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions,
 				      unsigned int ChangedInterval);
+      
+      /*! Returns foot */
+      CjrlFoot * getFoot() const;
 
      protected:
 
@@ -192,7 +198,7 @@ namespace PatternGeneratorJRL
       void SetDeltaTj(std::vector<double> & aDeltaTj);
 
       /*! Get the intervals time */
-      void GetDeltaTj(std::vector<double> & aDeltaTj);
+      void GetDeltaTj(std::vector<double> & aDeltaTj) const;
 
       /*! Display intervals value for left and right feet. */
       void DisplayIntervals();
@@ -201,7 +207,7 @@ namespace PatternGeneratorJRL
       void SetStepHeight(double aStepHeight);
 
       /*! Get the step height. */
-      double GetStepHeight();      
+      double GetStepHeight() const;      
 
       /*! \name Methods related to the time reference.
 	@{ */
@@ -211,13 +217,19 @@ namespace PatternGeneratorJRL
       the coherency of the returned informations has to be checked.
       If this is not the case, i.e. the trajectory generators have different
       absolute time references, the method returns -1. */
-      double GetAbsoluteTimeReference();
+      double GetAbsoluteTimeReference() const;
 
       /*! \brief Set the time reference for all the trajectory generators. */
       void SetAbsoluteTimeReference(double anAbsoluteTimeReference);
 
       /*! @} */
 
+
+      FootTrajectoryGenerationMultiple * getLeftFootTrajectory() const;
+      FootTrajectoryGenerationMultiple * getRightFootTrajectory() const;
+
+      LeftAndRightFootTrajectoryGenerationMultiple & operator=
+	(const LeftAndRightFootTrajectoryGenerationMultiple & aLRFTGM);
       
     };
 }
