@@ -293,7 +293,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
 
 void
-ZMPVelocityReferencedQP::OnLine(double time,
+ZMPVelocityReferencedQP::OnLine(double Time,
 				     deque<ZMPPosition> & FinalZMPTraj_deq,
 				     deque<COMState> & FinalCOMTraj_deq,
 				     deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
@@ -306,7 +306,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
   // Testing if we are reaching the end of the online mode.
   if ((EndingPhase_) &&
-      (time>=TimeToStopOnLineMode_))
+      (Time>=TimeToStopOnLineMode_))
     { m_OnLineMode = false; }
 
 
@@ -322,7 +322,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
   // UPDATE WALKING TRAJECTORIES:
   // ----------------------------
-  if(time + 0.00001 > UpperTimeLimitToUpdate_)
+  if(Time + 0.00001 > UpperTimeLimitToUpdate_)
     {
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
       struct timeval start,end;
@@ -332,7 +332,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // UPDATE INTERNAL DATA:
       // ---------------------
       VRQPGenerator_->Reference(VelRef_);
-      VRQPGenerator_->CurrentTime(time+TimeBuffer_);
+      VRQPGenerator_->CurrentTime(Time+TimeBuffer_);
       VRQPGenerator_->CoM(CoM_());
 
 
@@ -364,7 +364,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // ------------------------------------------------------
       deque<double> PreviewedSupportAngles_deq;
-      OrientPrw_->preview_orientations(time+TimeBuffer_,
+      OrientPrw_->preview_orientations(Time+TimeBuffer_,
                                 VelRef_,
 				SupportFSM_->StepPeriod(), CurrentSupport,
 				FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
@@ -418,7 +418,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
       // COMPUTE ORIENTATION OF TRUNK:
       // -----------------------------
-      OrientPrw_->interpolate_trunk_orientation(time+TimeBuffer_, CurrentIndex,
+      OrientPrw_->interpolate_trunk_orientation(Time+TimeBuffer_, CurrentIndex,
                             m_SamplingPeriod,
                             CurrentSupport,
                             FinalCOMTraj_deq);
@@ -426,8 +426,8 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
       // INTERPOLATE THE COMPUTED FEET POSITIONS:
       // ----------------------------------------
-      unsigned NumberStepsPrwd = PrwSupportStates_deq.back().StepNumber;
-      OFTG_->interpolate_feet_positions(time+TimeBuffer_,
+      unsigned int NumberStepsPrwd = PrwSupportStates_deq.back().StepNumber;
+      OFTG_->interpolate_feet_positions(Time+TimeBuffer_,
                                CurrentIndex, CurrentSupport,
                                Result.Solution_vec[2*QP_N_], Result.Solution_vec[2*QP_N_+NumberStepsPrwd],
                                PreviewedSupportAngles_deq,

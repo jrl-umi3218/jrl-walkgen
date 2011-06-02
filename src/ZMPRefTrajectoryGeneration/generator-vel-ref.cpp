@@ -192,6 +192,7 @@ GeneratorVelRef::initialize_matrices()
 void
 GeneratorVelRef::initialize_matrices( linear_inequality_t & Inequalities)
 {
+
   switch(Inequalities.type)
     {
     case IntermedQPMat::INEQ_COP:
@@ -285,10 +286,10 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 
   //set constraints for the whole preview window
   double SupportAngle = CurrentSupportAngle;
-  const int nEdges = 4;
-  double D_x[nEdges] = {0.0, 0.0, 0.0, 0.0};
-  double D_y[nEdges] = {0.0, 0.0, 0.0, 0.0};
-  double dc[nEdges] = {0.0, 0.0, 0.0, 0.0};
+  const int NbEdges = 4;
+  double D_x[NbEdges] = {0.0, 0.0, 0.0, 0.0};
+  double D_y[NbEdges] = {0.0, 0.0, 0.0, 0.0};
+  double dc[NbEdges] = {0.0, 0.0, 0.0, 0.0};
   for( int i=1;i<=N_;i++ )
     {
       const support_state_t & PrwSupport = SupportStates_deq[i];
@@ -304,11 +305,11 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 
       RFI->compute_linear_system( ZMPFeasibilityEdges, D_x, D_y, dc, PrwSupport );
 
-      for(int j = 0;j < nEdges; j++)
+      for(int j = 0;j < NbEdges; j++)
         {
-          Inequalities.D.x.push_back((i-1)*nEdges+j,i-1,D_x[j]);
-          Inequalities.D.y.push_back((i-1)*nEdges+j,i-1,D_y[j]);
-          Inequalities.dc((i-1)*nEdges+j) = dc[j];
+          Inequalities.D.x.push_back((i-1)*NbEdges+j,i-1,D_x[j]);
+          Inequalities.D.y.push_back((i-1)*NbEdges+j,i-1,D_y[j]);
+          Inequalities.dc((i-1)*NbEdges+j) = dc[j];
         }
 
     }
