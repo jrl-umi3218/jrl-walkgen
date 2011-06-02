@@ -32,11 +32,6 @@
 #ifndef _RELATIVE_FEET_INEQUALITIES_
 #define _RELATIVE_FEET_INEQUALITIES_
 
-#include <vector>
-#include <deque>
-#include <string>
-#include <sstream>
-
 #include <jrl/mal/matrixabstractlayer.hh>
 
 #include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
@@ -52,6 +47,7 @@
 namespace PatternGeneratorJRL
 {
 
+  //TODO: Change syntax
   /// \brief Generate a stack of inequalities relative to feet centers for the whole preview window.
   class RelativeFeetInequalities:public SimplePlugin
   {
@@ -71,22 +67,22 @@ namespace PatternGeneratorJRL
     /// \name Constructors and destructors.
     /// \{
     RelativeFeetInequalities (SimplePluginManager * aSPM,
-                                            CjrlHumanoidDynamicRobot * aHS);
+        CjrlHumanoidDynamicRobot * aHS);
     ~RelativeFeetInequalities ();
     /// \}
 
 
     /// \brief Adapt vertices to the support foot and its orientation
     ///
-    /// \param[out] ConvexHull vertices of the ZMP convex hull
-    /// \param[in] Orientation
-    /// \param[in] SupportState
-    /// \param[in] constraints_type
+    /// \param[out] ConvexHull Vertices of the convex hull
+    /// \param[in] Orientation Desired orientation of the convex hull
+    /// \param[in] SupportState Corresponding support state
+    /// \param[in] Type Type
     /// \return 0
-    int setVertices( convex_hull_t & ConvexHull,
-		     double Orientation,
-		     const support_state_t & SupportState,
-		     int constraints_type);
+    int set_vertices( convex_hull_t & ConvexHull,
+        double Orientation,
+        const support_state_t & SupportState,
+        int Type);
 
     /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
     /// convex hull specified by a vector of points.
@@ -96,23 +92,23 @@ namespace PatternGeneratorJRL
     /// \param[out] Dc right hand side of the inequalities
     /// \param[in] PrwSupport previewed support state
     /// \return 0
-    int computeLinearSystem (const convex_hull_t & ConvexHull,
-                             MAL_MATRIX (&D, double),
-                             MAL_MATRIX (&Dc, double),
-                             const support_state_t & PrwSupport) const;
+    int compute_linear_system (const convex_hull_t & ConvexHull,
+        MAL_MATRIX (&D, double),
+        MAL_MATRIX (&Dc, double),
+        const support_state_t & PrwSupport) const;
 
     /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
     /// convex hull specified by a vector of points.
     ///
     /// \param[in] aVecOfPoints a vector of vertices
-    /// \param[out] D_x left hand side of the constraints
-    /// \param[out] D_y left hand side of the constraints
+    /// \param[out] Dx left hand side of the constraints
+    /// \param[out] Dy left hand side of the constraints
     /// \param[out] Dc right hand side of the constraints
     /// \param[in] PrwSupport previewed support state
     /// \return 0
-    int computeLinearSystem (const convex_hull_t & ConvexHull,
-			     double * D_x, double * D_y, double * d,
-			     const support_state_t & PrwSupport) const;
+    int compute_linear_system (const convex_hull_t & ConvexHull,
+        double * Dx, double * Dy, double * Dc,
+        const support_state_t & PrwSupport) const;
 
     /// \brief Reimplement the interface of SimplePluginManager
     ///
@@ -125,44 +121,34 @@ namespace PatternGeneratorJRL
     //
   private:
 
-    /// \brief Initialize
-    void initFPConstrArrays ();
-
     /// \brief Initialize the convex hulls for the constraints
     ///
     /// \return 0
-    int initConvexHulls ();
+    int init_convex_hulls ();
 
     /// \brief Define the dimensions of the feet
     ///
     /// \param aHS object of the robot
     /// \return 0
-    int setFeetDimensions ( CjrlHumanoidDynamicRobot * aHS );
+    int set_feet_dimensions ( CjrlHumanoidDynamicRobot * aHS );
 
     /// \brief Initialize the constraint hulls
     ///
     /// return 0
-    int initFeetConstraints ();
+    int init_feet_constraints ();
 
     //
     // Private members
     //
   private:
 
-    /// \brief Reference to the Humanoid Specificities.
-    CjrlHumanoidDynamicRobot * m_HS;
-
-    /// \brief Vertices defining the constraints on the feet positions
-    double *m_FPosConstrVerticesX;
-    double *m_FPosConstrVerticesY;
-
     struct edges_s
     {
       convex_hull_t
-        leftSS,
-        rightSS,
-        rightDS,
-        leftDS;
+      LeftSS,
+      RightSS,
+      RightDS,
+      LeftDS;
     };
     struct edges_s FootPosEdges_, ZMPPosEdges_;
 

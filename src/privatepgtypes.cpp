@@ -29,6 +29,7 @@ namespace PatternGeneratorJRL
 
   struct support_state_s & support_state_t::operator =(const support_state_s & aSS)
   {
+
     Phase  = aSS.Phase;
     Foot  = aSS.Foot;
     StepsLeft  = aSS.StepsLeft;
@@ -41,10 +42,13 @@ namespace PatternGeneratorJRL
     yaw = aSS.yaw;
 
     return *this;
+
   }
+
 
   void support_state_t::reset()
   {
+
     Phase  = 0;
     Foot  = 0;
     StepsLeft  = 0;
@@ -55,16 +59,21 @@ namespace PatternGeneratorJRL
     x = 0.0;
     y = 0.0;
     yaw = 0.0;
+
   }
+
 
   support_state_s::support_state_s()
   {
+
     reset();
+
   }
 
 
   struct com_s & com_t::operator=(const com_s &aCS)
   {
+
     for(unsigned int i=0;i<3;i++)
       {
 	x[i] = aCS.x[i];
@@ -72,28 +81,34 @@ namespace PatternGeneratorJRL
 	z[i] = aCS.z[i];
       };
     return *this;
+
   }
       
+
   void com_t::reset()
   {
-    for(unsigned int i=0;i<3;i++)
-      { 
-        MAL_VECTOR_RESIZE(x,3);
-        MAL_VECTOR_RESIZE(y,3);
-        MAL_VECTOR_RESIZE(z,3);
-	x[i] = 0.0;
-	y[i] = 0.0;
-	z[i] = 0.0;
-      }
+
+    x.resize(3,false);
+    y.resize(3,false);
+    z.resize(3,false);
+    x.clear();
+    y.clear();
+    z.clear();
+
   }
+
 
   com_s::com_s()
   {
+
     reset();
+
   }
+
 
   struct trunk_s & trunk_t::operator=(const trunk_s &aTS)
   {
+
     for(unsigned int i=0;i<3;i++)
       {
         x[i] = aTS.x[i];
@@ -105,96 +120,119 @@ namespace PatternGeneratorJRL
         roll[i] = aTS.roll[i];
       };
     return *this;
+
   }
+
 
   void trunk_t::reset()
   {
-    for(unsigned int i=0;i<3;i++)
-      {
-        MAL_VECTOR_RESIZE(x,3);
-        MAL_VECTOR_RESIZE(y,3);
-        MAL_VECTOR_RESIZE(z,3);
-        MAL_VECTOR_RESIZE(yaw,3);
-        MAL_VECTOR_RESIZE(pitch,3);
-        MAL_VECTOR_RESIZE(roll,3);
-        x[i] = 0.0;
-        y[i] = 0.0;
-        z[i] = 0.0;
-        yaw[i] = 0.0;
-        pitch[i] = 0.0;
-        roll[i] = 0.0;
-      }
+
+    x.resize(3,false);
+    y.resize(3,false);
+    z.resize(3,false);
+    yaw.resize(3,false);
+    pitch.resize(3,false);
+    roll.resize(3,false);
+    x.clear();
+    y.clear();
+    z.clear();
+    yaw.clear();
+    pitch.clear();
+    roll.clear();
+
   }
 
   trunk_s::trunk_s()
   {
+
     reset();
+
   }
 
 
   void
-  convex_hull_t::rotate( double angle )
+  convex_hull_t::rotate( double Angle )
   {
 
-    double c_a = cos(angle);
-    double s_a = sin(angle);
-
-    for( int j=0;j<X.size();j++ )
+    double XOld, YOld;
+    for( unsigned int j=0; j<X.size(); j++ )
       {
-	X[j] = ( X[j]*c_a - Y[j]*s_a );
-	Y[j] = ( X[j]*s_a + Y[j]*c_a );
+        XOld = X[j];
+        YOld = Y[j];
+        X[j] = ( XOld*cos(Angle) - YOld*sin(Angle) );
+        Y[j] = ( XOld*sin(Angle) + YOld*cos(Angle) );
       }
+
   }
 
-  convex_hull_s::convex_hull_s( int size )
+
+  convex_hull_s::convex_hull_s( int Size )
   {
-    resize(size);
+
+    resize(Size);
     reset();
+
   }
+
 
   convex_hull_s::convex_hull_s()
   {
 
   }
 
+
   void
   convex_hull_t::reset()
   {
+
     X.clear();
     Y.clear();
+
   }
 
-  void
-  convex_hull_t::resize( int size )
-    {
-      X.resize(size);
-      Y.resize(size);
-    }
 
   void
-  convex_hull_t::set(const double * arrayX, const double * arrayY)
+  convex_hull_t::resize( int Size )
   {
-    for(int i=0;i<X.size();i++)
-      {
-	X[i] = arrayX[i];
-	Y[i] = arrayY[i];
-      }
+
+    X.resize(Size);
+    Y.resize(Size);
+
   }
+
+
+  void
+  convex_hull_t::set( const double * Xa, const double * Ya )
+  {
+
+    for(unsigned i=0; i<X.size(); i++)
+      {
+        X[i] = Xa[i];
+        Y[i] = Ya[i];
+      }
+
+  }
+
 
   void
   linear_inequality_t::clear()
   {
-    x.D.clear();
-    y.D.clear();
+
+    D.x.clear();
+    D.y.clear();
     dc.clear();
+
   }
 
+
   void
-  linear_inequality_t::resize( int n_rows, int n_cols, bool preserve )
+  linear_inequality_t::resize( int NbRows, int NbCols, bool Preserve )
   {
-    x.D.resize(n_rows, n_cols, preserve);
-    y.D.resize(n_rows, n_cols, preserve);
-    dc.resize(n_rows, preserve);
+
+    D.x.resize(NbRows, NbCols, Preserve);
+    D.y.resize(NbRows, NbCols, Preserve);
+    dc.resize(NbRows, Preserve);
+
   }
 
 }

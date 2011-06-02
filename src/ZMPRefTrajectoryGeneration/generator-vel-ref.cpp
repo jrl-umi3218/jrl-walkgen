@@ -152,22 +152,21 @@ GeneratorVelRef::generate_selection_matrices( const std::deque<support_state_t> 
 
 
 void 
-GeneratorVelRef::compute_global_reference(const deque<COMState> & TrunkStates_deq)
+GeneratorVelRef::compute_global_reference( const deque<COMState> & TrunkStates_deq )
 {
 
   reference_t & Ref = Matrices_.Reference();
 
-  MAL_VECTOR_RESIZE(Ref.global.X,N_);
-  Ref.global.X.clear();
-  MAL_VECTOR_RESIZE(Ref.global.Y,N_);
-  Ref.global.Y.clear();
-
-  for( int i=0;i<N_;i++)
+  Ref.Global.X.resize(N_,false);
+  Ref.Global.X.clear();
+  Ref.Global.Y.resize(N_,false);
+  Ref.Global.Y.clear();
+  double YawTrunk;
+  for( int i=0;i<N_;i++ )
     {
-      Ref.global.X(i) = Ref.local.x*cos(TrunkStates_deq[(int)(i+1)*T_Prw_/T_Ctr_].yaw[0])-
-	Ref.local.y*sin(TrunkStates_deq[(int)(i+1)*T_Prw_/T_Ctr_].yaw[0]);
-      Ref.global.Y(i) = Ref.local.y*cos(TrunkStates_deq[(int)(i+1)*T_Prw_/T_Ctr_].yaw[0])+
-	Ref.local.x*sin(TrunkStates_deq[(int)(i+1)*T_Prw_/T_Ctr_].yaw[0]);
+      YawTrunk = TrunkStates_deq[(int)(i+1)*T_Prw_/T_Ctr_].yaw[0];
+      Ref.Global.X(i) = Ref.Local.x*cos(YawTrunk)-Ref.Local.y*sin(YawTrunk);
+      Ref.Global.Y(i) = Ref.Local.y*cos(YawTrunk)+Ref.Local.x*sin(YawTrunk);
     }
 
 }
@@ -196,12 +195,11 @@ GeneratorVelRef::initialize_matrices( linear_inequality_t & Inequalities)
   switch(Inequalities.type)
     {
     case IntermedQPMat::INEQ_COP:
-      bool preserve = true;
-      Inequalities.x.D.resize(4*N_,N_,!preserve);
-      Inequalities.x.D.clear();
-      Inequalities.y.D.resize(4*N_,N_,!preserve);
-      Inequalities.y.D.clear();
-      Inequalities.dc.resize(4*N_,!preserve);
+      Inequalities.D.x.resize(4*N_,N_,false);
+      Inequalities.D.x.clear();
+      Inequalities.D.y.resize(4*N_,N_,false);
+      Inequalities.D.y.clear();
+      Inequalities.dc.resize(4*N_,false);
       Inequalities.dc.clear();
       break;
     }
@@ -280,7 +278,7 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
   else
     CurrentSupportAngle = AbsoluteRightFootPositions.back().theta*M_PI/180.0;
   convex_hull_t ZMPFeasibilityEdges;
-  RFI->setVertices( ZMPFeasibilityEdges,
+  RFI->set_vertices( ZMPFeasibilityEdges,
 		      CurrentSupportAngle,
 		      CurrentSupport,
 		      RelativeFeetInequalities::ZMP_CONSTRAINTS);
@@ -299,17 +297,17 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
         SupportAngle = PreviewedSupportAngles[PrwSupport.StepNumber-1];
 
       if( PrwSupport.StateChanged )
-        RFI->setVertices( ZMPFeasibilityEdges,
+        RFI->set_vertices( ZMPFeasibilityEdges,
 			    SupportAngle,
 			    PrwSupport,
 			    RelativeFeetInequalities::ZMP_CONSTRAINTS);
 
-      RFI->computeLinearSystem( ZMPFeasibilityEdges, D_x, D_y, dc, PrwSupport );
+      RFI->compute_linear_system( ZMPFeasibilityEdges, D_x, D_y, dc, PrwSupport );
 
       for(int j = 0;j < nEdges; j++)
         {
-          Inequalities.x.D.push_back((i-1)*nEdges+j,i-1,D_x[j]);
-          Inequalities.y.D.push_back((i-1)*nEdges+j,i-1,D_y[j]);
+          Inequalities.D.x.push_back((i-1)*nEdges+j,i-1,D_x[j]);
+          Inequalities.D.y.push_back((i-1)*nEdges+j,i-1,D_y[j]);
           Inequalities.dc((i-1)*nEdges+j) = dc[j];
         }
 
@@ -327,29 +325,27 @@ GeneratorVelRef::build_inequalities_feet(linear_inequality_t & Inequalities,
 				       const std::deque<double> & PreviewedSupportAngles) const
 {
 
+  // Initialize support angle
   const support_state_t & CurrentSupport = SupportStates_deq.front();
-
   double CurrentSupportAngle;
-  if( CurrentSupport.Foot==1 )
+  if( CurrentSupport.Foot == 1 )
     CurrentSupportAngle = AbsoluteLeftFootPositions.back().theta*M_PI/180.0;
   else
     CurrentSupportAngle = AbsoluteRightFootPositions.back().theta*M_PI/180.0;
-
-  convex_hull_t FootFeasibilityEdges;
-
-  //set constraints for the whole preview window
   double SupportAngle = CurrentSupportAngle;
 
   // Arrays for the generated set of inequalities
   const int NbEdges = 5;
-  double D_x[NbEdges] = {0.0, 0.0, 0.0, 0.0, 0.0};
-  double D_y[NbEdges] = {0.0, 0.0, 0.0, 0.0, 0.0};
+  double Dx[NbEdges] = {0.0, 0.0, 0.0, 0.0, 0.0};
+  double Dy[NbEdges] = {0.0, 0.0, 0.0, 0.0, 0.0};
   double dc[NbEdges] = {0.0, 0.0, 0.0, 0.0, 0.0};
 
   int NbStepsPreviewed = SupportStates_deq.back().StepNumber;
   Inequalities.resize(NbEdges*NbStepsPreviewed,NbStepsPreviewed, false);
 
-  int nb_step = 0;
+  convex_hull_t FootFeasibilityEdges;
+
+  int StepNumber = 0;
   for( int i=1;i<=N_;i++ )
     {
 
@@ -358,7 +354,6 @@ GeneratorVelRef::build_inequalities_feet(linear_inequality_t & Inequalities,
       //foot positioning constraints
       if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 && PrwSupport.Phase != 0)
 	{
-
 	  SupportAngle = PreviewedSupportAngles[PrwSupport.StepNumber-1];
 
 	  if( PrwSupport.StepNumber == 1 )
@@ -366,22 +361,22 @@ GeneratorVelRef::build_inequalities_feet(linear_inequality_t & Inequalities,
 	  else
 	    SupportAngle = PreviewedSupportAngles[PrwSupport.StepNumber-2];
 
-	  RFI->setVertices( FootFeasibilityEdges,
-			      SupportAngle, PrwSupport,
-			      RelativeFeetInequalities::FOOT_CONSTRAINTS);
+	  RFI->set_vertices( FootFeasibilityEdges, SupportAngle, PrwSupport,
+			      RelativeFeetInequalities::FOOT_CONSTRAINTS );
 
-	  RFI->computeLinearSystem( FootFeasibilityEdges, D_x, D_y, dc, PrwSupport );
+	  RFI->compute_linear_system( FootFeasibilityEdges, Dx, Dy, dc, PrwSupport );
 
 	  for(int j = 0;j < NbEdges; j++)
 	    {
-	      Inequalities.x.D.push_back((PrwSupport.StepNumber-1)*NbEdges+j, (PrwSupport.StepNumber-1), D_x[j]);
-	      Inequalities.y.D.push_back((PrwSupport.StepNumber-1)*NbEdges+j, (PrwSupport.StepNumber-1), D_y[j]);
+	      Inequalities.D.x.push_back((PrwSupport.StepNumber-1)*NbEdges+j, (PrwSupport.StepNumber-1), Dx[j]);
+	      Inequalities.D.y.push_back((PrwSupport.StepNumber-1)*NbEdges+j, (PrwSupport.StepNumber-1), Dy[j]);
 	      Inequalities.dc((PrwSupport.StepNumber-1)*NbEdges+j) = dc[j];
 	    }
 
-	  nb_step++;
+	  StepNumber++;
 	}
     }
+
 }
 
 
@@ -396,15 +391,15 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   boost_ublas::matrix<double> MM(NbInequalities,N_,false);
 
   // -D*U
-  compute_term(MM,-1.0,IneqCoP.x.D,CoP.U);
+  compute_term(MM,-1.0,IneqCoP.D.x,CoP.U);
   Pb.add_term(MM,QPProblem::MATRIX_DU,0,0);
-  compute_term(MM,-1.0,IneqCoP.y.D,CoP.U);
+  compute_term(MM,-1.0,IneqCoP.D.y,CoP.U);
   Pb.add_term(MM,QPProblem::MATRIX_DU,0,N_);
 
   // +D*V
-  compute_term(MM,1.0,IneqCoP.x.D,State.V);
+  compute_term(MM,1.0,IneqCoP.D.x,State.V);
   Pb.add_term(MM,QPProblem::MATRIX_DU,0,2*N_);
-  compute_term(MM,1.0,IneqCoP.y.D,State.V);
+  compute_term(MM,1.0,IneqCoP.D.y,State.V);
   Pb.add_term(MM,QPProblem::MATRIX_DU,0,2*N_+NbStepsPreviewed);
 
   //constant part
@@ -415,17 +410,17 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   boost_ublas::matrix<double> MM2(NbInequalities,3,false);
 
   // -D*S_z*x
-  compute_term(MM2,1.0,IneqCoP.x.D,CoP.S);
+  compute_term(MM2,1.0,IneqCoP.D.x,CoP.S);
   compute_term(MV,-1.0,MM2,State.CoM.x);
   Pb.add_term(MV,QPProblem::VECTOR_DS,0);
-  compute_term(MM2,1.0,IneqCoP.y.D,CoP.S);
+  compute_term(MM2,1.0,IneqCoP.D.y,CoP.S);
   compute_term(MV,-1.0,MM2,State.CoM.y);
   Pb.add_term(MV,QPProblem::VECTOR_DS,0);
 
   // +D*Vc*FP
-  compute_term(MV, State.SupportState.x, IneqCoP.x.D, State.Vc);
+  compute_term(MV, State.SupportState.x, IneqCoP.D.x, State.Vc);
   Pb.add_term(MV,QPProblem::VECTOR_DS,0);
-  compute_term(MV, State.SupportState.y, IneqCoP.y.D, State.Vc);
+  compute_term(MV, State.SupportState.y, IneqCoP.D.y, State.Vc);
   Pb.add_term(MV,QPProblem::VECTOR_DS,0);
 
 }
@@ -442,9 +437,9 @@ GeneratorVelRef::build_constraints_feet(const linear_inequality_t & IneqFeet,
   boost_ublas::matrix<double> MM(NbConstraints,NbStepsPreviewed,false);
 
   // -D*V_f
-  compute_term(MM,-1.0,IneqFeet.x.D,State.V_f);
+  compute_term(MM,-1.0,IneqFeet.D.x,State.V_f);
   Pb.add_term(MM,QPProblem::MATRIX_DU,4*N_,2*N_);
-  compute_term(MM,-1.0,IneqFeet.y.D,State.V_f);
+  compute_term(MM,-1.0,IneqFeet.D.y,State.V_f);
   Pb.add_term(MM,QPProblem::MATRIX_DU,4*N_,2*N_+NbStepsPreviewed);
 
   // +dc
@@ -452,9 +447,9 @@ GeneratorVelRef::build_constraints_feet(const linear_inequality_t & IneqFeet,
 
   // +D*Vc_f*FP
   boost_ublas::vector<double> MV(NbConstraints*NbStepsPreviewed,false);
-  compute_term(MV, State.SupportState.x, IneqFeet.x.D, State.Vc_f);
+  compute_term(MV, State.SupportState.x, IneqFeet.D.x, State.Vc_f);
   Pb.add_term(MV,QPProblem::VECTOR_DS,4*N_);
-  compute_term(MV, State.SupportState.y, IneqFeet.y.D, State.Vc_f);
+  compute_term(MV, State.SupportState.y, IneqFeet.D.y, State.Vc_f);
   Pb.add_term(MV,QPProblem::VECTOR_DS,4*N_);
 
 }
@@ -546,9 +541,9 @@ GeneratorVelRef::update_problem(QPProblem & Pb, const std::deque<support_state_t
   compute_term(weightMTV, InstVel.weight, InstVel.dyn->UT, MV, InstVel.dyn->S, State.CoM.y);
   Pb.add_term(weightMTV, QPProblem::VECTOR_D, N_);
   // +a*U'*ref
-  compute_term(weightMTV, -InstVel.weight, InstVel.dyn->UT, State.Ref.global.X);
+  compute_term(weightMTV, -InstVel.weight, InstVel.dyn->UT, State.Ref.Global.X);
   Pb.add_term(weightMTV, QPProblem::VECTOR_D, 0);
-  compute_term(weightMTV, -InstVel.weight, InstVel.dyn->UT, State.Ref.global.Y);
+  compute_term(weightMTV, -InstVel.weight, InstVel.dyn->UT, State.Ref.Global.Y);
   Pb.add_term(weightMTV, QPProblem::VECTOR_D, N_);
 
   // COP - centering terms
