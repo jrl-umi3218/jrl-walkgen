@@ -1415,7 +1415,6 @@ namespace PatternGeneratorJRL {
 			   lRelativeFootPositions.sx << " SY: "
 			   << lRelativeFootPositions.sy );
 		    m_ZMPM->SetCurrentTime(m_InternalClock);
-		    m_ZMPM->PropagateAbsoluteReferenceTime(m_InternalClock);
 		    m_ZMPM->OnLineAddFoot(lRelativeFootPositions,
 					  m_ZMPPositions,
 					  m_COMBuffer,
