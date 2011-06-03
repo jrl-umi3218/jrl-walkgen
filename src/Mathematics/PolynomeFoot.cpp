@@ -54,6 +54,9 @@ void Polynome3::SetParametersWithInitPosInitSpeed(double FT,
 						  double InitPos,
 						  double InitSpeed)
 {
+  m_FT = FT;
+  m_FP = FP;
+
   double tmp;
   m_Coefficients[0] = InitPos;
   m_Coefficients[1] = InitSpeed;
@@ -101,6 +104,9 @@ void Polynome4::SetParametersWithInitPosInitSpeed(double FT,
 						  double InitPos,
 						  double InitSpeed)
 {
+  m_FT = FT;
+  m_MP = MP;
+
   double tmp;
   m_Coefficients[0] = InitPos;
   m_Coefficients[1] = InitSpeed;

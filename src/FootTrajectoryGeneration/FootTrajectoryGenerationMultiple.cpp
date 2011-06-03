@@ -227,6 +227,28 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
   return 0;
 }
 
+/*! This method specifies the parameters for each of the polynome used by this
+  object. In this case, as it is used for the 3rd order polynome. The polynome to
+  which those parameters are set is specified with PolynomeIndex. 
+  @param PolynomeIndex: Set to which axis the parameters will be applied. 
+  @param TimeInterval: Set the time base of the polynome.
+  @param Position: Set the final position of the polynome at TimeInterval.
+*/
+int FootTrajectoryGenerationMultiple::SetParameters(unsigned int IntervalIndex,
+						    int AxisReference,
+						    double TimeInterval,
+						    double FinalPosition)
+{
+  if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
+    return -1;
+
+
+  m_SetOfFootTrajectoryGenerationObjects[IntervalIndex]->SetParameters(AxisReference,
+								       TimeInterval,
+								       FinalPosition);
+  return 0;
+}
+
 /*! This method get the parameters for each of the polynome used by this
   object. In this case, as it is used for the 3rd order polynome. The polynome to
   which those parameters are set is specified with PolynomeIndex. 
@@ -307,7 +329,11 @@ FootTrajectoryGenerationMultiple::operator=
       for(unsigned int lk=0;lk<6;lk++)
 	{
 	  GetParametersWithInitPosInitSpeed(li,lk,TI,FP,IP,IS);
-	  SetParametersWithInitPosInitSpeed(li,lk,TI,FP,IP,IS);
+	  /*! Special case when TI is equal to zero */
+	  if (TI==0.0)
+	    SetParameters(li,lk,TI,FP);
+	  else
+	    SetParametersWithInitPosInitSpeed(li,lk,TI,FP,IP,IS);
 	}
     }
   return *this;
