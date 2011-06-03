@@ -532,6 +532,25 @@ namespace PatternGeneratorJRL
 			   CompactTrajectoryInstanceParameters &aCTIPY);
       /*! @} */
 
+      /*! \brief Fill the queues of CoM, ZMP and feet trajectories.
+	The queues are filled by using the polynomial stored in m_AnalyticalZMPCoGTrajectoryX and
+	m_AnalyticalZMPCoGTrajectoryY. The interval time used for this is specified by StartingTime
+	and EndTime. The period used to sample the trajectory is m_SamplingPeriod.
+
+	\param StartingTime: The starting time to fill in the queues.
+	\param EndTime: The ending time to fill in the queues.
+	\param FinalZMPPositions: The queue of ZMP positions. More specifically fill in \f$px\f$ and \f$py\f$.
+	\param FinalCoMPositions: The queue of CoM positions. More specifically fill in \f$x,\dot{x},y,\dot{y}, z\f$, 
+	\param FinalLeftFootAbsolutePositions: The queue of Left Foot Absolute positions.
+	\param FinalRightFootAbsolutePositions: The queue of Right Foot Absolute positions.
+      */
+      void FillQueues(double StartingTime,
+		      double EndTime,
+		      deque<ZMPPosition> & FinalZMPPositions,
+		      deque<COMState> & FinalCoMPositions,
+		      deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+		      deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions);
+
       /*! \brief LU decomposition of the Z matrix. */
       MAL_MATRIX_TYPE(double) m_AF;
 

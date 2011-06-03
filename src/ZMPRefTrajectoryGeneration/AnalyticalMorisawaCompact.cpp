@@ -765,7 +765,7 @@ namespace PatternGeneratorJRL
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Test.dat");
       }
 
-    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.25 * m_Tsingle;    
+    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;    
     ODEBUG("End of InitOnLine : Size of relative foot positions: " << m_RelativeFootPositions.size());
 
     
@@ -914,7 +914,7 @@ namespace PatternGeneratorJRL
     aNewFootAbsPos.resize(1);
     aNewFootAbsPos[0]=aQAFP.back();
     
-    ODEBUG("New Foot Position: " << aNewFootAbsPos[0].x << " " << aNewFootAbsPos[0].y );
+    ODEBUG3("New Foot Position: " << aNewFootAbsPos[0].x << " " << aNewFootAbsPos[0].y );
     ODEBUG("Current Time: " << m_CurrentTime );
     m_AbsoluteCurrentSupportFootPosition = m_AbsoluteSupportFootPositions[0];
 
@@ -930,6 +930,7 @@ namespace PatternGeneratorJRL
     
     m_Clock2.StartTiming();
 
+    /* Realize the foot changing position during the last interval */
     ChangeFootLandingPosition(m_CurrentTime,
 			      IndexLastZMPProfil,
 			      aNewFootAbsPos,
@@ -998,7 +999,7 @@ namespace PatternGeneratorJRL
     m_Clock3.IncIteration();
 
     /* Update the time at which the stack should not be updated anymore */
-    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.25 * m_Tsingle;    
+    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;    
     ODEBUG("****************** End OnLineAddFoot **************************");
   }
 
@@ -2305,8 +2306,7 @@ namespace PatternGeneratorJRL
 	  BackUpm_AbsoluteSupportFootPositions;
 	m_RelativeFootPositions = 
 	  BackUpm_RelativeFootPositions;
-	//       	*m_FeetTrajectoryGenerator = 
-	//	  *m_BackUpm_FeetTrajectoryGenerator;
+	// *m_FeetTrajectoryGenerator =  *m_BackUpm_FeetTrajectoryGenerator;
 	ODEBUG("Unable to change the step ( " <<  
 		aFootAbsolutePosition[0].x << " , " <<
 		aFootAbsolutePosition[0].y << " , " <<
@@ -2323,7 +2323,7 @@ namespace PatternGeneratorJRL
     CoMPositions.clear();
     LeftFootAbsolutePositions.clear();
     RightFootAbsolutePositions.clear();
-    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.25 * m_Tsingle;    
+    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;    
     ODEBUG("m_UpperTimeLimitToUpdateStacks "<< m_UpperTimeLimitToUpdateStacks << 
 	    " m_AbsoluteTimeReference: " <<m_AbsoluteTimeReference << 
 	    " m_DeltaTj[0] " << m_DeltaTj[0] << " m_Tdble: " << m_Tdble);
@@ -2401,109 +2401,62 @@ namespace PatternGeneratorJRL
     vector<double> * lZMPY=0;
     double FinalCoMPosY=0.0;
 
-    lZMPX = &m_CTIPX.ZMPProfil;
-
+    /*! Prepare end condition for CoM along X axis */
     if (DoNotPrepareLastFoot)
       FinalCoMPosX = m_AbsoluteSupportFootPositions[lindex].x;
     else
       FinalCoMPosX = 0.5 *(m_AbsoluteSupportFootPositions[lindex-1].x + 
 			   m_AbsoluteSupportFootPositions[lindex].x);
+    m_CTIPX.FinalCoMPos = FinalCoMPosX;
 
-    ODEBUG("FinalCoMPosX:" << FinalCoMPosX);
-
+    /*! Prepare end condition for ZMP along X axis */
+    lZMPX = &m_CTIPX.ZMPProfil;
     unsigned int j=lZMPX->size();
-
     if (DoNotPrepareLastFoot)
       (*lZMPX)[j-2] = (*lZMPX)[j-1] = m_AbsoluteSupportFootPositions[lindex].x;
     else
       (*lZMPX)[j-2] = (*lZMPX)[j-1] = FinalCoMPosX;
     
-    m_CTIPX.FinalCoMPos = FinalCoMPosX;
-
     /*! Build 3rd order polynomials. */
     for(int i=1;i<NbOfIntervals-1;i++)
       {	m_AnalyticalZMPCoGTrajectoryX->Building3rdOrderPolynomial(i,(*lZMPX)[i-1],(*lZMPX)[i]); }
     
+    /*! Compute trajectory for CoM along X axis. */
     ComputeTrajectory(m_CTIPX,*m_AnalyticalZMPCoGTrajectoryX);
 
-    lZMPY = &m_CTIPY.ZMPProfil;
-
+    /*! Prepare end condition for CoM along Y axis */
     if (DoNotPrepareLastFoot)
       FinalCoMPosY = m_AbsoluteSupportFootPositions[lindex].y;
     else
       FinalCoMPosY = 0.5 *(m_AbsoluteSupportFootPositions[lindex-1].y + 
 			   m_AbsoluteSupportFootPositions[lindex].y);
-    
+    m_CTIPY.FinalCoMPos = FinalCoMPosY;
+
+    /*! Prepare end condition for ZMP along Y axis */
+    lZMPY = &m_CTIPY.ZMPProfil;
     if (DoNotPrepareLastFoot)
       (*lZMPY)[j-2] = (*lZMPY)[j-1] = m_AbsoluteSupportFootPositions[lindex].y;
     else
       (*lZMPY)[j-2] = (*lZMPY)[j-1] = FinalCoMPosY;
 
-    m_CTIPY.FinalCoMPos = FinalCoMPosY;
-
     /*! Build 3rd order polynomials. */
     for(int i=1;i<NbOfIntervals-1;i++)
       {	m_AnalyticalZMPCoGTrajectoryY->Building3rdOrderPolynomial(i,(*lZMPY)[i-1],(*lZMPY)[i]); }
 
+    /*! Compute the analytical trajectory*/
     ComputeTrajectory(m_CTIPY,*m_AnalyticalZMPCoGTrajectoryY);
-
+    
+    /* Specify when a new step should be asked for. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_PreviewControlTime;    
     ODEBUG("m_UpperTimeLimitToUpdateStacks:" << m_UpperTimeLimitToUpdateStacks);
-
-    unsigned int lIndexInterval,lPrevIndexInterval;
-    m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_AbsoluteTimeReference,lIndexInterval);
-    lPrevIndexInterval = lIndexInterval;
-
-    /*! Fill in the stacks: minimal strategy only 1 reference. */
-    for(double t=m_CurrentTime; t<=m_CurrentTime+2*m_SamplingPeriod; t+= m_SamplingPeriod)
-      {
-	m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(t,lIndexInterval,lPrevIndexInterval);
-	
-	/*! Feed the ZMPPositions. */
-	ZMPPosition aZMPPos;
-        if (!m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px,lIndexInterval))
-	  LTHROW("Unable to compute ZMP along X-Axis in EndPhaseOfWalking");
-	  
-	if (!m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py,lIndexInterval))
-	  LTHROW("Unable to compute ZMP along Y-Axis in EndPhaseOfWalking");
-
-	FinalZMPPositions.push_back(aZMPPos);
-
-		
-	/*! Feed the COMStates. */
-	COMState aCOMPos;
-	memset(&aCOMPos,0,sizeof(aCOMPos));
-	if (!m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0],lIndexInterval))
-	  { LTHROW("COM out of bound along X axis.");}
-	m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(t,aCOMPos.x[1],lIndexInterval);
-	if (!m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0],lIndexInterval))
-	  { LTHROW("COM out of bound along Y axis.");}
-	m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1],lIndexInterval);
-	aCOMPos.z[0] = m_InitialPoseCoMHeight;
-	FinalCoMPositions.push_back(aCOMPos);
-	/*! Feed the FootPositions. */
-
-	/*! Left */
-	FootAbsolutePosition LeftFootAbsPos;
-	memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
-	if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos,lIndexInterval))
-	  { LTHROW("Unable to compute left foot position in EndPhaseOfWalking");}
-	FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
-
-	/*! Right */
-	FootAbsolutePosition RightFootAbsPos;
-	memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
-	if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos,lIndexInterval))
-	  { LTHROW("Unable to compute right foot position in EndPhaseOfWalking");}
-	FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
-	  
-
-	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " << 
-		aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
-		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
-		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " << 
-		m_SamplingPeriod,"Test.dat");
-      }
+    
+    /* Put two positions from the new polynomials in the queues. */
+    FillQueues(m_CurrentTime,
+	       m_CurrentTime+2*m_SamplingPeriod,
+	       FinalZMPPositions,
+	       FinalCoMPositions,
+	       FinalLeftFootAbsolutePositions,
+	       FinalRightFootAbsolutePositions);
 
     m_EndPhase=true;
     ODEBUG("****************** End of EndPhaseOfTheWalking **************************");
@@ -2569,6 +2522,70 @@ namespace PatternGeneratorJRL
     m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(x);
     m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(x);
     m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(x);
+  }
+
+  void AnalyticalMorisawaCompact::FillQueues(double StartingTime,
+					     double EndTime,
+					     deque<ZMPPosition> & FinalZMPPositions,
+					     deque<COMState> & FinalCoMPositions,
+					     deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+					     deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions)
+  {
+    unsigned int lIndexInterval,lPrevIndexInterval;
+    m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_AbsoluteTimeReference,lIndexInterval);
+    lPrevIndexInterval = lIndexInterval;
+
+    ODEBUG3("Starting Time: " << StartingTime);
+    /*! Fill in the stacks: minimal strategy only 1 reference. */
+    for(double t=StartingTime; t<=EndTime; t+= m_SamplingPeriod)
+      {
+	m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(t,lIndexInterval,lPrevIndexInterval);
+	
+	/*! Feed the ZMPPositions. */
+	ZMPPosition aZMPPos;
+        if (!m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px,lIndexInterval))
+	  LTHROW("Unable to compute ZMP along X-Axis in EndPhaseOfWalking");
+	  
+	if (!m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py,lIndexInterval))
+	  LTHROW("Unable to compute ZMP along Y-Axis in EndPhaseOfWalking");
+
+	FinalZMPPositions.push_back(aZMPPos);
+
+	/*! Feed the COMStates. */
+	COMState aCOMPos;
+	memset(&aCOMPos,0,sizeof(aCOMPos));
+	if (!m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0],lIndexInterval))
+	  { LTHROW("COM out of bound along X axis.");}
+	m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(t,aCOMPos.x[1],lIndexInterval);
+	if (!m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0],lIndexInterval))
+	  { LTHROW("COM out of bound along Y axis.");}
+	m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1],lIndexInterval);
+	aCOMPos.z[0] = m_InitialPoseCoMHeight;
+	FinalCoMPositions.push_back(aCOMPos);
+	/*! Feed the FootPositions. */
+
+	/*! Left */
+	FootAbsolutePosition LeftFootAbsPos;
+	memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
+	if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos,lIndexInterval))
+	  { LTHROW("Unable to compute left foot position in EndPhaseOfWalking");}
+	FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
+
+	/*! Right */
+	FootAbsolutePosition RightFootAbsPos;
+	memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
+	if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos,lIndexInterval))
+	  { LTHROW("Unable to compute right foot position in EndPhaseOfWalking");}
+	FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
+	  
+
+	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " << 
+		aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
+		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
+		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " << 
+		m_SamplingPeriod,"Test.dat");
+      }
+
   }
 }
 
