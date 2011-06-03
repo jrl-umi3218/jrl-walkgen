@@ -166,7 +166,7 @@ protected:
 	  cout.flush();
 	}
 
-      double triggertime = 9.7*200 + m_deltatime*200;
+      double triggertime = 9.8*200 + m_deltatime*200;
       if ((m_OneStep.NbOfIt>triggertime) &&
 	  m_TestChangeFoot)
 	{
@@ -204,7 +204,7 @@ protected:
 	    }
 	  else 
 	    {
-	      m_deltatime += 0.025;
+	      m_deltatime += 0.005;
 	    }
 	}
     }
