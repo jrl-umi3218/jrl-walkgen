@@ -259,6 +259,9 @@ namespace PatternGeneratorJRL
 
       /*! Store the absolute time reference */
       double m_AbsoluteTimeReference;
+
+      /* \brien Sensitivity to numerical noise. */
+      double m_Sensitivity;
     };
 
   std::ostream& operator <<(std::ostream &os,const AnalyticalZMPCOGTrajectory &obj);

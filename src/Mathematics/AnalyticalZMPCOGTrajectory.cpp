@@ -39,6 +39,7 @@ namespace PatternGeneratorJRL
   {
     SetNumberOfIntervals(lNbOfIntervals);
     m_AbsoluteTimeReference = 0.0;
+    m_Sensitivity = 0.0;
   }
 
 
@@ -96,7 +97,7 @@ namespace PatternGeneratorJRL
     for(unsigned int j=0;j<m_DeltaTj.size();j++)
       {
 	ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<j << "]= "<< m_DeltaTj[j]);
-	if ((t>=reftime) && (t<=reftime+m_DeltaTj[j]))
+	if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
 	  {
 	    double deltaj=0.0;
 	    deltaj = t-reftime;
@@ -139,7 +140,7 @@ namespace PatternGeneratorJRL
     for(unsigned int j=0;j<m_DeltaTj.size();j++)
       {
 	ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<j << "]= "<< m_DeltaTj[j]);
-	if ((t>=reftime) && (t<=reftime+m_DeltaTj[j]))
+	if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
 	  {
 	    double deltaj=0.0;
 	    deltaj = t-reftime;
@@ -202,7 +203,7 @@ namespace PatternGeneratorJRL
     ODEBUG(" ====== ZMP ====== " );
     for(unsigned int j=0;j<m_DeltaTj.size();j++)
       {
-	if ((t>=reftime) && (t<=reftime+m_DeltaTj[j]))
+	if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
 	  {
 	    double deltaj=0.0;
 	    deltaj = t-reftime;
@@ -241,7 +242,7 @@ namespace PatternGeneratorJRL
     for(unsigned int j=0;j<m_DeltaTj.size();j++)
       {
 	ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<j << "]= "<< m_DeltaTj[j]);
-	if ((t>=reftime) && (t<=reftime+m_DeltaTj[j]))
+	if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
 	  {
 	    double deltaj=0.0;
 	    deltaj = t-reftime;
@@ -477,7 +478,7 @@ namespace PatternGeneratorJRL
     for(unsigned int lj=0;lj<m_DeltaTj.size();lj++)
       {
 	ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<lj << "]= "<< m_DeltaTj[lj]);
-	if ((t>=reftime) && (t<=reftime+m_DeltaTj[lj]))
+	if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[lj]+m_Sensitivity))
 	  {
 	    j = lj;
 	    return true;
@@ -495,7 +496,7 @@ namespace PatternGeneratorJRL
     for(unsigned int lj=prev_j;lj<m_DeltaTj.size();lj++)
       {
 	ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<j << "]= "<< m_DeltaTj[j]);
-	if ((t>=reftime) && (t<=reftime+m_DeltaTj[lj]))
+	if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[lj]+m_Sensitivity))
 	  {
 	    j = lj;
 	    return true;
