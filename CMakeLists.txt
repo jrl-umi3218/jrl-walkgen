@@ -52,7 +52,7 @@ ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.1.0")
 # Add aggressive optimization flags in release mode.
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET (CMAKE_CXX_FLAGS_RELEASE
-    "-O2 -DNDEBUG")
+    "-O3 -DNDEBUG")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 #IF(CMAKE_COMPILER_IS_GNUCXX)
