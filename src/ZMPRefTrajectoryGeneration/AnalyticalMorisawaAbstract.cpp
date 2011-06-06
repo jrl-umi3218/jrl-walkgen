@@ -155,4 +155,19 @@ namespace PatternGeneratorJRL
     os << endl;
     return os;
   }
+  
+  void AnalyticalMorisawaAbstract::displayDeltaTj(ostream &aos)
+  {
+    aos << "AnalyticalMorisawaCompact:";
+    for(unsigned int li=0;
+	li < m_DeltaTj.size();
+	li++)
+      {
+	aos << m_DeltaTj[li] ;
+	if (li < m_DeltaTj.size()-1)
+	  aos << " ";
+      }
+    aos << endl;
+  }
+  
 }

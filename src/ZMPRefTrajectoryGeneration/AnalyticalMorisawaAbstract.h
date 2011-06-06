@@ -361,8 +361,11 @@ namespace PatternGeneratorJRL
       /*! \brief Verbose level for debugging purposes.*/
       unsigned m_VerboseLevel;
 
-      /*! @} */
+      /*! \brief Display the value of m_DeltaTj in ostream aos. */
+      void displayDeltaTj(ostream &aos);
 
+      /*! @} */
+      
     public:
 
       /*! \brief Get the absolute reference time of 
