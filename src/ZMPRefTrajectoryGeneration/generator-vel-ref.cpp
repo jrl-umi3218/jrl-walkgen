@@ -703,9 +703,9 @@ GeneratorVelRef::build_constraints_door(double Time, double DesVelDoor,
 
 
 //			 NbConstraints = Pb.NbConstraints();
-//			 Pb.add_term(-HXTRU,QPProblem::MATRIX_DU,NbConstraints,0);
-//			 Pb.add_term(-HYTRU,QPProblem::MATRIX_DU,NbConstraints,N_);
-//			 Pb.add_term(COM_CONSTR_R2,QPProblem::VECTOR_DS,NbConstraints);
+			 Pb.add_term(HXTRU,QPProblem::MATRIX_DU,NbConstraints,0);
+			 Pb.add_term(HYTRU,QPProblem::MATRIX_DU,NbConstraints,N_);
+			 Pb.add_term(COM_CONSTR_R2,QPProblem::VECTOR_DS,NbConstraints);
 //
 //			 cout << "COM_CONSTR_R2" << COM_CONSTR_R2 << endl;
 //			 cout << "-HXTRU" << HXTRU << endl;
@@ -745,12 +745,12 @@ GeneratorVelRef::build_constraints_door(double Time, double DesVelDoor,
 //
 //
 
-                 Pb.add_term(WWx,QPProblem::MATRIX_DU,NbConstraints,2*N_);
-                 Pb.add_term(WWy,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
+                 Pb.add_term(-WWx,QPProblem::MATRIX_DU,NbConstraints,2*N_);
+                 Pb.add_term(-WWy,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
                  Pb.add_term(D5,QPProblem::VECTOR_DS,NbConstraints);
 
 
-		 cout<<"-WWx:"<<-WWx<<endl;
+		 cout<<"WWx:"<<WWx<<endl;
 		 cout<<"WWy"<<WWy<<endl;
 		 cout<<"D5:"<<D5<<endl;
 		 NbConstraints = Pb.NbConstraints();
