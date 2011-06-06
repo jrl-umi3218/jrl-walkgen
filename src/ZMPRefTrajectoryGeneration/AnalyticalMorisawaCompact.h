@@ -6,18 +6,18 @@
  *
  * JRL, CNRS/AIST
  *
- * This file is part of walkGenJrl.
- * walkGenJrl is free software: you can redistribute it and/or modify
+ * This file is part of jrl-walkgen.
+ * jrl-walkgen is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * walkGenJrl is distributed in the hope that it will be useful,
+ * jrl-walkgen is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
  * You should have received a copy of the GNU Lesser General Public License
- * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
+ * along with jrl-walkgen.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Research carried out within the scope of the 
  *  Joint Japanese-French Robotics Laboratory (JRL)
@@ -336,7 +336,8 @@ namespace PatternGeneratorJRL
 	(NewPosX, NewPosY) during time interval IndexStep and IndexStep+1, using 
 	the AnalyticalZMPCOGTrajectory objects and their parameters. 
 	IndexStep has to be a double support phase, because it determines
-	the landing position.
+	the landing position. It is also assumes that m_RelativeFootPositions
+	and m_AbsoluteSupportFootPositions are set for the new values.
 	
 	@param[in] t : The current time.
 	@param[in] IndexStep: The index of the interval where the modification will start.
@@ -352,6 +353,8 @@ namespace PatternGeneratorJRL
 	to generate the ZMP and CoM trajectories along the Y axis.
 	@param[in] TemporalShift : If true, this authorize the method to shift the time for the modified interval.
 	@param[in] aStepStackHandler: Access to the stack of steps.
+	@param[in] AddingAFootStep: In this the foot step specified in NewFootAbsPos is added at the end of the preview window.
+
 	@return : Returns an error index if the operation was not feasible. You should use
 	string error message to get the corresponding error message.
 
@@ -365,7 +368,8 @@ namespace PatternGeneratorJRL
 				    CompactTrajectoryInstanceParameters &aCTIPY,
 				    bool TemporalShift,
 				    bool ResetFilters,
-				    StepStackHandler *aStepStackHandler=0);
+				    StepStackHandler *aStepStackHandler,
+				    bool AddingAFootStep);
 
       /*! \brief For the current time t, we will change the foot position 
 	(NewPosX, NewPosY) during time interval IndexStep and IndexStep+1.

@@ -6,18 +6,18 @@
  *
  * JRL, CNRS/AIST
  *
- * This file is part of walkGenJrl.
- * walkGenJrl is free software: you can redistribute it and/or modify
+ * This file is part of jrl-walkgen.
+ * jrl-walkgen is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * walkGenJrl is distributed in the hope that it will be useful,
+ * jrl-walkgen is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
  * You should have received a copy of the GNU Lesser General Public License
- * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
+ * along with jrl-walkgen.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Research carried out within the scope of the 
  *  Joint Japanese-French Robotics Laboratory (JRL)
@@ -80,7 +80,6 @@ namespace PatternGeneratorJRL
   {
     
     RegisterMethods();
-    ODEBUG("Constructor");
     m_OnLineMode=false;
     m_EndPhase = false;
 
@@ -179,8 +178,7 @@ namespace PatternGeneratorJRL
 
     
     m_DeltaTj[0]=m_Tsingle*3.0;
-    ODEBUG("Delta_J:"<< setprecision(12) << m_DeltaTj[0]);
-    //m_DeltaTj[0]=m_Tsingle*1.0;
+
     m_StepTypes[0] = DOUBLE_SUPPORT;
     for(int i=1;i<m_NumberOfIntervals;i++)
       {
@@ -198,8 +196,6 @@ namespace PatternGeneratorJRL
     m_DeltaTj[m_NumberOfIntervals-1]=m_Tsingle*3.0;
     m_StepTypes[m_NumberOfIntervals-1]=DOUBLE_SUPPORT;
     ComputePreviewControlTimeWindow();
-    ODEBUG("PreviewControlTime:" << setprecision(12) << m_PreviewControlTime << 
-	   " " << m_Tsingle << " " << m_Tdble);
     
     if (m_VerboseLevel>=2)
       {
@@ -218,7 +214,6 @@ namespace PatternGeneratorJRL
     m_PolynomialDegrees[m_NumberOfIntervals-1] = 4;
     for(int i=1;i<m_NumberOfIntervals-1;i++)
       m_PolynomialDegrees[i] = 3;    
-    
 
     /*! Dynamic allocation for the foot trajectory. */
     if(m_FeetTrajectoryGenerator!=0)
@@ -227,9 +222,6 @@ namespace PatternGeneratorJRL
       }
     return true;
   }
-
-
-
 
   void AnalyticalMorisawaCompact::ComputePolynomialWeights()
   {
@@ -378,7 +370,6 @@ namespace PatternGeneratorJRL
     int NbSteps = m_RelativeFootPositions.size();
     int NbOfIntervals=2*NbSteps+1;
 
-    ODEBUG("Number of steps in advance: "<< NbSteps);
     SetNumberOfStepsInAdvance(NbSteps);
     InitializeBasicVariables();
     
@@ -418,7 +409,6 @@ namespace PatternGeneratorJRL
     vector<double> * lZMPX=0;
     lZMPX = &m_CTIPX.ZMPProfil;
 
-    ODEBUG("NbOfIntervals: " << NbOfIntervals);
     lZMPX->resize(NbOfIntervals);
     
     double InitialCoMY=0.0;
@@ -431,7 +421,6 @@ namespace PatternGeneratorJRL
   
     (*lZMPX)[0] = lStartingCOMState(0,0); 
     (*lZMPY)[0] = lStartingCOMState(1,0);
-    ODEBUG(" m_CTIPY COM : " << (*lZMPY)[0]);
 
     /*! Extract the set of initial conditions relevant for 
       computing the analytical trajectories. */
@@ -443,19 +432,7 @@ namespace PatternGeneratorJRL
     /*! Extract the set of absolute coordinates for the foot position. */
     if (m_FeetTrajectoryGenerator!=0)
       {
-	ODEBUG("Initialize Feet Trajectory Generator " << m_RelativeFootPositions.size());
 	m_FeetTrajectoryGenerator->SetDeltaTj(m_DeltaTj);
-
-	ODEBUG("LeftFootInitialPosition :" << 
-		LeftFootInitialPosition.x << " " <<
-		LeftFootInitialPosition.y << " " <<
-		LeftFootInitialPosition.theta);
-
-	ODEBUG("RightFootInitialPosition :" << 
-		RightFootInitialPosition.x << " " <<
-		RightFootInitialPosition.y << " " <<
-		RightFootInitialPosition.theta);
-	
 	m_FeetTrajectoryGenerator->InitializeFromRelativeSteps(m_RelativeFootPositions,
 							       LeftFootInitialPosition,
 							       RightFootInitialPosition,
@@ -470,8 +447,6 @@ namespace PatternGeneratorJRL
 	    
 	    (*lZMPY)[j] = m_AbsoluteSupportFootPositions[i].y;
 	    (*lZMPY)[j+1] = m_AbsoluteSupportFootPositions[i].y;	    
-	    ODEBUG("Interval ["<< j <<"]=("<< (*lZMPX)[j] << "," << (*lZMPY)[j] << ")");
-	    ODEBUG("Interval ["<< j+1 <<"]=("<< (*lZMPX)[j+1] << "," << (*lZMPY)[j+1] << ")");
 	  }
 
 								 
@@ -484,8 +459,6 @@ namespace PatternGeneratorJRL
 	else
 	  FinalCoMPosX = 0.5 *(m_AbsoluteSupportFootPositions[lindex-1].x + 
 			     m_AbsoluteSupportFootPositions[lindex].x);
-	ODEBUG("j: "<< j);
-
 	if (DoNotPrepareLastFoot)
 	  (*lZMPX)[j-2] = (*lZMPX)[j-1] = m_AbsoluteSupportFootPositions[lindex].x;
 	else
@@ -501,9 +474,6 @@ namespace PatternGeneratorJRL
 	  (*lZMPY)[j-2] = (*lZMPY)[j-1] = m_AbsoluteSupportFootPositions[lindex].y;
 	else
 	  (*lZMPY)[j-2] = (*lZMPY)[j-1] = FinalCoMPosY;
-
-	
-    
       }
     else 
       {
@@ -597,66 +567,14 @@ namespace PatternGeneratorJRL
     m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
 
     /*! Compute the total size of the array related to the steps. */
-    ODEBUG("m_SampligPeriod: " << m_SamplingPeriod);
-    ODEBUG("m_PreviewControlTime: " << m_PreviewControlTime);
-
-    /*! Fill in the stack of references */
-    for(double t=m_CurrentTime; 
-	t<m_CurrentTime+m_PreviewControlTime-TimeShift; 
-	t+= m_SamplingPeriod)
-      {
-	/*! Feed the ZMPPositions. */
-	ZMPPosition aZMPPos;
-        m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px);
-	m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py);
-	ZMPPositions.push_back(aZMPPos);
-
-	/*! Feed the COMStates. */
-	COMState aCOMPos;
-	memset(&aCOMPos,0,sizeof(aCOMPos));
-	if (!m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0]))
-	  {	  
-	    ODEBUG3("Pb at  t= " <<t);
-	    LTHROW("Unable to compute COM along X-axis in GetZMPDiscretization");
-	  }
-	m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(t,aCOMPos.x[1]);
-	if (!m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0]))
-	  {
-	    ODEBUG3("Pb at  t= " <<t);
-	    LTHROW("Unable to compute COM along Y-axis in GetZMPDiscretization");
-	  }
-	m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1]);
-
-	aCOMPos.z[0] = m_InitialPoseCoMHeight;
-	aCOMPos.z[1] = 0.0;
-	aCOMPos.z[2] = 0.0;
-	COMStates.push_back(aCOMPos);
-
-	/*! Feed the FootPositions. */
-
-	/*! Left */
-	FootAbsolutePosition LeftFootAbsPos;
-	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos);
-	LeftFootAbsolutePositions.push_back(LeftFootAbsPos);
-
-	/*! Right */
-	FootAbsolutePosition RightFootAbsPos;
-	m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos);
-	RightFootAbsolutePositions.push_back(RightFootAbsPos);
-
-	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " << aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
-		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
-		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " ,"Test.dat");
-      }
+    FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
+	       ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
 
     m_UpperTimeLimitToUpdateStacks = m_CurrentTime;
     for(int i=0;i<m_NumberOfIntervals;i++)
       {
 	m_UpperTimeLimitToUpdateStacks += m_DeltaTj[i];
       }
-    ODEBUG("m_UpperTimeLimitToUpdateStacks" <<
-	    m_UpperTimeLimitToUpdateStacks);
-
   }
 
   int AnalyticalMorisawaCompact::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
@@ -670,12 +588,10 @@ namespace PatternGeneratorJRL
 					    MAL_S3_VECTOR(&,double))
   {
     m_OnLineMode = true;
-    ODEBUG("Begin InitOnLine");
     m_RelativeFootPositions.clear();
 
     unsigned int r = RelativeFootPositions.size();
     unsigned int maxrelsteps = r < 3 ? r : 3;
-    ODEBUG("Number of relative steps: "<< maxrelsteps);
     MAL_S3x3_MATRIX(lMStartingCOMState,double);
 
     lMStartingCOMState(0,0)= lStartingCOMState.x[0];
@@ -698,13 +614,6 @@ namespace PatternGeneratorJRL
     else 
       m_AbsoluteCurrentSupportFootPosition = InitLeftFootAbsolutePosition;
 
-    ODEBUG("InitLeftFootAbsolutePosition: " << InitLeftFootAbsolutePosition.x << " " 
-	    << InitLeftFootAbsolutePosition.y);
-
-    ODEBUG("InitRightFootAbsolutePosition: " << InitRightFootAbsolutePosition.x << " " 
-	    << InitRightFootAbsolutePosition.y);
-
-
     /* This part computes the CoM and ZMP trajectory giving the foot position information. 
        It also creates the analytical feet trajectories.
      */
@@ -713,19 +622,11 @@ namespace PatternGeneratorJRL
 					  InitRightFootAbsolutePosition,
 					  true,true)<0)
       {	LTHROW("Error: Humanoid Specificities not initialized. "); }
-       
-    ODEBUG( " t1: " << m_Tsingle*2 << 
-	    " t2: " << 4*m_Tsingle+m_Tdble <<
-	    " t1: " << m_Tsingle*2/m_SamplingPeriod << 
-	    " t2: " << (4*m_Tsingle+m_Tdble)/m_SamplingPeriod );
 
     m_AbsoluteTimeReference = m_CurrentTime-m_Tsingle*2;
     m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
-
-    ODEBUG("Interval Test.dat : begin : " << m_CurrentTime << 
-	   " end : " << m_Tsingle+2*m_Tdble);
 
     /* Current strategy : add 2 values, and update at each iteration the stack.
        When the limit is reached, and the stack exhausted this method is called again.  */
@@ -738,9 +639,7 @@ namespace PatternGeneratorJRL
 
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;    
-    ODEBUG("End of InitOnLine : Size of relative foot positions: " << m_RelativeFootPositions.size());
 
-    
     return m_RelativeFootPositions.size();
   }
 
@@ -752,9 +651,6 @@ namespace PatternGeneratorJRL
 					 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
   {
     unsigned int lIndexInterval;
-    ODEBUG("time :" <<time << 
-	   " m_UpperTimeLimitToUpdateStacks: " <<  m_UpperTimeLimitToUpdateStacks <<
-	   " FinalLeftFootAbsolutePositions.size()" << FinalLeftFootAbsolutePositions.size());
     if (time<m_UpperTimeLimitToUpdateStacks) 
       {
 	if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
@@ -822,16 +718,6 @@ namespace PatternGeneratorJRL
 	    m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,RightFootAbsPos,lIndexInterval);
 	    FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
 
-	    if (m_EndPhase)
-	      {
-		ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " << 
-			aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << 
-			LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " << 
-			RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " <<
-			time,
-			"Test.dat");
-
-	      }
 	  }
       }
     else 
@@ -850,20 +736,13 @@ namespace PatternGeneratorJRL
 						bool )
   {
     ODEBUG("****************** Begin OnLineAddFoot **************************");
+    unsigned int StartingIndexInterval;
+    m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_CurrentTime,StartingIndexInterval);
 
     unsigned int IndexInterval = m_CTIPX.ZMPProfil.size()-1;
     
     /* If the interval detected is not a double support interval,
        a shift is done to chose the earliest double support interval. */
-    if (m_StepTypes[IndexInterval]!=DOUBLE_SUPPORT)
-      {
-	
-	if (IndexInterval!=0)
-	  IndexInterval-=1;
-	else
-	  IndexInterval+=1;
-      }
-
     vector<unsigned int> IndexLastZMPProfil;
     IndexLastZMPProfil.resize(1);
     IndexLastZMPProfil[0] = IndexInterval;
@@ -876,32 +755,23 @@ namespace PatternGeneratorJRL
 
     // Update the stack of relative foot positions.
     m_RelativeFootPositions.pop_front();
-    m_RelativeFootPositions.push_back(NewRelativeFootPosition);    
+    m_RelativeFootPositions.push_back(NewRelativeFootPosition);
 
-    
     deque<FootAbsolutePosition> aQAFP;
-    ODEBUG("Current LeftFootAbsolutePosition: " << FinalLeftFootAbsolutePositions[0].x  << " " 
-	    << " " << FinalLeftFootAbsolutePositions[0].y 
-	    << " " << FinalLeftFootAbsolutePositions[0].dx 
-	    << " " << FinalLeftFootAbsolutePositions[0].dy);
-    ODEBUG("Current RightFootAbsolutePosition: " << FinalRightFootAbsolutePositions[0].x  << " " 
-	    << " " << FinalRightFootAbsolutePositions[0].y
-	    << " " << FinalRightFootAbsolutePositions[0].dx
-	    << " " << FinalRightFootAbsolutePositions[0].dy);
-    ODEBUG("New relativeFootPositions when adding a foot.");
 
     m_FeetTrajectoryGenerator->ComputeAbsoluteStepsFromRelativeSteps(m_RelativeFootPositions,
 								     FinalLeftFootAbsolutePositions[0],
 								     FinalRightFootAbsolutePositions[0],
 								     aQAFP);
-								     
+    
     vector<FootAbsolutePosition> aNewFootAbsPos;
     aNewFootAbsPos.resize(1);
     aNewFootAbsPos[0]=aQAFP.back();
     
-    ODEBUG3("New Foot Position: " << aNewFootAbsPos[0].x << " " << aNewFootAbsPos[0].y );
-    ODEBUG("Current Time: " << m_CurrentTime );
-    m_AbsoluteCurrentSupportFootPosition = m_AbsoluteSupportFootPositions[0];
+    if (FinalLeftFootAbsolutePositions[0].z==0.0)
+      m_AbsoluteCurrentSupportFootPosition = FinalLeftFootAbsolutePositions[0];
+    else 
+      m_AbsoluteCurrentSupportFootPosition = FinalRightFootAbsolutePositions[0];
 
     m_AbsoluteSupportFootPositions.pop_front();
     m_AbsoluteSupportFootPositions.push_back(aNewFootAbsPos[0]);    
@@ -916,13 +786,18 @@ namespace PatternGeneratorJRL
     m_Clock2.StartTiming();
 
     /* Realize the foot changing position during the last interval */
+    bool lResetFilters = false;
+    bool lTemporalShift = false;
+    bool lAddingAFootStep = true;
     ChangeFootLandingPosition(m_CurrentTime,
 			      IndexLastZMPProfil,
 			      aNewFootAbsPos,
 			      *m_AnalyticalZMPCoGTrajectoryX,
 			      m_CTIPX,
 			      *m_AnalyticalZMPCoGTrajectoryY,
-			      m_CTIPY,true,false);
+			      m_CTIPY,
+			      lTemporalShift,lResetFilters,
+			      0, lAddingAFootStep);
 
     /* Indicates that the step has been taken into account appropriatly
        in computing the trajectory. */
@@ -965,11 +840,9 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_RESIZE(m_w, 2 * m_NumberOfIntervals + 6);
   
     // Initial CoM Position
-    ODEBUG("Ligne 1: " << InitialCoMPos << " " << ZMPPosSequence[0] );
     m_w(lindex)= InitialCoMPos - ZMPPosSequence[0];
     lindex++;
     // Initial CoM Speed
-    ODEBUG("Ligne 2: " << InitialCoMSpeed );
     m_w(lindex) = InitialCoMSpeed;
     lindex++;
 
@@ -985,16 +858,12 @@ namespace PatternGeneratorJRL
 	aPolynomeNext->GetCoefficients(NextCoeffsFromCOG);
 	if (j==1)
 	  {
-	    ODEBUG("Ligne "<< lindex << ": " << NextCoeffsFromCOG[0]<< " " <<  ZMPPosSequence[0] );
 	    m_w[lindex] = NextCoeffsFromCOG[0] - ZMPPosSequence[0];
 	    lindex++;
-	    ODEBUG("Ligne "<< lindex << ": " << NextCoeffsFromCOG[1] );
 	    m_w[lindex] = NextCoeffsFromCOG[1];
 	    lindex++;
-	    ODEBUG("Ligne "<< lindex << ": 0.0");
 	    m_w[lindex] = 0;//ZMPPosSequence[0] - ZMPPosSequence[0];
 	    lindex++;
-	    ODEBUG("Ligne "<< lindex << ": 0.0");
 	    m_w[lindex] = 0;
 	    lindex++;
 	  }
@@ -1004,10 +873,8 @@ namespace PatternGeneratorJRL
 	    aPolynome->GetCoefficients(CoeffsFromCOG);
 	    double r1=0.0,r2=0.0;
 	    double deltat1=1.0,deltat2=1.0;
-	    ODEBUG("Inside ComputeCompacteW: " << j-1 << " " << m_DeltaTj[j-1]);
 	    for (unsigned int k=0;k<CoeffsFromCOG.size();k++)
 	      {
-		ODEBUG(" COMcoeffs : " << k << " : " << CoeffsFromCOG[k]);
 		r1+= CoeffsFromCOG[k]* deltat1;
 		deltat1 *= m_DeltaTj[j-1];
 		if (k>0)
@@ -1019,24 +886,19 @@ namespace PatternGeneratorJRL
 	    if (j!=m_NumberOfIntervals-1)
 	      {
 		m_w[lindex] = NextCoeffsFromCOG[0] - r1;
-		ODEBUG("m_w: " << m_w[lindex] << " r1: " << r1 << " NextCoeffsFromCOG[0] " << NextCoeffsFromCOG[0]);
 	      }
 	    else 
 	      {
 		m_w[lindex] = ZMPPosSequence[j-1] - r1;
-		ODEBUG("m_w: " << m_w[lindex] << " r1: " << r1 << " ZMPPosSequence[" <<j-1<< "] "
-			<< ZMPPosSequence[j-1]);
 	      }
 	    lindex++;
 	    if (j!=m_NumberOfIntervals-1)
 	      {
 		m_w[lindex] = NextCoeffsFromCOG[1] - r2;
-		ODEBUG("m_w: " << m_w[lindex] << " r2: " << r2 << " NextCoeffsFromCOG[1] " << NextCoeffsFromCOG[1]);
 	      }
 	    else
 	      {
 		m_w[lindex] = - r2;
-		ODEBUG("m_w: " << m_w[lindex] << " -r2: " << -r2);
 	      }
 
 	    lindex++;
@@ -1253,7 +1115,6 @@ namespace PatternGeneratorJRL
 
     NbRows = 2+4+2*(m_NumberOfIntervals-2)+4;
     NbCols = 2*m_NumberOfIntervals + 6;
-    ODEBUG( "Rows: " << NbRows << " Cols: " << NbCols);
     MAL_MATRIX_RESIZE(m_Z,NbRows,NbCols);
 
     // Initial condition for the COG position and the velocity 
@@ -1401,7 +1262,7 @@ namespace PatternGeneratorJRL
       
       if (m_StepTypes[IndexStep]!=DOUBLE_SUPPORT)
 	{
-	  LTHROW("ERROR WRONG FOOT TYPE");
+	  LTHROW("ERROR WRONG FOOT TYPE. ");
 	}
 
     FinalTime = 0.0;
@@ -1409,18 +1270,11 @@ namespace PatternGeneratorJRL
       FinalTime+=m_DeltaTj[j];
 
     /* Find from which interval we are starting. */
-    double reftime=0.0;
-    
-    for(unsigned int j=0;j<m_DeltaTj.size();j++)
-      {
+    m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(LocalTime+m_AbsoluteTimeReference,IndexStartingInterval);
 
-	if ((LocalTime>=reftime) && (LocalTime<=reftime+m_DeltaTj[j]))
-	  {
-	    IndexStartingInterval = j;
-	    break;
-	  }
-	reftime+=m_DeltaTj[j];
-      }
+    double reftime=0.0;    
+    for(unsigned int j=0;j<IndexStartingInterval;j++)
+      reftime+=m_DeltaTj[j];
 
     NewTj = m_DeltaTj[IndexStartingInterval] - LocalTime  + reftime;
     
@@ -1428,16 +1282,9 @@ namespace PatternGeneratorJRL
        if this is the next step which should be changed
        and we went over half the current interval. 
      */
-    ODEBUG(" NewTj : " << NewTj 
-	    << " LT: " << LocalTime 
-	    << " RT:"<< reftime 
-	    << " DTj:" << m_DeltaTj[IndexStartingInterval]
-	    << " FT:" << FinalTime);
-
     if ((NewTj<m_Tsingle*0.5) &&
 	(IndexStep==IndexStartingInterval+1))
       {
-	ODEBUG(" Too Late for modification");
 	return ERROR_TOO_LATE_FOR_MODIFICATION;
       }
 
@@ -1449,12 +1296,8 @@ namespace PatternGeneratorJRL
   {
 
     /* Build the new time interval. */
-    ODEBUG("New time interval 0: "<< NewTime 
-	   << " m_Tsingle: " << m_Tsingle
-	   << " m_Tdble:" << m_Tdble);
     m_DeltaTj[0] = NewTime;
     m_StepTypes[0] = m_StepTypes[IndexStartingInterval];
-
     for(int i=1;i<m_NumberOfIntervals;i++)
       {
 	if (m_StepTypes[i-1]==DOUBLE_SUPPORT)
@@ -1470,6 +1313,7 @@ namespace PatternGeneratorJRL
       }
 
     m_DeltaTj[m_NumberOfIntervals-1]=m_Tsingle*3.0;
+    m_StepTypes[m_NumberOfIntervals-1] = DOUBLE_SUPPORT;
     ComputePreviewControlTimeWindow();
 
   }
@@ -1482,8 +1326,6 @@ namespace PatternGeneratorJRL
 						    unsigned int IndexStartingInterval,
 						    StepStackHandler *aStepStackHandler)
   {
-    ODEBUG("ConstraintsChange: " << IndexStartingInterval << " " << aCTIPX.ZMPProfil.size());
-
     if (IndexStartingInterval!=0)
       {
 	/* Shift the current value of the profil. */
@@ -1491,14 +1333,10 @@ namespace PatternGeneratorJRL
 	unsigned int j;
 	for(i=IndexStartingInterval,j=0;i<m_NumberOfIntervals;i++,j++)
 	  {
-	    /* Shift the ZMP profil */
+ 	    /* Shift the ZMP profil */
 	    aCTIPX.ZMPProfil[j] = aCTIPX.ZMPProfil[i];
 	    aCTIPY.ZMPProfil[j] = aCTIPY.ZMPProfil[i];
 	  }
-	ODEBUG("ConstraintsChange: " << j << " " 
-		<< m_AbsoluteSupportFootPositions.size()  << " "
-		<< aCTIPX.ZMPProfil.size() << " " 
-		<< aCTIPY.ZMPProfil.size()  );
 		    
 	/* Add value from the provided steps stack. 
 	   BE CAREFUL: There is a modification on the initial value
@@ -1509,13 +1347,11 @@ namespace PatternGeneratorJRL
 	 */
 	
 	unsigned int k = 0;
-
 	if (m_NewStepInTheStackOfAbsolutePosition)
 	  k = (i-3)/2;
 	else 
 	  k = (i-1)/2;
 
-	ODEBUG("Starting value for k:" << k);
 	for(;
 	    (k < m_AbsoluteSupportFootPositions.size()) &&
 	      (j< m_CTIPX.ZMPProfil.size());k++,j+=2)
@@ -1536,7 +1372,6 @@ namespace PatternGeneratorJRL
 	 */
 	if (aStepStackHandler!=0)
 	  {
-	    ODEBUG("Start the generation of steps");
 	    /* Compute the number of steps needed. */
 	    int NeededSteps = (aCTIPX.ZMPProfil.size()-j+1)/2;
 	    int r;
@@ -1572,7 +1407,7 @@ namespace PatternGeneratorJRL
 									     lAbsoluteSupportFootPositions);
 	    
 	    /* Add the necessary absolute support foot positions. */
-	    for(int li=0;(li<NeededSteps)&& (j< m_CTIPX.ZMPProfil.size());li++)
+	    for(int li=0;(li<NeededSteps)&& (j< m_CTIPX.ZMPProfil.size());li++,j+=2)
 	      {
 		
 		aCTIPX.ZMPProfil[j] = lAbsoluteSupportFootPositions[li].x;
@@ -1596,34 +1431,25 @@ namespace PatternGeneratorJRL
 	      }
 	    /*! Remove the corresponding step from the stack of relative and absolute
 	      foot positions. */
-	    ODEBUG("IndexStartingInterval: " <<IndexStartingInterval << " " << IndexStartingInterval/2);
 	    for(unsigned int li=0;li<IndexStartingInterval/2;li++)
 	      {
 		m_RelativeFootPositions.pop_front();    
 		m_AbsoluteSupportFootPositions.pop_front();
 	      }
 
-	    ODEBUG("End the generation of steps");
 	  }
-	
-	ODEBUG("Finished at index: j:" << j << " i:" << i << " k:" << k );
+
       }
+
     /* Compute the current value of the initial 
        and final CoM to be feed to the new system. */
     aCTIPX.InitialCoM = FPX.CoMInit;
     aCTIPX.InitialCoMSpeed = FPX.CoMSpeedInit;
     aCTIPX.FinalCoMPos = aCTIPX.ZMPProfil[m_NumberOfIntervals-1];
-    ODEBUG("InitialCoMPos " << aCTIPX.InitialCoM << 
-	    " InitialCoMSpeed " << aCTIPX.InitialCoMSpeed << 
-	    " FinalCoMPos " << aCTIPX.FinalCoMPos
-	    );
+
     aCTIPY.InitialCoM = FPY.CoMInit;
     aCTIPY.InitialCoMSpeed = FPY.CoMSpeedInit;
     aCTIPY.FinalCoMPos = aCTIPY.ZMPProfil[m_NumberOfIntervals-1];
-    ODEBUG("InitialCoM " << aCTIPY.InitialCoM << 
-	    " InitialCoMSpeed " << aCTIPY.InitialCoMSpeed << 
-	    " FinalCoMPos " << aCTIPY.FinalCoMPos
-	    );
 	
     
   }
@@ -1651,20 +1477,12 @@ namespace PatternGeneratorJRL
       aFP.ZMPNew = 0.0;
 
 
-    ODEBUG( aFP.CoMInit  << " " << aFP.ZMPInit << " " << aFP.CoMSpeedInit  << " " << aFP.ZMPSpeedInit ); 
-    ODEBUG( aFP.CoMNew  << " " << aFP.ZMPNew << " " << aFP.CoMSpeedNew  << " " << aFP.ZMPSpeedNew ); 
-    ODEBUG("m_Omagej[0]:" << m_Omegaj[0] );
-
-    ODEBUG("m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit)" << m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit));
-    ODEBUG("(aFP.CoMSpeedInit - aFP.ZMPSpeedInit)" << (aFP.CoMSpeedInit - aFP.ZMPSpeedInit));
     double rden= ( m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit) + (aFP.CoMSpeedInit - aFP.ZMPSpeedInit) );
     if (fabs(rden)<1e-5)
       rden = 0.0;
 
-    ODEBUG("m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew)" << m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew));
-    ODEBUG("(aFP.CoMSpeedNew - aFP.ZMPSpeedNew)"<<(aFP.CoMSpeedNew - aFP.ZMPSpeedNew));
     double rnum = (m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew) + (aFP.CoMSpeedNew - aFP.ZMPSpeedNew));
-    ODEBUG("r= " <<rnum << " /" <<rden );
+
     if (rden==0.0)
       r=0.0;
     else r = rnum/rden;
@@ -1673,7 +1491,6 @@ namespace PatternGeneratorJRL
     r2 = ( m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit) + (aFP.CoMSpeedInit - aFP.ZMPSpeedInit) )/
       (m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew) + (aFP.CoMSpeedNew - aFP.ZMPSpeedNew));
       
-    ODEBUG("Fluctuation: " << r );
     if (r<0.0)
       DeltaTNew = DeltaTInit + m_Tsingle*0.5;
     else if (r>0)
@@ -1681,15 +1498,6 @@ namespace PatternGeneratorJRL
     else if (r==0.0)
       DeltaTNew = DeltaTInit;
 
-    ODEBUG("DeltaTInit: " << DeltaTInit << " DeltaTNew : " 
-	   << DeltaTNew << " DeltaDeltaT: " 
-	   << DeltaTNew - DeltaTInit ); 
-#if 0
-    if (DeltaTNew<0.2*m_Tsingle)
-      DeltaTNew = 0.2*m_Tsingle;
-    if (DeltaTNew>DeltaTInit + m_Tsingle*0.5)
-      DeltaTNew = DeltaTInit + m_Tsingle*0.5;
-#endif
     return DeltaTNew;
 
   }
@@ -1715,12 +1523,6 @@ namespace PatternGeneratorJRL
 	      lIndexForFootPrintInterval=NewFootAbsPos.size()-1;
 	  }
 
-	ODEBUG("ZMPProfil To be modified: " << lIndexStep<< " " 
-		<< m_NumberOfIntervals-1<< " " 
-		<< lIndexForFootPrintInterval << " " 
-		<< NewFootAbsPos.size() << " " 
-		<< NewFootAbsPos[lIndexForFootPrintInterval].x<< " " 
-		<< NewFootAbsPos[lIndexForFootPrintInterval].y );
 	if (lIndexStep<aCTIPX.ZMPProfil.size())
 	  {
 	    aCTIPX.ZMPProfil[lIndexStep] = NewFootAbsPos[lIndexForFootPrintInterval].x;
@@ -1732,17 +1534,13 @@ namespace PatternGeneratorJRL
 	    aCTIPY.ZMPProfil[lIndexStep+1] = NewFootAbsPos[lIndexForFootPrintInterval].y;
 	  }
 	
-	
 	/* If the end condition has been changed... */
-	if ((int)lIndexStep+1==m_NumberOfIntervals-1)
+	if  ((int)lIndexStep+1==m_NumberOfIntervals-1)
 	  {
 	    aCTIPX.FinalCoMPos = NewFootAbsPos[lIndexForFootPrintInterval].x;
 	    aCTIPY.FinalCoMPos = NewFootAbsPos[lIndexForFootPrintInterval].y;
 	  }
       }
-    ODEBUG("FinalCOMPos " << aCTIPX.FinalCoMPos <<  " "  << aCTIPY.FinalCoMPos);
-		
-
   }
 
   int AnalyticalMorisawaCompact::ChangeFootLandingPosition(double t,
@@ -1755,7 +1553,7 @@ namespace PatternGeneratorJRL
 				*m_AnalyticalZMPCoGTrajectoryX,
 				m_CTIPX,
 				*m_AnalyticalZMPCoGTrajectoryY,
-				m_CTIPY,true,true);
+				m_CTIPY,true,true,0,false);
     return r;
   }
 							   
@@ -1768,7 +1566,8 @@ namespace PatternGeneratorJRL
 							   CompactTrajectoryInstanceParameters &aCTIPY,
 							   bool TemporalShift,
 							   bool ResetFilters,
-							   StepStackHandler * aStepStackHandler)
+							   StepStackHandler * aStepStackHandler,
+							   bool AddingAFootStep)
   {
     double LocalTime = t - m_AbsoluteTimeReference;
     double FinalTime=0.0;
@@ -1791,9 +1590,7 @@ namespace PatternGeneratorJRL
 	//	return RetourTC;
       }
 
-    ODEBUG("LocalTime: " << LocalTime + m_AbsoluteTimeReference 
-	   << " m_AbsoluteTimeReference : " << m_AbsoluteTimeReference
-	   << " IndexStartingInterval : " << IndexStartingInterval);
+    //displayDeltaTj(cerr);
 
     /* Store the current position and speed of each foot. */
     FootAbsolutePosition InitAbsLeftFootPos,InitAbsRightFootPos;
@@ -1801,32 +1598,28 @@ namespace PatternGeneratorJRL
     m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,InitAbsLeftFootPos);
     m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,InitAbsRightFootPos);
 
-    ODEBUG("Index Starting Interval :" << IndexStartingInterval << " " << IndexStep[0]);
-
     /* ! This part of the code is not used if we are just trying to add
        a foot step. */
-    if ((int)IndexStep[0]<m_NumberOfIntervals)
+    //    if ((int)IndexStep[0]<m_NumberOfIntervals)
+    if (!AddingAFootStep)
       {
 	/* Compute the time of maximal fluctuation for the initial solution along the X axis.*/
 	TmaxX = aAZCTX.FluctuationMaximal();
 	aAZCTX.ComputeCOM(t,aFPX.CoMInit,IndexStartingInterval);
-	ODEBUG("COM X: " << aFPX.CoMInit);
+
 	aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedInit);
 	aAZCTX.ComputeZMP(t,aFPX.ZMPInit,IndexStartingInterval);
-	ODEBUG("ZMP X: " << aFPX.ZMPInit);
+
 	aAZCTX.ComputeZMPSpeed(t,aFPX.ZMPSpeedInit);
 	
 	/* Compute the time of maximal fluctuation for the initial solution along the Y axis.*/
 	TmaxY = aAZCTY.FluctuationMaximal();
 	aAZCTY.ComputeCOM(t,aFPY.CoMInit,IndexStartingInterval);
 	aAZCTY.ComputeCOMSpeed(t,aFPY.CoMSpeedInit);
-	ODEBUG("COM Y: " << aFPY.CoMInit);
 	aAZCTY.ComputeZMP(t,aFPY.ZMPInit,IndexStartingInterval);
-	ODEBUG("ZMP Y: " << aFPY.ZMPInit);
+
 	aAZCTY.ComputeZMPSpeed(t,aFPY.ZMPSpeedInit);
 	
-	ODEBUG("NextStep X:" << NewFootAbsPos[0].x);
-	ODEBUG("NextStep Y:" << NewFootAbsPos[0].y);
 	/* Adapt the ZMP profil of aCTPIX and aCTPIY 
 	   according to IndexStep */
 	ChangeZMPProfil(IndexStep,NewFootAbsPos,
@@ -1837,8 +1630,6 @@ namespace PatternGeneratorJRL
 	  {
 	    aAZCTX.Building3rdOrderPolynomial(i,aCTIPX.ZMPProfil[i-1],aCTIPX.ZMPProfil[i]);
 	    aAZCTY.Building3rdOrderPolynomial(i,aCTIPY.ZMPProfil[i-1],aCTIPY.ZMPProfil[i]);
-	    ODEBUG( aCTIPX.ZMPProfil[i-1] << " " << aCTIPX.ZMPProfil[i] << " " << 
-		    aCTIPY.ZMPProfil[i-1] << " " << aCTIPY.ZMPProfil[i]);
 	  }
 	
 	/* Compute the trajectories */
@@ -1846,13 +1637,12 @@ namespace PatternGeneratorJRL
 	ComputeTrajectory(aCTIPX,aAZCTX);
 	
 	aAZCTX.ComputeCOM(t,aFPX.CoMNew);
-	ODEBUG( "FPX.COMInit :" << aFPX.CoMInit << " FPX.CoMNew: " << aFPX.CoMNew);
+
 	aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedNew);
 	aAZCTX.ComputeZMP(t,aFPX.ZMPNew);
 	aAZCTX.ComputeZMPSpeed(t,aFPX.ZMPSpeedNew);
 	
 	aAZCTY.ComputeCOM(t,aFPY.CoMNew);
-	ODEBUG("FPY.COMInit :" << aFPY.CoMInit << " FPY.CoMNew: " << aFPY.CoMNew );
 	aAZCTY.ComputeCOMSpeed(t,aFPY.CoMSpeedNew);
 	aAZCTY.ComputeZMP(t,aFPY.ZMPNew);
 	aAZCTY.ComputeZMPSpeed(t,aFPY.ZMPSpeedNew);
@@ -1861,7 +1651,6 @@ namespace PatternGeneratorJRL
 	TCY = TimeCompensationForZMPFluctuation(aFPY,NewTj); 
 	
 	TCMax = TCX < TCY ? TCY : TCX;
-	ODEBUG("TCX : "<< TCX << " TCY: " << TCY << " TCMax : " << TCMax << " DeltaTj[0] : " << m_DeltaTj[0]);
       }
     else
       {
@@ -1872,14 +1661,28 @@ namespace PatternGeneratorJRL
 	aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedInit);
 	aAZCTX.ComputeZMP(t,aFPX.ZMPInit,IndexStartingInterval);
 	aAZCTX.ComputeZMPSpeed(t,aFPX.ZMPSpeedInit);
-
+	
 	aAZCTY.ComputeCOM(t,aFPY.CoMInit);
 	aAZCTY.ComputeCOMSpeed(t,aFPY.CoMSpeedInit);
 	aAZCTY.ComputeZMP(t,aFPY.ZMPInit,IndexStartingInterval);
 	aAZCTY.ComputeZMPSpeed(t,aFPY.ZMPSpeedInit);
+
+
+	aAZCTX.ComputeCOM(t,aFPX.CoMNew);
+
+	aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedNew);
+	aAZCTX.ComputeZMP(t,aFPX.ZMPNew);
+	aAZCTX.ComputeZMPSpeed(t,aFPX.ZMPSpeedNew);
 	
-	
-	TCMax = m_Tsingle-m_SamplingPeriod;
+	aAZCTY.ComputeCOM(t,aFPY.CoMNew);
+	aAZCTY.ComputeCOMSpeed(t,aFPY.CoMSpeedNew);
+	aAZCTY.ComputeZMP(t,aFPY.ZMPNew);
+	aAZCTY.ComputeZMPSpeed(t,aFPY.ZMPSpeedNew);
+
+	if (m_StepTypes[IndexStartingInterval]==SINGLE_SUPPORT)
+	  TCMax = m_Tsingle-m_SamplingPeriod;
+	else 
+	  TCMax = m_Tdble-m_SamplingPeriod;
       }
 
 
@@ -1896,12 +1699,10 @@ namespace PatternGeneratorJRL
 	
 
     /*! Extract the set of absolute coordinates for the foot position,
-      and recompute the feet trajectory accordingly.
-     */
+      and recompute the feet trajectory accordingly.  */
     if (m_FeetTrajectoryGenerator!=0)
       {
 	
-	ODEBUG("ChangeFootLandingPosition: " << m_CurrentTime);
 	m_FeetTrajectoryGenerator->SetDeltaTj(m_DeltaTj);
 
 	/* Modify the feet trajectory */	
@@ -1921,13 +1722,13 @@ namespace PatternGeneratorJRL
 		      aCTIPX,aCTIPY,
 		      IndexStartingInterval,
 		      aStepStackHandler);
-    ODEBUG("In ChangeFootLandingPosition - before ");
+
     m_FeetTrajectoryGenerator->InitializeFromRelativeSteps(m_RelativeFootPositions,
 							   InitAbsLeftFootPos,
 							   InitAbsRightFootPos,
 							   m_AbsoluteSupportFootPositions,
 							   false,true);
-    ODEBUG("In ChangeFootLandingPosition - after");    
+
     // Initialize and modify the aAZCT trajectories' Tj and Omegaj.
     aAZCTX.SetStartingTimeIntervalsAndHeightVariation(m_DeltaTj,m_Omegaj);
     aAZCTY.SetStartingTimeIntervalsAndHeightVariation(m_DeltaTj,m_Omegaj);
@@ -1939,7 +1740,6 @@ namespace PatternGeneratorJRL
 	aAZCTY.Building3rdOrderPolynomial(i,aCTIPY.ZMPProfil[i-1],aCTIPY.ZMPProfil[i]);
       }
 
-    ODEBUG("ChangeFootLandingPosition: SetAbsoluteTimeReference to t:" << t);
     aAZCTX.SetAbsoluteTimeReference(t);
     aAZCTY.SetAbsoluteTimeReference(t);
     
@@ -1953,7 +1753,6 @@ namespace PatternGeneratorJRL
 
     m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(t);
     m_AbsoluteTimeReference = t;
-
 
     /* Reset the filters */
     // Preparing the filtering out of the feet.
@@ -2136,9 +1935,11 @@ namespace PatternGeneratorJRL
     else
       {	ODEBUG("Already on a DOUBLE_SUPPORT PHASE:" << IndexInterval);  }
     
-    ODEBUG3("IndexInterval: " << IndexInterval);
     if (IndexInterval==-1)
-      return -1;
+      {
+	LTHROW("No feasible double support interval found.");
+	return -1;
+      }
 
     /* Backup data structures */
     FootAbsolutePosition BackUpm_AbsoluteCurrentSupportFootPosition = 
@@ -2149,24 +1950,14 @@ namespace PatternGeneratorJRL
       m_RelativeFootPositions;
     *m_BackUpm_FeetTrajectoryGenerator = *m_FeetTrajectoryGenerator;
 	
-    /* Change the foot */
+    /* Find the corresponding interval in the stack of foot steps*/
     unsigned int lChangedIntervalFoot = (IndexInterval-1)/2;
-    ODEBUG("lChangedIntervalFoot:" <<lChangedIntervalFoot);
+
+    /* Which foot is the support one ? */
     if (LeftFootAbsolutePositions[0].z==0.0)
       m_AbsoluteCurrentSupportFootPosition = LeftFootAbsolutePositions[0];
     else 
       m_AbsoluteCurrentSupportFootPosition = RightFootAbsolutePositions[0];
-
-    ODEBUG("Current LeftFootAbsolutePosition: " << LeftFootAbsolutePositions[0].x  << " " 
-	    << " " << LeftFootAbsolutePositions[0].y 
-	    << " " << LeftFootAbsolutePositions[0].dx 
-	    << " " << LeftFootAbsolutePositions[0].dy);
-    ODEBUG("Current RightFootAbsolutePosition: " << RightFootAbsolutePositions[0].x  << " " 
-	    << " " << RightFootAbsolutePositions[0].y
-	    << " " << RightFootAbsolutePositions[0].dx
-	    << " " << RightFootAbsolutePositions[0].dy);
-    
-    ODEBUG("*** Begin Change foot position *** " << m_RelativeFootPositions.size());
     
     vector<unsigned int> IndexIntervals;
     vector<FootAbsolutePosition> NewRelFootAbsolutePositions;
@@ -2193,11 +1984,8 @@ namespace PatternGeneratorJRL
     else if (m_OnLineChangeStepMode==RELATIVE_FRAME)
       {
 	IndexIntervals.resize(m_NumberOfIntervals-IndexInterval);
-	ODEBUG("IndexIntervals.resize() = " <<IndexIntervals.size());
 
 	NewRelFootAbsolutePositions.resize(m_RelativeFootPositions.size()-lChangedIntervalFoot);
-	ODEBUG("NewRelFooAbsolutePositions.resize() = " <<NewRelFootAbsolutePositions.size());
-	ODEBUG("m_RelativeFootPositions.size() = " <<m_RelativeFootPositions.size());
 	
 	for(int j=IndexInterval,k=0;k<(int)IndexIntervals.size();j++,k++)
 	  {
@@ -2215,7 +2003,6 @@ namespace PatternGeneratorJRL
 	      aFootAbsolutePosition[i].theta;
 	  }
 
-	ODEBUG("lChangedInvertalFoot: " <<lChangedIntervalFoot);
 	deque<FootAbsolutePosition> lAbsoluteSupportFootPositions;
 	m_FeetTrajectoryGenerator->ComputeAbsoluteStepsFromRelativeSteps(m_RelativeFootPositions,
 									 LeftFootAbsolutePositions[0],
@@ -2232,7 +2019,6 @@ namespace PatternGeneratorJRL
 	  }
 	
       }
-    ODEBUG("After changingRelative foot steps");
 
 
     ODEBUG("*** End Change foot position *** ");
@@ -2246,7 +2032,7 @@ namespace PatternGeneratorJRL
 				  m_CTIPX,
 				  *m_AnalyticalZMPCoGTrajectoryY,
 				  m_CTIPY,true,true,
-				  aStepStackHandler);
+				  aStepStackHandler,false);
       }
     catch(exception &e)
       {
@@ -2261,7 +2047,7 @@ namespace PatternGeneratorJRL
 	/*! Same for the feet trajectories */
 	*m_FeetTrajectoryGenerator =  *m_BackUpm_FeetTrajectoryGenerator;
 	
-	ODEBUG("Unable to change the step ( " <<  
+	ODEBUG3("Unable to change the step ( " <<  
 		aFootAbsolutePosition[0].x << " , " <<
 		aFootAbsolutePosition[0].y << " , " <<
 		aFootAbsolutePosition[0].theta << " ) ");
@@ -2280,9 +2066,6 @@ namespace PatternGeneratorJRL
 
     /*! Compute next time where a foot-step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;    
-    ODEBUG("m_UpperTimeLimitToUpdateStacks "<< m_UpperTimeLimitToUpdateStacks << 
-	    " m_AbsoluteTimeReference: " <<m_AbsoluteTimeReference << 
-	    " m_DeltaTj[0] " << m_DeltaTj[0] << " m_Tdble: " << m_Tdble);
 
     /*! Put 2 iterations of the new trajectories in the queues */
     FillQueues(m_AbsoluteTimeReference,
@@ -2373,7 +2156,6 @@ namespace PatternGeneratorJRL
     
     /* Specify when a new step should be asked for. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_PreviewControlTime;    
-    ODEBUG("m_UpperTimeLimitToUpdateStacks:" << m_UpperTimeLimitToUpdateStacks);
     
     /* Put two positions from the new polynomials in the queues. */
     FillQueues(m_CurrentTime,
@@ -2418,8 +2200,6 @@ namespace PatternGeneratorJRL
 	      m_OnLineChangeStepMode = ABSOLUTE_FRAME;
 	    else if (aws=="relative")
 	      m_OnLineChangeStepMode = RELATIVE_FRAME;
-
-	    ODEBUG("On Line Change Step Frame: "<< m_OnLineChangeStepMode);
 	  }
       }
     else if (Method==":filtering")
@@ -2432,8 +2212,6 @@ namespace PatternGeneratorJRL
 	      m_FilteringActivate = true;
 	    else if (aws=="deactivate")
 	      m_FilteringActivate = false;
-
-	    ODEBUG("m_FilteringActivate: "<< m_FilteringActivate);
 	  }
       }
 
@@ -2442,7 +2220,6 @@ namespace PatternGeneratorJRL
 
   void AnalyticalMorisawaCompact::PropagateAbsoluteReferenceTime(double x)
   {
-    ODEBUG("Set Propagate Absolute Reference Time: " << x);
     m_AbsoluteTimeReference = x;
     m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(x);
     m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(x);
@@ -2509,7 +2286,6 @@ namespace PatternGeneratorJRL
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " << 
 		m_SamplingPeriod,"Test.dat");
       }
-
-  }
+  }    
 }
 
