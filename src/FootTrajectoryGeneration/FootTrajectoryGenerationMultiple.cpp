@@ -6,18 +6,18 @@
  *
  * JRL, CNRS/AIST
  *
- * This file is part of walkGenJrl.
- * walkGenJrl is free software: you can redistribute it and/or modify
+ * This file is part of jrl-walkgen.
+ * jrl-walkgen is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * walkGenJrl is distributed in the hope that it will be useful,
+ * jrl-walkgen is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
  * You should have received a copy of the GNU Lesser General Public License
- * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
+ * along with jrl-walkgen.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Research carried out within the scope of the 
  *  Joint Japanese-French Robotics Laboratory (JRL)
@@ -37,7 +37,7 @@ FootTrajectoryGenerationMultiple::FootTrajectoryGenerationMultiple(SimplePluginM
   : SimplePlugin(lSPM)
 {
   m_Foot = aFoot;
-  m_Sensitivity=1e-9;
+  m_Sensitivity=0.0;
 }
 
 FootTrajectoryGenerationMultiple::~FootTrajectoryGenerationMultiple()
@@ -147,7 +147,7 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
       ODEBUG("t: " << t << " reftime :" << setprecision(12) << reftime <<
 	     " Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j] 
 	     <<" max limit: " << setprecision(12) << (reftime+m_DeltaTj[j]+m_Sensitivity) );
-
+      ODEBUG(" Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j] );
       if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
 	{
 	  double deltaj=0.0;
@@ -158,11 +158,19 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
 	      m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAll(aFootAbsolutePosition,deltaj);
 	      aFootAbsolutePosition.stepType = m_NatureOfIntervals[j];
 	    }
+	  ODEBUG("t: " << t << " reftime :" << setprecision(12) << reftime <<
+		  " AbsoluteTimeReference : " << m_AbsoluteTimeReference <<
+		  " Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j] 
+	     <<" max limit: " << setprecision(12) << (reftime+m_DeltaTj[j]+m_Sensitivity) );
 	  ODEBUG("X: " << aFootAbsolutePosition.x << 
 		  " Y: " << aFootAbsolutePosition.y << 
 		  " Z: " << aFootAbsolutePosition.z << 
 		  " Theta: " << aFootAbsolutePosition.theta <<
-		  " Omega: " << aFootAbsolutePosition.omega);
+		  " Omega: " << aFootAbsolutePosition.omega << 
+		  " stepType: " << aFootAbsolutePosition.stepType << 
+		  " NI: " << m_NatureOfIntervals[j] <<
+		  " interval : " << j);
+
 	  return true;
 	}
       
