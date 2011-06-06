@@ -742,10 +742,17 @@ GeneratorVelRef::build_constraints_door(double Time, double DesVelDoor,
 //			 cout<<"HXRTW:"<<HXRTW<<endl;
 //			 cout<<"HYRTW:"<<HYRTW<<endl;
 //			 cout<<"D5:"<<D5<<endl;
+//
+//		 Pb.add_term(-WWx,QPProblem::MATRIX_DU,NbConstraints,2*N_);
+//		 Pb.add_term(WWy,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
+//		 Pb.add_term(D5,QPProblem::VECTOR_DS,NbConstraints);
+//
+//
 
-		 Pb.add_term(-WWx,QPProblem::MATRIX_DU,NbConstraints,2*N_);
-		 Pb.add_term(WWy,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
-		 Pb.add_term(D5,QPProblem::VECTOR_DS,NbConstraints);
+                 Pb.add_term(WWx,QPProblem::MATRIX_DU,NbConstraints,2*N_);
+                 Pb.add_term(WWy,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
+                 Pb.add_term(D5,QPProblem::VECTOR_DS,NbConstraints);
+
 
 		 cout<<"-WWx:"<<-WWx<<endl;
 		 cout<<"WWy"<<WWy<<endl;

@@ -411,15 +411,14 @@ ZMPVelocityReferencedQP::OnLine(double time,
       Problem_.dump_problem(FileName);
       cout<<"time:"<<time<<endl;
 
-      Problem_.set_nb_constraints( 0 );
-      Problem_.set_nb_variables( 0 );
+      Problem_.reset();
 
       for(int i=0;i<PrwSupportStates_deq.back().StepNumber;i++)
       {
           cout<<"X"<<i<<":"<<Result.Solution_vec(2*QP_N_+i)<<endl;
           cout<<"Y"<<i<<":"<<Result.Solution_vec(2*QP_N_+PrwSupportStates_deq.back().StepNumber+i)<<endl;
+          cout<<"LMult."<<Result.ConstrLagr_vec<<endl;
       }
-
 
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
