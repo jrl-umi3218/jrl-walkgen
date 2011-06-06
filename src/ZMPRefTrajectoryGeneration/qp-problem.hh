@@ -166,7 +166,7 @@ namespace PatternGeneratorJRL
 		 int row);
 
     /// \brief Dump on disk a problem.
-    void dumpProblem(const char *filename);
+    void dump_problem(const char *filename);
 
     /// \brief Dump on disk an array.
     ///
@@ -182,6 +182,9 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] type
     void clear( int type );
+
+    /// \brief Set matrices to zero
+    void reset();
 
     /// \brief Solve the problem
     ///

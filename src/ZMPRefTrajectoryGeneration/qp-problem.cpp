@@ -141,6 +141,22 @@ QPProblem_s::clear( int type )
 }
 
 
+void QPProblem_s::reset()
+{
+
+  Q_.fill(0.0);
+  Q_dense_.fill(0.0);
+  DU_.fill(0.0);
+  DU_dense_.fill(0.0);
+  D_.fill(0.0);
+  DS_.fill(0.0);
+  NbConstraints_ = 0;
+  NbEqConstraints_ = 0;
+  NbVariables_ = 0;
+
+}
+
+
 void
 QPProblem_s::solve( int solver, solution_t & result )
 {
@@ -189,13 +205,7 @@ QPProblem_s::solve( int solver, solution_t & result )
 
       result.Fail = ifail_;
       result.Print = iprint_;
-
     }
-
-  Q_.fill(0.0);
-  DU_.fill(0.0);
-  D_.fill(0.0);
-  DS_.fill(0.0);
 
 }
 
@@ -449,7 +459,7 @@ QPProblem_s::dump_problem(std::ostream &aos)
 
 
 void
-QPProblem_s::dumpProblem(const char * filename)
+QPProblem_s::dump_problem(const char * filename)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);

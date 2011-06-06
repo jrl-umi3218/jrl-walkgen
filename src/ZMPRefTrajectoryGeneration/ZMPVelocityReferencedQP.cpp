@@ -404,8 +404,16 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // --------------
       QPProblem_s::solution_t Result;
       Problem_.solve( QPProblem_s::QLD , Result );
-      Problem_.set_nb_constraints( 0 );
+
+
+      char FileName[1024];
+      sprintf(FileName,"/tmp/Problem%f.dat", time);
+      Problem_.dump_problem(FileName);
       cout<<"time:"<<time<<endl;
+
+      Problem_.set_nb_constraints( 0 );
+      Problem_.set_nb_variables( 0 );
+
       for(int i=0;i<PrwSupportStates_deq.back().StepNumber;i++)
       {
           cout<<"X"<<i<<":"<<Result.Solution_vec(2*QP_N_+i)<<endl;
@@ -431,8 +439,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // COMPUTE ORIENTATION OF TRUNK:
       // -----------------------------
       OrientPrw_->interpolate_trunk_orientation(time+TimeBuffer_, CurrentIndex,
-                            m_SamplingPeriod,
-                            CurrentSupport,
+                            m_SamplingPeriod, CurrentSupport,
                             FinalCOMTraj_deq);
 
 
@@ -466,6 +473,8 @@ ZMPVelocityReferencedQP::OnLine(double time,
       CurrentCPUTime = end.tv_sec - start.tv_sec +
         0.000001 * (end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
+
+
     }
 
 }

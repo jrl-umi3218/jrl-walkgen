@@ -328,7 +328,6 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
           Inequalities.y.D.push_back((i-1)*nEdges+j,i-1,D_y[j]);
           Inequalities.dc((i-1)*nEdges+j) = dc[j];
         }
-
     }
 
 }
@@ -662,28 +661,28 @@ GeneratorVelRef::build_constraints_door(double Time, double DesVelDoor,
 
 		 //Foot constraints with respect to Cadre
 
-			 boost_ublas::matrix<double> HXRTW2=prod(Diagx1,W);
-			 boost_ublas::matrix<double> HYRTW2= prod(Diagy1,W);
-			 boost_ublas::matrix<double> WWx2(NbPrwSteps,NbPrwSteps,false);
-			 boost_ublas::matrix<double> WWy2(NbPrwSteps,NbPrwSteps,false);
+		 boost_ublas::matrix<double> HXRTW2=prod(Diagx1,W);
+		 boost_ublas::matrix<double> HYRTW2= prod(Diagy1,W);
+		 boost_ublas::matrix<double> WWx2(NbPrwSteps,NbPrwSteps,false);
+		 boost_ublas::matrix<double> WWy2(NbPrwSteps,NbPrwSteps,false);
 
-			 int line1 = 0;
-			 for(int i=0;i<N_;i++)
-			 {
-				 for(int j=0;j<NbPrwSteps;j++)
-				 {
-					 if(W(i,j)==1 )
-					 {
-						 for(int p=0;p<NbPrwSteps;p++)
-						 {
-							 WWx2(line1,p)= HXRTW2(i,p);
-							 WWy2(line1,p)= HYRTW2(i,p);
-						 }
-						 line1++;
-					 }
+		 int line1 = 0;
+		 for(int i=0;i<N_;i++)
+		   {
+		     for(int j=0;j<NbPrwSteps;j++)
+		       {
+		         if(W(i,j)==1 )
+		           {
+		             for(int p=0;p<NbPrwSteps;p++)
+		               {
+		                 WWx2(line1,p)= HXRTW2(i,p);
+		                 WWy2(line1,p)= HYRTW2(i,p);
+		               }
+		             line1++;
+		           }
 
-				 }
-			 }
+		       }
+		   }
 
 
 //			 cout << "HXTRU" << HXTRU << endl;
@@ -696,8 +695,8 @@ GeneratorVelRef::build_constraints_door(double Time, double DesVelDoor,
 //			 cout << "HYRTW2" << HYRTW2 << endl;
 
 
-		     int NbConstraints = Pb.NbConstraints();
-		     cout<<"NbConstraints: "<<NbConstraints<<endl;
+		 int NbConstraints = Pb.NbConstraints();
+		 cout<<"NbConstraints: "<<NbConstraints<<endl;
 //			 Pb.add_term(HXTRU,QPProblem::MATRIX_DU,NbConstraints,0);
 //			 Pb.add_term(HYTRU,QPProblem::MATRIX_DU,NbConstraints,N_);
 //			 Pb.add_term(COM_CONSTR_R1,QPProblem::VECTOR_DS,NbConstraints);
@@ -744,15 +743,15 @@ GeneratorVelRef::build_constraints_door(double Time, double DesVelDoor,
 //			 cout<<"HYRTW:"<<HYRTW<<endl;
 //			 cout<<"D5:"<<D5<<endl;
 
-    		 Pb.add_term(-WWx,QPProblem::MATRIX_DU,NbConstraints,2*N_);
-    		 Pb.add_term(WWy,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
-    		 Pb.add_term(D5,QPProblem::VECTOR_DS,NbConstraints);
+		 Pb.add_term(-WWx,QPProblem::MATRIX_DU,NbConstraints,2*N_);
+		 Pb.add_term(WWy,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
+		 Pb.add_term(D5,QPProblem::VECTOR_DS,NbConstraints);
 
-    		 cout<<"-WWx:"<<-WWx<<endl;
-    		 cout<<"WWy"<<WWy<<endl;
-    		 cout<<"D5:"<<D5<<endl;
-		     NbConstraints = Pb.NbConstraints();
-		     cout<<"NbConstraints: "<<NbConstraints<<endl;
+		 cout<<"-WWx:"<<-WWx<<endl;
+		 cout<<"WWy"<<WWy<<endl;
+		 cout<<"D5:"<<D5<<endl;
+		 NbConstraints = Pb.NbConstraints();
+		 cout<<"NbConstraints: "<<NbConstraints<<endl;
 
 
 //
