@@ -41,17 +41,17 @@ using namespace PatternGeneratorJRL;
 
 
 RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
-                                                                                CjrlHumanoidDynamicRobot *aHS ) :
-  SimplePlugin(aSPM)
+    CjrlHumanoidDynamicRobot *aHS ) :
+    SimplePlugin(aSPM)
 {
 
   DSFeetDistance_ = 0.2;
   SecurityMarginX_ = 0.04;
   SecurityMarginY_ = 0.04;
 
-  setFeetDimensions( aHS );
+  set_feet_dimensions( aHS );
 
-  initConvexHulls();
+  init_convex_hulls();
 
   // Register method to handle
   string aMethodName[] =
@@ -66,15 +66,15 @@ RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
     }
 }
 
+
 RelativeFeetInequalities::~RelativeFeetInequalities()
 {
 
 }
 
 
-
 int
-RelativeFeetInequalities::initConvexHulls()
+RelativeFeetInequalities::init_convex_hulls()
 {
 
   double lxcoefsRight[4] = { 1.0, 1.0, -1.0, -1.0};
@@ -82,38 +82,38 @@ RelativeFeetInequalities::initConvexHulls()
   double lxcoefsLeft[4] = { 1.0, 1.0, -1.0, -1.0};
   double lycoefsLeft[4] = { 1.0, -1.0, -1.0, 1.0};
 
-  FootPosEdges_.leftDS.resize(5);
-  FootPosEdges_.leftSS.resize(5);
+  FootPosEdges_.LeftDS.resize(5);
+  FootPosEdges_.LeftSS.resize(5);
   double LeftFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
   double LeftFPosEdgesY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
-  FootPosEdges_.leftDS.set(LeftFPosEdgesX,LeftFPosEdgesY);
-  FootPosEdges_.leftSS.set(LeftFPosEdgesX,LeftFPosEdgesY);
+  FootPosEdges_.LeftDS.set(LeftFPosEdgesX,LeftFPosEdgesY);
+  FootPosEdges_.LeftSS.set(LeftFPosEdgesX,LeftFPosEdgesY);
 
-  FootPosEdges_.rightDS.resize(5);
-  FootPosEdges_.rightSS.resize(5);
+  FootPosEdges_.RightDS.resize(5);
+  FootPosEdges_.RightSS.resize(5);
   double RightFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
   double RightFPosEdgesY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
-  FootPosEdges_.rightDS.set(RightFPosEdgesX,RightFPosEdgesY);
-  FootPosEdges_.rightSS.set(RightFPosEdgesX,RightFPosEdgesY);
+  FootPosEdges_.RightDS.set(RightFPosEdgesX,RightFPosEdgesY);
+  FootPosEdges_.RightSS.set(RightFPosEdgesX,RightFPosEdgesY);
 
-  ZMPPosEdges_.leftDS.resize(4);
-  ZMPPosEdges_.leftSS.resize(4);
-  ZMPPosEdges_.rightDS.resize(4);
-  ZMPPosEdges_.rightSS.resize(4);
+  ZMPPosEdges_.LeftDS.resize(4);
+  ZMPPosEdges_.LeftSS.resize(4);
+  ZMPPosEdges_.RightDS.resize(4);
+  ZMPPosEdges_.RightSS.resize(4);
   for( unsigned j=0;j<4;j++ )
     {
       //Left single support phase
-      ZMPPosEdges_.leftSS.X[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
-      ZMPPosEdges_.leftSS.Y[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeight();
+      ZMPPosEdges_.LeftSS.X[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
+      ZMPPosEdges_.LeftSS.Y[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeight();
       //Right single support phase
-      ZMPPosEdges_.rightSS.X[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
-      ZMPPosEdges_.rightSS.Y[j] = lycoefsRight[j]*RightFootSize_.getHalfHeight();
+      ZMPPosEdges_.RightSS.X[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
+      ZMPPosEdges_.RightSS.Y[j] = lycoefsRight[j]*RightFootSize_.getHalfHeight();
       //Left DS phase
-      ZMPPosEdges_.leftDS.X[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
-      ZMPPosEdges_.leftDS.Y[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeightDS()-DSFeetDistance_/2.0;
+      ZMPPosEdges_.LeftDS.X[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
+      ZMPPosEdges_.LeftDS.Y[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeightDS()-DSFeetDistance_/2.0;
       //Right DS phase
-      ZMPPosEdges_.rightDS.X[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
-      ZMPPosEdges_.rightDS.Y[j] = lycoefsRight[j]*RightFootSize_.getHalfHeightDS()+DSFeetDistance_/2.0;
+      ZMPPosEdges_.RightDS.X[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
+      ZMPPosEdges_.RightDS.Y[j] = lycoefsRight[j]*RightFootSize_.getHalfHeightDS()+DSFeetDistance_/2.0;
     }
 
   return 0;
@@ -121,20 +121,19 @@ RelativeFeetInequalities::initConvexHulls()
 }
 
 
-
 int
-RelativeFeetInequalities::setFeetDimensions( CjrlHumanoidDynamicRobot *aHS )
+RelativeFeetInequalities::set_feet_dimensions( CjrlHumanoidDynamicRobot *aHS )
 {
 
   // Read feet specificities.
-  double lHalfHeightInit,lHalfWidthInit;
+  double HeightHalf,WidthHalf;
   CjrlFoot * RightFoot = aHS->rightFoot();
   if (RightFoot==0)
     {
       cerr << "Problem with the reading of the right foot"<< endl;
       return 0;
     }
-  RightFoot->getSoleSize( lHalfWidthInit,lHalfHeightInit );
+  RightFoot->getSoleSize( WidthHalf,HeightHalf );
 
   CjrlFoot * LeftFoot = aHS->leftFoot();
   if (RightFoot==0)
@@ -142,11 +141,11 @@ RelativeFeetInequalities::setFeetDimensions( CjrlHumanoidDynamicRobot *aHS )
       cerr << "Problem while reading of the left foot"<< endl;
       return 0;
     }
-  LeftFoot->getSoleSize( lHalfWidthInit,lHalfHeightInit );
+  LeftFoot->getSoleSize( WidthHalf,HeightHalf );
 
-  LeftFootSize_.setHalfSizeInit( lHalfWidthInit,lHalfHeightInit );
+  LeftFootSize_.setHalfSizeInit( WidthHalf,HeightHalf );
   LeftFootSize_.setConstraints( SecurityMarginX_,SecurityMarginY_ );
-  RightFootSize_.setHalfSizeInit( lHalfWidthInit,lHalfHeightInit );
+  RightFootSize_.setHalfSizeInit( WidthHalf,HeightHalf );
   RightFootSize_.setConstraints( SecurityMarginX_,SecurityMarginY_ );
 
   return 0;
@@ -154,23 +153,22 @@ RelativeFeetInequalities::setFeetDimensions( CjrlHumanoidDynamicRobot *aHS )
 }
 
 
-
 int
-RelativeFeetInequalities::setVertices( convex_hull_t & ConvexHull,
-						     double Orientation,
-						     const support_state_t & PrwSupport,
-						     int constraints_type)
+RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
+    double Orientation,
+    const support_state_t & PrwSupport,
+    int Type)
 {
 
-  edges_s * conv_hulls = 0;
+  edges_s * ConvexHull_p = 0;
 
-  switch(constraints_type)
+  switch(Type)
     {
     case ZMP_CONSTRAINTS:
-      conv_hulls = & ZMPPosEdges_;
+      ConvexHull_p = & ZMPPosEdges_;
       break;
     case FOOT_CONSTRAINTS:
-      conv_hulls = & FootPosEdges_;
+      ConvexHull_p = & FootPosEdges_;
       break;
 
     }
@@ -178,16 +176,16 @@ RelativeFeetInequalities::setVertices( convex_hull_t & ConvexHull,
   if( PrwSupport.Foot == 1 )
     {
       if( PrwSupport.Phase == 0 )
-        ConvexHull = conv_hulls->leftDS;
+        ConvexHull = ConvexHull_p->LeftDS;
       else
-        ConvexHull = conv_hulls->leftSS;
+        ConvexHull = ConvexHull_p->LeftSS;
     }
   else
     {
       if( PrwSupport.Phase == 0 )
-        ConvexHull = conv_hulls->rightDS;
+        ConvexHull = ConvexHull_p->RightDS;
       else
-        ConvexHull = conv_hulls->rightSS;
+        ConvexHull = ConvexHull_p->RightSS;
     }
 
   ConvexHull.rotate(Orientation);
@@ -197,12 +195,11 @@ RelativeFeetInequalities::setVertices( convex_hull_t & ConvexHull,
 }
 
 
-
 int
-RelativeFeetInequalities::computeLinearSystem( const convex_hull_t & ConvexHull,
-                                                             MAL_MATRIX(&D,double),
-                                                             MAL_MATRIX(&Dc,double),
-                                                             const support_state_t & PrwSupport ) const
+RelativeFeetInequalities::compute_linear_system( const convex_hull_t & ConvexHull,
+    MAL_MATRIX(&D,double),
+    MAL_MATRIX(&Dc,double),
+    const support_state_t & PrwSupport ) const
 {
 
   double dx,dy,dc,x1,y1,x2,y2;
@@ -259,9 +256,9 @@ RelativeFeetInequalities::computeLinearSystem( const convex_hull_t & ConvexHull,
 
 
 int
-RelativeFeetInequalities::computeLinearSystem (const convex_hull_t & ConvexHull,
-							     double * D_x, double * D_y, double * d,
-							     const support_state_t & PrwSupport) const
+RelativeFeetInequalities::compute_linear_system (const convex_hull_t & ConvexHull,
+    double * Dx, double * Dy, double * Dc,
+    const support_state_t & PrwSupport) const
 {
 
   double dx,dy,dc,x1,y1,x2,y2;
@@ -283,8 +280,8 @@ RelativeFeetInequalities::computeLinearSystem (const convex_hull_t & ConvexHull,
       dy = (double)PrwSupport.Foot*dy;
       dc = (double)PrwSupport.Foot*dc;
 
-      D_x[i] = dx; D_y[i]= dy;
-      d[i] = dc;
+      Dx[i] = dx; Dy[i]= dy;
+      Dc[i] = dc;
     }
 
   {
@@ -305,8 +302,8 @@ RelativeFeetInequalities::computeLinearSystem (const convex_hull_t & ConvexHull,
     dy = (double)PrwSupport.Foot*dy;
     dc = (double)PrwSupport.Foot*dc;
 
-    D_x[i] = dx; D_y[i]= dy;
-    d[i] = dc;
+    Dx[i] = dx; Dy[i]= dy;
+    Dc[i] = dc;
   }
 
   return 0;

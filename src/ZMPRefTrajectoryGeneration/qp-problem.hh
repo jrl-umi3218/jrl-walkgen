@@ -55,16 +55,15 @@ namespace PatternGeneratorJRL
     const static int QLD=10;
     const static int PLDP=11;
 
-
     /// \brief Solution
     struct solution_s
     {
 
       /// \brief Size of the solution array
-      int NbVariables;
+      unsigned int NbVariables_;
 
       /// \brief Number of constraints (lagrange multipliers)
-      int NbConstraints;
+      unsigned int NbConstraints_;
 
       /// \brief SHOWS THE TERMINATION REASON.
       ///   IFAIL = 0 :   SUCCESSFUL RETURN.
@@ -73,12 +72,12 @@ namespace PatternGeneratorJRL
       ///                 CRITERION.
       ///   IFAIL = 5 :   LENGTH OF A WORKING ARRAY IS TOO SHORT.
       ///   IFAIL > 10 :  THE CONSTRAINTS ARE INCONSISTENT.
-      int Fail;
+      int Fail_;
 
       /// \brief OUTPUT CONTROL.
       ///   IPRINT = 0 :  NO OUTPUT OF QL0001.
       ///   IPRINT > 0 :  BRIEF OUTPUT IN ERROR CASES.
-      int Print;
+      int Print_;
 
       /// \brief Solution vector
       boost_ublas::vector<double> Solution_vec;
@@ -91,12 +90,12 @@ namespace PatternGeneratorJRL
       boost_ublas::vector<double> UBoundsLagr_vec;
 
       /// \brief Resize solution containers
-      void resize( int nb_variables, int nb_constraints );
+      void resize( unsigned int NbVariables, unsigned int NbConstraints );
 
       /// \brief Dump solution
-      /// \param filename
-      void dump( const char *filename );
-      /// \brief Print solution
+      /// \param Filename
+      void dump( const char * Filename );
+      /// \brief Print_ solution
       /// \param aos
       void print( std::ostream & aos);
 
@@ -117,20 +116,21 @@ namespace PatternGeneratorJRL
 
     /// \brief Set the number of optimization parameters.
     ///
-    /// \param nb_variables
-    void set_nb_variables( int NbVariables )
+
+    /// \param NbVariables_
+    void NbVariables( unsigned int NbVariables )
     { NbVariables_ = NbVariables;};
 
     /// \brief Set the number of equality constraints.
     ///
-    /// \param nb_eq_constraints
-    inline void set_nb_eq_constraints( int NbEqConstraints )
+    /// \param NbEqConstraints
+    inline void NbEqConstraints( unsigned int NbEqConstraints )
     { NbEqConstraints_ = NbEqConstraints;};
 
     /// \brief Set the total number of constraints.
     ///
-    /// \param nb_constraints
-    inline void set_nb_constraints( int NbConstraints )
+    /// \param NbConstraints_
+    inline void NbConstraints( unsigned int NbConstraints )
     { NbConstraints_ = NbConstraints;};
     
     /// \brief Get the total number of constraints.
@@ -141,56 +141,52 @@ namespace PatternGeneratorJRL
 
     /// \brief Reallocate array
     ///
-    /// \param[in] array
-    /// \param[in] old_size
-    /// \param[in] new_size
+    /// \param[in] Array
+    /// \param[in] SizeOld Old array size
+    /// \param[in] SizeNew New array size
     template <typename type>
-    int resize( type * &array, int old_size, int new_size );
-
+    int resize( type * & Array, unsigned int SizeOld, unsigned int SizeNew );
 
     /// \brief Add a matrix to the final optimization problem in array form
     ///
     /// \param Mat Added matrix
-    /// \param type Target matrix type
-    /// \param row First row inside the target
-    /// \param col First column inside the target
-    void add_term(const MAL_MATRIX (&Mat, double), int type,
-		 int row, int col);
+    /// \param Type Target matrix type
+    /// \param Row First row inside the target
+    /// \param Col First column inside the target
+    void add_term(const boost_ublas::matrix<double> & Mat, int Type,
+        unsigned int Row, unsigned int Col);
 
     /// \brief Add a vector to the final optimization problem in array form
     ///
     /// \param Mat Added vector
     /// \param ype Target vector type
     /// \param row First row inside the target
-    void add_term(const MAL_VECTOR (&Vec, double), int type,
-		 int row);
+    void add_term(const boost_ublas::vector<double> & Vec, int Type,
+        unsigned int Row);
 
     /// \brief Dump on disk a problem.
-    void dump_problem(const char *filename);
+    void dump_problem(const char * Filename);
 
     /// \brief Dump on disk an array.
     ///
-    /// \param type
-    /// \param filename
-    void dump( int type, const char *filename);
+    /// \param Type
+    /// \param Filename
+    void dump( int Type, const char * Filename);
     /// \}
 
-    /// \brief Initialize set of arrays
-    void clear( );
-
-    /// \brief Initialize whole array
+    /// \brief Initialize array
     ///
     /// \param[in] type
-    void clear( int type );
+    void clear( int Type );
 
     /// \brief Set matrices to zero
     void reset();
 
-    /// \brief Solve the problem
+    /// \brief Solve the optimization problem
     ///
-    /// \param[in] solver
-    /// \param[out] result
-    void solve( int solver, solution_t & result);
+    /// \param[in] Solver
+    /// \param[out] Result
+    void solve( int Solver, solution_t & Result);
 
 
     //
@@ -208,12 +204,12 @@ namespace PatternGeneratorJRL
 
     /// \name Dumping functions
     /// \{
-    /// \brief Print on disk the parameters that are passed to the solver
-    void dump_solver_parameters(std::ostream & aos);
-    /// \brief Print array
-    void dump( int type, std::ostream & aos);
-    /// \brief Print problem
-    void dump_problem(std::ostream &);
+    /// \brief Print_ on disk the parameters that are passed to the solver
+    void dump_solver_parameters( std::ostream & aos );
+    /// \brief Print_ array
+    void dump( int Type, std::ostream & aos );
+    /// \brief Print_ problem
+    void dump_problem( std::ostream & );
     /// \}
 
     //
@@ -225,99 +221,107 @@ namespace PatternGeneratorJRL
     template<typename type>
     struct array_s
     {
-      type * array_;
+      type * Array_;
 
-      int id_;
-      int nrows_, ncols_;
-      unsigned int memsize_;
+      int Id_;
+      unsigned int NbRows_, NbCols_;
+      unsigned int SizeMem_;
 
-      void fill( type value)
-      { std::fill_n(array_, nrows_*ncols_, value); }
+      void fill( type Value )
+      { std::fill_n(Array_, NbRows_*NbCols_, Value); }
 
-      void fill( type * array, int size, type value)
-      { std::fill_n(array, size, value); }
+      void fill( type * Array, int Size, type Value )
+      { std::fill_n(Array, Size, Value); }
 
 
       /// \brief Make a contiguous array
       ///
-      /// \param[in] nrows Size of the new array
-      /// \param[in] ncols Size of the new array
-      /// \param[in] preserve Preserve old values
+      /// \param[in] FinalArray New array
+      /// \param[in] NbRows Size of the new array
+      /// \param[in] NbCols Size of the new array
       /// \return 0
-      int stick_together(struct array_s<type> & final_array,
-			 int nrows, int ncols)
+
+      int stick_together( struct array_s<type> & FinalArray,
+          unsigned int NbRows, unsigned int NbCols )
       {
+
         try {
 	  type * NewArray = 0;
-	  if ((final_array.memsize_<nrows*ncols) ||
-	      (final_array.array_==0))
+	  if ((FinalArray.SizeMem_<NbRows*NbCols) ||
+	      (FinalArray.Array_==0))
 	    {
-	      final_array.array_ = new type[nrows*ncols];
-	      final_array.memsize_ = nrows*ncols;
+	      FinalArray.Array_ = new type[NbRows*NbCols];
+	      FinalArray.SizeMem_ = NbRows*NbCols;
 	    }
-	  NewArray = final_array.array_;
+	  NewArray = FinalArray.Array_;
 	  
-          fill(NewArray, nrows*ncols, (type)0);
-          for(int i = 0; i < nrows; i++)
-            for(int j = 0; j < ncols; j++)
-              NewArray[i+nrows*j] = array_[i+nrows_*j];
+          fill(NewArray, NbRows*NbCols, (type)0);
+          for(unsigned int i = 0; i < NbRows; i++)
+            for(unsigned int j = 0; j < NbCols; j++)
+              NewArray[i+NbRows*j] = Array_[i+NbRows_*j];
 
-          nrows_ = nrows;
-          ncols_ = ncols;
+          NbRows_ = NbRows;
+          NbCols_ = NbCols;
         }
         catch (std::bad_alloc& ba)
         {std::cerr << "bad_alloc caught: " << ba.what() << std::endl; }
 
         return 0;
+
       }
 
       /// \brief Resize array
       ///
-      /// \param[in] nrows Size of the new array
-      /// \param[in] ncols Size of the new array
+      /// \param[in] NbRows Size of the new array
+      /// \param[in] NbCols Size of the new array
       /// \param[in] preserve Preserve old values
       /// \return 0
-      int resize(int nrows, int ncols, bool preserve)
+      int resize( unsigned int NbRows, unsigned int NbCols, bool Preserve )
       {
+
         try {
-	  bool b_reallocate = false;
+	  bool Reallocate = false;
 	  type * NewArray = 0;
-	  if (nrows*ncols>memsize_)
+	  if (NbRows*NbCols>SizeMem_)
 	    {
-	      NewArray = new type[nrows*ncols];
-	      memsize_ = nrows*ncols;
-	      b_reallocate = true;
-	      std::cout << "memsize_ " << memsize_ << std::endl;
+	      NewArray = new type[NbRows*NbCols];
+	      SizeMem_ = NbRows*NbCols;
+	      Reallocate = true;
 	    }
-	  else NewArray = array_;
+	  else NewArray = Array_;
 
-	  fill(NewArray, nrows*ncols, (type)0);
-	  if ((preserve) && 
-	      (array_!=0) ) {
-	    for(int i = 0; i < nrows_; i++)
-	      for(int j = 0; j < ncols_; j++)
-		NewArray[i+nrows*j] = array_[i+nrows_*j]; }
+	  fill(NewArray, NbRows*NbCols, (type)0);
+	  if ((Preserve) && 
+	      (Array_!=0) ) {
+	    for(unsigned int i = 0; i < NbRows_; i++)
+	      for(unsigned int j = 0; j < NbCols_; j++)
+		NewArray[i+NbRows*j] = Array_[i+NbRows_*j]; }
 
-	  if ((array_!=0) && b_reallocate)
+	  if ((Array_!=0) && Reallocate)
 	    {
-	      delete [] array_;
+	      delete [] Array_;
 	    }
-	  array_ = NewArray;
+	  Array_ = NewArray;
 	  
-          nrows_ = nrows;
-          ncols_ = ncols;
+          NbRows_ = NbRows;
+          NbCols_ = NbCols;
         }
         catch (std::bad_alloc& ba)
         {std::cerr << "bad_alloc caught: " << ba.what() << std::endl; }
 
         return 0;
+
       }
 
       array_s():
-        array_(0),id_(0),nrows_(0),ncols_(0), memsize_(0){
+        Array_(0),Id_(0),NbRows_(0),NbCols_(0), SizeMem_(0){
       };
       ~array_s()
-      {  if (array_!=0) delete [] array_;};
+      {
+
+        if (Array_!=0) delete [] Array_;
+
+      };
     };
 
     //
@@ -331,17 +335,17 @@ namespace PatternGeneratorJRL
     array_s<double> Q_, Q_dense_, D_, DU_, DU_dense_, DS_, XL_, XU_, X_, U_, war_;
     array_s<int> iwar_;
     int iout_, ifail_, iprint_, lwar_, liwar_;
-    double Eps_;
+    double eps_;
     /// \}
 
     /// \brief Number of optimization parameters
-    int NbVariables_;
+    unsigned int NbVariables_;
 
     /// \brief Total number of constraints
-    int NbConstraints_;
+    unsigned int NbConstraints_;
 
     /// \brief Number of equality constraints
-    int NbEqConstraints_;
+    unsigned int NbEqConstraints_;
   };
   typedef struct QPProblem_s QPProblem;
 }

@@ -93,6 +93,15 @@ protected:
       aPGI.ParseCmd(strm2);
     }
   }
+
+  void startTurningRightOnSpot(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.0 0.0 10.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+
   void stopOnLineWalking(PatternGeneratorInterface &aPGI)
   {
     {
@@ -119,21 +128,29 @@ protected:
 
   void generateEvent()
   {
-    unsigned TurningLeftTime = 5*200;
-    unsigned TurningRightTime = 10*200;
-    unsigned StoppingTime = 15*200;
 
-    if (m_OneStep.NbOfIt>TurningLeftTime)
-      {
-      startTurningLeft(*m_PGI);
-      }
-    if (m_OneStep.NbOfIt>TurningRightTime)
-      {
-      startTurningRight(*m_PGI);
-      }
-    if (m_OneStep.NbOfIt>StoppingTime) 
-      {
-        stopOnLineWalking(*m_PGI);
+    typedef void (TestHerdt2010::* localeventHandler_t)(PatternGeneratorInterface &);
+
+    struct localEvent 
+    {
+      unsigned time;
+      localeventHandler_t Handler ;
+    };
+
+    #define localNbOfEvents 4
+    struct localEvent events [localNbOfEvents] =
+      { { 5*200,&TestHerdt2010::startTurningLeft},
+	{10*200,&TestHerdt2010::startTurningRight},
+	{15*200,&TestHerdt2010::startTurningRightOnSpot},
+	{25*200,&TestHerdt2010::stopOnLineWalking}};
+    
+    // Test when triggering event.
+    for(unsigned int i=0;i<localNbOfEvents;i++)
+      { 
+	if ( m_OneStep.NbOfIt==events[i].time)
+	  {
+	    (this->*(events[i].Handler))(*m_PGI);
+	  }
       }
   }
 };

@@ -93,7 +93,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   /// Initialize  the 2D LIPM
   CoM_.SetSimulationControlPeriod(QP_T_);
   CoM_.SetRobotControlPeriod(0.005);
-  CoM_.SetComHeight(0.814);
   CoM_.InitializeSystem();
 
   VRQPGenerator_ = new GeneratorVelRef(lSPM );
@@ -145,18 +144,18 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 
 void ZMPVelocityReferencedQP::setVelReference(istringstream &strm)
 {
-  strm >> VelRef_.local.x;
-  strm >> VelRef_.local.y;
-  strm >> VelRef_.local.yaw;
+  strm >> VelRef_.Local.x;
+  strm >> VelRef_.Local.y;
+  strm >> VelRef_.Local.yaw;
 }
 
 void ZMPVelocityReferencedQP::setVelReference(double dx,
 					      double dy,
 					      double dyaw)
 {
-  VelRef_.local.x = dx;
-  VelRef_.local.y = dy;
-  VelRef_.local.yaw = dyaw;
+  VelRef_.Local.x = dx;
+  VelRef_.Local.y = dy;
+  VelRef_.Local.yaw = dyaw;
 }
 
 void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
@@ -283,6 +282,11 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM.y[0] = lStartingCOMState.y[0];
   CoM.y[1] = lStartingCOMState.y[1];
   CoM.y[2] = lStartingCOMState.y[2];
+  CoM.z[0] = lStartingCOMState.z[0];
+  CoM.z[1] = lStartingCOMState.z[1];
+  CoM.z[2] = lStartingCOMState.z[2];
+  CoM_.SetComHeight(lStartingCOMState.z[0]);
+  CoM_.InitializeSystem();
   CoM_(CoM);
 
   return 0;
@@ -290,7 +294,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
 
 void
-ZMPVelocityReferencedQP::OnLine(double time,
+ZMPVelocityReferencedQP::OnLine(double Time,
 				     deque<ZMPPosition> & FinalZMPTraj_deq,
 				     deque<COMState> & FinalCOMTraj_deq,
 				     deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
@@ -303,7 +307,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
   // Testing if we are reaching the end of the online mode.
   if ((EndingPhase_) &&
-      (time>=TimeToStopOnLineMode_))
+      (Time>=TimeToStopOnLineMode_))
     { m_OnLineMode = false; }
 
 
@@ -319,7 +323,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
   // UPDATE WALKING TRAJECTORIES:
   // ----------------------------
-  if(time + 0.00001 > UpperTimeLimitToUpdate_)
+  if(Time + 0.00001 > UpperTimeLimitToUpdate_)
     {
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
       struct timeval start,end;
@@ -329,7 +333,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // UPDATE INTERNAL DATA:
       // ---------------------
       VRQPGenerator_->Reference(VelRef_);
-      VRQPGenerator_->CurrentTime(time+TimeBuffer_);
+      VRQPGenerator_->CurrentTime(Time+TimeBuffer_);
       VRQPGenerator_->CoM(CoM_());
 
 
@@ -361,7 +365,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // ------------------------------------------------------
       deque<double> PreviewedSupportAngles_deq;
-      OrientPrw_->preview_orientations(time+TimeBuffer_,
+      OrientPrw_->preview_orientations(Time+TimeBuffer_,
                                 VelRef_,
 				SupportFSM_->StepPeriod(), CurrentSupport,
 				FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
@@ -396,7 +400,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // BUILD DOOR CONSTRAINTS:
       // -----------------------
       double DesVelDoor = 0.0;
-      VRQPGenerator_->build_constraints_door( time, DesVelDoor,
+      VRQPGenerator_->build_constraints_door( Time, DesVelDoor,
 		      Door_, PrwSupportStates_deq, Problem_);
 
 
@@ -407,9 +411,9 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
 
       char FileName[1024];
-      sprintf(FileName,"/tmp/Problem%f.dat", time);
+      sprintf(FileName,"/tmp/Problem%f.dat", Time);
       Problem_.dump_problem(FileName);
-      cout<<"time:"<<time<<endl;
+      cout<<"time:"<<Time<<endl;
 
       Problem_.reset();
 
@@ -437,15 +441,14 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
       // COMPUTE ORIENTATION OF TRUNK:
       // -----------------------------
-      OrientPrw_->interpolate_trunk_orientation(time+TimeBuffer_, CurrentIndex,
-                            m_SamplingPeriod, CurrentSupport,
-                            FinalCOMTraj_deq);
+      OrientPrw_->interpolate_trunk_orientation(Time+TimeBuffer_, CurrentIndex,
+                            m_SamplingPeriod, CurrentSupport, FinalCOMTraj_deq);
 
 
       // INTERPOLATE THE COMPUTED FEET POSITIONS:
       // ----------------------------------------
-      unsigned NumberStepsPrwd = PrwSupportStates_deq.back().StepNumber;
-      OFTG_->interpolate_feet_positions(time+TimeBuffer_,
+      unsigned int NumberStepsPrwd = PrwSupportStates_deq.back().StepNumber;
+      OFTG_->interpolate_feet_positions(Time+TimeBuffer_,
                                CurrentIndex, CurrentSupport,
                                Result.Solution_vec[2*QP_N_], Result.Solution_vec[2*QP_N_+NumberStepsPrwd],
                                PreviewedSupportAngles_deq,

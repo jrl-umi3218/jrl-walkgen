@@ -51,7 +51,7 @@ void SupportFSM::set_support_state(const double &Time, const int &pi,
   Support.StateChanged = false;
 
   bool ReferenceGiven = false;
-  if(fabs(Ref.local.x)>eps||fabs(Ref.local.y)>eps||fabs(Ref.local.yaw)>eps)
+  if(fabs(Ref.Local.x)>eps||fabs(Ref.Local.y)>eps||fabs(Ref.Local.yaw)>eps)
     ReferenceGiven = true;
 
   if(ReferenceGiven == true && Support.Phase == 0 && (Support.TimeLimit-Time-eps)>DSSSPeriod_)

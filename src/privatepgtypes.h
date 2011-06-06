@@ -127,7 +127,7 @@ namespace PatternGeneratorJRL
     };
     typedef struct frame_s frame_t;
 
-    frame_t global, local;
+    frame_t Global, Local;
 
   };
   typedef struct reference_s reference_t;
@@ -151,7 +151,7 @@ namespace PatternGeneratorJRL
   typedef struct linear_constraint_s
   linear_constraint_t;
 
-  /// \brief Set of 2-dimensional point
+  /// \brief Set of 2-dimensional points
   struct convex_hull_s
   {
 
@@ -160,24 +160,24 @@ namespace PatternGeneratorJRL
 
     /// \brief Rotate the points around the origin by angle
     ///
-    /// \param[in] angle
-    void rotate( double angle );
+    /// \param[in] Angle
+    void rotate( double Angle );
 
     /// \brief Resize members to the desired number of points
     ///
     /// \param[in] size
-    void resize( int size );
+    void resize( int Size );
 
     /// \brief Set the vectors from arrays
     ///
     /// \param[in] X
     /// \param[in] Y
-    void set(const double * arrayX, const double * arrayY);
+    void set(const double * X_a, const double * Y_a);
 
     /// \brief Set all points to zero
     void reset();
 
-    convex_hull_s( int size );
+    convex_hull_s( int Size );
     convex_hull_s();
 
   };
@@ -189,9 +189,10 @@ namespace PatternGeneratorJRL
   {
     struct coordinate_s
     {
-      boost_ublas::compressed_matrix<double, boost_ublas::row_major> D;
+      boost_ublas::compressed_matrix<double, boost_ublas::row_major> x;
+      boost_ublas::compressed_matrix<double, boost_ublas::row_major> y;
     };
-    struct coordinate_s x, y;
+    struct coordinate_s D;
 
     boost_ublas::vector<double> dc;
 
@@ -202,7 +203,7 @@ namespace PatternGeneratorJRL
     void clear();
 
     /// \brief Resize all elements
-    void resize( int n_rows, int n_cols, bool preserve );
+    void resize( int NbRows, int NbCols, bool Preserve );
   };
   typedef struct linear_inequality_s
     linear_inequality_t;
