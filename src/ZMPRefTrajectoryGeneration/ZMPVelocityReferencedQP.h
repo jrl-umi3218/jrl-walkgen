@@ -95,7 +95,7 @@ namespace PatternGeneratorJRL
 		   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
 
 
-    /* ! \brief Method to update the stacks on-line */
+    /// \brief Update the stacks on-line
     void OnLine(double time,
 		deque<ZMPPosition> & FinalZMPPositions,
 		deque<COMState> & CoMStates,
@@ -103,37 +103,54 @@ namespace PatternGeneratorJRL
 		deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
 
 
-    int validateConstraints(double * & DS,double * &DU,
-			    int NbOfConstraints,  int li,
-			    double *X, double time);
-
-
     /// \name Accessors
     /// \{
-    /*! Set the velocity reference */
-    void setVelReference(istringstream &strm);
+    /// \brief Set the reference (velocity only as for now) through the Interface (slow)
+    void Reference(istringstream &strm)
+    {
+      strm >> VelRef_.Local.x;
+      strm >> VelRef_.Local.y;
+      strm >> VelRef_.Local.yaw;
+    }
+    /// \brief Set the reference (Velocity only as for now)
+    inline void Reference(double dx, double dy, double dyaw)
+    {
+      VelRef_.Local.x = dx;
+      VelRef_.Local.y = dy;
+      VelRef_.Local.yaw = dyaw;
+    }
 
-    /*! Set the velocity reference from external reference */
-    void setVelReference(double dx,double dy, double dyaw);
+    /// \brief Set the final-stage trigger
+    inline void EndingPhase(bool EndingPhase)
+    { EndingPhase_ = EndingPhase;}
 
-    /*! Set the velocity reference from external reference */
+    /// \brief Set CoM perturbation force
     void setCoMPerturbationForce(double x,double y);
-
+    /// \brief Set CoM perturbation force
     void setCoMPerturbationForce(istringstream &strm);
     /// \}
 
+    /// \breif Reference
     reference_t VelRef_;
 
   private:
 
+    /// \brief Total mass of the robot
     double RobotMass_;
+
+    /// \brief Perturbation trigger
     bool PerturbationOccured_;
     
+    /// \brief Final stage trigger
     bool EndingPhase_;
+
+    /// \brief Time at which the online mode will stop
     double TimeToStopOnLineMode_;
 
+    /// \brief Time at which the problem should be updated
     double UpperTimeLimitToUpdate_;
 
+    /// \brief Security margin for trajectory queues
     double TimeBuffer_;
 
     /// \brief 2D LIPM to simulate the evolution of the robot.
@@ -160,15 +177,11 @@ namespace PatternGeneratorJRL
     /// \brief Additional term on the acceleration of the CoM
     MAL_VECTOR(PerturbationAcceleration_,double);
 
-    /// \brief QP-sampling period
+    /// \brief Sampling period considered in the QP
     double QP_T_;
 
-    /// \brief Nb samlings inside preview window
+    /// \brief Nb. samlings inside preview window
     int QP_N_;
-
-
-    /*! \brief Fast formulations mode. */
-    unsigned m_FastFormulationMode;
 
     
   public:

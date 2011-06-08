@@ -53,9 +53,7 @@ GeneratorVelRef::GeneratorVelRef(SimplePluginManager *lSPM ) : MPCTrajectoryGene
 	
 		
 GeneratorVelRef::~GeneratorVelRef()
-{
-  //TODO:
-}
+{}
 
 	
 //void
@@ -66,13 +64,14 @@ GeneratorVelRef::~GeneratorVelRef()
 
 	
 void 
-GeneratorVelRef::Ponderation( double weight, int type)
+GeneratorVelRef::Ponderation( double Weight, int type)
 {
 
   IntermedQPMat::objective_variant_t & Objective = Matrices_.Objective( type );
-  Objective.weight = weight;
+  Objective.weight = Weight;
 
 }	
+
 
 void
 GeneratorVelRef::preview_support_states( const SupportFSM * FSM, std::deque<support_state_t> & SupportStates_deq )
@@ -182,7 +181,6 @@ GeneratorVelRef::initialize_matrices()
   initialize_matrices( COP );
   IntermedQPMat::dynamics_t & Jerk = Matrices_.Dynamics( IntermedQPMat::JERK );
   initialize_matrices( Jerk );
-
   linear_inequality_t & IneqCoP = Matrices_.Inequalities( IntermedQPMat::INEQ_COP );
   initialize_matrices( IneqCoP );
 
@@ -266,18 +264,18 @@ GeneratorVelRef::initialize_matrices( IntermedQPMat::dynamics_t & Dynamics)
 void 
 GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 				      RelativeFeetInequalities * RFI,
-				      const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-				      const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+				      const std::deque< FootAbsolutePosition> & LeftFootPositions_deq,
+				      const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
 				      const std::deque<support_state_t> & SupportStates_deq,
-				      const std::deque<double> & PreviewedSupportAngles) const
+				      const std::deque<double> & PreviewedSupportAngles_deq) const
 {
 
   const support_state_t & CurrentSupport = SupportStates_deq.front();
   double CurrentSupportAngle;
   if( CurrentSupport.Foot==1 )
-    CurrentSupportAngle = AbsoluteLeftFootPositions.back().theta*M_PI/180.0;
+    CurrentSupportAngle = LeftFootPositions_deq.back().theta*M_PI/180.0;
   else
-    CurrentSupportAngle = AbsoluteRightFootPositions.back().theta*M_PI/180.0;
+    CurrentSupportAngle = RightFootPositions_deq.back().theta*M_PI/180.0;
   convex_hull_t ZMPFeasibilityEdges;
   RFI->set_vertices( ZMPFeasibilityEdges,
 		      CurrentSupportAngle,
@@ -295,7 +293,7 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
       const support_state_t & PrwSupport = SupportStates_deq[i];
 
       if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 )
-        SupportAngle = PreviewedSupportAngles[PrwSupport.StepNumber-1];
+        SupportAngle = PreviewedSupportAngles_deq[PrwSupport.StepNumber-1];
 
       if( PrwSupport.StateChanged )
         RFI->set_vertices( ZMPFeasibilityEdges,
@@ -320,19 +318,19 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 void
 GeneratorVelRef::build_inequalities_feet(linear_inequality_t & Inequalities,
 				       RelativeFeetInequalities * RFI,
-				       const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-				       const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+				       const std::deque< FootAbsolutePosition> & LeftFootPositions_deq,
+				       const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
 				       const std::deque<support_state_t> & SupportStates_deq,
-				       const std::deque<double> & PreviewedSupportAngles) const
+				       const std::deque<double> & PreviewedSupportAngles_deq) const
 {
 
   // Initialize support angle
   const support_state_t & CurrentSupport = SupportStates_deq.front();
   double CurrentSupportAngle;
   if( CurrentSupport.Foot == 1 )
-    CurrentSupportAngle = AbsoluteLeftFootPositions.back().theta*M_PI/180.0;
+    CurrentSupportAngle = LeftFootPositions_deq.back().theta*M_PI/180.0;
   else
-    CurrentSupportAngle = AbsoluteRightFootPositions.back().theta*M_PI/180.0;
+    CurrentSupportAngle = RightFootPositions_deq.back().theta*M_PI/180.0;
   double SupportAngle = CurrentSupportAngle;
 
   // Arrays for the generated set of inequalities
@@ -355,12 +353,12 @@ GeneratorVelRef::build_inequalities_feet(linear_inequality_t & Inequalities,
       //foot positioning constraints
       if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 && PrwSupport.Phase != 0)
 	{
-	  SupportAngle = PreviewedSupportAngles[PrwSupport.StepNumber-1];
+	  SupportAngle = PreviewedSupportAngles_deq[PrwSupport.StepNumber-1];
 
 	  if( PrwSupport.StepNumber == 1 )
 	    SupportAngle = CurrentSupportAngle;
 	  else
-	    SupportAngle = PreviewedSupportAngles[PrwSupport.StepNumber-2];
+	    SupportAngle = PreviewedSupportAngles_deq[PrwSupport.StepNumber-2];
 
 	  RFI->set_vertices( FootFeasibilityEdges, SupportAngle, PrwSupport,
 			      RelativeFeetInequalities::FOOT_CONSTRAINTS );
@@ -459,17 +457,17 @@ GeneratorVelRef::build_constraints_feet(const linear_inequality_t & IneqFeet,
 void
 GeneratorVelRef::build_constraints( QPProblem & Pb,
 				  RelativeFeetInequalities * RFI,
-				  const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-				  const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
+				  const std::deque< FootAbsolutePosition> & LeftFootPositions_deq,
+				  const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
 				  const std::deque<support_state_t> & SupportStates_deq,
-				  const std::deque<double> & PreviewedSupportAngles )
+				  const std::deque<double> & PreviewedSupportAngles_deq )
 {
 
   //CoP constraints
   linear_inequality_t & IneqCoP = Matrices_.Inequalities(IntermedQPMat::INEQ_COP);
   build_inequalities_cop(IneqCoP, RFI,
-		       AbsoluteLeftFootPositions, AbsoluteRightFootPositions,
-		       SupportStates_deq, PreviewedSupportAngles);
+		       LeftFootPositions_deq, RightFootPositions_deq,
+		       SupportStates_deq, PreviewedSupportAngles_deq);
 
   const IntermedQPMat::dynamics_t & CoP = Matrices_.Dynamics(IntermedQPMat::COP);
   const IntermedQPMat::state_variant_t & State = Matrices_.State();
@@ -479,8 +477,8 @@ GeneratorVelRef::build_constraints( QPProblem & Pb,
   //Feet constraints
   linear_inequality_t & IneqFeet = Matrices_.Inequalities(IntermedQPMat::INEQ_FEET);
   build_inequalities_feet(IneqFeet, RFI,
-			AbsoluteLeftFootPositions, AbsoluteRightFootPositions,
-			SupportStates_deq, PreviewedSupportAngles);
+			LeftFootPositions_deq, RightFootPositions_deq,
+			SupportStates_deq, PreviewedSupportAngles_deq);
 
   build_constraints_feet(IneqFeet, State, NbStepsPreviewed, Pb);
 

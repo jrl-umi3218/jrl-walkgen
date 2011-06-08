@@ -493,7 +493,7 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::setVelReference(istringstream &strm)
   {
     // Read the data inside strm.
-    m_ZMPVRQP->setVelReference(strm);
+    m_ZMPVRQP->Reference(strm);
   }
  
   void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(istringstream &strm)
@@ -1754,7 +1754,7 @@ namespace PatternGeneratorJRL {
 							      double y,
 							      double yaw)
   {
-    m_ZMPVRQP->setVelReference(x,y,yaw);
+    m_ZMPVRQP->Reference(x,y,yaw);
   }
 
   void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(double x,

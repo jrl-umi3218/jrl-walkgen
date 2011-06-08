@@ -120,6 +120,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
 }
 
+
 ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 {
 
@@ -141,23 +142,8 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 }
 
 
-void ZMPVelocityReferencedQP::setVelReference(istringstream &strm)
-{
-  strm >> VelRef_.Local.x;
-  strm >> VelRef_.Local.y;
-  strm >> VelRef_.Local.yaw;
-}
-
-void ZMPVelocityReferencedQP::setVelReference(double dx,
-					      double dy,
-					      double dyaw)
-{
-  VelRef_.Local.x = dx;
-  VelRef_.Local.y = dy;
-  VelRef_.Local.yaw = dyaw;
-}
-
-void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
+void
+ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
 {
   MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
 
@@ -168,7 +154,9 @@ void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
   PerturbationOccured_ = true;
 }
 
-void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x,double y)
+
+void
+ZMPVelocityReferencedQP::setCoMPerturbationForce(double x,double y)
 {
   MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
 
@@ -199,7 +187,7 @@ ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &st
 
 int
 ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
-					deque<COMState> & FinalCoMPositions,
+					deque<COMState> & FinalCoMPositions_deq,
 					deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
 					deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
 					FootAbsolutePosition & InitLeftFootAbsolutePosition,
@@ -240,7 +228,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   }
 
   FinalZMPTraj_deq.resize(AddArraySize);
-  FinalCoMPositions.resize(AddArraySize);
+  FinalCoMPositions_deq.resize(AddArraySize);
   FinalLeftFootTraj_deq.resize(AddArraySize);
   FinalRightFootTraj_deq.resize(AddArraySize);
   int CurrentZMPindex=0;
@@ -256,7 +244,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
       FinalZMPTraj_deq[CurrentZMPindex].stepType = 0;
 
       // Set CoM positions.
-      FinalCoMPositions[CurrentZMPindex] = lStartingCOMState;
+      FinalCoMPositions_deq[CurrentZMPindex] = lStartingCOMState;
       // Set Left Foot positions.
       FinalLeftFootTraj_deq[CurrentZMPindex] = CurrentLeftFootAbsPos;
       FinalRightFootTraj_deq[CurrentZMPindex] = CurrentRightFootAbsPos;
@@ -304,7 +292,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
   if (!m_OnLineMode)
     { return; }
 
-  // Testing if we are reaching the end of the online mode.
+  // Test if the end of the online mode has been reached.
   if ((EndingPhase_) &&
       (Time>=TimeToStopOnLineMode_))
     { m_OnLineMode = false; }
