@@ -234,9 +234,9 @@ OnLineFootTrajectoryGeneration::check_solution(double & X, double & Y,
 {
    if(CurrentSupport.StepsLeft>0)
      {
-       if(fabs(X)-0.00001<0.0)
+       if(fabs(X)+fabs(Y)-0.00001<0.0)
          {
-           cout<<"Previewed foot x-position zero at time: "<<CurrentTime<<endl;
+           //cout<<"Previewed foot x-position zero at time: "<<CurrentTime<<endl;
          }
        else if (CurrentSupport.TimeLimit-CurrentTime-QP_T_/2.0>0)
          {//The landing position is yet determined by the solver because the robot finds himself still in the single support phase
