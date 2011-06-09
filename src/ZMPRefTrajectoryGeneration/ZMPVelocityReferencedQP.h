@@ -24,9 +24,8 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/*! This object provides the generation of ZMP and CoM trajectory
-  using a new formulation of the stability problem.
-*/
+/*! Generate ZMP and CoM trajectories using Herdt2010IROS
+ */
 
 #ifndef _ZMPVELOCITYREFERENCEDQP_WITH_CONSTRAINT_H_
 #define _ZMPVELOCITYREFERENCEDQP_WITH_CONSTRAINT_H_
@@ -62,7 +61,7 @@ namespace PatternGeneratorJRL
 
     /* Default constructor. */
     ZMPVelocityReferencedQP(SimplePluginManager *SPM, string DataFile,
-			    CjrlHumanoidDynamicRobot *aHS=0);
+        CjrlHumanoidDynamicRobot *aHS=0);
 
     /* Default destructor. */
     ~ZMPVelocityReferencedQP();
@@ -83,24 +82,24 @@ namespace PatternGeneratorJRL
       - The starting COM Position will NOT be taken into account.
       Returns the number of steps which has been completely put inside
       the queue of ZMP, and foot positions.
-    */
+     */
     int InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-		   deque<COMState> & CoMStates,
-		   deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-		   deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-		   FootAbsolutePosition & InitLeftFootAbsolutePosition,
-		   FootAbsolutePosition & InitRightFootAbsolutePosition,
-		   deque<RelativeFootPosition> &RelativeFootPositions,
-		   COMState & lStartingCOMState,
-		   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
+        deque<COMState> & CoMStates,
+        deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+        deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+        FootAbsolutePosition & InitLeftFootAbsolutePosition,
+        FootAbsolutePosition & InitRightFootAbsolutePosition,
+        deque<RelativeFootPosition> &RelativeFootPositions,
+        COMState & lStartingCOMState,
+        MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
 
 
     /// \brief Update the stacks on-line
     void OnLine(double time,
-		deque<ZMPPosition> & FinalZMPPositions,
-		deque<COMState> & CoMStates,
-		deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-		deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
+        deque<ZMPPosition> & FinalZMPPositions,
+        deque<COMState> & CoMStates,
+        deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+        deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
 
 
     /// \name Accessors
@@ -140,7 +139,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Perturbation trigger
     bool PerturbationOccured_;
-    
+
     /// \brief Final stage trigger
     bool EndingPhase_;
 
@@ -186,44 +185,39 @@ namespace PatternGeneratorJRL
     /// \brief Nb. samlings inside preview window
     int QP_N_;
 
-    
+
   public:
 
-    /*! Methods to comply with the initial interface of ZMPRefTrajectoryGeneration.
-      TODO: Change the internal structure to make those methods not mandatory
-      for compiling.
-    */
-
     void GetZMPDiscretization(std::deque<ZMPPosition> & ZMPPositions,
-			      std::deque<COMState> & COMStates,
-			      std::deque<RelativeFootPosition> &RelativeFootPositions,
-			      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-			      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-			      double Xmax,
-			      COMState & lStartingCOMState,
-			      MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
-			      FootAbsolutePosition & InitLeftFootAbsolutePosition,
-			      FootAbsolutePosition & InitRightFootAbsolutePosition);
+        std::deque<COMState> & COMStates,
+        std::deque<RelativeFootPosition> &RelativeFootPositions,
+        std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+        std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+        double Xmax,
+        COMState & lStartingCOMState,
+        MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+        FootAbsolutePosition & InitLeftFootAbsolutePosition,
+        FootAbsolutePosition & InitRightFootAbsolutePosition);
 
     void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-		       std::deque<ZMPPosition> & FinalZMPPositions,
-		       std::deque<COMState> & COMStates,
-		       std::deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-		       std::deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
-		       bool EndSequence);
+        std::deque<ZMPPosition> & FinalZMPPositions,
+        std::deque<COMState> & COMStates,
+        std::deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+        std::deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
+        bool EndSequence);
 
     int OnLineFootChange(double time,
-			 FootAbsolutePosition &aFootAbsolutePosition,
-			 deque<ZMPPosition> & FinalZMPPositions,
-			 deque<COMState> & CoMPositions,
-			 deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-			 deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
-			 StepStackHandler  *aStepStackHandler);
+        FootAbsolutePosition &aFootAbsolutePosition,
+        deque<ZMPPosition> & FinalZMPPositions,
+        deque<COMState> & CoMPositions,
+        deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+        deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
+        StepStackHandler  *aStepStackHandler);
 
     void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-			      deque<COMState> &FinalCOMTraj_deq,
-			      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-			      deque<FootAbsolutePosition> &RightFootAbsolutePositions);
+        deque<COMState> &FinalCOMTraj_deq,
+        deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+        deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
     int ReturnOptimalTimeToRegenerateAStep();
   };

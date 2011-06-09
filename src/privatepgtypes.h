@@ -62,8 +62,6 @@ namespace PatternGeneratorJRL
 
     /// \brief (true) -> New single support state
     bool StateChanged;
-    /// \brief StepsLeft
-    bool StepsLeftChanged;
 
 
     struct support_state_s & operator = (const support_state_s &aSS);
