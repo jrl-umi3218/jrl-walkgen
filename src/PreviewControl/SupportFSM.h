@@ -85,10 +85,13 @@ namespace PatternGeneratorJRL
 
     /// \brief Number of steps done before DS
     unsigned NbStepsSSDS_;
+
     /// \brief Length of a double support phase
     double DSPeriod_;
+
     /// \brief Length of a step
     double StepPeriod_;
+
     /// \brief Duration of the transition ds -> ss
     double DSSSPeriod_;
 

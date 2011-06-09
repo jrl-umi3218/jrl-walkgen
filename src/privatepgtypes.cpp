@@ -32,7 +32,7 @@ namespace PatternGeneratorJRL
 
     Phase  = aSS.Phase;
     Foot  = aSS.Foot;
-    StepsLeft  = aSS.StepsLeft;
+    NbStepsLeft  = aSS.NbStepsLeft;
     TimeLimit = aSS.TimeLimit;
     StepNumber  = aSS.StepNumber;
     StateChanged = aSS.StateChanged;
@@ -51,7 +51,7 @@ namespace PatternGeneratorJRL
 
     Phase  = 0;
     Foot  = 0;
-    StepsLeft  = 0;
+    NbStepsLeft  = 0;
     TimeLimit = 0.0;
     StepNumber  = 0;
     StateChanged = false;

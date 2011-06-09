@@ -61,7 +61,7 @@ namespace PatternGeneratorJRL
   public:
 
     /* Default constructor. */
-    ZMPVelocityReferencedQP(SimplePluginManager *lSPM, string DataFile,
+    ZMPVelocityReferencedQP(SimplePluginManager *SPM, string DataFile,
 			    CjrlHumanoidDynamicRobot *aHS=0);
 
     /* Default destructor. */
@@ -164,6 +164,9 @@ namespace PatternGeneratorJRL
 
     /// \brief Generator of QP problem
     GeneratorVelRef * VRQPGenerator_;
+
+    /// \brief Intermediate QP data
+    IntermedQPMat * IntermedData_;
 
     /// \brief Object creating linear inequalities relative to feet centers.
     RelativeFeetInequalities * RFC_;

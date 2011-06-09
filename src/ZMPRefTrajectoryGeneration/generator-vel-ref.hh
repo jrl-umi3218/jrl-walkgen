@@ -54,7 +54,7 @@ namespace PatternGeneratorJRL
   public:
     /// \name Constructors and destructors.
     /// \{
-    GeneratorVelRef( SimplePluginManager *lSPM );
+    GeneratorVelRef( SimplePluginManager *lSPM, IntermedQPMat * Data );
     ~GeneratorVelRef();
     /// \}
 
@@ -110,11 +110,11 @@ namespace PatternGeneratorJRL
     void Ponderation(double Weight, int Type );
 
     inline void Reference(const reference_t & Ref)
-    {  Matrices_.Reference(Ref); };
+    {  Matrices_->Reference(Ref); };
     inline void SupportState(const support_state_t & SupportState)
-    { Matrices_.SupportState(SupportState); };
+    { Matrices_->SupportState(SupportState); };
     inline void CoM(const com_t & CoM)
-    { Matrices_.CoM(CoM); };
+    { Matrices_->CoM(CoM); };
     /// \}
 
     //
@@ -218,7 +218,7 @@ namespace PatternGeneratorJRL
     //
   protected:
 
-    IntermedQPMat Matrices_;
+    IntermedQPMat * Matrices_;
 
 
   };

@@ -49,17 +49,22 @@ namespace PatternGeneratorJRL
     /// \brief Support foot
     int Foot;
     /// \brief Number steps left before double support
-    int StepsLeft;
+    unsigned int NbStepsLeft;
     /// \brief Number of step previewed
-    int StepNumber;
-    /// \brief (true) -> New single support state
-    bool StateChanged;
+    unsigned int StepNumber;
+
     /// \brief Time until StateChanged == true
     double TimeLimit;
     /// \brief start time
     double StartTime;
     /// \brief Position and orientation on a plane
     double x,y,yaw;
+
+    /// \brief (true) -> New single support state
+    bool StateChanged;
+    /// \brief StepsLeft
+    bool StepsLeftChanged;
+
 
     struct support_state_s & operator = (const support_state_s &aSS);
 
