@@ -187,10 +187,9 @@ ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &st
       strm >> NbStepsSSDS;
       SupportFSM_->NbStepsSSDS(NbStepsSSDS);
     }
-  if (Method==":stoppg")
+  if (Method==":stoppg" || ":finish")
     {
       EndingPhase_ = true;
-      cout<<"EndingPhase"<<EndingPhase_<<endl;
     }
 
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
@@ -217,22 +216,20 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   EndingPhase_ = false;
   TimeToStopOnLineMode_ = -1.0;
 
-  // Initialize position of the feet.
+  // INITIALIZE FEET POSITIONS:
+  // --------------------------
   CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
   CurrentLeftFootAbsPos.z = 0.0;//OFTG_->m_AnklePositionLeft[2];
   CurrentLeftFootAbsPos.time = 0.0;
   CurrentLeftFootAbsPos.theta = 0.0;
-
 
   CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
   CurrentRightFootAbsPos.z = 0.0;//OFTG_->m_AnklePositionRight[2];
   CurrentRightFootAbsPos.time = 0.0;
   CurrentRightFootAbsPos.theta = 0.0;
 
-  // V pre is the difference between
-  // the current SupportFSM_ position and the precedent.
-
-
+  // FILL THE QUEUES:
+  // ----------------
   int AddArraySize;
   {
     assert(m_SamplingPeriod > 0);
@@ -273,6 +270,20 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
     }
 
+  // INITIALIZE THE SUPPORT STATE:
+  // -----------------------------
+  support_state_t CurrentSupport;
+  CurrentSupport.Phase = 0;
+  CurrentSupport.Foot = 1;
+  CurrentSupport.TimeLimit = 1000000000;
+  CurrentSupport.NbStepsLeft = 1;
+  CurrentSupport.StateChanged = false;
+  CurrentSupport.x = 0.0;
+  CurrentSupport.y = 0.1;
+  CurrentSupport.yaw = 0.0;
+  CurrentSupport.StartTime = 0.0;
+  IntermedData_->SupportState(CurrentSupport);
+
   // INITIALIZE CENTER OF MASS:
   // --------------------------
   com_t CoM;
@@ -288,6 +299,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM_.SetComHeight(lStartingCOMState.z[0]);
   CoM_.InitializeSystem();
   CoM_(CoM);
+  IntermedData_->CoM(CoM_());
 
   return 0;
 }
@@ -332,8 +344,8 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // UPDATE INTERNAL DATA:
       // ---------------------
-      IntermedData_->Reference(VelRef_);
       VRQPGenerator_->CurrentTime(Time+TimeBuffer_);
+      IntermedData_->Reference(VelRef_);
       IntermedData_->CoM(CoM_());
 
 
@@ -429,8 +441,6 @@ ZMPVelocityReferencedQP::OnLine(double Time,
                                PreviewedSupportAngles_deq,
 			       FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
 
-      if (CurrentSupport.NbStepsLeft == 0)
-        EndingPhase_ = true;
 
       // Specify that we are in the ending phase.
       if (EndingPhase_ == false)

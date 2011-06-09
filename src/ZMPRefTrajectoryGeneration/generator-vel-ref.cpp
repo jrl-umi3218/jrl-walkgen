@@ -38,19 +38,6 @@ GeneratorVelRef::GeneratorVelRef(SimplePluginManager *lSPM , IntermedQPMat * Dat
 
   Matrices_ = Data;
 
-  //Initialize the support state
-  support_state_t CurrentSupport;
-  CurrentSupport.Phase = 0;
-  CurrentSupport.Foot = 1;
-  CurrentSupport.TimeLimit = 1000000000;
-  CurrentSupport.NbStepsLeft = 1;
-  CurrentSupport.StateChanged = false;
-  CurrentSupport.x = 0.0;
-  CurrentSupport.y = 0.1;
-  CurrentSupport.yaw = 0.0;
-  CurrentSupport.StartTime = 0.0;
-  Matrices_->SupportState(CurrentSupport);
-
 }
 	
 		
