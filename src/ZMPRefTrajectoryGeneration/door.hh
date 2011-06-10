@@ -32,7 +32,7 @@ public:
 	void initialize( double Orientation);
 
 	///
-	void build_door_matrix(double Time, double DesVelDoor, int N, boost_ublas::matrix<double> & R, int RelativAngle, double & Xdoortip, double & Ydoortip);
+	void build_door_matrix(double Time, double DesVelDoor, int N, boost_ublas::matrix<double> & R, double RelativAngle, double & Xdoortip, double & Ydoortip);
 	/// void doormatrices_construct();
 
 	struct frame_s

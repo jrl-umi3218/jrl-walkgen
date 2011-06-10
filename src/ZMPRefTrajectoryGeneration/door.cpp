@@ -37,7 +37,7 @@ Door::initialize( double Orientation)
 
 
 void
-Door::build_door_matrix(double Time, double DesVelDoor, int N, boost_ublas::matrix<double> & R, int RelativAngle, double & Xdoortip, double & Ydoortip )
+Door::build_door_matrix(double Time, double DesVelDoor, int N, boost_ublas::matrix<double> & R, double RelativAngle, double & Xdoortip, double & Ydoortip )
 {
 
 	double Theta;
@@ -56,7 +56,7 @@ Door::build_door_matrix(double Time, double DesVelDoor, int N, boost_ublas::matr
    // door tip position in global frame
 	Xdoortip = L*sin( DesVelDoor*(Time))*cos(FrameBase_.Orientation_)- L*cos( DesVelDoor*(Time))*sin(FrameBase_.Orientation_)+FrameBase_.Position(X);
 	Ydoortip = L*sin( DesVelDoor*(Time))*sin(FrameBase_.Orientation_)+ L*cos( DesVelDoor*(Time))*cos(FrameBase_.Orientation_)+FrameBase_.Position(Y);
-	cout<<"FrameBase_.Orientation_"<<FrameBase_.Orientation_<< endl;
+//	cout<<"FrameBase_.Orientation_"<<FrameBase_.Orientation_<< endl;
 }
 
 
@@ -65,7 +65,7 @@ Door::frame_s::frame_s()
 	Orientation_ = -M_PI/2.0;
 	dOrientation_ = 0.0;
 	ddOrientation_ = 0.0;
-	Position_[X] = 2;
+	Position_[X] = 0.6;
 	Position_[Y] = 0.5;
 	Position_[Z] = 0.0;
 }

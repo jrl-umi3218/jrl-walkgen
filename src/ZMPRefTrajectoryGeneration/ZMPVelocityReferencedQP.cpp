@@ -532,4 +532,3 @@ int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep()
   return 2*r;
 }
 
-
