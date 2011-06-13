@@ -773,6 +773,10 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX_TYPE(double) & Body_R,
   double FootPositionomega = aFoot(4);
   double c,s,co,so;
 
+  // This is just to make the flag WERROR happy.
+  c = aCoMPosition(2) + ToTheHip(2) + lDt(2);
+
+
   ODEBUG("FootPositiontheta: " << FootPositiontheta);
   c = cos(FootPositiontheta*M_PI/180.0);
   s = sin(FootPositiontheta*M_PI/180.0);
@@ -788,7 +792,6 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX_TYPE(double) & Body_R,
 
   // position
   Foot_P(0) = aFoot(0);Foot_P(1) = aFoot(1); Foot_P(2) = aFoot(2);
-
 
   MAL_S3_VECTOR(Foot_Shift,double);
 

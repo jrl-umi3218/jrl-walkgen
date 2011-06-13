@@ -66,14 +66,6 @@ namespace PatternGeneratorJRL
     
     void CommonInitialization(PatternGeneratorJRL::PatternGeneratorInterface &aPGI);
     
-    void CreateAndInitializeHumanoidRobot(std::string &RobotFileName,
-					  std::string &LinkJointRank,
-					  std::string &SpecificitiesFileName,
-					  std::string &InitConfig,
-					  CjrlHumanoidDynamicRobot *& aHDR,
-					  CjrlHumanoidDynamicRobot *& aDebugHDR,
-					  PatternGeneratorJRL::PatternGeneratorInterface *&aPGI);
-    
     /*! \brief Structure to handle information related to one step of each algorithm */
     struct OneStep
     {

@@ -232,7 +232,6 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
   return 0;
 }
 
-
 int LinearizedInvertedPendulum2D::OneIteration(double CX,double CY)
 {
   

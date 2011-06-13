@@ -47,8 +47,10 @@ ADD_REQUIRED_DEPENDENCY("abstract-robot-dynamics >= 1.15")
 ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
 
 # Optional ones.
-ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.1.0")
+ADD_OPTIONAL_DEPENDENCY("hrp2_14 >= 1.0.1")
+ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
 
+MESSAGE(STATUS "hrp2-dynamics: " ${HRP2_DYNAMICS_FOUND})
 # Add aggressive optimization flags in release mode.
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET (CMAKE_CXX_FLAGS_RELEASE

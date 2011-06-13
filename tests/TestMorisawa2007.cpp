@@ -228,9 +228,10 @@ int PerformTests(int argc, char *argv[])
 
   for (unsigned int i=0;i<2;i++)
     {
-        TestMorisawa2007 aTM2007(argc,argv,
-				 TestNames[i],
-				 TestProfiles[i]);
+      TestMorisawa2007 aTM2007(argc,argv,
+			       TestNames[i],
+			       TestProfiles[i]);
+      aTM2007.init();
 	try
 	  {
 	    if (!aTM2007.doTest(std::cout))

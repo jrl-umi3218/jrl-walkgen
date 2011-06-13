@@ -339,9 +339,8 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
 
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
     {
-      ODEBUG("ZMPPositions.size()<m_SizeOfPreviewWindow:" <<
-	      ZMPPositions.size()<< " " << m_SizeOfPreviewWindow);
-      exit(0);
+      ODEBUG3(ZMPPositions.size() << " < " << m_SizeOfPreviewWindow);
+      LTHROW("ZMPPositions.size()<m_SizeOfPreviewWindow:" );
     }
   
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)

@@ -735,7 +735,6 @@ int ZMPVelocityReferencedQP::dumpProblem(MAL_VECTOR(& xk,double),
 
 int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
 						     double * &DU,
-						     double T, 
 						     double StartingTime,
 						     deque<LinearConstraintInequalityFreeFeet_t> &
 						     QueueOfLConstraintInequalitiesFreeFeet,
@@ -1756,7 +1755,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
 
       buildConstraintMatrices(m_Pb.DS,m_Pb.DU,
-			      m_QP_T,
 			      time+m_TimeBuffer,
 			      QueueOfLConstraintInequalitiesFreeFeet,
 			      QueueOfFeetPosInequalities,

@@ -90,7 +90,6 @@ namespace PatternGeneratorJRL
 
 
     int buildConstraintMatrices(double * &DS, double * &DU,
-				double T,
 				double StartingTime,
 				deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfLConstraintInequalitiesFreeFeet,
 				deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfFeetPosInequalities,

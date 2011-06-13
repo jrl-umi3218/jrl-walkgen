@@ -396,8 +396,10 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   int CurrentZMPindex=0;
 
   // Also very important for the initialization: reshape the ZMP reference for a smooth starting.
-  //  double startingZMPREF[3] = { lStartingCOMState.x[0], lStartingCOMState.y[0],lStartingZMPPosition(2)};
-  double startingZMPREF[3] = { 0.0, 0.0,lStartingZMPPosition(2)};
+  double startingZMPREF[3] = { lStartingCOMState.x[0], lStartingCOMState.y[0],lStartingZMPPosition(2)};
+  startingZMPREF[0] = 0.0;
+  startingZMPREF[1] = 0.0;
+  startingZMPREF[2] = lStartingZMPPosition(2);
   
   // Make sure that the robot thinks it is at the position it thinks it is.
   //double startingZMPREF[3] =  { 0.00949035, 0.00142561, lStartingZMPPosition(2)};

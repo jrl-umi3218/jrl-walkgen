@@ -38,11 +38,11 @@
 #endif /*WIN32*/
 
 #include <ostream>
+#include <string>
+
 
 #include <jrl/mal/matrixabstractlayer.hh>
-
 #include <jrl/dynamics/dynamicsfactory.hh>
-
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 
 #include "CommonTools.h"
@@ -67,8 +67,15 @@ namespace PatternGeneratorJRL
       /*! \name Destructor */
       ~TestObject();
   
+      /*! \brief Initialize the test object. */
+      void init();
+
       /*! \brief Perform test. */
       bool doTest(std::ostream &os);
+
+      /*! \brief Decide from which object the robot is build from. */
+      virtual void SpecializedRobotConstructor(CjrlHumanoidDynamicRobot *& aHDR,
+					       CjrlHumanoidDynamicRobot *& aDebugHDR );
       
     protected:
 
@@ -80,7 +87,21 @@ namespace PatternGeneratorJRL
 
       /*! \brief Profile of the test to perform. */
       unsigned int m_TestProfile;
-  
+
+      /*! \brief Useful methods to create the robot model. 
+	@{
+       */
+      /*! */
+      void CreateAndInitializeHumanoidRobot(std::string &RobotFileName,
+					    std::string &LinkJointRank,
+					    std::string &SpecificitiesFileName,
+					    std::string &InitConfig,
+					    CjrlHumanoidDynamicRobot *& aHDR,
+					    CjrlHumanoidDynamicRobot *& aDebugHDR,
+					    PatternGeneratorJRL::PatternGeneratorInterface *&aPGI);
+      
+      /*! @} */
+      
       /*! \name Vectors storing the robot's state.
 	@{
       */
@@ -162,6 +183,22 @@ namespace PatternGeneratorJRL
 
       /*! \brief Patten Generator Interface. */
       int m_PGIInterface;
+
+      /*! \brief Store options 
+       @{*/
+      /*! \brief Path to the VRML. */
+      std::string m_VRMLPath;
+      /*! \brief Name of the VRML. */
+      std::string m_VRMLFileName;
+      /*! \brief File describing the specificities of the robot. */
+      std::string m_SpecificitiesFileName;
+      /*! \brief File describing the relationship between the Joints
+	and their rank in the robot's state vector */
+      std::string m_LinkJointRank;
+
+      std::string m_InitConfig;
+
+      /*! @} */
     };
 
     

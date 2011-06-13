@@ -26,7 +26,7 @@
  */
 
 #include <fstream>
-
+#include "Debug.h"
 #include "TestObject.h"
 
 using namespace std;
@@ -67,29 +67,22 @@ namespace PatternGeneratorJRL
       m_DebugFGPI = true;
       m_DebugZMP2 = false;
 
-      /*! \brief Path to the VRML. */
-      string VRMLPath;
-      /*! \brief Name of the VRML. */
-      string VRMLFileName;
-      /*! \brief File describing the specificities of the robot. */
-      string SpecificitiesFileName;
-      /*! \brief File describing the relationship between the Joints
-	and their rank in the robot's state vector */
-      string LinkJointRank;
-
-      string InitConfig;
-
       /*! Extract options and fill in members. */
       getOptions(argc,argv,
-		 VRMLPath,
-		 VRMLFileName,
-		 SpecificitiesFileName,
-		 LinkJointRank,
-		 InitConfig,
+		 m_VRMLPath,
+		 m_VRMLFileName,
+		 m_SpecificitiesFileName,
+		 m_LinkJointRank,
+		 m_InitConfig,
 		 m_TestProfile);
+    }
+
+    void TestObject::init()
+    {
+
 
       // Instanciate and initialize.
-      string RobotFileName = VRMLPath + VRMLFileName;
+      string RobotFileName = m_VRMLPath + m_VRMLFileName;
 
       bool fileExist = false;
       {
@@ -100,9 +93,9 @@ namespace PatternGeneratorJRL
 	throw std::string ("failed to open robot model");
 
       CreateAndInitializeHumanoidRobot(RobotFileName,
-				       SpecificitiesFileName,
-				       LinkJointRank,
-				       InitConfig,
+				       m_SpecificitiesFileName,
+				       m_LinkJointRank,
+				       m_InitConfig,
 				       m_HDR, m_DebugHDR, m_PGI);
 
       // Specify the walking mode: here the default one.
@@ -131,6 +124,140 @@ namespace PatternGeneratorJRL
       if (m_PGI!=0)
 	delete m_PGI;
 
+    }
+
+    void TestObject::SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR,
+					CjrlHumanoidDynamicRobot *& aDebugHDR)
+    {
+      aHDR = 0;
+      aDebugHDR = 0;
+    }
+
+    void TestObject::CreateAndInitializeHumanoidRobot(string &RobotFileName,
+						      string &SpecificitiesFileName,
+						      string &LinkJointRank,
+						      string &InitConfig,
+						      CjrlHumanoidDynamicRobot * & aHDR,
+						      CjrlHumanoidDynamicRobot * & aDebugHDR,
+						      PatternGeneratorInterface * & aPGI)
+    {
+      // Creating the humanoid robot.
+
+      ODEBUG3("Before calling the robot constructor.");
+      SpecializedRobotConstructor(aHDR,aDebugHDR);
+      ODEBUG3("After calling the robot constructor.");
+      
+      if ((aHDR==0) || (aDebugHDR==0))
+	{
+	  if (aHDR!=0) delete aHDR;
+	  if (aDebugHDR!=0) delete aDebugHDR;
+	  
+	  dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
+	  aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
+	  aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
+	}
+
+
+      // Parsing the file.
+      dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,
+					     LinkJointRank,
+					     SpecificitiesFileName);
+
+      dynamicsJRLJapan::parseOpenHRPVRMLFile(*aDebugHDR,RobotFileName,
+					     LinkJointRank,
+					     SpecificitiesFileName);
+
+  
+      // Create Pattern Generator Interface
+      aPGI = patternGeneratorInterfaceFactory(aHDR);
+
+      bool conversiontoradneeded=true;
+  
+      //  double * dInitPos = InitialPoses[INTERACTION_2008];
+      unsigned int lNbDofs = aHDR->numberDof() ;
+      cout << "Nb of DOFs: " <<  lNbDofs << endl;
+
+      vector<CjrlJoint *> actuatedJoints = aHDR->getActuatedJoints();
+      unsigned int lNbActuatedJoints = actuatedJoints.size();
+  
+      double * dInitPos = new double[lNbActuatedJoints];
+
+      ifstream aif;
+      aif.open(InitConfig.c_str(),ifstream::in);
+      if (aif.is_open())
+	{
+	  for(unsigned int i=0;i<lNbActuatedJoints;i++)
+	    aif >> dInitPos[i];
+	}
+      aif.close();
+  
+      bool DebugConfiguration = true;
+      ofstream aofq;
+      if (DebugConfiguration)
+	{
+	  aofq.open("TestConfiguration.dat",ofstream::out);
+	  if (aofq.is_open())
+	    {
+	      for(unsigned int k=0;k<30;k++)
+		{
+		  aofq << dInitPos[k] << " ";
+		}
+	      aofq << endl;
+	    }
+
+	}
+  
+
+      // This is a vector corresponding to the DOFs actuated of the robot.
+      MAL_VECTOR_DIM(InitialPosition,double,lNbActuatedJoints);
+      //MAL_VECTOR_DIM(CurrentPosition,double,40);
+      if (conversiontoradneeded)
+	for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
+	  InitialPosition(i) = dInitPos[i]*M_PI/180.0;
+      else
+	for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
+	  InitialPosition(i) = dInitPos[i];
+      aPGI->SetCurrentJointValues(InitialPosition);
+
+      // Specify the walking mode: here the default one.
+      istringstream strm2(":walkmode 0");
+      aPGI->ParseCmd(strm2);
+
+      // This is a vector corresponding to ALL the DOFS of the robot:
+      // free flyer + actuated DOFS.
+      MAL_VECTOR_DIM(CurrentConfiguration,double,lNbDofs);
+      MAL_VECTOR_DIM(CurrentVelocity,double,lNbDofs);
+      MAL_VECTOR_DIM(CurrentAcceleration,double,lNbDofs);
+      MAL_VECTOR_DIM(PreviousConfiguration,double,lNbDofs) ;
+      MAL_VECTOR_DIM(PreviousVelocity,double,lNbDofs);
+      MAL_VECTOR_DIM(PreviousAcceleration,double,lNbDofs);
+      for(int i=0;i<6;i++)
+	{
+	  PreviousConfiguration[i] = 
+	    PreviousVelocity[i] = 
+	    PreviousAcceleration[i] = 0.0;
+	}
+
+      for(unsigned int i=6;i<lNbDofs;i++)
+	{
+	  PreviousConfiguration[i] = InitialPosition[i-6];
+	  PreviousVelocity[i] = 
+	    PreviousAcceleration[i] = 0.0;
+	}
+
+      MAL_VECTOR_DIM(ZMPTarget,double,3);
+  
+  
+      string inProperty[5]={"TimeStep","ComputeAcceleration",
+			    "ComputeBackwardDynamics", "ComputeZMP",
+			    "ResetIteration"};
+      string inValue[5]={"0.005","false","false","true","true"};
+  
+      for(unsigned int i=0;i<5;i++)
+	aDebugHDR->setProperty(inProperty[i],
+			       inValue[i]);
+
+  
     }
 
     void TestObject::prepareDebugFiles()
@@ -352,6 +479,10 @@ namespace PatternGeneratorJRL
 
 		  /*! Fill the debug files with appropriate information. */
 		  fillInDebugFiles();
+		}
+	      else 
+		{
+		  cerr << "Nothing to dump after " << m_OneStep.NbOfIt << endl;
 		}
 
 	    }

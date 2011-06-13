@@ -47,6 +47,8 @@ public:
     m_TestProfile = TestProfile;
   };
   
+  
+  
 protected:
 
   
@@ -120,6 +122,7 @@ int PerformTests(int argc, char *argv[])
       TestHerdt2010 aTH2010(argc,argv,
 			    TestNames[i],
 			    TestProfiles[i]);
+      aTH2010.init();
       try
 	{
 	  if (!aTH2010.doTest(std::cout))

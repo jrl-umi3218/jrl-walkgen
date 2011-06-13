@@ -108,6 +108,42 @@ ADD_DEPENDENCIES(TestHerdt2010 ${PROJECT_NAME})
 ADD_TEST(TestHerdt2010 TestHerdt2010
   ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 
+####################
+# Test Kajita 2003 #
+####################
+IF(HRP2_DYNAMICS_FOUND)
+  MESSAGE(STATUS "hrp2-dynamics taken into account")
+  CONFIG_FILES_CMAKE(TestKajita2003FGPI.datref)
+
+  ADD_EXECUTABLE(TestKajita2003
+    ../src/portability/gettimeofday.cc
+    TestKajita2003.cpp
+    CommonTools.cpp
+    TestObject.cpp
+    ClockCPUTime.cpp
+  )
+
+  MESSAGE(STATUS "jrl data dir: " ${HRP2_14_PKGDATAROOTDIR})
+  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/)
+  SET(hrp2dynamicsspec
+    ${HRP2_14_PKGDATAROOTDIR}/HRP2SpecificitiesSmall.xml
+  )
+  SET(hrp2dynamicsljr
+    ${HRP2_14_PKGDATAROOTDIR}/HRP2LinkJointRankSmall.xml
+  )
+  SET(hrp2dynamicsinitconfig
+    ${HRP2_14_PKGDATAROOTDIR}/HRP2JRLInitConfig.dat)
+
+  TARGET_LINK_LIBRARIES(TestKajita2003 ${PROJECT_NAME})
+  PKG_CONFIG_USE_DEPENDENCY(TestKajita2003 hrp2-dynamics)
+  ADD_DEPENDENCIES(TestKajita2003 ${PROJECT_NAME})
+
+  ADD_TEST(TestKajita2003 TestKajita2003
+    ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec} ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
+
+ENDIF(HRP2_DYNAMICS_FOUND)
+
+
 #####################
 # Add user examples #
 #####################

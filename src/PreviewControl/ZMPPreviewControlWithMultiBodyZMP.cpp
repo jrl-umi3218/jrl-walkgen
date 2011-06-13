@@ -211,9 +211,9 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 
   //  m_FIFOZMPRefPositions.push_back(NewZMPRefPos);
 
-  ODEBUG("FirstStage " << CurrentConfiguration);
-  ODEBUG("LFP : " << LeftFootPosition.x<< " " << LeftFootPosition.y << " " << LeftFootPosition.z);
-  ODEBUG("RFP : " << RightFootPosition.x<< " " << RightFootPosition.y << " " << RightFootPosition.z);
+  ODEBUG3("FirstStage " << CurrentConfiguration);
+  ODEBUG3("LFP : " << LeftFootPosition.x<< " " << LeftFootPosition.y << " " << LeftFootPosition.z);
+  ODEBUG3("RFP : " << RightFootPosition.x<< " " << RightFootPosition.y << " " << RightFootPosition.z);
   FirstStageOfControl(LeftFootPosition,RightFootPosition,refandfinalCOMState);
   // This call is suppose to initialize
   // correctly the current configuration, speed and acceleration.
@@ -234,21 +234,22 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 		aRightFAP.y << " " <<
 		aRightFAP.z,
 		"ZMPPCWMZOGSOC.dat");
-  ODEBUG("Before First CallToComAndFootRealization: " << CurrentConfiguration);
+  ODEBUG3("Before First CallToComAndFootRealization: " << CurrentConfiguration);
   CallToComAndFootRealization(acompos,aLeftFAP,aRightFAP,
 			      CurrentConfiguration,
 			      CurrentVelocity,
 			      CurrentAcceleration,
 			      m_NumberOfIterations,
 			      0);
-  ODEBUG("After First CallToComAndFootRealization: " << CurrentConfiguration);
-  ODEBUG("1-refandfinalCOMState: x: " << refandfinalCOMState.x[0] << 
+  ODEBUG3("After First CallToComAndFootRealization: " << CurrentConfiguration);
+  ODEBUG3("1-refandfinalCOMState: x: " << refandfinalCOMState.x[0] << 
 	 " y: " << refandfinalCOMState.y[0] <<
 	 " z: " << refandfinalCOMState.z[0]);
 
   if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
     EvaluateMultiBodyZMP(-1);
   
+  ODEBUG3("After EvaluateMultiBodyZMP");
   aLeftFAP = m_FIFOLeftFootPosition[0];
   aRightFAP = m_FIFORightFootPosition[0];
   
@@ -265,6 +266,7 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
 		" " << aRightFAP.z << 
 		" " << aRightFAP.stepType
 		, "2ndStage.dat");
+  ODEBUG3("After Second Stage of control");
   if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
     {
       CallToComAndFootRealization(refandfinalCOMState,aLeftFAP,aRightFAP,
@@ -276,7 +278,7 @@ int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePositi
       ODEBUG("After Second CallToComAndFootRealization: " << CurrentConfiguration);
     }
 
-  ODEBUG("Current Configuration: "<< CurrentConfiguration);
+  ODEBUG3("Current Configuration: "<< CurrentConfiguration);
   // Here it is assumed that the 4x4 CoM matrix 
   // is the orientation of the free flyer and
   // its position.
@@ -337,7 +339,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMState &finalCOMSt
   // Inverse Kinematics variables.
 
   COMState aCOMState = m_FIFOCOMStates[0];
-  ODEBUG("aCOMState: x: " << aCOMState.x[0] <<
+  ODEBUG3("aCOMState: x: " << aCOMState.x[0] <<
 	  " y: " << aCOMState.y[0] <<
 	  " z: " << aCOMState.z[0]);
   FootAbsolutePosition LeftFootPosition, RightFootPosition;
@@ -349,10 +351,10 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMState &finalCOMSt
   if ((m_StageStrategy==ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY)||
       (m_StageStrategy==ZMPCOM_TRAJECTORY_FULL))
     {
-      ODEBUG(m_FIFODeltaZMPPositions[0].px << " " <<
+      ODEBUG3(m_FIFODeltaZMPPositions[0].px << " " <<
 	      m_FIFODeltaZMPPositions[0].py);
 
-      ODEBUG("Second Stage Size of FIFODeltaZMPPositions: "<< m_FIFODeltaZMPPositions.size()
+      ODEBUG3("Second Stage Size of FIFODeltaZMPPositions: "<< m_FIFODeltaZMPPositions.size()
 	      << " " << m_Deltax 
 	      << " " << m_Deltay
 	      << " " << m_sxDeltazmp
@@ -375,7 +377,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMState &finalCOMSt
 	}
     }
 
-  ODEBUG("Delta :" 
+  ODEBUG3("Delta :" 
 	  << m_Deltax(0,0) << " " << m_Deltay(0,0) << " "
 	  << aCOMState.x[0] << " " << aCOMState.y[0]);
   // Update finalCOMState
@@ -391,7 +393,7 @@ int ZMPPreviewControlWithMultiBodyZMP::SecondStageOfControl(COMState &finalCOMSt
   m_FIFOLeftFootPosition.pop_front();
   m_FIFORightFootPosition.pop_front();
   
-  ODEBUG("End");
+  ODEBUG3("End");
   return 1;
 }
 
