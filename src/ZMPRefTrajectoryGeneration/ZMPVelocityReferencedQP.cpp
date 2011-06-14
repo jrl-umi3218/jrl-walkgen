@@ -105,6 +105,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   VRQPGenerator_->Ponderation( 0.00001, IntermedQPMat::JERK_MIN );
 
   Door_.initialize(-M_PI/2.00);
+  Door_.SamplingTime(QP_T_);
 
   // Register method to handle
   string aMethodName[2] =
@@ -399,9 +400,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // BUILD DOOR CONSTRAINTS:
       // -----------------------
-      double DesVelDoor = 0.0;
-      VRQPGenerator_->build_constraints_door( Time, DesVelDoor,
-		      Door_, PrwSupportStates_deq, Problem_);
+      VRQPGenerator_->build_constraints_door( Time, Door_, PrwSupportStates_deq, Problem_);
 
 
       // SOLVE PROBLEM:

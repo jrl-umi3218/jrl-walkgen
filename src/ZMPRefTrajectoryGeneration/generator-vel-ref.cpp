@@ -397,19 +397,20 @@ GeneratorVelRef::build_inequalities_feet(linear_inequality_t & Inequalities,
 
 
 void
-GeneratorVelRef::build_constraints_door(double Time, double DesVelDoor,
+GeneratorVelRef::build_constraints_door(double Time,
 				      Door & Door, const std::deque<support_state_t> & SupportStates_deq, QPProblem & Pb)
 {
 //	// Build rotation matrix Rrot
 //	  boost_ublas::vector<double> Rrot(2,false);
 //	  Rrot.clear();
 
+
 	// Build rotation matrix R
 	 boost_ublas::matrix<double> R(2,N_,false);
 	 R.clear();
 	 double Xdoortip = 0;
 	 double Ydoortip = 0;
-	 Door.build_door_matrix(Time, DesVelDoor, N_, R, 0.0, Xdoortip, Ydoortip);
+	 Door.build_door_matrix(Time, N_, R, 0.0, Xdoortip, Ydoortip);
 //	 cout << "Xdoortip" << Xdoortip << endl;
 //	 cout << "Ydoortip" << Ydoortip << endl;
 //	 cout << " R" <<  R << endl;
@@ -503,7 +504,6 @@ GeneratorVelRef::build_constraints_door(double Time, double DesVelDoor,
      for(int i=0;i<N_;i++)
      {
     	 Diagx(i,i) = HXRT(i);
-
      }
 
 //     cout << " HXRT " <<  HXRT  << endl;
@@ -595,7 +595,7 @@ GeneratorVelRef::build_constraints_door(double Time, double DesVelDoor,
 
 	 // lateral constraints with D3 and D4
 	 // ............................
-	 Door.build_door_matrix(Time, DesVelDoor, N_, R, M_PI/2.00, Xdoortip, Ydoortip );
+	 Door.build_door_matrix(Time, N_, R, M_PI/2.00, Xdoortip, Ydoortip );
 	 // Compute term diag(RH)Sx
 		 // -----------------------
 		// boost_ublas::vector<double> HXRT2 = trans(prod(HXT,R));
@@ -721,27 +721,28 @@ GeneratorVelRef::build_constraints_door(double Time, double DesVelDoor,
 //
 //// in front of door2
 //
-			 NbConstraints = Pb.NbConstraints();
-			 Pb.add_term(-HXTRU,QPProblem::MATRIX_DU,NbConstraints,0);
-			 Pb.add_term(-HYTRU,QPProblem::MATRIX_DU,NbConstraints,N_);
-			 Pb.add_term(COM_CONSTR_R1,QPProblem::VECTOR_DS,NbConstraints);
+//			 NbConstraints = Pb.NbConstraints();
+//			 Pb.add_term(-HXTRU,QPProblem::MATRIX_DU,NbConstraints,0);
+//			 Pb.add_term(-HYTRU,QPProblem::MATRIX_DU,NbConstraints,N_);
+//			 Pb.add_term(COM_CONSTR_R1,QPProblem::VECTOR_DS,NbConstraints);
+
 //			 cout<<"-HXTRU"<<HXTRU<<endl;
 //			 cout<<"-HYTRU"<<HYTRU<<endl;
 //			 cout<<"COM_CONSTR_R1"<<-COM_CONSTR_R1<<endl;
 
 
     		 //int NbStepsPreviewed = SupportStates_deq.back().StepNumber;
+//
+//			 NbConstraints = Pb.NbConstraints();
+//			 Pb.add_term(HXTRU2,QPProblem::MATRIX_DU,NbConstraints,0);
+//			 Pb.add_term(HYTRU2,QPProblem::MATRIX_DU,NbConstraints,N_);
+//			 Pb.add_term(COM_CONSTR_R2_2,QPProblem::VECTOR_DS,NbConstraints);
 
-			 NbConstraints = Pb.NbConstraints();
-			 Pb.add_term(HXTRU2,QPProblem::MATRIX_DU,NbConstraints,0);
-			 Pb.add_term(HYTRU2,QPProblem::MATRIX_DU,NbConstraints,N_);
-			 Pb.add_term(COM_CONSTR_R2_2,QPProblem::VECTOR_DS,NbConstraints);
 
-
-			 NbConstraints = Pb.NbConstraints();
-			 Pb.add_term(-HXTRU2,QPProblem::MATRIX_DU,NbConstraints,0);
-			 Pb.add_term(-HYTRU2,QPProblem::MATRIX_DU,NbConstraints,N_);
-			 Pb.add_term(COM_CONSTR_R1_2,QPProblem::VECTOR_DS,NbConstraints);
+//			 NbConstraints = Pb.NbConstraints();
+//			 Pb.add_term(-HXTRU2,QPProblem::MATRIX_DU,NbConstraints,0);
+//			 Pb.add_term(-HYTRU2,QPProblem::MATRIX_DU,NbConstraints,N_);
+//			 Pb.add_term(COM_CONSTR_R1_2,QPProblem::VECTOR_DS,NbConstraints);
 
 
 		     NbConstraints = Pb.NbConstraints();
@@ -759,21 +760,23 @@ GeneratorVelRef::build_constraints_door(double Time, double DesVelDoor,
 			 Pb.add_term(WWy,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
 			 Pb.add_term(-D5,QPProblem::VECTOR_DS,NbConstraints);
 
-			 NbConstraints = Pb.NbConstraints();
-		     D6=D6-WWH2;
-			 Pb.add_term(WWx2,QPProblem::MATRIX_DU,NbConstraints,2*N_);
-			 Pb.add_term(WWy2,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
-			 Pb.add_term(-D6,QPProblem::VECTOR_DS,NbConstraints);
+//			 NbConstraints = Pb.NbConstraints();
+//		     D6=D6-WWH2;
+//			 Pb.add_term(WWx2,QPProblem::MATRIX_DU,NbConstraints,2*N_);
+//			 Pb.add_term(WWy2,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
+//			 Pb.add_term(-D6,QPProblem::VECTOR_DS,NbConstraints);
+
+
 //			 cout<<"-D6"<<-D6<<endl;
 //			 cout<<"WWy2"<<WWy2<<endl;
 //			 cout<<"WWx2"<<WWx2<<endl;
 //			 cout<<"WWH2"<<WWH2<<endl;
 
-			 NbConstraints = Pb.NbConstraints();
-			 D7=D7-WWH2;
-			 Pb.add_term(-WWx2,QPProblem::MATRIX_DU,NbConstraints,2*N_);
-			 Pb.add_term(-WWy2,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
-			 Pb.add_term(D7,QPProblem::VECTOR_DS,NbConstraints);
+//			 NbConstraints = Pb.NbConstraints();
+//			 D7=D7-WWH2;
+//			 Pb.add_term(-WWx2,QPProblem::MATRIX_DU,NbConstraints,2*N_);
+//			 Pb.add_term(-WWy2,QPProblem::MATRIX_DU,NbConstraints,2*N_+NbStepsPreviewed);
+//			 Pb.add_term(D7,QPProblem::VECTOR_DS,NbConstraints);
 //			 cout<<"D7"<<D7<<endl;
 
 }

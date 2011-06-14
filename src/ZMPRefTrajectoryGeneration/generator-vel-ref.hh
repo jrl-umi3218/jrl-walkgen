@@ -92,7 +92,7 @@ namespace PatternGeneratorJRL
 			  const std::deque<double> & PreviewedSupportAngles);
 
     /// \brief Generate door constraints
-    void build_constraints_door(double Time, double DesVelDoor,
+    void build_constraints_door(double Time,
 			      Door & Door, const std::deque<support_state_t> & SupportStates_deq, QPProblem & Pb);
 
     /// \brief Build the constant part of the objective

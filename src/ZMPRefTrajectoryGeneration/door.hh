@@ -31,8 +31,9 @@ public:
 
 	void initialize( double Orientation);
 
+
 	///
-	void build_door_matrix(double Time, double DesVelDoor, int N, boost_ublas::matrix<double> & R, double RelativAngle, double & Xdoortip, double & Ydoortip);
+	void build_door_matrix(double Time, int N, boost_ublas::matrix<double> & R, double RelativAngle, double & Xdoortip, double & Ydoortip);
 	/// void doormatrices_construct();
 
 	struct frame_s
@@ -116,6 +117,8 @@ public:
 				{ return FrameBase_.InvHp_; };
 
 
+	inline void SamplingTime( const double SamplingTime )
+		{ SamplingTime_ = SamplingTime; }
 
 	/// \name Matrices defining the evolution
 	/// \{
@@ -147,6 +150,8 @@ private:
 	/// Wrist
 	/// TODO: Wrist undefined
 	frame_t FrameWrist_;
+
+	double SamplingTime_;
 
 
 };
