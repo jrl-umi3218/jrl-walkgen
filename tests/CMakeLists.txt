@@ -113,7 +113,10 @@ ADD_TEST(TestHerdt2010 TestHerdt2010
 ####################
 IF(HRP2_DYNAMICS_FOUND)
   MESSAGE(STATUS "hrp2-dynamics taken into account")
-  CONFIG_FILES_CMAKE(TestKajita2003FGPI.datref)
+  CONFIG_FILES_CMAKE(TestKajita2003StraightWalkingTestFGPI.datref)
+  CONFIG_FILES_CMAKE(TestKajita2003CircleTestFGPI.datref)
+  CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq1TestFGPI.datref)
+  CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq2TestFGPI.datref)
 
   ADD_EXECUTABLE(TestKajita2003
     ../src/portability/gettimeofday.cc

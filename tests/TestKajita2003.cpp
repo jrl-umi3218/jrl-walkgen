@@ -58,13 +58,10 @@ protected:
   virtual void SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR,
 					      CjrlHumanoidDynamicRobot *& aDebugHDR)
   {
-    ODEBUG3("Going through TestKajita2003::SpecializedRobotConstructor.");
     dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
     Chrp2OptHumanoidDynamicRobot *aHRP2HDR= new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
     aHDR = aHRP2HDR;
     aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
-
-    ODEBUG3("End of TestKajita2003::SpecializedRobotConstructor.");
   }
 
 
@@ -258,12 +255,12 @@ protected:
 int PerformTests(int argc, char *argv[])
 {
 
-  std::string TestNames[4] = { "TestKajita2003Circle",
-                               "TestKajita2003StraightWalking",
+ std::string TestNames[4] = {  "TestKajita2003StraightWalking",
+			       "TestKajita2003Circle",
                                "TestKajita2003PbFlorentSeq1",
                                "TestKajita2003PbFlorentSeq2"};
-  int TestProfiles[4] = { PROFIL_CIRCLE,
-                          PROFIL_STRAIGHT_WALKING,
+  int TestProfiles[4] = { PROFIL_STRAIGHT_WALKING,
+			  PROFIL_CIRCLE,
                           PROFIL_PB_FLORENT_SEQ1,
                           PROFIL_PB_FLORENT_SEQ2};
 

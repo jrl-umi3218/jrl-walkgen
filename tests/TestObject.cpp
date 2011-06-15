@@ -142,10 +142,7 @@ namespace PatternGeneratorJRL
 						      PatternGeneratorInterface * & aPGI)
     {
       // Creating the humanoid robot.
-
-      ODEBUG3("Before calling the robot constructor.");
       SpecializedRobotConstructor(aHDR,aDebugHDR);
-      ODEBUG3("After calling the robot constructor.");
       
       if ((aHDR==0) || (aDebugHDR==0))
 	{
