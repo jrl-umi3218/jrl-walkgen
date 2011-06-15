@@ -187,7 +187,7 @@ ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &st
       strm >> CurrentSupport.NbStepsLeft;
       SupportFSM_->NbStepsSSDS(CurrentSupport.NbStepsLeft);
     }
-  if (Method==":stoppg" || ":finish")
+  if (Method==":stoppg" || Method == ":finish")
     {
       EndingPhase_ = true;
     }
