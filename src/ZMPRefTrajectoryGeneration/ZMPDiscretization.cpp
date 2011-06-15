@@ -356,12 +356,15 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
   // the current support position and the precedent.
   ODEBUG4("ZMP::InitOnLine - Step 2.5 ","ZMDInitOnLine.txt");
 
-    // Initialize who is support foot.
+  // The current heading direction is the center of mass
+  // between the direction of the left foot and the direction of the right foot.
   double CurrentAbsZMPTheta=0;
   CurrentAbsZMPTheta = (CurrentRightFootAbsPos.theta + CurrentLeftFootAbsPos.theta)/2.0;
   ODEBUG("CurrentZMPTheta at start: " << " " 
 	  << CurrentRightFootAbsPos.theta << " " 
 	  << CurrentLeftFootAbsPos.theta);
+
+  // Initialize who is support foot.
   if (RelativeFootPositions[0].sy < 0 )
     {
       m_vdiffsupppre(0,0) = CurrentRightFootAbsPos.x - CurrentLeftFootAbsPos.x;
@@ -397,14 +400,14 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 
   // Also very important for the initialization: reshape the ZMP reference for a smooth starting.
   double startingZMPREF[3] = { lStartingCOMState.x[0], lStartingCOMState.y[0],lStartingZMPPosition(2)};
+
+  // Reset the current ZMP because of the formulation of Kajita implying that the CoM starts at (0,0).
   startingZMPREF[0] = 0.0;
   startingZMPREF[1] = 0.0;
   startingZMPREF[2] = lStartingZMPPosition(2);
   
   // Make sure that the robot thinks it is at the position it thinks it is.
   //double startingZMPREF[3] =  { 0.00949035, 0.00142561, lStartingZMPPosition(2)};
-
-
   double finalZMPREF[2] = {m_ZMPNeutralPosition[0],m_ZMPNeutralPosition[1]};
   ODEBUG("ZMPNeutralPosition: " << m_ZMPNeutralPosition[0] << " " 
 	  << m_ZMPNeutralPosition[1] << endl <<
@@ -456,7 +459,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       FinalCoMStates[CurrentZMPindex].yaw[1] = 
 	FinalCoMStates[CurrentZMPindex].yaw[2] = 0.0;
       
-      // Set Left Foot positions.
+      // Set Left and Right Foot positions.
       LeftFootAbsolutePositions[CurrentZMPindex] = 
 	CurrentLeftFootAbsPos;
       RightFootAbsolutePositions[CurrentZMPindex] = 
@@ -473,7 +476,6 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       CurrentZMPindex++;
     }
 
-  ODEBUG("InitOnline: ZMPPositions.size(): " << ZMPPositions.size());
   
   // The first foot when walking dynamically 
   // does not leave the soil, but needs to be treated for the first phase.
