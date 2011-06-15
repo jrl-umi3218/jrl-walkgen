@@ -210,9 +210,6 @@ namespace PatternGeneratorJRL
 
     double m_TimeBuffer;
 
-    /*! Uses a ZMPDiscretization scheme to get the usual Kajita heuristic. */
-    ZMPDiscretization * m_ZMPD;
-
     /*! Uses a 2D LIPM to simulate the evolution of the robot. */
     LinearizedInvertedPendulum2D * m_2DLIPM;
 

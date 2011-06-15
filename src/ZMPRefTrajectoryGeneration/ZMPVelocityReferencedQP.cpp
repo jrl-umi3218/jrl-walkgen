@@ -74,8 +74,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   m_Beta = 1.0; //Velocity
   m_Gamma = 0.000001; //ZMP
 
-  /*! Getting the ZMP reference from Kajita's heuristic. */
-  m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
 
   /*! For simulating the linearized inverted pendulum in 2D. */
   m_2DLIPM = new LinearizedInvertedPendulum2D();
@@ -149,9 +147,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
 ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 {
-
-  if (m_ZMPD!=0)
-    delete m_ZMPD;
 
   if (m_2DLIPM!=0)
     delete m_2DLIPM;
