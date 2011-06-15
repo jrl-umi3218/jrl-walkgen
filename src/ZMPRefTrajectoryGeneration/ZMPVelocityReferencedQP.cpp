@@ -79,7 +79,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   SupportFSM_->StepPeriod(0.8);
   SupportFSM_->DSPeriod(1e9);
   SupportFSM_->DSSSPeriod(0.8);
-  SupportFSM_->NbStepsSSDS(200);
+  SupportFSM_->NbStepsSSDS(2);
   SupportFSM_->SamplingPeriod(QP_T_);
 
   /* Orientations preview algorithm*/
