@@ -313,6 +313,7 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
   ODEBUG("m_A" <<m_A);
   ODEBUG("m_B" <<m_B);
   ODEBUG("m_C" <<m_C);
+
   m_SizeOfPreviewWindow = (unsigned int)(m_PreviewControlTime/
 					 m_SamplingPeriod);
   MAL_MATRIX_RESIZE(m_F,m_SizeOfPreviewWindow,1);
@@ -339,22 +340,21 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
 
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
     {
-      ODEBUG3(ZMPPositions.size() << " < " << m_SizeOfPreviewWindow);
       LTHROW("ZMPPositions.size()<m_SizeOfPreviewWindow:" );
     }
-  
+
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
     ux += m_F(i,0)* ZMPPositions[lindex+i].px;
 
   r = MAL_RET_A_by_B(m_Kx, y);
-
   uy = - r(0,0) + m_Ks * syzmp;
+
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
     uy += m_F(i,0)* ZMPPositions[lindex+i].py;
   
   x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
   y = MAL_RET_A_by_B(m_A,y) + uy * m_B;
-   
+
   zmpx2 = (MAL_RET_A_by_B(m_C,x))(0,0);
   zmpy2 = (MAL_RET_A_by_B(m_C,y))(0,0);
   
