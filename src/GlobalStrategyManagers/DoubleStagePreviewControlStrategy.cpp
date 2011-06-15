@@ -110,7 +110,6 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 	   (*m_ZMPPositions)[0].pz,"ZMPRef.dat");
 
 
-  ODEBUG3("m_ZMPpcwmbz->OneGlobalStepOfControl before");  
   m_ZMPpcwmbz->OneGlobalStepOfControl((*m_LeftFootPositions)[2*m_NL],
 				      (*m_RightFootPositions)[2*m_NL],
 				      (*m_ZMPPositions)[2*m_NL],
@@ -118,7 +117,6 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 				      CurrentConfiguration,
 				      CurrentVelocity,
 				      CurrentAcceleration);
-  ODEBUG3("m_ZMPpcwmbz->OneGlobalStepOfControl after");  
   ODEBUG4("finalCOMState:" <<finalCOMState.x[0] << " " 
 	  << finalCOMState.y[0] ,"DebugData.txt");
   
