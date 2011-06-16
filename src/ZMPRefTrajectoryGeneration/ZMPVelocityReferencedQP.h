@@ -24,9 +24,8 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/*! This object provides the generation of ZMP and CoM trajectory
-  using a new formulation of the stability problem.
-*/
+/*! Generate ZMP and CoM trajectories using Herdt2010IROS
+ */
 
 #ifndef _ZMPVELOCITYREFERENCEDQP_WITH_CONSTRAINT_H_
 #define _ZMPVELOCITYREFERENCEDQP_WITH_CONSTRAINT_H_
@@ -62,8 +61,8 @@ namespace PatternGeneratorJRL
   public:
 
     /* Default constructor. */
-    ZMPVelocityReferencedQP(SimplePluginManager *lSPM, string DataFile,
-			    CjrlHumanoidDynamicRobot *aHS=0);
+    ZMPVelocityReferencedQP(SimplePluginManager *SPM, string DataFile,
+        CjrlHumanoidDynamicRobot *aHS=0);
 
     /* Default destructor. */
     ~ZMPVelocityReferencedQP();
@@ -84,57 +83,74 @@ namespace PatternGeneratorJRL
       - The starting COM Position will NOT be taken into account.
       Returns the number of steps which has been completely put inside
       the queue of ZMP, and foot positions.
-    */
+     */
     int InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-		   deque<COMState> & CoMStates,
-		   deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-		   deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-		   FootAbsolutePosition & InitLeftFootAbsolutePosition,
-		   FootAbsolutePosition & InitRightFootAbsolutePosition,
-		   deque<RelativeFootPosition> &RelativeFootPositions,
-		   COMState & lStartingCOMState,
-		   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
+        deque<COMState> & CoMStates,
+        deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+        deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+        FootAbsolutePosition & InitLeftFootAbsolutePosition,
+        FootAbsolutePosition & InitRightFootAbsolutePosition,
+        deque<RelativeFootPosition> &RelativeFootPositions,
+        COMState & lStartingCOMState,
+        MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
 
 
-    /* ! \brief Method to update the stacks on-line */
+    /// \brief Update the stacks on-line
     void OnLine(double time,
-		deque<ZMPPosition> & FinalZMPPositions,
-		deque<COMState> & CoMStates,
-		deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-		deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
-
-
-    int validateConstraints(double * & DS,double * &DU,
-			    int NbOfConstraints,  int li,
-			    double *X, double time);
+        deque<ZMPPosition> & FinalZMPPositions,
+        deque<COMState> & CoMStates,
+        deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+        deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
 
 
     /// \name Accessors
     /// \{
-    /*! Set the velocity reference */
-    void setVelReference(istringstream &strm);
+    /// \brief Set the reference (velocity only as for now) through the Interface (slow)
+    void Reference(istringstream &strm)
+    {
+      strm >> VelRef_.Local.x;
+      strm >> VelRef_.Local.y;
+      strm >> VelRef_.Local.yaw;
+    }
+    /// \brief Set the reference (Velocity only as for now)
+    inline void Reference(double dx, double dy, double dyaw)
+    {
+      VelRef_.Local.x = dx;
+      VelRef_.Local.y = dy;
+      VelRef_.Local.yaw = dyaw;
+    }
 
-    /*! Set the velocity reference from external reference */
-    void setVelReference(double dx,double dy, double dyaw);
+    /// \brief Set the final-stage trigger
+    inline void EndingPhase(bool EndingPhase)
+    { EndingPhase_ = EndingPhase;}
 
-    /*! Set the velocity reference from external reference */
+    /// \brief Set CoM perturbation force
     void setCoMPerturbationForce(double x,double y);
-
+    /// \brief Set CoM perturbation force
     void setCoMPerturbationForce(istringstream &strm);
     /// \}
 
+    /// \breif Reference
     reference_t VelRef_;
 
   private:
 
+    /// \brief Total mass of the robot
     double RobotMass_;
+
+    /// \brief Perturbation trigger
     bool PerturbationOccured_;
-    
+
+    /// \brief Final stage trigger
     bool EndingPhase_;
+
+    /// \brief Time at which the online mode will stop
     double TimeToStopOnLineMode_;
 
+    /// \brief Time at which the problem should be updated
     double UpperTimeLimitToUpdate_;
 
+    /// \brief Security margin for trajectory queues
     double TimeBuffer_;
 
     /// \brief 2D LIPM to simulate the evolution of the robot.
@@ -148,6 +164,9 @@ namespace PatternGeneratorJRL
 
     /// \brief Generator of QP problem
     GeneratorVelRef * VRQPGenerator_;
+
+    /// \brief Intermediate QP data
+    IntermedQPMat * IntermedData_;
 
     /// \brief Object creating linear inequalities relative to feet centers.
     RelativeFeetInequalities * RFC_;
@@ -164,54 +183,45 @@ namespace PatternGeneratorJRL
     /// \brief Additional term on the acceleration of the CoM
     MAL_VECTOR(PerturbationAcceleration_,double);
 
-    /// \brief QP-sampling period
+    /// \brief Sampling period considered in the QP
     double QP_T_;
 
-    /// \brief Nb samlings inside preview window
+    /// \brief Nb. samlings inside preview window
     int QP_N_;
 
 
-    /*! \brief Fast formulations mode. */
-    unsigned m_FastFormulationMode;
-
-    
   public:
 
-    /*! Methods to comply with the initial interface of ZMPRefTrajectoryGeneration.
-      TODO: Change the internal structure to make those methods not mandatory
-      for compiling.
-    */
-
     void GetZMPDiscretization(std::deque<ZMPPosition> & ZMPPositions,
-			      std::deque<COMState> & COMStates,
-			      std::deque<RelativeFootPosition> &RelativeFootPositions,
-			      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-			      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-			      double Xmax,
-			      COMState & lStartingCOMState,
-			      MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
-			      FootAbsolutePosition & InitLeftFootAbsolutePosition,
-			      FootAbsolutePosition & InitRightFootAbsolutePosition);
+        std::deque<COMState> & COMStates,
+        std::deque<RelativeFootPosition> &RelativeFootPositions,
+        std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+        std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+        double Xmax,
+        COMState & lStartingCOMState,
+        MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+        FootAbsolutePosition & InitLeftFootAbsolutePosition,
+        FootAbsolutePosition & InitRightFootAbsolutePosition);
 
     void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-		       std::deque<ZMPPosition> & FinalZMPPositions,
-		       std::deque<COMState> & COMStates,
-		       std::deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-		       std::deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
-		       bool EndSequence);
+        std::deque<ZMPPosition> & FinalZMPPositions,
+        std::deque<COMState> & COMStates,
+        std::deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+        std::deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
+        bool EndSequence);
 
     int OnLineFootChange(double time,
-			 FootAbsolutePosition &aFootAbsolutePosition,
-			 deque<ZMPPosition> & FinalZMPPositions,
-			 deque<COMState> & CoMPositions,
-			 deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-			 deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
-			 StepStackHandler  *aStepStackHandler);
+        FootAbsolutePosition &aFootAbsolutePosition,
+        deque<ZMPPosition> & FinalZMPPositions,
+        deque<COMState> & CoMPositions,
+        deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+        deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
+        StepStackHandler  *aStepStackHandler);
 
     void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-			      deque<COMState> &FinalCOMTraj_deq,
-			      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-			      deque<FootAbsolutePosition> &RightFootAbsolutePositions);
+        deque<COMState> &FinalCOMTraj_deq,
+        deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+        deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
     int ReturnOptimalTimeToRegenerateAStep();
   };

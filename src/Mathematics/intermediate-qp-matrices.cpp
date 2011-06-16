@@ -34,27 +34,27 @@ using namespace PatternGeneratorJRL;
 IntermedQPMat::IntermedQPMat()
 {
 
-  m_MeanVelocity.type = MEAN_VELOCITY;
-  m_Velocity.type = VELOCITY;
-  m_MeanVelocity.dyn = & m_Velocity;
+  MeanVelocity_.type = MEAN_VELOCITY;
+  Velocity_.type = VELOCITY;
+  MeanVelocity_.dyn = & Velocity_;
 
-  m_InstantVelocity.type = INSTANT_VELOCITY;
-  m_InstantVelocity.dyn = & m_Velocity;
+  InstantVelocity_.type = INSTANT_VELOCITY;
+  InstantVelocity_.dyn = & Velocity_;
 
-  m_COPCentering.type = COP_CENTERING;
-  m_CoP.type = COP;
-  m_COPCentering.dyn = & m_CoP;
+  COPCentering_.type = COP_CENTERING;
+  CoP_.type = COP;
+  COPCentering_.dyn = & CoP_;
 
-  m_JerkMin.type = JERK_MIN;
-  m_Jerk.type = JERK;
-  m_JerkMin.dyn = & m_Jerk;
+  JerkMin_.type = JERK_MIN;
+  Jerk_.type = JERK;
+  JerkMin_.dyn = & Jerk_;
 
-  m_Position.type = POSITION;
-  m_Acceleration.type = ACCELERATION;
+  Position_.type = POSITION;
+  Acceleration_.type = ACCELERATION;
 
-  m_IneqCoP.type = INEQ_COP;
-  m_IneqCoM.type = INEQ_COM;
-  m_IneqFeet.type = INEQ_FEET;
+  IneqCoP_.type = INEQ_COP;
+  IneqCoM_.type = INEQ_COM;
+  IneqFeet_.type = INEQ_FEET;
 
 }
 
@@ -68,35 +68,36 @@ IntermedQPMat::objective_variant_t const &
 IntermedQPMat::Objective( const int type ) const
 {
   switch(type)
-    {
-    case MEAN_VELOCITY:
-      return m_MeanVelocity;
-    case INSTANT_VELOCITY:
-      return m_InstantVelocity;
-    case COP_CENTERING:
-      return m_COPCentering;
-    case JERK_MIN:
-      return m_JerkMin;
-    }
+  {
+  case MEAN_VELOCITY:
+    return MeanVelocity_;
+  case INSTANT_VELOCITY:
+    return InstantVelocity_;
+  case COP_CENTERING:
+    return COPCentering_;
+  case JERK_MIN:
+    return JerkMin_;
+  }
   /* Default behavior return Mean velocity. */
-  return m_MeanVelocity;
+  return MeanVelocity_;
 }
+
 IntermedQPMat::objective_variant_t &
 IntermedQPMat::Objective( const int type )
 {
   switch(type)
-    {
-    case MEAN_VELOCITY:
-      return m_MeanVelocity;
-    case INSTANT_VELOCITY:
-      return m_InstantVelocity;
-    case COP_CENTERING:
-      return m_COPCentering;
-    case JERK_MIN:
-      return m_JerkMin;
-    }
+  {
+  case MEAN_VELOCITY:
+    return MeanVelocity_;
+  case INSTANT_VELOCITY:
+    return InstantVelocity_;
+  case COP_CENTERING:
+    return COPCentering_;
+  case JERK_MIN:
+    return JerkMin_;
+  }
   /* Default behavior return Mean velocity. */
-  return m_MeanVelocity;
+  return MeanVelocity_;
 }
 
 
@@ -106,33 +107,34 @@ IntermedQPMat::Dynamics( const int type ) const
   switch(type)
     {
    case POSITION:
-	  return m_Position;
+	  return Position_;
    case VELOCITY:
-      return m_Velocity;
+      return Velocity_;
     case COP:
-      return m_CoP;
+      return CoP_;
     case JERK:
-      return m_Jerk;
+      return Jerk_;
     }
   /* Default behavior return velocity. */
-  return m_Velocity;
+  return Velocity_;
 }
+
 IntermedQPMat::dynamics_t &
 IntermedQPMat::Dynamics( const int type )
 {
   switch(type)
-    {
-    case POSITION:
-	  return m_Position;
-    case VELOCITY:
-      return m_Velocity;
-    case COP:
-      return m_CoP;
-    case JERK:
-      return m_Jerk;
-    }
+  {
+  case POSITION:
+        return Position_;
+  case VELOCITY:
+    return Velocity_;
+  case COP:
+    return CoP_;
+  case JERK:
+    return Jerk_;
+  }
   /*! Default behavior return velocity. */
-  return m_Velocity;
+  return Velocity_;
 }
 
 
@@ -140,63 +142,63 @@ linear_inequality_t const &
 IntermedQPMat::Inequalities( const int type ) const
 {
   switch(type)
-    {
-    case INEQ_COP:
-      return m_IneqCoP;
-    case INEQ_COM:
-      return m_IneqCoM;
-    case INEQ_FEET:
-      return m_IneqFeet;
-    }
+  {
+  case INEQ_COP:
+    return IneqCoP_;
+  case INEQ_COM:
+    return IneqCoM_;
+  case INEQ_FEET:
+    return IneqFeet_;
+  }
   /* Default behavior return an inequality on CoP */
-  return m_IneqCoP;
+  return IneqCoP_;
 }
 
 linear_inequality_t &
 IntermedQPMat::Inequalities( const int type )
 {
   switch(type)
-    {
-    case INEQ_COP:
-      m_IneqCoP.clear();
-      return m_IneqCoP;
-    case INEQ_COM:
-      m_IneqCoM.clear();
-      return m_IneqCoM;
-    case INEQ_FEET:
-      m_IneqFeet.clear();
-      return m_IneqFeet;
-    }
+  {
+  case INEQ_COP:
+    IneqCoP_.clear();
+    return IneqCoP_;
+  case INEQ_COM:
+    IneqCoM_.clear();
+    return IneqCoM_;
+  case INEQ_FEET:
+    IneqFeet_.clear();
+    return IneqFeet_;
+  }
   /* Default behavior return an inequality on CoP */
-  m_IneqCoP.clear();
-  return m_IneqCoP;
+  IneqCoP_.clear();
+  return IneqCoP_;
 }
 
 
 void
-IntermedQPMat::dumpObjective( const int aObjectiveType, std::ostream &aos )
+IntermedQPMat::dump_objective( const int aObjectiveType, std::ostream &aos )
 {
 
   switch(aObjectiveType)
-    {
-    case INSTANT_VELOCITY:
-      m_InstantVelocity.print(aos);
-      break;
+  {
+  case INSTANT_VELOCITY:
+    InstantVelocity_.print(aos);
+    break;
 
-    case JERK_MIN:
-      m_JerkMin.print(aos);
-      break;
+  case JERK_MIN:
+    JerkMin_.print(aos);
+    break;
 
-    case COP_CENTERING:
-      m_COPCentering.print(aos);
-      break;
-    }
+  case COP_CENTERING:
+    COPCentering_.print(aos);
+    break;
+  }
 
 }
 
 
 void
-IntermedQPMat::dumpState( std::ostream &aos )
+IntermedQPMat::dump_state( std::ostream &aos )
 {
   aos << "dumpState" << std::endl;
   aos << "=========" << std::endl;
@@ -204,22 +206,22 @@ IntermedQPMat::dumpState( std::ostream &aos )
 
 
 void
-IntermedQPMat::dumpObjective(const char * filename,
-			     const int type)
+IntermedQPMat::dump_objective(const char * filename,
+    const int type)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
-  dumpObjective(type,aof);
+  dump_objective(type,aof);
   aof.close();
 }
 
 
 void
-IntermedQPMat::dumpState(const char * filename)
+IntermedQPMat::dump_state(const char * filename)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);
-  dumpState(aof);
+  dump_state(aof);
   aof.close();
 }
 

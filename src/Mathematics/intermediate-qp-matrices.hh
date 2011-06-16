@@ -142,9 +142,9 @@ namespace PatternGeneratorJRL
     /// \brief Getter and setter
 
     inline state_variant_t const & State() const
-    { return m_StateMatrices; };
+    { return StateMatrices_; };
     inline state_variant_t & State()
-    { return m_StateMatrices; };
+    { return StateMatrices_; };
 
     objective_variant_t const & Objective( int type ) const;
     objective_variant_t & Objective( int type );
@@ -156,32 +156,32 @@ namespace PatternGeneratorJRL
     linear_inequality_t & Inequalities( int type );
 
     inline com_t const & CoM() const
-    { return m_StateMatrices.CoM; };
+    { return StateMatrices_.CoM; };
     inline void CoM( const com_t & CoM )
-    { m_StateMatrices.CoM = CoM; };
+    { StateMatrices_.CoM = CoM; };
 
     inline reference_t const & Reference() const
-    { return m_StateMatrices.Ref; };
+    { return StateMatrices_.Ref; };
     inline reference_t & Reference()
-    { return m_StateMatrices.Ref; };
+    { return StateMatrices_.Ref; };
     inline void Reference( const reference_t & Ref )
-    { m_StateMatrices.Ref = Ref; };
+    { StateMatrices_.Ref = Ref; };
 
     inline support_state_t const & SupportState() const
-    { return m_StateMatrices.SupportState; };
+    { return StateMatrices_.SupportState; };
     inline support_state_t & SupportState()
-    { return m_StateMatrices.SupportState; };
+    { return StateMatrices_.SupportState; };
     inline void SupportState( const support_state_t & SupportState )
-    { m_StateMatrices.SupportState = SupportState; };
+    { StateMatrices_.SupportState = SupportState; };
     /// \}
 
     /// \name Displaying
     /// \{
-    /// \brief Dump objective matrices
-    void dumpObjective( const int ObjectiveType, std::ostream &aos );
-    void dumpState( std::ostream &aos );
-    void dumpObjective(const char * filename, const int Objectivetype);
-    void dumpState(const char * filename);
+    /// \brief Dump
+    void dump_objective( const int ObjectiveType, std::ostream &aos );
+    void dump_state( std::ostream &aos );
+    void dump_objective(const char * filename, const int Objectivetype);
+    void dump_state(const char * filename);
     /// \}
 
     //
@@ -190,39 +190,25 @@ namespace PatternGeneratorJRL
   private:
 
     objective_variant_t
-      m_MeanVelocity,
-      m_InstantVelocity,
-      m_COPCentering,
-      m_JerkMin;
+    MeanVelocity_,
+    InstantVelocity_,
+    COPCentering_,
+    JerkMin_;
 
     state_variant_t
-      m_StateMatrices;
+    StateMatrices_;
 
     dynamics_t
-      m_Position,
-      m_Velocity,
-      m_Acceleration,
-      m_Jerk,
-      m_CoP;
+    Position_,
+    Velocity_,
+    Acceleration_,
+    Jerk_,
+    CoP_;
 
     linear_inequality_t
-      m_IneqCoP,
-      m_IneqCoM,
-      m_IneqFeet;
-
-    /// \brief Cholesky decomposition of the initial objective function $Q$
-    MAL_MATRIX(m_LQ,double);
-    /// \brief Cholesky decomposition of the initial objective function $Q$
-    MAL_MATRIX(m_iLQ,double);
-    /// \brief Constant part of the constraint matrices.
-    MAL_MATRIX(m_iDu,double);
-    /// \brief Constant part of the constraint matrices.
-    MAL_MATRIX(m_Ds,double);
-    /// \brief Sub matrices to compute the linear part of the objective function $p^{\top}_k$.
-    MAL_MATRIX(m_OptA,double);
-    MAL_MATRIX(m_OptB,double);
-    MAL_MATRIX(m_OptC,double);
-    MAL_MATRIX(m_OptD,double);
+    IneqCoP_,
+    IneqCoM_,
+    IneqFeet_;
 
   };
 

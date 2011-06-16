@@ -55,7 +55,7 @@ namespace PatternGeneratorJRL
   public:
     /// \name Constructors and destructors.
     /// \{
-    GeneratorVelRef( SimplePluginManager *lSPM );
+    GeneratorVelRef( SimplePluginManager *lSPM, IntermedQPMat * Data );
     ~GeneratorVelRef();
     /// \}
 
@@ -64,7 +64,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] FSM
     /// \param[out] deqSupportStates
-    void preview_support_states( const SupportFSM * FSM, std::deque<support_state_t> & deqSupportStates );
+    void preview_support_states( const SupportFSM * FSM, std::deque<support_state_t> & SupportStates_deq );
 
     /// \brief Set the global reference from the local one and the orientation of the trunk frame
     /// for the whole preview window
@@ -85,11 +85,11 @@ namespace PatternGeneratorJRL
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
     void build_constraints( QPProblem & Pb,
-			  RelativeFeetInequalities * RFI,
-			  const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-			  const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
-			  const std::deque<support_state_t> & deqSupportStates,
-			  const std::deque<double> & PreviewedSupportAngles);
+        RelativeFeetInequalities * RFI,
+        const std::deque< FootAbsolutePosition> & LeftFootPositions_deq,
+        const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
+        const std::deque<support_state_t> & SupportStates_deq,
+        const std::deque<double> & PreviewedSupportAngles_deq);
 
     /// \brief Generate door constraints
     void build_constraints_door(double Time,
@@ -105,21 +105,21 @@ namespace PatternGeneratorJRL
     /// \param[in] Pb
     /// \param[in] deqSupportStates
     void update_problem(QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq);
-	  
+
+    /// \name Accessors
+    /// \{
     /// \brief Set the weights on an objective term
     ///
-    /// \param[in] weight
-    /// \param[in] objective
-    void Ponderation(double weight, int objective );
+    /// \param[in] Weight
+    /// \param[in] Type Objective type
+    void Ponderation(double Weight, int Type );
 
-    /// \nam Inline accessors
-    /// \{
     inline void Reference(const reference_t & Ref)
-    {  Matrices_.Reference(Ref); };
+    {  Matrices_->Reference(Ref); };
     inline void SupportState(const support_state_t & SupportState)
-    { Matrices_.SupportState(SupportState); };
+    { Matrices_->SupportState(SupportState); };
     inline void CoM(const com_t & CoM)
-    { Matrices_.CoM(CoM); };
+    { Matrices_->CoM(CoM); };
     /// \}
 
     //
@@ -141,11 +141,11 @@ namespace PatternGeneratorJRL
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
     void build_inequalities_cop(linear_inequality_t & Inequalities,
-                              RelativeFeetInequalities * FCALS,
-                              const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-                              const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
-                              const std::deque<support_state_t> & deqSupportStates,
-                              const std::deque<double> & PreviewedSupportAngles) const;
+        RelativeFeetInequalities * FCALS,
+        const std::deque< FootAbsolutePosition> & LeftFootPositions_deq,
+        const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
+        const std::deque<support_state_t> & SupportStates_deq,
+        const std::deque<double> & PreviewedSupportAngles_deq) const;
 
     /// \brief Generate a queue of inequality constraints on
     /// the feet positions with respect to previous foot positions
@@ -156,24 +156,24 @@ namespace PatternGeneratorJRL
     /// \param[in] AbsoluteRightFootPositions
     /// \param[in] deqSupportStates
     /// \param[in] PreviewedSupportAngles
-      void build_inequalities_feet(linear_inequality_t & Inequalities,
-                               RelativeFeetInequalities * FCALS,
-                               const std::deque< FootAbsolutePosition> & AbsoluteLeftFootPositions,
-                               const std::deque<FootAbsolutePosition> & AbsoluteRightFootPositions,
-                               const std::deque<support_state_t> & deqSupportStates,
-                               const std::deque<double> & PreviewedSupportAngles) const;
+    void build_inequalities_feet(linear_inequality_t & Inequalities,
+        RelativeFeetInequalities * FCALS,
+        const std::deque< FootAbsolutePosition> & LeftFootPositions_deq,
+        const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
+        const std::deque<support_state_t> & SupportStates_deq,
+        const std::deque<double> & PreviewedSupportAngles_deq) const;
 
-      /// \brief Compute CoP constraints corresponding to the set of inequalities
-      ///
-      /// \param[in] IneqCop
-      /// \param[in] CoP
-      /// \param[in] State
-      /// \param[in] NbStepsPreviewed
-      /// \param[in] Pb
+    /// \brief Compute CoP constraints corresponding to the set of inequalities
+    ///
+    /// \param[in] IneqCop
+    /// \param[in] CoP
+    /// \param[in] State
+    /// \param[in] NbStepsPreviewed
+    /// \param[in] Pb
     void build_constraints_cop(const linear_inequality_t & IneqCoP,
-                             const IntermedQPMat::dynamics_t & CoP,
-                             const IntermedQPMat::state_variant_t & State,
-                             int NbStepsPreviewed, QPProblem & Pb);
+        const IntermedQPMat::dynamics_t & CoP,
+        const IntermedQPMat::state_variant_t & State,
+        int NbStepsPreviewed, QPProblem & Pb);
 
     /// \brief Compute feet constraints corresponding to the set of inequalities
     ///
@@ -182,8 +182,8 @@ namespace PatternGeneratorJRL
     /// \param[in] NbStepsPreviewed
     /// \param[in] Pb
     void build_constraints_feet(const linear_inequality_t & IneqFeet,
-                              const IntermedQPMat::state_variant_t & State,
-                              int NbStepsPreviewed, QPProblem & Pb);
+        const IntermedQPMat::state_variant_t & State,
+        int NbStepsPreviewed, QPProblem & Pb);
 
     /// \brief Initialize intermediate matrices
     ///
@@ -197,33 +197,33 @@ namespace PatternGeneratorJRL
 
     /// \brief Scaled product\f$ weight*M*M \f$
     void compute_term(MAL_MATRIX (&weightMM, double),
-		     double weight, const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
+        double weight, const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
 
     /// \brief Scaled product\f$ M*M \f$
     void compute_term(MAL_MATRIX (&MM, double),
-		     const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
+        const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
 
     /// \brief Scaled product \f$ weight*M*V \f$
     void compute_term(MAL_VECTOR (&weightMV, double),
-		     double weight, const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double));
+        double weight, const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double));
 
     /// \brief Scaled product \f$ weight*M*V*scalar \f$
     void compute_term(MAL_VECTOR (&weightMV, double),
-		     double weight, const MAL_MATRIX (&M, double),
-		     const MAL_VECTOR (&V, double), const double scalar);
+        double weight, const MAL_MATRIX (&M, double),
+        const MAL_VECTOR (&V, double), const double scalar);
 
     /// \brief Scaled product \f$ weight*M*M*V \f$
     void compute_term(MAL_VECTOR (&weightMV, double),
-		     double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
-		     const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
+        double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
+        const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
 
-	  
+
     //
     //Protected members
     //
   protected:
 
-    IntermedQPMat Matrices_;
+    IntermedQPMat * Matrices_;
 
 
   };

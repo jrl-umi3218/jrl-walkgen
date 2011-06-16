@@ -29,7 +29,7 @@
 
   Andrei Herdt,
   Olivier Stasse,
-*/
+ */
 
 #include "portability/gettimeofday.hh"
 
@@ -49,10 +49,10 @@ using namespace PatternGeneratorJRL;
 
 
 
-ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
-						 string DataFile,
-						 CjrlHumanoidDynamicRobot *aHS) :
-  ZMPRefTrajectoryGeneration(lSPM)
+ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
+    string DataFile,
+    CjrlHumanoidDynamicRobot *aHS) :
+    ZMPRefTrajectoryGeneration(SPM)
 {
 
   TimeBuffer_ = 0.040;
@@ -66,9 +66,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
 
 
   // For computing the equilibrium constraints from the feet positions.
-  RFC_ = new RelativeFeetInequalities(lSPM,aHS);
+  RFC_ = new RelativeFeetInequalities(SPM,aHS);
 
-  OFTG_ = new OnLineFootTrajectoryGeneration(lSPM,aHS->leftFoot());
+  OFTG_ = new OnLineFootTrajectoryGeneration(SPM,aHS->leftFoot());
   OFTG_->InitializeInternalDataStructures();
   OFTG_->SetSingleSupportTime(0.7);
   OFTG_->SetDoubleSupportTime(QP_T_);
@@ -79,7 +79,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   SupportFSM_->StepPeriod(0.8);
   SupportFSM_->DSPeriod(1e9);
   SupportFSM_->DSSSPeriod(0.8);
-  SupportFSM_->NbStepsSSDS(200);
+  SupportFSM_->NbStepsSSDS(2);
   SupportFSM_->SamplingPeriod(QP_T_);
 
   /* Orientations preview algorithm*/
@@ -95,7 +95,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   CoM_.SetRobotControlPeriod(0.005);
   CoM_.InitializeSystem();
 
-  VRQPGenerator_ = new GeneratorVelRef(lSPM );
+  IntermedData_ = new IntermedQPMat();
+
+  VRQPGenerator_ = new GeneratorVelRef(SPM, IntermedData_);
   VRQPGenerator_->NbPrwSamplings(QP_N_);
   VRQPGenerator_->SamplingPeriodPreview(QP_T_);
   VRQPGenerator_->ComHeight(0.814);
@@ -108,9 +110,10 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
   Door_.SamplingTime(QP_T_);
 
   // Register method to handle
-  string aMethodName[2] =
-    {":previewcontroltime",
-     ":numberstepsbeforestop"};
+  string aMethodName[3] =
+      {":previewcontroltime",
+          ":numberstepsbeforestop",
+          ":stoppg"};
 
   for(int i=0;i<2;i++)
     {
@@ -121,6 +124,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
     }
 
 }
+
 
 ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 {
@@ -143,24 +147,10 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 }
 
 
-void ZMPVelocityReferencedQP::setVelReference(istringstream &strm)
+void
+ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
 {
-  strm >> VelRef_.Local.x;
-  strm >> VelRef_.Local.y;
-  strm >> VelRef_.Local.yaw;
-}
 
-void ZMPVelocityReferencedQP::setVelReference(double dx,
-					      double dy,
-					      double dyaw)
-{
-  VelRef_.Local.x = dx;
-  VelRef_.Local.y = dy;
-  VelRef_.Local.yaw = dyaw;
-}
-
-void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
-{
   MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
 
   strm >> PerturbationAcceleration_(2);
@@ -168,10 +158,14 @@ void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
   PerturbationAcceleration_(2) = PerturbationAcceleration_(2)/RobotMass_;
   PerturbationAcceleration_(5) = PerturbationAcceleration_(5)/RobotMass_;
   PerturbationOccured_ = true;
+
 }
 
-void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x,double y)
+
+void
+ZMPVelocityReferencedQP::setCoMPerturbationForce(double x,double y)
 {
+
   MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
 
   PerturbationAcceleration_(2) = x/RobotMass_;
@@ -184,31 +178,37 @@ void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x,double y)
 void
 ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &strm)
 {
+
   if (Method==":previewcontroltime")
     {
       strm >> m_PreviewControlTime;
     }
   if (Method==":numberstepsbeforestop")
     {
-      unsigned NbStepsSSDS;
-      strm >> NbStepsSSDS;
-      SupportFSM_->NbStepsSSDS(NbStepsSSDS);
+      support_state_t & CurrentSupport = IntermedData_->SupportState();
+      strm >> CurrentSupport.NbStepsLeft;
+      SupportFSM_->NbStepsSSDS(CurrentSupport.NbStepsLeft);
+    }
+  if (Method==":stoppg" || Method == ":finish")
+    {
+      EndingPhase_ = true;
     }
 
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
+
 }
 
 
 int
 ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
-					deque<COMState> & FinalCoMPositions,
-					deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-					deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-					FootAbsolutePosition & InitLeftFootAbsolutePosition,
-					FootAbsolutePosition & InitRightFootAbsolutePosition,
-					deque<RelativeFootPosition> &, // RelativeFootPositions,
-					COMState & lStartingCOMState,
-					MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
+    deque<COMState> & FinalCoMPositions_deq,
+    deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+    deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+    FootAbsolutePosition & InitLeftFootAbsolutePosition,
+    FootAbsolutePosition & InitRightFootAbsolutePosition,
+    deque<RelativeFootPosition> &, // RelativeFootPositions,
+    COMState & lStartingCOMState,
+    MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
 {
 
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
@@ -218,22 +218,20 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   EndingPhase_ = false;
   TimeToStopOnLineMode_ = -1.0;
 
-  // Initialize position of the feet.
+  // INITIALIZE FEET POSITIONS:
+  // --------------------------
   CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
   CurrentLeftFootAbsPos.z = 0.0;//OFTG_->m_AnklePositionLeft[2];
   CurrentLeftFootAbsPos.time = 0.0;
   CurrentLeftFootAbsPos.theta = 0.0;
-
 
   CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
   CurrentRightFootAbsPos.z = 0.0;//OFTG_->m_AnklePositionRight[2];
   CurrentRightFootAbsPos.time = 0.0;
   CurrentRightFootAbsPos.theta = 0.0;
 
-  // V pre is the difference between
-  // the current SupportFSM_ position and the precedent.
-
-
+  // FILL THE QUEUES:
+  // ----------------
   int AddArraySize;
   {
     assert(m_SamplingPeriod > 0);
@@ -242,7 +240,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   }
 
   FinalZMPTraj_deq.resize(AddArraySize);
-  FinalCoMPositions.resize(AddArraySize);
+  FinalCoMPositions_deq.resize(AddArraySize);
   FinalLeftFootTraj_deq.resize(AddArraySize);
   FinalRightFootTraj_deq.resize(AddArraySize);
   int CurrentZMPindex=0;
@@ -258,21 +256,35 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
       FinalZMPTraj_deq[CurrentZMPindex].stepType = 0;
 
       // Set CoM positions.
-      FinalCoMPositions[CurrentZMPindex] = lStartingCOMState;
+      FinalCoMPositions_deq[CurrentZMPindex] = lStartingCOMState;
       // Set Left Foot positions.
       FinalLeftFootTraj_deq[CurrentZMPindex] = CurrentLeftFootAbsPos;
       FinalRightFootTraj_deq[CurrentZMPindex] = CurrentRightFootAbsPos;
 
       FinalLeftFootTraj_deq[CurrentZMPindex].time =
-        FinalRightFootTraj_deq[CurrentZMPindex].time = m_CurrentTime;
+          FinalRightFootTraj_deq[CurrentZMPindex].time = m_CurrentTime;
 
       FinalLeftFootTraj_deq[CurrentZMPindex].stepType =
-        FinalRightFootTraj_deq[CurrentZMPindex].stepType = 10;
+          FinalRightFootTraj_deq[CurrentZMPindex].stepType = 10;
 
       m_CurrentTime += m_SamplingPeriod;
       CurrentZMPindex++;
 
     }
+
+  // INITIALIZE THE SUPPORT STATE:
+  // -----------------------------
+  support_state_t CurrentSupport;
+  CurrentSupport.Phase = 0;
+  CurrentSupport.Foot = 1;
+  CurrentSupport.TimeLimit = 1000000000;
+  CurrentSupport.NbStepsLeft = 1;
+  CurrentSupport.StateChanged = false;
+  CurrentSupport.x = 0.0;
+  CurrentSupport.y = 0.1;
+  CurrentSupport.yaw = 0.0;
+  CurrentSupport.StartTime = 0.0;
+  IntermedData_->SupportState(CurrentSupport);
 
   // INITIALIZE CENTER OF MASS:
   // --------------------------
@@ -289,6 +301,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM_.SetComHeight(lStartingCOMState.z[0]);
   CoM_.InitializeSystem();
   CoM_(CoM);
+  IntermedData_->CoM(CoM_());
 
   return 0;
 }
@@ -296,17 +309,17 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
 void
 ZMPVelocityReferencedQP::OnLine(double Time,
-				     deque<ZMPPosition> & FinalZMPTraj_deq,
-				     deque<COMState> & FinalCOMTraj_deq,
-				     deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-				     deque<FootAbsolutePosition> &FinalRightFootTraj_deq)
+    deque<ZMPPosition> & FinalZMPTraj_deq,
+    deque<COMState> & FinalCOMTraj_deq,
+    deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+    deque<FootAbsolutePosition> &FinalRightFootTraj_deq)
 {
 
   // If on-line mode not activated we go out.
   if (!m_OnLineMode)
     { return; }
 
-  // Testing if we are reaching the end of the online mode.
+  // Test if the end of the online mode has been reached.
   if ((EndingPhase_) &&
       (Time>=TimeToStopOnLineMode_))
     { m_OnLineMode = false; }
@@ -333,9 +346,9 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // UPDATE INTERNAL DATA:
       // ---------------------
-      VRQPGenerator_->Reference(VelRef_);
       VRQPGenerator_->CurrentTime(Time+TimeBuffer_);
-      VRQPGenerator_->CoM(CoM_());
+      IntermedData_->Reference(VelRef_);
+      IntermedData_->CoM(CoM_());
 
 
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
@@ -359,18 +372,17 @@ ZMPVelocityReferencedQP::OnLine(double Time,
           CurrentSupport.y = FAP.y;
           CurrentSupport.yaw = FAP.theta*M_PI/180.0;
           CurrentSupport.StartTime = m_CurrentTime;
-          VRQPGenerator_->SupportState( CurrentSupport );
+          IntermedData_->SupportState( CurrentSupport );
         }
 
 
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // ------------------------------------------------------
       deque<double> PreviewedSupportAngles_deq;
-      OrientPrw_->preview_orientations(Time+TimeBuffer_,
-                                VelRef_,
-				SupportFSM_->StepPeriod(), CurrentSupport,
-				FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
-	                        PreviewedSupportAngles_deq);
+      OrientPrw_->preview_orientations(Time+TimeBuffer_, VelRef_,
+          SupportFSM_->StepPeriod(), CurrentSupport,
+          FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
+          PreviewedSupportAngles_deq);
 
 
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:
@@ -390,12 +402,9 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // BUILD CONSTRAINTS:
       // ------------------
-      VRQPGenerator_->build_constraints( Problem_,
-          RFC_,
-          FinalLeftFootTraj_deq,
-          FinalRightFootTraj_deq,
-          PrwSupportStates_deq,
-          PreviewedSupportAngles_deq );
+      VRQPGenerator_->build_constraints( Problem_, RFC_,
+          FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
+          PrwSupportStates_deq, PreviewedSupportAngles_deq );
 
 
       // BUILD DOOR CONSTRAINTS:
@@ -418,33 +427,31 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       FinalRightFootTraj_deq.resize((int)((QP_T_+TimeBuffer_)/m_SamplingPeriod));
       int CurrentIndex = (int)(TimeBuffer_/m_SamplingPeriod)-1;
       CoM_.Interpolation(FinalCOMTraj_deq,
-			      FinalZMPTraj_deq,
-			      CurrentIndex,
-			      Result.Solution_vec[0],Result.Solution_vec[QP_N_]);
+          FinalZMPTraj_deq,
+          CurrentIndex,
+          Result.Solution_vec[0],Result.Solution_vec[QP_N_]);
       CoM_.OneIteration(Result.Solution_vec[0],Result.Solution_vec[QP_N_]);
 
 
       // COMPUTE ORIENTATION OF TRUNK:
       // -----------------------------
       OrientPrw_->interpolate_trunk_orientation(Time+TimeBuffer_, CurrentIndex,
-                            m_SamplingPeriod, CurrentSupport, FinalCOMTraj_deq);
+          m_SamplingPeriod, CurrentSupport,
+          FinalCOMTraj_deq);
 
 
       // INTERPOLATE THE COMPUTED FEET POSITIONS:
       // ----------------------------------------
       unsigned int NumberStepsPrwd = PrwSupportStates_deq.back().StepNumber;
       OFTG_->interpolate_feet_positions(Time+TimeBuffer_,
-                               CurrentIndex, CurrentSupport,
-                               Result.Solution_vec[2*QP_N_], Result.Solution_vec[2*QP_N_+NumberStepsPrwd],
-                               PreviewedSupportAngles_deq,
-			       FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
+          CurrentIndex, CurrentSupport,
+          Result.Solution_vec[2*QP_N_], Result.Solution_vec[2*QP_N_+NumberStepsPrwd],
+          PreviewedSupportAngles_deq,
+          FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
 
 
-
-      if(CurrentSupport.StepsLeft == 0)
-        EndingPhase_ = true;
       // Specify that we are in the ending phase.
-      if (EndingPhase_==false)
+      if (EndingPhase_ == false)
         {
           // This should be done only during the transition EndingPhase=false -> EndingPhase=true
           TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
@@ -458,7 +465,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // Compute CPU consumption time.
       gettimeofday(&end,0);
       CurrentCPUTime = end.tv_sec - start.tv_sec +
-        0.000001 * (end.tv_usec - start.tv_usec);
+          0.000001 * (end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
 
 
@@ -468,45 +475,45 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
 
 void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ,
-						   deque<COMState> & ,
-						   deque<RelativeFootPosition> &,
-						   deque<FootAbsolutePosition> &,
-						   deque<FootAbsolutePosition> &,
-						   double ,
-						   COMState &,
-						   MAL_S3_VECTOR(&,double),
-						   FootAbsolutePosition & ,
-						   FootAbsolutePosition & )
+    deque<COMState> & ,
+    deque<RelativeFootPosition> &,
+    deque<FootAbsolutePosition> &,
+    deque<FootAbsolutePosition> &,
+    double ,
+    COMState &,
+    MAL_S3_VECTOR(&,double),
+    FootAbsolutePosition & ,
+    FootAbsolutePosition & )
 {
 }
 
 
 void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition & ,
-					    deque<ZMPPosition> & ,
-					    deque<COMState> & ,
-					    deque<FootAbsolutePosition> &,
-					    deque<FootAbsolutePosition> &,
-					    bool)
+    deque<ZMPPosition> & ,
+    deque<COMState> & ,
+    deque<FootAbsolutePosition> &,
+    deque<FootAbsolutePosition> &,
+    bool)
 {
   cout << "To be implemented" << endl;
 }
 
 int ZMPVelocityReferencedQP::OnLineFootChange(double ,
-					      FootAbsolutePosition &,
-					      deque<ZMPPosition> & ,
-					      deque<COMState> & ,
-					      deque<FootAbsolutePosition> &,
-					      deque<FootAbsolutePosition> &,
-					      StepStackHandler  *)
+    FootAbsolutePosition &,
+    deque<ZMPPosition> & ,
+    deque<COMState> & ,
+    deque<FootAbsolutePosition> &,
+    deque<FootAbsolutePosition> &,
+    StepStackHandler  *)
 {
   cout << "To be implemented" << endl;
   return -1;
 }
 
 void ZMPVelocityReferencedQP::EndPhaseOfTheWalking(deque<ZMPPosition> &, 
-						   deque<COMState> &,
-						   deque<FootAbsolutePosition> &,
-						   deque<FootAbsolutePosition> &)
+    deque<COMState> &,
+    deque<FootAbsolutePosition> &,
+    deque<FootAbsolutePosition> &)
 {
   cout << "To be implemented" << endl;
 }
