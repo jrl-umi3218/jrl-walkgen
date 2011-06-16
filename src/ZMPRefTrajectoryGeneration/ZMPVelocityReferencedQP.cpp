@@ -407,21 +407,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // --------------
       QPProblem_s::solution_t Result;
       Problem_.solve( QPProblem_s::QLD , Result );
-
-
-      char FileName[1024];
-      sprintf(FileName,"/tmp/Problem%f.dat", Time);
-      Problem_.dump_problem(FileName);
-      cout<<"time:"<<Time<<endl;
-
       Problem_.reset();
-
-      for(int i=0;i<PrwSupportStates_deq.back().StepNumber;i++)
-      {
-          cout<<"X"<<i<<":"<<Result.Solution_vec(2*QP_N_+i)<<endl;
-          cout<<"Y"<<i<<":"<<Result.Solution_vec(2*QP_N_+PrwSupportStates_deq.back().StepNumber+i)<<endl;
-          cout<<"LMult."<<Result.ConstrLagr_vec<<endl;
-      }
 
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
