@@ -165,9 +165,9 @@ void
 GeneratorVelRef::initialize_matrices()
 {
 
-  IntermedQPMat::dynamics_t & Position = Matrices_.Dynamics( IntermedQPMat::POSITION );
+  IntermedQPMat::dynamics_t & Position = Matrices_->Dynamics( IntermedQPMat::POSITION );
   initialize_matrices( Position );
-  IntermedQPMat::dynamics_t & Velocity = Matrices_.Dynamics( IntermedQPMat::VELOCITY );
+  IntermedQPMat::dynamics_t & Velocity = Matrices_->Dynamics( IntermedQPMat::VELOCITY );
   initialize_matrices( Velocity );
   IntermedQPMat::dynamics_t & COP = Matrices_->Dynamics( IntermedQPMat::COP );
   initialize_matrices( COP );
@@ -401,7 +401,7 @@ GeneratorVelRef::build_constraints_door(double Time, Door & Door,
   //	 double RrotHp = prod(Door.InvRp(),Rrot);
 
   // Build selection matrix W
-  IntermedQPMat::state_variant_t & State = Matrices_.State();
+  IntermedQPMat::state_variant_t & State = Matrices_->State();
 
   const int & NbPrwSteps = SupportStates_deq.back().StepNumber;
   boost_ublas::matrix<double> W(N_,NbPrwSteps,false);
@@ -450,7 +450,7 @@ GeneratorVelRef::build_constraints_door(double Time, Door & Door,
       D7(i) = 0.7;
     }
 
-  const IntermedQPMat::dynamics_t & PosDynamics = Matrices_.Dynamics(IntermedQPMat::POSITION);
+  const IntermedQPMat::dynamics_t & PosDynamics = Matrices_->Dynamics(IntermedQPMat::POSITION);
 
   // Number of inequality constraints
   linear_inequality_t DoorConstraints;
