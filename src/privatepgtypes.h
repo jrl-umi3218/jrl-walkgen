@@ -72,7 +72,7 @@ namespace PatternGeneratorJRL
   };
   typedef struct support_state_s support_state_t;
 
-  /// \brief Support state of the robot at a certain point in time
+  /// \brief State of the center of mass
   struct com_s
   {
     MAL_VECTOR(x,double);
