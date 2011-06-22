@@ -33,6 +33,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <PreviewControl/rigid-body-system.hh>
+
 
 namespace PatternGeneratorJRL
 {
@@ -209,6 +211,8 @@ namespace PatternGeneratorJRL
     IneqCoP_,
     IneqCoM_,
     IneqFeet_;
+
+    RigidBodySystem * Robot;
 
   };
 

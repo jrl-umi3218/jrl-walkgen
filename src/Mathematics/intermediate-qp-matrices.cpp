@@ -31,9 +31,10 @@ using namespace std;
 using namespace PatternGeneratorJRL;
 
 
-IntermedQPMat::IntermedQPMat()
+IntermedQPMat::IntermedQPMat():
+    Robot_(0)
 {
-
+  //TODO: Assignment of dynamics
   MeanVelocity_.type = MEAN_VELOCITY;
   Velocity_.type = VELOCITY;
   MeanVelocity_.dyn = & Velocity_;
@@ -105,16 +106,16 @@ IntermedQPMat::dynamics_t const &
 IntermedQPMat::Dynamics( const int type ) const
 {
   switch(type)
-    {
-   case POSITION:
-	  return Position_;
-   case VELOCITY:
-      return Velocity_;
-    case COP:
-      return CoP_;
-    case JERK:
-      return Jerk_;
-    }
+  {
+  case POSITION:
+    return Position_;
+  case VELOCITY:
+    return Velocity_;
+  case COP:
+    return CoP_;
+  case JERK:
+    return Jerk_;
+  }
   /* Default behavior return velocity. */
   return Velocity_;
 }
@@ -125,7 +126,7 @@ IntermedQPMat::Dynamics( const int type )
   switch(type)
   {
   case POSITION:
-        return Position_;
+    return Position_;
   case VELOCITY:
     return Velocity_;
   case COP:
