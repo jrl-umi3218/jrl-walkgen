@@ -31,8 +31,8 @@
 #define _ZMPVELOCITYREFERENCEDQP_WITH_CONSTRAINT_H_
 
 
-
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
+#include <PreviewControl/rigid-body-system.hh>
 #include <Mathematics/relative-feet-inequalities.hh>
 #include <Mathematics/OptCholesky.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
@@ -60,15 +60,13 @@ namespace PatternGeneratorJRL
     //
   public:
 
-    /* Default constructor. */
     ZMPVelocityReferencedQP(SimplePluginManager *SPM, string DataFile,
         CjrlHumanoidDynamicRobot *aHS=0);
 
-    /* Default destructor. */
     ~ZMPVelocityReferencedQP();
 
 
-    /*! Call method to handle the plugins (SimplePlugin interface) . */
+    /// \brief Handle plugins (SimplePlugin interface)
     void CallMethod(std::string &Method, std::istringstream &strm);
 
     /*! \name Call method to handle on-line generation of ZMP reference trajectory.
@@ -103,7 +101,7 @@ namespace PatternGeneratorJRL
         deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
 
 
-    /// \name Accessors
+    /// \name Accessors and mutators
     /// \{
     /// \brief Set the reference (velocity only as for now) through the Interface (slow)
     void Reference(istringstream &strm)
@@ -130,7 +128,7 @@ namespace PatternGeneratorJRL
     void setCoMPerturbationForce(istringstream &strm);
     /// \}
 
-    /// \breif Reference
+    /// \brief Reference
     reference_t VelRef_;
 
   private:
@@ -153,13 +151,16 @@ namespace PatternGeneratorJRL
     /// \brief Security margin for trajectory queues
     double TimeBuffer_;
 
-    /// \brief 2D LIPM to simulate the evolution of the robot.
+    /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D CoM_;
+
+    /// \brief Simplified robot model
+    RigidBodySystem * Robot_;
 
     /// \brief Finite State Machine to simulate the evolution of the support states.
     SupportFSM * SupportFSM_;
 
-    /// \brief Deecoupled optimization problem to compute the evolution of feet angles.
+    /// \brief Decoupled optimization problem to compute the evolution of feet angles.
     OrientationsPreview * OrientPrw_;
 
     /// \brief Generator of QP problem
@@ -186,7 +187,7 @@ namespace PatternGeneratorJRL
     /// \brief Sampling period considered in the QP
     double QP_T_;
 
-    /// \brief Nb. samlings inside preview window
+    /// \brief Nb. samplings inside preview window
     int QP_N_;
 
 

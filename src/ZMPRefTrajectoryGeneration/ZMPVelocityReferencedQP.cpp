@@ -50,9 +50,9 @@ using namespace PatternGeneratorJRL;
 
 
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
-    string DataFile,
-    CjrlHumanoidDynamicRobot *aHS) :
-    ZMPRefTrajectoryGeneration(SPM)
+    string DataFile, CjrlHumanoidDynamicRobot *aHS) :
+    ZMPRefTrajectoryGeneration(SPM),
+    Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFC_(0),OFTG_(0)
 {
 
   TimeBuffer_ = 0.040;
@@ -62,12 +62,11 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   PerturbationOccured_ = false;
   UpperTimeLimitToUpdate_ = 0.0;
   RobotMass_ = aHS->mass();
-  //Feet distance in the DS phase
 
-
-  // For computing the equilibrium constraints from the feet positions.
+  // Create and initialize online interpolation of feet trajectories
   RFC_ = new RelativeFeetInequalities(SPM,aHS);
 
+  // Create and initialize online interpolation of feet trajectories
   OFTG_ = new OnLineFootTrajectoryGeneration(SPM,aHS->leftFoot());
   OFTG_->InitializeInternalDataStructures();
   OFTG_->SetSingleSupportTime(0.7);
@@ -75,6 +74,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   OFTG_->QPSamplingPeriod(QP_T_);
   OFTG_->FeetDistance(0.2);
 
+  // Create and initialize the finite state machine for support sequences
   SupportFSM_ = new SupportFSM();
   SupportFSM_->StepPeriod(0.8);
   SupportFSM_->DSPeriod(1e9);
@@ -82,7 +82,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   SupportFSM_->NbStepsSSDS(2);
   SupportFSM_->SamplingPeriod(QP_T_);
 
-  /* Orientations preview algorithm*/
+  // Create and initialize preview of orientations
   OrientPrw_ = new OrientationsPreview(aHS->rootJoint());
   OrientPrw_->SamplingPeriod(QP_T_);
   OrientPrw_->NbSamplingsPreviewed(QP_N_);
@@ -90,10 +90,19 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   COMState CurrentTrunkState;
   OrientPrw_->CurrentTrunkState(CurrentTrunkState);
 
-  /// Initialize  the 2D LIPM
-  CoM_.SetSimulationControlPeriod(QP_T_);
-  CoM_.SetRobotControlPeriod(0.005);
+  // Initialize  the 2D LIPM
+  CoM_.SetSimulationControlPeriod( QP_T_ );
+  CoM_.SetRobotControlPeriod( m_SamplingPeriod );
   CoM_.InitializeSystem();
+
+  // Create and initialize simplified robot
+  Robot_ = new RigidBodySystem();
+  Robot_->Mass( aHS->mass() );
+  Robot_->NbSamplingsPreviewed( QP_N_ );
+  Robot_->SamplingPeriodSim( QP_T_ );
+  Robot_->SamplingPeriodAct( m_SamplingPeriod );
+  Robot_->CoMHeight(0.814);
+  Robot_->initialize();
 
   IntermedData_ = new IntermedQPMat();
 
@@ -143,6 +152,12 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 
   if (OrientPrw_!=0)
     delete OrientPrw_;
+
+  if (Robot_!=0)
+    delete Robot_;
+
+  if (IntermedData_!=0)
+    delete IntermedData_;
 
 }
 
