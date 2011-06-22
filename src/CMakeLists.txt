@@ -47,6 +47,8 @@ SET(SOURCES
   PreviewControl/OptimalControllerSolver.cpp
   PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp
   PreviewControl/LinearizedInvertedPendulum2D.cpp
+  PreviewControl/rigid-body.cpp
+  PreviewControl/rigid-body-system.cpp
   PreviewControl/SupportFSM.cpp
   ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.cpp
   ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp
