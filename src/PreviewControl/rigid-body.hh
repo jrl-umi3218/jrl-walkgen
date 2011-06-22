@@ -96,7 +96,7 @@ namespace PatternGeneratorJRL
       /// \brief State matrix
       boost_ublas::matrix<double> S;
 
-      unsigned int Type;
+      int Type;
     };
     typedef linear_dynamics_s linear_dynamics_t;
     /// \}
@@ -136,9 +136,8 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors
     /// \{
-
-    linear_dynamics_t const & Dynamics( int type ) const;
-    linear_dynamics_t & Dynamics( int type );
+    linear_dynamics_t const & Dynamics( int Type ) const;
+    linear_dynamics_t & Dynamics( int Type );
 
     inline double const & SamplingPeriodSim( ) const
     { return T_; }
@@ -149,6 +148,11 @@ namespace PatternGeneratorJRL
     { return Ta_; }
     inline void SamplingPeriodAct( double Ta )
     { Ta_ = Ta; }
+
+    inline double const & Mass( ) const
+    { return Mass_; }
+    inline void Mass( double Mass )
+    { Mass_ = Mass; }
     /// \}
 
     
@@ -178,8 +182,6 @@ namespace PatternGeneratorJRL
     
     /// \brief Sampling period actuators
     double Ta_;
-    
-    
 
     /// \brief Nb previewed samples
     unsigned int N_;

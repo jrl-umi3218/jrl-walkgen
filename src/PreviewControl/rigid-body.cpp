@@ -28,8 +28,13 @@ using namespace PatternGeneratorJRL;
 using namespace std;
 
 RigidBody::RigidBody():
-    T_(0),Ta_(0),N_(0),Mass_(0)
+    T_(0),Tr_(0),Ta_(0),N_(0),Mass_(0)
 {
+
+  PositionDynamics_.Type = POSITION;
+  VelocityDynamics_.Type = VELOCITY;
+  AccelerationDynamics_.Type = ACCELERATION;
+  JerkDynamics_.Type = JERK;
 
 }
 
@@ -73,12 +78,16 @@ RigidBody::increment_state(double Control)
 // ACCESSORS:
 // ----------
 RigidBody::linear_dynamics_t const &
-RigidBody::Dynamics( const int type ) const
+RigidBody::Dynamics( const int Type ) const
 {
-  switch(type)
+  switch(Type)
   {
+  case POSITION:
+    return PositionDynamics_;
   case VELOCITY:
     return VelocityDynamics_;
+  case ACCELERATION:
+    return AccelerationDynamics_;
   case JERK:
     return JerkDynamics_;
   }
@@ -88,12 +97,16 @@ RigidBody::Dynamics( const int type ) const
 }
 
 RigidBody::linear_dynamics_t &
-RigidBody::Dynamics( const int type )
+RigidBody::Dynamics( const int Type )
 {
-  switch(type)
+  switch(Type)
   {
+  case POSITION:
+    return PositionDynamics_;
   case VELOCITY:
     return VelocityDynamics_;
+  case ACCELERATION:
+    return AccelerationDynamics_;
   case JERK:
     return JerkDynamics_;
   }
@@ -136,14 +149,13 @@ void
 RigidBody::rigid_body_state_t::reset()
 {
 
-  // Redimension
   X.resize(3,false);
   Y.resize(3,false);
   Z.resize(3,false);
   Yaw.resize(3,false);
   Pitch.resize(3,false);
   Roll.resize(3,false);
-  // Set to zero
+
   X.clear();
   Y.clear();
   Z.clear();
