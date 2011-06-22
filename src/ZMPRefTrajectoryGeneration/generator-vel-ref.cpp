@@ -223,7 +223,6 @@ GeneratorVelRef::initialize_matrices( IntermedQPMat::dynamics_t & Dynamics)
              else
  	      Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
  	}
-       cout<<"Dynamics.S: "<<Dynamics.S<<endl;
        break;
 
     case IntermedQPMat::VELOCITY:
