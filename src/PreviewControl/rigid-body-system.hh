@@ -43,30 +43,28 @@ namespace PatternGeneratorJRL
     ~RigidBodySystem();
 
     /// \brief Initialize
-    ///
-    /// \return 0
     void initialize();
 
-    /// \brief Interpolate
-    int interpolate(std::deque<COMState> &COMStates,
-		      std::deque<ZMPPosition> &ZMPRefPositions,
-		      int CurrentPosition,
-		      double CX, double CY);
+//    /// \brief Interpolate
+//    int interpolate(std::deque<COMState> &COMStates,
+//		      std::deque<ZMPPosition> &ZMPRefPositions,
+//		      int CurrentPosition,
+//		      double CX, double CY);
+//
+//    /// \brief Increment the state
+//    ///
+//    /// \param[in] Control Control vector
+//    void increment_state( double Control );
+//
+//    /// \brief Decouple degree of freedom by injected trajectory
+//    ///
+//    /// \param[in] Axis The axis to be decoupled
+//    /// \param[in] Trajectory The injected trajectory
+//    ///
+//    /// \return 0
+//    int inject_trajectory( unsigned int Axis, boost_ublas::vector<double> Trajectory );
 
-    /// \brief Increment the state
-    ///
-    /// \param[in] Control Control vector
-    void increment_state( double Control );
-
-    /// \brief Decouple degree of freedom by injected trajectory
-    ///
-    /// \param[in] Axis The axis to be decoupled
-    /// \param[in] Trajectory The injected trajectory
-    ///
-    /// \return 0
-    int inject_trajectory( unsigned int Axis, boost_ublas::vector<double> Trajectory );
-
-    /// \name Accessors
+    /// \name Accessors and mutators
     /// \{
     inline const RigidBody operator ()() const
     {return CoM_;};
@@ -82,6 +80,21 @@ namespace PatternGeneratorJRL
     { return Ta_; }
     inline void SamplingPeriodAct( double Ta )
     { Ta_ = Ta; }
+
+    inline unsigned const & NbSamplingsPreviewed( ) const
+    { return N_; }
+    inline void NbSamplingsPreviewed( unsigned N )
+    { N_ = N; }
+
+    inline double const & Mass( ) const
+    { return Mass_; }
+    inline void Mass( double Mass )
+    { Mass_ = Mass; }
+
+    inline double const & CoMHeight( ) const
+    { return CoMHeight_; }
+    inline void CoMHeight( double Height )
+    { CoMHeight_ = Height; }
     /// \}
 
     
@@ -93,7 +106,7 @@ namespace PatternGeneratorJRL
     /// \brief Initialize dynamics matrices
     ///
     /// \param[in] Dynamics Matrices to be filled
-    void initialize_dynamics( RigidBody::linear_dynamics_t & Dynamics);
+    void initialize_dynamics( RigidBody::linear_dynamics_t & Dynamics );
 
     //
     // Private members
@@ -103,6 +116,9 @@ namespace PatternGeneratorJRL
     /// \brief Body
     RigidBody CoM_;
     
+    /// \brief Total robot mass
+    double Mass_;
+
     /// \brief CoMHeight
     double CoMHeight_;
 
