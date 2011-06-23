@@ -28,7 +28,7 @@
 #include "TestObject.h"
 
 #include <Debug.h>
-#include <hrp2Dynamics/hrp2OptHumanoidDynamicRobot.h>
+#include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
 
 using namespace::PatternGeneratorJRL;
 using namespace::PatternGeneratorJRL::TestSuite;
