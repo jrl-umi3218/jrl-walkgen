@@ -212,7 +212,7 @@ namespace PatternGeneratorJRL
     IneqCoM_,
     IneqFeet_;
 
-    RigidBodySystem * Robot;
+    RigidBodySystem * Robot_;
 
   };
 
