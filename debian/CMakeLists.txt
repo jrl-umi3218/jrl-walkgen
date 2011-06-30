@@ -14,7 +14,7 @@
 # jrl-walkgen. If not, see <http://www.gnu.org/licenses/>.
 
 IF(HRP2_14_FOUND)
-  SET(PACKAGE_HRP2_14_DATA "hrp2-14-data (>=1.7.7),")
+  SET(PACKAGE_HRP2_14_DATA "hrp2-14-data (>= 1.7.7),")
 ELSE(HRP2_14_FOUND)
   SET(PACKAGE_HRP2_14_DATA "")
 ENDIF(HRP2_14_FOUND)
