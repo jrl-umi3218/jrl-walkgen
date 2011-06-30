@@ -8,7 +8,7 @@ Build-Depends: debhelper (>= 7.0.50~), cmake (>= 2.6),
 	       libboost-dev (>= 1.33.1),
 	       libboost-thread-dev (>= 1.40.0),
 	       liblapack-dev (>= 1.2),
-	       libjrl-dynamics-dev (>= 1.9.3),
+	       libjrl-dynamics-dev (>= 1.9.3), @PACKAGE_HRP2_14_DATA@
 	       libabstract-robot-dynamics-dev (>= 1.16.2)
 Standards-Version: 3.8.4
 Vcs-Git:git://github.com/jrl-umi3218/jrl-walkgen.git
