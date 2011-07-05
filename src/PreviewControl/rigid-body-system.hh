@@ -66,10 +66,13 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors and mutators
     /// \{
-    inline const RigidBody operator ()() const
+    linear_dynamics_t const & Dynamics( DynamicsType ) const;
+    linear_dynamics_t & Dynamics( DynamicsType );
+
+    inline RigidBody const & CoM() const
     {return CoM_;};
-    inline void operator ()( RigidBody Body )
-    {CoM_ = Body;};
+    inline void CoM( const RigidBody & CoM )
+    {CoM_ = CoM;};
 
     inline double const & SamplingPeriodSim( ) const
     { return T_; }
@@ -106,7 +109,9 @@ namespace PatternGeneratorJRL
     /// \brief Initialize dynamics matrices
     ///
     /// \param[in] Dynamics Matrices to be filled
-    void initialize_dynamics( RigidBody::linear_dynamics_t & Dynamics );
+    ///
+    /// return 0
+    int initialize_dynamics( linear_dynamics_t & Dynamics );
 
     //
     // Private members
@@ -116,6 +121,10 @@ namespace PatternGeneratorJRL
     /// \brief Body
     RigidBody CoM_;
     
+    /// \brief Center of Pressure dynamics
+    linear_dynamics_t
+    CoPDynamics_;
+
     /// \brief Total robot mass
     double Mass_;
 

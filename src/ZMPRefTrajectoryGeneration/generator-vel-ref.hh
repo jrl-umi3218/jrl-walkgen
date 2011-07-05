@@ -35,6 +35,8 @@
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 #include <PreviewControl/SupportFSM.h>
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
+#include <PreviewControl/rigid-body-system.hh>
+#include <PreviewControl/rigid-body.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>
 #include <Mathematics/relative-feet-inequalities.hh>
 #include <ZMPRefTrajectoryGeneration/door.hh>
@@ -53,9 +55,10 @@ namespace PatternGeneratorJRL
     //Public methods
     //
   public:
+
     /// \name Constructors and destructors.
     /// \{
-    GeneratorVelRef( SimplePluginManager *lSPM, IntermedQPMat * Data );
+    GeneratorVelRef( SimplePluginManager *lSPM, IntermedQPMat * Data, RigidBodySystem * Robot );
     ~GeneratorVelRef();
     /// \}
 
@@ -171,7 +174,7 @@ namespace PatternGeneratorJRL
     /// \param[in] NbStepsPreviewed
     /// \param[in] Pb
     void build_constraints_cop(const linear_inequality_t & IneqCoP,
-        const IntermedQPMat::dynamics_t & CoP,
+        const linear_dynamics_t & CoP,
         const IntermedQPMat::state_variant_t & State,
         int NbStepsPreviewed, QPProblem & Pb);
 
@@ -184,11 +187,6 @@ namespace PatternGeneratorJRL
     void build_constraints_feet(const linear_inequality_t & IneqFeet,
         const IntermedQPMat::state_variant_t & State,
         int NbStepsPreviewed, QPProblem & Pb);
-
-    /// \brief Initialize intermediate matrices
-    ///
-    /// \param[in] Objective
-    void initialize_matrices( IntermedQPMat::dynamics_t & Objective);
 
     /// \brief Initialize inequality matrices
     ///
@@ -224,6 +222,7 @@ namespace PatternGeneratorJRL
   protected:
 
     IntermedQPMat * Matrices_;
+    RigidBodySystem * Robot_;
 
 
   };

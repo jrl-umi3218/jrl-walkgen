@@ -31,27 +31,13 @@ using namespace std;
 using namespace PatternGeneratorJRL;
 
 
-IntermedQPMat::IntermedQPMat():
-    Robot_(0)
+IntermedQPMat::IntermedQPMat()
 {
-  //TODO: Assignment of dynamics
+
   MeanVelocity_.type = MEAN_VELOCITY;
-  Velocity_.type = VELOCITY;
-  MeanVelocity_.dyn = & Velocity_;
-
   InstantVelocity_.type = INSTANT_VELOCITY;
-  InstantVelocity_.dyn = & Velocity_;
-
   COPCentering_.type = COP_CENTERING;
-  CoP_.type = COP;
-  COPCentering_.dyn = & CoP_;
-
   JerkMin_.type = JERK_MIN;
-  Jerk_.type = JERK;
-  JerkMin_.dyn = & Jerk_;
-
-  Position_.type = POSITION;
-  Acceleration_.type = ACCELERATION;
 
   IneqCoP_.type = INEQ_COP;
   IneqCoM_.type = INEQ_COM;
@@ -100,44 +86,6 @@ IntermedQPMat::Objective( const int type )
   /* Default behavior return Mean velocity. */
   return MeanVelocity_;
 }
-
-
-IntermedQPMat::dynamics_t const &
-IntermedQPMat::Dynamics( const int type ) const
-{
-  switch(type)
-  {
-  case POSITION:
-    return Position_;
-  case VELOCITY:
-    return Velocity_;
-  case COP:
-    return CoP_;
-  case JERK:
-    return Jerk_;
-  }
-  /* Default behavior return velocity. */
-  return Velocity_;
-}
-
-IntermedQPMat::dynamics_t &
-IntermedQPMat::Dynamics( const int type )
-{
-  switch(type)
-  {
-  case POSITION:
-    return Position_;
-  case VELOCITY:
-    return Velocity_;
-  case COP:
-    return CoP_;
-  case JERK:
-    return Jerk_;
-  }
-  /*! Default behavior return velocity. */
-  return Velocity_;
-}
-
 
 linear_inequality_t const &
 IntermedQPMat::Inequalities( const int type ) const
@@ -230,10 +178,7 @@ std::ostream&
 IntermedQPMat::objective_variant_s::print (std::ostream& o) const
 {
   o   << endl
-      << "weight: " << weight << endl
-      << "U: " << dyn->U << endl << endl
-      << "UT: " << dyn->UT << endl<< endl
-      << "S: " << dyn->S << endl;
+      << "weight: " << weight << endl;
 
   return o ;
 }

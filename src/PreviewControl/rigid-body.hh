@@ -33,73 +33,68 @@
 
 namespace PatternGeneratorJRL
 {
+
+  //
+  // Related types
+  //
+
+  /// \brief Axes
+  enum AxesType
+  {
+    X, Y, Z, PITCH, ROLL, YAW
+  };
+
+  /// \brief State vectors
+  struct rigid_body_state_s
+  {
+    /// \name Translational degrees of freedom
+    /// \{
+    boost_ublas::vector<double> X;
+    boost_ublas::vector<double> Y;
+    boost_ublas::vector<double> Z;
+    /// \}
+    /// \name Rotational degrees of freedom
+    /// \{
+    boost_ublas::vector<double> Pitch;
+    boost_ublas::vector<double> Roll;
+    boost_ublas::vector<double> Yaw;
+    /// \}
+
+    struct rigid_body_state_s & operator=(const rigid_body_state_s &RB);
+
+    void reset();
+
+    rigid_body_state_s();
+  };
+  typedef struct rigid_body_state_s rigid_body_state_t;
+
+  enum DynamicsType
+  {
+    POSITION, VELOCITY, ACCELERATION,
+    JERK, COP
+  };
+
+  /// \name Dynamics matrices
+  /// \{
+  struct linear_dynamics_s
+  {
+    /// \brief Control matrix
+    boost_ublas::matrix<double> U;
+    /// \brief Transpose of control matrix
+    boost_ublas::matrix<double> UT;
+
+    /// \brief State matrix
+    boost_ublas::matrix<double> S;
+
+    DynamicsType Type;
+  };
+  typedef linear_dynamics_s linear_dynamics_t;
+  /// \}
+
+
   class RigidBody
   {
 
-    //
-    // Public types
-    //
-  public:
-
-    /// \name Axes
-    /// \{
-    const static int X_AXIS = 0;
-    const static int Y_AXIS = 1;
-    const static int Z_AXIS = 2;
-    const static int PITCH = 3;
-    const static int ROLL = 4;
-    const static int YAW = 5;
-    /// \}
-
-    /// \name Axes
-    /// \{
-    const static int POSITION = 10;
-    const static int VELOCITY = 11;
-    const static int ACCELERATION = 12;
-    const static int JERK = 13;
-    const static int COP = 14;
-    /// \}
-
-    /// \brief State vectors
-    struct rigid_body_state_s
-    {
-      /// \name Translational degrees of freedom
-      /// \{
-      boost_ublas::vector<double> X;
-      boost_ublas::vector<double> Y;
-      boost_ublas::vector<double> Z;
-      /// \}
-      /// \name Rotational degrees of freedom
-      /// \{
-      boost_ublas::vector<double> Pitch;
-      boost_ublas::vector<double> Roll;
-      boost_ublas::vector<double> Yaw;
-      /// \}
-
-      struct rigid_body_state_s & operator=(const rigid_body_state_s &RB);
-
-      void reset();
-
-      rigid_body_state_s();
-    };
-    typedef struct rigid_body_state_s rigid_body_state_t;
-
-    /// \name Dynamics matrices
-    /// \{
-    struct linear_dynamics_s
-    {
-      /// \brief Control matrix
-      boost_ublas::matrix<double> U;
-      /// \brief Transpose of control matrix
-      boost_ublas::matrix<double> UT;
-
-      /// \brief State matrix
-      boost_ublas::matrix<double> S;
-
-      int Type;
-    };
-    typedef linear_dynamics_s linear_dynamics_t;
-    /// \}
 
     //
     // Public methods
@@ -110,6 +105,7 @@ namespace PatternGeneratorJRL
 
     ~RigidBody();
 
+
     /// \brief Initialize
     ///
     /// \return 0
@@ -117,9 +113,9 @@ namespace PatternGeneratorJRL
 
     /// \brief Interpolate
     int interpolate(std::deque<COMState> &COMStates,
-		      std::deque<ZMPPosition> &ZMPRefPositions,
-		      int CurrentPosition,
-		      double CX, double CY);
+        std::deque<ZMPPosition> &ZMPRefPositions,
+        int CurrentPosition,
+        double CX, double CY);
 
     /// \brief Increment the state
     ///
@@ -136,8 +132,8 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors
     /// \{
-    linear_dynamics_t const & Dynamics( int Type ) const;
-    linear_dynamics_t & Dynamics( int Type );
+    linear_dynamics_t const & Dynamics( DynamicsType ) const;
+    linear_dynamics_t & Dynamics( DynamicsType );
 
     inline double const & SamplingPeriodSim( ) const
     { return T_; }
@@ -149,13 +145,29 @@ namespace PatternGeneratorJRL
     inline void SamplingPeriodAct( double Ta )
     { Ta_ = Ta; }
 
+    inline unsigned const & NbSamplingsPreviewed( ) const
+    { return N_; }
+    inline void NbSamplingsPreviewed( unsigned N )
+    { N_ = N; }
+
     inline double const & Mass( ) const
     { return Mass_; }
     inline void Mass( double Mass )
     { Mass_ = Mass; }
     /// \}
 
-    
+
+    //
+    // Private member functions
+    //
+  private:
+
+    /// \brief Initialize dynamics
+    ///
+    /// \return 0
+    int initialize_dynamics( linear_dynamics_t & Dynamics );
+
+
     //
     // Private members
     //
@@ -172,20 +184,20 @@ namespace PatternGeneratorJRL
     AccelerationDynamics_,
     JerkDynamics_;
     /// \}
-    
+
     /// \brief Sampling period simulation
     double T_;
 
     /// \brief Recalculation period
     /// The state is incremented with respect to this parameter
     double Tr_;
-    
+
     /// \brief Sampling period actuators
     double Ta_;
 
     /// \brief Nb previewed samples
     unsigned int N_;
-    
+
     /// \brief Mass
     double Mass_;
 

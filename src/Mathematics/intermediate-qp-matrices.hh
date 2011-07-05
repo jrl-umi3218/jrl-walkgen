@@ -51,12 +51,6 @@ namespace PatternGeneratorJRL
     const static int COP_CENTERING = 2;
     const static int JERK_MIN = 3;
 
-    const static int POSITION = 10;
-    const static int VELOCITY = 11;
-    const static int ACCELERATION = 12;
-    const static int JERK = 13;
-    const static int COP = 14;
-
     const static int INEQ_COP = 20;
     const static int INEQ_COM = 21;
     const static int INEQ_FEET = 22;
@@ -104,7 +98,6 @@ namespace PatternGeneratorJRL
       boost_ublas::matrix<double> V_f;
       /// \brief Current support state
       support_state_t SupportState;
-
     };
     typedef state_variant_s state_variant_t;
     /// \}
@@ -116,15 +109,11 @@ namespace PatternGeneratorJRL
       /// \brief Ponderation
       double weight;
 
-      /// \brief Dynamics
-      dynamics_t * dyn;
-
       /// \brief Minimization objective type
       int type;
 
       std::ostream& print (std::ostream& o) const;
       void dump(const char * filename) const;
-
     };
     typedef objective_variant_s objective_variant_t;
     /// \}
@@ -200,19 +189,10 @@ namespace PatternGeneratorJRL
     state_variant_t
     StateMatrices_;
 
-    dynamics_t
-    Position_,
-    Velocity_,
-    Acceleration_,
-    Jerk_,
-    CoP_;
-
     linear_inequality_t
     IneqCoP_,
     IneqCoM_,
     IneqFeet_;
-
-    RigidBodySystem * Robot_;
 
   };
 

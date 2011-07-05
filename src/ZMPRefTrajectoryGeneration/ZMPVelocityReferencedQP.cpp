@@ -106,10 +106,10 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 
   IntermedData_ = new IntermedQPMat();
 
-  VRQPGenerator_ = new GeneratorVelRef(SPM, IntermedData_);
+  VRQPGenerator_ = new GeneratorVelRef(SPM, IntermedData_, Robot_ );
   VRQPGenerator_->NbPrwSamplings(QP_N_);
   VRQPGenerator_->SamplingPeriodPreview(QP_T_);
-  VRQPGenerator_->ComHeight(0.814);
+  VRQPGenerator_->ComHeight( 0.814 );
   VRQPGenerator_->initialize_matrices();
   VRQPGenerator_->Ponderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
   VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::COP_CENTERING );
@@ -422,9 +422,9 @@ ZMPVelocityReferencedQP::OnLine(double Time,
           PrwSupportStates_deq, PreviewedSupportAngles_deq );
 
 
-      // BUILD DOOR CONSTRAINTS:
-      // -----------------------
-      VRQPGenerator_->build_constraints_door( Time, Door_, PrwSupportStates_deq, Problem_);
+//      // BUILD DOOR CONSTRAINTS:
+//      // -----------------------
+//      VRQPGenerator_->build_constraints_door( Time, Door_, PrwSupportStates_deq, Problem_);
 
 
       // SOLVE PROBLEM:

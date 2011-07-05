@@ -31,8 +31,6 @@ RigidBodySystem::RigidBodySystem():
     Mass_(0),CoMHeight_(0),T_(0),Tr_(0),Ta_(0),N_(0)
 {
 
-  initialize();
-
 }
 
 
@@ -46,24 +44,21 @@ void
 RigidBodySystem::initialize()
 {
 
-  // Initialize total mass
-  CoM_.Mass( Mass_ );
-
   // Initialize dynamics
-  RigidBody::linear_dynamics_t & Position = CoM_.Dynamics( RigidBody::POSITION );
-  initialize_dynamics( Position );
-  RigidBody::linear_dynamics_t & Velocity = CoM_.Dynamics( RigidBody::VELOCITY );
-  initialize_dynamics( Velocity );
-  RigidBody::linear_dynamics_t & COP = CoM_.Dynamics( RigidBody::COP );
-  initialize_dynamics( COP );
-  RigidBody::linear_dynamics_t & Jerk = CoM_.Dynamics( RigidBody::JERK );
-  initialize_dynamics( Jerk );
+  // -------------------
+  CoM_.Mass( Mass_ );
+  CoM_.NbSamplingsPreviewed( N_ );
+  CoM_.SamplingPeriodSim( T_ );
+  CoM_.SamplingPeriodAct( Ta_ );
+  CoM_.initialize();
+  CoPDynamics_.Type = COP;
+  initialize_dynamics( CoPDynamics_ );
 
 }
 
 
-void
-RigidBodySystem::initialize_dynamics( RigidBody::linear_dynamics_t & Dynamics )
+int
+RigidBodySystem::initialize_dynamics( linear_dynamics_t & Dynamics )
 {
 
   bool preserve = true;
@@ -76,30 +71,7 @@ RigidBodySystem::initialize_dynamics( RigidBody::linear_dynamics_t & Dynamics )
 
   switch(Dynamics.Type)
   {
-  case RigidBody::POSITION:
-    for(unsigned int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 1; Dynamics.S(i,1) =(i+1)* T_; Dynamics.S(i,2) = ((i+1)* T_)*((i+1)* T_)/2;
-        for(unsigned int j=0;j<N_;j++)
-          if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) =(1+3*(i-j)+3*(i-j)*(i-j))*(T_*T_*T_)/6 ;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
-    break;
-  case RigidBody::VELOCITY:
-    for(unsigned int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 1.0; Dynamics.S(i,2) = (i+1)*T_;
-        for(unsigned int j=0;j<N_;j++)
-          if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = (2*(i-j)+1)*T_*T_*0.5 ;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
-    break;
-
-  case RigidBody::COP:
+  case COP:
     for(unsigned int i=0;i<N_;i++)
       {
         Dynamics.S(i,0) = 1.0; Dynamics.S(i,1) = (i+1)*T_; Dynamics.S(i,2) = (i+1)*(i+1)*T_*T_*0.5-CoMHeight_/9.81;
@@ -110,20 +82,18 @@ RigidBodySystem::initialize_dynamics( RigidBody::linear_dynamics_t & Dynamics )
             Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
       }
     break;
-
-  case RigidBody::JERK:
-    for(unsigned int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 0.0; Dynamics.S(i,2) = 0.0;
-        for(unsigned int j=0;j<N_;j++)
-          if (j==i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 1.0;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
+  case POSITION:
+    break;
+  case VELOCITY:
+    break;
+  case ACCELERATION:
+    break;
+  case JERK:
     break;
 
   }
+
+  return 0;
 
 }
 
@@ -145,3 +115,48 @@ RigidBodySystem::initialize_dynamics( RigidBody::linear_dynamics_t & Dynamics )
 //{
 //
 //}
+
+
+// ACCESSORS:
+// ----------
+linear_dynamics_t const &
+RigidBodySystem::Dynamics( const DynamicsType Type ) const
+{
+  switch( Type )
+  {
+  case COP:
+    return CoPDynamics_;
+  case POSITION:
+    break;
+  case VELOCITY:
+    break;
+  case ACCELERATION:
+    break;
+  case JERK:
+    break;
+  }
+
+  // Default
+  return CoPDynamics_;
+}
+
+linear_dynamics_t &
+RigidBodySystem::Dynamics( const DynamicsType Type )
+{
+  switch( Type )
+  {
+  case COP:
+    return CoPDynamics_;
+  case POSITION:
+    break;
+  case VELOCITY:
+    break;
+  case ACCELERATION:
+    break;
+  case JERK:
+    break;
+  }
+
+  // Default
+  return CoPDynamics_;
+}

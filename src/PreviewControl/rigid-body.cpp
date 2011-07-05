@@ -28,7 +28,7 @@ using namespace PatternGeneratorJRL;
 using namespace std;
 
 RigidBody::RigidBody():
-    T_(0),Tr_(0),Ta_(0),N_(0),Mass_(0)
+        T_(0),Tr_(0),Ta_(0),N_(0),Mass_(0)
 {
 
   PositionDynamics_.Type = POSITION;
@@ -41,45 +41,112 @@ RigidBody::RigidBody():
 
 RigidBody::~RigidBody()
 {
-  
+
 }
 
 
-int 
+int
 RigidBody::initialize()
 {
-  
+
+  // Initialize dynamics
+  // -------------------
+  initialize_dynamics( PositionDynamics_ );
+  initialize_dynamics( VelocityDynamics_ );
+  initialize_dynamics( JerkDynamics_ );
+
   return 0;
 
 }
 
 
-int 
-RigidBody::interpolate(deque<COMState> &COMStates,
-						deque<ZMPPosition> &ZMPRefPositions,
-						int CurrentPosition,
-						double CX, double CY)
+int
+RigidBody::initialize_dynamics( linear_dynamics_t & Dynamics )
 {
-  
+
+  bool preserve = true;
+  Dynamics.U.resize(N_,N_,!preserve);
+  Dynamics.U.clear();
+  Dynamics.UT.resize(N_,N_,!preserve);
+  Dynamics.UT.clear();
+  Dynamics.S.resize(N_,3,!preserve);
+  Dynamics.S.clear();
+
+  switch(Dynamics.Type)
+  {
+  case POSITION:
+    for(unsigned int i=0;i<N_;i++)
+      {
+        Dynamics.S(i,0) = 1; Dynamics.S(i,1) =(i+1)* T_; Dynamics.S(i,2) = ((i+1)* T_)*((i+1)* T_)/2;
+        for(unsigned int j=0;j<N_;j++)
+          if (j<=i)
+            Dynamics.U(i,j) = Dynamics.UT(j,i) =(1+3*(i-j)+3*(i-j)*(i-j))*(T_*T_*T_)/6 ;
+          else
+            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
+      }
+    break;
+  case VELOCITY:
+    for(unsigned int i=0;i<N_;i++)
+      {
+        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 1.0; Dynamics.S(i,2) = (i+1)*T_;
+        for(unsigned int j=0;j<N_;j++)
+          if (j<=i)
+            Dynamics.U(i,j) = Dynamics.UT(j,i) = (2*(i-j)+1)*T_*T_*0.5 ;
+          else
+            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
+      }
+    break;
+  case ACCELERATION:
+    break;
+  case JERK:
+    for(unsigned int i=0;i<N_;i++)
+      {
+        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 0.0; Dynamics.S(i,2) = 0.0;
+        for(unsigned int j=0;j<N_;j++)
+          if (j==i)
+            Dynamics.U(i,j) = Dynamics.UT(j,i) = 1.0;
+          else
+            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
+      }
+    break;
+  case COP:
+    break;
+
+  }
+
   return 0;
-  
+
 }
 
 
-RigidBody::rigid_body_state_t
-RigidBody::increment_state(double Control)
-{
-
-  return State_;
-  
-}
+// TODO: RigidBody::interpolate RigidBody::increment_state
+//int
+//RigidBody::interpolate(deque<COMState> &COMStates,
+//						deque<ZMPPosition> &ZMPRefPositions,
+//						int CurrentPosition,
+//						double CX, double CY)
+//{
+//
+//  return 0;
+//
+//}
+//
+//
+//RigidBody::rigid_body_state_t
+//RigidBody::increment_state(double Control)
+//{
+//
+//  return State_;
+//
+//}
 
 
 // ACCESSORS:
 // ----------
-RigidBody::linear_dynamics_t const &
-RigidBody::Dynamics( const int Type ) const
+linear_dynamics_t const &
+RigidBody::Dynamics( DynamicsType Type ) const
 {
+
   switch(Type)
   {
   case POSITION:
@@ -90,15 +157,18 @@ RigidBody::Dynamics( const int Type ) const
     return AccelerationDynamics_;
   case JERK:
     return JerkDynamics_;
+  case COP:
+    break;
   }
 
-  // Default
   return VelocityDynamics_;
+
 }
 
-RigidBody::linear_dynamics_t &
-RigidBody::Dynamics( const int Type )
+linear_dynamics_t &
+RigidBody::Dynamics( DynamicsType Type )
 {
+
   switch(Type)
   {
   case POSITION:
@@ -109,16 +179,18 @@ RigidBody::Dynamics( const int Type )
     return AccelerationDynamics_;
   case JERK:
     return JerkDynamics_;
+  case COP:
+    break;
   }
 
-  // Default
   return VelocityDynamics_;
+
 }
 
 
 // INTERNAL TYPE METHODS:
 // ----------------------
-RigidBody::rigid_body_state_s::rigid_body_state_s()
+rigid_body_state_s::rigid_body_state_s()
 {
 
   reset();
@@ -126,8 +198,8 @@ RigidBody::rigid_body_state_s::rigid_body_state_s()
 }
 
 
-struct RigidBody::rigid_body_state_s &
-RigidBody::rigid_body_state_t::operator=(const RigidBody::rigid_body_state_s & RB)
+struct rigid_body_state_s &
+rigid_body_state_t::operator=(const rigid_body_state_s & RB)
 {
 
   for(unsigned int i=0;i<3;i++)
@@ -146,7 +218,7 @@ RigidBody::rigid_body_state_t::operator=(const RigidBody::rigid_body_state_s & R
 
 
 void 
-RigidBody::rigid_body_state_t::reset()
+rigid_body_state_t::reset()
 {
 
   X.resize(3,false);

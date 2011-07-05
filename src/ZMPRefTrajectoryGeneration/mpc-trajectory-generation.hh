@@ -63,7 +63,7 @@ namespace PatternGeneratorJRL
      double PreviewControlTime_;
 
      /// \brief Size of the preview window (Nb. of samplings)
-     int N_;
+     unsigned int N_;
 
      /// \brief Number of variables
      int NbVariables_;
@@ -161,7 +161,7 @@ namespace PatternGeneratorJRL
     { T_Prw_ = SamplingPeriod;};
 		
     /// \brief Get the sampling period for the preview, set to 0.100 by default.
-    inline const int & NbPrwSamplings() const
+    inline const unsigned int & NbPrwSamplings() const
     { return N_; };
 
     /// \brief Set the sampling period for the preview.

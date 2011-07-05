@@ -158,8 +158,8 @@ namespace PatternGeneratorJRL
   struct convex_hull_s
   {
 
-    MAL_VECTOR(X,double);
-    MAL_VECTOR(Y,double);
+    boost_ublas::vector<double> X;
+    boost_ublas::vector<double> Y;
 
     /// \brief Rotate the points around the origin by angle
     ///
@@ -210,6 +210,8 @@ namespace PatternGeneratorJRL
   };
   typedef struct linear_inequality_s
     linear_inequality_t;
+
+
 
 
 }
