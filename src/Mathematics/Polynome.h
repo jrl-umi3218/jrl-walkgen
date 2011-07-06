@@ -44,6 +44,7 @@ namespace PatternGeneratorJRL
     {
 
     public:
+
       /*! Constructor */
       Polynome(int Degree);
 
@@ -61,6 +62,10 @@ namespace PatternGeneratorJRL
 
       /*! Set the coefficients. */
       void SetCoefficients(std::vector<double> &lCoefficients);
+
+      inline int Degree()
+      { return m_Degree; };
+
 
       /*! Print the coefficient. */
       void print();
