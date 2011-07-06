@@ -1,6 +1,7 @@
 /*
  * Copyright 2006, 2007, 2008, 2009, 2010, 
  *
+ * Andrei     Herdt
  * Florent    Lamiraux
  * Mathieu    Poirier 
  * Olivier    Stasse
@@ -108,8 +109,25 @@ namespace PatternGeneratorJRL
 
       /// Set the parameters
       void SetParameters(double FT, double FP);
+
+      /*! Set the parameters such that
+        the initial position, and initial speed
+        are different from zero.
+       */
+      void SetParametersWithInitPosInitSpeed(double FT,
+          double FP,
+          double InitPos,
+          double InitSpeed);
+
+      /// \brief Set parameters considering initial position, velocity, acceleration
+      void SetParameters(double FT, double FP,
+          double InitPos, double InitSpeed, double InitAcc);
+
+      double ComputeSecDerivative(double t);
+
       /// Destructor.
       ~Polynome5();
+
     };
 
   /// Polynome used for Z trajectory.

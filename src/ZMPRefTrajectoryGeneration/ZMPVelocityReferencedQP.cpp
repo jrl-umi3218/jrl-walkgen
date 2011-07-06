@@ -236,12 +236,14 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   // INITIALIZE FEET POSITIONS:
   // --------------------------
   CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
-  CurrentLeftFootAbsPos.z = 0.0;//OFTG_->m_AnklePositionLeft[2];
+  CurrentLeftFootAbsPos.z = 0.0;
+  CurrentLeftFootAbsPos.dz = CurrentLeftFootAbsPos.ddz = 0.0;
   CurrentLeftFootAbsPos.time = 0.0;
   CurrentLeftFootAbsPos.theta = 0.0;
 
   CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
-  CurrentRightFootAbsPos.z = 0.0;//OFTG_->m_AnklePositionRight[2];
+  CurrentRightFootAbsPos.z = 0.0;
+  CurrentRightFootAbsPos.dz = CurrentRightFootAbsPos.ddz = 0.0;
   CurrentRightFootAbsPos.time = 0.0;
   CurrentRightFootAbsPos.theta = 0.0;
 
@@ -259,7 +261,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   FinalLeftFootTraj_deq.resize(AddArraySize);
   FinalRightFootTraj_deq.resize(AddArraySize);
   int CurrentZMPindex=0;
-  for( unsigned i=0;i<FinalZMPTraj_deq.size();i++)
+  for( unsigned int i=0;i<FinalZMPTraj_deq.size();i++ )
     {
 
       // Smooth ramp

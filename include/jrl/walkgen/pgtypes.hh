@@ -107,7 +107,6 @@ namespace PatternGeneratorJRL
   };
   typedef struct ZMPPosition_s ZMPPosition;
 
-  //TODO 0: FootAbsolutePosition_t does not contain the acceleration
   /// Structure to store the absolute foot position.
   struct FootAbsolutePosition_t
   {
@@ -115,6 +114,8 @@ namespace PatternGeneratorJRL
     double x,y,z, theta, omega, omega2;
     /*! Speed of the foot. */
     double dx,dy,dz, dtheta, domega, domega2;
+    /*! Acceleration of the foot. */
+    double ddx,ddy,ddz, ddtheta, ddomega, ddomega2;
     /*! Time at which this position should be reached. */
     double time;
     /*! 1:normal walking 2:one step before opbstacle

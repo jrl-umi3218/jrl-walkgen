@@ -86,11 +86,17 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
           m_PolynomeX->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dx = 
           m_PolynomeX->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
+      if(m_PolynomeX->Degree() > 4)
+        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddx =
+            m_PolynomeX->ComputeSecDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
       //y, dy
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
           m_PolynomeY->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy = 
           m_PolynomeY->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
+      if(m_PolynomeY->Degree() > 4)
+        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddy =
+            m_PolynomeY->ComputeSecDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
       //theta, dtheta
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
           m_PolynomeTheta->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
@@ -105,11 +111,17 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
           m_PolynomeX->Compute(InterpolationTime);
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dx = 
           m_PolynomeX->ComputeDerivative(InterpolationTime);
+      if(m_PolynomeX->Degree() > 4)
+         NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddx =
+             m_PolynomeX->ComputeSecDerivative(InterpolationTime);
       //y, dy
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
           m_PolynomeY->Compute(InterpolationTime);
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy = 
           m_PolynomeY->ComputeDerivative(InterpolationTime);
+      if(m_PolynomeY->Degree() > 4)
+         NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddy =
+             m_PolynomeY->ComputeSecDerivative(InterpolationTime);
       //theta, dtheta
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
           m_PolynomeTheta->Compute( InterpolationTime );
@@ -186,44 +198,13 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
     dFY = s*dX;
   }
 
-#if _DEBUG_4_ACTIVATED_
-  ofstream aoflocal;
-  aoflocal.open("Corrections.dat",ofstream::app);
-  aoflocal << dFX << " " << dFY << " " << dFZ << " " << lOmega << endl;
-  aoflocal.close();
-#endif
+
   MAL_S3_VECTOR(Foot_Shift,double);
-#if 0
-  double co,so;
 
-  co = cos(lOmega);
-  so = sin(lOmega);
-
-  // COM Orientation
-  MAL_S3x3_MATRIX(Foot_R,double);
-
-  Foot_R(0,0) = c*co;        Foot_R(0,1) = -s;      Foot_R(0,2) = c*so;
-  Foot_R(1,0) = s*co;        Foot_R(1,1) =  c;      Foot_R(1,2) = s*so;
-  Foot_R(2,0) = -so;         Foot_R(2,1) = 0;       Foot_R(2,2) = co;
-
-  if (LeftOrRight==-1)
-    {
-      MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionRight);
-    }
-  else if (LeftOrRight==1)
-    MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionLeft);
-
-  // Modification of the foot position.
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x += (dFX + Foot_Shift(0));
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y += (dFY + Foot_Shift(1));
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z += (dFZ + Foot_Shift(2));
-#else
   // Modification of the foot position.
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x += dFX ;
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y += dFY ;
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z += dFZ ;
-#endif
-
 
 }
 
@@ -290,14 +271,12 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double time, int Curr
         }
 
       //Set parameters for current polynomial
-      SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::X_AXIS,
+      SetParameters(FootTrajectoryGenerationStandard::X_AXIS,
           UnlockedSwingPeriod-InterpolationTimePassed,FPx,
-          LastSwingFootPosition.x,
-          LastSwingFootPosition.dx);
-      SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Y_AXIS,
+          LastSwingFootPosition.x, LastSwingFootPosition.dx, LastSwingFootPosition.ddx);
+      SetParameters(FootTrajectoryGenerationStandard::Y_AXIS,
           UnlockedSwingPeriod-InterpolationTimePassed,FPy,
-          LastSwingFootPosition.y,
-          LastSwingFootPosition.dy);
+          LastSwingFootPosition.y, LastSwingFootPosition.dy, LastSwingFootPosition.ddy);
 
       if(CurrentSupport.StateChanged==true)
         SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle,StepHeight);

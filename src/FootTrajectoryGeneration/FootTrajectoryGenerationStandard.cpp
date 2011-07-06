@@ -117,8 +117,8 @@ void FootTrajectoryGenerationStandard::InitializeInternalDataStructures()
 {
   FreeInternalDataStructures();
   
-  m_PolynomeX = new Polynome3(0,0);
-  m_PolynomeY = new Polynome3(0,0);
+  m_PolynomeX = new Polynome5(0,0);
+  m_PolynomeY = new Polynome5(0,0);
   m_PolynomeZ = new Polynome4(0,0);
   m_PolynomeOmega = new Polynome3(0,0);
   m_PolynomeOmega2 = new Polynome3(0,0);
@@ -201,6 +201,43 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
      
    case Y_AXIS:
      m_PolynomeY->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   case Z_AXIS:
+     m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   case THETA_AXIS:
+     m_PolynomeTheta->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   case OMEGA_AXIS:
+     m_PolynomeOmega->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   case OMEGA2_AXIS:
+     m_PolynomeOmega2->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   default:
+     return -1;
+     break;
+   }
+ return 0;
+}
+
+int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double TimeInterval,
+    double FinalPosition, double InitPosition, double InitSpeed, double InitAcc)
+{
+ switch (PolynomeIndex)
+   {
+
+   case X_AXIS:
+     m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
+     break;
+
+   case Y_AXIS:
+     m_PolynomeY->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
      break;
 
    case Z_AXIS:
