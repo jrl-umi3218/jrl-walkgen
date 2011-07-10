@@ -80,6 +80,7 @@ QPProblem_s::release_memory()
 {
 }
 
+
 void
 QPProblem_s::resize_all()
 {
@@ -203,8 +204,8 @@ QPProblem_s::solve( int Solver, solution_t & Result )
           Result.ConstrLagr_vec(i) = U_.Array_[i];
         }
 
-      Result.Fail_ = ifail_;
-      Result.Print_ = iprint_;
+      Result.Fail = ifail_;
+      Result.Print = iprint_;
     }
 
 }
@@ -275,7 +276,8 @@ QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), int Type,
 }
 
 
-void QPProblem_s::add_term( const MAL_VECTOR (&Vec, double), int Type,
+void
+QPProblem_s::add_term( const MAL_VECTOR (&Vec, double), int Type,
     unsigned int Row )
 {
 
@@ -316,39 +318,6 @@ void QPProblem_s::add_term( const MAL_VECTOR (&Vec, double), int Type,
       VecIt++;
     }
 
-}
-
-
-void
-QPProblem_s::solution_t::resize( unsigned int SizeSolution, unsigned int SizeConstraints )
-{
-  NbVariables_ = SizeSolution;
-  NbConstraints_ = SizeConstraints;
-
-  Solution_vec.resize(SizeSolution, false);
-  ConstrLagr_vec.resize(SizeConstraints, false);
-  LBoundsLagr_vec.resize(SizeSolution, false);
-  UBoundsLagr_vec.resize(SizeSolution, false);
-}
-
-
-void
-QPProblem_s::solution_t::dump(const char * FileName)
-{
-  std::ofstream aof;
-  aof.open(FileName,std::ofstream::out);
-  print(aof);
-  aof.close();
-}
-
-
-void
-QPProblem_s::solution_t::print(std::ostream & aos)
-{
-  aos << "Arrays:" << std::endl
-      << "Solution: ";
-  for( unsigned int i = 0; i < NbVariables_; i++ )
-    {aos<<Solution_vec[i]<<" ";}; aos<<std::endl;
 }
 
 

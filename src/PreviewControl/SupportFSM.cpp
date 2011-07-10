@@ -55,9 +55,9 @@ void SupportFSM::set_support_state(const double &Time, const int &pi,
     ReferenceGiven = true;
 
   // Update time limit for double support phase
-  if(ReferenceGiven && Support.Phase == 0 && (Support.TimeLimit-Time-eps) > DSSSPeriod_)
+  if(ReferenceGiven && Support.Phase == DS && (Support.TimeLimit-Time-eps) > DSSSPeriod_)
     {
-      Support.TimeLimit = Time+DSSSPeriod_;
+      Support.TimeLimit = Time+DSSSPeriod_-T_/10.0;
       Support.NbStepsLeft = NbStepsSSDS_;
     }
 
@@ -66,27 +66,30 @@ void SupportFSM::set_support_state(const double &Time, const int &pi,
     {
 
       //SS->DS
-      if(Support.Phase == 1  && !ReferenceGiven && Support.NbStepsLeft == 0)
+      if(Support.Phase == SS  && !ReferenceGiven && Support.NbStepsLeft == 0)
 	{
-	  Support.Phase = 0;
-	  Support.TimeLimit = Time+pi*T_ + DSPeriod_;
+	  Support.Phase = DS;
+	  Support.TimeLimit = Time+pi*T_+DSPeriod_-T_/10.0;
 	  Support.StateChanged = true;
 	}
       //DS->SS
-      else if(Support.Phase == 0 && ReferenceGiven || Support.Phase == 0 && Support.NbStepsLeft > 0)
+      else if(Support.Phase == DS && ReferenceGiven || Support.Phase == DS && Support.NbStepsLeft > 0)
 	{
-	  Support.Phase = 1;
-	  Support.TimeLimit = Time+pi*T_ + StepPeriod_;
+	  Support.Phase = SS;
+	  Support.TimeLimit = Time+pi*T_+StepPeriod_-T_/10.0;
 	  Support.NbStepsLeft = NbStepsSSDS_;
 	  Support.StateChanged = true;
 	}
       //SS->SS
-      else if(Support.Phase == 1 && Support.NbStepsLeft > 0 ||
+      else if(Support.Phase == SS && Support.NbStepsLeft > 0 ||
 	      Support.NbStepsLeft == 0 && ReferenceGiven)
 	{
-	  Support.Foot = -1*Support.Foot;
+          if(Support.Foot == LEFT)
+            Support.Foot = RIGHT;
+          else
+            Support.Foot = LEFT;
 	  Support.StateChanged = true;
-	  Support.TimeLimit = Time+pi*T_ + StepPeriod_;
+	  Support.TimeLimit = Time+pi*T_+StepPeriod_-T_/10.0;
 	  Support.StepNumber++;
 	  if (!ReferenceGiven)
 	    Support.NbStepsLeft = Support.NbStepsLeft-1;

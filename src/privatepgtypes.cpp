@@ -24,6 +24,9 @@
  */
 #include <privatepgtypes.h>
 
+#include <iostream>
+#include <fstream>
+
 namespace PatternGeneratorJRL
 {
 
@@ -49,8 +52,8 @@ namespace PatternGeneratorJRL
   void support_state_t::reset()
   {
 
-    Phase  = 0;
-    Foot  = 0;
+    Phase = DS;
+    Foot = LEFT;
     NbStepsLeft  = 0;
     TimeLimit = 0.0;
     StepNumber  = 0;
@@ -233,6 +236,39 @@ namespace PatternGeneratorJRL
     D.y.resize(NbRows, NbCols, Preserve);
     dc.resize(NbRows, Preserve);
 
+  }
+
+
+  void
+  solution_t::resize( unsigned int SizeSolution, unsigned int SizeConstraints )
+  {
+    NbVariables = SizeSolution;
+    NbConstraints = SizeConstraints;
+
+    Solution_vec.resize(SizeSolution, false);
+    ConstrLagr_vec.resize(SizeConstraints, false);
+    LBoundsLagr_vec.resize(SizeSolution, false);
+    UBoundsLagr_vec.resize(SizeSolution, false);
+  }
+
+
+  void
+  solution_t::dump( const char * FileName )
+  {
+    std::ofstream aof;
+    aof.open(FileName,std::ofstream::out);
+    print(aof);
+    aof.close();
+  }
+
+
+  void
+  solution_t::print( std::ostream & aos )
+  {
+    aos << "Arrays:" << std::endl
+        << "Solution: ";
+    for( unsigned int i = 0; i < NbVariables; i++ )
+      {aos<<Solution_vec[i]<<" ";}; aos<<std::endl;
   }
 
 }

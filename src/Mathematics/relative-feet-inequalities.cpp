@@ -173,16 +173,16 @@ RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
 
     }
   //Prepare the computation of the convex hull
-  if( PrwSupport.Foot == 1 )
+  if( PrwSupport.Foot == LEFT )
     {
-      if( PrwSupport.Phase == 0 )
+      if( PrwSupport.Phase == DS )
         ConvexHull = ConvexHull_p->LeftDS;
       else
         ConvexHull = ConvexHull_p->LeftSS;
     }
   else
     {
-      if( PrwSupport.Phase == 0 )
+      if( PrwSupport.Phase == DS )
         ConvexHull = ConvexHull_p->RightDS;
       else
         ConvexHull = ConvexHull_p->RightSS;
@@ -207,7 +207,11 @@ RelativeFeetInequalities::compute_linear_system( const convex_hull_t & ConvexHul
   MAL_MATRIX_RESIZE( D,ConvexHull.X.size(),2 );
   MAL_MATRIX_RESIZE( Dc,ConvexHull.X.size(),1 );
 
-
+  double Sign;
+  if(PrwSupport.Foot == LEFT)
+    Sign = 1.0;
+  else
+    Sign = -1.0;
   for( unsigned i=0;i<n-1;i++ )//first n-1 inequalities
     {
       y1 = ConvexHull.Y[i];
@@ -220,9 +224,9 @@ RelativeFeetInequalities::compute_linear_system( const convex_hull_t & ConvexHul
       dc = dx*x1+dy*y1;
 
       //symmetrical constraints
-      dx = (double)PrwSupport.Foot*dx;
-      dy = (double)PrwSupport.Foot*dy;
-      dc = (double)PrwSupport.Foot*dc;
+      dx = Sign*dx;
+      dy = Sign*dy;
+      dc = Sign*dc;
 
       D(i,0) = dx; D(i,1)= dy;
       Dc(i,0) = dc;
@@ -242,9 +246,9 @@ RelativeFeetInequalities::compute_linear_system( const convex_hull_t & ConvexHul
     dc = dx*x1+dy*y1;
 
     //for symmetrical constraints
-    dx = (double)PrwSupport.Foot*dx;
-    dy = (double)PrwSupport.Foot*dy;
-    dc = (double)PrwSupport.Foot*dc;
+    dx = Sign*dx;
+    dy = Sign*dy;
+    dc = Sign*dc;
 
     D(i,0) = dx; D(i,1)= dy;
     Dc(i,0) = dc;
@@ -264,6 +268,11 @@ RelativeFeetInequalities::compute_linear_system (const convex_hull_t & ConvexHul
   double dx,dy,dc,x1,y1,x2,y2;
   unsigned nrows = ConvexHull.X.size();
 
+  double Sign;
+  if(PrwSupport.Foot == LEFT)
+    Sign = 1.0;
+  else
+    Sign = -1.0;
   for( unsigned i=0;i<nrows-1;i++ )//first n-1 inequalities
     {
       y1 = ConvexHull.Y[i];
@@ -276,9 +285,9 @@ RelativeFeetInequalities::compute_linear_system (const convex_hull_t & ConvexHul
       dc = dx*x1+dy*y1;
 
       //symmetrical constraints
-      dx = (double)PrwSupport.Foot*dx;
-      dy = (double)PrwSupport.Foot*dy;
-      dc = (double)PrwSupport.Foot*dc;
+      dx = Sign*dx;
+      dy = Sign*dy;
+      dc = Sign*dc;
 
       Dx[i] = dx; Dy[i]= dy;
       Dc[i] = dc;
@@ -298,9 +307,9 @@ RelativeFeetInequalities::compute_linear_system (const convex_hull_t & ConvexHul
     dc = dx*x1+dy*y1;
 
     //for symmetrical constraints
-    dx = (double)PrwSupport.Foot*dx;
-    dy = (double)PrwSupport.Foot*dy;
-    dc = (double)PrwSupport.Foot*dc;
+    dx = Sign*dx;
+    dy = Sign*dy;
+    dc = Sign*dc;
 
     Dx[i] = dx; Dy[i]= dy;
     Dc[i] = dc;

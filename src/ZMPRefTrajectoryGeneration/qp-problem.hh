@@ -55,53 +55,6 @@ namespace PatternGeneratorJRL
     const static int QLD=10;
     const static int PLDP=11;
 
-    /// \brief Solution
-    struct solution_s
-    {
-
-      /// \brief Size of the solution array
-      unsigned int NbVariables_;
-
-      /// \brief Number of constraints (lagrange multipliers)
-      unsigned int NbConstraints_;
-
-      /// \brief SHOWS THE TERMINATION REASON.
-      ///   IFAIL = 0 :   SUCCESSFUL RETURN.
-      ///   IFAIL = 1 :   TOO MANY ITERATIONS (MORE THAN 40*(N+M)).
-      ///   IFAIL = 2 :   ACCURACY INSUFFICIENT TO SATISFY CONVERGENCE
-      ///                 CRITERION.
-      ///   IFAIL = 5 :   LENGTH OF A WORKING ARRAY IS TOO SHORT.
-      ///   IFAIL > 10 :  THE CONSTRAINTS ARE INCONSISTENT.
-      int Fail_;
-
-      /// \brief OUTPUT CONTROL.
-      ///   IPRINT = 0 :  NO OUTPUT OF QL0001.
-      ///   IPRINT > 0 :  BRIEF OUTPUT IN ERROR CASES.
-      int Print_;
-
-      /// \brief Solution vector
-      boost_ublas::vector<double> Solution_vec;
-
-      /// \brief Lagrange multipliers of the constraints
-      boost_ublas::vector<double> ConstrLagr_vec;
-      /// \brief Lagrange multipliers of the lower bounds
-      boost_ublas::vector<double> LBoundsLagr_vec;
-      /// \brief Lagrange multipliers of the upper bounds
-      boost_ublas::vector<double> UBoundsLagr_vec;
-
-      /// \brief Resize solution containers
-      void resize( unsigned int NbVariables, unsigned int NbConstraints );
-
-      /// \brief Dump solution
-      /// \param Filename
-      void dump( const char * Filename );
-      /// \brief Print_ solution
-      /// \param aos
-      void print( std::ostream & aos);
-
-    };
-    typedef struct solution_s solution_t;
-
 
     //
     //Public methods

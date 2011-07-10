@@ -71,7 +71,7 @@ namespace PatternGeneratorJRL
   enum DynamicsType
   {
     POSITION, VELOCITY, ACCELERATION,
-    JERK, COP
+    JERK
   };
 
   /// \name Dynamics matrices
@@ -105,17 +105,16 @@ namespace PatternGeneratorJRL
 
     ~RigidBody();
 
-
-    /// \brief Initialize
-    ///
-    /// \return 0
-    int initialize();
-
     /// \brief Interpolate
     int interpolate(std::deque<COMState> &COMStates,
         std::deque<ZMPPosition> &ZMPRefPositions,
         int CurrentPosition,
         double CX, double CY);
+
+    /// \brief Initialize
+    ///
+    /// \return 0
+    int initialize();
 
     /// \brief Increment the state
     ///
@@ -161,12 +160,6 @@ namespace PatternGeneratorJRL
     // Private member functions
     //
   private:
-
-    /// \brief Initialize dynamics
-    ///
-    /// \return 0
-    int initialize_dynamics( linear_dynamics_t & Dynamics );
-
 
     //
     // Private members

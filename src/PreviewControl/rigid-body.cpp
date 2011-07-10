@@ -45,79 +45,19 @@ RigidBody::~RigidBody()
 }
 
 
-int
-RigidBody::initialize()
+int RigidBody::initialize()
 {
 
-  // Initialize dynamics
-  // -------------------
-  initialize_dynamics( PositionDynamics_ );
-  initialize_dynamics( VelocityDynamics_ );
-  initialize_dynamics( JerkDynamics_ );
+  PositionDynamics_.S.resize(N_,3,false);
+  PositionDynamics_.S.clear();
+  VelocityDynamics_.S.resize(N_,3,false);
+  VelocityDynamics_.S.clear();
+  AccelerationDynamics_.S.resize(N_,3,false);
+  AccelerationDynamics_.S.clear();
 
   return 0;
 
 }
-
-
-int
-RigidBody::initialize_dynamics( linear_dynamics_t & Dynamics )
-{
-
-  bool preserve = true;
-  Dynamics.U.resize(N_,N_,!preserve);
-  Dynamics.U.clear();
-  Dynamics.UT.resize(N_,N_,!preserve);
-  Dynamics.UT.clear();
-  Dynamics.S.resize(N_,3,!preserve);
-  Dynamics.S.clear();
-
-  switch(Dynamics.Type)
-  {
-  case POSITION:
-    for(unsigned int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 1; Dynamics.S(i,1) =(i+1)* T_; Dynamics.S(i,2) = ((i+1)* T_)*((i+1)* T_)/2;
-        for(unsigned int j=0;j<N_;j++)
-          if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) =(1+3*(i-j)+3*(i-j)*(i-j))*(T_*T_*T_)/6 ;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
-    break;
-  case VELOCITY:
-    for(unsigned int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 1.0; Dynamics.S(i,2) = (i+1)*T_;
-        for(unsigned int j=0;j<N_;j++)
-          if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = (2*(i-j)+1)*T_*T_*0.5 ;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
-    break;
-  case ACCELERATION:
-    break;
-  case JERK:
-    for(unsigned int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 0.0; Dynamics.S(i,2) = 0.0;
-        for(unsigned int j=0;j<N_;j++)
-          if (j==i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 1.0;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
-    break;
-  case COP:
-    break;
-
-  }
-
-  return 0;
-
-}
-
 
 // TODO: RigidBody::interpolate RigidBody::increment_state
 //int
@@ -157,8 +97,6 @@ RigidBody::Dynamics( DynamicsType Type ) const
     return AccelerationDynamics_;
   case JERK:
     return JerkDynamics_;
-  case COP:
-    break;
   }
 
   return VelocityDynamics_;
@@ -179,8 +117,6 @@ RigidBody::Dynamics( DynamicsType Type )
     return AccelerationDynamics_;
   case JERK:
     return JerkDynamics_;
-  case COP:
-    break;
   }
 
   return VelocityDynamics_;
@@ -188,8 +124,14 @@ RigidBody::Dynamics( DynamicsType Type )
 }
 
 
-// INTERNAL TYPE METHODS:
-// ----------------------
+//
+// Private methods
+//
+
+
+//
+// Internal type methods:
+//
 rigid_body_state_s::rigid_body_state_s()
 {
 

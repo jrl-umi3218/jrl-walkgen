@@ -109,7 +109,7 @@ OrientationsPreview::preview_orientations(double Time,
       // Initialize support orientation:
       // -------------------------------
       double CurrentSupportAngle;
-      if (CurrentSupport.Foot == 1)
+      if (CurrentSupport.Foot == LEFT)
 	  CurrentSupportAngle = LeftFootPositions_deq[0].theta*M_PI/180.0;
       else
 	  CurrentSupportAngle = RightFootPositions_deq[0].theta*M_PI/180.0;
@@ -117,7 +117,7 @@ OrientationsPreview::preview_orientations(double Time,
 
       // (Re)Compute the trunk orientation at the end of the acceleration phase:
       // -----------------------------------------------------------------------
-      if(CurrentSupport.Phase != 0)
+      if(CurrentSupport.Phase != DS)
 	{
 	  TrunkAngleOK = false;
 	  while(!TrunkAngleOK)
@@ -152,7 +152,11 @@ OrientationsPreview::preview_orientations(double Time,
       // Initialize variables in the orientations preview loop:
       // ------------------------------------------------------
       double PreviousSupportAngle = CurrentSupportAngle;
-      double PreviewedSupportFoot = CurrentSupport.Foot;
+      double PreviewedSupportFoot;
+      if(CurrentSupport.Foot == LEFT)
+        PreviewedSupportFoot = 1.0;
+      else
+        PreviewedSupportFoot = -1.0;
       double CurrentLeftFootAngle = LeftFoot.theta*M_PI/180.0;
       double CurrentRightFootAngle = RightFoot.theta*M_PI/180.0;
       double CurrentLeftFootVelocity = LeftFoot.dtheta*M_PI/180.0;
@@ -215,7 +219,7 @@ void
 OrientationsPreview::verify_acceleration_hip_joint(const reference_t & Ref,
 						       const support_state_t & CurrentSupport)
 {
-  if(CurrentSupport.Phase != 0)
+  if(CurrentSupport.Phase != DS)
       //Verify change in velocity reference against the maximal acceleration of the hip joint
     if(fabs(Ref.Local.yaw-TrunkState_.yaw[1]) > 2.0/3.0*T_*uaLimitHipYaw_)
 	{
@@ -239,7 +243,7 @@ OrientationsPreview::verify_angle_hip_joint(const support_state_t & CurrentSuppo
 
   //Which limitation is relevant in the current situation?
   double uJointLimit, lJointLimit, JointLimit;
-  if(CurrentSupport.Foot == 1)
+  if(CurrentSupport.Foot == LEFT)
     {
       uJointLimit = uLimitLeftHipYaw_;
       lJointLimit = lLimitLeftHipYaw_;
@@ -280,7 +284,7 @@ OrientationsPreview::verify_velocity_hip_joint(double Time,
 
   //To be implemented
   //For the
-  if(StepNumber>0 && CurrentSupport.Phase==1)
+  if(StepNumber>0 && CurrentSupport.Phase == SS)
     {
       //verify the necessary, maximal, relative foot velocity
       double MeanFootVelDifference = (PreviewedSupportAngle-CurrentAngle)/(SSPeriod_-T_);
@@ -292,7 +296,7 @@ OrientationsPreview::verify_velocity_hip_joint(double Time,
 	  PreviewedSupportAngle = CurrentAngle+MeanFootVelDifference*(SSPeriod_-T_);
 	}
     }
-  else if((StepNumber==0 && CurrentSupport.Phase==1) || (StepNumber==1 && CurrentSupport.Phase==0))
+  else if((StepNumber==0 && CurrentSupport.Phase == SS) || (StepNumber==1 && CurrentSupport.Phase == DS))
     {
       T = CurrentSupport.TimeLimit-Time-T_;
       //Previewed polynome
@@ -323,7 +327,7 @@ OrientationsPreview::interpolate_trunk_orientation(double time, int CurrentIndex
                                                     const support_state_t & CurrentSupport,
                                                     deque<COMState> & FinalCOMTraj_deq)
 {
-  if(CurrentSupport.Phase == 1 && time+3.0/2.0*T_ < CurrentSupport.TimeLimit)
+  if(CurrentSupport.Phase == SS && time+3.0/2.0*T_ < CurrentSupport.TimeLimit)
     {
       //Fourth order polynomial parameters
       double a =  TrunkState_.yaw[1];
@@ -355,7 +359,7 @@ OrientationsPreview::interpolate_trunk_orientation(double time, int CurrentIndex
 	  FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkState_.yaw[1];
         }
     }
-  else if (CurrentSupport.Phase == 0 || time+3.0/2.0*T_ > CurrentSupport.TimeLimit)
+  else if (CurrentSupport.Phase == DS || time+3.0/2.0*T_ > CurrentSupport.TimeLimit)
     {
       for(int k = 0; k<=(int)(T_/NewSamplingPeriod);k++)
         {

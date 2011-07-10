@@ -36,42 +36,6 @@
 namespace PatternGeneratorJRL
 {
 
-  /// \brief Support state of the robot at a certain point in time
-  struct support_state_s
-  {
-    const static int DS=0;
-    const static int SS=1;
-    const static int LEFT=2;
-    const static int RIGHT=-2;
-
-    /// \brief Support phase
-    int Phase;
-    /// \brief Support foot
-    int Foot;
-    /// \brief Number steps left before double support
-    unsigned int NbStepsLeft;
-    /// \brief Number of step previewed
-    unsigned int StepNumber;
-
-    /// \brief Time until StateChanged == true
-    double TimeLimit;
-    /// \brief start time
-    double StartTime;
-    /// \brief Position and orientation on a plane
-    double x,y,yaw;
-
-    /// \brief (true) -> New single support state
-    bool StateChanged;
-
-
-    struct support_state_s & operator = (const support_state_s &aSS);
-
-    void reset();
-
-    support_state_s();
-  };
-  typedef struct support_state_s support_state_t;
-
   /// \brief State of the center of mass
   struct com_s
   {
@@ -211,8 +175,94 @@ namespace PatternGeneratorJRL
   typedef struct linear_inequality_s
     linear_inequality_t;
 
+  /// \brief Solution
+  struct solution_s
+  {
+
+    /// \brief Size of the solution array
+    unsigned int NbVariables;
+
+    /// \brief Number of constraints (lagrange multipliers)
+    unsigned int NbConstraints;
+
+    /// \brief SHOWS THE TERMINATION REASON.
+    ///   IFAIL = 0 :   SUCCESSFUL RETURN.
+    ///   IFAIL = 1 :   TOO MANY ITERATIONS (MORE THAN 40*(N+M)).
+    ///   IFAIL = 2 :   ACCURACY INSUFFICIENT TO SATISFY CONVERGENCE
+    ///                 CRITERION.
+    ///   IFAIL = 5 :   LENGTH OF A WORKING ARRAY IS TOO SHORT.
+    ///   IFAIL > 10 :  THE CONSTRAINTS ARE INCONSISTENT.
+    int Fail;
+
+    /// \brief OUTPUT CONTROL.
+    ///   IPRINT = 0 :  NO OUTPUT OF QL0001.
+    ///   IPRINT > 0 :  BRIEF OUTPUT IN ERROR CASES.
+    int Print;
+
+    /// \brief Solution vector
+    boost_ublas::vector<double> Solution_vec;
+
+    /// \brief Lagrange multipliers of the constraints
+    boost_ublas::vector<double> ConstrLagr_vec;
+    /// \brief Lagrange multipliers of the lower bounds
+    boost_ublas::vector<double> LBoundsLagr_vec;
+    /// \brief Lagrange multipliers of the upper bounds
+    boost_ublas::vector<double> UBoundsLagr_vec;
+
+    /// \brief Resize solution containers
+    void resize( unsigned int NbVariables, unsigned int NbConstraints );
+
+    /// \brief Dump solution
+    /// \param Filename
+    void dump( const char * Filename );
+    /// \brief Print_ solution
+    /// \param aos
+    void print( std::ostream & aos);
+
+  };
+  typedef struct solution_s solution_t;
+
+  enum FootType
+  {
+    LEFT, RIGHT
+  };
+
+  enum PhaseType
+  {
+    SS, DS
+  };
+
+  /// \brief Support state of the robot at a certain point in time
+  struct support_state_s
+  {
+
+    /// \brief Support phase
+    PhaseType Phase;
+    /// \brief Support foot
+    FootType Foot;
+    /// \brief Number steps left before double support
+    unsigned int NbStepsLeft;
+    /// \brief Number of step previewed
+    unsigned int StepNumber;
+
+    /// \brief Time until StateChanged == true
+    double TimeLimit;
+    /// \brief start time
+    double StartTime;
+    /// \brief Position and orientation on a plane
+    double x,y,yaw;
+
+    /// \brief (true) -> New single support state
+    bool StateChanged;
 
 
+    struct support_state_s & operator = (const support_state_s &aSS);
+
+    void reset();
+
+    support_state_s();
+  };
+  typedef struct support_state_s support_state_t;
 
 }
 

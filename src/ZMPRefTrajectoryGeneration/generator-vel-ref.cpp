@@ -56,10 +56,10 @@ GeneratorVelRef::~GeneratorVelRef()
 
 	
 void 
-GeneratorVelRef::Ponderation( double Weight, int type)
+GeneratorVelRef::Ponderation( double Weight, int Type)
 {
 
-  IntermedQPMat::objective_variant_t & Objective = Matrices_->Objective( type );
+  IntermedQPMat::objective_variant_t & Objective = Matrices_->Objective( Type );
   Objective.weight = Weight;
 
 }	
@@ -204,7 +204,7 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 
   const support_state_t & CurrentSupport = SupportStates_deq.front();
   double CurrentSupportAngle;
-  if( CurrentSupport.Foot==1 )
+  if( CurrentSupport.Foot == LEFT )
     CurrentSupportAngle = LeftFootPositions_deq.back().theta*M_PI/180.0;
   else
     CurrentSupportAngle = RightFootPositions_deq.back().theta*M_PI/180.0;
@@ -258,7 +258,7 @@ GeneratorVelRef::build_inequalities_feet(linear_inequality_t & Inequalities,
   // Initialize support angle
   const support_state_t & CurrentSupport = SupportStates_deq.front();
   double CurrentSupportAngle;
-  if( CurrentSupport.Foot == 1 )
+  if( CurrentSupport.Foot == LEFT )
     CurrentSupportAngle = LeftFootPositions_deq.back().theta*M_PI/180.0;
   else
     CurrentSupportAngle = RightFootPositions_deq.back().theta*M_PI/180.0;
@@ -282,7 +282,7 @@ GeneratorVelRef::build_inequalities_feet(linear_inequality_t & Inequalities,
       const support_state_t & PrwSupport = SupportStates_deq[i];
 
       //foot positioning constraints
-      if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 && PrwSupport.Phase != 0)
+      if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 && PrwSupport.Phase != DS)
 	{
 	  SupportAngle = PreviewedSupportAngles_deq[PrwSupport.StepNumber-1];
 
@@ -685,7 +685,7 @@ GeneratorVelRef::build_constraints( QPProblem & Pb,
 		       LeftFootPositions_deq, RightFootPositions_deq,
 		       SupportStates_deq, PreviewedSupportAngles_deq);
 
-  const linear_dynamics_t & CoP = Robot_->Dynamics( COP );
+  const linear_dynamics_t & CoP = Robot_->Dynamics( );
   const IntermedQPMat::state_variant_t & State = Matrices_->State();
   int NbStepsPreviewed = SupportStates_deq.back().StepNumber;
   build_constraints_cop(IneqCoP, CoP, State, NbStepsPreviewed, Pb);
@@ -725,7 +725,7 @@ GeneratorVelRef::build_invariant_part(QPProblem & Pb)
 
   // +a*U'*U
   const IntermedQPMat::objective_variant_t & COPCent = Matrices_->Objective(IntermedQPMat::COP_CENTERING);
-  const linear_dynamics_t & CoPDynamics = Robot_->Dynamics( COP );
+  const linear_dynamics_t & CoPDynamics = Robot_->Dynamics();
   compute_term(weightMTM, COPCent.weight, CoPDynamics.UT, CoPDynamics.U);
   Pb.add_term(weightMTM, QPProblem::MATRIX_Q, 0, 0);
   Pb.add_term(weightMTM, QPProblem::MATRIX_Q, N_, N_);
@@ -768,7 +768,7 @@ GeneratorVelRef::update_problem(QPProblem & Pb, const std::deque<support_state_t
 
   // COP - centering terms
   const IntermedQPMat::objective_variant_t & COPCent = Matrices_->Objective(IntermedQPMat::COP_CENTERING);
-  const linear_dynamics_t & CoPDynamics = Robot_->Dynamics( COP );
+  const linear_dynamics_t & CoPDynamics = Robot_->Dynamics( );
   // Hessian
   // -a*U'*V
   compute_term(weightMTM, -COPCent.weight, CoPDynamics.UT, State.V);

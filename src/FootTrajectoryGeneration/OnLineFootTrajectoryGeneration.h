@@ -67,7 +67,7 @@ namespace PatternGeneratorJRL
    /// Set the foot position at index CurrentAbsoluteIndex of the queue.
    /// \param[out] StanceFootTraj_deq Queue of absolute position for the swinging
    /// foot. Set the foot position at index NoneSupportFootAbsolutePositions of the queue.
-   virtual void interpolate_feet_positions(double time, int CurrentIndex,
+   virtual void interpolate_feet_positions(double Time,
                                  const support_state_t & CurrentSupport,
                                  double FPx, double FPy,
                                  const deque<double> & PreviewedSupportAngles_deq,

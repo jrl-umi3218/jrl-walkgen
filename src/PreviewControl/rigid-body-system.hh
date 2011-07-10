@@ -27,6 +27,12 @@
 #define _RIGID_BODY_SYSTEM_
 
 #include <PreviewControl/rigid-body.hh>
+#include <privatepgtypes.h>
+#include <PreviewControl/SupportFSM.h>
+#include <FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.h>
+#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+
+//#include <jrl/walkgen/pgtypes.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -38,19 +44,47 @@ namespace PatternGeneratorJRL
     //
   public:
 
-    RigidBodySystem();
+    RigidBodySystem( SimplePluginManager *SPM, CjrlHumanoidDynamicRobot *aHS );
 
     ~RigidBodySystem();
 
     /// \brief Initialize
-    void initialize();
+    void initialize( );
 
-//    /// \brief Interpolate
-//    int interpolate(std::deque<COMState> &COMStates,
-//		      std::deque<ZMPPosition> &ZMPRefPositions,
-//		      int CurrentPosition,
-//		      double CX, double CY);
-//
+    /// \brief Interpolate
+    int interpolate( solution_t Result,
+        std::deque<ZMPPosition> & FinalZMPTraj_deq,
+        std::deque<COMState> & FinalCOMTraj_deq,
+        std::deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+        std::deque<FootAbsolutePosition> &FinalRightFootTraj_deq );
+
+    /// \brief Update feet matrices
+    ///
+    /// \param[in] FSM Finite state machine
+    /// \param[in] CurrentSupport The current support state
+    /// \param[in] Time Current time
+    int update( const SupportFSM * FSM, support_state_t & CurrentSupport, double Time );
+
+    /// \brief Initialize dynamics of the body center
+    /// Suppose a piecewise constant jerk
+    /// \param[in] Dynamics Matrices to be filled
+    ///
+    /// return 0
+    int compute_dyn_cjerk();
+
+    /// \brief Generate trajectories
+    ///
+    /// \param[in]
+    /// \param[in]
+    /// \param[in]
+    /// \param[in]
+    /// \param[in]
+    ///
+    /// return 0
+    int generate_trajectories( double Time, const support_state_t & CurrentSupport, const solution_t & Result,
+        const std::deque<support_state_t> & SupportStates_deq, const std::deque<double> & PreviewedSupportAngles_deq,
+              std::deque<FootAbsolutePosition> & LeftFootTraj_deq, std::deque<FootAbsolutePosition> & RightFootTraj_deq);
+
 //    /// \brief Increment the state
 //    ///
 //    /// \param[in] Control Control vector
@@ -66,8 +100,8 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors and mutators
     /// \{
-    linear_dynamics_t const & Dynamics( DynamicsType ) const;
-    linear_dynamics_t & Dynamics( DynamicsType );
+    linear_dynamics_t const & Dynamics() const;
+    linear_dynamics_t & Dynamics();
 
     inline RigidBody const & CoM() const
     {return CoM_;};
@@ -106,24 +140,52 @@ namespace PatternGeneratorJRL
     //
   private:
 
-    /// \brief Initialize dynamics matrices
+    /// \brief Initialize dynamics of the CoP
     ///
     /// \param[in] Dynamics Matrices to be filled
     ///
     /// return 0
-    int initialize_dynamics( linear_dynamics_t & Dynamics );
+    int compute_dyn_cop();
+
+    /// \brief Initialize dynamics of the body center
+    /// Suppose a piecewise constant jerk
+    /// \param[in] Dynamics Matrices to be filled
+    ///
+    /// return 0
+    int compute_dyn_cjerk( linear_dynamics_t & Dynamics );
+
+    /// \brief Initialize dynamics of the body center
+    /// Suppose a higher order polynomial
+    /// \param[in] Dynamics Matrices to be filled
+    ///
+    /// return 0
+    int compute_dyn_pol_feet( linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics,
+        const SupportFSM * FSM, const support_state_t & CurrentSupport, double Time );
+
+    /// \brief Compute a row of the dynamic matrix Sp
+    int compute_sbar( double * Spbar, double * Sabar, double T, double Td );
+
+    /// \brief Compute a row of the dynamic matrix Up
+    int compute_ubar( double * Upbar, double * Uabar, double T, double Td );
+
 
     //
     // Private members
     //
   private:
 
-    /// \brief Body
-    RigidBody CoM_;
+    /// \brief Bodies
+    RigidBody
+    CoM_,
+    LeftFoot_,
+    RightFoot_;
     
     /// \brief Center of Pressure dynamics
     linear_dynamics_t
     CoPDynamics_;
+
+    /// \brief Standard polynomial trajectories for the feet.
+    OnLineFootTrajectoryGeneration * OFTG_;
 
     /// \brief Total robot mass
     double Mass_;

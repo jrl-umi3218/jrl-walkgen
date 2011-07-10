@@ -34,11 +34,8 @@
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <PreviewControl/rigid-body-system.hh>
 #include <Mathematics/relative-feet-inequalities.hh>
-#include <Mathematics/OptCholesky.h>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
-#include <Mathematics/PLDPSolverHerdt.h>
 #include <PreviewControl/SupportFSM.h>
-#include <FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.h>
 #include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 #include <privatepgtypes.h>
@@ -171,9 +168,6 @@ namespace PatternGeneratorJRL
 
     /// \brief Object creating linear inequalities relative to feet centers.
     RelativeFeetInequalities * RFC_;
-
-    /// \brief Standard polynomial trajectories for the feet.
-    OnLineFootTrajectoryGeneration * OFTG_;
 
     /// \brief Final optimization problem
     QPProblem Problem_;
