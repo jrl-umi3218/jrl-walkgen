@@ -255,6 +255,8 @@ namespace PatternGeneratorJRL
     /// \brief (true) -> New single support state
     bool StateChanged;
 
+    /// \brief Number instants in current state
+    unsigned int NbInstants;
 
     struct support_state_s & operator = (const support_state_s &aSS);
 

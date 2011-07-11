@@ -42,43 +42,46 @@ SupportFSM::~SupportFSM()
 {
 }
 
-void SupportFSM::set_support_state(const double &Time, const int &pi,
+void SupportFSM::set_support_state(double Time, int Pi,
 				 support_state_t & Support, const reference_t & Ref) const
 {
 
-  double eps = 1e-6;
+  const double EPS = 1e-6;
 
   Support.StateChanged = false;
+  Support.NbInstants++;
 
   bool ReferenceGiven = false;
-  if(fabs(Ref.Local.x)>eps||fabs(Ref.Local.y)>eps||fabs(Ref.Local.yaw)>eps)
+  if(fabs(Ref.Local.x)>EPS||fabs(Ref.Local.y)>EPS||fabs(Ref.Local.yaw)>EPS)
     ReferenceGiven = true;
 
   // Update time limit for double support phase
-  if(ReferenceGiven && Support.Phase == DS && (Support.TimeLimit-Time-eps) > DSSSPeriod_)
+  if(ReferenceGiven && Support.Phase == DS && (Support.TimeLimit-Time-EPS) > DSSSPeriod_)
     {
       Support.TimeLimit = Time+DSSSPeriod_-T_/10.0;
       Support.NbStepsLeft = NbStepsSSDS_;
     }
 
   //FSM
-  if(Time+eps+pi*T_ >= Support.TimeLimit)
+  if(Time+EPS+Pi*T_ >= Support.TimeLimit)
     {
 
       //SS->DS
       if(Support.Phase == SS  && !ReferenceGiven && Support.NbStepsLeft == 0)
 	{
 	  Support.Phase = DS;
-	  Support.TimeLimit = Time+pi*T_+DSPeriod_-T_/10.0;
+	  Support.TimeLimit = Time+Pi*T_+DSPeriod_-T_/10.0;
 	  Support.StateChanged = true;
+	  Support.NbInstants = 0;
 	}
       //DS->SS
       else if(Support.Phase == DS && ReferenceGiven || Support.Phase == DS && Support.NbStepsLeft > 0)
 	{
 	  Support.Phase = SS;
-	  Support.TimeLimit = Time+pi*T_+StepPeriod_-T_/10.0;
+	  Support.TimeLimit = Time+Pi*T_+StepPeriod_-T_/10.0;
 	  Support.NbStepsLeft = NbStepsSSDS_;
 	  Support.StateChanged = true;
+	  Support.NbInstants = 0;
 	}
       //SS->SS
       else if(Support.Phase == SS && Support.NbStepsLeft > 0 ||
@@ -89,7 +92,8 @@ void SupportFSM::set_support_state(const double &Time, const int &pi,
           else
             Support.Foot = LEFT;
 	  Support.StateChanged = true;
-	  Support.TimeLimit = Time+pi*T_+StepPeriod_-T_/10.0;
+	  Support.NbInstants = 0;
+	  Support.TimeLimit = Time+Pi*T_+StepPeriod_-T_/10.0;
 	  Support.StepNumber++;
 	  if (!ReferenceGiven)
 	    Support.NbStepsLeft = Support.NbStepsLeft-1;

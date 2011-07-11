@@ -58,6 +58,7 @@ namespace PatternGeneratorJRL
     TimeLimit = 0.0;
     StepNumber  = 0;
     StateChanged = false;
+    NbInstants = 0;
     StartTime = 0.0;
     x = 0.0;
     y = 0.0;
