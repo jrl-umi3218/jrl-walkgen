@@ -75,7 +75,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   SupportFSM_->SamplingPeriod(QP_T_);
 
   // Create and initialize preview of orientations
-  OrientPrw_ = new OrientationsPreview(aHS->rootJoint());
+  OrientPrw_ = new OrientationsPreview( aHS->rootJoint() );
   OrientPrw_->SamplingPeriod( QP_T_ );
   OrientPrw_->NbSamplingsPreviewed( QP_N_ );
   OrientPrw_->SSLength( SupportFSM_->StepPeriod() );
@@ -88,7 +88,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   CoM_.InitializeSystem();
 
   // Create and initialize simplified robot
-  Robot_ = new RigidBodySystem( SPM, aHS );
+  Robot_ = new RigidBodySystem( SPM, aHS, SupportFSM_ );
   Robot_->Mass( aHS->mass() );
   Robot_->NbSamplingsPreviewed( QP_N_ );
   Robot_->SamplingPeriodSim( QP_T_ );
@@ -351,9 +351,9 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // UPDATE INTERNAL DATA:
       // ---------------------
-      VRQPGenerator_->CurrentTime(Time);
-      IntermedData_->Reference(VelRef_);
-      IntermedData_->CoM(CoM_());// TODO: still necessary?
+      VRQPGenerator_->CurrentTime( Time );
+      IntermedData_->Reference( VelRef_ );
+      IntermedData_->CoM( CoM_() );// TODO: still necessary?
 
 
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
@@ -384,10 +384,10 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // ------------------------------------------------------
       deque<double> PreviewedSupportAngles_deq;
-      OrientPrw_->preview_orientations(Time, VelRef_,
+      OrientPrw_->preview_orientations( Time, VelRef_,
           SupportFSM_->StepPeriod(), CurrentSupport,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
-          PreviewedSupportAngles_deq);
+          PreviewedSupportAngles_deq );
 
 
       // UPDATE THE DYNAMIC MATRICES:
@@ -441,9 +441,9 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // COMPUTE ORIENTATION OF TRUNK:
       // -----------------------------
-      OrientPrw_->interpolate_trunk_orientation(Time, CurrentIndex,
+      OrientPrw_->interpolate_trunk_orientation( Time, CurrentIndex,
           m_SamplingPeriod, CurrentSupport,
-          FinalCOMTraj_deq);
+          FinalCOMTraj_deq );
 
 
       // INTERPOLATE THE COMPUTED FEET POSITIONS:
