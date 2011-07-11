@@ -734,7 +734,7 @@ GeneratorVelRef::build_invariant_part(QPProblem & Pb)
 
 
 void
-GeneratorVelRef::update_problem(QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq)
+GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq )
 {
 
   Pb.clear(QPProblem::VECTOR_D);

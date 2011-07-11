@@ -48,12 +48,14 @@ RigidBody::~RigidBody()
 int RigidBody::initialize()
 {
 
-  PositionDynamics_.S.resize(N_,3,false);
+  PositionDynamics_.S.resize( N_,3,false );
   PositionDynamics_.S.clear();
-  VelocityDynamics_.S.resize(N_,3,false);
+  VelocityDynamics_.S.resize( N_,3,false );
   VelocityDynamics_.S.clear();
-  AccelerationDynamics_.S.resize(N_,3,false);
+  AccelerationDynamics_.S.resize( N_,3,false );
   AccelerationDynamics_.S.clear();
+
+  Trajectory_.resize( N_ );
 
   return 0;
 

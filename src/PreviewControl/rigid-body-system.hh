@@ -63,7 +63,7 @@ namespace PatternGeneratorJRL
     /// \param[in] FSM Finite state machine
     /// \param[in] CurrentSupport The current support state
     /// \param[in] Time Current time
-    int update( const SupportFSM * FSM, support_state_t & CurrentSupport, double Time );
+    int update( std::deque<support_state_t> & SupportStates_deq );
 
     /// \brief Initialize dynamics of the body center
     /// Suppose a piecewise constant jerk
@@ -159,11 +159,14 @@ namespace PatternGeneratorJRL
     /// \param[in] Dynamics Matrices to be filled
     ///
     /// return 0
-    int compute_dyn_pol_feet( linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics,
-        const SupportFSM * FSM, const support_state_t & CurrentSupport, double Time );
+    int compute_dyn_pol_feet( std::deque<support_state_t> & SupportStates_deq,
+        linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
 
-    /// \brief Precompute trajectories
-    int precompute_trajectory();
+    /// \brief Initialize trajectory constants
+    int initialize_trajectories();
+
+    /// \brief Compute predefined trajectories
+    int precompute_trajectories( std::deque<support_state_t> & SupportStates_deq );
 
     /// \brief Compute a row of the dynamic matrix Sp
     int compute_sbar( double * Spbar, double * Sabar, double T, double Td );
@@ -215,6 +218,8 @@ namespace PatternGeneratorJRL
 
     /// \brief Finite State Machine
     SupportFSM * FSM_;
+
+    CjrlHumanoidDynamicRobot * HDR_;
 
   };
 }

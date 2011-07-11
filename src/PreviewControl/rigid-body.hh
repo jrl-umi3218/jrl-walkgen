@@ -95,7 +95,6 @@ namespace PatternGeneratorJRL
   class RigidBody
   {
 
-
     //
     // Public methods
     //
@@ -153,6 +152,9 @@ namespace PatternGeneratorJRL
     { return Mass_; }
     inline void Mass( double Mass )
     { Mass_ = Mass; }
+
+    std::deque<rigid_body_state_t> & Trajectory()
+    { return Trajectory_; }
     /// \}
 
 
@@ -169,7 +171,7 @@ namespace PatternGeneratorJRL
     /// \brief State
     rigid_body_state_t State_;
 
-    /// \brief Trajectory
+    /// \brief Trajectory vector of decoupled DoF's
     std::deque<rigid_body_state_t> Trajectory_;
 
     /// \name Dynamics

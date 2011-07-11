@@ -392,7 +392,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // UPDATE THE DYNAMIC MATRICES:
       // ----------------------------
-      Robot_->update( SupportFSM_, CurrentSupport, Time );
+      Robot_->update( PreviewedSupportStates_deq );
 
 
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:
