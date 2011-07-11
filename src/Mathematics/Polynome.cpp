@@ -62,6 +62,19 @@ double Polynome::ComputeDerivative(double t)
   return r;
 }
 
+double Polynome::ComputeSecDerivative(double t)
+{
+
+  double r=0,pt=1;
+  for(unsigned int i=2;i<m_Coefficients.size();i++)
+    {
+      r += i*(i-1)*m_Coefficients[i]*pt;
+      pt *=t;
+    }
+  return r;
+
+}
+
 void Polynome::GetCoefficients(vector<double> &lCoefficients) const
 {
  lCoefficients = m_Coefficients;

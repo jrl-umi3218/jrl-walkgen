@@ -57,6 +57,9 @@ namespace PatternGeneratorJRL
       /*! Compute the value of the derivative. */
       double ComputeDerivative(double t);
       
+      /*! Compute the value of the second derivative. */
+      double ComputeSecDerivative(double t);
+
       /*! Get the coefficients. */
       void GetCoefficients(std::vector<double> &lCoefficients) const;
 

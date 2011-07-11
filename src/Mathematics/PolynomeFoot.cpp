@@ -153,19 +153,6 @@ void Polynome5::SetParameters(double FT, double FP,
   m_Coefficients[5] = ( -1.0/2.0*InitAcc*FT*FT - 3.0*InitSpeed*FT - 6.0*InitPos + 6.0*FP)/tmp;
 }
 
-double Polynome5::ComputeSecDerivative(double t)
-{
-
-  double r=0,pt=1;
-  for(unsigned int i=1;i<m_Coefficients.size();i++)
-    {
-      r += i*m_Coefficients[i]*pt;
-      pt *=t;
-    }
-  return r;
-
-}
-
 
 Polynome6::Polynome6(double FT, double MP) :Polynome(6)
 {

@@ -123,8 +123,6 @@ namespace PatternGeneratorJRL
       void SetParameters(double FT, double FP,
           double InitPos, double InitSpeed, double InitAcc);
 
-      double ComputeSecDerivative(double t);
-
       /// Destructor.
       ~Polynome5();
 
