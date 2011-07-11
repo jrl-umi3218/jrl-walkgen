@@ -132,7 +132,7 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = 
       m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = 
-      m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
+      m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
 
   bool ProtectionNeeded=false;
 
@@ -254,7 +254,6 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
 
   double LocalInterpolationTime = Time-(CurrentSupport.TimeLimit-(m_TDouble+m_TSingle));
 
-  double StepHeight = 0.05;
   int StepType = 1;
 
   if(CurrentSupport.Phase == SS && Time+3.0/2.0*QP_T_ < CurrentSupport.TimeLimit)
@@ -287,7 +286,7 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
           LastSwingFootPosition.y, LastSwingFootPosition.dy, LastSwingFootPosition.ddy);
 
       if(CurrentSupport.StateChanged==true)
-        SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle,StepHeight);
+        SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle, StepHeight_);
 
       SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::THETA_AXIS,
           UnlockedSwingPeriod-InterpolationTimePassed,

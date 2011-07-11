@@ -84,6 +84,10 @@ namespace PatternGeneratorJRL
    { return FeetDistanceDS_; };
    inline void FeetDistance( double FeetDistance )
    { FeetDistanceDS_ = FeetDistance; };
+   inline void StepHeight( double StepHeight )
+   { StepHeight_ = StepHeight; };
+   inline double StepHeight()
+   { return StepHeight_; };
    /// \}
 
    //
@@ -132,6 +136,10 @@ namespace PatternGeneratorJRL
 
    /// \brief Distance between feet centers in ds phase
    double FeetDistanceDS_;
+
+   /// \brief Height of the flying foot in the middle of the SS phase
+   double StepHeight_;
+
   };
   
 }
