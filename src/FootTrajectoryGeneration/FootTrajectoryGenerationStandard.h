@@ -52,7 +52,7 @@ namespace PatternGeneratorJRL
       @{ */
     
     /*! \brief along the frontal direction */
-    const static unsigned int X_AXIS =0;
+    const static unsigned int X_AXIS = 0;
     /*! \brief along the left of the robot */
     const static unsigned int Y_AXIS = 1;
     /*! \brief along the vertical axis of the robot. */
@@ -154,6 +154,9 @@ namespace PatternGeneratorJRL
 
    /*! Compute the value for a given polynome. */
    double Compute(unsigned int PolynomeIndex, double Time);
+
+   /*! Compute the value for a given polynome's second derivative. */
+   double ComputeSecDerivative(unsigned int PolynomeIndex, double Time);
 
    /*! Compute the absolute foot position from the queue of relative positions. 
      There is not direct dependency with time.

@@ -325,6 +325,44 @@ double FootTrajectoryGenerationStandard::Compute(unsigned int PolynomeIndex, dou
  return r;
 }
 
+double FootTrajectoryGenerationStandard::ComputeSecDerivative(unsigned int PolynomeIndex, double Time)
+{
+  double r=0.0;
+
+  switch (PolynomeIndex)
+   {
+
+   case X_AXIS:
+     r=m_PolynomeX->ComputeSecDerivative(Time);
+     break;
+
+   case Y_AXIS:
+     r=m_PolynomeY->ComputeSecDerivative(Time);
+     break;
+
+   case Z_AXIS:
+     r=m_PolynomeZ->ComputeSecDerivative(Time);
+     break;
+
+   case THETA_AXIS:
+     r=m_PolynomeTheta->ComputeSecDerivative(Time);
+     break;
+
+   case OMEGA_AXIS:
+     r=m_PolynomeOmega->ComputeSecDerivative(Time);
+     break;
+
+   case OMEGA2_AXIS:
+     r=m_PolynomeOmega2->ComputeSecDerivative(Time);
+     break;
+
+   default:
+     return -1.0;
+     break;
+   }
+ return r;
+}
+
 void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosition> &SupportFootAbsolutePositions,
 							  deque<FootAbsolutePosition> &NoneSupportFootAbsolutePositions,
 							  int CurrentAbsoluteIndex,  
