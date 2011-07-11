@@ -127,7 +127,6 @@ int OnlineStepPositionTrajectoryGeneration::InitializeMatrixPbConstants()
       m_PPx(i+m_QP_N,0) = 0.0; m_PPx(i+m_QP_N,1) =     0.0; m_PPx(i+m_QP_N,2) = 0.0; 
       m_PPx(i+m_QP_N,3) = 1.0; m_PPx(i+m_QP_N,4) = (i+1)*m_QP_T; m_PPx(i+m_QP_N,5) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5; 
  
-      //TODO: + or - m_ComHeight/9.81 
       m_PZx(i,0) = 1.0; m_PZx(i,1)     = (i+1)*m_QP_T; m_PZx(i,2) = (i+1)*(i+1)*m_QP_T*m_QP_T*0.5-m_ComHeight/9.81; 
       //m_PZx(i,3) = 0.0; m_PZx(i,4)     =       0; m_PZx(i,5) = 0.; 
       //		m_PZx(i+m_QP_N,0) = 0.0; m_PZx(i+m_QP_N,1) =     0.0; m_PZx(i+m_QP_N,2) = 0.0; 
@@ -2478,7 +2477,6 @@ void OnlineStepPositionTrajectoryGeneration::computeObjective(deque<LinearConstr
   m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx); 
   m_OptB = m_Beta * m_OptB; 
  
-  //TODO 2: The matrices of the value function have to go back where they come from 
   //MAL_MATRIX(m_OptD,double); 
   m_OptD = MAL_RET_TRANSPOSE(m_VPu); 
   m_OptD = m_Beta * m_OptD; 
@@ -2581,10 +2579,8 @@ void OnlineStepPositionTrajectoryGeneration::OnLine(double time,
 	
       m_2DLIPM->setState(xk);
 
-      //TODO : Add a get function to read the state 
       m_Support->setSupportState(time+m_TimeBuffer, 0, RefVel); 
 
-      //TODO : Temporary solution for the pldp solver. See above
       bool CurrentStateChanged = m_Support->m_StateChanged;
 
       //Add a new support foot to the support feet history deque
