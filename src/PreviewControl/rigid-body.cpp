@@ -28,7 +28,7 @@ using namespace PatternGeneratorJRL;
 using namespace std;
 
 RigidBody::RigidBody():
-        T_(0),Tr_(0),Ta_(0),N_(0),Mass_(0)
+        T_(0),Tr_(0),Ta_(0),N_(16),Mass_(0)
 {
 
   PositionDynamics_.Type = POSITION;
@@ -146,7 +146,7 @@ rigid_body_state_t::operator=(const rigid_body_state_s & RB)
 
   for(unsigned int i=0;i<3;i++)
     {
-      X(i) = RB.X(i);
+      X[i] = RB.X[i];
       Y[i] = RB.Y[i];
       Z[i] = RB.Z[i];
 

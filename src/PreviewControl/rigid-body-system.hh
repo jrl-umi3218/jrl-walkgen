@@ -44,7 +44,7 @@ namespace PatternGeneratorJRL
     //
   public:
 
-    RigidBodySystem( SimplePluginManager *SPM, CjrlHumanoidDynamicRobot *aHS );
+    RigidBodySystem( SimplePluginManager *SPM, CjrlHumanoidDynamicRobot *aHS, SupportFSM * FSM );
 
     ~RigidBodySystem();
 
@@ -162,6 +162,9 @@ namespace PatternGeneratorJRL
     int compute_dyn_pol_feet( linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics,
         const SupportFSM * FSM, const support_state_t & CurrentSupport, double Time );
 
+    /// \brief Precompute trajectories
+    int precompute_trajectory();
+
     /// \brief Compute a row of the dynamic matrix Sp
     int compute_sbar( double * Spbar, double * Sabar, double T, double Td );
 
@@ -179,13 +182,14 @@ namespace PatternGeneratorJRL
     CoM_,
     LeftFoot_,
     RightFoot_;
-    
+
     /// \brief Center of Pressure dynamics
     linear_dynamics_t
     CoPDynamics_;
 
-    /// \brief Standard polynomial trajectories for the feet.
-    OnLineFootTrajectoryGeneration * OFTG_;
+    /// \brief Fixed trajectories
+    std::deque<rigid_body_state_t>
+    FlyingFootTrajectory_;
 
     /// \brief Total robot mass
     double Mass_;
@@ -205,6 +209,12 @@ namespace PatternGeneratorJRL
     
     /// \brief Nb previewed samples
     unsigned int N_;
+
+    /// \brief Standard polynomial trajectories for the feet.
+    OnLineFootTrajectoryGeneration * OFTG_;
+
+    /// \brief Finite State Machine
+    SupportFSM * FSM_;
 
   };
 }

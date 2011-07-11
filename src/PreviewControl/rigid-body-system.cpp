@@ -27,11 +27,12 @@
 using namespace PatternGeneratorJRL;
 using namespace std;
 
-RigidBodySystem::RigidBodySystem( SimplePluginManager *SPM, CjrlHumanoidDynamicRobot *aHS ):
+RigidBodySystem::RigidBodySystem( SimplePluginManager * SPM, CjrlHumanoidDynamicRobot * aHS, SupportFSM * FSM ):
     Mass_(0),CoMHeight_(0),T_(0),Tr_(0),Ta_(0),N_(0),
-    OFTG_(0)
+    OFTG_(0), FSM_(0)
 {
 
+  FSM_ = FSM;
   OFTG_ = new OnLineFootTrajectoryGeneration(SPM,aHS->leftFoot());
 
 }
@@ -56,6 +57,7 @@ RigidBodySystem::initialize(  )
   OFTG_->SetDoubleSupportTime(T_);
   OFTG_->QPSamplingPeriod(T_);
   OFTG_->FeetDistance(0.2);
+  OFTG_->StepHeight( 0.05 );
 
   // Initialize dynamics
   // -------------------
@@ -65,14 +67,42 @@ RigidBodySystem::initialize(  )
   compute_dyn_cjerk();
   compute_dyn_cop();
 
+  precompute_trajectory();
   LeftFoot_.NbSamplingsPreviewed( N_ );
   LeftFoot_.initialize();
   RightFoot_.NbSamplingsPreviewed( N_ );
   RightFoot_.initialize();
 
 
+
 }
 
+
+int
+RigidBodySystem::precompute_trajectory()
+{
+
+  // Vertical foot trajectory of a stance phase
+  // starting from the begin of the simple support phase
+  // and ending at the end of the double support phase.
+  double SSPeriod = FSM_->StepPeriod()-T_;
+  unsigned int NbInstantsSS = (unsigned int)(SSPeriod/T_)+1;
+
+  OFTG_->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, SSPeriod, OFTG_->StepHeight() );
+
+  FlyingFootTrajectory_.resize(NbInstantsSS);
+  std::deque<rigid_body_state_t>::iterator FTIt;
+  FTIt = FlyingFootTrajectory_.begin();
+  for( unsigned int i = 0; i < NbInstantsSS; i++)
+    {
+      FTIt->Z[0] = OFTG_->Compute(FootTrajectoryGenerationStandard::Z_AXIS,i*T_);
+      FTIt->Z[2] = OFTG_->ComputeSecDerivative(FootTrajectoryGenerationStandard::Z_AXIS,i*T_);
+      FTIt++;
+    }
+
+  return 0;
+
+}
 
 int
 RigidBodySystem::update( const SupportFSM * FSM, support_state_t & CurrentSupport, double Time )
