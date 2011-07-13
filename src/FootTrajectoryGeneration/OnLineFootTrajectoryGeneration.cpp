@@ -129,11 +129,33 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
           m_PolynomeTheta->ComputeDerivative(InterpolationTime);
     }
 
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = 
-      m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = 
-      m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
+  if(HalfTimePassed_==false && LocalInterpolationStartTime+InterpolationTime >= m_TSingle/2.0 )
+    {
+      SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle/2.0, 0.0,
+          StepHeight_, 0.0, 0.0);
+      HalfTimePassed_ = true;
+    }
 
+  if(HalfTimePassed_)
+    {
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z =
+          m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime-m_TSingle/2.0-m_SamplingPeriod );
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
+          m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime-m_TSingle/2.0-m_SamplingPeriod );
+      if(m_PolynomeZ->Degree() > 3)
+        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddz =
+            m_PolynomeZ->ComputeSecDerivative(LocalInterpolationStartTime+InterpolationTime-m_TSingle/2.0-m_SamplingPeriod );
+    }
+  else
+    {
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z =
+          m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime-m_SamplingPeriod);
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
+          m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime-m_SamplingPeriod);
+      if(m_PolynomeZ->Degree() > 3)
+        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddz =
+            m_PolynomeZ->ComputeSecDerivative(LocalInterpolationStartTime+InterpolationTime-m_SamplingPeriod);
+    }
   bool ProtectionNeeded=false;
 
   // Treat Omega with the following strategy:
@@ -255,16 +277,15 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
   double LocalInterpolationTime = Time-(CurrentSupport.TimeLimit-(m_TDouble+m_TSingle));
 
   int StepType = 1;
-
   if(CurrentSupport.Phase == SS && Time+3.0/2.0*QP_T_ < CurrentSupport.TimeLimit)
     {
       //determine coefficients of interpolation polynom
       double ModulationSupportCoefficient = 0.9;
       double UnlockedSwingPeriod = m_TSingle * ModulationSupportCoefficient;
       double EndOfLiftOff = (m_TSingle-UnlockedSwingPeriod)*0.5;
-      double InterpolationTimePassed = 0.0;
+      double SwingTimePassed = 0.0;
       if(LocalInterpolationTime>EndOfLiftOff)
-        InterpolationTimePassed = LocalInterpolationTime-EndOfLiftOff;
+        SwingTimePassed = LocalInterpolationTime-EndOfLiftOff;
 
       FootAbsolutePosition LastSwingFootPosition;
 
@@ -279,26 +300,30 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
 
       //Set parameters for current polynomial
       SetParameters(FootTrajectoryGenerationStandard::X_AXIS,
-          UnlockedSwingPeriod-InterpolationTimePassed,FPx,
+          UnlockedSwingPeriod-SwingTimePassed,FPx,
           LastSwingFootPosition.x, LastSwingFootPosition.dx, LastSwingFootPosition.ddx);
       SetParameters(FootTrajectoryGenerationStandard::Y_AXIS,
-          UnlockedSwingPeriod-InterpolationTimePassed,FPy,
+          UnlockedSwingPeriod-SwingTimePassed,FPy,
           LastSwingFootPosition.y, LastSwingFootPosition.dy, LastSwingFootPosition.ddy);
 
       if(CurrentSupport.StateChanged==true)
-        SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle, StepHeight_);
+        {
+          SetParameters( FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle/2.0, StepHeight_ );
+          HalfTimePassed_ = false;
+        }
+
 
       SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::THETA_AXIS,
-          UnlockedSwingPeriod-InterpolationTimePassed,
+          UnlockedSwingPeriod-SwingTimePassed,
           PreviewedSupportAngles_deq[0]*180.0/M_PI,
           LastSwingFootPosition.theta,
           LastSwingFootPosition.dtheta);
       SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA_AXIS,
-          UnlockedSwingPeriod-InterpolationTimePassed,0.0*180.0/M_PI,
+          UnlockedSwingPeriod-SwingTimePassed,0.0*180.0/M_PI,
           LastSwingFootPosition.omega,
           LastSwingFootPosition.domega);
       SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA2_AXIS,
-          UnlockedSwingPeriod-InterpolationTimePassed,2*0.0*180.0/M_PI,
+          UnlockedSwingPeriod-SwingTimePassed,2*0.0*180.0/M_PI,
           LastSwingFootPosition.omega2,
           LastSwingFootPosition.domega2);
 

@@ -140,6 +140,9 @@ namespace PatternGeneratorJRL
    /// \brief Height of the flying foot in the middle of the SS phase
    double StepHeight_;
 
+   /// \brief Half of simple support passed trigger
+   bool HalfTimePassed_;
+
   };
   
 }
