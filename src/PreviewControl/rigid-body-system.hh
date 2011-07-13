@@ -52,6 +52,14 @@ namespace PatternGeneratorJRL
     void initialize( );
 
     /// \brief Interpolate
+    ///
+    /// \param[in] Result Optimization result
+    /// \param[in] FinalZMPTraj_deq
+    /// \param[in] FinalCOMTraj_deq
+    /// \param[in] FinalLeftFootTraj_deq
+    /// \param[in] FinalRightFootTraj_deq
+    ///
+    /// \return 0
     int interpolate( solution_t Result,
         std::deque<ZMPPosition> & FinalZMPTraj_deq,
         std::deque<COMState> & FinalCOMTraj_deq,
@@ -63,13 +71,14 @@ namespace PatternGeneratorJRL
     /// \param[in] FSM Finite state machine
     /// \param[in] CurrentSupport The current support state
     /// \param[in] Time Current time
+    ///
+    /// \return 0
     int update( std::deque<support_state_t> & SupportStates_deq,
         const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
         const std::deque<FootAbsolutePosition> & RightFootTraj_deq );
 
     /// \brief Initialize dynamics of the body center
     /// Suppose a piecewise constant jerk
-    /// \param[in] Dynamics Matrices to be filled
     ///
     /// return 0
     int compute_dyn_cjerk();
@@ -89,10 +98,6 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors and mutators
     /// \{
-    linear_dynamics_t const & DynamicsCoP() const
-    { return CoPDynamics_; }
-    linear_dynamics_t & DynamicsCoP()
-    { return CoPDynamics_; }
     linear_dynamics_t const & DynamicsCoPJerk() const
     { return CoPDynamicsJerk_; }
     linear_dynamics_t & DynamicsCoPJerk()
@@ -193,15 +198,15 @@ namespace PatternGeneratorJRL
     RigidBody
     CoM_,
     LeftFoot_,
-    RightFoot_;
+    RightFoot_,
+    LeftWrist_,
+    RightWrist_;
 
     /// \brief Center of Pressure dynamics
     /// Divided into two parts to reflect the two different
     /// parametrizations(piecewise jerk and single polynomials)
     linear_dynamics_t
-    CoPDynamics_,
     CoPDynamicsJerk_;
-//    CoPDynamicsFeet_;
 
     /// \brief Fixed trajectories
     std::deque<rigid_body_state_t>

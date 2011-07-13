@@ -53,7 +53,8 @@ void
 RigidBodySystem::initialize(  )
 {
 
-  // Create and initialize online interpolation of feet trajectories
+  // Create and initialize online interpolation of feet trajectories:
+  // ----------------------------------------------------------------
   OFTG_->InitializeInternalDataStructures();
   OFTG_->SetSingleSupportTime( 0.7 );
   OFTG_->SetDoubleSupportTime( T_ );
@@ -85,14 +86,8 @@ RigidBodySystem::initialize(  )
   // TODO: Use of bounded arrays
   // TODO: Remove CoP dynamics
   bool preserve = true;
-  CoPDynamics_.S.resize(N_,3 ,!preserve);
-  CoPDynamics_.S.clear();
   CoPDynamicsJerk_.S.resize(N_,3 ,!preserve);
   CoPDynamicsJerk_.S.clear();
-  CoPDynamics_.U.resize(N_,N_,!preserve);
-  CoPDynamics_.U.clear();
-  CoPDynamics_.UT.resize(N_,N_,!preserve);
-  CoPDynamics_.UT.clear();
   CoPDynamicsJerk_.U.resize(N_,N_,!preserve);
   CoPDynamicsJerk_.U.clear();
   CoPDynamicsJerk_.UT.resize(N_,N_,!preserve);
@@ -244,9 +239,6 @@ RigidBodySystem::compute_dyn_cop( std::deque<support_state_t> & SupportStates_de
   unsigned int NbSteps = SupportStates_deq.back().StepNumber;
   bool preserve = true;
   //TODO: Use of bounded_array to avoid dynamic allocation
-//  CoPDynamicsFeet_.U.resize(N_,NbSteps,!preserve);
-//  CoPDynamicsFeet_.UT.resize(NbSteps,N_,!preserve);
-
   LeftFoot_.Dynamics(COP).U.resize(N_,NbSteps,!preserve);
   LeftFoot_.Dynamics(COP).UT.resize(NbSteps,N_,!preserve);
   RightFoot_.Dynamics(COP).U.resize(N_,NbSteps,!preserve);
@@ -254,13 +246,7 @@ RigidBodySystem::compute_dyn_cop( std::deque<support_state_t> & SupportStates_de
   LeftFoot_.Dynamics(COP).clear();
   RightFoot_.Dynamics(COP).clear();
 
-//  CoPDynamicsFeet_.clear();
-//  CoPDynamicsFeet_.U.clear();
-//  CoPDynamicsFeet_.UT.clear();
   CoPDynamicsJerk_.clear();
-//  CoPDynamicsJerk_.U.clear();
-//  CoPDynamicsJerk_.UT.clear();
-
 
 
   // Add "weighted" dynamic matrices:
@@ -300,19 +286,6 @@ RigidBodySystem::compute_dyn_cop( std::deque<support_state_t> & SupportStates_de
       CoMTraj_it++;
       LFTraj_it++;
       RFTraj_it++;
-    }
-
-
-  // CoP dynamics considering only one "jerk parametrized" body:
-  // -----------------------------------------------------------
-  for(unsigned int i=0;i<N_;i++)
-    {
-      CoPDynamics_.S(i,0) = 1.0; CoPDynamics_.S(i,1) = (i+1)*T_; CoPDynamics_.S(i,2) = (i+1)*(i+1)*T_*T_*0.5-CoMHeight_/GRAVITY;
-      for(unsigned int j=0;j<N_;j++)
-        if (j<=i)
-          CoPDynamics_.U(i,j) = CoPDynamics_.UT(j,i) = (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T_*T_*T_/6.0 - T_*CoMHeight_/GRAVITY;
-        else
-          CoPDynamics_.U(i,j) = CoPDynamics_.UT(j,i) = 0.0;
     }
 
   return 0;
@@ -561,15 +534,11 @@ RigidBodySystem::generate_trajectories( double Time, const support_state_t & Cur
     std::deque<FootAbsolutePosition> & LeftFootTraj_deq, std::deque<FootAbsolutePosition> & RightFootTraj_deq )
 {
 
-//  FootAbsolutePosition CurLeftFoot = LeftFootTraj_deq.back();
-//  FootAbsolutePosition CurRightFoot = RightFootTraj_deq.back();
   unsigned int NumberStepsPrwd = PrwSupportStates_deq.back().StepNumber;
   OFTG_->interpolate_feet_positions(Time, CurrentSupport,
       Result.Solution_vec[2*N_], Result.Solution_vec[2*N_+NumberStepsPrwd],
       PreviewedSupportAngles_deq,
       LeftFootTraj_deq, RightFootTraj_deq);
-
-  cout<<"PreviewedStep"<<Result.Solution_vec[2*N_]<<" "<<Result.Solution_vec[2*N_+NumberStepsPrwd]<<endl;
 
 //  linear_dynamics_t LFDyn = LeftFoot_.Dynamics( ACCELERATION );
 //  cout<<"LFDyn.S"<<LFDyn.S<<endl;
@@ -616,13 +585,6 @@ RigidBodySystem::generate_trajectories( double Time, const support_state_t & Cur
   return 0;
 
 }
-
-
-//void
-//RigidBodySystem::increment_state(double Control)
-//{
-//
-//}
 
 
 //

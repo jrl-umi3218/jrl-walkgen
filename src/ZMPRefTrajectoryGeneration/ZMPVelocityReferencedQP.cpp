@@ -90,8 +90,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   // Create and initialize simplified robot
   Robot_ = new RigidBodySystem( SPM, aHS, SupportFSM_ );
   Robot_->Mass( aHS->mass() );
-  Robot_->LeftFoot().Mass( 0.6 );
-  Robot_->RightFoot().Mass( 0.6 );
+  Robot_->LeftFoot().Mass( 0.0 );
+  Robot_->RightFoot().Mass( 0.0 );
   Robot_->NbSamplingsPreviewed( QP_N_ );
   Robot_->SamplingPeriodSim( QP_T_ );
   Robot_->SamplingPeriodAct( m_SamplingPeriod );
