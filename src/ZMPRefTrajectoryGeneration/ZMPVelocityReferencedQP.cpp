@@ -68,11 +68,11 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 
   // Create and initialize the finite state machine for support sequences
   SupportFSM_ = new SupportFSM();
-  SupportFSM_->StepPeriod(0.8);
-  SupportFSM_->DSPeriod(1e9);
-  SupportFSM_->DSSSPeriod(0.8);
-  SupportFSM_->NbStepsSSDS(2);
-  SupportFSM_->SamplingPeriod(QP_T_);
+  SupportFSM_->StepPeriod( 0.8 );
+  SupportFSM_->DSPeriod( 1e9 );
+  SupportFSM_->DSSSPeriod( 0.8 );
+  SupportFSM_->NbStepsSSDS( 2 );
+  SupportFSM_->SamplingPeriod( QP_T_ );
 
   // Create and initialize preview of orientations
   OrientPrw_ = new OrientationsPreview( aHS->rootJoint() );
@@ -90,27 +90,27 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   // Create and initialize simplified robot
   Robot_ = new RigidBodySystem( SPM, aHS, SupportFSM_ );
   Robot_->Mass( aHS->mass() );
-  Robot_->LeftFoot().Mass( 0.7 );
-  Robot_->RightFoot().Mass( 0.0 );
+  Robot_->LeftFoot().Mass( 0.6 );
+  Robot_->RightFoot().Mass( 0.6 );
   Robot_->NbSamplingsPreviewed( QP_N_ );
   Robot_->SamplingPeriodSim( QP_T_ );
   Robot_->SamplingPeriodAct( m_SamplingPeriod );
-  Robot_->CoMHeight(0.814);
+  Robot_->CoMHeight( 0.814 );
   Robot_->initialize( );
 
   IntermedData_ = new IntermedQPMat();
 
   VRQPGenerator_ = new GeneratorVelRef(SPM, IntermedData_, Robot_ );
-  VRQPGenerator_->NbPrwSamplings(QP_N_);
-  VRQPGenerator_->SamplingPeriodPreview(QP_T_);
+  VRQPGenerator_->NbPrwSamplings( QP_N_ );
+  VRQPGenerator_->SamplingPeriodPreview( QP_T_ );
   VRQPGenerator_->ComHeight( 0.814 );
   VRQPGenerator_->initialize_matrices();
   VRQPGenerator_->Ponderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
   VRQPGenerator_->Ponderation( 0.0*0.000001, IntermedQPMat::COP_CENTERING );
-  VRQPGenerator_->Ponderation( 0.00001, IntermedQPMat::JERK_MIN );
+  VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::JERK_MIN );
 
-  Door_.initialize(-M_PI/2.00);
-  Door_.SamplingTime(QP_T_);
+  Door_.initialize( -M_PI/2.0 );
+  Door_.SamplingTime( QP_T_ );
 
   // Register method to handle
   string aMethodName[3] =

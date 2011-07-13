@@ -111,23 +111,32 @@ RigidBodySystem::initialize_trajectories()
 {
 
   // Vertical foot trajectory of a stance phase
-  // starting from the begin of the simple support phase
-  // and ending at the end of the double support phase:
-  // --------------------------------------------------
+  // starting from the beginning of the simple support phase
+  // and ending at the end of the double support phase.
+  // The trajectory is divided in two order 5 polynomials:
+  // -----------------------------------------------------
   double SSPeriod = FSM_->StepPeriod()-T_;
   unsigned int NbInstantsSS = (unsigned int)(SSPeriod/T_)+1;
-
-  OFTG_->SetParameters( FootTrajectoryGenerationStandard::Z_AXIS, SSPeriod, OFTG_->StepHeight() );
 
   FlyingFootTrajectory_deq_.resize(NbInstantsSS);
   std::deque<rigid_body_state_t>::iterator FTIt;
   FTIt = FlyingFootTrajectory_deq_.begin();
+  OFTG_->SetParameters( FootTrajectoryGenerationStandard::Z_AXIS, SSPeriod/2.0, OFTG_->StepHeight() );
+  double LocalStartTime = 0.0;
   for( unsigned int i = 0; i < NbInstantsSS; i++)
     {
-      FTIt->Z(0) = OFTG_->Compute( FootTrajectoryGenerationStandard::Z_AXIS,i*T_ );
-      FTIt->Z(2) = OFTG_->ComputeSecDerivative( FootTrajectoryGenerationStandard::Z_AXIS,i*T_ );
+      if(i*T_>SSPeriod/2.0)
+        {
+          LocalStartTime = SSPeriod/2.0;
+          OFTG_->SetParameters( FootTrajectoryGenerationStandard::Z_AXIS, SSPeriod/2.0, 0.0,
+              OFTG_->StepHeight(), 0.0, 0.0 );
+        }
+
+      FTIt->Z(0) = OFTG_->Compute( FootTrajectoryGenerationStandard::Z_AXIS,i*T_-LocalStartTime );
+      FTIt->Z(2) = OFTG_->ComputeSecDerivative( FootTrajectoryGenerationStandard::Z_AXIS,i*T_-LocalStartTime );
       FTIt++;
     }
+
 
   // Constant CoM Height:
   // --------------------
