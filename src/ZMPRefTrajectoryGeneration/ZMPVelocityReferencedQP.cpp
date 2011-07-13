@@ -90,6 +90,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   // Create and initialize simplified robot
   Robot_ = new RigidBodySystem( SPM, aHS, SupportFSM_ );
   Robot_->Mass( aHS->mass() );
+  Robot_->LeftFoot().Mass( 0.7 );
+  Robot_->RightFoot().Mass( 0.0 );
   Robot_->NbSamplingsPreviewed( QP_N_ );
   Robot_->SamplingPeriodSim( QP_T_ );
   Robot_->SamplingPeriodAct( m_SamplingPeriod );
@@ -104,7 +106,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_->ComHeight( 0.814 );
   VRQPGenerator_->initialize_matrices();
   VRQPGenerator_->Ponderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
-  VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::COP_CENTERING );
+  VRQPGenerator_->Ponderation( 0.0*0.000001, IntermedQPMat::COP_CENTERING );
   VRQPGenerator_->Ponderation( 0.00001, IntermedQPMat::JERK_MIN );
 
   Door_.initialize(-M_PI/2.00);
@@ -392,7 +394,8 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // UPDATE THE DYNAMIC MATRICES:
       // ----------------------------
-      Robot_->update( PreviewedSupportStates_deq );
+      Robot_->update( PreviewedSupportStates_deq,
+          FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
 
 
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:

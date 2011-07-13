@@ -71,7 +71,7 @@ namespace PatternGeneratorJRL
   enum DynamicsType
   {
     POSITION, VELOCITY, ACCELERATION,
-    JERK
+    JERK, COP
   };
 
   /// \name Dynamics matrices
@@ -87,6 +87,12 @@ namespace PatternGeneratorJRL
     boost_ublas::matrix<double> S;
 
     DynamicsType Type;
+
+    void clear()
+    { U.clear();
+      UT.clear();
+      S.clear();
+    }
   };
   typedef linear_dynamics_s linear_dynamics_t;
   /// \}
@@ -153,8 +159,13 @@ namespace PatternGeneratorJRL
     inline void Mass( double Mass )
     { Mass_ = Mass; }
 
-    std::deque<rigid_body_state_t> & Trajectory()
+    inline std::deque<rigid_body_state_t> & Trajectory()
     { return Trajectory_; }
+
+    inline rigid_body_state_t & State()
+    { return State_; }
+    inline rigid_body_state_t const & State() const
+    { return State_; }
     /// \}
 
 
@@ -180,7 +191,8 @@ namespace PatternGeneratorJRL
     PositionDynamics_,
     VelocityDynamics_,
     AccelerationDynamics_,
-    JerkDynamics_;
+    JerkDynamics_,
+    CoPDynamics_;
     /// \}
 
     /// \brief Sampling period simulation

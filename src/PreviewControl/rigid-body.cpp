@@ -54,6 +54,8 @@ int RigidBody::initialize()
   VelocityDynamics_.S.clear();
   AccelerationDynamics_.S.resize( N_,3,false );
   AccelerationDynamics_.S.clear();
+  CoPDynamics_.S.resize( N_,3,false );
+  CoPDynamics_.S.clear();
 
   Trajectory_.resize( N_ );
 
@@ -99,6 +101,8 @@ RigidBody::Dynamics( DynamicsType Type ) const
     return AccelerationDynamics_;
   case JERK:
     return JerkDynamics_;
+  case COP:
+    return CoPDynamics_;
   }
 
   return VelocityDynamics_;
@@ -119,6 +123,8 @@ RigidBody::Dynamics( DynamicsType Type )
     return AccelerationDynamics_;
   case JERK:
     return JerkDynamics_;
+  case COP:
+    return CoPDynamics_;
   }
 
   return VelocityDynamics_;

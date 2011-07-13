@@ -63,7 +63,9 @@ namespace PatternGeneratorJRL
     /// \param[in] FSM Finite state machine
     /// \param[in] CurrentSupport The current support state
     /// \param[in] Time Current time
-    int update( std::deque<support_state_t> & SupportStates_deq );
+    int update( std::deque<support_state_t> & SupportStates_deq,
+        const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
+        const std::deque<FootAbsolutePosition> & RightFootTraj_deq );
 
     /// \brief Initialize dynamics of the body center
     /// Suppose a piecewise constant jerk
@@ -85,28 +87,35 @@ namespace PatternGeneratorJRL
         const std::deque<support_state_t> & SupportStates_deq, const std::deque<double> & PreviewedSupportAngles_deq,
               std::deque<FootAbsolutePosition> & LeftFootTraj_deq, std::deque<FootAbsolutePosition> & RightFootTraj_deq);
 
-//    /// \brief Increment the state
-//    ///
-//    /// \param[in] Control Control vector
-//    void increment_state( double Control );
-//
-//    /// \brief Decouple degree of freedom by injected trajectory
-//    ///
-//    /// \param[in] Axis The axis to be decoupled
-//    /// \param[in] Trajectory The injected trajectory
-//    ///
-//    /// \return 0
-//    int inject_trajectory( unsigned int Axis, boost_ublas::vector<double> Trajectory );
-
     /// \name Accessors and mutators
     /// \{
-    linear_dynamics_t const & Dynamics() const;
-    linear_dynamics_t & Dynamics();
+    linear_dynamics_t const & DynamicsCoP() const
+    { return CoPDynamics_; }
+    linear_dynamics_t & DynamicsCoP()
+    { return CoPDynamics_; }
+    linear_dynamics_t const & DynamicsCoPJerk() const
+    { return CoPDynamicsJerk_; }
+    linear_dynamics_t & DynamicsCoPJerk()
+    { return CoPDynamicsJerk_; }
 
     inline RigidBody const & CoM() const
     {return CoM_;};
     inline void CoM( const RigidBody & CoM )
     {CoM_ = CoM;};
+
+    inline RigidBody const & LeftFoot() const
+    {return LeftFoot_;};
+    inline RigidBody & LeftFoot()
+    {return LeftFoot_;};
+    inline void LeftFoot( const RigidBody & LeftFoot )
+    {LeftFoot_ = LeftFoot;};
+
+    inline RigidBody const & RightFoot() const
+    {return RightFoot_;};
+    inline RigidBody & RightFoot()
+    {return RightFoot_;};
+    inline void RightFoot( const RigidBody & RightFoot )
+    {RightFoot_ = RightFoot;};
 
     inline double const & SamplingPeriodSim( ) const
     { return T_; }
@@ -145,7 +154,7 @@ namespace PatternGeneratorJRL
     /// \param[in] Dynamics Matrices to be filled
     ///
     /// return 0
-    int compute_dyn_cop();
+    int compute_dyn_cop( std::deque<support_state_t> & SupportStates_deq );
 
     /// \brief Initialize dynamics of the body center
     /// Suppose a piecewise constant jerk
@@ -187,12 +196,19 @@ namespace PatternGeneratorJRL
     RightFoot_;
 
     /// \brief Center of Pressure dynamics
+    /// Divided into two parts to reflect the two different
+    /// parametrizations(piecewise jerk and single polynomials)
     linear_dynamics_t
-    CoPDynamics_;
+    CoPDynamics_,
+    CoPDynamicsJerk_;
+//    CoPDynamicsFeet_;
 
     /// \brief Fixed trajectories
     std::deque<rigid_body_state_t>
-    FlyingFootTrajectory_;
+    FlyingFootTrajectory_deq_;
+
+    /// \brief Ground reaction force for the whole preview window
+    std::deque<double> GRF_deq_;
 
     /// \brief Total robot mass
     double Mass_;

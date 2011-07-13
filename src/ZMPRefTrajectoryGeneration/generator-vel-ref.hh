@@ -169,14 +169,13 @@ namespace PatternGeneratorJRL
     /// \brief Compute CoP constraints corresponding to the set of inequalities
     ///
     /// \param[in] IneqCop
-    /// \param[in] CoP
+    /// \param[in] LFTraj Final left foot trajectory
+    /// \param[in] RFTraj Final right foot trajectory
     /// \param[in] State
     /// \param[in] NbStepsPreviewed
     /// \param[in] Pb
-    void build_constraints_cop(const linear_inequality_t & IneqCoP,
-        const linear_dynamics_t & CoP,
-        const IntermedQPMat::state_variant_t & State,
-        int NbStepsPreviewed, QPProblem & Pb);
+    void build_constraints_cop(const linear_inequality_t & IneqCoP, int NbStepsPreviewed,
+         QPProblem & Pb);
 
     /// \brief Compute feet constraints corresponding to the set of inequalities
     ///
