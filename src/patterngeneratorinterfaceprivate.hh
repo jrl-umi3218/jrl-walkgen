@@ -73,7 +73,7 @@ namespace PatternGeneratorJRL
       there is the possibility to pass commands a string of stream to the method
       \a ParseCmd().
       
-      There is a set of functionnalities directly supported by the API:
+      There is a set of functionalities directly supported by the API:
       
      
       

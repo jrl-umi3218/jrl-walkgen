@@ -78,7 +78,7 @@ namespace PatternGeneratorJRL
 
       @param[out] LeftFootPosition: The position of the Left Foot position.
       @param[out] RightFootPosition: The position of the Right Foot position.
-      @param[out] ZMPRefPos: The ZMP position to be feed to the controller.
+      @param[out] ZMPRefPos: The ZMP position to be fed to the controller.
       @param[out] aCOMState: returns position, velocity and acceleration of the CoM.
       @param[out] CurrentConfiguration: The results is a state vector containing the articular positions.
       @param[out] CurrentVelocity: The results is a state vector containing the speed.

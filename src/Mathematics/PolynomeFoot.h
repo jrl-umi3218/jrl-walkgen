@@ -54,7 +54,7 @@ namespace PatternGeneratorJRL
       Polynome3(double FT, double FP);
 
       /*!  Set the parameters 
-	This method assumes implictly a position
+	This method assumes implicitly a position
 	set to zero, and a speed equals to zero.
        */
       void SetParameters(double FT, double FP);

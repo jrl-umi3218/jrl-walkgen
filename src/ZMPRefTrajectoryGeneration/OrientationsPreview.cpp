@@ -104,7 +104,7 @@ OrientationsPreview::preview_orientations(double Time,
   // Parameters of the trunk polynomial (fourth order)
   double a,b,c,d,e;
 
-  // Trunkangle at the end of the current support phase
+  // Trunk angle at the end of the current support phase
   double PreviewedTrunkAngleEnd;
 
   while(!TrunkVelOK)

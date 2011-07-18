@@ -24,7 +24,7 @@
  */
 
 /*! \file FootTrajectoryGenerationMultiple.h
-  \brief This object is in charge of maintaning the foot trajectory 
+  \brief This object is in charge of maintaining the foot trajectory
   generation for several intervals. 
   It relies on the FootTrajectoryGenerationStandard class.
 

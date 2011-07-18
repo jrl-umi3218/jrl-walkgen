@@ -74,7 +74,7 @@ namespace PatternGeneratorJRL
     virtual ~FootTrajectoryGenerationStandard();
 
     /*! This method computes the position of the swinging foot during single support phase,
-      and maintian a constant position for the support foot.
+      and maintain a constant position for the support foot.
       It uses polynomial of 3rd order for the X-axis, Y-axis, 
       orientation in the X-Z axis, and orientation in the X-Y axis,
       and finally it uses a 4th order polynome for the Z-axis.

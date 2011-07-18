@@ -87,7 +87,7 @@ namespace PatternGeneratorJRL
     double sx,sy,theta;
     double SStime;
     double DStime;
-    int stepType;     //1:normal walking 2:one step before opbstacle
+    int stepType;     //1:normal walking 2:one step before obstacle
                       //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
     double DeviationHipHeight;
   };
@@ -100,9 +100,9 @@ namespace PatternGeneratorJRL
     double px,py,pz;
     double theta;//For COM
     double time;
-    int stepType;     //1:normal walking 2:one step before opbstacle
+    int stepType;     //1:normal walking 2:one step before obstacle
                       //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
-    //+10 if duoble support phase
+    //+10 if double support phase
     //*(-1) if right foot stance else left foot stance
   };
   typedef struct ZMPPosition_s ZMPPosition;
@@ -118,7 +118,7 @@ namespace PatternGeneratorJRL
     double ddx,ddy,ddz, ddtheta, ddomega, ddomega2;
     /*! Time at which this position should be reached. */
     double time;
-    /*! 1:normal walking 2:one step before opbstacle
+    /*! 1:normal walking 2:one step before obstacle
       3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
       +10 if double support phase
       (-1) if support foot  */
