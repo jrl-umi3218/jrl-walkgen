@@ -383,57 +383,34 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 
   SupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = (-1)*StepType;
 
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = StepType;
+  FootAbsolutePosition & curr_NSFAP = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex];
+  const FootAbsolutePosition & init_NSFAP = NoneSupportFootAbsolutePositions[IndexInitial];
+
+  curr_NSFAP.stepType = StepType;
   
   if (LocalTime < EndOfLiftOff)
     {
       // Do not modify x, y and theta while liftoff.
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x = 
-	NoneSupportFootAbsolutePositions[IndexInitial].x;
-
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
-	NoneSupportFootAbsolutePositions[IndexInitial].y;
-       
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
-	NoneSupportFootAbsolutePositions[IndexInitial].theta;
+      curr_NSFAP.x = init_NSFAP.x;
+      curr_NSFAP.y = init_NSFAP.y;
+      curr_NSFAP.theta = init_NSFAP.theta;
     }
   else if (LocalTime < StartLanding)
     {
       // DO MODIFY x, y and theta the remaining time.
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x = 
-	m_PolynomeX->Compute(LocalTime - EndOfLiftOff) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].x;
-
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
-	m_PolynomeY->Compute(LocalTime - EndOfLiftOff) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].y;
-
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
-	m_PolynomeTheta->Compute(LocalTime - EndOfLiftOff) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].theta;
-	  
+      curr_NSFAP.x     = init_NSFAP.x     + m_PolynomeX->Compute(LocalTime - EndOfLiftOff);
+      curr_NSFAP.y     = init_NSFAP.y     + m_PolynomeY->Compute(LocalTime - EndOfLiftOff);
+      curr_NSFAP.theta = init_NSFAP.theta + m_PolynomeTheta->Compute(LocalTime - EndOfLiftOff);
     }
   else 
     {
       // Do not modify x, y and theta while landing.
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x = 
-	m_PolynomeX->Compute(ModulatedSingleSupportTime) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].x;
-       
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
-	m_PolynomeY->Compute(ModulatedSingleSupportTime) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].y;
-
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
-	m_PolynomeTheta->Compute(ModulatedSingleSupportTime) + 
-	NoneSupportFootAbsolutePositions[IndexInitial].theta;
+      curr_NSFAP.x     = init_NSFAP.x     + m_PolynomeX->Compute(ModulatedSingleSupportTime);
+      curr_NSFAP.y     = init_NSFAP.y     + m_PolynomeY->Compute(ModulatedSingleSupportTime);
+      curr_NSFAP.theta = init_NSFAP.theta + m_PolynomeTheta->Compute(ModulatedSingleSupportTime);
     }
 
-  
-
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = 
-    m_PolynomeZ->Compute(LocalTime) + 
-    NoneSupportFootAbsolutePositions[IndexInitial].z;
+  curr_NSFAP.z = init_NSFAP.z + m_PolynomeZ->Compute(LocalTime);
   
   bool ProtectionNeeded=false;
 
@@ -441,28 +418,27 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   // First treat the lift-off.
   if (LocalTime<EndOfLiftOff)
     {
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
-	m_PolynomeOmega->Compute(LocalTime) ;      
+      curr_NSFAP.omega = m_PolynomeOmega->Compute(LocalTime) ;
       ProtectionNeeded=true;
     }
   // Prepare for the landing.
   else if (LocalTime<StartLanding)
     {
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
+      curr_NSFAP.omega =
 	m_Omega - m_PolynomeOmega2->Compute(LocalTime-EndOfLiftOff);
     }
   // Realize the landing.
   else 
     {
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
+      curr_NSFAP.omega =
 	m_PolynomeOmega->Compute(LocalTime - StartLanding)  - m_Omega;
       ProtectionNeeded=true;
     }
   double dFX=0,dFY=0,dFZ=0;
   double lOmega = 0.0;
-  lOmega = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega*M_PI/180.0;
+  lOmega = curr_NSFAP.omega*M_PI/180.0;
   double lTheta = 0.0;
-  lTheta = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta*M_PI/180.0;
+  lTheta = curr_NSFAP.theta*M_PI/180.0;
 
   double c = cos(lTheta);
   double s = sin(lTheta);
@@ -522,21 +498,21 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
     MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionLeft);
 
   // Modification of the foot position.
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x += (dFX + Foot_Shift(0));
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y += (dFY + Foot_Shift(1));
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z += (dFZ + Foot_Shift(2));
+  curr_NSFAP.x += (dFX + Foot_Shift(0));
+  curr_NSFAP.y += (dFY + Foot_Shift(1));
+  curr_NSFAP.z += (dFZ + Foot_Shift(2));
 #else
   // Modification of the foot position.
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x += dFX ;
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y += dFY ;
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z += dFZ ;
+  curr_NSFAP.x += dFX ;
+  curr_NSFAP.y += dFY ;
+  curr_NSFAP.z += dFZ ;
 #endif
  
   ODEBUG4( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift 
 	   << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )" 
-	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x << " "
-	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y << " "
-	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z << " "
+	   << curr_NSFAP.x << " "
+	   << curr_NSFAP.y << " "
+	   << curr_NSFAP.z << " "
 	   ,"GeneratedFoot.dat");
 
 }

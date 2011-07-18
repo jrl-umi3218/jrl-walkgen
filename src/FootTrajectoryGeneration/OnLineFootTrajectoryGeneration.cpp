@@ -62,71 +62,58 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
   double EndOfLiftOff = (m_TSingle-UnlockedSwingPeriod)*0.5;
   double StartLanding = EndOfLiftOff + UnlockedSwingPeriod;
 
+  FootAbsolutePosition & curr_NSFAP = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex];
+  const FootAbsolutePosition & prev_NSFAP = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1];
+
   // The foot support does not move.
   SupportFootAbsolutePositions[CurrentAbsoluteIndex] = 
       SupportFootAbsolutePositions[StartIndex-1];
   SupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = (-1)*StepType;
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = StepType;
+
+
+  curr_NSFAP.stepType = StepType;
 
   if (LocalInterpolationStartTime +InterpolationTime <= EndOfLiftOff || LocalInterpolationStartTime +InterpolationTime >= StartLanding)
     {
       // Do not modify x, y and theta while liftoff.
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x = 
-          NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].x;
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
-          NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].y;
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
-          NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].theta;
+      curr_NSFAP.x = prev_NSFAP.x;
+      curr_NSFAP.y = prev_NSFAP.y;
+      curr_NSFAP.theta = prev_NSFAP.theta;
     }
   else if (LocalInterpolationStartTime < EndOfLiftOff && LocalInterpolationStartTime +InterpolationTime > EndOfLiftOff)
     {
       // DO MODIFY x, y and theta the remaining time.
+	  double remainingTime = LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff;
       // x, dx
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x = 
-          m_PolynomeX->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dx = 
-          m_PolynomeX->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
+      curr_NSFAP.x   = m_PolynomeX->Compute(remainingTime);
+      curr_NSFAP.dx  = m_PolynomeX->ComputeDerivative(remainingTime);
       if(m_PolynomeX->Degree() > 4)
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddx =
-            m_PolynomeX->ComputeSecDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
+        curr_NSFAP.ddx  = m_PolynomeX->ComputeSecDerivative(remainingTime);
       //y, dy
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
-          m_PolynomeY->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy = 
-          m_PolynomeY->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
+      curr_NSFAP.y   = m_PolynomeY->Compute(remainingTime);
+      curr_NSFAP.dy  = m_PolynomeY->ComputeDerivative(remainingTime);
       if(m_PolynomeY->Degree() > 4)
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddy =
-            m_PolynomeY->ComputeSecDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
+        curr_NSFAP.ddy  = m_PolynomeY->ComputeSecDerivative(remainingTime);
       //theta, dtheta
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
-          m_PolynomeTheta->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dtheta = 
-          m_PolynomeTheta->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
+      curr_NSFAP.theta   = m_PolynomeTheta->Compute(remainingTime);
+      curr_NSFAP.dtheta  = m_PolynomeTheta->ComputeDerivative(remainingTime);
     }
   else 
     {
       // DO MODIFY x, y and theta all the time.
       // x, dx
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x = 
-          m_PolynomeX->Compute(InterpolationTime);
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dx = 
-          m_PolynomeX->ComputeDerivative(InterpolationTime);
+      curr_NSFAP.x  = m_PolynomeX->Compute(InterpolationTime);
+      curr_NSFAP.dx = m_PolynomeX->ComputeDerivative(InterpolationTime);
       if(m_PolynomeX->Degree() > 4)
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddx =
-            m_PolynomeX->ComputeSecDerivative(InterpolationTime);
+        curr_NSFAP.ddx  = m_PolynomeX->ComputeSecDerivative(InterpolationTime);
       //y, dy
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
-          m_PolynomeY->Compute(InterpolationTime);
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy = 
-          m_PolynomeY->ComputeDerivative(InterpolationTime);
+      curr_NSFAP.y  = m_PolynomeY->Compute(InterpolationTime);
+      curr_NSFAP.dy = m_PolynomeY->ComputeDerivative(InterpolationTime);
       if(m_PolynomeY->Degree() > 4)
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddy =
-            m_PolynomeY->ComputeSecDerivative(InterpolationTime);
+        curr_NSFAP.ddy = m_PolynomeY->ComputeSecDerivative(InterpolationTime);
       //theta, dtheta
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
-          m_PolynomeTheta->Compute( InterpolationTime );
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dtheta = 
-          m_PolynomeTheta->ComputeDerivative(InterpolationTime);
+      curr_NSFAP.theta = m_PolynomeTheta->Compute( InterpolationTime );
+      curr_NSFAP.dtheta = m_PolynomeTheta->ComputeDerivative(InterpolationTime);
     }
 
   if(HalfTimePassed_==false && LocalInterpolationStartTime+InterpolationTime >= m_TSingle/2.0 )
@@ -162,33 +149,33 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
   // First treat the lift-off.
   if (LocalInterpolationStartTime+InterpolationTime<EndOfLiftOff)
     {
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
-          m_PolynomeOmega->Compute(InterpolationTime);
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].domega = 
-          m_PolynomeOmega->Compute(InterpolationTime);
+      curr_NSFAP.omega   = m_PolynomeOmega->Compute(InterpolationTime);
+      //TODO BEWARE: I think there is a typo in the original code
+	  //TODO      curr_NSFAP.domega  = m_PolynomeOmega->Compute(InterpolationTime);
+      curr_NSFAP.domega  = m_PolynomeOmega->ComputeDerivative(InterpolationTime);
 
       ProtectionNeeded=true;
     }
   // Prepare for the landing.
   else if (LocalInterpolationStartTime+InterpolationTime<StartLanding)
     {
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
+      curr_NSFAP.omega =
           m_Omega - m_PolynomeOmega2->Compute(LocalInterpolationStartTime+InterpolationTime-EndOfLiftOff)-
           NoneSupportFootAbsolutePositions[StartIndex-1].omega2;
     }
   // Realize the landing.
   else 
     {
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega = 
+      curr_NSFAP.omega =
           m_PolynomeOmega->Compute(LocalInterpolationStartTime+InterpolationTime - StartLanding) +
           NoneSupportFootAbsolutePositions[StartIndex-1].omega - m_Omega;
       ProtectionNeeded=true;
     }
   double dFX=0,dFY=0,dFZ=0;
   double lOmega = 0.0;
-  lOmega = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega*M_PI/180.0;
+  lOmega = curr_NSFAP.omega*M_PI/180.0;
   double lTheta = 0.0;
-  lTheta = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta*M_PI/180.0;
+  lTheta = curr_NSFAP.theta*M_PI/180.0;
 
   double c = cos(lTheta);
   double s = sin(lTheta);
@@ -224,10 +211,9 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
   MAL_S3_VECTOR(Foot_Shift,double);
 
   // Modification of the foot position.
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x += dFX ;
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y += dFY ;
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z += dFZ ;
-
+  curr_NSFAP.x += dFX ;
+  curr_NSFAP.y += dFY ;
+  curr_NSFAP.z += dFZ ;
 }
 
 
@@ -286,7 +272,7 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
   FinalRightFootTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex+1);
   if(CurrentSupport.Phase == SS && Time+3.0/2.0*QP_T_ < CurrentSupport.TimeLimit)
     {
-      //determine coefficients of interpolation polynom
+      //determine coefficients of interpolation polynome
       double ModulationSupportCoefficient = 0.9;
       double UnlockedSwingPeriod = m_TSingle * ModulationSupportCoefficient;
       double EndOfLiftOff = (m_TSingle-UnlockedSwingPeriod)*0.5;
@@ -294,24 +280,29 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
       if(LocalInterpolationTime>EndOfLiftOff)
         SwingTimePassed = LocalInterpolationTime-EndOfLiftOff;
 
-      FootAbsolutePosition LastSwingFootPosition;
+      FootAbsolutePosition * LastSFP; //LastSwingFootPosition
 
       if(CurrentSupport.Foot == LEFT)
         {
-          LastSwingFootPosition = FinalRightFootTraj_deq[CurrentIndex];
+    	  LastSFP = &(FinalRightFootTraj_deq[CurrentIndex]);
         }
       else
         {
-          LastSwingFootPosition = FinalLeftFootTraj_deq[CurrentIndex];
+    	  LastSFP = &(FinalLeftFootTraj_deq[CurrentIndex]);
         }
 
       //Set parameters for current polynomial
-      SetParameters(FootTrajectoryGenerationStandard::X_AXIS,
-          UnlockedSwingPeriod-SwingTimePassed,FPx,
-          LastSwingFootPosition.x, LastSwingFootPosition.dx, LastSwingFootPosition.ddx);
-      SetParameters(FootTrajectoryGenerationStandard::Y_AXIS,
-          UnlockedSwingPeriod-SwingTimePassed,FPy,
-          LastSwingFootPosition.y, LastSwingFootPosition.dy, LastSwingFootPosition.ddy);
+      double TimeInterval = UnlockedSwingPeriod-InterpolationTimePassed;
+      SetParameters(
+    	  FootTrajectoryGenerationStandard::X_AXIS,
+          TimeInterval,FPx,
+          LastSFP->x, LastSFP->dx, LastSFP->ddx)
+          );
+      SetParameters(
+    	  FootTrajectoryGenerationStandard::Y_AXIS,
+          TimeInterval,FPy,
+          LastSFP->y, LastSFP->dy, LastSFP->ddy
+          );
 
       if(CurrentSupport.StateChanged==true)
         {
@@ -320,19 +311,18 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
         }
 
 
-      SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::THETA_AXIS,
-          UnlockedSwingPeriod-SwingTimePassed,
-          PreviewedSupportAngles_deq[0]*180.0/M_PI,
-          LastSwingFootPosition.theta,
-          LastSwingFootPosition.dtheta);
-      SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA_AXIS,
-          UnlockedSwingPeriod-SwingTimePassed,0.0*180.0/M_PI,
-          LastSwingFootPosition.omega,
-          LastSwingFootPosition.domega);
-      SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::OMEGA2_AXIS,
-          UnlockedSwingPeriod-SwingTimePassed,2*0.0*180.0/M_PI,
-          LastSwingFootPosition.omega2,
-          LastSwingFootPosition.domega2);
+      SetParametersWithInitPosInitSpeed(
+          FootTrajectoryGenerationStandard::THETA_AXIS,
+          TimeInterval, PreviewedSupportAngles_deq[0]*180.0/M_PI,
+          LastSFP->theta, LastSFP->dtheta);
+      SetParametersWithInitPosInitSpeed(
+          FootTrajectoryGenerationStandard::OMEGA_AXIS,
+          TimeInterval,0.0*180.0/M_PI,
+          LastSFP->omega, LastSFP->domega);
+      SetParametersWithInitPosInitSpeed(
+          FootTrajectoryGenerationStandard::OMEGA2_AXIS,
+          TimeInterval,2*0.0*180.0/M_PI,
+          LastSFP->omega2, LastSFP->domega2);
 
       for(int k = 1; k<=(int)(QP_T_/m_SamplingPeriod);k++)
         {
