@@ -1543,7 +1543,7 @@ namespace PatternGeneratorJRL {
   }
 
 
-  int PatternGeneratorInterfacePrivate::GetWalkMode()
+  int PatternGeneratorInterfacePrivate::GetWalkMode() const
   {
     return m_StepStackHandler->GetWalkMode();
   }
@@ -1556,7 +1556,7 @@ namespace PatternGeneratorJRL {
   }
 
   void PatternGeneratorInterfacePrivate::GetLegJointVelocity(MAL_VECTOR( & dqr,double),
-							     MAL_VECTOR( & dql,double))
+							     MAL_VECTOR( & dql,double)) const
   {
 
     // TO DO: take the joint specific to the legs
@@ -1679,12 +1679,13 @@ namespace PatternGeneratorJRL {
 
   }
 
-  void PatternGeneratorInterfacePrivate::getWaistPositionMatrix(MAL_S4x4_MATRIX( &lWaistAbsPos,double))
+  void PatternGeneratorInterfacePrivate::getWaistPositionMatrix(MAL_S4x4_MATRIX( &lWaistAbsPos,double)) const
   {
     lWaistAbsPos = m_WaistAbsPos;
   }
 
-  void PatternGeneratorInterfacePrivate::getWaistPositionAndOrientation(double aTQ[7], double &Orientation)
+  //TODO test me 
+  void PatternGeneratorInterfacePrivate::getWaistPositionAndOrientation(double aTQ[7], double &Orientation) const
   {
     // Position
     aTQ[0] = MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 0,3);
@@ -1741,7 +1742,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::getWaistVelocity(double & dx,
 							  double & dy,
-							  double & omega)
+							  double & omega) const
   {
     dx = m_AbsLinearVelocity(0);
     dy = m_AbsLinearVelocity(1);
@@ -1886,7 +1887,7 @@ namespace PatternGeneratorJRL {
     m_ZMPInitialPointSet = true;
   }
 
-  void PatternGeneratorInterfacePrivate::getZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint)
+  void PatternGeneratorInterfacePrivate::getZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint) const
   {
     lZMPInitialPoint = m_ZMPInitialPoint;
   }

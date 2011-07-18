@@ -67,13 +67,13 @@ void FootTrajectoryGenerationMultiple::SetNumberOfIntervals(int lNumberOfInterva
   m_NatureOfIntervals.resize(lNumberOfIntervals);
 }
   
-int FootTrajectoryGenerationMultiple::GetNumberOfIntervals()
+int FootTrajectoryGenerationMultiple::GetNumberOfIntervals() const
 {
   return m_SetOfFootTrajectoryGenerationObjects.size();
 }
 
 
-void FootTrajectoryGenerationMultiple::SetTimeIntervals(vector<double> &lDeltaTj)
+void FootTrajectoryGenerationMultiple::SetTimeIntervals(const vector<double> &lDeltaTj)
 {
   m_DeltaTj = lDeltaTj;
   m_RefTime.resize(lDeltaTj.size());
@@ -88,7 +88,7 @@ void FootTrajectoryGenerationMultiple::SetTimeIntervals(vector<double> &lDeltaTj
   
 }
 
-void FootTrajectoryGenerationMultiple::GetTimeIntervals(vector<double> &lDeltaTj)
+void FootTrajectoryGenerationMultiple::GetTimeIntervals(vector<double> &lDeltaTj) const
 {
   lDeltaTj = m_DeltaTj;
 }
@@ -190,7 +190,7 @@ int FootTrajectoryGenerationMultiple::SetNatureInterval(unsigned int IntervalInd
 
 /*! This method returns the nature of the interval. 
 */
-int FootTrajectoryGenerationMultiple::GetNatureInterval(unsigned int IntervalIndex)
+int FootTrajectoryGenerationMultiple::GetNatureInterval(unsigned int IntervalIndex) const
 {
   if (IntervalIndex>=m_NatureOfIntervals.size())
     return -100;
@@ -228,7 +228,7 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 }
 
 
-double FootTrajectoryGenerationMultiple::GetAbsoluteTimeReference()
+double FootTrajectoryGenerationMultiple::GetAbsoluteTimeReference() const
 {
   return m_AbsoluteTimeReference;
 }
@@ -243,7 +243,7 @@ void FootTrajectoryGenerationMultiple::CallMethod(std::string &, //Method,
 {
   
 }
-int FootTrajectoryGenerationMultiple::DisplayIntervals()
+int FootTrajectoryGenerationMultiple::DisplayIntervals() const
 {
   for(unsigned int i=0;i<m_DeltaTj.size();i++)
     {

@@ -71,9 +71,9 @@ namespace PatternGeneratorJRL
     /// \param[out] PreviewedSupportAngles
     void preview_orientations(double Time, const reference_t & Ref,
 			     double StepDuration, const std::deque<support_state_t> & PrwSupportStates_deq,
-			     std::deque<FootAbsolutePosition> & LeftFootAbsolutePositions,
-			     std::deque<FootAbsolutePosition> & RightFootAbsolutePositions,
-                             std::deque<double> & PreviewedSupportAngles);
+			     const std::deque<FootAbsolutePosition> & LeftFootAbsolutePositions,
+			     const std::deque<FootAbsolutePosition> & RightFootAbsolutePositions,
+                 std::deque<double> & PreviewedSupportAngles);
 
     /// \brief Interpolate previewed orientation of the trunk
     ///

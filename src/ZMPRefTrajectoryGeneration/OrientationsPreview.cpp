@@ -75,8 +75,8 @@ void
 OrientationsPreview::preview_orientations(double Time,
     const reference_t & Ref,
     double StepDuration, const deque<support_state_t> & PrwSupportStates_deq,
-    std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
-    std::deque<FootAbsolutePosition> & RightFootPositions_deq,
+    const std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
+    const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
     std::deque<double> & PreviewedSupportAngles_deq)
 {
 

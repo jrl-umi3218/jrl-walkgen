@@ -81,12 +81,12 @@ void Polynome::GetCoefficients(vector<double> &lCoefficients) const
 }
 
 
-void Polynome::SetCoefficients(vector<double> &lCoefficients)
+void Polynome::SetCoefficients(const vector<double> &lCoefficients)
 {
   m_Coefficients = lCoefficients;
 }
 
-void Polynome::print()
+void Polynome::print() const
 {
   for(unsigned int i=0;i<m_Coefficients.size();i++)
     cout << m_Coefficients[i] << " " ;

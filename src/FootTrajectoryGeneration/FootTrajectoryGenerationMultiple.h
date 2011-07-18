@@ -96,22 +96,22 @@ namespace PatternGeneratorJRL
     void SetNumberOfIntervals(int lNumberOfIntervals);
 
     /*! \brief Get number of intervals. */
-    int GetNumberOfIntervals();
+    int GetNumberOfIntervals() const;
 
     /*! \brief Set the time for each interval. */
-    void SetTimeIntervals(std::vector<double> & lDeltaTj);
+    void SetTimeIntervals(const std::vector<double> & lDeltaTj);
     
     /*! \brief Get the time for each interval */
-    void GetTimeIntervals(std::vector<double>  & lDeltaTj);
+    void GetTimeIntervals(std::vector<double>  & lDeltaTj) const;
 
     /*! \brief Set nature of interval */
     int SetNatureInterval(unsigned int IntervalIndex, int Nature);
 
     /*! \brief Get nature of interval */
-    int GetNatureInterval(unsigned int IntervalIndex);
+    int GetNatureInterval(unsigned int IntervalIndex) const;
 
     /*! \brief Display intervals time. */
-    int DisplayIntervals();
+    int DisplayIntervals() const;
     
     /*! @} */
     
@@ -157,7 +157,7 @@ namespace PatternGeneratorJRL
      @{ */
 
    /*! Returns the time when the trajectory starts. */
-   double GetAbsoluteTimeReference();
+   double GetAbsoluteTimeReference() const;
 
    /*! Set the time when the trajectory starts.  */
    void SetAbsoluteTimeReference(double lAbsoluteTimeReference);

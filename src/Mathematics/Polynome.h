@@ -64,14 +64,14 @@ namespace PatternGeneratorJRL
       void GetCoefficients(std::vector<double> &lCoefficients) const;
 
       /*! Set the coefficients. */
-      void SetCoefficients(std::vector<double> &lCoefficients);
+      void SetCoefficients(const std::vector<double> &lCoefficients);
 
       inline int Degree()
       { return m_Degree; };
 
 
       /*! Print the coefficient. */
-      void print();
+      void print() const;
 
     protected:
 

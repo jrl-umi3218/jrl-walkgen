@@ -248,11 +248,11 @@ namespace PatternGeneratorJRL
     void SetCurrentJointValues(MAL_VECTOR( &lCurrentJointValues,double));
 
     /*! \brief Returns the walking mode. */
-    int GetWalkMode();
+    int GetWalkMode() const;
     
     /*! \brief Get the leg joint velocity */
     void GetLegJointVelocity(MAL_VECTOR( &dqr,double), 
-			     MAL_VECTOR( &dql,double));
+			     MAL_VECTOR( &dql,double)) const;
 
     /*! \brief Read a velocity reference. */
     void setVelReference(istringstream &strm);
@@ -313,7 +313,7 @@ namespace PatternGeneratorJRL
 
     /*! \brief Get the waist position and orientation as a quaternion,
      and the planar X-Y orientation in Orientation. */
-    void getWaistPositionAndOrientation(double TQ[7],double &Orientation);
+    void getWaistPositionAndOrientation(double TQ[7],double &Orientation) const;
 
     /*! \brief Set Waist position and Orientation  */
     void setWaistPositionAndOrientation(double TQ[7]);
@@ -321,10 +321,10 @@ namespace PatternGeneratorJRL
     /*! \brief Get Waist velocity */
     void getWaistVelocity(double &dx,
 			  double &dy,
-			  double &omega) ;
+			  double &omega) const;
 
     /*! \brief An other method to get the waist position using a matrix. */
-    void getWaistPositionMatrix(MAL_S4x4_MATRIX( &lWaistAbsPos,double));
+    void getWaistPositionMatrix(MAL_S4x4_MATRIX( &lWaistAbsPos,double)) const;
      
     /*!@} */
 
@@ -345,7 +345,7 @@ namespace PatternGeneratorJRL
     void setZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint);
 
     /*! \brief Get the initial ZMP reference point. */
-    void getZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint);
+    void getZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint) const;
 
     /*! \name System to call a given method based on registration of a method. 
       @{
