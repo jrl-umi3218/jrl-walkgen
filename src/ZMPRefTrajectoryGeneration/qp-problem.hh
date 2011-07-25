@@ -45,15 +45,21 @@ namespace PatternGeneratorJRL
     //
   public:
 
-    const static int MATRIX_Q=0;
-    const static int MATRIX_DU=1;
-    const static int VECTOR_D=2;
-    const static int VECTOR_DS=3;
-    const static int VECTOR_XL=4;
-    const static int VECTOR_XU=5;
+    enum QPElement
+    {
+      MATRIX_Q,
+      MATRIX_DU,
+      VECTOR_D,
+      VECTOR_DS,
+      VECTOR_XL,
+      VECTOR_XU
+    };
 
-    const static int QLD=10;
-    const static int PLDP=11;
+    enum Solver
+    {
+      QLD,
+      PLDP
+    };
 
 
     //
@@ -67,31 +73,6 @@ namespace PatternGeneratorJRL
     /// \brief Release the memory at the end only.
     ~QPProblem_s();
 
-    /// \brief Set the number of optimization parameters.
-    ///
-
-    /// \param NbVariables_
-    void NbVariables( unsigned int NbVariables )
-    { NbVariables_ = NbVariables;};
-
-    /// \brief Set the number of equality constraints.
-    ///
-    /// \param NbEqConstraints
-    inline void NbEqConstraints( unsigned int NbEqConstraints )
-    { NbEqConstraints_ = NbEqConstraints;};
-
-    /// \brief Set the total number of constraints.
-    ///
-    /// \param NbConstraints_
-    inline void NbConstraints( unsigned int NbConstraints )
-    { NbConstraints_ = NbConstraints;};
-    
-    /// \brief Get the total number of constraints.
-    ///
-    /// \param nb_constraints
-    inline int NbConstraints()
-    { return NbConstraints_;};
-
     /// \brief Reallocate array
     ///
     /// \param[in] Array
@@ -102,11 +83,11 @@ namespace PatternGeneratorJRL
 
     /// \brief Add a matrix to the final optimization problem in array form
     ///
-    /// \param Mat Added matrix
-    /// \param Type Target matrix type
-    /// \param Row First row inside the target
-    /// \param Col First column inside the target
-    void add_term(const boost_ublas::matrix<double> & Mat, int Type,
+    /// \param[in] Mat Added matrix
+    /// \param[in] Type Target matrix type
+    /// \param[in] Row First row inside the target
+    /// \param[in] Col First column inside the target
+    void add_term(const boost_ublas::matrix<double> & Mat, QPElement Type,
         unsigned int Row, unsigned int Col);
 
     /// \brief Add a vector to the final optimization problem in array form
@@ -114,7 +95,7 @@ namespace PatternGeneratorJRL
     /// \param Mat Added vector
     /// \param ype Target vector type
     /// \param row First row inside the target
-    void add_term(const boost_ublas::vector<double> & Vec, int Type,
+    void add_term(const boost_ublas::vector<double> & Vec, QPElement Type,
         unsigned int Row);
 
     /// \brief Dump on disk a problem.
@@ -124,13 +105,13 @@ namespace PatternGeneratorJRL
     ///
     /// \param Type
     /// \param Filename
-    void dump( int Type, const char * Filename);
+    void dump( QPElement Type, const char * Filename);
     /// \}
 
     /// \brief Initialize array
     ///
     /// \param[in] type
-    void clear( int Type );
+    void clear( QPElement Type );
 
     /// \brief Set matrices to zero
     void reset();
@@ -139,8 +120,25 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Solver
     /// \param[out] Result
-    void solve( int Solver, solution_t & Result);
+    void solve( Solver Solver, solution_t & Result);
 
+    /// \name Accessors and mutators
+    /// \{
+    inline void NbVariables( unsigned int NbVariables )
+    { NbVariables_ = NbVariables;};
+    inline unsigned int NbVariables( )
+    { return NbVariables_;};
+
+    inline void NbEqConstraints( unsigned int NbEqConstraints )
+    { NbEqConstraints_ = NbEqConstraints;};
+    inline unsigned int NbEqConstraints(  )
+    { return NbEqConstraints_;};
+
+    inline void NbConstraints( unsigned int NbConstraints )
+    { NbConstraints_ = NbConstraints;};
+    inline unsigned int NbConstraints()
+    { return NbConstraints_;};
+    /// \}
 
     //
     // Private methods
@@ -160,7 +158,7 @@ namespace PatternGeneratorJRL
     /// \brief Print_ on disk the parameters that are passed to the solver
     void dump_solver_parameters( std::ostream & aos );
     /// \brief Print_ array
-    void dump( int Type, std::ostream & aos );
+    void dump( QPElement Type, std::ostream & aos );
     /// \brief Print_ problem
     void dump_problem( std::ostream & );
     /// \}

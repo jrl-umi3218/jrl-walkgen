@@ -47,10 +47,10 @@ QPProblem_s::QPProblem_s():
   iout_(0),ifail_(0), iprint_(0),
   lwar_(0), liwar_(0),
   eps_(0),
-  NbVariables_(36), NbConstraints_(74),NbEqConstraints_(0)
+  NbVariables_(0), NbConstraints_(0),NbEqConstraints_(0)
 {
-  NbVariables_ = 36;
-  NbConstraints_ = 74;
+  NbVariables_ = 0;
+  NbConstraints_ = 0;
 
   m_ = NbConstraints_;
   me_ = NbEqConstraints_;
@@ -114,7 +114,7 @@ QPProblem_s::resize_all()
 
 
 void
-QPProblem_s::clear( int Type )
+QPProblem_s::clear( QPElement Type )
 {
 
   switch(Type)
@@ -159,13 +159,13 @@ void QPProblem_s::reset()
 
 
 void
-QPProblem_s::solve( int Solver, solution_t & Result )
+QPProblem_s::solve( Solver Solver, solution_t & Result )
 {
   switch(Solver)
     {
     case QLD:
 
-      m_ = NbConstraints_;
+      m_ = NbConstraints_+1;//TODO: Clarify why NbC.+1 and not NbC.
       me_ = NbEqConstraints_;
       mmax_ = m_+1;
       n_ = NbVariables_;
@@ -206,13 +206,16 @@ QPProblem_s::solve( int Solver, solution_t & Result )
 
       Result.Fail = ifail_;
       Result.Print = iprint_;
+
+    case PLDP:
+      break;
     }
 
 }
 
 
 void
-QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), int Type,
+QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), QPElement Type,
     unsigned int Row,  unsigned int Col )
 {
 
@@ -229,7 +232,17 @@ QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), int Type,
       Array_p = &DU_;
       NbConstraints_ = (Row+Mat.size1()>NbConstraints_) ? Row+Mat.size1() : NbConstraints_;
       NbVariables_ = (Col+Mat.size2()>NbVariables_) ? Col+Mat.size2() : NbVariables_;
+      Row++;//The first rows of DU,DS are empty
       break;
+
+    case VECTOR_D:
+       break;
+     case VECTOR_XL:
+       break;
+     case VECTOR_XU:
+       break;
+     case VECTOR_DS:
+       break;
     }
 
 
@@ -268,16 +281,15 @@ QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), int Type,
   double * p = Array_p->Array_;
   for( unsigned int i = 0;i < Mat.size1(); i++)
     for( unsigned int j = 0;j < Mat.size2(); j++)
-      {
+      {//TODO: Interchange the loops to increase speed
         p[Row+i+(Col+j)*Array_p->NbRows_] += Mat(i,j);
       }
-
 
 }
 
 
 void
-QPProblem_s::add_term( const MAL_VECTOR (&Vec, double), int Type,
+QPProblem_s::add_term( const MAL_VECTOR (&Vec, double), QPElement Type,
     unsigned int Row )
 {
 
@@ -303,6 +315,12 @@ QPProblem_s::add_term( const MAL_VECTOR (&Vec, double), int Type,
     case VECTOR_DS:
       Array_p = &DS_;
       NbConstraints_ = (Row+Vec.size()>NbConstraints_) ? Row+Vec.size() : NbConstraints_;
+      Row++;//The first rows of DU,DS are empty
+      break;
+
+    case MATRIX_DU:
+      break;
+    case MATRIX_Q:
       break;
     }
 
@@ -339,7 +357,7 @@ QPProblem_s::dump_solver_parameters(std::ostream & aos)
 
 
 void
-QPProblem_s::dump( int Type, std::ostream & aos)
+QPProblem_s::dump( QPElement Type, std::ostream & aos)
 {
 
   unsigned int NbRows=0, NbCols=0;
@@ -402,7 +420,7 @@ QPProblem_s::dump( int Type, std::ostream & aos)
 
 
 void
-QPProblem_s::dump( int Type, const char * FileName )
+QPProblem_s::dump( QPElement Type, const char * FileName )
 {
   std::ofstream aof;
   aof.open(FileName,std::ofstream::out);
