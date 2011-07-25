@@ -413,6 +413,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // --------------
       solution_t Result;
       Problem_.solve( QPProblem_s::QLD, Result );
+      Problem_.dump_problem( Time );
       Problem_.reset();
 
 
@@ -422,7 +423,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       FinalCOMTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex);
       FinalZMPTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex);
       CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, CurrentIndex,
-          Result.Solution_vec[0],Result.Solution_vec[QP_N_] );
+          Result.Solution_vec[0], Result.Solution_vec[QP_N_] );
       CoM_.OneIteration( Result.Solution_vec[0],Result.Solution_vec[QP_N_] );
 
 

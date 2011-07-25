@@ -87,19 +87,20 @@ namespace PatternGeneratorJRL
     /// \param[in] Type Target matrix type
     /// \param[in] Row First row inside the target
     /// \param[in] Col First column inside the target
-    void add_term(const boost_ublas::matrix<double> & Mat, QPElement Type,
-        unsigned int Row, unsigned int Col);
+    void add_term( const boost_ublas::matrix<double> & Mat, QPElement Type,
+        unsigned int Row, unsigned int Col );
 
     /// \brief Add a vector to the final optimization problem in array form
     ///
     /// \param Mat Added vector
     /// \param ype Target vector type
     /// \param row First row inside the target
-    void add_term(const boost_ublas::vector<double> & Vec, QPElement Type,
-        unsigned int Row);
+    void add_term( const boost_ublas::vector<double> & Vec, QPElement Type,
+        unsigned int Row );
 
-    /// \brief Dump on disk a problem.
-    void dump_problem(const char * Filename);
+    /// \brief Dump current problem on disk.
+    void dump_problem( const char * Filename );
+    void dump_problem( double Time );
 
     /// \brief Dump on disk an array.
     ///
@@ -211,8 +212,8 @@ namespace PatternGeneratorJRL
             for(unsigned int j = 0; j < NbCols; j++)
               NewArray[i+NbRows*j] = Array_[i+NbRows_*j];
 
-          NbRows_ = NbRows;
-          NbCols_ = NbCols;
+          FinalArray.NbRows_ = NbRows;
+          FinalArray.NbCols_ = NbCols;
         }
         catch (std::bad_alloc& ba)
         {std::cerr << "bad_alloc caught: " << ba.what() << std::endl; }

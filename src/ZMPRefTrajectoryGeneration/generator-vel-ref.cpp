@@ -636,7 +636,7 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
 
   //constant part
   // +dc
-  Pb.add_term(IneqCoP.dc,QPProblem::VECTOR_DS,0);
+  Pb.add_term(IneqCoP.dc,QPProblem::VECTOR_DS,NbConstraints);
 
   boost_ublas::vector<double> MV(NbInequalities,false);
   boost_ublas::matrix<double> MM2(NbInequalities,3,false);
@@ -741,7 +741,7 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, RelativeFeetInequalities * R
 
   unsigned int NbStepsPreviewed = PrwSupportStates_deq.back().StepNumber;
   //Equality constraints
-  //  build_eq_constraints_feet( PrwSupportStates_deq, NbStepsPreviewed, Pb );
+    build_eq_constraints_feet( PrwSupportStates_deq, NbStepsPreviewed, Pb );
 
   //CoP constraints
   linear_inequality_t & IneqCoP = IntermedData_->Inequalities(IntermedQPMat::INEQ_COP);

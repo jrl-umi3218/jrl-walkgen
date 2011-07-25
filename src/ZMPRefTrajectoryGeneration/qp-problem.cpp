@@ -165,7 +165,7 @@ QPProblem_s::solve( Solver Solver, solution_t & Result )
     {
     case QLD:
 
-      m_ = NbConstraints_+1;//TODO: Clarify why NbC.+1 and not NbC.
+      m_ = NbConstraints_+1;
       me_ = NbEqConstraints_;
       mmax_ = m_+1;
       n_ = NbVariables_;
@@ -366,14 +366,14 @@ QPProblem_s::dump( QPElement Type, std::ostream & aos)
   switch(Type)
     {
     case MATRIX_Q:
-      NbRows = NbCols = NbVariables_ ;
+      NbRows = NbCols = Q_dense_.NbCols_ ;
       Array = Q_dense_.Array_;
       Name = "Q";
       break;
 
     case MATRIX_DU:
-      NbRows = NbConstraints_+1;
-      NbCols = NbVariables_;
+      NbRows = DU_dense_.NbRows_;
+      NbCols = DU_dense_.NbCols_;
       Array = DU_dense_.Array_;
       Name = "DU";
       break;
@@ -400,7 +400,7 @@ QPProblem_s::dump( QPElement Type, std::ostream & aos)
       break;
 
     case VECTOR_DS:
-      NbRows = NbConstraints_+1;
+      NbRows = DS_.NbRows_;
       NbCols= 1;
       Array = DS_.Array_;
       Name = "DS";
@@ -450,6 +450,18 @@ QPProblem_s::dump_problem( const char * FileName )
 {
   std::ofstream aof;
   aof.open(FileName,std::ofstream::out);
+  dump_problem(aof);
+  aof.close();
+}
+
+
+void
+QPProblem_s::dump_problem( double Time )
+{
+  char Buffer[1024];
+  sprintf(Buffer, "Problem_%f.dat", Time);
+  std::ofstream aof;
+  aof.open(Buffer, std::ofstream::out);
   dump_problem(aof);
   aof.close();
 }
