@@ -59,6 +59,7 @@ RigidBodySystem::initialize(  )
   OFTG_->SetSingleSupportTime( 0.7 );
   OFTG_->SetDoubleSupportTime( T_ );
   OFTG_->QPSamplingPeriod( T_ );
+  OFTG_->NbSamplingsPreviewed( N_ );
   OFTG_->FeetDistance( 0.2 );
   OFTG_->StepHeight( 0.05 );
 
@@ -133,7 +134,7 @@ RigidBodySystem::initialize_trajectories()
     }
 
 
-  // Constant CoM Height:
+  // Constant CoM height:
   // --------------------
   std::deque<rigid_body_state_t>::iterator TrajIt;
   for(TrajIt = CoM_.Trajectory().begin(); TrajIt < CoM_.Trajectory().end(); TrajIt++)
@@ -141,13 +142,31 @@ RigidBodySystem::initialize_trajectories()
       TrajIt->Z(0) = CoMHeight_;
     }
 
+
+  // Fixed support states:
+  // ---------------------
+  SupportTrajectory_deq_.resize(40);
+  std::deque<support_state_t>::iterator ST_it = SupportTrajectory_deq_.begin();
+  ST_it->X = 0.257792; ST_it->Y = -0.105; ST_it++;
+  ST_it->X = 0.257792; ST_it->Y = -0.105; ST_it++;
+  ST_it->X = 0.412312; ST_it->Y = 0.095; ST_it++;
+  double PositionX = 0.412312;
+  for(ST_it = ST_it; ST_it < SupportTrajectory_deq_.end(); ST_it++)
+    {
+      PositionX += 0.16;
+      ST_it->X = PositionX; ST_it->Y = -0.105; ST_it++;
+      PositionX += 0.16;
+      ST_it->X = PositionX; ST_it->Y = 0.095;
+    }
+
+
   return 0;
 
 }
 
 
 int
-RigidBodySystem::precompute_trajectories( deque<support_state_t> & SupportStates_deq )
+RigidBodySystem::precompute_trajectories( const deque<support_state_t> & SupportStates_deq )
 {
 
   // Precompute vertical foot trajectories
@@ -156,7 +175,7 @@ RigidBodySystem::precompute_trajectories( deque<support_state_t> & SupportStates
   vector3d LocalAnklePosition;
   HDR_->leftFoot()->getAnklePositionInLocalFrame( LocalAnklePosition );
 
-  deque<support_state_t>::iterator SS_it = SupportStates_deq.begin();
+  deque<support_state_t>::const_iterator SS_it = SupportStates_deq.begin();
   SS_it++;//First support phase is current support phase
   deque<rigid_body_state_t>::iterator LFTraj_it = LeftFoot_.Trajectory().begin();
   deque<rigid_body_state_t>::iterator RFTraj_it = RightFoot_.Trajectory().begin();
@@ -200,13 +219,14 @@ RigidBodySystem::precompute_trajectories( deque<support_state_t> & SupportStates
 
 
 int
-RigidBodySystem::update( std::deque<support_state_t> & SupportStates_deq,
+RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
     const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
     const std::deque<FootAbsolutePosition> & RightFootTraj_deq )
 {
 
-  compute_dyn_pol_feet( SupportStates_deq, LeftFoot_.Dynamics(POSITION), RightFoot_.Dynamics(POSITION) );
-  compute_dyn_pol_feet( SupportStates_deq, LeftFoot_.Dynamics(ACCELERATION), RightFoot_.Dynamics(ACCELERATION) );
+
+  compute_foot_pol_dynamics( SupportStates_deq, LeftFoot_.Dynamics(POSITION), RightFoot_.Dynamics(POSITION) );
+  compute_foot_pol_dynamics( SupportStates_deq, LeftFoot_.Dynamics(ACCELERATION), RightFoot_.Dynamics(ACCELERATION) );
 
   precompute_trajectories( SupportStates_deq );
 
@@ -231,10 +251,10 @@ RigidBodySystem::update( std::deque<support_state_t> & SupportStates_deq,
 
 
 int
-RigidBodySystem::compute_dyn_cop( std::deque<support_state_t> & SupportStates_deq )
+RigidBodySystem::compute_dyn_cop( const std::deque<support_state_t> & SupportStates_deq )
 {
 
-  const double GRAVITY = 9.81;
+  const static double GRAVITY = 9.81;
 
   unsigned int NbSteps = SupportStates_deq.back().StepNumber;
   bool preserve = true;
@@ -312,7 +332,7 @@ RigidBodySystem::compute_dyn_cjerk()
 int
 RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
 {
-
+  //TODO: This can be moved to RigidBody.
   bool preserve = true;
   Dynamics.U.resize(N_,N_,!preserve);
   Dynamics.U.clear();
@@ -376,7 +396,7 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
 
 
 int
-RigidBodySystem::compute_dyn_pol_feet( std::deque<support_state_t> & SupportStates_deq,
+RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> & SupportStates_deq,
     linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics )
 {
 
@@ -404,7 +424,279 @@ RigidBodySystem::compute_dyn_pol_feet( std::deque<support_state_t> & SupportStat
   double Upbar[2], Uabar[2];
   unsigned int NbInstantSS = 0;
   unsigned int SwitchInstant = 0;
-  std::deque<support_state_t>::iterator SS_it =
+  std::deque<support_state_t>::const_iterator SS_it =
+      SupportStates_deq.begin();
+  SS_it++;
+  for(unsigned int i=0;i<N_;i++)
+    {
+      if(SS_it->Foot == LEFT)
+        {
+          SFDynamics = & LeftFootDynamics;
+          FFDynamics = & RightFootDynamics;
+        }
+      else
+        {
+          SFDynamics = & RightFootDynamics;
+          FFDynamics = & LeftFootDynamics;
+        }
+      if(SS_it->StateChanged == true)
+        {
+          SwitchInstant = i+1;
+          NbInstantSS = 0;
+        }
+      if(SS_it->Phase == DS)
+        {
+          // The previous row is copied in DS phase
+          if(i==0)
+            {
+              if(SFDynamics->Type == POSITION)
+                {
+                  SFDynamics->S(i,0) = 1.0;FFDynamics->S(i,0) = 1.0;
+                  SFDynamics->S(i,1) = 0.0;FFDynamics->S(i,1) = 0.0;
+                  SFDynamics->S(i,2) = 0.0;FFDynamics->S(i,2) = 0.0;
+                }
+            }
+          if(i>0)
+            {
+              SFDynamics->S(i,0) = SFDynamics->S(i-1,0);FFDynamics->S(i,0) = FFDynamics->S(i-1,0);
+              SFDynamics->S(i,1) = SFDynamics->S(i-1,1);FFDynamics->S(i,1) = FFDynamics->S(i-1,1);
+              SFDynamics->S(i,2) = SFDynamics->S(i-1,2);FFDynamics->S(i,2) = FFDynamics->S(i-1,2);
+              for(unsigned int SNb = 0; SNb < NbSteps; SNb++)
+                {
+                  SFDynamics->U(i,SNb) = SFDynamics->UT(SNb,i) = SFDynamics->U(i-1,SNb);
+                  FFDynamics->U(i,SNb) = FFDynamics->UT(SNb,i) = FFDynamics->U(i-1,SNb);
+                }
+            }
+          NbInstantSS = 0;
+        }
+      else
+        {
+          if(SS_it->StepNumber == 0)
+            {
+              if(FFDynamics->Type == POSITION)
+                {
+                  SFDynamics->S(i,0) = 1.0;
+                  SFDynamics->S(i,1) = 0.0;
+                  SFDynamics->S(i,2) = 0.0;
+                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = 0.0;
+                  SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
+                }
+            }
+          else if(SS_it->StepNumber == 1 && SS_it->StepNumber < NbSteps)
+            {
+              if(FFDynamics->Type == POSITION)
+                {
+                  FFDynamics->S(i,0) = Spbar[0];
+                  FFDynamics->S(i,1) = Spbar[1];
+                  FFDynamics->S(i,2) = Spbar[2];
+                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Upbar[0];
+                  SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = 1.0;
+                }
+            }
+          else if(SS_it->StepNumber == 2)
+            {
+              FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
+              FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
+              FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
+              for(unsigned int j = 0; j<NbSteps; j++)
+                {
+                  FFDynamics->U(i,j) = FFDynamics->UT(j,i) = FFDynamics->U(i-1,j);
+                  SFDynamics->U(i,j) = SFDynamics->UT(j,i) = SFDynamics->U(i-1,j);
+                }
+            }
+          NbInstantSS++;
+        }
+    }
+
+  return 0;
+
+}
+
+
+int
+RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & SupportStates_deq,
+    linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics )
+{
+
+  // Resize the matrices:
+  // --------------------
+  unsigned int NbSteps = SupportStates_deq.back().StepNumber;
+
+  bool preserve = true;
+  LeftFootDynamics.U.resize(N_,NbSteps,!preserve);
+  LeftFootDynamics.U.clear();
+  LeftFootDynamics.UT.resize(NbSteps,N_,!preserve);
+  LeftFootDynamics.UT.clear();
+  LeftFootDynamics.S.clear();
+  RightFootDynamics.U.resize(N_,NbSteps,!preserve);
+  RightFootDynamics.U.clear();
+  RightFootDynamics.UT.resize(NbSteps,N_,!preserve);
+  RightFootDynamics.UT.clear();
+  RightFootDynamics.S.clear();
+
+  // Fill the matrices:
+  // ------------------
+  linear_dynamics_t * SFDynamics;
+  linear_dynamics_t * FFDynamics;
+  double Spbar[3], Sabar[3];
+  double Upbar[2], Uabar[2];
+  unsigned int NbInstantSS = 0;
+  unsigned int SwitchInstant = 0;
+  std::deque<support_state_t>::const_iterator SS_it =
+      SupportStates_deq.begin();
+  SS_it++;
+  for(unsigned int i=0;i<N_;i++)
+    {
+      if(SS_it->Foot == LEFT)
+        {
+          SFDynamics = & LeftFootDynamics;
+          FFDynamics = & RightFootDynamics;
+        }
+      else
+        {
+          SFDynamics = & RightFootDynamics;
+          FFDynamics = & LeftFootDynamics;
+        }
+      if(SS_it->StateChanged == true)
+        {
+          SwitchInstant = i+1;
+          NbInstantSS = 0;
+        }
+      if(SS_it->Phase == DS)
+        {
+          // The previous row is copied in DS phase
+          // which means that the foot state stays the same
+          if(i==0)
+            {
+              if(SFDynamics->Type == POSITION)
+                {
+                  SFDynamics->S(i,0) = 1.0;FFDynamics->S(i,0) = 1.0;
+                  SFDynamics->S(i,1) = 0.0;FFDynamics->S(i,1) = 0.0;
+                  SFDynamics->S(i,2) = 0.0;FFDynamics->S(i,2) = 0.0;
+                }
+            }
+          if(i>0)
+            {
+              SFDynamics->S(i,0) = SFDynamics->S(i-1,0);FFDynamics->S(i,0) = FFDynamics->S(i-1,0);
+              SFDynamics->S(i,1) = SFDynamics->S(i-1,1);FFDynamics->S(i,1) = FFDynamics->S(i-1,1);
+              SFDynamics->S(i,2) = SFDynamics->S(i-1,2);FFDynamics->S(i,2) = FFDynamics->S(i-1,2);
+              for(unsigned int SNb = 0; SNb < NbSteps; SNb++)
+                {
+                  SFDynamics->U(i,SNb) = SFDynamics->UT(SNb,i) = SFDynamics->U(i-1,SNb);
+                  FFDynamics->U(i,SNb) = FFDynamics->UT(SNb,i) = FFDynamics->U(i-1,SNb);
+                }
+            }
+          NbInstantSS = 0;
+        }
+      else
+        {
+
+          compute_sbar( Spbar, Sabar, (NbInstantSS+1)*T_, FSM_->StepPeriod()-T_ );
+          compute_ubar( Upbar, Uabar, (NbInstantSS+1)*T_, FSM_->StepPeriod()-T_ );
+          if(SS_it->StepNumber == 0 && SS_it->StepNumber < NbSteps)
+            {
+              if(FFDynamics->Type == POSITION)
+                {
+                  FFDynamics->S(i,0) = Spbar[0];SFDynamics->S(i,0) = 1.0;
+                  FFDynamics->S(i,1) = Spbar[1];SFDynamics->S(i,1) = 0.0;
+                  FFDynamics->S(i,2) = Spbar[2];SFDynamics->S(i,2) = 0.0;
+                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Upbar[0];
+                  SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
+                }
+              else if(FFDynamics->Type == ACCELERATION)
+                {
+                  FFDynamics->S(i,0) = Sabar[0];SFDynamics->S(i,0) = 0.0;
+                  FFDynamics->S(i,1) = Sabar[1];SFDynamics->S(i,1) = 0.0;
+                  FFDynamics->S(i,2) = Sabar[2];SFDynamics->S(i,2) = 1.0;
+                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Uabar[0];
+                  SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
+                }
+              if((NbInstantSS+1)*T_ > FSM_->StepPeriod()-T_)
+                {
+                  FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
+                  FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
+                  FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
+                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = FFDynamics->U(i-1,SS_it->StepNumber);
+                  SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = SFDynamics->U(i-1,SS_it->StepNumber);
+                }
+            }
+          else if(SS_it->StepNumber == 1 && SS_it->StepNumber < NbSteps)
+            {
+              if(FFDynamics->Type == POSITION)
+                {
+                  FFDynamics->S(i,0) = Spbar[0]; //SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
+                  FFDynamics->S(i,1) = Spbar[1]; //SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
+                  FFDynamics->S(i,2) = Spbar[2]; //SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
+                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Upbar[0];
+                  SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = 1.0;
+                }
+              else if(FFDynamics->Type == ACCELERATION)
+                {
+                  FFDynamics->S(i,0) = Sabar[0];
+                  FFDynamics->S(i,1) = Sabar[1];
+                  FFDynamics->S(i,2) = Sabar[2];
+                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Uabar[0];
+                  SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = 1.0;
+                }
+              // The foot has touched the ground, the support phase has not switched yet
+              if((NbInstantSS+1)*T_ > FSM_->StepPeriod()-T_)
+                {
+                  FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
+                  FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
+                  FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
+                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = FFDynamics->U(i-1,SS_it->StepNumber);
+                  SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = SFDynamics->U(i-1,SS_it->StepNumber-1);
+                }
+            }
+          else if(SS_it->StepNumber == 2)
+            {
+              FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
+              FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
+              FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
+              for(unsigned int j = 0; j<NbSteps; j++)
+                {
+                  FFDynamics->U(i,j) = FFDynamics->UT(j,i) = FFDynamics->U(i-1,j);
+                  SFDynamics->U(i,j) = SFDynamics->UT(j,i) = SFDynamics->U(i-1,j);
+                }
+            }
+          NbInstantSS++;
+        }
+    }
+
+  return 0;
+
+}
+
+
+int
+RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> & SupportStates_deq,
+    linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics )
+{
+
+  // Resize the matrices:
+  // --------------------
+  unsigned int NbSteps = SupportStates_deq.back().StepNumber;
+  bool Preserve = true;
+  LeftFootDynamics.U.resize(N_,NbSteps,!Preserve);
+  LeftFootDynamics.U.clear();
+  LeftFootDynamics.UT.resize(NbSteps,N_,!Preserve);
+  LeftFootDynamics.UT.clear();
+  LeftFootDynamics.S.clear();
+  RightFootDynamics.U.resize(N_,NbSteps,!Preserve);
+  RightFootDynamics.U.clear();
+  RightFootDynamics.UT.resize(NbSteps,N_,!Preserve);
+  RightFootDynamics.UT.clear();
+  RightFootDynamics.S.clear();
+
+  // Fill the matrices:
+  // ------------------
+  linear_dynamics_t * SFDynamics;
+  linear_dynamics_t * FFDynamics;
+  double Spbar[3], Sabar[3];
+  double Upbar[2], Uabar[2];
+  unsigned int NbInstantSS = 0;
+  unsigned int SwitchInstant = 0;
+  std::deque<support_state_t>::const_iterator SS_it =
       SupportStates_deq.begin();
   SS_it++;
   for(unsigned int i=0;i<N_;i++)
@@ -529,15 +821,13 @@ RigidBodySystem::compute_dyn_pol_feet( std::deque<support_state_t> & SupportStat
 
 
 int
-RigidBodySystem::generate_trajectories( double Time, const support_state_t & CurrentSupport, const solution_t & Result,
+RigidBodySystem::generate_trajectories( double Time, const solution_t & Solution,
     const std::deque<support_state_t> & PrwSupportStates_deq, const std::deque<double> & PreviewedSupportAngles_deq,
     std::deque<FootAbsolutePosition> & LeftFootTraj_deq, std::deque<FootAbsolutePosition> & RightFootTraj_deq )
 {
 
-  unsigned int NumberStepsPrwd = PrwSupportStates_deq.back().StepNumber;
-  OFTG_->interpolate_feet_positions(Time, CurrentSupport,
-      Result.Solution_vec[2*N_], Result.Solution_vec[2*N_+NumberStepsPrwd],
-      PreviewedSupportAngles_deq,
+  OFTG_->interpolate_feet_positions(Time, PrwSupportStates_deq,
+      Solution, PreviewedSupportAngles_deq,
       LeftFootTraj_deq, RightFootTraj_deq);
 
 //  linear_dynamics_t LFDyn = LeftFoot_.Dynamics( ACCELERATION );
