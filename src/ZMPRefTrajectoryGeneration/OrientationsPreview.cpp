@@ -74,11 +74,14 @@ OrientationsPreview::~OrientationsPreview()
 void
 OrientationsPreview::preview_orientations(double Time,
     const reference_t & Ref,
-    double StepDuration, const support_state_t & CurrentSupport,
+    double StepDuration, const deque<support_state_t> & PrwSupportStates_deq,
     std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
     std::deque<FootAbsolutePosition> & RightFootPositions_deq,
     std::deque<double> & PreviewedSupportAngles_deq)
 {
+
+  support_state_t CurrentSupport = PrwSupportStates_deq.front();
+
   // Verify the acceleration of the hip joint
   verify_acceleration_hip_joint(Ref, CurrentSupport);
 
@@ -324,9 +327,12 @@ OrientationsPreview::verify_velocity_hip_joint(double Time,
 void
 OrientationsPreview::interpolate_trunk_orientation(double time, int CurrentIndex,
                                                    double NewSamplingPeriod,
-                                                    const support_state_t & CurrentSupport,
+                                                    const deque<support_state_t> & PrwSupportStates_deq,
                                                     deque<COMState> & FinalCOMTraj_deq)
 {
+
+  support_state_t CurrentSupport = PrwSupportStates_deq.front();
+
   if(CurrentSupport.Phase == SS && time+3.0/2.0*T_ < CurrentSupport.TimeLimit)
     {
       //Fourth order polynomial parameters

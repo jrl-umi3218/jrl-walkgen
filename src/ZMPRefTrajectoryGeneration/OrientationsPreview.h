@@ -70,7 +70,7 @@ namespace PatternGeneratorJRL
     /// \param[in] RightFootAbsolutePositions
     /// \param[out] PreviewedSupportAngles
     void preview_orientations(double Time, const reference_t & Ref,
-			     double StepDuration, const support_state_t & CurrentSupport,
+			     double StepDuration, const std::deque<support_state_t> & PrwSupportStates_deq,
 			     std::deque<FootAbsolutePosition> & LeftFootAbsolutePositions,
 			     std::deque<FootAbsolutePosition> & RightFootAbsolutePositions,
                              std::deque<double> & PreviewedSupportAngles);
@@ -84,9 +84,9 @@ namespace PatternGeneratorJRL
     /// \param[in] NewSamplingPeriod
     /// \param[in] CurrentSupport
     /// \param[out] FinalCOMTraj_deq
-    void interpolate_trunk_orientation(double time, int CurrentIndex,
+    void interpolate_trunk_orientation(double Time, int CurrentIndex,
         double NewSamplingPeriod,
-        const support_state_t & CurrentSupport,
+        const std::deque<support_state_t> & PrwSupportStates_deq,
         std::deque<COMState> & FinalCOMTraj_deq);
 
     /// \name Accessors
