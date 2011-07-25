@@ -107,7 +107,7 @@ protected:
     {
       istringstream strm2(":setVelReference  0.0 0.0 0.0");
       aPGI.ParseCmd(strm2);
-      istringstream strm3(":finish");
+      istringstream strm3(":stoppg");
       aPGI.ParseCmd(strm3);
     }
   }
