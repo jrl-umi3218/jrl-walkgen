@@ -112,16 +112,16 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dx = 
           m_PolynomeX->ComputeDerivative(InterpolationTime);
       if(m_PolynomeX->Degree() > 4)
-         NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddx =
-             m_PolynomeX->ComputeSecDerivative(InterpolationTime);
+        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddx =
+            m_PolynomeX->ComputeSecDerivative(InterpolationTime);
       //y, dy
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y = 
           m_PolynomeY->Compute(InterpolationTime);
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy = 
           m_PolynomeY->ComputeDerivative(InterpolationTime);
       if(m_PolynomeY->Degree() > 4)
-         NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddy =
-             m_PolynomeY->ComputeSecDerivative(InterpolationTime);
+        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddy =
+            m_PolynomeY->ComputeSecDerivative(InterpolationTime);
       //theta, dtheta
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta = 
           m_PolynomeTheta->Compute( InterpolationTime );
@@ -232,9 +232,10 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
 
 
 void
-OnLineFootTrajectoryGeneration::check_solution(double & X, double & Y,
-    const support_state_t & CurrentSupport, double CurrentTime)
+OnLineFootTrajectoryGeneration::interpret_solution( double CurrentTime, const solution_t & Solution,
+    const support_state_t & CurrentSupport, unsigned int NbSteps, double & X, double & Y )
 {
+
   double Sign;
   if(CurrentSupport.Foot == LEFT)
     Sign = 1.0;
@@ -242,6 +243,8 @@ OnLineFootTrajectoryGeneration::check_solution(double & X, double & Y,
     Sign = -1.0;
   if(CurrentSupport.NbStepsLeft > 0)
     {
+      X = Solution.Solution_vec[2*QP_N_];
+      Y = Solution.Solution_vec[2*QP_N_+NbSteps];
       if(fabs(X)+fabs(Y)-0.00001<0.0)
         {
           //cout<<"Previewed foot x-position zero at time: "<<CurrentTime<<endl;
@@ -254,29 +257,33 @@ OnLineFootTrajectoryGeneration::check_solution(double & X, double & Y,
   else
     {//The solver isn't responsible for the feet positions anymore
       //The robot is supposed to stop always with the feet aligned in the lateral plane.
-      X = CurrentSupport.x + Sign*sin(CurrentSupport.yaw)*FeetDistanceDS_;
-      Y = CurrentSupport.y - Sign*cos(CurrentSupport.yaw)*FeetDistanceDS_;
+      X = CurrentSupport.X + Sign*sin(CurrentSupport.Yaw)*FeetDistanceDS_;
+      Y = CurrentSupport.Y - Sign*cos(CurrentSupport.Yaw)*FeetDistanceDS_;
     }
+
 }
 
 
 void
 OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
-    const support_state_t & CurrentSupport,
-    double FPx, double FPy,
+    const deque<support_state_t> & PrwSupportStates_deq,
+    const solution_t & Solution,
     const deque<double> & PreviewedSupportAngles_deq,
-    deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-    deque<FootAbsolutePosition> &FinalRightFootTraj_deq)
+    deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+    deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
 {
 
-  unsigned int CurrentIndex = FinalLeftFootTraj_deq.size()-1;
-  FinalLeftFootTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex+1);
-  FinalRightFootTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex+1);
-  check_solution( FPx, FPy, CurrentSupport, Time);
+  support_state_t CurrentSupport = PrwSupportStates_deq.front();
+  unsigned int NbStepsPrwd = PrwSupportStates_deq.back().StepNumber;
+  double FPx, FPy;
+  interpret_solution( Time, Solution, CurrentSupport, NbStepsPrwd, FPx, FPy );
 
   double LocalInterpolationTime = Time-(CurrentSupport.TimeLimit-(m_TDouble+m_TSingle));
 
   int StepType = 1;
+  unsigned int CurrentIndex = FinalLeftFootTraj_deq.size()-1;
+  FinalLeftFootTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex+1);
+  FinalRightFootTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex+1);
   if(CurrentSupport.Phase == SS && Time+3.0/2.0*QP_T_ < CurrentSupport.TimeLimit)
     {
       //determine coefficients of interpolation polynom
@@ -355,14 +362,15 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
     {
       for(int k = 0; k<=(int)(QP_T_/m_SamplingPeriod);k++)
         {
-          FinalRightFootTraj_deq[CurrentIndex+k]=FinalRightFootTraj_deq[CurrentIndex+k-1];
-          FinalLeftFootTraj_deq[CurrentIndex+k]=FinalLeftFootTraj_deq[CurrentIndex+k-1];
+          FinalRightFootTraj_deq[CurrentIndex+k]=               FinalRightFootTraj_deq[CurrentIndex+k-1];
+          FinalLeftFootTraj_deq[CurrentIndex+k]=                FinalLeftFootTraj_deq[CurrentIndex+k-1];
           FinalLeftFootTraj_deq[CurrentIndex+k].time =
-              FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
+              FinalRightFootTraj_deq[CurrentIndex+k].time =     Time+k*m_SamplingPeriod;
           FinalLeftFootTraj_deq[CurrentIndex+k].stepType =
               FinalRightFootTraj_deq[CurrentIndex+k].stepType = 10;
         }
     }
+
 }
 
 
