@@ -32,8 +32,6 @@
 #include <FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.h>
 #include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 
-//#include <jrl/walkgen/pgtypes.hh>
-
 namespace PatternGeneratorJRL
 {
   class  RigidBodySystem
@@ -68,12 +66,12 @@ namespace PatternGeneratorJRL
 
     /// \brief Update feet matrices
     ///
-    /// \param[in] FSM Finite state machine
-    /// \param[in] CurrentSupport The current support state
-    /// \param[in] Time Current time
+    /// \param[in] SupportStates_deq Previewed support states
+    /// \param[in] LeftFootTraj_deq Final foot trajectory (left foot)
+    /// \param[in] RightFootTraj_deq Final foot trajectory (right foot)
     ///
     /// \return 0
-    int update( std::deque<support_state_t> & SupportStates_deq,
+    int update( const std::deque<support_state_t> & SupportStates_deq,
         const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
         const std::deque<FootAbsolutePosition> & RightFootTraj_deq );
 
@@ -83,16 +81,18 @@ namespace PatternGeneratorJRL
     /// return 0
     int compute_dyn_cjerk();
 
-    /// \brief Generate trajectories
+    /// \brief Generate final trajectories
     ///
-    /// \param[in]
-    /// \param[in]
-    /// \param[in]
-    /// \param[in]
-    /// \param[in]
+    /// \param[in] Time Current time
+    /// \param[in] CurrentSupport
+    /// \param[in] Result Optimization result
+    /// \param[in] SupportStates_deq
+    /// \param[in] PreviewedSupportAngles_deq
+    /// \param[out] LeftFootTraj_deq
+    /// \param[out] RightFootTraj_deq
     ///
     /// return 0
-    int generate_trajectories( double Time, const support_state_t & CurrentSupport, const solution_t & Result,
+    int generate_trajectories( double Time, const solution_t & Result,
         const std::deque<support_state_t> & SupportStates_deq, const std::deque<double> & PreviewedSupportAngles_deq,
               std::deque<FootAbsolutePosition> & LeftFootTraj_deq, std::deque<FootAbsolutePosition> & RightFootTraj_deq);
 
@@ -146,6 +146,9 @@ namespace PatternGeneratorJRL
     { return CoMHeight_; }
     inline void CoMHeight( double Height )
     { CoMHeight_ = Height; }
+
+    std::deque<support_state_t> & SupportTrajectory()
+    { return SupportTrajectory_deq_; }
     /// \}
 
     
@@ -156,36 +159,71 @@ namespace PatternGeneratorJRL
 
     /// \brief Initialize dynamics of the CoP
     ///
-    /// \param[in] Dynamics Matrices to be filled
+    /// \param[out] Dynamics Matrices to be filled
     ///
     /// return 0
-    int compute_dyn_cop( std::deque<support_state_t> & SupportStates_deq );
+    int compute_dyn_cop( const std::deque<support_state_t> & SupportStates_deq );
 
     /// \brief Initialize dynamics of the body center
     /// Suppose a piecewise constant jerk
-    /// \param[in] Dynamics Matrices to be filled
+    /// \param[out] Dynamics Matrices to be filled
     ///
     /// return 0
     int compute_dyn_cjerk( linear_dynamics_t & Dynamics );
 
-    /// \brief Initialize dynamics of the body center
-    /// Suppose a higher order polynomial
-    /// \param[in] Dynamics Matrices to be filled
+    /// \brief Compute foot "zero-dynamics"
+    ///
+    /// \param[in] SupportStates_deq Previewed support states
+    /// \param[out] LeftFootDynamics
+    /// \param[out] RightFootDynamics
     ///
     /// return 0
-    int compute_dyn_pol_feet( std::deque<support_state_t> & SupportStates_deq,
+    int compute_foot_zero_dynamics( const std::deque<support_state_t> & SupportStates_deq,
         linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
 
-    /// \brief Initialize trajectory constants
+    /// \brief Compute foot dynamics based on polynomial interpolation
+    ///
+    /// \param[in] SupportStates_deq Previewed support states
+    /// \param[out] LeftFootDynamics
+    /// \param[out] RightFootDynamics
+    ///
+    /// return 0
+    int compute_foot_pol_dynamics( const std::deque<support_state_t> & SupportStates_deq,
+        linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
+
+    /// \brief Compute foot dynamics based on "piecewise constant jerk" splines
+    ///
+    /// \param[in] SupportStates_deq Previewed support states
+    /// \param[out] LeftFootDynamics
+    /// \param[out] RightFootDynamics
+    ///
+    /// return 0
+    int compute_foot_cjerk_dynamics( const std::deque<support_state_t> & SupportStates_deq,
+        linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics);
+
+    /// \brief Initialize static trajectories
     int initialize_trajectories();
 
     /// \brief Compute predefined trajectories
-    int precompute_trajectories( std::deque<support_state_t> & SupportStates_deq );
+    /// \param[in] SupportStates_deq Previewed support states
+    int precompute_trajectories( const std::deque<support_state_t> & SupportStates_deq );
 
-    /// \brief Compute a row of the dynamic matrix Sp
+    /// \brief Compute a row of the dynamic matrices Sp and Sa
+    /// \param[out] Spbar
+    /// \param[out] Sabar
+    /// \param[T] T Sampling rate
+    /// \param[Td] Td Touchdown time
+    ///
+    /// \return 0
     int compute_sbar( double * Spbar, double * Sabar, double T, double Td );
 
-    /// \brief Compute a row of the dynamic matrix Up
+    /// \brief Compute a row of the dynamic matrices Up and Ua
+    /// \param[out] Upbar
+    /// \param[out] Uabar
+    /// \param[T] T Sampling rate
+    /// \param[Td] Td Touchdown time
+    ///
+    /// \return 0
     int compute_ubar( double * Upbar, double * Uabar, double T, double Td );
 
 
@@ -208,9 +246,14 @@ namespace PatternGeneratorJRL
     linear_dynamics_t
     CoPDynamicsJerk_;
 
-    /// \brief Fixed trajectories
-    std::deque<rigid_body_state_t>
-    FlyingFootTrajectory_deq_;
+    /// \name Fixed trajectories
+    /// \{
+    /// \brief Vertical motion of the free foot
+    std::deque<rigid_body_state_t> FlyingFootTrajectory_deq_;
+
+    /// \brief Support states
+    std::deque<support_state_t> SupportTrajectory_deq_;
+    // \}
 
     /// \brief Ground reaction force for the whole preview window
     std::deque<double> GRF_deq_;

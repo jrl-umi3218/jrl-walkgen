@@ -49,15 +49,15 @@ namespace PatternGeneratorJRL
   {
     /// \name Translational degrees of freedom
     /// \{
-    boost_ublas::bounded_vector<double, 3> X;
-    boost_ublas::bounded_vector<double, 3> Y;
-    boost_ublas::bounded_vector<double, 3> Z;
+    boost_ublas::vector<double> X;
+    boost_ublas::vector<double> Y;
+    boost_ublas::vector<double> Z;
     /// \}
     /// \name Rotational degrees of freedom
     /// \{
-    boost_ublas::bounded_vector<double, 3> Pitch;
-    boost_ublas::bounded_vector<double, 3> Roll;
-    boost_ublas::bounded_vector<double, 3> Yaw;
+    boost_ublas::vector<double> Pitch;
+    boost_ublas::vector<double> Roll;
+    boost_ublas::vector<double> Yaw;
     /// \}
 
     struct rigid_body_state_s & operator=(const rigid_body_state_s &RB);
@@ -89,7 +89,8 @@ namespace PatternGeneratorJRL
     DynamicsType Type;
 
     void clear()
-    { U.clear();
+    {
+      U.clear();
       UT.clear();
       S.clear();
     }
