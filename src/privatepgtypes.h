@@ -250,7 +250,7 @@ namespace PatternGeneratorJRL
     /// \brief start time
     double StartTime;
     /// \brief Position and orientation on a plane
-    double x,y,yaw;
+    double X,Y,Yaw;
 
     /// \brief (true) -> New single support state
     bool StateChanged;

@@ -1153,9 +1153,7 @@ namespace PatternGeneratorJRL {
       }
     else if (ZMPTrajAlgo=="Herdt")
       {
-	// m_AlgorithmforZMPCOM = ZMPCOM_DIMITROV_2008;
 	m_AlgorithmforZMPCOM = ZMPCOM_HERDT_2010;
-	// m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	m_CoMAndFootOnlyStrategy->SetTheLimitOfTheBuffer(0);
 	cout << "Herdt" << endl;
@@ -1261,7 +1259,7 @@ namespace PatternGeneratorJRL {
 	  ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
 	  "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
 	*/
-	return false;//Andremize
+	return false;
       }
     ODEBUG("Here");
 

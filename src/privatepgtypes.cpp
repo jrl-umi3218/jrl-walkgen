@@ -40,9 +40,9 @@ namespace PatternGeneratorJRL
     StepNumber  = aSS.StepNumber;
     StateChanged = aSS.StateChanged;
     StartTime = aSS.StartTime;
-    x = aSS.x;
-    y = aSS.y;
-    yaw = aSS.yaw;
+    X = aSS.X;
+    Y = aSS.Y;
+    Yaw = aSS.Yaw;
 
     return *this;
 
@@ -60,9 +60,9 @@ namespace PatternGeneratorJRL
     StateChanged = false;
     NbInstants = 0;
     StartTime = 0.0;
-    x = 0.0;
-    y = 0.0;
-    yaw = 0.0;
+    X = 0.0;
+    Y = 0.0;
+    Yaw = 0.0;
 
   }
 
