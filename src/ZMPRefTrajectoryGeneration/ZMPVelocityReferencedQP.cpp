@@ -105,9 +105,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_->SamplingPeriodPreview( QP_T_ );
   VRQPGenerator_->ComHeight( 0.814 );
   VRQPGenerator_->initialize_matrices();
-  VRQPGenerator_->Ponderation( 0*0.0001, IntermedQPMat::INSTANT_VELOCITY );
-  VRQPGenerator_->Ponderation( 0.0*0.000001, IntermedQPMat::COP_CENTERING );
-  VRQPGenerator_->Ponderation( 1.0/*0.000001*/, IntermedQPMat::JERK_MIN );
+  VRQPGenerator_->Ponderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
+  VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::COP_CENTERING );
+  VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::JERK_MIN );
 
   Door_.initialize( -M_PI/2.0 );
   Door_.SamplingTime( QP_T_ );
