@@ -41,7 +41,7 @@ Door::build_rotation_matrices(double Time, int N, boost_ublas::matrix<double> & 
 
   double DesVelDoor = 0.0;
   if(Time > 8.0)
-    DesVelDoor = M_PI/300.0;
+    DesVelDoor = M_PI/400.0;
 
   double CurrentDoorAngle = FrameDoor_.Orientation;
   double Theta;

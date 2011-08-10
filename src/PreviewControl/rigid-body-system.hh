@@ -211,7 +211,7 @@ namespace PatternGeneratorJRL
     /// \brief Compute a row of the dynamic matrices Sp and Sa
     /// \param[out] Spbar
     /// \param[out] Sabar
-    /// \param[T] T Sampling rate
+    /// \param[T] T Time inside the support phase
     /// \param[Td] Td Touchdown time
     ///
     /// \return 0

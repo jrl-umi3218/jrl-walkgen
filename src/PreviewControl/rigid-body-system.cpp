@@ -387,6 +387,8 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
             Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
       }
     break;
+  case COP:
+    break;
 
   }
 
@@ -420,9 +422,8 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
   // ------------------
   linear_dynamics_t * SFDynamics;
   linear_dynamics_t * FFDynamics;
-  double Spbar[3], Sabar[3];
-  double Upbar[2], Uabar[2];
-  unsigned int NbInstantSS = 0;
+  double Spbar[3];//, Sabar[3];
+  double Upbar[2];//, Uabar[2];
   unsigned int SwitchInstant = 0;
   std::deque<support_state_t>::const_iterator SS_it =
       SupportStates_deq.begin();
@@ -442,7 +443,6 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
       if(SS_it->StateChanged == true)
         {
           SwitchInstant = i+1;
-          NbInstantSS = 0;
         }
       if(SS_it->Phase == DS)
         {
@@ -467,7 +467,6 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
                   FFDynamics->U(i,SNb) = FFDynamics->UT(SNb,i) = FFDynamics->U(i-1,SNb);
                 }
             }
-          NbInstantSS = 0;
         }
       else
         {
@@ -504,7 +503,6 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
                   SFDynamics->U(i,j) = SFDynamics->UT(j,i) = SFDynamics->U(i-1,j);
                 }
             }
-          NbInstantSS++;
         }
     }
 
@@ -540,13 +538,13 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
   linear_dynamics_t * FFDynamics;
   double Spbar[3], Sabar[3];
   double Upbar[2], Uabar[2];
-  unsigned int NbInstantSS = 0;
   unsigned int SwitchInstant = 0;
   std::deque<support_state_t>::const_iterator SS_it =
       SupportStates_deq.begin();
   SS_it++;
   for(unsigned int i=0;i<N_;i++)
     {
+
       if(SS_it->Foot == LEFT)
         {
           SFDynamics = & LeftFootDynamics;
@@ -560,7 +558,6 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
       if(SS_it->StateChanged == true)
         {
           SwitchInstant = i+1;
-          NbInstantSS = 0;
         }
       if(SS_it->Phase == DS)
         {
@@ -586,13 +583,12 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
                   FFDynamics->U(i,SNb) = FFDynamics->UT(SNb,i) = FFDynamics->U(i-1,SNb);
                 }
             }
-          NbInstantSS = 0;
         }
       else
         {
 
-          compute_sbar( Spbar, Sabar, (NbInstantSS+1)*T_, FSM_->StepPeriod()-T_ );
-          compute_ubar( Upbar, Uabar, (NbInstantSS+1)*T_, FSM_->StepPeriod()-T_ );
+          compute_sbar( Spbar, Sabar, (SS_it->NbInstants)*T_, FSM_->StepPeriod()-T_ );
+          compute_ubar( Upbar, Uabar, (SS_it->NbInstants)*T_, FSM_->StepPeriod()-T_ );
           if(SS_it->StepNumber == 0 && SS_it->StepNumber < NbSteps)
             {
               if(FFDynamics->Type == POSITION)
@@ -611,8 +607,8 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
                   FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Uabar[0];
                   SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
                 }
-              if((NbInstantSS+1)*T_ > FSM_->StepPeriod()-T_)
-                {
+              if(((SS_it->NbInstants)*T_ > FSM_->StepPeriod()-T_) && (SS_it->StepNumber != 0))
+                {// DS phase
                   FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
                   FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
                   FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
@@ -639,7 +635,7 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
                   SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = 1.0;
                 }
               // The foot has touched the ground, the support phase has not switched yet
-              if((NbInstantSS+1)*T_ > FSM_->StepPeriod()-T_)
+              if((SS_it->NbInstants)*T_ > FSM_->StepPeriod()-T_)
                 {
                   FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
                   FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
@@ -659,8 +655,8 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
                   SFDynamics->U(i,j) = SFDynamics->UT(j,i) = SFDynamics->U(i-1,j);
                 }
             }
-          NbInstantSS++;
         }
+      SS_it++;
     }
 
   return 0;
@@ -694,7 +690,6 @@ RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> 
   linear_dynamics_t * FFDynamics;
   double Spbar[3], Sabar[3];
   double Upbar[2], Uabar[2];
-  unsigned int NbInstantSS = 0;
   unsigned int SwitchInstant = 0;
   std::deque<support_state_t>::const_iterator SS_it =
       SupportStates_deq.begin();
@@ -714,7 +709,6 @@ RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> 
       if(SS_it->StateChanged == true)
         {
           SwitchInstant = i+1;
-          NbInstantSS = 0;
         }
       if(SS_it->Phase == DS)
         {
@@ -739,13 +733,12 @@ RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> 
                   FFDynamics->U(i,SNb) = FFDynamics->UT(SNb,i) = FFDynamics->U(i-1,SNb);
                 }
             }
-          NbInstantSS = 0;
         }
       else
         {
 
-          compute_sbar( Spbar, Sabar, (NbInstantSS+1)*T_, FSM_->StepPeriod()-T_ );
-          compute_ubar( Upbar, Uabar, (NbInstantSS+1)*T_, FSM_->StepPeriod()-T_ );
+          compute_sbar( Spbar, Sabar, (SS_it->NbInstants+1)*T_, FSM_->StepPeriod()-T_ );
+          compute_ubar( Upbar, Uabar, (SS_it->NbInstants+1)*T_, FSM_->StepPeriod()-T_ );
           if(SS_it->StepNumber == 0 && SS_it->StepNumber < NbSteps)
             {
               if(FFDynamics->Type == POSITION)
@@ -764,7 +757,7 @@ RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> 
                   FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Uabar[0];
                   SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
                 }
-              if((NbInstantSS+1)*T_ > FSM_->StepPeriod()-T_)
+              if((SS_it->NbInstants+1)*T_ > FSM_->StepPeriod()-T_)
                 {
                   FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
                   FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
@@ -791,7 +784,7 @@ RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> 
                   FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Uabar[0];
                   SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = 1.0;
                 }
-              if((NbInstantSS+1)*T_ > FSM_->StepPeriod()-T_)
+              if((SS_it->NbInstants+1)*T_ > FSM_->StepPeriod()-T_)
                 {
                   FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
                   FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
@@ -811,8 +804,8 @@ RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> 
                   SFDynamics->U(i,j) = SFDynamics->UT(j,i) = SFDynamics->U(i-1,j);
                 }
             }
-          NbInstantSS++;
         }
+      SS_it++;
     }
 
   return 0;

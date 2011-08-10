@@ -87,7 +87,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   CoM_.SetRobotControlPeriod( m_SamplingPeriod );
   CoM_.InitializeSystem();
 
-  // Create and initialize simplified robot
+  // Create and initialize simplified robot model
   Robot_ = new RigidBodySystem( SPM, aHS, SupportFSM_ );
   Robot_->Mass( aHS->mass() );
   Robot_->LeftFoot().Mass( 0.0 );
@@ -105,9 +105,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_->SamplingPeriodPreview( QP_T_ );
   VRQPGenerator_->ComHeight( 0.814 );
   VRQPGenerator_->initialize_matrices();
-  VRQPGenerator_->Ponderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
-  VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::COP_CENTERING );
-  VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::JERK_MIN );
+  VRQPGenerator_->Ponderation( 0*0.0001, IntermedQPMat::INSTANT_VELOCITY );
+  VRQPGenerator_->Ponderation( 0.0*0.000001, IntermedQPMat::COP_CENTERING );
+  VRQPGenerator_->Ponderation( 1.0/*0.000001*/, IntermedQPMat::JERK_MIN );
 
   Door_.initialize( -M_PI/2.0 );
   Door_.SamplingTime( QP_T_ );
@@ -255,7 +255,6 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   int CurrentZMPindex=0;
   for( unsigned int i=0;i<FinalZMPTraj_deq.size();i++ )
     {
-
       // Smooth ramp
       FinalZMPTraj_deq[CurrentZMPindex].px = lStartingZMPPosition(0);
       FinalZMPTraj_deq[CurrentZMPindex].py = lStartingZMPPosition(1);
@@ -269,16 +268,13 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
       // Set Left Foot positions.
       FinalLeftFootTraj_deq[CurrentZMPindex] = CurrentLeftFootAbsPos;
       FinalRightFootTraj_deq[CurrentZMPindex] = CurrentRightFootAbsPos;
-
       FinalLeftFootTraj_deq[CurrentZMPindex].time =
           FinalRightFootTraj_deq[CurrentZMPindex].time = m_CurrentTime;
-
       FinalLeftFootTraj_deq[CurrentZMPindex].stepType =
           FinalRightFootTraj_deq[CurrentZMPindex].stepType = 10;
 
       m_CurrentTime += m_SamplingPeriod;
       CurrentZMPindex++;
-
     }
 
   // INITIAL SUPPORT STATE:
@@ -348,6 +344,8 @@ ZMPVelocityReferencedQP::OnLine(double Time,
   // ----------------------------
   if(Time + 0.00001 > UpperTimeLimitToUpdate_)
     {
+
+      cout<<"Time: "<<Time<<endl;
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
       struct timeval start,end;
       gettimeofday(&start,0);
@@ -363,8 +361,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // ----------------------------------------------------
       deque<support_state_t> PreviewedSupportStates_deq;
       VRQPGenerator_->preview_support_states( Time, SupportFSM_,
-          FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
-          PreviewedSupportStates_deq );
+          FinalLeftFootTraj_deq, FinalRightFootTraj_deq, PreviewedSupportStates_deq );
 
 
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
@@ -404,16 +401,15 @@ ZMPVelocityReferencedQP::OnLine(double Time,
           PreviewedSupportStates_deq, PreviewedSupportAngles_deq );
 
 
-//      // BUILD DOOR CONSTRAINTS:
-//      // -----------------------
-//      VRQPGenerator_->build_constraints_door( Time, Door_, PrwSupportStates_deq, Problem_ );
+      // BUILD DOOR CONSTRAINTS:
+      // -----------------------
+//      VRQPGenerator_->build_constraints_door( Time, Door_, PreviewedSupportStates_deq, Problem_ );
 
 
       // SOLVE PROBLEM:
       // --------------
       solution_t Result;
       Problem_.solve( QPProblem_s::QLD, Result );
-      Problem_.dump_problem( Time );
       Problem_.reset();
 
 
@@ -460,6 +456,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 }
 
 
+// TODO: New parent class needed
 void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ,
     deque<COMState> & ,
     deque<RelativeFootPosition> &,
@@ -471,6 +468,7 @@ void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ,
     FootAbsolutePosition & ,
     FootAbsolutePosition & )
 {
+  cout << "To be removed" << endl;
 }
 
 
@@ -481,7 +479,7 @@ void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition & ,
     deque<FootAbsolutePosition> &,
     bool)
 {
-  cout << "To be implemented" << endl;
+  cout << "To be removed" << endl;
 }
 
 int ZMPVelocityReferencedQP::OnLineFootChange(double ,
@@ -492,7 +490,7 @@ int ZMPVelocityReferencedQP::OnLineFootChange(double ,
     deque<FootAbsolutePosition> &,
     StepStackHandler  *)
 {
-  cout << "To be implemented" << endl;
+  cout << "To be removed" << endl;
   return -1;
 }
 
@@ -501,7 +499,7 @@ void ZMPVelocityReferencedQP::EndPhaseOfTheWalking(deque<ZMPPosition> &,
     deque<FootAbsolutePosition> &,
     deque<FootAbsolutePosition> &)
 {
-  cout << "To be implemented" << endl;
+  cout << "To be removed" << endl;
 }
 
 int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep()
