@@ -741,7 +741,7 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, RelativeFeetInequalities * R
 
   unsigned int NbStepsPreviewed = PrwSupportStates_deq.back().StepNumber;
   //Equality constraints
-  build_eq_constraints_feet( PrwSupportStates_deq, NbStepsPreviewed, Pb );
+//  build_eq_constraints_feet( PrwSupportStates_deq, NbStepsPreviewed, Pb );
 
   //CoP constraints
   linear_inequality_t & IneqCoP = IntermedData_->Inequalities(IntermedQPMat::INEQ_COP);
