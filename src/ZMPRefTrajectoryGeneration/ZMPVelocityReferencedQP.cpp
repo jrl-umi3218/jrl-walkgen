@@ -345,7 +345,6 @@ ZMPVelocityReferencedQP::OnLine(double Time,
   if(Time + 0.00001 > UpperTimeLimitToUpdate_)
     {
 
-      cout<<"Time: "<<Time<<endl;
       double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
       struct timeval start,end;
       gettimeofday(&start,0);
