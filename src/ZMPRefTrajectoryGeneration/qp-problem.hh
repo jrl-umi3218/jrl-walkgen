@@ -58,10 +58,15 @@ namespace PatternGeneratorJRL
     enum Solver
     {
       QLD,
-      PLDP
+      LSSOL
     };
 
-
+    enum Tests
+    {
+	NONE,
+	ALL,
+	ITT
+    };
     //
     //Public methods
     //
@@ -121,7 +126,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Solver
     /// \param[out] Result
-    void solve( Solver Solver, solution_t & Result);
+    void solve( Solver Solver, solution_t & Result,Tests Tests=NONE );
 
     /// \name Accessors and mutators
     /// \{
@@ -146,6 +151,8 @@ namespace PatternGeneratorJRL
     //
   private:
 
+  	  
+	  
     /// \brief Release memory.
     void release_memory();
 
@@ -283,6 +290,16 @@ namespace PatternGeneratorJRL
 
     /// \name ql-parameters
     /// \{
+  
+	int *istate_;
+	int *kx_ ;
+
+	double *b_;
+
+	int inform_;
+	int iter_; 
+	double obj_; 
+	double *clamda_;   
     int m_, me_, mmax_, n_, nmax_, mnn_;
     array_s<double> Q_, Q_dense_, D_, DU_, DU_dense_, DS_, XL_, XU_, X_, U_, war_;
     array_s<int> iwar_;

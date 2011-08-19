@@ -40,7 +40,12 @@
 #include <exception>
 
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
+
+#include <ZMPRefTrajectoryGeneration/lssol.h>
 using namespace PatternGeneratorJRL;
+
+
+
 
 QPProblem_s::QPProblem_s():
   m_(0),me_(0),mmax_(0), n_(0), nmax_(0), mnn_(0),
@@ -66,6 +71,15 @@ QPProblem_s::QPProblem_s():
   eps_ = 1e-8;
 
   resize_all();
+  
+
+	istate_	= new int [n_+m_]; 
+	kx_ 	= new int [n_];
+
+	b_ =new double [n_];
+
+	clamda_= new double [n_+m_]; 	  
+  
 }
 
 
@@ -159,13 +173,10 @@ void QPProblem_s::reset()
 
 
 void
-QPProblem_s::solve( Solver Solver, solution_t & Result )
+QPProblem_s::solve( Solver Solver, solution_t & Result, Tests Tests )
 {
-  switch(Solver)
-    {
-    case QLD:
 
-      m_ = NbConstraints_+1;
+	 m_ = NbConstraints_+1;
       me_ = NbEqConstraints_;
       mmax_ = m_+1;
       n_ = NbVariables_;
@@ -178,37 +189,79 @@ QPProblem_s::solve( Solver Solver, solution_t & Result )
       liwar_ = n_;
       eps_ = 1e-8;
 
-      //      if (m_FastFormulationMode==QLDANDLQ)
-      //        m_Pb.iwar_.Array_[0]=0;
-      //      else
-      iwar_.Array_[0]=1;
+
+	iwar_.Array_[0]=1;
 
       Q_.stick_together(Q_dense_,n_,n_);
       DU_.stick_together(DU_dense_,mmax_,n_);
-      
-      ql0001_(&m_, &me_, &mmax_, &n_, &nmax_, &mnn_,
+	
+	
+Result.resize(n_,m_); 
+	
+  switch(Solver)
+    {
+    case QLD:
+
+     
+
+	ql0001_(&m_, &me_, &mmax_, &n_, &nmax_, &mnn_,
               Q_dense_.Array_, D_.Array_, DU_dense_.Array_, DS_.Array_, XL_.Array_, XU_.Array_,
               X_.Array_, U_.Array_, &iout_, &ifail_, &iprint_,
               war_.Array_, &lwar_, iwar_.Array_, &liwar_, &eps_);
 
-      Result.resize(n_,m_);
 
-      for(int i = 0; i < n_; i++)
+	for(int i = 0; i < n_; i++)
         {
           Result.Solution_vec(i) = X_.Array_[i];
-          Result.LBoundsLagr_vec(i) = U_.Array_[m_+i];
-          Result.UBoundsLagr_vec(i) = U_.Array_[m_+n_+i];
+         Result.LBoundsLagr_vec(i) = U_.Array_[m_+i];
+         Result.UBoundsLagr_vec(i) = U_.Array_[m_+n_+i];
         }
       for(int i = 0; i < m_; i++)
         {
           Result.ConstrLagr_vec(i) = U_.Array_[i];
         }
 
-      Result.Fail = ifail_;
-      Result.Print = iprint_;
+break;
+    case LSSOL:
+	    	sendOption("Print Level = 0"); 
+		sendOption("Problem Type = QP2");
 
-    case PLDP:
-      break;
+		double *bl=new double[n_+m_];
+		double *bu=new double[n_+m_];	
+		int size1=n_;
+		for(int i=0;i<size1;++i){
+			bl[i]=XL_.Array_[i];
+			bu[i]=XU_.Array_[i];
+		}
+		int size2=size1+me_;
+		for(int i=size1;i<size2;++i){
+			bl[i]=-DS_.Array_[i-size1];
+			bu[i]=bl[i];	
+		}
+		int size3=size1+m_;
+		for(int i=size2;i<size3;++i){
+			bl[i]=-DS_.Array_[i-size1];		
+			bu[i]=10e10;
+		}	
+
+
+		lssol_(&n_, &n_, 
+		&m_, &mmax_, &n_, 
+		DU_dense_.Array_, bl, bu, D_.Array_, 
+		istate_, kx_, X_.Array_, Q_dense_.Array_, b_, 
+		&inform_, &iter_, &obj_, clamda_, 
+		iwar_.Array_, &liwar_, war_.Array_, &lwar_);
+
+		for(int i = 0; i < n_; i++)
+		{
+			Result.Solution_vec(i) = X_.Array_[i];
+		}
+	if (Tests==ITT || Tests==ALL){
+		std::cout << "nb itérations : " << iter_ << std::endl;
+	}
+
+ break;
+
     }
 
 }
