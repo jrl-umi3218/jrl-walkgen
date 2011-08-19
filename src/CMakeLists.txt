@@ -21,6 +21,10 @@ IF(WIN32)
 ADD_DEFINITIONS("/D __STDC__")
 ENDIF(WIN32)
 
+IF(USE_LSSOL)
+ADD_DEFINITIONS("/DLSSOL_FOUND")
+ENDIF(USE_LSSOL)
+
 SET(SOURCES
   FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
@@ -86,3 +90,6 @@ INSTALL(TARGETS jrl-walkgen DESTINATION lib)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen abstract-robot-dynamics)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-mal)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-dynamics)
+IF(USE_LSSOL)
+ PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen lssol)
+ENDIF(USE_LSSOL)

@@ -49,6 +49,15 @@ ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
 # Optional ones.
 ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.1.0")
 
+# TODO kinda dirty patch to find lssol for now
+#  using ADD_OPTIONAL_DEPENDENCY prevents the creation 
+#  of classic variables such as ${PKG}_FOUND
+# hence we use ADD_REQUIRED_DEPENDENCY to get the data
+OPTION(USE_LSSOL "Do you want to use the solver lssol?" OFF)
+IF(USE_LSSOL)
+ ADD_REQUIRED_DEPENDENCY("lssol >= 0.1.0")
+ENDIF(USE_LSSOL)
+
 # Add aggressive optimization flags in release mode.
 
 #IF(CMAKE_COMPILER_IS_GNUCXX)

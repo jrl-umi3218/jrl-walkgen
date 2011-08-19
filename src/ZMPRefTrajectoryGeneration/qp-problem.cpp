@@ -41,7 +41,11 @@
 
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 
-#include <ZMPRefTrajectoryGeneration/lssol.h>
+#ifdef LSSOL_FOUND
+# include <lssol/lssol.h>
+#endif //LSSOL_FOUND
+
+
 using namespace PatternGeneratorJRL;
 
 
@@ -223,6 +227,7 @@ Result.resize(n_,m_);
 
 break;
     case LSSOL:
+#ifdef LSSOL_FOUND
 	    	sendOption("Print Level = 0"); 
 		sendOption("Problem Type = QP2");
 
@@ -259,6 +264,9 @@ break;
 	if (Tests==ITT || Tests==ALL){
 		std::cout << "nb itérations : " << iter_ << std::endl;
 	}
+#else 
+	std::cerr << " LSSOL_FOUND not available" << std::endl;
+#endif //LSSOL_FOUND
 
  break;
 
