@@ -152,6 +152,26 @@ namespace PatternGeneratorJRL
 					 double InitPosition,
 					 double InitSpeed);
 
+   /*! This method specifies the parameters for each of the polynome used by this
+     object. In this case, as it is used for the 3rd order polynome. The polynome to
+     which those parameters are set is specified with PolynomeIndex.
+     @param PolynomeIndex: Set to which axis the parameters will be applied.
+     @param AxisReference: Index to the axis to be used.
+     @param TimeInterval: Set the time base of the polynome.
+     @param FinalPosition: Set the final position of the polynome at TimeInterval.
+     @param InitPosition: Initial position when computing the polynome at t= m_AbsoluteTimeReference.
+     @param InitSpeed: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
+     @param InitAcc: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
+   */
+  int SetParametersWithInitPosInitSpeedInitAcc(unsigned int PolynomeIndex,
+					 int AxisReference,
+					 double TimeInterval,
+					 double FinalPosition,
+					 double InitPosition,
+					 double InitSpeed,
+					 double InitAcc
+					 );
+
    /*! \name Methods related to the Absolute Time Reference. 
      This time specifies the beginning of the trajectory. 
      @{ */
