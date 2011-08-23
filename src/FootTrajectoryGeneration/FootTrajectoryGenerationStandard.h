@@ -178,14 +178,13 @@ namespace PatternGeneratorJRL
    Polynome5 *m_PolynomeX,*m_PolynomeY;
    
    /*! \brief Polynome for X-Y orientation */
-   Polynome3 *m_PolynomeTheta;
+   Polynome5 *m_PolynomeTheta;
 
    /*! \brief Polynome for Y-Z orientation */
-   Polynome3 *m_PolynomeOmega, *m_PolynomeOmega2;
+   Polynome5 *m_PolynomeOmega, *m_PolynomeOmega2;
 
    /*! \brief Polynome for Z axis position. */
-   Polynome5 *m_PolynomeZ;
-   
+   Polynome5 *m_PolynomeZ;   
 
    /*! \brief Foot dimension. */
    double m_FootB, m_FootH, m_FootF;

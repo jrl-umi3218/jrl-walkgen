@@ -196,27 +196,27 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
      
    case X_AXIS:
      ODEBUG("Initspeed: " << InitSpeed << " ");
-     m_PolynomeX->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
      break;
      
    case Y_AXIS:
-     m_PolynomeY->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_PolynomeY->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
      break;
 
    case Z_AXIS:
-     m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_PolynomeZ->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
      break;
 
    case THETA_AXIS:
-     m_PolynomeTheta->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_PolynomeTheta->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
      break;
 
    case OMEGA_AXIS:
-     m_PolynomeOmega->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_PolynomeOmega->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
      break;
 
    case OMEGA2_AXIS:
-     m_PolynomeOmega2->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_PolynomeOmega2->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
      break;
 
    default:
