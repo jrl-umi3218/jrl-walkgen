@@ -252,7 +252,7 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeedInitAcc(u
     return -1;
 
 
-  m_SetOfFootTrajectoryGenerationObjects[IntervalIndex]->SetParametersWithInitPosInitSpeedInitAcc(AxisReference,
+  m_SetOfFootTrajectoryGenerationObjects[IntervalIndex]->SetParameters(AxisReference,
 											  TimeInterval,
 											  FinalPosition,
 											  InitPosition,

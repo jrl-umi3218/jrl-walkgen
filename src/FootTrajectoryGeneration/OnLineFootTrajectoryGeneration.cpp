@@ -96,7 +96,8 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
       //theta, dtheta
       curr_NSFAP.theta   = m_PolynomeTheta->Compute(remainingTime);
       curr_NSFAP.dtheta  = m_PolynomeTheta->ComputeDerivative(remainingTime);
-      curr_NSFAP.ddtheta = m_PolynomeTheta->ComputeSecondDerivative(remainingTime);
+      if(m_PolynomeTheta->Degree() > 4)
+        curr_NSFAP.ddtheta = m_PolynomeTheta->ComputeSecDerivative(remainingTime);
     }
   else 
     {
@@ -114,7 +115,8 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
       //theta, dtheta
       curr_NSFAP.theta = m_PolynomeTheta->Compute( InterpolationTime );
       curr_NSFAP.dtheta = m_PolynomeTheta->ComputeDerivative(InterpolationTime);
-      curr_NSFAP.ddtheta = m_PolynomeTheta->ComputeSecondDerivative(InterpolationTime);
+      if(m_PolynomeTheta->Degree() > 4)
+        curr_NSFAP.ddtheta = m_PolynomeTheta->ComputeSecDerivative(InterpolationTime);
     }
 
   if(HalfTimePassed_==false && LocalInterpolationStartTime+InterpolationTime >= m_TSingle/2.0 )
@@ -153,7 +155,8 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
       curr_NSFAP.omega   = m_PolynomeOmega->Compute(InterpolationTime);
 //TODO      curr_NSFAP.domega  = m_PolynomeOmega->Compute(InterpolationTime);
       curr_NSFAP.domega  = m_PolynomeOmega->ComputeDerivative(InterpolationTime);
-      curr_NSFAP.ddomega = m_PolynomeOmega->ComputeSecondDerivative(InterpolationTime);
+      if(m_PolynomeOmega->Degree() > 4)
+        curr_NSFAP.ddomega = m_PolynomeOmega->ComputeSecDerivative(InterpolationTime);
 
       ProtectionNeeded=true;
     }
@@ -293,11 +296,11 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
         }
 
       //Set parameters for current polynomial
-      double TimeInterval = UnlockedSwingPeriod-InterpolationTimePassed;
+      double TimeInterval = UnlockedSwingPeriod-SwingTimePassed;
       SetParameters(
     	  FootTrajectoryGenerationStandard::X_AXIS,
           TimeInterval,FPx,
-          LastSFP->x, LastSFP->dx, LastSFP->ddx)
+          LastSFP->x, LastSFP->dx, LastSFP->ddx
           );
       SetParameters(
     	  FootTrajectoryGenerationStandard::Y_AXIS,

@@ -208,15 +208,15 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
      break;
 
    case THETA_AXIS:
-     m_PolynomeTheta->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
+     m_PolynomeTheta->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
      break;
 
    case OMEGA_AXIS:
-     m_PolynomeOmega->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
+     m_PolynomeOmega->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
      break;
 
    case OMEGA2_AXIS:
-     m_PolynomeOmega2->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
+     m_PolynomeOmega2->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
      break;
 
    default:
@@ -268,28 +268,25 @@ double FootTrajectoryGenerationStandard::ComputeAll(FootAbsolutePosition & aFoot
 {
   aFootAbsolutePosition.x = m_PolynomeX->Compute(Time);
   aFootAbsolutePosition.dx = m_PolynomeX->ComputeDerivative(Time);
-  aFootAbsolutePosition.ddx = m_PolynomeX->ComputeSecondDerivative(Time);
+//  aFootAbsolutePosition.ddx = m_PolynomeX->ComputeSecDerivative(Time);
   ODEBUG("t: " << Time << " : " << aFootAbsolutePosition.x); 
 
   aFootAbsolutePosition.y = m_PolynomeY->Compute(Time);
   aFootAbsolutePosition.dy = m_PolynomeY->ComputeDerivative(Time);
-  aFootAbsolutePosition.ddy = m_PolynomeY->ComputeSecondDerivative(Time);
+//  aFootAbsolutePosition.ddy = m_PolynomeY->ComputeSecDerivative(Time);
 
   aFootAbsolutePosition.z = m_PolynomeZ->Compute(Time);
   aFootAbsolutePosition.dz = m_PolynomeZ->ComputeDerivative(Time);
-  aFootAbsolutePosition.ddz = m_PolynomeZ->ComputeSecondDerivative(Time);
+//  aFootAbsolutePosition.ddz = m_PolynomeZ->ComputeSecDerivative(Time);
 
   aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(Time);
   aFootAbsolutePosition.dtheta = m_PolynomeTheta->ComputeDerivative(Time);
-  aFootAbsolutePosition.ddtheta = m_PolynomeTheta->ComputeSecondDerivative(Time);
 
   aFootAbsolutePosition.omega = m_PolynomeOmega->Compute(Time);
   aFootAbsolutePosition.domega = m_PolynomeOmega->ComputeDerivative(Time);
-  aFootAbsolutePosition.ddomega = m_PolynomeOmega->ComputeSecondDerivative(Time);
 
   aFootAbsolutePosition.omega2 = m_PolynomeOmega2->Compute(Time);
   aFootAbsolutePosition.domega2 = m_PolynomeOmega2->ComputeDerivative(Time);
-  aFootAbsolutePosition.ddomega2 = m_PolynomeOmega2->ComputeSecondDerivative(Time);
 
   return Time;
 }

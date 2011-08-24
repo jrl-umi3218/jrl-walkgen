@@ -153,9 +153,6 @@ void Polynome5::SetParameters(double FT, double FP,
   m_Coefficients[5] = ( -1.0/2.0*InitAcc*FT*FT - 3.0*InitSpeed*FT - 6.0*InitPos + 6.0*FP)/tmp;
 }
 
-Polynome5::~Polynome5()
-{}
-
 Polynome6::Polynome6(double FT, double MP) :Polynome(6)
 {
   SetParameters(FT,MP);
