@@ -62,29 +62,28 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Time
     /// \param[in] Ref
-    /// \param[in] TrunkState
-    /// \param[in] TrunkStateT
     /// \param[in] StepDuration
-    /// \param[in] CurrentSupport
-    /// \param[in] LeftFootAbsolutePositions
-    /// \param[in] RightFootAbsolutePositions
-    /// \param[out] PreviewedSupportAngles
-    void preview_orientations(double Time, const reference_t & Ref,
-			     double StepDuration, const std::deque<support_state_t> & PrwSupportStates_deq,
-			     const std::deque<FootAbsolutePosition> & LeftFootAbsolutePositions,
-			     const std::deque<FootAbsolutePosition> & RightFootAbsolutePositions,
-                 std::deque<double> & PreviewedSupportAngles);
+    /// \param[in] PrwSupportStates_deq
+    /// \param[in] LeftFootPositions_deq
+    /// \param[in] RightFootPositions_deq
+    /// \param[out] PreviewedSupportAngles_deq
+    void preview_orientations(double Time,
+        const reference_t & Ref,
+        double StepDuration,
+        const std::deque<support_state_t> & PrwSupportStates_deq,
+        const std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
+        const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
+        std::deque<double> & PreviewedSupportAngles_deq);
 
     /// \brief Interpolate previewed orientation of the trunk
     ///
-    /// \param[in] time
+    /// \param[in] Time
     /// \param[in] CurrentIndex
-    /// \param[in] TrunkState
-    /// \param[in] TrunkStateT
     /// \param[in] NewSamplingPeriod
-    /// \param[in] CurrentSupport
+    /// \param[in] PrwSupportStates_deq
     /// \param[out] FinalCOMTraj_deq
-    void interpolate_trunk_orientation(double Time, int CurrentIndex,
+    void interpolate_trunk_orientation(double Time,
+        int CurrentIndex,
         double NewSamplingPeriod,
         const std::deque<support_state_t> & PrwSupportStates_deq,
         std::deque<COMState> & FinalCOMTraj_deq);
@@ -118,19 +117,16 @@ namespace PatternGeneratorJRL
     /// The verification is based on the supposition that the final joint trajectory is composed by
     /// a fourth-order polynomial acceleration phase inside T_ and a constant velocity phase for the rest of the preview horizon.
     ///
-    /// \param[in] Ref Reference
-    /// \param[in] TrunkState Current trunk state
-    /// \param[out] TrunkStateT Trunk state at the next future sample
-    /// \param [in] CurrentSupport Current support state
+    /// \param[in] Ref
+    /// \param[in] CurrentSupport
     void verify_acceleration_hip_joint(const reference_t & Ref,
-                                      const support_state_t & CurrentSupport);
+        const support_state_t & CurrentSupport);
 
     /// \brief Verify velocity of hip joint
     /// The velocity is verified only between previewed supports.
     /// The verification is based on the supposition that the final joint trajectory is a third-order polynomial.
     ///
     /// \param[in] Time
-    /// \param[in] TrunkStateT
     /// \param[in] PreviewedSupportFoot
     /// \param[in] PreviewedSupportAngle
     /// \param[in] StepNumber
@@ -140,12 +136,14 @@ namespace PatternGeneratorJRL
     /// \param[in] CurrentLeftFootVelocity
     /// \param[in] CurrentRightFootVelocity
     void verify_velocity_hip_joint(double Time,
-                                  double PreviewedSupportFoot,
-                                  double PreviewedSupportAngle, unsigned StepNumber,
-                                  const support_state_t & CurrentSupport,
-                                  double CurrentRightFootAngle, double CurrentLeftFootAngle,
-                                  double CurrentLeftFootVelocity,
-                                  double CurrentRightFootVelocity);
+        double PreviewedSupportFoot,
+        double PreviewedSupportAngle,
+        unsigned StepNumber,
+        const support_state_t & CurrentSupport,
+        double CurrentRightFootAngle,
+        double CurrentLeftFootAngle,
+        double CurrentLeftFootVelocity,
+        double CurrentRightFootVelocity);
 
     /// \brief Verify angle of hip joint
     ///
@@ -155,18 +153,29 @@ namespace PatternGeneratorJRL
     /// \param[in] TrunkStateT
     /// \param[in] CurrentSupportAngle
     /// \param[in] StepNumber
+    ///
     /// \return AngleOK
     bool verify_angle_hip_joint(const support_state_t & CurrentSupport,
-                               double PreviewedTrunkAngleEnd,
-                               const COMState & TrunkState, COMState & TrunkStateT,
-                               double CurrentSupportFootAngle,
-                               unsigned StepNumber);
+        double PreviewedTrunkAngleEnd,
+        const COMState & TrunkState,
+        const COMState & TrunkStateT,
+        double CurrentSupportFootAngle,
+        unsigned StepNumber);
 
     /// \brief Fourth order polynomial trajectory
+    /// \param[in] abcd Parameters
+    /// \param[in] x
+    ///
+    /// \return Evaluation value
     double f(double a,double b,double c,double d,double x);
 
     /// \brief Fourth order polynomial trajectory derivative
+    /// \param[in] abcd Parameters
+    /// \param[in] x
+    ///
+    /// \return Evaluation value
     double df(double a,double b,double c,double d,double x);
+
 
     //
     // Private members:
