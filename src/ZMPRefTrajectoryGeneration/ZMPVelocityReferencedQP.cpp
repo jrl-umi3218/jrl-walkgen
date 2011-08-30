@@ -408,8 +408,9 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // SOLVE PROBLEM:
       // --------------
       solution_t Result;
-	
-      Problem_.solve( QPProblem_s::LSSOL, Result, QPProblem_s::ALL );
+
+//      Problem_.solve( QPProblem_s::LSSOL, Result, QPProblem_s::ALL );
+      Problem_.solve( QPProblem_s::QLD, Result, QPProblem_s::ALL );
       Problem_.reset();
 
 
@@ -450,26 +451,6 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       CurrentCPUTime = end.tv_sec - start.tv_sec +
           0.000001 * (end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
-
-	    static int k=0;
-	    static double tab[100000];
-	    static int nb=0;
-	    tab[nb]=CurrentCPUTime;
-	    ++nb;
-	    if (CurrentCPUTime>0.002){
-		    std::cout << "peak : " << CurrentCPUTime*1000 <<  " ms" << std::endl;
-	    }
-	    if (++k%10==0){
-		double moy=0;
-		for(int i=k-20;i<k;++i){
-			if (i>=0){
-				moy+=tab[i];
-			}
-		}
-		moy/=20;
-		std::cout << "mean period : " << moy*1000 <<  " ms" << std::endl;
-	    }	
-	
     }
 
 }
