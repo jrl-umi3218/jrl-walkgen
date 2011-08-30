@@ -215,7 +215,7 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 	break;
 			
       }
-      case 2:
+    case 2:
 	{	
 	  ODEBUG( "Walk Mode with Obstacle StepOver Selected \
                  (obstacle parameters have to be set first, \
@@ -225,6 +225,64 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
   
 	  break;
 	}
+    // With a varying double support time and a single support time.
+    case 5:
+      {	
+			
+	ODEBUG3( "Standard Walk Mode Selected" );
+	RelativeFootPosition aFootPosition;
+			
+	while(!strm.eof())
+	  {
+	    if (!strm.eof())
+	      strm >> aFootPosition.sx;
+	    else break;
+	    if (!strm.eof())
+	      strm >> aFootPosition.sy;
+	    else 
+	      break;
+	    if (!strm.eof())
+	      strm >> aFootPosition.theta;
+	    else 
+	      break;
+
+	    double lSST=0.0, lDST=0.0;
+	    if (!strm.eof())
+	      strm >> aFootPosition.SStime;
+	    else 
+	      break;
+	    if (!strm.eof())
+	      strm >> aFootPosition.DStime;
+	    else 
+	      break;
+				
+	    aFootPosition.DeviationHipHeight = 0;
+	    aFootPosition.stepType=1;
+	    ODEBUG3("FootPositions:" << aFootPosition.sx << " " <<
+		    aFootPosition.sy << " " <<
+		    aFootPosition.theta << " " << 
+		    aFootPosition.SStime << " " << 
+		    aFootPosition.DStime << " " << 
+		    aFootPosition.DeviationHipHeight << " " );
+	
+	    ODEBUG4(aFootPosition.sx << " " <<
+		    aFootPosition.sy << " " <<
+		    aFootPosition.theta << " " << 
+		    aFootPosition.SStime << " " << 
+		    aFootPosition.DStime << " " << 
+		    aFootPosition.DeviationHipHeight << " " ,
+		    "DebugGMFKW.dat");
+			
+	    m_RelativeFootPositions.push_back(aFootPosition);
+	    if (aFootPosition.sy>0)
+	      m_KeepLastCorrectSupportFoot=-1;
+	    else
+	      m_KeepLastCorrectSupportFoot=1;
+	  }
+
+	ODEBUG("m_RelativeFootPositions: " << m_RelativeFootPositions.size());
+	break;
+      }
 
     default: 
       {

@@ -146,6 +146,39 @@ IF(HRP2_DYNAMICS_FOUND)
 
 ENDIF(HRP2_DYNAMICS_FOUND)
 
+#########################
+# Read Novela Data 2011 #
+#########################
+
+IF(HRP2_DYNAMICS_FOUND)
+  MESSAGE(STATUS "hrp2-dynamics taken into account")
+  ADD_EXECUTABLE(ReadDataForNovela
+    ../src/portability/gettimeofday.cc
+    ReadDataForNovela.cpp
+    CommonTools.cpp
+    TestObject.cpp
+    ClockCPUTime.cpp
+  )
+
+  MESSAGE(STATUS "jrl data dir: " ${HRP2_14_PKGDATAROOTDIR})
+  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/)
+  SET(hrp2dynamicsspec
+    ${HRP2_14_PKGDATAROOTDIR}/HRP2SpecificitiesSmall.xml
+  )
+  SET(hrp2dynamicsljr
+    ${HRP2_14_PKGDATAROOTDIR}/HRP2LinkJointRankSmall.xml
+  )
+  SET(hrp2dynamicsinitconfig
+    ${HRP2_14_PKGDATAROOTDIR}/HRP2JRLInitConfig.dat)
+
+  TARGET_LINK_LIBRARIES(ReadDataForNovela ${PROJECT_NAME})
+  PKG_CONFIG_USE_DEPENDENCY(ReadDataForNovela hrp2-dynamics)
+  ADD_DEPENDENCIES(ReadDataForNovela ${PROJECT_NAME})
+
+  ADD_TEST(ReadDataForNovela
+    ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec} ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
+
+ENDIF(HRP2_DYNAMICS_FOUND)
 
 #####################
 # Add user examples #

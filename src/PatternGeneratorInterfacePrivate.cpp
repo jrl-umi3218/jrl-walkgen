@@ -456,10 +456,11 @@ namespace PatternGeneratorJRL {
       {
       case 0:
       case 4:
+      case 5:
       case 3:
       case 1:
 	{
-	  ODEBUG("Juste before the reading of the step sequence ");
+	  ODEBUG3("Juste before the reading of the step sequence ");
 	  m_StepStackHandler->ReadStepSequenceAccordingToWalkMode(strm);
 	  break;
 	}
