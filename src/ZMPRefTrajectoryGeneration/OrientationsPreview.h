@@ -158,7 +158,7 @@ namespace PatternGeneratorJRL
     bool verify_angle_hip_joint(const support_state_t & CurrentSupport,
         double PreviewedTrunkAngleEnd,
         const COMState & TrunkState,
-        const COMState & TrunkStateT,
+        COMState & TrunkStateT,
         double CurrentSupportFootAngle,
         unsigned StepNumber);
 
