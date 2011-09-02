@@ -422,8 +422,8 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
   // ------------------
   linear_dynamics_t * SFDynamics;
   linear_dynamics_t * FFDynamics;
-  double Spbar[3];//, Sabar[3];
-  double Upbar[2];//, Uabar[2];
+  double Spbar[3]={0.0,0.0,0.0};//, Sabar[3];
+  double Upbar[2]={0.0,0.0};//, Uabar[2];
   unsigned int SwitchInstant = 0;
   std::deque<support_state_t>::const_iterator SS_it =
       SupportStates_deq.begin();
@@ -822,48 +822,6 @@ RigidBodySystem::generate_trajectories( double Time, const solution_t & Solution
   OFTG_->interpolate_feet_positions(Time, PrwSupportStates_deq,
       Solution, PreviewedSupportAngles_deq,
       LeftFootTraj_deq, RightFootTraj_deq);
-
-//  linear_dynamics_t LFDyn = LeftFoot_.Dynamics( ACCELERATION );
-//  cout<<"LFDyn.S"<<LFDyn.S<<endl;
-//  cout<<"LFDyn.U"<<LFDyn.U<<endl;
-//  cout<<"Prediction: "<<LFDyn.S(0,0)*CurLeftFoot.x+LFDyn.S(0,1)*CurLeftFoot.dx+LFDyn.S(0,2)*CurLeftFoot.ddx+LFDyn.U(0,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Reality: "<<LeftFootTraj_deq.back().x<<endl;
-//  linear_dynamics_t RFDyn = RightFoot_.Dynamics( ACCELERATION );
-//  cout<<"CurrentSupport.Phase = "<<CurrentSupport.Phase<<endl;
-//  cout<<"CurrentSupport.Foot = "<<CurrentSupport.Foot<<endl;
-//  cout<<"CurrentSupport.TimeLimit = "<<CurrentSupport.TimeLimit<<endl;
-//  cout<<"RFDyn.S"<<RFDyn.S<<endl;
-//  cout<<"RFDyn.U"<<RFDyn.U<<endl;
-//  cout<<"Result.Solution_vec[2*N_] = "<<Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(0,0)*CurRightFoot.x+RFDyn.S(0,1)*CurRightFoot.dx+RFDyn.S(0,2)*CurRightFoot.ddx+RFDyn.U(0,0)*Result.Solution_vec[2*N_]
-//<<"Prediction: "<<LFDyn.S(0,0)*CurRightFoot.x+LFDyn.S(0,1)*CurRightFoot.dx+LFDyn.S(0,2)*CurRightFoot.ddx+LFDyn.U(0,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(1,0)*CurRightFoot.x+RFDyn.S(1,1)*CurRightFoot.dx+RFDyn.S(1,2)*CurRightFoot.ddx+RFDyn.U(1,0)*Result.Solution_vec[2*N_]
-//<<"Prediction: "<<LFDyn.S(1,0)*CurRightFoot.x+LFDyn.S(1,1)*CurRightFoot.dx+LFDyn.S(1,2)*CurRightFoot.ddx+LFDyn.U(1,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(2,0)*CurRightFoot.x+RFDyn.S(2,1)*CurRightFoot.dx+RFDyn.S(2,2)*CurRightFoot.ddx+RFDyn.U(2,0)*Result.Solution_vec[2*N_]
-//<<"Prediction: "<<LFDyn.S(2,0)*CurRightFoot.x+LFDyn.S(2,1)*CurRightFoot.dx+LFDyn.S(2,2)*CurRightFoot.ddx+LFDyn.U(2,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(3,0)*CurRightFoot.x+RFDyn.S(3,1)*CurRightFoot.dx+RFDyn.S(3,2)*CurRightFoot.ddx+RFDyn.U(3,0)*Result.Solution_vec[2*N_]
-//  <<"Prediction: "<<LFDyn.S(3,0)*CurRightFoot.x+LFDyn.S(3,1)*CurRightFoot.dx+LFDyn.S(3,2)*CurRightFoot.ddx+LFDyn.U(3,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(4,0)*CurRightFoot.x+RFDyn.S(4,1)*CurRightFoot.dx+RFDyn.S(4,2)*CurRightFoot.ddx+RFDyn.U(4,0)*Result.Solution_vec[2*N_]
-//<<"Prediction: "<<LFDyn.S(4,0)*CurRightFoot.x+LFDyn.S(4,1)*CurRightFoot.dx+LFDyn.S(4,2)*CurRightFoot.ddx+LFDyn.U(4,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(5,0)*CurRightFoot.x+RFDyn.S(5,1)*CurRightFoot.dx+RFDyn.S(5,2)*CurRightFoot.ddx+RFDyn.U(5,0)*Result.Solution_vec[2*N_]
-//  <<"Prediction: "<<LFDyn.S(5,0)*CurRightFoot.x+LFDyn.S(5,1)*CurRightFoot.dx+LFDyn.S(5,2)*CurRightFoot.ddx+LFDyn.U(5,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(6,0)*CurRightFoot.x+RFDyn.S(6,1)*CurRightFoot.dx+RFDyn.S(6,2)*CurRightFoot.ddx+RFDyn.U(6,0)*Result.Solution_vec[2*N_]
-//  <<"Prediction: "<<LFDyn.S(6,0)*CurRightFoot.x+LFDyn.S(6,1)*CurRightFoot.dx+LFDyn.S(6,2)*CurRightFoot.ddx+LFDyn.U(6,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(7,0)*CurRightFoot.x+RFDyn.S(7,1)*CurRightFoot.dx+RFDyn.S(7,2)*CurRightFoot.ddx+RFDyn.U(7,0)*Result.Solution_vec[2*N_]
-//  <<"Prediction: "<<LFDyn.S(7,0)*CurRightFoot.x+LFDyn.S(7,1)*CurRightFoot.dx+LFDyn.S(7,2)*CurRightFoot.ddx+LFDyn.U(7,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(8,0)*CurRightFoot.x+RFDyn.S(8,1)*CurRightFoot.dx+RFDyn.S(8,2)*CurRightFoot.ddx+RFDyn.U(8,0)*Result.Solution_vec[2*N_]
-//  <<"Prediction: "<<LFDyn.S(8,0)*CurRightFoot.x+LFDyn.S(8,1)*CurRightFoot.dx+LFDyn.S(8,2)*CurRightFoot.ddx+LFDyn.U(8,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(9,0)*CurRightFoot.x+RFDyn.S(9,1)*CurRightFoot.dx+RFDyn.S(9,2)*CurRightFoot.ddx+RFDyn.U(9,0)*Result.Solution_vec[2*N_]
-//  <<"Prediction: "<<LFDyn.S(9,0)*CurRightFoot.x+LFDyn.S(9,1)*CurRightFoot.dx+LFDyn.S(9,2)*CurRightFoot.ddx+LFDyn.U(9,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(10,0)*CurRightFoot.x+RFDyn.S(10,1)*CurRightFoot.dx+RFDyn.S(10,2)*CurRightFoot.ddx+RFDyn.U(10,0)*Result.Solution_vec[2*N_]
-//  <<"Prediction: "<<LFDyn.S(10,0)*CurRightFoot.x+LFDyn.S(10,1)*CurRightFoot.dx+LFDyn.S(10,2)*CurRightFoot.ddx+LFDyn.U(10,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(11,0)*CurRightFoot.x+RFDyn.S(11,1)*CurRightFoot.dx+RFDyn.S(11,2)*CurRightFoot.ddx+RFDyn.U(11,0)*Result.Solution_vec[2*N_]
-//  <<"Prediction: "<<LFDyn.S(11,0)*CurRightFoot.x+LFDyn.S(11,1)*CurRightFoot.dx+LFDyn.S(11,2)*CurRightFoot.ddx+LFDyn.U(11,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(12,0)*CurRightFoot.x+RFDyn.S(12,1)*CurRightFoot.dx+RFDyn.S(12,2)*CurRightFoot.ddx+RFDyn.U(12,0)*Result.Solution_vec[2*N_]
-//  <<"Prediction: "<<LFDyn.S(12,0)*CurRightFoot.x+LFDyn.S(12,1)*CurRightFoot.dx+LFDyn.S(12,2)*CurRightFoot.ddx+LFDyn.U(12,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Prediction: "<<RFDyn.S(13,0)*CurRightFoot.x+RFDyn.S(13,1)*CurRightFoot.dx+RFDyn.S(13,2)*CurRightFoot.ddx+RFDyn.U(13,0)*Result.Solution_vec[2*N_]
-//  <<"Prediction: "<<LFDyn.S(13,0)*CurRightFoot.x+LFDyn.S(13,1)*CurRightFoot.dx+LFDyn.S(13,2)*CurRightFoot.ddx+LFDyn.U(13,0)*Result.Solution_vec[2*N_]<<endl;
-//  cout<<"Reality: "<<RightFootTraj_deq.back().ddx<<endl;
 
   return 0;
 

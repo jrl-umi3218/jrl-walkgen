@@ -39,7 +39,6 @@
 #include <PreviewControl/rigid-body.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>
 #include <Mathematics/relative-feet-inequalities.hh>
-#include <ZMPRefTrajectoryGeneration/door.hh>
 
 #include <privatepgtypes.h>
 #include <cmath>
@@ -98,15 +97,6 @@ namespace PatternGeneratorJRL
         const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
         const std::deque<support_state_t> & PrwSupportStates_deq,
         const std::deque<double> & PrwSupportAngles_deq);
-
-    /// \brief Generate door constraints
-    ///
-    /// \param[in] Time
-    /// \param[in] Door
-    /// \param[in] SupportStates_deq
-    /// \param[out] Pb
-    void build_constraints_door(double Time,
-			      Door & Door, const std::deque<support_state_t> & SupportStates_deq, QPProblem & Pb);
 
     /// \brief Build the constant part of the objective
     ///
