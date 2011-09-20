@@ -87,6 +87,7 @@ protected:
     ostrm << " ";
     while(!aif.eof())
       {
+	double ltheta = 0.0;
 	double lx,ly, lTss=0.0;
 	aif >> lx;
 	if (aif.eof())
@@ -101,7 +102,12 @@ protected:
 	    cout << " break on ly " << endl;
 	    break;
 	  }
-		
+	aif >> ltheta;
+	if (aif.eof())
+	  {
+	    cout << " break on ly " << endl;
+	    break;
+	  }		
 	aif >> lTss;
 	if (aif.eof())
 	  {
@@ -110,12 +116,12 @@ protected:
 	  }
 
 	cout << "Reading: " <<lx << " " << ly << " " << lTss <<endl;
-	double ltheta = 0.0, lTds = 0.0;
+	double  lTds = 0.02;
 	ostrm << lx ; ostrm << " ";
 	ostrm << ly; ostrm << " ";
 	ostrm << ltheta; ostrm << " ";
-	ostrm << lTss/200.0; ostrm << " ";
-	ostrm << lTds/200.0;
+	ostrm << lTss; ostrm << " ";
+	ostrm << lTds;
 	if (!aif.eof())
 	  ostrm << " ";
       }

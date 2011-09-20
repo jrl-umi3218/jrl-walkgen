@@ -381,6 +381,8 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       
     }
 
+
+  ODEBUG3("PreviewControlTime: " << m_PreviewControlTime);
   ODEBUG4("ZMP::InitOnLine - Step 3 ","ZMDInitOnLine.txt");
   // Initialization of the ZMP position (stable values during the Preview control time window). 
   int AddArraySize;
@@ -600,10 +602,12 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 	  m_RelativeFootPositions[0].sy << " " << 
 	  m_RelativeFootPositions[0].theta,"DebugDataRFPos.txt" );
   ODEBUG(" OnLineAddFoot: m_RelativeFootPositions.size: " <<  m_RelativeFootPositions.size());
-  ODEBUG(" OnLineAddFoot: "<< endl <<
+  ODEBUG3(" OnLineAddFoot: "<< endl <<
 	  " NewRelativeFootPositions.x: " <<  NewRelativeFootPosition.sx <<
 	  " NewRelativeFootPositions.y: " <<  NewRelativeFootPosition.sy <<
-	  " NewRelativeFootPositions.theta: " <<  NewRelativeFootPosition.theta
+	  " NewRelativeFootPositions.theta: " <<  NewRelativeFootPosition.theta <<
+	  " NewRelativeFootPositions.DSTIME: " <<  NewRelativeFootPosition.DStime <<
+	  " NewRelativeFootPositions.SSTIME: " <<  NewRelativeFootPosition.SStime
 	  );
    if (m_RelativeFootPositions[1].DStime!=0.0)
     {	
@@ -612,7 +616,8 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
     }
   // Compute on the direction of the support foot.
   //  double stheta = sin(m_RelativeFootPositions[1].theta*M_PI/180.0);     
-  ODEBUG("Time of double support phase in OnLineFootAdd: "<< lTdble);
+  ODEBUG3("Time of double support phase in OnLineFootAdd: "<< lTdble);
+  ODEBUG3("Time of single support phase in OnLineFootAdd: "<< lTsingle);
   TimeFirstPhase = lTdble;
 
   // Initialize who is support foot.
@@ -634,7 +639,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
     }
   
   double TimeForThisFootPosition = TimeFirstPhase+ lTsingle;
-  ODEBUG4("TimeFirstPhase: " << TimeFirstPhase << " lTsingle: " << lTsingle,"DebugData.txt");
+  ODEBUG5("TimeFirstPhase: " << TimeFirstPhase << " lTsingle: " << lTsingle,"DebugData.txt");
   // Compute the size of cells to add inside the array.
   assert(m_SamplingPeriod > 0);
   double l2AddArraySize= TimeForThisFootPosition/m_SamplingPeriod;
@@ -642,7 +647,9 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   ODEBUG("Added part: "<<AddArraySize << " " << l2AddArraySize << 
 	  " TimeForThisFootPosition " << TimeForThisFootPosition <<
 	  " SamplingPeriod" << m_SamplingPeriod);
+  ODEBUG3("ZMPPositions size before resizing:" << ZMPPositions.size() );
   ZMPPositions.resize(AddArraySize);
+  ODEBUG3("ZMPPositions size after resizing:" << ZMPPositions.size() );
   LeftFootAbsolutePositions.resize(AddArraySize);
   RightFootAbsolutePositions.resize(AddArraySize);    
   
@@ -968,6 +975,9 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 
   m_RelativeFootPositions.pop_front();
 
+  ODEBUG3("Size of my queue: " << m_RelativeFootPositions.size()  <<
+	  " m_RelativeFootPositions[1].DStime: " << m_RelativeFootPositions[0].DStime <<
+	  " m_RelativeFootPositions[1].SStime: " << m_RelativeFootPositions[0].SStime);
   for(unsigned int i=0;i<ZMPPositions.size();i++)
     {
       COMState aCOMState;
