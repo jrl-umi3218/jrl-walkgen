@@ -186,7 +186,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
        m_HumanoidDynamicRobot->currentVelocity(CurrentVelocity);
 
        /* Update the current acceleration vector */
-       //m_HumanoidDynamicRobot->currentVelocity(CurrentAcceleration);
+      m_HumanoidDynamicRobot->currentAcceleration(CurrentAcceleration);
      }
  }
 
@@ -434,11 +434,14 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    m_FIFORightFootPosition.push_back(RightFootPosition);
    m_FIFOLeftFootPosition.push_back(LeftFootPosition);
 
+   ODEBUG("Fifo ZMP ref positions: "<< m_FIFOZMPRefPositions.size());
+
+   m_FIFOZMPRefPositions.pop_front();
    ODEBUG("FIFOs COM:"<< m_FIFOCOMStates.size() <<
 	  " RF: "<< m_FIFORightFootPosition.size() <<
-	  " LF: "<< m_FIFOLeftFootPosition.size());
-   m_FIFOZMPRefPositions.pop_front();
-
+	  " LF: "<< m_FIFOLeftFootPosition.size() <<
+	  " ZMP: " << m_FIFOZMPRefPositions.size());
+   
    return 1;
  }
 
@@ -655,7 +658,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    EvaluateMultiBodyZMP(localindex);
 
    m_FIFOZMPRefPositions.push_back(ZMPRefPositions[localindex+1+m_NL]);
-
+   
    m_NumberOfIterations++;
    return 0;
  }
@@ -732,8 +735,6 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
  #endif
 
      }
-   ODEBUG("ik ben hier b" << aFIFOZMPRefPositions.size() );
-   ODEBUG("ik ben hier c" << m_ExtraZMPRefBuffer.size());
 
  #ifdef _DEBUG_MODE_ON_
    if (aof_ExtraCOM.is_open())
