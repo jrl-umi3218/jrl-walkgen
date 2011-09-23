@@ -229,7 +229,7 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
     case 5:
       {	
 			
-	ODEBUG3( "Standard Walk Mode Selected" );
+	ODEBUG( "Standard Walk Mode Selected" );
 	RelativeFootPosition aFootPosition;
 			
 	while(!strm.eof())
@@ -258,7 +258,7 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 				
 	    aFootPosition.DeviationHipHeight = 0;
 	    aFootPosition.stepType=1;
-	    ODEBUG3("FootPositions:" << aFootPosition.sx << " " <<
+	    ODEBUG("FootPositions:" << aFootPosition.sx << " " <<
 		    aFootPosition.sy << " " <<
 		    aFootPosition.theta << " " << 
 		    aFootPosition.SStime << " " << 
