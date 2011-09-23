@@ -460,7 +460,6 @@ namespace PatternGeneratorJRL {
       case 3:
       case 1:
 	{
-	  ODEBUG3("Juste before the reading of the step sequence ");
 	  m_StepStackHandler->ReadStepSequenceAccordingToWalkMode(strm);
 	  break;
 	}
@@ -1135,7 +1134,7 @@ namespace PatternGeneratorJRL {
 	m_AlgorithmforZMPCOM = ZMPCOM_WIEBER_2006;
 	m_GlobalStrategyManager = m_DoubleStagePCStrategy;
       }
-    else if (ZMPTrajAlgo=="Kajita")
+    else if ((ZMPTrajAlgo=="Kajita") || (ZMPTrajAlgo=="KajitaOneStage"))
       {
 	m_AlgorithmforZMPCOM = ZMPCOM_KAJITA_2003;
 	m_GlobalStrategyManager = m_DoubleStagePCStrategy;
@@ -1851,6 +1850,8 @@ namespace PatternGeneratorJRL {
 				     lStartingZMPPosition,
 				     InitLeftFootAbsPos,
 				     InitRightFootAbsPos);
+
+
 	//	m_COMBuffer.clear();
 	//	m_COMBuffer.resize(m_RightFootPositions.size());
       }
