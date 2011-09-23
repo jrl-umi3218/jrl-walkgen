@@ -130,7 +130,7 @@ public:
   void updateSupportPolyWhenStarting()
   {
     prevSupportPoly_.x_ = (leftFoot_.x_+ rightFoot_.x_)/2.0;
-    prevSupportPoly_.y_ = (leftFoot_.x_+ rightFoot_.y_)/2.0;
+    prevSupportPoly_.y_ = (leftFoot_.y_+ rightFoot_.y_)/2.0;
     prevSupportPoly_.theta_ = (leftFoot_.theta_+ rightFoot_.theta_)/2.0;
   }
 
@@ -273,6 +273,8 @@ protected:
     else 
       adatum.event_ = CE_CONTACT;
 
+    adatum.x_ *= 0.7;
+    adatum.y_ *= 0.7;
     return !afile.eof();
   }
   
@@ -326,10 +328,14 @@ protected:
   {
     
     ofstream aof;
-    aof.open("DebugNovelaSteps.dat");
+    aof.open("DebugNovelaSteps.py");
 
     InitializePG(aPGI);
 
+    aof << "@optionalparentheses" << endl;
+    aof << "def seqH():" << endl;
+    aof << "    pg.parserCmd(\":SetAlgoForZmpTrajectory Kajita\")" << endl;
+	
     ifstream aif;
     aif.open(m_FileName.c_str(),ifstream::in);
     if (!aif.is_open())
@@ -337,11 +343,11 @@ protected:
 
     ostringstream ostrm;
     DataFromDiffFile newDatum, prevDatum;
-
+    
     ostrm << ":stepseq";
     ostrm << " ";
     unsigned long int nbData=0;
-    
+    unsigned long int nbSeq=0;
     StateFromDiffFile aDiffFileState;
 
     while(ReadDataFromDiffFile(aif,newDatum))
@@ -367,17 +373,31 @@ protected:
 	    // coordinates of the new one.
 	    SupportFoot.ExpressADatumInLocalCoordinates(aDiffFileState.prevSupportPoly_,
 							prevSupportFootInNewFrame);
-	
-	    ostringstream lstrm;
-	    lstrm << -prevSupportFootInNewFrame.x_ ; lstrm << " ";
-	    lstrm << -prevSupportFootInNewFrame.y_; lstrm << " ";
-	    lstrm << (-prevSupportFootInNewFrame.theta_*180/M_PI); lstrm << " ";
-	    lstrm << aDiffFileState.tss_; lstrm << " ";
-	    lstrm << aDiffFileState.tds_;
+
+	    // Check if the new support is right on the current one.
+	    if ( (fabs(prevSupportFootInNewFrame.x_)>1e-06) ||
+		 (fabs(prevSupportFootInNewFrame.y_)>1e-06) ||
+		 (fabs(prevSupportFootInNewFrame.theta_)>1e-06))
+	      {
+		ostringstream lstrm;
+		lstrm << -prevSupportFootInNewFrame.x_ ; lstrm << " ";
+		lstrm << -prevSupportFootInNewFrame.y_; lstrm << " ";
+		lstrm << (-prevSupportFootInNewFrame.theta_*180/M_PI); lstrm << " ";
+		lstrm << aDiffFileState.tss_; lstrm << " ";
+		lstrm << aDiffFileState.tds_;
+		
+		aof << "    seq" << nbSeq << " = \"";
+		aof << -prevSupportFootInNewFrame.x_ ; aof << " ";
+		aof << -prevSupportFootInNewFrame.y_; aof << " ";
+		aof << (-prevSupportFootInNewFrame.theta_*180/M_PI); aof << " ";
+		aof << aDiffFileState.tss_; aof << " ";
+		aof << aDiffFileState.tds_;
+		
+		aof << " \"" <<endl;
 	    
-	    aof << lstrm.str() << endl;
-	    
-	    ostrm << lstrm.str();
+		nbSeq++;
+		ostrm << lstrm.str();
+	      }
 
 	    // Update State: TO BE DONE AFTER computing new support foot coordinates.
 	    aDiffFileState.updateFeetWhenNewContact(newDatum);
@@ -398,6 +418,12 @@ protected:
 	nbData++;
       }
     
+    aof << "    seqall = ";
+    for(unsigned long int i=0;i<nbSeq-1;i++)
+      aof << "seq"<<i <<" + ";
+    aof << "seq"<<nbSeq-1 <<endl;
+    aof << "    pg.parserCmd(\":walkmode 5\")" << endl;
+    aof << "    pg.parserCmd(\":steseq \" + seqall)" << endl;
     aof.close();
 
     cout << "ostrm gives:" << endl

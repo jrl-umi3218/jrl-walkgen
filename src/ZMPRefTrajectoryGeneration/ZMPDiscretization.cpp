@@ -847,7 +847,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::Y_AXIS,
 						    ModulatedSingleSupportTime,vrel(1,0));
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
-						    m_Tsingle,lStepHeight);
+						    lTsingle,lStepHeight);
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::THETA_AXIS,
 						    ModulatedSingleSupportTime,RelTheta);
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::OMEGA_AXIS,

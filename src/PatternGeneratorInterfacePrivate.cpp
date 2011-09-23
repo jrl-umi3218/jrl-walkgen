@@ -451,8 +451,8 @@ namespace PatternGeneratorJRL {
   {
     // Read the data inside strm.
 
-
-    switch (m_StepStackHandler->GetWalkMode())
+    int r = m_StepStackHandler->GetWalkMode();
+    switch (r)
       {
       case 0:
       case 4:
@@ -479,10 +479,12 @@ namespace PatternGeneratorJRL {
 	}
       default:
 	{
-	  ODEBUG3( "Please select proper walk mode. \
-            (0 for normal walking ; \
-             1 for walking with waistheight variation ; \
-             2 for walking with obstacle stepover)" );
+	  ODEBUG3( "\n Please select proper walk mode (" << r << "). \n\
+            (0 for normal walking ; \n\
+             1 for walking with waistheight variation ; \n\
+             2 for walking with obstacle stepover) \n\
+             3-4: with pre-planned upper body trajectory \n\
+             5: with single and double support time specified \n" );
 	  return;
 	}
       }
