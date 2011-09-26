@@ -107,6 +107,8 @@ public:
   double tds_;
   /*! Single support phase duration */
   double tss_;
+  /*! Absolute time of the take off. */
+  double time_;
 
   StateFromDiffFile():
     state_(EGS_STARTING), tds_(0.02), tss_(0.0) {}
@@ -300,7 +302,8 @@ protected:
 	    aState.state_ = EGS_CONTACT;
 	    if (prevDatum.foot_==newDatum.foot_)
 	      {
-		aState.tss_=newDatum.time_ - prevDatum.time_;
+		aState.tss_ += newDatum.time_ - prevDatum.time_;
+		aState.time_ = prevDatum.time_;
 		return FOOT_CREATION;
 	      }
 	    else 
@@ -316,7 +319,11 @@ protected:
 	  {
 	    aState.tds_ = newDatum.time_ - prevDatum.time_;
 	    if (aState.tds_<0.02)
-	      aState.tds_ = 0.02;
+	      {
+		aState.tds_ = 0.02;
+		aState.tss_ = -0.02;
+	      } else 	aState.tss_ = 0.0;
+
 	  }
 	
 	aState.state_ = EGS_UP;
@@ -327,6 +334,7 @@ protected:
   void FillPGIWithDiff(PatternGeneratorInterface &aPGI)
   {
     
+    ofstream pyof("novela_contact.py"); pyof << "T = 1/dt" << std::endl;
     ofstream aof;
     aof.open("DebugNovelaSteps.py");
 
@@ -392,9 +400,23 @@ protected:
 		aof << (-prevSupportFootInNewFrame.theta_*180/M_PI); aof << " ";
 		aof << aDiffFileState.tss_; aof << " ";
 		aof << aDiffFileState.tds_;
-		
 		aof << " \"" <<endl;
 	    
+		double tabs =  aDiffFileState.time_;
+		if (nbSeq==0) tabs=0;
+		string footname = (newDatum.foot_==0)?"RF":"LF";
+		double tup = tabs+aDiffFileState.tds_,
+		  tdown = tabs+aDiffFileState.tss_+aDiffFileState.tds_;
+
+
+		pyof << "attime(int(round(" <<tup<<"*T)),\t lambda:";
+		pyof << "rmcontact(contact"<<footname<<",task"<<footname ;
+		pyof <<"),'" << footname <<" take off " << nbSeq << " t="<<tup<<"')"<< std::endl;
+
+		pyof << "attime(int(round(" << tdown <<"*T)),\t lambda:";
+		pyof << "contact(contact"<<footname<<",task"<<footname ;
+		pyof <<"),'" << footname <<" landing " << nbSeq << " t="<<tdown<<"')" << std::endl;
+
 		nbSeq++;
 		ostrm << lstrm.str();
 	      }
