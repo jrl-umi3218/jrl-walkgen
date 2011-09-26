@@ -342,7 +342,7 @@ protected:
 
     aof << "@optionalparentheses" << endl;
     aof << "def seqH():" << endl;
-    aof << "    pg.parserCmd(\":SetAlgoForZmpTrajectory Kajita\")" << endl;
+    aof << "    pg.parseCmd(\":SetAlgoForZmpTrajectory Kajita\")" << endl;
 	
     ifstream aif;
     aif.open(m_FileName.c_str(),ifstream::in);
@@ -444,8 +444,8 @@ protected:
     for(unsigned long int i=0;i<nbSeq-1;i++)
       aof << "seq"<<i <<" + ";
     aof << "seq"<<nbSeq-1 <<endl;
-    aof << "    pg.parserCmd(\":walkmode 5\")" << endl;
-    aof << "    pg.parserCmd(\":steseq \" + seqall)" << endl;
+    aof << "    pg.parseCmd(\":walkmode 5\")" << endl;
+    aof << "    pg.parseCmd(\":stepseq \" + seqall)" << endl;
     aof.close();
 
     cout << "ostrm gives:" << endl
