@@ -166,7 +166,6 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 		       FinalCOMStates,
 		       LeftFootAbsolutePositions,
 		       RightFootAbsolutePositions);
-
   FinalCOMStates.resize(FinalZMPPositions.size());
 }
 
@@ -324,6 +323,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 				  COMState & lStartingCOMState,
 				  MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
 {
+  m_CurrentTime =0.0;
   m_RelativeFootPositions.clear();
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
 
@@ -1179,7 +1179,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   
   unsigned int currentsize = 0;
   unsigned int CurrentZMPindex = 0;
-   ODEBUG4(" GetZMPDiscretization: Step 7 " << currentsize << " " << AddArraySize,"DebugData.txt");
+  ODEBUG4(" GetZMPDiscretization: Step 7 " << currentsize << " " << AddArraySize,"DebugData.txt");
 
   double dSizeOfEndPhase = TimeForThisFootPosition/m_SamplingPeriod;
   unsigned int SizeOfEndPhase = (unsigned int)round(dSizeOfEndPhase);
@@ -1203,6 +1203,10 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   pxf = 0.5*(m_CurrentSupportFootPosition(0,2) + m_PrevCurrentSupportFootPosition(0,2));
   pyf = 0.5*(m_CurrentSupportFootPosition(1,2) + m_PrevCurrentSupportFootPosition(1,2));
   
+  ODEBUG("px0: " << px0 << " py0: " <<py0 << " CurrentTime: " << m_CurrentTime);
+  ODEBUG("pxf: " << pxf << " pyf: " <<pyf << " CurrentTime: " << m_CurrentTime);
+  ODEBUG("Size of End phase: " << SizeOfEndPhase);
+
   delta_x = (pxf - px0)/(double)SizeOfEndPhase;
   delta_y = (pyf - py0)/(double)SizeOfEndPhase;
   
@@ -1212,7 +1216,6 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   
   ZMPPositions[0].theta = FinalZMPPositions.back().theta;
   ZMPPositions[0].stepType=0;
-  CurrentZMPindex++;
   ODEBUG("AddArraySize: " << AddArraySize << " SizeOfEndPhase:" <<SizeOfEndPhase);
 
   for(unsigned int k=0;k<SizeOfEndPhase;k++)
@@ -1318,7 +1321,8 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
 	  " m_ZMPPositions->size():" <<FinalZMPPositions.size() <<
 	  " CurrentZMPindex: " << CurrentZMPindex <<
 	  " ZMPPositions.size(): " << ZMPPositions.size());
-  
+
+
   ODEBUG4(" GetZMPDiscretization: Step 9 " << ZMPPositions.size(),"DebugData.txt");
   FilterOutValues(ZMPPositions,FinalZMPPositions,false);
 
