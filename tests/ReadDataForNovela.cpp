@@ -36,7 +36,7 @@ using namespace std;
 
 enum contactevent { CE_CONTACT, CE_UP};
 enum EventGenerationState {EGS_UP,EGS_CONTACT,EGS_STARTING};
-enum FootEvent { FOOT_CREATION, FOOT_STARTING, FOOT_NOTHING};
+enum FootEvent { FOOT_CREATION, FOOT_STARTING, FOOT_NOTHING, FOOT_SHIFT_ZMP};
 
 class DataFromDiffFile
 {
@@ -102,11 +102,16 @@ class StateFromDiffFile
 public:
   DataFromDiffFile leftFoot_, rightFoot_, prevSupportPoly_;
 
-  EventGenerationState state_;
+  EventGenerationState state_,prevState_;
   /*! Double support phase duration */
   double tds_;
+  /*! Double support phase duration */
+  double prevTds_;
   /*! Single support phase duration */
   double tss_;
+  /*! Previous single support phase duration */
+  double prevTss_;
+
   /*! Absolute time of the take off. */
   double time_;
 
@@ -144,13 +149,13 @@ ostream & operator<<(ostream & os, const StateFromDiffFile & aState)
   os << "tds_: " << aState.tds_ << endl;
   os << "tss_: " << aState.tss_ << endl;
   if (aState.state_ == EGS_STARTING)
-    os << "aState.state_ : EGS_STARTING"  << std::endl;
+    os << "state_ : EGS_STARTING"  << std::endl;
   
   if (aState.state_ == EGS_UP)
-    os << "aState.state_ : EGS_UP"  << std::endl;
+    os << "state_ : EGS_UP"  << std::endl;
   
   if (aState.state_ == EGS_CONTACT)
-    os << "aState.state_ : EGS_CONTACT"  << std::endl;
+    os << "state_ : EGS_CONTACT"  << std::endl;
 
   return os;
 }
@@ -284,6 +289,7 @@ protected:
 			DataFromDiffFile &newDatum,
 			DataFromDiffFile &prevDatum)
   {
+    aState.prevState_ = aState.state_;
 
     if (newDatum.time_==0.0)
       {
@@ -325,10 +331,96 @@ protected:
 	      } else 	aState.tss_ = 0.0;
 
 	  }
-	
+	if (aState.state_==EGS_STARTING)
+	  {
+	    aState.state_ = EGS_UP;
+	    return FOOT_SHIFT_ZMP;
+	  }
 	aState.state_ = EGS_UP;
       }
     return FOOT_NOTHING;
+  }
+
+  void CreatesNewFoot(DataFromDiffFile & newDatum,
+		      StateFromDiffFile &aDiffFileState,
+		      ofstream & aof, ofstream & pyof,
+		      unsigned long int &nbSeq,
+		      ostringstream &ostrm)
+  {
+    DataFromDiffFile SupportFoot;
+    DataFromDiffFile prevSupportFootInNewFrame;
+
+    // Who is support foot for the flying foot which
+    // just landed.
+    
+    if (newDatum.foot_==0)
+      SupportFoot=aDiffFileState.leftFoot_;
+    else 
+      SupportFoot=aDiffFileState.rightFoot_;
+    
+    // Compute the coordinates of the previous support foot in the
+    // coordinates of the new one.
+    SupportFoot.ExpressADatumInLocalCoordinates(aDiffFileState.prevSupportPoly_,
+						prevSupportFootInNewFrame);
+    // Check if the new support is right on the current one.
+    if ( (fabs(prevSupportFootInNewFrame.x_)>1e-06) ||
+	 (fabs(prevSupportFootInNewFrame.y_)>1e-06) ||
+	 (fabs(prevSupportFootInNewFrame.theta_)>1e-06))
+      {
+	ostringstream lstrm;
+	// If the foot is right after starting 
+	// this means that this is a shift of the ZMP
+	// and there was not foot before.
+	// So the function waits for the next one.
+	if (aDiffFileState.prevState_!=EGS_STARTING)
+	  {
+	    lstrm << -prevSupportFootInNewFrame.x_ ; lstrm << " ";
+	    lstrm << -prevSupportFootInNewFrame.y_; lstrm << " ";
+	    lstrm << (-prevSupportFootInNewFrame.theta_*180/M_PI); lstrm << " ";
+	    lstrm << aDiffFileState.prevTss_; lstrm << " ";
+	    lstrm << aDiffFileState.prevTds_;
+	    aof << "    seq" << nbSeq << " = \"";
+	    aof << -prevSupportFootInNewFrame.x_ ; aof << " ";
+	    aof << -prevSupportFootInNewFrame.y_; aof << " ";
+	    aof << (-prevSupportFootInNewFrame.theta_*180/M_PI); aof << " ";
+	    aof << aDiffFileState.prevTss_; aof << " ";
+	    aof << aDiffFileState.prevTds_;
+	    aof << " \"" <<endl;
+	    ostrm << lstrm.str();
+
+	
+	    double tabs =  aDiffFileState.time_;
+	    if (nbSeq==0) tabs=0;
+	    string footname = (newDatum.foot_==0)?"RF":"LF";
+	    double tup = tabs+aDiffFileState.tds_,
+	      tdown = tabs+aDiffFileState.tss_+aDiffFileState.tds_;
+	    
+	
+	    pyof << "attime(int(round(" <<tup<<"*T)),\t lambda:";
+	    pyof << "rmcontact(contact"<<footname<<",task"<<footname ;
+	    pyof <<"),'" << footname <<" take off " << nbSeq << " t="<<tup<<"')"<< std::endl;
+	    
+	    pyof << "attime(int(round(" << tdown <<"*T)),\t lambda:";
+	    pyof << "contact(contact"<<footname<<",task"<<footname ;
+	    pyof <<"),'" << footname <<" landing " << nbSeq << " t="<<tdown<<"')" << std::endl;
+	    
+	    nbSeq++;
+	  
+	    aDiffFileState.prevTss_ = aDiffFileState.tss_;
+	    aDiffFileState.prevTds_ = aDiffFileState.tds_;
+	  }
+	else 
+	  // But we have to update the time of the next support foot.
+	  {
+	    aDiffFileState.prevTss_ += aDiffFileState.tss_;
+	    aDiffFileState.prevTds_ += aDiffFileState.tds_;
+	  }
+      }
+    else 
+      {
+	aDiffFileState.prevTss_ += aDiffFileState.tss_;
+	aDiffFileState.prevTds_ += aDiffFileState.tds_;
+      }
   }
 
   void FillPGIWithDiff(PatternGeneratorInterface &aPGI)
@@ -358,74 +450,31 @@ protected:
     unsigned long int nbSeq=0;
     StateFromDiffFile aDiffFileState;
 
+    FootEvent prevCurrentFootEvent = FOOT_NOTHING;
+    FootEvent prevPrevCurrentFootEvent = FOOT_NOTHING;
+
     while(ReadDataFromDiffFile(aif,newDatum))
       {
-	DataFromDiffFile prevSupportFootInNewFrame;
+	FootEvent currentFootEvent = FilterEvent(aDiffFileState,
+						 newDatum,
+						 prevDatum);
 
-	FootEvent afe = FilterEvent(aDiffFileState,
-				    newDatum,
-				    prevDatum);
 
-	if (afe==FOOT_CREATION)
+	if (currentFootEvent==FOOT_SHIFT_ZMP)
 	  {
-	    DataFromDiffFile SupportFoot;
+	    CreatesNewFoot(newDatum, aDiffFileState,aof,pyof,nbSeq,ostrm);
+	    //aDiffFileState.updateFeetWhenNewContact(newDatum);
+	  }
 
-	    // Who is support foot the flying foot which
-	    // just landed.
-	    if (newDatum.foot_==0)
-	      SupportFoot=aDiffFileState.leftFoot_;
-	    else 
-	      SupportFoot=aDiffFileState.rightFoot_;
-		
-	    // Compute the coordinates of the previous support foot in the
-	    // coordinates of the new one.
-	    SupportFoot.ExpressADatumInLocalCoordinates(aDiffFileState.prevSupportPoly_,
-							prevSupportFootInNewFrame);
+	if (currentFootEvent==FOOT_CREATION)
+	  {
 
-	    // Check if the new support is right on the current one.
-	    if ( (fabs(prevSupportFootInNewFrame.x_)>1e-06) ||
-		 (fabs(prevSupportFootInNewFrame.y_)>1e-06) ||
-		 (fabs(prevSupportFootInNewFrame.theta_)>1e-06))
-	      {
-		ostringstream lstrm;
-		lstrm << -prevSupportFootInNewFrame.x_ ; lstrm << " ";
-		lstrm << -prevSupportFootInNewFrame.y_; lstrm << " ";
-		lstrm << (-prevSupportFootInNewFrame.theta_*180/M_PI); lstrm << " ";
-		lstrm << aDiffFileState.tss_; lstrm << " ";
-		lstrm << aDiffFileState.tds_;
-		
-		aof << "    seq" << nbSeq << " = \"";
-		aof << -prevSupportFootInNewFrame.x_ ; aof << " ";
-		aof << -prevSupportFootInNewFrame.y_; aof << " ";
-		aof << (-prevSupportFootInNewFrame.theta_*180/M_PI); aof << " ";
-		aof << aDiffFileState.tss_; aof << " ";
-		aof << aDiffFileState.tds_;
-		aof << " \"" <<endl;
-	    
-		double tabs =  aDiffFileState.time_;
-		if (nbSeq==0) tabs=0;
-		string footname = (newDatum.foot_==0)?"RF":"LF";
-		double tup = tabs+aDiffFileState.tds_,
-		  tdown = tabs+aDiffFileState.tss_+aDiffFileState.tds_;
-
-
-		pyof << "attime(int(round(" <<tup<<"*T)),\t lambda:";
-		pyof << "rmcontact(contact"<<footname<<",task"<<footname ;
-		pyof <<"),'" << footname <<" take off " << nbSeq << " t="<<tup<<"')"<< std::endl;
-
-		pyof << "attime(int(round(" << tdown <<"*T)),\t lambda:";
-		pyof << "contact(contact"<<footname<<",task"<<footname ;
-		pyof <<"),'" << footname <<" landing " << nbSeq << " t="<<tdown<<"')" << std::endl;
-
-		nbSeq++;
-		ostrm << lstrm.str();
-	      }
-
+	    CreatesNewFoot(newDatum, aDiffFileState,aof,pyof,nbSeq,ostrm);
 	    // Update State: TO BE DONE AFTER computing new support foot coordinates.
 	    aDiffFileState.updateFeetWhenNewContact(newDatum);
 	  }
 
-	if (afe==FOOT_STARTING)
+	if (currentFootEvent==FOOT_STARTING)
 	  {
 	    // Update State
 	    aDiffFileState.updateFeetWhenNewContact(newDatum);
@@ -437,6 +486,8 @@ protected:
 	  ostrm << " ";
 
 	prevDatum = newDatum;
+	prevPrevCurrentFootEvent = prevCurrentFootEvent;
+	prevCurrentFootEvent = currentFootEvent;
 	nbData++;
       }
     
