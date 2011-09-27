@@ -324,10 +324,11 @@ protected:
 	if (newDatum.event_==CE_UP)
 	  {
 	    aState.tds_ = newDatum.time_ - prevDatum.time_;
-	    if (aState.tds_<0.02)
+	    const double MIN_DS  = 0.1; // was 0.02
+	    if (aState.tds_< MIN_DS)
 	      {
-		aState.tds_ = 0.02;
-		aState.tss_ = -0.02;
+		aState.tds_ = MIN_DS;
+		aState.tss_ = -MIN_DS;
 	      } else 	aState.tss_ = 0.0;
 
 	  }
@@ -379,13 +380,13 @@ protected:
 	    lstrm << (-prevSupportFootInNewFrame.theta_*180/M_PI); lstrm << " ";
 	    lstrm << aDiffFileState.prevTss_; lstrm << " ";
 	    lstrm << aDiffFileState.prevTds_;
-	    aof << "    seq" << nbSeq << " = \"";
+	    aof << "stepSequence.append('";
 	    aof << -prevSupportFootInNewFrame.x_ ; aof << " ";
 	    aof << -prevSupportFootInNewFrame.y_; aof << " ";
 	    aof << (-prevSupportFootInNewFrame.theta_*180/M_PI); aof << " ";
 	    aof << aDiffFileState.prevTss_; aof << " ";
 	    aof << aDiffFileState.prevTds_;
-	    aof << " \"" <<endl;
+	    aof << " ')" <<endl;
 	    ostrm << lstrm.str();
 
 	
@@ -395,7 +396,7 @@ protected:
 	    double tup = tabs+aDiffFileState.tds_,
 	      tdown = tabs+aDiffFileState.tss_+aDiffFileState.tds_;
 	    
-	
+	    /**
 	    pyof << "attime(int(round(" <<tup<<"*T)),\t lambda:";
 	    pyof << "rmcontact(contact"<<footname<<",task"<<footname ;
 	    pyof <<"),'" << footname <<" take off " << nbSeq << " t="<<tup<<"')"<< std::endl;
@@ -403,7 +404,11 @@ protected:
 	    pyof << "attime(int(round(" << tdown <<"*T)),\t lambda:";
 	    pyof << "contact(contact"<<footname<<",task"<<footname ;
 	    pyof <<"),'" << footname <<" landing " << nbSeq << " t="<<tdown<<"')" << std::endl;
-	    
+	    */
+
+	    pyof << "contactTiming['up']['"<<footname<<"'].append("<<tup<<")" << std::endl;
+	    pyof << "contactTiming['down']['"<<footname<<"'].append("<<tdown<<")" << std::endl;
+
 	    nbSeq++;
 	  
 	    aDiffFileState.prevTss_ = aDiffFileState.tss_;
@@ -426,16 +431,24 @@ protected:
   void FillPGIWithDiff(PatternGeneratorInterface &aPGI)
   {
     
-    ofstream pyof("novela_contact.py"); pyof << "T = 1/dt" << std::endl;
+    ofstream pyof("novela_contact.py");
+    pyof << "contactTiming = { 'up': {'RF': [], 'LF': [] } , 'down': {'RF': [], 'LF': [] } }" <<std::endl;
+
     ofstream aof;
     aof.open("DebugNovelaSteps.py");
 
     InitializePG(aPGI);
 
-    aof << "@optionalparentheses" << endl;
+    /*    aof << "@optionalparentheses" << endl;
     aof << "def seqH():" << endl;
+    aof << "    pg.parseCmd(\":SetAlgoForZmpTrajectory Kajita\")" << endl; */
+
+    aof << "def addStepSequence(pg,step):" << endl;
     aof << "    pg.parseCmd(\":SetAlgoForZmpTrajectory Kajita\")" << endl;
-	
+    aof << "    pg.parseCmd(':walkmode 5') " << endl;
+    aof << "    pg.parseCmd(':stepseq '+reduce(lambda x,y:x+'     '+y,step)" << endl;
+    aof << "stepSequence = []" << endl;
+    	
     ifstream aif;
     aif.open(m_FileName.c_str(),ifstream::in);
     if (!aif.is_open())
@@ -491,12 +504,6 @@ protected:
 	nbData++;
       }
     
-    aof << "    seqall = ";
-    for(unsigned long int i=0;i<nbSeq-1;i++)
-      aof << "seq"<<i <<" + ";
-    aof << "seq"<<nbSeq-1 <<endl;
-    aof << "    pg.parseCmd(\":walkmode 5\")" << endl;
-    aof << "    pg.parseCmd(\":stepseq \" + seqall)" << endl;
     aof.close();
 
     cout << "ostrm gives:" << endl
