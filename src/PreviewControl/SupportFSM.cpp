@@ -42,7 +42,7 @@ SupportFSM::~SupportFSM()
 {
 }
 
-void SupportFSM::set_support_state(double Time, int Pi,
+void SupportFSM::set_support_state(double Time, unsigned int Pi,
 				 support_state_t & Support, const reference_t & Ref) const
 {
 
@@ -65,7 +65,6 @@ void SupportFSM::set_support_state(double Time, int Pi,
   //FSM
   if(Time+EPS+Pi*T_ >= Support.TimeLimit)
     {
-
       //SS->DS
       if(Support.Phase == SS  && !ReferenceGiven && Support.NbStepsLeft == 0)
 	{
