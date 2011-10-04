@@ -37,22 +37,22 @@ namespace PatternGeneratorJRL
 {
 
   /// \brief State of the center of mass
-  struct com_s
+  struct com_t
   {
     MAL_VECTOR(x,double);
     MAL_VECTOR(y,double);
     MAL_VECTOR(z,double);
 
-    struct com_s & operator=(const com_s &aCS);
+    struct com_t & operator=(const com_t &aCS);
 
     void reset();
 
-    com_s();
+    com_t();
   };
-  typedef struct com_s com_t;
+
 
   // Support state of the robot at a certain point in time
-  struct trunk_s
+  struct trunk_t
   {
     MAL_VECTOR(x,double);
     MAL_VECTOR(y,double);
@@ -62,27 +62,24 @@ namespace PatternGeneratorJRL
     MAL_VECTOR(pitch,double);
     MAL_VECTOR(roll,double);
 
-    struct trunk_s & operator=(const trunk_s &aTS);
+    struct trunk_t & operator=(const trunk_t &aTS);
 
     void reset();
 
-    trunk_s();
+    trunk_t();
   };
-  typedef struct trunk_s trunk_t;
 
   //State of the feet on the ground
-  struct supportfoot_s
+  struct supportfoot_t
   {
     double x,y,theta,StartTime;
     int SupportFoot;
   };
-  typedef struct supportfoot_s
-    supportfoot_t;
 
   /// Absolute reference.
-  struct reference_s
+  struct reference_t
   {
-    struct frame_s
+    struct frame_t
     {
       /// \brief Constant reference
       double x,y, yaw;
@@ -92,34 +89,30 @@ namespace PatternGeneratorJRL
       MAL_VECTOR(Y,double);
       MAL_VECTOR(YAW,double);
     };
-    typedef struct frame_s frame_t;
 
     frame_t Global, Local;
 
   };
-  typedef struct reference_s reference_t;
+
 
   /// \brief Linear inequality with free foot placement.
-  struct linear_inequality_ff_s
+  struct linear_inequality_ff_t
   {
     MAL_MATRIX(D,double);
     MAL_MATRIX(Dc,double);
     int StepNumber;
   };
-  typedef struct linear_inequality_ff_s
-    linear_inequality_ff_t;
 
   /// \brief Linear constraints
-  struct linear_constraint_s
+  struct linear_constraint_t
   {
     boost_ublas::compressed_vector<double> A;
     double b;
   };
-  typedef struct linear_constraint_s
-  linear_constraint_t;
+
 
   /// \brief Set of 2-dimensional points
-  struct convex_hull_s
+  struct convex_hull_t
   {
 
     boost_ublas::vector<double> X;
@@ -144,22 +137,21 @@ namespace PatternGeneratorJRL
     /// \brief Set all points to zero
     void reset();
 
-    convex_hull_s( int Size );
-    convex_hull_s();
+    convex_hull_t( int Size );
+    convex_hull_t();
 
   };
-  typedef struct convex_hull_s convex_hull_t;
 
 
   /// \brief Linear inequalities set
-  struct linear_inequality_s
+  struct linear_inequality_t
   {
-    struct coordinate_s
+    struct coordinate_t
     {
       boost_ublas::compressed_matrix<double, boost_ublas::row_major> x;
       boost_ublas::compressed_matrix<double, boost_ublas::row_major> y;
     };
-    struct coordinate_s D;
+    struct coordinate_t D;
 
     boost_ublas::vector<double> dc;
 
@@ -172,11 +164,9 @@ namespace PatternGeneratorJRL
     /// \brief Resize all elements
     void resize( int NbRows, int NbCols, bool Preserve );
   };
-  typedef struct linear_inequality_s
-    linear_inequality_t;
 
   /// \brief Solution
-  struct solution_s
+  struct solution_t
   {
 
     /// \brief Size of the solution array
@@ -220,7 +210,7 @@ namespace PatternGeneratorJRL
     void print( std::ostream & aos);
 
   };
-  typedef struct solution_s solution_t;
+
 
   enum FootType
   {
@@ -233,7 +223,7 @@ namespace PatternGeneratorJRL
   };
 
   /// \brief Support state of the robot at a certain point in time
-  struct support_state_s
+  struct support_state_t
   {
 
     /// \brief Support phase
@@ -258,13 +248,13 @@ namespace PatternGeneratorJRL
     /// \brief Number of samplings passed in this phase
     unsigned int NbInstants;
 
-    struct support_state_s & operator = (const support_state_s &aSS);
+    struct support_state_t & operator = (const support_state_t &aSS);
 
     void reset();
 
-    support_state_s();
+    support_state_t();
   };
-  typedef struct support_state_s support_state_t;
+
 
 }
 

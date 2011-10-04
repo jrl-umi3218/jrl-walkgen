@@ -30,7 +30,7 @@
 namespace PatternGeneratorJRL
 {
 
-  struct support_state_s & support_state_t::operator =(const support_state_s & aSS)
+  struct support_state_t & support_state_t::operator =(const support_state_t & aSS)
   {
 
     Phase  = aSS.Phase;
@@ -67,7 +67,7 @@ namespace PatternGeneratorJRL
   }
 
 
-  support_state_s::support_state_s()
+  support_state_t::support_state_t()
   {
 
     reset();
@@ -75,7 +75,7 @@ namespace PatternGeneratorJRL
   }
 
 
-  struct com_s & com_t::operator=(const com_s &aCS)
+  struct com_t & com_t::operator=(const com_t &aCS)
   {
 
     for(unsigned int i=0;i<3;i++)
@@ -102,7 +102,7 @@ namespace PatternGeneratorJRL
   }
 
 
-  com_s::com_s()
+  com_t::com_t()
   {
 
     reset();
@@ -110,7 +110,7 @@ namespace PatternGeneratorJRL
   }
 
 
-  struct trunk_s & trunk_t::operator=(const trunk_s &aTS)
+  struct trunk_t & trunk_t::operator=(const trunk_t &aTS)
   {
 
     for(unsigned int i=0;i<3;i++)
@@ -146,7 +146,7 @@ namespace PatternGeneratorJRL
 
   }
 
-  trunk_s::trunk_s()
+  trunk_t::trunk_t()
   {
 
     reset();
@@ -170,7 +170,7 @@ namespace PatternGeneratorJRL
   }
 
 
-  convex_hull_s::convex_hull_s( int Size )
+  convex_hull_t::convex_hull_t( int Size )
   {
 
     resize(Size);
@@ -179,7 +179,7 @@ namespace PatternGeneratorJRL
   }
 
 
-  convex_hull_s::convex_hull_s()
+  convex_hull_t::convex_hull_t()
   {
 
   }
