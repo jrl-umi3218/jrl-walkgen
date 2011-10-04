@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2011, 
  *
@@ -280,8 +281,9 @@ protected:
     else 
       adatum.event_ = CE_CONTACT;
 
-    adatum.x_ *= 0.7;
-    adatum.y_ *= 0.7;
+    double alpha = 0.7;
+    adatum.x_ *= alpha;
+    adatum.y_ *= alpha;
     return !afile.eof();
   }
   
@@ -347,55 +349,132 @@ protected:
 		      unsigned long int &nbSeq,
 		      ostringstream &ostrm)
   {
-    DataFromDiffFile SupportFoot;
+    // Information needed for normal step.
+    DataFromDiffFile SupportFoot,NonSupportFoot;
     DataFromDiffFile prevSupportFootInNewFrame;
+    ostringstream lstrm;
+    
+    // Information needed for additional step.
+    bool AdditionalStep = false;
+    ostringstream addstrm, addstrmforaof;
 
     // Who is support foot for the flying foot which
     // just landed.
     
     if (newDatum.foot_==0)
-      SupportFoot=aDiffFileState.leftFoot_;
+      {
+	SupportFoot    = aDiffFileState.leftFoot_;
+	NonSupportFoot = aDiffFileState.rightFoot_;
+      }
     else 
-      SupportFoot=aDiffFileState.rightFoot_;
-    
+      {
+	SupportFoot    = aDiffFileState.rightFoot_;
+	NonSupportFoot = aDiffFileState.leftFoot_;
+      }
+
     // Compute the coordinates of the previous support foot in the
     // coordinates of the new one.
     SupportFoot.ExpressADatumInLocalCoordinates(aDiffFileState.prevSupportPoly_,
 						prevSupportFootInNewFrame);
+
     // Check if the new support is right on the current one.
-    if ( (fabs(prevSupportFootInNewFrame.x_)>1e-06) ||
-	 (fabs(prevSupportFootInNewFrame.y_)>1e-06) ||
-	 (fabs(prevSupportFootInNewFrame.theta_)>1e-06))
+    // This may happen when the flying foot is the same 
+    // on two successive steps.
+    if ( (fabs(prevSupportFootInNewFrame.x_)<1e-06) &&
+	 (fabs(prevSupportFootInNewFrame.y_)<1e-06) &&
+	 (fabs(prevSupportFootInNewFrame.theta_)<1e-06))
       {
-	ostringstream lstrm;
+	std::cout << "prev to 0.0 0.0 0.0" << std::endl;
+	
+	AdditionalStep = true;
+	DataFromDiffFile IntSupportFootInNewFrame;
+	// Compute the coordinates of the previous support foot in the
+	// coordinates of the flying foot which just landed.
+	NonSupportFoot.ExpressADatumInLocalCoordinates(aDiffFileState.prevSupportPoly_,
+						       IntSupportFootInNewFrame);
+	
+	// Creates a new feet
+
+	// Building the sequence to send to PGI.
+	addstrm << -IntSupportFootInNewFrame.x_ << " "
+	      << -IntSupportFootInNewFrame.y_ << " "
+	      << (-IntSupportFootInNewFrame.theta_*180/M_PI) << " "
+	  // Here give a single support time of zero.
+	      << "0.0 0.01 " ;
+
+	addstrm << IntSupportFootInNewFrame.x_ << " "
+	      << IntSupportFootInNewFrame.y_ << " "
+	      << (IntSupportFootInNewFrame.theta_*180/M_PI) << " "
+	  // Here give a single support time of zero.
+	      << "0.0 0.01 " ;
+	
+	addstrmforaof << "    seqs.append(\"";
+	addstrmforaof << -IntSupportFootInNewFrame.x_; addstrmforaof << " ";
+	addstrmforaof << -IntSupportFootInNewFrame.y_; addstrmforaof << " ";
+	addstrmforaof << (-IntSupportFootInNewFrame.theta_*180/M_PI); addstrmforaof << " ";
+	// Here give a single support time of zero.
+	addstrmforaof << "0.0 0.01 \")" <<endl;
+
+	addstrmforaof << "    seqs.append(\"";
+	addstrmforaof << IntSupportFootInNewFrame.x_; addstrmforaof << " ";
+	addstrmforaof << IntSupportFootInNewFrame.y_; addstrmforaof << " ";
+	addstrmforaof << (IntSupportFootInNewFrame.theta_*180/M_PI); addstrmforaof << " ";
+	// Here give a single support time of zero.
+	addstrmforaof << "0.0 0.01 \")" <<endl;
+
+	
+	NonSupportFoot.ExpressADatumInLocalCoordinates(aDiffFileState.prevSupportPoly_,
+						       IntSupportFootInNewFrame);
+
+	aDiffFileState.prevTss_ -= 0.02;
+	aof << addstrmforaof.str();
+      }
+    else
+      {    
+    
 	// If the foot is right after starting 
 	// this means that this is a shift of the ZMP
 	// and there was not foot before.
 	// So the function waits for the next one.
 	if (aDiffFileState.prevState_!=EGS_STARTING)
 	  {
+	    // Building the sequence to send to PGI.
 	    lstrm << -prevSupportFootInNewFrame.x_ ; lstrm << " ";
 	    lstrm << -prevSupportFootInNewFrame.y_; lstrm << " ";
 	    lstrm << (-prevSupportFootInNewFrame.theta_*180/M_PI); lstrm << " ";
 	    lstrm << aDiffFileState.prevTss_; lstrm << " ";
 	    lstrm << aDiffFileState.prevTds_;
-	    aof << "    seq" << nbSeq << " = \"";
+	    std::cout << -prevSupportFootInNewFrame.x_ << " "
+		      << -prevSupportFootInNewFrame.y_ << " "
+		      << -prevSupportFootInNewFrame.theta_ 
+		      << std::endl;
+	    ostrm << lstrm.str();
+	    if (AdditionalStep)
+	      {
+		// ostrm << addstrm;
+	      }
+	    
+	    // Storing this sequence in a file
+	    aof << "    seqs.append(\"";
 	    aof << -prevSupportFootInNewFrame.x_ ; aof << " ";
 	    aof << -prevSupportFootInNewFrame.y_; aof << " ";
 	    aof << (-prevSupportFootInNewFrame.theta_*180/M_PI); aof << " ";
 	    aof << aDiffFileState.prevTss_; aof << " ";
 	    aof << aDiffFileState.prevTds_;
-	    aof << " \"" <<endl;
-	    ostrm << lstrm.str();
-
-	
+	    aof << " \")" <<endl;
+	    
+	    /* 
+	       if (AdditionalStep)
+	       aof << addstrmforaof.str();
+	    */
+	    // Contact information generation
 	    double tabs =  aDiffFileState.time_;
 	    if (nbSeq==0) tabs=0;
 	    string footname = (newDatum.foot_==0)?"RF":"LF";
 	    double tup = tabs+aDiffFileState.tds_,
 	      tdown = tabs+aDiffFileState.tss_+aDiffFileState.tds_;
-	    
 	
+	    
 	    pyof << "attime(int(round(" <<tup<<"*T)),\t lambda:";
 	    pyof << "rmcontact(contact"<<footname<<",task"<<footname ;
 	    pyof <<"),'" << footname <<" take off " << nbSeq << " t="<<tup<<"')"<< std::endl;
@@ -403,24 +482,14 @@ protected:
 	    pyof << "attime(int(round(" << tdown <<"*T)),\t lambda:";
 	    pyof << "contact(contact"<<footname<<",task"<<footname ;
 	    pyof <<"),'" << footname <<" landing " << nbSeq << " t="<<tdown<<"')" << std::endl;
+	  }
+	// Update intermediate information
+	nbSeq++;
 	    
-	    nbSeq++;
-	  
-	    aDiffFileState.prevTss_ = aDiffFileState.tss_;
-	    aDiffFileState.prevTds_ = aDiffFileState.tds_;
-	  }
-	else 
-	  // But we have to update the time of the next support foot.
-	  {
-	    aDiffFileState.prevTss_ += aDiffFileState.tss_;
-	    aDiffFileState.prevTds_ += aDiffFileState.tds_;
-	  }
+	aDiffFileState.prevTss_ = aDiffFileState.tss_;
+	aDiffFileState.prevTds_ = aDiffFileState.tds_;
       }
-    else 
-      {
-	aDiffFileState.prevTss_ += aDiffFileState.tss_;
-	aDiffFileState.prevTds_ += aDiffFileState.tds_;
-      }
+      
   }
 
   void FillPGIWithDiff(PatternGeneratorInterface &aPGI)
@@ -434,7 +503,8 @@ protected:
 
     aof << "@optionalparentheses" << endl;
     aof << "def seqH():" << endl;
-    aof << "    pg.parseCmd(\":SetAlgoForZmpTrajectory Kajita\")" << endl;
+    aof << "    pg.parseCmd(\":SetAlgoForZmpTrajectory KajitaOneState\")" << endl;
+    aof << "    seqs = []" <<endl;
 	
     ifstream aif;
     aif.open(m_FileName.c_str(),ifstream::in);
@@ -444,6 +514,13 @@ protected:
     ostringstream ostrm;
     DataFromDiffFile newDatum, prevDatum;
     
+    CommonInitialization(aPGI);
+    
+    {
+      istringstream strm2(":SetAlgoForZmpTrajectory KajitaOneStage");
+      aPGI.ParseCmd(strm2);
+    }
+
     ostrm << ":stepseq";
     ostrm << " ";
     unsigned long int nbData=0;
@@ -459,6 +536,8 @@ protected:
 						 newDatum,
 						 prevDatum);
 
+	std::cout << "newDatum: " << newDatum << " "
+		  << currentFootEvent << std::endl;
 
 	if (currentFootEvent==FOOT_SHIFT_ZMP)
 	  {
@@ -491,21 +570,36 @@ protected:
 	nbData++;
       }
     
-    aof << "    seqall = ";
-    for(unsigned long int i=0;i<nbSeq-1;i++)
-      aof << "seq"<<i <<" + ";
-    aof << "seq"<<nbSeq-1 <<endl;
+    aof << "    seqall = \"\"" << endl;
+    aof << "    for aseq in seqs:" << endl;
+    aof << "        seqall = seqall + aseq" << endl;
     aof << "    pg.parseCmd(\":walkmode 5\")" << endl;
     aof << "    pg.parseCmd(\":stepseq \" + seqall)" << endl;
     aof.close();
 
     cout << "ostrm gives:" << endl
 	 << ostrm.str() <<endl;
-    
+
+    if (0)
     {
       istringstream strm2(ostrm.str());
       aPGI.ParseCmd(strm2);
     }
+    {
+      istringstream strm2(":stepseq 0.0 0.095 0.0 0.78 0.02 \
+                     0.0 -0.19 -22.5 0.78 0.02  \
+                     0.0 0.19 0.0 0.78 0.02 \
+                     0.0 -0.19 -22.5 0.78 0.02  \
+                     0.0 0.19 0.0 0.78 0.02 \
+                     0.0 -0.19 -22.5 0.78 0.02  \
+                     0.0 0.19 0.0 0.78 0.02 \
+                     0.0 -0.19 -22.5 0.78 0.02  \
+                     0.0 0.19 0.0 0.78 0.02 \
+                     0.0 -0.19 -22.5 0.78 0.02  \
+                     0.0 0.19 0.0 0.78 0.02 ");
+      aPGI.ParseCmd(strm2);
+    }
+
 
   }
 
