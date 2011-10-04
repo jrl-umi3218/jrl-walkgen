@@ -81,6 +81,7 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,
   : ZMPRefTrajectoryGeneration(lSPM)
 {
 
+  m_WhoIsPreviousSupportFoot = 0; // Right is previous support by default.
   m_InitializationProfile = PREV_ZMP_INIT_PROFIL;
 
   m_HS = aHS;
@@ -365,20 +366,30 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 	  << CurrentLeftFootAbsPos.theta);
 
   // Initialize who is support foot.
-  if (RelativeFootPositions[0].sy < 0 )
+  // Handle numerical unstability
+  if ((fabs(RelativeFootPositions[0].sy) < 1e-6) && 
+      (fabs(RelativeFootPositions[0].sx) < 1e-6))
     {
-      m_vdiffsupppre(0,0) = CurrentRightFootAbsPos.x - CurrentLeftFootAbsPos.x;
-      m_vdiffsupppre(1,0) = CurrentRightFootAbsPos.y - CurrentLeftFootAbsPos.y;
-      m_AngleDiffToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentLeftFootAbsPos.theta;
-      m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentAbsZMPTheta;
+      m_vdiffsupppre(0,0) = 0.0; m_vdiffsupppre(1,0) = 0.0;
+      m_AngleDiffToSupportFootTheta = 
+	m_AngleDiffFromZMPThetaToSupportFootTheta = 0.0;
     }
-  else 
+  else
     {
-      m_vdiffsupppre(0,0) = -CurrentRightFootAbsPos.x + CurrentLeftFootAbsPos.x;
-      m_vdiffsupppre(1,0) = -CurrentRightFootAbsPos.y + CurrentLeftFootAbsPos.y;
-      m_AngleDiffToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
-      m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentAbsZMPTheta;
-      
+      if (RelativeFootPositions[0].sy < 0 )
+	{
+	  m_vdiffsupppre(0,0) = CurrentRightFootAbsPos.x - CurrentLeftFootAbsPos.x;
+	  m_vdiffsupppre(1,0) = CurrentRightFootAbsPos.y - CurrentLeftFootAbsPos.y;
+	  m_AngleDiffToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentLeftFootAbsPos.theta;
+	  m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentAbsZMPTheta;
+	}
+      else 
+	{
+	  m_vdiffsupppre(0,0) = -CurrentRightFootAbsPos.x + CurrentLeftFootAbsPos.x;
+	  m_vdiffsupppre(1,0) = -CurrentRightFootAbsPos.y + CurrentLeftFootAbsPos.y;
+	  m_AngleDiffToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
+	  m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentAbsZMPTheta;      
+	}
     }
 
 
@@ -621,21 +632,37 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   TimeFirstPhase = lTdble;
 
   // Initialize who is support foot.
-  if (m_RelativeFootPositions[0].sy < 0 )
+
+  ODEBUG("m_RelativeFootPositions:" 
+	 <<  m_RelativeFootPositions[0].sx 
+	 << " "<< m_RelativeFootPositions[0].sy);
+  // In case that the support did not move we keep
+  // the previous support foot.
+  if ((fabs(m_RelativeFootPositions[0].sy)<1e-6) &&
+      (fabs(m_RelativeFootPositions[0].sx)<1e-6))
     {
-      WhoIsSupportFoot = -1;//Right
-      m_vdiffsupppre(0,0) = CurrentRightFootAbsPos.x - CurrentLeftFootAbsPos.x;
-      m_vdiffsupppre(1,0) = CurrentRightFootAbsPos.y - CurrentLeftFootAbsPos.y;
-      m_AngleDiffToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentLeftFootAbsPos.theta;
-      m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentAbsZMPTheta;
+      WhoIsSupportFoot = m_WhoIsPreviousSupportFoot;
+      m_vdiffsupppre(0,0) = m_vdiffsupppre(1,0);
+      m_AngleDiffToSupportFootTheta = m_AngleDiffFromZMPThetaToSupportFootTheta = 0.0;
     }
-  else 
+  else
     {
-      WhoIsSupportFoot = 1;// Left
-      m_vdiffsupppre(0,0) = -CurrentRightFootAbsPos.x + CurrentLeftFootAbsPos.x;
-      m_vdiffsupppre(1,0) = -CurrentRightFootAbsPos.y + CurrentLeftFootAbsPos.y;
-      m_AngleDiffToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
-      m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentAbsZMPTheta;
+      if (m_RelativeFootPositions[0].sy < 0 )
+	{
+	  WhoIsSupportFoot = -1;//Right
+	  m_vdiffsupppre(0,0) = CurrentRightFootAbsPos.x - CurrentLeftFootAbsPos.x;
+	  m_vdiffsupppre(1,0) = CurrentRightFootAbsPos.y - CurrentLeftFootAbsPos.y;
+	  m_AngleDiffToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentLeftFootAbsPos.theta;
+	  m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentRightFootAbsPos.theta - CurrentAbsZMPTheta;
+	}
+      else 
+	{
+	  WhoIsSupportFoot = 1;// Left
+	  m_vdiffsupppre(0,0) = -CurrentRightFootAbsPos.x + CurrentLeftFootAbsPos.x;
+	  m_vdiffsupppre(1,0) = -CurrentRightFootAbsPos.y + CurrentLeftFootAbsPos.y;
+	  m_AngleDiffToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
+	  m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentAbsZMPTheta;
+	}
     }
   
   double TimeForThisFootPosition = TimeFirstPhase+ lTsingle;
@@ -699,9 +726,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
     {
       if (m_RelativeFootPositions[1].stepType == 3)
 	{
-	  //delta_x = (m_CurrentSupportFootPosition(0,2)+m_ZMPShift3Begin - px0)/SizeOf1stPhase;
 	  delta_x = (m_CurrentSupportFootPosition(0,2)+m_ZMPShift[0] - px0)/SizeOf1stPhase;
-	  //delta_y = (m_CurrentSupportFootPosition(1,2)+(WhoIsSupportFoot)*m_ZMPShift3BeginY - py0)/SizeOf1stPhase;
 	  delta_y = (m_CurrentSupportFootPosition(1,2) - py0)/SizeOf1stPhase;
 	  
 	}
@@ -709,8 +734,6 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 	{
 	  delta_x = (m_CurrentSupportFootPosition(0,2)+m_ZMPShift[2] - px0)/SizeOf1stPhase;
 	  delta_y = (m_CurrentSupportFootPosition(1,2)- py0)/SizeOf1stPhase;
-	  //delta_x = (CurrentSupportFootPosition(0,2)+m_ZMPShift4Begin - px0)/SizeOf1stPhase;
-	  //delta_y = (CurrentSupportFootPosition(1,2)+(WhoIsSupportFoot)*m_ZMPShift3BeginY - py0)/SizeOf1stPhase;
 	}
       
       if (m_RelativeFootPositions[1].stepType == 5)
@@ -718,10 +741,6 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 	  delta_x = (m_CurrentSupportFootPosition(0,2)-(m_ZMPShift[0] +m_ZMPShift[2]+
 							m_ZMPShift[1] +m_ZMPShift[3]) - px0)/SizeOf1stPhase;
 	  delta_y = (m_CurrentSupportFootPosition(1,2)- py0)/SizeOf1stPhase;
-	  //delta_x = (CurrentSupportFootPosition(0,2)-(m_ZMPShift3Begin + 
-	  // m_ZMPShift4Begin+m_ZMPShift3End + m_ZMPShift4End) - px0)/SizeOf1stPhase;
-	  //delta_y = (CurrentSupportFootPosition(1,2)-(WhoIsSupportFoot)*(m_ZMPShift3BeginY + 
-	  // m_ZMPShift4BeginY+m_ZMPShift3EndY + m_ZMPShift4EndY) - py0)/SizeOf1stPhase;
 	}
       
     }   	
@@ -908,19 +927,11 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 		{	
 		  delta_x = (m_CurrentSupportFootPosition(0,2)+m_ZMPShift[1] - px02)/SizeOfSndPhase;
 		  delta_y = (m_CurrentSupportFootPosition(1,2) - py02)/SizeOfSndPhase;
-		  //delta_x = (CurrentSupportFootPosition(0,2)+
-		  // m_ZMPShift3End - px02)/SizeOfSndPhase;
-		  //delta_y = (CurrentSupportFootPosition(1,2)+
-		  // (WhoIsSupportFoot)*m_ZMPShift3EndY - py02)/SizeOfSndPhase;
 		}
 	      else
 		{
 		  delta_x = (m_CurrentSupportFootPosition(0,2)+m_ZMPShift[3] - px02)/SizeOfSndPhase;
 		  delta_y = (m_CurrentSupportFootPosition(1,2)- py02)/SizeOfSndPhase;
-		  //delta_x = (CurrentSupportFootPosition(0,2)+
-		  // m_ZMPShift4End - px02)/SizeOfSndPhase;
-		  //delta_y = (CurrentSupportFootPosition(1,2)+
-		  // (WhoIsSupportFoot)*m_ZMPShift4EndY - py02)/SizeOfSndPhase;
 		}
 	
 	      ZMPPositions[CurrentZMPindex].px = ZMPPositions[CurrentZMPindex-1].px + delta_x;
@@ -967,11 +978,6 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       m_CurrentTime += m_SamplingPeriod;
       CurrentZMPindex++;
     }
-
-  if (WhoIsSupportFoot==1)
-    WhoIsSupportFoot = -1;//Right
-  else 
-    WhoIsSupportFoot = 1;// Left
 
   m_RelativeFootPositions.pop_front();
 
@@ -1035,6 +1041,9 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 			   FinalLeftFootAbsolutePositions,
 			   FinalRightFootAbsolutePositions);
     }
+
+  m_WhoIsPreviousSupportFoot = WhoIsSupportFoot;
+
   ODEBUG("After End Sequence: " << endl <<
 	  "ZMPPos : " <<FinalZMPPositions.size() << endl <<
 	  "LeftFootAbsolutePositions: " << FinalLeftFootAbsolutePositions.size() << endl << 
