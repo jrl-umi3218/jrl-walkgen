@@ -46,7 +46,9 @@ void SupportFSM::set_support_state(double Time, unsigned int Pi,
 				 support_state_t & Support, const reference_t & Ref) const
 {
 
-  const double EPS = 1e-6;
+
+
+	const double EPS = 1e-6;
 
   Support.StateChanged = false;
   Support.NbInstants++;
@@ -74,7 +76,7 @@ void SupportFSM::set_support_state(double Time, unsigned int Pi,
 	  Support.NbInstants = 0;
 	}
       //DS->SS
-      else if(Support.Phase == DS && ReferenceGiven || Support.Phase == DS && Support.NbStepsLeft > 0)
+      else if((Support.Phase == DS && ReferenceGiven) || (Support.Phase == DS && Support.NbStepsLeft) > 0)
 	{
 	  Support.Phase = SS;
 	  Support.TimeLimit = Time+Pi*T_+StepPeriod_-T_/10.0;
@@ -83,8 +85,8 @@ void SupportFSM::set_support_state(double Time, unsigned int Pi,
 	  Support.NbInstants = 0;
 	}
       //SS->SS
-      else if(Support.Phase == SS && Support.NbStepsLeft > 0 ||
-	      Support.NbStepsLeft == 0 && ReferenceGiven)
+      else if((Support.Phase == SS && Support.NbStepsLeft > 0) ||
+	      (Support.NbStepsLeft == 0 && ReferenceGiven))
 	{
           if(Support.Foot == LEFT)
             Support.Foot = RIGHT;
