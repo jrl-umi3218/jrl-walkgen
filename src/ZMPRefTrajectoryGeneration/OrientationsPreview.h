@@ -146,6 +146,7 @@ namespace PatternGeneratorJRL
         double CurrentRightFootVelocity);
 
     /// \brief Verify angle of hip joint
+    /// Reduce final velocity of the trunk if necessary
     ///
     /// \param[in] CurrentSupport
     /// \param[in] PreviewedTrunkAngleEnd
