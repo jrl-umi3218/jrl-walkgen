@@ -198,20 +198,20 @@ namespace PatternGeneratorJRL
     void initialize_matrices( linear_inequality_t & Inequalities);
 
     /// \brief Scaled product\f$ weight*M*M \f$
-    void compute_term(MAL_MATRIX (&weightMM, double),
+    void multiply_terms(MAL_MATRIX (&weightMM, double),
         double weight, const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
 
     /// \brief Scaled product \f$ weight*M*V \f$
-    void compute_term(MAL_VECTOR (&weightMV, double),
+    void multiply_terms(MAL_VECTOR (&weightMV, double),
         double weight, const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double));
 
     /// \brief Scaled product \f$ weight*M*V*scalar \f$
-    void compute_term(MAL_VECTOR (&weightMV, double),
+    void multiply_terms(MAL_VECTOR (&weightMV, double),
         double weight, const MAL_MATRIX (&M, double),
         const MAL_VECTOR (&V, double), const double scalar);
 
     /// \brief Scaled product \f$ weight*M*M*V \f$
-    void compute_term(MAL_VECTOR (&weightMV, double),
+    void multiply_terms(MAL_VECTOR (&weightMV, double),
         double weight, const MAL_MATRIX (&M1, double),
         const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
 
