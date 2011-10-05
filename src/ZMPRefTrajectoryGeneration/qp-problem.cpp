@@ -276,7 +276,7 @@ break;
 
 
 void
-QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), QPElement Type,
+QPProblem_s::add_term_to( QPElement Type, const MAL_MATRIX (&Mat, double),
     unsigned int Row,  unsigned int Col )
 {
 
@@ -350,7 +350,7 @@ QPProblem_s::add_term( const MAL_MATRIX (&Mat, double), QPElement Type,
 
 
 void
-QPProblem_s::add_term( const MAL_VECTOR (&Vec, double), QPElement Type,
+QPProblem_s::add_term_to( QPElement Type, const MAL_VECTOR (&Vec, double),
     unsigned int Row )
 {
 

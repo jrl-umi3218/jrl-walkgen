@@ -201,10 +201,6 @@ namespace PatternGeneratorJRL
     void compute_term(MAL_MATRIX (&weightMM, double),
         double weight, const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
 
-    /// \brief Scaled product\f$ M*M \f$
-    void compute_term(MAL_MATRIX (&MM, double),
-        const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
-
     /// \brief Scaled product \f$ weight*M*V \f$
     void compute_term(MAL_VECTOR (&weightMV, double),
         double weight, const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double));
@@ -216,7 +212,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Scaled product \f$ weight*M*M*V \f$
     void compute_term(MAL_VECTOR (&weightMV, double),
-        double weight, const MAL_MATRIX (&M1, double), MAL_VECTOR (&V1, double),
+        double weight, const MAL_MATRIX (&M1, double),
         const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
 
 
@@ -228,6 +224,12 @@ namespace PatternGeneratorJRL
     IntermedQPMat * IntermedData_;
     RigidBodySystem * Robot_;
 
+
+  private:
+    //Temporary vectors
+    boost_ublas::matrix<double> MM_;
+    boost_ublas::vector<double> MV_;
+    boost_ublas::vector<double> MV2_;
 
   };
 }

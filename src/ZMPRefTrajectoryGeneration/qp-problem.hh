@@ -92,7 +92,7 @@ namespace PatternGeneratorJRL
     /// \param[in] Type Target matrix type
     /// \param[in] Row First row inside the target
     /// \param[in] Col First column inside the target
-    void add_term( const boost_ublas::matrix<double> & Mat, QPElement Type,
+    void add_term_to( QPElement Type, const boost_ublas::matrix<double> & Mat,
         unsigned int Row, unsigned int Col );
 
     /// \brief Add a vector to the final optimization problem in array form
@@ -100,7 +100,7 @@ namespace PatternGeneratorJRL
     /// \param Mat Added vector
     /// \param ype Target vector type
     /// \param row First row inside the target
-    void add_term( const boost_ublas::vector<double> & Vec, QPElement Type,
+    void add_term_to( QPElement Type, const boost_ublas::vector<double> & Vec,
         unsigned int Row );
 
     /// \brief Dump current problem on disk.
