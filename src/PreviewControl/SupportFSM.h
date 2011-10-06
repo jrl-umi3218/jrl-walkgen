@@ -30,6 +30,7 @@
 #include <jrl/walkgen/pgtypes.hh>
 #include <privatepgtypes.h>
 
+
 namespace PatternGeneratorJRL
 {
 
@@ -46,6 +47,9 @@ namespace PatternGeneratorJRL
 
     /// \brief Destructor
     ~SupportFSM();
+
+
+    void update_vel_reference(reference_t & Ref, const support_state_t & CurrentSupport);
 
     /// \brief Initialize the previewed state
     ///
@@ -105,6 +109,26 @@ namespace PatternGeneratorJRL
 
     /// \Brief Sampling period
     double T_;
+
+
+    const double EPS_;
+
+    /// \brief True if the robot is in translation
+    bool in_translation_;
+
+    /// \brief True if the robot is in rotation
+    bool in_rotation_;
+
+    /// \brief Number of stabilize steps after the end of a rotation
+    int nb_steps_after_end_of_rotation_;
+
+    /// \brief Current support foot type (SS, DS)
+    FootType Current_support_foot_;
+
+    /// \brief True if the end phase of the rotation is begun
+    bool start_of_end_rotation_phase_;
+
+
 
   };
 }

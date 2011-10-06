@@ -349,7 +349,10 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // UPDATE INTERNAL DATA:
       // ---------------------
       VRQPGenerator_->CurrentTime( Time );
+
+      SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
       IntermedData_->Reference( VelRef_ );
+
       IntermedData_->CoM( CoM_() );// TODO: still necessary?
 
 
