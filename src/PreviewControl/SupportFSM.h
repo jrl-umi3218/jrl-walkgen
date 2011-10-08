@@ -49,6 +49,10 @@ namespace PatternGeneratorJRL
     ~SupportFSM();
 
 
+    /// \brief Update the velocity reference after a pure rotation
+    ///
+    /// \param[in] Ref
+    /// \param[in] CurrentSupport
     void update_vel_reference(reference_t & Ref, const support_state_t & CurrentSupport);
 
     /// \brief Initialize the previewed state
@@ -110,24 +114,26 @@ namespace PatternGeneratorJRL
     /// \Brief Sampling period
     double T_;
 
-
+    /// \brief Precision constant
     const double EPS_;
 
+    /// \name Rotation phase
+    /// \{
     /// \brief True if the robot is in translation
-    bool in_translation_;
+    bool InTranslation_;
 
     /// \brief True if the robot is in rotation
-    bool in_rotation_;
+    bool InRotation_;
 
     /// \brief Number of stabilize steps after the end of a rotation
-    int nb_steps_after_end_of_rotation_;
+    int NbStepsAfterRotation_;
 
     /// \brief Current support foot type (SS, DS)
-    FootType Current_support_foot_;
+    FootType CurrentSupportFoot_;
 
-    /// \brief True if the end phase of the rotation is begun
-    bool start_of_end_rotation_phase_;
-
+    /// \brief True if the end phase of the rotation has begun
+    bool PostRotationPhase_;
+    /// \}
 
 
   };

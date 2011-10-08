@@ -331,58 +331,45 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
     unsigned int NbStepsPreviewed, QPProblem & Pb)
 {
 
-
-
   unsigned int NbConstraints = Pb.NbConstraints();
 
   // -D*U
-  multiply_terms( MM_, -1.0, IneqCoP.D.x    ,    Robot_->DynamicsCoPJerk().U               );
-  Pb.add_term_to(  QPProblem::MATRIX_DU, MM_, NbConstraints, 0                      );
-
-  multiply_terms( MM_, -1.0, IneqCoP.D.y    ,    Robot_->DynamicsCoPJerk().U               );
-  Pb.add_term_to(  QPProblem::MATRIX_DU, MM_, NbConstraints, N_                     );
+  compute_term  ( MM_, -1.0, IneqCoP.D.x, Robot_->DynamicsCoPJerk().U   );
+  Pb.add_term_to( QPProblem::MATRIX_DU, MM_, NbConstraints, 0           );
+  compute_term  ( MM_, -1.0, IneqCoP.D.y, Robot_->DynamicsCoPJerk().U   );
+  Pb.add_term_to( QPProblem::MATRIX_DU, MM_, NbConstraints, N_          );
 
   // +D*V
-  multiply_terms( MM_, 1.0, IneqCoP.D.x    ,    IntermedData_->State().V   +
-      Robot_->LeftFoot().Dynamics(COP).U    +    Robot_->RightFoot().Dynamics(COP).U    );
-  Pb.add_term_to(  QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_                   );
-
-  multiply_terms( MM_, 1.0, IneqCoP.D.y    ,     IntermedData_->State().V   +
-      Robot_->LeftFoot().Dynamics(COP).U   +   Robot_->RightFoot().Dynamics(COP).U    );
-  Pb.add_term_to(  QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed  );
+  compute_term  ( MM_, 1.0, IneqCoP.D.x, IntermedData_->State().V +
+      Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U          );
+  Pb.add_term_to( QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_                        );
+  compute_term  ( MM_, 1.0, IneqCoP.D.y, IntermedData_->State().V   +
+      Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U          );
+  Pb.add_term_to( QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed       );
 
   //constant part
   // +dc
   Pb.add_term_to( QPProblem::VECTOR_DS,IneqCoP.dc, NbConstraints );
 
-
-
   // -D*S_z*x
-  multiply_terms( MV_  , -1.0,  IneqCoP.D.x   ,  Robot_->DynamicsCoPJerk().S   ,  IntermedData_->State().CoM.x   );
-  Pb.add_term_to(  QPProblem::VECTOR_DS, MV_,  NbConstraints                        );
-
-  multiply_terms( MV_, -1.0,  IneqCoP.D.x   ,   Robot_->LeftFoot().Dynamics(COP).S   ,  Robot_->LeftFoot().State().X      );
-  Pb.add_term_to(  QPProblem::VECTOR_DS, MV_,  NbConstraints                        );
-
-  multiply_terms( MV_, -1.0,  IneqCoP.D.x  ,    Robot_->RightFoot().Dynamics(COP).S   ,   Robot_->RightFoot().State().X      );
-  Pb.add_term_to(  QPProblem::VECTOR_DS, MV_,  NbConstraints                        );
-
-
-  multiply_terms( MV_, -1.0,  IneqCoP.D.y,     Robot_->DynamicsCoPJerk().S   , IntermedData_->State().CoM.y          );
-  Pb.add_term_to(  QPProblem::VECTOR_DS, MV_,  NbConstraints                        );
-
-  multiply_terms( MV_, -1.0,  IneqCoP.D.y,   Robot_->LeftFoot().Dynamics(COP).S   ,   Robot_->LeftFoot().State().Y      );
-  Pb.add_term_to(  QPProblem::VECTOR_DS, MV_,  NbConstraints                        );
-
-  multiply_terms( MV_, -1.0,  IneqCoP.D.y,    Robot_->RightFoot().Dynamics(COP).S  ,  Robot_->RightFoot().State().Y   );
-  Pb.add_term_to(  QPProblem::VECTOR_DS, MV_,  NbConstraints                        );
+  compute_term  ( MV_, -1.0, IneqCoP.D.x, Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.x          );
+  Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
+  compute_term  ( MV_, -1.0, IneqCoP.D.x, Robot_->LeftFoot().Dynamics(COP).S, Robot_->LeftFoot().State().X   );
+  Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
+  compute_term  ( MV_, -1.0, IneqCoP.D.x, Robot_->RightFoot().Dynamics(COP).S, Robot_->RightFoot().State().X );
+  Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
+  compute_term  ( MV_, -1.0, IneqCoP.D.y,  Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.y         );
+  Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
+  compute_term  ( MV_, -1.0, IneqCoP.D.y, Robot_->LeftFoot().Dynamics(COP).S, Robot_->LeftFoot().State().Y   );
+  Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
+  compute_term  ( MV_, -1.0, IneqCoP.D.y, Robot_->RightFoot().Dynamics(COP).S, Robot_->RightFoot().State().Y );
+  Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
 
   // +D*Vc*FP
-  multiply_terms( MV_, IntermedData_->State().SupportState.X    ,   IneqCoP.D.x    ,   IntermedData_->State().Vc);
-  Pb.add_term_to(  QPProblem::VECTOR_DS, MV_, NbConstraints);
-
-  multiply_terms( MV_, IntermedData_->State().SupportState.Y    ,  IneqCoP.D.y    ,   IntermedData_->State().Vc);
-  Pb.add_term_to(  QPProblem::VECTOR_DS, MV_, NbConstraints);
+  compute_term  ( MV_, IntermedData_->State().SupportState.X, IneqCoP.D.x, IntermedData_->State().Vc    );
+  Pb.add_term_to( QPProblem::VECTOR_DS, MV_, NbConstraints                                              );
+  compute_term  ( MV_, IntermedData_->State().SupportState.Y, IneqCoP.D.y, IntermedData_->State().Vc    );
+  Pb.add_term_to( QPProblem::VECTOR_DS, MV_, NbConstraints                                              );
 
 }
 
@@ -396,22 +383,19 @@ GeneratorVelRef::build_constraints_feet(const linear_inequality_t & IneqFeet,
   unsigned int NbConstraints = Pb.NbConstraints();
 
   // -D*V_f
-  multiply_terms( MM_, -1.0,   IneqFeet.D.x    ,   State.V_f                             );
-  Pb.add_term_to(  QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_                   );
-
-  multiply_terms( MM_, -1.0,   IneqFeet.D.y    ,   State.V_f                             );
-  Pb.add_term_to(  QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed  );
+  compute_term  ( MM_, -1.0, IneqFeet.D.x, State.V_f                              );
+  Pb.add_term_to( QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_                  );
+  compute_term  ( MM_, -1.0, IneqFeet.D.y, State.V_f                              );
+  Pb.add_term_to( QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed );
 
   // +dc
   Pb.add_term_to(  QPProblem::VECTOR_DS, IneqFeet.dc, NbConstraints );
 
   // D*Vc_f*FPc
-
-  multiply_terms( MV_, State.SupportState.X    ,   IneqFeet.D.x    ,   State.Vc_f              );
-  Pb.add_term_to(  QPProblem::VECTOR_DS, MV_, NbConstraints                         );
-
-  multiply_terms( MV_, State.SupportState.Y    ,   IneqFeet.D.y    ,   State.Vc_f              );
-  Pb.add_term_to(  QPProblem::VECTOR_DS, MV_, NbConstraints                         );
+  compute_term  ( MV_, State.SupportState.X, IneqFeet.D.x, State.Vc_f );
+  Pb.add_term_to( QPProblem::VECTOR_DS, MV_, NbConstraints            );
+  compute_term  ( MV_, State.SupportState.Y, IneqFeet.D.y, State.Vc_f );
+  Pb.add_term_to( QPProblem::VECTOR_DS, MV_, NbConstraints            );
 
 }
 
@@ -481,27 +465,26 @@ GeneratorVelRef::build_invariant_part( QPProblem & Pb )
 
   const RigidBody & CoM = Robot_->CoM();
 
-
   //Constant terms in the Hessian
   // +a*U'*U
   const IntermedQPMat::objective_variant_t & Jerk = IntermedData_->Objective(IntermedQPMat::JERK_MIN);
   const linear_dynamics_t & JerkDynamics = CoM.Dynamics( JERK );
-  multiply_terms( MM_, Jerk.weight    ,   JerkDynamics.UT    ,   JerkDynamics.U );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, 0, 0                    );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, N_, N_                  );
+  compute_term( MM_, Jerk.weight, JerkDynamics.UT, JerkDynamics.U );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, 0, 0              );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, N_, N_            );
 
   // +a*U'*U
   const IntermedQPMat::objective_variant_t & InstVel = IntermedData_->Objective(IntermedQPMat::INSTANT_VELOCITY);
   const linear_dynamics_t & VelDynamics = CoM.Dynamics( VELOCITY );
-  multiply_terms( MM_    ,   InstVel.weight    ,   VelDynamics.UT    ,   VelDynamics.U        );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, 0, 0                            );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, N_, N_                          );
+  compute_term  ( MM_, InstVel.weight, VelDynamics.UT, VelDynamics.U    );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, 0, 0                        );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, N_, N_                      );
 
   // +a*U'*U
   const IntermedQPMat::objective_variant_t & COPCent = IntermedData_->Objective(IntermedQPMat::COP_CENTERING);
-  multiply_terms( MM_    ,   COPCent.weight    ,   Robot_->DynamicsCoPJerk().UT    ,   Robot_->DynamicsCoPJerk().U    );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, 0, 0                                                    );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, N_, N_                                                  );
+  compute_term  ( MM_, COPCent.weight, Robot_->DynamicsCoPJerk().UT, Robot_->DynamicsCoPJerk().U   );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, 0, 0                                                   );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, N_, N_                                                 );
 
 }
 
@@ -510,12 +493,9 @@ void
 GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq )
 {
 
-
   Pb.clear(QPProblem::VECTOR_D);
 
-
   const int NbStepsPreviewed = SupportStates_deq[N_].StepNumber;
-
   const IntermedQPMat::state_variant_t & State = IntermedData_->State();
   const RigidBody & CoM = Robot_->CoM();
 
@@ -524,15 +504,15 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
   const linear_dynamics_t & VelDynamics = CoM.Dynamics( VELOCITY );
   // Linear part
   // +a*U'*S*x
-  multiply_terms( MV_    ,   InstVel.weight    ,   VelDynamics.UT     ,   VelDynamics.S    ,   State.CoM.x       );
-  Pb.add_term_to(  QPProblem::VECTOR_D, MV_, 0                                               );
-  multiply_terms( MV_    ,   InstVel.weight    ,   VelDynamics.UT      ,   VelDynamics.S    ,   State.CoM.y       );
-  Pb.add_term_to(  QPProblem::VECTOR_D, MV_, N_                                              );
+  compute_term  ( MV_, InstVel.weight , VelDynamics.UT, VelDynamics.S, State.CoM.x      );
+  Pb.add_term_to( QPProblem::VECTOR_D, MV_, 0                                           );
+  compute_term  ( MV_ , InstVel.weight, VelDynamics.UT, VelDynamics.S, State.CoM.y      );
+  Pb.add_term_to( QPProblem::VECTOR_D, MV_, N_                                          );
   // +a*U'*ref
-  multiply_terms( MV_    ,   -InstVel.weight    ,   VelDynamics.UT    ,   State.Ref.Global.X                  );
-  Pb.add_term_to(  QPProblem::VECTOR_D, MV_, 0                                               );
-  multiply_terms( MV_    ,   -InstVel.weight    ,   VelDynamics.UT    , State.Ref.Global.Y                  );
-  Pb.add_term_to(  QPProblem::VECTOR_D, MV_, N_                                              );
+  compute_term  ( MV_, -InstVel.weight, VelDynamics.UT, State.Ref.Global.X      );
+  Pb.add_term_to( QPProblem::VECTOR_D, MV_, 0                                   );
+  compute_term  ( MV_, -InstVel.weight, VelDynamics.UT, State.Ref.Global.Y      );
+  Pb.add_term_to( QPProblem::VECTOR_D, MV_, N_                                  );
 
   // COP - centering terms
   const IntermedQPMat::objective_variant_t & COPCent = IntermedData_->Objective(IntermedQPMat::COP_CENTERING);
@@ -541,35 +521,35 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
   //  const linear_dynamics_t & RFCoP = Robot_->RightFoot().Dynamics(COP);
   // Hessian
   // -a*U'*V
-  multiply_terms( MM_    ,   -COPCent.weight    ,   CoPDynamics.UT    ,   State.V                             );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, 0, 2*N_                                         );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, N_, 2*N_+NbStepsPreviewed                       );
+  compute_term  ( MM_, -COPCent.weight, CoPDynamics.UT, State.V                            );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, 0, 2*N_                                        );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, N_, 2*N_+NbStepsPreviewed                      );
   // -a*V*U
-  multiply_terms( MM_    ,   -COPCent.weight    ,   State.VT    ,   CoPDynamics.U                             );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, 2*N_, 0                                         );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, 2*N_+NbStepsPreviewed, N_                       );
+  compute_term  ( MM_, -COPCent.weight, State.VT, CoPDynamics.U                           );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, 2*N_, 0                                       );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, 2*N_+NbStepsPreviewed, N_                     );
   //+a*V'*V
-  multiply_terms( MM_    ,   COPCent.weight    ,   State.VT    ,   State.V                                    );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, 2*N_, 2*N_                                      );
-  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, 2*N_+NbStepsPreviewed, 2*N_+NbStepsPreviewed    );
+  compute_term  ( MM_, COPCent.weight, State.VT, State.V                                  );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, 2*N_, 2*N_                                    );
+  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, 2*N_+NbStepsPreviewed, 2*N_+NbStepsPreviewed  );
 
   //Linear part
   // -a*V'*S*x
-  multiply_terms( MV_    ,   -COPCent.weight    ,   State.VT    ,   CoPDynamics.S    ,   State.CoM.x    );
-  Pb.add_term_to(  QPProblem::VECTOR_D, MV_, 2*N_                                    );
-  multiply_terms( MV_    ,   -COPCent.weight    ,   State.VT    ,   CoPDynamics.S    ,  State.CoM.y    );
-  Pb.add_term_to(  QPProblem::VECTOR_D, MV_, 2*N_+NbStepsPreviewed                   );
+  compute_term  ( MV_, -COPCent.weight, State.VT, CoPDynamics.S, State.CoM.x    );
+  Pb.add_term_to( QPProblem::VECTOR_D, MV_, 2*N_                                );
+  compute_term  ( MV_, -COPCent.weight, State.VT, CoPDynamics.S, State.CoM.y    );
+  Pb.add_term_to( QPProblem::VECTOR_D, MV_, 2*N_+NbStepsPreviewed               );
   // +a*V'*Vc*x
-  multiply_terms( MV_    ,   COPCent.weight    ,   State.VT    ,   State.Vc    ,   State.SupportState.X     );
-  Pb.add_term_to(  QPProblem::VECTOR_D, MV_, 2*N_                                    );
-  multiply_terms( MV_    ,   COPCent.weight    ,   State.VT    ,   State.Vc    ,   State.SupportState.Y     );
-  Pb.add_term_to(  QPProblem::VECTOR_D, MV_, 2*N_+NbStepsPreviewed                   );
+  compute_term  ( MV_, COPCent.weight, State.VT, State.Vc, State.SupportState.X  );
+  Pb.add_term_to( QPProblem::VECTOR_D, MV_, 2*N_                                 );
+  compute_term  ( MV_, COPCent.weight, State.VT, State.Vc, State.SupportState.Y  );
+  Pb.add_term_to( QPProblem::VECTOR_D, MV_, 2*N_+NbStepsPreviewed                );
 
 }
 
 
 void
-GeneratorVelRef::multiply_terms(MAL_MATRIX (&weightMM, double), double weight,
+GeneratorVelRef::compute_term(MAL_MATRIX (&weightMM, double), double weight,
     const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double))
 {
   weightMM = MAL_RET_A_by_B(M1,M2);
@@ -579,7 +559,7 @@ GeneratorVelRef::multiply_terms(MAL_MATRIX (&weightMM, double), double weight,
 
 
 void
-GeneratorVelRef::multiply_terms(MAL_VECTOR (&weightMV, double), double weight,
+GeneratorVelRef::compute_term(MAL_VECTOR (&weightMV, double), double weight,
     const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double))
 {
   weightMV = MAL_RET_A_by_B(M,V);
@@ -588,7 +568,7 @@ GeneratorVelRef::multiply_terms(MAL_VECTOR (&weightMV, double), double weight,
 
 
 void
-GeneratorVelRef::multiply_terms(MAL_VECTOR (&weightMV, double),
+GeneratorVelRef::compute_term(MAL_VECTOR (&weightMV, double),
     double weight, const MAL_MATRIX (&M, double),
     const MAL_VECTOR (&V, double), double scalar)
 {
@@ -598,7 +578,7 @@ GeneratorVelRef::multiply_terms(MAL_VECTOR (&weightMV, double),
 
 
 void
-GeneratorVelRef::multiply_terms(MAL_VECTOR (&weightMV, double),
+GeneratorVelRef::compute_term(MAL_VECTOR (&weightMV, double),
     double weight, const MAL_MATRIX (&M1, double),
     const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double))
 {

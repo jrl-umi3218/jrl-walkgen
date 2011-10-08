@@ -27,18 +27,17 @@
 #include <fstream>
 
 #include <PreviewControl/SupportFSM.h>
-#include <Debug.h>
 
 using namespace PatternGeneratorJRL;
 using namespace std;
 
 SupportFSM::SupportFSM()
 :EPS_(1e-6)
-,in_translation_(false)
-,in_rotation_(false)
-,Current_support_foot_(LEFT)
-,nb_steps_after_end_of_rotation_(0)
-,start_of_end_rotation_phase_(false)
+,InTranslation_(false)
+,InRotation_(false)
+,CurrentSupportFoot_(LEFT)
+,NbStepsAfterRotation_(0)
+,PostRotationPhase_(false)
 {
 
 }
@@ -48,47 +47,47 @@ SupportFSM::~SupportFSM()
 {
 }
 
-void SupportFSM::update_vel_reference(reference_t & Ref, const support_state_t & CurrentSupport){
-	// Check the reference type of the robot (rotation, translation)
-	if(fabs(Ref.Local.x)>2*EPS_||fabs(Ref.Local.y)>2*EPS_){
-	    in_translation_ = true;
-	}else{
-		in_translation_ = false;
-	}
-	if(fabs(Ref.Local.yaw)>EPS_){
-	    in_rotation_ = true;
-	}else{
-		// make two step to avoid the robot's fall
-		if (in_rotation_ && !in_translation_){
-			Ref.Local.x=2*EPS_;
-			Ref.Local.y=2*EPS_;
-			if (!start_of_end_rotation_phase_){
-				Current_support_foot_=CurrentSupport.Foot;
-				nb_steps_after_end_of_rotation_=0;
-				start_of_end_rotation_phase_=true;
-			}else{
-				if (Current_support_foot_!=CurrentSupport.Foot){
-					Current_support_foot_=CurrentSupport.Foot;
-					++nb_steps_after_end_of_rotation_;
-				}
-				if (nb_steps_after_end_of_rotation_>2){
-					in_rotation_=false;
-					start_of_end_rotation_phase_=false;
-				}
-			}
-		}else{
-			in_rotation_=false;
-		}
-	}
+
+void
+SupportFSM::update_vel_reference(reference_t & Ref, const support_state_t & CurrentSupport){
+  // Check the reference type of the robot (rotation, translation)
+  if(fabs(Ref.Local.x)>2*EPS_||fabs(Ref.Local.y)>2*EPS_){
+      InTranslation_ = true;
+  }else{
+      InTranslation_ = false;
+  }
+  if(fabs(Ref.Local.yaw)>EPS_){
+      InRotation_ = true;
+  }else{
+      // make two step to avoid the robot's fall
+      if (InRotation_ && !InTranslation_){
+          Ref.Local.x=2*EPS_;
+          Ref.Local.y=2*EPS_;
+          if (!PostRotationPhase_){
+              CurrentSupportFoot_ = CurrentSupport.Foot;
+              NbStepsAfterRotation_ = 0;
+              PostRotationPhase_ = true;
+          }else{
+              if (CurrentSupportFoot_ != CurrentSupport.Foot){
+                  CurrentSupportFoot_ = CurrentSupport.Foot;
+                  ++NbStepsAfterRotation_;
+              }
+              if (NbStepsAfterRotation_>2){
+                  InRotation_ = false;
+                  PostRotationPhase_ = false;
+              }
+          }
+      }else{
+          InRotation_ = false;
+      }
+  }
 }
 
-void SupportFSM::set_support_state(double Time, unsigned int Pi,
-				 support_state_t & Support, const reference_t & Ref) const
+
+void
+SupportFSM::set_support_state(double Time, unsigned int Pi,
+    support_state_t & Support, const reference_t & Ref) const
 {
-
-
-
-
 
   Support.StateChanged = false;
   Support.NbInstants++;
