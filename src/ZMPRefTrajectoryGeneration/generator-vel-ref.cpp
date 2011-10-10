@@ -531,7 +531,6 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
   // Hessian
   // -a*U'*V
   compute_term  ( MM_    ,   -COPCent.weight    ,   CoPDynamics.UT    ,   State.V            );
-
   Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, 0, 2*N_                                         );
   Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, N_, 2*N_+NbStepsPreviewed                       );
 
