@@ -348,6 +348,8 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // UPDATE INTERNAL DATA:
       // ---------------------
+      Problem_.reset();
+      Solution_.reset();
       VRQPGenerator_->CurrentTime( Time );
       SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
       IntermedData_->Reference( VelRef_ );
@@ -424,12 +426,6 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       Robot_->generate_trajectories( Time, Solution_,
           Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
-
-
-      // RESET:
-      // ------
-      Problem_.reset();
-      Solution_.reset();
 
 
       // Specify that we are in the ending phase.
