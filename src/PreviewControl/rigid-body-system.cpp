@@ -151,7 +151,7 @@ RigidBodySystem::initialize_trajectories()
   ST_it->X = 0.257792; ST_it->Y = -0.105; ST_it++;
   ST_it->X = 0.412312; ST_it->Y = 0.095; ST_it++;
   double PositionX = 0.412312;
-  for(ST_it = ST_it; ST_it < SupportTrajectory_deq_.end(); ST_it++)
+  for(; ST_it < (--SupportTrajectory_deq_.end()); ST_it++)
     {
       PositionX += 0.16;
       ST_it->X = PositionX; ST_it->Y = -0.105; ST_it++;

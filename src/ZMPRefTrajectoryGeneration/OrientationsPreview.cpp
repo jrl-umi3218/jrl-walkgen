@@ -325,7 +325,7 @@ OrientationsPreview::verify_velocity_hip_joint(double Time,
 
 
 void
-OrientationsPreview::interpolate_trunk_orientation(double time, int CurrentIndex,
+OrientationsPreview::interpolate_trunk_orientation(double Time, int CurrentIndex,
                                                    double NewSamplingPeriod,
                                                     const deque<support_state_t> & PrwSupportStates_deq,
                                                     deque<COMState> & FinalCOMTraj_deq)
@@ -333,7 +333,7 @@ OrientationsPreview::interpolate_trunk_orientation(double time, int CurrentIndex
 
   support_state_t CurrentSupport = PrwSupportStates_deq.front();
 
-  if(CurrentSupport.Phase == SS && time+3.0/2.0*T_ < CurrentSupport.TimeLimit)
+  if(CurrentSupport.Phase == SS && Time+3.0/2.0*T_ < CurrentSupport.TimeLimit)
     {
       //Fourth order polynomial parameters
       double a =  TrunkState_.yaw[1];
@@ -346,9 +346,9 @@ OrientationsPreview::interpolate_trunk_orientation(double time, int CurrentIndex
       FinalCOMTraj_deq[CurrentIndex].yaw[0] = TrunkState_.yaw[0];
       FinalCOMTraj_deq[CurrentIndex].yaw[1] = TrunkState_.yaw[1];
       //Interpolate the
-      for(int k = 1; k<=(int)(T_/NewSamplingPeriod);k++)
+      for(int k = 0; k<(int)(T_/NewSamplingPeriod);k++)
         {
-          tT = (double)k*NewSamplingPeriod;
+          tT = (double)(k+1)*NewSamplingPeriod;
           //interpolate the orientation of the trunk
           if(fabs(TrunkStateT_.yaw[1]-TrunkState_.yaw[1])-0.000001 > 0)
             {
@@ -365,9 +365,9 @@ OrientationsPreview::interpolate_trunk_orientation(double time, int CurrentIndex
 	  FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkState_.yaw[1];
         }
     }
-  else if (CurrentSupport.Phase == DS || time+3.0/2.0*T_ > CurrentSupport.TimeLimit)
+  else if (CurrentSupport.Phase == DS || Time+3.0/2.0*T_ > CurrentSupport.TimeLimit)
     {
-      for(int k = 0; k<=(int)(T_/NewSamplingPeriod);k++)
+      for(int k = 0; k<(int)(T_/NewSamplingPeriod);k++)
         {
           FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = TrunkState_.yaw[0];
 	  FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkState_.yaw[1];
