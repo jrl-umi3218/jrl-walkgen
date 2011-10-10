@@ -336,8 +336,9 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
 
           RightFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_ );
           LeftFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_ );
+          init_convex_hulls();
           cout << "Security margin On X: " << SecurityMarginX_
-               << " Security margin On Y: " << SecurityMarginX_ << endl;
+               << " Security margin On Y: " << SecurityMarginY_ << endl;
         }
     }
 
