@@ -33,6 +33,8 @@
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 
+#include <deque>
+
 namespace PatternGeneratorJRL
 {
 
@@ -165,53 +167,6 @@ namespace PatternGeneratorJRL
     void resize( int NbRows, int NbCols, bool Preserve );
   };
 
-  /// \brief Solution
-  struct solution_t
-  {
-
-    /// \brief Size of the solution array
-    unsigned int NbVariables;
-
-    /// \brief Number of constraints (lagrange multipliers)
-    unsigned int NbConstraints;
-
-    /// \brief SHOWS THE TERMINATION REASON.
-    ///   IFAIL = 0 :   SUCCESSFUL RETURN.
-    ///   IFAIL = 1 :   TOO MANY ITERATIONS (MORE THAN 40*(N+M)).
-    ///   IFAIL = 2 :   ACCURACY INSUFFICIENT TO SATISFY CONVERGENCE
-    ///                 CRITERION.
-    ///   IFAIL = 5 :   LENGTH OF A WORKING ARRAY IS TOO SHORT.
-    ///   IFAIL > 10 :  THE CONSTRAINTS ARE INCONSISTENT.
-    int Fail;
-
-    /// \brief OUTPUT CONTROL.
-    ///   IPRINT = 0 :  NO OUTPUT OF QL0001.
-    ///   IPRINT > 0 :  BRIEF OUTPUT IN ERROR CASES.
-    int Print;
-
-    /// \brief Solution vector
-    boost_ublas::vector<double> Solution_vec;
-
-    /// \brief Lagrange multipliers of the constraints
-    boost_ublas::vector<double> ConstrLagr_vec;
-    /// \brief Lagrange multipliers of the lower bounds
-    boost_ublas::vector<double> LBoundsLagr_vec;
-    /// \brief Lagrange multipliers of the upper bounds
-    boost_ublas::vector<double> UBoundsLagr_vec;
-
-    /// \brief Resize solution containers
-    void resize( unsigned int NbVariables, unsigned int NbConstraints );
-
-    /// \brief Dump solution
-    /// \param Filename
-    void dump( const char * Filename );
-    /// \brief Print_ solution
-    /// \param aos
-    void print( std::ostream & aos);
-
-  };
-
-
   enum FootType
   {
     LEFT, RIGHT
@@ -255,6 +210,66 @@ namespace PatternGeneratorJRL
     support_state_t();
   };
 
+  /// \brief Solution
+  struct solution_t
+  {
+
+    /// \brief Size of the solution array
+    unsigned int NbVariables;
+
+    /// \brief Number of constraints (lagrange multipliers)
+    unsigned int NbConstraints;
+
+    /// \brief SHOWS THE TERMINATION REASON. (QLD)
+    ///   IFAIL = 0 :   SUCCESSFUL RETURN.
+    ///   IFAIL = 1 :   TOO MANY ITERATIONS (MORE THAN 40*(N+M)).
+    ///   IFAIL = 2 :   ACCURACY INSUFFICIENT TO SATISFY CONVERGENCE
+    ///                 CRITERION.
+    ///   IFAIL = 5 :   LENGTH OF A WORKING ARRAY IS TOO SHORT.
+    ///   IFAIL > 10 :  THE CONSTRAINTS ARE INCONSISTENT.
+    int Fail;
+
+    /// \brief OUTPUT CONTROL.
+    ///   IPRINT = 0 :  NO OUTPUT OF QL0001.
+    ///   IPRINT > 0 :  BRIEF OUTPUT IN ERROR CASES.
+    int Print;
+
+    /// \name Solution vectors
+    /// \{
+    /// \brief QP solution vector
+    boost_ublas::vector<double> Solution_vec;
+    /// \brief Previewed support orientations
+    std::deque<double> SupportOrientations_deq;
+    /// \brief Previewed support states
+    std::deque<support_state_t> SupportStates_deq;
+    /// \}
+
+    /// \name{
+    /// \{
+    /// \brief Lagrange multipliers of the constraints
+    boost_ublas::vector<double> ConstrLagr_vec;
+    /// \brief Lagrange multipliers of the lower bounds
+    boost_ublas::vector<double> LBoundsLagr_vec;
+    /// \brief Lagrange multipliers of the upper bounds
+    boost_ublas::vector<double> UBoundsLagr_vec;
+    /// \}
+
+    /// \brief Reset
+    void reset();
+
+    /// \brief Resize solution containers
+    void resize( unsigned int NbVariables, unsigned int NbConstraints );
+
+    /// \brief Dump solution
+    /// \param Filename
+    void dump( const char * Filename );
+    /// \brief Print_ solution
+    /// \param aos
+    void print( std::ostream & aos);
+
+    solution_t();
+
+  };
 
 }
 

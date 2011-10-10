@@ -106,7 +106,6 @@ namespace PatternGeneratorJRL
       strm >> VelRef_.Local.y;
       strm >> VelRef_.Local.yaw;
     }
-    /// \brief Set the reference (Velocity only as for now)
     inline void Reference(double dx, double dy, double dyaw)
     {
       VelRef_.Local.x = dx;
@@ -118,15 +117,20 @@ namespace PatternGeneratorJRL
     inline void EndingPhase(bool EndingPhase)
     { EndingPhase_ = EndingPhase;}
 
-    /// \brief Set CoM perturbation force
     void setCoMPerturbationForce(double x,double y);
-    /// \brief Set CoM perturbation force
     void setCoMPerturbationForce(istringstream &strm);
+
+    solution_t & Solution()
+    { return Solution_; }
+
     /// \}
 
     /// \brief Reference
-    reference_t VelRef_;
+    reference_t VelRef_;// TODO: Why public?
 
+    //
+    // Private members:
+    //
   private:
 
     /// \brief Total mass of the robot
@@ -170,6 +174,9 @@ namespace PatternGeneratorJRL
 
     /// \brief Final optimization problem
     QPProblem Problem_;
+
+    /// \brief Previewed Solution
+    solution_t Solution_;
 
     /// \brief Additional term on the acceleration of the CoM
     MAL_VECTOR(PerturbationAcceleration_,double);

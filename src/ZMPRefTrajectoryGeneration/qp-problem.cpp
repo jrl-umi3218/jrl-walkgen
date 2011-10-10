@@ -180,59 +180,61 @@ void
 QPProblem_s::solve( Solver Solver, solution_t & Result, Tests Tests )
 {
 
-	 m_ = NbConstraints_+1;
-      me_ = NbEqConstraints_;
-      mmax_ = m_+1;
-      n_ = NbVariables_;
-      nmax_ = n_;
-      mnn_ = m_+2*n_;
+  m_ = NbConstraints_+1;
+  me_ = NbEqConstraints_;
+  mmax_ = m_+1;
+  n_ = NbVariables_;
+  nmax_ = n_;
+  mnn_ = m_+2*n_;
 
-      iout_ = 0;
-      iprint_ = 1;
-      lwar_ = 3*nmax_*nmax_/2+ 10*nmax_  + 2*mmax_ + 20000;
-      liwar_ = n_;
-      eps_ = 1e-8;
+  iout_ = 0;
+  iprint_ = 1;
+  lwar_ = 3*nmax_*nmax_/2+ 10*nmax_  + 2*mmax_ + 20000;
+  liwar_ = n_;
+  eps_ = 1e-8;
 
 
-	iwar_.Array_[0]=1;
+  iwar_.Array_[0]=1;
 
-      Q_.stick_together(Q_dense_,n_,n_);
-      DU_.stick_together(DU_dense_,mmax_,n_);
-	
-	
-Result.resize(n_,m_); 
-	
+  Q_.stick_together(Q_dense_,n_,n_);
+  DU_.stick_together(DU_dense_,mmax_,n_);
+
+
+  Result.resize(n_,m_);
+
   switch(Solver)
-    {
-    case QLD:
+  {
+  case QLD:
 
-     
-
-	ql0001_(&m_, &me_, &mmax_, &n_, &nmax_, &mnn_,
-              Q_dense_.Array_, D_.Array_, DU_dense_.Array_, DS_.Array_, XL_.Array_, XU_.Array_,
-              X_.Array_, U_.Array_, &iout_, &ifail_, &iprint_,
-              war_.Array_, &lwar_, iwar_.Array_, &liwar_, &eps_);
+    ql0001_(&m_, &me_, &mmax_, &n_, &nmax_, &mnn_,
+        Q_dense_.Array_, D_.Array_, DU_dense_.Array_, DS_.Array_, XL_.Array_, XU_.Array_,
+        X_.Array_, U_.Array_, &iout_, &ifail_, &iprint_,
+        war_.Array_, &lwar_, iwar_.Array_, &liwar_, &eps_);
 
 
-	for(int i = 0; i < n_; i++)
-        {
-          Result.Solution_vec(i) = X_.Array_[i];
-         Result.LBoundsLagr_vec(i) = U_.Array_[m_+i];
-         Result.UBoundsLagr_vec(i) = U_.Array_[m_+n_+i];
-        }
-      for(int i = 0; i < m_; i++)
-        {
-          Result.ConstrLagr_vec(i) = U_.Array_[i];
-        }
+    for(int i = 0; i < n_; i++)
+      {
+        Result.Solution_vec(i) = X_.Array_[i];
+        Result.LBoundsLagr_vec(i) = U_.Array_[m_+i];
+        Result.UBoundsLagr_vec(i) = U_.Array_[m_+n_+i];
+      }
+    for(int i = 0; i < m_; i++)
+      {
+        Result.ConstrLagr_vec(i) = U_.Array_[i];
+      }
 
-break;
+    Result.Fail = ifail_;
+    Result.Print = iprint_;
+
+
+    break;
     case LSSOL:
 #ifdef LSSOL_FOUND
-	    	sendOption("Print Level = 0"); 
+	    	sendOption("Print Level = 0");
 		sendOption("Problem Type = QP2");
 
 		double *bl=new double[n_+m_];
-		double *bu=new double[n_+m_];	
+		double *bu=new double[n_+m_];
 		int size1=n_;
 		for(int i=0;i<size1;++i){
 			bl[i]=XL_.Array_[i];
@@ -241,20 +243,20 @@ break;
 		int size2=size1+me_;
 		for(int i=size1;i<size2;++i){
 			bl[i]=-DS_.Array_[i-size1];
-			bu[i]=bl[i];	
+			bu[i]=bl[i];
 		}
 		int size3=size1+m_;
 		for(int i=size2;i<size3;++i){
-			bl[i]=-DS_.Array_[i-size1];		
+			bl[i]=-DS_.Array_[i-size1];
 			bu[i]=10e10;
-		}	
+		}
 
 
-		lssol_(&n_, &n_, 
-		&m_, &mmax_, &n_, 
-		DU_dense_.Array_, bl, bu, D_.Array_, 
-		istate_, kx_, X_.Array_, Q_dense_.Array_, b_, 
-		&inform_, &iter_, &obj_, clamda_, 
+		lssol_(&n_, &n_,
+		&m_, &mmax_, &n_,
+		DU_dense_.Array_, bl, bu, D_.Array_,
+		istate_, kx_, X_.Array_, Q_dense_.Array_, b_,
+		&inform_, &iter_, &obj_, clamda_,
 		iwar_.Array_, &liwar_, war_.Array_, &lwar_);
 
 		for(int i = 0; i < n_; i++)
@@ -507,7 +509,7 @@ QPProblem_s::dump_problem( std::ostream &aos )
 
 
 void
-QPProblem_s::dump_problem( const char * FileName )
+QPProblem_s::dump( const char * FileName )
 {
   std::ofstream aof;
   aof.open(FileName,std::ofstream::out);
@@ -517,10 +519,10 @@ QPProblem_s::dump_problem( const char * FileName )
 
 
 void
-QPProblem_s::dump_problem( double Time )
+QPProblem_s::dump( double Time )
 {
   char Buffer[1024];
-  sprintf(Buffer, "Problem_%f.dat", Time);
+  sprintf(Buffer, "/tmp/Problem_%f.dat", Time);
   std::ofstream aof;
   aof.open(Buffer, std::ofstream::out);
   dump_problem(aof);
