@@ -91,7 +91,7 @@ namespace PatternGeneratorJRL
     double m_ComHeight;
 
     /*! \brief Interval for interpolation */
-    double m_InterpolationInterval;
+    int m_InterpolationInterval;
       
     /*! \brief Interval for robot control */
     double m_SamplingPeriod;
