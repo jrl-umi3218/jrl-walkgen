@@ -173,7 +173,7 @@ GeneratorVelRef::compute_global_reference( const deque<COMState> & TrunkStates_d
   double YawTrunk;
   for( unsigned int i=0;i<N_;i++ )
     {
-      YawTrunk = TrunkStates_deq[(i+1)*(int)(T_Prw_/T_Ctr_)].yaw[0];
+      YawTrunk = TrunkStates_deq[(int)((i+1)*(T_Prw_/T_Ctr_))].yaw[0];
       Ref.Global.X(i) = Ref.Local.x*cos(YawTrunk)-Ref.Local.y*sin(YawTrunk);
       Ref.Global.Y(i) = Ref.Local.y*cos(YawTrunk)+Ref.Local.x*sin(YawTrunk);
     }
