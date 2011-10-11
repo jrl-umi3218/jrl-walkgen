@@ -183,7 +183,13 @@ RigidBodySystem::precompute_trajectories( const deque<support_state_t> & Support
   for(unsigned int i=0;i<N_;i++)
     {
       FFTraj_it = FlyingFootTrajectory_deq_.begin();
-      for(unsigned int j = 0; j < SS_it->NbInstants; j++)
+	  //Patch :  It happens that  SS_it->NbInstants >  FlyingFootTrajectory_deq_.size()
+	  // which cause a wrong memory access during "FFTraj_it++;" (size of the deque exceedded). 
+	  // Typically, I witnessed during TestHerdt2010
+	  // a case where SS_it->NbInstants = 9  while FlyingFootTrajectory_deq_.size()=8
+	  //TODO: enhance this correction (find its origin).
+	  int endLoop = std::min<unsigned>(SS_it->NbInstants, FlyingFootTrajectory_deq_.size());
+      for(unsigned int j = 0; j < endLoop; j++)
         FFTraj_it++;
       if(SS_it->StateChanged)
         {
