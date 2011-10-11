@@ -103,6 +103,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_ = new GeneratorVelRef( SPM, IntermedData_, Robot_ );
   VRQPGenerator_->NbPrwSamplings( QP_N_ );
   VRQPGenerator_->SamplingPeriodPreview( QP_T_ );
+  VRQPGenerator_->SamplingPeriodControl( m_SamplingPeriod );
   VRQPGenerator_->ComHeight( 0.814 );
   VRQPGenerator_->initialize_matrices();
   VRQPGenerator_->Ponderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
@@ -346,6 +347,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       struct timeval start,end;
       gettimeofday(&start,0);
 
+
       // UPDATE INTERNAL DATA:
       // ---------------------
       Problem_.reset();
@@ -365,9 +367,9 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // ------------------------------------------------------
       OrientPrw_->preview_orientations( Time, VelRef_,
-          SupportFSM_->StepPeriod(), Solution_.SupportStates_deq,
+          SupportFSM_->StepPeriod(),
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
-          Solution_.SupportOrientations_deq );
+          Solution_ );
 
 
       // UPDATE THE DYNAMICS:
@@ -378,7 +380,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:
       // --------------------------------------
-      VRQPGenerator_->compute_global_reference( FinalCOMTraj_deq );
+      VRQPGenerator_->compute_global_reference( Solution_ );
 
 
       // BUILD CONSTANT PART OF THE OBJECTIVE:
@@ -404,6 +406,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       if(Solution_.Fail>0)
         Problem_.dump( Time );
 
+
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
       unsigned int CurrentIndex = FinalCOMTraj_deq.size();
@@ -414,14 +417,14 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
 
 
-      // COMPUTE ORIENTATION OF TRUNK:
-      // -----------------------------
+      // INTERPOLATE TRUNK ORIENTATION:
+      // ------------------------------
       OrientPrw_->interpolate_trunk_orientation( Time, CurrentIndex,
           m_SamplingPeriod, Solution_.SupportStates_deq,
           FinalCOMTraj_deq );
 
 
-      // INTERPOLATE THE COMPUTED FEET POSITIONS:
+      // INTERPOLATE THE COMPUTED FOOT POSITIONS:
       // ----------------------------------------
       Robot_->generate_trajectories( Time, Solution_,
           Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,

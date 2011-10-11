@@ -258,6 +258,7 @@ namespace PatternGeneratorJRL
 
     Solution_vec.resize                 (0,false);
     SupportOrientations_deq.resize      (0);
+    TrunkOrientations_deq.resize        (0);
     SupportStates_deq.resize            (0);
     ConstrLagr_vec.resize               (0,false);
     LBoundsLagr_vec.resize              (0,false);

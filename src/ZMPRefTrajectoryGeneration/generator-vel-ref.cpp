@@ -161,7 +161,7 @@ GeneratorVelRef::generate_selection_matrices( const std::deque<support_state_t> 
 
 
 void 
-GeneratorVelRef::compute_global_reference( const deque<COMState> & TrunkStates_deq )
+GeneratorVelRef::compute_global_reference( const solution_t & Solution )
 {
 
   reference_t & Ref = IntermedData_->Reference();
@@ -173,7 +173,7 @@ GeneratorVelRef::compute_global_reference( const deque<COMState> & TrunkStates_d
   double YawTrunk;
   for( unsigned int i=0;i<N_;i++ )
     {
-      YawTrunk = TrunkStates_deq[(int)((i+1)*(T_Prw_/T_Ctr_))].yaw[0];
+      YawTrunk = Solution.TrunkOrientations_deq[i];
       Ref.Global.X(i) = Ref.Local.x*cos(YawTrunk)-Ref.Local.y*sin(YawTrunk);
       Ref.Global.Y(i) = Ref.Local.y*cos(YawTrunk)+Ref.Local.x*sin(YawTrunk);
     }

@@ -76,8 +76,8 @@ namespace PatternGeneratorJRL
     /// \brief Set the global reference from the local one and the orientation of the trunk frame
     /// for the whole preview window
     ///
-    /// \param[in] TrunkStateT_deq Trunk states
-    void compute_global_reference( const std::deque<COMState> & TrunkStates_deq );
+    /// \param[in] Solution
+    void compute_global_reference( const solution_t & Solution );
 
     /// \brief Initialize intermediate matrices
     ///

@@ -96,7 +96,6 @@ namespace PatternGeneratorJRL
 
   };
 
-
   /// \brief Linear inequality with free foot placement.
   struct linear_inequality_ff_t
   {
@@ -111,7 +110,6 @@ namespace PatternGeneratorJRL
     boost_ublas::compressed_vector<double> A;
     double b;
   };
-
 
   /// \brief Set of 2-dimensional points
   struct convex_hull_t
@@ -240,6 +238,8 @@ namespace PatternGeneratorJRL
     boost_ublas::vector<double> Solution_vec;
     /// \brief Previewed support orientations
     std::deque<double> SupportOrientations_deq;
+    /// \brief Previewed trunk orientations (only yaw as for now)
+    std::deque<double> TrunkOrientations_deq;
     /// \brief Previewed support states
     std::deque<support_state_t> SupportStates_deq;
     /// \}

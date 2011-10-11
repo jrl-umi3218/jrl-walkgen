@@ -55,25 +55,25 @@ namespace PatternGeneratorJRL
     ~OrientationsPreview();
     /// \}
 
-    /// \brief Preview feet orientations inside the preview window
+    /// \brief Preview feet and trunk orientations inside the preview window
     /// The orientations of the feet are adapted to the previewed orientation of the hip.
     /// The resulting velocities accelerations and orientations are verified against the limits.
-    /// If the constraints can not be satisfied the rotational velocity of the trunk is reduced
+    /// If the constraints can not be satisfied the rotational velocity of the trunk is reduced.
+    /// The trunk is rotating with a constant speed after a constant acceleration phase of T_ length.
+    /// During the initial double support phase the trunk is not rotating contrary to the following.
     ///
     /// \param[in] Time
     /// \param[in] Ref
     /// \param[in] StepDuration
-    /// \param[in] PrwSupportStates_deq
     /// \param[in] LeftFootPositions_deq
     /// \param[in] RightFootPositions_deq
-    /// \param[out] PreviewedSupportAngles_deq
+    /// \param[out] Solution Trunk and Foot orientations
     void preview_orientations(double Time,
         const reference_t & Ref,
         double StepDuration,
-        const std::deque<support_state_t> & PrwSupportStates_deq,
         const std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
         const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
-        std::deque<double> & PreviewedSupportAngles_deq);
+        solution_t & Solution);
 
     /// \brief Interpolate previewed orientation of the trunk
     ///
