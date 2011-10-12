@@ -354,22 +354,31 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   // -D*S_z*x
   compute_term  ( MV_, -1.0, IneqCoP.D.x, Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.x          );
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
+  /*
+   * Usefull for multibody dynamics
+   *
   compute_term  ( MV_, -1.0, IneqCoP.D.x, Robot_->LeftFoot().Dynamics(COP).S, Robot_->LeftFoot().State().X   );
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
   compute_term  ( MV_, -1.0, IneqCoP.D.x, Robot_->RightFoot().Dynamics(COP).S, Robot_->RightFoot().State().X );
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
+  */
   compute_term  ( MV_, -1.0, IneqCoP.D.y,  Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.y         );
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
+  /*
+   * Usefull for multibody dynamics
+   *
   compute_term  ( MV_, -1.0, IneqCoP.D.y, Robot_->LeftFoot().Dynamics(COP).S, Robot_->LeftFoot().State().Y   );
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
   compute_term  ( MV_, -1.0, IneqCoP.D.y, Robot_->RightFoot().Dynamics(COP).S, Robot_->RightFoot().State().Y );
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
+  */
 
   // +D*Vc*FP
   compute_term  ( MV_, IntermedData_->State().SupportState.X, IneqCoP.D.x, IntermedData_->State().Vc    );
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_, NbConstraints                                              );
   compute_term  ( MV_, IntermedData_->State().SupportState.Y, IneqCoP.D.y, IntermedData_->State().Vc    );
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_, NbConstraints                                              );
+
 
 }
 
@@ -521,9 +530,10 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
   //  const linear_dynamics_t & RFCoP = Robot_->RightFoot().Dynamics(COP);
   // Hessian
   // -a*U'*V
-  compute_term  ( MM_, -COPCent.weight, CoPDynamics.UT, State.V                            );
-  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, 0, 2*N_                                        );
-  Pb.add_term_to( QPProblem::MATRIX_Q, MM_, N_, 2*N_+NbStepsPreviewed                      );
+  compute_term  ( MM_    ,   -COPCent.weight    ,   CoPDynamics.UT    ,   State.V            );
+  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, 0, 2*N_                                         );
+  Pb.add_term_to(  QPProblem::MATRIX_Q, MM_, N_, 2*N_+NbStepsPreviewed                       );
+
   // -a*V*U
   compute_term  ( MM_, -COPCent.weight, State.VT, CoPDynamics.U                           );
   Pb.add_term_to( QPProblem::MATRIX_Q, MM_, 2*N_, 0                                       );

@@ -27,9 +27,14 @@
 #ifndef _QP_PROBLEM_H_
 #define _QP_PROBLEM_H_
 
+
+
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <Mathematics/qld.h>
 #include <privatepgtypes.h>
+#include <PreviewControl/rigid-body-system.hh>
+#include <PreviewControl/rigid-body.hh>
+#include <Mathematics/intermediate-qp-matrices.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -126,7 +131,9 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Solver
     /// \param[out] Result
-    void solve( Solver Solver, solution_t & Result,Tests Tests=NONE );
+    void solve( Solver Solver, solution_t & Result, const std::deque<support_state_t> & PrwSupportStates_deq,
+    	    const std::deque<double> & PrwSupportAngles_deq, const RigidBodySystem * Robot,
+    	    const IntermedQPMat * IntermedData, const Tests & tests=NONE );
 
     /// \name Accessors and mutators
     /// \{
@@ -305,6 +312,11 @@ namespace PatternGeneratorJRL
     array_s<int> iwar_;
     int iout_, ifail_, iprint_, lwar_, liwar_;
     double eps_;
+
+    RigidBodySystem * Robot_;
+
+    boost_ublas::vector<double> last_solution_;
+
     /// \}
 
     /// \brief Number of optimization parameters

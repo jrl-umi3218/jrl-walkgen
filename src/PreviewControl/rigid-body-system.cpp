@@ -230,14 +230,14 @@ RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
     const std::deque<FootAbsolutePosition> & RightFootTraj_deq )
 {
 
-
+/*
   compute_foot_pol_dynamics( SupportStates_deq, LeftFoot_.Dynamics(POSITION), RightFoot_.Dynamics(POSITION) );
   compute_foot_pol_dynamics( SupportStates_deq, LeftFoot_.Dynamics(ACCELERATION), RightFoot_.Dynamics(ACCELERATION) );
 
   precompute_trajectories( SupportStates_deq );
-
+*/
   compute_dyn_cop( SupportStates_deq );
-
+/*
   LeftFoot_.State().X[0] = LeftFootTraj_deq.front().x;
   LeftFoot_.State().X[1] = LeftFootTraj_deq.front().dx;
   LeftFoot_.State().X[2] = LeftFootTraj_deq.front().ddx;
@@ -250,7 +250,7 @@ RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
   RightFoot_.State().Y[0] = RightFootTraj_deq.front().y;
   RightFoot_.State().Y[1] = RightFootTraj_deq.front().dy;
   RightFoot_.State().Y[2] = RightFootTraj_deq.front().ddy;
-
+*/
   return 0;
 
 }
@@ -294,7 +294,9 @@ RigidBodySystem::compute_dyn_cop( const std::deque<support_state_t> & SupportSta
       row   ( CoPDynamicsJerk_.S, i )  -= row( CoM_.Dynamics(ACCELERATION).S, i ) *       CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
       row   ( CoPDynamicsJerk_.U, i )  -= row( CoM_.Dynamics(ACCELERATION).U, i ) *       CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
       column( CoPDynamicsJerk_.UT, i ) -= row( CoM_.Dynamics(ACCELERATION).U, i ) *       CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
-
+/*
+   * Usefull for multibody dynamics
+   *
       row   ( LeftFoot_.Dynamics(COP).S, i )  += row( LeftFoot_.Dynamics(POSITION).S, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
       row   ( LeftFoot_.Dynamics(COP).U, i )  += row( LeftFoot_.Dynamics(POSITION).U, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
       column( LeftFoot_.Dynamics(COP).UT, i ) += row( LeftFoot_.Dynamics(POSITION).U, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
@@ -308,7 +310,7 @@ RigidBodySystem::compute_dyn_cop( const std::deque<support_state_t> & SupportSta
       row   ( RightFoot_.Dynamics(COP).S, i )  -= row( RightFoot_.Dynamics(ACCELERATION).S, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
       row   ( RightFoot_.Dynamics(COP).U, i )  -= row( RightFoot_.Dynamics(ACCELERATION).U, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
       column( RightFoot_.Dynamics(COP).UT, i ) -= row( RightFoot_.Dynamics(ACCELERATION).U, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
-
+*/
       CoMTraj_it++;
       LFTraj_it++;
       RFTraj_it++;
