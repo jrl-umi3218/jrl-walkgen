@@ -102,7 +102,7 @@ void MPCTrajectoryGeneration::CallMethod(std::string & Method, std::istringstrea
   else if (Method==":samplingperiod")
     {
       strm >> T_Prw_;
-      ODEBUG(":samplingperiod" << T_Prw_ << " ID: " << this);
+      ODEBUG(":samplingperiod" << T_Ctr_ << " ID: " << this);
     }
   
 }

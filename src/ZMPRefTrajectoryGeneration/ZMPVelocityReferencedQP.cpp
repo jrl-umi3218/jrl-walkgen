@@ -103,6 +103,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_ = new GeneratorVelRef( SPM, IntermedData_, Robot_ );
   VRQPGenerator_->NbPrwSamplings( QP_N_ );
   VRQPGenerator_->SamplingPeriodPreview( QP_T_ );
+  VRQPGenerator_->SamplingPeriodControl( m_SamplingPeriod );
   VRQPGenerator_->ComHeight( 0.814 );
   VRQPGenerator_->initialize_matrices();
   VRQPGenerator_->Ponderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
@@ -353,8 +354,11 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       struct timeval start,mid1,mid2,mid3,mid4,end;
       gettimeofday(&start,0);
 
+
       // UPDATE INTERNAL DATA:
       // ---------------------
+      Problem_.reset();
+      Solution_.reset();
       VRQPGenerator_->CurrentTime( Time );
       VelRef_=NewVelRef_;
 
@@ -365,31 +369,28 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
       // ----------------------------------------------------
-      deque<support_state_t> PreviewedSupportStates_deq;
       VRQPGenerator_->preview_support_states( Time, SupportFSM_,
-          FinalLeftFootTraj_deq, FinalRightFootTraj_deq, PreviewedSupportStates_deq );
+          FinalLeftFootTraj_deq, FinalRightFootTraj_deq, Solution_.SupportStates_deq );
 
 
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // ------------------------------------------------------
-      deque<double> PreviewedSupportAngles_deq;
       OrientPrw_->preview_orientations( Time, VelRef_,
-          SupportFSM_->StepPeriod(), PreviewedSupportStates_deq,
+          SupportFSM_->StepPeriod(),
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
-          PreviewedSupportAngles_deq );
+          Solution_ );
 
 
       // UPDATE THE DYNAMICS:
       // --------------------
-
-      Robot_->update( PreviewedSupportStates_deq,
+      Robot_->update( Solution_.SupportStates_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
 
 
 
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:
       // --------------------------------------
-      VRQPGenerator_->compute_global_reference( FinalCOMTraj_deq );
+      VRQPGenerator_->compute_global_reference( Solution_ );
 
 
       // BUILD CONSTANT PART OF THE OBJECTIVE:
@@ -398,25 +399,23 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // BUILD VARIANT PART OF THE OBJECTIVE:
       // ------------------------------------
-      VRQPGenerator_->update_problem( Problem_, PreviewedSupportStates_deq );
+      VRQPGenerator_->update_problem( Problem_, Solution_.SupportStates_deq );
 
 
       // BUILD CONSTRAINTS:
       // ------------------
       VRQPGenerator_->build_constraints( Problem_, RFC_,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
-          PreviewedSupportStates_deq, PreviewedSupportAngles_deq );
+          Solution_.SupportStates_deq, Solution_.SupportOrientations_deq );
 
 
       // SOLVE PROBLEM:
       // --------------
+      Problem_.solve(	QPProblem_s::QLD, Solution_, Solution_.SupportStates_deq,
+    		  Solution_.SupportOrientations_deq , Robot_, IntermedData_, QPProblem_s::NONE );
+      if(Solution_.Fail>0)
+        Problem_.dump( Time );
 
-
-
-      solution_t Result;
-      Problem_.solve(	QPProblem_s::QLD, Result, PreviewedSupportStates_deq,
-    		  	  	  	PreviewedSupportAngles_deq, Robot_, IntermedData_, QPProblem_s::NONE );
-      Problem_.reset();
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
@@ -424,21 +423,21 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       FinalCOMTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex);
       FinalZMPTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex);
       CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, CurrentIndex,
-          Result.Solution_vec[0], Result.Solution_vec[QP_N_] );
-      CoM_.OneIteration( Result.Solution_vec[0],Result.Solution_vec[QP_N_] );
+          Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
+      CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
 
 
-      // COMPUTE ORIENTATION OF TRUNK:
-      // -----------------------------
+      // INTERPOLATE TRUNK ORIENTATION:
+      // ------------------------------
       OrientPrw_->interpolate_trunk_orientation( Time, CurrentIndex,
-          m_SamplingPeriod, PreviewedSupportStates_deq,
+          m_SamplingPeriod, Solution_.SupportStates_deq,
           FinalCOMTraj_deq );
 
 
-      // INTERPOLATE THE COMPUTED FEET POSITIONS:
+      // INTERPOLATE THE COMPUTED FOOT POSITIONS:
       // ----------------------------------------
-      Robot_->generate_trajectories( Time, Result,
-          PreviewedSupportStates_deq, PreviewedSupportAngles_deq,
+      Robot_->generate_trajectories( Time, Solution_,
+          Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
 
 
@@ -447,7 +446,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
         {
           TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
         }
-      UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_+QP_T_;
+      UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
 
 
       // Compute CPU consumption time.

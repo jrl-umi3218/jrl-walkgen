@@ -115,7 +115,8 @@ SupportFSM::set_support_state(double Time, unsigned int Pi,
 	  Support.NbInstants = 0;
 	}
       //DS->SS
-      else if((Support.Phase == DS && ReferenceGiven) || (Support.Phase == DS && Support.NbStepsLeft > 0))
+      else if( ((Support.Phase == DS) && ReferenceGiven) 
+		  ||   ((Support.Phase == DS) && (Support.NbStepsLeft > 0)))
 	{
 	  Support.Phase = SS;
 	  Support.TimeLimit = Time+Pi*T_+StepPeriod_-T_/10.0;

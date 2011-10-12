@@ -257,12 +257,13 @@ namespace PatternGeneratorJRL {
       std::cout << "argc:" << argc << std::endl;
       if (argc!=6)
 	{
-	  cerr << " This program takes 4 arguments: " << endl;
+	  cerr << " This program takes 5 arguments: " << endl;
 	  cerr << "./TestFootPrintPGInterface \
                          PATH_TO_VRML_FILE	   \
                          VRML_FILE_NAME		   \
-                         PATH_TO_SPECIFICITIES_XML \
-                         LINK_JOINT_RANK" << endl;
+                         SPECIFICITIES_XML \
+                         LINK_JOINT_RANK	\
+                         INITIAL_CONFIGURATION" << endl;
 	  exit(-1);
 	}	
       else 

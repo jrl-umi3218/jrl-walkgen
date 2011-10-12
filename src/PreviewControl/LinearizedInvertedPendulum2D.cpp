@@ -162,7 +162,10 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
   int lCurrentPosition = CurrentPosition;
   // Fill the queues with the interpolated CoM values.
     
-  for(int lk=0;lk<=m_InterpolationInterval;lk++,lCurrentPosition++)
+  //TODO: with TestHerdt, it is mandatory to use COMStates.size()-1, or it will crash.
+  // Is it the same for the other PG ? Please check.
+  int loopEnd = std::min<int>( m_InterpolationInterval, ((int)COMStates.size())-1-CurrentPosition);
+  for(int lk=0;lk<=loopEnd;lk++,lCurrentPosition++)
     {
       ODEBUG("lCurrentPosition: "<< lCurrentPosition);
       COMState & aCOMPos = COMStates[lCurrentPosition];
