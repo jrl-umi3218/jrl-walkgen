@@ -231,7 +231,7 @@ OnLineFootTrajectoryGeneration::interpret_solution( double CurrentTime, const so
     Sign = 1.0;
   else
     Sign = -1.0;
-  if(CurrentSupport.NbStepsLeft > 0)
+  if(CurrentSupport.NbStepsLeft > 0 && NbSteps > 0 )
     {
       X = Solution.Solution_vec[2*QP_N_];
       Y = Solution.Solution_vec[2*QP_N_+NbSteps];
@@ -264,9 +264,13 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
 {
 
   support_state_t CurrentSupport = PrwSupportStates_deq.front();
-  unsigned int NbStepsPrwd = PrwSupportStates_deq.back().StepNumber;
+
   double FPx, FPy;
-  interpret_solution( Time, Solution, CurrentSupport, NbStepsPrwd, FPx, FPy );
+  if(CurrentSupport.Phase != DS)
+    {
+      unsigned int NbStepsPrwd = PrwSupportStates_deq.back().StepNumber;
+      interpret_solution( Time, Solution, CurrentSupport, NbStepsPrwd, FPx, FPy );
+    }
 
   double LocalInterpolationTime = Time-(CurrentSupport.TimeLimit-(m_TDouble+m_TSingle));
 
