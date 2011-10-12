@@ -52,7 +52,7 @@ using namespace PatternGeneratorJRL;
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
     string DataFile, CjrlHumanoidDynamicRobot *aHS) :
     ZMPRefTrajectoryGeneration(SPM),
-    Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFC_(0)
+    Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFC_(0),Problem_()
 {
 
   TimeBuffer_ = 0.040;
@@ -305,6 +305,13 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM_(CoM);
   IntermedData_->CoM(CoM_());
 
+  // INITIALIZE VEL REFERENCE:
+  // --------------------------
+  NewVelRef_.Local.x=0;
+  NewVelRef_.Local.y=0;
+  NewVelRef_.Local.yaw=0;
+
+
   return 0;
 }
 
@@ -342,13 +349,15 @@ ZMPVelocityReferencedQP::OnLine(double Time,
   if(Time + 0.00001 > UpperTimeLimitToUpdate_)
     {
 
-      double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0;
-      struct timeval start,end;
+      double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0, CurrentQLDTime=0.0, CurrentinvariantpartTime=0.0;
+      struct timeval start,mid1,mid2,mid3,mid4,end;
       gettimeofday(&start,0);
 
       // UPDATE INTERNAL DATA:
       // ---------------------
       VRQPGenerator_->CurrentTime( Time );
+      VelRef_=NewVelRef_;
+
       SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
       IntermedData_->Reference( VelRef_ );
       IntermedData_->CoM( CoM_() );// TODO: still necessary?
@@ -372,8 +381,10 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // UPDATE THE DYNAMICS:
       // --------------------
+
       Robot_->update( PreviewedSupportStates_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
+
 
 
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:
@@ -384,7 +395,6 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // BUILD CONSTANT PART OF THE OBJECTIVE:
       // -------------------------------------
       VRQPGenerator_->build_invariant_part( Problem_ );
-
 
       // BUILD VARIANT PART OF THE OBJECTIVE:
       // ------------------------------------
@@ -400,10 +410,13 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // SOLVE PROBLEM:
       // --------------
-      solution_t Result;
-      Problem_.solve( QPProblem_s::QLD, Result, QPProblem_s::ALL );
-      Problem_.reset();
 
+
+
+      solution_t Result;
+      Problem_.solve(	QPProblem_s::QLD, Result, PreviewedSupportStates_deq,
+    		  	  	  	PreviewedSupportAngles_deq, Robot_, IntermedData_, QPProblem_s::NONE );
+      Problem_.reset();
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
@@ -439,8 +452,23 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // Compute CPU consumption time.
       gettimeofday(&end,0);
+      /*
+      gettimeofday(&mid1,0);
+      gettimeofday(&mid2,0);
+      gettimeofday(&mid3,0);
+      gettimeofday(&mid4,0);
+	*/
+
       CurrentCPUTime = end.tv_sec - start.tv_sec +
           0.000001 * (end.tv_usec - start.tv_usec);
+      /*
+      CurrentQLDTime = mid2.tv_sec - mid1.tv_sec +
+          0.000001 * (mid2.tv_usec - mid1.tv_usec);
+      CurrentinvariantpartTime= mid4.tv_sec - mid3.tv_sec +
+              0.000001 * (mid4.tv_usec - mid3.tv_usec);
+      */
+    // std::cout << "Current CPU time : " << CurrentCPUTime*1000 << " ms, whose QLD :" << CurrentQLDTime*1000 << " ms (" << 100*CurrentQLDTime/CurrentCPUTime << " %) and invariant part :" << CurrentinvariantpartTime*1000 << " ms ("<< 100*CurrentinvariantpartTime/CurrentCPUTime << " %)" << std::endl;
+
       TotalAmountOfCPUTime += CurrentCPUTime;
     }
 

@@ -30,10 +30,10 @@
 # include <Windows.h>
 #endif /* WIN32 */
 
+#include <cmath>
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <iostream>
 #include <fstream>
 
@@ -57,6 +57,7 @@ QPProblem_s::QPProblem_s():
   lwar_(0), liwar_(0),
   eps_(0),
   NbVariables_(0), NbConstraints_(0),NbEqConstraints_(0)
+
 {
   NbVariables_ = 0;
   NbConstraints_ = 0;
@@ -74,6 +75,8 @@ QPProblem_s::QPProblem_s():
   liwar_ = n_;
   eps_ = 1e-8;
 
+  last_solution_.resize(1,1);
+  last_solution_.empty();
   resize_all();
   
 
@@ -84,6 +87,7 @@ QPProblem_s::QPProblem_s():
 
 	clamda_= new double [n_+m_]; 	  
   
+
 }
 
 
@@ -177,7 +181,8 @@ void QPProblem_s::reset()
 
 
 void
-QPProblem_s::solve( Solver Solver, solution_t & Result, Tests Tests )
+QPProblem_s::solve( Solver Solver, solution_t & Result, const std::deque<support_state_t> & PrwSupportStates_deq,
+	    const std::deque<double> & PrwSupportAngles_deq, const RigidBodySystem * Robot, const IntermedQPMat * IntermedData, const Tests & tests )
 {
 
 	 m_ = NbConstraints_+1;
@@ -201,7 +206,7 @@ QPProblem_s::solve( Solver Solver, solution_t & Result, Tests Tests )
 	
 	
 Result.resize(n_,m_); 
-	
+
   switch(Solver)
     {
     case QLD:
@@ -225,10 +230,20 @@ Result.resize(n_,m_);
           Result.ConstrLagr_vec(i) = U_.Array_[i];
         }
 
+  	if (tests==ITT || tests==ALL){
+  		int nb_itt_approx=0;
+  		for(int i = 0; i < m_; i++){
+  			if (Result.ConstrLagr_vec(i)!=0){
+  				nb_itt_approx++;
+  			}
+  		}
+  		std::cout << "nb itérations : " << nb_itt_approx << std::endl;
+  	}
+
 break;
     case LSSOL:
 #ifdef LSSOL_FOUND
-	    	sendOption("Print Level = 0"); 
+	    sendOption("Print Level = 0");
 		sendOption("Problem Type = QP2");
 
 		double *bl=new double[n_+m_];
@@ -249,6 +264,43 @@ break;
 			bu[i]=10e10;
 		}	
 
+		// compute initial solution wich respect all the constraints
+		// TODO : Compute initial solution in generator-vel-ref
+		int N=Robot->NbSamplingsPreviewed();
+		int M=PrwSupportStates_deq[N-1].StepNumber;
+		FootType Support_foot = PrwSupportStates_deq[0].Foot;
+		double current_support_foot_x = PrwSupportStates_deq[0].X;
+		double current_support_foot_y = PrwSupportStates_deq[0].Y;
+		double current_yaw = PrwSupportStates_deq[0].Yaw;
+		boost_ublas::vector<double> zmp_initial_solution(2*N);
+		double feet_spacing=0.19;
+		double sgn;
+		int j=0;
+
+		for(int i=0;i<N;i++){
+			if (Support_foot != PrwSupportStates_deq[i].Foot){
+				Support_foot=PrwSupportStates_deq[i].Foot;
+				if (PrwSupportStates_deq[i].Foot==RIGHT){
+					sgn=1;
+				}else{
+					sgn=-1;
+				}
+				current_support_foot_x+=sgn*feet_spacing*sin(current_yaw);
+				current_support_foot_y+=sgn*feet_spacing*cos(current_yaw);
+				current_yaw=PrwSupportAngles_deq[j];
+				++j;
+			}
+			zmp_initial_solution(i)=current_support_foot_x;
+			zmp_initial_solution(N+i)=current_support_foot_y;
+			X_.Array_[2*N+j]=current_support_foot_x;
+			X_.Array_[2*N+M+j]=current_support_foot_y;
+		}
+
+		boost_ublas::matrix<double> U = Robot->DynamicsCoPJerk().U;
+		boost_ublas::matrix<double> Um1();
+
+
+
 
 		lssol_(&n_, &n_, 
 		&m_, &mmax_, &n_, 
@@ -257,14 +309,17 @@ break;
 		&inform_, &iter_, &obj_, clamda_, 
 		iwar_.Array_, &liwar_, war_.Array_, &lwar_);
 
+
+		last_solution_.resize(n_,m_);
 		for(int i = 0; i < n_; i++)
 		{
 			Result.Solution_vec(i) = X_.Array_[i];
+			last_solution_(i)=Result.Solution_vec(i);
 		}
-	if (Tests==ITT || Tests==ALL){
+	if (tests==ITT || tests==ALL){
 		std::cout << "nb itérations : " << iter_ << std::endl;
 	}
-#else 
+#else
 	std::cerr << " LSSOL_FOUND not available" << std::endl;
 #endif //LSSOL_FOUND
 

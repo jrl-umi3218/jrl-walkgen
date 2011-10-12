@@ -102,16 +102,16 @@ namespace PatternGeneratorJRL
     /// \brief Set the reference (velocity only as for now) through the Interface (slow)
     void Reference(istringstream &strm)
     {
-      strm >> VelRef_.Local.x;
-      strm >> VelRef_.Local.y;
-      strm >> VelRef_.Local.yaw;
+      strm >> NewVelRef_.Local.x;
+      strm >> NewVelRef_.Local.y;
+      strm >> NewVelRef_.Local.yaw;
     }
     /// \brief Set the reference (Velocity only as for now)
     inline void Reference(double dx, double dy, double dyaw)
     {
-      VelRef_.Local.x = dx;
-      VelRef_.Local.y = dy;
-      VelRef_.Local.yaw = dyaw;
+    	NewVelRef_.Local.x = dx;
+    	NewVelRef_.Local.y = dy;
+    	NewVelRef_.Local.yaw = dyaw;
     }
 
     /// \brief Set the final-stage trigger
@@ -126,6 +126,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Reference
     reference_t VelRef_;
+    reference_t NewVelRef_;
 
   private:
 
