@@ -1094,7 +1094,6 @@ namespace PatternGeneratorJRL {
     else if (aCmd==":HerdtOnline")
       {
 	m_InternalClock = 0.0;
-	setVelReference(strm);
 	initOnlineHerdt();
 	printf("Online \n");
 	//ODEBUG4("InitOnLine","DebugHerdt.txt");
