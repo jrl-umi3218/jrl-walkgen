@@ -102,15 +102,15 @@ namespace PatternGeneratorJRL
     /// \brief Set the reference (velocity only as for now) through the Interface (slow)
     void Reference(istringstream &strm)
     {
-      strm >> NewVelRef_.Local.x;
-      strm >> NewVelRef_.Local.y;
-      strm >> NewVelRef_.Local.yaw;
+      strm >> NewVelRef_.Local.X;
+      strm >> NewVelRef_.Local.Y;
+      strm >> NewVelRef_.Local.Yaw;
     }
     inline void Reference(double dx, double dy, double dyaw)
     {
-    	NewVelRef_.Local.x = dx;
-    	NewVelRef_.Local.y = dy;
-    	NewVelRef_.Local.yaw = dyaw;
+    	NewVelRef_.Local.X = dx;
+    	NewVelRef_.Local.Y = dy;
+    	NewVelRef_.Local.Yaw = dyaw;
     }
 
     /// \brief Set the final-stage trigger
@@ -122,17 +122,18 @@ namespace PatternGeneratorJRL
 
     solution_t & Solution()
     { return Solution_; }
-
     /// \}
 
-    /// \brief Reference
-    reference_t VelRef_;// TODO: Why public?
-    reference_t NewVelRef_;
 
     //
     // Private members:
     //
   private:
+
+    /// \brief (Updated) Reference
+    reference_t VelRef_;
+    /// \brief Temporary (updating) reference
+    reference_t NewVelRef_;
 
     /// \brief Total mass of the robot
     double RobotMass_;

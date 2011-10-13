@@ -84,16 +84,21 @@ namespace PatternGeneratorJRL
     struct frame_t
     {
       /// \brief Constant reference
-      double x,y, yaw;
+      double X, Y, Yaw;
 
       /// \brief Reference vectors
-      MAL_VECTOR(X,double);
-      MAL_VECTOR(Y,double);
-      MAL_VECTOR(YAW,double);
+      MAL_VECTOR(X_vec,double);
+      MAL_VECTOR(Y_vec,double);
+      MAL_VECTOR(Yaw_vec,double);
+
+      frame_t();
+      frame_t(const frame_t &);
     };
 
     frame_t Global, Local;
 
+    reference_t();
+    reference_t(const reference_t &);
   };
 
   /// \brief Linear inequality with free foot placement.

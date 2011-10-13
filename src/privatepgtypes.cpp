@@ -299,4 +299,16 @@ namespace PatternGeneratorJRL
       {aos<<Solution_vec[i]<<" ";}; aos<<std::endl;
   }
 
+  reference_t::reference_t():Global(), Local()
+    {    }
+
+  reference_t::reference_t(const reference_t & R):Global(R.Global), Local(R.Local)
+    {    }
+
+  reference_t::frame_t::frame_t(): X(0), Y(0), Yaw(0), X_vec(), Y_vec(), Yaw_vec()
+    {   }
+
+  reference_t::frame_t::frame_t(const frame_t & F):
+      X(F.X), Y(F.X), Yaw(F.Yaw), X_vec(F.X_vec), Y_vec(F.Y_vec), Yaw_vec(F.Yaw_vec)
+  {}
 }
