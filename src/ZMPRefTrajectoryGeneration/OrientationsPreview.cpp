@@ -238,13 +238,13 @@ OrientationsPreview::verify_acceleration_hip_joint(const reference_t & Ref,
 {
   if(CurrentSupport.Phase != DS)
     //Verify change in velocity reference against the maximal acceleration of the hip joint
-    if(fabs(Ref.Local.yaw-TrunkState_.yaw[1]) > 2.0/3.0*T_*uaLimitHipYaw_)
+    if(fabs(Ref.Local.Yaw-TrunkState_.yaw[1]) > 2.0/3.0*T_*uaLimitHipYaw_)
       {
-        double signRotAccTrunk = (Ref.Local.yaw-TrunkState_.yaw[1] < 0.0)?-1.0:1.0;
+        double signRotAccTrunk = (Ref.Local.Yaw-TrunkState_.yaw[1] < 0.0)?-1.0:1.0;
         TrunkStateT_.yaw[1] = TrunkState_.yaw[1] + signRotAccTrunk * 2.0/3.0*T_* uaLimitHipYaw_;
       }
     else
-      TrunkStateT_.yaw[1] = Ref.Local.yaw;
+      TrunkStateT_.yaw[1] = Ref.Local.Yaw;
   else//No rotations in a double support phase
     TrunkStateT_.yaw[1] = 0.0;
 }

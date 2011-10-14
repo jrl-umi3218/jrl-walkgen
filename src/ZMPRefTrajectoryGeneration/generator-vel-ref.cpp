@@ -166,16 +166,16 @@ GeneratorVelRef::compute_global_reference( const solution_t & Solution )
 
   reference_t & Ref = IntermedData_->Reference();
 
-  Ref.Global.X.resize(N_,false);
-  Ref.Global.X.clear();
-  Ref.Global.Y.resize(N_,false);
-  Ref.Global.Y.clear();
+  Ref.Global.X_vec.resize(N_,false);
+  Ref.Global.X_vec.clear();
+  Ref.Global.Y_vec.resize(N_,false);
+  Ref.Global.Y_vec.clear();
   double YawTrunk;
   for( unsigned int i=0;i<N_;i++ )
     {
       YawTrunk = Solution.TrunkOrientations_deq[i];
-      Ref.Global.X(i) = Ref.Local.x*cos(YawTrunk)-Ref.Local.y*sin(YawTrunk);
-      Ref.Global.Y(i) = Ref.Local.y*cos(YawTrunk)+Ref.Local.x*sin(YawTrunk);
+      Ref.Global.X_vec(i) = Ref.Local.X*cos(YawTrunk)-Ref.Local.Y*sin(YawTrunk);
+      Ref.Global.Y_vec(i) = Ref.Local.Y*cos(YawTrunk)+Ref.Local.X*sin(YawTrunk);
     }
 
 }
@@ -518,9 +518,9 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
   compute_term  ( MV_ , InstVel.weight, VelDynamics.UT, VelDynamics.S, State.CoM.y      );
   Pb.add_term_to( QPProblem::VECTOR_D, MV_, N_                                          );
   // +a*U'*ref
-  compute_term  ( MV_, -InstVel.weight, VelDynamics.UT, State.Ref.Global.X      );
+  compute_term  ( MV_, -InstVel.weight, VelDynamics.UT, State.Ref.Global.X_vec      );
   Pb.add_term_to( QPProblem::VECTOR_D, MV_, 0                                   );
-  compute_term  ( MV_, -InstVel.weight, VelDynamics.UT, State.Ref.Global.Y      );
+  compute_term  ( MV_, -InstVel.weight, VelDynamics.UT, State.Ref.Global.Y_vec      );
   Pb.add_term_to( QPProblem::VECTOR_D, MV_, N_                                  );
 
   // COP - centering terms

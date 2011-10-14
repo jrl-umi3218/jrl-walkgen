@@ -51,18 +51,18 @@ SupportFSM::~SupportFSM()
 void
 SupportFSM::update_vel_reference(reference_t & Ref, const support_state_t & CurrentSupport){
   // Check the reference type of the robot (rotation, translation)
-  if(fabs(Ref.Local.x)>2*EPS_||fabs(Ref.Local.y)>2*EPS_){
+  if(fabs(Ref.Local.X)>2*EPS_||fabs(Ref.Local.Y)>2*EPS_){
       InTranslation_ = true;
   }else{
       InTranslation_ = false;
   }
-  if(fabs(Ref.Local.yaw)>EPS_){
+  if(fabs(Ref.Local.Yaw)>EPS_){
       InRotation_ = true;
   }else{
       // make two step to avoid the robot's fall
       if (InRotation_ && !InTranslation_){
-          Ref.Local.x=2*EPS_;
-          Ref.Local.y=2*EPS_;
+          Ref.Local.X=2*EPS_;
+          Ref.Local.Y=2*EPS_;
           if (!PostRotationPhase_){
               CurrentSupportFoot_ = CurrentSupport.Foot;
               NbStepsAfterRotation_ = 0;
@@ -93,7 +93,7 @@ SupportFSM::set_support_state(double Time, unsigned int Pi,
   Support.NbInstants++;
 
   bool ReferenceGiven = false;
-  if(fabs(Ref.Local.x)>EPS_||fabs(Ref.Local.y)>EPS_||fabs(Ref.Local.yaw)>EPS_)
+  if(fabs(Ref.Local.X)>EPS_||fabs(Ref.Local.Y)>EPS_||fabs(Ref.Local.Yaw)>EPS_)
     ReferenceGiven = true;
 
   // Update time limit for double support phase

@@ -70,7 +70,7 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":HerdtOnline 0.2 0.0 0.0");
+      istringstream strm2(":HerdtOnline");
       aPGI.ParseCmd(strm2);
     }
     {

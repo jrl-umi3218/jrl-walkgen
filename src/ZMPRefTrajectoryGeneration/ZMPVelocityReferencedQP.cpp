@@ -306,13 +306,6 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM_(CoM);
   IntermedData_->CoM(CoM_());
 
-  // INITIALIZE VEL REFERENCE:
-  // --------------------------
-  NewVelRef_.Local.x=0;
-  NewVelRef_.Local.y=0;
-  NewVelRef_.Local.yaw=0;
-
-
   return 0;
 }
 
@@ -389,7 +382,6 @@ ZMPVelocityReferencedQP::OnLine(double Time,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
 
 
-
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:
       // --------------------------------------
       VRQPGenerator_->compute_global_reference( Solution_ );
@@ -398,6 +390,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // BUILD CONSTANT PART OF THE OBJECTIVE:
       // -------------------------------------
       VRQPGenerator_->build_invariant_part( Problem_ );
+
 
       // BUILD VARIANT PART OF THE OBJECTIVE:
       // ------------------------------------
