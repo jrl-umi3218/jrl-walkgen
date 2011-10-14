@@ -71,7 +71,7 @@ void FootHalfSize::updateHalfHeightDS()
 {
   double DSFeetDistance = 0.2;
   
-  m_HalfHeightDS = m_HalfHeight-m_ConstraintsOnX+DSFeetDistance/2.0;
+  m_HalfHeightDS = m_HalfHeight+DSFeetDistance/2.0;
 }
 
 void FootHalfSize::setConstraints(double OnX, double OnY)
