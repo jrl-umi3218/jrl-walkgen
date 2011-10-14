@@ -557,6 +557,78 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
 
 }
 
+// compute initial solution wich respect all the constraints
+void GeneratorVelRef::warm_start(	boost_ublas::vector<double> & initialSolution,
+		const std::deque<support_state_t> & PrwSupportStates_deq,
+		const std::deque<double> & PrwSupportAngles_deq){
+
+	int N=Robot_->NbSamplingsPreviewed();
+	int M=PrwSupportStates_deq[N].StepNumber;
+
+	initialSolution.resize(2*N+2*M);
+
+	// Current support state
+	FootType Current_support_foot = PrwSupportStates_deq[0].Foot;
+	double current_support_foot_x = PrwSupportStates_deq[0].X;
+	double current_support_foot_y = PrwSupportStates_deq[0].Y;
+	double current_yaw = PrwSupportStates_deq[0].Yaw;
+
+	// ZMP position vector
+	boost_ublas::vector<double> zx(N);
+	boost_ublas::vector<double> zy(N);
+
+
+	double feetSpacing=0.2;
+	double sgn;
+	int j=0;
+
+	for(int i=1;i<=N;i++){
+		// Check if the support foot has changed
+		if (Current_support_foot != PrwSupportStates_deq[i].Foot){
+			Current_support_foot=PrwSupportStates_deq[i].Foot;
+			if (PrwSupportStates_deq[i].Foot==RIGHT){
+				sgn=1;
+			}else{
+				sgn=-1;
+			}
+
+			// Compute new feasible foot position
+			current_support_foot_x+=sgn*feetSpacing*sin(current_yaw);
+			current_support_foot_y-=sgn*feetSpacing*cos(current_yaw);
+			current_yaw=PrwSupportAngles_deq[j];
+
+			// Set the new position into initial solution vector
+			initialSolution(2*N+j)=current_support_foot_x;
+			initialSolution(2*N+M+j)=current_support_foot_y;
+
+			++j;
+		}
+
+		// Set the ZMP at the center of the foot
+		zx(i-1)=current_support_foot_x;
+		zy(i-1)=current_support_foot_y;
+	}
+
+
+	boost_ublas::vector<double> X(N);
+	boost_ublas::vector<double> Y(N);
+
+
+	// Compute initial jerk
+	MV2_=prod(Robot_->DynamicsCoPJerk().S,IntermedData_->State().CoM.x);
+	X=prod(Robot_->DynamicsCoPJerk().Um1,zx-MV2_);
+
+	MV2_=prod(Robot_->DynamicsCoPJerk().S,IntermedData_->State().CoM.y);
+	Y=prod(Robot_->DynamicsCoPJerk().Um1,zy-MV2_);
+
+	for(int i=0;i<N;i++){
+		initialSolution(i)=X(i);
+		initialSolution(N+i)=Y(i);
+	}
+
+}
+
+
 
 void
 GeneratorVelRef::compute_term(MAL_MATRIX (&weightMM, double), double weight,

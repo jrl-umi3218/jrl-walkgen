@@ -232,10 +232,14 @@ namespace PatternGeneratorJRL
     ///   IPRINT > 0 :  BRIEF OUTPUT IN ERROR CASES.
     int Print;
 
+    bool useWarmStart ;
+
     /// \name Solution vectors
     /// \{
     /// \brief QP solution vector
     boost_ublas::vector<double> Solution_vec;
+    /// \brief QP initial solution vector
+    boost_ublas::vector<double> initialSolution;
     /// \brief Previewed support orientations
     std::deque<double> SupportOrientations_deq;
     /// \brief Previewed trunk orientations (only yaw as for now)

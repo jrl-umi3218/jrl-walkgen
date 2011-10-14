@@ -199,9 +199,10 @@ void QPProblem_s::reset()
 }
 
 
+
+
 void
-QPProblem_s::solve( Solver Solver, solution_t & Result, const std::deque<support_state_t> & PrwSupportStates_deq,
-	    const std::deque<double> & PrwSupportAngles_deq, const RigidBodySystem * Robot, const IntermedQPMat * IntermedData, const Tests & tests )
+QPProblem_s::solve( Solver Solver, solution_t & Result, const Tests & tests )
 {
 
   m_ = NbConstraints_+1;
@@ -265,6 +266,7 @@ QPProblem_s::solve( Solver Solver, solution_t & Result, const std::deque<support
 break;
     case LSSOL:
 #ifdef LSSOL_FOUND
+
 	    sendOption("Print Level = 0");
 
 		sendOption("Problem Type = QP2");
@@ -287,61 +289,72 @@ break;
 			bu[i]=10e10;
 		}
 
-		// compute initial solution wich respect all the constraints
-		// TODO : Compute initial solution in generator-vel-ref
-		int N=Robot->NbSamplingsPreviewed();
-		int M=PrwSupportStates_deq[N-1].StepNumber;
-		FootType Support_foot = PrwSupportStates_deq[0].Foot;
-		double current_support_foot_x = PrwSupportStates_deq[0].X;
-		double current_support_foot_y = PrwSupportStates_deq[0].Y;
-		double current_yaw = PrwSupportStates_deq[0].Yaw;
-		boost_ublas::vector<double> zmp_initial_solution(2*N);
-		double feet_spacing=0.19;
-		double sgn;
-		int j=0;
-
-		for(int i=0;i<N;i++){
-			if (Support_foot != PrwSupportStates_deq[i].Foot){
-				Support_foot=PrwSupportStates_deq[i].Foot;
-				if (PrwSupportStates_deq[i].Foot==RIGHT){
-					sgn=1;
-				}else{
-					sgn=-1;
-				}
-				current_support_foot_x+=sgn*feet_spacing*sin(current_yaw);
-				current_support_foot_y+=sgn*feet_spacing*cos(current_yaw);
-				current_yaw=PrwSupportAngles_deq[j];
-				++j;
+		if (Result.useWarmStart){
+			for(unsigned i=0;i<NbVariables_;++i){
+				X_.Array_[i]=Result.initialSolution(i);
 			}
-			zmp_initial_solution(i)=current_support_foot_x;
-			zmp_initial_solution(N+i)=current_support_foot_y;
-			X_.Array_[2*N+j]=current_support_foot_x;
-			X_.Array_[2*N+M+j]=current_support_foot_y;
 		}
 
-		boost_ublas::matrix<double> U = Robot->DynamicsCoPJerk().U;
-		boost_ublas::matrix<double> Um1();
+		if (tests==CTR || tests==ALL){
+			// Check if initial solution respect all the constraints
+			boost_ublas::matrix<double> DU(NbConstraints_, NbVariables_);
+			boost_ublas::vector<double> XX(NbVariables_);
+			boost_ublas::vector<double> DS(NbConstraints_);
+			boost_ublas::vector<double> tmp;
+			for(unsigned i=0;i<NbConstraints_;++i){
+				for(unsigned j=0;j<NbVariables_;++j){
+					DU(i,j)=DU_.Array_[i+DU_.NbRows_*j];
+				}
+				DS(i)=DS_.Array_[i];
+			}
 
+			for(unsigned i=0;i<NbVariables_;++i){
+				XX(i)=X_.Array_[i];
+			}
 
+			tmp=prod(DU,XX);
+			int nb_ctr=0;
+			for(unsigned i=0;i<NbConstraints_;++i){
+				if (tmp(i)+DS(i)<-1e-6){
+					std::cout << "Unrespected constraint " << i << " : " << tmp(i) << " < " << -DS(i)  << std::endl;
+					++nb_ctr;
+				}
+			}
+			std::cout << std::endl << "Nb unrespected constraints : " << nb_ctr << std::endl;
+		}
 
 
 		lssol_(&n_, &n_,
-		&m_, &mmax_, &n_,
-		DU_dense_.Array_, bl, bu, D_.Array_,
-		istate_, kx_, X_.Array_, Q_dense_.Array_, b_,
-		&inform_, &iter_, &obj_, clamda_,
-		iwar_.Array_, &liwar_, war_.Array_, &lwar_);
+				&m_, &mmax_, &n_,
+				DU_dense_.Array_, bl, bu, D_.Array_,
+				istate_, kx_, X_.Array_, Q_dense_.Array_, b_,
+				&inform_, &iter_, &obj_, clamda_,
+				iwar_.Array_, &liwar_, war_.Array_, &lwar_);
 
 
-		last_solution_.resize(n_,m_);
+
+
+		last_solution_.resize(n_);
 		for(int i = 0; i < n_; i++)
 		{
 			Result.Solution_vec(i) = X_.Array_[i];
 			last_solution_(i)=Result.Solution_vec(i);
+			Result.LBoundsLagr_vec(i) = 0;
+			Result.UBoundsLagr_vec(i) = 0;
 		}
+		Result.Fail=0;
+		Result.Print = 0;
+	    for(int i = 0; i < m_; i++)
+	      {
+	        Result.ConstrLagr_vec(i) = 0;
+	      }
+
+
+
 	if (tests==ITT || tests==ALL){
 		std::cout << "nb itérations : " << iter_ << std::endl;
 	}
+
 #else
 	std::cerr << " LSSOL_FOUND not available" << std::endl;
 #endif //LSSOL_FOUND

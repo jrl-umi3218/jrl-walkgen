@@ -359,6 +359,8 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // ---------------------
       Problem_.reset();
       Solution_.reset();
+
+
       VRQPGenerator_->CurrentTime( Time );
       VelRef_=NewVelRef_;
 
@@ -411,8 +413,12 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // SOLVE PROBLEM:
       // --------------
-      Problem_.solve(	QPProblem_s::QLD, Solution_, Solution_.SupportStates_deq,
-    		  Solution_.SupportOrientations_deq , Robot_, IntermedData_, QPProblem_s::NONE );
+
+      if (Solution_.useWarmStart){
+    	  VRQPGenerator_->warm_start(Solution_.initialSolution, Solution_.SupportStates_deq, Solution_.SupportOrientations_deq);
+      }
+
+      Problem_.solve(QPProblem_s::QLD, Solution_, QPProblem_s::NONE );
       if(Solution_.Fail>0)
         Problem_.dump( Time );
 

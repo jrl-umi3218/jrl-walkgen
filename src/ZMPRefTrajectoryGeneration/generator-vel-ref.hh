@@ -109,6 +109,16 @@ namespace PatternGeneratorJRL
     /// \param[in] SupportStates_deq
     void update_problem(QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq);
 
+
+    /// \brief Compute the initial solution vector for warm start
+    ///
+    /// \param[in] initial_solution initial solution vector
+    /// \param[in] PrwSupportStates_deq   PrwSupportStates_deq
+    /// \param[in] PrwSupportAngles_deq   PrwSupportAngles_deq
+    void warm_start(boost_ublas::vector<double> & initial_solution,
+    		const std::deque<support_state_t> & PrwSupportStates_deq,
+    		const std::deque<double> & PrwSupportAngles_deq);
+
     /// \name Accessors
     /// \{
     /// \brief Set the weights on an objective term
@@ -236,6 +246,7 @@ namespace PatternGeneratorJRL
     boost_ublas::vector<double> MV_;
     boost_ublas::vector<double> MV2_;
     /// \}
+
 
   };
 }

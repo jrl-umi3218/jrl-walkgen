@@ -70,7 +70,8 @@ namespace PatternGeneratorJRL
     {
 	NONE,
 	ALL,
-	ITT
+	ITT,
+	CTR
     };
     //
     //Public methods
@@ -131,9 +132,8 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Solver
     /// \param[out] Result
-    void solve( Solver Solver, solution_t & Result, const std::deque<support_state_t> & PrwSupportStates_deq,
-    	    const std::deque<double> & PrwSupportAngles_deq, const RigidBodySystem * Robot,
-    	    const IntermedQPMat * IntermedData, const Tests & tests=NONE );
+    /// \param[in] Tests
+    void solve( Solver Solver, solution_t & Result, const Tests & Tests=NONE );
 
     /// \name Accessors and mutators
     /// \{
