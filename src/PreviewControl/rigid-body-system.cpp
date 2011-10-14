@@ -255,6 +255,32 @@ RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
 
 }
 
+/* TODO : Move this function on another file
+ *
+ * Matrix inversion routine.
+   Uses lu_factorize and lu_substitute in uBLAS to invert a matrix */
+template<class T>
+bool invertMatrix (const boost_ublas::matrix<T>& input, boost_ublas::matrix<T>& inverse) {
+	using namespace boost::numeric::ublas;
+	typedef permutation_matrix<std::size_t> pmatrix;
+	// create a working copy of the input
+	matrix<T> A(input);
+	// create a permutation matrix for the LU-factorization
+	pmatrix pm(A.size1());
+
+	// perform LU-factorization
+	int res = lu_factorize(A,pm);
+       if( res != 0 ) return false;
+
+	// create identity matrix of "inverse"
+	inverse.assign(boost_ublas::identity_matrix<T>(A.size1()));
+
+	// backsubstitute to get the inverse
+	lu_substitute(A, pm, inverse);
+
+	return true;
+}
+
 
 int
 RigidBodySystem::compute_dyn_cop( const std::deque<support_state_t> & SupportStates_deq )
@@ -315,6 +341,9 @@ RigidBodySystem::compute_dyn_cop( const std::deque<support_state_t> & SupportSta
       LFTraj_it++;
       RFTraj_it++;
     }
+
+  	CoPDynamicsJerk_.Um1.resize(CoPDynamicsJerk_.U.size1(),CoPDynamicsJerk_.U.size2());
+    invertMatrix(CoPDynamicsJerk_.U,CoPDynamicsJerk_.Um1);
 
   return 0;
 
