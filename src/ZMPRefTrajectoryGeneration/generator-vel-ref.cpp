@@ -558,20 +558,18 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
 }
 
 // compute initial solution wich respect all the constraints
-void GeneratorVelRef::warm_start(	boost_ublas::vector<double> & initialSolution,
-		const std::deque<support_state_t> & PrwSupportStates_deq,
-		const std::deque<double> & PrwSupportAngles_deq){
+void GeneratorVelRef::ComputeWarmStart(	solution_t & Solution){
 
 	int N=Robot_->NbSamplingsPreviewed();
-	int M=PrwSupportStates_deq[N].StepNumber;
+	int M=Solution.SupportStates_deq[N].StepNumber;
 
-	initialSolution.resize(2*N+2*M);
+	Solution.initialSolution.resize(2*N+2*M);
 
 	// Current support state
-	FootType Current_support_foot = PrwSupportStates_deq[0].Foot;
-	double current_support_foot_x = PrwSupportStates_deq[0].X;
-	double current_support_foot_y = PrwSupportStates_deq[0].Y;
-	double current_yaw = PrwSupportStates_deq[0].Yaw;
+	FootType Current_support_foot = Solution.SupportStates_deq[0].Foot;
+	double currentSupportFoot_x = Solution.SupportStates_deq[0].X;
+	double currentSupportFoot_y = Solution.SupportStates_deq[0].Y;
+	double currentYaw = Solution.SupportStates_deq[0].Yaw;
 
 	// ZMP position vector
 	boost_ublas::vector<double> zx(N);
@@ -584,29 +582,29 @@ void GeneratorVelRef::warm_start(	boost_ublas::vector<double> & initialSolution,
 
 	for(int i=1;i<=N;i++){
 		// Check if the support foot has changed
-		if (Current_support_foot != PrwSupportStates_deq[i].Foot){
-			Current_support_foot=PrwSupportStates_deq[i].Foot;
-			if (PrwSupportStates_deq[i].Foot==RIGHT){
+		if (Current_support_foot != Solution.SupportStates_deq[i].Foot){
+			Current_support_foot=Solution.SupportStates_deq[i].Foot;
+			if (Solution.SupportStates_deq[i].Foot==RIGHT){
 				sgn=1;
 			}else{
 				sgn=-1;
 			}
 
 			// Compute new feasible foot position
-			current_support_foot_x+=sgn*feetSpacing*sin(current_yaw);
-			current_support_foot_y-=sgn*feetSpacing*cos(current_yaw);
-			current_yaw=PrwSupportAngles_deq[j];
+			currentSupportFoot_x+=sgn*feetSpacing*sin(currentYaw);
+			currentSupportFoot_y-=sgn*feetSpacing*cos(currentYaw);
+			currentYaw=Solution.SupportOrientations_deq[j];
 
 			// Set the new position into initial solution vector
-			initialSolution(2*N+j)=current_support_foot_x;
-			initialSolution(2*N+M+j)=current_support_foot_y;
+			Solution.initialSolution(2*N+j)=currentSupportFoot_x;
+			Solution.initialSolution(2*N+M+j)=currentSupportFoot_y;
 
 			++j;
 		}
 
 		// Set the ZMP at the center of the foot
-		zx(i-1)=current_support_foot_x;
-		zy(i-1)=current_support_foot_y;
+		zx(i-1)=currentSupportFoot_x;
+		zy(i-1)=currentSupportFoot_y;
 	}
 
 
@@ -622,10 +620,9 @@ void GeneratorVelRef::warm_start(	boost_ublas::vector<double> & initialSolution,
 	Y=prod(Robot_->DynamicsCoPJerk().Um1,zy-MV2_);
 
 	for(int i=0;i<N;i++){
-		initialSolution(i)=X(i);
-		initialSolution(N+i)=Y(i);
+		Solution.initialSolution(i)=X(i);
+		Solution.initialSolution(N+i)=Y(i);
 	}
-
 }
 
 

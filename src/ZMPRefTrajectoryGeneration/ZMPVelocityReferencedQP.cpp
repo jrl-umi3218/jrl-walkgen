@@ -52,7 +52,7 @@ using namespace PatternGeneratorJRL;
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
     string DataFile, CjrlHumanoidDynamicRobot *aHS) :
     ZMPRefTrajectoryGeneration(SPM),
-    Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFC_(0),Problem_()
+    Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFC_(0),Problem_(),Solution_()
 {
 
   TimeBuffer_ = 0.040;
@@ -62,6 +62,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   PerturbationOccured_ = false;
   UpperTimeLimitToUpdate_ = 0.0;
   RobotMass_ = aHS->mass();
+  Solution_.useWarmStart=false;
 
   // Create and initialize online interpolation of feet trajectories
   RFC_ = new RelativeFeetInequalities( SPM,aHS );
@@ -352,7 +353,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // ---------------------
       Problem_.reset();
       Solution_.reset();
-      Solution_.useWarmStart=false;
+
 
       VRQPGenerator_->CurrentTime( Time );
       VelRef_=NewVelRef_;
@@ -408,7 +409,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // --------------
 
       if (Solution_.useWarmStart){
-    	  VRQPGenerator_->warm_start(Solution_.initialSolution, Solution_.SupportStates_deq, Solution_.SupportOrientations_deq);
+    	  VRQPGenerator_->ComputeWarmStart(Solution_);
       }
 
       Problem_.solve(QPProblem_s::QLD, Solution_, QPProblem_s::NONE );

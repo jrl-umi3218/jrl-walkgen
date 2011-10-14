@@ -115,9 +115,7 @@ namespace PatternGeneratorJRL
     /// \param[in] initial_solution initial solution vector
     /// \param[in] PrwSupportStates_deq   PrwSupportStates_deq
     /// \param[in] PrwSupportAngles_deq   PrwSupportAngles_deq
-    void warm_start(boost_ublas::vector<double> & initial_solution,
-    		const std::deque<support_state_t> & PrwSupportStates_deq,
-    		const std::deque<double> & PrwSupportAngles_deq);
+    void ComputeWarmStart(solution_t & Solution);
 
     /// \name Accessors
     /// \{
