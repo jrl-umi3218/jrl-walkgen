@@ -77,15 +77,19 @@ QPProblem_s::QPProblem_s():
 
   last_solution_.resize(1,1);
   last_solution_.empty();
-  resize_all();
   
+	istate_	= 0x0;
+	kx_ 	= 0x0;
 
-	istate_	= new int [n_+m_]; 
-	kx_ 	= new int [n_];
+	b_ =0x0;
 
-	b_ =new double [n_];
+	clamda_= 0x0;
 
-	clamda_= new double [n_+m_]; 	  
+
+  resize_all();
+
+
+
   
 
 }
@@ -123,7 +127,7 @@ QPProblem_s::resize_all()
       XU_.resize(2*NbVariables_, 1,true);
       XU_.fill(1e8); 
       X_.resize(2*NbVariables_, 1,true);
-      iwar_.resize(2*NbVariables_, 1,true);
+      iwar_.resize(2*NbVariables_+1000, 1,true);
       ok=true;
     }
 
@@ -132,6 +136,21 @@ QPProblem_s::resize_all()
       U_.resize(2*(NbConstraints_+2*NbVariables_), 1,true);
       war_.resize(2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000), 1,true);
     }
+
+	if (istate_!=0x0){
+	  delete [] istate_;
+	  delete [] kx_;
+	  delete [] b_;
+	  delete [] clamda_;
+	}
+
+	istate_	= new int [(NbVariables_+NbConstraints_+2)*10];
+	kx_ 	= new int [(NbVariables_+1)*10];
+
+	b_ =new double [(NbVariables_+1)*10];
+
+	clamda_= new double [(NbVariables_+NbConstraints_+2)*10];
+
 }
 
 
@@ -194,8 +213,8 @@ QPProblem_s::solve( Solver Solver, solution_t & Result, const std::deque<support
 
   iout_ = 0;
   iprint_ = 1;
-  lwar_ = 3*nmax_*nmax_/2+ 10*nmax_  + 2*mmax_ + 20000;
-  liwar_ = n_;
+  lwar_ = 2*(3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000);
+  liwar_ = 2*NbVariables_+1000;
   eps_ = 1e-8;
 
 
