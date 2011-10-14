@@ -352,7 +352,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // ---------------------
       Problem_.reset();
       Solution_.reset();
-
+      Solution_.useWarmStart=false;
 
       VRQPGenerator_->CurrentTime( Time );
       VelRef_=NewVelRef_;
