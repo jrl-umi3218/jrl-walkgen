@@ -33,6 +33,7 @@ Polynome::Polynome(int Degree)
 {
   m_Coefficients.clear();
   m_Coefficients.resize(Degree+1);
+  m_Degree = Degree;
 }
 
 Polynome::~Polynome()
