@@ -237,7 +237,7 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
   double D_x[NbEdges] = {0.0, 0.0, 0.0, 0.0};
   double D_y[NbEdges] = {0.0, 0.0, 0.0, 0.0};
   double dc[NbEdges] = {0.0, 0.0, 0.0, 0.0};
-  for( unsigned int i=1;i<=N_;i++ )
+  for( unsigned int i=1;i<=N_;i++ )// Only the previewed support states
     {
       const support_state_t & PrwSupport = SupportStates_deq[i];
 
@@ -340,11 +340,11 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   Pb.add_term_to( QPProblem::MATRIX_DU, MM_, NbConstraints, N_          );
 
   // +D*V
-  compute_term  ( MM_, 1.0, IneqCoP.D.x, IntermedData_->State().V +
-      Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U          );
+  compute_term  ( MM_, 1.0, IneqCoP.D.x, IntermedData_->State().V 						);
+   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U          );
   Pb.add_term_to( QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_                        );
-  compute_term  ( MM_, 1.0, IneqCoP.D.y, IntermedData_->State().V   +
-      Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U          );
+  compute_term  ( MM_, 1.0, IneqCoP.D.y, IntermedData_->State().V  						);
+   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U          );
   Pb.add_term_to( QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed       );
 
   //constant part
