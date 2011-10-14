@@ -115,7 +115,7 @@ namespace PatternGeneratorJRL
     /// \param[in] initial_solution initial solution vector
     /// \param[in] PrwSupportStates_deq   PrwSupportStates_deq
     /// \param[in] PrwSupportAngles_deq   PrwSupportAngles_deq
-    void ComputeWarmStart(solution_t & Solution);
+    void computeWarmStart(solution_t & Solution);
 
     /// \name Accessors
     /// \{

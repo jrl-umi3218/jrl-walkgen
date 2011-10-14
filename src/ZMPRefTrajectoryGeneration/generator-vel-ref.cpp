@@ -558,7 +558,7 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
 }
 
 // compute initial solution wich respect all the constraints
-void GeneratorVelRef::ComputeWarmStart(	solution_t & Solution){
+void GeneratorVelRef::computeWarmStart(	solution_t & Solution){
 
 	int N=Robot_->NbSamplingsPreviewed();
 	int M=Solution.SupportStates_deq[N].StepNumber;
@@ -566,7 +566,7 @@ void GeneratorVelRef::ComputeWarmStart(	solution_t & Solution){
 	Solution.initialSolution.resize(2*N+2*M);
 
 	// Current support state
-	FootType Current_support_foot = Solution.SupportStates_deq[0].Foot;
+	FootType CurrentSupportFoot = Solution.SupportStates_deq[0].Foot;
 	double currentSupportFoot_x = Solution.SupportStates_deq[0].X;
 	double currentSupportFoot_y = Solution.SupportStates_deq[0].Y;
 	double currentYaw = Solution.SupportStates_deq[0].Yaw;
@@ -582,8 +582,8 @@ void GeneratorVelRef::ComputeWarmStart(	solution_t & Solution){
 
 	for(int i=1;i<=N;i++){
 		// Check if the support foot has changed
-		if (Current_support_foot != Solution.SupportStates_deq[i].Foot){
-			Current_support_foot=Solution.SupportStates_deq[i].Foot;
+		if (CurrentSupportFoot != Solution.SupportStates_deq[i].Foot){
+			CurrentSupportFoot=Solution.SupportStates_deq[i].Foot;
 			if (Solution.SupportStates_deq[i].Foot==RIGHT){
 				sgn=1;
 			}else{
