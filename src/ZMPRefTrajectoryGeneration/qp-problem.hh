@@ -68,11 +68,12 @@ namespace PatternGeneratorJRL
 
     enum Tests
     {
-	NONE,
-	ALL,
-	ITT,
-	CTR
+      NONE,
+      ALL,
+      ITT,
+      CTR
     };
+
     //
     //Public methods
     //
@@ -157,7 +158,7 @@ namespace PatternGeneratorJRL
     // Private methods
     //
   private:
-	  
+
     /// \brief Release memory.
     void release_memory();
 
@@ -210,22 +211,22 @@ namespace PatternGeneratorJRL
       {
 
         try {
-	  type * NewArray = 0;
-	  if ((FinalArray.SizeMem_<NbRows*NbCols) ||
-	      (FinalArray.Array_==0))
-	    {
-	      FinalArray.Array_ = new type[NbRows*NbCols];
-	      FinalArray.SizeMem_ = NbRows*NbCols;
-	    }
-	  NewArray = FinalArray.Array_;
-	  
-          fill(NewArray, NbRows*NbCols, (type)0);
-          for(unsigned int i = 0; i < NbRows; i++)
-            for(unsigned int j = 0; j < NbCols; j++)
-              NewArray[i+NbRows*j] = Array_[i+NbRows_*j];
+            type * NewArray = 0;
+            if ((FinalArray.SizeMem_<NbRows*NbCols) ||
+                (FinalArray.Array_==0))
+              {
+                FinalArray.Array_ = new type[NbRows*NbCols];
+                FinalArray.SizeMem_ = NbRows*NbCols;
+              }
+            NewArray = FinalArray.Array_;
 
-          FinalArray.NbRows_ = NbRows;
-          FinalArray.NbCols_ = NbCols;
+            fill(NewArray, NbRows*NbCols, (type)0);
+            for(unsigned int i = 0; i < NbRows; i++)
+              for(unsigned int j = 0; j < NbCols; j++)
+                NewArray[i+NbRows*j] = Array_[i+NbRows_*j];
+
+            FinalArray.NbRows_ = NbRows;
+            FinalArray.NbCols_ = NbCols;
         }
         catch (std::bad_alloc& ba)
         {std::cerr << "bad_alloc caught: " << ba.what() << std::endl; }
@@ -244,31 +245,31 @@ namespace PatternGeneratorJRL
       {
 
         try {
-	  bool Reallocate = false;
-	  type * NewArray = 0;
-	  if (NbRows*NbCols>SizeMem_)
-	    {
-	      NewArray = new type[NbRows*NbCols];
-	      SizeMem_ = NbRows*NbCols;
-	      Reallocate = true;
-	    }
-	  else NewArray = Array_;
+            bool Reallocate = false;
+            type * NewArray = 0;
+            if (NbRows*NbCols>SizeMem_)
+              {
+                NewArray = new type[NbRows*NbCols];
+                SizeMem_ = NbRows*NbCols;
+                Reallocate = true;
+              }
+            else NewArray = Array_;
 
-	  fill(NewArray, NbRows*NbCols, (type)0);
-	  if ((Preserve) && 
-	      (Array_!=0) ) {
-	    for(unsigned int i = 0; i < NbRows_; i++)
-	      for(unsigned int j = 0; j < NbCols_; j++)
-		NewArray[i+NbRows*j] = Array_[i+NbRows_*j]; }
+            fill(NewArray, NbRows*NbCols, (type)0);
+            if ((Preserve) &&
+                (Array_!=0) ) {
+                for(unsigned int i = 0; i < NbRows_; i++)
+                  for(unsigned int j = 0; j < NbCols_; j++)
+                    NewArray[i+NbRows*j] = Array_[i+NbRows_*j]; }
 
-	  if ((Array_!=0) && Reallocate)
-	    {
-	      delete [] Array_;
-	    }
-	  Array_ = NewArray;
-	  
-          NbRows_ = NbRows;
-          NbCols_ = NbCols;
+            if ((Array_!=0) && Reallocate)
+              {
+                delete [] Array_;
+              }
+            Array_ = NewArray;
+
+            NbRows_ = NbRows;
+            NbCols_ = NbCols;
         }
         catch (std::bad_alloc& ba)
         {std::cerr << "bad_alloc caught: " << ba.what() << std::endl; }

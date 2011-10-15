@@ -341,10 +341,10 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
 
   // +D*V
   compute_term  ( MM_, 1.0, IneqCoP.D.x, IntermedData_->State().V 						);
-   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U          );
+  // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U          );
   Pb.add_term_to( QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_                        );
   compute_term  ( MM_, 1.0, IneqCoP.D.y, IntermedData_->State().V  						);
-   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U          );
+  // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U          );
   Pb.add_term_to( QPProblem::MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed       );
 
   //constant part
@@ -361,7 +361,7 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
   compute_term  ( MV_, -1.0, IneqCoP.D.x, Robot_->RightFoot().Dynamics(COP).S, Robot_->RightFoot().State().X );
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
-  */
+   */
   compute_term  ( MV_, -1.0, IneqCoP.D.y,  Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.y         );
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
   /*
@@ -371,7 +371,7 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
   compute_term  ( MV_, -1.0, IneqCoP.D.y, Robot_->RightFoot().Dynamics(COP).S, Robot_->RightFoot().State().Y );
   Pb.add_term_to( QPProblem::VECTOR_DS, MV_,  NbConstraints                                                  );
-  */
+   */
 
   // +D*Vc*FP
   compute_term  ( MV_, IntermedData_->State().SupportState.X, IneqCoP.D.x, IntermedData_->State().Vc    );
@@ -449,7 +449,7 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, RelativeFeetInequalities * R
 
   unsigned int NbStepsPreviewed = PrwSupportStates_deq.back().StepNumber;
   //Equality constraints
-//  build_eq_constraints_feet( PrwSupportStates_deq, NbStepsPreviewed, Pb );
+  //  build_eq_constraints_feet( PrwSupportStates_deq, NbStepsPreviewed, Pb );
 
   //CoP constraints
   linear_inequality_t & IneqCoP = IntermedData_->Inequalities(IntermedQPMat::INEQ_COP);
@@ -560,69 +560,69 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
 // compute initial solution wich respect all the constraints
 void GeneratorVelRef::computeWarmStart(	solution_t & Solution){
 
-	int N=Robot_->NbSamplingsPreviewed();
-	int M=Solution.SupportStates_deq[N].StepNumber;
+  int N=Robot_->NbSamplingsPreviewed();
+  int M=Solution.SupportStates_deq[N].StepNumber;
 
-	Solution.initialSolution.resize(2*N+2*M);
+  Solution.initialSolution.resize(2*N+2*M);
 
-	// Current support state
-	FootType CurrentSupportFoot = Solution.SupportStates_deq[0].Foot;
-	double currentSupportFoot_x = Solution.SupportStates_deq[0].X;
-	double currentSupportFoot_y = Solution.SupportStates_deq[0].Y;
-	double currentYaw = Solution.SupportStates_deq[0].Yaw;
+  // Current support state
+  FootType CurrentSupportFoot = Solution.SupportStates_deq[0].Foot;
+  double currentSupportFoot_x = Solution.SupportStates_deq[0].X;
+  double currentSupportFoot_y = Solution.SupportStates_deq[0].Y;
+  double currentYaw = Solution.SupportStates_deq[0].Yaw;
 
-	// ZMP position vector
-	boost_ublas::vector<double> zx(N);
-	boost_ublas::vector<double> zy(N);
-
-
-	double feetSpacing=0.2;
-	double sgn;
-	int j=0;
-
-	for(int i=1;i<=N;i++){
-		// Check if the support foot has changed
-		if (CurrentSupportFoot != Solution.SupportStates_deq[i].Foot){
-			CurrentSupportFoot=Solution.SupportStates_deq[i].Foot;
-			if (Solution.SupportStates_deq[i].Foot==RIGHT){
-				sgn=1;
-			}else{
-				sgn=-1;
-			}
-
-			// Compute new feasible foot position
-			currentSupportFoot_x+=sgn*feetSpacing*sin(currentYaw);
-			currentSupportFoot_y-=sgn*feetSpacing*cos(currentYaw);
-			currentYaw=Solution.SupportOrientations_deq[j];
-
-			// Set the new position into initial solution vector
-			Solution.initialSolution(2*N+j)=currentSupportFoot_x;
-			Solution.initialSolution(2*N+M+j)=currentSupportFoot_y;
-
-			++j;
-		}
-
-		// Set the ZMP at the center of the foot
-		zx(i-1)=currentSupportFoot_x;
-		zy(i-1)=currentSupportFoot_y;
-	}
+  // ZMP position vector
+  boost_ublas::vector<double> zx(N);
+  boost_ublas::vector<double> zy(N);
 
 
-	boost_ublas::vector<double> X(N);
-	boost_ublas::vector<double> Y(N);
+  double feetSpacing=0.2;
+  double sgn;
+  int j=0;
+
+  for(int i=1;i<=N;i++){
+      // Check if the support foot has changed
+      if (CurrentSupportFoot != Solution.SupportStates_deq[i].Foot){
+          CurrentSupportFoot=Solution.SupportStates_deq[i].Foot;
+          if (Solution.SupportStates_deq[i].Foot==RIGHT){
+              sgn=1;
+          }else{
+              sgn=-1;
+          }
+
+          // Compute new feasible foot position
+          currentSupportFoot_x+=sgn*feetSpacing*sin(currentYaw);
+          currentSupportFoot_y-=sgn*feetSpacing*cos(currentYaw);
+          currentYaw=Solution.SupportOrientations_deq[j];
+
+          // Set the new position into initial solution vector
+          Solution.initialSolution(2*N+j)=currentSupportFoot_x;
+          Solution.initialSolution(2*N+M+j)=currentSupportFoot_y;
+
+          ++j;
+      }
+
+      // Set the ZMP at the center of the foot
+      zx(i-1)=currentSupportFoot_x;
+      zy(i-1)=currentSupportFoot_y;
+  }
 
 
-	// Compute initial jerk
-	MV2_=prod(Robot_->DynamicsCoPJerk().S,IntermedData_->State().CoM.x);
-	X=prod(Robot_->DynamicsCoPJerk().Um1,zx-MV2_);
+  boost_ublas::vector<double> X(N);
+  boost_ublas::vector<double> Y(N);
 
-	MV2_=prod(Robot_->DynamicsCoPJerk().S,IntermedData_->State().CoM.y);
-	Y=prod(Robot_->DynamicsCoPJerk().Um1,zy-MV2_);
 
-	for(int i=0;i<N;i++){
-		Solution.initialSolution(i)=X(i);
-		Solution.initialSolution(N+i)=Y(i);
-	}
+  // Compute initial jerk
+  MV2_=prod(Robot_->DynamicsCoPJerk().S,IntermedData_->State().CoM.x);
+  X=prod(Robot_->DynamicsCoPJerk().Um1,zx-MV2_);
+
+  MV2_=prod(Robot_->DynamicsCoPJerk().S,IntermedData_->State().CoM.y);
+  Y=prod(Robot_->DynamicsCoPJerk().Um1,zy-MV2_);
+
+  for(int i=0;i<N;i++){
+      Solution.initialSolution(i)=X(i);
+      Solution.initialSolution(N+i)=Y(i);
+  }
 }
 
 
