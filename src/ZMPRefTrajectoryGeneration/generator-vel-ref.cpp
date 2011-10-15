@@ -557,72 +557,77 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
 
 }
 
-// compute initial solution wich respect all the constraints
-void GeneratorVelRef::computeWarmStart(	solution_t & Solution){
 
-  int N=Robot_->NbSamplingsPreviewed();
-  int M=Solution.SupportStates_deq[N].StepNumber;
+void
+GeneratorVelRef::compute_warm_start( solution_t & Solution )
+{
 
-  Solution.initialSolution.resize(2*N+2*M);
+  // Initialize:
+  // -----------
+  unsigned int nbSteps = Solution.SupportStates_deq.back().StepNumber;
 
-  // Current support state
-  foot_type_e CurrentSupportFoot = Solution.SupportStates_deq[0].Foot;
-  double currentSupportFoot_x = Solution.SupportStates_deq[0].X;
-  double currentSupportFoot_y = Solution.SupportStates_deq[0].Y;
-  double currentYaw = Solution.SupportStates_deq[0].Yaw;
+  // Copy current support
+  support_state_t currentSupport = Solution.SupportStates_deq.front();
 
   // ZMP position vector
-  boost_ublas::vector<double> zx(N);
-  boost_ublas::vector<double> zy(N);
+  boost_ublas::vector<double> zx(N_);
+  boost_ublas::vector<double> zy(N_);
 
+  double feetSpacing = 0.2;
+  double sgn = 0;
 
-  double feetSpacing=0.2;
-  double sgn;
-  int j=0;
+  Solution.initialSolution.resize(2*N_+2*nbSteps);
 
-  for(int i=1;i<=N;i++){
+  // Compute initial ZMP and foot positions:
+  // ---------------------------------------
+  deque<support_state_t>::iterator prwSS_it = Solution.SupportStates_deq.begin();
+  prwSS_it++;//Point at the first previewed support state
+  unsigned int j = 0;
+  for(unsigned int i=0; i<N_; i++)
+    {
       // Check if the support foot has changed
-      if (CurrentSupportFoot != Solution.SupportStates_deq[i].Foot){
-          CurrentSupportFoot=Solution.SupportStates_deq[i].Foot;
-          if (Solution.SupportStates_deq[i].Foot==RIGHT){
-              sgn=1;
-          }else{
-              sgn=-1;
-          }
+      if (currentSupport.Foot != prwSS_it->Foot)
+        {
+          currentSupport.Foot = prwSS_it->Foot;
 
           // Compute new feasible foot position
-          currentSupportFoot_x+=sgn*feetSpacing*sin(currentYaw);
-          currentSupportFoot_y-=sgn*feetSpacing*cos(currentYaw);
-          currentYaw=Solution.SupportOrientations_deq[j];
+          if(prwSS_it->Foot == RIGHT)
+            sgn=1;
+          else
+            sgn=-1;
+          currentSupport.X += sgn*feetSpacing*sin(currentSupport.Yaw);
+          currentSupport.Y -= sgn*feetSpacing*cos(currentSupport.Yaw);
+          currentSupport.Yaw = Solution.SupportOrientations_deq[j];
 
           // Set the new position into initial solution vector
-          Solution.initialSolution(2*N+j)=currentSupportFoot_x;
-          Solution.initialSolution(2*N+M+j)=currentSupportFoot_y;
+          Solution.initialSolution(2*N_+j) = currentSupport.X;
+          Solution.initialSolution(2*N_+nbSteps+j) = currentSupport.Y;
 
           ++j;
-      }
+        }
 
       // Set the ZMP at the center of the foot
-      zx(i-1)=currentSupportFoot_x;
-      zy(i-1)=currentSupportFoot_y;
-  }
+      zx(i-1) = currentSupport.X;
+      zy(i-1) = currentSupport.Y;
 
+      prwSS_it++;
+    }
 
-  boost_ublas::vector<double> X(N);
-  boost_ublas::vector<double> Y(N);
+  // Compute initial jerk:
+  // ---------------------
+  boost_ublas::vector<double> X(N_);
+  boost_ublas::vector<double> Y(N_);
+  MV2_= prod( Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.x  );
+  X=    prod( Robot_->DynamicsCoPJerk().Um1, zx-MV2_                     );
+  MV2_= prod( Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.y  );
+  Y=    prod( Robot_->DynamicsCoPJerk().Um1, zy-MV2_                     );
 
-
-  // Compute initial jerk
-  MV2_=prod(Robot_->DynamicsCoPJerk().S,IntermedData_->State().CoM.x);
-  X=prod(Robot_->DynamicsCoPJerk().Um1,zx-MV2_);
-
-  MV2_=prod(Robot_->DynamicsCoPJerk().S,IntermedData_->State().CoM.y);
-  Y=prod(Robot_->DynamicsCoPJerk().Um1,zy-MV2_);
-
-  for(int i=0;i<N;i++){
+  for(unsigned int i=0;i<N_;i++)
+    {
       Solution.initialSolution(i)=X(i);
-      Solution.initialSolution(N+i)=Y(i);
-  }
+      Solution.initialSolution(N_+i)=Y(i);
+    }
+
 }
 
 
@@ -634,7 +639,6 @@ GeneratorVelRef::compute_term(MAL_MATRIX (&weightMM, double), double weight,
   weightMM = MAL_RET_A_by_B(M1,M2);
   weightMM *= weight;
 }
-
 
 
 void

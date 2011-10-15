@@ -405,7 +405,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // SOLVE PROBLEM:
       // --------------
       if (Solution_.useWarmStart)
-    	  VRQPGenerator_->computeWarmStart(Solution_);
+    	  VRQPGenerator_->compute_warm_start( Solution_ );
       Problem_.solve(QPProblem_s::QLD, Solution_, QPProblem_s::NONE );
       if(Solution_.Fail>0)
         Problem_.dump( Time );
