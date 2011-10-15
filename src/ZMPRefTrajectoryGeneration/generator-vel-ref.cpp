@@ -566,7 +566,7 @@ void GeneratorVelRef::computeWarmStart(	solution_t & Solution){
   Solution.initialSolution.resize(2*N+2*M);
 
   // Current support state
-  FootType CurrentSupportFoot = Solution.SupportStates_deq[0].Foot;
+  foot_type_e CurrentSupportFoot = Solution.SupportStates_deq[0].Foot;
   double currentSupportFoot_x = Solution.SupportStates_deq[0].X;
   double currentSupportFoot_y = Solution.SupportStates_deq[0].Y;
   double currentYaw = Solution.SupportStates_deq[0].Yaw;

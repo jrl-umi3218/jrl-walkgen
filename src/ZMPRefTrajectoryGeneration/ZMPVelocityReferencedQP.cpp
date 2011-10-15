@@ -353,14 +353,11 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // ---------------------
       Problem_.reset();
       Solution_.reset();
-
-
       VRQPGenerator_->CurrentTime( Time );
       VelRef_=NewVelRef_;
-
       SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
       IntermedData_->Reference( VelRef_ );
-      IntermedData_->CoM( CoM_() );// TODO: still necessary?
+      IntermedData_->CoM( CoM_() );
 
 
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
@@ -407,11 +404,8 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // SOLVE PROBLEM:
       // --------------
-
-      if (Solution_.useWarmStart){
+      if (Solution_.useWarmStart)
     	  VRQPGenerator_->computeWarmStart(Solution_);
-      }
-
       Problem_.solve(QPProblem_s::QLD, Solution_, QPProblem_s::NONE );
       if(Solution_.Fail>0)
         Problem_.dump( Time );

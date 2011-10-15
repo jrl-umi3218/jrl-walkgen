@@ -170,7 +170,7 @@ namespace PatternGeneratorJRL
     void resize( int NbRows, int NbCols, bool Preserve );
   };
 
-  enum FootType
+  enum foot_type_e
   {
     LEFT, RIGHT
   };
@@ -187,7 +187,7 @@ namespace PatternGeneratorJRL
     /// \brief Support phase
     PhaseType Phase;
     /// \brief Support foot
-    FootType Foot;
+    foot_type_e Foot;
     /// \brief Number steps left before double support
     unsigned int NbStepsLeft;
     /// \brief Number of step previewed

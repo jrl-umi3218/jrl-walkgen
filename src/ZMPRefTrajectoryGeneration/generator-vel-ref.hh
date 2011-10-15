@@ -45,7 +45,7 @@
 
 namespace PatternGeneratorJRL
 {
- 
+
   /// \brief Generate optimization problem as proposed in Herdt2010IROS
   class  GeneratorVelRef : public MPCTrajectoryGeneration
   {
@@ -180,7 +180,7 @@ namespace PatternGeneratorJRL
     /// \param[in] NbStepsPreviewed
     /// \param[out] Pb
     void build_constraints_cop( const linear_inequality_t & IneqCoP, unsigned int NbStepsPreviewed,
-         QPProblem & Pb );
+        QPProblem & Pb );
 
     /// \brief Compute feet constraints corresponding to the set of inequalities
     ///

@@ -129,7 +129,7 @@ namespace PatternGeneratorJRL
     int NbStepsAfterRotation_;
 
     /// \brief Current support foot type (SS, DS)
-    FootType CurrentSupportFoot_;
+    foot_type_e CurrentSupportFoot_;
 
     /// \brief True if the end phase of the rotation has begun
     bool PostRotationPhase_;
