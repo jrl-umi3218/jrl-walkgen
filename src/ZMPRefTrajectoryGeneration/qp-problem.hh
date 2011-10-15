@@ -50,7 +50,7 @@ namespace PatternGeneratorJRL
     //
   public:
 
-    enum QPElement
+    enum qp_element_e
     {
       MATRIX_Q,
       MATRIX_DU,
@@ -60,13 +60,13 @@ namespace PatternGeneratorJRL
       VECTOR_XU
     };
 
-    enum Solver
+    enum solver_e
     {
       QLD,
       LSSOL
     };
 
-    enum Tests
+    enum tests_e
     {
       NONE,
       ALL,
@@ -95,19 +95,19 @@ namespace PatternGeneratorJRL
 
     /// \brief Add a matrix to the final optimization problem in array form
     ///
-    /// \param[in] Mat Added matrix
     /// \param[in] Type Target matrix type
+    /// \param[in] Mat Added matrix
     /// \param[in] Row First row inside the target
     /// \param[in] Col First column inside the target
-    void add_term_to( QPElement Type, const boost_ublas::matrix<double> & Mat,
+    void add_term_to( qp_element_e Type, const boost_ublas::matrix<double> & Mat,
         unsigned int Row, unsigned int Col );
 
     /// \brief Add a vector to the final optimization problem in array form
     ///
-    /// \param Mat Added vector
-    /// \param ype Target vector type
-    /// \param row First row inside the target
-    void add_term_to( QPElement Type, const boost_ublas::vector<double> & Vec,
+    /// \param[in] Type Target vector type
+    /// \param[in] Mat Added vector
+    /// \param[in] Row First row inside the target
+    void add_term_to( qp_element_e Type, const boost_ublas::vector<double> & Vec,
         unsigned int Row );
 
     /// \brief Dump current problem on disk.
@@ -118,13 +118,13 @@ namespace PatternGeneratorJRL
     ///
     /// \param Type
     /// \param Filename
-    void dump( QPElement Type, const char * Filename);
+    void dump( qp_element_e Type, const char * Filename);
     /// \}
 
     /// \brief Initialize array
     ///
     /// \param[in] type
-    void clear( QPElement Type );
+    void clear( qp_element_e Type );
 
     /// \brief Set matrices to zero
     void reset();
@@ -134,7 +134,7 @@ namespace PatternGeneratorJRL
     /// \param[in] Solver
     /// \param[out] Result
     /// \param[in] Tests
-    void solve( Solver Solver, solution_t & Result, const Tests & Tests=NONE );
+    void solve( solver_e Solver, solution_t & Result, const tests_e & Tests = NONE );
 
     /// \name Accessors and mutators
     /// \{
@@ -172,7 +172,7 @@ namespace PatternGeneratorJRL
     /// \brief Print_ on disk the parameters that are passed to the solver
     void dump_solver_parameters( std::ostream & aos );
     /// \brief Print_ array
-    void dump( QPElement Type, std::ostream & aos );
+    void dump( qp_element_e Type, std::ostream & aos );
     /// \brief Print_ problem
     void dump_problem( std::ostream & );
     /// \}
@@ -298,14 +298,13 @@ namespace PatternGeneratorJRL
     /// \{
     int *istate_;
     int *kx_ ;
-
     double *b_;
-
     int inform_;
     int iter_;
     double obj_;
     double *clamda_;
     /// \}
+
     /// \name ql-parameters
     /// \{
     int m_, me_, mmax_, n_, nmax_, mnn_;
@@ -313,12 +312,13 @@ namespace PatternGeneratorJRL
     array_s<int> iwar_;
     int iout_, ifail_, iprint_, lwar_, liwar_;
     double eps_;
+    /// \}
 
+    ///  \brief Robot
     RigidBodySystem * Robot_;
 
-    boost_ublas::vector<double> last_solution_;
-
-    /// \}
+    /// \brief Last solution
+    boost_ublas::vector<double> lastSolution_;
 
     /// \brief Number of optimization parameters
     unsigned int NbVariables_;

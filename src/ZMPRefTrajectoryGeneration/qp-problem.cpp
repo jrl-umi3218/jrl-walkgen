@@ -56,7 +56,6 @@ QPProblem_s::QPProblem_s():
       iout_(0),ifail_(0), iprint_(0),
       lwar_(0), liwar_(0), eps_(0),
       NbVariables_(0), NbConstraints_(0),NbEqConstraints_(0)
-
 {
   NbVariables_ = 0;
   NbConstraints_ = 0;
@@ -74,8 +73,8 @@ QPProblem_s::QPProblem_s():
   liwar_ = n_;
   eps_ = 1e-8;
 
-  last_solution_.resize(1,1);
-  last_solution_.empty();
+  lastSolution_.resize(1,1);
+  lastSolution_.empty();
 
   istate_       = 0x0;
   kx_ 	        = 0x0;
@@ -138,14 +137,14 @@ QPProblem_s::resize_all()
 
   istate_	= new int [(NbVariables_+NbConstraints_+2)*10];
   kx_ 	        = new int [(NbVariables_+1)*10];
-  b_            =new double [(NbVariables_+1)*10];
+  b_            = new double [(NbVariables_+1)*10];
   clamda_       = new double [(NbVariables_+NbConstraints_+2)*10];
 
 }
 
 
 void
-QPProblem_s::clear( QPElement Type )
+QPProblem_s::clear( qp_element_e Type )
 {
 
   switch(Type)
@@ -189,10 +188,8 @@ void QPProblem_s::reset()
 }
 
 
-
-
 void
-QPProblem_s::solve( Solver Solver, solution_t & Result, const Tests & tests )
+QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
 {
 
   m_ = NbConstraints_+1;
@@ -324,11 +321,11 @@ QPProblem_s::solve( Solver Solver, solution_t & Result, const Tests & tests )
 
 
 
-    last_solution_.resize(n_);
+    lastSolution_.resize(n_);
     for(int i = 0; i < n_; i++)
       {
         Result.Solution_vec(i) = X_.Array_[i];
-        last_solution_(i)=Result.Solution_vec(i);
+        lastSolution_(i)=Result.Solution_vec(i);
         Result.LBoundsLagr_vec(i) = 0;
         Result.UBoundsLagr_vec(i) = 0;
       }
@@ -357,7 +354,7 @@ QPProblem_s::solve( Solver Solver, solution_t & Result, const Tests & tests )
 
 
 void
-QPProblem_s::add_term_to( QPElement Type, const MAL_MATRIX (&Mat, double),
+QPProblem_s::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
     unsigned int Row,  unsigned int Col )
 {
 
@@ -431,7 +428,7 @@ QPProblem_s::add_term_to( QPElement Type, const MAL_MATRIX (&Mat, double),
 
 
 void
-QPProblem_s::add_term_to( QPElement Type, const MAL_VECTOR (&Vec, double),
+QPProblem_s::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
     unsigned int Row )
 {
 
@@ -499,7 +496,7 @@ QPProblem_s::dump_solver_parameters(std::ostream & aos)
 
 
 void
-QPProblem_s::dump( QPElement Type, std::ostream & aos)
+QPProblem_s::dump( qp_element_e Type, std::ostream & aos)
 {
 
   unsigned int NbRows=0, NbCols=0;
@@ -562,7 +559,7 @@ QPProblem_s::dump( QPElement Type, std::ostream & aos)
 
 
 void
-QPProblem_s::dump( QPElement Type, const char * FileName )
+QPProblem_s::dump( qp_element_e Type, const char * FileName )
 {
   std::ofstream aof;
   aof.open(FileName,std::ofstream::out);
