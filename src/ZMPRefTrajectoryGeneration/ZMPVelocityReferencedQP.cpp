@@ -62,7 +62,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   PerturbationOccured_ = false;
   UpperTimeLimitToUpdate_ = 0.0;
   RobotMass_ = aHS->mass();
-  Solution_.useWarmStart=false;
+  Solution_.useWarmStart=true;
 
   // Create and initialize online interpolation of feet trajectories
   RFC_ = new RelativeFeetInequalities( SPM,aHS );
@@ -406,7 +406,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // --------------
       if (Solution_.useWarmStart)
     	  VRQPGenerator_->compute_warm_start( Solution_ );
-      Problem_.solve(QPProblem_s::QLD, Solution_, QPProblem_s::NONE );
+      Problem_.solve(QPProblem_s::LSSOL, Solution_, QPProblem_s::NONE );
       if(Solution_.Fail>0)
         Problem_.dump( Time );
 
