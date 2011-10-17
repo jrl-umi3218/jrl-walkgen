@@ -605,11 +605,9 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
 
           ++j;
         }
-
       // Set the ZMP at the center of the foot
-      zx(i-1) = currentSupport.X;
-      zy(i-1) = currentSupport.Y;
-
+      zx(i) = currentSupport.X;
+      zy(i) = currentSupport.Y;
       prwSS_it++;
     }
 
