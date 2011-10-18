@@ -38,8 +38,8 @@ GeneratorVelRef::GeneratorVelRef(SimplePluginManager *lSPM,
 : MPCTrajectoryGeneration(lSPM)
 , IntermedData_ (Data)
 , Robot_(Robot)
-, MV_(1,false)
 , MM_(1,1,false)
+, MV_(1,false)
 , MV2_(1,false)
 {
 }

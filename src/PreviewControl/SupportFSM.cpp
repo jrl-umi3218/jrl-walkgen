@@ -35,8 +35,8 @@ SupportFSM::SupportFSM()
 :EPS_(1e-6)
 ,InTranslation_(false)
 ,InRotation_(false)
-,CurrentSupportFoot_(LEFT)
 ,NbStepsAfterRotation_(0)
+,CurrentSupportFoot_(LEFT)
 ,PostRotationPhase_(false)
 {
 
