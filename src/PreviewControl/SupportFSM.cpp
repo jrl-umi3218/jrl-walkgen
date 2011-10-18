@@ -62,7 +62,7 @@ SupportFSM::update_vel_reference(reference_t & Ref, const support_state_t & Curr
       // make two step to avoid the robot's fall
       if (InRotation_ && !InTranslation_){
           Ref.Local.X=2*EPS_;
-          Ref.Local.Y=2*EPS_;
+          Ref.Local.Y=0;
           if (!PostRotationPhase_){
               CurrentSupportFoot_ = CurrentSupport.Foot;
               NbStepsAfterRotation_ = 0;
