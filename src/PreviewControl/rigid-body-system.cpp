@@ -94,10 +94,10 @@ RigidBodySystem::initialize(  )
   CoPDynamicsJerk_.UT.resize(N_,N_,!preserve);
   CoPDynamicsJerk_.UT.clear();
 
-  LeftFoot_.Dynamics(COP).S.resize(N_,3,!preserve);
-  RightFoot_.Dynamics(COP).S.resize(N_,3,!preserve);
-  LeftFoot_.Dynamics(COP).clear();
-  RightFoot_.Dynamics(COP).clear();
+  LeftFoot_.Dynamics ( COP_POSITION ).S.resize(N_,3,!preserve);
+  RightFoot_.Dynamics( COP_POSITION ).S.resize(N_,3,!preserve);
+  LeftFoot_.Dynamics ( COP_POSITION ).clear();
+  RightFoot_.Dynamics( COP_POSITION ).clear();
 
 }
 
@@ -183,12 +183,12 @@ RigidBodySystem::precompute_trajectories( const deque<support_state_t> & Support
   for(unsigned int i=0;i<N_;i++)
     {
       FFTraj_it = FlyingFootTrajectory_deq_.begin();
-	  //Patch :  It happens that  SS_it->NbInstants >  FlyingFootTrajectory_deq_.size()
-	  // which cause a wrong memory access during "FFTraj_it++;" (size of the deque exceedded). 
-	  // Typically, I witnessed during TestHerdt2010
-	  // a case where SS_it->NbInstants = 9  while FlyingFootTrajectory_deq_.size()=8
-	  //TODO: enhance this correction (find its origin).
-	  int endLoop = std::min<unsigned>(SS_it->NbInstants, FlyingFootTrajectory_deq_.size());
+      //Patch :  It happens that  SS_it->NbInstants >  FlyingFootTrajectory_deq_.size()
+      // which cause a wrong memory access during "FFTraj_it++;" (size of the deque exceedded).
+      // Typically, I witnessed during TestHerdt2010
+      // a case where SS_it->NbInstants = 9  while FlyingFootTrajectory_deq_.size()=8
+      //TODO: enhance this correction (find its origin).
+      unsigned int endLoop = std::min<unsigned>(SS_it->NbInstants, FlyingFootTrajectory_deq_.size());
       for(unsigned int j = 0; j < endLoop; j++)
         FFTraj_it++;
       if(SS_it->StateChanged)
@@ -259,26 +259,26 @@ RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
  *
  * Matrix inversion routine.
    Uses lu_factorize and lu_substitute in uBLAS to invert a matrix */
-template<class T>
-bool invertMatrix (const boost_ublas::matrix<T>& input, boost_ublas::matrix<T>& inverse) {
-	using namespace boost::numeric::ublas;
-	typedef permutation_matrix<std::size_t> pmatrix;
-	// create a working copy of the input
-	matrix<T> A(input);
-	// create a permutation matrix for the LU-factorization
-	pmatrix pm(A.size1());
+template<class T> bool
+invertMatrix (const boost_ublas::matrix<T>& input, boost_ublas::matrix<T>& inverse) {
+  using namespace boost::numeric::ublas;
+  typedef permutation_matrix<std::size_t> pmatrix;
+  // create a working copy of the input
+  matrix<T> A(input);
+  // create a permutation matrix for the LU-factorization
+  pmatrix pm(A.size1());
 
-	// perform LU-factorization
-	int res = lu_factorize(A,pm);
-       if( res != 0 ) return false;
+  // perform LU-factorization
+  int res = lu_factorize(A,pm);
+  if( res != 0 ) return false;
 
-	// create identity matrix of "inverse"
-	inverse.assign(boost_ublas::identity_matrix<T>(A.size1()));
+  // create identity matrix of "inverse"
+  inverse.assign(boost_ublas::identity_matrix<T>(A.size1()));
 
-	// backsubstitute to get the inverse
-	lu_substitute(A, pm, inverse);
+  // backsubstitute to get the inverse
+  lu_substitute(A, pm, inverse);
 
-	return true;
+  return true;
 }
 
 
@@ -291,12 +291,12 @@ RigidBodySystem::compute_dyn_cop( const std::deque<support_state_t> & SupportSta
   unsigned int NbSteps = SupportStates_deq.back().StepNumber;
   bool preserve = true;
   //TODO: Use of bounded_array to avoid dynamic allocation
-  LeftFoot_.Dynamics(COP).U.resize(N_,NbSteps,!preserve);
-  LeftFoot_.Dynamics(COP).UT.resize(NbSteps,N_,!preserve);
-  RightFoot_.Dynamics(COP).U.resize(N_,NbSteps,!preserve);
-  RightFoot_.Dynamics(COP).UT.resize(NbSteps,N_,!preserve);
-  LeftFoot_.Dynamics(COP).clear();
-  RightFoot_.Dynamics(COP).clear();
+  LeftFoot_. Dynamics( COP_POSITION ).U.resize(N_,NbSteps,!preserve);
+  LeftFoot_. Dynamics( COP_POSITION ).UT.resize(NbSteps,N_,!preserve);
+  RightFoot_.Dynamics( COP_POSITION ).U.resize(N_,NbSteps,!preserve);
+  RightFoot_.Dynamics( COP_POSITION ).UT.resize(NbSteps,N_,!preserve);
+  LeftFoot_. Dynamics( COP_POSITION ).clear();
+  RightFoot_.Dynamics( COP_POSITION ).clear();
 
   CoPDynamicsJerk_.clear();
 
@@ -424,7 +424,7 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
             Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
       }
     break;
-  case COP:
+  case COP_POSITION:
     break;
 
   }

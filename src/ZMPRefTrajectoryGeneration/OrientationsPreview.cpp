@@ -220,13 +220,28 @@ OrientationsPreview::preview_orientations(double Time,
 
     }
 
-  // PREVIEW TRUNK ORIENTATIONS:
-  // ---------------------------
+  // PREVIEW TRUNK AND SUPPORT ORIENTATIONS:
+  // ---------------------------------------
   PreviewedTrunkOrientations_deq.push_back(TrunkState_.yaw[0]);
   PreviewedTrunkOrientations_deq.push_back(TrunkStateT_.yaw[0]);
-  for(unsigned int i = 1; i<N_; i++ )
+  unsigned j = 0;
+  for(unsigned i = 1; i<N_; i++ )
     {
       PreviewedTrunkOrientations_deq.push_back(TrunkStateT_.yaw[0]+TrunkStateT_.yaw[1]*T_);
+    }
+
+  std::deque<support_state_t>::iterator prwSS_it = Solution.SupportStates_deq.begin();
+  double supportAngle = prwSS_it->Yaw;
+  prwSS_it++;//Point at the first previewed instant
+  for(unsigned i = 0; i<N_; i++ )
+    {
+      if(prwSS_it->StateChanged == true)
+        {
+          supportAngle = Solution.SupportOrientations_deq[j];
+          j++;
+        }
+      prwSS_it->Yaw = supportAngle;
+      prwSS_it++;
     }
 
 }

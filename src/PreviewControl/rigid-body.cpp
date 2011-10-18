@@ -88,10 +88,10 @@ int RigidBody::initialize()
 // ACCESSORS:
 // ----------
 linear_dynamics_t const &
-RigidBody::Dynamics( DynamicsType Type ) const
+RigidBody::Dynamics( dynamics_e type ) const
 {
 
-  switch(Type)
+  switch(type)
   {
   case POSITION:
     return PositionDynamics_;
@@ -101,7 +101,7 @@ RigidBody::Dynamics( DynamicsType Type ) const
     return AccelerationDynamics_;
   case JERK:
     return JerkDynamics_;
-  case COP:
+  case COP_POSITION:
     return CoPDynamics_;
   }
 
@@ -110,10 +110,10 @@ RigidBody::Dynamics( DynamicsType Type ) const
 }
 
 linear_dynamics_t &
-RigidBody::Dynamics( DynamicsType Type )
+RigidBody::Dynamics( dynamics_e type )
 {
 
-  switch(Type)
+  switch(type)
   {
   case POSITION:
     return PositionDynamics_;
@@ -123,7 +123,7 @@ RigidBody::Dynamics( DynamicsType Type )
     return AccelerationDynamics_;
   case JERK:
     return JerkDynamics_;
-  case COP:
+  case COP_POSITION:
     return CoPDynamics_;
   }
 

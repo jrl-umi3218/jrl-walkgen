@@ -82,14 +82,14 @@ protected:
   void startTurningLeft(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.2 0.0 0.0");
+      istringstream strm2(":setVelReference  0.2 0.0 0.2");
       aPGI.ParseCmd(strm2);
     }
   }
   void startTurningRight(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.2 0.0 -0.0");
+      istringstream strm2(":setVelReference  0.2 0.0 -0.2");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -97,7 +97,7 @@ protected:
   void startTurningRightOnSpot(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.2 0.0 0.0");
+      istringstream strm2(":setVelReference  0.0 0.0 -0.2");
       aPGI.ParseCmd(strm2);
     }
   }

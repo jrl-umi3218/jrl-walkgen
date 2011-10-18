@@ -172,7 +172,7 @@ namespace PatternGeneratorJRL
     IntermedQPMat * IntermedData_;
 
     /// \brief Object creating linear inequalities relative to feet centers.
-    RelativeFeetInequalities * RFC_;
+    RelativeFeetInequalities * RFI_;
 
     /// \brief Final optimization problem
     QPProblem Problem_;

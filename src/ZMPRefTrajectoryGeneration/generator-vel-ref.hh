@@ -57,7 +57,7 @@ namespace PatternGeneratorJRL
 
     /// \name Constructors and destructors.
     /// \{
-    GeneratorVelRef( SimplePluginManager *lSPM, IntermedQPMat * Data, RigidBodySystem * Robot );
+    GeneratorVelRef( SimplePluginManager *lSPM, IntermedQPMat * Data, RigidBodySystem * Robot, RelativeFeetInequalities * RFC );
     ~GeneratorVelRef();
     /// \}
 
@@ -86,17 +86,8 @@ namespace PatternGeneratorJRL
     /// \brief Compute constraints
     ///
     /// \param[out] Pb
-    /// \param[in] RFI Inequalities generator
-    /// \param[in] LeftFootPositions_deq
-    /// \param[in] RightFootPositions_deq
-    /// \param[in] PrwSupportStates_deq
-    /// \param[in] PrwSupportAngles_deq
-    void build_constraints( QPProblem & Pb,
-        RelativeFeetInequalities * RFI,
-        const std::deque< FootAbsolutePosition> & LeftFootPositions_deq,
-        const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
-        const std::deque<support_state_t> & PrwSupportStates_deq,
-        const std::deque<double> & PrwSupportAngles_deq);
+    /// \param[in] Solution
+    void build_constraints( QPProblem & Pb, const solution_t & Solution );
 
     /// \brief Build the constant part of the objective
     ///
@@ -121,7 +112,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Weight
     /// \param[in] Type Objective type
-    void Ponderation(double Weight, int Type );
+    void Ponderation(double weight, objective_e type );
 
     inline void Reference(const reference_t & Ref)
     {  IntermedData_->Reference(Ref); };
@@ -145,32 +136,18 @@ namespace PatternGeneratorJRL
     ///
     /// \param[out] Inequalities
     /// \param[in] FCALS
-    /// \param[in] AbsoluteLeftFootPositions
-    /// \param[in] AbsoluteRightFootPositions
-    /// \param[in] deqSupportStates
-    /// \param[in] PreviewedSupportAngles
+    /// \param[in] SupportStates_deq
     void build_inequalities_cop(linear_inequality_t & Inequalities,
-        RelativeFeetInequalities * FCALS,
-        const std::deque< FootAbsolutePosition> & LeftFootPositions_deq,
-        const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
-        const std::deque<support_state_t> & SupportStates_deq,
-        const std::deque<double> & PreviewedSupportAngles_deq) const;
+        const std::deque<support_state_t> & SupportStates_deq) const;
 
     /// \brief Generate a queue of inequality constraints on
     /// the feet positions with respect to previous foot positions
     ///
     /// \param[out] Inequalities
     /// \param[in] FCALS
-    /// \param[in] LeftFootPositions_deq
-    /// \param[in] RightFootPositions_deq
     /// \param[in] SupportStates_deq
-    /// \param[in] PreviewedSupportAngles_deq
     void build_inequalities_feet(linear_inequality_t & Inequalities,
-        RelativeFeetInequalities * FCALS,
-        const std::deque< FootAbsolutePosition> & LeftFootPositions_deq,
-        const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
-        const std::deque<support_state_t> & SupportStates_deq,
-        const std::deque<double> & PreviewedSupportAngles_deq) const;
+        const std::deque<support_state_t> & SupportStates_deq) const;
 
     /// \brief Compute CoP constraints corresponding to the set of inequalities
     ///
@@ -229,6 +206,7 @@ namespace PatternGeneratorJRL
 
     IntermedQPMat * IntermedData_;
     RigidBodySystem * Robot_;
+    RelativeFeetInequalities * RFI_;
 
 
     //
