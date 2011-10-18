@@ -221,7 +221,7 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
   convex_hull_t ZMPFeasibilityEdges;
   RFI_->set_vertices( ZMPFeasibilityEdges,
       *prwSS_it,
-      RelativeFeetInequalities::ZMP_CONSTRAINTS );
+      INEQ_COP );
 
   const unsigned nbEdges = 4;
   double D_x[nbEdges] = {0.0, 0.0, 0.0, 0.0};
@@ -233,7 +233,7 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
     {
       if( prwSS_it->StateChanged )
         RFI_->set_vertices( ZMPFeasibilityEdges,*prwSS_it,
-            RelativeFeetInequalities::ZMP_CONSTRAINTS );
+            INEQ_COP );
 
       RFI_->compute_linear_system( ZMPFeasibilityEdges, D_x, D_y, dc, *prwSS_it );
 
@@ -275,7 +275,7 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
         {
           prwSS_it--;//Take the support state before
           RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it,
-              RelativeFeetInequalities::FOOT_CONSTRAINTS );
+              INEQ_FEET );
           prwSS_it++;
           RFI_->compute_linear_system( FootFeasibilityEdges, Dx, Dy, dc, *prwSS_it );
 

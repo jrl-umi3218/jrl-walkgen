@@ -85,14 +85,14 @@ RelativeFeetInequalities::init_convex_hulls()
   FootPosEdges_.LeftDS.resize(5);
   FootPosEdges_.LeftSS.resize(5);
   double LeftFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
-  double LeftFPosEdgesY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
+  double LeftFPosEdgesY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
   FootPosEdges_.LeftDS.set(LeftFPosEdgesX,LeftFPosEdgesY);
   FootPosEdges_.LeftSS.set(LeftFPosEdgesX,LeftFPosEdgesY);
 
   FootPosEdges_.RightDS.resize(5);
   FootPosEdges_.RightSS.resize(5);
   double RightFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
-  double RightFPosEdgesY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
+  double RightFPosEdgesY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
   FootPosEdges_.RightDS.set(RightFPosEdgesX,RightFPosEdgesY);
   FootPosEdges_.RightSS.set(RightFPosEdgesX,RightFPosEdgesY);
 
@@ -155,40 +155,39 @@ RelativeFeetInequalities::set_feet_dimensions( CjrlHumanoidDynamicRobot *aHS )
 
 int
 RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
-    double Orientation,
-    const support_state_t & PrwSupport,
-    int Type)
+    const support_state_t & Support,
+    ineq_e type)
 {
 
   edges_s * ConvexHull_p = 0;
 
-  switch(Type)
+  switch(type)
     {
-    case ZMP_CONSTRAINTS:
+    case INEQ_COP:
       ConvexHull_p = & ZMPPosEdges_;
       break;
-    case FOOT_CONSTRAINTS:
+    case INEQ_FEET:
       ConvexHull_p = & FootPosEdges_;
       break;
 
     }
   //Prepare the computation of the convex hull
-  if( PrwSupport.Foot == LEFT )
+  if( Support.Foot == LEFT )
     {
-      if( PrwSupport.Phase == DS )
+      if( Support.Phase == DS )
         ConvexHull = ConvexHull_p->LeftDS;
       else
         ConvexHull = ConvexHull_p->LeftSS;
     }
   else
     {
-      if( PrwSupport.Phase == DS )
+      if( Support.Phase == DS )
         ConvexHull = ConvexHull_p->RightDS;
       else
         ConvexHull = ConvexHull_p->RightSS;
     }
 
-  ConvexHull.rotate(Orientation);
+  ConvexHull.rotate(Support.Yaw);
 
   return 0;
 
