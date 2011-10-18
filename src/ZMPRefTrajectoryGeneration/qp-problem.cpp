@@ -73,9 +73,6 @@ QPProblem_s::QPProblem_s():
   liwar_ = n_;
   eps_ = 1e-8;
 
-  lastSolution_.resize(1,1);
-  lastSolution_.empty();
-
   istate_       = 0x0;
   kx_ 	        = 0x0;
   b_            = 0x0;
@@ -252,11 +249,15 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
 
     break;
   case LSSOL:
-#ifdef LSSOL_FOUND
-
-    sendOption("Print Level = 0");
-
+//#ifdef LSSOL_FOUND
+    if (tests==SOLVER || tests==ALL){
+    	sendOption("Print Level = 1000");
+    }else{
+    	sendOption("Print Level = 0");
+    }
     sendOption("Problem Type = QP2");
+    sendOption("warm start");
+    sendOption("Infinite Bound = 1.0E+7");
 
     double *bl=new double[n_+m_];
     double *bu=new double[n_+m_];
@@ -265,6 +266,7 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
         bl[i]=XL_.Array_[i];
         bu[i]=XU_.Array_[i];
     }
+
     int size2=size1+me_;
     for(int i=size1;i<size2;++i){
         bl[i]=-DS_.Array_[i-size1];
@@ -277,12 +279,17 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
     }
 
     if (Result.useWarmStart){
+    	istate_[0]=0;
         for(unsigned i=0;i<NbVariables_;++i){
             X_.Array_[i]=Result.initialSolution(i);
+            istate_[i+1]=0;
+        }
+        for(unsigned i=0;i<NbConstraints_;++i){
+        	istate_[i+n_+1]=Result.initialConstraint(i);
         }
     }
 
-    if (tests==CTR || tests==ALL){
+    if (tests==CTR1 || tests==ALL){
         // Check if initial solution respect all the constraints
         boost_ublas::matrix<double> DU(NbConstraints_, NbVariables_);
         boost_ublas::vector<double> XX(NbVariables_);
@@ -302,9 +309,12 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
         tmp=prod(DU,XX);
         int nb_ctr=0;
         for(unsigned i=0;i<NbConstraints_;++i){
-            if (tmp(i)+DS(i)<-1e-6){
-                std::cout << "Unrespected constraint " << i << " : " << tmp(i) << " < " << -DS(i)  << std::endl;
+            if (tmp(i)+DS(i)<0 && Result.initialConstraint(i)==0){
+                std::cout << "Unrespected constraint " << i << " : " << tmp(i) << " <  " << -DS(i)  << std::endl;
                 ++nb_ctr;
+            }else if(tmp(i)+DS(i)!=0 && Result.initialConstraint(i)!=0){
+            	std::cout << "Unrespected constraint " << i << " : " << tmp(i) << " != " << -DS(i)  << std::endl;
+            	 ++nb_ctr;
             }
         }
         std::cout << std::endl << "Nb unrespected constraints : " << nb_ctr << std::endl;
@@ -321,16 +331,16 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
 
 
 
-    lastSolution_.resize(n_);
+
     for(int i = 0; i < n_; i++)
       {
         Result.Solution_vec(i) = X_.Array_[i];
-        lastSolution_(i)=Result.Solution_vec(i);
         Result.LBoundsLagr_vec(i) = 0;
         Result.UBoundsLagr_vec(i) = 0;
       }
     Result.Fail=0;
     Result.Print = 0;
+
     for(int i = 0; i < m_; i++)
       {
         Result.ConstrLagr_vec(i) = 0;
@@ -341,10 +351,75 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
     if (tests==ITT || tests==ALL){
         std::cout << "nb iterations : " << iter_ << std::endl;
     }
+    if (tests==CTR2 || tests==ALL){
+		for(int i=0;i<16;++i){
+			for (int j=0;j<4;++j){
+				if (Result.initialConstraint(i*4+j)==0){
+					std::cout << '.';
+				}else{
+					std::cout << Result.initialConstraint(i*4+j);
+				}
 
-#else
-    std::cerr << " LSSOL_FOUND not available" << std::endl;
-#endif //LSSOL_FOUND
+
+			}
+			std::cout << " ";
+		}
+		std::cout << " ";
+		for(int i=0;i<(NbConstraints_-64)/5;++i){
+			for (int j=0;j<5;++j){
+				if (Result.initialConstraint(i*5+j+64)==0){
+					std::cout << '.';
+				}else{
+					std::cout << Result.initialConstraint(i*5+j+64);
+				}
+			}
+			std::cout << " ";
+		}
+		std::cout << std::endl;
+		for(int i=0;i<16;++i){
+			for (int j=0;j<4;++j){
+				if (istate_[i*4+j+n_+1]==0){
+					std::cout << '.';
+				}else{
+					std::cout << istate_[i*4+j+n_+1];
+				}
+
+
+			}
+			std::cout << " ";
+		}
+		std::cout << " ";
+		for(int i=0;i<(NbConstraints_-64)/5;++i){
+			for (int j=0;j<5;++j){
+				if (istate_[i*5+j+64+n_+1]==0){
+					std::cout << '.';
+				}else{
+					std::cout << istate_[i*5+j+64+n_+1];
+				}
+			}
+			std::cout << " ";
+		}
+
+
+
+		int nb=0;
+		for(int i=1;i<m_;++i){
+			if (istate_[i+n_] != Result.initialConstraint(i-1)){
+				++nb;
+			}
+		}
+
+		std::cout << "    " << iter_ << "    " << nb << std::endl<< std::endl;
+    }
+
+
+    for (int i=1; i < m_ ;++i){
+    	Result.initialConstraint(i-1) = istate_[i+n_];
+    }
+
+//#else
+//   std::cerr << " LSSOL_FOUND not available" << std::endl;
+//#endif //LSSOL_FOUND
 
     break;
 

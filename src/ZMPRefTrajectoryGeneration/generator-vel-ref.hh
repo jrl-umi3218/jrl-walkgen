@@ -113,7 +113,7 @@ namespace PatternGeneratorJRL
     /// \brief Compute the initial solution vector for warm start
     ///
     /// \param[in] Solution
-    void compute_warm_start(solution_t & Solution);
+    void compute_warm_start(solution_t & Solution, RelativeFeetInequalities * RFI);
 
     /// \name Accessors
     /// \{
@@ -242,6 +242,7 @@ namespace PatternGeneratorJRL
     boost_ublas::vector<double> MV_;
     boost_ublas::vector<double> MV2_;
     /// \}
+
 
 
   };

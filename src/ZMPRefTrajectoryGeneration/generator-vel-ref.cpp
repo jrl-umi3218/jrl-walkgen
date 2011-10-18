@@ -301,7 +301,7 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
       //foot positioning constraints
       if( PrwSupport.StateChanged && PrwSupport.StepNumber>0 && PrwSupport.Phase != DS)
         {
-          SupportAngle = PreviewedSupportAngles_deq[PrwSupport.StepNumber-1];
+          //SupportAngle = PreviewedSupportAngles_deq[PrwSupport.StepNumber-1];
           if( PrwSupport.StepNumber == 1 )
             SupportAngle = CurrentSupportAngle;
           else
@@ -559,13 +559,13 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
 
 
 void
-GeneratorVelRef::compute_warm_start( solution_t & Solution )
+GeneratorVelRef::compute_warm_start( solution_t & Solution , RelativeFeetInequalities * RFI )
 {
 
   // Initialize:
   // -----------
   unsigned int nbSteps = Solution.SupportStates_deq.back().StepNumber;
-
+  unsigned int nbStepsMax = 4;
   // Copy current support
   support_state_t currentSupport = Solution.SupportStates_deq.front();
 
@@ -573,42 +573,121 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
   boost_ublas::vector<double> zx(N_);
   boost_ublas::vector<double> zy(N_);
 
-  double feetSpacing = 0.2;
-  double sgn = 0;
-
   Solution.initialSolution.resize(2*N_+2*nbSteps);
+
+  // Compute initial constraints:
+  // ---------------------
+  unsigned int size=Solution.initialConstraint.size();
+  boost_ublas::vector<int> initialConstraintTmp;
+  initialConstraintTmp = Solution.initialConstraint;
+  if (size>=4*N_){
+	  for(unsigned int i=0;i<4*(N_-1);++i){
+		  Solution.initialConstraint(i)=initialConstraintTmp(i+4);
+	  }
+	  for(unsigned int i=4*(N_-1);i<4*N_;++i){
+		  Solution.initialConstraint(i)=initialConstraintTmp(i);
+	  }
+	  for(unsigned int i=4*N_;i<4*N_+5*nbSteps;++i){
+		  Solution.initialConstraint(i)=initialConstraintTmp(i);
+	  }
+	  for(unsigned int i=4*N_+5*nbSteps; i<4*N_+5*nbStepsMax; ++i){
+		  Solution.initialConstraint(i)=0;
+	  }
+  }else{
+	  Solution.initialConstraint.resize(4*N_+5*nbStepsMax);
+
+	  for(unsigned int i=0;i<4*N_+5*nbStepsMax;++i){
+		  Solution.initialConstraint(i)=0;
+	  }
+  }
 
   // Compute initial ZMP and foot positions:
   // ---------------------------------------
   deque<support_state_t>::iterator prwSS_it = Solution.SupportStates_deq.begin();
+  deque<double>::iterator prwOr_it = Solution.SupportOrientations_deq.begin();
+
   prwSS_it++;//Point at the first previewed support state
   unsigned int j = 0;
+  convex_hull_t FootFeasibilityEdges, COPFeasibilityEdges;
+  double shiftx,shifty;
+  bool noActiveConstraints;
   for(unsigned int i=0; i<N_; i++)
     {
+	  RFI->set_vertices( COPFeasibilityEdges, currentSupport.Yaw, *prwSS_it, RelativeFeetInequalities::ZMP_CONSTRAINTS );
       // Check if the support foot has changed
       if (currentSupport.Foot != prwSS_it->Foot)
         {
           currentSupport.Foot = prwSS_it->Foot;
+          // Place the foot on actives contraints
+          shiftx=shifty=0;
+          noActiveConstraints=true;
+          RFI->set_vertices( FootFeasibilityEdges, currentSupport.Yaw, *prwSS_it, RelativeFeetInequalities::FOOT_CONSTRAINTS );
+          for(unsigned int k=0;k<5;++k){
+        	  if (Solution.initialConstraint(k+64+j*5)!=0){
+        		  if (k==4){
+        			  if (Solution.initialConstraint(0+64+j*5)!=0){
+        				  shiftx=FootFeasibilityEdges.X[0];
+        				  shifty=FootFeasibilityEdges.Y[0];
+        			  }else{
+        				  shiftx=(FootFeasibilityEdges.X[4]+FootFeasibilityEdges.X[0])/2;
+        				  shifty=(FootFeasibilityEdges.Y[4]+FootFeasibilityEdges.Y[0])/2;
+        			  }
+        		  }else{
+        			  if (Solution.initialConstraint(k+1+64+j*5)!=0){
+        				  shiftx=FootFeasibilityEdges.X[k+1];
+        				  shifty=FootFeasibilityEdges.Y[k+1];
+        			  }else{
+        				  shiftx=(FootFeasibilityEdges.X[k]+FootFeasibilityEdges.X[k+1])/2;
+        				  shifty=(FootFeasibilityEdges.Y[k]+FootFeasibilityEdges.Y[k+1])/2;
+        			  }
+        		  }
 
-          // Compute new feasible foot position
-          if(prwSS_it->Foot == RIGHT)
-            sgn=1;
-          else
-            sgn=-1;
-          currentSupport.X += sgn*feetSpacing*sin(currentSupport.Yaw);
-          currentSupport.Y -= sgn*feetSpacing*cos(currentSupport.Yaw);
-          currentSupport.Yaw = Solution.SupportOrientations_deq[j];
+        		  noActiveConstraints=false;
+        		  break;
+        	  }
+          }
+          if (noActiveConstraints){
+			  shiftx=(FootFeasibilityEdges.X[4]+FootFeasibilityEdges.X[0])/2;
+			  shifty=(FootFeasibilityEdges.Y[4]+FootFeasibilityEdges.Y[0])/2;
+          }
+
+          currentSupport.X += shiftx;
+          currentSupport.Y += shifty;
 
           // Set the new position into initial solution vector
           Solution.initialSolution(2*N_+j) = currentSupport.X;
           Solution.initialSolution(2*N_+nbSteps+j) = currentSupport.Y;
-
+          currentSupport.Yaw = *prwOr_it;
+          ++prwOr_it;
           ++j;
         }
-      // Set the ZMP at the center of the foot
-      zx(i) = currentSupport.X;
-      zy(i) = currentSupport.Y;
-      prwSS_it++;
+      // Set the ZMP at the midle of active constraints
+      shiftx=shifty=0;
+      for(unsigned int k=0;k<4;++k){
+    	  if (Solution.initialConstraint(k+i*4)==1){
+    		  if (k==3){
+    			  if (Solution.initialConstraint(0+i*4)==1){
+    				  shiftx=COPFeasibilityEdges.X[0];
+    				  shifty=COPFeasibilityEdges.Y[0];
+    			  }else{
+    				  shiftx=(COPFeasibilityEdges.X[3]+COPFeasibilityEdges.X[0])/2;
+    				  shifty=(COPFeasibilityEdges.Y[3]+COPFeasibilityEdges.Y[0])/2;
+    			  }
+    		  }else{
+    			  if (Solution.initialConstraint(k+1+i*4)==1){
+    				  shiftx=COPFeasibilityEdges.X[k+1];
+    				  shifty=COPFeasibilityEdges.Y[k+1];
+    			  }else{
+    				  shiftx=(COPFeasibilityEdges.X[k]+COPFeasibilityEdges.X[k+1])/2;
+    				  shifty=(COPFeasibilityEdges.Y[k]+COPFeasibilityEdges.Y[k+1])/2;
+    			  }
+    		  }
+    		  break;
+    	  }
+      }
+      zx(i) = currentSupport.X+shiftx;
+      zy(i) = currentSupport.Y+shifty;
+      ++prwSS_it;
     }
 
   // Compute initial jerk:

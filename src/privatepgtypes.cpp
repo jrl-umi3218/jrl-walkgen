@@ -242,7 +242,7 @@ namespace PatternGeneratorJRL
 
   solution_t::solution_t():
       NbVariables(0),NbConstraints(0),Fail(0),Print(0),
-      Solution_vec(0),SupportOrientations_deq(0),SupportStates_deq(0),
+      Solution_vec(0),initialSolution(1),initialConstraint(1),SupportOrientations_deq(0),SupportStates_deq(0),
       ConstrLagr_vec(0),LBoundsLagr_vec(0),UBoundsLagr_vec(0)
   {  }
 

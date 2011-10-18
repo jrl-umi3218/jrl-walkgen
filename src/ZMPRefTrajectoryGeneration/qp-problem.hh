@@ -71,7 +71,9 @@ namespace PatternGeneratorJRL
       NONE,
       ALL,
       ITT,
-      CTR
+      CTR1,
+      CTR2,
+      SOLVER
     };
 
     //
@@ -316,9 +318,6 @@ namespace PatternGeneratorJRL
 
     ///  \brief Robot
     RigidBodySystem * Robot_;
-
-    /// \brief Last solution
-    boost_ublas::vector<double> lastSolution_;
 
     /// \brief Number of optimization parameters
     unsigned int NbVariables_;

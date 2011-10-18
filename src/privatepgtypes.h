@@ -237,6 +237,7 @@ namespace PatternGeneratorJRL
     ///   IPRINT > 0 :  BRIEF OUTPUT IN ERROR CASES.
     int Print;
 
+    /// \brief True if you want to use warmstart (only with LSSOL)
     bool useWarmStart ;
 
     /// \name Solution vectors
@@ -245,6 +246,8 @@ namespace PatternGeneratorJRL
     boost_ublas::vector<double> Solution_vec;
     /// \brief QP initial solution vector
     boost_ublas::vector<double> initialSolution;
+    /// \brief QP initial constraint vector
+    boost_ublas::vector<int>  initialConstraint;
     /// \brief Previewed support orientations
     std::deque<double> SupportOrientations_deq;
     /// \brief Previewed trunk orientations (only yaw as for now)
