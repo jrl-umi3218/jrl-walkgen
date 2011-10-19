@@ -68,27 +68,28 @@ GeneratorVelRef::Ponderation( double weight, objective_e type)
 
 
 void
-GeneratorVelRef::preview_support_states( double Time, const SupportFSM * FSM,
+GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
     const deque<FootAbsolutePosition> & FinalLeftFootTraj_deq, const deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
     deque<support_state_t> & SupportStates_deq )
 {
+
+  const FootAbsolutePosition * FAP = 0;
 
   // DETERMINE CURRENT SUPPORT STATE:
   // --------------------------------
   const reference_t & RefVel = IntermedData_->Reference();
   support_state_t & CurrentSupport = IntermedData_->SupportState();
-  FSM->set_support_state(CurrentTime_, 0, CurrentSupport, RefVel);
-  if(CurrentSupport.StateChanged == true)
+  FSM->set_support_state( CurrentTime_, 0, CurrentSupport, RefVel );
+  if( CurrentSupport.StateChanged == true )
     {
-      FootAbsolutePosition FAP;
-      if(CurrentSupport.Foot == LEFT)
-        FAP = FinalLeftFootTraj_deq.back();
+      if( CurrentSupport.Foot == LEFT )
+        FAP = & FinalLeftFootTraj_deq.front();
       else
-        FAP = FinalRightFootTraj_deq.back();
-      CurrentSupport.X = FAP.x;
-      CurrentSupport.Y = FAP.y;
-      CurrentSupport.Yaw = FAP.theta*M_PI/180.0;
-      CurrentSupport.StartTime = Time;
+        FAP = & FinalRightFootTraj_deq.front();
+      CurrentSupport.X = FAP->x;
+      CurrentSupport.Y = FAP->y;
+      CurrentSupport.Yaw = FAP->theta*M_PI/180.0;
+      CurrentSupport.StartTime = time;
     }
   SupportStates_deq.push_back( CurrentSupport );
   IntermedData_->SupportState( CurrentSupport );
@@ -99,9 +100,20 @@ GeneratorVelRef::preview_support_states( double Time, const SupportFSM * FSM,
   // initialize the previewed support state before previewing
   support_state_t PreviewedSupport = CurrentSupport;
   PreviewedSupport.StepNumber  = 0;
-  for(unsigned int i=1;i<=N_;i++)
+  for( unsigned spNb=1; spNb<=N_; spNb++ )
     {
-      FSM->set_support_state( CurrentTime_, i, PreviewedSupport, RefVel );
+      FSM->set_support_state( CurrentTime_, spNb, PreviewedSupport, RefVel );
+      if( spNb == 1 && PreviewedSupport.StateChanged )//Foot down
+        {
+          if( PreviewedSupport.Foot == LEFT )
+            FAP = & FinalLeftFootTraj_deq.back();
+          else
+            FAP = & FinalRightFootTraj_deq.back();
+          PreviewedSupport.X = FAP->x;
+          PreviewedSupport.Y = FAP->y;
+          PreviewedSupport.Yaw = FAP->theta*M_PI/180.0;
+          PreviewedSupport.StartTime = time+spNb*Tprw_;
+        }
       SupportStates_deq.push_back( PreviewedSupport );
     }
 
