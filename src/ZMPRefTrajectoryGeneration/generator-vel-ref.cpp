@@ -427,7 +427,7 @@ GeneratorVelRef::build_constraints_com( const linear_inequality_t & IneqCoM,
                   b*(Scy-State.Vc(i)*currSupport.Y)       +
                   c*Robot_->CoMHeight()                   +
                   d;
-              Pb.add_term_to( VECTOR_DS, MV_, nbConstraints );
+              Pb.add_term_to( VECTOR_DS, MV_, nbConstraints+nConstr );
           }
       }
 
