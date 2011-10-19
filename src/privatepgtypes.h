@@ -65,6 +65,30 @@ namespace PatternGeneratorJRL
     POSITION, VELOCITY, ACCELERATION,
     JERK, COP_POSITION
   };
+
+  enum qp_element_e
+  {
+    MATRIX_Q,
+    MATRIX_DU,
+    VECTOR_D,
+    VECTOR_DS,
+    VECTOR_XL,
+    VECTOR_XU
+  };
+
+  enum solver_e
+  {
+    QLD,
+    LSSOL
+  };
+
+  enum tests_e
+  {
+    NONE,
+    ALL,
+    ITT,
+    CTR
+  };
   // ------
   // :ENUMS
 
@@ -185,6 +209,7 @@ namespace PatternGeneratorJRL
     {
       boost_ublas::compressed_matrix<double, boost_ublas::row_major> x;
       boost_ublas::compressed_matrix<double, boost_ublas::row_major> y;
+      boost_ublas::compressed_matrix<double, boost_ublas::row_major> z;
     };
     struct coordinate_t D;
 
@@ -212,6 +237,8 @@ namespace PatternGeneratorJRL
     unsigned int NbStepsLeft;
     /// \brief Number of step previewed
     unsigned int StepNumber;
+    /// \brief Number of samplings passed in this phase
+    unsigned int NbInstants;
 
     /// \brief Time until StateChanged == true
     double TimeLimit;
@@ -222,9 +249,6 @@ namespace PatternGeneratorJRL
 
     /// \brief (true) -> New single support state
     bool StateChanged;
-
-    /// \brief Number of samplings passed in this phase
-    unsigned int NbInstants;
 
     struct support_state_t & operator = (const support_state_t &aSS);
 

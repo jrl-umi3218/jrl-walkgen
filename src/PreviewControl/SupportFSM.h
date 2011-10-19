@@ -57,12 +57,12 @@ namespace PatternGeneratorJRL
 
     /// \brief Initialize the previewed state
     ///
-    /// \param[in] Time Current time
-    /// \param[in] Pi Number of (p)reviewed sampling (i)nstant inside the preview period
+    /// \param[in] time Current time
+    /// \param[in] pi Number of (p)reviewed sampling (i)nstant inside the preview period
     /// \param[out] Support Support state to be actualized
     /// \param[in] Ref Trajectory reference
-    void set_support_state( double Time,
-        unsigned int Pi,
+    void set_support_state( double time,
+        unsigned int pi,
         support_state_t & Support,
         const reference_t & Ref) const;
 

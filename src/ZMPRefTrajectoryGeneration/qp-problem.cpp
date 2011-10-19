@@ -429,7 +429,7 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
 
 void
 QPProblem_s::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
-    unsigned int Row )
+    unsigned Row, unsigned Col )
 {
 
   array_s<double> * Array_p = 0;
@@ -458,6 +458,8 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
     break;
 
   case MATRIX_DU:
+    Array_p = &DU_;
+    NbConstraints_ = (Row+1>NbConstraints_) ? Row+1 : NbConstraints_;
     break;
   case MATRIX_Q:
     break;
@@ -469,11 +471,18 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
     }
 
   boost_ublas::vector<double>::const_iterator VecIt = Vec.begin();
-  for( unsigned int i = 0; i < Vec.size(); i++ )
-    {
-      Array_p->Array_[Row+i] += *VecIt;
-      VecIt++;
-    }
+  if(Type == MATRIX_DU){
+      for( unsigned i = 0; i < Vec.size(); i++ ){
+          Array_p->Array_[Row+(Col+i)*Array_p->NbRows_] += *VecIt;
+          VecIt++;
+      }
+  }
+  else{
+      for( unsigned int i = 0; i < Vec.size(); i++ ){
+          Array_p->Array_[Row+i] += *VecIt;
+          VecIt++;
+      }
+  }
 
 }
 

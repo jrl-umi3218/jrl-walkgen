@@ -161,11 +161,18 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] IneqFeet
     /// \param[in] State
-    /// \param[in] NbStepsPreviewed
+    /// \param[in] nbStepsPreviewed
     /// \param[out] Pb
     void build_constraints_feet(const linear_inequality_t & IneqFeet,
         const IntermedQPMat::state_variant_t & State,
-        int NbStepsPreviewed, QPProblem & Pb);
+        int nbStepsPreviewed, QPProblem & Pb);
+
+    /// \brief Compute com<->feet constraints
+    ///
+    /// \param[in] IneqCoM
+    /// \param[in] Solution
+    /// \param[out] Pb
+    void build_constraints_com( const linear_inequality_t & IneqCoM, const solution_t & Solution, QPProblem & Pb );
 
     /// \brief Compute feet equality constraints from a trajectory
     ///
@@ -214,7 +221,7 @@ namespace PatternGeneratorJRL
     //
   private:
 
-    /// \name Temporary vectors TODO: Move to intermediate data?
+    /// \name Temporary vectors
     /// \{
     boost_ublas::matrix<double> MM_;
     boost_ublas::vector<double> MV_;

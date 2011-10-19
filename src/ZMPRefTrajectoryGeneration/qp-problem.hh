@@ -45,34 +45,6 @@ namespace PatternGeneratorJRL
   struct QPProblem_s
   {
 
-    //
-    // Public types
-    //
-  public:
-
-    enum qp_element_e
-    {
-      MATRIX_Q,
-      MATRIX_DU,
-      VECTOR_D,
-      VECTOR_DS,
-      VECTOR_XL,
-      VECTOR_XU
-    };
-
-    enum solver_e
-    {
-      QLD,
-      LSSOL
-    };
-
-    enum tests_e
-    {
-      NONE,
-      ALL,
-      ITT,
-      CTR
-    };
 
     //
     //Public methods
@@ -108,7 +80,7 @@ namespace PatternGeneratorJRL
     /// \param[in] Mat Added vector
     /// \param[in] Row First row inside the target
     void add_term_to( qp_element_e Type, const boost_ublas::vector<double> & Vec,
-        unsigned int Row );
+        unsigned Row, unsigned Col = 0 );
 
     /// \brief Dump current problem on disk.
     void dump( const char * Filename );

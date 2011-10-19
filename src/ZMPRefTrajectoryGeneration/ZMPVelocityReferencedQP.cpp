@@ -392,17 +392,17 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // BUILD CONSTRAINTS:
       // ------------------
-      VRQPGenerator_->build_constraints( Problem_,
-          Solution_ );
+      VRQPGenerator_->build_constraints( Problem_, Solution_ );
 
 
       // SOLVE PROBLEM:
       // --------------
       if (Solution_.useWarmStart)
     	  VRQPGenerator_->compute_warm_start( Solution_ );
-      Problem_.solve(QPProblem_s::QLD, Solution_, QPProblem_s::NONE );
+      Problem_.solve( QLD, Solution_, NONE );
       if(Solution_.Fail>0)
-        Problem_.dump( Time );
+          Problem_.dump( Time );
+
 
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
