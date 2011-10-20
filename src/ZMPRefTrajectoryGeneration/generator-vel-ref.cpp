@@ -257,7 +257,6 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
         RFI_->set_vertices( ZMPFeasibilityEdges,*prwSS_it,
             INEQ_COP );
       	RFI_->compute_linear_system( ZMPFeasibilityEdges, D_x, D_y, dc, *prwSS_it );
-
       for( unsigned j = 0; j < NbEdgesLoop; j++ )
         {
           Inequalities.D.x.push_back(i*NbEdgesLoop+j,i,D_x[j]);

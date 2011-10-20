@@ -412,17 +412,13 @@ ZMPVelocityReferencedQP::OnLine(double Time,
     	  VRQPGenerator_->build_constraints( Problem_, Solution_);
       }
 
-
-
-
       // SOLVE PROBLEM:
       // --------------
 
       if (Solution_.useWarmStart)
     	  VRQPGenerator_->compute_warm_start( Solution_);
 
-
-      Problem_.solve(QPProblem_s::LSSOL, Solution_, QPProblem_s::NONE );
+      Problem_.solve(QPProblem_s::LSSOL, Solution_, QPProblem_s::CTR2 );
       if(Solution_.Fail>0)
         Problem_.dump( Time );
 
@@ -456,6 +452,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
           TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
         }
       UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
+
 
       // Compute CPU consumption time.
       gettimeofday(&end,0);
