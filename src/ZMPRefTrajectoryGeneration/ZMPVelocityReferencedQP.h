@@ -122,6 +122,9 @@ namespace PatternGeneratorJRL
 
     solution_t & Solution()
     { return Solution_; }
+
+    inline const int & QP_N(void) const
+    { return QP_N_; }
     /// \}
 
 

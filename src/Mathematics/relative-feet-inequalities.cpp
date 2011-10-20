@@ -50,7 +50,7 @@ RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
   SecurityMarginY_ = 0.04;
   
   double DefaultFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
-  double DefaultFPosEdgesY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
+  double DefaultFPosEdgesY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
   
   for(int i=0;i<5;i++)
     {
