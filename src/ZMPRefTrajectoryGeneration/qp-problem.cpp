@@ -55,7 +55,7 @@ QPProblem_s::QPProblem_s():
       m_(0),me_(0),mmax_(0), n_(0), nmax_(0), mnn_(0),
       iout_(0),ifail_(0), iprint_(0),
       lwar_(0), liwar_(0), eps_(0),
-      NbVariables_(0), NbConstraints_(0),NbEqConstraints_(0)
+      NbVariables_(100), NbConstraints_(100),NbEqConstraints_(0)
 {
   NbVariables_ = 0;
   NbConstraints_ = 0;
