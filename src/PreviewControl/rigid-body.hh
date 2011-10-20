@@ -68,12 +68,6 @@ namespace PatternGeneratorJRL
   };
   typedef struct rigid_body_state_s rigid_body_state_t;
 
-  enum DynamicsType
-  {
-    POSITION, VELOCITY, ACCELERATION,
-    JERK, COP
-  };
-
   /// \name Dynamics matrices
   /// \{
   struct linear_dynamics_s
@@ -90,7 +84,7 @@ namespace PatternGeneratorJRL
     /// \brief State matrix
     boost_ublas::matrix<double> S;
 
-    DynamicsType Type;
+    dynamics_e Type;
 
     void clear()
     {
@@ -141,8 +135,8 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors
     /// \{
-    linear_dynamics_t const & Dynamics( DynamicsType ) const;
-    linear_dynamics_t & Dynamics( DynamicsType );
+    linear_dynamics_t const & Dynamics( dynamics_e ) const;
+    linear_dynamics_t & Dynamics( dynamics_e );
 
     inline double const & SamplingPeriodSim( ) const
     { return T_; }

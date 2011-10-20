@@ -38,6 +38,36 @@
 namespace PatternGeneratorJRL
 {
 
+  // ENUMS:
+  // ------
+  enum foot_type_e
+  {
+    LEFT, RIGHT
+  };
+
+  enum PhaseType
+  {
+    SS, DS
+  };
+
+  enum ineq_e
+  {
+    INEQ_COP, INEQ_COM, INEQ_FEET
+  };
+
+  enum objective_e
+  {
+    INSTANT_VELOCITY, COP_CENTERING, JERK_MIN
+  };
+
+  enum dynamics_e
+  {
+    POSITION, VELOCITY, ACCELERATION,
+    JERK, COP_POSITION
+  };
+  // ------
+  // :ENUMS
+
   /// \brief State of the center of mass
   struct com_t
   {
@@ -168,16 +198,6 @@ namespace PatternGeneratorJRL
 
     /// \brief Resize all elements
     void resize( int NbRows, int NbCols, bool Preserve );
-  };
-
-  enum foot_type_e
-  {
-    LEFT, RIGHT
-  };
-
-  enum PhaseType
-  {
-    SS, DS
   };
 
   /// \brief Support state of the robot at a certain point in time
