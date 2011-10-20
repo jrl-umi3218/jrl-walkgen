@@ -112,6 +112,9 @@ namespace PatternGeneratorJRL
     void add_term_to( qp_element_e Type, const boost_ublas::vector<double> & Vec,
         unsigned int Row );
 
+    /// \brief Dump current problem on cout.
+    void solver_dump(solution_t & Result, const tests_e & tests );
+
     /// \brief Dump current problem on disk.
     void dump( const char * Filename );
     void dump( double Time );

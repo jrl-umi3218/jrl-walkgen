@@ -290,34 +290,7 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
     }
 
     if (tests==CTR1 || tests==ALL){
-        // Check if initial solution respect all the constraints
-        boost_ublas::matrix<double> DU(NbConstraints_, NbVariables_);
-        boost_ublas::vector<double> XX(NbVariables_);
-        boost_ublas::vector<double> DS(NbConstraints_);
-        boost_ublas::vector<double> tmp;
-        for(unsigned i=0;i<NbConstraints_;++i){
-            for(unsigned j=0;j<NbVariables_;++j){
-                DU(i,j)=DU_.Array_[i+DU_.NbRows_*j];
-            }
-            DS(i)=DS_.Array_[i];
-        }
-
-        for(unsigned i=0;i<NbVariables_;++i){
-            XX(i)=X_.Array_[i];
-        }
-
-        tmp=prod(DU,XX);
-        int nb_ctr=0;
-        for(unsigned i=0;i<NbConstraints_;++i){
-            if (tmp(i)+DS(i)<0 && Result.initialConstraint(i)==0){
-                std::cout << "Unrespected constraint " << i << " : " << tmp(i) << " <  " << -DS(i)  << std::endl;
-                ++nb_ctr;
-            }else if(tmp(i)+DS(i)!=0 && Result.initialConstraint(i)!=0){
-            	std::cout << "Unrespected constraint " << i << " : " << tmp(i) << " != " << -DS(i)  << std::endl;
-            	 ++nb_ctr;
-            }
-        }
-        std::cout << std::endl << "Nb unrespected constraints : " << nb_ctr << std::endl;
+        solver_dump(Result,CTR1);
     }
 
 
@@ -347,69 +320,11 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
       }
 
 
-
     if (tests==ITT || tests==ALL){
-        std::cout << "nb iterations : " << iter_ << std::endl;
+        solver_dump(Result,ITT);
     }
     if (tests==CTR2 || tests==ALL){
-		for(int i=0;i<16;++i){
-			for (int j=0;j<4;++j){
-				if (Result.initialConstraint(i*4+j)==0){
-					std::cout << '.';
-				}else{
-					std::cout << Result.initialConstraint(i*4+j);
-				}
-
-
-			}
-			std::cout << " ";
-		}
-		std::cout << " ";
-		for(int i=0;i<(NbConstraints_-64)/5;++i){
-			for (int j=0;j<5;++j){
-				if (Result.initialConstraint(i*5+j+64)==0){
-					std::cout << '.';
-				}else{
-					std::cout << Result.initialConstraint(i*5+j+64);
-				}
-			}
-			std::cout << " ";
-		}
-		std::cout << std::endl;
-		for(int i=0;i<16;++i){
-			for (int j=0;j<4;++j){
-				if (istate_[i*4+j+n_+1]==0){
-					std::cout << '.';
-				}else{
-					std::cout << istate_[i*4+j+n_+1];
-				}
-
-
-			}
-			std::cout << " ";
-		}
-		std::cout << " ";
-		for(int i=0;i<(NbConstraints_-64)/5;++i){
-			for (int j=0;j<5;++j){
-				if (istate_[i*5+j+64+n_+1]==0){
-					std::cout << '.';
-				}else{
-					std::cout << istate_[i*5+j+64+n_+1];
-				}
-			}
-			std::cout << " ";
-		}
-
-
-
-		int nb=0;
-		for(int i=1;i<m_;++i){
-			if (istate_[i+n_] != Result.initialConstraint(i-1)){
-				++nb;
-			}
-		}
-
-		std::cout << "    " << iter_ << "    " << nb << std::endl<< std::endl;
+    	solver_dump(Result,CTR2);
     }
 
 
@@ -427,6 +342,109 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
 
 }
 
+void QPProblem_s::solver_dump(solution_t & Result, const tests_e & tests ){
+	switch(tests){
+		case ITT:{
+
+			std::cout << "nb iterations : " << iter_ << std::endl;
+
+        break;
+		}case CTR2:{
+
+			for(unsigned int i=0;i<16;++i){
+				for (unsigned int j=0;j<2;++j){
+					if (Result.initialConstraint(i*2+j)==0){
+						std::cout << '.';
+					}else{
+						std::cout << Result.initialConstraint(i*2+j);
+					}
+
+
+				}
+				std::cout << " ";
+			}
+			std::cout << " ";
+			for(unsigned int i=0;i<(NbConstraints_-32)/5;++i){
+				for (unsigned int j=0;j<5;++j){
+					if (Result.initialConstraint(i*5+j+32)==0){
+						std::cout << '.';
+					}else{
+						std::cout << Result.initialConstraint(i*5+j+32);
+					}
+				}
+				std::cout << " ";
+			}
+			std::cout << std::endl;
+			for(unsigned int i=0;i<16;++i){
+				for (unsigned int j=0;j<2;++j){
+					if (istate_[i*2+j+n_+1]==0){
+						std::cout << '.';
+					}else{
+						std::cout << istate_[i*2+j+n_+1];
+					}
+
+
+				}
+				std::cout << " ";
+			}
+			std::cout << " ";
+			for(unsigned int i=0;i<(NbConstraints_-32)/5;++i){
+				for (unsigned int j=0;j<5;++j){
+					if (istate_[i*5+j+32+n_+1]==0){
+						std::cout << '.';
+					}else{
+						std::cout << istate_[i*5+j+32+n_+1];
+					}
+				}
+				std::cout << " ";
+			}
+
+
+
+			int nb=0;
+			for(int i=1;i<m_;++i){
+				if (istate_[i+n_] != Result.initialConstraint(i-1)){
+					++nb;
+				}
+			}
+
+			std::cout << "    " << iter_ << "    " << nb << std::endl<< std::endl;
+
+		break;
+		}case CTR1:{
+	        // Check if initial solution respect all the constraints
+	        boost_ublas::matrix<double> DU(NbConstraints_, NbVariables_);
+	        boost_ublas::vector<double> XX(NbVariables_);
+	        boost_ublas::vector<double> DS(NbConstraints_);
+	        boost_ublas::vector<double> tmp;
+	        for(unsigned i=0;i<NbConstraints_;++i){
+	            for(unsigned j=0;j<NbVariables_;++j){
+	                DU(i,j)=DU_.Array_[i+DU_.NbRows_*j];
+	            }
+	            DS(i)=DS_.Array_[i];
+	        }
+
+	        for(unsigned i=0;i<NbVariables_;++i){
+	            XX(i)=X_.Array_[i];
+	        }
+
+	        tmp=prod(DU,XX);
+	        int nb_ctr=0;
+	        for(unsigned i=0;i<NbConstraints_;++i){
+	            if (tmp(i)+DS(i)<0 && Result.initialConstraint(i)==0){
+	                std::cout << "Unrespected constraint " << i << " : " << tmp(i) << " <  " << -DS(i)  << std::endl;
+	                ++nb_ctr;
+	            }else if(tmp(i)+DS(i)!=0 && Result.initialConstraint(i)!=0){
+	            	std::cout << "Unrespected constraint " << i << " : " << tmp(i) << " != " << -DS(i)  << std::endl;
+	            	 ++nb_ctr;
+	            }
+	        }
+	        std::cout << std::endl << "Nb unrespected constraints : " << nb_ctr << std::endl;
+
+	    break;
+		}
+	}
+}
 
 void
 QPProblem_s::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
