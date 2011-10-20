@@ -101,6 +101,27 @@ protected:
       aPGI.ParseCmd(strm2);
     }
   }
+  void stop(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.0 0.0 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void walkForward(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.2 0.0 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void walkSidewards(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.0 0.2 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
 
   void stopOnLineWalking(PatternGeneratorInterface &aPGI)
   {
@@ -139,12 +160,16 @@ protected:
       localeventHandler_t Handler ;
     };
 
-    #define localNbOfEvents 4
+    #define localNbOfEvents 8
     struct localEvent events [localNbOfEvents] =
       { { 5*200,&TestHerdt2010::startTurningLeft},
 	{10*200,&TestHerdt2010::startTurningRight},
 	{15*200,&TestHerdt2010::startTurningRightOnSpot},
-	{25*200,&TestHerdt2010::stopOnLineWalking}};
+	{20*200,&TestHerdt2010::stop},
+	{25*200,&TestHerdt2010::walkSidewards},
+	{30*200,&TestHerdt2010::walkForward},
+	{35*200,&TestHerdt2010::stop},
+	{40*200,&TestHerdt2010::stopOnLineWalking}};
     
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
