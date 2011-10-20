@@ -34,7 +34,6 @@ using namespace PatternGeneratorJRL;
 IntermedQPMat::IntermedQPMat()
 {
 
-  MeanVelocity_.type = MEAN_VELOCITY;
   InstantVelocity_.type = INSTANT_VELOCITY;
   COPCentering_.type = COP_CENTERING;
   JerkMin_.type = JERK_MIN;
@@ -52,12 +51,10 @@ IntermedQPMat::~IntermedQPMat()
 
 
 IntermedQPMat::objective_variant_t const &
-IntermedQPMat::Objective( const int type ) const
+IntermedQPMat::Objective( objective_e type ) const
 {
   switch(type)
   {
-  case MEAN_VELOCITY:
-    return MeanVelocity_;
   case INSTANT_VELOCITY:
     return InstantVelocity_;
   case COP_CENTERING:
@@ -70,12 +67,10 @@ IntermedQPMat::Objective( const int type ) const
 }
 
 IntermedQPMat::objective_variant_t &
-IntermedQPMat::Objective( const int type )
+IntermedQPMat::Objective( objective_e type )
 {
   switch(type)
   {
-  case MEAN_VELOCITY:
-    return MeanVelocity_;
   case INSTANT_VELOCITY:
     return InstantVelocity_;
   case COP_CENTERING:
@@ -88,7 +83,7 @@ IntermedQPMat::Objective( const int type )
 }
 
 linear_inequality_t const &
-IntermedQPMat::Inequalities( const int type ) const
+IntermedQPMat::Inequalities( ineq_e type ) const
 {
   switch(type)
   {
@@ -104,7 +99,7 @@ IntermedQPMat::Inequalities( const int type ) const
 }
 
 linear_inequality_t &
-IntermedQPMat::Inequalities( const int type )
+IntermedQPMat::Inequalities( ineq_e type )
 {
   switch(type)
   {
@@ -125,10 +120,10 @@ IntermedQPMat::Inequalities( const int type )
 
 
 void
-IntermedQPMat::dump_objective( const int aObjectiveType, std::ostream &aos )
+IntermedQPMat::dump_objective( objective_e type, std::ostream &aos )
 {
 
-  switch(aObjectiveType)
+  switch(type)
   {
   case INSTANT_VELOCITY:
     InstantVelocity_.print(aos);
@@ -156,7 +151,7 @@ IntermedQPMat::dump_state( std::ostream &aos )
 
 void
 IntermedQPMat::dump_objective(const char * filename,
-    const int type)
+    objective_e type)
 {
   std::ofstream aof;
   aof.open(filename,std::ofstream::out);

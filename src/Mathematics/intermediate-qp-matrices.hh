@@ -46,31 +46,6 @@ namespace PatternGeneratorJRL
     //
   public:
 
-    const static int MEAN_VELOCITY = 0;
-    const static int INSTANT_VELOCITY = 1;
-    const static int COP_CENTERING = 2;
-    const static int JERK_MIN = 3;
-
-    const static int INEQ_COP = 20;
-    const static int INEQ_COM = 21;
-    const static int INEQ_FEET = 22;
-
-    /// \name Matrices defining the evolution
-    /// \{
-    struct dynamics_s
-    {
-      /// \brief Matrix of the quadratic part
-      boost_ublas::matrix<double> U;
-      /// \brief Transpose of U
-      boost_ublas::matrix<double> UT;
-
-      /// \brief Matrix of the linear part
-      boost_ublas::matrix<double> S;
-
-      int type;
-    };
-    typedef dynamics_s dynamics_t;
-
     /// \name QP elements that are objective independent
     /// \{
     struct state_variant_s
@@ -110,7 +85,7 @@ namespace PatternGeneratorJRL
       double weight;
 
       /// \brief Minimization objective type
-      int type;
+      objective_e type;
 
       std::ostream& print (std::ostream& o) const;
       void dump(const char * filename) const;
@@ -128,23 +103,18 @@ namespace PatternGeneratorJRL
     ~IntermedQPMat();
     /// \}
 
-    /// \name Accessors
+    /// \name Accessors and mutators
     /// \{
-    /// \brief Getter and setter
-
     inline state_variant_t const & State() const
     { return StateMatrices_; };
     inline state_variant_t & State()
     { return StateMatrices_; };
 
-    objective_variant_t const & Objective( int type ) const;
-    objective_variant_t & Objective( int type );
+    objective_variant_t const & Objective( objective_e type ) const;
+    objective_variant_t & Objective( objective_e type );
 
-    dynamics_t const & Dynamics( int type ) const;
-    dynamics_t & Dynamics( int type );
-
-    linear_inequality_t const & Inequalities( int type ) const;
-    linear_inequality_t & Inequalities( int type );
+    linear_inequality_t const & Inequalities( ineq_e type ) const;
+    linear_inequality_t & Inequalities( ineq_e type );
 
     inline com_t const & CoM() const
     { return StateMatrices_.CoM; };
@@ -169,9 +139,9 @@ namespace PatternGeneratorJRL
     /// \name Displaying
     /// \{
     /// \brief Dump
-    void dump_objective( const int ObjectiveType, std::ostream &aos );
+    void dump_objective( objective_e type, std::ostream &aos );
     void dump_state( std::ostream &aos );
-    void dump_objective(const char * filename, const int Objectivetype);
+    void dump_objective(const char * filename, objective_e type);
     void dump_state(const char * filename);
     /// \}
 

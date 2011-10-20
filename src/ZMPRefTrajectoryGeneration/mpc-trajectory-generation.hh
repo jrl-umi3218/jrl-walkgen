@@ -57,7 +57,7 @@ namespace PatternGeneratorJRL
      double Tdble_;
 
      /// \brief Sampling periods control and preview
-     double T_Ctr_, T_Prw_;
+     double Tctr_, Tprw_;
 
      /* ! \brief Preview control window in second. */
      double PreviewControlTime_;
@@ -146,19 +146,19 @@ namespace PatternGeneratorJRL
 		
     /// \brief Get the sampling period for the control, set to 0.005 by default. */
     inline const double & SamplingPeriodControl() const
-    { return T_Ctr_; };
+    { return Tctr_; };
 		
     /// \brief Set the sampling period for the control. */
     inline void SamplingPeriodControl(double SamplingPeriod)
-    { T_Ctr_ = SamplingPeriod;};
+    { Tctr_ = SamplingPeriod;};
 		
     /// \brief Get the sampling period for the preview, set to 0.100 by default.
     inline const double & SamplingPeriodPreview() const
-    { return T_Prw_; };
+    { return Tprw_; };
 		
     /// \brief Set the sampling period for the preview.
     inline void SamplingPeriodPreview(double SamplingPeriod)
-    { T_Prw_ = SamplingPeriod;};
+    { Tprw_ = SamplingPeriod;};
 		
     /// \brief Get the sampling period for the preview, set to 0.100 by default.
     inline const unsigned int & NbPrwSamplings() const

@@ -52,7 +52,7 @@ using namespace PatternGeneratorJRL;
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
     string DataFile, CjrlHumanoidDynamicRobot *aHS) :
     ZMPRefTrajectoryGeneration(SPM),
-    Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFC_(0),Problem_(),Solution_()
+    Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFI_(0),Problem_(),Solution_()
 {
 
   TimeBuffer_ = 0.040;
@@ -65,7 +65,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   Solution_.useWarmStart=true;
 
   // Create and initialize online interpolation of feet trajectories
-  RFC_ = new RelativeFeetInequalities( SPM,aHS );
+  RFI_ = new RelativeFeetInequalities( SPM,aHS );
 
   // Create and initialize the finite state machine for support sequences
   SupportFSM_ = new SupportFSM();
@@ -101,19 +101,21 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 
   IntermedData_ = new IntermedQPMat();
 
-  VRQPGenerator_ = new GeneratorVelRef( SPM, IntermedData_, Robot_ );
+  VRQPGenerator_ = new GeneratorVelRef( SPM, IntermedData_, Robot_, RFI_ );
   VRQPGenerator_->NbPrwSamplings( QP_N_ );
   VRQPGenerator_->SamplingPeriodPreview( QP_T_ );
   VRQPGenerator_->SamplingPeriodControl( m_SamplingPeriod );
   VRQPGenerator_->ComHeight( 0.814 );
+
   if(Solution_.useWarmStart){
   	  VRQPGenerator_->initialize_matrices(GeneratorVelRef::WITH_TWO_CONTRAINT_BOUNDS);
   }else{
 	  VRQPGenerator_->initialize_matrices();
   }
-  VRQPGenerator_->Ponderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
-  VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::COP_CENTERING );
-  VRQPGenerator_->Ponderation( 0.00001, IntermedQPMat::JERK_MIN );
+  VRQPGenerator_->Ponderation( 1.0, INSTANT_VELOCITY );
+  VRQPGenerator_->Ponderation( 0.000001, COP_CENTERING );
+  VRQPGenerator_->Ponderation( 0.00001, JERK_MIN );
+
 
   // Register method to handle
   const unsigned int NbMethods = 3;
@@ -142,8 +144,8 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
   if (SupportFSM_!=0)
     delete SupportFSM_;
 
-  if (RFC_!=0)
-    delete RFC_;
+  if (RFI_!=0)
+    delete RFI_;
 
   if (OrientPrw_!=0)
     delete OrientPrw_;
@@ -348,10 +350,13 @@ ZMPVelocityReferencedQP::OnLine(double Time,
   if(Time + 0.00001 > UpperTimeLimitToUpdate_)
     {
 
-      double TotalAmountOfCPUTime=0.0,CurrentCPUTime=0.0, CurrentQLDTime=0.0, CurrentinvariantpartTime=0.0;
+
+      static double CurrentCPUTime=0.0, CurrentQLDTime=0.0, CurrentinvariantpartTime=0.0;
+      static double MaxCPUTime=0.0, MaxQLDTime=0.0, MaxinvariantpartTime=0.0;
+      static int itt=0;
+
       struct timeval start,mid1,mid2,mid3,mid4,end;
       gettimeofday(&start,0);
-
 
       // UPDATE INTERNAL DATA:
       // ---------------------
@@ -362,7 +367,6 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
       IntermedData_->Reference( VelRef_ );
       IntermedData_->CoM( CoM_() );
-
 
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
       // ----------------------------------------------------
@@ -376,7 +380,6 @@ ZMPVelocityReferencedQP::OnLine(double Time,
           SupportFSM_->StepPeriod(),
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
           Solution_ );
-
 
       // UPDATE THE DYNAMICS:
       // --------------------
@@ -401,28 +404,27 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // BUILD CONSTRAINTS:
       // ------------------
+
       if (Solution_.useWarmStart){
-		  VRQPGenerator_->build_constraints( Problem_, RFC_,
-			  FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
-			  Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
+		  VRQPGenerator_->build_constraints( Problem_, Solution_,
 			  GeneratorVelRef::WITH_TWO_CONTRAINT_BOUNDS);
       }else{
-    	  VRQPGenerator_->build_constraints( Problem_, RFC_,
-    	  			  FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
-    	  			  Solution_.SupportStates_deq, Solution_.SupportOrientations_deq);
+    	  VRQPGenerator_->build_constraints( Problem_, Solution_);
       }
+
+
 
 
       // SOLVE PROBLEM:
       // --------------
 
       if (Solution_.useWarmStart)
-    	  VRQPGenerator_->compute_warm_start( Solution_, RFC_ );
+    	  VRQPGenerator_->compute_warm_start( Solution_);
+
 
       Problem_.solve(QPProblem_s::LSSOL, Solution_, QPProblem_s::NONE );
       if(Solution_.Fail>0)
         Problem_.dump( Time );
-
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
@@ -455,27 +457,45 @@ ZMPVelocityReferencedQP::OnLine(double Time,
         }
       UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
 
-
       // Compute CPU consumption time.
       gettimeofday(&end,0);
-      /*
-      gettimeofday(&mid3,0);
-      gettimeofday(&mid4,0);
-      gettimeofday(&mid2,0);
+
+
       gettimeofday(&mid1,0);
-	*/
-/*
-      CurrentCPUTime = end.tv_sec - start.tv_sec +
+      gettimeofday(&mid3,0);
+      gettimeofday(&mid2,0);
+      gettimeofday(&mid4,0);
+
+
+
+
+      CurrentCPUTime += end.tv_sec - start.tv_sec +
           0.000001 * (end.tv_usec - start.tv_usec);
 
-      CurrentQLDTime = mid2.tv_sec - mid1.tv_sec +
+      CurrentQLDTime += mid2.tv_sec - mid1.tv_sec +
           0.000001 * (mid2.tv_usec - mid1.tv_usec);
-      CurrentinvariantpartTime= mid4.tv_sec - mid3.tv_sec +
+      CurrentinvariantpartTime+= mid4.tv_sec - mid3.tv_sec +
               0.000001 * (mid4.tv_usec - mid3.tv_usec);
-*/
-     //std::cout << "Current CPU time : " << CurrentCPUTime*1000 << " ms, whose LSSOL :" << CurrentQLDTime*1000 << " ms (" << 100*CurrentQLDTime/CurrentCPUTime << " %) and warmstart :" << CurrentinvariantpartTime*1000 << " ms ("<< 100*CurrentinvariantpartTime/CurrentCPUTime << " %)" << std::endl;
+      if (end.tv_sec - start.tv_sec +0.000001 * (end.tv_usec - start.tv_usec)>MaxCPUTime){
+    	  MaxCPUTime=end.tv_sec - start.tv_sec +0.000001 * (end.tv_usec - start.tv_usec);
+      }
+      if (mid2.tv_sec - mid1.tv_sec +0.000001 * (mid2.tv_usec - mid1.tv_usec)>MaxQLDTime){
+    	  MaxQLDTime=mid2.tv_sec - mid1.tv_sec +0.000001 * (mid2.tv_usec - mid1.tv_usec);
+      }
+      if (mid4.tv_sec - mid3.tv_sec +0.000001 * (mid4.tv_usec - mid3.tv_usec)>MaxinvariantpartTime){
+    	  MaxinvariantpartTime=mid4.tv_sec - mid3.tv_sec +0.000001 * (mid4.tv_usec - mid3.tv_usec);
+      }
+      ++itt;
+      if (itt==10){
+    	  CurrentCPUTime/=10;
+    	  CurrentQLDTime/=10;
+    	  CurrentinvariantpartTime/=10;
+    	  itt=0;
+    	  std::cout << "mid loop time : " << CurrentCPUTime*1000 << " ms, whose LSSOL :" << CurrentQLDTime*1000 << " ms (" << 100*CurrentQLDTime/CurrentCPUTime << " %) and warmstart :" << CurrentinvariantpartTime*1000 << " ms ("<< 100*CurrentinvariantpartTime/CurrentCPUTime << " %)" << std::endl;
+    	  std::cout << "max loop time : " << MaxCPUTime*1000 << " ms, whose LSSOL :" << MaxQLDTime*1000 << " ms and warmstart :" << CurrentinvariantpartTime*1000 << " ms " << std::endl<< std::endl;
+    	  CurrentCPUTime=CurrentQLDTime=CurrentinvariantpartTime=0;
+      }
 
-      TotalAmountOfCPUTime += CurrentCPUTime;
     }
 
 }
