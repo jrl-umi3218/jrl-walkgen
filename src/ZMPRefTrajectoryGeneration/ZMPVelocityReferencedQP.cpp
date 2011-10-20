@@ -106,7 +106,11 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_->SamplingPeriodPreview( QP_T_ );
   VRQPGenerator_->SamplingPeriodControl( m_SamplingPeriod );
   VRQPGenerator_->ComHeight( 0.814 );
-  VRQPGenerator_->initialize_matrices();
+  if(Solution_.useWarmStart){
+  	  VRQPGenerator_->initialize_matrices(GeneratorVelRef::WITH_TWO_CONTRAINT_BOUNDS);
+  }else{
+	  VRQPGenerator_->initialize_matrices();
+  }
   VRQPGenerator_->Ponderation( 1.0, IntermedQPMat::INSTANT_VELOCITY );
   VRQPGenerator_->Ponderation( 0.000001, IntermedQPMat::COP_CENTERING );
   VRQPGenerator_->Ponderation( 0.00001, IntermedQPMat::JERK_MIN );
@@ -397,22 +401,28 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       // BUILD CONSTRAINTS:
       // ------------------
-      VRQPGenerator_->build_constraints( Problem_, RFC_,
-          FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
-          Solution_.SupportStates_deq, Solution_.SupportOrientations_deq );
+      if (Solution_.useWarmStart){
+		  VRQPGenerator_->build_constraints( Problem_, RFC_,
+			  FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
+			  Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
+			  GeneratorVelRef::WITH_TWO_CONTRAINT_BOUNDS);
+      }else{
+    	  VRQPGenerator_->build_constraints( Problem_, RFC_,
+    	  			  FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
+    	  			  Solution_.SupportStates_deq, Solution_.SupportOrientations_deq);
+      }
 
 
       // SOLVE PROBLEM:
       // --------------
-      gettimeofday(&mid3,0);
+
       if (Solution_.useWarmStart)
     	  VRQPGenerator_->compute_warm_start( Solution_, RFC_ );
-      gettimeofday(&mid4,0);
-      gettimeofday(&mid1,0);
+
       Problem_.solve(QPProblem_s::LSSOL, Solution_, QPProblem_s::NONE );
       if(Solution_.Fail>0)
         Problem_.dump( Time );
-      gettimeofday(&mid2,0);
+
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
@@ -449,12 +459,12 @@ ZMPVelocityReferencedQP::OnLine(double Time,
       // Compute CPU consumption time.
       gettimeofday(&end,0);
       /*
-
-
-
-
+      gettimeofday(&mid3,0);
+      gettimeofday(&mid4,0);
+      gettimeofday(&mid2,0);
+      gettimeofday(&mid1,0);
 	*/
-
+/*
       CurrentCPUTime = end.tv_sec - start.tv_sec +
           0.000001 * (end.tv_usec - start.tv_usec);
 
@@ -462,8 +472,8 @@ ZMPVelocityReferencedQP::OnLine(double Time,
           0.000001 * (mid2.tv_usec - mid1.tv_usec);
       CurrentinvariantpartTime= mid4.tv_sec - mid3.tv_sec +
               0.000001 * (mid4.tv_usec - mid3.tv_usec);
-
-    // std::cout << "Current CPU time : " << CurrentCPUTime*1000 << " ms, whose LSSOL :" << CurrentQLDTime*1000 << " ms (" << 100*CurrentQLDTime/CurrentCPUTime << " %) and warmstart :" << CurrentinvariantpartTime*1000 << " ms ("<< 100*CurrentinvariantpartTime/CurrentCPUTime << " %)" << std::endl;
+*/
+     //std::cout << "Current CPU time : " << CurrentCPUTime*1000 << " ms, whose LSSOL :" << CurrentQLDTime*1000 << " ms (" << 100*CurrentQLDTime/CurrentCPUTime << " %) and warmstart :" << CurrentinvariantpartTime*1000 << " ms ("<< 100*CurrentinvariantpartTime/CurrentCPUTime << " %)" << std::endl;
 
       TotalAmountOfCPUTime += CurrentCPUTime;
     }

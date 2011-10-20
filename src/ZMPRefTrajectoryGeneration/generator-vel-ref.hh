@@ -50,6 +50,14 @@ namespace PatternGeneratorJRL
   class  GeneratorVelRef : public MPCTrajectoryGeneration
   {
 
+
+  public:
+    enum option_e
+        {
+          WITH_TWO_CONTRAINT_BOUNDS,
+          NONE
+        };
+
     //
     //Public methods
     //
@@ -81,7 +89,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Initialize intermediate matrices
     ///
-    void initialize_matrices();
+    void initialize_matrices(option_e option=NONE);
 
     /// \brief Compute constraints
     ///
@@ -96,7 +104,8 @@ namespace PatternGeneratorJRL
         const std::deque< FootAbsolutePosition> & LeftFootPositions_deq,
         const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
         const std::deque<support_state_t> & PrwSupportStates_deq,
-        const std::deque<double> & PrwSupportAngles_deq);
+        const std::deque<double> & PrwSupportAngles_deq,
+        option_e option=NONE);
 
     /// \brief Build the constant part of the objective
     ///
@@ -154,7 +163,8 @@ namespace PatternGeneratorJRL
         const std::deque< FootAbsolutePosition> & LeftFootPositions_deq,
         const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
         const std::deque<support_state_t> & SupportStates_deq,
-        const std::deque<double> & PreviewedSupportAngles_deq) const;
+        const std::deque<double> & PreviewedSupportAngles_deq,
+        option_e option) const;
 
     /// \brief Generate a queue of inequality constraints on
     /// the feet positions with respect to previous foot positions
@@ -178,7 +188,7 @@ namespace PatternGeneratorJRL
     /// \param[in] NbStepsPreviewed
     /// \param[out] Pb
     void build_constraints_cop( const linear_inequality_t & IneqCoP, unsigned int NbStepsPreviewed,
-        QPProblem & Pb );
+        QPProblem & Pb, option_e option );
 
     /// \brief Compute feet constraints corresponding to the set of inequalities
     ///
@@ -188,7 +198,7 @@ namespace PatternGeneratorJRL
     /// \param[out] Pb
     void build_constraints_feet(const linear_inequality_t & IneqFeet,
         const IntermedQPMat::state_variant_t & State,
-        int NbStepsPreviewed, QPProblem & Pb);
+        int NbStepsPreviewed, QPProblem & Pb, option_e option);
 
     /// \brief Compute feet equality constraints from a trajectory
     ///
@@ -201,7 +211,7 @@ namespace PatternGeneratorJRL
     /// \brief Initialize inequality matrices
     ///
     /// \param[out] Inequalities
-    void initialize_matrices( linear_inequality_t & Inequalities);
+    void initialize_matrices( linear_inequality_t & Inequalities, option_e option);
 
     /// \brief Scaled product\f$ weight*M*M \f$
     void compute_term(MAL_MATRIX (&weightMM, double),
@@ -222,6 +232,8 @@ namespace PatternGeneratorJRL
         const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
 
 
+
+
     //
     //Protected members
     //
@@ -239,8 +251,10 @@ namespace PatternGeneratorJRL
     /// \name Temporary vectors TODO: Move to intermediate data?
     /// \{
     boost_ublas::matrix<double> MM_;
+    boost_ublas::matrix<double> MM2_;
     boost_ublas::vector<double> MV_;
     boost_ublas::vector<double> MV2_;
+
     /// \}
 
 

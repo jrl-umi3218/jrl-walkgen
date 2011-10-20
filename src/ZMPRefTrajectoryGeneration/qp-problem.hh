@@ -56,6 +56,7 @@ namespace PatternGeneratorJRL
       MATRIX_DU,
       VECTOR_D,
       VECTOR_DS,
+      VECTOR_DL,
       VECTOR_XL,
       VECTOR_XU
     };
@@ -313,7 +314,7 @@ namespace PatternGeneratorJRL
     /// \name ql-parameters
     /// \{
     int m_, me_, mmax_, n_, nmax_, mnn_;
-    array_s<double> Q_, Q_dense_, D_, DU_, DU_dense_, DS_, XL_, XU_, X_, U_, war_;
+    array_s<double> Q_, Q_dense_, D_, DU_, DU_dense_, DS_, DL_, XL_, XU_, X_, U_, war_;
     array_s<int> iwar_;
     int iout_, ifail_, iprint_, lwar_, liwar_;
     double eps_;

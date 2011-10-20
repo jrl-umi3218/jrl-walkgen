@@ -103,6 +103,8 @@ QPProblem_s::resize_all()
   if ((NbConstraints_>0) && (NbVariables_>0)) 
     {
       DU_.resize(2*NbConstraints_, 2*NbVariables_,true);
+      DS_.resize(2*NbConstraints_,1,true);
+      DL_.resize(2*NbConstraints_,1,true);
       ok=true;
     }
 
@@ -158,6 +160,9 @@ QPProblem_s::clear( qp_element_e Type )
   case VECTOR_DS:
     DS_.fill(0.0);
     break;
+  case VECTOR_DL:
+    DL_.fill(0.0);
+    break;
   case VECTOR_XL:
     XL_.fill(-1e8);
     break;
@@ -178,6 +183,7 @@ void QPProblem_s::reset()
   DU_dense_.fill(0.0);
   D_.fill(0.0);
   DS_.fill(0.0);
+  DL_.fill(0.0);
   NbConstraints_ = 0;
   NbEqConstraints_ = 0;
   NbVariables_ = 0;
@@ -275,9 +281,9 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
     int size3=size1+m_;
     for(int i=size2;i<size3;++i){
         bl[i]=-DS_.Array_[i-size1];
-        bu[i]=10e10;
-    }
+        bu[i]=-DL_.Array_[i-size1];
 
+    }
     if (Result.useWarmStart){
     	istate_[0]=0;
         for(unsigned i=0;i<NbVariables_;++i){
@@ -300,9 +306,6 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
         istate_, kx_, X_.Array_, Q_dense_.Array_, b_,
         &inform_, &iter_, &obj_, clamda_,
         iwar_.Array_, &liwar_, war_.Array_, &lwar_);
-
-
-
 
 
     for(int i = 0; i < n_; i++)
@@ -475,6 +478,8 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
     break;
   case VECTOR_DS:
     break;
+  case VECTOR_DL:
+    break;
   }
 
 
@@ -495,6 +500,7 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
       (NbConstraints_>0))
     {
       DS_.resize(2*NbConstraints_,1,true);
+      DL_.resize(2*NbConstraints_,1,true);
     }
 
   unsigned int USize = 2*(NbConstraints_+2*NbVariables_);
@@ -546,6 +552,12 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
 
   case VECTOR_DS:
     Array_p = &DS_;
+    NbConstraints_ = (Row+Vec.size()>NbConstraints_) ? Row+Vec.size() : NbConstraints_;
+    Row++;//The first rows of DU,DS are empty
+    break;
+
+  case VECTOR_DL:
+    Array_p = &DL_;
     NbConstraints_ = (Row+Vec.size()>NbConstraints_) ? Row+Vec.size() : NbConstraints_;
     Row++;//The first rows of DU,DS are empty
     break;
@@ -637,6 +649,13 @@ QPProblem_s::dump( qp_element_e Type, std::ostream & aos)
     Array = DS_.Array_;
     Name = "DS";
     break;
+
+  case VECTOR_DL:
+    NbRows = DL_.NbRows_;
+    NbCols= 1;
+    Array = DL_.Array_;
+    Name = "DL";
+    break;
   }
 
   aos << Name <<"["<<NbRows<< ","<< NbCols << "]" << std::endl;
@@ -669,6 +688,7 @@ QPProblem_s::dump_problem( std::ostream &aos )
 
   dump(MATRIX_DU,aos);
   dump(VECTOR_DS,aos);
+  dump(VECTOR_DL,aos);
 
   dump(VECTOR_XL,aos);
   dump(VECTOR_XU,aos);
