@@ -148,6 +148,9 @@ namespace PatternGeneratorJRL
     };
     struct edges_s FootPosEdges_, ZMPPosEdges_;
 
+    double LeftFPosEdgesX_[5], LeftFPosEdgesY_[5];
+    double RightFPosEdgesX_[5], RightFPosEdgesY_[5];
+
     /// \brief Half foot size
     FootHalfSize LeftFootSize_, RightFootSize_;
 

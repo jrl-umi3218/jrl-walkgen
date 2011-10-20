@@ -48,15 +48,29 @@ RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
   DSFeetDistance_ = 0.2;
   SecurityMarginX_ = 0.04;
   SecurityMarginY_ = 0.04;
-
+  
+  double DefaultFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
+  double DefaultFPosEdgesY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
+  
+  for(int i=0;i<5;i++)
+    {
+      LeftFPosEdgesX_[i] = DefaultFPosEdgesX[i];
+      LeftFPosEdgesY_[i] = DefaultFPosEdgesY[i];
+      
+      RightFPosEdgesX_[i] =  DefaultFPosEdgesX[i];
+      RightFPosEdgesY_[i] = -DefaultFPosEdgesY[i];
+    }
+  
   set_feet_dimensions( aHS );
 
   init_convex_hulls();
-
+  
   // Register method to handle
   string aMethodName[] =
-    {":setfeetconstraint"};
-
+    {":setfeetconstraint",
+     ":setDSFeetDistance",
+     ":setFPosEdges"};
+  
   for(int i=0;i<1;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
@@ -84,17 +98,15 @@ RelativeFeetInequalities::init_convex_hulls()
 
   FootPosEdges_.LeftDS.resize(5);
   FootPosEdges_.LeftSS.resize(5);
-  double LeftFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
-  double LeftFPosEdgesY[5] = {-0.2, -0.3, -0.4, -0.3, -0.2};
-  FootPosEdges_.LeftDS.set(LeftFPosEdgesX,LeftFPosEdgesY);
-  FootPosEdges_.LeftSS.set(LeftFPosEdgesX,LeftFPosEdgesY);
+
+  FootPosEdges_.LeftDS.set(LeftFPosEdgesX_,LeftFPosEdgesY_);
+  FootPosEdges_.LeftSS.set(LeftFPosEdgesX_,LeftFPosEdgesY_);
 
   FootPosEdges_.RightDS.resize(5);
   FootPosEdges_.RightSS.resize(5);
-  double RightFPosEdgesX[5] = {-0.28, -0.2, 0.0, 0.2, 0.28};
-  double RightFPosEdgesY[5] = {0.2, 0.3, 0.4, 0.3, 0.2};
-  FootPosEdges_.RightDS.set(RightFPosEdgesX,RightFPosEdgesY);
-  FootPosEdges_.RightSS.set(RightFPosEdgesX,RightFPosEdgesY);
+
+  FootPosEdges_.RightDS.set(RightFPosEdgesX_,RightFPosEdgesY_);
+  FootPosEdges_.RightSS.set(RightFPosEdgesX_,RightFPosEdgesY_);
 
   ZMPPosEdges_.LeftDS.resize(4);
   ZMPPosEdges_.LeftSS.resize(4);
@@ -143,10 +155,10 @@ RelativeFeetInequalities::set_feet_dimensions( CjrlHumanoidDynamicRobot *aHS )
     }
   LeftFoot->getSoleSize( WidthHalf,HeightHalf );
 
-  LeftFootSize_.setHalfSizeInit( WidthHalf,HeightHalf );
-  LeftFootSize_.setConstraints( SecurityMarginX_,SecurityMarginY_ );
-  RightFootSize_.setHalfSizeInit( WidthHalf,HeightHalf );
-  RightFootSize_.setConstraints( SecurityMarginX_,SecurityMarginY_ );
+  LeftFootSize_.setHalfSizeInit( WidthHalf,HeightHalf,DSFeetDistance_ );
+  LeftFootSize_.setConstraints( SecurityMarginX_,SecurityMarginY_,DSFeetDistance_ );
+  RightFootSize_.setHalfSizeInit( WidthHalf,HeightHalf,DSFeetDistance_ );
+  RightFootSize_.setConstraints( SecurityMarginX_,SecurityMarginY_,DSFeetDistance_ );
 
   return 0;
 
@@ -333,12 +345,47 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
           Args >> SecurityMarginX_;
           Args >> SecurityMarginY_;
 
-          RightFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_ );
-          LeftFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_ );
+          RightFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_ , DSFeetDistance_ );
+          LeftFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_ );
           init_convex_hulls();
           cout << "Security margin On X: " << SecurityMarginX_
                << " Security margin On Y: " << SecurityMarginY_ << endl;
         }
     }
+  else if( Method == ":setDSFeetDistance" )
+    {
+      Args >> DSFeetDistance_;
+      init_convex_hulls();
+      cout << "DSFeetDistance = " << DSFeetDistance_ << endl;
+    }
+  else if( Method == ":setFPosEdges" )
+    {
+      string lCmd;
+      Args >> lCmd;
 
+      if (lCmd == "X")
+        {
+          cout << "LeftFeftFPosEdgesX = ";
+          for(int i=0;i<5;i++)
+            {
+              Args >> LeftFPosEdgesX_[i];
+              RightFPosEdgesX_[i] = LeftFPosEdgesX_[i];
+              cout << LeftFPosEdgesX_[i] << "  ";
+            }
+          cout << endl;
+          init_convex_hulls();
+        }
+      else if (lCmd == "Y")
+        {
+          cout << "LeftFeftFPosEdgesY = ";
+          for(int i=0;i<5;i++)
+            {
+              Args >> LeftFPosEdgesY_[i];
+              RightFPosEdgesY_[i] = -LeftFPosEdgesY_[i];
+              cout << LeftFPosEdgesY_[i] << "  ";
+            }
+          cout << endl;
+          init_convex_hulls();
+        }
+    }
 }

@@ -38,13 +38,15 @@ namespace PatternGeneratorJRL
     ~FootHalfSize();
     
     void setHalfSizeInit(double lHalfWidth,
-			 double lHalfHeight);
+                         double lHalfHeight,
+                         double DSFeetDistance);
 
     void setConstraints(double OnX,
-			double OnY);
+                        double OnY,
+                        double DSFeetDistance);
     
   protected:
-    void updateHalfHeightDS();
+    void updateHalfHeightDS(double DSFeetDistance);
     void updateHalfSize();
 
   private:
