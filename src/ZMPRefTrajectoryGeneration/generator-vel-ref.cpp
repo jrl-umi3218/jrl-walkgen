@@ -230,10 +230,8 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 
   deque<support_state_t>::const_iterator prwSS_it = SupportStates_deq.begin();
 
-  convex_hull_t ZMPFeasibilityEdges;
-  RFI_->set_vertices( ZMPFeasibilityEdges,
-      *prwSS_it,
-      INEQ_COP );
+  convex_hull_t ZMPFeasibilityEdges(4);
+  RFI_->set_vertices( ZMPFeasibilityEdges, *prwSS_it, INEQ_COP );
 
   const unsigned nbEdges = 4;
   double D_x[nbEdges] = {0.0, 0.0, 0.0, 0.0};
@@ -244,16 +242,15 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
   for( unsigned i=0; i<N_; i++ )
     {
       if( prwSS_it->StateChanged )
-        RFI_->set_vertices( ZMPFeasibilityEdges,*prwSS_it,
-            INEQ_COP );
+        RFI_->set_vertices( ZMPFeasibilityEdges, *prwSS_it, INEQ_COP );
 
       RFI_->compute_linear_system( ZMPFeasibilityEdges, D_x, D_y, dc, *prwSS_it );
 
       for( unsigned j = 0; j < nbEdges; j++ )
         {
-          Inequalities.D.x.push_back(i*nbEdges+j,i,D_x[j]);
-          Inequalities.D.y.push_back(i*nbEdges+j,i,D_y[j]);
-          Inequalities.dc(i*nbEdges+j) = dc[j];
+          Inequalities.D.x.push_back( i*nbEdges+j, i, D_x[j] );
+          Inequalities.D.y.push_back( i*nbEdges+j, i, D_y[j] );
+          Inequalities.dc( i*nbEdges+j ) = dc[j];
         }
 
       prwSS_it++;
@@ -286,8 +283,7 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
       if( prwSS_it->StateChanged && prwSS_it->StepNumber>0 && prwSS_it->Phase != DS)
         {
           prwSS_it--;//Take the support state before
-          RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it,
-              INEQ_FEET );
+          RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it, INEQ_FEET );
           prwSS_it++;
           RFI_->compute_linear_system( FootFeasibilityEdges, Dx, Dy, dc, *prwSS_it );
 

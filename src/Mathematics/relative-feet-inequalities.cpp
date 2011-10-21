@@ -103,17 +103,17 @@ RelativeFeetInequalities::init_convex_hulls()
   for( unsigned j=0;j<4;j++ )
     {
       //Left single support phase
-      ZMPPosEdges_.LeftSS.X[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
-      ZMPPosEdges_.LeftSS.Y[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeight();
+      ZMPPosEdges_.LeftSS.X_vec[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
+      ZMPPosEdges_.LeftSS.Y_vec[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeight();
       //Right single support phase
-      ZMPPosEdges_.RightSS.X[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
-      ZMPPosEdges_.RightSS.Y[j] = lycoefsRight[j]*RightFootSize_.getHalfHeight();
+      ZMPPosEdges_.RightSS.X_vec[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
+      ZMPPosEdges_.RightSS.Y_vec[j] = lycoefsRight[j]*RightFootSize_.getHalfHeight();
       //Left DS phase
-      ZMPPosEdges_.LeftDS.X[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
-      ZMPPosEdges_.LeftDS.Y[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeightDS()-DSFeetDistance_/2.0;
+      ZMPPosEdges_.LeftDS.X_vec[j] = lxcoefsLeft[j]*LeftFootSize_.getHalfWidth();
+      ZMPPosEdges_.LeftDS.Y_vec[j] = lycoefsLeft[j]*LeftFootSize_.getHalfHeightDS()-DSFeetDistance_/2.0;
       //Right DS phase
-      ZMPPosEdges_.RightDS.X[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
-      ZMPPosEdges_.RightDS.Y[j] = lycoefsRight[j]*RightFootSize_.getHalfHeightDS()+DSFeetDistance_/2.0;
+      ZMPPosEdges_.RightDS.X_vec[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
+      ZMPPosEdges_.RightDS.Y_vec[j] = lycoefsRight[j]*RightFootSize_.getHalfHeightDS()+DSFeetDistance_/2.0;
     }
 
   return 0;
@@ -171,20 +171,33 @@ RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
       break;
 
     }
-  //Prepare the computation of the convex hull
+  //Choose edges
   if( Support.Foot == LEFT )
     {
       if( Support.Phase == DS )
-        ConvexHull = ConvexHull_p->LeftDS;
+        {
+          ConvexHull.X_vec = ConvexHull_p->LeftDS.X_vec;
+          ConvexHull.Y_vec = ConvexHull_p->LeftDS.Y_vec;
+        }
       else
-        ConvexHull = ConvexHull_p->LeftSS;
+        {
+          ConvexHull.Y_vec = ConvexHull_p->LeftSS.X_vec;
+          ConvexHull.Y_vec = ConvexHull_p->LeftSS.Y_vec;
+        }
+
     }
   else
     {
       if( Support.Phase == DS )
-        ConvexHull = ConvexHull_p->RightDS;
+        {
+          ConvexHull.Y_vec = ConvexHull_p->RightDS.X_vec;
+          ConvexHull.Y_vec = ConvexHull_p->RightDS.Y_vec;
+        }
       else
-        ConvexHull = ConvexHull_p->RightSS;
+        {
+          ConvexHull.Y_vec = ConvexHull_p->RightSS.X_vec;
+          ConvexHull.Y_vec = ConvexHull_p->RightSS.Y_vec;
+        }
     }
 
   ConvexHull.rotate(Support.Yaw);
@@ -194,124 +207,123 @@ RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
 }
 
 
+//int
+//RelativeFeetInequalities::compute_linear_system( const convex_hull_t & ConvexHull,
+//    MAL_MATRIX(&D,double),
+//    MAL_MATRIX(&Dc,double),
+//    const support_state_t & PrwSupport ) const
+//{
+//
+//  double dx,dy,dc,x1,y1,x2,y2;
+//  unsigned n = ConvexHull.X.size();
+//  MAL_MATRIX_RESIZE( D,ConvexHull.X.size(),2 );
+//  MAL_MATRIX_RESIZE( Dc,ConvexHull.X.size(),1 );
+//
+//  double Sign;
+//  if(PrwSupport.Foot == LEFT)
+//    Sign = 1.0;
+//  else
+//    Sign = -1.0;
+//  for( unsigned i=0;i<n-1;i++ )//first n-1 inequalities
+//    {
+//      y1 = ConvexHull.Y[i];
+//      y2 = ConvexHull.Y[i+1];
+//      x1 = ConvexHull.X[i];
+//      x2 = ConvexHull.X[i+1];
+//
+//      dx = y1-y2;
+//      dy = x2-x1;
+//      dc = dx*x1+dy*y1;
+//
+//      //symmetrical constraints
+//      dx = Sign*dx;
+//      dy = Sign*dy;
+//      dc = Sign*dc;
+//
+//      D(i,0) = dx; D(i,1)= dy;
+//      Dc(i,0) = dc;
+//    }
+//
+//  {
+//    //Last inequality
+//    unsigned i = n-1;
+//
+//    y1 = ConvexHull.Y[i];
+//    y2 = ConvexHull.Y[0];
+//    x1 = ConvexHull.X[i];
+//    x2 = ConvexHull.X[0];
+//
+//    dx = y1-y2;
+//    dy = x2-x1;
+//    dc = dx*x1+dy*y1;
+//
+//    //for symmetrical constraints
+//    dx = Sign*dx;
+//    dy = Sign*dy;
+//    dc = Sign*dc;
+//
+//    D(i,0) = dx; D(i,1)= dy;
+//    Dc(i,0) = dc;
+//  }
+//
+//  return 0;
+//
+//}
+
+
 int
-RelativeFeetInequalities::compute_linear_system( const convex_hull_t & ConvexHull,
-    MAL_MATRIX(&D,double),
-    MAL_MATRIX(&Dc,double),
+RelativeFeetInequalities::compute_linear_system ( const convex_hull_t & ConvexHull,
     const support_state_t & PrwSupport ) const
-{
-
-  double dx,dy,dc,x1,y1,x2,y2;
-  unsigned n = ConvexHull.X.size();
-  MAL_MATRIX_RESIZE( D,ConvexHull.X.size(),2 );
-  MAL_MATRIX_RESIZE( Dc,ConvexHull.X.size(),1 );
-
-  double Sign;
-  if(PrwSupport.Foot == LEFT)
-    Sign = 1.0;
-  else
-    Sign = -1.0;
-  for( unsigned i=0;i<n-1;i++ )//first n-1 inequalities
-    {
-      y1 = ConvexHull.Y[i];
-      y2 = ConvexHull.Y[i+1];
-      x1 = ConvexHull.X[i];
-      x2 = ConvexHull.X[i+1];
-
-      dx = y1-y2;
-      dy = x2-x1;
-      dc = dx*x1+dy*y1;
-
-      //symmetrical constraints
-      dx = Sign*dx;
-      dy = Sign*dy;
-      dc = Sign*dc;
-
-      D(i,0) = dx; D(i,1)= dy;
-      Dc(i,0) = dc;
-    }
-
-  {
-    //Last inequality
-    unsigned i = n-1;
-
-    y1 = ConvexHull.Y[i];
-    y2 = ConvexHull.Y[0];
-    x1 = ConvexHull.X[i];
-    x2 = ConvexHull.X[0];
-
-    dx = y1-y2;
-    dy = x2-x1;
-    dc = dx*x1+dy*y1;
-
-    //for symmetrical constraints
-    dx = Sign*dx;
-    dy = Sign*dy;
-    dc = Sign*dc;
-
-    D(i,0) = dx; D(i,1)= dy;
-    Dc(i,0) = dc;
-  }
-
-  return 0;
-
-}
-
-
-int
-RelativeFeetInequalities::compute_linear_system (const convex_hull_t & ConvexHull,
-    double * Dx, double * Dy, double * Dc,
-    const support_state_t & PrwSupport) const
 {
 
   double dx,dy,dc,x1,y1,x2,y2;
   unsigned nrows = ConvexHull.X.size();
 
-  double Sign;
-  if(PrwSupport.Foot == LEFT)
-    Sign = 1.0;
+  double sign;
+  if( PrwSupport.Foot == LEFT )
+    sign = 1.0;
   else
-    Sign = -1.0;
-  for( unsigned i=0;i<nrows-1;i++ )//first n-1 inequalities
+    sign = -1.0;
+  for( unsigned i=0; i<nrows-1;i++ )//first n-1 inequalities
     {
-      y1 = ConvexHull.Y[i];
-      y2 = ConvexHull.Y[i+1];
-      x1 = ConvexHull.X[i];
-      x2 = ConvexHull.X[i+1];
+      y1 = ConvexHull.Y_vec[i];
+      y2 = ConvexHull.Y_vec[i+1];
+      x1 = ConvexHull.X_vec[i];
+      x2 = ConvexHull.X_vec[i+1];
 
       dx = y1-y2;
       dy = x2-x1;
       dc = dx*x1+dy*y1;
 
       //symmetrical constraints
-      dx = Sign*dx;
-      dy = Sign*dy;
-      dc = Sign*dc;
+      dx = sign*dx;
+      dy = sign*dy;
+      dc = sign*dc;
 
-      Dx[i] = dx; Dy[i]= dy;
-      Dc[i] = dc;
+      ConvexHull.A_vec[i] = dx; ConvexHull.B_vec[i]= dy;
+      ConvexHull.D_vec[i] = dc;
     }
 
   {
     //Last inequality
     unsigned i = nrows-1;
 
-    y1 = ConvexHull.Y[i];
-    y2 = ConvexHull.Y[0];
-    x1 = ConvexHull.X[i];
-    x2 = ConvexHull.X[0];
+    y1 = ConvexHull.Y_vec[i];
+    y2 = ConvexHull.Y_vec[0];
+    x1 = ConvexHull.X_vec[i];
+    x2 = ConvexHull.X_vec[0];
 
     dx = y1-y2;
     dy = x2-x1;
     dc = dx*x1+dy*y1;
 
     //for symmetrical constraints
-    dx = Sign*dx;
-    dy = Sign*dy;
-    dc = Sign*dc;
+    dx = sign*dx;
+    dy = sign*dy;
+    dc = sign*dc;
 
-    Dx[i] = dx; Dy[i]= dy;
-    Dc[i] = dc;
+    ConvexHull.A_vec[i] = dx; ConvexHull.B_vec[i]= dy;
+    ConvexHull.D_vec[i] = dc;
   }
 
   return 0;

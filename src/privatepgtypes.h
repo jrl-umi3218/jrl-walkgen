@@ -38,8 +38,8 @@
 namespace PatternGeneratorJRL
 {
 
-  // ENUMS:
-  // ------
+  /// \name Enum types
+  /// \{
   enum foot_type_e
   {
     LEFT, RIGHT
@@ -65,8 +65,7 @@ namespace PatternGeneratorJRL
     POSITION, VELOCITY, ACCELERATION,
     JERK, COP_POSITION
   };
-  // ------
-  // :ENUMS
+  /// \}
 
   /// \brief State of the center of mass
   struct com_t
@@ -131,48 +130,35 @@ namespace PatternGeneratorJRL
     reference_t(const reference_t &);
   };
 
-  /// \brief Linear inequality with free foot placement.
-  struct linear_inequality_ff_t
-  {
-    MAL_MATRIX(D,double);
-    MAL_MATRIX(Dc,double);
-    int StepNumber;
-  };
-
-  /// \brief Linear constraints
-  struct linear_constraint_t
-  {
-    boost_ublas::compressed_vector<double> A;
-    double b;
-  };
-
-  /// \brief Set of 2-dimensional points
+  /// \brief Convex hull
   struct convex_hull_t
   {
 
-    boost_ublas::vector<double> X;
-    boost_ublas::vector<double> Y;
+    /// \brief Edges
+    std::vector<double> X_vec, Y_vec, Z_vec;
+    /// \brief Inequalities A_vec(i)*x+B_vec(i)y+C_vec(i)z+D_vec(i) > 0
+    std::vector<double> A_vec, B_vec, C_vec, D_vec;
 
     /// \brief Rotate the points around the origin by angle
     ///
-    /// \param[in] Angle
-    void rotate( double Angle );
+    /// \param[in] angle
+    void rotate( double angle );
 
     /// \brief Resize members to the desired number of points
     ///
     /// \param[in] size
-    void resize( int Size );
+    void resize( int size );
 
     /// \brief Set the vectors from arrays
     ///
-    /// \param[in] X
-    /// \param[in] Y
-    void set(const double * X_a, const double * Y_a);
+    /// \param[in] X_a
+    /// \param[in] Y_a
+    void set( const double * X_a, const double * Y_a );
 
     /// \brief Set all points to zero
     void reset();
 
-    convex_hull_t( int Size );
+    convex_hull_t( unsigned size );
     convex_hull_t();
 
   };

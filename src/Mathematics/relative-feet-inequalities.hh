@@ -80,18 +80,18 @@ namespace PatternGeneratorJRL
         const support_state_t & SupportState,
         ineq_e type);
 
-    /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
-    /// convex hull specified by a vector of points.
-    ///
-    /// \param[in] aVecOfPoints a vector of vertices
-    /// \param[out] D left hand side of the inequalities
-    /// \param[out] Dc right hand side of the inequalities
-    /// \param[in] PrwSupport previewed support state
-    /// \return 0
-    int compute_linear_system (const convex_hull_t & ConvexHull,
-        MAL_MATRIX (&D, double),
-        MAL_MATRIX (&Dc, double),
-        const support_state_t & PrwSupport) const;
+//    /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
+//    /// convex hull specified by a vector of points.
+//    ///
+//    /// \param[in] aVecOfPoints a vector of vertices
+//    /// \param[out] D left hand side of the inequalities
+//    /// \param[out] Dc right hand side of the inequalities
+//    /// \param[in] PrwSupport previewed support state
+//    /// \return 0
+//    int compute_linear_system (const convex_hull_t & ConvexHull,
+//        MAL_MATRIX (&D, double),
+//        MAL_MATRIX (&Dc, double),
+//        const support_state_t & PrwSupport) const;
 
     /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
     /// convex hull specified by a vector of points.

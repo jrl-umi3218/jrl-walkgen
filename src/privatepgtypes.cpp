@@ -155,22 +155,22 @@ namespace PatternGeneratorJRL
 
 
   void
-  convex_hull_t::rotate( double Angle )
+  convex_hull_t::rotate( double angle )
   {
 
-    double XOld, YOld;
+    double xOld, yOld;
     for( unsigned int j=0; j<X.size(); j++ )
       {
-        XOld = X[j];
-        YOld = Y[j];
-        X[j] = ( XOld*cos(Angle) - YOld*sin(Angle) );
-        Y[j] = ( XOld*sin(Angle) + YOld*cos(Angle) );
+        xOld = X[j];
+        yOld = Y[j];
+        X[j] = ( xOld*cos(angle) - yOld*sin(angle) );
+        Y[j] = ( xOld*sin(angle) + yOld*cos(angle) );
       }
 
   }
 
 
-  convex_hull_t::convex_hull_t( int Size )
+  convex_hull_t::convex_hull_t( int size )
   {
 
     resize(Size);
@@ -196,11 +196,16 @@ namespace PatternGeneratorJRL
 
 
   void
-  convex_hull_t::resize( int Size )
+  convex_hull_t::resize( unsigned size )
   {
 
-    X.resize(Size);
-    Y.resize(Size);
+    X_vec.resize(size);
+    Y_vec.resize(size);
+    Z_vec.resize(size);
+    A_vec.resize(size);
+    B_vec.resize(size);
+    C_vec.resize(size);
+    D_vec.resize(size);
 
   }
 
