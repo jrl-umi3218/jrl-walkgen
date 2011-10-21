@@ -121,6 +121,8 @@ namespace PatternGeneratorJRL
     { IntermedData_->CoM(CoM); };
     /// \}
 
+
+    void amelif_preview_display(solution_t & Solution);
     //
     // Protected methods
     //

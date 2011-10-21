@@ -406,9 +406,13 @@ ZMPVelocityReferencedQP::OnLine(double time,
       if (Solution_.useWarmStart)
     	  VRQPGenerator_->compute_warm_start( Solution_ );//TODO: Move to update_problem or build_constraints?
       Problem_.solve( QLD, Solution_, NONE );
+
       if(Solution_.Fail>0)
           Problem_.dump( time );
 
+
+
+      VRQPGenerator_->amelif_preview_display(Solution_);
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------

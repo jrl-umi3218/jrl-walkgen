@@ -28,7 +28,8 @@
 #include "portability/gettimeofday.hh"
 
 #include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
-
+#include <iostream>
+#include <fstream>
 using namespace std;
 using namespace PatternGeneratorJRL;
 
@@ -746,6 +747,109 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
 
 }
 
+void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
+	std::ofstream data("pg-data-displayer.dat");
+	boost_ublas::vector<double> ZX(N_);
+	boost_ublas::vector<double> ZY(N_);
+	boost_ublas::vector<double> CX(N_);
+	boost_ublas::vector<double> CY(N_);
+	boost_ublas::vector<double> X(N_);
+	boost_ublas::vector<double> Y(N_);
+	for(int i=0;i<16;++i){
+		X(i)=Solution.Solution_vec(i);
+		Y(i)=Solution.Solution_vec(i+N_);
+	}
+	// Compute previewed ZMP
+	ZX=prod(Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.x)+
+	   prod(Robot_->DynamicsCoPJerk().U,X);
+
+	ZY=prod(Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.y)+
+	   prod(Robot_->DynamicsCoPJerk().U,Y);
+
+	// Compute previewed COM
+	CX=prod(Robot_->CoM().Dynamics(POSITION).S, IntermedData_->State().CoM.x)+
+	   prod(Robot_->CoM().Dynamics(POSITION).U,X);
+
+	CY=prod(Robot_->CoM().Dynamics(POSITION).S, IntermedData_->State().CoM.y)+
+	   prod(Robot_->CoM().Dynamics(POSITION).U,Y);
+	//display previewed ZMP
+	for(int i=0;i<16;++i){
+		std::stringstream ssTmp;
+		ssTmp << "TRAJ\t1\t\t0\t1\t1\t\t" << ZX(i) << "\t" << ZY(i) << "\t0\n";
+		data.write(ssTmp.str().c_str(),ssTmp.str().size());
+	}
+
+	//display previewed COM
+	for(int i=0;i<16;++i){
+		std::stringstream ssTmp;
+		ssTmp << "TRAJ\t2\t\t1\t0\t0\t\t" << CX(i) << "\t" << CY(i) << "\t0\n";
+		data.write(ssTmp.str().c_str(),ssTmp.str().size());
+	}
+
+
+
+	support_state_t currentSupport = Solution.SupportStates_deq.front();
+	deque<support_state_t>::iterator prwSS_it = Solution.SupportStates_deq.begin();
+
+	unsigned int j = 0;
+	convex_hull_t FootFeasibilityEdges, COPFeasibilityEdges;
+	unsigned int nbSteps = Solution.SupportStates_deq.back().StepNumber;
+
+	//display current COP constraint
+	RFI_->set_vertices( COPFeasibilityEdges, *prwSS_it, INEQ_COP );
+	for(int k=0;k<4;++k){
+		  std::stringstream ssTmp;
+		  ssTmp << "BOUND\t-1\t\t0.5\t0.5\t0.5\t\t" <<
+				  COPFeasibilityEdges.X[k]+currentSupport.X << "\t" <<
+				  COPFeasibilityEdges.Y[k]+currentSupport.Y << "\t0\n";
+		  data.write(ssTmp.str().c_str(),ssTmp.str().size());
+	 }
+
+	prwSS_it++;
+	for(unsigned int i=0; i<N_; i++)
+	{
+
+	  //display constraints
+	  if (currentSupport.Foot != prwSS_it->Foot){
+		  currentSupport.Foot = prwSS_it->Foot;
+		  RFI_->set_vertices( COPFeasibilityEdges, *prwSS_it, INEQ_COP );
+
+
+		  RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it, INEQ_FEET );
+
+		  //display COP constraints
+		  for(int k=0;k<4;++k){
+			  std::stringstream ssTmp;
+			  ssTmp << "BOUND\t" << j << "\t\t0.5\t0.5\t0.5\t\t" <<
+					  COPFeasibilityEdges.X[k]+Solution.Solution_vec(2*N_+j) << "\t" <<
+					  COPFeasibilityEdges.Y[k]+Solution.Solution_vec(2*N_+nbSteps+j) << "\t0\n";
+			  data.write(ssTmp.str().c_str(),ssTmp.str().size());
+		  }
+
+		  //display feet constraints
+		  for(int k=0;k<5;++k){
+			  std::stringstream ssTmp;
+			  ssTmp << "BOUND\t" << j+nbSteps << "\t\t0.5\t0.5\t0.5\t\t" <<
+					  FootFeasibilityEdges.X[k]+Solution.Solution_vec(2*N_+j) << "\t" <<
+					  FootFeasibilityEdges.Y[k]+Solution.Solution_vec(2*N_+nbSteps+j) << "\t0\n";
+			  data.write(ssTmp.str().c_str(),ssTmp.str().size());
+		  }
+
+		  //display feet positions
+		  std::stringstream ssTmp;
+		  ssTmp << "POINT\t" << j+nbSteps << "\t\t1\t0\t0\t\t" <<
+				  Solution.Solution_vec(2*N_+j) << "\t" <<
+				  Solution.Solution_vec(2*N_+nbSteps+j) << "\t0\n";
+		  data.write(ssTmp.str().c_str(),ssTmp.str().size());
+		  j++;
+	  }
+	  prwSS_it++;
+	}
+	data.close();
+
+
+
+}
 
 
 void
