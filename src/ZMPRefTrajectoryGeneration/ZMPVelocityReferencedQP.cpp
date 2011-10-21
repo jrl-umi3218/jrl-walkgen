@@ -417,10 +417,12 @@ ZMPVelocityReferencedQP::OnLine(double Time,
 
       if (Solution_.useWarmStart)
     	  VRQPGenerator_->compute_warm_start( Solution_);
-
-      Problem_.solve(QPProblem_s::LSSOL, Solution_, QPProblem_s::CTR2 );
+      Problem_.solve(QPProblem_s::LSSOL, Solution_, QPProblem_s::NONE );
       if(Solution_.Fail>0)
         Problem_.dump( Time );
+
+
+      VRQPGenerator_->amelif_preview_display(Solution_);
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
@@ -453,14 +455,12 @@ ZMPVelocityReferencedQP::OnLine(double Time,
         }
       UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
 
-
+      /*
       // Compute CPU consumption time.
       gettimeofday(&end,0);
-
-
       gettimeofday(&mid1,0);
-      gettimeofday(&mid3,0);
       gettimeofday(&mid2,0);
+      gettimeofday(&mid3,0);
       gettimeofday(&mid4,0);
 
 
@@ -492,7 +492,7 @@ ZMPVelocityReferencedQP::OnLine(double Time,
     	  std::cout << "max loop time : " << MaxCPUTime*1000 << " ms, whose LSSOL :" << MaxQLDTime*1000 << " ms and warmstart :" << CurrentinvariantpartTime*1000 << " ms " << std::endl<< std::endl;
     	  CurrentCPUTime=CurrentQLDTime=CurrentinvariantpartTime=0;
       }
-
+*/
     }
 
 }
