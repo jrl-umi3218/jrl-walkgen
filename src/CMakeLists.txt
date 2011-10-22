@@ -43,7 +43,6 @@ SET(SOURCES
   Mathematics/Polynome.cpp
   Mathematics/PolynomeFoot.cpp
   Mathematics/PLDPSolver.cpp
-  Mathematics/PLDPHerdt.cpp
   Mathematics/qld.cpp
   Mathematics/StepOverPolynome.cpp
   Mathematics/intermediate-qp-matrices.cpp

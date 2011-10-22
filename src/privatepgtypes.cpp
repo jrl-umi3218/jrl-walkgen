@@ -155,65 +155,117 @@ namespace PatternGeneratorJRL
 
 
   void
-  convex_hull_t::rotate( double Angle )
+  convex_hull_t::rotate( axis_e axis, double angle )
   {
 
-    double XOld, YOld;
-    for( unsigned int j=0; j<X.size(); j++ )
+    switch(axis)
+    {
+    case YAW:
+      double xOld, yOld;
+      for( unsigned int j=0; j<X_vec.size(); j++ )
+        {
+          xOld = X_vec[j];
+          yOld = Y_vec[j];
+          X_vec[j] = ( xOld*cos(angle) - yOld*sin(angle) );
+          Y_vec[j] = ( xOld*sin(angle) + yOld*cos(angle) );
+        }
+      break;
+    case PITCH:
+      break;
+    case ROLL:
+      break;
+    case X_AXIS:
+      break;
+    case  Y_AXIS:
+      break;
+    case Z_AXIS:
+      break;
+    }
+
+  }
+
+
+  convex_hull_t::convex_hull_t( unsigned nbVert, unsigned nbIneq ):
+      nbIneq_(0), nbVert_(0)
+  {
+
+    resize( nbVert, nbIneq );
+    clear();
+
+  }
+
+
+  void
+  convex_hull_t::clear()
+  {
+
+    X_vec.clear();
+    Y_vec.clear();
+    Z_vec.clear();
+    A_vec.clear();
+    B_vec.clear();
+    C_vec.clear();
+    D_vec.clear();
+
+  }
+
+
+  void
+  convex_hull_t::resize( unsigned nbVert, unsigned nbIneq )
+  {
+
+    X_vec.resize(nbVert);
+    Y_vec.resize(nbVert);
+    Z_vec.resize(nbVert);
+    A_vec.resize(nbIneq);
+    B_vec.resize(nbIneq);
+    C_vec.resize(nbIneq);
+    D_vec.resize(nbIneq);
+
+    nbVert_ = nbVert;
+    nbIneq_ = nbIneq;
+
+  }
+
+
+  void
+  convex_hull_t::set_vertices( const double * X_a, const double * Y_a, const double * Z_a )
+  {
+
+    for(unsigned i=0; i<nbVert_; i++)
       {
-        XOld = X[j];
-        YOld = Y[j];
-        X[j] = ( XOld*cos(Angle) - YOld*sin(Angle) );
-        Y[j] = ( XOld*sin(Angle) + YOld*cos(Angle) );
+        X_vec[i] = X_a[i];
+        Y_vec[i] = Y_a[i];
+        Z_vec[i] = Z_a[i];
+      }
+
+  }
+  void
+  convex_hull_t::set_vertices( const double * X_a, const double * Y_a )
+  {
+
+    for(unsigned i=0; i<nbVert_; i++)
+      {
+        X_vec[i] = X_a[i];
+        Y_vec[i] = Y_a[i];
       }
 
   }
 
 
-  convex_hull_t::convex_hull_t( int Size )
-  {
-
-    resize(Size);
-    reset();
-
-  }
-
-
-  convex_hull_t::convex_hull_t()
-  {
-
-  }
-
-
   void
-  convex_hull_t::reset()
+  convex_hull_t::cout()
   {
 
-    X.clear();
-    Y.clear();
+    std::cout<<"Vertices: "<<nbVert_<<std::endl;
+    for(unsigned i=0; i<nbVert_; ++i)
+      std::cout<<X_vec[i]<<" "<<Y_vec[i]<<std::endl;
+    std::cout<<std::endl;
 
-  }
-
-
-  void
-  convex_hull_t::resize( int Size )
-  {
-
-    X.resize(Size);
-    Y.resize(Size);
-
-  }
-
-
-  void
-  convex_hull_t::set( const double * Xa, const double * Ya )
-  {
-
-    for(unsigned i=0; i<X.size(); i++)
-      {
-        X[i] = Xa[i];
-        Y[i] = Ya[i];
-      }
+    std::cout<<"Inequalities: "<<nbIneq_<<std::endl;
+    for(unsigned i=0; i<nbIneq_; ++i)
+      std::cout<<A_vec[i]<<" "<<B_vec[i]<<" "<<C_vec[i]<<" "<<D_vec[i]<<std::endl;
+    std::cout<<std::endl;
 
   }
 

@@ -38,8 +38,8 @@
 namespace PatternGeneratorJRL
 {
 
-  // ENUMS:
-  // ------
+  /// \name Enum types
+  /// \{
   enum foot_type_e
   {
     LEFT, RIGHT
@@ -89,8 +89,12 @@ namespace PatternGeneratorJRL
     ITT,
     CTR
   };
-  // ------
-  // :ENUMS
+
+  enum axis_e
+  {
+    X_AXIS, Y_AXIS, Z_AXIS, YAW, PITCH, ROLL
+  };
+  /// \}
 
   /// \brief State of the center of mass
   struct com_t
@@ -155,49 +159,57 @@ namespace PatternGeneratorJRL
     reference_t(const reference_t &);
   };
 
-  /// \brief Linear inequality with free foot placement.
-  struct linear_inequality_ff_t
-  {
-    MAL_MATRIX(D,double);
-    MAL_MATRIX(Dc,double);
-    int StepNumber;
-  };
-
-  /// \brief Linear constraints
-  struct linear_constraint_t
-  {
-    boost_ublas::compressed_vector<double> A;
-    double b;
-  };
-
-  /// \brief Set of 2-dimensional points
+  /// \brief Convex hull
   struct convex_hull_t
   {
 
-    boost_ublas::vector<double> X;
-    boost_ublas::vector<double> Y;
+    /// \brief Edges
+    std::vector<double> X_vec, Y_vec, Z_vec;
+    /// \brief Inequalities A_vec(i)*x+B_vec(i)y+C_vec(i)z+D_vec(i) > 0
+    std::vector<double> A_vec, B_vec, C_vec, D_vec;
 
-    /// \brief Rotate the points around the origin by angle
+    /// \brief Rotate the points around the origin of the hull
     ///
-    /// \param[in] Angle
-    void rotate( double Angle );
+    /// \param[in] axis
+    /// \param[in] angle
+    void rotate( axis_e axis, double angle );
 
     /// \brief Resize members to the desired number of points
-    ///
-    /// \param[in] size
-    void resize( int Size );
+    /// \param[in] nbVert
+    /// \param[in] nbIneq
+    void resize( unsigned nbVert, unsigned nbIneq = 0 );
 
-    /// \brief Set the vectors from arrays
+    /// \brief Set the polyhedron vertices from arrays
     ///
-    /// \param[in] X
-    /// \param[in] Y
-    void set(const double * X_a, const double * Y_a);
+    /// \param[in] X_a
+    /// \param[in] Y_a
+    /// \param[in] Z_a
+    void set_vertices( const double * X_a, const double * Y_a, const double * Z_a );
+    /// \brief Set the polygon vectors from arrays
+    ///
+    /// \param[in] X_a
+    /// \param[in] Y_a
+    void set_vertices( const double * X_a, const double * Y_a );
 
     /// \brief Set all points to zero
-    void reset();
+    void clear();
 
-    convex_hull_t( int Size );
-    convex_hull_t();
+    /// \brief Print
+    void cout();
+
+    /// \brief Constructor
+    ///
+    /// \param[in] nbVert Number vertices
+    /// \param[in] nbIneq Number inequalities
+    convex_hull_t( unsigned nbVert = 0, unsigned nbIneq = 0 );
+
+  private:
+
+    /// \brief Number inequalities
+    unsigned nbIneq_;
+
+    /// \brief Number vertices
+    unsigned nbVert_;
 
   };
 

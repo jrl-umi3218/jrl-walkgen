@@ -34,16 +34,6 @@
 namespace PatternGeneratorJRL
 {
 
-  //
-  // Related types
-  //
-
-  /// \brief Axes
-  enum AxesType
-  {
-    X, Y, Z, PITCH, ROLL, YAW
-  };
-
   /// \brief State vectors
   struct rigid_body_state_s
   {
