@@ -68,42 +68,21 @@ namespace PatternGeneratorJRL
     ~RelativeFeetInequalities ();
     /// \}
 
-
     /// \brief Adapt vertices to the support foot and its orientation
     ///
     /// \param[out] ConvexHull Vertices of the convex hull
-    /// \param[in] Orientation Desired orientation of the convex hull
     /// \param[in] SupportState Corresponding support state
-    /// \param[in] Type Type
-    /// \return 0
-    int set_vertices( convex_hull_t & ConvexHull,
+    /// \param[in] Type CoP/Feet
+    void set_vertices( convex_hull_t & ConvexHull,
         const support_state_t & SupportState,
         ineq_e type);
-
-//    /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
-//    /// convex hull specified by a vector of points.
-//    ///
-//    /// \param[in] aVecOfPoints a vector of vertices
-//    /// \param[out] D left hand side of the inequalities
-//    /// \param[out] Dc right hand side of the inequalities
-//    /// \param[in] PrwSupport previewed support state
-//    /// \return 0
-//    int compute_linear_system (const convex_hull_t & ConvexHull,
-//        MAL_MATRIX (&D, double),
-//        MAL_MATRIX (&Dc, double),
-//        const support_state_t & PrwSupport) const;
 
     /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
     /// convex hull specified by a vector of points.
     ///
-    /// \param[in] aVecOfPoints a vector of vertices
-    /// \param[out] Dx left hand side of the constraints
-    /// \param[out] Dy left hand side of the constraints
-    /// \param[out] Dc right hand side of the constraints
+    /// \param[out] aVecOfPoints a vector of vertices
     /// \param[in] PrwSupport previewed support state
-    /// \return 0
-    int compute_linear_system (const convex_hull_t & ConvexHull,
-        double * Dx, double * Dy, double * Dc,
+    void compute_linear_system ( convex_hull_t & ConvexHull,
         const support_state_t & PrwSupport) const;
 
     /// \brief Reimplement the interface of SimplePluginManager

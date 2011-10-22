@@ -65,6 +65,11 @@ namespace PatternGeneratorJRL
     POSITION, VELOCITY, ACCELERATION,
     JERK, COP_POSITION
   };
+
+  enum axis_e
+  {
+    X_AXIS, Y_AXIS, Z_AXIS, YAW, PITCH, ROLL
+  };
   /// \}
 
   /// \brief State of the center of mass
@@ -139,27 +144,48 @@ namespace PatternGeneratorJRL
     /// \brief Inequalities A_vec(i)*x+B_vec(i)y+C_vec(i)z+D_vec(i) > 0
     std::vector<double> A_vec, B_vec, C_vec, D_vec;
 
-    /// \brief Rotate the points around the origin by angle
+    /// \brief Rotate the points around the origin of the hull
     ///
+    /// \param[in] axis
     /// \param[in] angle
-    void rotate( double angle );
+    void rotate( axis_e axis, double angle );
 
     /// \brief Resize members to the desired number of points
-    ///
-    /// \param[in] size
-    void resize( int size );
+    /// \param[in] nbVert
+    /// \param[in] nbIneq
+    void resize( unsigned nbVert, unsigned nbIneq = 0 );
 
-    /// \brief Set the vectors from arrays
+    /// \brief Set the polyhedron vertices from arrays
     ///
     /// \param[in] X_a
     /// \param[in] Y_a
-    void set( const double * X_a, const double * Y_a );
+    /// \param[in] Z_a
+    void set_vertices( const double * X_a, const double * Y_a, const double * Z_a );
+    /// \brief Set the polygon vectors from arrays
+    ///
+    /// \param[in] X_a
+    /// \param[in] Y_a
+    void set_vertices( const double * X_a, const double * Y_a );
 
     /// \brief Set all points to zero
-    void reset();
+    void clear();
 
-    convex_hull_t( unsigned size );
-    convex_hull_t();
+    /// \brief Print
+    void cout();
+
+    /// \brief Constructor
+    ///
+    /// \param[in] nbVert Number vertices
+    /// \param[in] nbIneq Number inequalities
+    convex_hull_t( unsigned nbVert = 0, unsigned nbIneq = 0 );
+
+  private:
+
+    /// \brief Number inequalities
+    unsigned nbIneq_;
+
+    /// \brief Number vertices
+    unsigned nbVert_;
 
   };
 
