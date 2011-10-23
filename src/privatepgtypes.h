@@ -190,6 +190,13 @@ namespace PatternGeneratorJRL
     /// \param[in] X_a
     /// \param[in] Y_a
     void set_vertices( const double * X_a, const double * Y_a );
+    /// \brief Set polyhedral inequalities from arrays
+    ///
+    /// \param[in] A_a
+    /// \param[in] B_a
+    /// \param[in] C_a
+    /// \param[in] D_a
+    void set_inequalities( const double * A_a, const double * B_a, const double * C_a, const double * D_a );
 
     /// \brief Set all points to zero
     void clear();
@@ -219,13 +226,13 @@ namespace PatternGeneratorJRL
   {
     struct coordinate_t
     {
-      boost_ublas::compressed_matrix<double, boost_ublas::row_major> x;
-      boost_ublas::compressed_matrix<double, boost_ublas::row_major> y;
-      boost_ublas::compressed_matrix<double, boost_ublas::row_major> z;
+      boost_ublas::compressed_matrix<double, boost_ublas::row_major> X_mat;
+      boost_ublas::compressed_matrix<double, boost_ublas::row_major> Y_mat;
+      boost_ublas::compressed_matrix<double, boost_ublas::row_major> Z_mat;
     };
     struct coordinate_t D;
 
-    boost_ublas::vector<double> dc;
+    boost_ublas::vector<double> Dc_vec;
 
     /// \brief Classifier
     int type;

@@ -129,13 +129,12 @@ namespace PatternGeneratorJRL
 
     /// \brief Compute the selection matrices
     ///
-    /// \param[in] deqSupportStates
-    void generate_selection_matrices( const std::deque<support_state_t> & deqSupportStates);
+    /// \param[in] SupportStates_deq
+    void generate_selection_matrices( const std::deque<support_state_t> & SupportStates_deq);
 
     /// \brief Generate a queue of inequalities with respect to the centers of the feet
     ///
     /// \param[out] Inequalities
-    /// \param[in] FCALS
     /// \param[in] SupportStates_deq
     void build_inequalities_cop(linear_inequality_t & Inequalities,
         const std::deque<support_state_t> & SupportStates_deq) const;
@@ -144,9 +143,16 @@ namespace PatternGeneratorJRL
     /// the feet positions with respect to previous foot positions
     ///
     /// \param[out] Inequalities
-    /// \param[in] FCALS
     /// \param[in] SupportStates_deq
     void build_inequalities_feet(linear_inequality_t & Inequalities,
+        const std::deque<support_state_t> & SupportStates_deq) const;
+
+    /// \brief Generate a queue of inequality constraints on
+    /// the feet positions with respect to previous foot positions
+    ///
+    /// \param[out] Inequalities In matrix form
+    /// \param[in] SupportStates_deq
+    void build_inequalities_com(linear_inequality_t & Inequalities,
         const std::deque<support_state_t> & SupportStates_deq) const;
 
     /// \brief Compute CoP constraints corresponding to the set of inequalities
@@ -170,9 +176,9 @@ namespace PatternGeneratorJRL
     /// \brief Compute com<->feet constraints
     ///
     /// \param[in] IneqCoM
-    /// \param[in] Solution
+    /// \param[in] CurrentSupport
     /// \param[out] Pb
-    void build_constraints_com( const linear_inequality_t & IneqCoM, const solution_t & Solution, QPProblem & Pb );
+    void build_constraints_com( const linear_inequality_t & IneqCoM, const support_state_t & CurrentSupport, QPProblem & Pb );
 
     /// \brief Compute feet equality constraints from a trajectory
     ///

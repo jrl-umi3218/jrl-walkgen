@@ -77,6 +77,14 @@ namespace PatternGeneratorJRL
         const support_state_t & SupportState,
         ineq_e type);
 
+    /// \brief Adapt inequalities to the support foot and its orientation
+    ///
+    /// \param[out] ConvexHull
+    /// \param[in] SupportState
+    /// \param[in] Type CoP/Feet/CoM
+    void set_inequalities( convex_hull_t & ConvexHull,
+        const support_state_t & Support, ineq_e type);
+
     /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
     /// convex hull specified by a vector of points.
     ///
@@ -126,6 +134,9 @@ namespace PatternGeneratorJRL
       LeftDS;
     };
     struct edges_s FootPosEdges_, ZMPPosEdges_;
+
+    /// \brief Polyhedral hull
+    convex_hull_t CoMHull_;
 
     /// \brief Half foot size
     FootHalfSize LeftFootSize_, RightFootSize_;

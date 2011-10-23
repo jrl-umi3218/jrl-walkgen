@@ -69,9 +69,7 @@ RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
 
 
 RelativeFeetInequalities::~RelativeFeetInequalities()
-{
-
-}
+{ }
 
 
 int
@@ -80,10 +78,11 @@ RelativeFeetInequalities::init_convex_hulls()
 
   const unsigned nbVertCoP = 4;
   const unsigned nbVertFeet = 5;
+  const unsigned nbIneqCoM = 10;
 
 
-  // Feet hulls:
-  // -----------
+  // Feet polygonal hulls:
+  // ---------------------
   double LeftFPosEdgesX[nbVertFeet] = {-0.28, -0.2, 0.0, 0.2, 0.28};
   double LeftFPosEdgesY[nbVertFeet] = {-0.2, -0.3, -0.4, -0.3, -0.2};
   double RightFPosEdgesX[nbVertFeet] = {-0.28, -0.2, 0.0, 0.2, 0.28};
@@ -100,8 +99,8 @@ RelativeFeetInequalities::init_convex_hulls()
   FootPosEdges_.RightSS.set_vertices(RightFPosEdgesX,RightFPosEdgesY);
 
 
-  // ZMP hulls:
-  // ----------
+  // ZMP polygonal hulls:
+  // --------------------
   double lxcoefsRight[nbVertCoP] = { 1.0, 1.0, -1.0, -1.0};
   double lycoefsRight[nbVertCoP] = {-1.0, 1.0,  1.0, -1.0};
   double lxcoefsLeft[nbVertCoP] = { 1.0, 1.0, -1.0, -1.0};
@@ -126,6 +125,17 @@ RelativeFeetInequalities::init_convex_hulls()
       ZMPPosEdges_.RightDS.X_vec[j] = lxcoefsRight[j]*RightFootSize_.getHalfWidth();
       ZMPPosEdges_.RightDS.Y_vec[j] = lycoefsRight[j]*RightFootSize_.getHalfHeightDS()+DSFeetDistance_/2.0;
     }
+
+
+  // CoM polyhedric hull:
+  // --------------------
+  double IneqCoMA_a[nbIneqCoM] = { -0.6, -0.6, -0.6, -0.6, -0.6, -0.3, -0.3, -0.3, -0.3, -0.3};
+  double IneqCoMB_a[nbIneqCoM] = {-0.3, -0.175,  -0.05, 0.075, 0.2, -0.3, -0.175,  -0.05, 0.075, 0.2};
+  double IneqCoMC_a[nbIneqCoM] = {-0.8544, -0.818917, -0.801561, -0.803508, -0.824621, -1, -0.969858, -0.955249, -0.956883, -0.974679};
+  double IneqCoMD_a[nbIneqCoM] = {-0.862318, -0.836995, -0.818542, -0.807405, -0.803531, -0.9175, -0.894201, -0.876789, -0.865534, -0.860404};
+
+  CoMHull_.resize(0, nbIneqCoM);
+  CoMHull_.set_inequalities( IneqCoMA_a, IneqCoMB_a, IneqCoMC_a, IneqCoMD_a );
 
   return 0;
 
@@ -212,6 +222,33 @@ RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
     }
 
   ConvexHull.rotate( YAW, Support.Yaw);
+
+}
+
+
+void
+RelativeFeetInequalities::set_inequalities( convex_hull_t & ConvexHull,
+    const support_state_t & Support, ineq_e type)
+{
+
+  convex_hull_t * ConvexHull_p = 0;
+
+  switch(type)
+    {
+    case INEQ_COP:
+      break;
+    case INEQ_FEET:
+      break;
+    case INEQ_COM:
+      ConvexHull_p = & CoMHull_;
+      break;
+
+    }
+
+  ConvexHull.A_vec = ConvexHull_p->A_vec;
+  ConvexHull.B_vec = ConvexHull_p->B_vec;
+  ConvexHull.C_vec = ConvexHull_p->C_vec;
+  ConvexHull.D_vec = ConvexHull_p->D_vec;
 
 }
 

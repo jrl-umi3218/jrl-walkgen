@@ -381,6 +381,9 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
   case VECTOR_XU:
     break;
   case VECTOR_DS:
+    Array_p = &DS_;
+    NbConstraints_ = (Row+Mat.size1()>NbConstraints_) ? Row+Mat.size1() : NbConstraints_;
+    Row++;//The first rows of DU,DS are empty
     break;
   }
 

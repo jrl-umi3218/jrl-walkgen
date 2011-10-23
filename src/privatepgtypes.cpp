@@ -251,7 +251,19 @@ namespace PatternGeneratorJRL
       }
 
   }
+  void
+  convex_hull_t::set_inequalities( const double * A_a, const double * B_a, const double * C_a, const double * D_a )
+  {
 
+    for(unsigned i=0; i<nbIneq_; i++)
+      {
+        A_vec[i] = A_a[i];
+        B_vec[i] = B_a[i];
+        C_vec[i] = C_a[i];
+        D_vec[i] = D_a[i];
+      }
+
+  }
 
   void
   convex_hull_t::cout()
@@ -274,9 +286,10 @@ namespace PatternGeneratorJRL
   linear_inequality_t::clear()
   {
 
-    D.x.clear();
-    D.y.clear();
-    dc.clear();
+    D.X_mat.clear();
+    D.Y_mat.clear();
+    D.Z_mat.clear();
+    Dc_vec.clear();
 
   }
 
@@ -285,9 +298,10 @@ namespace PatternGeneratorJRL
   linear_inequality_t::resize( int NbRows, int NbCols, bool Preserve )
   {
 
-    D.x.resize(NbRows, NbCols, Preserve);
-    D.y.resize(NbRows, NbCols, Preserve);
-    dc.resize(NbRows, Preserve);
+    D.X_mat.resize(NbRows, NbCols, Preserve);
+    D.Y_mat.resize(NbRows, NbCols, Preserve);
+    D.Z_mat.resize(NbRows, NbCols, Preserve);
+    Dc_vec.resize(NbRows, Preserve);
 
   }
 
