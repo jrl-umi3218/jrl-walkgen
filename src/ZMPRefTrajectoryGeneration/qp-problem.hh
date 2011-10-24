@@ -193,8 +193,8 @@ namespace PatternGeneratorJRL
             NewArray = FinalArray.Array_;
 
             fill(NewArray, NbRows*NbCols, (type)0);
-            for(unsigned int i = 0; i < NbRows; i++)
-              for(unsigned int j = 0; j < NbCols; j++)
+            for(unsigned int j = 0; j < NbCols; j++)
+              for(unsigned int i = 0; i < NbRows; i++)
                 NewArray[i+NbRows*j] = Array_[i+NbRows_*j];
 
             FinalArray.NbRows_ = NbRows;
@@ -230,8 +230,8 @@ namespace PatternGeneratorJRL
             fill(NewArray, NbRows*NbCols, (type)0);
             if ((Preserve) &&
                 (Array_!=0) ) {
-                for(unsigned int i = 0; i < NbRows_; i++)
-                  for(unsigned int j = 0; j < NbCols_; j++)
+                for(unsigned int j = 0; j < NbCols_; j++)
+                  for(unsigned int i = 0; i < NbRows_; i++)
                     NewArray[i+NbRows*j] = Array_[i+NbRows_*j]; }
 
             if ((Array_!=0) && Reallocate)
