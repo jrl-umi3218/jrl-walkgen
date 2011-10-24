@@ -135,7 +135,8 @@ SupportFSM::set_support_state(double time, unsigned int pi,
 	  Support.StateChanged = true;
 	  Support.NbInstants = 0;
 	  Support.TimeLimit = time+pi*T_+StepPeriod_-T_/10.0;
-	  Support.StepNumber++;
+	  if(pi != 1)//Flying foot is not down
+	    ++Support.StepNumber;
 	  if (!ReferenceGiven)
 	    Support.NbStepsLeft = Support.NbStepsLeft-1;
 	  if (ReferenceGiven)

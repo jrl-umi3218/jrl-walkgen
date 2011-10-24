@@ -235,7 +235,7 @@ OrientationsPreview::preview_orientations(double Time,
   prwSS_it++;//Point at the first previewed instant
   for(unsigned i = 0; i<N_; i++ )
     {
-      if(prwSS_it->StateChanged == true)
+      if(prwSS_it->StateChanged)
         {
           supportAngle = Solution.SupportOrientations_deq[j];
           j++;

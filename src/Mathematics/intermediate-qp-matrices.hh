@@ -67,12 +67,12 @@ namespace PatternGeneratorJRL
       boost_ublas::matrix<double> Vshift;
       /// \brief Transpose of V
       boost_ublas::matrix<double> VT;
-      /// \brief Selection matrix for the current feet position
-      boost_ublas::vector<double> Vc;
-      /// \brief Shifted selection matrix for the current feet position
-      boost_ublas::vector<double> Vcshift;
+      /// \brief Selection matrix multiplied with the current foot position
+      boost_ublas::vector<double> VcX, VcY;
+      /// \brief Shifted selection matrix multiplied with the current feet position
+      boost_ublas::vector<double> VcshiftX, VcshiftY;
       /// \brief Selection matrix for the current foot position
-      boost_ublas::vector<double> Vc_f;
+      boost_ublas::vector<double> Vc_fX, Vc_fY;
       /// \brief Selection matrix for relative feet positions
       boost_ublas::matrix<double> V_f;
       /// \brief Current support state
