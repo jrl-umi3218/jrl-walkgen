@@ -38,8 +38,12 @@
 namespace PatternGeneratorJRL
 {
 
-  // ENUMS:
-  // ------
+  //
+  // Enum types
+  //
+
+  /// \name Enum types
+  /// \{
   enum foot_type_e
   {
     LEFT, RIGHT
@@ -65,9 +69,46 @@ namespace PatternGeneratorJRL
     POSITION, VELOCITY, ACCELERATION,
     JERK, COP_POSITION
   };
-  // ------
-  // :ENUMS
 
+  enum qp_element_e
+  {
+    MATRIX_Q,
+    MATRIX_DU,
+    VECTOR_D,
+    VECTOR_DS,
+    VECTOR_DL,
+    VECTOR_XL,
+    VECTOR_XU
+  };
+
+  enum solver_e
+  {
+    QLD,
+    LSSOL
+  };
+
+  enum tests_e
+  {
+      NONE,
+      ALL,
+      ITT,
+      CTR1,
+      CTR2,
+      SOLVER
+  };
+
+  enum axis_e
+  {
+    X_AXIS, Y_AXIS, Z_AXIS, YAW, PITCH, ROLL
+  };
+  /// \}
+
+  //
+  // Structures
+  //
+
+  /// \name Structures
+  /// \{
   /// \brief State of the center of mass
   struct com_t
   {
@@ -131,49 +172,64 @@ namespace PatternGeneratorJRL
     reference_t(const reference_t &);
   };
 
-  /// \brief Linear inequality with free foot placement.
-  struct linear_inequality_ff_t
-  {
-    MAL_MATRIX(D,double);
-    MAL_MATRIX(Dc,double);
-    int StepNumber;
-  };
-
-  /// \brief Linear constraints
-  struct linear_constraint_t
-  {
-    boost_ublas::compressed_vector<double> A;
-    double b;
-  };
-
-  /// \brief Set of 2-dimensional points
+  /// \brief Convex hull
   struct convex_hull_t
   {
 
-    boost_ublas::vector<double> X;
-    boost_ublas::vector<double> Y;
+    /// \brief Edges
+    std::vector<double> X_vec, Y_vec, Z_vec;
+    /// \brief Inequalities A_vec(i)*x+B_vec(i)y+C_vec(i)z+D_vec(i) > 0
+    std::vector<double> A_vec, B_vec, C_vec, D_vec;
 
-    /// \brief Rotate the points around the origin by angle
+    /// \brief Rotate the points around the origin of the hull
     ///
-    /// \param[in] Angle
-    void rotate( double Angle );
+    /// \param[in] axis
+    /// \param[in] angle
+    void rotate( axis_e axis, double angle );
 
     /// \brief Resize members to the desired number of points
-    ///
-    /// \param[in] size
-    void resize( int Size );
+    /// \param[in] nbVert
+    /// \param[in] nbIneq
+    void resize( unsigned nbVert, unsigned nbIneq = 0 );
 
-    /// \brief Set the vectors from arrays
+    /// \brief Set the polyhedron vertices from arrays
     ///
-    /// \param[in] X
-    /// \param[in] Y
-    void set(const double * X_a, const double * Y_a);
+    /// \param[in] X_a
+    /// \param[in] Y_a
+    /// \param[in] Z_a
+    void set_vertices( const double * X_a, const double * Y_a, const double * Z_a );
+    /// \brief Set the polygon vectors from arrays
+    ///
+    /// \param[in] X_a
+    /// \param[in] Y_a
+    void set_vertices( const double * X_a, const double * Y_a );
+    /// \brief Set polyhedral inequalities from arrays
+    ///
+    /// \param[in] A_a
+    /// \param[in] B_a
+    /// \param[in] C_a
+    /// \param[in] D_a
+    void set_inequalities( const double * A_a, const double * B_a, const double * C_a, const double * D_a );
 
     /// \brief Set all points to zero
-    void reset();
+    void clear();
 
-    convex_hull_t( int Size );
-    convex_hull_t();
+    /// \brief Print
+    void cout();
+
+    /// \brief Constructor
+    ///
+    /// \param[in] nbVert Number vertices
+    /// \param[in] nbIneq Number inequalities
+    convex_hull_t( unsigned nbVert = 0, unsigned nbIneq = 0 );
+
+  private:
+
+    /// \brief Number inequalities
+    unsigned nbIneq_;
+
+    /// \brief Number vertices
+    unsigned nbVert_;
 
   };
 
@@ -183,12 +239,13 @@ namespace PatternGeneratorJRL
   {
     struct coordinate_t
     {
-      boost_ublas::compressed_matrix<double, boost_ublas::row_major> x;
-      boost_ublas::compressed_matrix<double, boost_ublas::row_major> y;
+      boost_ublas::compressed_matrix<double, boost_ublas::row_major> X_mat;
+      boost_ublas::compressed_matrix<double, boost_ublas::row_major> Y_mat;
+      boost_ublas::compressed_matrix<double, boost_ublas::row_major> Z_mat;
     };
     struct coordinate_t D;
 
-    boost_ublas::vector<double> dc;
+    boost_ublas::vector<double> Dc_vec;
 
     /// \brief Classifier
     int type;
@@ -212,6 +269,8 @@ namespace PatternGeneratorJRL
     unsigned int NbStepsLeft;
     /// \brief Number of step previewed
     unsigned int StepNumber;
+    /// \brief Number of samplings passed in this phase
+    unsigned int NbInstants;
 
     /// \brief Time until StateChanged == true
     double TimeLimit;
@@ -222,9 +281,6 @@ namespace PatternGeneratorJRL
 
     /// \brief (true) -> New single support state
     bool StateChanged;
-
-    /// \brief Number of samplings passed in this phase
-    unsigned int NbInstants;
 
     struct support_state_t & operator = (const support_state_t &aSS);
 
@@ -302,6 +358,8 @@ namespace PatternGeneratorJRL
     solution_t();
 
   };
+
+  /// \}
 
 }
 

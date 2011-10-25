@@ -53,7 +53,7 @@ ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.1.0")
 #  using ADD_OPTIONAL_DEPENDENCY prevents the creation 
 #  of classic variables such as ${PKG}_FOUND
 # hence we use ADD_REQUIRED_DEPENDENCY to get the data
-OPTION(USE_LSSOL "Do you want to use the solver lssol?" OFF)
+OPTION(USE_LSSOL "Do you want to use the solver lssol?" ON)
 IF(USE_LSSOL)
  ADD_REQUIRED_DEPENDENCY("lssol >= 0.1.0")
 ENDIF(USE_LSSOL)

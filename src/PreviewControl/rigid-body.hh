@@ -34,16 +34,6 @@
 namespace PatternGeneratorJRL
 {
 
-  //
-  // Related types
-  //
-
-  /// \brief Axes
-  enum AxesType
-  {
-    X, Y, Z, PITCH, ROLL, YAW
-  };
-
   /// \brief State vectors
   struct rigid_body_state_s
   {
@@ -73,7 +63,7 @@ namespace PatternGeneratorJRL
   struct linear_dynamics_s
   {
     /// \brief Control matrix
-    boost_ublas::matrix<double> U;
+    boost_ublas::matrix<double,boost_ublas::row_major> U;
 
     /// \brief Inverse of control matrix
     boost_ublas::matrix<double> Um1;
@@ -82,7 +72,7 @@ namespace PatternGeneratorJRL
     boost_ublas::matrix<double> UT;
 
     /// \brief State matrix
-    boost_ublas::matrix<double> S;
+    boost_ublas::matrix<double, boost_ublas::row_major> S;
 
     dynamics_e Type;
 

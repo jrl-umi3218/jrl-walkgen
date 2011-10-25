@@ -102,19 +102,18 @@ namespace PatternGeneratorJRL
     /// \brief Build the constant part of the objective
     ///
     /// \param[in] Pb
-    void build_invariant_part(QPProblem & Pb);
+    void build_invariant_part( QPProblem & Pb );
 
     /// \brief Compute the objective matrices
     ///
     /// \param[in] Pb
     /// \param[in] SupportStates_deq
-    void update_problem(QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq);
-
+    void update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq );
 
     /// \brief Compute the initial solution vector for warm start
     ///
     /// \param[in] Solution
-    void compute_warm_start(solution_t & Solution);
+    void compute_warm_start( solution_t & Solution );
 
     /// \name Accessors
     /// \{
@@ -141,13 +140,12 @@ namespace PatternGeneratorJRL
 
     /// \brief Compute the selection matrices
     ///
-    /// \param[in] deqSupportStates
-    void generate_selection_matrices( const std::deque<support_state_t> & deqSupportStates);
+    /// \param[in] SupportStates_deq
+    void generate_selection_matrices( const std::deque<support_state_t> & SupportStates_deq);
 
     /// \brief Generate a queue of inequalities with respect to the centers of the feet
     ///
     /// \param[out] Inequalities
-    /// \param[in] FCALS
     /// \param[in] SupportStates_deq
     void build_inequalities_cop(linear_inequality_t & Inequalities,
         const std::deque<support_state_t> & SupportStates_deq, option_e option) const;
@@ -157,9 +155,16 @@ namespace PatternGeneratorJRL
     /// the feet positions with respect to previous foot positions
     ///
     /// \param[out] Inequalities
-    /// \param[in] FCALS
     /// \param[in] SupportStates_deq
     void build_inequalities_feet(linear_inequality_t & Inequalities,
+        const std::deque<support_state_t> & SupportStates_deq) const;
+
+    /// \brief Generate a queue of inequality constraints on
+    /// the feet positions with respect to previous foot positions
+    ///
+    /// \param[out] Inequalities In matrix form
+    /// \param[in] SupportStates_deq
+    void build_inequalities_com(linear_inequality_t & Inequalities,
         const std::deque<support_state_t> & SupportStates_deq) const;
 
     /// \brief Compute CoP constraints corresponding to the set of inequalities
@@ -174,11 +179,20 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] IneqFeet
     /// \param[in] State
-    /// \param[in] NbStepsPreviewed
+    /// \param[in] nbStepsPreviewed
     /// \param[out] Pb
     void build_constraints_feet(const linear_inequality_t & IneqFeet,
         const IntermedQPMat::state_variant_t & State,
         int NbStepsPreviewed, QPProblem & Pb, option_e option);
+
+
+    /// \brief Compute com<->feet constraints
+    ///
+    /// \param[in] IneqCoM
+    /// \param[in] CurrentSupport
+    /// \param[out] Pb
+    void build_constraints_com( const linear_inequality_t & IneqCoM, const support_state_t & CurrentSupport, QPProblem & Pb );
+
 
     /// \brief Compute feet equality constraints from a trajectory
     ///
@@ -191,7 +205,7 @@ namespace PatternGeneratorJRL
     /// \brief Initialize inequality matrices
     ///
     /// \param[out] Inequalities
-    void initialize_matrices( linear_inequality_t & Inequalities, option_e option);
+    void initialize_matrices( linear_inequality_t & Inequalities, option_e option=NONE);
 
     /// \brief Scaled product\f$ weight*M*M \f$
     void compute_term(MAL_MATRIX (&weightMM, double),
@@ -229,7 +243,7 @@ namespace PatternGeneratorJRL
     //
   private:
 
-    /// \name Temporary vectors TODO: Move to intermediate data?
+    /// \name Temporary vectors
     /// \{
     boost_ublas::matrix<double> MM_;
     boost_ublas::matrix<double> MM2_;

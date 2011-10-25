@@ -105,12 +105,14 @@ namespace PatternGeneratorJRL
       strm >> NewVelRef_.Local.X;
       strm >> NewVelRef_.Local.Y;
       strm >> NewVelRef_.Local.Yaw;
+
     }
     inline void Reference(double dx, double dy, double dyaw)
     {
     	NewVelRef_.Local.X = dx;
     	NewVelRef_.Local.Y = dy;
     	NewVelRef_.Local.Yaw = dyaw;
+
     }
 
     /// \brief Set the final-stage trigger
@@ -122,6 +124,9 @@ namespace PatternGeneratorJRL
 
     solution_t & Solution()
     { return Solution_; }
+
+    inline const int & QP_N(void) const
+    { return QP_N_; }
     /// \}
 
 
@@ -153,6 +158,15 @@ namespace PatternGeneratorJRL
     /// \brief Security margin for trajectory queues
     double TimeBuffer_;
 
+    /// \brief Additional term on the acceleration of the CoM
+    MAL_VECTOR(PerturbationAcceleration_,double);
+
+    /// \brief Sampling period considered in the QP
+    double QP_T_;
+
+    /// \brief Nb. samplings inside preview window
+    int QP_N_;
+
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D CoM_;
 
@@ -180,14 +194,7 @@ namespace PatternGeneratorJRL
     /// \brief Previewed Solution
     solution_t Solution_;
 
-    /// \brief Additional term on the acceleration of the CoM
-    MAL_VECTOR(PerturbationAcceleration_,double);
 
-    /// \brief Sampling period considered in the QP
-    double QP_T_;
-
-    /// \brief Nb. samplings inside preview window
-    int QP_N_;
 
 
   public:

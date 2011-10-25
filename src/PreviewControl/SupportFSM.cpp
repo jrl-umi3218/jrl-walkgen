@@ -85,7 +85,7 @@ SupportFSM::update_vel_reference(reference_t & Ref, const support_state_t & Curr
 
 
 void
-SupportFSM::set_support_state(double Time, unsigned int Pi,
+SupportFSM::set_support_state(double time, unsigned int pi,
     support_state_t & Support, const reference_t & Ref) const
 {
 
@@ -97,20 +97,20 @@ SupportFSM::set_support_state(double Time, unsigned int Pi,
     ReferenceGiven = true;
 
   // Update time limit for double support phase
-  if(ReferenceGiven && Support.Phase == DS && (Support.TimeLimit-Time-EPS_) > DSSSPeriod_)
+  if(ReferenceGiven && Support.Phase == DS && (Support.TimeLimit-time-EPS_) > DSSSPeriod_)
     {
-      Support.TimeLimit = Time+DSSSPeriod_-T_/10.0;
+      Support.TimeLimit = time+DSSSPeriod_-T_/10.0;
       Support.NbStepsLeft = NbStepsSSDS_;
     }
 
   //FSM
-  if(Time+EPS_+Pi*T_ >= Support.TimeLimit)
+  if(time+EPS_+pi*T_ >= Support.TimeLimit)
     {
       //SS->DS
       if(Support.Phase == SS  && !ReferenceGiven && Support.NbStepsLeft == 0)
 	{
 	  Support.Phase = DS;
-	  Support.TimeLimit = Time+Pi*T_+DSPeriod_-T_/10.0;
+	  Support.TimeLimit = time+pi*T_+DSPeriod_-T_/10.0;
 	  Support.StateChanged = true;
 	  Support.NbInstants = 0;
 	}
@@ -119,7 +119,7 @@ SupportFSM::set_support_state(double Time, unsigned int Pi,
 		  ||   ((Support.Phase == DS) && (Support.NbStepsLeft > 0)))
 	{
 	  Support.Phase = SS;
-	  Support.TimeLimit = Time+Pi*T_+StepPeriod_-T_/10.0;
+	  Support.TimeLimit = time+pi*T_+StepPeriod_-T_/10.0;
 	  Support.NbStepsLeft = NbStepsSSDS_;
 	  Support.StateChanged = true;
 	  Support.NbInstants = 0;
@@ -134,8 +134,9 @@ SupportFSM::set_support_state(double Time, unsigned int Pi,
             Support.Foot = LEFT;
 	  Support.StateChanged = true;
 	  Support.NbInstants = 0;
-	  Support.TimeLimit = Time+Pi*T_+StepPeriod_-T_/10.0;
-	  Support.StepNumber++;
+	  Support.TimeLimit = time+pi*T_+StepPeriod_-T_/10.0;
+	  if(pi != 1)//Flying foot is not down
+	    ++Support.StepNumber;
 	  if (!ReferenceGiven)
 	    Support.NbStepsLeft = Support.NbStepsLeft-1;
 	  if (ReferenceGiven)
