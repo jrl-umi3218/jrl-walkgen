@@ -83,7 +83,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Generate final trajectories
     ///
-    /// \param[in] Time Current time
+    /// \param[in] time Current time
     /// \param[in] CurrentSupport
     /// \param[in] Result Optimization result
     /// \param[in] SupportStates_deq
@@ -92,7 +92,7 @@ namespace PatternGeneratorJRL
     /// \param[out] RightFootTraj_deq
     ///
     /// return 0
-    int generate_trajectories( double Time, const solution_t & Result,
+    int generate_trajectories( double time, const solution_t & Result,
         const std::deque<support_state_t> & SupportStates_deq, const std::deque<double> & PreviewedSupportAngles_deq,
               std::deque<FootAbsolutePosition> & LeftFootTraj_deq, std::deque<FootAbsolutePosition> & RightFootTraj_deq);
 
@@ -122,30 +122,35 @@ namespace PatternGeneratorJRL
     inline void RightFoot( const RigidBody & RightFoot )
     {RightFoot_ = RightFoot;};
 
-    inline double const & SamplingPeriodSim( ) const
+    inline double SamplingPeriodSim( ) const
     { return T_; }
     inline void SamplingPeriodSim( double T )
     { T_ = T; }
 
-    inline double const & SamplingPeriodAct( ) const
+    inline double SamplingPeriodAct( ) const
     { return Ta_; }
     inline void SamplingPeriodAct( double Ta )
     { Ta_ = Ta; }
 
-    inline unsigned const & NbSamplingsPreviewed( ) const
+    inline unsigned NbSamplingsPreviewed( ) const
     { return N_; }
     inline void NbSamplingsPreviewed( unsigned N )
     { N_ = N; }
 
-    inline double const & Mass( ) const
-    { return Mass_; }
+    inline double Mass( ) const
+    { return mass_; }
     inline void Mass( double Mass )
-    { Mass_ = Mass; }
+    { mass_ = Mass; }
 
-    inline double const & CoMHeight( ) const
+    inline double CoMHeight( ) const
     { return CoMHeight_; }
     inline void CoMHeight( double Height )
     { CoMHeight_ = Height; }
+
+    inline bool multiBody( ) const
+    { return multiBody_; }
+    inline void multiBody( bool multiBody )
+    { multiBody_ = multiBody; }
 
     std::deque<support_state_t> & SupportTrajectory()
     { return SupportTrajectory_deq_; }
@@ -162,7 +167,7 @@ namespace PatternGeneratorJRL
     /// \param[out] Dynamics Matrices to be filled
     ///
     /// return 0
-    int compute_dyn_cop( const std::deque<support_state_t> & SupportStates_deq );
+    int compute_dyn_cop( unsigned nbSteps );
 
     /// \brief Initialize dynamics of the body center
     /// Suppose a piecewise constant jerk
@@ -259,7 +264,7 @@ namespace PatternGeneratorJRL
     std::deque<double> GRF_deq_;
 
     /// \brief Total robot mass
-    double Mass_;
+    double mass_;
 
     /// \brief CoMHeight
     double CoMHeight_;
@@ -276,6 +281,9 @@ namespace PatternGeneratorJRL
     
     /// \brief Nb previewed samples
     unsigned int N_;
+
+    /// \brief Multi-body mode
+    bool multiBody_;
 
     /// \brief Standard polynomial trajectories for the feet.
     OnLineFootTrajectoryGeneration * OFTG_;

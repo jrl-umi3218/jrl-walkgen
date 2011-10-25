@@ -403,6 +403,7 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   compute_term  ( MM_, -1.0, IneqCoP.D.Y_mat, Robot_->DynamicsCoPJerk().U       );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, N_                             );
 
+
   // +D*V
   compute_term  ( MM_, 1.0, IneqCoP.D.X_mat, IntermedData_->State().V 			);
   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
@@ -572,7 +573,6 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution 
   linear_inequality_t & IneqFeet = IntermedData_->Inequalities( INEQ_FEET );
   build_inequalities_feet( IneqFeet, Solution.SupportStates_deq );
   build_constraints_feet( IneqFeet, IntermedData_->State(), nbStepsPreviewed, Pb );
-
 
   // Polyhedric constraints:
   // -----------------------

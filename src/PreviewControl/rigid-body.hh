@@ -72,7 +72,7 @@ namespace PatternGeneratorJRL
     boost_ublas::matrix<double> UT;
 
     /// \brief State matrix
-    boost_ublas::matrix<double, boost_ublas::column_major> S;
+    boost_ublas::matrix<double, boost_ublas::row_major> S;
 
     dynamics_e Type;
 

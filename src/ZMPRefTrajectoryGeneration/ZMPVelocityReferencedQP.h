@@ -156,6 +156,15 @@ namespace PatternGeneratorJRL
     /// \brief Security margin for trajectory queues
     double TimeBuffer_;
 
+    /// \brief Additional term on the acceleration of the CoM
+    MAL_VECTOR(PerturbationAcceleration_,double);
+
+    /// \brief Sampling period considered in the QP
+    double QP_T_;
+
+    /// \brief Nb. samplings inside preview window
+    int QP_N_;
+
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D CoM_;
 
@@ -183,14 +192,7 @@ namespace PatternGeneratorJRL
     /// \brief Previewed Solution
     solution_t Solution_;
 
-    /// \brief Additional term on the acceleration of the CoM
-    MAL_VECTOR(PerturbationAcceleration_,double);
 
-    /// \brief Sampling period considered in the QP
-    double QP_T_;
-
-    /// \brief Nb. samplings inside preview window
-    int QP_N_;
 
 
   public:

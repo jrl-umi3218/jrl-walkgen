@@ -92,19 +92,18 @@ namespace PatternGeneratorJRL
     /// \brief Build the constant part of the objective
     ///
     /// \param[in] Pb
-    void build_invariant_part(QPProblem & Pb);
+    void build_invariant_part( QPProblem & Pb );
 
     /// \brief Compute the objective matrices
     ///
     /// \param[in] Pb
     /// \param[in] SupportStates_deq
-    void update_problem(QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq);
-
+    void update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq );
 
     /// \brief Compute the initial solution vector for warm start
     ///
     /// \param[in] Solution
-    void compute_warm_start(solution_t & Solution);
+    void compute_warm_start( solution_t & Solution );
 
     /// \name Accessors
     /// \{

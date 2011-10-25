@@ -42,7 +42,7 @@ namespace PatternGeneratorJRL
   /// \brief Final optimization problem.
   /// Store and solve a quadratic problem with linear constraints.
   ///
-  struct QPProblem_s
+  class QPProblem
   {
 
 
@@ -51,11 +51,9 @@ namespace PatternGeneratorJRL
     //
   public:
 
-    /// \brief Initialize by default an empty problem.
-    QPProblem_s();
+    QPProblem();
 
-    /// \brief Release the memory at the end only.
-    ~QPProblem_s();
+    ~QPProblem();
 
     /// \brief Reallocate array
     ///
@@ -98,8 +96,11 @@ namespace PatternGeneratorJRL
     /// \param[in] type
     void clear( qp_element_e Type );
 
-    /// \brief Set matrices to zero
+    /// \brief Set all qp elements to zero
     void reset();
+
+    /// \brief Set variant elements to zero
+    int reset_variant();
 
     /// \brief Solve the optimization problem
     ///
@@ -124,6 +125,16 @@ namespace PatternGeneratorJRL
     { NbConstraints_ = NbConstraints;};
     inline unsigned int NbConstraints()
     { return NbConstraints_;};
+
+    inline void nbInvariantRows( unsigned int nbInvariantRows )
+    { nbInvariantRows_ = nbInvariantRows;};
+    inline unsigned int nbInvariantRows()
+    { return nbInvariantRows_;};
+
+    inline void nbInvariantCols( unsigned int nbInvariantCols )
+    { nbInvariantCols_ = nbInvariantCols;};
+    inline unsigned int nbInvariantCols()
+    { return nbInvariantCols_;};
     /// \}
 
     //
@@ -300,8 +311,12 @@ namespace PatternGeneratorJRL
 
     /// \brief Number of equality constraints
     unsigned int NbEqConstraints_;
+
+    /// \brief First row and column of variant Hessian part
+    unsigned nbInvariantRows_, nbInvariantCols_;
+
   };
-  typedef struct QPProblem_s QPProblem;
+
 }
 #include <ZMPRefTrajectoryGeneration/qp-problem.hxx>
 #endif /* _QP_PROBLEM_H_ */

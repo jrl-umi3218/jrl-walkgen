@@ -51,11 +51,13 @@ using namespace PatternGeneratorJRL;
 
 
 
-QPProblem_s::QPProblem_s():
+QPProblem::QPProblem():
       m_(0),me_(0),mmax_(0), n_(0), nmax_(0), mnn_(0),
       iout_(0),ifail_(0), iprint_(0),
       lwar_(0), liwar_(0), eps_(0),
-      NbVariables_(0), NbConstraints_(0),NbEqConstraints_(0)
+      NbVariables_(0), NbConstraints_(0),NbEqConstraints_(0),
+      nbInvariantRows_(0),nbInvariantCols_(0)
+
 {
   NbVariables_ = 0;
   NbConstraints_ = 0;
@@ -86,20 +88,20 @@ QPProblem_s::QPProblem_s():
 }
 
 
-QPProblem_s::~QPProblem_s()
+QPProblem::~QPProblem()
 {
   release_memory();
 }
 
 
 void
-QPProblem_s::release_memory()
+QPProblem::release_memory()
 {
 }
 
 
 void
-QPProblem_s::resize_all()
+QPProblem::resize_all()
 {
   bool ok=false;
 
@@ -144,7 +146,7 @@ QPProblem_s::resize_all()
 
 
 void
-QPProblem_s::clear( qp_element_e Type )
+QPProblem::clear( qp_element_e Type )
 {
 
   switch(Type)
@@ -172,7 +174,8 @@ QPProblem_s::clear( qp_element_e Type )
 }
 
 
-void QPProblem_s::reset()
+void
+QPProblem::reset()
 {
 
   Q_.fill(0.0);
@@ -188,8 +191,59 @@ void QPProblem_s::reset()
 }
 
 
+int
+QPProblem::reset_variant()
+{
+
+  unsigned firstRow = (nbInvariantRows_ < Q_.NbRows_) ? nbInvariantRows_ : Q_.NbRows_;
+  unsigned firstCol = 0;
+  unsigned lastCol = (nbInvariantCols_ < Q_.NbCols_) ? nbInvariantCols_ : Q_.NbCols_;
+  if( (firstRow >= Q_.NbRows_) || (firstCol >= Q_.NbCols_) )
+    return 0;
+
+  double * p_it = 0;
+  for( unsigned col = firstCol; col < lastCol; col++ )
+    {
+      p_it = &Q_.Array_[firstRow + col*Q_.NbRows_];
+      for( unsigned i = firstRow; i < Q_.NbRows_; i++ )
+        {
+          *p_it = 0.0;
+          ++p_it;
+        }
+    }
+
+  firstRow = 0;
+  firstCol = (nbInvariantCols_ < Q_.NbCols_) ? nbInvariantCols_ : Q_.NbCols_;
+  lastCol = Q_.NbCols_;
+  if( (firstRow >= Q_.NbRows_) || (firstCol >= Q_.NbCols_) )
+    return 0;
+
+  for( unsigned col = firstCol; col < lastCol; col++ )
+    {
+      p_it = &Q_.Array_[firstRow + col*Q_.NbRows_];
+      for( unsigned i = firstRow; i < Q_.NbRows_; i++ )
+        {
+          *p_it = 0.0;
+          ++p_it;
+        }
+    }
+
+  Q_dense_.fill(0.0);
+  DU_.fill(0.0);
+  DU_dense_.fill(0.0);
+  D_.fill(0.0);
+  DS_.fill(0.0);
+  NbConstraints_ = 0;
+  NbEqConstraints_ = 0;
+  NbVariables_ = 0;
+
+  return 0;
+
+}
+
+
 void
-QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
+QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
 {
 
   m_ = NbConstraints_+1;
@@ -354,12 +408,9 @@ QPProblem_s::solve( solver_e Solver, solution_t & Result, const tests_e & tests 
 
 
 void
-QPProblem_s::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
+QPProblem::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
     unsigned int row,  unsigned int col )
 {
-
-  struct timeval start,end,start1,end1,start2,end2,start3,end3,start4,end4;
-   double CurrentCPUTime=0.0;
 
   array_s<double> * Array_p = 0;
 
@@ -372,8 +423,8 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
 
   case MATRIX_DU:
     Array_p = &DU_;
-    NbConstraints_ = (row+Mat.size1()>NbConstraints_) ? row+Mat.size1() : NbConstraints_;
-    NbVariables_ = (col+Mat.size2()>NbVariables_) ? col+Mat.size2() : NbVariables_;
+    NbConstraints_ = ( row+Mat.size1() > NbConstraints_ ) ? row+Mat.size1() : NbConstraints_;
+    NbVariables_ = ( col+Mat.size2() > NbVariables_ ) ? col+Mat.size2() : NbVariables_;
     row++;//The first rows of DU,DS are empty
     break;
 
@@ -391,36 +442,24 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
   }
 
 
-  if (NbVariables_ > Array_p->NbCols_ )
-    {
+  if( NbVariables_ > Array_p->NbCols_ )
       resize_all();
-    }
-  if ((NbConstraints_ > DU_.NbRows_) &&
-      (NbConstraints_>0))
+
+  if( (NbConstraints_ > DU_.NbRows_) && (NbConstraints_>0) )
     {
-      if (NbVariables_>0)
-        {
-          DU_.resize(2*NbConstraints_, 2*NbVariables_,true);
-        }
+      if( NbVariables_>0 )
+          DU_.resize( 2*NbConstraints_, 2*NbVariables_, true );
     }
 
-  if ((NbConstraints_ > DS_.NbRows_ ) &&
-      (NbConstraints_>0))
-    {
+  if( (NbConstraints_ > DS_.NbRows_ ) && (NbConstraints_>0) )
       DS_.resize(2*NbConstraints_,1,true);
-    }
 
-  unsigned usize = NbConstraints_+2*NbVariables_;
-  if(usize>U_.NbRows_)
-    {
-      U_.resize(usize, 1,true);
-    }
+  if( U_.NbRows_ < NbConstraints_+2*NbVariables_ )
+      U_.resize( NbConstraints_+2*NbVariables_, 1, true );
 
   unsigned warsize = 3*NbVariables_*NbVariables_/2+10*NbVariables_+2*(NbConstraints_+1)+20000;
-  if (warsize> war_.NbRows_)
-    {
-      war_.resize(warsize, 1,true);
-    }
+  if( warsize> war_.NbRows_ )
+      war_.resize( warsize, 1, true );
 
   double * p = Array_p->Array_;
   boost_ublas::matrix<double>::const_iterator1 row_it = Mat.begin1();
@@ -444,7 +483,7 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
 
 
 void
-QPProblem_s::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
+QPProblem::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
     unsigned row, unsigned col )
 {
 
@@ -481,10 +520,8 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
     break;
   }
 
-  if((NbVariables_ > D_.NbRows_ ) && (NbVariables_>0))
-    {
+  if( (NbVariables_ > D_.NbRows_ ) && (NbVariables_>0) )
       resize_all();
-    }
 
   boost_ublas::vector<double>::const_iterator vec_it = Vec.begin();
   double * p_it = &Array_p->Array_[row+col*Array_p->NbRows_];
@@ -511,7 +548,7 @@ QPProblem_s::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
 
 
 void
-QPProblem_s::dump_solver_parameters(std::ostream & aos)
+QPProblem::dump_solver_parameters(std::ostream & aos)
 {
   aos << "m: " << m_ << std::endl
       << "me: " << me_ << std::endl
@@ -528,7 +565,7 @@ QPProblem_s::dump_solver_parameters(std::ostream & aos)
 
 
 void
-QPProblem_s::dump( qp_element_e Type, std::ostream & aos)
+QPProblem::dump( qp_element_e Type, std::ostream & aos)
 {
 
   unsigned int NbRows=0, NbCols=0;
@@ -591,7 +628,7 @@ QPProblem_s::dump( qp_element_e Type, std::ostream & aos)
 
 
 void
-QPProblem_s::dump( qp_element_e Type, const char * FileName )
+QPProblem::dump( qp_element_e Type, const char * FileName )
 {
   std::ofstream aof;
   aof.open(FileName,std::ofstream::out);
@@ -601,7 +638,7 @@ QPProblem_s::dump( qp_element_e Type, const char * FileName )
 
 
 void
-QPProblem_s::dump_problem( std::ostream &aos )
+QPProblem::dump_problem( std::ostream &aos )
 {
   dump(MATRIX_Q,aos);
   dump(VECTOR_D,aos);
@@ -617,7 +654,7 @@ QPProblem_s::dump_problem( std::ostream &aos )
 
 
 void
-QPProblem_s::dump( const char * FileName )
+QPProblem::dump( const char * FileName )
 {
   std::ofstream aof;
   aof.open(FileName,std::ofstream::out);
@@ -627,7 +664,7 @@ QPProblem_s::dump( const char * FileName )
 
 
 void
-QPProblem_s::dump( double Time )
+QPProblem::dump( double Time )
 {
   char Buffer[1024];
   sprintf(Buffer, "/tmp/Problem_%f.dat", Time);

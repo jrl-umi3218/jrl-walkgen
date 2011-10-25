@@ -38,6 +38,10 @@
 namespace PatternGeneratorJRL
 {
 
+  //
+  // Enum types
+  //
+
   /// \name Enum types
   /// \{
   enum foot_type_e
@@ -96,6 +100,12 @@ namespace PatternGeneratorJRL
   };
   /// \}
 
+  //
+  // Structures
+  //
+
+  /// \name Structures
+  /// \{
   /// \brief State of the center of mass
   struct com_t
   {
@@ -342,6 +352,8 @@ namespace PatternGeneratorJRL
     solution_t();
 
   };
+
+  /// \}
 
 }
 

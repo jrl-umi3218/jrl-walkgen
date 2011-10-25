@@ -29,13 +29,15 @@ using namespace std;
 using namespace boost_ublas;
 
 RigidBodySystem::RigidBodySystem( SimplePluginManager * SPM, CjrlHumanoidDynamicRobot * aHS, SupportFSM * FSM ):
-    Mass_(0),CoMHeight_(0),T_(0),Tr_(0),Ta_(0),N_(0),
-    OFTG_(0), FSM_(0)
+            mass_(0),CoMHeight_(0),T_(0),Tr_(0),Ta_(0),N_(0),multiBody_(false),
+            OFTG_(0), FSM_(0)
 {
 
   HDR_ = aHS;
   FSM_ = FSM;
   OFTG_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
+
+
 
 }
 
@@ -63,13 +65,6 @@ RigidBodySystem::initialize(  )
   OFTG_->FeetDistance( 0.2 );
   OFTG_->StepHeight( 0.05 );
 
-  // Initialize dynamics
-  // -------------------
-  CoM_.Mass( Mass_ );
-  CoM_.NbSamplingsPreviewed( N_ );
-  CoM_.initialize();
-  compute_dyn_cjerk();
-
   // Initialize predetermined trajectories:
   // --------------------------------------
   initialize_trajectories();
@@ -86,18 +81,22 @@ RigidBodySystem::initialize(  )
   // -------------------------
   // TODO: Use of bounded arrays
   // TODO: Remove CoP dynamics
-  bool preserve = true;
-  CoPDynamicsJerk_.S.resize(N_,3 ,!preserve);
-  CoPDynamicsJerk_.S.clear();
-  CoPDynamicsJerk_.U.resize(N_,N_,!preserve);
-  CoPDynamicsJerk_.U.clear();
-  CoPDynamicsJerk_.UT.resize(N_,N_,!preserve);
-  CoPDynamicsJerk_.UT.clear();
+  if(multiBody_)
+    {
+      LeftFoot_.Dynamics ( COP_POSITION ).S.resize(N_,3,false);
+      RightFoot_.Dynamics( COP_POSITION ).S.resize(N_,3,false);
+      LeftFoot_.Dynamics ( COP_POSITION ).clear();
+      RightFoot_.Dynamics( COP_POSITION ).clear();
+    }
 
-  LeftFoot_.Dynamics ( COP_POSITION ).S.resize(N_,3,!preserve);
-  RightFoot_.Dynamics( COP_POSITION ).S.resize(N_,3,!preserve);
-  LeftFoot_.Dynamics ( COP_POSITION ).clear();
-  RightFoot_.Dynamics( COP_POSITION ).clear();
+  CoPDynamicsJerk_.Type = COP_POSITION;
+
+  // Initialize dynamics
+  // -------------------
+  CoM_.Mass( mass_ );
+  CoM_.NbSamplingsPreviewed( N_ );
+  CoM_.initialize();
+  compute_dyn_cjerk();
 
 }
 
@@ -230,30 +229,36 @@ RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
     const std::deque<FootAbsolutePosition> & RightFootTraj_deq )
 {
 
-/*
-  compute_foot_pol_dynamics( SupportStates_deq, LeftFoot_.Dynamics(POSITION), RightFoot_.Dynamics(POSITION) );
-  compute_foot_pol_dynamics( SupportStates_deq, LeftFoot_.Dynamics(ACCELERATION), RightFoot_.Dynamics(ACCELERATION) );
+  unsigned nbStepsPreviewed = SupportStates_deq.back().StepNumber;
+  if(multiBody_)
+    {
 
-  precompute_trajectories( SupportStates_deq );
-*/
-  compute_dyn_cop( SupportStates_deq );
-/*
-  LeftFoot_.State().X[0] = LeftFootTraj_deq.front().x;
-  LeftFoot_.State().X[1] = LeftFootTraj_deq.front().dx;
-  LeftFoot_.State().X[2] = LeftFootTraj_deq.front().ddx;
-  LeftFoot_.State().Y[0] = LeftFootTraj_deq.front().y;
-  LeftFoot_.State().Y[1] = LeftFootTraj_deq.front().dy;
-  LeftFoot_.State().Y[2] = LeftFootTraj_deq.front().ddy;
-  RightFoot_.State().X[0] = RightFootTraj_deq.front().x;
-  RightFoot_.State().X[1] = RightFootTraj_deq.front().dx;
-  RightFoot_.State().X[2] = RightFootTraj_deq.front().ddx;
-  RightFoot_.State().Y[0] = RightFootTraj_deq.front().y;
-  RightFoot_.State().Y[1] = RightFootTraj_deq.front().dy;
-  RightFoot_.State().Y[2] = RightFootTraj_deq.front().ddy;
-*/
+      compute_foot_pol_dynamics( SupportStates_deq, LeftFoot_.Dynamics(POSITION), RightFoot_.Dynamics(POSITION) );
+      compute_foot_pol_dynamics( SupportStates_deq, LeftFoot_.Dynamics(ACCELERATION), RightFoot_.Dynamics(ACCELERATION) );
+
+      precompute_trajectories( SupportStates_deq );
+
+      compute_dyn_cop( nbStepsPreviewed );
+
+      LeftFoot_.State().X[0] = LeftFootTraj_deq.front().x;
+      LeftFoot_.State().X[1] = LeftFootTraj_deq.front().dx;
+      LeftFoot_.State().X[2] = LeftFootTraj_deq.front().ddx;
+      LeftFoot_.State().Y[0] = LeftFootTraj_deq.front().y;
+      LeftFoot_.State().Y[1] = LeftFootTraj_deq.front().dy;
+      LeftFoot_.State().Y[2] = LeftFootTraj_deq.front().ddy;
+      RightFoot_.State().X[0] = RightFootTraj_deq.front().x;
+      RightFoot_.State().X[1] = RightFootTraj_deq.front().dx;
+      RightFoot_.State().X[2] = RightFootTraj_deq.front().ddx;
+      RightFoot_.State().Y[0] = RightFootTraj_deq.front().y;
+      RightFoot_.State().Y[1] = RightFootTraj_deq.front().dy;
+      RightFoot_.State().Y[2] = RightFootTraj_deq.front().ddy;
+
+    }
+
   return 0;
 
 }
+
 
 /* TODO : Move this function on another file
  *
@@ -283,30 +288,32 @@ invertMatrix (const boost_ublas::matrix<T>& input, boost_ublas::matrix<T>& inver
 
 
 int
-RigidBodySystem::compute_dyn_cop( const std::deque<support_state_t> & SupportStates_deq )
+RigidBodySystem::compute_dyn_cop( unsigned nbSteps )
 {
 
-  const static double GRAVITY = 9.81;
+  const double GRAVITY = 9.81;
 
-  unsigned int NbSteps = SupportStates_deq.back().StepNumber;
-  bool preserve = true;
-  //TODO: Use of bounded_array to avoid dynamic allocation
-  LeftFoot_. Dynamics( COP_POSITION ).U.resize(N_,NbSteps,!preserve);
-  LeftFoot_. Dynamics( COP_POSITION ).UT.resize(NbSteps,N_,!preserve);
-  RightFoot_.Dynamics( COP_POSITION ).U.resize(N_,NbSteps,!preserve);
-  RightFoot_.Dynamics( COP_POSITION ).UT.resize(NbSteps,N_,!preserve);
-  LeftFoot_. Dynamics( COP_POSITION ).clear();
-  RightFoot_.Dynamics( COP_POSITION ).clear();
+  if(multiBody_)
+    {
+      //TODO: Use of bounded_array to avoid dynamic allocation
+      LeftFoot_. Dynamics( COP_POSITION ).U.resize(N_,nbSteps,false);
+      LeftFoot_. Dynamics( COP_POSITION ).UT.resize(nbSteps,N_,false);
+      RightFoot_.Dynamics( COP_POSITION ).U.resize(N_,nbSteps,false);
+      RightFoot_.Dynamics( COP_POSITION ).UT.resize(nbSteps,N_,false);
+      LeftFoot_. Dynamics( COP_POSITION ).clear();
+      RightFoot_.Dynamics( COP_POSITION ).clear();
+    }
 
-  CoPDynamicsJerk_.clear();
-
+  CoPDynamicsJerk_.S.clear();
+  CoPDynamicsJerk_.U.clear();
+  CoPDynamicsJerk_.UT.clear();
 
   // Add "weighted" dynamic matrices:
   // --------------------------------
   std::deque<rigid_body_state_t>::iterator LFTraj_it = LeftFoot_.Trajectory().begin();
   std::deque<rigid_body_state_t>::iterator RFTraj_it = RightFoot_.Trajectory().begin();
   std::deque<rigid_body_state_t>::iterator CoMTraj_it = CoM_.Trajectory().begin();
-  std::deque<double>::iterator GRF_it = GRF_deq_.begin();
+  //  std::deque<double>::iterator GRF_it = GRF_deq_.begin();
   double GRF = 0.0;
   for(unsigned int i = 0; i < N_; i++)
     {
@@ -320,30 +327,31 @@ RigidBodySystem::compute_dyn_cop( const std::deque<support_state_t> & SupportSta
       row   ( CoPDynamicsJerk_.S, i )  -= row( CoM_.Dynamics(ACCELERATION).S, i ) *       CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
       row   ( CoPDynamicsJerk_.U, i )  -= row( CoM_.Dynamics(ACCELERATION).U, i ) *       CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
       column( CoPDynamicsJerk_.UT, i ) -= row( CoM_.Dynamics(ACCELERATION).U, i ) *       CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
-/*
-   * Usefull for multibody dynamics
-   *
-      row   ( LeftFoot_.Dynamics(COP).S, i )  += row( LeftFoot_.Dynamics(POSITION).S, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
-      row   ( LeftFoot_.Dynamics(COP).U, i )  += row( LeftFoot_.Dynamics(POSITION).U, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
-      column( LeftFoot_.Dynamics(COP).UT, i ) += row( LeftFoot_.Dynamics(POSITION).U, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
-      row   ( LeftFoot_.Dynamics(COP).S, i )  -= row( LeftFoot_.Dynamics(ACCELERATION).S, i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
-      row   ( LeftFoot_.Dynamics(COP).U, i )  -= row( LeftFoot_.Dynamics(ACCELERATION).U, i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
-      column( LeftFoot_.Dynamics(COP).UT, i ) -= row( LeftFoot_.Dynamics(ACCELERATION).U, i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
 
-      row   ( RightFoot_.Dynamics(COP).S, i )  += row( RightFoot_.Dynamics(POSITION).S, i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
-      row   ( RightFoot_.Dynamics(COP).U, i )  += row( RightFoot_.Dynamics(POSITION).U, i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
-      column( RightFoot_.Dynamics(COP).UT, i ) += row( RightFoot_.Dynamics(POSITION).U, i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
-      row   ( RightFoot_.Dynamics(COP).S, i )  -= row( RightFoot_.Dynamics(ACCELERATION).S, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
-      row   ( RightFoot_.Dynamics(COP).U, i )  -= row( RightFoot_.Dynamics(ACCELERATION).U, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
-      column( RightFoot_.Dynamics(COP).UT, i ) -= row( RightFoot_.Dynamics(ACCELERATION).U, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
-*/
+      if(multiBody_)
+        {
+          row   ( LeftFoot_.Dynamics(COP_POSITION).S, i )  += row( LeftFoot_.Dynamics(POSITION).S, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
+          row   ( LeftFoot_.Dynamics(COP_POSITION).U, i )  += row( LeftFoot_.Dynamics(POSITION).U, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
+          column( LeftFoot_.Dynamics(COP_POSITION).UT, i ) += row( LeftFoot_.Dynamics(POSITION).U, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
+          row   ( LeftFoot_.Dynamics(COP_POSITION).S, i )  -= row( LeftFoot_.Dynamics(ACCELERATION).S, i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
+          row   ( LeftFoot_.Dynamics(COP_POSITION).U, i )  -= row( LeftFoot_.Dynamics(ACCELERATION).U, i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
+          column( LeftFoot_.Dynamics(COP_POSITION).UT, i ) -= row( LeftFoot_.Dynamics(ACCELERATION).U, i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
+
+          row   ( RightFoot_.Dynamics(COP_POSITION).S, i )  += row( RightFoot_.Dynamics(POSITION).S, i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
+          row   ( RightFoot_.Dynamics(COP_POSITION).U, i )  += row( RightFoot_.Dynamics(POSITION).U, i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
+          column( RightFoot_.Dynamics(COP_POSITION).UT, i ) += row( RightFoot_.Dynamics(POSITION).U, i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
+          row   ( RightFoot_.Dynamics(COP_POSITION).S, i )  -= row( RightFoot_.Dynamics(ACCELERATION).S, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
+          row   ( RightFoot_.Dynamics(COP_POSITION).U, i )  -= row( RightFoot_.Dynamics(ACCELERATION).U, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
+          column( RightFoot_.Dynamics(COP_POSITION).UT, i ) -= row( RightFoot_.Dynamics(ACCELERATION).U, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
+        }
+
       CoMTraj_it++;
       LFTraj_it++;
       RFTraj_it++;
     }
 
-  	CoPDynamicsJerk_.Um1.resize(CoPDynamicsJerk_.U.size1(),CoPDynamicsJerk_.U.size2());
-    invertMatrix(CoPDynamicsJerk_.U,CoPDynamicsJerk_.Um1);
+  CoPDynamicsJerk_.Um1.resize(CoPDynamicsJerk_.U.size1(),CoPDynamicsJerk_.U.size2());
+  //    invertMatrix(CoPDynamicsJerk_.U,CoPDynamicsJerk_.Um1);
 
   return 0;
 
@@ -360,6 +368,7 @@ RigidBodySystem::compute_dyn_cjerk()
   compute_dyn_cjerk( CoM_.Dynamics(VELOCITY) );
   compute_dyn_cjerk( CoM_.Dynamics(ACCELERATION) );
   compute_dyn_cjerk( CoM_.Dynamics(JERK) );
+  compute_dyn_cjerk( CoPDynamicsJerk_ );
 
   return 0;
 
@@ -370,12 +379,11 @@ int
 RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
 {
   //TODO: This can be moved to RigidBody.
-  bool preserve = true;
-  Dynamics.U.resize(N_,N_,!preserve);
+  Dynamics.U.resize(N_,N_,false);
   Dynamics.U.clear();
-  Dynamics.UT.resize(N_,N_,!preserve);
+  Dynamics.UT.resize(N_,N_,false);
   Dynamics.UT.clear();
-  Dynamics.S.resize(N_,3,!preserve);
+  Dynamics.S.resize(N_,3,false);
   Dynamics.S.clear();
 
   switch(Dynamics.Type)
@@ -425,6 +433,17 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
       }
     break;
   case COP_POSITION:
+    for(int i=0;i<N_;i++)
+      {
+        Dynamics.S(i,0) = 1.0; Dynamics.S(i,1) = (i+1)*T_; Dynamics.S(i,2) = (i+1)*(i+1)*T_*T_*0.5-CoMHeight_/9.81;
+        for(int j=0;j<N_;j++)
+          if (j<=i)
+            Dynamics.U(i,j) = Dynamics.UT(j,i) = (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T_*T_*T_/6.0 - T_*CoMHeight_/9.81;
+          else
+            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
+      }
+    break;
+    //    compute_dyn_cop( 0 );
     break;
 
   }
@@ -441,17 +460,16 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
 
   // Resize the matrices:
   // --------------------
-  unsigned int NbSteps = SupportStates_deq.back().StepNumber;
+  unsigned int nbSteps = SupportStates_deq.back().StepNumber;
 
-  bool preserve = true;
-  LeftFootDynamics.U.resize(N_,NbSteps,!preserve);
+  LeftFootDynamics.U.resize(N_,nbSteps,false);
   LeftFootDynamics.U.clear();
-  LeftFootDynamics.UT.resize(NbSteps,N_,!preserve);
+  LeftFootDynamics.UT.resize(nbSteps,N_,false);
   LeftFootDynamics.UT.clear();
   LeftFootDynamics.S.clear();
-  RightFootDynamics.U.resize(N_,NbSteps,!preserve);
+  RightFootDynamics.U.resize(N_,nbSteps,false);
   RightFootDynamics.U.clear();
-  RightFootDynamics.UT.resize(NbSteps,N_,!preserve);
+  RightFootDynamics.UT.resize(nbSteps,N_,false);
   RightFootDynamics.UT.clear();
   RightFootDynamics.S.clear();
 
@@ -498,7 +516,7 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
               SFDynamics->S(i,0) = SFDynamics->S(i-1,0);FFDynamics->S(i,0) = FFDynamics->S(i-1,0);
               SFDynamics->S(i,1) = SFDynamics->S(i-1,1);FFDynamics->S(i,1) = FFDynamics->S(i-1,1);
               SFDynamics->S(i,2) = SFDynamics->S(i-1,2);FFDynamics->S(i,2) = FFDynamics->S(i-1,2);
-              for(unsigned int SNb = 0; SNb < NbSteps; SNb++)
+              for(unsigned int SNb = 0; SNb < nbSteps; SNb++)
                 {
                   SFDynamics->U(i,SNb) = SFDynamics->UT(SNb,i) = SFDynamics->U(i-1,SNb);
                   FFDynamics->U(i,SNb) = FFDynamics->UT(SNb,i) = FFDynamics->U(i-1,SNb);
@@ -518,7 +536,7 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
                   SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
                 }
             }
-          else if(SS_it->StepNumber == 1 && SS_it->StepNumber < NbSteps)
+          else if(SS_it->StepNumber == 1 && SS_it->StepNumber < nbSteps)
             {
               if(FFDynamics->Type == POSITION)
                 {
@@ -534,7 +552,7 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
               FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
               FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
               FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
-              for(unsigned int j = 0; j<NbSteps; j++)
+              for(unsigned int j = 0; j<nbSteps; j++)
                 {
                   FFDynamics->U(i,j) = FFDynamics->UT(j,i) = FFDynamics->U(i-1,j);
                   SFDynamics->U(i,j) = SFDynamics->UT(j,i) = SFDynamics->U(i-1,j);
@@ -555,17 +573,16 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
 
   // Resize the matrices:
   // --------------------
-  unsigned int NbSteps = SupportStates_deq.back().StepNumber;
+  unsigned int nbSteps = SupportStates_deq.back().StepNumber;
 
-  bool preserve = true;
-  LeftFootDynamics.U.resize(N_,NbSteps,!preserve);
+  LeftFootDynamics.U.resize(N_,nbSteps,false);
   LeftFootDynamics.U.clear();
-  LeftFootDynamics.UT.resize(NbSteps,N_,!preserve);
+  LeftFootDynamics.UT.resize(nbSteps,N_,false);
   LeftFootDynamics.UT.clear();
   LeftFootDynamics.S.clear();
-  RightFootDynamics.U.resize(N_,NbSteps,!preserve);
+  RightFootDynamics.U.resize(N_,nbSteps,false);
   RightFootDynamics.U.clear();
-  RightFootDynamics.UT.resize(NbSteps,N_,!preserve);
+  RightFootDynamics.UT.resize(nbSteps,N_,false);
   RightFootDynamics.UT.clear();
   RightFootDynamics.S.clear();
 
@@ -614,7 +631,7 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
               SFDynamics->S(i,0) = SFDynamics->S(i-1,0);FFDynamics->S(i,0) = FFDynamics->S(i-1,0);
               SFDynamics->S(i,1) = SFDynamics->S(i-1,1);FFDynamics->S(i,1) = FFDynamics->S(i-1,1);
               SFDynamics->S(i,2) = SFDynamics->S(i-1,2);FFDynamics->S(i,2) = FFDynamics->S(i-1,2);
-              for(unsigned int SNb = 0; SNb < NbSteps; SNb++)
+              for(unsigned int SNb = 0; SNb < nbSteps; SNb++)
                 {
                   SFDynamics->U(i,SNb) = SFDynamics->UT(SNb,i) = SFDynamics->U(i-1,SNb);
                   FFDynamics->U(i,SNb) = FFDynamics->UT(SNb,i) = FFDynamics->U(i-1,SNb);
@@ -626,7 +643,7 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
 
           compute_sbar( Spbar, Sabar, (SS_it->NbInstants)*T_, FSM_->StepPeriod()-T_ );
           compute_ubar( Upbar, Uabar, (SS_it->NbInstants)*T_, FSM_->StepPeriod()-T_ );
-          if(SS_it->StepNumber == 0 && SS_it->StepNumber < NbSteps)
+          if(SS_it->StepNumber == 0 && SS_it->StepNumber < nbSteps)
             {
               if(FFDynamics->Type == POSITION)
                 {
@@ -653,7 +670,7 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
                   SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = SFDynamics->U(i-1,SS_it->StepNumber);
                 }
             }
-          else if(SS_it->StepNumber == 1 && SS_it->StepNumber < NbSteps)
+          else if(SS_it->StepNumber == 1 && SS_it->StepNumber < nbSteps)
             {
               if(FFDynamics->Type == POSITION)
                 {
@@ -686,7 +703,7 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
               FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
               FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
               FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
-              for(unsigned int j = 0; j<NbSteps; j++)
+              for(unsigned int j = 0; j<nbSteps; j++)
                 {
                   FFDynamics->U(i,j) = FFDynamics->UT(j,i) = FFDynamics->U(i-1,j);
                   SFDynamics->U(i,j) = SFDynamics->UT(j,i) = SFDynamics->U(i-1,j);
@@ -708,16 +725,15 @@ RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> 
 
   // Resize the matrices:
   // --------------------
-  unsigned int NbSteps = SupportStates_deq.back().StepNumber;
-  bool Preserve = true;
-  LeftFootDynamics.U.resize(N_,NbSteps,!Preserve);
+  unsigned int nbSteps = SupportStates_deq.back().StepNumber;
+  LeftFootDynamics.U.resize(N_,nbSteps,false);
   LeftFootDynamics.U.clear();
-  LeftFootDynamics.UT.resize(NbSteps,N_,!Preserve);
+  LeftFootDynamics.UT.resize(nbSteps,N_,false);
   LeftFootDynamics.UT.clear();
   LeftFootDynamics.S.clear();
-  RightFootDynamics.U.resize(N_,NbSteps,!Preserve);
+  RightFootDynamics.U.resize(N_,nbSteps,false);
   RightFootDynamics.U.clear();
-  RightFootDynamics.UT.resize(NbSteps,N_,!Preserve);
+  RightFootDynamics.UT.resize(nbSteps,N_,false);
   RightFootDynamics.UT.clear();
   RightFootDynamics.S.clear();
 
@@ -764,7 +780,7 @@ RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> 
               SFDynamics->S(i,0) = SFDynamics->S(i-1,0);FFDynamics->S(i,0) = FFDynamics->S(i-1,0);
               SFDynamics->S(i,1) = SFDynamics->S(i-1,1);FFDynamics->S(i,1) = FFDynamics->S(i-1,1);
               SFDynamics->S(i,2) = SFDynamics->S(i-1,2);FFDynamics->S(i,2) = FFDynamics->S(i-1,2);
-              for(unsigned int SNb = 0; SNb < NbSteps; SNb++)
+              for(unsigned int SNb = 0; SNb < nbSteps; SNb++)
                 {
                   SFDynamics->U(i,SNb) = SFDynamics->UT(SNb,i) = SFDynamics->U(i-1,SNb);
                   FFDynamics->U(i,SNb) = FFDynamics->UT(SNb,i) = FFDynamics->U(i-1,SNb);
@@ -776,7 +792,7 @@ RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> 
 
           compute_sbar( Spbar, Sabar, (SS_it->NbInstants+1)*T_, FSM_->StepPeriod()-T_ );
           compute_ubar( Upbar, Uabar, (SS_it->NbInstants+1)*T_, FSM_->StepPeriod()-T_ );
-          if(SS_it->StepNumber == 0 && SS_it->StepNumber < NbSteps)
+          if(SS_it->StepNumber == 0 && SS_it->StepNumber < nbSteps)
             {
               if(FFDynamics->Type == POSITION)
                 {
@@ -803,7 +819,7 @@ RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> 
                   SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = SFDynamics->U(i-1,SS_it->StepNumber);
                 }
             }
-          else if(SS_it->StepNumber == 1 && SS_it->StepNumber < NbSteps)
+          else if(SS_it->StepNumber == 1 && SS_it->StepNumber < nbSteps)
             {
               if(FFDynamics->Type == POSITION)
                 {
@@ -835,7 +851,7 @@ RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> 
               FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
               FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
               FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
-              for(unsigned int j = 0; j<NbSteps; j++)
+              for(unsigned int j = 0; j<nbSteps; j++)
                 {
                   FFDynamics->U(i,j) = FFDynamics->UT(j,i) = FFDynamics->U(i-1,j);
                   SFDynamics->U(i,j) = SFDynamics->UT(j,i) = SFDynamics->U(i-1,j);
