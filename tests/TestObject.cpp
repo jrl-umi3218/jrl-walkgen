@@ -276,7 +276,7 @@ namespace PatternGeneratorJRL
 	  aFileName += "TestFGPI_description.dat";
 
 	  aof.open(aFileName.c_str(),ofstream::out);
-	  string Titles[26] =
+	  string Titles[27] =
 	    { "Time",
 	      "Com X",
 	      "Com Y" ,
@@ -302,8 +302,9 @@ namespace PatternGeneratorJRL
 	      "ZMP X (world ref.)" ,
 	      "ZMP Y (world ref.)" ,
 	      "Waist X (world ref.)" ,
-	      "Waist Y (world ref.)" };
-	  for(unsigned int i=0;i<26;i++)
+	      "Waist Y (world ref.)",
+	      "Waist yaw (world ref.)"};
+	  for(unsigned int i=0;i<27;i++)
 	    aof << i+1 << ". " <<Titles[i] <<std::endl;
 
 	  aof.close();
@@ -356,6 +357,7 @@ namespace PatternGeneratorJRL
 	    +m_CurrentConfiguration(1) ) << " "
 	      << filterprecision(m_CurrentConfiguration(0) ) << " "
 	      << filterprecision(m_CurrentConfiguration(1) ) << " "
+	      << filterprecision(m_CurrentConfiguration(5) ) << " " 
 	      << endl;
 	  aof.close();
 	}

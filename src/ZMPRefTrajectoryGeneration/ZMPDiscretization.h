@@ -317,6 +317,9 @@ namespace PatternGeneratorJRL
       /*! Initialization Profile */
       int m_InitializationProfile;
 
+      /*! Previous Support foot. */
+      int m_WhoIsPreviousSupportFoot;
+
     public:
 
       const static int PREV_ZMP_INIT_PROFIL = 1;
