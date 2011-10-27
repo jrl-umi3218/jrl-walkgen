@@ -57,7 +57,7 @@ namespace PatternGeneratorJRL
   {
     for(unsigned int i=0;i<3;i++)
       { 
-	x[i] = 0.0; y[i] = 0.0;
+	x[i] = 0.0; y[i] = 0.0; z[i] = 0.0;
 	yaw[i] = 0.0; pitch[i] = 0.0; roll[i] = 0.0;
       }
   }
