@@ -1703,7 +1703,7 @@ namespace PatternGeneratorJRL {
     Orientation = m_AbsTheta;
   }
 
-  void PatternGeneratorInterfacePrivate::setWaistPositionAndOrientation(double aTQ[7])
+  void PatternGeneratorInterfacePrivate::setWaistPositionAndOrientation(const double aTQ[7])
   {
     // Position
     MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 0,3) = aTQ[0];

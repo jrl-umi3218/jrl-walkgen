@@ -316,7 +316,7 @@ namespace PatternGeneratorJRL
     void getWaistPositionAndOrientation(double TQ[7],double &Orientation) const;
 
     /*! \brief Set Waist position and Orientation  */
-    void setWaistPositionAndOrientation(double TQ[7]);
+    void setWaistPositionAndOrientation(const double TQ[7]);
 
     /*! \brief Get Waist velocity */
     void getWaistVelocity(double &dx,
