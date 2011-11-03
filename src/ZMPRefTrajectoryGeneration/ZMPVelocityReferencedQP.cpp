@@ -128,11 +128,12 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_->Ponderation( 1.0, COM_POSITION );
 
   // Register method to handle
-  const unsigned int NbMethods = 3;
+  const unsigned int NbMethods = 4;
   string aMethodName[NbMethods] =
       {":previewcontroltime",
           ":numberstepsbeforestop",
-          ":stoppg"};
+          ":stoppg",
+          ":setweight"};
 
   for(unsigned int i=0;i<NbMethods;i++)
     {
@@ -214,6 +215,20 @@ ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &st
   if (Method==":stoppg")
     {
       EndingPhase_ = true;
+    }
+  if (Method==":setweight")
+    {
+      std::string type;
+      double weight;
+      strm >> type >> weight;
+      if (type=="instantvelocity")
+	VRQPGenerator_->Ponderation( weight, INSTANT_VELOCITY );
+      if (type=="copcentering")
+	VRQPGenerator_->Ponderation( weight, COP_CENTERING );
+      if (type=="jerkmin")
+	VRQPGenerator_->Ponderation( weight, JERK_MIN );
+      if (type=="position")
+	VRQPGenerator_->Ponderation( weight, COM_POSITION );
     }
 
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
