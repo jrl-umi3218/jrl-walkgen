@@ -112,6 +112,62 @@ namespace PatternGeneratorJRL
     	NewVelRef_.Local.Y = dy;
     	NewVelRef_.Local.Yaw = dyaw;
     }
+    /// \brief Set the reference (position) through the Interface (slow)
+    void PosReference(istringstream &strm)
+    {
+      strm >> PosRef_.Local.X;
+      strm >> PosRef_.Local.Y;
+      strm >> PosRef_.Local.Yaw;
+    }
+    /// \brief Set the reference (position)
+    inline void PosReference(double x, double y, double yaw)
+    {
+      PosRef_.Local.X = x;
+      PosRef_.Local.Y = y;
+      PosRef_.Local.Yaw = yaw;
+    }
+    /// \brief Set the minimum position through the Interface (slow)
+    void MinPos(istringstream &strm)
+    {
+      strm >> MinPos_.Local.X;
+      strm >> MinPos_.Local.Y;
+      strm >> MinPos_.Local.Yaw;
+    }
+    /// \brief Set the minimum position
+    inline void MinPos(double x, double y, double yaw)
+    {
+      MinPos_.Local.X = x;
+      MinPos_.Local.Y = y;
+      MinPos_.Local.Yaw = yaw;
+    }
+    /// \brief Set the mean position through the Interface (slow)
+    void MeanPos(istringstream &strm)
+    {
+      strm >> MeanPos_.Local.X;
+      strm >> MeanPos_.Local.Y;
+      strm >> MeanPos_.Local.Yaw;
+    }
+    /// \brief Set the mean position
+    inline void MeanPos(double x, double y, double yaw)
+    {
+      MeanPos_.Local.X = x;
+      MeanPos_.Local.Y = y;
+      MeanPos_.Local.Yaw = yaw;
+    }
+    /// \brief Set the maximum position through the Interface (slow)
+    void MaxPos(istringstream &strm)
+    {
+      strm >> MaxPos_.Local.X;
+      strm >> MaxPos_.Local.Y;
+      strm >> MaxPos_.Local.Yaw;
+    }
+    /// \brief Set the maximum position
+    inline void MaxPos(double x, double y, double yaw)
+    {
+      MaxPos_.Local.X = x;
+      MaxPos_.Local.Y = y;
+      MaxPos_.Local.Yaw = yaw;
+    }
 
     /// \brief Set the final-stage trigger
     inline void EndingPhase(bool EndingPhase)
@@ -137,6 +193,18 @@ namespace PatternGeneratorJRL
     reference_t VelRef_;
     /// \brief Temporary (updating) reference
     reference_t NewVelRef_;
+
+    /// \brief Position Reference
+    reference_t PosRef_;
+
+    /// \brief Min position of the CoM (relatively to PosRef)
+    reference_t MinPos_;
+
+    /// \brief Mean position of the CoM (relatively to PosRef)
+    reference_t MeanPos_;
+
+    /// \brief Max position of the CoM (relatively to PosRef)
+    reference_t MaxPos_;
 
     /// \brief Total mass of the robot
     double RobotMass_;

@@ -294,6 +294,18 @@ namespace PatternGeneratorJRL
       virtual void setVelocityReference(double x,
 					double y,
 					double yaw)=0;
+
+      /*! \brief Set position reference
+	This method is only supported by Herdt's algorithm.
+	Currently only a 3D position is supported:
+	\param x: Position along the saggital plane.
+	\param y: Position along the perpendicular plane.
+	\param yaw: Angular Position in the x-y plane.
+       */
+      virtual void setPositionReference(double x,
+					double y,
+					double yaw)=0;
+					
       /*! \brief Set velocity reference
 	\param x: Additive acceleration along the saggital plane.
 	\param y: Additive acceleration along the lateral plane.

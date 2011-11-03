@@ -172,7 +172,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()
   {
-    std::string aMethodName[15] =
+    std::string aMethodName[19] =
       {":LimitsFeasibility",
        ":ZMPShiftParameters",
        ":TimeDistributionParameters",
@@ -187,7 +187,11 @@ namespace PatternGeneratorJRL {
        ":samplingperiod",
        ":HerdtOnline",
        ":setVelReference",
-       ":setCoMPerturbationForce"};
+       ":setCoMPerturbationForce",
+       ":setPosReference",
+       ":setMinPos",
+       ":setMeanPos",
+       ":setMaxPos"};
 
     for(int i=0;i<15;i++)
       {
@@ -494,6 +498,30 @@ namespace PatternGeneratorJRL {
   {
     // Read the data inside strm.
     m_ZMPVRQP->Reference(strm);
+  }
+
+  void PatternGeneratorInterfacePrivate::setPosReference(istringstream &strm)
+  {
+    // Read the data inside strm.
+    m_ZMPVRQP->PosReference(strm);
+  }
+
+  void PatternGeneratorInterfacePrivate::setMinPos(istringstream &strm)
+  {
+    // Read the data inside strm.
+    m_ZMPVRQP->MinPos(strm);
+  }
+
+  void PatternGeneratorInterfacePrivate::setMeanPos(istringstream &strm)
+  {
+    // Read the data inside strm.
+    m_ZMPVRQP->MeanPos(strm);
+  }
+
+  void PatternGeneratorInterfacePrivate::setMaxPos(istringstream &strm)
+  {
+    // Read the data inside strm.
+    m_ZMPVRQP->MaxPos(strm);
   }
  
   void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(istringstream &strm)
@@ -1089,6 +1117,30 @@ namespace PatternGeneratorJRL {
       {
 	//m_InternalClock = 0.0;
 	setVelReference(strm);
+      }
+
+    else if (aCmd==":setPosReference")
+      {
+	//m_InternalClock = 0.0;
+	setPosReference(strm);
+      }
+
+    else if (aCmd==":setMinPos")
+      {
+	//m_InternalClock = 0.0;
+	setMinPos(strm);
+      }
+
+    else if (aCmd==":setMeanPos")
+      {
+	//m_InternalClock = 0.0;
+	setMeanPos(strm);
+      }
+
+    else if (aCmd==":setMaxPos")
+      {
+	//m_InternalClock = 0.0;
+	setMaxPos(strm);
       }
 
     else if (aCmd==":HerdtOnline")
@@ -1753,6 +1805,13 @@ namespace PatternGeneratorJRL {
 							      double yaw)
   {
     m_ZMPVRQP->Reference(x,y,yaw);
+  }
+  
+  void PatternGeneratorInterfacePrivate::setPositionReference(double x,
+							      double y,
+							      double yaw)
+  {
+    m_ZMPVRQP->PosReference(x,y,yaw);
   }
 
   void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(double x,

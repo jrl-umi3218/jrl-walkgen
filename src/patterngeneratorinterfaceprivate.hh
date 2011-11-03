@@ -257,6 +257,18 @@ namespace PatternGeneratorJRL
     /*! \brief Read a velocity reference. */
     void setVelReference(istringstream &strm);
 
+    /*! \brief Read a position reference. */
+    void setPosReference(istringstream &strm);
+
+    /*! \brief Read a position reference. */
+    void setMinPos(istringstream &strm);
+
+    /*! \brief Read a position reference. */
+    void setMeanPos(istringstream &strm);
+
+    /*! \brief Read a position reference. */
+    void setMaxPos(istringstream &strm);
+
     /*! \brief Read a perturbation force on the com. */
     void setCoMPerturbationForce(istringstream &strm);
 
@@ -380,6 +392,50 @@ namespace PatternGeneratorJRL
     void setVelocityReference(double x,
 			      double y,
 			      double yaw);
+
+      /*! \brief Set position reference
+	This method is only supported by Herdt's algorithm.
+	Currently only a 3D position is supported:
+	\param x: Position along the saggital plane.
+	\param y: Position along the perpendicular plane.
+	\param yaw: Angular Position in the x-y plane.
+       */
+    void setPositionReference(double x,
+			      double y,
+			      double yaw);
+
+      /*! \brief Set position Min of CoM (relatively to PosRef)
+	This method is only supported by Herdt's algorithm.
+	Currently only a 3D position is supported:
+	\param x: Position along the saggital plane.
+	\param y: Position along the perpendicular plane.
+	\param yaw: Angular Position in the x-y plane.
+       */
+    void setMinPos(double x,
+		   double y,
+		   double yaw);
+
+      /*! \brief Set position Mean of CoM (relatively to PosRef)
+	This method is only supported by Herdt's algorithm.
+	Currently only a 3D position is supported:
+	\param x: Position along the saggital plane.
+	\param y: Position along the perpendicular plane.
+	\param yaw: Angular Position in the x-y plane.
+       */
+    void setMeanPos(double x,
+		    double y,
+		    double yaw);
+
+      /*! \brief Set position Max of CoM (relatively to PosRef)
+	This method is only supported by Herdt's algorithm.
+	Currently only a 3D position is supported:
+	\param x: Position along the saggital plane.
+	\param y: Position along the perpendicular plane.
+	\param yaw: Angular Position in the x-y plane.
+       */
+    void setMaxPos(double x,
+		   double y,
+		   double yaw);
     
 
     /*! @} */

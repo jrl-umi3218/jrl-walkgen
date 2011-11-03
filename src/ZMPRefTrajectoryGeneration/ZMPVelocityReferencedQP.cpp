@@ -102,6 +102,19 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 
 
   IntermedData_ = new IntermedQPMat();
+  
+  //Initialization of references
+  PosRef_.Local.X = 0.;
+  PosRef_.Local.Y = 0.;
+  
+  MinPos_.Local.X = -99.;
+  MinPos_.Local.Y = -99.;
+  
+  MeanPos_.Local.X = 0.;
+  MeanPos_.Local.Y = 0.;
+  
+  MaxPos_.Local.X = 99.;
+  MaxPos_.Local.Y = 99.;
 
   VRQPGenerator_ = new GeneratorVelRef( SPM, IntermedData_, Robot_, RFI_ );
   VRQPGenerator_->NbPrwSamplings( QP_N_ );
@@ -112,6 +125,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_->Ponderation( 1.0, INSTANT_VELOCITY );
   VRQPGenerator_->Ponderation( 0.000001, COP_CENTERING );
   VRQPGenerator_->Ponderation( 0.00001, JERK_MIN );
+  VRQPGenerator_->Ponderation( 1.0, COM_POSITION );
 
   // Register method to handle
   const unsigned int NbMethods = 3;
@@ -363,6 +377,10 @@ ZMPVelocityReferencedQP::OnLine(double time,
       VelRef_=NewVelRef_;
       SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
       IntermedData_->Reference( VelRef_ );
+      IntermedData_->PosReference( PosRef_ );
+      IntermedData_->MinPos( MinPos_ );
+      IntermedData_->MeanPos( MeanPos_ );
+      IntermedData_->MaxPos( MaxPos_ );
       IntermedData_->CoM( CoM_() );
 
 

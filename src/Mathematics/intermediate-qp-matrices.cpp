@@ -37,6 +37,7 @@ IntermedQPMat::IntermedQPMat()
   InstantVelocity_.type = INSTANT_VELOCITY;
   COPCentering_.type = COP_CENTERING;
   JerkMin_.type = JERK_MIN;
+  Position_.type = COM_POSITION;
 
   IneqCoP_.type = INEQ_COP;
   IneqCoM_.type = INEQ_COM;
@@ -61,6 +62,8 @@ IntermedQPMat::Objective( objective_e type ) const
     return COPCentering_;
   case JERK_MIN:
     return JerkMin_;
+  case COM_POSITION:
+    return Position_;
   }
   /* Default behavior return Mean velocity. */
   return MeanVelocity_;
@@ -77,6 +80,8 @@ IntermedQPMat::Objective( objective_e type )
     return COPCentering_;
   case JERK_MIN:
     return JerkMin_;
+  case COM_POSITION:
+    return Position_;
   }
   /* Default behavior return Mean velocity. */
   return MeanVelocity_;
@@ -135,6 +140,10 @@ IntermedQPMat::dump_objective( objective_e type, std::ostream &aos )
 
   case COP_CENTERING:
     COPCentering_.print(aos);
+    break;
+    
+  case COM_POSITION:
+    Position_.print(aos);
     break;
   }
 

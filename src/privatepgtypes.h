@@ -61,7 +61,7 @@ namespace PatternGeneratorJRL
 
   enum objective_e
   {
-    INSTANT_VELOCITY, COP_CENTERING, JERK_MIN
+    INSTANT_VELOCITY, COP_CENTERING, JERK_MIN, COM_POSITION
   };
 
   enum dynamics_e

@@ -55,6 +55,18 @@ namespace PatternGeneratorJRL
       /// \brief Reference
       reference_t Ref;
 
+      /// \brief Position Reference
+      reference_t PosRef;
+
+      /// \brief Min CoM Position (relatively to PosRef)
+      reference_t MinPos;
+
+      /// \brief Mean CoM Position (relatively to PosRef)
+      reference_t MeanPos;
+
+      /// \brief Max CoM Position (relatively to PosRef)
+      reference_t MaxPos;
+
       /// \brief State of the Center of Mass
       com_t CoM;
 
@@ -132,6 +144,34 @@ namespace PatternGeneratorJRL
     inline void Reference( const reference_t & Ref )
     { StateMatrices_.Ref = Ref; };
 
+    inline reference_t const & PosReference() const
+    { return StateMatrices_.PosRef; };
+    inline reference_t & PosReference()
+    { return StateMatrices_.PosRef; };
+    inline void PosReference( const reference_t & Ref )
+    { StateMatrices_.PosRef = Ref; };
+
+    inline reference_t const & MinPos() const
+    { return StateMatrices_.MinPos; };
+    inline reference_t & MinPos()
+    { return StateMatrices_.MinPos; };
+    inline void MinPos( const reference_t & Ref )
+    { StateMatrices_.MinPos = Ref; };
+
+    inline reference_t const & MeanPos() const
+    { return StateMatrices_.MeanPos; };
+    inline reference_t & MeanPos()
+    { return StateMatrices_.MeanPos; };
+    inline void MeanPos( const reference_t & Ref )
+    { StateMatrices_.MeanPos = Ref; };
+
+    inline reference_t const & MaxPos() const
+    { return StateMatrices_.MaxPos; };
+    inline reference_t & MaxPos()
+    { return StateMatrices_.MaxPos; };
+    inline void MaxPos( const reference_t & Ref )
+    { StateMatrices_.MaxPos = Ref; };
+
     inline support_state_t const & SupportState() const
     { return StateMatrices_.SupportState; };
     inline support_state_t & SupportState()
@@ -158,7 +198,8 @@ namespace PatternGeneratorJRL
     MeanVelocity_,
     InstantVelocity_,
     COPCentering_,
-    JerkMin_;
+    JerkMin_,
+    Position_;
 
     state_variant_t
     StateMatrices_;
