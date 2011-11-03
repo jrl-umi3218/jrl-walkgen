@@ -25,6 +25,7 @@ INCLUDE(cmake/cpack.cmake)
 SET(PROJECT_NAME jrl-walkgen)
 SET(PROJECT_DESCRIPTION "Walking pattern generator for Humanoids")
 SET(PROJECT_URL "")
+SET(PROJECT_VERSION "99.0.0")
 
 
 SET(CXX_DISABLE_WERROR True)
