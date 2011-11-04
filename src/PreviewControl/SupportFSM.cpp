@@ -81,6 +81,13 @@ SupportFSM::update_vel_reference(reference_t & Ref, const support_state_t & Curr
           InRotation_ = false;
       }
   }
+
+  if (CurrentSupport.Phase==SS && CurrentSupport.NbStepsLeft == 0){
+	  Ref.Local.X=0;
+	  Ref.Local.Y=0;
+	  Ref.Local.Yaw=0;
+  }
+
 }
 
 
