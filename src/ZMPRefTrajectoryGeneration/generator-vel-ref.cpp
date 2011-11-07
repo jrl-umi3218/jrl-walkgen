@@ -800,8 +800,8 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 	for(int k=0;k<4;++k){
 		  std::stringstream ssTmp;
 		  ssTmp << "BOUND\t-1\t\t0.5\t0.5\t0.5\t\t" <<
-				  COPFeasibilityEdges.X[k]+currentSupport.X << "\t" <<
-				  COPFeasibilityEdges.Y[k]+currentSupport.Y << "\t0\n";
+				  COPFeasibilityEdges.X_vec[k]+currentSupport.X << "\t" <<
+				  COPFeasibilityEdges.Y_vec[k]+currentSupport.Y << "\t0\n";
 		  data.write(ssTmp.str().c_str(),ssTmp.str().size());
 	 }
 
@@ -821,8 +821,8 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 		  for(int k=0;k<4;++k){
 			  std::stringstream ssTmp;
 			  ssTmp << "BOUND\t" << j << "\t\t0.5\t0.5\t0.5\t\t" <<
-					  COPFeasibilityEdges.X[k]+Solution.Solution_vec(2*N_+j) << "\t" <<
-					  COPFeasibilityEdges.Y[k]+Solution.Solution_vec(2*N_+nbSteps+j) << "\t0\n";
+					  COPFeasibilityEdges.X_vec[k]+Solution.Solution_vec(2*N_+j) << "\t" <<
+					  COPFeasibilityEdges.Y_vec[k]+Solution.Solution_vec(2*N_+nbSteps+j) << "\t0\n";
 			  data.write(ssTmp.str().c_str(),ssTmp.str().size());
 		  }
 
@@ -830,8 +830,8 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 		  for(int k=0;k<5;++k){
 			  std::stringstream ssTmp;
 			  ssTmp << "BOUND\t" << j+nbSteps << "\t\t0.5\t0.5\t0.5\t\t" <<
-					  FootFeasibilityEdges.X[k]+Solution.Solution_vec(2*N_+j) << "\t" <<
-					  FootFeasibilityEdges.Y[k]+Solution.Solution_vec(2*N_+nbSteps+j) << "\t0\n";
+					  FootFeasibilityEdges.X_vec[k]+Solution.Solution_vec(2*N_+j) << "\t" <<
+					  FootFeasibilityEdges.Y_vec[k]+Solution.Solution_vec(2*N_+nbSteps+j) << "\t0\n";
 			  data.write(ssTmp.str().c_str(),ssTmp.str().size());
 		  }
 

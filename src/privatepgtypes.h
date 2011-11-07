@@ -284,6 +284,9 @@ namespace PatternGeneratorJRL
     void reset();
 
     support_state_t();
+
+    bool operator==(const support_state_t & ss) const;
+    bool operator!=(const support_state_t & ss) const;
   };
 
   /// \brief Solution

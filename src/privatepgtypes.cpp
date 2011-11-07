@@ -74,6 +74,27 @@ namespace PatternGeneratorJRL
 
   }
 
+  bool support_state_t::operator==(const support_state_t & ss) const{
+	  if (	  Phase==ss.Phase &&
+			  Foot==ss.Foot &&
+			  NbStepsLeft==ss.NbStepsLeft &&
+			  TimeLimit==ss.TimeLimit &&
+			  StepNumber==ss.StepNumber &&
+			  StateChanged==ss.StateChanged &&
+			  NbInstants==ss.NbInstants &&
+			  StartTime==ss.StartTime &&
+			  X==ss.X &&
+			  Y==ss.Y &&
+			  Yaw==ss.Yaw){
+		  	  return true;
+
+	  }
+	  return false;
+  }
+
+  bool support_state_t::operator!=(const support_state_t & ss) const{
+	  return (!(ss==*this));
+  }
 
   struct com_t & com_t::operator=(const com_t &aCS)
   {

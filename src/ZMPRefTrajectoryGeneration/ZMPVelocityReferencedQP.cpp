@@ -319,13 +319,29 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   return 0;
 }
 
-
 void
 ZMPVelocityReferencedQP::OnLine(double time,
     deque<ZMPPosition> & FinalZMPTraj_deq,
     deque<COMState> & FinalCOMTraj_deq,
     deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
     deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
+{
+	OnLine(time,
+			FinalZMPTraj_deq,
+			FinalCOMTraj_deq,
+			FinalLeftFootTraj_deq,
+			FinalRightFootTraj_deq,
+			IntermedData_->SupportState());
+}
+
+
+void
+ZMPVelocityReferencedQP::OnLine(double time,
+    deque<ZMPPosition> & FinalZMPTraj_deq,
+    deque<COMState> & FinalCOMTraj_deq,
+    deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+    deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+    support_state_t & new_current_support)
 {
 
   // If on-line mode not activated we go out.
@@ -365,12 +381,17 @@ ZMPVelocityReferencedQP::OnLine(double time,
       IntermedData_->Reference( VelRef_ );
       IntermedData_->CoM( CoM_() );
 
+      // Adaptive control of current support state
+      if (new_current_support!=IntermedData_->SupportState()){
+    	  IntermedData_->SupportState(new_current_support);
+      }
 
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
       // ----------------------------------------------------
       VRQPGenerator_->preview_support_states( time, SupportFSM_,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq, Solution_.SupportStates_deq );
-
+      // save the current support state for external use
+      new_current_support=IntermedData_->SupportState();
 
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // ------------------------------------------------------
