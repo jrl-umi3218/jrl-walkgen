@@ -362,12 +362,12 @@ OrientationsPreview::interpolate_trunk_orientation(double Time, int CurrentIndex
 
   support_state_t CurrentSupport = PrwSupportStates_deq.front();
 
-  if(CurrentSupport.Phase == SS && Time+3.0/2.0*T_ < CurrentSupport.TimeLimit)
+  if(CurrentSupport.Phase == SS && Time+3.0/2.0*Ti_ < CurrentSupport.TimeLimit)
     {
       //Fourth order polynomial parameters
       double a =  TrunkState_.yaw[1];
-      double c = 3.0*(TrunkStateT_.yaw[1]-TrunkState_.yaw[1])/(T_*T_);
-      double d = -2.0*c/(3.0*T_);
+      double c = 3.0*(TrunkStateT_.yaw[1]-TrunkState_.yaw[1])/(Ti_*Ti_);
+      double d = -2.0*c/(3.0*Ti_);
 
       double tT;
       double Theta = TrunkState_.yaw[0];
@@ -375,7 +375,7 @@ OrientationsPreview::interpolate_trunk_orientation(double Time, int CurrentIndex
       FinalCOMTraj_deq[CurrentIndex].yaw[0] = TrunkState_.yaw[0];
       FinalCOMTraj_deq[CurrentIndex].yaw[1] = TrunkState_.yaw[1];
       //Interpolate the
-      for(int k = 0; k<(int)(T_/NewSamplingPeriod);k++)
+      for(int k = 0; k<(int)(Ti_/NewSamplingPeriod);k++)
         {
           tT = (double)(k+1)*NewSamplingPeriod;
           //interpolate the orientation of the trunk
@@ -394,9 +394,9 @@ OrientationsPreview::interpolate_trunk_orientation(double Time, int CurrentIndex
           FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkState_.yaw[1];
         }
     }
-  else if (CurrentSupport.Phase == DS || Time+3.0/2.0*T_ > CurrentSupport.TimeLimit)
+  else if (CurrentSupport.Phase == DS || Time+3.0/2.0*Ti_ > CurrentSupport.TimeLimit)
     {
-      for(int k = 0; k<(int)(T_/NewSamplingPeriod);k++)
+      for(int k = 0; k<(int)(Ti_/NewSamplingPeriod);k++)
         {
           FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = TrunkState_.yaw[0];
           FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkState_.yaw[1];

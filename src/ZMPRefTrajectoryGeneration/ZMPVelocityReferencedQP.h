@@ -160,6 +160,16 @@ namespace PatternGeneratorJRL
 
     /// \brief Time at which the problem should be updated
     double UpperTimeLimitToUpdate_;
+    double UpperTimeLimitToFeedback_;
+
+    /// \brief Current time
+    double CurrentTime;
+
+    /// \brief Sampling feedback period
+    double m_SamplingFeedback;
+
+    /// \brief Duration of the first iteration for dynamic matrix
+    double FirstIterationDynamicsDuration_;
 
     /// \brief Security margin for trajectory queues
     double TimeBuffer_;

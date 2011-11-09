@@ -122,6 +122,7 @@ void LinearizedInvertedPendulum2D::setState(MAL_VECTOR_TYPE(double) lxk)
 
 int LinearizedInvertedPendulum2D::InitializeSystem()
 {
+
   if (m_T==-1.0)
     return -1;
   
@@ -164,7 +165,9 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
     
   //TODO: with TestHerdt, it is mandatory to use COMStates.size()-1, or it will crash.
   // Is it the same for the other PG ? Please check.
-  int loopEnd = std::min<int>( m_InterpolationInterval, ((int)COMStates.size())-1-CurrentPosition);
+  int loopEnd = std::max<int>(0,std::min<int>( m_InterpolationInterval-1, ((int)COMStates.size())-1-CurrentPosition));
+
+
   for(int lk=0;lk<=loopEnd;lk++,lCurrentPosition++)
     {
       ODEBUG("lCurrentPosition: "<< lCurrentPosition);
@@ -214,7 +217,7 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
       
       aZMPPos.py = m_C(0,0) * aCOMPos.y[0] +
 	m_C(0,1) * aCOMPos.y[1] + m_C(0,2) * aCOMPos.y[2];
-      
+
             
       ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
 	      aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<
@@ -229,6 +232,7 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
 
 com_t LinearizedInvertedPendulum2D::OneIteration(double ux, double uy)
 {
+
   MAL_VECTOR_DIM(Bux,double,3);
   MAL_VECTOR_DIM(Buy,double,3);
 

@@ -284,10 +284,11 @@ GeneratorVelRef::initialize_matrices( linear_inequality_t & Inequalities)
 
 void 
 GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
-    const std::deque<support_state_t> & SupportStates_deq) const
+    const std::deque<support_state_t> & SupportStates_deq, double FirstIterationDynamicsDuration) const
 {
 
   deque<support_state_t>::const_iterator prwSS_it = SupportStates_deq.begin();
+
 
   const unsigned nbEdges = 4;
   const unsigned nbIneq = 4;
@@ -297,6 +298,8 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
   ++prwSS_it;//Point at the first previewed instant
   for( unsigned i=0; i<N_; i++ )
     {
+
+
       if( prwSS_it->StateChanged )
         RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
 
@@ -309,7 +312,9 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
           Inequalities.Dc_vec( i*nbEdges+j ) = CoPHull.D_vec[j];
         }
 
+
       ++prwSS_it;
+
     }
 
 }
@@ -553,7 +558,7 @@ GeneratorVelRef::build_eq_constraints_feet( const std::deque<support_state_t> & 
 
 
 void
-GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution )
+GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution, double FirstIterationDynamicsDuration )
 {
 
   unsigned nbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
@@ -567,7 +572,7 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution 
   // ----------------------
   //CoP constraints
   linear_inequality_t & IneqCoP = IntermedData_->Inequalities( INEQ_COP );
-  build_inequalities_cop( IneqCoP, Solution.SupportStates_deq );
+  build_inequalities_cop( IneqCoP, Solution.SupportStates_deq, FirstIterationDynamicsDuration );
   build_constraints_cop( IneqCoP, nbStepsPreviewed, Pb );
 
   //Foot constraints
@@ -588,7 +593,7 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution 
 void 
 GeneratorVelRef::build_invariant_part( QPProblem & Pb )
 {
-
+	Pb.clear(MATRIX_Q);
   const RigidBody & CoM = Robot_->CoM();
 
   //Constant terms in the Hessian

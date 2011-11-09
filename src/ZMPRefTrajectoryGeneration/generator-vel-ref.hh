@@ -87,7 +87,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param[out] Pb
     /// \param[in] Solution
-    void build_constraints( QPProblem & Pb, const solution_t & Solution );
+    void build_constraints( QPProblem & Pb, const solution_t & Solution, double FirstIterationDynamicsDuration );
 
     /// \brief Build the constant part of the objective
     ///
@@ -138,7 +138,7 @@ namespace PatternGeneratorJRL
     /// \param[out] Inequalities
     /// \param[in] SupportStates_deq
     void build_inequalities_cop(linear_inequality_t & Inequalities,
-        const std::deque<support_state_t> & SupportStates_deq) const;
+        const std::deque<support_state_t> & SupportStates_deq, double FirstIterationDynamicsDuration) const;
 
     /// \brief Generate a queue of inequality constraints on
     /// the feet positions with respect to previous foot positions
