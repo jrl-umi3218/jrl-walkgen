@@ -388,8 +388,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
   if(time  >= UpperTimeLimitToFeedback_)
       {
 
-	  FirstIterationDynamicsDuration_ = UpperTimeLimitToUpdate_-UpperTimeLimitToFeedback_;
-	  UpperTimeLimitToFeedback_ = UpperTimeLimitToFeedback_ + m_SamplingFeedback;
+
 
       // UPDATE INTERNAL DATA:
       // ---------------------
@@ -404,7 +403,14 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // Adaptive control of current support state
       if (new_current_support!=IntermedData_->SupportState()){
     	  IntermedData_->SupportState(new_current_support);
+    	  UpperTimeLimitToUpdate_=time + QP_T_;
+    	  UpperTimeLimitToFeedback_ = time;
       }
+
+      // update time limits
+      FirstIterationDynamicsDuration_ = UpperTimeLimitToUpdate_-UpperTimeLimitToFeedback_;
+     	  UpperTimeLimitToFeedback_ = UpperTimeLimitToFeedback_ + m_SamplingFeedback;
+
 
       // Recompute dynamic matrix according to synchronization with DS phase
       Robot_->FirstIterationDynamicsDuration(FirstIterationDynamicsDuration_);
