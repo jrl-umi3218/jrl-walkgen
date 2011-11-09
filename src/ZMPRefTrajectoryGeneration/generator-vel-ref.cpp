@@ -288,11 +288,13 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 {
 
   deque<support_state_t>::const_iterator prwSS_it = SupportStates_deq.begin();
-
+  support_state_t current_state;
 
   const unsigned nbEdges = 4;
   const unsigned nbIneq = 4;
   convex_hull_t CoPHull( nbEdges, nbIneq );
+  convex_hull_t CurrentCoPHull( nbEdges, nbIneq );
+  convex_hull_t ConvexHullDS(2*nbEdges-2 , 2*nbIneq-2);
   RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
 
   ++prwSS_it;//Point at the first previewed instant
@@ -300,17 +302,56 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
     {
 
 
-      if( prwSS_it->StateChanged )
-        RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
 
-      RFI_->compute_linear_system( CoPHull, *prwSS_it );
 
-      for( unsigned j = 0; j < nbEdges; j++ )
-        {
-          Inequalities.D.X_mat.push_back( i*nbEdges+j, i, CoPHull.A_vec[j] );
-          Inequalities.D.Y_mat.push_back( i*nbEdges+j, i, CoPHull.B_vec[j] );
-          Inequalities.Dc_vec( i*nbEdges+j ) = CoPHull.D_vec[j];
-        }
+
+	  	if (prwSS_it->StateChanged && i==0 && prwSS_it->Phase==SS && SupportStates_deq[0].Phase==SS){
+
+	  		RFI_->set_vertices( CoPHull,*prwSS_it, INEQ_COP );
+	  		RFI_->set_vertices( CurrentCoPHull,SupportStates_deq[0], INEQ_COP );
+
+	  		double FootDX = prwSS_it->X-SupportStates_deq[0].X;
+	  		double FootDY = prwSS_it->Y-SupportStates_deq[0].Y;
+
+
+	  		ConvexHullDS.X_vec.resize(4);
+	  		ConvexHullDS.Y_vec.resize(4);
+
+	  		ConvexHullDS.X_vec[0]=CoPHull.X_vec[1];
+	  		ConvexHullDS.X_vec[1]=CurrentCoPHull.X_vec[0]-FootDX;
+	  		ConvexHullDS.X_vec[2]=CurrentCoPHull.X_vec[2]-FootDX;
+	  		ConvexHullDS.X_vec[3]=CoPHull.X_vec[3];
+
+	  		ConvexHullDS.Y_vec[0]=CoPHull.Y_vec[1];
+	  		ConvexHullDS.Y_vec[1]=CurrentCoPHull.Y_vec[0]-FootDY;
+	  		ConvexHullDS.Y_vec[2]=CurrentCoPHull.Y_vec[2]-FootDY;
+	  		ConvexHullDS.Y_vec[3]=CoPHull.Y_vec[3];
+
+
+	  		RFI_->compute_linear_system( ConvexHullDS, *prwSS_it );
+
+			for( unsigned j = 0; j < nbEdges; j++ )
+			        {
+			          Inequalities.D.X_mat.push_back( i*nbEdges+j, i, ConvexHullDS.A_vec[j] );
+			          Inequalities.D.Y_mat.push_back( i*nbEdges+j, i, ConvexHullDS.B_vec[j] );
+			          Inequalities.Dc_vec( i*nbEdges+j ) = ConvexHullDS.D_vec[j];
+			        }
+
+		}else{
+		  if( prwSS_it->StateChanged )
+				 RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
+			RFI_->compute_linear_system( CoPHull, *prwSS_it );
+
+			for( unsigned j = 0; j < nbEdges; j++ )
+			        {
+			          Inequalities.D.X_mat.push_back( i*nbEdges+j, i, CoPHull.A_vec[j] );
+			          Inequalities.D.Y_mat.push_back( i*nbEdges+j, i, CoPHull.B_vec[j] );
+			          Inequalities.Dc_vec( i*nbEdges+j ) = CoPHull.D_vec[j];
+			        }
+
+		}
+
+
 
 
       ++prwSS_it;
@@ -797,9 +838,9 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 	deque<support_state_t>::iterator prwSS_it = Solution.SupportStates_deq.begin();
 
 	unsigned int j = 0;
-	convex_hull_t FootFeasibilityEdges, COPFeasibilityEdges;
+	convex_hull_t FootFeasibilityEdges, COPFeasibilityEdges, ConvexHullDS, CurrentCoPHull;
 	unsigned int nbSteps = Solution.SupportStates_deq.back().StepNumber;
-
+	double Xfoot, Yfoot;
 	//display current COP constraint
 	RFI_->set_vertices( COPFeasibilityEdges, *prwSS_it, INEQ_COP );
 	for(int k=0;k<4;++k){
@@ -818,7 +859,37 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 	  if (currentSupport.Foot != prwSS_it->Foot){
 		  currentSupport.Foot = prwSS_it->Foot;
 		  RFI_->set_vertices( COPFeasibilityEdges, *prwSS_it, INEQ_COP );
+		  if (i==0 && prwSS_it->Phase==SS && Solution.SupportStates_deq[0].Phase==SS){
 
+		  	  		RFI_->set_vertices( COPFeasibilityEdges,*prwSS_it, INEQ_COP );
+		  	  		RFI_->set_vertices( CurrentCoPHull,Solution.SupportStates_deq[0], INEQ_COP );
+
+		  	  		double FootDX = prwSS_it->X-Solution.SupportStates_deq[0].X;
+		  	  		double FootDY = prwSS_it->Y-Solution.SupportStates_deq[0].Y;
+
+
+		  	  		ConvexHullDS.X_vec.resize(4);
+		  	  		ConvexHullDS.Y_vec.resize(4);
+
+		  	  		ConvexHullDS.X_vec[0]=COPFeasibilityEdges.X_vec[1];
+		  	  		ConvexHullDS.X_vec[1]=CurrentCoPHull.X_vec[0]-FootDX;
+		  	  		ConvexHullDS.X_vec[2]=CurrentCoPHull.X_vec[2]-FootDX;
+		  	  		ConvexHullDS.X_vec[3]=COPFeasibilityEdges.X_vec[3];
+
+		  	  		ConvexHullDS.Y_vec[0]=COPFeasibilityEdges.Y_vec[1];
+		  	  		ConvexHullDS.Y_vec[1]=CurrentCoPHull.Y_vec[0]-FootDY;
+		  	  		ConvexHullDS.Y_vec[2]=CurrentCoPHull.Y_vec[2]-FootDY;
+		  	  		ConvexHullDS.Y_vec[3]=COPFeasibilityEdges.Y_vec[3];
+
+
+		  	  		COPFeasibilityEdges = ConvexHullDS;
+
+		  	  		Xfoot=prwSS_it->X;
+		  	  		Yfoot=prwSS_it->Y;
+		  		}else{
+		  			Xfoot=Solution.Solution_vec(2*N_+j);
+		  			Yfoot=Solution.Solution_vec(2*N_+nbSteps+j);
+		  		}
 
 		  RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it, INEQ_FEET );
 
@@ -826,8 +897,8 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 		  for(int k=0;k<4;++k){
 			  std::stringstream ssTmp;
 			  ssTmp << "BOUND\t" << j << "\t\t0.5\t0.5\t0.5\t\t" <<
-					  COPFeasibilityEdges.X_vec[k]+Solution.Solution_vec(2*N_+j) << "\t" <<
-					  COPFeasibilityEdges.Y_vec[k]+Solution.Solution_vec(2*N_+nbSteps+j) << "\t0\n";
+					  COPFeasibilityEdges.X_vec[k]+Xfoot << "\t" <<
+					  COPFeasibilityEdges.Y_vec[k]+Yfoot << "\t0\n";
 			  data.write(ssTmp.str().c_str(),ssTmp.str().size());
 		  }
 
@@ -835,16 +906,16 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 		  for(int k=0;k<5;++k){
 			  std::stringstream ssTmp;
 			  ssTmp << "BOUND\t" << j+nbSteps << "\t\t0.5\t0.5\t0.5\t\t" <<
-					  FootFeasibilityEdges.X_vec[k]+Solution.Solution_vec(2*N_+j) << "\t" <<
-					  FootFeasibilityEdges.Y_vec[k]+Solution.Solution_vec(2*N_+nbSteps+j) << "\t0\n";
+					  FootFeasibilityEdges.X_vec[k]+Xfoot << "\t" <<
+					  FootFeasibilityEdges.Y_vec[k]+Yfoot << "\t0\n";
 			  data.write(ssTmp.str().c_str(),ssTmp.str().size());
 		  }
 
 		  //display feet positions
 		  std::stringstream ssTmp;
 		  ssTmp << "POINT\t" << j+nbSteps << "\t\t1\t0\t0\t\t" <<
-				  Solution.Solution_vec(2*N_+j) << "\t" <<
-				  Solution.Solution_vec(2*N_+nbSteps+j) << "\t0\n";
+				  Xfoot << "\t" <<
+				  Yfoot << "\t0\n";
 		  data.write(ssTmp.str().c_str(),ssTmp.str().size());
 		  j++;
 	  }
