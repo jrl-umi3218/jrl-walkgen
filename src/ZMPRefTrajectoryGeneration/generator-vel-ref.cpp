@@ -301,10 +301,6 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
   for( unsigned i=0; i<N_; i++ )
     {
 
-
-
-
-
 	  	if (prwSS_it->StateChanged && i==0 && prwSS_it->Phase==SS && SupportStates_deq[0].Phase==SS){
 
 	  		RFI_->set_vertices( CoPHull,*prwSS_it, INEQ_COP );
@@ -837,7 +833,8 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 	support_state_t currentSupport = Solution.SupportStates_deq.front();
 	deque<support_state_t>::iterator prwSS_it = Solution.SupportStates_deq.begin();
 
-	unsigned int j = 0;
+	unsigned int j = 0,b=0;
+	bool ds_phase=false;
 	convex_hull_t FootFeasibilityEdges, COPFeasibilityEdges, ConvexHullDS, CurrentCoPHull;
 	unsigned int nbSteps = Solution.SupportStates_deq.back().StepNumber;
 	double Xfoot, Yfoot;
@@ -845,22 +842,36 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 	RFI_->set_vertices( COPFeasibilityEdges, *prwSS_it, INEQ_COP );
 	for(int k=0;k<4;++k){
 		  std::stringstream ssTmp;
-		  ssTmp << "BOUND\t-1\t\t0.5\t0.5\t0.5\t\t" <<
+		  ssTmp << "BOUND\t-1\t\t0.1\t0.8\t0.1\t\t" <<
 				  COPFeasibilityEdges.X_vec[k]+currentSupport.X << "\t" <<
 				  COPFeasibilityEdges.Y_vec[k]+currentSupport.Y << "\t0\n";
 		  data.write(ssTmp.str().c_str(),ssTmp.str().size());
+	 }{
+		  std::stringstream ssTmp;
+		  ssTmp << "BOUND\t-1\t\t0.1\t0.8\t0.1\t\t" <<
+				  COPFeasibilityEdges.X_vec[0]+currentSupport.X << "\t" <<
+				  COPFeasibilityEdges.Y_vec[0]+currentSupport.Y << "\t0\n";
+		  data.write(ssTmp.str().c_str(),ssTmp.str().size());
 	 }
+
+	  //display current feet positions
+	  std::stringstream ssTmp;
+	  ssTmp << "POINT\t-1\t\t0.1\t0.8\t0.1\t\t" <<
+			  currentSupport.X << "\t" <<
+			  currentSupport.Y << "\t0\n";
+	  data.write(ssTmp.str().c_str(),ssTmp.str().size());
+	  ++b;
 
 	prwSS_it++;
 	for(unsigned int i=0; i<N_; i++)
 	{
 
 	  //display constraints
-	  if (currentSupport.Foot != prwSS_it->Foot){
-		  currentSupport.Foot = prwSS_it->Foot;
+	  if (prwSS_it->StateChanged || ds_phase){
 		  RFI_->set_vertices( COPFeasibilityEdges, *prwSS_it, INEQ_COP );
-		  if (i==0 && prwSS_it->Phase==SS && Solution.SupportStates_deq[0].Phase==SS){
-
+		  RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it, INEQ_FEET );
+		  if (i==0 && prwSS_it->Phase==SS && Solution.SupportStates_deq[0].Phase==SS && !ds_phase){
+			  	  	ds_phase=true;
 		  	  		RFI_->set_vertices( COPFeasibilityEdges,*prwSS_it, INEQ_COP );
 		  	  		RFI_->set_vertices( CurrentCoPHull,Solution.SupportStates_deq[0], INEQ_COP );
 
@@ -886,17 +897,33 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 
 		  	  		Xfoot=prwSS_it->X;
 		  	  		Yfoot=prwSS_it->Y;
+
+		  	  		prwSS_it--;
+		  		}else if(Solution.SupportStates_deq[0].Phase==DS && prwSS_it->StepNumber==1){
+		  			Xfoot=Solution.SupportStates_deq[0].X;
+		  			Yfoot=Solution.SupportStates_deq[0].Y;
+		  			ds_phase=false;
+
 		  		}else{
-		  			Xfoot=Solution.Solution_vec(2*N_+j);
-		  			Yfoot=Solution.Solution_vec(2*N_+nbSteps+j);
+		  			if (!ds_phase){
+		  				Xfoot=Solution.Solution_vec(2*N_+j);
+		  				Yfoot=Solution.Solution_vec(2*N_+nbSteps+j);
+		  				j++;
+		  			}else{
+		  				Xfoot=prwSS_it->X;
+		  				Yfoot=prwSS_it->Y;
+		  				ds_phase=false;
+		  			}
+
+
 		  		}
 
-		  RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it, INEQ_FEET );
+
 
 		  //display COP constraints
 		  for(int k=0;k<4;++k){
 			  std::stringstream ssTmp;
-			  ssTmp << "BOUND\t" << j << "\t\t0.5\t0.5\t0.5\t\t" <<
+			  ssTmp << "BOUND\t" << b << "\t\t0.5\t0.5\t0.5\t\t" <<
 					  COPFeasibilityEdges.X_vec[k]+Xfoot << "\t" <<
 					  COPFeasibilityEdges.Y_vec[k]+Yfoot << "\t0\n";
 			  data.write(ssTmp.str().c_str(),ssTmp.str().size());
@@ -905,7 +932,7 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 		  //display feet constraints
 		  for(int k=0;k<5;++k){
 			  std::stringstream ssTmp;
-			  ssTmp << "BOUND\t" << j+nbSteps << "\t\t0.5\t0.5\t0.5\t\t" <<
+			  ssTmp << "BOUND\t" << b+nbSteps << "\t\t0.5\t0.5\t0.5\t\t" <<
 					  FootFeasibilityEdges.X_vec[k]+Xfoot << "\t" <<
 					  FootFeasibilityEdges.Y_vec[k]+Yfoot << "\t0\n";
 			  data.write(ssTmp.str().c_str(),ssTmp.str().size());
@@ -913,13 +940,15 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 
 		  //display feet positions
 		  std::stringstream ssTmp;
-		  ssTmp << "POINT\t" << j+nbSteps << "\t\t1\t0\t0\t\t" <<
+		  ssTmp << "POINT\t" << b+nbSteps << "\t\t1\t0\t0\t\t" <<
 				  Xfoot << "\t" <<
 				  Yfoot << "\t0\n";
 		  data.write(ssTmp.str().c_str(),ssTmp.str().size());
-		  j++;
+		  ++b;
+
 	  }
 	  prwSS_it++;
+
 	}
 	data.close();
 
