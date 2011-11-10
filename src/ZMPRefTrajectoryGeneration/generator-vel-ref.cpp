@@ -299,12 +299,14 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
   support_state_t current_state;
 
   //RFI_->set_vertices( CoPHull2, *prwSS_it, INEQ_COP );
-  unsigned offset_DS=0;
+  unsigned nb_constraints=0;
   ++prwSS_it;//Point at the first previewed instant
 
 
   if (prwSS_it->InTransitionPhase){
 	  initialize_matrices(Inequalities,2);
+  }else{
+	  initialize_matrices(Inequalities);
   }
 
   for( unsigned i=0; i<N_; i++ )
@@ -318,13 +320,14 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 			RFI_->compute_ds_vertices(*prwSS_it, SupportStates_deq[0], ConvexHullDS);
 
 			RFI_->compute_linear_system( ConvexHullDS, *prwSS_it );
-			offset_DS=2;
+
 			for( unsigned j = 0; j < 6; j++ )
 					{
-					  Inequalities.D.X_mat.push_back( j, i, ConvexHullDS.A_vec[j] );
-					  Inequalities.D.Y_mat.push_back( j, i, ConvexHullDS.B_vec[j] );
-					  Inequalities.Dc_vec( j ) = ConvexHullDS.D_vec[j];
+					  Inequalities.D.X_mat.push_back( j+nb_constraints, i, ConvexHullDS.A_vec[j] );
+					  Inequalities.D.Y_mat.push_back( j+nb_constraints, i, ConvexHullDS.B_vec[j] );
+					  Inequalities.Dc_vec( j+nb_constraints ) = ConvexHullDS.D_vec[j];
 					}
+			nb_constraints+=6;
 
 		}else{
 
@@ -340,10 +343,11 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 
 			  for( unsigned j = 0; j < nbEdges; j++ )
 					{
-					  Inequalities.D.X_mat.push_back( i*nbEdges+j+offset_DS, i, CoPHull.A_vec[j] );
-					  Inequalities.D.Y_mat.push_back( i*nbEdges+j+offset_DS, i, CoPHull.B_vec[j] );
-					  Inequalities.Dc_vec( i*nbEdges+j+offset_DS ) = CoPHull.D_vec[j];
+					  Inequalities.D.X_mat.push_back( j+nb_constraints, i, CoPHull.A_vec[j] );
+					  Inequalities.D.Y_mat.push_back( j+nb_constraints, i, CoPHull.B_vec[j] );
+					  Inequalities.Dc_vec( j+nb_constraints ) = CoPHull.D_vec[j];
 					}
+			  nb_constraints+=4;
 
 		}
 
