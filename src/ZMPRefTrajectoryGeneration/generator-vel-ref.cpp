@@ -82,6 +82,7 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
   const reference_t & RefVel = IntermedData_->Reference();
   support_state_t & CurrentSupport = IntermedData_->SupportState();
   FSM->set_support_state( CurrentTime_, 0, CurrentSupport, RefVel );
+  CurrentSupport.InTransitionPhase=false;
   if( CurrentSupport.StateChanged == true )
     {
       if( CurrentSupport.Foot == LEFT )
@@ -93,6 +94,7 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
       CurrentSupport.Yaw = FAP->theta*M_PI/180.0;
       CurrentSupport.StartTime = time;
     }
+
   SupportStates_deq.push_back( CurrentSupport );
   IntermedData_->SupportState( CurrentSupport );
 
@@ -101,10 +103,12 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
   // -----------------------
   // initialize the previewed support state before previewing
   support_state_t PreviewedSupport = CurrentSupport;
+
   PreviewedSupport.StepNumber  = 0;
   for( unsigned pi=1; pi<=N_; pi++ )
     {
       FSM->set_support_state( CurrentTime_, pi, PreviewedSupport, RefVel );
+      PreviewedSupport.InTransitionPhase=false;
       if( PreviewedSupport.StateChanged )
         {
           if( pi == 1  )//Foot down
@@ -117,6 +121,9 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
               PreviewedSupport.Y = FAP->y;
               PreviewedSupport.Yaw = FAP->theta*M_PI/180.0;
               PreviewedSupport.StartTime = time+pi*Tprw_;
+              if (CurrentSupport.Phase==SS && PreviewedSupport.Phase==SS){
+            	  PreviewedSupport.InTransitionPhase=true;
+              }
             }
           if( /*pi > 1 &&*/ PreviewedSupport.StepNumber > 0 )
             {
@@ -124,6 +131,7 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
               PreviewedSupport.Y = 0.0;
             }
         }
+
       SupportStates_deq.push_back( PreviewedSupport );
     }
 
@@ -254,27 +262,27 @@ GeneratorVelRef::initialize_matrices()
 
 
 void
-GeneratorVelRef::initialize_matrices( linear_inequality_t & Inequalities)
+GeneratorVelRef::initialize_matrices( linear_inequality_t & Inequalities, int addedSize)
 {
 
   switch(Inequalities.type)
   {
   case INEQ_COP:
-    Inequalities.D.X_mat.resize(4*N_,N_,false);
+    Inequalities.D.X_mat.resize(4*N_+addedSize,N_,false);
     Inequalities.D.X_mat.clear();
-    Inequalities.D.Y_mat.resize(4*N_,N_,false);
+    Inequalities.D.Y_mat.resize(4*N_+addedSize,N_,false);
     Inequalities.D.Y_mat.clear();
-    Inequalities.Dc_vec.resize(4*N_,false);
+    Inequalities.Dc_vec.resize(4*N_+addedSize,false);
     Inequalities.Dc_vec.clear();
     break;
   case INEQ_COM://TODO: fixed resize
-    Inequalities.D.X_mat.resize(40,N_,false);
+    Inequalities.D.X_mat.resize(40+addedSize,N_,false);
     Inequalities.D.X_mat.clear();
-    Inequalities.D.Y_mat.resize(40,N_,false);
+    Inequalities.D.Y_mat.resize(40+addedSize,N_,false);
     Inequalities.D.Y_mat.clear();
-    Inequalities.D.Z_mat.resize(40,1,false);
+    Inequalities.D.Z_mat.resize(40+addedSize,1,false);
     Inequalities.D.Z_mat.clear();
-    Inequalities.Dc_vec.resize(40,false);
+    Inequalities.Dc_vec.resize(40+addedSize,false);
     Inequalities.Dc_vec.clear();
     break;
   }
@@ -284,78 +292,58 @@ GeneratorVelRef::initialize_matrices( linear_inequality_t & Inequalities)
 
 void 
 GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
-    const std::deque<support_state_t> & SupportStates_deq, double FirstIterationDynamicsDuration) const
+    const std::deque<support_state_t> & SupportStates_deq, double FirstIterationDynamicsDuration)
 {
 
   deque<support_state_t>::const_iterator prwSS_it = SupportStates_deq.begin();
   support_state_t current_state;
 
-  const unsigned nbEdges = 4;
-  const unsigned nbIneq = 4;
-  convex_hull_t CoPHull( nbEdges, nbIneq );
-  convex_hull_t CurrentCoPHull( nbEdges, nbIneq );
-  convex_hull_t ConvexHullDS(2*nbEdges-2 , 2*nbIneq-2);
-  RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
+  //RFI_->set_vertices( CoPHull2, *prwSS_it, INEQ_COP );
   unsigned offset_DS=0;
   ++prwSS_it;//Point at the first previewed instant
+
+
+  if (prwSS_it->InTransitionPhase){
+	  initialize_matrices(Inequalities,2);
+  }
+
   for( unsigned i=0; i<N_; i++ )
     {
 
-	  	if (prwSS_it->StateChanged && i==0 && prwSS_it->Phase==SS && SupportStates_deq[0].Phase==SS){
+	  	if (prwSS_it->InTransitionPhase){
 
-	  		RFI_->set_vertices( CoPHull,*prwSS_it, INEQ_COP );
-	  		RFI_->set_vertices( CurrentCoPHull,SupportStates_deq[0], INEQ_COP );
-
-	  		double FootDX = prwSS_it->X-SupportStates_deq[0].X;
-	  		double FootDY = prwSS_it->Y-SupportStates_deq[0].Y;
+	  	    convex_hull_t ConvexHullDS(6,6);
 
 
-	  		ConvexHullDS.X_vec.resize(6);
-	  		ConvexHullDS.Y_vec.resize(6);
+			RFI_->compute_ds_vertices(*prwSS_it, SupportStates_deq[0], ConvexHullDS);
 
-	  		ConvexHullDS.X_vec[0]=CoPHull.X_vec[3];
-	  		ConvexHullDS.X_vec[1]=CoPHull.X_vec[0];
-	  		ConvexHullDS.X_vec[2]=CoPHull.X_vec[1];
-	  		ConvexHullDS.X_vec[3]=CurrentCoPHull.X_vec[0]-FootDX;
-	  		ConvexHullDS.X_vec[4]=CurrentCoPHull.X_vec[3]-FootDX;
-	  		ConvexHullDS.X_vec[5]=CurrentCoPHull.X_vec[2]-FootDX;
-
-
-	  		ConvexHullDS.Y_vec[0]=CoPHull.Y_vec[3];
-	  		ConvexHullDS.Y_vec[1]=CoPHull.Y_vec[0];
-	  		ConvexHullDS.Y_vec[2]=CoPHull.Y_vec[1];
-	  		ConvexHullDS.Y_vec[3]=CurrentCoPHull.Y_vec[0]-FootDY;
-	  		ConvexHullDS.Y_vec[4]=CurrentCoPHull.Y_vec[3]-FootDY;
-	  		ConvexHullDS.Y_vec[5]=CurrentCoPHull.Y_vec[2]-FootDY;
-
-
-
-	  		RFI_->compute_linear_system( ConvexHullDS, *prwSS_it );
-	  		offset_DS=2;
-	  		Inequalities.D.X_mat.resize(4*N_+2,N_,false);
-			Inequalities.D.X_mat.clear();
-			Inequalities.D.Y_mat.resize(4*N_+2,N_,false);
-			Inequalities.D.Y_mat.clear();
-			Inequalities.Dc_vec.resize(4*N_+2,false);
-			Inequalities.Dc_vec.clear();
+			RFI_->compute_linear_system( ConvexHullDS, *prwSS_it );
+			offset_DS=2;
 			for( unsigned j = 0; j < 6; j++ )
-			        {
-			          Inequalities.D.X_mat.push_back( j, i, ConvexHullDS.A_vec[j] );
-			          Inequalities.D.Y_mat.push_back( j, i, ConvexHullDS.B_vec[j] );
-			          Inequalities.Dc_vec( j ) = ConvexHullDS.D_vec[j];
-			        }
+					{
+					  Inequalities.D.X_mat.push_back( j, i, ConvexHullDS.A_vec[j] );
+					  Inequalities.D.Y_mat.push_back( j, i, ConvexHullDS.B_vec[j] );
+					  Inequalities.Dc_vec( j ) = ConvexHullDS.D_vec[j];
+					}
 
 		}else{
-		  if( prwSS_it->StateChanged )
-				 RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
-			RFI_->compute_linear_system( CoPHull, *prwSS_it );
 
-			for( unsigned j = 0; j < nbEdges; j++ )
-			        {
-			          Inequalities.D.X_mat.push_back( i*nbEdges+j+offset_DS, i, CoPHull.A_vec[j] );
-			          Inequalities.D.Y_mat.push_back( i*nbEdges+j+offset_DS, i, CoPHull.B_vec[j] );
-			          Inequalities.Dc_vec( i*nbEdges+j+offset_DS ) = CoPHull.D_vec[j];
-			        }
+
+			  const unsigned nbEdges = 4;
+			  const unsigned nbIneq = 4;
+			  convex_hull_t CoPHull( nbEdges, nbIneq );
+			  convex_hull_t CurrentCoPHull( nbEdges, nbIneq );
+
+
+			  RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
+			  RFI_->compute_linear_system( CoPHull, *prwSS_it );
+
+			  for( unsigned j = 0; j < nbEdges; j++ )
+					{
+					  Inequalities.D.X_mat.push_back( i*nbEdges+j+offset_DS, i, CoPHull.A_vec[j] );
+					  Inequalities.D.Y_mat.push_back( i*nbEdges+j+offset_DS, i, CoPHull.B_vec[j] );
+					  Inequalities.Dc_vec( i*nbEdges+j+offset_DS ) = CoPHull.D_vec[j];
+					}
 
 		}
 
@@ -883,33 +871,10 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 		  RFI_->set_vertices( COPFeasibilityEdges, *prwSS_it, INEQ_COP );
 		  RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it, INEQ_FEET );
 		  int shiftDS=0;
-		  if (i==0 && prwSS_it->Phase==SS && Solution.SupportStates_deq[0].Phase==SS && !ds_phase){
+		  if (prwSS_it->InTransitionPhase && !ds_phase){
 			  	  	ds_phase=true;
-		  	  		RFI_->set_vertices( COPFeasibilityEdges,*prwSS_it, INEQ_COP );
-		  	  		RFI_->set_vertices( CurrentCoPHull,Solution.SupportStates_deq[0], INEQ_COP );
 
-		  	  		double FootDX = prwSS_it->X-Solution.SupportStates_deq[0].X;
-		  	  		double FootDY = prwSS_it->Y-Solution.SupportStates_deq[0].Y;
-
-
-		  	  		ConvexHullDS.X_vec.resize(6);
-		  	  		ConvexHullDS.Y_vec.resize(6);
-
-			  		ConvexHullDS.X_vec[0]=COPFeasibilityEdges.X_vec[3];
-			  		ConvexHullDS.X_vec[1]=COPFeasibilityEdges.X_vec[0];
-			  		ConvexHullDS.X_vec[2]=COPFeasibilityEdges.X_vec[1];
-			  		ConvexHullDS.X_vec[3]=CurrentCoPHull.X_vec[0]-FootDX;
-			  		ConvexHullDS.X_vec[4]=CurrentCoPHull.X_vec[3]-FootDX;
-			  		ConvexHullDS.X_vec[5]=CurrentCoPHull.X_vec[2]-FootDX;
-
-
-			  		ConvexHullDS.Y_vec[0]=COPFeasibilityEdges.Y_vec[3];
-			  		ConvexHullDS.Y_vec[1]=COPFeasibilityEdges.Y_vec[0];
-			  		ConvexHullDS.Y_vec[2]=COPFeasibilityEdges.Y_vec[1];
-			  		ConvexHullDS.Y_vec[3]=CurrentCoPHull.Y_vec[0]-FootDY;
-			  		ConvexHullDS.Y_vec[4]=CurrentCoPHull.Y_vec[3]-FootDY;
-			  		ConvexHullDS.Y_vec[5]=CurrentCoPHull.Y_vec[2]-FootDY;
-
+			  		RFI_->compute_ds_vertices(*prwSS_it, Solution.SupportStates_deq[0], ConvexHullDS);
 
 			  		shiftDS=2;
 		  	  		COPFeasibilityEdges = ConvexHullDS;

@@ -233,6 +233,40 @@ RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
 
 }
 
+void
+RelativeFeetInequalities::compute_ds_vertices(const support_state_t & prwSS_it, const support_state_t & SupportStates_deq,
+		  convex_hull_t & ConvexHullDS){
+
+	convex_hull_t CoPHull( 4, 4 );
+	convex_hull_t CurrentCoPHull( 4, 4 );
+
+		set_vertices( CoPHull,prwSS_it, INEQ_COP );
+		set_vertices( CurrentCoPHull,SupportStates_deq, INEQ_COP );
+
+		double FootDX = prwSS_it.X-SupportStates_deq.X;
+		double FootDY = prwSS_it.Y-SupportStates_deq.Y;
+
+
+		ConvexHullDS.X_vec.resize(6);
+		ConvexHullDS.Y_vec.resize(6);
+
+		ConvexHullDS.X_vec[0]=CoPHull.X_vec[3];
+		ConvexHullDS.X_vec[1]=CoPHull.X_vec[0];
+		ConvexHullDS.X_vec[2]=CoPHull.X_vec[1];
+		ConvexHullDS.X_vec[3]=CurrentCoPHull.X_vec[0]-FootDX;
+		ConvexHullDS.X_vec[4]=CurrentCoPHull.X_vec[3]-FootDX;
+		ConvexHullDS.X_vec[5]=CurrentCoPHull.X_vec[2]-FootDX;
+
+
+		ConvexHullDS.Y_vec[0]=CoPHull.Y_vec[3];
+		ConvexHullDS.Y_vec[1]=CoPHull.Y_vec[0];
+		ConvexHullDS.Y_vec[2]=CoPHull.Y_vec[1];
+		ConvexHullDS.Y_vec[3]=CurrentCoPHull.Y_vec[0]-FootDY;
+		ConvexHullDS.Y_vec[4]=CurrentCoPHull.Y_vec[3]-FootDY;
+		ConvexHullDS.Y_vec[5]=CurrentCoPHull.Y_vec[2]-FootDY;
+
+}
+
 
 void
 RelativeFeetInequalities::set_inequalities( convex_hull_t & ConvexHull,

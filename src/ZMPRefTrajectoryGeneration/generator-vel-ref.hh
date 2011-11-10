@@ -138,7 +138,7 @@ namespace PatternGeneratorJRL
     /// \param[out] Inequalities
     /// \param[in] SupportStates_deq
     void build_inequalities_cop(linear_inequality_t & Inequalities,
-        const std::deque<support_state_t> & SupportStates_deq, double FirstIterationDynamicsDuration) const;
+        const std::deque<support_state_t> & SupportStates_deq, double FirstIterationDynamicsDuration);
 
     /// \brief Generate a queue of inequality constraints on
     /// the feet positions with respect to previous foot positions
@@ -192,7 +192,7 @@ namespace PatternGeneratorJRL
     /// \brief Initialize inequality matrices
     ///
     /// \param[out] Inequalities
-    void initialize_matrices( linear_inequality_t & Inequalities);
+    void initialize_matrices( linear_inequality_t & Inequalities, int addedSize=0);
 
     /// \brief Scaled product\f$ weight*M*M \f$
     void compute_term(MAL_MATRIX (&weightMM, double),
