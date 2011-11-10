@@ -296,7 +296,7 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
   convex_hull_t CurrentCoPHull( nbEdges, nbIneq );
   convex_hull_t ConvexHullDS(2*nbEdges-2 , 2*nbIneq-2);
   RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
-
+  unsigned offset_DS=0;
   ++prwSS_it;//Point at the first previewed instant
   for( unsigned i=0; i<N_; i++ )
     {
@@ -310,27 +310,39 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 	  		double FootDY = prwSS_it->Y-SupportStates_deq[0].Y;
 
 
-	  		ConvexHullDS.X_vec.resize(4);
-	  		ConvexHullDS.Y_vec.resize(4);
+	  		ConvexHullDS.X_vec.resize(6);
+	  		ConvexHullDS.Y_vec.resize(6);
 
-	  		ConvexHullDS.X_vec[0]=CoPHull.X_vec[1];
-	  		ConvexHullDS.X_vec[1]=CurrentCoPHull.X_vec[0]-FootDX;
-	  		ConvexHullDS.X_vec[2]=CurrentCoPHull.X_vec[2]-FootDX;
-	  		ConvexHullDS.X_vec[3]=CoPHull.X_vec[3];
+	  		ConvexHullDS.X_vec[0]=CoPHull.X_vec[3];
+	  		ConvexHullDS.X_vec[1]=CoPHull.X_vec[0];
+	  		ConvexHullDS.X_vec[2]=CoPHull.X_vec[1];
+	  		ConvexHullDS.X_vec[3]=CurrentCoPHull.X_vec[0]-FootDX;
+	  		ConvexHullDS.X_vec[4]=CurrentCoPHull.X_vec[3]-FootDX;
+	  		ConvexHullDS.X_vec[5]=CurrentCoPHull.X_vec[2]-FootDX;
 
-	  		ConvexHullDS.Y_vec[0]=CoPHull.Y_vec[1];
-	  		ConvexHullDS.Y_vec[1]=CurrentCoPHull.Y_vec[0]-FootDY;
-	  		ConvexHullDS.Y_vec[2]=CurrentCoPHull.Y_vec[2]-FootDY;
-	  		ConvexHullDS.Y_vec[3]=CoPHull.Y_vec[3];
+
+	  		ConvexHullDS.Y_vec[0]=CoPHull.Y_vec[3];
+	  		ConvexHullDS.Y_vec[1]=CoPHull.Y_vec[0];
+	  		ConvexHullDS.Y_vec[2]=CoPHull.Y_vec[1];
+	  		ConvexHullDS.Y_vec[3]=CurrentCoPHull.Y_vec[0]-FootDY;
+	  		ConvexHullDS.Y_vec[4]=CurrentCoPHull.Y_vec[3]-FootDY;
+	  		ConvexHullDS.Y_vec[5]=CurrentCoPHull.Y_vec[2]-FootDY;
+
 
 
 	  		RFI_->compute_linear_system( ConvexHullDS, *prwSS_it );
-
-			for( unsigned j = 0; j < nbEdges; j++ )
+	  		offset_DS=2;
+	  		Inequalities.D.X_mat.resize(4*N_+2,N_,false);
+			Inequalities.D.X_mat.clear();
+			Inequalities.D.Y_mat.resize(4*N_+2,N_,false);
+			Inequalities.D.Y_mat.clear();
+			Inequalities.Dc_vec.resize(4*N_+2,false);
+			Inequalities.Dc_vec.clear();
+			for( unsigned j = 0; j < 6; j++ )
 			        {
-			          Inequalities.D.X_mat.push_back( i*nbEdges+j, i, ConvexHullDS.A_vec[j] );
-			          Inequalities.D.Y_mat.push_back( i*nbEdges+j, i, ConvexHullDS.B_vec[j] );
-			          Inequalities.Dc_vec( i*nbEdges+j ) = ConvexHullDS.D_vec[j];
+			          Inequalities.D.X_mat.push_back( j, i, ConvexHullDS.A_vec[j] );
+			          Inequalities.D.Y_mat.push_back( j, i, ConvexHullDS.B_vec[j] );
+			          Inequalities.Dc_vec( j ) = ConvexHullDS.D_vec[j];
 			        }
 
 		}else{
@@ -340,9 +352,9 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 
 			for( unsigned j = 0; j < nbEdges; j++ )
 			        {
-			          Inequalities.D.X_mat.push_back( i*nbEdges+j, i, CoPHull.A_vec[j] );
-			          Inequalities.D.Y_mat.push_back( i*nbEdges+j, i, CoPHull.B_vec[j] );
-			          Inequalities.Dc_vec( i*nbEdges+j ) = CoPHull.D_vec[j];
+			          Inequalities.D.X_mat.push_back( i*nbEdges+j+offset_DS, i, CoPHull.A_vec[j] );
+			          Inequalities.D.Y_mat.push_back( i*nbEdges+j+offset_DS, i, CoPHull.B_vec[j] );
+			          Inequalities.Dc_vec( i*nbEdges+j+offset_DS ) = CoPHull.D_vec[j];
 			        }
 
 		}
@@ -870,6 +882,7 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 	  if (prwSS_it->StateChanged || ds_phase){
 		  RFI_->set_vertices( COPFeasibilityEdges, *prwSS_it, INEQ_COP );
 		  RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it, INEQ_FEET );
+		  int shiftDS=0;
 		  if (i==0 && prwSS_it->Phase==SS && Solution.SupportStates_deq[0].Phase==SS && !ds_phase){
 			  	  	ds_phase=true;
 		  	  		RFI_->set_vertices( COPFeasibilityEdges,*prwSS_it, INEQ_COP );
@@ -879,20 +892,26 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 		  	  		double FootDY = prwSS_it->Y-Solution.SupportStates_deq[0].Y;
 
 
-		  	  		ConvexHullDS.X_vec.resize(4);
-		  	  		ConvexHullDS.Y_vec.resize(4);
+		  	  		ConvexHullDS.X_vec.resize(6);
+		  	  		ConvexHullDS.Y_vec.resize(6);
 
-		  	  		ConvexHullDS.X_vec[0]=COPFeasibilityEdges.X_vec[1];
-		  	  		ConvexHullDS.X_vec[1]=CurrentCoPHull.X_vec[0]-FootDX;
-		  	  		ConvexHullDS.X_vec[2]=CurrentCoPHull.X_vec[2]-FootDX;
-		  	  		ConvexHullDS.X_vec[3]=COPFeasibilityEdges.X_vec[3];
-
-		  	  		ConvexHullDS.Y_vec[0]=COPFeasibilityEdges.Y_vec[1];
-		  	  		ConvexHullDS.Y_vec[1]=CurrentCoPHull.Y_vec[0]-FootDY;
-		  	  		ConvexHullDS.Y_vec[2]=CurrentCoPHull.Y_vec[2]-FootDY;
-		  	  		ConvexHullDS.Y_vec[3]=COPFeasibilityEdges.Y_vec[3];
+			  		ConvexHullDS.X_vec[0]=COPFeasibilityEdges.X_vec[3];
+			  		ConvexHullDS.X_vec[1]=COPFeasibilityEdges.X_vec[0];
+			  		ConvexHullDS.X_vec[2]=COPFeasibilityEdges.X_vec[1];
+			  		ConvexHullDS.X_vec[3]=CurrentCoPHull.X_vec[0]-FootDX;
+			  		ConvexHullDS.X_vec[4]=CurrentCoPHull.X_vec[3]-FootDX;
+			  		ConvexHullDS.X_vec[5]=CurrentCoPHull.X_vec[2]-FootDX;
 
 
+			  		ConvexHullDS.Y_vec[0]=COPFeasibilityEdges.Y_vec[3];
+			  		ConvexHullDS.Y_vec[1]=COPFeasibilityEdges.Y_vec[0];
+			  		ConvexHullDS.Y_vec[2]=COPFeasibilityEdges.Y_vec[1];
+			  		ConvexHullDS.Y_vec[3]=CurrentCoPHull.Y_vec[0]-FootDY;
+			  		ConvexHullDS.Y_vec[4]=CurrentCoPHull.Y_vec[3]-FootDY;
+			  		ConvexHullDS.Y_vec[5]=CurrentCoPHull.Y_vec[2]-FootDY;
+
+
+			  		shiftDS=2;
 		  	  		COPFeasibilityEdges = ConvexHullDS;
 
 		  	  		Xfoot=prwSS_it->X;
@@ -921,7 +940,7 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 
 
 		  //display COP constraints
-		  for(int k=0;k<4;++k){
+		  for(int k=0;k<4+shiftDS;++k){
 			  std::stringstream ssTmp;
 			  ssTmp << "BOUND\t" << b << "\t\t0.5\t0.5\t0.5\t\t" <<
 					  COPFeasibilityEdges.X_vec[k]+Xfoot << "\t" <<
