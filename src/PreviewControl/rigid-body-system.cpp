@@ -372,6 +372,8 @@ RigidBodySystem::compute_dyn_cjerk()
 }
 
 
+
+
 int
 RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
 {
@@ -384,6 +386,8 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
   Dynamics.S.clear();
   Dynamics.Um1.resize(N_,N_,false);
   Dynamics.Um1.clear();
+  Dynamics.Um1T.resize(N_,N_,false);
+  Dynamics.Um1T.clear();
   switch(Dynamics.Type)
   {
   case POSITION:
@@ -440,7 +444,10 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
           else
             Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
       }
+
 	  invertMatrix(Dynamics.U,Dynamics.Um1);
+	  Dynamics.Um1T=boost::numeric::ublas::trans(Dynamics.Um1);
+
     break;
     //    compute_dyn_cop( 0 );
     break;

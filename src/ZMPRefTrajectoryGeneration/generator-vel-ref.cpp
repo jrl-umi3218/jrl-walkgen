@@ -30,6 +30,7 @@
 #include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 using namespace std;
 using namespace PatternGeneratorJRL;
 
@@ -291,7 +292,7 @@ GeneratorVelRef::initialize_matrices( linear_inequality_t & Inequalities, option
 void 
 GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
     const std::deque<support_state_t> & SupportStates_deq,
-    option_e option) const
+    option_e option, QPProblem & Pb)
 {
 
   deque<support_state_t>::const_iterator prwSS_it = SupportStates_deq.begin();
@@ -307,25 +308,67 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
   convex_hull_t CoPHull( nbEdges, nbIneq );
   RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
 
+  if (option==WITH_NEW_FORMULATION){
+	unsigned nbStepsPreviewed = SupportStates_deq.back().StepNumber;
+	int size = 2*N_+2*nbStepsPreviewed;
+	MV_.resize(size);
+	MV2_.resize(size);
+  }
+//std::cout << std::endl;
   ++prwSS_it;//Point at the first previewed instant
   for( unsigned i=0; i<N_; i++ )
     {
       if( prwSS_it->StateChanged )
         RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
+/*
+      if (prwSS_it->Phase==SS){
+    	  std::cout << "SS";
+      }else{
+    	  std::cout << "DS";
+      }
+      if (prwSS_it->Foot==LEFT){
+    	  std::cout << " L ";
+      }else{
+    	  std::cout << " R ";
+      }
+      if (prwSS_it->StateChanged){
+    	  std::cout << "/ ";
+      }else{
+    	  std::cout << ": ";
+      }*/
+      if (option==WITH_NEW_FORMULATION){
 
-      RFI_->compute_linear_system( CoPHull, *prwSS_it );
+  			MV_(i)     = min(CoPHull.X_vec[0],CoPHull.X_vec[3]);
+  			MV2_(i)    = max(CoPHull.X_vec[0],CoPHull.X_vec[3]);
 
-      for( unsigned j = 0; j < NbEdgesLoop; j++ )
-        {
-          Inequalities.D.X_mat.push_back( i*NbEdgesLoop+j, i, CoPHull.A_vec[j] );
-          Inequalities.D.Y_mat.push_back( i*NbEdgesLoop+j, i, CoPHull.B_vec[j] );
-          Inequalities.Dc_vec( i*NbEdgesLoop+j ) = CoPHull.D_vec[j];
-        }
+  			MV_(N_+i)  = min(CoPHull.Y_vec[0],CoPHull.Y_vec[1]);
+  			MV2_(N_+i) = max(CoPHull.Y_vec[0],CoPHull.Y_vec[1]);
 
+      }else{
+    	  RFI_->compute_linear_system( CoPHull, *prwSS_it );
+		  for( unsigned j = 0; j < NbEdgesLoop; j++ )
+			{
+			  Inequalities.D.X_mat.push_back( i*NbEdgesLoop+j, i, CoPHull.A_vec[j] );
+			  Inequalities.D.Y_mat.push_back( i*NbEdgesLoop+j, i, CoPHull.B_vec[j] );
+			  Inequalities.Dc_vec( i*NbEdgesLoop+j ) = CoPHull.D_vec[j];
+			}
+
+
+		}
       ++prwSS_it;
     }
 
+  if (option==WITH_NEW_FORMULATION){
+	  unsigned nbStepsPreviewed = SupportStates_deq.back().StepNumber;
+	for(unsigned int i=2*N_;i<2*N_+2*nbStepsPreviewed;++i){
+		MV_(i)=-10e10;
+		MV2_(i)=10e10;
+	}
 
+	Pb.add_term_to( VECTOR_XL, MV_, 0  );
+	Pb.add_term_to( VECTOR_XU, MV2_, 0  );
+
+  }
 }
 
 
@@ -412,77 +455,84 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
 
   unsigned int NbConstraints = Pb.NbConstraints();
 
-  // -D*U
-  compute_term  ( MM_, -1.0, IneqCoP.D.X_mat, Robot_->DynamicsCoPJerk().U       );
-  Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 0                              );
-  compute_term  ( MM_, -1.0, IneqCoP.D.Y_mat, Robot_->DynamicsCoPJerk().U       );
-  Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, N_                             );
+  if (option==WITH_NEW_FORMULATION){
 
 
-  // +D*V
-  compute_term  ( MM_, 1.0, IneqCoP.D.X_mat, IntermedData_->State().V 			);
-  // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
-  Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_                                   );
-  compute_term  ( MM_, 1.0, IneqCoP.D.Y_mat, IntermedData_->State().V  			);
-  // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
-  Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed                  );
 
-  //constant part
-  // +dc
-  Pb.add_term_to( VECTOR_DS,IneqCoP.Dc_vec, NbConstraints               );
-  if (option==WITH_TWO_CONTRAINT_BOUNDS){
-	  Pb.add_term_to( VECTOR_DL,-IneqCoP.Dc_vec, NbConstraints               );
-  }
 
-  // -D*S_z*x
-  compute_term  ( MV_, -1.0, IneqCoP.D.X_mat, Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.x         );
-  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                                );
-  if (option==WITH_TWO_CONTRAINT_BOUNDS){
-	  Pb.add_term_to( VECTOR_DL, MV_,  NbConstraints                                                                );
-  }
-  /*
-   * Usefull for multibody dynamics
-   *
-  compute_term  ( MV_, -1.0, IneqCoP.D.x, Robot_->LeftFoot().Dynamics(COP).S, Robot_->LeftFoot().State().X   );
-  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                  );
-  compute_term  ( MV_, -1.0, IneqCoP.D.x, Robot_->RightFoot().Dynamics(COP).S, Robot_->RightFoot().State().X );
-  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                  );
-   */
-  compute_term  ( MV_, -1.0, IneqCoP.D.Y_mat,  Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.y        );
-  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                                );
-  if (option==WITH_TWO_CONTRAINT_BOUNDS){
-	  Pb.add_term_to( VECTOR_DL, MV_,  NbConstraints                                                                );
-  }
-  /*
-   * Usefull for multibody dynamics
-   *
-  compute_term  ( MV_, -1.0, IneqCoP.D.y, Robot_->LeftFoot().Dynamics(COP).S, Robot_->LeftFoot().State().Y   );
-  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                  );
-  compute_term  ( MV_, -1.0, IneqCoP.D.y, Robot_->RightFoot().Dynamics(COP).S, Robot_->RightFoot().State().Y );
-  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                  );
-   */
+  }else if (option==NONE || option==WITH_TWO_CONTRAINT_BOUNDS){
 
-  // +D*Vc*FP
-  compute_term  ( MV_, 1.0, IneqCoP.D.X_mat, IntermedData_->State().VcX    );
-  Pb.add_term_to( VECTOR_DS, MV_, NbConstraints                            );
-  if (option==WITH_TWO_CONTRAINT_BOUNDS){
-	  Pb.add_term_to( VECTOR_DL, MV_, NbConstraints                            );
-  }
-  compute_term  ( MV_, 1.0, IneqCoP.D.Y_mat, IntermedData_->State().VcY    );
-  Pb.add_term_to( VECTOR_DS, MV_, NbConstraints                            );
-  if (option==WITH_TWO_CONTRAINT_BOUNDS){
-	  Pb.add_term_to( VECTOR_DL, MV_, NbConstraints                            );
-  }
+	  // -D*U
+	  compute_term  ( MM_, -1.0, IneqCoP.D.X_mat, Robot_->DynamicsCoPJerk().U       );
+	  Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 0                              );
+	  compute_term  ( MM_, -1.0, IneqCoP.D.Y_mat, Robot_->DynamicsCoPJerk().U       );
+	  Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, N_                             );
 
-  if (option==NONE){
-	  unsigned int size=MV_.size();
-	  MV2_.resize(size);
-	  for(unsigned int i=0;i<size;++i){
-		  MV2_(i)=-10e10;
+
+	  // +D*V
+	  compute_term  ( MM_, 1.0, IneqCoP.D.X_mat, IntermedData_->State().V 			);
+	  // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
+	  Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_                                   );
+	  compute_term  ( MM_, 1.0, IneqCoP.D.Y_mat, IntermedData_->State().V  			);
+	  // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
+	  Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed                  );
+
+	  //constant part
+	  // +dc
+	  Pb.add_term_to( VECTOR_DS,IneqCoP.Dc_vec, NbConstraints               );
+	  if (option==WITH_TWO_CONTRAINT_BOUNDS){
+		  Pb.add_term_to( VECTOR_DL,-IneqCoP.Dc_vec, NbConstraints               );
 	  }
-	  Pb.add_term_to( VECTOR_DL, MV2_, NbConstraints       );
-  }
 
+	  // -D*S_z*x
+	  compute_term  ( MV_, -1.0, IneqCoP.D.X_mat, Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.x         );
+	  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                                );
+	  if (option==WITH_TWO_CONTRAINT_BOUNDS){
+		  Pb.add_term_to( VECTOR_DL, MV_,  NbConstraints                                                                );
+	  }
+	  /*
+	   * Usefull for multibody dynamics
+	   *
+	  compute_term  ( MV_, -1.0, IneqCoP.D.x, Robot_->LeftFoot().Dynamics(COP).S, Robot_->LeftFoot().State().X   );
+	  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                  );
+	  compute_term  ( MV_, -1.0, IneqCoP.D.x, Robot_->RightFoot().Dynamics(COP).S, Robot_->RightFoot().State().X );
+	  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                  );
+	   */
+	  compute_term  ( MV_, -1.0, IneqCoP.D.Y_mat,  Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.y        );
+	  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                                );
+	  if (option==WITH_TWO_CONTRAINT_BOUNDS){
+		  Pb.add_term_to( VECTOR_DL, MV_,  NbConstraints                                                                );
+	  }
+	  /*
+	   * Usefull for multibody dynamics
+	   *
+	  compute_term  ( MV_, -1.0, IneqCoP.D.y, Robot_->LeftFoot().Dynamics(COP).S, Robot_->LeftFoot().State().Y   );
+	  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                  );
+	  compute_term  ( MV_, -1.0, IneqCoP.D.y, Robot_->RightFoot().Dynamics(COP).S, Robot_->RightFoot().State().Y );
+	  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                                                  );
+	   */
+
+	  // +D*Vc*FP
+	  compute_term  ( MV_, 1.0, IneqCoP.D.X_mat, IntermedData_->State().VcX    );
+	  Pb.add_term_to( VECTOR_DS, MV_, NbConstraints                            );
+	  if (option==WITH_TWO_CONTRAINT_BOUNDS){
+		  Pb.add_term_to( VECTOR_DL, MV_, NbConstraints                            );
+	  }
+	  compute_term  ( MV_, 1.0, IneqCoP.D.Y_mat, IntermedData_->State().VcY    );
+	  Pb.add_term_to( VECTOR_DS, MV_, NbConstraints                            );
+	  if (option==WITH_TWO_CONTRAINT_BOUNDS){
+		  Pb.add_term_to( VECTOR_DL, MV_, NbConstraints                            );
+	  }
+
+	  if (option==NONE){
+		  unsigned int size=MV_.size();
+		  MV2_.resize(size);
+		  for(unsigned int i=0;i<size;++i){
+			  MV2_(i)=-10e10;
+		  }
+		  Pb.add_term_to( VECTOR_DL, MV2_, NbConstraints       );
+	  }
+  }
 }
 
 
@@ -613,7 +663,7 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution,
   // ----------------------
   //CoP constraints
   linear_inequality_t & IneqCoP = IntermedData_->Inequalities( INEQ_COP );
-  build_inequalities_cop( IneqCoP, Solution.SupportStates_deq, option );
+  build_inequalities_cop( IneqCoP, Solution.SupportStates_deq, option, Pb );
   build_constraints_cop( IneqCoP, nbStepsPreviewed, Pb, option );
 
   //Foot constraints
@@ -633,91 +683,279 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution,
 
 
 void 
-GeneratorVelRef::build_invariant_part( QPProblem & Pb )
+GeneratorVelRef::build_invariant_part( QPProblem & Pb, option_e option )
 {
+	if (option==WITH_NEW_FORMULATION){
 
-  const RigidBody & CoM = Robot_->CoM();
 
-  //Constant terms in the Hessian
-  // +a*U'*U
-  const IntermedQPMat::objective_variant_t & Jerk = IntermedData_->Objective( JERK_MIN );
-  const linear_dynamics_t & JerkDynamics = CoM.Dynamics( JERK );
-  compute_term  ( MM_, Jerk.weight, JerkDynamics.UT, JerkDynamics.U     ); // U is identity, no ???
-  Pb.add_term_to( MATRIX_Q, MM_, 0, 0                                   );
-  Pb.add_term_to( MATRIX_Q, MM_, N_, N_                                 );
+	}else{
+	  const RigidBody & CoM = Robot_->CoM();
 
-  // +a*U'*U
-  const IntermedQPMat::objective_variant_t & InstVel = IntermedData_->Objective( INSTANT_VELOCITY );
-  const linear_dynamics_t & VelDynamics = CoM.Dynamics( VELOCITY );
-  compute_term  ( MM_, InstVel.weight, VelDynamics.UT, VelDynamics.U    );
-  Pb.add_term_to( MATRIX_Q, MM_, 0, 0                                   );
-  Pb.add_term_to( MATRIX_Q, MM_, N_, N_                                 );
+	  //Constant terms in the Hessian
+	  // +a*U'*U
+	  const IntermedQPMat::objective_variant_t & Jerk = IntermedData_->Objective( JERK_MIN );
+	  const linear_dynamics_t & JerkDynamics = CoM.Dynamics( JERK );
+	  compute_term  ( MM_, Jerk.weight, JerkDynamics.UT, JerkDynamics.U     ); // U is identity, no ???
+	  Pb.add_term_to( MATRIX_Q, MM_, 0, 0                                   );
+	  Pb.add_term_to( MATRIX_Q, MM_, N_, N_                                 );
 
-  // +a*U'*U
-  const IntermedQPMat::objective_variant_t & COPCent = IntermedData_->Objective( COP_CENTERING );
-  compute_term  ( MM_, COPCent.weight, Robot_->DynamicsCoPJerk().UT, Robot_->DynamicsCoPJerk().U        );
-  Pb.add_term_to( MATRIX_Q, MM_, 0, 0                                                                   );
-  Pb.add_term_to( MATRIX_Q, MM_, N_, N_                                                                 );
+	  // +a*U'*U
+	  const IntermedQPMat::objective_variant_t & InstVel = IntermedData_->Objective( INSTANT_VELOCITY );
+	  const linear_dynamics_t & VelDynamics = CoM.Dynamics( VELOCITY );
+	  compute_term  ( MM_, InstVel.weight, VelDynamics.UT, VelDynamics.U    );
+	  Pb.add_term_to( MATRIX_Q, MM_, 0, 0                                   );
+	  Pb.add_term_to( MATRIX_Q, MM_, N_, N_                                 );
 
+	  // +a*U'*U
+	  const IntermedQPMat::objective_variant_t & COPCent = IntermedData_->Objective( COP_CENTERING );
+	  compute_term  ( MM_, COPCent.weight, Robot_->DynamicsCoPJerk().UT, Robot_->DynamicsCoPJerk().U        );
+	  Pb.add_term_to( MATRIX_Q, MM_, 0, 0                                                                   );
+	  Pb.add_term_to( MATRIX_Q, MM_, N_, N_                                                                 );
+	}
 }
 
 
 void
-GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq )
+GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq, option_e option )
 {
 
-  Pb.clear(VECTOR_D);
+	if (option==WITH_NEW_FORMULATION){
 
-  unsigned nbStepsPreviewed = SupportStates_deq.back().StepNumber;
-  const IntermedQPMat::state_variant_t & State = IntermedData_->State();
-  const RigidBody & CoM = Robot_->CoM();
+		Pb.clear(VECTOR_D);
+		Pb.clear(MATRIX_Q);
+		const RigidBody & CoM = Robot_->CoM();
+		const IntermedQPMat::objective_variant_t & Jerk = IntermedData_->Objective( JERK_MIN );
+		const IntermedQPMat::objective_variant_t & InstVel = IntermedData_->Objective( INSTANT_VELOCITY );
+		const IntermedQPMat::objective_variant_t & COPCent = IntermedData_->Objective( COP_CENTERING );
+		const linear_dynamics_t & CoPDynamics = Robot_->DynamicsCoPJerk( );
+		const linear_dynamics_t & VelDynamics = CoM.Dynamics( VELOCITY );
+		const linear_dynamics_t & JerkDynamics = CoM.Dynamics( JERK );
+		const IntermedQPMat::state_variant_t & State = IntermedData_->State();
+		unsigned nbStepsPreviewed = SupportStates_deq.back().StepNumber;
 
-  // Instant velocity terms
-  const IntermedQPMat::objective_variant_t & InstVel = IntermedData_->Objective( INSTANT_VELOCITY );
-  const linear_dynamics_t & VelDynamics = CoM.Dynamics( VELOCITY );
-  // Linear part
-  // +a*U'*S*x
-  compute_term  ( MV_, InstVel.weight , VelDynamics.UT, VelDynamics.S, State.CoM.x      );
-  Pb.add_term_to( VECTOR_D, MV_, 0                                                      );
-  compute_term  ( MV_ , InstVel.weight, VelDynamics.UT, VelDynamics.S, State.CoM.y      );
-  Pb.add_term_to( VECTOR_D, MV_, N_                                                     );
-  // +a*U'*ref
-  compute_term  ( MV_, -InstVel.weight, VelDynamics.UT, State.Ref.Global.X_vec  );
-  Pb.add_term_to( VECTOR_D, MV_, 0                                              );
-  compute_term  ( MV_, -InstVel.weight, VelDynamics.UT, State.Ref.Global.Y_vec  );
-  Pb.add_term_to( VECTOR_D, MV_, N_                                             );
+		boost_ublas::matrix<double> Id_N(N_,N_);
+		for(int i=0;i<N_;++i){
+			for(int j=0;j<N_;++j){
+				if(i==j){
+					Id_N(i,j)=1;
+				}else{
+					Id_N(i,j)=0;
+				}
+			}
+		}
 
-  // COP - centering terms
-  const IntermedQPMat::objective_variant_t & COPCent = IntermedData_->Objective( COP_CENTERING );
-  const linear_dynamics_t & CoPDynamics = Robot_->DynamicsCoPJerk( );
-  //  const linear_dynamics_t & LFCoP = Robot_->LeftFoot().Dynamics(COP);
-  //  const linear_dynamics_t & RFCoP = Robot_->RightFoot().Dynamics(COP);
-  // Hessian
-  // -a*U'*V
-  compute_term  ( MM_, -COPCent.weight, CoPDynamics.UT, State.V         );
-  Pb.add_term_to(  MATRIX_Q, MM_, 0, 2*N_                               );
-  Pb.add_term_to(  MATRIX_Q, MM_, N_, 2*N_+nbStepsPreviewed             );
 
-  // -a*V*U
-  compute_term  ( MM_, -COPCent.weight, State.VT, CoPDynamics.U                );
-  Pb.add_term_to( MATRIX_Q, MM_, 2*N_, 0                                       );
-  Pb.add_term_to( MATRIX_Q, MM_, 2*N_+nbStepsPreviewed, N_                     );
-  //+a*V'*V
-  compute_term  ( MM_, COPCent.weight, State.VT, State.V                       );
-  Pb.add_term_to( MATRIX_Q, MM_, 2*N_, 2*N_                                    );
-  Pb.add_term_to( MATRIX_Q, MM_, 2*N_+nbStepsPreviewed, 2*N_+nbStepsPreviewed  );
 
-  //Linear part
-  // -a*V'*S*x
-  compute_term  ( MV_, -COPCent.weight, State.VT, CoPDynamics.S, State.CoM.x    );
-  Pb.add_term_to( VECTOR_D, MV_, 2*N_                                           );
-  compute_term  ( MV_, -COPCent.weight, State.VT, CoPDynamics.S, State.CoM.y    );
-  Pb.add_term_to( VECTOR_D, MV_, 2*N_+nbStepsPreviewed                          );
-  // +a*V'*Vc*x
-  compute_term  ( MV_, COPCent.weight, State.VT, State.VcX  );
-  Pb.add_term_to( VECTOR_D, MV_, 2*N_                       );
-  compute_term  ( MV_, COPCent.weight, State.VT, State.VcY  );
-  Pb.add_term_to( VECTOR_D, MV_, 2*N_+nbStepsPreviewed      );
+		boost_ublas::matrix<double> G(N_,N_);
+		boost_ublas::vector<double> H(N_);
+
+		MM_ = prod(VelDynamics.U,CoPDynamics.Um1);
+		MM_ = prod(VelDynamics.UT,MM_);
+		MM_ = prod(CoPDynamics.Um1T,MM_);
+
+		MM2_= prod(CoPDynamics.Um1T,CoPDynamics.Um1);
+
+		G=  InstVel.weight*MM_ +Jerk.weight*MM2_  ;
+		Pb.add_term_to( MATRIX_Q, G+COPCent.weight*Id_N, 0, 0 );
+		Pb.add_term_to( MATRIX_Q, G+COPCent.weight*Id_N, N_, N_ );
+
+		MM2_=prod(G , State.V);
+
+		Pb.add_term_to( MATRIX_Q, MM2_, 0 , 2*N_ );
+		Pb.add_term_to( MATRIX_Q, MM2_, N_, 2*N_+nbStepsPreviewed );
+
+		MM2_=prod(State.VT , G);
+
+		Pb.add_term_to( MATRIX_Q, MM2_, 2*N_ , 0 );
+		Pb.add_term_to( MATRIX_Q, MM2_, 2*N_+nbStepsPreviewed, N_ );
+
+		MM2_=prod(G,State.V);
+		MM2_=prod(State.VT, MM2_);
+
+		Pb.add_term_to( MATRIX_Q, MM2_, 2*N_ , 2*N_ );
+		Pb.add_term_to( MATRIX_Q, MM2_, 2*N_+nbStepsPreviewed, 2*N_+nbStepsPreviewed );
+
+
+		MM_ = prod(CoPDynamics.Um1, CoPDynamics.S);
+		MM_ = VelDynamics.S - prod(VelDynamics.U,MM_);
+
+		MV_ = prod(MM_,State.CoM.x);
+		MV_-= State.Ref.Global.X_vec;
+
+
+		MV_ = prod(VelDynamics.UT,MV_);
+		MV_ = prod(CoPDynamics.Um1T,MV_);
+		H   = InstVel.weight*MV_;
+
+		MV_ = prod(CoPDynamics.S   , State.CoM.x);
+		MV_ = prod(CoPDynamics.Um1 , MV_);
+		MV_ = prod(CoPDynamics.Um1T, MV_);
+		H   -= Jerk.weight * MV_;
+
+
+		MV_ = prod(CoPDynamics.Um1, State.VcX);
+		MV_ = prod(CoPDynamics.Um1T, MV_);
+		H  += Jerk.weight*MV_;
+
+		MV_ = prod(CoPDynamics.Um1, State.VcX);
+		MV_ = prod(VelDynamics.U, MV_);
+		MV_ = prod(VelDynamics.UT, MV_);
+		MV_ = prod(CoPDynamics.Um1T, MV_);
+		H  += InstVel.weight*MV_;
+
+		Pb.add_term_to( VECTOR_D, H, 0 );
+		MV_ = prod(State.VT,H);
+		Pb.add_term_to( VECTOR_D, MV_, 2*N_ );
+
+
+		MM_ = prod(CoPDynamics.Um1, CoPDynamics.S);
+		MM_ = VelDynamics.S - prod(VelDynamics.U,MM_);
+
+		MV_ = prod(MM_,State.CoM.y);
+		MV_-= State.Ref.Global.Y_vec;
+
+
+		MV_ = prod(VelDynamics.UT,MV_);
+		MV_ = prod(CoPDynamics.Um1T,MV_);
+		H   = InstVel.weight*MV_;
+
+		MV_ = prod(CoPDynamics.S   , State.CoM.y);
+		MV_ = prod(CoPDynamics.Um1 , MV_);
+		MV_ = prod(CoPDynamics.Um1T, MV_);
+		H   -= Jerk.weight * MV_;
+
+
+		MV_ = prod(CoPDynamics.Um1, State.VcY);
+		MV_ = prod(CoPDynamics.Um1T, MV_);
+		H  += Jerk.weight*MV_;
+
+		MV_ = prod(CoPDynamics.Um1, State.VcY);
+		MV_ = prod(VelDynamics.U, MV_);
+		MV_ = prod(VelDynamics.UT, MV_);
+		MV_ = prod(CoPDynamics.Um1T, MV_);
+		H  += InstVel.weight*MV_;
+
+		Pb.add_term_to( VECTOR_D, H, N_ );
+		MV_ = prod(State.VT,H);
+		Pb.add_term_to( VECTOR_D, MV_, 2*N_+nbStepsPreviewed );
+
+	  }else{
+
+		MV_.resize(N_);
+		for(int i=0;i<N_;++i){
+			MV_(i)=-10e10;
+		}
+		Pb.add_term_to( VECTOR_XL, MV_, 0  );
+		for(int i=0;i<N_;++i){
+			MV_(i)=10e10;
+		}
+		Pb.add_term_to( VECTOR_XU, MV_, 0  );
+
+	  Pb.clear(VECTOR_D);
+
+	  unsigned nbStepsPreviewed = SupportStates_deq.back().StepNumber;
+	  const IntermedQPMat::state_variant_t & State = IntermedData_->State();
+	  const RigidBody & CoM = Robot_->CoM();
+
+	  // Instant velocity terms
+	  const IntermedQPMat::objective_variant_t & InstVel = IntermedData_->Objective( INSTANT_VELOCITY );
+	  const linear_dynamics_t & VelDynamics = CoM.Dynamics( VELOCITY );
+	  // Linear part
+	  // +a*U'*S*x
+	  compute_term  ( MV_, InstVel.weight , VelDynamics.UT, VelDynamics.S, State.CoM.x      );
+	  Pb.add_term_to( VECTOR_D, MV_, 0                                                      );
+	  compute_term  ( MV_ , InstVel.weight, VelDynamics.UT, VelDynamics.S, State.CoM.y      );
+	  Pb.add_term_to( VECTOR_D, MV_, N_                                                     );
+	  // +a*U'*ref
+	  compute_term  ( MV_, -InstVel.weight, VelDynamics.UT, State.Ref.Global.X_vec  );
+	  Pb.add_term_to( VECTOR_D, MV_, 0                                              );
+	  compute_term  ( MV_, -InstVel.weight, VelDynamics.UT, State.Ref.Global.Y_vec  );
+	  Pb.add_term_to( VECTOR_D, MV_, N_                                             );
+
+	  // COP - centering terms
+	  const IntermedQPMat::objective_variant_t & COPCent = IntermedData_->Objective( COP_CENTERING );
+	  const linear_dynamics_t & CoPDynamics = Robot_->DynamicsCoPJerk( );
+	  //  const linear_dynamics_t & LFCoP = Robot_->LeftFoot().Dynamics(COP);
+	  //  const linear_dynamics_t & RFCoP = Robot_->RightFoot().Dynamics(COP);
+	  // Hessian
+	  // -a*U'*V
+	  compute_term  ( MM_, -COPCent.weight, CoPDynamics.UT, State.V         );
+	  Pb.add_term_to(  MATRIX_Q, MM_, 0, 2*N_                               );
+	  Pb.add_term_to(  MATRIX_Q, MM_, N_, 2*N_+nbStepsPreviewed             );
+
+	  // -a*V*U
+	  compute_term  ( MM_, -COPCent.weight, State.VT, CoPDynamics.U                );
+	  Pb.add_term_to( MATRIX_Q, MM_, 2*N_, 0                                       );
+	  Pb.add_term_to( MATRIX_Q, MM_, 2*N_+nbStepsPreviewed, N_                     );
+	  //+a*V'*V
+	  compute_term  ( MM_, COPCent.weight, State.VT, State.V                       );
+	  Pb.add_term_to( MATRIX_Q, MM_, 2*N_, 2*N_                                    );
+	  Pb.add_term_to( MATRIX_Q, MM_, 2*N_+nbStepsPreviewed, 2*N_+nbStepsPreviewed  );
+
+	  //Linear part
+	  // -a*V'*S*x
+	  compute_term  ( MV_, -COPCent.weight, State.VT, CoPDynamics.S, State.CoM.x    );
+	  Pb.add_term_to( VECTOR_D, MV_, 2*N_                                           );
+	  compute_term  ( MV_, -COPCent.weight, State.VT, CoPDynamics.S, State.CoM.y    );
+	  Pb.add_term_to( VECTOR_D, MV_, 2*N_+nbStepsPreviewed                          );
+	  // +a*V'*Vc*x
+	  compute_term  ( MV_, COPCent.weight, State.VT, State.VcX  );
+	  Pb.add_term_to( VECTOR_D, MV_, 2*N_                       );
+	  compute_term  ( MV_, COPCent.weight, State.VT, State.VcY  );
+	  Pb.add_term_to( VECTOR_D, MV_, 2*N_+nbStepsPreviewed      );
+	}
+
+}
+
+void
+GeneratorVelRef::convert_cop_to_jerk_formulation( solution_t & Solution ){
+
+	boost_ublas::vector<double> zx(N_);
+	boost_ublas::vector<double> zy(N_);
+
+	for(int i=0;i<N_;++i){
+		zx(i)=Solution.Solution_vec(i);
+		zy(i)=Solution.Solution_vec(N_+i);
+	}
+
+	int nbSteps =  (Solution.Solution_vec.size()-2*N_)/2;
+
+	boost_ublas::vector<double> px(nbSteps);
+	boost_ublas::vector<double> py(nbSteps);
+	boost_ublas::vector<double> Vpx(N_);
+	boost_ublas::vector<double> Vpy(N_);
+	for(int i=0;i<nbSteps;++i){
+		px(i)=Solution.Solution_vec(2*N_+i);
+		py(i)=Solution.Solution_vec(2*N_+nbSteps+i);
+	}
+
+	if (nbSteps>0){
+		Vpx=prod(IntermedData_->State().V,px);
+		Vpy=prod(IntermedData_->State().V,py);
+	}else{
+		for(int i=0;i<N_;++i){
+			Vpx(i)=0;
+			Vpy(i)=0;
+		}
+	}
+
+	zx+=Vpx+IntermedData_->State().VcX;
+	zy+=Vpy+IntermedData_->State().VcY;
+
+	boost_ublas::vector<double> X(N_);
+	boost_ublas::vector<double> Y(N_);
+	MV2_= prod( Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.x  );
+	X=    prod( Robot_->DynamicsCoPJerk().Um1, zx-MV2_                     );
+	MV2_= prod( Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.y  );
+	Y=    prod( Robot_->DynamicsCoPJerk().Um1, zy-MV2_                     );
+
+
+	for(int i=0;i<N_;++i){
+		Solution.Solution_vec(i)=X(i);
+		Solution.Solution_vec(N_+i)=Y(i);
+
+	}
+
 
 }
 
@@ -731,20 +969,19 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
   unsigned int nbSteps = Solution.SupportStates_deq.back().StepNumber;
   unsigned int nbStepsMax = 4;
 
-  // Copy current support
-  support_state_t currentSupport = Solution.SupportStates_deq.front();
 
   // ZMP position vector
   boost_ublas::vector<double> zx(N_);
   boost_ublas::vector<double> zy(N_);
 
-  Solution.initialSolution.resize(4*N_+2*nbSteps);
 
+  Solution.initialSolution.resize(4*N_+2*nbSteps);
   // Compute previewed initial constraints:
   // ---------------------
   unsigned int size=Solution.initialConstraint.size();
   boost_ublas::vector<int> initialConstraintTmp;
   initialConstraintTmp = Solution.initialConstraint;
+
   if (size>=2*N_){
 	  for(unsigned int i=0;i<2*(N_-1);++i){
 		  Solution.initialConstraint(i)=initialConstraintTmp(i+2);
@@ -768,9 +1005,13 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
   // Compute feasible initial ZMP and foot positions:
   // ---------------------------------------
   deque<support_state_t>::iterator prwSS_it = Solution.SupportStates_deq.begin();
-
   prwSS_it++;//Point at the first previewed support state
-
+  // Copy current support
+  support_state_t currentSupport = Solution.SupportStates_deq.front();
+  // if in transition phase
+  if (prwSS_it->StateChanged){
+	  currentSupport=*prwSS_it;
+  }
   unsigned int j = 0;
   convex_hull_t FootFeasibilityEdges(5,5);
   convex_hull_t COPFeasibilityEdges(4,4);
@@ -781,14 +1022,15 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
 	  // Get COP convex hull for current support
 	  RFI_->set_vertices( COPFeasibilityEdges, *prwSS_it, INEQ_COP );
       // Check if the support foot has changed
-      if (currentSupport.Foot != prwSS_it->Foot)
+      if (prwSS_it->StateChanged && prwSS_it->StepNumber>0)
         {
-          currentSupport.Foot = prwSS_it->Foot;
 
           // Get feet convex hull for current support
-          prwSS_it--;
-          RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it, INEQ_FEET );
-          prwSS_it++;
+		  prwSS_it--;
+		  RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it, INEQ_FEET );
+		  prwSS_it++;
+
+
 
           // Place the foot on active constraints
           shiftx=shifty=0;
@@ -870,26 +1112,12 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
       }
 
 
-      zx(i) = currentSupport.X+shiftx;
-      zy(i) = currentSupport.Y+shifty;
+      Solution.initialSolution(i) = shiftx;
+      Solution.initialSolution(N_+i) = shifty;
       ++prwSS_it;
 
     }
 
-  // Compute initial jerk:
-  // ---------------------
-  boost_ublas::vector<double> X(N_);
-  boost_ublas::vector<double> Y(N_);
-  MV2_= prod( Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.x  );
-  X=    prod( Robot_->DynamicsCoPJerk().Um1, zx-MV2_                     );
-  MV2_= prod( Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.y  );
-  Y=    prod( Robot_->DynamicsCoPJerk().Um1, zy-MV2_                     );
-
-  for(unsigned int i=0;i<N_;i++)
-    {
-      Solution.initialSolution(i)=X(i);
-      Solution.initialSolution(N_+i)=Y(i);
-    }
 
 }
 

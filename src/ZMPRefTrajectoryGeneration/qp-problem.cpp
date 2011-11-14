@@ -102,11 +102,11 @@ QPProblem::resize_all()
 {
   bool ok=false;
 
-  if ((NbConstraints_>0) && (NbVariables_>0)) 
+  if ((NbConstraints_>0))
     {
-      DU_.resize(2*NbConstraints_, 2*NbVariables_,true);
       DS_.resize(2*NbConstraints_,1,true);
       DL_.resize(2*NbConstraints_,1,true);
+      DU_.resize(2*NbConstraints_, 2*NbVariables_,true);
       ok=true;
     }
 
@@ -114,10 +114,9 @@ QPProblem::resize_all()
     {
       Q_.resize(2*NbVariables_, 2*NbVariables_,true);
       D_.resize(2*NbVariables_, 1,true);
+      DU_.resize(2*NbConstraints_, 2*NbVariables_,true);
       XL_.resize(2*NbVariables_, 1,true);
-      XL_.fill(-1e10);
       XU_.resize(2*NbVariables_, 1,true);
-      XU_.fill(1e10);
       X_.resize(2*NbVariables_, 1,true);
       iwar_.resize(2*NbVariables_+1000, 1,true);
       ok=true;
@@ -198,13 +197,14 @@ int
 QPProblem::reset_variant()
 {
 
+	// TODO : What does this method do !?
   unsigned firstRow = (nbInvariantRows_ < Q_.NbRows_) ? nbInvariantRows_ : Q_.NbRows_;
   unsigned firstCol = 0;
   unsigned lastCol = (nbInvariantCols_ < Q_.NbCols_) ? nbInvariantCols_ : Q_.NbCols_;
-  if( (firstRow >= Q_.NbRows_) || (firstCol >= Q_.NbCols_) )
-    return 0;
-
   double * p_it = 0;
+  if( (firstRow >= Q_.NbRows_) || (firstCol >= Q_.NbCols_) ){}else{
+
+
   for( unsigned col = firstCol; col < lastCol; col++ )
     {
       p_it = &Q_.Array_[firstRow + col*Q_.NbRows_];
@@ -214,12 +214,12 @@ QPProblem::reset_variant()
           ++p_it;
         }
     }
-
+  }
   firstRow = 0;
   firstCol = (nbInvariantCols_ < Q_.NbCols_) ? nbInvariantCols_ : Q_.NbCols_;
   lastCol = Q_.NbCols_;
-  if( (firstRow >= Q_.NbRows_) || (firstCol >= Q_.NbCols_) )
-    return 0;
+  if( (firstRow >= Q_.NbRows_) || (firstCol >= Q_.NbCols_) ){}else{
+
 
   for( unsigned col = firstCol; col < lastCol; col++ )
     {
@@ -230,13 +230,15 @@ QPProblem::reset_variant()
           ++p_it;
         }
     }
-
+  }
   Q_dense_.fill(0.0);
   DU_.fill(0.0);
   DU_dense_.fill(0.0);
   D_.fill(0.0);
   DS_.fill(0.0);
   DL_.fill(0.0);
+  XL_.fill(0.0);
+  XU_.fill(0.0);
   NbConstraints_ = 0;
   NbEqConstraints_ = 0;
   NbVariables_ = 0;
@@ -266,7 +268,9 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
 
   iwar_.Array_[0]=1;
 
+
   Q_.stick_together(Q_dense_,n_,n_);
+
   DU_.stick_together(DU_dense_,mmax_,n_);
 
 
@@ -300,6 +304,7 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
     break;
   case LSSOL:
 //#ifdef LSSOL_FOUND
+
     if (tests==SOLVER || tests==ALL){
     	sendOption("Print Level = 1000");
     }else{
@@ -307,13 +312,14 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
     }
     sendOption("Problem Type = QP2");
     sendOption("warm start");
-
     double *bl=new double[n_+m_];
     double *bu=new double[n_+m_];
     int size1=n_;
+
     for(int i=0;i<size1;++i){
         bl[i]=XL_.Array_[i];
         bu[i]=XU_.Array_[i];
+
     }
 
     int size2=size1+me_;
@@ -325,22 +331,23 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
     for(int i=size2;i<size3;++i){
         bl[i]=-DS_.Array_[i-size1];
         bu[i]=-DL_.Array_[i-size1];
-
     }
     if (Result.useWarmStart){
-    	istate_[0]=0;
         for(unsigned i=0;i<NbVariables_;++i){
             X_.Array_[i]=Result.initialSolution(i);
-            istate_[i+1]=0;
+            istate_[i]=Result.initialConstraint(i);
         }
-        for(unsigned i=0;i<NbConstraints_;++i){
-        	istate_[i+n_+1]=Result.initialConstraint(i);
+        istate_[NbVariables_]=0;
+        for(unsigned i=NbVariables_;i<NbVariables_+NbConstraints_;++i){
+        	istate_[i+1]=Result.initialConstraint(i);
         }
+
     }
 
     if (tests==CTR1 || tests==ALL){
         solver_dump(Result,CTR1);
     }
+
 
 
     lssol_(&n_, &n_,
@@ -356,14 +363,18 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
         Result.Solution_vec(i) = X_.Array_[i];
         Result.LBoundsLagr_vec(i) = 0;
         Result.UBoundsLagr_vec(i) = 0;
+
       }
+
     Result.Fail=0;
     Result.Print = 0;
 
     for(int i = 0; i < m_; i++)
       {
         Result.ConstrLagr_vec(i) = 0;
+
       }
+
 
 
     if (tests==ITT || tests==ALL){
@@ -373,10 +384,13 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
     	solver_dump(Result,CTR2);
     }
 
-
-    for (int i=1; i < m_ ;++i){
-    	Result.initialConstraint(i-1) = istate_[i+n_];
+    for (int i=0; i < n_ ;++i){
+    	Result.initialConstraint(i) = istate_[i];
     }
+    for (int i=n_+1; i < n_+m_ ;++i){
+    	Result.initialConstraint(i-1) = istate_[i];
+    }
+
 
 //#else
 //   std::cerr << " LSSOL_FOUND not available" << std::endl;
@@ -396,7 +410,6 @@ void QPProblem::solver_dump(solution_t & Result, const tests_e & tests ){
 
         break;
 		}case CTR2:{
-
 			for(unsigned int i=0;i<16;++i){
 				for (unsigned int j=0;j<2;++j){
 					if (Result.initialConstraint(i*2+j)==0){
@@ -410,7 +423,7 @@ void QPProblem::solver_dump(solution_t & Result, const tests_e & tests ){
 				std::cout << " ";
 			}
 			std::cout << " ";
-			for(unsigned int i=0;i<(NbConstraints_-32)/5;++i){
+			for(unsigned int i=0;i<(NbConstraints_)/5;++i){
 				for (unsigned int j=0;j<5;++j){
 					if (Result.initialConstraint(i*5+j+32)==0){
 						std::cout << '.';
@@ -423,10 +436,10 @@ void QPProblem::solver_dump(solution_t & Result, const tests_e & tests ){
 			std::cout << std::endl;
 			for(unsigned int i=0;i<16;++i){
 				for (unsigned int j=0;j<2;++j){
-					if (istate_[i*2+j+n_+1]==0){
+					if (istate_[i*2+j]==0){
 						std::cout << '.';
 					}else{
-						std::cout << istate_[i*2+j+n_+1];
+						std::cout << istate_[i*2+j];
 					}
 
 
@@ -434,12 +447,12 @@ void QPProblem::solver_dump(solution_t & Result, const tests_e & tests ){
 				std::cout << " ";
 			}
 			std::cout << " ";
-			for(unsigned int i=0;i<(NbConstraints_-32)/5;++i){
+			for(unsigned int i=0;i<(NbConstraints_)/5;++i){
 				for (unsigned int j=0;j<5;++j){
-					if (istate_[i*5+j+32+n_+1]==0){
+					if (istate_[i*5+j+32]==0){
 						std::cout << '.';
 					}else{
-						std::cout << istate_[i*5+j+32+n_+1];
+						std::cout << istate_[i*5+j+32+1];
 					}
 				}
 				std::cout << " ";
@@ -448,12 +461,16 @@ void QPProblem::solver_dump(solution_t & Result, const tests_e & tests ){
 
 
 			int nb=0;
-			for(int i=1;i<m_;++i){
-				if (istate_[i+n_] != Result.initialConstraint(i-1)){
+			for(int i=1;i<n_;++i){
+				if (istate_[i] != Result.initialConstraint(i)){
 					++nb;
 				}
 			}
-
+			for(int i=n_+1;i<n_+m_;++i){
+				if (istate_[i] != Result.initialConstraint(i-1)){
+					++nb;
+				}
+			}
 			std::cout << "    " << iter_ << "    " << nb << std::endl<< std::endl;
 
 		break;
@@ -496,7 +513,9 @@ void
 QPProblem::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
     unsigned int row,  unsigned int col )
 {
-
+	if (Mat.size1()==0 || Mat.size2()==0){
+		return;
+	}
   array_s<double> * Array_p = 0;
 
   switch(Type)
@@ -529,8 +548,10 @@ QPProblem::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
   }
 
 
-  if( NbVariables_ > Array_p->NbCols_ )
-      resize_all();
+  if( NbVariables_ > Array_p->NbCols_ ){
+	  resize_all();
+  }
+
 
   if( (NbConstraints_ > DU_.NbRows_) && (NbConstraints_>0) )
     {
@@ -576,9 +597,11 @@ void
 QPProblem::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
     unsigned row, unsigned col )
 {
-
+	if (Vec.size()==0){
+		return;
+	}
   array_s<double> * Array_p = 0;
-
+  int size=0;
   switch(Type)
   {
   case VECTOR_D:
@@ -615,8 +638,8 @@ QPProblem::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
   case MATRIX_Q:
     break;
   }
-
-  if( (NbVariables_ > D_.NbRows_ ) && (NbVariables_>0) )
+  size=row+Vec.size();
+  if( (size > Array_p->NbRows_ )  )
       resize_all();
 
   boost_ublas::vector<double>::const_iterator vec_it = Vec.begin();

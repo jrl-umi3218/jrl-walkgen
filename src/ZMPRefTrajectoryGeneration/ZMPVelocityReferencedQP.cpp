@@ -55,7 +55,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
     Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFI_(0),Problem_(),Solution_()
 {
 
-  TimeBuffer_ = 0.040;
+  TimeBuffer_ = 0.005*2;
   QP_T_ = 0.1;
   QP_N_ = 16;
   m_SamplingPeriod = 0.005;
@@ -110,12 +110,12 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_->ComHeight( 0.814 );
 
   if(Solution_.useWarmStart){
-  	  VRQPGenerator_->initialize_matrices(GeneratorVelRef::WITH_TWO_CONTRAINT_BOUNDS);
+  	  VRQPGenerator_->initialize_matrices(GeneratorVelRef::WITH_NEW_FORMULATION);
   }else{
 	  VRQPGenerator_->initialize_matrices();
   }
-  VRQPGenerator_->Ponderation( 1.0, INSTANT_VELOCITY );
-  VRQPGenerator_->Ponderation( 0.000001, COP_CENTERING );
+  VRQPGenerator_->Ponderation( 1, INSTANT_VELOCITY );
+  VRQPGenerator_->Ponderation( 10, COP_CENTERING );
   VRQPGenerator_->Ponderation( 0.00001, JERK_MIN );
 
 
@@ -320,8 +320,11 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   Problem_.reset();
   Problem_.nbInvariantRows(2*QP_N_);
   Problem_.nbInvariantCols(2*QP_N_);
-  VRQPGenerator_->build_invariant_part( Problem_ );
-
+  if (Solution_.useWarmStart){
+	  VRQPGenerator_->build_invariant_part( Problem_, GeneratorVelRef::WITH_NEW_FORMULATION );
+  }else{
+	  VRQPGenerator_->build_invariant_part( Problem_ );
+  }
   return 0;
 }
 
@@ -415,34 +418,45 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:
       // --------------------------------------
       VRQPGenerator_->compute_global_reference( Solution_ );
-
+      gettimeofday(&mid12,0);
 
       // BUILD VARIANT PART OF THE OBJECTIVE:
       // ------------------------------------
-      VRQPGenerator_->update_problem( Problem_, Solution_.SupportStates_deq );
-
+      gettimeofday(&mid7,0);
+      if (Solution_.useWarmStart){
+    	  VRQPGenerator_->update_problem( Problem_, Solution_.SupportStates_deq, GeneratorVelRef::WITH_NEW_FORMULATION);
+      }else{
+    	  VRQPGenerator_->update_problem( Problem_, Solution_.SupportStates_deq );
+      }
+      gettimeofday(&mid8,0);
 
       // BUILD CONSTRAINTS:
       // ------------------
-
+      gettimeofday(&mid5,0);
       if (Solution_.useWarmStart){
 		  VRQPGenerator_->build_constraints( Problem_, Solution_,
-			  GeneratorVelRef::WITH_TWO_CONTRAINT_BOUNDS);
+			  GeneratorVelRef::WITH_NEW_FORMULATION);
       }else{
     	  VRQPGenerator_->build_constraints( Problem_, Solution_);
       }
-
+      gettimeofday(&mid6,0);
       // SOLVE PROBLEM:
       // --------------
+      gettimeofday(&mid3,0);
       if (Solution_.useWarmStart)
     	  VRQPGenerator_->compute_warm_start( Solution_ );//TODO: Move to update_problem or build_constraints?
+      gettimeofday(&mid4,0);
+      gettimeofday(&mid1,0);
       Problem_.solve( LSSOL, Solution_, NONE );
-
+      gettimeofday(&mid2,0);
       if(Solution_.Fail>0)
           Problem_.dump( time );
+      if (Solution_.useWarmStart)
+    	  VRQPGenerator_->convert_cop_to_jerk_formulation(Solution_);
 
       VRQPGenerator_->amelif_preview_display(Solution_);
 
+      gettimeofday(&mid9,0);
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
       unsigned currentIndex = FinalCOMTraj_deq.size();
@@ -465,7 +479,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       Robot_->generate_trajectories( time, Solution_,
           Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
-
+      gettimeofday(&mid10,0);
 
       // Specify that we are in the ending phase.
       if (EndingPhase_ == false)
@@ -474,13 +488,13 @@ ZMPVelocityReferencedQP::OnLine(double time,
         }
       UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
 
-      /*
+
       // Compute CPU consumption time.
       gettimeofday(&end,0);
-      gettimeofday(&mid1,0);
-      gettimeofday(&mid2,0);
-      gettimeofday(&mid3,0);
-      gettimeofday(&mid4,0);
+
+
+
+
 
 
 
@@ -492,6 +506,19 @@ ZMPVelocityReferencedQP::OnLine(double time,
           0.000001 * (mid2.tv_usec - mid1.tv_usec);
       CurrentinvariantpartTime+= mid4.tv_sec - mid3.tv_sec +
               0.000001 * (mid4.tv_usec - mid3.tv_usec);
+
+      CurrentConstraintTime+= mid6.tv_sec - mid5.tv_sec +
+              0.000001 * (mid6.tv_usec - mid5.tv_usec);
+
+      CurrentObjTime+= mid8.tv_sec - mid7.tv_sec +
+              0.000001 * (mid8.tv_usec - mid7.tv_usec);
+
+      CurrentInterpolTime+= mid10.tv_sec - mid9.tv_sec +
+              0.000001 * (mid10.tv_usec - mid9.tv_usec);
+
+      CurrentrefTime+= mid12.tv_sec - mid11.tv_sec +
+              0.000001 * (mid12.tv_usec - mid11.tv_usec);
+
       if (end.tv_sec - start.tv_sec +0.000001 * (end.tv_usec - start.tv_usec)>MaxCPUTime){
     	  MaxCPUTime=end.tv_sec - start.tv_sec +0.000001 * (end.tv_usec - start.tv_usec);
       }
@@ -501,17 +528,50 @@ ZMPVelocityReferencedQP::OnLine(double time,
       if (mid4.tv_sec - mid3.tv_sec +0.000001 * (mid4.tv_usec - mid3.tv_usec)>MaxinvariantpartTime){
     	  MaxinvariantpartTime=mid4.tv_sec - mid3.tv_sec +0.000001 * (mid4.tv_usec - mid3.tv_usec);
       }
+      if (mid6.tv_sec - mid5.tv_sec +0.000001 * (mid6.tv_usec - mid5.tv_usec)>MaxConstraintTime){
+    	  MaxConstraintTime=mid6.tv_sec - mid5.tv_sec +0.000001 * (mid6.tv_usec - mid5.tv_usec);
+      }
+      if (mid8.tv_sec - mid7.tv_sec +0.000001 * (mid8.tv_usec - mid7.tv_usec)>MaxObjTime){
+    	  MaxObjTime=mid8.tv_sec - mid7.tv_sec +0.000001 * (mid8.tv_usec - mid7.tv_usec);
+      }
+      if (mid10.tv_sec - mid9.tv_sec +0.000001 * (mid10.tv_usec - mid9.tv_usec)>MaxInterpolTime){
+    	  MaxInterpolTime=mid10.tv_sec - mid9.tv_sec +0.000001 * (mid10.tv_usec - mid9.tv_usec);
+      }
+      if (mid12.tv_sec - mid11.tv_sec +0.000001 * (mid12.tv_usec - mid11.tv_usec)>MaxrefTime){
+    	  MaxrefTime=mid12.tv_sec - mid11.tv_sec +0.000001 * (mid12.tv_usec - mid11.tv_usec);
+      }
+      CurrentCPUTime=CurrentQLDTime+CurrentinvariantpartTime+CurrentConstraintTime+CurrentObjTime+CurrentInterpolTime+CurrentrefTime;
+      MaxCPUTime=MaxQLDTime+MaxinvariantpartTime+MaxConstraintTime+MaxObjTime+MaxInterpolTime+MaxrefTime;
       ++itt;
-      if (itt==10){
+      if (itt==100000){
     	  CurrentCPUTime/=10;
     	  CurrentQLDTime/=10;
     	  CurrentinvariantpartTime/=10;
+    	  CurrentConstraintTime/=10;
+    	  CurrentObjTime/=10;
+    	  CurrentInterpolTime/=10;
+    	  CurrentrefTime/=10;
     	  itt=0;
-    	  std::cout << "mid loop time : " << CurrentCPUTime*1000 << " ms, whose LSSOL :" << CurrentQLDTime*1000 << " ms (" << 100*CurrentQLDTime/CurrentCPUTime << " %) and warmstart :" << CurrentinvariantpartTime*1000 << " ms ("<< 100*CurrentinvariantpartTime/CurrentCPUTime << " %)" << std::endl;
-    	  std::cout << "max loop time : " << MaxCPUTime*1000 << " ms, whose LSSOL :" << MaxQLDTime*1000 << " ms and warmstart :" << CurrentinvariantpartTime*1000 << " ms " << std::endl<< std::endl;
-    	  CurrentCPUTime=CurrentQLDTime=CurrentinvariantpartTime=0;
+    	  std::cout << "mid loop time : " << CurrentCPUTime*1000000
+    			    << " us, whose \n LSSOL :" << CurrentQLDTime*1000000
+    			    << " us, \n warmstart :" << CurrentinvariantpartTime*1000000
+    			    << " us, \n constraints :" << CurrentConstraintTime*1000000
+    			    << " us, \n objective :" << CurrentObjTime*1000000
+    			    << " us, \n interpolation :" << CurrentInterpolTime*1000000
+    			    << " us, \n ref + preview :" << CurrentrefTime*1000000
+    			    << " us " << std::endl<< std::endl;
+
+    	  std::cout << "max loop time : " << MaxCPUTime*1000000
+    			    << " us, whose \n whose LSSOL :" << MaxQLDTime*1000000
+    			    << " us, \n warmstart :" << MaxinvariantpartTime*1000000
+    			    << " us, \n constraints :" << MaxConstraintTime*1000000
+    			    << " us, \n objective :" << MaxObjTime*1000000
+    			    << " us, \n interpolation :" << MaxInterpolTime*1000000
+    			    << " us, \n ref + preview :" << MaxrefTime*1000000
+    			    << " us " << std::endl<< std::endl<< std::endl<< std::endl;
+    	  CurrentCPUTime=CurrentQLDTime=CurrentinvariantpartTime=CurrentConstraintTime=CurrentObjTime=CurrentInterpolTime=CurrentrefTime=0;
       }
-*/
+
     }
 
 }

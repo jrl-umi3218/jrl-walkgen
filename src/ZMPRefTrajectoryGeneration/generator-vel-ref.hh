@@ -55,6 +55,7 @@ namespace PatternGeneratorJRL
     enum option_e
         {
           WITH_TWO_CONTRAINT_BOUNDS,
+          WITH_NEW_FORMULATION,
           NONE
         };
 
@@ -102,13 +103,13 @@ namespace PatternGeneratorJRL
     /// \brief Build the constant part of the objective
     ///
     /// \param[in] Pb
-    void build_invariant_part( QPProblem & Pb );
+    void build_invariant_part( QPProblem & Pb, option_e option=NONE );
 
     /// \brief Compute the objective matrices
     ///
     /// \param[in] Pb
     /// \param[in] SupportStates_deq
-    void update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq );
+    void update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq, option_e option=NONE );
 
     /// \brief Compute the initial solution vector for warm start
     ///
@@ -130,7 +131,7 @@ namespace PatternGeneratorJRL
     inline void CoM(const com_t & CoM)
     { IntermedData_->CoM(CoM); };
     /// \}
-
+    void convert_cop_to_jerk_formulation( solution_t & Solution );
 
     void amelif_preview_display(solution_t & Solution);
     //
@@ -148,7 +149,7 @@ namespace PatternGeneratorJRL
     /// \param[out] Inequalities
     /// \param[in] SupportStates_deq
     void build_inequalities_cop(linear_inequality_t & Inequalities,
-        const std::deque<support_state_t> & SupportStates_deq, option_e option) const;
+        const std::deque<support_state_t> & SupportStates_deq, option_e option, QPProblem & Pb);
 
 
     /// \brief Generate a queue of inequality constraints on

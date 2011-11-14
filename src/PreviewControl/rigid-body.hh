@@ -68,6 +68,9 @@ namespace PatternGeneratorJRL
     /// \brief Inverse of control matrix
     boost_ublas::matrix<double> Um1;
 
+    /// \brief TRanspose inverse of control matrix
+    boost_ublas::matrix<double> Um1T;
+
     /// \brief Transpose of control matrix
     boost_ublas::matrix<double> UT;
 

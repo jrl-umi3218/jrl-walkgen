@@ -50,6 +50,7 @@ SupportFSM::~SupportFSM()
 
 void
 SupportFSM::update_vel_reference(reference_t & Ref, const support_state_t & CurrentSupport){
+	/*
   // Check the reference type of the robot (rotation, translation)
   if(fabs(Ref.Local.X)>2*EPS_||fabs(Ref.Local.Y)>2*EPS_){
       InTranslation_ = true;
@@ -81,7 +82,7 @@ SupportFSM::update_vel_reference(reference_t & Ref, const support_state_t & Curr
           InRotation_ = false;
       }
   }
-
+*/
   if (CurrentSupport.Phase==SS && CurrentSupport.NbStepsLeft == 0){
 	  Ref.Local.X=0;
 	  Ref.Local.Y=0;
@@ -100,8 +101,9 @@ SupportFSM::set_support_state(double time, unsigned int pi,
   Support.NbInstants++;
 
   bool ReferenceGiven = false;
-  if(fabs(Ref.Local.X)>EPS_||fabs(Ref.Local.Y)>EPS_||fabs(Ref.Local.Yaw)>EPS_)
+  if(fabs(Ref.Local.X)>EPS_||fabs(Ref.Local.Y)>EPS_||fabs(Ref.Local.Yaw)>EPS_){
     ReferenceGiven = true;
+  }
 
   // Update time limit for double support phase
   if(ReferenceGiven && Support.Phase == DS && (Support.TimeLimit-time-EPS_) > DSSSPeriod_)

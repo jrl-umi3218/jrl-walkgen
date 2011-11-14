@@ -35,7 +35,7 @@
 #include <PreviewControl/rigid-body-system.hh>
 #include <PreviewControl/rigid-body.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>
-
+#include <cmath>
 namespace PatternGeneratorJRL
 {
 
@@ -209,7 +209,11 @@ namespace PatternGeneratorJRL
             fill(NewArray, NbRows*NbCols, (type)0);
             for(unsigned int j = 0; j < NbCols; j++)
               for(unsigned int i = 0; i < NbRows; i++)
-                NewArray[i+NbRows*j] = Array_[i+NbRows_*j];
+            	  if (i>=NbRows_ || j>=NbCols_){
+            		  NewArray[i+NbRows*j] = 0;
+            	  }else{
+            		  NewArray[i+NbRows*j] = Array_[i+NbRows_*j];
+            	  }
 
             FinalArray.NbRows_ = NbRows;
             FinalArray.NbCols_ = NbCols;
@@ -231,6 +235,8 @@ namespace PatternGeneratorJRL
       {
 
         try {
+        	NbRows=max((unsigned)1,NbRows);
+        	NbCols=max((unsigned)1,NbCols);
             bool Reallocate = false;
             type * NewArray = 0;
             if (NbRows*NbCols>SizeMem_)
@@ -266,6 +272,7 @@ namespace PatternGeneratorJRL
 
       array_s():
         Array_(0),Id_(0),NbRows_(0),NbCols_(0), SizeMem_(0){
+    	  resize(1,1,false);
       };
       ~array_s()
       {

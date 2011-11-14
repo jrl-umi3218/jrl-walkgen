@@ -26,7 +26,7 @@
  */
 #ifndef _QP_PROBLEM_HXX_
 #define _QP_PROBLEM_HXX_
-
+#include <cmath>
 namespace PatternGeneratorJRL
 {
 
@@ -40,6 +40,7 @@ namespace PatternGeneratorJRL
   {
     try
     {
+    	new_size=max(1,new_size);
       type * NewArray = new type[new_size];
       initialize(NewArray, new_size, (type)0);
       for(int i = 0; i < old_size; i++)
