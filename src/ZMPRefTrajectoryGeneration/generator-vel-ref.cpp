@@ -82,7 +82,7 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
   const reference_t & RefVel = IntermedData_->Reference();
   support_state_t & CurrentSupport = IntermedData_->SupportState();
   FSM->set_support_state( CurrentTime_, 0, CurrentSupport, RefVel );
-  CurrentSupport.InTransitionPhase=false;
+  CurrentSupport.InTransitionPhase = false;
   if( CurrentSupport.StateChanged == true )
     {
       if( CurrentSupport.Foot == LEFT )

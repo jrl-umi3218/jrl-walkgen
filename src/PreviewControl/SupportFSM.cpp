@@ -107,7 +107,7 @@ SupportFSM::set_support_state(double time, unsigned int pi,
   // Update time limit for double support phase
   if(ReferenceGiven && Support.Phase == DS && (Support.TimeLimit-time-EPS_) > DSSSPeriod_)
     {
-      Support.TimeLimit = time+DSSSPeriod_-T_/10.0;
+      Support.TimeLimit = time+DSSSPeriod_-T_/1000.0;
       Support.NbStepsLeft = NbStepsSSDS_;
     }
 
@@ -118,7 +118,7 @@ SupportFSM::set_support_state(double time, unsigned int pi,
       if(Support.Phase == SS  && !ReferenceGiven && Support.NbStepsLeft == 0)
 	{
 	  Support.Phase = DS;
-	  Support.TimeLimit = time+pi*T_+DSPeriod_-T_/10.0;
+	  Support.TimeLimit = time+pi*T_+DSPeriod_-T_/1000.0;
 	  Support.StateChanged = true;
 	  Support.NbInstants = 0;
 	}
@@ -127,7 +127,7 @@ SupportFSM::set_support_state(double time, unsigned int pi,
 		  ||   ((Support.Phase == DS) && (Support.NbStepsLeft > 0)))
 	{
 	  Support.Phase = SS;
-	  Support.TimeLimit = time+pi*T_+StepPeriod_-T_/10.0;
+	  Support.TimeLimit = time+pi*T_+StepPeriod_-T_/1000.0;
 	  Support.NbStepsLeft = NbStepsSSDS_;
 	  Support.StateChanged = true;
 	  Support.NbInstants = 0;
@@ -142,7 +142,7 @@ SupportFSM::set_support_state(double time, unsigned int pi,
             Support.Foot = LEFT;
 	  Support.StateChanged = true;
 	  Support.NbInstants = 0;
-	  Support.TimeLimit = time+pi*T_+StepPeriod_-T_/10.0;
+	  Support.TimeLimit = time+pi*T_+StepPeriod_-T_/1000.0;
 	  if(pi != 1)//Flying foot is not down
 	    ++Support.StepNumber;
 	  if (!ReferenceGiven)
