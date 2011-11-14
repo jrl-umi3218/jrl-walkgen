@@ -303,7 +303,7 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
 
     break;
   case LSSOL:
-//#ifdef LSSOL_FOUND
+#ifdef LSSOL_FOUND
 
     if (tests==SOLVER || tests==ALL){
     	sendOption("Print Level = 1000");
@@ -391,10 +391,11 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
     	Result.initialConstraint(i-1) = istate_[i];
     }
 
+#else
 
-//#else
+
 //   std::cerr << " LSSOL_FOUND not available" << std::endl;
-//#endif //LSSOL_FOUND
+#endif //LSSOL_FOUND
 
     break;
 

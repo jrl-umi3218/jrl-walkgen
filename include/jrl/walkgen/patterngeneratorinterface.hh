@@ -243,7 +243,7 @@ namespace PatternGeneratorJRL
       virtual void getWaistPositionAndOrientation(double TQ[7],double &Orientation) const=0;
 
       /*! \brief Set Waist position and Orientation  */
-      virtual void setWaistPositionAndOrientation(double TQ[7])=0;
+      virtual void setWaistPositionAndOrientation(const double TQ[7])=0;
 
       /*! \brief Get Waist velocity */
       virtual void getWaistVelocity(double &dx,
