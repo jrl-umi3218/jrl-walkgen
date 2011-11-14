@@ -109,11 +109,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_->SamplingPeriodControl( m_SamplingPeriod );
   VRQPGenerator_->ComHeight( 0.814 );
 
-  if(Solution_.useWarmStart){
-  	  VRQPGenerator_->initialize_matrices(GeneratorVelRef::WITH_NEW_FORMULATION);
-  }else{
-	  VRQPGenerator_->initialize_matrices();
-  }
+  VRQPGenerator_->initialize_matrices();
+
   VRQPGenerator_->Ponderation( 1, INSTANT_VELOCITY );
   VRQPGenerator_->Ponderation( 10, COP_CENTERING );
   VRQPGenerator_->Ponderation( 0.00001, JERK_MIN );
@@ -320,11 +317,8 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   Problem_.reset();
   Problem_.nbInvariantRows(2*QP_N_);
   Problem_.nbInvariantCols(2*QP_N_);
-  if (Solution_.useWarmStart){
-	  VRQPGenerator_->build_invariant_part( Problem_, GeneratorVelRef::WITH_NEW_FORMULATION );
-  }else{
-	  VRQPGenerator_->build_invariant_part( Problem_ );
-  }
+
+  VRQPGenerator_->build_invariant_part( Problem_);
   return 0;
 }
 
@@ -423,36 +417,27 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // BUILD VARIANT PART OF THE OBJECTIVE:
       // ------------------------------------
       gettimeofday(&mid7,0);
-      if (Solution_.useWarmStart){
-    	  VRQPGenerator_->update_problem( Problem_, Solution_.SupportStates_deq, GeneratorVelRef::WITH_NEW_FORMULATION);
-      }else{
-    	  VRQPGenerator_->update_problem( Problem_, Solution_.SupportStates_deq );
-      }
+      VRQPGenerator_->update_problem( Problem_, Solution_.SupportStates_deq );
       gettimeofday(&mid8,0);
 
       // BUILD CONSTRAINTS:
       // ------------------
       gettimeofday(&mid5,0);
-      if (Solution_.useWarmStart){
-		  VRQPGenerator_->build_constraints( Problem_, Solution_,
-			  GeneratorVelRef::WITH_NEW_FORMULATION);
-      }else{
-    	  VRQPGenerator_->build_constraints( Problem_, Solution_);
-      }
+      VRQPGenerator_->build_constraints( Problem_, Solution_);
       gettimeofday(&mid6,0);
       // SOLVE PROBLEM:
       // --------------
       gettimeofday(&mid3,0);
-      if (Solution_.useWarmStart)
-    	  VRQPGenerator_->compute_warm_start( Solution_ );//TODO: Move to update_problem or build_constraints?
+      VRQPGenerator_->compute_warm_start( Solution_ );
+
       gettimeofday(&mid4,0);
       gettimeofday(&mid1,0);
       Problem_.solve( LSSOL, Solution_, NONE );
       gettimeofday(&mid2,0);
       if(Solution_.Fail>0)
           Problem_.dump( time );
-      if (Solution_.useWarmStart)
-    	  VRQPGenerator_->convert_cop_to_jerk_formulation(Solution_);
+
+      VRQPGenerator_->convert_cop_to_jerk_formulation(Solution_);
 
       VRQPGenerator_->amelif_preview_display(Solution_);
 
