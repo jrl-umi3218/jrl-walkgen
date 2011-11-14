@@ -361,21 +361,35 @@ ZMPVelocityReferencedQP::OnLine(double time,
   if(time + 0.00001 > UpperTimeLimitToUpdate_)
     {
 
-
-      static double CurrentCPUTime=0.0, CurrentQLDTime=0.0, CurrentinvariantpartTime=0.0;
-      static double MaxCPUTime=0.0, MaxQLDTime=0.0, MaxinvariantpartTime=0.0;
+      static double CurrentCPUTime=0.0, CurrentQLDTime=0.0, CurrentinvariantpartTime=0.0,
+    		  CurrentConstraintTime=0.0, CurrentObjTime=0.0, CurrentInterpolTime=0.0, CurrentrefTime=0.0;
+      static double MaxCPUTime=0.0, MaxQLDTime=0.0, MaxinvariantpartTime=0.0,
+    		  MaxObjTime=0.0, MaxConstraintTime=0.0, MaxInterpolTime=0.0, MaxrefTime=0.0;
       static int itt=0;
 
-      struct timeval start,mid1,mid2,mid3,mid4,end;
+      struct timeval start,mid1,mid2,mid3,mid4,mid5,mid6,mid7,mid8,mid9,mid10,mid11,mid12,end;
       gettimeofday(&start,0);
 
+      gettimeofday(&mid11,0);
       // UPDATE INTERNAL DATA:
       // ---------------------
       Problem_.reset_variant();
       Solution_.reset();
       VRQPGenerator_->CurrentTime( time );
       VelRef_=NewVelRef_;
+
       SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
+      if (VelRef_.Local.Yaw==0 && VelRef_.Local.X==0 && VelRef_.Local.Y==0){
+		  VRQPGenerator_->Ponderation( 1, INSTANT_VELOCITY );
+		  VRQPGenerator_->Ponderation( 10, COP_CENTERING );
+		  VRQPGenerator_->Ponderation( 0.00001, JERK_MIN );
+      }else{
+		  VRQPGenerator_->Ponderation( 1, INSTANT_VELOCITY );
+		  VRQPGenerator_->Ponderation( 0.001, COP_CENTERING );
+		  VRQPGenerator_->Ponderation( 0.00001, JERK_MIN );
+      }
+
+
       IntermedData_->Reference( VelRef_ );
       IntermedData_->CoM( CoM_() );
 
