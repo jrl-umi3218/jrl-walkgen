@@ -108,6 +108,26 @@ ADD_DEPENDENCIES(TestHerdt2010 ${PROJECT_NAME})
 ADD_TEST(TestHerdt2010 TestHerdt2010
   ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 
+###################
+# Test Bussy 2011 #
+###################
+CONFIG_FILES_CMAKE(TestBussy2011OnLineTestFGPI.datref)
+
+ADD_EXECUTABLE(TestBussy2011
+  ../src/portability/gettimeofday.cc
+  TestBussy2011.cpp
+  CommonTools.cpp
+  TestObject.cpp
+  ClockCPUTime.cpp
+  )
+
+TARGET_LINK_LIBRARIES(TestBussy2011 ${PROJECT_NAME})
+PKG_CONFIG_USE_DEPENDENCY(TestBussy2011 jrl-dynamics)
+ADD_DEPENDENCIES(TestBussy2011 ${PROJECT_NAME})
+
+ADD_TEST(TestBussy2011 TestBussy2011
+  ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+
 #####################
 # Add user examples #
 #####################
