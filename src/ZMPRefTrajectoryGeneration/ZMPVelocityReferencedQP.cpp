@@ -57,7 +57,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 
   TimeBuffer_ = 0.040;
   QP_T_ = 0.1;
-  QP_N_ = 16;
+  QP_N_ = 13;
   m_SamplingPeriod = 0.005;
   PerturbationOccured_ = false;
   UpperTimeLimitToUpdate_ = 0.0;
