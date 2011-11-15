@@ -418,27 +418,6 @@ ZMPVelocityReferencedQP::OnLine(double time,
                                               FinalLeftFootTraj_deq, FinalRightFootTraj_deq, Solution_.SupportStates_deq );
 
 
-#if 0
-      std::cout << "UpperTimeLimitToUpdate = " << UpperTimeLimitToUpdate_
-		<< ", CurrentTime = " << CurrentTime_ << std::endl;
-      std::cout << "SupportStates_deq.InTransitionPhase : ";
-      for( unsigned int i = 0 ; i < Solution_.SupportStates_deq.size() ; i++ )
-	std::cout << Solution_.SupportStates_deq[i].InTransitionPhase << " ";
-      std::cout << std::endl;
-#endif
-#if 0
-      std::cout << "SupportStates_deq.Phase : ";
-      for( unsigned int i = 0 ; i < Solution_.SupportStates_deq.size() ; i++ )
-	std::cout << Solution_.SupportStates_deq[i].Phase << " ";
-      std::cout << std::endl;
-#endif
-#if 1
-      std::cout << "SupportStates_deq.StepNumber : ";
-      for( unsigned int i = 0 ; i < Solution_.SupportStates_deq.size() ; i++ )
-	std::cout << Solution_.SupportStates_deq[i].StepNumber << " ";
-      std::cout << std::endl;
-#endif
-      
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // ------------------------------------------------------
       OrientPrw_->preview_orientations( CurrentTime_, VelRef_,
@@ -506,7 +485,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
           Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
 
-      }
+    }
 }
 
 
