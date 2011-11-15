@@ -77,6 +77,8 @@ namespace PatternGeneratorJRL
       boost_ublas::matrix<double> V_f;
       /// \brief Current support state
       support_state_t SupportState;
+      /// \brief Next support state
+      support_state_t NextSupportState;
     };
     typedef state_variant_s state_variant_t;
     /// \}
@@ -136,8 +138,14 @@ namespace PatternGeneratorJRL
     { return StateMatrices_.SupportState; };
     inline support_state_t & SupportState()
     { return StateMatrices_.SupportState; };
+    inline support_state_t const & NextSupportState() const
+    { return StateMatrices_.NextSupportState; };
+    inline support_state_t & NextSupportState()
+    { return StateMatrices_.NextSupportState; };
     inline void SupportState( const support_state_t & SupportState )
     { StateMatrices_.SupportState = SupportState; };
+    inline void NextSupportState( const support_state_t & NextSupportState )
+    { StateMatrices_.NextSupportState = NextSupportState; };
     /// \}
 
     /// \name Displaying

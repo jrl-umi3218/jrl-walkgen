@@ -415,7 +415,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
       // ----------------------------------------------------
       VRQPGenerator_->preview_support_states( CurrentTime_, SupportFSM_,
-                                              FinalLeftFootTraj_deq, FinalRightFootTraj_deq, Solution_.SupportStates_deq );
+          FinalLeftFootTraj_deq, FinalRightFootTraj_deq, Solution_.SupportStates_deq );
 
 
 #if 0
@@ -505,6 +505,27 @@ ZMPVelocityReferencedQP::OnLine(double time,
       Robot_->generate_trajectories( CurrentTime_, Solution_,
           Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
+
+
+      // UPDATE INTERNAL DATA:
+      // ---------------------
+      support_state_t & NextSupportState = IntermedData_->NextSupportState();
+      if( Solution_.SupportStates_deq[2].StateChanged == true )
+        {
+          if( Solution_.SupportStates_deq[2].Foot == LEFT )
+            {
+              NextSupportState.X = FinalLeftFootTraj_deq.back().x;
+              NextSupportState.Y = FinalLeftFootTraj_deq.back().y;
+              NextSupportState.Yaw = FinalLeftFootTraj_deq.back().theta*M_PI/180.0;
+            }
+          else
+            {
+              NextSupportState.X = FinalRightFootTraj_deq.back().x;
+              NextSupportState.Y = FinalRightFootTraj_deq.back().y;
+              NextSupportState.Yaw = FinalRightFootTraj_deq.back().theta*M_PI/180.0;
+            }
+        }
+
 
       }
 }

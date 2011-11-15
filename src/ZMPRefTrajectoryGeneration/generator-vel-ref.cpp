@@ -81,20 +81,20 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
   // --------------------------------
   const reference_t & RefVel = IntermedData_->Reference();
   support_state_t & CurrentSupport = IntermedData_->SupportState();
+  support_state_t & NextSupport = IntermedData_->NextSupportState();
   FSM->set_support_state( CurrentTime_, 0, CurrentSupport, RefVel );
   CurrentSupport.InTransitionPhase = false;
   if( CurrentSupport.StateChanged == true )
     {
-      if( CurrentSupport.Foot == LEFT )
-        FAP = & FinalLeftFootTraj_deq.front();
-      else
-        FAP = & FinalRightFootTraj_deq.front();
-      CurrentSupport.X = FAP->x;
-      CurrentSupport.Y = FAP->y;
-      CurrentSupport.Yaw = FAP->theta*M_PI/180.0;
+//      if( CurrentSupport.Foot == LEFT )
+//        FAP = & FinalLeftFootTraj_deq.front();
+//      else
+//        FAP = & FinalRightFootTraj_deq.front();
+      CurrentSupport.X = NextSupport.X;
+      CurrentSupport.Y = NextSupport.Y;
+      CurrentSupport.Yaw = NextSupport.Yaw;
       CurrentSupport.StartTime = time;
     }
-
   SupportStates_deq.push_back( CurrentSupport );
   IntermedData_->SupportState( CurrentSupport );
 
@@ -111,17 +111,20 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
       PreviewedSupport.InTransitionPhase=false;
       if( PreviewedSupport.StateChanged )
         {
-          if( pi == 1  )//Foot down
+          if( pi == 1 )//Foot down
             {
-              if( PreviewedSupport.Foot == LEFT )
-                FAP = & FinalLeftFootTraj_deq.back();
-              else
-                FAP = & FinalRightFootTraj_deq.back();
-              PreviewedSupport.X = FAP->x;
-              PreviewedSupport.Y = FAP->y;
-              PreviewedSupport.Yaw = FAP->theta*M_PI/180.0;
+//              if( PreviewedSupport.Foot == LEFT )
+//                FAP = & FinalLeftFootTraj_deq.back();
+//              else
+//                FAP = & FinalRightFootTraj_deq.back();
+//              PreviewedSupport.X = FAP->x;
+//              PreviewedSupport.Y = FAP->y;
+//              PreviewedSupport.Yaw = FAP->theta*M_PI/180.0;
+              PreviewedSupport.X = NextSupport.X;
+              PreviewedSupport.Y = NextSupport.Y;
+              PreviewedSupport.Yaw = NextSupport.Yaw;
               PreviewedSupport.StartTime = time+pi*Tprw_;
-              if (CurrentSupport.Phase==SS && PreviewedSupport.Phase==SS){
+              if( CurrentSupport.Phase == SS && PreviewedSupport.Phase == SS ){
             	  PreviewedSupport.InTransitionPhase=true;
               }
             }
