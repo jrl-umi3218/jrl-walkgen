@@ -371,7 +371,6 @@ ZMPVelocityReferencedQP::OnLine(double time,
     }
 
 
-
   // UPDATE WALKING TRAJECTORIES:
   // ----------------------------
   if(time  > UpperTimeLimitToUpdate_ - 0.00001){
@@ -384,16 +383,14 @@ ZMPVelocityReferencedQP::OnLine(double time,
       CurrentTime_ = time;
   }
 
-
-  if(time  >= UpperTimeLimitToFeedback_ - 0.00001)
+  if(time  > UpperTimeLimitToFeedback_ - 0.00001)
     {
       // Adaptive control of current support state
       if ( support_state_changed ){
-        UpperTimeLimitToUpdate_=time + QP_T_;
-        UpperTimeLimitToFeedback_ = time;
-        CurrentTime_ = time;
+	UpperTimeLimitToUpdate_ = time + QP_T_;
+	//UpperTimeLimitToFeedback_ = time;
+	CurrentTime_ = time;
       }
-     
       
       // UPDATE INTERNAL DATA:
       // ---------------------
@@ -414,10 +411,33 @@ ZMPVelocityReferencedQP::OnLine(double time,
       Robot_->FirstIterationDynamicsDuration(FirstIterationDynamicsDuration_);
       Robot_->recompute_dynamic_matrix( );
 
+
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
       // ----------------------------------------------------
       VRQPGenerator_->preview_support_states( CurrentTime_, SupportFSM_,
                                               FinalLeftFootTraj_deq, FinalRightFootTraj_deq, Solution_.SupportStates_deq );
+
+
+#if 0
+      std::cout << "UpperTimeLimitToUpdate = " << UpperTimeLimitToUpdate_
+		<< ", CurrentTime = " << CurrentTime_ << std::endl;
+      std::cout << "SupportStates_deq.InTransitionPhase : ";
+      for( unsigned int i = 0 ; i < Solution_.SupportStates_deq.size() ; i++ )
+	std::cout << Solution_.SupportStates_deq[i].InTransitionPhase << " ";
+      std::cout << std::endl;
+#endif
+#if 0
+      std::cout << "SupportStates_deq.Phase : ";
+      for( unsigned int i = 0 ; i < Solution_.SupportStates_deq.size() ; i++ )
+	std::cout << Solution_.SupportStates_deq[i].Phase << " ";
+      std::cout << std::endl;
+#endif
+#if 1
+      std::cout << "SupportStates_deq.StepNumber : ";
+      for( unsigned int i = 0 ; i < Solution_.SupportStates_deq.size() ; i++ )
+	std::cout << Solution_.SupportStates_deq[i].StepNumber << " ";
+      std::cout << std::endl;
+#endif
       
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // ------------------------------------------------------
