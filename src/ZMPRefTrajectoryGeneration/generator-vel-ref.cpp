@@ -30,7 +30,9 @@
 #include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
 #include <iostream>
 #include <fstream>
+
 #include <cmath>
+
 using namespace std;
 using namespace PatternGeneratorJRL;
 
@@ -84,6 +86,7 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
   const reference_t & RefVel = IntermedData_->Reference();
   support_state_t & CurrentSupport = IntermedData_->SupportState();
   FSM->set_support_state( CurrentTime_, 0, CurrentSupport, RefVel );
+  CurrentSupport.InTransitionPhase=false;
   if( CurrentSupport.StateChanged == true )
     {
       if( CurrentSupport.Foot == LEFT )
@@ -95,6 +98,7 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
       CurrentSupport.Yaw = FAP->theta*M_PI/180.0;
       CurrentSupport.StartTime = time;
     }
+
   SupportStates_deq.push_back( CurrentSupport );
   IntermedData_->SupportState( CurrentSupport );
 
@@ -103,10 +107,12 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
   // -----------------------
   // initialize the previewed support state before previewing
   support_state_t PreviewedSupport = CurrentSupport;
+
   PreviewedSupport.StepNumber  = 0;
   for( unsigned pi=1; pi<=N_; pi++ )
     {
       FSM->set_support_state( CurrentTime_, pi, PreviewedSupport, RefVel );
+      PreviewedSupport.InTransitionPhase=false;
       if( PreviewedSupport.StateChanged )
         {
           if( pi == 1  )//Foot down
@@ -119,6 +125,9 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
               PreviewedSupport.Y = FAP->y;
               PreviewedSupport.Yaw = FAP->theta*M_PI/180.0;
               PreviewedSupport.StartTime = time+pi*Tprw_;
+              if (CurrentSupport.Phase==SS && PreviewedSupport.Phase==SS){
+            	  PreviewedSupport.InTransitionPhase=true;
+              }
             }
           if( /*pi > 1 &&*/ PreviewedSupport.StepNumber > 0 )
             {
@@ -126,6 +135,7 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
               PreviewedSupport.Y = 0.0;
             }
         }
+
       SupportStates_deq.push_back( PreviewedSupport );
     }
 
@@ -256,23 +266,20 @@ GeneratorVelRef::initialize_matrices()
 
 
 void
-GeneratorVelRef::initialize_matrices( linear_inequality_t & Inequalities)
+GeneratorVelRef::initialize_matrices( linear_inequality_t & Inequalities, int addedSize)
 {
 
   switch(Inequalities.type)
   {
-  case INEQ_COP:{
-
-	int ineqSize=4;
-
-    Inequalities.D.X_mat.resize(ineqSize*N_,N_,false);
+  case INEQ_COP:
+    Inequalities.D.X_mat.resize(addedSize,N_,false);
     Inequalities.D.X_mat.clear();
-    Inequalities.D.Y_mat.resize(ineqSize*N_,N_,false);
+    Inequalities.D.Y_mat.resize(addedSize,N_,false);
     Inequalities.D.Y_mat.clear();
-    Inequalities.Dc_vec.resize(ineqSize*N_,false);
+    Inequalities.Dc_vec.resize(addedSize,false);
     Inequalities.Dc_vec.clear();
-    break;}
-  case INEQ_COM:{//TODO: fixed resize
+    break;
+  case INEQ_COM://TODO: fixed resize
     Inequalities.D.X_mat.resize(40,N_,false);
     Inequalities.D.X_mat.clear();
     Inequalities.D.Y_mat.resize(40,N_,false);
@@ -281,7 +288,7 @@ GeneratorVelRef::initialize_matrices( linear_inequality_t & Inequalities)
     Inequalities.D.Z_mat.clear();
     Inequalities.Dc_vec.resize(40,false);
     Inequalities.Dc_vec.clear();
-    break;}
+    break;
   }
 
 }
@@ -291,7 +298,6 @@ void
 GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
     const std::deque<support_state_t> & SupportStates_deq)
 {
-
 
 
 }
@@ -396,9 +402,9 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
 	++prwSS_it;//Point at the first previewed instant
 	for( unsigned i=0; i<N_; i++ )
 	{
-	  if( prwSS_it->StateChanged )
+	  if( prwSS_it->StateChanged ){
 		RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
-
+	  }
 		MV_(i)     = min(CoPHull.X_vec[0],CoPHull.X_vec[3]);
 		MV2_(i)    = max(CoPHull.X_vec[0],CoPHull.X_vec[3]);
 
@@ -416,6 +422,9 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
 
 	Pb.add_term_to( VECTOR_XL, MV_, 0  );
 	Pb.add_term_to( VECTOR_XU, MV2_, 0  );
+
+
+
 
 
 }
@@ -548,8 +557,10 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution 
   // ----------------------
   //CoP constraints
   linear_inequality_t & IneqCoP = IntermedData_->Inequalities( INEQ_COP );
+
   build_inequalities_cop( IneqCoP, Solution.SupportStates_deq );
   build_constraints_cop( IneqCoP, nbStepsPreviewed, Pb, Solution.SupportStates_deq );
+
 
   //Foot constraints
   linear_inequality_t & IneqFeet = IntermedData_->Inequalities( INEQ_FEET );
@@ -571,11 +582,13 @@ void
 GeneratorVelRef::build_invariant_part( QPProblem & Pb)
 {
 
+
 }
 
 
 void
-GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq)
+GeneratorVelRef::update_problem( QPProblem & Pb,
+		const std::deque<support_state_t> & SupportStates_deq, double TimeFactor)
 {
 
 		Pb.clear(VECTOR_D);
@@ -600,21 +613,26 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
 				}
 			}
 		}
+		boost_ublas::matrix<double> Tf=Id_N;
+		Tf(0,0)=TimeFactor;
 
-
+		Tf(N_-1,N_-1)=1.05-TimeFactor;
 
 		boost_ublas::matrix<double> G(N_,N_);
 		boost_ublas::vector<double> H(N_);
 
 		MM_ = prod(VelDynamics.U,CoPDynamics.Um1);
+		MM_ = prod(Tf,MM_);
 		MM_ = prod(VelDynamics.UT,MM_);
 		MM_ = prod(CoPDynamics.Um1T,MM_);
 
-		MM2_= prod(CoPDynamics.Um1T,CoPDynamics.Um1);
+		MM2_= prod(Tf,CoPDynamics.Um1);
+		MM2_ = prod(CoPDynamics.Um1T,MM2_);
 
 		G=  InstVel.weight*MM_ +Jerk.weight*MM2_  ;
-		Pb.add_term_to( MATRIX_Q, G+COPCent.weight*Id_N, 0, 0 );
-		Pb.add_term_to( MATRIX_Q, G+COPCent.weight*Id_N, N_, N_ );
+		MM2_=G+COPCent.weight*Tf;
+		Pb.add_term_to( MATRIX_Q, MM2_, 0, 0 );
+		Pb.add_term_to( MATRIX_Q, MM2_, N_, N_ );
 
 		MM2_=prod(G , State.V);
 
@@ -639,23 +657,26 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
 		MV_ = prod(MM_,State.CoM.x);
 		MV_-= State.Ref.Global.X_vec;
 
-
+		MV_ = prod(Tf,MV_);
 		MV_ = prod(VelDynamics.UT,MV_);
 		MV_ = prod(CoPDynamics.Um1T,MV_);
 		H   = InstVel.weight*MV_;
 
 		MV_ = prod(CoPDynamics.S   , State.CoM.x);
 		MV_ = prod(CoPDynamics.Um1 , MV_);
+		MV_ = prod(Tf,MV_);
 		MV_ = prod(CoPDynamics.Um1T, MV_);
 		H   -= Jerk.weight * MV_;
 
 
 		MV_ = prod(CoPDynamics.Um1, State.VcX);
+		MV_ = prod(Tf,MV_);
 		MV_ = prod(CoPDynamics.Um1T, MV_);
 		H  += Jerk.weight*MV_;
 
 		MV_ = prod(CoPDynamics.Um1, State.VcX);
 		MV_ = prod(VelDynamics.U, MV_);
+		MV_ = prod(Tf,MV_);
 		MV_ = prod(VelDynamics.UT, MV_);
 		MV_ = prod(CoPDynamics.Um1T, MV_);
 		H  += InstVel.weight*MV_;
@@ -671,23 +692,26 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
 		MV_ = prod(MM_,State.CoM.y);
 		MV_-= State.Ref.Global.Y_vec;
 
-
+		MV_ = prod(Tf,MV_);
 		MV_ = prod(VelDynamics.UT,MV_);
 		MV_ = prod(CoPDynamics.Um1T,MV_);
 		H   = InstVel.weight*MV_;
 
 		MV_ = prod(CoPDynamics.S   , State.CoM.y);
 		MV_ = prod(CoPDynamics.Um1 , MV_);
+		MV_ = prod(Tf,MV_);
 		MV_ = prod(CoPDynamics.Um1T, MV_);
 		H   -= Jerk.weight * MV_;
 
 
 		MV_ = prod(CoPDynamics.Um1, State.VcY);
+		MV_ = prod(Tf,MV_);
 		MV_ = prod(CoPDynamics.Um1T, MV_);
 		H  += Jerk.weight*MV_;
 
 		MV_ = prod(CoPDynamics.Um1, State.VcY);
 		MV_ = prod(VelDynamics.U, MV_);
+		MV_ = prod(Tf,MV_);
 		MV_ = prod(VelDynamics.UT, MV_);
 		MV_ = prod(CoPDynamics.Um1T, MV_);
 		H  += InstVel.weight*MV_;
@@ -754,7 +778,7 @@ GeneratorVelRef::convert_cop_to_jerk_formulation( solution_t & Solution ){
 
 
 void
-GeneratorVelRef::compute_warm_start( solution_t & Solution )
+GeneratorVelRef::compute_warm_start( solution_t & Solution, double TimeFactor )
 {
 
   // Initialize:
@@ -774,19 +798,27 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
   unsigned int size=Solution.initialConstraint.size();
   boost_ublas::vector<int> initialConstraintTmp;
   initialConstraintTmp = Solution.initialConstraint;
-
+  unsigned int shift_ctr;
+  if (TimeFactor==1){
+	  shift_ctr=1;
+  }else{
+	  shift_ctr=0;
+  }
   if (size>=2*N_){
-	  for(unsigned int i=0;i<2*(N_-1);++i){
-		  Solution.initialConstraint(i)=initialConstraintTmp(i+2);
+	  for(unsigned int i=0;i<N_-1;++i){
+		  Solution.initialConstraint(i)=initialConstraintTmp(i+shift_ctr);
+		  Solution.initialConstraint(i+N_)=initialConstraintTmp(i+N_+shift_ctr);
 	  }
-	  for(unsigned int i=2*(N_-1);i<2*N_;++i){
+	  for(unsigned int i=N_-1;i<N_;++i){
 		  Solution.initialConstraint(i)=initialConstraintTmp(i);
+		  Solution.initialConstraint(i+N_)=initialConstraintTmp(i+N_);
+
 	  }
 	  for(unsigned int i=2*N_;i<2*N_+5*nbSteps;++i){
 		  Solution.initialConstraint(i)=initialConstraintTmp(i);
 	  }
 	  for(unsigned int i=2*N_+5*nbSteps; i<2*N_+5*nbStepsMax; ++i){
-		  Solution.initialConstraint(i)=0;
+		  Solution.initialConstraint(i)=initialConstraintTmp(i);
 	  }
   }else{
 	  Solution.initialConstraint.resize(2*N_+5*nbStepsMax);
@@ -794,6 +826,7 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
 		  Solution.initialConstraint(i)=0;
 	  }
   }
+
 
   // Compute feasible initial ZMP and foot positions:
   // ---------------------------------------
@@ -861,34 +894,34 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
       int k1=-1;
       int k2=-1;
       if (Solution.initialConstraint(0+i*2)==1){
-    	  if (Solution.initialConstraint(1+i*2)==1){
+    	  if (Solution.initialConstraint(N_+i*2)==1){
     		  k2=1;
     		  noActiveConstraints=false;
-    	  }else if (Solution.initialConstraint(1+i*2)==2){
+    	  }else if (Solution.initialConstraint(N_+i*2)==2){
     		  k2=0;
     		  noActiveConstraints=false;
-    	  }else if (Solution.initialConstraint(1+i*2)==0){
+    	  }else if (Solution.initialConstraint(N_+i*2)==0){
     		  k1=0;
     		  k2=1;
     		  noActiveConstraints=false;
     	  }
       }else if (Solution.initialConstraint(0+i*2)==2){
-    	  if (Solution.initialConstraint(1+i*2)==1){
+    	  if (Solution.initialConstraint(N_+i*2)==1){
     		  k2=2;
     		  noActiveConstraints=false;
-		  }else if (Solution.initialConstraint(1+i*2)==2){
+		  }else if (Solution.initialConstraint(N_+i*2)==2){
 			  k2=3;
 			  noActiveConstraints=false;
-		  }else if (Solution.initialConstraint(1+i*2)==0){
+		  }else if (Solution.initialConstraint(N_+i*2)==0){
 			  k1=3;
 			  k2=2;
 			  noActiveConstraints=false;
 		  }
-      }else if (Solution.initialConstraint(1+i*2)==1){
+      }else if (Solution.initialConstraint(N_+i*2)==1){
     	  k1=2;
     	  k2=1;
     	  noActiveConstraints=false;
-      }else if (Solution.initialConstraint(1+i*2)==2){
+      }else if (Solution.initialConstraint(N_+i*2)==2){
     	  k1=0;
     	  k2=3;
     	  noActiveConstraints=false;
@@ -922,6 +955,7 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 	boost_ublas::vector<double> CY(N_);
 	boost_ublas::vector<double> X(N_);
 	boost_ublas::vector<double> Y(N_);
+
 	for(int i=0;i<N_;++i){
 		X(i)=Solution.Solution_vec(i);
 		Y(i)=Solution.Solution_vec(i+N_);
@@ -940,6 +974,7 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 	CY=prod(Robot_->CoM().Dynamics(POSITION).S, IntermedData_->State().CoM.y)+
 	   prod(Robot_->CoM().Dynamics(POSITION).U,Y);
 	//display previewed ZMP
+
 	for(int i=0;i<N_;++i){
 		std::stringstream ssTmp;
 		ssTmp << "TRAJ\t1\t\t0\t1\t1\t\t" << ZX(i) << "\t" << ZY(i) << "\t0\n";
@@ -947,6 +982,7 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 	}
 
 	//display previewed COM
+
 	for(int i=0;i<N_;++i){
 		std::stringstream ssTmp;
 		ssTmp << "TRAJ\t2\t\t1\t0\t0\t\t" << CX(i) << "\t" << CY(i) << "\t0\n";
@@ -958,78 +994,86 @@ void GeneratorVelRef::amelif_preview_display(solution_t & Solution){
 	support_state_t currentSupport = Solution.SupportStates_deq.front();
 	deque<support_state_t>::iterator prwSS_it = Solution.SupportStates_deq.begin();
 
-	unsigned int j = 0;
-	double x,y;
-	convex_hull_t FootFeasibilityEdges(5,5);
-	convex_hull_t COPFeasibilityEdges(4,4);
+
+	unsigned int j = 0,b=0;
+
+	convex_hull_t FootFeasibilityEdges, COPFeasibilityEdges, ConvexHullDS, CurrentCoPHull;
 	unsigned int nbSteps = Solution.SupportStates_deq.back().StepNumber;
+	double Xfoot, Yfoot;
 
 	//display current COP constraint
 	RFI_->set_vertices( COPFeasibilityEdges, *prwSS_it, INEQ_COP );
 	for(int k=0;k<4;++k){
 		  std::stringstream ssTmp;
-		  ssTmp << "BOUND\t-1\t\t0.5\t0.5\t0.5\t\t" <<
+		  ssTmp << "BOUND\t-1\t\t0.1\t0.8\t0.1\t\t" <<
 				  COPFeasibilityEdges.X_vec[k]+currentSupport.X << "\t" <<
 				  COPFeasibilityEdges.Y_vec[k]+currentSupport.Y << "\t0\n";
 		  data.write(ssTmp.str().c_str(),ssTmp.str().size());
+	 }{
+		  std::stringstream ssTmp;
+		  ssTmp << "BOUND\t-1\t\t0.1\t0.8\t0.1\t\t" <<
+				  COPFeasibilityEdges.X_vec[0]+currentSupport.X << "\t" <<
+				  COPFeasibilityEdges.Y_vec[0]+currentSupport.Y << "\t0\n";
+		  data.write(ssTmp.str().c_str(),ssTmp.str().size());
 	 }
 
-	  prwSS_it++;
+	  //display current feet positions
+	  std::stringstream ssTmp;
+	  ssTmp << "POINT\t-1\t\t0.1\t0.8\t0.1\t\t" <<
+			  currentSupport.X << "\t" <<
+			  currentSupport.Y << "\t0\n";
+	  data.write(ssTmp.str().c_str(),ssTmp.str().size());
+	  ++b;
+
+	prwSS_it++;
+
 	for(unsigned int i=0; i<N_; i++)
 	{
 
 	  //display constraints
-	  if (currentSupport.Foot != prwSS_it->Foot){
-		  if (prwSS_it->StepNumber==0){
-			  x=prwSS_it->X;
-			  y=prwSS_it->Y;
-		  }else if (prwSS_it->StepNumber>=nbSteps){
-			  x=Solution.Solution_vec(2*N_+nbSteps-1);
-			  y=Solution.Solution_vec(2*N_+2*nbSteps-1);
-		  }else{
-			  x=Solution.Solution_vec(2*N_+prwSS_it->StepNumber-1);
-			  y=Solution.Solution_vec(2*N_+nbSteps+prwSS_it->StepNumber-1);
-		  }
-		  if (prwSS_it->StepNumber-1>0){
-			  j=prwSS_it->StepNumber-1;
-		  }else{
-			  j=0;
-		  }
-		  if (prwSS_it->StepNumber-1>=nbSteps){
-			  j=nbSteps-1;
-		  }
-		  currentSupport.Foot = prwSS_it->Foot;
+	  if (prwSS_it->StateChanged){
 		  RFI_->set_vertices( COPFeasibilityEdges, *prwSS_it, INEQ_COP );
-
 		  RFI_->set_vertices( FootFeasibilityEdges, *prwSS_it, INEQ_FEET );
+		  if(Solution.SupportStates_deq[0].Phase==DS && prwSS_it->StepNumber==1){
+				Xfoot=Solution.SupportStates_deq[0].X;
+				Yfoot=Solution.SupportStates_deq[0].Y;
+		  }else{
+				Xfoot=Solution.Solution_vec(2*N_+j);
+				Yfoot=Solution.Solution_vec(2*N_+nbSteps+j);
+				j++;
+		  }
+
+
 
 		  //display COP constraints
 		  for(int k=0;k<4;++k){
 			  std::stringstream ssTmp;
-			  ssTmp << "BOUND\t" << j << "\t\t0.5\t0.5\t0.5\t\t" <<
-					  COPFeasibilityEdges.X_vec[k]+x << "\t" <<
-					  COPFeasibilityEdges.Y_vec[k]+y << "\t0\n";
+			  ssTmp << "BOUND\t" << b << "\t\t0.5\t0.5\t0.5\t\t" <<
+					  COPFeasibilityEdges.X_vec[k]+Xfoot << "\t" <<
+					  COPFeasibilityEdges.Y_vec[k]+Yfoot << "\t0\n";
 			  data.write(ssTmp.str().c_str(),ssTmp.str().size());
 		  }
 
 		  //display feet constraints
 		  for(int k=0;k<5;++k){
 			  std::stringstream ssTmp;
-			  ssTmp << "BOUND\t" << j+nbSteps << "\t\t0.5\t0.5\t0.5\t\t" <<
-					  FootFeasibilityEdges.X_vec[k]+x << "\t" <<
-					  FootFeasibilityEdges.Y_vec[k]+y << "\t0\n";
+			  ssTmp << "BOUND\t" << b+nbSteps << "\t\t0.5\t0.5\t0.5\t\t" <<
+					  FootFeasibilityEdges.X_vec[k]+Xfoot << "\t" <<
+					  FootFeasibilityEdges.Y_vec[k]+Yfoot << "\t0\n";
 			  data.write(ssTmp.str().c_str(),ssTmp.str().size());
 		  }
 
 		  //display feet positions
 		  std::stringstream ssTmp;
-		  ssTmp << "POINT\t" << j+nbSteps << "\t\t1\t0\t0\t\t" <<
-				  x << "\t" <<
-				  y << "\t0\n";
+		  ssTmp << "POINT\t" << b+nbSteps << "\t\t1\t0\t0\t\t" <<
+				  Xfoot << "\t" <<
+				  Yfoot << "\t0\n";
 		  data.write(ssTmp.str().c_str(),ssTmp.str().size());
-		  j++;
+		  ++b;
+
 	  }
 	  prwSS_it++;
+
 	}
 	data.close();
 

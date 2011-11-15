@@ -96,6 +96,14 @@ namespace PatternGeneratorJRL
         deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
         deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
 
+    void OnLine(double time,
+        deque<ZMPPosition> & FinalZMPPositions,
+        deque<COMState> & CoMStates,
+        deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+        deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
+        support_state_t & new_current_support);
+
+
 
     /// \name Accessors and mutators
     /// \{
@@ -154,6 +162,16 @@ namespace PatternGeneratorJRL
 
     /// \brief Time at which the problem should be updated
     double UpperTimeLimitToUpdate_;
+    double UpperTimeLimitToFeedback_;
+
+    /// \brief Current time
+    double CurrentTime;
+
+    /// \brief Sampling feedback period
+    double m_SamplingFeedback;
+
+    /// \brief Duration of the first iteration for dynamic matrix
+    double FirstIterationDynamicsDuration_;
 
     /// \brief Security margin for trajectory queues
     double TimeBuffer_;

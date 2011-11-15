@@ -101,12 +101,12 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Pb
     /// \param[in] SupportStates_deq
-    void update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_deq );
+    void update_problem( QPProblem & Pb, const std::deque<support_state_t> & SupportStates_de, double FirstIterationDynamicsDuration );
 
     /// \brief Compute the initial solution vector for warm start
     ///
     /// \param[in] Solution
-    void compute_warm_start( solution_t & Solution );
+    void compute_warm_start( solution_t & Solution, double TimeFactor );
 
     /// \name Accessors
     /// \{
@@ -124,6 +124,7 @@ namespace PatternGeneratorJRL
     { IntermedData_->CoM(CoM); };
     /// \}
     void convert_cop_to_jerk_formulation( solution_t & Solution );
+
 
     void amelif_preview_display(solution_t & Solution);
     //
@@ -198,7 +199,7 @@ namespace PatternGeneratorJRL
     /// \brief Initialize inequality matrices
     ///
     /// \param[out] Inequalities
-    void initialize_matrices( linear_inequality_t & Inequalities);
+    void initialize_matrices( linear_inequality_t & Inequalities, int addedSize=0);
 
     /// \brief Scaled product\f$ weight*M*M \f$
     void compute_term(MAL_MATRIX (&weightMM, double),

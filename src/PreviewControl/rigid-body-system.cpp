@@ -60,7 +60,7 @@ RigidBodySystem::initialize(  )
   OFTG_->InitializeInternalDataStructures();
   OFTG_->SetSingleSupportTime( 0.7 );
   OFTG_->SetDoubleSupportTime( T_ );
-  OFTG_->QPSamplingPeriod( T_ );
+  OFTG_->QPSamplingPeriod( Ta_ );
   OFTG_->NbSamplingsPreviewed( N_ );
   OFTG_->FeetDistance( 0.2 );
   OFTG_->StepHeight( 0.05 );
@@ -99,6 +99,13 @@ RigidBodySystem::initialize(  )
   compute_dyn_cjerk();
 
 }
+
+void
+RigidBodySystem::recompute_dynamic_matrix(  ){
+	compute_dyn_cjerk();
+}
+
+
 
 
 int
@@ -372,8 +379,6 @@ RigidBodySystem::compute_dyn_cjerk()
 }
 
 
-
-
 int
 RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
 {
@@ -384,19 +389,31 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
   Dynamics.UT.clear();
   Dynamics.S.resize(N_,3,false);
   Dynamics.S.clear();
+
   Dynamics.Um1.resize(N_,N_,false);
   Dynamics.Um1.clear();
   Dynamics.Um1T.resize(N_,N_,false);
   Dynamics.Um1T.clear();
+
+
+  double S=FirstIterationDynamicsDuration_;
+  double T=Tm_;
+
+
+
   switch(Dynamics.Type)
   {
   case POSITION:
     for(unsigned int i=0;i<N_;i++)
       {
-        Dynamics.S(i,0) = 1; Dynamics.S(i,1) =(i+1)*T_; Dynamics.S(i,2) = ((i+1)*T_)*((i+1)*T_)/2;
-        for(unsigned int j=0;j<N_;j++)
+        Dynamics.S(i,0) = 1;
+        Dynamics.S(i,1) =i*T + S;
+		Dynamics.S(i,2) = S*S/2 + i*T*S + i*i*T*T/2;
+
+		Dynamics.U(i,0) = Dynamics.UT(0,i) =S*S*S/6 + i*T*S*S/2 + S*(i*i*T*T/2 );
+        for(unsigned int j=1;j<N_;j++)
           if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) =(1+3*(i-j)+3*(i-j)*(i-j))*(T_*T_*T_)/6 ;
+            Dynamics.U(i,j) = Dynamics.UT(j,i) =T*T*T/6 + 3*(i-j)*T*T*T/6 + 3*(i-j)*(i-j)*T*T*T/6;
           else
             Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
       }
@@ -404,10 +421,14 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
   case VELOCITY:
     for(unsigned int i=0;i<N_;i++)
       {
-        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 1.0; Dynamics.S(i,2) = (i+1)*T_;
-        for(unsigned int j=0;j<N_;j++)
+        Dynamics.S(i,0) = 0.0;
+        Dynamics.S(i,1) = 1.0;
+        Dynamics.S(i,2) = i*T + S;
+
+        Dynamics.U(i,0) = Dynamics.UT(0,i) = S*S/2 + i*T*S;
+        for(unsigned int j=1;j<N_;j++)
           if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = (2*(i-j)+1)*T_*T_*0.5 ;
+            Dynamics.U(i,j) = Dynamics.UT(j,i) = T*T/2 + (i-j)*T*T;
           else
             Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
       }
@@ -415,10 +436,14 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
   case ACCELERATION:
     for(unsigned int i=0;i<N_;i++)
       {
-        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 0.0; Dynamics.S(i,2) = 1.0;
-        for(unsigned int j=0;j<N_;j++)
+        Dynamics.S(i,0) = 0.0;
+        Dynamics.S(i,1) = 0.0;
+        Dynamics.S(i,2) = 1.0;
+
+        Dynamics.U(i,0) = Dynamics.UT(0,i) = S;
+        for(unsigned int j=1;j<N_;j++)
           if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = T_;
+            Dynamics.U(i,j) = Dynamics.UT(j,i) = T;
           else
             Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
       }
@@ -426,7 +451,10 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
   case JERK:
     for(unsigned int i=0;i<N_;i++)
       {
-        Dynamics.S(i,0) = 0.0; Dynamics.S(i,1) = 0.0; Dynamics.S(i,2) = 0.0;
+        Dynamics.S(i,0) = 0.0;
+        Dynamics.S(i,1) = 0.0;
+        Dynamics.S(i,2) = 0.0;
+
         for(unsigned int j=0;j<N_;j++)
           if (j==i)
             Dynamics.U(i,j) = Dynamics.UT(j,i) = 1.0;
@@ -435,23 +463,25 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
       }
     break;
   case COP_POSITION:
-    for(int i=0;i<N_;i++)
-      {
-        Dynamics.S(i,0) = 1.0; Dynamics.S(i,1) = (i+1)*T_; Dynamics.S(i,2) = (i+1)*(i+1)*T_*T_*0.5-CoMHeight_/9.81;
-        for(int j=0;j<N_;j++)
-          if (j<=i)
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T_*T_*T_/6.0 - T_*CoMHeight_/9.81;
-          else
-            Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
-      }
+	for(unsigned int i=0;i<N_;i++)
+	  {
+		Dynamics.S(i,0) = 1;
+		Dynamics.S(i,1) =i*T + S;
+		Dynamics.S(i,2) = S*S/2 + i*T*S + i*i*T*T/2-CoMHeight_/9.81;
 
+		Dynamics.U(i,0) = Dynamics.UT(0,i) =S*S*S/6 + i*T*S*S/2 + S*(i*i*T*T/2 - CoMHeight_/9.81);
+		for(unsigned int j=1;j<N_;j++)
+		  if (j<=i)
+			Dynamics.U(i,j) = Dynamics.UT(j,i) =T*T*T/6 + 3*(i-j)*T*T*T/6 + 3*(i-j)*(i-j)*T*T*T/6- T*CoMHeight_/9.81;
+		  else
+			Dynamics.U(i,j) = Dynamics.UT(j,i) = 0.0;
+	  }
 	  invertMatrix(Dynamics.U,Dynamics.Um1);
 	  Dynamics.Um1T=boost::numeric::ublas::trans(Dynamics.Um1);
 
     break;
     //    compute_dyn_cop( 0 );
     break;
-
   }
 
   return 0;

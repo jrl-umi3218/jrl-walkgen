@@ -127,6 +127,11 @@ namespace PatternGeneratorJRL
     inline void SamplingPeriodSim( double T )
     { T_ = T; }
 
+    inline double SamplingPeriodMatrix( ) const
+    { return T_; }
+    inline void SamplingPeriodMatrix( double Tm )
+    { Tm_ = Tm; }
+
     inline double SamplingPeriodAct( ) const
     { return Ta_; }
     inline void SamplingPeriodAct( double Ta )
@@ -154,9 +159,16 @@ namespace PatternGeneratorJRL
 
     std::deque<support_state_t> & SupportTrajectory()
     { return SupportTrajectory_deq_; }
+
+
+    inline double FirstIterationDynamicsDuration() const
+    { return FirstIterationDynamicsDuration_; }
+    inline void FirstIterationDynamicsDuration(double FirstIterationDynamicsDuration)
+    { FirstIterationDynamicsDuration_= FirstIterationDynamicsDuration; }
+
     /// \}
 
-    
+    void recompute_dynamic_matrix(  );
     //
     // Private methods
     //
@@ -271,6 +283,8 @@ namespace PatternGeneratorJRL
 
     /// \brief Sampling period simulation
     double T_;
+    double FirstIterationDynamicsDuration_;
+    double Tm_;
 
     /// \brief Recalculation period
     /// The state is incremented with respect to this parameter

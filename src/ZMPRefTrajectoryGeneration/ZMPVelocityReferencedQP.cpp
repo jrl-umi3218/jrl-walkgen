@@ -59,8 +59,11 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   QP_T_ = 0.1;
   QP_N_ = 16;
   m_SamplingPeriod = 0.005;
+  m_SamplingFeedback = 0.005;
   PerturbationOccured_ = false;
   UpperTimeLimitToUpdate_ = 0.0;
+  UpperTimeLimitToFeedback_ = 0.0;
+  FirstIterationDynamicsDuration_ = QP_T_;
   RobotMass_ = aHS->mass();
   Solution_.useWarmStart=true;
 
@@ -78,13 +81,14 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   // Create and initialize preview of orientations
   OrientPrw_ = new OrientationsPreview( aHS->rootJoint() );
   OrientPrw_->SamplingPeriod( QP_T_ );
+  OrientPrw_-> SimuPeriod(m_SamplingFeedback);
   OrientPrw_->NbSamplingsPreviewed( QP_N_ );
   OrientPrw_->SSLength( SupportFSM_->StepPeriod() );
   COMState CurrentTrunkState;
   OrientPrw_->CurrentTrunkState( CurrentTrunkState );
 
   // Initialize  the 2D LIPM
-  CoM_.SetSimulationControlPeriod( QP_T_ );
+  CoM_.SetSimulationControlPeriod( m_SamplingFeedback );
   CoM_.SetRobotControlPeriod( m_SamplingPeriod );
   CoM_.InitializeSystem();
 
@@ -94,10 +98,12 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   Robot_->LeftFoot().Mass( 0.0 );
   Robot_->RightFoot().Mass( 0.0 );
   Robot_->NbSamplingsPreviewed( QP_N_ );
-  Robot_->SamplingPeriodSim( QP_T_ );
+  Robot_->SamplingPeriodSim( m_SamplingFeedback );
+  Robot_->SamplingPeriodMatrix( QP_T_ );
   Robot_->SamplingPeriodAct( m_SamplingPeriod );
   Robot_->CoMHeight( 0.814 );
   Robot_->multiBody(false);
+  Robot_->FirstIterationDynamicsDuration(FirstIterationDynamicsDuration_);
   Robot_->initialize( );
 
 
@@ -113,7 +119,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 
   VRQPGenerator_->Ponderation( 1, INSTANT_VELOCITY );
   VRQPGenerator_->Ponderation( 10, COP_CENTERING );
-  VRQPGenerator_->Ponderation( 0.00001, JERK_MIN );
+  VRQPGenerator_->Ponderation( 0.001, JERK_MIN );
 
 
   // Register method to handle
@@ -315,11 +321,26 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   // BUILD CONSTANT PART OF THE OBJECTIVE:
   // -------------------------------------
   Problem_.reset();
+
   Problem_.nbInvariantRows(2*QP_N_);
   Problem_.nbInvariantCols(2*QP_N_);
 
-  VRQPGenerator_->build_invariant_part( Problem_);
   return 0;
+}
+
+void
+ZMPVelocityReferencedQP::OnLine(double time,
+    deque<ZMPPosition> & FinalZMPTraj_deq,
+    deque<COMState> & FinalCOMTraj_deq,
+    deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+    deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
+{
+	OnLine(time,
+			FinalZMPTraj_deq,
+			FinalCOMTraj_deq,
+			FinalLeftFootTraj_deq,
+			FinalRightFootTraj_deq,
+			IntermedData_->SupportState());
 }
 
 
@@ -328,7 +349,8 @@ ZMPVelocityReferencedQP::OnLine(double time,
     deque<ZMPPosition> & FinalZMPTraj_deq,
     deque<COMState> & FinalCOMTraj_deq,
     deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-    deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
+    deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+    support_state_t & new_current_support)
 {
 
   // If on-line mode not activated we go out.
@@ -355,8 +377,21 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
   // UPDATE WALKING TRAJECTORIES:
   // ----------------------------
-  if(time + 0.00001 > UpperTimeLimitToUpdate_)
-    {
+  if(time  > UpperTimeLimitToUpdate_+0.00001){
+      // Specify that we are in the ending phase.
+      if (EndingPhase_ == false)
+        {
+          TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
+        }
+      UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
+      CurrentTime = time;
+
+  }
+
+  if(time  >= UpperTimeLimitToFeedback_)
+      {
+
+
 
       static double CurrentCPUTime=0.0, CurrentQLDTime=0.0, CurrentinvariantpartTime=0.0,
     		  CurrentConstraintTime=0.0, CurrentObjTime=0.0, CurrentInterpolTime=0.0, CurrentrefTime=0.0;
@@ -370,35 +405,52 @@ ZMPVelocityReferencedQP::OnLine(double time,
       gettimeofday(&mid11,0);
       // UPDATE INTERNAL DATA:
       // ---------------------
-      Problem_.reset_variant();
+      Problem_.reset();
       Solution_.reset();
-      VRQPGenerator_->CurrentTime( time );
+      VRQPGenerator_->CurrentTime( CurrentTime );
       VelRef_=NewVelRef_;
 
       SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
       if (VelRef_.Local.Yaw==0 && VelRef_.Local.X==0 && VelRef_.Local.Y==0){
 		  VRQPGenerator_->Ponderation( 1, INSTANT_VELOCITY );
 		  VRQPGenerator_->Ponderation( 10, COP_CENTERING );
-		  VRQPGenerator_->Ponderation( 0.00001, JERK_MIN );
+		  VRQPGenerator_->Ponderation( 0.001, JERK_MIN );
       }else{
 		  VRQPGenerator_->Ponderation( 1, INSTANT_VELOCITY );
-		  VRQPGenerator_->Ponderation( 0.001, COP_CENTERING );
-		  VRQPGenerator_->Ponderation( 0.00001, JERK_MIN );
+		  VRQPGenerator_->Ponderation( 0.000001, COP_CENTERING );
+		  VRQPGenerator_->Ponderation( 0.001, JERK_MIN );
       }
-
 
       IntermedData_->Reference( VelRef_ );
       IntermedData_->CoM( CoM_() );
 
+      // Adaptive control of current support state
+      if (new_current_support!=IntermedData_->SupportState()){
+    	  IntermedData_->SupportState(new_current_support);
+    	  UpperTimeLimitToUpdate_=time + QP_T_;
+    	  UpperTimeLimitToFeedback_ = time;
+      }
+
+      // update time limits
+      FirstIterationDynamicsDuration_ = UpperTimeLimitToUpdate_-UpperTimeLimitToFeedback_;
+     	  UpperTimeLimitToFeedback_ = UpperTimeLimitToFeedback_ + m_SamplingFeedback;
+
+
+      // Recompute dynamic matrix according to synchronization with DS phase
+      Robot_->FirstIterationDynamicsDuration(FirstIterationDynamicsDuration_);
+      Robot_->recompute_dynamic_matrix( );
+
+
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
       // ----------------------------------------------------
-      VRQPGenerator_->preview_support_states( time, SupportFSM_,
+      VRQPGenerator_->preview_support_states( CurrentTime, SupportFSM_,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq, Solution_.SupportStates_deq );
-
+      // save the current support state for external use
+      new_current_support=IntermedData_->SupportState();
 
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // ------------------------------------------------------
-      OrientPrw_->preview_orientations( time, VelRef_,
+      OrientPrw_->preview_orientations( CurrentTime, VelRef_,
           SupportFSM_->StepPeriod(),
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
           Solution_ );
@@ -417,23 +469,25 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // BUILD VARIANT PART OF THE OBJECTIVE:
       // ------------------------------------
       gettimeofday(&mid7,0);
-      VRQPGenerator_->update_problem( Problem_, Solution_.SupportStates_deq );
+      VRQPGenerator_->update_problem( Problem_, Solution_.SupportStates_deq, FirstIterationDynamicsDuration_/QP_T_ );
       gettimeofday(&mid8,0);
 
       // BUILD CONSTRAINTS:
       // ------------------
+
       gettimeofday(&mid5,0);
       VRQPGenerator_->build_constraints( Problem_, Solution_);
       gettimeofday(&mid6,0);
       // SOLVE PROBLEM:
       // --------------
       gettimeofday(&mid3,0);
-      VRQPGenerator_->compute_warm_start( Solution_ );
+      VRQPGenerator_->compute_warm_start( Solution_, FirstIterationDynamicsDuration_/QP_T_ );
 
       gettimeofday(&mid4,0);
       gettimeofday(&mid1,0);
       Problem_.solve( LSSOL, Solution_, NONE );
       gettimeofday(&mid2,0);
+
       if(Solution_.Fail>0)
           Problem_.dump( time );
 
@@ -442,11 +496,13 @@ ZMPVelocityReferencedQP::OnLine(double time,
       VRQPGenerator_->amelif_preview_display(Solution_);
 
       gettimeofday(&mid9,0);
+
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
       unsigned currentIndex = FinalCOMTraj_deq.size();
-      FinalCOMTraj_deq.resize( (unsigned)(QP_T_/m_SamplingPeriod)+currentIndex );
-      FinalZMPTraj_deq.resize( (unsigned)(QP_T_/m_SamplingPeriod)+currentIndex );
+      FinalCOMTraj_deq.resize( (unsigned)(m_SamplingFeedback/m_SamplingPeriod)+currentIndex );
+      FinalZMPTraj_deq.resize( (unsigned)(m_SamplingFeedback/m_SamplingPeriod)+currentIndex );
+
       CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
           Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
       CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
@@ -454,24 +510,20 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
       // INTERPOLATE TRUNK ORIENTATION:
       // ------------------------------
-      OrientPrw_->interpolate_trunk_orientation( time, currentIndex,
-          m_SamplingPeriod, Solution_.SupportStates_deq,
+      OrientPrw_->interpolate_trunk_orientation( CurrentTime, currentIndex,
+    		  m_SamplingFeedback, Solution_.SupportStates_deq,
           FinalCOMTraj_deq );
 
 
       // INTERPOLATE THE COMPUTED FOOT POSITIONS:
       // ----------------------------------------
-      Robot_->generate_trajectories( time, Solution_,
+      Robot_->generate_trajectories( CurrentTime, Solution_,
           Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
+
       gettimeofday(&mid10,0);
 
-      // Specify that we are in the ending phase.
-      if (EndingPhase_ == false)
-        {
-          TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
-        }
-      UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
+
 
 
       // Compute CPU consumption time.
@@ -528,7 +580,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       CurrentCPUTime=CurrentQLDTime+CurrentinvariantpartTime+CurrentConstraintTime+CurrentObjTime+CurrentInterpolTime+CurrentrefTime;
       MaxCPUTime=MaxQLDTime+MaxinvariantpartTime+MaxConstraintTime+MaxObjTime+MaxInterpolTime+MaxrefTime;
       ++itt;
-      if (itt==100000){
+      if (itt==10){
     	  CurrentCPUTime/=10;
     	  CurrentQLDTime/=10;
     	  CurrentinvariantpartTime/=10;
@@ -558,6 +610,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       }
 
     }
+
 
 }
 

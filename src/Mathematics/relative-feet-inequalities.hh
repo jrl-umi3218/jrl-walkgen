@@ -85,6 +85,17 @@ namespace PatternGeneratorJRL
     void set_inequalities( convex_hull_t & ConvexHull,
         const support_state_t & Support, ineq_e type);
 
+
+    /// \brief Adapt vertices to the support foot and its orientation
+    ///
+    /// \param[in] SupportState1 Support state of current foot
+    /// \param[in] ConvexHullSS2 Support state of previous foot
+    /// \param[out] ConvexHullDS Vertices of resultant DS convex hull
+    /// \param[in] footDX x feet distance
+    /// \param[in] footDY y feet distance
+    void compute_ds_vertices(const support_state_t & SupportState1, const support_state_t & SupportState2,
+			  convex_hull_t & ConvexHullDS);
+
     /// \brief Compute the linear inequalities \f${\bf A}{\bf x} \geq {\bf b}\f$ associated with the
     /// convex hull specified by a vector of points.
     ///

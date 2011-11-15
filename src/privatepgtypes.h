@@ -282,11 +282,17 @@ namespace PatternGeneratorJRL
     /// \brief (true) -> New single support state
     bool StateChanged;
 
+    /// \brief (true) -> The robot is currently in DS transition phase
+    bool InTransitionPhase;
+
     struct support_state_t & operator = (const support_state_t &aSS);
 
     void reset();
 
     support_state_t();
+
+    bool operator==(const support_state_t & ss) const;
+    bool operator!=(const support_state_t & ss) const;
   };
 
   /// \brief Solution

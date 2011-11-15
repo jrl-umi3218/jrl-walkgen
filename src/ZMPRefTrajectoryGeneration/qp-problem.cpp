@@ -186,6 +186,8 @@ QPProblem::reset()
   D_.fill(0.0);
   DS_.fill(0.0);
   DL_.fill(0.0);
+  XU_.fill(0.0);
+  XL_.fill(0.0);
   NbConstraints_ = 0;
   NbEqConstraints_ = 0;
   NbVariables_ = 0;

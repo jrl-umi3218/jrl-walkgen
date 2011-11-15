@@ -102,6 +102,12 @@ namespace PatternGeneratorJRL
     { return T_; };
     inline void SamplingPeriod( double SamplingPeriod)
     { T_ = SamplingPeriod; };
+    inline double SimuPeriod() const
+    { return Ti_; };
+    inline void SimuPeriod( double SamplingPeriod)
+    { Ti_ = SamplingPeriod; };
+
+
     inline double NbSamplingsPreviewed() const
     { return N_; };
     inline void NbSamplingsPreviewed( double SamplingsPreviewed)
@@ -203,7 +209,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Time between two samplings
     double T_;
-
+    double Ti_;
     /// \brief Rotation sense of the trunks angular velocity and acceleration
     double signRotVelTrunk_, signRotAccTrunk_;
 
