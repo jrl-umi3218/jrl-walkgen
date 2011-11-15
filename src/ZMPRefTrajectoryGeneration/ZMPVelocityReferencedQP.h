@@ -134,6 +134,9 @@ namespace PatternGeneratorJRL
     support_state_t & SupportState()
     { return IntermedData_->SupportState(); }
     
+    support_state_t & NextSupportState()
+    { return IntermedData_->NextSupportState(); }
+    
     inline const int & QP_N(void) const
     { return QP_N_; }
     /// \}
