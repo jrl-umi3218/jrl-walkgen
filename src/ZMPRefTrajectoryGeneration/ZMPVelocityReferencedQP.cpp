@@ -55,7 +55,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFI_(0),Problem_(),Solution_()
 {
   
-  TimeBuffer_ = 0.040;
+  TimeBuffer_ = 0.000;
   QP_T_ = 0.1;
   QP_N_ = 16;
   m_SamplingPeriod = 0.005;
@@ -338,6 +338,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
          FinalLeftFootTraj_deq,
          FinalRightFootTraj_deq,
          false);
+  // TODO: Changing the support state can be done by a mutator, no?
 }
 
 
@@ -415,21 +416,20 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
       // ----------------------------------------------------
       VRQPGenerator_->preview_support_states( CurrentTime_, SupportFSM_,
-          FinalLeftFootTraj_deq, FinalRightFootTraj_deq, Solution_.SupportStates_deq );
+          Solution_.SupportStates_deq );
 
 
       // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
       // ------------------------------------------------------
       OrientPrw_->preview_orientations( CurrentTime_, VelRef_,
           SupportFSM_->StepPeriod(),
-          FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
+          Robot_->LeftFoot().State(),Robot_->RightFoot().State(),
           Solution_ );
 
 
       // UPDATE THE DYNAMICS:
       // --------------------
-      Robot_->update( Solution_.SupportStates_deq,
-          FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
+      Robot_->update( Solution_.SupportStates_deq );
 
 
       // COMPUTE REFERENCE IN THE GLOBAL FRAME:
@@ -466,7 +466,6 @@ ZMPVelocityReferencedQP::OnLine(double time,
       unsigned currentIndex = FinalCOMTraj_deq.size();
       FinalCOMTraj_deq.resize( (unsigned)(m_SamplingFeedback/m_SamplingPeriod)+currentIndex );
       FinalZMPTraj_deq.resize( (unsigned)(m_SamplingFeedback/m_SamplingPeriod)+currentIndex );
-
       CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
           Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
       CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
@@ -475,8 +474,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // INTERPOLATE TRUNK ORIENTATION:
       // ------------------------------
       OrientPrw_->interpolate_trunk_orientation( CurrentTime_, currentIndex,
-                      m_SamplingFeedback, Solution_.SupportStates_deq,
-          FinalCOMTraj_deq );
+          m_SamplingFeedback, Solution_.SupportStates_deq, FinalCOMTraj_deq );
 
 
       // INTERPOLATE THE COMPUTED FOOT POSITIONS:
@@ -484,26 +482,6 @@ ZMPVelocityReferencedQP::OnLine(double time,
       Robot_->generate_trajectories( CurrentTime_, Solution_,
           Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
-
-      // UPDATE INTERNAL DATA:
-      // ---------------------
-      support_state_t & NextSupportState = IntermedData_->NextSupportState();
-      if( Solution_.SupportStates_deq[2].StateChanged == true )
-        {
-          if( Solution_.SupportStates_deq[2].Foot == LEFT )
-            {
-              NextSupportState.X = FinalLeftFootTraj_deq.back().x;
-              NextSupportState.Y = FinalLeftFootTraj_deq.back().y;
-              NextSupportState.Yaw = FinalLeftFootTraj_deq.back().theta*M_PI/180.0;
-            }
-          else
-            {
-              NextSupportState.X = FinalRightFootTraj_deq.back().x;
-              NextSupportState.Y = FinalRightFootTraj_deq.back().y;
-              NextSupportState.Yaw = FinalRightFootTraj_deq.back().theta*M_PI/180.0;
-            }
-        }
-
 
       }
 

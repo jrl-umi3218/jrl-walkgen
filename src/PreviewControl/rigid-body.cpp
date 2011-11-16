@@ -167,6 +167,23 @@ rigid_body_state_t::operator=(const rigid_body_state_s & RB)
 }
 
 
+struct rigid_body_state_s &
+rigid_body_state_t::operator=(const FootAbsolutePosition & RB)
+{
+
+      X[0] = RB.x; X[1] = RB.dx; X[2] = RB.ddx;
+      Y[0] = RB.y; Y[1] = RB.dy; Y[2] = RB.ddy;
+      Z[0] = RB.z; Z[1] = RB.dz; Z[2] = RB.ddz;
+
+      Yaw[0] = RB.theta*M_PI/180.0; Yaw[1] = RB.dtheta*M_PI/180.0; Yaw[2] = RB.ddtheta*M_PI/180.0;
+//      Pitch[0] = RB.Pitch[i];Pitch[1] = RB.Pitch[i];Pitch[2] = RB.Pitch[i];
+//      Roll[0] = RB.Roll[i];Roll[1] = RB.Roll[i];Roll[2] = RB.Roll[i];
+
+  return *this;
+
+}
+
+
 void 
 rigid_body_state_t::reset()
 {

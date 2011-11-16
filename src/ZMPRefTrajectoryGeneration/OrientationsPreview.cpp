@@ -75,8 +75,8 @@ void
 OrientationsPreview::preview_orientations(double Time,
     const reference_t & Ref,
     double StepDuration,
-    const std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
-    const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
+    const rigid_body_state_t & LeftFoot,
+    const rigid_body_state_t & RightFoot,
     solution_t & Solution)
 {
 
@@ -88,10 +88,6 @@ OrientationsPreview::preview_orientations(double Time,
 
   // Verify the acceleration of the hip joint
   verify_acceleration_hip_joint(Ref, CurrentSupport);
-
-  // Current foot position
-  const FootAbsolutePosition & LeftFoot = LeftFootPositions_deq.back();
-  const FootAbsolutePosition & RightFoot = RightFootPositions_deq.back();
 
   bool TrunkVelOK = false;
   bool TrunkAngleOK = false;
@@ -117,9 +113,9 @@ OrientationsPreview::preview_orientations(double Time,
       // -------------------------------
       double CurrentSupportAngle;
       if (CurrentSupport.Foot == LEFT)
-        CurrentSupportAngle = LeftFootPositions_deq[0].theta*M_PI/180.0;
+        CurrentSupportAngle = LeftFoot.Yaw[0];
       else
-        CurrentSupportAngle = RightFootPositions_deq[0].theta*M_PI/180.0;
+        CurrentSupportAngle = RightFoot.Yaw[0];
 
 
       // (Re)Compute the trunk orientation at the end of the acceleration phase:
@@ -164,10 +160,10 @@ OrientationsPreview::preview_orientations(double Time,
         PreviewedSupportFoot = 1.0;
       else
         PreviewedSupportFoot = -1.0;
-      double CurrentLeftFootAngle = LeftFoot.theta*M_PI/180.0;
-      double CurrentRightFootAngle = RightFoot.theta*M_PI/180.0;
-      double CurrentLeftFootVelocity = LeftFoot.dtheta*M_PI/180.0;
-      double CurrentRightFootVelocity = RightFoot.dtheta*M_PI/180.0;
+      double CurrentLeftFootAngle = LeftFoot.Yaw[0];
+      double CurrentRightFootAngle = RightFoot.Yaw[0];
+      double CurrentLeftFootVelocity = LeftFoot.Yaw[1];
+      double CurrentRightFootVelocity = RightFoot.Yaw[1];
 
       // Preview of orientations:
       // ------------------------

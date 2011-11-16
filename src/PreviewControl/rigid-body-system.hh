@@ -67,13 +67,9 @@ namespace PatternGeneratorJRL
     /// \brief Update feet matrices
     ///
     /// \param[in] SupportStates_deq Previewed support states
-    /// \param[in] LeftFootTraj_deq Final foot trajectory (left foot)
-    /// \param[in] RightFootTraj_deq Final foot trajectory (right foot)
     ///
     /// \return 0
-    int update( const std::deque<support_state_t> & SupportStates_deq,
-        const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
-        const std::deque<FootAbsolutePosition> & RightFootTraj_deq );
+    int update( const std::deque<support_state_t> & SupportStates_deq );
 
     /// \brief Initialize dynamics of the body center
     /// Suppose a piecewise constant jerk

@@ -51,6 +51,7 @@ namespace PatternGeneratorJRL
     /// \}
 
     struct rigid_body_state_s & operator=(const rigid_body_state_s &RB);
+    struct rigid_body_state_s & operator=(const FootAbsolutePosition &RB);
 
     void reset();
 

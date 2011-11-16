@@ -38,6 +38,7 @@
 #include <privatepgtypes.h>
 #include <jrl/walkgen/pgtypes.hh>
 #include <abstract-robot-dynamics/joint.hh>
+#include <PreviewControl/rigid-body-system.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -65,14 +66,14 @@ namespace PatternGeneratorJRL
     /// \param[in] Time
     /// \param[in] Ref
     /// \param[in] StepDuration
-    /// \param[in] LeftFootPositions_deq
-    /// \param[in] RightFootPositions_deq
+    /// \param[in] LeftFoot
+    /// \param[in] RightFoot
     /// \param[out] Solution Trunk and Foot orientations
     void preview_orientations(double Time,
         const reference_t & Ref,
         double StepDuration,
-        const std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
-        const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
+        const rigid_body_state_t & LeftFoot,
+        const rigid_body_state_t & RightFoot,
         solution_t & Solution);
 
     /// \brief Interpolate previewed orientation of the trunk

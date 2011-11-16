@@ -134,6 +134,11 @@ namespace PatternGeneratorJRL
     support_state_t & SupportState()
     { return IntermedData_->SupportState(); }
     
+    rigid_body_state_t & LeftFoot()
+    { return Robot_->LeftFoot().State(); }
+    rigid_body_state_t & RightFoot()
+    { return Robot_->RightFoot().State(); }
+
     inline const int & QP_N(void) const
     { return QP_N_; }
     /// \}
