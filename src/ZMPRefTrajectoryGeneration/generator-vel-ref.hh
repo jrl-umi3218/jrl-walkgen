@@ -162,6 +162,11 @@ namespace PatternGeneratorJRL
     void build_constraints_cop( const linear_inequality_t & IneqCoP, unsigned int NbStepsPreviewed,
         QPProblem & Pb );
 
+    /// \brief Compute CoM constraints
+    ///
+    /// \param[out] Pb
+    void build_constraints_com( QPProblem & Pb );
+
     /// \brief Compute feet constraints corresponding to the set of inequalities
     ///
     /// \param[in] IneqFeet

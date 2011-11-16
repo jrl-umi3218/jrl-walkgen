@@ -218,12 +218,75 @@ GeneratorVelRef::compute_global_reference( const solution_t & Solution )
   Ref.Global.X_vec.clear();
   Ref.Global.Y_vec.resize(N_,false);
   Ref.Global.Y_vec.clear();
+
+  reference_t & PosRef = IntermedData_->PosReference();
+
+  PosRef.Global.X_vec.resize(N_,false);
+  PosRef.Global.X_vec.clear();
+  PosRef.Global.Y_vec.resize(N_,false);
+  PosRef.Global.Y_vec.clear();
+
+  reference_t & MinPos = IntermedData_->MinPos();
+
+  MinPos.Global.X_vec.resize(N_,false);
+  MinPos.Global.X_vec.clear();
+  MinPos.Global.Y_vec.resize(N_,false);
+  MinPos.Global.Y_vec.clear();
+
+  reference_t & MeanPos = IntermedData_->MeanPos();
+
+  MeanPos.Global.X_vec.resize(N_,false);
+  MeanPos.Global.X_vec.clear();
+  MeanPos.Global.Y_vec.resize(N_,false);
+  MeanPos.Global.Y_vec.clear();
+
+  reference_t & MaxPos = IntermedData_->MaxPos();
+
+  MaxPos.Global.X_vec.resize(N_,false);
+  MaxPos.Global.X_vec.clear();
+  MaxPos.Global.Y_vec.resize(N_,false);
+  MaxPos.Global.Y_vec.clear();
+  
   double YawTrunk;
+  
+  #define SAMPLING_TIME 0
+  double dx = SAMPLING_TIME * Ref.Local.X;
+  double dy = SAMPLING_TIME * Ref.Local.Y;
+  
+  bool vel_x = (std::abs(Ref.Local.X) > 0.01);
+  bool vel_y = (std::abs(Ref.Local.Y) > 0.01);
+  
   for( unsigned i=0;i<N_;i++ )
     {
       YawTrunk = Solution.TrunkOrientations_deq[i];
       Ref.Global.X_vec(i) = Ref.Local.X*cos(YawTrunk)-Ref.Local.Y*sin(YawTrunk);
       Ref.Global.Y_vec(i) = Ref.Local.Y*cos(YawTrunk)+Ref.Local.X*sin(YawTrunk);
+      
+      PosRef.Global.X_vec(i) = PosRef.Local.X*cos(YawTrunk)-PosRef.Local.Y*sin(YawTrunk);
+      PosRef.Global.Y_vec(i) = PosRef.Local.Y*cos(YawTrunk)+PosRef.Local.X*sin(YawTrunk);
+      MinPos.Global.X_vec(i) = MinPos.Local.X*cos(YawTrunk)-MinPos.Local.Y*sin(YawTrunk);
+      MinPos.Global.Y_vec(i) = MinPos.Local.Y*cos(YawTrunk)+MinPos.Local.X*sin(YawTrunk);
+      MeanPos.Global.X_vec(i) = MeanPos.Local.X*cos(YawTrunk)-MeanPos.Local.Y*sin(YawTrunk);
+      MeanPos.Global.Y_vec(i) = MeanPos.Local.Y*cos(YawTrunk)+MeanPos.Local.X*sin(YawTrunk);
+      MaxPos.Global.X_vec(i) = MaxPos.Local.X*cos(YawTrunk)-MaxPos.Local.Y*sin(YawTrunk);
+      MaxPos.Global.Y_vec(i) = MaxPos.Local.Y*cos(YawTrunk)+MaxPos.Local.X*sin(YawTrunk);
+      
+      
+      if(vel_x)
+      {
+	PosRef.Local.X += dx;
+	MinPos.Local.X += dx;
+	MeanPos.Local.X += dx;
+	MaxPos.Local.X += dx;
+      }
+      if(vel_y)
+      {
+	PosRef.Local.Y += dy;
+	MinPos.Local.Y += dy;
+	MeanPos.Local.Y += dy;
+	MaxPos.Local.Y += dy;
+      }
+      
     }
 
 }
@@ -447,6 +510,50 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
 
 }
 
+void
+GeneratorVelRef::build_constraints_com(QPProblem & Pb)
+{
+  
+  unsigned int NbConstraints = Pb.NbConstraints();
+  
+  const linear_dynamics_t & PosDynamics = Robot_->CoM().Dynamics( POSITION );
+
+  // +Up
+  // -Up
+  Pb.add_term_to(   MATRIX_DU, PosDynamics.U, NbConstraints, 0           );
+  Pb.add_term_to(   MATRIX_DU, PosDynamics.U, NbConstraints, N_          );
+  Pb.add_term_to(   MATRIX_DU,-PosDynamics.U, NbConstraints, 0           );
+  Pb.add_term_to(   MATRIX_DU,-PosDynamics.U, NbConstraints, N_          );
+
+  //constant part
+  // -minPos
+  // +maxPos
+  Pb.add_term_to( VECTOR_DS, -IntermedData_->MinPos().Global.X_vec, NbConstraints );
+  Pb.add_term_to( VECTOR_DS, -IntermedData_->MinPos().Global.Y_vec, NbConstraints );
+  Pb.add_term_to( VECTOR_DS,  IntermedData_->MaxPos().Global.X_vec, NbConstraints );
+  Pb.add_term_to( VECTOR_DS,  IntermedData_->MaxPos().Global.Y_vec, NbConstraints );
+  
+  //ref part
+  // -c_ref
+  // +c_ref
+  Pb.add_term_to( VECTOR_DS, -IntermedData_->State().PosRef.Global.X_vec , NbConstraints );
+  Pb.add_term_to( VECTOR_DS, -IntermedData_->State().PosRef.Global.Y_vec , NbConstraints );
+  Pb.add_term_to( VECTOR_DS,  IntermedData_->State().PosRef.Global.X_vec , NbConstraints );
+  Pb.add_term_to( VECTOR_DS,  IntermedData_->State().PosRef.Global.Y_vec , NbConstraints );
+
+  //  S_p*x
+  // -S_p*x
+  compute_term	( MV_, 1.0, PosDynamics.S,IntermedData_->State().CoM.x      );
+  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                 );
+  MV_ *= -1;
+  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                 );
+  compute_term	( MV_, 1.0, PosDynamics.S,IntermedData_->State().CoM.y      );
+  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                 );
+  MV_ *= -1;
+  Pb.add_term_to( VECTOR_DS, MV_,  NbConstraints                 );
+
+}
+
 
 void
 GeneratorVelRef::build_constraints_feet(const linear_inequality_t & IneqFeet,
@@ -574,6 +681,9 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution 
   build_inequalities_feet( IneqFeet, Solution.SupportStates_deq );
   build_constraints_feet( IneqFeet, IntermedData_->State(), nbStepsPreviewed, Pb );
 
+  //CoM constraints
+  build_constraints_com( Pb );
+
   // Polyhedric constraints:
   // -----------------------
 //  linear_inequality_t & IneqCoM = IntermedData_->Inequalities( INEQ_COM );
@@ -610,6 +720,13 @@ GeneratorVelRef::build_invariant_part( QPProblem & Pb )
   compute_term  ( MM_, COPCent.weight, Robot_->DynamicsCoPJerk().UT, Robot_->DynamicsCoPJerk().U        );
   Pb.add_term_to( MATRIX_Q, MM_, 0, 0                                                                   );
   Pb.add_term_to( MATRIX_Q, MM_, N_, N_                                                                 );
+  
+  // +a*U'*U
+  const IntermedQPMat::objective_variant_t & Pos = IntermedData_->Objective( COM_POSITION );
+  const linear_dynamics_t & PosDynamics = CoM.Dynamics( POSITION );
+  compute_term	( MM_, Pos.weight, PosDynamics.UT, PosDynamics.U	);
+  Pb.add_term_to( MATRIX_Q, MM_, 0,  0   	           		);
+  Pb.add_term_to( MATRIX_Q, MM_, N_, N_   	         		);
 
 }
 
@@ -670,6 +787,26 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
   Pb.add_term_to( VECTOR_D, MV_, 2*N_                       );
   compute_term  ( MV_, COPCent.weight, State.VT, State.VcY  );
   Pb.add_term_to( VECTOR_D, MV_, 2*N_+nbStepsPreviewed      );
+  
+  // Position terms
+  const IntermedQPMat::objective_variant_t & Position = IntermedData_->Objective( COM_POSITION );
+  const linear_dynamics_t & PosDynamics = CoM.Dynamics( POSITION );
+  // Linear part
+  // +a*U'*S*x
+  compute_term	( MV_, Position.weight, PosDynamics.UT, PosDynamics.S, State.CoM.x    );
+  Pb.add_term_to( VECTOR_D, MV_, 0   		                   		      );
+  compute_term	( MV_, Position.weight, PosDynamics.UT, PosDynamics.S, State.CoM.y    );
+  Pb.add_term_to( VECTOR_D, MV_, N_     	                            	      );
+  // -a*U'*ref
+  compute_term	( MV_, -Position.weight, PosDynamics.UT, State.PosRef.Global.X_vec        );
+  Pb.add_term_to( VECTOR_D, MV_, 0      	                           		  );
+  compute_term	( MV_, -Position.weight, PosDynamics.UT, State.PosRef.Global.Y_vec        );
+  Pb.add_term_to( VECTOR_D, MV_, N_       		                           	  );
+  // -a*U'*Amean
+  compute_term	( MV_, -Position.weight, PosDynamics.UT, State.MeanPos.Global.X_vec       );
+  Pb.add_term_to( VECTOR_D, MV_, 0       	                          		  );
+  compute_term	( MV_, -Position.weight, PosDynamics.UT, State.MeanPos.Global.Y_vec       );
+  Pb.add_term_to( VECTOR_D, MV_, N_			                                  );
 
 }
 
