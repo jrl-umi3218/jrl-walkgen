@@ -238,6 +238,21 @@ namespace PatternGeneratorJRL
 			    std::vector<int> &IndexInVRML,
 			    std::vector<int> &IndexinConfiguration);
 
+    /*! Map shoulders and wrist 
+     \param[in] aHand: The hand to be used for extraction of data.
+     \param[in] ActuatedJoints: The vector of actuated joints.
+     \param[out] IndexesInVRML: The kinematic chain from the shoulder
+     to the hand given with the VRML indexes.
+     \param[out] IndexesInConfiguration: The kinematic chain
+     from the shoulder given with the depth-first ordering.
+     \param[out] associateShoulder: The shoulder extracted from
+     the kinematic chain. 
+    */
+    void InitializeMapsForAHand(CjrlHand * aHand,
+				std::vector<CjrlJoint *> &ActuatedJoints,
+				vector<int> & IndexesInVRML,
+				vector<int> & IndexesInConfiguration,
+				CjrlJoint * & associateShoulder);
     /* Register methods. */
     void RegisterMethods();
 
