@@ -232,7 +232,7 @@ namespace PatternGeneratorJRL
 
   protected:
     
-    /*! Initialization of internal maps */
+    /*! \brief Initialization of internal maps of indexes */
     void InitializationMaps(std::vector<CjrlJoint *> &FromRootToFoot,
 			    std::vector<CjrlJoint *> &ActuatedJoints,
 			    std::vector<int> &IndexInVRML,
@@ -253,6 +253,10 @@ namespace PatternGeneratorJRL
 				vector<int> & IndexesInVRML,
 				vector<int> & IndexesInConfiguration,
 				CjrlJoint * & associateShoulder);
+
+    /*! Create the map of indexes for the shoulders and wrist */
+    void InitializeMapForChest(std::vector<CjrlJoint *> &ActuatedJoints);
+
     /* Register methods. */
     void RegisterMethods();
 
