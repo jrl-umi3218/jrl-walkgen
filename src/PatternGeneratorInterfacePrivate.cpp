@@ -193,7 +193,7 @@ namespace PatternGeneratorJRL {
        ":setMeanPos",
        ":setMaxPos"};
 
-    for(int i=0;i<15;i++)
+    for(int i=0;i<19;i++)
       {
 	if (!SimplePlugin::RegisterMethod(aMethodName[i]))
 	  {
