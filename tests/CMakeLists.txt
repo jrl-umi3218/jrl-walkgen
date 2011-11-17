@@ -112,6 +112,8 @@ ADD_TEST(TestHerdt2010 TestHerdt2010
 # Test Kajita 2003 #
 ####################
 IF(HRP2_DYNAMICS_FOUND)
+  IF(HRP2_14_FOUND)
+
   MESSAGE(STATUS "hrp2-dynamics taken into account")
   CONFIG_FILES_CMAKE(TestKajita2003StraightWalkingTestFGPI.datref)
   CONFIG_FILES_CMAKE(TestKajita2003CircleTestFGPI.datref)
@@ -143,7 +145,7 @@ IF(HRP2_DYNAMICS_FOUND)
 
   ADD_TEST(TestKajita2003 TestKajita2003
     ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec} ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
-
+  ENDIF(HRP2_14_FOUND)
 ENDIF(HRP2_DYNAMICS_FOUND)
 
 #########################
@@ -151,6 +153,8 @@ ENDIF(HRP2_DYNAMICS_FOUND)
 #########################
 
 IF(HRP2_DYNAMICS_FOUND)
+  IF(HRP2_14_FOUND)
+
   MESSAGE(STATUS "hrp2-dynamics taken into account")
   ADD_EXECUTABLE(ReadDataForNovela
     ../src/portability/gettimeofday.cc
@@ -175,9 +179,9 @@ IF(HRP2_DYNAMICS_FOUND)
   PKG_CONFIG_USE_DEPENDENCY(ReadDataForNovela hrp2-dynamics)
   ADD_DEPENDENCIES(ReadDataForNovela ${PROJECT_NAME})
 
-  ADD_TEST(ReadDataForNovela
-    ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec} ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
-
+#  ADD_TEST(ReadDataForNovela
+#    ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec} ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
+  ENDIF(HRP2_14_FOUND)
 ENDIF(HRP2_DYNAMICS_FOUND)
 
 #####################
