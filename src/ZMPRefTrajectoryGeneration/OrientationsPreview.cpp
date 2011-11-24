@@ -37,19 +37,31 @@ using namespace std;
 
 const double OrientationsPreview::EPS_ = 0.00000001;
 
-OrientationsPreview::OrientationsPreview( CjrlJoint *aRootJoint)
+OrientationsPreview::OrientationsPreview( CjrlHumanoidDynamicRobot *aHS )
 {
+  //get the waist joint
+  const CjrlJoint * waistJoint = aHS->waist();
 
-  lLimitLeftHipYaw_ = aRootJoint->childJoint(1)->lowerBound(0);//-30.0/180.0*M_PI;
-  uLimitLeftHipYaw_  = aRootJoint->childJoint(1)->upperBound(0);//45.0/180.0*M_PI;
+  // the hip yaw is *supposed to* be the first joint in the chain between the waist and the foot
+  const CjrlJoint * leftFootAnkle = aHS->leftFoot()->associatedAnkle();
+  const std::vector<CjrlJoint*> waistToLeftFoot = aHS->jointsBetween(*waistJoint, *leftFootAnkle);
+  const CjrlJoint * leftHipYaw = waistToLeftFoot[1];
+
+  lLimitLeftHipYaw_ = leftHipYaw->lowerBound(0);//-30.0/180.0*M_PI;
+  uLimitLeftHipYaw_ = leftHipYaw->upperBound(0);//45.0/180.0*M_PI;
   if (lLimitLeftHipYaw_==  uLimitLeftHipYaw_)
     {
       lLimitLeftHipYaw_ = -30.0/180.0*M_PI;
       uLimitLeftHipYaw_ = 45.0/180.0*M_PI;
     }
 
-  lLimitRightHipYaw_ = aRootJoint->childJoint(0)->lowerBound(0);//-45.0/180.0*M_PI;
-  uLimitRightHipYaw_ = aRootJoint->childJoint(0)->upperBound(0);//30.0/180.0*M_PI;
+  // Same thing for the right foot
+  const CjrlJoint * rightFootAnkle = aHS->rightFoot()->associatedAnkle();
+  const std::vector<CjrlJoint*> waistToRightFoot = aHS->jointsBetween(*waistJoint, *rightFootAnkle);
+  const CjrlJoint * rightHipYaw = waistToRightFoot[1];
+
+  lLimitRightHipYaw_ = rightHipYaw->lowerBound(0);//-45.0/180.0*M_PI;
+  uLimitRightHipYaw_ = rightHipYaw->upperBound(0);//30.0/180.0*M_PI;
   if (lLimitRightHipYaw_==  uLimitRightHipYaw_)
     {
       lLimitRightHipYaw_ = -30.0/180.0*M_PI;
@@ -57,10 +69,16 @@ OrientationsPreview::OrientationsPreview( CjrlJoint *aRootJoint)
     }
 
 
-  uvLimitFoot_ = fabs(aRootJoint->childJoint(0)->upperVelocityBound(0));
+  //Velocity limit
+  uvLimitFoot_ = fabs(rightHipYaw->upperVelocityBound(0));
+  if (rightHipYaw->lowerVelocityBound(0) == rightHipYaw->upperVelocityBound(0))
+    {
+	  uvLimitFoot_ = 3.54108;
+    }
 
   //Acceleration limit not given by HRP2JRLmain.wrl
   uaLimitHipYaw_ = 0.1;
+
   //Maximal cross angle between the feet
   uLimitFeet_ = 5.0/180.0*M_PI;
 }
