@@ -51,7 +51,7 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors
     /// \{
-    OrientationsPreview( CjrlHumanoidDynamicRobot *aHS );
+    OrientationsPreview( const CjrlHumanoidDynamicRobot *aHS );
     ~OrientationsPreview();
     /// \}
 

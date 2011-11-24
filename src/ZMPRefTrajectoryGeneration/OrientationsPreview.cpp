@@ -37,7 +37,7 @@ using namespace std;
 
 const double OrientationsPreview::EPS_ = 0.00000001;
 
-OrientationsPreview::OrientationsPreview( CjrlHumanoidDynamicRobot *aHS )
+OrientationsPreview::OrientationsPreview( const CjrlHumanoidDynamicRobot *aHS )
 {
   //get the waist joint
   const CjrlJoint * waistJoint = aHS->waist();
