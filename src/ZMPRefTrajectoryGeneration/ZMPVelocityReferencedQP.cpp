@@ -114,11 +114,15 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_->Ponderation( 0.00001, JERK_MIN );
 
   // Register method to handle
-  const unsigned int NbMethods = 3;
+  const unsigned int NbMethods = 6;
   string aMethodName[NbMethods] =
       {":previewcontroltime",
           ":numberstepsbeforestop",
-          ":stoppg"};
+          ":stoppg",
+          ":stepperiod",
+          ":dsperiod",
+          ":dsssperiod"
+      };
 
   for(unsigned int i=0;i<NbMethods;i++)
     {
@@ -200,6 +204,26 @@ ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &st
   if (Method==":stoppg")
     {
       EndingPhase_ = true;
+    }
+
+  // access to the FSM
+  if (Method==":stepperiod")
+    {
+	  double val;
+	  strm >> val;
+	  SupportFSM_->StepPeriod( val );
+    }
+  if (Method==":dsperiod")
+    {
+	  double val;
+	  strm >> val;
+	  SupportFSM_->DSPeriod( val );
+    }
+  if (Method==":dsssperiod")
+    {
+	  double val;
+	  strm >> val;
+	  SupportFSM_->DSSSPeriod( val );
     }
 
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
