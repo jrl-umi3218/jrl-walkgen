@@ -51,9 +51,9 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 
-#include <Mathematics/Polynome.h>
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
-#include <PreviewControl/PreviewControl.h>
+#include <Mathematics/Polynome.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
+#include <PreviewControl/PreviewControl.hh>
 
 
 

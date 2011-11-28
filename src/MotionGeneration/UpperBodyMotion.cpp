@@ -26,7 +26,7 @@
 /*! This object generate all the values for the upperbody motion */
 #include <iostream>
 #include <fstream>
-#include <MotionGeneration/UpperBodyMotion.h>
+#include <MotionGeneration/UpperBodyMotion.hh>
 
 using namespace::PatternGeneratorJRL;
 

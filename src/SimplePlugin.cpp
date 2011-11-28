@@ -27,8 +27,8 @@
    Pattern Generator Interface.
 */
 
-#include <SimplePlugin.h>
-#include <SimplePluginManager.h>
+#include <SimplePlugin.hh>
+#include <SimplePluginManager.hh>
 
 using namespace std;
 using namespace PatternGeneratorJRL;

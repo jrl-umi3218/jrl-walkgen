@@ -31,8 +31,8 @@
 #include <fstream>
 using namespace std;
 
-#include <Debug.h>
-#include <GlobalStrategyManagers/DoubleStagePreviewControlStrategy.h>
+#include <Debug.hh>
+#include <GlobalStrategyManagers/DoubleStagePreviewControlStrategy.hh>
 
 using namespace PatternGeneratorJRL;
 

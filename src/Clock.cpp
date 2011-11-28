@@ -36,7 +36,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <Clock.h>
+#include <Clock.hh>
 
 using namespace PatternGeneratorJRL;
 

@@ -71,5 +71,5 @@ namespace PatternGeneratorJRL
       { return m_SimplePluginManager; } 
   };
 }
-#include <SimplePluginManager.h>
+#include <SimplePluginManager.hh>
 #endif /* _PGI_SIMPLE_PLUGIN_H_ */

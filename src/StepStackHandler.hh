@@ -36,7 +36,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 
-#include <SimplePlugin.h>
+#include <SimplePlugin.hh>
 #include <jrl/walkgen/pgtypes.hh>
 
 namespace PatternGeneratorJRL
@@ -212,5 +212,5 @@ namespace PatternGeneratorJRL
   };
 
 }
-#include <MotionGeneration/StepOverPlanner.h>
+#include <MotionGeneration/StepOverPlanner.hh>
 #endif /* _FOOT_PRINT_H_*/

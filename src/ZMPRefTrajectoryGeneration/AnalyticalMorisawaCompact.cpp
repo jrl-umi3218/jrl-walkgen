@@ -31,9 +31,9 @@
    ICRA 2007, 3989--39994
 */
 
-#include <Debug.h>
+#include <Debug.hh>
 #include <fstream>
-#include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.h>
+#include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.hh>
 #include <iomanip> 
 
 typedef double doublereal;

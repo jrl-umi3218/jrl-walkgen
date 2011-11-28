@@ -36,7 +36,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 
-#include <Mathematics/Polynome.h>
+#include <Mathematics/Polynome.hh>
 
 
 

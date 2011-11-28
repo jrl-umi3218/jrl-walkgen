@@ -41,28 +41,28 @@
 
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 
-#include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
-#include <PreviewControl/PreviewControl.h>
+#include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.hh>
+#include <PreviewControl/PreviewControl.hh>
 
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
-#include <ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.h>
-#include <ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.h>
-#include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.h>
-#include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.h>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh>
+#include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.hh>
 
-#include <MotionGeneration/ComAndFootRealizationByGeometry.h>
-#include <MotionGeneration/GenerateMotionFromKineoWorks.h>
-#include <MotionGeneration/StepOverPlanner.h>
+#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
+#include <MotionGeneration/GenerateMotionFromKineoWorks.hh>
+#include <MotionGeneration/StepOverPlanner.hh>
 
-#include <FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.h>
+#include <FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.hh>
 
-#include <StepStackHandler.h>
+#include <StepStackHandler.hh>
 
-#include <SimplePluginManager.h>
-#include <SimplePlugin.h>
+#include <SimplePluginManager.hh>
+#include <SimplePlugin.hh>
 
-#include <GlobalStrategyManagers/DoubleStagePreviewControlStrategy.h>
-#include <GlobalStrategyManagers/CoMAndFootOnlyStrategy.h>
+#include <GlobalStrategyManagers/DoubleStagePreviewControlStrategy.hh>
+#include <GlobalStrategyManagers/CoMAndFootOnlyStrategy.hh>
 
 namespace PatternGeneratorJRL
 {

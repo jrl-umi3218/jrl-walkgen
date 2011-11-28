@@ -27,8 +27,8 @@
 #include <iostream>
 #include <iomanip>
 
-#include "Debug.h"
-#include "FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.h"
+#include "Debug.hh"
+#include "FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.hh"
 
 using namespace PatternGeneratorJRL;
 

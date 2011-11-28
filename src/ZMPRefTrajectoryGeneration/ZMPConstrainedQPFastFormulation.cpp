@@ -37,10 +37,10 @@
 #include <iostream>
 #include <fstream>
 
-#include <Mathematics/qld.h>
-#include <ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.h>
+#include <Mathematics/qld.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.hh>
 
-#include <Debug.h>
+#include <Debug.hh>
 using namespace std;
 using namespace PatternGeneratorJRL;
 

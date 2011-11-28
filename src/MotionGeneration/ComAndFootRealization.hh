@@ -31,8 +31,8 @@
 
 #include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 
-#include <SimplePlugin.h>
-#include <StepStackHandler.h>
+#include <SimplePlugin.hh>
+#include <StepStackHandler.hh>
 
 
 namespace PatternGeneratorJRL

@@ -27,8 +27,8 @@
 #include <set>
 #include <math.h>
 
-#include <Mathematics/ConvexHull.h>
-#include <Debug.h>
+#include <Mathematics/ConvexHull.hh>
+#include <Debug.hh>
 
 using namespace std;
 

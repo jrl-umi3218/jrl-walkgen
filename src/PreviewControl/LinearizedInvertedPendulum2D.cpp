@@ -31,8 +31,8 @@
 #include <iostream>
 #include <fstream>
 
-#include <PreviewControl/LinearizedInvertedPendulum2D.h>
-#include <Debug.h>
+#include <PreviewControl/LinearizedInvertedPendulum2D.hh>
+#include <Debug.hh>
 
 using namespace PatternGeneratorJRL;
 using namespace std;

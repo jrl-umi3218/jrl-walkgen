@@ -48,12 +48,12 @@ using namespace::std;
 #include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 
 /*! Framework includes */
-#include <Mathematics/PolynomeFoot.h>
-#include <Mathematics/ConvexHull.h>
+#include <Mathematics/PolynomeFoot.hh>
+#include <Mathematics/ConvexHull.hh>
 #include <jrl/walkgen/pgtypes.hh>
-#include <PreviewControl/PreviewControl.h>
-#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
-#include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
+#include <PreviewControl/PreviewControl.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh>
+#include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -328,5 +328,5 @@ namespace PatternGeneratorJRL
 
    };
 }
-#include <PreviewControl/PreviewControl.h>
+#include <PreviewControl/PreviewControl.hh>
 #endif /* _FOOT_PRINT_H_*/

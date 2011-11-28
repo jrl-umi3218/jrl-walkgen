@@ -30,11 +30,11 @@
 
 
 
-#include <PreviewControl/LinearizedInvertedPendulum2D.h>
-#include <Mathematics/FootConstraintsAsLinearSystem.h>
-#include <Mathematics/OptCholesky.h>
-#include <Mathematics/PLDPSolver.h>
-#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
+#include <PreviewControl/LinearizedInvertedPendulum2D.hh>
+#include <Mathematics/FootConstraintsAsLinearSystem.hh>
+#include <Mathematics/OptCholesky.hh>
+#include <Mathematics/PLDPSolver.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -363,5 +363,5 @@ namespace PatternGeneratorJRL
   };
 }
 
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
 #endif /* _ZMPQP_WITH_CONSTRAINT_H_ */

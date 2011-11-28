@@ -33,14 +33,14 @@
 
 
 
-#include <PreviewControl/LinearizedInvertedPendulum2D.h>
-#include <Mathematics/FootConstraintsAsLinearSystemForVelRef.h>
-#include <Mathematics/OptCholesky.h>
-#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
-#include <Mathematics/PLDPSolverHerdt.h>
-#include <PreviewControl/SupportFSM.h>
-#include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
-#include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
+#include <PreviewControl/LinearizedInvertedPendulum2D.hh>
+#include <Mathematics/FootConstraintsAsLinearSystemForVelRef.hh>
+#include <Mathematics/OptCholesky.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh>
+#include <Mathematics/PLDPSolverHerdt.hh>
+#include <PreviewControl/SupportFSM.hh>
+#include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.hh>
+#include <ZMPRefTrajectoryGeneration/OrientationsPreview.hh>
 #include <ZMPRefTrajectoryGeneration/problem-vel-ref.hh>
 
 namespace PatternGeneratorJRL
@@ -411,5 +411,5 @@ namespace PatternGeneratorJRL
   };
 }
 
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
 #endif /* _ZMPQP_WITH_CONSTRAINT_H_ */

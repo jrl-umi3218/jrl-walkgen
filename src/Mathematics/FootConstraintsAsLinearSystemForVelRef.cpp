@@ -31,12 +31,12 @@
 #include <iostream>
 #include <fstream>
 
-#include <Mathematics/FootConstraintsAsLinearSystemForVelRef.h>
+#include <Mathematics/FootConstraintsAsLinearSystemForVelRef.hh>
 
 using namespace std;
 using namespace PatternGeneratorJRL;
 
-#include <Debug.h>
+#include <Debug.hh>
 
 
 

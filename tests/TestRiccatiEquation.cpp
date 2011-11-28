@@ -27,7 +27,7 @@
 
 #include <iostream>
 #include <fstream>
-#include "PreviewControl/OptimalControllerSolver.h"
+#include "PreviewControl/OptimalControllerSolver.hh"
 
 using namespace std;
 

@@ -32,8 +32,8 @@
 
 /* Walking pattern generation related inclusions */
 
-#include <FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.h>
-#include <Mathematics/PolynomeFoot.h>
+#include <FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.hh>
+#include <Mathematics/PolynomeFoot.hh>
 
 namespace PatternGeneratorJRL
 {

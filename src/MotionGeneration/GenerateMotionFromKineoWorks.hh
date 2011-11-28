@@ -37,8 +37,8 @@
 #include <vector>
 
 
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
-#include <PreviewControl/PreviewControl.h>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
+#include <PreviewControl/PreviewControl.hh>
 
 namespace PatternGeneratorJRL
 {

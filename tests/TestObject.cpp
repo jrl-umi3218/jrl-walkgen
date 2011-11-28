@@ -26,8 +26,8 @@
  */
 
 #include <fstream>
-#include "Debug.h"
-#include "TestObject.h"
+#include "Debug.hh"
+#include "TestObject.hh"
 
 using namespace std;
 

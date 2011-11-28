@@ -35,10 +35,10 @@
 #include <iostream>
 #include <fstream>
 
-#include <Mathematics/qld.h>
-#include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.h>
+#include <Mathematics/qld.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh>
 
-#include <Debug.h>
+#include <Debug.hh>
 using namespace std;
 using namespace PatternGeneratorJRL;
 

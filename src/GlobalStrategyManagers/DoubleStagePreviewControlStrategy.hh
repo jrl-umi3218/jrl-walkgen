@@ -27,9 +27,9 @@
   It implements Kajita's algorithm presented in \ref Kajita2003 */
 
 
-#include <SimplePlugin.h>
-#include <GlobalStrategyManagers/GlobalStrategyManager.h>
-#include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
+#include <SimplePlugin.hh>
+#include <GlobalStrategyManagers/GlobalStrategyManager.hh>
+#include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.hh>
 
 #ifndef _DOUBLE_STAGE_PREVIEW_CONTROL_STRATEGY_H_
 #define _DOUBLE_STAGE_PREVIEW_CONTROL_STRATEGY_H_

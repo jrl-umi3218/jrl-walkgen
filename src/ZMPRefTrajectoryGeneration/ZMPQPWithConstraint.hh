@@ -30,8 +30,8 @@
 #define _ZMPQP_WITH_CONSTRAINT_H_
 
 
-#include <Mathematics/ConvexHull.h>
-#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
+#include <Mathematics/ConvexHull.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -229,5 +229,5 @@ namespace PatternGeneratorJRL
   };
 }
 
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
 #endif /* _ZMPQP_WITH_CONSTRAINT_H_ */

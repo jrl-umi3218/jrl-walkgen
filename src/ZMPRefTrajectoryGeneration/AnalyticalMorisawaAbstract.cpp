@@ -53,7 +53,7 @@
 #define ODEBUG6(x,y)
 
 #include <fstream>
-#include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.h>
+#include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.hh>
 
 typedef double doublereal;
 typedef int integer;

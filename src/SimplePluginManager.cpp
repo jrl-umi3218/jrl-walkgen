@@ -32,9 +32,9 @@
 #include <iostream>
 
 using namespace std;
-#include <SimplePlugin.h>
-#include <SimplePluginManager.h>
-#include <Debug.h>
+#include <SimplePlugin.hh>
+#include <SimplePluginManager.hh>
+#include <Debug.hh>
 #include <assert.h>
 
 

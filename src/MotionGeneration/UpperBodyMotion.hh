@@ -39,7 +39,7 @@
 using namespace::std;
 
 
-#include <Mathematics/PolynomeFoot.h>
+#include <Mathematics/PolynomeFoot.hh>
 
 
 

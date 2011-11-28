@@ -25,8 +25,8 @@
 /* \file This file tests A. Herdt's walking algorithm for
  * automatic foot placement giving an instantaneous CoM velocity reference.
  */
-#include "CommonTools.h"
-#include "TestObject.h"
+#include "CommonTools.hh"
+#include "TestObject.hh"
 
 using namespace::PatternGeneratorJRL;
 using namespace::PatternGeneratorJRL::TestSuite;

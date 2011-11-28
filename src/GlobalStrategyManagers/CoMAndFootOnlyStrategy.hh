@@ -26,11 +26,11 @@
   only foot, ZMP reference and CoM trajectories position every 5 ms.
 */
 
-#include <SimplePlugin.h>
+#include <SimplePlugin.hh>
 #include <jrl/walkgen/pgtypes.hh>
 
-#include <MotionGeneration/ComAndFootRealization.h>
-#include <GlobalStrategyManagers/GlobalStrategyManager.h>
+#include <MotionGeneration/ComAndFootRealization.hh>
+#include <GlobalStrategyManagers/GlobalStrategyManager.hh>
 
 #ifndef _COM_AND_FOOT_ONLY_STRATEGY_H_
 #define _COM_AND_FOOT_ONLY_STRATEGY_H_

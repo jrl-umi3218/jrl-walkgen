@@ -29,9 +29,9 @@
 
 #include <fstream>
 //#define _DEBUG_MODE_ON_
-#include <Debug.h>
+#include <Debug.hh>
 
-#include <PreviewControl/PreviewControl.h>
+#include <PreviewControl/PreviewControl.hh>
 
 using namespace::PatternGeneratorJRL;
 

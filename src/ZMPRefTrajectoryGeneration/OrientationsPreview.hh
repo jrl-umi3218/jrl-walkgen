@@ -37,7 +37,7 @@
 #include <deque>
 
 /*! Framework includes */
-#include <PreviewControl/SupportFSM.h>
+#include <PreviewControl/SupportFSM.hh>
 
 /*! Framework includes */
 #include <jrl/walkgen/pgtypes.hh>

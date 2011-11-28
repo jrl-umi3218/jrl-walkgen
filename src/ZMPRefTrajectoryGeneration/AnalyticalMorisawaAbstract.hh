@@ -34,11 +34,11 @@
 
 
 
-#include <Mathematics/PolynomeFoot.h>
-#include <Mathematics/ConvexHull.h>
-#include <Mathematics/AnalyticalZMPCOGTrajectory.h>
-#include <PreviewControl/PreviewControl.h>
-#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
+#include <Mathematics/PolynomeFoot.hh>
+#include <Mathematics/ConvexHull.hh>
+#include <Mathematics/AnalyticalZMPCOGTrajectory.hh>
+#include <PreviewControl/PreviewControl.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh>
 
 
 

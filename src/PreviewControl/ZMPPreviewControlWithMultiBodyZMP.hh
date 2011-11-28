@@ -39,9 +39,9 @@
 
 
 #include <jrl/walkgen/pgtypes.hh>
-#include <SimplePlugin.h>
-#include <PreviewControl/PreviewControl.h>
-#include <MotionGeneration/ComAndFootRealization.h>
+#include <SimplePlugin.hh>
+#include <PreviewControl/PreviewControl.hh>
+#include <MotionGeneration/ComAndFootRealization.hh>
 
 
 using namespace::std;

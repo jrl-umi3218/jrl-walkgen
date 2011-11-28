@@ -29,7 +29,7 @@
 #define ODEBUG3(x) cerr << "FilteringAnalyticalTrajectoryByPreviewControl" << ": " << __FUNCTION__ \
                        << "(# " << __LINE__ << "): "<< x << endl
 
-#include <ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.h>
+#include <ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.hh>
 
 
 using namespace PatternGeneratorJRL;

@@ -38,8 +38,8 @@
 // PG
 
 #include <jrl/walkgen/pgtypes.hh>
-#include <SimplePlugin.h>
-#include <PreviewControl/PreviewControl.h>
+#include <SimplePlugin.hh>
+#include <PreviewControl/PreviewControl.hh>
 
 /*! End of JRL inclusion */
 

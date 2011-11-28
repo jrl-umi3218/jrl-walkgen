@@ -53,12 +53,16 @@ namespace PatternGeneratorJRL
 
      where \f$ Q \f$ and \f$ R \f$ are also given as inputs.
 
-     the solution is then 
+     the solution is then:
+     \f{eqnarray*}
+     u_j = - K_1 \sum_{i=0}^k e(i) - K_2 x(k) - \sum_{j=1}^{N_L} K_p(j)p^{ref}_j(k+j)
+     \f}
+     
      \f{eqnarray*}
      {\bf K} & \equiv & (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA} \\
-     f_i & \equiv & (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T({\bf A}-{\bf bK})^{T*(i-1)}{\bf c}^TQ \\
+     K_p(i) & \equiv & (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T({\bf A}-{\bf bK})^{T*(i-1)}{\bf c}^TQ \\
      \f}
-
+     where \f$ K_1 = K(0,0)\f$, and \f$ K_2 = K(0,0 \cdots 2)\f$ 
      where \f$ {\bf P} \f$ is solution of the following Riccati equation:
      \f[
      {\bf P} = {\bf A}^T {\bf PA} + {\bf c}^TQ{\bf c} - {\bf A}^T{\bf Pb}(R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA}

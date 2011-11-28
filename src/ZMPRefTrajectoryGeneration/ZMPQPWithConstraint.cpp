@@ -38,10 +38,10 @@
 #include <iostream>
 #include <fstream>
 
-#include <Debug.h>
+#include <Debug.hh>
 
-#include <Mathematics/qld.h>
-#include <ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.h>
+#include <Mathematics/qld.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.hh>
 
 
 using namespace std;

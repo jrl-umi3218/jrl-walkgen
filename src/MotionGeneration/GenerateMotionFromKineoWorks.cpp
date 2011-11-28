@@ -33,9 +33,9 @@
 
 #include <jrl/mal/matrixabstractlayer.hh>
 
-#include <PreviewControl/PreviewControl.h>
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
-#include <MotionGeneration/GenerateMotionFromKineoWorks.h>
+#include <PreviewControl/PreviewControl.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
+#include <MotionGeneration/GenerateMotionFromKineoWorks.hh>
 
 
 

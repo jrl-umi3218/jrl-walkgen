@@ -29,9 +29,9 @@
    @endgroup
 */
 
-#include "Debug.h"
+#include "Debug.hh"
 /*! Walking Pattern Generator inclusion */
-#include "FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.h"
+#include "FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.hh"
 
 using namespace PatternGeneratorJRL;
 

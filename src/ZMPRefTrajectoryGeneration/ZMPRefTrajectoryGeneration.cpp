@@ -25,8 +25,8 @@
  */
 /* \file ZMPRefTrajectoryGeneration.cpp
    \brief Abstract object for ZMP trajectory generation.*/
-#include <Debug.h>
-#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.h>
+#include <Debug.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh>
 
 
 using namespace PatternGeneratorJRL;

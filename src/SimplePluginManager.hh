@@ -95,6 +95,6 @@ namespace PatternGeneratorJRL
   };
 }
 
-#include <SimplePlugin.h>
+#include <SimplePlugin.hh>
 
 #endif /* _PGI_SIMPLE_PLUGIN_H_ */

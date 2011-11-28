@@ -41,7 +41,7 @@
 #include <ostream>
 #include <vector>
 
-#include "CommonTools.h"
+#include "CommonTools.hh"
 
 namespace PatternGeneratorJRL {
 

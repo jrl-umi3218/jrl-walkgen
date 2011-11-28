@@ -30,9 +30,9 @@
 
 #include <fstream>
 
-#include "Debug.h"
+#include "Debug.hh"
 
-#include <MotionGeneration/StepOverPlanner.h>
+#include <MotionGeneration/StepOverPlanner.hh>
 
 
 using namespace::PatternGeneratorJRL;

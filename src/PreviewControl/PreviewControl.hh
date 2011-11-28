@@ -39,8 +39,8 @@ using namespace::std;
 
 
 #include <jrl/walkgen/pgtypes.hh>
-#include <SimplePlugin.h>
-#include <PreviewControl/OptimalControllerSolver.h>
+#include <SimplePlugin.hh>
+#include <PreviewControl/OptimalControllerSolver.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -182,5 +182,5 @@ namespace PatternGeneratorJRL
       unsigned int m_DefaultWeightComputationMode;
     };
 }
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
 #endif /* _PREVIEW_CONTROL_H_ */

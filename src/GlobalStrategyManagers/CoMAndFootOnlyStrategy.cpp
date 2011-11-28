@@ -30,8 +30,8 @@
   \brief This object defines a global strategy object to generate 
   only foot, ZMP reference and CoM trajectories position every 5 ms. */
 
-#include <Debug.h>
-#include <GlobalStrategyManagers/CoMAndFootOnlyStrategy.h>
+#include <Debug.hh>
+#include <GlobalStrategyManagers/CoMAndFootOnlyStrategy.hh>
 
 using namespace PatternGeneratorJRL;
 

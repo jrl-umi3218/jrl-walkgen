@@ -28,8 +28,8 @@
 
 /*! Local framework include */
 #include <jrl/mal/matrixabstractlayer.hh>
-#include <Mathematics/AnalyticalZMPCOGTrajectory.h>
-#include <PreviewControl/PreviewControl.h>
+#include <Mathematics/AnalyticalZMPCOGTrajectory.hh>
+#include <PreviewControl/PreviewControl.hh>
 
 namespace PatternGeneratorJRL
 {

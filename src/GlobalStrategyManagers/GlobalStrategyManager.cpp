@@ -26,9 +26,9 @@
   handled by the PatternGeneratorInterface object.
 */
 
-#include <Debug.h>
+#include <Debug.hh>
 #include <deque> 
-#include <GlobalStrategyManagers/GlobalStrategyManager.h>
+#include <GlobalStrategyManagers/GlobalStrategyManager.hh>
 
 using namespace PatternGeneratorJRL;
 

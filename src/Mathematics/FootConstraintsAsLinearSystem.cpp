@@ -31,8 +31,8 @@
 #include <iostream>
 #include <fstream>
 
-#include <Debug.h>
-#include <Mathematics/FootConstraintsAsLinearSystem.h>
+#include <Debug.hh>
+#include <Mathematics/FootConstraintsAsLinearSystem.hh>
 
 using namespace std;
 using namespace PatternGeneratorJRL;

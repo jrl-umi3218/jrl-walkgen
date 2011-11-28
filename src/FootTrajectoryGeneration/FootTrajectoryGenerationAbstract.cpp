@@ -28,8 +28,8 @@
 
    @ingroup foottrajectorygeneration
 */
-#include <Debug.h>
-#include "FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.h"
+#include <Debug.hh>
+#include "FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.hh"
 
 using namespace PatternGeneratorJRL;
 

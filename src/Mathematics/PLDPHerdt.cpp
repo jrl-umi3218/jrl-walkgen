@@ -34,7 +34,7 @@
 # include <Windows.h>
 #endif /* WIN32 */
 
-#include <Mathematics/PLDPSolverHerdt.h>
+#include <Mathematics/PLDPSolverHerdt.hh>
 
 
 // Isnan and Isinf
@@ -47,7 +47,7 @@
 inline int isinf (double x){return isnan (x - x);}
 #endif /* WIN32 */
 
-#include <Debug.h>
+#include <Debug.hh>
 
 using namespace PatternGeneratorJRL;
 using namespace Optimization::Solver;

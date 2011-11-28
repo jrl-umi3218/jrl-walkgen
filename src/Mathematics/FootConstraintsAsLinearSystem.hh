@@ -42,8 +42,8 @@
 
 
 #include <jrl/walkgen/pgtypes.hh>
-#include <Mathematics/ConvexHull.h>
-#include <SimplePlugin.h>
+#include <Mathematics/ConvexHull.hh>
+#include <SimplePlugin.hh>
 
 namespace PatternGeneratorJRL
 {

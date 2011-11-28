@@ -48,8 +48,8 @@
 
 /*! Humanoid Walking Pattern Generator */
 
-#include <PreviewControl/PreviewControl.h>
-#include <Mathematics/StepOverPolynome.h>
+#include <PreviewControl/PreviewControl.hh>
+#include <Mathematics/StepOverPolynome.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -345,8 +345,8 @@ namespace PatternGeneratorJRL
 
 }
 
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
-#include <MotionGeneration/CollisionDetector.h>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
+#include <MotionGeneration/CollisionDetector.hh>
 
 
 #endif /* _STEPOVER_PLANNER_H_ */

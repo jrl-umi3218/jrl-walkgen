@@ -25,7 +25,7 @@
 /* Polynomes object for trajectories. */
 
 #include <iostream>
-#include <Mathematics/Polynome.h>
+#include <Mathematics/Polynome.hh>
 
 using namespace::PatternGeneratorJRL;
 

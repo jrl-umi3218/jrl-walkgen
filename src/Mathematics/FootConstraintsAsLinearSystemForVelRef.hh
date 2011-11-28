@@ -43,11 +43,11 @@
 
 
 #include <jrl/walkgen/pgtypes.hh>
-#include <privatepgtypes.h>
-#include <Mathematics/ConvexHull.h>
+#include <privatepgtypes.hh>
+#include <Mathematics/ConvexHull.hh>
 #include <Mathematics/FootHalfSize.hh>
-#include <SimplePlugin.h>
-#include <PreviewControl/SupportFSM.h>
+#include <SimplePlugin.hh>
+#include <PreviewControl/SupportFSM.hh>
 
 namespace PatternGeneratorJRL
 {

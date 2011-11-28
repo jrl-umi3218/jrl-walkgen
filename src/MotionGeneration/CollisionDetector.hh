@@ -140,5 +140,5 @@ namespace PatternGeneratorJRL
 
 
 }
-#include <MotionGeneration/StepOverPlanner.h>
+#include <MotionGeneration/StepOverPlanner.hh>
 #endif /* _COLLISION_DETECTOR_H_ */

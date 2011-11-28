@@ -23,7 +23,7 @@
  */
 #include <fstream>
 #include <string>
-#include "ClockCPUTime.h"
+#include "ClockCPUTime.hh"
 
 using namespace std;
 

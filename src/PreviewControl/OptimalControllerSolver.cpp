@@ -28,10 +28,10 @@
 */
 
 #include <iostream>
-#include <PreviewControl/OptimalControllerSolver.h>
+#include <PreviewControl/OptimalControllerSolver.hh>
 
 //#define _DEBUG_MODE_ON_
-#include <Debug.h>
+#include <Debug.hh>
 
 using namespace PatternGeneratorJRL;
 using namespace std;

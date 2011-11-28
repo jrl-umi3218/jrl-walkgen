@@ -35,7 +35,7 @@
 
 /* Walking pattern generation related inclusions */
 
-#include "FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h"
+#include "FootTrajectoryGeneration/FootTrajectoryGenerationStandard.hh"
 
 namespace PatternGeneratorJRL
 {

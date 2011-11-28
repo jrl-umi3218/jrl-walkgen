@@ -37,8 +37,8 @@
 
 /* Walking Pattern Generator inclusion */
 
-#include <SimplePlugin.h>
-#include <FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.h>
+#include <SimplePlugin.hh>
+#include <FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.hh>
 
 namespace PatternGeneratorJRL
 {

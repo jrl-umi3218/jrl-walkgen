@@ -34,8 +34,8 @@
 #define deg2rad(x) x*M_PI/180.0
 #define rad2deg(x) x*180.0/M_PI
 
-#include <Debug.h>
-#include <StepStackHandler.h>
+#include <Debug.hh>
+#include <StepStackHandler.hh>
 
 using namespace::PatternGeneratorJRL;
 

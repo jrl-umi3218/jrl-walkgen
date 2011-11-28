@@ -25,8 +25,8 @@
  * real-time CoM and ZMP trajectory generation
  */
 
-#include "CommonTools.h"
-#include "TestObject.h"
+#include "CommonTools.hh"
+#include "TestObject.hh"
 
 using namespace::PatternGeneratorJRL;
 using namespace::PatternGeneratorJRL::TestSuite;
@@ -114,13 +114,7 @@ protected:
     }
 
     {
-      istringstream strm2(":stepseq 0.0 -0.105 0.0 \
-                     0.2  0.19 0.0		   \
-                     0.2 -0.19 0.0		   \
-                     0.2  0.19 0.0                 \
-                     0.2 -0.19 0.0                 \
-                     0.2  0.19 0.0		   \
-                     0.0 -0.19 0.0");
+      istringstream strm2(":stepseq 0.0 -0.105 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.0 -0.19 0.0");
       aPGI.ParseCmd(strm2);
     }
 

@@ -39,10 +39,10 @@
 #include <iostream>
 #include <fstream>
 
-#include <Debug.h>
+#include <Debug.hh>
 
-#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.h>
-#include <Mathematics/ConvexHull.h>
+#include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
+#include <Mathematics/ConvexHull.hh>
 
 #ifdef WIN32
 inline double round( double d )

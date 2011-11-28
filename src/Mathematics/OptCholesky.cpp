@@ -25,8 +25,8 @@
     \brief This object performs a cholesky decomposition optimized for 
     the problem to solved. */
 
-#include <Mathematics/OptCholesky.h>
-#include <Debug.h>
+#include <Mathematics/OptCholesky.hh>
+#include <Debug.hh>
 
 using namespace PatternGeneratorJRL;
 

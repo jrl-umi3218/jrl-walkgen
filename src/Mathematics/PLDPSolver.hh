@@ -33,7 +33,7 @@
 #ifndef _PLDP_SOLVER_H_
 
 #include <vector>
-#include <Mathematics/OptCholesky.h>
+#include <Mathematics/OptCholesky.hh>
 
 namespace Optimization
 {

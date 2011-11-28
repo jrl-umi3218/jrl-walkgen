@@ -32,8 +32,8 @@
 
 #include <time.h>
 
-#include <Debug.h>
-#include <MotionGeneration/ComAndFootRealizationByGeometry.h>
+#include <Debug.hh>
+#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 
 
 using namespace PatternGeneratorJRL;

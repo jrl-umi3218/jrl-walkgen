@@ -26,9 +26,9 @@
 #include <iostream>
 #include <fstream>
 
-#include <Debug.h>
+#include <Debug.hh>
 
-#include "FootTrajectoryGenerationStandard.h"
+#include "FootTrajectoryGenerationStandard.hh"
 
 
 using namespace PatternGeneratorJRL;

@@ -37,7 +37,7 @@
 
 
 #include <jrl/walkgen/pgtypes.hh>
-#include <SimplePlugin.h>
+#include <SimplePlugin.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -357,5 +357,5 @@ namespace PatternGeneratorJRL
   };
 }
 
-#include <StepStackHandler.h>
+#include <StepStackHandler.hh>
 #endif /* _ZMPREF_TRAJ_GEN_H_ */

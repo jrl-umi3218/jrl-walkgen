@@ -32,11 +32,11 @@
 
 
 #include <jrl/walkgen/pgtypes.hh>
-#include <MotionGeneration/ComAndFootRealization.h> 
-#include <MotionGeneration/StepOverPlanner.h>
-#include <MotionGeneration/WaistHeightVariation.h>
-#include <MotionGeneration/UpperBodyMotion.h>
-#include <MotionGeneration/GenerateMotionFromKineoWorks.h>
+#include <MotionGeneration/ComAndFootRealization.hh> 
+#include <MotionGeneration/StepOverPlanner.hh>
+#include <MotionGeneration/WaistHeightVariation.hh>
+#include <MotionGeneration/UpperBodyMotion.hh>
+#include <MotionGeneration/GenerateMotionFromKineoWorks.hh>
 
 namespace PatternGeneratorJRL
 {

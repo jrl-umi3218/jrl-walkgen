@@ -24,10 +24,10 @@
 /* \file This file tests A. Herdt's walking algorithm for
  * automatic foot placement giving an instantaneous CoM velocity reference.
  */
-#include "CommonTools.h"
-#include "TestObject.h"
+#include "CommonTools.hh"
+#include "TestObject.hh"
 
-#include <Debug.h>
+#include <Debug.hh>
 #include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
 
 using namespace::PatternGeneratorJRL;

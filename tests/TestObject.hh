@@ -45,8 +45,8 @@
 #include <jrl/dynamics/dynamicsfactory.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 
-#include "CommonTools.h"
-#include "ClockCPUTime.h"
+#include "CommonTools.hh"
+#include "ClockCPUTime.hh"
 
 
 namespace PatternGeneratorJRL

@@ -29,9 +29,9 @@
 
 #include <jrl/mal/matrixabstractlayer.hh>
 
-#include <Mathematics/StepOverPolynome.h>
+#include <Mathematics/StepOverPolynome.hh>
 
-#include <Debug.h>
+#include <Debug.hh>
 
 using namespace::std;
 using namespace::PatternGeneratorJRL;

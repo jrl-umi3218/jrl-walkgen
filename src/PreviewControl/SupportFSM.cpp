@@ -29,8 +29,8 @@
 #include <iostream>
 #include <fstream>
 
-#include <PreviewControl/SupportFSM.h>
-#include <Debug.h>
+#include <PreviewControl/SupportFSM.hh>
+#include <Debug.hh>
 
 using namespace PatternGeneratorJRL;
 using namespace std;

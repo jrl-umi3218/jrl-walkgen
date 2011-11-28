@@ -38,14 +38,14 @@
 
 
 
-#include <Clock.h>
-#include <Mathematics/PolynomeFoot.h>
-#include <Mathematics/ConvexHull.h>
-#include <Mathematics/AnalyticalZMPCOGTrajectory.h>
-#include <PreviewControl/PreviewControl.h>
-#include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.h>
-#include <ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.h>
-#include <FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.h>
+#include <Clock.hh>
+#include <Mathematics/PolynomeFoot.hh>
+#include <Mathematics/ConvexHull.hh>
+#include <Mathematics/AnalyticalZMPCOGTrajectory.hh>
+#include <PreviewControl/PreviewControl.hh>
+#include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.hh>
+#include <ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.hh>
+#include <FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.hh>
 
 
 namespace PatternGeneratorJRL

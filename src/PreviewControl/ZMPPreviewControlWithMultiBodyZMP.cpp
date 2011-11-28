@@ -36,9 +36,9 @@
 #include <sstream>
 #include <fstream>
 
-#include <Debug.h>
+#include <Debug.hh>
 
-#include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h>
+#include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.hh>
 
 using namespace PatternGeneratorJRL;
 

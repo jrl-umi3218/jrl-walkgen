@@ -29,11 +29,8 @@
 
 #include <iostream>
 #include <fstream>
-#include <Debug.h>
-
-
-
-#include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
+#include <Debug.hh>
+#include <ZMPRefTrajectoryGeneration/OrientationsPreview.hh>
 
 using namespace PatternGeneratorJRL;
 using namespace std;

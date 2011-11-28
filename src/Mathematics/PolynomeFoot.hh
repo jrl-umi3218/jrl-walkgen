@@ -38,7 +38,7 @@
 
 #include <vector>
 
-#include <Mathematics/Polynome.h>
+#include <Mathematics/Polynome.hh>
 
 namespace PatternGeneratorJRL
 {

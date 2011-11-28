@@ -27,9 +27,9 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include <Mathematics/AnalyticalZMPCOGTrajectory.h>
+#include <Mathematics/AnalyticalZMPCOGTrajectory.hh>
 
-#include <Debug.h>
+#include <Debug.hh>
 using namespace std;
 
 namespace PatternGeneratorJRL 
