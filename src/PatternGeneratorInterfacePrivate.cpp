@@ -1255,16 +1255,16 @@ namespace PatternGeneratorJRL {
     if ((!m_ShouldBeRunning) ||
 	(m_GlobalStrategyManager->EndOfMotion()<0))
       {
-	/*
-	  ODEBUG(" m_ShoulBeRunning " << m_ShouldBeRunning << endl <<
-	  " m_ZMPPositions " << m_ZMPPositions.size() << endl <<
-	  " 2*m_NL+1 " << 2*m_NL+1 << endl);
-	  ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
-	  "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
-	*/
+
+	ODEBUG(" m_ShoulBeRunning " << m_ShouldBeRunning << endl <<
+	       " m_ZMPPositions " << m_ZMPPositions.size() << endl <<
+	       " 2*m_NL+1 " << 2*m_NL+1 << endl);
+	ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
+	       "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
+
 	return false;//Andremize
       }
-    ODEBUG("Here");
+    ODEBUG("Internal clock:" << m_InternalClock);
 
     if (m_StepStackHandler->IsOnLineSteppingOn())
       {
@@ -1482,6 +1482,7 @@ namespace PatternGeneratorJRL {
     // Update the absolute position of the robot.
     // to be done only when the robot has finish a motion.
     UpdateAbsolutePosition(UpdateAbsMotionOrNot);
+    ODEBUG("Return true");
     return true;
   }
 

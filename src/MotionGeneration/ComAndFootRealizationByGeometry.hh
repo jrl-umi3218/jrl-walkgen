@@ -107,6 +107,24 @@ namespace PatternGeneratorJRL
       @{
      */
     
+    
+    /*! \brief Initialize the humanoid model considering the current
+      configuration set by the user. 
+      \param[in] BodyAnglesIni: The configuration vector provided by the user. 
+      \param[out] lStartingWaistPose: The waist pose according to the user configuration vector.
+    */
+    bool InitializationHumanoid(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
+			    MAL_VECTOR_TYPE(double) &lStartingWaistPose);
+
+    /*! \brief Initialize the foot position.
+      \param[in] aFoot: Pointer to the foot to be updated.
+      \param[in] m_AnklePosition: Translation from the ankle to the soil.
+      \param[out] InitFootPosition: The foot position according to the 
+      free flyer (set to 0.0 0.0 0.0)
+    */
+    bool InitializationFoot(CjrlFoot * aFoot,
+			    MAL_S3_VECTOR(& m_AnklePosition,double),
+			    FootAbsolutePosition & InitFootPosition);
 
     /*! This initialization phase does the following:
       1/ we take the current state of the robot
