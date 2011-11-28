@@ -1,4 +1,6 @@
 INPUT                  = @CMAKE_SOURCE_DIR@/include \
+		         @CMAKE_SOURCE_DIR@/src/Mathematics \
+			 @CMAKE_SOURCE_DIR@/src/PreviewControl \
 		         @CMAKE_SOURCE_DIR@/doc/additionalHeader
 IMAGE_PATH             = @CMAKE_SOURCE_DIR@/doc/pictures
 
