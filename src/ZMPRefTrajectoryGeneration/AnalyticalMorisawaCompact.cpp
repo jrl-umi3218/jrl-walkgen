@@ -560,7 +560,8 @@ namespace PatternGeneratorJRL
       }
 
     /*! Set the current time reference for the analytical trajectory. */
-    double TimeShift =  m_Tsingle*2;
+    //double TimeShift =  m_Tsingle*2;
+    double TimeShift = m_Tsingle;
     m_AbsoluteTimeReference = m_CurrentTime-TimeShift;
     m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
