@@ -378,10 +378,16 @@ namespace PatternGeneratorJRL
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI.datref";
 	  arif.open(aFileName.c_str(),ifstream::in);
-
+	 
+	  ofstream areportof;
+	  aFileName = m_TestName;
+	  aFileName += "TestFGPI_report.dat";
+	  areportof.open(aFileName.c_str(),ofstream::out);
+	    
 	  // Time
 	  double LocalInput[70], ReferenceInput[70];
-
+	  bool finalreport = true;
+	  unsigned long int nblines = 0;
 	  while ((!alif.eof()) ||
 		 (!arif.eof()))
 	    {
@@ -395,12 +401,22 @@ namespace PatternGeneratorJRL
 		{
 		  if  (fabs(LocalInput[i]-
 			    ReferenceInput[i])>=1e-6)
-		    return false;
+		    {
+		      finalreport = false;
+		      areportof << "l: " << nblines 
+				<< " col:" << i 
+				<< " ref: " << ReferenceInput[i] 
+				<< " now: " << LocalInput[i] 
+				<<std::endl;
+		    }
 		}
+	      nblines++;
 	    }
 
 	  alif.close();
 	  arif.close();
+	  areportof.close();
+	  return finalreport;
 	}
       return SameFile;
     }
