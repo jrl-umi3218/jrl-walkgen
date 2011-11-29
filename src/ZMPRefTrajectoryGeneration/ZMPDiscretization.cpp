@@ -1202,6 +1202,7 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
       COMState aCOMState;
 
       aCOMState.z[0] = m_ComHeight;
+      aCOMState.z[1] = aCOMState.z[2] = 0.0;
       aCOMState.yaw[0] = ZMPPositions[CurrentZMPindex].theta;
 
       FinalCOMStates.push_back(aCOMState);
