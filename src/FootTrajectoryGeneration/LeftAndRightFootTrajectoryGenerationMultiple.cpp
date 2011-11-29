@@ -509,11 +509,13 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	      {
 		LeftFootTmpFinalPos.z = 0;
 		LeftFootTmpFinalPos.dz = 0;
+		LeftFootTmpFinalPos.stepType = -1;
 		SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
 			      LeftFootTmpFinalPos,
 			      LeftFootTmpFinalPos);
 		RightFootTmpFinalPos.z = 0;
 		RightFootTmpFinalPos.dz = 0;
+		RightFootTmpFinalPos.stepType = -1;
 		SetAnInterval(IntervalIndex,m_RightFootTrajectory,
 			      RightFootTmpFinalPos,
 			      RightFootTmpFinalPos);
