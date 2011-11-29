@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: Member List</title>
+<title>jrl-walkgen: PatternGeneratorJRL::LinearizedInvertedPendulum2D Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,6 +9,7 @@
   <div class="tabs">
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -18,19 +19,355 @@
     <ul>
       <li><a href="annotated.html"><span>Class&nbsp;List</span></a></li>
       <li><a href="classes.html"><span>Class&nbsp;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&nbsp;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
   </div>
+  <div class="navpath"><a class="el" href="a00097.html">PatternGeneratorJRL</a>::<a class="el" href="a00029.html">LinearizedInvertedPendulum2D</a>
+  </div>
 </div>
 <div class="contents">
-<h1>PatternGeneratorJRL::COMPosition_s Member List</h1>This is the complete list of members for <a class="el" href="a00011.html">PatternGeneratorJRL::COMPosition_s</a>, including all inherited members.<table>
-  <tr class="memlist"><td><a class="el" href="a00011.html#a8ac70bba77cb465e4a91fa82b7314860">operator=</a>(const COMState_s &amp;aCS)</td><td><a class="el" href="a00011.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00011.html#a9c348212235d7d5b04555e281cc31443">pitch</a></td><td><a class="el" href="a00011.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00011.html#ac5380565a81edcb041e825c5a5a84b17">roll</a></td><td><a class="el" href="a00011.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00011.html#af6750f8e4562651d16dcb79a74c24f66">x</a></td><td><a class="el" href="a00011.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00011.html#a2f308984a0f4fb51589e2c89f16b7497">y</a></td><td><a class="el" href="a00011.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00011.html#aa4b7d099b1927795134a40d402e35b9c">yaw</a></td><td><a class="el" href="a00011.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00011.html#a3274e52a140566b720d8bb89b124a30b">z</a></td><td><a class="el" href="a00011.html">PatternGeneratorJRL::COMPosition_s</a></td><td></td></tr>
-</table></div>
+<h1>PatternGeneratorJRL::LinearizedInvertedPendulum2D Class Reference</h1><!-- doxytag: class="PatternGeneratorJRL::LinearizedInvertedPendulum2D" -->
+<p><code>#include &lt;/home/buildbot/devel-src/tools/pkg-dev-mng/Testing/Buildbot/slaves/jrlserver/jrlserverubuntu/build-jrl-walkgen-jrlmt-master/pkgsrc/src/PreviewControl/LinearizedInvertedPendulum2D.hh&gt;</code></p>
+
+<p><a href="a00264.html">List of all members.</a></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#ad77ecea37410f5f09d3098bdc8061f48">LinearizedInvertedPendulum2D</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#a735b6a4253f25e8627c878c95f39b3a2">~LinearizedInvertedPendulum2D</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#a8cd70cedd3e4f6a5a1cdfcf3421719e2">InitializeSystem</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initialize the system.  <a href="#a8cd70cedd3e4f6a5a1cdfcf3421719e2"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#aed4dd23cd7495d919614677585cd1872">Interpolation</a> (std::deque&lt; <a class="el" href="a00019.html">COMState</a> &gt; &amp;COMStates, std::deque&lt; <a class="el" href="a00056.html">ZMPPosition</a> &gt; &amp;ZMPRefPositions, int CurrentPosition, double CX, double CY)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Interpolation during a simulation period with control parameters.  <a href="#aed4dd23cd7495d919614677585cd1872"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#a27cdad62a4115b144e434fe0801d6aec">OneIteration</a> (double CX, double CY)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Simulate one iteration of the LIPM.  <a href="#a27cdad62a4115b144e434fe0801d6aec"></a><br/></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Getter and setter of variables</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrp3464ef5ac3228a01f5ecf8c18e40a7a8"></a> </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#adcd4a91e8fade824dc0816e1a40d3ea1">GetComHeight</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#aaa5fd7f716299d06eb4f3570b1681814">SetComHeight</a> (const double &amp;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#aeb1a8d1d2d6696862c1edb0c4e353129">GetSimulationControlPeriod</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#a32dd0116fe20dec34f3e3d6602c36b87">SetSimulationControlPeriod</a> (const double &amp;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const double &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#a757b9d9d098e9c420e6dc2ce1059fe7d">GetRobotControlPeriod</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#a63fcec207f7bea910fc71cc7c62b80ed">SetRobotControlPeriod</a> (const double &amp;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#a3eddb17f81c729392701643dd210c481">GetState</a> (MAL_VECTOR_TYPE(double)&amp;lxk)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00029.html#adc8d4456bad50402313566f0e3298ea6">setState</a> (MAL_VECTOR_TYPE(double) lxk)</td></tr>
+</table>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="ad77ecea37410f5f09d3098bdc8061f48"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::LinearizedInvertedPendulum2D" ref="ad77ecea37410f5f09d3098bdc8061f48" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">LinearizedInvertedPendulum2D::LinearizedInvertedPendulum2D </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Constructor </p>
+
+<p>References <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a600ee35ab76de8a72fbfcf6cc3542899">MAL_MATRIX_RESIZE</a>, and <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#af866ce3a4caff19ad5c67168a9fb1483">MAL_VECTOR_RESIZE</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a735b6a4253f25e8627c878c95f39b3a2"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::~LinearizedInvertedPendulum2D" ref="a735b6a4253f25e8627c878c95f39b3a2" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">LinearizedInvertedPendulum2D::~LinearizedInvertedPendulum2D </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Destructor </p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="adcd4a91e8fade824dc0816e1a40d3ea1"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::GetComHeight" ref="adcd4a91e8fade824dc0816e1a40d3ea1" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double &amp; LinearizedInvertedPendulum2D::GetComHeight </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Getter for the CoM height </p>
+
+</div>
+</div>
+<a class="anchor" id="a757b9d9d098e9c420e6dc2ce1059fe7d"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::GetRobotControlPeriod" ref="a757b9d9d098e9c420e6dc2ce1059fe7d" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double &amp; LinearizedInvertedPendulum2D::GetRobotControlPeriod </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Getter for the control period of the robot (for interpolation) . </p>
+
+</div>
+</div>
+<a class="anchor" id="aeb1a8d1d2d6696862c1edb0c4e353129"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::GetSimulationControlPeriod" ref="aeb1a8d1d2d6696862c1edb0c4e353129" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double &amp; LinearizedInvertedPendulum2D::GetSimulationControlPeriod </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Getter for the simulation period specifically </p>
+
+</div>
+</div>
+<a class="anchor" id="a3eddb17f81c729392701643dd210c481"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::GetState" ref="a3eddb17f81c729392701643dd210c481" args="(MAL_VECTOR_TYPE(double)&amp;lxk)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LinearizedInvertedPendulum2D::GetState </td>
+          <td>(</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&amp;&nbsp;</td>
+          <td class="paramname"> <em>lxk</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get state. </p>
+
+<p>References <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a775cdf9ddf39bf63992d6d21bc980de9">MAL_VECTOR_TYPE</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8cd70cedd3e4f6a5a1cdfcf3421719e2"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::InitializeSystem" ref="a8cd70cedd3e4f6a5a1cdfcf3421719e2" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int LinearizedInvertedPendulum2D::InitializeSystem </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Initialize the system. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>0 if the initialization is fine, -1 if the control period is not initialized, -2 if the Com height is not initialized. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aed4dd23cd7495d919614677585cd1872"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::Interpolation" ref="aed4dd23cd7495d919614677585cd1872" args="(std::deque&lt; COMState &gt; &amp;COMStates, std::deque&lt; ZMPPosition &gt; &amp;ZMPRefPositions, int CurrentPosition, double CX, double CY)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int LinearizedInvertedPendulum2D::Interpolation </td>
+          <td>(</td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00019.html">COMState</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>COMStates</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00056.html">ZMPPosition</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>ZMPRefPositions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&nbsp;</td>
+          <td class="paramname"> <em>CurrentPosition</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>CX</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>CY</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Interpolation during a simulation period with control parameters. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em></em>&nbsp;</td><td>NewFinalZMPPositions: queue of ZMP positions interpolated. </td></tr>
+    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em></em>&nbsp;</td><td>COMStates: queue of COM positions interpolated. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em></em>&nbsp;</td><td>ZMPRefPositions: Reference positions of ZMP (Kajita's heuristic every 5 ms). </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em></em>&nbsp;</td><td>CurrentPosition: index of the current position of the ZMP reference (this allow to propagate some parameters define by a heuristic to the CoM positions). </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em></em>&nbsp;</td><td>CX: command parameter in the forward direction. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em></em>&nbsp;</td><td>CY: command parameter in the perpendicular direction. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="a00076_source.html#l00100">PatternGeneratorJRL::ZMPPosition_s::px</a>, <a class="el" href="a00076_source.html#l00100">PatternGeneratorJRL::ZMPPosition_s::py</a>, <a class="el" href="a00076_source.html#l00101">PatternGeneratorJRL::ZMPPosition_s::theta</a>, <a class="el" href="a00076_source.html#l00069">PatternGeneratorJRL::COMState_s::x</a>, <a class="el" href="a00076_source.html#l00069">PatternGeneratorJRL::COMState_s::y</a>, <a class="el" href="a00076_source.html#l00070">PatternGeneratorJRL::COMState_s::yaw</a>, and <a class="el" href="a00076_source.html#l00069">PatternGeneratorJRL::COMState_s::z</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a27cdad62a4115b144e434fe0801d6aec"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::OneIteration" ref="a27cdad62a4115b144e434fe0801d6aec" args="(double CX, double CY)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int LinearizedInvertedPendulum2D::OneIteration </td>
+          <td>(</td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>CX</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>CY</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Simulate one iteration of the LIPM. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>CX,:</em>&nbsp;</td><td>control value in the forward direction. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>CY,:</em>&nbsp;</td><td>control value in the left-right direction. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>0 if the object has been properly initialized -1, otherwise. </dd></dl>
+
+<p><p>Vector to compute the command applied to the LIPM </p>
+</p>
+
+<p>References <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a83ce55a62b92b060d97674c2a589e2dc">MAL_C_eq_A_by_B</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#ada73b0370275a533dc31d335cd1ac4cf">MAL_RET_A_by_B</a>, and <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a1a4064cac32756f5f29cb5862914b6fa">MAL_VECTOR_DIM</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aaa5fd7f716299d06eb4f3570b1681814"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::SetComHeight" ref="aaa5fd7f716299d06eb4f3570b1681814" args="(const double &amp;)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LinearizedInvertedPendulum2D::SetComHeight </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>aComHeight</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Setter for the CoM height </p>
+
+</div>
+</div>
+<a class="anchor" id="a63fcec207f7bea910fc71cc7c62b80ed"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::SetRobotControlPeriod" ref="a63fcec207f7bea910fc71cc7c62b80ed" args="(const double &amp;)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LinearizedInvertedPendulum2D::SetRobotControlPeriod </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>aT</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Setter for the control period of the robot (for interpolation) . </p>
+
+</div>
+</div>
+<a class="anchor" id="a32dd0116fe20dec34f3e3d6602c36b87"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::SetSimulationControlPeriod" ref="a32dd0116fe20dec34f3e3d6602c36b87" args="(const double &amp;)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LinearizedInvertedPendulum2D::SetSimulationControlPeriod </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&nbsp;</td>
+          <td class="paramname"> <em>aT</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Setter for the simulation period specifically </p>
+
+</div>
+</div>
+<a class="anchor" id="adc8d4456bad50402313566f0e3298ea6"></a><!-- doxytag: member="PatternGeneratorJRL::LinearizedInvertedPendulum2D::setState" ref="adc8d4456bad50402313566f0e3298ea6" args="(MAL_VECTOR_TYPE(double) lxk)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LinearizedInvertedPendulum2D::setState </td>
+          <td>(</td>
+          <td class="paramtype">MAL_VECTOR_TYPE(double)&nbsp;</td>
+          <td class="paramname"> <em>lxk</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get state. </p>
+
+<p>References <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a775cdf9ddf39bf63992d6d21bc980de9">MAL_VECTOR_TYPE</a>.</p>
+
+</div>
+</div>
+</div>
 </body>
 </html>

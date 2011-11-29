@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: Member List</title>
+<title>jrl-walkgen: Optimization::Solver::PLDPSolverHerdt Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,6 +9,7 @@
   <div class="tabs">
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -18,17 +19,461 @@
     <ul>
       <li><a href="annotated.html"><span>Class&nbsp;List</span></a></li>
       <li><a href="classes.html"><span>Class&nbsp;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&nbsp;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
   </div>
+  <div class="navpath"><a class="el" href="a00095.html">Optimization</a>::<a class="el" href="a00096.html">Solver</a>::<a class="el" href="a00037.html">PLDPSolverHerdt</a>
+  </div>
 </div>
 <div class="contents">
-<h1>PatternGeneratorJRL::SupportFeet_s Member List</h1>This is the complete list of members for <a class="el" href="a00019.html">PatternGeneratorJRL::SupportFeet_s</a>, including all inherited members.<table>
-  <tr class="memlist"><td><a class="el" href="a00019.html#a2fd64c93ab9156d8962544ffa29cb172">StartTime</a></td><td><a class="el" href="a00019.html">PatternGeneratorJRL::SupportFeet_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00019.html#a873478d4ea8af4c4c6b8e23b449ae0fd">SupportFoot</a></td><td><a class="el" href="a00019.html">PatternGeneratorJRL::SupportFeet_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00019.html#aeee14b3c50d30df3e3286d8a7814b18a">theta</a></td><td><a class="el" href="a00019.html">PatternGeneratorJRL::SupportFeet_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00019.html#abc25515b6f2f697f4ce5e002d2035fbd">x</a></td><td><a class="el" href="a00019.html">PatternGeneratorJRL::SupportFeet_s</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="a00019.html#a23c6d62ff35d148c3b89882e27e5b8c2">y</a></td><td><a class="el" href="a00019.html">PatternGeneratorJRL::SupportFeet_s</a></td><td></td></tr>
-</table></div>
+<h1>Optimization::Solver::PLDPSolverHerdt Class Reference</h1><!-- doxytag: class="Optimization::Solver::PLDPSolverHerdt" -->
+<p><code>#include &lt;/home/buildbot/devel-src/tools/pkg-dev-mng/Testing/Buildbot/slaves/jrlserver/jrlserverubuntu/build-jrl-walkgen-jrlmt-master/pkgsrc/src/Mathematics/PLDPSolverHerdt.hh&gt;</code></p>
+
+<p><a href="a00213.html">List of all members.</a></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#adf6016d2eddd7832cd5a00c942f33264">PLDPSolverHerdt</a> (unsigned int CardU, double *iPu, double *Px, double *Pu, double *iLQ)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#adf6016d2eddd7832cd5a00c942f33264"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#ad76ee3bee13509d61b72f71b94565a48">~PLDPSolverHerdt</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor.  <a href="#ad76ee3bee13509d61b72f71b94565a48"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#ad65125676f4fbc297e3a5506daa75315">SolveProblem</a> (std::deque&lt; <a class="el" href="a00028.html">PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t</a> &gt; &amp;QueueOfLConstraintInequalitiesFreeFeet, std::deque&lt; <a class="el" href="a00052.html">PatternGeneratorJRL::SupportFeet_t</a> &gt; &amp;QueueOfSupportFeet, double *CstPartOfTheCostFunction, unsigned int NbOfConstraints, double *LinearPartOfConstraints, double *CstPartOfConstraints, double *XkYk, double *X, unsigned int NumberOfRemovedConstraints, unsigned int NbRemovedFootCstr, bool StartingSequence, unsigned int NumberSteps, bool CurrentStateChanged, double time)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Solve the optimization problem.  <a href="#ad65125676f4fbc297e3a5506daa75315"></a><br/></td></tr>
+<tr><td colspan="2"><h2>Protected Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a2dc7319337999ea0bc4e512a77787279">InitializeSolver</a> (unsigned int NumberSteps)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a81e7dca667010cfb5df5dc406b874a7b">AllocateMemoryForSolver</a> (unsigned int NumberSteps)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a5f457869f1857ecbf56a76bfd535a603">ComputeAlpha</a> (vector&lt; unsigned int &gt; &amp;NewActivatedConstraints, unsigned int NumberSteps)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a1bf110b3c9e6ba5672e6fb84fd5bbcb4">WriteCurrentZMPSolution</a> (string filename, double *XkYk)</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Initial solution methods related</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrpb851781b9d3125265b99f2fb147a31a3"></a> </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a40cff2a9c8c38f2a858c61991e1fe90d">ComputeInitialSolution</a> (std::deque&lt; <a class="el" href="a00028.html">PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t</a> &gt; &amp;QueueOfLConstraintInequalitiesFreeFeet, std::deque&lt; <a class="el" href="a00052.html">PatternGeneratorJRL::SupportFeet_t</a> &gt; &amp;QueueOfSupportFeet, unsigned int NumberSteps, double *XkYk)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a800043820cb83b177c3f5c5c08b7b159">PrecomputeiPuPx</a> (unsigned int NumberSteps)</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Projected descent direction methods related</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrpb8221a1e9ec858ecd21bd39c4cac8e5f"></a> </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#af54353547015847e02e9cd8b146c45fe">ComputeProjectedDescentDirection</a> (unsigned int NumberSteps)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Compute Projected descent direction.  <a href="#af54353547015847e02e9cd8b146c45fe"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a968991caae54a5ce5a01ac348cd884fa">ForwardSubstitution</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Forward substitution. First Phase EE^t v2 = v1 &lt;-&gt; LL^t v2 = v1 Now solving L y = v1.  <a href="#a968991caae54a5ce5a01ac348cd884fa"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00037.html#a5bd728c280eaffac79b3be2c2c2dbd98">BackwardSubstitution</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Compute v2 q (14b) in Dimitrov 2009. Second phase a Now solving LL^t v2 = v1 &lt;-&gt; L y = v1 with L^t v2 = y y solved with first phase. So now we are looking for v2.  <a href="#a5bd728c280eaffac79b3be2c2c2dbd98"></a><br/></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>Detailed Description</h2>
+<p>This class implements a two stage strategy to solve the following optimal problem: </p>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="adf6016d2eddd7832cd5a00c942f33264"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::PLDPSolverHerdt" ref="adf6016d2eddd7832cd5a00c942f33264" args="(unsigned int CardU, double *iPu, double *Px, double *Pu, double *iLQ)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">PLDPSolverHerdt::PLDPSolverHerdt </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&nbsp;</td>
+          <td class="paramname"> <em>CardU</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&nbsp;</td>
+          <td class="paramname"> <em>iPu</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&nbsp;</td>
+          <td class="paramname"> <em>Px</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&nbsp;</td>
+          <td class="paramname"> <em>Pu</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&nbsp;</td>
+          <td class="paramname"> <em>iLQ</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Constructor. </p>
+
+</div>
+</div>
+<a class="anchor" id="ad76ee3bee13509d61b72f71b94565a48"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::~PLDPSolverHerdt" ref="ad76ee3bee13509d61b72f71b94565a48" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">PLDPSolverHerdt::~PLDPSolverHerdt </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Destructor. </p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a81e7dca667010cfb5df5dc406b874a7b"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::AllocateMemoryForSolver" ref="a81e7dca667010cfb5df5dc406b874a7b" args="(unsigned int NumberSteps)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PLDPSolverHerdt::AllocateMemoryForSolver </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&nbsp;</td>
+          <td class="paramname"> <em>NumberSteps</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Allocate memory for solver. </p>
+
+<p>References <a class="el" href="a00077_source.html#l00211">PrecomputeiPuPx()</a>.</p>
+
+<p>Referenced by <a class="el" href="a00077_source.html#l00693">SolveProblem()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5bd728c280eaffac79b3be2c2c2dbd98"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::BackwardSubstitution" ref="a5bd728c280eaffac79b3be2c2c2dbd98" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int PLDPSolverHerdt::BackwardSubstitution </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Compute v2 q (14b) in Dimitrov 2009. Second phase a Now solving LL^t v2 = v1 &lt;-&gt; L y = v1 with L^t v2 = y y solved with first phase. So now we are looking for v2. </p>
+
+<p>Referenced by <a class="el" href="a00077_source.html#l00446">ComputeProjectedDescentDirection()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5f457869f1857ecbf56a76bfd535a603"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::ComputeAlpha" ref="a5f457869f1857ecbf56a76bfd535a603" args="(vector&lt; unsigned int &gt; &amp;NewActivatedConstraints, unsigned int NumberSteps)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Optimization::Solver::PLDPSolverHerdt::ComputeAlpha </td>
+          <td>(</td>
+          <td class="paramtype">vector&lt; unsigned int &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>NewActivatedConstraints</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&nbsp;</td>
+          <td class="paramname"> <em>NumberSteps</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Detecting violated constraints </p>
+
+<p>Referenced by <a class="el" href="a00077_source.html#l00693">SolveProblem()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a40cff2a9c8c38f2a858c61991e1fe90d"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::ComputeInitialSolution" ref="a40cff2a9c8c38f2a858c61991e1fe90d" args="(std::deque&lt; PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t &gt; &amp;QueueOfLConstraintInequalitiesFreeFeet, std::deque&lt; PatternGeneratorJRL::SupportFeet_t &gt; &amp;QueueOfSupportFeet, unsigned int NumberSteps, double *XkYk)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int PLDPSolverHerdt::ComputeInitialSolution </td>
+          <td>(</td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00028.html">PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>QueueOfLConstraintInequalitiesFreeFeet</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00052.html">PatternGeneratorJRL::SupportFeet_t</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>QueueOfSupportFeet</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&nbsp;</td>
+          <td class="paramname"> <em>NumberSteps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&nbsp;</td>
+          <td class="paramname"> <em>XkYk</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Compute the initial solution </p>
+
+<p><p>The initial solution of the problem is given by identical zmp and feet positions that are lying inside the feasible zones defined by the constraints on the feet placements. U0 = -iPu * Px [Xkt Ykt]t + iPu * InitialZMP</p>
+</p>
+
+<p>Referenced by <a class="el" href="a00077_source.html#l00693">SolveProblem()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af54353547015847e02e9cd8b146c45fe"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::ComputeProjectedDescentDirection" ref="af54353547015847e02e9cd8b146c45fe" args="(unsigned int NumberSteps)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int PLDPSolverHerdt::ComputeProjectedDescentDirection </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&nbsp;</td>
+          <td class="paramname"> <em>NumberSteps</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Compute Projected descent direction. </p>
+
+<p>References <a class="el" href="a00077_source.html#l00409">BackwardSubstitution()</a>, and <a class="el" href="a00077_source.html#l00384">ForwardSubstitution()</a>.</p>
+
+<p>Referenced by <a class="el" href="a00077_source.html#l00693">SolveProblem()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a968991caae54a5ce5a01ac348cd884fa"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::ForwardSubstitution" ref="a968991caae54a5ce5a01ac348cd884fa" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int PLDPSolverHerdt::ForwardSubstitution </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Forward substitution. First Phase EE^t v2 = v1 &lt;-&gt; LL^t v2 = v1 Now solving L y = v1. </p>
+
+<p>Referenced by <a class="el" href="a00077_source.html#l00446">ComputeProjectedDescentDirection()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2dc7319337999ea0bc4e512a77787279"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::InitializeSolver" ref="a2dc7319337999ea0bc4e512a77787279" args="(unsigned int NumberSteps)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PLDPSolverHerdt::InitializeSolver </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&nbsp;</td>
+          <td class="paramname"> <em>NumberSteps</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Initialize the internal variables of the class. </p>
+
+<p>Referenced by <a class="el" href="a00077_source.html#l00693">SolveProblem()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a800043820cb83b177c3f5c5c08b7b159"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::PrecomputeiPuPx" ref="a800043820cb83b177c3f5c5c08b7b159" args="(unsigned int NumberSteps)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int PLDPSolverHerdt::PrecomputeiPuPx </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&nbsp;</td>
+          <td class="paramname"> <em>NumberSteps</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Precompite iPuPx </p>
+
+<p>Referenced by <a class="el" href="a00077_source.html#l00111">AllocateMemoryForSolver()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad65125676f4fbc297e3a5506daa75315"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::SolveProblem" ref="ad65125676f4fbc297e3a5506daa75315" args="(std::deque&lt; PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t &gt; &amp;QueueOfLConstraintInequalitiesFreeFeet, std::deque&lt; PatternGeneratorJRL::SupportFeet_t &gt; &amp;QueueOfSupportFeet, double *CstPartOfTheCostFunction, unsigned int NbOfConstraints, double *LinearPartOfConstraints, double *CstPartOfConstraints, double *XkYk, double *X, unsigned int NumberOfRemovedConstraints, unsigned int NbRemovedFootCstr, bool StartingSequence, unsigned int NumberSteps, bool CurrentStateChanged, double time)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int PLDPSolverHerdt::SolveProblem </td>
+          <td>(</td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00028.html">PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>QueueOfLConstraintInequalitiesFreeFeet</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00052.html">PatternGeneratorJRL::SupportFeet_t</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>QueueOfSupportFeet</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&nbsp;</td>
+          <td class="paramname"> <em>CstPartOfTheCostFunction</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&nbsp;</td>
+          <td class="paramname"> <em>NbOfConstraints</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&nbsp;</td>
+          <td class="paramname"> <em>LinearPartOfConstraints</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&nbsp;</td>
+          <td class="paramname"> <em>CstPartOfConstraints</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&nbsp;</td>
+          <td class="paramname"> <em>XkYk</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&nbsp;</td>
+          <td class="paramname"> <em>X</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&nbsp;</td>
+          <td class="paramname"> <em>NumberOfRemovedConstraints</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&nbsp;</td>
+          <td class="paramname"> <em>NbRemovedFootCstr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&nbsp;</td>
+          <td class="paramname"> <em>StartingSequence</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&nbsp;</td>
+          <td class="paramname"> <em>NumberSteps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&nbsp;</td>
+          <td class="paramname"> <em>CurrentStateChanged</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>time</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Solve the optimization problem. </p>
+
+<p><p>Initialization de cholesky.</p>
+<p>Step two: Compute the projected descent direction.</p>
+<p>Step three : Compute alpha</p>
+<p>Compute new solution. </p>
+</p>
+
+<p>References <a class="el" href="a00077_source.html#l00111">AllocateMemoryForSolver()</a>, <a class="el" href="a00037.html#a5f457869f1857ecbf56a76bfd535a603">ComputeAlpha()</a>, <a class="el" href="a00077_source.html#l00295">ComputeInitialSolution()</a>, <a class="el" href="a00077_source.html#l00446">ComputeProjectedDescentDirection()</a>, <a class="el" href="a00077_source.html#l00142">InitializeSolver()</a>, and <a class="el" href="a00037.html#a1bf110b3c9e6ba5672e6fb84fd5bbcb4">WriteCurrentZMPSolution()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1bf110b3c9e6ba5672e6fb84fd5bbcb4"></a><!-- doxytag: member="Optimization::Solver::PLDPSolverHerdt::WriteCurrentZMPSolution" ref="a1bf110b3c9e6ba5672e6fb84fd5bbcb4" args="(string filename, double *XkYk)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Optimization::Solver::PLDPSolverHerdt::WriteCurrentZMPSolution </td>
+          <td>(</td>
+          <td class="paramtype">string&nbsp;</td>
+          <td class="paramname"> <em>filename</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&nbsp;</td>
+          <td class="paramname"> <em>XkYk</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Write current ZMP ref trajectory associated with current value of m_Vk. </p>
+
+<p>Referenced by <a class="el" href="a00077_source.html#l00693">SolveProblem()</a>.</p>
+
+</div>
+</div>
+</div>
 </body>
 </html>

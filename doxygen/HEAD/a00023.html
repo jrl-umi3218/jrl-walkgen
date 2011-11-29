@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>jrl-walkgen: PatternGeneratorJRL Namespace Reference</title>
+<title>jrl-walkgen: PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,207 +9,394 @@
   <div class="tabs">
     <ul>
       <li><a href="main.html"><span>Main&nbsp;Page</span></a></li>
-      <li class="current"><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="namespaces.html"><span>Namespace&nbsp;List</span></a></li>
-      <li><a href="namespacemembers.html"><span>Namespace&nbsp;Members</span></a></li>
+      <li><a href="annotated.html"><span>Class&nbsp;List</span></a></li>
+      <li><a href="classes.html"><span>Class&nbsp;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&nbsp;Hierarchy</span></a></li>
+      <li><a href="functions.html"><span>Class&nbsp;Members</span></a></li>
     </ul>
+  </div>
+  <div class="navpath"><a class="el" href="a00097.html">PatternGeneratorJRL</a>::<a class="el" href="a00023.html">FootConstraintsAsLinearSystemForVelRef</a>
   </div>
 </div>
 <div class="contents">
-<h1>PatternGeneratorJRL Namespace Reference</h1><table border="0" cellpadding="0" cellspacing="0">
-<tr><td colspan="2"><h2>Classes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00016.html">PatternGeneratorInterface</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">This class is the interface between the Pattern Generator and the external world.  <a href="a00016.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00011.html">COMPosition_s</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Structure to store the COM position computed by the preview control.  <a href="a00011.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00012.html">COMState_s</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Structure to store the COM state computed by the preview control.  <a href="a00012.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00018.html">RelativeFootPosition_s</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Structure to store each foot position when the user is specifying a sequence of relative positions.  <a href="a00018.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00020.html">ZMPPosition_s</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Structure to store each of the ZMP value, with a given direction at a certain time.  <a href="a00020.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00013.html">FootAbsolutePosition_t</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Structure to store the absolute foot position.  <a href="a00013.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00014.html">LinearConstraintInequality_s</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html">LinearConstraintInequalityFreeFeet_s</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Linear constraints with variable feet placement.  <a href="a00015.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00019.html">SupportFeet_s</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00017.html">ReferenceAbsoluteVelocity_t</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Structure to store the absolute reference.  <a href="a00017.html#_details">More...</a><br/></td></tr>
-<tr><td colspan="2"><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="a00011.html">COMPosition_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#adffb9486adcee69ca5061f47d0bd9637">COMPosition</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="a00011.html">COMPosition_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#a668c35fbe031055a0dc5de11599b6bbc">WaistState</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="a00012.html">COMState_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#a15ca9cc713e849c7c00f8303eeb373e2">COMState</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef struct <br class="typebreak"/>
-<a class="el" href="a00018.html">RelativeFootPosition_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#a925abb1f9f0cc3ae65998d70732a5cbc">RelativeFootPosition</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="a00020.html">ZMPPosition_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#af894087c7d23751679d0c93642c558ea">ZMPPosition</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef struct <br class="typebreak"/>
-<a class="el" href="a00013.html">FootAbsolutePosition_t</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#a9233c4a847ad0f7dc25d105466cdc468">FootAbsolutePosition</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef struct <br class="typebreak"/>
-<a class="el" href="a00014.html">LinearConstraintInequality_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#ae273db49aa26e8894e94376297793c80">LinearConstraintInequality_t</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef struct <br class="typebreak"/>
-<a class="el" href="a00015.html">LinearConstraintInequalityFreeFeet_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#acab0081572d66a8998222c6395b4db63">LinearConstraintInequalityFreeFeet_t</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="a00019.html">SupportFeet_s</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#a74766ede3d47f0a2f14d1c168ecd2289">SupportFeet_t</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef struct <br class="typebreak"/>
-<a class="el" href="a00017.html">ReferenceAbsoluteVelocity_t</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#ac515e2c05f41c0251a64de33b9ecbfd2">ReferenceAbsoluteVelocity</a></td></tr>
-<tr><td colspan="2"><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">WALK_GEN_JRL_EXPORT <br class="typebreak"/>
-<a class="el" href="a00016.html">PatternGeneratorInterface</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#a25af9873ebaa29e7e641aa98d33b2a62">patternGeneratorInterfaceFactory</a> (<a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="a00008.html">CjrlHumanoidDynamicRobot</a> *aHDR)</td></tr>
+<h1>PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef Class Reference</h1><!-- doxytag: class="PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef" -->
+<p><code>#include &lt;/home/buildbot/devel-src/tools/pkg-dev-mng/Testing/Buildbot/slaves/jrlserver/jrlserverubuntu/build-jrl-walkgen-jrlmt-master/pkgsrc/src/Mathematics/FootConstraintsAsLinearSystemForVelRef.hh&gt;</code></p>
+<div class="dynheader">
+Collaboration diagram for PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef:</div>
+<div class="dynsection">
+<div class="center"><img src="a00232.png" border="0" usemap="#_pattern_generator_j_r_l_1_1_foot_constraints_as_linear_system_for_vel_ref_coll__map" alt="Collaboration graph"/></div>
+<map name="_pattern_generator_j_r_l_1_1_foot_constraints_as_linear_system_for_vel_ref_coll__map" id="_pattern_generator_j_r_l_1_1_foot_constraints_as_linear_system_for_vel_ref_coll__map">
+<area shape="rect" href="a00024.html" title="PatternGeneratorJRL::FootHalfSize" alt="" coords="332,5,569,32"/><area shape="rect" href="a00013.html" title="PatternGeneratorJRL::CH_Point" alt="" coords="5,56,221,83"/><area shape="rect" doxygen="abstract-robot-dynamics.doxytag:" href="a00006.html" title="CjrlFoot" alt="" coords="416,120,485,147"/><area shape="rect" doxygen="abstract-robot-dynamics.doxytag:" href="a00008.html" title="CjrlHumanoidDynamicRobot" alt="" coords="351,171,551,197"/><area shape="rect" doxygen="abstract-robot-dynamics.doxytag:" href="a00005.html" title="CjrlDynamicRobot" alt="" coords="47,171,180,197"/></map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+
+<p><a href="a00233.html">List of all members.</a></p>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#ac33604dfc40f8d0fe303e47e39b54da1">FootConstraintsAsLinearSystemForVelRef</a> (SimplePluginManager *aSPM, <a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="a00008.html">CjrlHumanoidDynamicRobot</a> *aHS, double ConstraintOnX, double ConstraintOnY)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#a212c32dc12a55721ed3f07d8a2c7b9b2">~FootConstraintsAsLinearSystemForVelRef</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#ae8d57777a4dbfc3d40fb79b5fda5287e">ComputeLinearSystem</a> (std::vector&lt; <a class="el" href="a00013.html">CH_Point</a> &gt; aVecOfPoints, MAL_MATRIX(&amp;A, double), MAL_MATRIX(&amp;B, double), MAL_VECTOR(&amp;C, double))</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#ac45d8821afe0781e29a3d6a7668a925f">computeLinearSystem</a> (std::vector&lt; <a class="el" href="a00013.html">CH_Point</a> &gt; aVecOfPoints, MAL_MATRIX(&amp;D, double), MAL_MATRIX(&amp;Dc, double), SupportState_t PrwSupport)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#a4ed25da3cfe1b2e88f6f9bd5e87fc8ba">buildLinearConstraintInequalities</a> (std::deque&lt; <a class="el" href="a00021.html">FootAbsolutePosition</a> &gt; &amp;LeftFootAbsolutePositions, std::deque&lt; <a class="el" href="a00021.html">FootAbsolutePosition</a> &gt; &amp;RightFootAbsolutePositions, std::deque&lt; <a class="el" href="a00028.html">LinearConstraintInequalityFreeFeet_t</a> &gt; &amp;QueueOfLConstraintInequalities, std::deque&lt; <a class="el" href="a00028.html">LinearConstraintInequalityFreeFeet_t</a> &gt; &amp;QueueOfFeetPosInequalities, <a class="el" href="a00044.html">ReferenceAbsoluteVelocity</a> &amp;RefVel, double StartingTime, double m_QP_N, <a class="el" href="a00053.html">SupportFSM</a> *<a class="el" href="a00053.html">SupportFSM</a>, SupportState_t CurrentSupport, SupportState_t &amp;PrwSupport, std::deque&lt; double &gt; &amp;PreviewedSupportAngles, int &amp;NbOfConstraints)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#a31e2a175cd8c5772ef595ef19af50fa1">BuildLinearConstraintInequalities2</a> (std::deque&lt; <a class="el" href="a00021.html">FootAbsolutePosition</a> &gt; &amp;LeftFootAbsolutePositions, std::deque&lt; <a class="el" href="a00021.html">FootAbsolutePosition</a> &gt; &amp;RightFootAbsolutePositions, std::deque&lt; <a class="el" href="a00027.html">LinearConstraintInequality_t</a> &gt; &amp;QueueOfLConstraintInequalities, double ConstraintOnX, double ConstraintOnY)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#ad6fe7082e12ed4f1ca84a34ee703927e">FindSimilarConstraints</a> (MAL_MATRIX(&amp;A, double), std::vector&lt; int &gt; &amp;SimilarConstraints)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00023.html#a2976d1cf6ecafe4f8464fca8204137a3">CallMethod</a> (std::string &amp;Method, std::istringstream &amp;Args)</td></tr>
 </table>
-<hr/><h2>Typedef Documentation</h2>
-<a class="anchor" id="adffb9486adcee69ca5061f47d0bd9637"></a><!-- doxytag: member="PatternGeneratorJRL::COMPosition" ref="adffb9486adcee69ca5061f47d0bd9637" args="" -->
+<hr/><a name="_details"></a><h2>Detailed Description</h2>
+<p>This class generates matrix representation of linear constraint based on foot position. It handles a stack of constraint on a sliding mode for QP solving. </p>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="ac33604dfc40f8d0fe303e47e39b54da1"></a><!-- doxytag: member="PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef::FootConstraintsAsLinearSystemForVelRef" ref="ac33604dfc40f8d0fe303e47e39b54da1" args="(SimplePluginManager *aSPM, CjrlHumanoidDynamicRobot *aHS, double ConstraintOnX, double ConstraintOnY)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="a00011.html">COMPosition_s</a> <a class="el" href="a00011.html">PatternGeneratorJRL::COMPosition</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a15ca9cc713e849c7c00f8303eeb373e2"></a><!-- doxytag: member="PatternGeneratorJRL::COMState" ref="a15ca9cc713e849c7c00f8303eeb373e2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="a00012.html">COMState_s</a> <a class="el" href="a00012.html">PatternGeneratorJRL::COMState</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9233c4a847ad0f7dc25d105466cdc468"></a><!-- doxytag: member="PatternGeneratorJRL::FootAbsolutePosition" ref="a9233c4a847ad0f7dc25d105466cdc468" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="a00013.html">FootAbsolutePosition_t</a> <a class="el" href="a00013.html">PatternGeneratorJRL::FootAbsolutePosition</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae273db49aa26e8894e94376297793c80"></a><!-- doxytag: member="PatternGeneratorJRL::LinearConstraintInequality_t" ref="ae273db49aa26e8894e94376297793c80" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="a00014.html">LinearConstraintInequality_s</a> <a class="el" href="a00014.html">PatternGeneratorJRL::LinearConstraintInequality_t</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="acab0081572d66a8998222c6395b4db63"></a><!-- doxytag: member="PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t" ref="acab0081572d66a8998222c6395b4db63" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="a00015.html">LinearConstraintInequalityFreeFeet_s</a> <a class="el" href="a00015.html">PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_t</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac515e2c05f41c0251a64de33b9ecbfd2"></a><!-- doxytag: member="PatternGeneratorJRL::ReferenceAbsoluteVelocity" ref="ac515e2c05f41c0251a64de33b9ecbfd2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="a00017.html">ReferenceAbsoluteVelocity_t</a> <a class="el" href="a00017.html">PatternGeneratorJRL::ReferenceAbsoluteVelocity</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a925abb1f9f0cc3ae65998d70732a5cbc"></a><!-- doxytag: member="PatternGeneratorJRL::RelativeFootPosition" ref="a925abb1f9f0cc3ae65998d70732a5cbc" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="a00018.html">RelativeFootPosition_s</a> <a class="el" href="a00018.html">PatternGeneratorJRL::RelativeFootPosition</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a74766ede3d47f0a2f14d1c168ecd2289"></a><!-- doxytag: member="PatternGeneratorJRL::SupportFeet_t" ref="a74766ede3d47f0a2f14d1c168ecd2289" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="a00019.html">SupportFeet_s</a> <a class="el" href="a00019.html">PatternGeneratorJRL::SupportFeet_t</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a668c35fbe031055a0dc5de11599b6bbc"></a><!-- doxytag: member="PatternGeneratorJRL::WaistState" ref="a668c35fbe031055a0dc5de11599b6bbc" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="a00011.html">COMPosition_s</a> <a class="el" href="a00011.html">PatternGeneratorJRL::WaistState</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af894087c7d23751679d0c93642c558ea"></a><!-- doxytag: member="PatternGeneratorJRL::ZMPPosition" ref="af894087c7d23751679d0c93642c558ea" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="a00020.html">ZMPPosition_s</a> <a class="el" href="a00020.html">PatternGeneratorJRL::ZMPPosition</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<hr/><h2>Function Documentation</h2>
-<a class="anchor" id="a25af9873ebaa29e7e641aa98d33b2a62"></a><!-- doxytag: member="PatternGeneratorJRL::patternGeneratorInterfaceFactory" ref="a25af9873ebaa29e7e641aa98d33b2a62" args="(CjrlHumanoidDynamicRobot *aHDR)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">WALK_GEN_JRL_EXPORT <a class="el" href="a00016.html">PatternGeneratorInterface</a>* PatternGeneratorJRL::patternGeneratorInterfaceFactory </td>
+          <td class="memname">FootConstraintsAsLinearSystemForVelRef::FootConstraintsAsLinearSystemForVelRef </td>
           <td>(</td>
+          <td class="paramtype">SimplePluginManager *&nbsp;</td>
+          <td class="paramname"> <em>aSPM</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="a00008.html">CjrlHumanoidDynamicRobot</a> *&nbsp;</td>
-          <td class="paramname"> <em>aHDR</em></td>
+          <td class="paramname"> <em>aHS</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>ConstraintOnX</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>ConstraintOnY</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Constructor </p>
+
+<p>References <a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="a00006.html#a4fb45079eb23ad85990ca24cd0512417">CjrlFoot::getAnklePositionInLocalFrame()</a>, <a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="a00006.html#a1e3dafe856d5c0165b625b718cc77afc">CjrlFoot::getSoleSize()</a>, <a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="a00008.html#a4c9364a8712543a42dfe30b8555317f6">CjrlHumanoidDynamicRobot::leftFoot()</a>, <a class="elRef" doxygen="abstract-robot-dynamics.doxytag:" href="a00008.html#a7080f43f350e0662099cdfc04a64a628">CjrlHumanoidDynamicRobot::rightFoot()</a>, <a class="el" href="a00066_source.html#l00077">PatternGeneratorJRL::FootHalfSize::setConstraints()</a>, and <a class="el" href="a00066_source.html#l00051">PatternGeneratorJRL::FootHalfSize::setHalfSizeInit()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a212c32dc12a55721ed3f07d8a2c7b9b2"></a><!-- doxytag: member="PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef::~FootConstraintsAsLinearSystemForVelRef" ref="a212c32dc12a55721ed3f07d8a2c7b9b2" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">FootConstraintsAsLinearSystemForVelRef::~FootConstraintsAsLinearSystemForVelRef </td>
+          <td>(</td>
+          <td class="paramname"></td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>Factory of Pattern generator interface. </p>
+<p>Destructor </p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a4ed25da3cfe1b2e88f6f9bd5e87fc8ba"></a><!-- doxytag: member="PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities" ref="a4ed25da3cfe1b2e88f6f9bd5e87fc8ba" args="(std::deque&lt; FootAbsolutePosition &gt; &amp;LeftFootAbsolutePositions, std::deque&lt; FootAbsolutePosition &gt; &amp;RightFootAbsolutePositions, std::deque&lt; LinearConstraintInequalityFreeFeet_t &gt; &amp;QueueOfLConstraintInequalities, std::deque&lt; LinearConstraintInequalityFreeFeet_t &gt; &amp;QueueOfFeetPosInequalities, ReferenceAbsoluteVelocity &amp;RefVel, double StartingTime, double m_QP_N, SupportFSM *SupportFSM, SupportState_t CurrentSupport, SupportState_t &amp;PrwSupport, std::deque&lt; double &gt; &amp;PreviewedSupportAngles, int &amp;NbOfConstraints)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities </td>
+          <td>(</td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00021.html">FootAbsolutePosition</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>LeftFootAbsolutePositions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00021.html">FootAbsolutePosition</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>RightFootAbsolutePositions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00028.html">LinearConstraintInequalityFreeFeet_t</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>QueueOfLConstraintInequalities</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00028.html">LinearConstraintInequalityFreeFeet_t</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>QueueOfFeetPosInequalities</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="a00044.html">ReferenceAbsoluteVelocity</a> &amp;&nbsp;</td>
+          <td class="paramname"> <em>RefVel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>StartingTime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>m_QP_N</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="a00053.html">SupportFSM</a> *&nbsp;</td>
+          <td class="paramname"> <em>SupportFSM</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SupportState_t&nbsp;</td>
+          <td class="paramname"> <em>CurrentSupport</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SupportState_t &amp;&nbsp;</td>
+          <td class="paramname"> <em>PrwSupport</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::deque&lt; double &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>PreviewedSupportAngles</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int &amp;&nbsp;</td>
+          <td class="paramname"> <em>NbOfConstraints</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Build a queue of constraint Inequalities based on a list of Foot Absolute Position. </p>
+
+<p>References <a class="el" href="a00064_source.html#l00162">computeLinearSystem()</a>, <a class="el" href="a00066_source.html#l00087">PatternGeneratorJRL::FootHalfSize::getHalfHeight()</a>, <a class="el" href="a00066_source.html#l00097">PatternGeneratorJRL::FootHalfSize::getHalfHeightDS()</a>, <a class="el" href="a00066_source.html#l00092">PatternGeneratorJRL::FootHalfSize::getHalfWidth()</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a6e012b239f2bc5dfddf89de7dd90a9a3">MAL_MATRIX_NB_ROWS</a>, <a class="el" href="a00091_source.html#l00059">PatternGeneratorJRL::SupportFSM::setSupportState()</a>, and <a class="el" href="a00076_source.html#l00145">PatternGeneratorJRL::LinearConstraintInequalityFreeFeet_s::StepNumber</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a31e2a175cd8c5772ef595ef19af50fa1"></a><!-- doxytag: member="PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef::BuildLinearConstraintInequalities2" ref="a31e2a175cd8c5772ef595ef19af50fa1" args="(std::deque&lt; FootAbsolutePosition &gt; &amp;LeftFootAbsolutePositions, std::deque&lt; FootAbsolutePosition &gt; &amp;RightFootAbsolutePositions, std::deque&lt; LinearConstraintInequality_t &gt; &amp;QueueOfLConstraintInequalities, double ConstraintOnX, double ConstraintOnY)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef::BuildLinearConstraintInequalities2 </td>
+          <td>(</td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00021.html">FootAbsolutePosition</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>LeftFootAbsolutePositions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00021.html">FootAbsolutePosition</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>RightFootAbsolutePositions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::deque&lt; <a class="el" href="a00027.html">LinearConstraintInequality_t</a> &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>QueueOfLConstraintInequalities</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>ConstraintOnX</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>ConstraintOnY</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Build a queue of constraint Inequalities based on a list of Foot Absolute Position. </p>
+
+</div>
+</div>
+<a class="anchor" id="a2976d1cf6ecafe4f8464fca8204137a3"></a><!-- doxytag: member="PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef::CallMethod" ref="a2976d1cf6ecafe4f8464fca8204137a3" args="(std::string &amp;Method, std::istringstream &amp;Args)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FootConstraintsAsLinearSystemForVelRef::CallMethod </td>
+          <td>(</td>
+          <td class="paramtype">std::string &amp;&nbsp;</td>
+          <td class="paramname"> <em>Method</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::istringstream &amp;&nbsp;</td>
+          <td class="paramname"> <em>Args</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Reimplement the interface of SimplePluginManager </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Method,:</em>&nbsp;</td><td>The method to be called. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Args,:</em>&nbsp;</td><td>Arguments of the methods. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="a00066_source.html#l00077">PatternGeneratorJRL::FootHalfSize::setConstraints()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac45d8821afe0781e29a3d6a7668a925f"></a><!-- doxytag: member="PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef::computeLinearSystem" ref="ac45d8821afe0781e29a3d6a7668a925f" args="(std::vector&lt; CH_Point &gt; aVecOfPoints, MAL_MATRIX(&amp;D, double), MAL_MATRIX(&amp;Dc, double), SupportState_t PrwSupport)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int FootConstraintsAsLinearSystemForVelRef::computeLinearSystem </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="a00013.html">CH_Point</a> &gt;&nbsp;</td>
+          <td class="paramname"> <em>aVecOfPoints</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MAL_MATRIX &amp;,&nbsp;</td>
+          <td class="paramname"> <em>double</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MAL_MATRIX &amp;,&nbsp;</td>
+          <td class="paramname"> <em>double</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SupportState_t&nbsp;</td>
+          <td class="paramname"> <em>PrwSupport</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Compute the linear system <img class="formulaInl" alt="${\bf D}{\bf x} \geq {\bf b}$" src="form_2.png"/> associated with the set of points specified by aVecOfPoints. aVecOfPoints is supposed can represent either the convex hull of the robot contact points with the ground or the constraints on the placement of the feet. </p>
+
+<p>References <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a32647b9ffc55fcade27dd54bf1c85495">MAL_MATRIX</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a600ee35ab76de8a72fbfcf6cc3542899">MAL_MATRIX_RESIZE</a>, and <a class="el" href="a00087_source.html#l00387">n</a>.</p>
+
+<p>Referenced by <a class="el" href="a00064_source.html#l00225">buildLinearConstraintInequalities()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae8d57777a4dbfc3d40fb79b5fda5287e"></a><!-- doxytag: member="PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef::ComputeLinearSystem" ref="ae8d57777a4dbfc3d40fb79b5fda5287e" args="(std::vector&lt; CH_Point &gt; aVecOfPoints, MAL_MATRIX(&amp;A, double), MAL_MATRIX(&amp;B, double), MAL_VECTOR(&amp;C, double))" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef::ComputeLinearSystem </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="a00013.html">CH_Point</a> &gt;&nbsp;</td>
+          <td class="paramname"> <em>aVecOfPoints</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MAL_MATRIX &amp;,&nbsp;</td>
+          <td class="paramname"> <em>double</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MAL_MATRIX &amp;,&nbsp;</td>
+          <td class="paramname"> <em>double</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MAL_VECTOR &amp;,&nbsp;</td>
+          <td class="paramname"> <em>double</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Compute the linear system <img class="formulaInl" alt="${\bf A}{\bf x} \geq {\bf b}$" src="form_1.png"/> associated with the set of points specified by aVecOfPoints. aVecOfPoints is supposed to represent the convex hull of the robot contact points with the ground. </p>
+
+</div>
+</div>
+<a class="anchor" id="ad6fe7082e12ed4f1ca84a34ee703927e"></a><!-- doxytag: member="PatternGeneratorJRL::FootConstraintsAsLinearSystemForVelRef::FindSimilarConstraints" ref="ad6fe7082e12ed4f1ca84a34ee703927e" args="(MAL_MATRIX(&amp;A, double), std::vector&lt; int &gt; &amp;SimilarConstraints)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int FootConstraintsAsLinearSystemForVelRef::FindSimilarConstraints </td>
+          <td>(</td>
+          <td class="paramtype">MAL_MATRIX &amp;,&nbsp;</td>
+          <td class="paramname"> <em>double</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; int &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>SimilarConstraints</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Find Similar Constraints </p>
+
+<p>References <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a32647b9ffc55fcade27dd54bf1c85495">MAL_MATRIX</a>, and <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a6e012b239f2bc5dfddf89de7dd90a9a3">MAL_MATRIX_NB_ROWS</a>.</p>
 
 </div>
 </div>

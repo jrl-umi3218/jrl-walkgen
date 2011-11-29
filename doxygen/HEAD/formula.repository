@@ -1,1 +1,19 @@
 \form#0:$ (X,Y,\theta) $
+\form#1:${\bf A}{\bf x} \geq {\bf b}$
+\form#2:${\bf D}{\bf x} \geq {\bf b}$
+\form#3:$k$
+\form#4:$ x_k = [ c_x \dot{c}_x \ddot{c}_x c_y \dot{c}_y \ddot{c}_y$
+\form#5:\begin{eqnarray*} {\bf x}_{k+1} & =& {\bf A} x_k + {\bf b} u_k \\ p_k &=& {\bf cx}_k\\ \end{eqnarray*}
+\form#6:\[ J = \sum^{\infty}_{j=1} \{ Q(p^{ref}_j -p_j)^2 + Ru_j^2 \} \]
+\form#7:$ Q $
+\form#8:$ R $
+\form#9:\begin{eqnarray*} u_j = - K_1 \sum_{i=0}^k e(i) - K_2 x(k) - \sum_{j=1}^{N_L} K_p(j)p^{ref}_j(k+j) \end{eqnarray*}
+\form#10:\begin{eqnarray*} {\bf K} & \equiv & (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA} \\ K_p(i) & \equiv & (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T({\bf A}-{\bf bK})^{T*(i-1)}{\bf c}^TQ \\ \end{eqnarray*}
+\form#11:$ K_1 = K(0,0)$
+\form#12:$ K_2 = K(0,0 \cdots 2)$
+\form#13:$ {\bf P} $
+\form#14:\[ {\bf P} = {\bf A}^T {\bf PA} + {\bf c}^TQ{\bf c} - {\bf A}^T{\bf Pb}(R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA} \]
+\form#15:\begin{eqnarray*} {\bf x}_{k+1} &=& {\bf A}{\bf x}_k + {\bf B} u_{k} \\ p_k &=& {\bf C} {\bf x}_{k} \\ \end{eqnarray*}
+\form#16:\begin{eqnarray*} {\bf A} & \equiv & \left[ \begin{matrix} 1 & T & T^2/2 \\ 0 & 1 & T \\ 0 & 0 & 1 \end{matrix} \right] \\ {\bf B} & \equiv & \left[ \begin{matrix} T^3/6 \\ T^2/2 \\ T \end{matrix} \right] \\ {\bf C} & \equiv & \left[ 1 \; 0 \; \frac{-z_c}{g} \right] \end{eqnarray*}
+\form#17:\[ J = \sum^{NL}_{j=1} \{ Q(p^{ref}_j -p_j)^2 + Ru_j^2 \} \]
+\form#18:\begin{eqnarray*} \widetilde{\bf A} &\equiv & \left[ \begin{matrix} 1 & {\bf cA} \\ {\bf 0} & {\bf A} \\ \end{matrix} \right] \\ \tilde{\bf b} & \equiv & \left[ \begin{matrix} {\bf cb} \\ {\bf c} \end{matrix} \right] \\ \tilde{\bf c} & \equiv & [ 1 \; 0 \; 0 \; 0] \\ \end{eqnarray*}
