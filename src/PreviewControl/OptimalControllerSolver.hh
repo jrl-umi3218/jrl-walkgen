@@ -54,15 +54,21 @@ namespace PatternGeneratorJRL
      where \f$ Q \f$ and \f$ R \f$ are also given as inputs.
 
      the solution is then:
-     \f{eqnarray*}
-     u_j = - K_1 \sum_{i=0}^k e(i) - K_2 x(k) - \sum_{j=1}^{N_L} K_p(j)p^{ref}_j(k+j)
-     \f}
+ \f{eqnarray*}
+ u_j = - {\bf K}x_k + [ f_1, f_2, \cdots, f_N] 
+\left[
+\begin{matrix}
+p^{ref}_{k+1} \\
+\vdots \\
+p^{ref}_{k+N} 
+\end{matrix}
+\right]
+ \f}
      
      \f{eqnarray*}
      {\bf K} & \equiv & (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA} \\
      K_p(i) & \equiv & (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T({\bf A}-{\bf bK})^{T*(i-1)}{\bf c}^TQ \\
      \f}
-     where \f$ K_1 = K(0,0)\f$, and \f$ K_2 = K(0,0 \cdots 2)\f$ 
      where \f$ {\bf P} \f$ is solution of the following Riccati equation:
      \f[
      {\bf P} = {\bf A}^T {\bf PA} + {\bf c}^TQ{\bf c} - {\bf A}^T{\bf Pb}(R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA}
@@ -71,6 +77,60 @@ namespace PatternGeneratorJRL
 
      The resolution of the Riccati equation is taken from \ref Laub1979, and is
      based on a Schur form .
+
+  To suppress the problem of the initial CoM position,
+  we can reformulate the discrete problem by posing the following:
+  \f{eqnarray*}
+  \begin{matrix}
+  {\bf x}^*_{k+1} &= \widetilde{\bf A} {\bf x}^*_{k} + \widetilde{\bf b}\Delta u_k \\
+  p_k &= \widetilde{\bf c}{\bf x}^*_{k}
+  \end{matrix}
+  \f}
+with 
+ \f{eqnarray*}
+ \Delta u_k \equiv u_k - u_{k-1} & \Delta {\bf x}_k \equiv {\bf x}_k - {\bf x}_{k-1}\\
+{\bf x}_k \equiv \left[ 
+\begin{matrix}
+p_k\\
+\Delta {\bf x}_k
+\end{matrix}
+\right]
+ \f}
+The augmented system is then
+  \f{eqnarray*}
+
+  \widetilde{\bf A} &\equiv &
+  \left[
+  \begin{matrix}
+  1 & {\bf cA} \\
+  {\bf 0} & {\bf A} \\
+  \end{matrix}
+  \right] \\
+  \tilde{\bf b} & \equiv &
+  \left[
+  \begin{matrix}
+  {\bf cb} \\
+  {\bf c}
+  \end{matrix}
+  \right] \\
+  \tilde{\bf c} & 
+  \equiv & [ 1 \; 0 \; 0 \; 0] \\
+
+  \f}
+  with the following cost function:
+  \f[
+  J = \sum^{\infty}_{j=1} \{ Q(p^{ref}_j -p_j)^2 + R \Delta u_j^2 \}
+  \f]
+
+ the solution is then:
+     \f{eqnarray*}
+     u_j = - K_1 \sum_{i=0}^k e(i) - {\bf K}_2 x(k) - \sum_{j=1}^{N_L} K_p(j)p^{ref}_j(k+j)
+     \f}
+  
+     where \f{eqnarray*}
+     \left[ \begin{matrix} K_1 \\ {\bf K}_2 \\ \end{matrix} \right]= \widetilde{\bf K}
+     \f}
+  
 
      \anchor Laub1979
      Alan J. Laub A Schur method for solving Algebraic Riccati Equations, IEEE Transaction on Automatic Control,
@@ -210,7 +270,21 @@ namespace PatternGeneratorJRL
   \until Nl
 
   To suppress the problem of the initial CoM position,
-  we can reformulate the discrete problem with:
+  we can reformulate the discrete problem by posing the following:
+  \f{eqnarray*}
+  {\bf x}^*_{k+1} = \widetilde{\bf A} {\bf x}^*_{k} + \widetilde{\bf b}\Delta u_k
+  p_k = \widetilde{\bf c}{\bf x}^*_{k}
+  \f}
+with 
+ \f{eqnarray*
+ \Delta u_k \equiv u_k - u_{k-1} & \Delta {\bf x}_k \equiv {\bf x}_k - {\bf x}_{k-1}
+{\bf x}_k \equiv \left[ 
+\begin{matrix}
+p_k\\
+\Delta {\bf x}_k
+\end{matrix}
+\right]
+ \f}
   
   \f{eqnarray*}
 
