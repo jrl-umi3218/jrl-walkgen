@@ -193,7 +193,7 @@ SET(EXAMPLES_SOURCES
   TestFootPrintPGInterface.cpp
   TestHerdt2010.cpp
   CommonTools.cpp
-  CommonTools.h
+  CommonTools.hh
   examples.CMakeList
   )
 
