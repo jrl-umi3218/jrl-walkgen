@@ -31,6 +31,8 @@
 
 using namespace std;
 
+#define NB_OF_FIELDS 26
+
 #ifdef WIN32
 double trunc (double x)
 {
@@ -254,7 +256,7 @@ namespace PatternGeneratorJRL
 	aDebugHDR->setProperty(inProperty[i],
 			       inValue[i]);
 
-  
+      delete [] dInitPos;
     }
 
     void TestObject::prepareDebugFiles()
@@ -276,7 +278,7 @@ namespace PatternGeneratorJRL
 	  aFileName += "TestFGPI_description.dat";
 
 	  aof.open(aFileName.c_str(),ofstream::out);
-	  string Titles[26] =
+	  string Titles[NB_OF_FIELDS] =
 	    { "Time",
 	      "Com X",
 	      "Com Y" ,
@@ -303,7 +305,7 @@ namespace PatternGeneratorJRL
 	      "ZMP Y (world ref.)" ,
 	      "Waist X (world ref.)" ,
 	      "Waist Y (world ref.)" };
-	  for(unsigned int i=0;i<26;i++)
+	  for(unsigned int i=0;i<NB_OF_FIELDS;i++)
 	    aof << i+1 << ". " <<Titles[i] <<std::endl;
 
 	  aof.close();
@@ -385,19 +387,41 @@ namespace PatternGeneratorJRL
 	  areportof.open(aFileName.c_str(),ofstream::out);
 	    
 	  // Time
-	  double LocalInput[70], ReferenceInput[70];
+	  double LocalInput[NB_OF_FIELDS], ReferenceInput[NB_OF_FIELDS];
 	  bool finalreport = true;
 	  unsigned long int nblines = 0;
+	  bool endofinspection=false;
+
 	  while ((!alif.eof()) ||
-		 (!arif.eof()))
+		 (!arif.eof()) ||
+		 (endofinspection))
 	    {
-	      for (unsigned int i=0;i<70;i++)
-		alif >> LocalInput[i];
+	      for (unsigned int i=0;i<NB_OF_FIELDS;i++)
+		{
+		  alif >> LocalInput[i];
+		  if (alif.eof())
+		    {
+		      endofinspection =true;
+		      break;
+		    }
+		}
+	      if (endofinspection)
+		break;
 
-	      for (unsigned int i=0;i<70;i++)
-		arif >> ReferenceInput[i];
+	      for (unsigned int i=0;i<NB_OF_FIELDS;i++)
+		{
+		  arif >> ReferenceInput[i];
+		  if (alif.eof())
+		    {
+		      endofinspection =true;
+		      break;
+		    }
+		}
+	      if (endofinspection)
+		break;
 
-	      for (unsigned int i=0;i<70;i++)
+	      
+	      for (unsigned int i=0;i<NB_OF_FIELDS;i++)
 		{
 		  if  (fabs(LocalInput[i]-
 			    ReferenceInput[i])>=1e-6)
