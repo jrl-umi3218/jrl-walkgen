@@ -74,16 +74,40 @@
 <p>where <img class="formulaInl" alt="$ Q $" src="form_7.png"/> and <img class="formulaInl" alt="$ R $" src="form_8.png"/> are also given as inputs.</p>
 <p>the solution is then: </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\begin{eqnarray*} u_j = - K_1 \sum_{i=0}^k e(i) - K_2 x(k) - \sum_{j=1}^{N_L} K_p(j)p^{ref}_j(k+j) \end{eqnarray*}" src="form_9.png"/>
+<img class="formulaDsp" alt="\begin{eqnarray*} u_j = - {\bf K}x_k + [ f_1, f_2, \cdots, f_N] \left[ \begin{matrix} p^{ref}_{k+1} \\ \vdots \\ p^{ref}_{k+N} \end{matrix} \right] \end{eqnarray*}" src="form_9.png"/>
 </p>
 <p class="formulaDsp">
 <img class="formulaDsp" alt="\begin{eqnarray*} {\bf K} &amp; \equiv &amp; (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA} \\ K_p(i) &amp; \equiv &amp; (R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T({\bf A}-{\bf bK})^{T*(i-1)}{\bf c}^TQ \\ \end{eqnarray*}" src="form_10.png"/>
 </p>
-<p> where <img class="formulaInl" alt="$ K_1 = K(0,0)$" src="form_11.png"/>, and <img class="formulaInl" alt="$ K_2 = K(0,0 \cdots 2)$" src="form_12.png"/> where <img class="formulaInl" alt="$ {\bf P} $" src="form_13.png"/> is solution of the following Riccati equation: </p>
+<p> where <img class="formulaInl" alt="$ {\bf P} $" src="form_11.png"/> is solution of the following Riccati equation: </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ {\bf P} = {\bf A}^T {\bf PA} + {\bf c}^TQ{\bf c} - {\bf A}^T{\bf Pb}(R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA} \]" src="form_14.png"/>
+<img class="formulaDsp" alt="\[ {\bf P} = {\bf A}^T {\bf PA} + {\bf c}^TQ{\bf c} - {\bf A}^T{\bf Pb}(R + {\bf b}^T{\bf Pb})^{-1}{\bf b}^T{\bf PA} \]" src="form_12.png"/>
 </p>
 <p>The resolution of the Riccati equation is taken from <a class="el" href="a00034.html#Laub1979">Laub1979</a>, and is based on a Schur form .</p>
+<p>To suppress the problem of the initial CoM position, we can reformulate the discrete problem by posing the following: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\begin{eqnarray*} \begin{matrix} {\bf x}^*_{k+1} &amp;= \widetilde{\bf A} {\bf x}^*_{k} + \widetilde{\bf b}\Delta u_k \\ p_k &amp;= \widetilde{\bf c}{\bf x}^*_{k} \end{matrix} \end{eqnarray*}" src="form_13.png"/>
+</p>
+<p> with </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\begin{eqnarray*} \Delta u_k \equiv u_k - u_{k-1} &amp; \Delta {\bf x}_k \equiv {\bf x}_k - {\bf x}_{k-1}\\ {\bf x}_k \equiv \left[ \begin{matrix} p_k\\ \Delta {\bf x}_k \end{matrix} \right] \end{eqnarray*}" src="form_14.png"/>
+</p>
+<p> The augmented system is then </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\begin{eqnarray*} \widetilde{\bf A} &amp;\equiv &amp; \left[ \begin{matrix} 1 &amp; {\bf cA} \\ {\bf 0} &amp; {\bf A} \\ \end{matrix} \right] \\ \tilde{\bf b} &amp; \equiv &amp; \left[ \begin{matrix} {\bf cb} \\ {\bf c} \end{matrix} \right] \\ \tilde{\bf c} &amp; \equiv &amp; [ 1 \; 0 \; 0 \; 0] \\ \end{eqnarray*}" src="form_15.png"/>
+</p>
+<p> with the following cost function: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ J = \sum^{\infty}_{j=1} \{ Q(p^{ref}_j -p_j)^2 + R \Delta u_j^2 \} \]" src="form_16.png"/>
+</p>
+<p>the solution is then: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\begin{eqnarray*} u_j = - K_1 \sum_{i=0}^k e(i) - {\bf K}_2 x(k) - \sum_{j=1}^{N_L} K_p(j)p^{ref}_j(k+j) \end{eqnarray*}" src="form_17.png"/>
+</p>
+<p>where </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\begin{eqnarray*} \left[ \begin{matrix} K_1 \\ {\bf K}_2 \\ \end{matrix} \right]= \widetilde{\bf K} \end{eqnarray*}" src="form_18.png"/>
+</p>
 <p><a class="anchor" id="Laub1979"></a> Alan J. Laub A Schur method for solving Algebraic Riccati Equations, IEEE Transaction on Automatic Control, Vol AC-24, No.6 December 1979 </p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ac369e47572527327ec0188e88356a577"></a><!-- doxytag: member="PatternGeneratorJRL::OptimalControllerSolver::OptimalControllerSolver" ref="ac369e47572527327ec0188e88356a577" args="(MAL_MATRIX(&amp;A, double), MAL_MATRIX(&amp;b, double), MAL_MATRIX(&amp;c, double), double Q, double R, unsigned int Nl)" -->
@@ -136,7 +160,7 @@
 <div class="memdoc">
 <p>A constructor </p>
 
-<p>References <a class="el" href="a00087_source.html#l00388">b</a>, <a class="el" href="a00087_source.html#l00388">c</a>, <a class="el" href="a00074_source.html#l00146">m_Nl</a>, <a class="el" href="a00074_source.html#l00138">m_Q</a>, <a class="el" href="a00074_source.html#l00138">m_R</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a32647b9ffc55fcade27dd54bf1c85495">MAL_MATRIX</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#ac4cdf90245da28c5403fee0254ced977">MAL_MATRIX_NB_COLS</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a6e012b239f2bc5dfddf89de7dd90a9a3">MAL_MATRIX_NB_ROWS</a>, and <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a600ee35ab76de8a72fbfcf6cc3542899">MAL_MATRIX_RESIZE</a>.</p>
+<p>References <a class="el" href="a00087_source.html#l00388">b</a>, <a class="el" href="a00087_source.html#l00388">c</a>, <a class="el" href="a00074_source.html#l00206">m_Nl</a>, <a class="el" href="a00074_source.html#l00198">m_Q</a>, <a class="el" href="a00074_source.html#l00198">m_R</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a32647b9ffc55fcade27dd54bf1c85495">MAL_MATRIX</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#ac4cdf90245da28c5403fee0254ced977">MAL_MATRIX_NB_COLS</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a6e012b239f2bc5dfddf89de7dd90a9a3">MAL_MATRIX_NB_ROWS</a>, and <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a600ee35ab76de8a72fbfcf6cc3542899">MAL_MATRIX_RESIZE</a>.</p>
 
 </div>
 </div>
@@ -176,7 +200,7 @@
 <div class="memdoc">
 <p>Compute the weights Following the mode, there is a the inclusion of the P matrix inside the weights. </p>
 
-<p>References <a class="el" href="a00073_source.html#l00133">GeneralizedSchur()</a>, <a class="el" href="a00074_source.html#l00146">m_Nl</a>, <a class="el" href="a00074_source.html#l00138">m_Q</a>, <a class="el" href="a00074_source.html#l00138">m_R</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a848ca8580fdc32ff7f5fa4e4309e61e1">MAL_INVERSE</a>, <a class="el" href="a00034.html#accef967501bdf23490bb752838cae692">MAL_MATRIX()</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a1ecb2d43e5d380623ea2c56d5eaa693a">MAL_MATRIX_DIM</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#ac4cdf90245da28c5403fee0254ced977">MAL_MATRIX_NB_COLS</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a6e012b239f2bc5dfddf89de7dd90a9a3">MAL_MATRIX_NB_ROWS</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a600ee35ab76de8a72fbfcf6cc3542899">MAL_MATRIX_RESIZE</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a81473a3bb873d053314c069b9bc2eb95">MAL_MATRIX_SET_IDENTITY</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#ada73b0370275a533dc31d335cd1ac4cf">MAL_RET_A_by_B</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#af66fde72c34f603f592c944579c8e3f7">MAL_RET_TRANSPOSE</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a1a4064cac32756f5f29cb5862914b6fa">MAL_VECTOR_DIM</a>, <a class="el" href="a00074_source.html#l00083">MODE_WITHOUT_INITIALPOS</a>, and <a class="el" href="a00087_source.html#l00387">n</a>.</p>
+<p>References <a class="el" href="a00073_source.html#l00133">GeneralizedSchur()</a>, <a class="el" href="a00074_source.html#l00206">m_Nl</a>, <a class="el" href="a00074_source.html#l00198">m_Q</a>, <a class="el" href="a00074_source.html#l00198">m_R</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a848ca8580fdc32ff7f5fa4e4309e61e1">MAL_INVERSE</a>, <a class="el" href="a00034.html#accef967501bdf23490bb752838cae692">MAL_MATRIX()</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a1ecb2d43e5d380623ea2c56d5eaa693a">MAL_MATRIX_DIM</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#ac4cdf90245da28c5403fee0254ced977">MAL_MATRIX_NB_COLS</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a6e012b239f2bc5dfddf89de7dd90a9a3">MAL_MATRIX_NB_ROWS</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a600ee35ab76de8a72fbfcf6cc3542899">MAL_MATRIX_RESIZE</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a81473a3bb873d053314c069b9bc2eb95">MAL_MATRIX_SET_IDENTITY</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#ada73b0370275a533dc31d335cd1ac4cf">MAL_RET_A_by_B</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#af66fde72c34f603f592c944579c8e3f7">MAL_RET_TRANSPOSE</a>, <a class="elRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a1a4064cac32756f5f29cb5862914b6fa">MAL_VECTOR_DIM</a>, <a class="el" href="a00074_source.html#l00143">MODE_WITHOUT_INITIALPOS</a>, and <a class="el" href="a00087_source.html#l00387">n</a>.</p>
 
 </div>
 </div>

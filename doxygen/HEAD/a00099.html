@@ -25,7 +25,7 @@
   <a class="code" href="a00034.html" title="This class computes the gains for preview control for a given discrete system. The...">PatternGeneratorJRL::OptimalControllerSolver</a> *anOCS;
 </pre></div> You have then to build the linear discrete system of the linear inverted pendulum such that: </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\begin{eqnarray*} {\bf x}_{k+1} &amp;=&amp; {\bf A}{\bf x}_k + {\bf B} u_{k} \\ p_k &amp;=&amp; {\bf C} {\bf x}_{k} \\ \end{eqnarray*}" src="form_15.png"/>
+<img class="formulaDsp" alt="\begin{eqnarray*} {\bf x}_{k+1} &amp;=&amp; {\bf A}{\bf x}_k + {\bf B} u_{k} \\ p_k &amp;=&amp; {\bf C} {\bf x}_{k} \\ \end{eqnarray*}" src="form_19.png"/>
 </p>
 <p>For this we need to declare the associated matrices: <div class="fragment"><pre class="fragment">  <span class="comment">/* Declare the linear system */</span>
   <a class="codeRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a1ecb2d43e5d380623ea2c56d5eaa693a">MAL_MATRIX_DIM</a>(A,<span class="keywordtype">double</span>,3,3);
@@ -38,7 +38,7 @@
 </pre></div></p>
 <p>Then we have to initialize the discretized linear system with</p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\begin{eqnarray*} {\bf A} &amp; \equiv &amp; \left[ \begin{matrix} 1 &amp; T &amp; T^2/2 \\ 0 &amp; 1 &amp; T \\ 0 &amp; 0 &amp; 1 \end{matrix} \right] \\ {\bf B} &amp; \equiv &amp; \left[ \begin{matrix} T^3/6 \\ T^2/2 \\ T \end{matrix} \right] \\ {\bf C} &amp; \equiv &amp; \left[ 1 \; 0 \; \frac{-z_c}{g} \right] \end{eqnarray*}" src="form_16.png"/>
+<img class="formulaDsp" alt="\begin{eqnarray*} {\bf A} &amp; \equiv &amp; \left[ \begin{matrix} 1 &amp; T &amp; T^2/2 \\ 0 &amp; 1 &amp; T \\ 0 &amp; 0 &amp; 1 \end{matrix} \right] \\ {\bf B} &amp; \equiv &amp; \left[ \begin{matrix} T^3/6 \\ T^2/2 \\ T \end{matrix} \right] \\ {\bf C} &amp; \equiv &amp; \left[ 1 \; 0 \; \frac{-z_c}{g} \right] \end{eqnarray*}" src="form_20.png"/>
 </p>
 <p> <div class="fragment"><pre class="fragment">  <span class="comment">/* Build the initial discrete system</span>
 <span class="comment">     regarding the CoM and the ZMP. */</span>
@@ -56,16 +56,20 @@
 </pre></div></p>
 <p>We then have to initialize the weights of the index function: </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ J = \sum^{NL}_{j=1} \{ Q(p^{ref}_j -p_j)^2 + Ru_j^2 \} \]" src="form_17.png"/>
+<img class="formulaDsp" alt="\[ J = \sum^{NL}_{j=1} \{ Q(p^{ref}_j -p_j)^2 + Ru_j^2 \} \]" src="form_21.png"/>
 </p>
 <p><div class="fragment"><pre class="fragment">  Q = 1.0;
   R = 1e-6;
 
   Nl = (int)(1.6/T);
 </pre></div></p>
-<p>To suppress the problem of the initial CoM position, we can reformulate the discrete problem with:</p>
+<p>To suppress the problem of the initial CoM position, we can reformulate the discrete problem by posing the following: </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\begin{eqnarray*} \widetilde{\bf A} &amp;\equiv &amp; \left[ \begin{matrix} 1 &amp; {\bf cA} \\ {\bf 0} &amp; {\bf A} \\ \end{matrix} \right] \\ \tilde{\bf b} &amp; \equiv &amp; \left[ \begin{matrix} {\bf cb} \\ {\bf c} \end{matrix} \right] \\ \tilde{\bf c} &amp; \equiv &amp; [ 1 \; 0 \; 0 \; 0] \\ \end{eqnarray*}" src="form_18.png"/>
+<img class="formulaDsp" alt="\begin{eqnarray*} {\bf x}^*_{k+1} = \widetilde{\bf A} {\bf x}^*_{k} + \widetilde{\bf b}\Delta u_k p_k = \widetilde{\bf c}{\bf x}^*_{k} \end{eqnarray*}" src="form_22.png"/>
+</p>
+<p> with {eqnarray*  u_k  u_k - u_{k-1} &amp;  { x}_k  { x}_k - { x}_{k-1} { x}_k  [ {matrix} p_k\  { x}_k {matrix} ] }</p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\begin{eqnarray*} \widetilde{\bf A} &amp;\equiv &amp; \left[ \begin{matrix} 1 &amp; {\bf cA} \\ {\bf 0} &amp; {\bf A} \\ \end{matrix} \right] \\ \tilde{\bf b} &amp; \equiv &amp; \left[ \begin{matrix} {\bf cb} \\ {\bf c} \end{matrix} \right] \\ \tilde{\bf c} &amp; \equiv &amp; [ 1 \; 0 \; 0 \; 0] \\ \end{eqnarray*}" src="form_15.png"/>
 </p>
 <p>Then the subsequent code performs this operation and displays the associated matrices: <div class="fragment"><pre class="fragment">  <span class="comment">// Build the derivated system</span>
   <a class="codeRef" doxygen="jrl-mal.doxytag:" href="a00019.html#a1ecb2d43e5d380623ea2c56d5eaa693a">MAL_MATRIX_DIM</a>(Ax,<span class="keywordtype">double</span>,4,4);
