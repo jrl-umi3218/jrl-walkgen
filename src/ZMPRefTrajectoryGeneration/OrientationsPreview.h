@@ -37,8 +37,12 @@
 
 #include <privatepgtypes.h>
 #include <jrl/walkgen/pgtypes.hh>
+
 #include <abstract-robot-dynamics/joint.hh>
 #include <PreviewControl/rigid-body-system.hh>
+
+#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+
 
 namespace PatternGeneratorJRL
 {
@@ -52,7 +56,7 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors
     /// \{
-    OrientationsPreview( CjrlJoint *aLeg );
+    OrientationsPreview( const CjrlHumanoidDynamicRobot *aHS );
     ~OrientationsPreview();
     /// \}
 

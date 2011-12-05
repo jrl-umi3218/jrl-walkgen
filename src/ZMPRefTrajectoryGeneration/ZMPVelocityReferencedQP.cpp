@@ -82,7 +82,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   SupportFSM_->SamplingPeriod( QP_T_ );
   
   // Create and initialize preview of orientations
-  OrientPrw_ = new OrientationsPreview( aHS->rootJoint() );
+  OrientPrw_ = new OrientationsPreview( aHS );
   OrientPrw_->SamplingPeriod( QP_T_ );
   OrientPrw_-> SimuPeriod(m_SamplingFeedback);
   OrientPrw_->NbSamplingsPreviewed( QP_N_ );
@@ -125,12 +125,17 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_->Ponderation( 0.001, JERK_MIN );
 
   // Register method to handle
-  const unsigned int NbMethods = 3;
+  const unsigned int NbMethods = 6;
   string aMethodName[NbMethods] =
-    {":previewcontroltime",
-     ":numberstepsbeforestop",
-     ":stoppg"};
-  
+      {":previewcontroltime",
+          ":numberstepsbeforestop",
+          ":stoppg",
+          ":stepperiod",
+          ":dsperiod",
+          ":dsssperiod"
+      };
+
+
   for(unsigned int i=0;i<NbMethods;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
@@ -212,7 +217,27 @@ ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &st
     {
       EndingPhase_ = true;
     }
-  
+
+  // access to the FSM
+  if (Method==":stepperiod")
+    {
+	  double val;
+	  strm >> val;
+	  SupportFSM_->StepPeriod( val );
+    }
+  if (Method==":dsperiod")
+    {
+	  double val;
+	  strm >> val;
+	  SupportFSM_->DSPeriod( val );
+    }
+  if (Method==":dsssperiod")
+    {
+	  double val;
+	  strm >> val;
+	  SupportFSM_->DSSSPeriod( val );
+    }
+
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
   
 }
