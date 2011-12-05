@@ -101,7 +101,7 @@ namespace PatternGeneratorJRL
         deque<COMState> & CoMStates,
         deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
         deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
-        support_state_t & new_current_support);
+        bool support_state_changed);
 
 
 
@@ -132,6 +132,14 @@ namespace PatternGeneratorJRL
 
     solution_t & Solution()
     { return Solution_; }
+    
+    support_state_t & SupportState()
+    { return IntermedData_->SupportState(); }
+    
+    rigid_body_state_t & LeftFoot()
+    { return Robot_->LeftFoot().State(); }
+    rigid_body_state_t & RightFoot()
+    { return Robot_->RightFoot().State(); }
 
     inline const int & QP_N(void) const
     { return QP_N_; }
@@ -165,7 +173,7 @@ namespace PatternGeneratorJRL
     double UpperTimeLimitToFeedback_;
 
     /// \brief Current time
-    double CurrentTime;
+    double CurrentTime_;
 
     /// \brief Sampling feedback period
     double m_SamplingFeedback;
@@ -216,7 +224,9 @@ namespace PatternGeneratorJRL
 
 
   public:
-
+    double & CurrentTime()
+    { return CurrentTime_; }
+    
     void GetZMPDiscretization(std::deque<ZMPPosition> & ZMPPositions,
         std::deque<COMState> & COMStates,
         std::deque<RelativeFootPosition> &RelativeFootPositions,

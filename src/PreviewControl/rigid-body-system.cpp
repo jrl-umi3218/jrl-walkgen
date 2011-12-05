@@ -231,9 +231,7 @@ RigidBodySystem::precompute_trajectories( const deque<support_state_t> & Support
 
 
 int
-RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
-    const std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
-    const std::deque<FootAbsolutePosition> & RightFootTraj_deq )
+RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq )
 {
 
   unsigned nbStepsPreviewed = SupportStates_deq.back().StepNumber;
@@ -247,18 +245,18 @@ RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
 
       compute_dyn_cop( nbStepsPreviewed );
 
-      LeftFoot_.State().X[0] = LeftFootTraj_deq.front().x;
-      LeftFoot_.State().X[1] = LeftFootTraj_deq.front().dx;
-      LeftFoot_.State().X[2] = LeftFootTraj_deq.front().ddx;
-      LeftFoot_.State().Y[0] = LeftFootTraj_deq.front().y;
-      LeftFoot_.State().Y[1] = LeftFootTraj_deq.front().dy;
-      LeftFoot_.State().Y[2] = LeftFootTraj_deq.front().ddy;
-      RightFoot_.State().X[0] = RightFootTraj_deq.front().x;
-      RightFoot_.State().X[1] = RightFootTraj_deq.front().dx;
-      RightFoot_.State().X[2] = RightFootTraj_deq.front().ddx;
-      RightFoot_.State().Y[0] = RightFootTraj_deq.front().y;
-      RightFoot_.State().Y[1] = RightFootTraj_deq.front().dy;
-      RightFoot_.State().Y[2] = RightFootTraj_deq.front().ddy;
+//      LeftFoot_.State().X[0] = LeftFootTraj_deq.front().x;
+//      LeftFoot_.State().X[1] = LeftFootTraj_deq.front().dx;
+//      LeftFoot_.State().X[2] = LeftFootTraj_deq.front().ddx;
+//      LeftFoot_.State().Y[0] = LeftFootTraj_deq.front().y;
+//      LeftFoot_.State().Y[1] = LeftFootTraj_deq.front().dy;
+//      LeftFoot_.State().Y[2] = LeftFootTraj_deq.front().ddy;
+//      RightFoot_.State().X[0] = RightFootTraj_deq.front().x;
+//      RightFoot_.State().X[1] = RightFootTraj_deq.front().dx;
+//      RightFoot_.State().X[2] = RightFootTraj_deq.front().ddx;
+//      RightFoot_.State().Y[0] = RightFootTraj_deq.front().y;
+//      RightFoot_.State().Y[1] = RightFootTraj_deq.front().dy;
+//      RightFoot_.State().Y[2] = RightFootTraj_deq.front().ddy;
 
     }
 
@@ -911,6 +909,10 @@ RigidBodySystem::generate_trajectories( double Time, const solution_t & Solution
   OFTG_->interpolate_feet_positions(Time, PrwSupportStates_deq,
       Solution, PreviewedSupportAngles_deq,
       LeftFootTraj_deq, RightFootTraj_deq);
+
+  LeftFoot_.State() = LeftFootTraj_deq.back();
+  RightFoot_.State() = RightFootTraj_deq.back();
+
 
   return 0;
 

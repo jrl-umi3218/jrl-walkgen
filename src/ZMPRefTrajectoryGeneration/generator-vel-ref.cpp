@@ -74,31 +74,28 @@ GeneratorVelRef::Ponderation( double weight, objective_e type)
 
 void
 GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
-    const deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-    const deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
     deque<support_state_t> & SupportStates_deq )
 {
 
-  const FootAbsolutePosition * FAP = 0;
+  const rigid_body_state_t * Foot = 0;
 
   // DETERMINE CURRENT SUPPORT STATE:
   // --------------------------------
   const reference_t & RefVel = IntermedData_->Reference();
   support_state_t & CurrentSupport = IntermedData_->SupportState();
   FSM->set_support_state( CurrentTime_, 0, CurrentSupport, RefVel );
-  CurrentSupport.InTransitionPhase=false;
+  CurrentSupport.InTransitionPhase = false;
   if( CurrentSupport.StateChanged == true )
     {
       if( CurrentSupport.Foot == LEFT )
-        FAP = & FinalLeftFootTraj_deq.front();
+        Foot = & Robot_->LeftFoot().State();
       else
-        FAP = & FinalRightFootTraj_deq.front();
-      CurrentSupport.X = FAP->x;
-      CurrentSupport.Y = FAP->y;
-      CurrentSupport.Yaw = FAP->theta*M_PI/180.0;
+        Foot = & Robot_->RightFoot().State();
+      CurrentSupport.X = Foot->X[0];
+      CurrentSupport.Y = Foot->Y[0];
+      CurrentSupport.Yaw = Foot->Yaw[0];
       CurrentSupport.StartTime = time;
     }
-
   SupportStates_deq.push_back( CurrentSupport );
   IntermedData_->SupportState( CurrentSupport );
 
@@ -115,17 +112,17 @@ GeneratorVelRef::preview_support_states( double time, const SupportFSM * FSM,
       PreviewedSupport.InTransitionPhase=false;
       if( PreviewedSupport.StateChanged )
         {
-          if( pi == 1  )//Foot down
+          if( pi == 1 )//Foot down
             {
               if( PreviewedSupport.Foot == LEFT )
-                FAP = & FinalLeftFootTraj_deq.back();
+                Foot = & Robot_->LeftFoot().State();
               else
-                FAP = & FinalRightFootTraj_deq.back();
-              PreviewedSupport.X = FAP->x;
-              PreviewedSupport.Y = FAP->y;
-              PreviewedSupport.Yaw = FAP->theta*M_PI/180.0;
+                Foot = & Robot_->RightFoot().State();
+              PreviewedSupport.X = Foot->X[0];
+              PreviewedSupport.Y = Foot->Y[0];
+              PreviewedSupport.Yaw = Foot->Yaw[0];
               PreviewedSupport.StartTime = time+pi*Tprw_;
-              if (CurrentSupport.Phase==SS && PreviewedSupport.Phase==SS){
+              if( CurrentSupport.Phase == SS && PreviewedSupport.Phase == SS ){
             	  PreviewedSupport.InTransitionPhase=true;
               }
             }
@@ -616,7 +613,7 @@ GeneratorVelRef::update_problem( QPProblem & Pb,
 		boost_ublas::matrix<double> Tf=Id_N;
 		Tf(0,0)=TimeFactor;
 
-		Tf(N_-1,N_-1)=1.05-TimeFactor;
+		//Tf(N_-1,N_-1)=1.05-TimeFactor;
 
 		boost_ublas::matrix<double> G(N_,N_);
 		boost_ublas::vector<double> H(N_);

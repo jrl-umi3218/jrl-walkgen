@@ -68,11 +68,8 @@ namespace PatternGeneratorJRL
     ///
     /// \param[in] Time Current time
     /// \param[in] FSM Finite state machine
-    /// \param[in] FinalLeftFootTraj_deq
-    /// \param[in] FinalRightFootTraj_deq
     /// \param[out] SupportStates_deq
     void preview_support_states( double Time, const SupportFSM * FSM,
-        const deque<FootAbsolutePosition> & FinalLeftFootTraj_deq, const deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
         deque<support_state_t> & SupportStates_deq );
 
     /// \brief Set the global reference from the local one and the orientation of the trunk frame
