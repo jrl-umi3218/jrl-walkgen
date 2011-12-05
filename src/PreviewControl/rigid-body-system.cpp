@@ -142,8 +142,9 @@ RigidBodySystem::initialize_trajectories()
 
   // Constant CoM height:
   // --------------------
+  CoM_.Trajectory().resize(N_);
   std::deque<rigid_body_state_t>::iterator TrajIt;
-  for(TrajIt = CoM_.Trajectory().begin(); TrajIt < CoM_.Trajectory().end(); TrajIt++)
+  for(TrajIt = CoM_.Trajectory().begin(); TrajIt < CoM_.Trajectory().end(); ++TrajIt)
     {
       TrajIt->Z(0) = CoMHeight_;
     }
@@ -242,7 +243,6 @@ RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq )
       compute_foot_pol_dynamics( SupportStates_deq, LeftFoot_.Dynamics(ACCELERATION), RightFoot_.Dynamics(ACCELERATION) );
 
       precompute_trajectories( SupportStates_deq );
-
       compute_dyn_cop( nbStepsPreviewed );
 
 //      LeftFoot_.State().X[0] = LeftFootTraj_deq.front().x;
@@ -309,15 +309,14 @@ RigidBodySystem::compute_dyn_cop( unsigned nbSteps )
       RightFoot_.Dynamics( COP_POSITION ).clear();
     }
 
-  CoPDynamicsJerk_.S.clear();
-  CoPDynamicsJerk_.U.clear();
-  CoPDynamicsJerk_.UT.clear();
+  CoPDynamicsJerk_.clear();
 
   // Add "weighted" dynamic matrices:
   // --------------------------------
   std::deque<rigid_body_state_t>::iterator LFTraj_it = LeftFoot_.Trajectory().begin();
   std::deque<rigid_body_state_t>::iterator RFTraj_it = RightFoot_.Trajectory().begin();
   std::deque<rigid_body_state_t>::iterator CoMTraj_it = CoM_.Trajectory().begin();
+
   //  std::deque<double>::iterator GRF_it = GRF_deq_.begin();
   double GRF = 0.0;
   for(unsigned int i = 0; i < N_; i++)
@@ -752,152 +751,152 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
 }
 
 
-int
-RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> & SupportStates_deq,
-    linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics )
-{
-
-  // Resize the matrices:
-  // --------------------
-  unsigned int nbSteps = SupportStates_deq.back().StepNumber;
-  LeftFootDynamics.U.resize(N_,nbSteps,false);
-  LeftFootDynamics.U.clear();
-  LeftFootDynamics.UT.resize(nbSteps,N_,false);
-  LeftFootDynamics.UT.clear();
-  LeftFootDynamics.S.clear();
-  RightFootDynamics.U.resize(N_,nbSteps,false);
-  RightFootDynamics.U.clear();
-  RightFootDynamics.UT.resize(nbSteps,N_,false);
-  RightFootDynamics.UT.clear();
-  RightFootDynamics.S.clear();
-
-  // Fill the matrices:
-  // ------------------
-  linear_dynamics_t * SFDynamics;
-  linear_dynamics_t * FFDynamics;
-  double Spbar[3], Sabar[3];
-  double Upbar[2], Uabar[2];
-  unsigned int SwitchInstant = 0;
-  std::deque<support_state_t>::const_iterator SS_it =
-      SupportStates_deq.begin();
-  SS_it++;
-  for(unsigned int i=0;i<N_;i++)
-    {
-      if(SS_it->Foot == LEFT)
-        {
-          SFDynamics = & LeftFootDynamics;
-          FFDynamics = & RightFootDynamics;
-        }
-      else
-        {
-          SFDynamics = & RightFootDynamics;
-          FFDynamics = & LeftFootDynamics;
-        }
-      if(SS_it->StateChanged == true)
-        {
-          SwitchInstant = i+1;
-        }
-      if(SS_it->Phase == DS)
-        {
-          // The previous row is copied in DS phase
-          if(i==0)
-            {
-              if(SFDynamics->Type == POSITION)
-                {
-                  SFDynamics->S(i,0) = 1.0;FFDynamics->S(i,0) = 1.0;
-                  SFDynamics->S(i,1) = 0.0;FFDynamics->S(i,1) = 0.0;
-                  SFDynamics->S(i,2) = 0.0;FFDynamics->S(i,2) = 0.0;
-                }
-            }
-          if(i>0)
-            {
-              SFDynamics->S(i,0) = SFDynamics->S(i-1,0);FFDynamics->S(i,0) = FFDynamics->S(i-1,0);
-              SFDynamics->S(i,1) = SFDynamics->S(i-1,1);FFDynamics->S(i,1) = FFDynamics->S(i-1,1);
-              SFDynamics->S(i,2) = SFDynamics->S(i-1,2);FFDynamics->S(i,2) = FFDynamics->S(i-1,2);
-              for(unsigned int SNb = 0; SNb < nbSteps; SNb++)
-                {
-                  SFDynamics->U(i,SNb) = SFDynamics->UT(SNb,i) = SFDynamics->U(i-1,SNb);
-                  FFDynamics->U(i,SNb) = FFDynamics->UT(SNb,i) = FFDynamics->U(i-1,SNb);
-                }
-            }
-        }
-      else
-        {
-
-          compute_sbar( Spbar, Sabar, (SS_it->NbInstants+1)*T_, FSM_->StepPeriod()-T_ );
-          compute_ubar( Upbar, Uabar, (SS_it->NbInstants+1)*T_, FSM_->StepPeriod()-T_ );
-          if(SS_it->StepNumber == 0 && SS_it->StepNumber < nbSteps)
-            {
-              if(FFDynamics->Type == POSITION)
-                {
-                  FFDynamics->S(i,0) = Spbar[0];SFDynamics->S(i,0) = 1.0;
-                  FFDynamics->S(i,1) = Spbar[1];SFDynamics->S(i,1) = 0.0;
-                  FFDynamics->S(i,2) = Spbar[2];SFDynamics->S(i,2) = 0.0;
-                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Upbar[0];
-                  SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
-                }
-              else if(FFDynamics->Type == ACCELERATION)
-                {
-                  FFDynamics->S(i,0) = Sabar[0];SFDynamics->S(i,0) = 0.0;
-                  FFDynamics->S(i,1) = Sabar[1];SFDynamics->S(i,1) = 0.0;
-                  FFDynamics->S(i,2) = Sabar[2];SFDynamics->S(i,2) = 1.0;
-                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Uabar[0];
-                  SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
-                }
-              if((SS_it->NbInstants+1)*T_ > FSM_->StepPeriod()-T_)
-                {
-                  FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
-                  FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
-                  FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
-                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = FFDynamics->U(i-1,SS_it->StepNumber);
-                  SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = SFDynamics->U(i-1,SS_it->StepNumber);
-                }
-            }
-          else if(SS_it->StepNumber == 1 && SS_it->StepNumber < nbSteps)
-            {
-              if(FFDynamics->Type == POSITION)
-                {
-                  FFDynamics->S(i,0) = Spbar[0]; //SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
-                  FFDynamics->S(i,1) = Spbar[1]; //SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
-                  FFDynamics->S(i,2) = Spbar[2]; //SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
-                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Upbar[0];
-                  SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = 1.0;
-                }
-              else if(FFDynamics->Type == ACCELERATION)
-                {
-                  FFDynamics->S(i,0) = Sabar[0];
-                  FFDynamics->S(i,1) = Sabar[1];
-                  FFDynamics->S(i,2) = Sabar[2];
-                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Uabar[0];
-                  SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = 1.0;
-                }
-              if((SS_it->NbInstants+1)*T_ > FSM_->StepPeriod()-T_)
-                {
-                  FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
-                  FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
-                  FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
-                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = FFDynamics->U(i-1,SS_it->StepNumber);
-                  SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = SFDynamics->U(i-1,SS_it->StepNumber-1);
-                }
-            }
-          else if(SS_it->StepNumber == 2)
-            {
-              FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
-              FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
-              FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
-              for(unsigned int j = 0; j<nbSteps; j++)
-                {
-                  FFDynamics->U(i,j) = FFDynamics->UT(j,i) = FFDynamics->U(i-1,j);
-                  SFDynamics->U(i,j) = SFDynamics->UT(j,i) = SFDynamics->U(i-1,j);
-                }
-            }
-        }
-      SS_it++;
-    }
-
-  return 0;
-
-}
+//int
+//RigidBodySystem::compute_foot_cjerk_dynamics( const std::deque<support_state_t> & SupportStates_deq,
+//    linear_dynamics_t & LeftFootDynamics, linear_dynamics_t & RightFootDynamics )
+//{
+//
+//  // Resize the matrices:
+//  // --------------------
+//  unsigned int nbSteps = SupportStates_deq.back().StepNumber;
+//  LeftFootDynamics.U.resize(N_,nbSteps,false);
+//  LeftFootDynamics.U.clear();
+//  LeftFootDynamics.UT.resize(nbSteps,N_,false);
+//  LeftFootDynamics.UT.clear();
+//  LeftFootDynamics.S.clear();
+//  RightFootDynamics.U.resize(N_,nbSteps,false);
+//  RightFootDynamics.U.clear();
+//  RightFootDynamics.UT.resize(nbSteps,N_,false);
+//  RightFootDynamics.UT.clear();
+//  RightFootDynamics.S.clear();
+//
+//  // Fill the matrices:
+//  // ------------------
+//  linear_dynamics_t * SFDynamics;
+//  linear_dynamics_t * FFDynamics;
+//  double Spbar[3], Sabar[3];
+//  double Upbar[2], Uabar[2];
+//  unsigned int SwitchInstant = 0;
+//  std::deque<support_state_t>::const_iterator SS_it =
+//      SupportStates_deq.begin();
+//  SS_it++;
+//  for(unsigned int i=0;i<N_;i++)
+//    {
+//      if(SS_it->Foot == LEFT)
+//        {
+//          SFDynamics = & LeftFootDynamics;
+//          FFDynamics = & RightFootDynamics;
+//        }
+//      else
+//        {
+//          SFDynamics = & RightFootDynamics;
+//          FFDynamics = & LeftFootDynamics;
+//        }
+//      if(SS_it->StateChanged == true)
+//        {
+//          SwitchInstant = i+1;
+//        }
+//      if(SS_it->Phase == DS)
+//        {
+//          // The previous row is copied in DS phase
+//          if(i==0)
+//            {
+//              if(SFDynamics->Type == POSITION)
+//                {
+//                  SFDynamics->S(i,0) = 1.0;FFDynamics->S(i,0) = 1.0;
+//                  SFDynamics->S(i,1) = 0.0;FFDynamics->S(i,1) = 0.0;
+//                  SFDynamics->S(i,2) = 0.0;FFDynamics->S(i,2) = 0.0;
+//                }
+//            }
+//          if(i>0)
+//            {
+//              SFDynamics->S(i,0) = SFDynamics->S(i-1,0);FFDynamics->S(i,0) = FFDynamics->S(i-1,0);
+//              SFDynamics->S(i,1) = SFDynamics->S(i-1,1);FFDynamics->S(i,1) = FFDynamics->S(i-1,1);
+//              SFDynamics->S(i,2) = SFDynamics->S(i-1,2);FFDynamics->S(i,2) = FFDynamics->S(i-1,2);
+//              for(unsigned int SNb = 0; SNb < nbSteps; SNb++)
+//                {
+//                  SFDynamics->U(i,SNb) = SFDynamics->UT(SNb,i) = SFDynamics->U(i-1,SNb);
+//                  FFDynamics->U(i,SNb) = FFDynamics->UT(SNb,i) = FFDynamics->U(i-1,SNb);
+//                }
+//            }
+//        }
+//      else
+//        {
+//
+//          compute_sbar( Spbar, Sabar, (SS_it->NbInstants+1)*T_, FSM_->StepPeriod()-T_ );
+//          compute_ubar( Upbar, Uabar, (SS_it->NbInstants+1)*T_, FSM_->StepPeriod()-T_ );
+//          if(SS_it->StepNumber == 0 && SS_it->StepNumber < nbSteps)
+//            {
+//              if(FFDynamics->Type == POSITION)
+//                {
+//                  FFDynamics->S(i,0) = Spbar[0];SFDynamics->S(i,0) = 1.0;
+//                  FFDynamics->S(i,1) = Spbar[1];SFDynamics->S(i,1) = 0.0;
+//                  FFDynamics->S(i,2) = Spbar[2];SFDynamics->S(i,2) = 0.0;
+//                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Upbar[0];
+//                  SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
+//                }
+//              else if(FFDynamics->Type == ACCELERATION)
+//                {
+//                  FFDynamics->S(i,0) = Sabar[0];SFDynamics->S(i,0) = 0.0;
+//                  FFDynamics->S(i,1) = Sabar[1];SFDynamics->S(i,1) = 0.0;
+//                  FFDynamics->S(i,2) = Sabar[2];SFDynamics->S(i,2) = 1.0;
+//                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Uabar[0];
+//                  SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = 0.0;
+//                }
+//              if((SS_it->NbInstants+1)*T_ > FSM_->StepPeriod()-T_)
+//                {
+//                  FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
+//                  FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
+//                  FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
+//                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = FFDynamics->U(i-1,SS_it->StepNumber);
+//                  SFDynamics->U(i,SS_it->StepNumber) = SFDynamics->UT(SS_it->StepNumber,i) = SFDynamics->U(i-1,SS_it->StepNumber);
+//                }
+//            }
+//          else if(SS_it->StepNumber == 1 && SS_it->StepNumber < nbSteps)
+//            {
+//              if(FFDynamics->Type == POSITION)
+//                {
+//                  FFDynamics->S(i,0) = Spbar[0]; //SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
+//                  FFDynamics->S(i,1) = Spbar[1]; //SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
+//                  FFDynamics->S(i,2) = Spbar[2]; //SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
+//                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Upbar[0];
+//                  SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = 1.0;
+//                }
+//              else if(FFDynamics->Type == ACCELERATION)
+//                {
+//                  FFDynamics->S(i,0) = Sabar[0];
+//                  FFDynamics->S(i,1) = Sabar[1];
+//                  FFDynamics->S(i,2) = Sabar[2];
+//                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = Uabar[0];
+//                  SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = 1.0;
+//                }
+//              if((SS_it->NbInstants+1)*T_ > FSM_->StepPeriod()-T_)
+//                {
+//                  FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
+//                  FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
+//                  FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
+//                  FFDynamics->U(i,SS_it->StepNumber) = FFDynamics->UT(SS_it->StepNumber,i) = FFDynamics->U(i-1,SS_it->StepNumber);
+//                  SFDynamics->U(i,SS_it->StepNumber-1) = SFDynamics->UT(SS_it->StepNumber-1,i) = SFDynamics->U(i-1,SS_it->StepNumber-1);
+//                }
+//            }
+//          else if(SS_it->StepNumber == 2)
+//            {
+//              FFDynamics->S(i,0) = FFDynamics->S(i-1,0);SFDynamics->S(i,0) = SFDynamics->S(i-1,0);
+//              FFDynamics->S(i,1) = FFDynamics->S(i-1,1);SFDynamics->S(i,1) = SFDynamics->S(i-1,1);
+//              FFDynamics->S(i,2) = FFDynamics->S(i-1,2);SFDynamics->S(i,2) = SFDynamics->S(i-1,2);
+//              for(unsigned int j = 0; j<nbSteps; j++)
+//                {
+//                  FFDynamics->U(i,j) = FFDynamics->UT(j,i) = FFDynamics->U(i-1,j);
+//                  SFDynamics->U(i,j) = SFDynamics->UT(j,i) = SFDynamics->U(i-1,j);
+//                }
+//            }
+//        }
+//      SS_it++;
+//    }
+//
+//  return 0;
+//
+//}
 
 
 int

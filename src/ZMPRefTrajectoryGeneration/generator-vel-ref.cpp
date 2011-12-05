@@ -613,7 +613,7 @@ GeneratorVelRef::update_problem( QPProblem & Pb,
 		boost_ublas::matrix<double> Tf=Id_N;
 		Tf(0,0)=TimeFactor;
 
-		//Tf(N_-1,N_-1)=1.05-TimeFactor;
+		Tf(N_-1,N_-1)=1.05-TimeFactor;
 
 		boost_ublas::matrix<double> G(N_,N_);
 		boost_ublas::vector<double> H(N_);
