@@ -300,6 +300,11 @@ namespace PatternGeneratorJRL
        */
       virtual void setCoMPerturbationForce(double x, double y)=0;
 
+      /* \brief Get foot step position from velocity reference algorithm.
+	 Since the foot steps are decided by the velocity reference algorithm,
+	 this method allows to get the proper information.
+       */
+      virtual void getLandingFootPositionFromVelRef(double &x, double &y)=0;
     };
 
   /*! Factory of Pattern generator interface. */

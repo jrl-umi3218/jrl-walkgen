@@ -1894,12 +1894,16 @@ namespace PatternGeneratorJRL {
     lZMPInitialPoint = m_ZMPInitialPoint;
   }
 
+  void PatternGeneratorInterfacePrivate::
+  getLandingFootPositionFromVelRef(double &x, double &y)
+  {
+    m_ZMPVRQP->getLandingFootPosition(x,y);
+  }
 
   PatternGeneratorInterface * patternGeneratorInterfaceFactory(CjrlHumanoidDynamicRobot *aHDR)
   {
     return new PatternGeneratorInterfacePrivate(aHDR);
   }
-
 
 
 }

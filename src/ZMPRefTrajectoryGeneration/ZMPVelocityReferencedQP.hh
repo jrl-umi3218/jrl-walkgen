@@ -187,6 +187,7 @@ namespace PatternGeneratorJRL
     /* @} */
     ReferenceAbsoluteVelocity RefVel;
 
+   
     static const unsigned int QLD=0;
     static const unsigned int QLDANDLQ=1;
     static const unsigned int PLDP=2;
@@ -254,6 +255,9 @@ namespace PatternGeneratorJRL
 
     //Final optimization problem
     Problem m_Pb;
+
+    // Landing foot position.
+    double m_LandingXPosition, m_LandingYPosition;
 
     SupportState_t m_CurrentSupport, m_PrwSupport;
 
@@ -408,6 +412,12 @@ namespace PatternGeneratorJRL
 			      deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
     int ReturnOptimalTimeToRegenerateAStep();
+
+    /* Get foot position  */
+    void getLandingFootPosition(double &x, double &y)
+    { x = m_FPx; y = m_FPy;}
+    
+
   };
 }
 

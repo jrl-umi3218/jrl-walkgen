@@ -1909,6 +1909,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 	    {//The landing position is yet determined by the solver because the robot finds himself still in the single support phase
 	      m_FPx = ptX[2*m_QP_N];
 	      m_FPy = ptX[2*m_QP_N+m_PrwSupport.StepNumber];
+	      
+	      
 	    }
 	}
       else

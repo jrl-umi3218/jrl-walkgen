@@ -426,6 +426,8 @@ namespace PatternGeneratorJRL
     /*! \brief Realize a sequence of steps. */
     virtual void m_StepSequence(std::istringstream &strm);
 
+    /*! \brief Returns the foot landing position when using the velocity reference algorithm. */
+    virtual void getLandingFootPositionFromVelRef(double &x, double & y);
 
   private:
 
