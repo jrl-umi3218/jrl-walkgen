@@ -108,9 +108,9 @@ protected:
       {
 	stopOnLineWalking(*m_PGI);
       }
-    double x,y;
-    m_PGI->getLandingFootPositionFromVelRef(x,y);
-    std::cout << "Landing foot position: " << x << " " << y << std::endl;
+    double x,y,yaw;
+    m_PGI->getLandingFootPositionFromVelRef(x,y,yaw);
+    std::cout << "Landing foot position: " << x << " " << y << " " << yaw << std::endl;
   }
 };
 

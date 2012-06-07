@@ -414,8 +414,8 @@ namespace PatternGeneratorJRL
     int ReturnOptimalTimeToRegenerateAStep();
 
     /* Get foot position  */
-    void getLandingFootPosition(double &x, double &y)
-    { x = m_FPx; y = m_FPy;}
+    void getLandingFootPosition(double &x, double &y, double &yaw)
+    { x = m_FPx; y = m_FPy; yaw = m_PreviewedSupportAngles[0];}
     
 
   };

@@ -1895,9 +1895,9 @@ namespace PatternGeneratorJRL {
   }
 
   void PatternGeneratorInterfacePrivate::
-  getLandingFootPositionFromVelRef(double &x, double &y)
+  getLandingFootPositionFromVelRef(double &x, double &y, double &yaw)
   {
-    m_ZMPVRQP->getLandingFootPosition(x,y);
+    m_ZMPVRQP->getLandingFootPosition(x,y,yaw);
   }
 
   PatternGeneratorInterface * patternGeneratorInterfaceFactory(CjrlHumanoidDynamicRobot *aHDR)
