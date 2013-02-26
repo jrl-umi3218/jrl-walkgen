@@ -184,7 +184,7 @@ namespace PatternGeneratorJRL
    Polynome3 *m_PolynomeOmega, *m_PolynomeOmega2;
 
    /*! \brief Polynome for Z axis position. */
-   Polynome5 *m_PolynomeZ;   
+   Polynome4 *m_PolynomeZ;
 
    /*! \brief Foot dimension. */
    double m_FootB, m_FootH, m_FootF;

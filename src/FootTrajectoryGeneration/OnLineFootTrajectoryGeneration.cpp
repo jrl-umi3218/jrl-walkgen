@@ -119,33 +119,11 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
         curr_NSFAP.ddtheta = m_PolynomeTheta->ComputeSecDerivative(InterpolationTime);
     }
 
-  if(HalfTimePassed_==false && LocalInterpolationStartTime+InterpolationTime >= m_TSingle/2.0 )
-    {
-      SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle/2.0, 0.0,
-          StepHeight_, 0.0, 0.0);
-      HalfTimePassed_ = true;
-    }
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = 
+      m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = 
+      m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
 
-  if(HalfTimePassed_)
-    {
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z =
-          m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime-m_TSingle/2.0-m_SamplingPeriod );
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
-          m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime-m_TSingle/2.0-m_SamplingPeriod );
-      if(m_PolynomeZ->Degree() > 3)
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddz =
-            m_PolynomeZ->ComputeSecDerivative(LocalInterpolationStartTime+InterpolationTime-m_TSingle/2.0-m_SamplingPeriod );
-    }
-  else
-    {
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z =
-          m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime-m_SamplingPeriod);
-      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
-          m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime-m_SamplingPeriod);
-      if(m_PolynomeZ->Degree() > 3)
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].ddz =
-            m_PolynomeZ->ComputeSecDerivative(LocalInterpolationStartTime+InterpolationTime-m_SamplingPeriod);
-    }
   bool ProtectionNeeded=false;
 
   // Treat Omega with the following strategy:
@@ -313,11 +291,7 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
           );
 
       if(CurrentSupport.StateChanged==true)
-        {
-          SetParameters( FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle/2.0, StepHeight_ );
-          HalfTimePassed_ = false;
-        }
-
+        SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle, StepHeight_);
 
       SetParametersWithInitPosInitSpeed(
           FootTrajectoryGenerationStandard::THETA_AXIS,
