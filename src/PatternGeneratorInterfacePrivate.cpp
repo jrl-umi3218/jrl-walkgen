@@ -800,13 +800,13 @@ namespace PatternGeneratorJRL {
 
 
     ODEBUG("StartOnLineStepSequencing - 3 "
-	   << lStartingCOMState.x[0] << " "
-	   << lStartingCOMState.y[0] << " "
-	   << lStartingCOMState.z[0] << " "
-	   << lRelativeFootPositions.size()
+            << lStartingCOMState.x[0] << " "
+            << lStartingCOMState.y[0] << " "
+            << lStartingCOMState.z[0] << " "
+            << lRelativeFootPositions.size()
 	   );
     ODEBUG("ZMPInitialPoint OnLine" << lStartingZMPPosition(0)  << " "
-	   << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
+            << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
     int NbOfStepsToRemoveFromTheStack=0;
     if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
       {
@@ -1318,8 +1318,8 @@ namespace PatternGeneratorJRL {
 			  m_LeftFootPositions,
 			  m_RightFootPositions);
       }
-
-
+            
+            
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,
 						    RightFootPosition,
 						    ZMPTarget,
@@ -1327,6 +1327,26 @@ namespace PatternGeneratorJRL {
 						    CurrentConfiguration,
 						    CurrentVelocity,
 						    CurrentAcceleration);
+
+    ODEBUG("finalCOMState: "  << 
+            finalCOMState.x[0] << " " <<
+            finalCOMState.x[1] << " " <<
+            finalCOMState.x[2] << " " <<
+            finalCOMState.y[0] << " " <<
+            finalCOMState.y[1] << " " <<
+            finalCOMState.y[2] << " " <<
+            finalCOMState.z[0] << " " <<
+            finalCOMState.z[1] << " " <<
+            finalCOMState.z[2] << " " <<
+            finalCOMState.yaw[0] << " " <<
+            finalCOMState.yaw[1] << " " <<
+            finalCOMState.yaw[2] << " " <<
+            finalCOMState.pitch[0] << " " <<
+            finalCOMState.pitch[1] << " " <<
+            finalCOMState.pitch[2] << " " <<
+            finalCOMState.roll[0] << " " <<
+            finalCOMState.roll[1] << " " <<
+            finalCOMState.roll[2] << " " );
 
     // New scheme:
     // Update the queue of ZMP ref
