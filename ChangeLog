@@ -1,0 +1,1322 @@
+CHANGELOG
+----------------------
+
+[Current]
+ * Update tests for Kajita 2003.
+ *  Synchronize
+ * Fix ZMP computation for multibody correction.
+ * Beautify DEBUG output.
+ * Add operator<< to COMState.
+ * Synchronize.
+ * Fix the end part of feet trajectory generation.
+ * Add a documentation clearer on how to compute the optimal weights for preview control.
+ * Put the real number of lines in TestObject.cpp
+ * Update CMakeLists.txt with header name.
+ * Initialize dZ and ddZ in the end phase of Kajita 2003.
+ * Starting the reference trajectory at 2 * Tsingle.
+ * Update the source files with the new header format.
+ * Reduce the time to start Morisawa's algorithm.
+ * Generate report when performing the comparison.
+ * Correct computation of initial CoM position.
+ * Generate developer documentation.
+ * Change header name to comply with format and generate doc.
+ * Make the system resilient to biped robot (aka a humanoid robot without upper body...)
+ * Indexes for arms reorganized and resilient against biped robot.
+ * Reinforce the configuration tests for some unitary tests.
+ * Add program + new walk mode specific currently.
+ * Add hrp2-14-data in the standard jrl-walkgen package when present.
+ * Fix unproper reference to hrp2-14-data packet version.
+ * Modify debian/control depending on the packages detected.
+ * Correct wrong dependence and update the reference files.
+ * Fix pb on TestKajita2003 (wrong include) + update ref for binary tests.
+
+[v3.1.5]
+ * Add tests on Kajita 2003 algorithm (on two sequences)
+ * Add test Kajita 2003 (straight walking)
+ * Add test on Kajita 2003 algorithm (turning on a circle)
+ * Fix test for Morisawa 2007 algorithm
+ * Add new test for Kajita algorithm
+ * Remove useless field.
+ * Code cleaning
+ * Fix bugs introduced by commit 95ee for Kajita algorithm.
+ * Remove debugging messages.
+ * Remove debugging messages.
+ * Update test for Morisawa and insert Test for Kajita 2003.
+ * Clean up code, and started debugging for ZMP preview control.
+ * Update binary output of Morisawa On Line Test.
+ * Change test morisawa to reflect new test procedure.
+ * Set compilation to -O3 instead of -O2.
+ * Clean up code
+ * Add display of intervals duration.
+ * Add sensitivity to test intervals in analytical ZMP-COG trajectories.
+ * Set sensitivity to zero for FootGeneration. Add debug messages. Change package name in license part.
+ * Test traj. modification every 5 ms.
+ * Clean up AnalyticalMorisawaCompact + bug fix on failed traj. modification
+ * Fix operator= on FootTrajectoryGenerationMultiple.
+ * Clean up EndPhaseOfWalking and share queue filling.
+ * operator = and copy constructor for feet trajectories.
+ * Make sure that the new foot-step is introducing properly.
+ * Fix problem of time reference when adding a new foot-step.
+ * Fix package name.
+ * Prevent a memory loss by removing useless code
+ * Fix typo in debug message.
+ * Put name back to some nameless argument so it compiles with _DEBUG_MODE_ON_ too.
+ * [debian] Changed dpkh-shlibdeps to dh_shlibdeps
+ * [debian] Fix shlibdeps.
+ * Synchronize
+ * [debian] update changelog.
+ * [debian] Update shlibs file.
+
+[v3.1.4]
+ * [debian] Second bunch of modifications for debian package generation.
+ * [debian] Fix the files for launchpad binary package generation.
+ * Revert "Move the resolution of the optimization problem to the object defining it"
+ * Revert "Correct pointer initialization that provokes a warning"
+ * Revert "malloc -> new"
+ * Revert "Add new class for intermediate computations"
+ * Revert "Add a class for the construction of optimization problems"
+ * Revert "Add matrices and types necessary to construct a least squares objective"
+ * Revert "Add new type for the CoM to be used by:"
+ * Revert "... idem ..."
+ * Revert "Integrate new CoM type"
+ * Revert "Integrate new CoM type"
+ * Revert "* m_2DLIPM -> m_CoM"
+ * Revert "Add methods for the computation and assignment of the variant part of"
+ * Revert "minor changes"
+ * Revert "Improve access to matrices and their transformation into final form"
+ * Revert "Add debug methods"
+ * Revert "Correct initialization of transpose matrices + minor changes"
+ * Revert "Correct function call"
+ * Revert "-Introduce m_NbVariables"
+ * Revert "Add exception handling to the reallocation"
+ * Revert "Remove redundant instanciation"
+ * Revert "Revise reallocation and printing"
+ * Revert "Move to privatepgtypes.h"
+ * Revert "Add types trunk_t, supportfoot_t, reference_t"
+ * Revert "Change output of test results"
+ * Revert "Add initialization and destruction of array dInitPos"
+ * Revert "Changes due to changed type names (functionality untouched)"
+ * Revert "Add members and change accessor names"
+ * Revert "Add methods"
+ * Revert "Add new and remove deprecated methods"
+ * Revert "Test new classes"
+ * Revert "Add method for the construction of selection matrices"
+ * Revert "Initialization and templates"
+ * Revert "New type and type methods"
+ * Revert "Minor change"
+ * Revert "Remove replaced function"
+ * Revert "Replace initializing for-loop by std::fill_n"
+ * Revert "Remove BuildingConstantPartOfTheObjectiveFunction()"
+ * Revert "Assure proper initialization of matrices"
+ * Revert "Some clean-up"
+ * Revert "Implement generation of constraints from topic/vel-ref-gen-cleaning-restructuring"
+ * Revert "Implement the generation of constraints in GenVelRef"
+ * Revert "Make setVertices and computeLinearSystem public methods of FCALS"
+ * Revert "Integrate the new method in ZMPVelocityRef..."
+ * Revert "Move to privatepgtypes"
+ * Revert "Change name of type"
+ * Revert "Add type for linear constraint"
+ * Revert "Add structure to handle 2-dimensional convex hulls"
+ * Revert "Simplifications due to the new structure"
+ * Revert "Standardize treatment of convex hulls"
+ * Revert "Split method buildConstraintInequalities into:"
+ * Revert "New methods"
+ * Revert "Struct for linear inequality sets"
+ * Revert "Minor changes"
+ * Revert "Copy of computeLinearSystem that manipulates arrays"
+ * Revert "Add members and methods"
+ * Revert "Add functions"
+ * Revert "Add method"
+ * Revert "Remove functions"
+ * Revert "ZMPVelocityReferencedQPDebug.cpp not needed anymore"
+ * Revert "Minor changes"
+ * Revert "Remove obsolete members of ZMPVel...QP"
+ * Revert "Add class and methods"
+ * Revert "Clean up"
+ * Revert "add src directory to doxyfile"
+ * Revert "Eliminate warnings"
+ * Revert "Accessors and documentation"
+ * Revert "Introduce new struct for array handling inside qp-problem"
+ * Revert "Simplifications resulting from introduction of new class"
+ * Revert "Copy with iterators for better performance"
+ * Revert "Remove obsolete functions and rearrange"
+ * Revert "Calls obsolete due to automatic dimensionning and initialization"
+ * Revert "Fix a problem related to the number of variables dumped."
+ * Revert "Update binary results of new algorithm."
+ * Revert "Fix warning and remove unused setReference(strm) for generator-vel-ref."
+ * Revert "Adding default policy when asking for inequalities."
+ * Revert "Fix warning in tests."
+ * Revert "!warnings"
+ * Revert "Const correctness and documentation"
+ * Revert "Add member for the current support state and accessors"
+ * Revert "Additional documentation and slight rearrangement in online()"
+ * Revert "obsolete class and documentation"
+ * Revert "Obsolete function, obsolete variables, name changing"
+ * Revert "Encapsulate class IntermedQPMat inside GenVelRef"
+ * Revert "Improve documentation"
+ * Revert "row_major for faster prod() computation"
+ * Revert "Determine double support time"
+ * Revert "Minor change"
+ * Revert "Encapsulation and documentation"
+ * Revert "New class for online trajectory interpolation"
+ * Revert "Remove obsolete methods"
+ * Revert "Minor changes"
+ * Revert "Minor changes"
+ * Revert "Encapsulation, restructuring, documentation"
+ * Revert "Use of final com-trajectory (with orientation of the trunk)"
+ * Revert "Remove obsolete members"
+ * Revert "Add turning motions to the test scenario of TestHerdt2010"
+ * Revert "Encapsulation, name changing"
+ * Revert "Change name of class"
+ * Revert "Change name of corresponding file"
+ * Revert "Rearrange and change of member names"
+ * Revert "Clean up"
+ * Revert "Change call by value to call by reference"
+ * Revert "Test size of variables before trying to allocate memory."
+ * Revert "Fix some problems to generate documentation."
+ * Revert "Add install documentation."
+ * Revert "Update binary test for Herdt walking pattern generator."
+ * Revert "Pre initialize the matrix size"
+ * Revert "Change the memory allocation policy to avoid time peak."
+ * Change the memory allocation policy to avoid time peak.
+ * Pre initialize the matrix size
+ * Update binary test for Herdt walking pattern generator.
+ * Add install documentation.
+ * Fix some problems to generate documentation.
+ * Test size of variables before trying to allocate memory.
+ * Change call by value to call by reference
+ * Clean up
+ * Rearrange and change of member names
+ * Change name of corresponding file
+ * Change name of class
+ * Encapsulation, name changing
+ * Add turning motions to the test scenario of TestHerdt2010
+ * Remove obsolete members
+ * Use of final com-trajectory (with orientation of the trunk) for computation of global reference
+ * Encapsulation, restructuring, documentation
+ * Minor changes
+ * Minor changes
+ * Remove obsolete methods
+ * New class for online trajectory interpolation
+ * Encapsulation and documentation
+ * Minor change
+ * Determine double support time
+ * row_major for faster prod() computation
+ * Improve documentation
+ * Encapsulate class IntermedQPMat inside GenVelRef
+ * Obsolete function, obsolete variables, name changing
+ * obsolete class and documentation
+ * Additional documentation and slight rearrangement in online()
+ * Add member for the current support state and accessors
+ * Const correctness and documentation
+ * !warnings
+ * Fix warning in tests.
+ * Adding default policy when asking for inequalities.
+ * Fix warning and remove unused setReference(strm) for generator-vel-ref.
+ * Update binary results of new algorithm.
+ * Fix a problem related to the number of variables dumped.
+ * Calls obsolete due to automatic dimensionning and initialization
+ * Remove obsolete functions and rearrange
+ * Copy with iterators for better performance
+ * Simplifications resulting from introduction of new class
+ * Introduce new struct for array handling inside qp-problem
+ * Accessors and documentation
+ * Eliminate warnings
+ * add src directory to doxyfile
+ * Clean up
+ * Add class and methods
+ * Remove obsolete members of ZMPVel...QP
+ * Minor changes
+ * ZMPVelocityReferencedQPDebug.cpp not needed anymore
+ * Remove functions
+ * Add method
+ * Add functions
+ * Add members and methods
+ * Copy of computeLinearSystem that manipulates arrays instead of variables of a custom type
+ * Minor changes
+ * Struct for linear inequality sets
+ * New methods
+ * Split method buildConstraintInequalities into:
+ * Standardize treatment of convex hulls
+ * Simplifications due to the new structure
+ * Add structure to handle 2-dimensional convex hulls
+ * Add type for linear constraint
+ * Change name of type
+ * Move to privatepgtypes
+ * Integrate the new method in ZMPVelocityRef...
+ * Make setVertices and computeLinearSystem public methods of FCALS
+ * Implement the generation of constraints in GenVelRef
+ * Implement generation of constraints from topic/vel-ref-gen-cleaning-restructuring
+ * Some clean-up
+ * Assure proper initialization of matrices
+ * Remove BuildingConstantPartOfTheObjectiveFunction()
+ * Replace initializing for-loop by std::fill_n
+ * Remove replaced function
+ * Minor change
+ * New type and type methods
+ * Initialization and templates
+ * Add method for the construction of selection matrices
+ * Test new classes
+ * Add new and remove deprecated methods
+ * Add methods
+ * Add members and change accessor names
+ * Changes due to changed type names (functionality untouched)
+ * Add initialization and destruction of array dInitPos
+ * Change output of test results Change required precision from 1e-6 to 1e-5
+ * Add types trunk_t, supportfoot_t, reference_t
+ * Move to privatepgtypes.h
+ * Revise reallocation and printing
+ * Remove redundant instanciation
+ * Add exception handling to the reallocation
+ * -Introduce m_NbVariables -Introduce resize(array, size) and setNbVariables(NbVar)
+ * Correct function call
+ * Correct initialization of transpose matrices + minor changes
+ * Add debug methods
+ * Improve access to matrices and their transformation into final form
+ * minor changes
+ * Add methods for the computation and assignment of the variant part of the objective
+ * * m_2DLIPM -> m_CoM
+ * Integrate new CoM type Add new accessors
+ * Integrate new CoM type Add overloaded accessor functions
+ * ... idem ...
+ * Add new type for the CoM to be used by: LinearInvertedPendulum2D intermediate-qp-matrices
+ * Add matrices and types necessary to construct a least squares objective
+ * Add a class for the construction of optimization problems
+ * Add new class for intermediate computations
+ * malloc -> new
+ * Correct pointer initialization that provokes a warning
+ * Move the resolution of the optimization problem to the object defining it
+
+[v3.1.3]
+ * Synchronize.
+ * Remove ambiguity due to */* in comment
+ * Make compilation more robust.
+ * Fix cmake url.
+ * Change cmake url.
+ * Add an implementation for the function trunc for win32
+ * Synchronize
+ * Synchronize
+ * Synchronize
+ * Synchronize
+ * Update reading of sample data file using pkgdatarootdir.
+ * Increase the acceptable error between reference and computed values.
+ * Reindent
+ * Add missing parameter initialization
+ * Corrected bad pointer initialization.
+ * Clean ZMPVelocityReferencedQP.h and remove FullDebug mode.
+ * Fix end test + code cleaning.
+ * Add new reference tests to cope with new 1e-7 precision tests.
+ * Buildbot reported results with 1e-7 of error.
+ * Fix problem with ending phase + clean the code with vel-ref problem object.
+ * Fix regression test for TestHerdt2010.
+ * Code cleaning
+ * Synchronize.
+ * Update reference trajectoiries after hole filling.
+ * Fill some holes in the speed trajectories.
+ * Revert back optimization flags.
+ * Extend Problem to handle properly memory allocation.
+ * Add ODEBUG6SIMPLE
+ * Add constant part to avoid costly matrix multiplication.
+ * Fix cmake bugs for generating debian package for ubuntu 8.04.
+ * Fix assignement to an interger.
+ * Add packaging for 8.04 Ubuntu.
+ * Minor corrections.
+ * Update references value files with new filter.
+ * Remove any digits after 1e-8 for regression tests.
+ * Fix warnings.
+ * Synchronize
+ * Added correct use of lapack library for riccati equation unit test.
+ * Correct the link for TestRiccatiEquation
+ * Add missing compilation flag for win32
+ * Correct generation of pc file for jrl-walkgen.
+ * Removed unknown espace character.
+ * Fix ; in test-suite.
+ * Fix remaing ;
+ * Fix remaining ; + forbidden long long
+ * Fix problem of extra ;
+ * Synchronize cmake.
+ * Correct the flags for the unit tests
+ * Correct the use of HAVE_SYS_TIME_H
+ * Correct the API
+ * Win32: Correct the #include for gettimeofday
+ * Clean the code
+ * Fix problem on Com Z and dZ, update regression tests, synchronize.
+ * Use PKG_CONFIG_USE_DEPENDENCY new macro to import dependency flags properly.
+ * Added link flags and detection of lapack libraries.
+ * Synchronize.
+ * Add missing cross-links.
+ * Synchronize.
+ * Fix header installation.
+ * Fix unit tests compilation.
+ * Add JRL_DYNAMICS_LIBRARIES for tests.
+ * Revert merge 08b67f4cc7ecdc4ccea85803e9cef707813405b2.
+ * Make sure a shared library is generated.
+ * Add optional detection of hrp2-dynamics.
+ * Get rid of obsolete files.
+ * Fix aggressive optimization when setting release flags.
+ * Switch to submodule.
+ * Fix problems with further improvment of abstract-robot-dynamics normalization.
+ * Get rid of obsolete files.
+ * Fix aggressive optimization when setting release flags.
+ * Switch to submodule.
+ * Fix include path to matche branch topic/submodule of abstract-robot-dynamics.
+ * Implements package name modifications from other packages.
+ * Change related to abstract-robot-dynamics.
+ * Remove deprecated headers + reinforce header name policy
+ * Code cleaning.
+ * Update the reference data file for testing Herdt's algorithm.
+ * Remove m_EndPhaseOfWalking.
+ * Regression test for Herdt2010.
+ * Display information during regression test.
+ * Allows Herdt algorithms to stop.
+ * Add FootHalfSize as a file to be compiled.
+ * Applies use of FootHalfSize to handle constraints on feet size.
+ * Add new structure to handle data related to constraints on feet.
+ * Removed hard-coded values related to feet linear constraints.
+ * Win32 compatibility for the warning display
+ * Move SupportState_t to privatepgtypes.h
+ * Fix a compiling issue
+ * Finalize merge for ZMPVelocityReferencedQP.
+ * Finalize merge for OrientationsPreview.
+ * Merge OrientationsPreview.
+ * Acknowledge the fact that Velocity Reference is online anyway.
+ * Correct protection for recursive inclusion.
+ * Complete merge with vel-ref for FootConstraints.
+ * Indent PGTypes to GNU format.
+ * Remove trailing whitespace for PGTypes
+ * Remove trailing whitespace for FootConstraints.
+ * Finishes merge with vel-ref for FootConstraints
+ * Transitional commit for merging.
+ * Add SupportFSM in list of files to compile.
+ * Add SupportFSM object
+ * Remove StateSupport object.
+ * Reindent following emacs format.
+ * Remove trailing white spaces.
+ * Difference between two real values below 1e-8 is consider as 0.
+ * Remove trailing spaces.
+ * Changed indentation style to GNU
+ * Minor bugfix
+ * Delete SupportSate class
+ * Fix debian/watch file.
+ * Revert "Moved the new type SupportState_t to PGTypes.h"
+ * Revert "Online mode only"
+ * Revert "Changed class name SupportState to SupportFSM"
+ * Revert "Changed the structure of the FSM:"
+ * Changed the structure of the FSM: Now pure FSM The current and previewed support states are given as parameters of the new type SupportState_t.
+ * Changed class name SupportState to SupportFSM
+ * Online mode only
+ * Moved the new type SupportState_t to PGTypes.h
+ * Bump Debian package version.
+ * Added a new type for the support state
+ * Added new functions: interpolateTrunkState interpolateFeetPositions
+ * Fix output format for regression test.
+ * Code cleaning and warn the user that it compiles with hrp2Dynamics.
+ * Fix wrong test regarding hrp2Dynamics
+ * Make sure that ZMPVelocityReferencedQP works again.
+ * First of a series of clean ups. Removed some obsolete functions in ZMPVelocityReferencedQP, namely: ValidationConstraints EndPhaseOfTheWalking OnLineFootChange OnLineAddFoot buildZMPTrajectoryFromFootTrajectory!! GetZMPDiscretization!!
+ * Update debian package.
+ * Fix version debian/changelog.
+ * Add missing dependencies to Debian package.
+ * Fix missing export in debian/rules.
+ * Remove trailing whitespaces.
+ * Check that the robot model exists in unit tests.
+ * Disable test suite.
+ * Remove patch.
+
+[v3.1.2]
+ * Import private repository.
+
+[v3.1.1]
+
+[3.1.1]
+ * Release 3.1.1
+ * Add precision filtering for regression test.
+ * Remove trailing time.
+ * Implements the new policy of having the init pose outside this package.
+ * Add reading of init pose file.
+ * Prevent wrong access to the set of relative steps when changing foot.
+ * Code cleanup.
+ * Regression test based on sample.wrl
+ * Fix Morisawa 2007 online steps generation.
+ * Almost fix end part of online walking for Morisawa 2007 algorithm.
+ * Fix a bug in debugging log.
+ * Throw exceptions in case of problem.
+ * Put back in shape off-line construction of trajectory for Morisawa 2007.
+ * Format debugging.
+ * Fix partially a problem related to time reference settings.
+ * Implements modifications for regression. Make work Morisawa 2007.
+ * Fix some problem related to the transfer from pointer to vector<double>.
+ * Remove debug dumping.
+ * Add debug information.
+ * Change pointer to vector.
+ * Starting regression tests.
+ * Default directory for binary installation.
+ * Fix syntax problem with some tests.
+ * Fix test using & instead of &&.
+ * Makes doc filename have short names.
+ * Add setCoMPerturbationForce method Extend the PGI CoM and ZMP are initialized with respect to the initial posture
+ * Add setState method
+ * Correct the test by removing a warning.
+ * An unsigned cannot be negative.
+ * Win32: Exporting the method gettimeofday does not make sense
+ * Correct the compilation order for unit test TestHerdt2010
+ * The functions of a structure need to be exported too
+ * Disable some verbose warnings for win32
+ * functions for perturbations
+ * First working implementation for the new API.
+ * Add implementation of new PGTypes methods.
+ * New API - Bookkeeping.
+ * Added the possibility to change the number of steps before stop online.
+ * Bump version 3.1.0 including Herdt's algorithm.
+ * Put debug flag in off mode.
+ * Normalize name and add dependencies.
+ * Get the yaw.
+ * Indentation + Beautification
+ * Fix problem due to merge between master and andrei PLDP.
+ * Indentation
+ * Remove double free for ZMP-COM-Feet trajectories object.
+ * Fix pb from merging master and pldp velocity reference branch.
+ * Remove ~ files from git status.
+ * Adapt PLDP to Velocity Reference ZMP-CoM-Feet trajectories generation scheme.
+ * Change directory to install examples.
+ * Install examples directory.
+ * Adding package target.
+ * Add missing initialization
+ * Const static data must be defined outside the header
+ * Add class to build linear constraints with velocity reference
+ * Fix file name problem.
+ * Final fix regarding andreinew-branch merging.
+ * Assume that the solver will always been less than Sampling Period.
+ * Fix a bug (foot trajectory) induced by merging.
+ * Reorganize unit tests to make them easier to handle.
+ * Add exception.
+ * Fix orientation Angles are reinitialized each iteration.
+ * Add uninstall target.
+ * Minor fix. (Removed debug output)
+ * Fix pb on the time computation.
+ * Default initialization of Buffer limit for end motion.
+ * Warn when no references to feet exist.
+ * Reduced the size of the feet constraints slightly
+ * Changed the chosen support foot during the DS->SS transition
+ * Add velocity reference extension of the API.
+ * Minor changes
+ * Minor bugfix
+ * Proper rad/degree conversion and absolute reference
+ * Minor changes
+ * Bugfix and minor changes
+ * Bugfix + minor changes
+ * Resolve conflicts
+ * resolve conflict
+ * Resolve conflicts
+ * add centering of the feet
+ * Security mechanism for the positionnning of the feet
+ * Added a parallel double support phase
+ * No logs
+ * Minor changes
+ * Lowered the height of the support feet to zero
+ * changed the size of the simple support areas to 60*120 mm
+ * Uninitialized value bugfix
+ * Some modifications to prevent memory leaks
+ * Minor modifications to avoid memory errors.
+ * Bugfix and clean up
+ * Cosmetic changes
+ * Cosmetic changes
+ * Hip joint constraints are read from the HDR object
+ * Added velocity constraint of the swing leg
+ * Algorithm for the generation of the feet orientations using 3rd and 4th order polynomials for the feet and the trunk
+ * Added computation of derivatives
+ * First version of the improved orientations algorithm.
+ * Added function verifyAccelerationOfHipJoint
+ * Added the body of the class OrientationsPreview
+ * Added a new type COMState as the existing COMPosition does not include first and second derivatives of the Angles.
+ * m_AnklePositionLeft protected -> public
+ * minor change
+ * Smaller modifications
+ * Added interpolation of the height
+ * Clean up
+ * Modified the method for the interpolation of feet coordinates
+ * Added online interpolation of the feet coordinates
+ * Copies of FootTrajectoryGeneration classes slightly modified for online interpolation
+ * Added temporarily a new function Herdt_Stop for the tests of the new online mode To be bypassed by a direct call soon.
+ * Added method initOnLineHerdt
+ * Added method OnLine: new QP solved when the stacks are close to get empty Added method InitOnLine: Precomputation of CoM ZMP and Feet values Added a time buffer for the computation of the problems (40 ms now)
+ * Initialization of the first two feet through the constructor.
+ * Modified Interface for online method.
+ * Added reference setter
+ * No changes just some clean up
+ * New class, new profile
+ * New structure to store the reference
+ * New profile for online walking with Herdt2010IROS
+ * Results now the same as in Scilab with the constraints of Nicolas
+ * Integrated the feet position constraints in buildConstraintMatrices
+ * Integrated the feet position constraints into footConstraintsAsLinearSystem
+ * Convex hull of position constraint points
+ * Added new deques and arrays for feet constraints
+ * Simulation gives now with ZMP constraints the same results as in scilab.
+ * Did the same as before for sagittal constraints.
+ * Fixed buildConstraintMatrices
+ * Fixed buildConstraintMatrices and validateConstraints.
+ * Symmetrical constraints
+ * Made a comparison with an identical problem in scilab.
+ * Tried to fix the malloc error
+ * Same constraints as in scilab.
+ * Results now the same as in scilab
+ * Further simplified the pb for debugging
+ * Added debugging functions
+ * Added a fixed double support phase
+ * first version with simple QP: Minimization of the jerk, instantaneous velocities, zmp constraints, free feet positions.
+ * Adapted the constraints to the new order of the variables.
+ * Bugfix of the original version.
+ * Prepared the linear part of the objective function
+ * Bugfixing and minor improvement
+ * buildConstraintMatrices: Working intermediate version
+ * Working on buildConstraintMatrices
+ * Minor Bugfix Better debugging
+ * Bugfix: Time passed in the preview window is now taken into account
+ * SupportState is written in SupportStates.dat every time setSupportState is called.
+ * Bugfix SF_it was not initialized properly
+ * Trace-printfs
+ * New functions buildZMPTraje... and buildConstraintMat... Restored the old function BuildZMPTraje... Both programs should now run in parallel
+ * Bugfix: The matrices D and Dc are computed at each iteration step. Optimization necessary later on. Added tracing printfs.
+ * Just a delete of the new object f_CALS in the destructor
+ * Just some tracing printfs
+ * Debugged both files and added printfs at the borders of relevant functions for somewhat easier tracing in the future. Debugging: The queue QueueOfSupportFeet and the variables FPx, FPy, FPtheta are not declared nor in the header file nor in the constructor anymore.
+ * Should work again version but does not
+ * Buggy version: corrupt double linked list
+ * adapted the code to the new type
+ * added new type of linear inequalities
+ * cleaned the code
+ * Almost working version
+ * asdf
+ * Uninitialized value bugfix
+ * Some modifications to prevent memory leaks
+ * Minor modifications to avoid memory errors.
+ * Bugfix and clean up
+ * Cosmetic changes
+ * Cosmetic changes
+ * Hip joint constraints are read from the HDR object
+ * Added velocity constraint of the swing leg
+ * Algorithm for the generation of the feet orientations using 3rd and 4th order polynomials for the feet and the trunk
+ * Added computation of derivatives
+ * First version of the improved orientations algorithm.
+ * Added function verifyAccelerationOfHipJoint
+ * Added the body of the class OrientationsPreview
+ * Added a new type COMState as the existing COMPosition does not include first and second derivatives of the Angles.
+ * m_AnklePositionLeft protected -> public
+ * minor change
+ * Smaller modifications
+ * Added interpolation of the height
+ * Some indexes of A and c where not initialized, crashing the test in Debug mode
+ * Add attribute initialization in initialization list
+ * The unitTest testOptCholesky and TestRiccatiEquation can be compiled under windows
+ * Simplify the CMakeLists (there was no need to do these tests)
+ * Clean up
+ * Modified the method for the interpolation of feet coordinates
+ * Added online interpolation of the feet coordinates
+ * Copies of FootTrajectoryGeneration classes slightly modified for online interpolation
+ * Added temporarily a new function Herdt_Stop for the tests of the new online mode To be bypassed by a direct call soon.
+ * Added method initOnLineHerdt
+ * Added method OnLine: new QP solved when the stacks are close to get empty Added method InitOnLine: Precomputation of CoM ZMP and Feet values Added a time buffer for the computation of the problems (40 ms now)
+ * Initialization of the first two feet through the constructor.
+ * Modified Interface for online method.
+ * Do not destroy the robot model.
+ * Added reference setter
+ * No changes just some clean up
+ * New class, new profile
+ * New structure to store the reference
+ * New profile for online walking with Herdt2010IROS
+ * Results now the same as in Scilab with the constraints of Nicolas
+ * Integrated the feet position constraints in buildConstraintMatrices
+ * Integrated the feet position constraints into footConstraintsAsLinearSystem
+ * Convex hull of position constraint points
+ * Added new deques and arrays for feet constraints
+ * Simulation gives now with ZMP constraints the same results as in scilab.
+ * Did the same as before for sagittal constraints.
+ * Fixed buildConstraintMatrices
+ * Fixed buildConstraintMatrices and validateConstraints.
+ * Symmetrical constraints
+ * Made a comparison with an identical problem in scilab.
+ * Tried to fix the malloc error
+ * Same constraints as in scilab.
+ * Results now the same as in scilab
+ * Further simplified the pb for debugging
+ * Added debugging functions
+ * Added a fixed double support phase
+ * first version with simple QP: Minimization of the jerk, instantaneous velocities, zmp constraints, free feet positions.
+ * Adapted the constraints to the new order of the variables.
+ * Bugfix of the original version.
+ * Prepared the linear part of the objective function
+ * Bugfixing and minor improvement
+ * buildConstraintMatrices: Working intermediate version
+ * Working on buildConstraintMatrices
+ * Minor Bugfix Better debugging
+ * Bugfix: Time passed in the preview window is now taken into account
+ * SupportState is written in SupportStates.dat every time setSupportState is called.
+ * Bugfix SF_it was not initialized properly
+ * Trace-printfs
+ * New functions buildZMPTraje... and buildConstraintMat... Restored the old function BuildZMPTraje... Both programs should now run in parallel
+ * Bugfix: The matrices D and Dc are computed at each iteration step. Optimization necessary later on. Added tracing printfs.
+ * Just a delete of the new object f_CALS in the destructor
+ * Just some tracing printfs
+ * Debugged both files and added printfs at the borders of relevant functions for somewhat easier tracing in the future. Debugging: The queue QueueOfSupportFeet and the variables FPx, FPy, FPtheta are not declared nor in the header file nor in the constructor anymore.
+ * Should work again version but does not
+ * Buggy version: corrupt double linked list
+ * Fix precision problem.
+ * adding a sensitivity test to cope with numeric approximations when generating foot steps. This resulted in discontinuities in the foot reference when starting a step sequence.
+ * adapted the code to the new type
+ * added new type of linear inequalities
+ * cleaned the code
+ * Almost working version
+ * Dump current version as 3.0.2.99
+ * asdf
+
+[3.0.3]
+ * Release 3.0.3
+ * Notify GNU-LGPL-v3 license.
+
+[3.1.0]
+ * Bump version 3.1.0 including Herdt's algorithm.
+ * Put debug flag in off mode.
+ * Normalize name and add dependencies.
+ * Get the yaw.
+ * Indentation + Beautification
+ * Fix problem due to merge between master and andrei PLDP.
+ * Indentation
+ * Remove double free for ZMP-COM-Feet trajectories object.
+ * Fix pb from merging master and pldp velocity reference branch.
+ * Remove ~ files from git status.
+ * Adapt PLDP to Velocity Reference ZMP-CoM-Feet trajectories generation scheme.
+ * Change directory to install examples.
+ * Install examples directory.
+ * Adding package target.
+ * Add missing initialization
+ * Const static data must be defined outside the header
+ * Add class to build linear constraints with velocity reference
+ * Fix file name problem.
+ * Final fix regarding andreinew-branch merging.
+ * Assume that the solver will always been less than Sampling Period.
+ * Fix a bug (foot trajectory) induced by merging.
+ * Reorganize unit tests to make them easier to handle.
+ * Add exception.
+ * Fix orientation Angles are reinitialized each iteration.
+ * Add uninstall target.
+ * Minor fix. (Removed debug output)
+ * Fix pb on the time computation.
+ * Default initialization of Buffer limit for end motion.
+ * Warn when no references to feet exist.
+ * Reduced the size of the feet constraints slightly
+ * Changed the chosen support foot during the DS->SS transition
+ * Add velocity reference extension of the API.
+ * Minor changes
+ * Minor bugfix
+ * Proper rad/degree conversion and absolute reference
+ * Minor changes
+ * Bugfix and minor changes
+ * Bugfix + minor changes
+ * Resolve conflicts
+ * resolve conflict
+ * Resolve conflicts
+ * add centering of the feet
+ * Security mechanism for the positionnning of the feet
+ * Added a parallel double support phase
+ * No logs
+ * Minor changes
+ * Lowered the height of the support feet to zero
+ * changed the size of the simple support areas to 60*120 mm
+ * Uninitialized value bugfix
+ * Some modifications to prevent memory leaks
+ * Minor modifications to avoid memory errors.
+ * Bugfix and clean up
+ * Cosmetic changes
+ * Cosmetic changes
+ * Hip joint constraints are read from the HDR object
+ * Added velocity constraint of the swing leg
+ * Algorithm for the generation of the feet orientations using 3rd and 4th order polynomials for the feet and the trunk
+ * Added computation of derivatives
+ * First version of the improved orientations algorithm.
+ * Added function verifyAccelerationOfHipJoint
+ * Added the body of the class OrientationsPreview
+ * Added a new type COMState as the existing COMPosition does not include first and second derivatives of the Angles.
+ * m_AnklePositionLeft protected -> public
+ * minor change
+ * Smaller modifications
+ * Added interpolation of the height
+ * Clean up
+ * Modified the method for the interpolation of feet coordinates
+ * Added online interpolation of the feet coordinates
+ * Copies of FootTrajectoryGeneration classes slightly modified for online interpolation
+ * Added temporarily a new function Herdt_Stop for the tests of the new online mode To be bypassed by a direct call soon.
+ * Added method initOnLineHerdt
+ * Added method OnLine: new QP solved when the stacks are close to get empty Added method InitOnLine: Precomputation of CoM ZMP and Feet values Added a time buffer for the computation of the problems (40 ms now)
+ * Initialization of the first two feet through the constructor.
+ * Modified Interface for online method.
+ * Added reference setter
+ * No changes just some clean up
+ * New class, new profile
+ * New structure to store the reference
+ * New profile for online walking with Herdt2010IROS
+ * Results now the same as in Scilab with the constraints of Nicolas
+ * Integrated the feet position constraints in buildConstraintMatrices
+ * Integrated the feet position constraints into footConstraintsAsLinearSystem
+ * Convex hull of position constraint points
+ * Added new deques and arrays for feet constraints
+ * Simulation gives now with ZMP constraints the same results as in scilab.
+ * Did the same as before for sagittal constraints.
+ * Fixed buildConstraintMatrices
+ * Fixed buildConstraintMatrices and validateConstraints.
+ * Symmetrical constraints
+ * Made a comparison with an identical problem in scilab.
+ * Tried to fix the malloc error
+ * Same constraints as in scilab.
+ * Results now the same as in scilab
+ * Further simplified the pb for debugging
+ * Added debugging functions
+ * Added a fixed double support phase
+ * first version with simple QP: Minimization of the jerk, instantaneous velocities, zmp constraints, free feet positions.
+ * Adapted the constraints to the new order of the variables.
+ * Bugfix of the original version.
+ * Prepared the linear part of the objective function
+ * Bugfixing and minor improvement
+ * buildConstraintMatrices: Working intermediate version
+ * Working on buildConstraintMatrices
+ * Minor Bugfix Better debugging
+ * Bugfix: Time passed in the preview window is now taken into account
+ * SupportState is written in SupportStates.dat every time setSupportState is called.
+ * Bugfix SF_it was not initialized properly
+ * Trace-printfs
+ * New functions buildZMPTraje... and buildConstraintMat... Restored the old function BuildZMPTraje... Both programs should now run in parallel
+ * Bugfix: The matrices D and Dc are computed at each iteration step. Optimization necessary later on. Added tracing printfs.
+ * Just a delete of the new object f_CALS in the destructor
+ * Just some tracing printfs
+ * Debugged both files and added printfs at the borders of relevant functions for somewhat easier tracing in the future. Debugging: The queue QueueOfSupportFeet and the variables FPx, FPy, FPtheta are not declared nor in the header file nor in the constructor anymore.
+ * Should work again version but does not
+ * Buggy version: corrupt double linked list
+ * adapted the code to the new type
+ * added new type of linear inequalities
+ * cleaned the code
+ * Almost working version
+ * asdf
+ * Uninitialized value bugfix
+ * Some modifications to prevent memory leaks
+ * Minor modifications to avoid memory errors.
+ * Bugfix and clean up
+ * Cosmetic changes
+ * Cosmetic changes
+ * Hip joint constraints are read from the HDR object
+ * Added velocity constraint of the swing leg
+ * Algorithm for the generation of the feet orientations using 3rd and 4th order polynomials for the feet and the trunk
+ * Added computation of derivatives
+ * First version of the improved orientations algorithm.
+ * Added function verifyAccelerationOfHipJoint
+ * Added the body of the class OrientationsPreview
+ * Added a new type COMState as the existing COMPosition does not include first and second derivatives of the Angles.
+ * m_AnklePositionLeft protected -> public
+ * minor change
+ * Smaller modifications
+ * Added interpolation of the height
+ * Some indexes of A and c where not initialized, crashing the test in Debug mode
+ * Add attribute initialization in initialization list
+ * The unitTest testOptCholesky and TestRiccatiEquation can be compiled under windows
+ * Simplify the CMakeLists (there was no need to do these tests)
+ * Clean up
+ * Modified the method for the interpolation of feet coordinates
+ * Added online interpolation of the feet coordinates
+ * Copies of FootTrajectoryGeneration classes slightly modified for online interpolation
+ * Added temporarily a new function Herdt_Stop for the tests of the new online mode To be bypassed by a direct call soon.
+ * Added method initOnLineHerdt
+ * Added method OnLine: new QP solved when the stacks are close to get empty Added method InitOnLine: Precomputation of CoM ZMP and Feet values Added a time buffer for the computation of the problems (40 ms now)
+ * Initialization of the first two feet through the constructor.
+ * Modified Interface for online method.
+ * Do not destroy the robot model.
+ * Added reference setter
+ * No changes just some clean up
+ * New class, new profile
+ * New structure to store the reference
+ * New profile for online walking with Herdt2010IROS
+ * Results now the same as in Scilab with the constraints of Nicolas
+ * Integrated the feet position constraints in buildConstraintMatrices
+ * Integrated the feet position constraints into footConstraintsAsLinearSystem
+ * Convex hull of position constraint points
+ * Added new deques and arrays for feet constraints
+ * Simulation gives now with ZMP constraints the same results as in scilab.
+ * Did the same as before for sagittal constraints.
+ * Fixed buildConstraintMatrices
+ * Fixed buildConstraintMatrices and validateConstraints.
+ * Symmetrical constraints
+ * Made a comparison with an identical problem in scilab.
+ * Tried to fix the malloc error
+ * Same constraints as in scilab.
+ * Results now the same as in scilab
+ * Further simplified the pb for debugging
+ * Added debugging functions
+ * Added a fixed double support phase
+ * first version with simple QP: Minimization of the jerk, instantaneous velocities, zmp constraints, free feet positions.
+ * Adapted the constraints to the new order of the variables.
+ * Bugfix of the original version.
+ * Prepared the linear part of the objective function
+ * Bugfixing and minor improvement
+ * buildConstraintMatrices: Working intermediate version
+ * Working on buildConstraintMatrices
+ * Minor Bugfix Better debugging
+ * Bugfix: Time passed in the preview window is now taken into account
+ * SupportState is written in SupportStates.dat every time setSupportState is called.
+ * Bugfix SF_it was not initialized properly
+ * Trace-printfs
+ * New functions buildZMPTraje... and buildConstraintMat... Restored the old function BuildZMPTraje... Both programs should now run in parallel
+ * Bugfix: The matrices D and Dc are computed at each iteration step. Optimization necessary later on. Added tracing printfs.
+ * Just a delete of the new object f_CALS in the destructor
+ * Just some tracing printfs
+ * Debugged both files and added printfs at the borders of relevant functions for somewhat easier tracing in the future. Debugging: The queue QueueOfSupportFeet and the variables FPx, FPy, FPtheta are not declared nor in the header file nor in the constructor anymore.
+ * Should work again version but does not
+ * Buggy version: corrupt double linked list
+ * Fix precision problem.
+ * adding a sensitivity test to cope with numeric approximations when generating foot steps. This resulted in discontinuities in the foot reference when starting a step sequence.
+ * adapted the code to the new type
+ * added new type of linear inequalities
+ * cleaned the code
+ * Almost working version
+ * Dump current version as 3.0.2.99
+ * asdf
+
+[3.0.2]
+ * Release 3.0.2
+ * Temporarily fix a memory overflow
+ * Fix calls related to PreviewContron in the user Interface.
+ * Fix forgotten modifications in QP fast formulation.
+ * Fix bug regarding optimal weights computation.
+ * Clean the code, and avoid sharing of Preview Control object.
+ * Debugging
+ * Intermediate commit to fix some computation pb with the weights.
+ * Fix numerical problem when testing time.
+ * Fix initial boolean for Preview Control weight computation.
+ * No parameters file anymore...
+ * Fix a bug in the initial value of the CoM.
+ * Fix a bug on CallingMethod for DIMITROV's method.
+ * Disable classic and too verbose warnings in order to reveal important ones (for win32)
+ * Removed documentation file.
+ * Assert that m_SamplingPeriod is positive before dividing by this value
+ * Fix wrong test for Boost version.
+ * Update STATUS: Kajita's method validated on HRP-2010.
+ * Put initial pose for interaction in degrees.
+ * Make sure that the proper com height is used at initialization.
+ * Call comheight after EvaluateStartingState.
+ * Robustify optimal weights computation.
+ * Make the library compile with -D_DEBUG_MODE_ON_
+
+[3.0.0]
+ * Fix wrong version number of abstractRobotDynamics dependency.
+ * Replace dependency to dynamicsJRLJapan by dependency to abstractRobotDynamics.
+ * Generate doc by default.
+ * Enforce compatibility with t3d through MatrixAbstractLayer.
+ * Increment version number.
+ * Remove related Python file and correct CMakeLists.txt
+ * Remove OpenHRP-plugin.
+ * STATUS: 06/11/2009
+ * Add ZMP multibody computation when testing Kajita's method.
+ * Code cleaning.
+ * Code cleaning.
+ * Code cleaning.
+ * Code cleaning.
+ * Fix a bug concerning the size of the preview window.
+ * Compute the CoM position in the good reference frame.
+ * Add ZMP multibody computation external to the Pattern Generator Interface.
+ * Fix feet FIFO filling + code cleaning.
+ * STATUS: Kajita validated for the first stage ONLY.
+ * Fix a desynchronization between feet and com trajectories.
+ * Fix the kinematic chain for the legs.
+ * The difference between the CoM and the Waist are now properly computed.
+ * Investigue pb of Waist position.
+ * Adding the file including all the data.
+ * Move all data informations in TestFootPrintPGInterfaceData.h
+ * Add properties settings for initialization and code cleaning.
+ * Code cleaning: remove data dumping.
+ * Separate methods registration, adding sampling period, shifting iterations.
+ * Adding ODEBUG5SIMPLE for dumping in files.
+ * Fix a bug in weights values put at the wrong place.
+ * Force initialization of the buffer used for weight computation.
+ * Correct GENERATE_DOC option definition
+ * Intermediate -non- working version of Kajita's method.
+ * Computation of the Specialized Inverted Kinematics for Kajita's method.
+
+[usability-test]
+ * Add missing "std::"
+ * Add an option allowing to (dis)able doxygen documentation generation
+ * Add optimization flags when building in release mode with g++
+ * 1/ Fix a numerical problem in computing the time shift in Morisawa-Harada method. This should remove the quasi-static phase while walking. 2/ Remove debug output.
+ * License changes.
+ * Debugging.
+ * Change the timeline to test automatic stepping.
+ * Modification for reentrant use of the PG.
+ * Add DisplayIntervals to LeftAndRightFootTrajectoryGeneration, and detect automatically which interval in which the modification is done. Still currently modifications and adding foot on-line should be done during single support phase.
+ * Add DisplayIntervals method.
+ * Proper initialization of the Com, Waist and Feet positions.
+ * Now WalkGenJrl.cpp do not support OpenHRP 2.0 anymore.
+ * Correct links and disable some tests for win32 users.
+ * First working version for Morisawa algorithm. To be checked more thoroughly.
+ * Read now :sampling_period
+ * Get the chest information + code beautification.
+ * Created a second list to go through the links of a humanoid robot. The robot's description has to stick to the abstract interface.
+ * The compilation option -Wall is too powerful for Win32 users
+ * Fix the inclusion of "TimeUtilsWindows.h"
+ * Removed enable fortran.
+ * Removed Win32 export macro from private header.
+ * Removed HRP-2 specific data
+ * Modify the code to compile with the new abstract interface. Kajita's algorithm will not work with this version.
+ * Reorganization: Private headers stay in the library.
+ * Adding PatternGeneratorInterfacePrivate. Pimple rules.
+ * Reorganization + Adaptation to the new interface.
+ * Change file format
+ * Remove Win32 warning (missing dllimport/dllexport)
+ * Changes to take into account the new Abstract Interface.
+
+[pg3d-teleop.v1]
+ * Reactivated test for optimal cholesky implementation.
+ * Removed all warnings i.e. -Werror compliant.
+
+[Morisawa3d]
+ * Adding files to gitignore and the forgotten IDL interface.
+ * New profiling scheme.
+ * Modification of AnalyticalPreviewControl to use new objects.
+ * Finer control of optimal weights computation for preview control.
+ * Including date and time consumption inside Clock class.
+ * Revert changes which should have been in humanoidspecificities branch.
+ * Revert commit which should have been on humanoidspecificities branch.
+ * Release 2.5.4 for sot 1.1.0.
+
+[hs-1.0]
+ * Version which compile but segfault.
+ * Adding functionnal calls through the infamous setProperty.
+ * First version with no direct dynamicsJRLJapan dependency.  First compiled version 	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.h: . 	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.h: . 	* include/walkGenJrl/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h: . 	* include/walkGenJrl/FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.h: . 	* include/walkGenJrl/Mathematics/FootConstraintsAsLinearSystem.h: . 	* include/walkGenJrl/MotionGeneration/ComAndFootRealization.h: . 	* include/walkGenJrl/MotionGeneration/ComAndFootRealizationByGeometry.h: . 	* include/walkGenJrl/MotionGeneration/InverseKinematics.h: Remove. 	* include/walkGenJrl/MotionGeneration/StepOverPlanner.h: . 	* include/walkGenJrl/PatternGeneratorInterface.h: . 	* include/walkGenJrl/PreviewControl/ZMPPreviewControlWithMultiBodyZMP.h: . 	* include/walkGenJrl/ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.h: . 	* include/walkGenJrl/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.h: . 	* include/walkGenJrl/ZMPRefTrajectoryGeneration/AnalyticalMorisawaFull.h: . 	* include/walkGenJrl/ZMPRefTrajectoryGeneration/RealTimeHarada.h: Remove. 	* include/walkGenJrl/ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.h: . 	* include/walkGenJrl/ZMPRefTrajectoryGeneration/ZMPDiscretization.h: . 	* include/walkGenJrl/ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.h: . 	* src/CMakeLists.txt: . 	* src/FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp: . 	* src/FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp: . 	* src/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp: . 	* src/FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp: . 	* src/Mathematics/FootConstraintsAsLinearSystem.cpp: . 	* src/MotionGeneration/ComAndFootRealizationByGeometry.cpp: . 	* src/MotionGeneration/InverseKinematics.cpp: Remove. 	* src/MotionGeneration/StepOverPlanner.cpp: . 	* src/PatternGeneratorInterface.cpp: . 	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp: . 	* src/ZMPRefTrajectoryGeneration/AnalyticalMorisawaFull.cpp: . 	* src/ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp: . 	* src/ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp: . 	* src/ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp: .
+ * Continuing indenpendance...
+ * Making the code independent of dynamicsJRLJapan.
+ * Modification to fix uses of Kajita's algorithm in the new structure.
+ * [src/ZMPRefTrajectoryGeneration] Second validation for the filtering.
+ * [unitTesting] putting back TestRiccatiEquation + various scripts.
+ * [src] Validation of filtering in AnalyticalMorisawaCompact.
+ * [src/ZMPRefGenerationTrajectory] Preview Filter is now a plugin.
+ * License scheme.
+ * [src/PreviewControl] Plugin, license and optimization.
+ * [unitTesting] Adding script to perform valgrind check.
+
+[2.5.4]
+ * Release 2.5.4 for sot 1.1.0.
+
+[PreviewControlFiltering]
+ * [src/ZMPRefTrajectoryGeneration] Second validation for the filtering.
+ * [unitTesting] putting back TestRiccatiEquation + various scripts.
+ * [src] Validation of filtering in AnalyticalMorisawaCompact.
+ * [src/ZMPRefGenerationTrajectory] Preview Filter is now a plugin.
+ * License scheme.
+ * [src/PreviewControl] Plugin, license and optimization.
+ * [unitTesting] Adding script to perform valgrind check.
+
+[StoppingMorisawa]
+ * [src/FootTrajectoryGeneration] Adding proper stopping.
+ * Script files for display and build.
+ * [src/ZMPRefTrajectoryGeneration] Filtering Analytical Trajectory.
+ * [src/ZMPRefTrajectoryGeneration] Preparation for filtering.
+ * [src/PreviewControl] Adding 1D method to handle vector instead of queue.
+
+[TurningMorisawa]
+ * [unitTesting] Adding COM speed and other informations.
+ * [src/ZMPRefTrajectoryGeneration] Fix wrong initialization and memory leak.
+ * [src/MotionGeneration] Fixed wrong initialization of the feet.
+ * [src/FootTrajectoryGeneration] Adding ComputeCOMSpeed + proper init.
+ * [src/FootTrajectoryGeneration] Fix memory leak.
+ * [src] Code beautification.
+ * [src/Mathematics] Adding COM speed computation + removed memory leak.
+ * [src/ZMPRefTrajectoryGeneration] Add missing return value
+ * [src/ZMPRefTrajectoryGeneration] Nice ending phase for Morisawa's Algorithm.
+ * [ZMPRefTrajectoryGeneration] Adding states to ZMP trajectory generation.
+
+[v2009.4.30]
+ * [src] Modification of the Interface.
+ * [src/FootTrajectoryGeneration] Fix a pb for foot generation along Z.
+ * [unitTesting] Better handling of profile.
+ * [src] Adding debugging info in the stack of steps.
+ * [src/ZMPRefTrajectoryGeneration] Adding relative on-line modification.
+ * [src] Adding on-line Change Next Step functionnality for Morisawa's algo.
+ * [src/FootTrajectoryGeneration] Proper handling of step types.
+
+[v2009.04.15]
+ * [src] Make sure that the code is still compatiable with dynamicJRLJapan master.
+ * [src] Adding CoM height of the initial pose.
+ * [unitTesting] Proper profil by default (StraightWalking).
+ * [src] Adding AngularMomentum file generation.
+ * [include] Fix a bad return type for ComHeight (float instead of double).
+ * [src/ZMPRefTrajectoryGeneration] Shifted the ZMP filtering.
+ * [src] Modification for debugging description
+ * [unitTesting] Starting to specify profiles for future tests.
+ * [plugin] Fixed some warnings.
+ * [src/ZMPRefTrajectoryGeneration] Modification to specify by script the comheight.
+ * [src] Proper MAL syntax to access t3d & jrlMathTools code.
+ * [src] Bug fix with t3d.
+ * [src] Code compatible with T3D
+ * [src/Mathematics] Code cleaning.
+ * [src/Mathematics] Fixed previous commit on memory leak.
+ * [src][unitTesting] Modifications for Kajita One stage only support.
+ * [debug] Fixing debugging information.
+ * [src] Added proper delete to avoid memory leakage.
+ * Remove all traces of hard coded inclusion of jrlMathTools
+ * [src/ZMPRefTrajectoryGeneration] Fix the initial type of foot steps.
+ * [unitTesting] TestFootPrintPGInterface modified for easier testing.
+ * Win32 compatibility: correct the Doxygen command
+ * Added string.h for the linux in PLDPSolver (use to define memset() ).
+ * Adding a new reference frame to express the ZMP reference trajectory.
+ * Clean up this part of the code.
+ * Removed unnecessary method in IK.
+ * Extended again the interfaces + compilation flags fix.
+ * Testing others values for some parameters.
+ * Removed debugging information for experiments. Validation of Dimitrov 2009 on HRP2-10.
+ * Fixed some broken compiling options.
+ * Clean up and proper debugging generation.
+ * Added some interface to get information on waist position.
+ * Win32 Compatibility: Time
+ * - Warmstart working - Time limited comptutation working => PLDP is now working in 2.0 ms in the robot... The time limited computation guarantee that there is no peak above 1.5 ms. 5 times faster than QL.
+ * Tests
+ * Header
+ * Added a new interface to PGI for initial state.
+ * Win32 compatibility: correct the cxx and ld flags
+ * Typo
+ * Win32 compatibility: add isnan and isinf
+ * Hot start implementation.
+ * Removed jrlgesvd.f
+ * Adding the detection of Ai=-Aj with i<j. Speed up the computation. PLDP is now 4.4 ms for ConstraintX=0.04
+ * The Commit / Faster Stronger Better.
+ * First working implementation of PLDP. The time is similar to classical QLD around 8.3 ms.
+ * Last debugging phase. Pb on the ZMP profile, which is not good enough and creates a bad initial solution.
+ * Status at the end of 03/02/2009
+ * First test for debugging.
+ * First try for PLDP.
+ * First compiling version of PLDPSolver.
+ * Changes to implement towards implementing the full algorithm.
+ * Install useful files in share/walkgenjrl directory.
+ * First commit for the Primal Least Distance Problem Solver Dimitrov 2009.
+ * Fixed typo: Pu was not Pu anymore but DPu at the level of the optimization problem. Changed the name to avoid confusion...
+ * Dump current version as 1.5.0.99
+ * New formulation with pre-multiplication debugged. New time : 8.8 ms for Dimitrov 2009.
+ * Implemented the precomputation of Pu*LQ^{-T}. For some reason, it is not yet working (also do not crash...)
+ * Validation of the new formulation. It is possible to switch between the classical QLD and QLDANDLQ formulation. Pb: The QLDANDLQ is currently 5 ms longer than QLD. This due to the current formulation of Pu matrices. They should be computed BEFORE and multiply iLQ. A significant computation gain can be expected.
+ * Fixed some bugs: * Multiply the command v by iLQ instead of LQ is better. * Should provide the identity matrix to Q instead of LQ,   because the problem is well formulated now...
+ * typo
+ * New formulation with the Cholesky decomposition... ... currently under debugging.
+ * Bug fix.
+ * Adding new formulation with pre-multiplication by the Cholesky decomposition of the objective function in order to give to qld an identity matrix. The constraints and the linear part of the objective function should still be modified.
+ * The use is in charge of handling memory allocation for A and L in OptCholesky.
+ * Normal cholesky decomposition implemented. Real unitary test written.
+ * * Fixed the pb of pubsetbuf portability (implementation dependant). * Adding the test for debugging the Optimized Cholesky decomposition.
+ * Debugged the optimized cholesky.
+ * Removed files not supported anymore, and added the colesky implementation.
+ * First tentative for an optimized implementation of cholesky for QP solving.
+ * Typo
+ * The required files path is no longer hard coded and must be now precised in argument
+ * New structure of QP for optimized resolution checked, and debugged. Starting new cholesky decomposition specific to QP resolution.
+ * 1/ QP with constraint PBW Humanoids 2006 back in business inside ZMPQPWithConstraint.cpp.
+ * Update ZMPQPWithConstraint to the recent and not so recent changes of the WPG..
+ * Win32 compatibility : - add the \#include for M_PI - correct the documentation computation command
+ * Restructuration of QP formulation finished.
+ * Now the package can do link properly
+ * Now we can compile the PG again...
+ * Re-organizing the QP formulation.
+ * New dev. version
+ * New QP formulation (ICRA 2009)
+ * Removed unwanted log file.
+ * Removed a debug output.
+ * Improved the robustness of the plugin mecanisms. Thx to NP and PE for debug and confirmations.
+ * Removed a file from the repo which is generated automatically.
+ * Adding an initialization scheme avoiding discontinuities in the angles when starting. Currently it assumes that the initial position has its CoM at (0,0). Otherwise the system still got discontinuity when starting. The half-sitting position has this nice feature.
+ * Fix the problem of waist orientation during the initialization phase. OS
+ * Adding the first step automatic generation if :SetAutoFirstStep true is used in the scripts.
+ * Bump current version to 2.5.99
+
+[2.5.3]
+ * Release 2.5.3
+ * Update file src/data/HRP2Specificities.xml
+
+[2.5.2]
+ * Release 2.5.2
+ * Remove obsolete fortran file and install files for backward compat.
+ * Fixed documentation generation and dependencies.
+
+[2.5.1]
+ * Release 2.5.1
+ * Added namespace std:: in headers.
+
+[2.5.0]
+ * Disable compilation of unitTesting.
+ * Update ChangeLog.
+ * Cleaning before release
+
+[v2.5.0]
+ * Clean up of the documentation and release before modification regarding the starting foot.
+ * Found the bug which *DID NOT* change the stepheight. By default the stepheight was 12 cm hence the f.... impact. We expect better experimental results soon. Stay tuned... OS
+ * Code cleanup and modification of the interface.
+
+[PGinSoT]
+ * Validation with SoT. Finally the ZMP profile from CoM to zero seems to be better.
+ * Modification to keep compatibility with win32.
+ * Interface modification and ZMP initialization point modification for proper integration of the HWPG in SoT.
+ * Test on OpenHRP-3. Validation of BSCW experiment. The basic functionnalities have been checked on the real robot. Stepping over is not working yet.
+ * Changed the instruction for the headers installation.
+ * Test and bug fix of the new CMake capabilities against an OpenHRP-2 environment with a custom made installation. For use with Kineoworks
+ * jrlMathTools/constants.h becomes jrlMathTools/jrlConstants.h
+ * Modif the flags to compil the plugin OpenHRP.
+ * Define -DUNIX in compile flags if CMake detects that we are in a UNIX world. Fix minor warnings in Win32 modifs...
+ * The tests are now win32 compatible
+ * Insert the API for Win32 to create the corresponding .lib
+ * Author modification
+ * add the required modifications to make it win32 compatible: replacement of the UNIX-specific include,  add missing function, CMakeList correction
+ * Added a new script to test walkGenJRL under OpenHRP-3.0.1. It worked with Project HRP2JRLBush.xml and Torque control mode.
+ * Added file to generate idl according to OpenHRP version.
+ * Commit for compatibility with OpenHRP-3
+ * Add plugin with cmake.
+ * Removed unnessecary files.
+ * Detect OpenHRP-3 and perform a proper install of the XML files.
+ * Fixed warnings.
+ * Fixed compilation problem with g++ 4.3.2 and for unitTesting
+ * Clean up the installation process.
+ * Cleanup a bit the compiling options.
+ * Adding CMake capabilities.
+ * Fix a bug in the initialization of yaw in the very first phase of the reference trajectory generation.
+ * Modification of Makefile.in for smooth compil and install procedures even so OPENHRPHOME is undefined, or not well defined.
+ * Modification of the strategy to generate steps only when there is no other steps present in the stack.
+ * Fix 1 : Initialize now correctly the angles of the CoM. Fix 2 : startStepping is now simply the command in the plugin, it is assumed that the stack of steps has been properly initialized through the following line for instance walk.sendMsg(":parsecmd ::StartOnLineStepSequencing 0.0 0.105 0.0 \           		0.2 -0.21 0.0 \ 		        0.2 0.21 0.0 \ 			0.2 -0.21 0.0"); The number of steps depends upon the time of the steps (0.8 s) and the preview control window (3.2 s) here: 3.2/0.8 = 4 steps are necessary.
+ * Added successfull script tested in OpenHRP-2 (dynamical simulation) for online foot generation (Kajita-algo). One step further towards reactive walking...
+ * Modification to handle on-line foot step generation. Validation OpenHRP-2:no sim mode (...) Fixed a bug with ZMP filtering, fixed the end sequence, and the handling of the StepStackHandler.
+ * The stepping gives normal impact values regarding the force on the feet: 600-700 Newton, with the strongest impact on the left. The robot is clearly heavier on the left. Impact are reduced with the step height set to 5 cm instead of 7 cm.
+ * Code cleaning, testing on the real robot: OK. But be careful with the new parameters on HRP2Specificities.xml they imply a modification of the footsteps.
+ * Fixed the transition from seqplayer to pattern generator regarding the ZMP and the heuristic for the arms.
+ * Fixed bug for a proper estimation of ZMP multibody after phase 1.
+ * Commit to register modification to the handling of the CoM buffer, and make it internal to each generation algorithm.
+ * Removed duplicated code to go towards the on-line step generation. Now the same code is used in case of on-line and off-line steps generation for ZMPDiscretization (Kajita's heuristic). Validated on OpenHRP-2 simulation not the real robot.
+ * Tested the previous push on HRP2-number 10: looks ok. Trajectory looks smooth regarding the ZMP on Z, but should be improved on X and Y. The transition between the feet in double support phase looks smoother than the original PG. The position of the left ankle in the foot should be checked, there was an impact to 900 N. Strange behavior on the console, and on the robot in servo off, looked like a memory problem.
+ * Removed the warnings in g++-3.3.2 Put the unitary test under valgrind scrutinity. Remove some duplicated fields. The previous commit has been tested on the real robot.
+ * Important modifications: 1/ Fix the problem of the ZMP-height, it is now the waist height and the CoM (has asked by the stabilizer). The behavior of the stabilizer is much better in simulation now. 2/ The point position given by the user are now the center of the foot and not the ankle position (as it was up to now). The golden parameters have changed. The Y difference between is foot is now 0.21 and not 0.19. 3/ Be carefull but stop the walking pattern generator, there is still a difference between the last value in the seqplayer and the PG. It is not fixed yet.
+ * Modified the makefile for installation
+ * Valgrind the test file.
+ * Fixed some warnings and the installation process for the plugin.
+ * Fixed some warning when compiling with -Wall
+ * Modification to have the waist position properly set when using the classical double stage preview control strategy. I.e. it allows to make geometric simulation inside OpenHRP.
+ * Modification to start walking from various positions. Validated on OpenHRP2.
+ * Added new Makefile
+ * Added the installation of the idl file in the share-directory.
+ * OS: Fixed some namespace problems.
+ * Removed dumping debug data.
+ * Removed the debugging messages.
+ * Fixed the problem of arms discontinuity.
+ * Modification to remove some dumping. Do not use the current release unless say otherwise, recent experiments shows a discontinuity in the arm motions.
+ * Install useful headers.
+ * Fixed dependence to dynamicsJRLJapan in walkGenJRL.pc file.
+ * Added forgotten files... 8o)
+ * Added files for OmniORB4 compatibility. With the new structure some parameters have to have specify with :parsecmd
+ * Updated the plugin from ORBIX to omniorb 4. Validation of classical walking dynamically on OpenHRP-2 with Euler dynamical simulation. Seems ok.
+ * Remove svn entries.
+ * Added Morisawa & Harada Method for real-time pattern generation (ICRA 2007) Added a new foot trajectory layer. Added a new method to interact with the PG: allow to extract only the CoM and the foot position.
+ * Added a parenthesis in formula.
+ * Fixed some invalid access and memory leak.
+ * Bump current version to 2.4.99
+
+[2.4.1]
+ * Release 2.4.1
+ * Added missing return statement.
+ * remove useless files
+ * export doc directory in the pkgconfig file
+ * This software is copyright JRL, not LAAS
+ * compute doc directory from the package name
+ * rename package to walkGenJrl to be consistent with pkgconfig file name
+ * Install doc in $(datadir)/doc/walkGenJrl instead of $(datadir)/doc/walkGenJRL.
+
+[2.4]
+ * make the 2.4 release
+ * Correction of a compilation bug introduced by previous commit.
+ * Clean up the documentation.
+ * Adaptation to dynamicsJRLJapan modifications.
+ * fix bug in PatternGeneratorInterface::RunOneStepOfTheControlLoop()   computation of Z coordinate of ZMP(in waist frame) is corrected.
+
+[2.3.3]
+ * release 2.3.3
+ * add autogen script
+ * Removed automatically generated files.
+ * replace robotDynamicsJRLJapan with dynamicsJRLJapan
+
+[2.3.2]
+ * Revert previous change (back to 7 links for both arms). Make this the 2.3.2.
+
+[2.3.1]
+ * update changelog
+ * Removed last joints (22 and 29) from left and right arm, as per request of Oussama in private discussion. Bumped revision to 2.3.1.
+
+[2.3]
+ * Bumped revision to 2.3. Tagged repository.
+ * Added -release libtool flag to embed package revision number in library name. Removed explicit -llapack since it is inherited from DYNAMICJRLJAPAN_LDFLAGS.
+ *    -replace the file HRP2LinkJointRank in /src/data/ with a better version
+ * -- comment some useless variable in TestFootPrintPGInterface -- clean the configure.ac
+ * Removed from version control files that are automatically generated.
+ * Use MAL_S4x4_MATRIX_ACCESS_I_J everywhere to access 4x4 matrices elements (required for T3D implementation of 4x4 matrices).
+ * OS : Added a minimal test for demonstration.
+ * OS: Reentrance for QP with constraints (aka PBW algorithm) is now working, 	as well as the orientation for the feet.    Modification proposed by Dimitar now fully taken into account.    Level of validation: Geometric for Standard walking, stepping over, QP with constraints, 	No validation yet for Kineoworks part.
+
+[2.2]
+ * Make the 2.2 release.
+ * Use MAL_S4x4_MATRIX_ACCESS_I_J everywhere to access 4x4 matrices elements (required for T3D implementation of 4x4 matrices).
+ * regen
+ * Add ./data/HRP2LinkJointRank.xml as a config file.
+ * OS: Modifications from recent users feedback: 	* Updated the documentation for the main entry point of RunOneStepOfTheControlLoop 	* Updated the test program in unitTesting with proper initial values 	* Change the simulation of the dynamical system inside the QP algo (PBW) 	for a proper calculation of the constraints
+ * -- correct in walkGenJRL.pc.in the flags CFLAGS : -I${includedir}/walkGenJrl 	to acces the correct directory with the includes
+ * -- correct walkGenjrl.pc.in for the dependence with dynamicsJRLJap
+ * OS: Third round of debugging: Stepping over tested, as well as QP reformulation 	of ZMP preview control (ie PBW algo). First test of reentrance, but problems 	are remaining specially when mixing complex behaviors (stepping over + QP ).
+ * 2007/05/10 	1. (mathieu) correct configure.ac and src/Makefile.am to accept correctly the flags of dynamicsJRLJap package. 	note : make comments in configure.ac but didn't clean it
+ * OS: Second round of debugging for the new version of the WPG     The previous round proposed a straight motion validate only     with TestFootPrintPGInterface with the StraightWalking method.     This time we checked TurningOnACircle and reupdated the qt interface.
+ * -- correct configure.ac 	-- remove dependance variable --With-boost ... --with-VNL ... 	-- add dependance with package Dynamics-JRLJapan 		-- correct FLAGS dependance with sub-dependance package.pc.in 		so that dynamics-JRLJAPAN flags keep trace of 		MatrixAbstracLayer and  abstractRobotDynamics packages
+ * OS: Reorganization + modification for the newest version of dynamics-JRLJapan
+ * OS: Fixed a bug on the link between body and link on the root.     Wrote a test in TestHumanoidDynamicRobot for the jacobian computation Signed-off-by: Olivier Stasse <stasse@dhcpt1059.a02.aist.go.jp>
+ * OS: Added missing file Signed-off-by: Olivier Stasse <stasse@dhcpt1059.a02.aist.go.jp>
+ * OS: complete previous process Signed-off-by: Olivier Stasse <stasse@dhcpt1059.a02.aist.go.jp>
+ * OS: complete the previous process. Signed-off-by: Olivier Stasse <stasse@dhcpt1059.a02.aist.go.jp>
+ * OS: Complete the new branch with files which were not added ??
+ * OS: Update of the jrlCIR-dynamics interface +     First test of the Jacobian
+ * OS: Removed the static library of VNL
+ * OS: Version 2.1 : Integration of the jrl Dynamics, and software restructuration. Signed-off-by: Olivier Stasse <stasse@dhcpt1059.a02.aist.go.jp>
+
+[2.1]
+ * Release 2.1 Changes are: 4 - Remake the doxygen comment in PatternGeneratorInterface to actualy         appears in the html doc 3 - correct the file MatrixAbstractLayer.h with include "configJRLWPG.h" 2 - protection again double inclusion check and add on all file 1 - protection again double inclusion of MatrixAbstractLayerSmall.h
+ * - replace in COMPosition phi, omega, theta by roll, pitch, yaw
+ * OS: 1/ Fixed a bug related to walkmode 4 (did not include the orientation) in PatternGenerator.cpp     2/ Fixed a bug related to the arc generation mode. It is now much more well funded.
+ * -replace COMPosition phi, omega, theta by roll, pitch, yaw variable
+ * OS: Documentation update + added a gnuscript to display the trajectory of the Feet, COM and ZMPref. Signed-off-by: Olivier Stasse <stasse@dhcpt1059.a02.aist.go.jp>
+ * - modifed the doc and the corresponding source : 	- COMPosition
+ * -completed the documentation
+ * Corrected doc/Makefile.am in order to install HRP2 picture.
+ *  Remake the doxygen comment in PatternGeneratorInterface to actualy 	appears in the html doc
+ * correct the file MatrixAbstractLayer.h with include "configJRLWPG.h"
+ * - check and add if necessary protection against multiple inclusion
+ * 1 - protection on the multiple inclusion on MatrixAbstractLayerSmall.h
+ * Regen
+ * Mention 2.0 release which correspond to this commit. Please don't forget to update this file when you make changes.
+ * chmod -x
+ * HRP-2 specific data and parameters are to be installed (in share/walkGenJRL). Added license boilerplate.
+ * Added EXTRA_DIST files for doxygen. Added license boilerplate.
+ * put specific installation instructions here as automake regenerate INSTALL file automagically
+ * OS: Modification of the macro in matrix inversion on a suggestion of Anthony. The relationship between the meaning of the matrix and its memory map is clearer. Signed-off-by: Olivier Stasse <stasse@dhcpt1059.a02.aist.go.jp>
+ * Added information on how to get boost and boost-sandbox.
+ * 1. All necessary headers were not installed. It is noz corrected. 2. Removed reference to atlas in walkGenJrl.pc.in
+ * Added compilation flags in walkGenJrl.pc.in in order to get access to boost-sandbox, atlas, ...  headers and libs.
+ * OS: fixed the previous commit with all changes Signed-off-by: Olivier Stasse <stasse@dhcpt1059.a02.aist.go.jp>
+ * OS: Fixed some pbs related to VNL and autoconf: 	* Suppressed the StepOverPlannerExtraBuffer files which are useless. 	* Removed the TestRiccatiEquation 	* Reinserted the documentation in INSTALL removed from the previous commit. 	* Fixed the src/Makefile.am for compiling TestFootPrintPGInterface.cpp
+ * Added specific installation instructions.
+ * regen without symbolic links
+ * remove garbage
+ * 1. Added required files to wrap-up this package using autoconf and automake. See INSTALL for installation instructions. For old-type compilation, cd src; make -f Makefile.old
+ * OS: configJRLWPG.h embed all the options related to matrices. The documentation for this is not yet available.
+ * OS: Two new objects added to comply with jrlDynamics interface
+ * OS: First phase towards the jrlDymanics Interface. DynamicMultiBody, Body are now compliant with the interface.
+ * OS: * Full integration, and test of boost (geometrical validation only)     * Creation of a small matrix abstraction layer (cf MatrixAbstractLayerSmall*.h)     * Fixed the initialization bug.     * Starting to improve the documentation Signed-off-by: Olivier Stasse <stasse@dhcpt1059.a02.aist.go.jp>
+ * OS: This new version is a first port to BOOST MATRIX.     The following functionnalities have been ONLY geometrically     checked (i.e. through the q.t. interface)     - Normal walking     - Stepping over     - Walking towards the center     - PBW walking fast.       (this one has still some problem when running after another       	motion and is not reentrant).     The current Makefile is set by default to BOOST MATRIX.     There is one line to comment and one line to uncomment     to switch to VNL.     The last functionnality which should be reimplemented is     the pseudo-inverse computation.     Modified the qt interface's Makefile to use BOOST_MATRIX     and added the HRP2Model into the directory.
+ * Eiichi Yoshida: Added a script "plugin/script/PartialDemoChambreDeCommerce.py" wirtten by Olivier for stepping over motion (speaking part commented out). Do "cd plugin" and "make install" to put this script in the right directory Makefile.user changed accordingly.
+ * E. Yoshida Modifications to enable the PB Wieber's PG program and plugins for OpenHRP. The directory is supposed to be located at $OPENHRPHOME/PatternGeneratorJRL. in "src" directory, by make: in "plugin" direcory, by make  and make install to put the necessary plugin binaries and scripts in the right place. From Auditor, run "TestWalkGenPBW.py"
+ * OS: Added in hurry the last modification of the PG, where 	everthing has been validated on the Robot: 	- Stepping over, sharp turns, experience with kineo works, 	PBW algorithm. 	However in the last case, the robot is doing a quick motion 	with the arm which is strong than usual. This initial problem 	SHOULD be fixed in the future release.
+ * OS: Introduction of the Matrix Abstract Layer.     Please see MatrixAbstractLayer.h for definition.     The change to switch from VNL to BOOST is done inside the Makefile.     Currently the BOOST version is compiling but is NOT working.     The current validation of the PG is GEOMETRICAL SIMULATION only for : 	- normal mode (Kajita) 	- Pierre Brice Wieber ZMP generation (aka PBW ZMP trajectory generation) 	- Stepping Over 	- The Kineoworks path realization is not working     Introduction of the header file and a binary for VNL inside the repository.     (Please note that it is working only with a gcc-3.3 compiler).     Removed the -lg2c stuff, and fixed the OptimalControllerSolver.     But it is assumed now that a lapack library is currently set up with a     proper reference to a binding (see MatrixAbstractLayer.h for boost-sandbox, 	and include/VNL/Netlib/netlib.h for VNL).
+ * OS: Removed specific data regarding HRP-2 from the source code, and put it inside an external XML file.
+ * OS: First try to use GIT: Full PattenGenerator v2.0 + PBW's algorithm
+ * OS: Checkout and update of the pattern generator v2.0 with first PBW's algorithm implementation.
+ * Initial commit
