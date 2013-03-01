@@ -40,7 +40,8 @@
 #else
 #  define WALK_GEN_JRL_EXPORT
 #endif
-
+#include <iostream>
+#include <fstream>
 #include <jrl/mal/matrixabstractlayer.hh>
 
 namespace PatternGeneratorJRL
@@ -76,7 +77,11 @@ namespace PatternGeneratorJRL
     void reset();
 
     COMState_s();
+
+    friend std::ostream & operator<<(std::ostream &os, const struct COMState_s & acs);
   };
+    
+  
 
   typedef struct COMState_s COMState;
 

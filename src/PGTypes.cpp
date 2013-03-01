@@ -65,6 +65,33 @@ namespace PatternGeneratorJRL
   COMState_s::COMState_s()
   {
     reset();
+
+  }
+
+  std::ostream & operator<<(std::ostream &os,
+                            const COMState_s & acs)
+  {
+    os << acs.x[0] << " " <<
+      acs.x[1] << " " <<
+      acs.x[2] << " " <<
+      acs.y[0] << " " <<
+      acs.y[1] << " " <<
+      acs.y[2] << " " <<
+      acs.z[0] << " " <<
+      acs.z[1] << " " <<
+      acs.z[2] << " " <<
+      acs.yaw[0] << " " <<
+      acs.yaw[1] << " " <<
+      acs.yaw[2] << " " <<
+      acs.pitch[0] << " " <<
+      acs.pitch[1] << " " <<
+      acs.pitch[2] << " " <<
+      acs.roll[0] << " " <<
+      acs.roll[1] << " " <<
+      acs.roll[2] << " " << std::endl;
+    
+    return os;
+    
   }
 
 }
