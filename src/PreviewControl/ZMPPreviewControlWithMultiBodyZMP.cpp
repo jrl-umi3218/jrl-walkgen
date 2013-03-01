@@ -168,6 +168,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 
    /* Get the current acceleration vector */
    CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
+
    m_ComAndFootRealization->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
 								    aLeftFootPosition,
 								    aRightFootPosition,
@@ -186,7 +187,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
        m_HumanoidDynamicRobot->currentVelocity(CurrentVelocity);
 
        /* Update the current acceleration vector */
-       //m_HumanoidDynamicRobot->currentVelocity(CurrentAcceleration);
+       m_HumanoidDynamicRobot->currentAcceleration(CurrentAcceleration);
      }
  }
 
@@ -200,7 +201,6 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 							       MAL_VECTOR_TYPE(double) & CurrentVelocity,
 							       MAL_VECTOR_TYPE(double) & CurrentAcceleration)
  {
-
    FirstStageOfControl(LeftFootPosition,RightFootPosition,refandfinalCOMState);
    // This call is suppose to initialize
    // correctly the current configuration, speed and acceleration.
@@ -221,14 +221,14 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 		 aRightFAP.y << " " <<
 		 aRightFAP.z,
 		 "ZMPPCWMZOGSOC.dat");
-
+   
    CallToComAndFootRealization(acompos,aLeftFAP,aRightFAP,
 			       CurrentConfiguration,
 			       CurrentVelocity,
 			       CurrentAcceleration,
 			       m_NumberOfIterations,
 			       0);
-
+   
    if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
      EvaluateMultiBodyZMP(-1);
 
@@ -236,6 +236,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    aRightFAP = m_FIFORightFootPosition[0];
 
    SecondStageOfControl(refandfinalCOMState);
+
    ODEBUG4SIMPLE(refandfinalCOMState.x[0] << 
 		 " " << refandfinalCOMState.y[0] <<
 		 " " << refandfinalCOMState.z[0] <<
@@ -248,6 +249,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 		 " " << aRightFAP.z << 
 		 " " << aRightFAP.stepType
 		 , "2ndStage.dat");
+
    if (m_StageStrategy!=ZMPCOM_TRAJECTORY_FIRST_STAGE_ONLY)
      {
        CallToComAndFootRealization(refandfinalCOMState,aLeftFAP,aRightFAP,
@@ -300,6 +302,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 		 CurrentConfiguration[18]<< " ",
 		 "DebugDataqrql.txt");
    m_NumberOfIterations++;
+
    return 1;
  }
 
@@ -444,7 +447,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 
  int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int /* StartingIteration */)
  {
-   string sComputeZMP("ComputeZMP");
+   string sComputeZMP("ComputeBackwardDynamics");
    string sZMPtrue("true");
 
    ODEBUG("Start EvaluateMultiBodyZMP");
