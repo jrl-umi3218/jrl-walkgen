@@ -52,6 +52,8 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp
   ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.cpp
   ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQPDebug.cpp
+  ZMPRefTrajectoryGeneration/ZMPVisualServoingQP.cpp
+  ZMPRefTrajectoryGeneration/ZMPVisualServoingQPDebug.cpp
   ZMPRefTrajectoryGeneration/OrientationsPreview.cpp
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp
