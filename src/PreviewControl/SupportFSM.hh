@@ -40,11 +40,14 @@ namespace PatternGeneratorJRL
 	
     /*! Destructor */
     ~SupportFSM();
-	
+
     /*! \brief Initialize the previewed state. */
     void setSupportState(const double &Time, const int &pi,
-    		SupportState_t & Support, const ReferenceAbsoluteVelocity & RefVel);
-	
+			 SupportState_t & Support, const bool & ReferenceGiven);
+
+    void setSupportState(const double &Time, const int &pi,
+			 SupportState_t & Support, const ReferenceAbsoluteVelocity & RefVel);
+
     ///*! \brief Numerical precision */
     double m_eps;
 	

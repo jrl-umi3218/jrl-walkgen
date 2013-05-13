@@ -105,6 +105,19 @@ namespace PatternGeneratorJRL
 					    std::deque<double> &PreviewedSupportAngles,
 					    int & NbOfConstraints);
 
+      int buildLinearConstraintInequalities(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
+					    std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+					    std::deque<LinearConstraintInequalityFreeFeet_t> &
+					    QueueOfLConstraintInequalities,
+					    std::deque<LinearConstraintInequalityFreeFeet_t> &
+					    QueueOfFeetPosInequalities,
+					    const bool & ReferenceGiven,
+					    double StartingTime,
+					    double m_QP_N,
+					    SupportFSM * SupportFSM, SupportState_t CurrentSupport, SupportState_t & PrwSupport,
+					    std::deque<double> &PreviewedSupportAngles,
+					    int & NbOfConstraints);
+
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute Position.  */
       int BuildLinearConstraintInequalities2(std::deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
 					     std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,

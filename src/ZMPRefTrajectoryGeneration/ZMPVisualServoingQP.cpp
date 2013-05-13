@@ -1656,9 +1656,9 @@ void ZMPVisualServoingQP::OnLine(double time,
       //-----------------------------------
       gettimeofday(&start,0);
 
-
-      //m_OP->verifyAccelerationOfHipJoint(RefVel, m_TrunkState,
-      //				 m_TrunkStateT, m_CurrentSupport);
+      // TODO : RefVel.dYaw = (desiredAngle - m_TrunkState.yaw[1])/m_T;
+      m_OP->verifyAccelerationOfHipJoint(RefVel, m_TrunkState,
+					 m_TrunkStateT, m_CurrentSupport);
 
 
       m_OP->previewOrientations(time+m_TimeBuffer,
@@ -1685,7 +1685,9 @@ void ZMPVisualServoingQP::OnLine(double time,
 
 
       //TODO : Add a get function to read the state
-      m_SupportFSM->setSupportState(time+m_TimeBuffer, 0, m_CurrentSupport, RefVel);
+      //TODO : Set ReferenceGiven when watching landmarks
+      bool ReferenceGiven = false;
+      m_SupportFSM->setSupportState(time+m_TimeBuffer, 0, m_CurrentSupport, ReferenceGiven);
 
 
       //      //TODO : Temporary solution for the pldp solver. See above
@@ -1733,7 +1735,7 @@ void ZMPVisualServoingQP::OnLine(double time,
 						 FinalRightFootAbsolutePositions,
 						 QueueOfLConstraintInequalitiesFreeFeet,
 						 QueueOfFeetPosInequalities,
-						 RefVel,
+						 ReferenceGiven,
 						 time+m_TimeBuffer,
 						 m_QP_N,
 						 m_SupportFSM, m_CurrentSupport, m_PrwSupport, m_PreviewedSupportAngles,

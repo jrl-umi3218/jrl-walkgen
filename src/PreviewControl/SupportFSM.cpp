@@ -56,14 +56,24 @@ SupportFSM::~SupportFSM()
 {
 }
 
+void setSupportState(const double &Time, const int &pi,
+		     SupportState_t & Support, const ReferenceAbsoluteVelocity & RefVel)
+{
+  bool ReferenceGiven = false;
+  if(fabs(RefVel.x)>0||fabs(RefVel.y)>0)
+    ReferenceGiven = true;
+  setSupportState(Time,pi,Support,ReferenceGiven);
+
+}
+
 void SupportFSM::setSupportState(const double &Time, const int &pi,
-		SupportState_t & Support, const ReferenceAbsoluteVelocity & RefVel)
+		SupportState_t & Support, const bool & ReferenceGiven)
 {
 
   Support.StateChanged = false;
   
   m_ReferenceGiven = false;
-  if(fabs(RefVel.x)>0||fabs(RefVel.y)>0)
+  if(ReferenceGiven)
 	  m_ReferenceGiven = true;
     
   if(m_ReferenceGiven == true && Support.Phase == 0 && (Support.TimeLimit-Time-m_eps)>m_DSSSDuration)

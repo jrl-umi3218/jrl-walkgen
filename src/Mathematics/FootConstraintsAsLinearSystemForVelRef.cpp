@@ -72,7 +72,7 @@ FootConstraintsAsLinearSystemForVelRef(SimplePluginManager *aSPM,
   m_LeftFoot->getSoleSize(lHalfWidthInit,lHalfHeightInit);
   m_LeftFootSize.setHalfSizeInit(lHalfWidthInit,lHalfHeightInit);
   m_LeftFootSize.setConstraints(ConstraintOnX,ConstraintOnY);
-  
+
   m_DSFeetDistance = 0.2;
 
 
@@ -223,12 +223,34 @@ int FootConstraintsAsLinearSystemForVelRef::computeLinearSystem(vector<CH_Point>
 
 
 int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
+									      deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+									      deque<LinearConstraintInequalityFreeFeet_t> &
+									      QueueOfLConstraintInequalitiesFreeFeet,
+									      deque<LinearConstraintInequalityFreeFeet_t> &
+									      QueueOfFeetPosInequalities,
+									      ReferenceAbsoluteVelocity & RefVel,
+									      double StartingTime, double m_QP_N,
+									      SupportFSM * SupportFSM,
+									      SupportState_t CurrentSupport,
+									      SupportState_t & PrwSupport,
+									      deque<double> &PreviewedSupportAngles,
+									      int & NbOfConstraints){
+  bool ReferenceGiven = false;
+  if(fabs(RefVel.x)>0||fabs(RefVel.y)>0)
+    ReferenceGiven = true;
+  buildLinearConstraintInequalities(LeftFootAbsolutePositions,RightFootAbsolutePositions,
+				    QueueOfLConstraintInequalitiesFreeFeet,QueueOfFeetPosInequalities,
+				    ReferenceGiven,StartingTime,m_QP_N,SupportFSM,CurrentSupport,
+				    PrwSupport,PreviewedSupportAngles,NbOfConstraints);
+}
+
+int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(deque< FootAbsolutePosition> &LeftFootAbsolutePositions,
 								     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 								     deque<LinearConstraintInequalityFreeFeet_t> &
 								     QueueOfLConstraintInequalitiesFreeFeet,
 								     deque<LinearConstraintInequalityFreeFeet_t> &
 								     QueueOfFeetPosInequalities,
-								     ReferenceAbsoluteVelocity & RefVel,
+								     const bool & ReferenceGiven,
 								     double StartingTime, double m_QP_N,
 								     SupportFSM * SupportFSM, SupportState_t CurrentSupport, SupportState_t & PrwSupport,
 								     deque<double> &PreviewedSupportAngles,
@@ -290,7 +312,7 @@ int FootConstraintsAsLinearSystemForVelRef::buildLinearConstraintInequalities(de
   for(unsigned int i=1;i<=m_QP_N;i++)
     {
 
-      SupportFSM->setSupportState(StartingTime, i, PrwSupport, RefVel);
+      SupportFSM->setSupportState(StartingTime, i, PrwSupport, ReferenceGiven);
 
       ComputeCH=0;
 
