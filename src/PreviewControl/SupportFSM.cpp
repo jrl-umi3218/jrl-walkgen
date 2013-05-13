@@ -56,7 +56,7 @@ SupportFSM::~SupportFSM()
 {
 }
 
-void setSupportState(const double &Time, const int &pi,
+void SupportFSM::setSupportState(const double &Time, const int &pi,
 		     SupportState_t & Support, const ReferenceAbsoluteVelocity & RefVel)
 {
   bool ReferenceGiven = false;
