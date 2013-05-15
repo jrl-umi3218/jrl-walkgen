@@ -174,5 +174,23 @@ namespace PatternGeneratorJRL
   };
   typedef struct ReferenceAbsoluteVelocity_t ReferenceAbsoluteVelocity;
 
+  struct Map_s
+  {
+    int N;
+    MAL_MATRIX(*LandMarksInWorld,double);
+    MAL_MATRIX(*LandMarksInCamera,double);
+    MAL_MATRIX(*LandMarksProjected,double);
+  };
+  typedef struct Map_s Map_t;
+
+  struct LinearizationProjection_s
+  {
+    MAL_VECTOR(UVector,double);
+    MAL_VECTOR(VVector,double);
+    double UScalar;
+    double VScalar;
+  };
+  typedef LinearizationProjection_s LinearizationProjection_t;
+
 }
 #endif

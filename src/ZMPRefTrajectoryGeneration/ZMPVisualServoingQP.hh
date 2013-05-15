@@ -59,25 +59,25 @@ namespace PatternGeneratorJRL
 
     /* Default destructor. */
     ~ZMPVisualServoingQP();
-    
-    
+
+
     /*! \name Methods to build the optimization problem
       @{
     */
-    
+
     /*! \brief Compute the constant matrices over all the instances of the problem.
       This means \f$P_{pu}, P_{px}, P_{vs}, P_{vu}\f$.
       The necessary parameters to build those matrices are extracted from the
       PreviewControl link.
     */
     int InitializeMatrixPbConstants();
-    
+
     /*! \brief This method does the same once the previous method has been called
       to compute the static part of the optimization function.
       Assuming that the optimization function is of the form
       \f$ min_{u_k} \frac{1}{2} u^{\top}_k Q u_k + p^{\top}_k u_k \f$
       this method computes \f$Q\f$, the constant part of $p^{\top}_k$.
-      
+
     */
     int BuildingConstantPartOfTheObjectiveFunction();
 
@@ -85,10 +85,10 @@ namespace PatternGeneratorJRL
       \return A negative value in case of a problem 0 otherwise.
     */
     int InitConstants();
-    
+
     void initFeet();
-    
-    
+
+
     int buildConstraintMatrices(double * &DS, double * &DU,
 				double StartingTime,
 				deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfLConstraintInequalitiesFreeFeet,
@@ -97,7 +97,7 @@ namespace PatternGeneratorJRL
 				double Com_Height,
 				int NbOfConstraints,
 				MAL_VECTOR(&xk,double));
-    
+
 
 
     /*! \brief Build the constant part of the constraint matrices. */
@@ -145,7 +145,8 @@ namespace PatternGeneratorJRL
 		deque<ZMPPosition> & FinalZMPPositions,
 		deque<COMState> & CoMStates,
 		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
+		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
+		MAL_MATRIX(&COMPositionInWorld,double));
 
 
     int validateConstraints(double * & DS,double * &DU,
@@ -197,7 +198,7 @@ namespace PatternGeneratorJRL
     double m_RobotMass;
     bool m_PerturbationOccured;
     double m_FeetDistanceDS;
-    
+
     bool m_EndingPhase;
     double m_TimeToStopOnLineMode;
 
@@ -302,10 +303,10 @@ namespace PatternGeneratorJRL
     MAL_MATRIX(m_OptD,double);
 
     enum MatrixType  { M_PPU, M_PZU, M_VPU, M_PPX,
-			M_PZX, M_VPX, M_U, 
+			M_PZX, M_VPX, M_U,
 			M_LQ, M_ILQ};
     enum VectorType  {m_UC,M_OPTA, M_OPTB,	M_OPTC, M_OPTD };
-      
+
     /*! \name Parameters of the objective function
       @{ */
     /*! Putting weight on the velocity */
@@ -336,6 +337,24 @@ namespace PatternGeneratorJRL
     //! Primal Least square Distance Problem solver *\/ */
     Optimization::Solver::PLDPSolverHerdt * m_PLDPSolverHerdt;
 
+    /* Set of landmarks in world, camera and projected */
+    Map_t m_Map;
+
+    /* Linearization terms */
+    LinearizationProjection_t* m_LinearizationTerms;
+
+    /* Visual servoing matrices */
+    MAL_MATRIX_TYPE(double)* m_Du;
+    MAL_MATRIX_TYPE(double)* m_Dv;
+    MAL_MATRIX_TYPE(double)* m_Cu;
+    MAL_MATRIX_TYPE(double)* m_Cv;
+
+    /* Visual servoing weights */
+    MAL_MATRIX_TYPE(double) m_W;
+
+    /* Position of the COM in the camera frame */
+    MAL_MATRIX_TYPE(double) m_COMPositionInCamera;
+
     void initializeProblem();
 
     void computeCholeskyOfQ(double * OptA);
@@ -353,7 +372,7 @@ namespace PatternGeneratorJRL
 				  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 				  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
-    /*! \name Debugging related methods 
+    /*! \name Debugging related methods
      @{*/
     /*! \brief Dump the instance of the quadratic problem for one iteration. */
     int dumpProblem(MAL_VECTOR(& xk,double),
@@ -368,7 +387,16 @@ namespace PatternGeneratorJRL
     /*! \brief Dumping matrix specified by MatrixID in file named filename. */
     void debugMatrix(const char *filename, enum MatrixType MatrixID);
     /*! @} */
-    
+
+    /*! \brief Apply the projection. */
+    void projectToImagePlane();
+
+    /*! \brief Compute linearization parameters of the projection. */
+    void linearizeProjection();
+
+    /*! \brief Compute the matrices to be added to the objective function regarding visual errors minimization. */
+    void computeVisualServoingMatrices(MAL_MATRIX(&WorldPositionInCamera,double));
+
   public:
 
     /*! Methods to comply with the initial interface of ZMPRefTrajectoryGeneration.

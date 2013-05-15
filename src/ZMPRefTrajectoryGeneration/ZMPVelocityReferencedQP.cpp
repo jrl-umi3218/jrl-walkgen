@@ -333,10 +333,10 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
   MAL_MATRIX(OptA,double);
 
   //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
-  MAL_MATRIX(lterm1,double);
-  lterm1 = MAL_RET_TRANSPOSE(m_PPu);
-  lterm1 = MAL_RET_A_by_B(lterm1, m_PPu);
-  lterm1 = m_Beta * lterm1;
+  //MAL_MATRIX(lterm1,double);
+  //lterm1 = MAL_RET_TRANSPOSE(m_PPu);
+  //lterm1 = MAL_RET_A_by_B(lterm1, m_PPu);
+  //lterm1 = m_Beta * lterm1;
 
   MAL_MATRIX(lterm2,double);
   lterm2 = MAL_RET_TRANSPOSE(m_VPu);
@@ -361,15 +361,16 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
   //TODO:: size of Q is 3*Nx3*N which means that there is place for N/2 feet variables
 
   /*! Compute constants of the linear part of the objective function. */
-  lterm1 = MAL_RET_TRANSPOSE(m_PPu);
-  lterm1 = MAL_RET_A_by_B(lterm1,m_PPx);
+  //lterm1 = MAL_RET_TRANSPOSE(m_PPu);
+  //lterm1 = MAL_RET_A_by_B(lterm1,m_PPx);
   m_OptB = MAL_RET_TRANSPOSE(m_VPu);
   m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
-  m_OptB = m_Alpha * m_OptB;
-  m_OptB = m_OptB + m_Beta * lterm1;
+  //m_OptB = m_Alpha * m_OptB;
+  m_OptB = m_Beta * m_OptB;
+  //m_OptB = m_OptB + m_Beta * lterm1;
 
-  m_OptC = MAL_RET_TRANSPOSE(m_PPu);
-  m_OptC = m_Beta * m_OptC;
+  //m_OptC = MAL_RET_TRANSPOSE(m_PPu);
+  //m_OptC = m_Beta * m_OptC;
 
 
   if (m_FullDebug>0)
@@ -743,7 +744,7 @@ int ZMPVelocityReferencedQP::buildConstraintMatrices(double * &,
 {
 
   // Discretize the problem.
-  ODEBUG(" N:" << m_QP_N << " T: " << T);
+  //ODEBUG(" N:" << m_QP_N << " T: " << T);
 
   if (m_FullDebug>2)
    {
@@ -1345,8 +1346,8 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
     {
       for( int j=0;j<m_QP_N;j++)
 	{
-	  m_Pb.Q[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] -= ltermPZuPZu(i,j);
-	  m_Pb.Q[(m_QP_N+i)*2*(m_QP_N+m_PrwSupport.StepNumber)+m_QP_N+j] -= ltermPZuPZu(i,j);
+	  m_Pb.Q[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] += ltermPZuPZu(i,j);
+	  m_Pb.Q[(m_QP_N+i)*2*(m_QP_N+m_PrwSupport.StepNumber)+m_QP_N+j] += ltermPZuPZu(i,j);
 	}
     }
   if(m_PrwSupport.StepNumber>0)
@@ -1400,7 +1401,7 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
   OptD -= lterm1v;
 
   for( int i=0;i<2*m_QP_N;i++)
-    m_Pb.D[i] += OptD(i);
+    m_Pb.D[i] = OptD(i);
 
 
   //zmp
@@ -2016,9 +2017,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       TotalAmountOfCPUTime += CurrentCPUTime;
 
 
-      ODEBUG("Current Time : " <<time << " " <<
-	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back().EndingTime - time <<
-	     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
+      //ODEBUG("Current Time : " <<time << " " <<
+      //     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back().EndingTime - time <<
+      //     "Computation Time " << CurrentCPUTime << " " << TotalAmountOfCPUTime);
 
       QueueOfLConstraintInequalitiesFreeFeet.clear();
       QueueOfFeetPosInequalities.clear();

@@ -75,6 +75,12 @@ protected:
       istringstream strm2(":numberstepsbeforestop 2");
       aPGI.ParseCmd(strm2);
     }
+
+    {
+      istringstream strm2(":setfeetconstraint XY 0.06 0.06");
+      aPGI.ParseCmd(strm2);
+    }
+
   }
 
   void stopOnLineWalking(PatternGeneratorInterface &aPGI)
