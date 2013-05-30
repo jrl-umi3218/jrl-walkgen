@@ -141,12 +141,20 @@ namespace PatternGeneratorJRL
 
 
     /* ! \brief Method to update the stacks on-line */
+
+    void OnLine(double time,
+		deque<ZMPPosition> & FinalZMPPositions,
+		deque<COMState> & CoMStates,
+		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
+
     void OnLine(double time,
 		deque<ZMPPosition> & FinalZMPPositions,
 		deque<COMState> & CoMStates,
 		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-		MAL_MATRIX(&COMPositionInWorld,double));
+		MAL_MATRIX(&WorldPositionInCamera,double),
+		MAL_MATRIX(&CameraPositionInCOM,double));
 
 
     int validateConstraints(double * & DS,double * &DU,
@@ -160,6 +168,21 @@ namespace PatternGeneratorJRL
 
     /*! Set the velocity reference */
     void setVelReference(istringstream &strm);
+
+    /*! Set the number of landmarks */
+    void setNumberOfLandMarks(istringstream &strm);
+
+    /*! Set the position of the landmarks (x,y,z) ie. the Map */
+    void setLandMarksPositions(istringstream &strm);
+
+    /*! Set the desired final angular position */
+    void setDesiredAngle(istringstream &strm);
+
+    /*! Set the gain for the angle control */
+    void setAngleErrorGain(istringstream &strm);
+
+/*! Set the desired position of the landmarks (u,v) */
+    void setFinalLandMarks(istringstream &strm);
 
     /*! Set the velocity reference from external reference */
     void setVelReference(double x,double y, double yaw);
@@ -344,16 +367,22 @@ namespace PatternGeneratorJRL
     LinearizationProjection_t* m_LinearizationTerms;
 
     /* Visual servoing matrices */
-    MAL_MATRIX_TYPE(double)* m_Du;
-    MAL_MATRIX_TYPE(double)* m_Dv;
-    MAL_MATRIX_TYPE(double)* m_Cu;
-    MAL_MATRIX_TYPE(double)* m_Cv;
+    MAL_MATRIX_TYPE(double)* m_DupDvSqrbW;
+    MAL_MATRIX_TYPE(double)* m_DupDv;
+    MAL_MATRIX_TYPE(double)* m_DupDvTbW;
+    MAL_VECTOR_TYPE(double)* m_Cu;
+    MAL_VECTOR_TYPE(double)* m_Cv;
+    MAL_VECTOR_TYPE(double)* m_SdU;
+    MAL_VECTOR_TYPE(double)* m_SdV;
 
     /* Visual servoing weights */
-    MAL_MATRIX_TYPE(double) m_W;
+    MAL_VECTOR_TYPE(double) m_W;
 
-    /* Position of the COM in the camera frame */
-    MAL_MATRIX_TYPE(double) m_COMPositionInCamera;
+    /* Desired rotation angle*/
+    double m_desiredAngle;
+
+    /* Gain for the angle position control*/
+    double m_angleErrorGain;
 
     void initializeProblem();
 
@@ -395,7 +424,14 @@ namespace PatternGeneratorJRL
     void linearizeProjection();
 
     /*! \brief Compute the matrices to be added to the objective function regarding visual errors minimization. */
-    void computeVisualServoingMatrices(MAL_MATRIX(&WorldPositionInCamera,double));
+    void computeVisualServoingMatrices(MAL_MATRIX(&WorldRotationInCamera,double),
+				      MAL_MATRIX(&WorldTranslationInCamera,double),
+				      MAL_MATRIX(&CameraRotationInCOM,double),
+				      MAL_MATRIX(&CameraTranslationInCOM,double));
+
+    void allocateLandMarksArrays();
+
+    void releaseLandMarksArrays();
 
   public:
 

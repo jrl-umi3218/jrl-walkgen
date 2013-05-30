@@ -48,6 +48,7 @@
 #include <ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPVisualServoingQP.hh>
 #include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.hh>
 
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
@@ -204,6 +205,16 @@ namespace PatternGeneratorJRL
 				    FootAbsolutePosition &LeftFootPosition,
 				    FootAbsolutePosition &RightFootPosition);
 
+    bool RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+				    MAL_VECTOR_TYPE(double) & CurrentVelocity,
+				    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+				    MAL_VECTOR_TYPE(double) &ZMPTarget,
+				    COMState &COMState,
+				    FootAbsolutePosition &LeftFootPosition,
+				    FootAbsolutePosition &RightFootPosition,
+				    MAL_MATRIX(*WorldPositionInCamera,double),
+				    MAL_MATRIX(*CameraPositionInCOM,double));
+
     /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
      @param[out]  CurrentConfiguration The current configuration of the robot according to 
      the implementation of dynamic-JRLJapan. This should be first position and orientation
@@ -257,11 +268,29 @@ namespace PatternGeneratorJRL
     /*! \brief Read a velocity reference. */
     void setVelReference(istringstream &strm);
 
+    /*! \brief Set the number of landmarks. */
+    void setNumberOfLandMarks(istringstream &strm);
+
+    /*! Set the position of the landmarks (x,y,z) ie. the Map */
+    void setLandMarksPositions(istringstream &strm);
+
+    /*! Set the desired position of the landmarks (u,v) */
+    void setFinalLandMarks(istringstream &strm);
+
+    /*! Set the desired final angular position */
+    void setDesiredAngle(istringstream &strm);
+
+    /*! Set the gain for the angle control */
+    void setAngleErrorGain(istringstream &strm);
+
     /*! \brief Read a perturbation force on the com. */
     void setCoMPerturbationForce(istringstream &strm);
 
     /*! \brief Initialize online mode of Herdt. */
     void initOnlineHerdt();
+
+    /*! \brief Initialize online mode of the Visual Servoing Formulation. */
+    void initOnlineVS();
 
     /*! \brief Read a sequence of steps. */
     void ReadSequenceOfSteps(istringstream &strm);
@@ -456,6 +485,9 @@ namespace PatternGeneratorJRL
     /*! QP formulation with a velocity reference. */
     ZMPVelocityReferencedQP * m_ZMPVRQP;
 
+    /*! QP formulation visually guided. */
+    ZMPVisualServoingQP * m_ZMPVSQP;
+
     /*! ZMP and CoM trajectories generation from an analytical formulation */
     AnalyticalMorisawaCompact * m_ZMPM;
 
@@ -634,6 +666,10 @@ namespace PatternGeneratorJRL
     
     /*! Using the velocity referenced QP proposed by Herdt in 2010. */
     static const int ZMPCOM_HERDT_2010=5;
+
+    /*! Using the visually guided QP proposed by Mauricio Garcia in 2013. */
+    static const int ZMPCOM_GARCIA_2013=6;
+
     /*! @} */
     /*! @} */
 

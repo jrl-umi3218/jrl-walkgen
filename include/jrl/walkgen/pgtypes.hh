@@ -180,6 +180,14 @@ namespace PatternGeneratorJRL
     MAL_MATRIX(*LandMarksInWorld,double);
     MAL_MATRIX(*LandMarksInCamera,double);
     MAL_MATRIX(*LandMarksProjected,double);
+    MAL_MATRIX(*LandMarksDesired,double);
+
+    Map_s():N(0),
+	    LandMarksInWorld(NULL),
+	    LandMarksInCamera(NULL),
+	    LandMarksProjected(NULL),
+	    LandMarksDesired(NULL)
+    {}
   };
   typedef struct Map_s Map_t;
 

@@ -56,7 +56,16 @@ namespace ublas = boost::numeric::ublas;
 ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
 					 string DataFile,
 					 CjrlHumanoidDynamicRobot *aHS) :
-  ZMPRefTrajectoryGeneration(lSPM)
+  ZMPRefTrajectoryGeneration(lSPM),
+  m_Map(),
+  m_LinearizationTerms(NULL),
+  m_DupDvSqrbW(NULL),
+  m_DupDvTbW(NULL),
+  m_DupDv(NULL),
+  m_Cu(NULL),
+  m_Cv(NULL),
+  m_SdU(NULL),
+  m_SdV(NULL)
 {
 
   m_Pu = 0;
@@ -145,32 +154,85 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
 
   m_PerturbationOccured = false;
 
-  // Map and landmark positions for visual servoing
-  m_Map.N = 4;
+}
+
+void ZMPVisualServoingQP::allocateLandMarksArrays(){
+
+  releaseLandMarksArrays();
+
   m_Map.LandMarksInWorld = new MAL_MATRIX_TYPE(double)[m_Map.N];
   m_Map.LandMarksInCamera = new MAL_MATRIX_TYPE(double)[m_Map.N];
   m_Map.LandMarksProjected = new MAL_MATRIX_TYPE(double)[m_Map.N];
+  m_Map.LandMarksDesired = new MAL_MATRIX_TYPE(double)[m_Map.N];
   m_LinearizationTerms = new LinearizationProjection_t[m_Map.N];
-  m_Du = new MAL_MATRIX_TYPE(double)[m_Map.N];
-  m_Dv = new MAL_MATRIX_TYPE(double)[m_Map.N];
-  m_Cu = new MAL_MATRIX_TYPE(double)[m_Map.N];
-  m_Cv = new MAL_MATRIX_TYPE(double)[m_Map.N];
+  m_DupDvSqrbW = new MAL_MATRIX_TYPE(double)[m_Map.N];
+  m_DupDvTbW = new MAL_MATRIX_TYPE(double)[m_Map.N];
+  m_DupDv = new MAL_MATRIX_TYPE(double)[m_Map.N];
+  m_Cu = new MAL_VECTOR_TYPE(double)[m_Map.N];
+  m_Cv = new MAL_VECTOR_TYPE(double)[m_Map.N];
+  m_SdU = new MAL_VECTOR_TYPE(double)[m_Map.N];
+  m_SdV = new MAL_VECTOR_TYPE(double)[m_Map.N];
 
   for(int i=0; i<m_Map.N; i++)
     {
       MAL_MATRIX_RESIZE(m_Map.LandMarksInWorld[i],3,1);
       MAL_MATRIX_RESIZE(m_Map.LandMarksInCamera[i],3,1);
       MAL_MATRIX_RESIZE(m_Map.LandMarksProjected[i],2,1);
+      MAL_MATRIX_RESIZE(m_Map.LandMarksDesired[i],2,1);
       MAL_MATRIX_RESIZE(m_LinearizationTerms[i].UVector,3,1);
       MAL_MATRIX_RESIZE(m_LinearizationTerms[i].VVector,3,1);
-      MAL_MATRIX_RESIZE(m_Du[i],m_QP_N,2*m_QP_N);
-      MAL_MATRIX_RESIZE(m_Dv[i],m_QP_N,2*m_QP_N);
-      MAL_MATRIX_RESIZE(m_Cu[i],m_QP_N,1);
-      MAL_MATRIX_RESIZE(m_Cv[i],m_QP_N,1);
+      MAL_MATRIX_RESIZE(m_DupDvSqrbW[i],2*m_QP_N,2*m_QP_N);
+      MAL_MATRIX_RESIZE(m_DupDv[i],m_QP_N,2*m_QP_N);
+      MAL_MATRIX_RESIZE(m_DupDvTbW[i],2*m_QP_N,m_QP_N);
+      MAL_VECTOR_RESIZE(m_Cu[i],m_QP_N);
+      MAL_VECTOR_RESIZE(m_Cv[i],m_QP_N);
+      MAL_VECTOR_RESIZE(m_SdU[i],m_QP_N);
+      MAL_VECTOR_RESIZE(m_SdV[i],m_QP_N);
 
-      memset(&(m_Du[i].data()[0]),0,2*m_QP_N*m_QP_N);
-      memset(&(m_Dv[i].data()[0]),0,2*m_QP_N*m_QP_N);
+      memset(&(m_DupDvSqrbW[i].data()[0]),0,4*m_QP_N*m_QP_N);
+      memset(&(m_DupDv[i].data()[0]),0,2*m_QP_N*m_QP_N);
+      memset(&(m_DupDvTbW[i].data()[0]),0,2*m_QP_N*m_QP_N);
     }
+}
+
+void ZMPVisualServoingQP::releaseLandMarksArrays()
+{
+
+  if(m_Map.LandMarksInWorld)
+    delete[] m_Map.LandMarksInWorld;
+
+  if(m_Map.LandMarksInCamera)
+    delete[] m_Map.LandMarksInCamera;
+
+  if(m_Map.LandMarksProjected)
+    delete[] m_Map.LandMarksProjected;
+
+  if(m_Map.LandMarksDesired)
+    delete[] m_Map.LandMarksDesired;
+
+  if(m_LinearizationTerms)
+    delete[] m_LinearizationTerms;
+
+  if(m_DupDvSqrbW)
+    delete[] m_DupDvSqrbW;
+
+  if(m_DupDvTbW)
+    delete[] m_DupDvTbW;
+
+  if(m_DupDv)
+    delete[] m_DupDv;
+
+  if(m_Cu)
+    delete[] m_Cu;
+
+  if(m_Cv)
+    delete[] m_Cv;
+
+  if(m_SdU)
+    delete[] m_SdU;
+
+  if(m_SdV)
+    delete[] m_SdV;
 
 }
 
@@ -198,46 +260,41 @@ ZMPVisualServoingQP::~ZMPVisualServoingQP()
   if (m_Pu!=0)
     delete [] m_Pu ;
 
-  if(m_Map.LandMarksInWorld)
-    delete[] m_Map.LandMarksInWorld;
-
-  if(m_Map.LandMarksInCamera)
-    delete[] m_Map.LandMarksInCamera;
-
-  if(m_Map.LandMarksProjected)
-    delete[] m_Map.LandMarksProjected;
-
-  if(m_LinearizationTerms)
-    delete[] m_LinearizationTerms;
-
-  if(m_Du)
-    delete[] m_Du;
-
-  if(m_Dv)
-    delete[] m_Dv;
-
-  if(m_Cu)
-    delete[] m_Cu;
-
-  if(m_Cv)
-    delete[] m_Cv;
+  releaseLandMarksArrays();
 }
 
-
-void ZMPVisualServoingQP::setVelReference(istringstream &strm)
+void ZMPVisualServoingQP::setNumberOfLandMarks(istringstream &strm)
 {
-  strm >> RefVel.x;
-  strm >> RefVel.y;
-  strm >> RefVel.dYaw;
+  strm >> m_Map.N;
 }
 
-void ZMPVisualServoingQP::setVelReference(double x,
-					      double y,
-					      double yaw)
+void ZMPVisualServoingQP::setLandMarksPositions(istringstream &strm)
 {
-  RefVel.x = x;
-  RefVel.y = y;
-  RefVel.dYaw = yaw;
+  for(int i=0; i<m_Map.N; i++)
+    {
+      strm >> m_Map.LandMarksInWorld[i](0,0);
+      strm >> m_Map.LandMarksInWorld[i](1,0);
+      strm >> m_Map.LandMarksInWorld[i](2,0);
+    }
+}
+
+void ZMPVisualServoingQP::setFinalLandMarks(istringstream &strm)
+{
+  for(int i=0; i<m_Map.N; i++)
+    {
+      strm >> m_Map.LandMarksDesired[i](0,0);
+      strm >> m_Map.LandMarksDesired[i](1,0);
+    }
+}
+
+void ZMPVisualServoingQP::setDesiredAngle(istringstream &strm)
+{
+  strm >> m_desiredAngle;
+}
+
+void ZMPVisualServoingQP::setAngleErrorGain(istringstream &strm)
+{
+  strm >> m_angleErrorGain;
 }
 
 void ZMPVisualServoingQP::setCoMPerturbationForce(istringstream &strm)
@@ -382,9 +439,8 @@ int ZMPVisualServoingQP::InitializeMatrixPbConstants()
 int ZMPVisualServoingQP::BuildingConstantPartOfTheObjectiveFunction()
 {
 
-  MAL_MATRIX(OptA,double);
-
   //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
+  /*
   MAL_MATRIX(lterm1,double);
   lterm1 = MAL_RET_TRANSPOSE(m_PPu);
   lterm1 = MAL_RET_A_by_B(lterm1, m_PPu);
@@ -395,24 +451,20 @@ int ZMPVisualServoingQP::BuildingConstantPartOfTheObjectiveFunction()
   lterm2 = MAL_RET_A_by_B(lterm2,m_VPu);
   // lterm2 = m_Alpha * lterm2;//TODO:: original pb
   lterm2 = m_Beta*lterm2;
+  */
 
-  MAL_MATRIX_RESIZE(OptA,
-		    MAL_MATRIX_NB_ROWS(lterm2),
-		    MAL_MATRIX_NB_COLS(lterm2));
-  MAL_MATRIX_SET_IDENTITY(OptA);
-  OptA = m_Alpha*OptA;
-
+  MAL_MATRIX_RESIZE(m_OptA,2*m_QP_N,2*m_QP_N);
+  MAL_MATRIX_SET_IDENTITY(m_OptA);
+  m_OptA *= m_Alpha;
 
   // OptA = OptA + lterm1 + lterm2;//TODO:: original problem
-  OptA = OptA + lterm2;
-
-  m_OptA = OptA;
 
   // Initialization of the matrice regarding the quadratic
   // part of the objective function.
   //TODO:: size of Q is 3*Nx3*N which means that there is place for N/2 feet variables
 
   /*! Compute constants of the linear part of the objective function. */
+  /*
   lterm1 = MAL_RET_TRANSPOSE(m_PPu);
   lterm1 = MAL_RET_A_by_B(lterm1,m_PPx);
   m_OptB = MAL_RET_TRANSPOSE(m_VPu);
@@ -422,7 +474,6 @@ int ZMPVisualServoingQP::BuildingConstantPartOfTheObjectiveFunction()
 
   m_OptC = MAL_RET_TRANSPOSE(m_PPu);
   m_OptC = m_Beta * m_OptC;
-
 
   if (m_FullDebug>0)
     {
@@ -457,7 +508,7 @@ int ZMPVisualServoingQP::BuildingConstantPartOfTheObjectiveFunction()
       aof.close();
 
     }
-
+  */
   return 0;
 }
 
@@ -756,8 +807,6 @@ const double & ZMPVisualServoingQP::GetBeta() const
 {
   return m_Beta;
 }
-
-
 
 //------------------new functions---
 //
@@ -1285,11 +1334,12 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
   else
     m_Pb.iwar[0]=1;
 
+  /*
   MAL_VECTOR(VRef,double);
   MAL_MATRIX(ltermVel,double);
   MAL_VECTOR_DIM(OptD,double,2*m_QP_N);
   MAL_VECTOR_RESIZE(VRef,2*m_QP_N);
-
+  */
 
   //ZMP -------------------------------
   //Q
@@ -1386,12 +1436,42 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
   MAL_VECTOR(lterm4ZMPy,double);
   lterm4ZMPy = MAL_RET_A_by_B(lterm1ZMPy,m_U);
   lterm4ZMPy = -m_Gamma*lterm4ZMPy;
+
+  // Add visual servoing terms to the objective function
+  MAL_MATRIX_DIM(vsTermQSum,double,2*m_QP_N,2*m_QP_N);
+  memset(&(vsTermQSum.data()[0]),0,4*m_QP_N);
+  MAL_MATRIX_DIM(vsTermQ,double,2*m_QP_N,2*m_QP_N);
+
+  MAL_VECTOR_DIM(vsTermD,double,m_QP_N);
+  MAL_VECTOR_DIM(vsTermD2,double,2*m_QP_N);
+  MAL_VECTOR_DIM(vsTermDSum,double,2*m_QP_N);
+  memset(&(vsTermDSum.data()[0]),0,2*m_QP_N);
+
+  for(int i=0; i<m_Map.N; i++)
+    {
+      // Quadratic term
+      vsTermQ = MAL_RET_TRANSPOSE(m_PPu);
+      vsTermQ = MAL_RET_A_by_B(vsTermQ,m_DupDvSqrbW[i]);
+      vsTermQSum += MAL_RET_A_by_B(vsTermQ,m_PPu);
+
+      // Linear term
+      vsTermD2 = MAL_RET_A_by_B(m_PPx,xk);
+      vsTermD = MAL_RET_A_by_B(m_DupDv[i],vsTermD2);
+      vsTermD += m_Cu[i] + m_Cv[i] - m_SdU[i] - m_SdV[i];
+      vsTermD2 = MAL_RET_A_by_B(m_DupDvTbW[i],vsTermD);
+
+      vsTermQ = MAL_RET_TRANSPOSE(m_PPu);
+      vsTermDSum += MAL_RET_A_by_B(vsTermQ,vsTermD2);
+    }
+
   //---------------------------ZMP
   //m_Pb.Q--
   memset(m_Pb.Q,0,4*(m_QP_N+m_PrwSupport.StepNumber)*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
   for( int i=0;i<2*m_QP_N;i++)
     for( int j=0;j<2*m_QP_N;j++)
-      m_Pb.Q[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] = m_OptA(j,i);
+      {
+	m_Pb.Q[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] = m_OptA(j,i) + m_Beta*vsTermQSum(i,j);
+      }
   //ZMP----
   for( int i=0;i<m_QP_N;i++)
     {
@@ -1425,7 +1505,7 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
   //----ZMP
   //TODO: - only constant velocity
   //constant velocity for the whole preview window
-  for( int i=0;i<m_QP_N;i++)
+  /*  for( int i=0;i<m_QP_N;i++)
     VRef(i) = RefVel.x*cos(m_TrunkState.yaw[0]+m_TrunkStateT.yaw[1]*i*m_QP_T)-
       RefVel.y*sin(m_TrunkState.yaw[0]+m_TrunkStateT.yaw[1]*i*m_QP_T);
   for( int i=m_QP_N;i<2*m_QP_N;i++)
@@ -1435,6 +1515,7 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
   m_OptB = MAL_RET_TRANSPOSE(m_VPu);
   m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
   m_OptB = m_Beta * m_OptB;
+
 
   //TODO 2: The matrices of the value function have to go back where they come from
   //MAL_MATRIX(m_OptD,double);
@@ -1450,10 +1531,12 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
   MAL_VECTOR_RESIZE(OptD,2*m_QP_N);
   MAL_C_eq_A_by_B(OptD,m_OptB,xk);
   OptD -= lterm1v;
+  */
 
   for( int i=0;i<2*m_QP_N;i++)
-    m_Pb.D[i] += OptD(i);
-
+    {
+      m_Pb.D[i] = m_Beta*vsTermDSum(i);
+    }
 
   //zmp
   for( int i=0;i<m_QP_N;i++)
@@ -1664,13 +1747,20 @@ void ZMPVisualServoingQP::interpolateFeetPositions(double time, int CurrentIndex
     }
 }
 
+void ZMPVisualServoingQP::OnLine(double time,
+				 deque<ZMPPosition> & FinalZMPPositions,
+				 deque<COMState> & FinalCOMStates,
+				 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+				 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
+{}
 
 void ZMPVisualServoingQP::OnLine(double time,
 				 deque<ZMPPosition> & FinalZMPPositions,
 				 deque<COMState> & FinalCOMStates,
 				 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 				 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-				 MAL_MATRIX(&WorldPositionInCamera,double))
+				 MAL_MATRIX(&WorldPositionInCamera,double),
+				 MAL_MATRIX(&CameraPositionInCOM,double))
 {
 
   // If on-line mode not activated we go out.
@@ -1687,6 +1777,11 @@ void ZMPVisualServoingQP::OnLine(double time,
   WorldRotationInCamera = ublas::subrange(WorldPositionInCamera,0,3,0,3);
   WorldTranslationInCamera = ublas::subrange(WorldPositionInCamera,0,3,3,4);
 
+  MAL_MATRIX(CameraRotationInCOM,double);
+  MAL_MATRIX(CameraTranslationInCOM,double);
+  CameraRotationInCOM = ublas::subrange(CameraPositionInCOM,0,3,0,3);
+  CameraTranslationInCOM = ublas::subrange(CameraPositionInCOM,0,3,3,4);
+
   // Compute the landmarks in the camera frame
   for(int i=0; i<m_Map.N; i++)
     {
@@ -1700,7 +1795,7 @@ void ZMPVisualServoingQP::OnLine(double time,
   linearizeProjection();
 
   // Compute the visual servoing matrices
-  computeVisualServoingMatrices(WorldPositionInCamera);
+  computeVisualServoingMatrices(WorldRotationInCamera,WorldTranslationInCamera,CameraRotationInCOM,CameraTranslationInCOM);
 
   if(time + 0.00001 > m_UpperTimeLimitToUpdate)
     {
@@ -1728,7 +1823,14 @@ void ZMPVisualServoingQP::OnLine(double time,
       //-----------------------------------
       gettimeofday(&start,0);
 
-      // TODO : RefVel.dYaw = (desiredAngle - m_TrunkState.yaw[1])/m_T;
+      // Rotation angle estimation
+      MAL_MATRIX(COMRotationInWorld,double);
+      COMRotationInWorld = MAL_RET_A_by_B(MAL_RET_TRANSPOSE(WorldRotationInCamera),MAL_RET_TRANSPOSE(CameraRotationInCOM));
+      double estimatedAngle = -atan2(COMRotationInWorld(1,3),COMRotationInWorld(2,3));
+
+      double angleError = m_desiredAngle - estimatedAngle;
+      RefVel.dYaw = m_angleErrorGain*angleError;
+
       m_OP->verifyAccelerationOfHipJoint(RefVel, m_TrunkState,
 					 m_TrunkStateT, m_CurrentSupport);
 
@@ -2134,37 +2236,63 @@ void ZMPVisualServoingQP::linearizeProjection()
     }
 }
 
-void ZMPVisualServoingQP::computeVisualServoingMatrices(MAL_MATRIX(&WorldPositionInCamera,double))
+void ZMPVisualServoingQP::computeVisualServoingMatrices(MAL_MATRIX(&WorldRotationInCamera,double),
+						       MAL_MATRIX(&WorldTranslationInCamera,double),
+						       MAL_MATRIX(&CameraRotationInCOM,double),
+						       MAL_MATRIX(&CameraTranslationInCOM,double))
 {
   double au, av, bu, bv, cu, cv;
 
   MAL_MATRIX(tmp1,double);
   MAL_MATRIX(tmp2,double);
-  MAL_MATRIX(COMPositionInWorld,double);
 
-  tmp1 = ublas::subrange(m_COMPositionInCamera,0,3,3,4) - ublas::subrange(WorldPositionInCamera,0,3,2,3)*COMPositionInWorld(2,3);
+  MAL_MATRIX(COMTranslationInCamera,double);
+  MAL_MATRIX(CameraRotationInCOM_T,double);
+  MAL_MATRIX(WorldRotationInCamera_T,double);
+  MAL_MATRIX(COMTranslationInWorld,double);
+
+  CameraRotationInCOM_T = MAL_RET_TRANSPOSE(CameraRotationInCOM);
+  WorldRotationInCamera_T = MAL_RET_TRANSPOSE(WorldRotationInCamera);
+
+  COMTranslationInCamera = -MAL_RET_A_by_B(CameraRotationInCOM_T,CameraTranslationInCOM);
+
+  tmp1 = MAL_RET_A_by_B(CameraRotationInCOM_T,CameraTranslationInCOM) + WorldTranslationInCamera;
+  COMTranslationInWorld = - MAL_RET_A_by_B(WorldRotationInCamera_T,tmp1);
+
+  tmp1 = COMTranslationInCamera - ublas::subrange(WorldRotationInCamera,0,3,2,3)*COMTranslationInWorld(2,0);
 
   for(int i=0; i<m_Map.N; i++)
     {
-      au = inner_prod(m_LinearizationTerms[i].UVector,ublas::row(ublas::subrange(WorldPositionInCamera,0,3,0,1),0));
-      av = inner_prod(m_LinearizationTerms[i].VVector,ublas::row(ublas::subrange(WorldPositionInCamera,0,3,0,1),0));
+      au = -inner_prod(m_LinearizationTerms[i].UVector,ublas::column(WorldRotationInCamera,0));
+      av = -inner_prod(m_LinearizationTerms[i].VVector,ublas::column(WorldRotationInCamera,0));
 
-      bu = inner_prod(m_LinearizationTerms[i].UVector,ublas::row(ublas::subrange(WorldPositionInCamera,0,3,1,2),0));
-      bv = inner_prod(m_LinearizationTerms[i].VVector,ublas::row(ublas::subrange(WorldPositionInCamera,0,3,1,2),0));
+      bu = -inner_prod(m_LinearizationTerms[i].UVector,ublas::column(WorldRotationInCamera,1));
+      bv = -inner_prod(m_LinearizationTerms[i].VVector,ublas::column(WorldRotationInCamera,1));
 
-      tmp2 = ublas::prod(ublas::subrange(WorldPositionInCamera,0,3,0,3),m_Map.LandMarksInWorld[i]) + tmp1;
+      tmp2 = MAL_RET_A_by_B(WorldRotationInCamera,m_Map.LandMarksInWorld[i]) + tmp1;
 
-      cu = inner_prod(m_LinearizationTerms[i].UVector,ublas::row(tmp2,1)) + m_LinearizationTerms[i].UScalar;
-      cv = inner_prod(m_LinearizationTerms[i].VVector,ublas::row(tmp2,1)) + m_LinearizationTerms[i].VScalar;
+      cu = inner_prod(m_LinearizationTerms[i].UVector,ublas::column(tmp2,0)) + m_LinearizationTerms[i].UScalar;
+      cv = inner_prod(m_LinearizationTerms[i].VVector,ublas::column(tmp2,0)) + m_LinearizationTerms[i].VScalar;
 
       for(int j=0; j<m_QP_N; j++)
 	{
-	  m_Cu[i](j,0) = cu;
-	  m_Cv[i](j,0) = cv;
-	  m_Du[i](j,2*j) = au;
-	  m_Du[i](j,2*j+1) = bu;
-	  m_Du[i](j,2*j) = av;
-	  m_Du[i](j,2*j+1) = bv;
+	  m_Cu[i](j) = cu;
+	  m_Cv[i](j) = cv;
+
+	  // Du + Dv
+	  m_DupDv[i](j,2*j) = au+av;
+	  m_DupDv[i](j,2*j+1) = bu+bv;
+
+	  // (Dv + Dv)'*W
+	  m_DupDvTbW[i](2*j,j) = m_DupDv[i](j,2*j)*m_W(j);
+	  m_DupDvTbW[i](2*j+1,j) = m_DupDv[i](j,2*j+1)*m_W(j);
+
+	  // (Dv + Dv)'*W*(Dv + Dv)
+	  m_DupDvSqrbW[i](2*j,2*j) = m_DupDvTbW[i](2*j,j)*m_DupDv[i](j,2*j);
+	  m_DupDvSqrbW[i](2*j,2*j+1) = m_DupDvTbW[i](2*j,j)*m_DupDv[i](j,2*j+1);
+	  m_DupDvSqrbW[i](2*j+1,2*j) = m_DupDvTbW[i](2*j+1,j)*m_DupDv[i](j,2*j);
+	  m_DupDvSqrbW[i](2*j+1,2*j+1) = m_DupDvTbW[i](2*j+1,j)*m_DupDv[i](j,2*j+1);
+
 	}
     }
 }
