@@ -237,6 +237,15 @@ namespace PatternGeneratorJRL
 				    FootAbsolutePosition &LeftFootPosition,
 				    FootAbsolutePosition &RightFootPosition);
 
+    bool RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+				    MAL_VECTOR_TYPE(double) & CurrentVelocity,
+				    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+				    MAL_VECTOR_TYPE(double) &ZMPTarget,
+				    COMPosition &aCOMPosition,
+				    FootAbsolutePosition &LeftFootPosition,
+				    FootAbsolutePosition &RightFootPosition,
+				    MAL_MATRIX(*WorldPositionInCamera,double),
+				    MAL_MATRIX(*CameraPositionInCOM,double));
 
     /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
       @param[out] LeftFootPosition: Absolute position of the left foot.

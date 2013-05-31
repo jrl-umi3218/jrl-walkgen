@@ -53,6 +53,8 @@ namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
+    void computeTransformationMatrix(MAL_MATRIX(&transformationMatrix,double),
+				     const MAL_VECTOR(&parameters,double));
 
     /*! \brief Class running one test per algorithm */
     class TestObject
@@ -122,6 +124,12 @@ namespace PatternGeneratorJRL
   
       /*! \brief Previous acceleration */
       MAL_VECTOR(m_PreviousAcceleration,double);
+
+      /*! \brief World Position in camera frame */
+      MAL_MATRIX(m_WorldPositionInCamera,double);
+
+      /*! \brief Previous acceleration */
+      MAL_MATRIX(m_CameraPositionInCOM,double);
 
       /*! @} */
 

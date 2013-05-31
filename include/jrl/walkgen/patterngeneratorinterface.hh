@@ -139,6 +139,16 @@ namespace PatternGeneratorJRL
 					      FootAbsolutePosition &LeftFootPosition,
 					      FootAbsolutePosition &RightFootPosition)=0;
 
+      virtual bool RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+					      MAL_VECTOR_TYPE(double) & CurrentVelocity,
+					      MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+					      MAL_VECTOR_TYPE(double) &ZMPTarget,
+					      COMPosition &COMPosition,
+					      FootAbsolutePosition &LeftFootPosition,
+					      FootAbsolutePosition &RightFootPosition,
+					      MAL_MATRIX(*WorldPositionInCamera,double),
+					      MAL_MATRIX(*CameraPositionInCOM,double))=0;
+
       /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
 	@param[out]  CurrentConfiguration The current configuration of the robot according to 
 	the implementation of dynamic-JRLJapan. This should be first position and orientation
@@ -174,6 +184,17 @@ namespace PatternGeneratorJRL
 					      FootAbsolutePosition &RightFootPosition,
 					      ZMPPosition &ZMPRefPos,
 					      COMPosition &COMRefPos)=0;
+
+      virtual bool RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+					      MAL_VECTOR_TYPE(double) & CurrentVelocity,
+					      MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+					      MAL_VECTOR_TYPE(double) &ZMPTarget,
+					      COMState &COMState,
+					      FootAbsolutePosition &LeftFootPosition,
+					      FootAbsolutePosition &RightFootPosition,
+					      MAL_MATRIX(*WorldPositionInCamera,double),
+					      MAL_MATRIX(*CameraPositionInCOM,double))=0;
+
       /*! @} */
 
       /*! Set the current joint values of the robot.

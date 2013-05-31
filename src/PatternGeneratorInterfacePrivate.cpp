@@ -1374,6 +1374,32 @@ namespace PatternGeneratorJRL {
     return r;
   }
 
+
+  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+								    MAL_VECTOR_TYPE(double) & CurrentVelocity,
+								    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+								    MAL_VECTOR( &ZMPTarget,double),
+								    COMPosition &finalCOMPosition,
+								    FootAbsolutePosition &LeftFootPosition,
+								    FootAbsolutePosition &RightFootPosition,
+								    MAL_MATRIX(*WorldPositionInCamera,double),
+								    MAL_MATRIX(*CameraPositionInCOM,double) )
+  {
+    bool r=false;
+    COMState aCOMState;
+    r=RunOneStepOfTheControlLoop(CurrentConfiguration,
+				 CurrentVelocity,
+				 CurrentAcceleration,
+				 ZMPTarget,
+				 aCOMState,
+				 LeftFootPosition,
+				 RightFootPosition,
+				 WorldPositionInCamera,
+				 CameraPositionInCOM);
+    finalCOMPosition = aCOMState;
+    return r;
+  }
+
   bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
 								    MAL_VECTOR_TYPE(double) & CurrentVelocity,
 								    MAL_VECTOR_TYPE(double) & CurrentAcceleration,

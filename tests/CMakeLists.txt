@@ -89,6 +89,24 @@ ADD_TEST(TestMorisawa2007
   ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 
 ###################
+# Test Garcia 2013 #
+###################
+ADD_EXECUTABLE(TestGarcia2013
+  ../src/portability/gettimeofday.cc
+  TestGarcia2013.cpp
+  CommonTools.cpp
+  TestObject.cpp
+  ClockCPUTime.cpp
+  )
+
+TARGET_LINK_LIBRARIES(TestGarcia2013 ${PROJECT_NAME})
+PKG_CONFIG_USE_DEPENDENCY(TestGarcia2013 jrl-dynamics)
+ADD_DEPENDENCIES(TestGarcia2013 ${PROJECT_NAME})
+
+ADD_TEST(TestGarcia2013 TestGarcia2013
+  ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+
+###################
 # Test Herdt 2010 #
 ###################
 CONFIG_FILES_CMAKE(TestHerdt2010OnLineTestFGPI.datref)

@@ -154,6 +154,12 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
 
   m_PerturbationOccured = false;
 
+  MAL_VECTOR_RESIZE(m_W,m_QP_N);
+  m_W(0) = 1.0;
+  for(int i=1;i<m_QP_N;i++)
+    {
+      m_W(i) = 2.0*m_W(i-1);
+    }
 }
 
 void ZMPVisualServoingQP::allocateLandMarksArrays(){
@@ -266,6 +272,7 @@ ZMPVisualServoingQP::~ZMPVisualServoingQP()
 void ZMPVisualServoingQP::setNumberOfLandMarks(istringstream &strm)
 {
   strm >> m_Map.N;
+  allocateLandMarksArrays();
 }
 
 void ZMPVisualServoingQP::setLandMarksPositions(istringstream &strm)
@@ -1785,7 +1792,7 @@ void ZMPVisualServoingQP::OnLine(double time,
   // Compute the landmarks in the camera frame
   for(int i=0; i<m_Map.N; i++)
     {
-      m_Map.LandMarksInCamera[i] = ublas::prod(WorldRotationInCamera,m_Map.LandMarksInWorld[i]) + WorldTranslationInCamera;
+      m_Map.LandMarksInCamera[i] = MAL_RET_A_by_B(WorldRotationInCamera,m_Map.LandMarksInWorld[i]) + WorldTranslationInCamera;
     }
 
   // Project the landmarks to the image plane

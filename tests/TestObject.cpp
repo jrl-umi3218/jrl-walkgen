@@ -30,6 +30,7 @@
 #include "TestObject.hh"
 
 using namespace std;
+namespace ublas = boost::numeric::ublas;
 
 #define NB_OF_FIELDS 26
 
@@ -496,6 +497,35 @@ namespace PatternGeneratorJRL
 							 m_CurrentAcceleration,
 							 m_OneStep.ZMPTarget);
 		}
+	      else if (m_PGIInterface==2)
+		{
+		  MAL_VECTOR_DIM(paramCameraPositionInCOM,double,6);
+
+		  memset(&paramCameraPositionInCOM.data()[0],0,6*sizeof(double));
+
+		  paramCameraPositionInCOM(2) = 0.814;
+		  paramCameraPositionInCOM(4) = M_PI/2.0;
+		  paramCameraPositionInCOM(5) = -M_PI/2.0;
+
+		  MAL_MATRIX(COMPositionInWorld,double);
+
+		  computeTransformationMatrix(COMPositionInWorld,m_CurrentConfiguration);
+		  computeTransformationMatrix(m_CameraPositionInCOM,paramCameraPositionInCOM);
+
+		  MAL_MATRIX(CameraPositionInWorld,double);
+		  CameraPositionInWorld = MAL_RET_A_by_B(COMPositionInWorld,m_CameraPositionInCOM);
+		  MAL_INVERSE(CameraPositionInWorld,m_WorldPositionInCamera,double);
+
+		  ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
+							 m_CurrentVelocity,
+							 m_CurrentAcceleration,
+							 m_OneStep.ZMPTarget,
+							 m_OneStep.finalCOMPosition,
+							 m_OneStep.LeftFootPosition,
+							 m_OneStep.RightFootPosition,
+							 &m_WorldPositionInCamera,
+							 &m_CameraPositionInCOM);
+		}
 
 	      m_OneStep.NbOfIt++;
 
@@ -537,5 +567,42 @@ namespace PatternGeneratorJRL
       return compareDebugFiles();
     }
 
+    void computeTransformationMatrix(MAL_MATRIX(&transformationMatrix,double),
+
+				     const MAL_VECTOR(&parameters,double)){
+      double sx,cx,sy,cy,sz,cz;
+      sx = sin(parameters(3)); cx = cos(parameters(3));
+      sy = sin(parameters(4)); cy = cos(parameters(4));
+      sz = sin(parameters(5)); cz = cos(parameters(5));
+
+      MAL_MATRIX_DIM(rx,double,3,3);
+      MAL_MATRIX_DIM(ry,double,3,3);
+      MAL_MATRIX_DIM(rz,double,3,3);
+      MAL_MATRIX_DIM(tmp,double,3,3);
+
+      MAL_MATRIX_RESIZE(transformationMatrix,4,4);
+      memset(&transformationMatrix.data()[0],0,4*4*sizeof(double));
+
+      rx(0,0)=1.0; rx(0,1)=0.0; rx(0,2)=0.0;
+      rx(1,0)=0.0; rx(1,1)=cx; rx(1,2)=-sx;
+      rx(2,0)=0.0; rx(2,1)=sx; rx(2,2)=cx;
+
+      ry(0,0)=cy; ry(0,1)=0.0; ry(0,2)=sy;
+      ry(1,0)=0.0; ry(1,1)=1.0; ry(1,2)=0.0;
+      ry(2,0)=-sy; ry(2,1)=0.0; ry(2,2)=cy;
+
+      rz(0,0)=cz; rz(0,1)=-sz; rz(0,2)=0.0;
+      rz(1,0)=sz; rz(1,1)=cz; rz(1,2)=0.0;
+      rz(2,0)=0.0; rz(2,1)=0.0; rz(2,2)=1.0;
+
+      tmp = MAL_RET_A_by_B(ry,rz);
+      ublas::subrange(transformationMatrix,0,3,0,3) = MAL_RET_A_by_B(rx,tmp);
+
+      transformationMatrix(0,3) = parameters(0);
+      transformationMatrix(1,3) = parameters(1);
+      transformationMatrix(2,3) = parameters(2);
+      transformationMatrix(3,3) = 1.0;
+
+    }
   }
 }
