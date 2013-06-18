@@ -415,9 +415,23 @@ ZMPVelocityReferencedQP::OnLine(double time,
       unsigned currentIndex = FinalCOMTraj_deq.size();
       FinalCOMTraj_deq.resize( (unsigned)(QP_T_/m_SamplingPeriod)+currentIndex );
       FinalZMPTraj_deq.resize( (unsigned)(QP_T_/m_SamplingPeriod)+currentIndex );
-      CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
-          Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
-      CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
+      if(Solution_.SupportStates_deq.size() &&  Solution_.SupportStates_deq[0].NbStepsLeft == 0)
+      {
+         double jx = (FinalLeftFootTraj_deq[0].x + FinalRightFootTraj_deq[0].x)/2 - FinalCOMTraj_deq[0].x[0];
+         double jy = (FinalLeftFootTraj_deq[0].y + FinalRightFootTraj_deq[0].y)/2 - FinalCOMTraj_deq[0].y[0];
+         const double tf = 0.75;
+         jx = 6/(tf*tf*tf)*(jx - tf*FinalCOMTraj_deq[0].x[1] - (tf*tf/2)*FinalCOMTraj_deq[0].x[2]);
+         jy = 6/(tf*tf*tf)*(jy - tf*FinalCOMTraj_deq[0].y[1] - (tf*tf/2)*FinalCOMTraj_deq[0].y[2]);
+         CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
+             jx, jy);
+         CoM_.OneIteration( jx, jy );
+      }
+      else
+      {
+         CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
+             Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
+         CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
+      }
 
 
       // INTERPOLATE TRUNK ORIENTATION:
