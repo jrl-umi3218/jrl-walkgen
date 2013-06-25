@@ -72,15 +72,15 @@ PKG_CONFIG_USE_DEPENDENCY(TestMorisawa2007 jrl-dynamics)
 ADD_DEPENDENCIES(TestMorisawa2007 ${PROJECT_NAME})
 
 MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
-SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/examples/data/)
+SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
 SET(samplespec
-  ${JRL_DYNAMICS_PKGDATAROOTDIR}/examples/data/sampleSpecificities.xml
+  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
   )
 SET(sampleljr
-  ${JRL_DYNAMICS_PKGDATAROOTDIR}/examples/data/sampleLinkJointRank.xml
+  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
   )
 SET(sampleinitconfig
-  ${JRL_DYNAMICS_PKGDATAROOTDIR}/examples/data/sampleInitConfig.dat)
+  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat)
 
 LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
 
