@@ -80,9 +80,9 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
   m_ComHeight = 0.814;
 
   //Gains
-  m_Alpha = 0.00001;//Jerk
-  m_Beta = 1.0; //Visual error
-  m_Gamma = 0.000001; //ZMP
+  m_Alpha = 0.0001;//Jerk
+  m_Beta = 0.000006; //Visual error
+  m_Gamma = 10; //ZMP
 
 
   /*! For simulating the linearized inverted pendulum in 2D. */
@@ -1793,6 +1793,7 @@ void ZMPVisualServoingQP::OnLine(double time,
   for(int i=0; i<m_Map.N; i++)
     {
       m_Map.LandMarksInCamera[i] = MAL_RET_A_by_B(WorldRotationInCamera,m_Map.LandMarksInWorld[i]) + WorldTranslationInCamera;
+      //std::cerr<<"m_Map.LandMarksInCamera[i] "<<m_Map.LandMarksInCamera[i]<<std::endl;
     }
 
   // Project the landmarks to the image plane
@@ -1954,10 +1955,12 @@ void ZMPVisualServoingQP::OnLine(double time,
 	{
 	  struct timeval lbegin,lend;
 	  gettimeofday(&lbegin,0);
+	  std::cerr<<"here1"<<std::endl;
 	  ql0001_(&m_Pb.m, &m_Pb.me, &m_Pb.mmax, &m_Pb.n, &m_Pb.nmax, &m_Pb.mnn,
 		  m_Pb.Q, m_Pb.D, m_Pb.DU, m_Pb.DS, m_Pb.XL, m_Pb.XU,
 		  m_Pb.X, m_Pb.U, &m_Pb.iout, &m_Pb.ifail, &m_Pb.iprint,
 		  m_Pb.war, &m_Pb.lwar, m_Pb.iwar, &m_Pb.liwar, &m_Pb.Eps);
+	  std::cerr<<"here2"<<std::endl;
 	  gettimeofday(&lend,0);
 
 	  ldt = lend.tv_sec - lbegin.tv_sec +
@@ -2221,6 +2224,7 @@ void ZMPVisualServoingQP::projectToImagePlane()
       // Project
       m_Map.LandMarksProjected[i](0,0) = m_Map.LandMarksInCamera[i](0,0)/m_Map.LandMarksInCamera[i](2,0);
       m_Map.LandMarksProjected[i](1,0) = m_Map.LandMarksInCamera[i](1,0)/m_Map.LandMarksInCamera[i](2,0);
+      //std::cerr<<"--..---"<<m_Map.LandMarksProjected[i](0,0)<<" "<<m_Map.LandMarksProjected[i](1,0)<<std::endl;
     }
 }
 
@@ -2281,6 +2285,9 @@ void ZMPVisualServoingQP::computeVisualServoingMatrices(MAL_MATRIX(&WorldRotatio
       cu = inner_prod(m_LinearizationTerms[i].UVector,ublas::column(tmp2,0)) + m_LinearizationTerms[i].UScalar;
       cv = inner_prod(m_LinearizationTerms[i].VVector,ublas::column(tmp2,0)) + m_LinearizationTerms[i].VScalar;
 
+      //std::cerr<<"------------------Landmark--------------"<<i<<std::endl;
+      //std::cerr<<au<<" "<<av<<" "<<bu<<" "<<bv<<" "<<cu<<" "<<cv<<std::endl;
+
       for(int j=0; j<m_QP_N; j++)
 	{
 	  m_Cu[i](j) = cu;
@@ -2300,6 +2307,10 @@ void ZMPVisualServoingQP::computeVisualServoingMatrices(MAL_MATRIX(&WorldRotatio
 	  m_DupDvSqrbW[i](2*j+1,2*j) = m_DupDvTbW[i](2*j+1,j)*m_DupDv[i](j,2*j);
 	  m_DupDvSqrbW[i](2*j+1,2*j+1) = m_DupDvTbW[i](2*j+1,j)*m_DupDv[i](j,2*j+1);
 
+	  //std::cerr<<m_Cu[i]<<std::endl;
+	  //std::cerr<<m_DupDv[i]<<std::endl;
+	  //std::cerr<<m_DupDvTbW[i]<<std::endl;
+	  //std::cerr<<m_DupDvSqrbW[i]<<std::endl;
 	}
     }
 }

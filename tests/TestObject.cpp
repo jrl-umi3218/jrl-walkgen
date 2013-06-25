@@ -455,6 +455,19 @@ namespace PatternGeneratorJRL
       /*! Open and reset appropriatly the debug files. */
       prepareDebugFiles();
 
+      // Evaluate current state of the robot in the PG.
+      COMState   lStartingCOMPosition;
+      MAL_S3_VECTOR_TYPE(double)  lStartingZMPPosition;
+      MAL_VECTOR_TYPE(double)  lStartingWaistPose;
+      FootAbsolutePosition  InitLeftFootAbsPos;
+      FootAbsolutePosition  InitRightFootAbsPos;
+
+      m_PGI->EvaluateStartingState(lStartingCOMPosition,
+                                 lStartingZMPPosition,
+                                 lStartingWaistPose,
+                                 InitLeftFootAbsPos,
+                                 InitRightFootAbsPos);
+
       for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
 	{
 	  os << "<===============================================================>"<<endl;
@@ -500,17 +513,32 @@ namespace PatternGeneratorJRL
 	      else if (m_PGIInterface==2)
 		{
 		  MAL_VECTOR_DIM(paramCameraPositionInCOM,double,6);
-
 		  memset(&paramCameraPositionInCOM.data()[0],0,6*sizeof(double));
 
 		  paramCameraPositionInCOM(2) = 0.814;
 		  paramCameraPositionInCOM(4) = M_PI/2.0;
 		  paramCameraPositionInCOM(5) = -M_PI/2.0;
 
-		  MAL_MATRIX(COMPositionInWorld,double);
-
-		  computeTransformationMatrix(COMPositionInWorld,m_CurrentConfiguration);
 		  computeTransformationMatrix(m_CameraPositionInCOM,paramCameraPositionInCOM);
+		  //std::cerr<<m_CameraPositionInCOM<<std::endl;
+
+		  MAL_VECTOR_DIM(paramCOMPositionInWorld,double,6);
+		  memset(&paramCOMPositionInWorld.data()[0],0,6*sizeof(double));
+
+		  cerr << "----> Starting COM Position: "
+		       << lStartingCOMPosition.x[0] << " "
+		       << lStartingCOMPosition.y[0] << " "
+		       << lStartingCOMPosition.z[0] << " "
+		       << lStartingCOMPosition.yaw[0] << endl;
+
+		  paramCOMPositionInWorld(0) = lStartingCOMPosition.x[0];
+		  paramCOMPositionInWorld(1) = lStartingCOMPosition.y[0];
+		  paramCOMPositionInWorld(2) = lStartingCOMPosition.z[0];
+		  paramCOMPositionInWorld(5) = lStartingCOMPosition.yaw[0];
+
+		  MAL_MATRIX(COMPositionInWorld,double);
+		  computeTransformationMatrix(COMPositionInWorld,paramCOMPositionInWorld);
+		  //std::cerr<<"==========>>>>>>>>>>>>>>COMPositionInWorld"<<COMPositionInWorld<<std::endl;
 
 		  MAL_MATRIX(CameraPositionInWorld,double);
 		  CameraPositionInWorld = MAL_RET_A_by_B(COMPositionInWorld,m_CameraPositionInCOM);
@@ -530,7 +558,7 @@ namespace PatternGeneratorJRL
 	      m_OneStep.NbOfIt++;
 
 	      m_clock.stopOneIteration();
-
+	      lStartingCOMPosition = m_OneStep.finalCOMPosition;
 	      m_PreviousConfiguration = m_CurrentConfiguration;
 	      m_PreviousVelocity = m_CurrentVelocity;
 	      m_PreviousAcceleration = m_CurrentAcceleration;
