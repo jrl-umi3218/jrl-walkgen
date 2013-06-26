@@ -59,13 +59,12 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
   ZMPRefTrajectoryGeneration(lSPM),
   m_Map(),
   m_LinearizationTerms(NULL),
-  m_DupDvSqrbW(NULL),
-  m_DupDvTbW(NULL),
-  m_DupDv(NULL),
-  m_Cu(NULL),
-  m_Cv(NULL),
-  m_SdU(NULL),
-  m_SdV(NULL)
+  m_DuTWDu(NULL),
+  m_DvTWDv(NULL),
+  m_DuTWCu(NULL),
+  m_DvTWCv(NULL),
+  m_DuTWSdu(NULL),
+  m_DvTWSdv(NULL)
 {
 
   m_Pu = 0;
@@ -80,10 +79,9 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
   m_ComHeight = 0.814;
 
   //Gains
-  m_Alpha = 0.0001;//Jerk
-  m_Beta = 0.00001; //Visual error
-  m_Gamma = 10; //ZMP
-
+  m_Alpha = 10;//Jerk
+  m_Beta = 1.0; //Visual error
+  m_Gamma = 0.1; //ZMP
 
   /*! For simulating the linearized inverted pendulum in 2D. */
   m_2DLIPM = new LinearizedInvertedPendulum2D();
@@ -171,13 +169,12 @@ void ZMPVisualServoingQP::allocateLandMarksArrays(){
   m_Map.LandMarksProjected = new MAL_MATRIX_TYPE(double)[m_Map.N];
   m_Map.LandMarksDesired = new MAL_MATRIX_TYPE(double)[m_Map.N];
   m_LinearizationTerms = new LinearizationProjection_t[m_Map.N];
-  m_DupDvSqrbW = new MAL_MATRIX_TYPE(double)[m_Map.N];
-  m_DupDvTbW = new MAL_MATRIX_TYPE(double)[m_Map.N];
-  m_DupDv = new MAL_MATRIX_TYPE(double)[m_Map.N];
-  m_Cu = new MAL_VECTOR_TYPE(double)[m_Map.N];
-  m_Cv = new MAL_VECTOR_TYPE(double)[m_Map.N];
-  m_SdU = new MAL_VECTOR_TYPE(double)[m_Map.N];
-  m_SdV = new MAL_VECTOR_TYPE(double)[m_Map.N];
+  m_DuTWDu = new MAL_MATRIX_TYPE(double)[m_Map.N];
+  m_DvTWDv = new MAL_MATRIX_TYPE(double)[m_Map.N];
+  m_DuTWCu = new MAL_VECTOR_TYPE(double)[m_Map.N];
+  m_DvTWCv = new MAL_VECTOR_TYPE(double)[m_Map.N];
+  m_DuTWSdu = new MAL_VECTOR_TYPE(double)[m_Map.N];
+  m_DvTWSdv = new MAL_VECTOR_TYPE(double)[m_Map.N];
 
   for(int i=0; i<m_Map.N; i++)
     {
@@ -187,17 +184,15 @@ void ZMPVisualServoingQP::allocateLandMarksArrays(){
       MAL_MATRIX_RESIZE(m_Map.LandMarksDesired[i],2,1);
       MAL_MATRIX_RESIZE(m_LinearizationTerms[i].UVector,3,1);
       MAL_MATRIX_RESIZE(m_LinearizationTerms[i].VVector,3,1);
-      MAL_MATRIX_RESIZE(m_DupDvSqrbW[i],2*m_QP_N,2*m_QP_N);
-      MAL_MATRIX_RESIZE(m_DupDv[i],m_QP_N,2*m_QP_N);
-      MAL_MATRIX_RESIZE(m_DupDvTbW[i],2*m_QP_N,m_QP_N);
-      MAL_VECTOR_RESIZE(m_Cu[i],m_QP_N);
-      MAL_VECTOR_RESIZE(m_Cv[i],m_QP_N);
-      MAL_VECTOR_RESIZE(m_SdU[i],m_QP_N);
-      MAL_VECTOR_RESIZE(m_SdV[i],m_QP_N);
+      MAL_MATRIX_RESIZE(m_DuTWDu[i],2*m_QP_N,2*m_QP_N);
+      MAL_MATRIX_RESIZE(m_DvTWDv[i],2*m_QP_N,2*m_QP_N);
+      MAL_VECTOR_RESIZE(m_DuTWCu[i],2*m_QP_N);
+      MAL_VECTOR_RESIZE(m_DvTWCv[i],2*m_QP_N);
+      MAL_VECTOR_RESIZE(m_DuTWSdu[i],2*m_QP_N);
+      MAL_VECTOR_RESIZE(m_DvTWSdv[i],2*m_QP_N);
 
-      memset(&(m_DupDvSqrbW[i].data()[0]),0,4*m_QP_N*m_QP_N*sizeof(double));
-      memset(&(m_DupDv[i].data()[0]),0,2*m_QP_N*m_QP_N*sizeof(double));
-      memset(&(m_DupDvTbW[i].data()[0]),0,2*m_QP_N*m_QP_N*sizeof(double));
+      memset(&(m_DuTWDu[i].data()[0]),0,4*m_QP_N*m_QP_N*sizeof(double));
+      memset(&(m_DvTWDv[i].data()[0]),0,4*m_QP_N*m_QP_N*sizeof(double));
     }
 }
 
@@ -219,26 +214,23 @@ void ZMPVisualServoingQP::releaseLandMarksArrays()
   if(m_LinearizationTerms)
     delete[] m_LinearizationTerms;
 
-  if(m_DupDvSqrbW)
-    delete[] m_DupDvSqrbW;
+  if(m_DuTWDu)
+    delete[] m_DuTWDu;
 
-  if(m_DupDvTbW)
-    delete[] m_DupDvTbW;
+  if(m_DvTWDv)
+    delete[] m_DvTWDv;
 
-  if(m_DupDv)
-    delete[] m_DupDv;
+  if(m_DuTWCu)
+    delete[] m_DuTWCu;
 
-  if(m_Cu)
-    delete[] m_Cu;
+  if(m_DvTWCv)
+    delete[] m_DvTWCv;
 
-  if(m_Cv)
-    delete[] m_Cv;
+  if(m_DuTWSdu)
+    delete[] m_DuTWSdu;
 
-  if(m_SdU)
-    delete[] m_SdU;
-
-  if(m_SdV)
-    delete[] m_SdV;
+  if(m_DvTWSdv)
+    delete[] m_DvTWSdv;
 
 }
 
@@ -1455,35 +1447,40 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
   MAL_MATRIX_DIM(vsTermQ,double,2*m_QP_N,2*m_QP_N);
 
   MAL_VECTOR_DIM(vsTermD,double,m_QP_N);
-  MAL_VECTOR_DIM(vsTermD2,double,2*m_QP_N);
   MAL_VECTOR_DIM(vsTermDSum,double,2*m_QP_N);
   memset(&(vsTermDSum.data()[0]),0,2*m_QP_N*sizeof(double));
+  MAL_VECTOR(S0p,double) = MAL_RET_A_by_B(m_PPx,xk);
 
   for(int i=0; i<m_Map.N; i++)
     {
       // Quadratic term
       vsTermQ = MAL_RET_TRANSPOSE(m_PPu);
-      vsTermQ = MAL_RET_A_by_B(vsTermQ,m_DupDvSqrbW[i]);
+      vsTermQ = MAL_RET_A_by_B(vsTermQ,m_DuTWDu[i] + m_DvTWDv[i]);
       vsTermQSum += MAL_RET_A_by_B(vsTermQ,m_PPu);
 
       // Linear term
-      vsTermD2 = MAL_RET_A_by_B(m_PPx,xk);
-      vsTermD = MAL_RET_A_by_B(m_DupDv[i],vsTermD2);
-      vsTermD += m_Cu[i] + m_Cv[i] - m_SdU[i] - m_SdV[i];
-      vsTermD2 = MAL_RET_A_by_B(m_DupDvTbW[i],vsTermD);
-
+      vsTermD = MAL_RET_A_by_B(m_DuTWDu[i] + m_DvTWDv[i],S0p) + m_DuTWCu[i] + m_DvTWCv[i] - m_DuTWSdu[i] - m_DvTWSdv[i];
       vsTermQ = MAL_RET_TRANSPOSE(m_PPu);
-      vsTermDSum += MAL_RET_A_by_B(vsTermQ,vsTermD2);
-    }
-  //std::cerr<<vsTermQSum<<std::endl;
+      vsTermDSum += MAL_RET_A_by_B(vsTermQ,vsTermD);
 
+    }
+  /*
+  std::cerr<<m_DuTWDu[0]<<std::endl<<std::endl;
+  std::cerr<<m_DuTWCu[0]<<std::endl<<std::endl;
+  std::cerr<<m_DuTWSdu[0]<<std::endl<<std::endl;
+
+  std::cerr<<std::endl;
+  std::cerr<<vsTermQSum<<std::endl;
+  std::cerr<<vsTermDSum<<std::endl;
+  //std::cerr<<vsTermQSum<<std::endl;
+  */
   //---------------------------ZMP
   //m_Pb.Q--
   memset(m_Pb.Q,0,4*(m_QP_N+m_PrwSupport.StepNumber)*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
   for( int i=0;i<2*m_QP_N;i++)
     for( int j=0;j<2*m_QP_N;j++)
       {
-	m_Pb.Q[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] = m_OptA(j,i) + m_Beta*vsTermQSum(i,j);
+	m_Pb.Q[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] = m_OptA(j,i) + m_Beta*vsTermQSum(j,i);
       }
   //ZMP----
   for( int i=0;i<m_QP_N;i++)
@@ -2291,29 +2288,44 @@ void ZMPVisualServoingQP::computeVisualServoingMatrices(MAL_MATRIX(&WorldRotatio
       std::cerr<<"------------------Landmark--------------"<<i<<std::endl;
       std::cerr<<au<<" "<<av<<" "<<bu<<" "<<bv<<" "<<cu<<" "<<cv<<std::endl;
 
+      double jj, auW, buW, avW, bvW;
       for(int j=0; j<m_QP_N; j++)
 	{
-	  m_Cu[i](j) = cu;
-	  m_Cv[i](j) = cv;
+	  jj = m_QP_N+j;
 
-	  // Du + Dv
-	  m_DupDv[i](j,2*j) = au+av;
-	  m_DupDv[i](j,2*j+1) = bu+bv;
+	  auW = au*m_W(j);
+	  buW = bu*m_W(j);
 
-	  // (Dv + Dv)'*W
-	  m_DupDvTbW[i](2*j,j) = m_DupDv[i](j,2*j)*m_W(j);
-	  m_DupDvTbW[i](2*j+1,j) = m_DupDv[i](j,2*j+1)*m_W(j);
+	  avW = av*m_W(j);
+	  bvW = bv*m_W(j);
 
-	  // (Dv + Dv)'*W*(Dv + Dv)
-	  m_DupDvSqrbW[i](2*j,2*j) = m_DupDvTbW[i](2*j,j)*m_DupDv[i](j,2*j);
-	  m_DupDvSqrbW[i](2*j,2*j+1) = m_DupDvTbW[i](2*j,j)*m_DupDv[i](j,2*j+1);
-	  m_DupDvSqrbW[i](2*j+1,2*j) = m_DupDvTbW[i](2*j+1,j)*m_DupDv[i](j,2*j);
-	  m_DupDvSqrbW[i](2*j+1,2*j+1) = m_DupDvTbW[i](2*j+1,j)*m_DupDv[i](j,2*j+1);
+	  // Du'*W*Du
+	  m_DuTWDu[i](j,j) = auW*au;
+	  m_DuTWDu[i](j,jj) = auW*bu;
+	  m_DuTWDu[i](jj,j) = buW*au;
+	  m_DuTWDu[i](jj,jj) = buW*bu;
 
-	  //std::cerr<<m_Cu[i]<<std::endl;
-	  //std::cerr<<m_DupDv[i]<<std::endl;
-	  //std::cerr<<m_DupDvTbW[i]<<std::endl;
-	  //std::cerr<<m_DupDvSqrbW[i]<<std::endl;
+	  // Dv'*W*Dv
+	  m_DvTWDv[i](j,j) = avW*av;
+	  m_DvTWDv[i](j,jj) = avW*bv;
+	  m_DvTWDv[i](jj,j) = bvW*av;
+	  m_DvTWDv[i](jj,jj) = bvW*bv;
+
+	  // Du'*W*Cu
+	  m_DuTWCu[i](j) = auW*cu;
+	  m_DuTWCu[i](jj) = buW*cu;
+
+	  // Dv'*W*Cv
+	  m_DvTWCv[i](j) = avW*cv;
+	  m_DvTWCv[i](jj) = bvW*cv;
+
+	  // Du'*W*Sdu
+	  m_DuTWSdu[i](j) = auW*m_Map.LandMarksDesired[i](0,0);
+	  m_DuTWSdu[i](jj) = buW*m_Map.LandMarksDesired[i](0,0);
+
+	  // Dv'*W*Sdv
+	  m_DvTWSdv[i](j) = avW*m_Map.LandMarksDesired[i](1,0);
+	  m_DvTWSdv[i](jj) = bvW*m_Map.LandMarksDesired[i](1,0);
 	}
     }
 }

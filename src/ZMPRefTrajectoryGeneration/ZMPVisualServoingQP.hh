@@ -364,13 +364,12 @@ namespace PatternGeneratorJRL
     LinearizationProjection_t* m_LinearizationTerms;
 
     /* Visual servoing matrices */
-    MAL_MATRIX_TYPE(double)* m_DupDvSqrbW;
-    MAL_MATRIX_TYPE(double)* m_DupDv;
-    MAL_MATRIX_TYPE(double)* m_DupDvTbW;
-    MAL_VECTOR_TYPE(double)* m_Cu;
-    MAL_VECTOR_TYPE(double)* m_Cv;
-    MAL_VECTOR_TYPE(double)* m_SdU;
-    MAL_VECTOR_TYPE(double)* m_SdV;
+    MAL_MATRIX_TYPE(double)* m_DuTWDu;
+    MAL_MATRIX_TYPE(double)* m_DvTWDv;
+    MAL_VECTOR_TYPE(double)* m_DuTWCu;
+    MAL_VECTOR_TYPE(double)* m_DvTWCv;
+    MAL_VECTOR_TYPE(double)* m_DuTWSdu;
+    MAL_VECTOR_TYPE(double)* m_DvTWSdv;
 
     /* Visual servoing weights */
     MAL_VECTOR_TYPE(double) m_W;
