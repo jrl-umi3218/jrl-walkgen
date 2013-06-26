@@ -172,7 +172,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()
   {
-    std::string aMethodName[21] =
+    std::string aMethodName[22] =
       {":LimitsFeasibility",
        ":ZMPShiftParameters",
        ":TimeDistributionParameters",
@@ -191,11 +191,12 @@ namespace PatternGeneratorJRL {
        ":setNumberOfLandMarks",
        ":setLandMarksPositions",
        ":setFinalLandMarks",
+       ":setWalk",
        ":setDesiredAngle",
        ":setAngleErrorGain",
        ":setCoMPerturbationForce"};
 
-    for(int i=0;i<21;i++)
+    for(int i=0;i<22;i++)
       {
 	if (!SimplePlugin::RegisterMethod(aMethodName[i]))
 	  {
@@ -529,6 +530,12 @@ namespace PatternGeneratorJRL {
   {
     // Read the data inside strm.
     m_ZMPVSQP->setFinalLandMarks(strm);
+  }
+
+  void PatternGeneratorInterfacePrivate::setWalk(istringstream &strm)
+  {
+    // Read the data inside strm.
+    m_ZMPVSQP->setWalk(strm);
   }
 
   void PatternGeneratorInterfacePrivate::setDesiredAngle(istringstream &strm)
@@ -1192,10 +1199,13 @@ namespace PatternGeneratorJRL {
       {
 	setLandMarksPositions(strm);
       }
-
     else if (aCmd==":setFinalLandMarks")
       {
 	setFinalLandMarks(strm);
+      }
+    else if (aCmd==":setWalk")
+      {
+	setWalk(strm);
       }
     else if (aCmd==":setDesiredAngle")
       {
@@ -1216,7 +1226,7 @@ namespace PatternGeneratorJRL {
     else if (aCmd==":VSOnline")
       {
 	m_InternalClock = 0.0;
-	setFinalLandMarks(strm);
+	setWalk(strm);
 	initOnlineVS();
 	printf("Online \n");
 	//ODEBUG4("InitOnLine","DebugHerdt.txt");
@@ -1521,7 +1531,7 @@ namespace PatternGeneratorJRL {
 						    CurrentVelocity,
 						    CurrentAcceleration);
 
-    ODEBUG("finalCOMState: "  << 
+    ODEBUG("finalCOMState: "  <<
             finalCOMState.x[0] << " " <<
             finalCOMState.x[1] << " " <<
             finalCOMState.x[2] << " " <<
@@ -1539,7 +1549,7 @@ namespace PatternGeneratorJRL {
             finalCOMState.pitch[2] << " " <<
             finalCOMState.roll[0] << " " <<
             finalCOMState.roll[1] << " " <<
-            finalCOMState.roll[2] << " " );
+	    finalCOMState.roll[2] << " " );
 
     // New scheme:
     // Update the queue of ZMP ref

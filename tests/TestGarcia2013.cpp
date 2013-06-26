@@ -76,17 +76,20 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":setDesiredAngle 0.5236"); //30
+      istringstream strm2(":setDesiredAngle 0.5236"); // 30 degrees
       aPGI.ParseCmd(strm2);
     }
     {
       istringstream strm2(":setAngleErrorGain 0.1");
       aPGI.ParseCmd(strm2);
     }
-
     {
       // Position of final landmarks
-      istringstream strm2(":VSOnline 1.5146 0.6104 0.8232 0.4804 0.8232 0.0545 1.5146 0.0693");
+      istringstream strm2(":setFinalLandMarks 1.5146 0.6104 0.8232 0.4804 0.8232 0.0545 1.5146 0.0693");
+      aPGI.ParseCmd(strm2);
+    }
+    {
+      istringstream strm2(":VSOnline 1");
       aPGI.ParseCmd(strm2);
     }
     {
@@ -104,7 +107,7 @@ protected:
   void stopOnLineWalking(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.0 0.0 0.0");
+      istringstream strm2(":setWalk 0");
       aPGI.ParseCmd(strm2);
     }
   }

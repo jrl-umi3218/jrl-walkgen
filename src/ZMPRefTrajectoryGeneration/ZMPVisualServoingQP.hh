@@ -166,9 +166,6 @@ namespace PatternGeneratorJRL
       @{
     */
 
-    /*! Set the velocity reference */
-    void setVelReference(istringstream &strm);
-
     /*! Set the number of landmarks */
     void setNumberOfLandMarks(istringstream &strm);
 
@@ -181,11 +178,11 @@ namespace PatternGeneratorJRL
     /*! Set the gain for the angle control */
     void setAngleErrorGain(istringstream &strm);
 
-/*! Set the desired position of the landmarks (u,v) */
+    /*! Set the desired position of the landmarks (u,v) */
     void setFinalLandMarks(istringstream &strm);
 
-    /*! Set the velocity reference from external reference */
-    void setVelReference(double x,double y, double yaw);
+    /*! Set variable to start/stop motion */
+    void setWalk(istringstream &strm);
 
     /*! Set the velocity reference from external reference */
     void setCoMPerturbationForce(double x,double y);
@@ -378,10 +375,13 @@ namespace PatternGeneratorJRL
     /* Visual servoing weights */
     MAL_VECTOR_TYPE(double) m_W;
 
-    /* Desired rotation angle*/
+    /* Desired rotation angle */
     double m_desiredAngle;
 
-    /* Gain for the angle position control*/
+    /* Varible to start/stop walking*/
+    bool m_Walk;
+
+    /* Gain for the angle position control */
     double m_angleErrorGain;
 
     void initializeProblem();

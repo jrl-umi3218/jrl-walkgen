@@ -286,6 +286,9 @@ namespace PatternGeneratorJRL
     /*! Set the desired position of the landmarks (u,v) */
     void setFinalLandMarks(istringstream &strm);
 
+    /*! Set the walking flag */
+    void setWalk(istringstream &strm);
+
     /*! Set the desired final angular position */
     void setDesiredAngle(istringstream &strm);
 

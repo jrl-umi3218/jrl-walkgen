@@ -81,7 +81,7 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
 
   //Gains
   m_Alpha = 0.0001;//Jerk
-  m_Beta = 0.000006; //Visual error
+  m_Beta = 0.00001; //Visual error
   m_Gamma = 10; //ZMP
 
 
@@ -195,9 +195,9 @@ void ZMPVisualServoingQP::allocateLandMarksArrays(){
       MAL_VECTOR_RESIZE(m_SdU[i],m_QP_N);
       MAL_VECTOR_RESIZE(m_SdV[i],m_QP_N);
 
-      memset(&(m_DupDvSqrbW[i].data()[0]),0,4*m_QP_N*m_QP_N);
-      memset(&(m_DupDv[i].data()[0]),0,2*m_QP_N*m_QP_N);
-      memset(&(m_DupDvTbW[i].data()[0]),0,2*m_QP_N*m_QP_N);
+      memset(&(m_DupDvSqrbW[i].data()[0]),0,4*m_QP_N*m_QP_N*sizeof(double));
+      memset(&(m_DupDv[i].data()[0]),0,2*m_QP_N*m_QP_N*sizeof(double));
+      memset(&(m_DupDvTbW[i].data()[0]),0,2*m_QP_N*m_QP_N*sizeof(double));
     }
 }
 
@@ -302,6 +302,11 @@ void ZMPVisualServoingQP::setDesiredAngle(istringstream &strm)
 void ZMPVisualServoingQP::setAngleErrorGain(istringstream &strm)
 {
   strm >> m_angleErrorGain;
+}
+
+void ZMPVisualServoingQP::setWalk(istringstream &strm)
+{
+  strm >> m_Walk;
 }
 
 void ZMPVisualServoingQP::setCoMPerturbationForce(istringstream &strm)
@@ -1446,13 +1451,13 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
 
   // Add visual servoing terms to the objective function
   MAL_MATRIX_DIM(vsTermQSum,double,2*m_QP_N,2*m_QP_N);
-  memset(&(vsTermQSum.data()[0]),0,4*m_QP_N);
+  memset(&(vsTermQSum.data()[0]),0,4*m_QP_N*m_QP_N*sizeof(double));
   MAL_MATRIX_DIM(vsTermQ,double,2*m_QP_N,2*m_QP_N);
 
   MAL_VECTOR_DIM(vsTermD,double,m_QP_N);
   MAL_VECTOR_DIM(vsTermD2,double,2*m_QP_N);
   MAL_VECTOR_DIM(vsTermDSum,double,2*m_QP_N);
-  memset(&(vsTermDSum.data()[0]),0,2*m_QP_N);
+  memset(&(vsTermDSum.data()[0]),0,2*m_QP_N*sizeof(double));
 
   for(int i=0; i<m_Map.N; i++)
     {
@@ -1470,6 +1475,7 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
       vsTermQ = MAL_RET_TRANSPOSE(m_PPu);
       vsTermDSum += MAL_RET_A_by_B(vsTermQ,vsTermD2);
     }
+  //std::cerr<<vsTermQSum<<std::endl;
 
   //---------------------------ZMP
   //m_Pb.Q--
@@ -1779,34 +1785,33 @@ void ZMPVisualServoingQP::OnLine(double time,
       (time>=m_TimeToStopOnLineMode))
     m_OnLineMode = false;
 
-  MAL_MATRIX(WorldRotationInCamera,double);
-  MAL_MATRIX(WorldTranslationInCamera,double);
-  WorldRotationInCamera = ublas::subrange(WorldPositionInCamera,0,3,0,3);
-  WorldTranslationInCamera = ublas::subrange(WorldPositionInCamera,0,3,3,4);
-
-  MAL_MATRIX(CameraRotationInCOM,double);
-  MAL_MATRIX(CameraTranslationInCOM,double);
-  CameraRotationInCOM = ublas::subrange(CameraPositionInCOM,0,3,0,3);
-  CameraTranslationInCOM = ublas::subrange(CameraPositionInCOM,0,3,3,4);
-
-  // Compute the landmarks in the camera frame
-  for(int i=0; i<m_Map.N; i++)
-    {
-      m_Map.LandMarksInCamera[i] = MAL_RET_A_by_B(WorldRotationInCamera,m_Map.LandMarksInWorld[i]) + WorldTranslationInCamera;
-      //std::cerr<<"m_Map.LandMarksInCamera[i] "<<m_Map.LandMarksInCamera[i]<<std::endl;
-    }
-
-  // Project the landmarks to the image plane
-  projectToImagePlane();
-
-  // Linearize projection
-  linearizeProjection();
-
-  // Compute the visual servoing matrices
-  computeVisualServoingMatrices(WorldRotationInCamera,WorldTranslationInCamera,CameraRotationInCOM,CameraTranslationInCOM);
-
   if(time + 0.00001 > m_UpperTimeLimitToUpdate)
     {
+      MAL_MATRIX(WorldRotationInCamera,double);
+      MAL_MATRIX(WorldTranslationInCamera,double);
+      WorldRotationInCamera = ublas::subrange(WorldPositionInCamera,0,3,0,3);
+      WorldTranslationInCamera = ublas::subrange(WorldPositionInCamera,0,3,3,4);
+
+      MAL_MATRIX(CameraRotationInCOM,double);
+      MAL_MATRIX(CameraTranslationInCOM,double);
+      CameraRotationInCOM = ublas::subrange(CameraPositionInCOM,0,3,0,3);
+      CameraTranslationInCOM = ublas::subrange(CameraPositionInCOM,0,3,3,4);
+
+      // Compute the landmarks in the camera frame
+      for(int i=0; i<m_Map.N; i++)
+	{
+	  m_Map.LandMarksInCamera[i] = MAL_RET_A_by_B(WorldRotationInCamera,m_Map.LandMarksInWorld[i]) + WorldTranslationInCamera;
+	  //std::cerr<<"m_Map.LandMarksInCamera[i] "<<m_Map.LandMarksInCamera[i]<<std::endl;
+	}
+
+      // Project the landmarks to the image plane
+      projectToImagePlane();
+
+      // Linearize projection
+      linearizeProjection();
+
+      // Compute the visual servoing matrices
+      computeVisualServoingMatrices(WorldRotationInCamera,WorldTranslationInCamera,CameraRotationInCOM,CameraTranslationInCOM);
 
       int NbOfConstraints=0; // Nb of constraints are not known in advance
 
@@ -1867,8 +1872,7 @@ void ZMPVisualServoingQP::OnLine(double time,
 
 
       //TODO : Add a get function to read the state
-      //TODO : Set ReferenceGiven when watching landmarks
-      bool ReferenceGiven = false;
+      bool ReferenceGiven = m_Walk;
       m_SupportFSM->setSupportState(time+m_TimeBuffer, 0, m_CurrentSupport, ReferenceGiven);
 
 
@@ -2083,7 +2087,6 @@ void ZMPVisualServoingQP::OnLine(double time,
 			      ptX[0],ptX[m_QP_N]);
       m_2DLIPM->OneIteration(ptX[0],ptX[m_QP_N]);
 
-
       //The robot is supposed to stop always with the feet aligned in the lateral plane.
       if(m_CurrentSupport.StepsLeft>0)
 	{
@@ -2285,8 +2288,8 @@ void ZMPVisualServoingQP::computeVisualServoingMatrices(MAL_MATRIX(&WorldRotatio
       cu = inner_prod(m_LinearizationTerms[i].UVector,ublas::column(tmp2,0)) + m_LinearizationTerms[i].UScalar;
       cv = inner_prod(m_LinearizationTerms[i].VVector,ublas::column(tmp2,0)) + m_LinearizationTerms[i].VScalar;
 
-      //std::cerr<<"------------------Landmark--------------"<<i<<std::endl;
-      //std::cerr<<au<<" "<<av<<" "<<bu<<" "<<bv<<" "<<cu<<" "<<cv<<std::endl;
+      std::cerr<<"------------------Landmark--------------"<<i<<std::endl;
+      std::cerr<<au<<" "<<av<<" "<<bu<<" "<<bv<<" "<<cu<<" "<<cv<<std::endl;
 
       for(int j=0; j<m_QP_N; j++)
 	{
