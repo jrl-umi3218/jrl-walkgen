@@ -79,9 +79,9 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
   m_ComHeight = 0.814;
 
   //Gains
-  m_Alpha = 10;//Jerk
-  m_Beta = 1.0; //Visual error
-  m_Gamma = 0.1; //ZMP
+  m_Alpha = 0.001;//Jerk
+  m_Beta = 0.00000001; //Visual error
+  m_Gamma = 0.000001; //ZMP
 
   /*! For simulating the linearized inverted pendulum in 2D. */
   m_2DLIPM = new LinearizedInvertedPendulum2D();
@@ -1836,7 +1836,7 @@ void ZMPVisualServoingQP::OnLine(double time,
       // Rotation angle estimation
       MAL_MATRIX(COMRotationInWorld,double);
       COMRotationInWorld = MAL_RET_A_by_B(MAL_RET_TRANSPOSE(WorldRotationInCamera),MAL_RET_TRANSPOSE(CameraRotationInCOM));
-      double estimatedAngle = -atan2(COMRotationInWorld(1,3),COMRotationInWorld(2,3));
+      double estimatedAngle = -atan2(COMRotationInWorld(0,2),COMRotationInWorld(1,2));
 
       double angleError = m_desiredAngle - estimatedAngle;
       RefVel.dYaw = m_angleErrorGain*angleError;
@@ -1958,12 +1958,10 @@ void ZMPVisualServoingQP::OnLine(double time,
 	{
 	  struct timeval lbegin,lend;
 	  gettimeofday(&lbegin,0);
-	  std::cerr<<"here1"<<std::endl;
 	  ql0001_(&m_Pb.m, &m_Pb.me, &m_Pb.mmax, &m_Pb.n, &m_Pb.nmax, &m_Pb.mnn,
 		  m_Pb.Q, m_Pb.D, m_Pb.DU, m_Pb.DS, m_Pb.XL, m_Pb.XU,
 		  m_Pb.X, m_Pb.U, &m_Pb.iout, &m_Pb.ifail, &m_Pb.iprint,
 		  m_Pb.war, &m_Pb.lwar, m_Pb.iwar, &m_Pb.liwar, &m_Pb.Eps);
-	  std::cerr<<"here2"<<std::endl;
 	  gettimeofday(&lend,0);
 
 	  ldt = lend.tv_sec - lbegin.tv_sec +
