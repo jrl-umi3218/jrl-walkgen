@@ -1840,6 +1840,8 @@ void ZMPVisualServoingQP::OnLine(double time,
 
       double angleError = m_desiredAngle - estimatedAngle;
       RefVel.dYaw = m_angleErrorGain*angleError;
+      // TODO: Do not set, but compute it
+      RefVel.dYaw = 0.0;
 
       m_OP->verifyAccelerationOfHipJoint(RefVel, m_TrunkState,
 					 m_TrunkStateT, m_CurrentSupport);
