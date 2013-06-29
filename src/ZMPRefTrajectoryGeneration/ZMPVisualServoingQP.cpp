@@ -54,7 +54,7 @@ namespace ublas = boost::numeric::ublas;
 
 
 ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
-					 string DataFile,
+					 string /*DataFile */,
 					 CjrlHumanoidDynamicRobot *aHS) :
   ZMPRefTrajectoryGeneration(lSPM),
   m_Map(),
@@ -68,7 +68,7 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
 {
 
   m_Pu = 0;
-  m_FullDebug = -10;
+  m_FullDebug = 3;
   m_FastFormulationMode = QLD;
 
   m_QP_T = 0.1;
@@ -1762,11 +1762,11 @@ void ZMPVisualServoingQP::interpolateFeetPositions(double time, int CurrentIndex
     }
 }
 
-void ZMPVisualServoingQP::OnLine(double time,
-				 deque<ZMPPosition> & FinalZMPPositions,
-				 deque<COMState> & FinalCOMStates,
-				 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-				 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
+void ZMPVisualServoingQP::OnLine(double /* time*/,
+				 deque<ZMPPosition> & /* FinalZMPPositions */,
+				 deque<COMState> & /* FinalCOMStates */,
+				 deque<FootAbsolutePosition> & /*FinalLeftFootAbsolutePositions */,
+				 deque<FootAbsolutePosition> & /*FinalRightFootAbsolutePositions*/)
 {}
 
 void ZMPVisualServoingQP::OnLine(double time,
@@ -2126,31 +2126,39 @@ void ZMPVisualServoingQP::OnLine(double time,
 	{
 	  ofstream aof;
 
+          // Foot positions
 	  aof.open("/tmp/FootPositionsT.dat",ofstream::app);
 	  aof<<" "<<m_FPx<<" "<<m_FPy<<endl;
 	  aof.close();
+          
+          // Solution along X-axis
 	  char Buffer[1024];
 	  if(m_FastFormulationMode == PLDPHerdt)
 	    sprintf(Buffer,"/tmp/PLDPXff_%f.dat",time);
 	  else
 	    sprintf(Buffer,"/tmp/Xff_%f.dat",time);
 	  aof.open(Buffer,ofstream::out);
-
+          aof << "m_QP_N:" << m_QP_N << endl;
 	  for(int i=0;i<m_QP_N;i++)
 	    {
 	      aof << ptX[i] << endl;
 	    }
 	  aof.close();
+
+          // Dump solution along Y-axis
 	  if(m_FastFormulationMode == PLDPHerdt)
 	    sprintf(Buffer,"/tmp/PLDPYff_%f.dat",time);
 	  else
 	    sprintf(Buffer,"/tmp/Yff_%f.dat",time);
 	  aof.open(Buffer,ofstream::out);
-	  for(int i=m_QP_N+m_PrwSupport.StepNumber;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
+          aof << "m_QP_N:" << m_QP_N << endl;
+	  for(int i=m_QP_N+m_PrwSupport.StepNumber;i<2*(m_QP_N)+m_PrwSupport.StepNumber;i++)
 	    {
 	      aof << ptX[i] << endl;
 	    }
 	  aof.close();
+
+          // Dump com position
 	  aof.open("/tmp/comHeight.dat",ofstream::app);
 
 	  aof << FinalCOMStates[CurrentIndex].x[0]<<" "
@@ -2286,7 +2294,12 @@ void ZMPVisualServoingQP::computeVisualServoingMatrices(MAL_MATRIX(&WorldRotatio
       cu = inner_prod(m_LinearizationTerms[i].UVector,ublas::column(tmp2,0)) + m_LinearizationTerms[i].UScalar;
       cv = inner_prod(m_LinearizationTerms[i].VVector,ublas::column(tmp2,0)) + m_LinearizationTerms[i].VScalar;
 
-      double jj, auW, buW, avW, bvW;
+
+      std::cerr<<"------------------Landmark--------------"<<i<<std::endl;
+      std::cerr<<au<<" "<<av<<" "<<bu<<" "<<bv<<" "<<cu<<" "<<cv<<std::endl;
+
+      double auW, buW, avW, bvW;
+      int jj;
       for(int j=0; j<m_QP_N; j++)
 	{
 	  jj = m_QP_N+j;
