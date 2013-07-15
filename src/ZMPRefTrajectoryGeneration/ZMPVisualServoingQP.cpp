@@ -76,12 +76,12 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
 
   m_SamplingPeriod = 0.005;
 
-  m_ComHeight = 0.814;
+  m_ComHeight = 0.711691;
 
   //Gains
-  m_Alpha = 0.001;//Jerk
-  m_Beta = 0.00000001; //Visual error
-  m_Gamma = 0.000001; //ZMP
+  m_Alpha = 0.0001;//Jerk
+  m_Beta = 0.000015; //Visual error
+  m_Gamma = 10; //ZMP
 
   /*! For simulating the linearized inverted pendulum in 2D. */
   m_2DLIPM = new LinearizedInvertedPendulum2D();
@@ -157,6 +157,7 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
   for(int i=1;i<m_QP_N;i++)
     {
       m_W(i) = 2.0*m_W(i-1);
+      //m_W(i) = m_W(i-1);
     }
 }
 
@@ -1464,16 +1465,7 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
       vsTermDSum += MAL_RET_A_by_B(vsTermQ,vsTermD);
 
     }
-  /*
-  std::cerr<<m_DuTWDu[0]<<std::endl<<std::endl;
-  std::cerr<<m_DuTWCu[0]<<std::endl<<std::endl;
-  std::cerr<<m_DuTWSdu[0]<<std::endl<<std::endl;
 
-  std::cerr<<std::endl;
-  std::cerr<<vsTermQSum<<std::endl;
-  std::cerr<<vsTermDSum<<std::endl;
-  //std::cerr<<vsTermQSum<<std::endl;
-  */
   //---------------------------ZMP
   //m_Pb.Q--
   memset(m_Pb.Q,0,4*(m_QP_N+m_PrwSupport.StepNumber)*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
@@ -1482,15 +1474,17 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
       {
 	m_Pb.Q[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] = m_OptA(j,i) + m_Beta*vsTermQSum(j,i);
       }
+
   //ZMP----
   for( int i=0;i<m_QP_N;i++)
     {
       for( int j=0;j<m_QP_N;j++)
 	{
-	  m_Pb.Q[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] -= ltermPZuPZu(i,j);
-	  m_Pb.Q[(m_QP_N+i)*2*(m_QP_N+m_PrwSupport.StepNumber)+m_QP_N+j] -= ltermPZuPZu(i,j);
+	  m_Pb.Q[i*2*(m_QP_N+m_PrwSupport.StepNumber)+j] += ltermPZuPZu(i,j);
+	  m_Pb.Q[(m_QP_N+i)*2*(m_QP_N+m_PrwSupport.StepNumber)+m_QP_N+j] += ltermPZuPZu(i,j);
 	}
     }
+
   if(m_PrwSupport.StepNumber>0)
     {
       for( int i=0;i<m_QP_N;i++)
@@ -1512,6 +1506,7 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
 	    }
 	}
     }
+
   //----ZMP
   //TODO: - only constant velocity
   //constant velocity for the whole preview window
@@ -1532,9 +1527,6 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
   m_OptD = MAL_RET_TRANSPOSE(m_VPu);
   m_OptD = m_Beta * m_OptD;
 
-  //m_Pb.D-
-  memset(m_Pb.D,0,2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
-
   //velocity
   MAL_VECTOR(lterm1v,double);
   MAL_C_eq_A_by_B(lterm1v,m_OptD,VRef);
@@ -1542,6 +1534,9 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
   MAL_C_eq_A_by_B(OptD,m_OptB,xk);
   OptD -= lterm1v;
   */
+
+  //m_Pb.D-
+  memset(m_Pb.D,0,2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
 
   for( int i=0;i<2*m_QP_N;i++)
     {
@@ -1559,6 +1554,7 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
       m_Pb.D[2*m_QP_N+i] += lterm4ZMPx(i);
       m_Pb.D[2*m_QP_N+m_PrwSupport.StepNumber+i] += lterm4ZMPy(i);
     }
+
   //----------m_Pb.D
   for( int i=0;i<2*(m_QP_N+m_PrwSupport.StepNumber);i++)
     {
@@ -1798,7 +1794,6 @@ void ZMPVisualServoingQP::OnLine(double time,
       for(int i=0; i<m_Map.N; i++)
 	{
 	  m_Map.LandMarksInCamera[i] = MAL_RET_A_by_B(WorldRotationInCamera,m_Map.LandMarksInWorld[i]) + WorldTranslationInCamera;
-	  //std::cerr<<"m_Map.LandMarksInCamera[i] "<<m_Map.LandMarksInCamera[i]<<std::endl;
 	}
 
       // Project the landmarks to the image plane
@@ -2224,7 +2219,6 @@ void ZMPVisualServoingQP::projectToImagePlane()
       // Project
       m_Map.LandMarksProjected[i](0,0) = m_Map.LandMarksInCamera[i](0,0)/m_Map.LandMarksInCamera[i](2,0);
       m_Map.LandMarksProjected[i](1,0) = m_Map.LandMarksInCamera[i](1,0)/m_Map.LandMarksInCamera[i](2,0);
-      //std::cerr<<"--..---"<<m_Map.LandMarksProjected[i](0,0)<<" "<<m_Map.LandMarksProjected[i](1,0)<<std::endl;
     }
 }
 
@@ -2284,9 +2278,6 @@ void ZMPVisualServoingQP::computeVisualServoingMatrices(MAL_MATRIX(&WorldRotatio
 
       cu = inner_prod(m_LinearizationTerms[i].UVector,ublas::column(tmp2,0)) + m_LinearizationTerms[i].UScalar;
       cv = inner_prod(m_LinearizationTerms[i].VVector,ublas::column(tmp2,0)) + m_LinearizationTerms[i].VScalar;
-
-      std::cerr<<"------------------Landmark--------------"<<i<<std::endl;
-      std::cerr<<au<<" "<<av<<" "<<bu<<" "<<bv<<" "<<cu<<" "<<cv<<std::endl;
 
       double jj, auW, buW, avW, bvW;
       for(int j=0; j<m_QP_N; j++)

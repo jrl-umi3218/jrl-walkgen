@@ -87,8 +87,8 @@ protected:
     {
       // Position of final landmarks
       //istringstream strm2(":setFinalLandMarks 1.5146 0.6104 0.8232 0.4804 0.8232 0.0545 1.5146 0.0693"); // (2,1,30deg)
-      //istringstream strm2(":setFinalLandMarks 0.5000 0.3760 0.1667 0.3760 0.1667 0.0427 0.5000 0.0427"); //(2,1,0)
-      istringstream strm2(":setFinalLandMarks 0.16667 0.34189 -0.16667 0.34189 -0.16667 0.00856 0.16667 0.00856"); // (2,0,0)
+      istringstream strm2(":setFinalLandMarks 0.5000 0.3078 0.1667 0.3078 0.1667 -0.0255 0.5000 .0.0255"); //(2,1,0)
+      //istringstream strm2(":setFinalLandMarks 0.16667 0.30779 -0.16667 0.30779 -0.16667 -0.025539 0.16667 -0.025539"); // (2,0,0)
       aPGI.ParseCmd(strm2);
     }
     {
@@ -132,7 +132,7 @@ protected:
   
   void generateEvent()
   {
-    unsigned int StoppingTime = 2.0*200;
+    unsigned int StoppingTime =60.0*200;
 
     if (m_OneStep.NbOfIt>StoppingTime) 
       {

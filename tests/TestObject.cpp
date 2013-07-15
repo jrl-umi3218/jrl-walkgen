@@ -515,21 +515,22 @@ namespace PatternGeneratorJRL
 		  MAL_VECTOR_DIM(paramCameraPositionInCOM,double,6);
 		  memset(&paramCameraPositionInCOM.data()[0],0,6*sizeof(double));
 
-		  paramCameraPositionInCOM(2) = 0.814;
+		  paramCameraPositionInCOM(2) = 0.711691;
 		  paramCameraPositionInCOM(4) = M_PI/2.0;
 		  paramCameraPositionInCOM(5) = -M_PI/2.0;
 
 		  computeTransformationMatrix(m_CameraPositionInCOM,paramCameraPositionInCOM);
-		  //std::cerr<<m_CameraPositionInCOM<<std::endl;
 
 		  MAL_VECTOR_DIM(paramCOMPositionInWorld,double,6);
 		  memset(&paramCOMPositionInWorld.data()[0],0,6*sizeof(double));
 
+		  /*
 		  cerr << "----> Starting COM Position: "
 		       << lStartingCOMPosition.x[0] << " "
 		       << lStartingCOMPosition.y[0] << " "
 		       << lStartingCOMPosition.z[0] << " "
 		       << lStartingCOMPosition.yaw[0] << endl;
+		  */
 
 		  paramCOMPositionInWorld(0) = lStartingCOMPosition.x[0];
 		  paramCOMPositionInWorld(1) = lStartingCOMPosition.y[0];
