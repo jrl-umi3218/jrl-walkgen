@@ -46,12 +46,18 @@ OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
   m_SSPeriod = SSPeriod;
 
 
-  m_lLimitLeftHipYaw = aRootJoint->childJoint(1)->lowerBound(0);//-30.0/180.0*M_PI;
-  m_uLimitLeftHipYaw  = aRootJoint->childJoint(1)->upperBound(0);//45.0/180.0*M_PI;
-  m_lLimitRightHipYaw = aRootJoint->childJoint(0)->lowerBound(0);//-45.0/180.0*M_PI;
-  m_uLimitRightHipYaw = aRootJoint->childJoint(0)->upperBound(0);//30.0/180.0*M_PI;
+  //m_lLimitLeftHipYaw = aRootJoint->childJoint(1)->lowerBound(0);//-30.0/180.0*M_PI;
+  //m_uLimitLeftHipYaw  = aRootJoint->childJoint(1)->upperBound(0);//45.0/180.0*M_PI;
+  //m_lLimitRightHipYaw = aRootJoint->childJoint(0)->lowerBound(0);//-45.0/180.0*M_PI;
+  //m_uLimitRightHipYaw = aRootJoint->childJoint(0)->upperBound(0);//30.0/180.0*M_PI;
 
-  m_uvLimitFoot = fabs(aRootJoint->childJoint(0)->upperVelocityBound(0));
+  m_lLimitLeftHipYaw = -30.0/180.0*M_PI;
+  m_uLimitLeftHipYaw = 45.0/180.0*M_PI;
+  m_lLimitRightHipYaw = -45.0/180.0*M_PI;
+  m_uLimitRightHipYaw = 30.0/180.0*M_PI;
+
+  //m_uvLimitFoot = fabs(aRootJoint->childJoint(0)->upperVelocityBound(0));
+  m_uvLimitFoot = 10.0/180.0*M_PI;
 
   //Acceleration limit not given by HRP2JRLmain.wrl
   m_uaLimitHipYaw = 0.1;

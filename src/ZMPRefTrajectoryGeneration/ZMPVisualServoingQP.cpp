@@ -79,8 +79,17 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
   m_ComHeight = 0.711691;
 
   //Gains
-  m_Alpha = 0.0001;//Jerk
-  m_Beta = 0.000015; //Visual error
+  //m_Alpha = 0.0001;//Jerk
+  //  m_Beta = 0.000015; //Visual error
+  //m_Gamma = 10; //ZMP
+  /*
+  m_Alpha = 0.0003;//Jerk
+  m_Beta = 0.00001; //Visual error
+  m_Gamma = 10; //ZMP
+  */
+
+  m_Alpha = 0.0005;//Jerk
+  m_Beta = 0.0000025; //Visual error
   m_Gamma = 10; //ZMP
 
   /*! For simulating the linearized inverted pendulum in 2D. */
@@ -1831,12 +1840,10 @@ void ZMPVisualServoingQP::OnLine(double time,
       // Rotation angle estimation
       MAL_MATRIX(COMRotationInWorld,double);
       COMRotationInWorld = MAL_RET_A_by_B(MAL_RET_TRANSPOSE(WorldRotationInCamera),MAL_RET_TRANSPOSE(CameraRotationInCOM));
-      double estimatedAngle = -atan2(COMRotationInWorld(0,2),COMRotationInWorld(1,2));
+      double estimatedAngle = atan2(COMRotationInWorld(1,0),COMRotationInWorld(0,0));
 
       double angleError = m_desiredAngle - estimatedAngle;
       RefVel.dYaw = m_angleErrorGain*angleError;
-      // TODO: Do not set, but compute it
-      RefVel.dYaw = 0.0;
 
       m_OP->verifyAccelerationOfHipJoint(RefVel, m_TrunkState,
 					 m_TrunkStateT, m_CurrentSupport);

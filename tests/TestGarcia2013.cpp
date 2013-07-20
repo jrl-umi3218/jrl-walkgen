@@ -76,18 +76,20 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
-      //istringstream strm2(":setDesiredAngle 0.5236"); // 30 degree
-      istringstream strm2(":setDesiredAngle 0.0");
+      istringstream strm2(":setDesiredAngle 0.5236"); // 30 degree
+      //istringstream strm2(":setDesiredAngle 0.1745"); // 10 degree
+      //istringstream strm2(":setDesiredAngle 0.0");
       aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":setAngleErrorGain 0.1");
+      istringstream strm2(":setAngleErrorGain 0.05");
       aPGI.ParseCmd(strm2);
     }
     {
       // Position of final landmarks
-      //istringstream strm2(":setFinalLandMarks 1.5146 0.6104 0.8232 0.4804 0.8232 0.0545 1.5146 0.0693"); // (2,1,30deg)
-      istringstream strm2(":setFinalLandMarks 0.5000 0.3078 0.1667 0.3078 0.1667 -0.0255 0.5000 .0.0255"); //(2,1,0)
+      istringstream strm2(":setFinalLandMarks 1.5146 0.4996 0.8232 0.3933 0.8232 -0.0326 1.5146 -0.0415"); // (2,1,30deg)
+      //istringstream strm2(":setFinalLandMarks 0.7417 0.3428 0.3534 0.3220 0.3534 -0.0267 0.7417 -0.0284"); // (2,1,10deg)
+      //istringstream strm2(":setFinalLandMarks 0.5000 0.3078 0.1667 0.3078 0.1667 -0.0255 0.5000 .0.0255"); //(2,1,0)
       //istringstream strm2(":setFinalLandMarks 0.16667 0.30779 -0.16667 0.30779 -0.16667 -0.025539 0.16667 -0.025539"); // (2,0,0)
       aPGI.ParseCmd(strm2);
     }
@@ -132,7 +134,7 @@ protected:
   
   void generateEvent()
   {
-    unsigned int StoppingTime =60.0*200;
+    unsigned int StoppingTime =75.0*200;
 
     if (m_OneStep.NbOfIt>StoppingTime) 
       {
