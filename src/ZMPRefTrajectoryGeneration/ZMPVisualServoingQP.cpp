@@ -67,6 +67,9 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
   m_DvTWSdv(NULL)
 {
 
+  MAL_MATRIX_RESIZE(m_CameraIntrinsicParameters,3,3);
+  MAL_MATRIX_SET_IDENTITY(m_CameraIntrinsicParameters);
+  
   m_Pu = 0;
   m_FullDebug = 3;
   m_FastFormulationMode = QLD;
@@ -1802,7 +1805,9 @@ void ZMPVisualServoingQP::OnLine(double time,
       // Compute the landmarks in the camera frame
       for(int i=0; i<m_Map.N; i++)
 	{
-	  m_Map.LandMarksInCamera[i] = MAL_RET_A_by_B(WorldRotationInCamera,m_Map.LandMarksInWorld[i]) + WorldTranslationInCamera;
+          MAL_MATRIX_DIM(unnormalizedProj,double, 3,1);
+          unnormalizedProj = MAL_RET_A_by_B(WorldRotationInCamera,m_Map.LandMarksInWorld[i]) + WorldTranslationInCamera;
+          m_Map.LandMarksInCamera[i] = MAL_RET_A_by_B(m_CameraIntrinsicParameters,unnormalizedProj);
 	}
 
       // Project the landmarks to the image plane

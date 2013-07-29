@@ -525,7 +525,7 @@ namespace PatternGeneratorJRL
 		  memset(&paramCOMPositionInWorld.data()[0],0,6*sizeof(double));
 
 		  /*
-		  cerr << "----> Starting COM Position: "
+                   cerr << "----> Starting COM Position: "
 		       << lStartingCOMPosition.x[0] << " "
 		       << lStartingCOMPosition.y[0] << " "
 		       << lStartingCOMPosition.z[0] << " "

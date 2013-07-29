@@ -363,6 +363,9 @@ namespace PatternGeneratorJRL
     /* Linearization terms */
     LinearizationProjection_t* m_LinearizationTerms;
 
+    /* \brief Matrix of camera intrinsic parameters */
+    MAL_MATRIX(m_CameraIntrinsicParameters,double);
+
     /* Visual servoing matrices */
     MAL_MATRIX_TYPE(double)* m_DuTWDu;
     MAL_MATRIX_TYPE(double)* m_DvTWDv;

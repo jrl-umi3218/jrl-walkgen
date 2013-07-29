@@ -1,10 +1,9 @@
 /*
- * Copyright 2010, 
+ * Copyright 2013, 
  *
- * Andrei Herdt
- * Olivier Stasse
+ * Mauricio Garcia
  *
- * JRL, CNRS/AIST
+ * LAAS, CRNS
  *
  * This file is part of walkGenJrl.
  * walkGenJrl is free software: you can redistribute it and/or modify
@@ -19,8 +18,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
- *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file This file tests A. Herdt's walking algorithm for
  * automatic foot placement giving an instantaneous CoM velocity reference.
@@ -48,11 +45,7 @@ public:
   };
   
   
-  
 protected:
-
-  
-
   
   void startOnLineWalking(PatternGeneratorInterface &aPGI)
   {
@@ -103,7 +96,7 @@ protected:
     }
 
     {
-      istringstream strm2(":setfeetconstraint XY 0.06 0.06");
+      istringstream strm2(":setfeetconstraint XY 0.02 0.02");
       aPGI.ParseCmd(strm2);
     }
 
