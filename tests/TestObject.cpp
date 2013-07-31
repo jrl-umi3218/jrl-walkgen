@@ -523,14 +523,13 @@ namespace PatternGeneratorJRL
 
 		  MAL_VECTOR_DIM(paramCOMPositionInWorld,double,6);
 		  memset(&paramCOMPositionInWorld.data()[0],0,6*sizeof(double));
+                  
 
-		  /*
                    cerr << "----> Starting COM Position: "
 		       << lStartingCOMPosition.x[0] << " "
 		       << lStartingCOMPosition.y[0] << " "
 		       << lStartingCOMPosition.z[0] << " "
 		       << lStartingCOMPosition.yaw[0] << endl;
-		  */
 
 		  paramCOMPositionInWorld(0) = lStartingCOMPosition.x[0];
 		  paramCOMPositionInWorld(1) = lStartingCOMPosition.y[0];
@@ -544,7 +543,8 @@ namespace PatternGeneratorJRL
 		  MAL_MATRIX(CameraPositionInWorld,double);
 		  CameraPositionInWorld = MAL_RET_A_by_B(COMPositionInWorld,m_CameraPositionInCOM);
 		  MAL_INVERSE(CameraPositionInWorld,m_WorldPositionInCamera,double);
-
+                  std::cerr << "-> CameraPositionInWorld" << CameraPositionInWorld << std::endl;
+                  std::cerr << "-> m_WorldPositionInCamera" << m_WorldPositionInCamera << std::endl;
 		  ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
 							 m_CurrentVelocity,
 							 m_CurrentAcceleration,

@@ -144,11 +144,14 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
   initFeet();
 
   // Register method to handle
-  string aMethodName[2] =
+  string aMethodName[4] =
     {":previewcontroltime",
-     ":numberstepsbeforestop"};
+     ":numberstepsbeforestop",
+     ":cameraintrinsicparameters",
+     ":comheight"
+    };
 
-  for(int i=0;i<2;i++)
+  for(int i=0;i<4;i++)
     {
       if (!RegisterMethod(aMethodName[i]))
 	{
@@ -1086,6 +1089,12 @@ void ZMPVisualServoingQP::CallMethod(std::string & Method, std::istringstream &s
       strm >> m_ComHeight;
       m_2DLIPM->SetComHeight(m_ComHeight);
     }
+  if (Method==":cameraintrinsicparameters")
+    {
+      for(unsigned int i=0;i<3;i++)
+        for(unsigned int j=0;j<3;j++)
+          strm >> m_CameraIntrinsicParameters(i,j);
+    }
 
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
 }
@@ -1527,7 +1536,7 @@ void ZMPVisualServoingQP::computeObjective(deque<LinearConstraintInequalityFreeF
       RefVel.y*sin(m_TrunkState.yaw[0]+m_TrunkStateT.yaw[1]*i*m_QP_T);
   for( int i=m_QP_N;i<2*m_QP_N;i++)
     VRef(i) = RefVel.y*cos(m_TrunkState.yaw[0]+m_TrunkStateT.yaw[1]*i*m_QP_T)+
-      RefVel.x*sin(m_TrunkState.yaw[0]+m_TrunkStateT.yaw[1]*i*m_QP_T);
+    RefVel.x*sin(m_TrunkState.yaw[0]+m_TrunkStateT.yaw[1]*i*m_QP_T);
 
   m_OptB = MAL_RET_TRANSPOSE(m_VPu);
   m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
@@ -1780,7 +1789,7 @@ void ZMPVisualServoingQP::OnLine(double time,
 				 MAL_MATRIX(&WorldPositionInCamera,double),
 				 MAL_MATRIX(&CameraPositionInCOM,double))
 {
-
+  std::cout << "OnLine" << std::endl;
   // If on-line mode not activated we go out.
   if (!m_OnLineMode)
     return;
@@ -1808,7 +1817,7 @@ void ZMPVisualServoingQP::OnLine(double time,
           MAL_MATRIX_DIM(unnormalizedProj,double, 3,1);
           unnormalizedProj = MAL_RET_A_by_B(WorldRotationInCamera,m_Map.LandMarksInWorld[i]) + WorldTranslationInCamera;
           m_Map.LandMarksInCamera[i] = MAL_RET_A_by_B(m_CameraIntrinsicParameters,unnormalizedProj);
-	}
+        }
 
       // Project the landmarks to the image plane
       projectToImagePlane();
@@ -2234,11 +2243,16 @@ void ZMPVisualServoingQP::OnLine(double time,
 
 void ZMPVisualServoingQP::projectToImagePlane()
 {
+  std::cout << "Projection------------------" << 
+    m_CameraIntrinsicParameters << std::endl;
   for(int i=0; i<m_Map.N; i++)
     {
       // Project
-      m_Map.LandMarksProjected[i](0,0) = m_Map.LandMarksInCamera[i](0,0)/m_Map.LandMarksInCamera[i](2,0);
-      m_Map.LandMarksProjected[i](1,0) = m_Map.LandMarksInCamera[i](1,0)/m_Map.LandMarksInCamera[i](2,0);
+      m_Map.LandMarksProjected[i](0,0) = (m_Map.LandMarksInCamera[i](0,0)/m_Map.LandMarksInCamera[i](2,0))/320;
+      m_Map.LandMarksProjected[i](1,0) = (m_Map.LandMarksInCamera[i](1,0)/m_Map.LandMarksInCamera[i](2,0))/240;
+      cout << "** PROJECTION : Landmark " << i << " (" 
+           << m_Map.LandMarksProjected[i](0,0) << "," 
+           << m_Map.LandMarksProjected[i](1,0) << ")" << std::endl;
     }
 }
 
