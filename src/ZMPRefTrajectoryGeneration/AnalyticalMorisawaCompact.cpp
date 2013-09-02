@@ -60,7 +60,7 @@ extern "C"
 		     integer *, /* 19 IWORK */
 		     integer * /* 20 INFO */
                  );
-#if BOOST_VERSION >=104000
+
   extern void dgetrf_( integer * m, /* M */
 		       integer * n, /* N */
 		       doublereal * A, /* A */
@@ -68,7 +68,7 @@ extern "C"
 		       integer * ipiv, /* IPIV */
 		       integer *info /* info */
 		       ); 
-#endif
+
 }
 
 namespace PatternGeneratorJRL
