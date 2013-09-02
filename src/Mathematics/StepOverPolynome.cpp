@@ -82,7 +82,7 @@ void StepOverPolynomeFoot::SetParameters(MAL_VECTOR(boundCond,double),
   // cout << "determinant of Base matrix: " << detBase << endl;
 
  
-  for (unsigned int i=0;i<boundCond.size();i++)
+  for (int i=0;i<boundCond.size();i++)
     {
       Temp=Base;
       for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(Temp);j++)
@@ -134,10 +134,10 @@ void StepOverPolynomeFootZtoX::SetParameters(MAL_VECTOR(Zpos,double),
 
   detBase=MAL_MATRIX_RET_DETERMINANT(Base,double); 
  
-  for (unsigned int i=0;i<Zpos.size();i++)
+  for (int i=0;i<Zpos.size();i++)
     {
       Temp=Base;
-      for(unsigned int j=0;j<Zpos.size();j++)
+      for(int j=0;j<Zpos.size();j++)
 	Temp(j,i) = Zpos(j);
       m_Coefficients[i] = MAL_MATRIX_RET_DETERMINANT(Temp,double)/detBase;
     };
@@ -186,10 +186,10 @@ void StepOverPolynomeFootXtoTime::SetParameters(MAL_VECTOR(Xbound,double),
 
   // cout << "determinant of Base matrix: " << detBase << endl;
 
-  for (unsigned int i=0;i<Xbound.size();i++)
+  for (int i=0;i<Xbound.size();i++)
     {
       Temp=Base;
-      for (unsigned int j=0;j<Xbound.size();j++)
+      for (int j=0;j<Xbound.size();j++)
 	Temp(j,i) = Xbound(j);
       m_Coefficients[i] = MAL_MATRIX_RET_DETERMINANT(Temp,double)/detBase;
     };
@@ -244,7 +244,7 @@ void StepOverPolynomeHip4::SetParameters(MAL_VECTOR(boundCond,double),
   // cout << "determinant of Base matrix: " << detBase << endl;
 
  
-  for (unsigned int i=0;i<boundCond.size();i++)
+  for (int i=0;i<boundCond.size();i++)
     {
       Temp=Base;
       for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(Temp);j++)

@@ -53,7 +53,7 @@ using namespace PatternGeneratorJRL;
 
 
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *lSPM,
-						 string DataFile,
+						 string,
 						 CjrlHumanoidDynamicRobot *aHS) :
   ZMPRefTrajectoryGeneration(lSPM)
 {
