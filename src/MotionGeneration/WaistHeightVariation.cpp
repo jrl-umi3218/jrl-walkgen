@@ -218,7 +218,7 @@ void WaistPolynome::SetParameters(MAL_VECTOR( boundCond,double), vector<double> 
   detBase=MAL_MATRIX_RET_DETERMINANT(Base,double); 
 
  
-  for (unsigned int i=0;i<boundCond.size();i++)
+  for (int i=0;i<boundCond.size();i++)
     {
       Temp=Base;
       for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(Temp);j++)

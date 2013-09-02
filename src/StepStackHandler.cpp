@@ -246,7 +246,6 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 	    else 
 	      break;
 
-	    double lSST=0.0, lDST=0.0;
 	    if (!strm.eof())
 	      strm >> aFootPosition.SStime;
 	    else 
