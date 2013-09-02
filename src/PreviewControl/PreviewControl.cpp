@@ -464,8 +464,10 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
     }
   ODEBUG(" ux preview window phase: " << ux );
   x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
-   
-  zmpx2 = (MAL_RET_A_by_B(m_C,x))(0,0);
+  
+  MAL_MATRIX(temp,double);
+  temp = MAL_RET_A_by_B(m_C,x);
+  zmpx2 = temp(0,0);
   
   if (Simulation)
     {
