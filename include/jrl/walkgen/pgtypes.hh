@@ -43,6 +43,7 @@
 #include <iostream>
 #include <fstream>
 #include <jrl/mal/matrixabstractlayer.hh>
+#include <vector>
 
 namespace PatternGeneratorJRL
 {
