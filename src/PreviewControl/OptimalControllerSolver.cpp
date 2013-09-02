@@ -161,8 +161,11 @@ bool OptimalControllerSolver::GeneralizedSchur(MAL_MATRIX( &A,double),
   char lS[2]="S";
   for(int i=0;i<2*n;i++)
     bwork[i] =0;
-  A = MAL_RET_TRANSPOSE(A);
-  B = MAL_RET_TRANSPOSE(B);
+  MAL_MATRIX(temp,double);
+  temp = MAL_RET_TRANSPOSE(A);
+  A = temp;
+  temp = MAL_RET_TRANSPOSE(B);
+  B = temp;
   dgges_ (lV, lV,
           lS,
          (logical (*)(...))sb02ox,
@@ -179,10 +182,14 @@ bool OptimalControllerSolver::GeneralizedSchur(MAL_MATRIX( &A,double),
           bwork,
           &info);
 
-  A = MAL_RET_TRANSPOSE(A);
-  B = MAL_RET_TRANSPOSE(B);
-  L = MAL_RET_TRANSPOSE(L);
-  R = MAL_RET_TRANSPOSE(R);
+  temp = MAL_RET_TRANSPOSE(A);
+  A = temp;
+  temp = MAL_RET_TRANSPOSE(B);
+  B = temp;
+  temp = MAL_RET_TRANSPOSE(L);
+  L = temp;
+  temp = MAL_RET_TRANSPOSE(R);
+  R = temp;
   
   delete [] work;
   delete [] bwork;
@@ -326,7 +333,9 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
 
   PreMatrix = la * tm_b;
   BaseOfRecursion = m_A - MAL_RET_A_by_B(m_b , m_K);
-  BaseOfRecursion = MAL_RET_TRANSPOSE(BaseOfRecursion);
+  MAL_MATRIX(temp,double);
+  temp = MAL_RET_TRANSPOSE(BaseOfRecursion);
+  BaseOfRecursion = temp;
 
   PostMatrix = MAL_RET_TRANSPOSE(m_c);
   PostMatrix = PostMatrix * m_Q;
