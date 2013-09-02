@@ -129,15 +129,15 @@ IF(HRP2_DYNAMICS_FOUND)
   )
 
   MESSAGE(STATUS "jrl data dir: " ${HRP2_14_PKGDATAROOTDIR})
-  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/)
+  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/)
   SET(hrp2dynamicsspec
-    ${HRP2_14_PKGDATAROOTDIR}/HRP2SpecificitiesSmall.xml
+    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2SpecificitiesSmall.xml
   )
   SET(hrp2dynamicsljr
-    ${HRP2_14_PKGDATAROOTDIR}/HRP2LinkJointRankSmall.xml
+    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2LinkJointRankSmall.xml
   )
   SET(hrp2dynamicsinitconfig
-    ${HRP2_14_PKGDATAROOTDIR}/HRP2JRLInitConfig.dat)
+    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2JRLInitConfig.dat)
 
   TARGET_LINK_LIBRARIES(TestKajita2003 ${PROJECT_NAME})
   PKG_CONFIG_USE_DEPENDENCY(TestKajita2003 hrp2-dynamics)
