@@ -197,7 +197,7 @@ namespace PatternGeneratorJRL
 	  aofq.open("TestConfiguration.dat",ofstream::out);
 	  if (aofq.is_open())
 	    {
-	      for(unsigned int k=0;k<30;k++)
+	      for(unsigned int k=0;k<lNbActuatedJoints;k++)
 		{
 		  aofq << dInitPos[k] << " ";
 		}
