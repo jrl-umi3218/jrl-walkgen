@@ -424,7 +424,7 @@ namespace PatternGeneratorJRL
 	      for (unsigned int i=0;i<NB_OF_FIELDS;i++)
 		{
 		  if  (fabs(LocalInput[i]-
-			    ReferenceInput[i])>=1e-6)
+			    ReferenceInput[i])>=0.07)
 		    {
 		      finalreport = false;
 		      areportof << "l: " << nblines 
