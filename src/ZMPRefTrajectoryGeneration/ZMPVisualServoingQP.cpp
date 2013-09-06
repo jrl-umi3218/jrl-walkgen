@@ -71,7 +71,7 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
   MAL_MATRIX_SET_IDENTITY(m_CameraIntrinsicParameters);
   
   m_Pu = 0;
-  m_FullDebug = 3;
+  m_FullDebug = 0;
   m_FastFormulationMode = QLD;
 
   m_QP_T = 0.1;
@@ -148,7 +148,8 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
     {":previewcontroltime",
      ":numberstepsbeforestop",
      ":cameraintrinsicparameters",
-     ":comheight"
+     ":comheight",
+     ":setinitrobotpose",
     };
 
   for(int i=0;i<4;i++)
@@ -291,6 +292,13 @@ void ZMPVisualServoingQP::setLandMarksPositions(istringstream &strm)
       strm >> m_Map.LandMarksInWorld[i](1,0);
       strm >> m_Map.LandMarksInWorld[i](2,0);
     }
+}
+
+void ZMPVisualServoingQP::initRobotPose(istringstream &strm)
+{
+  for(unsigned int i=0;i<4;i++)
+    for(unsigned int j=0;j<4;j++)
+      strm >> m_initRobotPose(i,j)
 }
 
 void ZMPVisualServoingQP::setFinalLandMarks(istringstream &strm)
@@ -1046,8 +1054,8 @@ int ZMPVisualServoingQP::buildConstraintMatrices(double * &,
     {
 
       ODEBUG("localtime: " <<localtime);
-      m_Pb.dumpMatrix("/tmp/DU.dat",ProblemVelRef_s::MATRIX_DU);
-      m_Pb.dumpVector("/tmp/m_Pb.DS.dat", ProblemVelRef_s::VECTOR_DS);
+      //m_Pb.dumpMatrix("/tmp/DU.dat",ProblemVelRef_s::MATRIX_DU);
+      //m_Pb.dumpVector("/tmp/m_Pb.DS.dat", ProblemVelRef_s::VECTOR_DS);
 
       ofstream aof;
       char Buffer[1024];
@@ -1061,8 +1069,8 @@ int ZMPVisualServoingQP::buildConstraintMatrices(double * &,
 	}
       aof.close();
 
-      sprintf(Buffer,"/tmp/DPX_%f.dat", StartingTime);
-      m_Pb.dumpMatrix(Buffer,ProblemVelRef_s::VECTOR_DS);
+      //sprintf(Buffer,"/tmp/DPX_%f.dat", StartingTime);
+      //      m_Pb.dumpMatrix(Buffer,ProblemVelRef_s::VECTOR_DS);
     }
 
   return 0;
@@ -1095,6 +1103,8 @@ void ZMPVisualServoingQP::CallMethod(std::string & Method, std::istringstream &s
         for(unsigned int j=0;j<3;j++)
           strm >> m_CameraIntrinsicParameters(i,j);
     }
+  if (Method==":setinitrobotpose")
+    initRobotPose(strm);
 
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
 }
@@ -1789,7 +1799,6 @@ void ZMPVisualServoingQP::OnLine(double time,
 				 MAL_MATRIX(&WorldPositionInCamera,double),
 				 MAL_MATRIX(&CameraPositionInCOM,double))
 {
-  std::cout << "OnLine" << std::endl;
   // If on-line mode not activated we go out.
   if (!m_OnLineMode)
     return;
@@ -2243,16 +2252,18 @@ void ZMPVisualServoingQP::OnLine(double time,
 
 void ZMPVisualServoingQP::projectToImagePlane()
 {
-  std::cout << "Projection------------------" << 
-    m_CameraIntrinsicParameters << std::endl;
+  ODEBUG("Projection------------------" << 
+         m_CameraIntrinsicParameters);
   for(int i=0; i<m_Map.N; i++)
     {
       // Project
-      m_Map.LandMarksProjected[i](0,0) = (m_Map.LandMarksInCamera[i](0,0)/m_Map.LandMarksInCamera[i](2,0))/320;
-      m_Map.LandMarksProjected[i](1,0) = (m_Map.LandMarksInCamera[i](1,0)/m_Map.LandMarksInCamera[i](2,0))/240;
-      cout << "** PROJECTION : Landmark " << i << " (" 
-           << m_Map.LandMarksProjected[i](0,0) << "," 
-           << m_Map.LandMarksProjected[i](1,0) << ")" << std::endl;
+      m_Map.LandMarksProjected[i](0,0) = (m_Map.LandMarksInCamera[i](0,0)/m_Map.LandMarksInCamera[i](2,0));
+      m_Map.LandMarksProjected[i](1,0) = (m_Map.LandMarksInCamera[i](1,0)/m_Map.LandMarksInCamera[i](2,0));
+      ODEBUG("** PROJECTION : Landmark " << i << " (" 
+             << m_Map.LandMarksProjected[i](0,0) << "," 
+             << m_Map.LandMarksProjected[i](1,0) << ") Desired: (" 
+             << m_Map.LandMarksDesired[i](0,0) << "," 
+             << m_Map.LandMarksDesired[i](1,0) << ")");
     }
 }
 
@@ -2314,8 +2325,8 @@ void ZMPVisualServoingQP::computeVisualServoingMatrices(MAL_MATRIX(&WorldRotatio
       cv = inner_prod(m_LinearizationTerms[i].VVector,ublas::column(tmp2,0)) + m_LinearizationTerms[i].VScalar;
 
 
-      std::cerr<<"------------------Landmark--------------"<<i<<std::endl;
-      std::cerr<<au<<" "<<av<<" "<<bu<<" "<<bv<<" "<<cu<<" "<<cv<<std::endl;
+      ODEBUG("------------------Landmark--------------"<<i);
+      ODEBUG(au<<" "<<av<<" "<<bu<<" "<<bv<<" "<<cu<<" "<<cv);
 
       double auW, buW, avW, bvW;
       int jj;

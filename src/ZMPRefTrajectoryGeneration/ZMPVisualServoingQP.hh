@@ -192,6 +192,9 @@ namespace PatternGeneratorJRL
     void interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 			 deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
+    /* ! \brief Set the initialize pose of the robot when starting a new walking set. */
+    void initRobotPose(istringstream &strm);
+
     /*! Return \f$\alpha\f$ */
     const double & GetAlpha() const;
 
@@ -360,6 +363,9 @@ namespace PatternGeneratorJRL
     /* Set of landmarks in world, camera and projected */
     Map_t m_Map;
 
+    /*! \brief Set initial pose of the robot. */
+    ml::Matrix m_initRobotPose;
+
     /* Linearization terms */
     LinearizationProjection_t* m_LinearizationTerms;
 
@@ -474,6 +480,7 @@ namespace PatternGeneratorJRL
 			      deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
     int ReturnOptimalTimeToRegenerateAStep();
+    
   };
 }
 

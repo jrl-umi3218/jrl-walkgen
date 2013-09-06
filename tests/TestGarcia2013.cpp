@@ -65,11 +65,12 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":cameraintrinsicparameters 391.181 0.0 248.988 0.0 390.983 245.235 0.0 0.0 1.0");
-      aPGI.ParseCmd(strm2);
+      //istringstream strm2(":cameraintrinsicparameters 391.181 0.0 248.988 0.0 390.983 245.235 0.0 0.0 1.0");
+      //aPGI.ParseCmd(strm2);
     }
     {
       //istringstream strm2(":setLandMarksPositions 5.0 -0.5 0.5 5 0.5 0.5 5.0 0.5 1.5 5.0 -0.5 1.5");
+      //   istringstream strm2(":setLandMarksPositions 4.191465 0.412066 1.834407 4.442912 1.326137 1.773185 3.917841 1.345496 -0.094307 3.666394 0.431425 -0.033085 ");
       istringstream strm2(":setLandMarksPositions 4.191465 0.412066 1.834407 4.442912 1.326137 1.773185 3.917841 1.345496 -0.094307 3.666394 0.431425 -0.033085 ");
       aPGI.ParseCmd(strm2);
     }
@@ -85,7 +86,10 @@ protected:
     }
     {
       // Position of final landmarks
-      istringstream strm2(":setFinalLandMarks 300.0005 296.0929 401.0587 285.3273 431.3475 39.6418 313.0407 29.1062"); // (,)
+      //istringstream strm2(":setFinalLandMarks 300.0005 296.0929 401.0587 285.3273 431.3475 39.6418 313.0407 29.1062"); // (,)
+      istringstream strm2(":setFinalLandMarks 0.13041 0.13008 0.38875 0.10254 0.46618 -0.52584 0.16374 -0.55278 0.13041 0.13008");
+
+
       //istringstream strm2(":setFinalLandMarks 1.5146 0.4996 0.8232 0.3933 0.8232 -0.0326 1.5146 -0.0415"); // (2,1,30deg)
       //istringstream strm2(":setFinalLandMarks 0.7417 0.3428 0.3534 0.3220 0.3534 -0.0267 0.7417 -0.0284"); // (2,1,10deg)
       //istringstream strm2(":setFinalLandMarks 0.5000 0.3078 0.1667 0.3078 0.1667 -0.0255 0.5000 .0.0255"); //(2,1,0)
@@ -102,7 +106,7 @@ protected:
     }
 
     {
-      istringstream strm2(":setfeetconstraint XY 0.06 0.06");
+      istringstream strm2(":setfeetconstraint XY 0.02 0.02");
       aPGI.ParseCmd(strm2);
     }
 
