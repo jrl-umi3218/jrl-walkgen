@@ -58,11 +58,11 @@ PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-dynamics)
 # Test Morisawa 2007 #
 ######################
 math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
-CONFIG_FILES_CMAKE(TestMorisawa2007OnLineTestFGPI_${BITS}.datref)
-CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalkTestFGPI_${BITS}.datref)
+CONFIG_FILES_CMAKE(TestMorisawa2007OnLine${BITS}TestFGPI.datref)
+CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalk${BITS}TestFGPI.datref)
 
 MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
-  SET(testmorisawa2007 "${test_morisawa_arg}_${BITS}")
+  SET(testmorisawa2007 "${test_morisawa_arg}${BITS}")
 
   ADD_EXECUTABLE(${testmorisawa2007}
   ../src/portability/gettimeofday.cc
@@ -95,8 +95,8 @@ MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
     ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 ENDMACRO(ADD_MORISAWA_2007)
 
-ADD_MORISAWA_2007(TestMorisawa2007OnLineTestFGPI)
-ADD_MORISAWA_2007(TestMorisawa2007ShortWalkTestFGPI)
+ADD_MORISAWA_2007(TestMorisawa2007OnLine)
+ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
 
 ###################
 # Test Herdt 2010 #
