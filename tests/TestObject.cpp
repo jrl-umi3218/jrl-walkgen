@@ -67,7 +67,7 @@ namespace PatternGeneratorJRL
       m_OuterLoopNbItMax = 1;
 
       /*! default debug output */
-      m_DebugFGPI = false;
+      m_DebugFGPI = true;
       m_DebugZMP2 = false;
 
       /*! Extract options and fill in members. */
