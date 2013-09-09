@@ -149,7 +149,6 @@ ZMPVisualServoingQP::ZMPVisualServoingQP(SimplePluginManager *lSPM,
      ":numberstepsbeforestop",
      ":cameraintrinsicparameters",
      ":comheight",
-     ":setinitrobotpose",
     };
 
   for(int i=0;i<4;i++)
@@ -294,12 +293,6 @@ void ZMPVisualServoingQP::setLandMarksPositions(istringstream &strm)
     }
 }
 
-void ZMPVisualServoingQP::initRobotPose(istringstream &strm)
-{
-  for(unsigned int i=0;i<4;i++)
-    for(unsigned int j=0;j<4;j++)
-      strm >> m_initRobotPose(i,j)
-}
 
 void ZMPVisualServoingQP::setFinalLandMarks(istringstream &strm)
 {
@@ -1103,9 +1096,6 @@ void ZMPVisualServoingQP::CallMethod(std::string & Method, std::istringstream &s
         for(unsigned int j=0;j<3;j++)
           strm >> m_CameraIntrinsicParameters(i,j);
     }
-  if (Method==":setinitrobotpose")
-    initRobotPose(strm);
-
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
 }
 
