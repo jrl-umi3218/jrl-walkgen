@@ -147,19 +147,22 @@ IF(HRP2_DYNAMICS_FOUND)
   )
 
   MESSAGE(STATUS "jrl data dir: " ${HRP2_14_PKGDATAROOTDIR})
-  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/)
+  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/)
   SET(hrp2dynamicsspec
-    ${HRP2_14_PKGDATAROOTDIR}/HRP2SpecificitiesSmall.xml
+    ${hrp2dynamicsmodelpath}/HRP2SpecificitiesSmall.xml
   )
   SET(hrp2dynamicsljr
-    ${HRP2_14_PKGDATAROOTDIR}/HRP2LinkJointRankSmall.xml
+    ${hrp2dynamicsmodelpath}/HRP2LinkJointRankSmall.xml
   )
   SET(hrp2dynamicsinitconfig
-    ${HRP2_14_PKGDATAROOTDIR}/HRP2JRLInitConfig.dat)
+    ${hrp2dynamicsmodelpath}/HRP2JRLInitConfig.dat)
 
   TARGET_LINK_LIBRARIES(TestKajita2003 ${PROJECT_NAME})
   PKG_CONFIG_USE_DEPENDENCY(TestKajita2003 hrp2-dynamics)
   ADD_DEPENDENCIES(TestKajita2003 ${PROJECT_NAME})
+
+# This test is disabled for now as it fails.
+# FIXME: fix the test and/or the implementation
 
   ADD_TEST(TestKajita2003 TestKajita2003
     ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec} ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
