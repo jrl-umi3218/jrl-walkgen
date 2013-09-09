@@ -61,36 +61,42 @@ math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
 CONFIG_FILES_CMAKE(TestMorisawa2007OnLineTestFGPI_${BITS}.datref)
 CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalkTestFGPI_${BITS}.datref)
 
-SET(testmorisawa2007 "TestMorisawa2007__${BITS}")
-ADD_EXECUTABLE(${testmorisawa2007}
+MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
+  SET(testmorisawa2007 "${test_morisawa_arg}_${BITS}")
+
+  ADD_EXECUTABLE(${testmorisawa2007}
   ../src/portability/gettimeofday.cc
   TestMorisawa2007.cpp
   CommonTools.cpp
   TestObject.cpp
   ClockCPUTime.cpp
   )
-TARGET_LINK_LIBRARIES(${testmorisawa2007} ${PROJECT_NAME})
-PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} jrl-dynamics)
-ADD_DEPENDENCIES(${testmorisawa2007} ${PROJECT_NAME})
+  TARGET_LINK_LIBRARIES(${testmorisawa2007} ${PROJECT_NAME})
+  PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} jrl-dynamics)
+  ADD_DEPENDENCIES(${testmorisawa2007} ${PROJECT_NAME})
 
-MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
-SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
-SET(samplespec
-  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
+  MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
+  SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
+  SET(samplespec
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
   )
-SET(sampleljr
-  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
+  SET(sampleljr
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
   )
-SET(sampleinitconfig
-  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat)
+  SET(sampleinitconfig
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat)
 
-LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
+  LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
 
-# This test is disabled for now as it fails.
-# FIXME: fix the test and/or the implementation
-ADD_TEST(${testmorisawa2007}
-  ${testmorisawa2007}
-  ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+  # This test is disabled for now as it fails.
+  # FIXME: fix the test and/or the implementation
+  ADD_TEST(${testmorisawa2007}
+    ${testmorisawa2007}
+    ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+ENDMACRO(ADD_MORISAWA_2007)
+
+ADD_MORISAWA_2007(TestMorisawa2007OnLineTestFGPI)
+ADD_MORISAWA_2007(TestMorisawa2007ShortWalkTestFGPI)
 
 ###################
 # Test Herdt 2010 #
