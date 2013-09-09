@@ -57,19 +57,21 @@ PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-dynamics)
 ######################
 # Test Morisawa 2007 #
 ######################
-CONFIG_FILES_CMAKE(TestMorisawa2007OnLineTestFGPI.datref)
-CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalkTestFGPI.datref)
+math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
+CONFIG_FILES_CMAKE(TestMorisawa2007OnLineTestFGPI_${BITS}.datref)
+CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalkTestFGPI_${BITS}.datref)
 
-ADD_EXECUTABLE(TestMorisawa2007
+SET(testmorisawa2007 "TestMorisawa2007__${BITS}")
+ADD_EXECUTABLE(${testmorisawa2007}
   ../src/portability/gettimeofday.cc
   TestMorisawa2007.cpp
   CommonTools.cpp
   TestObject.cpp
   ClockCPUTime.cpp
   )
-TARGET_LINK_LIBRARIES(TestMorisawa2007 ${PROJECT_NAME})
-PKG_CONFIG_USE_DEPENDENCY(TestMorisawa2007 jrl-dynamics)
-ADD_DEPENDENCIES(TestMorisawa2007 ${PROJECT_NAME})
+TARGET_LINK_LIBRARIES(${testmorisawa2007} ${PROJECT_NAME})
+PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} jrl-dynamics)
+ADD_DEPENDENCIES(${testmorisawa2007} ${PROJECT_NAME})
 
 MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
 SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
@@ -86,9 +88,9 @@ LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
 
 # This test is disabled for now as it fails.
 # FIXME: fix the test and/or the implementation
-#ADD_TEST(TestMorisawa2007
-#  TestMorisawa2007
-#  ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+ADD_TEST(${testmorisawa2007}
+  ${testmorisawa2007}
+  ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 
 ###################
 # Test Herdt 2010 #
