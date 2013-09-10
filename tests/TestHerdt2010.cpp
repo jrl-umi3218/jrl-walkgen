@@ -68,6 +68,11 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
+      istringstream strm2(":doublesupporttime 0.1");
+      aPGI.ParseCmd(strm2);
+    }
+    {
+      //istringstream strm2(":HerdtOnline");
       istringstream strm2(":HerdtOnline 0.2 0.0 0.0");
       aPGI.ParseCmd(strm2);
     }
@@ -77,11 +82,57 @@ protected:
     }
   }
 
+  void startTurningLeft(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.2 0.0 0.2");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void startTurningRight(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.2 0.0 -0.2");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+
+  void startTurningRightOnSpot(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.0 0.0 -0.2");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void stop(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.0 0.0 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void walkForward(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.2 0.0 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void walkSidewards(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.0 0.2 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+
   void stopOnLineWalking(PatternGeneratorInterface &aPGI)
   {
     {
       istringstream strm2(":setVelReference  0.0 0.0 0.0");
       aPGI.ParseCmd(strm2);
+      istringstream strm3(":stoppg");
+      aPGI.ParseCmd(strm3);
     }
   }
 
@@ -102,11 +153,33 @@ protected:
   
   void generateEvent()
   {
-    unsigned int StoppingTime = 11*200;
 
-    if (m_OneStep.NbOfIt>StoppingTime) 
-      {
-	stopOnLineWalking(*m_PGI);
+    typedef void (TestHerdt2010::* localeventHandler_t)(PatternGeneratorInterface &);
+
+    struct localEvent 
+    {
+      unsigned time;
+      localeventHandler_t Handler ;
+    };
+
+    #define localNbOfEvents 8
+    struct localEvent events [localNbOfEvents] =
+      { { 5*200,&TestHerdt2010::startTurningLeft},
+	{10*200,&TestHerdt2010::startTurningRight},
+	{15*200,&TestHerdt2010::startTurningRightOnSpot},
+	{20*200,&TestHerdt2010::stop},
+	{25*200,&TestHerdt2010::walkSidewards},
+	{30*200,&TestHerdt2010::walkForward},
+	{35*200,&TestHerdt2010::stop},
+	{40*200,&TestHerdt2010::stopOnLineWalking}};
+    
+    // Test when triggering event.
+    for(unsigned int i=0;i<localNbOfEvents;i++)
+      { 
+	if ( m_OneStep.NbOfIt==events[i].time)
+	  {
+	    (this->*(events[i].Handler))(*m_PGI);
+	  }
       }
   }
 };

@@ -52,7 +52,7 @@ namespace PatternGeneratorJRL
       @{ */
     
     /*! \brief along the frontal direction */
-    const static unsigned int X_AXIS =0;
+    const static unsigned int X_AXIS = 0;
     /*! \brief along the left of the robot */
     const static unsigned int Y_AXIS = 1;
     /*! \brief along the vertical axis of the robot. */
@@ -74,7 +74,7 @@ namespace PatternGeneratorJRL
     virtual ~FootTrajectoryGenerationStandard();
 
     /*! This method computes the position of the swinging foot during single support phase,
-      and maintian a constant position for the support foot.
+      and maintain a constant position for the support foot.
       It uses polynomial of 3rd order for the X-axis, Y-axis, 
       orientation in the X-Z axis, and orientation in the X-Y axis,
       and finally it uses a 4th order polynome for the Z-axis.
@@ -158,6 +158,16 @@ namespace PatternGeneratorJRL
 					 double &FinalPosition,
 					 double &InitPosition,
 					 double &InitSpeed);
+   /// \brief Set parameters considering initial position, speed, acceleration.
+   ///
+   /// \param[in] PolynomeIndex
+   /// \param[in] TimeInterval
+   /// \param[in] FinalPosition
+   /// \param[in] InitPosition
+   /// \param[in] InitSpeed
+   /// \param[in] InitAcc
+   int SetParameters(int PolynomeIndex, double TimeInterval,
+       double FinalPosition, double InitPosition, double InitSpeed, double InitAcc);
 
    /*! Fill an absolute foot position structure for a given time. */
    double ComputeAll(FootAbsolutePosition & aFootAbsolutePosition,
@@ -165,6 +175,9 @@ namespace PatternGeneratorJRL
 
    /*! Compute the value for a given polynome. */
    double Compute(unsigned int PolynomeIndex, double Time);
+
+   /*! Compute the value for a given polynome's second derivative. */
+   double ComputeSecDerivative(unsigned int PolynomeIndex, double Time);
 
    /*! Compute the absolute foot position from the queue of relative positions. 
      There is not direct dependency with time.
@@ -183,7 +196,7 @@ namespace PatternGeneratorJRL
   protected:
    
    /*! \brief Polynomes for X and Y axis positions*/
-   Polynome3 *m_PolynomeX,*m_PolynomeY;
+   Polynome5 *m_PolynomeX,*m_PolynomeY;
    
    /*! \brief Polynome for X-Y orientation */
    Polynome3 *m_PolynomeTheta;
@@ -193,7 +206,6 @@ namespace PatternGeneratorJRL
 
    /*! \brief Polynome for Z axis position. */
    Polynome4 *m_PolynomeZ;
-   
 
    /*! \brief Foot dimension. */
    double m_FootB, m_FootH, m_FootF;

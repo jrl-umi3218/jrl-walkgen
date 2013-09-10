@@ -117,7 +117,7 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
   unsigned int NbPlugins=0;
   for (CurrentPlugin = RangeOfPlugins.first;
        CurrentPlugin != RangeOfPlugins.second;++NbPlugins,
-	 ++CurrentPlugin);
+	 ++CurrentPlugin) ;
   
   ODEBUG4("Size of SimplePlugins: " << m_SimplePlugins.size() 
 	  << " Found for " << MethodName << " : " << NbPlugins, "PgDebug.txt");

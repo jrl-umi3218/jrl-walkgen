@@ -1,6 +1,7 @@
 /*
  * Copyright 2006, 2007, 2008, 2009, 2010, 
  *
+ * Andrei     Herdt
  * Florent    Lamiraux
  * Mathieu    Poirier 
  * Olivier    Stasse
@@ -53,14 +54,16 @@ namespace PatternGeneratorJRL
       Polynome3(double FT, double FP);
 
       /*!  Set the parameters 
-	This method assumes implictly a position
+	This method assumes implicitly a position
 	set to zero, and a speed equals to zero.
+	Final velocity is 0
        */
       void SetParameters(double FT, double FP);
 
       /*! Set the parameters such that
 	the initial position, and initial speed
 	are different from zero.
+	Final velocity is 0
        */
       void SetParametersWithInitPosInitSpeed(double FT,
 					     double FP,
@@ -89,11 +92,14 @@ namespace PatternGeneratorJRL
       Polynome4(double FT, double MP);
   
       /// Set the parameters
+      // Initial velocity and position are 0
+      // Final velocity and position are 0
       void SetParameters(double FT, double MP);
 
       /*! Set the parameters such that
 	the initial position, and initial speed
 	are different from zero.
+	Final velocity and position are 0
        */
       void SetParametersWithInitPosInitSpeed(double FT,
 					     double MP,
@@ -127,8 +133,22 @@ namespace PatternGeneratorJRL
 
       /// Set the parameters
       void SetParameters(double FT, double FP);
+
+      /*! Set the parameters such that
+        the initial position, and initial speed
+        are different from zero.
+       */
+      void SetParametersWithInitPosInitSpeed(double FT,
+          double FP,
+          double InitPos,
+          double InitSpeed);
+
+      /// \brief Set parameters considering initial position, velocity, acceleration
+      void SetParameters(double FT, double FP,
+          double InitPos, double InitSpeed, double InitAcc);
       /// Destructor.
       ~Polynome5();
+
     };
 
   /// Polynome used for Z trajectory.
@@ -141,7 +161,11 @@ namespace PatternGeneratorJRL
       Polynome6(double FT, double MP);
   
       /// Set the parameters
+      // Initial acceleration, velocity and position by default 0
+      // Final acceleration, velocity and position are 0
       void SetParameters(double FT, double MP);
+      void SetParameters(double FT, double PM,
+		  	  double InitPos, double InitSpeed, double InitAcc);
 
       /// Destructor.
       ~Polynome6();

@@ -134,6 +134,9 @@ Polynome5::Polynome5(double FT, double FP) :Polynome(5)
   SetParameters(FT,FP);
 }
 
+Polynome5::~Polynome5()
+{}
+
 void Polynome5::SetParameters(double FT, double FP)
 {
   double tmp;
@@ -148,8 +151,37 @@ void Polynome5::SetParameters(double FT, double FP)
   m_Coefficients[5] = 6*FP/tmp;
 }
 
-Polynome5::~Polynome5()
-{}
+void Polynome5::SetParametersWithInitPosInitSpeed(double FT,
+                                                  double FP,
+                                                  double InitPos,
+                                                  double InitSpeed)
+{
+  double tmp;
+  m_Coefficients[0] = InitPos;
+  m_Coefficients[1] = InitSpeed;
+  m_Coefficients[2] = 0.0/2.0;
+  tmp = FT*FT*FT;
+  m_Coefficients[3] = (-3.0/2.0*0.0*FT*FT-6.0*InitSpeed*FT - 10.0*InitPos + 10.0*FP)/tmp;
+  tmp=tmp*FT;
+  m_Coefficients[4] = ( 3.0/2.0*0.0*FT*FT + 8.0*InitSpeed*FT + 15.0*InitPos - 15.0*FP)/tmp;
+  tmp=tmp*FT;
+  m_Coefficients[5] = ( -1.0/2.0*0.0*FT*FT - 3.0*InitSpeed*FT - 6.0*InitPos + 6.0*FP)/tmp;
+}
+
+void Polynome5::SetParameters(double FT, double FP,
+    double InitPos, double InitSpeed, double InitAcc)
+{
+  double tmp;
+  m_Coefficients[0] = InitPos;
+  m_Coefficients[1] = InitSpeed;
+  m_Coefficients[2] = InitAcc/2.0;
+  tmp = FT*FT*FT;
+  m_Coefficients[3] = (-3.0/2.0*InitAcc*FT*FT-6.0*InitSpeed*FT - 10.0*InitPos + 10.0*FP)/tmp;
+  tmp=tmp*FT;
+  m_Coefficients[4] = ( 3.0/2.0*InitAcc*FT*FT + 8.0*InitSpeed*FT + 15.0*InitPos - 15.0*FP)/tmp;
+  tmp=tmp*FT;
+  m_Coefficients[5] = ( -1.0/2.0*InitAcc*FT*FT - 3.0*InitSpeed*FT - 6.0*InitPos + 6.0*FP)/tmp;
+}
 
 Polynome6::Polynome6(double FT, double MP) :Polynome(6)
 {
@@ -170,6 +202,20 @@ void Polynome6::SetParameters(double FT, double MP)
   m_Coefficients[5] = 192*MP/tmp;
   tmp *=FT;
   m_Coefficients[6] = -64*MP/tmp;
+}
+
+
+void Polynome6::SetParameters(
+		double FT, double PM,
+		double InitPos, double InitSpeed, double InitAcc)
+{
+  m_Coefficients[0] = InitPos;
+  m_Coefficients[1] = InitSpeed;
+  m_Coefficients[2] = 0.5*InitAcc;
+  m_Coefficients[3] = -0.5*(5*FT*FT*InitAcc + 32*InitSpeed*FT + 84*InitPos - 128*PM)/(FT*FT*FT);
+  m_Coefficients[4] =  0.5*(76*InitSpeed*FT + 222*InitPos - 384*PM + 9*FT*FT*InitAcc)/(FT*FT*FT*FT);
+  m_Coefficients[5] = -0.5*(204*InitPos + 66*InitSpeed*FT - 384*PM + 7*FT*FT*InitAcc)/(FT*FT*FT*FT*FT);
+  m_Coefficients[6] =      (-64*PM+32*InitPos + 10*InitSpeed*FT + FT*FT*InitAcc)/(FT*FT*FT*FT*FT*FT);
 }
 
 Polynome6::~Polynome6()

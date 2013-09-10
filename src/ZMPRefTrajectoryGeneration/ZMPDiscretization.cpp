@@ -377,8 +377,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
       m_vdiffsupppre(0,0) = -CurrentRightFootAbsPos.x + CurrentLeftFootAbsPos.x;
       m_vdiffsupppre(1,0) = -CurrentRightFootAbsPos.y + CurrentLeftFootAbsPos.y;
       m_AngleDiffToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentRightFootAbsPos.theta;
-      m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentAbsZMPTheta;
-      
+      m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentAbsZMPTheta;    
     }
 
   ODEBUG4("ZMP::InitOnLine - Step 3 ","ZMDInitOnLine.txt");

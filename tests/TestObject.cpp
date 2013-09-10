@@ -31,7 +31,7 @@
 
 using namespace std;
 
-#define NB_OF_FIELDS 26
+#define NB_OF_FIELDS 38
 
 #ifdef WIN32
 double trunc (double x)
@@ -278,6 +278,7 @@ namespace PatternGeneratorJRL
 	  aFileName += "TestFGPI_description.dat";
 
 	  aof.open(aFileName.c_str(),ofstream::out);
+
 	  string Titles[NB_OF_FIELDS] =
 	    { "Time",
 	      "Com X",
@@ -292,12 +293,24 @@ namespace PatternGeneratorJRL
 	      "Left Foot X" ,
 	      "Left Foot Y" ,
 	      "Left Foot Z" ,
+	      "Left Foot dX" ,
+	      "Left Foot dY" ,
+	      "Left Foot dZ" ,
+	      "Left Foot ddX" ,
+	      "Left Foot ddY" ,
+	      "Left Foot ddZ" ,
 	      "Left Foot Theta" ,
 	      "Left Foot Omega" ,
 	      "Left Foot Omega2" ,
 	      "Right Foot X" ,
 	      "Right Foot Y" ,
 	      "Right Foot Z" ,
+	      "Right Foot dX" ,
+	      "Right Foot dY" ,
+	      "Right Foot dZ" ,
+	      "Right Foot ddX" ,
+	      "Right Foot ddY" ,
+	      "Right Foot ddZ" ,
 	      "Right Foot Theta" ,
 	      "Right Foot Omega" ,
 	      "Right Foot Omega2" ,
@@ -328,39 +341,52 @@ namespace PatternGeneratorJRL
 	  aof.open(aFileName.c_str(),ofstream::app);
 	  aof.precision(8);
 	  aof.setf(ios::scientific, ios::floatfield);
-	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "
-	      << filterprecision(m_OneStep.ZMPTarget(0) ) << " "
-	      << filterprecision(m_OneStep.ZMPTarget(1) ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.theta  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.y ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.z ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.theta ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "
+	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "                            // 1
+	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
+	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
+	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
+	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "                    // 5
+	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
+	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
+	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
+	      << filterprecision(m_OneStep.ZMPTarget(0) ) << " "                            // 9
+	      << filterprecision(m_OneStep.ZMPTarget(1) ) << " "                            // 10
+	      << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "                     // 11
+	      << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "                     // 12
+	      << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "                     // 13
+	      << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "                     // 14
+	      << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "                     // 15
+	      << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "                     // 16
+	      << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                     // 17
+	      << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                     // 18
+	      << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                     // 19
+	      << filterprecision(m_OneStep.LeftFootPosition.theta  ) << " "                 // 20
+	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
+	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
+	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23
+	      << filterprecision(m_OneStep.RightFootPosition.y ) << " "                     // 24
+	      << filterprecision(m_OneStep.RightFootPosition.z ) << " "                     // 25
+	      << filterprecision(m_OneStep.RightFootPosition.dx ) << " "                     // 26
+	      << filterprecision(m_OneStep.RightFootPosition.dy ) << " "                     // 27
+	      << filterprecision(m_OneStep.RightFootPosition.dz ) << " "                     // 28
+	      << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                     // 29
+	      << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                     // 30
+	      << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                     // 31
+	      << filterprecision(m_OneStep.RightFootPosition.theta ) << " "                 // 32
+	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 33
+	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 34
 	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
-	    m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
-	    +m_CurrentConfiguration(0) ) << " "
+				 m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
+				 +m_CurrentConfiguration(0) ) << " "                        // 35
 	      << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
-	    m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
-	    +m_CurrentConfiguration(1) ) << " "
-	      << filterprecision(m_CurrentConfiguration(0) ) << " "
-	      << filterprecision(m_CurrentConfiguration(1) ) << " "
+				 m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
+				 +m_CurrentConfiguration(1) ) << " "                        // 36
+	      << filterprecision(m_CurrentConfiguration(0) ) << " "                         // 37
+	      << filterprecision(m_CurrentConfiguration(1) ) << " "                         // 38
 	      << endl;
 	  aof.close();
-	}
+	  m_NbOfStoredVariables = 38;
+        }
     }
 
 

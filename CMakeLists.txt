@@ -51,6 +51,16 @@ ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.0.1")
 ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
 
 MESSAGE(STATUS "hrp2-dynamics: " ${HRP2_DYNAMICS_FOUND})
+
+# TODO kinda dirty patch to find lssol for now
+#  using ADD_OPTIONAL_DEPENDENCY prevents the creation 
+#  of classic variables such as ${PKG}_FOUND
+# hence we use ADD_REQUIRED_DEPENDENCY to get the data
+OPTION(USE_LSSOL "Do you want to use the solver lssol?" OFF)
+IF(USE_LSSOL)
+ ADD_REQUIRED_DEPENDENCY("lssol >= 0.1.0")
+ENDIF(USE_LSSOL)
+
 # Add aggressive optimization flags in release mode.
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET (CMAKE_CXX_FLAGS_RELEASE

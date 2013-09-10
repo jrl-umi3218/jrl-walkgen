@@ -21,6 +21,10 @@ IF(WIN32)
 ADD_DEFINITIONS("/D __STDC__")
 ENDIF(WIN32)
 
+IF(USE_LSSOL)
+ADD_DEFINITIONS("/DLSSOL_FOUND")
+ENDIF(USE_LSSOL)
+
 SET(SOURCES
   FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
@@ -38,13 +42,14 @@ SET(SOURCES
   Mathematics/Polynome.cpp
   Mathematics/PolynomeFoot.cpp
   Mathematics/PLDPSolver.cpp
-  Mathematics/PLDPHerdt.cpp
   Mathematics/qld.cpp
   Mathematics/StepOverPolynome.cpp
   PreviewControl/PreviewControl.cpp
   PreviewControl/OptimalControllerSolver.cpp
   PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp
   PreviewControl/LinearizedInvertedPendulum2D.cpp
+  PreviewControl/rigid-body.cpp
+  PreviewControl/rigid-body-system.cpp
   PreviewControl/SupportFSM.cpp
   ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.cpp
   ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp
@@ -79,3 +84,6 @@ INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen abstract-robot-dynamics)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-mal)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-dynamics)
+IF(USE_LSSOL)
+ PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen lssol)
+ENDIF(USE_LSSOL)
