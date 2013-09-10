@@ -28,7 +28,7 @@
 
 #include <PreviewControl/rigid-body.hh>
 #include <privatepgtypes.h>
-#include <PreviewControl/SupportFSM.h>
+#include <PreviewControl/SupportFSM.hh>
 #include <FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.h>
 #include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 

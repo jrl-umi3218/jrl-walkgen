@@ -33,7 +33,7 @@
 
 #include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
-#include <PreviewControl/SupportFSM.h>
+#include <PreviewControl/SupportFSM.hh>
 #include <PreviewControl/LinearizedInvertedPendulum2D.h>
 #include <PreviewControl/rigid-body-system.hh>
 #include <PreviewControl/rigid-body.hh>

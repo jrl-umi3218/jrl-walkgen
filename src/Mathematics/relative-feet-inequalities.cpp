@@ -36,8 +36,7 @@
 using namespace std;
 using namespace PatternGeneratorJRL;
 
-#include <Debug.h>
-
+#include <Debug.hh>
 
 
 RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,

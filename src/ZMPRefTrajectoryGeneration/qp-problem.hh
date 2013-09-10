@@ -30,7 +30,7 @@
 
 
 #include <jrl/mal/matrixabstractlayer.hh>
-#include <Mathematics/qld.h>
+#include <Mathematics/qld.hh>
 #include <privatepgtypes.h>
 #include <PreviewControl/rigid-body-system.hh>
 #include <PreviewControl/rigid-body.hh>

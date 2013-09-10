@@ -385,7 +385,6 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_CurrentConfiguration(1) ) << " "                         // 38
 	      << endl;
 	  aof.close();
-	  m_NbOfStoredVariables = 38;
         }
     }
 

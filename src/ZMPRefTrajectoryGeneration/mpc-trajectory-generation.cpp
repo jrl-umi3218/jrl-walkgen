@@ -25,7 +25,7 @@
 /* \file mpc-trajectory-generation.cpp
    \brief Abstract object for trajectory generation via model predictive control.*/
 
-#include <Debug.h>
+#include <Debug.hh>
 #include <ZMPRefTrajectoryGeneration/mpc-trajectory-generation.hh>
 
 

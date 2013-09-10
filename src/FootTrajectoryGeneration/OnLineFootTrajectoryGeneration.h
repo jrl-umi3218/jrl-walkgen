@@ -31,7 +31,7 @@
 #ifndef _ONLINE_FOOT_TRAJECTORY_GENERATION_H_
 #define _ONLINE_FOOT_TRAJECTORY_GENERATION_H_
 
-#include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.h>
+#include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.hh>
 
 namespace PatternGeneratorJRL
 {

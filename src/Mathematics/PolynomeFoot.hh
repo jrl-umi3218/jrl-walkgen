@@ -65,10 +65,10 @@ namespace PatternGeneratorJRL
 	are different from zero.
 	Final velocity is 0
        */
-      void SetParametersWithInitPosInitSpeed(double FT,
-					     double FP,
-					     double InitPos,
-					     double InitSpeed);
+      void SetParametersWithInitPosInitSpeed(double &FT,
+					     double &FP,
+					     double &InitPos,
+					     double &InitSpeed);
 
       void GetParametersWithInitPosInitSpeed(double &FT,
 					     double &FP,
@@ -125,6 +125,8 @@ namespace PatternGeneratorJRL
   /// Polynome used for X,Y and Theta trajectories.
   class  Polynome5 : public Polynome
     {
+    private:
+      double FT_, FP_, InitPos_, InitSpeed_,InitAcc_;
     public:
       /** Constructor:
 	  FT: Final time
@@ -139,9 +141,17 @@ namespace PatternGeneratorJRL
         are different from zero.
        */
       void SetParametersWithInitPosInitSpeed(double FT,
-          double FP,
-          double InitPos,
-          double InitSpeed);
+                                             double FP,
+                                             double InitPos,
+                                             double InitSpeed);
+      /*! Set the parameters such that
+        the initial position, and initial speed
+        are different from zero.
+       */
+      void GetParametersWithInitPosInitSpeed(double &FT,
+                                             double &FP,
+                                             double &InitPos,
+                                             double &InitSpeed);
 
       /// \brief Set parameters considering initial position, velocity, acceleration
       void SetParameters(double FT, double FP,

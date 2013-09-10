@@ -432,10 +432,10 @@ RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
       }
     break;
   case COP_POSITION:
-    for(int i=0;i<N_;i++)
+    for(unsigned int i=0;i<N_;i++)
       {
         Dynamics.S(i,0) = 1.0; Dynamics.S(i,1) = (i+1)*T_; Dynamics.S(i,2) = (i+1)*(i+1)*T_*T_*0.5-CoMHeight_/9.81;
-        for(int j=0;j<N_;j++)
+        for(unsigned int j=0;j<N_;j++)
           if (j<=i)
             Dynamics.U(i,j) = Dynamics.UT(j,i) = (1 + 3*(i-j) + 3*(i-j)*(i-j)) * T_*T_*T_/6.0 - T_*CoMHeight_/9.81;
           else

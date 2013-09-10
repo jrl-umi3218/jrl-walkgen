@@ -30,13 +30,14 @@ SET(SOURCES
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp
   FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp
+  FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.cpp
   GlobalStrategyManagers/CoMAndFootOnlyStrategy.cpp
   GlobalStrategyManagers/GlobalStrategyManager.cpp
   GlobalStrategyManagers/DoubleStagePreviewControlStrategy.cpp
   Mathematics/AnalyticalZMPCOGTrajectory.cpp
   Mathematics/ConvexHull.cpp
   Mathematics/FootConstraintsAsLinearSystem.cpp
-  Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
+#  Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
   Mathematics/FootHalfSize.cpp
   Mathematics/OptCholesky.cpp
   Mathematics/Polynome.cpp
@@ -44,6 +45,8 @@ SET(SOURCES
   Mathematics/PLDPSolver.cpp
   Mathematics/qld.cpp
   Mathematics/StepOverPolynome.cpp
+  Mathematics/relative-feet-inequalities.cpp
+  Mathematics/intermediate-qp-matrices.cpp
   PreviewControl/PreviewControl.cpp
   PreviewControl/OptimalControllerSolver.cpp
   PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp
@@ -56,12 +59,15 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp
   ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp
   ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.cpp
-  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQPDebug.cpp
   ZMPRefTrajectoryGeneration/OrientationsPreview.cpp
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp
   ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.cpp
   ZMPRefTrajectoryGeneration/problem-vel-ref.cpp
+  ZMPRefTrajectoryGeneration/qp-problem.cpp
+  ZMPRefTrajectoryGeneration/generator-vel-ref.cpp
+  ZMPRefTrajectoryGeneration/mpc-trajectory-generation.cpp
+  #ZMPRefTrajectoryGeneration/OnlineStepPositionTrajectoryGeneration.cpp
   MotionGeneration/StepOverPlanner.cpp
   MotionGeneration/CollisionDetector.cpp
   MotionGeneration/WaistHeightVariation.cpp
@@ -75,6 +81,7 @@ SET(SOURCES
   Clock.cpp
   PGTypes.cpp
   portability/gettimeofday.cc
+  privatepgtypes.cpp
   )
 
 ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES})

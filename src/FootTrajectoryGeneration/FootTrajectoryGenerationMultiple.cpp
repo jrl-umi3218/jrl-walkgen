@@ -250,6 +250,12 @@ int FootTrajectoryGenerationMultiple::SetParameters(unsigned int IntervalIndex,
   if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
     return -1;
 
+  return SetParametersWithInitPosInitSpeedInitAcc( IntervalIndex,
+                                                   AxisReference,
+                                                   TimeInterval,
+                                                   FinalPosition,
+                                                   0.0,0.0,0.0 );
+}
 /*! This method specifies the parameters for each of the polynome used by this
   object. In this case, as it is used for the 3rd order polynome. The polynome to
   which those parameters are set is specified with PolynomeIndex.
@@ -280,6 +286,34 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeedInitAcc(u
 											  InitPosition,
 											  InitSpeed,
 											  InitAcc);
+  return 0;
+}
+
+/*! This method get the parameters for each of the polynome used by this
+  object. In this case, as it is used for the 3rd order polynome. The polynome to
+  which those parameters are set is specified with PolynomeIndex. 
+  @param PolynomeIndex: Set to which axis the parameters will be applied. 
+  @param TimeInterval: Set the time base of the polynome.
+  @param Position: Set the final position of the polynome at TimeInterval.
+  @param InitPosition: Initial position when computing the polynome at t=0.0.
+  @param InitSpeed: Initial speed when computing the polynome at t=0.0.
+*/
+int FootTrajectoryGenerationMultiple::GetParametersWithInitPosInitSpeed(unsigned int IntervalIndex,
+									int AxisReference,
+									double &TimeInterval,
+									double &FinalPosition,
+									double &InitPosition,
+									double &InitSpeed)
+{
+  if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
+    return -1;
+
+
+  m_SetOfFootTrajectoryGenerationObjects[IntervalIndex]->GetParametersWithInitPosInitSpeed(AxisReference,
+											   TimeInterval,
+											   FinalPosition,
+											   InitPosition,
+											   InitSpeed);
   return 0;
 }
 

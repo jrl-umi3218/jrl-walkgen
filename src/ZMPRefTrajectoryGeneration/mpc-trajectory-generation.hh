@@ -35,7 +35,7 @@
 #include <string>
 
 #include <jrl/walkgen/pgtypes.hh>
-#include <SimplePlugin.h>
+#include <SimplePlugin.hh>
 
 namespace PatternGeneratorJRL
 {

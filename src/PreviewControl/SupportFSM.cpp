@@ -22,15 +22,11 @@
  *  Research carried out within the scope of the 
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/* TODO 3: Restructure the class
- *  setSupportState.cpp
- */
 
 #include <iostream>
 #include <fstream>
 
-#include <PreviewControl/SupportFSM.h>
-#include <Debug.hh>
+#include <PreviewControl/SupportFSM.hh>
 
 using namespace PatternGeneratorJRL;
 using namespace std;
@@ -43,20 +39,15 @@ SupportFSM::SupportFSM()
 ,CurrentSupportFoot_(LEFT)
 ,PostRotationPhase_(false)
 {
-  m_SSPeriod = 0.8; 	  //Duration of one step
-  m_DSDuration = 1e9;       //Duration of the DS phase
-  m_DSSSDuration = 0.8;
+  StepPeriod_ = 0.8; 	  //Duration of one step
+  DSPeriod_ = 1e9;       //Duration of the DS phase
+  DSSSPeriod_ = 0.8;
   //TODO: setNumberOfStepsSSDS
-  m_NbOfStepsSSDS = 200;
+  NbStepsSSDS_ = 200;
 
-  m_T = SamplingPeriod;
-
-  m_eps = 0.00000001;
-
-  m_FullDebug = 0;
-
+  T_ = 0.005;
 }
- 
+
 
 SupportFSM::~SupportFSM()
 {
@@ -156,20 +147,7 @@ SupportFSM::set_support_state(double time, unsigned int pi,
 	    Support.NbStepsLeft = Support.NbStepsLeft-1;
 	  if (ReferenceGiven)
 	    Support.NbStepsLeft = NbStepsSSDS_;
-
 	}
-    }
-  
-  if(m_FullDebug>0)
-    {
-      ofstream aof;
-      aof.open("SupportStates.dat", ios::app);
-      aof << "Time: "<<Time<<" PrwTime: "<<Time+pi*m_T
-  	  <<" CSF: "<<Support.Foot<<" CTL: "<<Support.TimeLimit
-  	  <<" SL: "<<Support.StepsLeft<<" *SF: "<<Support.Foot
-  	  <<" SN: "<<Support.StepNumber;
-      aof << endl;
-      aof.close();
     }
 
 }

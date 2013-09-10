@@ -24,24 +24,24 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/*! This object provides the generation of ZMP and CoM trajectory
-  using a new formulation of the stability problem.
-*/
+/*! Generate ZMP and CoM trajectories using Herdt2010IROS
+ */
 
 #ifndef _ZMPVELOCITYREFERENCEDQP_WITH_CONSTRAINT_H_
 #define _ZMPVELOCITYREFERENCEDQP_WITH_CONSTRAINT_H_
 
 
-
-#include <PreviewControl/LinearizedInvertedPendulum2D.hh>
-#include <Mathematics/FootConstraintsAsLinearSystemForVelRef.hh>
-#include <Mathematics/OptCholesky.hh>
+#include <PreviewControl/LinearizedInvertedPendulum2D.h>
+#include <PreviewControl/rigid-body-system.hh>
+#include <Mathematics/relative-feet-inequalities.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh>
-#include <Mathematics/PLDPSolverHerdt.hh>
 #include <PreviewControl/SupportFSM.hh>
-#include <FootTrajectoryGeneration/FootTrajectoryGenerationStandard.hh>
-#include <ZMPRefTrajectoryGeneration/OrientationsPreview.hh>
-#include <ZMPRefTrajectoryGeneration/problem-vel-ref.hh>
+#include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
+#include <ZMPRefTrajectoryGeneration/qp-problem.hh>
+#include <privatepgtypes.h>
+#include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
+#include <Mathematics/intermediate-qp-matrices.hh>
+#include <jrl/walkgen/pgtypes.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -51,69 +51,18 @@ namespace PatternGeneratorJRL
   class  ZMPVelocityReferencedQP : public ZMPRefTrajectoryGeneration
   {
 
+    //
+    // Public methods:
+    //
   public:
 
-    /* Default constructor. */
-    ZMPVelocityReferencedQP(SimplePluginManager *lSPM, string DataFile,
-			    CjrlHumanoidDynamicRobot *aHS=0);
+    ZMPVelocityReferencedQP(SimplePluginManager *SPM, string DataFile,
+                            CjrlHumanoidDynamicRobot *aHS=0);
 
-    /* Default destructor. */
     ~ZMPVelocityReferencedQP();
 
 
-    /*! \name Methods to build the optimization problem
-      @{
-    */
-
-    /*! \brief Compute the constant matrices over all the instances of the problem.
-      This means \f$P_{pu}, P_{px}, P_{vs}, P_{vu}\f$.
-      The necessary parameters to build those matrices are extracted from the
-      PreviewControl link.
-    */
-    int InitializeMatrixPbConstants();
-
-    /*! \brief This method does the same once the previous method has been called
-      to compute the static part of the optimization function.
-      Assuming that the optimization function is of the form
-      \f$ min_{u_k} \frac{1}{2} u^{\top}_k Q u_k + p^{\top}_k u_k \f$
-      this method computes \f$Q\f$, the constant part of $p^{\top}_k$.
-
-    */
-    int BuildingConstantPartOfTheObjectiveFunction();
-
-    /*! \brief Call the two previous methods
-      \return A negative value in case of a problem 0 otherwise.
-    */
-    int InitConstants();
-
-    void initFeet();
-
-
-    int buildConstraintMatrices(double * &DS, double * &DU,
-				double StartingTime,
-				deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfLConstraintInequalitiesFreeFeet,
-				deque<LinearConstraintInequalityFreeFeet_t>    & QueueOfFeetPosInequalities,
-				deque<SupportFeet_t>    & QueueOfSupportFeet,
-				double Com_Height,
-				int NbOfConstraints,
-				MAL_VECTOR(&xk,double));
-
-
-
-    /*! \brief Build the constant part of the constraint matrices. */
-    int BuildingConstantPartOfConstraintMatrices();
-
-    int buildConstraintMatricesPLDPHerdt();
-
-    /*! This method helps to build a linear system for constraining the ZMP. */
-    int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
-			    MAL_MATRIX(&A,double),
-			    MAL_MATRIX(&B,double));
-
-    /*! @} */
-
-
-    /*! Call method to handle the plugins (SimplePlugin interface) . */
+    /// \brief Handle plugins (SimplePlugin interface)
     void CallMethod(std::string &Method, std::istringstream &strm);
 
     /*! \name Call method to handle on-line generation of ZMP reference trajectory.
@@ -130,282 +79,154 @@ namespace PatternGeneratorJRL
       the queue of ZMP, and foot positions.
     */
     int InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-		   deque<COMState> & CoMStates,
-		   deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-		   deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions,
-		   FootAbsolutePosition & InitLeftFootAbsolutePosition,
-		   FootAbsolutePosition & InitRightFootAbsolutePosition,
-		   deque<RelativeFootPosition> &RelativeFootPositions,
-		   COMState & lStartingCOMState,
-		   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
+                   deque<COMState> & CoMStates,
+                   deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+                   deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+                   FootAbsolutePosition & InitLeftFootAbsolutePosition,
+                   FootAbsolutePosition & InitRightFootAbsolutePosition,
+                   deque<RelativeFootPosition> &RelativeFootPositions,
+                   COMState & lStartingCOMState,
+                   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
 
 
-    /* ! \brief Method to update the stacks on-line */
+    /// \brief Update the stacks on-line
     void OnLine(double time,
-		deque<ZMPPosition> & FinalZMPPositions,
-		deque<COMState> & CoMStates,
-		deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-		deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
+                deque<ZMPPosition> & FinalZMPPositions,
+                deque<COMState> & CoMStates,
+                deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+                deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
 
 
-    int validateConstraints(double * & DS,double * &DU,
-			    int NbOfConstraints,  int li,
-			    double *X, double time);
+    /// \name Accessors and mutators
+    /// \{
+    /// \brief Set the reference (velocity only as for now) through the Interface (slow)
+    void Reference(istringstream &strm)
+    {
+      strm >> NewVelRef_.Local.X;
+      strm >> NewVelRef_.Local.Y;
+      strm >> NewVelRef_.Local.Yaw;
+    }
+    inline void Reference(double dx, double dy, double dyaw)
+    {
+      NewVelRef_.Local.X = dx;
+      NewVelRef_.Local.Y = dy;
+      NewVelRef_.Local.Yaw = dyaw;
+    }
 
+    /// \brief Set the final-stage trigger
+    inline void EndingPhase(bool EndingPhase)
+    { EndingPhase_ = EndingPhase;}
 
-    /*! \name Setter and getter for the objective function parameters
-      @{
-    */
-
-    /*! Set the velocity reference */
-    void setVelReference(istringstream &strm);
-
-    /*! Set the velocity reference from external reference */
-    void setVelReference(double x,double y, double yaw);
-
-    /*! Set the velocity reference from external reference */
     void setCoMPerturbationForce(double x,double y);
-
     void setCoMPerturbationForce(istringstream &strm);
 
-    void interpolateFeet(deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-			 deque<FootAbsolutePosition> &RightFootAbsolutePositions);
+    solution_t & Solution()
+      { return Solution_; }
 
-    /*! Return \f$\alpha\f$ */
-    const double & GetAlpha() const;
+    inline const int & QP_N(void) const
+    { return QP_N_; }
+    /// \}
 
-    /*! Set \f$\alpha\f$ */
-    void SetAlpha(const double &);
 
-    /*! Return \f$\beta\f$ */
-    const double & GetBeta() const;
-
-    /*! Set \f$\beta\f$ */
-    void SetBeta(const double &);
-
-    /*! @}*/
-    /* @} */
-    ReferenceAbsoluteVelocity RefVel;
-
-    static const unsigned int QLD=0;
-    static const unsigned int QLDANDLQ=1;
-    static const unsigned int PLDP=2;
-    static const unsigned int PLDPHerdt = 3;
-
+    //
+    // Private members:
+    //
   private:
 
-    double m_RobotMass;
-    bool m_PerturbationOccured;
-    double m_FeetDistanceDS;
-    
-    bool m_EndingPhase;
-    double m_TimeToStopOnLineMode;
+    /// \brief (Updated) Reference
+    reference_t VelRef_;
+    /// \brief Temporary (updating) reference
+    reference_t NewVelRef_;
 
-    double m_FPx, m_FPy, m_FPtheta;
-    double m_StartTime;
+    /// \brief Total mass of the robot
+    double RobotMass_;
 
-    double m_UpperTimeLimitToUpdate;
+    /// \brief Perturbation trigger
+    bool PerturbationOccured_;
 
-    deque<SupportFeet_t> QueueOfSupportFeet;
+    /// \brief Final stage trigger
+    bool EndingPhase_;
 
-    double m_TimeBuffer;
+    /// \brief Time at which the online mode will stop
+    double TimeToStopOnLineMode_;
 
-    /*! Uses a 2D LIPM to simulate the evolution of the robot. */
-    LinearizedInvertedPendulum2D * m_2DLIPM;
+    /// \brief Time at which the problem should be updated
+    double UpperTimeLimitToUpdate_;
 
-    /*! Uses a Finite State Machine to simulate the evolution of the support states. */
-    SupportFSM * m_SupportFSM;
+    /// \brief Security margin for trajectory queues
+    double TimeBuffer_;
 
-    /*! Deecoupled optimization problem to compute the evolution of feet angles. */
-    OrientationsPreview * m_OP;
+    /// \brief Additional term on the acceleration of the CoM
+    MAL_VECTOR(PerturbationAcceleration_,double);
 
-    /*! \brief Object creating Linear inequalities constraints
-      based on the foot position. Those constraints are *NOT* the
-      one put in the QP, but they are a necessary intermediate step. */
-    FootConstraintsAsLinearSystemForVelRef * m_fCALS;
+    /// \brief Sampling period considered in the QP
+    double QP_T_;
 
-    /*! \brief Standard polynomial trajectories for the feet. */
-    FootTrajectoryGenerationStandard * m_FTGS;
+    /// \brief Nb. samplings inside preview window
+    int QP_N_;
 
-    /*! Constraint on X and Y */
-    double m_ConstraintOnX, m_ConstraintOnY;
+    /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
+    LinearizedInvertedPendulum2D CoM_;
 
-    /*! Com height */
-    double m_ComHeight;
+    /// \brief Simplified robot model
+    RigidBodySystem * Robot_;
 
-    /*! Current state of the trunk and the trunk state after m_QP_T*/
-    COMState m_TrunkState, m_TrunkStateT;
+    /// \brief Finite State Machine to simulate the evolution of the support states.
+    SupportFSM * SupportFSM_;
 
-    deque<COMState> m_QueueOfTrunkStates;
+    /// \brief Decoupled optimization problem to compute the evolution of feet angles.
+    OrientationsPreview * OrientPrw_;
 
-    double m_a, m_TrunkPolCoeffB, m_c, m_d, m_TrunkPolCoeffE;
+    /// \brief Generator of QP problem
+    GeneratorVelRef * VRQPGenerator_;
 
-    //Additional term on the acceleration of the CoM
-    MAL_VECTOR(m_PerturbationAcceleration,double);
+    /// \brief Intermediate QP data
+    IntermedQPMat * IntermedData_;
 
-    /*! Sampling of the QP. */
-    double m_QP_T;
+    /// \brief Object creating linear inequalities relative to feet centers.
+    RelativeFeetInequalities * RFI_;
 
-    /*! Preview window */
-    int m_QP_N;
+    /// \brief Final optimization problem
+    QPProblem Problem_;
 
-    /*! Orientations of the previewed support feet */
-    deque<double> m_PreviewedSupportAngles;
-
-    //Final optimization problem
-    Problem m_Pb;
-
-    SupportState_t m_CurrentSupport, m_PrwSupport;
-
-    /*! \name Variables related to the QP
-      @{ */
-    /*! \brief Matrix relating the command and the CoM position. */
-    MAL_MATRIX(m_PPu,double);
-
-    /*! \brief Matrix relating the command and the ZMP position. */
-    MAL_MATRIX(m_PZu,double);
-
-    /*! \brief Matrix relating the command and the CoM speed. */
-    MAL_MATRIX(m_VPu,double);
-
-    /*! \brief Matrix relating the CoM state and the CoM position. */
-    MAL_MATRIX(m_PPx,double);
-
-    /*! \brief Matrix relating the CoM state and the ZMP position. */
-    MAL_MATRIX(m_PZx,double);
-
-    /*! \brief Matrix relating the CoM state and the CoM speed. */
-    MAL_MATRIX(m_VPx,double);
-
-    /*! \brief Selection matrix for the previewed feet positions. */
-    MAL_MATRIX(m_U,double);
-
-    /*! \brief Selection matrix for the support feet. */
-    MAL_VECTOR(m_Uc,double);
-
-    /*! \brief Matrix of the objective function $Q$ */
-    //    double *m_Q;
-
-    /*! \brief Cholesky decomposition of the initial objective function $Q$ */
-    MAL_MATRIX(m_LQ,double);
-
-    /*! \brief Cholesky decomposition of the initial objective function $Q$ */
-    MAL_MATRIX(m_iLQ,double);
-
-    /*! \brief Optimized cholesky decomposition */
-    OptCholesky * m_OptCholesky;
-
-    /*! \brief Sub matrix to compute the linear part of the objective function $p^{\top}_k$. */
-    MAL_MATRIX(m_OptA,double);
-    MAL_MATRIX(m_OptB,double);
-    MAL_MATRIX(m_OptC,double);
-    MAL_MATRIX(m_OptD,double);
-
-    enum MatrixType  { M_PPU, M_PZU, M_VPU, M_PPX,
-			M_PZX, M_VPX, M_U, 
-			M_LQ, M_ILQ};
-    enum VectorType  {m_UC,M_OPTA, M_OPTB,	M_OPTC, M_OPTD };
-      
-    /*! \name Parameters of the objective function
-      @{ */
-    /*! Putting weight on the velocity */
-    double m_Beta;
-
-    /*! Putting weight on the jerk minimization. */
-    double m_Alpha;
-    /*! @} */
-
-    /*! Putting weight on the ZMP */
-    double m_Gamma;
-
-    /* Constant parts of the linear constraints. */
-    double * m_Pu;
-
-    /* Constant parts of the linear constraints. */
-    MAL_MATRIX(m_iPu,double);
-
-    /* Constant parts of the dynamical system. */
-    MAL_MATRIX(m_Px,double);
-
-    /*! \brief Debugging variable: dump everything is set to 1 */
-    int m_FullDebug;
-
-    /*! \brief Fast formulations mode. */
-    unsigned int m_FastFormulationMode;
-
-    //! Primal Least square Distance Problem solver *\/ */
-    Optimization::Solver::PLDPSolverHerdt * m_PLDPSolverHerdt;
-
-    void initializeProblem();
-
-    void computeCholeskyOfQ(double * OptA);
-
-    void computeObjective(deque<LinearConstraintInequalityFreeFeet_t> & QueueOfLConstraintInequalitiesFreeFeet,
-			  deque<SupportFeet_t> & QueueOfSupportFeet,
-			  int NbOfConstraints, int NbOfEqConstraints,
-			  int & CriteriaToMaximize, MAL_VECTOR(& xk,double), double time);
+    /// \brief Previewed Solution
+    solution_t Solution_;
 
 
-    void interpolateTrunkState(double time, int CurrentIndex,
-			       deque<COMState> & FinalCOMStates);
 
-    void interpolateFeetPositions(double time, int CurrentIndex,
-				  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-				  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
-    /*! \name Debugging related methods 
-     @{*/
-    /*! \brief Dump the instance of the quadratic problem for one iteration. */
-    int dumpProblem(MAL_VECTOR(& xk,double),
-		    double Time);
-
-    /*! \brief Debugging point for the constructor. */
-    void debugConstructor();
-
-    /*! \brief Dumping matrix specified by MatrixID in aos. */
-    void debugMatrix(ostream & aos, enum MatrixType MatrixID);
-
-    /*! \brief Dumping matrix specified by MatrixID in file named filename. */
-    void debugMatrix(const char *filename, enum MatrixType MatrixID);
-    /*! @} */
-    
   public:
 
-    /*! Methods to comply with the initial interface of ZMPRefTrajectoryGeneration.
-      TODO: Change the internal structure to make those methods not mandatory
-      for compiling.
-    */
-
     void GetZMPDiscretization(std::deque<ZMPPosition> & ZMPPositions,
-			      std::deque<COMState> & COMStates,
-			      std::deque<RelativeFootPosition> &RelativeFootPositions,
-			      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-			      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-			      double Xmax,
-			      COMState & lStartingCOMState,
-			      MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
-			      FootAbsolutePosition & InitLeftFootAbsolutePosition,
-			      FootAbsolutePosition & InitRightFootAbsolutePosition);
+                              std::deque<COMState> & COMStates,
+                              std::deque<RelativeFootPosition> &RelativeFootPositions,
+                              std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+                              std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+                              double Xmax,
+                              COMState & lStartingCOMState,
+                              MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+                              FootAbsolutePosition & InitLeftFootAbsolutePosition,
+                              FootAbsolutePosition & InitRightFootAbsolutePosition);
 
     void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-		       std::deque<ZMPPosition> & FinalZMPPositions,
-		       std::deque<COMState> & COMStates,
-		       std::deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-		       std::deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-		       bool EndSequence);
+                       std::deque<ZMPPosition> & FinalZMPPositions,
+                       std::deque<COMState> & COMStates,
+                       std::deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+                       std::deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
+                       bool EndSequence);
 
     int OnLineFootChange(double time,
-			 FootAbsolutePosition &aFootAbsolutePosition,
-			 deque<ZMPPosition> & FinalZMPPositions,
-			 deque<COMState> & CoMPositions,
-			 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-			 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
-			 StepStackHandler  *aStepStackHandler);
+                         FootAbsolutePosition &aFootAbsolutePosition,
+                         deque<ZMPPosition> & FinalZMPPositions,
+                         deque<COMState> & CoMPositions,
+                         deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+                         deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
+                         StepStackHandler  *aStepStackHandler);
 
     void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-			      deque<COMState> &FinalCOMStates,
-			      deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-			      deque<FootAbsolutePosition> &RightFootAbsolutePositions);
+                              deque<COMState> &FinalCOMTraj_deq,
+                              deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+                              deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
     int ReturnOptimalTimeToRegenerateAStep();
   };

@@ -37,14 +37,8 @@ using namespace std;
 
 const double OrientationsPreview::EPS_ = 0.00000001;
 
-OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
-					 const unsigned int & SamplingsPreviewed, const double & SSPeriod,
-					 CjrlJoint *aRootJoint)
+OrientationsPreview::OrientationsPreview( CjrlJoint *aRootJoint)
 {
-  m_T = SamplingPeriod;
-  m_N = SamplingsPreviewed;
-  m_SSPeriod = SSPeriod;
-
 
   lLimitLeftHipYaw_ = aRootJoint->childJoint(1)->lowerBound(0);//-30.0/180.0*M_PI;
   uLimitLeftHipYaw_  = aRootJoint->childJoint(1)->upperBound(0);//45.0/180.0*M_PI;
@@ -71,31 +65,16 @@ OrientationsPreview::OrientationsPreview(const double & SamplingPeriod,
   uLimitFeet_ = 5.0/180.0*M_PI;
 }
 
-
-  m_FullDebug = 0;
-
-  //TODO 1: How does ODEBUG/RESETDEBUG get activated?
-  if(m_FullDebug>2)
-    {
-      ofstream aof;
-      aof.open("/tmp/previewOrientations.dat",ofstream::out);
-      aof.close();
-      aof.open("/tmp/verifyAccelerationOfHipJoint.dat",ofstream::out);
-      aof.close();
-    }
-
-}
-
 OrientationsPreview::~OrientationsPreview() {
 }
 
 void
 OrientationsPreview::preview_orientations(double Time,
-    const reference_t & Ref,
-    double StepDuration,
-    const std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
-    const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
-    solution_t & Solution)
+                                          const reference_t & Ref,
+                                          double StepDuration,
+                                          const std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
+                                          const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
+                                          solution_t & Solution)
 {
 
   const deque<support_state_t> & PrwSupportStates_deq = Solution.SupportStates_deq;
@@ -111,18 +90,9 @@ OrientationsPreview::preview_orientations(double Time,
   const FootAbsolutePosition & LeftFoot = LeftFootPositions_deq.back();
   const FootAbsolutePosition & RightFoot = RightFootPositions_deq.back();
 
-  if(m_FullDebug>2)
-    {
-      ofstream aof;
-      aof.open("/tmp/previewOrientations.dat",ofstream::app);
-      aof<<endl<<endl;
-      aof<<"Time: "<<Time<<" LeftFootAbsolutePositions[0].theta*M_PI/180.0: "<<LeftFootAbsolutePositions[0].theta*M_PI/180.0<<
-	" RightFootAbsolutePositions[0].theta*M_PI/180.0: "<<RightFootAbsolutePositions[0].theta*M_PI/180.0
-	 <<" Last LeftFootAbsolutePosition: "<<lF_it->theta*M_PI/180.0<<
-	" Last RightFootAbsolutePosition: "<<rF_it->theta*M_PI/180.0<<endl;
-      aof.close();
-    }
-
+  bool TrunkVelOK = false;
+  bool TrunkAngleOK = false;
+  
   // In case of double support the next support angle is fixed
   // ds -> FirstFootPreviewed == 0
   // ss -> FirstFootPreviewed == 1
@@ -130,7 +100,7 @@ OrientationsPreview::preview_orientations(double Time,
 
   signRotVelTrunk_ = (TrunkStateT_.yaw[1] < 0.0)?-1.0:1.0;
 
-  m_signRotVelTrunk = (TrunkStateT.yaw[1] < 0.0)?-1.0:1.0;
+  unsigned StepNumber = 0;
 
   // Parameters of the trunk polynomial (fourth order)
   double a,b,c,d,e;
@@ -138,7 +108,7 @@ OrientationsPreview::preview_orientations(double Time,
   // Trunk angle at the end of the current support phase
   double PreviewedTrunkAngleEnd;
 
-  while(!m_TrunkVelOK)
+  while(!TrunkVelOK)
     {
       // Initialize support orientation:
       // -------------------------------
@@ -312,7 +282,7 @@ OrientationsPreview::verify_angle_hip_joint(const support_state_t & CurrentSuppo
       uJointLimit = uLimitRightHipYaw_;
       lJointLimit = lLimitRightHipYaw_;
     }
-  JointLimit = (TrunkStateT.yaw[1] < 0.0)?lJointLimit:uJointLimit;
+  JointLimit = (TrunkStateT_.yaw[1] < 0.0)?lJointLimit:uJointLimit;
 
   // Determine a new orientation if limit violated
   if (fabs(PreviewedTrunkAngleEnd - CurrentSupportFootAngle)>fabs(JointLimit))
