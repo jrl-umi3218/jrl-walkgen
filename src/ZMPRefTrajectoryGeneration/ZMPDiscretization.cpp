@@ -536,7 +536,7 @@ void ZMPDiscretization::UpdateCurrentSupportFootPosition(RelativeFootPosition aR
   v(1,0) = aRFP.sy;
   
   Orientation = MAL_RET_A_by_B(MM , Orientation);
-  v2 = MAL_RET_A_by_B(Orientation, v);
+  MAL_C_eq_A_by_B(v2,Orientation, v);
   ODEBUG("v :" << v  << " "
 	  "v2 : " << v2 << " "
 	  "Orientation : " << Orientation << " "
@@ -673,7 +673,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   
   MAL_VECTOR_DIM(ZMPInWorldCoordinates,double,3);
   
-  ZMPInWorldCoordinates = MAL_RET_A_by_B(m_CurrentSupportFootPosition, ZMPInFootCoordinates); 
+  MAL_C_eq_A_by_B(ZMPInWorldCoordinates,m_CurrentSupportFootPosition, ZMPInFootCoordinates); 
   
   delta_x = (ZMPInWorldCoordinates(0) - px0)/SizeOf1stPhase;
   delta_y = (ZMPInWorldCoordinates(1) - py0)/SizeOf1stPhase;
@@ -801,7 +801,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       
       v(0,0) = m_RelativeFootPositions[1].sx;
       v(1,0) = m_RelativeFootPositions[1].sy;
-      vdiffsupp = MAL_RET_A_by_B(Orientation,v);
+      MAL_C_eq_A_by_B(vdiffsupp,Orientation,v);
 	  
       vrel = vdiffsupp + m_vdiffsupppre;
 
@@ -835,6 +835,9 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   double ModulatedSingleSupportTime = lTsingle * m_ModulationSupportCoefficient;
   double EndOfLiftOff = (lTsingle-ModulatedSingleSupportTime)*0.5;
 
+  ODEBUG("ModulatedSingleSupportTime:" << ModulatedSingleSupportTime << " " 
+          << vrel(0,0) << " " 
+          << vrel(1,0));
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::X_AXIS,
 						    ModulatedSingleSupportTime,vrel(0,0));
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::Y_AXIS,
@@ -848,6 +851,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::OMEGA2_AXIS,
 						    ModulatedSingleSupportTime,2*m_Omega);
   
+  //  m_FootTrajectoryGenerationStandard->print();
 
   //m_PolynomeZMPTheta->SetParameters(lTsingle,NextZMPTheta);
   m_PolynomeZMPTheta->SetParameters(lTsingle,RelZMPTheta);
@@ -880,7 +884,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 	  
       MAL_VECTOR_DIM(ZMPInWorldCoordinates,double,3);
 
-      ZMPInWorldCoordinates = MAL_RET_A_by_B(m_CurrentSupportFootPosition, 
+      MAL_C_eq_A_by_B(ZMPInWorldCoordinates,m_CurrentSupportFootPosition, 
 					     ZMPInFootCoordinates); 
 
       ODEBUG4("CSFP: " << m_CurrentSupportFootPosition << endl <<
@@ -927,7 +931,6 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 	ZMPPositions[indexinitial].theta;
 
       ZMPPositions[CurrentZMPindex].stepType = WhoIsSupportFoot*m_RelativeFootPositions[0].stepType;
-	  
       if (WhoIsSupportFoot==1)
 	{
 	  m_FootTrajectoryGenerationStandard->UpdateFootPosition(LeftFootAbsolutePositions,

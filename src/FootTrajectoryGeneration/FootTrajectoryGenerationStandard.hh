@@ -192,6 +192,7 @@ namespace PatternGeneratorJRL
    
    /*! @} */
    
+    void print();
 
   protected:
    

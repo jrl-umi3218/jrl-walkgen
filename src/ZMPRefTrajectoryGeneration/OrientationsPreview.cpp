@@ -338,13 +338,20 @@ OrientationsPreview::verify_velocity_hip_joint(double Time,
       d = (-b*T+2*a-2*PreviewedSupportAngle)/(T*T*T);
 
       //maximal speed violated
-      if(df(a,b,c,d,-1.0/3.0*c/d)>uvLimitFoot_)
+      double temp;
+      if(d==0)
+        temp = 0;
+      else
+        temp = -1.0/3.0*c/d;
+
+      if(df(a,b,c,d,temp)>uvLimitFoot_)
         {
           a = 0;
           c = -1.0/(2.0*T)*(2.0*b-2.0*uvLimitFoot_+2.0*sqrt(uvLimitFoot_*uvLimitFoot_-b*uvLimitFoot_));
           d = (-2.0*c-b/T)/(3.0*T);
           PreviewedSupportAngle = f(a,b,c,d,T);
         }
+      
     }
 
 }

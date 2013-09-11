@@ -89,7 +89,7 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   m_AnklePositionLeft[1] = -lWidth*0.5 + AnklePosition[1];
   m_AnklePositionLeft[2] = AnklePosition[2];
 
-  RESETDEBUG4("GeneratedFoot.dat");
+  RESETDEBUG5("GeneratedFoot.dat");
 }
 
 FootTrajectoryGenerationStandard::~FootTrajectoryGenerationStandard()
@@ -148,8 +148,8 @@ void FootTrajectoryGenerationStandard::FreeInternalDataStructures()
 }
 
 int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex,
-						     double TimeInterval,
-						     double Position)
+                                                    double TimeInterval,
+                                                    double Position)
 {
  switch (PolynomeIndex)
    {
@@ -456,6 +456,9 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
     }
 
   curr_NSFAP.z = init_NSFAP.z + m_PolynomeZ->Compute(LocalTime);
+  ODEBUG("x:" << curr_NSFAP.x << " LocalTime - EndOfLiftOff" << LocalTime - EndOfLiftOff
+          << " " << m_PolynomeX->Compute(LocalTime - EndOfLiftOff));
+  //  m_PolynomeX->print();
   
   bool ProtectionNeeded=false;
 
@@ -553,7 +556,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   curr_NSFAP.z += dFZ ;
 #endif
  
-  ODEBUG4( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift 
+  ODEBUG5( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift 
 	   << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )" 
 	   << curr_NSFAP.x << " "
 	   << curr_NSFAP.y << " "
@@ -585,7 +588,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   SupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = (-1)*StepType;
 
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = StepType;
-  // cout<<"LocalInterpolationStartTime+InterpolationTime: "<<LocalInterpolationStartTime+InterpolationTime;
+  cout<<"LocalInterpolationStartTime+InterpolationTime: "<<LocalInterpolationStartTime+InterpolationTime;
   if (LocalInterpolationStartTime +InterpolationTime <= EndOfLiftOff || LocalInterpolationStartTime +InterpolationTime >= StartLanding)
     {
       // Do not modify x, y and theta while liftoff.
@@ -764,7 +767,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z += dFZ ;
 #endif
  
-  ODEBUG4( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift 
+  ODEBUG5( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift 
 	   << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )" 
 	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x << " "
 	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y << " "
@@ -829,5 +832,20 @@ void FootTrajectoryGenerationStandard::ComputingAbsFootPosFromQueueOfRelPos(dequ
     }
 }
 
-
+void FootTrajectoryGenerationStandard::print()
+{
+  std::cout << "Polynome X:" <<std::endl;
+  m_PolynomeX->print();
+  std::cout << "Polynome Y:" <<std::endl;
+  m_PolynomeY->print();
+  std::cout << "Polynome Z:" <<std::endl;
+  m_PolynomeZ->print();
+  std::cout << "Polynome Roll:" <<std::endl;
+  m_PolynomeOmega->print();
+  std::cout << "Polynome Pitch:" <<std::endl;
+  m_PolynomeOmega2->print();
+  std::cout << "Polynome Yaw:" <<std::endl;
+  m_PolynomeTheta->print();
+  
+}
 

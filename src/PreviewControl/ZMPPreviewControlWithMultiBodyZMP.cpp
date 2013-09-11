@@ -69,9 +69,9 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
   RESETDEBUG4("DebugConfSO.dat");
   RESETDEBUG4("DebugConfSV.dat");
   RESETDEBUG4("DebugConfSA.dat");
-  RESETDEBUG4("DebugDataCheckZMP1.txt");
+  RESETDEBUG5("DebugDataCheckZMP1.txt");
   RESETDEBUG4("2ndStage.dat");
-  RESETDEBUG4("ZMPPCWMZOGSOC.dat");
+  RESETDEBUG5("ZMPPCWMZOGSOC.dat");
   // Sampling period.
   m_SamplingPeriod = -1;
   
@@ -208,7 +208,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[m_NL];
    FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[m_NL];
 
-   ODEBUG4SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
+   ODEBUG5SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
 		 m_FIFOZMPRefPositions[0].py << " " <<
 		 m_FIFOZMPRefPositions[0].pz << " " <<
 		 acompos.x[0] << " " <<
@@ -459,7 +459,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    // compute the ZMP related to the motion found by CoMAndZMPRealization.
    MAL_S3_VECTOR_TYPE(double) ZMPmultibody;
    ZMPmultibody = m_HumanoidDynamicRobot->zeroMomentumPoint();
-   ODEBUG4(ZMPmultibody[0] << " " << ZMPmultibody[1], "DebugDataCheckZMP1.txt");
+   ODEBUG5(ZMPmultibody[0] << " " << ZMPmultibody[1], "DebugDataCheckZMP1.txt");
    MAL_S3_VECTOR_TYPE(double) CoMmultibody;
    CoMmultibody = m_HumanoidDynamicRobot->positionCenterOfMass();
    ODEBUG("Stage 2");
@@ -631,7 +631,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[localindex];
    FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[localindex];
 
-   ODEBUG4SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
+   ODEBUG5SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
 		 m_FIFOZMPRefPositions[0].py << " " <<
 		 m_FIFOZMPRefPositions[0].pz << " " <<
 		 acompos.x[0] << " " <<

@@ -399,7 +399,7 @@ namespace PatternGeneratorJRL
 	  string aFileName;
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI.dat";
-          ODEBUG3("Report:" << aFileName);
+          ODEBUG("Report:" << aFileName);
           unsigned max_nb_of_pbs=100;
           unsigned nb_of_pbs = 0;
 
@@ -414,7 +414,7 @@ namespace PatternGeneratorJRL
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI.datref";
 	  arif.open(aFileName.c_str(),ifstream::in);
-          ODEBUG3("ReportRef:" << aFileName);
+          ODEBUG("ReportRef:" << aFileName);
 
           if (!arif.is_open())
             {

@@ -700,6 +700,9 @@ namespace PatternGeneratorJRL
     /*! \brief Register the methods handled by the SimplePlugin part of this object. */
     void RegisterPluginMethods();
 
+    /*! \brief Start FPE trapping. */
+    void AllowFPE();
+
   protected:
 
     /*! \name Internal methods which are not to be exposed. 

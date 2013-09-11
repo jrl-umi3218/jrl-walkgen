@@ -355,9 +355,13 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
   x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
   y = MAL_RET_A_by_B(m_A,y) + uy * m_B;
 
-  zmpx2 = (MAL_RET_A_by_B(m_C,x))(0,0);
-  zmpy2 = (MAL_RET_A_by_B(m_C,y))(0,0);
-  
+  zmpx2 = 0.0;
+  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(x);i++)
+    zmpx2 += m_C(0,i)*x(i,0);
+  zmpy2 = 0.0;
+  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(y);i++)
+    zmpy2 += m_C(0,i)*y(i,0);
+    
   if (Simulation)
     {
       sxzmp += (ZMPPositions[lindex].px - zmpx2);
@@ -399,7 +403,10 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
   ODEBUG(" ux preview window phase: " << ux );
   x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
    
-  zmpx2 = (MAL_RET_A_by_B(m_C,x))(0,0);
+  zmpx2 = 0.0;
+  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(x);i++)
+    zmpx2 += m_C(0,i)*x(i,0);
+
   
   if (Simulation)
     {
@@ -459,8 +466,10 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
     }
   ODEBUG(" ux preview window phase: " << ux );
   x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
-   
-  zmpx2 = (MAL_RET_A_by_B(m_C,x))(0,0);
+  
+  zmpx2 = 0.0;
+  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(x);i++)
+    zmpx2 += m_C(0,i)*x(i,0);
   
   if (Simulation)
     {

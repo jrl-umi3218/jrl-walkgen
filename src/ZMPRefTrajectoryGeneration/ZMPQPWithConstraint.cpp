@@ -917,20 +917,22 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
 
   //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
   MAL_MATRIX(lterm1,double);
-  lterm1 = MAL_RET_TRANSPOSE(PPu);
-  lterm1 = MAL_RET_A_by_B(lterm1, PPu);
-  lterm1 = beta * lterm1;
+  MAL_MATRIX(tmp,double);
+
+  tmp = MAL_RET_TRANSPOSE(PPu);
+  MAL_C_eq_A_by_B(lterm1, tmp,PPu);
+  //  MAL_C_eq_A_by_B(lterm1,beta,tmp);
 
   MAL_MATRIX(lterm2,double);
-  lterm2 = MAL_RET_TRANSPOSE(VPu);
-  lterm2 = MAL_RET_A_by_B(lterm2, VPu);
-  lterm2 = alpha * lterm2;
+  tmp = MAL_RET_TRANSPOSE(VPu);
+  MAL_C_eq_A_by_B(lterm2, tmp,VPu);
+  //MAL_C_eq_A_by_B(lterm2,alpha,tmp);
 
   MAL_MATRIX_RESIZE(OptA,
 		    MAL_MATRIX_NB_ROWS(lterm1),
 		    MAL_MATRIX_NB_COLS(lterm1));
-  MAL_MATRIX_SET_IDENTITY(OptA);
-  OptA = OptA + lterm1 + lterm2;
+  //MAL_MATRIX_SET_IDENTITY(OptA);
+  OptA = beta*lterm1 + alpha*lterm2;
 
 
 
@@ -959,11 +961,11 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
     }
   
   lterm1 = MAL_RET_TRANSPOSE(PPu);
-  lterm1 = MAL_RET_A_by_B(lterm1,PPx);
+  MAL_C_eq_A_by_B(lterm1,lterm1,PPx);
   OptB = MAL_RET_TRANSPOSE(VPu);
-  OptB = MAL_RET_A_by_B(OptB,VPx);
-  OptB = alpha * OptB;
-  OptB = OptB + beta * lterm1;
+  MAL_C_eq_A_by_B(tmp,OptB,VPx);
+  OptB = alpha*tmp;
+  OptB += beta * lterm1;
 
   if (0)
   {

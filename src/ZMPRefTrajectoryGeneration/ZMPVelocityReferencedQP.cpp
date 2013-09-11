@@ -329,6 +329,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
     deque<COMState> & FinalCOMTraj_deq,
     deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
     deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
+
 {
 
   // If on-line mode not activated we go out.

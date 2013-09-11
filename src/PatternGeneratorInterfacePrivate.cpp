@@ -33,6 +33,7 @@
    generation architecture. */
 #include <fstream>
 #include <time.h>
+#include <fenv.h>
 
 #include "portability/gettimeofday.hh"
 #include "portability/bzero.hh"
@@ -49,6 +50,7 @@ namespace PatternGeneratorJRL {
   PatternGeneratorInterfacePrivate::PatternGeneratorInterfacePrivate(CjrlHumanoidDynamicRobot *aHDR)
     : PatternGeneratorInterface(aHDR),SimplePlugin(this)
   {
+    //AllowFPE();
     m_HumanoidDynamicRobot = aHDR;
 
     ODEBUG4("Step 0","DebugPGI.txt");
@@ -94,7 +96,10 @@ namespace PatternGeneratorJRL {
 
     m_SamplingPeriod = m_PC->SamplingPeriod();
     m_PreviewControlTime = m_PC->PreviewControlTime();
-    m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+    if(m_SamplingPeriod==0)
+      m_NL = 0;
+    else
+      m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
 
     /* For debug purposes. */
     MAL_VECTOR_RESIZE(m_Debug_prev_qr,6);
@@ -168,6 +173,11 @@ namespace PatternGeneratorJRL {
     m_ZMPInitialPointSet = false;
 
     RegisterPluginMethods();
+  }
+
+  void PatternGeneratorInterfacePrivate::AllowFPE()
+  {
+    feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
   }
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()

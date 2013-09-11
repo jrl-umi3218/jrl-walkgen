@@ -187,7 +187,6 @@ protected:
 	{105*200,&TestHerdt2010::stop},
 	{110*200,&TestHerdt2010::stopOnLineWalking}};
     
-    ODEBUG3("NbOfIt: " << m_OneStep.NbOfIt);
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
       { 
