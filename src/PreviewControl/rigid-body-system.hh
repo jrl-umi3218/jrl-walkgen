@@ -27,7 +27,7 @@
 #define _RIGID_BODY_SYSTEM_
 
 #include <PreviewControl/rigid-body.hh>
-#include <privatepgtypes.h>
+#include <privatepgtypes.hh>
 #include <PreviewControl/SupportFSM.hh>
 #include <FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.h>
 #include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>

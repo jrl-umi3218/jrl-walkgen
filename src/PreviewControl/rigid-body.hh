@@ -29,7 +29,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <deque>
 #include <jrl/walkgen/pgtypes.hh>
-#include <privatepgtypes.h>
+#include <privatepgtypes.hh>
 
 namespace PatternGeneratorJRL
 {

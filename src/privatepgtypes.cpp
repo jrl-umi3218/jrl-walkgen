@@ -22,7 +22,7 @@
  *  Research carried out within the scope of the 
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-#include <privatepgtypes.h>
+#include <privatepgtypes.hh>
 
 #include <iostream>
 #include <fstream>

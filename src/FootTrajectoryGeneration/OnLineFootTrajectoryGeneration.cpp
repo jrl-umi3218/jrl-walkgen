@@ -27,7 +27,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <privatepgtypes.h>
+#include <privatepgtypes.hh>
 
 #include "OnLineFootTrajectoryGeneration.h"
 

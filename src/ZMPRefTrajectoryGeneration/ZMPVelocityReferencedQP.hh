@@ -31,14 +31,14 @@
 #define _ZMPVELOCITYREFERENCEDQP_WITH_CONSTRAINT_H_
 
 
-#include <PreviewControl/LinearizedInvertedPendulum2D.h>
+#include <PreviewControl/LinearizedInvertedPendulum2D.hh>
 #include <PreviewControl/rigid-body-system.hh>
 #include <Mathematics/relative-feet-inequalities.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh>
 #include <PreviewControl/SupportFSM.hh>
-#include <ZMPRefTrajectoryGeneration/OrientationsPreview.h>
+#include <ZMPRefTrajectoryGeneration/OrientationsPreview.hh>
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
-#include <privatepgtypes.h>
+#include <privatepgtypes.hh>
 #include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>
 #include <jrl/walkgen/pgtypes.hh>

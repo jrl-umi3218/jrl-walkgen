@@ -38,7 +38,7 @@
 
 
 #include <jrl/walkgen/pgtypes.hh>
-#include <privatepgtypes.h>
+#include <privatepgtypes.hh>
 #include <Mathematics/ConvexHull.hh>
 #include <Mathematics/FootHalfSize.hh>
 #include <SimplePlugin.hh>

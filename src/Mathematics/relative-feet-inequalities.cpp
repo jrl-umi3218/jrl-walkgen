@@ -40,8 +40,8 @@ using namespace PatternGeneratorJRL;
 
 
 RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
-    CjrlHumanoidDynamicRobot *aHS ) :
-    SimplePlugin(aSPM)
+                                                    CjrlHumanoidDynamicRobot *aHS ) :
+  SimplePlugin(aSPM)
 {
 
   DSFeetDistance_ = 0.2;

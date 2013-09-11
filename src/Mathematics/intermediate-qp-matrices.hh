@@ -28,7 +28,7 @@
 #define INTERMEDQPMAT_HH_
 
 #include <jrl/mal/matrixabstractlayer.hh>
-#include <privatepgtypes.h>
+#include <privatepgtypes.hh>
 
 #include <iostream>
 #include <fstream>

@@ -31,7 +31,7 @@
 
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <Mathematics/qld.hh>
-#include <privatepgtypes.h>
+#include <privatepgtypes.hh>
 #include <PreviewControl/rigid-body-system.hh>
 #include <PreviewControl/rigid-body.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>

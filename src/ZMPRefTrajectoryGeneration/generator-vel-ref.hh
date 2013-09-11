@@ -34,13 +34,13 @@
 #include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 #include <PreviewControl/SupportFSM.hh>
-#include <PreviewControl/LinearizedInvertedPendulum2D.h>
+#include <PreviewControl/LinearizedInvertedPendulum2D.hh>
 #include <PreviewControl/rigid-body-system.hh>
 #include <PreviewControl/rigid-body.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>
 #include <Mathematics/relative-feet-inequalities.hh>
 
-#include <privatepgtypes.h>
+#include <privatepgtypes.hh>
 #include <cmath>
 
 namespace PatternGeneratorJRL

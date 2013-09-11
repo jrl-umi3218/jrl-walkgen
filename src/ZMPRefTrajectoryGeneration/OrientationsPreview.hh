@@ -35,7 +35,7 @@
 
 #include <deque>
 
-#include <privatepgtypes.h>
+#include <privatepgtypes.hh>
 #include <jrl/walkgen/pgtypes.hh>
 #include <abstract-robot-dynamics/joint.hh>
 

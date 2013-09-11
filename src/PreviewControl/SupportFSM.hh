@@ -28,7 +28,7 @@
 #define _SUPPORT_FSM_
 
 #include <jrl/walkgen/pgtypes.hh>
-#include <privatepgtypes.h>
+#include <privatepgtypes.hh>
 
 
 namespace PatternGeneratorJRL
