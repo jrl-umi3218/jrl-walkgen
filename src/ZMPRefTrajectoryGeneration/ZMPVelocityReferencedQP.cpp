@@ -335,24 +335,24 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
   //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
   MAL_MATRIX(lterm1,double);
   lterm1 = MAL_RET_TRANSPOSE(m_PPu);
-  lterm1 = MAL_RET_A_by_B(lterm1, m_PPu);
-  lterm1 = m_Beta * lterm1;
+  MAL_C_eq_A_by_B(lterm1,lterm1, m_PPu);
+  MAL_C_eq_A_by_B(lterm1 , m_Beta , lterm1);
 
   MAL_MATRIX(lterm2,double);
   lterm2 = MAL_RET_TRANSPOSE(m_VPu);
   lterm2 = MAL_RET_A_by_B(lterm2,m_VPu);
   // lterm2 = m_Alpha * lterm2;//TODO:: original pb
-  lterm2 = m_Beta*lterm2;
+  MAL_C_eq_A_by_B(lterm2 ,m_Beta,lterm2);
 
   MAL_MATRIX_RESIZE(OptA,
 		    MAL_MATRIX_NB_ROWS(lterm2),
 		    MAL_MATRIX_NB_COLS(lterm2));
   MAL_MATRIX_SET_IDENTITY(OptA);
-  OptA = m_Alpha*OptA;
+  MAL_C_eq_A_by_B(OptA , m_Alpha,OptA);
 
 
   // OptA = OptA + lterm1 + lterm2;//TODO:: original problem
-  OptA = OptA + lterm2;
+  OptA += lterm2;
   
   m_OptA = OptA;
 
@@ -362,14 +362,14 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
 
   /*! Compute constants of the linear part of the objective function. */
   lterm1 = MAL_RET_TRANSPOSE(m_PPu);
-  lterm1 = MAL_RET_A_by_B(lterm1,m_PPx);
+  MAL_C_eq_A_by_B(lterm1,lterm1,m_PPx);
   m_OptB = MAL_RET_TRANSPOSE(m_VPu);
-  m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
-  m_OptB = m_Alpha * m_OptB;
+  MAL_C_eq_A_by_B(m_OptB,m_OptB,m_VPx);
+  MAL_C_eq_A_by_B(m_OptB,m_Alpha,m_OptB);
   m_OptB = m_OptB + m_Beta * lterm1;
 
   m_OptC = MAL_RET_TRANSPOSE(m_PPu);
-  m_OptC = m_Beta * m_OptC;
+  MAL_C_eq_A_by_B(m_OptC,m_Beta,m_OptC);
 
 
   if (m_FullDebug>0)
@@ -1249,8 +1249,8 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
   LCIFF_it = QueueOfLConstraintInequalitiesFreeFeet.begin();
 
   ltermPZuPZu = MAL_RET_TRANSPOSE(m_PZu);
-  ltermPZuPZu = MAL_RET_A_by_B(ltermPZuPZu,m_PZu);
-  ltermPZuPZu = m_Gamma*ltermPZuPZu;
+  MAL_C_eq_A_by_B(ltermPZuPZu,ltermPZuPZu,m_PZu);
+  MAL_C_eq_A_by_B(ltermPZuPZu,m_Gamma,ltermPZuPZu);
 
   if(m_PrwSupport.StepNumber>0)
     {
@@ -1282,11 +1282,11 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
     }
 
   ltermPZuU = MAL_RET_TRANSPOSE(m_PZu);
-  ltermPZuU = MAL_RET_A_by_B(ltermPZuU,m_U);
-  ltermPZuU = m_Gamma*ltermPZuU;
+  MAL_C_eq_A_by_B(ltermPZuU,ltermPZuU,m_U);
+  MAL_C_eq_A_by_B(ltermPZuU,m_Gamma,ltermPZuU);
   ltermUU = MAL_RET_TRANSPOSE(m_U);
   ltermUU = MAL_RET_A_by_B(ltermUU,m_U);
-  ltermUU = m_Gamma*ltermUU;
+  MAL_C_eq_A_by_B(ltermUU,m_Gamma,ltermUU);
   //pT
   deque<SupportFeet_t>::iterator SF_it;//, storeFF_it, VFF_it;
   SF_it = QueueOfSupportFeet.end();
@@ -1302,7 +1302,7 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
     xkT(i)=xk(i);
 
   MAL_C_eq_A_by_B(lterm1ZMPx,m_PZx,xkT);
-  lterm2ZMPx = m_Uc*SF_it->x;
+  MAL_C_eq_A_by_B(lterm2ZMPx,m_Uc,SF_it->x);
 
   //m_Uc = MAL_C_eq_A_by_B(lterm2ZMPx,m_Uc,SF_it->x);
 
@@ -1310,11 +1310,11 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
   temp = MAL_RET_TRANSPOSE(lterm1ZMPx);
   lterm1ZMPx = temp;
   MAL_MATRIX(lterm3ZMPx,double);
-  lterm3ZMPx = MAL_RET_A_by_B(lterm1ZMPx,m_PZu);
-  lterm3ZMPx = m_Gamma*lterm3ZMPx;
+  MAL_C_eq_A_by_B(lterm3ZMPx,lterm1ZMPx,m_PZu);
+  MAL_C_eq_A_by_B(lterm3ZMPx,m_Gamma,lterm3ZMPx);
   MAL_MATRIX(lterm4ZMPx,double);
-  lterm4ZMPx = MAL_RET_A_by_B(lterm1ZMPx,m_U);
-  lterm4ZMPx = -m_Gamma*lterm4ZMPx;
+  MAL_C_eq_A_by_B(lterm4ZMPx,lterm1ZMPx,m_U);
+  MAL_C_eq_A_by_B(lterm4ZMPx,-m_Gamma,lterm4ZMPx);
 
   //pTy
   MAL_MATRIX(lterm1ZMPy,double);
@@ -1326,17 +1326,17 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
     ykT(i)=xk(3+i);
 
   MAL_C_eq_A_by_B(lterm1ZMPy,m_PZx,ykT);
-  lterm2ZMPy = m_Uc*SF_it->y;
+  MAL_C_eq_A_by_B(lterm2ZMPy,m_Uc,SF_it->y);
 
   lterm1ZMPy -= lterm2ZMPy;
   temp = MAL_RET_TRANSPOSE(lterm1ZMPy);
   lterm1ZMPy = temp;
   MAL_MATRIX(lterm3ZMPy,double);
-  lterm3ZMPy = MAL_RET_A_by_B(lterm1ZMPy,m_PZu);
-  lterm3ZMPy = m_Gamma*lterm3ZMPy;
+  MAL_C_eq_A_by_B(lterm3ZMPy,lterm1ZMPy,m_PZu);
+  MAL_C_eq_A_by_B(lterm3ZMPy,m_Gamma,lterm3ZMPy);
   MAL_MATRIX(lterm4ZMPy,double);
-  lterm4ZMPy = MAL_RET_A_by_B(lterm1ZMPy,m_U);
-  lterm4ZMPy = -m_Gamma*lterm4ZMPy;
+  MAL_C_eq_A_by_B(lterm4ZMPy,lterm1ZMPy,m_U);
+  MAL_C_eq_A_by_B(lterm4ZMPy,-m_Gamma,lterm4ZMPy);
   //---------------------------ZMP
   //m_Pb.Q--
   memset(m_Pb.Q,0,4*(m_QP_N+m_PrwSupport.StepNumber)*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));
@@ -1385,12 +1385,12 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
 
   m_OptB = MAL_RET_TRANSPOSE(m_VPu);
   m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
-  m_OptB = m_Beta * m_OptB;
+  MAL_C_eq_A_by_B(m_OptB , m_Beta , m_OptB);
 
   //TODO 2: The matrices of the value function have to go back where they come from
   //MAL_MATRIX(m_OptD,double);
   m_OptD = MAL_RET_TRANSPOSE(m_VPu);
-  m_OptD = m_Beta * m_OptD;
+  MAL_C_eq_A_by_B(m_OptD , m_Beta , m_OptD);
 
   //m_Pb.D-
   memset(m_Pb.D,0,2*(m_QP_N+m_PrwSupport.StepNumber)*sizeof(double));

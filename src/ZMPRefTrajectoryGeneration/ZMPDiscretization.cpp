@@ -536,7 +536,7 @@ void ZMPDiscretization::UpdateCurrentSupportFootPosition(RelativeFootPosition aR
   v(1,0) = aRFP.sy;
   
   Orientation = MAL_RET_A_by_B(MM , Orientation);
-  v2 = MAL_RET_A_by_B(Orientation, v);
+  MAL_C_eq_A_by_B(v2,Orientation, v);
   ODEBUG("v :" << v  << " "
 	  "v2 : " << v2 << " "
 	  "Orientation : " << Orientation << " "
@@ -673,7 +673,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   
   MAL_VECTOR_DIM(ZMPInWorldCoordinates,double,3);
   
-  ZMPInWorldCoordinates = MAL_RET_A_by_B(m_CurrentSupportFootPosition, ZMPInFootCoordinates); 
+  MAL_C_eq_A_by_B(ZMPInWorldCoordinates,m_CurrentSupportFootPosition, ZMPInFootCoordinates); 
   
   delta_x = (ZMPInWorldCoordinates(0) - px0)/SizeOf1stPhase;
   delta_y = (ZMPInWorldCoordinates(1) - py0)/SizeOf1stPhase;
@@ -801,7 +801,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       
       v(0,0) = m_RelativeFootPositions[1].sx;
       v(1,0) = m_RelativeFootPositions[1].sy;
-      vdiffsupp = MAL_RET_A_by_B(Orientation,v);
+      MAL_C_eq_A_by_B(vdiffsupp,Orientation,v);
 	  
       vrel = vdiffsupp + m_vdiffsupppre;
 
@@ -880,7 +880,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 	  
       MAL_VECTOR_DIM(ZMPInWorldCoordinates,double,3);
 
-      ZMPInWorldCoordinates = MAL_RET_A_by_B(m_CurrentSupportFootPosition, 
+      MAL_C_eq_A_by_B(ZMPInWorldCoordinates,m_CurrentSupportFootPosition, 
 					     ZMPInFootCoordinates); 
 
       ODEBUG4("CSFP: " << m_CurrentSupportFootPosition << endl <<

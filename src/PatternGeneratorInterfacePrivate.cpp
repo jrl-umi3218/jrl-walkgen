@@ -94,7 +94,10 @@ namespace PatternGeneratorJRL {
 
     m_SamplingPeriod = m_PC->SamplingPeriod();
     m_PreviewControlTime = m_PC->PreviewControlTime();
-    m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+    if(m_SamplingPeriod==0)
+      m_NL = 0;
+    else
+      m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
 
     /* For debug purposes. */
     MAL_VECTOR_RESIZE(m_Debug_prev_qr,6);
