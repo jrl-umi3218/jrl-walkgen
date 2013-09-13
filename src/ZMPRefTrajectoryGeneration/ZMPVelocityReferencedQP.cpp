@@ -334,12 +334,12 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
 
   //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
   MAL_MATRIX(lterm1,double);
-  lterm1 = MAL_RET_TRANSPOSE(m_PPu);
+  MAL_TRANSPOSE_A_in_At(m_PPu,lterm1);
   MAL_C_eq_A_by_B(lterm1,lterm1, m_PPu);
   MAL_C_eq_A_by_B(lterm1 , m_Beta , lterm1);
 
   MAL_MATRIX(lterm2,double);
-  lterm2 = MAL_RET_TRANSPOSE(m_VPu);
+  MAL_TRANSPOSE_A_in_At(m_VPu,lterm2);
   lterm2 = MAL_RET_A_by_B(lterm2,m_VPu);
   // lterm2 = m_Alpha * lterm2;//TODO:: original pb
   MAL_C_eq_A_by_B(lterm2 ,m_Beta,lterm2);
@@ -361,12 +361,12 @@ int ZMPVelocityReferencedQP::BuildingConstantPartOfTheObjectiveFunction()
   //TODO:: size of Q is 3*Nx3*N which means that there is place for N/2 feet variables
 
   /*! Compute constants of the linear part of the objective function. */
-  lterm1 = MAL_RET_TRANSPOSE(m_PPu);
+  MAL_TRANSPOSE_A_in_At(m_PPu,lterm1);
   MAL_C_eq_A_by_B(lterm1,lterm1,m_PPx);
-  m_OptB = MAL_RET_TRANSPOSE(m_VPu);
+  MAL_TRANSPOSE_A_in_At(m_VPu,m_OptB);
   MAL_C_eq_A_by_B(m_OptB,m_OptB,m_VPx);
   MAL_C_eq_A_by_B(m_OptB,m_Alpha,m_OptB);
-  m_OptB = m_OptB + m_Beta * lterm1;
+  m_OptB += m_Beta * lterm1;
 
   m_OptC = MAL_RET_TRANSPOSE(m_PPu);
   MAL_C_eq_A_by_B(m_OptC,m_Beta,m_OptC);
@@ -1381,13 +1381,13 @@ void ZMPVelocityReferencedQP::computeObjective(deque<LinearConstraintInequalityF
     VRef(i) = RefVel.y*cos(m_TrunkState.yaw[0]+m_TrunkStateT.yaw[1]*i*m_QP_T)+
       RefVel.x*sin(m_TrunkState.yaw[0]+m_TrunkStateT.yaw[1]*i*m_QP_T);
 
-  m_OptB = MAL_RET_TRANSPOSE(m_VPu);
+  MAL_TRANSPOSE_A_in_At(m_VPu,m_OptB);
   m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
   MAL_C_eq_A_by_B(m_OptB , m_Beta , m_OptB);
 
   //TODO 2: The matrices of the value function have to go back where they come from
   //MAL_MATRIX(m_OptD,double);
-  m_OptD = MAL_RET_TRANSPOSE(m_VPu);
+  MAL_TRANSPOSE_A_in_At(m_VPu,m_OptD);
   MAL_C_eq_A_by_B(m_OptD , m_Beta , m_OptD);
 
   //m_Pb.D-

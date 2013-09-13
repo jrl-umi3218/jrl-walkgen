@@ -356,10 +356,10 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
   y = MAL_RET_A_by_B(m_A,y) + uy * m_B;
 
   zmpx2 = 0.0;
-  for(int i=0;i<x.rows();i++)
+  for(int i=0;i<MAL_MATRIX_NB_ROWS(x);i++)
     zmpx2 += m_C(0,i)*x(i,0);
   zmpy2 = 0.0;
-  for(int i=0;i<y.rows();i++)
+  for(int i=0;i<MAL_MATRIX_NB_ROWS(y);i++)
     zmpy2 += m_C(0,i)*y(i,0);
     
   if (Simulation)
@@ -404,7 +404,7 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
   x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
    
   zmpx2 = 0.0;
-  for(int i=0;i<x.rows();i++)
+  for(int i=0;i<MAL_MATRIX_NB_ROWS(x);i++)
     zmpx2 += m_C(0,i)*x(i,0);
   
   if (Simulation)
@@ -467,7 +467,7 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
   x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
   
   zmpx2 = 0.0;
-  for(int i=0;i<x.rows();i++)
+  for(int i=0;i<MAL_MATRIX_NB_ROWS(x);i++)
     zmpx2 += m_C(0,i)*x(i,0);
   
   if (Simulation)

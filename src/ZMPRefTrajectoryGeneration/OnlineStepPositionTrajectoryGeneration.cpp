@@ -447,25 +447,25 @@ int OnlineStepPositionTrajectoryGeneration::BuildingConstantPartOfTheObjectiveFu
  
   //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu; 
   MAL_MATRIX(lterm1,double); 
-  lterm1.noaliase() = MAL_RET_TRANSPOSE(m_PPu); 
-  lterm1.noaliase() = MAL_RET_A_by_B(lterm1, m_PPu); 
-  lterm1.noaliase() = m_Beta * lterm1; 
+  MAL_TRANSPOSE_A_in_At(m_PPu,lterm1); 
+  MAL_C_eq_A_by_B(lterm1,lterm1, m_PPu); 
+  MAL_C_eq_A_by_B(lterm1,m_Beta,lterm1); 
  
   MAL_MATRIX(lterm2,double); 
-  lterm2.noaliase() = MAL_RET_TRANSPOSE(m_VPu); 
-  lterm2.noaliase() = MAL_RET_A_by_B(lterm2,m_VPu); 
+  MAL_TRANSPOSE_A_in_At(m_VPu,lterm2); 
+  MAL_C_eq_A_by_B(lterm2,lterm2,m_VPu); 
   // lterm2 = m_Alpha * lterm2;//Andremize: original pb 
-  lterm2.noaliase() = m_Beta*lterm2; 
+  MAL_C_eq_A_by_B(lterm2,m_Beta,lterm2); 
  
   MAL_MATRIX_RESIZE(OptA, 
 		    MAL_MATRIX_NB_ROWS(lterm2), 
 		    MAL_MATRIX_NB_COLS(lterm2)); 
 //  MAL_MATRIX_SET_IDENTITY(OptA); 
-  OptA.noaliase() = m_Alpha; 
+  OptA = m_Alpha; 
  
  
   // OptA = OptA + lterm1 + lterm2;//Andremize: original problem 
-  OptA.noaliase() = OptA + lterm2; 
+  OptA += lterm2; 
  
   // Initialization of the matrice regarding the quadratic 
   // part of the objective function. 
@@ -492,15 +492,15 @@ int OnlineStepPositionTrajectoryGeneration::BuildingConstantPartOfTheObjectiveFu
     } 
  
   /*! Compute constants of the linear part of the objective function. */ 
-  lterm1.noaliase() = MAL_RET_TRANSPOSE(m_PPu); 
-  lterm1.noaliase() = MAL_RET_A_by_B(lterm1,m_PPx); 
-  m_OptB.noaliase() = MAL_RET_TRANSPOSE(m_VPu); 
-  m_OptB.noaliase() = MAL_RET_A_by_B(m_OptB,m_VPx); 
-  m_OptB.noaliase() = m_Alpha * m_OptB; 
-  m_OptB.noaliase() = m_OptB + m_Beta * lterm1; 
+  MAL_TRANSPOSE_A_in_At(m_PPu,lterm1); 
+  MAL_C_eq_A_by_B(lterm1,lterm1,m_PPx); 
+  MAL_TRANSPOSE_A_in_At(m_VPu,m_OptB); 
+  MAL_C_eq_A_by_B(m_OptB,m_OptB,m_VPx); 
+  MAL_C_eq_A_by_B(m_OptB,m_Alpha,m_OptB); 
+  m_OptB= m_OptB + m_Beta * lterm1; 
  
-  m_OptC.noaliase() = MAL_RET_TRANSPOSE(m_PPu); 
-  m_OptC.noaliase() = m_Beta * m_OptC; 
+  MAL_TRANSPOSE_A_in_At(m_PPu,m_OptC); 
+  MAL_C_eq_A_by_B(m_OptC , m_Beta , m_OptC); 
  
  
  
