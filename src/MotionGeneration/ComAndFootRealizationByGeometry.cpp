@@ -500,13 +500,13 @@ InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
 
   // Initialize Feet.
   InitializationFoot(RightFoot, m_AnklePositionRight,InitRightFootPosition);
-  ODEBUG3("InitRightFootPosition : " << InitRightFootPosition.x 
+  ODEBUG("InitRightFootPosition : " << InitRightFootPosition.x 
 	  << " " << InitRightFootPosition.y 
 	  << " " << InitRightFootPosition.z << std::endl
 	  << " Ankle: " << m_AnklePositionRight);
 
   InitializationFoot(LeftFoot,  m_AnklePositionLeft, InitLeftFootPosition);
-  ODEBUG3("InitLeftFootPosition : " << InitLeftFootPosition.x 
+  ODEBUG("InitLeftFootPosition : " << InitLeftFootPosition.x 
 	  << " " << InitLeftFootPosition.y 
 	  << " " << InitLeftFootPosition.z << std::endl
 	  << " Ankle: " << m_AnklePositionLeft);
@@ -529,7 +529,7 @@ InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
 	   << lStartingCOMPosition[0] << " "
 	   << lStartingCOMPosition[1] << " "
 	   << lStartingCOMPosition[2],"DebugDataStartingCOM.dat");
-  ODEBUG3( lStartingCOMPosition[0] << " "
+  ODEBUG( lStartingCOMPosition[0] << " "
 	  << lStartingCOMPosition[1] << " "
 	  << lStartingCOMPosition[2]);
   lStartingCOMPosition[2] -= InitRightFootPosition.z;
@@ -539,7 +539,7 @@ InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
   m_DiffBetweenComAndWaist[1] =  lStartingWaistPose(1) - lStartingCOMPosition[1];
   m_DiffBetweenComAndWaist[2] =  lStartingWaistPose(2) - lStartingCOMPosition[2];
   ODEBUG("lFootPosition[2]: " <<InitRightFootPosition.z);
-  ODEBUG3( "Diff between Com and Waist" << m_DiffBetweenComAndWaist[0] << " " 
+  ODEBUG( "Diff between Com and Waist" << m_DiffBetweenComAndWaist[0] << " " 
 	   << m_DiffBetweenComAndWaist[1] << " " 
 	   << m_DiffBetweenComAndWaist[2]);
   // This term is usefull if
