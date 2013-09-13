@@ -399,27 +399,53 @@ namespace PatternGeneratorJRL
 	  string aFileName;
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI.dat";
+          ODEBUG3("Report:" << aFileName);
+          unsigned max_nb_of_pbs=100;
+          unsigned nb_of_pbs = 0;
+
 	  alif.open(aFileName.c_str(),ifstream::in);
+          if (!alif.is_open())
+            {
+              std::cerr << "Unable to open "<< aFileName << std::endl;
+              return -1;
+            }
 
 	  ifstream arif;
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI.datref";
 	  arif.open(aFileName.c_str(),ifstream::in);
-	 
+          ODEBUG3("ReportRef:" << aFileName);
+
+          if (!arif.is_open())
+            {
+              std::cerr << "Unable to open "<< aFileName << std::endl;
+              return -1;
+            }
+
+
 	  ofstream areportof;
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI_report.dat";
 	  areportof.open(aFileName.c_str(),ofstream::out);
-	    
+          
 	  // Time
 	  double LocalInput[NB_OF_FIELDS], ReferenceInput[NB_OF_FIELDS];
 	  bool finalreport = true;
 	  unsigned long int nblines = 0;
 	  bool endofinspection=false;
 
-	  while ((!alif.eof()) ||
-		 (!arif.eof()) ||
-		 (endofinspection))
+          // Find size of the two files.
+          alif.seekg (0, alif.end);
+          int alif_length = alif.tellg();
+          alif.seekg (0, alif.beg);
+
+          arif.seekg (0, arif.end);
+          int arif_length = arif.tellg();
+          arif.seekg (0, arif.beg);
+
+	  while ((!alif.eof()) &&
+		 (!arif.eof()) &&
+		 (!endofinspection))
 	    {
 	      for (unsigned int i=0;i<NB_OF_FIELDS;i++)
 		{
@@ -436,7 +462,7 @@ namespace PatternGeneratorJRL
 	      for (unsigned int i=0;i<NB_OF_FIELDS;i++)
 		{
 		  arif >> ReferenceInput[i];
-		  if (alif.eof())
+		  if (arif.eof())
 		    {
 		      endofinspection =true;
 		      break;
@@ -452,14 +478,30 @@ namespace PatternGeneratorJRL
 			    ReferenceInput[i])>=1e-6)
 		    {
 		      finalreport = false;
-		      areportof << "l: " << nblines 
-				<< " col:" << i 
-				<< " ref: " << ReferenceInput[i] 
-				<< " now: " << LocalInput[i] 
-				<<std::endl;
+                      ostringstream oss;
+                      oss << "l: " << nblines 
+                          << " col:" << i 
+                          << " ref: " << ReferenceInput[i] 
+                          << " now: " << LocalInput[i] 
+                          << " " << nb_of_pbs
+                          <<std::endl;
+		      areportof << oss.str();
+                      std::cout << oss.str();
+                      nb_of_pbs++;
+                      if(nb_of_pbs>max_nb_of_pbs)
+                        {
+                          endofinspection=true;
+                        }
 		    }
 		}
+              
 	      nblines++;
+              if ((nblines*2> alif_length) ||
+                  (nblines*2> arif_length))
+                {
+                  endofinspection=true;
+                  break;
+                }
 	    }
 
 	  alif.close();
