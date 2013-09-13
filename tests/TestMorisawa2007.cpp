@@ -214,32 +214,42 @@ protected:
 
 int PerformTests(int argc, char *argv[])
 {
-
-  std::string TestNames[2] = { "TestMorisawa2007OnLine",
-			       "TestMorisawa2007ShortWalk"};
+  std::string CompleteName = string(argv[0]);
+  unsigned found = CompleteName.find_last_of("/\\");
+  std::string TestName =  CompleteName.substr(found+1);
   int TestProfiles[2] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
 			  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING};
+  int indexProfile=-1;
 
-  for (unsigned int i=0;i<2;i++)
+  if (TestName.compare(16,6,"OnLine")==0)
+    indexProfile=0;
+  if (TestName.compare(16,9,"ShortWalk")==0)
+    indexProfile=1;
+
+  if (indexProfile==-1)
     {
-      TestMorisawa2007 aTM2007(argc,argv,
-			       TestNames[i],
-			       TestProfiles[i]);
-      aTM2007.init();
-	try
-	  {
-	    if (!aTM2007.doTest(std::cout))
-	      {
-		cout << "Failed test " << i << endl;
-		return -1;
-	      }
-	    else
-	      cout << "Passed test " << i << endl;
-	  }
-	catch (const char * astr)
-	  { cerr << "Failed on following error " << astr << std::endl;
-	    return -1; }
+      std::cerr << "CompleteName: " << CompleteName << std::endl;
+      std::cerr<< " TestName: " << TestName <<std::endl;
+      std::cerr<< "Failure to find the proper indexFile:" << TestName.substr(17,6) << endl;
+      exit(-1);
     }
+  TestMorisawa2007 aTM2007(argc,argv,
+                           TestName,
+                           TestProfiles[indexProfile]);
+  aTM2007.init();
+  try
+    {
+      if (!aTM2007.doTest(std::cout))
+        {
+          cout << "Failed test " << indexProfile << endl;
+          return -1;
+        }
+      else
+        cout << "Passed test " << indexProfile << endl;
+        }
+  catch (const char * astr)
+    { cerr << "Failed on following error " << astr << std::endl;
+      return -1; }
   return 0;
 }
 

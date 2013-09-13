@@ -1,6 +1,10 @@
 jrl-walkgen
 ===========
 
+[![Build Status](https://travis-ci.org/jrl-umi3218/jrl-walkgen.png)](https://travis-ci.org/jrl-umi3218/jrl-walkgen)
+[![Coverage Status](https://coveralls.io/repos/jrl-umi3218/jrl-walkgen/badge.png?branch=master)](https://coveralls.io/r/jrl-umi3218/jrl-walkgen?branch=master)
+
+
 This software provides a pattern generator for biped robots.
 
 It relies on the [abstract-robot-dynamics][abstract-robot-dynamics]
