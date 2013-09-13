@@ -109,6 +109,9 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
 	   (*m_ZMPPositions)[0].py << " " <<
 	   (*m_ZMPPositions)[0].pz,"ZMPRef.dat");
 
+  ODEBUG("m_LeftFootPositions: "<<m_LeftFootPositions->size());
+  ODEBUG("m_RightFootPositions: "<<m_RightFootPositions->size());
+  ODEBUG("m_ZMPPositions: "<<m_ZMPPositions->size());
 
   m_ZMPpcwmbz->OneGlobalStepOfControl((*m_LeftFootPositions)[2*m_NL],
 				      (*m_RightFootPositions)[2*m_NL],
@@ -219,7 +222,7 @@ int DoubleStagePreviewControlStrategy::EndOfMotion()
 	 << 2*m_NL << " " );
   if (m_ZMPPositions->size()== 2*m_NL)
     return 0;
-  else if (m_ZMPPositions->size()< 2*m_NL+1)
+  else if (m_ZMPPositions->size()< 2*m_NL)
     return -1;
 
   return 1;

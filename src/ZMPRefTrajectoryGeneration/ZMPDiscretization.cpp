@@ -162,10 +162,12 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 	     lStartingCOMState,
 	     lStartingZMPPosition);
 
+
   EndPhaseOfTheWalking(FinalZMPPositions,
 		       FinalCOMStates,
 		       LeftFootAbsolutePositions,
 		       RightFootAbsolutePositions);
+
 
   FinalCOMStates.resize(FinalZMPPositions.size());
 }
@@ -506,7 +508,6 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 		    false);
     }
   ODEBUG4("ZMP::InitOnLine: End ","ZMDInitOnLine.txt");
-
 
   return RelativeFootPositions.size();
 }
@@ -1044,7 +1045,6 @@ void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
 {
   unsigned int lshift=2;
   // Filter out the ZMP values.
-  ODEBUG("FinalZMPPositions.size()="<<FinalZMPPositions.size());
   for(unsigned int i=0;i<ZMPPositions.size();i++)
     {
       double ltmp[3]={0,0,0};
@@ -1099,9 +1099,6 @@ void ZMPDiscretization::FilterOutValues(deque<ZMPPosition> &ZMPPositions,
       aZMPPos.stepType = ZMPPositions[i].stepType;
            
       FinalZMPPositions.push_back(aZMPPos);
-
-
-     
     }
   ODEBUG("ZMPPosition.back=( " <<ZMPPositions.back().px << " , " << ZMPPositions.back().py << " )");
   ODEBUG("FinalZMPPosition.back=( " <<FinalZMPPositions.back().px << " , " << FinalZMPPositions.back().py << " )");
@@ -1144,13 +1141,12 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   // Deal with the end phase of the walking.
   TimeForThisFootPosition = m_Tdble;
   assert(m_SamplingPeriod > 0);
-  double dlAddArraySize = TimeForThisFootPosition/m_SamplingPeriod;
+  double dlAddArraySize = m_Tdble/(2*m_SamplingPeriod);
   unsigned int AddArraySize = (unsigned int)round(dlAddArraySize);
   
   unsigned int currentsize = 0;
   unsigned int CurrentZMPindex = 0;
   ZMPPositions.resize(currentsize+AddArraySize);
-  
   ODEBUG4(" GetZMPDiscretization: Step 7 " << currentsize << " " << AddArraySize,"DebugData.txt");
 
   double dSizeOfEndPhase = m_Tdble/(2*m_SamplingPeriod);
@@ -1182,6 +1178,22 @@ void ZMPDiscretization::EndPhaseOfTheWalking(  deque<ZMPPosition> &FinalZMPPosit
   ZMPPositions[0].theta = FinalZMPPositions.back().theta;
   ZMPPositions[0].stepType=0;
   CurrentZMPindex++;
+
+  LeftFootAbsolutePosition = 
+    FinalLeftFootAbsolutePositions.back();
+  RightFootAbsolutePosition = 
+    FinalRightFootAbsolutePositions.back();
+  
+  LeftFootAbsolutePosition.time = 
+    RightFootAbsolutePosition.time = m_CurrentTime;
+  
+  LeftFootAbsolutePosition.stepType = 
+    RightFootAbsolutePosition.stepType = 0;
+  
+  FinalLeftFootAbsolutePositions.push_back(LeftFootAbsolutePosition);
+  FinalRightFootAbsolutePositions.push_back(RightFootAbsolutePosition);
+
+  m_CurrentTime += m_SamplingPeriod;
 
   for(unsigned int k=1;k<SizeOfEndPhase;k++)
     {
@@ -1324,6 +1336,7 @@ void ZMPDiscretization::CallMethod(std::string &Method, std::istringstream &strm
       strm >> m_SamplingPeriod;
       InitializeFilter();
     }
+
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
     
 }
