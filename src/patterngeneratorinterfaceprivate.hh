@@ -593,6 +593,8 @@ namespace PatternGeneratorJRL
 
     bool m_ShouldBeRunning;
 
+    bool m_Running;
+
     /*! \name To handle a new step. 
       @{
      */

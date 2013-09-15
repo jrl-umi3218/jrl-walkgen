@@ -58,7 +58,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
     ZMPRefTrajectoryGeneration(SPM),
     Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFI_(0),Problem_(),Solution_()
 {
-
+  Running_ = false;
   TimeBuffer_ = 0.04;
   QP_T_ = 0.1;
   QP_N_ = 16;
@@ -411,6 +411,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       {
          double jx = (FinalLeftFootTraj_deq[0].x + FinalRightFootTraj_deq[0].x)/2 - FinalCOMTraj_deq[0].x[0];
          double jy = (FinalLeftFootTraj_deq[0].y + FinalRightFootTraj_deq[0].y)/2 - FinalCOMTraj_deq[0].y[0];
+         if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3) { Running_ = false; }
          const double tf = 0.75;
          jx = 6/(tf*tf*tf)*(jx - tf*FinalCOMTraj_deq[0].x[1] - (tf*tf/2)*FinalCOMTraj_deq[0].x[2]);
          jy = 6/(tf*tf*tf)*(jy - tf*FinalCOMTraj_deq[0].y[1] - (tf*tf/2)*FinalCOMTraj_deq[0].y[2]);
@@ -420,6 +421,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       }
       else
       {
+         Running_ = true;
          CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
              Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
          CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );

@@ -113,6 +113,9 @@ namespace PatternGeneratorJRL
       NewVelRef_.Local.Yaw = dyaw;
     }
 
+    inline bool Running()
+    {   return Running_; }
+
     /// \brief Set the final-stage trigger
     inline void EndingPhase(bool EndingPhase)
     { EndingPhase_ = EndingPhase;}
@@ -146,6 +149,9 @@ namespace PatternGeneratorJRL
 
     /// \brief Final stage trigger
     bool EndingPhase_;
+
+    /// \brief PG running
+    bool Running_;
 
     /// \brief Time at which the online mode will stop
     double TimeToStopOnLineMode_;
