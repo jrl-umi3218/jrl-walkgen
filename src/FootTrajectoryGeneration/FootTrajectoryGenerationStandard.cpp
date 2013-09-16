@@ -195,7 +195,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
    {
      
    case X_AXIS:
-     ODEBUG("Initspeed: " << InitSpeed << " ");
+     ODEBUG2("Initspeed: " << InitSpeed << " ");
      m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
      break;
      
@@ -273,7 +273,7 @@ int FootTrajectoryGenerationStandard::GetParametersWithInitPosInitSpeed(int Poly
    {
      
    case X_AXIS:
-     ODEBUG("Initspeed: " << InitSpeed << " ");
+     ODEBUG2("Initspeed: " << InitSpeed << " ");
      m_PolynomeX->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
      break;
      
@@ -309,16 +309,16 @@ double FootTrajectoryGenerationStandard::ComputeAll(FootAbsolutePosition & aFoot
 {
   aFootAbsolutePosition.x = m_PolynomeX->Compute(Time);
   aFootAbsolutePosition.dx = m_PolynomeX->ComputeDerivative(Time);
-//  aFootAbsolutePosition.ddx = m_PolynomeX->ComputeSecDerivative(Time);
-  ODEBUG("t: " << Time << " : " << aFootAbsolutePosition.x); 
+  //  aFootAbsolutePosition.ddx = m_PolynomeX->ComputeSecDerivative(Time);
+  ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.x); 
 
   aFootAbsolutePosition.y = m_PolynomeY->Compute(Time);
   aFootAbsolutePosition.dy = m_PolynomeY->ComputeDerivative(Time);
-//  aFootAbsolutePosition.ddy = m_PolynomeY->ComputeSecDerivative(Time);
+  //  aFootAbsolutePosition.ddy = m_PolynomeY->ComputeSecDerivative(Time);
 
   aFootAbsolutePosition.z = m_PolynomeZ->Compute(Time);
   aFootAbsolutePosition.dz = m_PolynomeZ->ComputeDerivative(Time);
-//  aFootAbsolutePosition.ddz = m_PolynomeZ->ComputeSecDerivative(Time);
+  //  aFootAbsolutePosition.ddz = m_PolynomeZ->ComputeSecDerivative(Time);
 
   aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(Time);
   aFootAbsolutePosition.dtheta = m_PolynomeTheta->ComputeDerivative(Time);
@@ -456,7 +456,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
     }
 
   curr_NSFAP.z = init_NSFAP.z + m_PolynomeZ->Compute(LocalTime);
-  ODEBUG("x:" << curr_NSFAP.x << " LocalTime - EndOfLiftOff" << LocalTime - EndOfLiftOff
+  ODEBUG2("x:" << curr_NSFAP.x << " LocalTime - EndOfLiftOff" << LocalTime - EndOfLiftOff
           << " " << m_PolynomeX->Compute(LocalTime - EndOfLiftOff));
   //  m_PolynomeX->print();
   
@@ -556,12 +556,12 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   curr_NSFAP.z += dFZ ;
 #endif
  
-  ODEBUG5( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift 
-	   << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )" 
-	   << curr_NSFAP.x << " "
-	   << curr_NSFAP.y << " "
-	   << curr_NSFAP.z << " "
-	   ,"GeneratedFoot.dat");
+  ODEBUG4( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift 
+          << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )" 
+          << curr_NSFAP.x << " "
+          << curr_NSFAP.y << " "
+          << curr_NSFAP.z << " "
+          ,"GeneratedFoot.dat");
 
 }
 
@@ -767,12 +767,12 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z += dFZ ;
 #endif
  
-  ODEBUG5( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift 
-	   << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )" 
-	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x << " "
-	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y << " "
-	   << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z << " "
-	   ,"GeneratedFoot.dat");
+  ODEBUG4( "Foot Step:" << StepType << "Foot Shift: "<< Foot_Shift 
+          << " ( " << dFX<< " , " << dFY<< " , " << " , " << dFZ << " )" 
+          << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x << " "
+          << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y << " "
+          << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z << " "
+          ,"GeneratedFoot.dat");
 
 }
 

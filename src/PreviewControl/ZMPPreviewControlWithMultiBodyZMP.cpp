@@ -208,7 +208,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[m_NL];
    FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[m_NL];
 
-   ODEBUG5SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
+   ODEBUG4SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
 		 m_FIFOZMPRefPositions[0].py << " " <<
 		 m_FIFOZMPRefPositions[0].pz << " " <<
 		 acompos.x[0] << " " <<
@@ -329,10 +329,10 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    if ((m_StageStrategy==ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY)||
        (m_StageStrategy==ZMPCOM_TRAJECTORY_FULL))
      {
-       ODEBUG(m_FIFODeltaZMPPositions[0].px << " " <<
+       ODEBUG2(m_FIFODeltaZMPPositions[0].px << " " <<
 	      m_FIFODeltaZMPPositions[0].py);
 
-       ODEBUG("Second Stage Size of FIFODeltaZMPPositions: "<< m_FIFODeltaZMPPositions.size()
+       ODEBUG2("Second Stage Size of FIFODeltaZMPPositions: "<< m_FIFODeltaZMPPositions.size()
 	       << " " << m_Deltax 
 	       << " " << m_Deltay
 	       << " " << m_sxDeltazmp
@@ -355,7 +355,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 	 }
      }
 
-   ODEBUG("Delta :" 
+   ODEBUG2("Delta :" 
 	   << m_Deltax(0,0) << " " << m_Deltay(0,0) << " "
 	   << aCOMState.x[0] << " " << aCOMState.y[0]);
    // Update finalCOMState
@@ -371,7 +371,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    m_FIFOLeftFootPosition.pop_front();
    m_FIFORightFootPosition.pop_front();
 
-   ODEBUG("End");
+   ODEBUG2("End");
    return 1;
  }
 
@@ -459,7 +459,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    // compute the ZMP related to the motion found by CoMAndZMPRealization.
    MAL_S3_VECTOR_TYPE(double) ZMPmultibody;
    ZMPmultibody = m_HumanoidDynamicRobot->zeroMomentumPoint();
-   ODEBUG5(ZMPmultibody[0] << " " << ZMPmultibody[1], "DebugDataCheckZMP1.txt");
+   ODEBUG4(ZMPmultibody[0] << " " << ZMPmultibody[1], "DebugDataCheckZMP1.txt");
    MAL_S3_VECTOR_TYPE(double) CoMmultibody;
    CoMmultibody = m_HumanoidDynamicRobot->positionCenterOfMass();
    ODEBUG("Stage 2");
@@ -631,7 +631,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[localindex];
    FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[localindex];
 
-   ODEBUG5SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
+   ODEBUG4SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
 		 m_FIFOZMPRefPositions[0].py << " " <<
 		 m_FIFOZMPRefPositions[0].pz << " " <<
 		 acompos.x[0] << " " <<
