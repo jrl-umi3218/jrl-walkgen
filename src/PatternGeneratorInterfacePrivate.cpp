@@ -1325,8 +1325,8 @@ namespace PatternGeneratorJRL {
 			  m_COMBuffer,
 			  m_LeftFootPositions,
 			  m_RightFootPositions);
-      }
     m_Running = m_ZMPVRQP->Running();
+      }
             
             
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,
