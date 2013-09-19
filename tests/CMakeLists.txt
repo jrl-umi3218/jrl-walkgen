@@ -102,6 +102,7 @@ ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
 # Test Herdt 2010 #
 ###################
 CONFIG_FILES_CMAKE(TestHerdt2010OnLineTestFGPI.datref)
+CONFIG_FILES_CMAKE(TestHerdt2010EmergencyStopTestFGPI.datref)
 
 ADD_EXECUTABLE(TestHerdt2010
   ../src/portability/gettimeofday.cc
