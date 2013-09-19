@@ -21,42 +21,52 @@ IF(WIN32)
 ADD_DEFINITIONS("/D __STDC__")
 ENDIF(WIN32)
 
+IF(USE_LSSOL)
+ADD_DEFINITIONS("/DLSSOL_FOUND")
+ENDIF(USE_LSSOL)
+
 SET(SOURCES
   FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp
   FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.cpp
+  FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.cpp
   GlobalStrategyManagers/CoMAndFootOnlyStrategy.cpp
   GlobalStrategyManagers/GlobalStrategyManager.cpp
   GlobalStrategyManagers/DoubleStagePreviewControlStrategy.cpp
   Mathematics/AnalyticalZMPCOGTrajectory.cpp
   Mathematics/ConvexHull.cpp
   Mathematics/FootConstraintsAsLinearSystem.cpp
-  Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
+#  Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
   Mathematics/FootHalfSize.cpp
   Mathematics/OptCholesky.cpp
   Mathematics/Polynome.cpp
   Mathematics/PolynomeFoot.cpp
   Mathematics/PLDPSolver.cpp
-  Mathematics/PLDPHerdt.cpp
   Mathematics/qld.cpp
   Mathematics/StepOverPolynome.cpp
+  Mathematics/relative-feet-inequalities.cpp
+  Mathematics/intermediate-qp-matrices.cpp
   PreviewControl/PreviewControl.cpp
   PreviewControl/OptimalControllerSolver.cpp
   PreviewControl/ZMPPreviewControlWithMultiBodyZMP.cpp
   PreviewControl/LinearizedInvertedPendulum2D.cpp
+  PreviewControl/rigid-body.cpp
+  PreviewControl/rigid-body-system.cpp
   PreviewControl/SupportFSM.cpp
   ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.cpp
   ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp
   ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp
   ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp
   ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.cpp
-  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQPDebug.cpp
   ZMPRefTrajectoryGeneration/OrientationsPreview.cpp
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp
   ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.cpp
   ZMPRefTrajectoryGeneration/problem-vel-ref.cpp
+  ZMPRefTrajectoryGeneration/qp-problem.cpp
+  ZMPRefTrajectoryGeneration/generator-vel-ref.cpp
+  ZMPRefTrajectoryGeneration/mpc-trajectory-generation.cpp
   MotionGeneration/StepOverPlanner.cpp
   MotionGeneration/CollisionDetector.cpp
   MotionGeneration/WaistHeightVariation.cpp
@@ -70,6 +80,7 @@ SET(SOURCES
   Clock.cpp
   PGTypes.cpp
   portability/gettimeofday.cc
+  privatepgtypes.cpp
   )
 
 ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES})
@@ -79,3 +90,6 @@ INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen abstract-robot-dynamics)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-mal)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-dynamics)
+IF(USE_LSSOL)
+ PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen lssol)
+ENDIF(USE_LSSOL)

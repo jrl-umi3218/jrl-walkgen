@@ -33,6 +33,7 @@
    generation architecture. */
 #include <fstream>
 #include <time.h>
+#include <fenv.h>
 
 #include "portability/gettimeofday.hh"
 #include "portability/bzero.hh"
@@ -49,6 +50,7 @@ namespace PatternGeneratorJRL {
   PatternGeneratorInterfacePrivate::PatternGeneratorInterfacePrivate(CjrlHumanoidDynamicRobot *aHDR)
     : PatternGeneratorInterface(aHDR),SimplePlugin(this)
   {
+    //AllowFPE();
     m_HumanoidDynamicRobot = aHDR;
 
     ODEBUG4("Step 0","DebugPGI.txt");
@@ -94,7 +96,10 @@ namespace PatternGeneratorJRL {
 
     m_SamplingPeriod = m_PC->SamplingPeriod();
     m_PreviewControlTime = m_PC->PreviewControlTime();
-    m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+    if(m_SamplingPeriod==0)
+      m_NL = 0;
+    else
+      m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
 
     /* For debug purposes. */
     MAL_VECTOR_RESIZE(m_Debug_prev_qr,6);
@@ -168,6 +173,11 @@ namespace PatternGeneratorJRL {
     m_ZMPInitialPointSet = false;
 
     RegisterPluginMethods();
+  }
+
+  void PatternGeneratorInterfacePrivate::AllowFPE()
+  {
+    feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
   }
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()
@@ -460,7 +470,6 @@ namespace PatternGeneratorJRL {
       case 3:
       case 1:
 	{
-	  ODEBUG3("Juste before the reading of the step sequence ");
 	  m_StepStackHandler->ReadStepSequenceAccordingToWalkMode(strm);
 	  break;
 	}
@@ -494,7 +503,7 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::setVelReference(istringstream &strm)
   {
     // Read the data inside strm.
-    m_ZMPVRQP->setVelReference(strm);
+    m_ZMPVRQP->Reference(strm);
   }
  
   void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(istringstream &strm)
@@ -1095,7 +1104,6 @@ namespace PatternGeneratorJRL {
     else if (aCmd==":HerdtOnline")
       {
 	m_InternalClock = 0.0;
-	setVelReference(strm);
 	initOnlineHerdt();
 	printf("Online \n");
 	//ODEBUG4("InitOnLine","DebugHerdt.txt");
@@ -1154,9 +1162,7 @@ namespace PatternGeneratorJRL {
       }
     else if (ZMPTrajAlgo=="Herdt")
       {
-	// m_AlgorithmforZMPCOM = ZMPCOM_DIMITROV_2008;
 	m_AlgorithmforZMPCOM = ZMPCOM_HERDT_2010;
-	// m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	m_GlobalStrategyManager = m_CoMAndFootOnlyStrategy;
 	m_CoMAndFootOnlyStrategy->SetTheLimitOfTheBuffer(0);
 	cout << "Herdt" << endl;
@@ -1566,7 +1572,7 @@ namespace PatternGeneratorJRL {
   }
 
 
-  int PatternGeneratorInterfacePrivate::GetWalkMode()
+  int PatternGeneratorInterfacePrivate::GetWalkMode() const
   {
     return m_StepStackHandler->GetWalkMode();
   }
@@ -1579,7 +1585,7 @@ namespace PatternGeneratorJRL {
   }
 
   void PatternGeneratorInterfacePrivate::GetLegJointVelocity(MAL_VECTOR( & dqr,double),
-							     MAL_VECTOR( & dql,double))
+							     MAL_VECTOR( & dql,double)) const
   {
 
     // TO DO: take the joint specific to the legs
@@ -1702,12 +1708,13 @@ namespace PatternGeneratorJRL {
 
   }
 
-  void PatternGeneratorInterfacePrivate::getWaistPositionMatrix(MAL_S4x4_MATRIX( &lWaistAbsPos,double))
+  void PatternGeneratorInterfacePrivate::getWaistPositionMatrix(MAL_S4x4_MATRIX( &lWaistAbsPos,double)) const
   {
     lWaistAbsPos = m_WaistAbsPos;
   }
 
-  void PatternGeneratorInterfacePrivate::getWaistPositionAndOrientation(double aTQ[7], double &Orientation)
+  //TODO test me 
+  void PatternGeneratorInterfacePrivate::getWaistPositionAndOrientation(double aTQ[7], double &Orientation) const
   {
     // Position
     aTQ[0] = MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 0,3);
@@ -1764,7 +1771,7 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::getWaistVelocity(double & dx,
 							  double & dy,
-							  double & omega)
+							  double & omega) const
   {
     dx = m_AbsLinearVelocity(0);
     dy = m_AbsLinearVelocity(1);
@@ -1775,7 +1782,7 @@ namespace PatternGeneratorJRL {
 							      double y,
 							      double yaw)
   {
-    m_ZMPVRQP->setVelReference(x,y,yaw);
+    m_ZMPVRQP->Reference(x,y,yaw);
   }
 
   void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(double x,
@@ -1909,7 +1916,7 @@ namespace PatternGeneratorJRL {
     m_ZMPInitialPointSet = true;
   }
 
-  void PatternGeneratorInterfacePrivate::getZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint)
+  void PatternGeneratorInterfacePrivate::getZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint) const
   {
     lZMPInitialPoint = m_ZMPInitialPoint;
   }

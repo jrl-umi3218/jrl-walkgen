@@ -33,6 +33,7 @@ Polynome::Polynome(int Degree)
 {
   m_Coefficients.clear();
   m_Coefficients.resize(Degree+1);
+  m_Degree = Degree;
 }
 
 Polynome::~Polynome()
@@ -62,18 +63,29 @@ double Polynome::ComputeDerivative(double t)
   return r;
 }
 
+double Polynome::ComputeSecDerivative(double t)
+{
+  double r=0,pt=1;
+  for(unsigned int i=2;i<m_Coefficients.size();i++)
+    {
+      r += i*(i-1)*m_Coefficients[i]*pt;
+      pt *=t;
+    }
+  return r;
+}
+
 void Polynome::GetCoefficients(vector<double> &lCoefficients) const
 {
  lCoefficients = m_Coefficients;
 }
 
 
-void Polynome::SetCoefficients(vector<double> &lCoefficients)
+void Polynome::SetCoefficients(const vector<double> &lCoefficients)
 {
   m_Coefficients = lCoefficients;
 }
 
-void Polynome::print()
+void Polynome::print() const
 {
   for(unsigned int i=0;i<m_Coefficients.size();i++)
     cout << m_Coefficients[i] << " " ;

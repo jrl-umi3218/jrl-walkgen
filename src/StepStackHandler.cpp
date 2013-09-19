@@ -601,7 +601,7 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
 	
       MAL_C_eq_A_by_B(FPos, Romega, MFNSF);
       ODEBUG("FPos: " << FPos);
-      FPos = MAL_RET_A_by_B(RiR,FPos);
+      MAL_C_eq_A_by_B(FPos,RiR,FPos);
       ODEBUG("FPos final :");
 
       aFootPosition.sx = FPos(0,2);

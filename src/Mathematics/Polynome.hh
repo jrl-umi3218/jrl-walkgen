@@ -44,6 +44,7 @@ namespace PatternGeneratorJRL
     {
 
     public:
+
       /*! Constructor */
       Polynome(int Degree);
 
@@ -56,14 +57,21 @@ namespace PatternGeneratorJRL
       /*! Compute the value of the derivative. */
       double ComputeDerivative(double t);
       
+      /*! Compute the value of the second derivative. */
+      double ComputeSecDerivative(double t);
+
       /*! Get the coefficients. */
       void GetCoefficients(std::vector<double> &lCoefficients) const;
 
       /*! Set the coefficients. */
-      void SetCoefficients(std::vector<double> &lCoefficients);
+      void SetCoefficients(const std::vector<double> &lCoefficients);
+
+      inline int Degree()
+      { return m_Degree; };
+
 
       /*! Print the coefficient. */
-      void print();
+      void print() const;
 
     protected:
 

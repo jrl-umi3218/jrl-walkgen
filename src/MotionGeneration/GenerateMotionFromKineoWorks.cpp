@@ -281,7 +281,10 @@ namespace PatternGeneratorJRL
     m_PC = aPC;
     m_SamplingPeriod = m_PC->SamplingPeriod();
     m_PreviewControlTime = m_PC->PreviewControlTime();
-    m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
+    if(m_SamplingPeriod == 0)
+      m_NL = 0;
+    else
+      m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
   }
 
   void GenerateMotionFromKineoWorks::ComputeUpperBodyPosition(deque< KWNode >&     UpperBodyPositionsBuffer,

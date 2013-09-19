@@ -49,13 +49,14 @@ FootHalfSize::~FootHalfSize()
 }
 
 void FootHalfSize::setHalfSizeInit(double lHalfWidthInit,
-			      double lHalfHeightInit)
+                                   double lHalfHeightInit,
+                                   double DSFeetDistance)
 {
   m_HalfHeightInit = lHalfHeightInit;
   m_HalfWidthInit = lHalfWidthInit;
   
   updateHalfSize();
-  updateHalfHeightDS();
+  updateHalfHeightDS(DSFeetDistance);
 }
 
 void FootHalfSize::updateHalfSize()
@@ -67,20 +68,18 @@ void FootHalfSize::updateHalfSize()
   m_HalfHeight -= m_ConstraintsOnY;
 }
 
-void FootHalfSize::updateHalfHeightDS()
+void FootHalfSize::updateHalfHeightDS(double DSFeetDistance)
 {
-  double DSFeetDistance = 0.2;
-  
-  m_HalfHeightDS = m_HalfHeight-m_ConstraintsOnX+DSFeetDistance/2.0;
+  m_HalfHeightDS = m_HalfHeight+DSFeetDistance/2.0;
 }
 
-void FootHalfSize::setConstraints(double OnX, double OnY)
+void FootHalfSize::setConstraints(double OnX, double OnY, double DSFeetDistance)
 {
   m_ConstraintsOnX = OnX;
   m_ConstraintsOnY = OnY;
 
   updateHalfSize();
-  updateHalfHeightDS();
+  updateHalfHeightDS(DSFeetDistance);
 
 }
 

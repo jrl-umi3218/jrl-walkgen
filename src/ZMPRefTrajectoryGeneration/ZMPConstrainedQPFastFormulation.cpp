@@ -472,10 +472,10 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
 
 
   // New formulation (Dimitar08)
-  m_OptB = MAL_RET_A_by_B(m_iLQ,m_OptB);
+  MAL_C_eq_A_by_B(m_OptB,m_iLQ,m_OptB);
 
   // New formulation (Dimitar08)
-  m_OptC = MAL_RET_A_by_B(m_iLQ,m_OptC);
+  MAL_C_eq_A_by_B(m_OptC,m_iLQ,m_OptC);
 
   if (m_FullDebug>0)
     {  
@@ -513,17 +513,18 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
 {
 
   MAL_MATRIX(OptA,double);
+  MAL_MATRIX(tmp,double);
 
   //  OptA = Id + alpha * VPu.Transpose() * VPu + beta * PPu.Transpose() * PPu;
   MAL_MATRIX(lterm1,double);
   lterm1 = MAL_RET_TRANSPOSE(m_PPu);
-  lterm1 = MAL_RET_A_by_B(lterm1, m_PPu);
-  lterm1 = m_Beta * lterm1;
+  MAL_C_eq_A_by_B(tmp,lterm1, m_PPu);
+  lterm1=m_Beta*tmp;
 
   MAL_MATRIX(lterm2,double);
   lterm2 = MAL_RET_TRANSPOSE(m_VPu);
-  lterm2 = MAL_RET_A_by_B(lterm2,m_VPu);
-  lterm2 = m_Alpha * lterm2;
+  MAL_C_eq_A_by_B(tmp,lterm2,m_VPu);
+  lterm2=m_Alpha*lterm2;
 
   MAL_MATRIX_RESIZE(OptA,
 		    MAL_MATRIX_NB_ROWS(lterm1),
@@ -556,14 +557,14 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
 
   /*! Compute constants of the linear part of the objective function. */
   lterm1 = MAL_RET_TRANSPOSE(m_PPu);
-  lterm1 = MAL_RET_A_by_B(lterm1,m_PPx);
+  MAL_C_eq_A_by_B(lterm1,lterm1,m_PPx);
   m_OptB = MAL_RET_TRANSPOSE(m_VPu);
-  m_OptB = MAL_RET_A_by_B(m_OptB,m_VPx);
-  m_OptB = m_Alpha * m_OptB;
+  MAL_C_eq_A_by_B(tmp,m_OptB,m_VPx);
+  m_OptB=m_Alpha*tmp;
   m_OptB = m_OptB + m_Beta * lterm1;
   
   m_OptC = MAL_RET_TRANSPOSE(m_PPu);
-  m_OptC = m_Beta * m_OptC;
+  m_OptC = m_Beta *m_OptC;
 
   if ((m_FastFormulationMode==QLDANDLQ) ||
       (m_FastFormulationMode==PLDP))

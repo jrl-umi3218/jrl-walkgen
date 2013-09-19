@@ -69,9 +69,9 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
   RESETDEBUG4("DebugConfSO.dat");
   RESETDEBUG4("DebugConfSV.dat");
   RESETDEBUG4("DebugConfSA.dat");
-  RESETDEBUG4("DebugDataCheckZMP1.txt");
+  RESETDEBUG5("DebugDataCheckZMP1.txt");
   RESETDEBUG4("2ndStage.dat");
-  RESETDEBUG4("ZMPPCWMZOGSOC.dat");
+  RESETDEBUG5("ZMPPCWMZOGSOC.dat");
   // Sampling period.
   m_SamplingPeriod = -1;
   
@@ -329,10 +329,10 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    if ((m_StageStrategy==ZMPCOM_TRAJECTORY_SECOND_STAGE_ONLY)||
        (m_StageStrategy==ZMPCOM_TRAJECTORY_FULL))
      {
-       ODEBUG(m_FIFODeltaZMPPositions[0].px << " " <<
+       ODEBUG2(m_FIFODeltaZMPPositions[0].px << " " <<
 	      m_FIFODeltaZMPPositions[0].py);
 
-       ODEBUG("Second Stage Size of FIFODeltaZMPPositions: "<< m_FIFODeltaZMPPositions.size()
+       ODEBUG2("Second Stage Size of FIFODeltaZMPPositions: "<< m_FIFODeltaZMPPositions.size()
 	       << " " << m_Deltax 
 	       << " " << m_Deltay
 	       << " " << m_sxDeltazmp
@@ -355,7 +355,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 	 }
      }
 
-   ODEBUG("Delta :" 
+   ODEBUG2("Delta :" 
 	   << m_Deltax(0,0) << " " << m_Deltay(0,0) << " "
 	   << aCOMState.x[0] << " " << aCOMState.y[0]);
    // Update finalCOMState
@@ -371,7 +371,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    m_FIFOLeftFootPosition.pop_front();
    m_FIFORightFootPosition.pop_front();
 
-   ODEBUG("End");
+   ODEBUG2("End");
    return 1;
  }
 

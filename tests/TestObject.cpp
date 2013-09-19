@@ -31,7 +31,7 @@
 
 using namespace std;
 
-#define NB_OF_FIELDS 26
+#define NB_OF_FIELDS 38
 
 #ifdef WIN32
 double trunc (double x)
@@ -278,6 +278,7 @@ namespace PatternGeneratorJRL
 	  aFileName += "TestFGPI_description.dat";
 
 	  aof.open(aFileName.c_str(),ofstream::out);
+
 	  string Titles[NB_OF_FIELDS] =
 	    { "Time",
 	      "Com X",
@@ -292,12 +293,24 @@ namespace PatternGeneratorJRL
 	      "Left Foot X" ,
 	      "Left Foot Y" ,
 	      "Left Foot Z" ,
+	      "Left Foot dX" ,
+	      "Left Foot dY" ,
+	      "Left Foot dZ" ,
+	      "Left Foot ddX" ,
+	      "Left Foot ddY" ,
+	      "Left Foot ddZ" ,
 	      "Left Foot Theta" ,
 	      "Left Foot Omega" ,
 	      "Left Foot Omega2" ,
 	      "Right Foot X" ,
 	      "Right Foot Y" ,
 	      "Right Foot Z" ,
+	      "Right Foot dX" ,
+	      "Right Foot dY" ,
+	      "Right Foot dZ" ,
+	      "Right Foot ddX" ,
+	      "Right Foot ddY" ,
+	      "Right Foot ddZ" ,
 	      "Right Foot Theta" ,
 	      "Right Foot Omega" ,
 	      "Right Foot Omega2" ,
@@ -328,39 +341,51 @@ namespace PatternGeneratorJRL
 	  aof.open(aFileName.c_str(),ofstream::app);
 	  aof.precision(8);
 	  aof.setf(ios::scientific, ios::floatfield);
-	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "
-	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "
-	      << filterprecision(m_OneStep.ZMPTarget(0) ) << " "
-	      << filterprecision(m_OneStep.ZMPTarget(1) ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.theta  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "
-	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.y ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.z ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.theta ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "
-	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "
+	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "                            // 1
+	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
+	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
+	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
+	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "                    // 5
+	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
+	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
+	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
+	      << filterprecision(m_OneStep.ZMPTarget(0) ) << " "                            // 9
+	      << filterprecision(m_OneStep.ZMPTarget(1) ) << " "                            // 10
+	      << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "                     // 11
+	      << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "                     // 12
+	      << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "                     // 13
+	      << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "                     // 14
+	      << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "                     // 15
+	      << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "                     // 16
+	      << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                     // 17
+	      << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                     // 18
+	      << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                     // 19
+	      << filterprecision(m_OneStep.LeftFootPosition.theta  ) << " "                 // 20
+	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
+	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
+	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23
+	      << filterprecision(m_OneStep.RightFootPosition.y ) << " "                     // 24
+	      << filterprecision(m_OneStep.RightFootPosition.z ) << " "                     // 25
+	      << filterprecision(m_OneStep.RightFootPosition.dx ) << " "                     // 26
+	      << filterprecision(m_OneStep.RightFootPosition.dy ) << " "                     // 27
+	      << filterprecision(m_OneStep.RightFootPosition.dz ) << " "                     // 28
+	      << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                     // 29
+	      << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                     // 30
+	      << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                     // 31
+	      << filterprecision(m_OneStep.RightFootPosition.theta ) << " "                 // 32
+	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 33
+	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 34
 	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
-	    m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
-	    +m_CurrentConfiguration(0) ) << " "
+				 m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
+				 +m_CurrentConfiguration(0) ) << " "                        // 35
 	      << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
-	    m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
-	    +m_CurrentConfiguration(1) ) << " "
-	      << filterprecision(m_CurrentConfiguration(0) ) << " "
-	      << filterprecision(m_CurrentConfiguration(1) ) << " "
+				 m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
+				 +m_CurrentConfiguration(1) ) << " "                        // 36
+	      << filterprecision(m_CurrentConfiguration(0) ) << " "                         // 37
+	      << filterprecision(m_CurrentConfiguration(1) ) << " "                         // 38
 	      << endl;
 	  aof.close();
-	}
+        }
     }
 
 
@@ -374,27 +399,53 @@ namespace PatternGeneratorJRL
 	  string aFileName;
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI.dat";
+          ODEBUG("Report:" << aFileName);
+          unsigned max_nb_of_pbs=100;
+          unsigned nb_of_pbs = 0;
+
 	  alif.open(aFileName.c_str(),ifstream::in);
+          if (!alif.is_open())
+            {
+              std::cerr << "Unable to open "<< aFileName << std::endl;
+              return -1;
+            }
 
 	  ifstream arif;
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI.datref";
 	  arif.open(aFileName.c_str(),ifstream::in);
-	 
+          ODEBUG("ReportRef:" << aFileName);
+
+          if (!arif.is_open())
+            {
+              std::cerr << "Unable to open "<< aFileName << std::endl;
+              return -1;
+            }
+
+
 	  ofstream areportof;
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI_report.dat";
 	  areportof.open(aFileName.c_str(),ofstream::out);
-	    
+          
 	  // Time
 	  double LocalInput[NB_OF_FIELDS], ReferenceInput[NB_OF_FIELDS];
 	  bool finalreport = true;
 	  unsigned long int nblines = 0;
 	  bool endofinspection=false;
 
-	  while ((!alif.eof()) ||
-		 (!arif.eof()) ||
-		 (endofinspection))
+          // Find size of the two files.
+          alif.seekg (0, alif.end);
+          int alif_length = alif.tellg();
+          alif.seekg (0, alif.beg);
+
+          arif.seekg (0, arif.end);
+          int arif_length = arif.tellg();
+          arif.seekg (0, arif.beg);
+
+	  while ((!alif.eof()) &&
+		 (!arif.eof()) &&
+		 (!endofinspection))
 	    {
 	      for (unsigned int i=0;i<NB_OF_FIELDS;i++)
 		{
@@ -411,7 +462,7 @@ namespace PatternGeneratorJRL
 	      for (unsigned int i=0;i<NB_OF_FIELDS;i++)
 		{
 		  arif >> ReferenceInput[i];
-		  if (alif.eof())
+		  if (arif.eof())
 		    {
 		      endofinspection =true;
 		      break;
@@ -427,14 +478,30 @@ namespace PatternGeneratorJRL
 			    ReferenceInput[i])>=1e-6)
 		    {
 		      finalreport = false;
-		      areportof << "l: " << nblines 
-				<< " col:" << i 
-				<< " ref: " << ReferenceInput[i] 
-				<< " now: " << LocalInput[i] 
-				<<std::endl;
+                      ostringstream oss;
+                      oss << "l: " << nblines 
+                          << " col:" << i 
+                          << " ref: " << ReferenceInput[i] 
+                          << " now: " << LocalInput[i] 
+                          << " " << nb_of_pbs
+                          <<std::endl;
+		      areportof << oss.str();
+                      std::cout << oss.str();
+                      nb_of_pbs++;
+                      if(nb_of_pbs>max_nb_of_pbs)
+                        {
+                          endofinspection=true;
+                        }
 		    }
 		}
+              
 	      nblines++;
+              if ((nblines*2> alif_length) ||
+                  (nblines*2> arif_length))
+                {
+                  endofinspection=true;
+                  break;
+                }
 	    }
 
 	  alif.close();

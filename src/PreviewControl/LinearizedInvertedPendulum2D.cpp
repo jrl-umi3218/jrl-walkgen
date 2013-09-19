@@ -23,8 +23,8 @@
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
- /* This object simulate a 2D Linearized Inverted Pendulum
-    with a control at the jerk level. */
+/* This object simulate a 2D Linearized Inverted Pendulum
+   with a control at the jerk level. */
 
 //#define _DEBUG_MODE_ON_
 
@@ -43,11 +43,13 @@ LinearizedInvertedPendulum2D::LinearizedInvertedPendulum2D()
   m_ComHeight = -1.0;
   m_SamplingPeriod = -1.0; 
   m_InterpolationInterval = -1;
-  MAL_MATRIX_RESIZE(m_A,6,6);
-  MAL_MATRIX_RESIZE(m_B,6,1);
-  MAL_MATRIX_RESIZE(m_C,2,6);
+  MAL_MATRIX_RESIZE(m_A,3,3);
+  MAL_MATRIX_RESIZE(m_B,3,1);
+  MAL_MATRIX_RESIZE(m_C,1,3);
 
   MAL_VECTOR_RESIZE(m_xk,6);
+  MAL_VECTOR_RESIZE(m_CoM.x,3);
+  MAL_VECTOR_RESIZE(m_CoM.y,3);
   MAL_VECTOR_RESIZE(m_zk,2);
 
   RESETDEBUG4("Debug2DLIPM.dat");
@@ -102,8 +104,12 @@ void LinearizedInvertedPendulum2D::SetRobotControlPeriod(const double & aT)
   
 }
 
+
 void LinearizedInvertedPendulum2D::GetState(MAL_VECTOR_TYPE(double) &lxk)
 {
+  //For compability reasons
+  m_xk[0] = m_CoM.x[0];m_xk[1] = m_CoM.x[1];m_xk[2] = m_CoM.x[2];
+  m_xk[3] = m_CoM.y[0];m_xk[4] = m_CoM.y[1];m_xk[5] = m_CoM.y[2];
   lxk = m_xk;
 }
 
@@ -122,42 +128,27 @@ int LinearizedInvertedPendulum2D::InitializeSystem()
   if (m_ComHeight==-1.0)
     return -2;
 
-  for(int i=0;i<6;i++)
+  for(int i=0;i<3;i++)
     {
       m_B(i,0) = 0.0;
       m_C(0,i) = 0.0;
-      m_C(1,i) = 0.0;
-      for(int j=0;j<6;j++)
+      for(int j=0;j<3;j++)
 	m_A(i,j)=0.0;
     }
 
   m_A(0,0) = 1.0; m_A(0,1) =   m_T; m_A(0,2) = m_T*m_T/2.0;
   m_A(1,0) = 0.0; m_A(1,1) =   1.0; m_A(1,2) = m_T;
   m_A(2,0) = 0.0; m_A(2,1) =   0.0; m_A(2,2) = 1.0;
-  m_A(3,3) = 1.0; m_A(3,4) =   m_T; m_A(3,5) = m_T*m_T/2.0;
-  m_A(4,3) = 0.0; m_A(4,4) =   1.0; m_A(4,5) = m_T;
-  m_A(5,3) = 0.0; m_A(5,4) =   0.0; m_A(5,5) = 1.0;
-  
 
   m_B(0,0) = m_T*m_T*m_T/6.0;
   m_B(1,0) = m_T*m_T/2.0;
   m_B(2,0) = m_T;
-  m_B(3,0) = m_T*m_T*m_T/6.0;
-  m_B(4,0) = m_T*m_T/2.0;
-  m_B(5,0) = m_T;
-
   
   m_C(0,0) = 1.0;
   m_C(0,1) = 0.0;
   m_C(0,2) = -m_ComHeight/9.81;
 
-  m_C(1,3) = 1.0;
-  m_C(1,4) = 0.0;
-  m_C(1,5) = -m_ComHeight/9.81;
 
-  //for(unsigned int i=0;i<6;i++)
-  //  m_xk[i] = 0.0;
-  
   return 0;
 }
 
@@ -171,7 +162,10 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
   int lCurrentPosition = CurrentPosition;
   // Fill the queues with the interpolated CoM values.
     
-  for(int lk=0;lk<=m_InterpolationInterval;lk++,lCurrentPosition++)
+  //TODO: with TestHerdt, it is mandatory to use COMStates.size()-1, or it will crash.
+  // Is it the same for the other PG ? Please check.
+  int loopEnd = std::min<int>( m_InterpolationInterval, ((int)COMStates.size())-1-CurrentPosition);
+  for(int lk=0;lk<=loopEnd;lk++,lCurrentPosition++)
     {
       ODEBUG("lCurrentPosition: "<< lCurrentPosition);
       COMState & aCOMPos = COMStates[lCurrentPosition];
@@ -179,33 +173,33 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
       lkSP = (lk+1) * m_SamplingPeriod;
       
       aCOMPos.x[0] = 
-	m_xk[0] + // Position
-	lkSP * m_xk[1] +  // Speed
-	0.5 * lkSP*lkSP * m_xk[2] +// Acceleration 
+	m_CoM.x[0] + // Position
+	lkSP * m_CoM.x[1] +  // Speed
+	0.5 * lkSP*lkSP * m_CoM.x[2] +// Acceleration
 	lkSP * lkSP * lkSP * CX /6.0; // Jerk
       
       aCOMPos.x[1] = 
-	m_xk[1] + // Speed
-	lkSP * m_xk[2] +  // Acceleration
+	m_CoM.x[1] + // Speed
+	lkSP * m_CoM.x[2] +  // Acceleration
 	0.5 * lkSP * lkSP * CX; // Jerk
       
       aCOMPos.x[2] = 
-	m_xk[2] +  // Acceleration
+	m_CoM.x[2] +  // Acceleration
 	lkSP * CX; // Jerk
       
       aCOMPos.y[0] = 
-	m_xk[3] + // Position
-	lkSP * m_xk[4] +  // Speed
-	0.5 * lkSP*lkSP * m_xk[5] + // Acceleration 
+	m_CoM.y[0] + // Position
+	lkSP * m_CoM.y[1] +  // Speed
+	0.5 * lkSP*lkSP * m_CoM.y[2] + // Acceleration
 	lkSP * lkSP * lkSP * CY /6.0; // Jerk
       
       aCOMPos.y[1] = 
-	m_xk[4] + // Speed
-	lkSP * m_xk[5] +  // Acceleration
+	m_CoM.y[1] + // Speed
+	lkSP * m_CoM.y[2] +  // Acceleration
 	0.5 * lkSP * lkSP * CY; // Jerk
       
       aCOMPos.y[2] = 
-	m_xk[5] +  // Acceleration
+	m_CoM.y[2] +  // Acceleration
 	lkSP * CY; // Jerk
       
       aCOMPos.yaw[0] = ZMPRefPositions[lCurrentPosition].theta;      
@@ -225,45 +219,46 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
       ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
 	      aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<
 	      aCOMPos.yaw << " " <<
-	      aZMPPos.px << " " << aZMPPos.py <<  " " << aZMPPos.theta << " " << 
-	      CX << " " << CY << " " << 
+	      aZMPPos.px << " " << aZMPPos.py <<  " " << aZMPPos.theta << " " <<
+	      CX << " " << CY << " " <<
 	      lkSP << " " << m_T , "DebugInterpol.dat");
     }
   return 0;
 }
 
-int LinearizedInvertedPendulum2D::OneIteration(double CX,double CY)
+
+com_t LinearizedInvertedPendulum2D::OneIteration(double ux, double uy)
 {
-  
-  /*! Vector to compute the command applied to the LIPM */
-  MAL_VECTOR_DIM(Buk,double,6);
+  MAL_VECTOR_DIM(Bux,double,3);
+  MAL_VECTOR_DIM(Buy,double,3);
 
-  // Compute the command multiply 
-  Buk[0] = CX*m_B(0,0);
-  Buk[1] = CX*m_B(1,0);
-  Buk[2] = CX*m_B(2,0);
-      
-  Buk[3] = CY*m_B(3,0);
-  Buk[4] = CY*m_B(4,0);
-  Buk[5] = CY*m_B(5,0);
+  Bux[0] = ux*m_B(0,0);
+  Bux[1] = ux*m_B(1,0);
+  Bux[2] = ux*m_B(2,0);
 
+  Buy[0] = uy*m_B(0,0);
+  Buy[1] = uy*m_B(1,0);
+  Buy[2] = uy*m_B(2,0);
 
   // Simulate the dynamical system
-  m_xk = MAL_RET_A_by_B(m_A,m_xk) + Buk ;
+  m_CoM.x = MAL_RET_A_by_B(m_A,m_CoM.x);
+  m_CoM.x = m_CoM.x + Bux;
+  m_CoM.y = MAL_RET_A_by_B(m_A,m_CoM.y);
+  m_CoM.y = m_CoM.y + Buy;
   // Modif. from Dimitar: Initially a mistake regarding the ordering.
-  MAL_C_eq_A_by_B(m_zk,m_C,m_xk);
+  //MAL_C_eq_A_by_B(m_zk,m_C,m_xk);
 
 
   ODEBUG4( m_xk[0] << " " << m_xk[1] << " " << m_xk[2] << " " <<
 	   m_xk[3] << " " << m_xk[4] << " " << m_xk[5] << " " <<
-	   CX  << " " << CY  << " " << 
-	   m_zk[0] << " " << m_zk[1] << " " << 
+	   CX  << " " << CY  << " " <<
+	   m_zk[0] << " " << m_zk[1] << " " <<
 	   Buk[0] << " " << Buk[1] << " " << Buk[2] << " " <<
 	   Buk[3] << " " << Buk[4] << " " << Buk[5] << " " <<
 	   m_B(0,0) << " " << m_B(1,0) << " " << m_B(2,0) << " " <<
 	   m_B(3,0) << " " << m_B(4,0) << " " << m_B(5,0) << " " ,
-	  "Debug2DLIPM.dat");
+	   "Debug2DLIPM.dat");
 
   
-  return 0;
+  return m_CoM;
 }

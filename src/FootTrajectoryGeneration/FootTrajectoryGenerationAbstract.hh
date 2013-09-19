@@ -140,7 +140,7 @@ namespace PatternGeneratorJRL
     { m_TSingle =aTSingle;};
     
     /*! \brief Get single support time */
-    double GetSingleSupportTime()
+    double GetSingleSupportTime() const
     { return m_TSingle;};
     /*! @} */
 
@@ -153,7 +153,7 @@ namespace PatternGeneratorJRL
     { m_TDouble =aTDouble;};
     
     /*! \brief Get single support time */
-    double GetDoubleSupportTime()
+    double GetDoubleSupportTime() const
     { return m_TDouble;};
 
     /*! @}*/
@@ -167,7 +167,7 @@ namespace PatternGeneratorJRL
     { m_SamplingPeriod = aSamplingPeriod;};
     
     /*! \brief Get single support time */
-    double GetSamplingPeriod()
+    double GetSamplingPeriod() const
     { return m_SamplingPeriod;};
 
     /*!@}*/
@@ -176,7 +176,7 @@ namespace PatternGeneratorJRL
       @{*/
 
     /*! Get Omega */
-    double GetOmega()
+    double GetOmega() const
     { return m_Omega; };
 
     /*! Set Omega */

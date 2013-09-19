@@ -73,7 +73,7 @@ int FootTrajectoryGenerationMultiple::GetNumberOfIntervals() const
 }
 
 
-void FootTrajectoryGenerationMultiple::SetTimeIntervals(vector<double> &lDeltaTj)
+void FootTrajectoryGenerationMultiple::SetTimeIntervals(const vector<double> &lDeltaTj)
 {
   m_DeltaTj = lDeltaTj;
   m_RefTime.resize(lDeltaTj.size());
@@ -250,10 +250,42 @@ int FootTrajectoryGenerationMultiple::SetParameters(unsigned int IntervalIndex,
   if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
     return -1;
 
+  return SetParametersWithInitPosInitSpeedInitAcc( IntervalIndex,
+                                                   AxisReference,
+                                                   TimeInterval,
+                                                   FinalPosition,
+                                                   0.0,0.0,0.0 );
+}
+/*! This method specifies the parameters for each of the polynome used by this
+  object. In this case, as it is used for the 3rd order polynome. The polynome to
+  which those parameters are set is specified with PolynomeIndex.
+  @param PolynomeIndex: Set to which axis the parameters will be applied.
+  @param AxisReference: Index to the axis to be used.
+  @param TimeInterval: Set the time base of the polynome.
+  @param FinalPosition: Set the final position of the polynome at TimeInterval.
+  @param InitPosition: Initial position when computing the polynome at t= m_AbsoluteTimeReference.
+  @param InitSpeed: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
+  @param InitAcc: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
+*/
+int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeedInitAcc(unsigned int IntervalIndex,
+					 int AxisReference,
+					 double TimeInterval,
+					 double FinalPosition,
+					 double InitPosition,
+					 double InitSpeed,
+					 double InitAcc
+					 )
+{
+  if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
+    return -1;
+
 
   m_SetOfFootTrajectoryGenerationObjects[IntervalIndex]->SetParameters(AxisReference,
-								       TimeInterval,
-								       FinalPosition);
+											  TimeInterval,
+											  FinalPosition,
+											  InitPosition,
+											  InitSpeed,
+											  InitAcc);
   return 0;
 }
 
@@ -285,6 +317,8 @@ int FootTrajectoryGenerationMultiple::GetParametersWithInitPosInitSpeed(unsigned
   return 0;
 }
 
+
+
 double FootTrajectoryGenerationMultiple::GetAbsoluteTimeReference() const
 {
   return m_AbsoluteTimeReference;
@@ -300,8 +334,7 @@ void FootTrajectoryGenerationMultiple::CallMethod(std::string &, //Method,
 {
   
 }
-
-int FootTrajectoryGenerationMultiple::DisplayIntervals()
+int FootTrajectoryGenerationMultiple::DisplayIntervals() const
 {
   for(unsigned int i=0;i<m_DeltaTj.size();i++)
     {
