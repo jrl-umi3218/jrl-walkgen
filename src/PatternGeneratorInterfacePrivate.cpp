@@ -164,6 +164,7 @@ namespace PatternGeneratorJRL {
     m_NewTheta = 0.0;
     m_NewStep = false;
     m_ShouldBeRunning = false;
+    m_Running = false;
 
     m_AbsMotionTheta = 0;
     m_InternalClock = 0.0;
@@ -1187,14 +1188,14 @@ namespace PatternGeneratorJRL {
     COMState finalCOMState;
     FootAbsolutePosition LeftFootPosition,RightFootPosition;
 
-    return RunOneStepOfTheControlLoop(CurrentConfiguration,
+    m_Running = RunOneStepOfTheControlLoop(CurrentConfiguration,
 				      CurrentVelocity,
 				      CurrentAcceleration,
 				      ZMPTarget,
 				      finalCOMState,
 				      LeftFootPosition,
 				      RightFootPosition);
-
+    return m_Running;
   }
 
   bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(FootAbsolutePosition &LeftFootPosition,
@@ -1207,9 +1208,8 @@ namespace PatternGeneratorJRL {
     MAL_VECTOR_TYPE(double)  CurrentAcceleration;
     MAL_VECTOR( ZMPTarget,double);
     COMState aCOMRefState;
-    bool r=false;
 
-    r = RunOneStepOfTheControlLoop(CurrentConfiguration,
+    m_Running = RunOneStepOfTheControlLoop(CurrentConfiguration,
 				   CurrentVelocity,
 				   CurrentAcceleration,
 				   ZMPTarget,
@@ -1221,7 +1221,7 @@ namespace PatternGeneratorJRL {
     bzero(&ZMPRefPos,sizeof(ZMPPosition));
     ZMPRefPos.px = ZMPTarget(0);
     ZMPRefPos.py = ZMPTarget(1);
-    return r;
+    return m_Running;
   }
 
 
@@ -1233,9 +1233,8 @@ namespace PatternGeneratorJRL {
 								    FootAbsolutePosition &LeftFootPosition,
 								    FootAbsolutePosition &RightFootPosition )
   {
-    bool r=false;
     COMState aCOMState;
-    r=RunOneStepOfTheControlLoop(CurrentConfiguration,
+    m_Running = RunOneStepOfTheControlLoop(CurrentConfiguration,
 			       CurrentVelocity,
 			       CurrentAcceleration,
 			       ZMPTarget,
@@ -1243,7 +1242,7 @@ namespace PatternGeneratorJRL {
 			       LeftFootPosition,
 			       RightFootPosition);
     finalCOMPosition = aCOMState;
-    return r;
+    return m_Running;
   }
 
   bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
@@ -1268,9 +1267,12 @@ namespace PatternGeneratorJRL {
 	ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
 	       "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
 
-	return false;//Andremize
+    m_Running = false;
+	return m_Running;//Andremize
       }
     ODEBUG("Internal clock:" << m_InternalClock);
+
+    m_Running = true;
 
     if (m_StepStackHandler->IsOnLineSteppingOn())
       {
@@ -1323,6 +1325,7 @@ namespace PatternGeneratorJRL {
 			  m_COMBuffer,
 			  m_LeftFootPositions,
 			  m_RightFootPositions);
+    m_Running = m_ZMPVRQP->Running();
       }
             
             
@@ -1509,7 +1512,7 @@ namespace PatternGeneratorJRL {
     // to be done only when the robot has finish a motion.
     UpdateAbsolutePosition(UpdateAbsMotionOrNot);
     ODEBUG("Return true");
-    return true;
+    return m_Running;
   }
 
 
