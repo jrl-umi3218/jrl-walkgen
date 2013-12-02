@@ -231,16 +231,8 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   // INITIALIZE FEET POSITIONS:
   // --------------------------
   CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
-  CurrentLeftFootAbsPos.z = 0.0;
-  CurrentLeftFootAbsPos.dz = CurrentLeftFootAbsPos.ddz = 0.0;
-  CurrentLeftFootAbsPos.time = 0.0;
-  CurrentLeftFootAbsPos.theta = 0.0;
 
   CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
-  CurrentRightFootAbsPos.z = 0.0;
-  CurrentRightFootAbsPos.dz = CurrentRightFootAbsPos.ddz = 0.0;
-  CurrentRightFootAbsPos.time = 0.0;
-  CurrentRightFootAbsPos.theta = 0.0;
 
   // FILL THE QUEUES:
   // ----------------
@@ -256,6 +248,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   FinalLeftFootTraj_deq.resize(AddArraySize);
   FinalRightFootTraj_deq.resize(AddArraySize);
   int CurrentZMPindex=0;
+  m_CurrentTime = 0;
   for( unsigned int i=0;i<FinalZMPTraj_deq.size();i++ )
     {
       // Smooth ramp
@@ -288,9 +281,9 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CurrentSupport.TimeLimit = 1000000000;
   CurrentSupport.NbStepsLeft = 1;
   CurrentSupport.StateChanged = false;
-  CurrentSupport.X = 0.0;
-  CurrentSupport.Y = 0.1;
-  CurrentSupport.Yaw = 0.0;
+  CurrentSupport.X   = CurrentLeftFootAbsPos.x;
+  CurrentSupport.Y   = CurrentLeftFootAbsPos.y;
+  CurrentSupport.Yaw = CurrentLeftFootAbsPos.theta*M_PI/180;
   CurrentSupport.StartTime = 0.0;
   IntermedData_->SupportState(CurrentSupport);
 
@@ -309,7 +302,10 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM_.SetComHeight(lStartingCOMState.z[0]);
   CoM_.InitializeSystem();
   CoM_(CoM);
-  IntermedData_->CoM(CoM_());
+  IntermedData_->CoM(CoM);
+
+  // Initialize preview of orientations
+  OrientPrw_->CurrentTrunkState( lStartingCOMState );
 
   // BUILD CONSTANT PART OF THE OBJECTIVE:
   // -------------------------------------
@@ -331,10 +327,11 @@ ZMPVelocityReferencedQP::OnLine(double time,
     deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
 
 {
-
   // If on-line mode not activated we go out.
   if (!m_OnLineMode)
+  {
     return;
+  }
 
   // Test if the end of the online mode has been reached.
   if ((EndingPhase_) &&
@@ -399,7 +396,9 @@ ZMPVelocityReferencedQP::OnLine(double time,
     	  VRQPGenerator_->compute_warm_start( Solution_ );//TODO: Move to update_problem or build_constraints?
       Problem_.solve( QLD, Solution_, NONE );
       if(Solution_.Fail>0)
+      {
           Problem_.dump( time );
+      }
 
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:

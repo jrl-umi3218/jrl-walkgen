@@ -76,7 +76,6 @@ OrientationsPreview::preview_orientations(double Time,
                                           const std::deque<FootAbsolutePosition> & RightFootPositions_deq,
                                           solution_t & Solution)
 {
-
   const deque<support_state_t> & PrwSupportStates_deq = Solution.SupportStates_deq;
   std::deque<double> & PreviewedSupportAngles_deq = Solution.SupportOrientations_deq;
   std::deque<double> & PreviewedTrunkOrientations_deq = Solution.TrunkOrientations_deq;
@@ -269,7 +268,6 @@ OrientationsPreview::verify_angle_hip_joint(const support_state_t & CurrentSuppo
     double CurrentSupportFootAngle,
     unsigned StepNumber)
 {
-
   //Which limitation is relevant in the current situation?
   double uJointLimit, lJointLimit, JointLimit;
   if(CurrentSupport.Foot == LEFT)
@@ -291,7 +289,9 @@ OrientationsPreview::verify_angle_hip_joint(const support_state_t & CurrentSuppo
       return false;
     }
   else
+  {
     return true;
+  }
 }
 
 
