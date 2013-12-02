@@ -61,6 +61,16 @@ namespace PatternGeneratorJRL
 
   };
 
+  inline std::ostream & operator<<(std::ostream & os, const COMPosition_s & aCp)
+  {
+    for(size_t i = 0; i < 3; ++i)
+    {
+      os << "x[" << i << "] " << aCp.x[i] << " y[" << i << "] " << aCp.y[i] << " z[" << i << "] " << aCp.z[i] << std::endl;
+    }
+    os << "yaw " << aCp.yaw << " pitch " << aCp.pitch << " roll " << aCp.roll;
+    return os;
+  }
+
   typedef struct COMPosition_s COMPosition;
   typedef struct COMPosition_s WaistState;
 
@@ -98,6 +108,13 @@ namespace PatternGeneratorJRL
   };
   typedef struct RelativeFootPosition_s RelativeFootPosition;
 
+  inline std::ostream & operator<<(std::ostream & os, const RelativeFootPosition_s & rfp)
+  {
+    os << "sx " << rfp.sx << " sy " << rfp.sy << " theta " << rfp.theta << std::endl;
+    os << "SStime " << rfp.SStime << " DStime " << rfp.DStime << " stepType " << rfp.stepType << " DeviationHipHeight " << rfp.DeviationHipHeight;
+    return os;
+  }
+
   /** Structure to store each of the ZMP value, with a given
       direction at a certain time. */
   struct ZMPPosition_s
@@ -111,6 +128,13 @@ namespace PatternGeneratorJRL
     //*(-1) if right foot stance else left foot stance
   };
   typedef struct ZMPPosition_s ZMPPosition;
+
+  inline std::ostream & operator<<(std::ostream & os, const ZMPPosition_s & zmp)
+  {
+    os << "px " << zmp.px << " py " << zmp.pz << " pz " << zmp.pz << " theta " << zmp.theta << std::endl;
+    os << "time " << zmp.time << " stepType " << zmp.stepType;
+    return os;
+  }
 
   /// Structure to store the absolute foot position.
   struct FootAbsolutePosition_t
@@ -130,6 +154,15 @@ namespace PatternGeneratorJRL
     int stepType;
   };
   typedef struct FootAbsolutePosition_t FootAbsolutePosition;
+
+  inline std::ostream & operator<<(std::ostream & os, const FootAbsolutePosition & fap)
+  {
+    os << "x " << fap.x << " y " << fap.y << " z " << fap.z << " theta " << fap.theta << " omega " << fap.omega << " omega2 " << fap.omega2 << std::endl;
+    os << "dx " << fap.dx << " dy " << fap.dy << " dz " << fap.dz << " dtheta " << fap.dtheta << " domega " << fap.domega << " domega2 " << fap.domega2 << std::endl;
+    os << "ddx " << fap.ddx << " ddy " << fap.ddy << " ddz " << fap.ddz << " ddtheta " << fap.ddtheta << " ddomega " << fap.ddomega << " ddomega2 " << fap.ddomega2 << std::endl;
+    os << "time " << fap.time << " stepType " << fap.stepType;
+    return os;
+  }
 
   // Linear constraint.
   struct LinearConstraintInequality_s
@@ -162,6 +195,13 @@ namespace PatternGeneratorJRL
   typedef struct SupportFeet_s
     SupportFeet_t;
 
+  inline std::ostream & operator<<(std::ostream & os, const SupportFeet_s & sf)
+  {
+    os << "x " << sf.x << " y " << sf.y << " theta " << sf.theta << std::endl;
+    os << " StartTime " << sf.StartTime << " SupportFoot " << sf.SupportFoot;
+    return os;
+  }
+
   /// Structure to store the absolute reference.
   struct ReferenceAbsoluteVelocity_t
   {
@@ -174,6 +214,12 @@ namespace PatternGeneratorJRL
     MAL_VECTOR(RefVectorTheta,double);
   };
   typedef struct ReferenceAbsoluteVelocity_t ReferenceAbsoluteVelocity;
+
+  inline std::ostream & operator<<(std::ostream & os, const ReferenceAbsoluteVelocity_t & rav)
+  {
+    os << "x " << rav.x << " y " << rav.y << " z " << rav.z << " dYaw " << rav.dYaw;
+    return os;
+  }
 
 }
 #endif

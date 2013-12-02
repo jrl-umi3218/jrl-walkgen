@@ -49,10 +49,36 @@ namespace PatternGeneratorJRL
     LEFT, RIGHT
   };
 
+  inline std::ostream & operator<<(std::ostream & out, const foot_type_e & ft)
+  {
+    switch(ft)
+    {
+      case LEFT:
+        out << "LEFT";
+        break;
+      default:
+        out << "RIGHT";
+    }
+    return out;
+  }
+
   enum PhaseType
   {
     SS, DS
   };
+
+  inline std::ostream & operator<<(std::ostream & out, const PhaseType & pt)
+  {
+    switch(pt)
+    {
+      case SS:
+        out << "SingleSupport";
+        break;
+      default:
+        out << "DoubleSupport";
+    }
+    return out;
+  }
 
   enum ineq_e
   {
@@ -168,6 +194,13 @@ namespace PatternGeneratorJRL
     reference_t();
     reference_t(const reference_t &);
   };
+
+  inline std::ostream & operator<<(std::ostream & out, const reference_t & Ref)
+  {
+    out << "Global: (" << Ref.Global.X << ", " << Ref.Global.Y << ", " << Ref.Global.Yaw << ")" << std::endl;
+    out << "Local: (" << Ref.Local.X << ", " << Ref.Local.Y << ", " << Ref.Local.Yaw << ")";
+    return out;
+  }
 
   /// \brief Convex hull
   struct convex_hull_t
@@ -285,6 +318,23 @@ namespace PatternGeneratorJRL
 
     support_state_t();
   };
+
+  inline std::ostream & operator<<(std::ostream & out, const support_state_t & st)
+  {
+    out << "SupportState" << std::endl;
+    out << "PhaseType " << st.Phase << std::endl;
+    out << "Foot " << st.Foot << std::endl;
+    out << "NbStepsLeft " << st.NbStepsLeft << std::endl;
+    out << "StepNumber " << st.StepNumber << std::endl;
+    out << "NbInstants " << st.NbInstants << std::endl;
+    out << "TimeLimit " << st.TimeLimit << std::endl;
+    out << "StartTime " << st.StartTime << std::endl;
+    out << "X " << st.X << std::endl;
+    out << "Y " << st.Y << std::endl;
+    out << "Yaw " << st.Yaw << std::endl;
+    out << "StateChanged " << st.StateChanged;
+    return out;
+  }
 
   /// \brief Solution
   struct solution_t

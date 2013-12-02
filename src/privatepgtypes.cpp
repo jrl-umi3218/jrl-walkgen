@@ -377,4 +377,5 @@ namespace PatternGeneratorJRL
   reference_t::frame_t::frame_t(const frame_t & F):
       X(F.X), Y(F.X), Yaw(F.Yaw), X_vec(F.X_vec), Y_vec(F.Y_vec), Yaw_vec(F.Yaw_vec)
   {}
+
 }
