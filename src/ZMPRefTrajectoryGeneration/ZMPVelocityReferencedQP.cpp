@@ -220,6 +220,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
     COMState & lStartingCOMState,
     MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
 {
+  UpperTimeLimitToUpdate_ = 0.0;
 
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
 
