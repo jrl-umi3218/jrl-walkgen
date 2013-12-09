@@ -145,6 +145,9 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
   aStartingCOMState.x[0] = lStartingCOMState(0);
   aStartingCOMState.y[0] = lStartingCOMState(1);
   aStartingCOMState.z[0] = lStartingCOMState(2);
+  aStartingCOMState.yaw[0] = lStartingWaistPose(5);
+  aStartingCOMState.pitch[0] = lStartingWaistPose(4);
+  aStartingCOMState.roll[0] = lStartingWaistPose(3);
   aStartingZMPPosition= m_ComAndFootRealization->GetCOGInitialAnkles();
 
   //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in   CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;

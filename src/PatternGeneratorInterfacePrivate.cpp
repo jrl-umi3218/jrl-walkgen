@@ -541,7 +541,6 @@ namespace PatternGeneratorJRL {
     deque<RelativeFootPosition> RelativeFootPositions;
     m_ZMPVRQP->SetCurrentTime(m_InternalClock);
 
-
     m_ZMPVRQP->InitOnLine(m_ZMPPositions,
 			  m_COMBuffer,
 			  m_LeftFootPositions,
@@ -898,7 +897,6 @@ namespace PatternGeneratorJRL {
     MAL_VECTOR_TYPE(double) lCurrentConfiguration;
 
     lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
-    ODEBUG("lCurrent Configuration :" << lCurrentConfiguration);
 
 
     deque<RelativeFootPosition> lRelativeFootPositions;

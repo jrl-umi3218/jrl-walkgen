@@ -125,6 +125,11 @@ namespace PatternGeneratorJRL
     inline void CoM( const com_t & CoM )
     { StateMatrices_.CoM = CoM; };
 
+    inline trunk_t const & Trunk() const
+    { return StateMatrices_.Trunk; }
+    inline void Trunk( const trunk_t & Trunk )
+    { StateMatrices_.Trunk = Trunk; }
+
     inline reference_t const & Reference() const
     { return StateMatrices_.Ref; };
     inline reference_t & Reference()

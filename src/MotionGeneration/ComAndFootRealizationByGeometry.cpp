@@ -366,13 +366,19 @@ InitializationHumanoid(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
     getHumanoidDynamicRobot()->currentConfiguration();
 
   // Set to zero the free floating root.
-  CurrentConfig[0] = 0.0;
-  CurrentConfig[1] = 0.0;
-  CurrentConfig[2] = 0.0;
-
-  CurrentConfig[3] = 0.0;
-  CurrentConfig[4] = 0.0;
-  CurrentConfig[5] = 0.0;
+  if(lStartingWaistPose.size())
+  {
+    CurrentConfig[0] = lStartingWaistPose(0);
+    CurrentConfig[1] = lStartingWaistPose(1);
+    CurrentConfig[2] = lStartingWaistPose(2);
+    CurrentConfig[3] = lStartingWaistPose(3);
+    CurrentConfig[4] = lStartingWaistPose(4);
+    CurrentConfig[5] = lStartingWaistPose(5);
+  }
+  else
+  {
+    lStartingWaistPose.resize(6,0);
+  }
   
   // Initialize the configuration vector.
   for(unsigned int i=0;i<m_GlobalVRMLIDtoConfiguration.size();i++)
@@ -403,9 +409,9 @@ InitializationHumanoid(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
   lStartingWaistPose(0) = CurrentConfig(0); // 0.0
   lStartingWaistPose(1) = CurrentConfig(1); // 0.0
   lStartingWaistPose(2) = CurrentConfig(2);
-  lStartingWaistPose(3) = 0.0;
-  lStartingWaistPose(4) = 0.0;
-  lStartingWaistPose(5) = 0.0;
+  lStartingWaistPose(3) = CurrentConfig(3); //0.0;
+  lStartingWaistPose(4) = CurrentConfig(4); //0.0;
+  lStartingWaistPose(5) = CurrentConfig(5); //0.0;
 
   ODEBUG("Current Config: " << CurrentConfig);
   return true;
@@ -485,9 +491,6 @@ InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
   /* Initialize properly the left and right initial positions of the feet. */
   memset((char *)&InitLeftFootPosition,0,sizeof(FootAbsolutePosition));
   memset((char *)&InitRightFootPosition,0,sizeof(FootAbsolutePosition));
-
-  /* Initialize the waist pose.*/
-  MAL_VECTOR_RESIZE(lStartingWaistPose,6);
 
   // Compute the forward dynamics from the configuration vector provided by the user. 
   // Initialize waist pose.

@@ -77,8 +77,8 @@ SET(SOURCES
   PatternGeneratorInterfacePrivate.cpp
   SimplePlugin.cpp
   SimplePluginManager.cpp
+  pgtypes.cpp
   Clock.cpp
-  PGTypes.cpp
   portability/gettimeofday.cc
   privatepgtypes.cpp
   )
