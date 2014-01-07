@@ -15,6 +15,13 @@
 
 INCLUDE(CTest)
 
+# Optional test dependencies. 
+# We put them here to prevent them to be listed in the .pc file.
+ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
+ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
+
+MESSAGE(STATUS "hrp2-dynamics: " ${HRP2_DYNAMICS_FOUND})
+
 # Import jrl-mal flags.
 ADD_DEFINITIONS(${JRL_MAL_CFLAGS})
 LINK_DIRECTORIES(${JRL_DYNAMICS_LIBRARY_DIRS})
