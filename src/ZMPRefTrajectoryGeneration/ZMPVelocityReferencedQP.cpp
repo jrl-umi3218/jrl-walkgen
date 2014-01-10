@@ -47,6 +47,9 @@
 #include <privatepgtypes.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh>
 
+//#include <metapod/algos/rnea.hh>
+//#include "common.hh"
+
 #include <Debug.hh>
 using namespace std;
 using namespace PatternGeneratorJRL;
@@ -70,6 +73,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 
   // Create and initialize online interpolation of feet trajectories
   RFI_ = new RelativeFeetInequalities( SPM,aHS );
+
+  // Save the reference to HDR
+  HDR_ = aHS ;
 
   // Create and initialize the finite state machine for support sequences
   SupportFSM_ = new SupportFSM();
@@ -104,7 +110,6 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   Robot_->multiBody(false);
   Robot_->initialize( );
 
-
   IntermedData_ = new IntermedQPMat();
 
   VRQPGenerator_ = new GeneratorVelRef( SPM, IntermedData_, Robot_, RFI_ );
@@ -131,7 +136,13 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 	  std::cerr << "Unable to register " << aMethodName << std::endl;
 	}
     }
-  
+
+  // Initialization of the Kajita preview controls (ICRA 2003).
+  MAL_MATRIX_RESIZE(m_deltax,3,1);  MAL_MATRIX_RESIZE(m_deltay,3,1);
+  m_PC = new PreviewControl(SPM,
+			    OptimalControllerSolver::MODE_WITHOUT_INITIALPOS,
+			    true);
+
 }
 
 
@@ -401,6 +412,10 @@ ZMPVelocityReferencedQP::OnLine(double time,
       if(Solution_.Fail>0)
           Problem_.dump( time );
 
+      // DYNAMIC FILTER
+      // --------------
+      //DynamicFilter(        );
+
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
@@ -441,7 +456,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
           Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
 
-      
+
       // Specify that we are in the ending phase.
       if (EndingPhase_ == false)
         {
@@ -496,7 +511,7 @@ int ZMPVelocityReferencedQP::OnLineFootChange(double ,
   return -1;
 }
 
-void ZMPVelocityReferencedQP::EndPhaseOfTheWalking(deque<ZMPPosition> &, 
+void ZMPVelocityReferencedQP::EndPhaseOfTheWalking(deque<ZMPPosition> &,
     deque<COMState> &,
     deque<FootAbsolutePosition> &,
     deque<FootAbsolutePosition> &)
@@ -510,3 +525,169 @@ int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep()
   return 2*r;
 }
 
+#define CONFIG_DIRECTORY "/home/mnaveau/devel/metapod/tests/data/simple_humanoid"
+int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPositions,
+		      std::deque<COMState> &FinalCOMTraj_deq ,
+		      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+		      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions
+		      )
+{
+  // \brief claculate, from the CoM of computed by the preview control,
+  //    the corresponding articular position, velocity and acceleration
+  // ------------------------------------------------------------------
+  const int qp_N = QP_N_ ;
+  MAL_VECTOR_TYPE(double) configurationTraj [qp_N] ;
+  MAL_VECTOR_TYPE(double) velocityTraj [qp_N] ;
+  MAL_VECTOR_TYPE(double) accelerationTraj [qp_N] ;
+  for(int i = 0 ; i <  QP_N_ ; i++ ){
+     MAL_VECTOR_TYPE(double) currentConfiguration;
+     MAL_VECTOR_TYPE(double) currentVelocity;
+     MAL_VECTOR_TYPE(double) currentAcceleration;
+     COMState acompos ( FinalCOMTraj_deq[i] );
+     FootAbsolutePosition aLeftFAP ( LeftFootAbsolutePositions [i] );
+     FootAbsolutePosition aRightFAP ( RightFootAbsolutePositions [i] );
+     CallToComAndFootRealization(acompos,aLeftFAP,aRightFAP,
+				 currentConfiguration,
+				 currentVelocity,
+				 currentAcceleration,i,0);
+     configurationTraj[i] = currentConfiguration ;
+     velocityTraj[i] = currentVelocity ;
+     accelerationTraj[i] = currentAcceleration ;
+  }
+
+  // \brief rnea
+  // -----------
+//  typedef CURRENT_MODEL_ROBOT<LocalFloatType> Robot;
+//  // Set configuration vectors (q, dq, ddq) to reference values.
+//  Robot::confVector torques;
+//  vectorN <vectorN <double>> allTorques ;
+//  vectorN <double> torques ;
+//  for (int i = 0 ; i < QP_N_ ; i++ ){
+//    // Apply the RNEA to the metapod multibody and print the result in a log file.
+//    rnea< Robot, true >::run(robot, configurationTraj[i], velocityTraj[i], accelerationTraj[i]);
+//    getTorques(robot, torques);
+//    allTorques[i] = torques ;
+//  }
+
+  // Projection of the Torques on the ground, the result is the ZMP Multi-Body
+  // -------------------------------------------------------------------------
+  double factor = 1/(RobotMass_*9.81);
+  vector <ZMPPosition> deltaZMPMBPositions (QP_N_,ZMPPosition());
+  for(int i = 0 ; i <  QP_N_ ; i++ ){
+    // Smooth ramp
+    //deltaZMPMBPositions[i].px = ZMPPositions[i].x + allTorques[i].y * factor ;
+    //deltaZMPMBPositions[i].py = ZMPPositions[i].y - allTorques[i].x * factor;
+    deltaZMPMBPositions[i].pz = 0 ;
+    deltaZMPMBPositions[i].theta = 0.0;
+    deltaZMPMBPositions[i].time = m_CurrentTime;
+    deltaZMPMBPositions[i].stepType = 0 ;
+  }
+
+  // Preview control on the ZMPMBs computed
+  // --------------------------------------
+    // setup
+  m_PC->SetPreviewControlTime (TimeBuffer_);
+  m_PC->SetSamplingPeriod (m_SamplingPeriod);
+  double aSxzmp (0) , aSyzmp(0);
+  double deltaZMPx (0) , deltaZMPy (0) ;
+    // calcul of the preview control along the "ZMPPositions"
+  for (int i = 0 ; i < QP_N_ ; i++ ){
+    m_PC->OneIterationOfPreview(m_deltax,m_deltay,
+				aSxzmp,aSyzmp,
+				ZMPPositions,i,
+				deltaZMPx, deltaZMPy, true);
+  }
+  {
+    COMState aCOMState ;
+    for(int i=0;i<3;i++){
+      aCOMState.x[i] += m_deltax(i,0);
+      aCOMState.y[i] += m_deltay(i,0);
+    }
+    FinalCOMTraj_deq[0] = aCOMState ;
+  }
+  return 0;
+}
+
+
+void ZMPVelocityReferencedQP::CallToComAndFootRealization(COMState &acomp,
+     FootAbsolutePosition &aLeftFAP,
+     FootAbsolutePosition &aRightFAP,
+     MAL_VECTOR_TYPE(double) &CurrentConfiguration,
+     MAL_VECTOR_TYPE(double) &CurrentVelocity,
+     MAL_VECTOR_TYPE(double) &CurrentAcceleration,
+     int IterationNumber,
+     int StageOfTheAlgorithm)
+ {
+
+   // New scheme for WPG v3.0
+   // We call the object in charge of generating the whole body
+   // motion  ( for a given CoM and Feet points)  before applying the second filter.
+   MAL_VECTOR_DIM(aCOMState,double,6);
+   MAL_VECTOR_DIM(aCOMSpeed,double,6);
+   MAL_VECTOR_DIM(aCOMAcc,double,6);
+
+   aCOMState(0) = acomp.x[0];
+   aCOMState(1) = acomp.y[0];
+   aCOMState(2) = acomp.z[0];
+   aCOMState(3) = acomp.roll[0];
+   aCOMState(4) = acomp.pitch[0];
+   aCOMState(5) = acomp.yaw[0];
+
+   aCOMSpeed(0) = acomp.x[1];
+   aCOMSpeed(1) = acomp.y[1];
+   aCOMSpeed(2) = acomp.z[1];
+   aCOMSpeed(3) = acomp.roll[1];
+   aCOMSpeed(4) = acomp.roll[1];
+   aCOMSpeed(5) = acomp.roll[1];
+
+   aCOMAcc(0) = acomp.x[2];
+   aCOMAcc(1) = acomp.y[2];
+   aCOMAcc(2) = acomp.z[2];
+   aCOMAcc(3) = acomp.roll[2];
+   aCOMAcc(4) = acomp.roll[2];
+   aCOMAcc(5) = acomp.roll[2];
+
+   MAL_VECTOR_DIM(aLeftFootPosition,double,5);
+   MAL_VECTOR_DIM(aRightFootPosition,double,5);
+
+   aLeftFootPosition(0) = aLeftFAP.x;
+   aLeftFootPosition(1) = aLeftFAP.y;
+   aLeftFootPosition(2) = aLeftFAP.z;
+   aLeftFootPosition(3) = aLeftFAP.theta;
+   aLeftFootPosition(4) = aLeftFAP.omega;
+
+   aRightFootPosition(0) = aRightFAP.x;
+   aRightFootPosition(1) = aRightFAP.y;
+   aRightFootPosition(2) = aRightFAP.z;
+   aRightFootPosition(3) = aRightFAP.theta;
+   aRightFootPosition(4) = aRightFAP.omega;
+
+   /* Get the current configuration vector */
+   CurrentConfiguration = HDR_->currentConfiguration();
+
+   /* Get the current velocity vector */
+   CurrentVelocity = HDR_->currentVelocity();
+
+   /* Get the current acceleration vector */
+   CurrentAcceleration = HDR_->currentAcceleration();
+
+   m_ComAndFootRealization->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
+								    aLeftFootPosition,
+								    aRightFootPosition,
+								    CurrentConfiguration,
+								    CurrentVelocity,
+								    CurrentAcceleration,
+								    IterationNumber,
+								    StageOfTheAlgorithm);
+   if (StageOfTheAlgorithm==0)
+     {
+       /* Update the current configuration vector */
+       HDR_->currentConfiguration(CurrentConfiguration);
+
+       /* Update the current velocity vector */
+       HDR_->currentVelocity(CurrentVelocity);
+
+       /* Update the current acceleration vector */
+       HDR_->currentAcceleration(CurrentAcceleration);
+     }
+ }

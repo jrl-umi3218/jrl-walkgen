@@ -30,7 +30,7 @@
 #ifndef _ZMPVELOCITYREFERENCEDQP_WITH_CONSTRAINT_H_
 #define _ZMPVELOCITYREFERENCEDQP_WITH_CONSTRAINT_H_
 
-
+#include <PreviewControl/PreviewControl.hh>
 #include <PreviewControl/LinearizedInvertedPendulum2D.hh>
 #include <PreviewControl/rigid-body-system.hh>
 #include <Mathematics/relative-feet-inequalities.hh>
@@ -42,6 +42,7 @@
 #include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>
 #include <jrl/walkgen/pgtypes.hh>
+#include <MotionGeneration/ComAndFootRealization.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -198,8 +199,18 @@ namespace PatternGeneratorJRL
     /// \brief Previewed Solution
     solution_t Solution_;
 
+    /// \brief Store a reference to the object to solve posture resolution.
+    ComAndFootRealization * m_ComAndFootRealization;
+    
+    /// \brief HDR allow the computation of the dynamic filter
+    CjrlHumanoidDynamicRobot * HDR_ ;
 
+    /// \brief Pointer to the Preview Control object.
+    PreviewControl *m_PC;
 
+    /// \brief State of the Preview control.
+    MAL_MATRIX( m_deltax,double);
+    MAL_MATRIX( m_deltay,double);
 
   public:
 
@@ -233,8 +244,25 @@ namespace PatternGeneratorJRL
                               deque<COMState> &FinalCOMTraj_deq,
                               deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
                               deque<FootAbsolutePosition> &RightFootAbsolutePositions);
-
+ 
     int ReturnOptimalTimeToRegenerateAStep();
+
+    int DynamicFilter(std::deque<ZMPPosition> & ZMPPositions,
+		      std::deque<COMState> & COMStates,
+		      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
+		      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions
+		      );
+    
+    void CallToComAndFootRealization(COMState &acomp,
+				    FootAbsolutePosition &aLeftFAP,
+				    FootAbsolutePosition &aRightFAP,
+				    MAL_VECTOR_TYPE(double) &CurrentConfiguration,
+				    MAL_VECTOR_TYPE(double) &CurrentVelocity,
+				    MAL_VECTOR_TYPE(double) &CurrentAcceleration,
+				    int IterationNumber,
+				    int StageOfTheAlgorithm
+				    );
+    
   };
 }
 
