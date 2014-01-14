@@ -42,7 +42,7 @@
 #include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>
 #include <jrl/walkgen/pgtypes.hh>
-#include <MotionGeneration/ComAndFootRealization.hh>
+#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -129,7 +129,15 @@ namespace PatternGeneratorJRL
 
     inline const int & QP_N(void) const
     { return QP_N_; }
+
+    /// \brief Setter and getter for the ComAndZMPTrajectoryGeneration.
+    inline bool setComAndFootRealization(ComAndFootRealization * aCFR)
+      { ComAndFootRealization_ = aCFR; return true;};
+    inline ComAndFootRealization * getComAndFootRealization()
+      { return ComAndFootRealization_;};
+
     /// \}
+
 
 
     //
@@ -200,8 +208,8 @@ namespace PatternGeneratorJRL
     solution_t Solution_;
 
     /// \brief Store a reference to the object to solve posture resolution.
-    ComAndFootRealization * m_ComAndFootRealization;
-    
+    ComAndFootRealization * ComAndFootRealization_;
+
     /// \brief HDR allow the computation of the dynamic filter
     CjrlHumanoidDynamicRobot * HDR_ ;
 
@@ -244,7 +252,7 @@ namespace PatternGeneratorJRL
                               deque<COMState> &FinalCOMTraj_deq,
                               deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
                               deque<FootAbsolutePosition> &RightFootAbsolutePositions);
- 
+
     int ReturnOptimalTimeToRegenerateAStep();
 
     int DynamicFilter(std::deque<ZMPPosition> & ZMPPositions,
@@ -252,7 +260,7 @@ namespace PatternGeneratorJRL
 		      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 		      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions
 		      );
-    
+
     void CallToComAndFootRealization(COMState &acomp,
 				    FootAbsolutePosition &aLeftFAP,
 				    FootAbsolutePosition &aRightFAP,
@@ -262,7 +270,7 @@ namespace PatternGeneratorJRL
 				    int IterationNumber,
 				    int StageOfTheAlgorithm
 				    );
-    
+
   };
 }
 

@@ -15,6 +15,8 @@
 
 # Make sure to find Debug.h
 INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src)
+INCLUDE_DIRECTORIES(BEFORE ${HOME}/devel/metapod/_bin/include/)
+INCLUDE_DIRECTORIES(BEFORE ${HOME}/devel/metapod/_bin/include/metapod/)
 
 # add flag to compile qld.cc
 IF(WIN32)

@@ -47,7 +47,7 @@
 #include <privatepgtypes.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh>
 
-//#include <metapod/algos/rnea.hh>
+#include "metapod/algos/rnea.hh"
 //#include "common.hh"
 
 #include <Debug.hh>
@@ -122,6 +122,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VRQPGenerator_->Ponderation( 0.000001, COP_CENTERING );
   VRQPGenerator_->Ponderation( 0.00001, JERK_MIN );
 
+  ComAndFootRealization_ = 0 ;
+
   // Register method to handle
   const unsigned int NbMethods = 3;
   string aMethodName[NbMethods] =
@@ -166,6 +168,9 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 
   if (IntermedData_!=0)
     delete IntermedData_;
+
+  if (ComAndFootRealization_!=0)
+    delete ComAndFootRealization_;
 
 }
 
@@ -525,6 +530,8 @@ int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep()
   return 2*r;
 }
 
+
+//  typedef CURRENT_MODEL_ROBOT<LocalFloatType> Robot;
 #define CONFIG_DIRECTORY "/home/mnaveau/devel/metapod/tests/data/simple_humanoid"
 int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPositions,
 		      std::deque<COMState> &FinalCOMTraj_deq ,
@@ -535,29 +542,23 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
   // \brief claculate, from the CoM of computed by the preview control,
   //    the corresponding articular position, velocity and acceleration
   // ------------------------------------------------------------------
-  const int qp_N = QP_N_ ;
-  MAL_VECTOR_TYPE(double) configurationTraj [qp_N] ;
-  MAL_VECTOR_TYPE(double) velocityTraj [qp_N] ;
-  MAL_VECTOR_TYPE(double) accelerationTraj [qp_N] ;
+  MAL_VECTOR_TYPE(double) configurationTraj [QP_N_] ;
+  MAL_VECTOR_TYPE(double) velocityTraj [QP_N_] ;
+  MAL_VECTOR_TYPE(double) accelerationTraj [QP_N_] ;
   for(int i = 0 ; i <  QP_N_ ; i++ ){
-     MAL_VECTOR_TYPE(double) currentConfiguration;
-     MAL_VECTOR_TYPE(double) currentVelocity;
-     MAL_VECTOR_TYPE(double) currentAcceleration;
-     COMState acompos ( FinalCOMTraj_deq[i] );
-     FootAbsolutePosition aLeftFAP ( LeftFootAbsolutePositions [i] );
-     FootAbsolutePosition aRightFAP ( RightFootAbsolutePositions [i] );
-     CallToComAndFootRealization(acompos,aLeftFAP,aRightFAP,
-				 currentConfiguration,
-				 currentVelocity,
-				 currentAcceleration,i,0);
-     configurationTraj[i] = currentConfiguration ;
-     velocityTraj[i] = currentVelocity ;
-     accelerationTraj[i] = currentAcceleration ;
+    CallToComAndFootRealization(
+      FinalCOMTraj_deq[i],
+      LeftFootAbsolutePositions [i],
+      RightFootAbsolutePositions [i],
+      configurationTraj[i],
+      velocityTraj[i],
+      accelerationTraj[i],
+      i,0);
   }
 
   // \brief rnea
   // -----------
-//  typedef CURRENT_MODEL_ROBOT<LocalFloatType> Robot;
+
 //  // Set configuration vectors (q, dq, ddq) to reference values.
 //  Robot::confVector torques;
 //  vectorN <vectorN <double>> allTorques ;
@@ -671,7 +672,7 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(COMState &acomp,
    /* Get the current acceleration vector */
    CurrentAcceleration = HDR_->currentAcceleration();
 
-   m_ComAndFootRealization->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
+   ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
 								    aLeftFootPosition,
 								    aRightFootPosition,
 								    CurrentConfiguration,
