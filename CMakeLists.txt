@@ -102,6 +102,8 @@ SET(${PROJECT_NAME}_HEADERS
   include/jrl/walkgen/pgtypes.hh
 )
 
+TARGET_LINK_LIBRARIES(metapod_${model_name})
+
 # Define subdirectories to explore for cmake
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(tests)
