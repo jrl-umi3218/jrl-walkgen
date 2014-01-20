@@ -2,6 +2,206 @@ CHANGELOG
 ----------------------
 
 [Current]
+ * Since hrp2 is only needed for the tests, the dependency is declared in the tests.
+ * Synchronize.
+ * Merge pull request #19 from gergondet/topic/fixPGInitialization
+ * synchronize cmake module
+ * Fix intialization to allow restart of Herdt's PG
+ * Fix PG initialization
+ * Add some ostream operators for walkgen structures
+ * Fix source naming inconsistency
+ * Merge pull request #17 from gergondet/topic/fixHerdtFinalPosAndRunningFlag
+ * Correctly set m_Running
+ * Set running value properly for Herdt's PG
+ * Put the CoM at the center of the feet when stopping
+
+[3.1.7]
+ * [cmake] Synchronize
+ * Update datref.cmake for Morisawa walking pattern generator.
+ * Merge branch 'topic/merge-rc-3.1.4'
+ * Synchronize
+ * Add a test for emergency stop.
+ * Remove debug output.
+ * Optimize code and remove initialisation problems (division by zero).
+ * Add test stress on Herdt WPG.
+ * Improve the test validation.
+ * Makes sure that ZMP, Left and Foot trajectory generation are synchronized.
+ * Makes jrl-walkgen less verbose.
+ * Cleaning. Remove unused code.
+ * Update ref values for unit test.
+ * First version with sensible output. The graphs have to be checked.
+ * First compiling version.
+ * Update the dependency in hrp2-14.
+ * Merge branch 'topic/rc-v3.1.4' into topic/merge-rc-3.1.4
+ * Simplify name handling for TestMorisawa2007.
+ * Add TestMorisaw2007ShortWalkTEstFGPI_64.datref.cmake
+ * [CMakeLists.txt] Add MACRO to generate Morisawa 2007 tests.
+ * Fix comparaison between x86_32 and x86_64.
+ * Fix problem related to the robot data path.
+ * [travis] Make cmake verbose
+ * Disable failing tests
+ * Synchronize
+ * Update README.md
+ * [travis] Add Travis support
+ * Fix directory to load default sample.wrl file for unitTesting.
+ * Update lib installation path (multiarch portability).
+ * Synchronize
+ * Revert "Interpolation of height with fifth order polynomials"
+ * Add vim swap files to .gitignore
+ * Synchronize.
+ * Make multi-body mode work
+ * Speed up computation
+ * Speed up add_term()
+ * Change the computation of selection matrices Vc..
+ * Merge branch 'topic/toes' of github.com:jrl-umi3218/jrl-walkgen into topic/toes
+ * Constraints on the com
+ * Merge branch 'topic/rc-v3.1.4 into topic/toes
+ * Enums and convex hull
+ * Remove PLDPHerdt ;(
+ * temporary
+ * Merge branch 'topic/toes' of github.com:jrl-umi3218/jrl-walkgen into toes
+ * change sign of foot constraint area in y-axis
+ * change sign for foot constraint in y-axis
+ * add access function of QP_N
+ * remove dependency of ROBOT
+ * Merge branch 'topic/rc-v3.1.4' into topic/toes
+ * Introduce pointer, rename
+ * Complete the list of maneuvers in TestHerdt2010
+ * Correct insertion of constraints
+ * CoM constraints, enums, clean up
+ * ...missing in the previous commit...
+ * Enums, rotations, clean up,
+ * Warning removal
+ * Improve, clarify and cohere compute_warm_start()
+ * Clean up
+ * Change enum type names and clean up
+ * Update indentation
+ * typo 2
+ * Typo
+ * UseWarmstart must be false if you dont use LSSOL
+ * Merge branch 'topic/rc-v3.1.4' of github.com:jrl-umi3218/jrl-walkgen into rc-v3.1.4
+ * Add the computation of initial solution wich respect all the constraints note : used in LSSOL (QLD don't support this)
+ * correct a segfault in LSSOL
+ * Add a comment
+ * compute the inverse of COP dynamic matrix U
+ * m_Degree must be initialize in the constructor
+ * COP double support constraint was wrong because security margins was counted two times
+ * Initialization + Attribute names
+ * Omit setting of velocity reference :HerdtOnLine
+ * Merge branch 'topic/rc-v3.1.4' of github.com:jrl-umi3218/jrl-walkgen into topic/rc-v3.1.4
+ * Include verification of sup. phase before interpretation
+ * Add a buffer to the modification of velocity reference It's usefull to avoid multi-thread problems
+ * Merge branch 'topic/rc-v3.1.4' of github.com:jrl-umi3218/jrl-walkgen into HEAD
+ * comment the part which concern the multi-body dynamics, because it's unused
+ * A minor bug with parenthesis (did not affect the program behavior)
+ * uninitialized data
+ * First part of warm-start with LSSOL
+ * Add interpolation of trunk orientations for N_ instants
+ * Correct a bug introduced in commit 5efc71.
+ * Add a patch in rigid-body-system to avoid wrong memory access.
+ * Correct test + warning removal.
+ * Move reset to the beginning of online routine
+ * Smaller refactoring
+ * I think there are five arguments...
+ * Add missing initialization in CallMethod
+ * Correct the type of an attribute (should be int rather than double).
+ * Add a patch preventing wrong memory access.
+ * Fix overflow problems inside for loops
+ * Align and complete previous commits
+ * Avoid the fall of the robot if it completed a pure rotation TODO to complete this : Center the CoM at the end of a movement
+ * Rename compute_term into multiply_terms
+ * Optimize and clarify the code
+ * Add a comment in OrientationsPreview class
+ * remove obsolete contents
+ * Correct a minor warning
+ * Documentation
+ * Remove object and warnings
+ * Correct the declaration of verify_angle_hip_joint. One of the parameters cannot be const.
+ * Remove debug traces et restore the use of QLD by default.
+ * Minor corrections in documentation
+ * Correct some rebase errors
+ * Add the second derivative for x,y,z,theta,omega and omega2.
+ * Use Polynomes of degree 5/6 instead of 3/4
+ * Add methods to initialize the Polynome of degree 5/6
+ * Simple rewriting of the code
+ * Add the computation of the second derivative to Polynome
+ * Correct typos
+ * Adding const operator wherever it's possible
+ * The link with lssol is now optional
+ * Add LSSOL solver to qp-problem and add some online tests for these Note : LSSOL sources are not included
+ * Disactivate equality constraints on feet positions
+ * remove cout
+ * Enhance jerk gain
+ * Minor changes
+ * Minor changes
+ * Method + minor bugfix
+ * Add methods for dynamics computation
+ * Add members and documentation
+ * Use of SupportStates_deq
+ * New method, some minor improvements
+ * :finish is deprecated for ZMPVelRef
+ * Minor changes
+ * Move solution interpretation and resize to OLFTG
+ * - Introduce enum type QPElement - Introduce enum type Solver - Remove predefined QP size - The first row of the constraints matrix is now zero!!! - m =
+ * Remove old CoP dynamics computation, doc., cleaning
+ * Change vertical interpolation to two order 5 polynomials
+ * Add computation of three-body cop dynamics
+ * Interpolation of height with fifth order polynomials
+ * Trajectory precomputation
+ * Add NbInstants to support_state_t
+ * see previous commit...
+ * Add precomputation of trajectory
+ * Remove obsolete todos
+ * Add member StepHeight_ and accessors
+ * Add computation of second derivative
+ * Move second derivative computation to parent class
+ * Include foot dynamics + Move declaration of types
+ * See previous commmit
+ * Switch to fifth order polynomials
+ * Move specification of dynamics to rigid-body...
+ * Minor bugfix
+ * Initialization
+ * Initialization
+ * New instance, documentation, pointer destruction
+ * Minor cleaning
+ * Add pointer member to simplified model
+ * Merge branch 'topic/new-classes' into topic/door
+ * Introduce classes for simulation of rigid bodies
+ * Complete unmerged details
+ * Merge topic/rc-v3.1.4
+ * Clean up and restructure slightly
+ * Bugfix
+ * Modify FSM to solve instability issues at the beginning
+ * The door is opening. The frontal constraints have to be verified
+ * Bugfixes, door fixed
+ * Minor changes
+ * PG cancellation and initialization
+ * Add call and move IQPMat
+ * Remove debug message
+ * Accessor, documentation
+ * Add external constraints on the CoM
+ * Merge with topic/rc-v3.1.4
+ * Minor temporary changes
+ * Add method
+ * Smaller refactoring
+ * Bugfix, Warnings, Refactoring
+ * Bugfix and clean up
+ * Bugfix and reformulation
+ * Add computation of external constraints and CoM position dynamics
+ * Add new object Door
+ * Add accessor to the constraints number and bugfix
+ * Add accessor to position matrices
+ * Add external object door
+ * Temporary change of the CoM initialization
+ * Documentation, clean up and bugfix
+ * Reformulated tests for Herdt2010 algorithm.
+ * Typo
+ * Add velocity output for the trunk direction, and bounds on hip joints angular velocity.
+ * Remove memory size display for qp-problem.
+
+[3.1.6]
+ * Remove debian .
+ * Update ChangeLog
  * Update tests for Kajita 2003.
  *  Synchronize
  * Fix ZMP computation for multibody correction.
