@@ -16,16 +16,25 @@
 # Requires at least CMake 2.6 to configure the package.
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+
+INCLUDE(cmake/cmake_metapod_configure.cmake)
+##############################################################################
+SET(WITH_METAPODFROMURDF TRUE)
+SET(model_name "simple_humanoid")
+# Define the simple humanoid model for the metapod algorithm
+ADD_SAMPLEURDFMODEL(${model_name})
+##############################################################################
+
 # Includes from jrl-cmaketools
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/lapack.cmake)
 INCLUDE(cmake/cpack.cmake)
+INCLUDE(CMakeDependentOption)
 
 # Define properties of the project
 SET(PROJECT_NAME jrl-walkgen)
 SET(PROJECT_DESCRIPTION "Walking pattern generator for Humanoids")
 SET(PROJECT_URL "")
-
 
 SET(CXX_DISABLE_WERROR True)
 
@@ -52,6 +61,14 @@ ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
 ADD_OPTIONAL_DEPENDENCY("metapod >= 1.0.7")
 
 MESSAGE(STATUS "hrp2-dynamics: " ${HRP2_DYNAMICS_FOUND})
+
+# Search for Eigen.
+ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.0")
+# Eigen (at least version 3.0.5) makes gcc report conversion warnings
+# when one assigns to a block. This floods the compilation results.
+# So we include Eigen headers as if they were system headers: the compiler
+# won't report warning coming from them.
+INCLUDE_DIRECTORIES(SYSTEM ${EIGEN3_INCLUDE_DIRS})
 
 # TODO kinda dirty patch to find lssol for now
 #  using ADD_OPTIONAL_DEPENDENCY prevents the creation
