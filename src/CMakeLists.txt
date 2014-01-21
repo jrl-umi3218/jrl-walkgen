@@ -87,6 +87,15 @@ SET(SOURCES
 
 ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
+# Define dependencies
+##############################################################################
+SET(WITH_METAPODFROMURDF TRUE)
+SET(model_name "hrp2_14")
+# Define the simple humanoid model for the metapod algorithm
+ADD_SAMPLEURDFMODEL(${model_name})
+##############################################################################
+TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name})
+
 INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen abstract-robot-dynamics)

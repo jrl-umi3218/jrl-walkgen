@@ -18,12 +18,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 
 INCLUDE(cmake/cmake_metapod_configure.cmake)
-##############################################################################
-SET(WITH_METAPODFROMURDF TRUE)
-SET(model_name "simple_humanoid")
-# Define the simple humanoid model for the metapod algorithm
-ADD_SAMPLEURDFMODEL(${model_name})
-##############################################################################
 
 # Includes from jrl-cmaketools
 INCLUDE(cmake/base.cmake)
@@ -48,8 +42,6 @@ IF(SYS_TIME_H)
 ADD_DEFINITIONS("-DHAVE_SYS_TIME_H")
 ENDIF(SYS_TIME_H)
 
-# Define dependencies
-
 # Required dependencies
 ADD_REQUIRED_DEPENDENCY("jrl-mal >= 1.9.0")
 ADD_REQUIRED_DEPENDENCY("abstract-robot-dynamics >= 1.15")
@@ -59,8 +51,8 @@ ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
 ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
 ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
 ADD_OPTIONAL_DEPENDENCY("metapod >= 1.0.7")
-
 MESSAGE(STATUS "hrp2-dynamics: " ${HRP2_DYNAMICS_FOUND})
+
 
 # Search for Eigen.
 ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.0")
@@ -102,8 +94,6 @@ SET(${PROJECT_NAME}_HEADERS
   include/jrl/walkgen/pgtypes.hh
 )
 
-TARGET_LINK_LIBRARIES(metapod_${model_name})
-
 # Define subdirectories to explore for cmake
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(tests)
@@ -111,6 +101,7 @@ ADD_SUBDIRECTORY(tests)
 
 # Generate dependency to jrl-walkgen in pc file
 PKG_CONFIG_APPEND_LIBS("jrl-walkgen")
+
 
 # Ask to generate the final steps.
 SETUP_PROJECT_FINALIZE()

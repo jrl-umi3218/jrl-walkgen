@@ -47,32 +47,13 @@
 #include <privatepgtypes.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh>
 
-
-
-
-#ifndef METAPOD_INCLUDES
-# define  METAPOD_INCLUDES
-
-// Common includes
-# include <string>
-# include <iostream>
-# include <fstream>
-# include <cmath>
-
-// Boost test suite includes
-# define BOOST_TEST_MODULE METAPOD
-# include <boost/test/unit_test.hpp>
-
-typedef double LocalFloatType;
-
-#define CONFIG_DIRECTORY "/home/mnaveau/devel/metapod/tests/data/simple_humanoid"
 // metapod includes
+typedef double LocalFloatType;
+#define CONFIG_DIRECTORY "/home/mnaveau/devel/metapod/tests/data/simple_humanoid"
 #include <metapod/models/simple_humanoid/simple_humanoid.hh>
 #include <metapod/tools/print.hh>
 #include <metapod/tools/initconf.hh>
 #include "metapod/algos/rnea.hh"
-
-#endif
 
 #include <Debug.hh>
 using namespace std;
@@ -579,13 +560,20 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
 
   // \brief rnea
   // -----------
-  typedef CURRENT_MODEL_ROBOT<LocalFloatType> Robot;
+  typedef metapod::simple_humanoid<LocalFloatType> Robot_Model;
+  Robot_Model robot;
   // Set configuration vectors (q, dq, ddq) to reference values.
-  Robot::confVector torques;
-  vector < vectorN <double> > allTorques (QP_N_) ;
+  Robot_Model::confVector torques;
+  vector < Robot_Model::confVector > allTorques (QP_N_) ;
+  Robot_Model::confVector q, dq, ddq;
   for (int i = 0 ; i < QP_N_ ; i++ ){
     // Apply the RNEA to the metapod multibody and print the result in a log file.
-    rnea< Robot, true >::run(robot, configurationTraj[i], velocityTraj[i], accelerationTraj[i]);
+    for(unsigned int j = 0 ; j < configurationTraj[i].size() ; j++ ){
+      q(j,0) = configurationTraj[i][j] ;
+      dq(j,0) = velocityTraj[i][j] ;
+      ddq(j,0) = accelerationTraj[i][j] ;
+    }
+    metapod::rnea< Robot_Model, true >::run(robot, q, dq, ddq);
     getTorques(robot, torques);
     allTorques[i] = torques ;
   }
@@ -596,8 +584,8 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
   vector <ZMPPosition> deltaZMPMBPositions (QP_N_,ZMPPosition());
   for(int i = 0 ; i <  QP_N_ ; i++ ){
     // Smooth ramp
-    deltaZMPMBPositions[i].px = ZMPPositions[i].x + allTorques[i].y * factor ;
-    deltaZMPMBPositions[i].py = ZMPPositions[i].y - allTorques[i].x * factor;
+    deltaZMPMBPositions[i].px = ZMPPositions[i].px + allTorques[i](1,0) /*(4,0)*/ * factor ;
+    deltaZMPMBPositions[i].py = ZMPPositions[i].py - allTorques[i](0,0) /*(3,0)*/ * factor ;
     deltaZMPMBPositions[i].pz = 0 ;
     deltaZMPMBPositions[i].theta = 0.0;
     deltaZMPMBPositions[i].time = m_CurrentTime;
