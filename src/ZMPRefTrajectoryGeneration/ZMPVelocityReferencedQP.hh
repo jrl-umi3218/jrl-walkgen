@@ -136,6 +136,9 @@ namespace PatternGeneratorJRL
     inline ComAndFootRealization * getComAndFootRealization()
       { return ComAndFootRealization_;};
 
+    inline deque<ZMPPosition> getZMPTrajRef ()
+      { return ZMPTrajRef ;};
+
     /// \}
 
 
@@ -219,6 +222,9 @@ namespace PatternGeneratorJRL
     /// \brief State of the Preview control.
     MAL_MATRIX( m_deltax,double);
     MAL_MATRIX( m_deltay,double);
+
+    /// \brief State or the ZMP calculated with the pointual inverted pendulum model
+    deque<ZMPPosition> ZMPTrajRef ;
 
   public:
 

@@ -104,20 +104,40 @@ ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
 CONFIG_FILES_CMAKE(TestHerdt2010OnLineTestFGPI.datref)
 CONFIG_FILES_CMAKE(TestHerdt2010EmergencyStopTestFGPI.datref)
 
-ADD_EXECUTABLE(TestHerdt2010
+MACRO(ADD_HERDT_2010 test_herdt2010_arg)
+  ADD_EXECUTABLE(${test_herdt2010_arg}
   ../src/portability/gettimeofday.cc
-  TestHerdt2010.cpp
+  ${test_herdt2010_arg}.cpp
   CommonTools.cpp
   TestObject.cpp
   ClockCPUTime.cpp
   )
+  TARGET_LINK_LIBRARIES(${test_herdt2010_arg} ${PROJECT_NAME})
+  PKG_CONFIG_USE_DEPENDENCY(${test_herdt2010_arg} jrl-dynamics)
+  ADD_DEPENDENCIES(${test_herdt2010_arg} ${PROJECT_NAME})
 
-TARGET_LINK_LIBRARIES(TestHerdt2010 ${PROJECT_NAME})
-PKG_CONFIG_USE_DEPENDENCY(TestHerdt2010 jrl-dynamics)
-ADD_DEPENDENCIES(TestHerdt2010 ${PROJECT_NAME})
+  MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
+  SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
+  SET(samplespec
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
+  )
+  SET(sampleljr
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
+  )
+  SET(sampleinitconfig
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat)
 
-ADD_TEST(TestHerdt2010 TestHerdt2010
-  ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+  LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
+
+  # This test is disabled for now as it fails.
+  # FIXME: fix the test and/or the implementation
+  ADD_TEST(${test_herdt2010_arg}
+    ${test_herdt2010_arg}
+    ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+ENDMACRO(ADD_HERDT_2010)
+
+ADD_HERDT_2010(TestHerdt2010)
+ADD_HERDT_2010(TestHerdt2010DynamicFilter)
 
 ####################
 # Test Kajita 2003 #

@@ -47,13 +47,17 @@
 #include <privatepgtypes.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh>
 
+#ifndef METAPOD_INCLUDES
+#define METAPOD_INCLUDES
 // metapod includes
 typedef double LocalFloatType;
-#define CONFIG_DIRECTORY "/home/mnaveau/devel/metapod/tests/data/simple_humanoid"
-#include <metapod/models/simple_humanoid/simple_humanoid.hh>
+#include <metapod/models/hrp2_14/hrp2_14.hh>
 #include <metapod/tools/print.hh>
 #include <metapod/tools/initconf.hh>
 #include "metapod/algos/rnea.hh"
+#include <Eigen/StdVector>
+typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
+#endif
 
 #include <Debug.hh>
 using namespace std;
@@ -157,26 +161,40 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 {
 
   if (VRQPGenerator_!=0)
+  {
     delete VRQPGenerator_;
+    VRQPGenerator_ = 0 ;
+  }
 
   if (SupportFSM_!=0)
-    delete SupportFSM_;
+  {
+      delete SupportFSM_;
+      SupportFSM_ = 0 ;
+  }
 
   if (RFI_!=0)
+  {
     delete RFI_;
+    RFI_ = 0 ;
+  }
 
   if (OrientPrw_!=0)
+  {
     delete OrientPrw_;
+    OrientPrw_ = 0 ;
+  }
 
   if (Robot_!=0)
+  {
     delete Robot_;
+    Robot_ = 0 ;
+  }
 
   if (IntermedData_!=0)
+  {
     delete IntermedData_;
-
-  if (ComAndFootRealization_!=0)
-    delete ComAndFootRealization_;
-
+    IntermedData_ = 0 ;
+  }
 }
 
 
@@ -422,43 +440,47 @@ ZMPVelocityReferencedQP::OnLine(double time,
       if(Solution_.Fail>0)
           Problem_.dump( time );
 
-      // DYNAMIC FILTER
-      // --------------
-      //DynamicFilter(        );
-
-
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
       unsigned currentIndex = FinalCOMTraj_deq.size();
-      FinalCOMTraj_deq.resize( (unsigned)(QP_T_/m_SamplingPeriod)+currentIndex );
-      FinalZMPTraj_deq.resize( (unsigned)(QP_T_/m_SamplingPeriod)+currentIndex );
-      if(Solution_.SupportStates_deq.size() &&  Solution_.SupportStates_deq[0].NbStepsLeft == 0)
+      unsigned numberOfSample = (unsigned)(QP_T_/m_SamplingPeriod);
+      FinalCOMTraj_deq.resize( numberOfSample * currentIndex );
+      FinalZMPTraj_deq.resize( numberOfSample * currentIndex );
+      for(unsigned int i = 0 ; i < currentIndex ; i++)
       {
-         double jx = (FinalLeftFootTraj_deq[0].x + FinalRightFootTraj_deq[0].x)/2 - FinalCOMTraj_deq[0].x[0];
-         double jy = (FinalLeftFootTraj_deq[0].y + FinalRightFootTraj_deq[0].y)/2 - FinalCOMTraj_deq[0].y[0];
-         if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3) { Running_ = false; }
-         const double tf = 0.75;
-         jx = 6/(tf*tf*tf)*(jx - tf*FinalCOMTraj_deq[0].x[1] - (tf*tf/2)*FinalCOMTraj_deq[0].x[2]);
-         jy = 6/(tf*tf*tf)*(jy - tf*FinalCOMTraj_deq[0].y[1] - (tf*tf/2)*FinalCOMTraj_deq[0].y[2]);
-         CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
-             jx, jy);
-         CoM_.OneIteration( jx, jy );
+        FinalCOMTraj_deq[numberOfSample*i] = FinalCOMTraj_deq[i];
+        FinalZMPTraj_deq[numberOfSample*i] = FinalZMPTraj_deq[i];
       }
-      else
+      for(unsigned int i = 0 , k = 0 ; i < currentIndex ; i++ , k=numberOfSample*i)
       {
-         Running_ = true;
-         CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
-             Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
-         CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
+        if(Solution_.SupportStates_deq.size() &&  Solution_.SupportStates_deq[0].NbStepsLeft == 0)
+        {
+           double jx = (FinalLeftFootTraj_deq[k].x + FinalRightFootTraj_deq[k].x)/2 - FinalCOMTraj_deq[k].x[0];
+           double jy = (FinalLeftFootTraj_deq[k].y + FinalRightFootTraj_deq[k].y)/2 - FinalCOMTraj_deq[k].y[0];
+           if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3) { Running_ = false; }
+           const double tf = 0.75;
+           jx = 6/(tf*tf*tf)*(jx - tf*FinalCOMTraj_deq[k].x[1] - (tf*tf/2)*FinalCOMTraj_deq[k].x[2]);
+           jy = 6/(tf*tf*tf)*(jy - tf*FinalCOMTraj_deq[k].y[1] - (tf*tf/2)*FinalCOMTraj_deq[k].y[2]);
+           CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, k,
+               jx, jy);
+           CoM_.OneIteration( jx, jy );
+        }
+        else
+        {
+           Running_ = true;
+           CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, k,
+               Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
+           CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
+        }
+
+
+        // INTERPOLATE TRUNK ORIENTATION:
+        // ------------------------------
+        OrientPrw_->interpolate_trunk_orientation( time, k,
+            m_SamplingPeriod, Solution_.SupportStates_deq,
+            FinalCOMTraj_deq );
+
       }
-
-
-      // INTERPOLATE TRUNK ORIENTATION:
-      // ------------------------------
-      OrientPrw_->interpolate_trunk_orientation( time, currentIndex,
-          m_SamplingPeriod, Solution_.SupportStates_deq,
-          FinalCOMTraj_deq );
-
 
       // INTERPOLATE THE COMPUTED FOOT POSITIONS:
       // ----------------------------------------
@@ -466,12 +488,16 @@ ZMPVelocityReferencedQP::OnLine(double time,
           Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
 
+      // DYNAMIC FILTER
+      // --------------
+      DynamicFilter( FinalZMPTraj_deq, FinalCOMTraj_deq, FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
+
 
       // Specify that we are in the ending phase.
       if (EndingPhase_ == false)
-        {
+      {
           TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
-        }
+      }
       UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
 
     }
@@ -535,19 +561,30 @@ int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep()
   return 2*r;
 }
 
+double filterprecision(double adb)
+{
+  if (fabs(adb)<1e-7)
+    return 0.0;
+
+  double ladb2 = adb * 1e7;
+  double lintadb2 = trunc(ladb2);
+  return lintadb2/1e7;
+}
+
 int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPositions,
 		      std::deque<COMState> &FinalCOMTraj_deq ,
 		      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
 		      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions
 		      )
 {
+  const unsigned int N = FinalCOMTraj_deq.size();
   // \brief claculate, from the CoM of computed by the preview control,
   //    the corresponding articular position, velocity and acceleration
   // ------------------------------------------------------------------
-  MAL_VECTOR_TYPE(double) configurationTraj [QP_N_] ;
-  MAL_VECTOR_TYPE(double) velocityTraj [QP_N_] ;
-  MAL_VECTOR_TYPE(double) accelerationTraj [QP_N_] ;
-  for(int i = 0 ; i <  QP_N_ ; i++ ){
+  vector <MAL_VECTOR_TYPE(double)> configurationTraj (N) ;
+  vector <MAL_VECTOR_TYPE(double)> velocityTraj (N) ;
+  vector <MAL_VECTOR_TYPE(double)> accelerationTraj (N) ;
+  for(int i = 0 ; i <  N ; i++ ){
     CallToComAndFootRealization(
       FinalCOMTraj_deq[i],
       LeftFootAbsolutePositions [i],
@@ -560,15 +597,16 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
 
   // \brief rnea
   // -----------
-  typedef metapod::simple_humanoid<LocalFloatType> Robot_Model;
+  // Initialize the robot with the autogenerated files by MetapodFromUrdf
   Robot_Model robot;
   // Set configuration vectors (q, dq, ddq) to reference values.
   Robot_Model::confVector torques;
-  vector < Robot_Model::confVector > allTorques (QP_N_) ;
+  vector < Robot_Model::confVector,Eigen::aligned_allocator<Robot_Model::confVector> > allTorques (N) ;
   Robot_Model::confVector q, dq, ddq;
-  for (int i = 0 ; i < QP_N_ ; i++ ){
+  for (int i = 0 ; i < N ; i++ ){
     // Apply the RNEA to the metapod multibody and print the result in a log file.
-    for(unsigned int j = 0 ; j < configurationTraj[i].size() ; j++ ){
+    for(unsigned int j = 0 ; j < configurationTraj[i].size() ; j++ )
+    {
       q(j,0) = configurationTraj[i][j] ;
       dq(j,0) = velocityTraj[i][j] ;
       ddq(j,0) = accelerationTraj[i][j] ;
@@ -581,39 +619,74 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
   // Projection of the Torques on the ground, the result is the ZMP Multi-Body
   // -------------------------------------------------------------------------
   double factor = 1/(RobotMass_*9.81);
-  vector <ZMPPosition> deltaZMPMBPositions (QP_N_,ZMPPosition());
-  for(int i = 0 ; i <  QP_N_ ; i++ ){
+  std::deque<ZMPPosition> deltaZMPMBPositions (N,ZMPPosition());
+  for(int i = 0 ; i <  N ; i++ )
+  {
     // Smooth ramp
-    deltaZMPMBPositions[i].px = ZMPPositions[i].px + allTorques[i](1,0) /*(4,0)*/ * factor ;
-    deltaZMPMBPositions[i].py = ZMPPositions[i].py - allTorques[i](0,0) /*(3,0)*/ * factor ;
-    deltaZMPMBPositions[i].pz = 0 ;
+    deltaZMPMBPositions[i].px = ZMPPositions[i].px + allTorques[i](4,0) /*(1,0)*/  * factor ;
+    deltaZMPMBPositions[i].py = ZMPPositions[i].py - allTorques[i](3,0) /*(0,0)*/  * factor ;
+    deltaZMPMBPositions[i].pz = 0.0 ;
     deltaZMPMBPositions[i].theta = 0.0;
     deltaZMPMBPositions[i].time = m_CurrentTime;
-    deltaZMPMBPositions[i].stepType = 0 ;
+    deltaZMPMBPositions[i].stepType = ZMPPositions[i].stepType ;
   }
+
+  static int iteration = 0;
+  if (iteration == 0)
+  {
+    ofstream aof;
+    string aFileName;
+	  aFileName = "TestHerdt2010DynamicFilterPC.dat";
+	  aof.open(aFileName.c_str(),ofstream::out);
+	  aof.close();
+  }
+  ofstream aof;
+  string aFileName;
+	aFileName = "TestHerdt2010DynamicFilterPC.dat";
+	aof.open(aFileName.c_str(),ofstream::app);
+	aof.precision(8);
+	aof.setf(ios::scientific, ios::floatfield);
+	aof << filterprecision(iteration*0.005 ) << " "             // 1
+	    << filterprecision(deltaZMPMBPositions[0].px ) << " "   // 2
+	    << filterprecision(deltaZMPMBPositions[0].py ) << " "   // 3
+      << filterprecision(FinalCOMTraj_deq[0].x[0]) << " "     // 4
+      << filterprecision(FinalCOMTraj_deq[0].y[0]) << " "     // 5
+      << filterprecision(ZMPPositions[0].px) << " "        // 6
+      << filterprecision(ZMPPositions[0].py) << " " ;      // 7
+  iteration++;
 
   // Preview control on the ZMPMBs computed
   // --------------------------------------
-    // setup
-  m_PC->SetPreviewControlTime (TimeBuffer_);
+  // setup
+  m_PC->SetPreviewControlTime (QP_T_*(QP_N_*0.5-1));
   m_PC->SetSamplingPeriod (m_SamplingPeriod);
+  m_PC->SetHeightOfCoM(Robot_->CoMHeight());
+  m_PC->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
   double aSxzmp (0) , aSyzmp(0);
   double deltaZMPx (0) , deltaZMPy (0) ;
     // calcul of the preview control along the "ZMPPositions"
-  for (int i = 0 ; i < QP_N_ ; i++ ){
-    m_PC->OneIterationOfPreview(m_deltax,m_deltay,
-				aSxzmp,aSyzmp,
-				ZMPPositions,i,
-				deltaZMPx, deltaZMPy, true);
-  }
+  for (int i = 0 ; i < QP_N_ ; i++ )
   {
-    COMState aCOMState ;
-    for(int i=0;i<3;i++){
-      aCOMState.x[i] += m_deltax(i,0);
-      aCOMState.y[i] += m_deltay(i,0);
+    m_PC->OneIterationOfPreview(m_deltax,m_deltay,
+                                aSxzmp,aSyzmp,
+                                deltaZMPMBPositions,i,
+                                deltaZMPx, deltaZMPy, true);
+
+    for(int j=0;j<3;j++)
+    {
+      FinalCOMTraj_deq[i].x[j] += m_deltax(j,0);
+      FinalCOMTraj_deq[i].y[j] += m_deltay(j,0);
     }
-    FinalCOMTraj_deq[0] = aCOMState ;
   }
+
+
+  aof << filterprecision(m_deltax(0,0)) << " "            // 8
+	    << filterprecision(m_deltay(0,0)) << " "            // 9
+      << filterprecision(FinalCOMTraj_deq[0].x[0]) << " " // 10
+      << filterprecision(FinalCOMTraj_deq[0].y[0]) << " " // 11
+      << endl ;
+  aof.close();
+
   return 0;
 }
 

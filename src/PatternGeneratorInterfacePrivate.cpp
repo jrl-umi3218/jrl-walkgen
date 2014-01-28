@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Andrei     Herdt
  * Fumio      Kanehiro
@@ -9,7 +9,7 @@
  * Alireza    Nakhaei
  * Mathieu    Poirier
  * Olivier    Stasse
- * Eiichi     Yoshida 
+ * Eiichi     Yoshida
  *
  * JRL, CNRS/AIST
  *
@@ -26,7 +26,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \doc This object is the interface to the walking gait
@@ -506,7 +506,7 @@ namespace PatternGeneratorJRL {
     // Read the data inside strm.
     m_ZMPVRQP->Reference(strm);
   }
- 
+
   void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(istringstream &strm)
   {
     // Read the data inside strm.
@@ -1316,19 +1316,19 @@ namespace PatternGeneratorJRL {
       }
 
     if (m_AlgorithmforZMPCOM==ZMPCOM_HERDT_2010)
-      {
-	ODEBUG("InternalClock:" <<m_InternalClock  <<
+    {
+      ODEBUG("InternalClock:" <<m_InternalClock  <<
 	       " SamplingPeriod: "<<m_SamplingPeriod);
+      m_ZMPVRQP->setComAndFootRealization(m_ComAndFootRealization);
+      m_ZMPVRQP->OnLine(m_InternalClock,
+                        m_ZMPPositions,
+                        m_COMBuffer,
+                        m_LeftFootPositions,
+                        m_RightFootPositions);
+      m_Running = m_ZMPVRQP->Running();
+    }
 
-	m_ZMPVRQP->OnLine(m_InternalClock,
-			  m_ZMPPositions,
-			  m_COMBuffer,
-			  m_LeftFootPositions,
-			  m_RightFootPositions);
-    m_Running = m_ZMPVRQP->Running();
-      }
-            
-            
+
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,
 						    RightFootPosition,
 						    ZMPTarget,
@@ -1337,7 +1337,7 @@ namespace PatternGeneratorJRL {
 						    CurrentVelocity,
 						    CurrentAcceleration);
 
-    ODEBUG("finalCOMState: "  << 
+    ODEBUG("finalCOMState: "  <<
             finalCOMState.x[0] << " " <<
             finalCOMState.x[1] << " " <<
             finalCOMState.x[2] << " " <<
@@ -1716,7 +1716,7 @@ namespace PatternGeneratorJRL {
     lWaistAbsPos = m_WaistAbsPos;
   }
 
-  //TODO test me 
+  //TODO test me
   void PatternGeneratorInterfacePrivate::getWaistPositionAndOrientation(double aTQ[7], double &Orientation) const
   {
     // Position
@@ -1780,7 +1780,7 @@ namespace PatternGeneratorJRL {
     dy = m_AbsLinearVelocity(1);
     omega = m_AbsAngularVelocity(2);
   }
-  
+
   void PatternGeneratorInterfacePrivate::setVelocityReference(double x,
 							      double y,
 							      double yaw)

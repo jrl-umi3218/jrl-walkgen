@@ -88,6 +88,7 @@ SET(SOURCES
 ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
 # Define dependencies
+
 ##############################################################################
 SET(WITH_METAPODFROMURDF TRUE)
 SET(model_name "hrp2_14")
