@@ -95,7 +95,9 @@ SET(model_name "hrp2_14")
 # Define the simple humanoid model for the metapod algorithm
 ADD_SAMPLEURDFMODEL(${model_name})
 ##############################################################################
-TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name})
+TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name} )
+
+
 
 INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

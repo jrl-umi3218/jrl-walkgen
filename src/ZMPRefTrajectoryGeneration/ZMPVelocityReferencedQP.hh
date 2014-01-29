@@ -264,7 +264,8 @@ namespace PatternGeneratorJRL
     int DynamicFilter(std::deque<ZMPPosition> & ZMPPositions,
 		      std::deque<COMState> & COMStates,
 		      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-		      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions
+		      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+		      unsigned currentIndex
 		      );
 
     void CallToComAndFootRealization(COMState &acomp,
@@ -273,8 +274,7 @@ namespace PatternGeneratorJRL
 				    MAL_VECTOR_TYPE(double) &CurrentConfiguration,
 				    MAL_VECTOR_TYPE(double) &CurrentVelocity,
 				    MAL_VECTOR_TYPE(double) &CurrentAcceleration,
-				    int IterationNumber,
-				    int StageOfTheAlgorithm
+				    int IterationNumber
 				    );
 
   };

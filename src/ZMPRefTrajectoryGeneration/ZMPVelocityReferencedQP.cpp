@@ -442,45 +442,42 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
+      deque<ZMPPosition> ZMPTraj_deq = FinalZMPTraj_deq ;
+      deque<COMState> COMTraj_deq = FinalCOMTraj_deq ;
+      deque<FootAbsolutePosition> LeftFootTraj_deq = FinalLeftFootTraj_deq ;
+      deque<FootAbsolutePosition> RightFootTraj_deq = FinalRightFootTraj_deq ;
+
       unsigned currentIndex = FinalCOMTraj_deq.size();
       unsigned numberOfSample = (unsigned)(QP_T_/m_SamplingPeriod);
-      FinalCOMTraj_deq.resize( numberOfSample * currentIndex );
-      FinalZMPTraj_deq.resize( numberOfSample * currentIndex );
-      for(unsigned int i = 0 ; i < currentIndex ; i++)
+      FinalCOMTraj_deq.resize( numberOfSample + currentIndex );
+      FinalZMPTraj_deq.resize( numberOfSample + currentIndex );
+
+      if(Solution_.SupportStates_deq.size() &&  Solution_.SupportStates_deq[0].NbStepsLeft == 0)
       {
-        FinalCOMTraj_deq[numberOfSample*i] = FinalCOMTraj_deq[i];
-        FinalZMPTraj_deq[numberOfSample*i] = FinalZMPTraj_deq[i];
+         double jx = (FinalLeftFootTraj_deq[0].x + FinalRightFootTraj_deq[0].x)/2 - FinalCOMTraj_deq[0].x[0];
+         double jy = (FinalLeftFootTraj_deq[0].y + FinalRightFootTraj_deq[0].y)/2 - FinalCOMTraj_deq[0].y[0];
+         if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3) { Running_ = false; }
+         const double tf = 0.75;
+         jx = 6/(tf*tf*tf)*(jx - tf*FinalCOMTraj_deq[0].x[1] - (tf*tf/2)*FinalCOMTraj_deq[0].x[2]);
+         jy = 6/(tf*tf*tf)*(jy - tf*FinalCOMTraj_deq[0].y[1] - (tf*tf/2)*FinalCOMTraj_deq[0].y[2]);
+         CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
+             jx, jy);
+         CoM_.OneIteration( jx, jy );
       }
-      for(unsigned int i = 0 , k = 0 ; i < currentIndex ; i++ , k=numberOfSample*i)
+      else
       {
-        if(Solution_.SupportStates_deq.size() &&  Solution_.SupportStates_deq[0].NbStepsLeft == 0)
-        {
-           double jx = (FinalLeftFootTraj_deq[k].x + FinalRightFootTraj_deq[k].x)/2 - FinalCOMTraj_deq[k].x[0];
-           double jy = (FinalLeftFootTraj_deq[k].y + FinalRightFootTraj_deq[k].y)/2 - FinalCOMTraj_deq[k].y[0];
-           if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3) { Running_ = false; }
-           const double tf = 0.75;
-           jx = 6/(tf*tf*tf)*(jx - tf*FinalCOMTraj_deq[k].x[1] - (tf*tf/2)*FinalCOMTraj_deq[k].x[2]);
-           jy = 6/(tf*tf*tf)*(jy - tf*FinalCOMTraj_deq[k].y[1] - (tf*tf/2)*FinalCOMTraj_deq[k].y[2]);
-           CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, k,
-               jx, jy);
-           CoM_.OneIteration( jx, jy );
-        }
-        else
-        {
-           Running_ = true;
-           CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, k,
-               Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
-           CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
-        }
-
-
-        // INTERPOLATE TRUNK ORIENTATION:
-        // ------------------------------
-        OrientPrw_->interpolate_trunk_orientation( time, k,
-            m_SamplingPeriod, Solution_.SupportStates_deq,
-            FinalCOMTraj_deq );
-
+         Running_ = true;
+         CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
+             Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
+         CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
       }
+
+
+      // INTERPOLATE TRUNK ORIENTATION:
+      // ------------------------------
+      OrientPrw_->interpolate_trunk_orientation( time, currentIndex,
+          m_SamplingPeriod, Solution_.SupportStates_deq,
+          FinalCOMTraj_deq );
 
       // INTERPOLATE THE COMPUTED FOOT POSITIONS:
       // ----------------------------------------
@@ -490,7 +487,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
       // DYNAMIC FILTER
       // --------------
-      DynamicFilter( FinalZMPTraj_deq, FinalCOMTraj_deq, FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
+      //DynamicFilter( FinalZMPTraj_deq, FinalCOMTraj_deq, FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
 
 
       // Specify that we are in the ending phase.
@@ -574,7 +571,8 @@ double filterprecision(double adb)
 int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPositions,
 		      std::deque<COMState> &FinalCOMTraj_deq ,
 		      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-		      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions
+		      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
+		      unsigned currentIndex
 		      )
 {
   const unsigned int N = FinalCOMTraj_deq.size();
@@ -584,7 +582,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
   vector <MAL_VECTOR_TYPE(double)> configurationTraj (N) ;
   vector <MAL_VECTOR_TYPE(double)> velocityTraj (N) ;
   vector <MAL_VECTOR_TYPE(double)> accelerationTraj (N) ;
-  for(int i = 0 ; i <  N ; i++ ){
+  for(unsigned int i = 0 ; i <  N ; i++ ){
     CallToComAndFootRealization(
       FinalCOMTraj_deq[i],
       LeftFootAbsolutePositions [i],
@@ -592,7 +590,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
       configurationTraj[i],
       velocityTraj[i],
       accelerationTraj[i],
-      i,0);
+      i);
   }
 
   // \brief rnea
@@ -603,7 +601,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
   Robot_Model::confVector torques;
   vector < Robot_Model::confVector,Eigen::aligned_allocator<Robot_Model::confVector> > allTorques (N) ;
   Robot_Model::confVector q, dq, ddq;
-  for (int i = 0 ; i < N ; i++ ){
+  for (unsigned int i = 0 ; i < N ; i++ ){
     // Apply the RNEA to the metapod multibody and print the result in a log file.
     for(unsigned int j = 0 ; j < configurationTraj[i].size() ; j++ )
     {
@@ -620,7 +618,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
   // -------------------------------------------------------------------------
   double factor = 1/(RobotMass_*9.81);
   std::deque<ZMPPosition> deltaZMPMBPositions (N,ZMPPosition());
-  for(int i = 0 ; i <  N ; i++ )
+  for(unsigned int i = 0 ; i <  N ; i++ )
   {
     // Smooth ramp
     deltaZMPMBPositions[i].px = ZMPPositions[i].px + allTorques[i](4,0) /*(1,0)*/  * factor ;
@@ -697,63 +695,63 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(COMState &acomp,
      MAL_VECTOR_TYPE(double) &CurrentConfiguration,
      MAL_VECTOR_TYPE(double) &CurrentVelocity,
      MAL_VECTOR_TYPE(double) &CurrentAcceleration,
-     int IterationNumber,
-     int StageOfTheAlgorithm)
+     int IterationNumber)
  {
 
-   // New scheme for WPG v3.0
-   // We call the object in charge of generating the whole body
-   // motion  ( for a given CoM and Feet points)  before applying the second filter.
-   MAL_VECTOR_DIM(aCOMState,double,6);
-   MAL_VECTOR_DIM(aCOMSpeed,double,6);
-   MAL_VECTOR_DIM(aCOMAcc,double,6);
+  // New scheme for WPG v3.0
+  // We call the object in charge of generating the whole body
+  // motion  ( for a given CoM and Feet points)  before applying the second filter.
+  MAL_VECTOR_DIM(aCOMState,double,6);
+  MAL_VECTOR_DIM(aCOMSpeed,double,6);
+  MAL_VECTOR_DIM(aCOMAcc,double,6);
 
-   aCOMState(0) = acomp.x[0];
-   aCOMState(1) = acomp.y[0];
-   aCOMState(2) = acomp.z[0];
-   aCOMState(3) = acomp.roll[0];
-   aCOMState(4) = acomp.pitch[0];
-   aCOMState(5) = acomp.yaw[0];
+  aCOMState(0) = acomp.x[0];
+  aCOMState(1) = acomp.y[0];
+  aCOMState(2) = acomp.z[0];
+  aCOMState(3) = acomp.roll[0];
+  aCOMState(4) = acomp.pitch[0];
+  aCOMState(5) = acomp.yaw[0];
 
-   aCOMSpeed(0) = acomp.x[1];
-   aCOMSpeed(1) = acomp.y[1];
-   aCOMSpeed(2) = acomp.z[1];
-   aCOMSpeed(3) = acomp.roll[1];
-   aCOMSpeed(4) = acomp.roll[1];
-   aCOMSpeed(5) = acomp.roll[1];
+  aCOMSpeed(0) = acomp.x[1];
+  aCOMSpeed(1) = acomp.y[1];
+  aCOMSpeed(2) = acomp.z[1];
+  aCOMSpeed(3) = acomp.roll[1];
+  aCOMSpeed(4) = acomp.roll[1];
+  aCOMSpeed(5) = acomp.roll[1];
 
-   aCOMAcc(0) = acomp.x[2];
-   aCOMAcc(1) = acomp.y[2];
-   aCOMAcc(2) = acomp.z[2];
-   aCOMAcc(3) = acomp.roll[2];
-   aCOMAcc(4) = acomp.roll[2];
-   aCOMAcc(5) = acomp.roll[2];
+  aCOMAcc(0) = acomp.x[2];
+  aCOMAcc(1) = acomp.y[2];
+  aCOMAcc(2) = acomp.z[2];
+  aCOMAcc(3) = acomp.roll[2];
+  aCOMAcc(4) = acomp.roll[2];
+  aCOMAcc(5) = acomp.roll[2];
 
-   MAL_VECTOR_DIM(aLeftFootPosition,double,5);
-   MAL_VECTOR_DIM(aRightFootPosition,double,5);
+  MAL_VECTOR_DIM(aLeftFootPosition,double,5);
+  MAL_VECTOR_DIM(aRightFootPosition,double,5);
 
-   aLeftFootPosition(0) = aLeftFAP.x;
-   aLeftFootPosition(1) = aLeftFAP.y;
-   aLeftFootPosition(2) = aLeftFAP.z;
-   aLeftFootPosition(3) = aLeftFAP.theta;
-   aLeftFootPosition(4) = aLeftFAP.omega;
+  aLeftFootPosition(0) = aLeftFAP.x;
+  aLeftFootPosition(1) = aLeftFAP.y;
+  aLeftFootPosition(2) = aLeftFAP.z;
+  aLeftFootPosition(3) = aLeftFAP.theta;
+  aLeftFootPosition(4) = aLeftFAP.omega;
 
-   aRightFootPosition(0) = aRightFAP.x;
-   aRightFootPosition(1) = aRightFAP.y;
-   aRightFootPosition(2) = aRightFAP.z;
-   aRightFootPosition(3) = aRightFAP.theta;
-   aRightFootPosition(4) = aRightFAP.omega;
+  aRightFootPosition(0) = aRightFAP.x;
+  aRightFootPosition(1) = aRightFAP.y;
+  aRightFootPosition(2) = aRightFAP.z;
+  aRightFootPosition(3) = aRightFAP.theta;
+  aRightFootPosition(4) = aRightFAP.omega;
 
-   /* Get the current configuration vector */
-   CurrentConfiguration = HDR_->currentConfiguration();
+  /* Get the current configuration vector */
+  CurrentConfiguration = HDR_->currentConfiguration();
 
-   /* Get the current velocity vector */
-   CurrentVelocity = HDR_->currentVelocity();
+  /* Get the current velocity vector */
+  CurrentVelocity = HDR_->currentVelocity();
 
-   /* Get the current acceleration vector */
-   CurrentAcceleration = HDR_->currentAcceleration();
+  /* Get the current acceleration vector */
+  CurrentAcceleration = HDR_->currentAcceleration();
 
-   ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
+  static int StageOfTheAlgorithm = 0 ;
+  ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
 								    aLeftFootPosition,
 								    aRightFootPosition,
 								    CurrentConfiguration,
@@ -761,15 +759,4 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(COMState &acomp,
 								    CurrentAcceleration,
 								    IterationNumber,
 								    StageOfTheAlgorithm);
-   if (StageOfTheAlgorithm==0)
-     {
-       /* Update the current configuration vector */
-       HDR_->currentConfiguration(CurrentConfiguration);
-
-       /* Update the current velocity vector */
-       HDR_->currentVelocity(CurrentVelocity);
-
-       /* Update the current acceleration vector */
-       HDR_->currentAcceleration(CurrentAcceleration);
-     }
  }
