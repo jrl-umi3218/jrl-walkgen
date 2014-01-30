@@ -442,32 +442,44 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
-      deque<ZMPPosition> ZMPTraj_deq = FinalZMPTraj_deq ;
-      deque<COMState> COMTraj_deq = FinalCOMTraj_deq ;
-      deque<FootAbsolutePosition> LeftFootTraj_deq = FinalLeftFootTraj_deq ;
-      deque<FootAbsolutePosition> RightFootTraj_deq = FinalRightFootTraj_deq ;
+      deque<ZMPPosition> ZMPTraj_deq ( FinalZMPTraj_deq.size() );
+      deque<COMState> COMTraj_deq ( FinalCOMTraj_deq.size() );
+      deque<FootAbsolutePosition> LeftFootTraj_deq ( FinalLeftFootTraj_deq.size() );
+      deque<FootAbsolutePosition> RightFootTraj_deq ( FinalRightFootTraj_deq.size() );
+      for (unsigned int i = 0 ; i < FinalZMPTraj_deq.size() ; i++ )
+      {
+        ZMPTraj_deq[i] = FinalZMPTraj_deq[i] ;
+        COMTraj_deq[i] = FinalCOMTraj_deq[i] ;
+        LeftFootTraj_deq[i] = FinalLeftFootTraj_deq[i] ;
+        RightFootTraj_deq[i] = FinalRightFootTraj_deq[i] ;
+      }
 
-      unsigned currentIndex = FinalCOMTraj_deq.size();
+      unsigned currentIndex = COMTraj_deq.size();
       unsigned numberOfSample = (unsigned)(QP_T_/m_SamplingPeriod);
+      COMTraj_deq.resize( numberOfSample + currentIndex );
+      ZMPTraj_deq.resize( numberOfSample + currentIndex );
+
       FinalCOMTraj_deq.resize( numberOfSample + currentIndex );
       FinalZMPTraj_deq.resize( numberOfSample + currentIndex );
+      FinalLeftFootTraj_deq.resize( numberOfSample + currentIndex );
+      FinalRightFootTraj_deq.resize( numberOfSample + currentIndex );
 
       if(Solution_.SupportStates_deq.size() &&  Solution_.SupportStates_deq[0].NbStepsLeft == 0)
       {
-         double jx = (FinalLeftFootTraj_deq[0].x + FinalRightFootTraj_deq[0].x)/2 - FinalCOMTraj_deq[0].x[0];
-         double jy = (FinalLeftFootTraj_deq[0].y + FinalRightFootTraj_deq[0].y)/2 - FinalCOMTraj_deq[0].y[0];
+         double jx = (LeftFootTraj_deq[0].x + RightFootTraj_deq[0].x)/2 - COMTraj_deq[0].x[0];
+         double jy = (LeftFootTraj_deq[0].y + RightFootTraj_deq[0].y)/2 - COMTraj_deq[0].y[0];
          if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3) { Running_ = false; }
          const double tf = 0.75;
-         jx = 6/(tf*tf*tf)*(jx - tf*FinalCOMTraj_deq[0].x[1] - (tf*tf/2)*FinalCOMTraj_deq[0].x[2]);
-         jy = 6/(tf*tf*tf)*(jy - tf*FinalCOMTraj_deq[0].y[1] - (tf*tf/2)*FinalCOMTraj_deq[0].y[2]);
-         CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
+         jx = 6/(tf*tf*tf)*(jx - tf*COMTraj_deq[0].x[1] - (tf*tf/2)*COMTraj_deq[0].x[2]);
+         jy = 6/(tf*tf*tf)*(jy - tf*COMTraj_deq[0].y[1] - (tf*tf/2)*COMTraj_deq[0].y[2]);
+         CoM_.Interpolation( COMTraj_deq, ZMPTraj_deq, currentIndex,
              jx, jy);
          CoM_.OneIteration( jx, jy );
       }
       else
       {
          Running_ = true;
-         CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
+         CoM_.Interpolation( COMTraj_deq, ZMPTraj_deq, currentIndex,
              Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
          CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
       }
@@ -477,17 +489,27 @@ ZMPVelocityReferencedQP::OnLine(double time,
       // ------------------------------
       OrientPrw_->interpolate_trunk_orientation( time, currentIndex,
           m_SamplingPeriod, Solution_.SupportStates_deq,
-          FinalCOMTraj_deq );
+          COMTraj_deq );
 
       // INTERPOLATE THE COMPUTED FOOT POSITIONS:
       // ----------------------------------------
       Robot_->generate_trajectories( time, Solution_,
           Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
-          FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
+          LeftFootTraj_deq, RightFootTraj_deq );
+
+
 
       // DYNAMIC FILTER
       // --------------
       //DynamicFilter( FinalZMPTraj_deq, FinalCOMTraj_deq, FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
+
+      for (unsigned int i = 0 ; i < FinalZMPTraj_deq.size() ; i++ )
+      {
+        FinalZMPTraj_deq[i] = ZMPTraj_deq[i] ;
+        FinalCOMTraj_deq[i] = COMTraj_deq[i] ;
+        FinalLeftFootTraj_deq[i] = LeftFootTraj_deq[i] ;
+        FinalRightFootTraj_deq[i] = RightFootTraj_deq[i] ;
+      }
 
 
       // Specify that we are in the ending phase.

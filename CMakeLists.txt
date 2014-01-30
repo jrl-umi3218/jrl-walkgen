@@ -23,6 +23,7 @@ INCLUDE(cmake/cmake_metapod_configure.cmake)
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/lapack.cmake)
 INCLUDE(cmake/cpack.cmake)
+INCLUDE(cmake/boost.cmake)
 INCLUDE(CMakeDependentOption)
 
 # Define properties of the project
@@ -52,6 +53,24 @@ ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
 ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
 ADD_OPTIONAL_DEPENDENCY("metapod >= 1.0.7")
 MESSAGE(STATUS "hrp2-dynamics: " ${HRP2_DYNAMICS_FOUND})
+
+# Search for Boost.
+# Boost.Test is used by the test suite.
+# Boost program_options is used by the embedfile utility, which is used
+# by metapod_robotbuilder
+# Boost filesystem and regex are used by metapod_robotbuilder.
+# Boost filesystem depends on Boost system.
+SET(BOOST_COMPONENTS
+  filesystem system unit_test_framework program_options regex)
+SEARCH_FOR_BOOST()
+# If Boost is recent enough, we look for Boost timer which can be used by
+# by metapod_timer, which is in turn used by the benchmark.
+# Boost timer depends on Boost chrono and system.
+IF((BUILD_MULTI_MODEL_BENCHMARK OR BUILD_SINGLE_MODEL_BENCHMARKS)
+   AND NOT Boost_VERSION LESS 104800)
+  SET(BOOST_COMPONENTS ${BOOST_COMPONENTS} timer chrono system)
+  SEARCH_FOR_BOOST()
+ENDIF()
 
 # Search for Eigen.
 ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.0")

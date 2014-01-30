@@ -18,6 +18,10 @@ INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src)
 INCLUDE_DIRECTORIES(BEFORE ${HOME}/devel/metapod/_bin/include/)
 INCLUDE_DIRECTORIES(BEFORE ${HOME}/devel/metapod/_bin/include/metapod/)
 
+# Add Boost path to include directories.
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+message (STATUS "-- Boost Dir : " ${Boost_INCLUDE_DIRS} )
+
 # add flag to compile qld.cc
 IF(WIN32)
 ADD_DEFINITIONS("/D __STDC__")
@@ -89,15 +93,14 @@ ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
 # Define dependencies
 
-##############################################################################
+# define and search for metapod library
 SET(WITH_METAPODFROMURDF TRUE)
 SET(model_name "hrp2_14")
 # Define the simple humanoid model for the metapod algorithm
 ADD_SAMPLEURDFMODEL(${model_name})
-##############################################################################
-TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name} )
 
-
+TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name} ${Boost_LIBRARIES})
+message (STATUS "--Boost : " ${Boost_LIBRARIES} )
 
 INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
