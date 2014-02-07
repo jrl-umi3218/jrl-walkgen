@@ -116,6 +116,11 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   CoM_.SetRobotControlPeriod( m_SamplingPeriod );
   CoM_.InitializeSystem();
 
+  // Initialize  the 2D LIPM
+  CoM2_.SetSimulationControlPeriod( QP_T_ );
+  CoM2_.SetRobotControlPeriod( m_SamplingPeriod );
+  CoM2_.InitializeSystem();
+
   // Create and initialize simplified robot model
   Robot_ = new RigidBodySystem( SPM, aHS, SupportFSM_ );
   Robot_->Mass( aHS->mass() );
@@ -160,7 +165,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   // Initialization of the Kajita preview controls (ICRA 2003).
   MAL_MATRIX_RESIZE(m_deltax,3,1);  MAL_MATRIX_RESIZE(m_deltay,3,1);
   m_PC = new PreviewControl(SPM,
-			    OptimalControllerSolver::MODE_WITH_INITIALPOS,
+			    OptimalControllerSolver::MODE_WITHOUT_INITIALPOS,
 			    true);
 
   // init of the debug files
@@ -170,15 +175,15 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 
 	// init of the buffer for the kajita's dynamic filter
 	m_numberOfSample = (unsigned)(QP_T_/m_SamplingPeriod);
-  m_ZMPTraj_deq.resize( QP_N_ * m_numberOfSample + 20 );
-  m_COMTraj_deq.resize( QP_N_ * m_numberOfSample + 20 );
-  m_LeftFootTraj_deq.resize( QP_N_ * m_numberOfSample + 20 );
-  m_RightFootTraj_deq.resize( QP_N_ * m_numberOfSample + 20 );
+  m_ZMPTraj_deq.resize( QP_N_ * m_numberOfSample + 50 );
+  m_COMTraj_deq.resize( QP_N_ * m_numberOfSample + 50 );
+  m_LeftFootTraj_deq.resize( QP_N_ * m_numberOfSample + 50 );
+  m_RightFootTraj_deq.resize( QP_N_ * m_numberOfSample + 50 );
   m_configurationTraj.resize( QP_N_ * m_numberOfSample );
   m_velocityTraj.resize( QP_N_ * m_numberOfSample );
   m_accelerationTraj.resize( QP_N_ * m_numberOfSample );
   m_allTorques.resize( QP_N_ * m_numberOfSample ) ;
-  m_deltaZMPMBPositions.resize ( QP_N_ * m_numberOfSample );
+  m_deltaZMPMBPositions.resize ( QP_N_ * m_numberOfSample + 1);
 
 }
 
@@ -376,6 +381,10 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM_(CoM);
   IntermedData_->CoM(CoM_());
 
+  CoM2_.SetComHeight(lStartingCOMState.z[0]);
+  CoM2_.InitializeSystem();
+  CoM2_(CoM);
+
   // BUILD CONSTANT PART OF THE OBJECTIVE:
   // -------------------------------------
   Problem_.reset();
@@ -422,7 +431,6 @@ ZMPVelocityReferencedQP::OnLine(double time,
       SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
       IntermedData_->Reference( VelRef_ );
       IntermedData_->CoM( CoM_() );
-
 
       // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
       // ----------------------------------------------------
@@ -479,7 +487,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       }
       aof << endl;
       aof.close();
-      NbOfIt++;
+
 
       // INTERPOLATE THE NEXT COMPUTED COM STATE:
       // ----------------------------------------
@@ -503,22 +511,26 @@ ZMPVelocityReferencedQP::OnLine(double time,
           const double tf = 0.75;
           jx = 6/(tf*tf*tf)*(jx - tf*FinalCOMTraj_deq[0].x[1] - (tf*tf/2)*FinalCOMTraj_deq[0].x[2]);
           jy = 6/(tf*tf*tf)*(jy - tf*FinalCOMTraj_deq[0].y[1] - (tf*tf/2)*FinalCOMTraj_deq[0].y[2]);
-          CoM_.Interpolation( m_COMTraj_deq, m_ZMPTraj_deq, currentIndex + i * m_numberOfSample,
-                              jx, jy);
           if(i == 0)
           {
+            CoM2_.setState(CoM_());
             CoM_.OneIteration( jx, jy );
           }
+          CoM2_.Interpolation( m_COMTraj_deq, m_ZMPTraj_deq, currentIndex + i * m_numberOfSample,
+                              jx, jy);
+          CoM2_.OneIteration( Solution_.Solution_vec[i], Solution_.Solution_vec[QP_N_+i] );
         }
         else
         {
           Running_ = true;
-          CoM_.Interpolation( m_COMTraj_deq, m_ZMPTraj_deq, currentIndex + i * m_numberOfSample,
-               Solution_.Solution_vec[i], Solution_.Solution_vec[QP_N_+i] );
           if(i == 0)
           {
+            CoM2_.setState(CoM_());
             CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
           }
+          CoM2_.Interpolation( m_COMTraj_deq, m_ZMPTraj_deq, currentIndex + i * m_numberOfSample,
+                              Solution_.Solution_vec[i], Solution_.Solution_vec[QP_N_+i] );
+          CoM2_.OneIteration( Solution_.Solution_vec[i], Solution_.Solution_vec[QP_N_+i] );
         }
 
         // INTERPOLATE TRUNK ORIENTATION:
@@ -544,7 +556,26 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
       // DYNAMIC FILTER
       // --------------
-      DynamicFilter( m_ZMPTraj_deq, m_COMTraj_deq, m_LeftFootTraj_deq, m_RightFootTraj_deq, currentIndex );
+      //DynamicFilter( m_ZMPTraj_deq, m_COMTraj_deq, m_LeftFootTraj_deq, m_RightFootTraj_deq, currentIndex );
+
+      ofstream aof2;
+      if (NbOfIt == 0)
+      {
+        aof2.open("TestHerdt2010DynamicFilterBuffer.dat",ofstream::out);
+        aof2.close();
+      }
+      aof2.open("TestHerdt2010DynamicFilterBuffer.dat",ofstream::app);
+      aof2.precision(8);
+      aof2.setf(ios::scientific, ios::floatfield);
+      for (int unsigned i = currentIndex ; i < QP_N_ * m_numberOfSample + currentIndex; i++){
+        aof2  << filterprecision(m_COMTraj_deq[i].x[0]) << " "
+              << filterprecision(m_COMTraj_deq[i].y[0]) << " ";
+      }
+      aof2  << filterprecision(CoM_().x[0]) << " "
+            << filterprecision(CoM_().y[0]) << " "
+            << filterprecision(CoM2_().x[0]) << " "
+            << filterprecision(CoM2_().y[0]) << endl ;
+      NbOfIt++;
 
       // RECOPIE DU BUFFER
       FinalCOMTraj_deq.resize( m_numberOfSample + currentIndex );
@@ -552,7 +583,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       FinalLeftFootTraj_deq.resize( m_numberOfSample + currentIndex );
       FinalRightFootTraj_deq.resize( m_numberOfSample + currentIndex );
 
-      for (unsigned int i = currentIndex ; i < FinalZMPTraj_deq.size() ; i++ )
+      for (unsigned int i = 0 ; i < FinalZMPTraj_deq.size() ; i++ )
       {
         FinalZMPTraj_deq[i] = m_ZMPTraj_deq[i] ;
         FinalCOMTraj_deq[i] = m_COMTraj_deq[i] ;
@@ -668,18 +699,31 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
   /// \brief Projection of the Torques on the ground, the result is the ZMP Multi-Body
   /// --------------------------------------------------------------------------------
   double factor = 1/(RobotMass_*9.81);
-  for(unsigned int i = 0 ; i <  N ; i++ )
   {
-    m_deltaZMPMBPositions[i].px = ZMPPositions[currentIndex+i].px + m_allTorques[i](4,0) /*(1,0)*/  * factor ;
-    m_deltaZMPMBPositions[i].py = ZMPPositions[currentIndex+i].py - m_allTorques[i](3,0) /*(0,0)*/  * factor ;
+    ZMPPosition aZMPPosition;
+    aZMPPosition.px = 0.0 ;
+    aZMPPosition.py = 0.0 ;
+    aZMPPosition.pz = 0.0 ;
+    aZMPPosition.theta = 0.0 ;
+    aZMPPosition.time = m_CurrentTime ;
+    aZMPPosition.stepType = ZMPPositions[0].stepType ;
+    m_deltaZMPMBPositions.push_front(aZMPPosition);
+  }
+  for(unsigned int i = 1 ; i <  N+1 ; i++ )
+  {
+    m_deltaZMPMBPositions[i].px = ZMPPositions[currentIndex+i].px + m_allTorques[i](4,0) * factor - FinalCOMTraj_deq[currentIndex].x[0] ;
+    m_deltaZMPMBPositions[i].py = ZMPPositions[currentIndex+i].py - m_allTorques[i](3,0) * factor - FinalCOMTraj_deq[currentIndex].y[0] ;
     m_deltaZMPMBPositions[i].pz = 0.0 ;
     m_deltaZMPMBPositions[i].theta = 0.0 ;
-    m_deltaZMPMBPositions[i].time = m_CurrentTime + i * m_SamplingPeriod ;
-    m_deltaZMPMBPositions[i].stepType = ZMPPositions[i].stepType ;
+    m_deltaZMPMBPositions[i].time = m_CurrentTime + i+1 * m_SamplingPeriod ;
+    m_deltaZMPMBPositions[i].stepType = ZMPPositions[currentIndex+i].stepType ;
   }
+
 
   /// \brief Debug Purpose
   /// --------------------
+  ofstream aof;
+  string aFileName;
   static int iteration = 0;
   if (iteration == 0)
   {
@@ -689,9 +733,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
 	  aof.open(aFileName.c_str(),ofstream::out);
 	  aof.close();
   }
-  ofstream aof;
-  string aFileName;
-	aFileName = "TestHerdt2010DynamicFilterPC.dat";
+  aFileName = "TestHerdt2010DynamicFilterPC.dat";
 	aof.open(aFileName.c_str(),ofstream::app);
 	aof.precision(8);
 	aof.setf(ios::scientific, ios::floatfield);
@@ -701,15 +743,15 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
       << filterprecision(FinalCOMTraj_deq[currentIndex].x[0]) << " "     // 4
       << filterprecision(FinalCOMTraj_deq[currentIndex].y[0]) << " "     // 5
       << filterprecision(ZMPPositions[currentIndex].px) << " "           // 6
-      << filterprecision(ZMPPositions[currentIndex].py) << " " ;         // 7
-
+      << filterprecision(ZMPPositions[currentIndex].py) << " "    ;      // 7
 
   /// Preview control on the ZMPMBs computed
   /// --------------------------------------
+  // init of the Kajita preview control
   m_PC->SetPreviewControlTime (QP_T_*(QP_N_-1));
   m_PC->SetSamplingPeriod (m_SamplingPeriod);
   m_PC->SetHeightOfCoM(Robot_->CoMHeight());
-  m_PC->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
+  m_PC->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
   for(int j=0;j<3;j++)
   {
     m_deltax(j,0) = 0 ;
@@ -717,28 +759,32 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
   }
   double aSxzmp (0) , aSyzmp(0);
   double deltaZMPx (0) , deltaZMPy (0) ;
-    // calcul of the preview control along the "ZMPPositions"
+  // calcul of the preview control along the "ZMPPositions"
+  std::deque<COMState> COMStateBuffer (m_numberOfSample);
   for (unsigned i = 0 ; i < m_numberOfSample ; i++ )
   {
-
     m_PC->OneIterationOfPreview(m_deltax,m_deltay,
                                 aSxzmp,aSyzmp,
                                 m_deltaZMPMBPositions,i,
-                                deltaZMPx, deltaZMPy, true);
-
+                                deltaZMPx, deltaZMPy, false);
     for(int j=0;j<3;j++)
     {
-      FinalCOMTraj_deq[currentIndex+i].x[j] += m_deltax(j,0);
-      FinalCOMTraj_deq[currentIndex+i].y[j] += m_deltay(j,0);
+      COMStateBuffer[i].x[j] += m_deltax(j,0);
+      COMStateBuffer[i].y[j] += m_deltay(j,0);
     }
   }
 
+  for (unsigned int i = 0 ; i < m_numberOfSample ; i++)
+  {
+    FinalCOMTraj_deq[currentIndex + i] = COMStateBuffer[i];
+  }
   aof << filterprecision(m_deltax(0,0)) << " "            // 8
 	    << filterprecision(m_deltay(0,0)) << " "            // 9
       << filterprecision(FinalCOMTraj_deq[currentIndex].x[0]) << " " // 10
       << filterprecision(FinalCOMTraj_deq[currentIndex].y[0]) << " " // 11
       << endl ;
   aof.close();
+
   iteration++;
   return 0;
 }
@@ -751,7 +797,7 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(COMState &acomp,
      MAL_VECTOR_TYPE(double) &CurrentVelocity,
      MAL_VECTOR_TYPE(double) &CurrentAcceleration,
      int IterationNumber)
- {
+{
 
   // New scheme for WPG v3.0
   // We call the object in charge of generating the whole body
@@ -814,4 +860,4 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(COMState &acomp,
 								    CurrentAcceleration,
 								    IterationNumber,
 								    StageOfTheAlgorithm);
- }
+}

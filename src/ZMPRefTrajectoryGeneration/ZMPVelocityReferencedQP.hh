@@ -188,7 +188,7 @@ namespace PatternGeneratorJRL
     int QP_N_;
 
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
-    LinearizedInvertedPendulum2D CoM_;
+    LinearizedInvertedPendulum2D CoM_, CoM2_;
 
     /// \brief Simplified robot model
     RigidBodySystem * Robot_;
