@@ -556,26 +556,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
       // DYNAMIC FILTER
       // --------------
-      //DynamicFilter( m_ZMPTraj_deq, m_COMTraj_deq, m_LeftFootTraj_deq, m_RightFootTraj_deq, currentIndex );
-
-      ofstream aof2;
-      if (NbOfIt == 0)
-      {
-        aof2.open("TestHerdt2010DynamicFilterBuffer.dat",ofstream::out);
-        aof2.close();
-      }
-      aof2.open("TestHerdt2010DynamicFilterBuffer.dat",ofstream::app);
-      aof2.precision(8);
-      aof2.setf(ios::scientific, ios::floatfield);
-      for (int unsigned i = currentIndex ; i < QP_N_ * m_numberOfSample + currentIndex; i++){
-        aof2  << filterprecision(m_COMTraj_deq[i].x[0]) << " "
-              << filterprecision(m_COMTraj_deq[i].y[0]) << " ";
-      }
-      aof2  << filterprecision(CoM_().x[0]) << " "
-            << filterprecision(CoM_().y[0]) << " "
-            << filterprecision(CoM2_().x[0]) << " "
-            << filterprecision(CoM2_().y[0]) << endl ;
-      NbOfIt++;
+      DynamicFilter( m_ZMPTraj_deq, m_COMTraj_deq, m_LeftFootTraj_deq, m_RightFootTraj_deq, currentIndex );
 
       // RECOPIE DU BUFFER
       FinalCOMTraj_deq.resize( m_numberOfSample + currentIndex );
@@ -590,6 +571,25 @@ ZMPVelocityReferencedQP::OnLine(double time,
         FinalLeftFootTraj_deq[i] = m_LeftFootTraj_deq[i] ;
         FinalRightFootTraj_deq[i] = m_RightFootTraj_deq[i] ;
       }
+
+      ofstream aof2;
+      if (NbOfIt == 0)
+      {
+        aof2.open("TestHerdt2010DynamicFilterBuffer.dat",ofstream::out);
+        aof2.close();
+      }
+      aof2.open("TestHerdt2010DynamicFilterBuffer.dat",ofstream::app);
+      aof2.precision(8);
+      aof2.setf(ios::scientific, ios::floatfield);
+      for (int unsigned i = currentIndex ; i < m_numberOfSample + currentIndex; i++){
+        aof2  << filterprecision(FinalCOMTraj_deq[i].x[0]) << " "
+              << filterprecision(FinalCOMTraj_deq[i].y[0]) << " "
+              << filterprecision(FinalZMPTraj_deq[i].px) << " "
+              << filterprecision(FinalZMPTraj_deq[i].py) << " ";
+      }
+      aof2 << endl ;
+      NbOfIt++;
+
 
       // Specify that we are in the ending phase.
       if (EndingPhase_ == false)
