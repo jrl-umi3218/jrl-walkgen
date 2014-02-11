@@ -719,8 +719,9 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
       i);
   }
 
-  /// \brief rnea
-  /// -----------
+  /// \brief rnea, calculation of the multi body ZMP
+  /// ----------------------------------------------
+  double _1_mg = 1/(RobotMass_*9.81);
   for (unsigned int i = 0 ; i < N ; i++ ){
     // Apply the RNEA to the metapod multibody and print the result in a log file.
     for(unsigned int j = 0 ; j < m_configurationTraj[i].size() ; j++ )
@@ -732,19 +733,15 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
     metapod::rnea< Robot_Model, true >::run(m_robot, m_q, m_dq, m_ddq);
     getTorques(m_robot, m_torques);
     m_allTorques[i] = m_torques ;
-  }
 
-  /// \brief Projection of the Torques on the ground, the result is the ZMP Multi-Body
-  /// --------------------------------------------------------------------------------
-  double _1_mg = 1/(RobotMass_*9.81);
-//  m_deltaZMPMBPositions[0].px = 0.0 ;
-//  m_deltaZMPMBPositions[0].py = 0.0 ;
-//  m_deltaZMPMBPositions[0].pz = 0.0 ;
-//  m_deltaZMPMBPositions[0].theta = 0.0 ;
-//  m_deltaZMPMBPositions[0].time = m_CurrentTime ;
-//  m_deltaZMPMBPositions[0].stepType = ZMPPositions[0].stepType ;
-  for(unsigned int i = 0; i <  N ; i++ )
-  {
+    Node & node = boost::fusion::at_c<0>(Robot_Model.nodes);
+    metapod::Spatial::Force aforce = node.joint.f ;
+
+
+
+
+
+
     m_deltaZMPMBPositions[i].px = ZMPPositions[currentIndex+i].px - ( - m_allTorques[i](4,0) * _1_mg + FinalCOMTraj_deq[currentIndex+i].x[0] ) ;
     m_deltaZMPMBPositions[i].py = ZMPPositions[currentIndex+i].py - ( m_allTorques[i](3,0) * _1_mg + FinalCOMTraj_deq[currentIndex+i].y[0] ) ;
     m_deltaZMPMBPositions[i].pz = 0.0 ;
@@ -752,6 +749,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
     m_deltaZMPMBPositions[i].time = m_CurrentTime + i * m_SamplingPeriod ;
     m_deltaZMPMBPositions[i].stepType = ZMPPositions[currentIndex+i].stepType ;
   }
+
 
   /// \brief Debug Purpose
   /// --------------------

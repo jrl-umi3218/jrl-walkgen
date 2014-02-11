@@ -49,6 +49,7 @@
 #define METAPOD_TYPEDEF
 typedef double LocalFloatType;
 typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
+typedef metapod::Nodes< Robot_Model, 0 >::type Node;
 #endif
 
 namespace PatternGeneratorJRL
