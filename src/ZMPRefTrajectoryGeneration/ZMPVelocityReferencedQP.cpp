@@ -721,7 +721,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
 
   /// \brief rnea, calculation of the multi body ZMP
   /// ----------------------------------------------
-  double _1_mg = 1/(RobotMass_*9.81);
+  vector< vector<double> > ZMPMB ( N , vector<double> (2) );
   for (unsigned int i = 0 ; i < N ; i++ ){
     // Apply the RNEA to the metapod multibody and print the result in a log file.
     for(unsigned int j = 0 ; j < m_configurationTraj[i].size() ; j++ )
@@ -734,16 +734,13 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
     getTorques(m_robot, m_torques);
     m_allTorques[i] = m_torques ;
 
-    Node & node = boost::fusion::at_c<0>(Robot_Model.nodes);
+    Node & node = boost::fusion::at_c<0>(m_robot.nodes);
     Force & aforce = node.joint.f ;
 
-
-
-
-
-
-    m_deltaZMPMBPositions[i].px = ZMPPositions[currentIndex+i].px - ( - m_allTorques[i](4,0) * _1_mg + FinalCOMTraj_deq[currentIndex+i].x[0] ) ;
-    m_deltaZMPMBPositions[i].py = ZMPPositions[currentIndex+i].py - ( m_allTorques[i](3,0) * _1_mg + FinalCOMTraj_deq[currentIndex+i].y[0] ) ;
+    ZMPMB[i][0] = - aforce.n()[1] / aforce.f()[2];
+    ZMPMB[i][1] = aforce.n()[0] / aforce.f()[2] ;
+    m_deltaZMPMBPositions[i].px = ZMPPositions[currentIndex+i].px - ( - aforce.n()[1] / aforce.f()[2] ) ;
+    m_deltaZMPMBPositions[i].py = ZMPPositions[currentIndex+i].py - (   aforce.n()[0] / aforce.f()[2] ) ;
     m_deltaZMPMBPositions[i].pz = 0.0 ;
     m_deltaZMPMBPositions[i].theta = 0.0 ;
     m_deltaZMPMBPositions[i].time = m_CurrentTime + i * m_SamplingPeriod ;
@@ -769,14 +766,14 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
 	aof5.precision(8);
 	aof5.setf(ios::scientific, ios::floatfield);
 	for(unsigned int i = 0 ; i < m_deltaZMPMBPositions.size(); i++){
-	  aof5  << filterprecision(ZMPPositions[currentIndex+i].px ) << " "   // 1
-          << filterprecision(ZMPPositions[currentIndex+i].py ) << " "   // 2
-          << filterprecision(- m_allTorques[i](4,0) * _1_mg + FinalCOMTraj_deq[currentIndex+i].x[0] ) << " "   // 1
-          << filterprecision(  m_allTorques[i](3,0) * _1_mg + FinalCOMTraj_deq[currentIndex+i].y[0] ) << " "   // 2
+	  aof5  << filterprecision( ZMPPositions[currentIndex+i].px ) << " "   // 1
+          << filterprecision( ZMPPositions[currentIndex+i].py ) << " "   // 2
+          << filterprecision( ZMPMB[i][0] ) << " "   // 1
+          << filterprecision( ZMPMB[i][1] ) << " "   // 2
           << filterprecision( FinalCOMTraj_deq[currentIndex+i].x[0] ) << " "   // 1
           << filterprecision( FinalCOMTraj_deq[currentIndex+i].y[0] ) << " "   // 2
-          << filterprecision(m_deltaZMPMBPositions[i].px ) << " "   // 2
-          << filterprecision(m_deltaZMPMBPositions[i].py ) << " "   // 3
+          << filterprecision( m_deltaZMPMBPositions[i].px ) << " "   // 2
+          << filterprecision( m_deltaZMPMBPositions[i].py ) << " "   // 3
           << endl ;
 	}
 	aof5.close();
@@ -797,8 +794,8 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
 	aof5.setf(ios::scientific, ios::floatfield);
   aof5  << filterprecision(ZMPPositions[currentIndex+N-1].px ) << " "   // 1
         << filterprecision(ZMPPositions[currentIndex+N-1].py ) << " "   // 2
-        << filterprecision(- m_allTorques[N-1](4,0) * _1_mg + FinalCOMTraj_deq[currentIndex+N-1].x[0] ) << " "   // 1
-        << filterprecision(  m_allTorques[N-1](3,0) * _1_mg + FinalCOMTraj_deq[currentIndex+N-1].y[0] ) << " "   // 2
+        << filterprecision(ZMPMB[0][0] ) << " "   // 1
+        << filterprecision(ZMPMB[0][1]) << " "   // 2
         << endl ;
 	aof5.close();
 
