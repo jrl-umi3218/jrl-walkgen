@@ -17,7 +17,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 
-INCLUDE(cmake/cmake_metapod_configure.cmake)
+INCLUDE(cmake_metapod_configure.cmake)
 
 # Includes from jrl-cmaketools
 INCLUDE(cmake/base.cmake)
