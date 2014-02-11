@@ -48,6 +48,7 @@
 #ifndef METAPOD_TYPEDEF
 #define METAPOD_TYPEDEF
 typedef double LocalFloatType;
+typedef metapod::Spatial::ForceTpl<LocalFloatType> Force;
 typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
 typedef metapod::Nodes< Robot_Model, 0 >::type Node;
 #endif

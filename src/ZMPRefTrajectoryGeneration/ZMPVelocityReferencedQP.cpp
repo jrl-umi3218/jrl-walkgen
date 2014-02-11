@@ -735,7 +735,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
     m_allTorques[i] = m_torques ;
 
     Node & node = boost::fusion::at_c<0>(Robot_Model.nodes);
-    metapod::Spatial::Force aforce = node.joint.f ;
+    Force aforce = node.joint.f ;
 
 
 
