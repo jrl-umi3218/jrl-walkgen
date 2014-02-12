@@ -719,6 +719,29 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
       i);
   }
 
+  /// \brief Debug Purpose
+  /// --------------------
+  ofstream aof6;
+  string aFileName;
+  static int iteration = 0;
+  if (iteration == 0)
+  {
+    ofstream aof6;
+    string aFileName;
+	  aFileName = "TestHerdt2010DynamicFilterArt.dat";
+	  aof6.open(aFileName.c_str(),ofstream::out);
+	  aof6.close();
+  }
+  aFileName = "TestHerdt2010DynamicFilterArt.dat";
+	aof6.open(aFileName.c_str(),ofstream::app);
+	aof6.precision(8);
+	aof6.setf(ios::scientific, ios::floatfield);
+	for(unsigned int i = 0 ; i < m_configurationTraj[0].size() ; i++){
+    aof6  << filterprecision( m_configurationTraj[0](i) ) << " " ;  // 1;
+	}
+	aof6 << endl ;
+	aof6.close();
+
   /// \brief rnea, calculation of the multi body ZMP
   /// ----------------------------------------------
   vector< vector<double> > ZMPMB ( N , vector<double> (2) );
@@ -726,15 +749,15 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
     // Apply the RNEA to the metapod multibody and print the result in a log file.
     for(unsigned int j = 0 ; j < m_configurationTraj[i].size() ; j++ )
     {
-      m_q(j,0) = m_configurationTraj[i][j] ;
-      m_dq(j,0) = m_velocityTraj[i][j] ;
-      m_ddq(j,0) = m_accelerationTraj[i][j] ;
+      m_q(j,0) = m_configurationTraj[i](j) ;
+      m_dq(j,0) = m_velocityTraj[i](j) ;
+      m_ddq(j,0) = m_accelerationTraj[i](j) ;
     }
     metapod::rnea< Robot_Model, true >::run(m_robot, m_q, m_dq, m_ddq);
     getTorques(m_robot, m_torques);
     m_allTorques[i] = m_torques ;
 
-    Node & node = boost::fusion::at_c<0>(m_robot.nodes);
+    Node & node = boost::fusion::at_c<Robot_Model::BODY>(m_robot.nodes);
     Force & aforce = node.joint.f ;
 
     ZMPMB[i][0] = - aforce.n()[1] / aforce.f()[2];
@@ -751,17 +774,15 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
   /// \brief Debug Purpose
   /// --------------------
   ofstream aof5;
-  string aFileName;
-  static int iteration = 0;
   if (iteration == 0)
   {
     ofstream aof5;
     string aFileName;
-	  aFileName = "TestHerdt2010DynamicFilterDZMP.dat";
+	  aFileName = "TestHerdt2010DynamicDZMP.dat";
 	  aof5.open(aFileName.c_str(),ofstream::out);
 	  aof5.close();
   }
-  aFileName = "TestHerdt2010DynamicFilterDZMP.dat";
+  aFileName = "TestHerdt2010DynamicDZMP.dat";
 	aof5.open(aFileName.c_str(),ofstream::app);
 	aof5.precision(8);
 	aof5.setf(ios::scientific, ios::floatfield);
@@ -958,7 +979,35 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(COMState &acomp,
   /* Get the current acceleration vector */
   CurrentAcceleration = HDR_->currentAcceleration();
 
-  static int StageOfTheAlgorithm = 0 ;
+  /// \brief Debug Purpose
+  /// --------------------
+  ofstream aof6;
+  string aFileName;
+  static int iteration = 0;
+  if (iteration == 0)
+  {
+    ofstream aof6;
+    string aFileName;
+	  aFileName = "TestHerdt2010DynamicFilterArt2.dat";
+	  aof6.open(aFileName.c_str(),ofstream::out);
+	  aof6.close();
+  }
+  aFileName = "TestHerdt2010DynamicFilterArt2.dat";
+	aof6.open(aFileName.c_str(),ofstream::app);
+	aof6.precision(8);
+	aof6.setf(ios::scientific, ios::floatfield);
+	for(unsigned int i = 0 ; i < CurrentConfiguration.size() ; i++){
+    aof6  << filterprecision( CurrentConfiguration(i) ) << " " ;  // 1;
+	}
+	aof6 << endl ;
+	aof6.close();
+  iteration++;
+  static int StageOfTheAlgorithm = 1 ;
+//  if (StageOfTheAlgorithm == 0)
+//  {
+//    ComAndFootRealization_->setSamplingPeriod(m_SamplingPeriod);
+//    ComAndFootRealization_->Initialization();
+//  }
   ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
 								    aLeftFootPosition,
 								    aRightFootPosition,

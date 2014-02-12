@@ -30,17 +30,22 @@
 #include "TestObject.hh"
 #include <jrl/walkgen/pgtypes.hh>
 
-
+#include <metapod/models/hrp2_14/hrp2_14.hh>
 #ifndef METAPOD_INCLUDES
 #define METAPOD_INCLUDES
 // metapod includes
-typedef double LocalFloatType;
-#include <metapod/models/hrp2_14/hrp2_14.hh>
 #include <metapod/tools/print.hh>
 #include <metapod/tools/initconf.hh>
-#include "metapod/algos/rnea.hh"
+#include <metapod/algos/rnea.hh>
 #include <Eigen/StdVector>
-typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
+#endif
+
+#ifndef METAPOD_TYPEDEF2
+#define METAPOD_TYPEDEF2
+typedef double LocalFloatType2;
+typedef metapod::Spatial::ForceTpl<LocalFloatType2> Force2;
+typedef metapod::hrp2_14<LocalFloatType2> Robot_Model2;
+typedef metapod::Nodes< Robot_Model2, Robot_Model2::BODY >::type Node2;
 #endif
 
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
@@ -59,25 +64,21 @@ class TestHerdt2010: public TestObject
 
 private:
   // buffer to save all the zmps positions
-  ComAndFootRealizationByGeometry * comAndFootRealization ;
   double errZMP [2] ;
+  Robot_Model2 robot_ ;
+  ComAndFootRealization * ComAndFootRealization_;
 
   public:
   TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
     TestObject(argc,argv,aString)
   {
     m_TestProfile = TestProfile;
-    comAndFootRealization = new ComAndFootRealizationByGeometry(NULL);
     errZMP[0]=0.0;
     errZMP[1]=0.0;
+    ComAndFootRealization_ = 0 ;
   };
 
-  ~TestHerdt2010(){
-    if (comAndFootRealization != NULL ){
-      delete comAndFootRealization ;
-      comAndFootRealization = NULL ;
-    }
-  }
+  ~TestHerdt2010(){}
 
   typedef void (TestHerdt2010::* localeventHandler_t)(PatternGeneratorInterface &);
 
@@ -131,19 +132,21 @@ private:
         }
         else if (m_PGIInterface==1)
         {
-        ok = m_PGI->RunOneStepOfTheControlLoop( m_CurrentConfiguration,
+          ok = m_PGI->RunOneStepOfTheControlLoop( m_CurrentConfiguration,
                                                 m_CurrentVelocity,
                                                 m_CurrentAcceleration,
                                                 m_OneStep.ZMPTarget);
         }
-        m_OneStep.NbOfIt++;
-        m_clock.stopOneIteration();
-        m_PreviousConfiguration = m_CurrentConfiguration;
-        m_PreviousVelocity = m_CurrentVelocity;
-        m_PreviousAcceleration = m_CurrentAcceleration;
+	      m_OneStep.NbOfIt++;
+
+	      m_clock.stopOneIteration();
+
+	      m_PreviousConfiguration = m_CurrentConfiguration;
+	      m_PreviousVelocity = m_CurrentVelocity;
+	      m_PreviousAcceleration = m_CurrentAcceleration;
 
         /*! Call the reimplemented method to generate events. */
-        if (ok)
+	      if (ok)
         {
           m_clock.startModification();
           generateEvent();
@@ -152,13 +155,15 @@ private:
           m_clock.fillInStatistics();
 
           /*! Fill the debug files with appropriate information. */
+          ComparingZMPs();
           fillInDebugFiles();
-          //ComparingZMPs(m_OneStep.NbOfIt);
-         }
-         else
-         {
-            cerr << "Nothing to dump after " << m_OneStep.NbOfIt << endl;
-         }
+
+        }
+	      else
+        {
+          cerr << "Nothing to dump after " << m_OneStep.NbOfIt << endl;
+        }
+
       }
 
       os << endl << "End of iteration " << lNbIt << endl;
@@ -173,91 +178,47 @@ private:
     return compareDebugFiles();
   }
 
-protected:
+  void init()
+  {
+    // Instanciate and initialize.
+    string RobotFileName = m_VRMLPath + m_VRMLFileName;
 
-  void CallToComAndFootRealization(COMState &acomp,
-       FootAbsolutePosition &aLeftFAP,
-       FootAbsolutePosition &aRightFAP,
-       MAL_VECTOR_TYPE(double) &CurrentConfiguration,
-       MAL_VECTOR_TYPE(double) &CurrentVelocity,
-       MAL_VECTOR_TYPE(double) &CurrentAcceleration,
-       int IterationNumber,
-       int StageOfTheAlgorithm,
-       ComAndFootRealizationByGeometry *comAndFootRealization)
-   {
-
-     // New scheme for WPG v3.0
-     // We call the object in charge of generating the whole body
-     // motion  ( for a given CoM and Feet points)  before applying the second filter.
-     MAL_VECTOR_DIM(aCOMState,double,6);
-     MAL_VECTOR_DIM(aCOMSpeed,double,6);
-     MAL_VECTOR_DIM(aCOMAcc,double,6);
-
-     aCOMState(0) = acomp.x[0];
-     aCOMState(1) = acomp.y[0];
-     aCOMState(2) = acomp.z[0];
-     aCOMState(3) = acomp.roll[0];
-     aCOMState(4) = acomp.pitch[0];
-     aCOMState(5) = acomp.yaw[0];
-
-     aCOMSpeed(0) = acomp.x[1];
-     aCOMSpeed(1) = acomp.y[1];
-     aCOMSpeed(2) = acomp.z[1];
-     aCOMSpeed(3) = acomp.roll[1];
-     aCOMSpeed(4) = acomp.roll[1];
-     aCOMSpeed(5) = acomp.roll[1];
-
-     aCOMAcc(0) = acomp.x[2];
-     aCOMAcc(1) = acomp.y[2];
-     aCOMAcc(2) = acomp.z[2];
-     aCOMAcc(3) = acomp.roll[2];
-     aCOMAcc(4) = acomp.roll[2];
-     aCOMAcc(5) = acomp.roll[2];
-
-     MAL_VECTOR_DIM(aLeftFootPosition,double,5);
-     MAL_VECTOR_DIM(aRightFootPosition,double,5);
-
-     aLeftFootPosition(0) = aLeftFAP.x;
-     aLeftFootPosition(1) = aLeftFAP.y;
-     aLeftFootPosition(2) = aLeftFAP.z;
-     aLeftFootPosition(3) = aLeftFAP.theta;
-     aLeftFootPosition(4) = aLeftFAP.omega;
-
-     aRightFootPosition(0) = aRightFAP.x;
-     aRightFootPosition(1) = aRightFAP.y;
-     aRightFootPosition(2) = aRightFAP.z;
-     aRightFootPosition(3) = aRightFAP.theta;
-     aRightFootPosition(4) = aRightFAP.omega;
-
-     /* Get the current configuration vector */
-     CurrentConfiguration = m_HDR->currentConfiguration();
-
-     /* Get the current velocity vector */
-     CurrentVelocity = m_HDR->currentVelocity();
-
-     /* Get the current acceleration vector */
-     CurrentAcceleration = m_HDR->currentAcceleration();
-
-     comAndFootRealization->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
-                      aLeftFootPosition,
-                      aRightFootPosition,
-                      CurrentConfiguration,
-                      CurrentVelocity,
-                      CurrentAcceleration,
-                      IterationNumber,
-                      StageOfTheAlgorithm);
-     if (StageOfTheAlgorithm==0)
-       {
-         /* Update the current configuration vector */
-         m_HDR->currentConfiguration(CurrentConfiguration);
-
-         /* Update the current velocity vector */
-         m_HDR->currentVelocity(CurrentVelocity);
-
-         /* Update the current acceleration vector */
-         m_HDR->currentAcceleration(CurrentAcceleration);
-       }
+    bool fileExist = false;
+    {
+      std::ifstream file (RobotFileName.c_str ());
+      fileExist = !file.fail ();
     }
+    if (!fileExist)
+      throw std::string ("failed to open robot model");
+
+    CreateAndInitializeHumanoidRobot(RobotFileName,
+				       m_SpecificitiesFileName,
+				       m_LinkJointRank,
+				       m_InitConfig,
+				       m_HDR, m_DebugHDR, m_PGI);
+
+    // Specify the walking mode: here the default one.
+    istringstream strm2(":walkmode 0");
+    m_PGI->ParseCmd(strm2);
+
+    MAL_VECTOR_RESIZE(m_CurrentConfiguration, m_HDR->numberDof());
+    MAL_VECTOR_RESIZE(m_CurrentVelocity, m_HDR->numberDof());
+    MAL_VECTOR_RESIZE(m_CurrentAcceleration, m_HDR->numberDof());
+
+    MAL_VECTOR_RESIZE(m_PreviousConfiguration, m_HDR->numberDof());
+    MAL_VECTOR_RESIZE(m_PreviousVelocity, m_HDR->numberDof());
+    MAL_VECTOR_RESIZE(m_PreviousAcceleration, m_HDR->numberDof());
+
+    ComAndFootRealization_ = new ComAndFootRealizationByGeometry( NULL );
+    ComAndFootRealization_->setHumanoidDynamicRobot(m_HDR);
+    ComAndFootRealization_->SetHeightOfTheCoM(0.814);
+    ComAndFootRealization_->setSamplingPeriod(0.1);
+    ComAndFootRealization_->SetStepStackHandler(new StepStackHandler(new SimplePluginManager()));
+    ComAndFootRealization_->Initialization();
+
+  }
+
+protected:
 
   double filterprecision(double adb)
   {
@@ -269,94 +230,92 @@ protected:
     return lintadb2/1e7;
   }
 
-  void ComparingZMPs(int it)
+  void ComparingZMPs()
   {
-    // Read the robot VRML file model.
-    comAndFootRealization->setHumanoidDynamicRobot(m_HDR);
-    comAndFootRealization->SetHeightOfTheCoM(0.814);
-    comAndFootRealization->setSamplingPeriod(0.1);
-    comAndFootRealization->SetStepStackHandler(new StepStackHandler(new SimplePluginManager()));
-    comAndFootRealization->Initialization();
+    static int iteration = 0 ;
+    /// \brief claculate, from the CoM of computed by the preview control,
+    ///    the corresponding articular position, velocity and acceleration
+    /// ------------------------------------------------------------------
+    MAL_VECTOR(CurrentConfiguration,double);
+    MAL_VECTOR(CurrentVelocity,double);
+    MAL_VECTOR(CurrentAcceleration,double);
 
-    // \brief claculate, from the CoM of computed by the preview control,
-    //    the corresponding articular position, velocity and acceleration
-    // ------------------------------------------------------------------
-    MAL_VECTOR_TYPE(double) configurationTraj ;
-    MAL_VECTOR_TYPE(double) velocityTraj ;
-    MAL_VECTOR_TYPE(double) accelerationTraj ;
-    COMState aComSta ;
-    for(unsigned int i=0;i<3;i++)
-    {
-      aComSta.x[i] = m_OneStep.finalCOMPosition.x[i];
-      aComSta.y[i] = m_OneStep.finalCOMPosition.y[i];
-      aComSta.z[i] = m_OneStep.finalCOMPosition.z[i];
-    };
-    aComSta.yaw[0]   = m_OneStep.finalCOMPosition.yaw;   aComSta.yaw[1]   = aComSta.yaw[2]   = 0.0;
-    aComSta.pitch[0] = m_OneStep.finalCOMPosition.pitch; aComSta.pitch[1] = aComSta.pitch[2] = 0.0;
-    aComSta.roll[0]  = m_OneStep.finalCOMPosition.roll;  aComSta.roll[1]  = aComSta.roll[2]  = 0.0;
-    CallToComAndFootRealization(
-        aComSta,
-        m_OneStep.LeftFootPosition,
-        m_OneStep.RightFootPosition,
-        configurationTraj,
-        velocityTraj,
-        accelerationTraj,
-        it,0,comAndFootRealization);
+    MAL_VECTOR_RESIZE(CurrentConfiguration, m_HDR->numberDof());
+    MAL_VECTOR_RESIZE(CurrentVelocity, m_HDR->numberDof());
+    MAL_VECTOR_RESIZE(CurrentAcceleration, m_HDR->numberDof());
 
-    // \brief rnea
-    // -----------
-    // Initialize the robot with the autogenerated files by MetapodFromUrdf
-    Robot_Model robot;
-    // Set configuration vectors (q, dq, ddq) to reference values.
-    Robot_Model::confVector torques;
-    Robot_Model::confVector q, dq, ddq;
-    // Apply the RNEA to the metapod multibody and print the result in a log file.
-    for( unsigned int j = 0 ; j < configurationTraj.size() ; j++ )
+    MAL_VECTOR_DIM(aCOMState,double,6);
+    MAL_VECTOR_DIM(aCOMSpeed,double,6);
+    MAL_VECTOR_DIM(aCOMAcc,double,6);
+    MAL_VECTOR_DIM(aLeftFootPosition,double,5);
+    MAL_VECTOR_DIM(aRightFootPosition,double,5);
+
+    aCOMState(0) = m_OneStep.finalCOMPosition.x[0];      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
+    aCOMState(1) = m_OneStep.finalCOMPosition.y[0];      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
+    aCOMState(2) = m_OneStep.finalCOMPosition.z[0];      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
+    aCOMState(3) = m_OneStep.finalCOMPosition.roll;      aCOMSpeed(3) = aCOMAcc(3) = 0 ;
+    aCOMState(4) = m_OneStep.finalCOMPosition.pitch;     aCOMSpeed(4) = aCOMAcc(4) = 0 ;
+    aCOMState(5) = m_OneStep.finalCOMPosition.yaw;       aCOMSpeed(5) = aCOMAcc(5) = 0 ;
+
+    aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
+    aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
+    aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
+    aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
+    aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
+
+    ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
+                      aLeftFootPosition,
+                      aRightFootPosition,
+                      CurrentConfiguration,
+                      CurrentVelocity,
+                      CurrentAcceleration,
+                      iteration,
+                      1);
+
+    /// \brief rnea, calculation of the multi body ZMP
+    /// ----------------------------------------------
+    Robot_Model2::confVector q, dq, ddq;
+    for(unsigned int j = 0 ; j < m_CurrentConfiguration.size() ; j++ )
     {
-      q(j,0) = configurationTraj[j] ;
-      dq(j,0) = velocityTraj[j] ;
-      ddq(j,0) = accelerationTraj[j] ;
+      q(j,0) = CurrentConfiguration[j] ;
+      dq(j,0) = CurrentVelocity[j] ;
+      ddq(j,0) = CurrentAcceleration[j] ;
     }
-    metapod::rnea< Robot_Model, true >::run(robot, q, dq, ddq);
-    getTorques(robot, torques);
+    metapod::rnea< Robot_Model2, true >::run(robot_, q, dq, ddq);
 
-    // Projection of the Torques on the ground, the result is the ZMP Multi-Body
-    // -------------------------------------------------------------------------
-    double factor = 1/(m_HDR->mass()*9.81);
-    ZMPPosition ZMPMB;
-    // Smooth ramp
-    ZMPMB.px = torques(1,0) /*(4,0)*/ * factor ;
-    ZMPMB.py = torques(0,0) /*(3,0)*/ * factor ;
-    ZMPMB.pz = 0 ;
-    ZMPMB.theta = 0.0;
-    ZMPMB.time = m_clock.getStartOneIteration();
-    ZMPMB.stepType = 0 ;
+    Node2 & node = boost::fusion::at_c<Robot_Model2::BODY>(robot_.nodes);
+    Force2 & aforce = node.joint.f ;
 
-    double errx = fabs ( m_OneStep.ZMPTarget(0) - ZMPMB.px ) ;
-    double erry = fabs ( m_OneStep.ZMPTarget(1) - ZMPMB.py ) ;
+    double ZMPMB[2];
+
+    ZMPMB[0] = - aforce.n()[1] / aforce.f()[2] ;
+    ZMPMB[1] = aforce.n()[0] / aforce.f()[2] ;
+
+    double errx = fabs ( m_OneStep.ZMPTarget(0) - ZMPMB[0] ) ;
+    double erry = fabs ( m_OneStep.ZMPTarget(1) - ZMPMB[1] ) ;
 
     errZMP[0] += errx ;
     errZMP[1] += erry ;
 
     // Writing of the two zmps and the error.
     ofstream aof;
-	  string aFileName;
-	  aFileName = m_TestName;
-	  aFileName += "DeltaZMP.dat";
-	  aof.open(aFileName.c_str(),ofstream::app);
+    if (iteration == 0)
+    {
+      ofstream aof;
+      aof.open("TestHerdt2010DynamicFilterDeltaZMP.dat",ofstream::out);
+      aof.close();
+    }
+	  aof.open("TestHerdt2010DynamicFilterDeltaZMP.dat",ofstream::app);
 	  aof.precision(8);
 	  aof.setf(ios::scientific, ios::floatfield);
 	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "          // 1
-        << filterprecision(m_OneStep.ZMPTarget(0) ) << " "          // 2
-        << filterprecision(m_OneStep.ZMPTarget(1) ) << " "          // 3
-        << filterprecision(ZMPMB.px) << " "                         // 4
-        << filterprecision(ZMPMB.py) << " "                         // 5
-        << filterprecision(errx) << " "                             // 6
-        << filterprecision(erry) << " "                             // 7
-        << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " " // 8
-	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " " // 9
+        << filterprecision( ZMPMB[0] ) << " "                       // 2
+        << filterprecision( ZMPMB[1] ) << " "                       // 3
+        << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " " // 4
+	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " " // 5
         << endl ;
     aof.close();
+    iteration++;
   }
 
   void ComputeAndDisplayAverageError(){
