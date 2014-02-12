@@ -95,8 +95,8 @@ MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
     ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 ENDMACRO(ADD_MORISAWA_2007)
 
-ADD_MORISAWA_2007(TestMorisawa2007OnLine)
-ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
+#ADD_MORISAWA_2007(TestMorisawa2007OnLine)
+#ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
 
 ###################
 # Test Herdt 2010 #
@@ -136,7 +136,7 @@ MACRO(ADD_HERDT_2010 test_herdt2010_arg)
     ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 ENDMACRO(ADD_HERDT_2010)
 
-ADD_HERDT_2010(TestHerdt2010)
+#ADD_HERDT_2010(TestHerdt2010)
 ADD_HERDT_2010(TestHerdt2010DynamicFilter)
 
 ####################
