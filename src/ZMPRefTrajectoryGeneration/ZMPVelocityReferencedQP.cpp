@@ -983,31 +983,60 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(COMState &acomp,
   /// --------------------
   ofstream aof6;
   string aFileName;
+  ostringstream oss(std::ostringstream::ate);
   static int iteration = 0;
-  if (iteration == 0)
+  if (IterationNumber == 0)
   {
     ofstream aof6;
     string aFileName;
-	  aFileName = "TestHerdt2010DynamicFilterArt2.dat";
-	  aof6.open(aFileName.c_str(),ofstream::out);
-	  aof6.close();
+    oss.str("TestHerdt2010DynamicFilterArt2");
+    oss << "_" << iteration << ".dat";
+    aFileName = oss.str();
+    aof6.open(aFileName.c_str(),ofstream::out);
+    aof6.close();
+    oss.str("TestHerdt2010COMFeet");
+    oss << "_" << iteration << ".dat";
+    aFileName = oss.str();    
+    aof6.open(aFileName.c_str(),ofstream::out);
+    aof6.close();
   }
-  aFileName = "TestHerdt2010DynamicFilterArt2.dat";
-	aof6.open(aFileName.c_str(),ofstream::app);
-	aof6.precision(8);
-	aof6.setf(ios::scientific, ios::floatfield);
-	for(unsigned int i = 0 ; i < CurrentConfiguration.size() ; i++){
+
+  oss.str("TestHerdt2010DynamicFilterArt2");
+  oss << "_" << iteration << ".dat";
+    aFileName = oss.str();
+  aof6.open(aFileName.c_str(),ofstream::app);
+  aof6.precision(8);
+  aof6.setf(ios::scientific, ios::floatfield);
+  for(unsigned int i = 0 ; i < CurrentConfiguration.size() ; i++){
     aof6  << filterprecision( CurrentConfiguration(i) ) << " " ;  // 1;
-	}
-	aof6 << endl ;
-	aof6.close();
-  iteration++;
+  }
+  aof6 << endl ;
+  aof6.close();
+  oss.str("TestHerdt2010COMFeet");
+  oss << "_" << iteration<< ".dat";
+  aFileName = oss.str();
+  aof6.open(aFileName.c_str(),ofstream::app);
+  aof6.precision(8);
+  aof6.setf(ios::scientific, ios::floatfield);
+  for(unsigned int i = 0 ; i < aCOMState.size() ; i++){
+    aof6  << filterprecision( aCOMState(i) ) << " " ;  // 1;
+  }
+  for(unsigned int i = 0 ; i < aLeftFootPosition.size() ; i++){
+    aof6  << filterprecision( aLeftFootPosition(i) ) << " " ;  // 1;
+  }
+  for(unsigned int i = 0 ; i < aRightFootPosition.size() ; i++){
+    aof6  << filterprecision( aRightFootPosition(i) ) << " " ;  // 1;
+  }
+
+  aof6 << endl ;
+  aof6.close();
+
   static int StageOfTheAlgorithm = 1 ;
-//  if (StageOfTheAlgorithm == 0)
-//  {
-//    ComAndFootRealization_->setSamplingPeriod(m_SamplingPeriod);
-//    ComAndFootRealization_->Initialization();
-//  }
+  //  if (StageOfTheAlgorithm == 0)
+  //  {
+  //    ComAndFootRealization_->setSamplingPeriod(m_SamplingPeriod);
+  //    ComAndFootRealization_->Initialization();
+  //  }
   ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
 								    aLeftFootPosition,
 								    aRightFootPosition,
@@ -1017,4 +1046,8 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(COMState &acomp,
 								    IterationNumber,
 								    StageOfTheAlgorithm);
   StageOfTheAlgorithm = 1 ;
+
+  if (IterationNumber==m_numberOfSample*QP_N_-1)
+    iteration++;
+        
 }
