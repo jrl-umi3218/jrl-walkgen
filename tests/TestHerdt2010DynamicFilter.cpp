@@ -516,8 +516,8 @@ protected:
 //      {75*200,&TestHerdt2010::walkForward},
 //      {85*200,&TestHerdt2010::startTurningLeft},
 //      {95*200,&TestHerdt2010::startTurningRight},
-      {10*200,&TestHerdt2010::stop},
-      {25*200,&TestHerdt2010::stopOnLineWalking}
+      {15*200,&TestHerdt2010::stop},
+      {20.5*200,&TestHerdt2010::stopOnLineWalking}
     };
 
     // Test when triggering event.
