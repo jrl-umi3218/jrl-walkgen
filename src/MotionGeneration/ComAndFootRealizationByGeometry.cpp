@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Olivier Stasse
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 #include <iostream>
@@ -48,7 +48,7 @@ ComAndFootRealizationByGeometry(PatternGeneratorInterfacePrivate *aPGI)
   m_ZARM = -1.0;
   m_LeftShoulder = 0;
   m_RightShoulder = 0;
-						
+
   RegisterMethods();
 
   for(unsigned int i=0;i<3;i++)
@@ -117,9 +117,9 @@ InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
       IndexInVRML.resize(FromRootToJoint.size());
       IndexinConfiguration.resize(FromRootToJoint.size());
 
-      ODEBUG("Enter 6.1 " );      
+      ODEBUG("Enter 6.1 " );
       int lindex =0;
-      
+
       // Here we assume that they are in a decending order.
       for(unsigned int i=0;i<FromRootToJoint.size();i++)
 	{
@@ -131,7 +131,7 @@ InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
 		  break;
 		}
 	    }
-	  
+
 	  IndexinConfiguration[lindex] = FromRootToJoint[i]->rankInConfiguration();
 	  lindex++;
 	}
@@ -153,7 +153,7 @@ InitializeMapsForAHand(CjrlHand * aHand,
   CjrlJoint *Chest = getHumanoidDynamicRobot()->chest();
   if (Chest==0)
     return;
-  
+
   const CjrlJoint * associatedWrist = aHand->associatedWrist();
   if (associatedWrist==0)
     return;
@@ -177,7 +177,7 @@ InitializeMapsForAHand(CjrlHand * aHand,
 	    FromRootToJoint2.push_back(*itJoint);
 	}
       itJoint++;
-      
+
     }
   associateShoulder = FromRootToJoint2[0];
   InitializationMaps(FromRootToJoint2,ActuatedJoints,
@@ -199,11 +199,11 @@ InitializeMapForChest(std::vector<CjrlJoint *> &ActuatedJoints)
   while(itJoint!=FromRootToJoint.end())
     {
       std::vector<CjrlJoint *>::iterator current = itJoint;
-      
+
       if (*current==Chest)
 	{
 	  startadding=true;
-	  
+
 	}
       else
 	{
@@ -228,7 +228,7 @@ Initialization()
     m_UpBody = new UpperBodyMotion();
 
   ODEBUG("Enter 1.0 ");
-  
+
   ODEBUG("Enter 2.0 ");
   // Take the right ankle position (should be equivalent)
   vector3d lAnklePositionRight,lAnklePositionLeft;
@@ -240,7 +240,7 @@ Initialization()
   RightFoot = getHumanoidDynamicRobot()->rightFoot();
   if (RightFoot==0)
     LTHROW("No right foot");
-    
+
   RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
   LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
 
@@ -254,7 +254,7 @@ Initialization()
   m_AnklePositionLeft[1]  = lAnklePositionLeft[1];
   m_AnklePositionRight[2] = lAnklePositionRight[2];
   m_AnklePositionLeft[2]  = lAnklePositionRight[2];
-      
+
   ODEBUG4("m_AnklePositionRight: "<< m_AnklePositionRight[0] << " " <<
 	 m_AnklePositionRight[1] << " " <<
 	  m_AnklePositionRight[2],"DebugDataStartingCOM.dat");
@@ -266,12 +266,12 @@ Initialization()
   // to the VRML ID.
   ODEBUG("Enter 5.0 ");
   // Extract the indexes of the Right leg.
-  
+
   if (RightFoot->associatedAnkle()==0)
     LTHROW("No right ankle");
-  std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint = 
+  std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint =
     RightFoot->associatedAnkle()->jointsFromRootToThis();
-  std::vector<CjrlJoint *> ActuatedJoints = 
+  std::vector<CjrlJoint *> ActuatedJoints =
     getHumanoidDynamicRobot()->getActuatedJoints();
   ODEBUG4("Size of ActuatedJoints"<<ActuatedJoints.size(),"DebugDataStartingCOM.dat");
   // Build global map.
@@ -298,18 +298,18 @@ Initialization()
 			 ActuatedJoints,
 			 m_LeftArmIndexInVRML, m_LeftArmIndexinConfiguration,
 			 m_LeftShoulder);
-  
+
   // Create maps for the right hand.
   InitializeMapsForAHand(getHumanoidDynamicRobot()->rightHand(),
 			 ActuatedJoints,
 			 m_RightArmIndexInVRML, m_RightArmIndexinConfiguration,
 			 m_RightShoulder);
-  
+
   FromRootToJoint.clear();
   FromRootToJoint2.clear();
 
 
-  
+
   ODEBUG("RightLegIndex: "
 	 << m_RightLegIndexInVRML[0] << " "
 	 << m_RightLegIndexInVRML[1] << " "
@@ -336,9 +336,9 @@ Initialization()
 	 << m_LeftLegIndexinConfiguration[3] << " "
 	 << m_LeftLegIndexinConfiguration[4] << " "
 	 << m_LeftLegIndexinConfiguration[5] );
-  
+
   ODEBUG("Enter 12.0 ");
-  
+
   MAL_VECTOR_FILL(m_prev_Configuration,0.0);
   MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity,0.0);
@@ -362,7 +362,7 @@ InitializationHumanoid(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
 {
   // For initialization we read the current value inside
   // the model. But we do not use it.
-  MAL_VECTOR_TYPE(double) CurrentConfig = 
+  MAL_VECTOR_TYPE(double) CurrentConfig =
     getHumanoidDynamicRobot()->currentConfiguration();
 
   // Set to zero the free floating root.
@@ -373,12 +373,12 @@ InitializationHumanoid(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
   CurrentConfig[3] = 0.0;
   CurrentConfig[4] = 0.0;
   CurrentConfig[5] = 0.0;
-  
+
   // Initialize the configuration vector.
   for(unsigned int i=0;i<m_GlobalVRMLIDtoConfiguration.size();i++)
     {
       CurrentConfig[m_GlobalVRMLIDtoConfiguration[i]] = BodyAnglesIni[i];
-    }  
+    }
 
   CjrlHumanoidDynamicRobot *aDMB =  getHumanoidDynamicRobot();
   aDMB->currentConfiguration(CurrentConfig);
@@ -425,7 +425,7 @@ InitializationFoot(CjrlFoot * aFoot,
   for(unsigned int i=0;i<3;i++)
     MAL_S4x4_MATRIX_ACCESS_I_J(FootTranslation, i,3) = -
       m_AnklePosition[i];
-  
+
   lFootPose = MAL_S4x4_RET_A_by_B(lFootPose,FootTranslation);
 
   InitFootPosition.x = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 0,3);
@@ -489,7 +489,7 @@ InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
   /* Initialize the waist pose.*/
   MAL_VECTOR_RESIZE(lStartingWaistPose,6);
 
-  // Compute the forward dynamics from the configuration vector provided by the user. 
+  // Compute the forward dynamics from the configuration vector provided by the user.
   // Initialize waist pose.
   InitializationHumanoid(BodyAnglesIni,lStartingWaistPose);
 
@@ -500,23 +500,23 @@ InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
 
   // Initialize Feet.
   InitializationFoot(RightFoot, m_AnklePositionRight,InitRightFootPosition);
-  ODEBUG("InitRightFootPosition : " << InitRightFootPosition.x 
-	  << " " << InitRightFootPosition.y 
+  ODEBUG("InitRightFootPosition : " << InitRightFootPosition.x
+	  << " " << InitRightFootPosition.y
 	  << " " << InitRightFootPosition.z << std::endl
 	  << " Ankle: " << m_AnklePositionRight);
 
   InitializationFoot(LeftFoot,  m_AnklePositionLeft, InitLeftFootPosition);
-  ODEBUG("InitLeftFootPosition : " << InitLeftFootPosition.x 
-	  << " " << InitLeftFootPosition.y 
+  ODEBUG("InitLeftFootPosition : " << InitLeftFootPosition.x
+	  << " " << InitLeftFootPosition.y
 	  << " " << InitLeftFootPosition.z << std::endl
 	  << " Ankle: " << m_AnklePositionLeft);
-  
+
   // Compute the center of gravity between the ankles.
-  MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,0) = 
+  MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,0) =
     0.5 * (InitRightFootPosition.x + InitLeftFootPosition.x);
-  MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,1) = 
+  MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,1) =
     0.5 * (InitRightFootPosition.y + InitLeftFootPosition.y);
-  MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,2) = 
+  MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,2) =
     0.5 * (InitRightFootPosition.z + InitLeftFootPosition.z);
   ODEBUG("COGInitialAnkle : "<<m_COGInitialAnkles);
 
@@ -539,8 +539,8 @@ InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
   m_DiffBetweenComAndWaist[1] =  lStartingWaistPose(1) - lStartingCOMPosition[1];
   m_DiffBetweenComAndWaist[2] =  lStartingWaistPose(2) - lStartingCOMPosition[2];
   ODEBUG("lFootPosition[2]: " <<InitRightFootPosition.z);
-  ODEBUG( "Diff between Com and Waist" << m_DiffBetweenComAndWaist[0] << " " 
-	   << m_DiffBetweenComAndWaist[1] << " " 
+  ODEBUG( "Diff between Com and Waist" << m_DiffBetweenComAndWaist[0] << " "
+	   << m_DiffBetweenComAndWaist[1] << " "
 	   << m_DiffBetweenComAndWaist[2]);
   // This term is usefull if
 
@@ -551,9 +551,9 @@ InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
   // The one which initialize correctly the height of the pattern generator.
   for(int i=0;i<3;i++)
     {
-      m_TranslationToTheLeftHip(i)  = 
+      m_TranslationToTheLeftHip(i)  =
 	m_StaticToTheLeftHip(i)  + m_DiffBetweenComAndWaist[i];
-      m_TranslationToTheRightHip(i) = 
+      m_TranslationToTheRightHip(i) =
 	m_StaticToTheRightHip(i) + m_DiffBetweenComAndWaist[i];
     }
 
@@ -591,7 +591,7 @@ InitializationUpperBody(deque<ZMPPosition> &inZMPPositions,
   ODEBUG6("FinishAndRealizeStepSequence() - 1","DebugGMFKW.dat");
   cout << __FUNCTION__ << ":"<< __LINE__ << ": You should implement something here"
        << endl;
- 
+
   ODEBUG6("FinishAndRealizeStepSequence() - 3 ","DebugGMFKW.dat");
 
   gettimeofday(&time2,0);
@@ -755,7 +755,7 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX_TYPE(double) & Body_R,
 		    Body_P[2] << " " <<
 		    Foot_P[0] << " " <<
 		    Foot_P[1] << " " <<
-		    Foot_P[2] << " " 
+		    Foot_P[2] << " "
 		    ,"DebugDataIK.dat");
     }
 
@@ -770,9 +770,9 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX_TYPE(double) & Body_R,
     {
       for(unsigned int j=0;j<3;j++)
 	{
-	  MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,i,j) = 
+	  MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,i,j) =
 	    MAL_S3x3_MATRIX_ACCESS_I_J(Body_R,i,j);
-	  MAL_S4x4_MATRIX_ACCESS_I_J(FootPose,i,j) = 
+	  MAL_S4x4_MATRIX_ACCESS_I_J(FootPose,i,j) =
 	    MAL_S3x3_MATRIX_ACCESS_I_J(Foot_R,i,j);
 	}
       MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,i,3) = MAL_S3_VECTOR_ACCESS(Body_P,i);
@@ -781,12 +781,12 @@ KinematicsForOneLeg(MAL_S3x3_MATRIX_TYPE(double) & Body_R,
 
 
   CjrlJoint *Waist = getHumanoidDynamicRobot()->waist();
-  
+
   ODEBUG("Typeid of humanoid: " << typeid(getHumanoidDynamicRobot()).name() );
   // Call specialized dynamics.
   getHumanoidDynamicRobot()->getSpecializedInverseKinematics(*Waist,*Ankle,BodyPose,FootPose,lq);
 
-	  
+
   return true;
 }
 
@@ -848,7 +848,7 @@ KinematicsForTheLegs(MAL_VECTOR_TYPE(double) & aCoMPosition,
   Body_P(1) = aCoMPosition(1) + ToTheHip(1);
   Body_P(2) = aCoMPosition(2) + ToTheHip(2);
 
-  ODEBUG(aCoMPosition(2) << 
+  ODEBUG(aCoMPosition(2) <<
 	 " Body_P : " << Body_P  << std::endl <<
 	 " aLeftFoot : " << aLeftFoot);
   /* If this is the second call, (stage =1)
@@ -918,7 +918,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) & aCoMPosition,
 					int IterationNumber,
 					int Stage)
 {
-  
+
   MAL_VECTOR(lqr,double);
   MAL_VECTOR(lql,double);
 
@@ -950,9 +950,9 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) & aCoMPosition,
 	  lAbsoluteWaistPosition(i) = MAL_S3_VECTOR_ACCESS(AbsoluteWaistPosition,i);
 	  lAbsoluteWaistPosition(i+3) = aCoMPosition(i+3);
 	}
-      ODEBUG("AbsoluteWaistPosition:" << lAbsoluteWaistPosition  << 
+      ODEBUG("AbsoluteWaistPosition:" << lAbsoluteWaistPosition  <<
 	     " ComPosition" << aCoMPosition);
-      
+
       ComputeUpperBodyHeuristicForNormalWalking(qArmr,
 						qArml,
 						lAbsoluteWaistPosition,
@@ -1027,7 +1027,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) & aCoMPosition,
       CurrentAcceleration[i] = 0.0;
       /* Keep the new value for the legs. */
     }
-  
+
   double ldt =  getSamplingPeriod();
 
   if (Stage==0)
@@ -1095,7 +1095,7 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) & aCoMPosition,
 
   for(int i=0;i<6;i++)
     CurrentVelocity[i] = aCoMSpeed(i);
-  
+
   for(int i=0;i<6;i++)
     CurrentAcceleration[i] = aCoMAcc(i);
 
@@ -1162,7 +1162,7 @@ EvaluateStartingCoM(MAL_VECTOR(&BodyAngles,double),
 
 int ComAndFootRealizationByGeometry::
 EvaluateCOMForStartingPosition( MAL_VECTOR( &BodyAngles,double),
-				double , // omega, 
+				double , // omega,
 				double , // theta,
 				MAL_S3_VECTOR( &lCOMPosition,double),
 				FootAbsolutePosition & InitLeftFootPosition,
@@ -1193,7 +1193,7 @@ ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR_TYPE(double) & qArmr,
 					  MAL_VECTOR_TYPE(double) & RFP,
 					  MAL_VECTOR_TYPE(double) & LFP)
 {
-  
+
   ODEBUG4("aCOMPosition:" << aCOMPosition << endl <<
 	  "Right Foot Position:" << RFP << endl <<
 	  "Left Foot Position:" << LFP << endl, "DebugDataIKArms.txt");
@@ -1219,24 +1219,24 @@ ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR_TYPE(double) & qArmr,
   TempARight = TempXR*-1.0;
   TempALeft = TempXL*-1.0;
 
-  ODEBUG4("Values: TL " << TempALeft << 
-	  " TR " << TempARight << 
-	  " "    << m_ZARM << 
+  ODEBUG4("Values: TL " << TempALeft <<
+	  " TR " << TempARight <<
+	  " "    << m_ZARM <<
 	  " "    << m_Xmax ,"DebugDataIKArms.txt");
-  ODEBUG("Values: TL " << TempALeft << 
-	 " TR " << TempARight << 
-	 " "    << m_ZARM << 
+  ODEBUG("Values: TL " << TempALeft <<
+	 " TR " << TempARight <<
+	 " "    << m_ZARM <<
 	 " "    << m_Xmax );
   // Compute angles using inverse kinematics and the computed hand position.
 
   matrix4d jointRootPosition,jointEndPosition;
   MAL_S4x4_MATRIX_SET_IDENTITY(jointRootPosition);
   MAL_S4x4_MATRIX_SET_IDENTITY(jointEndPosition);
-  
-  MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,0,3) = 
+
+  MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,0,3) =
     TempALeft * m_GainFactor / 0.2;
   MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,2,3) = m_ZARM;
-  
+
   getHumanoidDynamicRobot()->getSpecializedInverseKinematics(*m_LeftShoulder,
 							     *getHumanoidDynamicRobot()->leftWrist(),
 							     jointRootPosition,
@@ -1249,7 +1249,7 @@ ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR_TYPE(double) & qArmr,
 
   MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,0,3) = TempARight;
   MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,2,3) = m_ZARM;
-  
+
   getHumanoidDynamicRobot()->getSpecializedInverseKinematics(*m_RightShoulder,
 							     *getHumanoidDynamicRobot()->rightWrist(),
 							     jointRootPosition,
@@ -1329,6 +1329,47 @@ GetCurrentPositionofWaistInCOMFrame()
 
 MAL_S3_VECTOR_TYPE(double) ComAndFootRealizationByGeometry::GetCOGInitialAnkles()
 {
-  
+
   return m_COGInitialAnkles;
+}
+
+ostream& PatternGeneratorJRL::operator<<(ostream &os,const ComAndFootRealization &obj)
+{
+
+  SimplePluginManager * SPM = obj.getSimplePluginManager() ;
+  os << "The Simple Plugin Manager is :\n" ;
+  os << SPM << endl ;
+
+//  MAL_S3_VECTOR_TYPE(double) COGInitialAnkles = obj.GetCOGInitialAnkles() ;
+//  os << "The initial COG of ankles is :\n" ;
+//  os << COGInitialAnkles(0,0) << endl
+//  << COGInitialAnkles(1,0) << endl
+//  << COGInitialAnkles(2,0) << endl ;
+
+  StepStackHandler* stepStackHandler = obj.GetStepStackHandler() ;
+  os << "The Step Stack Handler pointer is :\n" ;
+  os << stepStackHandler << endl ;
+
+  double SamplingPeriod = obj.getSamplingPeriod() ;
+  os << "The sampling period is :\n" ;
+  os << SamplingPeriod << endl ;
+
+//  MAL_S4x4_MATRIX_TYPE(double) P = obj.GetCurrentPositionofWaistInCOMFrame();
+//  os<< "The current position of waist in COM frame is :\n" ;
+//      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 0,0) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 0,1) << " "
+//      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 0,2) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 0,3) << endl
+//      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 1,0) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 1,1) << " "
+//      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 1,2) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 1,3) << endl
+//      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 2,0) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 2,1) << " "
+//      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 2,2) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 2,3) << endl
+//      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,0) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,1) << " "
+//      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,2) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,3) << endl ;
+
+  CjrlHumanoidDynamicRobot * HumanoidDynamicRobot = obj.getHumanoidDynamicRobot();
+  os << "The HumanoidDynamicRobot is at the adress :\n" << HumanoidDynamicRobot << endl ;
+
+  double HeightOfTheCoM = obj.GetHeightOfTheCoM();
+  os << "The height of the robot is :\n" << HeightOfTheCoM << endl << endl ;
+
+  return os;
 }

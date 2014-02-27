@@ -228,7 +228,8 @@ namespace PatternGeneratorJRL {
     // INFO: This where you should instanciate your own
     // INFO: object for Com and Foot realization.
     // INFO: The default one is based on a geometrical approach.
-    m_ComAndFootRealization = new ComAndFootRealizationByGeometry(this);
+    m_ComAndFootRealization.resize(2);
+    m_ComAndFootRealization[0] = new ComAndFootRealizationByGeometry(this);
 
     // Creates the foot trajectory generator.
     m_FeetTrajectoryGenerator = new LeftAndRightFootTrajectoryGenerationMultiple(this,
@@ -245,6 +246,7 @@ namespace PatternGeneratorJRL {
 
     // ZMP and CoM generation using the method proposed in Herdt2010.
     m_ZMPVRQP = new ZMPVelocityReferencedQP(this,"",m_HumanoidDynamicRobot);
+    m_ComAndFootRealization[1] = m_ZMPVRQP->getComAndFootRealization();
 
     // ZMP and CoM generation using the analytical method proposed in Morisawa2007.
     m_ZMPM = new AnalyticalMorisawaCompact(this);
@@ -282,7 +284,7 @@ namespace PatternGeneratorJRL {
 						 &m_LeftFootPositions,
 						 &m_RightFootPositions);
 
-    // Defa`<ult handler :DoubleStagePreviewControl.
+    // Default handler :DoubleStagePreviewControl.
     m_GlobalStrategyManager = m_DoubleStagePCStrategy;
 
     // End of the creation of the fundamental objects.
@@ -296,7 +298,7 @@ namespace PatternGeneratorJRL {
 
     // Initialize the Preview Control general object.
     m_DoubleStagePCStrategy->InitInterObjects(m_HumanoidDynamicRobot,
-					      m_ComAndFootRealization,
+					      (*m_ComAndFootRealization.begin()),
 					      m_StepStackHandler);
 
     m_CoMAndFootOnlyStrategy->InitInterObjects(m_HumanoidDynamicRobot,
@@ -335,15 +337,13 @@ namespace PatternGeneratorJRL {
 
     // Read the robot VRML file model.
 
-    m_ComAndFootRealization->setHumanoidDynamicRobot(m_HumanoidDynamicRobot);
+    m_ComAndFootRealization[0]->setHumanoidDynamicRobot(m_HumanoidDynamicRobot);
+    m_ComAndFootRealization[0]->SetHeightOfTheCoM(m_PC->GetHeightOfCoM());
+    m_ComAndFootRealization[0]->setSamplingPeriod(m_PC->SamplingPeriod());
+    m_ComAndFootRealization[0]->SetStepStackHandler(m_StepStackHandler);
+    m_ComAndFootRealization[0]->Initialization();
 
-    m_ComAndFootRealization->SetHeightOfTheCoM(m_PC->GetHeightOfCoM());
-
-    m_ComAndFootRealization->setSamplingPeriod(m_PC->SamplingPeriod());
-
-    m_ComAndFootRealization->SetStepStackHandler(m_StepStackHandler);
-
-    m_ComAndFootRealization->Initialization();
+    m_ComAndFootRealization[1]->SetStepStackHandler(m_StepStackHandler);
 
     m_StOvPl->SetPreviewControl(m_PC);
     m_StOvPl->SetDynamicMultiBodyModel(m_HumanoidDynamicRobot);
@@ -353,6 +353,7 @@ namespace PatternGeneratorJRL {
     m_StepStackHandler->SetStepOverPlanner(m_StOvPl);
     m_StepStackHandler->SetWalkMode(0);
     // End of the initialization of the fundamental object.
+
   }
 
   PatternGeneratorInterfacePrivate::~PatternGeneratorInterfacePrivate()
@@ -396,8 +397,8 @@ namespace PatternGeneratorJRL {
       delete m_ZMPM;
     ODEBUG4("Destructor: did m_ZMPM","DebugPGI.txt");
 
-    if (m_ComAndFootRealization!=0)
-      delete m_ComAndFootRealization;
+    if ((*m_ComAndFootRealization.begin())!=0)
+      delete (*m_ComAndFootRealization.begin());
 
     if (m_FeetTrajectoryGenerator!=0)
       delete m_FeetTrajectoryGenerator;
@@ -1319,7 +1320,6 @@ namespace PatternGeneratorJRL {
     {
       ODEBUG("InternalClock:" <<m_InternalClock  <<
 	       " SamplingPeriod: "<<m_SamplingPeriod);
-      m_ZMPVRQP->setComAndFootRealization(m_ComAndFootRealization);
       m_ZMPVRQP->OnLine(m_InternalClock,
                         m_ZMPPositions,
                         m_COMBuffer,
@@ -1512,6 +1512,10 @@ namespace PatternGeneratorJRL {
     // to be done only when the robot has finish a motion.
     UpdateAbsolutePosition(UpdateAbsMotionOrNot);
     ODEBUG("Return true");
+
+    //cout << "CoM 0 :\n" << *m_ComAndFootRealization[0] << endl ;
+    //cout << "CoM 1 :\n" << *m_ComAndFootRealization[1] << endl ;
+
     return m_Running;
   }
 

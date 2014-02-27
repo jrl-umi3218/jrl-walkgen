@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008, 2009, 2010, 
+ * Copyright 2007, 2008, 2009, 2010,
  *
  * Olivier  Stasse
  *
@@ -18,11 +18,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with jrl-walkgen.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file CoMAndFootOnlyStrategy.h
-  \brief This object defines a global strategy object to generate 
+  \brief This object defines a global strategy object to generate
   only foot, ZMP reference and CoM trajectories position every 5 ms.
 */
 
@@ -42,7 +42,7 @@ namespace PatternGeneratorJRL
   */
   class  CoMAndFootOnlyStrategy: public GlobalStrategyManager
   {
-    
+
   public:
 
     /*! Default constructor. */
@@ -51,7 +51,7 @@ namespace PatternGeneratorJRL
     /*! Default destructor. */
     ~CoMAndFootOnlyStrategy();
 
-    /*! \name Reimplement the interface inherited from Global Strategy Manager 
+    /*! \name Reimplement the interface inherited from Global Strategy Manager
      @{
     */
 
@@ -60,7 +60,7 @@ namespace PatternGeneratorJRL
 
       @param[out] LeftFootPosition: The position of the Left Foot position.
       @param[out] RightFootPosition: The position of the Right Foot position.
-      @param[out] ZMPRefPos: The ZMP position to be feed to the controller, in the waist 
+      @param[out] ZMPRefPos: The ZMP position to be feed to the controller, in the waist
       frame reference.
       @param[out] finalCOMState: returns CoM state position, velocity and acceleration.
       @param[out] CurrentConfiguration: The results is a state vector containing the articular positions.
@@ -74,9 +74,9 @@ namespace PatternGeneratorJRL
 			       MAL_VECTOR_TYPE(double) & CurrentConfiguration,
 			       MAL_VECTOR_TYPE(double) & CurrentVelocity,
 			       MAL_VECTOR_TYPE(double) & CurrentAcceleration);
-    
 
-    
+
+
     /*! Computes the COM of the robot with the Joint values given in BodyAngles,
       velocities set to zero, and returns the values of the COM in aStaringCOMState.
       Assuming that the waist is at (0,0,0)
@@ -103,7 +103,7 @@ namespace PatternGeneratorJRL
 
 
     /*! This method returns :
-      \li -1 if there is no more motion to realize 
+      \li -1 if there is no more motion to realize
       \li 0 if a new step is needed,
       \li 1 if there is still enough steps inside the internal stack.
     */
@@ -112,17 +112,17 @@ namespace PatternGeneratorJRL
     /*! @} */
 
     /*! Methods related to the end of the motion.
-     @{ 
+     @{
     */
     /* Fix the end of the buffer to be tested. */
     void SetTheLimitOfTheBuffer(unsigned int lBufferSizeLimit);
-    
+
     /*! @} */
 
 
     /*! Reimplement the Call method for SimplePlugin part */
     void CallMethod(std::string &Method, std::istringstream &astrm);
-    
+
     /*! */
     void Setup(deque<ZMPPosition> & aZMPPositions,
 	       deque<COMState> & aCOMBuffer,
@@ -131,7 +131,7 @@ namespace PatternGeneratorJRL
 
     /*! \brief Initialization of the inter objects relationship. */
     int InitInterObjects(CjrlHumanoidDynamicRobot * aHDR,
-			 ComAndFootRealization * aCFR,
+			 std::vector<ComAndFootRealization *> aCFR,
 			 StepStackHandler * aSSH);
 
   protected:
@@ -140,7 +140,7 @@ namespace PatternGeneratorJRL
 
     /*! Keeps a link towards an object allowing to find a pose for a given CoM and
       foot position. */
-    ComAndFootRealization *m_ComAndFootRealization;
+    std::vector<ComAndFootRealization *>m_ComAndFootRealization;
 
     /*! Set the position of the buffer size limit. */
     unsigned m_BufferSizeLimit;

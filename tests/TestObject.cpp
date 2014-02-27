@@ -360,7 +360,7 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 17
 	      << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 18
 	      << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 19
-	      << filterprecision(m_OneStep.LeftFootPosition.theta  ) << " "                 // 20
+	      << filterprecision(m_OneStep.LeftFootPosition.theta * M_PI / 180 ) << " "     // 20
 	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
 	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
 	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23
@@ -372,20 +372,61 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                   // 29
 	      << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 30
 	      << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 31
-	      << filterprecision(m_OneStep.RightFootPosition.theta ) << " "                 // 32
+	      << filterprecision(m_OneStep.RightFootPosition.theta* M_PI / 180 ) << " "     // 32
 	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 33
 	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 34
 	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
 				 m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
-				 +m_CurrentConfiguration(0) ) << " "                        // 35
+				 +m_CurrentConfiguration(0) ) << " "                                          // 35
 	      << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
 				 m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
-				 +m_CurrentConfiguration(1) ) << " "                        // 36
+				 +m_CurrentConfiguration(1) ) << " "                                          // 36
 	      << filterprecision(m_CurrentConfiguration(0) ) << " "                         // 37
-	      << filterprecision(m_CurrentConfiguration(1) ) << " "                         // 38
-	      << endl;
+	      << filterprecision(m_CurrentConfiguration(1) ) << " ";                        // 38
+        for (unsigned int i = 0 ; i < m_CurrentConfiguration.size() ; i++)
+        {
+          aof << filterprecision(m_CurrentConfiguration(i)) << " " ;                  // 39 - 74
+        }
+	  aof << endl;
 	  aof.close();
         }
+
+
+//      /// \brief Debug Purpose
+//      /// --------------------
+//      ofstream aof;
+//      string aFileName;
+//      ostringstream oss(std::ostringstream::ate);
+//      static int iteration = 0;
+//      int iteration100 = (int)iteration/100;
+//      int iteration10 = (int)(iteration - iteration100*100)/10;
+//      int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
+//
+//
+//      if ( iteration == 0 ){
+//        oss.str("/tmp/walkfwd_kajita.pos");
+//        aFileName = oss.str();
+//        aof.open(aFileName.c_str(),ofstream::out);
+//        aof.close();
+//      }
+//      ///----
+//      oss.str("/tmp/walkfwd_kajita.pos");
+//      aFileName = oss.str();
+//      aof.open(aFileName.c_str(),ofstream::app);
+//      aof.precision(8);
+//      aof.setf(ios::scientific, ios::floatfield);
+//      aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
+//      for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
+//        aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 1
+//      }
+//      for(unsigned int i = 0 ; i < 10 ; i++){
+//        aof << 0.0 << " "  ;
+//      }
+//      aof  << endl ;
+//      aof.close();
+//
+//      iteration++;
+
     }
 
 

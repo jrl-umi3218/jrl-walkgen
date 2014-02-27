@@ -29,6 +29,8 @@
 #include "CommonTools.hh"
 #include "TestObject.hh"
 #include <jrl/walkgen/pgtypes.hh>
+#include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
+#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 
 #include <metapod/models/hrp2_14/hrp2_14.hh>
 #ifndef METAPOD_INCLUDES
@@ -48,7 +50,6 @@ typedef metapod::hrp2_14<LocalFloatType2> Robot_Model2;
 typedef metapod::Nodes< Robot_Model2, Robot_Model2::BODY >::type Node2;
 #endif
 
-#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 
 using namespace::PatternGeneratorJRL;
 using namespace::PatternGeneratorJRL::TestSuite;
@@ -219,6 +220,14 @@ private:
   }
 
 protected:
+
+  void SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR, CjrlHumanoidDynamicRobot *& aDebugHDR )
+  {
+    dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
+    Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot( &aRobotDynamicsObjectConstructor );
+    aHDR = aHRP2HDR;
+    aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
+  }
 
   double filterprecision(double adb)
   {
@@ -506,9 +515,9 @@ protected:
 
     #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-    { { 5*200,&TestHerdt2010::walkForward},
+    { {5*200,&TestHerdt2010::walkForward},
    //   {10*200,&TestHerdt2010::walkSidewards},
- //     {25*200,&TestHerdt2010::startTurningRightOnSpot},
+      {15*200,&TestHerdt2010::startTurningRightOnSpot},
 //      {35*200,&TestHerdt2010::walkForward},
 //      {45*200,&TestHerdt2010::startTurningLeftOnSpot},
 //      {55*200,&TestHerdt2010::walkForward},
@@ -516,8 +525,8 @@ protected:
 //      {75*200,&TestHerdt2010::walkForward},
 //      {85*200,&TestHerdt2010::startTurningLeft},
 //      {95*200,&TestHerdt2010::startTurningRight},
-      {15*200,&TestHerdt2010::stop},
-      {20.5*200,&TestHerdt2010::stopOnLineWalking}
+      {25*200,&TestHerdt2010::stop},
+      {27.5*200,&TestHerdt2010::stopOnLineWalking}
     };
 
     // Test when triggering event.

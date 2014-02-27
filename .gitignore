@@ -30,3 +30,10 @@ build/
 +committed/
 *~
 *.swp
+_build-DEBUG-CB/
+_build-RELEASE-CB/
+_build-RELEASE/
+cmake_metapod_configure_hrp2_14.cmake
+cmake_metapod_configure_simple_humanoid.cmake
+src/ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.cpp_dirty
+

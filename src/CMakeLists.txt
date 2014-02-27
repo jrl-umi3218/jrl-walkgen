@@ -89,7 +89,23 @@ SET(SOURCES
   privatepgtypes.cpp
   )
 
-ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES})
+# prefix and suffix each element of list by ${prefix}elemnt${suffix}
+macro(ADDPREFIX newlist prefix list_name)
+    # create empty list - necessary?
+    SET(${newlist})
+
+     # prefix and suffix elements
+    foreach(l ${${list_name}})
+      list(APPEND ${newlist} ${prefix}${l} )
+    endforeach()
+
+endmacro(ADDPREFIX)
+
+IF ( '${CMAKE_EXTRA_GENERATOR}' STREQUAL 'CodeBlocks' )
+    ADDPREFIX(${PROJECT_NAME}_ABSOLUTE_HEADERS  "${CMAKE_SOURCE_DIR}/"  ${PROJECT_NAME}_HEADERS)
+ENDIF ( '${CMAKE_EXTRA_GENERATOR}' STREQUAL 'CodeBlocks' )
+
+ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES} ${${PROJECT_NAME}_ABSOLUTE_HEADERS})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
 # Define dependencies
 

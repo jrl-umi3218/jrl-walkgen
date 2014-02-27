@@ -114,6 +114,7 @@ MACRO(ADD_HERDT_2010 test_herdt2010_arg)
   )
   TARGET_LINK_LIBRARIES(${test_herdt2010_arg} ${PROJECT_NAME})
   PKG_CONFIG_USE_DEPENDENCY(${test_herdt2010_arg} jrl-dynamics)
+  PKG_CONFIG_USE_DEPENDENCY(${test_herdt2010_arg} hrp2-dynamics)
   ADD_DEPENDENCIES(${test_herdt2010_arg} ${PROJECT_NAME})
 
   MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})

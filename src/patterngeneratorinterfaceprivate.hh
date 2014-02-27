@@ -647,7 +647,7 @@ namespace PatternGeneratorJRL
 
     /*! Objet to realize the generate the posture for given CoM
       and feet positions. */
-    ComAndFootRealization * m_ComAndFootRealization;
+    std::vector<ComAndFootRealization *> m_ComAndFootRealization;
 
     /* \name Object related to stepping over.
        @{

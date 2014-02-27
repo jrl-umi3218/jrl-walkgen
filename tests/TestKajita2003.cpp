@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Olivier Stasse
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file This file tests A. Herdt's walking algorithm for
@@ -78,7 +78,7 @@ protected:
       istringstream strm2(":arc 0.0 0.75 30.0 -1");
       aPGI.ParseCmd(strm2);
     }
-  
+
     {
       istringstream strm2(":lastsupport");
       aPGI.ParseCmd(strm2);
@@ -99,7 +99,7 @@ protected:
       istringstream strm2(":SetAlgoForZmpTrajectory Kajita");
       aPGI.ParseCmd(strm2);
     }
- 
+
     {
       istringstream strm2(":stepseq 0.0 -0.105 0.0 \
                      0.2 0.21 0.0  \
@@ -219,13 +219,13 @@ protected:
 				0 -0.2 0 ");
       aPGI.ParseCmd(strm2);
     }
-      
+
   }
 
 
   void chooseTestProfile()
   {
-    
+
     switch(m_TestProfile)
       {
 
@@ -246,7 +246,7 @@ protected:
 	break;
       }
   }
-  
+
   void generateEvent()
   {
   }
@@ -256,11 +256,11 @@ int PerformTests(int argc, char *argv[])
 {
 
  std::string TestNames[4] = {  "TestKajita2003StraightWalking",
-			       "TestKajita2003Circle",
+                               "TestKajita2003Circle",
                                "TestKajita2003PbFlorentSeq1",
                                "TestKajita2003PbFlorentSeq2"};
   int TestProfiles[4] = { PROFIL_STRAIGHT_WALKING,
-			  PROFIL_CIRCLE,
+                          PROFIL_CIRCLE,
                           PROFIL_PB_FLORENT_SEQ1,
                           PROFIL_PB_FLORENT_SEQ2};
 
