@@ -253,7 +253,7 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_TYPE(double) m_QP_T_previousVelocity ;
     MAL_VECTOR_TYPE(double) m_QP_T_previousAcceleration ;
 
-    /// \brief Buffer for the torques computed by RNEA algorithme from Featherstone
+    /// \brief Buffer for the torques computed by RNEA algorithm from Featherstone
     vector < Robot_Model::confVector,Eigen::aligned_allocator<Robot_Model::confVector> > m_allTorques ;
 
     /// \brief Buffer comtaimimg the difference between the ZMP computed from the Herdt controler\

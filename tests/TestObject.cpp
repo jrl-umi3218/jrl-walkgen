@@ -392,40 +392,40 @@ namespace PatternGeneratorJRL
         }
 
 
-//      /// \brief Debug Purpose
-//      /// --------------------
-//      ofstream aof;
-//      string aFileName;
-//      ostringstream oss(std::ostringstream::ate);
-//      static int iteration = 0;
-//      int iteration100 = (int)iteration/100;
-//      int iteration10 = (int)(iteration - iteration100*100)/10;
-//      int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
-//
-//
-//      if ( iteration == 0 ){
-//        oss.str("/tmp/walkfwd_kajita.pos");
-//        aFileName = oss.str();
-//        aof.open(aFileName.c_str(),ofstream::out);
-//        aof.close();
-//      }
-//      ///----
-//      oss.str("/tmp/walkfwd_kajita.pos");
-//      aFileName = oss.str();
-//      aof.open(aFileName.c_str(),ofstream::app);
-//      aof.precision(8);
-//      aof.setf(ios::scientific, ios::floatfield);
-//      aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
-//      for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
-//        aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 1
-//      }
-//      for(unsigned int i = 0 ; i < 10 ; i++){
-//        aof << 0.0 << " "  ;
-//      }
-//      aof  << endl ;
-//      aof.close();
-//
-//      iteration++;
+      /// \brief Debug Purpose
+      /// --------------------
+      ofstream aof;
+      string aFileName;
+      ostringstream oss(std::ostringstream::ate);
+      static int iteration = 0;
+      int iteration100 = (int)iteration/100;
+      int iteration10 = (int)(iteration - iteration100*100)/10;
+      int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
+
+
+      if ( iteration == 0 ){
+        oss.str("/tmp/walkfwd_kajita.pos");
+        aFileName = oss.str();
+        aof.open(aFileName.c_str(),ofstream::out);
+        aof.close();
+      }
+      ///----
+      oss.str("/tmp/walkfwd_kajita.pos");
+      aFileName = oss.str();
+      aof.open(aFileName.c_str(),ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
+      for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
+        aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 1
+      }
+      for(unsigned int i = 0 ; i < 10 ; i++){
+        aof << 0.0 << " "  ;
+      }
+      aof  << endl ;
+      aof.close();
+
+      iteration++;
 
     }
 

@@ -517,7 +517,7 @@ protected:
     struct localEvent events [localNbOfEvents] =
     { {5*200,&TestHerdt2010::walkForward},
    //   {10*200,&TestHerdt2010::walkSidewards},
-      {15*200,&TestHerdt2010::startTurningRightOnSpot},
+    //  {15*200,&TestHerdt2010::startTurningRightOnSpot},
 //      {35*200,&TestHerdt2010::walkForward},
 //      {45*200,&TestHerdt2010::startTurningLeftOnSpot},
 //      {55*200,&TestHerdt2010::walkForward},
@@ -525,6 +525,8 @@ protected:
 //      {75*200,&TestHerdt2010::walkForward},
 //      {85*200,&TestHerdt2010::startTurningLeft},
 //      {95*200,&TestHerdt2010::startTurningRight},
+      {10*200,&TestHerdt2010::startTurningLeft2},
+      {15*200,&TestHerdt2010::startTurningRight2},
       {25*200,&TestHerdt2010::stop},
       {27.5*200,&TestHerdt2010::stopOnLineWalking}
     };

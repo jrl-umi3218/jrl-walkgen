@@ -517,6 +517,9 @@ ZMPVelocityReferencedQP::OnLine(double time,
     if(Solution_.Fail>0)
         Problem_.dump( time );
 
+    static int iteration = 0;
+     if (iteration == 51)
+        iteration = 51;
     // INTERPOLATE THE NEXT COMPUTED COM STATE:
     // ----------------------------------------
     unsigned currentIndex = FinalCOMTraj_deq.size();
@@ -566,6 +569,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
         CoM2_.OneIteration( Solution_.Solution_vec[i], Solution_.Solution_vec[QP_N_+i] );
       }
 
+
       // INTERPOLATE TRUNK ORIENTATION:
       // ------------------------------
       OrientPrw_->interpolate_trunk_orientation( time + i * QP_T_, currentIndex + i * m_numberOfSample,
@@ -600,7 +604,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
     ofstream aof;
     string aFileName;
     ostringstream oss(std::ostringstream::ate);
-    static int iteration = 0;
+
     int iteration100 = (int)iteration/100;
     int iteration10 = (int)(iteration - iteration100*100)/10;
     int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
@@ -636,7 +640,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
     // DYNAMIC FILTER
     // --------------
-    //DynamicFilter( m_ZMPTraj_deq, m_COMTraj_deq, m_LeftFootTraj_deq, m_RightFootTraj_deq, currentIndex );
+    DynamicFilter( m_ZMPTraj_deq, m_COMTraj_deq, m_LeftFootTraj_deq, m_RightFootTraj_deq, currentIndex );
 
     CoM_.setState(m_COMTraj_deq[m_numberOfSample + currentIndex - 1]);
 
@@ -774,8 +778,6 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
   }
   aof.close();
 
-
-
   if ( iteration == 0 ){
     oss.str("/tmp/walkfwd_herdt.pos");
     aFileName = oss.str();
@@ -788,18 +790,40 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> & ZMPPosition
   aof.open(aFileName.c_str(),ofstream::app);
   aof.precision(8);
   aof.setf(ios::scientific, ios::floatfield);
-  aof << filterprecision( iteration * m_SamplingPeriod ) << " "  ; // 1
-  for(unsigned int j = 6 ; j < m_numberOfSample ; j++){
+
+  for(unsigned int j = 0 ; j < m_numberOfSample ; j++){
+    aof << filterprecision( iteration * QP_T_ + j * m_SamplingPeriod ) << " "  ; // 1
     for(unsigned int i = 6 ; i < m_configurationTraj[j].size() ; i++){
       aof << filterprecision( m_configurationTraj[j](i) ) << " "  ; // 1
     }
+    for(unsigned int i = 0 ; i < 10; i++){
+      aof << 0.0 << " "  ;
+    }
+    aof << endl ;
   }
-  for(unsigned int i = 0 ; i < 10 ; i++){
-    aof << 0 << " "  ;
-  }
-  aof  << endl ;
   aof.close();
 
+  if ( iteration == 0 ){
+    oss.str("/tmp/walkfwd_herdt.hip");
+    aFileName = oss.str();
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+  ///----
+  oss.str("/tmp/walkfwd_herdt.hip");
+  aFileName = oss.str();
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+
+  for(unsigned int j = 0 ; j < m_numberOfSample ; j++){
+    aof << filterprecision( iteration * QP_T_ + j * m_SamplingPeriod ) << " "  ; // 1
+    aof << filterprecision( FinalCOMTraj_deq[currentIndex+j].roll[0] ) << " "  ; // 1
+    aof << filterprecision( FinalCOMTraj_deq[currentIndex+j].pitch[0] ) << " "  ; // 1
+    aof << filterprecision( FinalCOMTraj_deq[currentIndex+j].yaw[0] ) << " "  ; // 1
+    aof << endl ;
+  }
+  aof.close();
 
 //  /// \brief rnea, calculation of the multi body ZMP
 //  /// ----------------------------------------------

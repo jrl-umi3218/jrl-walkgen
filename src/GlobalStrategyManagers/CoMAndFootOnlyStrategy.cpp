@@ -138,20 +138,22 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
   lStartingCOMState(2) = aStartingCOMState.z[0];
 
   std::vector<ComAndFootRealization *>::iterator itCFR ;
-  for (itCFR = m_ComAndFootRealization.begin() ; itCFR == m_ComAndFootRealization.end() ; ++itCFR )
+  for (itCFR = m_ComAndFootRealization.begin() ; itCFR != m_ComAndFootRealization.end() ; ++itCFR )
   {
     (*itCFR)->InitializationCoM(BodyAngles,lStartingCOMState,
 					     lStartingWaistPose,
 					     InitLeftFootPosition, InitRightFootPosition);
+
+
+    ODEBUG("EvaluateStartingCOM: m_StartingCOMState: " << lStartingCOMState);
+    aStartingCOMState.x[0] = lStartingCOMState(0);
+    aStartingCOMState.y[0] = lStartingCOMState(1);
+    aStartingCOMState.z[0] = lStartingCOMState(2);
+    aStartingZMPPosition= (*itCFR)->GetCOGInitialAnkles();
+
   }
-
-  ODEBUG("EvaluateStartingCOM: m_StartingCOMState: " << lStartingCOMState);
-  aStartingCOMState.x[0] = lStartingCOMState(0);
-  aStartingCOMState.y[0] = lStartingCOMState(1);
-  aStartingCOMState.z[0] = lStartingCOMState(2);
-  aStartingZMPPosition= (*m_ComAndFootRealization.begin())->GetCOGInitialAnkles();
-
   //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in   CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
+
   return 0;
 }
 
