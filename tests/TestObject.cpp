@@ -360,7 +360,7 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 17
 	      << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 18
 	      << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 19
-	      << filterprecision(m_OneStep.LeftFootPosition.theta * M_PI / 180 ) << " "     // 20
+	      << filterprecision(m_OneStep.LeftFootPosition.theta ) << " "     // 20
 	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
 	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
 	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23
@@ -372,7 +372,7 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                   // 29
 	      << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 30
 	      << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 31
-	      << filterprecision(m_OneStep.RightFootPosition.theta* M_PI / 180 ) << " "     // 32
+	      << filterprecision(m_OneStep.RightFootPosition.theta ) << " "     // 32
 	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 33
 	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 34
 	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -

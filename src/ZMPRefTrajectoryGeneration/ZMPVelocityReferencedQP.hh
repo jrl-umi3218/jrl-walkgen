@@ -44,13 +44,14 @@
 #include <jrl/walkgen/pgtypes.hh>
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 
+// metapod includes
 #include <metapod/models/hrp2_14/hrp2_14.hh>
 #ifndef METAPOD_TYPEDEF
 #define METAPOD_TYPEDEF
-typedef double LocalFloatType;
-typedef metapod::Spatial::ForceTpl<LocalFloatType> Force;
-typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
-typedef metapod::Nodes< Robot_Model, Robot_Model::BODY >::type Node;
+  typedef double LocalFloatType;
+  typedef metapod::Spatial::ForceTpl<LocalFloatType> Force_HRP2_14;
+  typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
+  typedef metapod::Nodes< Robot_Model, Robot_Model::BODY >::type Node;
 #endif
 
 namespace PatternGeneratorJRL
@@ -217,9 +218,6 @@ namespace PatternGeneratorJRL
     /// \brief Previewed Solution
     solution_t Solution_;
 
-    /// \brief StepStackHandler for ComAndFootRealization object
-    StepStackHandler* SSH_;
-
     /// \brief Store a reference to the object to solve posture resolution.
     ComAndFootRealization * ComAndFootRealization_;
 
@@ -253,11 +251,8 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_TYPE(double) m_QP_T_previousVelocity ;
     MAL_VECTOR_TYPE(double) m_QP_T_previousAcceleration ;
 
-    /// \brief Buffer for the torques computed by RNEA algorithm from Featherstone
-    vector < Robot_Model::confVector,Eigen::aligned_allocator<Robot_Model::confVector> > m_allTorques ;
-
-    /// \brief Buffer comtaimimg the difference between the ZMP computed from the Herdt controler\
-    and the ZMP Multibody computed from the articular trajectory
+    /// \brief Buffer comtaimimg the difference between the ZMP computed from the Herdt controler
+    ///and the ZMP Multibody computed from the articular trajectory
     std::deque<ZMPPosition> m_deltaZMPMBPositions ;
 
     /// \brief Set configuration vectors (q, dq, ddq, torques) to reference values.
@@ -268,7 +263,6 @@ namespace PatternGeneratorJRL
 
     /// \brief Standard polynomial trajectories for the feet.
     OnLineFootTrajectoryGeneration * OFTG_;
-
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // to use the vector of eigen used by metapod
@@ -321,6 +315,11 @@ namespace PatternGeneratorJRL
 				    MAL_VECTOR_TYPE(double) &CurrentAcceleration,
 				    int IterationNumber
 				    );
+
+    void Interpolate_trunk_orientation(int CurrentIndex,
+            deque<COMState> & FinalCOMTraj_deq,
+            deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+            deque<FootAbsolutePosition> & FinalRightFootTraj_deq);
 
   };
 }
