@@ -512,15 +512,20 @@ ZMPVelocityReferencedQP::OnLine(double time,
         Problem_.dump( time );
 
     static int iteration = 0;
-     if (iteration == 51)
-        iteration = 51;
+     if (iteration == 150)
+        iteration = 150;
+    int changes = 0 ;
+
     // INTERPOLATE THE NEXT COMPUTED COM STATE:
     // ----------------------------------------
     unsigned currentIndex = FinalCOMTraj_deq.size();
-    deque<support_state_t> prwSupportStates_deq = Solution_.SupportStates_deq ;
-    deque<double> previewedSupportAngles_deq = Solution_.SupportOrientations_deq ;
+//    deque<support_state_t> prwSupportStates_deq = Solution_.SupportStates_deq ;
+//    deque<double> previewedSupportAngles_deq = Solution_.SupportOrientations_deq ;
+    solution_t solution = Solution_ ;
     deque<FootAbsolutePosition> m_LeftFootTraj ;
     deque<FootAbsolutePosition> m_RightFootTraj ;
+    support_state_t CurrentSupport, PreviousSupport ;
+    CurrentSupport = PreviousSupport = solution.SupportStates_deq.front() ;
 
     for (unsigned i = 0 ; i < currentIndex ; i++)
     {
@@ -535,7 +540,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
     for ( int i = 0 ; i < QP_N_ ; i++ )
     {
-      if(Solution_.SupportStates_deq.size() &&  Solution_.SupportStates_deq[0].NbStepsLeft == 0)
+      if(solution.SupportStates_deq.size() &&  solution.SupportStates_deq[0].NbStepsLeft == 0)
       {
         double jx = (FinalLeftFootTraj_deq[0].x + FinalRightFootTraj_deq[0].x)/2 - FinalCOMTraj_deq[0].x[0];
         double jy = (FinalLeftFootTraj_deq[0].y + FinalRightFootTraj_deq[0].y)/2 - FinalCOMTraj_deq[0].y[0];
@@ -559,36 +564,48 @@ ZMPVelocityReferencedQP::OnLine(double time,
           CoM2_.setState(CoM_());
         }
         CoM2_.Interpolation( m_COMTraj_deq, m_ZMPTraj_deq, currentIndex + i * m_numberOfSample,
-                            Solution_.Solution_vec[i], Solution_.Solution_vec[QP_N_+i] );
-        CoM2_.OneIteration( Solution_.Solution_vec[i], Solution_.Solution_vec[QP_N_+i] );
+                            solution.Solution_vec[i], solution.Solution_vec[QP_N_+i] );
+        CoM2_.OneIteration( solution.Solution_vec[i], solution.Solution_vec[QP_N_+i] );
       }
 
       // INTERPOLATE THE COMPUTED FOOT POSITIONS:
       // ----------------------------------------
       OFTG_->interpolate_feet_positions(time + i * QP_T_,
-                                        prwSupportStates_deq,
-                                        Solution_,
-                                        previewedSupportAngles_deq,
+                                        solution.SupportStates_deq,
+                                        solution,
+                                        solution.SupportOrientations_deq,
                                         m_LeftFootTraj_deq,
                                         m_RightFootTraj_deq);
 
       Interpolate_trunk_orientation( currentIndex + i * m_numberOfSample, m_COMTraj_deq,
                                       m_LeftFootTraj_deq, m_RightFootTraj_deq);
 
-      support_state_t &CurrentSupport = prwSupportStates_deq.front();
-      if (CurrentSupport.StateChanged==true && CurrentSupport.Phase == SS && Solution_.Solution_vec.size() >= (unsigned int)(2*QP_N_+3) )
+
+
+      if (CurrentSupport.StateChanged==true && CurrentSupport.Phase == SS && solution.Solution_vec.size() >= (unsigned int)(2*QP_N_+3) )
       {
         if (firstStep == 1)
         {
-          Solution_.Solution_vec[2*QP_N_] = Solution_.Solution_vec[2*QP_N_+1] ;
-          Solution_.Solution_vec[2*QP_N_+2] = Solution_.Solution_vec[2*QP_N_+3];
-          previewedSupportAngles_deq[0]=previewedSupportAngles_deq[2];
+          solution.Solution_vec[2*QP_N_] = solution.Solution_vec[2*QP_N_+1] ;
+          solution.Solution_vec[2*QP_N_+2] = solution.Solution_vec[2*QP_N_+3];
+          solution.SupportOrientations_deq[0]=solution.SupportOrientations_deq[2];
         }
         firstStep = 1 ;
       }
-      prwSupportStates_deq.pop_front();
+
+      if ( CurrentSupport.Phase != PreviousSupport.Phase )
+      {
+        //previewedSupportAngles_deq[0]=previewedSupportAngles_deq[2];
+        changes++;
+      }
+      cout << CurrentSupport.Phase << endl ;
+      PreviousSupport = CurrentSupport;
+      solution.SupportStates_deq.pop_front();
+      CurrentSupport = solution.SupportStates_deq.front();
     }
 
+
+    cout << "changes = " << changes << endl ;
     /// \brief Debug Purpose
     /// --------------------
     ofstream aof;
@@ -626,11 +643,9 @@ ZMPVelocityReferencedQP::OnLine(double time,
     }
     aof.close();
 
-    iteration++;
-
     // DYNAMIC FILTER
     // --------------
-    DynamicFilter( m_ZMPTraj_deq, m_COMTraj_deq, m_LeftFootTraj_deq, m_RightFootTraj_deq, currentIndex );
+    //DynamicFilter( m_ZMPTraj_deq, m_COMTraj_deq, m_LeftFootTraj_deq, m_RightFootTraj_deq, currentIndex );
 
     CoM_.setState(m_COMTraj_deq[m_numberOfSample + currentIndex - 1]);
 
@@ -648,6 +663,34 @@ ZMPVelocityReferencedQP::OnLine(double time,
       FinalLeftFootTraj_deq[i] = m_LeftFootTraj_deq[i] ;
       FinalRightFootTraj_deq[i] = m_RightFootTraj_deq[i] ;
     }
+
+    /// \brief Debug Purpose
+    /// --------------------
+    if ( iteration == 0 )
+    {
+      oss.str("TestHerdt2010Orientation.dat");
+      aFileName = oss.str();
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+    }
+    ///----
+    oss.str("TestHerdt2010Orientation.dat");
+    aFileName = oss.str();
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    aof   << iteration*0.005 << " "   // 1
+          << FinalLeftFootTraj_deq[currentIndex].theta << " "   // 14
+          << FinalRightFootTraj_deq[currentIndex].theta << " "   // 15
+          << FinalCOMTraj_deq[currentIndex].roll[0] << " "   // 19
+          << FinalCOMTraj_deq[currentIndex].pitch[0] << " "   // 19
+          << FinalCOMTraj_deq[currentIndex].yaw[0] << " "   // 19
+          << FinalCOMTraj_deq[currentIndex].x[0] << " "   // 19
+          << FinalCOMTraj_deq[currentIndex].y[0] << " "   // 19
+          << endl ;
+    aof.close();
+
+    iteration++;
 
     // Specify that we are in the ending phase.
     if (EndingPhase_ == false)

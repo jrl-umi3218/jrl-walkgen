@@ -513,7 +513,7 @@ protected:
       localeventHandler_t Handler ;
     };
 
-    #define localNbOfEvents 12
+    #define localNbOfEvents 5
     struct localEvent events [localNbOfEvents] =
     { {5*200,&TestHerdt2010::walkForward},
    //   {10*200,&TestHerdt2010::walkSidewards},
