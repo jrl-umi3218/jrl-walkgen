@@ -519,8 +519,6 @@ ZMPVelocityReferencedQP::OnLine(double time,
     // INTERPOLATE THE NEXT COMPUTED COM STATE:
     // ----------------------------------------
     unsigned currentIndex = FinalCOMTraj_deq.size();
-//    deque<support_state_t> prwSupportStates_deq = Solution_.SupportStates_deq ;
-//    deque<double> previewedSupportAngles_deq = Solution_.SupportOrientations_deq ;
     solution_t solution = Solution_ ;
     deque<FootAbsolutePosition> m_LeftFootTraj ;
     deque<FootAbsolutePosition> m_RightFootTraj ;
@@ -536,10 +534,16 @@ ZMPVelocityReferencedQP::OnLine(double time,
     }
     m_LeftFootTraj_deq = FinalLeftFootTraj_deq ;
     m_RightFootTraj_deq = FinalRightFootTraj_deq ;
-    bool firstStep = 0 ;
+    int stateModified = 0 ;
 
     for ( int i = 0 ; i < QP_N_ ; i++ )
     {
+      if (CurrentSupport.StateChanged==true )
+      {
+        solution.SupportOrientations_deq[0] = solution.SupportOrientations_deq[stateModified+1];
+        stateModified++;
+      }
+
       if(solution.SupportStates_deq.size() &&  solution.SupportStates_deq[0].NbStepsLeft == 0)
       {
         double jx = (FinalLeftFootTraj_deq[0].x + FinalRightFootTraj_deq[0].x)/2 - FinalCOMTraj_deq[0].x[0];
@@ -580,32 +584,27 @@ ZMPVelocityReferencedQP::OnLine(double time,
       Interpolate_trunk_orientation( currentIndex + i * m_numberOfSample, m_COMTraj_deq,
                                       m_LeftFootTraj_deq, m_RightFootTraj_deq);
 
-
-
-      if (CurrentSupport.StateChanged==true && CurrentSupport.Phase == SS && solution.Solution_vec.size() >= (unsigned int)(2*QP_N_+3) )
+//
+//      if ( CurrentSupport.Phase == SS && CurrentSupport.StateChanged==true &&  solution.Solution_vec.size() >= (2*QP_N_ + 4))
+//      {
+////      solution.Solution_vec[2*QP_N_] = solution.Solution_vec[2*QP_N_+1] ;
+////      solution.Solution_vec[2*QP_N_+2] = solution.Solution_vec[2*QP_N_+3];
+////      solution.SupportOrientations_deq[0]=solution.SupportOrientations_deq[2];
+//        cout << "passage from double to single support\n" ;
+//      }
+      if (CurrentSupport.StateChanged==true )
       {
-        if (firstStep == 1)
-        {
-          solution.Solution_vec[2*QP_N_] = solution.Solution_vec[2*QP_N_+1] ;
-          solution.Solution_vec[2*QP_N_+2] = solution.Solution_vec[2*QP_N_+3];
-          solution.SupportOrientations_deq[0]=solution.SupportOrientations_deq[2];
-        }
-        firstStep = 1 ;
+        solution.SupportOrientations_deq[0] = solution.SupportOrientations_deq[stateModified+1];
+        stateModified++;
       }
-
-      if ( CurrentSupport.Phase != PreviousSupport.Phase )
-      {
-        //previewedSupportAngles_deq[0]=previewedSupportAngles_deq[2];
-        changes++;
-      }
-      cout << CurrentSupport.Phase << endl ;
-      PreviousSupport = CurrentSupport;
       solution.SupportStates_deq.pop_front();
       CurrentSupport = solution.SupportStates_deq.front();
+
     }
 
 
     cout << "changes = " << changes << endl ;
+    cout << "solution.Solution_vec.size() = " << solution.Solution_vec.size() << endl ;
     /// \brief Debug Purpose
     /// --------------------
     ofstream aof;
