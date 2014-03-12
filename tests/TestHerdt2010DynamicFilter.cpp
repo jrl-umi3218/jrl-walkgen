@@ -68,6 +68,7 @@ private:
   double errZMP [2] ;
   Robot_Model2 robot_ ;
   ComAndFootRealization * ComAndFootRealization_;
+  SimplePluginManager * SPM ;
 
   public:
   TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
@@ -77,9 +78,13 @@ private:
     errZMP[0]=0.0;
     errZMP[1]=0.0;
     ComAndFootRealization_ = 0 ;
+    SimplePluginManager * SPM = 0 ;
   };
 
-  ~TestHerdt2010(){}
+  ~TestHerdt2010(){
+    delete ComAndFootRealization_ ;
+    delete SPM ;
+  }
 
   typedef void (TestHerdt2010::* localeventHandler_t)(PatternGeneratorInterface &);
 
@@ -210,11 +215,14 @@ private:
     MAL_VECTOR_RESIZE(m_PreviousVelocity, m_HDR->numberDof());
     MAL_VECTOR_RESIZE(m_PreviousAcceleration, m_HDR->numberDof());
 
-    ComAndFootRealization_ = new ComAndFootRealizationByGeometry( NULL );
+
+    SPM = new SimplePluginManager();
+
+    ComAndFootRealization_ = new ComAndFootRealizationByGeometry( (PatternGeneratorInterfacePrivate*) SPM );
     ComAndFootRealization_->setHumanoidDynamicRobot(m_HDR);
     ComAndFootRealization_->SetHeightOfTheCoM(0.814);
     ComAndFootRealization_->setSamplingPeriod(0.1);
-    ComAndFootRealization_->SetStepStackHandler(new StepStackHandler(new SimplePluginManager()));
+    ComAndFootRealization_->SetStepStackHandler(new StepStackHandler(SPM));
     ComAndFootRealization_->Initialization();
 
   }
