@@ -519,7 +519,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
     // INTERPOLATE THE NEXT COMPUTED COM STATE:
     // ----------------------------------------
     unsigned currentIndex = FinalCOMTraj_deq.size();
-    solution_t solution = Solution_ ;
+    solution_t solution (Solution_), solution2 (Solution_) ;
     deque<FootAbsolutePosition> m_LeftFootTraj ;
     deque<FootAbsolutePosition> m_RightFootTraj ;
     support_state_t CurrentSupport, PreviousSupport ;
@@ -579,22 +579,18 @@ ZMPVelocityReferencedQP::OnLine(double time,
           m_SamplingPeriod, solution.SupportStates_deq,
           m_COMTraj_deq );
     COMState aCoMState = OrientPrw_->CurrentTrunkState();
-    Robot_->generate_trajectories( time, solution,
-            solution.SupportStates_deq, solution.SupportOrientations_deq,
-            m_LeftFootTraj_deq, m_RightFootTraj_deq );
     solution.SupportStates_deq.pop_front();
     for ( int i = 1 ; i < QP_N_ ; i++ ){
       OrientPrw_->interpolate_trunk_orientation( time + i * QP_T_, currentIndex + i * m_numberOfSample,
             m_SamplingPeriod, solution.SupportStates_deq,
             m_COMTraj_deq );
-
-      Robot_->generate_trajectories( time + i * QP_T_, solution,
-            solution.SupportStates_deq, solution.SupportOrientations_deq,
-            m_LeftFootTraj_deq, m_RightFootTraj_deq );
-
       solution.SupportStates_deq.pop_front();
     }
     OrientPrw_->CurrentTrunkState(aCoMState);
+
+    Robot_->generate_trajectories( time, solution2,
+                  solution2.SupportStates_deq, solution2.SupportOrientations_deq,
+                  m_LeftFootTraj_deq, m_RightFootTraj_deq );
 
 //    // INTERPOLATE THE COMPUTED FOOT POSITIONS:
 //    // ----------------------------------------
@@ -646,8 +642,8 @@ ZMPVelocityReferencedQP::OnLine(double time,
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
     for(unsigned int i = 0 ; i < currentIndex + QP_N_ * m_numberOfSample ; i++){
-      aof << m_LeftFootTraj_deq[i].theta *M_PI/180 << " "   // 14
-          << m_RightFootTraj_deq[i].theta *M_PI/180 << " "   // 15
+      aof //<< m_LeftFootTraj_deq[i].theta *M_PI/180 << " "   // 14
+          //<< m_RightFootTraj_deq[i].theta *M_PI/180 << " "   // 15
           << m_COMTraj_deq[i].roll[0] << " "   // 19
           << m_COMTraj_deq[i].pitch[0] << " "   // 19
           << m_COMTraj_deq[i].yaw[0] << " "   // 19
@@ -655,10 +651,10 @@ ZMPVelocityReferencedQP::OnLine(double time,
           << m_COMTraj_deq[i].y[0] << " "   // 19
           << m_ZMPTraj_deq[i].px << " "   // 19
           << m_ZMPTraj_deq[i].py << " "   // 19
-          << m_LeftFootTraj_deq[i].x << " "   // 14
-          << m_RightFootTraj_deq[i].x << " "   // 15
-          << m_LeftFootTraj_deq[i].y << " "   // 14
-          << m_RightFootTraj_deq[i].y << " "   // 15
+          //<< m_LeftFootTraj_deq[i].x << " "   // 14
+          //<< m_RightFootTraj_deq[i].x << " "   // 15
+          //<< m_LeftFootTraj_deq[i].y << " "   // 14
+          //<< m_RightFootTraj_deq[i].y << " "   // 15
           << endl ;
     }
 
