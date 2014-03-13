@@ -573,14 +573,28 @@ ZMPVelocityReferencedQP::OnLine(double time,
       }
     }
 
-    // INTERPOLATE THE COMPUTED FOOT POSITIONS:
-    // ----------------------------------------
-    Robot_->generate_trajectories( time, Solution_,
-          Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
-          FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
+    // INTERPOLATE TRUNK ORIENTATION AND THE COMPUTED FOOT POSITIONS :
+    // ---------------------------------------------------------------
+    OrientPrw_->interpolate_trunk_orientation( time, currentIndex,
+          m_SamplingPeriod, solution.SupportStates_deq,
+          m_COMTraj_deq );
+    COMState aCoMState = OrientPrw_->CurrentTrunkState();
+    Robot_->generate_trajectories( time, solution,
+            solution.SupportStates_deq, solution.SupportOrientations_deq,
+            m_LeftFootTraj_deq, m_RightFootTraj_deq );
+    solution.SupportStates_deq.pop_front();
+    for ( int i = 1 ; i < QP_N_ ; i++ ){
+      OrientPrw_->interpolate_trunk_orientation( time + i * QP_T_, currentIndex + i * m_numberOfSample,
+            m_SamplingPeriod, solution.SupportStates_deq,
+            m_COMTraj_deq );
 
-    Interpolate_trunk_orientation( currentIndex, m_COMTraj_deq,
-                                    FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
+      Robot_->generate_trajectories( time + i * QP_T_, solution,
+            solution.SupportStates_deq, solution.SupportOrientations_deq,
+            m_LeftFootTraj_deq, m_RightFootTraj_deq );
+
+      solution.SupportStates_deq.pop_front();
+    }
+    OrientPrw_->CurrentTrunkState(aCoMState);
 
 //    // INTERPOLATE THE COMPUTED FOOT POSITIONS:
 //    // ----------------------------------------
@@ -622,30 +636,34 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
     /// \brief Debug Purpose
     /// --------------------
-//    oss.str("TestHerdt2010DynamicBuffers");
-//    oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
-//    aFileName = oss.str();
-//    aof.open(aFileName.c_str(),ofstream::out);
-//    aof.close();
-//    ///----
-//    aof.open(aFileName.c_str(),ofstream::app);
-//    aof.precision(8);
-//    aof.setf(ios::scientific, ios::floatfield);
-//    for(unsigned int i = 0 ; i < currentIndex + QP_N_ * m_numberOfSample ; i++){
-//      aof << filterprecision( m_ZMPTraj_deq[i].px ) << " "   // 1
-//          << filterprecision( m_ZMPTraj_deq[i].py ) << " "   // 2
-//          << filterprecision( m_COMTraj_deq[i].x[0] ) << " "   // 3
-//          << filterprecision( m_COMTraj_deq[i].y[0] ) << " "   // 4
-//          << filterprecision( m_COMTraj_deq[i].yaw[0]*180 / M_PI) << " "   // 5
-//          << filterprecision( m_LeftFootTraj_deq[i].x ) << " "   // 6
-//          << filterprecision( m_LeftFootTraj_deq[i].y ) << " "   // 7
-//          << filterprecision( m_LeftFootTraj_deq[i].theta ) << " "   // 8
-//          << filterprecision( m_RightFootTraj_deq[i].x ) << " "   // 9
-//          << filterprecision( m_RightFootTraj_deq[i].y ) << " "   // 10
-//          << filterprecision( m_RightFootTraj_deq[i].theta ) << " "   // 11
-//          << endl ;
-//    }
-//    aof.close();
+    oss.str("TestHerdt2010DynamicBuffers");
+    oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
+    aFileName = oss.str();
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+    ///----
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    for(unsigned int i = 0 ; i < currentIndex + QP_N_ * m_numberOfSample ; i++){
+      aof << m_LeftFootTraj_deq[i].theta *M_PI/180 << " "   // 14
+          << m_RightFootTraj_deq[i].theta *M_PI/180 << " "   // 15
+          << m_COMTraj_deq[i].roll[0] << " "   // 19
+          << m_COMTraj_deq[i].pitch[0] << " "   // 19
+          << m_COMTraj_deq[i].yaw[0] << " "   // 19
+          << m_COMTraj_deq[i].x[0] << " "   // 19
+          << m_COMTraj_deq[i].y[0] << " "   // 19
+          << m_ZMPTraj_deq[i].px << " "   // 19
+          << m_ZMPTraj_deq[i].py << " "   // 19
+          << m_LeftFootTraj_deq[i].x << " "   // 14
+          << m_RightFootTraj_deq[i].x << " "   // 15
+          << m_LeftFootTraj_deq[i].y << " "   // 14
+          << m_RightFootTraj_deq[i].y << " "   // 15
+          << endl ;
+    }
+
+
+    aof.close();
 //    cout << "time = " << time << endl ;
     // DYNAMIC FILTER
     // --------------
@@ -657,15 +675,15 @@ ZMPVelocityReferencedQP::OnLine(double time,
     // -----------------
     FinalCOMTraj_deq.resize( m_numberOfSample + currentIndex );
     FinalZMPTraj_deq.resize( m_numberOfSample + currentIndex );
-    //FinalLeftFootTraj_deq.resize( m_numberOfSample + currentIndex );
-    //FinalRightFootTraj_deq.resize( m_numberOfSample + currentIndex );
+    FinalLeftFootTraj_deq.resize( m_numberOfSample + currentIndex );
+    FinalRightFootTraj_deq.resize( m_numberOfSample + currentIndex );
 
     for (unsigned int i = currentIndex ; i < FinalZMPTraj_deq.size() ; i++ )
     {
       FinalZMPTraj_deq[i] = m_ZMPTraj_deq[i] ;
       FinalCOMTraj_deq[i] = m_COMTraj_deq[i] ;
-      //FinalLeftFootTraj_deq[i] = m_LeftFootTraj_deq[i] ;
-      //FinalRightFootTraj_deq[i] = m_RightFootTraj_deq[i] ;
+      FinalLeftFootTraj_deq[i] = m_LeftFootTraj_deq[i] ;
+      FinalRightFootTraj_deq[i] = m_RightFootTraj_deq[i] ;
     }
 
     /// \brief Debug Purpose
@@ -684,8 +702,8 @@ ZMPVelocityReferencedQP::OnLine(double time,
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
     aof   << iteration*0.005 << " "   // 1
-          << FinalLeftFootTraj_deq[0].theta << " "   // 14
-          << FinalRightFootTraj_deq[0].theta << " "   // 15
+          << FinalLeftFootTraj_deq[0].theta *M_PI/180 << " "   // 14
+          << FinalRightFootTraj_deq[0].theta *M_PI/180 << " "   // 15
           << FinalCOMTraj_deq[0].roll[0] << " "   // 19
           << FinalCOMTraj_deq[0].pitch[0] << " "   // 19
           << FinalCOMTraj_deq[0].yaw[0] << " "   // 19
@@ -693,6 +711,11 @@ ZMPVelocityReferencedQP::OnLine(double time,
           << FinalCOMTraj_deq[0].y[0] << " "   // 19
           << FinalZMPTraj_deq[0].px << " "   // 19
           << FinalZMPTraj_deq[0].py << " "   // 19
+          << filterprecision( m_LeftFootTraj_deq[0].x ) << " "   // 6
+          << filterprecision( m_LeftFootTraj_deq[0].y ) << " "   // 7
+          << filterprecision( m_RightFootTraj_deq[0].x ) << " "   // 9
+          << filterprecision( m_RightFootTraj_deq[0].y ) << " "   // 10
+
           << endl ;
     aof.close();
 
