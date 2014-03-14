@@ -315,12 +315,6 @@ namespace PatternGeneratorJRL
 				    MAL_VECTOR_TYPE(double) &CurrentAcceleration,
 				    int IterationNumber
 				    );
-
-    void Interpolate_trunk_orientation(int CurrentIndex,
-            deque<COMState> & FinalCOMTraj_deq,
-            deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-            deque<FootAbsolutePosition> & FinalRightFootTraj_deq);
-
   };
 }
 
