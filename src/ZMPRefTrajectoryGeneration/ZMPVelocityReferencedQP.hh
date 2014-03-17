@@ -237,6 +237,10 @@ namespace PatternGeneratorJRL
     deque<FootAbsolutePosition> m_LeftFootTraj_deq ;
     deque<FootAbsolutePosition> m_RightFootTraj_deq ;
 
+
+    unsigned m_currentIndex ;
+    solution_t m_solution ;
+
     /// \brief Number of interpolated point computed during QP_T_ (27/02/2014 :0.1)
     unsigned m_numberOfSample ;
 
@@ -250,6 +254,13 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_TYPE(double) m_QP_T_Configuration ;
     MAL_VECTOR_TYPE(double) m_QP_T_previousVelocity ;
     MAL_VECTOR_TYPE(double) m_QP_T_previousAcceleration ;
+
+    /// \brief force acting the CoM of the robot expressed in the Euclidean Frame
+    Force_HRP2_14 m_force ;
+
+    /// \brief Used to compute once, the initial difference between the ZMP and the ZMPMB
+    bool m_once ;
+    double m_dInitX, m_dInitY ;
 
     /// \brief Buffer comtaimimg the difference between the ZMP computed from the Herdt controler
     ///and the ZMP Multibody computed from the articular trajectory
@@ -313,7 +324,7 @@ namespace PatternGeneratorJRL
 				    MAL_VECTOR_TYPE(double) &CurrentConfiguration,
 				    MAL_VECTOR_TYPE(double) &CurrentVelocity,
 				    MAL_VECTOR_TYPE(double) &CurrentAcceleration,
-				    int IterationNumber
+				    unsigned IterationNumber
 				    );
   };
 }

@@ -65,6 +65,121 @@ protected:
   }
 
 
+  void fillInDebugFiles( )
+  {
+      if (m_DebugFGPI)
+    {
+	  ofstream aof;
+	  string aFileName;
+	  aFileName = m_TestName;
+	  aFileName += "TestFGPI.dat";
+	  aof.open(aFileName.c_str(),ofstream::app);
+	  aof.precision(8);
+	  aof.setf(ios::scientific, ios::floatfield);
+	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "                            // 1
+	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
+	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
+	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
+	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "                    // 5
+	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
+	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
+	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
+	      << filterprecision(m_OneStep.ZMPTarget(0) ) << " "                            // 9
+	      << filterprecision(m_OneStep.ZMPTarget(1) ) << " "                            // 10
+	      << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "                     // 11
+	      << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "                     // 12
+	      << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "                     // 13
+	      << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "                    // 14
+	      << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "                    // 15
+	      << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "                    // 16
+	      << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 17
+	      << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 18
+	      << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 19
+	      << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "     // 20
+	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
+	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
+	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23
+	      << filterprecision(m_OneStep.RightFootPosition.y ) << " "                     // 24
+	      << filterprecision(m_OneStep.RightFootPosition.z ) << " "                     // 25
+	      << filterprecision(m_OneStep.RightFootPosition.dx ) << " "                    // 26
+	      << filterprecision(m_OneStep.RightFootPosition.dy ) << " "                    // 27
+	      << filterprecision(m_OneStep.RightFootPosition.dz ) << " "                    // 28
+	      << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                   // 29
+	      << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 30
+	      << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 31
+	      << filterprecision(m_OneStep.RightFootPosition.theta*M_PI/180 ) << " "     // 32
+	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 33
+	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 34
+	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
+				 m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
+				 +m_CurrentConfiguration(0) ) << " "                                          // 35
+	      << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
+				 m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
+				 +m_CurrentConfiguration(1) ) << " "                                          // 36
+	      << filterprecision(m_CurrentConfiguration(0) ) << " "                         // 37
+	      << filterprecision(m_CurrentConfiguration(1) ) << " ";                        // 38
+        for (unsigned int i = 0 ; i < m_HDR->currentConfiguration().size() ; i++)
+        {
+          aof << filterprecision(m_HDR->currentConfiguration()(i)) << " " ;                  // 39 - 74
+        }
+	  aof << endl;
+	  aof.close();
+        }
+
+
+      /// \brief Debug Purpose
+      /// --------------------
+      ofstream aof;
+      string aFileName;
+      ostringstream oss(std::ostringstream::ate);
+      static int iteration = 0;
+
+      if ( iteration == 0 ){
+        oss.str("/tmp/walk_Kajita.pos");
+        aFileName = oss.str();
+        aof.open(aFileName.c_str(),ofstream::out);
+        aof.close();
+      }
+      ///----
+      oss.str("/tmp/walk_Kajita.pos");
+      aFileName = oss.str();
+      aof.open(aFileName.c_str(),ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      aof << filterprecision( iteration * 0.1 ) << " "  ; // 1
+      for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
+        aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 1
+      }
+      for(unsigned int i = 0 ; i < 10 ; i++){
+        aof << 0.0 << " "  ;
+      }
+      aof  << endl ;
+      aof.close();
+
+      if ( iteration == 0 ){
+        oss.str("/tmp/walk_Kajita.hip");
+        aFileName = oss.str();
+        aof.open(aFileName.c_str(),ofstream::out);
+        aof.close();
+      }
+      oss.str("/tmp/walk_Kajita.hip");
+      aFileName = oss.str();
+      aof.open(aFileName.c_str(),ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      for(unsigned int j = 0 ; j < m_numberOfSample ; j++){
+        aof << filterprecision( iteration * 0.5 ) << " "  ; // 1
+        aof << filterprecision( 0.0 ) << " "  ; // 1
+        aof << filterprecision( 0.0 ) << " "  ; // 1
+        aof << filterprecision( m_OneStep.finalCOMPosition.yaw ) << " "  ; // 1
+        aof << endl ;
+      }
+      aof.close();
+
+
+    iteration++;
+  }
+
   void TurningOnTheCircle(PatternGeneratorInterface &aPGI)
   {
     CommonInitialization(aPGI);
