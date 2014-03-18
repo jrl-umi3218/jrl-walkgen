@@ -61,6 +61,16 @@ namespace PatternGeneratorJRL
 
   };
 
+  inline std::ostream & operator<<(std::ostream & os, const COMPosition_s & aCp)
+  {
+    for(size_t i = 0; i < 3; ++i)
+    {
+      os << "x[" << i << "] " << aCp.x[i] << " y[" << i << "] " << aCp.y[i] << " z[" << i << "] " << aCp.z[i] << std::endl;
+    }
+    os << "yaw " << aCp.yaw << " pitch " << aCp.pitch << " roll " << aCp.roll;
+    return os;
+  }
+
   typedef struct COMPosition_s COMPosition;
   typedef struct COMPosition_s WaistState;
 
@@ -80,8 +90,8 @@ namespace PatternGeneratorJRL
 
     friend std::ostream & operator<<(std::ostream &os, const struct COMState_s & acs);
   };
-    
-  
+
+
 
   typedef struct COMState_s COMState;
 

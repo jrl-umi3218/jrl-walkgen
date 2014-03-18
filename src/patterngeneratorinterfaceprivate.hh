@@ -684,10 +684,6 @@ namespace PatternGeneratorJRL
     /*! Buffer of ZMP positions */
     deque<ZMPPosition> m_ZMPPositions;
 
-     /*! Buffer of reference ZMP positions */
-    deque<ZMPPosition> m_ZMPReference;
-
-
     /*! Buffer of Absolute foot position (World frame) */
     deque<FootAbsolutePosition> m_FootAbsolutePositions;
 

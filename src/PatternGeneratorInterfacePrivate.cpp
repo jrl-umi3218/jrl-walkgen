@@ -397,8 +397,8 @@ namespace PatternGeneratorJRL {
       delete m_ZMPM;
     ODEBUG4("Destructor: did m_ZMPM","DebugPGI.txt");
 
-    if ((*m_ComAndFootRealization.begin())!=0)
-      delete (*m_ComAndFootRealization.begin());
+    if (m_ComAndFootRealization[0]!=0)
+      delete (m_ComAndFootRealization[0]);
 
     if (m_FeetTrajectoryGenerator!=0)
       delete m_FeetTrajectoryGenerator;
@@ -1512,10 +1512,6 @@ namespace PatternGeneratorJRL {
     // to be done only when the robot has finish a motion.
     UpdateAbsolutePosition(UpdateAbsMotionOrNot);
     ODEBUG("Return true");
-
-    //cout << "CoM 0 :\n" << *m_ComAndFootRealization[0] << endl ;
-    //cout << "CoM 1 :\n" << *m_ComAndFootRealization[1] << endl ;
-
     return m_Running;
   }
 

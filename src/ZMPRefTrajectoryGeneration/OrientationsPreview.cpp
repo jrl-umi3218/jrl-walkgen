@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Andrei   Herdt
  * Francois Keith
@@ -20,7 +20,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*
@@ -92,7 +92,7 @@ OrientationsPreview::preview_orientations(double Time,
 
   bool TrunkVelOK = false;
   bool TrunkAngleOK = false;
-  
+
   // In case of double support the next support angle is fixed
   // ds -> FirstFootPreviewed == 0
   // ss -> FirstFootPreviewed == 1
@@ -291,7 +291,9 @@ OrientationsPreview::verify_angle_hip_joint(const support_state_t & CurrentSuppo
       return false;
     }
   else
+  {
     return true;
+  }
 }
 
 
@@ -351,7 +353,7 @@ OrientationsPreview::verify_velocity_hip_joint(double Time,
           d = (-2.0*c-b/T)/(3.0*T);
           PreviewedSupportAngle = f(a,b,c,d,T);
         }
-      
+
     }
 
 }

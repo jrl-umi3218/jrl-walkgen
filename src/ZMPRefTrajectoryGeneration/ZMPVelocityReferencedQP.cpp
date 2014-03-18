@@ -332,6 +332,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
     COMState & lStartingCOMState,
     MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
 {
+  UpperTimeLimitToUpdate_ = 0.0;
 
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
 
@@ -343,16 +344,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   // INITIALIZE FEET POSITIONS:
   // --------------------------
   CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
-  CurrentLeftFootAbsPos.z = 0.0;
-  CurrentLeftFootAbsPos.dz = CurrentLeftFootAbsPos.ddz = 0.0;
-  CurrentLeftFootAbsPos.time = 0.0;
-  CurrentLeftFootAbsPos.theta = 0.0;
-
   CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
-  CurrentRightFootAbsPos.z = 0.0;
-  CurrentRightFootAbsPos.dz = CurrentRightFootAbsPos.ddz = 0.0;
-  CurrentRightFootAbsPos.time = 0.0;
-  CurrentRightFootAbsPos.theta = 0.0;
 
   // FILL THE QUEUES:
   // ----------------
@@ -368,6 +360,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   FinalLeftFootTraj_deq.resize(AddArraySize);
   FinalRightFootTraj_deq.resize(AddArraySize);
   int CurrentZMPindex=0;
+  m_CurrentTime = 0;
   for( unsigned int i=0;i<FinalZMPTraj_deq.size();i++ )
     {
       // Smooth ramp
@@ -400,9 +393,9 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CurrentSupport.TimeLimit = 1000000000;
   CurrentSupport.NbStepsLeft = 1;
   CurrentSupport.StateChanged = false;
-  CurrentSupport.X = 0.0;
-  CurrentSupport.Y = 0.1;
-  CurrentSupport.Yaw = 0.0;
+  CurrentSupport.X   = 0.0 ; //CurrentLeftFootAbsPos.x;
+  CurrentSupport.Y   = 0.1 ; //CurrentLeftFootAbsPos.y;
+  CurrentSupport.Yaw = 0.0 ; //CurrentLeftFootAbsPos.theta*M_PI/180;
   CurrentSupport.StartTime = 0.0;
   IntermedData_->SupportState(CurrentSupport);
 
@@ -422,6 +415,9 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM_.InitializeSystem();
   CoM_(CoM);
   IntermedData_->CoM(CoM_());
+
+  // Initialize preview of orientations
+  OrientPrw_->CurrentTrunkState( lStartingCOMState );
 
   // initialisation of a second object that allow the interpolation along 1.6s
   CoM2_.SetComHeight(lStartingCOMState.z[0]);
@@ -451,7 +447,9 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
   // If on-line mode not activated we go out.
   if (!m_OnLineMode)
+  {
     return;
+  }
 
   // Test if the end of the online mode has been reached.
   if ((EndingPhase_) &&
@@ -512,16 +510,20 @@ ZMPVelocityReferencedQP::OnLine(double time,
     // SOLVE PROBLEM:
     // --------------
     if (Solution_.useWarmStart)
+    {
   	  VRQPGenerator_->compute_warm_start( Solution_ );//TODO: Move to update_problem or build_constraints?
+    }
     Problem_.solve( QLD, Solution_, NONE );
     if(Solution_.Fail>0)
-        Problem_.dump( time );
+    {
+      Problem_.dump( time );
+    }
 
-      static int iteration = 0 ;
-      if (iteration == 269)
-      {
-        Solution_.print(cout);
-      }
+    static int iteration = 0 ;
+    if (iteration == 269)
+    {
+      Solution_.print(cout);
+    }
 
 
     // INTERPOLATE THE NEXT COMPUTED COM STATE:
