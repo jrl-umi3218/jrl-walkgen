@@ -292,38 +292,39 @@ namespace PatternGeneratorJRL
     void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
                        std::deque<ZMPPosition> & FinalZMPPositions,
                        std::deque<COMState> & COMStates,
-                       std::deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-                       std::deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
+                       std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+                       std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
                        bool EndSequence);
 
     int OnLineFootChange(double time,
-                         FootAbsolutePosition &aFootAbsolutePosition,
+                         FootAbsolutePosition & aFootAbsolutePosition,
                          deque<ZMPPosition> & FinalZMPPositions,
                          deque<COMState> & CoMPositions,
-                         deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-                         deque<FootAbsolutePosition> &FinalRightFootTraj_deq,
-                         StepStackHandler  *aStepStackHandler);
+                         deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+                         deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
+                         StepStackHandler * aStepStackHandler);
 
-    void EndPhaseOfTheWalking(deque<ZMPPosition> &ZMPPositions,
-                              deque<COMState> &FinalCOMTraj_deq,
-                              deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-                              deque<FootAbsolutePosition> &RightFootAbsolutePositions);
+    void EndPhaseOfTheWalking(deque<ZMPPosition> & ZMPPositions,
+                              deque<COMState> & FinalCOMTraj_deq,
+                              deque<FootAbsolutePosition> & LeftFootAbsolutePositions,
+                              deque<FootAbsolutePosition> & RightFootAbsolutePositions);
 
     int ReturnOptimalTimeToRegenerateAStep();
 
     int DynamicFilter(std::deque<ZMPPosition> & ZMPPositions,
-		      std::deque<COMState> & COMStates,
-		      std::deque<FootAbsolutePosition> &LeftFootAbsolutePositions,
-		      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
-		      unsigned currentIndex
+		      std::deque<COMState> & COMTraj_deq,
+		      std::deque<FootAbsolutePosition> & LeftFootAbsolutePositions,
+		      std::deque<FootAbsolutePosition> & RightFootAbsolutePositions,
+		      unsigned currentIndex,
+		      double time
 		      );
 
-    void CallToComAndFootRealization(COMState &acomp,
-				    FootAbsolutePosition &aLeftFAP,
-				    FootAbsolutePosition &aRightFAP,
-				    MAL_VECTOR_TYPE(double) &CurrentConfiguration,
-				    MAL_VECTOR_TYPE(double) &CurrentVelocity,
-				    MAL_VECTOR_TYPE(double) &CurrentAcceleration,
+    void CallToComAndFootRealization(COMState & acomp,
+				    FootAbsolutePosition & aLeftFAP,
+				    FootAbsolutePosition & aRightFAP,
+				    MAL_VECTOR_TYPE(double) & CurrentConfiguration,
+				    MAL_VECTOR_TYPE(double) & CurrentVelocity,
+				    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
 				    unsigned IterationNumber
 				    );
   };

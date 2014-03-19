@@ -360,7 +360,7 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 17
 	      << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 18
 	      << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 19
-	      << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "     // 20
+	      << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "         // 20
 	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
 	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
 	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23

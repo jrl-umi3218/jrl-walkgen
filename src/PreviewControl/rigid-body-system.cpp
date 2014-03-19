@@ -32,22 +32,16 @@ RigidBodySystem::RigidBodySystem( SimplePluginManager * SPM, CjrlHumanoidDynamic
             mass_(0),CoMHeight_(0),T_(0),Tr_(0),Ta_(0),N_(0),multiBody_(false),
             OFTG_(0), FSM_(0)
 {
-
   HDR_ = aHS;
   FSM_ = FSM;
   OFTG_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
-
-
-
 }
 
 
 RigidBodySystem::~RigidBodySystem()
 {
-
   if (OFTG_!=0)
     delete OFTG_;
-
 }
 
 

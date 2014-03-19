@@ -81,7 +81,8 @@ private:
     SimplePluginManager * SPM = 0 ;
   };
 
-  ~TestHerdt2010(){
+  ~TestHerdt2010()
+  {
     delete ComAndFootRealization_ ;
     delete SPM ;
   }
@@ -161,7 +162,7 @@ private:
           m_clock.fillInStatistics();
 
           /*! Fill the debug files with appropriate information. */
-          ComparingZMPs();
+          //ComparingZMPs();
           fillInDebugFiles();
 
         }
@@ -180,7 +181,7 @@ private:
     m_clock.writeBuffer(lProfileOutput);
     m_clock.displayStatistics(os,m_OneStep);
     // Compare debugging files
-    ComputeAndDisplayAverageError();
+    //ComputeAndDisplayAverageError();
     return compareDebugFiles();
   }
 
@@ -638,7 +639,7 @@ protected:
 
     #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-    { {5*200,&TestHerdt2010::walkForward},
+    { {1*200,&TestHerdt2010::walkForward},
    //   {10*200,&TestHerdt2010::walkSidewards},
     //  {15*200,&TestHerdt2010::startTurningRightOnSpot},
 //      {35*200,&TestHerdt2010::walkForward},
@@ -648,10 +649,10 @@ protected:
 //      {75*200,&TestHerdt2010::walkForward},
 //      {85*200,&TestHerdt2010::startTurningLeft},
 //      {95*200,&TestHerdt2010::startTurningRight},
-      {10*200,&TestHerdt2010::startTurningLeft2},
-      {15*200,&TestHerdt2010::startTurningRight2},
-      {25*200,&TestHerdt2010::stop},
-      {30*200,&TestHerdt2010::stopOnLineWalking}
+      {3*200,&TestHerdt2010::startTurningLeft2},
+      {6*200,&TestHerdt2010::startTurningRight2},
+      {9*200,&TestHerdt2010::stop},
+      {15*200,&TestHerdt2010::stopOnLineWalking}
     };
 
     // Test when triggering event.
