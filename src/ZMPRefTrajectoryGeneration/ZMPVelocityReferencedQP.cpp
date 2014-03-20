@@ -76,7 +76,7 @@ double filterprecision(double adb)
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
     string , CjrlHumanoidDynamicRobot *aHS ) :
     ZMPRefTrajectoryGeneration(SPM),
-    Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFI_(0),Problem_(),Solution_()
+    Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFI_(0),Problem_(),Solution_(),EPS_(1e-6)
 {
   Running_ = false;
   TimeBuffer_ = 0.04;
@@ -578,7 +578,10 @@ ZMPVelocityReferencedQP::OnLine(double time,
     }
     // DYNAMIC FILTER
     // --------------
-    if ( Solution_.SupportStates_deq.front().Phase == SS )
+    bool ReferenceGiven = false;
+    if(fabs(VelRef_.Local.X)>EPS_||fabs(VelRef_.Local.Y)>EPS_||fabs(VelRef_.Local.Yaw)>EPS_)
+        ReferenceGiven = true;
+    if ( Solution_.SupportStates_deq.front().Phase == SS || ReferenceGiven )
     {
       DynamicFilter( m_ZMPTraj_deq, m_COMTraj_deq, m_LeftFootTraj_deq, m_RightFootTraj_deq, m_currentIndex, time );
     }

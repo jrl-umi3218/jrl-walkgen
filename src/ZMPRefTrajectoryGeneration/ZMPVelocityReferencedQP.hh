@@ -270,6 +270,7 @@ namespace PatternGeneratorJRL
     /// \brief Used to compute once, the initial difference between the ZMP and the ZMPMB
     bool m_once ;
     double m_dInitX, m_dInitY ;
+    const double EPS_ ;
 
     /// \brief Buffer comtaimimg the difference between the ZMP computed from the Herdt controler
     ///and the ZMP Multibody computed from the articular trajectory
