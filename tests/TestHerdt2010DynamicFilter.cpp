@@ -60,6 +60,8 @@ enum Profiles_t {
   PROFIL_HERDT_EMERGENCY_STOP                  // 2
 };
 
+bool ONCE = true ;
+
 class TestHerdt2010: public TestObject
 {
 
@@ -69,6 +71,8 @@ private:
   Robot_Model2 robot_ ;
   ComAndFootRealization * ComAndFootRealization_;
   SimplePluginManager * SPM ;
+  double dInitX, dInitY;
+  int iteration ;
 
   public:
   TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
@@ -79,6 +83,9 @@ private:
     errZMP[1]=0.0;
     ComAndFootRealization_ = 0 ;
     SimplePluginManager * SPM = 0 ;
+    dInitX = 0 ;
+    dInitY = 0 ;
+    iteration = 0 ;
   };
 
   ~TestHerdt2010()
@@ -102,7 +109,6 @@ private:
 
     /*! Open and reset appropriatly the debug files. */
     prepareDebugFiles();
-
     for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
     {
       os << "<===============================================================>"<<endl;
@@ -162,15 +168,18 @@ private:
           m_clock.fillInStatistics();
 
           /*! Fill the debug files with appropriate information. */
-          //ComparingZMPs();
+          if ( m_OneStep.NbOfIt == 1 )
+          {
+            initIK();
+          }
+          ComparingZMPs();
           fillInDebugFiles();
-
+          iteration++;
         }
 	      else
         {
           cerr << "Nothing to dump after " << m_OneStep.NbOfIt << endl;
         }
-
       }
 
       os << endl << "End of iteration " << lNbIt << endl;
@@ -181,7 +190,7 @@ private:
     m_clock.writeBuffer(lProfileOutput);
     m_clock.displayStatistics(os,m_OneStep);
     // Compare debugging files
-    //ComputeAndDisplayAverageError();
+    ComputeAndDisplayAverageError();
     return compareDebugFiles();
   }
 
@@ -216,7 +225,6 @@ private:
     MAL_VECTOR_RESIZE(m_PreviousVelocity, m_HDR->numberDof());
     MAL_VECTOR_RESIZE(m_PreviousAcceleration, m_HDR->numberDof());
 
-
     SPM = new SimplePluginManager();
 
     ComAndFootRealization_ = new ComAndFootRealizationByGeometry( (PatternGeneratorInterfacePrivate*) SPM );
@@ -225,10 +233,31 @@ private:
     ComAndFootRealization_->setSamplingPeriod(0.1);
     ComAndFootRealization_->SetStepStackHandler(new StepStackHandler(SPM));
     ComAndFootRealization_->Initialization();
-
   }
 
 protected:
+
+  void initIK()
+  {
+    MAL_VECTOR_DIM(BodyAngles,double,(m_HDR->numberDof()-6));
+    MAL_VECTOR_DIM(waist,double,6);
+    for (int i = 0 ; i < 6 ; ++i )
+    {
+      waist(i) = m_PreviousConfiguration(i);
+    }
+    for (int i = 0 ; i < (m_HDR->numberDof()-6) ; ++i )
+    {
+      BodyAngles(i) = m_PreviousConfiguration(i+6);
+    }
+    MAL_S3_VECTOR(lStartingCOMState,double);
+
+    lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
+    lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
+    lStartingCOMState(2) = m_OneStep.finalCOMPosition.z[0] ;
+    ComAndFootRealization_->InitializationCoM(BodyAngles,lStartingCOMState,
+					     waist,
+					     m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
+  }
 
   void fillInDebugFiles( )
     {
@@ -297,7 +326,6 @@ protected:
       ofstream aof;
       string aFileName;
       ostringstream oss(std::ostringstream::ate);
-      static int iteration = 0;
 
       if ( iteration == 0 ){
         oss.str("/tmp/walk_mnaveau.pos");
@@ -340,9 +368,6 @@ protected:
         aof << endl ;
       }
       aof.close();
-
-
-    iteration++;
   }
 
   void SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR, CjrlHumanoidDynamicRobot *& aDebugHDR )
@@ -365,8 +390,7 @@ protected:
 
   void ComparingZMPs()
   {
-    static int iteration = 0 ;
-    /// \brief claculate, from the CoM of computed by the preview control,
+    /// \brief calculate, from the CoM of computed by the preview control,
     ///    the corresponding articular position, velocity and acceleration
     /// ------------------------------------------------------------------
     MAL_VECTOR(CurrentConfiguration,double);
@@ -408,7 +432,7 @@ protected:
     /// \brief rnea, calculation of the multi body ZMP
     /// ----------------------------------------------
     Robot_Model2::confVector q, dq, ddq;
-    for(unsigned int j = 0 ; j < m_CurrentConfiguration.size() ; j++ )
+    for(unsigned int j = 0 ; j < CurrentConfiguration.size() ; j++ )
     {
       q(j,0) = CurrentConfiguration[j] ;
       dq(j,0) = CurrentVelocity[j] ;
@@ -416,39 +440,52 @@ protected:
     }
     metapod::rnea< Robot_Model2, true >::run(robot_, q, dq, ddq);
 
-    Node2 & node = boost::fusion::at_c<Robot_Model2::BODY>(robot_.nodes);
-    Force2 & aforce = node.joint.f ;
+    Node2 node = boost::fusion::at_c<Robot_Model2::BODY>(robot_.nodes);
+    Force2 aforce = node.body.iX0.applyInv (node.joint.f) ;
 
     double ZMPMB[2];
 
     ZMPMB[0] = - aforce.n()[1] / aforce.f()[2] ;
     ZMPMB[1] = aforce.n()[0] / aforce.f()[2] ;
 
-    double errx = fabs ( m_OneStep.ZMPTarget(0) - ZMPMB[0] ) ;
-    double erry = fabs ( m_OneStep.ZMPTarget(1) - ZMPMB[1] ) ;
 
-    errZMP[0] += errx ;
-    errZMP[1] += erry ;
+    if (m_OneStep.NbOfIt==10){
+      dInitX = m_OneStep.ZMPTarget(0) - ZMPMB[0] ;
+      dInitY = m_OneStep.ZMPTarget(1) - ZMPMB[1] ;
+      errZMP[0] = 0 ;
+      errZMP[1] = 0 ;
+    }
 
     // Writing of the two zmps and the error.
     ofstream aof;
-    if (iteration == 0)
+    if (ONCE)
     {
       ofstream aof;
-      aof.open("TestHerdt2010DynamicFilterDeltaZMP.dat",ofstream::out);
+      aof.open("TestHerdt2010ErrorZMP.dat",ofstream::out);
+      aof.close();
+      ONCE = false ;
+    }
+
+    if (m_OneStep.NbOfIt >= 10)
+    {
+      double errx = sqrt ( ( m_OneStep.ZMPTarget(0) - ZMPMB[0] - dInitX )*( m_OneStep.ZMPTarget(0) - ZMPMB[0] - dInitX ) ) ;
+      double erry = sqrt ( ( m_OneStep.ZMPTarget(1) - ZMPMB[1] - dInitY )*( m_OneStep.ZMPTarget(1) - ZMPMB[1] - dInitY ) ) ;
+
+      errZMP[0] += errx ;
+      errZMP[1] += erry ;
+
+
+      aof.open("TestHerdt2010ErrorZMP.dat",ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      aof << filterprecision(m_OneStep.NbOfIt*0.1 ) << " "          // 1
+          << filterprecision( ZMPMB[0] + dInitX ) << " "                       // 2
+          << filterprecision( ZMPMB[1] + dInitY ) << " "                       // 3
+          << filterprecision(m_OneStep.ZMPTarget(0) ) << " "          // 4
+          << filterprecision(m_OneStep.ZMPTarget(1) ) << " "          // 5
+          << endl ;
       aof.close();
     }
-	  aof.open("TestHerdt2010DynamicFilterDeltaZMP.dat",ofstream::app);
-	  aof.precision(8);
-	  aof.setf(ios::scientific, ios::floatfield);
-	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "          // 1
-        << filterprecision( ZMPMB[0] ) << " "                       // 2
-        << filterprecision( ZMPMB[1] ) << " "                       // 3
-        << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " " // 4
-	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " " // 5
-        << endl ;
-    aof.close();
-    iteration++;
   }
 
   void ComputeAndDisplayAverageError(){
@@ -639,20 +676,18 @@ protected:
 
     #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-    { {1*200,&TestHerdt2010::walkForward},
-   //   {10*200,&TestHerdt2010::walkSidewards},
-    //  {15*200,&TestHerdt2010::startTurningRightOnSpot},
-//      {35*200,&TestHerdt2010::walkForward},
-//      {45*200,&TestHerdt2010::startTurningLeftOnSpot},
-//      {55*200,&TestHerdt2010::walkForward},
-//      {65*200,&TestHerdt2010::startTurningRightOnSpot},
-//      {75*200,&TestHerdt2010::walkForward},
-//      {85*200,&TestHerdt2010::startTurningLeft},
-//      {95*200,&TestHerdt2010::startTurningRight},
-      {3*200,&TestHerdt2010::startTurningLeft2},
-      {6*200,&TestHerdt2010::startTurningRight2},
-      {9*200,&TestHerdt2010::stop},
-      {15*200,&TestHerdt2010::stopOnLineWalking}
+    { {5*200,&TestHerdt2010::walkForward},
+      {10*200,&TestHerdt2010::walkSidewards},
+      {25*200,&TestHerdt2010::startTurningRightOnSpot},
+      {35*200,&TestHerdt2010::walkForward},
+      {45*200,&TestHerdt2010::startTurningLeftOnSpot},
+      {55*200,&TestHerdt2010::walkForward},
+      {65*200,&TestHerdt2010::startTurningRightOnSpot},
+      {75*200,&TestHerdt2010::walkForward},
+      {85*200,&TestHerdt2010::startTurningLeft},
+      {95*200,&TestHerdt2010::startTurningRight},
+      {105*200,&TestHerdt2010::stop},
+      {110*200,&TestHerdt2010::stopOnLineWalking}
     };
 
     // Test when triggering event.
@@ -732,14 +767,12 @@ int main(int argc, char *argv[])
   try
     {
       int ret = PerformTests(argc,argv);
-      system("pause");
       return ret ;
     }
   catch (const std::string& msg)
     {
       std::cerr << msg << std::endl;
     }
-  system("pause");
   return 1;
 }
 

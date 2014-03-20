@@ -147,14 +147,14 @@ namespace PatternGeneratorJRL
       SpecializedRobotConstructor(aHDR,aDebugHDR);
 
       if ((aHDR==0) || (aDebugHDR==0))
-	{
-	  if (aHDR!=0) delete aHDR;
-	  if (aDebugHDR!=0) delete aDebugHDR;
+      {
+        if (aHDR!=0) delete aHDR;
+        if (aDebugHDR!=0) delete aDebugHDR;
 
-	  dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
-	  aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
-	  aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
-	}
+        dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
+        aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
+        aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
+      }
 
 
       // Parsing the file.
@@ -184,38 +184,38 @@ namespace PatternGeneratorJRL
       ifstream aif;
       aif.open(InitConfig.c_str(),ifstream::in);
       if (aif.is_open())
-	{
-	  for(unsigned int i=0;i<lNbActuatedJoints;i++)
-	    aif >> dInitPos[i];
-	}
+      {
+        for(unsigned int i=0;i<lNbActuatedJoints;i++)
+          aif >> dInitPos[i];
+      }
       aif.close();
 
       bool DebugConfiguration = true;
       ofstream aofq;
       if (DebugConfiguration)
-	{
-	  aofq.open("TestConfiguration.dat",ofstream::out);
-	  if (aofq.is_open())
-	    {
-	      for(unsigned int k=0;k<30;k++)
-		{
-		  aofq << dInitPos[k] << " ";
-		}
-	      aofq << endl;
-	    }
+      {
+        aofq.open("TestConfiguration.dat",ofstream::out);
+        if (aofq.is_open())
+          {
+            for(unsigned int k=0;k<30;k++)
+        {
+          aofq << dInitPos[k] << " ";
+        }
+            aofq << endl;
+          }
 
-	}
+      }
 
 
       // This is a vector corresponding to the DOFs actuated of the robot.
       MAL_VECTOR_DIM(InitialPosition,double,lNbActuatedJoints);
       //MAL_VECTOR_DIM(CurrentPosition,double,40);
       if (conversiontoradneeded)
-	for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
-	  InitialPosition(i) = dInitPos[i]*M_PI/180.0;
+        for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
+          InitialPosition(i) = dInitPos[i]*M_PI/180.0;
       else
-	for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
-	  InitialPosition(i) = dInitPos[i];
+        for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
+          InitialPosition(i) = dInitPos[i];
       aPGI->SetCurrentJointValues(InitialPosition);
 
       // Specify the walking mode: here the default one.
@@ -231,18 +231,18 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_DIM(PreviousVelocity,double,lNbDofs);
       MAL_VECTOR_DIM(PreviousAcceleration,double,lNbDofs);
       for(int i=0;i<6;i++)
-	{
-	  PreviousConfiguration[i] =
-	    PreviousVelocity[i] =
-	    PreviousAcceleration[i] = 0.0;
-	}
+      {
+        PreviousConfiguration[i] =
+          PreviousVelocity[i] =
+          PreviousAcceleration[i] = 0.0;
+      }
 
       for(unsigned int i=6;i<lNbDofs;i++)
-	{
-	  PreviousConfiguration[i] = InitialPosition[i-6];
-	  PreviousVelocity[i] =
-	    PreviousAcceleration[i] = 0.0;
-	}
+      {
+        PreviousConfiguration[i] = InitialPosition[i-6];
+          PreviousVelocity[i] =
+          PreviousAcceleration[i] = 0.0;
+      }
 
       MAL_VECTOR_DIM(ZMPTarget,double,3);
 
@@ -253,7 +253,7 @@ namespace PatternGeneratorJRL
       string inValue[5]={"0.005","false","false","true","true"};
 
       for(unsigned int i=0;i<5;i++)
-	aDebugHDR->setProperty(inProperty[i],
+        aDebugHDR->setProperty(inProperty[i],
 			       inValue[i]);
 
       delete [] dInitPos;
