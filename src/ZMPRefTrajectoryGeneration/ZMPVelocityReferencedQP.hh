@@ -148,9 +148,9 @@ namespace PatternGeneratorJRL
     /// \}
 
     inline double ControlPeriod ()
-    { return m_ControlPeriod ; }
+    { return ControlPeriod_ ; }
     inline void ControlPeriod ( double period )
-    { m_ControlPeriod = period ; }
+    { ControlPeriod_ = period ; }
 
 
     //
@@ -228,15 +228,15 @@ namespace PatternGeneratorJRL
     CjrlHumanoidDynamicRobot * HDR_ ;
 
     /// \brief Pointer to the Preview Control object.
-    PreviewControl *m_PC;
+    PreviewControl *PC_;
 
     /// \brief State of the Preview control.
     MAL_MATRIX( m_deltax,double);
     MAL_MATRIX( m_deltay,double);
 
     /// \brief Buffers for the Kajita's dynamic filter
-    deque<ZMPPosition> m_ZMPTraj_deq ;
-    deque<COMState> m_COMTraj_deq ;
+    deque<ZMPPosition> ZMPTraj_deq_ ;
+    deque<COMState> COMTraj_deq_ ;
     deque<FootAbsolutePosition> m_LeftFootTraj_deq ;
     deque<FootAbsolutePosition> m_RightFootTraj_deq ;
 
@@ -247,34 +247,39 @@ namespace PatternGeneratorJRL
     solution_t m_solution ;
 
     /// \brief Control Period of the robot
-    double m_ControlPeriod ;
+    double ControlPeriod_ ;
+
+    /// \brief Step Period of the robot
+    double StepPeriod_ ;
+
+    /// \brief Time that the robot spend on double support
+    double CoMHeight_ ;
 
     /// \brief Number of interpolated point computed during QP_T_ (27/02/2014 :0.1)
-    unsigned m_numberOfSample ;
+    unsigned NumberOfSample_ ;
 
     /// \brief Buffers for the CoM an Feet computation, i.e. the simplify inverse kinematics.
-    vector <MAL_VECTOR_TYPE(double)> m_configurationTraj ;
-    vector <MAL_VECTOR_TYPE(double)> m_velocityTraj ;
-    vector <MAL_VECTOR_TYPE(double)> m_accelerationTraj ;
-    MAL_VECTOR_TYPE(double) m_previousConfiguration ;
-    MAL_VECTOR_TYPE(double) m_previousVelocity ;
-    MAL_VECTOR_TYPE(double) m_previousAcceleration ;
-    MAL_VECTOR_TYPE(double) m_QP_T_Configuration ;
-    MAL_VECTOR_TYPE(double) m_QP_T_previousVelocity ;
-    MAL_VECTOR_TYPE(double) m_QP_T_previousAcceleration ;
-    std::deque<COMState> m_comStateBuffer ;
+    vector <MAL_VECTOR_TYPE(double)> ConfigurationTraj_ ;
+    vector <MAL_VECTOR_TYPE(double)> VelocityTraj_ ;
+    vector <MAL_VECTOR_TYPE(double)> AccelerationTraj_ ;
+    MAL_VECTOR_TYPE(double) PreviousConfiguration_ ;
+    MAL_VECTOR_TYPE(double) PreviousVelocity_ ;
+    MAL_VECTOR_TYPE(double) PreviousAcceleration_ ;
+
+    /// \brief Buffers for the uotput of the Kajita preview control algorithm.
+    std::deque<COMState> ComStateBuffer_ ;
 
     /// \brief force acting the CoM of the robot expressed in the Euclidean Frame
     Force_HRP2_14 m_force ;
 
     /// \brief Used to compute once, the initial difference between the ZMP and the ZMPMB
-    bool m_once ;
-    double m_dInitX, m_dInitY ;
+    bool Once_ ;
+    double DInitX_, DInitY_ ;
     const double EPS_ ;
 
     /// \brief Buffer comtaimimg the difference between the ZMP computed from the Herdt controler
     ///and the ZMP Multibody computed from the articular trajectory
-    std::deque<ZMPPosition> m_deltaZMPMBPositions ;
+    std::deque<ZMPPosition> DeltaZMPMBPositions_ ;
 
     /// \brief Set configuration vectors (q, dq, ddq, torques) to reference values.
     Robot_Model::confVector m_torques, m_q, m_dq, m_ddq;
