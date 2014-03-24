@@ -318,15 +318,15 @@ namespace PatternGeneratorJRL {
     m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
     m_ZMPCQPFF->SetPreviewControl(m_PC);
 
-    m_ZMPVRQP->SetSamplingPeriod(m_PC->SamplingPeriod());
+
 
     m_ZMPVRQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
     //m_ZMPVRQP->SetPreviewControl(m_PC);
+    //m_ZMPVRQP->SetSamplingPeriod(m_PC->SamplingPeriod());
+
     //m_ZMPCQPFF->SetSamplingPeriod(m_PC->SamplingPeriod());
     //m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
-    m_ZMPVRQP->SetSamplingPeriod(m_PC->SamplingPeriod());
 
-    m_ZMPVRQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
 
     m_ZMPM->SetSamplingPeriod(m_PC->SamplingPeriod());
     m_ZMPM->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());

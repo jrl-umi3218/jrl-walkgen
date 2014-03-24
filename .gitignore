@@ -39,3 +39,4 @@ src/ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.cpp_dirty
 _build-intit-herdt/
 tests/plot.gnu
 tests/plotTmp.gnu
+.gitignore.orig
