@@ -79,13 +79,13 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
     Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFI_(0),Problem_(),Solution_(),EPS_(1e-6),OFTG_(0)
 {
   Running_ = false;
-  TimeBuffer_ = 1.0;
+  TimeBuffer_ = 0.04;
   QP_T_ = 0.1;
   QP_N_ = 16;
-  m_SamplingPeriod = 0.05;
+  m_SamplingPeriod = 0.005;
   ControlPeriod_ = 0.005 ;
   StepPeriod_ = 0.8 ;
-  CoMHeight_ = 0.8078 ;
+  CoMHeight_ = 0.814 ;
   PerturbationOccured_ = false;
   UpperTimeLimitToUpdate_ = 0.0;
   RobotMass_ = aHS->mass();
@@ -322,7 +322,7 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
     COMState & lStartingCOMState,
     MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
 {
-  m_SamplingPeriod = 0.05 ;
+  //m_SamplingPeriod = 0.05 ;
   UpperTimeLimitToUpdate_ = 0.0;
 
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
@@ -436,7 +436,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
     deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
 
 {
-  m_SamplingPeriod = 0.05 ;
+  //m_SamplingPeriod = 0.05 ;
   // If on-line mode not activated we go out.
   if (!m_OnLineMode)
   {
@@ -532,7 +532,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
     for ( int i = 0 ; i < QP_N_ ; i++ )
     {
-      if(solution_.SupportStates_deq.size() &&  solution_.SupportStates_deq[0].NbStepsLeft == 0)
+      if(solution_.SupportStates_deq.size() &&  solution_.SupportStates_deq[i].NbStepsLeft == 0)
       {
         double jx = (FinalLeftFootTraj_deq[0].x + FinalRightFootTraj_deq[0].x)/2 - FinalCOMTraj_deq[0].x[0];
         double jy = (FinalLeftFootTraj_deq[0].y + FinalRightFootTraj_deq[0].y)/2 - FinalCOMTraj_deq[0].y[0];
@@ -567,17 +567,19 @@ ZMPVelocityReferencedQP::OnLine(double time,
           m_SamplingPeriod, solution_.SupportStates_deq,
           COMTraj_deq_ );
     COMState aCoMState = OrientPrw_->CurrentTrunkState();
-    Robot_->generate_trajectories( time, solution_,
-                      solution_.SupportStates_deq, solution_.SupportOrientations_deq,
-                      LeftFootTraj_deq_, RightFootTraj_deq_ );
+    OFTG_->interpolate_feet_positions(time,
+          solution_.SupportStates_deq, solution_,
+          solution_.SupportOrientations_deq,
+          LeftFootTraj_deq_, RightFootTraj_deq_);
     solution_.SupportStates_deq.pop_front();
     for ( int i = 1 ; i < QP_N_ ; i++ ){
       OrientPrw_->interpolate_trunk_orientation( time + i * QP_T_, CurrentIndex_ + i * NumberOfSample_,
             m_SamplingPeriod, solution_.SupportStates_deq,
             COMTraj_deq_ );
-      Robot_->generate_trajectories( time + i * QP_T_, solution_,
-                      solution_.SupportStates_deq, solution_.SupportOrientations_deq,
-                      LeftFootTraj_deq_, RightFootTraj_deq_ );
+      OFTG_->interpolate_feet_positions(time + i * QP_T_,
+          solution_.SupportStates_deq, solution_,
+          solution_.SupportOrientations_deq,
+          LeftFootTraj_deq_, RightFootTraj_deq_);
       solution_.SupportStates_deq.pop_front();
     }
 
@@ -903,9 +905,9 @@ void ZMPVelocityReferencedQP::Interpolation(std::deque<ZMPPosition> & ZMPPositio
 		      LinearizedInvertedPendulum2D * LIPM,
 		      OrientationsPreview * OrientPrw,
           OnLineFootTrajectoryGeneration * OFTG,
-          RigidBodySystem * Robot,
 		      unsigned currentIndex,
-		      double time
+		      double time,
+		      unsigned IterationNumber
 		      )
 {
   if(Solution->SupportStates_deq.size() && Solution->SupportStates_deq[0].NbStepsLeft == 0)
@@ -916,43 +918,30 @@ void ZMPVelocityReferencedQP::Interpolation(std::deque<ZMPPosition> & ZMPPositio
      const double tf = 0.75;
      jx = 6/(tf*tf*tf)*(jx - tf*COMTraj_deq[0].x[1] - (tf*tf/2)*COMTraj_deq[0].x[2]);
      jy = 6/(tf*tf*tf)*(jy - tf*COMTraj_deq[0].y[1] - (tf*tf/2)*COMTraj_deq[0].y[2]);
-     LIPM->Interpolation( COMTraj_deq, ZMPPositions, currentIndex,
+     LIPM->Interpolation( COMTraj_deq, ZMPPositions, currentIndex + IterationNumber * NumberOfSample_,
          jx, jy);
      LIPM->OneIteration( jx, jy );
   }
   else
   {
      Running_ = true;
-     LIPM->Interpolation( COMTraj_deq, ZMPPositions, currentIndex,
-         Solution->Solution_vec[0], Solution->Solution_vec[QP_N_] );
-     LIPM->OneIteration( Solution->Solution_vec[0],Solution->Solution_vec[QP_N_] );
+     LIPM->Interpolation( COMTraj_deq, ZMPPositions, currentIndex + IterationNumber * NumberOfSample_,
+         Solution->Solution_vec[IterationNumber], Solution->Solution_vec[IterationNumber+QP_N_] );
+     LIPM->OneIteration( Solution->Solution_vec[IterationNumber],Solution->Solution_vec[IterationNumber+QP_N_] );
   }
 
   // INTERPOLATE TRUNK ORIENTATION:
   // ------------------------------
-  OrientPrw->interpolate_trunk_orientation( time, currentIndex,
+  OrientPrw->interpolate_trunk_orientation( time + IterationNumber * QP_T_, currentIndex,
         m_SamplingPeriod, Solution->SupportStates_deq,
         COMTraj_deq_ );
 
   // INTERPOLATE THE COMPUTED FOOT POSITIONS:
   // ----------------------------------------
-  Robot->generate_trajectories( time, *Solution,
-        Solution->SupportStates_deq, Solution->SupportOrientations_deq,
-        LeftFootTraj_deq, RightFootTraj_deq );
+  OFTG->interpolate_feet_positions( time + IterationNumber * QP_T_,
+          Solution->SupportStates_deq, *Solution,
+          Solution->SupportOrientations_deq,
+          LeftFootTraj_deq, RightFootTraj_deq);
 
   return ;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

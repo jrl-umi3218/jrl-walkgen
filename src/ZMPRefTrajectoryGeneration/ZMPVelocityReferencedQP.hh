@@ -350,10 +350,10 @@ namespace PatternGeneratorJRL
 		      solution_t * Solution,
 		      LinearizedInvertedPendulum2D * LIPM,
 		      OrientationsPreview * OrientPrw,
-		      OnLineFootTrajectoryGeneration * OFTG,
-          RigidBodySystem * Robot,
+          OnLineFootTrajectoryGeneration * OFTG,
 		      unsigned currentIndex,
-		      double time
+		      double time,
+		      unsigned IterationNumber
 		      );
   };
 }
