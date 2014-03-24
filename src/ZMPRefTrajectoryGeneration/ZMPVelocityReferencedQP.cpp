@@ -366,15 +366,16 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
   // INITIAL SUPPORT STATE:
   // ----------------------
+  //TODO check init with left foot (divergence)
   support_state_t CurrentSupport;
   CurrentSupport.Phase = DS;
-  CurrentSupport.Foot = LEFT;
+  CurrentSupport.Foot = RIGHT;
   CurrentSupport.TimeLimit = 1e9;
   CurrentSupport.NbStepsLeft = 1;
   CurrentSupport.StateChanged = false;
-  CurrentSupport.X   = CurrentLeftFootAbsPos.x; //0.0 ;
-  CurrentSupport.Y   = CurrentLeftFootAbsPos.y; //0.1 ;
-  CurrentSupport.Yaw = CurrentLeftFootAbsPos.theta*M_PI/180; //0.0 ;
+  CurrentSupport.X   = CurrentRightFootAbsPos.x; //0.0 ;
+  CurrentSupport.Y   = CurrentRightFootAbsPos.y; //0.1 ;
+  CurrentSupport.Yaw = CurrentRightFootAbsPos.theta*M_PI/180; //0.0 ;
   CurrentSupport.StartTime = 0.0;
   IntermedData_->SupportState(CurrentSupport);
 
@@ -572,13 +573,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
     }
     // DYNAMIC FILTER
     // --------------
-    bool ReferenceGiven = false;
-    if(fabs(VelRef_.Local.X)>EPS_||fabs(VelRef_.Local.Y)>EPS_||fabs(VelRef_.Local.Yaw)>EPS_)
-        ReferenceGiven = true;
-    if ( Solution_.SupportStates_deq.front().Phase == SS && ReferenceGiven )
-    {
-      DynamicFilter( ZMPTraj_deq_, COMTraj_deq_, m_LeftFootTraj_deq, m_RightFootTraj_deq, m_currentIndex, time );
-    }
+    DynamicFilter( ZMPTraj_deq_, COMTraj_deq_, m_LeftFootTraj_deq, m_RightFootTraj_deq, m_currentIndex, time );
     CoM_.setState(COMTraj_deq_[NumberOfSample_ + m_currentIndex - 1]);
     OrientPrw_->CurrentTrunkState(COMTraj_deq_[NumberOfSample_ + m_currentIndex - 1]);
 
@@ -720,8 +715,9 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> &ZMPPositions
   }
   double aSxzmp (0) , aSyzmp(0);
   double deltaZMPx (0) , deltaZMPy (0) ;
+
   // calcul of the preview control along the "ZMPPositions"
-  for (unsigned i = 0 ; i < NumberOfSample_ ; i++ )
+  for (unsigned i = 0 ; i < QP_T_/ControlPeriod_ ; i++ )
   {
     PC_->OneIterationOfPreview(m_deltax,m_deltay,
                                 aSxzmp,aSyzmp,
@@ -734,7 +730,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> &ZMPPositions
     }
   }
 
-  for (unsigned int i = 0 ; i < NumberOfSample_ ; i++)
+  for (unsigned int i = 0 ; i < QP_T_/ControlPeriod_ ; i++)
   {
     for(int j=0;j<3;j++)
     {
@@ -744,6 +740,56 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> &ZMPPositions
         COMTraj_deq[currentIndex+i].y[j] += ComStateBuffer_[i].y[j] ;
     }
   }
+
+  /// \brief Debug Purpose
+  /// --------------------
+  ofstream aof;
+  string aFileName;
+  ostringstream oss(std::ostringstream::ate);
+  static int iteration = 0;
+  int iteration100 = (int)iteration/100;
+  int iteration10 = (int)(iteration - iteration100*100)/10;
+  int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
+  /// \brief Debug Purpose
+  /// --------------------
+  oss.str("TestHerdt2010DynamicDZMP");
+  oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
+  aFileName = oss.str();
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.close();
+  ///----
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < DeltaZMPMBPositions_.size() ; ++i )
+  {
+    aof << filterprecision( DeltaZMPMBPositions_[i].px ) << " "   // 1
+        << filterprecision( DeltaZMPMBPositions_[i].py ) << " "   // 2
+        << endl ;
+  }
+
+  /// \brief Debug Purpose
+  /// --------------------
+  oss.str("TestHerdt2010DynamicDCOM");
+  oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
+  aFileName = oss.str();
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.close();
+  ///----
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < ComStateBuffer_.size() ; ++i )
+  {
+    aof << filterprecision( ComStateBuffer_[i].x[0] ) << " "   // 1
+        << filterprecision( ComStateBuffer_[i].y[0] ) << " "   // 2
+        << filterprecision( ComStateBuffer_[i].x[1] ) << " "   // 1
+        << filterprecision( ComStateBuffer_[i].y[1] ) << " "   // 2
+        << filterprecision( ComStateBuffer_[i].x[2] ) << " "   // 1
+        << filterprecision( ComStateBuffer_[i].y[2] ) << " "   // 2
+        << endl ;
+  }
+  iteration++;
   return 0;
 }
 
