@@ -322,7 +322,6 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
     COMState & lStartingCOMState,
     MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
 {
-  //m_SamplingPeriod = 0.05 ;
   UpperTimeLimitToUpdate_ = 0.0;
 
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
@@ -436,7 +435,6 @@ ZMPVelocityReferencedQP::OnLine(double time,
     deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
 
 {
-  //m_SamplingPeriod = 0.05 ;
   // If on-line mode not activated we go out.
   if (!m_OnLineMode)
   {
@@ -523,66 +521,26 @@ ZMPVelocityReferencedQP::OnLine(double time,
     LeftFootTraj_deq_ = FinalLeftFootTraj_deq ;
     RightFootTraj_deq_ = FinalRightFootTraj_deq ;
 
-//    // INTERPOLATE THE COMPUTED FOOT POSITIONS:
-//    // ----------------------------------------
-//    OFTG_->interpolate_feet_positions(time + i * QP_T_,
-//          solution.SupportStates_deq, solution,
-//          solution.SupportOrientations_deq,
-//          m_LeftFootTraj_deq, m_RightFootTraj_deq);
-
-    for ( int i = 0 ; i < QP_N_ ; i++ )
-    {
-      if(solution_.SupportStates_deq.size() &&  solution_.SupportStates_deq[i].NbStepsLeft == 0)
-      {
-        double jx = (FinalLeftFootTraj_deq[0].x + FinalRightFootTraj_deq[0].x)/2 - FinalCOMTraj_deq[0].x[0];
-        double jy = (FinalLeftFootTraj_deq[0].y + FinalRightFootTraj_deq[0].y)/2 - FinalCOMTraj_deq[0].y[0];
-        if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3) { Running_ = false; }
-        const double tf = 0.75;
-        jx = 6/(tf*tf*tf)*(jx - tf*FinalCOMTraj_deq[0].x[1] - (tf*tf/2)*FinalCOMTraj_deq[0].x[2]);
-        jy = 6/(tf*tf*tf)*(jy - tf*FinalCOMTraj_deq[0].y[1] - (tf*tf/2)*FinalCOMTraj_deq[0].y[2]);
-        if(i == 0)
-        {
-          CoM2_.setState(CoM_());
-        }
-        CoM2_.Interpolation( COMTraj_deq_, ZMPTraj_deq_, CurrentIndex_ + i * NumberOfSample_,
-                            jx, jy);
-        CoM2_.OneIteration( jx, jy );
-      }
-      else
-      {
-        Running_ = true;
-        if(i == 0)
-        {
-          CoM2_.setState(CoM_());
-        }
-        CoM2_.Interpolation( COMTraj_deq_, ZMPTraj_deq_, CurrentIndex_ + i * NumberOfSample_,
-                            solution_.Solution_vec[i], solution_.Solution_vec[QP_N_+i] );
-        CoM2_.OneIteration( solution_.Solution_vec[i], solution_.Solution_vec[QP_N_+i] );
-      }
-    }
-
     // INTERPOLATE TRUNK ORIENTATION AND THE COMPUTED FOOT POSITIONS :
     // ---------------------------------------------------------------
-    OrientPrw_->interpolate_trunk_orientation( time, CurrentIndex_,
-          m_SamplingPeriod, solution_.SupportStates_deq,
-          COMTraj_deq_ );
+    CoM2_.setState(CoM_());
+    Interpolation(ZMPTraj_deq_, COMTraj_deq_ ,
+		      LeftFootTraj_deq_, RightFootTraj_deq_,
+		      &solution_, &CoM2_, OrientPrw_, OFTG_,
+		      CurrentIndex_, time, 0 ) ;
     COMState aCoMState = OrientPrw_->CurrentTrunkState();
-    OFTG_->interpolate_feet_positions(time,
-          solution_.SupportStates_deq, solution_,
-          solution_.SupportOrientations_deq,
-          LeftFootTraj_deq_, RightFootTraj_deq_);
     solution_.SupportStates_deq.pop_front();
+
     for ( int i = 1 ; i < QP_N_ ; i++ ){
-      OrientPrw_->interpolate_trunk_orientation( time + i * QP_T_, CurrentIndex_ + i * NumberOfSample_,
-            m_SamplingPeriod, solution_.SupportStates_deq,
-            COMTraj_deq_ );
-      OFTG_->interpolate_feet_positions(time + i * QP_T_,
-          solution_.SupportStates_deq, solution_,
-          solution_.SupportOrientations_deq,
-          LeftFootTraj_deq_, RightFootTraj_deq_);
-      solution_.SupportStates_deq.pop_front();
+      Interpolation(ZMPTraj_deq_, COMTraj_deq_ ,
+		      LeftFootTraj_deq_, RightFootTraj_deq_,
+		      &solution_, &CoM2_, OrientPrw_, OFTG_,
+		      CurrentIndex_, time, i ) ;
+		  solution_.SupportStates_deq.pop_front();
     }
 
+    // RECOPIE DES BUFFER
+    // -----------------
     FinalZMPTraj_deq.resize( QP_T_/ControlPeriod_ + CurrentIndex_ );
     FinalLeftFootTraj_deq.resize( QP_T_/ControlPeriod_ + CurrentIndex_ );
     FinalRightFootTraj_deq.resize( QP_T_/ControlPeriod_ + CurrentIndex_ );
@@ -592,6 +550,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
       FinalLeftFootTraj_deq[i] = LeftFootTraj_deq_[i] ;
       FinalRightFootTraj_deq[i] = RightFootTraj_deq_[i] ;
     }
+
     // DYNAMIC FILTER
     // --------------
     DynamicFilter( ZMPTraj_deq_, COMTraj_deq_, LeftFootTraj_deq_, RightFootTraj_deq_, CurrentIndex_, time );
@@ -907,7 +866,7 @@ void ZMPVelocityReferencedQP::Interpolation(std::deque<ZMPPosition> & ZMPPositio
           OnLineFootTrajectoryGeneration * OFTG,
 		      unsigned currentIndex,
 		      double time,
-		      unsigned IterationNumber
+		      int IterationNumber
 		      )
 {
   if(Solution->SupportStates_deq.size() && Solution->SupportStates_deq[0].NbStepsLeft == 0)
@@ -932,7 +891,7 @@ void ZMPVelocityReferencedQP::Interpolation(std::deque<ZMPPosition> & ZMPPositio
 
   // INTERPOLATE TRUNK ORIENTATION:
   // ------------------------------
-  OrientPrw->interpolate_trunk_orientation( time + IterationNumber * QP_T_, currentIndex,
+  OrientPrw->interpolate_trunk_orientation( time + IterationNumber * QP_T_, currentIndex + IterationNumber * NumberOfSample_,
         m_SamplingPeriod, Solution->SupportStates_deq,
         COMTraj_deq_ );
 
