@@ -147,10 +147,10 @@ namespace PatternGeneratorJRL
       { return ComAndFootRealization_;};
     /// \}
 
-    inline double ControlPeriod ()
-    { return ControlPeriod_ ; }
-    inline void ControlPeriod ( double period )
-    { ControlPeriod_ = period ; }
+    inline double InterpolationPeriod()
+    { return InterpolationPeriod_ ; }
+    inline void InterpolationPeriod( double T )
+    { InterpolationPeriod_ = T ; }
 
 
     //
@@ -246,13 +246,25 @@ namespace PatternGeneratorJRL
     /// \brief Index where to begin the interpolation
     unsigned CurrentIndex_ ;
 
-    /// \brief Control Period of the robot
-    double ControlPeriod_ ;
+    /// \brief Interpolation Period for the dynamic filter
+    double InterpolationPeriod_ ;
 
     /// \brief Step Period of the robot
     double StepPeriod_ ;
 
-    /// \brief Time that the robot spend on double support
+    /// \brief Period where the robot is on ONE feet
+    double SSPeriod ;
+
+    /// \brief Period where the robot is on TWO feet
+    double DSPeriod ;
+
+    /// \brief Maximum distance between the feet
+    double FeetDistance ;
+
+    /// \brief Maximum height of the feet
+    double StepHeight ;
+
+    /// \brief Height of the CoM
     double CoMHeight_ ;
 
     /// \brief Number of interpolated point computed during QP_T_ (27/02/2014 :0.1)
@@ -289,6 +301,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Standard polynomial trajectories for the feet.
     OnLineFootTrajectoryGeneration * OFTG_;
+    OnLineFootTrajectoryGeneration * OFTG_control_ ;
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // to use the vector of eigen used by metapod
@@ -343,6 +356,7 @@ namespace PatternGeneratorJRL
 				    unsigned IterationNumber
 				    );
 
+    // WARNING the interpolation modifie the solution_t, send a copy as argument
     void Interpolation(std::deque<ZMPPosition> & ZMPPositions,
 		      std::deque<COMState> & COMTraj_deq ,
 		      std::deque<FootAbsolutePosition> & LeftFootTraj_deq,

@@ -151,8 +151,10 @@ namespace PatternGeneratorJRL
 
     /*! Get state. */
     void GetState(MAL_VECTOR_TYPE(double) &lxk);
+    inline com_t GetState()
+    {return m_CoM ;}
 
-    /*! Get state. */
+    /*! Set state. */
     void setState(com_t aCoM);
     void setState(COMState aCoM);
     /*! @} */

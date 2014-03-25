@@ -78,18 +78,22 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
     ZMPRefTrajectoryGeneration(SPM),
     Robot_(0),SupportFSM_(0),OrientPrw_(0),VRQPGenerator_(0),IntermedData_(0),RFI_(0),Problem_(),Solution_(),EPS_(1e-6),OFTG_(0)
 {
-  Running_ = false;
-  TimeBuffer_ = 0.04;
-  QP_T_ = 0.1;
-  QP_N_ = 16;
-  m_SamplingPeriod = 0.005;
-  ControlPeriod_ = 0.005 ;
+  Running_ = false ;
+  TimeBuffer_ = 0.04 ;
+  QP_T_ = 0.1 ;
+  QP_N_ = 16 ;
+  m_SamplingPeriod = 0.005 ;
+  InterpolationPeriod_ = 0.005 ;
   StepPeriod_ = 0.8 ;
+  SSPeriod = 0.7 ;
+  DSPeriod = 0.1 ;
+  FeetDistance = 0.2 ;
+  StepHeight = 0.05 ;
   CoMHeight_ = 0.814 ;
-  PerturbationOccured_ = false;
-  UpperTimeLimitToUpdate_ = 0.0;
-  RobotMass_ = aHS->mass();
-  Solution_.useWarmStart=false;
+  PerturbationOccured_ = false ;
+  UpperTimeLimitToUpdate_ = 0.0 ;
+  RobotMass_ = aHS->mass() ;
+  Solution_.useWarmStart=false ;
 
   // Create and initialize online interpolation of feet trajectories
   RFI_ = new RelativeFeetInequalities( SPM,aHS );
@@ -100,9 +104,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   // Create and initialize the finite state machine for support sequences
   SupportFSM_ = new SupportFSM();
   SupportFSM_->StepPeriod( StepPeriod_ );
-  SupportFSM_->DSPeriod( 1e9 );
+  SupportFSM_->DSPeriod( 1e9 ); // period during the robot move at 0.0 com speed
   SupportFSM_->DSSSPeriod( StepPeriod_ );
-  SupportFSM_->NbStepsSSDS( 2 );
+  SupportFSM_->NbStepsSSDS( 2 ); // number of previw step
   SupportFSM_->SamplingPeriod( QP_T_ );
 
   // Create and initialize preview of orientations
@@ -114,14 +118,14 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   OrientPrw_->CurrentTrunkState( CurrentTrunkState );
 
   // Initialize  the 2D LIPM
-  CoM_.SetSimulationControlPeriod( QP_T_ );
-  CoM_.SetRobotControlPeriod( m_SamplingPeriod );
-  CoM_.InitializeSystem();
+  LIPM_control_.SetSimulationControlPeriod( QP_T_ );
+  LIPM_control_.SetRobotControlPeriod( m_SamplingPeriod );
+  LIPM_control_.InitializeSystem();
 
   // Initialize  the 2D LIPM
-  CoM2_.SetSimulationControlPeriod( QP_T_ );
-  CoM2_.SetRobotControlPeriod( m_SamplingPeriod );
-  CoM2_.InitializeSystem();
+  LIPM_.SetSimulationControlPeriod( QP_T_ );
+  LIPM_.SetRobotControlPeriod( InterpolationPeriod_ );
+  LIPM_.InitializeSystem();
 
   // Create and initialize simplified robot model
   Robot_ = new RigidBodySystem( SPM, aHS, SupportFSM_ );
@@ -130,7 +134,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   Robot_->RightFoot().Mass( 0.0 );
   Robot_->NbSamplingsPreviewed( QP_N_ );
   Robot_->SamplingPeriodSim( QP_T_ );
-  Robot_->SamplingPeriodAct( ControlPeriod_ );
+  Robot_->SamplingPeriodAct( m_SamplingPeriod );
   Robot_->CoMHeight( CoMHeight_ );
   Robot_->multiBody(false);
   Robot_->initialize( );
@@ -151,19 +155,30 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   // ----------------------------------------------------------------
   OFTG_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
   OFTG_->InitializeInternalDataStructures();
-  OFTG_->SetSingleSupportTime( 0.7 );
-  OFTG_->SetDoubleSupportTime( 0.1 );
+  OFTG_->SetSingleSupportTime( SSPeriod );
+  OFTG_->SetDoubleSupportTime( DSPeriod );
+  OFTG_->SetSamplingPeriod( m_SamplingPeriod );
   OFTG_->QPSamplingPeriod( QP_T_ );
   OFTG_->NbSamplingsPreviewed( QP_N_ );
-  OFTG_->FeetDistance( 0.2 );
-  OFTG_->StepHeight( 0.05 );
+  OFTG_->FeetDistance( FeetDistance );
+  OFTG_->StepHeight( StepHeight );
+
+  OFTG_control_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
+  OFTG_control_->InitializeInternalDataStructures();
+  OFTG_control_->SetSingleSupportTime( SSPeriod );
+  OFTG_control_->SetDoubleSupportTime( DSPeriod );
+  OFTG_control_->SetSamplingPeriod( InterpolationPeriod_ );
+  OFTG_control_->QPSamplingPeriod( QP_T_ );
+  OFTG_control_->NbSamplingsPreviewed( QP_N_ );
+  OFTG_control_->FeetDistance( FeetDistance );
+  OFTG_control_->StepHeight( StepHeight );
 
   // Create and initialize the class that compute the simplify inverse kinematics :
   // ------------------------------------------------------------------------------
   ComAndFootRealization_ = new ComAndFootRealizationByGeometry( (PatternGeneratorInterfacePrivate*) SPM );
   ComAndFootRealization_->setHumanoidDynamicRobot(aHS);
   ComAndFootRealization_->SetHeightOfTheCoM(0.0);// seems weird...
-  ComAndFootRealization_->setSamplingPeriod(m_SamplingPeriod);
+  ComAndFootRealization_->setSamplingPeriod(InterpolationPeriod_);
   ComAndFootRealization_->Initialization();
 
   // Register method to handle
@@ -184,7 +199,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   // Initialization of the Kajita preview controls (ICRA 2003).
   MAL_MATRIX_RESIZE(m_deltax,3,1);  MAL_MATRIX_RESIZE(m_deltay,3,1);
   PC_ = new PreviewControl(SPM, OptimalControllerSolver::MODE_WITH_INITIALPOS, false);
-  PC_->SetPreviewControlTime (QP_T_*QP_N_ - QP_T_/ControlPeriod_*m_SamplingPeriod);
+  PC_->SetPreviewControlTime (QP_T_*QP_N_ - QP_T_/InterpolationPeriod_*m_SamplingPeriod);
   PC_->SetSamplingPeriod (m_SamplingPeriod);
   PC_->SetHeightOfCoM(CoMHeight_);
 
@@ -194,11 +209,13 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 	NumberOfSample_ = (unsigned)(QP_T_/m_SamplingPeriod);
 
     // size = numberOfIterationOfThePreviewControl * NumberOfSample + Margin
-  ZMPTraj_deq_.resize( QP_N_ * NumberOfSample_ + 50 );
-  COMTraj_deq_.resize( QP_N_ * NumberOfSample_ + 50 );
+  ZMPTraj_deq_.resize( QP_N_ * NumberOfSample_+20);
+  COMTraj_deq_.resize( QP_N_ * NumberOfSample_+20);
+
   ConfigurationTraj_.resize( QP_N_ * NumberOfSample_ );
   VelocityTraj_.resize( QP_N_ * NumberOfSample_ );
   AccelerationTraj_.resize( QP_N_ * NumberOfSample_ );
+
   DeltaZMPMBPositions_.resize ( QP_N_ * NumberOfSample_ );
 
     // Initialization of the configuration vectors
@@ -206,7 +223,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   PreviousVelocity_ = aHS->currentVelocity();
   PreviousAcceleration_ = aHS->currentAcceleration();
 
-  ComStateBuffer_.resize(QP_T_/ControlPeriod_);
+  ComStateBuffer_.resize(QP_T_/InterpolationPeriod_);
 
   Once_ = true ;
   DInitX_ = 0 ;
@@ -402,18 +419,18 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM.z[0] = lStartingCOMState.z[0];
   CoM.z[1] = lStartingCOMState.z[1];
   CoM.z[2] = lStartingCOMState.z[2];
-  CoM_.SetComHeight(lStartingCOMState.z[0]);
-  CoM_.InitializeSystem();
-  CoM_(CoM);
-  IntermedData_->CoM(CoM_());
+  LIPM_control_.SetComHeight(lStartingCOMState.z[0]);
+  LIPM_control_.InitializeSystem();
+  LIPM_control_(CoM);
+  IntermedData_->CoM(LIPM_control_());
+
+  // initialisation of a second object that allow the interpolation along 1.6s
+  LIPM_.SetComHeight(lStartingCOMState.z[0]);
+  LIPM_.InitializeSystem();
+  LIPM_(CoM);
 
   // Initialize preview of orientations
   OrientPrw_->CurrentTrunkState( lStartingCOMState );
-
-  // initialisation of a second object that allow the interpolation along 1.6s
-  CoM2_.SetComHeight(lStartingCOMState.z[0]);
-  CoM2_.InitializeSystem();
-  CoM2_(CoM);
 
   // BUILD CONSTANT PART OF THE OBJECTIVE:
   // -------------------------------------
@@ -461,7 +478,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
     VelRef_=NewVelRef_;
     SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
     IntermedData_->Reference( VelRef_ );
-    IntermedData_->CoM( CoM_() );
+    IntermedData_->CoM( LIPM_control_() );
 
     // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
     // ----------------------------------------------------
@@ -509,61 +526,50 @@ ZMPVelocityReferencedQP::OnLine(double time,
       Problem_.dump( time );
     }
 
-    // INTERPOLATE THE NEXT COMPUTED COM STATE:
-    // ----------------------------------------
+    // INITIALZE INTERPOLATION:
+    // ------------------------
     CurrentIndex_ = FinalCOMTraj_deq.size();
     solution_ = Solution_ ;
     for (unsigned i = 0 ; i < CurrentIndex_ ; i++)
     {
-      ZMPTraj_deq_[i] = FinalZMPTraj_deq[i] ;
-      COMTraj_deq_[i] = FinalCOMTraj_deq[i] ;
+      ZMPTraj_deq_[i] = FinalZMPTraj_deq[ i ] ;
+      COMTraj_deq_[i] = FinalCOMTraj_deq[ i ] ;
+    }
+    FinalZMPTraj_deq.resize( QP_T_/m_SamplingPeriod + CurrentIndex_ );
+    FinalCOMTraj_deq.resize( QP_T_/m_SamplingPeriod + CurrentIndex_ );
+
+    // interpolation on the first QP_T_ second
+    Interpolation(FinalZMPTraj_deq, FinalCOMTraj_deq ,
+		      FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
+		      &solution_, &LIPM_control_, OrientPrw_, OFTG_control_,
+		      CurrentIndex_, time, 0 ) ;
+
+    for (unsigned i = 0 ; i < NumberOfSample_ ; i++)
+    {
+      ZMPTraj_deq_[ CurrentIndex_ + i] = FinalZMPTraj_deq[ CurrentIndex_ + i * InterpolationPeriod_ / m_SamplingPeriod ] ;
+      COMTraj_deq_[ CurrentIndex_ + i] = FinalCOMTraj_deq[ CurrentIndex_ + i * InterpolationPeriod_ / m_SamplingPeriod ] ;
     }
     LeftFootTraj_deq_ = FinalLeftFootTraj_deq ;
     RightFootTraj_deq_ = FinalRightFootTraj_deq ;
 
-    // INTERPOLATE TRUNK ORIENTATION AND THE COMPUTED FOOT POSITIONS :
-    // ---------------------------------------------------------------
-    CoM2_.setState(CoM_());
-    Interpolation(ZMPTraj_deq_, COMTraj_deq_ ,
-		      LeftFootTraj_deq_, RightFootTraj_deq_,
-		      &solution_, &CoM2_, OrientPrw_, OFTG_,
-		      CurrentIndex_, time, 0 ) ;
-    COMState aCoMState = OrientPrw_->CurrentTrunkState();
-    solution_.SupportStates_deq.pop_front();
-
+    LIPM_.setState(LIPM_control_.GetState());
     for ( int i = 1 ; i < QP_N_ ; i++ ){
       Interpolation(ZMPTraj_deq_, COMTraj_deq_ ,
 		      LeftFootTraj_deq_, RightFootTraj_deq_,
-		      &solution_, &CoM2_, OrientPrw_, OFTG_,
+		      &solution_, &LIPM_, OrientPrw_, OFTG_,
 		      CurrentIndex_, time, i ) ;
-		  solution_.SupportStates_deq.pop_front();
-    }
-
-    // RECOPIE DES BUFFER
-    // -----------------
-    FinalZMPTraj_deq.resize( QP_T_/ControlPeriod_ + CurrentIndex_ );
-    FinalLeftFootTraj_deq.resize( QP_T_/ControlPeriod_ + CurrentIndex_ );
-    FinalRightFootTraj_deq.resize( QP_T_/ControlPeriod_ + CurrentIndex_ );
-    for (unsigned int i = CurrentIndex_ ; i < FinalZMPTraj_deq.size() ; i++ )
-    {
-      FinalZMPTraj_deq[i] = ZMPTraj_deq_[i] ;
-      FinalLeftFootTraj_deq[i] = LeftFootTraj_deq_[i] ;
-      FinalRightFootTraj_deq[i] = RightFootTraj_deq_[i] ;
     }
 
     // DYNAMIC FILTER
     // --------------
     DynamicFilter( ZMPTraj_deq_, COMTraj_deq_, LeftFootTraj_deq_, RightFootTraj_deq_, CurrentIndex_, time );
-    CoM_.setState(COMTraj_deq_[NumberOfSample_ + CurrentIndex_ - 1]);
+    //LIPM_control_.setState(COMTraj_deq_[NumberOfSample_ + CurrentIndex_ - 1]);
     OrientPrw_->CurrentTrunkState(COMTraj_deq_[NumberOfSample_ + CurrentIndex_ - 1]);
 
     // RECOPIE DU BUFFER
     // -----------------
-    FinalCOMTraj_deq.resize( NumberOfSample_ + CurrentIndex_ );
     for (unsigned int i = CurrentIndex_ ; i < FinalZMPTraj_deq.size() ; i++ )
-    {
       FinalCOMTraj_deq[i] = COMTraj_deq_[i] ;
-    }
 
     // Specify that we are in the ending phase.
     if (EndingPhase_ == false)
@@ -684,7 +690,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> &ZMPPositions
   /// Preview control on the ZMPMBs computed
   /// --------------------------------------
   //init of the Kajita preview control
-  PC_->SetPreviewControlTime (QP_T_*QP_N_ - QP_T_/ControlPeriod_*m_SamplingPeriod);
+  PC_->SetPreviewControlTime (QP_T_*QP_N_ - QP_T_/InterpolationPeriod_*m_SamplingPeriod);
   PC_->SetSamplingPeriod (m_SamplingPeriod);
   PC_->SetHeightOfCoM(0.814);
   PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
@@ -697,7 +703,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> &ZMPPositions
   double deltaZMPx (0) , deltaZMPy (0) ;
 
   // calcul of the preview control along the "ZMPPositions"
-  for (unsigned i = 0 ; i < QP_T_/ControlPeriod_ ; i++ )
+  for (unsigned i = 0 ; i < QP_T_/InterpolationPeriod_ ; i++ )
   {
     PC_->OneIterationOfPreview(m_deltax,m_deltay,
                                 aSxzmp,aSyzmp,
@@ -710,7 +716,7 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> &ZMPPositions
     }
   }
 
-  for (unsigned int i = 0 ; i < QP_T_/ControlPeriod_ ; i++)
+  for (unsigned int i = 0 ; i < QP_T_/InterpolationPeriod_ ; i++)
   {
     for(int j=0;j<3;j++)
     {
@@ -720,56 +726,6 @@ int ZMPVelocityReferencedQP::DynamicFilter(std::deque<ZMPPosition> &ZMPPositions
         COMTraj_deq[currentIndex+i].y[j] += ComStateBuffer_[i].y[j] ;
     }
   }
-
-  /// \brief Debug Purpose
-  /// --------------------
-  ofstream aof;
-  string aFileName;
-  ostringstream oss(std::ostringstream::ate);
-  static int iteration = 0;
-  int iteration100 = (int)iteration/100;
-  int iteration10 = (int)(iteration - iteration100*100)/10;
-  int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
-  /// \brief Debug Purpose
-  /// --------------------
-  oss.str("TestHerdt2010DynamicDZMP");
-  oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
-  aFileName = oss.str();
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.close();
-  ///----
-  aof.open(aFileName.c_str(),ofstream::app);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < DeltaZMPMBPositions_.size() ; ++i )
-  {
-    aof << filterprecision( DeltaZMPMBPositions_[i].px ) << " "   // 1
-        << filterprecision( DeltaZMPMBPositions_[i].py ) << " "   // 2
-        << endl ;
-  }
-
-  /// \brief Debug Purpose
-  /// --------------------
-  oss.str("TestHerdt2010DynamicDCOM");
-  oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
-  aFileName = oss.str();
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.close();
-  ///----
-  aof.open(aFileName.c_str(),ofstream::app);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < ComStateBuffer_.size() ; ++i )
-  {
-    aof << filterprecision( ComStateBuffer_[i].x[0] ) << " "   // 1
-        << filterprecision( ComStateBuffer_[i].y[0] ) << " "   // 2
-        << filterprecision( ComStateBuffer_[i].x[1] ) << " "   // 1
-        << filterprecision( ComStateBuffer_[i].y[1] ) << " "   // 2
-        << filterprecision( ComStateBuffer_[i].x[2] ) << " "   // 1
-        << filterprecision( ComStateBuffer_[i].y[2] ) << " "   // 2
-        << endl ;
-  }
-  iteration++;
   return 0;
 }
 
@@ -892,7 +848,7 @@ void ZMPVelocityReferencedQP::Interpolation(std::deque<ZMPPosition> & ZMPPositio
   // INTERPOLATE TRUNK ORIENTATION:
   // ------------------------------
   OrientPrw->interpolate_trunk_orientation( time + IterationNumber * QP_T_, currentIndex + IterationNumber * NumberOfSample_,
-        m_SamplingPeriod, Solution->SupportStates_deq,
+        InterpolationPeriod_, Solution->SupportStates_deq,
         COMTraj_deq_ );
 
   // INTERPOLATE THE COMPUTED FOOT POSITIONS:
@@ -902,5 +858,7 @@ void ZMPVelocityReferencedQP::Interpolation(std::deque<ZMPPosition> & ZMPPositio
           Solution->SupportOrientations_deq,
           LeftFootTraj_deq, RightFootTraj_deq);
 
+  // WARNING the interpolation modifie the solution send a copy as argument
+  Solution->SupportStates_deq.pop_front();
   return ;
 }
