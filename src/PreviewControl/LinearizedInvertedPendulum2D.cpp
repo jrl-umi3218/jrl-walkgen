@@ -127,6 +127,21 @@ void LinearizedInvertedPendulum2D::setState(COMState aCoM)
   m_CoM.z[2] = aCoM.z[2];
 }
 
+COMState LinearizedInvertedPendulum2D::GetState()
+{
+  COMState aCoM ;
+  aCoM.x[0] = m_CoM.x[0];
+  aCoM.x[1] = m_CoM.x[1];
+  aCoM.x[2] = m_CoM.x[2];
+  aCoM.y[0] = m_CoM.y[0];
+  aCoM.y[1] = m_CoM.y[1];
+  aCoM.y[2] = m_CoM.y[2];
+  aCoM.z[0] = m_CoM.z[0];
+  aCoM.z[1] = m_CoM.z[1];
+  aCoM.z[2] = m_CoM.z[2];
+  return aCoM ;
+}
+
 void LinearizedInvertedPendulum2D::setState(com_t aCoM)
 {
   m_CoM = aCoM ;

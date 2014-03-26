@@ -243,6 +243,9 @@ namespace PatternGeneratorJRL
     deque<FootAbsolutePosition> LeftFootTraj_deq_ ;
     deque<FootAbsolutePosition> RightFootTraj_deq_ ;
 
+    deque<COMState> tmpCoM_ ;
+    deque<ZMPPosition> tmpZMP_ ;
+
     /// \brief Index where to begin the interpolation
     unsigned CurrentIndex_ ;
 
@@ -267,8 +270,11 @@ namespace PatternGeneratorJRL
     /// \brief Height of the CoM
     double CoMHeight_ ;
 
-    /// \brief Number of interpolated point computed during QP_T_ (27/02/2014 :0.1)
-    unsigned NumberOfSample_ ;
+    /// \brief Number of interpolated point needed for control computed during QP_T_
+    unsigned NbSampleControl_ ;
+
+    /// \brief Number of interpolated point needed for the dynamic filter computed during QP_T_
+    unsigned NbSampleInterpolation_ ;
 
     /// \brief Buffers for the CoM an Feet computation, i.e. the simplify inverse kinematics.
     vector <MAL_VECTOR_TYPE(double)> ConfigurationTraj_ ;
@@ -287,7 +293,6 @@ namespace PatternGeneratorJRL
     /// \brief Used to compute once, the initial difference between the ZMP and the ZMPMB
     bool Once_ ;
     double DInitX_, DInitY_ ;
-    const double EPS_ ;
 
     /// \brief Buffer comtaimimg the difference between the ZMP computed from the Herdt controler
     ///and the ZMP Multibody computed from the articular trajectory
@@ -301,6 +306,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Standard polynomial trajectories for the feet.
     OnLineFootTrajectoryGeneration * OFTG_;
+    OnLineFootTrajectoryGeneration * OFTG_control_ ;
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // to use the vector of eigen used by metapod
@@ -355,7 +361,6 @@ namespace PatternGeneratorJRL
 				    unsigned IterationNumber
 				    );
 
-    // WARNING the interpolation modifie the solution_t, send a copy as argument
     void Interpolation(std::deque<ZMPPosition> & ZMPPositions,
 		      std::deque<COMState> & COMTraj_deq ,
 		      std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
@@ -366,8 +371,20 @@ namespace PatternGeneratorJRL
           OnLineFootTrajectoryGeneration * OFTG,
 		      unsigned currentIndex,
 		      double time,
-		      int IterationNumber
+		      int IterationNumber,
+		      unsigned numberOfSample
 		      );
+
+    void CoMZMPInterpolation(
+          std::deque<ZMPPosition> & ZMPPositions,
+		      std::deque<COMState> & COMTraj_deq ,
+		      std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
+		      std::deque<FootAbsolutePosition> & RightFootTraj_deq,
+		      solution_t * Solution,
+          LinearizedInvertedPendulum2D * LIPM,
+          unsigned currentIndex,
+		      int IterationNumber,
+		      unsigned numberOfSample);
   };
 }
 

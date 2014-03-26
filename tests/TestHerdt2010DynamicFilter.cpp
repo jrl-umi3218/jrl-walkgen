@@ -316,6 +316,7 @@ protected:
         {
           aof << filterprecision(m_HDR->currentConfiguration()(i)) << " " ;                  // 39 - 74
         }
+
 	  aof << endl;
 	  aof.close();
         }
