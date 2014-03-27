@@ -349,13 +349,7 @@ namespace PatternGeneratorJRL
 
     int ReturnOptimalTimeToRegenerateAStep();
 
-    int DynamicFilter(std::deque<ZMPPosition> & ZMPPositions,
-		      std::deque<COMState> & COMTraj_deq,
-		      std::deque<FootAbsolutePosition> & LeftFootAbsolutePositions,
-		      std::deque<FootAbsolutePosition> & RightFootAbsolutePositions,
-		      unsigned currentIndex,
-		      double time
-		      );
+    int DynamicFilter(double time, std::deque<COMState> & FinalCOMTraj_deq);
 
     void CallToComAndFootRealization(COMState & acomp,
 				    FootAbsolutePosition & aLeftFAP,

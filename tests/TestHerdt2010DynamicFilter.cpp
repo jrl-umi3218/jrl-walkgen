@@ -675,20 +675,20 @@ protected:
       localeventHandler_t Handler ;
     };
 
-    #define localNbOfEvents 12
+    #define localNbOfEvents 6
     struct localEvent events [localNbOfEvents] =
     { {1*200,&TestHerdt2010::walkForward},
       {5*200,&TestHerdt2010::walkSidewards},
-//      {25*200,&TestHerdt2010::startTurningRightOnSpot},
+      {10*200,&TestHerdt2010::startTurningRightOnSpot},
 //      {35*200,&TestHerdt2010::walkForward},
-//      {45*200,&TestHerdt2010::startTurningLeftOnSpot},
+      {15*200,&TestHerdt2010::startTurningLeftOnSpot},
 //      {55*200,&TestHerdt2010::walkForward},
 //      {65*200,&TestHerdt2010::startTurningRightOnSpot},
 //      {75*200,&TestHerdt2010::walkForward},
 //      {85*200,&TestHerdt2010::startTurningLeft},
 //      {95*200,&TestHerdt2010::startTurningRight},
-      {9*200,&TestHerdt2010::stop},
-      {15*200,&TestHerdt2010::stopOnLineWalking}
+      {20*200,&TestHerdt2010::stop},
+      {25*200,&TestHerdt2010::stopOnLineWalking}
     };
 
     // Test when triggering event.
