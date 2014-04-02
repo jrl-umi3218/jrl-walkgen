@@ -67,24 +67,29 @@ class TestHerdt2010: public TestObject
 
 private:
   // buffer to save all the zmps positions
-  double errZMP [2] ;
+  vector< vector<double> > errZMP_ ;
   Robot_Model2 robot_ ;
   ComAndFootRealization * ComAndFootRealization_;
   SimplePluginManager * SPM ;
   double dInitX, dInitY;
-  int iteration ;
+  int iteration,iteration_zmp ;
 
   public:
   TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
     TestObject(argc,argv,aString)
   {
     m_TestProfile = TestProfile;
-    errZMP[0]=0.0;
-    errZMP[1]=0.0;
+    {
+      vector<double> tmp_zmp(2) ;
+      tmp_zmp[0] =0.0 ;
+      tmp_zmp[1] =0.0 ;
+      errZMP_.push_back(tmp_zmp);
+    }
+
     ComAndFootRealization_ = 0 ;
-    SimplePluginManager * SPM = 0 ;
     dInitX = 0 ;
     dInitY = 0 ;
+    iteration_zmp = 0 ;
     iteration = 0 ;
   };
 
@@ -109,6 +114,7 @@ private:
 
     /*! Open and reset appropriatly the debug files. */
     prepareDebugFiles();
+    initIK();
     for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
     {
       os << "<===============================================================>"<<endl;
@@ -168,13 +174,9 @@ private:
           m_clock.fillInStatistics();
 
           /*! Fill the debug files with appropriate information. */
-          if ( m_OneStep.NbOfIt == 1 )
-          {
-            initIK();
-          }
           ComparingZMPs();
+          ComputeAndDisplayAverageError(false);
           fillInDebugFiles();
-          iteration++;
         }
 	      else
         {
@@ -190,7 +192,7 @@ private:
     m_clock.writeBuffer(lProfileOutput);
     m_clock.displayStatistics(os,m_OneStep);
     // Compare debugging files
-    ComputeAndDisplayAverageError();
+    ComputeAndDisplayAverageError(true);
     return compareDebugFiles();
   }
 
@@ -229,9 +231,9 @@ private:
 
     ComAndFootRealization_ = new ComAndFootRealizationByGeometry( (PatternGeneratorInterfacePrivate*) SPM );
     ComAndFootRealization_->setHumanoidDynamicRobot(m_HDR);
-    ComAndFootRealization_->SetHeightOfTheCoM(0.814);
-    ComAndFootRealization_->setSamplingPeriod(0.1);
     ComAndFootRealization_->SetStepStackHandler(new StepStackHandler(SPM));
+    ComAndFootRealization_->SetHeightOfTheCoM(0.814);
+    ComAndFootRealization_->setSamplingPeriod(0.005);
     ComAndFootRealization_->Initialization();
   }
 
@@ -245,7 +247,7 @@ protected:
     {
       waist(i) = m_PreviousConfiguration(i);
     }
-    for (int i = 0 ; i < (m_HDR->numberDof()-6) ; ++i )
+    for (unsigned int i = 0 ; i < (m_HDR->numberDof()-6) ; ++i )
     {
       BodyAngles(i) = m_PreviousConfiguration(i+6);
     }
@@ -254,9 +256,13 @@ protected:
     lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
     lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
     lStartingCOMState(2) = m_OneStep.finalCOMPosition.z[0] ;
+    ComAndFootRealization_->SetHeightOfTheCoM(0.814);
+    ComAndFootRealization_->setSamplingPeriod(0.005);
+    ComAndFootRealization_->Initialization();
     ComAndFootRealization_->InitializationCoM(BodyAngles,lStartingCOMState,
 					     waist,
 					     m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
+    ComAndFootRealization_->Initialization();
   }
 
   void fillInDebugFiles( )
@@ -369,6 +375,8 @@ protected:
         aof << endl ;
       }
       aof.close();
+
+      iteration++;
   }
 
   void SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR, CjrlHumanoidDynamicRobot *& aDebugHDR )
@@ -420,14 +428,13 @@ protected:
     aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
     aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
     aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
-
     ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
                       aLeftFootPosition,
                       aRightFootPosition,
                       CurrentConfiguration,
                       CurrentVelocity,
                       CurrentAcceleration,
-                      iteration,
+                      iteration_zmp,
                       1);
 
     /// \brief rnea, calculation of the multi body ZMP
@@ -450,56 +457,87 @@ protected:
     ZMPMB[1] = aforce.n()[0] / aforce.f()[2] ;
 
 
-    if (m_OneStep.NbOfIt==10){
+    if (m_OneStep.NbOfIt<=10){
       dInitX = m_OneStep.ZMPTarget(0) - ZMPMB[0] ;
       dInitY = m_OneStep.ZMPTarget(1) - ZMPMB[1] ;
-      errZMP[0] = 0 ;
-      errZMP[1] = 0 ;
+      {
+        vector<double> tmp_zmp(2) ;
+        tmp_zmp[0] =0.0 ;
+        tmp_zmp[1] =0.0 ;
+        errZMP_.push_back(tmp_zmp);
+      }
     }
+
+    if (m_OneStep.NbOfIt >= 10)
+    {
+      double errx = sqrt( ( m_OneStep.ZMPTarget(0) - ZMPMB[0] - dInitX )*( m_OneStep.ZMPTarget(0) - ZMPMB[0] - dInitX ) ) ;
+      double erry = sqrt( ( m_OneStep.ZMPTarget(1) - ZMPMB[1] - dInitY )*( m_OneStep.ZMPTarget(1) - ZMPMB[1] - dInitY ) ) ;
+      {
+        vector<double> tmp_zmp(2) ;
+        tmp_zmp[0] =errx ;
+        tmp_zmp[1] =erry ;
+        errZMP_.push_back(tmp_zmp);
+      }
+    }
+
+
+    static double ecartmaxX = 0 ;
+    static double ecartmaxY = 0 ;
+    if ( abs(errZMP_.back()[0]) > ecartmaxX )
+      ecartmaxX = abs(errZMP_.back()[0]) ;
+    if ( abs(errZMP_.back()[1]) > ecartmaxY )
+      ecartmaxY = abs(errZMP_.back()[1]) ;
+
+    cout << "ecartmaxX :" << ecartmaxX << endl ;
+    cout << "ecartmaxY :" << ecartmaxY << endl ;
 
     // Writing of the two zmps and the error.
     ofstream aof;
     if (ONCE)
     {
-      ofstream aof;
       aof.open("TestHerdt2010ErrorZMP.dat",ofstream::out);
       aof.close();
       ONCE = false ;
     }
+    aof.open("TestHerdt2010ErrorZMP.dat",ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    aof << filterprecision( iteration_zmp ) << " "          // 1
+        << filterprecision( ZMPMB[0] + dInitX ) << " "      // 2
+        << filterprecision( ZMPMB[1] + dInitY ) << " "      // 3
+        << filterprecision(m_OneStep.ZMPTarget(0) ) << " "  // 4
+        << filterprecision(m_OneStep.ZMPTarget(1) ) << " "  // 5
+        << endl ;
+    aof.close();
 
-    if (m_OneStep.NbOfIt >= 10)
-    {
-      double errx = sqrt ( ( m_OneStep.ZMPTarget(0) - ZMPMB[0] - dInitX )*( m_OneStep.ZMPTarget(0) - ZMPMB[0] - dInitX ) ) ;
-      double erry = sqrt ( ( m_OneStep.ZMPTarget(1) - ZMPMB[1] - dInitY )*( m_OneStep.ZMPTarget(1) - ZMPMB[1] - dInitY ) ) ;
-
-      errZMP[0] += errx ;
-      errZMP[1] += erry ;
-
-
-      aof.open("TestHerdt2010ErrorZMP.dat",ofstream::app);
-      aof.precision(8);
-      aof.setf(ios::scientific, ios::floatfield);
-      aof << filterprecision(m_OneStep.NbOfIt*0.1 ) << " "          // 1
-          << filterprecision( ZMPMB[0] + dInitX ) << " "                       // 2
-          << filterprecision( ZMPMB[1] + dInitY ) << " "                       // 3
-          << filterprecision(m_OneStep.ZMPTarget(0) ) << " "          // 4
-          << filterprecision(m_OneStep.ZMPTarget(1) ) << " "          // 5
-          << endl ;
-      aof.close();
-    }
+    iteration_zmp++;
+    return ;
   }
 
-  void ComputeAndDisplayAverageError(){
-    double moyErrX = errZMP[0] / m_OneStep.NbOfIt ;
-    double moyErrY = errZMP[1] / m_OneStep.NbOfIt ;
-    cout << "moyErrX = " << moyErrX << endl
-         << "moyErrY = " << moyErrY << endl ;
-
-    // Writing of the two zmps and the error.
+  void ComputeAndDisplayAverageError(bool display){
+    static int plot_it = 0 ;
+    double moyErrX = 0 ;
+    double moyErrY = 0 ;
+    for (unsigned int i = 0 ; i < errZMP_.size(); ++i)
+    {
+      moyErrX += errZMP_[i][0] ;
+      moyErrY += errZMP_[i][1] ;
+    }
+    moyErrX = moyErrX / errZMP_.size() ;
+    moyErrY = moyErrY / errZMP_.size() ;
+    if ( display )
+    {
+      cout << "moyErrX = " << moyErrX << endl
+           << "moyErrY = " << moyErrY << endl ;
+    }
     ofstream aof;
 	  string aFileName;
 	  aFileName = m_TestName;
 	  aFileName += "MoyZMP.dat";
+	  if(plot_it==0){
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+	  }
 	  aof.open(aFileName.c_str(),ofstream::app);
 	  aof.precision(8);
 	  aof.setf(ios::scientific, ios::floatfield);
@@ -507,10 +545,11 @@ protected:
         << filterprecision(moyErrY ) << " "        // 2
         << endl ;
     aof.close();
+    plot_it++;
   }
 
-    void startOnLineWalking(PatternGeneratorInterface &aPGI)
-  {
+void startOnLineWalking(PatternGeneratorInterface &aPGI)
+{
     CommonInitialization(aPGI);
 
     {
@@ -735,7 +774,7 @@ protected:
     }
   }
 
- };
+};
 
 int PerformTests(int argc, char *argv[])
 {

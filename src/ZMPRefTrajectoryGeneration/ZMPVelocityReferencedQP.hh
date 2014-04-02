@@ -194,10 +194,12 @@ namespace PatternGeneratorJRL
     int QP_N_;
 
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
-    LinearizedInvertedPendulum2D LIPM_control_ ;
-    LinearizedInvertedPendulum2D LIPM_control_subsampled_ ;
-    LinearizedInvertedPendulum2D LIPM_DF_ ;
-    LinearizedInvertedPendulum2D LIPM_DF_subsampled_ ;
+//    LinearizedInvertedPendulum2D LIPM_control_ ;
+//    LinearizedInvertedPendulum2D LIPM_control_subsampled_ ;
+//    LinearizedInvertedPendulum2D LIPM_DF_ ;
+//    LinearizedInvertedPendulum2D LIPM_DF_subsampled_ ;
+    LinearizedInvertedPendulum2D LIPM_ ;
+    LinearizedInvertedPendulum2D LIPM_subsampled_ ;
 
     /// \brief Simplified robot model
     RigidBodySystem * Robot_ ;
@@ -247,6 +249,8 @@ namespace PatternGeneratorJRL
 
     deque<COMState> tmpCoM_ ;
     deque<ZMPPosition> tmpZMP_ ;
+    deque<FootAbsolutePosition> tmpRF_ ;
+    deque<FootAbsolutePosition> tmpLF_ ;
 
     /// \brief Index where to begin the interpolation
     unsigned CurrentIndex_ ;
@@ -295,7 +299,7 @@ namespace PatternGeneratorJRL
     /// \brief Used to compute once, the initial difference between the ZMP and the ZMPMB
     bool Once_ ;
     double DInitX_, DInitY_ ;
-    COMState InitStateLIPMcontrol_ ;
+    COMState InitStateLIPM_ ;
     COMState InitStateOrientPrw_ ;
     COMState FinalStateOrientPrw_ ;
 
@@ -349,36 +353,38 @@ namespace PatternGeneratorJRL
 
     int ReturnOptimalTimeToRegenerateAStep();
 
-    int DynamicFilter(double time, std::deque<COMState> & FinalCOMTraj_deq);
+    int DynamicFilter(double time,
+      std::deque<COMState> & FinalCOMTraj_deq
+      );
 
-    void CallToComAndFootRealization(COMState & acomp,
-				    FootAbsolutePosition & aLeftFAP,
-				    FootAbsolutePosition & aRightFAP,
+    void CallToComAndFootRealization(
+            const COMState & acomp,
+				    const FootAbsolutePosition & aLeftFAP,
+				    const FootAbsolutePosition & aRightFAP,
 				    MAL_VECTOR_TYPE(double) & CurrentConfiguration,
 				    MAL_VECTOR_TYPE(double) & CurrentVelocity,
 				    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
-				    unsigned IterationNumber
+				    const unsigned IterationNumber
 				    );
 
     void CoMZMPInterpolation(
-          std::deque<ZMPPosition> & ZMPPositions,             // OUTPUT
-		      std::deque<COMState> & COMTraj_deq ,                // OUTPUT
-		      std::deque<FootAbsolutePosition> & LeftFootTraj_deq,  // INPUT
-		      std::deque<FootAbsolutePosition> & RightFootTraj_deq, // INPUT
-		      solution_t * Solution,                                // INPUT
-          LinearizedInvertedPendulum2D * LIPM,                  // INPUT
-		      unsigned numberOfSample,                              // INPUT
-		      int IterationNumber);                                 // INPUT
+          std::deque<ZMPPosition> & ZMPPositions,                     // OUTPUT
+		      std::deque<COMState> & COMTraj_deq ,                        // OUTPUT
+		      const std::deque<FootAbsolutePosition> & LeftFootTraj_deq, // INPUT
+		      const std::deque<FootAbsolutePosition> & RightFootTraj_deq,// INPUT
+		      const solution_t * Solution,                               // INPUT
+          LinearizedInvertedPendulum2D * LIPM,                        // INPUT/OUTPUT
+		      const unsigned numberOfSample,                             // INPUT
+		      const int IterationNumber);                                // INPUT
 
     void ControlInterpolation(
-          std::deque<ZMPPosition> & FinalZMPTraj_deq,
-		      std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-		      std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
-		      double time);
+          std::deque<COMState> & FinalCOMTraj_deq,                      // OUTPUT
+          std::deque<ZMPPosition> & FinalZMPTraj_deq,                   // OUTPUT
+		      std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,     // OUTPUT
+		      std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,    // OUTPUT
+		      double time);                                          // INPUT
 
-    void DynamicFilterInterpolation(
-          std::deque<COMState> & FinalCOMTraj_deq,
-          double time);
+    void DynamicFilterInterpolation(double time);
   };
 }
 
