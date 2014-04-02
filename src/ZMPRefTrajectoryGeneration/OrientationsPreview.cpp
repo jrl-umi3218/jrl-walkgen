@@ -368,7 +368,7 @@ OrientationsPreview::interpolate_trunk_orientation(double Time, int CurrentIndex
 
   support_state_t CurrentSupport = PrwSupportStates_deq.front();
 
-  if(CurrentSupport.Phase == SS && Time+3.0/2.0*T_ < CurrentSupport.TimeLimit)
+  if(CurrentSupport.Phase == SS && Time+1.5*T_ < CurrentSupport.TimeLimit) // CurrentSupport.Phase == SS && Time+3.0/2.0*T_ < CurrentSupport.TimeLimit
     {
       //Fourth order polynomial parameters
       double a =  TrunkState_.yaw[1];
@@ -380,6 +380,7 @@ OrientationsPreview::interpolate_trunk_orientation(double Time, int CurrentIndex
 
       FinalCOMTraj_deq[CurrentIndex].yaw[0] = TrunkState_.yaw[0];
       FinalCOMTraj_deq[CurrentIndex].yaw[1] = TrunkState_.yaw[1];
+      FinalCOMTraj_deq[CurrentIndex].yaw[2] = TrunkState_.yaw[2];
       //Interpolate the
       for(int k = 0; k<(int)(T_/NewSamplingPeriod);k++)
         {
@@ -398,14 +399,16 @@ OrientationsPreview::interpolate_trunk_orientation(double Time, int CurrentIndex
             }
           FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = TrunkState_.yaw[0];
           FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkState_.yaw[1];
+          FinalCOMTraj_deq[CurrentIndex+k].yaw[2] = TrunkState_.yaw[2];
         }
     }
-  else if (CurrentSupport.Phase == DS || Time+3.0/2.0*T_ > CurrentSupport.TimeLimit)
+  else if (CurrentSupport.Phase == DS || Time+1.5*T_ > CurrentSupport.TimeLimit)
     {
       for(int k = 0; k<(int)(T_/NewSamplingPeriod);k++)
         {
           FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = TrunkState_.yaw[0];
           FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkState_.yaw[1];
+          FinalCOMTraj_deq[CurrentIndex+k].yaw[2] = TrunkState_.yaw[2];
         }
     }
 

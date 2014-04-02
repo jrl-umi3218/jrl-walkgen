@@ -488,8 +488,8 @@ protected:
     if ( abs(errZMP_.back()[1]) > ecartmaxY )
       ecartmaxY = abs(errZMP_.back()[1]) ;
 
-    cout << "ecartmaxX :" << ecartmaxX << endl ;
-    cout << "ecartmaxY :" << ecartmaxY << endl ;
+//    cout << "ecartmaxX :" << ecartmaxX << endl ;
+//    cout << "ecartmaxY :" << ecartmaxY << endl ;
 
     // Writing of the two zmps and the error.
     ofstream aof;

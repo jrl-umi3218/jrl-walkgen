@@ -84,7 +84,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   QP_T_ = 0.1 ;
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
-  InterpolationPeriod_ = QP_T_/20;
+  InterpolationPeriod_ = QP_T_/2;
   StepPeriod_ = 0.8 ;
   SSPeriod = 0.7 ;
   DSPeriod = 0.1 ;
@@ -598,17 +598,19 @@ ZMPVelocityReferencedQP::OnLine(double time,
         << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[2] ) << " "         // 8
         << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[2] ) << " "         // 9
         << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[0] ) << " "       // 10
-        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].x ) << " "       // 11
-        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].y ) << " "       // 12
-        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].z ) << " "       // 13
-        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].theta * M_PI / 180 ) << " "   // 14
-        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].omega * M_PI / 180 ) << " "   // 15
-        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].x ) << " "      //16
-        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].y ) << " "      //17
-        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].z ) << " "  //18
-        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].theta * M_PI / 180 ) << " "  //19
-        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].omega * M_PI / 180 ) << " "  //20
-        << filterprecision( solution_.Solution_vec[i/NbSampleInterpolation_] ) << " "  //20
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[1] ) << " "       // 11
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[2] ) << " "       // 12
+        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].x ) << " "       // 13
+        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].y ) << " "       // 14
+        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].z ) << " "       // 15
+        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].theta * M_PI / 180 ) << " "   // 16
+        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].omega * M_PI / 180 ) << " "   // 17
+        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].x ) << " "      //18
+        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].y ) << " "      //19
+        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].z ) << " "  //20
+        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].theta * M_PI / 180 ) << " "  //21
+        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].omega * M_PI / 180 ) << " "  //22
+        << filterprecision( solution_.Solution_vec[i/NbSampleInterpolation_] ) << " "  //23
         << endl ;
   }
   aof.close() ;
@@ -832,8 +834,8 @@ int ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & F
   if ( abs(DeltaZMPMBPositions_[0].py) > ecartmaxY )
     ecartmaxY = abs(DeltaZMPMBPositions_[0].py) ;
 
-//  cout << "ecartmaxX :" << ecartmaxX << endl ;
-//  cout << "ecartmaxY :" << ecartmaxY << endl ;
+  cout << "ecartmaxX :" << ecartmaxX << endl ;
+  cout << "ecartmaxY :" << ecartmaxY << endl ;
 
   /// Preview control on the ZMPMBs computed
   /// --------------------------------------
@@ -896,8 +898,16 @@ int ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & F
   for (unsigned int i = 0 ; i < DeltaZMPMBPositions_.size() ; ++i )
   {
     aof << filterprecision( DeltaZMPMBPositions_[i].px ) << " "   // 1
-        << filterprecision( DeltaZMPMBPositions_[i].py ) << " "   // 2
-        << endl ;
+        << filterprecision( DeltaZMPMBPositions_[i].py ) << " ";   // 2
+    for (int j = 0 ; j < VelocityTraj_[i].size() ; ++j)
+    {
+      aof << filterprecision(VelocityTraj_[i](j)) << " " ;
+    }
+    for (int j = 0 ; j < AccelerationTraj_[i].size() ; ++j)
+    {
+      aof << filterprecision(AccelerationTraj_[i](j)) << " " ;
+    }
+    aof << endl ;
   }
 
   /// \brief Debug Purpose
@@ -955,15 +965,15 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(
   aCOMSpeed(1) = acomp.y[1];
   aCOMSpeed(2) = acomp.z[1];
   aCOMSpeed(3) = acomp.roll[1];
-  aCOMSpeed(4) = acomp.roll[1];
-  aCOMSpeed(5) = acomp.roll[1];
+  aCOMSpeed(4) = acomp.pitch[1];
+  aCOMSpeed(5) = acomp.yaw[1];
 
   aCOMAcc(0) = acomp.x[2];
   aCOMAcc(1) = acomp.y[2];
   aCOMAcc(2) = acomp.z[2];
   aCOMAcc(3) = acomp.roll[2];
-  aCOMAcc(4) = acomp.roll[2];
-  aCOMAcc(5) = acomp.roll[2];
+  aCOMAcc(4) = acomp.pitch[2];
+  aCOMAcc(5) = acomp.yaw[2];
 
   MAL_VECTOR_DIM(aLeftFootPosition,double,5);
   MAL_VECTOR_DIM(aRightFootPosition,double,5);
