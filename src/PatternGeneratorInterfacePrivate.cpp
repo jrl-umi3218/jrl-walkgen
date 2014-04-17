@@ -1253,68 +1253,67 @@ namespace PatternGeneratorJRL {
 								    COMState &finalCOMState,
 								    FootAbsolutePosition &LeftFootPosition,
 								    FootAbsolutePosition &RightFootPosition )
-
   {
 
     m_InternalClock+=m_SamplingPeriod;
 
     if ((!m_ShouldBeRunning) ||
-	(m_GlobalStrategyManager->EndOfMotion()<0))
-      {
+		(m_GlobalStrategyManager->EndOfMotion()<0))
+		{
 
-	ODEBUG(" m_ShoulBeRunning " << m_ShouldBeRunning << endl <<
-	       " m_ZMPPositions " << m_ZMPPositions.size() << endl <<
-	       " 2*m_NL+1 " << 2*m_NL+1 << endl);
-	ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
-	       "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
+			ODEBUG(" m_ShoulBeRunning " << m_ShouldBeRunning << endl <<
+						 " m_ZMPPositions " << m_ZMPPositions.size() << endl <<
+						 " 2*m_NL+1 " << 2*m_NL+1 << endl);
+			ODEBUG("m_ShouldBeRunning : "<< m_ShouldBeRunning << endl <<
+						 "m_GlobalStrategyManager: " << m_GlobalStrategyManager->EndOfMotion());
 
-    m_Running = false;
-	return m_Running;//Andremize
-      }
+			m_Running = false;
+			return m_Running;//Andremize
+		}
     ODEBUG("Internal clock:" << m_InternalClock);
 
     m_Running = true;
 
     if (m_StepStackHandler->IsOnLineSteppingOn())
-      {
-	ODEBUG("On Line Stepping: ON!");
-	// ********* WARNING THIS IS THE TIME CONSUMING PART *******************
-	if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
-	  {
-	  }
-	else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
-	  {
-	    m_ZMPD->OnLine(m_InternalClock,
-			   m_ZMPPositions,
-			   m_COMBuffer,
-			   m_LeftFootPositions,
-			   m_RightFootPositions);
-	  }
-	else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
-	  {
-	    ODEBUG("InternalClock:" <<m_InternalClock  <<
-		   " SamplingPeriod: "<<m_SamplingPeriod);
+		{
+			ODEBUG("On Line Stepping: ON!");
+			// ********* WARNING THIS IS THE TIME CONSUMING PART *******************
+			if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
+			{
+			}
+			else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
+			{
+				m_ZMPD->OnLine(m_InternalClock,
+					 m_ZMPPositions,
+					 m_COMBuffer,
+					 m_LeftFootPositions,
+					 m_RightFootPositions);
+			}
+			else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+			{
+				ODEBUG("InternalClock:" <<m_InternalClock  <<
+				 " SamplingPeriod: "<<m_SamplingPeriod);
 
-	    m_ZMPM->OnLine(m_InternalClock,
-			   m_ZMPPositions,
-			   m_COMBuffer,
-			   m_LeftFootPositions,
-			   m_RightFootPositions);
-	  }
-      }
+				m_ZMPM->OnLine(m_InternalClock,
+					 m_ZMPPositions,
+					 m_COMBuffer,
+					 m_LeftFootPositions,
+					 m_RightFootPositions);
+			}
+		}
     else
       /* Check if we are not in an ending phase generated on-line */
-      {
-	if ((m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007) &&
-	    (m_ZMPM->GetOnLineMode()))
-	  {
-	    m_ZMPM->OnLine(m_InternalClock,
-			   m_ZMPPositions,
-			   m_COMBuffer,
-			   m_LeftFootPositions,
-			   m_RightFootPositions);
-	  }
-      }
+    {
+			if ((m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007) &&
+					(m_ZMPM->GetOnLineMode()))
+			{
+				m_ZMPM->OnLine(m_InternalClock,
+					m_ZMPPositions,
+					m_COMBuffer,
+					m_LeftFootPositions,
+					m_RightFootPositions);
+			}
+    }
 
     if (m_AlgorithmforZMPCOM==ZMPCOM_HERDT_2010)
     {
@@ -1389,131 +1388,130 @@ namespace PatternGeneratorJRL {
     //    if ((u=(m_count - (m_ZMPPositions.size()-2*m_NL)))>=0)
 
     if (m_GlobalStrategyManager->EndOfMotion()==GlobalStrategyManager::NEW_STEP_NEEDED)
-      {
-	ODEBUG("NEW STEP NEEDED" << m_InternalClock/m_SamplingPeriod << " Internal Clock :" << m_InternalClock);
-	if (m_StepStackHandler->IsOnLineSteppingOn())
-	  {
-	    ODEBUG("Add a step");
-	    // CAREFULL: we assume that this sequence will create a
-	    // a new foot steps at the back of the queue handled by the StepStackHandler.
-	    // Then we have two foot steps: the last one put inside the preview,
-	    // and the new one.
-	    RelativeFootPosition lRelativeFootPositions;
-	    // Add a new step inside the stack.
-	    if (m_StepStackHandler->ReturnStackSize()<=1)
-	      {
-		m_StepStackHandler->AddStandardOnLineStep(m_NewStep, m_NewStepX, m_NewStepY, m_NewTheta);
-		m_NewStep = false;
-	      }
+		{
+			ODEBUG("NEW STEP NEEDED" << m_InternalClock/m_SamplingPeriod << " Internal Clock :" << m_InternalClock);
+			if (m_StepStackHandler->IsOnLineSteppingOn())
+			{
+				ODEBUG("Add a step");
+				// CAREFULL: we assume that this sequence will create a
+				// a new foot steps at the back of the queue handled by the StepStackHandler.
+				// Then we have two foot steps: the last one put inside the preview,
+				// and the new one.
+				RelativeFootPosition lRelativeFootPositions;
+				// Add a new step inside the stack.
+				if (m_StepStackHandler->ReturnStackSize()<=1)
+				{
+					m_StepStackHandler->AddStandardOnLineStep(m_NewStep, m_NewStepX, m_NewStepY, m_NewTheta);
+					m_NewStep = false;
+				}
 
-	    // Remove the first step of the queue.
-	    bool EndSequence = m_StepStackHandler->RemoveFirstStepInTheStack();
-	    ODEBUG("EndSequence:" <<EndSequence);
-	    // Returns the front foot step in the step stack handler which is not yet
-	    // in the preview control queue.
-	    bool EnoughSteps= m_StepStackHandler->ReturnFrontFootPosition(lRelativeFootPositions);
-	    if ((!EnoughSteps)&& (!EndSequence))
-	      {
-		ODEBUG3("You don't have enough steps in the step stack handler.");
-		ODEBUG3("And this is not an end sequence.");
-	      }
+				// Remove the first step of the queue.
+				bool EndSequence = m_StepStackHandler->RemoveFirstStepInTheStack();
+				ODEBUG("EndSequence:" <<EndSequence);
+				// Returns the front foot step in the step stack handler which is not yet
+				// in the preview control queue.
+				bool EnoughSteps= m_StepStackHandler->ReturnFrontFootPosition(lRelativeFootPositions);
+				if ((!EnoughSteps)&& (!EndSequence))
+				{
+					ODEBUG3("You don't have enough steps in the step stack handler.");
+					ODEBUG3("And this is not an end sequence.");
+				}
 
 
-	    ODEBUG(" EnoughSteps: " << EnoughSteps << endl <<
-		    " EndSequence:" << EndSequence << endl);
+				ODEBUG(" EnoughSteps: " << EnoughSteps << endl <<
+					" EndSequence:" << EndSequence << endl);
 
-	    if (!EndSequence)
-	      {
-		// ********* WARNING THIS IS THE TIME CONSUMING PART *******************
-		if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
-		  {
-		  }
-		else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
-		  {
+				if (!EndSequence)
+				{
+					// ********* WARNING THIS IS THE TIME CONSUMING PART *******************
+					if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
+					{
+					}
+					else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
+					{
 
-		    m_ZMPD->OnLineAddFoot(lRelativeFootPositions,
-					  m_ZMPPositions,
-					  m_COMBuffer,
-					  m_LeftFootPositions,
-					  m_RightFootPositions,
-					  EndSequence);
+						m_ZMPD->OnLineAddFoot(lRelativeFootPositions,
+								m_ZMPPositions,
+								m_COMBuffer,
+								m_LeftFootPositions,
+								m_RightFootPositions,
+								EndSequence);
 
-		  }
-		else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
-		  {
-		    ODEBUG("Putting a new step SX: " <<
-			   lRelativeFootPositions.sx << " SY: "
-			   << lRelativeFootPositions.sy );
-		    m_ZMPM->SetCurrentTime(m_InternalClock);
-		    m_ZMPM->OnLineAddFoot(lRelativeFootPositions,
-					  m_ZMPPositions,
-					  m_COMBuffer,
-					  m_LeftFootPositions,
-					  m_RightFootPositions,
-					  EndSequence);
-		    ODEBUG("Left and Right foot positions queues: "
-			   << m_LeftFootPositions.size() << " "
-			   << m_RightFootPositions.size() );
-		  }
-	      }
-	    else if (EndSequence)
-	      {
-		ODEBUG("End Sequence");
-		if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
-		  {
-		  }
-		else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
-		  {
-		    m_ZMPD->EndPhaseOfTheWalking(m_ZMPPositions,
-						 m_COMBuffer,
-						 m_LeftFootPositions,
-						 m_RightFootPositions);
-		  }
-		else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
-		  {
-		    ODEBUG("Putting a new step SX: " <<
-			   lRelativeFootPositions.sx << " SY: "
-			   << lRelativeFootPositions.sy );
-		    m_ZMPM->SetCurrentTime(m_InternalClock);
-		    m_ZMPM->EndPhaseOfTheWalking(m_ZMPPositions,
-						 m_COMBuffer,
-						 m_LeftFootPositions,
-						 m_RightFootPositions);
-		    ODEBUG("("<<m_InternalClock << ")");
-		    ODEBUG("Left and Right foot positions queues: "
-			   << m_LeftFootPositions.size() << " "
-			   << m_RightFootPositions.size() );
-		  }
-	      }
-	    // ************* THIS HAS TO FIT INSIDE THE control step time  ***********
+					}
+					else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+					{
+						ODEBUG("Putting a new step SX: " <<
+						 lRelativeFootPositions.sx << " SY: "
+						 << lRelativeFootPositions.sy );
+						m_ZMPM->SetCurrentTime(m_InternalClock);
+						m_ZMPM->OnLineAddFoot(lRelativeFootPositions,
+								m_ZMPPositions,
+								m_COMBuffer,
+								m_LeftFootPositions,
+								m_RightFootPositions,
+								EndSequence);
+						ODEBUG("Left and Right foot positions queues: "
+						 << m_LeftFootPositions.size() << " "
+						 << m_RightFootPositions.size() );
+					}
+				}
+				else if (EndSequence)
+				{
+					ODEBUG("End Sequence");
+					if (m_AlgorithmforZMPCOM==ZMPCOM_WIEBER_2006)
+					{
+					}
+					else if (m_AlgorithmforZMPCOM==ZMPCOM_KAJITA_2003)
+					{
+						m_ZMPD->EndPhaseOfTheWalking(m_ZMPPositions,
+								 m_COMBuffer,
+								 m_LeftFootPositions,
+								 m_RightFootPositions);
+					}
+					else if (m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007)
+					{
+						ODEBUG("Putting a new step SX: " <<
+						 lRelativeFootPositions.sx << " SY: "
+						 << lRelativeFootPositions.sy );
+						m_ZMPM->SetCurrentTime(m_InternalClock);
+						m_ZMPM->EndPhaseOfTheWalking(m_ZMPPositions,
+								 m_COMBuffer,
+								 m_LeftFootPositions,
+								 m_RightFootPositions);
+						ODEBUG("("<<m_InternalClock << ")");
+						ODEBUG("Left and Right foot positions queues: "
+						 << m_LeftFootPositions.size() << " "
+						 << m_RightFootPositions.size() );
+					}
+				}
+				// ************* THIS HAS TO FIT INSIDE THE control step time  ***********
 
-	  }
-	else
-	  {
+			}
+			else
+			{
+				//	cout << "Sorry not enough information" << endl;
+				m_ShouldBeRunning = false;
+				UpdateAbsMotionOrNot = true;
 
-	    //	cout << "Sorry not enough information" << endl;
-	    m_ShouldBeRunning = false;
-	    UpdateAbsMotionOrNot = true;
+				if ((m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007) &&
+						(m_ZMPM->GetOnLineMode()))
+				{
+					m_ShouldBeRunning = true;
+				}
 
-	    if ((m_AlgorithmforZMPCOM==ZMPCOM_MORISAWA_2007) &&
-		(m_ZMPM->GetOnLineMode()))
-	      {
-		m_ShouldBeRunning = true;
-	      }
+					ODEBUG("Finished the walking pattern generator ("<<m_InternalClock << ")");
+			}
 
-	    ODEBUG("Finished the walking pattern generator ("<<m_InternalClock << ")");
-	  }
+			ODEBUG4("*** TAG *** " , "DebugDataIK.dat");
 
-	ODEBUG4("*** TAG *** " , "DebugDataIK.dat");
+		}
 
-      }
-
-    // Update the absolute position of the robot.
-    // to be done only when the robot has finish a motion.
-    UpdateAbsolutePosition(UpdateAbsMotionOrNot);
-    ODEBUG("Return true");
-    return m_Running;
-  }
+		// Update the absolute position of the robot.
+		// to be done only when the robot has finish a motion.
+		UpdateAbsolutePosition(UpdateAbsMotionOrNot);
+		ODEBUG("Return true");
+		return m_Running;
+	}
 
 
 

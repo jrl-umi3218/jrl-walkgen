@@ -194,10 +194,6 @@ namespace PatternGeneratorJRL
     int QP_N_;
 
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
-//    LinearizedInvertedPendulum2D LIPM_control_ ;
-//    LinearizedInvertedPendulum2D LIPM_control_subsampled_ ;
-//    LinearizedInvertedPendulum2D LIPM_DF_ ;
-//    LinearizedInvertedPendulum2D LIPM_DF_subsampled_ ;
     LinearizedInvertedPendulum2D LIPM_ ;
     LinearizedInvertedPendulum2D LIPM_subsampled_ ;
 
@@ -209,6 +205,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Decoupled optimization problem to compute the evolution of feet angles.
     OrientationsPreview * OrientPrw_;
+    OrientationsPreview * OrientPrw_DF_;
 
     /// \brief Generator of QP problem
     GeneratorVelRef * VRQPGenerator_;
@@ -262,16 +259,16 @@ namespace PatternGeneratorJRL
     double StepPeriod_ ;
 
     /// \brief Period where the robot is on ONE feet
-    double SSPeriod ;
+    double SSPeriod_ ;
 
     /// \brief Period where the robot is on TWO feet
-    double DSPeriod ;
+    double DSPeriod_ ;
 
     /// \brief Maximum distance between the feet
-    double FeetDistance ;
+    double FeetDistance_ ;
 
     /// \brief Maximum height of the feet
-    double StepHeight ;
+    double StepHeight_ ;
 
     /// \brief Height of the CoM
     double CoMHeight_ ;
@@ -301,7 +298,8 @@ namespace PatternGeneratorJRL
     double DInitX_, DInitY_ ;
     COMState InitStateLIPM_ ;
     COMState InitStateOrientPrw_ ;
-    COMState FinalStateOrientPrw_ ;
+    COMState FinalCurrentStateOrientPrw_ ;
+    COMState FinalPreviewStateOrientPrw_ ;
 
     /// \brief Buffer comtaimimg the difference between the ZMP computed from the Herdt controler
     ///and the ZMP Multibody computed from the articular trajectory
@@ -353,7 +351,7 @@ namespace PatternGeneratorJRL
 
     int ReturnOptimalTimeToRegenerateAStep();
 
-    int DynamicFilter(double time,
+    void DynamicFilter(double time,
       std::deque<COMState> & FinalCOMTraj_deq
       );
 
@@ -364,27 +362,33 @@ namespace PatternGeneratorJRL
 				    MAL_VECTOR_TYPE(double) & CurrentConfiguration,
 				    MAL_VECTOR_TYPE(double) & CurrentVelocity,
 				    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
-				    const unsigned IterationNumber
+				    const unsigned & IterationNumber
 				    );
 
     void CoMZMPInterpolation(
-          std::deque<ZMPPosition> & ZMPPositions,                     // OUTPUT
-		      std::deque<COMState> & COMTraj_deq ,                        // OUTPUT
-		      const std::deque<FootAbsolutePosition> & LeftFootTraj_deq, // INPUT
-		      const std::deque<FootAbsolutePosition> & RightFootTraj_deq,// INPUT
-		      const solution_t * Solution,                               // INPUT
-          LinearizedInvertedPendulum2D * LIPM,                        // INPUT/OUTPUT
-		      const unsigned numberOfSample,                             // INPUT
-		      const int IterationNumber);                                // INPUT
+          std::deque<ZMPPosition> & ZMPPositions,                    	 // OUTPUT
+		      std::deque<COMState> & COMTraj_deq ,                       	 // OUTPUT
+		      const std::deque<FootAbsolutePosition> & LeftFootTraj_deq, 	// INPUT
+		      const std::deque<FootAbsolutePosition> & RightFootTraj_deq,	// INPUT
+		      const solution_t * Solution,                               	// INPUT
+          LinearizedInvertedPendulum2D * LIPM,                       	 // INPUT/OUTPUT
+		      const unsigned numberOfSample,                             	// INPUT
+		      const int IterationNumber);                                	// INPUT
 
     void ControlInterpolation(
           std::deque<COMState> & FinalCOMTraj_deq,                      // OUTPUT
           std::deque<ZMPPosition> & FinalZMPTraj_deq,                   // OUTPUT
 		      std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,     // OUTPUT
 		      std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,    // OUTPUT
-		      double time);                                          // INPUT
+		      double time);                                          			// INPUT
 
     void DynamicFilterInterpolation(double time);
+
+    void InterpretSolution(vector<double> &solFoot);
+
+    void PrepareSolution(int iteration, const vector<double> &solFoot);
+
+    void ProjectionOnConstraints(double & X, double & Y);
   };
 }
 

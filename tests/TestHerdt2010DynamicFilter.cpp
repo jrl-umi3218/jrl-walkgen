@@ -114,7 +114,6 @@ private:
 
     /*! Open and reset appropriatly the debug files. */
     prepareDebugFiles();
-    initIK();
     for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
     {
       os << "<===============================================================>"<<endl;
@@ -235,6 +234,8 @@ private:
     ComAndFootRealization_->SetHeightOfTheCoM(0.814);
     ComAndFootRealization_->setSamplingPeriod(0.005);
     ComAndFootRealization_->Initialization();
+
+		initIK();
   }
 
 protected:
@@ -259,6 +260,7 @@ protected:
     ComAndFootRealization_->SetHeightOfTheCoM(0.814);
     ComAndFootRealization_->setSamplingPeriod(0.005);
     ComAndFootRealization_->Initialization();
+
     ComAndFootRealization_->InitializationCoM(BodyAngles,lStartingCOMState,
 					     waist,
 					     m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
@@ -428,14 +430,15 @@ protected:
     aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
     aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
     aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
+    ComAndFootRealization_->setSamplingPeriod(0.005);
     ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
                       aLeftFootPosition,
                       aRightFootPosition,
                       CurrentConfiguration,
                       CurrentVelocity,
                       CurrentAcceleration,
-                      iteration_zmp,
-                      1);
+                      m_OneStep.NbOfIt,
+                      0);
 
     /// \brief rnea, calculation of the multi body ZMP
     /// ----------------------------------------------
@@ -448,8 +451,8 @@ protected:
     }
     metapod::rnea< Robot_Model2, true >::run(robot_, q, dq, ddq);
 
-    Node2 node = boost::fusion::at_c<Robot_Model2::BODY>(robot_.nodes);
-    Force2 aforce = node.body.iX0.applyInv (node.joint.f) ;
+    Node2 anode = boost::fusion::at_c<Robot_Model2::BODY>(robot_.nodes);
+    Force2 aforce = anode.body.iX0.applyInv (anode.joint.f) ;
 
     double ZMPMB[2];
 
@@ -474,8 +477,8 @@ protected:
       double erry = sqrt( ( m_OneStep.ZMPTarget(1) - ZMPMB[1] - dInitY )*( m_OneStep.ZMPTarget(1) - ZMPMB[1] - dInitY ) ) ;
       {
         vector<double> tmp_zmp(2) ;
-        tmp_zmp[0] =errx ;
-        tmp_zmp[1] =erry ;
+        tmp_zmp[0] = errx ;
+        tmp_zmp[1] = erry ;
         errZMP_.push_back(tmp_zmp);
       }
     }
@@ -717,8 +720,8 @@ void startOnLineWalking(PatternGeneratorInterface &aPGI)
     #define localNbOfEvents 6
     struct localEvent events [localNbOfEvents] =
     { {1*200,&TestHerdt2010::walkForward},
-      {5*200,&TestHerdt2010::walkSidewards},
-      {10*200,&TestHerdt2010::startTurningRightOnSpot},
+      {5*200,&TestHerdt2010::startTurningRightOnSpot},
+      {10*200,&TestHerdt2010::walkForward},
 //      {35*200,&TestHerdt2010::walkForward},
       {15*200,&TestHerdt2010::startTurningLeftOnSpot},
 //      {55*200,&TestHerdt2010::walkForward},
@@ -733,10 +736,10 @@ void startOnLineWalking(PatternGeneratorInterface &aPGI)
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
     {
-	  if ( m_OneStep.NbOfIt==events[i].time){
-        ODEBUG3("********* GENERATE EVENT OLW ***********");
-	    (this->*(events[i].Handler))(*m_PGI);
-	  }
+			if ( m_OneStep.NbOfIt==events[i].time){
+					ODEBUG3("********* GENERATE EVENT OLW ***********");
+				(this->*(events[i].Handler))(*m_PGI);
+			}
     }
   }
 

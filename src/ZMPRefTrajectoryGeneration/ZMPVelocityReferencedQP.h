@@ -90,7 +90,7 @@ namespace PatternGeneratorJRL
       the queue of ZMP, and foot positions.
     */
     int InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
-                   deque<COMState> & CoMStates,
+                   deque<COMState> & FinalCoMPositions_deq,
                    deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
                    deque<FootAbsolutePosition> & FinalRightFootTraj_deq,
                    FootAbsolutePosition & InitLeftFootAbsolutePosition,
@@ -103,7 +103,7 @@ namespace PatternGeneratorJRL
     /// \brief Update the stacks on-line
     void OnLine(double time,
                 deque<ZMPPosition> & FinalZMPPositions,
-                deque<COMState> & CoMStates,
+                deque<COMState> & FinalCOMTraj_deq,
                 deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
                 deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
 
@@ -194,8 +194,8 @@ namespace PatternGeneratorJRL
     int QP_N_;
 
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
-    LinearizedInvertedPendulum2D LIPM_control_ ;
     LinearizedInvertedPendulum2D LIPM_ ;
+    LinearizedInvertedPendulum2D LIPM_subsampled_ ;
 
     /// \brief Simplified robot model
     RigidBodySystem * Robot_ ;
@@ -205,6 +205,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Decoupled optimization problem to compute the evolution of feet angles.
     OrientationsPreview * OrientPrw_;
+    OrientationsPreview * OrientPrw_DF_;
 
     /// \brief Generator of QP problem
     GeneratorVelRef * VRQPGenerator_;
@@ -245,6 +246,8 @@ namespace PatternGeneratorJRL
 
     deque<COMState> tmpCoM_ ;
     deque<ZMPPosition> tmpZMP_ ;
+    deque<FootAbsolutePosition> tmpRF_ ;
+    deque<FootAbsolutePosition> tmpLF_ ;
 
     /// \brief Index where to begin the interpolation
     unsigned CurrentIndex_ ;
@@ -293,6 +296,10 @@ namespace PatternGeneratorJRL
     /// \brief Used to compute once, the initial difference between the ZMP and the ZMPMB
     bool Once_ ;
     double DInitX_, DInitY_ ;
+    COMState InitStateLIPM_ ;
+    COMState InitStateOrientPrw_ ;
+    COMState FinalCurrentStateOrientPrw_ ;
+    COMState FinalPreviewStateOrientPrw_ ;
 
     /// \brief Buffer comtaimimg the difference between the ZMP computed from the Herdt controler
     ///and the ZMP Multibody computed from the articular trajectory
@@ -305,7 +312,7 @@ namespace PatternGeneratorJRL
     Robot_Model m_robot;
 
     /// \brief Standard polynomial trajectories for the feet.
-    OnLineFootTrajectoryGeneration * OFTG_;
+    OnLineFootTrajectoryGeneration * OFTG_DF_ ;
     OnLineFootTrajectoryGeneration * OFTG_control_ ;
 
   public:
@@ -344,47 +351,38 @@ namespace PatternGeneratorJRL
 
     int ReturnOptimalTimeToRegenerateAStep();
 
-    int DynamicFilter(std::deque<ZMPPosition> & ZMPPositions,
-		      std::deque<COMState> & COMTraj_deq,
-		      std::deque<FootAbsolutePosition> & LeftFootAbsolutePositions,
-		      std::deque<FootAbsolutePosition> & RightFootAbsolutePositions,
-		      unsigned currentIndex,
-		      double time
-		      );
+    int DynamicFilter(double time,
+      std::deque<COMState> & FinalCOMTraj_deq
+      );
 
-    void CallToComAndFootRealization(COMState & acomp,
-				    FootAbsolutePosition & aLeftFAP,
-				    FootAbsolutePosition & aRightFAP,
+    void CallToComAndFootRealization(
+            const COMState & acomp,
+				    const FootAbsolutePosition & aLeftFAP,
+				    const FootAbsolutePosition & aRightFAP,
 				    MAL_VECTOR_TYPE(double) & CurrentConfiguration,
 				    MAL_VECTOR_TYPE(double) & CurrentVelocity,
 				    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
-				    unsigned IterationNumber
+				    const unsigned IterationNumber
 				    );
 
-    void Interpolation(std::deque<ZMPPosition> & ZMPPositions,
-		      std::deque<COMState> & COMTraj_deq ,
-		      std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
-		      std::deque<FootAbsolutePosition> & RightFootTraj_deq,
-		      solution_t * Solution,
-		      LinearizedInvertedPendulum2D * LIPM,
-		      OrientationsPreview * OrientPrw,
-          OnLineFootTrajectoryGeneration * OFTG,
-		      unsigned currentIndex,
-		      double time,
-		      int IterationNumber,
-		      unsigned numberOfSample
-		      );
-
     void CoMZMPInterpolation(
-          std::deque<ZMPPosition> & ZMPPositions,
-		      std::deque<COMState> & COMTraj_deq ,
-		      std::deque<FootAbsolutePosition> & LeftFootTraj_deq,
-		      std::deque<FootAbsolutePosition> & RightFootTraj_deq,
-		      solution_t * Solution,
-          LinearizedInvertedPendulum2D * LIPM,
-          unsigned currentIndex,
-		      int IterationNumber,
-		      unsigned numberOfSample);
+          std::deque<ZMPPosition> & ZMPPositions,                     // OUTPUT
+		      std::deque<COMState> & COMTraj_deq ,                        // OUTPUT
+		      const std::deque<FootAbsolutePosition> & LeftFootTraj_deq, // INPUT
+		      const std::deque<FootAbsolutePosition> & RightFootTraj_deq,// INPUT
+		      const solution_t * Solution,                               // INPUT
+          LinearizedInvertedPendulum2D * LIPM,                        // INPUT/OUTPUT
+		      const unsigned numberOfSample,                             // INPUT
+		      const int IterationNumber);                                // INPUT
+
+    void ControlInterpolation(
+          std::deque<COMState> & FinalCOMTraj_deq,                      // OUTPUT
+          std::deque<ZMPPosition> & FinalZMPTraj_deq,                   // OUTPUT
+		      std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,     // OUTPUT
+		      std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,    // OUTPUT
+		      double time);                                          // INPUT
+
+    void DynamicFilterInterpolation(double time);
   };
 }
 

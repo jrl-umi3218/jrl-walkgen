@@ -137,6 +137,7 @@ OrientationsPreview::preview_orientations(double Time,
                 }
               else
                 TrunkStateT_.yaw[0] = TrunkState_.yaw[0] + TrunkState_.yaw[1]*T_;
+
               //Compute the trunk angle at the end of the support phase
               SupportTimePassed_ = CurrentSupport.TimeLimit-Time;
               PreviewedTrunkAngleEnd = TrunkStateT_.yaw[0] + TrunkStateT_.yaw[1]*(SupportTimePassed_-T_);

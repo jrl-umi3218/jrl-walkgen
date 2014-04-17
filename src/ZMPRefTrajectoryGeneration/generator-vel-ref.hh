@@ -121,6 +121,14 @@ namespace PatternGeneratorJRL
     { IntermedData_->CoM(CoM); };
     /// \}
 
+		/// \brief Generate a queue of inequality constraints on
+    /// the feet positions with respect to previous foot positions
+    ///
+    /// \param[out] Inequalities
+    /// \param[in] SupportStates_deq
+    void build_inequalities_feet(linear_inequality_t & Inequalities,
+        const std::deque<support_state_t> & SupportStates_deq) const;
+
     //
     // Protected methods
     //
@@ -136,14 +144,6 @@ namespace PatternGeneratorJRL
     /// \param[out] Inequalities
     /// \param[in] SupportStates_deq
     void build_inequalities_cop(linear_inequality_t & Inequalities,
-        const std::deque<support_state_t> & SupportStates_deq) const;
-
-    /// \brief Generate a queue of inequality constraints on
-    /// the feet positions with respect to previous foot positions
-    ///
-    /// \param[out] Inequalities
-    /// \param[in] SupportStates_deq
-    void build_inequalities_feet(linear_inequality_t & Inequalities,
         const std::deque<support_state_t> & SupportStates_deq) const;
 
     /// \brief Generate a queue of inequality constraints on
