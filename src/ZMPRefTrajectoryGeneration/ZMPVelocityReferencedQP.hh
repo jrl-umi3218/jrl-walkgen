@@ -351,10 +351,12 @@ namespace PatternGeneratorJRL
 
     int ReturnOptimalTimeToRegenerateAStep();
 
+		/// \brief Compute the dynamic filter from Kajita
     void DynamicFilter(double time,
       std::deque<COMState> & FinalCOMTraj_deq
       );
 
+		/// \brief Compute the inverse kinamatics with a simplified inverted pendulum model
     void CallToComAndFootRealization(
             const COMState & acomp,
 				    const FootAbsolutePosition & aLeftFAP,
@@ -365,6 +367,7 @@ namespace PatternGeneratorJRL
 				    const unsigned & IterationNumber
 				    );
 
+		/// \brief Interpolation form the com jerk the position of the com and the zmp corresponding to the kart table model
     void CoMZMPInterpolation(
           std::deque<ZMPPosition> & ZMPPositions,                    	 // OUTPUT
 		      std::deque<COMState> & COMTraj_deq ,                       	 // OUTPUT
@@ -375,6 +378,7 @@ namespace PatternGeneratorJRL
 		      const unsigned numberOfSample,                             	// INPUT
 		      const int IterationNumber);                                	// INPUT
 
+		/// \brief Interpolate just enough data to pilot the robot (period of interpolation = QP_T_)
     void ControlInterpolation(
           std::deque<COMState> & FinalCOMTraj_deq,                      // OUTPUT
           std::deque<ZMPPosition> & FinalZMPTraj_deq,                   // OUTPUT
@@ -382,12 +386,16 @@ namespace PatternGeneratorJRL
 		      std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,    // OUTPUT
 		      double time);                                          			// INPUT
 
+		/// \brief Interpolation everything on the whole preview
     void DynamicFilterInterpolation(double time);
 
+		/// \brief Define the position of an additionnal foot step outside the preview to interpolate the position of the feet in 3D
     void InterpretSolution(vector<double> &solFoot);
 
+		/// \brief Prepare the vecteur containing the solution for the interpolation
     void PrepareSolution(int iteration, const vector<double> &solFoot);
 
+		/// \brief Project the found third foot step on the constraints
     void ProjectionOnConstraints(double & X, double & Y);
   };
 }

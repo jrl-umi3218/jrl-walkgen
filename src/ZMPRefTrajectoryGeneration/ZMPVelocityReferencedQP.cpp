@@ -684,7 +684,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
   iteration++;
 
-
+		cout << "----------------------------------------------\n" ;
     // Specify that we are in the ending phase.
     if (EndingPhase_ == false)
     {
@@ -787,6 +787,7 @@ void ZMPVelocityReferencedQP::ControlInterpolation(
 
 void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 {
+	// interpolation the position of the com along the whole preview
 	vector<double> solFoot;
   LIPM_subsampled_.setState(InitStateLIPM_) ;
   OrientPrw_DF_->CurrentTrunkState(InitStateOrientPrw_) ;
@@ -799,6 +800,7 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
       NbSampleInterpolation_, i);
   }
 
+	// Copy the solution for the orientation interpolation function
 	OFTG_DF_->SetSamplingPeriod( InterpolationPeriod_ );
   solution_t aSolution  = solution_ ;
 
@@ -813,6 +815,8 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
         CurrentIndex_ + i * NbSampleInterpolation_, InterpolationPeriod_,
         solution_.SupportStates_deq, COMTraj_deq_ );
 
+		// Modify a copy of the solution to allow "OFTG_DF_->interpolate_feet_positions"
+		// to use the correcte feet step previewed
 		PrepareSolution(i,solFoot);
 
 		if(solution_.SupportStates_deq.front().Phase != DS){
@@ -826,16 +830,8 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
     solution_.SupportStates_deq.pop_front();
 	}
 
-	static int it_DF = 0 ;
-	it_DF++;
-	if (it_DF == 16)
-	{
-		it_DF = 16;
-	}
-
   OrientPrw_DF_->CurrentTrunkState(FinalCurrentStateOrientPrw_);
   OrientPrw_DF_->CurrentTrunkState(FinalPreviewStateOrientPrw_);
-  cout << "----------------------------------------------\n" ;
   return ;
 }
 
@@ -853,30 +849,34 @@ void ZMPVelocityReferencedQP::InterpretSolution(vector<double> &solFoot)
 	sinTheta = sin(LastSupport.Yaw) ;
 	cout << "velref X=" << VelRef_.Local.X << " Y=" << VelRef_.Local.Y<< " Yaw=" << VelRef_.Local.Yaw << " Lastfoot.yaw="<< LastSupport.Yaw <<endl ;
 	static int tour (0);
-	if ( tour == 101 )
+	if ( tour == 58 )
 	{
-		tour = 101 ;
+		tour = 58 ;
 	}
 	tour++;
 
-	if ( nbSteps == 0 )
+	if (LastSupport.Phase == DS)
 	{
-		PosFootX = 0 ;
-		PosFootY = 0 ;
+		PosFootX = LastSupport.X ;
+		PosFootY = LastSupport.Y ;
+		cout << "PosFootX = "<< PosFootX << " " << "PosFootY = "<< PosFootY ;
+		cout << endl ;
 	}
 	else
 	{
 		if(FirstSupport.Foot == LEFT )
-			Sign = -1.0 ;
-		else
 			Sign = 1.0 ;
+		else
+			Sign = -1.0 ;
+		if(LastSupport.Phase == SS && FirstSupport.Phase == DS )
+			Sign = -Sign ;
+		// compute the next foot step
 		PosFootX = (Vx * StepPeriod_ + Sign * sin(LastSupport.Yaw) * FeetDistance_ + solution_.Solution_vec[2*QP_N_ + nbSteps -1]) ;
 		PosFootY = (Vy * StepPeriod_ - Sign * cos(LastSupport.Yaw) * FeetDistance_ + solution_.Solution_vec[2*QP_N_ + 2*nbSteps -1]) ;
-		ProjectionOnConstraints(PosFootX,PosFootY);
+		cout << "PosFootX = "<< PosFootX << " " << "PosFootY = "<< PosFootY ;
+		cout << endl ;
+		//ProjectionOnConstraints(PosFootX,PosFootY);
 	}
-
-
-
 
 	solFoot.resize ((nbSteps+1)*2,0.0);
 	for (int i = 0 ; i < nbSteps ; ++i )
@@ -898,28 +898,30 @@ void ZMPVelocityReferencedQP::InterpretSolution(vector<double> &solFoot)
 
 void ZMPVelocityReferencedQP::ProjectionOnConstraints(double & X, double & Y)
 {
+	// intialization
 	vector<int> active_set ;
 	boost_ublas::compressed_matrix<double, boost_ublas::row_major> DX ;
 	linear_inequality_t IneqFeet = IntermedData_->Inequalities( INEQ_FEET );
 	int nbSteps(0),Sign(1);
 	double dx(0),dy(0);
 
+	// definition of a fake buffer of support foot to get an appropriate convex hull
 	std::deque<support_state_t> SupportStatesDeq = Solution_.SupportStates_deq ;
 	support_state_t LastSupport = SupportStatesDeq.back() ;
 	support_state_t FirstSupport = SupportStatesDeq.front() ;
 	nbSteps = LastSupport.StepNumber ;
 	if(FirstSupport.Foot == LEFT )
-	{
-		Sign = -1.0 ;
-		LastSupport.Foot = LEFT ;
-	}
-	else
-	{
 		Sign = 1.0 ;
-		LastSupport.Foot = RIGHT ;
-	}
-	LastSupport.StateChanged = true ;
+	else
+		Sign = -1.0 ;
+	if(LastSupport.Phase == SS && FirstSupport.Phase == DS )
+		Sign = -Sign ;
 
+	if ( Sign == 1 )
+		LastSupport.Foot = RIGHT ;
+	else
+		LastSupport.Foot = LEFT ;
+	LastSupport.StateChanged = true ;
 	SupportStatesDeq.pop_front();
 	for (unsigned i = 0 ; i < SupportStatesDeq.size() ; ++i)
 	{
@@ -929,11 +931,14 @@ void ZMPVelocityReferencedQP::ProjectionOnConstraints(double & X, double & Y)
 	}
 	SupportStatesDeq.push_back(LastSupport);
 
+	// collecting the linear inequalities
 	VRQPGenerator_->build_inequalities_feet(IneqFeet,SupportStatesDeq);
 
-	cout << "LastSupport.X = " << LastSupport.X << endl ;
+	// transalating the linear inequalities at the appropriate position
 	dx = Sign * sin(LastSupport.Yaw) * FeetDistance_ * 0.5 + solution_.Solution_vec[2*QP_N_ + nbSteps -1] ;
 	dy = Sign * cos(LastSupport.Yaw) * FeetDistance_ * 0.5 + solution_.Solution_vec[2*QP_N_ + 2*nbSteps -1] ;
+
+	// Translation
 	for (unsigned i = 0 ; i < IneqFeet.Dc_vec.size() ; ++ i)
 	{
 		IneqFeet.Dc_vec(i) = IneqFeet.Dc_vec(i) + IneqFeet.D.X_mat(i,0) * dx + IneqFeet.D.Y_mat(i,0) * dy ;
@@ -942,6 +947,7 @@ void ZMPVelocityReferencedQP::ProjectionOnConstraints(double & X, double & Y)
 	cout << " dx dy : " ;
 	cout << dx << " " << dy << endl ;
 
+	// Computing the active set
 	DX = (IneqFeet.D.X_mat * X + IneqFeet.D.Y_mat * Y) ;
 	for (unsigned i = 0 ; i < DX.size1() ; ++ i)
 	{
@@ -950,7 +956,9 @@ void ZMPVelocityReferencedQP::ProjectionOnConstraints(double & X, double & Y)
 			active_set.push_back(i);
 		}
 	}
+	cout << "active_set.size() = " << active_set.size() << endl ;
 
+	// Projection on the active set if it is not empty
 	if ( active_set.size() == 1 )
 	{
 		double a = IneqFeet.D.X_mat(active_set[0],0);
@@ -1015,6 +1023,8 @@ void ZMPVelocityReferencedQP::ProjectionOnConstraints(double & X, double & Y)
 	return ;
 }
 
+// Modify a copy of the solution to allow "OFTG_DF_->interpolate_feet_positions()"
+		// to use the correct foot step previewed
 void ZMPVelocityReferencedQP::PrepareSolution(int iteration, const vector<double> &solFoot)
 {
 	static int nbStepChanged = 0 ;
