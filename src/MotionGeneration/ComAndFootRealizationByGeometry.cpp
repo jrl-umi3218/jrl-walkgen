@@ -108,13 +108,11 @@ RegisterMethods()
 void ComAndFootRealizationByGeometry::
 InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
 		   std::vector<CjrlJoint *> &ActuatedJoints,
-		   std::vector<int> &IndexInVRML,
 		   std::vector<int> &IndexinConfiguration )
 {
   if (FromRootToJoint.size()!=0)
     {
       ODEBUG("Enter 6.0 " << this);
-      IndexInVRML.resize(FromRootToJoint.size());
       IndexinConfiguration.resize(FromRootToJoint.size());
 
       ODEBUG("Enter 6.1 " );      
@@ -123,15 +121,6 @@ InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
       // Here we assume that they are in a decending order.
       for(unsigned int i=0;i<FromRootToJoint.size();i++)
 	{
-	  for(unsigned int j=0;j<ActuatedJoints.size();j++)
-	    {
-	      if (FromRootToJoint[i]==ActuatedJoints[j])
-		{
-		  IndexInVRML[lindex] = j;
-		  break;
-		}
-	    }
-	  
 	  IndexinConfiguration[lindex] = FromRootToJoint[i]->rankInConfiguration();
 	  lindex++;
 	}
@@ -141,7 +130,6 @@ InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
 void ComAndFootRealizationByGeometry::
 InitializeMapsForAHand(CjrlHand * aHand,
 		       std::vector<CjrlJoint *> &ActuatedJoints,
-		       vector<int> & IndexesInVRML,
 		       vector<int> & IndexesInConfiguration,
 		       CjrlJoint * & associateShoulder)
 {
@@ -181,7 +169,7 @@ InitializeMapsForAHand(CjrlHand * aHand,
     }
   associateShoulder = FromRootToJoint2[0];
   InitializationMaps(FromRootToJoint2,ActuatedJoints,
-		     IndexesInVRML, IndexesInConfiguration);
+		     IndexesInConfiguration);
 }
 
 void ComAndFootRealizationByGeometry::
@@ -212,7 +200,7 @@ InitializeMapForChest(std::vector<CjrlJoint *> &ActuatedJoints)
 	}
       itJoint++;
     }
-  InitializationMaps(FromRootToJoint2,ActuatedJoints,m_ChestIndexInVRML,m_ChestIndexinConfiguration);
+  InitializationMaps(FromRootToJoint2,ActuatedJoints,m_ChestIndexinConfiguration);
 
 }
 void ComAndFootRealizationByGeometry::
@@ -286,23 +274,23 @@ Initialization()
   // Remove the first element
   FromRootToJoint.erase(FromRootToJoint.begin());
   InitializationMaps(FromRootToJoint,ActuatedJoints,
-		     m_RightLegIndexInVRML,m_RightLegIndexinConfiguration);
+		     m_RightLegIndexinConfiguration);
   FromRootToJoint.clear();
   FromRootToJoint = LeftFoot->associatedAnkle()->jointsFromRootToThis();
   FromRootToJoint.erase(FromRootToJoint.begin());
   InitializationMaps(FromRootToJoint,ActuatedJoints,
-		     m_LeftLegIndexInVRML,m_LeftLegIndexinConfiguration);
+		     m_LeftLegIndexinConfiguration);
 
   // Create maps for the left hand.
   InitializeMapsForAHand(getHumanoidDynamicRobot()->leftHand(),
 			 ActuatedJoints,
-			 m_LeftArmIndexInVRML, m_LeftArmIndexinConfiguration,
+			 m_LeftArmIndexinConfiguration,
 			 m_LeftShoulder);
   
   // Create maps for the right hand.
   InitializeMapsForAHand(getHumanoidDynamicRobot()->rightHand(),
 			 ActuatedJoints,
-			 m_RightArmIndexInVRML, m_RightArmIndexinConfiguration,
+			 m_RightArmIndexinConfiguration,
 			 m_RightShoulder);
   
   FromRootToJoint.clear();
@@ -311,12 +299,6 @@ Initialization()
 
   
   ODEBUG("RightLegIndex: "
-	 << m_RightLegIndexInVRML[0] << " "
-	 << m_RightLegIndexInVRML[1] << " "
-	 << m_RightLegIndexInVRML[2] << " "
-	 << m_RightLegIndexInVRML[3] << " "
-	 << m_RightLegIndexInVRML[4] << " "
-	 << m_RightLegIndexInVRML[5] << " "
 	 << m_RightLegIndexinConfiguration[0] << " "
 	 << m_RightLegIndexinConfiguration[1] << " "
 	 << m_RightLegIndexinConfiguration[2] << " "
@@ -324,12 +306,6 @@ Initialization()
 	 << m_RightLegIndexinConfiguration[4] << " "
 	 << m_RightLegIndexinConfiguration[5] );
   ODEBUG("LeftLegIndex: "
-	 << m_LeftLegIndexInVRML[0] << " "
-	 << m_LeftLegIndexInVRML[1] << " "
-	 << m_LeftLegIndexInVRML[2] << " "
-	 << m_LeftLegIndexInVRML[3] << " "
-	 << m_LeftLegIndexInVRML[4] << " "
-	 << m_LeftLegIndexInVRML[5] << " "
 	 << m_LeftLegIndexinConfiguration[0] << " "
 	 << m_LeftLegIndexinConfiguration[1] << " "
 	 << m_LeftLegIndexinConfiguration[2] << " "
