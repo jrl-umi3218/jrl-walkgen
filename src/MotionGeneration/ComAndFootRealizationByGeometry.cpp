@@ -149,7 +149,8 @@ InitializeMapsForAHand(CjrlHand * aHand,
   std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint;
   FromRootToJoint.clear();
   FromRootToJoint2.clear();
-  FromRootToJoint = associatedWrist->jointsFromRootToThis();
+  CjrlJoint *waist = getHumanoidDynamicRobot()->waist();
+  FromRootToJoint = getHumanoidDynamicRobot()->jointsBetween(*waist, *associatedWrist);
 
   std::vector<CjrlJoint *>::iterator itJoint = FromRootToJoint.begin();
   bool startadding=false;
@@ -254,11 +255,13 @@ Initialization()
   // to the VRML ID.
   ODEBUG("Enter 5.0 ");
   // Extract the indexes of the Right leg.
+  CjrlJoint *waist = getHumanoidDynamicRobot()->waist();
   
   if (RightFoot->associatedAnkle()==0)
     LTHROW("No right ankle");
+
   std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint = 
-    RightFoot->associatedAnkle()->jointsFromRootToThis();
+    getHumanoidDynamicRobot()->jointsBetween(*waist, *(RightFoot->associatedAnkle()));
   std::vector<CjrlJoint *> ActuatedJoints = 
     getHumanoidDynamicRobot()->getActuatedJoints();
   ODEBUG4("Size of ActuatedJoints"<<ActuatedJoints.size(),"DebugDataStartingCOM.dat");
@@ -276,7 +279,9 @@ Initialization()
   InitializationMaps(FromRootToJoint,ActuatedJoints,
 		     m_RightLegIndexinConfiguration);
   FromRootToJoint.clear();
-  FromRootToJoint = LeftFoot->associatedAnkle()->jointsFromRootToThis();
+  FromRootToJoint = 
+    getHumanoidDynamicRobot()->jointsBetween(*waist, *(LeftFoot->associatedAnkle()));
+
   FromRootToJoint.erase(FromRootToJoint.begin());
   InitializationMaps(FromRootToJoint,ActuatedJoints,
 		     m_LeftLegIndexinConfiguration);
