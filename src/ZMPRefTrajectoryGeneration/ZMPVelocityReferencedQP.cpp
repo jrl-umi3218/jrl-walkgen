@@ -837,10 +837,21 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 
 void ZMPVelocityReferencedQP::InterpretSolution(vector<double> &solFoot)
 {
-	double PosFootX(0),PosFootY(0),Vx(0),Vy(0),cosTheta(0),sinTheta(0),Sign(0);
-	int nbSteps (0);
+	double PosFootX=0; double Vx=0; double cosTheta(0); double Dx=0;
+	double PosFootY=0; double Vy=0; double sinTheta(0); double Dy=0;
+	int nbSteps=0; int Sign=0;
 
 	support_state_t & LastSupport = solution_.SupportStates_deq.back() ;
+	int index = 0 ;
+	for (unsigned int i = 0 ; i < solution_.SupportStates_deq.size() ; ++i)
+	{
+		if ( solution_.SupportStates_deq[i].StateChanged )
+		{
+			index = i ;
+			break ;
+		}
+	}
+	support_state_t & BeforeLastSupport = solution_.SupportStates_deq[index] ;
 	support_state_t & FirstSupport = solution_.SupportStates_deq.front() ;
 	nbSteps = LastSupport.StepNumber ;
 	Vx = VelRef_.Local.X ;
@@ -870,9 +881,20 @@ void ZMPVelocityReferencedQP::InterpretSolution(vector<double> &solFoot)
 			Sign = -1.0 ;
 		if(LastSupport.Phase == SS && FirstSupport.Phase == DS )
 			Sign = -Sign ;
+
+		if( (Vx*Vx + Vy*Vy) < 0.001)
+		{
+			PosFootX = solution_.Solution_vec[2*QP_N_ + nbSteps -1]   - BeforeLastSupport.X - Sign * sin(LastSupport.Yaw) * FeetDistance_ ;
+			PosFootY = solution_.Solution_vec[2*QP_N_ + 2*nbSteps -1] - BeforeLastSupport.Y + Sign * cos(LastSupport.Yaw) * FeetDistance_ ;
+		}
+		else
+		{
+			PosFootX = (Vx * StepPeriod_ + Sign * sin(LastSupport.Yaw) * FeetDistance_ + solution_.Solution_vec[2*QP_N_ + nbSteps -1]) ;
+			PosFootY = (Vy * StepPeriod_ - Sign * cos(LastSupport.Yaw) * FeetDistance_ + solution_.Solution_vec[2*QP_N_ + 2*nbSteps -1]) ;
+		}
+
 		// compute the next foot step
-		PosFootX = (Vx * StepPeriod_ + Sign * sin(LastSupport.Yaw) * FeetDistance_ + solution_.Solution_vec[2*QP_N_ + nbSteps -1]) ;
-		PosFootY = (Vy * StepPeriod_ - Sign * cos(LastSupport.Yaw) * FeetDistance_ + solution_.Solution_vec[2*QP_N_ + 2*nbSteps -1]) ;
+
 		cout << "PosFootX = "<< PosFootX << " " << "PosFootY = "<< PosFootY ;
 		cout << endl ;
 		//ProjectionOnConstraints(PosFootX,PosFootY);
@@ -1028,14 +1050,14 @@ void ZMPVelocityReferencedQP::ProjectionOnConstraints(double & X, double & Y)
 void ZMPVelocityReferencedQP::PrepareSolution(int iteration, const vector<double> &solFoot)
 {
 	static int nbStepChanged = 0 ;
-	int nbSteps (0);
+	int nbSteps = 0 ;
 	nbSteps = solution_.SupportStates_deq.back().StepNumber ;
 
 	if (iteration > 0)
 	{
 		nbStepChanged = nbStepChanged + (int)(solution_.SupportStates_deq.front().StateChanged) ;
 	}
-	if (iteration == 0)
+	if (iteration == 0 || solution_.SupportStates_deq.front().Phase == DS )
 	{
 		nbStepChanged = 0 ;
 	}
@@ -1055,6 +1077,7 @@ void ZMPVelocityReferencedQP::PrepareSolution(int iteration, const vector<double
 		solution_.Solution_vec[2*QP_N_] = solFoot[nbSteps-1] ;
 		solution_.Solution_vec[2*QP_N_+nbSteps] = solFoot[2*nbSteps] ;
 	}else{/*do nothing*/}
+
 
 	if (solution_.SupportStates_deq.front().Foot == LEFT)
 			cout << "footsupport = LEFT" ;
