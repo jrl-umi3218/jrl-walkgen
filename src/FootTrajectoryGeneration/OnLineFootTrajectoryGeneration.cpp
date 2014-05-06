@@ -20,7 +20,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* This object generate all the values for the foot trajectories, */
@@ -65,7 +65,7 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
   const FootAbsolutePosition & prev_NSFAP = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1];
 
   // The foot support does not move.
-  SupportFootAbsolutePositions[CurrentAbsoluteIndex] = 
+  SupportFootAbsolutePositions[CurrentAbsoluteIndex] =
       SupportFootAbsolutePositions[StartIndex-1];
   SupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = (-1)*StepType;
 
@@ -99,7 +99,7 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
       if(m_PolynomeTheta->Degree() > 4)
         curr_NSFAP.ddtheta = m_PolynomeTheta->ComputeSecDerivative(remainingTime);
     }
-  else 
+  else
     {
       // DO MODIFY x, y and theta all the time.
       // x, dx
@@ -119,13 +119,23 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
         curr_NSFAP.ddtheta = m_PolynomeTheta->ComputeSecDerivative(InterpolationTime);
     }
 
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = 
-      m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime);  
+  if (m_isStepStairOn == 1)
+  {
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z =
+      m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime);
       //m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = 
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
       m_BsplinesZ->ZComputeVelocity(LocalInterpolationStartTime+InterpolationTime);
      // m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
+  }
 
+  else{
+    NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z =
+      m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
+    NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
+      m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
+
+  }
   bool ProtectionNeeded=false;
 
   // Treat Omega with the following strategy:
@@ -148,7 +158,7 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
           NoneSupportFootAbsolutePositions[StartIndex-1].omega2;
     }
   // Realize the landing.
-  else 
+  else
     {
       curr_NSFAP.omega =
           m_PolynomeOmega->Compute(LocalInterpolationStartTime+InterpolationTime - StartLanding) +
@@ -167,7 +177,7 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
   {
     // Make sure the foot is not going inside the floor.
     double dX=0,Z1=0,Z2=0,X1=0,X2=0;
-    double B=m_FootB,H=m_FootH,F=m_FootF; 
+    double B=m_FootB,H=m_FootH,F=m_FootF;
 
     if (lOmega<0)
       {
