@@ -41,6 +41,7 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   m_PolynomeX = 0;
   m_PolynomeY = 0;
   m_PolynomeZ = 0;
+  m_BsplinesZ = 0;
   m_PolynomeOmega = 0;
   m_PolynomeOmega2 = 0;
   m_PolynomeTheta = 0;
@@ -103,6 +104,9 @@ FootTrajectoryGenerationStandard::~FootTrajectoryGenerationStandard()
   if (m_PolynomeZ!=0)
     delete m_PolynomeZ;
 
+  if (m_BsplinesZ!=0)
+    delete m_BsplinesZ;
+
   if (m_PolynomeOmega!=0)
     delete m_PolynomeOmega;
 
@@ -120,6 +124,7 @@ void FootTrajectoryGenerationStandard::InitializeInternalDataStructures()
   m_PolynomeX = new Polynome5(0,0);
   m_PolynomeY = new Polynome5(0,0);
   m_PolynomeZ = new Polynome4(0,0);
+  m_BsplinesZ = new ZBsplines(0,0,0,0);
   m_PolynomeOmega = new Polynome3(0,0);
   m_PolynomeOmega2 = new Polynome3(0,0);
   m_PolynomeTheta = new Polynome3(0,0);  
@@ -135,6 +140,9 @@ void FootTrajectoryGenerationStandard::FreeInternalDataStructures()
 
   if (m_PolynomeZ!=0)
     delete m_PolynomeZ;
+
+  if (m_BsplinesZ!=0)
+    delete m_BsplinesZ;
 
   if (m_PolynomeOmega!=0)
     delete m_PolynomeOmega;
@@ -164,6 +172,7 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex,
 
    case Z_AXIS:
      m_PolynomeZ->SetParameters(TimeInterval,Position);
+     m_BsplinesZ->SetParameters(TimeInterval,Position/1.5,TimeInterval/3.0,Position);
      break;
 
    case THETA_AXIS:
@@ -205,6 +214,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
 
    case Z_AXIS:
      m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_BsplinesZ->SetParameters(TimeInterval,FinalPosition/1.5,TimeInterval/3.0,FinalPosition);
      break;
 
    case THETA_AXIS:
@@ -242,6 +252,7 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
 
    case Z_AXIS:
      m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_BsplinesZ->SetParameters(TimeInterval,FinalPosition/1.5,TimeInterval/3.0,FinalPosition);
      break;
 
    case THETA_AXIS:
@@ -283,6 +294,7 @@ int FootTrajectoryGenerationStandard::GetParametersWithInitPosInitSpeed(int Poly
 
    case Z_AXIS:
      m_PolynomeZ->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_BsplinesZ->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
      break;
 
    case THETA_AXIS:
@@ -316,9 +328,12 @@ double FootTrajectoryGenerationStandard::ComputeAll(FootAbsolutePosition & aFoot
   aFootAbsolutePosition.dy = m_PolynomeY->ComputeDerivative(Time);
   //  aFootAbsolutePosition.ddy = m_PolynomeY->ComputeSecDerivative(Time);
 
-  aFootAbsolutePosition.z = m_PolynomeZ->Compute(Time);
-  aFootAbsolutePosition.dz = m_PolynomeZ->ComputeDerivative(Time);
+  //aFootAbsolutePosition.z = m_PolynomeZ->Compute(Time);
+  //aFootAbsolutePosition.dz = m_PolynomeZ->ComputeDerivative(Time);
   //  aFootAbsolutePosition.ddz = m_PolynomeZ->ComputeSecDerivative(Time);
+
+  aFootAbsolutePosition.z = m_BsplinesZ->ZComputePosition(Time);
+  aFootAbsolutePosition.dz = m_BsplinesZ->ZComputeVelocity(Time);
 
   aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(Time);
   aFootAbsolutePosition.dtheta = m_PolynomeTheta->ComputeDerivative(Time);
@@ -348,7 +363,8 @@ double FootTrajectoryGenerationStandard::Compute(unsigned int PolynomeIndex, dou
      break;
 
    case Z_AXIS:
-     r=m_PolynomeZ->Compute(Time);
+     //r=m_PolynomeZ->Compute(Time);
+     r=m_BsplinesZ->ZComputePosition(Time);
      break;
 
    case THETA_AXIS:
@@ -386,7 +402,8 @@ double FootTrajectoryGenerationStandard::ComputeSecDerivative(unsigned int Polyn
      break;
 
    case Z_AXIS:
-     r=m_PolynomeZ->ComputeSecDerivative(Time);
+     //r=m_PolynomeZ->ComputeSecDerivative(Time);
+     r=m_BsplinesZ->ZComputeVelocity(Time);
      break;
 
    case THETA_AXIS:
@@ -455,7 +472,8 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
       curr_NSFAP.theta = init_NSFAP.theta + m_PolynomeTheta->Compute(ModulatedSingleSupportTime);
     }
 
-  curr_NSFAP.z = init_NSFAP.z + m_PolynomeZ->Compute(LocalTime);
+  //curr_NSFAP.z = init_NSFAP.z + m_PolynomeZ->Compute(LocalTime);
+  curr_NSFAP.z = init_NSFAP.z + m_BsplinesZ->ZComputePosition(LocalTime);
   ODEBUG2("x:" << curr_NSFAP.x << " LocalTime - EndOfLiftOff" << LocalTime - EndOfLiftOff
           << " " << m_PolynomeX->Compute(LocalTime - EndOfLiftOff));
   //  m_PolynomeX->print();
@@ -656,10 +674,12 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
     }
 
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = 
-    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+    //m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+    m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime);
     //m_AnklePositionRight[2];
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = 
-    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+    //m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+    m_BsplinesZ->ZComputeVelocity(LocalInterpolationStartTime+InterpolationTime); 
     //m_AnklePositionRight[2];
   
   bool ProtectionNeeded=false;

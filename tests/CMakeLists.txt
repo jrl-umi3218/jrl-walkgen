@@ -52,6 +52,15 @@ ADD_EXECUTABLE(TestOptCholesky
 )
 
 #########################
+# Test Bspline #
+#########################
+MESSAGE(STATUS "Bspline taken into account")
+ADD_EXECUTABLE(TestBsplines
+  TestBsplines.cpp
+  ../src/Mathematics/Bsplines.cpp
+  )
+
+#########################
 # Test Ricatti Equation #
 #########################
 ADD_EXECUTABLE(TestRiccatiEquation

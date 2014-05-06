@@ -34,7 +34,7 @@
 
 #include <FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.hh>
 #include <Mathematics/PolynomeFoot.hh>
-
+#include <Mathematics/Bsplines.hh>
 namespace PatternGeneratorJRL
 {
 
@@ -208,6 +208,9 @@ namespace PatternGeneratorJRL
    /*! \brief Polynome for Z axis position. */
    Polynome4 *m_PolynomeZ;
 
+   /*! \brief Bsplines for Z axis position. */
+   ZBsplines *m_BsplinesZ;
+
    /*! \brief Foot dimension. */
    double m_FootB, m_FootH, m_FootF;
 
@@ -216,8 +219,6 @@ namespace PatternGeneratorJRL
 
    /*! \brief Position of the ankle in the right foot. */
    MAL_S3_VECTOR(m_AnklePositionRight,double);
-
-   
 
   };
   

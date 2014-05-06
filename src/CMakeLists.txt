@@ -40,6 +40,7 @@ SET(SOURCES
 #  Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
   Mathematics/FootHalfSize.cpp
   Mathematics/OptCholesky.cpp
+  Mathematics/Bsplines.cpp
   Mathematics/Polynome.cpp
   Mathematics/PolynomeFoot.cpp
   Mathematics/PLDPSolver.cpp

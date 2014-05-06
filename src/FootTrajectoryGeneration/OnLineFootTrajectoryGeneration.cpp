@@ -120,9 +120,11 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
     }
 
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = 
-      m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
+      m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime);  
+      //m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = 
-      m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
+      m_BsplinesZ->ZComputeVelocity(LocalInterpolationStartTime+InterpolationTime);
+     // m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
 
   bool ProtectionNeeded=false;
 

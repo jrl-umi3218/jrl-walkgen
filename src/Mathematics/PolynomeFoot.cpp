@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2006, 2007, 2008, 2009, 2010,
  *
  * Olivier    Stasse
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* Polynomes object for generating foot trajectories. */
@@ -27,11 +27,13 @@
 
 #include <Debug.hh>
 #include <Mathematics/PolynomeFoot.hh>
+//#include <Mathematics/Bsplines.hh>
 
 
 
 using namespace::std;
 using namespace::PatternGeneratorJRL;
+
 
 Polynome3::Polynome3(double FT, double FP) :Polynome(3)
 {
@@ -156,14 +158,14 @@ void Polynome4::GetParametersWithInitPosInitSpeed(double &FT,
 }
 Polynome4::~Polynome4()
 {}
-Polynome5::Polynome5(double FT, double FP) 
+Polynome5::Polynome5(double FT, double FP)
   :Polynome(5),
    FT_(FT),
    FP_(FP),
    InitPos_(0.0),
    InitSpeed_(0.0),
    InitAcc_(0.0)
-   
+
 {
   SetParameters(FT,FP);
 }
@@ -283,6 +285,6 @@ void Polynome6::SetParameters(
 }
 
 Polynome6::~Polynome6()
-{  
+{
 }
 
