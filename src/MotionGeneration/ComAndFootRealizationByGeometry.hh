@@ -245,6 +245,20 @@ namespace PatternGeneratorJRL
     */
     MAL_S4x4_MATRIX_TYPE(double) GetCurrentPositionofWaistInCOMFrame();
 
+		/*! \brief Getter and setter for the previous configurations and velocities */
+		inline void SetPreviousConfigurationStage0(MAL_VECTOR_TYPE(double) & prev_Configuration)
+		{ m_prev_Configuration = prev_Configuration ;};
+
+		inline void SetPreviousConfigurationStage1(MAL_VECTOR_TYPE(double) & prev_Configuration1)
+		{ m_prev_Configuration1 = prev_Configuration1 ;};
+
+		inline void SetPreviousVelocityStage0(MAL_VECTOR_TYPE(double) & prev_Velocity)
+		{ m_prev_Velocity = prev_Velocity ;};
+
+		inline void SetPreviousVelocityStage1(MAL_VECTOR_TYPE(double) & prev_Velocity1)
+		{ m_prev_Velocity1 = prev_Velocity1 ;};
+
+
     /*! \brief Get the COG of the ankles at the starting position. */
     virtual MAL_S3_VECTOR_TYPE(double) GetCOGInitialAnkles();
 

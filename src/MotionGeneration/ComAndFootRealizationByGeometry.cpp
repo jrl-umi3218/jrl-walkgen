@@ -1039,29 +1039,29 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) & aCoMPosition,
   if (Stage==0)
     {
       if (IterationNumber>0)
-	{
-	  /* Compute the speed */
-	  for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
-	    {
-	      CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration[i])/ ldt;
-	      /* Keep the new value for the legs. */
-	    }
+			{
+				/* Compute the speed */
+				for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
+					{
+						CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration[i])/ ldt;
+						/* Keep the new value for the legs. */
+					}
 
-	  if (IterationNumber>1)
-	    {
-	      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity);i++)
-		CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity[i])/ ldt;
-	    }
-	}
+				if (IterationNumber>1)
+					{
+						for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity);i++)
+							CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity[i])/ ldt;
+					}
+			}
       else
-	{
-	  /* Compute the speed */
-	  for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentVelocity);i++)
-	    {
-	      CurrentVelocity[i] = 0.0;
-	      /* Keep the new value for the legs. */
-	    }
-	}
+			{
+				/* Compute the speed */
+				for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentVelocity);i++)
+					{
+						CurrentVelocity[i] = 0.0;
+						/* Keep the new value for the legs. */
+					}
+			}
 
       ODEBUG4(CurrentVelocity, "DebugDataVelocity0.dat");
       m_prev_Configuration = CurrentConfiguration;
@@ -1071,28 +1071,28 @@ ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) & aCoMPosition,
     {
       ODEBUG("lql: "<<lql<< " lqr: " <<lqr);
       if (IterationNumber>0)
-	{
-	  /* Compute the speed */
-	  for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
-	    {
-	      CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration1[i])/ getSamplingPeriod();
-	      /* Keep the new value for the legs. */
-	    }
-	  if (IterationNumber>1)
-	    {
-	      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity1);i++)
-		CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity1[i])/ ldt;
-	    }
-	}
+			{
+				/* Compute the speed */
+				for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
+					{
+						CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration1[i])/ getSamplingPeriod();
+						/* Keep the new value for the legs. */
+					}
+				if (IterationNumber>1)
+					{
+						for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity1);i++)
+							CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity1[i])/ ldt;
+					}
+			}
       else
-	{
-	  /* Compute the speed */
-	  for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
-	    {
-	      CurrentVelocity[i] = 0.0;
-	      /* Keep the new value for the legs. */
-	    }
-	}
+			{
+				/* Compute the speed */
+				for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
+					{
+						CurrentVelocity[i] = 0.0;
+						/* Keep the new value for the legs. */
+					}
+			}
       ODEBUG4(CurrentVelocity, "DebugDataVelocity1.dat");
       m_prev_Configuration1 = CurrentConfiguration;
       m_prev_Velocity1 = CurrentVelocity;

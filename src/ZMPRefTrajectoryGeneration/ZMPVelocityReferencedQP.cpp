@@ -86,7 +86,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   QP_T_ = 0.1 ;
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
-  InterpolationPeriod_ = QP_T_/20;
+  InterpolationPeriod_ = QP_T_/2;
   StepPeriod_ = 0.8 ;
   SSPeriod_ = 0.7 ;
   DSPeriod_ = 0.1 ;
@@ -186,11 +186,11 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 
   // Create and initialize the class that compute the simplify inverse kinematics :
   // ------------------------------------------------------------------------------
-  ComAndFootRealization_ = new ComAndFootRealizationByGeometry( (PatternGeneratorInterfacePrivate*) SPM );
-  ComAndFootRealization_->setHumanoidDynamicRobot(aHS);
-  ComAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);// seems weird...
-  ComAndFootRealization_->setSamplingPeriod(InterpolationPeriod_);
-  ComAndFootRealization_->Initialization();
+  ComAndFootRealizationByGeometry_ = new ComAndFootRealizationByGeometry( (PatternGeneratorInterfacePrivate*) SPM );
+  ComAndFootRealizationByGeometry_->setHumanoidDynamicRobot(aHS);
+  ComAndFootRealizationByGeometry_->SetHeightOfTheCoM(CoMHeight_);// seems weird...
+  ComAndFootRealizationByGeometry_->setSamplingPeriod(InterpolationPeriod_);
+  ComAndFootRealizationByGeometry_->Initialization();
 
   // Register method to handle
   const unsigned int NbMethods = 3;
@@ -239,6 +239,9 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 
   ComStateBuffer_.resize(NbSampleControl_);
 
+
+	m_Jacobian_LF = Jacobian_LF::Jacobian::Zero();
+	m_Jacobian_RF = Jacobian_RF::Jacobian::Zero();
   Once_ = true ;
   DInitX_ = 0 ;
   DInitY_ = 0 ;
@@ -290,9 +293,9 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
     IntermedData_ = 0 ;
   }
 
-  if (ComAndFootRealization_!=0){
-    delete ComAndFootRealization_;
-    ComAndFootRealization_ = 0 ;
+  if (ComAndFootRealizationByGeometry_!=0){
+    delete ComAndFootRealizationByGeometry_;
+    ComAndFootRealizationByGeometry_ = 0 ;
   }
 
 }
@@ -503,7 +506,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
     VelRef_=NewVelRef_;
     SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
     IntermedData_->Reference( VelRef_ );
-    IntermedData_->CoM( LIPM_() );
+    IntermedData_->CoM( LIPM_.getState() );
 
     // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
     // ----------------------------------------------------
@@ -565,8 +568,12 @@ ZMPVelocityReferencedQP::OnLine(double time,
     FinalZMPTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
     FinalCOMTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
 
+		// INTERPRET THE SOLUTION VECTOR :
+		// -------------------------------
+		InterpretSolutionVector();
+
     static int iteration = 0;
-    if (iteration == 11){
+    if (iteration >= 11){
       iteration = 11;
     }
 
@@ -574,6 +581,16 @@ ZMPVelocityReferencedQP::OnLine(double time,
     ControlInterpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, FinalLeftFootTraj_deq,
                           FinalRightFootTraj_deq, time) ;
     DynamicFilterInterpolation( time) ;
+
+		cout << "FinalCOMTraj_deq(0.05) = \n"
+		<< FinalCOMTraj_deq[CurrentIndex_+9].x[0] << " " << FinalCOMTraj_deq[CurrentIndex_+9].y[0] << " " << FinalCOMTraj_deq[CurrentIndex_+9].z[0] <<  endl
+		<< FinalCOMTraj_deq[CurrentIndex_+9].x[1] << " " << FinalCOMTraj_deq[CurrentIndex_+9].y[1] << " " << FinalCOMTraj_deq[CurrentIndex_+9].z[1] <<  endl
+		<< FinalCOMTraj_deq[CurrentIndex_+9].x[2] << " " << FinalCOMTraj_deq[CurrentIndex_+9].y[2] << " " << FinalCOMTraj_deq[CurrentIndex_+9].z[2] <<  endl;
+
+		cout << "COMTraj_deq_(0.05) = \n"
+		<< COMTraj_deq_[CurrentIndex_].x[0] << " " << COMTraj_deq_[CurrentIndex_].y[0] << " " << COMTraj_deq_[CurrentIndex_].z[0] <<  endl
+		<< COMTraj_deq_[CurrentIndex_].x[1] << " " << COMTraj_deq_[CurrentIndex_].y[1] << " " << COMTraj_deq_[CurrentIndex_].z[1] <<  endl
+		<< COMTraj_deq_[CurrentIndex_].x[2] << " " << COMTraj_deq_[CurrentIndex_].y[2] << " " << COMTraj_deq_[CurrentIndex_].z[2] <<  endl;
 
     // DYNAMIC FILTER
     // --------------
@@ -604,7 +621,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
   aof.setf(ios::scientific, ios::floatfield);
   for (unsigned int i = 0 ; i < NbSampleInterpolation_ * QP_N_ ; ++i )
   {
-    aof << filterprecision( COMTraj_deq_[/*CurrentIndex_+*/i].x[0] ) << " "         // 1
+    aof << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[0] ) << " "         // 1
         << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[0] ) << " "         // 2
         << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[0] ) << " "         // 3
         << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[1] ) << " "         // 4
@@ -760,27 +777,31 @@ void ZMPVelocityReferencedQP::ControlInterpolation(
 		      double time)                                                  // INPUT
 {
   InitStateLIPM_ = LIPM_.GetState() ;
+  cout << "InitStateLIPM_ = \n"
+  << InitStateLIPM_.x[0] << " " << InitStateLIPM_.y[0] << " " << InitStateLIPM_.z[0] <<  endl
+  << InitStateLIPM_.x[1] << " " << InitStateLIPM_.y[1] << " " << InitStateLIPM_.z[1] <<  endl
+  << InitStateLIPM_.x[2] << " " << InitStateLIPM_.y[2] << " " << InitStateLIPM_.z[2] <<  endl;
   InitStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
 
   // INTERPOLATE CoM AND ZMP TRAJECTORIES:
   // -------------------------------------
   CoMZMPInterpolation(FinalZMPTraj_deq, FinalCOMTraj_deq,
       FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
-      &solution_, &LIPM_, NbSampleControl_, 0);
+      &Solution_, &LIPM_, NbSampleControl_, 0);
 
   // INTERPOLATE TRUNK ORIENTATION:
   // ------------------------------
   InitStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
   OrientPrw_->interpolate_trunk_orientation( time, CurrentIndex_,
-        m_SamplingPeriod, solution_.SupportStates_deq,
+        m_SamplingPeriod, Solution_.SupportStates_deq,
         FinalCOMTraj_deq );
   FinalCurrentStateOrientPrw_ = OrientPrw_->CurrentTrunkState();
   FinalPreviewStateOrientPrw_ = OrientPrw_->PreviewTrunkState();
   // INTERPOLATE THE COMPUTED FOOT POSITIONS:
   // ----------------------------------------
   OFTG_control_->interpolate_feet_positions( time,
-          solution_.SupportStates_deq, solution_,
-          solution_.SupportOrientations_deq,
+          Solution_.SupportStates_deq, Solution_,
+          Solution_.SupportOrientations_deq,
           FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
   return ;
 }
@@ -791,15 +812,15 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 	vector<double> solFoot;
   LIPM_subsampled_.setState(InitStateLIPM_) ;
   OrientPrw_DF_->CurrentTrunkState(InitStateOrientPrw_) ;
-	InterpretSolution(solFoot);
   for ( int i = 0 ; i < QP_N_ ; i++ )
   {
     CoMZMPInterpolation(ZMPTraj_deq_, COMTraj_deq_,
       LeftFootTraj_deq_, RightFootTraj_deq_,
-      &solution_, &LIPM_subsampled_,
+      &Solution_, &LIPM_subsampled_,
       NbSampleInterpolation_, i);
   }
 
+	InterpretSolution(solFoot);
 	// Copy the solution for the orientation interpolation function
 	OFTG_DF_->SetSamplingPeriod( InterpolationPeriod_ );
   solution_t aSolution  = solution_ ;
@@ -837,75 +858,63 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 
 void ZMPVelocityReferencedQP::InterpretSolution(vector<double> &solFoot)
 {
-	double PosFootX=0; double Vx=0; double cosTheta(0); double Dx=0;
-	double PosFootY=0; double Vy=0; double sinTheta(0); double Dy=0;
-	int nbSteps=0; int Sign=0;
-
-	support_state_t & LastSupport = solution_.SupportStates_deq.back() ;
-	int index = 0 ;
+	double PosFootX=0;
+  double PosFootY=0;
+	support_state_t & CurrentSupport = solution_.SupportStates_deq.front() ;
+  support_state_t & LastSupport = solution_.SupportStates_deq.back() ;
+  int nbSteps = LastSupport.StepNumber ;
+	const double & LastPrwSupState_X = solution_.Solution_vec[2*QP_N_ + nbSteps   -1] ;
+	const double & LastPrwSupState_Y = solution_.Solution_vec[2*QP_N_ + 2*nbSteps -1] ;
+	vector<int> index ;
 	for (unsigned int i = 0 ; i < solution_.SupportStates_deq.size() ; ++i)
 	{
 		if ( solution_.SupportStates_deq[i].StateChanged )
+			index.push_back(i-1) ;
+		if ( !(solution_.SupportStates_deq[i].NbStepsLeft > 0 && nbSteps > 0) )
 		{
-			index = i ;
-			break ;
+			solution_.SupportStates_deq[i].X = CurrentSupport.X ;
+			solution_.SupportStates_deq[i].Y = CurrentSupport.Y ;
 		}
 	}
-	support_state_t & BeforeLastSupport = solution_.SupportStates_deq[index] ;
-	support_state_t & FirstSupport = solution_.SupportStates_deq.front() ;
-	nbSteps = LastSupport.StepNumber ;
-	Vx = VelRef_.Local.X ;
-	Vy = VelRef_.Local.Y ;
-	cosTheta = cos(LastSupport.Yaw) ;
-	sinTheta = sin(LastSupport.Yaw) ;
-	cout << "velref X=" << VelRef_.Local.X << " Y=" << VelRef_.Local.Y<< " Yaw=" << VelRef_.Local.Yaw << " Lastfoot.yaw="<< LastSupport.Yaw <<endl ;
-	static int tour (0);
-	if ( tour == 58 )
-	{
-		tour = 58 ;
-	}
-	tour++;
 
-	if (LastSupport.Phase == DS)
+	static int patate_flambee = 0 ;
+	if ( patate_flambee == 26 )
+		cout << "etape 26\n" ;
+	patate_flambee++;
+
+	solFoot.resize ((nbSteps+1)*2,0.0);
+	if ( (CurrentSupport.Phase == DS && LastSupport.Phase == DS)
+		|| (CurrentSupport.Phase == SS && LastSupport.Phase == DS) )
 	{
 		PosFootX = LastSupport.X ;
 		PosFootY = LastSupport.Y ;
 		cout << "PosFootX = "<< PosFootX << " " << "PosFootY = "<< PosFootY ;
 		cout << endl ;
-	}
-	else
-	{
-		if(FirstSupport.Foot == LEFT )
-			Sign = 1.0 ;
-		else
-			Sign = -1.0 ;
-		if(LastSupport.Phase == SS && FirstSupport.Phase == DS )
-			Sign = -Sign ;
-
-		if( (Vx*Vx + Vy*Vy) < 0.001)
-		{
-			PosFootX = solution_.Solution_vec[2*QP_N_ + nbSteps -1]   - BeforeLastSupport.X - Sign * sin(LastSupport.Yaw) * FeetDistance_ ;
-			PosFootY = solution_.Solution_vec[2*QP_N_ + 2*nbSteps -1] - BeforeLastSupport.Y + Sign * cos(LastSupport.Yaw) * FeetDistance_ ;
-		}
-		else
-		{
-			PosFootX = (Vx * StepPeriod_ + Sign * sin(LastSupport.Yaw) * FeetDistance_ + solution_.Solution_vec[2*QP_N_ + nbSteps -1]) ;
-			PosFootY = (Vy * StepPeriod_ - Sign * cos(LastSupport.Yaw) * FeetDistance_ + solution_.Solution_vec[2*QP_N_ + 2*nbSteps -1]) ;
-		}
-
-		// compute the next foot step
-
-		cout << "PosFootX = "<< PosFootX << " " << "PosFootY = "<< PosFootY ;
-		cout << endl ;
-		//ProjectionOnConstraints(PosFootX,PosFootY);
+		solFoot[nbSteps] = PosFootX ;
+		solFoot[solFoot.size()-1] = PosFootY ;
+		return ;
 	}
 
-	solFoot.resize ((nbSteps+1)*2,0.0);
 	for (int i = 0 ; i < nbSteps ; ++i )
 	{
 	  solFoot[i] = solution_.Solution_vec[2*QP_N_+i] ;
 	  solFoot[nbSteps+1+i] = solution_.Solution_vec[2*QP_N_+nbSteps+i] ;
 	}
+
+	double Vx = VelRef_.Local.X ;
+	double Vy = VelRef_.Local.Y ;
+	int lastCoMDSIndex = CurrentIndex_+ index.back()*NbSampleInterpolation_ + 2 ;
+	if ( lastCoMDSIndex > (COMTraj_deq_.size()-1) )
+		lastCoMDSIndex = COMTraj_deq_.size()-1 ;
+
+	const COMState & aCOMPos =  COMTraj_deq_[lastCoMDSIndex];
+	PosFootX = LastPrwSupState_X + 2*( (aCOMPos.x[0]+Vx*StepPeriod_) - LastPrwSupState_X );
+	PosFootY = LastPrwSupState_Y + 2*( (aCOMPos.y[0]+Vy*StepPeriod_) - LastPrwSupState_Y );
+
+	cout << "PosFootX = "<< PosFootX << " " << "PosFootY = "<< PosFootY ;
+	cout << endl ;
+	//ProjectionOnConstraints(PosFootX,PosFootY);
+
 	solFoot[nbSteps] = PosFootX ;
 	solFoot[solFoot.size()-1] = PosFootY ;
 
@@ -915,133 +924,6 @@ void ZMPVelocityReferencedQP::InterpretSolution(vector<double> &solFoot)
 	}
 	cout << endl ;
 
-	return ;
-}
-
-void ZMPVelocityReferencedQP::ProjectionOnConstraints(double & X, double & Y)
-{
-	// intialization
-	vector<int> active_set ;
-	boost_ublas::compressed_matrix<double, boost_ublas::row_major> DX ;
-	linear_inequality_t IneqFeet = IntermedData_->Inequalities( INEQ_FEET );
-	int nbSteps(0),Sign(1);
-	double dx(0),dy(0);
-
-	// definition of a fake buffer of support foot to get an appropriate convex hull
-	std::deque<support_state_t> SupportStatesDeq = Solution_.SupportStates_deq ;
-	support_state_t LastSupport = SupportStatesDeq.back() ;
-	support_state_t FirstSupport = SupportStatesDeq.front() ;
-	nbSteps = LastSupport.StepNumber ;
-	if(FirstSupport.Foot == LEFT )
-		Sign = 1.0 ;
-	else
-		Sign = -1.0 ;
-	if(LastSupport.Phase == SS && FirstSupport.Phase == DS )
-		Sign = -Sign ;
-
-	if ( Sign == 1 )
-		LastSupport.Foot = RIGHT ;
-	else
-		LastSupport.Foot = LEFT ;
-	LastSupport.StateChanged = true ;
-	SupportStatesDeq.pop_front();
-	for (unsigned i = 0 ; i < SupportStatesDeq.size() ; ++i)
-	{
-		if ( SupportStatesDeq[i].StateChanged )
-			SupportStatesDeq[i].StateChanged = false ;
-		SupportStatesDeq[i].StepNumber = 1 ;
-	}
-	SupportStatesDeq.push_back(LastSupport);
-
-	// collecting the linear inequalities
-	VRQPGenerator_->build_inequalities_feet(IneqFeet,SupportStatesDeq);
-
-	// transalating the linear inequalities at the appropriate position
-	dx = Sign * sin(LastSupport.Yaw) * FeetDistance_ * 0.5 + solution_.Solution_vec[2*QP_N_ + nbSteps -1] ;
-	dy = Sign * cos(LastSupport.Yaw) * FeetDistance_ * 0.5 + solution_.Solution_vec[2*QP_N_ + 2*nbSteps -1] ;
-
-	// Translation
-	for (unsigned i = 0 ; i < IneqFeet.Dc_vec.size() ; ++ i)
-	{
-		IneqFeet.Dc_vec(i) = IneqFeet.Dc_vec(i) + IneqFeet.D.X_mat(i,0) * dx + IneqFeet.D.Y_mat(i,0) * dy ;
-	}
-
-	cout << " dx dy : " ;
-	cout << dx << " " << dy << endl ;
-
-	// Computing the active set
-	DX = (IneqFeet.D.X_mat * X + IneqFeet.D.Y_mat * Y) ;
-	for (unsigned i = 0 ; i < DX.size1() ; ++ i)
-	{
-		if( (DX(i,0) - IneqFeet.Dc_vec(i)) < 0 )
-		{
-			active_set.push_back(i);
-		}
-	}
-	cout << "active_set.size() = " << active_set.size() << endl ;
-
-	// Projection on the active set if it is not empty
-	if ( active_set.size() == 1 )
-	{
-		double a = IneqFeet.D.X_mat(active_set[0],0);
-		double b = IneqFeet.D.Y_mat(active_set[0],0);
-		double c = IneqFeet.Dc_vec(active_set[0]);
-		double Bx(1),By(1) ;
-		double BH(0),normV(0);
-		if ( a == 0 && b != 0 )
-		{
-			By = c/b ;
-		}else if ( a != 0 && b == 0 )
-		{
-			Bx = c/a ;
-		}else
-		{
-			By = (c-a*Bx) / b ;
-		}
-		normV = sqrt( a*a + b*b );
-		BH = ( (X - Bx)*(-b) + (Y - By)*a ) / normV ;
-
-		X = Bx + BH / normV * (-b) ;
-		Y = By + BH / normV * a ;
-	}else if ( active_set.size() == 2 )
-	{
-		double a1 = IneqFeet.D.X_mat(active_set[0],0);
-		double b1 = IneqFeet.D.Y_mat(active_set[0],0);
-		double c1 = IneqFeet.Dc_vec(active_set[0]);
-		double a2 = IneqFeet.D.X_mat(active_set[1],0);
-		double b2 = IneqFeet.D.Y_mat(active_set[1],0);
-		double c2 = IneqFeet.Dc_vec(active_set[1]);
-
-		if (a1!=0 && b1!=0 && a2==0 && b2!=0)
-		{
-		  Y = c2/b2 ;
-		  X = (c1-b1*Y)/a1 ;
-		}else if (a1==0 && b1!=0 && a2!=0 && b2!=0)
-		{
-		  Y = c1/b1 ;
-			X = (c2-b2*Y)/a2 ;
-		}else if (a1!=0 && b1==0 && a2!=0 && b2!=0)
-		{
-		  X = c1/a1 ;
-		  Y = (c2-a2*X)/b2 ;
-		}else if (a1!=0 && b1!=0 && a2!=0 && b2==0)
-		{
-		  X = c2/a2 ;
-		  Y = (c1-a1*X)/b1 ;
-		}else if (a1!=0 && b1==0 && a2==0 && b2!=0)
-		{
-		  X = c1/a1 ;
-		  Y = c2/b2 ;
-		}else if (a1==0 && b1!=0 && a2!=0 && b2==0)
-		{
-		  X = c2/a2 ;
-		  Y = c1/b1 ;
-		}else if (a1!=0 && b1!=0 && a2!=0 && b2!=0)
-		{
-		  Y = c2/(b1-a1/a2*b2) ;
-		  X = (c2-b2*Y)/a2 ;
-		}
-	}
 	return ;
 }
 
@@ -1084,9 +966,12 @@ void ZMPVelocityReferencedQP::PrepareSolution(int iteration, const vector<double
 		else
 			cout << "footsupport = RIGHT" ;
 	if(solution_.Solution_vec.size()!=0 && solution_.SupportStates_deq.front().Phase != DS && nbSteps > 0 ){
-		 cout << " ; SolX = " << solution_.Solution_vec[2*QP_N_]
-		 << " ; SolY = " << solution_.Solution_vec[2*QP_N_+nbSteps]
-		 << " ; nbSteps = " << solution_.SupportStates_deq.front().StepNumber
+		for (int i = 0 ; i < nbSteps ; ++i )
+		{
+			cout << " ; SolX = " << solution_.Solution_vec[2*QP_N_ + i]
+					 << " ; SolY = " << solution_.Solution_vec[2*QP_N_ + nbSteps + i ];
+		}
+		 cout<< " ; nbSteps = " << solution_.SupportStates_deq.front().StepNumber
 		 <<	" ; nbStepChanged = " << nbStepChanged;
 
 	}else{}
@@ -1100,27 +985,33 @@ void ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & 
   // \brief calculate, from the CoM computed by the preview control,
   //    the corresponding articular position, velocity and acceleration
   // ------------------------------------------------------------------
-  for(unsigned int i = 0 ; i <  N ; i++ ){
-    CallToComAndFootRealization(
-      COMTraj_deq_[CurrentIndex_+i],
-      LeftFootTraj_deq_ [CurrentIndex_+i],
-      RightFootTraj_deq_ [CurrentIndex_+i],
-      ConfigurationTraj_[i],
-      VelocityTraj_[i],
-      AccelerationTraj_[i],
-      i);
-  }
+  CallToComAndFootRealization();
+
   /// \brief Debug Purpose
   /// --------------------
-  ofstream aof,aof2;
-  string aFileName, aFileName2;
+  ofstream aof,aof2,aof3;
+  string aFileName, aFileName2, aFileName3;
   ostringstream oss(std::ostringstream::ate);
   ostringstream oss2(std::ostringstream::ate);
+  ostringstream oss3(std::ostringstream::ate);
   static int iteration = 0;
   int iteration100 = (int)iteration/100;
   int iteration10 = (int)(iteration - iteration100*100)/10;
   int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
-
+	static double Px = 0 ;
+	static double Py = 0 ;
+	static double Pz = 0 ;
+	static double Lx = 0 ;
+	static double Ly = 0 ;
+	static double Lz = 0 ;
+	static double PrvFx = 0 ;
+	static double PrvFy = 0 ;
+	static double PrvFz = 0 ;
+	static double PrvNx = 0 ;
+	static double PrvNy = 0 ;
+	static double PrvNz = 0 ;
+	static double ZMPMP_KajitaX = 0 ;
+	static double ZMPMP_KajitaY = 0 ;
   /// \brief Debug Purpose
   /// --------------------
   oss.str("TestHerdt2010DynamicZMPMB.dat");
@@ -1129,6 +1020,14 @@ void ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & 
   {
     aof.open(aFileName.c_str(),ofstream::out);
     aof.close();
+  }
+
+  oss3.str("TestHerdt2010DynamicJacobian.dat");
+  aFileName3 = oss.str();
+  if (iteration == 0 )
+  {
+    aof3.open(aFileName3.c_str(),ofstream::out);
+    aof3.close();
   }
   for (unsigned int i = 0 ; i < N ; i++ )
   {
@@ -1139,6 +1038,7 @@ void ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & 
       m_dq(j,0) = VelocityTraj_[i](j) ;
       m_ddq(j,0) = AccelerationTraj_[i](j) ;
     }
+
     metapod::rnea< Robot_Model, true >::run(m_robot, m_q, m_dq, m_ddq);
 
     Node & node = boost::fusion::at_c<Robot_Model::BODY>(m_robot.nodes);
@@ -1162,10 +1062,49 @@ void ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & 
 		aof.precision(8);
 		aof.setf(ios::scientific, ios::floatfield);
     if (i<NbSampleInterpolation_){
+//			Px += (m_force.f()[0]+PrvFx)*0.5*InterpolationPeriod_ ;
+//			Py += (m_force.f()[1]+PrvFy)*0.5*InterpolationPeriod_ ;
+//			Pz += (m_force.f()[2]+PrvFz)*0.5*InterpolationPeriod_ ;
+			Px = RobotMass_*COMTraj_deq_[CurrentIndex_+i].x[1] ;
+      Py = RobotMass_*COMTraj_deq_[CurrentIndex_+i].y[1] ;
+			Pz = RobotMass_*COMTraj_deq_[CurrentIndex_+i].z[1] ;
+
+			Lx += (m_force.n()[0]+PrvNx)*0.5*InterpolationPeriod_ ;
+			Ly += (m_force.n()[1]+PrvNy)*0.5*InterpolationPeriod_ ;
+			Lz += (m_force.n()[2]+PrvNz)*0.5*InterpolationPeriod_ ;
+
+			PrvFx = m_force.f()[0] ;
+			PrvFy = m_force.f()[1] ;
+			PrvFz = m_force.f()[2] ;
+
+			PrvNx = m_force.n()[0] ;
+			PrvNy = m_force.n()[1] ;
+			PrvNz = m_force.n()[2] ;
+
+			ZMPMP_KajitaX = (HDR_->mass()*9.81*COMTraj_deq_[CurrentIndex_+i].x[0] - m_force.n()[0])/(HDR_->mass()*9.81+m_force.f()[2]);
+			ZMPMP_KajitaY = (HDR_->mass()*9.81*COMTraj_deq_[CurrentIndex_+i].y[0] + m_force.f()[1])/(HDR_->mass()*9.81+m_force.f()[2]);
+
       aof << filterprecision( ( - m_force.n()[1] / m_force.f()[2] ) + DInitX_ ) << " "   // 1
       << filterprecision( (   m_force.n()[0] / m_force.f()[2] ) + DInitY_ ) << " "   // 2
-      << filterprecision( ZMPTraj_deq_[i].px ) << " "   // 3
-      << filterprecision( ZMPTraj_deq_[i].py ) << " "   // 4
+      << filterprecision( ZMPTraj_deq_[CurrentIndex_+i].px ) << " "   // 3
+      << filterprecision( ZMPTraj_deq_[CurrentIndex_+i].py ) << " "   // 4
+      << filterprecision( Px ) << " "   // 5
+      << filterprecision( Py ) << " "   // 6
+			<< filterprecision( Pz ) << " "   // 7
+			<< filterprecision( Lx ) << " "   // 8
+      << filterprecision( Ly ) << " "   // 9
+			<< filterprecision( Lz ) << " "   // 10
+			<< filterprecision( PrvFx ) << " "   // 11
+			<< filterprecision( PrvFy ) << " "   // 12
+			<< filterprecision( PrvFz ) << " "   // 13
+			<< filterprecision( PrvNx ) << " "   // 14
+			<< filterprecision( PrvNy ) << " "   // 15
+			<< filterprecision( PrvNz ) << " "   // 16
+			<< filterprecision( ZMPMP_KajitaX ) << " "   // 17
+			<< filterprecision( ZMPMP_KajitaY ) << " "   // 18
+			<< filterprecision( COMTraj_deq_[CurrentIndex_+i].x[0] ) << " "  // 19
+			<< filterprecision( COMTraj_deq_[CurrentIndex_+i].y[0] ) << " "  // 20
+			<< filterprecision( COMTraj_deq_[CurrentIndex_+i].z[0] ) << " "  // 21
       << endl ;
     }
 		aof.close();
@@ -1187,9 +1126,7 @@ void ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & 
       << filterprecision( ZMPTraj_deq_[CurrentIndex_+i].py ) << " "   // 4
       << endl ;
 		aof2.close();
-
   }
-
 
   static double ecartmaxX = 0 ;
   static double ecartmaxY = 0 ;
@@ -1252,27 +1189,27 @@ void ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & 
 
   /// \brief Debug Purpose
   /// --------------------
-  oss.str("TestHerdt2010DynamicART");
-  oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
-  aFileName = oss.str();
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.close();
+  if ( iteration == 0 )
+  {
+		oss.str("TestHerdt2010DynamicART.dat");
+		aFileName = oss.str();
+		aof.open(aFileName.c_str(),ofstream::out);
+		aof.close();
+	}
   ///----
+  oss.str("TestHerdt2010DynamicART.dat");
+	aFileName = oss.str();
   aof.open(aFileName.c_str(),ofstream::app);
   aof.precision(8);
   aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < DeltaZMPMBPositions_.size() ; ++i )
+  for (unsigned int i = 0 ; i < NbSampleInterpolation_ ; ++i )
   {
-    aof << filterprecision( DeltaZMPMBPositions_[i].px ) << " "   // 1
-        << filterprecision( DeltaZMPMBPositions_[i].py ) << " ";   // 2
+		for (unsigned int j = 0 ; j < ConfigurationTraj_[i].size() ; ++j)
+      aof << filterprecision(ConfigurationTraj_[i](j)) << " " ;
     for (unsigned int j = 0 ; j < VelocityTraj_[i].size() ; ++j)
-    {
       aof << filterprecision(VelocityTraj_[i](j)) << " " ;
-    }
     for (unsigned int j = 0 ; j < AccelerationTraj_[i].size() ; ++j)
-    {
       aof << filterprecision(AccelerationTraj_[i](j)) << " " ;
-    }
     aof << endl ;
   }
 	cout << "iteration = " << iteration << endl;
@@ -1297,98 +1234,123 @@ void ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & 
         << filterprecision( ComStateBuffer_[i].y[2] ) << " "   // 2
         << endl ;
   }
+	aof.close();
+
+  /// \brief Debug Purpose
+  /// --------------------
+  if ( iteration == 0 ){
+    oss.str("/tmp/walk_herdt.pos");
+    aFileName = oss.str();
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+  ///----
+  oss.str("/tmp/walk_herdt.pos");
+  aFileName = oss.str();
+  aof.open(aFileName.c_str(),ofstream::app);
+  if (!aof.is_open())
+  {cout << "FAIT CH****************************************************\n";}
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+	for (unsigned int j = 0 ; j < NbSampleInterpolation_ ; ++j )
+  {
+		aof << filterprecision( iteration * InterpolationPeriod_ ) << " "  ; // 1
+		for(unsigned int i = 6 ; i < ConfigurationTraj_[j].size() ; i++){
+			aof << filterprecision( ConfigurationTraj_[j](i) ) << " "  ; // 1
+		}
+		for(unsigned int i = 0 ; i < 10 ; i++){
+			aof << 0.0 << " "  ;
+		}
+		aof  << endl ;
+	}
+	aof.close();
+
+
+  if ( iteration == 0 ){
+    oss.str("/tmp/walk_herdt.hip");
+    aFileName = oss.str();
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+  oss.str("/tmp/walk_herdt.hip");
+  aFileName = oss.str();
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for(unsigned int j = 0 ; j < NbSampleInterpolation_ ; j++){
+    aof << filterprecision( iteration * InterpolationPeriod_ ) << " "  ; // 1
+    aof << filterprecision( 0.0 ) << " "  ; // 1
+    aof << filterprecision( 0.0 ) << " "  ; // 1
+    aof << filterprecision( COMTraj_deq_[CurrentIndex_+j].yaw[0] ) << " "  ; // 1
+    aof << endl ;
+  }
+  aof.close();
+
   iteration++;
 
   return ;
 }
 
 
-void ZMPVelocityReferencedQP::CallToComAndFootRealization(
-    const COMState & acomp,
-		const FootAbsolutePosition & aLeftFAP,
-    const FootAbsolutePosition & aRightFAP,
-    MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-    MAL_VECTOR_TYPE(double) & CurrentVelocity,
-    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
-    const unsigned & IterationNumber)
+void ZMPVelocityReferencedQP::CallToComAndFootRealization()
 {
+	const unsigned int N = NbSampleInterpolation_ * QP_N_ ;
+	static int static_i = 0 ;
+	const int stage0 = 0 ;
 
-  // New scheme for WPG v3.0
-  // We call the object in charge of generating the whole body
-  // motion  ( for a given CoM and Feet points)  before applying the second filter.
-  MAL_VECTOR_DIM(aCOMState,double,6);
-  MAL_VECTOR_DIM(aCOMSpeed,double,6);
-  MAL_VECTOR_DIM(aCOMAcc,double,6);
+	PreviousConfiguration_ = HDR_->currentConfiguration();
+	PreviousVelocity_ = HDR_->currentVelocity();
+	PreviousAcceleration_ = HDR_->currentAcceleration();
+	ComAndFootRealizationByGeometry_->SetPreviousConfigurationStage0(PreviousConfiguration_);
+	ComAndFootRealizationByGeometry_->SetPreviousVelocityStage0(PreviousVelocity_);
 
-  aCOMState(0) = acomp.x[0];
-  aCOMState(1) = acomp.y[0];
-  aCOMState(2) = acomp.z[0];
-  aCOMState(3) = acomp.roll[0];
-  aCOMState(4) = acomp.pitch[0];
-  aCOMState(5) = acomp.yaw[0];
-
-  aCOMSpeed(0) = acomp.x[1];
-  aCOMSpeed(1) = acomp.y[1];
-  aCOMSpeed(2) = acomp.z[1];
-  aCOMSpeed(3) = acomp.roll[1];
-  aCOMSpeed(4) = acomp.pitch[1];
-  aCOMSpeed(5) = acomp.yaw[1];
-
-  aCOMAcc(0) = acomp.x[2];
-  aCOMAcc(1) = acomp.y[2];
-  aCOMAcc(2) = acomp.z[2];
-  aCOMAcc(3) = acomp.roll[2];
-  aCOMAcc(4) = acomp.pitch[2];
-  aCOMAcc(5) = acomp.yaw[2];
-
-  MAL_VECTOR_DIM(aLeftFootPosition,double,5);
-  MAL_VECTOR_DIM(aRightFootPosition,double,5);
-
-  aLeftFootPosition(0) = aLeftFAP.x;
-  aLeftFootPosition(1) = aLeftFAP.y;
-  aLeftFootPosition(2) = aLeftFAP.z;
-  aLeftFootPosition(3) = aLeftFAP.theta;
-  aLeftFootPosition(4) = aLeftFAP.omega;
-
-  aRightFootPosition(0) = aRightFAP.x;
-  aRightFootPosition(1) = aRightFAP.y;
-  aRightFootPosition(2) = aRightFAP.z;
-  aRightFootPosition(3) = aRightFAP.theta;
-  aRightFootPosition(4) = aRightFAP.omega;
-
-  if (IterationNumber == 0)
+  for(unsigned int i = 0 ; i <  N ; i++ )
   {
-    CurrentConfiguration = HDR_->currentConfiguration();
-    CurrentVelocity = HDR_->currentConfiguration();
-    CurrentAcceleration = HDR_->currentConfiguration();
-  }else
-  {
-    CurrentConfiguration = PreviousConfiguration_ ;
-    CurrentVelocity = PreviousVelocity_ ;
-    CurrentAcceleration = PreviousAcceleration_ ;
-  }
-  ComAndFootRealization_->setSamplingPeriod(InterpolationPeriod_);
-  ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
-								    aLeftFootPosition,
-								    aRightFootPosition,
-								    CurrentConfiguration,
-								    CurrentVelocity,
-								    CurrentAcceleration,
-								    IterationNumber,
-								    0);
+		const COMState & acomp = COMTraj_deq_[CurrentIndex_+i] ;
+		const FootAbsolutePosition & aLeftFAP = LeftFootTraj_deq_ [CurrentIndex_+i] ;
+    const FootAbsolutePosition & aRightFAP = RightFootTraj_deq_ [CurrentIndex_+i] ;
 
-  if(IterationNumber == NbSampleInterpolation_-1 )
-  {
-    HDR_->currentConfiguration(CurrentConfiguration);
-    HDR_->currentConfiguration(CurrentVelocity);
-    HDR_->currentConfiguration(CurrentAcceleration);
-  }else
-  {
-    PreviousConfiguration_ = CurrentConfiguration ;
-    PreviousVelocity_ = CurrentVelocity ;
-    PreviousAcceleration_ = CurrentAcceleration ;
-  }
+		MAL_VECTOR_DIM(aCOMState,double,6);	MAL_VECTOR_DIM(aLeftFootPosition,double,5);
+		MAL_VECTOR_DIM(aCOMSpeed,double,6);	MAL_VECTOR_DIM(aRightFootPosition,double,5);
+		MAL_VECTOR_DIM(aCOMAcc,double,6);
 
+		aCOMState(0) = acomp.x[0];      aCOMSpeed(0) = acomp.x[1];			aCOMAcc(0) = acomp.x[2];
+		aCOMState(1) = acomp.y[0];      aCOMSpeed(1) = acomp.y[1];      aCOMAcc(1) = acomp.y[2];
+		aCOMState(2) = acomp.z[0];      aCOMSpeed(2) = acomp.z[1];      aCOMAcc(2) = acomp.z[2];
+		aCOMState(3) = acomp.roll[0];   aCOMSpeed(3) = acomp.roll[1];   aCOMAcc(3) = acomp.roll[2];
+		aCOMState(4) = acomp.pitch[0];  aCOMSpeed(4) = acomp.pitch[1];  aCOMAcc(4) = acomp.pitch[2];
+		aCOMState(5) = acomp.yaw[0];		aCOMSpeed(5) = acomp.yaw[1];		aCOMAcc(5) = acomp.yaw[2];
+
+		aLeftFootPosition(0) = aLeftFAP.x;			aRightFootPosition(0) = aRightFAP.x;
+		aLeftFootPosition(1) = aLeftFAP.y;      aRightFootPosition(1) = aRightFAP.y;
+		aLeftFootPosition(2) = aLeftFAP.z;      aRightFootPosition(2) = aRightFAP.z;
+		aLeftFootPosition(3) = aLeftFAP.theta;  aRightFootPosition(3) = aRightFAP.theta;
+		aLeftFootPosition(4) = aLeftFAP.omega;  aRightFootPosition(4) = aRightFAP.omega;
+
+		ConfigurationTraj_[i] = PreviousConfiguration_ ;
+		VelocityTraj_[i] = PreviousVelocity_ ;
+		AccelerationTraj_[i] = PreviousAcceleration_ ;
+
+		ComAndFootRealizationByGeometry_->setSamplingPeriod(InterpolationPeriod_);
+		ComAndFootRealizationByGeometry_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
+											aLeftFootPosition,
+											aRightFootPosition,
+											ConfigurationTraj_[i],
+											VelocityTraj_[i],
+											AccelerationTraj_[i],
+											i+static_i,
+											stage0);
+		PreviousConfiguration_ = ConfigurationTraj_[i] ;
+		PreviousVelocity_ = VelocityTraj_[i] ;
+		PreviousAcceleration_ = AccelerationTraj_[i] ;
+	}
+
+	HDR_->currentConfiguration(ConfigurationTraj_[NbSampleInterpolation_-1]);
+	HDR_->currentVelocity(VelocityTraj_[NbSampleInterpolation_-1]);
+	HDR_->currentAcceleration(AccelerationTraj_[NbSampleInterpolation_-1]);
+
+	cout << static_i << endl ;
+	static_i += NbSampleInterpolation_ ;
   return ;
 }
 
@@ -1424,3 +1386,8 @@ void ZMPVelocityReferencedQP::CoMZMPInterpolation(
   return ;
 }
 
+
+void ZMPVelocityReferencedQP::InterpretSolutionVector()
+{
+	return ;
+}

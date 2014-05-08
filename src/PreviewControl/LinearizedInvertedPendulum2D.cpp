@@ -188,46 +188,52 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
 {
   int lCurrentPosition = CurrentPosition;
   // Fill the queues with the interpolated CoM values.
-
+	cout << "m_CoM = \n"
+  << m_CoM.x[0] << " " << m_CoM.y[0] << " " << m_CoM.z[0] <<  endl
+  << m_CoM.x[1] << " " << m_CoM.y[1] << " " << m_CoM.z[1] <<  endl
+  << m_CoM.x[2] << " " << m_CoM.y[2] << " " << m_CoM.z[2] <<  endl
+  << " Jerk = " << CX << " " << CY << endl ;
   //TODO: with TestHerdt, it is mandatory to use COMStates.size()-1, or it will crash.
   // Is it the same for the other PG ? Please check.
-  int loopEnd = std::min<int>( m_InterpolationInterval, ((int)COMStates.size())-1-CurrentPosition);
+  // TODO: with TestHerdt, it is mandatory to use m_InterpolationInterval-1 to interpolate correctly
+  // along the whole preview window will it be still fine with the reste of the PG?
+  int loopEnd = std::min<int>( m_InterpolationInterval-1, ((int)COMStates.size())-1-CurrentPosition);
   for(int lk=0;lk<=loopEnd;lk++,lCurrentPosition++)
     {
       ODEBUG("lCurrentPosition: "<< lCurrentPosition);
       COMState & aCOMPos = COMStates[lCurrentPosition];
       double lkSP;
       lkSP = (lk+1) * m_SamplingPeriod;
-
+			cout << "lkSP=" << lkSP << " " ;
       aCOMPos.x[0] =
-	m_CoM.x[0] + // Position
-	lkSP * m_CoM.x[1] +  // Speed
-	0.5 * lkSP*lkSP * m_CoM.x[2] +// Acceleration
-	lkSP * lkSP * lkSP * CX /6.0; // Jerk
+				m_CoM.x[0] + // Position
+				lkSP * m_CoM.x[1] +  // Speed
+				0.5 * lkSP*lkSP * m_CoM.x[2] +// Acceleration
+				lkSP * lkSP * lkSP * CX /6.0; // Jerk
 
       aCOMPos.x[1] =
-	m_CoM.x[1] + // Speed
-	lkSP * m_CoM.x[2] +  // Acceleration
-	0.5 * lkSP * lkSP * CX; // Jerk
+				m_CoM.x[1] + // Speed
+				lkSP * m_CoM.x[2] +  // Acceleration
+				0.5 * lkSP * lkSP * CX; // Jerk
 
       aCOMPos.x[2] =
-	m_CoM.x[2] +  // Acceleration
-	lkSP * CX; // Jerk
+				m_CoM.x[2] +  // Acceleration
+				lkSP * CX; // Jerk
 
       aCOMPos.y[0] =
-	m_CoM.y[0] + // Position
-	lkSP * m_CoM.y[1] +  // Speed
-	0.5 * lkSP*lkSP * m_CoM.y[2] + // Acceleration
-	lkSP * lkSP * lkSP * CY /6.0; // Jerk
+				m_CoM.y[0] + // Position
+				lkSP * m_CoM.y[1] +  // Speed
+				0.5 * lkSP*lkSP * m_CoM.y[2] + // Acceleration
+				lkSP * lkSP * lkSP * CY /6.0; // Jerk
 
       aCOMPos.y[1] =
-	m_CoM.y[1] + // Speed
-	lkSP * m_CoM.y[2] +  // Acceleration
-	0.5 * lkSP * lkSP * CY; // Jerk
+				m_CoM.y[1] + // Speed
+				lkSP * m_CoM.y[2] +  // Acceleration
+				0.5 * lkSP * lkSP * CY; // Jerk
 
       aCOMPos.y[2] =
-	m_CoM.y[2] +  // Acceleration
-	lkSP * CY; // Jerk
+				m_CoM.y[2] +  // Acceleration
+				lkSP * CY; // Jerk
 
       aCOMPos.yaw[0] = ZMPRefPositions[lCurrentPosition].theta;
 
@@ -250,6 +256,7 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
 	      CX << " " << CY << " " <<
 	      lkSP << " " << m_T , "DebugInterpol.dat");
     }
+    cout << endl ;
   return 0;
 }
 
@@ -272,6 +279,7 @@ com_t LinearizedInvertedPendulum2D::OneIteration(double ux, double uy)
   m_CoM.x = m_CoM.x + Bux;
   m_CoM.y = MAL_RET_A_by_B(m_A,m_CoM.y);
   m_CoM.y = m_CoM.y + Buy;
+
   // Modif. from Dimitar: Initially a mistake regarding the ordering.
   //MAL_C_eq_A_by_B(m_zk,m_C,m_xk);
 
