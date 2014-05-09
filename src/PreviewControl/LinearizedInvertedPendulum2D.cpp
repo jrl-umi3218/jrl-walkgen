@@ -188,11 +188,6 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
 {
   int lCurrentPosition = CurrentPosition;
   // Fill the queues with the interpolated CoM values.
-	cout << "m_CoM = \n"
-  << m_CoM.x[0] << " " << m_CoM.y[0] << " " << m_CoM.z[0] <<  endl
-  << m_CoM.x[1] << " " << m_CoM.y[1] << " " << m_CoM.z[1] <<  endl
-  << m_CoM.x[2] << " " << m_CoM.y[2] << " " << m_CoM.z[2] <<  endl
-  << " Jerk = " << CX << " " << CY << endl ;
   //TODO: with TestHerdt, it is mandatory to use COMStates.size()-1, or it will crash.
   // Is it the same for the other PG ? Please check.
   // TODO: with TestHerdt, it is mandatory to use m_InterpolationInterval-1 to interpolate correctly
@@ -204,7 +199,6 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
       COMState & aCOMPos = COMStates[lCurrentPosition];
       double lkSP;
       lkSP = (lk+1) * m_SamplingPeriod;
-			cout << "lkSP=" << lkSP << " " ;
       aCOMPos.x[0] =
 				m_CoM.x[0] + // Position
 				lkSP * m_CoM.x[1] +  // Speed
@@ -256,7 +250,6 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
 	      CX << " " << CY << " " <<
 	      lkSP << " " << m_T , "DebugInterpol.dat");
     }
-    cout << endl ;
   return 0;
 }
 

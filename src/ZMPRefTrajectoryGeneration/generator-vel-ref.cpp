@@ -340,14 +340,6 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
 
           RFI_->compute_linear_system( FeetHull, *prwSS_it );
 
-					cout << " FeetHull : " << endl ;
-					for ( int i = 0 ; i < FeetHull.X_vec.size() ; ++i )
-					{
-						cout << FeetHull.X_vec[i] << " ";
-						cout << FeetHull.Y_vec[i] << endl ;
-					}
-					cout << endl ;
-
           for( unsigned j = 0; j < nbEdges; j++ )
           {
             Inequalities.D.X_mat.push_back( (prwSS_it->StepNumber-1)*nbEdges+j, (prwSS_it->StepNumber-1), FeetHull.A_vec[j] );
