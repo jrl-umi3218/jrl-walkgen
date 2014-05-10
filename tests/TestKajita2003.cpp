@@ -93,7 +93,7 @@ protected:
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
 	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
-	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "                    // 5
+	      << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                    // 5
 	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
 	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
 	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
@@ -184,7 +184,7 @@ protected:
         aof << filterprecision( iteration * 0.5 ) << " "  ; // 1
         aof << filterprecision( 0.0 ) << " "  ; // 1
         aof << filterprecision( 0.0 ) << " "  ; // 1
-        aof << filterprecision( m_OneStep.finalCOMPosition.yaw ) << " "  ; // 1
+        aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] ) << " "  ; // 1
         aof << endl ;
       }
       aof.close();

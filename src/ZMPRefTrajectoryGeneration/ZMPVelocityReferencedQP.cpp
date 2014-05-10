@@ -231,7 +231,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   AccelerationTraj_.resize( QP_N_ * NbSampleInterpolation_ );
 
   DeltaZMPMBPositions_.resize ( QP_N_ * NbSampleInterpolation_ );
-
+	ZMPMBTraj_deq_.resize( QP_N_ * NbSampleInterpolation_, vector<double>(2) );
     // Initialization of the configuration vectors
   PreviousConfiguration_ = aHS->currentConfiguration() ;
   PreviousVelocity_ = aHS->currentVelocity();
@@ -581,6 +581,89 @@ ZMPVelocityReferencedQP::OnLine(double time,
     // --------------
     DynamicFilter( time, FinalCOMTraj_deq );
 
+
+
+
+
+
+
+
+
+
+
+
+	/// \brief Debug Purpose
+  /// --------------------
+  ofstream aof;
+  string aFileName;
+  ostringstream oss(std::ostringstream::ate);
+	static int iteration = 0 ;
+  int iteration100 = (int)iteration/100;
+  int iteration10 = (int)(iteration - iteration100*100)/10;
+  int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
+
+  /// \brief Debug Purpose
+  /// --------------------
+  oss.str("TestHerdt2010footcom");
+  oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
+  aFileName = oss.str();
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.close();
+  ///----
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < NbSampleInterpolation_ * QP_N_ ; ++i )
+  {
+    aof << filterprecision( i * InterpolationPeriod_ ) << " "       // 0
+				<< filterprecision( COMTraj_deq_[CurrentIndex_+i].x[0] ) << " "         // 1
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[0] ) << " "         // 2
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[0] ) << " "         // 3
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[1] ) << " "         // 4
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[1] ) << " "         // 5
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[1] ) << " "         // 6
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[2] ) << " "         // 7
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[2] ) << " "         // 8
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[2] ) << " "         // 9
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[0] ) << " "       // 10
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[1] ) << " "       // 11
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[2] ) << " "       // 12
+        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].x ) << " "       // 13
+        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].y ) << " "       // 14
+        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].z ) << " "       // 15
+        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].theta * M_PI / 180 ) << " "   // 16
+        << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].omega * M_PI / 180 ) << " "   // 17
+        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].x ) << " "      //18
+        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].y ) << " "      //19
+        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].z ) << " "  //20
+        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].theta * M_PI / 180 ) << " "  //21
+        << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].omega * M_PI / 180 ) << " "  //22
+        << filterprecision( solution_.Solution_vec[i/NbSampleInterpolation_] ) << " "  //23
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[0] ) << " "       // 24
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[1] ) << " "       // 25
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[2] ) << " "       // 26
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[0] ) << " "       // 27
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[1] ) << " "       // 28
+        << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[2] ) << " "       // 29
+        << endl ;
+  }
+  aof.close() ;
+
+	iteration++;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Specify that we are in the ending phase.
     if (EndingPhase_ == false)
     {
@@ -848,8 +931,12 @@ void ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & 
       DInitY_ = ZMPTraj_deq_[CurrentIndex_].py - (   m_force.n()[0] / m_force.f()[2] ) ;
       Once_ = false ;
     }
-    DeltaZMPMBPositions_[i].px = ZMPTraj_deq_[CurrentIndex_+i].px - ( - m_force.n()[1] / m_force.f()[2] ) - DInitX_ ;
-    DeltaZMPMBPositions_[i].py = ZMPTraj_deq_[CurrentIndex_+i].py - (   m_force.n()[0] / m_force.f()[2] ) - DInitY_ ;
+
+    ZMPMBTraj_deq_[i][0] = - m_force.n()[1] / m_force.f()[2] + DInitX_ ;
+    ZMPMBTraj_deq_[i][1] =   m_force.n()[0] / m_force.f()[2]  + DInitY_ ;
+
+    DeltaZMPMBPositions_[i].px = ZMPTraj_deq_[CurrentIndex_+i].px - ZMPMBTraj_deq_[i][0] ;
+    DeltaZMPMBPositions_[i].py = ZMPTraj_deq_[CurrentIndex_+i].py - ZMPMBTraj_deq_[i][1] ;
     DeltaZMPMBPositions_[i].pz = 0.0 ;
     DeltaZMPMBPositions_[i].theta = 0.0 ;
     DeltaZMPMBPositions_[i].time = time + i * m_SamplingPeriod ;
@@ -915,6 +1002,116 @@ void ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & 
 		}
   }
 
+	/// \brief Debug Purpose
+  /// --------------------
+  ofstream aof;
+  string aFileName;
+  ostringstream oss(std::ostringstream::ate);
+  static int iteration = 0;
+  int iteration100 = (int)iteration/100;
+  int iteration10 = (int)(iteration - iteration100*100)/10;
+  int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
+
+	/// \brief Debug Purpose
+  /// --------------------
+  oss.str("TestHerdt2010DynamicDZMP");
+  oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
+  aFileName = oss.str();
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.close();
+  ///----
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < ZMPMBTraj_deq_.size() ; ++i )
+  {
+		aof << filterprecision( ZMPMBTraj_deq_[i][0] ) << " "   // 1
+				<< filterprecision( ZMPMBTraj_deq_[i][1] ) << " "   // 2
+				<< filterprecision( ZMPTraj_deq_[CurrentIndex_+i].px ) << " "   // 3
+				<< filterprecision( ZMPTraj_deq_[CurrentIndex_+i].py ) << " "   // 4
+				<< endl ;
+  }
+	aof.close();
+
+  /// \brief Debug Purpose
+  /// --------------------
+  oss.str("TestHerdt2010DynamicDCOM");
+  oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
+  aFileName = oss.str();
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.close();
+  ///----
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < ComStateBuffer_.size() ; ++i )
+  {
+    aof << filterprecision( i ) << " "   // 1
+				<< filterprecision( ComStateBuffer_[i].x[0] ) << " "   // 2
+        << filterprecision( ComStateBuffer_[i].y[0] ) << " "   // 3
+        << filterprecision( ComStateBuffer_[i].x[1] ) << " "   // 4
+        << filterprecision( ComStateBuffer_[i].y[1] ) << " "   // 5
+        << filterprecision( ComStateBuffer_[i].x[2] ) << " "   // 6
+        << filterprecision( ComStateBuffer_[i].y[2] ) << " "   // 7
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].x[0]-ComStateBuffer_[i].x[0] ) << " "   // 8
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].y[0]-ComStateBuffer_[i].y[0] ) << " "   // 9
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].x[1]-ComStateBuffer_[i].x[1] ) << " "   // 10
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].y[1]-ComStateBuffer_[i].y[1] ) << " "   // 11
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].x[2]-ComStateBuffer_[i].x[2] ) << " "   // 12
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].y[2]-ComStateBuffer_[i].y[2] ) << " "   // 13
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].x[0] ) << " "   // 14
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].y[0] ) << " "   // 15
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].x[1] ) << " "   // 16
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].y[1] ) << " "   // 17
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].x[2] ) << " "   // 18
+        << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].y[2] ) << " "   // 19
+        << endl ;
+  }
+	aof.close();
+
+	/// \brief Debug Purpose
+  /// --------------------
+  oss.str("TestHerdt2010DynamicCOMXY.dat");
+  aFileName = oss.str();
+  if(iteration == 0)
+  {
+		aof.open(aFileName.c_str(),ofstream::out);
+		aof.close();
+	}
+  ///----
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i )
+  {
+    aof << filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].x[0] ) << " "   // 1
+				<< filterprecision( FinalCOMTraj_deq[CurrentIndex_+i].y[0] ) << " "   // 2
+        << endl ;
+  }
+	aof.close();
+
+	/// \brief Debug Purpose
+  /// --------------------
+  oss.str("TestHerdt2010DynamicZMPMB.dat");
+  aFileName = oss.str();
+  if(iteration == 0)
+  {
+		aof.open(aFileName.c_str(),ofstream::out);
+		aof.close();
+	}
+  ///----
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < NbSampleInterpolation_ ; ++i )
+  {
+    aof << filterprecision( ZMPMBTraj_deq_[i][0] ) << " "   // 1
+				<< filterprecision( ZMPMBTraj_deq_[i][1] ) << " "   // 2
+        << endl ;
+  }
+	aof.close();
+
+  ++iteration;
   return ;
 }
 
@@ -985,19 +1182,19 @@ void ZMPVelocityReferencedQP::CoMZMPInterpolation(
 		      std::deque<COMState> & COMTraj_deq ,                        // OUTPUT
 		      const std::deque<FootAbsolutePosition> & LeftFootTraj_deq, // INPUT
 		      const std::deque<FootAbsolutePosition> & RightFootTraj_deq,// INPUT
-		      const solution_t * Solution,                               // INPUT
+		      const solution_t * aSolutionReference,                               // INPUT
           LinearizedInvertedPendulum2D * LIPM,                        // INPUT/OUTPUT
 		      const unsigned numberOfSample,                             // INPUT
 		      const int IterationNumber)                                 // INPUT
 {
-  if(Solution->SupportStates_deq.size() && Solution->SupportStates_deq[IterationNumber].NbStepsLeft == 0)
+  if(aSolutionReference->SupportStates_deq.size() && aSolutionReference->SupportStates_deq[IterationNumber].NbStepsLeft == 0)
   {
      double jx = (LeftFootTraj_deq[0].x + RightFootTraj_deq[0].x)/2 - LIPM->GetState().x[0];
      double jy = (LeftFootTraj_deq[0].y + RightFootTraj_deq[0].y)/2 - LIPM->GetState().y[0];
      if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3) { Running_ = false; }
      const double tf = 0.75;
-     jx = 6/(tf*tf*tf)*(jx - tf*LIPM->GetState().x[1] - (tf*tf/2)*LIPM->GetState().x[2]);
-     jy = 6/(tf*tf*tf)*(jy - tf*LIPM->GetState().y[1] - (tf*tf/2)*LIPM->GetState().y[2]);
+     jx = 6/(tf*tf*tf)*(jx - tf*COMTraj_deq[0].x[1] - (tf*tf/2)*COMTraj_deq[0].x[2]);
+     jy = 6/(tf*tf*tf)*(jy - tf*COMTraj_deq[0].y[1] - (tf*tf/2)*COMTraj_deq[0].y[2]);
      LIPM->Interpolation( COMTraj_deq, ZMPPositions, CurrentIndex_ + IterationNumber * numberOfSample,
          jx, jy);
      LIPM->OneIteration( jx, jy );
@@ -1006,8 +1203,8 @@ void ZMPVelocityReferencedQP::CoMZMPInterpolation(
   {
      Running_ = true;
      LIPM->Interpolation( COMTraj_deq, ZMPPositions, CurrentIndex_ + IterationNumber * numberOfSample,
-         Solution->Solution_vec[IterationNumber], Solution->Solution_vec[IterationNumber+QP_N_] );
-     LIPM->OneIteration( Solution->Solution_vec[IterationNumber],Solution->Solution_vec[IterationNumber+QP_N_] );
+         aSolutionReference->Solution_vec[IterationNumber], aSolutionReference->Solution_vec[IterationNumber+QP_N_] );
+     LIPM->OneIteration( aSolutionReference->Solution_vec[IterationNumber],aSolutionReference->Solution_vec[IterationNumber+QP_N_] );
   }
   return ;
 }

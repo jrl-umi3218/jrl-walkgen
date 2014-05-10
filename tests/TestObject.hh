@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Olivier Stasse
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file Abstract Object test aim at testing various walking algorithms */
@@ -60,13 +60,13 @@ namespace PatternGeneratorJRL
     public:
       /*! \brief Constructor for the test named TestName.
        All generated files will have their names prefixed by TestName*/
-      TestObject(int argc, char *argv[], 
+      TestObject(int argc, char *argv[],
 		 std::string &TestName,
 		 int lPGIInterface=0);
 
       /*! \name Destructor */
       ~TestObject();
-  
+
       /*! \brief Initialize the test object. */
       void init();
 
@@ -76,19 +76,19 @@ namespace PatternGeneratorJRL
       /*! \brief Decide from which object the robot is build from. */
       virtual void SpecializedRobotConstructor(CjrlHumanoidDynamicRobot *& aHDR,
 					       CjrlHumanoidDynamicRobot *& aDebugHDR );
-      
+
     protected:
 
       /*! \brief Choose which test to perform. */
       virtual void chooseTestProfile()=0;
-      
+
       /*! \brief Generate events. */
       virtual void generateEvent()=0;
 
       /*! \brief Profile of the test to perform. */
       unsigned int m_TestProfile;
 
-      /*! \brief Useful methods to create the robot model. 
+      /*! \brief Useful methods to create the robot model.
 	@{
        */
       /*! */
@@ -99,9 +99,9 @@ namespace PatternGeneratorJRL
 					    CjrlHumanoidDynamicRobot *& aHDR,
 					    CjrlHumanoidDynamicRobot *& aDebugHDR,
 					    PatternGeneratorJRL::PatternGeneratorInterface *&aPGI);
-      
+
       /*! @} */
-      
+
       /*! \name Vectors storing the robot's state.
 	@{
       */
@@ -119,9 +119,12 @@ namespace PatternGeneratorJRL
 
       /*! \brief Previous velocity */
       MAL_VECTOR(m_PreviousVelocity,double);
-  
+
       /*! \brief Previous acceleration */
       MAL_VECTOR(m_PreviousAcceleration,double);
+
+      /*! \brief Initial Configuration */
+      MAL_VECTOR(InitialPosition,double);
 
       /*! @} */
 
@@ -139,22 +142,22 @@ namespace PatternGeneratorJRL
       /*! \brief Pointer towards the Pattern Generator Interface */
       PatternGeneratorInterface * m_PGI;
 
-      /*! \name Debugging information 
+      /*! \name Debugging information
 	@{
       */
-      /*! \brief ZMP of the multibody robot. 
+      /*! \brief ZMP of the multibody robot.
 	This flag makes sense only for algorithm allowing to compute
 	the whole robot articular trajectories.
       */
       bool m_DebugZMP2;
-  
+
       /*! \brief Output Com, ZMP and feet trajectories
 	for a single mass robot model. */
       bool m_DebugFGPI;
 
       /*! \brief Reset debug files according to flags. */
       void prepareDebugFiles();
-  
+
       /*! \brief Fill in the debug files with the appropriate
 	information */
       void fillInDebugFiles();
@@ -170,13 +173,13 @@ namespace PatternGeneratorJRL
       /*! \brief Name of the test */
       std::string m_TestName;
 
-      /*! \brief Clock CPU timing 
+      /*! \brief Clock CPU timing
 	This object measure three parts of the algorithm:
 	off-line, on-line, and during modification.
        */
       ClockCPUTime m_clock;
 
-      /*! \brief Number of maximum iterations for outer loop. 
+      /*! \brief Number of maximum iterations for outer loop.
 	Default value is set to 1.
        */
       unsigned int m_OuterLoopNbItMax;
@@ -184,7 +187,7 @@ namespace PatternGeneratorJRL
       /*! \brief Patten Generator Interface. */
       int m_PGIInterface;
 
-      /*! \brief Store options 
+      /*! \brief Store options
        @{*/
       /*! \brief Path to the VRML. */
       std::string m_VRMLPath;
@@ -201,7 +204,7 @@ namespace PatternGeneratorJRL
       /*! @} */
     };
 
-    
+
   } /* end of TestSuite namespace */
 } /* end of PatternGeneratorJRL namespace */
 #endif /* _TEST_OBJECT_PATTERN_GENERATOR_UTESTING_H_*/

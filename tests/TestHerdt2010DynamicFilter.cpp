@@ -242,15 +242,15 @@ protected:
 
   void initIK()
   {
-    MAL_VECTOR_DIM(BodyAngles,double,(m_HDR->numberDof()-6));
+    MAL_VECTOR_DIM(BodyAngles,double,MAL_VECTOR_SIZE(InitialPosition));
     MAL_VECTOR_DIM(waist,double,6);
     for (int i = 0 ; i < 6 ; ++i )
     {
-      waist(i) = m_PreviousConfiguration(i);
+      waist(i) = 0;
     }
     for (unsigned int i = 0 ; i < (m_HDR->numberDof()-6) ; ++i )
     {
-      BodyAngles(i) = m_PreviousConfiguration(i+6);
+      BodyAngles(i) = InitialPosition(i);
     }
     MAL_S3_VECTOR(lStartingCOMState,double);
 
@@ -282,7 +282,7 @@ protected:
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
 	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
-	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "                    // 5
+	      << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                    // 5
 	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
 	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
 	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
@@ -373,7 +373,7 @@ protected:
         aof << filterprecision( iteration * 0.1 ) << " "  ; // 1
         aof << filterprecision( 0.0 ) << " "  ; // 1
         aof << filterprecision( 0.0 ) << " "  ; // 1
-        aof << filterprecision( m_OneStep.finalCOMPosition.yaw ) << " "  ; // 1
+        aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] ) << " "  ; // 1
         aof << endl ;
       }
       aof.close();
@@ -401,6 +401,7 @@ protected:
 
   void ComparingZMPs()
   {
+		const int stage0 = 0 ;
     /// \brief calculate, from the CoM of computed by the preview control,
     ///    the corresponding articular position, velocity and acceleration
     /// ------------------------------------------------------------------
@@ -421,9 +422,9 @@ protected:
     aCOMState(0) = m_OneStep.finalCOMPosition.x[0];      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
     aCOMState(1) = m_OneStep.finalCOMPosition.y[0];      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
     aCOMState(2) = m_OneStep.finalCOMPosition.z[0];      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
-    aCOMState(3) = m_OneStep.finalCOMPosition.roll;      aCOMSpeed(3) = aCOMAcc(3) = 0 ;
-    aCOMState(4) = m_OneStep.finalCOMPosition.pitch;     aCOMSpeed(4) = aCOMAcc(4) = 0 ;
-    aCOMState(5) = m_OneStep.finalCOMPosition.yaw;       aCOMSpeed(5) = aCOMAcc(5) = 0 ;
+    aCOMState(3) = m_OneStep.finalCOMPosition.roll[0];   aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1]; 	aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2];
+    aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0];  aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1];	aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2];
+    aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0];    aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1];  	aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2];
 
     aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
     aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
@@ -438,7 +439,38 @@ protected:
                       CurrentVelocity,
                       CurrentAcceleration,
                       m_OneStep.NbOfIt,
-                      0);
+                      stage0);
+
+		/// \brief Debug Purpose
+		/// --------------------
+		ofstream aof;
+		string aFileName;
+		ostringstream oss(std::ostringstream::ate);
+		oss.str("TestHerdt2010DynamicART2.dat");
+		aFileName = oss.str();
+		if ( iteration_zmp == 0 )
+		{
+			aof.open(aFileName.c_str(),ofstream::out);
+			aof.close();
+		}
+		///----
+		aof.open(aFileName.c_str(),ofstream::app);
+		aof.precision(8);
+		aof.setf(ios::scientific, ios::floatfield);
+		for (unsigned int j = 0 ; j < CurrentConfiguration.size() ; ++j)
+		{
+			aof << filterprecision(CurrentConfiguration(j)) << " " ;
+		}
+		for (unsigned int j = 0 ; j < CurrentVelocity.size() ; ++j)
+		{
+			aof << filterprecision(CurrentVelocity(j)) << " " ;
+		}
+		for (unsigned int j = 0 ; j < CurrentAcceleration.size() ; ++j)
+		{
+			aof << filterprecision(CurrentAcceleration(j)) << " " ;
+		}
+		aof << endl ;
+
 
     /// \brief rnea, calculation of the multi body ZMP
     /// ----------------------------------------------
@@ -495,7 +527,6 @@ protected:
 //    cout << "ecartmaxY :" << ecartmaxY << endl ;
 
     // Writing of the two zmps and the error.
-    ofstream aof;
     if (ONCE)
     {
       aof.open("TestHerdt2010ErrorZMP.dat",ofstream::out);

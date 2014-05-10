@@ -208,7 +208,7 @@ namespace PatternGeneratorJRL
 
 
       // This is a vector corresponding to the DOFs actuated of the robot.
-      MAL_VECTOR_DIM(InitialPosition,double,lNbActuatedJoints);
+      MAL_VECTOR_RESIZE(InitialPosition,lNbActuatedJoints);
       //MAL_VECTOR_DIM(CurrentPosition,double,40);
       if (conversiontoradneeded)
         for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
@@ -345,7 +345,7 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
 	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
-	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "                    // 5
+	      << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                    // 5
 	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
 	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
 	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
