@@ -302,7 +302,7 @@ void Bsplines::PrintDegree() const
 
 ZBsplines::ZBsplines(double FT, double FP, double ToMP, double MP):Bsplines(4)
 {
-    SetParameters(FT, FP, ToMP, MP);
+    SetParameters( FT, FP, ToMP, MP);
 }
 
 ZBsplines::~ZBsplines()
@@ -351,7 +351,13 @@ double ZBsplines::ZComputeAcc(double t)
 void  ZBsplines::SetParameters(double FT, double FP, double ToMP, double MP)
 {
     ZGenerateKnotVector(FT,ToMP);
-    ZGenerateControlPoints(FT, FP, ToMP, MP);
+    ZGenerateControlPoints(0.0,FT, FP, ToMP, MP);
+}
+
+void  ZBsplines::SetParametersWithInitPos(double IP, double FT, double FP, double ToMP, double MP)
+{
+    ZGenerateKnotVector(FT,ToMP);
+    ZGenerateControlPoints(IP,FT, FP, ToMP, MP);
 }
 
 void ZBsplines::GetParametersWithInitPosInitSpeed(double &FT,
@@ -386,46 +392,47 @@ void ZBsplines::ZGenerateKnotVector(double FT, double ToMP)
     SetKnotVector(knot);
 }
 
-void ZBsplines::ZGenerateControlPoints(double FT, double FP, double ToMP, double MP)
+void ZBsplines::ZGenerateControlPoints(double IP, double FT, double FP, double ToMP, double MP)
 {
     m_FT = FT;
     m_FP = FP;
     m_ToMP = ToMP;
     m_MP = MP;
+    m_IP = IP;
     std::vector<Point> control_points;
     control_points.clear();
     std::ofstream myfile1;
     myfile1.open("control_point.txt");
 
-    Point A = {0.0,0.0};
+    Point A = {0.0,IP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {m_FT*0.05,0.0};
+    A = {m_FT*0.05,IP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {m_FT*0.1,0.0};
+    A = {m_FT*0.1,IP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.85*m_ToMP,m_MP};
+    A = {0.85*m_ToMP,m_MP+IP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {1.15*m_ToMP,m_MP};
+    A = {1.15*m_ToMP,m_MP+IP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.85*m_FT,m_FP};
+    A = {0.85*m_FT,m_FP+IP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.9*m_FT,m_FP};
+    A = {0.9*m_FT,m_FP+IP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {m_FT,m_FP};
+    A = {m_FT,m_FP+IP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
