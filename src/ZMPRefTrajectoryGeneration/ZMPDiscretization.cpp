@@ -842,8 +842,22 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
 						    ModulatedSingleSupportTime,vrel(0,0));
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::Y_AXIS,
 						    ModulatedSingleSupportTime,vrel(1,0));
-  m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
-						    m_Tsingle,lStepHeight);
+
+  FootAbsolutePosition * LastSFP; //LastSwingFootPosition
+
+      if(m_RelativeFootPositions[0].sy > 0)
+        {
+    	  LastSFP = &(LeftFootAbsolutePositions[CurrentZMPindex]);
+        }
+      else
+        {
+    	  LastSFP = &(RightFootAbsolutePositions[CurrentZMPindex]);
+        }
+  m_FootTrajectoryGenerationStandard->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Z_AXIS,
+          m_Tsingle,lStepHeight,
+          LastSFP->z, LastSFP->dz);
+ // m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
+						   // m_Tsingle,lStepHeight);
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::THETA_AXIS,
 						    ModulatedSingleSupportTime,RelTheta);
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::OMEGA_AXIS,
