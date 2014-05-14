@@ -90,8 +90,8 @@ namespace PatternGeneratorJRL
 
     friend std::ostream & operator<<(std::ostream &os, const struct COMState_s & acs);
   };
-    
-  
+
+
 
   typedef struct COMState_s COMState;
 
@@ -99,7 +99,7 @@ namespace PatternGeneratorJRL
       a sequence of relative positions. */
   struct RelativeFootPosition_s
   {
-    double sx,sy,theta;
+    double sx,sy,sz,theta;
     double SStime;
     double DStime;
     int stepType;     //1:normal walking 2:one step before obstacle

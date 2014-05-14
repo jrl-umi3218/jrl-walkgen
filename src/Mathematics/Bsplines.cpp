@@ -97,7 +97,6 @@ void Bsplines::GenerateKnotVector(std::string method)
                 cout << "Knot vector cant be created. m_control_points.size()-1>=m_degree "<< endl;
                 m_knot_vector.clear();
             }
-
         }
 
         else if (method =="universal")
@@ -296,11 +295,11 @@ void Bsplines::PrintDegree() const
 }
 
 
-// Class ZBplines heritage of class Bsplines
-// create a foot trajectory of Z on function the time t
+/// Class ZBplines heritage of class Bsplines
+/// create a foot trajectory of Z on function the time t
 
 
-ZBsplines::ZBsplines(double FT, double FP, double ToMP, double MP):Bsplines(4)
+ZBsplines::ZBsplines( double FT, double FP, double ToMP, double MP):Bsplines(4)
 {
     SetParameters(FT, FP, ToMP, MP);
 }
@@ -351,16 +350,25 @@ double ZBsplines::ZComputeAcc(double t)
 void  ZBsplines::SetParameters(double FT, double FP, double ToMP, double MP)
 {
     ZGenerateKnotVector(FT,ToMP);
-    ZGenerateControlPoints(FT, FP, ToMP, MP);
+    ZGenerateControlPoints(0.0,FT, FP, ToMP, MP);
 }
 
+void ZBsplines::SetParametersWithInitPosInitSpeed(double FT, double FP, double ToMP, double MP,
+						  double InitPos,
+						  double InitSpeed)
+{
+    ZGenerateKnotVector(FT,ToMP);
+    ZGenerateControlPoints(InitPos,FT, FP, ToMP, MP);
+}
+
+
 void ZBsplines::GetParametersWithInitPosInitSpeed(double &FT,
-						  double &FP,
+						  double &MP,
 						  double &InitPos,
 						  double &InitSpeed)
 {
     FT = m_FT;
-    FP = m_FP;
+    MP = m_MP;
     InitPos = ZComputePosition(0.0);
     InitSpeed = ZComputeVelocity(0.0);
 }
@@ -382,50 +390,50 @@ void ZBsplines::ZGenerateKnotVector(double FT, double ToMP)
     {
         knot.push_back(FT);
     }
-
     SetKnotVector(knot);
 }
 
-void ZBsplines::ZGenerateControlPoints(double FT, double FP, double ToMP, double MP)
+void ZBsplines::ZGenerateControlPoints(double IP,double FT, double FP, double ToMP, double MP)
 {
     m_FT = FT;
     m_FP = FP;
     m_ToMP = ToMP;
     m_MP = MP;
+
     std::vector<Point> control_points;
     control_points.clear();
     std::ofstream myfile1;
     myfile1.open("control_point.txt");
 
-    Point A = {0.0,0.0};
+    Point A = {0.0,IP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {m_FT*0.05,0.0};
+    A = {m_FT*0.05,IP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {m_FT*0.1,0.0};
+    A = {m_FT*0.1,IP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.85*m_ToMP,m_MP};
+    A = {0.85*m_ToMP,IP+ m_MP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {1.15*m_ToMP,m_MP};
+    A = {1.15*m_ToMP,IP+m_MP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.85*m_FT,m_FP};
+    A = {0.85*m_FT,IP+m_FP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.9*m_FT,m_FP};
+    A = {0.9*m_FT,IP+m_FP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {m_FT,m_FP};
+    A = {m_FT,IP+m_FP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
@@ -433,5 +441,3 @@ void ZBsplines::ZGenerateControlPoints(double FT, double FP, double ToMP, double
 
     SetControlPoints(control_points);
 }
-
-

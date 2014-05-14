@@ -211,7 +211,7 @@ namespace PatternGeneratorJRL
    /*! \brief Bsplines for Z axis position. */
    ZBsplines *m_BsplinesZ;
 
-   int m_isStepStairOn;
+  // int m_isStepStairOn;
 
    /*! \brief Foot dimension. */
    double m_FootB, m_FootH, m_FootF;

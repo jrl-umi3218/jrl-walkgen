@@ -85,7 +85,8 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":numberstepsbeforestop 2");
+    //  m_TestProfile.m_isStepStairOn = 0;
+      istringstream strm2(":numberstepsbeforestop 1");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -248,7 +249,7 @@ protected:
      //   {10*200,&TestHerdt2010::walkForward},
       //  {25*200,&TestHerdt2010::walkForward},
        // {35*200,&TestHerdt2010::walkForward},
-        {45*200,&TestHerdt2010::stop}
+        {15*200,&TestHerdt2010::stop}
      /*   {55*200,&TestHerdt2010::walkForward},
         {65*200,&TestHerdt2010::walkForward},
         {75*200,&TestHerdt2010::walkForward},

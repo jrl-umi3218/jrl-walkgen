@@ -109,11 +109,15 @@ namespace PatternGeneratorJRL
        */
       void SetParameters(double FT, double FP, double ToMP, double MP);
 
+      void SetParametersWithInitPosInitSpeed(double FT, double FP, double ToMP, double MP,
+						  double InitPos,
+						  double InitSpeed);
+
       void GetParametersWithInitPosInitSpeed(double &FT,
-						  double &FP,
+						  double &MP,
 						  double &InitPos,
 						  double &InitSpeed);
-	
+
       /*! Create a vector of Control Points with 8 Points :
       {0.0,0.0},
       {m_FT*0.05,0.0},
@@ -123,7 +127,7 @@ namespace PatternGeneratorJRL
       {0.85*m_FT,m_FP},
       {0.9*m_FT,m_FP},
       {m_FT,m_FP}*/
-      void ZGenerateControlPoints(double FT, double FP, double ToMP, double MP);
+      void ZGenerateControlPoints(double IP,double FT, double FP, double ToMP, double MP);
 
       void ZGenerateKnotVector(double FT, double ToMP);
 

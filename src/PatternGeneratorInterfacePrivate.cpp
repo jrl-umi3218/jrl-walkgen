@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Andrei     Herdt
  * Fumio      Kanehiro
@@ -9,7 +9,7 @@
  * Alireza    Nakhaei
  * Mathieu    Poirier
  * Olivier    Stasse
- * Eiichi     Yoshida 
+ * Eiichi     Yoshida
  *
  * JRL, CNRS/AIST
  *
@@ -26,7 +26,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \doc This object is the interface to the walking gait
@@ -183,11 +183,12 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()
   {
-    std::string aMethodName[15] =
+    std::string aMethodName[16] =
       {":LimitsFeasibility",
        ":ZMPShiftParameters",
        ":TimeDistributionParameters",
        ":stepseq",
+       ":stepstairseq"
        ":finish",
        ":StartOnLineStepSequencing",
        ":StopOnLineStepSequencing",
@@ -200,7 +201,7 @@ namespace PatternGeneratorJRL {
        ":setVelReference",
        ":setCoMPerturbationForce"};
 
-    for(int i=0;i<15;i++)
+    for(int i=0;i<16;i++)
       {
 	if (!SimplePlugin::RegisterMethod(aMethodName[i]))
 	  {
@@ -461,13 +462,16 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::ReadSequenceOfSteps(istringstream &strm)
   {
     // Read the data inside strm.
-
-
     switch (m_StepStackHandler->GetWalkMode())
       {
       case 0:
       case 4:
       case 5:
+      case 6:
+      {
+	  m_StepStackHandler->ReadStepSequenceAccordingToWalkMode(strm);
+	  break;
+	 }
       case 3:
       case 1:
 	{
@@ -506,7 +510,7 @@ namespace PatternGeneratorJRL {
     // Read the data inside strm.
     m_ZMPVRQP->Reference(strm);
   }
- 
+
   void PatternGeneratorInterfacePrivate::setCoMPerturbationForce(istringstream &strm)
   {
     // Read the data inside strm.
@@ -563,6 +567,17 @@ namespace PatternGeneratorJRL {
   {
 
     ODEBUG("Step Sequence");
+    ofstream DebugFile;
+    ReadSequenceOfSteps(strm);
+    ODEBUG("After reading Step Sequence");
+    FinishAndRealizeStepSequence();
+    ODEBUG("After finish and realize Step Sequence");
+  }
+
+  void PatternGeneratorInterfacePrivate::m_StepStairSequence(istringstream &strm)
+  {
+
+    ODEBUG("Step Stair Sequence");
     ofstream DebugFile;
     ReadSequenceOfSteps(strm);
     ODEBUG("After reading Step Sequence");
@@ -717,6 +732,7 @@ namespace PatternGeneratorJRL {
       {
 	ODEBUG(lRelativeFootPositions[i].sx << " " <<
 	       lRelativeFootPositions[i].sy << " " <<
+	       lRelativeFootPositions[i].sz << " " <<
 	       lRelativeFootPositions[i].theta );
 
       }
@@ -743,6 +759,7 @@ namespace PatternGeneratorJRL {
 	    ODEBUG("Push a position in stack of steps:"<<
 		   lRelativeFootPositions[0].sx << " " <<
 		   lRelativeFootPositions[0].sy << " " <<
+		   lRelativeFootPositions[0].sz << " " <<
 		   lRelativeFootPositions[0].theta);
 	  }
       }
@@ -1047,6 +1064,7 @@ namespace PatternGeneratorJRL {
 	double ltime = (double)m_ZMPM->GetTSingleSupport();
 	strm >> aFAP.x;
 	strm >> aFAP.y;
+	//strm >> aFAP.z;
 	strm >> aFAP.theta;
 	ChangeOnLineStep(ltime,aFAP,newtime);
       }
@@ -1081,6 +1099,9 @@ namespace PatternGeneratorJRL {
 
     else if (aCmd==":stepseq")
       m_StepSequence(strm);
+
+    else if (aCmd==":stepstairseq")
+      m_StepStairSequence(strm);
 
     else if (aCmd==":finish")
       m_FinishAndRealizeStepSequence(strm);
@@ -1325,8 +1346,8 @@ namespace PatternGeneratorJRL {
 			  m_RightFootPositions);
     m_Running = m_ZMPVRQP->Running();
       }
-            
-            
+
+
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,
 						    RightFootPosition,
 						    ZMPTarget,
@@ -1335,7 +1356,7 @@ namespace PatternGeneratorJRL {
 						    CurrentVelocity,
 						    CurrentAcceleration);
 
-    ODEBUG("finalCOMState: "  << 
+    ODEBUG("finalCOMState: "  <<
             finalCOMState.x[0] << " " <<
             finalCOMState.x[1] << " " <<
             finalCOMState.x[2] << " " <<
@@ -1714,7 +1735,7 @@ namespace PatternGeneratorJRL {
     lWaistAbsPos = m_WaistAbsPos;
   }
 
-  //TODO test me 
+  //TODO test me
   void PatternGeneratorInterfacePrivate::getWaistPositionAndOrientation(double aTQ[7], double &Orientation) const
   {
     // Position
@@ -1778,7 +1799,7 @@ namespace PatternGeneratorJRL {
     dy = m_AbsLinearVelocity(1);
     omega = m_AbsAngularVelocity(2);
   }
-  
+
   void PatternGeneratorInterfacePrivate::setVelocityReference(double x,
 							      double y,
 							      double yaw)

@@ -45,7 +45,7 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   m_PolynomeOmega = 0;
   m_PolynomeOmega2 = 0;
   m_PolynomeTheta = 0;
-  m_isStepStairOn = 1;
+//  m_isStepStairOn = 1;
 
   /* Computes information on foot dimension
      from humanoid specific informations. */
@@ -179,6 +179,7 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex,
      else
      {
         m_BsplinesZ->SetParameters(TimeInterval,Position/1.5,TimeInterval/3.0,Position);
+        cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
      }
      break;
 
@@ -226,9 +227,8 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
      }
      else
      {
-        m_BsplinesZ->SetParameters(TimeInterval,FinalPosition/1.5,TimeInterval/3.0,FinalPosition);
+        m_BsplinesZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition/1.5,TimeInterval/3.0,FinalPosition,InitPosition,InitSpeed);
      }
-
      break;
 
    case THETA_AXIS:
@@ -271,7 +271,7 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
      }
      else
      {
-        m_BsplinesZ->SetParameters(TimeInterval,FinalPosition/1.5,TimeInterval/3.0,FinalPosition);
+        m_BsplinesZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition/1.5,TimeInterval/3.0,FinalPosition,InitPosition,InitSpeed);
      }
      break;
 
@@ -444,7 +444,7 @@ double FootTrajectoryGenerationStandard::ComputeSecDerivative(unsigned int Polyn
     }
      else
      {
-     r=m_BsplinesZ->ZComputeVelocity(Time);
+     r=m_BsplinesZ->ZComputeAcc(Time);
      }
      break;
 
@@ -497,6 +497,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
       // Do not modify x, y and theta while liftoff.
       curr_NSFAP.x = init_NSFAP.x;
       curr_NSFAP.y = init_NSFAP.y;
+      //curr_NSFAP.z = init_NSFAP.z;
       curr_NSFAP.theta = init_NSFAP.theta;
     }
   else if (LocalTime < StartLanding)
@@ -504,6 +505,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
       // DO MODIFY x, y and theta the remaining time.
       curr_NSFAP.x     = init_NSFAP.x     + m_PolynomeX->Compute(LocalTime - EndOfLiftOff);
       curr_NSFAP.y     = init_NSFAP.y     + m_PolynomeY->Compute(LocalTime - EndOfLiftOff);
+
       curr_NSFAP.theta = init_NSFAP.theta + m_PolynomeTheta->Compute(LocalTime - EndOfLiftOff);
     }
   else
@@ -522,6 +524,8 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   {
   curr_NSFAP.z = init_NSFAP.z + m_BsplinesZ->ZComputePosition(LocalTime);
   }
+
+
   ODEBUG2("x:" << curr_NSFAP.x << " LocalTime - EndOfLiftOff" << LocalTime - EndOfLiftOff
           << " " << m_PolynomeX->Compute(LocalTime - EndOfLiftOff));
   //  m_PolynomeX->print();
@@ -693,6 +697,8 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dtheta =
 	m_PolynomeTheta->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
 	// +NoneSupportFootAbsolutePositions[StartIndex].dtheta;
+
+
     }
   else
     {
@@ -721,28 +727,36 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
       // + NoneSupportFootAbsolutePositions[StartIndex].dtheta;
     }
 
-  if (m_isStepStairOn == 1)
+ if (m_isStepStairOn == 1)
   {
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z =
-    //m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
-    m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime);
-    //m_AnklePositionRight[2];
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
-    //m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
-    m_BsplinesZ->ZComputeVelocity(LocalInterpolationStartTime+InterpolationTime);
-    //m_AnklePositionRight[2];
+      if (m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime)== 0.0)
+      {
+    cout << LocalInterpolationStartTime+InterpolationTime << " " << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].z << " " << NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z << endl;
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].z +
+           m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime);
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
+          m_BsplinesZ->ZComputeVelocity(LocalInterpolationStartTime+InterpolationTime);
+      }
+
+      else{
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = //prev_NSFAP.z +
+           m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime);
+      NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
+          m_BsplinesZ->ZComputeVelocity(LocalInterpolationStartTime+InterpolationTime);
+        }
+
   }
   else
   {
    NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z =
     m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
-
     //m_AnklePositionRight[2];
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
-    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
 
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
+    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//
     //m_AnklePositionRight[2];
   }
+
 
   bool ProtectionNeeded=false;
 

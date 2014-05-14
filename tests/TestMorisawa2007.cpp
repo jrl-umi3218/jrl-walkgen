@@ -114,7 +114,18 @@ protected:
     }
 
     {
-      istringstream strm2(":stepseq 0.0 -0.105 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.0 -0.19 0.0");
+       istringstream strm2(":stepseq 0.0 -0.105 0.0 \
+                          0.2 0.0 0.0 \
+                           0.2 0.0 0.0 \
+                          ");
+    /*  istringstream strm2(":stepseq 0.0 -0.105 0.0 0.0 \
+                          0.2 0.19 0.1 0.0 \
+                            0.2 -0.19 0.1 0.0 \
+                          0.2 0.19 0.1 0.0\
+                           0.2 -0.19 0.1 0.0 \
+                          0.2 0.19 0.1 0.0 \
+                          0.0 -0.19 0.1 0.0");*/
+
       aPGI.ParseCmd(strm2);
     }
 
@@ -150,21 +161,21 @@ protected:
 
 
     /* Stop after 30 seconds the on-line stepping */
-    if (m_OneStep.NbOfIt>StoppingTime) 
+    if (m_OneStep.NbOfIt>StoppingTime)
       {
 	StopOnLineWalking(*m_PGI);
       }
-    else 
+    else
       {
 	/* Stay on the spot during 5.0 s before stopping. */
-	if (m_OneStep.NbOfIt<StoppingTime-200*5.0) 
+	if (m_OneStep.NbOfIt<StoppingTime-200*5.0)
 	  {
 	    if (m_OneStep.NbOfIt%200==0)
 	      {
 		cout << "Progress " << (unsigned int)r << " "<< "\r";
 		cout.flush();
 	      }
-	
+
 	    double triggertime = 9.8*200 + m_deltatime*200;
 	    if ((m_OneStep.NbOfIt>triggertime) &&
 		m_TestChangeFoot)
@@ -184,7 +195,7 @@ protected:
 		  }
 		double newtime;
 		bool stepHandledCorrectly=true;
-		try 
+		try
 		  {
 		    m_PGI->ChangeOnLineStep(0.805,aFAP,newtime);
 		  }
@@ -201,7 +212,7 @@ protected:
 		    if (m_NbStepsModified==360)
 		      m_TestChangeFoot=false;
 		  }
-		else 
+		else
 		  {
 		    m_deltatime += 0.005;
 		  }
@@ -209,7 +220,7 @@ protected:
 	  }
       }
   };
-  
+
 };
 
 int PerformTests(int argc, char *argv[])
