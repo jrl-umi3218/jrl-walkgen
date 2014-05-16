@@ -87,6 +87,8 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
   InterpolationPeriod_ = QP_T_/20;
+	NbSampleControl_ = (unsigned)(QP_T_/m_SamplingPeriod) ;
+  NbSampleInterpolation_ = (unsigned)(QP_T_/InterpolationPeriod_) ;
   StepPeriod_ = 0.8 ;
   SSPeriod_ = 0.7 ;
   DSPeriod_ = 0.1 ;
@@ -216,11 +218,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
 
 	// init of the buffer for the kajita's dynamic filter
 
-    // number of sample inside one iteration of the preview control
-	NbSampleControl_ = (unsigned)(QP_T_/m_SamplingPeriod) ;
-  NbSampleInterpolation_ = (unsigned)(QP_T_/InterpolationPeriod_) ;
-
-    // size = numberOfIterationOfThePreviewControl * NumberOfSample + Margin
+  // size = numberOfIterationOfThePreviewControl * NumberOfSample + Margin
   ZMPTraj_deq_.resize( QP_N_ * NbSampleInterpolation_+20);
   COMTraj_deq_.resize( QP_N_ * NbSampleInterpolation_+20);
   tmpCoM_.resize(QP_N_ * NbSampleControl_ + 20);
@@ -230,12 +228,20 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   VelocityTraj_.resize( QP_N_ * NbSampleInterpolation_ );
   AccelerationTraj_.resize( QP_N_ * NbSampleInterpolation_ );
 
+	ConfigurationTrajControl_.resize( NbSampleControl_ );
+	VelocityTrajControl_.resize( NbSampleControl_ );
+	AccelerationTrajControl_.resize( NbSampleControl_ );
+
   DeltaZMPMBPositions_.resize ( QP_N_ * NbSampleInterpolation_ );
 	ZMPMBTraj_deq_.resize( QP_N_ * NbSampleInterpolation_, vector<double>(2) );
     // Initialization of the configuration vectors
   PreviousConfiguration_ = aHS->currentConfiguration() ;
   PreviousVelocity_ = aHS->currentVelocity();
   PreviousAcceleration_ = aHS->currentAcceleration();
+	PreviousConfigurationControl_ = aHS->currentConfiguration() ;
+  PreviousVelocityControl_ = aHS->currentVelocity();
+  PreviousAccelerationControl_ = aHS->currentAcceleration();
+
 
   ComStateBuffer_.resize(NbSampleControl_);
 
@@ -796,10 +802,10 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 		<< Solution_.SupportStates_deq[i].StateChanged << " " << endl ;
 	}
 	cout << "X solution = " ;
-	for (int i = 0 ; i < FootPrw_vec.size() ; ++i )
+	for (unsigned int i = 0 ; i < FootPrw_vec.size() ; ++i )
 		cout << FootPrw_vec[i][0] << " " ;
 	cout << " Y solution = " ;
-	for (int i = 0 ; i < FootPrw_vec.size() ; ++i )
+	for (unsigned int i = 0 ; i < FootPrw_vec.size() ; ++i )
 		cout << FootPrw_vec[i][1] << " " ;
 	cout << endl ;
 
@@ -1115,6 +1121,7 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization()
 	HDR_->currentAcceleration(AccelerationTraj_[NbSampleInterpolation_+1]);
 
 	static_i += NbSampleInterpolation_ ;
+
   return ;
 }
 
@@ -1207,7 +1214,6 @@ void ZMPVelocityReferencedQP::InterpretSolutionVector()
 		// to use the correct foot step previewed
 void ZMPVelocityReferencedQP::PrepareSolution()
 {
-	static int nbStepChanged = 0 ;
 	int nbSteps = 0 ;
 	nbSteps = solution_.SupportStates_deq.back().StepNumber ;
 	support_state_t & CurrentSupport = solution_.SupportStates_deq.front() ;
@@ -1218,4 +1224,58 @@ void ZMPVelocityReferencedQP::PrepareSolution()
 		solution_.Solution_vec[2*QP_N_+nbSteps] = FootPrw_vec[CurrentSupport.StepNumber+1][1];
 	}
 	return ;
+}
+
+void ZMPVelocityReferencedQP::ComputeTrajArtControl(
+                deque<COMState> & FinalCOMTraj_deq,
+                deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+                deque<FootAbsolutePosition> &FinalRightFootTraj_deq)
+{
+	const unsigned int N = NbSampleControl_ ;
+	const int stage0 = 0 ;
+
+	PreviousConfigurationControl_ = HDR_->currentConfiguration();
+	PreviousVelocityControl_ = HDR_->currentVelocity();
+	PreviousAccelerationControl_ = HDR_->currentAcceleration();
+  for(unsigned int i = 0 ; i <  N ; i++ )
+  {
+		const COMState & acomp = FinalCOMTraj_deq[CurrentIndex_+i] ;
+		const FootAbsolutePosition & aLeftFAP = FinalLeftFootTraj_deq [CurrentIndex_+i] ;
+    const FootAbsolutePosition & aRightFAP = FinalRightFootTraj_deq [CurrentIndex_+i] ;
+
+		MAL_VECTOR_DIM(aCOMState,double,6);	MAL_VECTOR_DIM(aLeftFootPosition,double,5);
+		MAL_VECTOR_DIM(aCOMSpeed,double,6);	MAL_VECTOR_DIM(aRightFootPosition,double,5);
+		MAL_VECTOR_DIM(aCOMAcc,double,6);
+
+		aCOMState(0) = acomp.x[0];      aCOMSpeed(0) = acomp.x[1];			aCOMAcc(0) = acomp.x[2];
+		aCOMState(1) = acomp.y[0];      aCOMSpeed(1) = acomp.y[1];      aCOMAcc(1) = acomp.y[2];
+		aCOMState(2) = acomp.z[0];      aCOMSpeed(2) = acomp.z[1];      aCOMAcc(2) = acomp.z[2];
+		aCOMState(3) = acomp.roll[0];   aCOMSpeed(3) = acomp.roll[1];   aCOMAcc(3) = acomp.roll[2];
+		aCOMState(4) = acomp.pitch[0];  aCOMSpeed(4) = acomp.pitch[1];  aCOMAcc(4) = acomp.pitch[2];
+		aCOMState(5) = acomp.yaw[0];		aCOMSpeed(5) = acomp.yaw[1];		aCOMAcc(5) = acomp.yaw[2];
+
+		aLeftFootPosition(0) = aLeftFAP.x;			aRightFootPosition(0) = aRightFAP.x;
+		aLeftFootPosition(1) = aLeftFAP.y;      aRightFootPosition(1) = aRightFAP.y;
+		aLeftFootPosition(2) = aLeftFAP.z;      aRightFootPosition(2) = aRightFAP.z;
+		aLeftFootPosition(3) = aLeftFAP.theta;  aRightFootPosition(3) = aRightFAP.theta;
+		aLeftFootPosition(4) = aLeftFAP.omega;  aRightFootPosition(4) = aRightFAP.omega;
+
+		ConfigurationTrajControl_[i] = PreviousConfigurationControl_ ;
+		VelocityTrajControl_[i] = PreviousVelocityControl_ ;
+		AccelerationTrajControl_[i] = PreviousAccelerationControl_ ;
+
+		ComAndFootRealizationByGeometry_->setSamplingPeriod(InterpolationPeriod_);
+		ComAndFootRealizationByGeometry_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
+											aLeftFootPosition,
+											aRightFootPosition,
+											ConfigurationTrajControl_[i],
+											VelocityTraj_[i],
+											AccelerationTrajControl_[i],
+											2,
+											stage0);
+		PreviousConfigurationControl_ = ConfigurationTrajControl_[i] ;
+		PreviousVelocityControl_ = VelocityTrajControl_[i] ;
+		PreviousAccelerationControl_ = AccelerationTrajControl_[i] ;
+	}
+  return ;
 }

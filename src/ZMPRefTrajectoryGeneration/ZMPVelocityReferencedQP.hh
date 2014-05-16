@@ -289,9 +289,15 @@ namespace PatternGeneratorJRL
     vector <MAL_VECTOR_TYPE(double)> ConfigurationTraj_ ;
     vector <MAL_VECTOR_TYPE(double)> VelocityTraj_ ;
     vector <MAL_VECTOR_TYPE(double)> AccelerationTraj_ ;
+    vector <MAL_VECTOR_TYPE(double)> ConfigurationTrajControl_ ;
+    vector <MAL_VECTOR_TYPE(double)> VelocityTrajControl_ ;
+    vector <MAL_VECTOR_TYPE(double)> AccelerationTrajControl_ ;
     MAL_VECTOR_TYPE(double) PreviousConfiguration_ ;
     MAL_VECTOR_TYPE(double) PreviousVelocity_ ;
     MAL_VECTOR_TYPE(double) PreviousAcceleration_ ;
+    MAL_VECTOR_TYPE(double) PreviousConfigurationControl_ ;
+    MAL_VECTOR_TYPE(double) PreviousVelocityControl_ ;
+    MAL_VECTOR_TYPE(double) PreviousAccelerationControl_ ;
 
     /// \brief Buffers for the uotput of the Kajita preview control algorithm.
     std::deque<COMState> ComStateBuffer_ ;
@@ -397,6 +403,12 @@ namespace PatternGeneratorJRL
 
 		/// \brief Project the found third foot step on the constraints
     void ProjectionOnConstraints(double & X, double & Y);
+
+
+    void ComputeTrajArtControl(
+                deque<COMState> & FinalCOMTraj_deq,
+                deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+                deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
   };
 }
 
