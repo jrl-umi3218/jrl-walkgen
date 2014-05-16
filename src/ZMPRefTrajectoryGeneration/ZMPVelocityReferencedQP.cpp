@@ -581,10 +581,12 @@ ZMPVelocityReferencedQP::OnLine(double time,
     // INTERPOLATION
     ControlInterpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, FinalLeftFootTraj_deq,
                           FinalRightFootTraj_deq, time) ;
-    DynamicFilterInterpolation( time) ;
+
+		ComputeTrajArtControl( FinalCOMTraj_deq, FinalLeftFootTraj_deq, FinalRightFootTraj_deq) ;
 
     // DYNAMIC FILTER
     // --------------
+    DynamicFilterInterpolation( time) ;
     DynamicFilter( time, FinalCOMTraj_deq );
 
 
