@@ -140,6 +140,11 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   LIPM_subsampled_.SetRobotControlPeriod( InterpolationPeriod_ );
   LIPM_subsampled_.InitializeSystem();
 
+   // Initialize the 2D LIPM
+  CoM_.SetSimulationControlPeriod( QP_T_ );
+  CoM_.SetRobotControlPeriod( m_SamplingPeriod );
+  CoM_.InitializeSystem();
+
   // Create and initialize simplified robot model
   Robot_ = new RigidBodySystem( SPM, aHS, SupportFSM_ );
   Robot_->Mass( aHS->mass() );
@@ -456,7 +461,11 @@ ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   LIPM_subsampled_.InitializeSystem();
   LIPM_subsampled_(CoM);
   //--
-  IntermedData_->CoM(LIPM_());
+  CoM_.SetComHeight(lStartingCOMState.z[0]);
+  CoM_.InitializeSystem();
+  CoM_(CoM);
+
+  IntermedData_->CoM(CoM);
 
   // Initialize preview of orientations
   OrientPrw_->CurrentTrunkState( lStartingCOMState );
@@ -512,7 +521,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
     VelRef_=NewVelRef_;
     SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
     IntermedData_->Reference( VelRef_ );
-    IntermedData_->CoM( LIPM_.getState() );
+    IntermedData_->CoM( CoM_() );
 
     // PREVIEW SUPPORT STATES FOR THE WHOLE PREVIEW WINDOW:
     // ----------------------------------------------------
@@ -579,8 +588,56 @@ ZMPVelocityReferencedQP::OnLine(double time,
 		InterpretSolutionVector();
 
     // INTERPOLATION
-    ControlInterpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, FinalLeftFootTraj_deq,
-                          FinalRightFootTraj_deq, time) ;
+    //ControlInterpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, FinalLeftFootTraj_deq,
+    //                      FinalRightFootTraj_deq, time) ;
+
+
+
+		// INTERPOLATE THE NEXT COMPUTED COM STATE:
+    // ----------------------------------------
+    unsigned currentIndex = CurrentIndex_;
+    if(Solution_.SupportStates_deq.size() && Solution_.SupportStates_deq[0].NbStepsLeft == 0)
+    {
+       double jx = (FinalLeftFootTraj_deq[0].x + FinalRightFootTraj_deq[0].x)/2 - FinalCOMTraj_deq[0].x[0];
+       double jy = (FinalLeftFootTraj_deq[0].y + FinalRightFootTraj_deq[0].y)/2 - FinalCOMTraj_deq[0].y[0];
+       if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3) { Running_ = false; }
+       const double tf = 0.75;
+       jx = 6/(tf*tf*tf)*(jx - tf*FinalCOMTraj_deq[0].x[1] - (tf*tf/2)*FinalCOMTraj_deq[0].x[2]);
+       jy = 6/(tf*tf*tf)*(jy - tf*FinalCOMTraj_deq[0].y[1] - (tf*tf/2)*FinalCOMTraj_deq[0].y[2]);
+       CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
+           jx, jy);
+       CoM_.OneIteration( jx, jy );
+    }
+    else
+    {
+       Running_ = true;
+       CoM_.Interpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, currentIndex,
+           Solution_.Solution_vec[0], Solution_.Solution_vec[QP_N_] );
+       CoM_.OneIteration( Solution_.Solution_vec[0],Solution_.Solution_vec[QP_N_] );
+    }
+
+
+    // INTERPOLATE TRUNK ORIENTATION:
+    // ------------------------------
+    OrientPrw_->interpolate_trunk_orientation( time, currentIndex,
+        m_SamplingPeriod, Solution_.SupportStates_deq,
+        FinalCOMTraj_deq );
+
+
+    // INTERPOLATE THE COMPUTED FOOT POSITIONS:
+    // ----------------------------------------
+    Robot_->generate_trajectories( time, Solution_,
+        Solution_.SupportStates_deq, Solution_.SupportOrientations_deq,
+        FinalLeftFootTraj_deq, FinalRightFootTraj_deq );
+
+
+
+
+
+
+
+
+
 
 		ComputeTrajArtControl( FinalCOMTraj_deq, FinalLeftFootTraj_deq, FinalRightFootTraj_deq) ;
 
@@ -1128,12 +1185,12 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization()
 }
 
 void ZMPVelocityReferencedQP::CoMZMPInterpolation(
-					std::deque<ZMPPosition> & ZMPPositions,                     // OUTPUT
-		      std::deque<COMState> & COMTraj_deq ,                        // OUTPUT
+					std::deque<ZMPPosition> & ZMPPositions,                    // OUTPUT
+		      std::deque<COMState> & COMTraj_deq ,                       // OUTPUT
 		      const std::deque<FootAbsolutePosition> & LeftFootTraj_deq, // INPUT
 		      const std::deque<FootAbsolutePosition> & RightFootTraj_deq,// INPUT
-		      const solution_t * aSolutionReference,                               // INPUT
-          LinearizedInvertedPendulum2D * LIPM,                        // INPUT/OUTPUT
+		      const solution_t * aSolutionReference,                     // INPUT
+          LinearizedInvertedPendulum2D * LIPM,                       // INPUT/OUTPUT
 		      const unsigned numberOfSample,                             // INPUT
 		      const int IterationNumber)                                 // INPUT
 {
@@ -1236,9 +1293,6 @@ void ZMPVelocityReferencedQP::ComputeTrajArtControl(
 	const unsigned int N = NbSampleControl_ ;
 	const int stage0 = 0 ;
 
-	PreviousConfigurationControl_ = HDR_->currentConfiguration();
-	PreviousVelocityControl_ = HDR_->currentVelocity();
-	PreviousAccelerationControl_ = HDR_->currentAcceleration();
   for(unsigned int i = 0 ; i <  N ; i++ )
   {
 		const COMState & acomp = FinalCOMTraj_deq[CurrentIndex_+i] ;
@@ -1271,7 +1325,7 @@ void ZMPVelocityReferencedQP::ComputeTrajArtControl(
 											aLeftFootPosition,
 											aRightFootPosition,
 											ConfigurationTrajControl_[i],
-											VelocityTraj_[i],
+											VelocityTrajControl_[i],
 											AccelerationTrajControl_[i],
 											2,
 											stage0);
@@ -1279,5 +1333,42 @@ void ZMPVelocityReferencedQP::ComputeTrajArtControl(
 		PreviousVelocityControl_ = VelocityTrajControl_[i] ;
 		PreviousAccelerationControl_ = AccelerationTrajControl_[i] ;
 	}
+
+	/// \brief Debug Purpose
+  /// --------------------
+  ofstream aof;
+  string aFileName;
+  ostringstream oss(std::ostringstream::ate);
+  static int iteration = 0;
+
+	/// \brief Debug Purpose
+  /// --------------------
+  oss.str("TestHerdt2010DynamicArtControl.dat");
+  aFileName = oss.str();
+  if(iteration == 0)
+  {
+		aof.open(aFileName.c_str(),ofstream::out);
+		aof.close();
+	}
+  ///----
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i )
+  {
+    aof << filterprecision( 0.0 ) << " "   // 1
+				<< filterprecision( 0.0 ) << " " ; // 2
+		for(unsigned int j = 0 ; j < ConfigurationTrajControl_[i].size() ; j++ )
+			aof << filterprecision( ConfigurationTrajControl_[i](j) ) << " " ;
+		for(unsigned int j = 0 ; j < VelocityTrajControl_[i].size() ; j++ )
+      aof << filterprecision( VelocityTrajControl_[i](j) ) << " " ;
+		for(unsigned int j = 0 ; j < AccelerationTrajControl_[i].size() ; j++ )
+      aof << filterprecision( AccelerationTrajControl_[i](j) ) << " " ;
+    aof << endl ;
+  }
+	aof.close();
+
+  ++iteration;
+
   return ;
 }

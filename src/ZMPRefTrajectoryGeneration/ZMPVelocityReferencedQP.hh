@@ -200,6 +200,7 @@ namespace PatternGeneratorJRL
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D LIPM_ ;
     LinearizedInvertedPendulum2D LIPM_subsampled_ ;
+		LinearizedInvertedPendulum2D CoM_;
 
     /// \brief Simplified robot model
     RigidBodySystem * Robot_ ;
