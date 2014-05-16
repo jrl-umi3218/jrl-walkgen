@@ -86,7 +86,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   QP_T_ = 0.1 ;
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
-  InterpolationPeriod_ = QP_T_/2;
+  InterpolationPeriod_ = QP_T_/20;
   StepPeriod_ = 0.8 ;
   SSPeriod_ = 0.7 ;
   DSPeriod_ = 0.1 ;
@@ -1041,8 +1041,14 @@ void ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & 
   for (unsigned int i = 0 ; i < NbSampleInterpolation_ ; ++i )
   {
     aof << filterprecision( ZMPMBTraj_deq_[i][0] ) << " "   // 1
-				<< filterprecision( ZMPMBTraj_deq_[i][1] ) << " "   // 2
-        << endl ;
+				<< filterprecision( ZMPMBTraj_deq_[i][1] ) << " " ; // 2
+		for(unsigned int j = 0 ; j < ConfigurationTraj_[i].size() ; j++ )
+			aof << filterprecision( ConfigurationTraj_[i](j) ) << " " ;
+		for(unsigned int j = 0 ; j < VelocityTraj_[i].size() ; j++ )
+      aof << filterprecision( VelocityTraj_[i](j) ) << " " ;
+		for(unsigned int j = 0 ; j < AccelerationTraj_[i].size() ; j++ )
+      aof << filterprecision( AccelerationTraj_[i](j) ) << " " ;
+    aof << endl ;
   }
 	aof.close();
 
@@ -1097,16 +1103,16 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization()
 											ConfigurationTraj_[i],
 											VelocityTraj_[i],
 											AccelerationTraj_[i],
-											i+static_i,
+											2,
 											stage0);
 		PreviousConfiguration_ = ConfigurationTraj_[i] ;
 		PreviousVelocity_ = VelocityTraj_[i] ;
 		PreviousAcceleration_ = AccelerationTraj_[i] ;
 	}
 
-	HDR_->currentConfiguration(ConfigurationTraj_[NbSampleInterpolation_-1]);
-	HDR_->currentVelocity(VelocityTraj_[NbSampleInterpolation_-1]);
-	HDR_->currentAcceleration(AccelerationTraj_[NbSampleInterpolation_-1]);
+	HDR_->currentConfiguration(ConfigurationTraj_[NbSampleInterpolation_+1]);
+	HDR_->currentVelocity(VelocityTraj_[NbSampleInterpolation_+1]);
+	HDR_->currentAcceleration(AccelerationTraj_[NbSampleInterpolation_+1]);
 
 	static_i += NbSampleInterpolation_ ;
   return ;
@@ -1210,40 +1216,6 @@ void ZMPVelocityReferencedQP::PrepareSolution()
 	{
 		solution_.Solution_vec[2*QP_N_] = FootPrw_vec[CurrentSupport.StepNumber+1][0] ;
 		solution_.Solution_vec[2*QP_N_+nbSteps] = FootPrw_vec[CurrentSupport.StepNumber+1][1];
-		cout << "solutions retenue ; " << solution_.Solution_vec[2*QP_N_] << " " << solution_.Solution_vec[2*QP_N_+nbSteps]
-		<< " speed ; " << VelRef_.Local.X << " " << VelRef_.Local.Y << endl;
 	}
-
-
-
-
-//
-
-//
-//	if (iteration > 0)
-//	{
-//		nbStepChanged = nbStepChanged + (int)(solution_.SupportStates_deq.front().StateChanged) ;
-//	}
-//	if (iteration == 0 || solution_.SupportStates_deq.front().Phase == DS )
-//	{
-//		nbStepChanged = 0 ;
-//	}
-//
-////	if ( solution_.SupportStates_deq.front().Phase == DS )
-////	{/*do nothing*/}
-////*	else*/ if ( nbSteps == 1 && nbStepChanged == 2 )
-//	{
-//		solution_.Solution_vec[2*QP_N_] = solFoot[nbSteps] ;
-//		solution_.Solution_vec[2*QP_N_+nbSteps] = solFoot.back() ;
-//	}
-//	else if ( nbSteps == 2 && nbStepChanged == 2 )
-//	{
-//		solution_.Solution_vec[2*QP_N_] = solFoot[nbSteps] ;
-//		solution_.Solution_vec[2*QP_N_+nbSteps] = solFoot.back() ;
-//	}else if ( nbSteps == 2 && nbStepChanged == 1 ){
-//		solution_.Solution_vec[2*QP_N_] = solFoot[nbSteps-1] ;
-//		solution_.Solution_vec[2*QP_N_+nbSteps] = solFoot[2*nbSteps] ;
-//	}else{/*do nothing*/}
-
 	return ;
 }
