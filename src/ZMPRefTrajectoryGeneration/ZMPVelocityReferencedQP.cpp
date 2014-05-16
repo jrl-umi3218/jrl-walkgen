@@ -570,7 +570,7 @@ ZMPVelocityReferencedQP::OnLine(double time,
 
 		// INTERPRET THE SOLUTION VECTOR :
 		// -------------------------------
-		//InterpretSolutionVector();
+		InterpretSolutionVector();
 
     // INTERPOLATION
     ControlInterpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, FinalLeftFootTraj_deq,
@@ -767,7 +767,6 @@ void ZMPVelocityReferencedQP::ControlInterpolation(
 void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 {
 	// interpolation the position of the com along the whole preview
-	vector<double> solFoot;
   LIPM_subsampled_.setState(InitStateLIPM_) ;
   OrientPrw_DF_->CurrentTrunkState(InitStateOrientPrw_) ;
   for ( int i = 0 ; i < QP_N_ ; i++ )
@@ -778,11 +777,36 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
       NbSampleInterpolation_, i);
   }
 
-	InterpretSolution(solFoot);
+	InterpretSolutionVector();
+
+	cout << "support foot\n"
+	<< "Phase Foot NbStepsLeft StepNumber NbInstants TimeLimit StartTime X Y Yaw StateChanged\n";
+	for (unsigned int i = 0 ; i < Solution_.SupportStates_deq.size() ; ++i)
+	{
+		cout<< Solution_.SupportStates_deq[i].Phase << " "
+		<< Solution_.SupportStates_deq[i].Foot << " "
+		<< Solution_.SupportStates_deq[i].NbStepsLeft << " "
+		<< Solution_.SupportStates_deq[i].StepNumber << " "
+		<< Solution_.SupportStates_deq[i].NbInstants << " "
+		<< Solution_.SupportStates_deq[i].TimeLimit << " "
+		<< Solution_.SupportStates_deq[i].StartTime << " "
+		<< Solution_.SupportStates_deq[i].X << " "
+		<< Solution_.SupportStates_deq[i].Y << " "
+		<< Solution_.SupportStates_deq[i].Yaw << " "
+		<< Solution_.SupportStates_deq[i].StateChanged << " " << endl ;
+	}
+	cout << "X solution = " ;
+	for (int i = 0 ; i < FootPrw_vec.size() ; ++i )
+		cout << FootPrw_vec[i][0] << " " ;
+	cout << " Y solution = " ;
+	for (int i = 0 ; i < FootPrw_vec.size() ; ++i )
+		cout << FootPrw_vec[i][1] << " " ;
+	cout << endl ;
+
 	// Copy the solution for the orientation interpolation function
 	OFTG_DF_->SetSamplingPeriod( InterpolationPeriod_ );
-  solution_t aSolution  = solution_ ;
-
+  solution_t aSolution  = Solution_ ;
+	solution_.SupportStates_deq.pop_front();
   for ( int i = 0 ; i < QP_N_ ; i++ )
   {
 		OrientPrw_DF_->preview_orientations( time + i * QP_T_, VelRef_,
@@ -796,7 +820,7 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 
 		// Modify a copy of the solution to allow "OFTG_DF_->interpolate_feet_positions"
 		// to use the correcte feet step previewed
-		PrepareSolution(i,solFoot);
+		PrepareSolution();
 
 		if(solution_.SupportStates_deq.front().Phase != DS){
 			int vjskbsrtlb = 0;
@@ -811,97 +835,8 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 
   OrientPrw_DF_->CurrentTrunkState(FinalCurrentStateOrientPrw_);
   OrientPrw_DF_->CurrentTrunkState(FinalPreviewStateOrientPrw_);
+
   return ;
-}
-
-void ZMPVelocityReferencedQP::InterpretSolution(vector<double> &solFoot)
-{
-	double PosFootX=0;
-  double PosFootY=0;
-	support_state_t & CurrentSupport = solution_.SupportStates_deq.front() ;
-  support_state_t & LastSupport = solution_.SupportStates_deq.back() ;
-  int nbSteps = LastSupport.StepNumber ;
-	const double & LastPrwSupState_X = solution_.Solution_vec[2*QP_N_ + nbSteps   -1] ;
-	const double & LastPrwSupState_Y = solution_.Solution_vec[2*QP_N_ + 2*nbSteps -1] ;
-	vector<int> index ;
-	for (unsigned int i = 0 ; i < solution_.SupportStates_deq.size() ; ++i)
-	{
-		if ( solution_.SupportStates_deq[i].StateChanged )
-			index.push_back(i-1) ;
-		if ( !(solution_.SupportStates_deq[i].NbStepsLeft > 0 && nbSteps > 0) )
-		{
-			solution_.SupportStates_deq[i].X = CurrentSupport.X ;
-			solution_.SupportStates_deq[i].Y = CurrentSupport.Y ;
-		}
-	}
-	solFoot.resize ((nbSteps+1)*2,0.0);
-	if ( (CurrentSupport.Phase == DS && LastSupport.Phase == DS)
-		|| (CurrentSupport.Phase == SS && LastSupport.Phase == DS) )
-	{
-		PosFootX = LastSupport.X ;
-		PosFootY = LastSupport.Y ;
-		solFoot[nbSteps] = PosFootX ;
-		solFoot[solFoot.size()-1] = PosFootY ;
-		return ;
-	}
-
-	for (int i = 0 ; i < nbSteps ; ++i )
-	{
-	  solFoot[i] = solution_.Solution_vec[2*QP_N_+i] ;
-	  solFoot[nbSteps+1+i] = solution_.Solution_vec[2*QP_N_+nbSteps+i] ;
-	}
-
-	double Vx = VelRef_.Local.X ;
-	double Vy = VelRef_.Local.Y ;
-	int lastCoMDSIndex = CurrentIndex_+ index.back()*NbSampleInterpolation_ + 2 ;
-	if ( lastCoMDSIndex > (COMTraj_deq_.size()-1) )
-		lastCoMDSIndex = COMTraj_deq_.size()-1 ;
-
-	const COMState & aCOMPos =  COMTraj_deq_[lastCoMDSIndex];
-	PosFootX = LastPrwSupState_X + 2*( (aCOMPos.x[0]+Vx*StepPeriod_) - LastPrwSupState_X );
-	PosFootY = LastPrwSupState_Y + 2*( (aCOMPos.y[0]+Vy*StepPeriod_) - LastPrwSupState_Y );
-
-	//ProjectionOnConstraints(PosFootX,PosFootY);
-
-	solFoot[nbSteps] = PosFootX ;
-	solFoot[solFoot.size()-1] = PosFootY ;
-	return ;
-}
-
-// Modify a copy of the solution to allow "OFTG_DF_->interpolate_feet_positions()"
-		// to use the correct foot step previewed
-void ZMPVelocityReferencedQP::PrepareSolution(int iteration, const vector<double> &solFoot)
-{
-	static int nbStepChanged = 0 ;
-	int nbSteps = 0 ;
-	nbSteps = solution_.SupportStates_deq.back().StepNumber ;
-
-	if (iteration > 0)
-	{
-		nbStepChanged = nbStepChanged + (int)(solution_.SupportStates_deq.front().StateChanged) ;
-	}
-	if (iteration == 0 || solution_.SupportStates_deq.front().Phase == DS )
-	{
-		nbStepChanged = 0 ;
-	}
-
-//	if ( solution_.SupportStates_deq.front().Phase == DS )
-//	{/*do nothing*/}
-/*	else*/ if ( nbSteps == 1 && nbStepChanged == 2 )
-	{
-		solution_.Solution_vec[2*QP_N_] = solFoot[nbSteps] ;
-		solution_.Solution_vec[2*QP_N_+nbSteps] = solFoot.back() ;
-	}
-	else if ( nbSteps == 2 && nbStepChanged == 2 )
-	{
-		solution_.Solution_vec[2*QP_N_] = solFoot[nbSteps] ;
-		solution_.Solution_vec[2*QP_N_+nbSteps] = solFoot.back() ;
-	}else if ( nbSteps == 2 && nbStepChanged == 1 ){
-		solution_.Solution_vec[2*QP_N_] = solFoot[nbSteps-1] ;
-		solution_.Solution_vec[2*QP_N_+nbSteps] = solFoot[2*nbSteps] ;
-	}else{/*do nothing*/}
-
-	return ;
 }
 
 void ZMPVelocityReferencedQP::DynamicFilter(double time, std::deque<COMState> & FinalCOMTraj_deq)
@@ -1212,5 +1147,103 @@ void ZMPVelocityReferencedQP::CoMZMPInterpolation(
 
 void ZMPVelocityReferencedQP::InterpretSolutionVector()
 {
+	double Vx = VelRef_.Local.X ;
+	double Vy = VelRef_.Local.Y ;
+	std::deque<support_state_t> & SupportStates = solution_.SupportStates_deq ;
+	support_state_t & LastSupport = solution_.SupportStates_deq.back() ;
+	support_state_t & FirstSupport = solution_.SupportStates_deq[1] ;
+	int nbSteps = LastSupport.StepNumber ;
+	vector<int> index ;
+	FootPrw_vec.resize( nbSteps+2 , vector<double>(2,0.0) );
+
+	// complete the previewed feet position
+	FootPrw_vec[0][0] = FirstSupport.X ;
+	FootPrw_vec[0][1] = FirstSupport.Y ;
+	for (int i = 0 ; i < nbSteps ; ++i )
+	{
+		FootPrw_vec[i+1][0] = solution_.Solution_vec[2*QP_N_+i] ;
+		FootPrw_vec[i+1][1] = solution_.Solution_vec[2*QP_N_+nbSteps+i] ;
+	}
+
+	// compute an additional previewed foot position
+	{
+		int size_vec_sol = FootPrw_vec.size();
+
+		if ( nbSteps > 0 ){
+			// center of the feet of the last preview double support phase :
+			double middleX = (FootPrw_vec[size_vec_sol-2][0] + FootPrw_vec[size_vec_sol-3][0])*0.5 ;
+			double middleY = (FootPrw_vec[size_vec_sol-2][1] + FootPrw_vec[size_vec_sol-3][1])*0.5 ;
+
+			FootPrw_vec[size_vec_sol-1][0] = FootPrw_vec[size_vec_sol-2][0] + 2*( (middleX + Vx*StepPeriod_) - FootPrw_vec[size_vec_sol-2][0] );
+			FootPrw_vec[size_vec_sol-1][1] = FootPrw_vec[size_vec_sol-2][1] + 2*( (middleY + Vy*StepPeriod_) - FootPrw_vec[size_vec_sol-2][1] );
+		}else
+		{
+			double Sign;
+			if(FirstSupport.Foot == LEFT)
+				Sign = 1.0;
+			else
+				Sign = -1.0;
+			FootPrw_vec[size_vec_sol-1][0] = FirstSupport.X + Sign*sin(FirstSupport.Yaw)*FeetDistance_;
+      FootPrw_vec[size_vec_sol-1][1] = FirstSupport.Y - Sign*cos(FirstSupport.Yaw)*FeetDistance_;
+		}
+	}
+
+	for (unsigned int i = 1 ; i < SupportStates.size() ; ++i)
+	{
+		SupportStates[i].X = FootPrw_vec[SupportStates[i].StepNumber][0] ;
+		SupportStates[i].Y = FootPrw_vec[SupportStates[i].StepNumber][1] ;
+	}
+
+	return ;
+}
+
+// Modify a copy of the solution to allow "OFTG_DF_->interpolate_feet_positions()"
+		// to use the correct foot step previewed
+void ZMPVelocityReferencedQP::PrepareSolution()
+{
+	static int nbStepChanged = 0 ;
+	int nbSteps = 0 ;
+	nbSteps = solution_.SupportStates_deq.back().StepNumber ;
+	support_state_t & CurrentSupport = solution_.SupportStates_deq.front() ;
+
+	if(CurrentSupport.Phase!=DS && nbSteps!=0)
+	{
+		solution_.Solution_vec[2*QP_N_] = FootPrw_vec[CurrentSupport.StepNumber+1][0] ;
+		solution_.Solution_vec[2*QP_N_+nbSteps] = FootPrw_vec[CurrentSupport.StepNumber+1][1];
+		cout << "solutions retenue ; " << solution_.Solution_vec[2*QP_N_] << " " << solution_.Solution_vec[2*QP_N_+nbSteps]
+		<< " speed ; " << VelRef_.Local.X << " " << VelRef_.Local.Y << endl;
+	}
+
+
+
+
+//
+
+//
+//	if (iteration > 0)
+//	{
+//		nbStepChanged = nbStepChanged + (int)(solution_.SupportStates_deq.front().StateChanged) ;
+//	}
+//	if (iteration == 0 || solution_.SupportStates_deq.front().Phase == DS )
+//	{
+//		nbStepChanged = 0 ;
+//	}
+//
+////	if ( solution_.SupportStates_deq.front().Phase == DS )
+////	{/*do nothing*/}
+////*	else*/ if ( nbSteps == 1 && nbStepChanged == 2 )
+//	{
+//		solution_.Solution_vec[2*QP_N_] = solFoot[nbSteps] ;
+//		solution_.Solution_vec[2*QP_N_+nbSteps] = solFoot.back() ;
+//	}
+//	else if ( nbSteps == 2 && nbStepChanged == 2 )
+//	{
+//		solution_.Solution_vec[2*QP_N_] = solFoot[nbSteps] ;
+//		solution_.Solution_vec[2*QP_N_+nbSteps] = solFoot.back() ;
+//	}else if ( nbSteps == 2 && nbStepChanged == 1 ){
+//		solution_.Solution_vec[2*QP_N_] = solFoot[nbSteps-1] ;
+//		solution_.Solution_vec[2*QP_N_+nbSteps] = solFoot[2*nbSteps] ;
+//	}else{/*do nothing*/}
+
 	return ;
 }

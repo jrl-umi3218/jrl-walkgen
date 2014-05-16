@@ -253,6 +253,7 @@ namespace PatternGeneratorJRL
     deque<ZMPPosition> tmpZMP_ ;
     deque<FootAbsolutePosition> tmpRF_ ;
     deque<FootAbsolutePosition> tmpLF_ ;
+    vector< vector<double> > FootPrw_vec ;
 
     /// \brief Index where to begin the interpolation
     unsigned CurrentIndex_ ;
@@ -388,12 +389,11 @@ namespace PatternGeneratorJRL
 		/// \brief Interpolation everything on the whole preview
     void DynamicFilterInterpolation(double time);
 
-		/// \brief Define the position of an additionnal foot step outside the preview to interpolate the position of the feet in 3D
-    void InterpretSolution(vector<double> &solFoot);
+		/// \brief Define the position of an additionnal foot step outside the preview to interpolate the position of the swinging feet in 3D
     void InterpretSolutionVector();
 
 		/// \brief Prepare the vecteur containing the solution for the interpolation
-    void PrepareSolution(int iteration, const vector<double> &solFoot);
+    void PrepareSolution();
 
 		/// \brief Project the found third foot step on the constraints
     void ProjectionOnConstraints(double & X, double & Y);
