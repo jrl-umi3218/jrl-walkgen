@@ -129,6 +129,10 @@ namespace PatternGeneratorJRL
 
       void ZGenerateKnotVector(double FT, double ToMP);
 
+      double GetMP();
+
+      double GetFT();
+
       private:
       double m_IP, m_FT, m_FP, m_ToMP, m_MP;
   };

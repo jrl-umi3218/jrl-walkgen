@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Olivier  Stasse
  *
@@ -18,15 +18,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* This object generate the reference value for the
    ZMP based on a polynomail representation
-   of the ZMP following 
+   of the ZMP following
    "Experimentation of Humanoid Walking Allowing Immediate
    Modification of Foot Place Based on Analytical Solution"
-   Morisawa, Harada, Kajita, Nakaoka, Fujiwara, Kanehiro, Hirukawa, 
+   Morisawa, Harada, Kajita, Nakaoka, Fujiwara, Kanehiro, Hirukawa,
    ICRA 2007, 3989--39994
 */
 
@@ -70,6 +70,7 @@ namespace PatternGeneratorJRL
     m_DeltaTj.clear();
     m_Omegaj.clear();
     m_VerboseLevel=0;
+    m_isStepStairOn =1;
   }
 
 
@@ -143,7 +144,7 @@ namespace PatternGeneratorJRL
     for(unsigned int i=0;i<obj.m_DeltaTj.size();i++)
       os << obj.m_DeltaTj[i] << " ";
     os << endl;
-    
+
     os << "Step Types:" << endl;
     for(unsigned int i=0;i<obj.m_StepTypes.size();i++)
       os << obj.m_StepTypes[i] << " ";
@@ -155,7 +156,7 @@ namespace PatternGeneratorJRL
     os << endl;
     return os;
   }
-  
+
   void AnalyticalMorisawaAbstract::displayDeltaTj(ostream &aos)
   {
     aos << "AnalyticalMorisawaCompact:";
@@ -169,5 +170,5 @@ namespace PatternGeneratorJRL
       }
     aos << endl;
   }
-  
+
 }

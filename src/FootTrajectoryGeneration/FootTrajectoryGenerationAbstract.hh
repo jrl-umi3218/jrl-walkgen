@@ -192,6 +192,10 @@ namespace PatternGeneratorJRL
     */
     virtual void CallMethod(std::string &Method, std::istringstream &strm);
 
+    double GetStairs();
+    void SetStairs(double stairs);
+
+
   protected:
 
     /*! Sampling period of the control. */
@@ -210,6 +214,8 @@ namespace PatternGeneratorJRL
     double m_Omega;
 
     int m_isStepStairOn;
+
+    double m_stairs;
   };
 
 

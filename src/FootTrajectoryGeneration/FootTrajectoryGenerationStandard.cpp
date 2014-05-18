@@ -177,8 +177,8 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex,
    }
    else
    {
-     m_BsplinesZ->SetParameters(TimeInterval,Position/1.5,TimeInterval/3.0,Position);
-     cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx" << endl;
+     m_BsplinesZ->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position*1.5);
+  //   cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx" << endl;
    }
      break;
 
@@ -226,8 +226,11 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
    }
    else
    {
-     m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition/1.5,TimeInterval/3.0,FinalPosition);
-   }
+     //if (InitPosition < FinalPosition)
+        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,InitPosition+(FinalPosition-InitPosition)*1.5);
+     //  else if (InitPosition == FinalPosition)
+     //   m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,FinalPosition);
+    }
     break;
 
    case THETA_AXIS:
@@ -270,7 +273,10 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
    }
    else
    {
-     m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition/1.5,TimeInterval/3.0,FinalPosition);
+       //if (InitPosition <= FinalPosition)
+        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,InitPosition+(FinalPosition-InitPosition)*1.5);
+      // else if (InitPosition == FinalPosition)
+       // m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,FinalPosition);
 
    }
     break;
@@ -342,6 +348,73 @@ int FootTrajectoryGenerationStandard::GetParametersWithInitPosInitSpeed(int Poly
  return 0;
 }
 
+
+double FootTrajectoryGenerationStandard::ComputeAll(std::deque<FootAbsolutePosition> & adFootAbsolutePosition,double Time)
+
+    {
+
+
+        FootAbsolutePosition aFootAbsolutePosition;
+  aFootAbsolutePosition.x = m_PolynomeX->Compute(Time);
+  aFootAbsolutePosition.dx = m_PolynomeX->ComputeDerivative(Time);
+  //  aFootAbsolutePosition.ddx = m_PolynomeX->ComputeSecDerivative(Time);
+  ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.x);
+
+  aFootAbsolutePosition.y = m_PolynomeY->Compute(Time);
+  aFootAbsolutePosition.dy = m_PolynomeY->ComputeDerivative(Time);
+  //  aFootAbsolutePosition.ddy = m_PolynomeY->ComputeSecDerivative(Time);
+
+  if (m_isStepStairOn == 0)
+   {
+      aFootAbsolutePosition.z = m_PolynomeZ->Compute(Time);
+      aFootAbsolutePosition.dz = m_PolynomeZ->ComputeDerivative(Time);
+   // aFootAbsolutePosition.ddz = m_PolynomeZ->ComputeSecDerivative(Time);
+   }
+   else
+   {
+
+   /*   if (m_BsplinesZ->ZComputePosition(Time)==0)
+     {
+        // cout << m_BsplinesZ->ZComputePosition(Time) << endl;
+      if (adFootAbsolutePosition.size() > 0)
+            aFootAbsolutePosition.z = adFootAbsolutePosition.back().z;
+        else
+            aFootAbsolutePosition.z =0.0;
+
+        // m_BsplinesZ->SetParametersWithInitPos(adFootAbsolutePosition.back().z,m_BsplinesZ->GetFT(),m_BsplinesZ->GetMP()/1.5,m_BsplinesZ->GetMP(),m_BsplinesZ->GetFT()/3.0);
+//   m_BsplinesZ->SetParametersWithInitPos(aFootAbsolutePosition.z,m_BsplinesZ->GetFT(),m_BsplinesZ->GetMP()/1.5,m_BsplinesZ->GetMP(),m_BsplinesZ->GetFT()/3.0);
+
+        //    cout << m_BsplinesZ->ZComputePosition(Time) << endl;
+     }
+     else
+     {
+       //  cout << adFootAbsolutePosition.back().z << " " << m_BsplinesZ->GetFT() << " " << m_BsplinesZ->GetMP()/1.5 << " " << m_BsplinesZ->GetMP() << " " << m_BsplinesZ->GetFT()/3.0 << endl;
+//        m_BsplinesZ->SetParametersWithInitPos(aFootAbsolutePosition.z,m_BsplinesZ->GetFT(),m_BsplinesZ->GetMP()/1.5,m_BsplinesZ->GetMP(),m_BsplinesZ->GetFT()/3.0);
+
+        aFootAbsolutePosition.z = m_BsplinesZ->ZComputePosition(Time);
+     //   cout << "ooooooooooo "<<m_stairs<< endl;
+     }*/
+     aFootAbsolutePosition.z = m_BsplinesZ->ZComputePosition(Time);
+      aFootAbsolutePosition.dz = m_BsplinesZ->ZComputeVelocity(Time);
+   }
+
+  aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(Time);
+  aFootAbsolutePosition.dtheta = m_PolynomeTheta->ComputeDerivative(Time);
+
+  aFootAbsolutePosition.omega = m_PolynomeOmega->Compute(Time);
+  aFootAbsolutePosition.domega = m_PolynomeOmega->ComputeDerivative(Time);
+
+  aFootAbsolutePosition.omega2 = m_PolynomeOmega2->Compute(Time);
+  aFootAbsolutePosition.domega2 = m_PolynomeOmega2->ComputeDerivative(Time);
+
+  //
+  adFootAbsolutePosition.push_back(aFootAbsolutePosition);
+ // cout << "AAAAAAAAAAAAAAAA "<< Time << "   "<< m_BsplinesZ->GetFT() <<"   "<< m_BsplinesZ->GetMP() <<"  "<< adFootAbsolutePosition.back().z << endl;
+  return Time;
+}
+
+
+
 double FootTrajectoryGenerationStandard::ComputeAll(FootAbsolutePosition & aFootAbsolutePosition,
 						    double Time)
 {
@@ -357,7 +430,7 @@ double FootTrajectoryGenerationStandard::ComputeAll(FootAbsolutePosition & aFoot
   if (m_isStepStairOn == 0)
    {
       aFootAbsolutePosition.z = m_PolynomeZ->Compute(Time);
-        aFootAbsolutePosition.dz = m_PolynomeZ->ComputeDerivative(Time);
+      aFootAbsolutePosition.dz = m_PolynomeZ->ComputeDerivative(Time);
    // aFootAbsolutePosition.ddz = m_PolynomeZ->ComputeSecDerivative(Time);
    }
    else

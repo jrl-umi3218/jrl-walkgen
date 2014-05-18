@@ -416,23 +416,23 @@ void ZBsplines::ZGenerateControlPoints(double IP, double FT, double FP, double T
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.85*m_ToMP,m_MP+IP};
+    A = {0.85*m_ToMP,m_MP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {1.15*m_ToMP,m_MP+IP};
+    A = {1.15*m_ToMP,m_MP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.85*m_FT,m_FP+IP};
+    A = {0.85*m_FT,m_FP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.9*m_FT,m_FP+IP};
+    A = {0.9*m_FT,m_FP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {m_FT,m_FP+IP};
+    A = {m_FT,m_FP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
@@ -441,4 +441,13 @@ void ZBsplines::ZGenerateControlPoints(double IP, double FT, double FP, double T
     SetControlPoints(control_points);
 }
 
+double ZBsplines::GetMP()
+{
+    return m_MP;
+}
 
+
+double ZBsplines::GetFT()
+{
+    return m_FT;
+}

@@ -94,7 +94,10 @@ protected:
     }
 
     {
-      istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0 0.0 0.19 0.0 0.0 -0.19 0.0 0.0 0.19 0.0");
+      istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0 \
+                                                        0.0 0.19 0.0 0.0\
+                                                        -0.19 0.0 0.0 \
+                                                        0.19 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -107,16 +110,34 @@ protected:
 
   void AnalyticalShortStraightWalking(PatternGeneratorInterface &aPGI)
   {
+
     CommonInitialization(aPGI);
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
       aPGI.ParseCmd(strm2);
     }
 
-    {
-      istringstream strm2(":stepseq 0.0 -0.105 0.0 0.2 0.19 0.0 0.0 -0.19 0.0 0.2 0.19 0.0 0.0 -0.19 0.0 0.2 0.19 0.0 0.0 -0.19 0.0");
+ /*   {
+      istringstream strm2(":walkmode 6");
       aPGI.ParseCmd(strm2);
     }
+  cout << "TESTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" << endl;*/
+
+    {
+      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
+                                         0.2 0.19 0.1 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.2 0.19 0.1 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.2 0.19 0.1 0.0\
+                                        0.0 -0.19 0.0 0.0");
+
+      aPGI.ParseCmd(strm2);
+    }
+  /*  {
+      istringstream strm2(":stepseq 0.0 -0.105 0.0 0.2 0.19 0.0 0.0 -0.19 0.0 0.2 0.19 0.0 0.0 -0.19 0.0 0.2 0.19 0.0 0.0 -0.19 0.0");
+      aPGI.ParseCmd(strm2);
+    }*/
 
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, 2009, 2010, 
+ * Copyright 2008, 2009, 2010,
  *
  * Torea Foissotte
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with jrl-walkgen.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
@@ -52,21 +52,21 @@ void FootTrajectoryGenerationMultiple::SetNumberOfIntervals(int lNumberOfInterva
 {
   if (m_SetOfFootTrajectoryGenerationObjects.size()==(unsigned int)lNumberOfIntervals)
     return;
-  
+
   for(unsigned int i=0;i<m_SetOfFootTrajectoryGenerationObjects.size();i++)
     {
       delete m_SetOfFootTrajectoryGenerationObjects[i];
     }
-  
+
   m_SetOfFootTrajectoryGenerationObjects.resize(lNumberOfIntervals);
   for(unsigned int i=0;i<m_SetOfFootTrajectoryGenerationObjects.size();i++)
     {
       m_SetOfFootTrajectoryGenerationObjects[i] = new FootTrajectoryGenerationStandard(getSimplePluginManager(),m_Foot);
       m_SetOfFootTrajectoryGenerationObjects[i]->InitializeInternalDataStructures();
-    }  
+    }
   m_NatureOfIntervals.resize(lNumberOfIntervals);
 }
-  
+
 int FootTrajectoryGenerationMultiple::GetNumberOfIntervals() const
 {
   return m_SetOfFootTrajectoryGenerationObjects.size();
@@ -78,14 +78,14 @@ void FootTrajectoryGenerationMultiple::SetTimeIntervals(const vector<double> &lD
   m_DeltaTj = lDeltaTj;
   m_RefTime.resize(lDeltaTj.size());
   double reftime=0.0;
-  
+
   for(unsigned int li=0;li<m_DeltaTj.size();li++)
     {
       m_RefTime[li] = reftime;
 	  ODEBUG(" m_RefTime["<< li <<"]: " << setprecision(12) << m_RefTime[li] << " reftime: "<< setprecision(12) << reftime );
       reftime+=m_DeltaTj[li];
     }
-  
+
 }
 
 void FootTrajectoryGenerationMultiple::GetTimeIntervals(vector<double> &lDeltaTj) const
@@ -100,27 +100,27 @@ bool FootTrajectoryGenerationMultiple::Compute(int axis, double t, double &resul
   double reftime=0;
   ODEBUG(" ====== CoM ====== ");
   ODEBUG(" t: " << t << " reftime :" << reftime << " m_Sensitivity: "<< m_Sensitivity <<" m_DeltaTj.size(): "<< m_DeltaTj.size() );
-	  
+
   for(unsigned int j=0;j<m_DeltaTj.size();j++)
     {
       ODEBUG(" t: " << t << " reftime :" << reftime << " Tj["<<j << "]= "<< m_DeltaTj[j]);
-	  
+
       if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
 	{
 	  double deltaj=0.0;
 	  deltaj = t-reftime;
-	  
+
 	  if (m_SetOfFootTrajectoryGenerationObjects[j]!=0)
 	    {
 	      result = m_SetOfFootTrajectoryGenerationObjects[j]->Compute(axis,deltaj);
 	    }
 	  return true;
 	}
-      
+
       reftime+=m_DeltaTj[j];
     }
   ODEBUG(" reftime :" << reftime );
-	  
+
   return false;
 }
 
@@ -129,62 +129,79 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
 {
   double deltaj = t - m_AbsoluteTimeReference - m_RefTime[IndexInterval];
   ODEBUG("IndexInterval : " << IndexInterval );
+
   m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAll(aFootAbsolutePosition,deltaj);
   aFootAbsolutePosition.stepType = m_NatureOfIntervals[IndexInterval];
   return true;
 }
+
+/*bool FootTrajectoryGenerationMultiple::Compute(double t, deque<FootAbsolutePosition> &adFootAbsolutePosition, unsigned int IndexInterval)
+{
+  double deltaj = t - m_AbsoluteTimeReference - m_RefTime[IndexInterval];
+    ODEBUG("IndexInterval : " << IndexInterval );
+
+//  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->m_BsplinesZ->SetParametersWithInitPos(adFootAbsolutePosition.back().z,m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->m_BsplinesZ->GetFT(),m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->m_BsplinesZ->GetMP()/1.5,m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->m_BsplinesZ->GetMP(),m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->m_BsplinesZ->GetFT()/3.0);
+
+  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAll(adFootAbsolutePosition,deltaj);
+// cout << IndexInterval<< "  "<<m_DeltaTj[IndexInterval] << "   "<< deltaj << "          " << t << "         "<< adFootAbsolutePosition.back().z<<"                     " <<m_AbsoluteTimeReference << " " << m_RefTime[IndexInterval] << endl;
+
+  //m_SetOfFootTrajectoryGenerationObjects[IndexInterval+1]->SetStairs( (m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->GetStairs()));
+  adFootAbsolutePosition[IndexInterval].stepType = m_NatureOfIntervals[IndexInterval];
+  return true;
+}*/
+
 
 bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & aFootAbsolutePosition)
 {
   t -= m_AbsoluteTimeReference;
   double reftime=0;
   ODEBUG(" ====== Foot ====== " << m_DeltaTj.size());
-  ODEBUG("t: " << setprecision(12) << t << " reftime :" << reftime << 
+  ODEBUG("t: " << setprecision(12) << t << " reftime :" << reftime <<
   	" m_Sensitivity: "<< m_Sensitivity  <<" m_DeltaTj.size(): "<< m_DeltaTj.size() );
-	  
+
   for(unsigned int j=0;j<m_DeltaTj.size();j++)
     {
       ODEBUG("t: " << t << " reftime :" << setprecision(12) << reftime <<
-	     " Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j] 
+	     " Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j]
 	     <<" max limit: " << setprecision(12) << (reftime+m_DeltaTj[j]+m_Sensitivity) );
       ODEBUG(" Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j] );
       if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[j]+m_Sensitivity))
 	{
 	  double deltaj=0.0;
 	  deltaj = t-reftime;
-	  
+
 	  if (m_SetOfFootTrajectoryGenerationObjects[j]!=0)
-	    {	      
+	    {
 	      m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAll(aFootAbsolutePosition,deltaj);
 	      aFootAbsolutePosition.stepType = m_NatureOfIntervals[j];
 	    }
 	  ODEBUG("t: " << t << " reftime :" << setprecision(12) << reftime <<
 		  " AbsoluteTimeReference : " << m_AbsoluteTimeReference <<
-		  " Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j] 
+		  " Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j]
 	     <<" max limit: " << setprecision(12) << (reftime+m_DeltaTj[j]+m_Sensitivity) );
-	  ODEBUG("X: " << aFootAbsolutePosition.x << 
-		  " Y: " << aFootAbsolutePosition.y << 
-		  " Z: " << aFootAbsolutePosition.z << 
+	  ODEBUG("X: " << aFootAbsolutePosition.x <<
+		  " Y: " << aFootAbsolutePosition.y <<
+		  " Z: " << aFootAbsolutePosition.z <<
 		  " Theta: " << aFootAbsolutePosition.theta <<
-		  " Omega: " << aFootAbsolutePosition.omega << 
-		  " stepType: " << aFootAbsolutePosition.stepType << 
+		  " Omega: " << aFootAbsolutePosition.omega <<
+		  " stepType: " << aFootAbsolutePosition.stepType <<
 		  " NI: " << m_NatureOfIntervals[j] <<
 		  " interval : " << j);
 
 	  return true;
 	}
-      
+
       reftime+=m_DeltaTj[j];
     }
   ODEBUG(" reftime :" << reftime <<
 	  " m_AbsoluteReferenceTime" << m_AbsoluteTimeReference);
-  ODEBUG("t: " << setprecision(12) << t << " reftime :" << reftime << 
+  ODEBUG("t: " << setprecision(12) << t << " reftime :" << reftime <<
 	  " m_Sensitivity: "<< m_Sensitivity  <<" m_DeltaTj.size(): "<< m_DeltaTj.size() );
 
   return false;
 }
 
-/*! This method specifies the nature of the interval. 
+/*! This method specifies the nature of the interval.
 */
 int FootTrajectoryGenerationMultiple::SetNatureInterval(unsigned int IntervalIndex,
 							int Nature)
@@ -193,24 +210,24 @@ int FootTrajectoryGenerationMultiple::SetNatureInterval(unsigned int IntervalInd
     return -1;
   m_NatureOfIntervals[IntervalIndex] = Nature;
   return 0;
-  
+
 }
 
-/*! This method returns the nature of the interval. 
+/*! This method returns the nature of the interval.
 */
 int FootTrajectoryGenerationMultiple::GetNatureInterval(unsigned int IntervalIndex) const
 {
   if (IntervalIndex>=m_NatureOfIntervals.size())
     return -100;
-  
+
   return  m_NatureOfIntervals[IntervalIndex];
 }
 
 
 /*! This method specifies the parameters for each of the polynome used by this
   object. In this case, as it is used for the 3rd order polynome. The polynome to
-  which those parameters are set is specified with PolynomeIndex. 
-  @param PolynomeIndex: Set to which axis the parameters will be applied. 
+  which those parameters are set is specified with PolynomeIndex.
+  @param PolynomeIndex: Set to which axis the parameters will be applied.
   @param TimeInterval: Set the time base of the polynome.
   @param Position: Set the final position of the polynome at TimeInterval.
   @param InitPosition: Initial position when computing the polynome at t=0.0.
@@ -237,8 +254,8 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 
 /*! This method specifies the parameters for each of the polynome used by this
   object. In this case, as it is used for the 3rd order polynome. The polynome to
-  which those parameters are set is specified with PolynomeIndex. 
-  @param PolynomeIndex: Set to which axis the parameters will be applied. 
+  which those parameters are set is specified with PolynomeIndex.
+  @param PolynomeIndex: Set to which axis the parameters will be applied.
   @param TimeInterval: Set the time base of the polynome.
   @param Position: Set the final position of the polynome at TimeInterval.
 */
@@ -291,8 +308,8 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeedInitAcc(u
 
 /*! This method get the parameters for each of the polynome used by this
   object. In this case, as it is used for the 3rd order polynome. The polynome to
-  which those parameters are set is specified with PolynomeIndex. 
-  @param PolynomeIndex: Set to which axis the parameters will be applied. 
+  which those parameters are set is specified with PolynomeIndex.
+  @param PolynomeIndex: Set to which axis the parameters will be applied.
   @param TimeInterval: Set the time base of the polynome.
   @param Position: Set the final position of the polynome at TimeInterval.
   @param InitPosition: Initial position when computing the polynome at t=0.0.
@@ -332,7 +349,7 @@ void FootTrajectoryGenerationMultiple::SetAbsoluteTimeReference(double lAbsolute
 void FootTrajectoryGenerationMultiple::CallMethod(std::string &, //Method,
 						  std::istringstream & ) //strm)
 {
-  
+
 }
 int FootTrajectoryGenerationMultiple::DisplayIntervals() const
 {
@@ -343,7 +360,7 @@ int FootTrajectoryGenerationMultiple::DisplayIntervals() const
   return 0;
 }
 
-FootTrajectoryGenerationMultiple & 
+FootTrajectoryGenerationMultiple &
 FootTrajectoryGenerationMultiple::operator=
 (const FootTrajectoryGenerationMultiple & aFTGM)
 {

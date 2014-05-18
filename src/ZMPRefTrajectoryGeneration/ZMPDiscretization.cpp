@@ -633,6 +633,7 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       m_AngleDiffFromZMPThetaToSupportFootTheta = CurrentLeftFootAbsPos.theta - CurrentAbsZMPTheta;
     }
 
+
   double TimeForThisFootPosition = TimeFirstPhase+ lTsingle;
   ODEBUG4("TimeFirstPhase: " << TimeFirstPhase << " lTsingle: " << lTsingle,"DebugData.txt");
   // Compute the size of cells to add inside the array.
@@ -843,21 +844,9 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::Y_AXIS,
 						    ModulatedSingleSupportTime,vrel(1,0));
 
-  FootAbsolutePosition * LastSFP; //LastSwingFootPosition
 
-      if(m_RelativeFootPositions[0].sy > 0)
-        {
-    	  LastSFP = &(LeftFootAbsolutePositions[CurrentZMPindex]);
-        }
-      else
-        {
-    	  LastSFP = &(RightFootAbsolutePositions[CurrentZMPindex]);
-        }
-  m_FootTrajectoryGenerationStandard->SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Z_AXIS,
-          m_Tsingle,lStepHeight,
-          LastSFP->z, LastSFP->dz);
- // m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
-						   // m_Tsingle,lStepHeight);
+  m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
+						    m_Tsingle,lStepHeight);
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::THETA_AXIS,
 						    ModulatedSingleSupportTime,RelTheta);
   m_FootTrajectoryGenerationStandard->SetParameters(FootTrajectoryGenerationStandard::OMEGA_AXIS,
