@@ -421,12 +421,16 @@ InitializationFoot(CjrlFoot * aFoot,
       MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,i,j) =
   	MAL_S4x4_MATRIX_ACCESS_I_J(invrot,i,j);
 
-  // We assume that the foot is flat on the floor...
+  // The foot *must be* flat on the floor...
   // Thus
   // lRightFootPose(0:2,0:2)=
   // coct    -st    -soct
   // cost     ct    -sost
   // so        0    co
+  assert((MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,1) == 0) &&
+        "Error in the walk pattern generator initialization:" &&
+        " Initial foot position is not flat");
+
   InitFootPosition.omega =
     atan2(MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,0),
 	  MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,2))*180/M_PI;
