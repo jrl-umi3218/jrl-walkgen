@@ -146,30 +146,12 @@ InitializeMapsForAHand(CjrlHand * aHand,
   if (associatedWrist==0)
     return;
 
-  std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint;
-  FromRootToJoint.clear();
-  FromRootToJoint2.clear();
-  CjrlJoint *waist = getHumanoidDynamicRobot()->waist();
-  FromRootToJoint = getHumanoidDynamicRobot()->jointsBetween(*waist, *associatedWrist);
+  std::vector<CjrlJoint *> FromRootToJoint =
+    getHumanoidDynamicRobot()->jointsBetween(*Chest, *associatedWrist);
 
   std::vector<CjrlJoint *>::iterator itJoint = FromRootToJoint.begin();
-  bool startadding=false;
-  while(itJoint!=FromRootToJoint.end())
-    {
-
-      std::vector<CjrlJoint *>::iterator current = itJoint;
-      if (*current==Chest)
-	  startadding=true;
-      else
-	{
-	  if (startadding)
-	    FromRootToJoint2.push_back(*itJoint);
-	}
-      itJoint++;
-      
-    }
-  associateShoulder = FromRootToJoint2[0];
-  InitializationMaps(FromRootToJoint2,ActuatedJoints,
+  associateShoulder = FromRootToJoint[0];
+  InitializationMaps(FromRootToJoint,ActuatedJoints,
 		     IndexesInConfiguration);
 }
 
@@ -278,7 +260,7 @@ Initialization()
   FromRootToJoint.erase(FromRootToJoint.begin());
   InitializationMaps(FromRootToJoint,ActuatedJoints,
 		     m_RightLegIndexinConfiguration);
-  FromRootToJoint.clear();
+
   FromRootToJoint = 
     getHumanoidDynamicRobot()->jointsBetween(*waist, *(LeftFoot->associatedAnkle()));
 
