@@ -372,7 +372,7 @@ namespace PatternGeneratorJRL
       );
 
 		/// \brief Compute the inverse kinematics with a simplified inverted pendulum model
-    void CallToComAndFootRealization();
+    void CallToComAndFootRealization(double time);
 
 		/// \brief Interpolation form the com jerk the position of the com and the zmp corresponding to the kart table model
     void CoMZMPInterpolation(
@@ -409,7 +409,7 @@ namespace PatternGeneratorJRL
     void ComputeTrajArtControl(
                 deque<COMState> & FinalCOMTraj_deq,
                 deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-                deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
+                deque<FootAbsolutePosition> &FinalRightFootTraj_deq,double time);
   };
 }
 

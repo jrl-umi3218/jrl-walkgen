@@ -40,3 +40,16 @@ _build-intit-herdt/
 tests/plot.gnu
 tests/plotTmp.gnu
 .gitignore.orig
+CMakeLists.txt.user
+_build-qmake/
+animate.gif
+buffer11_50ms.png
+buffer11_5ms.png
+convexHull.dat
+inc_dec.gnu
+loop.gnu
+plotBuffers.py
+plotBuffers.pyc
+plotBuffersDCOM.py
+plotCoM.gnu
+plot_tmp2.gnu

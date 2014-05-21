@@ -748,21 +748,36 @@ void startOnLineWalking(PatternGeneratorInterface &aPGI)
       localeventHandler_t Handler ;
     };
 
-    #define localNbOfEvents 6
+    #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-    { {1*200,&TestHerdt2010::walkForward},
-      {2*200,&TestHerdt2010::startTurningRightOnSpot},
-      {5*200,&TestHerdt2010::walkForward},
-//      {35*200,&TestHerdt2010::walkForward},
-      {7*200,&TestHerdt2010::startTurningLeftOnSpot},
-//      {55*200,&TestHerdt2010::walkForward},
-//      {65*200,&TestHerdt2010::startTurningRightOnSpot},
-//      {75*200,&TestHerdt2010::walkForward},
-//      {85*200,&TestHerdt2010::startTurningLeft},
-//      {95*200,&TestHerdt2010::startTurningRight},
-      {9*200,&TestHerdt2010::stop},
-      {11*200,&TestHerdt2010::stopOnLineWalking}
-    };
+      { { 5*200,&TestHerdt2010::walkForward},
+        {10*200,&TestHerdt2010::walkSidewards},
+        {25*200,&TestHerdt2010::startTurningRightOnSpot},
+        {35*200,&TestHerdt2010::walkForward},
+        {45*200,&TestHerdt2010::startTurningLeftOnSpot},
+        {55*200,&TestHerdt2010::walkForward},
+        {65*200,&TestHerdt2010::startTurningRightOnSpot},
+        {75*200,&TestHerdt2010::walkForward},
+        {85*200,&TestHerdt2010::startTurningLeft},
+				{95*200,&TestHerdt2010::startTurningRight},
+				{105*200,&TestHerdt2010::stop},
+				{110*200,&TestHerdt2010::stopOnLineWalking}};
+
+//    #define localNbOfEvents 6
+//    struct localEvent events [localNbOfEvents] =
+//    { {1*200,&TestHerdt2010::walkForward},
+//      {2*200,&TestHerdt2010::startTurningRightOnSpot},
+//      {5*200,&TestHerdt2010::walkForward},
+////      {35*200,&TestHerdt2010::walkForward},
+//      {7*200,&TestHerdt2010::startTurningLeftOnSpot},
+////      {55*200,&TestHerdt2010::walkForward},
+////      {65*200,&TestHerdt2010::startTurningRightOnSpot},
+////      {75*200,&TestHerdt2010::walkForward},
+////      {85*200,&TestHerdt2010::startTurningLeft},
+////      {95*200,&TestHerdt2010::startTurningRight},
+//      {9*200,&TestHerdt2010::stop},
+//      {14.6*200,&TestHerdt2010::stopOnLineWalking}
+//    };
 
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
