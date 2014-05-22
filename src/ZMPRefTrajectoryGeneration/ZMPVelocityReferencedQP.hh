@@ -405,11 +405,6 @@ namespace PatternGeneratorJRL
 		/// \brief Project the found third foot step on the constraints
     void ProjectionOnConstraints(double & X, double & Y);
 
-
-    void ComputeTrajArtControl(
-                deque<COMState> & FinalCOMTraj_deq,
-                deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-                deque<FootAbsolutePosition> &FinalRightFootTraj_deq,double time);
   };
 }
 

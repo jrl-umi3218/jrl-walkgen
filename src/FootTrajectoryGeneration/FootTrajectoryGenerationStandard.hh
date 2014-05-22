@@ -200,7 +200,7 @@ namespace PatternGeneratorJRL
    Polynome5 *m_PolynomeX,*m_PolynomeY;
    
    /*! \brief Polynome for X-Y orientation */
-   Polynome3 *m_PolynomeTheta;
+   Polynome5 *m_PolynomeTheta;
 
    /*! \brief Polynome for Y-Z orientation */
    Polynome3 *m_PolynomeOmega, *m_PolynomeOmega2;

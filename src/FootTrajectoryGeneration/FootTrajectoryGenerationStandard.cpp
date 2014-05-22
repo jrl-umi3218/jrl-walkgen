@@ -122,7 +122,7 @@ void FootTrajectoryGenerationStandard::InitializeInternalDataStructures()
   m_PolynomeZ = new Polynome4(0,0);
   m_PolynomeOmega = new Polynome3(0,0);
   m_PolynomeOmega2 = new Polynome3(0,0);
-  m_PolynomeTheta = new Polynome3(0,0);  
+  m_PolynomeTheta = new Polynome5(0,0);
 }
 
 void FootTrajectoryGenerationStandard::FreeInternalDataStructures()

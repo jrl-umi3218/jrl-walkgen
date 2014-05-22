@@ -593,7 +593,6 @@ void
     // INTERPOLATION
     ControlInterpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, FinalLeftFootTraj_deq,
                           FinalRightFootTraj_deq, time) ;
-    ComputeTrajArtControl( FinalCOMTraj_deq, FinalLeftFootTraj_deq, FinalRightFootTraj_deq, time) ;
 
     DynamicFilterInterpolation( time) ;
     CallToComAndFootRealization(time);
@@ -1244,19 +1243,32 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(double time)
                                                                               VelocityTraj_[i],
                                                                               AccelerationTraj_[i],
                                                                               it, stage0);
+  }
 
-    PreviousAcceleration_ = AccelerationTraj_[i] ;
+  // 2 point filter
+  vector <MAL_VECTOR_TYPE(double)> tmpConfigurationTraj_ (QP_N_ * NbSampleInterpolation_) ;
+  vector <MAL_VECTOR_TYPE(double)> tmpVelocityTraj_(QP_N_ * NbSampleInterpolation_) ;
+  vector <MAL_VECTOR_TYPE(double)> tmpAccelerationTraj_(QP_N_ * NbSampleInterpolation_) ;
 
-    // 2 point filter
-    ConfigurationTraj_[i]=( ConfigurationTraj_[i]+ComAndFootRealizationByGeometry_->GetPreviousConfigurationStage0())*0.5;
-    VelocityTraj_[i]=( VelocityTraj_[i]+ComAndFootRealizationByGeometry_->GetPreviousVelocityStage0() )*0.5;
-    AccelerationTraj_[i]=(AccelerationTraj_[i]+PreviousAcceleration_)*0.5;
+  tmpConfigurationTraj_[0] = ( ConfigurationTraj_[0]+PreviousConfiguration_ )*0.5;
+  tmpVelocityTraj_[0]      = ( VelocityTraj_[0]+PreviousVelocity_ )*0.5;
+  tmpAccelerationTraj_[0]  = ( AccelerationTraj_[0]+PreviousAcceleration_ )*0.5;
+
+  for (unsigned int i = 1 ; i < N ; ++i )
+  {
+    tmpConfigurationTraj_[i] = ( ConfigurationTraj_[i]+ ConfigurationTraj_[i-1] )*0.5;
+    tmpVelocityTraj_[i] = ( VelocityTraj_[i] + VelocityTraj_[i-1] )*0.5;
+    tmpAccelerationTraj_[i] = ( AccelerationTraj_[i] + AccelerationTraj_[i-1] )*0.5;
   }
 
   // saving the precedent state of the next QP_ computation
   PreviousConfiguration_ = ConfigurationTraj_[NbSampleInterpolation_-1] ;
   PreviousVelocity_ = VelocityTraj_[NbSampleInterpolation_-1] ;
   PreviousAcceleration_ = AccelerationTraj_[NbSampleInterpolation_-1] ;
+
+  ConfigurationTraj_ = tmpConfigurationTraj_ ;
+  VelocityTraj_ = tmpVelocityTraj_ ;
+  AccelerationTraj_ = tmpAccelerationTraj_ ;
 
   //	HDR_->currentConfiguration(ConfigurationTraj_[NbSampleInterpolation_-1]);
   //	HDR_->currentVelocity(VelocityTraj_[NbSampleInterpolation_-1]);
@@ -1403,107 +1415,5 @@ void ZMPVelocityReferencedQP::PrepareSolution()
     solution_.Solution_vec[2*QP_N_] = FootPrw_vec[CurrentSupport.StepNumber+1][0] ;
     solution_.Solution_vec[2*QP_N_+nbSteps] = FootPrw_vec[CurrentSupport.StepNumber+1][1];
   }
-  return ;
-}
-
-void ZMPVelocityReferencedQP::ComputeTrajArtControl(
-    deque<COMState> & FinalCOMTraj_deq,
-    deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
-    deque<FootAbsolutePosition> &FinalRightFootTraj_deq, double time)
-{
-  const unsigned int N = NbSampleControl_ ;
-  const int stage0 = 0 ;
-  int it = (int)(time / QP_T_) ;
-
-  ComAndFootRealizationByGeometry_->SetPreviousConfigurationStage0(PreviousConfigurationControl_);
-  ComAndFootRealizationByGeometry_->SetPreviousVelocityStage0(PreviousVelocityControl_);
-
-  for(unsigned int i = 0 ; i <  N ; i++ )
-  {
-    const COMState & acomp = FinalCOMTraj_deq[CurrentIndex_+i] ;
-    const FootAbsolutePosition & aLeftFAP = FinalLeftFootTraj_deq [CurrentIndex_+i] ;
-    const FootAbsolutePosition & aRightFAP = FinalRightFootTraj_deq [CurrentIndex_+i] ;
-
-    MAL_VECTOR_DIM(aCOMState,double,6);	MAL_VECTOR_DIM(aLeftFootPosition,double,5);
-    MAL_VECTOR_DIM(aCOMSpeed,double,6);	MAL_VECTOR_DIM(aRightFootPosition,double,5);
-    MAL_VECTOR_DIM(aCOMAcc,double,6);
-
-    aCOMState(0) = acomp.x[0];      aCOMSpeed(0) = acomp.x[1];			aCOMAcc(0) = acomp.x[2];
-    aCOMState(1) = acomp.y[0];      aCOMSpeed(1) = acomp.y[1];      aCOMAcc(1) = acomp.y[2];
-    aCOMState(2) = acomp.z[0];      aCOMSpeed(2) = acomp.z[1];      aCOMAcc(2) = acomp.z[2];
-    aCOMState(3) = acomp.roll[0];   aCOMSpeed(3) = acomp.roll[1];   aCOMAcc(3) = acomp.roll[2];
-    aCOMState(4) = acomp.pitch[0];  aCOMSpeed(4) = acomp.pitch[1];  aCOMAcc(4) = acomp.pitch[2];
-    aCOMState(5) = acomp.yaw[0];		aCOMSpeed(5) = acomp.yaw[1];		aCOMAcc(5) = acomp.yaw[2];
-
-    aLeftFootPosition(0) = aLeftFAP.x;			aRightFootPosition(0) = aRightFAP.x;
-    aLeftFootPosition(1) = aLeftFAP.y;      aRightFootPosition(1) = aRightFAP.y;
-    aLeftFootPosition(2) = aLeftFAP.z;      aRightFootPosition(2) = aRightFAP.z;
-    aLeftFootPosition(3) = aLeftFAP.theta;  aRightFootPosition(3) = aRightFAP.theta;
-    aLeftFootPosition(4) = aLeftFAP.omega;  aRightFootPosition(4) = aRightFAP.omega;
-
-    ComAndFootRealizationByGeometry_->setSamplingPeriod(m_SamplingPeriod);
-    ComAndFootRealizationByGeometry_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
-                                                                              aLeftFootPosition,
-                                                                              aRightFootPosition,
-                                                                              ConfigurationTrajControl_[i],
-                                                                              VelocityTrajControl_[i],
-                                                                              AccelerationTrajControl_[i],
-                                                                              it, stage0);
-//    // 2 point filter
-//    ConfigurationTrajControl_[i]= (ConfigurationTrajControl_[i] + PreviousConfigurationControl_  )*0.5;
-//    VelocityTrajControl_[i]=      (VelocityTrajControl_[i]      + PreviousVelocityControl_       )*0.5;
-//    AccelerationTrajControl_[i]=  (AccelerationTrajControl_[i]  + PreviousAccelerationControl_   )*0.5;
-//
-//    // saving precedent state
-//    PreviousConfigurationControl_ = ConfigurationTrajControl_[i] ;
-//    PreviousVelocityControl_      = VelocityTrajControl_[i] ;
-//    PreviousAccelerationControl_  = AccelerationTrajControl_[i] ;
-  }
-
-  // saving the precedent state of the next QP_ computation
-  PreviousConfigurationControl_ = ConfigurationTrajControl_[NbSampleInterpolation_-1] ;
-  PreviousVelocityControl_      = VelocityTrajControl_[NbSampleInterpolation_-1] ;
-  PreviousAccelerationControl_  = AccelerationTrajControl_[NbSampleInterpolation_-1] ;
-
-
-  /// \brief Debug Purpose
-  /// --------------------
-  ofstream aof;
-  string aFileName;
-  ostringstream oss(std::ostringstream::ate);
-  static int iteration = 0;
-  //int iteration100 = (int)iteration/100;
-  //int iteration10 = (int)(iteration - iteration100*100)/10;
-  //int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
-
-  /// \brief Debug Purpose
-  /// --------------------
-  oss.str("TestHerdt2010DynamicArtControl.dat");
-  aFileName = oss.str();
-  if(iteration == 0)
-  {
-    aof.open(aFileName.c_str(),ofstream::out);
-    aof.close();
-  }
-  ///----
-  aof.open(aFileName.c_str(),ofstream::app);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i )
-  {
-    aof << filterprecision( 0.0 ) << " "   // 1
-        << filterprecision( 0.0 ) << " " ; // 2
-    for(unsigned int j = 0 ; j < ConfigurationTrajControl_[i].size() ; j++ )
-      aof << filterprecision( ConfigurationTrajControl_[i](j) ) << " " ;
-    for(unsigned int j = 0 ; j < VelocityTrajControl_[i].size() ; j++ )
-      aof << filterprecision( VelocityTrajControl_[i](j) ) << " " ;
-    for(unsigned int j = 0 ; j < AccelerationTrajControl_[i].size() ; j++ )
-      aof << filterprecision( AccelerationTrajControl_[i](j) ) << " " ;
-    aof << endl ;
-  }
-  aof.close();
-
-  ++iteration;
-
   return ;
 }
