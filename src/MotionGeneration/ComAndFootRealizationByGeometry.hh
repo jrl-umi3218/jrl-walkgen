@@ -258,6 +258,19 @@ namespace PatternGeneratorJRL
 		inline void SetPreviousVelocityStage1(MAL_VECTOR_TYPE(double) & prev_Velocity1)
 		{ m_prev_Velocity1 = prev_Velocity1 ;};
 
+    /*! \brief Getter and setter for the previous configurations and velocities */
+    inline MAL_VECTOR_TYPE(double) & GetPreviousConfigurationStage0()
+    { return m_prev_Configuration ;};
+
+    inline MAL_VECTOR_TYPE(double) & GetPreviousConfigurationStage1()
+    { return m_prev_Configuration1 ;};
+
+    inline MAL_VECTOR_TYPE(double) & GetPreviousVelocityStage0()
+    { return m_prev_Velocity ;};
+
+    inline MAL_VECTOR_TYPE(double) & GetPreviousVelocityStage1()
+    { return m_prev_Velocity1 ;};
+
 
     /*! \brief Get the COG of the ankles at the starting position. */
     virtual MAL_S3_VECTOR_TYPE(double) GetCOGInitialAnkles();
