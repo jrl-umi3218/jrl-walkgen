@@ -108,13 +108,11 @@ RegisterMethods()
 void ComAndFootRealizationByGeometry::
 InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
 		   std::vector<CjrlJoint *> &ActuatedJoints,
-		   std::vector<int> &IndexInVRML,
 		   std::vector<int> &IndexinConfiguration )
 {
   if (FromRootToJoint.size()!=0)
     {
       ODEBUG("Enter 6.0 " << this);
-      IndexInVRML.resize(FromRootToJoint.size());
       IndexinConfiguration.resize(FromRootToJoint.size());
 
       ODEBUG("Enter 6.1 " );      
@@ -123,15 +121,6 @@ InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
       // Here we assume that they are in a decending order.
       for(unsigned int i=0;i<FromRootToJoint.size();i++)
 	{
-	  for(unsigned int j=0;j<ActuatedJoints.size();j++)
-	    {
-	      if (FromRootToJoint[i]==ActuatedJoints[j])
-		{
-		  IndexInVRML[lindex] = j;
-		  break;
-		}
-	    }
-	  
 	  IndexinConfiguration[lindex] = FromRootToJoint[i]->rankInConfiguration();
 	  lindex++;
 	}
@@ -141,7 +130,6 @@ InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
 void ComAndFootRealizationByGeometry::
 InitializeMapsForAHand(CjrlHand * aHand,
 		       std::vector<CjrlJoint *> &ActuatedJoints,
-		       vector<int> & IndexesInVRML,
 		       vector<int> & IndexesInConfiguration,
 		       CjrlJoint * & associateShoulder)
 {
@@ -158,30 +146,13 @@ InitializeMapsForAHand(CjrlHand * aHand,
   if (associatedWrist==0)
     return;
 
-  std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint;
-  FromRootToJoint.clear();
-  FromRootToJoint2.clear();
-  FromRootToJoint = associatedWrist->jointsFromRootToThis();
+  std::vector<CjrlJoint *> FromRootToJoint =
+    getHumanoidDynamicRobot()->jointsBetween(*Chest, *associatedWrist);
 
   std::vector<CjrlJoint *>::iterator itJoint = FromRootToJoint.begin();
-  bool startadding=false;
-  while(itJoint!=FromRootToJoint.end())
-    {
-
-      std::vector<CjrlJoint *>::iterator current = itJoint;
-      if (*current==Chest)
-	  startadding=true;
-      else
-	{
-	  if (startadding)
-	    FromRootToJoint2.push_back(*itJoint);
-	}
-      itJoint++;
-      
-    }
-  associateShoulder = FromRootToJoint2[0];
-  InitializationMaps(FromRootToJoint2,ActuatedJoints,
-		     IndexesInVRML, IndexesInConfiguration);
+  associateShoulder = FromRootToJoint[0];
+  InitializationMaps(FromRootToJoint,ActuatedJoints,
+		     IndexesInConfiguration);
 }
 
 void ComAndFootRealizationByGeometry::
@@ -212,7 +183,7 @@ InitializeMapForChest(std::vector<CjrlJoint *> &ActuatedJoints)
 	}
       itJoint++;
     }
-  InitializationMaps(FromRootToJoint2,ActuatedJoints,m_ChestIndexInVRML,m_ChestIndexinConfiguration);
+  InitializationMaps(FromRootToJoint2,ActuatedJoints,m_ChestIndexinConfiguration);
 
 }
 void ComAndFootRealizationByGeometry::
@@ -266,11 +237,13 @@ Initialization()
   // to the VRML ID.
   ODEBUG("Enter 5.0 ");
   // Extract the indexes of the Right leg.
+  CjrlJoint *waist = getHumanoidDynamicRobot()->waist();
   
   if (RightFoot->associatedAnkle()==0)
     LTHROW("No right ankle");
+
   std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint = 
-    RightFoot->associatedAnkle()->jointsFromRootToThis();
+    getHumanoidDynamicRobot()->jointsBetween(*waist, *(RightFoot->associatedAnkle()));
   std::vector<CjrlJoint *> ActuatedJoints = 
     getHumanoidDynamicRobot()->getActuatedJoints();
   ODEBUG4("Size of ActuatedJoints"<<ActuatedJoints.size(),"DebugDataStartingCOM.dat");
@@ -286,23 +259,25 @@ Initialization()
   // Remove the first element
   FromRootToJoint.erase(FromRootToJoint.begin());
   InitializationMaps(FromRootToJoint,ActuatedJoints,
-		     m_RightLegIndexInVRML,m_RightLegIndexinConfiguration);
-  FromRootToJoint.clear();
-  FromRootToJoint = LeftFoot->associatedAnkle()->jointsFromRootToThis();
+		     m_RightLegIndexinConfiguration);
+
+  FromRootToJoint = 
+    getHumanoidDynamicRobot()->jointsBetween(*waist, *(LeftFoot->associatedAnkle()));
+
   FromRootToJoint.erase(FromRootToJoint.begin());
   InitializationMaps(FromRootToJoint,ActuatedJoints,
-		     m_LeftLegIndexInVRML,m_LeftLegIndexinConfiguration);
+		     m_LeftLegIndexinConfiguration);
 
   // Create maps for the left hand.
   InitializeMapsForAHand(getHumanoidDynamicRobot()->leftHand(),
 			 ActuatedJoints,
-			 m_LeftArmIndexInVRML, m_LeftArmIndexinConfiguration,
+			 m_LeftArmIndexinConfiguration,
 			 m_LeftShoulder);
   
   // Create maps for the right hand.
   InitializeMapsForAHand(getHumanoidDynamicRobot()->rightHand(),
 			 ActuatedJoints,
-			 m_RightArmIndexInVRML, m_RightArmIndexinConfiguration,
+			 m_RightArmIndexinConfiguration,
 			 m_RightShoulder);
   
   FromRootToJoint.clear();
@@ -311,12 +286,6 @@ Initialization()
 
   
   ODEBUG("RightLegIndex: "
-	 << m_RightLegIndexInVRML[0] << " "
-	 << m_RightLegIndexInVRML[1] << " "
-	 << m_RightLegIndexInVRML[2] << " "
-	 << m_RightLegIndexInVRML[3] << " "
-	 << m_RightLegIndexInVRML[4] << " "
-	 << m_RightLegIndexInVRML[5] << " "
 	 << m_RightLegIndexinConfiguration[0] << " "
 	 << m_RightLegIndexinConfiguration[1] << " "
 	 << m_RightLegIndexinConfiguration[2] << " "
@@ -324,12 +293,6 @@ Initialization()
 	 << m_RightLegIndexinConfiguration[4] << " "
 	 << m_RightLegIndexinConfiguration[5] );
   ODEBUG("LeftLegIndex: "
-	 << m_LeftLegIndexInVRML[0] << " "
-	 << m_LeftLegIndexInVRML[1] << " "
-	 << m_LeftLegIndexInVRML[2] << " "
-	 << m_LeftLegIndexInVRML[3] << " "
-	 << m_LeftLegIndexInVRML[4] << " "
-	 << m_LeftLegIndexInVRML[5] << " "
 	 << m_LeftLegIndexinConfiguration[0] << " "
 	 << m_LeftLegIndexinConfiguration[1] << " "
 	 << m_LeftLegIndexinConfiguration[2] << " "
@@ -458,12 +421,16 @@ InitializationFoot(CjrlFoot * aFoot,
       MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,i,j) =
   	MAL_S4x4_MATRIX_ACCESS_I_J(invrot,i,j);
 
-  // We assume that the foot is flat on the floor...
+  // The foot *must be* flat on the floor...
   // Thus
   // lRightFootPose(0:2,0:2)=
   // coct    -st    -soct
   // cost     ct    -sost
   // so        0    co
+  assert((MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,1) == 0) &&
+        "Error in the walk pattern generator initialization:" &&
+        " Initial foot position is not flat");
+
   InitFootPosition.omega =
     atan2(MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,0),
 	  MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,2))*180/M_PI;

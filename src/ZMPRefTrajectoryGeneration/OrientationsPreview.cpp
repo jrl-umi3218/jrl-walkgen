@@ -37,27 +37,35 @@ using namespace std;
 
 const double OrientationsPreview::EPS_ = 0.00000001;
 
-OrientationsPreview::OrientationsPreview( CjrlJoint *aRootJoint)
+OrientationsPreview::OrientationsPreview( CjrlHumanoidDynamicRobot *aHS)
 {
+  CjrlJoint * waist     = aHS->waist();
 
-  lLimitLeftHipYaw_ = aRootJoint->childJoint(1)->lowerBound(0);//-30.0/180.0*M_PI;
-  uLimitLeftHipYaw_  = aRootJoint->childJoint(1)->upperBound(0);//45.0/180.0*M_PI;
+  // left hip
+  CjrlJoint * leftFoot  = aHS->leftFoot()->associatedAnkle();
+  CjrlJoint * leftHip   = aHS->jointsBetween(*waist, *leftFoot)[0];
+
+  lLimitLeftHipYaw_  = leftHip->lowerBound(0);//-30.0/180.0*M_PI;
+  uLimitLeftHipYaw_  = leftHip->upperBound(0);//45.0/180.0*M_PI;
   if (lLimitLeftHipYaw_==  uLimitLeftHipYaw_)
     {
       lLimitLeftHipYaw_ = -30.0/180.0*M_PI;
       uLimitLeftHipYaw_ = 45.0/180.0*M_PI;
     }
 
-  lLimitRightHipYaw_ = aRootJoint->childJoint(0)->lowerBound(0);//-45.0/180.0*M_PI;
-  uLimitRightHipYaw_ = aRootJoint->childJoint(0)->upperBound(0);//30.0/180.0*M_PI;
+  // right hip
+  CjrlJoint * rightFoot = aHS->rightFoot()->associatedAnkle();
+  CjrlJoint * rightHip  = aHS->jointsBetween(*waist, *rightFoot)[0];
+
+  lLimitRightHipYaw_ = rightHip->lowerBound(0);//-45.0/180.0*M_PI;
+  uLimitRightHipYaw_ = rightHip->upperBound(0);//30.0/180.0*M_PI;
   if (lLimitRightHipYaw_==  uLimitRightHipYaw_)
     {
       lLimitRightHipYaw_ = -30.0/180.0*M_PI;
       uLimitRightHipYaw_ = 45.0/180.0*M_PI;
     }
 
-
-  uvLimitFoot_ = fabs(aRootJoint->childJoint(0)->upperVelocityBound(0));
+  uvLimitFoot_ = fabs(leftHip->upperVelocityBound(0));
 
   //Acceleration limit not given by HRP2JRLmain.wrl
   uaLimitHipYaw_ = 0.1;

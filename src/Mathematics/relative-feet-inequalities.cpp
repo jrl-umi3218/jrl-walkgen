@@ -171,6 +171,7 @@ RelativeFeetInequalities::set_feet_dimensions( CjrlHumanoidDynamicRobot *aHS )
     }
   LeftFoot->getSoleSize( WidthHalf,HeightHalf );
 
+  assert(WidthHalf > 0);
   LeftFootSize_.setHalfSizeInit( WidthHalf, HeightHalf, DSFeetDistance_                 );
   LeftFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_     );
   RightFootSize_.setHalfSizeInit( WidthHalf, HeightHalf, DSFeetDistance_                );
