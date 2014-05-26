@@ -533,6 +533,7 @@ void
     // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
     // ------------------------------------------------------
     InitStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
+    cout << "Support Orientation " << Solution_.SupportOrientations_deq.size() << endl ;
     OrientPrw_->preview_orientations( time, VelRef_,
                                       SupportFSM_->StepPeriod(),
                                       FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
@@ -829,59 +830,6 @@ void
   //----------"Real-time" loop---------
 }
 
-
-// TODO: New parent class needed
-void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ,
-                                                   deque<COMState> & ,
-                                                   deque<RelativeFootPosition> &,
-                                                   deque<FootAbsolutePosition> &,
-                                                   deque<FootAbsolutePosition> &,
-                                                   double ,
-                                                   COMState &,
-                                                   MAL_S3_VECTOR(&,double),
-                                                   FootAbsolutePosition & ,
-                                                   FootAbsolutePosition & )
-{
-  cout << "To be removed" << endl;
-}
-
-
-void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition & ,
-                                            deque<ZMPPosition> & ,
-                                            deque<COMState> & ,
-                                            deque<FootAbsolutePosition> &,
-                                            deque<FootAbsolutePosition> &,
-                                            bool)
-{
-  cout << "To be removed" << endl;
-}
-
-int ZMPVelocityReferencedQP::OnLineFootChange(double ,
-                                              FootAbsolutePosition &,
-                                              deque<ZMPPosition> & ,
-                                              deque<COMState> & ,
-                                              deque<FootAbsolutePosition> &,
-                                              deque<FootAbsolutePosition> &,
-                                              StepStackHandler  *)
-{
-  cout << "To be removed" << endl;
-  return -1;
-}
-
-void ZMPVelocityReferencedQP::EndPhaseOfTheWalking(deque<ZMPPosition> &,
-                                                   deque<COMState> &,
-                                                   deque<FootAbsolutePosition> &,
-                                                   deque<FootAbsolutePosition> &)
-{
-  cout << "To be removed" << endl;
-}
-
-int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep()
-{
-  int r = (int)(m_PreviewControlTime/m_SamplingPeriod);
-  return 2*r;
-}
-
 void ZMPVelocityReferencedQP::ControlInterpolation(
     std::deque<COMState> & FinalCOMTraj_deq,                      // OUTPUT
     std::deque<ZMPPosition> & FinalZMPTraj_deq,                   // OUTPUT
@@ -910,6 +858,10 @@ void ZMPVelocityReferencedQP::ControlInterpolation(
                                              Solution_.SupportStates_deq, Solution_,
                                              Solution_.SupportOrientations_deq,
                                              FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
+  cout << "FinalLeftFootTraj_deq.ddtheta = " << FinalLeftFootTraj_deq[CurrentIndex_-1].ddtheta << " "
+      << FinalLeftFootTraj_deq[CurrentIndex_+NbSampleControl_-1].ddtheta << endl ;
+  cout << "FinalRightFootTraj_deq.ddtheta = " << FinalRightFootTraj_deq[CurrentIndex_-1].ddtheta << " "
+      << FinalRightFootTraj_deq[CurrentIndex_+NbSampleControl_-1].ddtheta << endl ;
   return ;
 }
 
@@ -959,6 +911,7 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 
   for ( int i = 0 ; i < QP_N_ ; i++ )
   {
+    aSolution.SupportOrientations_deq.clear();
     OrientPrw_DF_->preview_orientations( time + i * QP_T_, VelRef_,
                                          SupportFSM_->StepPeriod(),
                                          LeftFootTraj_deq_, RightFootTraj_deq_,
@@ -1245,34 +1198,10 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(double time)
                                                                               it, stage0);
   }
 
-  // 2 point filter
-  vector <MAL_VECTOR_TYPE(double)> tmpConfigurationTraj_ (QP_N_ * NbSampleInterpolation_) ;
-  vector <MAL_VECTOR_TYPE(double)> tmpVelocityTraj_(QP_N_ * NbSampleInterpolation_) ;
-  vector <MAL_VECTOR_TYPE(double)> tmpAccelerationTraj_(QP_N_ * NbSampleInterpolation_) ;
-
-  tmpConfigurationTraj_[0] = ( ConfigurationTraj_[0]+PreviousConfiguration_ )*0.5;
-  tmpVelocityTraj_[0]      = ( VelocityTraj_[0]+PreviousVelocity_ )*0.5;
-  tmpAccelerationTraj_[0]  = ( AccelerationTraj_[0]+PreviousAcceleration_ )*0.5;
-
-  for (unsigned int i = 1 ; i < N ; ++i )
-  {
-    tmpConfigurationTraj_[i] = ( ConfigurationTraj_[i]+ ConfigurationTraj_[i-1] )*0.5;
-    tmpVelocityTraj_[i] = ( VelocityTraj_[i] + VelocityTraj_[i-1] )*0.5;
-    tmpAccelerationTraj_[i] = ( AccelerationTraj_[i] + AccelerationTraj_[i-1] )*0.5;
-  }
-
   // saving the precedent state of the next QP_ computation
   PreviousConfiguration_ = ConfigurationTraj_[NbSampleInterpolation_-1] ;
   PreviousVelocity_ = VelocityTraj_[NbSampleInterpolation_-1] ;
   PreviousAcceleration_ = AccelerationTraj_[NbSampleInterpolation_-1] ;
-
-  ConfigurationTraj_ = tmpConfigurationTraj_ ;
-  VelocityTraj_ = tmpVelocityTraj_ ;
-  AccelerationTraj_ = tmpAccelerationTraj_ ;
-
-  //	HDR_->currentConfiguration(ConfigurationTraj_[NbSampleInterpolation_-1]);
-  //	HDR_->currentVelocity(VelocityTraj_[NbSampleInterpolation_-1]);
-  //	HDR_->currentAcceleration(AccelerationTraj_[NbSampleInterpolation_-1]);
 
   /// \brief Debug Purpose
   /// --------------------
@@ -1416,4 +1345,63 @@ void ZMPVelocityReferencedQP::PrepareSolution()
     solution_.Solution_vec[2*QP_N_+nbSteps] = FootPrw_vec[CurrentSupport.StepNumber+1][1];
   }
   return ;
+}
+
+
+
+
+
+
+
+
+// TODO: New parent class needed
+void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ,
+                                                   deque<COMState> & ,
+                                                   deque<RelativeFootPosition> &,
+                                                   deque<FootAbsolutePosition> &,
+                                                   deque<FootAbsolutePosition> &,
+                                                   double ,
+                                                   COMState &,
+                                                   MAL_S3_VECTOR(&,double),
+                                                   FootAbsolutePosition & ,
+                                                   FootAbsolutePosition & )
+{
+  cout << "To be removed" << endl;
+}
+
+
+void ZMPVelocityReferencedQP::OnLineAddFoot(RelativeFootPosition & ,
+                                            deque<ZMPPosition> & ,
+                                            deque<COMState> & ,
+                                            deque<FootAbsolutePosition> &,
+                                            deque<FootAbsolutePosition> &,
+                                            bool)
+{
+  cout << "To be removed" << endl;
+}
+
+int ZMPVelocityReferencedQP::OnLineFootChange(double ,
+                                              FootAbsolutePosition &,
+                                              deque<ZMPPosition> & ,
+                                              deque<COMState> & ,
+                                              deque<FootAbsolutePosition> &,
+                                              deque<FootAbsolutePosition> &,
+                                              StepStackHandler  *)
+{
+  cout << "To be removed" << endl;
+  return -1;
+}
+
+void ZMPVelocityReferencedQP::EndPhaseOfTheWalking(deque<ZMPPosition> &,
+                                                   deque<COMState> &,
+                                                   deque<FootAbsolutePosition> &,
+                                                   deque<FootAbsolutePosition> &)
+{
+  cout << "To be removed" << endl;
+}
+
+int ZMPVelocityReferencedQP::ReturnOptimalTimeToRegenerateAStep()
+{
+  int r = (int)(m_PreviewControlTime/m_SamplingPeriod);
+  return 2*r;
 }

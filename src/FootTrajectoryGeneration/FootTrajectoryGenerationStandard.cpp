@@ -245,7 +245,7 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
      break;
 
    case THETA_AXIS:
-     m_PolynomeTheta->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_PolynomeTheta->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
      break;
 
    case OMEGA_AXIS:
