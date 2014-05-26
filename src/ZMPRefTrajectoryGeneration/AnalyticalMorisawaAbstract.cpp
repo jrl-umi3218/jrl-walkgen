@@ -171,4 +171,14 @@ namespace PatternGeneratorJRL
     aos << endl;
   }
 
+  void AnalyticalMorisawaAbstract::GetIsStepStairOn(int &isStepStairOn)
+  {
+      isStepStairOn = m_isStepStairOn;
+  }
+
+  void AnalyticalMorisawaAbstract::SetIsStepStairOn(int isStepStairOn)
+  {
+      m_isStepStairOn = isStepStairOn;
+  }
+
 }

@@ -192,9 +192,6 @@ namespace PatternGeneratorJRL
     */
     virtual void CallMethod(std::string &Method, std::istringstream &strm);
 
-    double GetStairs();
-    void SetStairs(double stairs);
-
 
   protected:
 
@@ -215,7 +212,6 @@ namespace PatternGeneratorJRL
 
     int m_isStepStairOn;
 
-    double m_stairs;
   };
 
 

@@ -178,7 +178,6 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex,
    else
    {
      m_BsplinesZ->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position*1.5);
-  //   cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx" << endl;
    }
      break;
 
@@ -226,11 +225,13 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
    }
    else
    {
-     //if (InitPosition < FinalPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,InitPosition+(FinalPosition-InitPosition)*1.5);
-     //  else if (InitPosition == FinalPosition)
-     //   m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,FinalPosition);
+      m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,InitPosition+(FinalPosition-InitPosition)*1.6);
     }
+    /*if (InitPosition == FinalPosition)
+        m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+    else
+        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,InitPosition+(FinalPosition-InitPosition)*1.5);
+*/
     break;
 
    case THETA_AXIS:
@@ -273,12 +274,14 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
    }
    else
    {
-       //if (InitPosition <= FinalPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,InitPosition+(FinalPosition-InitPosition)*1.5);
-      // else if (InitPosition == FinalPosition)
-       // m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,FinalPosition);
-
+       m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,InitPosition+(FinalPosition-InitPosition)*1.6);
    }
+
+  /*  if (InitPosition == FinalPosition)
+        m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+    else
+        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,InitPosition+(FinalPosition-InitPosition)*1.5);
+*/
     break;
 
    case THETA_AXIS:
@@ -372,28 +375,6 @@ double FootTrajectoryGenerationStandard::ComputeAll(std::deque<FootAbsolutePosit
    }
    else
    {
-
-   /*   if (m_BsplinesZ->ZComputePosition(Time)==0)
-     {
-        // cout << m_BsplinesZ->ZComputePosition(Time) << endl;
-      if (adFootAbsolutePosition.size() > 0)
-            aFootAbsolutePosition.z = adFootAbsolutePosition.back().z;
-        else
-            aFootAbsolutePosition.z =0.0;
-
-        // m_BsplinesZ->SetParametersWithInitPos(adFootAbsolutePosition.back().z,m_BsplinesZ->GetFT(),m_BsplinesZ->GetMP()/1.5,m_BsplinesZ->GetMP(),m_BsplinesZ->GetFT()/3.0);
-//   m_BsplinesZ->SetParametersWithInitPos(aFootAbsolutePosition.z,m_BsplinesZ->GetFT(),m_BsplinesZ->GetMP()/1.5,m_BsplinesZ->GetMP(),m_BsplinesZ->GetFT()/3.0);
-
-        //    cout << m_BsplinesZ->ZComputePosition(Time) << endl;
-     }
-     else
-     {
-       //  cout << adFootAbsolutePosition.back().z << " " << m_BsplinesZ->GetFT() << " " << m_BsplinesZ->GetMP()/1.5 << " " << m_BsplinesZ->GetMP() << " " << m_BsplinesZ->GetFT()/3.0 << endl;
-//        m_BsplinesZ->SetParametersWithInitPos(aFootAbsolutePosition.z,m_BsplinesZ->GetFT(),m_BsplinesZ->GetMP()/1.5,m_BsplinesZ->GetMP(),m_BsplinesZ->GetFT()/3.0);
-
-        aFootAbsolutePosition.z = m_BsplinesZ->ZComputePosition(Time);
-     //   cout << "ooooooooooo "<<m_stairs<< endl;
-     }*/
      aFootAbsolutePosition.z = m_BsplinesZ->ZComputePosition(Time);
       aFootAbsolutePosition.dz = m_BsplinesZ->ZComputeVelocity(Time);
    }

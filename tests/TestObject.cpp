@@ -44,12 +44,11 @@ namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
-
     double filterprecision(double adb)
     {
       if (fabs(adb)<1e-7)
 	return 0.0;
-	    
+
       double ladb2 = adb * 1e7;
       double lintadb2 = trunc(ladb2);
       return lintadb2/1e7;
@@ -81,8 +80,6 @@ namespace PatternGeneratorJRL
 
     void TestObject::init()
     {
-
-
       // Instanciate and initialize.
       string RobotFileName = m_VRMLPath + m_VRMLFileName;
 
@@ -125,7 +122,6 @@ namespace PatternGeneratorJRL
 
       if (m_PGI!=0)
 	delete m_PGI;
-
     }
 
     void TestObject::SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR,
@@ -134,6 +130,7 @@ namespace PatternGeneratorJRL
       aHDR = 0;
       aDebugHDR = 0;
     }
+
 
     void TestObject::CreateAndInitializeHumanoidRobot(string &RobotFileName,
 						      string &SpecificitiesFileName,
@@ -145,12 +142,12 @@ namespace PatternGeneratorJRL
     {
       // Creating the humanoid robot.
       SpecializedRobotConstructor(aHDR,aDebugHDR);
-      
+
       if ((aHDR==0) || (aDebugHDR==0))
 	{
 	  if (aHDR!=0) delete aHDR;
 	  if (aDebugHDR!=0) delete aDebugHDR;
-	  
+
 	  dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
 	  aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
 	  aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
@@ -166,19 +163,19 @@ namespace PatternGeneratorJRL
 					     LinkJointRank,
 					     SpecificitiesFileName);
 
-  
+
       // Create Pattern Generator Interface
       aPGI = patternGeneratorInterfaceFactory(aHDR);
 
       bool conversiontoradneeded=true;
-  
+
       //  double * dInitPos = InitialPoses[INTERACTION_2008];
       unsigned int lNbDofs = aHDR->numberDof() ;
       cout << "Nb of DOFs: " <<  lNbDofs << endl;
 
       vector<CjrlJoint *> actuatedJoints = aHDR->getActuatedJoints();
       unsigned int lNbActuatedJoints = actuatedJoints.size();
-  
+
       double * dInitPos = new double[lNbActuatedJoints];
 
       ifstream aif;
@@ -189,7 +186,7 @@ namespace PatternGeneratorJRL
 	    aif >> dInitPos[i];
 	}
       aif.close();
-  
+
       bool DebugConfiguration = true;
       ofstream aofq;
       if (DebugConfiguration)
@@ -205,10 +202,10 @@ namespace PatternGeneratorJRL
 	    }
 
 	}
-  
+
 
       // This is a vector corresponding to the DOFs actuated of the robot.
-      MAL_VECTOR_DIM(InitialPosition,double,lNbActuatedJoints);
+      MAL_VECTOR_RESIZE(InitialPosition,lNbActuatedJoints);
       //MAL_VECTOR_DIM(CurrentPosition,double,40);
       if (conversiontoradneeded)
 	for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
@@ -232,26 +229,26 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_DIM(PreviousAcceleration,double,lNbDofs);
       for(int i=0;i<6;i++)
 	{
-	  PreviousConfiguration[i] = 
-	    PreviousVelocity[i] = 
+	  PreviousConfiguration[i] =
+	    PreviousVelocity[i] =
 	    PreviousAcceleration[i] = 0.0;
 	}
 
       for(unsigned int i=6;i<lNbDofs;i++)
 	{
 	  PreviousConfiguration[i] = InitialPosition[i-6];
-	  PreviousVelocity[i] = 
+	  PreviousVelocity[i] =
 	    PreviousAcceleration[i] = 0.0;
 	}
 
       MAL_VECTOR_DIM(ZMPTarget,double,3);
-  
-  
+
+
       string inProperty[5]={"TimeStep","ComputeAcceleration",
 			    "ComputeBackwardDynamics", "ComputeZMP",
 			    "ResetIteration"};
       string inValue[5]={"0.005","false","false","true","true"};
-  
+
       for(unsigned int i=0;i<5;i++)
 	aDebugHDR->setProperty(inProperty[i],
 			       inValue[i]);
@@ -330,6 +327,7 @@ namespace PatternGeneratorJRL
 	}
     }
 
+
     void TestObject::fillInDebugFiles( )
     {
       if (m_DebugFGPI)
@@ -345,7 +343,7 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
 	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
-	      << filterprecision(m_OneStep.finalCOMPosition.yaw ) << " "                    // 5
+	      << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                    // 5
 	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
 	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
 	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
@@ -427,7 +425,7 @@ namespace PatternGeneratorJRL
 	  aFileName = m_TestName;
 	  aFileName += "TestFGPI_report.dat";
 	  areportof.open(aFileName.c_str(),ofstream::out);
-          
+
 	  // Time
 	  double LocalInput[NB_OF_FIELDS], ReferenceInput[NB_OF_FIELDS];
 	  bool finalreport = true;
@@ -471,7 +469,7 @@ namespace PatternGeneratorJRL
 	      if (endofinspection)
 		break;
 
-	      
+
 	      for (unsigned int i=0;i<NB_OF_FIELDS;i++)
 		{
 		  if  (fabs(LocalInput[i]-
@@ -479,10 +477,10 @@ namespace PatternGeneratorJRL
 		    {
 		      finalreport = false;
                       ostringstream oss;
-                      oss << "l: " << nblines 
-                          << " col:" << i 
-                          << " ref: " << ReferenceInput[i] 
-                          << " now: " << LocalInput[i] 
+                      oss << "l: " << nblines
+                          << " col:" << i
+                          << " ref: " << ReferenceInput[i]
+                          << " now: " << LocalInput[i]
                           << " " << nb_of_pbs
                           <<std::endl;
 		      areportof << oss.str();
@@ -494,7 +492,7 @@ namespace PatternGeneratorJRL
                         }
 		    }
 		}
-              
+
 	      nblines++;
               if ((nblines*2> alif_length) ||
                   (nblines*2> arif_length))
@@ -581,10 +579,11 @@ namespace PatternGeneratorJRL
 
 		  m_clock.fillInStatistics();
 
+
 		  /*! Fill the debug files with appropriate information. */
 		  fillInDebugFiles();
 		}
-	      else 
+	      else
 		{
 		  cerr << "Nothing to dump after " << m_OneStep.NbOfIt << endl;
 		}

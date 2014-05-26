@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Francois   Keith
  * Olivier    Stasse
@@ -19,12 +19,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file StepStackHandler.h
    \brief This object handle the step stack of the pattern generator.
-    It allows also to create automatically stack of steps according to 
+    It allows also to create automatically stack of steps according to
     some high level functionnalities.
 */
 
@@ -46,10 +46,10 @@ namespace PatternGeneratorJRL
   /*! @ingroup pgjrl
     This class is in charge of handling the stack of footprints.
     There is two modes currently:
-    - An off-line mode, where the complete stack is send to 
+    - An off-line mode, where the complete stack is send to
     the ZMP reference trajectory generator object, and created off-line.
-    - An on-line mode, where one step at a time is send to 
-    the ZMP reference trajectory generator object. 
+    - An on-line mode, where one step at a time is send to
+    the ZMP reference trajectory generator object.
    */
   class  StepStackHandler : public SimplePlugin
   {
@@ -77,12 +77,14 @@ namespace PatternGeneratorJRL
     /*! \brief Set the link towards an instance of Step Over planner. */
     void SetStepOverPlanner(StepOverPlanner *aSOP);
 
-    /*! \brief Take a serie of string as an input and 
+    /*! \brief Take a serie of string as an input and
       read the steps according to the chosen walkmode. */
+
     void ReadStepSequenceAccordingToWalkMode(std::istringstream &strm);
+    void ReadStepStairSequenceAccordingToWalkMode(std::istringstream &strm);
 
     /*! \brief Real a partial sequence of steps
-      without termination and immediate execution. */ 
+      without termination and immediate execution. */
     void m_PartialStepSequence(std::istringstream &strm);
 
     /*! \brief Set the single time support. */
@@ -90,16 +92,16 @@ namespace PatternGeneratorJRL
 
     /*! \brief Get the time for single support. */
     double GetSingleTimeSupport();
-    
+
     /*! \brief Set the time for double support. */
     void SetDoubleTimeSupport(double aDoubleSupportTime);
-    
+
     /*! \brief Get the time for double support. */
     double GetDoubleTimeSupport();
 
     /*! \brief Prepare the stack to start for a specific support foot. */
     void PrepareForSupportFoot(int SupportFoot);
-    
+
     /*! \brief To force the last generated support foot. */
     void FinishOnTheLastCorrectSupportFoot();
 
@@ -110,18 +112,18 @@ namespace PatternGeneratorJRL
     void CopyRelativeFootPosition(std::deque<RelativeFootPosition> & lRelativeFootPositions,
 				  bool PerformClean);
 
-    /*! \name Method related to online stepping. 
+    /*! \name Method related to online stepping.
       @{
      */
-    
+
     /*! \brief Start On Line stepping. */
     void StartOnLineStep();
-        
+
     /*! \brief Stop On Line stepping. */
     void StopOnLineStep();
 
     /*! \brief Add a standard step on the stack. */
-    void AddStandardOnLineStep(bool NewStep, 
+    void AddStandardOnLineStep(bool NewStep,
 			       double NewStepX,
 			       double NewStepY,
 			       double Theta);
@@ -131,11 +133,11 @@ namespace PatternGeneratorJRL
     bool IsOnLineSteppingOn();
     /*! @} */
 
-    /*! \brief Methods to handle the stack. 
+    /*! \brief Methods to handle the stack.
       @{
      */
 
-    /*! \brief Remove the first step in the stack. 
+    /*! \brief Remove the first step in the stack.
       @return Returns true if this is the end of the sequence. */
     bool RemoveFirstStepInTheStack();
 
@@ -158,7 +160,7 @@ namespace PatternGeneratorJRL
 
     /*! @} */
 
-    /*! \name High level methods to create stack of steps for large motion. 
+    /*! \name High level methods to create stack of steps for large motion.
       @{
      */
     /*! \brief Create a sequence of step to realize an arc of rayon R,
@@ -167,7 +169,7 @@ namespace PatternGeneratorJRL
      the  center of the arc.
     */
     void CreateArcCenteredInStepStack(  double R,
-					double arc_deg, 
+					double arc_deg,
 					int SupportFoot);
     /*! \brief Create a sequence of steps to realize an arc of rayon R,
       for arc_deg degrees, starting with the support foot defined
@@ -196,17 +198,17 @@ namespace PatternGeneratorJRL
     int m_WalkMode;
 
     /*! Link to the step over planner. */
-    StepOverPlanner *m_StOvPl;	
+    StepOverPlanner *m_StOvPl;
 
     /*! Default value for Single time support and double time support. */
     double m_SingleSupportTime, m_DoubleSupportTime;
 
     /*! Variable for delta feasibility limit */
-    double m_DeltaFeasibilityLimit;	
-    
+    double m_DeltaFeasibilityLimit;
+
     /*! On line step stack handling. */
     bool m_OnLineSteps;
-    
+
     /*! Transition for finishing on line stepping. */
     bool m_TransitionFinishOnLine;
   };

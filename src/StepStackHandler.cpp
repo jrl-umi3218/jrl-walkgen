@@ -124,16 +124,9 @@ int StepStackHandler::GetWalkMode()
   return m_WalkMode;
 }
 
+void StepStackHandler::ReadStepStairSequenceAccordingToWalkMode(istringstream &strm)
 
-void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 {
-  m_RelativeFootPositions.clear();
-  switch (m_WalkMode)
-    {
-    case 0:
-    case 6:
-     {
-
 	ODEBUG( "Standard Stepping on the Stairs Mode Selected" );
 
 	RelativeFootPosition aFootPosition;
@@ -184,8 +177,16 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 
 	  }
 	ODEBUG("m_RelativeFootPositions: " << m_RelativeFootPositions.size());
-	break;
-      }
+
+
+}
+void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
+{
+  m_RelativeFootPositions.clear();
+  switch (m_WalkMode)
+    {
+    case 0:
+
     case 4:
       {
 

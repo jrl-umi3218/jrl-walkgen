@@ -197,6 +197,11 @@ namespace PatternGeneratorJRL
       /*! Set the \f[ \Delta T_j \f] */
       int SetDeltaTj(std::vector<double> &GetDeltaTj);
 
+
+        void GetIsStepStairOn(int &isStepStairOn);
+
+        void SetIsStepStairOn(int isStepStairOn);
+
       /*! \name Methods for the full linear system
 	@{ */
 

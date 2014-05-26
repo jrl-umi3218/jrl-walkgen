@@ -434,6 +434,11 @@ namespace PatternGeneratorJRL
     if (m_FeetTrajectoryGenerator!=0)
       {
 	m_FeetTrajectoryGenerator->SetDeltaTj(m_DeltaTj);
+
+	int isStepStairOn;
+
+	GetIsStepStairOn(isStepStairOn);
+
 	if (m_isStepStairOn == 1)
         m_FeetTrajectoryGenerator->InitializeFromRelativeSteps(m_RelativeFootPositions,
 							       LeftFootInitialPosition,
@@ -2248,6 +2253,21 @@ namespace PatternGeneratorJRL
     m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_AbsoluteTimeReference,lIndexInterval);
     lPrevIndexInterval = lIndexInterval;
 
+    double up_time=0.0, up_height=0.0, first_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime ;
+
+    if (m_isStepStairOn == 1)
+	{
+
+
+        for (int i =0;i<m_RelativeFootPositions.size();i++)
+    {
+        up_height += m_RelativeFootPositions[i].sz;
+        up_time += m_RelativeFootPositions[i].SStime + m_RelativeFootPositions[i].DStime;
+    }
+
+ //   cout << up_height << " " << up_time << endl;
+
+	}
     /*! Fill in the stacks: minimal strategy only 1 reference. */
     for(double t=StartingTime; t<=EndTime; t+= m_SamplingPeriod)
       {
@@ -2270,21 +2290,9 @@ namespace PatternGeneratorJRL
 	FootAbsolutePosition LeftFootAbsPos;
 	memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
 
-if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos,lIndexInterval))
+    if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos,lIndexInterval))
           { LTHROW("Unable to compute left foot position in EndPhaseOfWalking");}
         FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
-/*
-	if (m_isStepStairOn == 0)
-	{
-        if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos,lIndexInterval))
-          { LTHROW("Unable to compute left foot position in EndPhaseOfWalking");}
-        FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
-	}
-    else
-    {
-        if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,FinalLeftFootAbsolutePositions,lIndexInterval))
-          { LTHROW("Unable to compute left foot position in EndPhaseOfWalking");}
-    }*/
 
 	/*! Right */
 	FootAbsolutePosition RightFootAbsPos;
@@ -2303,27 +2311,42 @@ if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos
 	  { LTHROW("COM out of bound along Y axis.");}
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1],lIndexInterval);
 
-    if (RightFootAbsPos.z < LeftFootAbsPos.z)
+
+
+    if (RightFootAbsPos.z <= LeftFootAbsPos.z){
+        aCOMPos.z[1] = (m_InitialPoseCoMHeight + RightFootAbsPos.z - aCOMPos.z[0])/m_SamplingPeriod;
         aCOMPos.z[0] = m_InitialPoseCoMHeight + RightFootAbsPos.z;
-    else
+        }
+    else{
+        aCOMPos.z[1] = (m_InitialPoseCoMHeight + LeftFootAbsPos.z - aCOMPos.z[0])/m_SamplingPeriod;
         aCOMPos.z[0] = m_InitialPoseCoMHeight + LeftFootAbsPos.z;
+    }
 
-    FinalCoMPositions.push_back(aCOMPos);
-/*
-	if (m_isStepStairOn == 0)
+    if (m_isStepStairOn == 0)
 	{
-
-        if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos,lIndexInterval))
-          { LTHROW("Unable to compute right foot position in EndPhaseOfWalking");}
-        FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
+        aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	}
-    else
-    {
+	else{
+	   /* if (LeftFootAbsPos.z <= RightFootAbsPos.z)
+	    {
+            aCOMPos.z[1] =( m_InitialPoseCoMHeight + LeftFootAbsPos.z - aCOMPos.z[0]) / m_SamplingPeriod;
+            aCOMPos.z[0] = m_InitialPoseCoMHeight + LeftFootAbsPos.z;
+	    }
+	    else
+	    {
+	         aCOMPos.z[1] =( m_InitialPoseCoMHeight + RightFootAbsPos.z - aCOMPos.z[0]) / m_SamplingPeriod;
+	        aCOMPos.z[0] = m_InitialPoseCoMHeight + RightFootAbsPos.z;
+	    }*/
+        if (t<=first_time || t >= up_time){
+            aCOMPos.z[1] = 0.0;
+            aCOMPos.z[0] = m_InitialPoseCoMHeight + RightFootAbsPos.z;}
+        else{
+            aCOMPos.z[1] = (t*up_height/(up_time-first_time) + ( m_InitialPoseCoMHeight- first_time*up_height/(up_time-first_time) )  -  aCOMPos.z[0])/m_SamplingPeriod;
+            aCOMPos.z[0] = t*up_height/(up_time-first_time) + ( m_InitialPoseCoMHeight- first_time*up_height/(up_time-first_time) )  ; }
+    }
+    FinalCoMPositions.push_back(aCOMPos);
 
-        if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,FinalRightFootAbsolutePositions,lIndexInterval))
-          { LTHROW("Unable to compute right foot position in EndPhaseOfWalking");}
-         }
-*/
+
 	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " <<
 		aCOMPos.x[0] << " " << aCOMPos.y[0] << " " <<
 		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " <<

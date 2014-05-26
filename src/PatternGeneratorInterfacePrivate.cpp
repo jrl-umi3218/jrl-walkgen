@@ -574,7 +574,7 @@ namespace PatternGeneratorJRL {
 
     ODEBUG("Step Sequence");
     ofstream DebugFile;
-    ReadSequenceOfSteps(strm);
+    m_StepStackHandler->ReadStepStairSequenceAccordingToWalkMode(strm);
 
     ODEBUG("After reading Step Sequence");
     FinishAndRealizeStepSequence();

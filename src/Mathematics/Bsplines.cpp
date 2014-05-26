@@ -351,13 +351,13 @@ double ZBsplines::ZComputeAcc(double t)
 void  ZBsplines::SetParameters(double FT, double FP, double ToMP, double MP)
 {
     ZGenerateKnotVector(FT,ToMP);
-    ZGenerateControlPoints(0.0,FT, FP, ToMP, MP);
+    ZGenerateControlPoints(0.0, FT, FP, ToMP, MP);
 }
 
 void  ZBsplines::SetParametersWithInitPos(double IP, double FT, double FP, double ToMP, double MP)
 {
     ZGenerateKnotVector(FT,ToMP);
-    ZGenerateControlPoints(IP,FT, FP, ToMP, MP);
+    ZGenerateControlPoints(IP, FT, FP, ToMP, MP);
 }
 
 void ZBsplines::GetParametersWithInitPosInitSpeed(double &FT,

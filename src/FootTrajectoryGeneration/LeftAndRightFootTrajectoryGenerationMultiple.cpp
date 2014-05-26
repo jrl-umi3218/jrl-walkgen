@@ -618,8 +618,6 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
   MAL_MATRIX_SET_IDENTITY(Orientation);
   MAL_MATRIX_DIM(v,double,2,1);
   MAL_MATRIX_DIM(v2,double,2,1);
-  cout <<" ORIENTATIONNNNNNNNNNNN" << endl;
-      cout << Orientation << endl;
 
   if (m_DeltaTj.size()!=lNbOfIntervals)
     m_DeltaTj.resize(lNbOfIntervals);
@@ -775,20 +773,10 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
       v(0,0) = RelativeFootPositions[i].sx;
       v(1,0) = RelativeFootPositions[i].sy;
      // v(2,0) = RelativeFootPositions[i].sz;
-      cout << "VVVVVVVVVVVVVVVVVVV" << endl;
-      cout << v << endl;
-      cout << "MMMMMMMMMMMMMMMM" << endl;
-      cout << MM <<endl;
-      cout <<" ORIENTATIONNNNNNNNNNNN" << endl;
-      cout << Orientation << endl;
-      /*! Compute the new orientation of the foot vector. */
+        /*! Compute the new orientation of the foot vector. */
       Orientation = MAL_RET_A_by_B(MM , Orientation);
 
-      cout <<" ORIENTATIONNNNNNNNNNNN" << endl;
-      cout << Orientation << endl;
-      v2 = MAL_RET_A_by_B(Orientation, v);
-      cout << "v222222222222222" << endl;
-      cout << v2 << endl;
+       v2 = MAL_RET_A_by_B(Orientation, v);
 
       /*! Update the world coordinates of the support foot. */
       if ((!IgnoreFirst) || (i>0))
@@ -803,8 +791,6 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
       CurrentSupportFootPosition(2,2) += RelativeFootPositions[i].sz;
 	}
 
-      cout << "CSFP:" << CurrentSupportFootPosition(0,2) << " " << CurrentSupportFootPosition(1,2) <<" " << CurrentSupportFootPosition(2,2)<< " "<< CurrentAbsTheta;
-      cout << ""<< endl<<endl;
       AbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
       AbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
       AbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
@@ -822,7 +808,10 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	      /*! The current support foot is the left one.*/
 	      RightFootTmpFinalPos.x = CurrentSupportFootPosition(0,2);
 	      RightFootTmpFinalPos.y = CurrentSupportFootPosition(1,2);
-	      RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);//m_StepHeight;
+	      if (RightFootTmpFinalPos.z == CurrentSupportFootPosition(2,2))
+            RightFootTmpFinalPos.z = m_StepHeight + RightFootTmpFinalPos.z;
+	      else
+            RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);//
 	      RightFootTmpFinalPos.theta = CurrentAbsTheta;
 	      RightFootTmpFinalPos.omega = m_Omega;
 	      RightFootTmpFinalPos.omega2 = 0.0;
@@ -843,7 +832,12 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	      /*! The current support foot is the right one.*/
 	      LeftFootTmpFinalPos.x = CurrentSupportFootPosition(0,2);
 	      LeftFootTmpFinalPos.y = CurrentSupportFootPosition(1,2);
-	      LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);//m_StepHeight;
+
+          if (LeftFootTmpFinalPos.z == CurrentSupportFootPosition(2,2))
+            LeftFootTmpFinalPos.z = m_StepHeight + LeftFootTmpFinalPos.z;
+	      else
+            LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);//
+
 	      LeftFootTmpFinalPos.theta = CurrentAbsTheta;
 	      LeftFootTmpFinalPos.omega = m_Omega;
 	      LeftFootTmpFinalPos.omega2 = 0.0;
@@ -859,7 +853,6 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	     // RightFootTmpFinalPos.z = 0.0;
 	      RightFootTmpFinalPos.dz = 0.0;
 	      RightFootTmpFinalPos.stepType = -1;
-
 	    }
 	}
       else
@@ -1013,20 +1006,6 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	}
 
     }
-
-      cout << "LeftInit: ( " << LeftFootTmpInitPos.x << " , "
-		 << LeftFootTmpInitPos.y << " , "
-		 << LeftFootTmpInitPos.z << " ) ( "
-		 << LeftFootTmpInitPos.dx << " , "
-		 << LeftFootTmpInitPos.dy << " , "
-		 << LeftFootTmpInitPos.dz << " ) "
-		 << endl << "LeftFinal : ( "
-		 << LeftFootTmpFinalPos.x << " , "
-		 << LeftFootTmpFinalPos.y << " , "
-		 << LeftFootTmpFinalPos.z << " ) ( "
-		 << LeftFootTmpFinalPos.dx << " , "
-		 << LeftFootTmpFinalPos.dy << " , "
-		 << LeftFootTmpFinalPos.dz << " ) " << endl;
 
 }
 
@@ -1405,3 +1384,5 @@ FootTrajectoryGenerationMultiple * LeftAndRightFootTrajectoryGenerationMultiple:
 {
   return m_RightFootTrajectory;
 }
+
+
