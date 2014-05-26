@@ -336,17 +336,6 @@ void
       FinalLeftFootTraj_deq[CurrentIndex+k].time =
           FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
     }
-
-    if(CurrentSupport.Foot == LEFT)
-    {
-      LastSFP = &(FinalRightFootTraj_deq[(unsigned int)(CurrentIndex+QP_T_/m_SamplingPeriod)]);
-    }
-    else
-    {
-      LastSFP = &(FinalLeftFootTraj_deq[(unsigned int)(CurrentIndex+QP_T_/m_SamplingPeriod)]);
-    }
-    cout << "NewSFP->ddtheta = " << LastSFP->ddtheta << endl  ;
-
   }
   else if (CurrentSupport.Phase == DS || Time+3.0/2.0*QP_T_ > CurrentSupport.TimeLimit)
   {

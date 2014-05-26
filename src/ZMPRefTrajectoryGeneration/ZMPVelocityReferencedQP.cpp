@@ -203,9 +203,6 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0)
   PreviousConfiguration_ = aHS->currentConfiguration() ;
   PreviousVelocity_ = aHS->currentVelocity();
   PreviousAcceleration_ = aHS->currentAcceleration();
-  PreviousConfigurationControl_ = aHS->currentConfiguration() ;
-  PreviousVelocityControl_ = aHS->currentVelocity();
-  PreviousAccelerationControl_ = aHS->currentAcceleration();
 
   ComAndFootRealizationByGeometry_->SetPreviousConfigurationStage0(PreviousConfiguration_);
   ComAndFootRealizationByGeometry_->SetPreviousVelocityStage0(PreviousVelocity_);
@@ -243,9 +240,9 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0)
   VelocityTraj_.resize( QP_N_ * NbSampleInterpolation_, aHS->currentVelocity() );
   AccelerationTraj_.resize( QP_N_ * NbSampleInterpolation_, aHS->currentAcceleration() );
 
-  ConfigurationTrajControl_.resize( NbSampleControl_, aHS->currentConfiguration() );
-  VelocityTrajControl_.resize( NbSampleControl_, aHS->currentConfiguration() );
-  AccelerationTrajControl_.resize( NbSampleControl_, aHS->currentConfiguration() );
+  tmpConfigurationTraj_.resize(QP_N_ * NbSampleInterpolation_) ;
+  tmpVelocityTraj_.resize(QP_N_ * NbSampleInterpolation_) ;
+  tmpAccelerationTraj_.resize(QP_N_ * NbSampleInterpolation_) ;
 
   DeltaZMPMBPositions_.resize ( QP_N_ * NbSampleInterpolation_ );
   ZMPMBTraj_deq_.resize( QP_N_ * NbSampleInterpolation_, vector<double>(2) );
@@ -595,7 +592,7 @@ void
     ControlInterpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, FinalLeftFootTraj_deq,
                           FinalRightFootTraj_deq, time) ;
 
-    DynamicFilterInterpolation( time) ;
+    DynamicFilterInterpolation(time) ;
     CallToComAndFootRealization(time);
 
 
@@ -1198,10 +1195,30 @@ void ZMPVelocityReferencedQP::CallToComAndFootRealization(double time)
                                                                               it, stage0);
   }
 
+  tmpConfigurationTraj_[0] = ( ConfigurationTraj_[1]+ConfigurationTraj_[0]+PreviousConfiguration_ )/3;
+  tmpVelocityTraj_[0]      = ( VelocityTraj_[1]+VelocityTraj_[0]+PreviousVelocity_ )/3;
+  tmpAccelerationTraj_[0]  = ( AccelerationTraj_[1]+AccelerationTraj_[0]+PreviousAcceleration_ )/3;
+
   // saving the precedent state of the next QP_ computation
   PreviousConfiguration_ = ConfigurationTraj_[NbSampleInterpolation_-1] ;
   PreviousVelocity_ = VelocityTraj_[NbSampleInterpolation_-1] ;
   PreviousAcceleration_ = AccelerationTraj_[NbSampleInterpolation_-1] ;
+
+  for (unsigned int i = 1 ; i < N-1 ; ++i )
+  {
+    tmpConfigurationTraj_[i] = ( ConfigurationTraj_[i+1] + ConfigurationTraj_[i] + ConfigurationTraj_[i-1] )/3;
+    tmpVelocityTraj_[i] = ( VelocityTraj_[i+1] + VelocityTraj_[i] + VelocityTraj_[i-1] )/3;
+    tmpAccelerationTraj_[i] = ( AccelerationTraj_[i+1] + AccelerationTraj_[i] + AccelerationTraj_[i-1] )/3;
+  }
+
+  tmpConfigurationTraj_[N-1] = ( ConfigurationTraj_[N-1]+ConfigurationTraj_[N-2] )*0.5;
+  tmpVelocityTraj_[N-1]      = ( VelocityTraj_[N-1]+VelocityTraj_[N-2] )*0.5;
+  tmpAccelerationTraj_[N-1]  = ( AccelerationTraj_[N-1]+AccelerationTraj_[N-2] )*0.5;
+
+
+  ConfigurationTraj_ = tmpConfigurationTraj_ ;
+  VelocityTraj_ = tmpVelocityTraj_ ;
+  AccelerationTraj_ = tmpAccelerationTraj_ ;
 
   /// \brief Debug Purpose
   /// --------------------

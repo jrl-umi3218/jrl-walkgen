@@ -287,18 +287,18 @@ namespace PatternGeneratorJRL
     unsigned NbSampleInterpolation_ ;
 
     /// \brief Buffers for the CoM an Feet computation, i.e. the simplify inverse kinematics.
-    vector <MAL_VECTOR_TYPE(double)> ConfigurationTraj_ ;
-    vector <MAL_VECTOR_TYPE(double)> VelocityTraj_ ;
-    vector <MAL_VECTOR_TYPE(double)> AccelerationTraj_ ;
-    vector <MAL_VECTOR_TYPE(double)> ConfigurationTrajControl_ ;
-    vector <MAL_VECTOR_TYPE(double)> VelocityTrajControl_ ;
-    vector <MAL_VECTOR_TYPE(double)> AccelerationTrajControl_ ;
+    std::vector <MAL_VECTOR_TYPE(double)> ConfigurationTraj_ ;
+    std::vector <MAL_VECTOR_TYPE(double)> VelocityTraj_ ;
+    std::vector <MAL_VECTOR_TYPE(double)> AccelerationTraj_ ;
     MAL_VECTOR_TYPE(double) PreviousConfiguration_ ;
     MAL_VECTOR_TYPE(double) PreviousVelocity_ ;
     MAL_VECTOR_TYPE(double) PreviousAcceleration_ ;
-    MAL_VECTOR_TYPE(double) PreviousConfigurationControl_ ;
-    MAL_VECTOR_TYPE(double) PreviousVelocityControl_ ;
-    MAL_VECTOR_TYPE(double) PreviousAccelerationControl_ ;
+
+    // 2 point filter
+    vector <MAL_VECTOR_TYPE(double)> tmpConfigurationTraj_ ;
+    vector <MAL_VECTOR_TYPE(double)> tmpVelocityTraj_ ;
+    vector <MAL_VECTOR_TYPE(double)> tmpAccelerationTraj_ ;
+
 
     /// \brief Buffers for the uotput of the Kajita preview control algorithm.
     std::deque<COMState> ComStateBuffer_ ;
