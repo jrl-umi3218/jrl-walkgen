@@ -171,6 +171,7 @@ RelativeFeetInequalities::set_feet_dimensions( CjrlHumanoidDynamicRobot *aHS )
     }
   LeftFoot->getSoleSize( WidthHalf,HeightHalf );
 
+  assert(WidthHalf > 0);
   LeftFootSize_.setHalfSizeInit( WidthHalf, HeightHalf, DSFeetDistance_                 );
   LeftFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_     );
   RightFootSize_.setHalfSizeInit( WidthHalf, HeightHalf, DSFeetDistance_                );
@@ -235,7 +236,7 @@ RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
 
 void
 RelativeFeetInequalities::set_inequalities( convex_hull_t & ConvexHull,
-    const support_state_t & Support, ineq_e type)
+    const support_state_t &, ineq_e type)
 {
 
   convex_hull_t * ConvexHull_p = 0;

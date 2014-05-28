@@ -117,8 +117,8 @@ void FootTrajectoryGenerationStandard::InitializeInternalDataStructures()
 {
   FreeInternalDataStructures();
   
-  m_PolynomeX = new Polynome5(0,0);
-  m_PolynomeY = new Polynome5(0,0);
+  m_PolynomeX = new Polynome7(0,0);
+  m_PolynomeY = new Polynome7(0,0);
   m_PolynomeZ = new Polynome4(0,0);
   m_PolynomeOmega = new Polynome3(0,0);
   m_PolynomeOmega2 = new Polynome3(0,0);
@@ -227,17 +227,17 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
 }
 
 int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double TimeInterval,
-    double FinalPosition, double InitPosition, double InitSpeed, double InitAcc)
+    double FinalPosition, double InitPosition, double InitSpeed, double InitAcc, double InitJerk)
 {
  switch (PolynomeIndex)
    {
 
    case X_AXIS:
-     m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
+     m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc,InitJerk);
      break;
 
    case Y_AXIS:
-     m_PolynomeY->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
+     m_PolynomeY->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc,InitJerk);
      break;
 
    case Z_AXIS:

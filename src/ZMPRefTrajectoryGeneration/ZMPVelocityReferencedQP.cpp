@@ -115,7 +115,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0)
   SupportFSM_->SamplingPeriod( QP_T_ );
 
   // Create and initialize preview of orientations
-  OrientPrw_ = new OrientationsPreview( aHS->rootJoint() );
+  OrientPrw_ = new OrientationsPreview( aHS );
   OrientPrw_->SamplingPeriod( QP_T_ );
   OrientPrw_->NbSamplingsPreviewed( QP_N_ );
   OrientPrw_->SSLength( SupportFSM_->StepPeriod() );
@@ -123,7 +123,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0)
   OrientPrw_->CurrentTrunkState( CurrentTrunkState );
 
   // Create and initialize preview of orientations
-  OrientPrw_DF_ = new OrientationsPreview( aHS->rootJoint() );
+  OrientPrw_DF_ = new OrientationsPreview( aHS );
   OrientPrw_DF_->SamplingPeriod( QP_T_ );
   OrientPrw_DF_->NbSamplingsPreviewed( QP_N_ );
   OrientPrw_DF_->SSLength( SupportFSM_->StepPeriod() );
@@ -592,14 +592,14 @@ void
     ControlInterpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, FinalLeftFootTraj_deq,
                           FinalRightFootTraj_deq, time) ;
 
-    DynamicFilterInterpolation(time) ;
-    CallToComAndFootRealization(time);
+    //DynamicFilterInterpolation(time) ;
+    //CallToComAndFootRealization(time);
 
 
-    deque<COMState> tmp = FinalCOMTraj_deq ;
+    //deque<COMState> tmp = FinalCOMTraj_deq ;
     // DYNAMIC FILTER
     // --------------
-    DynamicFilter( time, tmp );
+    //DynamicFilter( time, tmp );
 
 
 
@@ -621,120 +621,120 @@ void
     int iteration100 = (int)iteration/100;
     int iteration10 = (int)(iteration - iteration100*100)/10;
     int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
+//
+//    /// \brief Debug Purpose
+//    /// --------------------
+//    oss.str("TestHerdt2010footcom");
+//    oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
+//    aFileName = oss.str();
+//    aof.open(aFileName.c_str(),ofstream::out);
+//    aof.close();
+//    ///----
+//    aof.open(aFileName.c_str(),ofstream::app);
+//    aof.precision(8);
+//    aof.setf(ios::scientific, ios::floatfield);
+//    for (unsigned int i = 0 ; i < NbSampleInterpolation_ * QP_N_ ; ++i )
+//    {
+//      aof << filterprecision( i * InterpolationPeriod_ ) << " "       // 0
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[0] ) << " "         // 1
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[0] ) << " "         // 2
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[0] ) << " "         // 3
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[1] ) << " "         // 4
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[1] ) << " "         // 5
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[1] ) << " "         // 6
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[2] ) << " "         // 7
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[2] ) << " "         // 8
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[2] ) << " "         // 9
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[0] ) << " "       // 10
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[1] ) << " "       // 11
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[2] ) << " "       // 12
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].x ) << " "       // 13
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].y ) << " "       // 14
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].z ) << " "       // 15
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].theta * M_PI / 180 ) << " "   // 16
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].omega * M_PI / 180 ) << " "   // 17
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].x ) << " "      //18
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].y ) << " "      //19
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].z ) << " "  //20
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].theta * M_PI / 180 ) << " "  //21
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].omega * M_PI / 180 ) << " "  //22
+//          << filterprecision( solution_.Solution_vec[i/NbSampleInterpolation_] ) << " "  //23
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[0] ) << " "       // 24
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[1] ) << " "       // 25
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[2] ) << " "       // 26
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[0] ) << " "       // 27
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[1] ) << " "       // 28
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[2] ) << " "       // 29
+//          << endl ;
+//    }
+//    aof.close() ;
 
-    /// \brief Debug Purpose
-    /// --------------------
-    oss.str("TestHerdt2010footcom");
-    oss << "_" << iteration100 << iteration10 << iteration1 << ".dat";
-    aFileName = oss.str();
-    aof.open(aFileName.c_str(),ofstream::out);
-    aof.close();
-    ///----
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-    for (unsigned int i = 0 ; i < NbSampleInterpolation_ * QP_N_ ; ++i )
-    {
-      aof << filterprecision( i * InterpolationPeriod_ ) << " "       // 0
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[0] ) << " "         // 1
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[0] ) << " "         // 2
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[0] ) << " "         // 3
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[1] ) << " "         // 4
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[1] ) << " "         // 5
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[1] ) << " "         // 6
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[2] ) << " "         // 7
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[2] ) << " "         // 8
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[2] ) << " "         // 9
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[0] ) << " "       // 10
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[1] ) << " "       // 11
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[2] ) << " "       // 12
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].x ) << " "       // 13
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].y ) << " "       // 14
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].z ) << " "       // 15
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].theta * M_PI / 180 ) << " "   // 16
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].omega * M_PI / 180 ) << " "   // 17
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].x ) << " "      //18
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].y ) << " "      //19
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].z ) << " "  //20
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].theta * M_PI / 180 ) << " "  //21
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].omega * M_PI / 180 ) << " "  //22
-          << filterprecision( solution_.Solution_vec[i/NbSampleInterpolation_] ) << " "  //23
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[0] ) << " "       // 24
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[1] ) << " "       // 25
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[2] ) << " "       // 26
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[0] ) << " "       // 27
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[1] ) << " "       // 28
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[2] ) << " "       // 29
-          << endl ;
-    }
-    aof.close() ;
-
-    /// \brief Debug Purpose
-    /// --------------------
-    oss.str("TestHerdt2010DynamicCoMComparison1.dat");
-    aFileName = oss.str();
-    if(iteration == 0)
-    {
-      aof.open(aFileName.c_str(),ofstream::out);
-      aof.close();
-    }
-    ///----
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-    for (unsigned int i = 0 ; i < NbSampleInterpolation_ ; ++i )
-    {
-      aof << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].x ) << " "         // 1
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].y ) << " "         // 2
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].z ) << " "         // 3
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].theta ) << " "     // 4
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].omega ) << " "     // 5
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].dx ) << " "        // 6
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].dy ) << " "        // 7
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].dz ) << " "        // 8
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].dtheta ) << " "    // 9
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].domega ) << " "    // 10
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].ddx ) << " "       // 11
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].ddy ) << " "       // 12
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].ddz ) << " "       // 13
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].ddtheta ) << " "   // 14
-          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].ddomega ) << " "   // 15
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].x ) << " "        // 16
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].y ) << " "        // 17
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].z ) << " "        // 18
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].theta ) << " "    // 19
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].omega ) << " "    // 20
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].dx ) << " "       // 21
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].dy ) << " "       // 22
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].dz ) << " "       // 23
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].dtheta ) << " "   // 24
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].domega ) << " "   // 25
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].ddx ) << " "      // 26
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].ddy ) << " "      // 27
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].ddz ) << " "      // 28
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].ddtheta ) << " "  // 29
-          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].ddomega ) << " "  // 30
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[0] ) << " "           // 31
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[0] ) << " "           // 32
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[0] ) << " "           // 33
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[1] ) << " "           // 34
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[1] ) << " "           // 35
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[1] ) << " "           // 36
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[2] ) << " "           // 37
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[2] ) << " "           // 38
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[2] ) << " "           // 39
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[0] ) << " "        // 40
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[0] ) << " "       // 41
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[0] ) << " "         // 42
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[1] ) << " "        // 43
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[1] ) << " "       // 44
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[1] ) << " "         // 45
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[2] ) << " "        // 46
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[2] ) << " "       // 47
-          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[2] ) << " "         // 48
-          << endl ;
-    }
-    aof.close();
+//    /// \brief Debug Purpose
+//    /// --------------------
+//    oss.str("TestHerdt2010DynamicCoMComparison1.dat");
+//    aFileName = oss.str();
+//    if(iteration == 0)
+//    {
+//      aof.open(aFileName.c_str(),ofstream::out);
+//      aof.close();
+//    }
+//    ///----
+//    aof.open(aFileName.c_str(),ofstream::app);
+//    aof.precision(8);
+//    aof.setf(ios::scientific, ios::floatfield);
+//    for (unsigned int i = 0 ; i < NbSampleInterpolation_ ; ++i )
+//    {
+//      aof << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].x ) << " "         // 1
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].y ) << " "         // 2
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].z ) << " "         // 3
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].theta ) << " "     // 4
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].omega ) << " "     // 5
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].dx ) << " "        // 6
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].dy ) << " "        // 7
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].dz ) << " "        // 8
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].dtheta ) << " "    // 9
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].domega ) << " "    // 10
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].ddx ) << " "       // 11
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].ddy ) << " "       // 12
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].ddz ) << " "       // 13
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].ddtheta ) << " "   // 14
+//          << filterprecision( LeftFootTraj_deq_[CurrentIndex_+i].ddomega ) << " "   // 15
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].x ) << " "        // 16
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].y ) << " "        // 17
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].z ) << " "        // 18
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].theta ) << " "    // 19
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].omega ) << " "    // 20
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].dx ) << " "       // 21
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].dy ) << " "       // 22
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].dz ) << " "       // 23
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].dtheta ) << " "   // 24
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].domega ) << " "   // 25
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].ddx ) << " "      // 26
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].ddy ) << " "      // 27
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].ddz ) << " "      // 28
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].ddtheta ) << " "  // 29
+//          << filterprecision( RightFootTraj_deq_[CurrentIndex_+i].ddomega ) << " "  // 30
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[0] ) << " "           // 31
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[0] ) << " "           // 32
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[0] ) << " "           // 33
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[1] ) << " "           // 34
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[1] ) << " "           // 35
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[1] ) << " "           // 36
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].x[2] ) << " "           // 37
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].y[2] ) << " "           // 38
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].z[2] ) << " "           // 39
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[0] ) << " "        // 40
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[0] ) << " "       // 41
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[0] ) << " "         // 42
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[1] ) << " "        // 43
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[1] ) << " "       // 44
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[1] ) << " "         // 45
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].roll[2] ) << " "        // 46
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].pitch[2] ) << " "       // 47
+//          << filterprecision( COMTraj_deq_[CurrentIndex_+i].yaw[2] ) << " "         // 48
+//          << endl ;
+//    }
+//    aof.close();
 
     /// \brief Debug Purpose
     /// --------------------
@@ -855,10 +855,10 @@ void ZMPVelocityReferencedQP::ControlInterpolation(
                                              Solution_.SupportStates_deq, Solution_,
                                              Solution_.SupportOrientations_deq,
                                              FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
-  cout << "FinalLeftFootTraj_deq.ddtheta = " << FinalLeftFootTraj_deq[CurrentIndex_-1].ddtheta << " "
-      << FinalLeftFootTraj_deq[CurrentIndex_+NbSampleControl_-1].ddtheta << endl ;
-  cout << "FinalRightFootTraj_deq.ddtheta = " << FinalRightFootTraj_deq[CurrentIndex_-1].ddtheta << " "
-      << FinalRightFootTraj_deq[CurrentIndex_+NbSampleControl_-1].ddtheta << endl ;
+//  cout << "FinalLeftFootTraj_deq.ddtheta = " << FinalLeftFootTraj_deq[CurrentIndex_-1].ddtheta << " "
+//      << FinalLeftFootTraj_deq[CurrentIndex_+NbSampleControl_-1].ddtheta << endl ;
+//  cout << "FinalRightFootTraj_deq.ddtheta = " << FinalRightFootTraj_deq[CurrentIndex_-1].ddtheta << " "
+//      << FinalRightFootTraj_deq[CurrentIndex_+NbSampleControl_-1].ddtheta << endl ;
   return ;
 }
 

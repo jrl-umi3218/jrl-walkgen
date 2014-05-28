@@ -155,7 +155,7 @@ namespace PatternGeneratorJRL
 
       /// \brief Set parameters considering initial position, velocity, acceleration
       void SetParameters(double FT, double FP,
-          double InitPos, double InitSpeed, double InitAcc);
+          double InitPos, double InitSpeed, double InitAcc, double InitJerk = 0.0);
       /// Destructor.
       ~Polynome5();
 
@@ -179,6 +179,54 @@ namespace PatternGeneratorJRL
 
       /// Destructor.
       ~Polynome6();
+    };
+
+  /// Polynome used for X,Y and Theta trajectories.
+  class  Polynome7 : public Polynome
+    {
+    private:
+      double FT_, FP_, InitPos_, InitSpeed_,InitAcc_;
+    public:
+      /** Constructor:
+    FT: Final time
+    FP: Final position */
+      Polynome7(double FT, double FP);
+
+      /// Set the parameters
+      void SetParameters(double FT, double FP);
+
+      /*! Set the parameters such that
+        the initial position, and initial speed
+        are different from zero.
+       */
+      void SetParametersWithInitPosInitSpeed(double FT,
+                                             double FP,
+                                             double InitPos,
+                                             double InitSpeed);
+
+      /// \brief Set parameters considering initial position, velocity, acceleration
+      void SetParameters(double FT, double FP,
+          double InitPos, double InitSpeed, double InitAcc);
+
+      /// \brief Set parameters considering initial position, velocity, acceleration, jerk
+      void SetParameters(double FT, double FP,
+          double InitPos, double InitSpeed, double InitAcc, double InitJerk);
+
+
+      /*! Set the parameters such that
+        the initial position, and initial speed
+        are different from zero.
+       */
+      void GetParametersWithInitPosInitSpeed(double &FT,
+                                             double &FP,
+                                             double &InitPos,
+                                             double &InitSpeed);
+
+
+
+      /// Destructor.
+      ~Polynome7();
+
     };
 
 }

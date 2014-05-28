@@ -167,7 +167,7 @@ namespace PatternGeneratorJRL
    /// \param[in] InitSpeed
    /// \param[in] InitAcc
    int SetParameters(int PolynomeIndex, double TimeInterval,
-       double FinalPosition, double InitPosition, double InitSpeed, double InitAcc);
+       double FinalPosition, double InitPosition, double InitSpeed, double InitAcc, double InitJerk=0.0);
 
    /*! Fill an absolute foot position structure for a given time. */
    double ComputeAll(FootAbsolutePosition & aFootAbsolutePosition,
@@ -197,7 +197,7 @@ namespace PatternGeneratorJRL
   protected:
    
    /*! \brief Polynomes for X and Y axis positions*/
-   Polynome5 *m_PolynomeX,*m_PolynomeY;
+   Polynome7 *m_PolynomeX,*m_PolynomeY;
    
    /*! \brief Polynome for X-Y orientation */
    Polynome5 *m_PolynomeTheta;

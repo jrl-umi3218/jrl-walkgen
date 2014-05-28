@@ -131,6 +131,8 @@ namespace PatternGeneratorJRL
     double dx,dy,dz, dtheta, domega, domega2;
     /*! Acceleration of the foot. */
     double ddx,ddy,ddz, ddtheta, ddomega, ddomega2;
+    /*! Jerk of the foot. */
+    double dddx,dddy,dddz, dddtheta, dddomega, dddomega2;
     /*! Time at which this position should be reached. */
     double time;
     /*! 1:normal walking 2:one step before obstacle

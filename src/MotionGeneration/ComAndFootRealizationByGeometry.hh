@@ -282,7 +282,6 @@ namespace PatternGeneratorJRL
     /*! \brief Initialization of internal maps of indexes */
     void InitializationMaps(std::vector<CjrlJoint *> &FromRootToFoot,
 			    std::vector<CjrlJoint *> &ActuatedJoints,
-			    std::vector<int> &IndexInVRML,
 			    std::vector<int> &IndexinConfiguration);
 
     /*! Map shoulders and wrist
@@ -297,7 +296,6 @@ namespace PatternGeneratorJRL
     */
     void InitializeMapsForAHand(CjrlHand * aHand,
 				std::vector<CjrlJoint *> &ActuatedJoints,
-				vector<int> & IndexesInVRML,
 				vector<int> & IndexesInConfiguration,
 				CjrlJoint * & associateShoulder);
 
@@ -396,13 +394,6 @@ namespace PatternGeneratorJRL
 
     /*! Conversion between the index of the plan and the robot DOFs. */
     std::vector<int> m_ConversionForUpperBodyFromLocalIndexToRobotDOFs;
-
-    /*! Keep the indexes for the legs of the robot in the VRML numbering system. */
-    std::vector<int> m_LeftLegIndexInVRML;
-    std::vector<int> m_RightLegIndexInVRML;
-    std::vector<int> m_LeftArmIndexInVRML;
-    std::vector<int> m_RightArmIndexInVRML;
-    std::vector<int> m_ChestIndexInVRML;
 
     /*! \name Keep the indexes into the Configuration numbering system.
      @{
