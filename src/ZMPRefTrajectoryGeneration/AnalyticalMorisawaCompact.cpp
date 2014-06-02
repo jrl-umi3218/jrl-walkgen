@@ -2253,21 +2253,6 @@ namespace PatternGeneratorJRL
     m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_AbsoluteTimeReference,lIndexInterval);
     lPrevIndexInterval = lIndexInterval;
 
-    double up_time=0.0, up_height=0.0, first_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime ;
-
-    if (m_isStepStairOn == 1)
-	{
-
-
-        for (int i =0;i<m_RelativeFootPositions.size();i++)
-    {
-        up_height += m_RelativeFootPositions[i].sz;
-        up_time += m_RelativeFootPositions[i].SStime + m_RelativeFootPositions[i].DStime;
-    }
-
- //   cout << up_height << " " << up_time << endl;
-
-	}
     /*! Fill in the stacks: minimal strategy only 1 reference. */
     for(double t=StartingTime; t<=EndTime; t+= m_SamplingPeriod)
       {
@@ -2327,23 +2312,11 @@ namespace PatternGeneratorJRL
         aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	}
 	else{
-	   /* if (LeftFootAbsPos.z <= RightFootAbsPos.z)
-	    {
-            aCOMPos.z[1] =( m_InitialPoseCoMHeight + LeftFootAbsPos.z - aCOMPos.z[0]) / m_SamplingPeriod;
-            aCOMPos.z[0] = m_InitialPoseCoMHeight + LeftFootAbsPos.z;
-	    }
-	    else
-	    {
-	         aCOMPos.z[1] =( m_InitialPoseCoMHeight + RightFootAbsPos.z - aCOMPos.z[0]) / m_SamplingPeriod;
-	        aCOMPos.z[0] = m_InitialPoseCoMHeight + RightFootAbsPos.z;
-	    }*/
-        if (t<=first_time || t >= up_time){
-            aCOMPos.z[1] = 0.0;
-            aCOMPos.z[0] = m_InitialPoseCoMHeight + RightFootAbsPos.z;}
-        else{
-            aCOMPos.z[1] = (t*up_height/(up_time-first_time) + ( m_InitialPoseCoMHeight- first_time*up_height/(up_time-first_time) )  -  aCOMPos.z[0])/m_SamplingPeriod;
-            aCOMPos.z[0] = t*up_height/(up_time-first_time) + ( m_InitialPoseCoMHeight- first_time*up_height/(up_time-first_time) )  ; }
+
+	    ComputeCoMz(t,aCOMPos.z[0]);
     }
+
+
     FinalCoMPositions.push_back(aCOMPos);
 
 
@@ -2354,5 +2327,43 @@ namespace PatternGeneratorJRL
 		m_SamplingPeriod,"Test.dat");
       }
   }
+
+
+    void AnalyticalMorisawaCompact::ComputeCoMz(double t, double &CoMz)
+    {
+
+    int Index;
+    double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
+    double deltaZ;
+
+
+
+    if (t >= moving_time){
+     /*   Index = int((t-moving_time)/(moving_time*2));
+        if (Index < (m_AbsoluteSupportFootPositions.size() - 1)/2){
+            deltaZ = (m_AbsoluteSupportFootPositions[2*Index + 1].z - m_AbsoluteSupportFootPositions[2*Index].z );
+            CoMz = t*deltaZ/(moving_time*2) + ( m_InitialPoseCoMHeight - (2*Index + 1)*moving_time*deltaZ/(moving_time*2) ) + m_AbsoluteSupportFootPositions[2*Index].z  ;
+      */
+        Index = int((t-moving_time)/(moving_time*2));
+        if (Index < (m_AbsoluteSupportFootPositions.size() - 1)/2){
+                deltaZ = (m_AbsoluteSupportFootPositions[2*Index + 1].z - m_AbsoluteSupportFootPositions[2*Index].z );
+                if (deltaZ > 0 && t>=(2*Index+2)*moving_time && t<=(2*Index+2)*moving_time + m_RelativeFootPositions[2*Index+1].SStime)
+                    CoMz = t*deltaZ/m_RelativeFootPositions[0].SStime +  m_InitialPoseCoMHeight - (2*Index + 2)*moving_time*deltaZ/m_RelativeFootPositions[0].SStime + m_AbsoluteSupportFootPositions[2*Index].z  ;
+                else if (deltaZ > 0  && t>(2*Index+2)*moving_time + m_RelativeFootPositions[2*Index+1].SStime)
+                    CoMz = CoMz;
+                if (deltaZ < 0 && t>=(2*Index+1)*moving_time && t<=(2*Index+2)*moving_time )
+                    CoMz = t*deltaZ/moving_time +  m_InitialPoseCoMHeight - (2*Index + 1)*moving_time*deltaZ/moving_time + m_AbsoluteSupportFootPositions[2*Index].z  ;
+                else if (deltaZ > 0  && t>(2*Index+2)*moving_time + m_RelativeFootPositions[2*Index+1].SStime)
+                    CoMz = CoMz;
+
+            }
+        }
+    else
+        CoMz = m_InitialPoseCoMHeight;
+
 }
+
+}
+
+
 

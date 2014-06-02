@@ -70,6 +70,7 @@ ADD_EXECUTABLE(TestRiccatiEquation
 
 PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-dynamics)
 
+
 ######################
 # Test Morisawa 2007 #
 ######################
@@ -79,6 +80,7 @@ IF(HRP2_DYNAMICS_FOUND)
     math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
     CONFIG_FILES_CMAKE(TestMorisawa2007OnLine${BITS}TestFGPI.datref)
     CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalk${BITS}TestFGPI.datref)
+   # CONFIG_FILES_CMAKE(TestMorisawa2007Climbing${BITS}TestFGPI.datref)
 
     MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
       SET(testmorisawa2007 "${test_morisawa_arg}${BITS}")
@@ -117,8 +119,14 @@ IF(HRP2_DYNAMICS_FOUND)
 
     ADD_MORISAWA_2007(TestMorisawa2007OnLine)
     ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
+    ADD_MORISAWA_2007(TestMorisawa2007Climbing)
+    ADD_MORISAWA_2007(TestMorisawa2007GoingDown)
+
   ENDIF(HRP2_14_FOUND)
 ENDIF(HRP2_DYNAMICS_FOUND)
+
+
+
 ###################
 # Test Herdt 2010 #
 ###################

@@ -25,20 +25,17 @@
  * real-time CoM and ZMP trajectory generation
  */
 
-#include "Debug.hh"
 #include "CommonTools.hh"
 #include "TestObject.hh"
-#include <jrl/walkgen/pgtypes.hh>
-#include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
-#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
-
 using namespace::PatternGeneratorJRL;
 using namespace::PatternGeneratorJRL::TestSuite;
 using namespace std;
 
 enum Profiles_t {
   PROFIL_ANALYTICAL_ONLINE_WALKING,                 // 1
-  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING          //  2
+  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,          //  2
+  PROFIL_ANALYTICAL_CLIMBING_STAIRS,                //3
+  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS,                //4
 };
 
 #define NBOFPREDEFONLINEFOOTSTEPS 11
@@ -179,6 +176,7 @@ public:
 
           /*! Fill the debug files with appropriate information. */
           IK();
+
 //          ComputeAndDisplayAverageError(false);
           fillInDebugFiles();
         }
@@ -398,6 +396,12 @@ protected:
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
       }
+      FootAbsolutePosition aSupportState;
+
+      if (m_OneStep.LeftFootPosition.stepType < 0 )
+        aSupportState = m_OneStep.LeftFootPosition ;
+        else
+        aSupportState = m_OneStep.RightFootPosition ;
       oss.str("/tmp/Step_Stair.zmp");
       aFileName = oss.str();
       aof.open(aFileName.c_str(),ofstream::app);
@@ -406,7 +410,7 @@ protected:
         aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
         aof << filterprecision( m_OneStep.ZMPTarget(0) - m_CurrentConfiguration(0)) << " "  ; // 1
         aof << filterprecision( m_OneStep.ZMPTarget(1) - m_CurrentConfiguration(1) ) << " "  ; // 1
-        aof << filterprecision( m_OneStep.ZMPTarget(2) - m_CurrentConfiguration(2)) << " "  ; // 1
+        aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2)) << " "  ; // 1
         aof << endl ;
       aof.close();
 
@@ -447,44 +451,6 @@ protected:
                       m_CurrentAcceleration,
                       m_OneStep.NbOfIt,
                       stage0);
-
-		/// \brief Debug Purpose
-		/// --------------------
-		ofstream aof;
-		string aFileName;
-		ostringstream oss(std::ostringstream::ate);
-		oss.str("TestHerdt2010DynamicART2.dat");
-		aFileName = oss.str();
-		if ( iteration_zmp == 0 )
-		{
-			aof.open(aFileName.c_str(),ofstream::out);
-			aof.close();
-		}
-		///----
-		aof.open(aFileName.c_str(),ofstream::app);
-		aof.precision(8);
-		aof.setf(ios::scientific, ios::floatfield);
-		for (unsigned int j = 0 ; j < m_CurrentConfiguration.size() ; ++j)
-		{
-			aof << filterprecision(m_CurrentConfiguration(j)) << " " ;
-		}
-		aof <<endl;
-		for (unsigned int j = 0 ; j < m_CurrentVelocity.size() ; ++j)
-		{
-			aof << filterprecision(m_CurrentVelocity(j)) << " " ;
-		}
-		aof <<endl;
-		for (unsigned int j = 0 ; j < m_CurrentAcceleration.size() ; ++j)
-		{
-			aof << filterprecision(m_CurrentAcceleration(j)) << " " ;
-		}
-		aof << endl ;
-		for (unsigned int j = 0 ; j < aCOMState.size() ; ++j)
-		{
-			aof << filterprecision(aCOMState(j)) << " " ;
-		}
-		aof << endl ;
-
   }
 
 
@@ -524,38 +490,65 @@ protected:
 
   void AnalyticalShortStraightWalking(PatternGeneratorInterface &aPGI)
   {
-
     CommonInitialization(aPGI);
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
       aPGI.ParseCmd(strm2);
     }
 
- /*   {
-      istringstream strm2(":walkmode 6");
-      aPGI.ParseCmd(strm2);
-    }
-  cout << "TESTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" << endl;*/
-
-   {
+    {
       istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
-                                         0.3 0.19 0.2 0.0\
+                                         0.3 0.19 0.086 0.0\
                                         0.0 -0.19 0.0 0.0\
-                                        0.3 0.19 0.2 0.0\
+                                        0.3 0.19 0.086 0.0\
                                         0.0 -0.19 0.0 0.0\
-                                        0.3 0.19 0.2 0.0\
-                                        0. -0.19 0.0 0.0"); /*0.4 0.19 0.05 0.0\
-                                        0. -0.19 0.0 0.0\
-                                        0.4 0.19 0.05 0.0\
-                                        0.0 -0.19 0.0 0.0*/
-
+                                        0.3 0.19 0.086 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.3 0.19 -0.086 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.3 0.19 -0.086 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.3 0.19 -0.086 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        ");
       aPGI.ParseCmd(strm2);
     }
 
-  /* {
-      istringstream strm2(":stepseq 0.0 -0.105 0.0 0.2 0.19 0.0 0.0 -0.19 0.0 0.2 0.19 0.0 0.0 -0.19 0.0 0.2 0.19 0.0 0.0 -0.19 0.0");
+  }
+
+  void AnalyticalClimbingStairs(PatternGeneratorInterface &aPGI)
+  {
+    CommonInitialization(aPGI);
+    {
+      istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
       aPGI.ParseCmd(strm2);
-    }*/
+    }
+
+    {
+      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
+                                         0.3 0.19 0.086 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        ");
+      aPGI.ParseCmd(strm2);
+    }
+
+  }
+
+    void AnalyticalGoingDownStairs(PatternGeneratorInterface &aPGI)
+  {
+    CommonInitialization(aPGI);
+    {
+      istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
+                                         0.3 0.19 -0.086 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        ");
+      aPGI.ParseCmd(strm2);
+    }
 
   }
 
@@ -568,9 +561,19 @@ protected:
 	AnalyticalShortStraightWalking(*m_PGI);
 	break;
 
+	case PROFIL_ANALYTICAL_CLIMBING_STAIRS:
+	AnalyticalClimbingStairs(*m_PGI);
+	break;
+
+    case PROFIL_ANALYTICAL_GOING_DOWN_STAIRS:
+	AnalyticalGoingDownStairs(*m_PGI);
+	break;
+
+
       case PROFIL_ANALYTICAL_ONLINE_WALKING:
 	StartAnalyticalOnLineWalking(*m_PGI);
 	break;
+
       default:
 	throw("No correct test profile");
 	break;
@@ -581,6 +584,11 @@ protected:
   {
     if (m_TestProfile==PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING)
       return;
+    if (m_TestProfile==PROFIL_ANALYTICAL_CLIMBING_STAIRS)
+      return;
+    if (m_TestProfile==PROFIL_ANALYTICAL_GOING_DOWN_STAIRS)
+      return;
+
 
     unsigned int StoppingTime = 70*200;
 
@@ -647,7 +655,7 @@ protected:
 	      }
 	  }
       }
-  }
+  };
 
 };
 
@@ -656,14 +664,21 @@ int PerformTests(int argc, char *argv[])
   std::string CompleteName = string(argv[0]);
   unsigned found = CompleteName.find_last_of("/\\");
   std::string TestName =  CompleteName.substr(found+1);
-  int TestProfiles[2] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
-			  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING};
+  int TestProfiles[4] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
+			  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,
+			  PROFIL_ANALYTICAL_CLIMBING_STAIRS,
+			  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS};
   int indexProfile=-1;
 
   if (TestName.compare(16,6,"OnLine")==0)
     indexProfile=0;
   if (TestName.compare(16,9,"ShortWalk")==0)
     indexProfile=1;
+  if (TestName.compare(16,8,"Climbing")==0)
+    indexProfile=2;
+  if (TestName.compare(16,9,"GoingDown")==0)
+    indexProfile=3;
+
 
   if (indexProfile==-1)
     {

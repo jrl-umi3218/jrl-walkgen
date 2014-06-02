@@ -133,13 +133,13 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
   m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAll(aFootAbsolutePosition,deltaj);
   aFootAbsolutePosition.stepType = m_NatureOfIntervals[IndexInterval];
 
-    ofstream aof;
+ /*   ofstream aof;
     string aFileName;
 
     aFileName ="ex.dat";
     aof.open(aFileName.c_str(),ofstream::app);
     aof << "deltaj " << deltaj << " t " << t << " m_Absoulute " << m_AbsoluteTimeReference << " Ref " << m_RefTime[IndexInterval] << " j " << IndexInterval << " foot  "<< aFootAbsolutePosition.x << " "<< aFootAbsolutePosition.z << endl;
-    aof.close();
+    aof.close();*/
 
   return true;
 }
@@ -251,7 +251,6 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 {
   if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
     return -1;
-
 
   m_SetOfFootTrajectoryGenerationObjects[IntervalIndex]->SetParametersWithInitPosInitSpeed(AxisReference,
 											  TimeInterval,

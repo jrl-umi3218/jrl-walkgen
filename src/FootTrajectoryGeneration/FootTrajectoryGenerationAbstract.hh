@@ -183,6 +183,12 @@ namespace PatternGeneratorJRL
     void SetOmega(double anOmega)
     { m_Omega = anOmega; };
 
+    int GetSetStepStairOn() const
+    { return  m_isStepStairOn; };
+
+    void SetStepStairOn(int aSSO)
+    {  m_isStepStairOn= aSSO;};
+
     /*! @} */
     /*! @} */
 

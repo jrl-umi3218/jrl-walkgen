@@ -116,14 +116,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 	  << FootFinalPosition.z << "," << FootInitialPosition.z << "," << FootInitialPosition.dz << ")");
   aFTGM->SetNatureInterval(IntervalIndex,FootFinalPosition.stepType);
 
-  // Init the first interval.
-  // X axis.
-  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
-					   FootTrajectoryGenerationStandard::X_AXIS,
-					   m_DeltaTj[IntervalIndex],
-					   FootFinalPosition.x,
-					   FootInitialPosition.x,
-					   FootInitialPosition.dx);
+
   // Y axis.
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::Y_AXIS,
@@ -136,7 +129,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::Z_AXIS,
-					   m_DeltaTj[IntervalIndex],
+					   0.95*m_DeltaTj[IntervalIndex],
 					   FootFinalPosition.z,
 					   FootInitialPosition.z,
 					   FootInitialPosition.dz);
@@ -164,6 +157,15 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 					   FootFinalPosition.omega2,
 					   FootInitialPosition.omega2,
 					   FootInitialPosition.domega2);
+
+    // Init the first interval.
+  // X axis.
+  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+					   FootTrajectoryGenerationStandard::X_AXIS,
+					   0.8*m_DeltaTj[IntervalIndex],
+					   FootFinalPosition.x,
+					   FootInitialPosition.x,
+					   FootInitialPosition.dx);
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::

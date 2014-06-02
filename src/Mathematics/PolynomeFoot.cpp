@@ -196,6 +196,22 @@ void Polynome5::SetParameters(double FT, double FP)
   }
 }
 
+
+double Polynome5::Compute(double t)
+{
+  double r=0.0,pt=1.0;
+  if (t<=FT_){
+      for(unsigned int i=0;i<m_Coefficients.size();i++)
+        {
+          r += m_Coefficients[i]*pt;
+          pt *=t;
+        }
+  }
+    else
+        r = FP_;
+  return r;
+}
+
 void Polynome5::SetParametersWithInitPosInitSpeed(double FT,
                                                   double FP,
                                                   double InitPos,

@@ -312,10 +312,10 @@ ZBsplines::~ZBsplines()
 
 double ZBsplines::ZComputePosition(double t)
 {
-    if (t<m_FT)
+    if (t<=m_FT)
         return ComputeBsplines(t).y;
     else
-        return ComputeBsplines(m_FT - t).y;
+        return m_FP;
 }
 
 double ZBsplines::ZComputeVelocity(double t)
@@ -424,11 +424,11 @@ void ZBsplines::ZGenerateControlPoints(double IP, double FT, double FP, double T
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.85*m_FT,m_FP};
+    A = {0.90*m_FT,m_FP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.9*m_FT,m_FP};
+    A = {0.95*m_FT,m_FP};
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 

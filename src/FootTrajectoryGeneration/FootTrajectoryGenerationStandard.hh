@@ -173,10 +173,6 @@ namespace PatternGeneratorJRL
    double ComputeAll(FootAbsolutePosition & aFootAbsolutePosition,
 		     double Time);
 
-   double ComputeAll(deque<FootAbsolutePosition> & adFootAbsolutePosition,
-						    double Time);
-
-
    /*! Compute the value for a given polynome. */
    double Compute(unsigned int PolynomeIndex, double Time);
 
