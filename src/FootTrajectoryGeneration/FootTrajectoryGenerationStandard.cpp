@@ -228,7 +228,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
        if (FinalPosition >= InitPosition)
         m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,1.5*TimeInterval/5.0,InitPosition+abs(FinalPosition-InitPosition)*1.5);
        else if (FinalPosition < InitPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,3.0*TimeInterval/5.0,InitPosition+abs(FinalPosition-InitPosition)*0.3);
+        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,4.0*TimeInterval/5.0,InitPosition+abs(FinalPosition-InitPosition)*0.2);
       // else if (FinalPosition == InitPosition)
         //m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
 
@@ -283,7 +283,7 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
        if (FinalPosition >= InitPosition)
         m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,1.5*TimeInterval/5.0,InitPosition+abs(FinalPosition-InitPosition)*1.5);
        else if (FinalPosition < InitPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,3.0*TimeInterval/5.0,InitPosition+abs(FinalPosition-InitPosition)*0.3);
+        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,4.0*TimeInterval/5.0,InitPosition+abs(FinalPosition-InitPosition)*0.2);
       // else if (FinalPosition == InitPosition)
      //   m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
 
