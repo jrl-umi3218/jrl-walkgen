@@ -33,36 +33,58 @@
 using namespace::std;
 using namespace::PatternGeneratorJRL;
 
-Polynome3::Polynome3(double FT, double FP) :Polynome(3)
+double PolynomeFoot::Compute(double t)
+{
+  //cout << "t=" << t << " FT_=" << FT_ << endl ;
+  if (t>=FT_)
+    return Polynome::Compute(FT_);
+  else
+    return Polynome::Compute(t);
+}
+
+double PolynomeFoot::ComputeDerivative(double t)
+{
+  if (t>=FT_)
+    return Polynome::ComputeDerivative(FT_);
+  else
+    return Polynome::ComputeDerivative(t);
+}
+
+double PolynomeFoot::ComputeSecDerivative(double t)
+{
+  if (t>=FT_)
+    return Polynome::ComputeSecDerivative(FT_);
+  else
+    return Polynome::ComputeSecDerivative(t);
+}
+
+double PolynomeFoot::ComputeJerk(double t)
+{
+  if (t>=FT_)
+    return Polynome::ComputeJerk(FT_);
+  else
+    return Polynome::ComputeJerk(t);
+}
+
+Polynome3::Polynome3(double FT, double FP) : PolynomeFoot(3,FT)
 {
   SetParameters(FT,FP);
 }
 
 void Polynome3::SetParameters(double FT, double FP)
 {
-  m_FT = FT;
-  m_FP = FP;
-  double tmp;
-  m_Coefficients[0] = 0.0;
-  m_Coefficients[1] = 0.0;
-  tmp = FT*FT;
-  if(FP == 0.0 || FT == 0.0)
-  {
-    m_Coefficients[2] = 0.0;
-    m_Coefficients[3] = 0.0;
-  }else{
-    m_Coefficients[2] = 3.0*FP/tmp;
-    m_Coefficients[3] = -2.0*FP/(tmp*FT);
-  }
+  Polynome3::SetParametersWithInitPosInitSpeed(FT,FP,
+                /*InitPos*/0.0,
+                /*InitSpeed*/0.0);
 }
 
-void Polynome3::SetParametersWithInitPosInitSpeed(double &FT,
-						  double &FP,
-						  double &InitPos,
-						  double &InitSpeed)
+void Polynome3::SetParametersWithInitPosInitSpeed(double FT,
+              double FP,
+              double InitPos,
+              double InitSpeed)
 {
-  m_FT = FT;
-  m_FP = FP;
+  FT_ = FT;
+  FP_ = FP;
 
   double tmp;
   m_Coefficients[0] = InitPos;
@@ -85,38 +107,23 @@ void Polynome3::GetParametersWithInitPosInitSpeed(double &FT,
 {
   InitPos= m_Coefficients[0];
   InitSpeed= m_Coefficients[1];
-  FT = m_FT;
-  FP = m_FP;
+  FT = FT_;
+  FP = FP_;
 }
 
 Polynome3::~Polynome3()
 {}
 
-Polynome4::Polynome4(double FT, double FP) :Polynome(4)
+Polynome4::Polynome4(double FT, double FP) :PolynomeFoot(4,FT)
 {
   SetParameters(FT,FP);
 }
 
 void Polynome4::SetParameters(double FT, double MP)
 {
-  m_FT = FT;
-  m_MP = MP;
-  double tmp;
-  m_Coefficients[0] = 0.0;
-  m_Coefficients[1] = 0.0;
-  tmp = FT*FT;
-  if(MP==0.0 || tmp==0.0)
-  {
-    m_Coefficients[2] = 0.0;
-    m_Coefficients[3] = 0.0;
-    m_Coefficients[4] = 0.0;
-  }else{
-    m_Coefficients[2] = 16.0*MP/tmp;
-    tmp=tmp*FT;
-    m_Coefficients[3] = -32.0*MP/tmp;
-    tmp=tmp*FT;
-    m_Coefficients[4] = 16.0*MP/tmp;
-  }
+  SetParametersWithInitPosInitSpeed(FT,MP,
+                /*InitPos*/0.0,
+                /*InitSpeed*/0.0);
 }
 
 void Polynome4::SetParametersWithInitPosInitSpeed(double FT,
@@ -124,8 +131,8 @@ void Polynome4::SetParametersWithInitPosInitSpeed(double FT,
 						  double InitPos,
 						  double InitSpeed)
 {
-  m_FT = FT;
-  m_MP = MP;
+  FT_ = FT;
+  MP_ = MP;
 
   double tmp;
   m_Coefficients[0] = InitPos;
@@ -149,8 +156,8 @@ void Polynome4::GetParametersWithInitPosInitSpeed(double &FT,
 						  double &InitPos,
 						  double &InitSpeed)
 {
-  FT = m_FT;
-  MP = m_MP;
+  FT = FT_;
+  MP = MP_;
   InitPos = m_Coefficients[0];
   InitSpeed = m_Coefficients[1];
 }
@@ -158,8 +165,7 @@ Polynome4::~Polynome4()
 {}
 
 Polynome5::Polynome5(double FT, double FP) 
-  :Polynome(5),
-   FT_(FT),
+  :PolynomeFoot(5,FT),
    FP_(FP),
    InitPos_(0.0),
    InitSpeed_(0.0),
@@ -174,25 +180,7 @@ Polynome5::~Polynome5()
 
 void Polynome5::SetParameters(double FT, double FP)
 {
-  double tmp;
-  FT_ = FT; FP_=FP; InitPos_ = 0.0;
-  InitSpeed_ = 0; InitAcc_ = 0.0;
-  m_Coefficients[0] = 0.0;
-  m_Coefficients[1] = 0.0;
-  m_Coefficients[2] = 0.0;
-  tmp = FT*FT*FT;
-  if(FP==0.0 || tmp==0.0)
-  {
-    m_Coefficients[3] = 0.0;
-    m_Coefficients[4] = 0.0;
-    m_Coefficients[5] = 0.0;
-  }else{
-    m_Coefficients[3] = 10*FP/tmp;
-    tmp *=FT;
-    m_Coefficients[4] = -15*FP/tmp;
-    tmp*=FT;
-    m_Coefficients[5] = 6*FP/tmp;
-  }
+  SetParameters(FT, FP, 0.0, 0.0, 0.0, 0.0);
 }
 
 void Polynome5::SetParametersWithInitPosInitSpeed(double FT,
@@ -238,47 +226,47 @@ void Polynome5::SetParameters(double FT, double FP,
   }
 }
 
-Polynome6::Polynome6(double FT, double MP) :Polynome(6)
+Polynome6::Polynome6(double FT, double MP) :PolynomeFoot(6,FT)
 {
   SetParameters(FT,MP);
 }
 
+
+
 void Polynome6::SetParameters(double FT, double MP)
 {
-  double tmp;
-  m_Coefficients[0] = 0.0;
-  m_Coefficients[1] = 0.0;
-  m_Coefficients[2] = 0.0;
-  tmp = FT*FT*FT;
-  if(MP==0.0 || tmp==0.0)
+  SetParameters(FT,MP,
+                /*InitPos=*/0.0,
+                /*InitSpeed=*/0.0,
+                /*InitAcc=*/0.0);
+}
+
+
+void Polynome6::SetParameters(
+    double FT, double MP,
+		double InitPos, double InitSpeed, double InitAcc)
+{
+  FT_=FT;
+  MP_=MP;
+  InitPos_=InitPos;
+  InitSpeed_=InitSpeed;
+  InitAcc_=InitAcc;
+  m_Coefficients[0] = InitPos;
+  m_Coefficients[1] = InitSpeed;
+  m_Coefficients[2] = 0.5*InitAcc;
+  if(MP==0.0 || FT==0.0)
   {
     m_Coefficients[3] = 0.0;
     m_Coefficients[4] = 0.0;
     m_Coefficients[5] = 0.0;
     m_Coefficients[6] = 0.0;
   }else{
-    m_Coefficients[3] = 64*MP/tmp;
-    tmp *=FT;
-    m_Coefficients[4] = -192*MP/tmp;
-    tmp *=FT;
-    m_Coefficients[5] = 192*MP/tmp;
-    tmp *=FT;
-    m_Coefficients[6] = -64*MP/tmp;
+    m_Coefficients[3] =  -0.5*(5*FT*FT*InitAcc + 32*InitSpeed*FT + 84*InitPos - 128*MP)/(FT*FT*FT);
+    m_Coefficients[4] =  0.5*(76*InitSpeed*FT + 222*InitPos - 384*MP + 9*FT*FT*InitAcc)/(FT*FT*FT*FT);
+    m_Coefficients[5] = -0.5*(204*InitPos + 66*InitSpeed*FT - 384*MP + 7*FT*FT*InitAcc)/(FT*FT*FT*FT*FT);
+    m_Coefficients[6] =           (-64*MP+32*InitPos + 10*InitSpeed*FT + FT*FT*InitAcc)/(FT*FT*FT*FT*FT*FT);
   }
-}
 
-
-void Polynome6::SetParameters(
-		double FT, double PM,
-		double InitPos, double InitSpeed, double InitAcc)
-{
-  m_Coefficients[0] = InitPos;
-  m_Coefficients[1] = InitSpeed;
-  m_Coefficients[2] = 0.5*InitAcc;
-  m_Coefficients[3] =  -0.5*(5*FT*FT*InitAcc + 32*InitSpeed*FT + 84*InitPos - 128*PM)/(FT*FT*FT);
-  m_Coefficients[4] =  0.5*(76*InitSpeed*FT + 222*InitPos - 384*PM + 9*FT*FT*InitAcc)/(FT*FT*FT*FT);
-  m_Coefficients[5] = -0.5*(204*InitPos + 66*InitSpeed*FT - 384*PM + 7*FT*FT*InitAcc)/(FT*FT*FT*FT*FT);
-  m_Coefficients[6] =           (-64*PM+32*InitPos + 10*InitSpeed*FT + FT*FT*InitAcc)/(FT*FT*FT*FT*FT*FT);
 }
 
 Polynome6::~Polynome6()
@@ -286,8 +274,7 @@ Polynome6::~Polynome6()
 }
 
 Polynome7::Polynome7(double FT, double FP)
-  :Polynome(7),
-   FT_(FT),
+  :PolynomeFoot(7,FT),
    FP_(FP),
    InitPos_(0.0),
    InitSpeed_(0.0),
@@ -299,29 +286,11 @@ Polynome7::Polynome7(double FT, double FP)
 
 void Polynome7::SetParameters(double FT, double FP)
 {
-  double tmp;
-  FT_ = FT; FP_=FP; InitPos_ = 0.0;
-  InitSpeed_ = 0; InitAcc_ = 0.0;
-  m_Coefficients[0] = InitPos_;
-  m_Coefficients[1] = InitSpeed_;
-  m_Coefficients[2] = InitAcc_;
-  m_Coefficients[3] = 0.0; // init jerk = 0.0;
-  tmp = FT*FT*FT*FT;
-  if(FP==0.0 || tmp==0.0)
-  {
-    m_Coefficients[4] = 0.0;
-    m_Coefficients[5] = 0.0;
-    m_Coefficients[6] = 0.0;
-    m_Coefficients[7] = 0.0;
-  }else{
-    m_Coefficients[4] = 35*FP/tmp;
-    tmp *=FT;
-    m_Coefficients[5] = -84*FP/tmp;
-    tmp*=FT;
-    m_Coefficients[6] = 140*FP/tmp;
-    tmp*=FT;
-    m_Coefficients[7] = -20*FP/tmp;
-  }
+  SetParameters(FT, FP,
+                /*InitPos*/0.0,
+                /*InitSpeed*/0.0,
+                /*InitAcc*/0.0,
+                /*InitJerk*/0.0);
 }
 
 void Polynome7::SetParametersWithInitPosInitSpeed(double FT,
@@ -344,19 +313,15 @@ void Polynome7::GetParametersWithInitPosInitSpeed(double &FT,
 }
 
 void Polynome7::SetParameters(double FT, double FP,
-    double InitPos, double InitSpeed, double InitAcc)
-{
-  SetParameters(FT,FP,InitPos,InitSpeed,InitAcc,0.0); // init jerk = 0;
-}
-
-void Polynome7::SetParameters(double FT, double FP,
     double InitPos, double InitSpeed, double InitAcc, double InitJerk)
 {
   double tmp;
+  FT_ = FT;
+  FP_ = FP;
   m_Coefficients[0] = InitPos_ = InitPos;
   m_Coefficients[1] = InitSpeed_ = InitSpeed;
   m_Coefficients[2] = InitAcc/2.0; InitAcc_ = InitAcc;
-  m_Coefficients[3] = InitJerk/6.0;
+  m_Coefficients[3] = InitJerk/6.0; InitJerk_ = InitJerk ;
 
   tmp = FT*FT*FT*FT;
   if(tmp==0.0)

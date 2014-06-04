@@ -530,7 +530,6 @@ void
     // COMPUTE ORIENTATIONS OF FEET FOR WHOLE PREVIEW PERIOD:
     // ------------------------------------------------------
     InitStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
-    cout << "Support Orientation " << Solution_.SupportOrientations_deq.size() << endl ;
     OrientPrw_->preview_orientations( time, VelRef_,
                                       SupportFSM_->StepPeriod(),
                                       FinalLeftFootTraj_deq, FinalRightFootTraj_deq,
@@ -799,6 +798,8 @@ void
           << filterprecision( FinalCOMTraj_deq[i].roll[2] ) << " "      // 46
           << filterprecision( FinalCOMTraj_deq[i].pitch[2] ) << " "     // 47
           << filterprecision( FinalCOMTraj_deq[i].yaw[2] ) << " "       // 48
+          << filterprecision( FinalLeftFootTraj_deq[i].dddx ) << " "       // 49
+          << filterprecision( FinalRightFootTraj_deq[i].dddx ) << " "       // 50
           << endl ;
     }
     aof.close();

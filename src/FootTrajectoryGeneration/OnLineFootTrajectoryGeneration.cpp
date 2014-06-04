@@ -47,7 +47,8 @@ OnLineFootTrajectoryGeneration::~OnLineFootTrajectoryGeneration()
 
 }
 
-void OnLineFootTrajectoryGeneration::ComputeFootPosition(double t, FootAbsolutePosition& curr_NSFAP){
+void OnLineFootTrajectoryGeneration::ComputeXYThetaFootPosition(double t, FootAbsolutePosition& curr_NSFAP){
+//  cout << "t_ = " << t << endl ;
   // x, dx, ddx, dddx
   curr_NSFAP.x   = m_PolynomeX->Compute(t);
   curr_NSFAP.dx  = m_PolynomeX->ComputeDerivative(t);
@@ -87,17 +88,19 @@ void
   double EndOfLiftOff = (m_TSingle-UnlockedSwingPeriod)*0.5;
   double StartLanding = EndOfLiftOff + UnlockedSwingPeriod;
 
+  //cout << "EndOfLiftOff interpol = " << EndOfLiftOff << endl ;
+  //cout << "UnlockedSwingPeriod interpol = " << UnlockedSwingPeriod << endl ;
+
   FootAbsolutePosition & curr_NSFAP = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex];
   const FootAbsolutePosition & prev_NSFAP = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1];
 
   // The foot support does not move.
-  SupportFootAbsolutePositions[CurrentAbsoluteIndex] =
-      SupportFootAbsolutePositions[StartIndex-1];
+  SupportFootAbsolutePositions[CurrentAbsoluteIndex] = SupportFootAbsolutePositions[StartIndex-1];
   SupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = (-1)*StepType;
 
 
   curr_NSFAP.stepType = StepType;
-
+  //cout << LocalInterpolationStartTime +InterpolationTime << " <= " << EndOfLiftOff << " || " << LocalInterpolationStartTime +InterpolationTime << " >= " << StartLanding << endl ;
   if (LocalInterpolationStartTime +InterpolationTime <= EndOfLiftOff || LocalInterpolationStartTime +InterpolationTime >= StartLanding)
   {
     // Do not modify x, y and theta while liftoff.
@@ -118,21 +121,20 @@ void
 //    curr_NSFAP.ddtheta = 0.0;
 //    curr_NSFAP.dddtheta  = 0.0;
   }
-  else if (LocalInterpolationStartTime < EndOfLiftOff && LocalInterpolationStartTime +InterpolationTime > EndOfLiftOff)
+  else if (LocalInterpolationStartTime < EndOfLiftOff)
   {
     // DO MODIFY x, y and theta the remaining time.
-    double remainingTime = LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff;
-    ComputeFootPosition(remainingTime,curr_NSFAP);
+    double remainingTime = InterpolationTime - EndOfLiftOff;
+    ComputeXYThetaFootPosition(remainingTime,curr_NSFAP);
   }
   else
   {
-    ComputeFootPosition(InterpolationTime,curr_NSFAP);
+    // DO MODIFY x, y and theta the rest of the time.
+    ComputeXYThetaFootPosition(InterpolationTime,curr_NSFAP);
   }
 
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z =
-      m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
-  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
-      m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
+  curr_NSFAP.z = m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
+  curr_NSFAP.dz = m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
 
   bool ProtectionNeeded=false;
 
@@ -163,17 +165,17 @@ void
         NoneSupportFootAbsolutePositions[StartIndex-1].omega - m_Omega;
     ProtectionNeeded=true;
   }
+
+  // Make sure the foot is not going inside the floor.
   double dFX=0,dFY=0,dFZ=0;
-  double lOmega = 0.0;
-  lOmega = curr_NSFAP.omega*M_PI/180.0;
-  double lTheta = 0.0;
-  lTheta = curr_NSFAP.theta*M_PI/180.0;
-
-  double c = cos(lTheta);
-  double s = sin(lTheta);
-
   {
-    // Make sure the foot is not going inside the floor.
+    double lOmega = 0.0;
+    lOmega = curr_NSFAP.omega*M_PI/180.0;
+    double lTheta = 0.0;
+    lTheta = curr_NSFAP.theta*M_PI/180.0;
+    double c = cos(lTheta);
+    double s = sin(lTheta);
+
     double dX=0,Z1=0,Z2=0,X1=0,X2=0;
     double B=m_FootB,H=m_FootH,F=m_FootF;
 
@@ -200,8 +202,10 @@ void
   }
 
 
-  MAL_S3_VECTOR(Foot_Shift,double);
-
+  //MAL_S3_VECTOR(Foot_Shift,double);
+  if ( abs(dFX) + abs(dFY) + abs(dFZ) )
+  //cout << "dFX = " << dFX << " ; dFY = " << dFY << " ; dFZ = " << dFZ << endl ;
+  //cout << "#########################################################################\n";
   // Modification of the foot position.
   curr_NSFAP.x += dFX ;
   curr_NSFAP.y += dFY ;
@@ -251,19 +255,59 @@ void
 
   support_state_t CurrentSupport = PrwSupportStates_deq.front();
 
-  double FPx, FPy;
+  double FPx(0.0), FPy(0.0);
   if(CurrentSupport.Phase != DS)
   {
     unsigned int NbStepsPrwd = PrwSupportStates_deq.back().StepNumber;
     interpret_solution( Time, Solution, CurrentSupport, NbStepsPrwd, FPx, FPy );
   }
+  /// \brief Debug Purpose
+  /// --------------------
+  ofstream aof;
+  string aFileName;
+  ostringstream oss(std::ostringstream::ate);
+  static int iteration = 0 ;
+  int iteration100 = (int)iteration/100;
+  int iteration10 = (int)(iteration - iteration100*100)/10;
+  int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
+
+  /// \brief Debug Purpose
+  /// --------------------
+  oss.str("TestHerdt2010DynamicSolutionPieds.dat");
+  aFileName = oss.str();
+  if(iteration == 0)
+  {
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+  ///----
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  aof << FPx << " "       // 1
+      << FPy << " "       // 2
+      << endl ;
+  iteration++;
 
   double LocalInterpolationStartTime = Time-(CurrentSupport.TimeLimit-(m_TDouble+m_TSingle));
 
   int StepType = 1;
   unsigned int CurrentIndex = FinalLeftFootTraj_deq.size()-1;
+
+
+  FootAbsolutePosition * LastSFP; //LastSwingFootPosition
+  if(CurrentSupport.Foot == LEFT)
+  {
+    LastSFP = &(FinalRightFootTraj_deq[CurrentIndex]);
+  }
+  else
+  {
+    LastSFP = &(FinalLeftFootTraj_deq[CurrentIndex]);
+  }
+
   FinalLeftFootTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex+1);
   FinalRightFootTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex+1);
+
   if(CurrentSupport.Phase == SS && Time+1.5*QP_T_ < CurrentSupport.TimeLimit)
   {
     //determine coefficients of interpolation polynome
@@ -274,20 +318,9 @@ void
     if(LocalInterpolationStartTime>EndOfLiftOff)
       SwingTimePassed = LocalInterpolationStartTime-EndOfLiftOff;
 
-    FootAbsolutePosition * LastSFP; //LastSwingFootPosition
-
-    if(CurrentSupport.Foot == LEFT)
-    {
-      LastSFP = &(FinalRightFootTraj_deq[CurrentIndex]);
-    }
-    else
-    {
-      LastSFP = &(FinalLeftFootTraj_deq[CurrentIndex]);
-    }
-
     //Set parameters for current polynomial
     double TimeInterval = UnlockedSwingPeriod-SwingTimePassed;
-    cout << std::setprecision(3) << std::fixed ;
+    cout << std::setprecision(5) << std::fixed ;
     cout << "########################################################\n" ;
     cout << "time: " << Time << endl;
     std::cout << "TimeInterval: " << TimeInterval << std::endl;
@@ -297,6 +330,12 @@ void
     cout << "stateChanged: " << CurrentSupport.StateChanged << endl ;
     cout << "TimeLimit: " << CurrentSupport.TimeLimit << endl ;
     cout << "EndOfLiftOff: " << EndOfLiftOff << endl ;
+    cout << "FPx = " << FPx << " ; FPy = " << FPy << endl ;
+    cout << "LastSFP x,dx,ddx.dddx = " << LastSFP->x << " " << LastSFP->dx <<" "<< LastSFP->ddx << " " << LastSFP->dddx << " " << endl ;
+    cout << "LastSFP y,dy,ddy.dddy = " << LastSFP->y << " " << LastSFP->dy <<" "<< LastSFP->ddy << " " << LastSFP->dddy << " " ;
+    if (TimeInterval>=0.06499 && TimeInterval<=0.065999)
+      cout << endl ;
+    cout << endl ;
     cout << "########################################################\n" ;
     SetParameters(
     	  FootTrajectoryGenerationStandard::X_AXIS,
@@ -371,6 +410,7 @@ void
   }
   else if (CurrentSupport.Phase == DS || Time+3.0/2.0*QP_T_ > CurrentSupport.TimeLimit)
   {
+    cout << " double support phase || " << Time+3.0/2.0*QP_T_ << " > " << CurrentSupport.TimeLimit << endl ;
     for(int k = 0; k<=(int)(QP_T_/m_SamplingPeriod);k++)
     {
       FinalRightFootTraj_deq[CurrentIndex+k]=               FinalRightFootTraj_deq[CurrentIndex+k-1];

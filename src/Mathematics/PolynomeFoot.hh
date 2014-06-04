@@ -44,8 +44,33 @@
 namespace PatternGeneratorJRL
 {
 
+  class PolynomeFoot : public Polynome
+  {
+  protected :
+      /*! Store final time */
+      double FT_;
+
+  public :
+
+    PolynomeFoot(int degree=0.0, double FT=0.0) : Polynome(degree), FT_(FT)
+    {};
+
+    /*! Compute the value. */
+    double Compute(double t);
+
+    /*! Compute the value of the derivative. */
+    double ComputeDerivative(double t);
+
+    /*! Compute the value of the second derivative. */
+    double ComputeSecDerivative(double t);
+
+    /*! Compute the value of the third derivative (jerk). */
+    double ComputeJerk(double t);
+
+};
+
   /// Polynome used for X,Y and Theta trajectories.
-  class  Polynome3 : public Polynome
+  class  Polynome3 : public PolynomeFoot
     {
     public:
       /** Constructor:
@@ -65,10 +90,10 @@ namespace PatternGeneratorJRL
 	are different from zero.
 	Final velocity is 0
        */
-      void SetParametersWithInitPosInitSpeed(double &FT,
-					     double &FP,
-					     double &InitPos,
-					     double &InitSpeed);
+      void SetParametersWithInitPosInitSpeed(double FT,
+               double FP,
+               double InitPos,
+               double InitSpeed);
 
       void GetParametersWithInitPosInitSpeed(double &FT,
 					     double &FP,
@@ -79,18 +104,18 @@ namespace PatternGeneratorJRL
       
     private:
       /*! Store final time and final position. */
-      double m_FT, m_FP;
+      double FP_;
     };
 
   /// Polynome used for Z trajectory.
-  class  Polynome4 : public Polynome
+  class  Polynome4 : public PolynomeFoot
     {
     public:
       /** Constructor:
        FT: Final time
        MP: Middle position */
       Polynome4(double FT, double MP);
-  
+
       /// Set the parameters
       // Initial velocity and position are 0
       // Final velocity and position are 0
@@ -118,15 +143,15 @@ namespace PatternGeneratorJRL
       
     private:
       /*! Store final time and middle position. */
-      double m_FT, m_MP;
+      double MP_;
       
     };
 
   /// Polynome used for X,Y and Theta trajectories.
-  class  Polynome5 : public Polynome
+  class  Polynome5 : public PolynomeFoot
     {
     private:
-      double FT_, FP_, InitPos_, InitSpeed_,InitAcc_;
+      double FP_, InitPos_, InitSpeed_,InitAcc_;
     public:
       /** Constructor:
 	  FT: Final time
@@ -162,19 +187,21 @@ namespace PatternGeneratorJRL
     };
 
   /// Polynome used for Z trajectory.
-  class  Polynome6 : public Polynome
+  class  Polynome6 : public PolynomeFoot
     {
+    private:
+      double MP_, InitPos_, InitSpeed_,InitAcc_;
     public:
       /// Constructor:
       /// FT: Final time
       /// MP: Middle position
       Polynome6(double FT, double MP);
-  
+
       /// Set the parameters
       // Initial acceleration, velocity and position by default 0
       // Final acceleration, velocity and position are 0
       void SetParameters(double FT, double MP);
-      void SetParameters(double FT, double PM,
+      void SetParameters(double FT, double MP,
 		  	  double InitPos, double InitSpeed, double InitAcc);
 
       /// Destructor.
@@ -182,10 +209,10 @@ namespace PatternGeneratorJRL
     };
 
   /// Polynome used for X,Y and Theta trajectories.
-  class  Polynome7 : public Polynome
+  class  Polynome7 : public PolynomeFoot
     {
     private:
-      double FT_, FP_, InitPos_, InitSpeed_,InitAcc_;
+      double FP_, InitPos_, InitSpeed_,InitAcc_,InitJerk_;
     public:
       /** Constructor:
     FT: Final time
@@ -204,13 +231,9 @@ namespace PatternGeneratorJRL
                                              double InitPos,
                                              double InitSpeed);
 
-      /// \brief Set parameters considering initial position, velocity, acceleration
-      void SetParameters(double FT, double FP,
-          double InitPos, double InitSpeed, double InitAcc);
-
       /// \brief Set parameters considering initial position, velocity, acceleration, jerk
       void SetParameters(double FT, double FP,
-          double InitPos, double InitSpeed, double InitAcc, double InitJerk);
+          double InitPos, double InitSpeed, double InitAcc, double InitJerk=0.0);
 
 
       /*! Set the parameters such that

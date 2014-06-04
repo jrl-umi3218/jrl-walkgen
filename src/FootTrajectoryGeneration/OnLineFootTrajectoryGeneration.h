@@ -129,7 +129,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param t : the time
     /// \param curr_NSFAP : absolute position for the swinging
-    virtual void ComputeFootPosition(double t,
+    virtual void ComputeXYThetaFootPosition(double t,
                                      FootAbsolutePosition& curr_NSFAP);
 
     //

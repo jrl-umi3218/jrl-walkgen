@@ -193,14 +193,13 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
 {
  switch (PolynomeIndex)
    {
-     
    case X_AXIS:
      ODEBUG2("Initspeed: " << InitSpeed << " ");
-     m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
+     m_PolynomeX->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
      break;
      
    case Y_AXIS:
-     m_PolynomeY->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
+     m_PolynomeY->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
      break;
 
    case Z_AXIS:
