@@ -152,6 +152,11 @@ namespace PatternGeneratorJRL
     /// \brief Half of simple support passed trigger
     bool HalfTimePassed_;
 
+    /// \brief vector containing the first preview support solution along the foot step
+    vector<double> FirstPrvSuppFootX_vec, FirstPrvSuppFootY_vec ;
+    
+    /// \brief final position determined 3 iteration before landing
+    double FPx_,FPy_ ;
   };
 
 }

@@ -39,7 +39,15 @@ OnLineFootTrajectoryGeneration::OnLineFootTrajectoryGeneration(SimplePluginManag
                                                                CjrlFoot *aFoot)
                                                                  : FootTrajectoryGenerationStandard(lSPM,aFoot)
 {
-
+  QP_T_ = 0.0 ;
+  QP_N_ = 0 ;
+  FeetDistanceDS_ = 0.0 ;
+  StepHeight_ = 0.0 ;
+  HalfTimePassed_ = false;
+  FPx_ = 0.0 ;
+  FPy_ = 0.0 ;
+  FirstPrvSuppFootX_vec.clear();
+  FirstPrvSuppFootY_vec.clear();
 }
 
 OnLineFootTrajectoryGeneration::~OnLineFootTrajectoryGeneration()
@@ -100,8 +108,9 @@ void
 
 
   curr_NSFAP.stepType = StepType;
-  //cout << LocalInterpolationStartTime +InterpolationTime << " <= " << EndOfLiftOff << " || " << LocalInterpolationStartTime +InterpolationTime << " >= " << StartLanding << endl ;
-  if (LocalInterpolationStartTime +InterpolationTime <= EndOfLiftOff || LocalInterpolationStartTime +InterpolationTime >= StartLanding)
+
+  if (LocalInterpolationStartTime +InterpolationTime <= EndOfLiftOff
+   || LocalInterpolationStartTime +InterpolationTime >= StartLanding)
   {
     // Do not modify x, y and theta while liftoff.
     curr_NSFAP.x = prev_NSFAP.x;
@@ -215,7 +224,8 @@ void
 
 void
     OnLineFootTrajectoryGeneration::interpret_solution( double CurrentTime, const solution_t & Solution,
-                                                        const support_state_t & CurrentSupport, unsigned int NbSteps, double & X, double & Y )
+                                                        const support_state_t & CurrentSupport, unsigned int NbSteps,
+                                                        double & X, double & Y )
 {
   double Sign;
   if(CurrentSupport.Foot == LEFT)
@@ -224,14 +234,32 @@ void
     Sign = -1.0;
   if(CurrentSupport.NbStepsLeft > 0 && NbSteps > 0 )
   {
-    X = Solution.Solution_vec[2*QP_N_];
-    Y = Solution.Solution_vec[2*QP_N_+NbSteps];
+    if (CurrentSupport.TimeLimit-CurrentTime >= 2*QP_T_)
+    {
+      FirstPrvSuppFootX_vec.push_back(Solution.Solution_vec[2*QP_N_]);
+      FirstPrvSuppFootY_vec.push_back(Solution.Solution_vec[2*QP_N_+NbSteps]);
+      FPx_ = FPy_ = 0.0 ;
+      for (unsigned int i = 0 ; i < FirstPrvSuppFootX_vec.size() ; ++i)
+      {
+        FPx_ += FirstPrvSuppFootX_vec[i] ;
+        FPy_ += FirstPrvSuppFootY_vec[i] ;
+      }
+      FPx_ = X = FPx_/FirstPrvSuppFootX_vec.size() ;
+      FPy_ = Y = FPy_/FirstPrvSuppFootX_vec.size() ;
+    }else
+    {
+      X = FPx_ ;
+      Y = FPy_ ;
+      FirstPrvSuppFootX_vec.clear();
+      FirstPrvSuppFootY_vec.clear();
+    }
     if(fabs(X)+fabs(Y)-0.00001<0.0)
     {
       //cout<<"Previewed foot x-position zero at time: "<<CurrentTime<<endl;
     }
     else if (CurrentSupport.TimeLimit-CurrentTime-QP_T_/2.0 > 0.0)
-    {//The landing position is yet determined by the solver because the robot finds himself still in the single support phase
+    {//The landing position is yet determined by the solver
+      //because the robot finds himself still in the single support phase
       //do nothing
     }
   }
@@ -331,8 +359,10 @@ void
     cout << "TimeLimit: " << CurrentSupport.TimeLimit << endl ;
     cout << "EndOfLiftOff: " << EndOfLiftOff << endl ;
     cout << "FPx = " << FPx << " ; FPy = " << FPy << endl ;
-    cout << "LastSFP x,dx,ddx.dddx = " << LastSFP->x << " " << LastSFP->dx <<" "<< LastSFP->ddx << " " << LastSFP->dddx << " " << endl ;
-    cout << "LastSFP y,dy,ddy.dddy = " << LastSFP->y << " " << LastSFP->dy <<" "<< LastSFP->ddy << " " << LastSFP->dddy << " " ;
+    cout << "LastSFP x,dx,ddx.dddx = " << LastSFP->x << " "
+        << LastSFP->dx <<" "<< LastSFP->ddx << " " << LastSFP->dddx << " " << endl ;
+    cout << "LastSFP y,dy,ddy.dddy = " << LastSFP->y << " "
+        << LastSFP->dy <<" "<< LastSFP->ddy << " " << LastSFP->dddy << " " ;
     if (TimeInterval>=0.06499 && TimeInterval<=0.065999)
       cout << endl ;
     cout << endl ;
