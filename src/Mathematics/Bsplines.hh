@@ -109,13 +109,11 @@ namespace PatternGeneratorJRL
        */
       void SetParameters(double FT, double FP, double ToMP, double MP);
 
-<<<<<<< HEAD
       void SetParametersWithInitPosInitSpeed(double FT, double FP, double ToMP, double MP,
 						  double InitPos,
 						  double InitSpeed);
-=======
+
       void SetParametersWithInitPos(double IP, double FT, double FP, double ToMP, double MP);
->>>>>>> tmp
 
       void GetParametersWithInitPosInitSpeed(double &FT,
 						  double &MP,
