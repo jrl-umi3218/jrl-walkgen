@@ -39,6 +39,7 @@ src/ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.cpp_dirty
 _build-intit-herdt/
 tests/plot.gnu
 tests/plotTmp.gnu
+*.orig
 .gitignore.orig
 CMakeLists.txt.user
 _build-qmake/
@@ -53,3 +54,5 @@ plotBuffers.pyc
 plotBuffersDCOM.py
 plotCoM.gnu
 plot_tmp2.gnu
+_build-DEBUG/
+src/#StepStackHandler.cpp#
