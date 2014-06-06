@@ -80,7 +80,9 @@ namespace PatternGeneratorJRL
 
     /*! \brief Take a serie of string as an input and
       read the steps according to the chosen walkmode. */
+
     void ReadStepSequenceAccordingToWalkMode(std::istringstream &strm);
+    void ReadStepStairSequenceAccordingToWalkMode(std::istringstream &strm);
 
     /*! \brief Real a partial sequence of steps
       without termination and immediate execution. */

@@ -40,7 +40,9 @@ FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginM
   m_Omega = 0.0;
   m_Foot= aFoot;
   m_SamplingPeriod = 0.005;
-  m_isStepStairOn =0;
+  m_isStepStairOn = 1;
+  m_StepHeight = 0.07;
+
 
   std::string aMethodName[5] =
     {":omega",
@@ -105,3 +107,4 @@ void FootTrajectoryGenerationAbstract::UpdateFootPosition(std::deque<FootAbsolut
 {
   LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-2: To be implemented ");
 }
+

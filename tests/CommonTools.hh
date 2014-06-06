@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Olivier Stasse
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 #ifdef UNIX
@@ -56,25 +56,25 @@ namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
-    void getOptions(int , char *[], 
+    void getOptions(int , char *[],
 		    std::string &VRMLPath,
 		    std::string &VRMLFileName,
 		    std::string &SpecificitiesFileName,
 		    std::string &LinkJointRank,
 		    std::string &InitConfig,
 		    unsigned int &TestProfil);
-    
+
     void CommonInitialization(PatternGeneratorJRL::PatternGeneratorInterface &aPGI);
-    
+
     /*! \brief Structure to handle information related to one step of each algorithm */
     struct OneStep
     {
-      COMPosition finalCOMPosition;
+      COMState finalCOMPosition;
       FootAbsolutePosition LeftFootPosition;
       FootAbsolutePosition RightFootPosition;
       MAL_VECTOR(ZMPTarget,double);
       unsigned long int NbOfIt;
-      
+
       OneStep()
       {
 	MAL_VECTOR_RESIZE(ZMPTarget,3);
@@ -83,7 +83,7 @@ namespace PatternGeneratorJRL
 	memset(&RightFootPosition,0,sizeof(RightFootPosition));
 	memset(&finalCOMPosition,0,sizeof(finalCOMPosition));
       }
-    };    
+    };
 
   } /* end of TestSuite namespace */
 } /* end of PatternGeneratorJRL namespace */

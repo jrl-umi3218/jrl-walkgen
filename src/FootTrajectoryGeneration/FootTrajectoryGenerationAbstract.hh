@@ -183,6 +183,12 @@ namespace PatternGeneratorJRL
     void SetOmega(double anOmega)
     { m_Omega = anOmega; };
 
+    int GetSetStepStairOn() const
+    { return  m_isStepStairOn; };
+
+    void SetStepStairOn(int aSSO)
+    {  m_isStepStairOn= aSSO;};
+
     /*! @} */
     /*! @} */
 
@@ -191,6 +197,7 @@ namespace PatternGeneratorJRL
       the feet behaviors (\f$omega\f$, \f$ stepheight \f$) .
     */
     virtual void CallMethod(std::string &Method, std::istringstream &strm);
+
 
   protected:
 
@@ -210,6 +217,9 @@ namespace PatternGeneratorJRL
     double m_Omega;
 
     int m_isStepStairOn;
+
+    double m_StepHeight;
+
   };
 
 

@@ -77,7 +77,6 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
       // Do not modify x, y and theta while liftoff.
       curr_NSFAP.x = prev_NSFAP.x;
       curr_NSFAP.y = prev_NSFAP.y;
-      //curr_NSFAP.z = prev_NSFAP.z;
       curr_NSFAP.theta = prev_NSFAP.theta;
     }
   else if (LocalInterpolationStartTime < EndOfLiftOff && LocalInterpolationStartTime +InterpolationTime > EndOfLiftOff)
@@ -86,7 +85,6 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
 	  double remainingTime = LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff;
       // x, dx
       curr_NSFAP.x   = m_PolynomeX->Compute(remainingTime);
-   //   cout << "remain "<< prev_NSFAP.x << " " << remainingTime << " " <<  curr_NSFAP.x <<endl;
       curr_NSFAP.dx  = m_PolynomeX->ComputeDerivative(remainingTime);
       if(m_PolynomeX->Degree() > 4)
         curr_NSFAP.ddx  = m_PolynomeX->ComputeSecDerivative(remainingTime);
@@ -98,7 +96,6 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
       //theta, dtheta
       curr_NSFAP.theta   = m_PolynomeTheta->Compute(remainingTime);
       curr_NSFAP.dtheta  = m_PolynomeTheta->ComputeDerivative(remainingTime);
-
       if(m_PolynomeTheta->Degree() > 4)
         curr_NSFAP.ddtheta = m_PolynomeTheta->ComputeSecDerivative(remainingTime);
     }
@@ -107,7 +104,6 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
       // DO MODIFY x, y and theta all the time.
       // x, dx
       curr_NSFAP.x  = m_PolynomeX->Compute(InterpolationTime);
-     // cout << "Inter "<< prev_NSFAP.x << " " << InterpolationTime << " " <<  curr_NSFAP.x <<endl;
       curr_NSFAP.dx = m_PolynomeX->ComputeDerivative(InterpolationTime);
       if(m_PolynomeX->Degree() > 4)
         curr_NSFAP.ddx  = m_PolynomeX->ComputeSecDerivative(InterpolationTime);
@@ -116,7 +112,6 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
       curr_NSFAP.dy = m_PolynomeY->ComputeDerivative(InterpolationTime);
       if(m_PolynomeY->Degree() > 4)
         curr_NSFAP.ddy = m_PolynomeY->ComputeSecDerivative(InterpolationTime);
-
       //theta, dtheta
       curr_NSFAP.theta = m_PolynomeTheta->Compute( InterpolationTime );
       curr_NSFAP.dtheta = m_PolynomeTheta->ComputeDerivative(InterpolationTime);
@@ -124,28 +119,33 @@ OnLineFootTrajectoryGeneration::UpdateFootPosition(deque<FootAbsolutePosition> &
         curr_NSFAP.ddtheta = m_PolynomeTheta->ComputeSecDerivative(InterpolationTime);
     }
 
-    if (m_isStepStairOn == 1)
+    if (m_isStepStairOn == 0)
     {
-      if (m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime) == 0.0)
-      {
+        curr_NSFAP.z = m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
+        //m_AnklePositionRight[2];
+        curr_NSFAP.dz = m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
 
-     //cout << LocalInterpolationStartTime+InterpolationTime << " " << prev_NSFAP.z << " " << curr_NSFAP.z << endl;
-      curr_NSFAP.z = prev_NSFAP.z;
-      curr_NSFAP.dz = m_BsplinesZ->ZComputeVelocity(LocalInterpolationStartTime+InterpolationTime);
-      }
+        //m_AnklePositionRight[2];
+    }
 
-      else{
-      curr_NSFAP.z = m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime);
-      curr_NSFAP.dz = m_BsplinesZ->ZComputeVelocity(LocalInterpolationStartTime+InterpolationTime);
+    else
+
+    {
+        if (m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime) == 0)
+        {
+            curr_NSFAP.z = prev_NSFAP.z;
         }
-  }
+        else
+        {
+        curr_NSFAP.z = m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime);
 
-  else{
-    NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z =
-      m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
-    NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
-      m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
-  }
+        }//m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+        //m_AnklePositionRight[2];
+        curr_NSFAP.dz = m_BsplinesZ->ZComputeVelocity(LocalInterpolationStartTime+InterpolationTime);
+        //m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+        //m_AnklePositionRight[2];
+    }
+
 
   bool ProtectionNeeded=false;
 
@@ -281,7 +281,6 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
   FinalRightFootTraj_deq.resize((unsigned int)(QP_T_/m_SamplingPeriod)+CurrentIndex+1);
   if(CurrentSupport.Phase == SS && Time+3.0/2.0*QP_T_ < CurrentSupport.TimeLimit)
     {
-     // m_isStepStairOn = 1;
       //determine coefficients of interpolation polynome
       double ModulationSupportCoefficient = 0.9;
       double UnlockedSwingPeriod = m_TSingle * ModulationSupportCoefficient;
@@ -317,12 +316,15 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
       if(CurrentSupport.StateChanged==true)
       {
 
-           if (m_isStepStairOn == 1)
-               SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Z_AXIS,TimeInterval,StepHeight_,LastSFP->z,LastSFP->dz);
-            else
-               SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle, StepHeight_);
-        // SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle, StepHeight_);
+
+        if (m_isStepStairOn == 0)
+            SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle, StepHeight_);
+        else
+            SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Z_AXIS,
+          m_TSingle,StepHeight_,
+          LastSFP->z, LastSFP->dz);
       }
+
       SetParametersWithInitPosInitSpeed(
           FootTrajectoryGenerationStandard::THETA_AXIS,
           TimeInterval, PreviewedSupportAngles_deq[0]*180.0/M_PI,
@@ -362,7 +364,6 @@ OnLineFootTrajectoryGeneration::interpolate_feet_positions(double Time,
     }
   else if (CurrentSupport.Phase == DS || Time+3.0/2.0*QP_T_ > CurrentSupport.TimeLimit)
     {
-      //m_isStepStairOn = 0;
       for(int k = 0; k<=(int)(QP_T_/m_SamplingPeriod);k++)
         {
           FinalRightFootTraj_deq[CurrentIndex+k]=               FinalRightFootTraj_deq[CurrentIndex+k-1];

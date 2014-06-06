@@ -124,30 +124,23 @@ int StepStackHandler::GetWalkMode()
   return m_WalkMode;
 }
 
+void StepStackHandler::ReadStepStairSequenceAccordingToWalkMode(istringstream &strm)
 
-void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 {
-  m_RelativeFootPositions.clear();
-  switch (m_WalkMode)
-    {
-    case 0:
-    case 6:
-     {
+	ODEBUG( "Standard Stepping on the Stairs Mode Selected" );
 
-	ODEBUG( "Climbing Stair" );
 	RelativeFootPosition aFootPosition;
 
 	while(!strm.eof())
 	  {
 	    if (!strm.eof())
 	      strm >> aFootPosition.sx;
-	    else
-          break;
+	    else break;
 	    if (!strm.eof())
 	      strm >> aFootPosition.sy;
 	    else
 	      break;
-	    if (!strm.eof())
+        if (!strm.eof())
 	      strm >> aFootPosition.sz;
 	    else
 	      break;
@@ -159,7 +152,7 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 	    aFootPosition.DeviationHipHeight = 0;
 	    aFootPosition.SStime=m_SingleSupportTime;
 	    aFootPosition.DStime=m_DoubleSupportTime;
-	    aFootPosition.stepType=6;
+	    aFootPosition.stepType=1;
 	    ODEBUG4(aFootPosition.sx << " " <<
 		    aFootPosition.sy << " " <<
 		    aFootPosition.sz << " " <<
@@ -169,16 +162,31 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 		    aFootPosition.DeviationHipHeight << " " ,
 		    "DebugGMFKW.dat");
 
+        cout << "TESTTTTTTTTTT   "<<aFootPosition.sx << " " <<
+		    aFootPosition.sy << " " <<
+		    aFootPosition.sz << " " <<
+		    aFootPosition.theta << " " <<
+		    aFootPosition.SStime << " " <<
+		    aFootPosition.DStime << " " <<
+		    aFootPosition.DeviationHipHeight << endl;
 	    m_RelativeFootPositions.push_back(aFootPosition);
 	    if (aFootPosition.sy>0)
 	      m_KeepLastCorrectSupportFoot=-1;
 	    else
 	      m_KeepLastCorrectSupportFoot=1;
-	  }
 
+	  }
 	ODEBUG("m_RelativeFootPositions: " << m_RelativeFootPositions.size());
-	break;
-      }
+
+
+}
+void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
+{
+  m_RelativeFootPositions.clear();
+  switch (m_WalkMode)
+    {
+    case 0:
+
     case 4:
       {
 
@@ -216,6 +224,7 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 	      m_KeepLastCorrectSupportFoot=-1;
 	    else
 	      m_KeepLastCorrectSupportFoot=1;
+
 	  }
 
 	ODEBUG("m_RelativeFootPositions: " << m_RelativeFootPositions.size());
@@ -224,6 +233,8 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
     case 3:
     case 1:
       {
+
+
 	ODEBUG4( "Walk Mode with HipHeight Variation Selected","DebugGMFKW.dat" );
 	RelativeFootPosition aFootPosition;
 
@@ -252,6 +263,8 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 		    aFootPosition.DStime << " " <<
 		    aFootPosition.DeviationHipHeight << " " ,
 		    "DebugFootPrint.dat");
+
+
 	    m_RelativeFootPositions.push_back(aFootPosition);
 	    if (aFootPosition.sy>0)
 	      m_KeepLastCorrectSupportFoot=-1;
@@ -910,22 +923,6 @@ void StepStackHandler::AddStepInTheStack(double sx, double sy,
   m_RelativeFootPositions.push_back(aFootPosition);
 }
 
-void StepStackHandler::AddStepStairInTheStack(double sx, double sy, double sz,
-					 double theta, double sstime,
-					 double dstime)
-{
-  RelativeFootPosition aFootPosition;
-  aFootPosition.sx = sx;
-  aFootPosition.sy = sy;
-  aFootPosition.sz = sz;
-  aFootPosition.theta = theta;
-  aFootPosition.SStime = sstime;
-  aFootPosition.DStime = dstime;
-  aFootPosition.stepType = 6;
-
-  m_RelativeFootPositions.push_back(aFootPosition);
-}
-
 void StepStackHandler::PushFrontAStepInTheStack(RelativeFootPosition &aRFP)
 {
   m_RelativeFootPositions.push_front(aRFP);
@@ -994,37 +991,6 @@ void StepStackHandler::m_PartialStepSequence(istringstream &strm)
     }
 }
 
-void StepStackHandler::m_PartialStepStairSequence(istringstream &strm)
-{
-  RelativeFootPosition aFootPosition;
-
-
-  while(!strm.eof())
-    {
-      if (!strm.eof())
-	strm >> aFootPosition.sx;
-      else
-      break;
-      if (!strm.eof())
-	strm >> aFootPosition.sy;
-      else
-	break;
-	if (!strm.eof())
-	strm >> aFootPosition.sz;
-      else
-	break;
-      if (!strm.eof())
-	strm >> aFootPosition.theta;
-      else
-	break;
-      aFootPosition.DStime = m_DoubleSupportTime;
-      aFootPosition.SStime = m_SingleSupportTime;
-      aFootPosition.stepType = 6;
-      m_RelativeFootPositions.push_back(aFootPosition);
-    }
-}
-
-
 /* Implementation of the plugin methods. */
 void StepStackHandler::CallMethod(std::string &Method, std::istringstream &strm)
 {
@@ -1056,6 +1022,7 @@ void StepStackHandler::CallMethod(std::string &Method, std::istringstream &strm)
 
       while(!strm.eof())
 	{
+
 	  if (!strm.eof())
 	    strm >> x;
 	  else break;

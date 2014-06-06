@@ -87,7 +87,7 @@ namespace PatternGeneratorJRL
        FP: Final position
        ToMP : Time of Max Position
        MP : Max Position */
-      ZBsplines(double FT, double FP, double ToMP, double MP);
+      ZBsplines( double FT, double FP, double ToMP, double MP);
 
       /*!Compute Position at time t */
       double ZComputePosition(double t);
@@ -109,9 +109,13 @@ namespace PatternGeneratorJRL
        */
       void SetParameters(double FT, double FP, double ToMP, double MP);
 
+<<<<<<< HEAD
       void SetParametersWithInitPosInitSpeed(double FT, double FP, double ToMP, double MP,
 						  double InitPos,
 						  double InitSpeed);
+=======
+      void SetParametersWithInitPos(double IP, double FT, double FP, double ToMP, double MP);
+>>>>>>> tmp
 
       void GetParametersWithInitPosInitSpeed(double &FT,
 						  double &MP,
@@ -131,8 +135,12 @@ namespace PatternGeneratorJRL
 
       void ZGenerateKnotVector(double FT, double ToMP);
 
+      double GetMP();
+
+      double GetFT();
+
       private:
-      double m_FT, m_FP, m_ToMP, m_MP;
+      double m_IP, m_FT, m_FP, m_ToMP, m_MP;
   };
 
 }

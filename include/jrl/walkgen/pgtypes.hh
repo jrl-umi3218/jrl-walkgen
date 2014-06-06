@@ -103,7 +103,7 @@ namespace PatternGeneratorJRL
     double SStime;
     double DStime;
     int stepType;     //1:normal walking 2:one step before obstacle
-                      //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
+                      //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle 6 :stepping stair
     double DeviationHipHeight;
   };
   typedef struct RelativeFootPosition_s RelativeFootPosition;
