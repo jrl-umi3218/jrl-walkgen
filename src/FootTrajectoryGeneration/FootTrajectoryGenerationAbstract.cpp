@@ -41,6 +41,7 @@ FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginM
   m_Foot= aFoot;
   m_SamplingPeriod = 0.005;
   m_isStepStairOn = 1;
+  m_StepHeight = 0.07;
 
 
   std::string aMethodName[5] =

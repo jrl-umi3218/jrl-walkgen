@@ -171,14 +171,8 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex,
      break;
 
    case Z_AXIS:
-   if (m_isStepStairOn == 0)
-   {
      m_PolynomeZ->SetParameters(TimeInterval,Position);
-   }
-   else
-   {
      m_BsplinesZ->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position*1.5);
-   }
      break;
 
    case THETA_AXIS:
@@ -219,20 +213,14 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
      break;
 
    case Z_AXIS:
-   if (m_isStepStairOn == 0)
-   {
      m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
-   }
-   else
-   {
-       if (FinalPosition >= InitPosition)
+       if ((FinalPosition - InitPosition)== m_StepHeight)
+        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,InitPosition,0.5*TimeInterval,InitPosition+m_StepHeight);
+        else if (FinalPosition >= InitPosition)
         m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,1.5*TimeInterval/5.0,InitPosition+abs(FinalPosition-InitPosition)*1.5);
        else if (FinalPosition < InitPosition)
         m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,4.0*TimeInterval/5.0,InitPosition+abs(FinalPosition-InitPosition)*0.2);
-      // else if (FinalPosition == InitPosition)
-        //m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
 
-    }
     /*if (InitPosition == FinalPosition)
         m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
     else
@@ -280,10 +268,13 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
    //}
    //else
    //{
-       if (FinalPosition >= InitPosition)
+       if ((FinalPosition - InitPosition)== m_StepHeight)
+                m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,InitPosition,0.5*TimeInterval,InitPosition+m_StepHeight);
+        else if (FinalPosition >= InitPosition)
         m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,1.5*TimeInterval/5.0,InitPosition+abs(FinalPosition-InitPosition)*1.5);
        else if (FinalPosition < InitPosition)
         m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,4.0*TimeInterval/5.0,InitPosition+abs(FinalPosition-InitPosition)*0.2);
+
       // else if (FinalPosition == InitPosition)
      //   m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
 
@@ -334,14 +325,10 @@ int FootTrajectoryGenerationStandard::GetParametersWithInitPosInitSpeed(int Poly
      break;
 
    case Z_AXIS:
-   if (m_isStepStairOn == 0)
-   {
      m_PolynomeZ->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
-   }
-   else
-   {
+
      m_BsplinesZ->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
-   }
+
     break;
 
    case THETA_AXIS:

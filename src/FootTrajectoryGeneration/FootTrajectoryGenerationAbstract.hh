@@ -218,6 +218,8 @@ namespace PatternGeneratorJRL
 
     int m_isStepStairOn;
 
+    double m_StepHeight;
+
   };
 
 

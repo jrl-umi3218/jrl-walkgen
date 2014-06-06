@@ -861,7 +861,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	{
 	  LeftFootTmpFinalPos = LeftFootTmpInitPos;
 
-	  //LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+	  LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
 	  LeftFootTmpFinalPos.omega = 0.0;
 	  LeftFootTmpFinalPos.omega2 = 0.0;
 	  LeftFootTmpFinalPos.dx = LeftFootTmpInitPos.dx = 0.0;
@@ -872,7 +872,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  LeftFootTmpFinalPos.stepType = 11;
 
 	  RightFootTmpFinalPos = RightFootTmpInitPos;
-	  //RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
+	  RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
 	  RightFootTmpFinalPos.omega = 0.0;
 	  RightFootTmpFinalPos.omega2 = 0.0;
 	  RightFootTmpFinalPos.dx = RightFootTmpInitPos.dx = 0.0;
