@@ -39,10 +39,11 @@ GeneratorVelRef::GeneratorVelRef(SimplePluginManager *lSPM,
 , IntermedData_ (Data)
 , Robot_(Robot)
 , RFI_(RFI)
+, LastFootSolX_(-1.0)
+, LastFootSolY_(-1.0)
 , MM_(1,1,false)
 , MV_(1,false)
-, MV2_(1,false)
-{
+, MV2_(1,false){
 }
 
 
@@ -550,6 +551,50 @@ GeneratorVelRef::build_eq_constraints_feet( const std::deque<support_state_t> & 
 
 }
 
+void GeneratorVelRef::build_eq_constraints_limitPosFeet(const solution_t & Solution,QPProblem & Pb)
+{
+  std::deque<support_state_t>::const_iterator SPTraj_it = Solution.SupportStates_deq.begin();
+  int ItBeforeLanding = 0 ;
+  while(SPTraj_it!=Solution.SupportStates_deq.end())
+  {
+    ++SPTraj_it;
+    cout << "StateChanged = " << (int)SPTraj_it->StateChanged ;
+    cout << "  Phase = " << SPTraj_it->Phase << endl;
+    if ( SPTraj_it->StateChanged !=1 )
+      ++ItBeforeLanding ;
+    else
+      break;
+  }
+
+  if( ItBeforeLanding <= 3 && Solution.SupportStates_deq.front().Phase == SS )
+  {  unsigned nbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
+
+    boost_ublas::matrix<double> EqualityMatrix;
+    boost_ublas::vector<double> EqualityVector;
+
+    EqualityMatrix.resize(2,2*(N_+nbStepsPreviewed), false);
+    EqualityMatrix.clear();
+    EqualityVector.resize(2, false);
+    EqualityVector.clear();
+
+    EqualityMatrix(0,2*N_) =  1.0;
+    EqualityMatrix(1,2*N_+nbStepsPreviewed) =  1.0;
+    EqualityVector(0) =  LastFootSolX_ ;
+    EqualityVector(1) =  LastFootSolY_ ;
+
+    cout << "EqualityVector \n" << EqualityVector << endl;
+    cout << "EqualityMatrix \n" << EqualityMatrix << endl;
+
+    Pb.NbEqConstraints(2);
+
+    Pb.add_term_to( MATRIX_DU, EqualityMatrix, 0, 0 );
+    Pb.add_term_to( VECTOR_DS, EqualityVector, 0 );
+
+    EqualityMatrix.clear();
+    EqualityVector.clear();
+  }
+  return;
+}
 
 void
 GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution )
@@ -559,8 +604,8 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution 
 
   //Equality constraints:
   //---------------------
-  //  build_eq_constraints_feet( PrwSupportStates_deq, NbStepsPreviewed, Pb );
-
+  //build_eq_constraints_feet( PrwSupportStates_deq, NbStepsPreviewed, Pb );
+  build_eq_constraints_limitPosFeet( Solution , Pb);
 
   // Polygonal constraints:
   // ----------------------

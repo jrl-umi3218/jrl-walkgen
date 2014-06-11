@@ -515,8 +515,9 @@ void
     // UPDATE INTERNAL DATA:
     // ---------------------
     Problem_.reset_variant();
-    Solution_.reset();
+    VRQPGenerator_->LastFootSol( Solution_ );
     VRQPGenerator_->CurrentTime( time );
+    Solution_.reset();
     VelRef_=NewVelRef_;
     SupportFSM_->update_vel_reference(VelRef_, IntermedData_->SupportState());
     IntermedData_->Reference( VelRef_ );

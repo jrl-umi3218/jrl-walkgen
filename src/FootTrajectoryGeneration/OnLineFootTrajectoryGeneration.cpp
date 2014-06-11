@@ -223,53 +223,38 @@ void
 
 
 void
-    OnLineFootTrajectoryGeneration::interpret_solution( double CurrentTime, const solution_t & Solution,
-                                                        const support_state_t & CurrentSupport, unsigned int NbSteps,
-                                                        double & X, double & Y )
+OnLineFootTrajectoryGeneration::interpret_solution( double CurrentTime, const solution_t & Solution,
+    const support_state_t & CurrentSupport, unsigned int NbSteps, double & X, double & Y )
 {
+
   double Sign;
   if(CurrentSupport.Foot == LEFT)
     Sign = 1.0;
   else
     Sign = -1.0;
   if(CurrentSupport.NbStepsLeft > 0 && NbSteps > 0 )
-  {
-    if (CurrentSupport.TimeLimit-CurrentTime >= 2*QP_T_)
     {
-      FirstPrvSuppFootX_vec.push_back(Solution.Solution_vec[2*QP_N_]);
-      FirstPrvSuppFootY_vec.push_back(Solution.Solution_vec[2*QP_N_+NbSteps]);
-      FPx_ = FPy_ = 0.0 ;
-      for (unsigned int i = 0 ; i < FirstPrvSuppFootX_vec.size() ; ++i)
-      {
-        FPx_ += FirstPrvSuppFootX_vec[i] ;
-        FPy_ += FirstPrvSuppFootY_vec[i] ;
-      }
-      FPx_ = X = FPx_/FirstPrvSuppFootX_vec.size() ;
-      FPy_ = Y = FPy_/FirstPrvSuppFootX_vec.size() ;
-    }else
-    {
-      X = FPx_ ;
-      Y = FPy_ ;
-      FirstPrvSuppFootX_vec.clear();
-      FirstPrvSuppFootY_vec.clear();
+      X = Solution.Solution_vec[2*QP_N_];
+      Y = Solution.Solution_vec[2*QP_N_+NbSteps];
+      if(fabs(X)+fabs(Y)-0.00001<0.0)
+        {
+          //cout<<"Previewed foot x-position zero at time: "<<CurrentTime<<endl;
+        }
+      else if (CurrentSupport.TimeLimit-CurrentTime-QP_T_/2.0 > 0.0)
+        {//The landing position is yet determined by the solver because the robot finds himself still in the single support phase
+          //do nothing
+        }
     }
-    if(fabs(X)+fabs(Y)-0.00001<0.0)
-    {
-      //cout<<"Previewed foot x-position zero at time: "<<CurrentTime<<endl;
-    }
-    else if (CurrentSupport.TimeLimit-CurrentTime-QP_T_/2.0 > 0.0)
-    {//The landing position is yet determined by the solver
-      //because the robot finds himself still in the single support phase
-      //do nothing
-    }
-  }
   else
-  {//The solver isn't responsible for the feet positions anymore
-    //The robot is supposed to stop always with the feet aligned in the lateral plane.
-    X = CurrentSupport.X + Sign*sin(CurrentSupport.Yaw)*FeetDistanceDS_;
-    Y = CurrentSupport.Y - Sign*cos(CurrentSupport.Yaw)*FeetDistanceDS_;
-  }
+    {//The solver isn't responsible for the feet positions anymore
+      //The robot is supposed to stop always with the feet aligned in the lateral plane.
+      X = CurrentSupport.X + Sign*sin(CurrentSupport.Yaw)*FeetDistanceDS_;
+      Y = CurrentSupport.Y - Sign*cos(CurrentSupport.Yaw)*FeetDistanceDS_;
+    }
+
 }
+
+
 
 
 void
@@ -295,9 +280,9 @@ void
   string aFileName;
   ostringstream oss(std::ostringstream::ate);
   static int iteration = 0 ;
-  int iteration100 = (int)iteration/100;
-  int iteration10 = (int)(iteration - iteration100*100)/10;
-  int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
+//  int iteration100 = (int)iteration/100;
+//  int iteration10 = (int)(iteration - iteration100*100)/10;
+//  int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
 
   /// \brief Debug Purpose
   /// --------------------

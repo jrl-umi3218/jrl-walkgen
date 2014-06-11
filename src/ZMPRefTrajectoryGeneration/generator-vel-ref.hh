@@ -119,6 +119,21 @@ namespace PatternGeneratorJRL
     { IntermedData_->SupportState(SupportState); };
     inline void CoM(const com_t & CoM)
     { IntermedData_->CoM(CoM); };
+    inline void LastFootSol(const solution_t & Solution)
+    {
+      unsigned NbStepPrvw = Solution.SupportStates_deq.back().StepNumber ;
+      if(Solution.Solution_vec.size()>2*N_)
+      {
+        LastFootSolX_ = Solution.Solution_vec[2*N_];
+        LastFootSolY_ = Solution.Solution_vec[2*N_+NbStepPrvw];
+      }
+      else
+      {
+        LastFootSolX_ = -1.0 ;
+        LastFootSolY_ = -1.0 ;
+      }
+    }
+
     /// \}
 
 		/// \brief Generate a queue of inequality constraints on
@@ -187,6 +202,12 @@ namespace PatternGeneratorJRL
     void build_eq_constraints_feet( const std::deque<support_state_t> & SupportStates_deq,
         unsigned int NbStepsPreviewed, QPProblem & Pb );
 
+    /// \brief Compute feet equality constraints to restrain the previewed foot position
+    /// some iteration before landing
+    /// \param[in] Solution
+    /// \param[out] Pb
+    void build_eq_constraints_limitPosFeet(const solution_t & Solution,QPProblem & Pb);
+
     /// \brief Initialize inequality matrices
     ///
     /// \param[out] Inequalities
@@ -219,8 +240,8 @@ namespace PatternGeneratorJRL
     IntermedQPMat * IntermedData_;
     RigidBodySystem * Robot_;
     RelativeFeetInequalities * RFI_;
-
-
+    double LastFootSolX_ ;
+    double LastFootSolY_ ;
     //
     //Private members
     //
