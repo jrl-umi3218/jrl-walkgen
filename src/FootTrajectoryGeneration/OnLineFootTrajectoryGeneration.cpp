@@ -351,7 +351,6 @@ void
     if (TimeInterval>=0.06499 && TimeInterval<=0.065999)
       cout << endl ;
     cout << endl ;
-    cout << "########################################################\n" ;
     SetParameters(
     	  FootTrajectoryGenerationStandard::X_AXIS,
         TimeInterval,FPx,

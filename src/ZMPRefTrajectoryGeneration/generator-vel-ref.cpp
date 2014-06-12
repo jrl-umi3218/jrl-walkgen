@@ -540,7 +540,7 @@ GeneratorVelRef::build_eq_constraints_feet( const std::deque<support_state_t> & 
   Pb.NbEqConstraints(2*NbStepsPreviewed);
   for(unsigned int i = 0; i< NbStepsPreviewed; i++)
     {
-      EqualityMatrix(0,i) = 1.0; EqualityVector(0) = -SPTraj_it->X;
+      EqualityMatrix(0,i) = 1.0;                  EqualityVector(0) = -SPTraj_it->X;
       EqualityMatrix(1,NbStepsPreviewed+i) = 1.0; EqualityVector(1) = -SPTraj_it->Y;
       Pb.add_term_to( MATRIX_DU, EqualityMatrix, 2*i, 2*N_ );
       Pb.add_term_to( VECTOR_DS, EqualityVector, 2*i );
@@ -567,29 +567,24 @@ void GeneratorVelRef::build_eq_constraints_limitPosFeet(const solution_t & Solut
   }
 
   if( ItBeforeLanding <= 3 && Solution.SupportStates_deq.front().Phase == SS )
-  {  unsigned nbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
+  {  unsigned NbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
+
+    Pb.NbEqConstraints(2);
 
     boost_ublas::matrix<double> EqualityMatrix;
     boost_ublas::vector<double> EqualityVector;
 
-    EqualityMatrix.resize(2,2*(N_+nbStepsPreviewed), false);
+    EqualityMatrix.resize(2,2*N_+2*NbStepsPreviewed, false);
     EqualityMatrix.clear();
     EqualityVector.resize(2, false);
     EqualityVector.clear();
 
-    EqualityMatrix(0,2*N_) =  1.0;
-    EqualityMatrix(1,2*N_+nbStepsPreviewed) =  1.0;
-    EqualityVector(0) =  LastFootSolX_ ;
-    EqualityVector(1) =  LastFootSolY_ ;
-
-    cout << "EqualityVector \n" << EqualityVector << endl;
-    cout << "EqualityMatrix \n" << EqualityMatrix << endl;
-
-    Pb.NbEqConstraints(2);
-
+    EqualityMatrix(0,2*N_) =  1.0;                EqualityVector(0) =  LastFootSolX_ ;
+    EqualityMatrix(1,2*N_+NbStepsPreviewed) =  1.0; EqualityVector(1) =  LastFootSolY_ ;
     Pb.add_term_to( MATRIX_DU, EqualityMatrix, 0, 0 );
     Pb.add_term_to( VECTOR_DS, EqualityVector, 0 );
-
+    cout << "EqualityVector \n" << EqualityVector << endl;
+    cout << "EqualityMatrix \n" << EqualityMatrix << endl;
     EqualityMatrix.clear();
     EqualityVector.clear();
   }

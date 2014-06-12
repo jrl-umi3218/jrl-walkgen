@@ -73,6 +73,7 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/qp-problem.cpp
   ZMPRefTrajectoryGeneration/generator-vel-ref.cpp
   ZMPRefTrajectoryGeneration/mpc-trajectory-generation.cpp
+  ZMPRefTrajectoryGeneration/DynamicFilter.cpp
   MotionGeneration/StepOverPlanner.cpp
   MotionGeneration/CollisionDetector.cpp
   MotionGeneration/WaistHeightVariation.cpp

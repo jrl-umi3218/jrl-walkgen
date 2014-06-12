@@ -298,7 +298,7 @@ namespace PatternGeneratorJRL {
 
     // Initialize the Preview Control general object.
     m_DoubleStagePCStrategy->InitInterObjects(m_HumanoidDynamicRobot,
-                                              (*m_ComAndFootRealization.begin()),
+                                              m_ComAndFootRealization[0],
                                               m_StepStackHandler);
 
     m_CoMAndFootOnlyStrategy->InitInterObjects(m_HumanoidDynamicRobot,
