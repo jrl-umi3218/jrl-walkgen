@@ -2298,23 +2298,18 @@ namespace PatternGeneratorJRL
 
 
 
-    if (RightFootAbsPos.z <= LeftFootAbsPos.z){
+   /* if (RightFootAbsPos.z <= LeftFootAbsPos.z){
         aCOMPos.z[1] = (m_InitialPoseCoMHeight + RightFootAbsPos.z - aCOMPos.z[0])/m_SamplingPeriod;
         aCOMPos.z[0] = m_InitialPoseCoMHeight + RightFootAbsPos.z;
         }
     else{
         aCOMPos.z[1] = (m_InitialPoseCoMHeight + LeftFootAbsPos.z - aCOMPos.z[0])/m_SamplingPeriod;
         aCOMPos.z[0] = m_InitialPoseCoMHeight + LeftFootAbsPos.z;
-    }
+    }*/
 
-    if (m_isStepStairOn == 0)
-	{
-        aCOMPos.z[0] = m_InitialPoseCoMHeight;
-	}
-	else{
 
-	    ComputeCoMz(t,aCOMPos.z[0]);
-    }
+    ComputeCoMz(t,aCOMPos.z[0], aCOMPos.z[1]);
+
 
 
     FinalCoMPositions.push_back(aCOMPos);
@@ -2329,41 +2324,82 @@ namespace PatternGeneratorJRL
   }
 
 
-    void AnalyticalMorisawaCompact::ComputeCoMz(double t, double &CoMz)
+    void AnalyticalMorisawaCompact::ComputeCoMz(double t, double &CoMz, double &CoMvelocity)
     {
 
-    int Index;
+    int Index,Index2;
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
     double deltaZ;
-
-
+    double CoMzpre = CoMz;
+    double variable=0.1,variableright = 0.9 ,variableleft = 0.0;
+    double              variableright1 = 0.9 ,variableleft1 = 0.0;
+    // put first leg on the stairs with CoM going down variable % of step height
 
     if (t >= moving_time){
-     /*   Index = int((t-moving_time)/(moving_time*2));
-        if (Index < (m_AbsoluteSupportFootPositions.size() - 1)/2){
-            deltaZ = (m_AbsoluteSupportFootPositions[2*Index + 1].z - m_AbsoluteSupportFootPositions[2*Index].z );
-            CoMz = t*deltaZ/(moving_time*2) + ( m_InitialPoseCoMHeight - (2*Index + 1)*moving_time*deltaZ/(moving_time*2) ) + m_AbsoluteSupportFootPositions[2*Index].z  ;
-      */
-        Index = int((t-moving_time)/(moving_time*2));
+
+        Index2 = int(t/moving_time);
+
+
+        if (Index2 < m_AbsoluteSupportFootPositions.size())
+        {
+            // climbing
+            if (m_AbsoluteSupportFootPositions[Index2].z > m_AbsoluteSupportFootPositions[Index2-1].z)
+            {
+                deltaZ = (-m_AbsoluteSupportFootPositions[Index2].z + m_AbsoluteSupportFootPositions[Index2-1].z );
+                if (t <= Index2*moving_time + variableright*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + variableleft*m_RelativeFootPositions[Index2].SStime)
+                    CoMz = (t-Index2*moving_time - variableleft*m_RelativeFootPositions[Index2].SStime)*variable*deltaZ/((variableright-variableleft)*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z ;
+                else if (t < Index2*moving_time + variableleft*m_RelativeFootPositions[Index2].SStime)
+                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z ;
+                else
+                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z + variable*deltaZ;
+            }
+            else if (m_AbsoluteSupportFootPositions[Index2].z == m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2-1].sz > 0)
+            {
+                deltaZ = (m_AbsoluteSupportFootPositions[Index2].z - m_AbsoluteSupportFootPositions[Index2-2].z );
+                if (t <= Index2*moving_time + variableright1*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + variableleft1*m_RelativeFootPositions[Index2].SStime)
+                    CoMz = (t-Index2*moving_time - variableleft1*m_RelativeFootPositions[Index2].SStime)*(1+variable)*deltaZ/((variableright1-variableleft1)*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-2].z - variable*deltaZ ;
+                else if (t < Index2*moving_time + variableleft1*m_RelativeFootPositions[Index2].SStime)
+                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-2].z - variable*deltaZ;
+                else
+                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z;
+            }
+
+                // going down et normal walk
+            if (m_AbsoluteSupportFootPositions[Index2].z <= m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2-1].sz <= 0)
+            {
+                deltaZ = (m_AbsoluteSupportFootPositions[Index2].z - m_AbsoluteSupportFootPositions[Index2-1].z );
+                if (t <= Index2*moving_time + 0.9*m_RelativeFootPositions[Index2].SStime )
+                    CoMz = (t-Index2*moving_time)*deltaZ/(0.9*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z  ;
+                else
+                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z;
+            }
+        }
+
+        else
+            CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z;
+
+
+
+        }
+    else
+        CoMz = m_InitialPoseCoMHeight ;
+
+    CoMvelocity = (CoMz -CoMzpre)/m_SamplingPeriod;
+}
+
+}
+
+     /*Index = int((t-moving_time)/(moving_time*2));
         if (Index < (m_AbsoluteSupportFootPositions.size() - 1)/2){
                 deltaZ = (m_AbsoluteSupportFootPositions[2*Index + 1].z - m_AbsoluteSupportFootPositions[2*Index].z );
                 if (deltaZ > 0 && t>=(2*Index+2)*moving_time && t<=(2*Index+2)*moving_time + m_RelativeFootPositions[2*Index+1].SStime)
                     CoMz = t*deltaZ/m_RelativeFootPositions[0].SStime +  m_InitialPoseCoMHeight - (2*Index + 2)*moving_time*deltaZ/m_RelativeFootPositions[0].SStime + m_AbsoluteSupportFootPositions[2*Index].z  ;
                 else if (deltaZ > 0  && t>(2*Index+2)*moving_time + m_RelativeFootPositions[2*Index+1].SStime)
-                    CoMz = CoMz;
+                    CoMz = CoMz + m_AbsoluteSupportFootPositions[2*Index].z;
                 if (deltaZ < 0 && t>=(2*Index+1)*moving_time && t<=(2*Index+2)*moving_time )
                     CoMz = t*deltaZ/moving_time +  m_InitialPoseCoMHeight - (2*Index + 1)*moving_time*deltaZ/moving_time + m_AbsoluteSupportFootPositions[2*Index].z  ;
                 else if (deltaZ > 0  && t>(2*Index+2)*moving_time + m_RelativeFootPositions[2*Index+1].SStime)
-                    CoMz = CoMz;
+                    CoMz = CoMz +  m_AbsoluteSupportFootPositions[2*Index].z;
 
-            }
-        }
-    else
-        CoMz = m_InitialPoseCoMHeight;
-
-}
-
-}
-
-
+            }*/
 

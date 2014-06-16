@@ -351,13 +351,13 @@ protected:
       ostringstream oss(std::ostringstream::ate);
 
       if ( iteration == 0 ){
-        oss.str("/tmp/Step_Stair_Down.pos");
+        oss.str("/tmp/Step_Stair_Down_Seq.pos");
         aFileName = oss.str();
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
       }
       ///----
-      oss.str("/tmp/Step_Stair_Down.pos");
+      oss.str("/tmp/Step_Stair_Down_Seq.pos");
       aFileName = oss.str();
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
@@ -373,12 +373,12 @@ protected:
       aof.close();
 
       if ( iteration == 0 ){
-        oss.str("/tmp/Step_Stair_Down.hip");
+        oss.str("/tmp/Step_Stair_Down_Seq.hip");
         aFileName = oss.str();
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
       }
-      oss.str("/tmp/Step_Stair_Down.hip");
+      oss.str("/tmp/Step_Stair_Down_Seq.hip");
       aFileName = oss.str();
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
@@ -391,7 +391,7 @@ protected:
       aof.close();
 
       if ( iteration == 0 ){
-        oss.str("/tmp/Step_Stair_Down.zmp");
+        oss.str("/tmp/Step_Stair_Down_Seq.zmp");
         aFileName = oss.str();
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
@@ -402,7 +402,7 @@ protected:
         aSupportState = m_OneStep.LeftFootPosition ;
         else
         aSupportState = m_OneStep.RightFootPosition ;
-      oss.str("/tmp/Step_Stair_Down.zmp");
+      oss.str("/tmp/Step_Stair_Down_Seq.zmp");
       aFileName = oss.str();
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
@@ -498,16 +498,44 @@ protected:
 
     {
       istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
-                                         0.3 0.19 -0.086 0.0\
+                                        0.3 0.19 -0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
-                                        0.3 0.19 0.086 0.0\
+                                        0.3 0.19 -0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
-                                        0.3 0.19 0.0 0.0\
-                                        0.0 -0.19 0.0 0.0\
-                                        0.3 0.19 0.0 0.0\
+                                        0.3 0.19 -0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
                                         ");
       aPGI.ParseCmd(strm2);
+      /*0.0 -0.105 0.0 0.0\
+      0.2 0.19 0.0 0.0\
+                                        0.2 -0.19 0.0 0.0\
+                                        0.2 0.19 0.0 0.0\
+                                        0.0 -0.19 0.0 0.0\
+
+                                        0.2 0.19 0.0 0.0\
+                                        0.2 -0.19 0.0 0.0\
+                                        0.2 0.19 0.0 0.0\
+                                        0.2 -0.19 0.0 0.0\
+                                        0.1 0.19 0.0 0.0\
+                                        0.4 -0.19 0.086 0.0\
+                                        0.0 0.19 0.0 0.0\
+                                        0.4 -0.19 0.086 0.0\
+                                        0.0 0.19 0.0 0.0\
+                                        0.4 -0.19 0.086 0.0\
+                                        0.0 0.19 0.0 0.0\
+                                        0.2 -0.19 0.0 0.0\
+                                        0.2 0.19 0.0 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.4 0.19 -0.086 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.4 0.19 -0.086 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.4 0.19 -0.086 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.2 0.19 0.0 0.0\
+                                        0.2 -0.19 0.0 0.0\
+                                        0.2 0.19 0.0 0.0\
+                                        0.0 -0.19 0.0 0.0\*/
     }
 
   }
