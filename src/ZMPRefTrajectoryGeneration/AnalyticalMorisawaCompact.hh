@@ -26,7 +26,7 @@
    \brief Compact form of the analytical solution to generate the ZMP and the CoM.
 
    This object generate the reference value for the
-   ZMP based on a polynomail representation
+   ZMP based on a polynomial representation
    of the ZMP following 
    "Experimentation of Humanoid Walking Allowing Immediate
    Modification of Foot Place Based on Analytical Solution"
@@ -46,7 +46,7 @@
 #include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.hh>
 #include <ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.hh>
 #include <FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.hh>
-
+#include <ZMPRefTrajectoryGeneration/DynamicFilter.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -106,7 +106,7 @@ namespace PatternGeneratorJRL
       const static unsigned int RELATIVE_FRAME = 1;
       /*! @} */
       /*! Constructor */
-      AnalyticalMorisawaCompact(SimplePluginManager * lSPM);
+      AnalyticalMorisawaCompact(SimplePluginManager * lSPM , CjrlHumanoidDynamicRobot *aHS);
       
       /*! Destructor */
       virtual ~AnalyticalMorisawaCompact();
@@ -414,6 +414,10 @@ namespace PatternGeneratorJRL
       /*! Get the feet trajectory generator */
       LeftAndRightFootTrajectoryGenerationMultiple * GetFeetTrajectoryGenerator();
       
+      /*!  Setter and getter for the ComAndZMPTrajectoryGeneration.  */
+      inline ComAndFootRealization * getComAndFootRealization()
+        { return m_kajitaDynamicFilter->getComAndFootRealization();};
+      
       /*! @} */
       
       /*! Simple plugin interfaces 
@@ -626,7 +630,8 @@ namespace PatternGeneratorJRL
 
       /*! \brief Filtering the axis through a preview control. */
       FilteringAnalyticalTrajectoryByPreviewControl * m_FilterXaxisByPC, * m_FilterYaxisByPC;
-      
+      DynamicFilter * m_kajitaDynamicFilter ;
+
       /*! \brief Activate or desactivate the filtering. */
       bool m_FilteringActivate;
 

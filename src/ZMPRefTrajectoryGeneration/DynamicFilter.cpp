@@ -97,12 +97,16 @@ void DynamicFilter::init(
   PC_->SetSamplingPeriod (interpolationPeriod);
   PC_->SetHeightOfCoM(CoMHeight_);
 
+  previousConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
+  previousVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
+  previousAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
+
   configurationTraj_.resize( PG_N_ * NbI_, previousConfiguration_ ); ;
   velocityTraj_.resize( PG_N_ * NbI_, previousVelocity_ ); ;
   accelerationTraj_.resize( PG_N_ * NbI_, previousAcceleration_ ); ;
 
   deltaZMP_deq_.resize( PG_N_ * NbI_);
-  ZMPMB_vec_.resize( PG_N_ * NbI_);
+  ZMPMB_vec_.resize( PG_N_ * NbI_ , vector<double>(2));
 
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
@@ -129,9 +133,13 @@ int DynamicFilter::filter(
       inputCOMTraj_deq_,
       inputLeftFootTraj_deq_,
       inputRightFootTraj_deq_);
+
+  printDebug();
+
   InverseDynamics(inputZMPTraj_deq_);
+
   int error = OptimalControl(outputDeltaCOMTraj_deq_);
-  //printDebug();
+
   return error ;
 }
 
@@ -141,7 +149,7 @@ void DynamicFilter::InverseKinematics(
     deque<FootAbsolutePosition> & inputRightFootTraj_deq_)
 {
   const int stage0 = 0 ;
-  const unsigned int N = inputCOMTraj_deq_.size();
+  const unsigned int N = PG_N_ * NbI_ ;
   int iteration = 2 ;
   comAndFootRealization_->SetPreviousConfigurationStage0(
       previousConfiguration_);
@@ -216,7 +224,7 @@ void DynamicFilter::InverseKinematics(
 void DynamicFilter::InverseDynamics(
     deque<ZMPPosition> inputZMPTraj_deq_)
 {
-  const unsigned int N = inputZMPTraj_deq_.size();
+  const unsigned int N = PG_N_ * NbI_ ;
   for (unsigned int i = 0 ; i < N ; i++ )
   {
     // Copy the angular trajectory data from "Boost" to "Eigen"
@@ -258,6 +266,9 @@ void DynamicFilter::InverseDynamics(
 int DynamicFilter::OptimalControl(
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
+  if(!PC_->IsCoherent())
+    PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
+
 
   double aSxzmp (0) , aSyzmp(0);
   double deltaZMPx (0) , deltaZMPy (0) ;
@@ -318,9 +329,9 @@ void DynamicFilter::printDebug()
   string aFileName;
   ostringstream oss(std::ostringstream::ate);
   static int iteration = 0;
-  //int iteration100 = (int)iteration/100;
-  //int iteration10 = (int)(iteration - iteration100*100)/10;
-  //int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
+  int iteration100 = (int)iteration/100;
+  int iteration10 = (int)(iteration - iteration100*100)/10;
+  int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
 
   /// \brief Debug Purpose
   /// --------------------

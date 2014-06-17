@@ -228,7 +228,7 @@ namespace PatternGeneratorJRL {
     // INFO: This where you should instanciate your own
     // INFO: object for Com and Foot realization.
     // INFO: The default one is based on a geometrical approach.
-    m_ComAndFootRealization.resize(2);
+    m_ComAndFootRealization.resize(3);
     m_ComAndFootRealization[0] = new ComAndFootRealizationByGeometry(this);
 
     // Creates the foot trajectory generator.
@@ -249,8 +249,9 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization[1] = m_ZMPVRQP->getComAndFootRealization();
 
     // ZMP and CoM generation using the analytical method proposed in Morisawa2007.
-    m_ZMPM = new AnalyticalMorisawaCompact(this);
+    m_ZMPM = new AnalyticalMorisawaCompact(this,m_HumanoidDynamicRobot);
     m_ZMPM->SetHumanoidSpecificities(m_HumanoidDynamicRobot);
+    m_ComAndFootRealization[2] = m_ZMPM->getComAndFootRealization();
 
     // Preview control for a 3D Linear inverse pendulum
     m_PC = new PreviewControl(this,OptimalControllerSolver::MODE_WITHOUT_INITIALPOS,true);

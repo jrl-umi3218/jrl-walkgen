@@ -75,7 +75,7 @@ namespace PatternGeneratorJRL
 {
 
 
-  AnalyticalMorisawaCompact::AnalyticalMorisawaCompact(SimplePluginManager *lSPM)
+  AnalyticalMorisawaCompact::AnalyticalMorisawaCompact(SimplePluginManager *lSPM , CjrlHumanoidDynamicRobot *aHS)
     : AnalyticalMorisawaAbstract(lSPM)
   {
     
@@ -87,7 +87,7 @@ namespace PatternGeneratorJRL
     memset(&m_CTIPY,0,sizeof(m_CTIPY));
 
     m_OnLineChangeStepMode = ABSOLUTE_FRAME;
-    m_HS = 0;
+    m_HS = aHS ;
     m_FeetTrajectoryGenerator = 
       m_BackUpm_FeetTrajectoryGenerator = 0;
 
@@ -114,6 +114,8 @@ namespace PatternGeneratorJRL
     m_VerboseLevel=0;
     
     m_NewStepInTheStackOfAbsolutePosition = false;
+
+    m_kajitaDynamicFilter = new DynamicFilter(lSPM,m_HS);
 
     m_FilteringActivate = true;
     RESETDEBUG4("Test.dat");
@@ -641,6 +643,14 @@ namespace PatternGeneratorJRL
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;    
 
+    m_kajitaDynamicFilter->init(m_CurrentTime,
+                                m_SamplingPeriod,
+                                m_SamplingPeriod,
+                                m_SamplingPeriod,
+                                m_PreviewControlTime,
+                                lStartingCOMState.z[0]
+                                );
+
     return m_RelativeFootPositions.size();
   }
 
@@ -684,6 +694,8 @@ namespace PatternGeneratorJRL
 		  }
 	      }
 
+            std::deque<COMState> deltaCoMTraj_deq (1);
+            //m_kajitaDynamicFilter->filter(,,,,deltaCoMTraj_deq);
 	    
 	    /*! Feed the ZMPPositions. */
 	    double lZMPPosx=0.0,lZMPPosy=0.0;
@@ -700,8 +712,8 @@ namespace PatternGeneratorJRL
 	    m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(time,lCOMPosdx,lIndexInterval);
 	    m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,lCOMPosy,lIndexInterval);
 	    m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(time,lCOMPosdy,lIndexInterval);
-	    aCOMPos.x[0] += lCOMPosx; aCOMPos.x[1] += lCOMPosdx;
-	    aCOMPos.y[0] += lCOMPosy; aCOMPos.y[1] += lCOMPosdy;
+	    aCOMPos.x[0] += lCOMPosx + deltaCoMTraj_deq[0].x[0] ; aCOMPos.x[1] += lCOMPosdx + deltaCoMTraj_deq[0].x[1];
+	    aCOMPos.y[0] += lCOMPosy + deltaCoMTraj_deq[0].y[0] ; aCOMPos.y[1] += lCOMPosdy + deltaCoMTraj_deq[0].y[1];
 	    aCOMPos.z[0] = m_InitialPoseCoMHeight;
 	    FinalCOMStates.push_back(aCOMPos);
 	    /*! Feed the FootPositions. */

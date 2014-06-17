@@ -42,7 +42,6 @@
 #include <ZMPRefTrajectoryGeneration/generator-vel-ref.hh>
 #include <Mathematics/intermediate-qp-matrices.hh>
 #include <jrl/walkgen/pgtypes.hh>
-#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 #include <ZMPRefTrajectoryGeneration/DynamicFilter.hh>
 
 namespace PatternGeneratorJRL
@@ -274,7 +273,6 @@ namespace PatternGeneratorJRL
     DynamicFilter * dynamicFilter_ ;
 
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW // to use the vector of eigen used by metapod
 
     void GetZMPDiscretization(std::deque<ZMPPosition> & ZMPPositions,
                               std::deque<COMState> & COMStates,

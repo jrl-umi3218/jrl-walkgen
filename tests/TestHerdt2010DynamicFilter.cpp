@@ -60,8 +60,6 @@ enum Profiles_t {
   PROFIL_HERDT_EMERGENCY_STOP                  // 2
 };
 
-bool ONCE = true ;
-
 class TestHerdt2010: public TestObject
 {
 
@@ -73,6 +71,7 @@ private:
   SimplePluginManager * SPM ;
   double dInitX, dInitY;
   int iteration,iteration_zmp ;
+  bool once ;
 
   public:
   TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
@@ -91,6 +90,7 @@ private:
     dInitY = 0 ;
     iteration_zmp = 0 ;
     iteration = 0 ;
+    once = true ;
   };
 
   ~TestHerdt2010()
@@ -527,11 +527,11 @@ protected:
 //    cout << "ecartmaxY :" << ecartmaxY << endl ;
 
     // Writing of the two zmps and the error.
-    if (ONCE)
+    if (once)
     {
       aof.open("TestHerdt2010ErrorZMP.dat",ofstream::out);
       aof.close();
-      ONCE = false ;
+      once = false ;
     }
     aof.open("TestHerdt2010ErrorZMP.dat",ofstream::app);
     aof.precision(8);

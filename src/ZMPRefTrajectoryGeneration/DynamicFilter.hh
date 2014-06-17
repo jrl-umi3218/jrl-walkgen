@@ -19,6 +19,10 @@ namespace PatternGeneratorJRL
   class DynamicFilter
   {
   public: // Public methods
+
+    // to use the vector of eigen used by metapod
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     /// \brief
     DynamicFilter(SimplePluginManager *SPM,
                   CjrlHumanoidDynamicRobot *aHS);
@@ -140,7 +144,7 @@ namespace PatternGeneratorJRL
       Force_HRP2_14 m_force ;
 
       /// \brief Set of configuration vectors (q, dq, ddq, torques)
-      Robot_Model::confVector m_torques, m_q, m_dq, m_ddq;
+      Robot_Model::confVector m_q, m_dq, m_ddq;
 
       /// \brief Used to eliminate the initiale difference between
       /// the zmp and the zmpmb

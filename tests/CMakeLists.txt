@@ -73,6 +73,7 @@ MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
   )
   TARGET_LINK_LIBRARIES(${testmorisawa2007} ${PROJECT_NAME})
   PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} jrl-dynamics)
+  PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} hrp2-dynamics)
   ADD_DEPENDENCIES(${testmorisawa2007} ${PROJECT_NAME})
 
   MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
@@ -95,8 +96,8 @@ MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
     ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 ENDMACRO(ADD_MORISAWA_2007)
 
-#ADD_MORISAWA_2007(TestMorisawa2007OnLine)
-#ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
+ADD_MORISAWA_2007(TestMorisawa2007OnLine)
+ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
 
 ###################
 # Test Herdt 2010 #
