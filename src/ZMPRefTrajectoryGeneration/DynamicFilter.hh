@@ -22,7 +22,7 @@ namespace PatternGeneratorJRL
     /// \brief
     DynamicFilter(SimplePluginManager *SPM,
                   CjrlHumanoidDynamicRobot *aHS);
-
+    ~DynamicFilter();
     /// \brief
     int filter(
         deque<COMState> & inputCOMTraj_deq_,

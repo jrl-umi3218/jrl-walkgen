@@ -600,7 +600,7 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution 
   //Equality constraints:
   //---------------------
   //build_eq_constraints_feet( PrwSupportStates_deq, NbStepsPreviewed, Pb );
-  build_eq_constraints_limitPosFeet( Solution , Pb);
+  //build_eq_constraints_limitPosFeet( Solution , Pb);
 
   // Polygonal constraints:
   // ----------------------

@@ -60,6 +60,18 @@ DynamicFilter::DynamicFilter(
 
 }
 
+DynamicFilter::~DynamicFilter()
+{
+  if (PC_!=0){
+    delete PC_;
+    PC_ = 0 ;
+  }
+  if (comAndFootRealization_!=0){
+    delete comAndFootRealization_;
+    comAndFootRealization_ = 0 ;
+  }
+}
+
 /// \brief Initialse all objects, to be called just after the constructor
 void DynamicFilter::init(
     double currentTime,
@@ -91,6 +103,9 @@ void DynamicFilter::init(
 
   deltaZMP_deq_.resize( PG_N_ * NbI_);
   ZMPMB_vec_.resize( PG_N_ * NbI_);
+
+  comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
+  comAndFootRealization_->Initialization();
 
   MAL_VECTOR_RESIZE(aCoMState_,6);
   MAL_VECTOR_RESIZE(aCoMSpeed_,6);
