@@ -178,7 +178,7 @@ namespace PatternGeneratorJRL
     deltaj = t- m_AbsoluteTimeReference - m_RefTime[j];
 	  
     r = cosh(m_omegaj[j]*deltaj) * m_V[j] +
-      sinh(m_omegaj[j]*deltaj) * m_W[j];
+        sinh(m_omegaj[j]*deltaj) * m_W[j];
     r += m_ListOfCOGPolynomials[j]->Compute(deltaj);
     return true;
   }
@@ -189,9 +189,21 @@ namespace PatternGeneratorJRL
     deltaj = t- m_AbsoluteTimeReference - m_RefTime[j];
 	
     r = m_omegaj[j] * sinh(m_omegaj[j]*deltaj) * m_V[j] +
-	      m_omegaj[j] * cosh(m_omegaj[j]*deltaj) * m_W[j];  
+        m_omegaj[j] * cosh(m_omegaj[j]*deltaj) * m_W[j];
     r += m_ListOfCOGPolynomials[j]->ComputeDerivative(deltaj);
-    ODEBUG("ComputeCOMPSeed: " << r);
+    ODEBUG("ComputeCOMSpeed: " << r);
+    return true;
+  }
+
+  bool AnalyticalZMPCOGTrajectory::ComputeCOMAcceleration(double t, double &r, int j)
+  {
+    double deltaj=0.0;
+    deltaj = t- m_AbsoluteTimeReference - m_RefTime[j];
+
+    r = m_omegaj[j] * m_omegaj[j] * cosh(m_omegaj[j]*deltaj) * m_V[j] +
+        m_omegaj[j] * m_omegaj[j] * sinh(m_omegaj[j]*deltaj) * m_W[j];
+    r += m_ListOfCOGPolynomials[j]->ComputeSecDerivative(deltaj);
+    ODEBUG("ComputeCOMAcceleration: " << r);
     return true;
   }
 

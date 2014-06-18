@@ -95,6 +95,17 @@ namespace PatternGeneratorJRL
       */
       bool ComputeCOMSpeed(double t,double &r, int i);
 
+      /*! Compute the current acceleration according
+	to time and the index of the interval.
+	To be efficient this method does not have
+	any boundary check.
+	@param t: the time,
+	@param i: the numero of the interval
+	@param r: the result,
+	@return Returns true if the function has been
+	computed, false otherwise.
+      */
+      bool ComputeCOMAcceleration(double t, double &r, int j);
 
       /*! Compute the current value according
 	to time.

@@ -62,7 +62,20 @@ namespace PatternGeneratorJRL
     /// --------------------------------------
     int OptimalControl(std::deque<COMState> & outputDeltaCOMTraj_deq_);
 
-    void printDebug();
+    void printAlongTime(deque<COMState> & inputCOMTraj_deq_,
+                    deque<ZMPPosition> inputZMPTraj_deq_,
+                    deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+                    deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+                    deque<COMState> & outputDeltaCOMTraj_deq_
+                    );
+
+    void printBuffers(deque<COMState> & inputCOMTraj_deq_,
+                    deque<ZMPPosition> inputZMPTraj_deq_,
+                    deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+                    deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+                    deque<COMState> & outputDeltaCOMTraj_deq_
+                    );
+
     double filterprecision(double adb);
 
 
@@ -81,9 +94,24 @@ namespace PatternGeneratorJRL
     inline void setPGPeriod(double PG_T)
     {PG_T_ = PG_T ;}
 
+    inline void setPreviewWindowSize_(double previewWindowSize)
+    { previewWindowSize_ = previewWindowSize; }
+
     /// \brief getter :
     inline ComAndFootRealization * getComAndFootRealization()
     { return comAndFootRealization_;};
+
+    inline double getCurrentTime()
+    {return currentTime_ ;}
+
+    inline double getControlPeriod()
+    {return controlPeriod_ ;}
+
+    inline double getInterpolationPeriod()
+    {return interpolationPeriod_ ;}
+
+    inline double getPreviewWindowSize_()
+    {return previewWindowSize_ ;}
 
   private: // Private members
 

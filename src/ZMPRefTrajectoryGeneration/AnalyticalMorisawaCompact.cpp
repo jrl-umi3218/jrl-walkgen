@@ -645,9 +645,9 @@ namespace PatternGeneratorJRL
 
     m_kajitaDynamicFilter->init(m_CurrentTime,
                                 m_SamplingPeriod,
+                                0.050,
                                 m_SamplingPeriod,
-                                m_SamplingPeriod,
-                                m_PreviewControlTime,
+                                1.6,
                                 lStartingCOMState.z[0]
                                 );
 
@@ -666,71 +666,92 @@ namespace PatternGeneratorJRL
       {
 	if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
 	  {
-	    
-	    ZMPPosition aZMPPos;
-	    memset(&aZMPPos,0,sizeof(aZMPPos));
-	    COMState aCOMPos;
-	    memset(&aCOMPos,0,sizeof(aCOMPos));
+            // prepare the buffers for the dynamic filter
+	    unsigned N = (unsigned)(m_kajitaDynamicFilter->getPreviewWindowSize_()/
+                                    m_kajitaDynamicFilter->getInterpolationPeriod());
 
-	    if (m_FilteringActivate)
-	      {
-		double FZmpX=0, FComX=0,FComdX=0;
-		
-		// Should we filter ?
-		bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
-		if (r)
-		  {
-		    double FZmpY=0, FComY=0,FComdY=0;
-		    // Yes we should.
-		    m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
+            std::deque<ZMPPosition> ZMPPos_deq (N);
+	    std::deque<COMState> COMPos_deq(N);
+            std::deque<FootAbsolutePosition> LeftFootAbsPos_deq (N);
+            std::deque<FootAbsolutePosition> RightFootAbsPos_deq (N);
+            for (unsigned i = 0 ; i < N ; ++i)
+            {
+              memset(&ZMPPos_deq[i],0,sizeof(ZMPPos_deq[i]));
+              memset(&COMPos_deq[i],0,sizeof(COMPos_deq[i]));
+              memset(&LeftFootAbsPos_deq[i],0,sizeof(LeftFootAbsPos_deq[i]));
+              memset(&RightFootAbsPos_deq[i],0,sizeof(RightFootAbsPos_deq[i]));
+            }
 
-		    /*! Feed the ZMPPositions. */
-		    aZMPPos.px = FZmpX;
-		    aZMPPos.py = FZmpY;
+            /*! Feed the buffer for the dynamic filter */
+            double current_time = time ;
+            for (unsigned i = 0 ; i < N ; ++i)
+            {
+              current_time += i*0.050 ;
 
-		    /*! Feed the COMStates. */
-		    aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
-		    aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
-		  }
-	      }
+              if (0/*m_FilteringActivate*/)
+              {
+                double FZmpX=0, FComX=0,FComdX=0;
+
+                // Should we filter ?
+                bool r = m_FilterXaxisByPC->UpdateOneStep(current_time,FZmpX, FComX, FComdX);
+                if (r)
+                {
+                  double FZmpY=0, FComY=0,FComdY=0;
+                  // Yes we should.
+                  m_FilterYaxisByPC->UpdateOneStep(current_time,FZmpY, FComY, FComdY);
+
+                  /*! Feed the ZMPPositions. */
+                  ZMPPos_deq[i].px = FZmpX;
+                  ZMPPos_deq[i].py = FZmpY;
+
+                  /*! Feed the COMStates. */
+                  COMPos_deq[i].x[0] = FComX; COMPos_deq[i].x[1] = FComdX;
+                  COMPos_deq[i].y[0] = FComY; COMPos_deq[i].y[1] = FComdY;
+                }
+              }
+
+              /*! Feed the ZMPPositions. */
+              double lZMPPosx=0.0,lZMPPosy=0.0;
+              m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(current_time,lZMPPosx,lIndexInterval);
+              ZMPPos_deq[i].px = lZMPPosx;
+              m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(current_time,lZMPPosy,lIndexInterval);
+              ZMPPos_deq[i].py = lZMPPosy;
+
+              /*! Feed the COMStates. */
+              double lCOMPosx=0.0, lCOMPosdx=0.0, lCOMPosddx=0.0;
+              double lCOMPosy=0.0, lCOMPosdy=0.0, lCOMPosddy=0.0;
+              m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(current_time,lCOMPosx,lIndexInterval);
+              m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(current_time,lCOMPosdx,lIndexInterval);
+              m_AnalyticalZMPCoGTrajectoryX->ComputeCOMAcceleration(current_time,lCOMPosddx,lIndexInterval);
+
+              m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(current_time,lCOMPosy,lIndexInterval);
+              m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(current_time,lCOMPosdy,lIndexInterval);
+              m_AnalyticalZMPCoGTrajectoryY->ComputeCOMAcceleration(current_time,lCOMPosddy,lIndexInterval);
+              COMPos_deq[i].x[0] = lCOMPosx ; COMPos_deq[i].x[1] = lCOMPosdx ; COMPos_deq[i].x[2] = lCOMPosddx ;
+              COMPos_deq[i].y[0] = lCOMPosy ; COMPos_deq[i].y[1] = lCOMPosdy ; COMPos_deq[i].y[2] = lCOMPosddy ;
+              COMPos_deq[i].z[0] = m_InitialPoseCoMHeight;
+
+              /*! Feed the FootPositions. */
+              /*! Left */
+              m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,current_time,LeftFootAbsPos_deq[i],lIndexInterval);
+              m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,current_time,RightFootAbsPos_deq[i],lIndexInterval);
+            }
 
             std::deque<COMState> deltaCoMTraj_deq (1);
-            //m_kajitaDynamicFilter->filter(,,,,deltaCoMTraj_deq);
-	    
-	    /*! Feed the ZMPPositions. */
-	    double lZMPPosx=0.0,lZMPPosy=0.0;
-	    m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(time,lZMPPosx,lIndexInterval);
-	    aZMPPos.px += lZMPPosx;
-	    m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(time,lZMPPosy,lIndexInterval);
-	    aZMPPos.py += lZMPPosy;
-	    FinalZMPPositions.push_back(aZMPPos);
-	    
-	    /*! Feed the COMStates. */
-	    double lCOMPosx=0.0, lCOMPosdx=0.0;
-	    double lCOMPosy=0.0, lCOMPosdy=0.0;
-	    m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,lCOMPosx,lIndexInterval);
-	    m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(time,lCOMPosdx,lIndexInterval);
-	    m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,lCOMPosy,lIndexInterval);
-	    m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(time,lCOMPosdy,lIndexInterval);
-	    aCOMPos.x[0] += lCOMPosx + deltaCoMTraj_deq[0].x[0] ; aCOMPos.x[1] += lCOMPosdx + deltaCoMTraj_deq[0].x[1];
-	    aCOMPos.y[0] += lCOMPosy + deltaCoMTraj_deq[0].y[0] ; aCOMPos.y[1] += lCOMPosdy + deltaCoMTraj_deq[0].y[1];
-	    aCOMPos.z[0] = m_InitialPoseCoMHeight;
-	    FinalCOMStates.push_back(aCOMPos);
-	    /*! Feed the FootPositions. */
+            memset(&deltaCoMTraj_deq[0],0,sizeof(deltaCoMTraj_deq[0]));
+            m_kajitaDynamicFilter->filter(COMPos_deq,ZMPPos_deq,LeftFootAbsPos_deq,RightFootAbsPos_deq,deltaCoMTraj_deq);
+            
 
-
-	    /*! Left */
-	    FootAbsolutePosition LeftFootAbsPos;
-	    memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
-	    m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,time,LeftFootAbsPos,lIndexInterval);
-	    FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
-	    
-	    /*! Right */
-	    FootAbsolutePosition RightFootAbsPos;
-	    memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
-	    m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,RightFootAbsPos,lIndexInterval);
-	    FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
-
+            COMState aCOMState (COMPos_deq[0]) ;
+            for(unsigned i = 0 ; i < 3 ; ++i)
+            {
+              aCOMState.x[i] += deltaCoMTraj_deq[0].x[i] ;
+              aCOMState.y[i] += deltaCoMTraj_deq[0].y[i] ;
+            }
+            FinalZMPPositions.push_back(ZMPPos_deq[0]);
+            FinalCOMStates.push_back(aCOMState);
+            FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos_deq[0]);
+            FinalRightFootAbsolutePositions.push_back(RightFootAbsPos_deq[0]);
 	  }
       }
     else 
