@@ -232,8 +232,7 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization[0] = new ComAndFootRealizationByGeometry(this);
 
     // Creates the foot trajectory generator.
-    m_FeetTrajectoryGenerator = new LeftAndRightFootTrajectoryGenerationMultiple(this,
-                                                                                 m_HumanoidDynamicRobot->leftFoot());
+    m_FeetTrajectoryGenerator = new LeftAndRightFootTrajectoryGenerationMultiple(this,m_HumanoidDynamicRobot->leftFoot());
 
     // ZMP reference and Foot trajectory planner (Preview control method from Kajita2003)
     m_ZMPD = new ZMPDiscretization(this,"",m_HumanoidDynamicRobot);
@@ -345,6 +344,7 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization[0]->Initialization();
 
     m_ComAndFootRealization[1]->SetStepStackHandler(m_StepStackHandler);
+    m_ComAndFootRealization[2]->SetStepStackHandler(m_StepStackHandler);
 
     m_StOvPl->SetPreviewControl(m_PC);
     m_StOvPl->SetDynamicMultiBodyModel(m_HumanoidDynamicRobot);

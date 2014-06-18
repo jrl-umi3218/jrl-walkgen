@@ -300,7 +300,7 @@ protected:
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
 	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
-        << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                 // 5
+              << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                 // 5
 	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
 	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
 	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
@@ -315,7 +315,7 @@ protected:
 	      << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 17
 	      << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 18
 	      << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 19
-        << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "         // 20
+              << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "         // 20
 	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
 	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
 	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23

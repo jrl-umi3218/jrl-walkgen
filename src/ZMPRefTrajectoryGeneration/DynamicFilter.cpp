@@ -88,25 +88,29 @@ void DynamicFilter::init(
   PG_T_ = PG_T ;
   previewWindowSize_ = previewWindowSize ;
 
-  NbI_ = (int)(PG_T_/interpolationPeriod) ;
-  NCtrl_ = (int)(PG_T_/controlPeriod) ;
-  PG_N_ = (int)(previewWindowSize_/PG_T_) ;
+  if (PG_T>interpolationPeriod_)
+  {NbI_=1;}
+  else
+  {NbI_ = PG_T/interpolationPeriod_;}
+
+  NCtrl_ = (int)(PG_T_/controlPeriod_) ;
+  PG_N_ = (int)(previewWindowSize_/interpolationPeriod_) ;
 
   CoMHeight_ = CoMHeight ;
-  PC_->SetPreviewControlTime (previewWindowSize_ - PG_T/controlPeriod * interpolationPeriod);
-  PC_->SetSamplingPeriod (interpolationPeriod);
+  PC_->SetPreviewControlTime (previewWindowSize_ - PG_T/controlPeriod_ * interpolationPeriod_);
+  PC_->SetSamplingPeriod (interpolationPeriod_);
   PC_->SetHeightOfCoM(CoMHeight_);
 
   previousConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
   previousVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
   previousAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
 
-  configurationTraj_.resize( PG_N_ * NbI_, previousConfiguration_ ); ;
-  velocityTraj_.resize( PG_N_ * NbI_, previousVelocity_ ); ;
-  accelerationTraj_.resize( PG_N_ * NbI_, previousAcceleration_ ); ;
+  configurationTraj_.resize( PG_N_, previousConfiguration_ ); ;
+  velocityTraj_.resize( PG_N_, previousVelocity_ ); ;
+  accelerationTraj_.resize( PG_N_, previousAcceleration_ ); ;
 
-  deltaZMP_deq_.resize( PG_N_ * NbI_);
-  ZMPMB_vec_.resize( PG_N_ * NbI_ , vector<double>(2));
+  deltaZMP_deq_.resize( PG_N_);
+  ZMPMB_vec_.resize( PG_N_, vector<double>(2));
 
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
@@ -129,10 +133,10 @@ int DynamicFilter::filter(
     deque<COMState> & outputDeltaCOMTraj_deq_
     )
 {
-//  InverseKinematics(
-//      inputCOMTraj_deq_,
-//      inputLeftFootTraj_deq_,
-//      inputRightFootTraj_deq_);
+  InverseKinematics(
+      inputCOMTraj_deq_,
+      inputLeftFootTraj_deq_,
+      inputRightFootTraj_deq_);
 
 
   //InverseDynamics(inputZMPTraj_deq_);
@@ -154,14 +158,13 @@ void DynamicFilter::InverseKinematics(
     deque<FootAbsolutePosition> & inputRightFootTraj_deq_)
 {
   const int stage0 = 0 ;
-  const unsigned int N = PG_N_ * NbI_ ;
   int iteration = 2 ;
   comAndFootRealization_->SetPreviousConfigurationStage0(
       previousConfiguration_);
   comAndFootRealization_->SetPreviousVelocityStage0(
       previousVelocity_);
 
-  for(unsigned int i = 0 ; i <  N ; i++ )
+  for(unsigned int i = 0 ; i <  PG_N_ ; i++ )
   {
     const COMState & acomp = inputCOMTraj_deq_[i] ;
     const FootAbsolutePosition & aLeftFAP =
@@ -229,8 +232,7 @@ void DynamicFilter::InverseKinematics(
 void DynamicFilter::InverseDynamics(
     deque<ZMPPosition> inputZMPTraj_deq_)
 {
-  const unsigned int N = PG_N_ * NbI_ ;
-  for (unsigned int i = 0 ; i < N ; i++ )
+  for (unsigned int i = 0 ; i < PG_N_ ; i++ )
   {
     // Copy the angular trajectory data from "Boost" to "Eigen"
     for(unsigned int j = 0 ; j < configurationTraj_[i].size() ; j++ )
@@ -493,47 +495,48 @@ void DynamicFilter::printBuffers(deque<COMState> & inputCOMTraj_deq_,
         << filterprecision( inputZMPTraj_deq_[i].px ) << " "      // 19
         << filterprecision( inputZMPTraj_deq_[i].py ) << " "      // 20
 
-//        << filterprecision( ZMPMB_vec_[i][0] ) << " "                  // 21
-//        << filterprecision( ZMPMB_vec_[i][1] ) << " "                  // 22
+        << filterprecision( inputLeftFootTraj_deq_[i].x ) << " "       // 21
+        << filterprecision( inputLeftFootTraj_deq_[i].y ) << " "       // 22
+        << filterprecision( inputLeftFootTraj_deq_[i].z ) << " "       // 23
+        << filterprecision( inputLeftFootTraj_deq_[i].theta ) << " "   // 24
+        << filterprecision( inputLeftFootTraj_deq_[i].omega ) << " "   // 25
+        << filterprecision( inputLeftFootTraj_deq_[i].dx ) << " "      // 26
+        << filterprecision( inputLeftFootTraj_deq_[i].dy ) << " "      // 27
+        << filterprecision( inputLeftFootTraj_deq_[i].dz ) << " "      // 28
+        << filterprecision( inputLeftFootTraj_deq_[i].dtheta ) << " "  // 29
+        << filterprecision( inputLeftFootTraj_deq_[i].domega ) << " "  // 30
+        << filterprecision( inputLeftFootTraj_deq_[i].ddx ) << " "     // 31
+        << filterprecision( inputLeftFootTraj_deq_[i].ddy ) << " "     // 32
+        << filterprecision( inputLeftFootTraj_deq_[i].ddz ) << " "     // 33
+        << filterprecision( inputLeftFootTraj_deq_[i].ddtheta ) << " " // 34
+        << filterprecision( inputLeftFootTraj_deq_[i].ddomega ) << " " // 35
 
-        << filterprecision( inputLeftFootTraj_deq_[i].x ) << " "       // 23
-        << filterprecision( inputLeftFootTraj_deq_[i].y ) << " "       // 24
-        << filterprecision( inputLeftFootTraj_deq_[i].z ) << " "       // 25
-        << filterprecision( inputLeftFootTraj_deq_[i].theta ) << " "   // 26
-        << filterprecision( inputLeftFootTraj_deq_[i].omega ) << " "   // 27
-        << filterprecision( inputLeftFootTraj_deq_[i].dx ) << " "      // 28
-        << filterprecision( inputLeftFootTraj_deq_[i].dy ) << " "      // 29
-        << filterprecision( inputLeftFootTraj_deq_[i].dz ) << " "      // 30
-        << filterprecision( inputLeftFootTraj_deq_[i].dtheta ) << " "  // 31
-        << filterprecision( inputLeftFootTraj_deq_[i].domega ) << " "  // 32
-        << filterprecision( inputLeftFootTraj_deq_[i].ddx ) << " "     // 33
-        << filterprecision( inputLeftFootTraj_deq_[i].ddy ) << " "     // 34
-        << filterprecision( inputLeftFootTraj_deq_[i].ddz ) << " "     // 35
-        << filterprecision( inputLeftFootTraj_deq_[i].ddtheta ) << " " // 36
-        << filterprecision( inputLeftFootTraj_deq_[i].ddomega ) << " " // 37
+        << filterprecision( inputRightFootTraj_deq_[i].x ) << " "       // 36
+        << filterprecision( inputRightFootTraj_deq_[i].y ) << " "       // 37
+        << filterprecision( inputRightFootTraj_deq_[i].z ) << " "       // 38
+        << filterprecision( inputRightFootTraj_deq_[i].theta ) << " "   // 39
+        << filterprecision( inputRightFootTraj_deq_[i].omega ) << " "   // 40
+        << filterprecision( inputRightFootTraj_deq_[i].dx ) << " "      // 41
+        << filterprecision( inputRightFootTraj_deq_[i].dy ) << " "      // 42
+        << filterprecision( inputRightFootTraj_deq_[i].dz ) << " "      // 43
+        << filterprecision( inputRightFootTraj_deq_[i].dtheta ) << " "  // 44
+        << filterprecision( inputRightFootTraj_deq_[i].domega ) << " "  // 45
+        << filterprecision( inputRightFootTraj_deq_[i].ddx ) << " "     // 46
+        << filterprecision( inputRightFootTraj_deq_[i].ddy ) << " "     // 47
+        << filterprecision( inputRightFootTraj_deq_[i].ddz ) << " "     // 48
+        << filterprecision( inputRightFootTraj_deq_[i].ddtheta ) << " " // 49
+        << filterprecision( inputRightFootTraj_deq_[i].ddomega ) << " ";// 50
 
-        << filterprecision( inputRightFootTraj_deq_[i].x ) << " "      // 38
-        << filterprecision( inputRightFootTraj_deq_[i].y ) << " "      // 39
-        << filterprecision( inputRightFootTraj_deq_[i].z ) << " "      // 40
-        << filterprecision( inputRightFootTraj_deq_[i].theta ) << " "  // 41
-        << filterprecision( inputRightFootTraj_deq_[i].omega ) << " "  // 42
-        << filterprecision( inputRightFootTraj_deq_[i].dx ) << " "     // 43
-        << filterprecision( inputRightFootTraj_deq_[i].dy ) << " "     // 44
-        << filterprecision( inputRightFootTraj_deq_[i].dz ) << " "     // 45
-        << filterprecision( inputRightFootTraj_deq_[i].dtheta ) << " " // 46
-        << filterprecision( inputRightFootTraj_deq_[i].domega ) << " " // 47
-        << filterprecision( inputRightFootTraj_deq_[i].ddx ) << " "    // 48
-        << filterprecision( inputRightFootTraj_deq_[i].ddy ) << " "    // 49
-        << filterprecision( inputRightFootTraj_deq_[i].ddz ) << " "    // 50
-        << filterprecision( inputRightFootTraj_deq_[i].ddtheta ) << " "// 51
-        << filterprecision( inputRightFootTraj_deq_[i].ddomega ) << " ";// 52
+    //        << filterprecision( ZMPMB_vec_[i][0] ) << " "                  // 21
+    //        << filterprecision( ZMPMB_vec_[i][1] ) << " "                  // 22
 
-//    for(unsigned int j = 0 ; j < configurationTraj_[i].size() ; j++ )
-//      aof << filterprecision( configurationTraj_[i](j) ) << " " ;
-//    for(unsigned int j = 0 ; j < velocityTraj_[i].size() ; j++ )
-//      aof << filterprecision( velocityTraj_[i](j) ) << " " ;
-//    for(unsigned int j = 0 ; j < accelerationTraj_[i].size() ; j++ )
-//      aof << filterprecision( accelerationTraj_[i](j) ) << " " ;
+
+    for(unsigned int j = 0 ; j < configurationTraj_[i].size() ; j++ )
+      aof << filterprecision( configurationTraj_[i](j) ) << " " ;
+    for(unsigned int j = 0 ; j < velocityTraj_[i].size() ; j++ )
+      aof << filterprecision( velocityTraj_[i](j) ) << " " ;
+    for(unsigned int j = 0 ; j < accelerationTraj_[i].size() ; j++ )
+      aof << filterprecision( accelerationTraj_[i](j) ) << " " ;
 
     aof << endl ;
   }

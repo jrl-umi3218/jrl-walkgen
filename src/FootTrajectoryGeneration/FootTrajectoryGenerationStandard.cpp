@@ -308,16 +308,16 @@ double FootTrajectoryGenerationStandard::ComputeAll(FootAbsolutePosition & aFoot
 {
   aFootAbsolutePosition.x = m_PolynomeX->Compute(Time);
   aFootAbsolutePosition.dx = m_PolynomeX->ComputeDerivative(Time);
-  //  aFootAbsolutePosition.ddx = m_PolynomeX->ComputeSecDerivative(Time);
+  aFootAbsolutePosition.ddx = m_PolynomeX->ComputeSecDerivative(Time);
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.x); 
 
   aFootAbsolutePosition.y = m_PolynomeY->Compute(Time);
   aFootAbsolutePosition.dy = m_PolynomeY->ComputeDerivative(Time);
-  //  aFootAbsolutePosition.ddy = m_PolynomeY->ComputeSecDerivative(Time);
+  aFootAbsolutePosition.ddy = m_PolynomeY->ComputeSecDerivative(Time);
 
   aFootAbsolutePosition.z = m_PolynomeZ->Compute(Time);
   aFootAbsolutePosition.dz = m_PolynomeZ->ComputeDerivative(Time);
-  //  aFootAbsolutePosition.ddz = m_PolynomeZ->ComputeSecDerivative(Time);
+  aFootAbsolutePosition.ddz = m_PolynomeZ->ComputeSecDerivative(Time);
 
   aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(Time);
   aFootAbsolutePosition.dtheta = m_PolynomeTheta->ComputeDerivative(Time);

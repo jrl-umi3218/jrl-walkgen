@@ -382,7 +382,10 @@ namespace PatternGeneratorJRL
 				 m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
 				 +m_CurrentConfiguration(1) ) << " "                                          // 36
 	      << filterprecision(m_CurrentConfiguration(0) ) << " "                         // 37
-	      << filterprecision(m_CurrentConfiguration(1) ) << " ";                        // 38
+	      << filterprecision(m_CurrentConfiguration(1) ) << " "                        // 38
+          << filterprecision(m_OneStep.finalCOMPosition.x[2] ) << " "                   // 39
+          << filterprecision(m_OneStep.finalCOMPosition.y[2] ) << " "                   // 40
+          << filterprecision(m_OneStep.finalCOMPosition.z[2] ) << " "   ;                // 41
         for (unsigned int i = 0 ; i < m_HDR->currentConfiguration().size() ; i++)
         {
           aof << filterprecision(m_HDR->currentConfiguration()(i)) << " " ;                  // 39 - 74
