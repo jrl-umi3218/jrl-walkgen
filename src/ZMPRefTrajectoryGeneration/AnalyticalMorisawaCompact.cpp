@@ -2310,11 +2310,7 @@ namespace PatternGeneratorJRL
 
     ComputeCoMz(t,aCOMPos.z[0], aCOMPos.z[1]);
 
-
-
     FinalCoMPositions.push_back(aCOMPos);
-
-
 	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " <<
 		aCOMPos.x[0] << " " << aCOMPos.y[0] << " " <<
 		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " <<
@@ -2333,7 +2329,9 @@ namespace PatternGeneratorJRL
     double CoMzpre = CoMz;
     double variable=0.1,variableright = 0.9 ,variableleft = 0.0;
     double              variableright1 = 0.9 ,variableleft1 = 0.0;
-    // put first leg on the stairs with CoM going down variable % of step height
+    // put first leg on the stairs with decrease of CoM variable% of step height
+
+    double var = 0.1;
 
     if (t >= moving_time){
 
@@ -2365,21 +2363,28 @@ namespace PatternGeneratorJRL
             }
 
                 // going down et normal walk
-            if (m_AbsoluteSupportFootPositions[Index2].z <= m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2-1].sz <= 0)
+            if (m_AbsoluteSupportFootPositions[Index2].z < m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2].sz < 0)
             {
                 deltaZ = (m_AbsoluteSupportFootPositions[Index2].z - m_AbsoluteSupportFootPositions[Index2-1].z );
-                if (t <= Index2*moving_time + 0.9*m_RelativeFootPositions[Index2].SStime )
-                    CoMz = (t-Index2*moving_time)*deltaZ/(0.9*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z  ;
+                if (t <= Index2*moving_time + 0.9*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + 0.0*m_RelativeFootPositions[Index2].SStime)
+                    CoMz = (t-Index2*moving_time- 0.0*m_RelativeFootPositions[Index2].SStime)*(1+var)*deltaZ/(0.9*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z  ;
+                else if (t  < Index2*moving_time + 0.0*m_RelativeFootPositions[Index2].SStime)
+                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z ;
                 else
-                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z;
+                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z + var*deltaZ;
+            }
+            else if (m_AbsoluteSupportFootPositions[Index2].z == m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2-1].sz < 0)
+            {
+                deltaZ = (m_AbsoluteSupportFootPositions[Index2-2].z - m_AbsoluteSupportFootPositions[Index2].z );
+                if (t <= Index2*moving_time + m_RelativeFootPositions[Index2].SStime )
+                    CoMz = (t-Index2*moving_time)*var*deltaZ/(m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z - var*deltaZ ;
+                else
+                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z ;
             }
         }
 
         else
             CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z;
-
-
-
         }
     else
         CoMz = m_InitialPoseCoMHeight ;

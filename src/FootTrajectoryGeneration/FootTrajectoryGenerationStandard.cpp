@@ -222,14 +222,9 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
         else if (FinalPosition == InitPosition)
         m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,FinalPosition);//+abs(FinalPosition-InitPosition)*1.5);
        else if (FinalPosition < InitPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,3.7*TimeInterval/5.0,FinalPosition+m_StepHeight);//abs(FinalPosition-InitPosition)*0.3);
+        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,6.0*TimeInterval/10.0,InitPosition+m_StepHeight/3.0);//abs(FinalPosition-InitPosition)*0.3);
 
-    /*if (InitPosition == FinalPosition)
-        m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
-    else
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,InitPosition+(FinalPosition-InitPosition)*1.5);
-*/
-    break;
+     break;
 
    case THETA_AXIS:
      m_PolynomeTheta->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
@@ -272,24 +267,14 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
    //else
    //{
        if ((FinalPosition - InitPosition)== m_StepHeight)
-                m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,InitPosition,0.5*TimeInterval,InitPosition+m_StepHeight);
+        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,InitPosition,0.5*TimeInterval,InitPosition+m_StepHeight);
         else if (FinalPosition > InitPosition)
         m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,1.5*TimeInterval/5.0,FinalPosition+m_StepHeight);//InitPosition+abs(FinalPosition-InitPosition)*1.5);
        else if (FinalPosition == InitPosition)
         m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,FinalPosition);//InitPosition+abs(FinalPosition-InitPosition)*1.5);
        else if (FinalPosition < InitPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,3.7*TimeInterval/5.0,FinalPosition+m_StepHeight);//+abs(FinalPosition-InitPosition)*0.3);
+        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,6.0*TimeInterval/10.0,InitPosition+m_StepHeight/3.0);//+abs(FinalPosition-InitPosition)*0.3);
 
-      // else if (FinalPosition == InitPosition)
-     //   m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
-
-  // }
-
-  /*  if (InitPosition == FinalPosition)
-        m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
-    else
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,TimeInterval/3.0,InitPosition+(FinalPosition-InitPosition)*1.5);
-*/
     break;
 
    case THETA_AXIS:

@@ -125,7 +125,15 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 					   FootInitialPosition.y,
 					   FootInitialPosition.dy);
 
+ if (FootFinalPosition.z < FootInitialPosition.z )
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+                           FootTrajectoryGenerationStandard::Z_AXIS,
+                           m_DeltaTj[IntervalIndex],
+                           FootFinalPosition.z,
+                           FootInitialPosition.z,
+                           FootInitialPosition.dz);
+  else
+    aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
                            FootTrajectoryGenerationStandard::Z_AXIS,
                            m_DeltaTj[IntervalIndex],
                            FootFinalPosition.z,
@@ -159,20 +167,27 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 
     // Init the first interval.
   // X axis.
-  if (FootFinalPosition.z < FootInitialPosition.z )
+  if (FootFinalPosition.z <= FootInitialPosition.z )  //down
     aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::X_AXIS,
-					   m_DeltaTj[IntervalIndex],
+					   0.8*m_DeltaTj[IntervalIndex],
 					   FootFinalPosition.x,
 					   FootInitialPosition.x,
 					   FootInitialPosition.dx);
-  else
+  else if (FootFinalPosition.z > FootInitialPosition.z )    // up
     aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::X_AXIS,
 					   0.75*m_DeltaTj[IntervalIndex],
 					   FootFinalPosition.x,
 					   FootInitialPosition.x,
 					   FootInitialPosition.dx);
+ /* else if (FootFinalPosition.z - FootInitialPosition.z  == m_StepHeight) //normal walking
+    aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+					   FootTrajectoryGenerationStandard::X_AXIS,
+					   m_DeltaTj[IntervalIndex],
+					   FootFinalPosition.x,
+					   FootInitialPosition.x,
+					   FootInitialPosition.dx);*/
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::
@@ -697,13 +712,6 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  "RightFootTmpInitPos.dy " << RightFootTmpInitPos.dy << endl <<
 	  "RightFootTmpInitPos.dz " << RightFootTmpInitPos.dz << endl );
 
-	   cout <<"RightFootTmpInitPos.x " << RightFootTmpInitPos.x << endl <<
-	  "RightFootTmpInitPos.y " << RightFootTmpInitPos.y << endl <<
-	  "RightFootTmpInitPos.z " << RightFootTmpInitPos.z << endl <<
-	  "RightFootTmpInitPos.dx " << RightFootTmpInitPos.dx << endl <<
-	  "RightFootTmpInitPos.dy " << RightFootTmpInitPos.dy << endl <<
-	  "RightFootTmpInitPos.dz " << RightFootTmpInitPos.dz << endl ;
-
   bool FirstIntervalIsSingleSupport = true;
   if (LeftFootInitialPosition.stepType>10)
     FirstIntervalIsSingleSupport = false;
@@ -983,12 +991,14 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
       SupportFootAbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
       SupportFootAbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
       SupportFootAbsoluteFootPositions[i].theta = CurrentAbsTheta;
+cout << "x "<< SupportFootAbsoluteFootPositions[i].x << "y " << SupportFootAbsoluteFootPositions[i].y << "z " << SupportFootAbsoluteFootPositions[i].z << endl;
+
 
       if ((!IgnoreFirst) || (i>0))
 	SupportFoot=-SupportFoot;
     }
 
-  /*! This part initializes correctly the last two intervals
+      /*! This part initializes correctly the last two intervals
    if the system is in real-time foot modification. In this case,
    the representation of the intervals shift from:
   ONE DOUBLE SUPPORT STARTING PHASE - 1st foot single support phase - double support phase - 2nd foot single support phase
