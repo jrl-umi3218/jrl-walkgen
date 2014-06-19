@@ -555,8 +555,15 @@ void
     // DYNAMIC FILTER
     // --------------
     //DynamicFilter( time, tmp );
-    dynamicFilter_->filter(COMTraj_deq_,ZMPTraj_deq_,LeftFootTraj_deq_,
-                           RightFootTraj_deq_,deltaCOMTraj_deq_);
+    dynamicFilter_->filter(
+        FinalCOMTraj_deq.back(),
+        FinalLeftFootTraj_deq.back(),
+        FinalRightFootTraj_deq.back(),
+        COMTraj_deq_,
+        ZMPTraj_deq_,
+        LeftFootTraj_deq_,
+        RightFootTraj_deq_,
+        deltaCOMTraj_deq_);
 
 
     for (unsigned int i = 0 ; i < deltaCOMTraj_deq_.size() ; ++i )

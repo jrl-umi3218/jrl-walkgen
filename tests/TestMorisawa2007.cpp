@@ -27,26 +27,8 @@
 
 #include "CommonTools.hh"
 #include "TestObject.hh"
-
 #include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
-#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
-#include <metapod/models/hrp2_14/hrp2_14.hh>
-#ifndef METAPOD_INCLUDES
-#define METAPOD_INCLUDES
-// metapod includes
-#include <metapod/tools/print.hh>
-#include <metapod/tools/initconf.hh>
-#include <metapod/algos/rnea.hh>
-#include <Eigen/StdVector>
-#endif
-
-#ifndef METAPOD_TYPEDEF2
-#define METAPOD_TYPEDEF2
-typedef double LocalFloatType2;
-typedef metapod::Spatial::ForceTpl<LocalFloatType2> Force2;
-typedef metapod::hrp2_14<LocalFloatType2> Robot_Model2;
-typedef metapod::Nodes< Robot_Model2, Robot_Model2::BODY >::type Node2;
-#endif
+#include <ZMPRefTrajectoryGeneration/DynamicFilter.hh>
 
 using namespace::PatternGeneratorJRL;
 using namespace::PatternGeneratorJRL::TestSuite;
@@ -84,35 +66,40 @@ private:
   double m_deltatime;
 
   // buffer to save all the zmps positions
-  vector< vector<double> > errZMP_ ;
-  Robot_Model2 robot_ ;
-  ComAndFootRealization * ComAndFootRealization_;
-  SimplePluginManager * SPM ;
-  double dInitX, dInitY;
+  vector< vector<double> > deltaZMP_vec ;
+  vector< vector<double> > ZMPMB_vec ;
+  SimplePluginManager * SPM_ ;
+  DynamicFilter* dynamicfilter_;
+  double dInitX_, dInitY_;
   int iteration,iteration_zmp ;
   bool once ;
+  double samplingPeriod_;
 
 public:
   TestMorisawa2007(int argc, char*argv[], string &aString, int TestProfile):
-    TestObject(argc, argv, aString)
+      TestObject(argc, argv, aString)
   {
     m_TestProfile = TestProfile;
     m_TestChangeFoot = true;
     m_NbStepsModified = 0;
     m_deltatime = 0;
 
-    ComAndFootRealization_ = 0 ;
-    dInitX = 0 ;
-    dInitY = 0 ;
+    SPM_ = NULL ;
+    dynamicfilter_ = NULL ;
+    dInitX_ = 0 ;
+    dInitY_ = 0 ;
     iteration_zmp = 0 ;
     iteration = 0 ;
     once = true ;
+    ZMPMB_vec.resize(2);
+    deltaZMP_vec.clear();
+    samplingPeriod_ = 0.005 ;
   };
 
   ~TestMorisawa2007()
   {
-    delete ComAndFootRealization_ ;
-    delete SPM ;
+    delete dynamicfilter_ ;
+    delete SPM_ ;
   }
 
   bool doTest(ostream &os)
@@ -149,30 +136,30 @@ public:
         if (m_PGIInterface==0)
         {
           ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
-                   m_CurrentVelocity,
-                   m_CurrentAcceleration,
-                   m_OneStep.ZMPTarget,
-                   m_OneStep.finalCOMPosition,
-                   m_OneStep.LeftFootPosition,
-                   m_OneStep.RightFootPosition);
+                                                 m_CurrentVelocity,
+                                                 m_CurrentAcceleration,
+                                                 m_OneStep.ZMPTarget,
+                                                 m_OneStep.finalCOMPosition,
+                                                 m_OneStep.LeftFootPosition,
+                                                 m_OneStep.RightFootPosition);
         }
         else if (m_PGIInterface==1)
         {
           ok = m_PGI->RunOneStepOfTheControlLoop( m_CurrentConfiguration,
-                                                m_CurrentVelocity,
-                                                m_CurrentAcceleration,
-                                                m_OneStep.ZMPTarget);
+                                                  m_CurrentVelocity,
+                                                  m_CurrentAcceleration,
+                                                  m_OneStep.ZMPTarget);
         }
-	      m_OneStep.NbOfIt++;
+        m_OneStep.NbOfIt++;
 
-	      m_clock.stopOneIteration();
+        m_clock.stopOneIteration();
 
-	      m_PreviousConfiguration = m_CurrentConfiguration;
-	      m_PreviousVelocity = m_CurrentVelocity;
-	      m_PreviousAcceleration = m_CurrentAcceleration;
+        m_PreviousConfiguration = m_CurrentConfiguration;
+        m_PreviousVelocity = m_CurrentVelocity;
+        m_PreviousAcceleration = m_CurrentAcceleration;
 
         /*! Call the reimplemented method to generate events. */
-	      if (ok)
+        if (ok)
         {
           m_clock.startModification();
           generateEvent();
@@ -182,10 +169,9 @@ public:
 
           /*! Fill the debug files with appropriate information. */
           ComparingZMPs();
-          ComputeAndDisplayAverageError(false);
           fillInDebugFiles();
         }
-	      else
+        else
         {
           cerr << "Nothing to dump after " << m_OneStep.NbOfIt << endl;
         }
@@ -234,16 +220,10 @@ public:
     MAL_VECTOR_RESIZE(m_PreviousVelocity, m_HDR->numberDof());
     MAL_VECTOR_RESIZE(m_PreviousAcceleration, m_HDR->numberDof());
 
-    SPM = new SimplePluginManager();
-
-    ComAndFootRealization_ = new ComAndFootRealizationByGeometry( (PatternGeneratorInterfacePrivate*) SPM );
-    ComAndFootRealization_->setHumanoidDynamicRobot(m_HDR);
-    ComAndFootRealization_->SetStepStackHandler(new StepStackHandler(SPM));
-    ComAndFootRealization_->SetHeightOfTheCoM(0.814);
-    ComAndFootRealization_->setSamplingPeriod(0.005);
-    ComAndFootRealization_->Initialization();
-
-		initIK();
+    SPM_ = new SimplePluginManager();
+    dynamicfilter_ = new DynamicFilter(SPM_,m_HDR);
+    dynamicfilter_->init(0.0,samplingPeriod_,samplingPeriod_,samplingPeriod_,samplingPeriod_,0.814);
+    initIK();
   }
 
 protected:
@@ -275,14 +255,17 @@ protected:
     lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
     lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
     lStartingCOMState(2) = m_OneStep.finalCOMPosition.z[0] ;
-    ComAndFootRealization_->SetHeightOfTheCoM(0.814);
-    ComAndFootRealization_->setSamplingPeriod(0.005);
-    ComAndFootRealization_->Initialization();
-
-    ComAndFootRealization_->InitializationCoM(BodyAngles,lStartingCOMState,
-					     waist,
-					     m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
-    ComAndFootRealization_->Initialization();
+    ComAndFootRealizationByGeometry * CaFR = dynamicfilter_->getComAndFootRealization() ;
+    CaFR->SetHeightOfTheCoM(0.814);
+    CaFR->setSamplingPeriod(samplingPeriod_);
+    CaFR->SetStepStackHandler(new StepStackHandler(SPM_));
+    CaFR->Initialization();
+    CaFR->InitializationCoM(BodyAngles,lStartingCOMState,
+                            waist, m_OneStep.LeftFootPosition,
+                            m_OneStep.RightFootPosition);
+    CaFR->Initialization();
+    CaFR->SetPreviousConfigurationStage0(m_HDR->currentConfiguration());
+    CaFR->SetPreviousVelocityStage0(m_HDR->currentVelocity());
   }
 
   void fillInDebugFiles( )
@@ -296,7 +279,7 @@ protected:
 	  aof.open(aFileName.c_str(),ofstream::app);
 	  aof.precision(8);
 	  aof.setf(ios::scientific, ios::floatfield);
-	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "                            // 1
+	  aof << filterprecision(m_OneStep.NbOfIt*samplingPeriod_ ) << " "                            // 1
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
 	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
@@ -327,7 +310,7 @@ protected:
 	      << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                   // 29
 	      << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 30
 	      << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 31
-	      << filterprecision(m_OneStep.RightFootPosition.theta*M_PI/180 ) << " "     // 32
+	      << filterprecision(m_OneStep.RightFootPosition.theta*M_PI/180 ) << " "        // 32
 	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 33
 	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 34
 	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
@@ -409,10 +392,13 @@ protected:
 
   void ComparingZMPs()
   {
-		const int stage0 = 0 ;
-    /// \brief calculate, from the CoM of computed by the preview control,
-    ///    the corresponding articular position, velocity and acceleration
-    /// ------------------------------------------------------------------
+    // Debug Purpose
+    // -------------
+    ofstream aof;
+    string aFileName;
+    ostringstream oss(std::ostringstream::ate);
+    static int iteration = 0;
+
     MAL_VECTOR(CurrentConfiguration,double);
     MAL_VECTOR(CurrentVelocity,double);
     MAL_VECTOR(CurrentAcceleration,double);
@@ -421,172 +407,170 @@ protected:
     MAL_VECTOR_RESIZE(CurrentVelocity, m_HDR->numberDof());
     MAL_VECTOR_RESIZE(CurrentAcceleration, m_HDR->numberDof());
 
-    MAL_VECTOR_DIM(aCOMState,double,6);
-    MAL_VECTOR_DIM(aCOMSpeed,double,6);
-    MAL_VECTOR_DIM(aCOMAcc,double,6);
-    MAL_VECTOR_DIM(aLeftFootPosition,double,5);
-    MAL_VECTOR_DIM(aRightFootPosition,double,5);
+    dynamicfilter_->InverseKinematics(
+        m_OneStep.finalCOMPosition,m_OneStep.LeftFootPosition,m_OneStep.RightFootPosition,
+        CurrentConfiguration,CurrentVelocity,CurrentAcceleration,samplingPeriod_,iteration);
 
-    aCOMState(0) = m_OneStep.finalCOMPosition.x[0];      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
-    aCOMState(1) = m_OneStep.finalCOMPosition.y[0];      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
-    aCOMState(2) = m_OneStep.finalCOMPosition.z[0];      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
-    aCOMState(3) = m_OneStep.finalCOMPosition.roll[0];   aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1]; 	aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2];
-    aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0];  aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1];	aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2];
-    aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0];    aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1];  	aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2];
-
-    aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
-    aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
-    aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
-    aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
-    aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
-    ComAndFootRealization_->setSamplingPeriod(0.005);
-    ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
-                      aLeftFootPosition,
-                      aRightFootPosition,
-                      CurrentConfiguration,
-                      CurrentVelocity,
-                      CurrentAcceleration,
-                      m_OneStep.NbOfIt,
-                      stage0);
-
-		/// \brief Debug Purpose
-		/// --------------------
-		ofstream aof;
-		string aFileName;
-		ostringstream oss(std::ostringstream::ate);
-		oss.str("TestHerdt2010DynamicART2.dat");
-		aFileName = oss.str();
-		if ( iteration_zmp == 0 )
-		{
-			aof.open(aFileName.c_str(),ofstream::out);
-			aof.close();
-		}
-		///----
-		aof.open(aFileName.c_str(),ofstream::app);
-		aof.precision(8);
-		aof.setf(ios::scientific, ios::floatfield);
-		for (unsigned int j = 0 ; j < CurrentConfiguration.size() ; ++j)
-		{
-			aof << filterprecision(CurrentConfiguration(j)) << " " ;
-		}
-		for (unsigned int j = 0 ; j < CurrentVelocity.size() ; ++j)
-		{
-			aof << filterprecision(CurrentVelocity(j)) << " " ;
-		}
-		for (unsigned int j = 0 ; j < CurrentAcceleration.size() ; ++j)
-		{
-			aof << filterprecision(CurrentAcceleration(j)) << " " ;
-		}
-		aof << endl ;
-
-
-    /// \brief rnea, calculation of the multi body ZMP
-    /// ----------------------------------------------
-    Robot_Model2::confVector q, dq, ddq;
-    for(unsigned int j = 0 ; j < CurrentConfiguration.size() ; j++ )
-    {
-      q(j,0) = CurrentConfiguration[j] ;
-      dq(j,0) = CurrentVelocity[j] ;
-      ddq(j,0) = CurrentAcceleration[j] ;
-    }
-    metapod::rnea< Robot_Model2, true >::run(robot_, q, dq, ddq);
-
-    Node2 anode = boost::fusion::at_c<Robot_Model2::BODY>(robot_.nodes);
-    Force2 aforce = anode.body.iX0.applyInv (anode.joint.f) ;
-
-    double ZMPMB[2];
-
-    ZMPMB[0] = - aforce.n()[1] / aforce.f()[2] ;
-    ZMPMB[1] = aforce.n()[0] / aforce.f()[2] ;
-
+    vector<double> dZMPtmp (2);
+    vector<double> ZMPMBtmp (2);
+    dynamicfilter_->ComputeZMPMB(CurrentConfiguration,CurrentVelocity,CurrentAcceleration,ZMPMBtmp);
 
     if (m_OneStep.NbOfIt<=10){
-      dInitX = m_OneStep.ZMPTarget(0) - ZMPMB[0] ;
-      dInitY = m_OneStep.ZMPTarget(1) - ZMPMB[1] ;
-      {
-        vector<double> tmp_zmp(2) ;
-        tmp_zmp[0] =0.0 ;
-        tmp_zmp[1] =0.0 ;
-        errZMP_.push_back(tmp_zmp);
-      }
+      dInitX_ = m_OneStep.ZMPTarget(0) - ZMPMBtmp[0] ;
+      dInitY_ = m_OneStep.ZMPTarget(1) - ZMPMBtmp[1] ;
     }
 
-    if (m_OneStep.NbOfIt >= 10)
+    dZMPtmp[0] = m_OneStep.ZMPTarget(0) - ZMPMBtmp[0] - dInitX_  ;
+    dZMPtmp[1] = m_OneStep.ZMPTarget(1) - ZMPMBtmp[1] - dInitY_  ;
+
+    deltaZMP_vec.push_back(dZMPtmp);
+    ZMPMB_vec.push_back(ZMPMBtmp);
+
+
+    // --------------------
+    oss.str("DynamicFilterAllVariablesFiltered.dat");
+    aFileName = oss.str();
+
+    if ( iteration == 0 )
     {
-      double errx = sqrt( ( m_OneStep.ZMPTarget(0) - ZMPMB[0] - dInitX )*( m_OneStep.ZMPTarget(0) - ZMPMB[0] - dInitX ) ) ;
-      double erry = sqrt( ( m_OneStep.ZMPTarget(1) - ZMPMB[1] - dInitY )*( m_OneStep.ZMPTarget(1) - ZMPMB[1] - dInitY ) ) ;
-      {
-        vector<double> tmp_zmp(2) ;
-        tmp_zmp[0] = errx ;
-        tmp_zmp[1] = erry ;
-        errZMP_.push_back(tmp_zmp);
-      }
-    }
-
-
-    static double ecartmaxX = 0 ;
-    static double ecartmaxY = 0 ;
-    if ( abs(errZMP_.back()[0]) > ecartmaxX )
-      ecartmaxX = abs(errZMP_.back()[0]) ;
-    if ( abs(errZMP_.back()[1]) > ecartmaxY )
-      ecartmaxY = abs(errZMP_.back()[1]) ;
-
-//    cout << "ecartmaxX :" << ecartmaxX << endl ;
-//    cout << "ecartmaxY :" << ecartmaxY << endl ;
-
-    // Writing of the two zmps and the error.
-    if (once)
-    {
-      aof.open("TestHerdt2010ErrorZMP.dat",ofstream::out);
+      aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
-      once = false ;
     }
-    aof.open("TestHerdt2010ErrorZMP.dat",ofstream::app);
+    ///----
+    aof.open(aFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( iteration_zmp ) << " "          // 1
-        << filterprecision( ZMPMB[0] + dInitX ) << " "      // 2
-        << filterprecision( ZMPMB[1] + dInitY ) << " "      // 3
-        << filterprecision(m_OneStep.ZMPTarget(0) ) << " "  // 4
-        << filterprecision(m_OneStep.ZMPTarget(1) ) << " "  // 5
-        << endl ;
+    aof << filterprecision( iteration*samplingPeriod_ ) << " " // 0
+        << filterprecision( m_OneStep.finalCOMPosition.x[0] ) << " "    // 1
+        << filterprecision( m_OneStep.finalCOMPosition.x[1] ) << " "    // 2
+        << filterprecision( m_OneStep.finalCOMPosition.x[2] ) << " "    // 3
+        << filterprecision( m_OneStep.finalCOMPosition.y[0] ) << " "    // 4
+        << filterprecision( m_OneStep.finalCOMPosition.y[1] ) << " "    // 5
+        << filterprecision( m_OneStep.finalCOMPosition.y[2] ) << " "    // 6
+        << filterprecision( m_OneStep.finalCOMPosition.z[0] ) << " "    // 7
+        << filterprecision( m_OneStep.finalCOMPosition.z[1] ) << " "    // 8
+        << filterprecision( m_OneStep.finalCOMPosition.z[2] ) << " "    // 9
+        << filterprecision( m_OneStep.finalCOMPosition.roll[0] ) << " " // 10
+        << filterprecision( m_OneStep.finalCOMPosition.roll[1] ) << " " // 11
+        << filterprecision( m_OneStep.finalCOMPosition.roll[2] ) << " " // 12
+        << filterprecision( m_OneStep.finalCOMPosition.pitch[0] ) << " "// 13
+        << filterprecision( m_OneStep.finalCOMPosition.pitch[1] ) << " "// 14
+        << filterprecision( m_OneStep.finalCOMPosition.pitch[2] ) << " "// 15
+        << filterprecision( m_OneStep.finalCOMPosition.yaw[0] ) << " "  // 16
+        << filterprecision( m_OneStep.finalCOMPosition.yaw[1] ) << " "  // 17
+        << filterprecision( m_OneStep.finalCOMPosition.yaw[2] ) << " "  // 18
+
+        << filterprecision( m_OneStep.ZMPTarget[0] ) << " "      // 19
+        << filterprecision( m_OneStep.ZMPTarget[1] ) << " "      // 20
+
+        << filterprecision( m_OneStep.LeftFootPosition.x ) << " "       // 21
+        << filterprecision( m_OneStep.LeftFootPosition.y ) << " "       // 22
+        << filterprecision( m_OneStep.LeftFootPosition.z ) << " "       // 23
+        << filterprecision( m_OneStep.LeftFootPosition.theta ) << " "   // 24
+        << filterprecision( m_OneStep.LeftFootPosition.omega ) << " "   // 25
+        << filterprecision( m_OneStep.LeftFootPosition.dx ) << " "      // 26
+        << filterprecision( m_OneStep.LeftFootPosition.dy ) << " "      // 27
+        << filterprecision( m_OneStep.LeftFootPosition.dz ) << " "      // 28
+        << filterprecision( m_OneStep.LeftFootPosition.dtheta ) << " "  // 29
+        << filterprecision( m_OneStep.LeftFootPosition.domega ) << " "  // 30
+        << filterprecision( m_OneStep.LeftFootPosition.ddx ) << " "     // 31
+        << filterprecision( m_OneStep.LeftFootPosition.ddy ) << " "     // 32
+        << filterprecision( m_OneStep.LeftFootPosition.ddz ) << " "     // 33
+        << filterprecision( m_OneStep.LeftFootPosition.ddtheta ) << " " // 34
+        << filterprecision( m_OneStep.LeftFootPosition.ddomega ) << " " // 35
+
+        << filterprecision( m_OneStep.RightFootPosition.x ) << " "       // 36
+        << filterprecision( m_OneStep.RightFootPosition.y ) << " "       // 37
+        << filterprecision( m_OneStep.RightFootPosition.z ) << " "       // 38
+        << filterprecision( m_OneStep.RightFootPosition.theta ) << " "   // 39
+        << filterprecision( m_OneStep.RightFootPosition.omega ) << " "   // 40
+        << filterprecision( m_OneStep.RightFootPosition.dx ) << " "      // 41
+        << filterprecision( m_OneStep.RightFootPosition.dy ) << " "      // 42
+        << filterprecision( m_OneStep.RightFootPosition.dz ) << " "      // 43
+        << filterprecision( m_OneStep.RightFootPosition.dtheta ) << " "  // 44
+        << filterprecision( m_OneStep.RightFootPosition.domega ) << " "  // 45
+        << filterprecision( m_OneStep.RightFootPosition.ddx ) << " "     // 46
+        << filterprecision( m_OneStep.RightFootPosition.ddy ) << " "     // 47
+        << filterprecision( m_OneStep.RightFootPosition.ddz ) << " "     // 48
+        << filterprecision( m_OneStep.RightFootPosition.ddtheta ) << " " // 49
+        << filterprecision( m_OneStep.RightFootPosition.ddomega ) << " ";// 50
+
+    for(unsigned int j = 0 ; j < CurrentConfiguration.size() ; j++ )
+      aof << filterprecision( CurrentConfiguration(j) ) << " " ;
+    for(unsigned int j = 0 ; j < CurrentVelocity.size() ; j++ )
+      aof << filterprecision( CurrentVelocity(j) ) << " " ;
+    for(unsigned int j = 0 ; j < CurrentAcceleration.size() ; j++ )
+      aof << filterprecision( CurrentAcceleration(j) ) << " " ;
+
+    aof << filterprecision( ZMPMB_vec.back()[0] ) << " "                  // 159
+        << filterprecision( ZMPMB_vec.back()[1] ) << " ";                 // 160
+
+    aof << filterprecision( deltaZMP_vec.back()[0] ) << " "                  // 161
+        << filterprecision( deltaZMP_vec.back()[1] ) << " ";                 // 162
+
+
+    aof << endl ;
+
     aof.close();
 
-    iteration_zmp++;
+    ++iteration;
     return ;
   }
 
   void ComputeAndDisplayAverageError(bool display){
     static int plot_it = 0 ;
-    double moyErrX = 0 ;
-    double moyErrY = 0 ;
-    for (unsigned int i = 0 ; i < errZMP_.size(); ++i)
+
+    static double maxErrX = 0 ;
+    static double maxErrY = 0 ;
+    for (unsigned int i = 0 ; i < deltaZMP_vec.size() ; ++i )
     {
-      moyErrX += errZMP_[i][0] ;
-      moyErrY += errZMP_[i][1] ;
+      if ( abs(deltaZMP_vec[i][0]) > maxErrX )
+      {
+        maxErrX = abs(deltaZMP_vec[i][0]) ;
+      }
+      if ( abs(deltaZMP_vec[i][1]) > maxErrY )
+      {
+        maxErrY = abs(deltaZMP_vec[i][1]) ;
+      }
     }
-    moyErrX = moyErrX / errZMP_.size() ;
-    moyErrY = moyErrY / errZMP_.size() ;
-    if ( display )
+
+    static double moyErrX = 0 ;
+    static double moyErrY = 0 ;
+    static double sumErrX = 0 ;
+    static double sumErrY = 0 ;
+    for (unsigned int i = 0 ; i < deltaZMP_vec.size(); ++i)
     {
-      cout << "moyErrX = " << moyErrX << endl
-           << "moyErrY = " << moyErrY << endl ;
+      sumErrX += abs(deltaZMP_vec[i][0]) ;
+      sumErrY += abs(deltaZMP_vec[i][1]) ;
     }
+    moyErrX = sumErrX / deltaZMP_vec.size() ;
+    moyErrY = sumErrY / deltaZMP_vec.size() ;
+
+    if(display)
+    {
+      cout << "moyErrX = " << moyErrX ;
+      cout << "moyErrY = " << moyErrY ;
+      cout << "maxErrX = " << maxErrX ;
+      cout << "maxErrY = " << maxErrY ;
+    }
+
     ofstream aof;
-	  string aFileName;
-	  aFileName = m_TestName;
-	  aFileName += "MoyZMP.dat";
-	  if(plot_it==0){
+    string aFileName;
+    aFileName = "TestMorisawa2007OnLine32MoyFilteredZMP.dat" ;
+    if(plot_it==0){
       aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
-	  }
-	  aof.open(aFileName.c_str(),ofstream::app);
-	  aof.precision(8);
-	  aof.setf(ios::scientific, ios::floatfield);
-	  aof << filterprecision(moyErrX ) << " "        // 1
+    }
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    aof << filterprecision(moyErrX ) << " "        // 1
         << filterprecision(moyErrY ) << " "        // 2
+        << filterprecision(maxErrX ) << " "        // 3
+        << filterprecision(maxErrY ) << " "        // 4
         << endl ;
     aof.close();
+
     plot_it++;
   }
 

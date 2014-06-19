@@ -712,9 +712,12 @@ namespace PatternGeneratorJRL
             for (unsigned i = 0 ; i < N ; ++i)
             {
               current_time += m_kajitaDynamicFilter->getInterpolationPeriod() ;
-              
-              if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(current_time,lIndexInterval,lPrevIndexInterval))
+              bool setTime = !m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(current_time,lIndexInterval,lPrevIndexInterval);
+              if( setTime == 1 )
               {
+                current_time -= m_kajitaDynamicFilter->getInterpolationPeriod();
+                m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval);
+              }
                 /*! Feed the ZMPPositions. */
                 m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(current_time,ZMPPos_deq[i].px,lIndexInterval);
                 m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(current_time,ZMPPos_deq[i].py,lIndexInterval);
@@ -734,32 +737,52 @@ namespace PatternGeneratorJRL
                 /*! Left */
                 m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,current_time,LeftFootAbsPos_deq[i],lIndexInterval);
                 m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,current_time,RightFootAbsPos_deq[i],lIndexInterval);
-              }else
-              {
-                ZMPPos_deq[i]=ZMPPos_deq[i-1];
-                COMPos_deq[i]=COMPos_deq[i-1];
-                LeftFootAbsPos_deq[i]=LeftFootAbsPos_deq[i-1];
-                RightFootAbsPos_deq[i]=RightFootAbsPos_deq[i-1];
-                LeftFootAbsPos_deq[i].time = RightFootAbsPos_deq[i].time = ZMPPos_deq[i].time = current_time ;
-              }
             }
+            m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval);
+            COMState lastCtrlCoMState; memset(&lastCtrlCoMState,0,sizeof(lastCtrlCoMState));
+            ZMPPosition lastCtrlZMP ; memset(&lastCtrlZMP,0,sizeof(lastCtrlZMP));
+            FootAbsolutePosition lastCtrlLeftFoot; memset(&lastCtrlLeftFoot,0,sizeof(lastCtrlLeftFoot));
+            FootAbsolutePosition lastCtrlRightFoot; memset(&lastCtrlRightFoot,0,sizeof(lastCtrlRightFoot));
+
+            m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(time,lastCtrlZMP.px,lIndexInterval);
+            m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(time,lastCtrlZMP.py,lIndexInterval);
+
+            m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,lastCtrlCoMState.x[0],lIndexInterval);
+            m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(time,lastCtrlCoMState.x[1],lIndexInterval);
+            m_AnalyticalZMPCoGTrajectoryX->ComputeCOMAcceleration(time,lastCtrlCoMState.x[2],lIndexInterval);
+
+            m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,lastCtrlCoMState.y[0],lIndexInterval);
+            m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(time,lastCtrlCoMState.y[1],lIndexInterval);
+            m_AnalyticalZMPCoGTrajectoryY->ComputeCOMAcceleration(time,lastCtrlCoMState.y[2],lIndexInterval);
+            lastCtrlCoMState.z[0] = m_InitialPoseCoMHeight;
+
+            m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,time,lastCtrlLeftFoot,lIndexInterval);
+            m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,lastCtrlRightFoot,lIndexInterval);
 
             std::deque<COMState> deltaCoMTraj_deq (1);
             memset(&deltaCoMTraj_deq[0],0,sizeof(deltaCoMTraj_deq[0]));
-            m_kajitaDynamicFilter->filter(COMPos_deq,ZMPPos_deq,LeftFootAbsPos_deq,RightFootAbsPos_deq,deltaCoMTraj_deq);
+
+            m_kajitaDynamicFilter->filter(
+                lastCtrlCoMState,
+                lastCtrlLeftFoot,
+                lastCtrlRightFoot,
+                COMPos_deq,
+                ZMPPos_deq,
+                LeftFootAbsPos_deq,
+                RightFootAbsPos_deq,
+                deltaCoMTraj_deq);
             
-            COMState aCOMState (COMPos_deq[0]) ;
             for(unsigned i = 0 ; i < 3 ; ++i)
             {
-              aCOMState.x[i] += deltaCoMTraj_deq[0].x[i] ;
-              aCOMState.y[i] += deltaCoMTraj_deq[0].y[i] ;
+              lastCtrlCoMState.x[i] += deltaCoMTraj_deq[0].x[i] + aCOMStateToFilter.x[i] ;
+              lastCtrlCoMState.y[i] += deltaCoMTraj_deq[0].y[i] + aCOMStateToFilter.y[i] ;
             }
-            ZMPPos_deq[0].px += aZMPPositionToFilter.px;
-            ZMPPos_deq[0].py += aZMPPositionToFilter.py;
-            FinalZMPPositions.push_back(ZMPPos_deq[0]);
-            FinalCOMStates.push_back(aCOMState);
-            FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos_deq[0]);
-            FinalRightFootAbsolutePositions.push_back(RightFootAbsPos_deq[0]);
+            lastCtrlZMP.px += aZMPPositionToFilter.px;
+            lastCtrlZMP.py += aZMPPositionToFilter.py;
+            FinalZMPPositions.push_back(lastCtrlZMP);
+            FinalCOMStates.push_back(lastCtrlCoMState);
+            FinalLeftFootAbsolutePositions.push_back(lastCtrlLeftFoot);
+            FinalRightFootAbsolutePositions.push_back(lastCtrlRightFoot);
 	  }
       }
     else 

@@ -258,6 +258,19 @@ namespace PatternGeneratorJRL
 		inline void SetPreviousVelocityStage1(MAL_VECTOR_TYPE(double) & prev_Velocity1)
 		{ m_prev_Velocity1 = prev_Velocity1 ;};
 
+		/*! \brief Getter and setter for the previous configurations and velocities */
+		inline void SetPreviousConfigurationStage0(const MAL_VECTOR_TYPE(double) & prev_Configuration)
+		{ m_prev_Configuration = prev_Configuration ;};
+
+		inline void SetPreviousConfigurationStage1(const MAL_VECTOR_TYPE(double) & prev_Configuration1)
+		{ m_prev_Configuration1 = prev_Configuration1 ;};
+
+		inline void SetPreviousVelocityStage0(const MAL_VECTOR_TYPE(double) & prev_Velocity)
+		{ m_prev_Velocity = prev_Velocity ;};
+
+		inline void SetPreviousVelocityStage1(const MAL_VECTOR_TYPE(double) & prev_Velocity1)
+		{ m_prev_Velocity1 = prev_Velocity1 ;};
+
     /*! \brief Getter and setter for the previous configurations and velocities */
     inline MAL_VECTOR_TYPE(double) & GetPreviousConfigurationStage0()
     { return m_prev_Configuration ;};

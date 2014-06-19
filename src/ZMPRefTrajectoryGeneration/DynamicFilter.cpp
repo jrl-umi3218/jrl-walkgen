@@ -7,8 +7,7 @@ using namespace metapod;
 
 DynamicFilter::DynamicFilter(
     SimplePluginManager *SPM,
-    CjrlHumanoidDynamicRobot *aHS
-    )
+    CjrlHumanoidDynamicRobot *aHS)
 {
   currentTime_ = 0.0 ;
   controlPeriod_ = 0.0 ;
@@ -79,8 +78,7 @@ void DynamicFilter::init(
     double interpolationPeriod,
     double PG_T,
     double previewWindowSize,
-    double CoMHeight
-    )
+    double CoMHeight)
 {
   currentTime_ = currentTime ;
   controlPeriod_ = controlPeriod ;
@@ -88,10 +86,10 @@ void DynamicFilter::init(
   PG_T_ = PG_T ;
   previewWindowSize_ = previewWindowSize ;
 
-  if (PG_T>interpolationPeriod_)
+  if (interpolationPeriod_>PG_T)
   {NbI_=1;}
   else
-  {NbI_ = PG_T/interpolationPeriod_;}
+  {NbI_ = (int)(PG_T/interpolationPeriod_);}
 
   NCtrl_ = (int)(PG_T_/controlPeriod_) ;
   PG_N_ = (int)(previewWindowSize_/interpolationPeriod_) ;
@@ -126,147 +124,153 @@ void DynamicFilter::init(
 }
 
 int DynamicFilter::filter(
+    COMState & lastCtrlCoMState,
+    FootAbsolutePosition & lastCtrlLeftFoot,
+    FootAbsolutePosition & lastCtrlRightFoot,
     deque<COMState> & inputCOMTraj_deq_,
     deque<ZMPPosition> inputZMPTraj_deq_,
     deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
     deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-    deque<COMState> & outputDeltaCOMTraj_deq_
-    )
+    deque<COMState> & outputDeltaCOMTraj_deq_)
 {
   InverseKinematics(
+      lastCtrlCoMState,
+      lastCtrlLeftFoot,
+      lastCtrlRightFoot,
       inputCOMTraj_deq_,
       inputLeftFootTraj_deq_,
       inputRightFootTraj_deq_);
 
+  InverseDynamics(inputZMPTraj_deq_);
 
-  //InverseDynamics(inputZMPTraj_deq_);
-
-  //int error = OptimalControl(outputDeltaCOMTraj_deq_);
+  int error = OptimalControl(outputDeltaCOMTraj_deq_);
 
   printBuffers(inputCOMTraj_deq_,
              inputZMPTraj_deq_,
              inputLeftFootTraj_deq_,
              inputRightFootTraj_deq_,
              outputDeltaCOMTraj_deq_);
-  int error = 0 ;
+  printAlongTime(inputCOMTraj_deq_,
+                 inputZMPTraj_deq_,
+                 inputLeftFootTraj_deq_,
+                 inputRightFootTraj_deq_,
+                 outputDeltaCOMTraj_deq_);
   return error ;
 }
 
 void DynamicFilter::InverseKinematics(
+    COMState & lastCtrlCoMState,
+    FootAbsolutePosition & lastCtrlLeftFoot,
+    FootAbsolutePosition & lastCtrlRightFoot,
     deque<COMState> & inputCOMTraj_deq_,
     deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
     deque<FootAbsolutePosition> & inputRightFootTraj_deq_)
 {
-  const int stage0 = 0 ;
-  int iteration = 2 ;
-  comAndFootRealization_->SetPreviousConfigurationStage0(
-      previousConfiguration_);
-  comAndFootRealization_->SetPreviousVelocityStage0(
-      previousVelocity_);
+  int stage0 = 0 ;
+  int stage1 = 1 ;
 
+  comAndFootRealization_->SetPreviousConfigurationStage0(previousConfiguration_);
+  comAndFootRealization_->SetPreviousVelocityStage0(previousVelocity_);
+  comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   for(unsigned int i = 0 ; i <  PG_N_ ; i++ )
   {
-    const COMState & acomp = inputCOMTraj_deq_[i] ;
-    const FootAbsolutePosition & aLeftFAP =
-        inputLeftFootTraj_deq_ [i] ;
-    const FootAbsolutePosition & aRightFAP =
-        inputRightFootTraj_deq_ [i] ;
-
-    aCoMState_(0) = acomp.x[0];      aCoMSpeed_(0) = acomp.x[1];
-    aCoMState_(1) = acomp.y[0];      aCoMSpeed_(1) = acomp.y[1];
-    aCoMState_(2) = acomp.z[0];      aCoMSpeed_(2) = acomp.z[1];
-    aCoMState_(3) = acomp.roll[0];   aCoMSpeed_(3) = acomp.roll[1];
-    aCoMState_(4) = acomp.pitch[0];  aCoMSpeed_(4) = acomp.pitch[1];
-    aCoMState_(5) = acomp.yaw[0];		 aCoMSpeed_(5) = acomp.yaw[1];
-
-    aCoMAcc_(0) = acomp.x[2];    aLeftFootPosition_(0) = aLeftFAP.x;
-    aCoMAcc_(1) = acomp.y[2];    aLeftFootPosition_(1) = aLeftFAP.y;
-    aCoMAcc_(2) = acomp.z[2];    aLeftFootPosition_(2) = aLeftFAP.z;
-    aCoMAcc_(3) = acomp.roll[2]; aLeftFootPosition_(3) = aLeftFAP.theta;
-    aCoMAcc_(4) = acomp.pitch[2];aLeftFootPosition_(4) = aLeftFAP.omega;
-    aCoMAcc_(5) = acomp.yaw[2];
-
-    aRightFootPosition_(0) = aRightFAP.x;
-    aRightFootPosition_(1) = aRightFAP.y;
-    aRightFootPosition_(2) = aRightFAP.z;
-    aRightFootPosition_(3) = aRightFAP.theta;
-    aRightFootPosition_(4) = aRightFAP.omega;
-
-    comAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(
-        aCoMState_, aCoMSpeed_, aCoMAcc_,
-        aLeftFootPosition_, aRightFootPosition_,
-        configurationTraj_[i],
-        velocityTraj_[i],
-        accelerationTraj_[i],
-        iteration, stage0);
+    InverseKinematics(inputCOMTraj_deq_[i],inputLeftFootTraj_deq_ [i], inputRightFootTraj_deq_ [i],
+                      configurationTraj_[i],velocityTraj_[i],accelerationTraj_[i],
+                      interpolationPeriod_, stage0);
   }
 
-//  tmpConfigurationTraj_[0] = ( ConfigurationTraj_[1]+ConfigurationTraj_[0]+PreviousConfiguration_ )/3;
-//  tmpVelocityTraj_[0]      = ( VelocityTraj_[1]+VelocityTraj_[0]+PreviousVelocity_ )/3;
-//  tmpAccelerationTraj_[0]  = ( AccelerationTraj_[1]+AccelerationTraj_[0]+PreviousAcceleration_ )/3;
-
-  // saving the precedent state of the next QP_ computation
-  previousConfiguration_ = configurationTraj_[NbI_-1] ;
-  previousVelocity_ = velocityTraj_[NbI_-1] ;
-  previousAcceleration_ = accelerationTraj_[NbI_-1] ;
-
-//  for (unsigned int i = 1 ; i < N-1 ; ++i )
-//  {
-//    tmpConfigurationTraj_[i] = ( ConfigurationTraj_[i+1] + ConfigurationTraj_[i] + ConfigurationTraj_[i-1] )/3;
-//    tmpVelocityTraj_[i] = ( VelocityTraj_[i+1] + VelocityTraj_[i] + VelocityTraj_[i-1] )/3;
-//    tmpAccelerationTraj_[i] = ( AccelerationTraj_[i+1] + AccelerationTraj_[i] + AccelerationTraj_[i-1] )/3;
-//  }
-//
-//  tmpConfigurationTraj_[N-1] = ( ConfigurationTraj_[N-1]+ConfigurationTraj_[N-2] )*0.5;
-//  tmpVelocityTraj_[N-1]      = ( VelocityTraj_[N-1]+VelocityTraj_[N-2] )*0.5;
-//  tmpAccelerationTraj_[N-1]  = ( AccelerationTraj_[N-1]+AccelerationTraj_[N-2] )*0.5;
-//
-//
-//  ConfigurationTraj_ = tmpConfigurationTraj_ ;
-//  VelocityTraj_ = tmpVelocityTraj_ ;
-//  AccelerationTraj_ = tmpAccelerationTraj_ ;
-
+  InverseKinematics(lastCtrlCoMState, lastCtrlLeftFoot, lastCtrlRightFoot,
+                    previousConfiguration_,previousVelocity_,previousAcceleration_,
+                    controlPeriod_, stage1);
   return ;
 }
 
-void DynamicFilter::InverseDynamics(
-    deque<ZMPPosition> inputZMPTraj_deq_)
+void DynamicFilter::InverseKinematics(
+    COMState & inputCoMState,
+    FootAbsolutePosition & inputLeftFoot,
+    FootAbsolutePosition & inputRightFoot,
+    MAL_VECTOR_TYPE(double)& configuration,
+    MAL_VECTOR_TYPE(double)& velocity,
+    MAL_VECTOR_TYPE(double)& acceleration,
+    double samplingPeriod,
+    int stage)
+{
+  int iteration = 2 ;
+  aCoMState_(0) = inputCoMState.x[0];      aCoMSpeed_(0) = inputCoMState.x[1];
+  aCoMState_(1) = inputCoMState.y[0];      aCoMSpeed_(1) = inputCoMState.y[1];
+  aCoMState_(2) = inputCoMState.z[0];      aCoMSpeed_(2) = inputCoMState.z[1];
+  aCoMState_(3) = inputCoMState.roll[0];   aCoMSpeed_(3) = inputCoMState.roll[1];
+  aCoMState_(4) = inputCoMState.pitch[0];  aCoMSpeed_(4) = inputCoMState.pitch[1];
+  aCoMState_(5) = inputCoMState.yaw[0];    aCoMSpeed_(5) = inputCoMState.yaw[1];
+
+  aCoMAcc_(0) = inputCoMState.x[2];    aLeftFootPosition_(0) = inputLeftFoot.x;
+  aCoMAcc_(1) = inputCoMState.y[2];    aLeftFootPosition_(1) = inputLeftFoot.y;
+  aCoMAcc_(2) = inputCoMState.z[2];    aLeftFootPosition_(2) = inputLeftFoot.z;
+  aCoMAcc_(3) = inputCoMState.roll[2]; aLeftFootPosition_(3) = inputLeftFoot.theta;
+  aCoMAcc_(4) = inputCoMState.pitch[2];aLeftFootPosition_(4) = inputLeftFoot.omega;
+  aCoMAcc_(5) = inputCoMState.yaw[2];
+
+  aRightFootPosition_(0) = inputRightFoot.x;
+  aRightFootPosition_(1) = inputRightFoot.y;
+  aRightFootPosition_(2) = inputRightFoot.z;
+  aRightFootPosition_(3) = inputRightFoot.theta;
+  aRightFootPosition_(4) = inputRightFoot.omega;
+
+  comAndFootRealization_->setSamplingPeriod(samplingPeriod);
+  comAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(
+      aCoMState_, aCoMSpeed_, aCoMAcc_,
+      aLeftFootPosition_, aRightFootPosition_,
+      configuration, velocity, acceleration,
+      iteration, stage);
+  return;
+}
+
+void DynamicFilter::InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq)
 {
   for (unsigned int i = 0 ; i < PG_N_ ; i++ )
   {
-    // Copy the angular trajectory data from "Boost" to "Eigen"
-    for(unsigned int j = 0 ; j < configurationTraj_[i].size() ; j++ )
-    {
-      m_q(j,0) = configurationTraj_[i](j) ;
-      m_dq(j,0) = velocityTraj_[i](j) ;
-      m_ddq(j,0) = accelerationTraj_[i](j) ;
-    }
-
-    // Apply the RNEA on the robot model
-    metapod::rnea< Robot_Model, true >::run(m_robot, m_q, m_dq, m_ddq);
-
-    Node & node =
-        boost::fusion::at_c<Robot_Model::BODY>(m_robot.nodes);
-    m_force = node.body.iX0.applyInv (node.joint.f);
+    ComputeZMPMB(configurationTraj_[i],velocityTraj_[i],accelerationTraj_[i],ZMPMB_vec_[i]);
 
     if (Once_){
-      DInitX_ = inputZMPTraj_deq_[0].px -
-                ( - m_force.n()[1] / m_force.f()[2] ) ;
-      DInitY_ = inputZMPTraj_deq_[0].py -
-                (   m_force.n()[0] / m_force.f()[2] ) ;
+      DInitX_ = inputZMPTraj_deq[0].px - ZMPMB_vec_[i][0];
+      DInitY_ = inputZMPTraj_deq[0].py - ZMPMB_vec_[i][1];
       Once_ = false ;
     }
 
-    ZMPMB_vec_[i][0] = - m_force.n()[1] / m_force.f()[2] + DInitX_ ;
-    ZMPMB_vec_[i][1] =   m_force.n()[0] / m_force.f()[2] + DInitY_ ;
-
-    deltaZMP_deq_[i].px = inputZMPTraj_deq_[i].px - ZMPMB_vec_[i][0] ;
-    deltaZMP_deq_[i].py = inputZMPTraj_deq_[i].py - ZMPMB_vec_[i][1] ;
+    deltaZMP_deq_[i].px = inputZMPTraj_deq[i].px - ZMPMB_vec_[i][0] - DInitX_  ;
+    deltaZMP_deq_[i].py = inputZMPTraj_deq[i].py - ZMPMB_vec_[i][1] - DInitY_  ;
     deltaZMP_deq_[i].pz = 0.0 ;
     deltaZMP_deq_[i].theta = 0.0 ;
     deltaZMP_deq_[i].time = currentTime_ + i * interpolationPeriod_ ;
-    deltaZMP_deq_[i].stepType = inputZMPTraj_deq_[i].stepType ;
+    deltaZMP_deq_[i].stepType = inputZMPTraj_deq[i].stepType ;
   }
+  return ;
+}
+
+void DynamicFilter::ComputeZMPMB(
+    MAL_VECTOR_TYPE(double) & configuration,
+    MAL_VECTOR_TYPE(double) & velocity,
+    MAL_VECTOR_TYPE(double) & acceleration,
+    vector<double> & ZMPMB)
+{
+  // Copy the angular trajectory data from "Boost" to "Eigen"
+  for(unsigned int j = 0 ; j < configuration.size() ; j++ )
+  {
+    m_q(j,0) = configuration(j) ;
+    m_dq(j,0) = velocity(j) ;
+    m_ddq(j,0) = acceleration(j) ;
+  }
+
+  // Apply the RNEA on the robot model
+  metapod::rnea< Robot_Model, true >::run(m_robot, m_q, m_dq, m_ddq);
+
+  Node & node = boost::fusion::at_c<Robot_Model::BODY>(m_robot.nodes);
+  m_force = node.body.iX0.applyInv (node.joint.f);
+
+  ZMPMB.resize(2);
+  ZMPMB[0] = - m_force.n()[1] / m_force.f()[2] ;
+  ZMPMB[1] =   m_force.n()[0] / m_force.f()[2] ;
+
   return ;
 }
 
@@ -332,8 +336,7 @@ void DynamicFilter::printAlongTime(deque<COMState> & inputCOMTraj_deq_,
                                deque<ZMPPosition> inputZMPTraj_deq_,
                                deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
                                deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-                               deque<COMState> & outputDeltaCOMTraj_deq_
-                               )
+                               deque<COMState> & outputDeltaCOMTraj_deq_)
 {  
   // Debug Purpose
   // -------------
@@ -341,12 +344,9 @@ void DynamicFilter::printAlongTime(deque<COMState> & inputCOMTraj_deq_,
   string aFileName;
   ostringstream oss(std::ostringstream::ate);
   static int iteration = 0;
-//  int iteration100 = (int)iteration/100;
-//  int iteration10 = (int)(iteration - iteration100*100)/10;
-//  int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
 
   // --------------------
-  oss.str("DynamicFilterAllVariablesAlongInTime.dat");
+  oss.str("DynamicFilterAllVariablesNoisyAlongInTime.dat");
   aFileName = oss.str();
   if(iteration == 0)
   {
@@ -357,87 +357,82 @@ void DynamicFilter::printAlongTime(deque<COMState> & inputCOMTraj_deq_,
   aof.open(aFileName.c_str(),ofstream::app);
   aof.precision(8);
   aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < NbI_ ; ++i )
-  {
-    aof << filterprecision( iteration*controlPeriod_ + i*interpolationPeriod_ ) << " " // 0
-        << filterprecision( inputCOMTraj_deq_[i].x[0] ) << " "    // 1
-        << filterprecision( inputCOMTraj_deq_[i].x[1] ) << " "    // 2
-        << filterprecision( inputCOMTraj_deq_[i].x[2] ) << " "    // 3
-        << filterprecision( inputCOMTraj_deq_[i].y[0] ) << " "    // 4
-        << filterprecision( inputCOMTraj_deq_[i].y[1] ) << " "    // 5
-        << filterprecision( inputCOMTraj_deq_[i].y[2] ) << " "    // 6
-        << filterprecision( inputCOMTraj_deq_[i].z[0] ) << " "    // 7
-        << filterprecision( inputCOMTraj_deq_[i].z[1] ) << " "    // 8
-        << filterprecision( inputCOMTraj_deq_[i].z[2] ) << " "    // 9
-        << filterprecision( inputCOMTraj_deq_[i].roll[0] ) << " " // 10
-        << filterprecision( inputCOMTraj_deq_[i].roll[1] ) << " " // 11
-        << filterprecision( inputCOMTraj_deq_[i].roll[2] ) << " " // 12
-        << filterprecision( inputCOMTraj_deq_[i].pitch[0] ) << " "// 13
-        << filterprecision( inputCOMTraj_deq_[i].pitch[1] ) << " "// 14
-        << filterprecision( inputCOMTraj_deq_[i].pitch[2] ) << " "// 15
-        << filterprecision( inputCOMTraj_deq_[i].yaw[0] ) << " "  // 16
-        << filterprecision( inputCOMTraj_deq_[i].yaw[1] ) << " "  // 17
-        << filterprecision( inputCOMTraj_deq_[i].yaw[2] ) << " "  // 18
+  aof << filterprecision( iteration*controlPeriod_) << " " // 0
+      << filterprecision( inputCOMTraj_deq_[0].x[0] ) << " "    // 1
+      << filterprecision( inputCOMTraj_deq_[0].x[1] ) << " "    // 2
+      << filterprecision( inputCOMTraj_deq_[0].x[2] ) << " "    // 3
+      << filterprecision( inputCOMTraj_deq_[0].y[0] ) << " "    // 4
+      << filterprecision( inputCOMTraj_deq_[0].y[1] ) << " "    // 5
+      << filterprecision( inputCOMTraj_deq_[0].y[2] ) << " "    // 6
+      << filterprecision( inputCOMTraj_deq_[0].z[0] ) << " "    // 7
+      << filterprecision( inputCOMTraj_deq_[0].z[1] ) << " "    // 8
+      << filterprecision( inputCOMTraj_deq_[0].z[2] ) << " "    // 9
+      << filterprecision( inputCOMTraj_deq_[0].roll[0] ) << " " // 10
+      << filterprecision( inputCOMTraj_deq_[0].roll[1] ) << " " // 11
+      << filterprecision( inputCOMTraj_deq_[0].roll[2] ) << " " // 12
+      << filterprecision( inputCOMTraj_deq_[0].pitch[0] ) << " "// 13
+      << filterprecision( inputCOMTraj_deq_[0].pitch[1] ) << " "// 14
+      << filterprecision( inputCOMTraj_deq_[0].pitch[2] ) << " "// 15
+      << filterprecision( inputCOMTraj_deq_[0].yaw[0] ) << " "  // 16
+      << filterprecision( inputCOMTraj_deq_[0].yaw[1] ) << " "  // 17
+      << filterprecision( inputCOMTraj_deq_[0].yaw[2] ) << " "  // 18
 
-        << filterprecision( inputZMPTraj_deq_[i].px ) << " "      // 19
-        << filterprecision( inputZMPTraj_deq_[i].py ) << " "      // 20
+      << filterprecision( inputZMPTraj_deq_[0].px ) << " "      // 19
+      << filterprecision( inputZMPTraj_deq_[0].py ) << " "      // 20
 
-        << filterprecision( ZMPMB_vec_[i][0] ) << " "                  // 21
-        << filterprecision( ZMPMB_vec_[i][1] ) << " "                  // 22
+      << filterprecision( ZMPMB_vec_[0][0] ) << " "                  // 21
+      << filterprecision( ZMPMB_vec_[0][1] ) << " "                  // 22
 
-        << filterprecision( inputLeftFootTraj_deq_[i].x ) << " "       // 23
-        << filterprecision( inputLeftFootTraj_deq_[i].y ) << " "       // 24
-        << filterprecision( inputLeftFootTraj_deq_[i].z ) << " "       // 25
-        << filterprecision( inputLeftFootTraj_deq_[i].theta ) << " "   // 26
-        << filterprecision( inputLeftFootTraj_deq_[i].omega ) << " "   // 27
-        << filterprecision( inputLeftFootTraj_deq_[i].dx ) << " "      // 28
-        << filterprecision( inputLeftFootTraj_deq_[i].dy ) << " "      // 29
-        << filterprecision( inputLeftFootTraj_deq_[i].dz ) << " "      // 30
-        << filterprecision( inputLeftFootTraj_deq_[i].dtheta ) << " "  // 31
-        << filterprecision( inputLeftFootTraj_deq_[i].domega ) << " "  // 32
-        << filterprecision( inputLeftFootTraj_deq_[i].ddx ) << " "     // 33
-        << filterprecision( inputLeftFootTraj_deq_[i].ddy ) << " "     // 34
-        << filterprecision( inputLeftFootTraj_deq_[i].ddz ) << " "     // 35
-        << filterprecision( inputLeftFootTraj_deq_[i].ddtheta ) << " " // 36
-        << filterprecision( inputLeftFootTraj_deq_[i].ddomega ) << " " // 37
+      << filterprecision( inputLeftFootTraj_deq_[0].x ) << " "       // 23
+      << filterprecision( inputLeftFootTraj_deq_[0].y ) << " "       // 24
+      << filterprecision( inputLeftFootTraj_deq_[0].z ) << " "       // 25
+      << filterprecision( inputLeftFootTraj_deq_[0].theta ) << " "   // 26
+      << filterprecision( inputLeftFootTraj_deq_[0].omega ) << " "   // 27
+      << filterprecision( inputLeftFootTraj_deq_[0].dx ) << " "      // 28
+      << filterprecision( inputLeftFootTraj_deq_[0].dy ) << " "      // 29
+      << filterprecision( inputLeftFootTraj_deq_[0].dz ) << " "      // 30
+      << filterprecision( inputLeftFootTraj_deq_[0].dtheta ) << " "  // 31
+      << filterprecision( inputLeftFootTraj_deq_[0].domega ) << " "  // 32
+      << filterprecision( inputLeftFootTraj_deq_[0].ddx ) << " "     // 33
+      << filterprecision( inputLeftFootTraj_deq_[0].ddy ) << " "     // 34
+      << filterprecision( inputLeftFootTraj_deq_[0].ddz ) << " "     // 35
+      << filterprecision( inputLeftFootTraj_deq_[0].ddtheta ) << " " // 36
+      << filterprecision( inputLeftFootTraj_deq_[0].ddomega ) << " " // 37
 
-        << filterprecision( inputRightFootTraj_deq_[i].x ) << " "      // 38
-        << filterprecision( inputRightFootTraj_deq_[i].y ) << " "      // 39
-        << filterprecision( inputRightFootTraj_deq_[i].z ) << " "      // 40
-        << filterprecision( inputRightFootTraj_deq_[i].theta ) << " "  // 41
-        << filterprecision( inputRightFootTraj_deq_[i].omega ) << " "  // 42
-        << filterprecision( inputRightFootTraj_deq_[i].dx ) << " "     // 43
-        << filterprecision( inputRightFootTraj_deq_[i].dy ) << " "     // 44
-        << filterprecision( inputRightFootTraj_deq_[i].dz ) << " "     // 45
-        << filterprecision( inputRightFootTraj_deq_[i].dtheta ) << " " // 46
-        << filterprecision( inputRightFootTraj_deq_[i].domega ) << " " // 47
-        << filterprecision( inputRightFootTraj_deq_[i].ddx ) << " "    // 48
-        << filterprecision( inputRightFootTraj_deq_[i].ddy ) << " "    // 49
-        << filterprecision( inputRightFootTraj_deq_[i].ddz ) << " "    // 50
-        << filterprecision( inputRightFootTraj_deq_[i].ddtheta ) << " "// 51
-        << filterprecision( inputRightFootTraj_deq_[i].ddomega ) << " ";// 52
+      << filterprecision( inputRightFootTraj_deq_[0].x ) << " "      // 38
+      << filterprecision( inputRightFootTraj_deq_[0].y ) << " "      // 39
+      << filterprecision( inputRightFootTraj_deq_[0].z ) << " "      // 40
+      << filterprecision( inputRightFootTraj_deq_[0].theta ) << " "  // 41
+      << filterprecision( inputRightFootTraj_deq_[0].omega ) << " "  // 42
+      << filterprecision( inputRightFootTraj_deq_[0].dx ) << " "     // 43
+      << filterprecision( inputRightFootTraj_deq_[0].dy ) << " "     // 44
+      << filterprecision( inputRightFootTraj_deq_[0].dz ) << " "     // 45
+      << filterprecision( inputRightFootTraj_deq_[0].dtheta ) << " " // 46
+      << filterprecision( inputRightFootTraj_deq_[0].domega ) << " " // 47
+      << filterprecision( inputRightFootTraj_deq_[0].ddx ) << " "    // 48
+      << filterprecision( inputRightFootTraj_deq_[0].ddy ) << " "    // 49
+      << filterprecision( inputRightFootTraj_deq_[0].ddz ) << " "    // 50
+      << filterprecision( inputRightFootTraj_deq_[0].ddtheta ) << " "// 51
+      << filterprecision( inputRightFootTraj_deq_[0].ddomega ) << " ";// 52
 
-    for(unsigned int j = 0 ; j < configurationTraj_[i].size() ; j++ )
-      aof << filterprecision( configurationTraj_[i](j) ) << " " ;
-    for(unsigned int j = 0 ; j < velocityTraj_[i].size() ; j++ )
-      aof << filterprecision( velocityTraj_[i](j) ) << " " ;
-    for(unsigned int j = 0 ; j < accelerationTraj_[i].size() ; j++ )
-      aof << filterprecision( accelerationTraj_[i](j) ) << " " ;
-    aof << endl ;
-  }
+  for(unsigned int j = 0 ; j < previousConfiguration_.size() ; j++ )
+    aof << filterprecision( previousConfiguration_(j) ) << " " ;
+  for(unsigned int j = 0 ; j < previousVelocity_.size() ; j++ )
+    aof << filterprecision( previousVelocity_(j) ) << " " ;
+  for(unsigned int j = 0 ; j < previousAcceleration_.size() ; j++ )
+    aof << filterprecision( accelerationTraj_[0](j) ) << " " ;
+
+  aof << filterprecision( outputDeltaCOMTraj_deq_[0].x[0] ) << " "
+      << filterprecision( outputDeltaCOMTraj_deq_[0].x[1] ) << " "
+      << filterprecision( outputDeltaCOMTraj_deq_[0].x[2] ) << " "
+      << filterprecision( outputDeltaCOMTraj_deq_[0].y[0] ) << " "
+      << filterprecision( outputDeltaCOMTraj_deq_[0].y[1] ) << " "
+      << filterprecision( outputDeltaCOMTraj_deq_[0].y[2] ) << " ";
+
+  aof << endl ;
   aof.close();
 
   ++iteration;
-
-  static double ecartmaxX = 0 ;
-  static double ecartmaxY = 0 ;
-  for (unsigned int i = 0 ; i < deltaZMP_deq_.size() ; i++ )
-  {
-    if ( abs(deltaZMP_deq_[i].px) > ecartmaxX )
-      ecartmaxX = abs(deltaZMP_deq_[i].px) ;
-    if ( abs(deltaZMP_deq_[i].py) > ecartmaxY )
-      ecartmaxY = abs(deltaZMP_deq_[i].py) ;
-  }
 
   return ;
 }
@@ -446,8 +441,7 @@ void DynamicFilter::printBuffers(deque<COMState> & inputCOMTraj_deq_,
                 deque<ZMPPosition> inputZMPTraj_deq_,
                 deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
                 deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-                deque<COMState> & outputDeltaCOMTraj_deq_
-                )
+                deque<COMState> & outputDeltaCOMTraj_deq_)
 {
   // Debug Purpose
   // -------------
@@ -527,10 +521,6 @@ void DynamicFilter::printBuffers(deque<COMState> & inputCOMTraj_deq_,
         << filterprecision( inputRightFootTraj_deq_[i].ddtheta ) << " " // 49
         << filterprecision( inputRightFootTraj_deq_[i].ddomega ) << " ";// 50
 
-    //        << filterprecision( ZMPMB_vec_[i][0] ) << " "                  // 21
-    //        << filterprecision( ZMPMB_vec_[i][1] ) << " "                  // 22
-
-
     for(unsigned int j = 0 ; j < configurationTraj_[i].size() ; j++ )
       aof << filterprecision( configurationTraj_[i](j) ) << " " ;
     for(unsigned int j = 0 ; j < velocityTraj_[i].size() ; j++ )
@@ -538,8 +528,59 @@ void DynamicFilter::printBuffers(deque<COMState> & inputCOMTraj_deq_,
     for(unsigned int j = 0 ; j < accelerationTraj_[i].size() ; j++ )
       aof << filterprecision( accelerationTraj_[i](j) ) << " " ;
 
+    aof << filterprecision( ZMPMB_vec_[i][0] ) << " "                  // 159
+        << filterprecision( ZMPMB_vec_[i][1] ) << " ";                 // 160
+
+    aof << filterprecision( deltaZMP_deq_[i].px ) << " "                  // 161
+        << filterprecision( deltaZMP_deq_[i].py ) << " ";                 // 162
+
+
     aof << endl ;
   }
+  aof.close();
+
+
+  static double maxErrX = 0 ;
+  static double maxErrY = 0 ;
+  for (unsigned int i = 0 ; i < deltaZMP_deq_.size() ; ++i )
+  {
+    if ( deltaZMP_deq_[i].px > maxErrX )
+    {
+      maxErrX = deltaZMP_deq_[i].px ;
+    }
+    if ( deltaZMP_deq_[i].py > maxErrY )
+    {
+      maxErrY = deltaZMP_deq_[i].py ;
+    }
+  }
+
+  static double moyErrX = 0 ;
+  static double moyErrY = 0 ;
+  static double sumErrX = 0 ;
+  static double sumErrY = 0 ;
+  static int nbRNEAcomputed = 0 ;
+  for (unsigned int i = 0 ; i < deltaZMP_deq_.size(); ++i)
+  {
+    sumErrX += deltaZMP_deq_[i].px ;
+    sumErrY += deltaZMP_deq_[i].py ;
+  }
+  nbRNEAcomputed += deltaZMP_deq_.size() ;
+  moyErrX = sumErrX / nbRNEAcomputed ;
+  moyErrY = sumErrY / nbRNEAcomputed ;
+
+  aFileName = "TestMorisawa2007OnLine32MoyNoisyZMP.dat" ;
+  if(iteration==0){
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  aof << filterprecision(moyErrX ) << " "        // 1
+      << filterprecision(moyErrY ) << " "        // 2
+      << filterprecision(maxErrX ) << " "        // 3
+      << filterprecision(maxErrY ) << " "        // 4
+      << endl ;
   aof.close();
 
 

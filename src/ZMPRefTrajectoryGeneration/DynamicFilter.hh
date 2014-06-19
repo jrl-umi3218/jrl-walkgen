@@ -29,6 +29,9 @@ namespace PatternGeneratorJRL
     ~DynamicFilter();
     /// \brief
     int filter(
+        COMState & lastCtrlCoMState,
+        FootAbsolutePosition & lastCtrlLeftFoot,
+        FootAbsolutePosition & lastCtrlRightFoot,
         deque<COMState> & inputCOMTraj_deq_,
         deque<ZMPPosition> inputZMPTraj_deq_,
         deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
@@ -45,37 +48,60 @@ namespace PatternGeneratorJRL
         double CoMHeight
         );
 
+    /// \brief atomic function
+    void InverseKinematics(
+        COMState & inputCoMState,
+        FootAbsolutePosition & inputLeftFoot,
+        FootAbsolutePosition & inputRightFoot,
+        MAL_VECTOR_TYPE(double)& configuration,
+        MAL_VECTOR_TYPE(double)& velocity,
+        MAL_VECTOR_TYPE(double)& acceleration,
+        double samplingPeriod,
+        int stage);
+
+    /// \brief atomic function
+    void ComputeZMPMB(
+        MAL_VECTOR_TYPE(double)& configuration,
+        MAL_VECTOR_TYPE(double)& velocity,
+        MAL_VECTOR_TYPE(double)& acceleration,
+        vector<double> & ZMPMB);
+
   private: // Private methods
 
-    // \brief calculate, from the CoM computed by the preview control,
-    //    the corresponding articular position, velocity and acceleration
+    /// \brief calculate, from the CoM computed by the preview control,
+    ///    the corresponding articular position, velocity and acceleration
     void InverseKinematics(
+        COMState & lastCtrlCoMState,
+        FootAbsolutePosition & lastCtrlLeftFoot,
+        FootAbsolutePosition & lastCtrlRightFoot,
         deque<COMState> & inputCOMTraj_deq_,
         deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-        deque<FootAbsolutePosition> & inputRightFootTraj_deq_
-        );
+        deque<FootAbsolutePosition> & inputRightFootTraj_deq_);
 
-    // Apply the RNEA on the robot model
-    void InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq_);
+    /// \brief Apply the RNEA on the robot model and over the whole trajectory
+    /// given by the function "filter"
+    void InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq);
 
-    /// Preview control on the ZMPMBs computed
-    /// --------------------------------------
+    /// \brief Preview control on the ZMPMBs computed
     int OptimalControl(std::deque<COMState> & outputDeltaCOMTraj_deq_);
 
+    // -------------------------------------------------------------------
+
+    /// \brief Debug function
     void printAlongTime(deque<COMState> & inputCOMTraj_deq_,
                     deque<ZMPPosition> inputZMPTraj_deq_,
                     deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
                     deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
                     deque<COMState> & outputDeltaCOMTraj_deq_
                     );
-
+    /// \brief Debug function
     void printBuffers(deque<COMState> & inputCOMTraj_deq_,
                     deque<ZMPPosition> inputZMPTraj_deq_,
                     deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
                     deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
                     deque<COMState> & outputDeltaCOMTraj_deq_
                     );
-
+    /// \brief Debug function
     double filterprecision(double adb);
 
 
@@ -98,7 +124,7 @@ namespace PatternGeneratorJRL
     { previewWindowSize_ = previewWindowSize; }
 
     /// \brief getter :
-    inline ComAndFootRealization * getComAndFootRealization()
+    inline ComAndFootRealizationByGeometry * getComAndFootRealization()
     { return comAndFootRealization_;};
 
     inline double getCurrentTime()
