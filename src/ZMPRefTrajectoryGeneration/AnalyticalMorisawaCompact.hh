@@ -559,6 +559,22 @@ namespace PatternGeneratorJRL
 		      deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
 		      deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions);
 
+      void FillQueues(double SamplingPeriod,
+                      double StartingTime,
+                      double EndTime,
+                      deque<ZMPPosition> & FinalZMPPositions,
+                      deque<COMState> & FinalCoMPositions,
+                      deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+                      deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions);
+
+      void ComputeOneElementOfTheQueue(unsigned int & lIndexInterval,
+                                       unsigned int & lPrevIndexInterval,
+                                       double t,
+                                       ZMPPosition & FinalZMPPosition,
+                                       COMState & FinalCoMPosition,
+                                       FootAbsolutePosition & FinalLeftFootAbsolutePosition,
+                                       FootAbsolutePosition & FinalRightFootAbsolutePosition);
+
       /*! \brief LU decomposition of the Z matrix. */
       MAL_MATRIX_TYPE(double) m_AF;
 

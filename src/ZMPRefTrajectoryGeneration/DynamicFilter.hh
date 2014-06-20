@@ -25,7 +25,8 @@ namespace PatternGeneratorJRL
 
     /// \brief
     DynamicFilter(SimplePluginManager *SPM,
-                  CjrlHumanoidDynamicRobot *aHS);
+                  CjrlHumanoidDynamicRobot *aHS
+                  );
     ~DynamicFilter();
     /// \brief
     int filter(
@@ -45,7 +46,8 @@ namespace PatternGeneratorJRL
         double interpolationPeriod,
         double PG_T,
         double previewWindowSize,
-        double CoMHeight
+        double CoMHeight,
+        FootAbsolutePosition supportFoot
         );
 
     /// \brief atomic function
@@ -57,14 +59,18 @@ namespace PatternGeneratorJRL
         MAL_VECTOR_TYPE(double)& velocity,
         MAL_VECTOR_TYPE(double)& acceleration,
         double samplingPeriod,
-        int stage);
+        int stage,
+        int iteration);
 
-    /// \brief atomic function
+    /// \brief atomic function allow to compute
     void ComputeZMPMB(
-        MAL_VECTOR_TYPE(double)& configuration,
-        MAL_VECTOR_TYPE(double)& velocity,
-        MAL_VECTOR_TYPE(double)& acceleration,
-        vector<double> & ZMPMB);
+        double samplingPeriod,
+        COMState  inputCoMState,
+        FootAbsolutePosition  inputLeftFoot,
+        FootAbsolutePosition  inputRightFoot,
+        vector<double> & ZMPMB,
+        int iteration);
+
 
   private: // Private methods
 
@@ -81,6 +87,13 @@ namespace PatternGeneratorJRL
     /// \brief Apply the RNEA on the robot model and over the whole trajectory
     /// given by the function "filter"
     void InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq);
+
+    /// \brief Compute the ZMPMB according to a configuration
+    void ComputeZMPMB(
+        MAL_VECTOR_TYPE(double) & configuration,
+        MAL_VECTOR_TYPE(double) & velocity,
+        MAL_VECTOR_TYPE(double) & acceleration,
+        vector<double> & ZMPMB);
 
     /// \brief Preview control on the ZMPMBs computed
     int OptimalControl(std::deque<COMState> & outputDeltaCOMTraj_deq_);
@@ -186,6 +199,17 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_TYPE(double) aCoMAcc_;
       MAL_VECTOR_TYPE(double) aLeftFootPosition_;
       MAL_VECTOR_TYPE(double) aRightFootPosition_;
+
+      /// \brief used to compute the ZMPMB from only
+      /// com and feet position from outside of the class
+      MAL_VECTOR_TYPE(double) ZMPMBConfiguration_ ;
+      MAL_VECTOR_TYPE(double) ZMPMBVelocity_ ;
+      MAL_VECTOR_TYPE(double) ZMPMBAcceleration_ ;
+
+      /// \brief data of the previous iteration
+      Eigen::Matrix< LocalFloatType, 6, 1 > PreviousSupportFoot_ ;
+      Robot_Model::confVector m_prev_q, m_prev_dq, m_prev_ddq;
+
 
     /// \brief Inverse Dynamics variables
     /// ---------------------------------

@@ -222,7 +222,16 @@ public:
 
     SPM_ = new SimplePluginManager();
     dynamicfilter_ = new DynamicFilter(SPM_,m_HDR);
-    dynamicfilter_->init(0.0,samplingPeriod_,samplingPeriod_,samplingPeriod_,samplingPeriod_,0.814);
+
+    FootAbsolutePosition supportFoot ;
+    if (m_OneStep.LeftFootPosition.stepType<0)
+    {
+      supportFoot = m_OneStep.LeftFootPosition ;
+    }
+    else{
+      supportFoot = m_OneStep.RightFootPosition ;
+    }
+    dynamicfilter_->init(0.0,samplingPeriod_,samplingPeriod_,samplingPeriod_,samplingPeriod_,0.814,supportFoot);
     initIK();
   }
 
@@ -398,28 +407,17 @@ protected:
     string aFileName;
     ostringstream oss(std::ostringstream::ate);
     static int iteration = 0;
-
-    MAL_VECTOR(CurrentConfiguration,double);
-    MAL_VECTOR(CurrentVelocity,double);
-    MAL_VECTOR(CurrentAcceleration,double);
-
-    MAL_VECTOR_RESIZE(CurrentConfiguration, m_HDR->numberDof());
-    MAL_VECTOR_RESIZE(CurrentVelocity, m_HDR->numberDof());
-    MAL_VECTOR_RESIZE(CurrentAcceleration, m_HDR->numberDof());
-
-    dynamicfilter_->InverseKinematics(
-        m_OneStep.finalCOMPosition,m_OneStep.LeftFootPosition,m_OneStep.RightFootPosition,
-        CurrentConfiguration,CurrentVelocity,CurrentAcceleration,samplingPeriod_,iteration);
-
-    vector<double> dZMPtmp (2);
-    vector<double> ZMPMBtmp (2);
-    dynamicfilter_->ComputeZMPMB(CurrentConfiguration,CurrentVelocity,CurrentAcceleration,ZMPMBtmp);
+    vector<double> ZMPMBtmp;
+    dynamicfilter_->ComputeZMPMB(
+        samplingPeriod_, m_OneStep.finalCOMPosition, m_OneStep.LeftFootPosition,
+        m_OneStep.RightFootPosition, ZMPMBtmp, iteration);
 
     if (m_OneStep.NbOfIt<=10){
       dInitX_ = m_OneStep.ZMPTarget(0) - ZMPMBtmp[0] ;
       dInitY_ = m_OneStep.ZMPTarget(1) - ZMPMBtmp[1] ;
     }
 
+    vector<double> dZMPtmp (2);
     dZMPtmp[0] = m_OneStep.ZMPTarget(0) - ZMPMBtmp[0] - dInitX_  ;
     dZMPtmp[1] = m_OneStep.ZMPTarget(1) - ZMPMBtmp[1] - dInitY_  ;
 
@@ -495,18 +493,11 @@ protected:
         << filterprecision( m_OneStep.RightFootPosition.ddtheta ) << " " // 49
         << filterprecision( m_OneStep.RightFootPosition.ddomega ) << " ";// 50
 
-    for(unsigned int j = 0 ; j < CurrentConfiguration.size() ; j++ )
-      aof << filterprecision( CurrentConfiguration(j) ) << " " ;
-    for(unsigned int j = 0 ; j < CurrentVelocity.size() ; j++ )
-      aof << filterprecision( CurrentVelocity(j) ) << " " ;
-    for(unsigned int j = 0 ; j < CurrentAcceleration.size() ; j++ )
-      aof << filterprecision( CurrentAcceleration(j) ) << " " ;
+    aof << filterprecision( ZMPMBtmp[0] ) << " "                  // 51
+        << filterprecision( ZMPMBtmp[1] ) << " ";                 // 52
 
-    aof << filterprecision( ZMPMB_vec.back()[0] ) << " "                  // 159
-        << filterprecision( ZMPMB_vec.back()[1] ) << " ";                 // 160
-
-    aof << filterprecision( deltaZMP_vec.back()[0] ) << " "                  // 161
-        << filterprecision( deltaZMP_vec.back()[1] ) << " ";                 // 162
+    aof << filterprecision( dZMPtmp[0] ) << " "                  // 53
+        << filterprecision( dZMPtmp[1] ) << " ";                 // 54
 
 
     aof << endl ;

@@ -78,13 +78,21 @@ void DynamicFilter::init(
     double interpolationPeriod,
     double PG_T,
     double previewWindowSize,
-    double CoMHeight)
+    double CoMHeight,
+    FootAbsolutePosition supportFoot)
 {
   currentTime_ = currentTime ;
   controlPeriod_ = controlPeriod ;
   interpolationPeriod_ = interpolationPeriod ;
   PG_T_ = PG_T ;
   previewWindowSize_ = previewWindowSize ;
+
+  PreviousSupportFoot_(0,0) = supportFoot.x ;
+  PreviousSupportFoot_(1,0) = supportFoot.y ;
+  PreviousSupportFoot_(2,0) = supportFoot.z ;
+  PreviousSupportFoot_(3,0) = supportFoot.omega ;
+  PreviousSupportFoot_(4,0) = supportFoot.omega2 ;
+  PreviousSupportFoot_(5,0) = supportFoot.theta ;
 
   if (interpolationPeriod_>PG_T)
   {NbI_=1;}
@@ -103,9 +111,24 @@ void DynamicFilter::init(
   previousVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
   previousAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
 
+  ZMPMBConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
+  ZMPMBVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
+  ZMPMBAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
+
   configurationTraj_.resize( PG_N_, previousConfiguration_ ); ;
   velocityTraj_.resize( PG_N_, previousVelocity_ ); ;
   accelerationTraj_.resize( PG_N_, previousAcceleration_ ); ;
+
+  for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )
+  {
+    m_q(j,0) = ZMPMBConfiguration_(j) ;
+    m_dq(j,0) = ZMPMBVelocity_(j) ;
+    m_ddq(j,0) = ZMPMBAcceleration_(j) ;
+  }
+  m_prev_q = m_q ;
+  m_prev_dq = m_dq ;
+  m_prev_ddq = m_ddq ;
+
 
   deltaZMP_deq_.resize( PG_N_);
   ZMPMB_vec_.resize( PG_N_, vector<double>(2));
@@ -176,12 +199,12 @@ void DynamicFilter::InverseKinematics(
   {
     InverseKinematics(inputCOMTraj_deq_[i],inputLeftFootTraj_deq_ [i], inputRightFootTraj_deq_ [i],
                       configurationTraj_[i],velocityTraj_[i],accelerationTraj_[i],
-                      interpolationPeriod_, stage0);
+                      interpolationPeriod_, stage0, 2);
   }
 
   InverseKinematics(lastCtrlCoMState, lastCtrlLeftFoot, lastCtrlRightFoot,
                     previousConfiguration_,previousVelocity_,previousAcceleration_,
-                    controlPeriod_, stage1);
+                    controlPeriod_, stage1, 2);
   return ;
 }
 
@@ -193,9 +216,9 @@ void DynamicFilter::InverseKinematics(
     MAL_VECTOR_TYPE(double)& velocity,
     MAL_VECTOR_TYPE(double)& acceleration,
     double samplingPeriod,
-    int stage)
+    int stage,
+    int iteration)
 {
-  int iteration = 2 ;
   aCoMState_(0) = inputCoMState.x[0];      aCoMSpeed_(0) = inputCoMState.x[1];
   aCoMState_(1) = inputCoMState.y[0];      aCoMSpeed_(1) = inputCoMState.y[1];
   aCoMState_(2) = inputCoMState.z[0];      aCoMSpeed_(2) = inputCoMState.z[1];
@@ -244,6 +267,86 @@ void DynamicFilter::InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq)
     deltaZMP_deq_[i].time = currentTime_ + i * interpolationPeriod_ ;
     deltaZMP_deq_[i].stepType = inputZMPTraj_deq[i].stepType ;
   }
+  return ;
+}
+
+void DynamicFilter::ComputeZMPMB(
+    double samplingPeriod,
+    COMState  inputCoMState,
+    FootAbsolutePosition  inputLeftFoot,
+    FootAbsolutePosition  inputRightFoot,
+    vector<double> & ZMPMB,
+    int iteration)
+{
+  int stage = 1 ;
+  InverseKinematics( inputCoMState, inputLeftFoot, inputRightFoot,
+      ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
+      samplingPeriod, stage, iteration) ;
+
+  Node & node_waist = boost::fusion::at_c<Robot_Model::BODY>(m_robot.nodes);
+  Eigen::Matrix< LocalFloatType, 6, 1 > supportFoot ;
+  TransformT<LocalFloatType,Spatial::RotationMatrixIdentityTpl<LocalFloatType> > supportFootXwaist;
+  if (inputLeftFoot.stepType<0)
+  {
+    supportFoot(0,0) = inputLeftFoot.x ;
+    supportFoot(1,0) = inputLeftFoot.y ;
+    supportFoot(2,0) = inputLeftFoot.z ;
+    supportFoot(3,0) = inputLeftFoot.omega ;
+    supportFoot(4,0) = inputLeftFoot.omega2 ;
+    supportFoot(5,0) = inputLeftFoot.theta ;
+    Node & node_lleg0 = boost::fusion::at_c<Robot_Model::LLEG_LINK0>(m_robot.nodes);
+    Node & node_lleg1 = boost::fusion::at_c<Robot_Model::LLEG_LINK1>(m_robot.nodes);
+    Node & node_lleg2 = boost::fusion::at_c<Robot_Model::LLEG_LINK2>(m_robot.nodes);
+    Node & node_lleg3 = boost::fusion::at_c<Robot_Model::LLEG_LINK3>(m_robot.nodes);
+    Node & node_lleg4 = boost::fusion::at_c<Robot_Model::LLEG_LINK4>(m_robot.nodes);
+    Node & node_l_ankle = boost::fusion::at_c<Robot_Model::l_ankle>(m_robot.nodes);
+    supportFootXwaist = node_lleg0.sXp * node_lleg1.sXp * node_lleg2.sXp *
+                        node_lleg3.sXp * node_lleg4.sXp * node_l_ankle.sXp ;
+  }else
+  {
+    supportFoot(0,0) = inputRightFoot.x ;
+    supportFoot(1,0) = inputRightFoot.y ;
+    supportFoot(2,0) = inputRightFoot.z ;
+    supportFoot(3,0) = inputRightFoot.omega ;
+    supportFoot(4,0) = inputRightFoot.omega2 ;
+    supportFoot(5,0) = inputRightFoot.theta ;
+    Node & node_rleg0 = boost::fusion::at_c<Robot_Model::RLEG_LINK0>(m_robot.nodes);
+    Node & node_rleg1 = boost::fusion::at_c<Robot_Model::RLEG_LINK1>(m_robot.nodes);
+    Node & node_rleg2 = boost::fusion::at_c<Robot_Model::RLEG_LINK2>(m_robot.nodes);
+    Node & node_rleg3 = boost::fusion::at_c<Robot_Model::RLEG_LINK3>(m_robot.nodes);
+    Node & node_rleg4 = boost::fusion::at_c<Robot_Model::RLEG_LINK4>(m_robot.nodes);
+    Node & node_r_ankle = boost::fusion::at_c<Robot_Model::r_ankle>(m_robot.nodes);
+    supportFootXwaist = node_rleg0.sXp * node_rleg1.sXp * node_rleg2.sXp *
+                        node_rleg3.sXp * node_rleg4.sXp * node_r_ankle.sXp ;
+  }
+
+  Eigen::Matrix< FloatType, 6, 1 > waist_pos , waist_speed, waist_acc ;
+  
+  waist_pos =
+
+  // Copy the angular trajectory data from "Boost" to "Eigen"
+  for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )
+  {
+    m_q(j,0) = ZMPMBConfiguration_(j) ;
+    m_dq(j,0) = ZMPMBVelocity_(j) ;
+    m_ddq(j,0) = ZMPMBAcceleration_(j) ;
+  }
+
+  // Apply the RNEA on the robot model
+  metapod::rnea< Robot_Model, true >::run(m_robot, m_q, m_dq, m_ddq);
+
+
+  m_force = node_waist.body.iX0.applyInv (node_waist.joint.f);
+
+  ZMPMB.resize(2);
+  ZMPMB[0] = - m_force.n()[1] / m_force.f()[2] ;
+  ZMPMB[1] =   m_force.n()[0] / m_force.f()[2] ;
+
+  PreviousSupportFoot_ = supportFoot ;
+  m_prev_q = m_q ;
+  m_prev_dq = m_dq ;
+  m_prev_ddq = m_ddq ;
+
   return ;
 }
 
