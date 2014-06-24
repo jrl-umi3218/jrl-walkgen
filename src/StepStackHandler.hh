@@ -67,7 +67,6 @@ namespace PatternGeneratorJRL
       2: Stepping over.
       3: Read a path.
       4: Freeze the upper body.
-      6: Climbing stairs
     */
     void SetWalkMode(int lWalkMode);
 

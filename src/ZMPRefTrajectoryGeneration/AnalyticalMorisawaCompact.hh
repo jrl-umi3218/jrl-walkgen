@@ -555,8 +555,7 @@ namespace PatternGeneratorJRL
 		      deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
 		      deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions);
 
-
-      void ComputeCoMz(double t, double &CoMz, double &CoMvelocity);
+      void ComputeCoMz(double t, double &CoMz);
 
       /*! \brief LU decomposition of the Z matrix. */
       MAL_MATRIX_TYPE(double) m_AF;

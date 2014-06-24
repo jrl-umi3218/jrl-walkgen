@@ -162,13 +162,6 @@ void StepStackHandler::ReadStepStairSequenceAccordingToWalkMode(istringstream &s
 		    aFootPosition.DeviationHipHeight << " " ,
 		    "DebugGMFKW.dat");
 
-        cout << "TESTTTTTTTTTT   "<<aFootPosition.sx << " " <<
-		    aFootPosition.sy << " " <<
-		    aFootPosition.sz << " " <<
-		    aFootPosition.theta << " " <<
-		    aFootPosition.SStime << " " <<
-		    aFootPosition.DStime << " " <<
-		    aFootPosition.DeviationHipHeight << endl;
 	    m_RelativeFootPositions.push_back(aFootPosition);
 	    if (aFootPosition.sy>0)
 	      m_KeepLastCorrectSupportFoot=-1;

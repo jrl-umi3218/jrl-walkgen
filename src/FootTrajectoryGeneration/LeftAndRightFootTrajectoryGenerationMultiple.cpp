@@ -125,21 +125,12 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 					   FootInitialPosition.y,
 					   FootInitialPosition.dy);
 
- if (FootFinalPosition.z < FootInitialPosition.z )
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
                            FootTrajectoryGenerationStandard::Z_AXIS,
                            m_DeltaTj[IntervalIndex],
                            FootFinalPosition.z,
                            FootInitialPosition.z,
                            FootInitialPosition.dz);
-  else
-    aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
-                           FootTrajectoryGenerationStandard::Z_AXIS,
-                           m_DeltaTj[IntervalIndex],
-                           FootFinalPosition.z,
-                           FootInitialPosition.z,
-                           FootInitialPosition.dz);
-
 
   // THETA
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
@@ -165,7 +156,6 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 					   FootInitialPosition.omega2,
 					   FootInitialPosition.domega2);
 
-    // Init the first interval.
   // X axis.
   if (FootFinalPosition.z <= FootInitialPosition.z )  //down
     aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
@@ -181,13 +171,6 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 					   FootFinalPosition.x,
 					   FootInitialPosition.x,
 					   FootInitialPosition.dx);
- /* else if (FootFinalPosition.z - FootInitialPosition.z  == m_StepHeight) //normal walking
-    aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
-					   FootTrajectoryGenerationStandard::X_AXIS,
-					   m_DeltaTj[IntervalIndex],
-					   FootFinalPosition.x,
-					   FootInitialPosition.x,
-					   FootInitialPosition.dx);*/
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::
@@ -966,8 +949,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 		LeftFootTmpFinalPos.dz = 0;
 		LeftFootTmpFinalPos.stepType = -1;
 
-		//cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA  " << LeftFootTmpFinalPos.z << endl;
-		SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
+        SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
 			      LeftFootTmpFinalPos,
 			      LeftFootTmpFinalPos);
 		RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
@@ -991,8 +973,6 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
       SupportFootAbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
       SupportFootAbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
       SupportFootAbsoluteFootPositions[i].theta = CurrentAbsTheta;
-cout << "x "<< SupportFootAbsoluteFootPositions[i].x << "y " << SupportFootAbsoluteFootPositions[i].y << "z " << SupportFootAbsoluteFootPositions[i].z << endl;
-
 
       if ((!IgnoreFirst) || (i>0))
 	SupportFoot=-SupportFoot;

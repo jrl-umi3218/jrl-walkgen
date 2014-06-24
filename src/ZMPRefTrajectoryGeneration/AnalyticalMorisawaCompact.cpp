@@ -435,18 +435,7 @@ namespace PatternGeneratorJRL
       {
 	m_FeetTrajectoryGenerator->SetDeltaTj(m_DeltaTj);
 
-	int isStepStairOn;
-
-	GetIsStepStairOn(isStepStairOn);
-
-	if (m_isStepStairOn == 1)
-        m_FeetTrajectoryGenerator->InitializeFromRelativeSteps(m_RelativeFootPositions,
-							       LeftFootInitialPosition,
-							       RightFootInitialPosition,
-							       m_AbsoluteSupportFootPositions,
-							       IgnoreFirstRelativeFoot, false);
-    else
-        m_FeetTrajectoryGenerator->InitializeFromRelativeSteps_backup(m_RelativeFootPositions,
+    m_FeetTrajectoryGenerator->InitializeFromRelativeSteps(m_RelativeFootPositions,
 							       LeftFootInitialPosition,
 							       RightFootInitialPosition,
 							       m_AbsoluteSupportFootPositions,
@@ -2250,6 +2239,7 @@ namespace PatternGeneratorJRL
 					     deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions)
   {
     unsigned int lIndexInterval,lPrevIndexInterval;
+    double static preCoMz =0;
     m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_AbsoluteTimeReference,lIndexInterval);
     lPrevIndexInterval = lIndexInterval;
 
@@ -2296,23 +2286,15 @@ namespace PatternGeneratorJRL
 	  { LTHROW("COM out of bound along Y axis.");}
 	m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1],lIndexInterval);
 
+    ComputeCoMz(t,aCOMPos.z[0]);
 
+    aCOMPos.z[1] = (aCOMPos.z[0] - preCoMz) / m_SamplingPeriod;
+    preCoMz = aCOMPos.z[0];
 
-   /* if (RightFootAbsPos.z <= LeftFootAbsPos.z){
-        aCOMPos.z[1] = (m_InitialPoseCoMHeight + RightFootAbsPos.z - aCOMPos.z[0])/m_SamplingPeriod;
-        aCOMPos.z[0] = m_InitialPoseCoMHeight + RightFootAbsPos.z;
-        }
-    else{
-        aCOMPos.z[1] = (m_InitialPoseCoMHeight + LeftFootAbsPos.z - aCOMPos.z[0])/m_SamplingPeriod;
-        aCOMPos.z[0] = m_InitialPoseCoMHeight + LeftFootAbsPos.z;
-    }*/
-
-
-    ComputeCoMz(t,aCOMPos.z[0], aCOMPos.z[1]);
 
     FinalCoMPositions.push_back(aCOMPos);
 	ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " <<
-		aCOMPos.x[0] << " " << aCOMPos.y[0] << " " <<
+		aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << aCOMPos.z[0] <<" "<<
 		LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " <<
 		RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " <<
 		m_SamplingPeriod,"Test.dat");
@@ -2320,13 +2302,13 @@ namespace PatternGeneratorJRL
   }
 
 
-    void AnalyticalMorisawaCompact::ComputeCoMz(double t, double &CoMz, double &CoMvelocity)
+    void AnalyticalMorisawaCompact::ComputeCoMz(double t, double &CoMz)
     {
 
     int Index,Index2;
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
     double deltaZ;
-    double CoMzpre = CoMz;
+   // double static CoMzpre = CoMz;
     double variable=0.1,variableright = 0.9 ,variableleft = 0.0;
     double              variableright1 = 0.9 ,variableleft1 = 0.0;
     // put first leg on the stairs with decrease of CoM variable% of step height
@@ -2362,8 +2344,8 @@ namespace PatternGeneratorJRL
                     CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z;
             }
 
-                // going down et normal walk
-            if (m_AbsoluteSupportFootPositions[Index2].z < m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2].sz < 0)
+                // going down
+            else if (m_AbsoluteSupportFootPositions[Index2].z < m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2].sz < 0)
             {
                 deltaZ = (m_AbsoluteSupportFootPositions[Index2].z - m_AbsoluteSupportFootPositions[Index2-1].z );
                 if (t <= Index2*moving_time + 0.9*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + 0.0*m_RelativeFootPositions[Index2].SStime)
@@ -2381,30 +2363,19 @@ namespace PatternGeneratorJRL
                 else
                     CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z ;
             }
+            else // normal walking
+                CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z;
         }
 
-        else
+        else //after final step
             CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z;
         }
-    else
+    else //first step
         CoMz = m_InitialPoseCoMHeight ;
 
-    CoMvelocity = (CoMz -CoMzpre)/m_SamplingPeriod;
+  //  CoMvelocity = (CoMz - CoMzpre)/m_SamplingPeriod;
+   // cout << "v" << CoMz <<" "<<CoMzpre << endl;
 }
 
 }
-
-     /*Index = int((t-moving_time)/(moving_time*2));
-        if (Index < (m_AbsoluteSupportFootPositions.size() - 1)/2){
-                deltaZ = (m_AbsoluteSupportFootPositions[2*Index + 1].z - m_AbsoluteSupportFootPositions[2*Index].z );
-                if (deltaZ > 0 && t>=(2*Index+2)*moving_time && t<=(2*Index+2)*moving_time + m_RelativeFootPositions[2*Index+1].SStime)
-                    CoMz = t*deltaZ/m_RelativeFootPositions[0].SStime +  m_InitialPoseCoMHeight - (2*Index + 2)*moving_time*deltaZ/m_RelativeFootPositions[0].SStime + m_AbsoluteSupportFootPositions[2*Index].z  ;
-                else if (deltaZ > 0  && t>(2*Index+2)*moving_time + m_RelativeFootPositions[2*Index+1].SStime)
-                    CoMz = CoMz + m_AbsoluteSupportFootPositions[2*Index].z;
-                if (deltaZ < 0 && t>=(2*Index+1)*moving_time && t<=(2*Index+2)*moving_time )
-                    CoMz = t*deltaZ/moving_time +  m_InitialPoseCoMHeight - (2*Index + 1)*moving_time*deltaZ/moving_time + m_AbsoluteSupportFootPositions[2*Index].z  ;
-                else if (deltaZ > 0  && t>(2*Index+2)*moving_time + m_RelativeFootPositions[2*Index+1].SStime)
-                    CoMz = CoMz +  m_AbsoluteSupportFootPositions[2*Index].z;
-
-            }*/
 
