@@ -57,6 +57,8 @@ DynamicFilter::DynamicFilter(
   DInitX_ = 0.0 ;
   DInitY_ = 0.0 ;
 
+  jacobian_lf_ = Jacobian_LF::Jacobian::Zero();
+  jacobian_rf_ = Jacobian_RF::Jacobian::Zero();
 }
 
 DynamicFilter::~DynamicFilter()
@@ -79,20 +81,13 @@ void DynamicFilter::init(
     double PG_T,
     double previewWindowSize,
     double CoMHeight,
-    FootAbsolutePosition supportFoot)
+    FootAbsolutePosition inputLeftFoot)
 {
   currentTime_ = currentTime ;
   controlPeriod_ = controlPeriod ;
   interpolationPeriod_ = interpolationPeriod ;
   PG_T_ = PG_T ;
   previewWindowSize_ = previewWindowSize ;
-
-  PreviousSupportFoot_(0,0) = supportFoot.x ;
-  PreviousSupportFoot_(1,0) = supportFoot.y ;
-  PreviousSupportFoot_(2,0) = supportFoot.z ;
-  PreviousSupportFoot_(3,0) = supportFoot.omega ;
-  PreviousSupportFoot_(4,0) = supportFoot.omega2 ;
-  PreviousSupportFoot_(5,0) = supportFoot.theta ;
 
   if (interpolationPeriod_>PG_T)
   {NbI_=1;}
@@ -121,14 +116,20 @@ void DynamicFilter::init(
 
   for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )
   {
-    m_q(j,0) = ZMPMBConfiguration_(j) ;
-    m_dq(j,0) = ZMPMBVelocity_(j) ;
-    m_ddq(j,0) = ZMPMBAcceleration_(j) ;
+    q_(j,0) = ZMPMBConfiguration_(j) ;
+    dq_(j,0) = ZMPMBVelocity_(j) ;
+    ddq_(j,0) = ZMPMBAcceleration_(j) ;
   }
-  m_prev_q = m_q ;
-  m_prev_dq = m_dq ;
-  m_prev_ddq = m_ddq ;
 
+  if (inputLeftFoot.stepType<0)
+    PreviousSupportFoot_ = true ; // left foot is supporting
+  else
+    PreviousSupportFoot_ = false ; // right foot is supporting
+
+  prev_q_ = q_ ;
+  prev_dq_ = dq_ ;
+  prev_ddq_ = ddq_ ;
+  bcalc<Robot_Model>::run(robot_, prev_q_);
 
   deltaZMP_deq_.resize( PG_N_);
   ZMPMB_vec_.resize( PG_N_, vector<double>(2));
@@ -182,12 +183,12 @@ int DynamicFilter::filter(
 }
 
 void DynamicFilter::InverseKinematics(
-    COMState & lastCtrlCoMState,
-    FootAbsolutePosition & lastCtrlLeftFoot,
-    FootAbsolutePosition & lastCtrlRightFoot,
-    deque<COMState> & inputCOMTraj_deq_,
-    deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-    deque<FootAbsolutePosition> & inputRightFootTraj_deq_)
+    const COMState & lastCtrlCoMState,
+    const FootAbsolutePosition & lastCtrlLeftFoot,
+    const FootAbsolutePosition & lastCtrlRightFoot,
+    const deque<COMState> & inputCOMTraj_deq_,
+    const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+    const deque<FootAbsolutePosition> & inputRightFootTraj_deq_)
 {
   int stage0 = 0 ;
   int stage1 = 1 ;
@@ -209,9 +210,9 @@ void DynamicFilter::InverseKinematics(
 }
 
 void DynamicFilter::InverseKinematics(
-    COMState & inputCoMState,
-    FootAbsolutePosition & inputLeftFoot,
-    FootAbsolutePosition & inputRightFoot,
+    const COMState & inputCoMState,
+    const FootAbsolutePosition & inputLeftFoot,
+    const FootAbsolutePosition & inputRightFoot,
     MAL_VECTOR_TYPE(double)& configuration,
     MAL_VECTOR_TYPE(double)& velocity,
     MAL_VECTOR_TYPE(double)& acceleration,
@@ -231,7 +232,7 @@ void DynamicFilter::InverseKinematics(
   aCoMAcc_(2) = inputCoMState.z[2];    aLeftFootPosition_(2) = inputLeftFoot.z;
   aCoMAcc_(3) = inputCoMState.roll[2]; aLeftFootPosition_(3) = inputLeftFoot.theta;
   aCoMAcc_(4) = inputCoMState.pitch[2];aLeftFootPosition_(4) = inputLeftFoot.omega;
-  aCoMAcc_(5) = inputCoMState.yaw[2];
+  aCoMAcc_(5) = inputCoMState.yaw[2];bcalc<Robot_Model>::run(robot_, prev_q_);
 
   aRightFootPosition_(0) = inputRightFoot.x;
   aRightFootPosition_(1) = inputRightFoot.y;
@@ -272,9 +273,9 @@ void DynamicFilter::InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq)
 
 void DynamicFilter::ComputeZMPMB(
     double samplingPeriod,
-    COMState  inputCoMState,
-    FootAbsolutePosition  inputLeftFoot,
-    FootAbsolutePosition  inputRightFoot,
+    const COMState & inputCoMState,
+    const FootAbsolutePosition & inputLeftFoot,
+    const FootAbsolutePosition & inputRightFoot,
     vector<double> & ZMPMB,
     int iteration)
 {
@@ -283,69 +284,25 @@ void DynamicFilter::ComputeZMPMB(
       ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
       samplingPeriod, stage, iteration) ;
 
-  Node & node_waist = boost::fusion::at_c<Robot_Model::BODY>(m_robot.nodes);
-  Eigen::Matrix< LocalFloatType, 6, 1 > supportFoot ;
-  TransformT<LocalFloatType,Spatial::RotationMatrixIdentityTpl<LocalFloatType> > supportFootXwaist;
-  if (inputLeftFoot.stepType<0)
-  {
-    supportFoot(0,0) = inputLeftFoot.x ;
-    supportFoot(1,0) = inputLeftFoot.y ;
-    supportFoot(2,0) = inputLeftFoot.z ;
-    supportFoot(3,0) = inputLeftFoot.omega ;
-    supportFoot(4,0) = inputLeftFoot.omega2 ;
-    supportFoot(5,0) = inputLeftFoot.theta ;
-    Node & node_lleg0 = boost::fusion::at_c<Robot_Model::LLEG_LINK0>(m_robot.nodes);
-    Node & node_lleg1 = boost::fusion::at_c<Robot_Model::LLEG_LINK1>(m_robot.nodes);
-    Node & node_lleg2 = boost::fusion::at_c<Robot_Model::LLEG_LINK2>(m_robot.nodes);
-    Node & node_lleg3 = boost::fusion::at_c<Robot_Model::LLEG_LINK3>(m_robot.nodes);
-    Node & node_lleg4 = boost::fusion::at_c<Robot_Model::LLEG_LINK4>(m_robot.nodes);
-    Node & node_l_ankle = boost::fusion::at_c<Robot_Model::l_ankle>(m_robot.nodes);
-    supportFootXwaist = node_lleg0.sXp * node_lleg1.sXp * node_lleg2.sXp *
-                        node_lleg3.sXp * node_lleg4.sXp * node_l_ankle.sXp ;
-  }else
-  {
-    supportFoot(0,0) = inputRightFoot.x ;
-    supportFoot(1,0) = inputRightFoot.y ;
-    supportFoot(2,0) = inputRightFoot.z ;
-    supportFoot(3,0) = inputRightFoot.omega ;
-    supportFoot(4,0) = inputRightFoot.omega2 ;
-    supportFoot(5,0) = inputRightFoot.theta ;
-    Node & node_rleg0 = boost::fusion::at_c<Robot_Model::RLEG_LINK0>(m_robot.nodes);
-    Node & node_rleg1 = boost::fusion::at_c<Robot_Model::RLEG_LINK1>(m_robot.nodes);
-    Node & node_rleg2 = boost::fusion::at_c<Robot_Model::RLEG_LINK2>(m_robot.nodes);
-    Node & node_rleg3 = boost::fusion::at_c<Robot_Model::RLEG_LINK3>(m_robot.nodes);
-    Node & node_rleg4 = boost::fusion::at_c<Robot_Model::RLEG_LINK4>(m_robot.nodes);
-    Node & node_r_ankle = boost::fusion::at_c<Robot_Model::r_ankle>(m_robot.nodes);
-    supportFootXwaist = node_rleg0.sXp * node_rleg1.sXp * node_rleg2.sXp *
-                        node_rleg3.sXp * node_rleg4.sXp * node_r_ankle.sXp ;
-  }
-
-  Eigen::Matrix< FloatType, 6, 1 > waist_pos , waist_speed, waist_acc ;
-  
-  waist_pos =
-
   // Copy the angular trajectory data from "Boost" to "Eigen"
   for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )
   {
-    m_q(j,0) = ZMPMBConfiguration_(j) ;
-    m_dq(j,0) = ZMPMBVelocity_(j) ;
-    m_ddq(j,0) = ZMPMBAcceleration_(j) ;
+    q_(j,0) = ZMPMBConfiguration_(j) ;
+    dq_(j,0) = ZMPMBVelocity_(j) ;
+    ddq_(j,0) = ZMPMBAcceleration_(j) ;
   }
 
+  //computeWaist( inputLeftFoot );
+
   // Apply the RNEA on the robot model
-  metapod::rnea< Robot_Model, true >::run(m_robot, m_q, m_dq, m_ddq);
+  metapod::rnea< Robot_Model, true >::run(robot_, q_, dq_, ddq_);
 
-
+  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
   m_force = node_waist.body.iX0.applyInv (node_waist.joint.f);
 
   ZMPMB.resize(2);
   ZMPMB[0] = - m_force.n()[1] / m_force.f()[2] ;
   ZMPMB[1] =   m_force.n()[0] / m_force.f()[2] ;
-
-  PreviousSupportFoot_ = supportFoot ;
-  m_prev_q = m_q ;
-  m_prev_dq = m_dq ;
-  m_prev_ddq = m_ddq ;
 
   return ;
 }
@@ -359,15 +316,15 @@ void DynamicFilter::ComputeZMPMB(
   // Copy the angular trajectory data from "Boost" to "Eigen"
   for(unsigned int j = 0 ; j < configuration.size() ; j++ )
   {
-    m_q(j,0) = configuration(j) ;
-    m_dq(j,0) = velocity(j) ;
-    m_ddq(j,0) = acceleration(j) ;
+    q_(j,0) = configuration(j) ;
+    dq_(j,0) = velocity(j) ;
+    ddq_(j,0) = acceleration(j) ;
   }
 
   // Apply the RNEA on the robot model
-  metapod::rnea< Robot_Model, true >::run(m_robot, m_q, m_dq, m_ddq);
+  metapod::rnea< Robot_Model, true >::run(robot_, q_, dq_, ddq_);
 
-  Node & node = boost::fusion::at_c<Robot_Model::BODY>(m_robot.nodes);
+  RootNode & node = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
   m_force = node.body.iX0.applyInv (node.joint.f);
 
   ZMPMB.resize(2);
@@ -420,6 +377,54 @@ int DynamicFilter::OptimalControl(
     }
   }
   return 0 ;
+}
+
+void DynamicFilter::computeWaist(const FootAbsolutePosition & inputLeftFoot)
+{
+  Eigen::Matrix< LocalFloatType, 6, 1 > waist_speed, waist_acc ;
+  Eigen::Matrix< LocalFloatType, 3, 1 > waist_theta ;
+  // compute the speed and acceleration of the waist in the world frame
+  if (PreviousSupportFoot_)
+  {
+    Jacobian_LF::run(robot_, prev_q_, Vector3dTpl<LocalFloatType>::Type(0,0,0), jacobian_lf_);
+    waist_speed = jacobian_lf_ * prev_dq_ ;
+    waist_acc = jacobian_lf_ * prev_ddq_ ;/* + d_jacobian_lf_ * prev_dq_*/ ;
+  }else
+  {
+    Jacobian_RF::run(robot_, prev_q_, Vector3dTpl<LocalFloatType>::Type(0,0,0), jacobian_rf_);
+    waist_speed = jacobian_rf_ * prev_dq_ ;
+    waist_acc = jacobian_rf_ * prev_ddq_  /*+ d_jacobian_rf_ * prev_dq_*/ ;
+  }
+  for (unsigned int i = 0 ; i < 6 ; ++i)
+  {
+    dq_(i,0)   = waist_speed(i,0);
+    ddq_(i,0)  = waist_acc(i,0);
+  }
+  // compute the position of the waist in the world frame
+  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
+  waist_theta(0,0) = prev_q_(3,0) ;
+  waist_theta(1,0) = prev_dq_(4,0) ;
+  waist_theta(2,0) = prev_ddq_(5,0) ;
+  q_(0,0) = node_waist.body.iX0.inverse().r()(0,0) ;
+  q_(1,0) = node_waist.body.iX0.inverse().r()(1,0) ;
+  q_(2,0) = node_waist.body.iX0.inverse().r()(2,0) ;
+  q_(3,0) = waist_theta(0,0) ;
+  q_(4,0) = waist_theta(1,0) ;
+  q_(5,0) = waist_theta(2,0) ;
+
+  if (inputLeftFoot.stepType<0)
+  {
+    PreviousSupportFoot_ = true ; // left foot is supporting
+  }
+  else
+  {
+    PreviousSupportFoot_ = false ; // right foot is supporting
+  }
+  prev_q_ = q_ ;
+  prev_dq_ = dq_ ;
+  prev_ddq_ = ddq_ ;
+
+  return ;
 }
 
 double DynamicFilter::filterprecision(double adb)

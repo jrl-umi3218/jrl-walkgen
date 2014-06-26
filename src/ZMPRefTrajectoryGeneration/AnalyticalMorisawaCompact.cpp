@@ -642,16 +642,8 @@ namespace PatternGeneratorJRL
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;    
 
-    FootAbsolutePosition supportFoot ;
-    if (InitLeftFootAbsolutePosition.stepType<0)
-    {
-      supportFoot = InitLeftFootAbsolutePosition ;
-    }else
-    {
-      supportFoot = InitRightFootAbsolutePosition ;
-    }
     m_kajitaDynamicFilter->init(m_CurrentTime, m_SamplingPeriod, 0.050, m_SamplingPeriod,
-                                1.6, lStartingCOMState.z[0], supportFoot );
+                                1.6, lStartingCOMState.z[0], InitLeftFootAbsolutePosition );
 
     return m_RelativeFootPositions.size();
   }

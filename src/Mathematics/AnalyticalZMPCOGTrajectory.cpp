@@ -483,25 +483,13 @@ namespace PatternGeneratorJRL
 
   bool AnalyticalZMPCOGTrajectory::GetIntervalIndexFromTime(double t, unsigned int &j)
   {
-    ODEBUG("Here "<< m_DeltaTj.size());
-    t -= m_AbsoluteTimeReference;
-    double reftime=0;
-    ODEBUG(" ====== CoM ====== ");
-    for(unsigned int lj=0;lj<m_DeltaTj.size();lj++)
-      {
-	ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<lj << "]= "<< m_DeltaTj[lj]);
-	if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[lj]+m_Sensitivity))
-	  {
-	    j = lj;
-	    return true;
-	  }
-	reftime+=m_DeltaTj[lj];
-      }
-    return false;
+    unsigned int prev_j = 0 ;
+    return GetIntervalIndexFromTime(t, j, prev_j);
   }
 
   bool AnalyticalZMPCOGTrajectory::GetIntervalIndexFromTime(double t, unsigned int &j, unsigned int &prev_j)
   {
+    ODEBUG("Here "<< m_DeltaTj.size());
     t -= m_AbsoluteTimeReference;
     double reftime=0;
     ODEBUG(" ====== CoM ====== ");
