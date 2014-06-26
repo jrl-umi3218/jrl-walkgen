@@ -80,7 +80,7 @@ ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
   SupportFSM_->SamplingPeriod( QP_T_ );
 
   // Create and initialize preview of orientations
-  OrientPrw_ = new OrientationsPreview( aHS->rootJoint() );
+  OrientPrw_ = new OrientationsPreview( aHS );
   OrientPrw_->SamplingPeriod( QP_T_ );
   OrientPrw_->NbSamplingsPreviewed( QP_N_ );
   OrientPrw_->SSLength( SupportFSM_->StepPeriod() );
