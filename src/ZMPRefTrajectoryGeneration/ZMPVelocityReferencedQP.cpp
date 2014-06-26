@@ -434,17 +434,8 @@ int
   InitStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
   FinalCurrentStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
 
-  FootAbsolutePosition supportFoot ;
-  if (InitLeftFootAbsolutePosition.stepType<0)
-  {
-    supportFoot = InitLeftFootAbsolutePosition ;
-  }else
-  {
-    supportFoot = InitRightFootAbsolutePosition ;
-  }
-
   dynamicFilter_->init(0.0,m_SamplingPeriod,InterpolationPeriod_,
-                       QP_T_,QP_N_*QP_T_,CoMHeight_,supportFoot);
+                       QP_T_,QP_N_*QP_T_,CoMHeight_,InitLeftFootAbsolutePosition);
   return 0;
 }
 
