@@ -128,10 +128,6 @@ namespace PatternGeneratorJRL
     */
     bool Compute(double t, FootAbsolutePosition & aFootAbsolutePosition);
 
-   /*
-    bool Compute(double t, std::deque<FootAbsolutePosition> & adFootAbsolutePosition, unsigned int IndexInterval);
-*/
-
     /*! \brief Compute the value asked for according to :
       @param[in] t: the time,
       @param[in] IndexInterval: Index of the interval to be used for the computation.

@@ -2309,13 +2309,13 @@ namespace PatternGeneratorJRL
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
     double deltaZ;
    // double static CoMzpre = CoMz;
-    double variable=0.1,variableright = 0.9 ,variableleft = 0.0;
-    double              variableright1 = 0.9 ,variableleft1 = 0.0;
-    // put first leg on the stairs with decrease of CoM variable% of step height
+    double up=0.1,upRight = 0.9 ,upLeft = 0.0;
+    double              upRight1 = 0.9 ,upLeft1 = 0.0;
 
-    double var = 0.1;
 
-    if (t >= moving_time){
+    double down = 0.1, downRight =0.9, downLeft = 0.0;
+
+    if (t >= moving_time){ // we start analyze since 2nd step
 
         Index2 = int(t/moving_time);
 
@@ -2323,43 +2323,49 @@ namespace PatternGeneratorJRL
         if (Index2 < m_AbsoluteSupportFootPositions.size())
         {
             // climbing
-            if (m_AbsoluteSupportFootPositions[Index2].z > m_AbsoluteSupportFootPositions[Index2-1].z)
+
+            // put first leg on the stairs with decrease of CoM //up// of stair height
+            // the CoM line will decrease between an //upLeft to upRight// interval of SStime.
+            // the CoM line will go up between an //upLeft1 to upRight1// interval of SStime while 2nd leg moving up on the stairs.
+            if (m_AbsoluteSupportFootPositions[Index2].z > m_AbsoluteSupportFootPositions[Index2-1].z) // first leg
             {
                 deltaZ = (-m_AbsoluteSupportFootPositions[Index2].z + m_AbsoluteSupportFootPositions[Index2-1].z );
-                if (t <= Index2*moving_time + variableright*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + variableleft*m_RelativeFootPositions[Index2].SStime)
-                    CoMz = (t-Index2*moving_time - variableleft*m_RelativeFootPositions[Index2].SStime)*variable*deltaZ/((variableright-variableleft)*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z ;
-                else if (t < Index2*moving_time + variableleft*m_RelativeFootPositions[Index2].SStime)
+                if (t <= Index2*moving_time + upRight*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + upLeft*m_RelativeFootPositions[Index2].SStime)
+                    CoMz = (t-Index2*moving_time - upLeft*m_RelativeFootPositions[Index2].SStime)*up*deltaZ/((upRight-upLeft)*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z ;
+                else if (t < Index2*moving_time + upLeft*m_RelativeFootPositions[Index2].SStime)
                     CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z ;
                 else
-                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z + variable*deltaZ;
+                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z + up*deltaZ;
             }
-            else if (m_AbsoluteSupportFootPositions[Index2].z == m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2-1].sz > 0)
+            else if (m_AbsoluteSupportFootPositions[Index2].z == m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2-1].sz > 0) // 2nd leg
             {
                 deltaZ = (m_AbsoluteSupportFootPositions[Index2].z - m_AbsoluteSupportFootPositions[Index2-2].z );
-                if (t <= Index2*moving_time + variableright1*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + variableleft1*m_RelativeFootPositions[Index2].SStime)
-                    CoMz = (t-Index2*moving_time - variableleft1*m_RelativeFootPositions[Index2].SStime)*(1+variable)*deltaZ/((variableright1-variableleft1)*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-2].z - variable*deltaZ ;
-                else if (t < Index2*moving_time + variableleft1*m_RelativeFootPositions[Index2].SStime)
-                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-2].z - variable*deltaZ;
+                if (t <= Index2*moving_time + upRight1*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + upLeft1*m_RelativeFootPositions[Index2].SStime)
+                    CoMz = (t-Index2*moving_time - upLeft1*m_RelativeFootPositions[Index2].SStime)*(1+up)*deltaZ/((upRight1-upLeft1)*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-2].z - up*deltaZ ;
+                else if (t < Index2*moving_time + upLeft1*m_RelativeFootPositions[Index2].SStime)
+                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-2].z - up*deltaZ;
                 else
                     CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z;
             }
 
                 // going down
-            else if (m_AbsoluteSupportFootPositions[Index2].z < m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2].sz < 0)
+                // the CoM line will decrease an //1+down// stair height between an //downLeft to downRight// interval of SStime while moving first leg down
+                // put the 2nd leg down while standing up the CoM.
+            else if (m_AbsoluteSupportFootPositions[Index2].z < m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2].sz < 0) // first leg
             {
                 deltaZ = (m_AbsoluteSupportFootPositions[Index2].z - m_AbsoluteSupportFootPositions[Index2-1].z );
-                if (t <= Index2*moving_time + 0.9*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + 0.0*m_RelativeFootPositions[Index2].SStime)
-                    CoMz = (t-Index2*moving_time- 0.0*m_RelativeFootPositions[Index2].SStime)*(1+var)*deltaZ/(0.9*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z  ;
-                else if (t  < Index2*moving_time + 0.0*m_RelativeFootPositions[Index2].SStime)
+                if (t <= Index2*moving_time + downRight*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + downLeft*m_RelativeFootPositions[Index2].SStime)
+                    CoMz = (t-Index2*moving_time- downLeft*m_RelativeFootPositions[Index2].SStime)*(1+down)*deltaZ/((downRight - downLeft)*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z  ;
+                else if (t  < Index2*moving_time + downLeft*m_RelativeFootPositions[Index2].SStime)
                     CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z ;
                 else
-                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z + var*deltaZ;
+                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z + down*deltaZ;
             }
-            else if (m_AbsoluteSupportFootPositions[Index2].z == m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2-1].sz < 0)
+            else if (m_AbsoluteSupportFootPositions[Index2].z == m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2-1].sz < 0) //second leg
             {
                 deltaZ = (m_AbsoluteSupportFootPositions[Index2-2].z - m_AbsoluteSupportFootPositions[Index2].z );
                 if (t <= Index2*moving_time + m_RelativeFootPositions[Index2].SStime )
-                    CoMz = (t-Index2*moving_time)*var*deltaZ/(m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z - var*deltaZ ;
+                    CoMz = (t-Index2*moving_time)*down*deltaZ/(m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z - down*deltaZ ;
                 else
                     CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z ;
             }
@@ -2373,8 +2379,6 @@ namespace PatternGeneratorJRL
     else //first step
         CoMz = m_InitialPoseCoMHeight ;
 
-  //  CoMvelocity = (CoMz - CoMzpre)/m_SamplingPeriod;
-   // cout << "v" << CoMz <<" "<<CoMzpre << endl;
 }
 
 }

@@ -144,21 +144,6 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
   return true;
 }
 
-/*bool FootTrajectoryGenerationMultiple::Compute(double t, deque<FootAbsolutePosition> &adFootAbsolutePosition, unsigned int IndexInterval)
-{
-  double deltaj = t - m_AbsoluteTimeReference - m_RefTime[IndexInterval];
-    ODEBUG("IndexInterval : " << IndexInterval );
-
-//  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->m_BsplinesZ->SetParametersWithInitPos(adFootAbsolutePosition.back().z,m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->m_BsplinesZ->GetFT(),m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->m_BsplinesZ->GetMP()/1.5,m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->m_BsplinesZ->GetMP(),m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->m_BsplinesZ->GetFT()/3.0);
-
-  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAll(adFootAbsolutePosition,deltaj);
-// cout << IndexInterval<< "  "<<m_DeltaTj[IndexInterval] << "   "<< deltaj << "          " << t << "         "<< adFootAbsolutePosition.back().z<<"                     " <<m_AbsoluteTimeReference << " " << m_RefTime[IndexInterval] << endl;
-
-  //m_SetOfFootTrajectoryGenerationObjects[IndexInterval+1]->SetStairs( (m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->GetStairs()));
-  adFootAbsolutePosition[IndexInterval].stepType = m_NatureOfIntervals[IndexInterval];
-  return true;
-}*/
-
 
 bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & aFootAbsolutePosition)
 {

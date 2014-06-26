@@ -54,4 +54,17 @@ tests/jrl-walkgen.cbp
 tests/jrl-walkgen.pc
 tests/src/
 tests/tests/
+src/FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp.orig
+src/FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.hh.orig
+src/FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp.orig
+src/FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.cpp.orig
+src/Mathematics/Bsplines.cpp.orig
+src/Mathematics/Bsplines.hh.orig
+src/PatternGeneratorInterfacePrivate.cpp.orig
+src/StepStackHandler.cpp.orig
+src/ZMPRefTrajectoryGeneration/ZMPDiscretization.cpp.orig
+src/patterngeneratorinterfaceprivate.hh.orig
+tests/TestBsplines.cpp.orig
+tests/TestHerdt2010.cpp.orig
+
 
