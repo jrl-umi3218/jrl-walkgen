@@ -547,8 +547,12 @@ protected:
     }
 
     {
-      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
-                                         0.3 0.19 -0.086 0.0\
+     istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
+                                        0.32 0.19 -0.15 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.32 0.19 -0.15 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.32 0.19 -0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
                                         ");
       aPGI.ParseCmd(strm2);
