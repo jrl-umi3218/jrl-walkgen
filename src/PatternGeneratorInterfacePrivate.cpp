@@ -581,9 +581,9 @@ namespace PatternGeneratorJRL {
     ofstream DebugFile;
     m_StepStackHandler->ReadStepStairSequenceAccordingToWalkMode(strm);
 
-    ODEBUG("After reading Step Sequence");
+    ODEBUG("After reading Step Stair Sequence");
     FinishAndRealizeStepSequence();
-    ODEBUG("After finish and realize Step Sequence");
+    ODEBUG("After finish and realize Step Stair Sequence");
   }
 
 
@@ -958,12 +958,6 @@ namespace PatternGeneratorJRL {
 			InitLeftFootAbsPos,
 			InitRightFootAbsPos);
 
-    /*cout <<"aaaaaaaaaaaaaaaaaaa "<< m_LeftFootPositions.back().z << " " << m_RightFootPositions.back().z << endl;
-
-    for (int i = 0; i<m_RightFootPositions.size();i++)
-    {
-        cout <<"aaaaaaaaaaaaaaaaaaa "<< m_LeftFootPositions[i].z << " " << m_RightFootPositions[i].z << endl;
-    }*/
 
     ODEBUG("First m_ZMPPositions" << m_ZMPPositions[0].px << " " << m_ZMPPositions[0].py);
     deque<ZMPPosition> aZMPBuffer;

@@ -176,7 +176,6 @@ public:
 
           /*! Fill the debug files with appropriate information. */
           IK();
-
 //          ComputeAndDisplayAverageError(false);
           fillInDebugFiles();
         }
@@ -344,27 +343,29 @@ protected:
         }
 
 
-      /// \brief Debug Purpose
+      /// \brief Create file .hip .pos .zmp
       /// --------------------
       ofstream aof;
       string aFileName;
       ostringstream oss(std::ostringstream::ate);
 
       if ( iteration == 0 ){
-        oss.str("/tmp/Step_Stair_Down_Seq.pos");
-        aFileName = oss.str();
+        aFileName = "/tmp/";
+        aFileName+=m_TestName;
+        aFileName+=".pos";
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
       }
       ///----
-      oss.str("/tmp/Step_Stair_Down_Seq.pos");
-      aFileName = oss.str();
+      aFileName = "/tmp/";
+        aFileName+=m_TestName;
+        aFileName+=".pos";
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
       aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
       for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
-        aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 1
+        aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 2
       }
       for(unsigned int i = 0 ; i < 10 ; i++){
         aof << 0.0 << " "  ;
@@ -373,44 +374,49 @@ protected:
       aof.close();
 
       if ( iteration == 0 ){
-        oss.str("/tmp/Step_Stair_Down_Seq.hip");
-        aFileName = oss.str();
+        aFileName = "/tmp/";
+        aFileName+=m_TestName;
+        aFileName+=".hip";
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
       }
-      oss.str("/tmp/Step_Stair_Down_Seq.hip");
-      aFileName = oss.str();
+      aFileName = "/tmp/";
+        aFileName+=m_TestName;
+        aFileName+=".hip";
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
         aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
-        aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ; // 1
-        aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0] ) << " "  ; // 1
-        aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] ) << " "  ; // 1
+        aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ; // 2
+        aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0] ) << " "  ; // 3
+        aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] ) << " "  ; // 4
         aof << endl ;
       aof.close();
 
       if ( iteration == 0 ){
-        oss.str("/tmp/Step_Stair_Down_Seq.zmp");
-        aFileName = oss.str();
+        aFileName = "/tmp/";
+        aFileName+=m_TestName;
+        aFileName+=".zmp";
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
       }
-      FootAbsolutePosition aSupportState;
 
+      FootAbsolutePosition aSupportState;
       if (m_OneStep.LeftFootPosition.stepType < 0 )
         aSupportState = m_OneStep.LeftFootPosition ;
-        else
+      else
         aSupportState = m_OneStep.RightFootPosition ;
-      oss.str("/tmp/Step_Stair_Down_Seq.zmp");
-      aFileName = oss.str();
+
+      aFileName = "/tmp/";
+        aFileName+=m_TestName;
+        aFileName+=".zmp";
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
         aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
-        aof << filterprecision( m_OneStep.ZMPTarget(0) - m_CurrentConfiguration(0)) << " "  ; // 1
-        aof << filterprecision( m_OneStep.ZMPTarget(1) - m_CurrentConfiguration(1) ) << " "  ; // 1
-        aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2)) << " "  ; // 1
+        aof << filterprecision( m_OneStep.ZMPTarget(0) - m_CurrentConfiguration(0)) << " "  ; // 2
+        aof << filterprecision( m_OneStep.ZMPTarget(1) - m_CurrentConfiguration(1) ) << " "  ; // 3
+        aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2)) << " "  ; // 4
         aof << endl ;
       aof.close();
 
@@ -498,51 +504,14 @@ protected:
 
     {
       istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
-                                        0.32 0.19 -0.15 0.0\
-                                        0.0 -0.19 0.0 0.0\
-                                         0.32 0.19 -0.15 0.0\
-                                        0.0 -0.19 0.0 0.0\
-                                         0.32 0.19 -0.15 0.0\
+                                        0.3 0.19 0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
                                         0.3 0.19 0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
                                         0.3 0.19 0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
-                                        0.2 0.19 0.0 0.0\
-                                        0.2 -0.19 0.0 0.0\
-                                        0.0 0.19 0.0 0.0\
                                         ");
       aPGI.ParseCmd(strm2);
-      /*0.0 -0.105 0.0 0.0\
-      0.2 0.19 0.0 0.0\
-                                        0.2 -0.19 0.0 0.0\
-                                        0.2 0.19 0.0 0.0\
-                                        0.0 -0.19 0.0 0.0\
-
-                                        0.2 0.19 0.0 0.0\
-                                        0.2 -0.19 0.0 0.0\
-                                        0.2 0.19 0.0 0.0\
-                                        0.2 -0.19 0.0 0.0\
-                                        0.1 0.19 0.0 0.0\
-                                        0.4 -0.19 0.086 0.0\
-                                        0.0 0.19 0.0 0.0\
-                                        0.4 -0.19 0.086 0.0\
-                                        0.0 0.19 0.0 0.0\
-                                        0.4 -0.19 0.086 0.0\
-                                        0.0 0.19 0.0 0.0\
-                                        0.2 -0.19 0.0 0.0\
-                                        0.2 0.19 0.0 0.0\
-                                        0.0 -0.19 0.0 0.0\
-                                        0.4 0.19 -0.086 0.0\
-                                        0.0 -0.19 0.0 0.0\
-                                        0.4 0.19 -0.086 0.0\
-                                        0.0 -0.19 0.0 0.0\
-                                        0.4 0.19 -0.086 0.0\
-                                        0.0 -0.19 0.0 0.0\
-                                        0.2 0.19 0.0 0.0\
-                                        0.2 -0.19 0.0 0.0\
-                                        0.2 0.19 0.0 0.0\
-                                        0.0 -0.19 0.0 0.0\*/
     }
 
   }
@@ -556,8 +525,12 @@ protected:
     }
 
     {
-      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
-                                         0.3 0.19 0.086 0.0\
+        istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
+                                        0.3 0.19 0.15 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.3 0.19 0.15 0.0\
+                                        0.0 -0.19 0.0 0.0\
+                                        0.3 0.19 0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
                                         ");
       aPGI.ParseCmd(strm2);
