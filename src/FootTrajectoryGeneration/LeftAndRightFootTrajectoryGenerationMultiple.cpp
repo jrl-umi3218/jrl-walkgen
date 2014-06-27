@@ -164,6 +164,13 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 					   FootFinalPosition.x,
 					   FootInitialPosition.x,
 					   FootInitialPosition.dx);
+    else if ((FootFinalPosition.z - FootInitialPosition.z ) == m_StepHeight)    // normal walk
+    aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+					   FootTrajectoryGenerationStandard::X_AXIS,
+					   0.9*m_DeltaTj[IntervalIndex],
+					   FootFinalPosition.x,
+					   FootInitialPosition.x,
+					   FootInitialPosition.dx);
   else if (FootFinalPosition.z > FootInitialPosition.z )    // up
     aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::X_AXIS,
@@ -912,7 +919,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  SetAnInterval(IntervalIndex,m_RightFootTrajectory,
 			RightFootTmpInitPos,
 			RightFootTmpFinalPos);
-
+    //  cout << RightFootTmpFinalPos.z << endl;
         if (SupportFoot==1)
             RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
         else
@@ -973,6 +980,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
       SupportFootAbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
       SupportFootAbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
       SupportFootAbsoluteFootPositions[i].theta = CurrentAbsTheta;
+
 
       if ((!IgnoreFirst) || (i>0))
 	SupportFoot=-SupportFoot;
