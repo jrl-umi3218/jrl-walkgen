@@ -216,7 +216,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
 
     m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
 
-    cout <<(FinalPosition - InitPosition) << " " << m_StepHeight << " "<<((FinalPosition - InitPosition) == m_StepHeight) << endl;
+    //cout <<(FinalPosition - InitPosition) << " " << m_StepHeight << " "<<((FinalPosition - InitPosition) == m_StepHeight) << endl;
 
        if ((FinalPosition - InitPosition) == m_StepHeight)
         m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,InitPosition,0.5*TimeInterval,InitPosition+m_StepHeight);

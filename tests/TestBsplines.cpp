@@ -57,10 +57,10 @@ int main()
     {
 
         t=double(k)*Z->GetKnotVector().back()/1000.0;
-        cout << k << endl;
+        //cout << k << endl;
         myfile << t << " " << Z->ZComputePosition(t) << " " << Z->ZComputeVelocity(t)<< " " << Z->ZComputeAcc(t)<< endl;
 	// time - Position - Velocity - Acceleration
-        cout <<  t  << " " << Z->ZComputePosition(t)<<" "<< Z->ZComputeVelocity(t)<< " "<< Z->ZComputeAcc(t)<< endl;
+        //cout <<  t  << " " << Z->ZComputePosition(t)<<" "<< Z->ZComputeVelocity(t)<< " "<< Z->ZComputeAcc(t)<< endl;
     }
     myfile.close();
     delete Z;
