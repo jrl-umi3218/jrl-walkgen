@@ -321,6 +321,7 @@ double FootTrajectoryGenerationStandard::ComputeAll(FootAbsolutePosition & aFoot
 
   aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(Time);
   aFootAbsolutePosition.dtheta = m_PolynomeTheta->ComputeDerivative(Time);
+  aFootAbsolutePosition.ddtheta = m_PolynomeTheta->ComputeSecDerivative(Time);
 
   aFootAbsolutePosition.omega = m_PolynomeOmega->Compute(Time);
   aFootAbsolutePosition.domega = m_PolynomeOmega->ComputeDerivative(Time);

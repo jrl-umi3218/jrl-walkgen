@@ -567,7 +567,8 @@ void GeneratorVelRef::build_eq_constraints_limitPosFeet(const solution_t & Solut
   }
 
   if( ItBeforeLanding <= 3 && Solution.SupportStates_deq.front().Phase == SS )
-  {  unsigned NbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
+  {
+    unsigned NbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
 
     Pb.NbEqConstraints(2);
 

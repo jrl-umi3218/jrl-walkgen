@@ -538,7 +538,8 @@ void
     RightFootTraj_deq_ = FinalRightFootTraj_deq ;
     FinalZMPTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
     FinalCOMTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
-    deltaCOMTraj_deq_.resize(NbSampleControl_);
+    vector < vector<double> > ZMPMB_deq (NbSampleControl_,vector<double>(2));
+    //deltaCOMTraj_deq_.resize(NbSampleControl_);
     // INTERPRET THE SOLUTION VECTOR :
     // -------------------------------
     InterpretSolutionVector();
@@ -555,25 +556,33 @@ void
     // DYNAMIC FILTER
     // --------------
     //DynamicFilter( time, tmp );
-    dynamicFilter_->filter(
-        FinalCOMTraj_deq.back(),
-        FinalLeftFootTraj_deq.back(),
-        FinalRightFootTraj_deq.back(),
-        COMTraj_deq_,
-        ZMPTraj_deq_,
-        LeftFootTraj_deq_,
-        RightFootTraj_deq_,
-        deltaCOMTraj_deq_);
+//    dynamicFilter_->filter(
+//        FinalCOMTraj_deq.back(),
+//        FinalLeftFootTraj_deq.back(),
+//        FinalRightFootTraj_deq.back(),
+//        COMTraj_deq_,
+//        ZMPTraj_deq_,
+//        LeftFootTraj_deq_,
+//        RightFootTraj_deq_,
+//        deltaCOMTraj_deq_);
+    for(unsigned int i = CurrentIndex_ ; i < FinalCOMTraj_deq.size() ; ++ i )
+      dynamicFilter_->ComputeZMPMB(m_SamplingPeriod,
+                                   FinalCOMTraj_deq[i],
+                                   FinalLeftFootTraj_deq[i],
+                                   FinalRightFootTraj_deq[i],
+                                   ZMPMB_deq[i-CurrentIndex_],
+                                   (int)time/QP_T_ + i*m_SamplingPeriod
+                                   );
 
 
-    for (unsigned int i = 0 ; i < deltaCOMTraj_deq_.size() ; ++i )
-    {
-      for(int j=0;j<3;j++)
-      {
-        FinalCOMTraj_deq[CurrentIndex_+i].x[j] = deltaCOMTraj_deq_[i].x[j];
-        FinalCOMTraj_deq[CurrentIndex_+i].y[j] = deltaCOMTraj_deq_[i].y[j];
-      }
-    }
+//    for (unsigned int i = 0 ; i < deltaCOMTraj_deq_.size() ; ++i )
+//    {
+//      for(int j=0;j<3;j++)
+//      {
+//        FinalCOMTraj_deq[CurrentIndex_+i].x[j] = deltaCOMTraj_deq_[i].x[j];
+//        FinalCOMTraj_deq[CurrentIndex_+i].y[j] = deltaCOMTraj_deq_[i].y[j];
+//      }
+//    }
 
 
 
@@ -587,9 +596,9 @@ void
     string aFileName;
     ostringstream oss(std::ostringstream::ate);
     static int iteration = 0 ;
-    int iteration100 = (int)iteration/100;
-    int iteration10 = (int)(iteration - iteration100*100)/10;
-    int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
+//    int iteration100 = (int)iteration/100;
+//    int iteration10 = (int)(iteration - iteration100*100)/10;
+//    int iteration1 = (int)(iteration - iteration100*100 - iteration10*10 );
 //
 //    /// \brief Debug Purpose
 //    /// --------------------
@@ -770,6 +779,10 @@ void
           << filterprecision( FinalCOMTraj_deq[i].yaw[2] ) << " "       // 48
           << filterprecision( FinalLeftFootTraj_deq[i].dddx ) << " "       // 49
           << filterprecision( FinalRightFootTraj_deq[i].dddx ) << " "       // 50
+          << filterprecision( ZMPMB_deq[i-CurrentIndex_][0] ) << " "       // 51
+          << filterprecision( ZMPMB_deq[i-CurrentIndex_][1] ) << " "       // 52
+          << filterprecision( FinalZMPTraj_deq[i].px ) << " "       // 53
+          << filterprecision( FinalZMPTraj_deq[i].py ) << " "       // 54
           << endl ;
     }
     aof.close();

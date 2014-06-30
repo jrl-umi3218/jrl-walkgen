@@ -665,27 +665,27 @@ namespace PatternGeneratorJRL
         COMState aCOMPos;
         memset(&aCOMPos,0,sizeof(aCOMPos));
 
-        if (m_FilteringActivate)
-        {
-          double FZmpX=0, FComX=0,FComdX=0;
-
-          // Should we filter ?
-          bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
-          if (r)
-          {
-            double FZmpY=0, FComY=0,FComdY=0;
-            // Yes we should.
-            m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
-
-            /*! Feed the ZMPPositions. */
-            aZMPPos.px = FZmpX;
-            aZMPPos.py = FZmpY;
-
-            /*! Feed the COMStates. */
-            aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
-            aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
-          }
-        }
+//        if (m_FilteringActivate)
+//        {
+//          double FZmpX=0, FComX=0,FComdX=0;
+//
+//          // Should we filter ?
+//          bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
+//          if (r)
+//          {
+//            double FZmpY=0, FComY=0,FComdY=0;
+//            // Yes we should.
+//            m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
+//
+//            /*! Feed the ZMPPositions. */
+//            aZMPPos.px = FZmpX;
+//            aZMPPos.py = FZmpY;
+//
+//            /*! Feed the COMStates. */
+//            aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
+//            aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
+//          }
+//        }
 
 
         /*! Feed the ZMPPositions. */
@@ -708,9 +708,9 @@ namespace PatternGeneratorJRL
         aCOMPos.x[0] += lCOMPosx; aCOMPos.x[1] += lCOMPosdx; aCOMPos.x[2] = lCOMPosddx;
         aCOMPos.y[0] += lCOMPosy; aCOMPos.y[1] += lCOMPosdy; aCOMPos.y[2] = lCOMPosddy;
         aCOMPos.z[0] = m_InitialPoseCoMHeight;
-        FinalCOMStates.push_back(aCOMPos);
-        /*! Feed the FootPositions. */
 
+
+        /*! Feed the FootPositions. */
 
         /*! Left */
         FootAbsolutePosition LeftFootAbsPos;
@@ -724,6 +724,13 @@ namespace PatternGeneratorJRL
         m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,RightFootAbsPos,lIndexInterval);
         FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
 
+        /*! Feed the Waist orientation */
+        aCOMPos.yaw[0] = 0.5*(LeftFootAbsPos.theta + RightFootAbsPos.theta);
+        aCOMPos.yaw[1] = 0.5*(LeftFootAbsPos.dtheta + RightFootAbsPos.dtheta);
+        aCOMPos.yaw[2] = 0.5*(LeftFootAbsPos.ddtheta + RightFootAbsPos.ddtheta);
+        FinalCOMStates.push_back(aCOMPos);
+
+        /*! Feed the ZMPMB */
         vector<double> ZMPMB (2) ;
         static int iteration = 0;
         m_kajitaDynamicFilter->ComputeZMPMB( m_SamplingPeriod, aCOMPos, LeftFootAbsPos, RightFootAbsPos, ZMPMB , iteration);
@@ -744,59 +751,59 @@ namespace PatternGeneratorJRL
         aof.open(aFileName.c_str(),ofstream::app);
         aof.precision(8);
         aof.setf(ios::scientific, ios::floatfield);
-        aof << iteration*m_SamplingPeriod << " " // 0
-            << aCOMPos.x[0] << " "    // 1
-            << aCOMPos.x[1] << " "    // 2
-            << aCOMPos.x[2] << " "    // 3
-            << aCOMPos.y[0] << " "    // 4
-            << aCOMPos.y[1] << " "    // 5
-            <<  aCOMPos.y[2]  << " "    // 6
-            <<  aCOMPos.z[0]  << " "    // 7
-            <<  aCOMPos.z[1]  << " "    // 8
-            <<  aCOMPos.z[2]  << " "    // 9
-            <<  aCOMPos.roll[0]  << " " // 10
-            <<  aCOMPos.roll[1]  << " " // 11
-            <<  aCOMPos.roll[2]  << " " // 12
-            <<  aCOMPos.pitch[0]  << " "// 13
-            <<  aCOMPos.pitch[1]  << " "// 14
-            <<  aCOMPos.pitch[2]  << " "// 15
-            <<  aCOMPos.yaw[0]  << " "  // 16
-            <<  aCOMPos.yaw[1]  << " "  // 17
-            <<  aCOMPos.yaw[2]  << " "  // 18
-            <<  aZMPPos.px  << " "      // 19
-            <<  aZMPPos.py  << " "      // 20
-            <<  ZMPMB[0]  << " "               // 21
-            <<  ZMPMB[1]  << " "               // 22
-            <<  LeftFootAbsPos.x  << " "       // 23
-            <<  LeftFootAbsPos.y  << " "       // 24
-            <<  LeftFootAbsPos.z  << " "       // 25
-            <<  LeftFootAbsPos.theta  << " "   // 26
-            <<  LeftFootAbsPos.omega  << " "   // 27
-            <<  LeftFootAbsPos.dx  << " "      // 28
-            <<  LeftFootAbsPos.dy  << " "      // 29
-            <<  LeftFootAbsPos.dz  << " "      // 30
-            <<  LeftFootAbsPos.dtheta  << " "  // 31
-            <<  LeftFootAbsPos.domega  << " "  // 32
-            <<  LeftFootAbsPos.ddx  << " "     // 33
-            <<  LeftFootAbsPos.ddy  << " "     // 34
-            <<  LeftFootAbsPos.ddz  << " "     // 35
-            <<  LeftFootAbsPos.ddtheta  << " " // 36
-            <<  LeftFootAbsPos.ddomega  << " " // 37
-            <<  RightFootAbsPos.x  << " "      // 38
-            <<  RightFootAbsPos.y  << " "      // 39
-            <<  RightFootAbsPos.z  << " "      // 40
-            <<  RightFootAbsPos.theta  << " "  // 41
-            <<  RightFootAbsPos.omega  << " "  // 42
-            <<  RightFootAbsPos.dx  << " "     // 43
-            <<  RightFootAbsPos.dy  << " "     // 44
-            <<  RightFootAbsPos.dz  << " "     // 45
-            <<  RightFootAbsPos.dtheta  << " " // 46
-            <<  RightFootAbsPos.domega  << " " // 47
-            <<  RightFootAbsPos.ddx  << " "    // 48
-            <<  RightFootAbsPos.ddy  << " "    // 49
-            <<  RightFootAbsPos.ddz  << " "    // 50
-            <<  RightFootAbsPos.ddtheta  << " "// 51
-            <<  RightFootAbsPos.ddomega  << " ";// 52
+        aof << iteration*m_SamplingPeriod << " "  // 1
+            <<  aCOMPos.x[0] << " "               // 2
+            <<  aCOMPos.x[1] << " "               // 3
+            <<  aCOMPos.x[2] << " "               // 4
+            <<  aCOMPos.y[0] << " "               // 5
+            <<  aCOMPos.y[1] << " "               // 6
+            <<  aCOMPos.y[2]  << " "              // 7
+            <<  aCOMPos.z[0]  << " "              // 8
+            <<  aCOMPos.z[1]  << " "              // 9
+            <<  aCOMPos.z[2]  << " "              // 10
+            <<  aCOMPos.roll[0]  << " "           // 11
+            <<  aCOMPos.roll[1]  << " "           // 12
+            <<  aCOMPos.roll[2]  << " "           // 13
+            <<  aCOMPos.pitch[0]  << " "          // 14
+            <<  aCOMPos.pitch[1]  << " "          // 15
+            <<  aCOMPos.pitch[2]  << " "          // 16
+            <<  aCOMPos.yaw[0]  << " "            // 17
+            <<  aCOMPos.yaw[1]  << " "            // 18
+            <<  aCOMPos.yaw[2]  << " "            // 19
+            <<  aZMPPos.px  << " "                // 20
+            <<  aZMPPos.py  << " "                // 21
+            <<  ZMPMB[0]  << " "                  // 22
+            <<  ZMPMB[1]  << " "                  // 23
+            <<  LeftFootAbsPos.x  << " "          // 24
+            <<  LeftFootAbsPos.y  << " "          // 25
+            <<  LeftFootAbsPos.z  << " "          // 26
+            <<  LeftFootAbsPos.theta  << " "      // 27
+            <<  LeftFootAbsPos.omega  << " "      // 28
+            <<  LeftFootAbsPos.dx  << " "         // 29
+            <<  LeftFootAbsPos.dy  << " "         // 30
+            <<  LeftFootAbsPos.dz  << " "         // 31
+            <<  LeftFootAbsPos.dtheta  << " "     // 32
+            <<  LeftFootAbsPos.domega  << " "     // 33
+            <<  LeftFootAbsPos.ddx  << " "        // 34
+            <<  LeftFootAbsPos.ddy  << " "        // 35
+            <<  LeftFootAbsPos.ddz  << " "        // 36
+            <<  LeftFootAbsPos.ddtheta  << " "    // 37
+            <<  LeftFootAbsPos.ddomega  << " "    // 38
+            <<  RightFootAbsPos.x  << " "         // 39
+            <<  RightFootAbsPos.y  << " "         // 40
+            <<  RightFootAbsPos.z  << " "         // 41
+            <<  RightFootAbsPos.theta  << " "     // 42
+            <<  RightFootAbsPos.omega  << " "     // 43
+            <<  RightFootAbsPos.dx  << " "        // 44
+            <<  RightFootAbsPos.dy  << " "        // 45
+            <<  RightFootAbsPos.dz  << " "        // 46
+            <<  RightFootAbsPos.dtheta  << " "    // 47
+            <<  RightFootAbsPos.domega  << " "    // 48
+            <<  RightFootAbsPos.ddx  << " "       // 49
+            <<  RightFootAbsPos.ddy  << " "       // 50
+            <<  RightFootAbsPos.ddz  << " "       // 51
+            <<  RightFootAbsPos.ddtheta  << " "   // 52
+            <<  RightFootAbsPos.ddomega  << " ";  // 53
 
         aof << endl ;
         aof.close();

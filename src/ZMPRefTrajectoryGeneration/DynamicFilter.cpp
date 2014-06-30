@@ -130,6 +130,7 @@ void DynamicFilter::init(
   prev_dq_ = dq_ ;
   prev_ddq_ = ddq_ ;
   bcalc<Robot_Model>::run(robot_, prev_q_);
+  bcalc<Robot_Model>::run(robot_2,prev_q_);
 
   deltaZMP_deq_.resize( PG_N_);
   ZMPMB_vec_.resize( PG_N_, vector<double>(2));
@@ -220,19 +221,19 @@ void DynamicFilter::InverseKinematics(
     int stage,
     int iteration)
 {
-  aCoMState_(0) = inputCoMState.x[0];      aCoMSpeed_(0) = inputCoMState.x[1];
-  aCoMState_(1) = inputCoMState.y[0];      aCoMSpeed_(1) = inputCoMState.y[1];
-  aCoMState_(2) = inputCoMState.z[0];      aCoMSpeed_(2) = inputCoMState.z[1];
-  aCoMState_(3) = inputCoMState.roll[0];   aCoMSpeed_(3) = inputCoMState.roll[1];
-  aCoMState_(4) = inputCoMState.pitch[0];  aCoMSpeed_(4) = inputCoMState.pitch[1];
-  aCoMState_(5) = inputCoMState.yaw[0];    aCoMSpeed_(5) = inputCoMState.yaw[1];
+  aCoMState_(0) = inputCoMState.x[0];       aCoMSpeed_(0) = inputCoMState.x[1];
+  aCoMState_(1) = inputCoMState.y[0];       aCoMSpeed_(1) = inputCoMState.y[1];
+  aCoMState_(2) = inputCoMState.z[0];       aCoMSpeed_(2) = inputCoMState.z[1];
+  aCoMState_(3) = inputCoMState.roll[0];    aCoMSpeed_(3) = inputCoMState.roll[1];
+  aCoMState_(4) = inputCoMState.pitch[0];   aCoMSpeed_(4) = inputCoMState.pitch[1];
+  aCoMState_(5) = inputCoMState.yaw[0];     aCoMSpeed_(5) = inputCoMState.yaw[1];
 
-  aCoMAcc_(0) = inputCoMState.x[2];    aLeftFootPosition_(0) = inputLeftFoot.x;
-  aCoMAcc_(1) = inputCoMState.y[2];    aLeftFootPosition_(1) = inputLeftFoot.y;
-  aCoMAcc_(2) = inputCoMState.z[2];    aLeftFootPosition_(2) = inputLeftFoot.z;
-  aCoMAcc_(3) = inputCoMState.roll[2]; aLeftFootPosition_(3) = inputLeftFoot.theta;
-  aCoMAcc_(4) = inputCoMState.pitch[2];aLeftFootPosition_(4) = inputLeftFoot.omega;
-  aCoMAcc_(5) = inputCoMState.yaw[2];bcalc<Robot_Model>::run(robot_, prev_q_);
+  aCoMAcc_(0) = inputCoMState.x[2];         aLeftFootPosition_(0) = inputLeftFoot.x;
+  aCoMAcc_(1) = inputCoMState.y[2];         aLeftFootPosition_(1) = inputLeftFoot.y;
+  aCoMAcc_(2) = inputCoMState.z[2];         aLeftFootPosition_(2) = inputLeftFoot.z;
+  aCoMAcc_(3) = inputCoMState.roll[2];      aLeftFootPosition_(3) = inputLeftFoot.theta;
+  aCoMAcc_(4) = inputCoMState.pitch[2];     aLeftFootPosition_(4) = inputLeftFoot.omega;
+  aCoMAcc_(5) = inputCoMState.yaw[2];
 
   aRightFootPosition_(0) = inputRightFoot.x;
   aRightFootPosition_(1) = inputRightFoot.y;
@@ -284,6 +285,7 @@ void DynamicFilter::ComputeZMPMB(
       ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
       samplingPeriod, stage, iteration) ;
 
+
   // Copy the angular trajectory data from "Boost" to "Eigen"
   for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )
   {
@@ -303,6 +305,117 @@ void DynamicFilter::ComputeZMPMB(
   ZMPMB.resize(2);
   ZMPMB[0] = - m_force.n()[1] / m_force.f()[2] ;
   ZMPMB[1] =   m_force.n()[0] / m_force.f()[2] ;
+
+
+
+
+
+
+  Robot_Model::confVector q, dq, ddq;
+  for(unsigned int j = 0 ; j < 6 ; j++ )
+  {
+    q(j,0) = 0 ;
+    dq(j,0) = 0 ;
+    ddq(j,0) = 0 ;
+  }
+  for(unsigned int j = 6 ; j < ZMPMBConfiguration_.size() ; j++ )
+  {
+    q(j,0) = ZMPMBConfiguration_(j) ;
+    dq(j,0) = ZMPMBVelocity_(j) ;
+    ddq(j,0) = ZMPMBAcceleration_(j) ;
+  }
+
+  metapod::rnea< Robot_Model, true >::run(robot_2, q, dq, ddq);
+  LankleNode & node_lankle = boost::fusion::at_c<Robot_Model::l_ankle>(robot_2.nodes);
+  RankleNode & node_rankle = boost::fusion::at_c<Robot_Model::r_ankle>(robot_2.nodes);
+
+  // Debug Purpose
+  // -------------
+  ofstream aof;
+  string aFileName;
+  ostringstream oss(std::ostringstream::ate);
+  static int it = 0;
+
+  // --------------------
+  oss.str("DynamicFilterMetapodAccWaistSupportFoot.dat");
+  aFileName = oss.str();
+  if(it == 0)
+  {
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+  ///----
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  aof << filterprecision( it*samplingPeriod) << " " ;     // 1
+
+  if (inputLeftFoot.stepType < 0)
+  {
+    aof << filterprecision( node_lankle.body.ai.v()(0,0) ) << " "  // 2
+        << filterprecision( node_lankle.body.ai.v()(1,0) ) << " "  // 3
+        << filterprecision( node_lankle.body.ai.v()(2,0) ) << " "  // 4
+        << filterprecision( node_lankle.body.ai.w()(0,0) ) << " "  // 5
+        << filterprecision( node_lankle.body.ai.w()(1,0) ) << " "  // 6
+        << filterprecision( node_lankle.body.ai.w()(2,0) ) << " "; // 7
+  }else
+  {
+    aof << filterprecision( node_rankle.body.ai.v()(0,0) ) << " "  // 2
+        << filterprecision( node_rankle.body.ai.v()(1,0) ) << " "  // 3
+        << filterprecision( node_rankle.body.ai.v()(2,0) ) << " "  // 4
+        << filterprecision( node_rankle.body.ai.w()(0,0) ) << " "  // 5
+        << filterprecision( node_rankle.body.ai.w()(1,0) ) << " "  // 6
+        << filterprecision( node_rankle.body.ai.w()(2,0) ) << " " ;// 7
+  }
+
+  aof << filterprecision( inputCoMState.x[2] ) << " "           // 8
+      << filterprecision( inputCoMState.y[2] ) << " "           // 9
+      << filterprecision( inputCoMState.z[2] ) << " "           // 10
+      << filterprecision( inputCoMState.roll[2] ) << " "        // 11
+      << filterprecision( inputCoMState.pitch[2] ) << " "       // 12
+      << filterprecision( inputCoMState.yaw[2] ) << " "       ; // 13
+
+  if (inputLeftFoot.stepType < 0)
+  {
+    aof << filterprecision( node_lankle.body.vi.v()(0,0) ) << " "  // 14
+        << filterprecision( node_lankle.body.vi.v()(1,0) ) << " "  // 15
+        << filterprecision( node_lankle.body.vi.v()(2,0) ) << " "  // 16
+        << filterprecision( node_lankle.body.vi.w()(0,0) ) << " "  // 17
+        << filterprecision( node_lankle.body.vi.w()(1,0) ) << " "  // 18
+        << filterprecision( node_lankle.body.vi.w()(2,0) ) << " " ;// 19
+  }else
+  {
+    aof << filterprecision( node_rankle.body.vi.v()(0,0) ) << " "  // 14
+        << filterprecision( node_rankle.body.vi.v()(1,0) ) << " "  // 15
+        << filterprecision( node_rankle.body.vi.v()(2,0) ) << " "  // 16
+        << filterprecision( node_rankle.body.vi.w()(0,0) ) << " "  // 17
+        << filterprecision( node_rankle.body.vi.w()(1,0) ) << " "  // 18
+        << filterprecision( node_rankle.body.vi.w()(2,0) ) << " "; // 19
+  }
+  aof << filterprecision( inputCoMState.x[1] ) << " "           // 20
+      << filterprecision( inputCoMState.y[1] ) << " "           // 21
+      << filterprecision( inputCoMState.z[1] ) << " "           // 22
+      << filterprecision( inputCoMState.roll[1] ) << " "        // 23
+      << filterprecision( inputCoMState.pitch[1] ) << " "       // 24
+      << filterprecision( inputCoMState.yaw[1] ) << " "     ;   // 25
+
+  for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )//26
+    aof << filterprecision( ZMPMBConfiguration_(j) ) << " " ;
+  for(unsigned int j = 0 ; j < ZMPMBVelocity_.size() ; j++ )    //62
+    aof << filterprecision( ZMPMBVelocity_(j) ) << " " ;
+  for(unsigned int j = 0 ; j < ZMPMBAcceleration_.size() ; j++ )//98
+    aof << filterprecision( ZMPMBAcceleration_(j) ) << " " ;
+
+  aof << filterprecision( node_waist.body.vi.v()(0,0) ) << " "  // 133
+      << filterprecision( node_waist.body.vi.v()(1,0) ) << " "  // 134
+      << filterprecision( node_waist.body.vi.v()(2,0) ) << " "  // 135
+      << filterprecision( node_waist.body.vi.w()(0,0) ) << " "  // 136
+      << filterprecision( node_waist.body.vi.w()(1,0) ) << " "  // 137
+      << filterprecision( node_waist.body.vi.w()(2,0) ) << " "; // 138
+
+  aof << endl ;
+  aof.close();
+  ++it;
 
   return ;
 }

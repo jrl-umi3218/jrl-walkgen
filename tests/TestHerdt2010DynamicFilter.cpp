@@ -759,9 +759,9 @@ void startOnLineWalking(PatternGeneratorInterface &aPGI)
         {65*200,&TestHerdt2010::startTurningRightOnSpot},
         {75*200,&TestHerdt2010::walkForward},
         {85*200,&TestHerdt2010::startTurningLeft},
-				{95*200,&TestHerdt2010::startTurningRight},
-				{105*200,&TestHerdt2010::stop},
-				{110*200,&TestHerdt2010::stopOnLineWalking}};
+        {95*200,&TestHerdt2010::startTurningRight},
+        {105*200,&TestHerdt2010::stop},
+        {110*200,&TestHerdt2010::stopOnLineWalking}};
 
 //    #define localNbOfEvents 6
 //    struct localEvent events [localNbOfEvents] =

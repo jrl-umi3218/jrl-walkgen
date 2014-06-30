@@ -168,7 +168,7 @@ public:
           m_clock.fillInStatistics();
 
           /*! Fill the debug files with appropriate information. */
-          ComparingZMPs();
+          //ComparingZMPs();
           fillInDebugFiles();
         }
         else
