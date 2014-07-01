@@ -643,7 +643,7 @@ namespace PatternGeneratorJRL
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;    
 
     m_kajitaDynamicFilter->init(m_CurrentTime, m_SamplingPeriod, 0.050, m_SamplingPeriod,
-                                1.6, lStartingCOMState.z[0], InitLeftFootAbsolutePosition );
+                                1.6, lStartingCOMState.z[0], InitLeftFootAbsolutePosition, lStartingCOMState );
 
     return m_RelativeFootPositions.size();
   }
@@ -655,7 +655,7 @@ namespace PatternGeneratorJRL
                                          deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
   {
     unsigned int lIndexInterval;
-    if (time<m_UpperTimeLimitToUpdateStacks)
+    if (time<=m_UpperTimeLimitToUpdateStacks)
     {
       if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
       {
@@ -1002,8 +1002,8 @@ namespace PatternGeneratorJRL
 
     /* Current strategy : add 2 values, and update at each iteration the stack.
        When the limit is reached, and the stack exhausted this method is called again.  */
-    FillQueues(m_AbsoluteTimeReference,
-	       m_AbsoluteTimeReference+2*m_SamplingPeriod,
+    FillQueues(m_AbsoluteTimeReference-m_SamplingPeriod,
+	       m_AbsoluteTimeReference+m_SamplingPeriod,
 	       FinalZMPPositions,
 	       FinalCoMPositions,
 	       FinalLeftFootAbsolutePositions,
@@ -1013,7 +1013,7 @@ namespace PatternGeneratorJRL
     m_Clock3.IncIteration();
 
     /* Update the time at which the stack should not be updated anymore */
-    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;    
+    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.05 * m_Tsingle;
     ODEBUG("****************** End OnLineAddFoot **************************");
   }
 

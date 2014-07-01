@@ -435,7 +435,7 @@ int
   FinalCurrentStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
 
   dynamicFilter_->init(0.0,m_SamplingPeriod,InterpolationPeriod_,
-                       QP_T_,QP_N_*QP_T_,CoMHeight_,InitLeftFootAbsolutePosition);
+                       QP_T_,QP_N_*QP_T_,CoMHeight_,InitLeftFootAbsolutePosition,lStartingCOMState);
   return 0;
 }
 

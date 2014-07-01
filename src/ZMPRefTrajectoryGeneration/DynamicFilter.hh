@@ -56,7 +56,8 @@ namespace PatternGeneratorJRL
         double PG_T,
         double previewWindowSize,
         double CoMHeight,
-        FootAbsolutePosition supportFoot
+        FootAbsolutePosition supportFoot,
+        COMState inputCoM
         );
 
     /// \brief atomic function
@@ -220,7 +221,7 @@ namespace PatternGeneratorJRL
       /// \brief data of the previous iteration
       bool PreviousSupportFoot_ ; // 1 = left ; 0 = right ;
       Robot_Model::confVector prev_q_, prev_dq_, prev_ddq_;
-
+      double CWx, CWy;
 
     /// \brief Inverse Dynamics variables
     /// ---------------------------------

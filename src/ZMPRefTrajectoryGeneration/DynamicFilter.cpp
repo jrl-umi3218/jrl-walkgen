@@ -81,7 +81,8 @@ void DynamicFilter::init(
     double PG_T,
     double previewWindowSize,
     double CoMHeight,
-    FootAbsolutePosition inputLeftFoot)
+    FootAbsolutePosition inputLeftFoot,
+    COMState inputCoMState)
 {
   currentTime_ = currentTime ;
   controlPeriod_ = controlPeriod ;
@@ -122,10 +123,13 @@ void DynamicFilter::init(
   }
 
   if (inputLeftFoot.stepType<0)
+  {
     PreviousSupportFoot_ = true ; // left foot is supporting
+  }
   else
+  {
     PreviousSupportFoot_ = false ; // right foot is supporting
-
+  }
   prev_q_ = q_ ;
   prev_dq_ = dq_ ;
   prev_ddq_ = ddq_ ;
@@ -145,6 +149,10 @@ void DynamicFilter::init(
   MAL_VECTOR_RESIZE(aRightFootPosition_,5);
   MAL_MATRIX_RESIZE(deltax_,3,1);
   MAL_MATRIX_RESIZE(deltay_,3,1);
+
+  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
+  CWx = node_waist.body.iX0.r()(0,0) - inputCoMState.x[0] ;
+  CWy = node_waist.body.iX0.r()(1,0) - inputCoMState.y[0] ;
   return ;
 }
 
@@ -284,7 +292,9 @@ void DynamicFilter::ComputeZMPMB(
   InverseKinematics( inputCoMState, inputLeftFoot, inputRightFoot,
       ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
       samplingPeriod, stage, iteration) ;
-
+  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
+  ZMPMBVelocity_[0] = inputCoMState.x[1] -  inputCoMState.yaw[1] * CWy ;
+  ZMPMBVelocity_[1] = inputCoMState.y[1] +  inputCoMState.yaw[1] * CWx ;
 
   // Copy the angular trajectory data from "Boost" to "Eigen"
   for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )
@@ -298,13 +308,24 @@ void DynamicFilter::ComputeZMPMB(
 
   // Apply the RNEA on the robot model
   metapod::rnea< Robot_Model, true >::run(robot_, q_, dq_, ddq_);
-
-  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
-  m_force = node_waist.body.iX0.applyInv (node_waist.joint.f);
+  m_force = node_waist.body.iX0.applyInv(node_waist.joint.f);
 
   ZMPMB.resize(2);
   ZMPMB[0] = - m_force.n()[1] / m_force.f()[2] ;
   ZMPMB[1] =   m_force.n()[0] / m_force.f()[2] ;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -328,6 +349,9 @@ void DynamicFilter::ComputeZMPMB(
   metapod::rnea< Robot_Model, true >::run(robot_2, q, dq, ddq);
   LankleNode & node_lankle = boost::fusion::at_c<Robot_Model::l_ankle>(robot_2.nodes);
   RankleNode & node_rankle = boost::fusion::at_c<Robot_Model::r_ankle>(robot_2.nodes);
+
+  CWx = node_waist.body.iX0.r()(0,0) - inputCoMState.x[0] ;
+  CWy = node_waist.body.iX0.r()(1,0) - inputCoMState.y[0] ;
 
   // Debug Purpose
   // -------------
@@ -392,6 +416,7 @@ void DynamicFilter::ComputeZMPMB(
         << filterprecision( node_rankle.body.vi.w()(1,0) ) << " "  // 18
         << filterprecision( node_rankle.body.vi.w()(2,0) ) << " "; // 19
   }
+
   aof << filterprecision( inputCoMState.x[1] ) << " "           // 20
       << filterprecision( inputCoMState.y[1] ) << " "           // 21
       << filterprecision( inputCoMState.z[1] ) << " "           // 22
@@ -399,19 +424,32 @@ void DynamicFilter::ComputeZMPMB(
       << filterprecision( inputCoMState.pitch[1] ) << " "       // 24
       << filterprecision( inputCoMState.yaw[1] ) << " "     ;   // 25
 
-  for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )//26
+  aof << filterprecision( node_waist.joint.vj.v()(0,0) ) << " " // 26
+      << filterprecision( node_waist.joint.vj.v()(1,0) ) << " "  // 27
+      << filterprecision( node_waist.joint.vj.v()(2,0) ) << " "  // 28
+      << filterprecision( node_waist.joint.vj.w()(0,0) ) << " "  // 29
+      << filterprecision( node_waist.joint.vj.w()(1,0) ) << " "  // 30
+      << filterprecision( node_waist.joint.vj.w()(2,0) ) << " "; // 31
+
+  aof << filterprecision( inputCoMState.x[0] ) << " "           // 32
+      << filterprecision( inputCoMState.y[0] ) << " "           // 33
+      << filterprecision( inputCoMState.z[0] ) << " "           // 34
+      << filterprecision( inputCoMState.roll[0] ) << " "        // 35
+      << filterprecision( inputCoMState.pitch[0] ) << " "       // 36
+      << filterprecision( inputCoMState.yaw[0] ) << " "     ;   // 37
+
+  aof << filterprecision( node_waist.body.iX0.r()(0,0) ) << " " // 38
+      << filterprecision( node_waist.body.iX0.r()(1,0) ) << " " // 39
+      << filterprecision( node_waist.body.iX0.r()(2,0) ) << " ";// 40
+
+
+  for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )//41
     aof << filterprecision( ZMPMBConfiguration_(j) ) << " " ;
-  for(unsigned int j = 0 ; j < ZMPMBVelocity_.size() ; j++ )    //62
+  for(unsigned int j = 0 ; j < ZMPMBVelocity_.size() ; j++ )    //77
     aof << filterprecision( ZMPMBVelocity_(j) ) << " " ;
-  for(unsigned int j = 0 ; j < ZMPMBAcceleration_.size() ; j++ )//98
+  for(unsigned int j = 0 ; j < ZMPMBAcceleration_.size() ; j++ )//113
     aof << filterprecision( ZMPMBAcceleration_(j) ) << " " ;
 
-  aof << filterprecision( node_waist.body.vi.v()(0,0) ) << " "  // 133
-      << filterprecision( node_waist.body.vi.v()(1,0) ) << " "  // 134
-      << filterprecision( node_waist.body.vi.v()(2,0) ) << " "  // 135
-      << filterprecision( node_waist.body.vi.w()(0,0) ) << " "  // 136
-      << filterprecision( node_waist.body.vi.w()(1,0) ) << " "  // 137
-      << filterprecision( node_waist.body.vi.w()(2,0) ) << " "; // 138
 
   aof << endl ;
   aof.close();
@@ -501,12 +539,12 @@ void DynamicFilter::computeWaist(const FootAbsolutePosition & inputLeftFoot)
   {
     Jacobian_LF::run(robot_, prev_q_, Vector3dTpl<LocalFloatType>::Type(0,0,0), jacobian_lf_);
     waist_speed = jacobian_lf_ * prev_dq_ ;
-    waist_acc = jacobian_lf_ * prev_ddq_ ;/* + d_jacobian_lf_ * prev_dq_*/ ;
+    waist_acc = jacobian_lf_ * prev_ddq_ /* + d_jacobian_lf_ * prev_dq_*/ ;
   }else
   {
     Jacobian_RF::run(robot_, prev_q_, Vector3dTpl<LocalFloatType>::Type(0,0,0), jacobian_rf_);
     waist_speed = jacobian_rf_ * prev_dq_ ;
-    waist_acc = jacobian_rf_ * prev_ddq_  /*+ d_jacobian_rf_ * prev_dq_*/ ;
+    waist_acc = jacobian_rf_ * prev_ddq_ /*+ d_jacobian_rf_ * prev_dq_*/ ;
   }
   for (unsigned int i = 0 ; i < 6 ; ++i)
   {

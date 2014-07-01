@@ -231,7 +231,8 @@ public:
     else{
       supportFoot = m_OneStep.RightFootPosition ;
     }
-    dynamicfilter_->init(0.0,samplingPeriod_,samplingPeriod_,samplingPeriod_,samplingPeriod_,0.814,supportFoot);
+    dynamicfilter_->init(0.0,samplingPeriod_,samplingPeriod_,samplingPeriod_,
+                         samplingPeriod_,0.814,supportFoot,m_OneStep.finalCOMPosition);
     initIK();
   }
 

@@ -489,7 +489,6 @@ namespace PatternGeneratorJRL
 
   bool AnalyticalZMPCOGTrajectory::GetIntervalIndexFromTime(double t, unsigned int &j, unsigned int &prev_j)
   {
-    cout << "m_Sensitivity = " << m_Sensitivity << endl ;
     ODEBUG("Here "<< m_DeltaTj.size());
     t -= m_AbsoluteTimeReference;
     double reftime=0;
@@ -497,7 +496,7 @@ namespace PatternGeneratorJRL
     for(unsigned int lj=prev_j;lj<m_DeltaTj.size();lj++)
       {
 	ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<j << "]= "<< m_DeltaTj[j]);
-	if (((t+m_Sensitivity)>=reftime) && (t<reftime+m_DeltaTj[lj]+m_Sensitivity))
+	if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[lj]+m_Sensitivity))
 	  {
 	    j = lj;
 	    return true;
