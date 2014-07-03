@@ -43,7 +43,7 @@ OrientationsPreview::OrientationsPreview( CjrlHumanoidDynamicRobot *aHS)
 
   // left hip
   CjrlJoint * leftFoot  = aHS->leftFoot()->associatedAnkle();
-  CjrlJoint * leftHip   = aHS->jointsBetween(*waist, *leftFoot)[0];
+  CjrlJoint * leftHip   = aHS->jointsBetween(*waist, *leftFoot)[1];
 
   lLimitLeftHipYaw_  = leftHip->lowerBound(0);//-30.0/180.0*M_PI;
   uLimitLeftHipYaw_  = leftHip->upperBound(0);//45.0/180.0*M_PI;
@@ -55,7 +55,7 @@ OrientationsPreview::OrientationsPreview( CjrlHumanoidDynamicRobot *aHS)
 
   // right hip
   CjrlJoint * rightFoot = aHS->rightFoot()->associatedAnkle();
-  CjrlJoint * rightHip  = aHS->jointsBetween(*waist, *rightFoot)[0];
+  CjrlJoint * rightHip  = aHS->jointsBetween(*waist, *rightFoot)[1];
 
   lLimitRightHipYaw_ = rightHip->lowerBound(0);//-45.0/180.0*M_PI;
   uLimitRightHipYaw_ = rightHip->upperBound(0);//30.0/180.0*M_PI;
