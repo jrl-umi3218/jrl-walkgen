@@ -517,7 +517,7 @@ int DynamicFilter::OptimalControl(
     PC_->OneIterationOfPreview(deltax_,deltay_,
                                aSxzmp_,aSyzmp_,
                                inputdeltaZMP_deq,i,
-                               deltaZMPx, deltaZMPy, true);
+                               deltaZMPx, deltaZMPy, false);
     cout << "PC CoMz = " << PC_->GetHeightOfCoM()
     << " ; PC controlTime = " << PC_->PreviewControlTime()
     << " ; PC sampling period : " << PC_->SamplingPeriod() << endl ;
