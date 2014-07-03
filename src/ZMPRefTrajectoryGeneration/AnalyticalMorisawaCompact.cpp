@@ -812,34 +812,37 @@ When the limit is reached, and the stack exhausted this method is called again. 
     {
       if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
       {
-
-//        ZMPPosition aZMPPos;
-//        memset(&aZMPPos,0,sizeof(aZMPPos));
-//        COMState aCOMPos;
-//        memset(&aCOMPos,0,sizeof(aCOMPos));
-//
+//        ZMPPosition aZMPPos0;
+//        memset(&aZMPPos0,0,sizeof(aZMPPos0));
+//        COMState aCOMPos0;
+//        memset(&aCOMPos0,0,sizeof(aCOMPos0));
+//        unsigned int n = m_kajitaDynamicFilter->getPreviewWindowSize_()/m_SamplingPeriod ;
+//        std::deque<ZMPPosition> deltaZMPPos_deq(n,aZMPPos0) ;
+//        std::deque<COMState> deltaCOMPos_deq(n,aCOMPos0) ;
 //        if (m_FilteringActivate)
 //        {
-//          double FZmpX=0, FComX=0,FComdX=0;
-//
-//          // Should we filter ?
-//          bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
-//          if (r)
+//          for (unsigned int i = 0 ; i < n ; ++i)
 //          {
-//            double FZmpY=0, FComY=0,FComdY=0;
-//            // Yes we should.
-//            m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
+//            double FZmpX=0, FComX=0,FComdX=0;
 //
-//            /*! Feed the ZMPPositions. */
-//            aZMPPos.px = FZmpX;
-//            aZMPPos.py = FZmpY;
+//            // Should we filter ?
+//            bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
+//            if (r)
+//            {
+//              double FZmpY=0, FComY=0,FComdY=0;
+//              // Yes we should.
+//              m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
 //
-//            /*! Feed the COMStates. */
-//            aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
-//            aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
+//              /*! Feed the ZMPPositions. */
+//              deltaZMPPos_deq[i].px = FZmpX;
+//              deltaZMPPos_deq[i].py = FZmpY;
+//
+//              /*! Feed the COMStates. */
+//              deltaCOMPos_deq[i].x[0] = FComX; deltaCOMPos_deq[i].x[1] = FComdX;
+//              deltaCOMPos_deq[i].y[0] = FComY; deltaCOMPos_deq[i].y[1] = FComdY;
+//            }
 //          }
 //        }
-
         std::deque<ZMPPosition> ZMPPos_deq ;
         std::deque<COMState> COMPos_deq ;
         std::deque<FootAbsolutePosition> LeftFootAbsPos ;

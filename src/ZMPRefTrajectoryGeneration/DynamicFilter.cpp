@@ -164,6 +164,13 @@ void DynamicFilter::init(
   syzmp_ = 0.0 ;
   deltaZMPx_ = 0.0 ;
   deltaZMPy_ = 0.0 ;
+
+  for(int j=0;j<3;j++)
+  {
+    deltax_(j,0) = 0 ;
+    deltay_(j,0) = 0 ;
+  }
+
   return ;
 }
 
@@ -385,11 +392,6 @@ int DynamicFilter::OptimalControl(
 
   outputDeltaCOMTraj_deq_.resize(NCtrl_);
   // calcul of the preview control along the "deltaZMP_deq_"
-  for(int j=0;j<3;j++)
-  {
-    deltax_(j,0) = 0 ;
-    deltay_(j,0) = 0 ;
-  }
   for (unsigned i = 0 ; i < NCtrl_ ; i++ )
   {
     aof << i*controlPeriod_ << " "               // 1
@@ -424,6 +426,7 @@ int DynamicFilter::OptimalControl(
   }
   return 0 ;
 }
+
 
 void DynamicFilter::computeWaist(const FootAbsolutePosition & inputLeftFoot)
 {
