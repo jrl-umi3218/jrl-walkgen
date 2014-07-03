@@ -59,6 +59,11 @@ DynamicFilter::DynamicFilter(
 
   jacobian_lf_ = Jacobian_LF::Jacobian::Zero();
   jacobian_rf_ = Jacobian_RF::Jacobian::Zero();
+
+  sxzmp_ = 0.0 ;
+  syzmp_ = 0.0 ;
+  deltaZMPx_ = 0.0 ;
+  deltaZMPy_ = 0.0 ;
 }
 
 DynamicFilter::~DynamicFilter()
@@ -99,9 +104,10 @@ void DynamicFilter::init(
   PG_N_ = (int)(previewWindowSize_/interpolationPeriod_) ;
 
   CoMHeight_ = CoMHeight ;
-  PC_->SetPreviewControlTime (previewWindowSize_ - PG_T/controlPeriod_ * interpolationPeriod_);
+  PC_->SetPreviewControlTime (previewWindowSize_);
   PC_->SetSamplingPeriod (interpolationPeriod_);
   PC_->SetHeightOfCoM(CoMHeight_);
+  PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
 
   previousConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
   previousVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
@@ -154,9 +160,10 @@ void DynamicFilter::init(
   CWx = node_waist.body.iX0.r()(0,0) - inputCoMState.x[0] ;
   CWy = node_waist.body.iX0.r()(1,0) - inputCoMState.y[0] ;
 
-   aSxzmp_ = 0.0 ;
-   aSyzmp_ = 0.0 ;
-
+  sxzmp_ = 0.0 ;
+  syzmp_ = 0.0 ;
+  deltaZMPx_ = 0.0 ;
+  deltaZMPy_ = 0.0 ;
   return ;
 }
 
@@ -500,34 +507,43 @@ int DynamicFilter::OptimalControl(
     deque<ZMPPosition> & inputdeltaZMP_deq,
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
+  /// --------------------
+  ofstream aof;
+  string aFileName;
+  ostringstream oss(std::ostringstream::ate);
+  /// --------------------
+  oss.str("ZMPDiscretisationErr.dat");
+  aFileName = oss.str();
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.close();
+  ///----
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+
   if(!PC_->IsCoherent())
     PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
 
-  outputDeltaCOMTraj_deq_.clear();
-  double deltaZMPx (0) , deltaZMPy (0) ;
-  COMState aCOMState ;
+  outputDeltaCOMTraj_deq_.resize(NCtrl_);
   // calcul of the preview control along the "deltaZMP_deq_"
   for (unsigned i = 0 ; i < NCtrl_ ; i++ )
   {
-    for(int j=0;j<3;j++)
-    {
-      deltax_(j,0) = 0 ;
-      deltay_(j,0) = 0 ;
-    }
+    aof << i*controlPeriod_ << " "               // 1
+        << sxzmp_ << " "                         // 2
+        << syzmp_ << " "                         // 3
+        << endl ;
     PC_->OneIterationOfPreview(deltax_,deltay_,
-                               aSxzmp_,aSyzmp_,
+                               sxzmp_,syzmp_,
                                inputdeltaZMP_deq,i,
-                               deltaZMPx, deltaZMPy, true);
-    cout << "PC CoMz = " << PC_->GetHeightOfCoM()
-    << " ; PC controlTime = " << PC_->PreviewControlTime()
-    << " ; PC sampling period : " << PC_->SamplingPeriod() << endl ;
+                               deltaZMPx_, deltaZMPy_, false);
     for(int j=0;j<3;j++)
     {
-      aCOMState.x[j] = deltax_(j,0);
-      aCOMState.y[j] = deltay_(j,0);
+      outputDeltaCOMTraj_deq_[i].x[j] = deltax_(j,0);
+      outputDeltaCOMTraj_deq_[i].y[j] = deltay_(j,0);
     }
-    outputDeltaCOMTraj_deq_.push_back(aCOMState);
   }
+
+  aof.close();
 
   for (unsigned int i = 0 ; i < NCtrl_ ; i++)
   {

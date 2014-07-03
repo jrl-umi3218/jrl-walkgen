@@ -185,7 +185,7 @@ public:
     m_clock.writeBuffer(lProfileOutput);
     m_clock.displayStatistics(os,m_OneStep);
     // Compare debugging files
-    ComputeAndDisplayAverageError(true);
+    //ComputeAndDisplayAverageError(true);
     return compareDebugFiles();
   }
 
