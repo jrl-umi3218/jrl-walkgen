@@ -527,8 +527,8 @@ computing the analytical trajectories. */
   {
     m_RelativeFootPositions = RelativeFootPositions;
     /* This part computes the CoM and ZMP trajectory giving the foot position information.
-It also creates the analytical feet trajectories.
-*/
+       It also creates the analytical feet trajectories.
+    */
     MAL_S3x3_MATRIX(lMStartingCOMState,double);
 
     lMStartingCOMState(0,0)= lStartingCOMState.x[0];
