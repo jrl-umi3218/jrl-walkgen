@@ -569,9 +569,6 @@ It also creates the analytical feet trajectories.
     m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
 
-    m_kajitaDynamicFilter->init( m_CurrentTime, m_SamplingPeriod, m_SamplingPeriod, m_SamplingPeriod, 1.6,
-                                 lStartingCOMState.z[0], InitLeftFootAbsolutePosition, lStartingCOMState );
-
     /*! Compute the total size of the array related to the steps. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
