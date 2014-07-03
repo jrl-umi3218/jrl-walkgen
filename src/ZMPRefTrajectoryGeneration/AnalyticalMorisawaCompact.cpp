@@ -794,7 +794,7 @@ When the limit is reached, and the stack exhausted this method is called again. 
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
 
-    m_kajitaDynamicFilter->init( m_CurrentTime, m_SamplingPeriod, 0.005, m_SamplingPeriod, 1.6,
+    m_kajitaDynamicFilter->init( m_CurrentTime, m_SamplingPeriod, m_SamplingPeriod, m_SamplingPeriod, 1.6,
                                  lStartingCOMState.z[0], InitLeftFootAbsolutePosition, lStartingCOMState );
 
     return m_RelativeFootPositions.size();
@@ -874,7 +874,7 @@ When the limit is reached, and the stack exhausted this method is called again. 
         }
 
         deque<ZMPPosition> inputdeltaZMP_deq(ZMPMB.size()) ;
-        deque<COMState> outputDeltaCOMTraj_deq_ ;
+        deque<COMState> outputDeltaCOMTraj_deq ;
 
         for (unsigned int i = 0 ; i < ZMPMB.size() ; ++i)
         {
@@ -885,22 +885,18 @@ When the limit is reached, and the stack exhausted this method is called again. 
           inputdeltaZMP_deq[i].time = time + i * m_kajitaDynamicFilter->getInterpolationPeriod() ;
           inputdeltaZMP_deq[i].stepType = ZMPPos_deq[i].stepType ;
         }
-        m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq_) ;
+        m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
 
         COMState aCOMState = COMPos_deq[0] ;
         for(int j=0;j<3;j++)
         {
-          aCOMState.x[j] += outputDeltaCOMTraj_deq_[0].x[j] ;
-          aCOMState.y[j] += outputDeltaCOMTraj_deq_[0].y[j] ;
+          aCOMState.x[j] += outputDeltaCOMTraj_deq[0].x[j] ;
+          aCOMState.y[j] += outputDeltaCOMTraj_deq[0].y[j] ;
         }
         vector<double> ZMPMBcorrige (2,0.0);
         m_kajitaDynamicFilter->ComputeZMPMB( m_SamplingPeriod, aCOMState,
                                              LeftFootAbsPos[0], RightFootAbsPos[0],
                                              ZMPMBcorrige , stage2, iteration);
-
-
-
-
 
         /// \brief Debug Purpose
         /// --------------------
@@ -948,40 +944,46 @@ When the limit is reached, and the stack exhausted this method is called again. 
               <<  ZMPPos_deq[i].py  << " "                // 21
               <<  ZMPMB[i][0] << " "                      // 22
               <<  ZMPMB[i][1] << " "                      // 23
-              <<  LeftFootAbsPos[i].x  << " "             // 24
-              <<  LeftFootAbsPos[i].y  << " "             // 25
-              <<  LeftFootAbsPos[i].z  << " "             // 26
-              <<  LeftFootAbsPos[i].theta  << " "         // 27
-              <<  LeftFootAbsPos[i].omega  << " "         // 28
-              <<  LeftFootAbsPos[i].dx  << " "            // 29
-              <<  LeftFootAbsPos[i].dy  << " "            // 30
-              <<  LeftFootAbsPos[i].dz  << " "            // 31
-              <<  LeftFootAbsPos[i].dtheta  << " "        // 32
-              <<  LeftFootAbsPos[i].domega  << " "        // 33
-              <<  LeftFootAbsPos[i].ddx  << " "           // 34
-              <<  LeftFootAbsPos[i].ddy  << " "           // 35
-              <<  LeftFootAbsPos[i].ddz  << " "           // 36
-              <<  LeftFootAbsPos[i].ddtheta  << " "       // 37
-              <<  LeftFootAbsPos[i].ddomega  << " "       // 38
-              <<  RightFootAbsPos[i].x  << " "            // 39
-              <<  RightFootAbsPos[i].y  << " "            // 40
-              <<  RightFootAbsPos[i].z  << " "            // 41
-              <<  RightFootAbsPos[i].theta  << " "        // 42
-              <<  RightFootAbsPos[i].omega  << " "        // 43
-              <<  RightFootAbsPos[i].dx  << " "           // 44
-              <<  RightFootAbsPos[i].dy  << " "           // 45
-              <<  RightFootAbsPos[i].dz  << " "           // 46
-              <<  RightFootAbsPos[i].dtheta  << " "       // 47
-              <<  RightFootAbsPos[i].domega  << " "       // 48
-              <<  RightFootAbsPos[i].ddx  << " "          // 49
-              <<  RightFootAbsPos[i].ddy  << " "          // 50
-              <<  RightFootAbsPos[i].ddz  << " "          // 51
-              <<  RightFootAbsPos[i].ddtheta  << " "      // 52
-              <<  RightFootAbsPos[i].ddomega  << " "      // 53
-              <<  ZMPPos_deq[i].px  << " "                // 54
-              <<  ZMPPos_deq[i].py  << " "                // 55
-              <<  inputdeltaZMP_deq[i].px << " "          // 56
-              <<  inputdeltaZMP_deq[i].py << " "          // 57
+              <<  ZMPMBcorrige[0] << " "                  // 24
+              <<  ZMPMBcorrige[1] << " "                  // 25
+              <<  inputdeltaZMP_deq[i].px << " "          // 26
+              <<  inputdeltaZMP_deq[i].py << " "          // 27
+              <<  outputDeltaCOMTraj_deq[0].x[0] << " "   // 28
+              <<  outputDeltaCOMTraj_deq[0].x[1] << " "   // 29
+              <<  outputDeltaCOMTraj_deq[0].x[2] << " "   // 30
+              <<  outputDeltaCOMTraj_deq[0].y[0] << " "   // 31
+              <<  outputDeltaCOMTraj_deq[0].y[1] << " "   // 32
+              <<  outputDeltaCOMTraj_deq[0].y[2] << " "   // 33
+              <<  LeftFootAbsPos[i].x  << " "             // 34
+              <<  LeftFootAbsPos[i].y  << " "             // 35
+              <<  LeftFootAbsPos[i].z  << " "             // 36
+              <<  LeftFootAbsPos[i].theta  << " "         // 37
+              <<  LeftFootAbsPos[i].omega  << " "         // 38
+              <<  LeftFootAbsPos[i].dx  << " "            // 39
+              <<  LeftFootAbsPos[i].dy  << " "            // 40
+              <<  LeftFootAbsPos[i].dz  << " "            // 41
+              <<  LeftFootAbsPos[i].dtheta  << " "        // 42
+              <<  LeftFootAbsPos[i].domega  << " "        // 43
+              <<  LeftFootAbsPos[i].ddx  << " "           // 44
+              <<  LeftFootAbsPos[i].ddy  << " "           // 45
+              <<  LeftFootAbsPos[i].ddz  << " "           // 46
+              <<  LeftFootAbsPos[i].ddtheta  << " "       // 47
+              <<  LeftFootAbsPos[i].ddomega  << " "       // 48
+              <<  RightFootAbsPos[i].x  << " "            // 49
+              <<  RightFootAbsPos[i].y  << " "            // 50
+              <<  RightFootAbsPos[i].z  << " "            // 51
+              <<  RightFootAbsPos[i].theta  << " "        // 52
+              <<  RightFootAbsPos[i].omega  << " "        // 53
+              <<  RightFootAbsPos[i].dx  << " "           // 54
+              <<  RightFootAbsPos[i].dy  << " "           // 55
+              <<  RightFootAbsPos[i].dz  << " "           // 56
+              <<  RightFootAbsPos[i].dtheta  << " "       // 57
+              <<  RightFootAbsPos[i].domega  << " "       // 58
+              <<  RightFootAbsPos[i].ddx  << " "          // 59
+              <<  RightFootAbsPos[i].ddy  << " "          // 60
+              <<  RightFootAbsPos[i].ddz  << " "          // 61
+              <<  RightFootAbsPos[i].ddtheta  << " "      // 62
+              <<  RightFootAbsPos[i].ddomega  << " "      // 63
               << endl ;
         }
         aof.close() ;
@@ -997,7 +999,7 @@ When the limit is reached, and the stack exhausted this method is called again. 
         aof.open(aFileName.c_str(),ofstream::app);
         aof.precision(8);
         aof.setf(ios::scientific, ios::floatfield);
-        aof << iteration*m_SamplingPeriod << " "  // 1
+        aof << iteration*m_SamplingPeriod << " "        // 1
             <<  COMPos_deq[0].x[0] << " "               // 2
             <<  COMPos_deq[0].x[1] << " "               // 3
             <<  COMPos_deq[0].x[2] << " "               // 4
@@ -1018,8 +1020,18 @@ When the limit is reached, and the stack exhausted this method is called again. 
             <<  COMPos_deq[0].yaw[2]  << " "            // 19
             <<  ZMPPos_deq[0].px  << " "                // 20
             <<  ZMPPos_deq[0].py  << " "                // 21
-            <<  ZMPMBcontrol[0] << " "                  // 22
-            <<  ZMPMBcontrol[1]  << " "                 // 23
+            <<  ZMPMB[0][0] << " "                      // 22
+            <<  ZMPMB[0][1] << " "                      // 23
+            <<  ZMPMBcorrige[0] << " "                  // 24
+            <<  ZMPMBcorrige[1] << " "                  // 25
+            <<  inputdeltaZMP_deq[0].px << " "          // 26
+            <<  inputdeltaZMP_deq[0].py << " "          // 27
+            <<  outputDeltaCOMTraj_deq[0].x[0] << " "   // 28
+            <<  outputDeltaCOMTraj_deq[0].x[1] << " "   // 29
+            <<  outputDeltaCOMTraj_deq[0].x[2] << " "   // 30
+            <<  outputDeltaCOMTraj_deq[0].y[0] << " "   // 31
+            <<  outputDeltaCOMTraj_deq[0].y[1] << " "   // 32
+            <<  outputDeltaCOMTraj_deq[0].y[2] << " "   // 33
             <<  LeftFootAbsPos[0].x  << " "             // 24
             <<  LeftFootAbsPos[0].y  << " "             // 25
             <<  LeftFootAbsPos[0].z  << " "             // 26
@@ -1050,31 +1062,15 @@ When the limit is reached, and the stack exhausted this method is called again. 
             <<  RightFootAbsPos[0].ddz  << " "          // 51
             <<  RightFootAbsPos[0].ddtheta  << " "      // 52
             <<  RightFootAbsPos[0].ddomega  << " "      // 53
-            <<  ZMPMBcorrige[0] << " "                  // 54
-            <<  ZMPMBcorrige[1] << " "                  // 55
-            <<  outputDeltaCOMTraj_deq_[0].x[0] << " "  // 56
-            <<  outputDeltaCOMTraj_deq_[0].x[1] << " "  // 57
-            <<  outputDeltaCOMTraj_deq_[0].x[2] << " "  // 58
-            <<  outputDeltaCOMTraj_deq_[0].y[0] << " "  // 59
-            <<  outputDeltaCOMTraj_deq_[0].y[1] << " "  // 60
-            <<  outputDeltaCOMTraj_deq_[0].y[2] << " "  // 61
-            <<  inputdeltaZMP_deq[0].px << " "          // 62
-            <<  inputdeltaZMP_deq[0].py << " "       ;  // 63
-
-
-        aof << endl ;
+            << endl ;
         aof.close();
-
         ++iteration;
-
-
-
       }
     }
     else
     {
       /*! We reached the end of the trajectory generated
-and no foot steps have been added. */
+      and no foot steps have been added. */
       m_OnLineMode = false;
     }
   }

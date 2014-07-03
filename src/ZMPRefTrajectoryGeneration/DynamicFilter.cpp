@@ -332,147 +332,6 @@ void DynamicFilter::ComputeZMPMB(
   ZMPMB[0] = - m_force.n()[1] / m_force.f()[2] ;
   ZMPMB[1] =   m_force.n()[0] / m_force.f()[2] ;
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//  Robot_Model::confVector q, dq, ddq;
-//  for(unsigned int j = 0 ; j < 6 ; j++ )
-//  {
-//    q(j,0) = 0 ;
-//    dq(j,0) = 0 ;
-//    ddq(j,0) = 0 ;
-//  }
-//  for(unsigned int j = 6 ; j < ZMPMBConfiguration_.size() ; j++ )
-//  {
-//    q(j,0) = ZMPMBConfiguration_(j) ;
-//    dq(j,0) = ZMPMBVelocity_(j) ;
-//    ddq(j,0) = ZMPMBAcceleration_(j) ;
-//  }
-//
-//  metapod::rnea< Robot_Model, true >::run(robot_2, q, dq, ddq);
-//  LankleNode & node_lankle = boost::fusion::at_c<Robot_Model::l_ankle>(robot_2.nodes);
-//  RankleNode & node_rankle = boost::fusion::at_c<Robot_Model::r_ankle>(robot_2.nodes);
-//
-//  CWx = node_waist.body.iX0.r()(0,0) - inputCoMState.x[0] ;
-//  CWy = node_waist.body.iX0.r()(1,0) - inputCoMState.y[0] ;
-//
-//  // Debug Purpose
-//  // -------------
-//  ofstream aof;
-//  string aFileName;
-//  ostringstream oss(std::ostringstream::ate);
-//  static int it = 0;
-//
-//  // --------------------
-//  oss.str("DynamicFilterMetapodAccWaistSupportFoot.dat");
-//  aFileName = oss.str();
-//  if(it == 0)
-//  {
-//    aof.open(aFileName.c_str(),ofstream::out);
-//    aof.close();
-//  }
-//  ///----
-//  aof.open(aFileName.c_str(),ofstream::app);
-//  aof.precision(8);
-//  aof.setf(ios::scientific, ios::floatfield);
-//  aof << filterprecision( it*samplingPeriod) << " " ;     // 1
-//
-//  if (inputLeftFoot.stepType < 0)
-//  {
-//    aof << filterprecision( node_lankle.body.ai.v()(0,0) ) << " "  // 2
-//        << filterprecision( node_lankle.body.ai.v()(1,0) ) << " "  // 3
-//        << filterprecision( node_lankle.body.ai.v()(2,0) ) << " "  // 4
-//        << filterprecision( node_lankle.body.ai.w()(0,0) ) << " "  // 5
-//        << filterprecision( node_lankle.body.ai.w()(1,0) ) << " "  // 6
-//        << filterprecision( node_lankle.body.ai.w()(2,0) ) << " "; // 7
-//  }else
-//  {
-//    aof << filterprecision( node_rankle.body.ai.v()(0,0) ) << " "  // 2
-//        << filterprecision( node_rankle.body.ai.v()(1,0) ) << " "  // 3
-//        << filterprecision( node_rankle.body.ai.v()(2,0) ) << " "  // 4
-//        << filterprecision( node_rankle.body.ai.w()(0,0) ) << " "  // 5
-//        << filterprecision( node_rankle.body.ai.w()(1,0) ) << " "  // 6
-//        << filterprecision( node_rankle.body.ai.w()(2,0) ) << " " ;// 7
-//  }
-//
-//  aof << filterprecision( inputCoMState.x[2] ) << " "           // 8
-//      << filterprecision( inputCoMState.y[2] ) << " "           // 9
-//      << filterprecision( inputCoMState.z[2] ) << " "           // 10
-//      << filterprecision( inputCoMState.roll[2] ) << " "        // 11
-//      << filterprecision( inputCoMState.pitch[2] ) << " "       // 12
-//      << filterprecision( inputCoMState.yaw[2] ) << " "       ; // 13
-//
-//  if (inputLeftFoot.stepType < 0)
-//  {
-//    aof << filterprecision( node_lankle.body.vi.v()(0,0) ) << " "  // 14
-//        << filterprecision( node_lankle.body.vi.v()(1,0) ) << " "  // 15
-//        << filterprecision( node_lankle.body.vi.v()(2,0) ) << " "  // 16
-//        << filterprecision( node_lankle.body.vi.w()(0,0) ) << " "  // 17
-//        << filterprecision( node_lankle.body.vi.w()(1,0) ) << " "  // 18
-//        << filterprecision( node_lankle.body.vi.w()(2,0) ) << " " ;// 19
-//  }else
-//  {
-//    aof << filterprecision( node_rankle.body.vi.v()(0,0) ) << " "  // 14
-//        << filterprecision( node_rankle.body.vi.v()(1,0) ) << " "  // 15
-//        << filterprecision( node_rankle.body.vi.v()(2,0) ) << " "  // 16
-//        << filterprecision( node_rankle.body.vi.w()(0,0) ) << " "  // 17
-//        << filterprecision( node_rankle.body.vi.w()(1,0) ) << " "  // 18
-//        << filterprecision( node_rankle.body.vi.w()(2,0) ) << " "; // 19
-//  }
-//
-//  aof << filterprecision( inputCoMState.x[1] ) << " "           // 20
-//      << filterprecision( inputCoMState.y[1] ) << " "           // 21
-//      << filterprecision( inputCoMState.z[1] ) << " "           // 22
-//      << filterprecision( inputCoMState.roll[1] ) << " "        // 23
-//      << filterprecision( inputCoMState.pitch[1] ) << " "       // 24
-//      << filterprecision( inputCoMState.yaw[1] ) << " "     ;   // 25
-//
-//  aof << filterprecision( node_waist.joint.vj.v()(0,0) ) << " " // 26
-//      << filterprecision( node_waist.joint.vj.v()(1,0) ) << " "  // 27
-//      << filterprecision( node_waist.joint.vj.v()(2,0) ) << " "  // 28
-//      << filterprecision( node_waist.joint.vj.w()(0,0) ) << " "  // 29
-//      << filterprecision( node_waist.joint.vj.w()(1,0) ) << " "  // 30
-//      << filterprecision( node_waist.joint.vj.w()(2,0) ) << " "; // 31
-//
-//  aof << filterprecision( inputCoMState.x[0] ) << " "           // 32
-//      << filterprecision( inputCoMState.y[0] ) << " "           // 33
-//      << filterprecision( inputCoMState.z[0] ) << " "           // 34
-//      << filterprecision( inputCoMState.roll[0] ) << " "        // 35
-//      << filterprecision( inputCoMState.pitch[0] ) << " "       // 36
-//      << filterprecision( inputCoMState.yaw[0] ) << " "     ;   // 37
-//
-//  aof << filterprecision( node_waist.body.iX0.r()(0,0) ) << " " // 38
-//      << filterprecision( node_waist.body.iX0.r()(1,0) ) << " " // 39
-//      << filterprecision( node_waist.body.iX0.r()(2,0) ) << " ";// 40
-//
-//
-//  for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )//41
-//    aof << filterprecision( ZMPMBConfiguration_(j) ) << " " ;
-//  for(unsigned int j = 0 ; j < ZMPMBVelocity_.size() ; j++ )    //77
-//    aof << filterprecision( ZMPMBVelocity_(j) ) << " " ;
-//  for(unsigned int j = 0 ; j < ZMPMBAcceleration_.size() ; j++ )//113
-//    aof << filterprecision( ZMPMBAcceleration_(j) ) << " " ;
-//
-//
-//  aof << endl ;
-//  aof.close();
-//  ++it;
-
   return ;
 }
 
@@ -610,6 +469,129 @@ void DynamicFilter::computeWaist(const FootAbsolutePosition & inputLeftFoot)
   prev_q_ = q_ ;
   prev_dq_ = dq_ ;
   prev_ddq_ = ddq_ ;
+
+  //  Robot_Model::confVector q, dq, ddq;
+  //  for(unsigned int j = 0 ; j < 6 ; j++ )
+  //  {
+  //    q(j,0) = 0 ;
+  //    dq(j,0) = 0 ;
+  //    ddq(j,0) = 0 ;
+  //  }
+  //  for(unsigned int j = 6 ; j < ZMPMBConfiguration_.size() ; j++ )
+  //  {
+  //    q(j,0) = ZMPMBConfiguration_(j) ;
+  //    dq(j,0) = ZMPMBVelocity_(j) ;
+  //    ddq(j,0) = ZMPMBAcceleration_(j) ;
+  //  }
+  //
+  //  metapod::rnea< Robot_Model, true >::run(robot_2, q, dq, ddq);
+  //  LankleNode & node_lankle = boost::fusion::at_c<Robot_Model::l_ankle>(robot_2.nodes);
+  //  RankleNode & node_rankle = boost::fusion::at_c<Robot_Model::r_ankle>(robot_2.nodes);
+  //
+  //  CWx = node_waist.body.iX0.r()(0,0) - inputCoMState.x[0] ;
+  //  CWy = node_waist.body.iX0.r()(1,0) - inputCoMState.y[0] ;
+  //
+  //  // Debug Purpose
+  //  // -------------
+  //  ofstream aof;
+  //  string aFileName;
+  //  ostringstream oss(std::ostringstream::ate);
+  //  static int it = 0;
+  //
+  //  // --------------------
+  //  oss.str("DynamicFilterMetapodAccWaistSupportFoot.dat");
+  //  aFileName = oss.str();
+  //  if(it == 0)
+  //  {
+  //    aof.open(aFileName.c_str(),ofstream::out);
+  //    aof.close();
+  //  }
+  //  ///----
+  //  aof.open(aFileName.c_str(),ofstream::app);
+  //  aof.precision(8);
+  //  aof.setf(ios::scientific, ios::floatfield);
+  //  aof << filterprecision( it*samplingPeriod) << " " ;     // 1
+  //
+  //  if (inputLeftFoot.stepType < 0)
+  //  {
+  //    aof << filterprecision( node_lankle.body.ai.v()(0,0) ) << " "  // 2
+  //        << filterprecision( node_lankle.body.ai.v()(1,0) ) << " "  // 3
+  //        << filterprecision( node_lankle.body.ai.v()(2,0) ) << " "  // 4
+  //        << filterprecision( node_lankle.body.ai.w()(0,0) ) << " "  // 5
+  //        << filterprecision( node_lankle.body.ai.w()(1,0) ) << " "  // 6
+  //        << filterprecision( node_lankle.body.ai.w()(2,0) ) << " "; // 7
+  //  }else
+  //  {
+  //    aof << filterprecision( node_rankle.body.ai.v()(0,0) ) << " "  // 2
+  //        << filterprecision( node_rankle.body.ai.v()(1,0) ) << " "  // 3
+  //        << filterprecision( node_rankle.body.ai.v()(2,0) ) << " "  // 4
+  //        << filterprecision( node_rankle.body.ai.w()(0,0) ) << " "  // 5
+  //        << filterprecision( node_rankle.body.ai.w()(1,0) ) << " "  // 6
+  //        << filterprecision( node_rankle.body.ai.w()(2,0) ) << " " ;// 7
+  //  }
+  //
+  //  aof << filterprecision( inputCoMState.x[2] ) << " "           // 8
+  //      << filterprecision( inputCoMState.y[2] ) << " "           // 9
+  //      << filterprecision( inputCoMState.z[2] ) << " "           // 10
+  //      << filterprecision( inputCoMState.roll[2] ) << " "        // 11
+  //      << filterprecision( inputCoMState.pitch[2] ) << " "       // 12
+  //      << filterprecision( inputCoMState.yaw[2] ) << " "       ; // 13
+  //
+  //  if (inputLeftFoot.stepType < 0)
+  //  {
+  //    aof << filterprecision( node_lankle.body.vi.v()(0,0) ) << " "  // 14
+  //        << filterprecision( node_lankle.body.vi.v()(1,0) ) << " "  // 15
+  //        << filterprecision( node_lankle.body.vi.v()(2,0) ) << " "  // 16
+  //        << filterprecision( node_lankle.body.vi.w()(0,0) ) << " "  // 17
+  //        << filterprecision( node_lankle.body.vi.w()(1,0) ) << " "  // 18
+  //        << filterprecision( node_lankle.body.vi.w()(2,0) ) << " " ;// 19
+  //  }else
+  //  {
+  //    aof << filterprecision( node_rankle.body.vi.v()(0,0) ) << " "  // 14
+  //        << filterprecision( node_rankle.body.vi.v()(1,0) ) << " "  // 15
+  //        << filterprecision( node_rankle.body.vi.v()(2,0) ) << " "  // 16
+  //        << filterprecision( node_rankle.body.vi.w()(0,0) ) << " "  // 17
+  //        << filterprecision( node_rankle.body.vi.w()(1,0) ) << " "  // 18
+  //        << filterprecision( node_rankle.body.vi.w()(2,0) ) << " "; // 19
+  //  }
+  //
+  //  aof << filterprecision( inputCoMState.x[1] ) << " "           // 20
+  //      << filterprecision( inputCoMState.y[1] ) << " "           // 21
+  //      << filterprecision( inputCoMState.z[1] ) << " "           // 22
+  //      << filterprecision( inputCoMState.roll[1] ) << " "        // 23
+  //      << filterprecision( inputCoMState.pitch[1] ) << " "       // 24
+  //      << filterprecision( inputCoMState.yaw[1] ) << " "     ;   // 25
+  //
+  //  aof << filterprecision( node_waist.joint.vj.v()(0,0) ) << " " // 26
+  //      << filterprecision( node_waist.joint.vj.v()(1,0) ) << " "  // 27
+  //      << filterprecision( node_waist.joint.vj.v()(2,0) ) << " "  // 28
+  //      << filterprecision( node_waist.joint.vj.w()(0,0) ) << " "  // 29
+  //      << filterprecision( node_waist.joint.vj.w()(1,0) ) << " "  // 30
+  //      << filterprecision( node_waist.joint.vj.w()(2,0) ) << " "; // 31
+  //
+  //  aof << filterprecision( inputCoMState.x[0] ) << " "           // 32
+  //      << filterprecision( inputCoMState.y[0] ) << " "           // 33
+  //      << filterprecision( inputCoMState.z[0] ) << " "           // 34
+  //      << filterprecision( inputCoMState.roll[0] ) << " "        // 35
+  //      << filterprecision( inputCoMState.pitch[0] ) << " "       // 36
+  //      << filterprecision( inputCoMState.yaw[0] ) << " "     ;   // 37
+  //
+  //  aof << filterprecision( node_waist.body.iX0.r()(0,0) ) << " " // 38
+  //      << filterprecision( node_waist.body.iX0.r()(1,0) ) << " " // 39
+  //      << filterprecision( node_waist.body.iX0.r()(2,0) ) << " ";// 40
+  //
+  //
+  //  for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )//41
+  //    aof << filterprecision( ZMPMBConfiguration_(j) ) << " " ;
+  //  for(unsigned int j = 0 ; j < ZMPMBVelocity_.size() ; j++ )    //77
+  //    aof << filterprecision( ZMPMBVelocity_(j) ) << " " ;
+  //  for(unsigned int j = 0 ; j < ZMPMBAcceleration_.size() ; j++ )//113
+  //    aof << filterprecision( ZMPMBAcceleration_(j) ) << " " ;
+  //
+  //
+  //  aof << endl ;
+  //  aof.close();
+  //  ++it;
 
   return ;
 }
