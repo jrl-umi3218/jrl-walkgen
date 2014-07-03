@@ -168,6 +168,9 @@ namespace PatternGeneratorJRL
     inline double getPreviewWindowSize_()
     {return previewWindowSize_ ;}
 
+    inline void getPCerror_(double & errx, double & erry)
+    { errx = sxzmp_ ; erry = syzmp_ ; }
+
   private: // Private members
 
     /// \brief Time variables
@@ -260,7 +263,8 @@ namespace PatternGeneratorJRL
     /// --------------------------------
       /// \brief Pointer to the Preview Control object.
       PreviewControl *PC_;
-      double aSxzmp_ , aSyzmp_ ;
+      double sxzmp_ , syzmp_ ;
+      double deltaZMPx_, deltaZMPy_ ;
       double CoMHeight_ ;
 
       /// \brief State of the Preview control.

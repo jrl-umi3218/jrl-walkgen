@@ -527,8 +527,8 @@ computing the analytical trajectories. */
   {
     m_RelativeFootPositions = RelativeFootPositions;
     /* This part computes the CoM and ZMP trajectory giving the foot position information.
-It also creates the analytical feet trajectories.
-*/
+       It also creates the analytical feet trajectories.
+    */
     MAL_S3x3_MATRIX(lMStartingCOMState,double);
 
     lMStartingCOMState(0,0)= lStartingCOMState.x[0];
@@ -569,15 +569,166 @@ It also creates the analytical feet trajectories.
     m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
 
+    double KajitaPCpreviewWindow = 1.6 ;
+    m_kajitaDynamicFilter->init( m_CurrentTime,
+                                 m_SamplingPeriod,
+                                 m_SamplingPeriod,
+                                 m_PreviewControlTime+2*m_SamplingPeriod-TimeShift,
+                                 KajitaPCpreviewWindow,
+                                 lStartingCOMState.z[0],
+                                 InitLeftFootAbsolutePosition,
+                                 lStartingCOMState );
+
     /*! Compute the total size of the array related to the steps. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
+    deque<COMState> filteredCoM = COMStates ;
+
+    /*! Add KajitaPCpreviewWindow second to the buffers for fitering */
+    unsigned int n = ZMPPositions.size();
+    ZMPPosition lastZMP = ZMPPositions.back();
+    COMState lastCoM = COMStates.back();
+    FootAbsolutePosition lastLF = LeftFootAbsolutePositions.back();
+    FootAbsolutePosition lastRF = RightFootAbsolutePositions.back();
+    for (unsigned int i = 0  ; i < KajitaPCpreviewWindow/m_SamplingPeriod ; ++i)
+    {
+      ZMPPositions.push_back(lastZMP);
+      COMStates.push_back(lastCoM);
+      LeftFootAbsolutePositions.push_back(lastLF);
+      RightFootAbsolutePositions.push_back(lastRF);
+    }
+    unsigned int N = ZMPPositions.size();
+    int stage0 = 0 ;
+    int stage1 = 1 ;
+    vector <vector<double> > ZMPMB (N , vector<double> (2,0.0)) ;
+    for (unsigned int i = 0  ; i < N ; ++i)
+    {
+      m_kajitaDynamicFilter->ComputeZMPMB( m_SamplingPeriod, COMStates[i],
+                                           LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
+                                           ZMPMB[i] , stage0 , i);
+    }
+    deque<ZMPPosition> inputdeltaZMP_deq(N) ;
+    deque<COMState> outputDeltaCOMTraj_deq ;
+    for (unsigned int i = 0 ; i < N ; ++i)
+    {
+      inputdeltaZMP_deq[i].px = ZMPPositions[i].px - ZMPMB[i][0] ;
+      inputdeltaZMP_deq[i].py = ZMPPositions[i].py - ZMPMB[i][1] ;
+      inputdeltaZMP_deq[i].pz = 0.0 ;
+      inputdeltaZMP_deq[i].theta = 0.0 ;
+      inputdeltaZMP_deq[i].time = m_CurrentTime + i * m_SamplingPeriod ;
+      inputdeltaZMP_deq[i].stepType = ZMPPositions[i].stepType ;
+    }
+    int OptimalControlError = m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
+    cout << "OptimalControlError = " << OptimalControlError << endl ;
+    cout << "outputDeltaCOMTraj_deq.size() = " << outputDeltaCOMTraj_deq.size() << endl ;
+    cout << "n = " << n << endl ;
+    cout << "N = " << N << endl ;
+    vector <vector<double> > filteredZMPMB (n , vector<double> (2,0.0)) ;
+    for (unsigned int i = 0 ; i < n ; ++i)
+    {
+      outputDeltaCOMTraj_deq[1600].x[0] ;
+      for(int j=0;j<3;j++)
+      {
+        filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+        filteredCoM[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+      }
+      m_kajitaDynamicFilter->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
+                                          LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
+                                          filteredZMPMB[i] , stage1, i);
+    }
 
     m_UpperTimeLimitToUpdateStacks = m_CurrentTime;
     for(int i=0;i<m_NumberOfIntervals;i++)
     {
       m_UpperTimeLimitToUpdateStacks += m_DeltaTj[i];
     }
+
+    /// \brief Debug Purpose
+    /// --------------------
+    ofstream aof;
+    string aFileName;
+    ostringstream oss(std::ostringstream::ate);
+    static int iteration = 0;
+    cout << "iteration = " << iteration ;
+    /// \brief Debug Purpose
+    /// --------------------
+    oss.str("ZMPDiscretisationBuffer.dat");
+    aFileName = oss.str();
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+    ///----
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    for (unsigned int i = 0 ; i < n ; ++i )
+    {
+      aof << i*m_SamplingPeriod << " "                           // 1
+          <<  COMStates[i].x[0] << " "                           // 2
+          <<  COMStates[i].x[1] << " "                           // 3
+          <<  COMStates[i].x[2] << " "                           // 4
+          <<  COMStates[i].y[0] << " "                           // 5
+          <<  COMStates[i].y[1] << " "                           // 6
+          <<  COMStates[i].y[2]  << " "                          // 7
+          <<  COMStates[i].z[0]  << " "                          // 8
+          <<  COMStates[i].z[1]  << " "                          // 9
+          <<  COMStates[i].z[2]  << " "                          // 10
+          <<  COMStates[i].roll[0]  << " "                       // 11
+          <<  COMStates[i].roll[1]  << " "                       // 12
+          <<  COMStates[i].roll[2]  << " "                       // 13
+          <<  COMStates[i].pitch[0]  << " "                      // 14
+          <<  COMStates[i].pitch[1]  << " "                      // 15
+          <<  COMStates[i].pitch[2]  << " "                      // 16
+          <<  COMStates[i].yaw[0]  << " "                        // 17
+          <<  COMStates[i].yaw[1]  << " "                        // 18
+          <<  COMStates[i].yaw[2]  << " "                        // 19
+          <<  ZMPPositions[i].px  << " "                         // 20
+          <<  ZMPPositions[i].py  << " "                         // 21
+          <<  ZMPMB[i][0] << " "                                 // 22
+          <<  ZMPMB[i][1] << " "                                 // 23
+          <<  filteredZMPMB[i][0] << " "                         // 24
+          <<  filteredZMPMB[i][1] << " "                         // 25
+          <<  inputdeltaZMP_deq[i].px << " "                     // 26
+          <<  inputdeltaZMP_deq[i].py << " "                     // 27
+          <<  outputDeltaCOMTraj_deq[i].x[0] << " "              // 28
+          <<  outputDeltaCOMTraj_deq[i].x[1] << " "              // 29
+          <<  outputDeltaCOMTraj_deq[i].x[2] << " "              // 30
+          <<  outputDeltaCOMTraj_deq[i].y[0] << " "              // 31
+          <<  outputDeltaCOMTraj_deq[i].y[1] << " "              // 32
+          <<  outputDeltaCOMTraj_deq[i].y[2] << " "              // 33
+          <<  LeftFootAbsolutePositions[i].x  << " "             // 34
+          <<  LeftFootAbsolutePositions[i].y  << " "             // 35
+          <<  LeftFootAbsolutePositions[i].z  << " "             // 36
+          <<  LeftFootAbsolutePositions[i].theta  << " "         // 37
+          <<  LeftFootAbsolutePositions[i].omega  << " "         // 38
+          <<  LeftFootAbsolutePositions[i].dx  << " "            // 39
+          <<  LeftFootAbsolutePositions[i].dy  << " "            // 40
+          <<  LeftFootAbsolutePositions[i].dz  << " "            // 41
+          <<  LeftFootAbsolutePositions[i].dtheta  << " "        // 42
+          <<  LeftFootAbsolutePositions[i].domega  << " "        // 43
+          <<  LeftFootAbsolutePositions[i].ddx  << " "           // 44
+          <<  LeftFootAbsolutePositions[i].ddy  << " "           // 45
+          <<  LeftFootAbsolutePositions[i].ddz  << " "           // 46
+          <<  LeftFootAbsolutePositions[i].ddtheta  << " "       // 47
+          <<  LeftFootAbsolutePositions[i].ddomega  << " "       // 48
+          <<  RightFootAbsolutePositions[i].x  << " "            // 49
+          <<  RightFootAbsolutePositions[i].y  << " "            // 50
+          <<  RightFootAbsolutePositions[i].z  << " "            // 51
+          <<  RightFootAbsolutePositions[i].theta  << " "        // 52
+          <<  RightFootAbsolutePositions[i].omega  << " "        // 53
+          <<  RightFootAbsolutePositions[i].dx  << " "           // 54
+          <<  RightFootAbsolutePositions[i].dy  << " "           // 55
+          <<  RightFootAbsolutePositions[i].dz  << " "           // 56
+          <<  RightFootAbsolutePositions[i].dtheta  << " "       // 57
+          <<  RightFootAbsolutePositions[i].domega  << " "       // 58
+          <<  RightFootAbsolutePositions[i].ddx  << " "          // 59
+          <<  RightFootAbsolutePositions[i].ddy  << " "          // 60
+          <<  RightFootAbsolutePositions[i].ddz  << " "          // 61
+          <<  RightFootAbsolutePositions[i].ddtheta  << " "      // 62
+          <<  RightFootAbsolutePositions[i].ddomega  << " "      // 63
+          << endl ;
+    }
+    aof.close() ;
+    ++iteration;
   }
 
   int AnalyticalMorisawaCompact::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
@@ -2505,58 +2656,7 @@ new step has to be generate.
                                              deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
                                              deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions)
   {
-    unsigned int lIndexInterval,lPrevIndexInterval;
-    m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_AbsoluteTimeReference,lIndexInterval);
-    lPrevIndexInterval = lIndexInterval;
-
-    /*! Fill in the stacks: minimal strategy only 1 reference. */
-    for(double t=StartingTime; t<=EndTime; t+= m_SamplingPeriod)
-    {
-      m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(t,lIndexInterval,lPrevIndexInterval);
-
-      /*! Feed the ZMPPositions. */
-      ZMPPosition aZMPPos;
-      if (!m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px,lIndexInterval))
-        LTHROW("Unable to compute ZMP along X-Axis in EndPhaseOfWalking");
-
-      if (!m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py,lIndexInterval))
-        LTHROW("Unable to compute ZMP along Y-Axis in EndPhaseOfWalking");
-
-      FinalZMPPositions.push_back(aZMPPos);
-
-      /*! Feed the COMStates. */
-      COMState aCOMPos;
-      memset(&aCOMPos,0,sizeof(aCOMPos));
-      if (!m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(t,aCOMPos.x[0],lIndexInterval))
-      { LTHROW("COM out of bound along X axis.");}
-      m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(t,aCOMPos.x[1],lIndexInterval);
-      if (!m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(t,aCOMPos.y[0],lIndexInterval))
-      { LTHROW("COM out of bound along Y axis.");}
-      m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1],lIndexInterval);
-      aCOMPos.z[0] = m_InitialPoseCoMHeight;
-      FinalCoMPositions.push_back(aCOMPos);
-      /*! Feed the FootPositions. */
-
-      /*! Left */
-      FootAbsolutePosition LeftFootAbsPos;
-      memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
-      if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,t,LeftFootAbsPos,lIndexInterval))
-      { LTHROW("Unable to compute left foot position in EndPhaseOfWalking");}
-      FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
-
-      /*! Right */
-      FootAbsolutePosition RightFootAbsPos;
-      memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
-      if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos,lIndexInterval))
-      { LTHROW("Unable to compute right foot position in EndPhaseOfWalking");}
-      FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
-
-
-      ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " <<
-              aCOMPos.x[0] << " " << aCOMPos.y[0] << " " <<
-              LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " <<
-              RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " <<
-              m_SamplingPeriod,"Test.dat");
-    }
+    FillQueues(m_SamplingPeriod, StartingTime, EndTime, FinalZMPPositions,
+               FinalCoMPositions, FinalLeftFootAbsolutePositions, FinalRightFootAbsolutePositions);
   }
 }

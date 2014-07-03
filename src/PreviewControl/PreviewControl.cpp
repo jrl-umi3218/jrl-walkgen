@@ -28,7 +28,7 @@
 */
 
 #include <fstream>
-//#define _DEBUG_MODE_ON_
+#define _DEBUG_MODE_ON_
 #include <Debug.hh>
 
 #include <PreviewControl/PreviewControl.hh>
@@ -342,7 +342,7 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
     {
       LTHROW("ZMPPositions.size()<m_SizeOfPreviewWindow:" );
     }
-
+  //cout << "Size preview = "<< ZMPPositions.size() << endl ;
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
     ux += m_F(i,0)* ZMPPositions[lindex+i].px;
 
