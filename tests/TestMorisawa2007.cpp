@@ -411,7 +411,7 @@ protected:
     vector<double> ZMPMBtmp;
     dynamicfilter_->ComputeZMPMB(
         samplingPeriod_, m_OneStep.finalCOMPosition, m_OneStep.LeftFootPosition,
-        m_OneStep.RightFootPosition, ZMPMBtmp, iteration);
+        m_OneStep.RightFootPosition, ZMPMBtmp, 1,iteration);
 
     if (m_OneStep.NbOfIt<=10){
       dInitX_ = m_OneStep.ZMPTarget(0) - ZMPMBtmp[0] ;

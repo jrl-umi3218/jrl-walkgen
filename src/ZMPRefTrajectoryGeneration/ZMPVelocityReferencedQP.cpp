@@ -570,7 +570,7 @@ void
                                    FinalCOMTraj_deq[i],
                                    FinalLeftFootTraj_deq[i],
                                    FinalRightFootTraj_deq[i],
-                                   ZMPMB_deq[i-CurrentIndex_],
+                                   ZMPMB_deq[i-CurrentIndex_],1,
                                    (int)time/QP_T_ + i*m_SamplingPeriod
                                    );
 

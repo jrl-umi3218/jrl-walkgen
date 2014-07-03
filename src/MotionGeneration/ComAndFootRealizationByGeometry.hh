@@ -366,11 +366,17 @@ namespace PatternGeneratorJRL
     /*! \brief For the speed (stage 1). */
     MAL_VECTOR( m_prev_Configuration1,double);
 
+    /*! \brief For the speed (stage 1). */
+    MAL_VECTOR( m_prev_Configuration2,double);
+
     /*! \brief For the speed (stage 0). */
     MAL_VECTOR(m_prev_Velocity,double);
 
     /*! \brief For the speed (stage 1). */
     MAL_VECTOR( m_prev_Velocity1,double);
+
+    /*! \brief For the speed (stage 1). */
+    MAL_VECTOR( m_prev_Velocity2,double);
 
     //@}
 

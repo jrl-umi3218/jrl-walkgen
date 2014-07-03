@@ -58,8 +58,10 @@ ComAndFootRealizationByGeometry::
   // the humanoid is assume to have 6 DOFs per leg.
   MAL_VECTOR_FILL(m_prev_Configuration,0.0);
   MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
+  MAL_VECTOR_FILL(m_prev_Configuration2,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
+  MAL_VECTOR_FILL(m_prev_Velocity2,0.0);
 
   RESETDEBUG4("DebugDataVelocity.dat");
 
@@ -304,8 +306,10 @@ void ComAndFootRealizationByGeometry::
 
   MAL_VECTOR_FILL(m_prev_Configuration,0.0);
   MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
+  MAL_VECTOR_FILL(m_prev_Configuration2,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
+  MAL_VECTOR_FILL(m_prev_Velocity2,0.0);
 
 }
 
@@ -533,8 +537,10 @@ bool ComAndFootRealizationByGeometry::
   // Initialize previous configuration vector
   MAL_VECTOR_FILL(m_prev_Configuration,0.0);
   MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
+  MAL_VECTOR_FILL(m_prev_Configuration2,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
+  MAL_VECTOR_FILL(m_prev_Velocity2,0.0);
 
   InitLeftFootPosition.z = 0.0;
   InitRightFootPosition.z = 0.0;
@@ -1064,6 +1070,37 @@ bool ComAndFootRealizationByGeometry::
     m_prev_Configuration1 = CurrentConfiguration;
     m_prev_Velocity1 = CurrentVelocity;
   }
+  else if (Stage==2)
+  {
+    ODEBUG("lql: "<<lql<< " lqr: " <<lqr);
+    if (IterationNumber>0)
+    {
+      /* Compute the speed */
+      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration2);i++)
+      {
+        CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration2[i])/ getSamplingPeriod();
+        /* Keep the new value for the legs. */
+      }
+      if (IterationNumber>1)
+      {
+        for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity2);i++)
+          CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity2[i])/ ldt;
+      }
+    }
+    else
+    {
+      /* Compute the speed */
+      for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_prev_Configuration2);i++)
+      {
+        CurrentVelocity[i] = 0.0;
+        /* Keep the new value for the legs. */
+      }
+    }
+    ODEBUG4(CurrentVelocity, "DebugDataVelocity1.dat");
+    m_prev_Configuration2 = CurrentConfiguration;
+    m_prev_Velocity2 = CurrentVelocity;
+  }
+
 
 
   for(int i=0;i<6;i++)
@@ -1245,11 +1282,13 @@ bool ComAndFootRealizationByGeometry::
 
   MAL_VECTOR_RESIZE(m_prev_Configuration,aHDMB->numberDof());
   MAL_VECTOR_RESIZE(m_prev_Configuration1,aHDMB->numberDof());
+  MAL_VECTOR_RESIZE(m_prev_Configuration2,aHDMB->numberDof());
 
   for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
   {
     m_prev_Configuration[i] = 0.0;
     m_prev_Configuration1[i] = 0.0;
+    m_prev_Configuration2[i] = 0.0;
   }
   return true;
 }

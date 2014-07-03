@@ -559,7 +559,7 @@ namespace PatternGeneratorJRL
 		      deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
 		      deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions);
 
-      void FillQueues(double SamplingPeriod,
+      void FillQueues(double samplingPeriod,
                       double StartingTime,
                       double EndTime,
                       deque<ZMPPosition> & FinalZMPPositions,

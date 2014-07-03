@@ -79,8 +79,15 @@ namespace PatternGeneratorJRL
         const FootAbsolutePosition & inputLeftFoot,
         const FootAbsolutePosition & inputRightFoot,
         vector<double> & ZMPMB,
+        int stage,
         int iteration);
 
+    void stage0INstage1();
+
+    /// \brief Preview control on the ZMPMBs computed
+    int OptimalControl(
+        deque<ZMPPosition> & inputdeltaZMP_deq,
+        deque<COMState> & outputDeltaCOMTraj_deq_);
 
   private: // Private methods
 
@@ -104,9 +111,6 @@ namespace PatternGeneratorJRL
         MAL_VECTOR_TYPE(double) & velocity,
         MAL_VECTOR_TYPE(double) & acceleration,
         vector<double> & ZMPMB);
-
-    /// \brief Preview control on the ZMPMBs computed
-    int OptimalControl(std::deque<COMState> & outputDeltaCOMTraj_deq_);
 
     void computeWaist(const FootAbsolutePosition & inputLeftFoot);
 
@@ -256,6 +260,7 @@ namespace PatternGeneratorJRL
     /// --------------------------------
       /// \brief Pointer to the Preview Control object.
       PreviewControl *PC_;
+      double aSxzmp_ , aSyzmp_ ;
       double CoMHeight_ ;
 
       /// \brief State of the Preview control.
