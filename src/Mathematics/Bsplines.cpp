@@ -405,35 +405,35 @@ void ZBsplines::ZGenerateControlPoints(double IP, double FT, double FP, double T
     std::ofstream myfile1;
     myfile1.open("control_point.txt");
 
-    Point A = {0.0,IP};
+    Point A; A.x = 0.0 ; A.y = IP ;
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {m_FT*0.05,IP};
+    A.x = m_FT*0.05 ; A.y = IP ;
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {m_FT*0.1,IP};
+    A.x = m_FT*0.1 ; A.y = IP ;
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.85*m_ToMP,m_MP};
+    A.x = 0.85*m_ToMP ; A.y = m_MP ;
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {1.15*m_ToMP,m_MP};
+    A.x = 1.15*m_ToMP ; A.y = m_MP ;
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.90*m_FT,m_FP};
+    A.x = 0.90*m_FT ; A.y = m_FP ;
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {0.95*m_FT,m_FP};
+    A.x = 0.95*m_FT ; A.y = m_FP ;
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 
-    A = {m_FT,m_FP};
+    A.x = m_FT ; A.y = m_FP ;
     control_points.push_back(A);
     myfile1 << A.x <<" "<< A.y<< endl;
 

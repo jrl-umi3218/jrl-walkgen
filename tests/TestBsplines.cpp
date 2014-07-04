@@ -35,8 +35,6 @@ int main()
 {
     PatternGeneratorJRL::ZBsplines *Z;
     double t=0.0;
-    int m_degree;
-    int i , j;
     ofstream myfile;
     myfile.open("TestBsplines.txt");
 

@@ -116,24 +116,6 @@ namespace PatternGeneratorJRL
 
     // -------------------------------------------------------------------
 
-    /// \brief Debug function
-    void printAlongTime(deque<COMState> & inputCOMTraj_deq_,
-                    deque<ZMPPosition> inputZMPTraj_deq_,
-                    deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-                    deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-                    deque<COMState> & outputDeltaCOMTraj_deq_
-                    );
-    /// \brief Debug function
-    void printBuffers(deque<COMState> & inputCOMTraj_deq_,
-                    deque<ZMPPosition> inputZMPTraj_deq_,
-                    deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-                    deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-                    deque<COMState> & outputDeltaCOMTraj_deq_
-                    );
-    /// \brief Debug function
-    double filterprecision(double adb);
-
-
   public: // The accessors
 
     /// \brief setter :

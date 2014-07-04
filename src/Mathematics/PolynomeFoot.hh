@@ -161,7 +161,6 @@ namespace PatternGeneratorJRL
       void SetParameters(double FT, double FP);
 
 
-      double Compute(double t);
       /*! Set the parameters such that
         the initial position, and initial speed
         are different from zero.

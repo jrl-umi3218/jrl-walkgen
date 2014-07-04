@@ -76,7 +76,7 @@ namespace PatternGeneratorJRL
 
 
   AnalyticalMorisawaCompact::AnalyticalMorisawaCompact(SimplePluginManager *lSPM , CjrlHumanoidDynamicRobot *aHS)
-      : AnalyticalMorisawaAbstract(lSPM)
+    : AnalyticalMorisawaAbstract(lSPM)
   {
 
     RegisterMethods();
@@ -101,7 +101,7 @@ namespace PatternGeneratorJRL
     /*! Dynamic allocation of the analytical trajectories for the ZMP and the COG */
     m_AnalyticalZMPCoGTrajectoryX = new AnalyticalZMPCOGTrajectory(7);
     m_AnalyticalZMPCoGTrajectoryY = new AnalyticalZMPCOGTrajectory(7);
-   // m_AnalyticalZMPCoGTrajectoryZ = new AnalyticalZMPCOGTrajectory(7);
+    // m_AnalyticalZMPCoGTrajectoryZ = new AnalyticalZMPCOGTrajectory(7);
 
     /*! Dynamic allocation of the filters. */
     m_FilterXaxisByPC = new FilteringAnalyticalTrajectoryByPreviewControl(lSPM,
@@ -813,37 +813,37 @@ When the limit is reached, and the stack exhausted this method is called again. 
     {
       if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
       {
-//        ZMPPosition aZMPPos0;
-//        memset(&aZMPPos0,0,sizeof(aZMPPos0));
-//        COMState aCOMPos0;
-//        memset(&aCOMPos0,0,sizeof(aCOMPos0));
-//        unsigned int n = m_kajitaDynamicFilter->getPreviewWindowSize_()/m_SamplingPeriod ;
-//        std::deque<ZMPPosition> deltaZMPPos_deq(n,aZMPPos0) ;
-//        std::deque<COMState> deltaCOMPos_deq(n,aCOMPos0) ;
-//        if (m_FilteringActivate)
-//        {
-//          for (unsigned int i = 0 ; i < n ; ++i)
-//          {
-//            double FZmpX=0, FComX=0,FComdX=0;
-//
-//            // Should we filter ?
-//            bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
-//            if (r)
-//            {
-//              double FZmpY=0, FComY=0,FComdY=0;
-//              // Yes we should.
-//              m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
-//
-//              /*! Feed the ZMPPositions. */
-//              deltaZMPPos_deq[i].px = FZmpX;
-//              deltaZMPPos_deq[i].py = FZmpY;
-//
-//              /*! Feed the COMStates. */
-//              deltaCOMPos_deq[i].x[0] = FComX; deltaCOMPos_deq[i].x[1] = FComdX;
-//              deltaCOMPos_deq[i].y[0] = FComY; deltaCOMPos_deq[i].y[1] = FComdY;
-//            }
-//          }
-//        }
+        //        ZMPPosition aZMPPos0;
+        //        memset(&aZMPPos0,0,sizeof(aZMPPos0));
+        //        COMState aCOMPos0;
+        //        memset(&aCOMPos0,0,sizeof(aCOMPos0));
+        //        unsigned int n = m_kajitaDynamicFilter->getPreviewWindowSize_()/m_SamplingPeriod ;
+        //        std::deque<ZMPPosition> deltaZMPPos_deq(n,aZMPPos0) ;
+        //        std::deque<COMState> deltaCOMPos_deq(n,aCOMPos0) ;
+        //        if (m_FilteringActivate)
+        //        {
+        //          for (unsigned int i = 0 ; i < n ; ++i)
+        //          {
+        //            double FZmpX=0, FComX=0,FComdX=0;
+        //
+        //            // Should we filter ?
+        //            bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
+        //            if (r)
+        //            {
+        //              double FZmpY=0, FComY=0,FComdY=0;
+        //              // Yes we should.
+        //              m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
+        //
+        //              /*! Feed the ZMPPositions. */
+        //              deltaZMPPos_deq[i].px = FZmpX;
+        //              deltaZMPPos_deq[i].py = FZmpY;
+        //
+        //              /*! Feed the COMStates. */
+        //              deltaCOMPos_deq[i].x[0] = FComX; deltaCOMPos_deq[i].x[1] = FComdX;
+        //              deltaCOMPos_deq[i].y[0] = FComY; deltaCOMPos_deq[i].y[1] = FComdY;
+        //            }
+        //          }
+        //        }
         std::deque<ZMPPosition> ZMPPos_deq ;
         std::deque<COMState> COMPos_deq ;
         std::deque<FootAbsolutePosition> LeftFootAbsPos ;
@@ -2639,17 +2639,14 @@ new step has to be generate.
       aCOMPos.yaw[1] = 0.5*(LeftFootAbsPos.dtheta + RightFootAbsPos.dtheta);
       aCOMPos.yaw[2] = 0.5*(LeftFootAbsPos.ddtheta + RightFootAbsPos.ddtheta);
 
+      ComputeCoMz(t,aCOMPos.z[0]);
+
+      aCOMPos.z[1] = (aCOMPos.z[0] - preCoMz) / m_SamplingPeriod;
+      preCoMz = aCOMPos.z[0];
+
       FinalCoMPositions.push_back(aCOMPos);
-
-    ComputeCoMz(t,aCOMPos.z[0]);
-
-    aCOMPos.z[1] = (aCOMPos.z[0] - preCoMz) / m_SamplingPeriod;
-    preCoMz = aCOMPos.z[0];
-
-
-    FinalCoMPositions.push_back(aCOMPos);
       ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " <<
-		aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << aCOMPos.z[0] <<" "<<
+              aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << aCOMPos.z[0] <<" "<<
               LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " <<
               RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " <<
               samplingPeriod,"Test.dat");
@@ -2657,13 +2654,13 @@ new step has to be generate.
   }
 
 
-    void AnalyticalMorisawaCompact::ComputeCoMz(double t, double &CoMz)
-    {
+  void AnalyticalMorisawaCompact::ComputeCoMz(double t, double &CoMz)
+  {
 
-    int Index,Index2;
+    unsigned int Index;
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
     double deltaZ;
-   // double static CoMzpre = CoMz;
+    // double static CoMzpre = CoMz;
     double up=0.1,upRight = 0.9 ,upLeft = 0.0;
     double              upRight1 = 0.9 ,upLeft1 = 0.0;
 
@@ -2672,69 +2669,69 @@ new step has to be generate.
 
     if (t >= moving_time){ // we start analyze since 2nd step
 
-        Index2 = int(t/moving_time);
+      Index = int(t/moving_time);
 
 
-        if (Index2 < m_AbsoluteSupportFootPositions.size())
+      if (Index < m_AbsoluteSupportFootPositions.size())
+      {
+        // climbing
+
+        // put first leg on the stairs with decrease of CoM //up// of stair height
+        // the CoM line will decrease between an //upLeft to upRight// interval of SStime.
+        // the CoM line will go up between an //upLeft1 to upRight1// interval of SStime while 2nd leg moving up on the stairs.
+        if (m_AbsoluteSupportFootPositions[Index].z > m_AbsoluteSupportFootPositions[Index-1].z) // first leg
         {
-            // climbing
-
-            // put first leg on the stairs with decrease of CoM //up// of stair height
-            // the CoM line will decrease between an //upLeft to upRight// interval of SStime.
-            // the CoM line will go up between an //upLeft1 to upRight1// interval of SStime while 2nd leg moving up on the stairs.
-            if (m_AbsoluteSupportFootPositions[Index2].z > m_AbsoluteSupportFootPositions[Index2-1].z) // first leg
-            {
-                deltaZ = (-m_AbsoluteSupportFootPositions[Index2].z + m_AbsoluteSupportFootPositions[Index2-1].z );
-                if (t <= Index2*moving_time + upRight*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + upLeft*m_RelativeFootPositions[Index2].SStime)
-                    CoMz = (t-Index2*moving_time - upLeft*m_RelativeFootPositions[Index2].SStime)*up*deltaZ/((upRight-upLeft)*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z ;
-                else if (t < Index2*moving_time + upLeft*m_RelativeFootPositions[Index2].SStime)
-                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z ;
-                else
-                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z + up*deltaZ;
-            }
-            else if (m_AbsoluteSupportFootPositions[Index2].z == m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2-1].sz > 0) // 2nd leg
-            {
-                deltaZ = (m_AbsoluteSupportFootPositions[Index2].z - m_AbsoluteSupportFootPositions[Index2-2].z );
-                if (t <= Index2*moving_time + upRight1*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + upLeft1*m_RelativeFootPositions[Index2].SStime)
-                    CoMz = (t-Index2*moving_time - upLeft1*m_RelativeFootPositions[Index2].SStime)*(1+up)*deltaZ/((upRight1-upLeft1)*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-2].z - up*deltaZ ;
-                else if (t < Index2*moving_time + upLeft1*m_RelativeFootPositions[Index2].SStime)
-                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-2].z - up*deltaZ;
-                else
-                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z;
-            }
-
-                // going down
-                // the CoM line will decrease an //1+down// stair height between an //downLeft to downRight// interval of SStime while moving first leg down
-                // put the 2nd leg down while standing up the CoM.
-            else if (m_AbsoluteSupportFootPositions[Index2].z < m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2].sz < 0) // first leg
-            {
-                deltaZ = (m_AbsoluteSupportFootPositions[Index2].z - m_AbsoluteSupportFootPositions[Index2-1].z );
-                if (t <= Index2*moving_time + downRight*m_RelativeFootPositions[Index2].SStime && t >= Index2*moving_time + downLeft*m_RelativeFootPositions[Index2].SStime)
-                    CoMz = (t-Index2*moving_time- downLeft*m_RelativeFootPositions[Index2].SStime)*(1+down)*deltaZ/((downRight - downLeft)*m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z  ;
-                else if (t  < Index2*moving_time + downLeft*m_RelativeFootPositions[Index2].SStime)
-                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z ;
-                else
-                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z + down*deltaZ;
-            }
-            else if (m_AbsoluteSupportFootPositions[Index2].z == m_AbsoluteSupportFootPositions[Index2-1].z && m_RelativeFootPositions[Index2-1].sz < 0) //second leg
-            {
-                deltaZ = (m_AbsoluteSupportFootPositions[Index2-2].z - m_AbsoluteSupportFootPositions[Index2].z );
-                if (t <= Index2*moving_time + m_RelativeFootPositions[Index2].SStime )
-                    CoMz = (t-Index2*moving_time)*down*deltaZ/(m_RelativeFootPositions[Index2].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2-1].z - down*deltaZ ;
-                else
-                    CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z ;
-            }
-            else // normal walking
-                CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index2].z;
+          deltaZ = (-m_AbsoluteSupportFootPositions[Index].z + m_AbsoluteSupportFootPositions[Index-1].z );
+          if (t <= Index*moving_time + upRight*m_RelativeFootPositions[Index].SStime && t >= Index*moving_time + upLeft*m_RelativeFootPositions[Index].SStime)
+            CoMz = (t-Index*moving_time - upLeft*m_RelativeFootPositions[Index].SStime)*up*deltaZ/((upRight-upLeft)*m_RelativeFootPositions[Index].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index-1].z ;
+          else if (t < Index*moving_time + upLeft*m_RelativeFootPositions[Index].SStime)
+            CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index-1].z ;
+          else
+            CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index-1].z + up*deltaZ;
+        }
+        else if (m_AbsoluteSupportFootPositions[Index].z == m_AbsoluteSupportFootPositions[Index-1].z && m_RelativeFootPositions[Index-1].sz > 0) // 2nd leg
+        {
+          deltaZ = (m_AbsoluteSupportFootPositions[Index].z - m_AbsoluteSupportFootPositions[Index-2].z );
+          if (t <= Index*moving_time + upRight1*m_RelativeFootPositions[Index].SStime && t >= Index*moving_time + upLeft1*m_RelativeFootPositions[Index].SStime)
+            CoMz = (t-Index*moving_time - upLeft1*m_RelativeFootPositions[Index].SStime)*(1+up)*deltaZ/((upRight1-upLeft1)*m_RelativeFootPositions[Index].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index-2].z - up*deltaZ ;
+          else if (t < Index*moving_time + upLeft1*m_RelativeFootPositions[Index].SStime)
+            CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index-2].z - up*deltaZ;
+          else
+            CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z;
         }
 
-        else //after final step
-            CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z;
+        // going down
+        // the CoM line will decrease an //1+down// stair height between an //downLeft to downRight// interval of SStime while moving first leg down
+        // put the 2nd leg down while standing up the CoM.
+        else if (m_AbsoluteSupportFootPositions[Index].z < m_AbsoluteSupportFootPositions[Index-1].z && m_RelativeFootPositions[Index].sz < 0) // first leg
+        {
+          deltaZ = (m_AbsoluteSupportFootPositions[Index].z - m_AbsoluteSupportFootPositions[Index-1].z );
+          if (t <= Index*moving_time + downRight*m_RelativeFootPositions[Index].SStime && t >= Index*moving_time + downLeft*m_RelativeFootPositions[Index].SStime)
+            CoMz = (t-Index*moving_time- downLeft*m_RelativeFootPositions[Index].SStime)*(1+down)*deltaZ/((downRight - downLeft)*m_RelativeFootPositions[Index].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index-1].z  ;
+          else if (t  < Index*moving_time + downLeft*m_RelativeFootPositions[Index].SStime)
+            CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index-1].z ;
+          else
+            CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z + down*deltaZ;
         }
+        else if (m_AbsoluteSupportFootPositions[Index].z == m_AbsoluteSupportFootPositions[Index-1].z && m_RelativeFootPositions[Index-1].sz < 0) //second leg
+        {
+          deltaZ = (m_AbsoluteSupportFootPositions[Index-2].z - m_AbsoluteSupportFootPositions[Index].z );
+          if (t <= Index*moving_time + m_RelativeFootPositions[Index].SStime )
+            CoMz = (t-Index*moving_time)*down*deltaZ/(m_RelativeFootPositions[Index].SStime) +  m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index-1].z - down*deltaZ ;
+          else
+            CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z ;
+        }
+        else // normal walking
+          CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z;
+      }
+
+      else //after final step
+        CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z;
+    }
     else //first step
-        CoMz = m_InitialPoseCoMHeight ;
+      CoMz = m_InitialPoseCoMHeight ;
 
-}
+  }
 
 
   void AnalyticalMorisawaCompact::FillQueues(double StartingTime,
