@@ -183,11 +183,12 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()
   {
-    std::string aMethodName[15] =
+    std::string aMethodName[16] =
     {":LimitsFeasibility",
      ":ZMPShiftParameters",
      ":TimeDistributionParameters",
      ":stepseq",
+       ":stepstairseq",
      ":finish",
      ":StartOnLineStepSequencing",
      ":StopOnLineStepSequencing",
@@ -200,7 +201,7 @@ namespace PatternGeneratorJRL {
      ":setVelReference",
      ":setCoMPerturbationForce"};
 
-    for(int i=0;i<15;i++)
+    for(int i=0;i<16;i++)
     {
       if (!SimplePlugin::RegisterMethod(aMethodName[i]))
       {
@@ -463,13 +464,16 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::ReadSequenceOfSteps(istringstream &strm)
   {
     // Read the data inside strm.
-
-
     switch (m_StepStackHandler->GetWalkMode())
     {
     case 0:
     case 4:
     case 5:
+      case 6:
+      {
+	  m_StepStackHandler->ReadStepSequenceAccordingToWalkMode(strm);
+	  break;
+	 }
     case 3:
     case 1:
       {
@@ -543,7 +547,6 @@ namespace PatternGeneratorJRL {
     deque<RelativeFootPosition> RelativeFootPositions;
     m_ZMPVRQP->SetCurrentTime(m_InternalClock);
 
-
     m_ZMPVRQP->InitOnLine(m_ZMPPositions,
                           m_COMBuffer,
                           m_LeftFootPositions,
@@ -572,6 +575,19 @@ namespace PatternGeneratorJRL {
     FinishAndRealizeStepSequence();
     ODEBUG("After finish and realize Step Sequence");
   }
+
+    void PatternGeneratorInterfacePrivate::m_StepStairSequence(istringstream &strm)
+  {
+
+    ODEBUG("Step Sequence");
+    ofstream DebugFile;
+    m_StepStackHandler->ReadStepStairSequenceAccordingToWalkMode(strm);
+
+    ODEBUG("After reading Step Stair Sequence");
+    FinishAndRealizeStepSequence();
+    ODEBUG("After finish and realize Step Stair Sequence");
+  }
+
 
   void PatternGeneratorInterfacePrivate::EvaluateStartingCOM(MAL_VECTOR(  & Configuration,double),
                                                              MAL_S3_VECTOR(  & lStartingCOMState,double))
@@ -720,6 +736,7 @@ namespace PatternGeneratorJRL {
     {
       ODEBUG(lRelativeFootPositions[i].sx << " " <<
              lRelativeFootPositions[i].sy << " " <<
+	       lRelativeFootPositions[i].sz << " " <<
              lRelativeFootPositions[i].theta );
 
     }
@@ -746,6 +763,7 @@ namespace PatternGeneratorJRL {
         ODEBUG("Push a position in stack of steps:"<<
                lRelativeFootPositions[0].sx << " " <<
                lRelativeFootPositions[0].sy << " " <<
+	       lRelativeFootPositions[0].sz << " " <<
                lRelativeFootPositions[0].theta);
       }
     }
@@ -897,11 +915,11 @@ namespace PatternGeneratorJRL {
     vector<double> lCurrentJointValues;
     m_ZMPD->SetZMPShift(m_ZMPShift);
 
+
+
     MAL_VECTOR_TYPE(double) lCurrentConfiguration;
 
     lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
-    ODEBUG("lCurrent Configuration :" << lCurrentConfiguration);
-
 
     deque<RelativeFootPosition> lRelativeFootPositions;
     CommonInitializationOfWalking(lStartingCOMState,
@@ -909,6 +927,8 @@ namespace PatternGeneratorJRL {
                                   BodyAnglesIni,
                                   InitLeftFootAbsPos, InitRightFootAbsPos,
                                   lRelativeFootPositions,lCurrentJointValues,true);
+
+
 
     ODEBUG("lStartingCOMState: "
            << lStartingCOMState.x[0] << " "
@@ -925,8 +945,11 @@ namespace PatternGeneratorJRL {
     m_HumanoidDynamicRobot->currentConfiguration(lCurrentConfiguration);
 
     ODEBUG("Size of lRelativeFootPositions :" << lRelativeFootPositions.size());
+   // cout <<"Size of lRelativeFootPositions :" << lRelativeFootPositions.size() << endl;
     ODEBUG("ZMPInitialPoint" << lStartingZMPPosition(0)  << " "
            << lStartingZMPPosition(1)  << " " << lStartingZMPPosition(2) );
+
+
 
     ODEBUG("COMBuffer: " << m_COMBuffer.size() );
 
@@ -936,6 +959,7 @@ namespace PatternGeneratorJRL {
                         lStartingZMPPosition,
                         InitLeftFootAbsPos,
                         InitRightFootAbsPos);
+
 
     ODEBUG("First m_ZMPPositions" << m_ZMPPositions[0].px << " " << m_ZMPPositions[0].py);
     deque<ZMPPosition> aZMPBuffer;
@@ -991,10 +1015,13 @@ namespace PatternGeneratorJRL {
     gettimeofday(&time4,0);
     ODEBUG4("FinishAndRealizeStepSequence() - 7 ","DebugGMFKW.dat");
     // Read NL informations from ZMPRefPositions.
+
+
     m_GlobalStrategyManager->Setup(m_ZMPPositions,
                                    m_COMBuffer,
                                    m_LeftFootPositions,
                                    m_RightFootPositions);
+
 
     gettimeofday(&time5,0);
 
@@ -1037,10 +1064,12 @@ namespace PatternGeneratorJRL {
     strm >> aCmd;
 
     ODEBUG("PARSECMD");
+
     if (SimplePluginManager::CallMethod(aCmd,strm))
     {
       ODEBUG("Method " << aCmd << " found and handled.");
     }
+
     return 0;
   }
   void PatternGeneratorInterfacePrivate::ChangeOnLineStep(istringstream &strm,double &newtime)
@@ -1051,7 +1080,9 @@ namespace PatternGeneratorJRL {
       double ltime = (double)m_ZMPM->GetTSingleSupport();
       strm >> aFAP.x;
       strm >> aFAP.y;
+	//strm >> aFAP.z;
       strm >> aFAP.theta;
+
       ChangeOnLineStep(ltime,aFAP,newtime);
     }
   }
@@ -1085,6 +1116,9 @@ namespace PatternGeneratorJRL {
 
     else if (aCmd==":stepseq")
       m_StepSequence(strm);
+
+    else if (aCmd==":stepstairseq")
+      m_StepStairSequence(strm);
 
     else if (aCmd==":finish")
       m_FinishAndRealizeStepSequence(strm);

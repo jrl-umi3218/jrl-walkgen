@@ -15,6 +15,13 @@
 
 INCLUDE(CTest)
 
+# Optional test dependencies.
+# We put them here to prevent them to be listed in the .pc file.
+ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
+ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
+
+MESSAGE(STATUS "hrp2-dynamics: " ${HRP2_DYNAMICS_FOUND})
+
 # Import jrl-mal flags.
 ADD_DEFINITIONS(${JRL_MAL_CFLAGS})
 LINK_DIRECTORIES(${JRL_DYNAMICS_LIBRARY_DIRS})
@@ -45,6 +52,15 @@ ADD_EXECUTABLE(TestOptCholesky
 )
 
 #########################
+# Test Bspline #
+#########################
+MESSAGE(STATUS "Bspline taken into account")
+ADD_EXECUTABLE(TestBsplines
+  TestBsplines.cpp
+  ../src/Mathematics/Bsplines.cpp
+  )
+
+#########################
 # Test Ricatti Equation #
 #########################
 ADD_EXECUTABLE(TestRiccatiEquation
@@ -54,50 +70,62 @@ ADD_EXECUTABLE(TestRiccatiEquation
 
 PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-dynamics)
 
+
 ######################
 # Test Morisawa 2007 #
 ######################
-math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
-CONFIG_FILES_CMAKE(TestMorisawa2007OnLine${BITS}TestFGPI.datref)
-CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalk${BITS}TestFGPI.datref)
+IF(HRP2_DYNAMICS_FOUND)
+  IF(HRP2_14_FOUND)
 
-MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
-  SET(testmorisawa2007 "${test_morisawa_arg}${BITS}")
+    math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
+    CONFIG_FILES_CMAKE(TestMorisawa2007OnLine${BITS}TestFGPI.datref)
+    CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalk${BITS}TestFGPI.datref)
+   # CONFIG_FILES_CMAKE(TestMorisawa2007Climbing${BITS}TestFGPI.datref)
 
-  ADD_EXECUTABLE(${testmorisawa2007}
-  ../src/portability/gettimeofday.cc
-  TestMorisawa2007.cpp
-  CommonTools.cpp
-  TestObject.cpp
-  ClockCPUTime.cpp
-  )
-  TARGET_LINK_LIBRARIES(${testmorisawa2007} ${PROJECT_NAME})
-  PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} jrl-dynamics)
-  PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} hrp2-dynamics)
-  ADD_DEPENDENCIES(${testmorisawa2007} ${PROJECT_NAME})
+    MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
+      SET(testmorisawa2007 "${test_morisawa_arg}${BITS}")
 
-  MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
-  SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
-  SET(samplespec
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
-  )
-  SET(sampleljr
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
-  )
-  SET(sampleinitconfig
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat)
+      ADD_EXECUTABLE(${testmorisawa2007}
+      ../src/portability/gettimeofday.cc
+      TestMorisawa2007.cpp
+      CommonTools.cpp
+      TestObject.cpp
+      ClockCPUTime.cpp
+      )
+      TARGET_LINK_LIBRARIES(${testmorisawa2007} ${PROJECT_NAME})
+      PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} jrl-dynamics)
+      PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} hrp2-dynamics)
+      ADD_DEPENDENCIES(${testmorisawa2007} ${PROJECT_NAME})
 
-  LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
+      MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
+      SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
+      SET(samplespec
+        ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
+      )
+      SET(sampleljr
+        ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
+      )
+      SET(sampleinitconfig
+        ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat)
 
-  # This test is disabled for now as it fails.
-  # FIXME: fix the test and/or the implementation
-  ADD_TEST(${testmorisawa2007}
-    ${testmorisawa2007}
-    ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
-ENDMACRO(ADD_MORISAWA_2007)
+      LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
 
-ADD_MORISAWA_2007(TestMorisawa2007OnLine)
-ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
+      # This test is disabled for now as it fails.
+      # FIXME: fix the test and/or the implementation
+      ADD_TEST(${testmorisawa2007}
+        ${testmorisawa2007}
+        ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+    ENDMACRO(ADD_MORISAWA_2007)
+
+    ADD_MORISAWA_2007(TestMorisawa2007OnLine)
+    ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
+    ADD_MORISAWA_2007(TestMorisawa2007Climbing)
+    ADD_MORISAWA_2007(TestMorisawa2007GoingDown)
+
+  ENDIF(HRP2_14_FOUND)
+ENDIF(HRP2_DYNAMICS_FOUND)
+
+
 
 ###################
 # Test Herdt 2010 #

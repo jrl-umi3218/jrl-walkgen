@@ -96,9 +96,6 @@ void
   double EndOfLiftOff = (m_TSingle-UnlockedSwingPeriod)*0.5;
   double StartLanding = EndOfLiftOff + UnlockedSwingPeriod;
 
-  //cout << "EndOfLiftOff interpol = " << EndOfLiftOff << endl ;
-  //cout << "UnlockedSwingPeriod interpol = " << UnlockedSwingPeriod << endl ;
-
   FootAbsolutePosition & curr_NSFAP = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex];
   const FootAbsolutePosition & prev_NSFAP = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1];
 
@@ -142,8 +139,33 @@ void
     ComputeXYThetaFootPosition(InterpolationTime,curr_NSFAP);
   }
 
-  curr_NSFAP.z = m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
-  curr_NSFAP.dz = m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
+    if (m_isStepStairOn == 0)
+    {
+        curr_NSFAP.z = m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
+        //m_AnklePositionRight[2];
+        curr_NSFAP.dz = m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
+
+        //m_AnklePositionRight[2];
+    }
+
+    else
+
+    {
+        if (m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime) == 0)
+        {
+            curr_NSFAP.z = prev_NSFAP.z;
+        }
+        else
+        {
+        curr_NSFAP.z = m_BsplinesZ->ZComputePosition(LocalInterpolationStartTime+InterpolationTime);
+
+        }//m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+        //m_AnklePositionRight[2];
+        curr_NSFAP.dz = m_BsplinesZ->ZComputeVelocity(LocalInterpolationStartTime+InterpolationTime);
+        //m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+        //m_AnklePositionRight[2];
+    }
+
 
   bool ProtectionNeeded=false;
 
@@ -362,7 +384,16 @@ void
         LastSFP->y, LastSFP->dy, LastSFP->ddy, LastSFP->dddy
         );
     if(CurrentSupport.StateChanged==true)
-      SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle, StepHeight_);
+      {
+
+
+        if (m_isStepStairOn == 0)
+            SetParameters(FootTrajectoryGenerationStandard::Z_AXIS, m_TSingle, StepHeight_);
+        else
+            SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Z_AXIS,
+          m_TSingle,StepHeight_,
+          LastSFP->z, LastSFP->dz);
+      }
 
     SetParameters(
         FootTrajectoryGenerationStandard::THETA_AXIS,
@@ -423,18 +454,17 @@ void
     }
   }
   else if (CurrentSupport.Phase == DS || Time+3.0/2.0*QP_T_ > CurrentSupport.TimeLimit)
-  {
-    cout << " double support phase || " << Time+3.0/2.0*QP_T_ << " > " << CurrentSupport.TimeLimit << endl ;
-    for(int k = 0; k<=(int)(QP_T_/m_SamplingPeriod);k++)
     {
-      FinalRightFootTraj_deq[CurrentIndex+k]=               FinalRightFootTraj_deq[CurrentIndex+k-1];
-      FinalLeftFootTraj_deq[CurrentIndex+k]=                FinalLeftFootTraj_deq[CurrentIndex+k-1];
-      FinalLeftFootTraj_deq[CurrentIndex+k].time =
-          FinalRightFootTraj_deq[CurrentIndex+k].time =     Time+k*m_SamplingPeriod;
-      FinalLeftFootTraj_deq[CurrentIndex+k].stepType =
-          FinalRightFootTraj_deq[CurrentIndex+k].stepType = 10;
+      for(int k = 0; k<=(int)(QP_T_/m_SamplingPeriod);k++)
+        {
+          FinalRightFootTraj_deq[CurrentIndex+k]=               FinalRightFootTraj_deq[CurrentIndex+k-1];
+          FinalLeftFootTraj_deq[CurrentIndex+k]=                FinalLeftFootTraj_deq[CurrentIndex+k-1];
+          FinalLeftFootTraj_deq[CurrentIndex+k].time =
+              FinalRightFootTraj_deq[CurrentIndex+k].time =     Time+k*m_SamplingPeriod;
+          FinalLeftFootTraj_deq[CurrentIndex+k].stepType =
+              FinalRightFootTraj_deq[CurrentIndex+k].stepType = 10;
+        }
     }
-  }
 
 }
 

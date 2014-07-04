@@ -44,6 +44,8 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <jrl/dynamics/dynamicsfactory.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
+#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
+#include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
 
 #include "CommonTools.hh"
 #include "ClockCPUTime.hh"
@@ -69,6 +71,7 @@ namespace PatternGeneratorJRL
 
       /*! \brief Initialize the test object. */
       void init();
+     // void initIK();
 
       /*! \brief Perform test. */
       bool doTest(std::ostream &os);
@@ -125,6 +128,7 @@ namespace PatternGeneratorJRL
 
       /*! \brief Initial Configuration */
       MAL_VECTOR(InitialPosition,double);
+
 
       /*! @} */
 

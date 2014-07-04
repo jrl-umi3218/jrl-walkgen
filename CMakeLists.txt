@@ -48,11 +48,13 @@ ADD_REQUIRED_DEPENDENCY("jrl-mal >= 1.9.0")
 ADD_REQUIRED_DEPENDENCY("abstract-robot-dynamics >= 1.15")
 ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
 
-# Optional ones.
+################################################################
 ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
 ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
 ADD_OPTIONAL_DEPENDENCY("metapod >= 1.0.7")
 MESSAGE(STATUS "hrp2-dynamics: " ${HRP2_DYNAMICS_FOUND})
+#################################################################
+
 
 # Search for Boost.
 # Boost.Test is used by the test suite.

@@ -426,6 +426,8 @@ namespace PatternGeneratorJRL
     /*! \brief Realize a sequence of steps. */
     virtual void m_StepSequence(std::istringstream &strm);
 
+    virtual void m_StepStairSequence(std::istringstream &strm);
+
 
   private:
 
@@ -603,7 +605,7 @@ namespace PatternGeneratorJRL
     bool m_NewStep;
 
     /*! \brief X, Y, Theta coordinates of the new step.*/
-    double m_NewStepX, m_NewStepY, m_NewTheta;
+    double m_NewStepX, m_NewStepY, m_NewStepZ, m_NewTheta;
     /*! @} */
 
     /*! \brief Add automatically the first new step */

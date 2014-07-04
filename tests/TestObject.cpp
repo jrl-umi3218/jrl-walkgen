@@ -44,7 +44,6 @@ namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
-
     double filterprecision(double adb)
     {
       if (fabs(adb)<1e-7)
@@ -81,8 +80,6 @@ namespace PatternGeneratorJRL
 
     void TestObject::init()
     {
-
-
       // Instanciate and initialize.
       string RobotFileName = m_VRMLPath + m_VRMLFileName;
 
@@ -125,7 +122,6 @@ namespace PatternGeneratorJRL
 
       if (m_PGI!=0)
 	delete m_PGI;
-
     }
 
     void TestObject::SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR,
@@ -134,6 +130,7 @@ namespace PatternGeneratorJRL
       aHDR = 0;
       aDebugHDR = 0;
     }
+
 
     void TestObject::CreateAndInitializeHumanoidRobot(string &RobotFileName,
 						      string &SpecificitiesFileName,
@@ -329,6 +326,7 @@ namespace PatternGeneratorJRL
 	  aof.close();
 	}
     }
+
 
     void TestObject::fillInDebugFiles( )
     {
@@ -589,6 +587,7 @@ namespace PatternGeneratorJRL
 		  m_clock.stopModification();
 
 		  m_clock.fillInStatistics();
+
 
 		  /*! Fill the debug files with appropriate information. */
 		  fillInDebugFiles();

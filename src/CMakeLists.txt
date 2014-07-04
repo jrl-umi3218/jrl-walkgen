@@ -46,6 +46,7 @@ SET(SOURCES
 #  Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
   Mathematics/FootHalfSize.cpp
   Mathematics/OptCholesky.cpp
+  Mathematics/Bsplines.cpp
   Mathematics/Polynome.cpp
   Mathematics/PolynomeFoot.cpp
   Mathematics/PLDPSolver.cpp
@@ -84,8 +85,8 @@ SET(SOURCES
   PatternGeneratorInterfacePrivate.cpp
   SimplePlugin.cpp
   SimplePluginManager.cpp
+  pgtypes.cpp
   Clock.cpp
-  PGTypes.cpp
   portability/gettimeofday.cc
   privatepgtypes.cpp
   )

@@ -1,9 +1,9 @@
 /*
- * Copyright 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2006, 2007, 2008, 2009, 2010,
  *
  * Andrei     Herdt
  * Florent    Lamiraux
- * Mathieu    Poirier 
+ * Mathieu    Poirier
  * Olivier    Stasse
  *
  * JRL, CNRS/AIST
@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /** \file PolynomeFoot.h
@@ -43,7 +43,6 @@
 
 namespace PatternGeneratorJRL
 {
-
   class PolynomeFoot : public Polynome
   {
   protected :
@@ -78,7 +77,7 @@ namespace PatternGeneratorJRL
        FP: Final position */
       Polynome3(double FT, double FP);
 
-      /*!  Set the parameters 
+      /*!  Set the parameters
 	This method assumes implicitly a position
 	set to zero, and a speed equals to zero.
 	Final velocity is 0
@@ -101,7 +100,7 @@ namespace PatternGeneratorJRL
 					     double &InitSpeed);
       /// Destructor.
       ~Polynome3();
-      
+
     private:
       /*! Store final time and final position. */
       double FP_;
@@ -140,11 +139,11 @@ namespace PatternGeneratorJRL
 
       /// Destructor.
       ~Polynome4();
-      
+
     private:
       /*! Store final time and middle position. */
       double MP_;
-      
+
     };
 
   /// Polynome used for X,Y and Theta trajectories.
@@ -161,6 +160,8 @@ namespace PatternGeneratorJRL
       /// Set the parameters
       void SetParameters(double FT, double FP);
 
+
+      double Compute(double t);
       /*! Set the parameters such that
         the initial position, and initial speed
         are different from zero.
@@ -181,6 +182,7 @@ namespace PatternGeneratorJRL
       /// \brief Set parameters considering initial position, velocity, acceleration
       void SetParameters(double FT, double FP,
           double InitPos, double InitSpeed, double InitAcc, double InitJerk = 0.0);
+
       /// Destructor.
       ~Polynome5();
 

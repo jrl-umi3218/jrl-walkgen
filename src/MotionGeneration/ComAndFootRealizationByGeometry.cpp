@@ -187,6 +187,7 @@ void ComAndFootRealizationByGeometry::
     itJoint++;
   }
   InitializationMaps(FromRootToJoint2,ActuatedJoints,m_ChestIndexinConfiguration);
+  InitializationMaps(FromRootToJoint2,ActuatedJoints,m_ChestIndexinConfiguration);
 
 }
 void ComAndFootRealizationByGeometry::
@@ -266,6 +267,7 @@ void ComAndFootRealizationByGeometry::
 
   FromRootToJoint =
       getHumanoidDynamicRobot()->jointsBetween(*waist, *(LeftFoot->associatedAnkle()));
+
   FromRootToJoint.erase(FromRootToJoint.begin());
   InitializationMaps(FromRootToJoint,ActuatedJoints,
                      m_LeftLegIndexinConfiguration);
@@ -376,9 +378,9 @@ bool ComAndFootRealizationByGeometry::
   lStartingWaistPose(0) = CurrentConfig(0); // 0.0
   lStartingWaistPose(1) = CurrentConfig(1); // 0.0
   lStartingWaistPose(2) = CurrentConfig(2);
-  lStartingWaistPose(3) = 0.0;
-  lStartingWaistPose(4) = 0.0;
-  lStartingWaistPose(5) = 0.0;
+  lStartingWaistPose(3) = CurrentConfig(3); //0.0;
+  lStartingWaistPose(4) = CurrentConfig(4); //0.0;
+  lStartingWaistPose(5) = CurrentConfig(5); //0.0;
 
   ODEBUG("Current Config: " << CurrentConfig);
   return true;
@@ -434,6 +436,7 @@ bool ComAndFootRealizationByGeometry::
   assert((MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,1) == 0) &&
          "Error in the walk pattern generator initialization:" &&
          " Initial foot position is not flat");
+
   InitFootPosition.omega =
       atan2(MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,0),
             MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,2))*180/M_PI;
@@ -462,9 +465,6 @@ bool ComAndFootRealizationByGeometry::
   /* Initialize properly the left and right initial positions of the feet. */
   memset((char *)&InitLeftFootPosition,0,sizeof(FootAbsolutePosition));
   memset((char *)&InitRightFootPosition,0,sizeof(FootAbsolutePosition));
-
-  /* Initialize the waist pose.*/
-  MAL_VECTOR_RESIZE(lStartingWaistPose,6);
 
   // Compute the forward dynamics from the configuration vector provided by the user.
   // Initialize waist pose.

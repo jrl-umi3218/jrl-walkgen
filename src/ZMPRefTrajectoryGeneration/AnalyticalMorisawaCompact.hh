@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, 2009, 2010, 
+ * Copyright 2008, 2009, 2010,
  *
  * Alireza Nakhaei
  * Olivier  Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with jrl-walkgen.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*! \file AnalyticalMorisawaCompact.h
@@ -27,10 +27,10 @@
 
    This object generate the reference value for the
    ZMP based on a polynomial representation
-   of the ZMP following 
+   of the ZMP following
    "Experimentation of Humanoid Walking Allowing Immediate
    Modification of Foot Place Based on Analytical Solution"
-   Morisawa, Harada, Kajita, Nakaoka, Fujiwara, Kanehiro, Hirukawa, 
+   Morisawa, Harada, Kajita, Nakaoka, Fujiwara, Kanehiro, Hirukawa,
    ICRA 2007, 3989--39994
 */
 #ifndef _ANALYTICAL_MORISAWA_FULL_H_
@@ -64,14 +64,14 @@ namespace PatternGeneratorJRL
     double FinalCoMPos;
 
     /*! ZMP profil for the chosen axis. */
-    std::vector<double> ZMPProfil; 
+    std::vector<double> ZMPProfil;
 
     /*! Height ZMP profil.*/
     std::vector<double> ZMPZ;
 
     /*! Height COM profil. */
     std::vector<double> CoMZ;
-    
+
   } CompactTrajectoryInstanceParameters;
 
   /*!     @ingroup analyticalformulation
@@ -90,10 +90,10 @@ namespace PatternGeneratorJRL
    */
   class  AnalyticalMorisawaCompact: public AnalyticalMorisawaAbstract
     {
-      
+
     public:
 
-      /*! \name Constants to handle errors 
+      /*! \name Constants to handle errors
 	when changing foot steps.
 	 @{ */
       const static int ERROR_WRONG_FOOT_TYPE = -1;
@@ -107,44 +107,44 @@ namespace PatternGeneratorJRL
       /*! @} */
       /*! Constructor */
       AnalyticalMorisawaCompact(SimplePluginManager * lSPM , CjrlHumanoidDynamicRobot *aHS);
-      
+
       /*! Destructor */
       virtual ~AnalyticalMorisawaCompact();
 
       /*! \name Methods inherited from ZMPRefTrajectoryGeneration and reimplemented
 	@{ */
 
-      /*! Returns the CoM and ZMP trajectory for some relative foot positions. 
+      /*! Returns the CoM and ZMP trajectory for some relative foot positions.
 	Generate ZMP discreatization from a vector of foot position.
 	ASSUME A COMPLETE MOTION FROM END TO START, and GENERATE EVERY VALUE.
-	
+
 	@param[out] ZMPPositions: Returns the ZMP reference values for the overall motion.
 	Those are absolute position in the world reference frame. The origin is the initial
 	position of the robot. The relative foot position specified are added.
-	
+
 	@param[out] CoMStates: Returns the CoM reference values for the overall motion.
 	Those are absolute position in the world reference frame. The origin is the initial
 	position of the robot. The relative foot position specified are added.
 
-	@param[in] RelativeFootPositions: The set of 
+	@param[in] RelativeFootPositions: The set of
 	relative steps to be performed by the robot.
-		
+
 	@param[out] LeftFootAbsolutePositions: Returns the absolute position of the left foot.
 	According to the macro FULL_POLYNOME the trajectory will follow a third order
-	polynom or a fifth order. By experience it is wise to put a third order. 
+	polynom or a fifth order. By experience it is wise to put a third order.
 	A null acceleration might cause problem for the compensation of the Z-axis momentum.
-	
+
 	@param[out] RightFootAbsolutePositions: Returns the absolute position of the right foot.
-	
-	
+
+
 	@param[in] Xmax: The maximal distance of a hand along the X axis in the waist coordinates.
-	
+
 	@param[in] lStartingCOMState: The initial position of the CoM.
 
 	@param[in] lStartingZMPPosition: The initial position of the ZMP.
 
 	@param[in] InitLeftFootAbsolutePosition: The initial position of the left foot.
-	
+
 	@param[in] InitRightFootAbsolutePosition: The initial position of the right foot.
       */
       void GetZMPDiscretization(deque<ZMPPosition> & ZMPPositions,
@@ -157,8 +157,8 @@ namespace PatternGeneratorJRL
 				MAL_S3_VECTOR_TYPE(double) &lStartingZMPPosition,
 				FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				FootAbsolutePosition & InitRightFootAbsolutePosition);
-      
-      /*! \brief Methods for on-line generation. 
+
+      /*! \brief Methods for on-line generation.
 	The queues will be updated as follows:
 	- The first values necessary to start walking will be inserted.
 	- The initial positions of the feet will be taken into account
@@ -166,7 +166,7 @@ namespace PatternGeneratorJRL
 	- The RelativeFootPositions stack will be taken into account,
 	in this case only three steps will be removed from the stack,
 	- The starting COM Position.
-	Returns the number of steps which has been completely put inside 
+	Returns the number of steps which has been completely put inside
 	the queue of ZMP, and foot positions.
 
 	@param[out] FinalZMPPositions: The queue of ZMP reference positions.
@@ -189,11 +189,11 @@ namespace PatternGeneratorJRL
 		     COMState &lStartingCOMState,
 		     MAL_S3_VECTOR(&,double) lStartingZMPPosition
 		     );
-      
-      /* ! \brief Methods to update the stack on-line by inserting a new foot position. 
+
+      /* ! \brief Methods to update the stack on-line by inserting a new foot position.
         The foot is put right at the end of the stack. This method is supposed to be called
         when the first foot in the stack is finished.
-       
+
         @param[in] NewRelativeFootPosition: The new foot to put in the stack.
         @param[out] FinalZMPPositions: The stack of final ZMP positions to be updated
         with the new relative foot position.
@@ -205,16 +205,16 @@ namespace PatternGeneratorJRL
 
        */
       void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
-			 deque<ZMPPosition> & FinalZMPPositions,		
-			 deque<COMState> & CoMStates,			     
+			 deque<ZMPPosition> & FinalZMPPositions,
+			 deque<COMState> & CoMStates,
 			 deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 			 deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
 			 bool EndSequence);
-      
+
       /* ! \brief Method to update the stacks on-line */
       void OnLine(double time,
-		  deque<ZMPPosition> & FinalZMPPositions,		
-		  deque<COMState> & CoMStates,			     
+		  deque<ZMPPosition> & FinalZMPPositions,
+		  deque<COMState> & CoMStates,
 		  deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 		  deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions);
 
@@ -222,8 +222,8 @@ namespace PatternGeneratorJRL
 	 @return If the method failed it returns -1, 0 otherwise.
       */
       int OnLineFootChange(double time,
-			   FootAbsolutePosition &aFootPosition,				
-			   deque<ZMPPosition> & FinalZMPPositions,			     
+			   FootAbsolutePosition &aFootPosition,
+			   deque<ZMPPosition> & FinalZMPPositions,
 			   deque<COMState> & CoMStates,
 			   deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 			   deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
@@ -233,8 +233,8 @@ namespace PatternGeneratorJRL
 	 @return If the method failed it returns -1, 0 otherwise.
       */
       int OnLineFootChanges(double time,
-			    deque<FootAbsolutePosition> &FeetPosition,				
-			    deque<ZMPPosition> & FinalZMPPositions,			     
+			    deque<FootAbsolutePosition> &FeetPosition,
+			    deque<ZMPPosition> & FinalZMPPositions,
 			    deque<COMState> & CoMStates,
 			    deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
 			    deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions,
@@ -252,19 +252,19 @@ namespace PatternGeneratorJRL
 				deque<FootAbsolutePosition> &RightFootAbsolutePositions);
 
 
-      
-      /*! \brief Return the time at which it is optimal to regenerate a step in online mode. 
+
+      /*! \brief Return the time at which it is optimal to regenerate a step in online mode.
        */
       int ReturnOptimalTimeToRegenerateAStep();
-      
+
       /*! @} */
-      
+
       /*! \name Methods specifics to our current implementation.
        @{ */
-      /*! \name Methods for the full linear system 
+      /*! \name Methods for the full linear system
 	@{ */
 
-      /*! \brief Building the Z matrix to be inverted. 
+      /*! \brief Building the Z matrix to be inverted.
 	@param[in] lCoMZ: Profile of the CoM's height trajectory for each interval.
 	@param[in] lZMPZ: Profile of the ZMP's height trajectory for each interval.
        */
@@ -273,7 +273,7 @@ namespace PatternGeneratorJRL
       /*! \brief Building the Z matrix to be inverted. */
       void BuildingTheZMatrix();
 
-      /*! \brief Building the w vector. 
+      /*! \brief Building the w vector.
 	It is currently assume that all ZMP's speed will be
 	set to zero, as well as the final COM's speed.
 	The sequence of ZMPSequence is the final value of the
@@ -311,7 +311,7 @@ namespace PatternGeneratorJRL
 						  bool InitializeaAZCT);
       /*! @} */
 
-      /*! \brief Initialize automatically Polynomial degrees, and temporal intervals. 
+      /*! \brief Initialize automatically Polynomial degrees, and temporal intervals.
 	@return True if succeedeed, false otherwise.
        */
       bool InitializeBasicVariables();
@@ -332,13 +332,13 @@ namespace PatternGeneratorJRL
 	problem */
       void ResetTheResolutionOfThePolynomial();
 
-      /*! \brief For the current time t, we will change the foot position 
-	(NewPosX, NewPosY) during time interval IndexStep and IndexStep+1, using 
-	the AnalyticalZMPCOGTrajectory objects and their parameters. 
+      /*! \brief For the current time t, we will change the foot position
+	(NewPosX, NewPosY) during time interval IndexStep and IndexStep+1, using
+	the AnalyticalZMPCOGTrajectory objects and their parameters.
 	IndexStep has to be a double support phase, because it determines
 	the landing position. It is also assumes that m_RelativeFootPositions
 	and m_AbsoluteSupportFootPositions are set for the new values.
-	
+
 	@param[in] t : The current time.
 	@param[in] IndexStep: The index of the interval where the modification will start.
 	The modification of the foot position is done over 2 intervals.
@@ -371,11 +371,11 @@ namespace PatternGeneratorJRL
 				    StepStackHandler *aStepStackHandler,
 				    bool AddingAFootStep);
 
-      /*! \brief For the current time t, we will change the foot position 
+      /*! \brief For the current time t, we will change the foot position
 	(NewPosX, NewPosY) during time interval IndexStep and IndexStep+1.
 	IndexStep has to be a double support phase, because it determines
 	the landing position.
-	
+
 	@param[in] t : The current time.
 	@param[in] IndexStep: The index of the interval where the modification will start.
 	The modification of the foot position is done over 2 intervals.
@@ -387,16 +387,16 @@ namespace PatternGeneratorJRL
       int ChangeFootLandingPosition(double t,
 				    vector<unsigned int> & IndexStep,
  				    vector<FootAbsolutePosition> & NewFootAbsPos);
-      
-      
+
+
       /*! @} */
-      
+
       /*! Put an error messages string in ErrorMessage,
        according to ErrorIndex. */
       void StringErrorMessage(int ErrorIndex, string & ErrorMessage);
 
-      /*! \brief This method filter out the orthogonal trajectory to minimize the 
-	fluctuation involved by the time shift. 
+      /*! \brief This method filter out the orthogonal trajectory to minimize the
+	fluctuation involved by the time shift.
       */
       void FilterOutOrthogonalDirection(AnalyticalZMPCOGTrajectory & aAZCT,
 					CompactTrajectoryInstanceParameters &aCTIP,
@@ -406,21 +406,21 @@ namespace PatternGeneratorJRL
 
 
 
-      /*! \name Feet Trajectory Generator methods  
+      /*! \name Feet Trajectory Generator methods
        @{ */
       /*! Set the feet trajectory generator */
       void SetFeetTrajectoryGenerator(LeftAndRightFootTrajectoryGenerationMultiple * aFeetTrajectoryGenerator);
-      
+
       /*! Get the feet trajectory generator */
       LeftAndRightFootTrajectoryGenerationMultiple * GetFeetTrajectoryGenerator();
-      
+
       /*!  Setter and getter for the ComAndZMPTrajectoryGeneration.  */
       inline ComAndFootRealization * getComAndFootRealization()
         { return m_kajitaDynamicFilter->getComAndFootRealization();};
       
       /*! @} */
-      
-      /*! Simple plugin interfaces 
+
+      /*! Simple plugin interfaces
 	@{
        */
       /*! Register methods. */
@@ -428,30 +428,30 @@ namespace PatternGeneratorJRL
 
       /*! Call methods according to the arguments. */
       void CallMethod(std::string & Method, std::istringstream &strm);
-      
+
       /*! @} */
     protected:
-      
-	      
+
+
       /*! \name Internal Methods to compute the full linear
-	system. 
+	system.
 	@{
       */
 
       /*! \brief Building the Z1 Matrix */
       void ComputeZ1(unsigned int &lindex);
 
-      /*! \brief Building the Zj Matrix 
-       @param intervalindex: Index of the interval, 
+      /*! \brief Building the Zj Matrix
+       @param intervalindex: Index of the interval,
        @param colindex: Index of the column inside the matrix,
        @param rowindex: Index of the row inside the matrix. */
-      void ComputeZj(unsigned int intervalindex, 
-		     unsigned int &colindex, 
+      void ComputeZj(unsigned int intervalindex,
+		     unsigned int &colindex,
 		     unsigned int &rowindex);
-      
+
       /*! \brief Building the Zm Matrix */
-      void ComputeZm(unsigned int intervalindex, 
-		     unsigned int &colindex, 
+      void ComputeZm(unsigned int intervalindex,
+		     unsigned int &colindex,
 		     unsigned int &rowindex);
 
       /*! \brief Considering the current time given by LocalTime,
@@ -470,9 +470,9 @@ namespace PatternGeneratorJRL
 	and the index of the first interval. */
       void NewTimeIntervals(unsigned IndexStartingInterval,
 			    double NewTime);
-      
+
       /*! \brief Recompute the trajectories based on the current time (LocalTime),
-	the new landing position and the time interval (IndexStep) when the 
+	the new landing position and the time interval (IndexStep) when the
 	modification should take place.
        */
       void ConstraintsChange(double LocalTime,
@@ -482,21 +482,21 @@ namespace PatternGeneratorJRL
 			     CompactTrajectoryInstanceParameters &aCTIPY,
 			     unsigned int IndexStartingInterval,
 			     StepStackHandler *aStepStackHandler=0);
-	
+
       /*! \brief Compute the time to compensate for the ZMP fluctuation. */
       double TimeCompensationForZMPFluctuation(FluctuationParameters &aFluctuationParameters,
 					       double DeltaTInit);
 
       /*! @} */
 
-      /*! \name Internal Methods to generate steps and create the associated 
-	problem. 
-	
+      /*! \name Internal Methods to generate steps and create the associated
+	problem.
+
 	@{
-      */  
+      */
 
       /*! \brief Build and solve the linear problem associated with a set of relative footholds.
-	@param[in] lStartingCOMState: Specify the initial condition of the CoM \f$(x,y,z)\f$ for the 
+	@param[in] lStartingCOMState: Specify the initial condition of the CoM \f$(x,y,z)\f$ for the
 	resolution of the linear problem. The matrix is defined as:
 	\f[
 	\left(
@@ -518,7 +518,7 @@ namespace PatternGeneratorJRL
 	@param[in] IgnoreFirstRelativeFoot: Boolean to ignore the first relative foot.
 	@param[in] DoNotPrepareLastFoot:  Boolean to not perform for the ending sequence.
 
-	
+
       */
       int BuildAndSolveCOMZMPForASetOfSteps(MAL_S3x3_MATRIX(& ,double) lStartingCOMState,
 					    FootAbsolutePosition &LeftFootInitialPosition,
@@ -548,7 +548,7 @@ namespace PatternGeneratorJRL
 	\param StartingTime: The starting time to fill in the queues.
 	\param EndTime: The ending time to fill in the queues.
 	\param FinalZMPPositions: The queue of ZMP positions. More specifically fill in \f$px\f$ and \f$py\f$.
-	\param FinalCoMPositions: The queue of CoM positions. More specifically fill in \f$x,\dot{x},y,\dot{y}, z\f$, 
+	\param FinalCoMPositions: The queue of CoM positions. More specifically fill in \f$x,\dot{x},y,\dot{y}, z\f$,
 	\param FinalLeftFootAbsolutePositions: The queue of Left Foot Absolute positions.
 	\param FinalRightFootAbsolutePositions: The queue of Right Foot Absolute positions.
       */
@@ -558,6 +558,8 @@ namespace PatternGeneratorJRL
 		      deque<COMState> & FinalCoMPositions,
 		      deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
 		      deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions);
+
+      void ComputeCoMz(double t, double &CoMz);
 
       void FillQueues(double samplingPeriod,
                       double StartingTime,
@@ -585,18 +587,21 @@ namespace PatternGeneratorJRL
 	precomputed Z matrix LU decomposition */
       bool m_NeedToReset;
 
-      /*! \brief Pointer to the preview control object used to 
+      /*! \brief Pointer to the preview control object used to
 	filter out the orthogonal direction . */
       PreviewControl *  m_PreviewControl;
 
-      /*! \name Object to handle trajectories. 
+      /*! \name Object to handle trajectories.
 	@{
 	*/
       /*! \brief Analytical sagital trajectories */
       AnalyticalZMPCOGTrajectory *m_AnalyticalZMPCoGTrajectoryX;
-      
+
       /*! \brief Analytical sagital trajectories */
       AnalyticalZMPCOGTrajectory *m_AnalyticalZMPCoGTrajectoryY;
+
+      /*! \brief Analytical sagital trajectories */
+    //  AnalyticalZMPCOGTrajectory *m_AnalyticalZMPCoGTrajectoryZ;
 
       /*! \brief Foot Trajectory Generator */
       LeftAndRightFootTrajectoryGenerationMultiple * m_FeetTrajectoryGenerator;
@@ -609,10 +614,10 @@ namespace PatternGeneratorJRL
       /*! \brief Stores the relative foot positions currently in the buffer */
       deque<RelativeFootPosition> m_RelativeFootPositions;
 
-      /*! \brief Stores the absolute support foot positions currently in the buffer */ 
+      /*! \brief Stores the absolute support foot positions currently in the buffer */
       deque<FootAbsolutePosition> m_AbsoluteSupportFootPositions;
 
-      /*! \brief Store the currently realized support foot position. 
+      /*! \brief Store the currently realized support foot position.
 	\warning This field makes sense only direct ON-LINE mode.
        */
       FootAbsolutePosition m_AbsoluteCurrentSupportFootPosition;
@@ -640,7 +645,7 @@ namespace PatternGeneratorJRL
 
       /*! \brief Height of the initial CoM position. */
       double m_InitialPoseCoMHeight;
-    
+
       /*! \brief On-line change step mode */
       unsigned int m_OnLineChangeStepMode;
 
@@ -654,6 +659,8 @@ namespace PatternGeneratorJRL
       /*! \brief End phase */
       bool m_EndPhase;
 
+
+
     public:
       /*! \name Methods related to the Preview Control object used
 	by this class. @{ */
@@ -663,7 +670,7 @@ namespace PatternGeneratorJRL
       /*! Get the preview control object. */
       PreviewControl * GetPreviewControl();
       /*! @} */
-      
+
       /*! \brief Propagate Absolute Reference Time */
       void PropagateAbsoluteReferenceTime(double x);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Andrei  Herdt
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
@@ -59,15 +59,15 @@ namespace PatternGeneratorJRL {
 	 ":previewcontroltime 1.6",
 	 ":omega 0.0",
 	 ":stepheight 0.07",
-	 ":singlesupporttime 0.78",
-	 ":doublesupporttime 0.02",
+	 ":singlesupporttime 1.56",
+	 ":doublesupporttime 0.04",
 	 ":armparameters 0.5",
 	 ":LimitsFeasibility 0.0",
 	 ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
 	 ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
 	 ":UpperBodyMotionParameters -0.1 -1.0 0.0"
 	};
-  
+
       for(int i=0;i<9;i++)
 	{
 	  std::istringstream strm(lBuffer[i]);
@@ -85,28 +85,28 @@ namespace PatternGeneratorJRL {
 				 lStartingWaistPose,
 				 InitLeftFootAbsPos,
 				 InitRightFootAbsPos);
-      
-      cout << "Starting COM Position: " 
+
+      cout << "Starting COM Position: "
 	   << lStartingCOMPosition.x[0] << " "
 	   << lStartingCOMPosition.y[0] << " "
 	   << lStartingCOMPosition.z[0] << endl;
 
-      cout << "Starting Left Foot Pos: " 
+      cout << "Starting Left Foot Pos: "
 	   << InitLeftFootAbsPos.x << " "
 	   << InitLeftFootAbsPos.y << " "
-	   << InitLeftFootAbsPos.z << " " 
+	   << InitLeftFootAbsPos.z << " "
 	   << InitLeftFootAbsPos.theta<< " "
 	   << InitLeftFootAbsPos.omega << " "
-	   << InitLeftFootAbsPos.omega2 << " " 
+	   << InitLeftFootAbsPos.omega2 << " "
 	   << endl;
 
-      cout << "Starting Right Foot Pos: " 
+      cout << "Starting Right Foot Pos: "
 	   << InitRightFootAbsPos.x << " "
 	   << InitRightFootAbsPos.y << " "
-	   << InitRightFootAbsPos.z << " " 
+	   << InitRightFootAbsPos.z << " "
 	   << InitRightFootAbsPos.theta<< " "
 	   << InitRightFootAbsPos.omega << " "
-	   << InitRightFootAbsPos.omega2 << " " 
+	   << InitRightFootAbsPos.omega2 << " "
 	   << endl;
 
     }
@@ -132,8 +132,8 @@ namespace PatternGeneratorJRL {
                          LINK_JOINT_RANK	\
                          INITIAL_CONFIGURATION" << endl;
 	  exit(-1);
-	}	
-      else 
+	}
+      else
 	{
 	  VRMLPath=argv[1];
 	  VRMLFileName=argv[2];

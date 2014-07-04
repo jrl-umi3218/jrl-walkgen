@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Andrei Herdt
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file This file tests A. Herdt's walking algorithm for
@@ -48,28 +48,28 @@ public:
   {
     m_TestProfile = TestProfile;
   };
-  
+
   typedef void (TestHerdt2010::* localeventHandler_t)(PatternGeneratorInterface &);
-  
-  struct localEvent 
+
+  struct localEvent
   {
     unsigned time;
     localeventHandler_t Handler ;
   };
-  
+
 protected:
 
-  
 
-  
+
+
   void startOnLineWalking(PatternGeneratorInterface &aPGI)
   {
     CommonInitialization(aPGI);
-    
+
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
       aPGI.ParseCmd(strm2);
-      
+
     }
     {
       istringstream strm2(":singlesupporttime 0.7");
@@ -85,7 +85,8 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":numberstepsbeforestop 2");
+    //  m_TestProfile.m_isStepStairOn = 0;
+      istringstream strm2(":numberstepsbeforestop 1");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -93,11 +94,11 @@ protected:
   void startEmergencyStop(PatternGeneratorInterface &aPGI)
   {
     CommonInitialization(aPGI);
-    
+
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
       aPGI.ParseCmd(strm2);
-      
+
     }
     {
       istringstream strm2(":singlesupporttime 0.7");
@@ -178,7 +179,7 @@ protected:
   void walkForward(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.2 0.0 0.0");
+      istringstream strm2(":setVelReference  0.02 0.0 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -202,7 +203,7 @@ protected:
 
   void chooseTestProfile()
   {
-    
+
     switch(m_TestProfile)
       {
 
@@ -222,15 +223,16 @@ protected:
   void generateEventOnLineWalking()
   {
 
-    struct localEvent 
+    struct localEvent
     {
       unsigned time;
       localeventHandler_t Handler ;
     };
 
-    #define localNbOfEvents 12
+    #define localNbOfEvents 2
     struct localEvent events [localNbOfEvents] =
-      { { 5*200,&TestHerdt2010::walkForward},
+      {
+        /*  { 5*200,&TestHerdt2010::walkForward},
         {10*200,&TestHerdt2010::walkSidewards},
         {25*200,&TestHerdt2010::startTurningRightOnSpot},
         {35*200,&TestHerdt2010::walkForward},
@@ -241,11 +243,24 @@ protected:
         {85*200,&TestHerdt2010::startTurningLeft},
 	{95*200,&TestHerdt2010::startTurningRight},
 	{105*200,&TestHerdt2010::stop},
-	{110*200,&TestHerdt2010::stopOnLineWalking}};
-    
+	{110*200,&TestHerdt2010::stopOnLineWalking}*/
+
+	{ 5*200,&TestHerdt2010::walkForward},
+     //   {10*200,&TestHerdt2010::walkForward},
+      //  {25*200,&TestHerdt2010::walkForward},
+       // {35*200,&TestHerdt2010::walkForward},
+        {45*200,&TestHerdt2010::stop}
+     /*   {55*200,&TestHerdt2010::walkForward},
+        {65*200,&TestHerdt2010::walkForward},
+        {75*200,&TestHerdt2010::walkForward},
+        {85*200,&TestHerdt2010::walkForward},
+	{95*200,&TestHerdt2010::walkForward},
+	{105*200,&TestHerdt2010::stop},
+	{110*200,&TestHerdt2010::stopOnLineWalking}*/};
+
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
-      { 
+      {
 	if ( m_OneStep.NbOfIt==events[i].time)
 	  {
             ODEBUG3("********* GENERATE EVENT OLW ***********");
@@ -263,10 +278,10 @@ protected:
         {10*200,&TestHerdt2010::startTurningRight2},
         {15.2*200,&TestHerdt2010::stop},
         {20.8*200,&TestHerdt2010::stopOnLineWalking}};
-    
+
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEventsEMS;i++)
-      { 
+      {
 	if ( m_OneStep.NbOfIt==events[i].time)
 	  {
             ODEBUG3("********* GENERATE EVENT EMS ***********");
