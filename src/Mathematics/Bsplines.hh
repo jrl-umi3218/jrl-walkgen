@@ -71,7 +71,7 @@ namespace PatternGeneratorJRL
 
     protected:
 
-        int m_degree;
+        unsigned int m_degree;
 
         std::vector<Point> m_control_points;
 

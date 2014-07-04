@@ -22,17 +22,18 @@ Bsplines::~Bsplines()
 
 void Bsplines::GenerateDegree()
 {
-    m_degree = (m_knot_vector.size()-1) - (m_control_points.size()-1) -1;
-    if (m_degree < 0)
+    int degree = (m_knot_vector.size()-1) - (m_control_points.size()-1) -1;
+    if (degree < 0)
     {
         cout << " Attention !! degree is smaller than 0 " << endl;
     }
+    m_degree = (unsigned)degree ;
 }
 
 void Bsplines::GenerateKnotVector(std::string method)
 {
     /*Calculer set of parameters*/
-    int i,j;
+    unsigned int i,j;
     vector<double> set_of_pam;
 
         if (method == "centripetal")
@@ -126,7 +127,7 @@ double *Bsplines::ComputeBasisFunction(double t)
 {
     double **m_basis_function;
     m_basis_function = new double* [m_degree+1];
-    int i,j,n;
+    unsigned int i,j,n;
 
     if (m_degree!= m_knot_vector.size() - m_control_points.size() -1 )
     {
@@ -192,7 +193,7 @@ Point Bsplines::ComputeBsplines(double t)
     }
     if (m_degree == ((m_knot_vector.size()-1) - (m_control_points.size()-1)- 1) )
         {
-            for (int i=0;i<m_control_points.size();i++)
+            for (unsigned int i=0;i<m_control_points.size();i++)
             {
                 C.x += m_basis_function[i] * m_control_points[i].x;
                 C.y += m_basis_function[i] * m_control_points[i].y;
@@ -210,7 +211,7 @@ Bsplines Bsplines::DerivativeBsplines()
     Point T;
     if (m_degree >=1)
     {
-        for (int i=0;i<m_control_points.size()-1;i++)
+        for (unsigned int i=0;i<m_control_points.size()-1;i++)
         {
             T.x = ((m_control_points[i+1].x - m_control_points[i].x)*double(m_degree) )/ (m_knot_vector[i+m_degree+1] - m_knot_vector[i+1]);
 
@@ -274,7 +275,7 @@ std::vector<double> Bsplines::GetKnotVector() const
 void Bsplines::PrintKnotVector() const
 {
     std::cout << "Knot Vector: "<< std::endl;
-    for (int i = 0;i<m_knot_vector.size();i++)
+    for (unsigned int i = 0;i<m_knot_vector.size();i++)
     {
         std::cout << m_knot_vector[i] << " , ";
     }
@@ -284,7 +285,7 @@ void Bsplines::PrintKnotVector() const
 void Bsplines::PrintControlPoints() const
 {
     std::cout << "Control Points : "<< std::endl;
-    for (int i = 0;i<m_control_points.size();i++)
+    for (unsigned int i = 0;i<m_control_points.size();i++)
     {
         std::cout << m_control_points[i].x << " , " << m_control_points[i].y << std::endl;
     }
@@ -375,7 +376,7 @@ void ZBsplines::ZGenerateKnotVector(double FT, double ToMP)
 {
     std::vector<double> knot;
     knot.clear();
-    for (int i=0;i<=m_degree;i++)
+    for (unsigned int i=0;i<=m_degree;i++)
     {
         knot.push_back(0.0);
     }
@@ -384,7 +385,7 @@ void ZBsplines::ZGenerateKnotVector(double FT, double ToMP)
     knot.push_back(ToMP);
     knot.push_back(1.3*ToMP);
 
-    for (int i =0;i<=m_degree;i++)
+    for (unsigned int i =0;i<=m_degree;i++)
     {
         knot.push_back(FT);
     }
