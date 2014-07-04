@@ -570,23 +570,23 @@ computing the analytical trajectories. */
     m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
 
-    double KajitaPCpreviewWindow = 1.6 ;
-    m_kajitaDynamicFilter->init( m_CurrentTime,
-                                 m_SamplingPeriod,
-                                 m_SamplingPeriod,
-                                 m_PreviewControlTime+2*m_SamplingPeriod-TimeShift,
-                                 KajitaPCpreviewWindow,
-                                 lStartingCOMState.z[0],
-                                 InitLeftFootAbsolutePosition,
-                                 lStartingCOMState );
-
     /*! Compute the total size of the array related to the steps. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
     deque<COMState> filteredCoM = COMStates ;
 
-    /*! Add KajitaPCpreviewWindow second to the buffers for fitering */
     unsigned int n = ZMPPositions.size();
+    double KajitaPCpreviewWindow = 1.6 ;
+    m_kajitaDynamicFilter->init( m_CurrentTime,
+                                 m_SamplingPeriod,
+                                 m_SamplingPeriod,
+                                 (double)(n+1)*m_SamplingPeriod,
+                                 KajitaPCpreviewWindow,
+                                 lStartingCOMState.z[0],
+                                 InitLeftFootAbsolutePosition,
+                                 lStartingCOMState );
+
+    /*! Add KajitaPCpreviewWindow second to the buffers for fitering */
     ZMPPosition lastZMP = ZMPPositions.back();
     COMState lastCoM = COMStates.back();
     FootAbsolutePosition lastLF = LeftFootAbsolutePositions.back();
@@ -627,7 +627,6 @@ computing the analytical trajectories. */
     vector <vector<double> > filteredZMPMB (n , vector<double> (2,0.0)) ;
     for (unsigned int i = 0 ; i < n ; ++i)
     {
-      outputDeltaCOMTraj_deq[1600].x[0] ;
       for(int j=0;j<3;j++)
       {
         filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
