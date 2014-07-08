@@ -2,6 +2,18 @@ CHANGELOG
 ----------------------
 
 [Current]
+ * Correct bug introduced in 846be4ab58282d87.
+ * Merge pull request #20 from francois-keith/master
+ * Verify using an assertion that the foot is flat during the initialization of the walk.
+ * Simplify the chain building from the chest to the wrist.
+ * Add an assertion to avoid nul size of the sole.
+ * Use waist rather than root to create the chain.
+ * Remove useless IndexInVRML vector.
+ * Correct errors in debug mode.
+ * Correct OrientationsPreview: the order of left/right feet is no longer hard coded.
+ * Remove useless files (only the .hh were used).
+
+[3.1.8]
  * Since hrp2 is only needed for the tests, the dependency is declared in the tests.
  * Synchronize.
  * Merge pull request #19 from gergondet/topic/fixPGInitialization
