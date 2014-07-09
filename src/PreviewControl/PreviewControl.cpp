@@ -28,7 +28,7 @@
 */
 
 #include <fstream>
-#define _DEBUG_MODE_ON_
+//#define _DEBUG_MODE_ON_
 #include <Debug.hh>
 
 #include <PreviewControl/PreviewControl.hh>

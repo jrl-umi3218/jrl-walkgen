@@ -391,6 +391,27 @@ protected:
       }
       aof.close();
 
+      /// !!!! cela ne marche pas
+      if ( iteration == 0 ){
+        oss.str("/tmp/walk_mnaveau.zmp");
+        aFileName = oss.str();
+        aof.open(aFileName.c_str(),ofstream::out);
+        aof.close();
+      }
+      oss.str("/tmp/walk_mnaveau.zmp");
+      aFileName = oss.str();
+      aof.open(aFileName.c_str(),ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      for(unsigned int j = 0 ; j < 20 ; j++){
+        aof << filterprecision( iteration * 0.1 ) << " "  ; // 1
+        aof << filterprecision( 0.0 ) << " "  ; // 1
+        aof << filterprecision( 0.0 ) << " "  ; // 1
+        aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] ) << " "  ; // 1
+        aof << endl ;
+      }
+      aof.close();
+
       iteration++;
   }
 

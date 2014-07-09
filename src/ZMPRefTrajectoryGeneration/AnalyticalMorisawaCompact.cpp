@@ -35,7 +35,6 @@ ICRA 2007, 3989--39994
 #include <fstream>
 #include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.hh>
 #include <iomanip>
-
 typedef double doublereal;
 typedef int integer;
 
@@ -608,6 +607,8 @@ computing the analytical trajectories. */
                                            LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
                                            ZMPMB[i] , stage0 , i);
     }
+    m_kajitaDynamicFilter->getClock()->Display();
+
     deque<ZMPPosition> inputdeltaZMP_deq(N) ;
     deque<COMState> outputDeltaCOMTraj_deq ;
     for (unsigned int i = 0 ; i < N ; ++i)
@@ -619,11 +620,7 @@ computing the analytical trajectories. */
       inputdeltaZMP_deq[i].time = m_CurrentTime + i * m_SamplingPeriod ;
       inputdeltaZMP_deq[i].stepType = ZMPPositions[i].stepType ;
     }
-    int OptimalControlError = m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
-    cout << "OptimalControlError = " << OptimalControlError << endl ;
-    cout << "outputDeltaCOMTraj_deq.size() = " << outputDeltaCOMTraj_deq.size() << endl ;
-    cout << "n = " << n << endl ;
-    cout << "N = " << N << endl ;
+    m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
     vector <vector<double> > filteredZMPMB (n , vector<double> (2,0.0)) ;
     for (unsigned int i = 0 ; i < n ; ++i)
     {
@@ -649,7 +646,6 @@ computing the analytical trajectories. */
     string aFileName;
     ostringstream oss(std::ostringstream::ate);
     static int iteration = 0;
-    cout << "iteration = " << iteration ;
     /// \brief Debug Purpose
     /// --------------------
     oss.str("ZMPDiscretisationBuffer.dat");
@@ -2522,8 +2518,8 @@ new step has to be generate.
 
   void AnalyticalMorisawaCompact::RegisterMethods()
   {
-    std::string aMethodName[1]=
-    {":onlinechangestepframe"};
+    std::string aMethodName[2]=
+    {":onlinechangestepframe",":setRobotUpperPart"};
 
     for(int i=0;i<1;i++)
     {
@@ -2563,6 +2559,15 @@ new step has to be generate.
           m_FilteringActivate = true;
         else if (aws=="deactivate")
           m_FilteringActivate = false;
+      }
+    }
+    else if (Method==":setRobotUpperPart")
+    {
+      MAL_VECTOR_TYPE(double) configuration ;
+      if (strm.good())
+      {
+        strm >> configuration;
+        m_kajitaDynamicFilter->setRobotUpperPart(configuration);
       }
     }
 

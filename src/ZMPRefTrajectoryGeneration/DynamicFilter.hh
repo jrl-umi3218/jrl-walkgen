@@ -5,6 +5,7 @@
 #include <metapod/models/hrp2_14/hrp2_14.hh>
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 #include <metapod/algos/jac_point_chain.hh>
+#include "Clock.hh"
 
 #ifndef METAPOD_TYPEDEF
 #define METAPOD_TYPEDEF
@@ -134,6 +135,8 @@ namespace PatternGeneratorJRL
     inline void setPreviewWindowSize_(double previewWindowSize)
     { previewWindowSize_ = previewWindowSize; }
 
+    void setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration);
+
     /// \brief getter :
     inline ComAndFootRealizationByGeometry * getComAndFootRealization()
     { return comAndFootRealization_;};
@@ -152,6 +155,9 @@ namespace PatternGeneratorJRL
 
     inline void getPCerror_(double & errx, double & erry)
     { errx = sxzmp_ ; erry = syzmp_ ; }
+
+    inline Clock * getClock()
+    { return &clock_ ; };
 
   private: // Private members
 
@@ -207,6 +213,9 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_TYPE(double) ZMPMBVelocity_ ;
       MAL_VECTOR_TYPE(double) ZMPMBAcceleration_ ;
 
+      MAL_VECTOR_TYPE(double) upperPartConfiguration_ ;
+      std::vector <unsigned int> upperPartIndex ;
+
       /// \brief data of the previous iteration
       bool PreviousSupportFoot_ ; // 1 = left ; 0 = right ;
       Robot_Model::confVector prev_q_, prev_dq_, prev_ddq_;
@@ -252,6 +261,9 @@ namespace PatternGeneratorJRL
       /// \brief State of the Preview control.
       MAL_MATRIX(deltax_,double);
       MAL_MATRIX(deltay_,double);
+
+      /// \brief time measurement
+      Clock clock_;
   };
 
 }

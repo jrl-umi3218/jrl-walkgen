@@ -64,6 +64,8 @@ DynamicFilter::DynamicFilter(
   syzmp_ = 0.0 ;
   deltaZMPx_ = 0.0 ;
   deltaZMPy_ = 0.0 ;
+
+  upperPartIndex.clear();
 }
 
 DynamicFilter::~DynamicFilter()
@@ -76,6 +78,15 @@ DynamicFilter::~DynamicFilter()
     delete comAndFootRealization_;
     comAndFootRealization_ = 0 ;
   }
+}
+
+void DynamicFilter::setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration)
+{
+  for ( unsigned int i = 0 ; i < upperPartIndex.size() ; ++i )
+  {
+    upperPartConfiguration_(upperPartIndex[i])= configuration(upperPartIndex[i]);
+  }
+  return ;
 }
 
 /// \brief Initialse all objects, to be called just after the constructor
@@ -112,6 +123,8 @@ void DynamicFilter::init(
   previousConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
   previousVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
   previousAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
+
+  upperPartConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
 
   ZMPMBConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
   ZMPMBVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
@@ -171,6 +184,11 @@ void DynamicFilter::init(
     deltay_(j,0) = 0 ;
   }
 
+  upperPartIndex.resize(2+2+6+6);
+  for (unsigned int i = 0 ; i < upperPartIndex.size() ; ++i )
+  {
+    upperPartIndex[i]=i+18;
+  }
   return ;
 }
 
@@ -323,7 +341,12 @@ void DynamicFilter::ComputeZMPMB(
   //computeWaist( inputLeftFoot );
 
   // Apply the RNEA on the robot model
+  clock_.StartTiming();
   metapod::rnea< Robot_Model, true >::run(robot_, q_, dq_, ddq_);
+  clock_.StopTiming();
+
+  clock_.IncIteration();
+
   m_force = node_waist.body.iX0.applyInv(node_waist.joint.f);
 
   ZMPMB.resize(2);
