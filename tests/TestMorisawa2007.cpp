@@ -171,6 +171,14 @@ public:
 
           /*! Fill the debug files with appropriate information. */
           //ComparingZMPs();
+          dynamicfilter_->InverseKinematics(
+              m_OneStep.finalCOMPosition,
+              m_OneStep.LeftFootPosition,
+              m_OneStep.RightFootPosition,
+              m_CurrentConfiguration,
+              m_CurrentVelocity,
+              m_CurrentAcceleration,
+              0.005,0,m_OneStep.NbOfIt);
           fillInDebugFiles();
         }
         else
@@ -342,7 +350,24 @@ protected:
 	  aof.close();
         }
 
-
+      m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
+      m_CurrentConfiguration(19)= 0.0 ;            // CHEST_JOINT1
+      m_CurrentConfiguration(20)= 0.0 ;            // HEAD_JOINT0
+      m_CurrentConfiguration(21)= 0.0 ;            // HEAD_JOINT1
+      m_CurrentConfiguration(22)= -0.108210414 ;   // RARM_JOINT0
+      m_CurrentConfiguration(23)= 0.0383972435 ;   // RARM_JOINT1
+      m_CurrentConfiguration(24)= 0.474729557 ;    // RARM_JOINT2
+      m_CurrentConfiguration(25)= -1.41720735 ;    // RARM_JOINT3
+      m_CurrentConfiguration(26)= 1.45385927 ;     // RARM_JOINT4
+      m_CurrentConfiguration(27)= 0.509636142 ;    // RARM_JOINT5
+      m_CurrentConfiguration(28)= 0.034906585 ;    // RARM_JOINT6
+      m_CurrentConfiguration(29)= -0.200712864 ;   // LARM_JOINT0
+      m_CurrentConfiguration(30)= -0.129154365 ;   // LARM_JOINT1
+      m_CurrentConfiguration(31)= -0.333357887 ;   // LARM_JOINT2
+      m_CurrentConfiguration(32)= -1.39277274 ;    // LARM_JOINT3
+      m_CurrentConfiguration(33)= 1.18856922 ;     // LARM_JOINT4
+      m_CurrentConfiguration(34)= -0.193731547 ;   // LARM_JOINT5
+      m_CurrentConfiguration(35)= 0.034906585 ;    // LARM_JOINT6
       /// \brief Create file .hip .pos .zmp
       /// --------------------
       ofstream aof;

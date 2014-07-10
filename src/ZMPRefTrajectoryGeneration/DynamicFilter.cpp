@@ -184,7 +184,7 @@ void DynamicFilter::init(
     deltay_(j,0) = 0 ;
   }
 
-  upperPartIndex.resize(2+2+6+6);
+  upperPartIndex.resize(2+2+7+7);
   for (unsigned int i = 0 ; i < upperPartIndex.size() ; ++i )
   {
     upperPartIndex[i]=i+18;
