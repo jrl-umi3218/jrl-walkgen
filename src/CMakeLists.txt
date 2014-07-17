@@ -117,6 +117,8 @@ SET(model_name "hrp2_14")
 # Define the simple humanoid model for the metapod algorithm
 ADD_SAMPLEURDFMODEL(${model_name})
 
+SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta ")
+
 TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name} ${Boost_LIBRARIES})
 message (STATUS "--Boost : " ${Boost_LIBRARIES} )
 

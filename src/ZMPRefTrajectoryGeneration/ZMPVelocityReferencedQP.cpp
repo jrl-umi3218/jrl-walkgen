@@ -549,13 +549,15 @@ void
                           FinalRightFootTraj_deq, time) ;
 
     DynamicFilterInterpolation(time) ;
-    //CallToComAndFootRealization(time);
 
 
     //deque<COMState> tmp = FinalCOMTraj_deq ;
     // DYNAMIC FILTER
     // --------------
-    //DynamicFilter( time, tmp );
+//    dynamicFilter_->InverseKinematics(FinalCOMTraj_deq,FinalLeftFootTraj_deq,FinalRightFootTraj_deq,);
+//
+//
+//
 //    dynamicFilter_->filter(
 //        FinalCOMTraj_deq.back(),
 //        FinalLeftFootTraj_deq.back(),
@@ -565,14 +567,14 @@ void
 //        LeftFootTraj_deq_,
 //        RightFootTraj_deq_,
 //        deltaCOMTraj_deq_);
-    for(unsigned int i = CurrentIndex_ ; i < FinalCOMTraj_deq.size() ; ++ i )
-      dynamicFilter_->ComputeZMPMB(m_SamplingPeriod,
-                                   FinalCOMTraj_deq[i],
-                                   FinalLeftFootTraj_deq[i],
-                                   FinalRightFootTraj_deq[i],
-                                   ZMPMB_deq[i-CurrentIndex_],1,
-                                   (int)(time/QP_T_ + i*m_SamplingPeriod)
-                                   );
+//    for(unsigned int i = CurrentIndex_ ; i < FinalCOMTraj_deq.size() ; ++ i )
+//      dynamicFilter_->ComputeZMPMB(m_SamplingPeriod,
+//                                   FinalCOMTraj_deq[i],
+//                                   FinalLeftFootTraj_deq[i],
+//                                   FinalRightFootTraj_deq[i],
+//                                   ZMPMB_deq[i-CurrentIndex_],1,
+//                                   (int)(time/QP_T_ + i*m_SamplingPeriod)
+//                                   );
 
 
 //    for (unsigned int i = 0 ; i < deltaCOMTraj_deq_.size() ; ++i )

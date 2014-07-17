@@ -574,7 +574,7 @@ computing the analytical trajectories. */
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
     deque<COMState> filteredCoM = COMStates ;
 
-    unsigned int n = ZMPPositions.size();
+    unsigned int n = COMStates.size();
     double KajitaPCpreviewWindow = 1.6 ;
     m_kajitaDynamicFilter->init( m_CurrentTime,
                                  m_SamplingPeriod,
@@ -584,29 +584,60 @@ computing the analytical trajectories. */
                                  lStartingCOMState.z[0],
                                  InitLeftFootAbsolutePosition,
                                  lStartingCOMState );
-    MAL_VECTOR_TYPE(double) UpperConfig = m_kajitaDynamicFilter->getComAndFootRealization()
-                                          ->getHumanoidDynamicRobot()->currentConfiguration() ;
+
+    CjrlHumanoidDynamicRobot * aHDR = m_kajitaDynamicFilter->
+                                             getComAndFootRealization()->getHumanoidDynamicRobot();
+    MAL_VECTOR_TYPE(double) UpperConfig = aHDR->currentConfiguration() ;
+    MAL_VECTOR_TYPE(double) UpperVel = aHDR->currentVelocity() ;
+    MAL_VECTOR_TYPE(double) UpperAcc = aHDR->currentAcceleration() ;
+//    // carry the weight in front of him
+//    UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
+//    UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
+//    UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
+//    UpperConfig(21)= 0.0 ;            // HEAD_JOINT1
+//    UpperConfig(22)= -0.108210414 ;   // RARM_JOINT0
+//    UpperConfig(23)= 0.0383972435 ;   // RARM_JOINT1
+//    UpperConfig(24)= 0.474729557 ;    // RARM_JOINT2
+//    UpperConfig(25)= -1.41720735 ;    // RARM_JOINT3
+//    UpperConfig(26)= 1.45385927 ;     // RARM_JOINT4
+//    UpperConfig(27)= 0.509636142 ;    // RARM_JOINT5
+//    UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
+//    UpperConfig(29)= -0.108210414 ;   // LARM_JOINT0
+//    UpperConfig(30)= -0.129154365 ;   // LARM_JOINT1
+//    UpperConfig(31)= -0.333357887 ;   // LARM_JOINT2
+//    UpperConfig(32)= -1.41720735 ;    // LARM_JOINT3
+//    UpperConfig(33)= 1.45385927 ;     // LARM_JOINT4
+//    UpperConfig(34)= -0.193731547 ;   // LARM_JOINT5
+//    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
+
+    // carry the weight over the head
     UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
-    UpperConfig(19)= 0.015 ;            // CHEST_JOINT1
+    UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
     UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
     UpperConfig(21)= 0.0 ;            // HEAD_JOINT1
-    UpperConfig(22)= -0.108210414 ;   // RARM_JOINT0
-    UpperConfig(23)= 0.0383972435 ;    // RARM_JOINT1
-    UpperConfig(24)= 0.474729557 ;     // RARM_JOINT2
-    UpperConfig(25)= -1.41720735 ;    // RARM_JOINT3
-    UpperConfig(26)= 1.45385927 ;     // RARM_JOINT4
-    UpperConfig(27)= 0.509636142 ;     // RARM_JOINT5
-    UpperConfig(28)= 0.034906585 ;     // RARM_JOINT6
-    UpperConfig(29)= -0.200712864 ;    // LARM_JOINT0
-    UpperConfig(30)= -0.129154365 ;    // LARM_JOINT1
-    UpperConfig(31)= -0.333357887 ;    // LARM_JOINT2
-    UpperConfig(32)= -1.39277274 ;     // LARM_JOINT3
-    UpperConfig(33)= 1.18856922 ;      // LARM_JOINT4
-    UpperConfig(34)= -0.193731547 ;    // LARM_JOINT5
-    UpperConfig(35)= 0.034906585 ;     // LARM_JOINT6
+    UpperConfig(22)= -1.26361838 ;   // RARM_JOINT0
+    UpperConfig(23)= -0.0523598776 ;   // RARM_JOINT1
+    UpperConfig(24)= 0.310668607 ;    // RARM_JOINT2
+    UpperConfig(25)= -1.94953277 ;    // RARM_JOINT3
+    UpperConfig(26)= 1.56556034 ;     // RARM_JOINT4
+    UpperConfig(27)= 0.383972435 ;    // RARM_JOINT5
+    UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
+    UpperConfig(29)= -1.26361838 ;     // LARM_JOINT0
+    UpperConfig(30)= 0.0523598776 ;   // LARM_JOINT1
+    UpperConfig(31)= -0.310668607 ;      // LARM_JOINT2
+    UpperConfig(32)= -1.94953277 ;    // LARM_JOINT3
+    UpperConfig(33)= -1.56556034 ;     // LARM_JOINT4
+    UpperConfig(34)= 0.383972435 ;     // LARM_JOINT5
+    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
+
+    for(unsigned int i = 0 ; i < 18 ; ++i){
+      UpperVel(i)=0.0;
+      UpperAcc(i)=0.0;
+    }
 
 
-    m_kajitaDynamicFilter->setRobotUpperPart(UpperConfig);
+
+    m_kajitaDynamicFilter->setRobotUpperPart(UpperConfig,UpperVel,UpperAcc);
 
     /*! Add KajitaPCpreviewWindow second to the buffers for fitering */
     ZMPPosition lastZMP = ZMPPositions.back();
@@ -644,6 +675,7 @@ computing the analytical trajectories. */
       inputdeltaZMP_deq[i].stepType = ZMPPositions[i].stepType ;
     }
     m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
+
     vector <vector<double> > filteredZMPMB (n , vector<double> (2,0.0)) ;
     for (unsigned int i = 0 ; i < n ; ++i)
     {
@@ -651,6 +683,8 @@ computing the analytical trajectories. */
       {
         filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
         filteredCoM[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+        COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+        COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
       m_kajitaDynamicFilter->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
                                           LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
@@ -662,6 +696,92 @@ computing the analytical trajectories. */
     {
       m_UpperTimeLimitToUpdateStacks += m_DeltaTj[i];
     }
+//
+//
+//    /// \brief Debug Purpose
+//    /// --------------------
+//    ifstream iof;
+//    string aFileName;
+//    aFileName = "/home/mnaveau/devel/HRP2Log/ClimbingWithTools-11072014-01-astate.log" ;
+//    iof.open(aFileName.c_str(),std::ifstream::in);
+//    string entete;
+//    getline(iof,entete);
+//    vector <vector <double> > Datas (4000,vector <double>(176));
+//    for(unsigned int i = 0 ; i < 4000 ; ++i)
+//    {
+//      for (unsigned int j = 0 ; j < 176 ; ++j )
+//      {
+//        iof >> Datas[i][j] ;
+//      }
+//    }
+//
+//    vector < MAL_VECTOR_TYPE(double) > POS (4000);
+//    vector < MAL_VECTOR_TYPE(double) > VIT (4000);
+//    vector < MAL_VECTOR_TYPE(double) > ACC (4000);
+//    for(unsigned int i = 0 ; i < 4000 ; ++i)
+//    {
+//      MAL_VECTOR_RESIZE(POS[i], 36);
+//      MAL_VECTOR_RESIZE(VIT[i], 36);
+//      MAL_VECTOR_RESIZE(ACC[i], 36);
+//    }
+//
+//    for (unsigned int j = 0 ; j < 6 ; ++j )
+//    {
+//      POS[0](j+158) = Datas[i][j] ;
+//      POS[1](j+158) = Datas[i][j] ;
+//    }
+//    for (unsigned int j = 0 ; j < 30 ; ++j )
+//    {
+//      POS[0](j+6) = Datas[i][j] ;
+//      POS[1](j+6) = Datas[i][j] ;
+//    }
+//
+//    for(unsigned int i = 2 ; i < 4000 ; ++i)
+//    {
+//      for (unsigned int j = 0 ; j < 30 ; ++j )
+//      {
+//         m_CurrentConfiguration = Datas[i][j] ;
+//      }
+//    }
+//
+//
+    double ecartMax_ZMP_ZMPMB=0.0;
+    double ecartMax_ZMP_ZMPcorrected=0.0;
+    double ecartMoy_ZMP_ZMPMB=0.0;
+    double ecartMoy_ZMP_ZMPcorrected=0.0;
+
+    for (unsigned int i = 0 ; i < n ; ++i )
+    {
+      double ecartZMP_ZMPMB = 0 ;
+      double ecartZMP_ZMPcorrected = 0 ;
+      ecartZMP_ZMPMB = (ZMPPositions[i].px - ZMPMB[i][0])*(ZMPPositions[i].px - ZMPMB[i][0])+
+	               (ZMPPositions[i].py - ZMPMB[i][1])*(ZMPPositions[i].py - ZMPMB[i][1]);
+
+      ecartZMP_ZMPcorrected = (ZMPPositions[i].px - filteredZMPMB[i][0])*
+			      (ZMPPositions[i].px - filteredZMPMB[i][0])
+				+
+                              (ZMPPositions[i].py - filteredZMPMB[i][1])*
+                              (ZMPPositions[i].py - filteredZMPMB[i][1]);
+      ecartZMP_ZMPMB = sqrt(ecartZMP_ZMPMB);
+      ecartZMP_ZMPcorrected = sqrt(ecartZMP_ZMPcorrected);
+      if(ecartZMP_ZMPMB > ecartMax_ZMP_ZMPMB)
+      {
+	ecartMax_ZMP_ZMPMB = ecartZMP_ZMPMB ;
+      }
+      if(ecartZMP_ZMPcorrected > ecartMax_ZMP_ZMPcorrected)
+      {
+	ecartMax_ZMP_ZMPcorrected = ecartZMP_ZMPcorrected ;
+      }
+      ecartMoy_ZMP_ZMPMB += ecartZMP_ZMPMB ;
+      ecartMoy_ZMP_ZMPcorrected += ecartZMP_ZMPcorrected ;
+    }
+    ecartMoy_ZMP_ZMPMB = ecartMoy_ZMP_ZMPMB/n ;
+    ecartMoy_ZMP_ZMPcorrected = ecartMoy_ZMP_ZMPcorrected/n ;
+
+    cout << "ecartMax_ZMP_ZMPMB = " << ecartMax_ZMP_ZMPMB << endl ;
+    cout << "ecartMax_ZMP_ZMPcorrected = " << ecartMax_ZMP_ZMPcorrected << endl ;
+    cout << "ecartMoy_ZMP_ZMPMB = " << ecartMoy_ZMP_ZMPMB << endl ;
+    cout << "ecartMoy_ZMP_ZMPcorrected = " << ecartMoy_ZMP_ZMPcorrected << endl ;
 
     /// \brief Debug Purpose
     /// --------------------
@@ -748,6 +868,7 @@ computing the analytical trajectories. */
     }
     aof.close() ;
     ++iteration;
+
   }
 
   int AnalyticalMorisawaCompact::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
@@ -813,7 +934,7 @@ When the limit is reached, and the stack exhausted this method is called again. 
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
 
-    m_kajitaDynamicFilter->init( m_CurrentTime, m_SamplingPeriod, m_SamplingPeriod, m_SamplingPeriod, 1.6,
+    m_kajitaDynamicFilter->init( m_CurrentTime, m_SamplingPeriod, 0.04, m_SamplingPeriod, 1.6,
                                  lStartingCOMState.z[0], InitLeftFootAbsolutePosition, lStartingCOMState );
 
     return m_RelativeFootPositions.size();
@@ -1086,7 +1207,49 @@ When the limit is reached, and the stack exhausted this method is called again. 
             <<  RightFootAbsPos[0].ddomega  << " "      // 53
             << endl ;
         aof.close();
-        ++iteration;
+
+
+
+        static double ecartMax_ZMP_ZMPMB=0.0;
+        static double ecartMax_ZMP_ZMPcorrected=0.0;
+        static double sumZMP_ZMPMB=0.0;
+        static double sumZMP_ZMPcorrected=0.0;
+        static double ecartMoy_ZMP_ZMPMB=0.0;
+        static double ecartMoy_ZMP_ZMPcorrected=0.0;
+
+        double ecartZMP_ZMPMB = 0 ;
+        double ecartZMP_ZMPcorrected = 0 ;
+        ecartZMP_ZMPMB = (ZMPPos_deq[0].px - ZMPMB[0][0])*(ZMPPos_deq[0].px - ZMPMB[0][0])+
+                         (ZMPPos_deq[0].py - ZMPMB[0][1])*(ZMPPos_deq[0].py - ZMPMB[0][1]);
+
+        ecartZMP_ZMPcorrected = (ZMPPos_deq[0].px - ZMPMBcorrige[0])*
+                                (ZMPPos_deq[0].px - ZMPMBcorrige[0])
+                                +
+                                (ZMPPos_deq[0].py - ZMPMBcorrige[1])*
+                                (ZMPPos_deq[0].py - ZMPMBcorrige[1]);
+        ecartZMP_ZMPMB = sqrt(ecartZMP_ZMPMB);
+        ecartZMP_ZMPcorrected = sqrt(ecartZMP_ZMPcorrected);
+        if(ecartZMP_ZMPMB > ecartMax_ZMP_ZMPMB)
+        {
+          ecartMax_ZMP_ZMPMB = ecartZMP_ZMPMB ;
+        }
+        if(ecartZMP_ZMPcorrected > ecartMax_ZMP_ZMPcorrected)
+        {
+          ecartMax_ZMP_ZMPcorrected = ecartZMP_ZMPcorrected ;
+        }
+        sumZMP_ZMPMB += ecartZMP_ZMPMB ;
+        sumZMP_ZMPcorrected += ecartZMP_ZMPcorrected ;
+
+
+        ecartMoy_ZMP_ZMPMB = sumZMP_ZMPMB/iteration ;
+        ecartMoy_ZMP_ZMPcorrected = sumZMP_ZMPcorrected/iteration ;
+
+        cout << "ecartMax_ZMP_ZMPMB = " << ecartMax_ZMP_ZMPMB << endl ;
+        cout << "ecartMax_ZMP_ZMPcorrected = " << ecartMax_ZMP_ZMPcorrected << endl ;
+        cout << "ecartMoy_ZMP_ZMPMB = " << ecartMoy_ZMP_ZMPMB << endl ;
+        cout << "ecartMoy_ZMP_ZMPcorrected = " << ecartMoy_ZMP_ZMPcorrected << endl ;
+
+         ++iteration;
       }
     }
     else
@@ -2586,12 +2749,12 @@ new step has to be generate.
     }
     else if (Method==":setRobotUpperPart")
     {
-      MAL_VECTOR_TYPE(double) configuration ;
-      if (strm.good())
-      {
-        strm >> configuration;
-        m_kajitaDynamicFilter->setRobotUpperPart(configuration);
-      }
+//      MAL_VECTOR_TYPE(double) configuration ;
+//      if (strm.good())
+//      {
+//        strm >> configuration;
+//        m_kajitaDynamicFilter->setRobotUpperPart(configuration);
+//      }
     }
 
     ZMPRefTrajectoryGeneration::CallMethod(Method,strm);

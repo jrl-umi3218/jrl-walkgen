@@ -15,6 +15,10 @@
   typedef metapod::Nodes< Robot_Model, Robot_Model::BODY >::type RootNode;
   typedef metapod::Nodes< Robot_Model, Robot_Model::l_ankle >::type LankleNode;
   typedef metapod::Nodes< Robot_Model, Robot_Model::r_ankle >::type RankleNode;
+  typedef metapod::Nodes< Robot_Model, Robot_Model::l_wrist >::type LhandNode;
+  typedef metapod::Nodes< Robot_Model, Robot_Model::r_wrist >::type RhandNode;
+  typedef metapod::Nodes< Robot_Model, Robot_Model::LARM_LINK0 >::type LshoulderNode;
+  typedef metapod::Nodes< Robot_Model, Robot_Model::RARM_LINK0 >::type RshoulderNode;
 
   typedef metapod::jac_point_chain < Robot_Model,
     Robot_Model::l_ankle, Robot_Model::BODY,0,true,false> Jacobian_LF;
@@ -39,7 +43,7 @@ namespace PatternGeneratorJRL
                   );
     ~DynamicFilter();
     /// \brief
-    int filter(
+    int OffLinefilter(
         COMState & lastCtrlCoMState,
         FootAbsolutePosition & lastCtrlLeftFoot,
         FootAbsolutePosition & lastCtrlRightFoot,
@@ -47,8 +51,17 @@ namespace PatternGeneratorJRL
         deque<ZMPPosition> inputZMPTraj_deq_,
         deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
         deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-        deque<COMState> & outputDeltaCOMTraj_deq_
-        );
+        deque<COMState> & outputDeltaCOMTraj_deq_);
+
+    int OnLinefilter(
+        const deque<COMState> & ctrlCoMState,
+        const deque<FootAbsolutePosition> & ctrlLeftFoot,
+        const deque<FootAbsolutePosition> & ctrlRightFoot,
+        const deque<COMState> & inputCOMTraj_deq_,
+        const deque<ZMPPosition> inputZMPTraj_deq_,
+        const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+        const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+        deque<COMState> & outputDeltaCOMTraj_deq_);
 
     void init(
         double currentTime,
@@ -89,6 +102,10 @@ namespace PatternGeneratorJRL
     int OptimalControl(
         deque<ZMPPosition> & inputdeltaZMP_deq,
         deque<COMState> & outputDeltaCOMTraj_deq_);
+
+    void ForwardKinematics(MAL_VECTOR_TYPE(double) & configuration,
+                           MAL_VECTOR_TYPE(double) & velocity,
+                           MAL_VECTOR_TYPE(double) & acceleration);
 
   private: // Private methods
 
@@ -135,7 +152,9 @@ namespace PatternGeneratorJRL
     inline void setPreviewWindowSize_(double previewWindowSize)
     { previewWindowSize_ = previewWindowSize; }
 
-    void setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration);
+    void setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration,
+                                          MAL_VECTOR_TYPE(double) & velocity,
+                                          MAL_VECTOR_TYPE(double) & acceleration);
 
     /// \brief getter :
     inline ComAndFootRealizationByGeometry * getComAndFootRealization()
@@ -214,7 +233,12 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_TYPE(double) ZMPMBAcceleration_ ;
 
       MAL_VECTOR_TYPE(double) upperPartConfiguration_ ;
+      MAL_VECTOR_TYPE(double) previousUpperPartConfiguration_ ;
+      MAL_VECTOR_TYPE(double) upperPartVelocity_ ;
+      MAL_VECTOR_TYPE(double) previousUpperPartVelocity_ ;
+      MAL_VECTOR_TYPE(double) upperPartAcceleration_ ;
       std::vector <unsigned int> upperPartIndex ;
+      bool walkingHeuristic_ ;
 
       /// \brief data of the previous iteration
       bool PreviousSupportFoot_ ; // 1 = left ; 0 = right ;

@@ -171,6 +171,7 @@ public:
 
           /*! Fill the debug files with appropriate information. */
           //ComparingZMPs();
+          static int iter = 0 ;
           dynamicfilter_->InverseKinematics(
               m_OneStep.finalCOMPosition,
               m_OneStep.LeftFootPosition,
@@ -178,7 +179,9 @@ public:
               m_CurrentConfiguration,
               m_CurrentVelocity,
               m_CurrentAcceleration,
-              0.005,0,m_OneStep.NbOfIt);
+              0.005,1,iter);
+          dynamicfilter_->ForwardKinematics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
+          iter++;
           fillInDebugFiles();
         }
         else
@@ -244,6 +247,19 @@ public:
     dynamicfilter_->init(0.0,samplingPeriod_,samplingPeriod_,samplingPeriod_,
                          samplingPeriod_,0.814,supportFoot,m_OneStep.finalCOMPosition);
     initIK();
+    MAL_VECTOR_TYPE(double) UpperConfig = m_HDR->currentConfiguration() ;
+    MAL_VECTOR_TYPE(double) UpperVel = m_HDR->currentVelocity() ;
+    MAL_VECTOR_TYPE(double) UpperAcc = m_HDR->currentAcceleration() ;
+    dynamicfilter_->setRobotUpperPart(UpperConfig,UpperVel,UpperAcc);
+    dynamicfilter_->InverseKinematics(
+        m_OneStep.finalCOMPosition,
+        m_OneStep.LeftFootPosition,
+        m_OneStep.RightFootPosition,
+        m_CurrentConfiguration,
+        m_CurrentVelocity,
+        m_CurrentAcceleration,
+        0.005,1,0);
+    dynamicfilter_->ForwardKinematics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
   }
 
 protected:
@@ -350,38 +366,60 @@ protected:
 	  aof.close();
         }
 
+//      // carry the weight in front of him
+//      m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
+//      m_CurrentConfiguration(19)= 0.015 ;            // CHEST_JOINT1
+//      m_CurrentConfiguration(20)= 0.0 ;            // HEAD_JOINT0
+//      m_CurrentConfiguration(21)= 0.0 ;            // HEAD_JOINT1
+//      m_CurrentConfiguration(22)= -0.108210414 ;   // RARM_JOINT0
+//      m_CurrentConfiguration(23)= 0.0383972435 ;    // RARM_JOINT1
+//      m_CurrentConfiguration(24)= 0.474729557 ;     // RARM_JOINT2
+//      m_CurrentConfiguration(25)= -1.41720735 ;    // RARM_JOINT3
+//      m_CurrentConfiguration(26)= 1.45385927 ;     // RARM_JOINT4
+//      m_CurrentConfiguration(27)= 0.509636142 ;     // RARM_JOINT5
+//      m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
+//      m_CurrentConfiguration(29)= -0.108210414 ;    // LARM_JOINT0
+//      m_CurrentConfiguration(30)= -0.129154365 ;    // LARM_JOINT1
+//      m_CurrentConfiguration(31)= -0.333357887 ;    // LARM_JOINT2
+//      m_CurrentConfiguration(32)= -1.41720735 ;     // LARM_JOINT3
+//      m_CurrentConfiguration(33)= 1.45385927 ;      // LARM_JOINT4
+//      m_CurrentConfiguration(34)= -0.193731547 ;    // LARM_JOINT5
+//      m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
+//
+      // carry the weight over the head
       m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
-      m_CurrentConfiguration(19)= 0.0 ;            // CHEST_JOINT1
+      m_CurrentConfiguration(19)= 0.015 ;          // CHEST_JOINT1
       m_CurrentConfiguration(20)= 0.0 ;            // HEAD_JOINT0
       m_CurrentConfiguration(21)= 0.0 ;            // HEAD_JOINT1
-      m_CurrentConfiguration(22)= -0.108210414 ;   // RARM_JOINT0
-      m_CurrentConfiguration(23)= 0.0383972435 ;   // RARM_JOINT1
-      m_CurrentConfiguration(24)= 0.474729557 ;    // RARM_JOINT2
-      m_CurrentConfiguration(25)= -1.41720735 ;    // RARM_JOINT3
-      m_CurrentConfiguration(26)= 1.45385927 ;     // RARM_JOINT4
-      m_CurrentConfiguration(27)= 0.509636142 ;    // RARM_JOINT5
-      m_CurrentConfiguration(28)= 0.034906585 ;    // RARM_JOINT6
-      m_CurrentConfiguration(29)= -0.200712864 ;   // LARM_JOINT0
-      m_CurrentConfiguration(30)= -0.129154365 ;   // LARM_JOINT1
-      m_CurrentConfiguration(31)= -0.333357887 ;   // LARM_JOINT2
-      m_CurrentConfiguration(32)= -1.39277274 ;    // LARM_JOINT3
-      m_CurrentConfiguration(33)= 1.18856922 ;     // LARM_JOINT4
-      m_CurrentConfiguration(34)= -0.193731547 ;   // LARM_JOINT5
-      m_CurrentConfiguration(35)= 0.034906585 ;    // LARM_JOINT6
+      m_CurrentConfiguration(22)= -1.26361838 ;    // RARM_JOINT0
+      m_CurrentConfiguration(23)= -0.0523598776 ;  // RARM_JOINT1
+      m_CurrentConfiguration(24)= 0.310668607 ;    // RARM_JOINT2
+      m_CurrentConfiguration(25)= -1.94953277 ;    // RARM_JOINT3
+      m_CurrentConfiguration(26)= 1.56556034 ;     // RARM_JOINT4
+      m_CurrentConfiguration(27)= 0.383972435 ;    // RARM_JOINT5
+      m_CurrentConfiguration(28)= 0.174532925 ;    // RARM_JOINT6
+      m_CurrentConfiguration(29)= -1.26361838 ;    // LARM_JOINT0
+      m_CurrentConfiguration(30)= 0.0523598776 ;   // LARM_JOINT1
+      m_CurrentConfiguration(31)= -0.310668607 ;   // LARM_JOINT2
+      m_CurrentConfiguration(32)= -1.94953277 ;    // LARM_JOINT3
+      m_CurrentConfiguration(33)= -1.56556034 ;    // LARM_JOINT4
+      m_CurrentConfiguration(34)= 0.383972435 ;    // LARM_JOINT5
+      m_CurrentConfiguration(35)= 0.174532925 ;    // LARM_JOINT6
+
       /// \brief Create file .hip .pos .zmp
       /// --------------------
       ofstream aof;
       string aFileName;
 
       if ( iteration == 0 ){
-        aFileName = "/tmp/";
+        aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
         aFileName+=m_TestName;
         aFileName+=".pos";
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
       }
       ///----
-      aFileName = "/tmp/";
+      aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
         aFileName+=m_TestName;
         aFileName+=".pos";
       aof.open(aFileName.c_str(),ofstream::app);
@@ -391,20 +429,20 @@ protected:
       for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
         aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 2
       }
-      for(unsigned int i = 0 ; i < 10 ; i++){
+      for(unsigned int i = 0 ; i < 9 ; i++){
         aof << 0.0 << " "  ;
       }
-      aof  << endl ;
+      aof << 0.0  << endl ;
       aof.close();
 
       if ( iteration == 0 ){
-        aFileName = "/tmp/";
+        aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
         aFileName+=m_TestName;
         aFileName+=".hip";
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
       }
-      aFileName = "/tmp/";
+      aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
         aFileName+=m_TestName;
         aFileName+=".hip";
       aof.open(aFileName.c_str(),ofstream::app);
@@ -413,12 +451,12 @@ protected:
         aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
         aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ; // 2
         aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0] ) << " "  ; // 3
-        aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] ) << " "  ; // 4
+        aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] ) ; // 4
         aof << endl ;
       aof.close();
 
       if ( iteration == 0 ){
-        aFileName = "/tmp/";
+        aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
         aFileName+=m_TestName;
         aFileName+=".zmp";
         aof.open(aFileName.c_str(),ofstream::out);
@@ -431,7 +469,7 @@ protected:
       else
         aSupportState = m_OneStep.RightFootPosition ;
 
-      aFileName = "/tmp/";
+      aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
         aFileName+=m_TestName;
         aFileName+=".zmp";
       aof.open(aFileName.c_str(),ofstream::app);
@@ -440,7 +478,7 @@ protected:
         aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
         aof << filterprecision( m_OneStep.ZMPTarget(0) - m_CurrentConfiguration(0)) << " "  ; // 2
         aof << filterprecision( m_OneStep.ZMPTarget(1) - m_CurrentConfiguration(1) ) << " "  ; // 3
-        aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2)) << " "  ; // 4
+        aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2))  ; // 4
         aof << endl ;
       aof.close();
 
@@ -684,14 +722,14 @@ protected:
     }
 
     {
-        istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
-                                        0.3 0.19 0.15 0.0\
-                                        0.0 -0.19 0.0 0.0\
-                                        0.3 0.19 0.15 0.0\
-                                        0.0 -0.19 0.0 0.0\
-                                        0.3 0.19 0.15 0.0\
-                                        0.0 -0.19 0.0 0.0\
-                                        ");
+      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
+                                              0.3 0.19 0.15 0.0\
+                                              0.0 -0.19 0.0 0.0\
+                                              0.3 0.19 0.15 0.0\
+                                              0.0 -0.19 0.0 0.0\
+                                              0.3 0.19 0.15 0.0\
+                                              0.0 -0.19 0.0 0.0\
+                                              ");
       aPGI.ParseCmd(strm2);
     }
 
@@ -707,11 +745,11 @@ protected:
 
     {
      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
-                                        0.32 0.19 -0.15 0.0\
+                                        0.31 0.19 -0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
-                                        0.32 0.19 -0.15 0.0\
+                                        0.31 0.19 -0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
-                                        0.32 0.19 -0.15 0.0\
+                                        0.31 0.19 -0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
                                         ");
       aPGI.ParseCmd(strm2);

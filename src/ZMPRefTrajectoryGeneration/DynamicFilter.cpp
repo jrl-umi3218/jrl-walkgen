@@ -66,6 +66,8 @@ DynamicFilter::DynamicFilter(
   deltaZMPy_ = 0.0 ;
 
   upperPartIndex.clear();
+
+  walkingHeuristic_ = false ;
 }
 
 DynamicFilter::~DynamicFilter()
@@ -80,11 +82,29 @@ DynamicFilter::~DynamicFilter()
   }
 }
 
-void DynamicFilter::setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration)
+void DynamicFilter::ForwardKinematics(MAL_VECTOR_TYPE(double) & configuration,
+                                      MAL_VECTOR_TYPE(double) & velocity,
+                                      MAL_VECTOR_TYPE(double) & acceleration)
+{
+  Robot_Model::confVector q, dq, ddq ;
+  for(unsigned int j = 0 ; j < configuration.size() ; j++ )
+  {
+    q(j,0) = configuration(j) ;
+    dq(j,0) = velocity(j) ;
+    ddq(j,0) = acceleration(j) ;
+  }
+  metapod::rnea< Robot_Model, true >::run(robot_, q, dq, ddq);
+}
+
+void DynamicFilter::setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration,
+                                      MAL_VECTOR_TYPE(double) & velocity,
+                                      MAL_VECTOR_TYPE(double) & acceleration)
 {
   for ( unsigned int i = 0 ; i < upperPartIndex.size() ; ++i )
   {
-    upperPartConfiguration_(upperPartIndex[i])= configuration(upperPartIndex[i]);
+    upperPartConfiguration_(upperPartIndex[i])  = configuration(upperPartIndex[i]);
+    upperPartVelocity_(upperPartIndex[i])       = velocity(upperPartIndex[i]);
+    upperPartAcceleration_(upperPartIndex[i])   = acceleration(upperPartIndex[i]);
   }
   return ;
 }
@@ -125,6 +145,10 @@ void DynamicFilter::init(
   previousAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
 
   upperPartConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
+  previousUpperPartConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
+  upperPartVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
+  previousUpperPartVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
+  upperPartAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
 
   ZMPMBConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
   ZMPMBVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
@@ -152,8 +176,8 @@ void DynamicFilter::init(
   prev_q_ = q_ ;
   prev_dq_ = dq_ ;
   prev_ddq_ = ddq_ ;
-  bcalc<Robot_Model>::run(robot_, prev_q_);
-  bcalc<Robot_Model>::run(robot_2,prev_q_);
+  jcalc<Robot_Model>::run(robot_,q_ ,dq_ );
+  jcalc<Robot_Model>::run(robot_2,q_, dq_);
 
   deltaZMP_deq_.resize( PG_N_);
   ZMPMB_vec_.resize( PG_N_, vector<double>(2));
@@ -192,7 +216,7 @@ void DynamicFilter::init(
   return ;
 }
 
-int DynamicFilter::filter(
+int DynamicFilter::OffLinefilter(
     COMState & lastCtrlCoMState,
     FootAbsolutePosition & lastCtrlLeftFoot,
     FootAbsolutePosition & lastCtrlRightFoot,
@@ -202,47 +226,20 @@ int DynamicFilter::filter(
     deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
-  InverseKinematics(
-      lastCtrlCoMState,
-      lastCtrlLeftFoot,
-      lastCtrlRightFoot,
-      inputCOMTraj_deq_,
-      inputLeftFootTraj_deq_,
-      inputRightFootTraj_deq_);
-
-  InverseDynamics(inputZMPTraj_deq_);
-  outputDeltaCOMTraj_deq_;
-  //int error = OptimalControl(outputDeltaCOMTraj_deq_);
-  int error = 0;
-
-  return error ;
+  return 0;
 }
 
-void DynamicFilter::InverseKinematics(
-    const COMState & lastCtrlCoMState,
-    const FootAbsolutePosition & lastCtrlLeftFoot,
-    const FootAbsolutePosition & lastCtrlRightFoot,
+int DynamicFilter::OnLinefilter(
+    const deque<COMState> & ctrlCoMState,
+    const deque<FootAbsolutePosition> & ctrlLeftFoot,
+    const deque<FootAbsolutePosition> & ctrlRightFoot,
     const deque<COMState> & inputCOMTraj_deq_,
+    const deque<ZMPPosition> inputZMPTraj_deq_,
     const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-    const deque<FootAbsolutePosition> & inputRightFootTraj_deq_)
+    const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+    deque<COMState> & outputDeltaCOMTraj_deq_)
 {
-  int stage0 = 0 ;
-  int stage1 = 1 ;
-
-  comAndFootRealization_->SetPreviousConfigurationStage0(previousConfiguration_);
-  comAndFootRealization_->SetPreviousVelocityStage0(previousVelocity_);
-  comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
-  for(unsigned int i = 0 ; i <  PG_N_ ; i++ )
-  {
-    InverseKinematics(inputCOMTraj_deq_[i],inputLeftFootTraj_deq_ [i], inputRightFootTraj_deq_ [i],
-                      configurationTraj_[i],velocityTraj_[i],accelerationTraj_[i],
-                      interpolationPeriod_, stage0, 2);
-  }
-
-  InverseKinematics(lastCtrlCoMState, lastCtrlLeftFoot, lastCtrlRightFoot,
-                    previousConfiguration_,previousVelocity_,previousAcceleration_,
-                    controlPeriod_, stage1, 2);
-  return ;
+  return 0 ;
 }
 
 void DynamicFilter::InverseKinematics(
@@ -282,29 +279,167 @@ void DynamicFilter::InverseKinematics(
       aLeftFootPosition_, aRightFootPosition_,
       configuration, velocity, acceleration,
       iteration, stage);
-  return;
-}
 
-void DynamicFilter::InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq)
-{
-  for (unsigned int i = 0 ; i < PG_N_ ; i++ )
+  static int it = 0 ;
+
+  if (walkingHeuristic_)
   {
-    ComputeZMPMB(configurationTraj_[i],velocityTraj_[i],accelerationTraj_[i],ZMPMB_vec_[i]);
+    LankleNode & node_lankle = boost::fusion::at_c<Robot_Model::l_ankle>(robot_.nodes);
+    RankleNode & node_rankle = boost::fusion::at_c<Robot_Model::r_ankle>(robot_.nodes);
 
-    if (Once_){
-      DInitX_ = inputZMPTraj_deq[0].px - ZMPMB_vec_[i][0];
-      DInitY_ = inputZMPTraj_deq[0].py - ZMPMB_vec_[i][1];
-      Once_ = false ;
+    LhandNode & node_lhand = boost::fusion::at_c<Robot_Model::l_wrist>(robot_.nodes);
+    RhandNode & node_rhand = boost::fusion::at_c<Robot_Model::r_wrist>(robot_.nodes);
+
+    LshoulderNode & node_lshoulder = boost::fusion::at_c<Robot_Model::LARM_LINK0>(robot_.nodes);
+    RshoulderNode & node_rshoulder = boost::fusion::at_c<Robot_Model::RARM_LINK0>(robot_.nodes);
+
+    RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
+
+    Spatial::TransformT<LocalFloatType,Spatial::RotationMatrixTpl<LocalFloatType> > waistXlf ;
+    Spatial::TransformT<LocalFloatType,Spatial::RotationMatrixTpl<LocalFloatType> > waistXrf ;
+    waistXlf = node_waist.body.iX0 * node_lankle.body.iX0.inverse() ;
+    waistXrf = node_waist.body.iX0 * node_rankle.body.iX0.inverse() ;
+//
+//    Spatial::TransformT<LocalFloatType,Spatial::RotationMatrixTpl<LocalFloatType> > shoulderXlh ;
+//    Spatial::TransformT<LocalFloatType,Spatial::RotationMatrixTpl<LocalFloatType> > shoulderXrh ;
+//    shoulderXlh = node_lshoulder.body.iX0 * node_lhand.body.iX0.inverse() ;
+//    shoulderXrh = node_rshoulder.body.iX0 * node_rhand.body.iX0.inverse() ;
+
+    // Homogeneous matrix
+    matrix4d identity,leftHandPose, rightHandPose;
+    MAL_S4x4_MATRIX_SET_IDENTITY(identity);
+    MAL_S4x4_MATRIX_SET_IDENTITY(leftHandPose);
+    MAL_S4x4_MATRIX_SET_IDENTITY(rightHandPose);
+
+    MAL_S4x4_MATRIX_ACCESS_I_J(leftHandPose,0,3) = -4*waistXrf.r()(0);
+    MAL_S4x4_MATRIX_ACCESS_I_J(leftHandPose,1,3) = 0.0;
+    MAL_S4x4_MATRIX_ACCESS_I_J(leftHandPose,2,3) = -0.45;
+
+
+
+    MAL_S4x4_MATRIX_ACCESS_I_J(rightHandPose,0,3) = -4*waistXlf.r()(0);
+    MAL_S4x4_MATRIX_ACCESS_I_J(rightHandPose,1,3) = 0.0;
+    MAL_S4x4_MATRIX_ACCESS_I_J(rightHandPose,2,3) = -0.45;
+
+    MAL_VECTOR_DIM(larm_q, double, 6) ;
+    MAL_VECTOR_DIM(rarm_q, double, 6) ;
+
+    CjrlHumanoidDynamicRobot * HDR = comAndFootRealization_->getHumanoidDynamicRobot();
+    int err1,err2;
+
+    CjrlJoint* left_shoulder = NULL ;
+    CjrlJoint* right_shoulder = NULL ;
+
+    std::vector<CjrlJoint*> actuatedJoints = HDR->getActuatedJoints() ;
+    for (unsigned int i = 0 ; i < actuatedJoints.size() ; ++i )
+    {
+      if ( actuatedJoints[i]->getName() == "LARM_JOINT0" )
+        left_shoulder = actuatedJoints[i];
+      if ( actuatedJoints[i]->getName() == "RARM_JOINT0" )
+        right_shoulder = actuatedJoints[i];
     }
 
-    deltaZMP_deq_[i].px = inputZMPTraj_deq[i].px - ZMPMB_vec_[i][0] - DInitX_  ;
-    deltaZMP_deq_[i].py = inputZMPTraj_deq[i].py - ZMPMB_vec_[i][1] - DInitY_  ;
-    deltaZMP_deq_[i].pz = 0.0 ;
-    deltaZMP_deq_[i].theta = 0.0 ;
-    deltaZMP_deq_[i].time = currentTime_ + i * interpolationPeriod_ ;
-    deltaZMP_deq_[i].stepType = inputZMPTraj_deq[i].stepType ;
+
+    err1 = HDR->getSpecializedInverseKinematics( *left_shoulder ,*(HDR->leftWrist()), identity, leftHandPose, larm_q );
+    err2 = HDR->getSpecializedInverseKinematics( *right_shoulder ,*(HDR->rightWrist()), identity, rightHandPose, rarm_q );
+
+    ofstream aof;
+
+    string aFileName;
+    if ( it == 0 ){
+      aFileName = "larmrarm.dat";
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+    }
+    aFileName = "larmrarm.dat";
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+
+    aof << it * 0.005 << " "  ; // 1
+
+    for(unsigned int i = 0 ; i < larm_q.size() ; i++){
+      aof << rarm_q(i) << " "  ; // 2
+    }
+
+    for(unsigned int i = 0 ; i < rarm_q.size() ; i++){
+      aof << larm_q(i) << " "  ; // 8
+    }
+    aof << waistXrf.r()(0) << " "
+        << waistXlf.r()(0) << " ";
+
+    aof  << endl ;
+    aof.close();
+
+    // swinging arms
+    upperPartConfiguration_(upperPartIndex[0])= 0.0 ;             // CHEST_JOINT0
+    upperPartConfiguration_(upperPartIndex[1])= 0.015 ;           // CHEST_JOINT1
+    upperPartConfiguration_(upperPartIndex[2])= 0.0 ;             // HEAD_JOINT0
+    upperPartConfiguration_(upperPartIndex[3])= 0.0 ;             // HEAD_JOINT1
+    upperPartConfiguration_(upperPartIndex[4])= rarm_q(0) ;       // RARM_JOINT0
+    upperPartConfiguration_(upperPartIndex[5])= rarm_q(1) ;       // RARM_JOINT1
+    upperPartConfiguration_(upperPartIndex[6])= rarm_q(2) ;       // RARM_JOINT2
+    upperPartConfiguration_(upperPartIndex[7])= rarm_q(3) ;       // RARM_JOINT3
+    upperPartConfiguration_(upperPartIndex[8])= rarm_q(4) ;       // RARM_JOINT4
+    upperPartConfiguration_(upperPartIndex[9])= rarm_q(5) ;       // RARM_JOINT5
+    upperPartConfiguration_(upperPartIndex[10])= 0.174532925 ;    // RARM_JOINT6
+    upperPartConfiguration_(upperPartIndex[11])= larm_q(0) ;      // LARM_JOINT0
+    upperPartConfiguration_(upperPartIndex[12])= larm_q(1) ;      // LARM_JOINT1
+    upperPartConfiguration_(upperPartIndex[13])= larm_q(2) ;      // LARM_JOINT2
+    upperPartConfiguration_(upperPartIndex[14])= larm_q(3) ;      // LARM_JOINT3
+    upperPartConfiguration_(upperPartIndex[15])= larm_q(4) ;      // LARM_JOINT4
+    upperPartConfiguration_(upperPartIndex[16])= larm_q(5) ;      // LARM_JOINT5
+    upperPartConfiguration_(upperPartIndex[17])= 0.174532925 ;    // LARM_JOINT6
+
+    for (unsigned int i = 0 ; i < upperPartIndex.size() ; ++i)
+    {
+      upperPartVelocity_(upperPartIndex[i]) = (upperPartConfiguration_(upperPartIndex[i]) -
+                                               previousUpperPartConfiguration_(upperPartIndex[i]))/samplingPeriod;
+      upperPartAcceleration_(upperPartIndex[i]) = (upperPartVelocity_(upperPartIndex[i]) -
+                                                   previousUpperPartVelocity_(upperPartIndex[i]))/samplingPeriod;
+    }
+    previousUpperPartConfiguration_ = upperPartConfiguration_ ;
+    previousUpperPartVelocity_ = upperPartVelocity_ ;
   }
-  return ;
+
+  for ( unsigned int i = 18 ; i < 36 ; ++i )
+  {
+    configuration(i)= upperPartConfiguration_(i);
+    velocity(i) = upperPartVelocity_(i) ;
+    acceleration(i) = upperPartAcceleration_(i) ;
+  }
+
+
+  /// \brief Create file .hip .pos .zmp
+  /// --------------------
+  ofstream aof;
+  string aFileName;
+
+  if ( it == 0 ){
+    aFileName = "/tmp/goingDownWithWeightDFtest";
+    aFileName+=".pos";
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+  ///----
+  aFileName = "/tmp/goingDownWithWeightDFtest";
+    aFileName+=".pos";
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  aof << it * 0.005 << " "  ; // 1
+  for(unsigned int i = 6 ; i < configuration.size() ; i++){
+    aof << configuration(i) << " "  ; // 2
+  }
+  for(unsigned int i = 0 ; i < 10 ; i++){
+    aof << 0.0 << " "  ;
+  }
+  aof  << endl ;
+  aof.close();
+
+  ++it;
+
+  return;
 }
 
 void DynamicFilter::stage0INstage1()
@@ -326,9 +461,6 @@ void DynamicFilter::ComputeZMPMB(
   InverseKinematics( inputCoMState, inputLeftFoot, inputRightFoot,
       ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
       samplingPeriod, stage, iteration) ;
-  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
-  ZMPMBVelocity_[0] = inputCoMState.x[1] -  inputCoMState.yaw[1] * CWy ;
-  ZMPMBVelocity_[1] = inputCoMState.y[1] +  inputCoMState.yaw[1] * CWx ;
 
   // Copy the angular trajectory data from "Boost" to "Eigen"
   for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )
@@ -339,7 +471,7 @@ void DynamicFilter::ComputeZMPMB(
   }
 
   //computeWaist( inputLeftFoot );
-
+  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
   // Apply the RNEA on the robot model
   clock_.StartTiming();
   metapod::rnea< Robot_Model, true >::run(robot_, q_, dq_, ddq_);
