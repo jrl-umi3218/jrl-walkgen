@@ -385,26 +385,26 @@ protected:
 //      m_CurrentConfiguration(33)= 1.45385927 ;      // LARM_JOINT4
 //      m_CurrentConfiguration(34)= -0.193731547 ;    // LARM_JOINT5
 //      m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
-//
-      // carry the weight over the head
-      m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
-      m_CurrentConfiguration(19)= 0.015 ;          // CHEST_JOINT1
-      m_CurrentConfiguration(20)= 0.0 ;            // HEAD_JOINT0
-      m_CurrentConfiguration(21)= 0.0 ;            // HEAD_JOINT1
-      m_CurrentConfiguration(22)= -1.26361838 ;    // RARM_JOINT0
-      m_CurrentConfiguration(23)= -0.0523598776 ;  // RARM_JOINT1
-      m_CurrentConfiguration(24)= 0.310668607 ;    // RARM_JOINT2
-      m_CurrentConfiguration(25)= -1.94953277 ;    // RARM_JOINT3
-      m_CurrentConfiguration(26)= 1.56556034 ;     // RARM_JOINT4
-      m_CurrentConfiguration(27)= 0.383972435 ;    // RARM_JOINT5
-      m_CurrentConfiguration(28)= 0.174532925 ;    // RARM_JOINT6
-      m_CurrentConfiguration(29)= -1.26361838 ;    // LARM_JOINT0
-      m_CurrentConfiguration(30)= 0.0523598776 ;   // LARM_JOINT1
-      m_CurrentConfiguration(31)= -0.310668607 ;   // LARM_JOINT2
-      m_CurrentConfiguration(32)= -1.94953277 ;    // LARM_JOINT3
-      m_CurrentConfiguration(33)= -1.56556034 ;    // LARM_JOINT4
-      m_CurrentConfiguration(34)= 0.383972435 ;    // LARM_JOINT5
-      m_CurrentConfiguration(35)= 0.174532925 ;    // LARM_JOINT6
+
+//      // carry the weight over the head
+//      m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
+//      m_CurrentConfiguration(19)= 0.015 ;          // CHEST_JOINT1
+//      m_CurrentConfiguration(20)= 0.0 ;            // HEAD_JOINT0
+//      m_CurrentConfiguration(21)= 0.0 ;            // HEAD_JOINT1
+//      m_CurrentConfiguration(22)= -1.4678219 ;     // RARM_JOINT0
+//      m_CurrentConfiguration(23)= 0.0366519143 ;   // RARM_JOINT1
+//      m_CurrentConfiguration(24)= 0.541052068 ;    // RARM_JOINT2
+//      m_CurrentConfiguration(25)= -1.69296937 ;    // RARM_JOINT3
+//      m_CurrentConfiguration(26)= 1.56556034 ;     // RARM_JOINT4
+//      m_CurrentConfiguration(27)= 0.584685299 ;    // RARM_JOINT5
+//      m_CurrentConfiguration(28)= 0.174532925 ;    // RARM_JOINT6
+//      m_CurrentConfiguration(29)= -1.4678219 ;     // LARM_JOINT0
+//      m_CurrentConfiguration(30)= -0.0366519143 ;  // LARM_JOINT1
+//      m_CurrentConfiguration(31)= -0.541052068 ;   // LARM_JOINT2
+//      m_CurrentConfiguration(32)= -1.69296937 ;    // LARM_JOINT3
+//      m_CurrentConfiguration(33)= -1.56556034 ;     // LARM_JOINT4
+//      m_CurrentConfiguration(34)= 0.584685299 ;    // LARM_JOINT5
+//      m_CurrentConfiguration(35)= 0.174532925 ;    // LARM_JOINT6
 
       /// \brief Create file .hip .pos .zmp
       /// --------------------
@@ -745,9 +745,9 @@ protected:
 
     {
      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
-                                        0.31 0.19 -0.15 0.0\
+                                        0.32 0.19 -0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
-                                        0.31 0.19 -0.15 0.0\
+                                        0.32 0.19 -0.15 0.0\
                                         0.0 -0.19 0.0 0.0\
                                         0.31 0.19 -0.15 0.0\
                                         0.0 -0.19 0.0 0.0\

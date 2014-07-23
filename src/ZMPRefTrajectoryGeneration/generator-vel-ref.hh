@@ -121,16 +121,16 @@ namespace PatternGeneratorJRL
     { IntermedData_->CoM(CoM); };
     inline void LastFootSol(const solution_t & Solution)
     {
-      unsigned NbStepPrvw = Solution.SupportStates_deq.back().StepNumber ;
       if(Solution.Solution_vec.size()>2*N_)
       {
+        unsigned NbStepPrvw = Solution.SupportStates_deq.back().StepNumber ;
         LastFootSolX_ = Solution.Solution_vec[2*N_];
         LastFootSolY_ = Solution.Solution_vec[2*N_+NbStepPrvw];
       }
       else
       {
-        LastFootSolX_ = -1.0 ;
-        LastFootSolY_ = -1.0 ;
+        LastFootSolX_ = 0.0 ;
+        LastFootSolY_ = 0.0 ;
       }
     }
 

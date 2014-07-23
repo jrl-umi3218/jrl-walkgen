@@ -610,25 +610,25 @@ computing the analytical trajectories. */
 //    UpperConfig(34)= -0.193731547 ;   // LARM_JOINT5
 //    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
 
-    // carry the weight over the head
-    UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
-    UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
-    UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
-    UpperConfig(21)= 0.0 ;            // HEAD_JOINT1
-    UpperConfig(22)= -1.26361838 ;   // RARM_JOINT0
-    UpperConfig(23)= -0.0523598776 ;   // RARM_JOINT1
-    UpperConfig(24)= 0.310668607 ;    // RARM_JOINT2
-    UpperConfig(25)= -1.94953277 ;    // RARM_JOINT3
-    UpperConfig(26)= 1.56556034 ;     // RARM_JOINT4
-    UpperConfig(27)= 0.383972435 ;    // RARM_JOINT5
-    UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
-    UpperConfig(29)= -1.26361838 ;     // LARM_JOINT0
-    UpperConfig(30)= 0.0523598776 ;   // LARM_JOINT1
-    UpperConfig(31)= -0.310668607 ;      // LARM_JOINT2
-    UpperConfig(32)= -1.94953277 ;    // LARM_JOINT3
-    UpperConfig(33)= -1.56556034 ;     // LARM_JOINT4
-    UpperConfig(34)= 0.383972435 ;     // LARM_JOINT5
-    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
+//    // carry the weight over the head
+//    UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
+//    UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
+//    UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
+//    UpperConfig(21)= 0.0 ;            // HEAD_JOINT1
+//    UpperConfig(22)= -1.4678219 ;     // RARM_JOINT0
+//    UpperConfig(23)= 0.0366519143 ;   // RARM_JOINT1
+//    UpperConfig(24)= 0.541052068 ;    // RARM_JOINT2
+//    UpperConfig(25)= -1.69296937 ;    // RARM_JOINT3
+//    UpperConfig(26)= 1.56556034 ;     // RARM_JOINT4
+//    UpperConfig(27)= 0.584685299 ;    // RARM_JOINT5
+//    UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
+//    UpperConfig(29)= -1.4678219 ;     // LARM_JOINT0
+//    UpperConfig(30)= -0.0366519143 ;  // LARM_JOINT1
+//    UpperConfig(31)= -0.541052068 ;   // LARM_JOINT2
+//    UpperConfig(32)= -1.69296937 ;    // LARM_JOINT3
+//    UpperConfig(33)= -1.56556034 ;     // LARM_JOINT4
+//    UpperConfig(34)= 0.584685299 ;    // LARM_JOINT5
+//    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
 
     for(unsigned int i = 0 ; i < 18 ; ++i){
       UpperVel(i)=0.0;
@@ -639,7 +639,7 @@ computing the analytical trajectories. */
 
     m_kajitaDynamicFilter->setRobotUpperPart(UpperConfig,UpperVel,UpperAcc);
 
-    /*! Add KajitaPCpreviewWindow second to the buffers for fitering */
+    /*! Add "KajitaPCpreviewWindow" second to the buffers for fitering */
     ZMPPosition lastZMP = ZMPPositions.back();
     COMState lastCoM = COMStates.back();
     FootAbsolutePosition lastLF = LeftFootAbsolutePositions.back();
@@ -690,6 +690,10 @@ computing the analytical trajectories. */
                                           LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
                                           filteredZMPMB[i] , stage1, i);
     }
+
+    cout << "COMStates.size() = " << COMStates.size() << endl ;
+    cout << "Buffer.size() = " << inputdeltaZMP_deq.size() << endl ;
+    cout << "outputDeltaCOMTraj_deq.size() =  " << outputDeltaCOMTraj_deq.size() << endl ;
 
     m_UpperTimeLimitToUpdateStacks = m_CurrentTime;
     for(int i=0;i<m_NumberOfIntervals;i++)
@@ -782,6 +786,14 @@ computing the analytical trajectories. */
     cout << "ecartMax_ZMP_ZMPcorrected = " << ecartMax_ZMP_ZMPcorrected << endl ;
     cout << "ecartMoy_ZMP_ZMPMB = " << ecartMoy_ZMP_ZMPMB << endl ;
     cout << "ecartMoy_ZMP_ZMPcorrected = " << ecartMoy_ZMP_ZMPcorrected << endl ;
+
+    for (unsigned int i = 0  ; i < KajitaPCpreviewWindow/m_SamplingPeriod ; ++i)
+    {
+      ZMPPositions.pop_back();
+      COMStates.pop_back();
+      LeftFootAbsolutePositions.pop_back();
+      RightFootAbsolutePositions.pop_back();
+    }
 
     /// \brief Debug Purpose
     /// --------------------
@@ -2852,7 +2864,7 @@ new step has to be generate.
     double deltaZ;
     // double static CoMzpre = CoMz;
     double up=0.1,upRight = 0.9 ,upLeft = 0.0;
-    double              upRight1 = 0.9 ,upLeft1 = 0.0;
+    double upRight1 = 0.9 ,upLeft1 = 0.0;
 
 
     double down = 0.1, downRight =0.9, downLeft = 0.0;

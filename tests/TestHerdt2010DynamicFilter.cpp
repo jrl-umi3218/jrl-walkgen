@@ -73,9 +73,9 @@ private:
   int iteration,iteration_zmp ;
   bool once ;
 
-  public:
+public:
   TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
-    TestObject(argc,argv,aString)
+      TestObject(argc,argv,aString)
   {
     m_TestProfile = TestProfile;
     {
@@ -141,30 +141,30 @@ private:
         if (m_PGIInterface==0)
         {
           ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
-                   m_CurrentVelocity,
-                   m_CurrentAcceleration,
-                   m_OneStep.ZMPTarget,
-                   m_OneStep.finalCOMPosition,
-                   m_OneStep.LeftFootPosition,
-                   m_OneStep.RightFootPosition);
+                                                 m_CurrentVelocity,
+                                                 m_CurrentAcceleration,
+                                                 m_OneStep.ZMPTarget,
+                                                 m_OneStep.finalCOMPosition,
+                                                 m_OneStep.LeftFootPosition,
+                                                 m_OneStep.RightFootPosition);
         }
         else if (m_PGIInterface==1)
         {
           ok = m_PGI->RunOneStepOfTheControlLoop( m_CurrentConfiguration,
-                                                m_CurrentVelocity,
-                                                m_CurrentAcceleration,
-                                                m_OneStep.ZMPTarget);
+                                                  m_CurrentVelocity,
+                                                  m_CurrentAcceleration,
+                                                  m_OneStep.ZMPTarget);
         }
-	      m_OneStep.NbOfIt++;
+        m_OneStep.NbOfIt++;
 
-	      m_clock.stopOneIteration();
+        m_clock.stopOneIteration();
 
-	      m_PreviousConfiguration = m_CurrentConfiguration;
-	      m_PreviousVelocity = m_CurrentVelocity;
-	      m_PreviousAcceleration = m_CurrentAcceleration;
+        m_PreviousConfiguration = m_CurrentConfiguration;
+        m_PreviousVelocity = m_CurrentVelocity;
+        m_PreviousAcceleration = m_CurrentAcceleration;
 
         /*! Call the reimplemented method to generate events. */
-	      if (ok)
+        if (ok)
         {
           m_clock.startModification();
           generateEvent();
@@ -177,7 +177,7 @@ private:
           ComputeAndDisplayAverageError(false);
           fillInDebugFiles();
         }
-	      else
+        else
         {
           cerr << "Nothing to dump after " << m_OneStep.NbOfIt << endl;
         }
@@ -209,10 +209,10 @@ private:
       throw std::string ("failed to open robot model");
 
     CreateAndInitializeHumanoidRobot(RobotFileName,
-				       m_SpecificitiesFileName,
-				       m_LinkJointRank,
-				       m_InitConfig,
-				       m_HDR, m_DebugHDR, m_PGI);
+                                     m_SpecificitiesFileName,
+                                     m_LinkJointRank,
+                                     m_InitConfig,
+                                     m_HDR, m_DebugHDR, m_PGI);
 
     // Specify the walking mode: here the default one.
     istringstream strm2(":walkmode 0");
@@ -235,7 +235,7 @@ private:
     ComAndFootRealization_->setSamplingPeriod(0.005);
     ComAndFootRealization_->Initialization();
 
-		initIK();
+    initIK();
   }
 
 protected:
@@ -262,123 +262,123 @@ protected:
     ComAndFootRealization_->Initialization();
 
     ComAndFootRealization_->InitializationCoM(BodyAngles,lStartingCOMState,
-					     waist,
-					     m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
+                                              waist,
+                                              m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
     ComAndFootRealization_->Initialization();
   }
 
   void fillInDebugFiles( )
+  {
+    if (m_DebugFGPI)
     {
-      if (m_DebugFGPI)
-	{
-	  ofstream aof;
-	  string aFileName;
-	  aFileName = m_TestName;
-	  aFileName += "TestFGPI.dat";
-	  aof.open(aFileName.c_str(),ofstream::app);
-	  aof.precision(8);
-	  aof.setf(ios::scientific, ios::floatfield);
-	  aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "                            // 1
-	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
-	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
-	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
-        << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                 // 5
-	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
-	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
-	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
-	      << filterprecision(m_OneStep.ZMPTarget(0) ) << " "                            // 9
-	      << filterprecision(m_OneStep.ZMPTarget(1) ) << " "                            // 10
-	      << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "                     // 11
-	      << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "                     // 12
-	      << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "                     // 13
-	      << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "                    // 14
-	      << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "                    // 15
-	      << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "                    // 16
-	      << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 17
-	      << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 18
-	      << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 19
-        << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "         // 20
-	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
-	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
-	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23
-	      << filterprecision(m_OneStep.RightFootPosition.y ) << " "                     // 24
-	      << filterprecision(m_OneStep.RightFootPosition.z ) << " "                     // 25
-	      << filterprecision(m_OneStep.RightFootPosition.dx ) << " "                    // 26
-	      << filterprecision(m_OneStep.RightFootPosition.dy ) << " "                    // 27
-	      << filterprecision(m_OneStep.RightFootPosition.dz ) << " "                    // 28
-	      << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                   // 29
-	      << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 30
-	      << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 31
-	      << filterprecision(m_OneStep.RightFootPosition.theta*M_PI/180 ) << " "     // 32
-	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 33
-	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 34
-	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
-				 m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
-				 +m_CurrentConfiguration(0) ) << " "                                          // 35
-	      << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
-				 m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
-				 +m_CurrentConfiguration(1) ) << " "                                          // 36
-	      << filterprecision(m_CurrentConfiguration(0) ) << " "                         // 37
-	      << filterprecision(m_CurrentConfiguration(1) ) << " ";                        // 38
-        for (unsigned int i = 0 ; i < m_HDR->currentConfiguration().size() ; i++)
-        {
-          aof << filterprecision(m_HDR->currentConfiguration()(i)) << " " ;                  // 39 - 74
-        }
-
-	  aof << endl;
-	  aof.close();
-        }
-
-
-      /// \brief Debug Purpose
-      /// --------------------
       ofstream aof;
       string aFileName;
-      ostringstream oss(std::ostringstream::ate);
-
-      if ( iteration == 0 ){
-        oss.str("/tmp/walk_mnaveau.pos");
-        aFileName = oss.str();
-        aof.open(aFileName.c_str(),ofstream::out);
-        aof.close();
+      aFileName = m_TestName;
+      aFileName += "TestFGPI.dat";
+      aof.open(aFileName.c_str(),ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "                            // 1
+          << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
+          << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
+          << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
+          << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                 // 5
+          << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
+          << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
+          << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
+          << filterprecision(m_OneStep.ZMPTarget(0) ) << " "                            // 9
+          << filterprecision(m_OneStep.ZMPTarget(1) ) << " "                            // 10
+          << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "                     // 11
+          << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "                     // 12
+          << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "                     // 13
+          << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "                    // 14
+          << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "                    // 15
+          << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "                    // 16
+          << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 17
+          << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 18
+          << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 19
+          << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "         // 20
+          << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
+          << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
+          << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23
+          << filterprecision(m_OneStep.RightFootPosition.y ) << " "                     // 24
+          << filterprecision(m_OneStep.RightFootPosition.z ) << " "                     // 25
+          << filterprecision(m_OneStep.RightFootPosition.dx ) << " "                    // 26
+          << filterprecision(m_OneStep.RightFootPosition.dy ) << " "                    // 27
+          << filterprecision(m_OneStep.RightFootPosition.dz ) << " "                    // 28
+          << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                   // 29
+          << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 30
+          << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 31
+          << filterprecision(m_OneStep.RightFootPosition.theta*M_PI/180 ) << " "     // 32
+          << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 33
+          << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 34
+          << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
+                             m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
+                             +m_CurrentConfiguration(0) ) << " "                                          // 35
+          << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
+                             m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
+                             +m_CurrentConfiguration(1) ) << " "                                          // 36
+          << filterprecision(m_CurrentConfiguration(0) ) << " "                         // 37
+          << filterprecision(m_CurrentConfiguration(1) ) << " ";                        // 38
+      for (unsigned int i = 0 ; i < m_HDR->currentConfiguration().size() ; i++)
+      {
+        aof << filterprecision(m_HDR->currentConfiguration()(i)) << " " ;                  // 39 - 74
       }
-      ///----
+
+      aof << endl;
+      aof.close();
+    }
+
+
+    /// \brief Debug Purpose
+    /// --------------------
+    ofstream aof;
+    string aFileName;
+    ostringstream oss(std::ostringstream::ate);
+
+    if ( iteration == 0 ){
       oss.str("/tmp/walk_mnaveau.pos");
       aFileName = oss.str();
-      aof.open(aFileName.c_str(),ofstream::app);
-      aof.precision(8);
-      aof.setf(ios::scientific, ios::floatfield);
-      aof << filterprecision( iteration * 0.1 ) << " "  ; // 1
-      for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
-        aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 1
-      }
-      for(unsigned int i = 0 ; i < 10 ; i++){
-        aof << 0.0 << " "  ;
-      }
-      aof  << endl ;
+      aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
+    }
+    ///----
+    oss.str("/tmp/walk_mnaveau.pos");
+    aFileName = oss.str();
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    aof << filterprecision( iteration * 0.1 ) << " "  ; // 1
+    for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
+      aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 1
+    }
+    for(unsigned int i = 0 ; i < 10 ; i++){
+      aof << 0.0 << " "  ;
+    }
+    aof  << endl ;
+    aof.close();
 
-      if ( iteration == 0 ){
-        oss.str("/tmp/walk_mnaveau.hip");
-        aFileName = oss.str();
-        aof.open(aFileName.c_str(),ofstream::out);
-        aof.close();
-      }
+    if ( iteration == 0 ){
       oss.str("/tmp/walk_mnaveau.hip");
       aFileName = oss.str();
-      aof.open(aFileName.c_str(),ofstream::app);
-      aof.precision(8);
-      aof.setf(ios::scientific, ios::floatfield);
-      for(unsigned int j = 0 ; j < 20 ; j++){
-        aof << filterprecision( iteration * 0.1 ) << " "  ; // 1
-        aof << filterprecision( 0.0 ) << " "  ; // 1
-        aof << filterprecision( 0.0 ) << " "  ; // 1
-        aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] ) << " "  ; // 1
-        aof << endl ;
-      }
+      aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
+    }
+    oss.str("/tmp/walk_mnaveau.hip");
+    aFileName = oss.str();
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    for(unsigned int j = 0 ; j < 20 ; j++){
+      aof << filterprecision( iteration * 0.1 ) << " "  ; // 1
+      aof << filterprecision( 0.0 ) << " "  ; // 1
+      aof << filterprecision( 0.0 ) << " "  ; // 1
+      aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] ) << " "  ; // 1
+      aof << endl ;
+    }
+    aof.close();
 
-      iteration++;
+    iteration++;
   }
 
   void SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR, CjrlHumanoidDynamicRobot *& aDebugHDR )
@@ -401,7 +401,7 @@ protected:
 
   void ComparingZMPs()
   {
-		const int stage0 = 0 ;
+    const int stage0 = 0 ;
     /// \brief calculate, from the CoM of computed by the preview control,
     ///    the corresponding articular position, velocity and acceleration
     /// ------------------------------------------------------------------
@@ -433,43 +433,43 @@ protected:
     aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
     ComAndFootRealization_->setSamplingPeriod(0.005);
     ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
-                      aLeftFootPosition,
-                      aRightFootPosition,
-                      CurrentConfiguration,
-                      CurrentVelocity,
-                      CurrentAcceleration,
-                      m_OneStep.NbOfIt,
-                      stage0);
+                                                                    aLeftFootPosition,
+                                                                    aRightFootPosition,
+                                                                    CurrentConfiguration,
+                                                                    CurrentVelocity,
+                                                                    CurrentAcceleration,
+                                                                    m_OneStep.NbOfIt,
+                                                                    stage0);
 
-		/// \brief Debug Purpose
-		/// --------------------
-		ofstream aof;
-		string aFileName;
-		ostringstream oss(std::ostringstream::ate);
-		oss.str("TestHerdt2010DynamicART2.dat");
-		aFileName = oss.str();
-		if ( iteration_zmp == 0 )
-		{
-			aof.open(aFileName.c_str(),ofstream::out);
-			aof.close();
-		}
-		///----
-		aof.open(aFileName.c_str(),ofstream::app);
-		aof.precision(8);
-		aof.setf(ios::scientific, ios::floatfield);
-		for (unsigned int j = 0 ; j < CurrentConfiguration.size() ; ++j)
-		{
-			aof << filterprecision(CurrentConfiguration(j)) << " " ;
-		}
-		for (unsigned int j = 0 ; j < CurrentVelocity.size() ; ++j)
-		{
-			aof << filterprecision(CurrentVelocity(j)) << " " ;
-		}
-		for (unsigned int j = 0 ; j < CurrentAcceleration.size() ; ++j)
-		{
-			aof << filterprecision(CurrentAcceleration(j)) << " " ;
-		}
-		aof << endl ;
+    /// \brief Debug Purpose
+    /// --------------------
+    ofstream aof;
+    string aFileName;
+    ostringstream oss(std::ostringstream::ate);
+    oss.str("TestHerdt2010DynamicART2.dat");
+    aFileName = oss.str();
+    if ( iteration_zmp == 0 )
+    {
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+    }
+    ///----
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    for (unsigned int j = 0 ; j < CurrentConfiguration.size() ; ++j)
+    {
+      aof << filterprecision(CurrentConfiguration(j)) << " " ;
+    }
+    for (unsigned int j = 0 ; j < CurrentVelocity.size() ; ++j)
+    {
+      aof << filterprecision(CurrentVelocity(j)) << " " ;
+    }
+    for (unsigned int j = 0 ; j < CurrentAcceleration.size() ; ++j)
+    {
+      aof << filterprecision(CurrentAcceleration(j)) << " " ;
+    }
+    aof << endl ;
 
 
     /// \brief rnea, calculation of the multi body ZMP
@@ -523,8 +523,8 @@ protected:
     if ( abs(errZMP_.back()[1]) > ecartmaxY )
       ecartmaxY = abs(errZMP_.back()[1]) ;
 
-//    cout << "ecartmaxX :" << ecartmaxX << endl ;
-//    cout << "ecartmaxY :" << ecartmaxY << endl ;
+    //    cout << "ecartmaxX :" << ecartmaxX << endl ;
+    //    cout << "ecartmaxY :" << ecartmaxY << endl ;
 
     // Writing of the two zmps and the error.
     if (once)
@@ -562,28 +562,28 @@ protected:
     if ( display )
     {
       cout << "moyErrX = " << moyErrX << endl
-           << "moyErrY = " << moyErrY << endl ;
+          << "moyErrY = " << moyErrY << endl ;
     }
     ofstream aof;
-	  string aFileName;
-	  aFileName = m_TestName;
-	  aFileName += "MoyZMP.dat";
-	  if(plot_it==0){
+    string aFileName;
+    aFileName = m_TestName;
+    aFileName += "MoyZMP.dat";
+    if(plot_it==0){
       aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
-	  }
-	  aof.open(aFileName.c_str(),ofstream::app);
-	  aof.precision(8);
-	  aof.setf(ios::scientific, ios::floatfield);
-	  aof << filterprecision(moyErrX ) << " "        // 1
+    }
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    aof << filterprecision(moyErrX ) << " "        // 1
         << filterprecision(moyErrY ) << " "        // 2
         << endl ;
     aof.close();
     plot_it++;
   }
 
-void startOnLineWalking(PatternGeneratorInterface &aPGI)
-{
+  void startOnLineWalking(PatternGeneratorInterface &aPGI)
+  {
     CommonInitialization(aPGI);
 
     {
@@ -724,18 +724,18 @@ void startOnLineWalking(PatternGeneratorInterface &aPGI)
   {
 
     switch(m_TestProfile)
-      {
+    {
 
-      case PROFIL_HERDT_ONLINE_WALKING:
-        startOnLineWalking(*m_PGI);
-        break;
-      case PROFIL_HERDT_EMERGENCY_STOP:
-        startEmergencyStop(*m_PGI);
-        break;
-      default:
-	    throw("No correct test profile");
-	    break;
-      }
+    case PROFIL_HERDT_ONLINE_WALKING:
+      startOnLineWalking(*m_PGI);
+      break;
+    case PROFIL_HERDT_EMERGENCY_STOP:
+      startEmergencyStop(*m_PGI);
+      break;
+    default:
+      throw("No correct test profile");
+      break;
+    }
   }
 
 
@@ -748,51 +748,37 @@ void startOnLineWalking(PatternGeneratorInterface &aPGI)
       localeventHandler_t Handler ;
     };
 
-    #define localNbOfEvents 12
+#define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-      { { 5*200,&TestHerdt2010::walkForward},
-        {10*200,&TestHerdt2010::walkSidewards},
-        {25*200,&TestHerdt2010::startTurningRightOnSpot},
-        {35*200,&TestHerdt2010::walkForward},
-        {45*200,&TestHerdt2010::startTurningLeftOnSpot},
-        {55*200,&TestHerdt2010::walkForward},
-        {65*200,&TestHerdt2010::startTurningRightOnSpot},
-        {75*200,&TestHerdt2010::walkForward},
-        {85*200,&TestHerdt2010::startTurningLeft},
-        {95*200,&TestHerdt2010::startTurningRight},
-        {105*200,&TestHerdt2010::stop},
-        {110*200,&TestHerdt2010::stopOnLineWalking}};
-
-//    #define localNbOfEvents 6
-//    struct localEvent events [localNbOfEvents] =
-//    { {1*200,&TestHerdt2010::walkForward},
-//      {2*200,&TestHerdt2010::startTurningRightOnSpot},
-//      {5*200,&TestHerdt2010::walkForward},
-////      {35*200,&TestHerdt2010::walkForward},
-//      {7*200,&TestHerdt2010::startTurningLeftOnSpot},
-////      {55*200,&TestHerdt2010::walkForward},
-////      {65*200,&TestHerdt2010::startTurningRightOnSpot},
-////      {75*200,&TestHerdt2010::walkForward},
-////      {85*200,&TestHerdt2010::startTurningLeft},
-////      {95*200,&TestHerdt2010::startTurningRight},
-//      {9*200,&TestHerdt2010::stop},
-//      {14.6*200,&TestHerdt2010::stopOnLineWalking}
-//    };
+    {
+            { 5*200,&TestHerdt2010::walkForward},
+            {10*200,&TestHerdt2010::walkSidewards},
+            {25*200,&TestHerdt2010::startTurningRightOnSpot},
+            {35*200,&TestHerdt2010::walkForward},
+            {45*200,&TestHerdt2010::startTurningLeftOnSpot},
+            {55*200,&TestHerdt2010::walkForward},
+            {65*200,&TestHerdt2010::startTurningRightOnSpot},
+            {75*200,&TestHerdt2010::walkForward},
+            {85*200,&TestHerdt2010::startTurningLeft},
+            {95*200,&TestHerdt2010::startTurningRight},
+            {105*200,&TestHerdt2010::stop},
+            {110*200,&TestHerdt2010::stopOnLineWalking}
+    };
 
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
     {
-			if ( m_OneStep.NbOfIt==events[i].time){
-					ODEBUG3("********* GENERATE EVENT OLW ***********");
-				(this->*(events[i].Handler))(*m_PGI);
-			}
+      if ( m_OneStep.NbOfIt==events[i].time){
+        ODEBUG3("********* GENERATE EVENT ONLINE WALKING ***********");
+        (this->*(events[i].Handler))(*m_PGI);
+      }
     }
   }
 
   void generateEventEmergencyStop()
   {
 
-    #define localNbOfEventsEMS 5
+#define localNbOfEventsEMS 5
     struct localEvent events [localNbOfEventsEMS] =
     { {5*200,&TestHerdt2010::startTurningLeft2},
       {10*200,&TestHerdt2010::startTurningRight2},
@@ -803,7 +789,7 @@ void startOnLineWalking(PatternGeneratorInterface &aPGI)
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEventsEMS;i++){
       if ( m_OneStep.NbOfIt==events[i].time){
-          ODEBUG3("********* GENERATE EVENT EMS ***********");
+        ODEBUG3("********* GENERATE EVENT EMERGENCY STOP ***********");
         (this->*(events[i].Handler))(*m_PGI);
       }
     }
@@ -812,14 +798,14 @@ void startOnLineWalking(PatternGeneratorInterface &aPGI)
   void generateEvent()
   {
     switch(m_TestProfile){
-      case PROFIL_HERDT_ONLINE_WALKING:
-        generateEventOnLineWalking();
-        break;
-      case PROFIL_HERDT_EMERGENCY_STOP:
-        generateEventEmergencyStop();
-        break;
-      default:
-        break;
+    case PROFIL_HERDT_ONLINE_WALKING:
+      generateEventOnLineWalking();
+      break;
+    case PROFIL_HERDT_EMERGENCY_STOP:
+      generateEventEmergencyStop();
+      break;
+    default:
+      break;
     }
   }
 
@@ -827,9 +813,9 @@ void startOnLineWalking(PatternGeneratorInterface &aPGI)
 
 int PerformTests(int argc, char *argv[])
 {
-  #define NB_PROFILES 2
+#define NB_PROFILES 2
   std::string TestNames[NB_PROFILES] = { "TestHerdt2010DynamicFilter",
-                               "TestHerdt2010EmergencyStop"};
+                                         "TestHerdt2010EmergencyStop"};
   int TestProfiles[NB_PROFILES] = { PROFIL_HERDT_ONLINE_WALKING,
                                     PROFIL_HERDT_EMERGENCY_STOP};
 
@@ -838,10 +824,10 @@ int PerformTests(int argc, char *argv[])
     aTH2010.init();
     try{
       if (!aTH2010.doTest(std::cout)){
-	    cout << "Failed test " << i << endl;
-	    return -1;
-	  }
-	  else
+        cout << "Failed test " << i << endl;
+        return -1;
+      }
+      else
         cout << "Passed test " << i << endl;
     }
     catch (const char * astr){
@@ -854,14 +840,14 @@ int PerformTests(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
   try
-    {
-      int ret = PerformTests(argc,argv);
-      return ret ;
-    }
+  {
+    int ret = PerformTests(argc,argv);
+    return ret ;
+  }
   catch (const std::string& msg)
-    {
-      std::cerr << msg << std::endl;
-    }
+  {
+    std::cerr << msg << std::endl;
+  }
   return 1;
 }
 

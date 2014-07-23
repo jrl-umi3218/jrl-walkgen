@@ -355,24 +355,24 @@ void
 
     //Set parameters for current polynomial
     double TimeInterval = UnlockedSwingPeriod-SwingTimePassed;
-    cout << std::setprecision(5) << std::fixed ;
-    cout << "########################################################\n" ;
-    cout << "time: " << Time << endl;
-    std::cout << "TimeInterval: " << TimeInterval << std::endl;
-    cout << "UnlockedSwingPeriod: " << UnlockedSwingPeriod << endl ;
-    cout << "SwingTimePassed: " << SwingTimePassed << endl ;
-    cout << "LocalInterpolationStartTime: " << LocalInterpolationStartTime << endl ;
-    cout << "stateChanged: " << CurrentSupport.StateChanged << endl ;
-    cout << "TimeLimit: " << CurrentSupport.TimeLimit << endl ;
-    cout << "EndOfLiftOff: " << EndOfLiftOff << endl ;
-    cout << "FPx = " << FPx << " ; FPy = " << FPy << endl ;
-    cout << "LastSFP x,dx,ddx.dddx = " << LastSFP->x << " "
-        << LastSFP->dx <<" "<< LastSFP->ddx << " " << LastSFP->dddx << " " << endl ;
-    cout << "LastSFP y,dy,ddy.dddy = " << LastSFP->y << " "
-        << LastSFP->dy <<" "<< LastSFP->ddy << " " << LastSFP->dddy << " " ;
-    if (TimeInterval>=0.06499 && TimeInterval<=0.065999)
-      cout << endl ;
-    cout << endl ;
+//    cout << std::setprecision(5) << std::fixed ;
+//    cout << "########################################################\n" ;
+//    cout << "time: " << Time << endl;
+//    std::cout << "TimeInterval: " << TimeInterval << std::endl;
+//    cout << "UnlockedSwingPeriod: " << UnlockedSwingPeriod << endl ;
+//    cout << "SwingTimePassed: " << SwingTimePassed << endl ;
+//    cout << "LocalInterpolationStartTime: " << LocalInterpolationStartTime << endl ;
+//    cout << "stateChanged: " << CurrentSupport.StateChanged << endl ;
+//    cout << "TimeLimit: " << CurrentSupport.TimeLimit << endl ;
+//    cout << "EndOfLiftOff: " << EndOfLiftOff << endl ;
+//    cout << "FPx = " << FPx << " ; FPy = " << FPy << endl ;
+//    cout << "LastSFP x,dx,ddx.dddx = " << LastSFP->x << " "
+//        << LastSFP->dx <<" "<< LastSFP->ddx << " " << LastSFP->dddx << " " << endl ;
+//    cout << "LastSFP y,dy,ddy.dddy = " << LastSFP->y << " "
+//        << LastSFP->dy <<" "<< LastSFP->ddy << " " << LastSFP->dddy << " " ;
+//    if (TimeInterval>=0.06499 && TimeInterval<=0.065999)
+//      cout << endl ;
+//    cout << endl ;
     SetParameters(
     	  FootTrajectoryGenerationStandard::X_AXIS,
         TimeInterval,FPx,

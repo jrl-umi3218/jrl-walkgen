@@ -39,8 +39,8 @@ GeneratorVelRef::GeneratorVelRef(SimplePluginManager *lSPM,
 , IntermedData_ (Data)
 , Robot_(Robot)
 , RFI_(RFI)
-, LastFootSolX_(-1.0)
-, LastFootSolY_(-1.0)
+, LastFootSolX_(0.0)
+, LastFootSolY_(0.0)
 , MM_(1,1,false)
 , MV_(1,false)
 , MV2_(1,false){
@@ -558,20 +558,21 @@ void GeneratorVelRef::build_eq_constraints_limitPosFeet(const solution_t & Solut
   while(SPTraj_it!=Solution.SupportStates_deq.end())
   {
     ++SPTraj_it;
-    cout << "StateChanged = " << (int)SPTraj_it->StateChanged ;
-    cout << "  Phase = " << SPTraj_it->Phase << endl;
     if ( SPTraj_it->StateChanged !=1 )
+    {
       ++ItBeforeLanding ;
+    }
     else
+    {
       break;
+    }
   }
-
-  if( ItBeforeLanding <= 3 && Solution.SupportStates_deq.front().Phase == SS )
+  int ItBeforeLandingThresh = 2 ;
+  unsigned NbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
+  if( ItBeforeLanding <= ItBeforeLandingThresh && ItBeforeLanding > 0 && Solution.SupportStates_deq.front().Phase == SS
+      && Solution.SupportStates_deq.front().StateChanged != 1 && NbStepsPreviewed > 0 )
   {
-    unsigned NbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
-
-    Pb.NbEqConstraints(2);
-
+    unsigned int NbConstraints = Pb.NbConstraints();
     boost_ublas::matrix<double> EqualityMatrix;
     boost_ublas::vector<double> EqualityVector;
 
@@ -580,14 +581,16 @@ void GeneratorVelRef::build_eq_constraints_limitPosFeet(const solution_t & Solut
     EqualityVector.resize(2, false);
     EqualityVector.clear();
 
-    EqualityMatrix(0,2*N_) =  1.0;                EqualityVector(0) =  LastFootSolX_ ;
-    EqualityMatrix(1,2*N_+NbStepsPreviewed) =  1.0; EqualityVector(1) =  LastFootSolY_ ;
-    Pb.add_term_to( MATRIX_DU, EqualityMatrix, 0, 0 );
-    Pb.add_term_to( VECTOR_DS, EqualityVector, 0 );
-    cout << "EqualityVector \n" << EqualityVector << endl;
-    cout << "EqualityMatrix \n" << EqualityMatrix << endl;
+    EqualityMatrix(0,2*N_) =  1.0;                  EqualityVector(0) =  -LastFootSolX_ ;
+    EqualityMatrix(1,2*N_+NbStepsPreviewed) =  1.0; EqualityVector(1) =  -LastFootSolY_ ;
+    Pb.add_term_to( MATRIX_DU, EqualityMatrix, NbConstraints, 0 );
+    Pb.add_term_to( VECTOR_DS, EqualityVector, NbConstraints );
+
     EqualityMatrix.clear();
     EqualityVector.clear();
+    Pb.NbEqConstraints(EqualityVector.size()+1);
+  }else{
+    Pb.NbEqConstraints(0);
   }
   return;
 }
@@ -595,13 +598,12 @@ void GeneratorVelRef::build_eq_constraints_limitPosFeet(const solution_t & Solut
 void
 GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution )
 {
-
   unsigned nbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
 
   //Equality constraints:
   //---------------------
-  //build_eq_constraints_feet( PrwSupportStates_deq, NbStepsPreviewed, Pb );
-  //build_eq_constraints_limitPosFeet( Solution , Pb);
+  //build_eq_constraints_feet( Solution.SupportStates_deq, nbStepsPreviewed, Pb );
+  build_eq_constraints_limitPosFeet( Solution , Pb);
 
   // Polygonal constraints:
   // ----------------------

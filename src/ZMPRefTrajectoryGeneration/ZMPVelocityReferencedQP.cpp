@@ -470,7 +470,6 @@ void
     // UPDATE INTERNAL DATA:
     // ---------------------
     Problem_.reset_variant();
-    VRQPGenerator_->CurrentTime( time );
     Solution_.reset();
     VRQPGenerator_->CurrentTime( time );
     VelRef_=NewVelRef_;
@@ -524,6 +523,7 @@ void
     {
       Problem_.dump( time );
     }
+    VRQPGenerator_->LastFootSol(Solution_);
 
     // INITIALIZE INTERPOLATION:
     // ------------------------
@@ -538,8 +538,7 @@ void
     RightFootTraj_deq_ = FinalRightFootTraj_deq ;
     FinalZMPTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
     FinalCOMTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
-    vector < vector<double> > ZMPMB_deq (NbSampleControl_,vector<double>(2));
-    //deltaCOMTraj_deq_.resize(NbSampleControl_);
+
     // INTERPRET THE SOLUTION VECTOR :
     // -------------------------------
     InterpretSolutionVector();
@@ -548,8 +547,65 @@ void
     ControlInterpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, FinalLeftFootTraj_deq,
                           FinalRightFootTraj_deq, time) ;
 
-    DynamicFilterInterpolation(time) ;
+    // Computing the control ZMPMB
+    unsigned int ControlIteration = time / QP_T_ ;
+    int stage0 = 0 ;
+    vector< vector<double> > zmpmb (NbSampleControl_,vector<double>(2,0.0));
+    for(unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
+    {
+      dynamicFilter_->ComputeZMPMB(m_SamplingPeriod,
+                                   FinalCOMTraj_deq[i+CurrentIndex_],
+                                   FinalLeftFootTraj_deq[i+CurrentIndex_],
+                                   FinalRightFootTraj_deq[i+CurrentIndex_],
+                                   zmpmb[i],
+                                   stage0,
+                                   ControlIteration + i);
+    }
 
+    // Computing the interpolated ZMPMB
+    DynamicFilterInterpolation(time) ;
+    int stage1 = 1 ;
+    vector< vector<double> > zmpmb_i (NbSampleControl_,vector<double>(2,0.0));
+    dynamicFilter_->stage0INstage1();
+    for(unsigned int i = 0 ; i < NbSampleInterpolation_ ; ++i)
+    {
+      dynamicFilter_->ComputeZMPMB(m_SamplingPeriod,
+                                   COMTraj_deq_[i+CurrentIndex_],
+                                   LeftFootTraj_deq_[i+CurrentIndex_],
+                                   RightFootTraj_deq_[i+CurrentIndex_],
+                                   zmpmb_i[i],
+                                   stage1,
+                                   ControlIteration + i);
+    }
+
+    deque<ZMPPosition> inputdeltaZMP_deq(N) ;
+    deque<COMState> outputDeltaCOMTraj_deq ;
+    for (unsigned int i = 0 ; i < NbSampleInterpolation_ ; ++i)
+    {
+      inputdeltaZMP_deq[i].px = ZMPTraj_deq_[i+CurrentIndex_].px - zmpmb_i[i][0] ;
+      inputdeltaZMP_deq[i].py = ZMPTraj_deq_[i+CurrentIndex_].py - zmpmb_i[i][1] ;
+      inputdeltaZMP_deq[i].pz = 0.0 ;
+      inputdeltaZMP_deq[i].theta = 0.0 ;
+      inputdeltaZMP_deq[i].time = m_CurrentTime + i * m_SamplingPeriod ;
+      inputdeltaZMP_deq[i].stepType = ZMPPositions[i].stepType ;
+    }
+    m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
+
+    deque<COMState> filteredCoM = FinalCOMTraj_deq ;
+    vector <vector<double> > filteredZMPMB (NbSampleControl_ , vector<double> (2,0.0)) ;
+    for (unsigned int i = 0 ; i < n ; ++i)
+    {
+      for(int j=0;j<3;j++)
+      {
+        filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+        filteredCoM[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+        COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+        COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+      }
+      m_kajitaDynamicFilter->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
+                                          LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
+                                          filteredZMPMB[i] , stage1, i);
+    }
 
     //deque<COMState> tmp = FinalCOMTraj_deq ;
     // DYNAMIC FILTER
@@ -781,8 +837,8 @@ void
           << filterprecision( FinalCOMTraj_deq[i].yaw[2] ) << " "       // 48
           << filterprecision( FinalLeftFootTraj_deq[i].dddx ) << " "       // 49
           << filterprecision( FinalRightFootTraj_deq[i].dddx ) << " "       // 50
-          << filterprecision( ZMPMB_deq[i-CurrentIndex_][0] ) << " "       // 51
-          << filterprecision( ZMPMB_deq[i-CurrentIndex_][1] ) << " "       // 52
+          << filterprecision( zmpmb[i-CurrentIndex_][0] ) << " "       // 51
+          << filterprecision( zmpmb[i-CurrentIndex_][1] ) << " "       // 52
           << filterprecision( FinalZMPTraj_deq[i].px ) << " "       // 53
           << filterprecision( FinalZMPTraj_deq[i].py ) << " "       // 54
           << endl ;
@@ -863,29 +919,29 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 
   InterpretSolutionVector();
 
-  cout << "support foot\n"
-      << "Phase Foot NbStepsLeft StepNumber NbInstants TimeLimit StartTime X Y Yaw StateChanged\n";
-  for (unsigned int i = 0 ; i < Solution_.SupportStates_deq.size() ; ++i)
-  {
-    cout<< Solution_.SupportStates_deq[i].Phase << " "
-        << Solution_.SupportStates_deq[i].Foot << " "
-        << Solution_.SupportStates_deq[i].NbStepsLeft << " "
-        << Solution_.SupportStates_deq[i].StepNumber << " "
-        << Solution_.SupportStates_deq[i].NbInstants << " "
-        << Solution_.SupportStates_deq[i].TimeLimit << " "
-        << Solution_.SupportStates_deq[i].StartTime << " "
-        << Solution_.SupportStates_deq[i].X << " "
-        << Solution_.SupportStates_deq[i].Y << " "
-        << Solution_.SupportStates_deq[i].Yaw << " "
-        << Solution_.SupportStates_deq[i].StateChanged << " " << endl ;
-  }
-  cout << "X solution = " ;
-  for (unsigned int i = 0 ; i < FootPrw_vec.size() ; ++i )
-    cout << FootPrw_vec[i][0] << " " ;
-  cout << " Y solution = " ;
-  for (unsigned int i = 0 ; i < FootPrw_vec.size() ; ++i )
-    cout << FootPrw_vec[i][1] << " " ;
-  cout << endl ;
+//  cout << "support foot\n"
+//      << "Phase Foot NbStepsLeft StepNumber NbInstants TimeLimit StartTime X Y Yaw StateChanged\n";
+//  for (unsigned int i = 0 ; i < Solution_.SupportStates_deq.size() ; ++i)
+//  {
+//    cout<< Solution_.SupportStates_deq[i].Phase << " "
+//        << Solution_.SupportStates_deq[i].Foot << " "
+//        << Solution_.SupportStates_deq[i].NbStepsLeft << " "
+//        << Solution_.SupportStates_deq[i].StepNumber << " "
+//        << Solution_.SupportStates_deq[i].NbInstants << " "
+//        << Solution_.SupportStates_deq[i].TimeLimit << " "
+//        << Solution_.SupportStates_deq[i].StartTime << " "
+//        << Solution_.SupportStates_deq[i].X << " "
+//        << Solution_.SupportStates_deq[i].Y << " "
+//        << Solution_.SupportStates_deq[i].Yaw << " "
+//        << Solution_.SupportStates_deq[i].StateChanged << " " << endl ;
+//  }
+//  cout << "X solution = " ;
+//  for (unsigned int i = 0 ; i < FootPrw_vec.size() ; ++i )
+//    cout << FootPrw_vec[i][0] << " " ;
+//  cout << " Y solution = " ;
+//  for (unsigned int i = 0 ; i < FootPrw_vec.size() ; ++i )
+//    cout << FootPrw_vec[i][1] << " " ;
+//  cout << endl ;
 
   // Copy the solution for the orientation interpolation function
   OFTG_DF_->SetSamplingPeriod( InterpolationPeriod_ );
