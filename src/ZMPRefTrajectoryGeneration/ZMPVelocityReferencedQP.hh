@@ -225,10 +225,6 @@ namespace PatternGeneratorJRL
     deque<FootAbsolutePosition> LeftFootTraj_deq_ ;
     deque<FootAbsolutePosition> RightFootTraj_deq_ ;
 
-    deque<COMState> tmpCoM_ ;
-    deque<ZMPPosition> tmpZMP_ ;
-    deque<FootAbsolutePosition> tmpRF_ ;
-    deque<FootAbsolutePosition> tmpLF_ ;
     vector< vector<double> > FootPrw_vec ;
 
     /// \brief Index where to begin the interpolation

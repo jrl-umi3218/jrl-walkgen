@@ -897,10 +897,8 @@ bool ComAndFootRealizationByGeometry::
                                             int IterationNumber,
                                             int Stage)
 {
-
-  MAL_VECTOR(lqr,double);
-  MAL_VECTOR(lql,double);
-
+  MAL_VECTOR_DIM(lqr,double,6);
+  MAL_VECTOR_DIM(lql,double,6);
   MAL_S3_VECTOR(AbsoluteWaistPosition,double);
 
   // Kinematics for the legs.

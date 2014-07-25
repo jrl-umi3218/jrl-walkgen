@@ -205,8 +205,6 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   // size = numberOfIterationOfThePreviewControl * NumberOfSample + Margin
   ZMPTraj_deq_.resize( QP_N_ * NbSampleInterpolation_+20);
   COMTraj_deq_.resize( QP_N_ * NbSampleInterpolation_+20);
-  tmpCoM_.resize(QP_N_ * NbSampleControl_ + 20);
-  tmpZMP_.resize(QP_N_ * NbSampleControl_ + 20);
 }
 
 
@@ -435,7 +433,7 @@ int
   FinalCurrentStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
 
   dynamicFilter_->init(0.0,m_SamplingPeriod,InterpolationPeriod_,
-                       QP_T_,QP_N_*QP_T_,CoMHeight_,InitLeftFootAbsolutePosition,lStartingCOMState);
+                       QP_T_, QP_N_*QP_T_ - QP_T_/m_SamplingPeriod * InterpolationPeriod_ ,CoMHeight_,InitLeftFootAbsolutePosition,lStartingCOMState);
   return 0;
 }
 
@@ -548,15 +546,19 @@ void
                           FinalRightFootTraj_deq, time) ;
 
     // Computing the control ZMPMB
-    unsigned int ControlIteration = time / QP_T_ ;
+    unsigned int ControlIteration = 0 ;
+    if ( time > m_SamplingPeriod )
+    {
+      ControlIteration = 2;
+    }
     int stage0 = 0 ;
     vector< vector<double> > zmpmb (NbSampleControl_,vector<double>(2,0.0));
     for(unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
     {
       dynamicFilter_->ComputeZMPMB(m_SamplingPeriod,
-                                   FinalCOMTraj_deq[i+CurrentIndex_],
-                                   FinalLeftFootTraj_deq[i+CurrentIndex_],
-                                   FinalRightFootTraj_deq[i+CurrentIndex_],
+                                   FinalCOMTraj_deq[i],
+                                   FinalLeftFootTraj_deq[i],
+                                   FinalRightFootTraj_deq[i],
                                    zmpmb[i],
                                    stage0,
                                    ControlIteration + i);
@@ -564,47 +566,56 @@ void
 
     // Computing the interpolated ZMPMB
     DynamicFilterInterpolation(time) ;
+
+    // computing the interpolated ZMPMB
     int stage1 = 1 ;
-    vector< vector<double> > zmpmb_i (NbSampleControl_,vector<double>(2,0.0));
-    dynamicFilter_->stage0INstage1();
-    for(unsigned int i = 0 ; i < NbSampleInterpolation_ ; ++i)
+    vector< vector<double> > zmpmb_i (QP_N_*NbSampleInterpolation_,vector<double>(2,0.0));
+
+    for(unsigned int i = 0 ; i < QP_N_*NbSampleInterpolation_ ; ++i)
     {
       dynamicFilter_->ComputeZMPMB(m_SamplingPeriod,
-                                   COMTraj_deq_[i+CurrentIndex_],
-                                   LeftFootTraj_deq_[i+CurrentIndex_],
-                                   RightFootTraj_deq_[i+CurrentIndex_],
+                                   COMTraj_deq_[i],
+                                   LeftFootTraj_deq_[i],
+                                   RightFootTraj_deq_[i],
                                    zmpmb_i[i],
                                    stage1,
                                    ControlIteration + i);
     }
 
-    deque<ZMPPosition> inputdeltaZMP_deq(N) ;
+    dynamicFilter_->stage0INstage1();
+
+    // Compute the delta ZMP
+    deque<ZMPPosition> inputdeltaZMP_deq(QP_N_*NbSampleInterpolation_) ;
     deque<COMState> outputDeltaCOMTraj_deq ;
-    for (unsigned int i = 0 ; i < NbSampleInterpolation_ ; ++i)
+    for (unsigned int i = 0 ; i < QP_N_*NbSampleInterpolation_ ; ++i)
     {
-      inputdeltaZMP_deq[i].px = ZMPTraj_deq_[i+CurrentIndex_].px - zmpmb_i[i][0] ;
-      inputdeltaZMP_deq[i].py = ZMPTraj_deq_[i+CurrentIndex_].py - zmpmb_i[i][1] ;
+      inputdeltaZMP_deq[i].px = ZMPTraj_deq_[i].px - zmpmb_i[i][0] ;
+      inputdeltaZMP_deq[i].py = ZMPTraj_deq_[i].py - zmpmb_i[i][1] ;
       inputdeltaZMP_deq[i].pz = 0.0 ;
       inputdeltaZMP_deq[i].theta = 0.0 ;
       inputdeltaZMP_deq[i].time = m_CurrentTime + i * m_SamplingPeriod ;
-      inputdeltaZMP_deq[i].stepType = ZMPPositions[i].stepType ;
+      inputdeltaZMP_deq[i].stepType = ZMPTraj_deq_[i].stepType ;
     }
-    m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
 
+    // compute the delta CoM
+    dynamicFilter_->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
+
+    // Correct the CoM.
     deque<COMState> filteredCoM = FinalCOMTraj_deq ;
     vector <vector<double> > filteredZMPMB (NbSampleControl_ , vector<double> (2,0.0)) ;
-    for (unsigned int i = 0 ; i < n ; ++i)
+    int stage2 = 2 ;
+    for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
     {
       for(int j=0;j<3;j++)
       {
         filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
         filteredCoM[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
-        COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-        COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+        FinalCOMTraj_deq[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+        FinalCOMTraj_deq[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
-      m_kajitaDynamicFilter->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
-                                          LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
-                                          filteredZMPMB[i] , stage1, i);
+      dynamicFilter_->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
+                                          FinalLeftFootTraj_deq[i], FinalRightFootTraj_deq[i],
+                                          filteredZMPMB[i] , stage2, ControlIteration + i);
     }
 
     //deque<COMState> tmp = FinalCOMTraj_deq ;
@@ -785,7 +796,7 @@ void
     aof.open(aFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    for (unsigned int i = CurrentIndex_ ; i < FinalCOMTraj_deq.size() ; ++i )
+    for (unsigned int i = 0 ; i < FinalCOMTraj_deq.size()-CurrentIndex_ ; ++i )
     {
       aof << filterprecision( FinalLeftFootTraj_deq[i].x ) << " "       // 1
           << filterprecision( FinalLeftFootTraj_deq[i].y ) << " "       // 2
@@ -837,10 +848,12 @@ void
           << filterprecision( FinalCOMTraj_deq[i].yaw[2] ) << " "       // 48
           << filterprecision( FinalLeftFootTraj_deq[i].dddx ) << " "       // 49
           << filterprecision( FinalRightFootTraj_deq[i].dddx ) << " "       // 50
-          << filterprecision( zmpmb[i-CurrentIndex_][0] ) << " "       // 51
-          << filterprecision( zmpmb[i-CurrentIndex_][1] ) << " "       // 52
+          << filterprecision( zmpmb[i][0] ) << " "       // 51
+          << filterprecision( zmpmb[i][1] ) << " "       // 52
           << filterprecision( FinalZMPTraj_deq[i].px ) << " "       // 53
           << filterprecision( FinalZMPTraj_deq[i].py ) << " "       // 54
+          << filterprecision( filteredZMPMB[i][0] ) << " "       // 55
+          << filterprecision( filteredZMPMB[i][1] ) << " "       // 56
           << endl ;
     }
     aof.close();

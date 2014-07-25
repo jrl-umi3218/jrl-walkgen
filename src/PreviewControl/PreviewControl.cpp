@@ -339,10 +339,10 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
   ux = - r(0,0) + m_Ks * sxzmp ;
 
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
-    {
-      LTHROW("ZMPPositions.size()<m_SizeOfPreviewWindow:" );
-    }
-  //cout << "Size preview = "<< ZMPPositions.size() << endl ;
+  {
+    LTHROW("ZMPPositions.size()<m_SizeOfPreviewWindow:" );
+  }
+
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
     ux += m_F(i,0)* ZMPPositions[lindex+i].px;
 

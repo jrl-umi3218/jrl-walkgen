@@ -140,6 +140,8 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
   std::vector<ComAndFootRealization *>::iterator itCFR ;
   for (itCFR = m_ComAndFootRealization.begin() ; itCFR != m_ComAndFootRealization.end() ; ++itCFR )
   {
+    // here we use the analytical forward kinematics to initialise the position of the CoM of mass according to
+    // the articular position of the robot.
     (*itCFR)->InitializationCoM(BodyAngles,lStartingCOMState,
 					     lStartingWaistPose,
 					     InitLeftFootPosition, InitRightFootPosition);
@@ -154,6 +156,19 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
     aStartingZMPPosition= (*itCFR)->GetCOGInitialAnkles();
 
   }
+
+  // We assume that the robot is not moving at the beginning so the zmp is the projection of the com on the ground.
+  aStartingZMPPosition(0) = aStartingCOMState.x[0] ;
+  aStartingZMPPosition(1) = aStartingCOMState.y[0] ;
+  // The  altitude of the zmp depend on the altitude of the support foot.
+  if (InitLeftFootPosition.stepType < 0)
+  {
+    aStartingZMPPosition(2) = InitLeftFootPosition.z ;
+  }else{
+    aStartingZMPPosition(2) = InitRightFootPosition.z ;
+  }
+
+
   //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in   CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
 
   return 0;

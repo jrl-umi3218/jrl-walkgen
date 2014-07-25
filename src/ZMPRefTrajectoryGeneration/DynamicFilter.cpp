@@ -280,8 +280,6 @@ void DynamicFilter::InverseKinematics(
       configuration, velocity, acceleration,
       iteration, stage);
 
-  static int it = 0 ;
-
   if (walkingHeuristic_)
   {
     LankleNode & node_lankle = boost::fusion::at_c<Robot_Model::l_ankle>(robot_.nodes);
@@ -343,34 +341,6 @@ void DynamicFilter::InverseKinematics(
     err1 = HDR->getSpecializedInverseKinematics( *left_shoulder ,*(HDR->leftWrist()), identity, leftHandPose, larm_q );
     err2 = HDR->getSpecializedInverseKinematics( *right_shoulder ,*(HDR->rightWrist()), identity, rightHandPose, rarm_q );
 
-    ofstream aof;
-
-    string aFileName;
-    if ( it == 0 ){
-      aFileName = "larmrarm.dat";
-      aof.open(aFileName.c_str(),ofstream::out);
-      aof.close();
-    }
-    aFileName = "larmrarm.dat";
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-
-    aof << it * 0.005 << " "  ; // 1
-
-    for(unsigned int i = 0 ; i < larm_q.size() ; i++){
-      aof << rarm_q(i) << " "  ; // 2
-    }
-
-    for(unsigned int i = 0 ; i < rarm_q.size() ; i++){
-      aof << larm_q(i) << " "  ; // 8
-    }
-    aof << waistXrf.r()(0) << " "
-        << waistXlf.r()(0) << " ";
-
-    aof  << endl ;
-    aof.close();
-
     // swinging arms
     upperPartConfiguration_(upperPartIndex[0])= 0.0 ;             // CHEST_JOINT0
     upperPartConfiguration_(upperPartIndex[1])= 0.015 ;           // CHEST_JOINT1
@@ -408,36 +378,6 @@ void DynamicFilter::InverseKinematics(
     velocity(i) = upperPartVelocity_(i) ;
     acceleration(i) = upperPartAcceleration_(i) ;
   }
-
-
-  /// \brief Create file .hip .pos .zmp
-  /// --------------------
-  ofstream aof;
-  string aFileName;
-
-  if ( it == 0 ){
-    aFileName = "/tmp/goingDownWithWeightDFtest";
-    aFileName+=".pos";
-    aof.open(aFileName.c_str(),ofstream::out);
-    aof.close();
-  }
-  ///----
-  aFileName = "/tmp/goingDownWithWeightDFtest";
-    aFileName+=".pos";
-  aof.open(aFileName.c_str(),ofstream::app);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  aof << it * 0.005 << " "  ; // 1
-  for(unsigned int i = 6 ; i < configuration.size() ; i++){
-    aof << configuration(i) << " "  ; // 2
-  }
-  for(unsigned int i = 0 ; i < 10 ; i++){
-    aof << 0.0 << " "  ;
-  }
-  aof  << endl ;
-  aof.close();
-
-  ++it;
 
   return;
 }
