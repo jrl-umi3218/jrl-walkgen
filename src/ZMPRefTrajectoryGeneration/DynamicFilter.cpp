@@ -29,10 +29,6 @@ DynamicFilter::DynamicFilter(
       SPM,OptimalControllerSolver::MODE_WITH_INITIALPOS,false);
   CoMHeight_ = 0.0 ;
 
-  configurationTraj_.clear();
-  velocityTraj_.clear();
-  accelerationTraj_.clear();
-  previousConfiguration_.clear();
   deltaZMP_deq_.clear();
   ZMPMB_vec_.clear();
 
@@ -44,14 +40,10 @@ DynamicFilter::DynamicFilter(
   MAL_MATRIX_RESIZE(deltax_,3,1);
   MAL_MATRIX_RESIZE(deltay_,3,1);
 
-  previousConfiguration_ = aHS->currentConfiguration() ;
-  previousVelocity_ = aHS->currentVelocity() ;
-  previousAcceleration_ = aHS->currentAcceleration() ;
-
   comAndFootRealization_->SetPreviousConfigurationStage0(
-      previousConfiguration_);
+      aHS->currentConfiguration());
   comAndFootRealization_->SetPreviousVelocityStage0(
-      previousVelocity_);
+      aHS->currentVelocity());
 
   Once_ = true ;
   DInitX_ = 0.0 ;
@@ -140,10 +132,6 @@ void DynamicFilter::init(
   PC_->SetHeightOfCoM(CoMHeight_);
   PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
 
-  previousConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
-  previousVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
-  previousAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
-
   upperPartConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
   previousUpperPartConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
   upperPartVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
@@ -153,10 +141,6 @@ void DynamicFilter::init(
   ZMPMBConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
   ZMPMBVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
   ZMPMBAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
-
-  configurationTraj_.resize( PG_N_, previousConfiguration_ ); ;
-  velocityTraj_.resize( PG_N_, previousVelocity_ ); ;
-  accelerationTraj_.resize( PG_N_, previousAcceleration_ ); ;
 
   for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )
   {

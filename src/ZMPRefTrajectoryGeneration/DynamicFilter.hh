@@ -214,12 +214,6 @@ namespace PatternGeneratorJRL
       ComAndFootRealizationByGeometry * comAndFootRealization_;
 
       /// \brief Buffers for the Inverse Kinematics
-      std::vector <MAL_VECTOR_TYPE(double)> configurationTraj_ ;
-      std::vector <MAL_VECTOR_TYPE(double)> velocityTraj_ ;
-      std::vector <MAL_VECTOR_TYPE(double)> accelerationTraj_ ;
-      MAL_VECTOR_TYPE(double) previousConfiguration_ ;
-      MAL_VECTOR_TYPE(double) previousVelocity_ ;
-      MAL_VECTOR_TYPE(double) previousAcceleration_ ;
       MAL_VECTOR_TYPE(double) aCoMState_;
       MAL_VECTOR_TYPE(double) aCoMSpeed_;
       MAL_VECTOR_TYPE(double) aCoMAcc_;

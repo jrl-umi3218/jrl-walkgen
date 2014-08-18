@@ -190,7 +190,8 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   string aMethodName[NbMethods] =
   {":previewcontroltime",
    ":numberstepsbeforestop",
-   ":stoppg"};
+   ":stoppg"
+   ":setfeetconstraint"};
 
   for(unsigned int i=0;i<NbMethods;i++)
   {
@@ -307,9 +308,11 @@ void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstrea
   {
     EndingPhase_ = true;
   }
-
+  if(Method==":setfeetconstraint")
+  {
+   RFI_->CallMethod(Method,strm);
+  }
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
-
 }
 
 int
@@ -854,6 +857,12 @@ void
           << filterprecision( FinalZMPTraj_deq[i].py ) << " "       // 54
           << filterprecision( filteredZMPMB[i][0] ) << " "       // 55
           << filterprecision( filteredZMPMB[i][1] ) << " "       // 56
+          << filterprecision( outputDeltaCOMTraj_deq[i].x[0] ) << " "       // 57
+          << filterprecision( outputDeltaCOMTraj_deq[i].x[1] ) << " "       // 58
+          << filterprecision( outputDeltaCOMTraj_deq[i].x[2] ) << " "       // 59
+          << filterprecision( outputDeltaCOMTraj_deq[i].y[0] ) << " "       // 60
+          << filterprecision( outputDeltaCOMTraj_deq[i].y[1] ) << " "       // 61
+          << filterprecision( outputDeltaCOMTraj_deq[i].y[2] ) << " "       // 62
           << endl ;
     }
     aof.close();
