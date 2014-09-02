@@ -315,7 +315,7 @@ protected:
 	  aof.open(aFileName.c_str(),ofstream::app);
 	  aof.precision(8);
 	  aof.setf(ios::scientific, ios::floatfield);
-	  aof << filterprecision(m_OneStep.NbOfIt*samplingPeriod_ ) << " "                            // 1
+	  aof << filterprecision(m_OneStep.NbOfIt*samplingPeriod_ ) << " "                  // 1
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
 	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
@@ -703,9 +703,18 @@ protected:
     }
 
     {
-      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
-                          0.2 0.19 0.0 0.0\
-                          0.2 -0.19 0.0 0.0\
+      istringstream strm2(":stepstairseq\
+                          0.0 -0.105 0.0 0.0\
+                          0.0 0.19 0.0 0.0\
+                          0.0 -0.19 0.0 0.0\
+                          0.0 0.19 0.0 0.0\
+                          0.0 -0.19 0.0 0.0\
+                          0.0 0.19 0.0 0.0\
+                          0.0 -0.19 0.0 0.0\
+                          0.0 0.19 0.0 0.0\
+                          0.0 -0.19 0.0 0.0\
+                          0.0 0.19 0.0 0.0\
+                          0.0 -0.19 0.0 0.0\
                           0.0 0.19 0.0 0.0\
                           ");
       aPGI.ParseCmd(strm2);

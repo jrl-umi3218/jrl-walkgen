@@ -919,10 +919,6 @@ void ZMPVelocityReferencedQP::ControlInterpolation(
                                              Solution_.SupportStates_deq, Solution_,
                                              Solution_.SupportOrientations_deq,
                                              FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
-//  cout << "FinalLeftFootTraj_deq.ddtheta = " << FinalLeftFootTraj_deq[CurrentIndex_-1].ddtheta << " "
-//      << FinalLeftFootTraj_deq[CurrentIndex_+NbSampleControl_-1].ddtheta << endl ;
-//  cout << "FinalRightFootTraj_deq.ddtheta = " << FinalRightFootTraj_deq[CurrentIndex_-1].ddtheta << " "
-//      << FinalRightFootTraj_deq[CurrentIndex_+NbSampleControl_-1].ddtheta << endl ;
   return ;
 }
 

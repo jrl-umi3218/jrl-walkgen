@@ -297,9 +297,15 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
   ++prwSS_it;//Point at the first previewed instant
   for( unsigned i=0; i<N_; i++ )
     {
-      if( prwSS_it->StateChanged )
+    if( prwSS_it->StateChanged ){
         RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
-
+      if( prwSS_it->Foot == LEFT )
+        cout << "LEFT \n" ;
+      else
+        cout << "RIGHT \n" ;
+      for(unsigned int k = 0 ; k < CoPHull.X_vec.size() ; ++k)
+        cout << CoPHull.X_vec[k] << " " << CoPHull.Y_vec[k] << endl ;
+    }
       RFI_->compute_linear_system( CoPHull, *prwSS_it );
 
       for( unsigned j = 0; j < nbEdges; j++ )
@@ -339,6 +345,13 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
           RFI_->set_vertices( FeetHull, *prwSS_it, INEQ_FEET );
           prwSS_it++;
 
+          if( prwSS_it->Foot == LEFT )
+            cout << "LEFT \n" ;
+          else
+            cout << "RIGHT \n" ;
+          for(unsigned int k = 0 ; k < FeetHull.X_vec.size() ; ++k)
+            cout << FeetHull.X_vec[k] << " " << FeetHull.Y_vec[k] << endl ;
+
           RFI_->compute_linear_system( FeetHull, *prwSS_it );
 
           for( unsigned j = 0; j < nbEdges; j++ )
@@ -351,7 +364,7 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
 
       prwSS_it++;
     }
-
+  cout << "############################################################\n";
 }
 
 
@@ -404,15 +417,26 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   compute_term  ( MM_, -1.0, IneqCoP.D.Y_mat, Robot_->DynamicsCoPJerk().U       );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, N_                             );
 
+  cout << "IneqCoP.D.X_mat = " << IneqCoP.D.X_mat << endl ;
+  cout << "Robot_->DynamicsCoPJerk().U = " << Robot_->DynamicsCoPJerk().U << endl ;
+  cout << "IneqCoP.D.Y_mat = " << IneqCoP.D.Y_mat << endl ;
+  cout << "Robot_->DynamicsCoPJerk().U = " << Robot_->DynamicsCoPJerk().U << endl ;
+
 
   // +D*V
   compute_term  ( MM_, 1.0, IneqCoP.D.X_mat, IntermedData_->State().V 			);
   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_                                   );
+
+  cout << "IntermedData_->State().V  = " << IntermedData_->State().V  << endl ;
   compute_term  ( MM_, 1.0, IneqCoP.D.Y_mat, IntermedData_->State().V  			);
   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed                  );
 
+
+  
+  
+  
   //constant part
   // +dc
   Pb.add_term_to( VECTOR_DS,IneqCoP.Dc_vec, NbConstraints               );
@@ -454,12 +478,12 @@ GeneratorVelRef::build_constraints_feet(const linear_inequality_t & IneqFeet,
     const IntermedQPMat::state_variant_t & State,
     int NbStepsPreviewed, QPProblem & Pb)
 {
-
   unsigned int NbConstraints = Pb.NbConstraints();
 
   // -D*V_f
   compute_term  ( MM_, -1.0, IneqFeet.D.X_mat, State.V_f               );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_                  );
+
   compute_term  ( MM_, -1.0, IneqFeet.D.Y_mat, State.V_f               );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed );
 
@@ -469,9 +493,9 @@ GeneratorVelRef::build_constraints_feet(const linear_inequality_t & IneqFeet,
   // D*Vc_f*FPc
   compute_term  ( MV_, 1.0, IneqFeet.D.X_mat, State.Vc_fX              );
   Pb.add_term_to( VECTOR_DS, MV_, NbConstraints                        );
+
   compute_term  ( MV_, 1.0, IneqFeet.D.Y_mat, State.Vc_fY              );
   Pb.add_term_to( VECTOR_DS, MV_, NbConstraints                        );
-
 }
 
 
