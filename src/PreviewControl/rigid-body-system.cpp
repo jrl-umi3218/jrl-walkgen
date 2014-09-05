@@ -32,22 +32,16 @@ RigidBodySystem::RigidBodySystem( SimplePluginManager * SPM, CjrlHumanoidDynamic
             mass_(0),CoMHeight_(0),T_(0),Tr_(0),Ta_(0),N_(0),multiBody_(false),
             OFTG_(0), FSM_(0)
 {
-
   HDR_ = aHS;
   FSM_ = FSM;
   OFTG_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
-
-
-
 }
 
 
 RigidBodySystem::~RigidBodySystem()
 {
-
   if (OFTG_!=0)
     delete OFTG_;
-
 }
 
 
@@ -63,7 +57,7 @@ RigidBodySystem::initialize(  )
   OFTG_->QPSamplingPeriod( T_ );
   OFTG_->NbSamplingsPreviewed( N_ );
   OFTG_->FeetDistance( 0.2 );
-  OFTG_->StepHeight( 0.05 );
+  OFTG_->StepHeight( 0.03 );
 
   // Initialize predetermined trajectories:
   // --------------------------------------

@@ -236,7 +236,7 @@ RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
 
 void
 RelativeFeetInequalities::set_inequalities( convex_hull_t & ConvexHull,
-    const support_state_t & Support, ineq_e type)
+    const support_state_t &, ineq_e type)
 {
 
   convex_hull_t * ConvexHull_p = 0;

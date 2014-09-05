@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Andrei  Herdt
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
@@ -105,49 +105,49 @@ SupportFSM::set_support_state(double time, unsigned int pi,
   // Update time limit for double support phase
   if(ReferenceGiven && Support.Phase == DS && (Support.TimeLimit-time-EPS_) > DSSSPeriod_)
     {
-      Support.TimeLimit = time+DSSSPeriod_-T_/10.0;
+      Support.TimeLimit = time+DSSSPeriod_;
       Support.NbStepsLeft = NbStepsSSDS_;
     }
 
   //FSM
   if(time+EPS_+pi*T_ >= Support.TimeLimit)
-    {
-      //SS->DS
-      if(Support.Phase == SS  && !ReferenceGiven && Support.NbStepsLeft == 0)
-	{
-	  Support.Phase = DS;
-	  Support.TimeLimit = time+pi*T_+DSPeriod_-T_/10.0;
-	  Support.StateChanged = true;
-	  Support.NbInstants = 0;
-	}
-      //DS->SS
-      else if( ((Support.Phase == DS) && ReferenceGiven) 
-		  ||   ((Support.Phase == DS) && (Support.NbStepsLeft > 0)))
-	{
-	  Support.Phase = SS;
-	  Support.TimeLimit = time+pi*T_+StepPeriod_-T_/10.0;
-	  Support.NbStepsLeft = NbStepsSSDS_;
-	  Support.StateChanged = true;
-	  Support.NbInstants = 0;
-	}
-      //SS->SS
-      else if((Support.Phase == SS && Support.NbStepsLeft > 0) ||
-	      (Support.NbStepsLeft == 0 && ReferenceGiven))
-	{
-          if(Support.Foot == LEFT)
-            Support.Foot = RIGHT;
-          else
-            Support.Foot = LEFT;
-	  Support.StateChanged = true;
-	  Support.NbInstants = 0;
-	  Support.TimeLimit = time+pi*T_+StepPeriod_-T_/10.0;
-	  if(pi != 1)//Flying foot is not down
-	    ++Support.StepNumber;
-	  if (!ReferenceGiven)
-	    Support.NbStepsLeft = Support.NbStepsLeft-1;
-	  if (ReferenceGiven)
-	    Support.NbStepsLeft = NbStepsSSDS_;
-	}
-    }
+  {
+    //SS->DS
+    if(Support.Phase == SS  && !ReferenceGiven && Support.NbStepsLeft == 0)
+		{
+			Support.Phase = DS;
+      Support.TimeLimit = time+pi*T_+DSPeriod_;
+			Support.StateChanged = true;
+			Support.NbInstants = 0;
+		}
+    //DS->SS
+    else if( ((Support.Phase == DS) && ReferenceGiven)
+	  ||   ((Support.Phase == DS) && (Support.NbStepsLeft > 0)))
+		{
+			Support.Phase = SS;
+      Support.TimeLimit = time+pi*T_+StepPeriod_;
+			Support.NbStepsLeft = NbStepsSSDS_;
+			Support.StateChanged = true;
+			Support.NbInstants = 0;
+		}
+    //SS->SS
+    else if((Support.Phase == SS && Support.NbStepsLeft > 0) ||
+	    (Support.NbStepsLeft == 0 && ReferenceGiven))
+		{
+			if(Support.Foot == LEFT)
+				Support.Foot = RIGHT;
+			else
+				Support.Foot = LEFT;
+			Support.StateChanged = true;
+			Support.NbInstants = 0;
+      Support.TimeLimit = time+pi*T_+StepPeriod_;
+			if(pi != 1)//Flying foot is not down
+				++Support.StepNumber;
+			if (!ReferenceGiven)
+				Support.NbStepsLeft = Support.NbStepsLeft-1;
+			if (ReferenceGiven)
+				Support.NbStepsLeft = NbStepsSSDS_;
+		}
+  }
 
 }

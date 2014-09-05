@@ -137,6 +137,8 @@ namespace PatternGeneratorJRL
     { return nbInvariantCols_;};
     /// \}
 
+    /// \brief Print_ array
+    void dump( qp_element_e Type, std::ostream & aos );
     //
     // Private methods
     //
@@ -154,8 +156,7 @@ namespace PatternGeneratorJRL
     /// \{
     /// \brief Print_ on disk the parameters that are passed to the solver
     void dump_solver_parameters( std::ostream & aos );
-    /// \brief Print_ array
-    void dump( qp_element_e Type, std::ostream & aos );
+
     /// \brief Print_ problem
     void dump_problem( std::ostream & );
     /// \}

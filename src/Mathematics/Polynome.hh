@@ -32,7 +32,7 @@
 #define _POLYNOME_H_
 
 #include <vector>
-
+#include <iostream>
 
 using namespace::std;
 
@@ -59,6 +59,9 @@ namespace PatternGeneratorJRL
       
       /*! Compute the value of the second derivative. */
       double ComputeSecDerivative(double t);
+
+      /*! Compute the value of the third derivative (jerk). */
+      double ComputeJerk(double t);
 
       /*! Get the coefficients. */
       void GetCoefficients(std::vector<double> &lCoefficients) const;

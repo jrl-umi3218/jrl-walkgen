@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Mehdi    Benallegue
  * Andrei   Herdt
@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*
@@ -94,6 +94,10 @@ namespace PatternGeneratorJRL
     { return TrunkState_; };
     inline void CurrentTrunkState(const COMState & TrunkState)
     { TrunkState_ = TrunkState; };
+    inline COMState const & PreviewTrunkState() const
+    { return TrunkStateT_; };
+    inline void PreviewTrunkState(const COMState & TrunkState)
+    { TrunkStateT_ = TrunkState; };
     inline double SSLength() const
     { return SSPeriod_; };
     inline void SSLength( double SSPeriod)
