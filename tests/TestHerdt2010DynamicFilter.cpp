@@ -269,11 +269,23 @@ protected:
 
   void fillInDebugFiles( )
   {
+    static int cleanFiles = 0 ;
+    if (cleanFiles == 0){
+      ofstream aof;
+      string aFileName;
+      string path = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/" ;
+      aFileName = path + m_TestName;
+      aFileName += "TestFGPI.dat";
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+    }
+    cleanFiles = 1 ;
     if (m_DebugFGPI)
     {
       ofstream aof;
       string aFileName;
-      aFileName = m_TestName;
+      string path = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/" ;
+      aFileName = path + m_TestName;
       aFileName += "TestFGPI.dat";
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
@@ -286,45 +298,37 @@ protected:
           << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
           << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
           << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
-          << filterprecision(m_OneStep.ZMPTarget(0) ) << " "                            // 9
-          << filterprecision(m_OneStep.ZMPTarget(1) ) << " "                            // 10
-          << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "                     // 11
-          << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "                     // 12
-          << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "                     // 13
-          << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "                    // 14
-          << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "                    // 15
-          << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "                    // 16
-          << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 17
-          << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 18
-          << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 19
-          << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "         // 20
-          << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
-          << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
-          << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23
-          << filterprecision(m_OneStep.RightFootPosition.y ) << " "                     // 24
-          << filterprecision(m_OneStep.RightFootPosition.z ) << " "                     // 25
-          << filterprecision(m_OneStep.RightFootPosition.dx ) << " "                    // 26
-          << filterprecision(m_OneStep.RightFootPosition.dy ) << " "                    // 27
-          << filterprecision(m_OneStep.RightFootPosition.dz ) << " "                    // 28
-          << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                   // 29
-          << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 30
-          << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 31
-          << filterprecision(m_OneStep.RightFootPosition.theta*M_PI/180 ) << " "     // 32
-          << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 33
-          << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 34
-          << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
-                             m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
-                             +m_CurrentConfiguration(0) ) << " "                                          // 35
-          << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
-                             m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
-                             +m_CurrentConfiguration(1) ) << " "                                          // 36
-          << filterprecision(m_CurrentConfiguration(0) ) << " "                         // 37
-          << filterprecision(m_CurrentConfiguration(1) ) << " ";                        // 38
-      for (unsigned int i = 0 ; i < m_HDR->currentConfiguration().size() ; i++)
-      {
-        aof << filterprecision(m_HDR->currentConfiguration()(i)) << " " ;                  // 39 - 74
-      }
-
+          << filterprecision(m_OneStep.finalCOMPosition.yaw[1] ) << " "                 // 9
+          << filterprecision(m_OneStep.finalCOMPosition.x[2] ) << " "                   // 10
+          << filterprecision(m_OneStep.finalCOMPosition.y[2] ) << " "                   // 11
+          << filterprecision(m_OneStep.finalCOMPosition.z[2] ) << " "                   // 12
+          << filterprecision(m_OneStep.finalCOMPosition.yaw[2] ) << " "                 // 13
+          << filterprecision(m_OneStep.ZMPTarget(0) ) << " "                            // 14
+          << filterprecision(m_OneStep.ZMPTarget(1) ) << " "                            // 15
+          << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "                     // 16
+          << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "                     // 17
+          << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "                     // 18
+          << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "                    // 19
+          << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "                    // 20
+          << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "                    // 21
+          << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 22
+          << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 23
+          << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 24
+          << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "         // 25
+          << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 26
+          << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 27
+          << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 28
+          << filterprecision(m_OneStep.RightFootPosition.y ) << " "                     // 29
+          << filterprecision(m_OneStep.RightFootPosition.z ) << " "                     // 30
+          << filterprecision(m_OneStep.RightFootPosition.dx ) << " "                    // 31
+          << filterprecision(m_OneStep.RightFootPosition.dy ) << " "                    // 32
+          << filterprecision(m_OneStep.RightFootPosition.dz ) << " "                    // 33
+          << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                   // 34
+          << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 35
+          << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 36
+          << filterprecision(m_OneStep.RightFootPosition.theta*M_PI/180 ) << " "        // 37
+          << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 38
+          << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "              ;// 39
       aof << endl;
       aof.close();
     }
@@ -748,21 +752,12 @@ protected:
       localeventHandler_t Handler ;
     };
 
-#define localNbOfEvents 12
+#define localNbOfEvents 3
     struct localEvent events [localNbOfEvents] =
     {
-            { 5*200,&TestHerdt2010::walkForward},
-            {10*200,&TestHerdt2010::walkSidewards},
-            {25*200,&TestHerdt2010::startTurningRightOnSpot},
-            {35*200,&TestHerdt2010::walkForward},
-            {45*200,&TestHerdt2010::startTurningLeftOnSpot},
-            {55*200,&TestHerdt2010::walkForward},
-            {65*200,&TestHerdt2010::startTurningRightOnSpot},
-            {75*200,&TestHerdt2010::walkForward},
-            {85*200,&TestHerdt2010::startTurningLeft},
-            {95*200,&TestHerdt2010::startTurningRight},
-            {105*200,&TestHerdt2010::stop},
-            {110*200,&TestHerdt2010::stopOnLineWalking}
+       { 5*200,&TestHerdt2010::walkForward},
+       {30*200,&TestHerdt2010::stop},
+       {35*200,&TestHerdt2010::stopOnLineWalking}
     };
 
     // Test when triggering event.
@@ -778,12 +773,12 @@ protected:
   void generateEventEmergencyStop()
   {
 
-#define localNbOfEventsEMS 5
+#define localNbOfEventsEMS 3
     struct localEvent events [localNbOfEventsEMS] =
-    { {5*200,&TestHerdt2010::startTurningLeft2},
-      {10*200,&TestHerdt2010::startTurningRight2},
-      {15.2*200,&TestHerdt2010::stop},
-      {20.8*200,&TestHerdt2010::stopOnLineWalking}
+    {
+      { 5*200,&TestHerdt2010::walkSidewards},
+      {30*200,&TestHerdt2010::stop},
+      {35*200,&TestHerdt2010::stopOnLineWalking}
     };
 
     // Test when triggering event.

@@ -526,6 +526,31 @@ void
     }
     VRQPGenerator_->LastFootSol(Solution_);
 
+
+//    Problem_.dump(MATRIX_Q,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Q.dat");
+//    Problem_.dump(VECTOR_D,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/P.dat");
+//
+//    Problem_.dump(MATRIX_DU,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/A.dat");
+//    Problem_.dump(VECTOR_DS,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/lbA.dat");
+//
+//    Problem_.dump(VECTOR_XL,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/LB.dat");
+//    Problem_.dump(VECTOR_XU,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/UB.dat");
+//
+//    Problem_.dump(MATRIX_Q,cout);
+//    Problem_.dump(VECTOR_D,cout);
+//
+//    Problem_.dump(MATRIX_DU,cout);
+//    Problem_.dump(VECTOR_DS,cout);
+//
+//    Problem_.dump(VECTOR_XL,cout);
+//    Problem_.dump(VECTOR_XU,cout);
+
+    static int patate = 0 ;
+    if (patate == 50)
+      int stop = 0 ;
+
+    ++patate;
+
     // INITIALIZE INTERPOLATION:
     // ------------------------
     CurrentIndex_ = FinalCOMTraj_deq.size();
@@ -613,8 +638,8 @@ void
       {
         filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
         filteredCoM[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
-        FinalCOMTraj_deq[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-        FinalCOMTraj_deq[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+        //FinalCOMTraj_deq[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+        //FinalCOMTraj_deq[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
       dynamicFilter_->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
                                           FinalLeftFootTraj_deq[i], FinalRightFootTraj_deq[i],
@@ -867,7 +892,48 @@ void
     }
     aof.close();
 
-
+    /// \brief Debug Purpose
+    /// --------------------
+    oss.str("/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/walkSideward2m_s.dat");
+    aFileName = oss.str();
+    if(iteration == 0)
+    {
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+    }
+    ///----
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    int nstep = Solution_.SupportStates_deq.back().StepNumber ;
+    for (unsigned int i = 0 ; i < QP_N_ ; ++i )
+    {
+      aof << filterprecision( Solution_.Solution_vec[i] ) << " "      ; // 1
+    }
+    for (unsigned int i = 0 ; i < 2 ; ++i )
+    {
+      if (i >= nstep)
+      {
+        aof << filterprecision( 0.0 ) << " "      ; // 1
+      }else{
+        aof << filterprecision( Solution_.Solution_vec[2*QP_N_+i] ) << " "      ; // 1
+      }
+    }
+    for (unsigned int i = 0 ; i < QP_N_ ; ++i )
+    {
+      aof << filterprecision( Solution_.Solution_vec[QP_N_+i] ) << " "      ; // 1
+    }
+    for (unsigned int i = 0 ; i < 2 ; ++i )
+    {
+      if (i >= nstep)
+      {
+        aof << filterprecision( 0.0 ) << " "      ; // 1
+      }else{
+        aof << filterprecision( Solution_.Solution_vec[2*QP_N_+nstep+i] ) << " "      ; // 1
+      }
+    }
+    aof << endl ;
+    aof.close();
 
 
 

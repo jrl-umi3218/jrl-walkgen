@@ -62,8 +62,14 @@ OrientationsPreview::OrientationsPreview(CjrlHumanoidDynamicRobot *aHS)
     uLimitRightHipYaw_ = 45.0/180.0*M_PI;
   }
 
+  cout << "lLimitLeftHipYaw_ = " << lLimitLeftHipYaw_ * 180/M_PI << endl
+       << "uLimitLeftHipYaw_ = " << uLimitLeftHipYaw_ * 180/M_PI << endl
+       << "lLimitRightHipYaw_ = " << lLimitRightHipYaw_ * 180/M_PI << endl
+       << "uLimitRightHipYaw_ = " << uLimitRightHipYaw_ * 180/M_PI << endl ;
 
   uvLimitFoot_ = fabs(leftHip->upperVelocityBound(0));
+
+  cout << "upper velocity Limit Foot_ = " << uvLimitFoot_ << endl ;
 
   //Acceleration limit not given by HRP2JRLmain.wrl
   uaLimitHipYaw_ = 0.1;
