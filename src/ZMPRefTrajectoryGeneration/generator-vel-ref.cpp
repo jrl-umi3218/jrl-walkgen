@@ -299,12 +299,12 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
     {
     if( prwSS_it->StateChanged ){
         RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
-      if( prwSS_it->Foot == LEFT )
-        cout << "LEFT \n" ;
-      else
-        cout << "RIGHT \n" ;
-      for(unsigned int k = 0 ; k < CoPHull.X_vec.size() ; ++k)
-        cout << CoPHull.X_vec[k] << " " << CoPHull.Y_vec[k] << endl ;
+//      if( prwSS_it->Foot == LEFT )
+//        cout << "LEFT \n" ;
+//      else
+//        cout << "RIGHT \n" ;
+//      for(unsigned int k = 0 ; k < CoPHull.X_vec.size() ; ++k)
+//        cout << CoPHull.X_vec[k] << " " << CoPHull.Y_vec[k] << endl ;
     }
       RFI_->compute_linear_system( CoPHull, *prwSS_it );
 
@@ -345,12 +345,12 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
           RFI_->set_vertices( FeetHull, *prwSS_it, INEQ_FEET );
           prwSS_it++;
 
-          if( prwSS_it->Foot == LEFT )
-            cout << "LEFT \n" ;
-          else
-            cout << "RIGHT \n" ;
-          for(unsigned int k = 0 ; k < FeetHull.X_vec.size() ; ++k)
-            cout << FeetHull.X_vec[k] << " " << FeetHull.Y_vec[k] << endl ;
+//          if( prwSS_it->Foot == LEFT )
+//            cout << "LEFT \n" ;
+//          else
+//            cout << "RIGHT \n" ;
+//          for(unsigned int k = 0 ; k < FeetHull.X_vec.size() ; ++k)
+//            cout << FeetHull.X_vec[k] << " " << FeetHull.Y_vec[k] << endl ;
 
           RFI_->compute_linear_system( FeetHull, *prwSS_it );
 
@@ -364,7 +364,7 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
 
       prwSS_it++;
     }
-  cout << "############################################################\n";
+  //cout << "############################################################\n";
 }
 
 
@@ -417,10 +417,10 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   compute_term  ( MM_, -1.0, IneqCoP.D.Y_mat, Robot_->DynamicsCoPJerk().U       );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, N_                             );
 
-  cout << "IneqCoP.D.X_mat = " << IneqCoP.D.X_mat << endl ;
-  cout << "Robot_->DynamicsCoPJerk().U = " << Robot_->DynamicsCoPJerk().U << endl ;
-  cout << "IneqCoP.D.Y_mat = " << IneqCoP.D.Y_mat << endl ;
-  cout << "Robot_->DynamicsCoPJerk().U = " << Robot_->DynamicsCoPJerk().U << endl ;
+//  cout << "IneqCoP.D.X_mat = " << IneqCoP.D.X_mat << endl ;
+//  cout << "Robot_->DynamicsCoPJerk().U = " << Robot_->DynamicsCoPJerk().U << endl ;
+//  cout << "IneqCoP.D.Y_mat = " << IneqCoP.D.Y_mat << endl ;
+//  cout << "Robot_->DynamicsCoPJerk().U = " << Robot_->DynamicsCoPJerk().U << endl ;
 
 
   // +D*V
@@ -428,7 +428,7 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_                                   );
 
-  cout << "IntermedData_->State().V  = " << IntermedData_->State().V  << endl ;
+//  cout << "IntermedData_->State().V  = " << IntermedData_->State().V  << endl ;
   compute_term  ( MM_, 1.0, IneqCoP.D.Y_mat, IntermedData_->State().V  			);
   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed                  );
@@ -706,6 +706,8 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
   compute_term  ( MV_, -InstVel.weight, VelDynamics.UT, State.Ref.Global.Y_vec  );
   Pb.add_term_to( VECTOR_D, MV_, N_                                             );
 
+
+
   // COP - centering terms
   const IntermedQPMat::objective_variant_t & COPCent = IntermedData_->Objective( COP_CENTERING );
   const linear_dynamics_t & CoPDynamics = Robot_->DynamicsCoPJerk( );
@@ -737,7 +739,6 @@ GeneratorVelRef::update_problem( QPProblem & Pb, const std::deque<support_state_
   Pb.add_term_to( VECTOR_D, MV_, 2*N_                       );
   compute_term  ( MV_, COPCent.weight, State.VT, State.VcY  );
   Pb.add_term_to( VECTOR_D, MV_, 2*N_+nbStepsPreviewed      );
-
 }
 
 

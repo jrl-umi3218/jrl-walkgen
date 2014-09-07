@@ -803,7 +803,7 @@ computing the analytical trajectories. */
     static int iteration = 0;
     /// \brief Debug Purpose
     /// --------------------
-    oss.str("ZMPDiscretisationBuffer.dat");
+    oss.str("/home/mnaveau/Desktop/mehdi_data/walkstraight20cmperstep.dat");
     aFileName = oss.str();
     aof.open(aFileName.c_str(),ofstream::out);
     aof.close();
