@@ -95,8 +95,16 @@ public:
 
   ~TestHerdt2010()
   {
-    delete ComAndFootRealization_ ;
-    delete SPM ;
+    if ( ComAndFootRealization_ != 0 )
+    {
+      delete ComAndFootRealization_ ;
+      ComAndFootRealization_ = 0 ;
+    }
+    if ( SPM != 0 )
+    {
+      delete SPM ;
+      SPM = 0 ;
+    }
   }
 
   typedef void (TestHerdt2010::* localeventHandler_t)(PatternGeneratorInterface &);
@@ -236,6 +244,12 @@ public:
     ComAndFootRealization_->Initialization();
 
     initIK();
+
+    {
+      istringstream strm2(":setfeetconstraint XY 0.04 0.04");
+      m_PGI->ParseCmd(strm2);
+    }
+
   }
 
 protected:
@@ -752,12 +766,23 @@ protected:
       localeventHandler_t Handler ;
     };
 
-#define localNbOfEvents 3
+#define localNbOfEvents 2
     struct localEvent events [localNbOfEvents] =
     {
-       { 5*200,&TestHerdt2010::walkForward},
-       {30*200,&TestHerdt2010::stop},
-       {35*200,&TestHerdt2010::stopOnLineWalking}
+       { 5*200,&TestHerdt2010::stop},
+       {20*200,&TestHerdt2010::stopOnLineWalking}
+//      { 1*200,&TestHerdt2010::walkForward},
+//      { 5*200,&TestHerdt2010::walkSidewards},
+//      {10*200,&TestHerdt2010::startTurningRightOnSpot},
+//      {15*200,&TestHerdt2010::walkForward},
+//      {20*200,&TestHerdt2010::startTurningLeftOnSpot},
+//      {25*200,&TestHerdt2010::walkForward},
+//      {30*200,&TestHerdt2010::startTurningRightOnSpot},
+//      {35*200,&TestHerdt2010::walkForward},
+//      {40*200,&TestHerdt2010::startTurningLeft},
+//      {45*200,&TestHerdt2010::startTurningRight},
+//      {50*200,&TestHerdt2010::stop},
+//      {55*200,&TestHerdt2010::stopOnLineWalking}
     };
 
     // Test when triggering event.
@@ -777,8 +802,8 @@ protected:
     struct localEvent events [localNbOfEventsEMS] =
     {
       { 5*200,&TestHerdt2010::walkSidewards},
-      {30*200,&TestHerdt2010::stop},
-      {35*200,&TestHerdt2010::stopOnLineWalking}
+      {15*200,&TestHerdt2010::stop},
+      {20*200,&TestHerdt2010::stopOnLineWalking}
     };
 
     // Test when triggering event.

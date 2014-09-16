@@ -299,25 +299,28 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
     {
     if( prwSS_it->StateChanged ){
         RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
+//        cout << "cop foot\n" ;
 //      if( prwSS_it->Foot == LEFT )
 //        cout << "LEFT \n" ;
 //      else
 //        cout << "RIGHT \n" ;
+//      cout << "convex hull : \n";
 //      for(unsigned int k = 0 ; k < CoPHull.X_vec.size() ; ++k)
 //        cout << CoPHull.X_vec[k] << " " << CoPHull.Y_vec[k] << endl ;
     }
       RFI_->compute_linear_system( CoPHull, *prwSS_it );
-
+//      cout << "linear system \n";
       for( unsigned j = 0; j < nbEdges; j++ )
         {
           Inequalities.D.X_mat.push_back( i*nbEdges+j, i, CoPHull.A_vec[j] );
           Inequalities.D.Y_mat.push_back( i*nbEdges+j, i, CoPHull.B_vec[j] );
           Inequalities.Dc_vec( i*nbEdges+j ) = CoPHull.D_vec[j];
+//          cout << CoPHull.A_vec[j] << " " << CoPHull.B_vec[j] << " " << CoPHull.D_vec[j] << endl;
         }
 
       ++prwSS_it;
     }
-
+//  cout << endl;
 }
 
 
@@ -343,8 +346,6 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
         {
           prwSS_it--;//Take the support state before
           RFI_->set_vertices( FeetHull, *prwSS_it, INEQ_FEET );
-          prwSS_it++;
-
 //          if( prwSS_it->Foot == LEFT )
 //            cout << "LEFT \n" ;
 //          else
@@ -352,19 +353,22 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
 //          for(unsigned int k = 0 ; k < FeetHull.X_vec.size() ; ++k)
 //            cout << FeetHull.X_vec[k] << " " << FeetHull.Y_vec[k] << endl ;
 
-          RFI_->compute_linear_system( FeetHull, *prwSS_it );
+          prwSS_it++;
 
+          RFI_->compute_linear_system( FeetHull, *prwSS_it );
+          //cout << "linear system \n";
           for( unsigned j = 0; j < nbEdges; j++ )
           {
             Inequalities.D.X_mat.push_back( (prwSS_it->StepNumber-1)*nbEdges+j, (prwSS_it->StepNumber-1), FeetHull.A_vec[j] );
             Inequalities.D.Y_mat.push_back( (prwSS_it->StepNumber-1)*nbEdges+j, (prwSS_it->StepNumber-1), FeetHull.B_vec[j] );
             Inequalities.Dc_vec( (prwSS_it->StepNumber-1)*nbEdges+j ) = FeetHull.D_vec[j];
+//            cout << FeetHull.A_vec[j] << " " << FeetHull.B_vec[j] << " " << FeetHull.D_vec[j] << endl;
           }
         }
 
       prwSS_it++;
     }
-  //cout << "############################################################\n";
+//  cout << endl ;
 }
 
 
@@ -417,9 +421,51 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   compute_term  ( MM_, -1.0, IneqCoP.D.Y_mat, Robot_->DynamicsCoPJerk().U       );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, N_                             );
 
-//  cout << "IneqCoP.D.X_mat = " << IneqCoP.D.X_mat << endl ;
-//  cout << "Robot_->DynamicsCoPJerk().U = " << Robot_->DynamicsCoPJerk().U << endl ;
-//  cout << "IneqCoP.D.Y_mat = " << IneqCoP.D.Y_mat << endl ;
+
+  /// \brief Debug Purpose
+  /// --------------------
+  ofstream aof;
+  string aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/DX.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for(unsigned int i=0;i<64;i++)
+    {
+      for(unsigned int j=0;j<16;j++)
+        aof << std::scientific << IneqCoP.D.X_mat(i,j) << " ";
+      aof << std::endl;
+    }
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/DY.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for(unsigned int i=0;i<64;i++)
+    {
+      for(unsigned int j=0;j<16;j++)
+        aof << std::scientific << IneqCoP.D.Y_mat(i,j) << " ";
+      aof << std::endl;
+    }
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Pzu.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for(unsigned int i=0;i<16;i++)
+    {
+      for(unsigned int j=0;j<16;j++)
+        aof << std::scientific << Robot_->DynamicsCoPJerk().U(i,j) << " ";
+      aof << std::endl;
+    }
+  aof << std::endl;
+  aof.close();
+
+  //  cout << "Robot_->DynamicsCoPJerk().U = " << Robot_->DynamicsCoPJerk().U << endl ;
+
 //  cout << "Robot_->DynamicsCoPJerk().U = " << Robot_->DynamicsCoPJerk().U << endl ;
 
 
@@ -433,7 +479,20 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed                  );
 
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/V_kp1.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  //cout << IntermedData_->State().V << endl;
 
+  for(unsigned int i=0;i<IntermedData_->State().V.size1();i++)
+    {
+      for(unsigned int j=0;j<IntermedData_->State().V.size2();j++)
+        aof << std::scientific << IntermedData_->State().V(i,j) << " ";
+      aof << std::endl;
+    }
+  aof << std::endl;
+  aof.close();
   
   
   
@@ -469,6 +528,82 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   compute_term  ( MV_, 1.0, IneqCoP.D.Y_mat, IntermedData_->State().VcY    );
   Pb.add_term_to( VECTOR_DS, MV_, NbConstraints                            );
 
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/comX.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+
+
+      for(unsigned int j=0;j<IntermedData_->State().CoM.x.size();j++)
+        aof << std::scientific << IntermedData_->State().CoM.x(j) << " ";
+      aof << std::endl;
+
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/comY.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+
+
+      for(unsigned int j=0;j<IntermedData_->State().CoM.y.size();j++)
+        aof << std::scientific << IntermedData_->State().CoM.y(j) << " ";
+      aof << std::endl;
+
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Bdxdy.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+
+
+      for(unsigned int j=0;j<IneqCoP.Dc_vec.size();j++)
+        aof << std::scientific << IneqCoP.Dc_vec(j) << " ";
+      aof << std::endl;
+
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/VcX.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+
+
+      for(unsigned int j=0;j<IntermedData_->State().VcX.size();j++)
+        aof << std::scientific << IntermedData_->State().VcX(j) << " ";
+      aof << std::endl;
+
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/VcY.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+
+      for(unsigned int j=0;j<IntermedData_->State().VcY.size();j++)
+        aof << std::scientific << IntermedData_->State().VcY(j) << " ";
+      aof << std::endl;
+
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Pzs.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for(unsigned int i=0;i<Robot_->DynamicsCoPJerk().S.size1();i++)
+    {
+      for(unsigned int j=0;j<Robot_->DynamicsCoPJerk().S.size2();j++)
+        aof << std::scientific << Robot_->DynamicsCoPJerk().S(i,j) << " ";
+      aof << std::endl;
+    }
+  aof << std::endl;
+  aof.close();
 
 }
 
@@ -496,6 +631,83 @@ GeneratorVelRef::build_constraints_feet(const linear_inequality_t & IneqFeet,
 
   compute_term  ( MV_, 1.0, IneqFeet.D.Y_mat, State.Vc_fY              );
   Pb.add_term_to( VECTOR_DS, MV_, NbConstraints                        );
+
+
+  /// \brief Debug Purpose
+  /// --------------------
+  ofstream aof;
+  string aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/AX.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for(unsigned int i=0;i<IneqFeet.D.X_mat.size1();i++)
+    {
+      for(unsigned int j=0;j<IneqFeet.D.X_mat.size2();j++)
+        aof << std::scientific << IneqFeet.D.X_mat(i,j) << " ";
+      aof << std::endl;
+    }
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/AY.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for(unsigned int i=0;i<IneqFeet.D.Y_mat.size1();i++)
+    {
+      for(unsigned int j=0;j<IneqFeet.D.Y_mat.size2();j++)
+        aof << std::scientific << IneqFeet.D.Y_mat(i,j) << " ";
+      aof << std::endl;
+    }
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/v_f.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for(unsigned int i=0;i<State.V_f.size1();i++)
+    {
+      for(unsigned int j=0;j<State.V_f.size2();j++)
+        aof << std::scientific << State.V_f(i,j) << " ";
+      aof << std::endl;
+    }
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Baxay.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+      for(unsigned int j=0;j<IneqFeet.Dc_vec.size();j++)
+        aof << std::scientific << IneqFeet.Dc_vec(j) << " ";
+      aof << std::endl;
+
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Vc_fx.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+      for(unsigned int j=0;j<State.Vc_fX.size();j++)
+        aof << std::scientific << State.Vc_fX(j) << " ";
+      aof << std::endl;
+
+  aof << std::endl;
+  aof.close();
+
+  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Vc_fy.dat" ;
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+      for(unsigned int j=0;j<State.Vc_fY.size();j++)
+        aof << std::scientific << State.Vc_fY(j) << " ";
+      aof << std::endl;
+
+  aof << std::endl;
+  aof.close();
+
 }
 
 

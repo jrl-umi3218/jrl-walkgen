@@ -126,10 +126,10 @@ namespace PatternGeneratorJRL {
 	{
 	  cerr << " This program takes 5 arguments: " << endl;
 	  cerr << "./TestFootPrintPGInterface \
-                         PATH_TO_VRML_FILE	   \
-                         VRML_FILE_NAME		   \
+                         PATH_TO_VRML_FILE \
+                         VRML_FILE_NAME \
                          SPECIFICITIES_XML \
-                         LINK_JOINT_RANK	\
+                         LINK_JOINT_RANK \
                          INITIAL_CONFIGURATION" << endl;
 	  exit(-1);
 	}

@@ -435,6 +435,9 @@ int
   InitStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
   FinalCurrentStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
 
+  cout << "lStartingCOMState = " << std::scientific << lStartingCOMState << endl ;
+  cout << "lStartingZMPPosition = " << std::scientific << lStartingZMPPosition << endl ;
+
   dynamicFilter_->init(0.0,m_SamplingPeriod,InterpolationPeriod_,
                        QP_T_, QP_N_*QP_T_ - QP_T_/m_SamplingPeriod * InterpolationPeriod_ ,CoMHeight_,InitLeftFootAbsolutePosition,lStartingCOMState);
   return 0;
@@ -527,27 +530,30 @@ void
     VRQPGenerator_->LastFootSol(Solution_);
 
 
-//    Problem_.dump(MATRIX_Q,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Q.dat");
-//    Problem_.dump(VECTOR_D,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/P.dat");
-//
-//    Problem_.dump(MATRIX_DU,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/A.dat");
-//    Problem_.dump(VECTOR_DS,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/lbA.dat");
-//
-//    Problem_.dump(VECTOR_XL,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/LB.dat");
-//    Problem_.dump(VECTOR_XU,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/UB.dat");
-//
-//    Problem_.dump(MATRIX_Q,cout);
-//    Problem_.dump(VECTOR_D,cout);
-//
-//    Problem_.dump(MATRIX_DU,cout);
-//    Problem_.dump(VECTOR_DS,cout);
-//
-//    Problem_.dump(VECTOR_XL,cout);
-//    Problem_.dump(VECTOR_XU,cout);
-
     static int patate = 0 ;
-    if (patate == 50)
-      int stop = 0 ;
+    if (patate == 58)
+    {
+      cout << Solution_.SupportStates_deq.front().Foot << endl ;
+      cout << Solution_.SupportStates_deq.front().X << endl ;
+      cout << Solution_.SupportStates_deq.front().Y << endl ;
+      Problem_.dump(MATRIX_Q,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Q.dat");
+      Problem_.dump(VECTOR_D,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/P.dat");
+
+      Problem_.dump(MATRIX_DU,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/A.dat");
+      Problem_.dump(VECTOR_DS,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/lbA.dat");
+
+      Problem_.dump(VECTOR_XL,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/LB.dat");
+      Problem_.dump(VECTOR_XU,"/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/UB.dat");
+
+      Problem_.dump(MATRIX_Q,cout);
+      Problem_.dump(VECTOR_D,cout);
+
+      Problem_.dump(MATRIX_DU,cout);
+      Problem_.dump(VECTOR_DS,cout);
+
+      Problem_.dump(VECTOR_XL,cout);
+      Problem_.dump(VECTOR_XU,cout);
+    }
 
     ++patate;
 
