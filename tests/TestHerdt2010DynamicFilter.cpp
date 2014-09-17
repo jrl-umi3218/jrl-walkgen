@@ -766,11 +766,12 @@ protected:
       localeventHandler_t Handler ;
     };
 
-#define localNbOfEvents 2
+#define localNbOfEvents 3
     struct localEvent events [localNbOfEvents] =
     {
-       { 5*200,&TestHerdt2010::stop},
-       {20*200,&TestHerdt2010::stopOnLineWalking}
+      { 5*200,&TestHerdt2010::walkForward},
+      {15*200,&TestHerdt2010::stop},
+      {20*200,&TestHerdt2010::stopOnLineWalking}
 //      { 1*200,&TestHerdt2010::walkForward},
 //      { 5*200,&TestHerdt2010::walkSidewards},
 //      {10*200,&TestHerdt2010::startTurningRightOnSpot},

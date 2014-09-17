@@ -40,6 +40,7 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
 					     CjrlFoot * lFoot) : SimplePlugin(lSPM)
 {
   m_Omega = 0.0;
+  m_Omega2 = 0.0;
   m_Foot = lFoot;
 
   m_LeftFootTrajectory = new FootTrajectoryGenerationMultiple(lSPM,m_Foot);
@@ -89,6 +90,10 @@ void LeftAndRightFootTrajectoryGenerationMultiple::CallMethod(std::string & Meth
   if (Method==":omega")
     {
       strm >> m_Omega;
+    }
+  else if (Method==":omega2")
+    {
+      strm >> m_Omega2;
     }
   else if (Method==":stepheight")
     {
@@ -398,7 +403,7 @@ InitializeFromRelativeSteps_backup(deque<RelativeFootPosition> &RelativeFootPosi
 	      RightFootTmpFinalPos.z = m_StepHeight;
 	      RightFootTmpFinalPos.theta = CurrentAbsTheta;
 	      RightFootTmpFinalPos.omega = m_Omega;
-	      RightFootTmpFinalPos.omega2 = 0.0;
+	      RightFootTmpFinalPos.omega2 = m_Omega2;
 	      RightFootTmpFinalPos.dx = 0.0;
 	      RightFootTmpFinalPos.dy = 0.0;
 	      RightFootTmpFinalPos.dz = 0.0;
@@ -420,7 +425,7 @@ InitializeFromRelativeSteps_backup(deque<RelativeFootPosition> &RelativeFootPosi
 	      LeftFootTmpFinalPos.z = m_StepHeight;
 	      LeftFootTmpFinalPos.theta = CurrentAbsTheta;
 	      LeftFootTmpFinalPos.omega = m_Omega;
-	      LeftFootTmpFinalPos.omega2 = 0.0;
+	      LeftFootTmpFinalPos.omega2 = m_Omega2;
 	      LeftFootTmpFinalPos.dx = 0.0;
 	      LeftFootTmpFinalPos.dy = 0.0;
 	      LeftFootTmpFinalPos.dz = 0.0;
@@ -821,7 +826,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
             RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);//
 	      RightFootTmpFinalPos.theta = CurrentAbsTheta;
 	      RightFootTmpFinalPos.omega = m_Omega;
-	      RightFootTmpFinalPos.omega2 = 0.0;
+	      RightFootTmpFinalPos.omega2 = m_Omega2;
 	      RightFootTmpFinalPos.dx = 0.0;
 	      RightFootTmpFinalPos.dy = 0.0;
 	      RightFootTmpFinalPos.dz = 0.0;
@@ -846,7 +851,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
 	      LeftFootTmpFinalPos.theta = CurrentAbsTheta;
 	      LeftFootTmpFinalPos.omega = m_Omega;
-	      LeftFootTmpFinalPos.omega2 = 0.0;
+	      LeftFootTmpFinalPos.omega2 = m_Omega2;
 	      LeftFootTmpFinalPos.dx = 0.0;
 	      LeftFootTmpFinalPos.dy = 0.0;
 	      LeftFootTmpFinalPos.dz = 0.0;

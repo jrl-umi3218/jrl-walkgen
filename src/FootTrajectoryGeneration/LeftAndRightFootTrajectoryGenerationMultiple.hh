@@ -195,6 +195,9 @@ namespace PatternGeneratorJRL
       /*! Omega */
       double m_Omega;
 
+      /*! Omega2 */
+      double m_Omega2;
+
       /*! Step height. */
       double m_StepHeight;
 
