@@ -180,7 +180,7 @@ public:
               m_CurrentVelocity,
               m_CurrentAcceleration,
               0.005,1,iter);
-          dynamicfilter_->ForwardKinematics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
+          dynamicfilter_->InverseDynamics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
           iter++;
           fillInDebugFiles();
         }
@@ -259,7 +259,7 @@ public:
         m_CurrentVelocity,
         m_CurrentAcceleration,
         0.005,1,0);
-    dynamicfilter_->ForwardKinematics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
+    dynamicfilter_->InverseDynamics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
   }
 
 protected:
@@ -703,7 +703,11 @@ protected:
     }
 
     {
-      istringstream strm2(":omega2 3");
+      istringstream strm2(":omega2 0");
+      aPGI.ParseCmd(strm2);
+    }
+    {
+      istringstream strm2(":omega -3");
       aPGI.ParseCmd(strm2);
     }
 
