@@ -701,16 +701,6 @@ protected:
       istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
       aPGI.ParseCmd(strm2);
     }
-
-    {
-      istringstream strm2(":omega2 0");
-      aPGI.ParseCmd(strm2);
-    }
-    {
-      istringstream strm2(":omega -3");
-      aPGI.ParseCmd(strm2);
-    }
-
     {
       istringstream strm2(":stepstairseq\
                           0.0 -0.105 0.0 0.0\

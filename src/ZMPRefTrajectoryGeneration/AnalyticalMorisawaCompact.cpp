@@ -683,8 +683,8 @@ computing the analytical trajectories. */
       {
         filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
         filteredCoM[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
-        COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-        COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+        //COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+        //COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
       m_kajitaDynamicFilter->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
                                           LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],

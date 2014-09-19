@@ -146,6 +146,8 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 					   FootInitialPosition.dtheta);
 
   // Omega
+  cout << "Init omega = " << FootInitialPosition.omega << endl ;
+  cout << "Final omega = " << FootFinalPosition.omega << endl ;
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::OMEGA_AXIS,
 					   m_DeltaTj[IntervalIndex],
