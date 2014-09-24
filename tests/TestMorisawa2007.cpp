@@ -38,7 +38,8 @@ enum Profiles_t {
   PROFIL_ANALYTICAL_ONLINE_WALKING,         // 1
   PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING, // 2
   PROFIL_ANALYTICAL_CLIMBING_STAIRS,        // 3
-  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS       // 4
+  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS,       // 4
+  PROFIL_ANALYTICAL_STEPPING_STONES       // 5
 };
 
 #define NBOFPREDEFONLINEFOOTSTEPS 11
@@ -775,7 +776,7 @@ protected:
 
   }
 
-    void AnalyticalGoingDownStairs(PatternGeneratorInterface &aPGI)
+  void AnalyticalGoingDownStairs(PatternGeneratorInterface &aPGI)
   {
     CommonInitialization(aPGI);
     {
@@ -797,6 +798,31 @@ protected:
 
   }
 
+ void AnalyticalSteppingStones(PatternGeneratorInterface &aPGI)
+  {
+    CommonInitialization(aPGI);
+    {
+      istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
+                                        0.3 0.19 0.05 0.0\
+                                        0.2 -0.19 0.05 0.0\
+                                        0.2 0.19 0.05 0.0\
+                                        0.2 -0.19 0.05 0.0\
+                                        0.2 0.19 0.0 0.0\
+                                        0.2 -0.19 -0.05 0.0\
+                                        0.2 0.19 -0.05 0.0\
+                                        0.2 -0.19 -0.05 0.0\
+                                        0.2 0.19 0.0 0.0\
+                                        0.0 -0.19 0.0 0.0");
+
+      aPGI.ParseCmd(strm2);
+    }
+
+  }
   void chooseTestProfile()
   {
 
@@ -806,14 +832,17 @@ protected:
 	AnalyticalShortStraightWalking(*m_PGI);
 	break;
 
-	case PROFIL_ANALYTICAL_CLIMBING_STAIRS:
+      case PROFIL_ANALYTICAL_CLIMBING_STAIRS:
 	AnalyticalClimbingStairs(*m_PGI);
 	break;
-
-    case PROFIL_ANALYTICAL_GOING_DOWN_STAIRS:
+        
+      case PROFIL_ANALYTICAL_GOING_DOWN_STAIRS:
 	AnalyticalGoingDownStairs(*m_PGI);
 	break;
 
+      case PROFIL_ANALYTICAL_STEPPING_STONES:
+	AnalyticalSteppingStones(*m_PGI);
+	break;
 
       case PROFIL_ANALYTICAL_ONLINE_WALKING:
 	StartAnalyticalOnLineWalking(*m_PGI);
@@ -832,6 +861,9 @@ protected:
       return;
     if (m_TestProfile==PROFIL_ANALYTICAL_GOING_DOWN_STAIRS)
       return;
+    if (m_TestProfile==PROFIL_ANALYTICAL_STEPPING_STONES)
+      return;
+
 
 
     unsigned int StoppingTime = 70*200;
@@ -908,10 +940,11 @@ int PerformTests(int argc, char *argv[])
   std::string CompleteName = string(argv[0]);
   unsigned found = CompleteName.find_last_of("/\\");
   std::string TestName =  CompleteName.substr(found+1);
-  int TestProfiles[4] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
+  int TestProfiles[5] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
 			  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,
 			  PROFIL_ANALYTICAL_CLIMBING_STAIRS,
-			  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS};
+			  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS,
+                          PROFIL_ANALYTICAL_STEPPING_STONES};
   int indexProfile=-1;
 
   if (TestName.compare(16,6,"OnLine")==0)
@@ -922,7 +955,8 @@ int PerformTests(int argc, char *argv[])
     indexProfile=2;
   if (TestName.compare(16,9,"GoingDown")==0)
     indexProfile=3;
-
+  if (TestName.compare(16,14,"SteppingStones")==0)
+    indexProfile=4;
 
   if (indexProfile==-1)
     {
