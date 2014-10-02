@@ -2867,7 +2867,7 @@ new step has to be generate.
     double upRight1 = 0.9 ,upLeft1 = 0.0;
     double up_a=0.0, up_b=0.0;
 
-    double down = 0.3, downRight =0.9, downLeft = 0.0;
+    double down = 0.5, downRight =0.9, downLeft = 0.0;
     double down_a=0.0, down_b=0.0;
 
     if (t>moving_time){ // we start analyze since 2nd step
@@ -2961,6 +2961,7 @@ new step has to be generate.
         else if (m_AbsoluteSupportFootPositions[Index].z == m_AbsoluteSupportFootPositions[Index-1].z && 
                  m_RelativeFootPositions[Index-1].sz < 0) //second leg
         {
+
           deltaZ = -(m_AbsoluteSupportFootPositions[Index-2].z - m_AbsoluteSupportFootPositions[Index].z );
           if (t <= Index*moving_time + m_RelativeFootPositions[Index].SStime )
             CoMz = (t-Index*moving_time)*(1-down)*deltaZ/(m_RelativeFootPositions[Index].SStime) +  
