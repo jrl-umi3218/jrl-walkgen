@@ -57,7 +57,7 @@ namespace PatternGeneratorJRL {
 	{":comheight 0.8078",
 	 ":samplingperiod 0.005",
 	 ":previewcontroltime 1.6",
-	 ":omega 0.0",
+	 ":omega -3.0",
 	 ":stepheight 0.07",
 	 ":singlesupporttime 0.78",
 	 ":doublesupporttime 0.02",

@@ -683,8 +683,8 @@ computing the analytical trajectories. */
       {
         filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
         filteredCoM[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
-        //COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-        //COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+        COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+        COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
       m_kajitaDynamicFilter->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
                                           LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
@@ -803,7 +803,7 @@ computing the analytical trajectories. */
     static int iteration = 0;
     /// \brief Debug Purpose
     /// --------------------
-    oss.str("/home/mnaveau/Desktop/mehdi_data/walkstraight20cmperstep.dat");
+    oss.str("testMorisawaSlopes.dat");
     aFileName = oss.str();
     aof.open(aFileName.c_str(),ofstream::out);
     aof.close();
@@ -2841,9 +2841,10 @@ new step has to be generate.
       aCOMPos.yaw[1] = 0.5*(LeftFootAbsPos.dtheta + RightFootAbsPos.dtheta);
       aCOMPos.yaw[2] = 0.5*(LeftFootAbsPos.ddtheta + RightFootAbsPos.ddtheta);
 
-      ComputeCoMz(t,aCOMPos.z[0]);
+      aCOMPos.z[0] = m_InitialPoseCoMHeight + aCOMPos.x[0]*tan(0.0872664626) ;
+      //ComputeCoMz(t,aCOMPos.z[0]);
 
-      aCOMPos.z[1] = (aCOMPos.z[0] - preCoMz) / m_SamplingPeriod;
+      //aCOMPos.z[1] = (aCOMPos.z[0] - preCoMz) / m_SamplingPeriod;
       preCoMz = aCOMPos.z[0];
 
       FinalCoMPositions.push_back(aCOMPos);
@@ -2853,6 +2854,30 @@ new step has to be generate.
               RightFootAbsPos.x << " " << RightFootAbsPos.y << " " << RightFootAbsPos.z << " " <<
               samplingPeriod,"Test.dat");
     }
+
+    // 3 point filter for the com z
+    deque<double> FilteredCoMPositions (FinalCoMPositions.size(),0.0) ;
+    for (unsigned int i = 1 ; i < FinalCoMPositions.size()-1 ; ++i)
+    {
+      FilteredCoMPositions[i] = (FinalCoMPositions[i-1].z[0]+FinalCoMPositions[i].z[0]+FinalCoMPositions[i+1].z[0])/3 ;
+    }
+    FilteredCoMPositions[0]= (2*FinalCoMPositions[0].z[0]+FinalCoMPositions[1].z[0])/3;
+    FilteredCoMPositions[FilteredCoMPositions.size()-1] =
+        (2*FinalCoMPositions[FilteredCoMPositions.size()-1].z[0]+FinalCoMPositions[FilteredCoMPositions.size()-2].z[0])/3;
+
+
+    for (unsigned int i = 0 ; i < FinalCoMPositions.size() ; ++i)
+      FinalCoMPositions[i].z[0] = FilteredCoMPositions[i] ;
+
+    // !!!! valid only zmpdiscretisation call !!!!
+    FinalCoMPositions[0].z[1]=0.0;
+    for (unsigned int i = 1 ; i < FinalCoMPositions.size() ; ++i)
+      FinalCoMPositions[i].z[1] = (FilteredCoMPositions[i] - FilteredCoMPositions[i-1])/m_SamplingPeriod ;
+
+    FinalCoMPositions[0].z[2]=0.0;
+    for (unsigned int i = 1 ; i < FinalCoMPositions.size() ; ++i)
+      FinalCoMPositions[i].z[2] = (FinalCoMPositions[i].z[1] - FinalCoMPositions[i-1].z[1])/m_SamplingPeriod ;
+
   }
 
 

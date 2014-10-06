@@ -168,6 +168,8 @@ ENDMACRO(ADD_HERDT_2010)
 
 #ADD_HERDT_2010(TestHerdt2010)
 ADD_HERDT_2010(TestHerdt2010DynamicFilter)
+ADD_HERDT_2010(TestInverseKinematics)
+
 
 ####################
 # Test Kajita 2003 #

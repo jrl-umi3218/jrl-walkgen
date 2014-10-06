@@ -146,8 +146,13 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 					   FootInitialPosition.dtheta);
 
   // Omega
+  static int cunt = 1 ;
+  cout << "m_omega" << m_Omega << endl ;
   cout << "Init omega = " << FootInitialPosition.omega << endl ;
   cout << "Final omega = " << FootFinalPosition.omega << endl ;
+  cout << "set plynoome : " << cunt << endl;
+  cout << "####" << endl ;
+  cunt++;
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::OMEGA_AXIS,
 					   m_DeltaTj[IntervalIndex],
@@ -873,8 +878,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  LeftFootTmpFinalPos = LeftFootTmpInitPos;
 
 	  LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-	  LeftFootTmpFinalPos.omega = 0.0;
-	  LeftFootTmpFinalPos.omega2 = 0.0;
+	  LeftFootTmpFinalPos.omega = m_Omega;
+	  LeftFootTmpFinalPos.omega2 = m_Omega2;
 	  LeftFootTmpFinalPos.dx = LeftFootTmpInitPos.dx = 0.0;
 	  LeftFootTmpFinalPos.dy = LeftFootTmpInitPos.dy =0.0;
 	  LeftFootTmpFinalPos.dz = LeftFootTmpInitPos.dz =0.0;
@@ -884,8 +889,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
 	  RightFootTmpFinalPos = RightFootTmpInitPos;
 	  RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-	  RightFootTmpFinalPos.omega = 0.0;
-	  RightFootTmpFinalPos.omega2 = 0.0;
+	  RightFootTmpFinalPos.omega = m_Omega;
+	  RightFootTmpFinalPos.omega2 = m_Omega2 ;
 	  RightFootTmpFinalPos.dx = RightFootTmpInitPos.dx = 0.0;
 	  RightFootTmpFinalPos.dy = RightFootTmpInitPos.dy =0.0;
 	  RightFootTmpFinalPos.dz = RightFootTmpInitPos.dz =0.0;
