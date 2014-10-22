@@ -136,8 +136,8 @@ public:
     {
       for(int j=0;j<3;j++)
       {
-        comPos[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-        comPos[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+//        comPos[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+//        comPos[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
     }
 
