@@ -57,6 +57,8 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
 	}
     }
 
+  wayPoint.resize(2,0.0);
+
 }
 
  CjrlFoot* LeftAndRightFootTrajectoryGenerationMultiple::getFoot() const

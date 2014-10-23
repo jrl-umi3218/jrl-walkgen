@@ -591,24 +591,24 @@ computing the analytical trajectories. */
     MAL_VECTOR_TYPE(double) UpperVel = aHDR->currentVelocity() ;
     MAL_VECTOR_TYPE(double) UpperAcc = aHDR->currentAcceleration() ;
 //    // carry the weight in front of him
-//    UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
-//    UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
-//    UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
-//    UpperConfig(21)= 0.0 ;            // HEAD_JOINT1
-//    UpperConfig(22)= -0.108210414 ;   // RARM_JOINT0
-//    UpperConfig(23)= 0.0383972435 ;   // RARM_JOINT1
-//    UpperConfig(24)= 0.474729557 ;    // RARM_JOINT2
-//    UpperConfig(25)= -1.41720735 ;    // RARM_JOINT3
-//    UpperConfig(26)= 1.45385927 ;     // RARM_JOINT4
-//    UpperConfig(27)= 0.509636142 ;    // RARM_JOINT5
-//    UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
-//    UpperConfig(29)= -0.108210414 ;   // LARM_JOINT0
-//    UpperConfig(30)= -0.129154365 ;   // LARM_JOINT1
-//    UpperConfig(31)= -0.333357887 ;   // LARM_JOINT2
-//    UpperConfig(32)= -1.41720735 ;    // LARM_JOINT3
-//    UpperConfig(33)= 1.45385927 ;     // LARM_JOINT4
-//    UpperConfig(34)= -0.193731547 ;   // LARM_JOINT5
-//    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
+    UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
+    UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
+    UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
+    UpperConfig(21)= 0.0 ;            // HEAD_JOINT1
+    UpperConfig(22)= -0.108210414 ;   // RARM_JOINT0
+    UpperConfig(23)= 0.0383972435 ;   // RARM_JOINT1
+    UpperConfig(24)= 0.474729557 ;    // RARM_JOINT2
+    UpperConfig(25)= -1.41720735 ;    // RARM_JOINT3
+    UpperConfig(26)= 1.45385927 ;     // RARM_JOINT4
+    UpperConfig(27)= 0.509636142 ;    // RARM_JOINT5
+    UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
+    UpperConfig(29)= -0.108210414 ;   // LARM_JOINT0
+    UpperConfig(30)= -0.129154365 ;   // LARM_JOINT1
+    UpperConfig(31)= -0.333357887 ;   // LARM_JOINT2
+    UpperConfig(32)= -1.41720735 ;    // LARM_JOINT3
+    UpperConfig(33)= 1.45385927 ;     // LARM_JOINT4
+    UpperConfig(34)= -0.193731547 ;   // LARM_JOINT5
+    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
 
 //    // carry the weight over the head
 //    UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
