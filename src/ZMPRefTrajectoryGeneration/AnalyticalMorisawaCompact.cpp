@@ -683,8 +683,8 @@ computing the analytical trajectories. */
       {
         filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
         filteredCoM[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
-        //        COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-        //        COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+//                COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+//                COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
       m_kajitaDynamicFilter->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
                                           LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
@@ -803,7 +803,7 @@ computing the analytical trajectories. */
     static int iteration = 0;
     /// \brief Debug Purpose
     /// --------------------
-    oss.str("/home/mnaveau/Desktop/mehdi_data/walkstraight20cmperstep.dat");
+    oss.str("MorisawaData.dat");
     aFileName = oss.str();
     aof.open(aFileName.c_str(),ofstream::out);
     aof.close();
@@ -1187,36 +1187,36 @@ When the limit is reached, and the stack exhausted this method is called again. 
             <<  outputDeltaCOMTraj_deq[0].y[0] << " "   // 31
             <<  outputDeltaCOMTraj_deq[0].y[1] << " "   // 32
             <<  outputDeltaCOMTraj_deq[0].y[2] << " "   // 33
-            <<  LeftFootAbsPos[0].x  << " "             // 24
-            <<  LeftFootAbsPos[0].y  << " "             // 25
-            <<  LeftFootAbsPos[0].z  << " "             // 26
-            <<  LeftFootAbsPos[0].theta  << " "         // 27
-            <<  LeftFootAbsPos[0].omega  << " "         // 28
-            <<  LeftFootAbsPos[0].dx  << " "            // 29
-            <<  LeftFootAbsPos[0].dy  << " "            // 30
-            <<  LeftFootAbsPos[0].dz  << " "            // 31
-            <<  LeftFootAbsPos[0].dtheta  << " "        // 32
-            <<  LeftFootAbsPos[0].domega  << " "        // 33
-            <<  LeftFootAbsPos[0].ddx  << " "           // 34
-            <<  LeftFootAbsPos[0].ddy  << " "           // 35
-            <<  LeftFootAbsPos[0].ddz  << " "           // 36
-            <<  LeftFootAbsPos[0].ddtheta  << " "       // 37
-            <<  LeftFootAbsPos[0].ddomega  << " "       // 38
-            <<  RightFootAbsPos[0].x  << " "            // 39
-            <<  RightFootAbsPos[0].y  << " "            // 40
-            <<  RightFootAbsPos[0].z  << " "            // 41
-            <<  RightFootAbsPos[0].theta  << " "        // 42
-            <<  RightFootAbsPos[0].omega  << " "        // 43
-            <<  RightFootAbsPos[0].dx  << " "           // 44
-            <<  RightFootAbsPos[0].dy  << " "           // 45
-            <<  RightFootAbsPos[0].dz  << " "           // 46
-            <<  RightFootAbsPos[0].dtheta  << " "       // 47
-            <<  RightFootAbsPos[0].domega  << " "       // 48
-            <<  RightFootAbsPos[0].ddx  << " "          // 49
-            <<  RightFootAbsPos[0].ddy  << " "          // 50
-            <<  RightFootAbsPos[0].ddz  << " "          // 51
-            <<  RightFootAbsPos[0].ddtheta  << " "      // 52
-            <<  RightFootAbsPos[0].ddomega  << " "      // 53
+            <<  LeftFootAbsPos[0].x  << " "             // 34
+            <<  LeftFootAbsPos[0].y  << " "             // 35
+            <<  LeftFootAbsPos[0].z  << " "             // 36
+            <<  LeftFootAbsPos[0].theta  << " "         // 37
+            <<  LeftFootAbsPos[0].omega  << " "         // 38
+            <<  LeftFootAbsPos[0].dx  << " "            // 39
+            <<  LeftFootAbsPos[0].dy  << " "            // 40
+            <<  LeftFootAbsPos[0].dz  << " "            // 41
+            <<  LeftFootAbsPos[0].dtheta  << " "        // 42
+            <<  LeftFootAbsPos[0].domega  << " "        // 43
+            <<  LeftFootAbsPos[0].ddx  << " "           // 44
+            <<  LeftFootAbsPos[0].ddy  << " "           // 45
+            <<  LeftFootAbsPos[0].ddz  << " "           // 46
+            <<  LeftFootAbsPos[0].ddtheta  << " "       // 47
+            <<  LeftFootAbsPos[0].ddomega  << " "       // 48
+            <<  RightFootAbsPos[0].x  << " "            // 49
+            <<  RightFootAbsPos[0].y  << " "            // 50
+            <<  RightFootAbsPos[0].z  << " "            // 51
+            <<  RightFootAbsPos[0].theta  << " "        // 52
+            <<  RightFootAbsPos[0].omega  << " "        // 53
+            <<  RightFootAbsPos[0].dx  << " "           // 54
+            <<  RightFootAbsPos[0].dy  << " "           // 55
+            <<  RightFootAbsPos[0].dz  << " "           // 56
+            <<  RightFootAbsPos[0].dtheta  << " "       // 57
+            <<  RightFootAbsPos[0].domega  << " "       // 58
+            <<  RightFootAbsPos[0].ddx  << " "          // 59
+            <<  RightFootAbsPos[0].ddy  << " "          // 60
+            <<  RightFootAbsPos[0].ddz  << " "          // 61
+            <<  RightFootAbsPos[0].ddtheta  << " "      // 62
+            <<  RightFootAbsPos[0].ddomega  << " "      // 63
             << endl ;
         aof.close();
 
@@ -2842,8 +2842,13 @@ new step has to be generate.
       aCOMPos.yaw[2] = 0.5*(LeftFootAbsPos.ddtheta + RightFootAbsPos.ddtheta);
 
       ComputeCoMz(t,aCOMPos.z[0]);
+      if(t==0.0)
+      {
+        aCOMPos.z[1] = 0.0;
+      }else{
+        aCOMPos.z[1] = (aCOMPos.z[0] - preCoMz) / m_SamplingPeriod;
+      }
 
-      aCOMPos.z[1] = (aCOMPos.z[0] - preCoMz) / m_SamplingPeriod;
       preCoMz = aCOMPos.z[0];
 
       FinalCoMPositions.push_back(aCOMPos);
@@ -2863,8 +2868,8 @@ new step has to be generate.
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
     double deltaZ,deltaZ2,deltaZ3;
     // double static CoMzpre = CoMz;
-    double up=0.1,upRight = 0.9 ,upLeft = 0.0;
-    double upRight1 = 0.9 ,upLeft1 = 0.0;
+    double up=0.1,upRight = 0.90 ,upLeft = 0.0;
+    double upRight1 = 0.90 ,upLeft1 = 0.0;
     double up_a=0.0, up_b=0.0;
 
     double down = 0.5, downRight =0.9, downLeft = 0.0;
