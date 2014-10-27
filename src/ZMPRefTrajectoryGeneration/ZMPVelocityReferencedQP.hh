@@ -125,14 +125,14 @@ namespace PatternGeneratorJRL
     void setCoMPerturbationForce(istringstream &strm);
 
     solution_t & Solution()
-      { return Solution_; }
+    { return Solution_; }
 
     inline const int & QP_N(void) const
     { return QP_N_; }
 
     /// \brief Setter and getter for the ComAndZMPTrajectoryGeneration.
     inline ComAndFootRealization * getComAndFootRealization()
-      { return dynamicFilter_->getComAndFootRealization();};
+    { return dynamicFilter_->getComAndFootRealization();};
     /// \}
 
     inline double InterpolationPeriod()
@@ -184,7 +184,7 @@ namespace PatternGeneratorJRL
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D LIPM_ ;
     LinearizedInvertedPendulum2D LIPM_subsampled_ ;
-		LinearizedInvertedPendulum2D CoM_;
+    LinearizedInvertedPendulum2D CoM_;
 
     /// \brief Simplified robot model
     RigidBodySystem * Robot_ ;
@@ -303,35 +303,35 @@ namespace PatternGeneratorJRL
 
     int ReturnOptimalTimeToRegenerateAStep();
 
-		/// \brief Interpolation form the com jerk the position of the com and the zmp corresponding to the kart table model
+    /// \brief Interpolation form the com jerk the position of the com and the zmp corresponding to the kart table model
     void CoMZMPInterpolation(
-          std::deque<ZMPPosition> & ZMPPositions,                    	 // OUTPUT
-		      std::deque<COMState> & COMTraj_deq ,                       	 // OUTPUT
-		      const std::deque<FootAbsolutePosition> & LeftFootTraj_deq, 	// INPUT
-		      const std::deque<FootAbsolutePosition> & RightFootTraj_deq,	// INPUT
-		      const solution_t * Solution,                               	// INPUT
-          LinearizedInvertedPendulum2D * LIPM,                       	 // INPUT/OUTPUT
-		      const unsigned numberOfSample,                             	// INPUT
-		      const int IterationNumber);                                	// INPUT
+        std::deque<ZMPPosition> & ZMPPositions,                    	 // OUTPUT
+        std::deque<COMState> & COMTraj_deq ,                       	 // OUTPUT
+        const std::deque<FootAbsolutePosition> & LeftFootTraj_deq, 	// INPUT
+        const std::deque<FootAbsolutePosition> & RightFootTraj_deq,	// INPUT
+        const solution_t * Solution,                               	// INPUT
+        LinearizedInvertedPendulum2D * LIPM,                       	 // INPUT/OUTPUT
+        const unsigned numberOfSample,                             	// INPUT
+        const int IterationNumber);                                	// INPUT
 
-		/// \brief Interpolate just enough data to pilot the robot (period of interpolation = QP_T_)
+    /// \brief Interpolate just enough data to pilot the robot (period of interpolation = QP_T_)
     void ControlInterpolation(
-          std::deque<COMState> & FinalCOMTraj_deq,                      // OUTPUT
-          std::deque<ZMPPosition> & FinalZMPTraj_deq,                   // OUTPUT
-		      std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,     // OUTPUT
-		      std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,    // OUTPUT
-		      double time);                                          			// INPUT
+        std::deque<COMState> & FinalCOMTraj_deq,                      // OUTPUT
+        std::deque<ZMPPosition> & FinalZMPTraj_deq,                   // OUTPUT
+        std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,     // OUTPUT
+        std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq,    // OUTPUT
+        double time);                                          			// INPUT
 
-		/// \brief Interpolation everything on the whole preview
+    /// \brief Interpolation everything on the whole preview
     void DynamicFilterInterpolation(double time);
 
-		/// \brief Define the position of an additionnal foot step outside the preview to interpolate the position of the swinging feet in 3D
+    /// \brief Define the position of an additionnal foot step outside the preview to interpolate the position of the swinging feet in 3D
     void InterpretSolutionVector();
 
-		/// \brief Prepare the vecteur containing the solution for the interpolation
+    /// \brief Prepare the vecteur containing the solution for the interpolation
     void PrepareSolution();
 
-		/// \brief Project the found third foot step on the constraints
+    /// \brief Project the found third foot step on the constraints
     void ProjectionOnConstraints(double & X, double & Y);
 
   };
