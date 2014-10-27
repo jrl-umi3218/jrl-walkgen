@@ -2868,8 +2868,8 @@ new step has to be generate.
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
     double deltaZ,deltaZ2,deltaZ3;
     // double static CoMzpre = CoMz;
-    double up=0.1,upRight = 0.90 ,upLeft = 0.0;
-    double upRight1 = 0.90 ,upLeft1 = 0.0;
+    double up=0.1,upRight = 0.9 ,upLeft = 0.0;
+    double upRight1 = 0.9 ,upLeft1 = 0.0;
     double up_a=0.0, up_b=0.0;
 
     double down = 0.5, downRight =0.9, downLeft = 0.0;
