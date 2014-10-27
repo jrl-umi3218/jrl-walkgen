@@ -572,7 +572,6 @@ computing the analytical trajectories. */
     /*! Compute the total size of the array related to the steps. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
-    deque<COMState> filteredCoM = COMStates ;
 
     unsigned int n = COMStates.size();
     double KajitaPCpreviewWindow = 1.6 ;
@@ -653,7 +652,6 @@ computing the analytical trajectories. */
     }
     unsigned int N = ZMPPositions.size();
     int stage0 = 0 ;
-    int stage1 = 1 ;
     vector <vector<double> > ZMPMB (N , vector<double> (2,0.0)) ;
     for (unsigned int i = 0  ; i < N ; ++i)
     {
@@ -681,111 +679,16 @@ computing the analytical trajectories. */
     {
       for(int j=0;j<3;j++)
       {
-        filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-        filteredCoM[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
 //                COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
 //                COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
-      m_kajitaDynamicFilter->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
-                                          LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
-                                          filteredZMPMB[i] , stage1, i);
     }
-
-    cout << "COMStates.size() = " << COMStates.size() << endl ;
-    cout << "Buffer.size() = " << inputdeltaZMP_deq.size() << endl ;
-    cout << "outputDeltaCOMTraj_deq.size() =  " << outputDeltaCOMTraj_deq.size() << endl ;
 
     m_UpperTimeLimitToUpdateStacks = m_CurrentTime;
     for(int i=0;i<m_NumberOfIntervals;i++)
     {
       m_UpperTimeLimitToUpdateStacks += m_DeltaTj[i];
     }
-//
-//
-//    /// \brief Debug Purpose
-//    /// --------------------
-//    ifstream iof;
-//    string aFileName;
-//    aFileName = "/home/mnaveau/devel/HRP2Log/ClimbingWithTools-11072014-01-astate.log" ;
-//    iof.open(aFileName.c_str(),std::ifstream::in);
-//    string entete;
-//    getline(iof,entete);
-//    vector <vector <double> > Datas (4000,vector <double>(176));
-//    for(unsigned int i = 0 ; i < 4000 ; ++i)
-//    {
-//      for (unsigned int j = 0 ; j < 176 ; ++j )
-//      {
-//        iof >> Datas[i][j] ;
-//      }
-//    }
-//
-//    vector < MAL_VECTOR_TYPE(double) > POS (4000);
-//    vector < MAL_VECTOR_TYPE(double) > VIT (4000);
-//    vector < MAL_VECTOR_TYPE(double) > ACC (4000);
-//    for(unsigned int i = 0 ; i < 4000 ; ++i)
-//    {
-//      MAL_VECTOR_RESIZE(POS[i], 36);
-//      MAL_VECTOR_RESIZE(VIT[i], 36);
-//      MAL_VECTOR_RESIZE(ACC[i], 36);
-//    }
-//
-//    for (unsigned int j = 0 ; j < 6 ; ++j )
-//    {
-//      POS[0](j+158) = Datas[i][j] ;
-//      POS[1](j+158) = Datas[i][j] ;
-//    }
-//    for (unsigned int j = 0 ; j < 30 ; ++j )
-//    {
-//      POS[0](j+6) = Datas[i][j] ;
-//      POS[1](j+6) = Datas[i][j] ;
-//    }
-//
-//    for(unsigned int i = 2 ; i < 4000 ; ++i)
-//    {
-//      for (unsigned int j = 0 ; j < 30 ; ++j )
-//      {
-//         m_CurrentConfiguration = Datas[i][j] ;
-//      }
-//    }
-//
-//
-    double ecartMax_ZMP_ZMPMB=0.0;
-    double ecartMax_ZMP_ZMPcorrected=0.0;
-    double ecartMoy_ZMP_ZMPMB=0.0;
-    double ecartMoy_ZMP_ZMPcorrected=0.0;
-
-    for (unsigned int i = 0 ; i < n ; ++i )
-    {
-      double ecartZMP_ZMPMB = 0 ;
-      double ecartZMP_ZMPcorrected = 0 ;
-      ecartZMP_ZMPMB = (ZMPPositions[i].px - ZMPMB[i][0])*(ZMPPositions[i].px - ZMPMB[i][0])+
-	               (ZMPPositions[i].py - ZMPMB[i][1])*(ZMPPositions[i].py - ZMPMB[i][1]);
-
-      ecartZMP_ZMPcorrected = (ZMPPositions[i].px - filteredZMPMB[i][0])*
-			      (ZMPPositions[i].px - filteredZMPMB[i][0])
-				+
-                              (ZMPPositions[i].py - filteredZMPMB[i][1])*
-                              (ZMPPositions[i].py - filteredZMPMB[i][1]);
-      ecartZMP_ZMPMB = sqrt(ecartZMP_ZMPMB);
-      ecartZMP_ZMPcorrected = sqrt(ecartZMP_ZMPcorrected);
-      if(ecartZMP_ZMPMB > ecartMax_ZMP_ZMPMB)
-      {
-	ecartMax_ZMP_ZMPMB = ecartZMP_ZMPMB ;
-      }
-      if(ecartZMP_ZMPcorrected > ecartMax_ZMP_ZMPcorrected)
-      {
-	ecartMax_ZMP_ZMPcorrected = ecartZMP_ZMPcorrected ;
-      }
-      ecartMoy_ZMP_ZMPMB += ecartZMP_ZMPMB ;
-      ecartMoy_ZMP_ZMPcorrected += ecartZMP_ZMPcorrected ;
-    }
-    ecartMoy_ZMP_ZMPMB = ecartMoy_ZMP_ZMPMB/n ;
-    ecartMoy_ZMP_ZMPcorrected = ecartMoy_ZMP_ZMPcorrected/n ;
-
-    cout << "ecartMax_ZMP_ZMPMB = " << ecartMax_ZMP_ZMPMB << endl ;
-    cout << "ecartMax_ZMP_ZMPcorrected = " << ecartMax_ZMP_ZMPcorrected << endl ;
-    cout << "ecartMoy_ZMP_ZMPMB = " << ecartMoy_ZMP_ZMPMB << endl ;
-    cout << "ecartMoy_ZMP_ZMPcorrected = " << ecartMoy_ZMP_ZMPcorrected << endl ;
 
     for (unsigned int i = 0  ; i < KajitaPCpreviewWindow/m_SamplingPeriod ; ++i)
     {
@@ -794,92 +697,6 @@ computing the analytical trajectories. */
       LeftFootAbsolutePositions.pop_back();
       RightFootAbsolutePositions.pop_back();
     }
-
-    /// \brief Debug Purpose
-    /// --------------------
-    ofstream aof;
-    string aFileName;
-    ostringstream oss(std::ostringstream::ate);
-    static int iteration = 0;
-    /// \brief Debug Purpose
-    /// --------------------
-    oss.str("MorisawaData.dat");
-    aFileName = oss.str();
-    aof.open(aFileName.c_str(),ofstream::out);
-    aof.close();
-    ///----
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-    for (unsigned int i = 0 ; i < n ; ++i )
-    {
-      aof << i*m_SamplingPeriod << " "                           // 1
-          <<  COMStates[i].x[0] << " "                           // 2
-          <<  COMStates[i].x[1] << " "                           // 3
-          <<  COMStates[i].x[2] << " "                           // 4
-          <<  COMStates[i].y[0] << " "                           // 5
-          <<  COMStates[i].y[1] << " "                           // 6
-          <<  COMStates[i].y[2]  << " "                          // 7
-          <<  COMStates[i].z[0]  << " "                          // 8
-          <<  COMStates[i].z[1]  << " "                          // 9
-          <<  COMStates[i].z[2]  << " "                          // 10
-          <<  COMStates[i].roll[0]  << " "                       // 11
-          <<  COMStates[i].roll[1]  << " "                       // 12
-          <<  COMStates[i].roll[2]  << " "                       // 13
-          <<  COMStates[i].pitch[0]  << " "                      // 14
-          <<  COMStates[i].pitch[1]  << " "                      // 15
-          <<  COMStates[i].pitch[2]  << " "                      // 16
-          <<  COMStates[i].yaw[0]  << " "                        // 17
-          <<  COMStates[i].yaw[1]  << " "                        // 18
-          <<  COMStates[i].yaw[2]  << " "                        // 19
-          <<  ZMPPositions[i].px  << " "                         // 20
-          <<  ZMPPositions[i].py  << " "                         // 21
-          <<  ZMPMB[i][0] << " "                                 // 22
-          <<  ZMPMB[i][1] << " "                                 // 23
-          <<  filteredZMPMB[i][0] << " "                         // 24
-          <<  filteredZMPMB[i][1] << " "                         // 25
-          <<  inputdeltaZMP_deq[i].px << " "                     // 26
-          <<  inputdeltaZMP_deq[i].py << " "                     // 27
-          <<  outputDeltaCOMTraj_deq[i].x[0] << " "              // 28
-          <<  outputDeltaCOMTraj_deq[i].x[1] << " "              // 29
-          <<  outputDeltaCOMTraj_deq[i].x[2] << " "              // 30
-          <<  outputDeltaCOMTraj_deq[i].y[0] << " "              // 31
-          <<  outputDeltaCOMTraj_deq[i].y[1] << " "              // 32
-          <<  outputDeltaCOMTraj_deq[i].y[2] << " "              // 33
-          <<  LeftFootAbsolutePositions[i].x  << " "             // 34
-          <<  LeftFootAbsolutePositions[i].y  << " "             // 35
-          <<  LeftFootAbsolutePositions[i].z  << " "             // 36
-          <<  LeftFootAbsolutePositions[i].theta  << " "         // 37
-          <<  LeftFootAbsolutePositions[i].omega  << " "         // 38
-          <<  LeftFootAbsolutePositions[i].dx  << " "            // 39
-          <<  LeftFootAbsolutePositions[i].dy  << " "            // 40
-          <<  LeftFootAbsolutePositions[i].dz  << " "            // 41
-          <<  LeftFootAbsolutePositions[i].dtheta  << " "        // 42
-          <<  LeftFootAbsolutePositions[i].domega  << " "        // 43
-          <<  LeftFootAbsolutePositions[i].ddx  << " "           // 44
-          <<  LeftFootAbsolutePositions[i].ddy  << " "           // 45
-          <<  LeftFootAbsolutePositions[i].ddz  << " "           // 46
-          <<  LeftFootAbsolutePositions[i].ddtheta  << " "       // 47
-          <<  LeftFootAbsolutePositions[i].ddomega  << " "       // 48
-          <<  RightFootAbsolutePositions[i].x  << " "            // 49
-          <<  RightFootAbsolutePositions[i].y  << " "            // 50
-          <<  RightFootAbsolutePositions[i].z  << " "            // 51
-          <<  RightFootAbsolutePositions[i].theta  << " "        // 52
-          <<  RightFootAbsolutePositions[i].omega  << " "        // 53
-          <<  RightFootAbsolutePositions[i].dx  << " "           // 54
-          <<  RightFootAbsolutePositions[i].dy  << " "           // 55
-          <<  RightFootAbsolutePositions[i].dz  << " "           // 56
-          <<  RightFootAbsolutePositions[i].dtheta  << " "       // 57
-          <<  RightFootAbsolutePositions[i].domega  << " "       // 58
-          <<  RightFootAbsolutePositions[i].ddx  << " "          // 59
-          <<  RightFootAbsolutePositions[i].ddy  << " "          // 60
-          <<  RightFootAbsolutePositions[i].ddz  << " "          // 61
-          <<  RightFootAbsolutePositions[i].ddtheta  << " "      // 62
-          <<  RightFootAbsolutePositions[i].ddomega  << " "      // 63
-          << endl ;
-    }
-    aof.close() ;
-    ++iteration;
 
   }
 
@@ -964,310 +781,63 @@ When the limit is reached, and the stack exhausted this method is called again. 
     {
       if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
       {
-        //        ZMPPosition aZMPPos0;
-        //        memset(&aZMPPos0,0,sizeof(aZMPPos0));
-        //        COMState aCOMPos0;
-        //        memset(&aCOMPos0,0,sizeof(aCOMPos0));
-        //        unsigned int n = m_kajitaDynamicFilter->getPreviewWindowSize_()/m_SamplingPeriod ;
-        //        std::deque<ZMPPosition> deltaZMPPos_deq(n,aZMPPos0) ;
-        //        std::deque<COMState> deltaCOMPos_deq(n,aCOMPos0) ;
-        //        if (m_FilteringActivate)
-        //        {
-        //          for (unsigned int i = 0 ; i < n ; ++i)
-        //          {
-        //            double FZmpX=0, FComX=0,FComdX=0;
-        //
-        //            // Should we filter ?
-        //            bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
-        //            if (r)
-        //            {
-        //              double FZmpY=0, FComY=0,FComdY=0;
-        //              // Yes we should.
-        //              m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
-        //
-        //              /*! Feed the ZMPPositions. */
-        //              deltaZMPPos_deq[i].px = FZmpX;
-        //              deltaZMPPos_deq[i].py = FZmpY;
-        //
-        //              /*! Feed the COMStates. */
-        //              deltaCOMPos_deq[i].x[0] = FComX; deltaCOMPos_deq[i].x[1] = FComdX;
-        //              deltaCOMPos_deq[i].y[0] = FComY; deltaCOMPos_deq[i].y[1] = FComdY;
-        //            }
-        //          }
-        //        }
-        std::deque<ZMPPosition> ZMPPos_deq ;
-        std::deque<COMState> COMPos_deq ;
-        std::deque<FootAbsolutePosition> LeftFootAbsPos ;
-        std::deque<FootAbsolutePosition> RightFootAbsPos ;
-        vector <vector<double> > ZMPMB ;
-        FillQueues(m_kajitaDynamicFilter->getInterpolationPeriod(),
-                   time, time + m_kajitaDynamicFilter->getPreviewWindowSize_(),
-                   ZMPPos_deq, COMPos_deq, LeftFootAbsPos, RightFootAbsPos);
-
-        FinalZMPPositions.push_back(ZMPPos_deq[0]);
-        FinalCOMStates.push_back(COMPos_deq[0]);
-        FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos[0]);
-        FinalRightFootAbsolutePositions.push_back(RightFootAbsPos[0]);
-
-        static int iteration = 0;
-        int stage0 = 0 ;
-        int stage1 = 1 ;
-        int stage2 = 2 ;
-        vector<double> ZMPMBcontrol (2,0.0);
-        m_kajitaDynamicFilter->stage0INstage1();
-        m_kajitaDynamicFilter->ComputeZMPMB( m_SamplingPeriod, COMPos_deq[0],
-                                             LeftFootAbsPos[0], RightFootAbsPos[0],
-                                             ZMPMBcontrol , stage0, iteration);
-
-        for (unsigned int i = 0  ; i < COMPos_deq.size() ; ++i)
+        ZMPPosition aZMPPos;
+        memset(&aZMPPos,0,sizeof(aZMPPos));
+        COMState aCOMPos;
+        memset(&aCOMPos,0,sizeof(aCOMPos));
+        if (m_FilteringActivate)
         {
-          vector<double> tmpZMPMB (2,0.0);
-          m_kajitaDynamicFilter->ComputeZMPMB( m_SamplingPeriod, COMPos_deq[i],
-                                               LeftFootAbsPos[i], RightFootAbsPos[i],
-                                               tmpZMPMB , stage1 , i+iteration);
-          ZMPMB.push_back(tmpZMPMB);
+          double FZmpX=0, FComX=0,FComdX=0;
+          // Should we filter ?
+          bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
+          if (r)
+          {
+            double FZmpY=0, FComY=0,FComdY=0;
+            // Yes we should.
+            m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
+            /*! Feed the ZMPPositions. */
+            aZMPPos.px = FZmpX;
+            aZMPPos.py = FZmpY;
+            /*! Feed the COMStates. */
+            aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
+            aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
+          }
         }
-
-        deque<ZMPPosition> inputdeltaZMP_deq(ZMPMB.size()) ;
-        deque<COMState> outputDeltaCOMTraj_deq ;
-
-        for (unsigned int i = 0 ; i < ZMPMB.size() ; ++i)
-        {
-          inputdeltaZMP_deq[i].px = ZMPPos_deq[i].px - ZMPMB[i][0] ;
-          inputdeltaZMP_deq[i].py = ZMPPos_deq[i].py - ZMPMB[i][1] ;
-          inputdeltaZMP_deq[i].pz = 0.0 ;
-          inputdeltaZMP_deq[i].theta = 0.0 ;
-          inputdeltaZMP_deq[i].time = time + i * m_kajitaDynamicFilter->getInterpolationPeriod() ;
-          inputdeltaZMP_deq[i].stepType = ZMPPos_deq[i].stepType ;
-        }
-        m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
-
-        COMState aCOMState = COMPos_deq[0] ;
-        for(int j=0;j<3;j++)
-        {
-          //          aCOMState.x[j] += outputDeltaCOMTraj_deq[0].x[j] ;
-          //          aCOMState.y[j] += outputDeltaCOMTraj_deq[0].y[j] ;
-        }
-        vector<double> ZMPMBcorrige (2,0.0);
-        m_kajitaDynamicFilter->ComputeZMPMB( m_SamplingPeriod, aCOMState,
-                                             LeftFootAbsPos[0], RightFootAbsPos[0],
-                                             ZMPMBcorrige , stage2, iteration);
-
-        /// \brief Debug Purpose
-        /// --------------------
-        ofstream aof;
-        string aFileName;
-        ostringstream oss(std::ostringstream::ate);
-        int iteration1000 = (int)iteration/1000;
-        int iteration100 = (int)(iteration - iteration1000*1000)/100;
-        int iteration10 = (int)(iteration - iteration1000*1000 - iteration100*100)/10;
-        int iteration1 = (int)(iteration - iteration1000*1000 - iteration100*100 - iteration10*10 )/1;
-
-        /// \brief Debug Purpose
-        /// --------------------
-        oss.str("ZMPMBbuffer/ZMPMBbuffer");
-        oss << "_" << iteration1000 << iteration100 << iteration10 << iteration1 << ".dat";
-        aFileName = oss.str();
-        aof.open(aFileName.c_str(),ofstream::out);
-        aof.close();
-        ///----
-        aof.open(aFileName.c_str(),ofstream::app);
-        aof.precision(8);
-        aof.setf(ios::scientific, ios::floatfield);
-        for (unsigned int i = 0 ; i < COMPos_deq.size() ; ++i )
-        {
-          aof << i*m_SamplingPeriod << " "                // 1
-              <<  COMPos_deq[i].x[0] << " "               // 2
-              <<  COMPos_deq[i].x[1] << " "               // 3
-              <<  COMPos_deq[i].x[2] << " "               // 4
-              <<  COMPos_deq[i].y[0] << " "               // 5
-              <<  COMPos_deq[i].y[1] << " "               // 6
-              <<  COMPos_deq[i].y[2]  << " "              // 7
-              <<  COMPos_deq[i].z[0]  << " "              // 8
-              <<  COMPos_deq[i].z[1]  << " "              // 9
-              <<  COMPos_deq[i].z[2]  << " "              // 10
-              <<  COMPos_deq[i].roll[0]  << " "           // 11
-              <<  COMPos_deq[i].roll[1]  << " "           // 12
-              <<  COMPos_deq[i].roll[2]  << " "           // 13
-              <<  COMPos_deq[i].pitch[0]  << " "          // 14
-              <<  COMPos_deq[i].pitch[1]  << " "          // 15
-              <<  COMPos_deq[i].pitch[2]  << " "          // 16
-              <<  COMPos_deq[i].yaw[0]  << " "            // 17
-              <<  COMPos_deq[i].yaw[1]  << " "            // 18
-              <<  COMPos_deq[i].yaw[2]  << " "            // 19
-              <<  ZMPPos_deq[i].px  << " "                // 20
-              <<  ZMPPos_deq[i].py  << " "                // 21
-              <<  ZMPMB[i][0] << " "                      // 22
-              <<  ZMPMB[i][1] << " "                      // 23
-              <<  ZMPMBcorrige[0] << " "                  // 24
-              <<  ZMPMBcorrige[1] << " "                  // 25
-              <<  inputdeltaZMP_deq[i].px << " "          // 26
-              <<  inputdeltaZMP_deq[i].py << " "          // 27
-              <<  outputDeltaCOMTraj_deq[0].x[0] << " "   // 28
-              <<  outputDeltaCOMTraj_deq[0].x[1] << " "   // 29
-              <<  outputDeltaCOMTraj_deq[0].x[2] << " "   // 30
-              <<  outputDeltaCOMTraj_deq[0].y[0] << " "   // 31
-              <<  outputDeltaCOMTraj_deq[0].y[1] << " "   // 32
-              <<  outputDeltaCOMTraj_deq[0].y[2] << " "   // 33
-              <<  LeftFootAbsPos[i].x  << " "             // 34
-              <<  LeftFootAbsPos[i].y  << " "             // 35
-              <<  LeftFootAbsPos[i].z  << " "             // 36
-              <<  LeftFootAbsPos[i].theta  << " "         // 37
-              <<  LeftFootAbsPos[i].omega  << " "         // 38
-              <<  LeftFootAbsPos[i].dx  << " "            // 39
-              <<  LeftFootAbsPos[i].dy  << " "            // 40
-              <<  LeftFootAbsPos[i].dz  << " "            // 41
-              <<  LeftFootAbsPos[i].dtheta  << " "        // 42
-              <<  LeftFootAbsPos[i].domega  << " "        // 43
-              <<  LeftFootAbsPos[i].ddx  << " "           // 44
-              <<  LeftFootAbsPos[i].ddy  << " "           // 45
-              <<  LeftFootAbsPos[i].ddz  << " "           // 46
-              <<  LeftFootAbsPos[i].ddtheta  << " "       // 47
-              <<  LeftFootAbsPos[i].ddomega  << " "       // 48
-              <<  RightFootAbsPos[i].x  << " "            // 49
-              <<  RightFootAbsPos[i].y  << " "            // 50
-              <<  RightFootAbsPos[i].z  << " "            // 51
-              <<  RightFootAbsPos[i].theta  << " "        // 52
-              <<  RightFootAbsPos[i].omega  << " "        // 53
-              <<  RightFootAbsPos[i].dx  << " "           // 54
-              <<  RightFootAbsPos[i].dy  << " "           // 55
-              <<  RightFootAbsPos[i].dz  << " "           // 56
-              <<  RightFootAbsPos[i].dtheta  << " "       // 57
-              <<  RightFootAbsPos[i].domega  << " "       // 58
-              <<  RightFootAbsPos[i].ddx  << " "          // 59
-              <<  RightFootAbsPos[i].ddy  << " "          // 60
-              <<  RightFootAbsPos[i].ddz  << " "          // 61
-              <<  RightFootAbsPos[i].ddtheta  << " "      // 62
-              <<  RightFootAbsPos[i].ddomega  << " "      // 63
-              << endl ;
-        }
-        aof.close() ;
-
-
-        oss.str("ZMPMB.dat");
-        aFileName = oss.str();
-        if (iteration == 0)
-        {
-          aof.open(aFileName.c_str(),ofstream::out);
-          aof.close();
-        }
-        aof.open(aFileName.c_str(),ofstream::app);
-        aof.precision(8);
-        aof.setf(ios::scientific, ios::floatfield);
-        aof << iteration*m_SamplingPeriod << " "        // 1
-            <<  COMPos_deq[0].x[0] << " "               // 2
-            <<  COMPos_deq[0].x[1] << " "               // 3
-            <<  COMPos_deq[0].x[2] << " "               // 4
-            <<  COMPos_deq[0].y[0] << " "               // 5
-            <<  COMPos_deq[0].y[1] << " "               // 6
-            <<  COMPos_deq[0].y[2]  << " "              // 7
-            <<  COMPos_deq[0].z[0]  << " "              // 8
-            <<  COMPos_deq[0].z[1]  << " "              // 9
-            <<  COMPos_deq[0].z[2]  << " "              // 10
-            <<  COMPos_deq[0].roll[0]  << " "           // 11
-            <<  COMPos_deq[0].roll[1]  << " "           // 12
-            <<  COMPos_deq[0].roll[2]  << " "           // 13
-            <<  COMPos_deq[0].pitch[0]  << " "          // 14
-            <<  COMPos_deq[0].pitch[1]  << " "          // 15
-            <<  COMPos_deq[0].pitch[2]  << " "          // 16
-            <<  COMPos_deq[0].yaw[0]  << " "            // 17
-            <<  COMPos_deq[0].yaw[1]  << " "            // 18
-            <<  COMPos_deq[0].yaw[2]  << " "            // 19
-            <<  ZMPPos_deq[0].px  << " "                // 20
-            <<  ZMPPos_deq[0].py  << " "                // 21
-            <<  ZMPMB[0][0] << " "                      // 22
-            <<  ZMPMB[0][1] << " "                      // 23
-            <<  ZMPMBcorrige[0] << " "                  // 24
-            <<  ZMPMBcorrige[1] << " "                  // 25
-            <<  inputdeltaZMP_deq[0].px << " "          // 26
-            <<  inputdeltaZMP_deq[0].py << " "          // 27
-            <<  outputDeltaCOMTraj_deq[0].x[0] << " "   // 28
-            <<  outputDeltaCOMTraj_deq[0].x[1] << " "   // 29
-            <<  outputDeltaCOMTraj_deq[0].x[2] << " "   // 30
-            <<  outputDeltaCOMTraj_deq[0].y[0] << " "   // 31
-            <<  outputDeltaCOMTraj_deq[0].y[1] << " "   // 32
-            <<  outputDeltaCOMTraj_deq[0].y[2] << " "   // 33
-            <<  LeftFootAbsPos[0].x  << " "             // 34
-            <<  LeftFootAbsPos[0].y  << " "             // 35
-            <<  LeftFootAbsPos[0].z  << " "             // 36
-            <<  LeftFootAbsPos[0].theta  << " "         // 37
-            <<  LeftFootAbsPos[0].omega  << " "         // 38
-            <<  LeftFootAbsPos[0].dx  << " "            // 39
-            <<  LeftFootAbsPos[0].dy  << " "            // 40
-            <<  LeftFootAbsPos[0].dz  << " "            // 41
-            <<  LeftFootAbsPos[0].dtheta  << " "        // 42
-            <<  LeftFootAbsPos[0].domega  << " "        // 43
-            <<  LeftFootAbsPos[0].ddx  << " "           // 44
-            <<  LeftFootAbsPos[0].ddy  << " "           // 45
-            <<  LeftFootAbsPos[0].ddz  << " "           // 46
-            <<  LeftFootAbsPos[0].ddtheta  << " "       // 47
-            <<  LeftFootAbsPos[0].ddomega  << " "       // 48
-            <<  RightFootAbsPos[0].x  << " "            // 49
-            <<  RightFootAbsPos[0].y  << " "            // 50
-            <<  RightFootAbsPos[0].z  << " "            // 51
-            <<  RightFootAbsPos[0].theta  << " "        // 52
-            <<  RightFootAbsPos[0].omega  << " "        // 53
-            <<  RightFootAbsPos[0].dx  << " "           // 54
-            <<  RightFootAbsPos[0].dy  << " "           // 55
-            <<  RightFootAbsPos[0].dz  << " "           // 56
-            <<  RightFootAbsPos[0].dtheta  << " "       // 57
-            <<  RightFootAbsPos[0].domega  << " "       // 58
-            <<  RightFootAbsPos[0].ddx  << " "          // 59
-            <<  RightFootAbsPos[0].ddy  << " "          // 60
-            <<  RightFootAbsPos[0].ddz  << " "          // 61
-            <<  RightFootAbsPos[0].ddtheta  << " "      // 62
-            <<  RightFootAbsPos[0].ddomega  << " "      // 63
-            << endl ;
-        aof.close();
-
-
-
-        static double ecartMax_ZMP_ZMPMB=0.0;
-        static double ecartMax_ZMP_ZMPcorrected=0.0;
-        static double sumZMP_ZMPMB=0.0;
-        static double sumZMP_ZMPcorrected=0.0;
-        static double ecartMoy_ZMP_ZMPMB=0.0;
-        static double ecartMoy_ZMP_ZMPcorrected=0.0;
-
-        double ecartZMP_ZMPMB = 0 ;
-        double ecartZMP_ZMPcorrected = 0 ;
-        ecartZMP_ZMPMB = (ZMPPos_deq[0].px - ZMPMB[0][0])*(ZMPPos_deq[0].px - ZMPMB[0][0])+
-                         (ZMPPos_deq[0].py - ZMPMB[0][1])*(ZMPPos_deq[0].py - ZMPMB[0][1]);
-
-        ecartZMP_ZMPcorrected = (ZMPPos_deq[0].px - ZMPMBcorrige[0])*
-                                (ZMPPos_deq[0].px - ZMPMBcorrige[0])
-                                +
-                                (ZMPPos_deq[0].py - ZMPMBcorrige[1])*
-                                (ZMPPos_deq[0].py - ZMPMBcorrige[1]);
-        ecartZMP_ZMPMB = sqrt(ecartZMP_ZMPMB);
-        ecartZMP_ZMPcorrected = sqrt(ecartZMP_ZMPcorrected);
-        if(ecartZMP_ZMPMB > ecartMax_ZMP_ZMPMB)
-        {
-          ecartMax_ZMP_ZMPMB = ecartZMP_ZMPMB ;
-        }
-        if(ecartZMP_ZMPcorrected > ecartMax_ZMP_ZMPcorrected)
-        {
-          ecartMax_ZMP_ZMPcorrected = ecartZMP_ZMPcorrected ;
-        }
-        sumZMP_ZMPMB += ecartZMP_ZMPMB ;
-        sumZMP_ZMPcorrected += ecartZMP_ZMPcorrected ;
-
-
-        ecartMoy_ZMP_ZMPMB = sumZMP_ZMPMB/iteration ;
-        ecartMoy_ZMP_ZMPcorrected = sumZMP_ZMPcorrected/iteration ;
-
-        cout << "ecartMax_ZMP_ZMPMB = " << ecartMax_ZMP_ZMPMB << endl ;
-        cout << "ecartMax_ZMP_ZMPcorrected = " << ecartMax_ZMP_ZMPcorrected << endl ;
-        cout << "ecartMoy_ZMP_ZMPMB = " << ecartMoy_ZMP_ZMPMB << endl ;
-        cout << "ecartMoy_ZMP_ZMPcorrected = " << ecartMoy_ZMP_ZMPcorrected << endl ;
-
-         ++iteration;
+        /*! Feed the ZMPPositions. */
+        double lZMPPosx=0.0,lZMPPosy=0.0;
+        m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(time,lZMPPosx,lIndexInterval);
+        aZMPPos.px += lZMPPosx;
+        m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(time,lZMPPosy,lIndexInterval);
+        aZMPPos.py += lZMPPosy;
+        FinalZMPPositions.push_back(aZMPPos);
+        /*! Feed the COMStates. */
+        double lCOMPosx=0.0, lCOMPosdx=0.0;
+        double lCOMPosy=0.0, lCOMPosdy=0.0;
+        m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,lCOMPosx,lIndexInterval);
+        m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(time,lCOMPosdx,lIndexInterval);
+        m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,lCOMPosy,lIndexInterval);
+        m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(time,lCOMPosdy,lIndexInterval);
+        aCOMPos.x[0] += lCOMPosx; aCOMPos.x[1] += lCOMPosdx;
+        aCOMPos.y[0] += lCOMPosy; aCOMPos.y[1] += lCOMPosdy;
+        aCOMPos.z[0] = m_InitialPoseCoMHeight;
+        FinalCOMStates.push_back(aCOMPos);
+        /*! Feed the FootPositions. */
+        /*! Left */
+        FootAbsolutePosition LeftFootAbsPos;
+        memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
+        m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,time,LeftFootAbsPos,lIndexInterval);
+        FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
+        /*! Right */
+        FootAbsolutePosition RightFootAbsPos;
+        memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
+        m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,RightFootAbsPos,lIndexInterval);
+        FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
       }
     }
     else
     {
       /*! We reached the end of the trajectory generated
-      and no foot steps have been added. */
+          and no foot steps have been added. */
       m_OnLineMode = false;
     }
   }
