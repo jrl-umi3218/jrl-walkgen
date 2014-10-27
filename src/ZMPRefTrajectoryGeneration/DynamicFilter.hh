@@ -123,15 +123,6 @@ namespace PatternGeneratorJRL
     /// given by the function "filter"
     void InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq);
 
-    /// \brief Compute the ZMPMB according to a configuration
-    void ComputeZMPMB(
-        MAL_VECTOR_TYPE(double) & configuration,
-        MAL_VECTOR_TYPE(double) & velocity,
-        MAL_VECTOR_TYPE(double) & acceleration,
-        vector<double> & ZMPMB);
-
-    void computeWaist(const FootAbsolutePosition & inputLeftFoot);
-
     // -------------------------------------------------------------------
 
   public: // The accessors
