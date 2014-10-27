@@ -79,6 +79,10 @@ void MPCTrajectoryGeneration::CallMethod(std::string & Method, std::istringstrea
     {
       strm >> Omega_;
     }
+  else if (Method==":omega2")
+    {
+      strm >> Omega2_;
+    }
   else if (Method==":stepheight")
     {
       strm >> StepHeight_;

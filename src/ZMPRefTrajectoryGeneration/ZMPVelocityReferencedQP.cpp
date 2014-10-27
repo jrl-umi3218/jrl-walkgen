@@ -819,7 +819,7 @@ void
 
     /// \brief Debug Purpose
     /// --------------------
-    oss.str("TestHerdt2010DynamicCoMComparison2.dat");
+    oss.str("/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/walkSideward2m_s.dat");
     aFileName = oss.str();
     if(iteration == 0)
     {
@@ -832,116 +832,75 @@ void
     aof.setf(ios::scientific, ios::floatfield);
     for (unsigned int i = 0 ; i < FinalCOMTraj_deq.size()-CurrentIndex_ ; ++i )
     {
-      aof << filterprecision( FinalLeftFootTraj_deq[i].x ) << " "       // 1
-          << filterprecision( FinalLeftFootTraj_deq[i].y ) << " "       // 2
-          << filterprecision( FinalLeftFootTraj_deq[i].z ) << " "       // 3
-          << filterprecision( FinalLeftFootTraj_deq[i].theta ) << " "   // 4
-          << filterprecision( FinalLeftFootTraj_deq[i].omega ) << " "   // 5
-          << filterprecision( FinalLeftFootTraj_deq[i].dx ) << " "      // 6
-          << filterprecision( FinalLeftFootTraj_deq[i].dy ) << " "      // 7
-          << filterprecision( FinalLeftFootTraj_deq[i].dz ) << " "      // 8
-          << filterprecision( FinalLeftFootTraj_deq[i].dtheta ) << " "  // 9
-          << filterprecision( FinalLeftFootTraj_deq[i].domega ) << " "  // 10
-          << filterprecision( FinalLeftFootTraj_deq[i].ddx ) << " "     // 11
-          << filterprecision( FinalLeftFootTraj_deq[i].ddy ) << " "     // 12
-          << filterprecision( FinalLeftFootTraj_deq[i].ddz ) << " "     // 13
-          << filterprecision( FinalLeftFootTraj_deq[i].ddtheta ) << " " // 14
-          << filterprecision( FinalLeftFootTraj_deq[i].ddomega ) << " " // 15
-          << filterprecision( FinalRightFootTraj_deq[i].x ) << " "      // 16
-          << filterprecision( FinalRightFootTraj_deq[i].y ) << " "      // 17
-          << filterprecision( FinalRightFootTraj_deq[i].z ) << " "  	// 18
-          << filterprecision( FinalRightFootTraj_deq[i].theta ) << " "  // 19
-          << filterprecision( FinalRightFootTraj_deq[i].omega ) << " "  // 20
-          << filterprecision( FinalRightFootTraj_deq[i].dx ) << " "     // 21
-          << filterprecision( FinalRightFootTraj_deq[i].dy ) << " "     // 22
-          << filterprecision( FinalRightFootTraj_deq[i].dz ) << " "  	// 23
-          << filterprecision( FinalRightFootTraj_deq[i].dtheta ) << " " // 24
-          << filterprecision( FinalRightFootTraj_deq[i].domega ) << " " // 25
-          << filterprecision( FinalRightFootTraj_deq[i].ddx ) << " "    // 26
-          << filterprecision( FinalRightFootTraj_deq[i].ddy ) << " "    // 27
-          << filterprecision( FinalRightFootTraj_deq[i].ddz ) << " "  	// 28
-          << filterprecision( FinalRightFootTraj_deq[i].ddtheta ) << " "// 29
-          << filterprecision( FinalRightFootTraj_deq[i].ddomega ) << " "// 30
-          << filterprecision( FinalCOMTraj_deq[i].x[0] ) << " "         // 31
-          << filterprecision( FinalCOMTraj_deq[i].y[0] ) << " "         // 32
-          << filterprecision( FinalCOMTraj_deq[i].z[0] ) << " "         // 33
-          << filterprecision( FinalCOMTraj_deq[i].x[1] ) << " "         // 34
-          << filterprecision( FinalCOMTraj_deq[i].y[1] ) << " "         // 35
-          << filterprecision( FinalCOMTraj_deq[i].z[1] ) << " "         // 36
-          << filterprecision( FinalCOMTraj_deq[i].x[2] ) << " "         // 37
-          << filterprecision( FinalCOMTraj_deq[i].y[2] ) << " "         // 38
-          << filterprecision( FinalCOMTraj_deq[i].z[2] ) << " "         // 39
-          << filterprecision( FinalCOMTraj_deq[i].roll[0] ) << " "      // 40
-          << filterprecision( FinalCOMTraj_deq[i].pitch[0] ) << " "     // 41
-          << filterprecision( FinalCOMTraj_deq[i].yaw[0] ) << " "       // 42
-          << filterprecision( FinalCOMTraj_deq[i].roll[1] ) << " "      // 43
-          << filterprecision( FinalCOMTraj_deq[i].pitch[1] ) << " "     // 44
-          << filterprecision( FinalCOMTraj_deq[i].yaw[1] ) << " "       // 45
-          << filterprecision( FinalCOMTraj_deq[i].roll[2] ) << " "      // 46
-          << filterprecision( FinalCOMTraj_deq[i].pitch[2] ) << " "     // 47
-          << filterprecision( FinalCOMTraj_deq[i].yaw[2] ) << " "       // 48
-          << filterprecision( FinalLeftFootTraj_deq[i].dddx ) << " "       // 49
-          << filterprecision( FinalRightFootTraj_deq[i].dddx ) << " "       // 50
-          << filterprecision( zmpmb[i][0] ) << " "       // 51
-          << filterprecision( zmpmb[i][1] ) << " "       // 52
-          << filterprecision( FinalZMPTraj_deq[i].px ) << " "       // 53
-          << filterprecision( FinalZMPTraj_deq[i].py ) << " "       // 54
-          << filterprecision( filteredZMPMB[i][0] ) << " "       // 55
-          << filterprecision( filteredZMPMB[i][1] ) << " "       // 56
-          << filterprecision( outputDeltaCOMTraj_deq[i].x[0] ) << " "       // 57
-          << filterprecision( outputDeltaCOMTraj_deq[i].x[1] ) << " "       // 58
-          << filterprecision( outputDeltaCOMTraj_deq[i].x[2] ) << " "       // 59
-          << filterprecision( outputDeltaCOMTraj_deq[i].y[0] ) << " "       // 60
-          << filterprecision( outputDeltaCOMTraj_deq[i].y[1] ) << " "       // 61
-          << filterprecision( outputDeltaCOMTraj_deq[i].y[2] ) << " "       // 62
-          << endl ;
+      aof << filterprecision( time + 0.005*i ) << " "                   // 1
+          << filterprecision( FinalCOMTraj_deq[i].x[0] ) << " "         // 2
+          << filterprecision( FinalCOMTraj_deq[i].y[0] ) << " "         // 3
+          << filterprecision( FinalCOMTraj_deq[i].z[0] ) << " "         // 4
+          << filterprecision( FinalCOMTraj_deq[i].yaw[0] ) << " "       // 5
+          << filterprecision( FinalCOMTraj_deq[i].x[1] ) << " "         // 6
+          << filterprecision( FinalCOMTraj_deq[i].y[1] ) << " "         // 7
+          << filterprecision( FinalCOMTraj_deq[i].z[1] ) << " "         // 8
+          << filterprecision( FinalCOMTraj_deq[i].yaw[1] ) << " "       // 9
+          << filterprecision( FinalCOMTraj_deq[i].x[2] ) << " "         // 10
+          << filterprecision( FinalCOMTraj_deq[i].y[2] ) << " "         // 11
+          << filterprecision( FinalCOMTraj_deq[i].z[2] ) << " "         // 12
+          << filterprecision( FinalCOMTraj_deq[i].yaw[2] ) << " "       // 13
+          << filterprecision( FinalZMPTraj_deq[i].px ) << " "           // 14
+          << filterprecision( FinalZMPTraj_deq[i].py ) << " "           // 15
+          << filterprecision( FinalLeftFootTraj_deq[i].x ) << " "       // 16
+          << filterprecision( FinalLeftFootTraj_deq[i].y ) << " "       // 17
+          << filterprecision( FinalLeftFootTraj_deq[i].z ) << " "       // 18
+          << filterprecision( FinalLeftFootTraj_deq[i].dx ) << " "      // 19
+          << filterprecision( FinalLeftFootTraj_deq[i].dy ) << " "      // 20
+          << filterprecision( FinalLeftFootTraj_deq[i].dz ) << " "      // 21
+          << filterprecision( FinalLeftFootTraj_deq[i].ddx ) << " "     // 22
+          << filterprecision( FinalLeftFootTraj_deq[i].ddy ) << " "     // 23
+          << filterprecision( FinalLeftFootTraj_deq[i].ddz ) << " "     // 24
+          << filterprecision( FinalLeftFootTraj_deq[i].theta ) << " "   // 25
+          << filterprecision( FinalLeftFootTraj_deq[i].omega ) << " "   // 26
+          << filterprecision( FinalLeftFootTraj_deq[i].omega2 ) << " "  // 27
+          << filterprecision( FinalRightFootTraj_deq[i].x ) << " "      // 28
+          << filterprecision( FinalRightFootTraj_deq[i].y ) << " "      // 29
+          << filterprecision( FinalRightFootTraj_deq[i].z ) << " "      // 30
+          << filterprecision( FinalRightFootTraj_deq[i].dx ) << " "     // 31
+          << filterprecision( FinalRightFootTraj_deq[i].dy ) << " "     // 32
+          << filterprecision( FinalRightFootTraj_deq[i].dz ) << " "     // 33
+          << filterprecision( FinalRightFootTraj_deq[i].ddx ) << " "    // 34
+          << filterprecision( FinalRightFootTraj_deq[i].ddy ) << " "    // 35
+          << filterprecision( FinalRightFootTraj_deq[i].ddz ) << " "    // 36
+          << filterprecision( FinalRightFootTraj_deq[i].theta ) << " "  // 37
+          << filterprecision( FinalRightFootTraj_deq[i].omega ) << " "  // 38
+          << filterprecision( FinalRightFootTraj_deq[i].omega2 ) << " ";// 39
+      int nstep = Solution_.SupportStates_deq.back().StepNumber ;
+      for (unsigned int j = 0 ; j < QP_N_ ; ++j )
+      {
+        aof << filterprecision( Solution_.Solution_vec[j] ) << " "      ; // 40-56
+      }
+      for (unsigned int j = 0 ; j < 2 ; ++j )
+      {
+        if (j >= nstep)
+        {
+          aof << filterprecision( 0.0 ) << " "      ;
+        }else{
+          aof << filterprecision( Solution_.Solution_vec[2*QP_N_+j] ) << " "      ; // 57 58
+        }
+      }
+      for (unsigned int j = 0 ; j < QP_N_ ; ++j )
+      {
+        aof << filterprecision( Solution_.Solution_vec[QP_N_+j] ) << " "      ; // 59-75
+      }
+      for (unsigned int j = 0 ; j < 2 ; ++j )
+      {
+        if (j >= nstep)
+        {
+          aof << filterprecision( 0.0 ) << " "      ;
+        }else{
+          aof << filterprecision( Solution_.Solution_vec[2*QP_N_+nstep+j] ) << " "      ;// 76 77
+        }
+      }
+      aof << endl ;
     }
     aof.close();
-
-    /// \brief Debug Purpose
-    /// --------------------
-    oss.str("/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/walkSideward2m_s.dat");
-    aFileName = oss.str();
-    if(iteration == 0)
-    {
-      aof.open(aFileName.c_str(),ofstream::out);
-      aof.close();
-    }
-    ///----
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-    int nstep = Solution_.SupportStates_deq.back().StepNumber ;
-    for (unsigned int i = 0 ; i < QP_N_ ; ++i )
-    {
-      aof << filterprecision( Solution_.Solution_vec[i] ) << " "      ; // 1
-    }
-    for (unsigned int i = 0 ; i < 2 ; ++i )
-    {
-      if (i >= nstep)
-      {
-        aof << filterprecision( 0.0 ) << " "      ; // 1
-      }else{
-        aof << filterprecision( Solution_.Solution_vec[2*QP_N_+i] ) << " "      ; // 1
-      }
-    }
-    for (unsigned int i = 0 ; i < QP_N_ ; ++i )
-    {
-      aof << filterprecision( Solution_.Solution_vec[QP_N_+i] ) << " "      ; // 1
-    }
-    for (unsigned int i = 0 ; i < 2 ; ++i )
-    {
-      if (i >= nstep)
-      {
-        aof << filterprecision( 0.0 ) << " "      ; // 1
-      }else{
-        aof << filterprecision( Solution_.Solution_vec[2*QP_N_+nstep+i] ) << " "      ; // 1
-      }
-    }
-    aof << endl ;
-    aof.close();
-
-
 
     iteration++;
 

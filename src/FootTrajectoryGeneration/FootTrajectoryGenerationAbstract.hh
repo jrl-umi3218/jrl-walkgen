@@ -216,6 +216,9 @@ namespace PatternGeneratorJRL
     /*! Omega the angle for taking off and landing. */
     double m_Omega;
 
+    /*! Omega the angle for slope walking. */
+    double m_Omega2 ;
+
     int m_isStepStairOn;
 
     double m_StepHeight;

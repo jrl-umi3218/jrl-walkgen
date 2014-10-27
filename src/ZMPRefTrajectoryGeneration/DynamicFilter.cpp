@@ -74,7 +74,7 @@ DynamicFilter::~DynamicFilter()
   }
 }
 
-void DynamicFilter::ForwardKinematics(MAL_VECTOR_TYPE(double) & configuration,
+void DynamicFilter::InverseDynamics(MAL_VECTOR_TYPE(double) & configuration,
                                       MAL_VECTOR_TYPE(double) & velocity,
                                       MAL_VECTOR_TYPE(double) & acceleration)
 {

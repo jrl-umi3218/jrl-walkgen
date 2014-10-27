@@ -68,6 +68,10 @@ void FootTrajectoryGenerationAbstract::CallMethod(std::string &Method,
     {
       strm >> m_Omega;
     }
+  else if (Method==":omega2")
+    {
+      strm >> m_Omega2;
+    }
   else if (Method==":singlesupporttime")
     {
       strm >> m_TSingle;

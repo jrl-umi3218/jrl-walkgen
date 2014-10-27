@@ -103,7 +103,7 @@ namespace PatternGeneratorJRL
         deque<ZMPPosition> & inputdeltaZMP_deq,
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
-    void ForwardKinematics(MAL_VECTOR_TYPE(double) & configuration,
+    void InverseDynamics(MAL_VECTOR_TYPE(double) & configuration,
                            MAL_VECTOR_TYPE(double) & velocity,
                            MAL_VECTOR_TYPE(double) & acceleration);
 

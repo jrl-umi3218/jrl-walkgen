@@ -40,6 +40,7 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
 					     CjrlFoot * lFoot) : SimplePlugin(lSPM)
 {
   m_Omega = 0.0;
+  m_Omega2 = 0.0;
   m_Foot = lFoot;
 
   m_LeftFootTrajectory = new FootTrajectoryGenerationMultiple(lSPM,m_Foot);
@@ -55,6 +56,8 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
 	  std::cerr << "Unable to register " << aMethodName << std::endl;
 	}
     }
+
+  wayPoint.resize(2,0.0);
 
 }
 
@@ -89,6 +92,10 @@ void LeftAndRightFootTrajectoryGenerationMultiple::CallMethod(std::string & Meth
   if (Method==":omega")
     {
       strm >> m_Omega;
+    }
+  else if (Method==":omega2")
+    {
+      strm >> m_Omega2;
     }
   else if (Method==":stepheight")
     {
@@ -141,6 +148,13 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 					   FootInitialPosition.dtheta);
 
   // Omega
+  static int cunt = 1 ;
+  cout << "m_omega" << m_Omega << endl ;
+  cout << "Init omega = " << FootInitialPosition.omega << endl ;
+  cout << "Final omega = " << FootFinalPosition.omega << endl ;
+  cout << "set plynoome : " << cunt << endl;
+  cout << "####" << endl ;
+  cunt++;
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::OMEGA_AXIS,
 					   m_DeltaTj[IntervalIndex],
@@ -398,7 +412,7 @@ InitializeFromRelativeSteps_backup(deque<RelativeFootPosition> &RelativeFootPosi
 	      RightFootTmpFinalPos.z = m_StepHeight;
 	      RightFootTmpFinalPos.theta = CurrentAbsTheta;
 	      RightFootTmpFinalPos.omega = m_Omega;
-	      RightFootTmpFinalPos.omega2 = 0.0;
+	      RightFootTmpFinalPos.omega2 = m_Omega2;
 	      RightFootTmpFinalPos.dx = 0.0;
 	      RightFootTmpFinalPos.dy = 0.0;
 	      RightFootTmpFinalPos.dz = 0.0;
@@ -420,7 +434,7 @@ InitializeFromRelativeSteps_backup(deque<RelativeFootPosition> &RelativeFootPosi
 	      LeftFootTmpFinalPos.z = m_StepHeight;
 	      LeftFootTmpFinalPos.theta = CurrentAbsTheta;
 	      LeftFootTmpFinalPos.omega = m_Omega;
-	      LeftFootTmpFinalPos.omega2 = 0.0;
+	      LeftFootTmpFinalPos.omega2 = m_Omega2;
 	      LeftFootTmpFinalPos.dx = 0.0;
 	      LeftFootTmpFinalPos.dy = 0.0;
 	      LeftFootTmpFinalPos.dz = 0.0;
@@ -821,7 +835,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
             RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);//
 	      RightFootTmpFinalPos.theta = CurrentAbsTheta;
 	      RightFootTmpFinalPos.omega = m_Omega;
-	      RightFootTmpFinalPos.omega2 = 0.0;
+	      RightFootTmpFinalPos.omega2 = m_Omega2;
 	      RightFootTmpFinalPos.dx = 0.0;
 	      RightFootTmpFinalPos.dy = 0.0;
 	      RightFootTmpFinalPos.dz = 0.0;
@@ -846,7 +860,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
 	      LeftFootTmpFinalPos.theta = CurrentAbsTheta;
 	      LeftFootTmpFinalPos.omega = m_Omega;
-	      LeftFootTmpFinalPos.omega2 = 0.0;
+	      LeftFootTmpFinalPos.omega2 = m_Omega2;
 	      LeftFootTmpFinalPos.dx = 0.0;
 	      LeftFootTmpFinalPos.dy = 0.0;
 	      LeftFootTmpFinalPos.dz = 0.0;
@@ -866,8 +880,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  LeftFootTmpFinalPos = LeftFootTmpInitPos;
 
 	  LeftFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-	  LeftFootTmpFinalPos.omega = 0.0;
-	  LeftFootTmpFinalPos.omega2 = 0.0;
+	  LeftFootTmpFinalPos.omega = m_Omega;
+	  LeftFootTmpFinalPos.omega2 = m_Omega2;
 	  LeftFootTmpFinalPos.dx = LeftFootTmpInitPos.dx = 0.0;
 	  LeftFootTmpFinalPos.dy = LeftFootTmpInitPos.dy =0.0;
 	  LeftFootTmpFinalPos.dz = LeftFootTmpInitPos.dz =0.0;
@@ -877,8 +891,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
 	  RightFootTmpFinalPos = RightFootTmpInitPos;
 	  RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
-	  RightFootTmpFinalPos.omega = 0.0;
-	  RightFootTmpFinalPos.omega2 = 0.0;
+	  RightFootTmpFinalPos.omega = m_Omega;
+	  RightFootTmpFinalPos.omega2 = m_Omega2 ;
 	  RightFootTmpFinalPos.dx = RightFootTmpInitPos.dx = 0.0;
 	  RightFootTmpFinalPos.dy = RightFootTmpInitPos.dy =0.0;
 	  RightFootTmpFinalPos.dz = RightFootTmpInitPos.dz =0.0;
