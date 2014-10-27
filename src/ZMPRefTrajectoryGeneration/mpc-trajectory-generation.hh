@@ -90,6 +90,9 @@ namespace PatternGeneratorJRL
 
      /// \brief The foot orientation for the lift off and the landing
      double Omega_;
+
+     /// \brief The foot orientation for the lift off and the landing
+     double Omega2_;
      /// @}
 
 

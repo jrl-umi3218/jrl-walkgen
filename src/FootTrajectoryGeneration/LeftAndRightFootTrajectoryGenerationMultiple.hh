@@ -195,6 +195,11 @@ namespace PatternGeneratorJRL
       /*! Omega */
       double m_Omega;
 
+      /*! Omega2 */
+      double m_Omega2;
+
+      std::vector<double> wayPoint ;
+
       /*! Step height. */
       double m_StepHeight;
 

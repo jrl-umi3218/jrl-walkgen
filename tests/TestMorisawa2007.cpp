@@ -181,7 +181,7 @@ public:
               m_CurrentVelocity,
               m_CurrentAcceleration,
               0.005,1,iter);
-          dynamicfilter_->ForwardKinematics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
+          dynamicfilter_->InverseDynamics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
           iter++;
           fillInDebugFiles();
         }
@@ -260,7 +260,8 @@ public:
         m_CurrentVelocity,
         m_CurrentAcceleration,
         0.005,1,0);
-    dynamicfilter_->ForwardKinematics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
+    dynamicfilter_->InverseDynamics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
+
   }
 
 protected:
@@ -702,29 +703,17 @@ protected:
       istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
       aPGI.ParseCmd(strm2);
     }
-
     {
       istringstream strm2(":stepstairseq\
                           0.0 -0.105 0.0 0.0\
-                          0.2 0.19 0.0 0.0\
-                          0.2 -0.19 0.0 0.0\
-                          0.2 0.19 0.0 0.0\
-                          0.2 -0.19 0.0 0.0\
-                          0.2 0.19 0.0 0.0\
-                          0.2 -0.19 0.0 0.0\
-                          0.2 0.19 0.0 0.0\
-                          0.2 -0.19 0.0 0.0\
-                          0.2 0.19 0.0 0.0\
-                          0.2 -0.19 0.0 0.0\
-                          0.2 0.19 0.0 0.0\
-                          0.2 -0.19 0.0 0.0\
-                          0.2 0.19 0.0 0.0\
-                          0.2 -0.19 0.0 0.0\
-                          0.2 0.19 0.0 0.0\
-                          0.2 -0.19 0.0 0.0\
-                          0.2 0.19 0.0 0.0\
-                          0.2 -0.19 0.0 0.0\
-                          0.0 0.19 0.0 0.0\
+                          0.2 0.19 0.0174977327 0.0\
+                          0.2 -0.19 0.0174977327 0.0\
+                          0.2 0.19 0.0174977327 0.0\
+                          0.2 -0.19 0.0174977327 0.0\
+                          0.2 0.19 0.0174977327 0.0\
+                          0.2 -0.19 0.0174977327 0.0\
+                          0.2 0.19 0.0174977327 0.0\
+                          0.0 -0.19 0.0 0.0\
                           ");
 
       //                          0.0 -0.19 0.0 0.174532925\
