@@ -343,7 +343,7 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
 	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
-	      << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                    // 5
+          << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                 // 5
 	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
 	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
 	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
