@@ -53,14 +53,16 @@ namespace PatternGeneratorJRL
                   );
     ~DynamicFilter();
     /// \brief
-    int OffLinefilter(
-        COMState & lastCtrlCoMState,
+    int OffLinefilter(COMState & lastCtrlCoMState,
         FootAbsolutePosition & lastCtrlLeftFoot,
         FootAbsolutePosition & lastCtrlRightFoot,
         deque<COMState> & inputCOMTraj_deq_,
         deque<ZMPPosition> inputZMPTraj_deq_,
         deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
         deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+        vector<boost_ublas::vector<double> > &UpperPart_q,
+        vector<boost_ublas::vector<double> > &UpperPart_dq,
+        vector<boost_ublas::vector<double> > &UpperPart_ddq,
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
     int OnLinefilter(
@@ -103,8 +105,8 @@ namespace PatternGeneratorJRL
         const FootAbsolutePosition & inputLeftFoot,
         const FootAbsolutePosition & inputRightFoot,
         vector<double> & ZMPMB,
-        int stage,
-        int iteration);
+        unsigned int stage,
+        unsigned int iteration);
 
     void stage0INstage1();
 
@@ -128,13 +130,6 @@ namespace PatternGeneratorJRL
     /// \brief Apply the RNEA on the robot model and over the whole trajectory
     /// given by the function "filter"
     void InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq);
-
-    /// \brief Compute the ZMPMB according to a configuration
-    void ComputeZMPMB(
-        MAL_VECTOR_TYPE(double) & configuration,
-        MAL_VECTOR_TYPE(double) & velocity,
-        MAL_VECTOR_TYPE(double) & acceleration,
-        vector<double> & ZMPMB);
 
     void computeWaist(const FootAbsolutePosition & inputLeftFoot);
     metapod::Vector3dTpl< LocalFloatType >::Type computeCoM();
@@ -299,6 +294,10 @@ namespace PatternGeneratorJRL
 
       /// \brief time measurement
       Clock clock_;
+
+      /// \brief Stages, used in the analytical inverse kinematic.
+      unsigned int stage0_ ;
+      unsigned int stage1_ ;
 
   private : // private struct
       struct MassSum

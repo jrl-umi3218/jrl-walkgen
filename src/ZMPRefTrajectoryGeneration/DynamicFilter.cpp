@@ -25,6 +25,8 @@ DynamicFilter::DynamicFilter(
   comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
+  stage0_ = 0 ;
+  stage1_ = 1 ;
 
   PC_ = new PreviewControl(
       SPM,OptimalControllerSolver::MODE_WITH_INITIALPOS,false);
@@ -194,8 +196,37 @@ int DynamicFilter::OffLinefilter(
     deque<ZMPPosition> inputZMPTraj_deq_,
     deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
     deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+    vector< MAL_VECTOR_TYPE(double) > & UpperPart_q,
+    vector< MAL_VECTOR_TYPE(double) > & UpperPart_dq,
+    vector< MAL_VECTOR_TYPE(double) > & UpperPart_ddq,
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
+  unsigned int N = inputCOMTraj_deq_.size() ;
+  ZMPMB_vec_.resize(N) ;
+  deltaZMP_deq_.resize(N);
+
+  setRobotUpperPart(UpperPart_q[0],UpperPart_dq[0],UpperPart_ddq[0]);
+
+  for(unsigned int i = 0 ; i < inputCOMTraj_deq_.size() ; ++i )
+  {
+    ComputeZMPMB(interpolationPeriod_,inputCOMTraj_deq_[i],inputLeftFootTraj_deq_[i],
+                 inputRightFootTraj_deq_[i], ZMPMB_vec_[i] , stage0_ , i);
+  }
+  for (unsigned int i = 0 ; i < N ; ++i)
+  {
+    deltaZMP_deq_[i].px = inputZMPTraj_deq_[i].px - ZMPMB_vec_[i][0] ;
+    deltaZMP_deq_[i].py = inputZMPTraj_deq_[i].py - ZMPMB_vec_[i][1] ;
+    deltaZMP_deq_[i].pz = 0.0 ;
+    deltaZMP_deq_[i].theta = 0.0 ;
+    deltaZMP_deq_[i].time = m_CurrentTime + i * interpolationPeriod_ ;
+    deltaZMP_deq_[i].stepType = ZMPMB_vec_[i].stepType ;
+  }
+  m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
+
+
+
+
+
   return 0;
 }
 
@@ -347,14 +378,13 @@ void DynamicFilter::stage0INstage1()
   return ;
 }
 
-void DynamicFilter::ComputeZMPMB(
-    double samplingPeriod,
+void DynamicFilter::ComputeZMPMB(double samplingPeriod,
     const COMState & inputCoMState,
     const FootAbsolutePosition & inputLeftFoot,
     const FootAbsolutePosition & inputRightFoot,
     vector<double> & ZMPMB,
-    int stage,
-    int iteration)
+    unsigned int stage,
+    unsigned int iteration)
 {
   InverseKinematics( inputCoMState, inputLeftFoot, inputRightFoot,
       ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
@@ -369,20 +399,18 @@ void DynamicFilter::ComputeZMPMB(
   }
 
   //computeWaist( inputLeftFoot );
-  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
+
   // Apply the RNEA on the robot model
-  clock_.StartTiming();
+  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
   metapod::rnea< Robot_Model, true >::run(robot_, q_, dq_, ddq_);
-  clock_.StopTiming();
 
-  clock_.IncIteration();
-
+  // extract the CoM momentum and forces
   m_force = node_waist.body.iX0.applyInv(node_waist.joint.f);
-
   metapod::Vector3dTpl< LocalFloatType >::Type CoM_Waist_vec (node_waist.body.iX0.r() - com ()) ;
   metapod::Vector3dTpl< LocalFloatType >::Type CoM_torques (0.0,0.0,0.0);
-
   CoM_torques = m_force.n() + metapod::Skew<LocalFloatType>(CoM_Waist_vec) * m_force.f() ;
+
+  // compute the Multibody ZMP
   ZMPMB.resize(2);
   ZMPMB[0] = - CoM_torques[1] / m_force.f()[2] ;
   ZMPMB[1] =   CoM_torques[0] / m_force.f()[2] ;
