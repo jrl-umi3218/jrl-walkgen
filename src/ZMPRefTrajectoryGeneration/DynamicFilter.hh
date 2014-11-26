@@ -53,16 +53,15 @@ namespace PatternGeneratorJRL
                   );
     ~DynamicFilter();
     /// \brief
-    int OffLinefilter(COMState & lastCtrlCoMState,
-        FootAbsolutePosition & lastCtrlLeftFoot,
-        FootAbsolutePosition & lastCtrlRightFoot,
-        deque<COMState> & inputCOMTraj_deq_,
-        deque<ZMPPosition> inputZMPTraj_deq_,
-        deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-        deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-        vector<boost_ublas::vector<double> > &UpperPart_q,
-        vector<boost_ublas::vector<double> > &UpperPart_dq,
-        vector<boost_ublas::vector<double> > &UpperPart_ddq,
+    int OffLinefilter(
+        const double currentTime,
+        const deque<COMState> & inputCOMTraj_deq_,
+        const deque<ZMPPosition> & inputZMPTraj_deq_,
+        const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+        const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+        const vector<MAL_VECTOR_TYPE(double) > &UpperPart_q,
+        const vector<MAL_VECTOR_TYPE(double) > &UpperPart_dq,
+        const vector<MAL_VECTOR_TYPE(double) > &UpperPart_ddq,
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
     int OnLinefilter(
@@ -76,7 +75,6 @@ namespace PatternGeneratorJRL
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
     void init(
-        double currentTime,
         double controlPeriod,
         double interpolationPeriod,
         double PG_T,
@@ -139,9 +137,6 @@ namespace PatternGeneratorJRL
   public: // The accessors
 
     /// \brief setter :
-    inline void setCurrentTime(double time)
-    {currentTime_ = time ;}
-
     inline void setControlPeriod(double controlPeriod)
     {controlPeriod_ = controlPeriod ;}
 
@@ -154,16 +149,13 @@ namespace PatternGeneratorJRL
     inline void setPreviewWindowSize_(double previewWindowSize)
     { previewWindowSize_ = previewWindowSize; }
 
-    void setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration,
-                                          MAL_VECTOR_TYPE(double) & velocity,
-                                          MAL_VECTOR_TYPE(double) & acceleration);
+    void setRobotUpperPart(const MAL_VECTOR_TYPE(double) & configuration,
+                           const MAL_VECTOR_TYPE(double) & velocity,
+                           const MAL_VECTOR_TYPE(double) & acceleration);
 
     /// \brief getter :
     inline ComAndFootRealizationByGeometry * getComAndFootRealization()
     { return comAndFootRealization_;}
-
-    inline double getCurrentTime()
-    {return currentTime_ ;}
 
     inline double getControlPeriod()
     {return controlPeriod_ ;}
@@ -194,9 +186,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Time variables
     /// -----------------------------------
-      /// \brief Current time of the PG.
-      double currentTime_ ;
-
+    ///
       /// \brief control period of the PG host
       double controlPeriod_;
 

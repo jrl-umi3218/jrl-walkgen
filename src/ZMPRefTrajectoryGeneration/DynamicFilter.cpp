@@ -10,7 +10,6 @@ DynamicFilter::DynamicFilter(
     SimplePluginManager *SPM,
     CjrlHumanoidDynamicRobot *aHS)
 {
-  currentTime_ = 0.0 ;
   controlPeriod_ = 0.0 ;
   interpolationPeriod_ = 0.0 ;
   previewWindowSize_ = 0.0 ;
@@ -77,9 +76,9 @@ DynamicFilter::~DynamicFilter()
   }
 }
 
-void DynamicFilter::setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration,
-                                      MAL_VECTOR_TYPE(double) & velocity,
-                                      MAL_VECTOR_TYPE(double) & acceleration)
+void DynamicFilter::setRobotUpperPart(const MAL_VECTOR_TYPE(double) & configuration,
+                                      const MAL_VECTOR_TYPE(double) & velocity,
+                                      const MAL_VECTOR_TYPE(double) & acceleration)
 {
   for ( unsigned int i = 0 ; i < upperPartIndex.size() ; ++i )
   {
@@ -92,7 +91,6 @@ void DynamicFilter::setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration,
 
 /// \brief Initialse all objects, to be called just after the constructor
 void DynamicFilter::init(
-    double currentTime,
     double controlPeriod,
     double interpolationPeriod,
     double PG_T,
@@ -101,7 +99,6 @@ void DynamicFilter::init(
     FootAbsolutePosition inputLeftFoot,
     COMState inputCoMState)
 {
-  currentTime_ = currentTime ;
   controlPeriod_ = controlPeriod ;
   interpolationPeriod_ = interpolationPeriod ;
   PG_T_ = PG_T ;
@@ -189,16 +186,14 @@ void DynamicFilter::init(
 }
 
 int DynamicFilter::OffLinefilter(
-    COMState & lastCtrlCoMState,
-    FootAbsolutePosition & lastCtrlLeftFoot,
-    FootAbsolutePosition & lastCtrlRightFoot,
-    deque<COMState> & inputCOMTraj_deq_,
-    deque<ZMPPosition> inputZMPTraj_deq_,
-    deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-    deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-    vector< MAL_VECTOR_TYPE(double) > & UpperPart_q,
-    vector< MAL_VECTOR_TYPE(double) > & UpperPart_dq,
-    vector< MAL_VECTOR_TYPE(double) > & UpperPart_ddq,
+    const double currentTime,
+    const deque<COMState> &inputCOMTraj_deq_,
+    const deque<ZMPPosition> &inputZMPTraj_deq_,
+    const deque<FootAbsolutePosition> &inputLeftFootTraj_deq_,
+    const deque<FootAbsolutePosition> &inputRightFootTraj_deq_,
+    const vector< MAL_VECTOR_TYPE(double) > & UpperPart_q,
+    const vector< MAL_VECTOR_TYPE(double) > & UpperPart_dq,
+    const vector< MAL_VECTOR_TYPE(double) > & UpperPart_ddq,
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
   unsigned int N = inputCOMTraj_deq_.size() ;
@@ -207,7 +202,7 @@ int DynamicFilter::OffLinefilter(
 
   setRobotUpperPart(UpperPart_q[0],UpperPart_dq[0],UpperPart_ddq[0]);
 
-  for(unsigned int i = 0 ; i < inputCOMTraj_deq_.size() ; ++i )
+  for(unsigned int i = 0 ; i < N ; ++i )
   {
     ComputeZMPMB(interpolationPeriod_,inputCOMTraj_deq_[i],inputLeftFootTraj_deq_[i],
                  inputRightFootTraj_deq_[i], ZMPMB_vec_[i] , stage0_ , i);
@@ -218,14 +213,10 @@ int DynamicFilter::OffLinefilter(
     deltaZMP_deq_[i].py = inputZMPTraj_deq_[i].py - ZMPMB_vec_[i][1] ;
     deltaZMP_deq_[i].pz = 0.0 ;
     deltaZMP_deq_[i].theta = 0.0 ;
-    deltaZMP_deq_[i].time = m_CurrentTime + i * interpolationPeriod_ ;
-    deltaZMP_deq_[i].stepType = ZMPMB_vec_[i].stepType ;
+    deltaZMP_deq_[i].time = currentTime + i * interpolationPeriod_ ;
+    deltaZMP_deq_[i].stepType = inputZMPTraj_deq_[i].stepType ;
   }
-  m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
-
-
-
-
+  OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
 
   return 0;
 }

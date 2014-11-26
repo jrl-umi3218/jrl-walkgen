@@ -244,7 +244,7 @@ public:
     else{
       supportFoot = m_OneStep.RightFootPosition ;
     }
-    dynamicfilter_->init(0.0,samplingPeriod_,samplingPeriod_,samplingPeriod_,
+    dynamicfilter_->init(samplingPeriod_,samplingPeriod_,samplingPeriod_,
                          samplingPeriod_,0.814,supportFoot,m_OneStep.finalCOMPosition);
     initIK();
     MAL_VECTOR_TYPE(double) UpperConfig = m_HDR->currentConfiguration() ;

@@ -563,7 +563,6 @@ computing the analytical trajectories. */
 
     /*! Set the current time reference for the analytical trajectory. */
     double TimeShift = m_Tsingle*2;
-    //double TimeShift = m_Tsingle;
     m_AbsoluteTimeReference = m_CurrentTime-TimeShift;
     m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
@@ -572,12 +571,13 @@ computing the analytical trajectories. */
     /*! Compute the total size of the array related to the steps. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
-    deque<COMState> filteredCoM = COMStates ;
 
+    //deque<COMState> filteredCoM = COMStates ;
+
+    /*! initialize the dynamic filter */
     unsigned int n = COMStates.size();
     double KajitaPCpreviewWindow = 1.6 ;
-    m_kajitaDynamicFilter->init( m_CurrentTime,
-                                 m_SamplingPeriod,
+    m_kajitaDynamicFilter->init( m_SamplingPeriod,
                                  m_SamplingPeriod,
                                  (double)(n+1)*m_SamplingPeriod,
                                  KajitaPCpreviewWindow,
@@ -585,6 +585,7 @@ computing the analytical trajectories. */
                                  InitLeftFootAbsolutePosition,
                                  lStartingCOMState );
 
+    /*! Set the upper body trajectory */
     CjrlHumanoidDynamicRobot * aHDR = m_kajitaDynamicFilter->
                                              getComAndFootRealization()->getHumanoidDynamicRobot();
     MAL_VECTOR_TYPE(double) UpperConfig = aHDR->currentConfiguration() ;
@@ -635,8 +636,6 @@ computing the analytical trajectories. */
       UpperAcc(i)=0.0;
     }
 
-
-
     m_kajitaDynamicFilter->setRobotUpperPart(UpperConfig,UpperVel,UpperAcc);
 
     /*! Add "KajitaPCpreviewWindow" second to the buffers for fitering */
@@ -651,236 +650,34 @@ computing the analytical trajectories. */
       LeftFootAbsolutePositions.push_back(lastLF);
       RightFootAbsolutePositions.push_back(lastRF);
     }
-    unsigned int N = ZMPPositions.size();
-    int stage0 = 0 ;
-    int stage1 = 1 ;
-    vector <vector<double> > ZMPMB (N , vector<double> (2,0.0)) ;
-    for (unsigned int i = 0  ; i < N ; ++i)
-    {
-      m_kajitaDynamicFilter->ComputeZMPMB( m_SamplingPeriod, COMStates[i],
-                                           LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
-                                           ZMPMB[i] , stage0 , i);
-    }
-    m_kajitaDynamicFilter->getClock()->Display();
 
-    deque<ZMPPosition> inputdeltaZMP_deq(N) ;
     deque<COMState> outputDeltaCOMTraj_deq ;
-    for (unsigned int i = 0 ; i < N ; ++i)
-    {
-      inputdeltaZMP_deq[i].px = ZMPPositions[i].px - ZMPMB[i][0] ;
-      inputdeltaZMP_deq[i].py = ZMPPositions[i].py - ZMPMB[i][1] ;
-      inputdeltaZMP_deq[i].pz = 0.0 ;
-      inputdeltaZMP_deq[i].theta = 0.0 ;
-      inputdeltaZMP_deq[i].time = m_CurrentTime + i * m_SamplingPeriod ;
-      inputdeltaZMP_deq[i].stepType = ZMPPositions[i].stepType ;
-    }
-    m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
+    m_kajitaDynamicFilter->OffLinefilter(
+                m_CurrentTime,
+                COMStates,
+                ZMPPositions,
+                LeftFootAbsolutePositions,
+                RightFootAbsolutePositions,
+                vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
+                vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
+                vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
+                outputDeltaCOMTraj_deq);
 
     vector <vector<double> > filteredZMPMB (n , vector<double> (2,0.0)) ;
     for (unsigned int i = 0 ; i < n ; ++i)
     {
       for(int j=0;j<3;j++)
       {
-        filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-        filteredCoM[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
-                COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-                COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+        COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+        COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
-      m_kajitaDynamicFilter->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
-                                          LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
-                                          filteredZMPMB[i] , stage1, i);
     }
-
-    cout << "COMStates.size() = " << COMStates.size() << endl ;
-    cout << "Buffer.size() = " << inputdeltaZMP_deq.size() << endl ;
-    cout << "outputDeltaCOMTraj_deq.size() =  " << outputDeltaCOMTraj_deq.size() << endl ;
 
     m_UpperTimeLimitToUpdateStacks = m_CurrentTime;
     for(int i=0;i<m_NumberOfIntervals;i++)
     {
       m_UpperTimeLimitToUpdateStacks += m_DeltaTj[i];
     }
-//
-//
-//    /// \brief Debug Purpose
-//    /// --------------------
-//    ifstream iof;
-//    string aFileName;
-//    aFileName = "/home/mnaveau/devel/HRP2Log/ClimbingWithTools-11072014-01-astate.log" ;
-//    iof.open(aFileName.c_str(),std::ifstream::in);
-//    string entete;
-//    getline(iof,entete);
-//    vector <vector <double> > Datas (4000,vector <double>(176));
-//    for(unsigned int i = 0 ; i < 4000 ; ++i)
-//    {
-//      for (unsigned int j = 0 ; j < 176 ; ++j )
-//      {
-//        iof >> Datas[i][j] ;
-//      }
-//    }
-//
-//    vector < MAL_VECTOR_TYPE(double) > POS (4000);
-//    vector < MAL_VECTOR_TYPE(double) > VIT (4000);
-//    vector < MAL_VECTOR_TYPE(double) > ACC (4000);
-//    for(unsigned int i = 0 ; i < 4000 ; ++i)
-//    {
-//      MAL_VECTOR_RESIZE(POS[i], 36);
-//      MAL_VECTOR_RESIZE(VIT[i], 36);
-//      MAL_VECTOR_RESIZE(ACC[i], 36);
-//    }
-//
-//    for (unsigned int j = 0 ; j < 6 ; ++j )
-//    {
-//      POS[0](j+158) = Datas[i][j] ;
-//      POS[1](j+158) = Datas[i][j] ;
-//    }
-//    for (unsigned int j = 0 ; j < 30 ; ++j )
-//    {
-//      POS[0](j+6) = Datas[i][j] ;
-//      POS[1](j+6) = Datas[i][j] ;
-//    }
-//
-//    for(unsigned int i = 2 ; i < 4000 ; ++i)
-//    {
-//      for (unsigned int j = 0 ; j < 30 ; ++j )
-//      {
-//         m_CurrentConfiguration = Datas[i][j] ;
-//      }
-//    }
-//
-//
-    double ecartMax_ZMP_ZMPMB=0.0;
-    double ecartMax_ZMP_ZMPcorrected=0.0;
-    double ecartMoy_ZMP_ZMPMB=0.0;
-    double ecartMoy_ZMP_ZMPcorrected=0.0;
-
-    for (unsigned int i = 0 ; i < n ; ++i )
-    {
-      double ecartZMP_ZMPMB = 0 ;
-      double ecartZMP_ZMPcorrected = 0 ;
-      ecartZMP_ZMPMB = (ZMPPositions[i].px - ZMPMB[i][0])*(ZMPPositions[i].px - ZMPMB[i][0])+
-	               (ZMPPositions[i].py - ZMPMB[i][1])*(ZMPPositions[i].py - ZMPMB[i][1]);
-
-      ecartZMP_ZMPcorrected = (ZMPPositions[i].px - filteredZMPMB[i][0])*
-			      (ZMPPositions[i].px - filteredZMPMB[i][0])
-				+
-                              (ZMPPositions[i].py - filteredZMPMB[i][1])*
-                              (ZMPPositions[i].py - filteredZMPMB[i][1]);
-      ecartZMP_ZMPMB = sqrt(ecartZMP_ZMPMB);
-      ecartZMP_ZMPcorrected = sqrt(ecartZMP_ZMPcorrected);
-      if(ecartZMP_ZMPMB > ecartMax_ZMP_ZMPMB)
-      {
-	ecartMax_ZMP_ZMPMB = ecartZMP_ZMPMB ;
-      }
-      if(ecartZMP_ZMPcorrected > ecartMax_ZMP_ZMPcorrected)
-      {
-	ecartMax_ZMP_ZMPcorrected = ecartZMP_ZMPcorrected ;
-      }
-      ecartMoy_ZMP_ZMPMB += ecartZMP_ZMPMB ;
-      ecartMoy_ZMP_ZMPcorrected += ecartZMP_ZMPcorrected ;
-    }
-    ecartMoy_ZMP_ZMPMB = ecartMoy_ZMP_ZMPMB/n ;
-    ecartMoy_ZMP_ZMPcorrected = ecartMoy_ZMP_ZMPcorrected/n ;
-
-    cout << "ecartMax_ZMP_ZMPMB = " << ecartMax_ZMP_ZMPMB << endl ;
-    cout << "ecartMax_ZMP_ZMPcorrected = " << ecartMax_ZMP_ZMPcorrected << endl ;
-    cout << "ecartMoy_ZMP_ZMPMB = " << ecartMoy_ZMP_ZMPMB << endl ;
-    cout << "ecartMoy_ZMP_ZMPcorrected = " << ecartMoy_ZMP_ZMPcorrected << endl ;
-
-    for (unsigned int i = 0  ; i < KajitaPCpreviewWindow/m_SamplingPeriod ; ++i)
-    {
-      ZMPPositions.pop_back();
-      COMStates.pop_back();
-      LeftFootAbsolutePositions.pop_back();
-      RightFootAbsolutePositions.pop_back();
-    }
-
-    /// \brief Debug Purpose
-    /// --------------------
-    ofstream aof;
-    string aFileName;
-    ostringstream oss(std::ostringstream::ate);
-    static int iteration = 0;
-    /// \brief Debug Purpose
-    /// --------------------
-    oss.str("MorisawaData.dat");
-    aFileName = oss.str();
-    aof.open(aFileName.c_str(),ofstream::out);
-    aof.close();
-    ///----
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-    for (unsigned int i = 0 ; i < n ; ++i )
-    {
-      aof << i*m_SamplingPeriod << " "                           // 1
-          <<  COMStates[i].x[0] << " "                           // 2
-          <<  COMStates[i].x[1] << " "                           // 3
-          <<  COMStates[i].x[2] << " "                           // 4
-          <<  COMStates[i].y[0] << " "                           // 5
-          <<  COMStates[i].y[1] << " "                           // 6
-          <<  COMStates[i].y[2]  << " "                          // 7
-          <<  COMStates[i].z[0]  << " "                          // 8
-          <<  COMStates[i].z[1]  << " "                          // 9
-          <<  COMStates[i].z[2]  << " "                          // 10
-          <<  COMStates[i].roll[0]  << " "                       // 11
-          <<  COMStates[i].roll[1]  << " "                       // 12
-          <<  COMStates[i].roll[2]  << " "                       // 13
-          <<  COMStates[i].pitch[0]  << " "                      // 14
-          <<  COMStates[i].pitch[1]  << " "                      // 15
-          <<  COMStates[i].pitch[2]  << " "                      // 16
-          <<  COMStates[i].yaw[0]  << " "                        // 17
-          <<  COMStates[i].yaw[1]  << " "                        // 18
-          <<  COMStates[i].yaw[2]  << " "                        // 19
-          <<  ZMPPositions[i].px  << " "                         // 20
-          <<  ZMPPositions[i].py  << " "                         // 21
-          <<  ZMPMB[i][0] << " "                                 // 22
-          <<  ZMPMB[i][1] << " "                                 // 23
-          <<  filteredZMPMB[i][0] << " "                         // 24
-          <<  filteredZMPMB[i][1] << " "                         // 25
-          <<  inputdeltaZMP_deq[i].px << " "                     // 26
-          <<  inputdeltaZMP_deq[i].py << " "                     // 27
-          <<  outputDeltaCOMTraj_deq[i].x[0] << " "              // 28
-          <<  outputDeltaCOMTraj_deq[i].x[1] << " "              // 29
-          <<  outputDeltaCOMTraj_deq[i].x[2] << " "              // 30
-          <<  outputDeltaCOMTraj_deq[i].y[0] << " "              // 31
-          <<  outputDeltaCOMTraj_deq[i].y[1] << " "              // 32
-          <<  outputDeltaCOMTraj_deq[i].y[2] << " "              // 33
-          <<  LeftFootAbsolutePositions[i].x  << " "             // 34
-          <<  LeftFootAbsolutePositions[i].y  << " "             // 35
-          <<  LeftFootAbsolutePositions[i].z  << " "             // 36
-          <<  LeftFootAbsolutePositions[i].theta  << " "         // 37
-          <<  LeftFootAbsolutePositions[i].omega  << " "         // 38
-          <<  LeftFootAbsolutePositions[i].dx  << " "            // 39
-          <<  LeftFootAbsolutePositions[i].dy  << " "            // 40
-          <<  LeftFootAbsolutePositions[i].dz  << " "            // 41
-          <<  LeftFootAbsolutePositions[i].dtheta  << " "        // 42
-          <<  LeftFootAbsolutePositions[i].domega  << " "        // 43
-          <<  LeftFootAbsolutePositions[i].ddx  << " "           // 44
-          <<  LeftFootAbsolutePositions[i].ddy  << " "           // 45
-          <<  LeftFootAbsolutePositions[i].ddz  << " "           // 46
-          <<  LeftFootAbsolutePositions[i].ddtheta  << " "       // 47
-          <<  LeftFootAbsolutePositions[i].ddomega  << " "       // 48
-          <<  RightFootAbsolutePositions[i].x  << " "            // 49
-          <<  RightFootAbsolutePositions[i].y  << " "            // 50
-          <<  RightFootAbsolutePositions[i].z  << " "            // 51
-          <<  RightFootAbsolutePositions[i].theta  << " "        // 52
-          <<  RightFootAbsolutePositions[i].omega  << " "        // 53
-          <<  RightFootAbsolutePositions[i].dx  << " "           // 54
-          <<  RightFootAbsolutePositions[i].dy  << " "           // 55
-          <<  RightFootAbsolutePositions[i].dz  << " "           // 56
-          <<  RightFootAbsolutePositions[i].dtheta  << " "       // 57
-          <<  RightFootAbsolutePositions[i].domega  << " "       // 58
-          <<  RightFootAbsolutePositions[i].ddx  << " "          // 59
-          <<  RightFootAbsolutePositions[i].ddy  << " "          // 60
-          <<  RightFootAbsolutePositions[i].ddz  << " "          // 61
-          <<  RightFootAbsolutePositions[i].ddtheta  << " "      // 62
-          <<  RightFootAbsolutePositions[i].ddomega  << " "      // 63
-          << endl ;
-    }
-    aof.close() ;
-    ++iteration;
-
   }
 
   int AnalyticalMorisawaCompact::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
@@ -946,7 +743,7 @@ When the limit is reached, and the stack exhausted this method is called again. 
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
 
-    m_kajitaDynamicFilter->init( m_CurrentTime, m_SamplingPeriod, 0.04, m_SamplingPeriod, 1.6,
+    m_kajitaDynamicFilter->init( m_SamplingPeriod, 0.04, m_SamplingPeriod, 1.6,
                                  lStartingCOMState.z[0], InitLeftFootAbsolutePosition, lStartingCOMState );
 
     return m_RelativeFootPositions.size();

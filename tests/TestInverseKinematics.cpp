@@ -100,7 +100,7 @@ public:
     int stage0 = 0 ;
     int stage1 = 1 ;
     double samplingPeriod = 0.005 ;
-    dynamicfilter_->init( 0.0,
+    dynamicfilter_->init(
                           samplingPeriod,
                           samplingPeriod,
                           (double)(comPos.size()-320)*samplingPeriod,
@@ -268,7 +268,7 @@ public:
       supportFoot = m_OneStep.RightFootPosition ;
     }
     double samplingPeriod = 0.005;
-    dynamicfilter_->init(0.0,samplingPeriod,samplingPeriod,0.1,
+    dynamicfilter_->init(samplingPeriod,samplingPeriod,0.1,
                          1.6,0.814,supportFoot,m_OneStep.finalCOMPosition);
     initIK();
     MAL_VECTOR_TYPE(double) UpperConfig = m_HDR->currentConfiguration() ;
