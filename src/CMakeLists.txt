@@ -31,7 +31,78 @@ IF(USE_LSSOL)
 ADD_DEFINITIONS("/DLSSOL_FOUND")
 ENDIF(USE_LSSOL)
 
+SET(INCLUDES
+  PreviewControl/rigid-body.hh
+  PreviewControl/OptimalControllerSolver.hh
+  PreviewControl/rigid-body-system.hh
+  PreviewControl/ZMPPreviewControlWithMultiBodyZMP.hh
+  PreviewControl/SupportFSM.hh
+  PreviewControl/LinearizedInvertedPendulum2D.hh
+  PreviewControl/PreviewControl.hh
+  PreviewControl/SupportFSM_backup.hh
+  FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.hh
+  FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.hh
+  FootTrajectoryGeneration/FootTrajectoryGenerationStandard.hh
+  FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.hh
+  Debug.hh
+  SimplePluginManager.hh
+  privatepgtypes.hh
+  MultiContactRefTrajectoryGeneration/MultiContactHirukawa.hh
+  patterngeneratorinterfaceprivate.hh
+  Mathematics/FootConstraintsAsLinearSystem.hh
+  Mathematics/Polynome.hh
+  Mathematics/ConvexHull.hh
+  Mathematics/Bsplines.hh
+  Mathematics/StepOverPolynome.hh
+  Mathematics/AnalyticalZMPCOGTrajectory.hh
+  Mathematics/qld.hh
+  Mathematics/PLDPSolver.hh
+  Mathematics/FootHalfSize.hh
+  Mathematics/relative-feet-inequalities.hh
+  Mathematics/intermediate-qp-matrices.hh
+  Mathematics/PolynomeFoot.hh
+  Mathematics/PLDPSolverHerdt.hh
+  Mathematics/OptCholesky.hh
+  StepStackHandler.hh
+  configJRLWPG.hh
+  Clock.hh
+  GlobalStrategyManagers/CoMAndFootOnlyStrategy.hh
+  GlobalStrategyManagers/GlobalStrategyManager.hh
+  GlobalStrategyManagers/DoubleStagePreviewControlStrategy.hh
+  ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.hh
+  ZMPRefTrajectoryGeneration/DynamicFilter.hh
+  ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.hh
+  ZMPRefTrajectoryGeneration/qp-problem.hh
+  ZMPRefTrajectoryGeneration/ZMPDiscretization.hh
+  ZMPRefTrajectoryGeneration/OrientationsPreview.hh
+  ZMPRefTrajectoryGeneration/mpc-trajectory-generation.hh
+  ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh
+  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh
+  ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.hh
+  ZMPRefTrajectoryGeneration/generator-vel-ref.hh
+  ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.hh
+  ZMPRefTrajectoryGeneration/problem-vel-ref.hh
+  ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.hh
+  SimplePlugin.hh
+  portability/gettimeofday.hh
+  portability/bzero.hh
+  MotionGeneration/ComAndFootRealizationByGeometry.hh
+  MotionGeneration/StepOverPlanner.hh
+  MotionGeneration/WaistHeightVariation.hh
+  MotionGeneration/ComAndFootRealization.hh
+  MotionGeneration/GenerateMotionFromKineoWorks.hh
+  MotionGeneration/UpperBodyMotion.hh
+  MotionGeneration/CollisionDetector.hh
+  ../tests/CommonTools.hh
+  ../tests/ClockCPUTime.hh
+  ../tests/TestObject.hh
+  ../doc/additionalHeader/modules.hh
+  ../include/jrl/walkgen/pgtypes.hh
+  ../include/jrl/walkgen/patterngeneratorinterface.hh
+)
+
 SET(SOURCES
+  ${INCLUDES}
   FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp
@@ -75,6 +146,7 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/generator-vel-ref.cpp
   ZMPRefTrajectoryGeneration/mpc-trajectory-generation.cpp
   ZMPRefTrajectoryGeneration/DynamicFilter.cpp
+  MultiContactRefTrajectoryGeneration/MultiContactHirukawa.cc
   MotionGeneration/StepOverPlanner.cpp
   MotionGeneration/CollisionDetector.cpp
   MotionGeneration/WaistHeightVariation.cpp

@@ -6,24 +6,34 @@
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 #include <metapod/algos/jac_point_chain.hh>
 #include "Clock.hh"
+#include <boost/fusion/include/accumulate.hpp>
 
 #ifndef METAPOD_TYPEDEF
 #define METAPOD_TYPEDEF
-  typedef double LocalFloatType;
-  typedef metapod::Spatial::ForceTpl<LocalFloatType> Force_HRP2_14;
-  typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
-  typedef metapod::Nodes< Robot_Model, Robot_Model::BODY >::type RootNode;
-  typedef metapod::Nodes< Robot_Model, Robot_Model::l_ankle >::type LankleNode;
-  typedef metapod::Nodes< Robot_Model, Robot_Model::r_ankle >::type RankleNode;
-  typedef metapod::Nodes< Robot_Model, Robot_Model::l_wrist >::type LhandNode;
-  typedef metapod::Nodes< Robot_Model, Robot_Model::r_wrist >::type RhandNode;
-  typedef metapod::Nodes< Robot_Model, Robot_Model::LARM_LINK0 >::type LshoulderNode;
-  typedef metapod::Nodes< Robot_Model, Robot_Model::RARM_LINK0 >::type RshoulderNode;
+    typedef double LocalFloatType;
+    typedef metapod::Spatial::ForceTpl<LocalFloatType> Force_HRP2_14;
+    typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
 
-  typedef metapod::jac_point_chain < Robot_Model,
-    Robot_Model::l_ankle, Robot_Model::BODY,0,true,false> Jacobian_LF;
-  typedef metapod::jac_point_chain < Robot_Model,
-    Robot_Model::r_ankle, Robot_Model::BODY,0,true,false> Jacobian_RF;
+    typedef metapod::Nodes< Robot_Model, Robot_Model::BODY >::type RootNode;
+    typedef metapod::Nodes< Robot_Model, Robot_Model::l_wrist >::type LhandNode;
+    typedef metapod::Nodes< Robot_Model, Robot_Model::r_wrist >::type RhandNode;
+    typedef metapod::Nodes< Robot_Model, Robot_Model::LARM_LINK0 >::type LshoulderNode;
+    typedef metapod::Nodes< Robot_Model, Robot_Model::RARM_LINK0 >::type RshoulderNode;
+
+    typedef metapod::Nodes< Robot_Model, Robot_Model::LLEG_LINK0 >::type LhipNode;
+    typedef metapod::Nodes< Robot_Model, Robot_Model::RLEG_LINK0 >::type RhipNode;
+    typedef metapod::Nodes< Robot_Model, Robot_Model::l_ankle >::type LankleNode;
+    typedef metapod::Nodes< Robot_Model, Robot_Model::r_ankle >::type RankleNode;
+
+    typedef metapod::jac_point_chain < Robot_Model,
+    Robot_Model::l_ankle, Robot_Model::LLEG_LINK0,0,true,false> Jac_LF;
+    typedef metapod::jac_point_chain < Robot_Model,
+    Robot_Model::r_ankle, Robot_Model::RLEG_LINK0,0,true,false> Jac_RF;
+
+    typedef metapod::jac_point_chain < Robot_Model,
+    Robot_Model::l_wrist, Robot_Model::LARM_LINK0,0,true,false> Jac_LH;
+    typedef metapod::jac_point_chain < Robot_Model,
+    Robot_Model::r_wrist, Robot_Model::RARM_LINK0,0,true,false> Jac_RH;
 
 #endif
 
@@ -44,13 +54,14 @@ namespace PatternGeneratorJRL
     ~DynamicFilter();
     /// \brief
     int OffLinefilter(
-        COMState & lastCtrlCoMState,
-        FootAbsolutePosition & lastCtrlLeftFoot,
-        FootAbsolutePosition & lastCtrlRightFoot,
-        deque<COMState> & inputCOMTraj_deq_,
-        deque<ZMPPosition> inputZMPTraj_deq_,
-        deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-        deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+        const double currentTime,
+        const deque<COMState> & inputCOMTraj_deq_,
+        const deque<ZMPPosition> & inputZMPTraj_deq_,
+        const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+        const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+        const vector<MAL_VECTOR_TYPE(double) > &UpperPart_q,
+        const vector<MAL_VECTOR_TYPE(double) > &UpperPart_dq,
+        const vector<MAL_VECTOR_TYPE(double) > &UpperPart_ddq,
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
     int OnLinefilter(
@@ -64,7 +75,6 @@ namespace PatternGeneratorJRL
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
     void init(
-        double currentTime,
         double controlPeriod,
         double interpolationPeriod,
         double PG_T,
@@ -93,8 +103,8 @@ namespace PatternGeneratorJRL
         const FootAbsolutePosition & inputLeftFoot,
         const FootAbsolutePosition & inputRightFoot,
         vector<double> & ZMPMB,
-        int stage,
-        int iteration);
+        unsigned int stage,
+        unsigned int iteration);
 
     void stage0INstage1();
 
@@ -102,10 +112,6 @@ namespace PatternGeneratorJRL
     int OptimalControl(
         deque<ZMPPosition> & inputdeltaZMP_deq,
         deque<COMState> & outputDeltaCOMTraj_deq_);
-
-    void InverseDynamics(MAL_VECTOR_TYPE(double) & configuration,
-                           MAL_VECTOR_TYPE(double) & velocity,
-                           MAL_VECTOR_TYPE(double) & acceleration);
 
   private: // Private methods
 
@@ -123,14 +129,12 @@ namespace PatternGeneratorJRL
     /// given by the function "filter"
     void InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq);
 
+    metapod::Vector3dTpl< LocalFloatType >::Type computeCoM();
     // -------------------------------------------------------------------
 
   public: // The accessors
 
     /// \brief setter :
-    inline void setCurrentTime(double time)
-    {currentTime_ = time ;}
-
     inline void setControlPeriod(double controlPeriod)
     {controlPeriod_ = controlPeriod ;}
 
@@ -143,16 +147,13 @@ namespace PatternGeneratorJRL
     inline void setPreviewWindowSize_(double previewWindowSize)
     { previewWindowSize_ = previewWindowSize; }
 
-    void setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration,
-                                          MAL_VECTOR_TYPE(double) & velocity,
-                                          MAL_VECTOR_TYPE(double) & acceleration);
+    void setRobotUpperPart(const MAL_VECTOR_TYPE(double) & configuration,
+                           const MAL_VECTOR_TYPE(double) & velocity,
+                           const MAL_VECTOR_TYPE(double) & acceleration);
 
     /// \brief getter :
     inline ComAndFootRealizationByGeometry * getComAndFootRealization()
-    { return comAndFootRealization_;};
-
-    inline double getCurrentTime()
-    {return currentTime_ ;}
+    { return comAndFootRealization_;}
 
     inline double getControlPeriod()
     {return controlPeriod_ ;}
@@ -167,15 +168,23 @@ namespace PatternGeneratorJRL
     { errx = sxzmp_ ; erry = syzmp_ ; }
 
     inline Clock * getClock()
-    { return &clock_ ; };
+    { return &clock_ ; }
+
+
+    inline metapod::Vector3dTpl< LocalFloatType >::Type com ()
+    {
+        double sum_mass = 0.0 ;
+        metapod::Vector3dTpl< LocalFloatType >::Type com (0.0,0.0,0.0);
+        sum_mass = boost::fusion::accumulate(robot_.nodes , sum_mass , MassSum() );
+        com      = boost::fusion::accumulate(robot_.nodes , com      , MassbyComSum() );
+        return com / sum_mass ;
+    }
 
   private: // Private members
 
     /// \brief Time variables
     /// -----------------------------------
-      /// \brief Current time of the PG.
-      double currentTime_ ;
-
+    ///
       /// \brief control period of the PG host
       double controlPeriod_;
 
@@ -234,12 +243,12 @@ namespace PatternGeneratorJRL
     /// ---------------------------------
       /// \brief Initialize the robot with the autogenerated files
       /// by MetapodFromUrdf
-      Robot_Model robot_,robot_2;
+      Robot_Model robot_;
 
       /// \brief Initialize the robot leg jacobians with the
       /// autogenerated files by MetapodFromUrdf
-      Jacobian_LF::Jacobian jacobian_rf_ ;
-      Jacobian_RF::Jacobian jacobian_lf_ ;
+      Jac_LF::Jacobian jacobian_rf_ ;
+      Jac_RF::Jacobian jacobian_lf_ ;
 
       /// \brief force acting on the CoM of the robot expressed
       /// in the Euclidean Frame
@@ -273,6 +282,34 @@ namespace PatternGeneratorJRL
 
       /// \brief time measurement
       Clock clock_;
+
+      /// \brief Stages, used in the analytical inverse kinematic.
+      unsigned int stage0_ ;
+      unsigned int stage1_ ;
+
+  private : // private struct
+      struct MassSum
+      {
+          typedef LocalFloatType result_type;
+
+          template <typename T>
+          result_type operator()( const result_type sum_mass, T & node) const
+          {
+              return ( sum_mass + Robot_Model::inertias[node.id].m() ) ;
+          }
+      };
+
+      struct MassbyComSum
+      {
+          typedef metapod::Vector3dTpl< LocalFloatType >::Type result_type;
+
+          template <typename T>
+          result_type operator()( const result_type sum_h, const T & x) const
+          {
+              double mass = Robot_Model::inertias[x.id].m() ;
+              return ( sum_h + mass * x.body.iX0.r() + x.body.iX0.E() * Robot_Model::inertias[x.id].h() );
+          }
+      };
   };
 
 }

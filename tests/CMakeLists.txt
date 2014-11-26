@@ -169,7 +169,79 @@ ENDMACRO(ADD_HERDT_2010)
 
 #ADD_HERDT_2010(TestHerdt2010)
 ADD_HERDT_2010(TestHerdt2010DynamicFilter)
-ADD_HERDT_2010(TestInverseKinematics)
+
+###########################
+# Test Inverse Kinematics #
+###########################
+
+ADD_EXECUTABLE(TestInverseKinematics
+    ../src/portability/gettimeofday.cc
+    TestInverseKinematics.cpp
+    CommonTools.cpp
+    TestObject.cpp
+    ClockCPUTime.cpp
+)
+
+TARGET_LINK_LIBRARIES(TestInverseKinematics ${PROJECT_NAME})
+PKG_CONFIG_USE_DEPENDENCY(TestInverseKinematics jrl-dynamics)
+PKG_CONFIG_USE_DEPENDENCY(TestInverseKinematics hrp2-dynamics)
+ADD_DEPENDENCIES(TestInverseKinematics ${PROJECT_NAME})
+
+MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
+SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
+SET(samplespec
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
+)
+SET(sampleljr
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
+)
+SET(sampleinitconfig
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
+)
+
+LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
+
+# This test is disabled for now as it fails.
+# FIXME: fix the test and/or the implementation
+ADD_TEST(TestInverseKinematics
+TestInverseKinematics
+${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+
+
+######################
+# Test Hirukawa 2007 #
+######################
+
+ADD_EXECUTABLE(TestHirukawa2007
+../src/portability/gettimeofday.cc
+TestHirukawa2007.cpp
+CommonTools.cpp
+TestObject.cpp
+ClockCPUTime.cpp
+)
+TARGET_LINK_LIBRARIES(TestHirukawa2007 ${PROJECT_NAME})
+PKG_CONFIG_USE_DEPENDENCY(TestHirukawa2007 jrl-dynamics)
+PKG_CONFIG_USE_DEPENDENCY(TestHirukawa2007 hrp2-dynamics)
+ADD_DEPENDENCIES(TestHirukawa2007 ${PROJECT_NAME})
+
+MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
+SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
+SET(samplespec
+  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
+)
+SET(sampleljr
+  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
+)
+SET(sampleinitconfig
+  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat)
+
+LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
+
+# This test is disabled for now as it fails.
+# FIXME: fix the test and/or the implementation
+ADD_TEST(TestHirukawa2007
+  TestHirukawa2007
+  ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 
 
 ####################

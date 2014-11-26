@@ -181,7 +181,6 @@ public:
               m_CurrentVelocity,
               m_CurrentAcceleration,
               0.005,1,iter);
-          dynamicfilter_->InverseDynamics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
           iter++;
           fillInDebugFiles();
         }
@@ -245,7 +244,7 @@ public:
     else{
       supportFoot = m_OneStep.RightFootPosition ;
     }
-    dynamicfilter_->init(0.0,samplingPeriod_,samplingPeriod_,samplingPeriod_,
+    dynamicfilter_->init(samplingPeriod_,samplingPeriod_,samplingPeriod_,
                          samplingPeriod_,0.814,supportFoot,m_OneStep.finalCOMPosition);
     initIK();
     MAL_VECTOR_TYPE(double) UpperConfig = m_HDR->currentConfiguration() ;
@@ -260,7 +259,6 @@ public:
         m_CurrentVelocity,
         m_CurrentAcceleration,
         0.005,1,0);
-    dynamicfilter_->InverseDynamics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
 
   }
 
@@ -319,9 +317,9 @@ protected:
 	  aof.setf(ios::scientific, ios::floatfield);
 	  aof << filterprecision(m_OneStep.NbOfIt*samplingPeriod_ ) << " "                  // 1
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
-	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
+          << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
-              << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                 // 5
+          << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                 // 5
 	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
 	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
 	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
@@ -336,7 +334,7 @@ protected:
 	      << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 17
 	      << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 18
 	      << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 19
-              << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "         // 20
+          << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "         // 20
 	      << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
 	      << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
 	      << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23
@@ -704,20 +702,20 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":stepstairseq\
-                          0.0 -0.105 0.0 0.0\
-                          0.1 0.19 0.0 0.0\
-                          0.1 -0.19 0.0 0.0\
-                          0.1 0.19 0.0 0.0\
-                          0.1 -0.19 0.0 0.0\
-                          0.1 0.19 0.0 0.0\
-                          0.1 -0.19 0.0 0.0\
-                          0.1 0.19 0.0 0.0\
-                          0.1 -0.19 0.0 0.0\
-                          0.1 0.19 0.0 0.0\
-                          0.1 -0.19 0.0 0.0\
-                          0.0 0.19 0.0 0.0"
-                          );
+        istringstream strm2(":stepstairseq\
+                            0.0 -0.105 0.0 0.0\
+                            0.2 0.19 0.0 0.0\
+                            0.2 -0.19 0.0 0.0\
+                            0.2 0.19 0.0 0.0\
+                            0.2 -0.19 0.0 0.0\
+                            0.2 0.19 0.0 0.0\
+                            0.2 -0.19 0.0 0.0\
+                            0.2 0.19 0.0 0.0\
+                            0.2 -0.19 0.0 0.0\
+                            0.2 0.19 0.0 0.0\
+                            0.2 -0.19 0.0 0.0\
+                            0.0 0.19 0.0 0.0\
+                            ");
       aPGI.ParseCmd(strm2);
     }
   }

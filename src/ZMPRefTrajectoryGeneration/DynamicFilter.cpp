@@ -9,7 +9,6 @@ DynamicFilter::DynamicFilter(
     SimplePluginManager *SPM,
     CjrlHumanoidDynamicRobot *aHS)
 {
-  currentTime_ = 0.0 ;
   controlPeriod_ = 0.0 ;
   interpolationPeriod_ = 0.0 ;
   previewWindowSize_ = 0.0 ;
@@ -24,6 +23,8 @@ DynamicFilter::DynamicFilter(
   comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
+  stage0_ = 0 ;
+  stage1_ = 1 ;
 
   PC_ = new PreviewControl(
       SPM,OptimalControllerSolver::MODE_WITH_INITIALPOS,false);
@@ -49,8 +50,8 @@ DynamicFilter::DynamicFilter(
   DInitX_ = 0.0 ;
   DInitY_ = 0.0 ;
 
-  jacobian_lf_ = Jacobian_LF::Jacobian::Zero();
-  jacobian_rf_ = Jacobian_RF::Jacobian::Zero();
+  jacobian_lf_ = Jac_LF::Jacobian::Zero();
+  jacobian_rf_ = Jac_RF::Jacobian::Zero();
 
   sxzmp_ = 0.0 ;
   syzmp_ = 0.0 ;
@@ -74,23 +75,9 @@ DynamicFilter::~DynamicFilter()
   }
 }
 
-void DynamicFilter::InverseDynamics(MAL_VECTOR_TYPE(double) & configuration,
-                                      MAL_VECTOR_TYPE(double) & velocity,
-                                      MAL_VECTOR_TYPE(double) & acceleration)
-{
-  Robot_Model::confVector q, dq, ddq ;
-  for(unsigned int j = 0 ; j < configuration.size() ; j++ )
-  {
-    q(j,0) = configuration(j) ;
-    dq(j,0) = velocity(j) ;
-    ddq(j,0) = acceleration(j) ;
-  }
-  metapod::rnea< Robot_Model, true >::run(robot_, q, dq, ddq);
-}
-
-void DynamicFilter::setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration,
-                                      MAL_VECTOR_TYPE(double) & velocity,
-                                      MAL_VECTOR_TYPE(double) & acceleration)
+void DynamicFilter::setRobotUpperPart(const MAL_VECTOR_TYPE(double) & configuration,
+                                      const MAL_VECTOR_TYPE(double) & velocity,
+                                      const MAL_VECTOR_TYPE(double) & acceleration)
 {
   for ( unsigned int i = 0 ; i < upperPartIndex.size() ; ++i )
   {
@@ -103,7 +90,6 @@ void DynamicFilter::setRobotUpperPart(MAL_VECTOR_TYPE(double) & configuration,
 
 /// \brief Initialise all objects, to be called just after the constructor
 void DynamicFilter::init(
-    double currentTime,
     double controlPeriod,
     double interpolationPeriod,
     double PG_T,
@@ -112,7 +98,6 @@ void DynamicFilter::init(
     FootAbsolutePosition inputLeftFoot,
     COMState inputCoMState)
 {
-  currentTime_ = currentTime ;
   controlPeriod_ = controlPeriod ;
   interpolationPeriod_ = interpolationPeriod ;
   PG_T_ = PG_T ;
@@ -161,7 +146,6 @@ void DynamicFilter::init(
   prev_dq_ = dq_ ;
   prev_ddq_ = ddq_ ;
   jcalc<Robot_Model>::run(robot_,q_ ,dq_ );
-  jcalc<Robot_Model>::run(robot_2,q_, dq_);
 
   deltaZMP_deq_.resize( PG_N_);
   ZMPMB_vec_.resize( PG_N_, vector<double>(2));
@@ -201,32 +185,53 @@ void DynamicFilter::init(
 }
 
 int DynamicFilter::OffLinefilter(
-    COMState & lastCtrlCoMState,
-    FootAbsolutePosition & lastCtrlLeftFoot,
-    FootAbsolutePosition & lastCtrlRightFoot,
-    deque<COMState> & inputCOMTraj_deq_,
-    deque<ZMPPosition> inputZMPTraj_deq_,
-    deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-    deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+    const double currentTime,
+    const deque<COMState> &inputCOMTraj_deq_,
+    const deque<ZMPPosition> &inputZMPTraj_deq_,
+    const deque<FootAbsolutePosition> &inputLeftFootTraj_deq_,
+    const deque<FootAbsolutePosition> &inputRightFootTraj_deq_,
+    const vector< MAL_VECTOR_TYPE(double) > & UpperPart_q,
+    const vector< MAL_VECTOR_TYPE(double) > & UpperPart_dq,
+    const vector< MAL_VECTOR_TYPE(double) > & UpperPart_ddq,
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
-  // TODO implement the filter in one single function for offline walking
+  unsigned int N = inputCOMTraj_deq_.size() ;
+  ZMPMB_vec_.resize(N) ;
+  deltaZMP_deq_.resize(N);
+
+  setRobotUpperPart(UpperPart_q[0],UpperPart_dq[0],UpperPart_ddq[0]);
+
+  for(unsigned int i = 0 ; i < N ; ++i )
+  {
+    ComputeZMPMB(interpolationPeriod_,inputCOMTraj_deq_[i],inputLeftFootTraj_deq_[i],
+                 inputRightFootTraj_deq_[i], ZMPMB_vec_[i] , stage0_ , i);
+  }
+  for (unsigned int i = 0 ; i < N ; ++i)
+  {
+    deltaZMP_deq_[i].px = inputZMPTraj_deq_[i].px - ZMPMB_vec_[i][0] ;
+    deltaZMP_deq_[i].py = inputZMPTraj_deq_[i].py - ZMPMB_vec_[i][1] ;
+    deltaZMP_deq_[i].pz = 0.0 ;
+    deltaZMP_deq_[i].theta = 0.0 ;
+    deltaZMP_deq_[i].time = currentTime + i * interpolationPeriod_ ;
+    deltaZMP_deq_[i].stepType = inputZMPTraj_deq_[i].stepType ;
+  }
+  OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
+
   return 0;
 }
 
-int DynamicFilter::OnLinefilter(
-    const deque<COMState> & ctrlCoMState,
-    const deque<FootAbsolutePosition> & ctrlLeftFoot,
-    const deque<FootAbsolutePosition> & ctrlRightFoot,
-    const deque<COMState> & inputCOMTraj_deq_,
-    const deque<ZMPPosition> inputZMPTraj_deq_,
-    const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-    const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-    deque<COMState> & outputDeltaCOMTraj_deq_)
-{
-  // TODO implement the filter in one single function for online walking
-  return 0 ;
-}
+//int DynamicFilter::OnLinefilter(
+//    const deque<COMState> & ctrlCoMState,
+//    const deque<FootAbsolutePosition> & ctrlLeftFoot,
+//    const deque<FootAbsolutePosition> & ctrlRightFoot,
+//    const deque<COMState> & inputCOMTraj_deq_,
+//    const deque<ZMPPosition> inputZMPTraj_deq_,
+//    const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+//    const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+//    deque<COMState> & outputDeltaCOMTraj_deq_)
+//{
+//  return 0 ;
+//}
 
 void DynamicFilter::InverseKinematics(
     const COMState & inputCoMState,
@@ -239,6 +244,8 @@ void DynamicFilter::InverseKinematics(
     int stage,
     int iteration)
 {
+
+  // lower body
   aCoMState_(0) = inputCoMState.x[0];       aCoMSpeed_(0) = inputCoMState.x[1];
   aCoMState_(1) = inputCoMState.y[0];       aCoMSpeed_(1) = inputCoMState.y[1];
   aCoMState_(2) = inputCoMState.z[0];       aCoMSpeed_(2) = inputCoMState.z[1];
@@ -266,16 +273,11 @@ void DynamicFilter::InverseKinematics(
       configuration, velocity, acceleration,
       iteration, stage);
 
+  // upper body
   if (walkingHeuristic_)
   {
     LankleNode & node_lankle = boost::fusion::at_c<Robot_Model::l_ankle>(robot_.nodes);
     RankleNode & node_rankle = boost::fusion::at_c<Robot_Model::r_ankle>(robot_.nodes);
-
-    LhandNode & node_lhand = boost::fusion::at_c<Robot_Model::l_wrist>(robot_.nodes);
-    RhandNode & node_rhand = boost::fusion::at_c<Robot_Model::r_wrist>(robot_.nodes);
-
-    LshoulderNode & node_lshoulder = boost::fusion::at_c<Robot_Model::LARM_LINK0>(robot_.nodes);
-    RshoulderNode & node_rshoulder = boost::fusion::at_c<Robot_Model::RARM_LINK0>(robot_.nodes);
 
     RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
 
@@ -283,11 +285,6 @@ void DynamicFilter::InverseKinematics(
     Spatial::TransformT<LocalFloatType,Spatial::RotationMatrixTpl<LocalFloatType> > waistXrf ;
     waistXlf = node_waist.body.iX0 * node_lankle.body.iX0.inverse() ;
     waistXrf = node_waist.body.iX0 * node_rankle.body.iX0.inverse() ;
-//
-//    Spatial::TransformT<LocalFloatType,Spatial::RotationMatrixTpl<LocalFloatType> > shoulderXlh ;
-//    Spatial::TransformT<LocalFloatType,Spatial::RotationMatrixTpl<LocalFloatType> > shoulderXrh ;
-//    shoulderXlh = node_lshoulder.body.iX0 * node_lhand.body.iX0.inverse() ;
-//    shoulderXrh = node_rshoulder.body.iX0 * node_rhand.body.iX0.inverse() ;
 
     // Homogeneous matrix
     matrix4d identity,leftHandPose, rightHandPose;
@@ -299,8 +296,6 @@ void DynamicFilter::InverseKinematics(
     MAL_S4x4_MATRIX_ACCESS_I_J(leftHandPose,1,3) = 0.0;
     MAL_S4x4_MATRIX_ACCESS_I_J(leftHandPose,2,3) = -0.45;
 
-
-
     MAL_S4x4_MATRIX_ACCESS_I_J(rightHandPose,0,3) = -4*waistXlf.r()(0);
     MAL_S4x4_MATRIX_ACCESS_I_J(rightHandPose,1,3) = 0.0;
     MAL_S4x4_MATRIX_ACCESS_I_J(rightHandPose,2,3) = -0.45;
@@ -309,7 +304,6 @@ void DynamicFilter::InverseKinematics(
     MAL_VECTOR_DIM(rarm_q, double, 6) ;
 
     CjrlHumanoidDynamicRobot * HDR = comAndFootRealization_->getHumanoidDynamicRobot();
-    int err1,err2;
 
     CjrlJoint* left_shoulder = NULL ;
     CjrlJoint* right_shoulder = NULL ;
@@ -323,9 +317,8 @@ void DynamicFilter::InverseKinematics(
         right_shoulder = actuatedJoints[i];
     }
 
-
-    err1 = HDR->getSpecializedInverseKinematics( *left_shoulder ,*(HDR->leftWrist()), identity, leftHandPose, larm_q );
-    err2 = HDR->getSpecializedInverseKinematics( *right_shoulder ,*(HDR->rightWrist()), identity, rightHandPose, rarm_q );
+    HDR->getSpecializedInverseKinematics( *left_shoulder ,*(HDR->leftWrist()), identity, leftHandPose, larm_q );
+    HDR->getSpecializedInverseKinematics( *right_shoulder ,*(HDR->rightWrist()), identity, rightHandPose, rarm_q );
 
     // swinging arms
     upperPartConfiguration_(upperPartIndex[0])= 0.0 ;             // CHEST_JOINT0
@@ -381,8 +374,8 @@ void DynamicFilter::ComputeZMPMB(
     const FootAbsolutePosition & inputLeftFoot,
     const FootAbsolutePosition & inputRightFoot,
     vector<double> & ZMPMB,
-    int stage,
-    int iteration)
+    unsigned int stage,
+    unsigned int iteration)
 {
   InverseKinematics( inputCoMState, inputLeftFoot, inputRightFoot,
       ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
@@ -397,19 +390,21 @@ void DynamicFilter::ComputeZMPMB(
   }
 
   //computeWaist( inputLeftFoot );
-  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
+
   // Apply the RNEA on the robot model
-  clock_.StartTiming();
+  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
   metapod::rnea< Robot_Model, true >::run(robot_, q_, dq_, ddq_);
-  clock_.StopTiming();
 
-  clock_.IncIteration();
-
+  // extract the CoM momentum and forces
   m_force = node_waist.body.iX0.applyInv(node_waist.joint.f);
+  metapod::Vector3dTpl< LocalFloatType >::Type CoM_Waist_vec (node_waist.body.iX0.r() - com ()) ;
+  metapod::Vector3dTpl< LocalFloatType >::Type CoM_torques (0.0,0.0,0.0);
+  CoM_torques = m_force.n() + metapod::Skew<LocalFloatType>(CoM_Waist_vec) * m_force.f() ;
 
+  // compute the Multibody ZMP
   ZMPMB.resize(2);
-  ZMPMB[0] = - m_force.n()[1] / m_force.f()[2] ;
-  ZMPMB[1] =   m_force.n()[0] / m_force.f()[2] ;
+  ZMPMB[0] = - CoM_torques[1] / m_force.f()[2] ;
+  ZMPMB[1] =   CoM_torques[0] / m_force.f()[2] ;
 
   return ;
 }
@@ -451,4 +446,176 @@ int DynamicFilter::OptimalControl(
     }
   }
   return 0 ;
+}
+
+// TODO finish the implementation of a better waist tracking
+void DynamicFilter::computeWaist(const FootAbsolutePosition & inputLeftFoot)
+{
+  Eigen::Matrix< LocalFloatType, 6, 1 > waist_speed, waist_acc ;
+  Eigen::Matrix< LocalFloatType, 3, 1 > waist_theta ;
+  // compute the speed and acceleration of the waist in the world frame
+  if (PreviousSupportFoot_)
+  {
+    Jac_LF::run(robot_, prev_q_, Vector3dTpl<LocalFloatType>::Type(0,0,0), jacobian_lf_);
+    waist_speed = jacobian_lf_ * prev_dq_ ;
+    waist_acc = jacobian_lf_ * prev_ddq_ /* + d_jacobian_lf_ * prev_dq_*/ ;
+  }else
+  {
+    Jac_RF::run(robot_, prev_q_, Vector3dTpl<LocalFloatType>::Type(0,0,0), jacobian_rf_);
+    waist_speed = jacobian_rf_ * prev_dq_ ;
+    waist_acc = jacobian_rf_ * prev_ddq_ /*+ d_jacobian_rf_ * prev_dq_*/ ;
+  }
+  for (unsigned int i = 0 ; i < 6 ; ++i)
+  {
+    dq_(i,0)   = waist_speed(i,0);
+    ddq_(i,0)  = waist_acc(i,0);
+  }
+  // compute the position of the waist in the world frame
+  RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
+  waist_theta(0,0) = prev_q_(3,0) ;
+  waist_theta(1,0) = prev_dq_(4,0) ;
+  waist_theta(2,0) = prev_ddq_(5,0) ;
+  q_(0,0) = node_waist.body.iX0.inverse().r()(0,0) ;
+  q_(1,0) = node_waist.body.iX0.inverse().r()(1,0) ;
+  q_(2,0) = node_waist.body.iX0.inverse().r()(2,0) ;
+  q_(3,0) = waist_theta(0,0) ;
+  q_(4,0) = waist_theta(1,0) ;
+  q_(5,0) = waist_theta(2,0) ;
+
+  if (inputLeftFoot.stepType<0)
+  {
+    PreviousSupportFoot_ = true ; // left foot is supporting
+  }
+  else
+  {
+    PreviousSupportFoot_ = false ; // right foot is supporting
+  }
+  prev_q_ = q_ ;
+  prev_dq_ = dq_ ;
+  prev_ddq_ = ddq_ ;
+
+  //  Robot_Model::confVector q, dq, ddq;
+  //  for(unsigned int j = 0 ; j < 6 ; j++ )
+  //  {
+  //    q(j,0) = 0 ;
+  //    dq(j,0) = 0 ;
+  //    ddq(j,0) = 0 ;
+  //  }
+  //  for(unsigned int j = 6 ; j < ZMPMBConfiguration_.size() ; j++ )
+  //  {
+  //    q(j,0) = ZMPMBConfiguration_(j) ;
+  //    dq(j,0) = ZMPMBVelocity_(j) ;
+  //    ddq(j,0) = ZMPMBAcceleration_(j) ;
+  //  }
+  //
+  //  metapod::rnea< Robot_Model, true >::run(robot_2, q, dq, ddq);
+  //  LankleNode & node_lankle = boost::fusion::at_c<Robot_Model::l_ankle>(robot_2.nodes);
+  //  RankleNode & node_rankle = boost::fusion::at_c<Robot_Model::r_ankle>(robot_2.nodes);
+  //
+  //  CWx = node_waist.body.iX0.r()(0,0) - inputCoMState.x[0] ;
+  //  CWy = node_waist.body.iX0.r()(1,0) - inputCoMState.y[0] ;
+  //
+  //  // Debug Purpose
+  //  // -------------
+  //  ofstream aof;
+  //  string aFileName;
+  //  ostringstream oss(std::ostringstream::ate);
+  //  static int it = 0;
+  //
+  //  // --------------------
+  //  oss.str("DynamicFilterMetapodAccWaistSupportFoot.dat");
+  //  aFileName = oss.str();
+  //  if(it == 0)
+  //  {
+  //    aof.open(aFileName.c_str(),ofstream::out);
+  //    aof.close();
+  //  }
+  //  ///----
+  //  aof.open(aFileName.c_str(),ofstream::app);
+  //  aof.precision(8);
+  //  aof.setf(ios::scientific, ios::floatfield);
+  //  aof << filterprecision( it*samplingPeriod) << " " ;     // 1
+  //
+  //  if (inputLeftFoot.stepType < 0)
+  //  {
+  //    aof << filterprecision( node_lankle.body.ai.v()(0,0) ) << " "  // 2
+  //        << filterprecision( node_lankle.body.ai.v()(1,0) ) << " "  // 3
+  //        << filterprecision( node_lankle.body.ai.v()(2,0) ) << " "  // 4
+  //        << filterprecision( node_lankle.body.ai.w()(0,0) ) << " "  // 5
+  //        << filterprecision( node_lankle.body.ai.w()(1,0) ) << " "  // 6
+  //        << filterprecision( node_lankle.body.ai.w()(2,0) ) << " "; // 7
+  //  }else
+  //  {
+  //    aof << filterprecision( node_rankle.body.ai.v()(0,0) ) << " "  // 2
+  //        << filterprecision( node_rankle.body.ai.v()(1,0) ) << " "  // 3
+  //        << filterprecision( node_rankle.body.ai.v()(2,0) ) << " "  // 4
+  //        << filterprecision( node_rankle.body.ai.w()(0,0) ) << " "  // 5
+  //        << filterprecision( node_rankle.body.ai.w()(1,0) ) << " "  // 6
+  //        << filterprecision( node_rankle.body.ai.w()(2,0) ) << " " ;// 7
+  //  }
+  //
+  //  aof << filterprecision( inputCoMState.x[2] ) << " "           // 8
+  //      << filterprecision( inputCoMState.y[2] ) << " "           // 9
+  //      << filterprecision( inputCoMState.z[2] ) << " "           // 10
+  //      << filterprecision( inputCoMState.roll[2] ) << " "        // 11
+  //      << filterprecision( inputCoMState.pitch[2] ) << " "       // 12
+  //      << filterprecision( inputCoMState.yaw[2] ) << " "       ; // 13
+  //
+  //  if (inputLeftFoot.stepType < 0)
+  //  {
+  //    aof << filterprecision( node_lankle.body.vi.v()(0,0) ) << " "  // 14
+  //        << filterprecision( node_lankle.body.vi.v()(1,0) ) << " "  // 15
+  //        << filterprecision( node_lankle.body.vi.v()(2,0) ) << " "  // 16
+  //        << filterprecision( node_lankle.body.vi.w()(0,0) ) << " "  // 17
+  //        << filterprecision( node_lankle.body.vi.w()(1,0) ) << " "  // 18
+  //        << filterprecision( node_lankle.body.vi.w()(2,0) ) << " " ;// 19
+  //  }else
+  //  {
+  //    aof << filterprecision( node_rankle.body.vi.v()(0,0) ) << " "  // 14
+  //        << filterprecision( node_rankle.body.vi.v()(1,0) ) << " "  // 15
+  //        << filterprecision( node_rankle.body.vi.v()(2,0) ) << " "  // 16
+  //        << filterprecision( node_rankle.body.vi.w()(0,0) ) << " "  // 17
+  //        << filterprecision( node_rankle.body.vi.w()(1,0) ) << " "  // 18
+  //        << filterprecision( node_rankle.body.vi.w()(2,0) ) << " "; // 19
+  //  }
+  //
+  //  aof << filterprecision( inputCoMState.x[1] ) << " "           // 20
+  //      << filterprecision( inputCoMState.y[1] ) << " "           // 21
+  //      << filterprecision( inputCoMState.z[1] ) << " "           // 22
+  //      << filterprecision( inputCoMState.roll[1] ) << " "        // 23
+  //      << filterprecision( inputCoMState.pitch[1] ) << " "       // 24
+  //      << filterprecision( inputCoMState.yaw[1] ) << " "     ;   // 25
+  //
+  //  aof << filterprecision( node_waist.joint.vj.v()(0,0) ) << " " // 26
+  //      << filterprecision( node_waist.joint.vj.v()(1,0) ) << " "  // 27
+  //      << filterprecision( node_waist.joint.vj.v()(2,0) ) << " "  // 28
+  //      << filterprecision( node_waist.joint.vj.w()(0,0) ) << " "  // 29
+  //      << filterprecision( node_waist.joint.vj.w()(1,0) ) << " "  // 30
+  //      << filterprecision( node_waist.joint.vj.w()(2,0) ) << " "; // 31
+  //
+  //  aof << filterprecision( inputCoMState.x[0] ) << " "           // 32
+  //      << filterprecision( inputCoMState.y[0] ) << " "           // 33
+  //      << filterprecision( inputCoMState.z[0] ) << " "           // 34
+  //      << filterprecision( inputCoMState.roll[0] ) << " "        // 35
+  //      << filterprecision( inputCoMState.pitch[0] ) << " "       // 36
+  //      << filterprecision( inputCoMState.yaw[0] ) << " "     ;   // 37
+  //
+  //  aof << filterprecision( node_waist.body.iX0.r()(0,0) ) << " " // 38
+  //      << filterprecision( node_waist.body.iX0.r()(1,0) ) << " " // 39
+  //      << filterprecision( node_waist.body.iX0.r()(2,0) ) << " ";// 40
+  //
+  //
+  //  for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )//41
+  //    aof << filterprecision( ZMPMBConfiguration_(j) ) << " " ;
+  //  for(unsigned int j = 0 ; j < ZMPMBVelocity_.size() ; j++ )    //77
+  //    aof << filterprecision( ZMPMBVelocity_(j) ) << " " ;
+  //  for(unsigned int j = 0 ; j < ZMPMBAcceleration_.size() ; j++ )//113
+  //    aof << filterprecision( ZMPMBAcceleration_(j) ) << " " ;
+  //
+  //
+  //  aof << endl ;
+  //  aof.close();
+  //  ++it;
+
+  return ;
 }

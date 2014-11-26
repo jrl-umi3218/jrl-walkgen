@@ -563,7 +563,6 @@ computing the analytical trajectories. */
 
     /*! Set the current time reference for the analytical trajectory. */
     double TimeShift = m_Tsingle*2;
-    //double TimeShift = m_Tsingle;
     m_AbsoluteTimeReference = m_CurrentTime-TimeShift;
     m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
     m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
@@ -573,10 +572,12 @@ computing the analytical trajectories. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
 
+    //deque<COMState> filteredCoM = COMStates ;
+
+    /*! initialize the dynamic filter */
     unsigned int n = COMStates.size();
     double KajitaPCpreviewWindow = 1.6 ;
-    m_kajitaDynamicFilter->init( m_CurrentTime,
-                                 m_SamplingPeriod,
+    m_kajitaDynamicFilter->init( m_SamplingPeriod,
                                  m_SamplingPeriod,
                                  (double)(n+1)*m_SamplingPeriod,
                                  KajitaPCpreviewWindow,
@@ -584,12 +585,13 @@ computing the analytical trajectories. */
                                  InitLeftFootAbsolutePosition,
                                  lStartingCOMState );
 
+    /*! Set the upper body trajectory */
     CjrlHumanoidDynamicRobot * aHDR = m_kajitaDynamicFilter->
                                              getComAndFootRealization()->getHumanoidDynamicRobot();
     MAL_VECTOR_TYPE(double) UpperConfig = aHDR->currentConfiguration() ;
     MAL_VECTOR_TYPE(double) UpperVel = aHDR->currentVelocity() ;
     MAL_VECTOR_TYPE(double) UpperAcc = aHDR->currentAcceleration() ;
-//    // carry the weight in front of him
+    // carry the weight in front of him
     UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
     UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
     UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
@@ -634,8 +636,6 @@ computing the analytical trajectories. */
       UpperAcc(i)=0.0;
     }
 
-
-
     m_kajitaDynamicFilter->setRobotUpperPart(UpperConfig,UpperVel,UpperAcc);
 
     /*! Add "KajitaPCpreviewWindow" second to the buffers for fitering */
@@ -650,37 +650,26 @@ computing the analytical trajectories. */
       LeftFootAbsolutePositions.push_back(lastLF);
       RightFootAbsolutePositions.push_back(lastRF);
     }
-    unsigned int N = ZMPPositions.size();
-    int stage0 = 0 ;
-    vector <vector<double> > ZMPMB (N , vector<double> (2,0.0)) ;
-    for (unsigned int i = 0  ; i < N ; ++i)
-    {
-      m_kajitaDynamicFilter->ComputeZMPMB( m_SamplingPeriod, COMStates[i],
-                                           LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],
-                                           ZMPMB[i] , stage0 , i);
-    }
-    m_kajitaDynamicFilter->getClock()->Display();
 
-    deque<ZMPPosition> inputdeltaZMP_deq(N) ;
     deque<COMState> outputDeltaCOMTraj_deq ;
-    for (unsigned int i = 0 ; i < N ; ++i)
-    {
-      inputdeltaZMP_deq[i].px = ZMPPositions[i].px - ZMPMB[i][0] ;
-      inputdeltaZMP_deq[i].py = ZMPPositions[i].py - ZMPMB[i][1] ;
-      inputdeltaZMP_deq[i].pz = 0.0 ;
-      inputdeltaZMP_deq[i].theta = 0.0 ;
-      inputdeltaZMP_deq[i].time = m_CurrentTime + i * m_SamplingPeriod ;
-      inputdeltaZMP_deq[i].stepType = ZMPPositions[i].stepType ;
-    }
-    m_kajitaDynamicFilter->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
+    m_kajitaDynamicFilter->OffLinefilter(
+                m_CurrentTime,
+                COMStates,
+                ZMPPositions,
+                LeftFootAbsolutePositions,
+                RightFootAbsolutePositions,
+                vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
+                vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
+                vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
+                outputDeltaCOMTraj_deq);
 
     vector <vector<double> > filteredZMPMB (n , vector<double> (2,0.0)) ;
     for (unsigned int i = 0 ; i < n ; ++i)
     {
       for(int j=0;j<3;j++)
       {
-//                COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-//                COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+        COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+        COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
     }
 
@@ -689,15 +678,6 @@ computing the analytical trajectories. */
     {
       m_UpperTimeLimitToUpdateStacks += m_DeltaTj[i];
     }
-
-    for (unsigned int i = 0  ; i < KajitaPCpreviewWindow/m_SamplingPeriod ; ++i)
-    {
-      ZMPPositions.pop_back();
-      COMStates.pop_back();
-      LeftFootAbsolutePositions.pop_back();
-      RightFootAbsolutePositions.pop_back();
-    }
-
   }
 
   int AnalyticalMorisawaCompact::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
@@ -763,7 +743,7 @@ When the limit is reached, and the stack exhausted this method is called again. 
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
 
-    m_kajitaDynamicFilter->init( m_CurrentTime, m_SamplingPeriod, 0.04, m_SamplingPeriod, 1.6,
+    m_kajitaDynamicFilter->init( m_SamplingPeriod, 0.04, m_SamplingPeriod, 1.6,
                                  lStartingCOMState.z[0], InitLeftFootAbsolutePosition, lStartingCOMState );
 
     return m_RelativeFootPositions.size();

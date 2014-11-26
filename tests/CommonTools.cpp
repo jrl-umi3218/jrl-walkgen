@@ -140,6 +140,11 @@ namespace PatternGeneratorJRL {
 	  SpecificitiesFileName = argv[3];
 	  LinkJointRank = argv[4];
 	  InitConfig = argv[5];
+      cout << VRMLPath << endl ;
+      cout << VRMLFileName << endl ;
+      cout << SpecificitiesFileName << endl ;
+      cout << LinkJointRank << endl ;
+      cout << InitConfig << endl ;
 	}
     }
   } /* End of TestSuite namespace */
