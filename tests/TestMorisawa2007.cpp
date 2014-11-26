@@ -181,7 +181,6 @@ public:
               m_CurrentVelocity,
               m_CurrentAcceleration,
               0.005,1,iter);
-          dynamicfilter_->InverseDynamics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
           iter++;
           fillInDebugFiles();
         }
@@ -260,7 +259,6 @@ public:
         m_CurrentVelocity,
         m_CurrentAcceleration,
         0.005,1,0);
-    dynamicfilter_->InverseDynamics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
 
   }
 
@@ -319,7 +317,7 @@ protected:
 	  aof.setf(ios::scientific, ios::floatfield);
 	  aof << filterprecision(m_OneStep.NbOfIt*samplingPeriod_ ) << " "                  // 1
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
-	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
+          << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
           << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                 // 5
 	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6

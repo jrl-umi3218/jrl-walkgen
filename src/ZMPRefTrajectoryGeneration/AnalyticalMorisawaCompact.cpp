@@ -590,7 +590,7 @@ computing the analytical trajectories. */
     MAL_VECTOR_TYPE(double) UpperConfig = aHDR->currentConfiguration() ;
     MAL_VECTOR_TYPE(double) UpperVel = aHDR->currentVelocity() ;
     MAL_VECTOR_TYPE(double) UpperAcc = aHDR->currentAcceleration() ;
-//    // carry the weight in front of him
+    // carry the weight in front of him
     UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
     UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
     UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
@@ -683,8 +683,8 @@ computing the analytical trajectories. */
       {
         filteredCoM[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
         filteredCoM[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
-//                COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-//                COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+                COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+                COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
       m_kajitaDynamicFilter->ComputeZMPMB(m_SamplingPeriod, filteredCoM[i],
                                           LeftFootAbsolutePositions[i], RightFootAbsolutePositions[i],

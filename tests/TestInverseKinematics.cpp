@@ -283,7 +283,6 @@ public:
         m_CurrentVelocity,
         m_CurrentAcceleration,
         0.005,1,0);
-    dynamicfilter_->InverseDynamics(m_CurrentConfiguration,m_CurrentVelocity,m_CurrentAcceleration);
   }
 
 protected:
