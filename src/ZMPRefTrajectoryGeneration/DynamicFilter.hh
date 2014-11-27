@@ -127,7 +127,12 @@ namespace PatternGeneratorJRL
 
     /// \brief Apply the RNEA on the robot model and over the whole trajectory
     /// given by the function "filter"
-    void InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq);
+    void InverseDynamics(MAL_VECTOR_TYPE(double)& configuration,
+                         MAL_VECTOR_TYPE(double)& velocity,
+                         MAL_VECTOR_TYPE(double)& acceleration);
+
+    void ExtractZMP(vector<double> & ZMPMB,
+                    const COMState & inputCoMState) ;
 
     metapod::Vector3dTpl< LocalFloatType >::Type computeCoM();
 
@@ -173,6 +178,8 @@ namespace PatternGeneratorJRL
     inline Clock * getClock()
     { return &clock_ ; }
 
+    inline deque< vector<double> > zmpmb()
+    { return ZMPMB_vec_ ; }
 
     inline metapod::Vector3dTpl< LocalFloatType >::Type com ()
     {

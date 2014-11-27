@@ -567,6 +567,29 @@ void
                                    ControlIteration + i);
     }
 
+    ofstream aof;
+    string aFileName;
+    static int iteration_zmp = 0 ;
+    ostringstream oss(std::ostringstream::ate);
+    oss.str("zmpmb_herdt.dat");
+    aFileName = oss.str();
+    if ( iteration_zmp == 0 )
+    {
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+    }
+    ///----
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
+    {
+      aof << filterprecision( zmpmb[i][0] ) << " " ;
+      aof << filterprecision( zmpmb[i][1] ) << " " ;
+    }
+    aof.close();
+
+
     // Computing the interpolated ZMPMB
     DynamicFilterInterpolation(time) ;
 
@@ -608,10 +631,34 @@ void
     {
       for(int j=0;j<3;j++)
       {
-        //FinalCOMTraj_deq[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-        //FinalCOMTraj_deq[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+        FinalCOMTraj_deq[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+        FinalCOMTraj_deq[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
     }
+
+    int stage2 = 2 ;
+    vector< vector<double> > zmpmb_corr (NbSampleControl_,vector<double>(2,0.0));
+    for(unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
+    {
+      dynamicFilter_->ComputeZMPMB(m_SamplingPeriod,
+                                   FinalCOMTraj_deq[i],
+                                   FinalLeftFootTraj_deq[i],
+                                   FinalRightFootTraj_deq[i],
+                                   zmpmb_corr[i],
+                                   stage2,
+                                   ControlIteration + i);
+    }
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
+    {
+      aof << filterprecision( zmpmb_corr[i][0] ) << " " ;
+      aof << filterprecision( zmpmb_corr[i][1] ) << " " ;
+      aof << endl ;
+    }
+    aof.close();
+    iteration_zmp++ ;
 
     // Specify that we are in the ending phase.
     if (EndingPhase_ == false)

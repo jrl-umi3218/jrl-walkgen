@@ -673,6 +673,14 @@ computing the analytical trajectories. */
       }
     }
 
+    for (unsigned int i = 0  ; i < KajitaPCpreviewWindow/m_SamplingPeriod ; ++i)
+    {
+      ZMPPositions.pop_back();
+      COMStates.pop_back();
+      LeftFootAbsolutePositions.pop_back();
+      RightFootAbsolutePositions.pop_back();
+    }
+
     m_UpperTimeLimitToUpdateStacks = m_CurrentTime;
     for(int i=0;i<m_NumberOfIntervals;i++)
     {

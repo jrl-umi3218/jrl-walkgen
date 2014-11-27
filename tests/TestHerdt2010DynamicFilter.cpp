@@ -246,7 +246,7 @@ public:
     initIK();
 
     {
-      istringstream strm2(":setfeetconstraint XY 0.04 0.04");
+      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
       m_PGI->ParseCmd(strm2);
     }
 
@@ -285,24 +285,23 @@ protected:
   {
     static int cleanFiles = 0 ;
     if (cleanFiles == 0){
-      ofstream aof;
-      string aFileName;
-      string path = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/" ;
-      aFileName = path + m_TestName;
-      aFileName += "TestFGPI.dat";
+        ofstream aof;
+        string aFileName;
+        aFileName = m_TestName;
+        aFileName += "TestFGPI.dat";
       aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
+      cleanFiles = 1 ;
     }
     cleanFiles = 1 ;
     if (m_DebugFGPI)
-    {
-      ofstream aof;
-      string aFileName;
-      string path = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/" ;
-      aFileName = path + m_TestName;
-      aFileName += "TestFGPI.dat";
-      aof.open(aFileName.c_str(),ofstream::app);
-      aof.precision(8);
+      {
+        ofstream aof;
+        string aFileName;
+        aFileName = m_TestName;
+        aFileName += "TestFGPI.dat";
+        aof.open(aFileName.c_str(),ofstream::app);
+        aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
       aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "                            // 1
           << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
@@ -626,6 +625,10 @@ protected:
       istringstream strm2(":numberstepsbeforestop 2");
       aPGI.ParseCmd(strm2);
     }
+    {
+      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
+      m_PGI->ParseCmd(strm2);
+    }
   }
 
   void startEmergencyStop(PatternGeneratorInterface &aPGI)
@@ -653,6 +656,10 @@ protected:
     {
       istringstream strm2(":numberstepsbeforestop 2");
       aPGI.ParseCmd(strm2);
+    }
+    {
+      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
+      m_PGI->ParseCmd(strm2);
     }
   }
 
