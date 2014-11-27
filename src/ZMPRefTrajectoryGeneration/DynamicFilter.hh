@@ -130,6 +130,9 @@ namespace PatternGeneratorJRL
     void InverseDynamics(deque<ZMPPosition> inputZMPTraj_deq);
 
     metapod::Vector3dTpl< LocalFloatType >::Type computeCoM();
+
+    void computeWaist(const FootAbsolutePosition & inputLeftFoot) ;
+
     // -------------------------------------------------------------------
 
   public: // The accessors
