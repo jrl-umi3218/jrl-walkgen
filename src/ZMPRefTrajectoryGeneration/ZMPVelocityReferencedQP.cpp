@@ -515,10 +515,6 @@ void
 
     // SOLVE PROBLEM:
     // --------------
-    if (Solution_.useWarmStart)
-    {
-      VRQPGenerator_->compute_warm_start( Solution_ );//TODO: Move to update_problem or build_constraints?
-    }
     Problem_.solve( QLD, Solution_, NONE );
     if(Solution_.Fail>0)
     {
@@ -548,84 +544,16 @@ void
     ControlInterpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, FinalLeftFootTraj_deq,
                           FinalRightFootTraj_deq, time) ;
 
-    // Computing the control ZMPMB
-    unsigned int ControlIteration = 0 ;
-    if ( time > m_SamplingPeriod )
-    {
-      ControlIteration = 20;
-    }
-    int stage0 = 0 ;
-    vector< vector<double> > zmpmb (NbSampleControl_,vector<double>(2,0.0));
-    for(unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
-    {
-      dynamicFilter_->ComputeZMPMB(m_SamplingPeriod,
-                                   FinalCOMTraj_deq[i],
-                                   FinalLeftFootTraj_deq[i],
-                                   FinalRightFootTraj_deq[i],
-                                   zmpmb[i],
-                                   stage0,
-                                   ControlIteration + i);
-    }
+    DynamicFilterInterpolation(time);
 
-    ofstream aof;
-    string aFileName;
-    static int iteration_zmp = 0 ;
-    ostringstream oss(std::ostringstream::ate);
-    oss.str("zmpmb_herdt.dat");
-    aFileName = oss.str();
-    if ( iteration_zmp == 0 )
-    {
-      aof.open(aFileName.c_str(),ofstream::out);
-      aof.close();
-    }
-    ///----
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-    for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
-    {
-      aof << filterprecision( zmpmb[i][0] ) << " " ;
-      aof << filterprecision( zmpmb[i][1] ) << " " ;
-    }
-    aof.close();
-
-
-    // Computing the interpolated ZMPMB
-    DynamicFilterInterpolation(time) ;
-
-    // computing the interpolated ZMPMB
-    int stage1 = 1 ;
-    vector< vector<double> > zmpmb_i (QP_N_*NbSampleInterpolation_,vector<double>(2,0.0));
-
-    for(unsigned int i = 0 ; i < QP_N_*NbSampleInterpolation_ ; ++i)
-    {
-      dynamicFilter_->ComputeZMPMB(m_SamplingPeriod,
-                                   COMTraj_deq_[i],
-                                   LeftFootTraj_deq_[i],
-                                   RightFootTraj_deq_[i],
-                                   zmpmb_i[i],
-                                   stage1,
-                                   ControlIteration + i);
-    }
-
-    dynamicFilter_->stage0INstage1();
-
-    // Compute the delta ZMP
-    deque<ZMPPosition> inputdeltaZMP_deq(QP_N_*NbSampleInterpolation_) ;
     deque<COMState> outputDeltaCOMTraj_deq ;
-    for (unsigned int i = 0 ; i < QP_N_*NbSampleInterpolation_ ; ++i)
-    {
-      inputdeltaZMP_deq[i].px = ZMPTraj_deq_[i].px - zmpmb_i[i][0] ;
-      inputdeltaZMP_deq[i].py = ZMPTraj_deq_[i].py - zmpmb_i[i][1] ;
-      inputdeltaZMP_deq[i].pz = 0.0 ;
-      inputdeltaZMP_deq[i].theta = 0.0 ;
-      inputdeltaZMP_deq[i].time = m_CurrentTime + i * m_SamplingPeriod ;
-      inputdeltaZMP_deq[i].stepType = ZMPTraj_deq_[i].stepType ;
-    }
-
-    // compute the delta CoM
-    dynamicFilter_->OptimalControl(inputdeltaZMP_deq,outputDeltaCOMTraj_deq) ;
-
+    dynamicFilter_->OnLinefilter(time,FinalCOMTraj_deq,
+                                 FinalLeftFootTraj_deq,
+                                 FinalRightFootTraj_deq,
+                                 COMTraj_deq_,ZMPTraj_deq_,
+                                 LeftFootTraj_deq_,
+                                 RightFootTraj_deq_,
+                                 outputDeltaCOMTraj_deq);
     // Correct the CoM.
     for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
     {
@@ -635,30 +563,6 @@ void
         FinalCOMTraj_deq[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
       }
     }
-
-    int stage2 = 2 ;
-    vector< vector<double> > zmpmb_corr (NbSampleControl_,vector<double>(2,0.0));
-    for(unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
-    {
-      dynamicFilter_->ComputeZMPMB(m_SamplingPeriod,
-                                   FinalCOMTraj_deq[i],
-                                   FinalLeftFootTraj_deq[i],
-                                   FinalRightFootTraj_deq[i],
-                                   zmpmb_corr[i],
-                                   stage2,
-                                   ControlIteration + i);
-    }
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-    for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
-    {
-      aof << filterprecision( zmpmb_corr[i][0] ) << " " ;
-      aof << filterprecision( zmpmb_corr[i][1] ) << " " ;
-      aof << endl ;
-    }
-    aof.close();
-    iteration_zmp++ ;
 
     // Specify that we are in the ending phase.
     if (EndingPhase_ == false)

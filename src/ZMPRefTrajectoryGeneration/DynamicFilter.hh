@@ -64,7 +64,7 @@ namespace PatternGeneratorJRL
         const vector<MAL_VECTOR_TYPE(double) > &UpperPart_ddq,
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
-    int OnLinefilter(
+    int OnLinefilter(const double currentTime,
         const deque<COMState> & ctrlCoMState,
         const deque<FootAbsolutePosition> & ctrlLeftFoot,
         const deque<FootAbsolutePosition> & ctrlRightFoot,
@@ -115,24 +115,13 @@ namespace PatternGeneratorJRL
 
   private: // Private methods
 
-    /// \brief calculate, from the CoM computed by the preview control,
-    ///    the corresponding articular position, velocity and acceleration
-    void InverseKinematics(
-        const COMState & lastCtrlCoMState,
-        const FootAbsolutePosition & lastCtrlLeftFoot,
-        const FootAbsolutePosition & lastCtrlRightFoot,
-        const deque<COMState> & inputCOMTraj_deq_,
-        const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
-        const deque<FootAbsolutePosition> & inputRightFootTraj_deq_);
-
     /// \brief Apply the RNEA on the robot model and over the whole trajectory
     /// given by the function "filter"
     void InverseDynamics(MAL_VECTOR_TYPE(double)& configuration,
                          MAL_VECTOR_TYPE(double)& velocity,
                          MAL_VECTOR_TYPE(double)& acceleration);
 
-    void ExtractZMP(vector<double> & ZMPMB,
-                    const COMState & inputCoMState) ;
+    void ExtractZMP(vector<double> & ZMPMB) ;
 
     metapod::Vector3dTpl< LocalFloatType >::Type computeCoM();
 
@@ -294,8 +283,8 @@ namespace PatternGeneratorJRL
       Clock clock_;
 
       /// \brief Stages, used in the analytical inverse kinematic.
-      unsigned int stage0_ ;
-      unsigned int stage1_ ;
+      const unsigned int stage0_ ;
+      const unsigned int stage1_ ;
 
   private : // private struct
       struct MassSum

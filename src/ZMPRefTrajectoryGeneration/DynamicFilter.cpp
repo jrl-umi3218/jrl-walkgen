@@ -7,7 +7,7 @@ using namespace metapod;
 
 DynamicFilter::DynamicFilter(
     SimplePluginManager *SPM,
-    CjrlHumanoidDynamicRobot *aHS)
+    CjrlHumanoidDynamicRobot *aHS): stage0_(0) , stage1_(1)
 {
   controlPeriod_ = 0.0 ;
   interpolationPeriod_ = 0.0 ;
@@ -15,15 +15,13 @@ DynamicFilter::DynamicFilter(
   PG_T_ = 0.0 ;
   NbI_ = 0.0 ;
   NCtrl_ = 0.0;
-  NbI_ = 0.0 ;
+  PG_N_ = 0.0 ;
 
   comAndFootRealization_ = new ComAndFootRealizationByGeometry((PatternGeneratorInterfacePrivate*) SPM );
   comAndFootRealization_->setHumanoidDynamicRobot(aHS);
   comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
-  stage0_ = 0 ;
-  stage1_ = 1 ;
 
   PC_ = new PreviewControl(
         SPM,OptimalControllerSolver::MODE_WITH_INITIALPOS,false);
@@ -108,7 +106,7 @@ void DynamicFilter::init(
     {NbI_ = (int)(PG_T/interpolationPeriod_);}
 
   NCtrl_ = (int)(PG_T_/controlPeriod_) ;
-  PG_N_ = (int)(previewWindowSize_/interpolationPeriod_) ;
+  PG_N_ = (int)( (previewWindowSize_+PG_T_/controlPeriod*interpolationPeriod)/PG_T_ ) ;
 
   CoMHeight_ = CoMHeight ;
   PC_->SetPreviewControlTime (previewWindowSize_);
@@ -146,11 +144,15 @@ void DynamicFilter::init(
   prev_ddq_ = ddq_ ;
   jcalc<Robot_Model>::run(robot_,q_ ,dq_ );
 
-  deltaZMP_deq_.resize( PG_N_);
-  ZMPMB_vec_.resize( PG_N_, vector<double>(2));
+  deltaZMP_deq_.resize( PG_N_*NbI_);
+  ZMPMB_vec_.resize( PG_N_*NbI_, vector<double>(2));
 
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
+  comAndFootRealization_->SetPreviousConfigurationStage0(ZMPMBConfiguration_);
+  comAndFootRealization_->SetPreviousConfigurationStage1(ZMPMBConfiguration_);
+  comAndFootRealization_->SetPreviousVelocityStage0(ZMPMBVelocity_);
+  comAndFootRealization_->SetPreviousVelocityStage1(ZMPMBVelocity_);
 
   MAL_VECTOR_RESIZE(aCoMState_,6);
   MAL_VECTOR_RESIZE(aCoMSpeed_,6);
@@ -220,6 +222,7 @@ int DynamicFilter::OffLinefilter(
 }
 
 int DynamicFilter::OnLinefilter(
+    const double currentTime,
     const deque<COMState> & ctrlCoMState,
     const deque<FootAbsolutePosition> & ctrlLeftFoot,
     const deque<FootAbsolutePosition> & ctrlRightFoot,
@@ -229,17 +232,35 @@ int DynamicFilter::OnLinefilter(
     const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
-  unsigned int N = inputCOMTraj_deq_.size() ;
-  ZMPMB_vec_.resize(N) ;
-  deltaZMP_deq_.resize(N);
-
-  setRobotUpperPart(UpperPart_q[0],UpperPart_dq[0],UpperPart_ddq[0]);
-
-  for(unsigned int i = 0 ; i < N ; ++i )
+  static int currentIteration = 0 ;
+  vector< MAL_VECTOR_TYPE(double) > q_vec ;
+  vector< MAL_VECTOR_TYPE(double) > dq_vec ;
+  vector< MAL_VECTOR_TYPE(double) > ddq_vec ;
+  for(unsigned int i = 0 ; i < NbI_ ; ++i)
     {
-      ComputeZMPMB(interpolationPeriod_,inputCOMTraj_deq_[i],inputLeftFootTraj_deq_[i],
-                   inputRightFootTraj_deq_[i], ZMPMB_vec_[i] , stage0_ , i);
+      InverseKinematics( inputCOMTraj_deq_[i], inputLeftFootTraj_deq_[i],
+                         inputRightFootTraj_deq_[i], ZMPMBConfiguration_, ZMPMBVelocity_,
+                         ZMPMBAcceleration_, interpolationPeriod_, stage0_, currentIteration+i) ;
+      q_vec.push_back(ZMPMBConfiguration_);
+      dq_vec.push_back(ZMPMBVelocity_);
+      ddq_vec.push_back(ZMPMBAcceleration_);
     }
+
+  unsigned int N = PG_N_ * NbI_ ;
+  ZMPMB_vec_.resize( N , vector<double>(2,0.0));
+  for(unsigned int i = 0 ; i < N ; ++i)
+  {
+      ComputeZMPMB(interpolationPeriod_,
+                   inputCOMTraj_deq_[i],
+                   inputLeftFootTraj_deq_[i],
+                   inputRightFootTraj_deq_[i],
+                   ZMPMB_vec_[i],
+                   stage1_,
+                   currentIteration + i);
+  }
+  stage0INstage1();
+
+  deltaZMP_deq_.resize(N);
   for (unsigned int i = 0 ; i < N ; ++i)
     {
       deltaZMP_deq_[i].px = inputZMPTraj_deq_[i].px - ZMPMB_vec_[i][0] ;
@@ -250,6 +271,126 @@ int DynamicFilter::OnLinefilter(
       deltaZMP_deq_[i].stepType = inputZMPTraj_deq_[i].stepType ;
     }
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
+
+  currentIteration += NbI_ ;
+//#############################################################################
+  deque<COMState> CoM_tmp = ctrlCoMState ;
+  for (unsigned int i = 0 ; i < NCtrl_ ; ++i)
+  {
+    for(int j=0;j<3;j++)
+    {
+      CoM_tmp[i].x[j] += outputDeltaCOMTraj_deq_[i].x[j] ;
+      CoM_tmp[i].y[j] += outputDeltaCOMTraj_deq_[i].y[j] ;
+    }
+  }
+
+  int stage2 = 2 ;
+  vector< vector<double> > zmpmb_corr (NCtrl_,vector<double>(2,0.0));
+  for(unsigned int i = 0 ; i < NCtrl_ ; ++i)
+  {
+      ComputeZMPMB(controlPeriod_,
+                   CoM_tmp[i],
+                   ctrlLeftFoot[i],
+                   ctrlRightFoot[i],
+                   zmpmb_corr[i],
+                   stage2,
+                   currentIteration + i);
+  }
+
+  ofstream aof;
+  string aFileName;
+  static int iteration_zmp = 0 ;
+  ostringstream oss(std::ostringstream::ate);
+  oss.str("zmpmb_herdt.txt");
+  aFileName = oss.str();
+  if ( iteration_zmp == 0 )
+  {
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < NbI_ ; ++i)
+  {
+    aof << inputZMPTraj_deq_[i].px << " " ;
+    aof << inputZMPTraj_deq_[i].py << " " ;
+
+    aof << ZMPMB_vec_[i][0] << " " ;
+    aof << ZMPMB_vec_[i][1] << " " ;
+
+    aof << inputCOMTraj_deq_[i].x[0] << " " ; //5
+    aof << inputCOMTraj_deq_[i].x[1] << " " ;
+    aof << inputCOMTraj_deq_[i].x[2] << " " ;
+
+    aof << inputLeftFootTraj_deq_[i].x << " " ;
+    aof << inputLeftFootTraj_deq_[i].dx << " " ;
+    aof << inputLeftFootTraj_deq_[i].ddx << " " ;
+
+    aof << inputRightFootTraj_deq_[i].x << " " ;
+    aof << inputRightFootTraj_deq_[i].dx << " " ;
+    aof << inputRightFootTraj_deq_[i].ddx << " " ;
+
+    aof << inputCOMTraj_deq_[i].y[0] << " " ; //14
+    aof << inputCOMTraj_deq_[i].y[1] << " " ;
+    aof << inputCOMTraj_deq_[i].y[2] << " " ;
+
+    aof << inputLeftFootTraj_deq_[i].y << " " ;
+    aof << inputLeftFootTraj_deq_[i].dy << " " ;
+    aof << inputLeftFootTraj_deq_[i].ddy << " " ;
+
+    aof << inputRightFootTraj_deq_[i].y << " " ;
+    aof << inputRightFootTraj_deq_[i].dy << " " ;
+    aof << inputRightFootTraj_deq_[i].ddy << " " ;
+
+    aof << inputCOMTraj_deq_[i].yaw[0] << " " ; // 23
+    aof << inputCOMTraj_deq_[i].yaw[1] << " " ;
+    aof << inputCOMTraj_deq_[i].yaw[2] << " " ;
+
+    aof << inputLeftFootTraj_deq_[i].theta << " " ;
+    aof << inputLeftFootTraj_deq_[i].dtheta << " " ;
+    aof << inputLeftFootTraj_deq_[i].ddtheta << " " ;
+
+    aof << inputRightFootTraj_deq_[i].theta << " " ;
+    aof << inputRightFootTraj_deq_[i].dtheta << " " ;
+    aof << inputRightFootTraj_deq_[i].ddtheta << " " ;
+
+    for(unsigned int j = 0 ; j < q_vec[0].size() ; ++j) // 32 -- 38
+      {
+        aof << q_vec[i][j] << " " ;
+      }
+    for(unsigned int j = 0 ; j < dq_vec[0].size() ; ++j) // 68 -- 72
+      {
+        aof << dq_vec[i][j] << " " ;
+      }
+    for(unsigned int j = 0 ; j < ddq_vec[0].size() ; ++j) // 102 -- 108
+      {
+        aof << ddq_vec[i][j] << " " ;
+      }
+
+    aof << endl ;
+  }
+  aof.close();
+
+  aFileName = "zmpmb_corr_herdt.txt" ;
+  if ( iteration_zmp == 0 )
+  {
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < NCtrl_ ; ++i)
+  {
+    aof << zmpmb_corr[i][0] << " " ;
+    aof << zmpmb_corr[i][1] << " " ;
+    aof << endl ;
+  }
+  aof.close();
+
+  iteration_zmp++;
 
   return 0 ;
 }
@@ -404,15 +545,12 @@ void DynamicFilter::InverseDynamics(
   return ;
 }
 
-void DynamicFilter::ExtractZMP(vector<double> & ZMPMB,
-                               const COMState & inputCoMState)
+void DynamicFilter::ExtractZMP(vector<double> & ZMPMB)
 {
   RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
 
   // extract the CoM momentum and forces
   m_force = node_waist.body.iX0.applyInv(node_waist.joint.f);
-  metapod::Vector3dTpl< LocalFloatType >::Type CoM_ref
-      (inputCoMState.x[0],inputCoMState.y[0],inputCoMState.z[0]);
   metapod::Vector3dTpl< LocalFloatType >::Type CoM_Waist_vec (node_waist.body.iX0.r() - com ()) ;
   metapod::Vector3dTpl< LocalFloatType >::Type CoM_torques (0.0,0.0,0.0);
   CoM_torques = m_force.n() + metapod::Skew<LocalFloatType>(CoM_Waist_vec) * m_force.f() ;
@@ -446,7 +584,7 @@ void DynamicFilter::ComputeZMPMB(
 
   InverseDynamics(ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_);
 
-  ExtractZMP(ZMPMB,inputCoMState);
+  ExtractZMP(ZMPMB);
 
   return ;
 }

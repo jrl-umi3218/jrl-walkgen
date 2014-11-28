@@ -151,8 +151,6 @@ void ComAndFootRealizationByGeometry::
   std::vector<CjrlJoint *> FromRootToJoint =
       getHumanoidDynamicRobot()->jointsBetween(*Chest, *associatedWrist);
 
-  std::vector<CjrlJoint *>::iterator itJoint = FromRootToJoint.begin();
-
   associateShoulder = FromRootToJoint[0];
   InitializationMaps(FromRootToJoint,ActuatedJoints,
                      IndexesInConfiguration);
@@ -219,8 +217,7 @@ void ComAndFootRealizationByGeometry::
   RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
   LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
 
-  double lWidth,lHeight,lDepth;
-  lDepth = lAnklePositionRight[2];
+  double lWidth,lHeight ;
   LeftFoot->getSoleSize(lWidth,lHeight);
 
   m_AnklePositionRight[0] = lAnklePositionRight[0];
@@ -1099,12 +1096,39 @@ bool ComAndFootRealizationByGeometry::
     m_prev_Velocity2 = CurrentVelocity;
   }
 
+  MAL_S3_VECTOR(waistCom,double);
+  for(int i=0;i<3;i++)
+    waistCom(i) = aCoMPosition(i) - AbsoluteWaistPosition(i) ;
 
+  // v_waist = v_com + waist-com x omega :
+  CurrentVelocity[0] = aCoMSpeed(0) + (waistCom(1)*aCoMSpeed(5)  - waistCom(2)*aCoMSpeed(4) ) ;
+  CurrentVelocity[1] = aCoMSpeed(1) + (waistCom(2)*aCoMSpeed(3)  - waistCom(0)*aCoMSpeed(5) ) ;
+  CurrentVelocity[2] = aCoMSpeed(2) + (waistCom(0)*aCoMSpeed(4)  - waistCom(1)*aCoMSpeed(3) ) ;
 
-  for(int i=0;i<6;i++)
+  // omega_waist = omega_com
+  for(int i=3;i<6;i++)
     CurrentVelocity[i] = aCoMSpeed(i);
 
-  for(int i=0;i<6;i++)
+
+  // (omega x waist-com) x omega = waist-com ( omega . omega ) - omega ( omega . waist-com )
+  MAL_S3_VECTOR(coriolis,double);
+  double omega_dot_omega = aCoMSpeed(3)*aCoMSpeed(3) +
+                           aCoMSpeed(4)*aCoMSpeed(4) +
+                           aCoMSpeed(5)*aCoMSpeed(5) ;
+  double omega_dot_waistCom = aCoMSpeed(3)*waistCom(0) +
+                              aCoMSpeed(4)*waistCom(1) +
+                              aCoMSpeed(5)*waistCom(2) ;
+  coriolis(0) = waistCom(0) * omega_dot_omega - aCoMSpeed(3) * omega_dot_waistCom ;
+  coriolis(1) = waistCom(1) * omega_dot_omega - aCoMSpeed(4) * omega_dot_waistCom ;
+  coriolis(2) = waistCom(2) * omega_dot_omega - aCoMSpeed(5) * omega_dot_waistCom ;
+
+  // a_waist = a_com + waist-com x d omega/dt + (omega x waist-com) x omega
+  CurrentAcceleration[0] = aCoMAcc(0) + (waistCom(1)*aCoMAcc(5)  - waistCom(2)*aCoMAcc(4) ) + coriolis(0) ;
+  CurrentAcceleration[1] = aCoMAcc(1) + (waistCom(2)*aCoMAcc(3)  - waistCom(0)*aCoMAcc(5) ) + coriolis(1) ;
+  CurrentAcceleration[2] = aCoMAcc(2) + (waistCom(0)*aCoMAcc(4)  - waistCom(1)*aCoMAcc(3) ) + coriolis(2) ;
+
+  // d omega_waist /dt = d omega_com /dt
+  for(int i=3;i<6;i++)
     CurrentAcceleration[i] = aCoMAcc(i);
 
   ODEBUG( "CurrentVelocity :" << endl << CurrentVelocity);

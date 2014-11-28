@@ -832,7 +832,7 @@ void GeneratorVelRef::build_eq_constraints_limitPosFeet(const solution_t & Solut
 }
 
 void
-GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution )
+GeneratorVelRef::build_constraints( QPProblem & Pb, solution_t & Solution )
 {
   unsigned nbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
 
@@ -860,6 +860,11 @@ GeneratorVelRef::build_constraints( QPProblem & Pb, const solution_t & Solution 
 //  const support_state_t & CurrentSupport = Solution.SupportStates_deq.front();
 //  build_constraints_com( IneqCoM, CurrentSupport, Pb );
 
+  if (Solution.useWarmStart)
+  {
+    compute_warm_start( Solution );
+    //TODO: Move to update_problem or build_constraints?
+  }
 }
 
 

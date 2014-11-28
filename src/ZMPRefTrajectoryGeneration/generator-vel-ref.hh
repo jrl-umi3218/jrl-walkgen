@@ -87,7 +87,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param[out] Pb
     /// \param[in] Solution
-    void build_constraints( QPProblem & Pb, const solution_t & Solution );
+    void build_constraints(QPProblem & Pb, solution_t &Solution );
 
     /// \brief Build the constant part of the objective
     ///
