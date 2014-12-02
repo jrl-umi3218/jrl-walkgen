@@ -49,7 +49,8 @@ FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginM
      ":stepheight",
      ":singlesupporttime",
      ":doublesupporttime",
-     ":samplingperiod"};
+     ":samplingperiod"
+     ":stepstairon"};
 
   for (int i=0;i<5;i++)
     {
@@ -85,8 +86,6 @@ void FootTrajectoryGenerationAbstract::CallMethod(std::string &Method,
       strm >> m_SamplingPeriod;
       ODEBUG("Sampling period: " << m_SamplingPeriod);
     }
-
-
 }
 
 void FootTrajectoryGenerationAbstract::UpdateFootPosition(std::deque<FootAbsolutePosition> & , //SupportFootAbsolutePositions,

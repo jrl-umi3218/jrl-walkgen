@@ -535,7 +535,6 @@ namespace PatternGeneratorJRL {
     memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
     memset(&InitRightFootAbsPos,0,sizeof(InitRightFootAbsPos));
 
-    vector<double> lCurrentJointValues;
     MAL_VECTOR(lStartingWaistPose,double);
 
     EvaluateStartingState(lStartingCOMState,

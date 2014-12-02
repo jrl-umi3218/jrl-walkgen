@@ -123,8 +123,6 @@ namespace PatternGeneratorJRL
 
     void ExtractZMP(vector<double> & ZMPMB) ;
 
-    metapod::Vector3dTpl< LocalFloatType >::Type computeCoM();
-
     void computeWaist(const FootAbsolutePosition & inputLeftFoot) ;
 
     // -------------------------------------------------------------------
@@ -178,6 +176,13 @@ namespace PatternGeneratorJRL
         com      = boost::fusion::accumulate(robot_.nodes , com      , MassbyComSum() );
         return com / sum_mass ;
     }
+
+    inline metapod::Vector3dTpl< LocalFloatType >::Type waist_pos ()
+    {
+      RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
+      return node_waist.body.iX0.r() ;
+    }
+
 
   private: // Private members
 

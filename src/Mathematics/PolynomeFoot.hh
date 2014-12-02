@@ -113,12 +113,12 @@ namespace PatternGeneratorJRL
       /** Constructor:
        FT: Final time
        MP: Middle position */
-      Polynome4(double FT, double MP);
+      Polynome4(double FT, double MP, double FP=0.0);
 
       /// Set the parameters
       // Initial velocity and position are 0
       // Final velocity and position are 0
-      void SetParameters(double FT, double MP);
+      void SetParameters(double FT, double MP, double FP=0.0);
 
       /*! Set the parameters such that
 	the initial position, and initial speed
@@ -128,14 +128,16 @@ namespace PatternGeneratorJRL
       void SetParametersWithInitPosInitSpeed(double FT,
 					     double MP,
 					     double InitPos,
-					     double InitSpeed);
+					     double InitSpeed,
+					     double FP = 0.0);
 
 
       /*! Get the parameters */
       void GetParametersWithInitPosInitSpeed(double &FT,
-					     double &MP,
-					     double &InitPos,
-					     double &InitSpeed);
+                                             double &MP,
+                                             double &FP,
+                                             double &InitPos,
+                                             double &InitSpeed);
 
       /// Destructor.
       ~Polynome4();
@@ -143,6 +145,7 @@ namespace PatternGeneratorJRL
     private:
       /*! Store final time and middle position. */
       double MP_;
+      double FP_;
 
     };
 

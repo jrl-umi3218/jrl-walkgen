@@ -462,6 +462,8 @@ bool ComAndFootRealizationByGeometry::
   /* Initialize properly the left and right initial positions of the feet. */
   memset((char *)&InitLeftFootPosition,0,sizeof(FootAbsolutePosition));
   memset((char *)&InitRightFootPosition,0,sizeof(FootAbsolutePosition));
+  MAL_S3_VECTOR_CLEAR(lStartingCOMPosition);
+  MAL_VECTOR_FILL(lStartingWaistPose,0.0);
 
   // Compute the forward dynamics from the configuration vector provided by the user.
   // Initialize waist pose.
@@ -538,9 +540,6 @@ bool ComAndFootRealizationByGeometry::
   MAL_VECTOR_FILL(m_prev_Velocity,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity2,0.0);
-
-  InitLeftFootPosition.z = 0.0;
-  InitRightFootPosition.z = 0.0;
 
   return true;
 }

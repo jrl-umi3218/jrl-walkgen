@@ -229,6 +229,7 @@ namespace PatternGeneratorJRL
 
     /// \brief Index where to begin the interpolation
     unsigned CurrentIndex_ ;
+    unsigned CurrentIndex_DF_ ;
 
     /// \brief Interpolation Period for the dynamic filter
     double InterpolationPeriod_ ;
@@ -312,7 +313,8 @@ namespace PatternGeneratorJRL
         const solution_t * Solution,                               	// INPUT
         LinearizedInvertedPendulum2D * LIPM,                       	 // INPUT/OUTPUT
         const unsigned numberOfSample,                             	// INPUT
-        const int IterationNumber);                                	// INPUT
+        const int IterationNumber,                                      // INPUT
+        const unsigned int currentIndex);                                // INPUT
 
     /// \brief Interpolate just enough data to pilot the robot (period of interpolation = QP_T_)
     void ControlInterpolation(

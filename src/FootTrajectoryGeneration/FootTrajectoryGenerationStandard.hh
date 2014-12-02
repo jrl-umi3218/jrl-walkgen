@@ -194,6 +194,8 @@ namespace PatternGeneratorJRL
 
     void print();
 
+    void copyPolynomesFromFTGS (FootTrajectoryGenerationStandard * FTGS);
+
   protected:
 
    /*! \brief Polynomes for X and Y axis positions*/

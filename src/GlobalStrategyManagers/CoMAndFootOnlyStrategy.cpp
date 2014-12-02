@@ -161,13 +161,7 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
   aStartingZMPPosition(0) = aStartingCOMState.x[0] ;
   aStartingZMPPosition(1) = aStartingCOMState.y[0] ;
   // The  altitude of the zmp depend on the altitude of the support foot.
-  if (InitLeftFootPosition.stepType < 0)
-  {
-    aStartingZMPPosition(2) = InitLeftFootPosition.z ;
-  }else{
-    aStartingZMPPosition(2) = InitRightFootPosition.z ;
-  }
-
+  aStartingZMPPosition(2) = 0.5 * (InitLeftFootPosition.z + InitRightFootPosition.z) ;
 
   //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in   CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
 

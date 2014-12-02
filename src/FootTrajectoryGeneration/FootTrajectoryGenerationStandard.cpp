@@ -171,7 +171,7 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex,
      break;
 
    case Z_AXIS:
-     m_PolynomeZ->SetParameters(TimeInterval,Position);
+     m_PolynomeZ->SetParameters(TimeInterval,Position+m_StepHeight,Position);
      m_BsplinesZ->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position + m_StepHeight);
      break;
 
@@ -214,18 +214,16 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
 
    case Z_AXIS:
 
-    m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition+m_StepHeight,InitPosition,InitSpeed,FinalPosition);
 
-    //cout <<(FinalPosition - InitPosition) << " " << m_StepHeight << " "<<((FinalPosition - InitPosition) == m_StepHeight) << endl;
-
-       if ((FinalPosition - InitPosition) == m_StepHeight)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,InitPosition,0.5*TimeInterval,InitPosition+m_StepHeight);
-        else if (FinalPosition > InitPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,1.5*TimeInterval/5.0,FinalPosition+m_StepHeight);//+abs(FinalPosition-InitPosition)*1.5);
-        else if (FinalPosition == InitPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,FinalPosition);//+abs(FinalPosition-InitPosition)*1.5);
-       else if (FinalPosition < InitPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,6.0*TimeInterval/10.0,InitPosition+m_StepHeight/3.0);//abs(FinalPosition-InitPosition)*0.3);
+     if ((FinalPosition - InitPosition) == m_StepHeight)
+       m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,InitPosition,0.5*TimeInterval,InitPosition+m_StepHeight);
+     else if (FinalPosition > InitPosition)
+       m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,1.5*TimeInterval/5.0,FinalPosition+m_StepHeight);//+abs(FinalPosition-InitPosition)*1.5);
+     else if (FinalPosition == InitPosition)
+       m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,m_StepHeight);//+abs(FinalPosition-InitPosition)*1.5);
+     else if (FinalPosition < InitPosition)
+       m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,6.0*TimeInterval/10.0,InitPosition+m_StepHeight/3.0);//abs(FinalPosition-InitPosition)*0.3);
 
      break;
 
@@ -305,6 +303,7 @@ int FootTrajectoryGenerationStandard::GetParametersWithInitPosInitSpeed(int Poly
 									double &InitPosition,
 									double &InitSpeed)
 {
+  double MiddlePosition = 0.0 ; // for polynome4
  switch (PolynomeIndex)
    {
 
@@ -318,7 +317,7 @@ int FootTrajectoryGenerationStandard::GetParametersWithInitPosInitSpeed(int Poly
      break;
 
    case Z_AXIS:
-     m_PolynomeZ->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_PolynomeZ->GetParametersWithInitPosInitSpeed(TimeInterval,MiddlePosition,FinalPosition,InitPosition,InitSpeed);
 
      m_BsplinesZ->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
 
@@ -523,14 +522,14 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
           << " " << m_PolynomeX->Compute(LocalTime - EndOfLiftOff));
   //  m_PolynomeX->print();
 
-  bool ProtectionNeeded=false;
+  //bool ProtectionNeeded=false;
 
   // Treat Omega with the following strategy:
   // First treat the lift-off.
   if (LocalTime<EndOfLiftOff)
     {
       curr_NSFAP.omega = m_PolynomeOmega->Compute(LocalTime) ;
-      ProtectionNeeded=true;
+      //ProtectionNeeded=true;
     }
   // Prepare for the landing.
   else if (LocalTime<StartLanding)
@@ -543,7 +542,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
     {
       curr_NSFAP.omega =
 	m_PolynomeOmega->Compute(LocalTime - StartLanding)  - m_Omega;
-      ProtectionNeeded=true;
+      //ProtectionNeeded=true;
     }
   double dFX=0,dFY=0,dFZ=0;
   double lOmega = 0.0;
@@ -745,7 +744,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
         //m_AnklePositionRight[2];
     }
 
-  bool ProtectionNeeded=false;
+  //bool ProtectionNeeded=false;
 
   // Treat Omega with the following strategy:
   // First treat the lift-off.
@@ -759,7 +758,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 	m_PolynomeOmega->Compute(InterpolationTime);//  +
     // NoneSupportFootAbsolutePositions[StartIndex-1].domega;
 
-      ProtectionNeeded=true;
+      //ProtectionNeeded=true;
     }
   // Prepare for the landing.
   else if (LocalInterpolationStartTime+InterpolationTime<StartLanding)
@@ -774,7 +773,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega =
 	m_PolynomeOmega->Compute(LocalInterpolationStartTime+InterpolationTime - StartLanding) +
 	NoneSupportFootAbsolutePositions[StartIndex-1].omega - m_Omega;
-      ProtectionNeeded=true;
+      //ProtectionNeeded=true;
     }
   double dFX=0,dFY=0,dFZ=0;
   double lOmega = 0.0;
@@ -932,3 +931,19 @@ void FootTrajectoryGenerationStandard::print()
 
 }
 
+void FootTrajectoryGenerationStandard::copyPolynomesFromFTGS (FootTrajectoryGenerationStandard * FTGS)
+{
+  vector<double> tmp_coefficients ;
+  FTGS->m_PolynomeX->GetCoefficients(tmp_coefficients);
+  m_PolynomeX->SetCoefficients(tmp_coefficients);
+  FTGS->m_PolynomeY->GetCoefficients(tmp_coefficients);
+  m_PolynomeY->SetCoefficients(tmp_coefficients);
+  FTGS->m_PolynomeTheta->GetCoefficients(tmp_coefficients);
+  m_PolynomeTheta->SetCoefficients(tmp_coefficients);
+  FTGS->m_PolynomeOmega->GetCoefficients(tmp_coefficients);
+  m_PolynomeOmega->SetCoefficients(tmp_coefficients);
+  FTGS->m_PolynomeOmega2->GetCoefficients(tmp_coefficients);
+  m_PolynomeOmega2->SetCoefficients(tmp_coefficients);
+  FTGS->m_PolynomeZ->GetCoefficients(tmp_coefficients);
+  m_PolynomeZ->SetCoefficients(tmp_coefficients);
+}

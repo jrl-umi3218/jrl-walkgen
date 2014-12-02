@@ -150,9 +150,11 @@ void DynamicFilter::init(
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
   comAndFootRealization_->SetPreviousConfigurationStage0(ZMPMBConfiguration_);
-  comAndFootRealization_->SetPreviousConfigurationStage1(ZMPMBConfiguration_);
   comAndFootRealization_->SetPreviousVelocityStage0(ZMPMBVelocity_);
   comAndFootRealization_->SetPreviousVelocityStage1(ZMPMBVelocity_);
+  comAndFootRealization_->SetPreviousConfigurationStage1(ZMPMBConfiguration_);
+  comAndFootRealization_->SetPreviousVelocityStage2(ZMPMBVelocity_);
+  comAndFootRealization_->SetPreviousConfigurationStage2(ZMPMBConfiguration_);
 
   MAL_VECTOR_RESIZE(aCoMState_,6);
   MAL_VECTOR_RESIZE(aCoMSpeed_,6);
@@ -236,14 +238,11 @@ int DynamicFilter::OnLinefilter(
   vector< MAL_VECTOR_TYPE(double) > q_vec ;
   vector< MAL_VECTOR_TYPE(double) > dq_vec ;
   vector< MAL_VECTOR_TYPE(double) > ddq_vec ;
-  for(unsigned int i = 0 ; i < NbI_ ; ++i)
+  for(unsigned int i = 0 ; i <= NCtrl_; ++i)
     {
-      InverseKinematics( inputCOMTraj_deq_[i], inputLeftFootTraj_deq_[i],
-                         inputRightFootTraj_deq_[i], ZMPMBConfiguration_, ZMPMBVelocity_,
-                         ZMPMBAcceleration_, interpolationPeriod_, stage0_, currentIteration+i) ;
-      q_vec.push_back(ZMPMBConfiguration_);
-      dq_vec.push_back(ZMPMBVelocity_);
-      ddq_vec.push_back(ZMPMBAcceleration_);
+      InverseKinematics( ctrlCoMState[i], ctrlLeftFoot[i],
+                         ctrlRightFoot[i], ZMPMBConfiguration_, ZMPMBVelocity_,
+                         ZMPMBAcceleration_, controlPeriod_, stage0_, currentIteration+i) ;
     }
 
   unsigned int N = PG_N_ * NbI_ ;
@@ -257,6 +256,9 @@ int DynamicFilter::OnLinefilter(
                    ZMPMB_vec_[i],
                    stage1_,
                    currentIteration + i);
+      q_vec.push_back(ZMPMBConfiguration_);
+      dq_vec.push_back(ZMPMBVelocity_);
+      ddq_vec.push_back(ZMPMBAcceleration_);
   }
   stage0INstage1();
 
@@ -314,61 +316,72 @@ int DynamicFilter::OnLinefilter(
   aof.setf(ios::scientific, ios::floatfield);
   for (unsigned int i = 0 ; i < NbI_ ; ++i)
   {
-    aof << inputZMPTraj_deq_[i].px << " " ;
-    aof << inputZMPTraj_deq_[i].py << " " ;
+    aof << inputZMPTraj_deq_[i].px << " " ;           // 1
+    aof << inputZMPTraj_deq_[i].py << " " ;           // 2
 
-    aof << ZMPMB_vec_[i][0] << " " ;
-    aof << ZMPMB_vec_[i][1] << " " ;
+    aof << ZMPMB_vec_[i][0] << " " ;                  // 3
+    aof << ZMPMB_vec_[i][1] << " " ;                  // 4
 
-    aof << inputCOMTraj_deq_[i].x[0] << " " ; //5
-    aof << inputCOMTraj_deq_[i].x[1] << " " ;
-    aof << inputCOMTraj_deq_[i].x[2] << " " ;
+    aof << inputCOMTraj_deq_[i].x[0] << " " ;         // 5
+    aof << inputCOMTraj_deq_[i].x[1] << " " ;         // 6
+    aof << inputCOMTraj_deq_[i].x[2] << " " ;         // 7
 
-    aof << inputLeftFootTraj_deq_[i].x << " " ;
-    aof << inputLeftFootTraj_deq_[i].dx << " " ;
-    aof << inputLeftFootTraj_deq_[i].ddx << " " ;
+    aof << inputLeftFootTraj_deq_[i].x << " " ;       // 8
+    aof << inputLeftFootTraj_deq_[i].dx << " " ;      // 9
+    aof << inputLeftFootTraj_deq_[i].ddx << " " ;     // 10
 
-    aof << inputRightFootTraj_deq_[i].x << " " ;
-    aof << inputRightFootTraj_deq_[i].dx << " " ;
-    aof << inputRightFootTraj_deq_[i].ddx << " " ;
+    aof << inputRightFootTraj_deq_[i].x << " " ;      // 11
+    aof << inputRightFootTraj_deq_[i].dx << " " ;     // 12
+    aof << inputRightFootTraj_deq_[i].ddx << " " ;    // 13
 
-    aof << inputCOMTraj_deq_[i].y[0] << " " ; //14
-    aof << inputCOMTraj_deq_[i].y[1] << " " ;
-    aof << inputCOMTraj_deq_[i].y[2] << " " ;
+    aof << inputCOMTraj_deq_[i].y[0] << " " ;         // 14
+    aof << inputCOMTraj_deq_[i].y[1] << " " ;         // 15
+    aof << inputCOMTraj_deq_[i].y[2] << " " ;         // 16
 
-    aof << inputLeftFootTraj_deq_[i].y << " " ;
-    aof << inputLeftFootTraj_deq_[i].dy << " " ;
-    aof << inputLeftFootTraj_deq_[i].ddy << " " ;
+    aof << inputLeftFootTraj_deq_[i].y << " " ;       // 17
+    aof << inputLeftFootTraj_deq_[i].dy << " " ;      // 18
+    aof << inputLeftFootTraj_deq_[i].ddy << " " ;     // 19
 
-    aof << inputRightFootTraj_deq_[i].y << " " ;
-    aof << inputRightFootTraj_deq_[i].dy << " " ;
-    aof << inputRightFootTraj_deq_[i].ddy << " " ;
+    aof << inputRightFootTraj_deq_[i].y << " " ;      // 20
+    aof << inputRightFootTraj_deq_[i].dy << " " ;     // 21
+    aof << inputRightFootTraj_deq_[i].ddy << " " ;    // 22
 
-    aof << inputCOMTraj_deq_[i].yaw[0] << " " ; // 23
-    aof << inputCOMTraj_deq_[i].yaw[1] << " " ;
-    aof << inputCOMTraj_deq_[i].yaw[2] << " " ;
+    aof << inputCOMTraj_deq_[i].yaw[0] << " " ;       // 23
+    aof << inputCOMTraj_deq_[i].yaw[1] << " " ;       // 24
+    aof << inputCOMTraj_deq_[i].yaw[2] << " " ;       // 25
 
-    aof << inputLeftFootTraj_deq_[i].theta << " " ;
-    aof << inputLeftFootTraj_deq_[i].dtheta << " " ;
-    aof << inputLeftFootTraj_deq_[i].ddtheta << " " ;
+    aof << inputLeftFootTraj_deq_[i].theta << " " ;   // 26
+    aof << inputLeftFootTraj_deq_[i].dtheta << " " ;  // 27
+    aof << inputLeftFootTraj_deq_[i].ddtheta << " " ; // 28
 
-    aof << inputRightFootTraj_deq_[i].theta << " " ;
-    aof << inputRightFootTraj_deq_[i].dtheta << " " ;
-    aof << inputRightFootTraj_deq_[i].ddtheta << " " ;
+    aof << inputRightFootTraj_deq_[i].theta << " " ;  // 29
+    aof << inputRightFootTraj_deq_[i].dtheta << " " ; // 30
+    aof << inputRightFootTraj_deq_[i].ddtheta << " " ;// 31
 
-    for(unsigned int j = 0 ; j < q_vec[0].size() ; ++j) // 32 -- 38
+    aof << inputCOMTraj_deq_[i].z[0] << " " ;         // 32
+    aof << inputCOMTraj_deq_[i].z[1] << " " ;         // 33
+    aof << inputCOMTraj_deq_[i].z[2] << " " ;         // 34
+
+    aof << inputLeftFootTraj_deq_[i].z << " " ;       // 35
+    aof << inputLeftFootTraj_deq_[i].dz << " " ;      // 36
+    aof << inputLeftFootTraj_deq_[i].ddz << " " ;     // 37
+
+    aof << inputRightFootTraj_deq_[i].z << " " ;      // 38
+    aof << inputRightFootTraj_deq_[i].dz << " " ;     // 39
+    aof << inputRightFootTraj_deq_[i].ddz << " " ;    // 40
+
+    for(unsigned int j = 0 ; j < q_vec[0].size() ; ++j) // 41 -- 47
       {
         aof << q_vec[i][j] << " " ;
       }
-    for(unsigned int j = 0 ; j < dq_vec[0].size() ; ++j) // 68 -- 72
+    for(unsigned int j = 0 ; j < dq_vec[0].size() ; ++j) // 77 -- 83
       {
         aof << dq_vec[i][j] << " " ;
       }
-    for(unsigned int j = 0 ; j < ddq_vec[0].size() ; ++j) // 102 -- 108
+    for(unsigned int j = 0 ; j < ddq_vec[0].size() ; ++j) // 113 -- 119
       {
         aof << ddq_vec[i][j] << " " ;
       }
-
     aof << endl ;
   }
   aof.close();
