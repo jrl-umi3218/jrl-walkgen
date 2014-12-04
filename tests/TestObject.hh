@@ -55,6 +55,7 @@ namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
+    double filterprecision(double adb);
 
     /*! \brief Class running one test per algorithm */
     class TestObject

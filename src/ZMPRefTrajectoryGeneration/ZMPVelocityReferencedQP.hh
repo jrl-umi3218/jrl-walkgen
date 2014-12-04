@@ -218,18 +218,22 @@ namespace PatternGeneratorJRL
     CjrlHumanoidDynamicRobot * HDR_ ;
 
     /// \brief Buffers for the Kajita's dynamic filter
-    deque<ZMPPosition> ZMPTraj_deq_ ;
-    deque< vector<double> >ZMPMBTraj_deq_ ;
-    deque<COMState> COMTraj_deq_ ;
     deque<COMState> deltaCOMTraj_deq_ ;
+
+    deque<ZMPPosition> ZMPTraj_deq_ ;
+    deque<COMState> COMTraj_deq_ ;    
     deque<FootAbsolutePosition> LeftFootTraj_deq_ ;
     deque<FootAbsolutePosition> RightFootTraj_deq_ ;
+
+    deque<ZMPPosition> ZMPTraj_deq_ctrl_ ;
+    deque<COMState> COMTraj_deq_ctrl_ ;
+    deque<FootAbsolutePosition> LeftFootTraj_deq_ctrl_ ;
+    deque<FootAbsolutePosition> RightFootTraj_deq_ctrl_ ;
 
     vector< vector<double> > FootPrw_vec ;
 
     /// \brief Index where to begin the interpolation
     unsigned CurrentIndex_ ;
-    unsigned CurrentIndex_DF_ ;
 
     /// \brief Interpolation Period for the dynamic filter
     double InterpolationPeriod_ ;

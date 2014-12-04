@@ -68,6 +68,9 @@ OrientationsPreview::OrientationsPreview(CjrlHumanoidDynamicRobot *aHS)
   uaLimitHipYaw_ = 0.1;
   //Maximal cross angle between the feet
   uLimitFeet_ = 5.0/180.0*M_PI;
+
+  // Polynome to interpolate the trunk orientation
+  TrunkStateTheta_ = new Polynome5(0.0,0.0);
 }
 
 OrientationsPreview::~OrientationsPreview() {

@@ -37,6 +37,7 @@
 
 #include <privatepgtypes.hh>
 #include <jrl/walkgen/pgtypes.hh>
+#include <Mathematics/PolynomeFoot.hh>
 #include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
 
 namespace PatternGeneratorJRL
@@ -221,6 +222,8 @@ namespace PatternGeneratorJRL
     COMState TrunkState_;
     /// \brief State of the trunk at the first previewed sampling
     COMState TrunkStateT_;
+
+    Polynome5 * TrunkStateTheta_ ;
 
   };
 }

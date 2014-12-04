@@ -194,20 +194,24 @@ namespace PatternGeneratorJRL
   class  Polynome6 : public PolynomeFoot
     {
     private:
-      double MP_, InitPos_, InitSpeed_,InitAcc_;
+      double MP_, FP_, InitPos_, InitSpeed_,InitAcc_;
     public:
       /// Constructor:
       /// FT: Final time
       /// MP: Middle position
-      Polynome6(double FT, double MP);
+      Polynome6(double FT, double MP, double FP=0.0);
 
       /// Set the parameters
       // Initial acceleration, velocity and position by default 0
       // Final acceleration, velocity and position are 0
-      void SetParameters(double FT, double MP);
-      void SetParameters(double FT, double MP,
-		  	  double InitPos, double InitSpeed, double InitAcc);
-
+      void SetParameters(double FT, double MP, double FP = 0.0);
+      void SetParametersWithMiddlePos(double FT, double MP,
+                          double InitPos, double InitSpeed, double InitAcc=0.0, double FP = 0.0);
+      void GetParametersWithInitPosInitSpeed(double &TimeInterval,
+                                             double &MiddlePosition,
+                                             double &FinalPosition,
+                                             double &InitPosition,
+                                             double &InitSpeed);
       /// Destructor.
       ~Polynome6();
     };

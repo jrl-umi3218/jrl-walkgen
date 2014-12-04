@@ -343,7 +343,7 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "                   // 2
 	      << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "                   // 3
 	      << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "                   // 4
-          << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                 // 5
+	      << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "                 // 5
 	      << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "                   // 6
 	      << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "                   // 7
 	      << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "                   // 8
@@ -370,23 +370,23 @@ namespace PatternGeneratorJRL
 	      << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                   // 29
 	      << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 30
 	      << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 31
-	      << filterprecision(m_OneStep.RightFootPosition.theta*M_PI/180 ) << " "     // 32
+	      << filterprecision(m_OneStep.RightFootPosition.theta*M_PI/180 ) << " "        // 32
 	      << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 33
 	      << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 34
 	      << filterprecision(m_OneStep.ZMPTarget(0)*cos(m_CurrentConfiguration(5)) -
 				 m_OneStep.ZMPTarget(1)*sin(m_CurrentConfiguration(5))
-				 +m_CurrentConfiguration(0) ) << " "                                          // 35
+				 +m_CurrentConfiguration(0) ) << " "                        // 35
 	      << filterprecision(m_OneStep.ZMPTarget(0)*sin(m_CurrentConfiguration(5)) +
 				 m_OneStep.ZMPTarget(1)*cos(m_CurrentConfiguration(5))
-				 +m_CurrentConfiguration(1) ) << " "                                          // 36
+				 +m_CurrentConfiguration(1) ) << " "                        // 36
 	      << filterprecision(m_CurrentConfiguration(0) ) << " "                         // 37
-	      << filterprecision(m_CurrentConfiguration(1) ) << " "                        // 38
-          << filterprecision(m_OneStep.finalCOMPosition.x[2] ) << " "                   // 39
-          << filterprecision(m_OneStep.finalCOMPosition.y[2] ) << " "                   // 40
-          << filterprecision(m_OneStep.finalCOMPosition.z[2] ) << " "   ;                // 41
+	      << filterprecision(m_CurrentConfiguration(1) ) << " "			    // 38
+	  << filterprecision(m_OneStep.finalCOMPosition.x[2] ) << " "			    // 39
+	  << filterprecision(m_OneStep.finalCOMPosition.y[2] ) << " "                       // 40
+	  << filterprecision(m_OneStep.finalCOMPosition.z[2] ) << " "   ;                   // 41
         for (unsigned int i = 0 ; i < m_HDR->currentConfiguration().size() ; i++)
         {
-          aof << filterprecision(m_HDR->currentConfiguration()(i)) << " " ;                  // 39 - 74
+          aof << filterprecision(m_HDR->currentConfiguration()(i)) << " " ;                 // 39 - 74
         }
 	  aof << endl;
 	  aof.close();

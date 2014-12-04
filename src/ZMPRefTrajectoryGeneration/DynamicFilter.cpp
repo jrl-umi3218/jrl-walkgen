@@ -234,15 +234,15 @@ int DynamicFilter::OnLinefilter(
     const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
-  static int currentIteration = 0 ;
+  int currentIteration = 20 ;
   vector< MAL_VECTOR_TYPE(double) > q_vec ;
   vector< MAL_VECTOR_TYPE(double) > dq_vec ;
   vector< MAL_VECTOR_TYPE(double) > ddq_vec ;
-  for(unsigned int i = 0 ; i <= NCtrl_; ++i)
+  for(unsigned int i = 0 ; i < NbI_; ++i)
     {
-      InverseKinematics( ctrlCoMState[i], ctrlLeftFoot[i],
-                         ctrlRightFoot[i], ZMPMBConfiguration_, ZMPMBVelocity_,
-                         ZMPMBAcceleration_, controlPeriod_, stage0_, currentIteration+i) ;
+      InverseKinematics( inputCOMTraj_deq_[i], inputLeftFootTraj_deq_[i],
+                         inputRightFootTraj_deq_[i], ZMPMBConfiguration_, ZMPMBVelocity_,
+                         ZMPMBAcceleration_, interpolationPeriod_, stage0_, currentIteration) ;
     }
 
   unsigned int N = PG_N_ * NbI_ ;
@@ -255,7 +255,7 @@ int DynamicFilter::OnLinefilter(
                    inputRightFootTraj_deq_[i],
                    ZMPMB_vec_[i],
                    stage1_,
-                   currentIteration + i);
+                   currentIteration);
       q_vec.push_back(ZMPMBConfiguration_);
       dq_vec.push_back(ZMPMBVelocity_);
       ddq_vec.push_back(ZMPMBAcceleration_);
@@ -274,7 +274,6 @@ int DynamicFilter::OnLinefilter(
     }
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
 
-  currentIteration += NbI_ ;
 //#############################################################################
   deque<COMState> CoM_tmp = ctrlCoMState ;
   for (unsigned int i = 0 ; i < NCtrl_ ; ++i)
@@ -296,7 +295,7 @@ int DynamicFilter::OnLinefilter(
                    ctrlRightFoot[i],
                    zmpmb_corr[i],
                    stage2,
-                   currentIteration + i);
+                   20);
   }
 
   ofstream aof;
@@ -420,7 +419,7 @@ void DynamicFilter::InverseKinematics(
     int iteration)
 {
 
-  // lower body
+  // lower body !!!!! the angular quantities are set in degree !!!!!!
   aCoMState_(0) = inputCoMState.x[0];       aCoMSpeed_(0) = inputCoMState.x[1];
   aCoMState_(1) = inputCoMState.y[0];       aCoMSpeed_(1) = inputCoMState.y[1];
   aCoMState_(2) = inputCoMState.z[0];       aCoMSpeed_(2) = inputCoMState.z[1];

@@ -167,7 +167,7 @@ namespace PatternGeneratorJRL
    /// \param[in] InitSpeed
    /// \param[in] InitAcc
    int SetParameters(int PolynomeIndex, double TimeInterval,
-       double FinalPosition, double InitPosition, double InitSpeed, double InitAcc, double InitJerk=0.0);
+       double FinalPosition, double InitPosition, double InitSpeed, double InitAcc=0.0, double InitJerk=0.0);
 
    /*! Fill an absolute foot position structure for a given time. */
    double ComputeAll(FootAbsolutePosition & aFootAbsolutePosition,
@@ -208,7 +208,7 @@ namespace PatternGeneratorJRL
    Polynome3 *m_PolynomeOmega, *m_PolynomeOmega2;
 
    /*! \brief Polynome for Z axis position. */
-   Polynome4 *m_PolynomeZ;
+   Polynome6 *m_PolynomeZ;
 
    /*! \brief Bsplines for Z axis position. */
    ZBsplines *m_BsplinesZ;

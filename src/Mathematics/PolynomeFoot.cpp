@@ -230,28 +230,31 @@ void Polynome5::SetParameters(double FT, double FP,
   }
 }
 
-Polynome6::Polynome6(double FT, double MP) :PolynomeFoot(6,FT)
+Polynome6::Polynome6(double FT, double MP, double FP) :PolynomeFoot(6,FT)
 {
-  SetParameters(FT,MP);
+  SetParameters(FT,MP,FP);
 }
 
 
 
-void Polynome6::SetParameters(double FT, double MP)
+void Polynome6::SetParameters(double FT, double MP, double FP)
 {
-  SetParameters(FT,MP,
+  SetParametersWithMiddlePos(FT,MP,
                 /*InitPos=*/0.0,
                 /*InitSpeed=*/0.0,
-                /*InitAcc=*/0.0);
+                /*InitAcc=*/0.0,
+                FP);
 }
 
 
-void Polynome6::SetParameters(
+void Polynome6::SetParametersWithMiddlePos(
     double FT, double MP,
-		double InitPos, double InitSpeed, double InitAcc)
+    double InitPos, double InitSpeed, double InitAcc,
+    double FP)
 {
   FT_=FT;
   MP_=MP;
+  FP_=FP;
   InitPos_=InitPos;
   InitSpeed_=InitSpeed;
   InitAcc_=InitAcc;
@@ -265,12 +268,25 @@ void Polynome6::SetParameters(
     m_Coefficients[5] = 0.0;
     m_Coefficients[6] = 0.0;
   }else{
-    m_Coefficients[3] =  -0.5*(5*FT*FT*InitAcc + 32*InitSpeed*FT + 84*InitPos - 128*MP)/(FT*FT*FT);
-    m_Coefficients[4] =  0.5*(76*InitSpeed*FT + 222*InitPos - 384*MP + 9*FT*FT*InitAcc)/(FT*FT*FT*FT);
-    m_Coefficients[5] = -0.5*(204*InitPos + 66*InitSpeed*FT - 384*MP + 7*FT*FT*InitAcc)/(FT*FT*FT*FT*FT);
-    m_Coefficients[6] =           (-64*MP+32*InitPos + 10*InitSpeed*FT + FT*FT*InitAcc)/(FT*FT*FT*FT*FT*FT);
+    m_Coefficients[3] = -0.5*( 5*FT*FT*InitAcc+32*FT*InitSpeed-128*MP+ 84*InitPos+ 44*FP )/(FT*FT*FT);
+    m_Coefficients[4] =  0.5*( 9*FT*FT*InitAcc+76*FT*InitSpeed-384*MP+222*InitPos+162*FP )/(FT*FT*FT*FT);
+    m_Coefficients[5] = -0.5*( 7*FT*FT*InitAcc+66*FT*InitSpeed-384*MP+204*InitPos+180*FP )/(FT*FT*FT*FT*FT);
+    m_Coefficients[6] =      (   FT*FT*InitAcc+10*FT*InitSpeed- 64*MP+ 32*InitPos+ 32*FP )/(FT*FT*FT*FT*FT*FT);
   }
 
+}
+
+void Polynome6::GetParametersWithInitPosInitSpeed(double &TimeInterval,
+                                                  double &MiddlePosition,
+                                                  double &FinalPosition,
+                                                  double &InitPosition,
+                                                  double &InitSpeed)
+{
+  TimeInterval   = FT_        ;
+  MiddlePosition = MP_        ;
+  FinalPosition  = FP_        ;
+  InitPosition   = InitPos_   ;
+  InitSpeed      = InitSpeed_ ;
 }
 
 Polynome6::~Polynome6()

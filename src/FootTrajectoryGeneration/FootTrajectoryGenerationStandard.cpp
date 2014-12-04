@@ -123,7 +123,7 @@ void FootTrajectoryGenerationStandard::InitializeInternalDataStructures()
 
   m_PolynomeX = new Polynome5(0,0);
   m_PolynomeY = new Polynome5(0,0);
-  m_PolynomeZ = new Polynome4(0,0);
+  m_PolynomeZ = new Polynome6(0,0);
   m_BsplinesZ = new ZBsplines(0,0,0,0);
   m_PolynomeOmega = new Polynome3(0,0);
   m_PolynomeOmega2 = new Polynome3(0,0);
@@ -214,7 +214,8 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
 
    case Z_AXIS:
 
-     m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition+m_StepHeight,InitPosition,InitSpeed,FinalPosition);
+     m_PolynomeZ->SetParametersWithMiddlePos(TimeInterval, FinalPosition+m_StepHeight,
+                                             InitPosition, InitSpeed, 0.0, FinalPosition);
 
      if ((FinalPosition - InitPosition) == m_StepHeight)
        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,InitPosition,0.5*TimeInterval,InitPosition+m_StepHeight);
@@ -263,7 +264,8 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
    case Z_AXIS:
    //  if (m_isStepStairOn == 0)
    //{
-     m_PolynomeZ->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     m_PolynomeZ->SetParametersWithMiddlePos(TimeInterval,FinalPosition+m_StepHeight,InitPosition,InitSpeed,
+                                             InitAcc,FinalPosition);
    //}
    //else
    //{

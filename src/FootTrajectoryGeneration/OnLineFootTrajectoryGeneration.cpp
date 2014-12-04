@@ -130,6 +130,7 @@ void
     {
       curr_NSFAP.z = m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
       curr_NSFAP.dz = m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
+      curr_NSFAP.ddz = m_PolynomeZ->ComputeSecDerivative(LocalInterpolationStartTime+InterpolationTime);
     }
   else
     {
@@ -303,19 +304,21 @@ void
     //Set parameters for current polynomial
     double TimeInterval = UnlockedSwingPeriod-SwingTimePassed;
     SetParameters(
-    	  FootTrajectoryGenerationStandard::X_AXIS,
-        TimeInterval,FPx,
-        LastSFP->x, LastSFP->dx, LastSFP->ddx, LastSFP->dddx
-        );
+          FootTrajectoryGenerationStandard::X_AXIS,
+          TimeInterval,FPx,
+          LastSFP->x, LastSFP->dx, LastSFP->ddx, LastSFP->dddx
+          );
     SetParameters(
-    	  FootTrajectoryGenerationStandard::Y_AXIS,
-        TimeInterval,FPy,
-        LastSFP->y, LastSFP->dy, LastSFP->ddy, LastSFP->dddy
-        );
+          FootTrajectoryGenerationStandard::Y_AXIS,
+          TimeInterval,FPy,
+          LastSFP->y, LastSFP->dy, LastSFP->ddy, LastSFP->dddy
+          );
     if(CurrentSupport.StateChanged==true)
       {
-        SetParametersWithInitPosInitSpeed(FootTrajectoryGenerationStandard::Z_AXIS,
-                                          m_TSingle,m_AnklePositionLeft[2],LastSFP->z, LastSFP->dz);
+        SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
+                      m_TSingle,m_AnklePositionLeft[2],
+                      LastSFP->z, LastSFP->dz, LastSFP->ddz
+                      );
       }
 
     SetParameters(

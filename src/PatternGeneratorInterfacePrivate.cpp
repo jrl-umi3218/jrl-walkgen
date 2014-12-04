@@ -528,8 +528,7 @@ namespace PatternGeneratorJRL {
 
     COMState lStartingCOMState;
     memset(&lStartingCOMState,0,sizeof(COMState));
-    MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
-    MAL_VECTOR( BodyAnglesIni,double);
+    MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;;
 
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
     memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
@@ -1288,7 +1287,6 @@ namespace PatternGeneratorJRL {
                                                                     FootAbsolutePosition &LeftFootPosition,
                                                                     FootAbsolutePosition &RightFootPosition )
   {
-
     m_InternalClock+=m_SamplingPeriod;
 
     if ((!m_ShouldBeRunning) ||
@@ -1360,8 +1358,6 @@ namespace PatternGeneratorJRL {
                         m_RightFootPositions);
       m_Running = m_ZMPVRQP->Running();
     }
-
-
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,
                                                     RightFootPosition,
                                                     ZMPTarget,
@@ -1369,7 +1365,6 @@ namespace PatternGeneratorJRL {
                                                     CurrentConfiguration,
                                                     CurrentVelocity,
                                                     CurrentAcceleration);
-
     ODEBUG("finalCOMState: "  <<
            finalCOMState.x[0] << " " <<
            finalCOMState.x[1] << " " <<
@@ -1758,9 +1753,9 @@ namespace PatternGeneratorJRL {
 
 
     // Carefull : Extremly specific to the pattern generator.
-    double cx,cy,cz, sx,sy,sz;
-    cx = 0; cy = 0; cz = cos(0.5*m_AbsTheta);
-    sx = 0; sy = 0; sz = sin(0.5*m_AbsTheta);
+    double /*cx,cy,*/ cz, /*sx,sy,*/ sz;
+    /*cx = 0; cy = 0;*/ cz = cos(0.5*m_AbsTheta);
+    /*sx = 0; sy = 0;*/ sz = sin(0.5*m_AbsTheta);
     aTQ[3] = 0;
     aTQ[4] = 0;
     aTQ[5] = sz;

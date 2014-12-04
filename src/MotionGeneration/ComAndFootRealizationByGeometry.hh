@@ -290,6 +290,10 @@ namespace PatternGeneratorJRL
     inline MAL_VECTOR_TYPE(double) & GetPreviousVelocityStage1()
     { return m_prev_Velocity1 ;};
 
+    inline bool ShiftFoot()
+    {return ShiftFoot_ ;}
+    inline void ShiftFoot(bool ShiftFoot)
+    {ShiftFoot_=ShiftFoot ;}
 
     /*! \brief Get the COG of the ankles at the starting position. */
     virtual MAL_S3_VECTOR_TYPE(double) GetCOGInitialAnkles();
@@ -451,6 +455,8 @@ namespace PatternGeneratorJRL
 
     /*! Store the position of the left and right shoulders. */
     CjrlJoint *m_LeftShoulder, *m_RightShoulder;
+
+    bool ShiftFoot_ ;
   };
 
   ostream & operator <<(ostream &os,const ComAndFootRealization &obj);

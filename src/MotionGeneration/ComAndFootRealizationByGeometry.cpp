@@ -48,7 +48,7 @@ ComAndFootRealizationByGeometry::
   m_ZARM = -1.0;
   m_LeftShoulder = 0;
   m_RightShoulder = 0;
-
+  ShiftFoot_ = false ;
   RegisterMethods();
 
   for(unsigned int i=0;i<3;i++)
@@ -716,7 +716,10 @@ bool ComAndFootRealizationByGeometry::
     Ankle = getHumanoidDynamicRobot()->leftAnkle();
   }
 
-  Foot_P = Foot_P + Foot_Shift;
+  if(ShiftFoot_)
+    {
+      Foot_P = Foot_P + Foot_Shift;
+    }
   //  Foot_P(2)-=(aCoMPosition(2) + ToTheHip(2));
   ODEBUG("Body_P:" << endl << Body_P);
   ODEBUG("Body_R:" << endl << Body_R);

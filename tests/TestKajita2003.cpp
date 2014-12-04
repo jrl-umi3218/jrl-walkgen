@@ -41,19 +41,6 @@ enum Profiles_t {
   PROFIL_PB_FLORENT_SEQ2                // 4
 };
 
-double filterprecision(double adb)
-{
-  if (fabs(adb)<1e-7)
-    return 0.0;
-
-  if (fabs(adb)>1e7)
-    return 1e7 ;
-
-  double ladb2 = adb * 1e7;
-  double lintadb2 = trunc(ladb2);
-  return lintadb2/1e7;
-}
-
 class TestKajita2003: public TestObject
 {
 
@@ -63,7 +50,7 @@ public:
     TestObject(argc,argv,aString)
   {
     m_TestProfile = TestProfile;
-  };
+  }
 
 
 protected:

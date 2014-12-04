@@ -78,7 +78,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   QP_T_ = 0.1 ;
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
-  InterpolationPeriod_ = QP_T_/2;
+  InterpolationPeriod_ = QP_T_/10;
   NbSampleControl_ = (int)round(QP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(QP_T_/InterpolationPeriod_) ;
   StepPeriod_ = 0.8 ;
@@ -93,7 +93,6 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   Solution_.useWarmStart=false ;
 
   CurrentIndex_ = 0 ;
-  CurrentIndex_DF_ = 0 ;
 
   // Create and initialize online interpolation of feet trajectories
   RFI_ = new RelativeFeetInequalities( SPM,aHS );
@@ -132,7 +131,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
 
   // Initialize  the 2D LIPM
   LIPM_subsampled_.SetSimulationControlPeriod( QP_T_ );
-  LIPM_subsampled_.SetRobotControlPeriod( InterpolationPeriod_ );
+  LIPM_subsampled_.SetRobotControlPeriod( m_SamplingPeriod );
   LIPM_subsampled_.InitializeSystem();
 
   // Initialize the 2D LIPM
@@ -170,7 +169,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   OFTG_DF_->InitializeInternalDataStructures();
   OFTG_DF_->SetSingleSupportTime( SSPeriod_ );
   OFTG_DF_->SetDoubleSupportTime( DSPeriod_ );
-  OFTG_DF_->SetSamplingPeriod( InterpolationPeriod_ );
+  OFTG_DF_->SetSamplingPeriod( m_SamplingPeriod );
   OFTG_DF_->QPSamplingPeriod( QP_T_ );
   OFTG_DF_->NbSamplingsPreviewed( QP_N_ );
   OFTG_DF_->FeetDistance( FeetDistance_ );
@@ -209,8 +208,13 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   // init of the buffer for the kajita's dynamic filter
 
   // size = numberOfIterationOfThePreviewControl * NumberOfSample + Margin
-  ZMPTraj_deq_.resize( QP_N_ * NbSampleInterpolation_+20);
-  COMTraj_deq_.resize( QP_N_ * NbSampleInterpolation_+20);
+  ZMPTraj_deq_.resize( QP_N_ * NbSampleInterpolation_+10);
+  COMTraj_deq_.resize( QP_N_ * NbSampleInterpolation_+10);
+  LeftFootTraj_deq_.resize( QP_N_ * NbSampleInterpolation_+10) ;
+  RightFootTraj_deq_.resize( QP_N_ * NbSampleInterpolation_+10) ;
+
+  ZMPTraj_deq_ctrl_.resize( QP_N_ * NbSampleControl_+10) ;
+  COMTraj_deq_ctrl_.resize( QP_N_ * NbSampleControl_+10) ;
 }
 
 
@@ -268,8 +272,7 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 }
 
 
-void
-    ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
+void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
 {
 
   MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
@@ -281,8 +284,7 @@ void
   PerturbationOccured_ = true;
 }
 
-void
-    ZMPVelocityReferencedQP::setCoMPerturbationForce(double x, double y)
+void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x, double y)
 {
 
   MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
@@ -462,7 +464,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   FinalCurrentStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
 
   dynamicFilter_->init(m_SamplingPeriod,InterpolationPeriod_,
-                       QP_T_, QP_N_*QP_T_ - QP_T_/m_SamplingPeriod * InterpolationPeriod_ ,CoMHeight_,InitLeftFootAbsolutePosition,lStartingCOMState);
+                       QP_T_, QP_N_*QP_T_/2 - QP_T_/m_SamplingPeriod * InterpolationPeriod_ ,CoMHeight_,InitLeftFootAbsolutePosition,lStartingCOMState);
   return 0;
 }
 
@@ -475,6 +477,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
                                     deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
 
 {
+  cout << "time = " << time << endl ;
   // If on-line mode not activated we go out.
   if (!m_OnLineMode)
   {
@@ -546,63 +549,80 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       Problem_.dump( time );
     }
     VRQPGenerator_->LastFootSol(Solution_);
+    //OrientPrw_->
 
     // INITIALIZE INTERPOLATION:
     // ------------------------
     CurrentIndex_ = FinalCOMTraj_deq.size();
-    CurrentIndex_DF_ = (int)round(CurrentIndex_ * m_SamplingPeriod / InterpolationPeriod_) ;
-    LeftFootTraj_deq_.resize(CurrentIndex_DF_) ;
-    RightFootTraj_deq_.resize(CurrentIndex_DF_) ;
-
-    cout << "CurrentIndex_ = " << CurrentIndex_ << " CurrentIndex_DF_ = "  << CurrentIndex_DF_  << endl << endl;
-
-
-    int inc =  (int)round(InterpolationPeriod_ / m_SamplingPeriod) ;
-    for (unsigned int i = 0 , j = 0 ; j < CurrentIndex_DF_ ; i = i + inc , ++j )
+    for (unsigned int i = 0  ; i < CurrentIndex_ ; ++i )
     {
-      ZMPTraj_deq_[j] = FinalZMPTraj_deq[i] ;
-      COMTraj_deq_[j] = FinalCOMTraj_deq[i] ;
-      LeftFootTraj_deq_[j] = FinalLeftFootTraj_deq[i] ;
-      RightFootTraj_deq_[j] = FinalRightFootTraj_deq[i] ;
+        ZMPTraj_deq_ctrl_[i] = FinalZMPTraj_deq[i] ;
+        COMTraj_deq_ctrl_[i] = FinalCOMTraj_deq[i] ;
     }
-    FinalZMPTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
-    FinalCOMTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
+    LeftFootTraj_deq_ctrl_ = FinalLeftFootTraj_deq ;
+    RightFootTraj_deq_ctrl_ = FinalRightFootTraj_deq ;
 
-    // INTERPRET THE SOLUTION VECTOR :
-    // -------------------------------
     solution_ = Solution_ ;
     InterpretSolutionVector();
 
     // INTERPOLATION
+    FinalZMPTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
+    FinalCOMTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
     ControlInterpolation( FinalCOMTraj_deq, FinalZMPTraj_deq, FinalLeftFootTraj_deq,
                           FinalRightFootTraj_deq, time) ;
 
     DynamicFilterInterpolation(time);
 
-    deque<COMState> outputDeltaCOMTraj_deq ;
-    dynamicFilter_->OnLinefilter(time,FinalCOMTraj_deq,
-                                 FinalLeftFootTraj_deq,
-                                 FinalRightFootTraj_deq,
-                                 COMTraj_deq_,ZMPTraj_deq_,
-                                 LeftFootTraj_deq_,
-                                 RightFootTraj_deq_,
-                                 outputDeltaCOMTraj_deq);
-    // Correct the CoM.
-    for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
+    unsigned int IndexMax = (int)round(QP_N_*QP_T_*0.5  / InterpolationPeriod_);
+    ZMPTraj_deq_.resize(IndexMax);
+    COMTraj_deq_.resize(IndexMax);
+    LeftFootTraj_deq_.resize(IndexMax);
+    RightFootTraj_deq_.resize(IndexMax);
+    int inc =  (int)round(InterpolationPeriod_ / m_SamplingPeriod) ;
+    for (unsigned int i = 0 , j = 0 ; j < IndexMax ; i = i + inc , ++j )
     {
-      for(int j=0;j<3;j++)
-      {
-        FinalCOMTraj_deq[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-        FinalCOMTraj_deq[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
-      }
+      ZMPTraj_deq_[j] = ZMPTraj_deq_ctrl_[i] ;
+      COMTraj_deq_[j] = COMTraj_deq_ctrl_[i] ;
+      LeftFootTraj_deq_[j] = LeftFootTraj_deq_ctrl_[i] ;
+      RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
     }
 
-    // Specify that we are in the ending phase.
-    if (EndingPhase_ == false)
+    bool filterOn_ = true ;
+    if(filterOn_)
     {
-      TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
+      dynamicFilter_->OnLinefilter(time,FinalCOMTraj_deq,
+                                   FinalLeftFootTraj_deq,
+                                   FinalRightFootTraj_deq,
+                                   COMTraj_deq_,ZMPTraj_deq_,
+                                   LeftFootTraj_deq_,
+                                   RightFootTraj_deq_,
+                                   deltaCOMTraj_deq_);
+      // Correct the CoM.
+      for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
+      {
+        for(int j=0;j<3;j++)
+        {
+          FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
+          FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
+        }
+      }
     }
-    UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
+    // Specify that we are in the ending phase.
+    if (time <= m_SamplingPeriod )
+      {
+        if (EndingPhase_ == false)
+        {
+          TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_ + m_SamplingPeriod;
+        }
+        UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_ + m_SamplingPeriod ;
+      }else{
+        if (EndingPhase_ == false)
+        {
+          TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + QP_T_ * QP_N_;
+        }
+        UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + QP_T_;
+      }
+
 
   }
   //-----------------------------------
@@ -640,6 +660,13 @@ void ZMPVelocityReferencedQP::ControlInterpolation(
                                              Solution_.SupportStates_deq, Solution_,
                                              Solution_.SupportOrientations_deq,
                                              FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
+
+  for(unsigned int i = 0 ; i<FinalCOMTraj_deq.size() ; ++i)
+    {
+      FinalCOMTraj_deq[i].yaw[0] = 0.5*(FinalRightFootTraj_deq[i].theta  +FinalLeftFootTraj_deq[i].theta   );
+      FinalCOMTraj_deq[i].yaw[1] = 0.5*(FinalRightFootTraj_deq[i].dtheta +FinalLeftFootTraj_deq[i].dtheta  );
+      FinalCOMTraj_deq[i].yaw[2] = 0.5*(FinalRightFootTraj_deq[i].ddtheta+FinalLeftFootTraj_deq[i].ddtheta );
+    }
   return ;
 }
 
@@ -650,16 +677,16 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
   OrientPrw_DF_->CurrentTrunkState(InitStateOrientPrw_) ;
   for ( int i = 0 ; i < QP_N_ ; i++ )
   {
-    CoMZMPInterpolation(ZMPTraj_deq_, COMTraj_deq_,
-                        LeftFootTraj_deq_, RightFootTraj_deq_,
+    CoMZMPInterpolation(ZMPTraj_deq_ctrl_, COMTraj_deq_ctrl_,
+                        LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_,
                         &Solution_, &LIPM_subsampled_,
-                        NbSampleInterpolation_, i, CurrentIndex_DF_);
+                        NbSampleControl_, i, CurrentIndex_);
   }
 
   InterpretSolutionVector();
 
   // Copy the solution for the orientation interpolation function
-  OFTG_DF_->SetSamplingPeriod( InterpolationPeriod_ );
+  OFTG_DF_->SetSamplingPeriod( m_SamplingPeriod );
   solution_t aSolution  = Solution_ ;
   //solution_.SupportStates_deq.pop_front();
 
@@ -668,12 +695,12 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
     aSolution.SupportOrientations_deq.clear();
     OrientPrw_DF_->preview_orientations( time + i * QP_T_, VelRef_,
                                          SupportFSM_->StepPeriod(),
-                                         LeftFootTraj_deq_, RightFootTraj_deq_,
+                                         LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_,
                                          aSolution);
 
     OrientPrw_DF_->interpolate_trunk_orientation( time + i * QP_T_,
-                                                  CurrentIndex_DF_ + i * NbSampleInterpolation_, InterpolationPeriod_,
-                                                  solution_.SupportStates_deq, COMTraj_deq_ );
+                                                  CurrentIndex_ + i * NbSampleControl_, m_SamplingPeriod,
+                                                  solution_.SupportStates_deq, COMTraj_deq_ctrl_ );
 
     // Modify a copy of the solution to allow "OFTG_DF_->interpolate_feet_positions"
     // to use the correcte feet step previewed
@@ -681,7 +708,7 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
     OFTG_DF_->interpolate_feet_positions( time + i * QP_T_,
                                           solution_.SupportStates_deq, solution_,
                                           aSolution.SupportOrientations_deq,
-                                          LeftFootTraj_deq_, RightFootTraj_deq_);
+                                          LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_);
     solution_.SupportStates_deq.pop_front();
   }
 
@@ -689,6 +716,13 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
   OrientPrw_DF_->CurrentTrunkState(FinalPreviewStateOrientPrw_);
 
   OFTG_DF_->copyPolynomesFromFTGS(OFTG_control_);
+
+  for(unsigned int i = 0 ; i<QP_N_*NbSampleControl_ ; ++i)
+    {
+      COMTraj_deq_ctrl_[i].yaw[0] = 0.5*(LeftFootTraj_deq_ctrl_[i].theta  +RightFootTraj_deq_ctrl_[i].theta   );
+      COMTraj_deq_ctrl_[i].yaw[1] = 0.5*(LeftFootTraj_deq_ctrl_[i].dtheta +RightFootTraj_deq_ctrl_[i].dtheta  );
+      COMTraj_deq_ctrl_[i].yaw[2] = 0.5*(LeftFootTraj_deq_ctrl_[i].ddtheta+RightFootTraj_deq_ctrl_[i].ddtheta );
+    }
   return ;
 }
 
