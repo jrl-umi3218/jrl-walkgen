@@ -652,7 +652,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   SupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = (-1)*StepType;
 
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = StepType;
-  cout<<"LocalInterpolationStartTime+InterpolationTime: "<<LocalInterpolationStartTime+InterpolationTime;
+  //cout<<"LocalInterpolationStartTime+InterpolationTime: "<<LocalInterpolationStartTime+InterpolationTime;
   if (LocalInterpolationStartTime +InterpolationTime <= EndOfLiftOff || LocalInterpolationStartTime +InterpolationTime >= StartLanding)
     {
       // Do not modify x, y and theta while liftoff.

@@ -314,6 +314,16 @@ namespace PatternGeneratorJRL
               return ( sum_h + mass * x.body.iX0.r() + x.body.iX0.E() * Robot_Model::inertias[x.id].h() );
           }
       };
+
+    private : // debug functions
+      void Debug(const deque<COMState> & ctrlCoMState,
+                 const deque<FootAbsolutePosition> & ctrlLeftFoot,
+                 const deque<FootAbsolutePosition> & ctrlRightFoot,
+                 const deque<COMState> & inputCOMTraj_deq_,
+                 const deque<ZMPPosition> inputZMPTraj_deq_,
+                 const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+                 const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+                 deque<COMState> & outputDeltaCOMTraj_deq_);
   };
 
 }

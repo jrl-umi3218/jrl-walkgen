@@ -273,208 +273,17 @@ int DynamicFilter::OnLinefilter(
       deltaZMP_deq_[i].stepType = inputZMPTraj_deq_[i].stepType ;
     }
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
-
-//#############################################################################
-  deque<COMState> CoM_tmp = ctrlCoMState ;
-  for (unsigned int i = 0 ; i < NCtrl_ ; ++i)
-  {
-    for(int j=0;j<3;j++)
-    {
-      CoM_tmp[i].x[j] += outputDeltaCOMTraj_deq_[i].x[j] ;
-      CoM_tmp[i].y[j] += outputDeltaCOMTraj_deq_[i].y[j] ;
-    }
-  }
-
-  int stage2 = 2 ;
-  vector< vector<double> > zmpmb_corr (NCtrl_,vector<double>(2,0.0));
-  for(unsigned int i = 0 ; i < NCtrl_ ; ++i)
-  {
-      ComputeZMPMB(controlPeriod_,
-                   CoM_tmp[i],
-                   ctrlLeftFoot[i],
-                   ctrlRightFoot[i],
-                   zmpmb_corr[i],
-                   stage2,
-                   20);
-  }
-
-  ofstream aof;
-  string aFileName;
-  static int iteration_zmp = 0 ;
-  ostringstream oss(std::ostringstream::ate);
-  oss.str("zmpmb_herdt.txt");
-  aFileName = oss.str();
-  if ( iteration_zmp == 0 )
-  {
-    aof.open(aFileName.c_str(),ofstream::out);
-    aof.close();
-  }
-
-  aof.open(aFileName.c_str(),ofstream::app);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < NbI_ ; ++i)
-  {
-    aof << inputZMPTraj_deq_[i].px << " " ;           // 1
-    aof << inputZMPTraj_deq_[i].py << " " ;           // 2
-
-    aof << ZMPMB_vec_[i][0] << " " ;                  // 3
-    aof << ZMPMB_vec_[i][1] << " " ;                  // 4
-
-    aof << inputCOMTraj_deq_[i].x[0] << " " ;         // 5
-    aof << inputCOMTraj_deq_[i].x[1] << " " ;         // 6
-    aof << inputCOMTraj_deq_[i].x[2] << " " ;         // 7
-
-    aof << inputLeftFootTraj_deq_[i].x << " " ;       // 8
-    aof << inputLeftFootTraj_deq_[i].dx << " " ;      // 9
-    aof << inputLeftFootTraj_deq_[i].ddx << " " ;     // 10
-
-    aof << inputRightFootTraj_deq_[i].x << " " ;      // 11
-    aof << inputRightFootTraj_deq_[i].dx << " " ;     // 12
-    aof << inputRightFootTraj_deq_[i].ddx << " " ;    // 13
-
-    aof << inputCOMTraj_deq_[i].y[0] << " " ;         // 14
-    aof << inputCOMTraj_deq_[i].y[1] << " " ;         // 15
-    aof << inputCOMTraj_deq_[i].y[2] << " " ;         // 16
-
-    aof << inputLeftFootTraj_deq_[i].y << " " ;       // 17
-    aof << inputLeftFootTraj_deq_[i].dy << " " ;      // 18
-    aof << inputLeftFootTraj_deq_[i].ddy << " " ;     // 19
-
-    aof << inputRightFootTraj_deq_[i].y << " " ;      // 20
-    aof << inputRightFootTraj_deq_[i].dy << " " ;     // 21
-    aof << inputRightFootTraj_deq_[i].ddy << " " ;    // 22
-
-    aof << inputCOMTraj_deq_[i].yaw[0] << " " ;       // 23
-    aof << inputCOMTraj_deq_[i].yaw[1] << " " ;       // 24
-    aof << inputCOMTraj_deq_[i].yaw[2] << " " ;       // 25
-
-    aof << inputLeftFootTraj_deq_[i].theta << " " ;   // 26
-    aof << inputLeftFootTraj_deq_[i].dtheta << " " ;  // 27
-    aof << inputLeftFootTraj_deq_[i].ddtheta << " " ; // 28
-
-    aof << inputRightFootTraj_deq_[i].theta << " " ;  // 29
-    aof << inputRightFootTraj_deq_[i].dtheta << " " ; // 30
-    aof << inputRightFootTraj_deq_[i].ddtheta << " " ;// 31
-
-    aof << inputCOMTraj_deq_[i].z[0] << " " ;         // 32
-    aof << inputCOMTraj_deq_[i].z[1] << " " ;         // 33
-    aof << inputCOMTraj_deq_[i].z[2] << " " ;         // 34
-
-    aof << inputLeftFootTraj_deq_[i].z << " " ;       // 35
-    aof << inputLeftFootTraj_deq_[i].dz << " " ;      // 36
-    aof << inputLeftFootTraj_deq_[i].ddz << " " ;     // 37
-
-    aof << inputRightFootTraj_deq_[i].z << " " ;      // 38
-    aof << inputRightFootTraj_deq_[i].dz << " " ;     // 39
-    aof << inputRightFootTraj_deq_[i].ddz << " " ;    // 40
-
-    for(unsigned int j = 0 ; j < q_vec[0].size() ; ++j) // 41 -- 47
-      {
-        aof << q_vec[i][j] << " " ;
-      }
-    for(unsigned int j = 0 ; j < dq_vec[0].size() ; ++j) // 77 -- 83
-      {
-        aof << dq_vec[i][j] << " " ;
-      }
-    for(unsigned int j = 0 ; j < ddq_vec[0].size() ; ++j) // 113 -- 119
-      {
-        aof << ddq_vec[i][j] << " " ;
-      }
-    aof << endl ;
-  }
-  aof.close();
-
-  aFileName = "zmpmb_corr_herdt.txt" ;
-  if ( iteration_zmp == 0 )
-  {
-    aof.open(aFileName.c_str(),ofstream::out);
-    aof.close();
-  }
-  aof.open(aFileName.c_str(),ofstream::app);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < NCtrl_ ; ++i)
-  {
-    aof << zmpmb_corr[i][0] << " " ;
-    aof << zmpmb_corr[i][1] << " " ;
-    aof << endl ;
-  }
-  aof.close();
-
-  oss.str("/tmp/buffer_");
-  oss << setfill('0') << setw(3) << iteration_zmp << ".txt" ;
-  aFileName = oss.str();
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.close();
-
-  aof.open(aFileName.c_str(),ofstream::app);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < NbI_*PG_N_ ; ++i)
-  {
-    aof << i << " " ; // 0
-    aof << inputZMPTraj_deq_[i].px << " " ;           // 1
-    aof << inputZMPTraj_deq_[i].py << " " ;           // 2
-
-    aof << ZMPMB_vec_[i][0] << " " ;                  // 3
-    aof << ZMPMB_vec_[i][1] << " " ;                  // 4
-
-    aof << inputCOMTraj_deq_[i].x[0] << " " ;         // 5
-    aof << inputCOMTraj_deq_[i].x[1] << " " ;         // 6
-    aof << inputCOMTraj_deq_[i].x[2] << " " ;         // 7
-
-    aof << inputLeftFootTraj_deq_[i].x << " " ;       // 8
-    aof << inputLeftFootTraj_deq_[i].dx << " " ;      // 9
-    aof << inputLeftFootTraj_deq_[i].ddx << " " ;     // 10
-
-    aof << inputRightFootTraj_deq_[i].x << " " ;      // 11
-    aof << inputRightFootTraj_deq_[i].dx << " " ;     // 12
-    aof << inputRightFootTraj_deq_[i].ddx << " " ;    // 13
-
-    aof << inputCOMTraj_deq_[i].y[0] << " " ;         // 14
-    aof << inputCOMTraj_deq_[i].y[1] << " " ;         // 15
-    aof << inputCOMTraj_deq_[i].y[2] << " " ;         // 16
-
-    aof << inputLeftFootTraj_deq_[i].y << " " ;       // 17
-    aof << inputLeftFootTraj_deq_[i].dy << " " ;      // 18
-    aof << inputLeftFootTraj_deq_[i].ddy << " " ;     // 19
-
-    aof << inputRightFootTraj_deq_[i].y << " " ;      // 20
-    aof << inputRightFootTraj_deq_[i].dy << " " ;     // 21
-    aof << inputRightFootTraj_deq_[i].ddy << " " ;    // 22
-
-    aof << inputCOMTraj_deq_[i].yaw[0] << " " ;       // 23
-    aof << inputCOMTraj_deq_[i].yaw[1] << " " ;       // 24
-    aof << inputCOMTraj_deq_[i].yaw[2] << " " ;       // 25
-
-    aof << inputLeftFootTraj_deq_[i].theta << " " ;   // 26
-    aof << inputLeftFootTraj_deq_[i].dtheta << " " ;  // 27
-    aof << inputLeftFootTraj_deq_[i].ddtheta << " " ; // 28
-
-    aof << inputRightFootTraj_deq_[i].theta << " " ;  // 29
-    aof << inputRightFootTraj_deq_[i].dtheta << " " ; // 30
-    aof << inputRightFootTraj_deq_[i].ddtheta << " " ;// 31
-
-    aof << inputCOMTraj_deq_[i].z[0] << " " ;         // 32
-    aof << inputCOMTraj_deq_[i].z[1] << " " ;         // 33
-    aof << inputCOMTraj_deq_[i].z[2] << " " ;         // 34
-
-    aof << inputLeftFootTraj_deq_[i].z << " " ;       // 35
-    aof << inputLeftFootTraj_deq_[i].dz << " " ;      // 36
-    aof << inputLeftFootTraj_deq_[i].ddz << " " ;     // 37
-
-    aof << inputRightFootTraj_deq_[i].z << " " ;      // 38
-    aof << inputRightFootTraj_deq_[i].dz << " " ;     // 39
-    aof << inputRightFootTraj_deq_[i].ddz << " " ;    // 40
-
-    aof << endl ;
-  }
-  aof.close();
-
-
-  iteration_zmp++;
-
+#define DEBUG
+#ifdef DEBUG
+  Debug(ctrlCoMState,
+        ctrlLeftFoot,
+        ctrlRightFoot,
+        inputCOMTraj_deq_,
+        inputZMPTraj_deq_,
+        inputLeftFootTraj_deq_,
+        inputRightFootTraj_deq_,
+        outputDeltaCOMTraj_deq_);
+#endif
   return 0 ;
 }
 
@@ -703,7 +512,9 @@ int DynamicFilter::OptimalControl(
                outputDeltaCOMTraj_deq_[i].y[j] == outputDeltaCOMTraj_deq_[i].y[j] )
             {}
           else{
+#ifdef DEBUG
               cout << "kajita2003 preview control diverged\n" ;
+#endif
               return -1 ;
             }
         }
@@ -880,5 +691,204 @@ void DynamicFilter::computeWaist(const FootAbsolutePosition & inputLeftFoot)
   //  aof.close();
   //  ++it;
 
+  return ;
+}
+
+void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
+                          const deque<FootAbsolutePosition> & ctrlLeftFoot,
+                          const deque<FootAbsolutePosition> & ctrlRightFoot,
+                          const deque<COMState> & inputCOMTraj_deq_,
+                          const deque<ZMPPosition> inputZMPTraj_deq_,
+                          const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
+                          const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
+                          deque<COMState> & outputDeltaCOMTraj_deq_)
+{
+  deque<COMState> CoM_tmp = ctrlCoMState ;
+  for (unsigned int i = 0 ; i < NCtrl_ ; ++i)
+  {
+    for(int j=0;j<3;j++)
+    {
+      CoM_tmp[i].x[j] += outputDeltaCOMTraj_deq_[i].x[j] ;
+      CoM_tmp[i].y[j] += outputDeltaCOMTraj_deq_[i].y[j] ;
+    }
+  }
+
+  int stage2 = 2 ;
+  vector< vector<double> > zmpmb_corr (NCtrl_,vector<double>(2,0.0));
+  for(unsigned int i = 0 ; i < NCtrl_ ; ++i)
+  {
+      ComputeZMPMB(controlPeriod_,
+                   CoM_tmp[i],
+                   ctrlLeftFoot[i],
+                   ctrlRightFoot[i],
+                   zmpmb_corr[i],
+                   stage2,
+                   20);
+  }
+
+  ofstream aof;
+  string aFileName;
+  static int iteration_zmp = 0 ;
+  ostringstream oss(std::ostringstream::ate);
+  oss.str("zmpmb_herdt.txt");
+  aFileName = oss.str();
+  if ( iteration_zmp == 0 )
+  {
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < NbI_ ; ++i)
+  {
+    aof << inputZMPTraj_deq_[i].px << " " ;           // 1
+    aof << inputZMPTraj_deq_[i].py << " " ;           // 2
+
+    aof << ZMPMB_vec_[i][0] << " " ;                  // 3
+    aof << ZMPMB_vec_[i][1] << " " ;                  // 4
+
+    aof << inputCOMTraj_deq_[i].x[0] << " " ;         // 5
+    aof << inputCOMTraj_deq_[i].x[1] << " " ;         // 6
+    aof << inputCOMTraj_deq_[i].x[2] << " " ;         // 7
+
+    aof << inputLeftFootTraj_deq_[i].x << " " ;       // 8
+    aof << inputLeftFootTraj_deq_[i].dx << " " ;      // 9
+    aof << inputLeftFootTraj_deq_[i].ddx << " " ;     // 10
+
+    aof << inputRightFootTraj_deq_[i].x << " " ;      // 11
+    aof << inputRightFootTraj_deq_[i].dx << " " ;     // 12
+    aof << inputRightFootTraj_deq_[i].ddx << " " ;    // 13
+
+    aof << inputCOMTraj_deq_[i].y[0] << " " ;         // 14
+    aof << inputCOMTraj_deq_[i].y[1] << " " ;         // 15
+    aof << inputCOMTraj_deq_[i].y[2] << " " ;         // 16
+
+    aof << inputLeftFootTraj_deq_[i].y << " " ;       // 17
+    aof << inputLeftFootTraj_deq_[i].dy << " " ;      // 18
+    aof << inputLeftFootTraj_deq_[i].ddy << " " ;     // 19
+
+    aof << inputRightFootTraj_deq_[i].y << " " ;      // 20
+    aof << inputRightFootTraj_deq_[i].dy << " " ;     // 21
+    aof << inputRightFootTraj_deq_[i].ddy << " " ;    // 22
+
+    aof << inputCOMTraj_deq_[i].yaw[0] << " " ;       // 23
+    aof << inputCOMTraj_deq_[i].yaw[1] << " " ;       // 24
+    aof << inputCOMTraj_deq_[i].yaw[2] << " " ;       // 25
+
+    aof << inputLeftFootTraj_deq_[i].theta << " " ;   // 26
+    aof << inputLeftFootTraj_deq_[i].dtheta << " " ;  // 27
+    aof << inputLeftFootTraj_deq_[i].ddtheta << " " ; // 28
+
+    aof << inputRightFootTraj_deq_[i].theta << " " ;  // 29
+    aof << inputRightFootTraj_deq_[i].dtheta << " " ; // 30
+    aof << inputRightFootTraj_deq_[i].ddtheta << " " ;// 31
+
+    aof << inputCOMTraj_deq_[i].z[0] << " " ;         // 32
+    aof << inputCOMTraj_deq_[i].z[1] << " " ;         // 33
+    aof << inputCOMTraj_deq_[i].z[2] << " " ;         // 34
+
+    aof << inputLeftFootTraj_deq_[i].z << " " ;       // 35
+    aof << inputLeftFootTraj_deq_[i].dz << " " ;      // 36
+    aof << inputLeftFootTraj_deq_[i].ddz << " " ;     // 37
+
+    aof << inputRightFootTraj_deq_[i].z << " " ;      // 38
+    aof << inputRightFootTraj_deq_[i].dz << " " ;     // 39
+    aof << inputRightFootTraj_deq_[i].ddz << " " ;    // 40
+
+    aof << endl ;
+  }
+  aof.close();
+
+  aFileName = "zmpmb_corr_herdt.txt" ;
+  if ( iteration_zmp == 0 )
+  {
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < NCtrl_ ; ++i)
+  {
+    aof << zmpmb_corr[i][0] << " " ;
+    aof << zmpmb_corr[i][1] << " " ;
+    aof << endl ;
+  }
+  aof.close();
+
+  oss.str("/tmp/buffer_");
+  oss << setfill('0') << setw(3) << iteration_zmp << ".txt" ;
+  aFileName = oss.str();
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.close();
+
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (unsigned int i = 0 ; i < NbI_*PG_N_ ; ++i)
+  {
+    aof << i << " " ; // 0
+    aof << inputZMPTraj_deq_[i].px << " " ;           // 1
+    aof << inputZMPTraj_deq_[i].py << " " ;           // 2
+
+    aof << ZMPMB_vec_[i][0] << " " ;                  // 3
+    aof << ZMPMB_vec_[i][1] << " " ;                  // 4
+
+    aof << inputCOMTraj_deq_[i].x[0] << " " ;         // 5
+    aof << inputCOMTraj_deq_[i].x[1] << " " ;         // 6
+    aof << inputCOMTraj_deq_[i].x[2] << " " ;         // 7
+
+    aof << inputLeftFootTraj_deq_[i].x << " " ;       // 8
+    aof << inputLeftFootTraj_deq_[i].dx << " " ;      // 9
+    aof << inputLeftFootTraj_deq_[i].ddx << " " ;     // 10
+
+    aof << inputRightFootTraj_deq_[i].x << " " ;      // 11
+    aof << inputRightFootTraj_deq_[i].dx << " " ;     // 12
+    aof << inputRightFootTraj_deq_[i].ddx << " " ;    // 13
+
+    aof << inputCOMTraj_deq_[i].y[0] << " " ;         // 14
+    aof << inputCOMTraj_deq_[i].y[1] << " " ;         // 15
+    aof << inputCOMTraj_deq_[i].y[2] << " " ;         // 16
+
+    aof << inputLeftFootTraj_deq_[i].y << " " ;       // 17
+    aof << inputLeftFootTraj_deq_[i].dy << " " ;      // 18
+    aof << inputLeftFootTraj_deq_[i].ddy << " " ;     // 19
+
+    aof << inputRightFootTraj_deq_[i].y << " " ;      // 20
+    aof << inputRightFootTraj_deq_[i].dy << " " ;     // 21
+    aof << inputRightFootTraj_deq_[i].ddy << " " ;    // 22
+
+    aof << inputCOMTraj_deq_[i].yaw[0] << " " ;       // 23
+    aof << inputCOMTraj_deq_[i].yaw[1] << " " ;       // 24
+    aof << inputCOMTraj_deq_[i].yaw[2] << " " ;       // 25
+
+    aof << inputLeftFootTraj_deq_[i].theta << " " ;   // 26
+    aof << inputLeftFootTraj_deq_[i].dtheta << " " ;  // 27
+    aof << inputLeftFootTraj_deq_[i].ddtheta << " " ; // 28
+
+    aof << inputRightFootTraj_deq_[i].theta << " " ;  // 29
+    aof << inputRightFootTraj_deq_[i].dtheta << " " ; // 30
+    aof << inputRightFootTraj_deq_[i].ddtheta << " " ;// 31
+
+    aof << inputCOMTraj_deq_[i].z[0] << " " ;         // 32
+    aof << inputCOMTraj_deq_[i].z[1] << " " ;         // 33
+    aof << inputCOMTraj_deq_[i].z[2] << " " ;         // 34
+
+    aof << inputLeftFootTraj_deq_[i].z << " " ;       // 35
+    aof << inputLeftFootTraj_deq_[i].dz << " " ;      // 36
+    aof << inputLeftFootTraj_deq_[i].ddz << " " ;     // 37
+
+    aof << inputRightFootTraj_deq_[i].z << " " ;      // 38
+    aof << inputRightFootTraj_deq_[i].dz << " " ;     // 39
+    aof << inputRightFootTraj_deq_[i].ddz << " " ;    // 40
+
+    aof << endl ;
+  }
+  aof.close();
+
+
+  iteration_zmp++;
   return ;
 }

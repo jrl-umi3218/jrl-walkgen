@@ -657,12 +657,6 @@ void ZMPVelocityReferencedQP::ControlInterpolation(
 
   // INTERPOLATE THE COMPUTED FOOT POSITIONS:
   // ----------------------------------------
-  int index_orientation = Solution_.SupportStates_deq[1].StepNumber ;
-  if (time+1.5*QP_T_ > Solution_.SupportStates_deq.front().TimeLimit)
-    cout << "ds" << " " << Solution_.SupportStates_deq.front().StateChanged << "  " << (bool)(time+1.5*QP_T_ > Solution_.SupportStates_deq.front().TimeLimit) << " " << Solution_.SupportOrientations_deq[0] << endl ;
-  else
-    cout << Solution_.SupportOrientations_deq[index_orientation] << " " << "orient foot sol = " << Solution_.SupportOrientations_deq[0] << endl ;
-
   OFTG_control_->interpolate_feet_positions( time,
                                              Solution_.SupportStates_deq, Solution_,
                                              Solution_.SupportOrientations_deq,
@@ -700,8 +694,6 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
     // to use the correcte feet step previewed
     PrepareSolution();
 
-    int index_orientation = Solution_.SupportStates_deq[1].StepNumber ;
-    cout << "Preview : orient foot sol = " << solution_.SupportOrientations_deq[index_orientation] << endl ;
     OFTG_DF_->interpolate_feet_positions( time + i * QP_T_,
                                           solution_.SupportStates_deq, solution_,
                                           solution_.SupportOrientations_deq,

@@ -421,54 +421,6 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   compute_term  ( MM_, -1.0, IneqCoP.D.Y_mat, Robot_->DynamicsCoPJerk().U       );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, N_                             );
 
-
-  /// \brief Debug Purpose
-  /// --------------------
-  ofstream aof;
-  string aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/DX.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for(unsigned int i=0;i<64;i++)
-    {
-      for(unsigned int j=0;j<16;j++)
-        aof << std::scientific << IneqCoP.D.X_mat(i,j) << " ";
-      aof << std::endl;
-    }
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/DY.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for(unsigned int i=0;i<64;i++)
-    {
-      for(unsigned int j=0;j<16;j++)
-        aof << std::scientific << IneqCoP.D.Y_mat(i,j) << " ";
-      aof << std::endl;
-    }
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Pzu.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for(unsigned int i=0;i<16;i++)
-    {
-      for(unsigned int j=0;j<16;j++)
-        aof << std::scientific << Robot_->DynamicsCoPJerk().U(i,j) << " ";
-      aof << std::endl;
-    }
-  aof << std::endl;
-  aof.close();
-
-  //  cout << "Robot_->DynamicsCoPJerk().U = " << Robot_->DynamicsCoPJerk().U << endl ;
-
-//  cout << "Robot_->DynamicsCoPJerk().U = " << Robot_->DynamicsCoPJerk().U << endl ;
-
-
   // +D*V
   compute_term  ( MM_, 1.0, IneqCoP.D.X_mat, IntermedData_->State().V 			);
   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
@@ -478,23 +430,6 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   compute_term  ( MM_, 1.0, IneqCoP.D.Y_mat, IntermedData_->State().V  			);
   // +  Robot_->LeftFoot().Dynamics(COP).U + Robot_->RightFoot().Dynamics(COP).U        );
   Pb.add_term_to( MATRIX_DU, MM_, NbConstraints, 2*N_+NbStepsPreviewed                  );
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/V_kp1.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  //cout << IntermedData_->State().V << endl;
-
-  for(unsigned int i=0;i<IntermedData_->State().V.size1();i++)
-    {
-      for(unsigned int j=0;j<IntermedData_->State().V.size2();j++)
-        aof << std::scientific << IntermedData_->State().V(i,j) << " ";
-      aof << std::endl;
-    }
-  aof << std::endl;
-  aof.close();
-  
-  
   
   //constant part
   // +dc
@@ -527,84 +462,6 @@ GeneratorVelRef::build_constraints_cop(const linear_inequality_t & IneqCoP,
   Pb.add_term_to( VECTOR_DS, MV_, NbConstraints                            );
   compute_term  ( MV_, 1.0, IneqCoP.D.Y_mat, IntermedData_->State().VcY    );
   Pb.add_term_to( VECTOR_DS, MV_, NbConstraints                            );
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/comX.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-
-
-      for(unsigned int j=0;j<IntermedData_->State().CoM.x.size();j++)
-        aof << std::scientific << IntermedData_->State().CoM.x(j) << " ";
-      aof << std::endl;
-
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/comY.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-
-
-      for(unsigned int j=0;j<IntermedData_->State().CoM.y.size();j++)
-        aof << std::scientific << IntermedData_->State().CoM.y(j) << " ";
-      aof << std::endl;
-
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Bdxdy.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-
-
-      for(unsigned int j=0;j<IneqCoP.Dc_vec.size();j++)
-        aof << std::scientific << IneqCoP.Dc_vec(j) << " ";
-      aof << std::endl;
-
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/VcX.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-
-
-      for(unsigned int j=0;j<IntermedData_->State().VcX.size();j++)
-        aof << std::scientific << IntermedData_->State().VcX(j) << " ";
-      aof << std::endl;
-
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/VcY.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-
-      for(unsigned int j=0;j<IntermedData_->State().VcY.size();j++)
-        aof << std::scientific << IntermedData_->State().VcY(j) << " ";
-      aof << std::endl;
-
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Pzs.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for(unsigned int i=0;i<Robot_->DynamicsCoPJerk().S.size1();i++)
-    {
-      for(unsigned int j=0;j<Robot_->DynamicsCoPJerk().S.size2();j++)
-        aof << std::scientific << Robot_->DynamicsCoPJerk().S(i,j) << " ";
-      aof << std::endl;
-    }
-  aof << std::endl;
-  aof.close();
-
 }
 
 
@@ -631,83 +488,6 @@ GeneratorVelRef::build_constraints_feet(const linear_inequality_t & IneqFeet,
 
   compute_term  ( MV_, 1.0, IneqFeet.D.Y_mat, State.Vc_fY              );
   Pb.add_term_to( VECTOR_DS, MV_, NbConstraints                        );
-
-
-  /// \brief Debug Purpose
-  /// --------------------
-  ofstream aof;
-  string aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/AX.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for(unsigned int i=0;i<IneqFeet.D.X_mat.size1();i++)
-    {
-      for(unsigned int j=0;j<IneqFeet.D.X_mat.size2();j++)
-        aof << std::scientific << IneqFeet.D.X_mat(i,j) << " ";
-      aof << std::endl;
-    }
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/AY.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for(unsigned int i=0;i<IneqFeet.D.Y_mat.size1();i++)
-    {
-      for(unsigned int j=0;j<IneqFeet.D.Y_mat.size2();j++)
-        aof << std::scientific << IneqFeet.D.Y_mat(i,j) << " ";
-      aof << std::endl;
-    }
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/v_f.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for(unsigned int i=0;i<State.V_f.size1();i++)
-    {
-      for(unsigned int j=0;j<State.V_f.size2();j++)
-        aof << std::scientific << State.V_f(i,j) << " ";
-      aof << std::endl;
-    }
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Baxay.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-      for(unsigned int j=0;j<IneqFeet.Dc_vec.size();j++)
-        aof << std::scientific << IneqFeet.Dc_vec(j) << " ";
-      aof << std::endl;
-
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Vc_fx.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-      for(unsigned int j=0;j<State.Vc_fX.size();j++)
-        aof << std::scientific << State.Vc_fX(j) << " ";
-      aof << std::endl;
-
-  aof << std::endl;
-  aof.close();
-
-  aFileName = "/home/mnaveau/devel/Walking-Pattern-Generator-Prototype/tests/data/Vc_fy.dat" ;
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-      for(unsigned int j=0;j<State.Vc_fY.size();j++)
-        aof << std::scientific << State.Vc_fY(j) << " ";
-      aof << std::endl;
-
-  aof << std::endl;
-  aof.close();
-
 }
 
 

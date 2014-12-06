@@ -35,7 +35,6 @@ using namespace::PatternGeneratorJRL;
 
 double PolynomeFoot::Compute(double t)
 {
-  //cout << "t=" << t << " FT_=" << FT_ << endl ;
   if (t>=FT_)
     return Polynome::Compute(FT_);
   else

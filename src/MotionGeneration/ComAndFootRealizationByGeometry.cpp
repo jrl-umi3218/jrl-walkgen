@@ -693,7 +693,6 @@ bool ComAndFootRealizationByGeometry::
   co = cos(FootPositionomega*M_PI/180.0);
   so = sin(FootPositionomega*M_PI/180.0);
 
-  //      cout << ZMPRefPositions[lindex].theta << " " << LeftFootPosition[lindex].theta;
   // Orientation
   Foot_R(0,0) = c*co;       Foot_R(0,1) = -s;       Foot_R(0,2) = c*so;
   Foot_R(1,0) = s*co;       Foot_R(1,1) =  c;       Foot_R(1,2) = s*so;
