@@ -477,7 +477,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
                                     deque<FootAbsolutePosition> & FinalRightFootTraj_deq)
 
 {
-  cout << "time = " << time << endl ;
   // If on-line mode not activated we go out.
   if (!m_OnLineMode)
   {
@@ -648,6 +647,8 @@ void ZMPVelocityReferencedQP::ControlInterpolation(
 
   // INTERPOLATE TRUNK ORIENTATION:
   // ------------------------------
+  OrientPrw_->one_iteration(time,Solution_.SupportStates_deq);
+
   OrientPrw_->interpolate_trunk_orientation( time, CurrentIndex_,
                                              m_SamplingPeriod, Solution_.SupportStates_deq,
                                              FinalCOMTraj_deq );
@@ -656,17 +657,16 @@ void ZMPVelocityReferencedQP::ControlInterpolation(
 
   // INTERPOLATE THE COMPUTED FOOT POSITIONS:
   // ----------------------------------------
+  int index_orientation = Solution_.SupportStates_deq[1].StepNumber ;
+  if (time+1.5*QP_T_ > Solution_.SupportStates_deq.front().TimeLimit)
+    cout << "ds" << " " << Solution_.SupportStates_deq.front().StateChanged << "  " << (bool)(time+1.5*QP_T_ > Solution_.SupportStates_deq.front().TimeLimit) << " " << Solution_.SupportOrientations_deq[0] << endl ;
+  else
+    cout << Solution_.SupportOrientations_deq[index_orientation] << " " << "orient foot sol = " << Solution_.SupportOrientations_deq[0] << endl ;
+
   OFTG_control_->interpolate_feet_positions( time,
                                              Solution_.SupportStates_deq, Solution_,
                                              Solution_.SupportOrientations_deq,
                                              FinalLeftFootTraj_deq, FinalRightFootTraj_deq);
-
-  for(unsigned int i = 0 ; i<FinalCOMTraj_deq.size() ; ++i)
-    {
-      FinalCOMTraj_deq[i].yaw[0] = 0.5*(FinalRightFootTraj_deq[i].theta  +FinalLeftFootTraj_deq[i].theta   );
-      FinalCOMTraj_deq[i].yaw[1] = 0.5*(FinalRightFootTraj_deq[i].dtheta +FinalLeftFootTraj_deq[i].dtheta  );
-      FinalCOMTraj_deq[i].yaw[2] = 0.5*(FinalRightFootTraj_deq[i].ddtheta+FinalLeftFootTraj_deq[i].ddtheta );
-    }
   return ;
 }
 
@@ -687,27 +687,24 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 
   // Copy the solution for the orientation interpolation function
   OFTG_DF_->SetSamplingPeriod( m_SamplingPeriod );
-  solution_t aSolution  = Solution_ ;
+  solution_  = Solution_ ;
   //solution_.SupportStates_deq.pop_front();
 
   for ( int i = 0 ; i < QP_N_ ; i++ )
   {
-    aSolution.SupportOrientations_deq.clear();
-    OrientPrw_DF_->preview_orientations( time + i * QP_T_, VelRef_,
-                                         SupportFSM_->StepPeriod(),
-                                         LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_,
-                                         aSolution);
-
-    OrientPrw_DF_->interpolate_trunk_orientation( time + i * QP_T_,
-                                                  CurrentIndex_ + i * NbSampleControl_, m_SamplingPeriod,
-                                                  solution_.SupportStates_deq, COMTraj_deq_ctrl_ );
+    OrientPrw_->interpolate_trunk_orientation( time + i * QP_T_,
+                                               CurrentIndex_ + i * NbSampleControl_, m_SamplingPeriod,
+                                               solution_.SupportStates_deq, COMTraj_deq_ctrl_ );
 
     // Modify a copy of the solution to allow "OFTG_DF_->interpolate_feet_positions"
     // to use the correcte feet step previewed
     PrepareSolution();
+
+    int index_orientation = Solution_.SupportStates_deq[1].StepNumber ;
+    cout << "Preview : orient foot sol = " << solution_.SupportOrientations_deq[index_orientation] << endl ;
     OFTG_DF_->interpolate_feet_positions( time + i * QP_T_,
                                           solution_.SupportStates_deq, solution_,
-                                          aSolution.SupportOrientations_deq,
+                                          solution_.SupportOrientations_deq,
                                           LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_);
     solution_.SupportStates_deq.pop_front();
   }
@@ -717,12 +714,6 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 
   OFTG_DF_->copyPolynomesFromFTGS(OFTG_control_);
 
-  for(unsigned int i = 0 ; i<QP_N_*NbSampleControl_ ; ++i)
-    {
-      COMTraj_deq_ctrl_[i].yaw[0] = 0.5*(LeftFootTraj_deq_ctrl_[i].theta  +RightFootTraj_deq_ctrl_[i].theta   );
-      COMTraj_deq_ctrl_[i].yaw[1] = 0.5*(LeftFootTraj_deq_ctrl_[i].dtheta +RightFootTraj_deq_ctrl_[i].dtheta  );
-      COMTraj_deq_ctrl_[i].yaw[2] = 0.5*(LeftFootTraj_deq_ctrl_[i].ddtheta+RightFootTraj_deq_ctrl_[i].ddtheta );
-    }
   return ;
 }
 

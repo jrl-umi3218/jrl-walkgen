@@ -321,9 +321,10 @@ void
                       );
       }
 
+    int index_orientation = PrwSupportStates_deq[1].StepNumber ;
     SetParameters(
         FootTrajectoryGenerationStandard::THETA_AXIS,
-        TimeInterval, PreviewedSupportAngles_deq[0]*180.0/M_PI,
+        TimeInterval, PreviewedSupportAngles_deq[index_orientation]*180.0/M_PI,
         LastSFP->theta, LastSFP->dtheta, LastSFP->ddtheta);
 
     SetParametersWithInitPosInitSpeed(

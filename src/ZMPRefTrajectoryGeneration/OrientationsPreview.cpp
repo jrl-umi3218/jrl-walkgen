@@ -70,14 +70,15 @@ OrientationsPreview::OrientationsPreview(CjrlHumanoidDynamicRobot *aHS)
   uLimitFeet_ = 5.0/180.0*M_PI;
 
   // Polynome to interpolate the trunk orientation
-  TrunkStateTheta_ = new Polynome5(0.0,0.0);
+  TrunkStateYaw_ = new Polynome4(0.0,0.0);
+
+  LastFirstPvwSol_ = 0.0 ;
 }
 
 OrientationsPreview::~OrientationsPreview() {
 }
 
-void
-    OrientationsPreview::preview_orientations(double Time,
+void OrientationsPreview::preview_orientations(double Time,
                                               const reference_t & Ref,
                                               double StepDuration,
                                               const std::deque<FootAbsolutePosition> & LeftFootPositions_deq,
@@ -108,10 +109,25 @@ void
 
   signRotVelTrunk_ = (TrunkStateT_.yaw[1] < 0.0)?-1.0:1.0;
 
-  unsigned StepNumber = 0;
+  // compute the number of iteration before landing on the first previewed step
+  std::deque<support_state_t>::const_iterator SPTraj_it = Solution.SupportStates_deq.begin();
+  int ItBeforeLanding = 0 ;
+  while(SPTraj_it!=Solution.SupportStates_deq.end())
+  {
+    if ( SPTraj_it->StateChanged !=1 )
+    {
+      ++ItBeforeLanding ;
+    }
+    else
+    {
+      break;
+    }
+    ++SPTraj_it;
+  }
+  int ItBeforeLandingThresh = 2 ;
+  unsigned NbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
 
-  // Parameters of the trunk polynomial (fourth order)
-  double a,b,c,d,e;
+  unsigned StepNumber = 0;
 
   // Trunk angle at the end of the current support phase
   double PreviewedTrunkAngleEnd;
@@ -134,14 +150,22 @@ void
       TrunkAngleOK = false;
       while(!TrunkAngleOK)
       {
+        // order 4 polynomial P(t) = a + b t + 1/2 c t^2 + 1/3 d t^3 + 1/4 e t^4
+        // with the following cnstraint :
+        // - P(0)          = InitAngle          = TrunkState_.yaw[0]
+        // - d P(0) /dt    = InitAngleVelocity  = TrunkState_.yaw[0]
+        // - d² P(0) /dt²  = 0
+        // - d P(T_) /dt   = FinalAngleVelocity = TrunkStateT_.yaw[1]
+        // - d² P(T_) /dt² = 0
         if (fabs(TrunkStateT_.yaw[1]-TrunkState_.yaw[1]) > EPS_)
         {
-          a = TrunkState_.yaw[0];
-          b = TrunkState_.yaw[1];
-          c = 0.0;
-          d = 3.0*(TrunkStateT_.yaw[1]-TrunkState_.yaw[1]) / (T_*T_);
-          e = -2.0*d/(3.0*T_);
-          TrunkStateT_.yaw[0] = a + b*T_+1.0/2.0*c*T_*T_+1.0/3.0*d*T_*T_*T_+1.0/4.0*e*T_*T_*T_*T_;
+          TrunkStateYaw_->SetParameters(T_,
+                                        TrunkState_.yaw[0],
+                                        TrunkState_.yaw[1],
+                                        /*initAcc*/0.0,
+                                        /*finalSpeed*/TrunkStateT_.yaw[1],
+                                        /*finalAcc*/0.0);
+          TrunkStateT_.yaw[0] = TrunkStateYaw_->Compute(T_);
         }
         else
           TrunkStateT_.yaw[0] = TrunkState_.yaw[0] + TrunkState_.yaw[1]*T_;
@@ -182,7 +206,10 @@ void
     StepNumber++)
     {
       PreviewedSupportFoot = -PreviewedSupportFoot;
-      //compute the optimal support orientation
+      // compute the optimal support orientation :
+      // the standard is that the orientation of the next support foot is the orientation of the trunk
+      // plus half of the angular displacement of the trunk. Which lead, more or less to the assumption
+      //  the orientation of taht the orientation of the trunk is half of the orientation of the feet.
       double PreviewedSupportAngle = PreviewedTrunkAngleEnd + TrunkStateT_.yaw[1]*SSPeriod_/2.0;
 
       verify_velocity_hip_joint(Time,
@@ -209,9 +236,16 @@ void
         TrunkVelOK = false;
         break;
       }
-      else
-        PreviewedSupportAngles_deq.push_back(PreviewedSupportAngle);
+      else{
 
+          if( ItBeforeLanding <= ItBeforeLandingThresh && ItBeforeLanding > 0 && Solution.SupportStates_deq.front().Phase == SS
+              && Solution.SupportStates_deq.front().StateChanged != 1 && NbStepsPreviewed > 0
+              && StepNumber == (unsigned) FirstFootPreviewed )
+          {
+            PreviewedSupportAngles_deq.push_back(LastFirstPvwSol_);
+          }
+          PreviewedSupportAngles_deq.push_back(PreviewedSupportAngle);
+      }
       //Prepare for the next step
       PreviewedTrunkAngleEnd = PreviewedTrunkAngleEnd + SSPeriod_*TrunkStateT_.yaw[1];
       PreviousSupportAngle = PreviewedSupportAngle;
@@ -249,12 +283,11 @@ void
     prwSS_it->Yaw = supportAngle;
     prwSS_it++;
   }
-
+  LastFirstPvwSol_ = PreviewedSupportAngles_deq[0];
 }
 
 
-void
-    OrientationsPreview::verify_acceleration_hip_joint(const reference_t & Ref,
+void OrientationsPreview::verify_acceleration_hip_joint(const reference_t & Ref,
                                                        const support_state_t & CurrentSupport)
 {
   if(CurrentSupport.Phase != DS)
@@ -271,8 +304,7 @@ void
 }
 
 
-bool
-    OrientationsPreview::verify_angle_hip_joint(const support_state_t & CurrentSupport,
+bool OrientationsPreview::verify_angle_hip_joint(const support_state_t & CurrentSupport,
                                                 double PreviewedTrunkAngleEnd,
                                                 const COMState &TrunkState_, COMState &TrunkStateT_,
                                                 double CurrentSupportFootAngle,
@@ -306,8 +338,7 @@ bool
 }
 
 
-void
-    OrientationsPreview::verify_velocity_hip_joint(double Time,
+void OrientationsPreview::verify_velocity_hip_joint(double Time,
                                                    double PreviewedSupportFoot, double PreviewedSupportAngle,
                                                    unsigned StepNumber, const support_state_t & CurrentSupport,
                                                    double CurrentRightFootAngle, double CurrentLeftFootAngle,
@@ -368,70 +399,105 @@ void
 }
 
 
-void
-    OrientationsPreview::interpolate_trunk_orientation(double Time, int CurrentIndex,
-                                                       double NewSamplingPeriod,
-                                                       const deque<support_state_t> & PrwSupportStates_deq,
-                                                       deque<COMState> & FinalCOMTraj_deq)
+void OrientationsPreview::interpolate_trunk_orientation(double Time, int CurrentIndex,
+                                                        double NewSamplingPeriod,
+                                                        const deque<support_state_t> & PrwSupportStates_deq,
+                                                        deque<COMState> & FinalCOMTraj_deq)
 {
 
   support_state_t CurrentSupport = PrwSupportStates_deq.front();
 
+  double initPos   = FinalCOMTraj_deq[CurrentIndex-1].yaw[0];
+  double initSpeed = FinalCOMTraj_deq[CurrentIndex-1].yaw[1];
+  double initAcc   = FinalCOMTraj_deq[CurrentIndex-1].yaw[2];
+  double tT = 0.0 ;
   if(CurrentSupport.Phase == SS && Time+1.5*T_ < CurrentSupport.TimeLimit) // CurrentSupport.Phase == SS && Time+3.0/2.0*T_ < CurrentSupport.TimeLimit
   {
-    //Fourth order polynomial parameters
-    double a =  TrunkState_.yaw[1];
-    double c = 3.0*(TrunkStateT_.yaw[1]-TrunkState_.yaw[1])/(T_*T_);
-    double d = -2.0*c/(3.0*T_);
-
-    double tT;
-    double Theta = TrunkState_.yaw[0];
-
-    FinalCOMTraj_deq[CurrentIndex].yaw[0] = TrunkState_.yaw[0];
-    FinalCOMTraj_deq[CurrentIndex].yaw[1] = TrunkState_.yaw[1];
-    FinalCOMTraj_deq[CurrentIndex].yaw[2] = TrunkState_.yaw[2];
+    TrunkStateYaw_->SetParameters( T_,initPos ,initSpeed , initAcc , TrunkStateT_.yaw[1], 0.0);
 
     //Interpolate the orientation of the trunk
     for(int k = 0; k<(int)(T_/NewSamplingPeriod);k++)
     {
       tT = (double)(k+1)*NewSamplingPeriod;
-      if(fabs(TrunkStateT_.yaw[1]-TrunkState_.yaw[1])-0.000001 > 0)
-      {
-        TrunkState_.yaw[0] = (((1.0/4.0*d*tT+1.0/3.0*c)*
-                               tT)*tT+a)*tT+Theta;
-        TrunkState_.yaw[1] = ((d*tT+c)*tT)*tT+a;
-        TrunkState_.yaw[2] = (3.0*d*tT+2.0*c)*tT;
-      }
-      else
-      {
-        TrunkState_.yaw[0] += NewSamplingPeriod*TrunkStateT_.yaw[1];
-      }
-      FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = TrunkState_.yaw[0];
-      FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkState_.yaw[1];
-      FinalCOMTraj_deq[CurrentIndex+k].yaw[2] = TrunkState_.yaw[2];
+      FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = TrunkStateYaw_->Compute(tT) ;
+      FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkStateYaw_->ComputeDerivative(tT) ;
+      FinalCOMTraj_deq[CurrentIndex+k].yaw[2] = TrunkStateYaw_->ComputeSecDerivative(tT) ;
     }
   }
   else if (CurrentSupport.Phase == DS || Time+1.5*T_ > CurrentSupport.TimeLimit)
   {
     for(int k = 0; k<(int)(T_/NewSamplingPeriod);k++)
     {
-      FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = TrunkState_.yaw[0];
-      FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkState_.yaw[1];
-      FinalCOMTraj_deq[CurrentIndex+k].yaw[2] = TrunkState_.yaw[2];
+      FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = initPos;
+      FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = initSpeed;
+      FinalCOMTraj_deq[CurrentIndex+k].yaw[2] = initAcc;
     }
   }
-
 }
 
+void OrientationsPreview::one_iteration(double Time,
+                                        const deque<support_state_t> & PrwSupportStates_deq)
+{
+  support_state_t CurrentSupport = PrwSupportStates_deq.front();
 
-double
-    OrientationsPreview::f(double a,double b,double c,double d,double x)
+  if(CurrentSupport.Phase == SS && Time+1.5*T_ < CurrentSupport.TimeLimit) // CurrentSupport.Phase == SS && Time+3.0/2.0*T_ < CurrentSupport.TimeLimit
+  {
+    //Fourth order polynomial parameters
+    //Interpolate the orientation of the trunk
+    if(fabs(TrunkStateT_.yaw[1]-TrunkState_.yaw[1])-0.000001 > 0)
+    {
+      double initPos    = TrunkState_.yaw[0];
+      double initSpeed  = TrunkState_.yaw[1];
+      double initAcc    = 0.0;
+      double finalSpeed = TrunkStateT_.yaw[1];
+      double finalAcc   = 0.0 ;
+      TrunkStateYaw_->SetParameters( T_, initPos , initSpeed , initAcc , finalSpeed , finalAcc );
+      TrunkState_.yaw[0] = TrunkStateYaw_->Compute(T_);
+      TrunkState_.yaw[1] = TrunkStateYaw_->ComputeDerivative(T_);
+      TrunkState_.yaw[2] = TrunkStateYaw_->ComputeSecDerivative(T_);
+    }
+    else
+    {
+      TrunkState_.yaw[0] += T_*TrunkStateT_.yaw[1];
+    }
+  }
+  else if (CurrentSupport.Phase == DS || Time+1.5*T_ > CurrentSupport.TimeLimit)
+  {
+  }
+}
+
+double OrientationsPreview::f(double a,double b,double c,double d,double x)
 {return a+b*x+c*x*x+d*x*x*x;}
 
 
-double
-    OrientationsPreview::df(double ,double b,double c,double d,double x)
+double OrientationsPreview::df(double ,double b,double c,double d,double x)
 {return b+2*c*x+3.0*d*x*x;}
 
 
 
+////Fourth order polynomial parameters
+//double initPos   = FinalCOMTraj_deq[CurrentIndex-1].yaw[0];
+//double initSpeed = FinalCOMTraj_deq[CurrentIndex-1].yaw[1];
+//double initAcc   = FinalCOMTraj_deq[CurrentIndex-1].yaw[2];
+
+//TrunkStateYaw_->SetParameters( T_,initPos ,initSpeed , initAcc , TrunkStateT_.yaw[1], 0.0);
+//FinalCOMTraj_deq[CurrentIndex].yaw[0] = TrunkState_.yaw[0];
+//FinalCOMTraj_deq[CurrentIndex].yaw[1] = TrunkState_.yaw[1];
+//FinalCOMTraj_deq[CurrentIndex].yaw[2] = TrunkState_.yaw[2];
+
+//cout << "interpolation\n" << endl ;
+////Interpolate the orientation of the trunk
+//for(int k = 0; k<(int)(T_/NewSamplingPeriod);k++)
+//{
+//  if(fabs(TrunkStateT_.yaw[1]-TrunkState_.yaw[1])-0.000001 > 0)
+//  {
+//    FinalCOMTraj_deq[CurrentIndex+k].yaw[0] = TrunkStateYaw_->Compute(tT) ;
+//    FinalCOMTraj_deq[CurrentIndex+k].yaw[1] = TrunkStateYaw_->ComputeDerivative(tT) ;
+//    FinalCOMTraj_deq[CurrentIndex+k].yaw[2] = TrunkStateYaw_->ComputeSecDerivative(tT) ;
+//  }
+//  else
+//  {
+//    TrunkState_.yaw[0] += NewSamplingPeriod*TrunkStateT_.yaw[1];
+//  }
+
+//}

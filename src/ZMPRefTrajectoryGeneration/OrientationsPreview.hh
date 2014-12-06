@@ -89,6 +89,17 @@ namespace PatternGeneratorJRL
                                        const std::deque<support_state_t> & PrwSupportStates_deq,
                                        std::deque<COMState> & FinalCOMTraj_deq);
 
+    /// \brief Compute the current state for the preview of the orientation
+    ///
+    /// \param[in] Time
+    /// \param[in] CurrentIndex
+    /// \param[in] NewSamplingPeriod
+    /// \param[in] PrwSupportStates_deq
+    /// \param[out] FinalCOMTraj_deq
+    void one_iteration(double Time,
+                       const std::deque<support_state_t> & PrwSupportStates_deq);
+
+
     /// \name Accessors
     /// \{
     inline COMState const & CurrentTrunkState() const
@@ -215,6 +226,9 @@ namespace PatternGeneratorJRL
     /// \brief
     double SupportTimePassed_;
 
+    /// \brief
+    double LastFirstPvwSol_ ;
+
     /// \brief Numerical precision
     const static double EPS_;
 
@@ -223,8 +237,7 @@ namespace PatternGeneratorJRL
     /// \brief State of the trunk at the first previewed sampling
     COMState TrunkStateT_;
 
-    Polynome5 * TrunkStateTheta_ ;
-
+    Polynome4 * TrunkStateYaw_ ;
   };
 }
 #endif /* ORIENTATIONSPREVIEW_H_ */

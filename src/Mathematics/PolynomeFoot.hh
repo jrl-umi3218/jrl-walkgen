@@ -120,6 +120,20 @@ namespace PatternGeneratorJRL
       // Final velocity and position are 0
       void SetParameters(double FT, double MP, double FP=0.0);
 
+      /// Set the parameters
+      // time horizon
+      // Initial Position
+      // Initial velocity (IS)
+      // Initial Acceleration
+      // Final velocity
+      // Final Acceleration
+      void SetParameters(double FT,
+                         double InitPos,
+                         double InitSpeed,
+                         double InitAcc,
+                         double FinalSpeed,
+                         double FinalAcc);
+
       /*! Set the parameters such that
 	the initial position, and initial speed
 	are different from zero.

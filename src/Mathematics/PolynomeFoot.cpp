@@ -127,6 +127,34 @@ void Polynome4::SetParameters(double FT, double MP, double FP)
                 /*Final Pos*/FP);
 }
 
+void Polynome4::SetParameters(double FT,
+                              double InitPos,
+                              double InitSpeed,
+                              double InitAcc,
+                              double FinalSpeed,
+                              double FinalAcc)
+{
+  MP_ = 0.0; // default value
+  FP_ = 0.0 ;
+
+  FT_ = FT;
+
+  double tmp;
+  m_Coefficients[0] = InitPos;
+  m_Coefficients[1] = InitSpeed;
+  m_Coefficients[2] = InitAcc/2;
+  tmp = FT*FT;
+  if(tmp==0.0)
+  {
+    m_Coefficients[3] = 0.0;
+    m_Coefficients[4] = 0.0;
+  }else{
+    m_Coefficients[3] = (- 5*InitAcc*FT - 2*FinalAcc*FT - 6.0*InitSpeed + 6.0*FinalSpeed)/(6*tmp);
+    tmp=tmp*FT;
+    m_Coefficients[4] = (  3*InitAcc*FT + 2*FinalAcc*FT + 4.0*InitSpeed - 4.0*FinalSpeed)/(8*tmp);
+  }
+}
+
 void Polynome4::SetParametersWithInitPosInitSpeed(double FT,
 						  double MP,
 						  double InitPos,
