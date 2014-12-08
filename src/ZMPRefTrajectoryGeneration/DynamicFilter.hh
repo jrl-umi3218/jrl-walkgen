@@ -6,6 +6,7 @@
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 #include <metapod/algos/jac_point_chain.hh>
 #include "Clock.hh"
+#include <boost/fusion/algorithm/iteration/accumulate.hpp>
 #include <boost/fusion/include/accumulate.hpp>
 
 #ifndef METAPOD_TYPEDEF
@@ -172,8 +173,10 @@ namespace PatternGeneratorJRL
     {
         double sum_mass = 0.0 ;
         metapod::Vector3dTpl< LocalFloatType >::Type com (0.0,0.0,0.0);
-        sum_mass = boost::fusion::accumulate(robot_.nodes , sum_mass , MassSum() );
-        com      = boost::fusion::accumulate(robot_.nodes , com      , MassbyComSum() );
+        const metapod::Vector3dTpl< LocalFloatType >::Type const_zero (0.0,0.0,0.0);
+        const double init_sum = 0.0 ;
+        sum_mass = boost::fusion::accumulate(robot_.nodes , init_sum  , MassSum()      );
+        com      = boost::fusion::accumulate(robot_.nodes , const_zero, MassbyComSum() );
         return com / sum_mass ;
     }
 
@@ -297,9 +300,15 @@ namespace PatternGeneratorJRL
           typedef LocalFloatType result_type;
 
           template <typename T>
-          result_type operator()( const result_type sum_mass, T & node) const
+          result_type operator()(const T & t , const result_type & sum_mass ) const
           {
-              return ( sum_mass + Robot_Model::inertias[node.id].m() ) ;
+              return ( sum_mass + Robot_Model::inertias[t.id].m() ) ;
+          }
+
+          template <typename T>
+          result_type operator()(const result_type & sum_mass , const T & t ) const
+          {
+              return this(t,sum_mass);
           }
       };
 
@@ -308,10 +317,15 @@ namespace PatternGeneratorJRL
           typedef metapod::Vector3dTpl< LocalFloatType >::Type result_type;
 
           template <typename T>
-          result_type operator()( const result_type sum_h, const T & x) const
+          result_type operator()(const T & t , const result_type & sum_h ) const
           {
-              double mass = Robot_Model::inertias[x.id].m() ;
-              return ( sum_h + mass * x.body.iX0.r() + x.body.iX0.E() * Robot_Model::inertias[x.id].h() );
+              double mass = Robot_Model::inertias[t.id].m() ;
+              return ( sum_h + mass * t.body.iX0.r() + t.body.iX0.E() * Robot_Model::inertias[t.id].h() );
+          }
+          template <typename T>
+          result_type operator()(const result_type & sum_h , const T & t ) const
+          {
+               return this(t,sum_h);
           }
       };
 

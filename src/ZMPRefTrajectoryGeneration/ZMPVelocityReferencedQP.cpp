@@ -82,7 +82,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   previewDuration_ = QP_N_/2*QP_T_ ;
   NbSampleControl_ = (int)round(QP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(QP_T_/InterpolationPeriod_) ;
-  previewSize_ = previewDuration_/NbSampleInterpolation_ ;
+  previewSize_ = (int)round(previewDuration_/InterpolationPeriod_/NbSampleInterpolation_) ;
   StepPeriod_ = 0.8 ;
   SSPeriod_ = 0.7 ;
   DSPeriod_ = 0.1 ;
@@ -671,7 +671,7 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
   // interpolation the position of the com along the whole preview
   LIPM_subsampled_.setState(InitStateLIPM_) ;
   OrientPrw_DF_->CurrentTrunkState(InitStateOrientPrw_) ;
-  for ( int i = 0 ; i < QP_N_ ; i++ )
+  for ( int i = 0 ; i < previewSize_ ; i++ )
   {
     CoMZMPInterpolation(ZMPTraj_deq_ctrl_, COMTraj_deq_ctrl_,
                         LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_,
@@ -686,7 +686,7 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
   solution_  = Solution_ ;
   //solution_.SupportStates_deq.pop_front();
 
-  for ( int i = 0 ; i < QP_N_ ; i++ )
+  for ( int i = 0 ; i < previewSize_ ; i++ )
   {
     OrientPrw_->interpolate_trunk_orientation( time + i * QP_T_,
                                                CurrentIndex_ + i * NbSampleControl_, m_SamplingPeriod,

@@ -273,7 +273,7 @@ int DynamicFilter::OnLinefilter(
       deltaZMP_deq_[i].stepType = inputZMPTraj_deq_[i].stepType ;
     }
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
   Debug(ctrlCoMState,
         ctrlLeftFoot,

@@ -296,9 +296,15 @@ public:
         typedef LocalFloatType result_type;
 
         template <typename T>
-        result_type operator()( const result_type sum_mass, T & node) const
+        result_type operator()(const T & t , const result_type & sum_mass ) const
         {
-            return ( sum_mass + Robot_Model::inertias[node.id].m() ) ;
+            return ( sum_mass + Robot_Model::inertias[t.id].m() ) ;
+        }
+
+        template <typename T>
+        result_type operator()(const result_type & sum_mass , const T & t ) const
+        {
+            return ( sum_mass + Robot_Model::inertias[t.id].m() ) ;
         }
     };
 
@@ -307,10 +313,16 @@ public:
         typedef metapod::Vector3dTpl< LocalFloatType >::Type result_type;
 
         template <typename T>
-        result_type operator()( const result_type sum_h, const T & x) const
+        result_type operator()(const T & t , const result_type & sum_h ) const
         {
-            double mass = Robot_Model::inertias[x.id].m() ;
-            return ( sum_h + mass * x.body.iX0.r() + x.body.iX0.E() * Robot_Model::inertias[x.id].h() );
+            double mass = Robot_Model::inertias[t.id].m() ;
+            return ( sum_h + mass * t.body.iX0.r() + t.body.iX0.E() * Robot_Model::inertias[t.id].h() );
+        }
+        template <typename T>
+        result_type operator()(const result_type & sum_h , const T & t ) const
+        {
+            double mass = Robot_Model::inertias[t.id].m() ;
+            return ( sum_h + mass * t.body.iX0.r() + t.body.iX0.E() * Robot_Model::inertias[t.id].h() );
         }
     };
 
