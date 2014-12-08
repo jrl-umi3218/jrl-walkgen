@@ -79,8 +79,10 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
   InterpolationPeriod_ = QP_T_/10;
+  previewDuration_ = QP_N_/2*QP_T_ ;
   NbSampleControl_ = (int)round(QP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(QP_T_/InterpolationPeriod_) ;
+  previewSize_ = previewDuration_/NbSampleInterpolation_ ;
   StepPeriod_ = 0.8 ;
   SSPeriod_ = 0.7 ;
   DSPeriod_ = 0.1 ;
@@ -464,7 +466,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   FinalCurrentStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
 
   dynamicFilter_->init(m_SamplingPeriod,InterpolationPeriod_,
-                       QP_T_, QP_N_*QP_T_/2 - QP_T_/m_SamplingPeriod * InterpolationPeriod_ ,CoMHeight_,InitLeftFootAbsolutePosition,lStartingCOMState);
+                       QP_T_, previewDuration_ - NbSampleControl_*InterpolationPeriod_ ,CoMHeight_,InitLeftFootAbsolutePosition,lStartingCOMState);
   return 0;
 }
 
@@ -572,7 +574,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
     DynamicFilterInterpolation(time);
 
-    unsigned int IndexMax = (int)round(QP_N_*QP_T_*0.5  / InterpolationPeriod_);
+    unsigned int IndexMax = (int)round(previewDuration_  / InterpolationPeriod_);
     ZMPTraj_deq_.resize(IndexMax);
     COMTraj_deq_.resize(IndexMax);
     LeftFootTraj_deq_.resize(IndexMax);

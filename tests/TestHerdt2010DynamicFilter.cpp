@@ -355,9 +355,9 @@ protected:
     aCOMState(0) = m_OneStep.finalCOMPosition.x[0];      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
     aCOMState(1) = m_OneStep.finalCOMPosition.y[0];      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
     aCOMState(2) = m_OneStep.finalCOMPosition.z[0];      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
-    aCOMState(3) = m_OneStep.finalCOMPosition.roll[0];   aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1];   aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2];
-    aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0];  aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1];  aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2];
-    aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0];    aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1];    aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2];
+    aCOMState(3) = m_OneStep.finalCOMPosition.roll[0]*180/M_PI;   aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1]*180/M_PI;   aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2]*180/M_PI;
+    aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0]*180/M_PI;  aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1]*180/M_PI;  aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2]*180/M_PI;
+    aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0]*180/M_PI;    aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1]*180/M_PI;    aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2]*180/M_PI;
 
     aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
     aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
@@ -373,6 +373,9 @@ protected:
                                                                     m_CurrentAcceleration,
                                                                     20,
                                                                     0);
+
+    m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
+    m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
 
     /// \brief Create file .hip .pos .zmp
     /// --------------------
@@ -572,7 +575,6 @@ protected:
     }
   }
 
-
   void stop(PatternGeneratorInterface &aPGI)
   {
     {
@@ -583,14 +585,22 @@ protected:
   void walkForward(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.2 0.0 0.0");
+      istringstream strm2(":setVelReference  0.3 0.0 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
   void walkSidewards(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.0 0.2 0.0");
+      istringstream strm2(":setVelReference  0.0 -0.3 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+
+  void startWalkInDiagonal(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.2 0.2 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -633,8 +643,9 @@ protected:
     };
 #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-    { { 5*200,&TestHerdt2010::walkForward},
-    {10*200,&TestHerdt2010::startTurningRightOnSpot},
+    { { 5*200,&TestHerdt2010::startWalkInDiagonal},
+      {10*200,&TestHerdt2010::walkSidewards},
+      {15*200,&TestHerdt2010::startTurningRightOnSpot},
 /*    {25*200,&TestHerdt2010::startTurningRightOnSpot},
     {35*200,&TestHerdt2010::walkForward},
     {45*200,&TestHerdt2010::startTurningLeftOnSpot},*//*
@@ -645,8 +656,8 @@ protected:
     {95*200,&TestHerdt2010::startTurningRight},*/
 //    {105*200,&TestHerdt2010::stop},
 //    {110*200,&TestHerdt2010::stopOnLineWalking}};
-    {15*200,&TestHerdt2010::stop},
-    {20*200,&TestHerdt2010::stopOnLineWalking}};
+    {20*200,&TestHerdt2010::stop},
+    {25*200,&TestHerdt2010::stopOnLineWalking}};
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
       {

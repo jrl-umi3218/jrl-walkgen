@@ -181,6 +181,12 @@ namespace PatternGeneratorJRL
     /// \brief Nb. samplings inside preview window
     int QP_N_;
 
+    /// \brief Size of the preview for filtering
+    double previewDuration_ ;
+
+    /// \brief Duration of the preview for filtering
+    int previewSize_ ;
+
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D LIPM_ ;
     LinearizedInvertedPendulum2D LIPM_subsampled_ ;
