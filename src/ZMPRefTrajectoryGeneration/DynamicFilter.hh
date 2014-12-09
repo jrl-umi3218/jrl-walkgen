@@ -66,9 +66,6 @@ namespace PatternGeneratorJRL
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
     int OnLinefilter(const double currentTime,
-        const deque<COMState> & ctrlCoMState,
-        const deque<FootAbsolutePosition> & ctrlLeftFoot,
-        const deque<FootAbsolutePosition> & ctrlRightFoot,
         const deque<COMState> & inputCOMTraj_deq_,
         const deque<ZMPPosition> inputZMPTraj_deq_,
         const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
@@ -232,6 +229,10 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_TYPE(double) ZMPMBConfiguration_ ;
       MAL_VECTOR_TYPE(double) ZMPMBVelocity_ ;
       MAL_VECTOR_TYPE(double) ZMPMBAcceleration_ ;
+      MAL_VECTOR_TYPE(double) previousZMPMBConfiguration_ ;
+      MAL_VECTOR_TYPE(double) previousZMPMBVelocity_ ;
+      MAL_VECTOR_TYPE(double) previousZMPMBAcceleration_ ;
+
 
       MAL_VECTOR_TYPE(double) upperPartConfiguration_ ;
       MAL_VECTOR_TYPE(double) previousUpperPartConfiguration_ ;
@@ -308,7 +309,7 @@ namespace PatternGeneratorJRL
           template <typename T>
           result_type operator()(const result_type & sum_mass , const T & t ) const
           {
-              return this(t,sum_mass);
+              return this->operator()(t,sum_mass);
           }
       };
 
@@ -325,11 +326,11 @@ namespace PatternGeneratorJRL
           template <typename T>
           result_type operator()(const result_type & sum_h , const T & t ) const
           {
-               return this(t,sum_h);
+               return this->operator ()(t,sum_h);
           }
       };
 
-    private : // debug functions
+    public : // debug functions
       void Debug(const deque<COMState> & ctrlCoMState,
                  const deque<FootAbsolutePosition> & ctrlLeftFoot,
                  const deque<FootAbsolutePosition> & ctrlRightFoot,
@@ -337,7 +338,7 @@ namespace PatternGeneratorJRL
                  const deque<ZMPPosition> inputZMPTraj_deq_,
                  const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
                  const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-                 deque<COMState> & outputDeltaCOMTraj_deq_);
+                 const deque<COMState> &outputDeltaCOMTraj_deq_);
   };
 
 }

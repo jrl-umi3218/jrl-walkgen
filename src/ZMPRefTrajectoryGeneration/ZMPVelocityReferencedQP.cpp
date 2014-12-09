@@ -591,9 +591,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
     bool filterOn_ = true ;
     if(filterOn_)
     {
-      dynamicFilter_->OnLinefilter(time,FinalCOMTraj_deq,
-                                   FinalLeftFootTraj_deq,
-                                   FinalRightFootTraj_deq,
+      dynamicFilter_->OnLinefilter(time,
                                    COMTraj_deq_,ZMPTraj_deq_,
                                    LeftFootTraj_deq_,
                                    RightFootTraj_deq_,
@@ -607,6 +605,17 @@ void ZMPVelocityReferencedQP::OnLine(double time,
           FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
         }
       }
+
+      #define DEBUG
+      #ifdef DEBUG
+        dynamicFilter_->Debug(FinalCOMTraj_deq,
+                              FinalLeftFootTraj_deq,
+                              FinalRightFootTraj_deq,
+                              COMTraj_deq_,ZMPTraj_deq_,
+                              LeftFootTraj_deq_,
+                              RightFootTraj_deq_,
+                              deltaCOMTraj_deq_);
+      #endif
     }
     // Specify that we are in the ending phase.
     if (time <= m_SamplingPeriod )

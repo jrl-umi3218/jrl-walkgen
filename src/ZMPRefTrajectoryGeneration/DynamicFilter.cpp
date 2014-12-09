@@ -121,8 +121,11 @@ void DynamicFilter::init(
   upperPartAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
 
   ZMPMBConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
-  ZMPMBVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
-  ZMPMBAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
+  ZMPMBVelocity_      = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
+  ZMPMBAcceleration_  = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
+  previousZMPMBConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
+  previousZMPMBVelocity_      = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
+  previousZMPMBAcceleration_  = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
 
   for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )
     {
@@ -225,9 +228,6 @@ int DynamicFilter::OffLinefilter(
 
 int DynamicFilter::OnLinefilter(
     const double currentTime,
-    const deque<COMState> & ctrlCoMState,
-    const deque<FootAbsolutePosition> & ctrlLeftFoot,
-    const deque<FootAbsolutePosition> & ctrlRightFoot,
     const deque<COMState> & inputCOMTraj_deq_,
     const deque<ZMPPosition> inputZMPTraj_deq_,
     const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
@@ -235,16 +235,6 @@ int DynamicFilter::OnLinefilter(
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
   int currentIteration = 20 ;
-  vector< MAL_VECTOR_TYPE(double) > q_vec ;
-  vector< MAL_VECTOR_TYPE(double) > dq_vec ;
-  vector< MAL_VECTOR_TYPE(double) > ddq_vec ;
-  for(unsigned int i = 0 ; i < NbI_; ++i)
-    {
-      InverseKinematics( inputCOMTraj_deq_[i], inputLeftFootTraj_deq_[i],
-                         inputRightFootTraj_deq_[i], ZMPMBConfiguration_, ZMPMBVelocity_,
-                         ZMPMBAcceleration_, interpolationPeriod_, stage0_, currentIteration) ;
-    }
-
   unsigned int N = PG_N_ * NbI_ ;
   ZMPMB_vec_.resize( N , vector<double>(2,0.0));
   for(unsigned int i = 0 ; i < N ; ++i)
@@ -256,11 +246,15 @@ int DynamicFilter::OnLinefilter(
                    ZMPMB_vec_[i],
                    stage1_,
                    currentIteration);
-      q_vec.push_back(ZMPMBConfiguration_);
-      dq_vec.push_back(ZMPMBVelocity_);
-      ddq_vec.push_back(ZMPMBAcceleration_);
+      if(i == (NbI_-1))
+        {
+          previousZMPMBConfiguration_ = ZMPMBConfiguration_;
+          previousZMPMBVelocity_      = ZMPMBVelocity_     ;
+          previousZMPMBAcceleration_  = ZMPMBAcceleration_ ;
+        }
   }
-  stage0INstage1();
+  comAndFootRealization_->SetPreviousConfigurationStage1(previousZMPMBConfiguration_);
+  comAndFootRealization_->SetPreviousVelocityStage1(previousZMPMBVelocity_);
 
   deltaZMP_deq_.resize(N);
   for (unsigned int i = 0 ; i < N ; ++i)
@@ -273,17 +267,7 @@ int DynamicFilter::OnLinefilter(
       deltaZMP_deq_[i].stepType = inputZMPTraj_deq_[i].stepType ;
     }
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
-//#define DEBUG
-#ifdef DEBUG
-  Debug(ctrlCoMState,
-        ctrlLeftFoot,
-        ctrlRightFoot,
-        inputCOMTraj_deq_,
-        inputZMPTraj_deq_,
-        inputLeftFootTraj_deq_,
-        inputRightFootTraj_deq_,
-        outputDeltaCOMTraj_deq_);
-#endif
+
   return 0 ;
 }
 
@@ -512,9 +496,7 @@ int DynamicFilter::OptimalControl(
                outputDeltaCOMTraj_deq_[i].y[j] == outputDeltaCOMTraj_deq_[i].y[j] )
             {}
           else{
-#ifdef DEBUG
               cout << "kajita2003 preview control diverged\n" ;
-#endif
               return -1 ;
             }
         }
@@ -701,7 +683,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
                           const deque<ZMPPosition> inputZMPTraj_deq_,
                           const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
                           const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
-                          deque<COMState> & outputDeltaCOMTraj_deq_)
+                          const deque<COMState> & outputDeltaCOMTraj_deq_)
 {
   deque<COMState> CoM_tmp = ctrlCoMState ;
   for (unsigned int i = 0 ; i < NCtrl_ ; ++i)
