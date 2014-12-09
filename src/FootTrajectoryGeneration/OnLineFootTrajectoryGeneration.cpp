@@ -247,8 +247,8 @@ OnLineFootTrajectoryGeneration::interpret_solution( double CurrentTime, const so
   else
     {//The solver isn't responsible for the feet positions anymore
       //The robot is supposed to stop always with the feet aligned in the lateral plane.
-      X = CurrentSupport.X + Sign*sin(CurrentSupport.Yaw)*FeetDistanceDS_;
-      Y = CurrentSupport.Y - Sign*cos(CurrentSupport.Yaw)*FeetDistanceDS_;
+      X = CurrentSupport.X ;
+      Y = CurrentSupport.Y ;
     }
 
 }
@@ -364,10 +364,53 @@ void
     {
       for(int k = 0; k<=(int)(QP_T_/m_SamplingPeriod);k++)
         {
-          FinalRightFootTraj_deq[CurrentIndex+k]=               FinalRightFootTraj_deq[CurrentIndex+k-1];
-          FinalLeftFootTraj_deq[CurrentIndex+k]=                FinalLeftFootTraj_deq[CurrentIndex+k-1];
+          FinalRightFootTraj_deq[CurrentIndex+k] = FinalRightFootTraj_deq[CurrentIndex+k-1];
+          FinalLeftFootTraj_deq [CurrentIndex+k] = FinalLeftFootTraj_deq [CurrentIndex+k-1];
+
+          FinalLeftFootTraj_deq [CurrentIndex+k].dx      = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dy      = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dz      = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].domega  = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].domega2 = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dtheta  = 0.0 ;
+
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddx       = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddy       = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddz       = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddomega   = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddomega2  = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].ddtheta   = 0.0 ;
+
+          FinalLeftFootTraj_deq [CurrentIndex+k].dddx       = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dddy       = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dddz       = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dddomega   = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dddomega2  = 0.0 ;
+          FinalLeftFootTraj_deq [CurrentIndex+k].dddtheta   = 0.0 ;
+
+          FinalRightFootTraj_deq [CurrentIndex+k].dx      = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dy      = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dz      = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].domega  = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].domega2 = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dtheta  = 0.0 ;
+
+          FinalRightFootTraj_deq [CurrentIndex+k].ddx       = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].ddy       = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].ddz       = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].ddomega   = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].ddomega2  = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].ddtheta   = 0.0 ;
+
+          FinalRightFootTraj_deq [CurrentIndex+k].dddx       = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dddy       = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dddz       = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dddomega   = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dddomega2  = 0.0 ;
+          FinalRightFootTraj_deq [CurrentIndex+k].dddtheta   = 0.0 ;
+
           FinalLeftFootTraj_deq[CurrentIndex+k].time =
-              FinalRightFootTraj_deq[CurrentIndex+k].time =     Time+k*m_SamplingPeriod;
+              FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
           FinalLeftFootTraj_deq[CurrentIndex+k].stepType =
               FinalRightFootTraj_deq[CurrentIndex+k].stepType = 10;
         }

@@ -124,7 +124,7 @@ void OrientationsPreview::preview_orientations(double Time,
     }
     ++SPTraj_it;
   }
-  int ItBeforeLandingThresh = 2 ;
+  int ItBeforeLandingThresh = 3 ;
   unsigned NbStepsPreviewed = Solution.SupportStates_deq.back().StepNumber;
 
   unsigned StepNumber = 0;

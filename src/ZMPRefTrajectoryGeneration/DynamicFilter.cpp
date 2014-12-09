@@ -125,7 +125,6 @@ void DynamicFilter::init(
   ZMPMBAcceleration_  = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
   previousZMPMBConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
   previousZMPMBVelocity_      = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
-  previousZMPMBAcceleration_  = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
 
   for(unsigned int j = 0 ; j < ZMPMBConfiguration_.size() ; j++ )
     {
@@ -244,17 +243,16 @@ int DynamicFilter::OnLinefilter(
                    inputLeftFootTraj_deq_[i],
                    inputRightFootTraj_deq_[i],
                    ZMPMB_vec_[i],
-                   stage1_,
+                   stage0_,
                    currentIteration);
       if(i == (NbI_-1))
         {
           previousZMPMBConfiguration_ = ZMPMBConfiguration_;
           previousZMPMBVelocity_      = ZMPMBVelocity_     ;
-          previousZMPMBAcceleration_  = ZMPMBAcceleration_ ;
         }
   }
-  comAndFootRealization_->SetPreviousConfigurationStage1(previousZMPMBConfiguration_);
-  comAndFootRealization_->SetPreviousVelocityStage1(previousZMPMBVelocity_);
+  comAndFootRealization_->SetPreviousConfigurationStage0(previousZMPMBConfiguration_);
+  comAndFootRealization_->SetPreviousVelocityStage0(previousZMPMBVelocity_);
 
   deltaZMP_deq_.resize(N);
   for (unsigned int i = 0 ; i < N ; ++i)
@@ -778,6 +776,15 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
     aof << inputRightFootTraj_deq_[i].z << " " ;      // 38
     aof << inputRightFootTraj_deq_[i].dz << " " ;     // 39
     aof << inputRightFootTraj_deq_[i].ddz << " " ;    // 40
+
+    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].x[0] << " " ;
+    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].x[1] << " " ;
+    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].x[2] << " " ;
+
+    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].y[0] << " " ;
+    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].y[1] << " " ;
+    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].y[2] << " " ;
+
 
     aof << endl ;
   }

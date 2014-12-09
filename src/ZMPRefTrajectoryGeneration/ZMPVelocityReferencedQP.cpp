@@ -79,7 +79,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
   InterpolationPeriod_ = QP_T_/10;
-  previewDuration_ = QP_N_/2*QP_T_ ;
+  previewDuration_ = (QP_N_/2)*QP_T_ ;
   NbSampleControl_ = (int)round(QP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(QP_T_/InterpolationPeriod_) ;
   previewSize_ = (int)round(previewDuration_/InterpolationPeriod_/NbSampleInterpolation_) ;
@@ -596,17 +596,8 @@ void ZMPVelocityReferencedQP::OnLine(double time,
                                    LeftFootTraj_deq_,
                                    RightFootTraj_deq_,
                                    deltaCOMTraj_deq_);
-      // Correct the CoM.
-      for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
-      {
-        for(int j=0;j<3;j++)
-        {
-          FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
-          FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
-        }
-      }
 
-      //#define DEBUG
+      #define DEBUG
       #ifdef DEBUG
         dynamicFilter_->Debug(FinalCOMTraj_deq,
                               FinalLeftFootTraj_deq,
@@ -616,6 +607,16 @@ void ZMPVelocityReferencedQP::OnLine(double time,
                               RightFootTraj_deq_,
                               deltaCOMTraj_deq_);
       #endif
+
+      // Correct the CoM.
+      for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
+      {
+        for(int j=0;j<3;j++)
+        {
+          FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
+          FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
+        }
+      }
     }
     // Specify that we are in the ending phase.
     if (time <= m_SamplingPeriod )
@@ -692,7 +693,7 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
 
   // Copy the solution for the orientation interpolation function
   OFTG_DF_->SetSamplingPeriod( m_SamplingPeriod );
-  solution_  = Solution_ ;
+  //solution_  = Solution_ ;
   //solution_.SupportStates_deq.pop_front();
 
   for ( int i = 0 ; i < previewSize_ ; i++ )
@@ -761,6 +762,7 @@ void ZMPVelocityReferencedQP::InterpretSolutionVector()
   std::deque<support_state_t> & SupportStates = solution_.SupportStates_deq ;
   support_state_t & LastSupport = solution_.SupportStates_deq.back() ;
   support_state_t & FirstSupport = solution_.SupportStates_deq[1] ;
+  support_state_t & CurrentSupport = solution_.SupportStates_deq.front() ;
   int nbSteps = LastSupport.StepNumber ;
   FootPrw_vec.resize( nbSteps+2 , vector<double>(2,0.0) );
 
@@ -791,8 +793,8 @@ void ZMPVelocityReferencedQP::InterpretSolutionVector()
         Sign = 1.0;
       else
         Sign = -1.0;
-      FootPrw_vec[size_vec_sol-1][0] = FirstSupport.X + Sign*sin(FirstSupport.Yaw)*FeetDistance_;
-      FootPrw_vec[size_vec_sol-1][1] = FirstSupport.Y - Sign*cos(FirstSupport.Yaw)*FeetDistance_;
+      FootPrw_vec[size_vec_sol-1][0] = CurrentSupport.X + Sign*sin(FirstSupport.Yaw)*FeetDistance_;
+      FootPrw_vec[size_vec_sol-1][1] = CurrentSupport.Y - Sign*cos(FirstSupport.Yaw)*FeetDistance_;
     }
   }
 
@@ -800,8 +802,9 @@ void ZMPVelocityReferencedQP::InterpretSolutionVector()
   {
     SupportStates[i].X = FootPrw_vec[SupportStates[i].StepNumber][0] ;
     SupportStates[i].Y = FootPrw_vec[SupportStates[i].StepNumber][1] ;
+    cout << SupportStates[i].X << " " << SupportStates[i].Y << " " << endl ;
   }
-
+  cout << "#############\n";
   return ;
 }
 

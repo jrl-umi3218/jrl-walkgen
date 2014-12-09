@@ -287,7 +287,7 @@ protected:
                                                                     m_CurrentVelocity,
                                                                     m_CurrentAcceleration,
                                                                     20,
-                                                                    0);
+                                                                    1);
 
     m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
     m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6

@@ -107,8 +107,7 @@ namespace PatternGeneratorJRL
     void stage0INstage1();
 
     /// \brief Preview control on the ZMPMBs computed
-    int OptimalControl(
-        deque<ZMPPosition> & inputdeltaZMP_deq,
+    int OptimalControl(deque<ZMPPosition> &inputdeltaZMP_deq,
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
   private: // Private methods
@@ -231,8 +230,6 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_TYPE(double) ZMPMBAcceleration_ ;
       MAL_VECTOR_TYPE(double) previousZMPMBConfiguration_ ;
       MAL_VECTOR_TYPE(double) previousZMPMBVelocity_ ;
-      MAL_VECTOR_TYPE(double) previousZMPMBAcceleration_ ;
-
 
       MAL_VECTOR_TYPE(double) upperPartConfiguration_ ;
       MAL_VECTOR_TYPE(double) previousUpperPartConfiguration_ ;
@@ -309,7 +306,7 @@ namespace PatternGeneratorJRL
           template <typename T>
           result_type operator()(const result_type & sum_mass , const T & t ) const
           {
-              return this->operator()(t,sum_mass);
+              return ( sum_mass + Robot_Model::inertias[t.id].m() ) ;
           }
       };
 
@@ -326,7 +323,8 @@ namespace PatternGeneratorJRL
           template <typename T>
           result_type operator()(const result_type & sum_h , const T & t ) const
           {
-               return this->operator ()(t,sum_h);
+              double mass = Robot_Model::inertias[t.id].m() ;
+              return ( sum_h + mass * t.body.iX0.r() + t.body.iX0.E() * Robot_Model::inertias[t.id].h() );
           }
       };
 
