@@ -388,7 +388,7 @@ protected:
     /// \brief Create file .hip .pos .zmp
     /// --------------------
     ofstream aof ;
-      string root = "/opt/grx/HRP2LAAS/etc/mnaveau" ;
+    string root = "/opt/grx/HRP2LAAS/etc/mnaveau/" ;
     string aFileName = root + m_TestName + ".pos" ;
     if ( iteration == 0 )
     {
@@ -701,11 +701,11 @@ protected:
 #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
     { { 5*200,&TestHerdt2010::startWalkInDiagonal3m_s},
-      {15*200,&TestHerdt2010::startTurningRightOnSpot},
-      {25*200,&TestHerdt2010::walkSidewards1m_s},
-      {35*200,&TestHerdt2010::walkSidewards3m_s},
-      {50*200,&TestHerdt2010::stop},
-      {55*200,&TestHerdt2010::stopOnLineWalking}};
+      {10*200,&TestHerdt2010::startWalkInDiagonal1m_s},
+      {15*200,&TestHerdt2010::walkSidewards1m_s},
+      {20*200,&TestHerdt2010::walkSidewards2m_s},
+      {25*200,&TestHerdt2010::stop},
+      {30*200,&TestHerdt2010::stopOnLineWalking}};
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
       {

@@ -597,7 +597,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
                                    RightFootTraj_deq_,
                                    deltaCOMTraj_deq_);
 
-//      #define DEBUG
+      #define DEBUG
       #ifdef DEBUG
         dynamicFilter_->Debug(FinalCOMTraj_deq,
                               FinalLeftFootTraj_deq,
@@ -797,6 +797,10 @@ void ZMPVelocityReferencedQP::InterpretSolutionVector()
       FootPrw_vec[size_vec_sol-1][1] = CurrentSupport.Y - Sign*cos(FirstSupport.Yaw)*FeetDistance_;
     }
   }
+  for(unsigned int i = 0 ; i < SupportStates.size() ; ++i)
+    {
+      SupportStates[i].NbStepsLeft = 2 ;
+    }
   return ;
 }
 
