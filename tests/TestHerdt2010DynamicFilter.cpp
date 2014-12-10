@@ -115,6 +115,99 @@ public:
     localeventHandler_t Handler ;
   };
 
+  bool doTest(ostream &os)
+  {
+
+    // Set time reference.
+    m_clock.startingDate();
+
+    /*! Open and reset appropriatly the debug files. */
+    prepareDebugFiles();
+
+    for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
+      {
+        os << "<===============================================================>"<<endl;
+        os << "Iteration nb: " << lNbIt << endl;
+
+        m_clock.startPlanning();
+
+	/*! According to test profile initialize the current profile. */
+	chooseTestProfile();
+
+	m_clock.endPlanning();
+
+	if (m_DebugHDR!=0)
+	  {
+	    m_DebugHDR->currentConfiguration(m_PreviousConfiguration);
+	    m_DebugHDR->currentVelocity(m_PreviousVelocity);
+	    m_DebugHDR->currentAcceleration(m_PreviousAcceleration);
+	    m_DebugHDR->computeForwardKinematics();
+	  }
+
+	bool ok = true;
+	while(ok)
+	  {
+	    m_clock.startOneIteration();
+
+	    if (m_PGIInterface==0)
+	      {
+		ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
+						       m_CurrentVelocity,
+						       m_CurrentAcceleration,
+						       m_OneStep.ZMPTarget,
+						       m_OneStep.finalCOMPosition,
+						       m_OneStep.LeftFootPosition,
+						       m_OneStep.RightFootPosition);
+	      }
+	    else if (m_PGIInterface==1)
+	      {
+		ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
+						       m_CurrentVelocity,
+						       m_CurrentAcceleration,
+						       m_OneStep.ZMPTarget);
+	      }
+
+	    m_OneStep.NbOfIt++;
+
+	    m_clock.stopOneIteration();
+
+	    m_PreviousConfiguration = m_CurrentConfiguration;
+	    m_PreviousVelocity = m_CurrentVelocity;
+	    m_PreviousAcceleration = m_CurrentAcceleration;
+
+	    /*! Call the reimplemented method to generate events. */
+	    if (ok)
+	      {
+		m_clock.startModification();
+		generateEvent();
+		m_clock.stopModification();
+
+		m_clock.fillInStatistics();
+
+
+		/*! Fill the debug files with appropriate information. */
+		fillInDebugFiles();
+	      }
+	    else
+	      {
+		cerr << "Nothing to dump after " << m_OneStep.NbOfIt << endl;
+	      }
+
+	  }
+
+	os << endl << "End of iteration " << lNbIt << endl;
+	os << "<===============================================================>"<<endl;
+      }
+
+    string lProfileOutput= m_TestName;
+    lProfileOutput +="TimeProfile.dat";
+    m_clock.writeBuffer(lProfileOutput);
+    m_clock.displayStatistics(os,m_OneStep);
+
+    // Compare debugging files
+    return compareDebugFiles();
+  }
+
   void init()
   {
     // Instanciate and initialize.
@@ -295,7 +388,7 @@ protected:
     /// \brief Create file .hip .pos .zmp
     /// --------------------
     ofstream aof ;
-      string root = "/opt/grx/HRP2LAAS/etc/mnaveau/" ;
+      string root = "/opt/grx/HRP2LAAS/etc/mnaveau" ;
     string aFileName = root + m_TestName + ".pos" ;
     if ( iteration == 0 )
     {
@@ -504,6 +597,13 @@ protected:
       aPGI.ParseCmd(strm2);
     }
   }
+  void walkForward1m_s(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.1 0.0 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
   void walkForward3m_s(PatternGeneratorInterface &aPGI)
   {
     {
@@ -525,10 +625,24 @@ protected:
       aPGI.ParseCmd(strm2);
     }
   }
+  void walkSidewards1m_s(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.0 -0.1 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
   void walkSidewards(PatternGeneratorInterface &aPGI)
   {
     {
       istringstream strm2(":setVelReference  0.0 -0.2 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void startWalkInDiagonal1m_s(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.1 0.1 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -587,23 +701,11 @@ protected:
 #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
     { { 5*200,&TestHerdt2010::startWalkInDiagonal3m_s},
-      { 8*200,&TestHerdt2010::startWalkInDiagonal3m_s},
-      { 10*200,&TestHerdt2010::walkSidewards},
-      { 12*200,&TestHerdt2010::walkSidewards3m_s},
-      { 15*200,&TestHerdt2010::walkSidewards},
-      {20*200,&TestHerdt2010::startTurningRightOnSpot},
-/*    {25*200,&TestHerdt2010::startTurningRightOnSpot},
-    {35*200,&TestHerdt2010::walkForward},
-    {45*200,&TestHerdt2010::startTurningLeftOnSpot},*//*
-    {55*200,&TestHerdt2010::walkForward},
-    {65*200,&TestHerdt2010::startTurningRightOnSpot},
-    {75*200,&TestHerdt2010::walkForward},
-    {85*200,&TestHerdt2010::startTurningLeft},
-    {95*200,&TestHerdt2010::startTurningRight},*/
-//    {105*200,&TestHerdt2010::stop},
-//    {110*200,&TestHerdt2010::stopOnLineWalking}};
-    {25*200,&TestHerdt2010::stop},
-    {30*200,&TestHerdt2010::stopOnLineWalking}};
+      {15*200,&TestHerdt2010::startTurningRightOnSpot},
+      {25*200,&TestHerdt2010::walkSidewards1m_s},
+      {35*200,&TestHerdt2010::walkSidewards3m_s},
+      {50*200,&TestHerdt2010::stop},
+      {55*200,&TestHerdt2010::stopOnLineWalking}};
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
       {
