@@ -797,14 +797,6 @@ void ZMPVelocityReferencedQP::InterpretSolutionVector()
       FootPrw_vec[size_vec_sol-1][1] = CurrentSupport.Y - Sign*cos(FirstSupport.Yaw)*FeetDistance_;
     }
   }
-
-  for (unsigned int i = 1 ; i < SupportStates.size() ; ++i)
-  {
-    SupportStates[i].X = FootPrw_vec[SupportStates[i].StepNumber][0] ;
-    SupportStates[i].Y = FootPrw_vec[SupportStates[i].StepNumber][1] ;
-    cout << SupportStates[i].X << " " << SupportStates[i].Y << " " << endl ;
-  }
-  cout << "#############\n";
   return ;
 }
 
