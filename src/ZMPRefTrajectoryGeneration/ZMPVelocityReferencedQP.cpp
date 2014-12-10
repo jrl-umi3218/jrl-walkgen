@@ -79,10 +79,10 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
   InterpolationPeriod_ = QP_T_/10;
-  previewDuration_ = (QP_N_/2)*QP_T_ ;
+  previewDuration_ = 0.7 ;
   NbSampleControl_ = (int)round(QP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(QP_T_/InterpolationPeriod_) ;
-  previewSize_ = (int)round(previewDuration_/InterpolationPeriod_/NbSampleInterpolation_) ;
+  previewSize_ = 7 ;
   StepPeriod_ = 0.8 ;
   SSPeriod_ = 0.7 ;
   DSPeriod_ = 0.1 ;
