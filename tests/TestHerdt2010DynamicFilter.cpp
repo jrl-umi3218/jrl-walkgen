@@ -590,17 +590,17 @@ protected:
       aPGI.ParseCmd(strm2);
     }
   }
-  void walkForward(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.2 0.0 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
   void walkForward1m_s(PatternGeneratorInterface &aPGI)
   {
     {
       istringstream strm2(":setVelReference  0.1 0.0 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void walkForward2m_s(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.2 0.0 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -611,10 +611,10 @@ protected:
       aPGI.ParseCmd(strm2);
     }
   }
-  void walkSidewards3m_s(PatternGeneratorInterface &aPGI)
+  void walkSidewards1m_s(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.0 -0.3 0.0");
+      istringstream strm2(":setVelReference  0.0 -0.1 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -625,17 +625,10 @@ protected:
       aPGI.ParseCmd(strm2);
     }
   }
-  void walkSidewards1m_s(PatternGeneratorInterface &aPGI)
+  void walkSidewards3m_s(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.0 -0.1 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-  void walkSidewards(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.0 -0.2 0.0");
+      istringstream strm2(":setVelReference  0.0 -0.3 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -700,12 +693,15 @@ protected:
     };
 #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-    { { 5*200,&TestHerdt2010::startWalkInDiagonal3m_s},
-      {10*200,&TestHerdt2010::startWalkInDiagonal1m_s},
-      {15*200,&TestHerdt2010::walkSidewards1m_s},
-      {20*200,&TestHerdt2010::walkSidewards2m_s},
-      {25*200,&TestHerdt2010::stop},
-      {30*200,&TestHerdt2010::stopOnLineWalking}};
+    { { 5*200,&TestHerdt2010::walkForward3m_s},
+      {10*200,&TestHerdt2010::walkForward2m_s},
+      {15*200,&TestHerdt2010::walkForward1m_s},
+      {20*200,&TestHerdt2010::walkSidewards1m_s},
+      {25*200,&TestHerdt2010::walkSidewards2m_s},
+      {30*200,&TestHerdt2010::walkSidewards3m_s},
+      {35*200,&TestHerdt2010::startTurningRightOnSpot},
+      {40*200,&TestHerdt2010::stop},
+      {45*200,&TestHerdt2010::stopOnLineWalking}};
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
       {

@@ -24,7 +24,6 @@ int MultiContactHirukawa::InverseKinematicsOnLimbs(std::vector< FootAbsolutePosi
                                                    std::vector< HandAbsolutePosition > & lh,
                                                    unsigned int currentIndex)
 {
-    cout << "q = \n" << q_ << endl ;
     //metapod::jac< Robot_Model>::run(*robot_, jacobian_);
     Jac_LF::run(*robot_, q_, metapod::Vector3dTpl<LocalFloatType>::Type(0,0,0), jac_LF);
     Jac_RF::run(*robot_, q_, metapod::Vector3dTpl<LocalFloatType>::Type(0,0,0), jac_RF);
@@ -136,7 +135,7 @@ int MultiContactHirukawa::online(vector<COMState> & comPos_,
                                  vector<HandAbsolutePosition> & lh_)
 {
     DetermineContact(rf_,lf_,rh_,lh_);
-//    InverseKinematicsOnLimbs(rf_,lf_,rh_,lh_,0);
+    InverseKinematicsOnLimbs(rf_,lf_,rh_,lh_,0);
 
     return 0 ;
 }
