@@ -39,7 +39,8 @@ enum Profiles_t {
   PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING, // 2
   PROFIL_ANALYTICAL_CLIMBING_STAIRS,        // 3
   PROFIL_ANALYTICAL_GOING_DOWN_STAIRS,       // 4
-  PROFIL_ANALYTICAL_STEPPING_STONES       // 5
+  PROFIL_ANALYTICAL_STEPPING_STONES,         // 5
+  PROFIL_ANALYTICAL_WALKING_ON_BEAM         // 6
 };
 
 #define NBOFPREDEFONLINEFOOTSTEPS 11
@@ -153,10 +154,13 @@ public:
                                                   m_CurrentAcceleration,
                                                   m_OneStep.ZMPTarget);
         }
+        // Number of iterations
         m_OneStep.NbOfIt++;
 
+        // Check time of one iteration
         m_clock.stopOneIteration();
 
+        // Save the current state to have it as previous one in the next iteration
         m_PreviousConfiguration = m_CurrentConfiguration;
         m_PreviousVelocity = m_CurrentVelocity;
         m_PreviousAcceleration = m_CurrentAcceleration;
@@ -367,24 +371,24 @@ protected:
         }
 
       // carry the weight in front of him
-      m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
-      m_CurrentConfiguration(19)= 0.015 ;            // CHEST_JOINT1
-      m_CurrentConfiguration(20)= 0.0 ;            // HEAD_JOINT0
-      m_CurrentConfiguration(21)= 0.0 ;            // HEAD_JOINT1
-      m_CurrentConfiguration(22)= -0.108210414 ;   // RARM_JOINT0
-      m_CurrentConfiguration(23)= 0.0383972435 ;    // RARM_JOINT1
-      m_CurrentConfiguration(24)= 0.474729557 ;     // RARM_JOINT2
-      m_CurrentConfiguration(25)= -1.41720735 ;    // RARM_JOINT3
-      m_CurrentConfiguration(26)= 1.45385927 ;     // RARM_JOINT4
-      m_CurrentConfiguration(27)= 0.509636142 ;     // RARM_JOINT5
-      m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
-      m_CurrentConfiguration(29)= -0.108210414 ;    // LARM_JOINT0
-      m_CurrentConfiguration(30)= -0.129154365 ;    // LARM_JOINT1
-      m_CurrentConfiguration(31)= -0.333357887 ;    // LARM_JOINT2
-      m_CurrentConfiguration(32)= -1.41720735 ;     // LARM_JOINT3
-      m_CurrentConfiguration(33)= 1.45385927 ;      // LARM_JOINT4
-      m_CurrentConfiguration(34)= -0.193731547 ;    // LARM_JOINT5
-      m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
+//      m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
+//      m_CurrentConfiguration(19)= 0.015 ;            // CHEST_JOINT1
+//      m_CurrentConfiguration(20)= 0.0 ;            // HEAD_JOINT0
+//      m_CurrentConfiguration(21)= 0.0 ;            // HEAD_JOINT1
+//      m_CurrentConfiguration(22)= -0.108210414 ;   // RARM_JOINT0
+//      m_CurrentConfiguration(23)= 0.0383972435 ;    // RARM_JOINT1
+//      m_CurrentConfiguration(24)= 0.474729557 ;     // RARM_JOINT2
+//      m_CurrentConfiguration(25)= -1.41720735 ;    // RARM_JOINT3
+//      m_CurrentConfiguration(26)= 1.45385927 ;     // RARM_JOINT4
+//      m_CurrentConfiguration(27)= 0.509636142 ;     // RARM_JOINT5
+//      m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
+//      m_CurrentConfiguration(29)= -0.108210414 ;    // LARM_JOINT0
+//      m_CurrentConfiguration(30)= -0.129154365 ;    // LARM_JOINT1
+//      m_CurrentConfiguration(31)= -0.333357887 ;    // LARM_JOINT2
+//      m_CurrentConfiguration(32)= -1.41720735 ;     // LARM_JOINT3
+//      m_CurrentConfiguration(33)= 1.45385927 ;      // LARM_JOINT4
+//      m_CurrentConfiguration(34)= -0.193731547 ;    // LARM_JOINT5
+//      m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
 
 //      // carry the weight over the head
 //      m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
@@ -412,14 +416,14 @@ protected:
       string aFileName;
 
       if ( iteration == 0 ){
-        aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
+        aFileName = "/home/cvassall/Trajectories/";
         aFileName+=m_TestName;
         aFileName+=".pos";
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
       }
       ///----
-      aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
+      aFileName = "/home/cvassall/Trajectories/";
         aFileName+=m_TestName;
         aFileName+=".pos";
       aof.open(aFileName.c_str(),ofstream::app);
@@ -436,13 +440,13 @@ protected:
       aof.close();
 
       if ( iteration == 0 ){
-        aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
+        aFileName = "/home/cvassall/Trajectories/"; // change path
         aFileName+=m_TestName;
         aFileName+=".hip";
         aof.open(aFileName.c_str(),ofstream::out);
         aof.close();
       }
-      aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
+      aFileName = "/home/cvassall/Trajectories/";
         aFileName+=m_TestName;
         aFileName+=".hip";
       aof.open(aFileName.c_str(),ofstream::app);
@@ -456,7 +460,7 @@ protected:
       aof.close();
 
       if ( iteration == 0 ){
-        aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
+        aFileName = "/home/cvassall/Trajectories/";
         aFileName+=m_TestName;
         aFileName+=".zmp";
         aof.open(aFileName.c_str(),ofstream::out);
@@ -469,7 +473,7 @@ protected:
       else
         aSupportState = m_OneStep.RightFootPosition ;
 
-      aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
+      aFileName = "/home/cvassall/Trajectories/";
         aFileName+=m_TestName;
         aFileName+=".zmp";
       aof.open(aFileName.c_str(),ofstream::app);
@@ -800,6 +804,45 @@ protected:
     }
 
   }
+
+
+
+ // Define here the function to Generate Walking on Beam motion
+ void AnalyticalWalkingOnBeam(PatternGeneratorInterface &aPGI)
+  {
+    CommonInitialization(aPGI);
+    {
+      istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":singlesupporttime 1.4");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":doublesupporttime 0.2");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
+                                        0.25 0.19 0.05 0.0\
+                                        0.2 -0.19 0.05 0.0\
+                                        0.25 0.19 0.05 0.0\
+                                        0.2 -0.19 0.05 0.0\
+                                        0.2 0.19 0.0 0.0\
+                                        0.2 -0.19 -0.05 0.0\
+                                        0.2 0.19 -0.05 0.0\
+                                        0.2 -0.19 -0.05 0.0\
+                                        0.2 0.19 0.0 0.0\
+                                        0.0 -0.19 0.0 0.0");
+
+      aPGI.ParseCmd(strm2);
+    }
+  }
+
   void chooseTestProfile()
   {
 
@@ -824,6 +867,12 @@ protected:
       case PROFIL_ANALYTICAL_ONLINE_WALKING:
 	StartAnalyticalOnLineWalking(*m_PGI);
 	break;
+
+    case PROFIL_ANALYTICAL_WALKING_ON_BEAM:
+    AnalyticalWalkingOnBeam(*m_PGI);
+    break;
+
+
       default:
 	throw("No correct test profile");
 	break;
@@ -840,6 +889,11 @@ protected:
       return;
     if (m_TestProfile==PROFIL_ANALYTICAL_STEPPING_STONES)
       return;
+    if (m_TestProfile==PROFIL_ANALYTICAL_WALKING_ON_BEAM)
+      return;
+
+
+
 
 
 
@@ -917,11 +971,13 @@ int PerformTests(int argc, char *argv[])
   std::string CompleteName = string(argv[0]);
   unsigned found = CompleteName.find_last_of("/\\");
   std::string TestName =  CompleteName.substr(found+1);
-  int TestProfiles[5] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
+  int TestProfiles[6] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
 			  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,
 			  PROFIL_ANALYTICAL_CLIMBING_STAIRS,
 			  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS,
-                          PROFIL_ANALYTICAL_STEPPING_STONES};
+              PROFIL_ANALYTICAL_STEPPING_STONES,
+              PROFIL_ANALYTICAL_WALKING_ON_BEAM
+              };
   int indexProfile=-1;
 
   if (TestName.compare(16,6,"OnLine")==0)
@@ -934,6 +990,8 @@ int PerformTests(int argc, char *argv[])
     indexProfile=3;
   if (TestName.compare(16,14,"SteppingStones")==0)
     indexProfile=4;
+  if (TestName.compare(16,13,"WalkingOnBeam")==0)
+    indexProfile=5;
 
   if (indexProfile==-1)
     {

@@ -301,17 +301,17 @@ void Bsplines::PrintDegree() const
 // create a foot trajectory of Z on function the time t
 
 
-ZBsplines::ZBsplines(double FT, double FP, double ToMP, double MP):Bsplines(4)
+FootBSplines::FootBSplines(double FT, double FP, double ToMP, double MP):Bsplines(4)
 {
     SetParameters( FT, FP, ToMP, MP);
 }
 
-ZBsplines::~ZBsplines()
+FootBSplines::~FootBSplines()
 {
 
 }
 
-double ZBsplines::ZComputePosition(double t)
+double FootBSplines::FootComputePosition(double t)
 {
     if (t<=m_FT)
         return ComputeBsplines(t).y;
@@ -319,7 +319,7 @@ double ZBsplines::ZComputePosition(double t)
         return m_FP;
 }
 
-double ZBsplines::ZComputeVelocity(double t)
+double FootBSplines::FootComputeVelocity(double t)
 {
     if (m_degree >=1){
         if (t<m_FT)
@@ -334,7 +334,7 @@ double ZBsplines::ZComputeVelocity(double t)
     }
 }
 
-double ZBsplines::ZComputeAcc(double t)
+double FootBSplines::FootComputeAcc(double t)
 {
     if (m_degree >=2){
         if (t<m_FT)
@@ -349,30 +349,30 @@ double ZBsplines::ZComputeAcc(double t)
     }
 }
 
-void  ZBsplines::SetParameters(double FT, double FP, double ToMP, double MP)
+void  FootBSplines::SetParameters(double FT, double FP, double ToMP, double MP)
 {
-    ZGenerateKnotVector(FT,ToMP);
-    ZGenerateControlPoints(0.0, FT, FP, ToMP, MP);
+    FootGenerateKnotVector(FT,ToMP);
+    FootGenerateControlPoints(0.0, FT, FP, ToMP, MP);
 }
 
-void  ZBsplines::SetParametersWithInitPos(double IP, double FT, double FP, double ToMP, double MP)
+void  FootBSplines::SetParametersWithInitPos(double IP, double FT, double FP, double ToMP, double MP)
 {
-    ZGenerateKnotVector(FT,ToMP);
-    ZGenerateControlPoints(IP, FT, FP, ToMP, MP);
+    FootGenerateKnotVector(FT,ToMP);
+    FootGenerateControlPoints(IP, FT, FP, ToMP, MP);
 }
 
-void ZBsplines::GetParametersWithInitPosInitSpeed(double &FT,
+void FootBSplines::GetParametersWithInitPosInitSpeed(double &FT,
 						  double &FP,
 						  double &InitPos,
 						  double &InitSpeed)
 {
     FT = m_FT;
     FP = m_FP;
-    InitPos = ZComputePosition(0.0);
-    InitSpeed = ZComputeVelocity(0.0);
+    InitPos = FootComputePosition(0.0);
+    InitSpeed = FootComputeVelocity(0.0);
 }
 
-void ZBsplines::ZGenerateKnotVector(double FT, double ToMP)
+void FootBSplines::FootGenerateKnotVector(double FT, double ToMP)
 {
     std::vector<double> knot;
     knot.clear();
@@ -393,7 +393,7 @@ void ZBsplines::ZGenerateKnotVector(double FT, double ToMP)
     SetKnotVector(knot);
 }
 
-void ZBsplines::ZGenerateControlPoints(double IP, double FT, double FP, double ToMP, double MP)
+void FootBSplines::FootGenerateControlPoints(double IP, double FT, double FP, double ToMP, double MP)
 {
     m_FT = FT;
     m_FP = FP;
@@ -442,13 +442,14 @@ void ZBsplines::ZGenerateControlPoints(double IP, double FT, double FP, double T
     SetControlPoints(control_points);
 }
 
-double ZBsplines::GetMP()
+double FootBSplines::GetMP()
 {
     return m_MP;
 }
 
 
-double ZBsplines::GetFT()
+double FootBSplines::GetFT()
 {
     return m_FT;
 }
+

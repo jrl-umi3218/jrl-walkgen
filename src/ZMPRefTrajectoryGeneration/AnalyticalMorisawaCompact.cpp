@@ -572,106 +572,111 @@ computing the analytical trajectories. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
 
-    //deque<COMState> filteredCoM = COMStates ;
-
-    /*! initialize the dynamic filter */
-    unsigned int n = COMStates.size();
-    double KajitaPCpreviewWindow = 1.6 ;
-    m_kajitaDynamicFilter->init( m_SamplingPeriod,
-                                 m_SamplingPeriod,
-                                 (double)(n+1)*m_SamplingPeriod,
-                                 KajitaPCpreviewWindow,
-                                 lStartingCOMState.z[0],
-                                 InitLeftFootAbsolutePosition,
-                                 lStartingCOMState );
-
-    /*! Set the upper body trajectory */
-    CjrlHumanoidDynamicRobot * aHDR = m_kajitaDynamicFilter->
-                                             getComAndFootRealization()->getHumanoidDynamicRobot();
-    MAL_VECTOR_TYPE(double) UpperConfig = aHDR->currentConfiguration() ;
-    MAL_VECTOR_TYPE(double) UpperVel = aHDR->currentVelocity() ;
-    MAL_VECTOR_TYPE(double) UpperAcc = aHDR->currentAcceleration() ;
-    // carry the weight in front of him
-    UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
-    UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
-    UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
-    UpperConfig(21)= 0.0 ;            // HEAD_JOINT1
-    UpperConfig(22)= -0.108210414 ;   // RARM_JOINT0
-    UpperConfig(23)= 0.0383972435 ;   // RARM_JOINT1
-    UpperConfig(24)= 0.474729557 ;    // RARM_JOINT2
-    UpperConfig(25)= -1.41720735 ;    // RARM_JOINT3
-    UpperConfig(26)= 1.45385927 ;     // RARM_JOINT4
-    UpperConfig(27)= 0.509636142 ;    // RARM_JOINT5
-    UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
-    UpperConfig(29)= -0.108210414 ;   // LARM_JOINT0
-    UpperConfig(30)= -0.129154365 ;   // LARM_JOINT1
-    UpperConfig(31)= -0.333357887 ;   // LARM_JOINT2
-    UpperConfig(32)= -1.41720735 ;    // LARM_JOINT3
-    UpperConfig(33)= 1.45385927 ;     // LARM_JOINT4
-    UpperConfig(34)= -0.193731547 ;   // LARM_JOINT5
-    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
-
-//    // carry the weight over the head
-//    UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
-//    UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
-//    UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
-//    UpperConfig(21)= 0.0 ;            // HEAD_JOINT1
-//    UpperConfig(22)= -1.4678219 ;     // RARM_JOINT0
-//    UpperConfig(23)= 0.0366519143 ;   // RARM_JOINT1
-//    UpperConfig(24)= 0.541052068 ;    // RARM_JOINT2
-//    UpperConfig(25)= -1.69296937 ;    // RARM_JOINT3
-//    UpperConfig(26)= 1.56556034 ;     // RARM_JOINT4
-//    UpperConfig(27)= 0.584685299 ;    // RARM_JOINT5
-//    UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
-//    UpperConfig(29)= -1.4678219 ;     // LARM_JOINT0
-//    UpperConfig(30)= -0.0366519143 ;  // LARM_JOINT1
-//    UpperConfig(31)= -0.541052068 ;   // LARM_JOINT2
-//    UpperConfig(32)= -1.69296937 ;    // LARM_JOINT3
-//    UpperConfig(33)= -1.56556034 ;     // LARM_JOINT4
-//    UpperConfig(34)= 0.584685299 ;    // LARM_JOINT5
-//    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
-
-    for(unsigned int i = 0 ; i < 18 ; ++i){
-      UpperVel(i)=0.0;
-      UpperAcc(i)=0.0;
-    }
-
-    m_kajitaDynamicFilter->setRobotUpperPart(UpperConfig,UpperVel,UpperAcc);
-
-    /*! Add "KajitaPCpreviewWindow" second to the buffers for fitering */
-    ZMPPosition lastZMP = ZMPPositions.back();
-    COMState lastCoM = COMStates.back();
-    FootAbsolutePosition lastLF = LeftFootAbsolutePositions.back();
-    FootAbsolutePosition lastRF = RightFootAbsolutePositions.back();
-    for (unsigned int i = 0  ; i < KajitaPCpreviewWindow/m_SamplingPeriod ; ++i)
+    bool filterOn_ = false ;
+    if(filterOn_)
     {
-      ZMPPositions.push_back(lastZMP);
-      COMStates.push_back(lastCoM);
-      LeftFootAbsolutePositions.push_back(lastLF);
-      RightFootAbsolutePositions.push_back(lastRF);
-    }
+        /*! initialize the dynamic filter */
+        unsigned int n = COMStates.size();
+        double KajitaPCpreviewWindow = 1.6 ;
+        m_kajitaDynamicFilter->init( m_SamplingPeriod,
+                                     m_SamplingPeriod,
+                                     (double)(n+1)*m_SamplingPeriod,
+                                     KajitaPCpreviewWindow,
+                                     lStartingCOMState.z[0],
+                                     InitLeftFootAbsolutePosition,
+                                     lStartingCOMState );
 
-    deque<COMState> outputDeltaCOMTraj_deq ;
-    m_kajitaDynamicFilter->OffLinefilter(
-                m_CurrentTime,
-                COMStates,
-                ZMPPositions,
-                LeftFootAbsolutePositions,
-                RightFootAbsolutePositions,
-                vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
-                vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
-                vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
-                outputDeltaCOMTraj_deq);
+        /*! Set the upper body trajectory */
+        CjrlHumanoidDynamicRobot * aHDR = m_kajitaDynamicFilter->
+                                                 getComAndFootRealization()->getHumanoidDynamicRobot();
+        MAL_VECTOR_TYPE(double) UpperConfig = aHDR->currentConfiguration() ;
+        MAL_VECTOR_TYPE(double) UpperVel = aHDR->currentVelocity() ;
+        MAL_VECTOR_TYPE(double) UpperAcc = aHDR->currentAcceleration() ;
+        // carry the weight in front of him
+        UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
+        UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
+        UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
+        UpperConfig(21)= 0.0 ;            // HEAD_JOINT1
+        UpperConfig(22)= -0.108210414 ;   // RARM_JOINT0
+        UpperConfig(23)= 0.0383972435 ;   // RARM_JOINT1
+        UpperConfig(24)= 0.474729557 ;    // RARM_JOINT2
+        UpperConfig(25)= -1.41720735 ;    // RARM_JOINT3
+        UpperConfig(26)= 1.45385927 ;     // RARM_JOINT4
+        UpperConfig(27)= 0.509636142 ;    // RARM_JOINT5
+        UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
+        UpperConfig(29)= -0.108210414 ;   // LARM_JOINT0
+        UpperConfig(30)= -0.129154365 ;   // LARM_JOINT1
+        UpperConfig(31)= -0.333357887 ;   // LARM_JOINT2
+        UpperConfig(32)= -1.41720735 ;    // LARM_JOINT3
+        UpperConfig(33)= 1.45385927 ;     // LARM_JOINT4
+        UpperConfig(34)= -0.193731547 ;   // LARM_JOINT5
+        UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
 
-    vector <vector<double> > filteredZMPMB (n , vector<double> (2,0.0)) ;
-    for (unsigned int i = 0 ; i < n ; ++i)
-    {
-      for(int j=0;j<3;j++)
-      {
-        COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
-        COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
-      }
+    //    // carry the weight over the head
+    //    UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
+    //    UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
+    //    UpperConfig(20)= 0.0 ;            // HEAD_JOINT0
+    //    UpperConfig(21)= 0.0 ;            // HEAD_JOINT1
+    //    UpperConfig(22)= -1.4678219 ;     // RARM_JOINT0
+    //    UpperConfig(23)= 0.0366519143 ;   // RARM_JOINT1
+    //    UpperConfig(24)= 0.541052068 ;    // RARM_JOINT2
+    //    UpperConfig(25)= -1.69296937 ;    // RARM_JOINT3
+    //    UpperConfig(26)= 1.56556034 ;     // RARM_JOINT4
+    //    UpperConfig(27)= 0.584685299 ;    // RARM_JOINT5
+    //    UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
+    //    UpperConfig(29)= -1.4678219 ;     // LARM_JOINT0
+    //    UpperConfig(30)= -0.0366519143 ;  // LARM_JOINT1
+    //    UpperConfig(31)= -0.541052068 ;   // LARM_JOINT2
+    //    UpperConfig(32)= -1.69296937 ;    // LARM_JOINT3
+    //    UpperConfig(33)= -1.56556034 ;     // LARM_JOINT4
+    //    UpperConfig(34)= 0.584685299 ;    // LARM_JOINT5
+    //    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
+
+        for(unsigned int i = 0 ; i < 18 ; ++i){
+          UpperVel(i)=0.0;
+          UpperAcc(i)=0.0;
+        }
+
+        m_kajitaDynamicFilter->setRobotUpperPart(UpperConfig,UpperVel,UpperAcc);
+
+        /*! Add "KajitaPCpreviewWindow" second to the buffers for fitering */
+        ZMPPosition lastZMP = ZMPPositions.back();
+        COMState lastCoM = COMStates.back();
+        FootAbsolutePosition lastLF = LeftFootAbsolutePositions.back();
+        FootAbsolutePosition lastRF = RightFootAbsolutePositions.back();
+        for (unsigned int i = 0  ; i < KajitaPCpreviewWindow/m_SamplingPeriod ; ++i)
+        {
+          ZMPPositions.push_back(lastZMP);
+          COMStates.push_back(lastCoM);
+          LeftFootAbsolutePositions.push_back(lastLF);
+          RightFootAbsolutePositions.push_back(lastRF);
+        }
+
+        // Filter the trajectory
+        deque<COMState> outputDeltaCOMTraj_deq ;
+        m_kajitaDynamicFilter->OffLinefilter(
+                    m_CurrentTime,
+                    COMStates,
+                    ZMPPositions,
+                    LeftFootAbsolutePositions,
+                    RightFootAbsolutePositions,
+                    vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
+                    vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
+                    vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
+                    outputDeltaCOMTraj_deq);
+
+        vector <vector<double> > filteredZMPMB (n , vector<double> (2,0.0)) ;
+        for (unsigned int i = 0 ; i < n ; ++i)
+        {
+          for(int j=0;j<3;j++)
+          {
+            COMStates[i].x[j] += outputDeltaCOMTraj_deq[i].x[j] ;
+            COMStates[i].y[j] += outputDeltaCOMTraj_deq[i].y[j] ;
+          }
+        }
     }
+    // End the Filtering
+
 
     for (unsigned int i = 0  ; i < KajitaPCpreviewWindow/m_SamplingPeriod ; ++i)
     {
