@@ -500,22 +500,50 @@ protected:
   void walkForward(PatternGeneratorInterface &aPGI)
   {
     {
+      istringstream strm2(":setVelReference  0.2 0.0 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void walkForward3m_s(PatternGeneratorInterface &aPGI)
+  {
+    {
       istringstream strm2(":setVelReference  0.3 0.0 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
-  void walkSidewards(PatternGeneratorInterface &aPGI)
+  void walkSidewards3m_s(PatternGeneratorInterface &aPGI)
   {
     {
       istringstream strm2(":setVelReference  0.0 -0.3 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
-
-  void startWalkInDiagonal(PatternGeneratorInterface &aPGI)
+  void walkSidewards2m_s(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.0 -0.2 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void walkSidewards(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.0 -0.2 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+  void startWalkInDiagonal2m_s(PatternGeneratorInterface &aPGI)
   {
     {
       istringstream strm2(":setVelReference  0.2 0.2 0.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+
+  void startWalkInDiagonal3m_s(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":setVelReference  0.3 0.3 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -558,9 +586,12 @@ protected:
     };
 #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-    { { 5*200,&TestHerdt2010::startWalkInDiagonal},
-      {10*200,&TestHerdt2010::walkSidewards},
-      {15*200,&TestHerdt2010::startTurningRightOnSpot},
+    { { 5*200,&TestHerdt2010::startWalkInDiagonal3m_s},
+      { 8*200,&TestHerdt2010::startWalkInDiagonal3m_s},
+      { 10*200,&TestHerdt2010::walkSidewards},
+      { 12*200,&TestHerdt2010::walkSidewards3m_s},
+      { 15*200,&TestHerdt2010::walkSidewards},
+      {20*200,&TestHerdt2010::startTurningRightOnSpot},
 /*    {25*200,&TestHerdt2010::startTurningRightOnSpot},
     {35*200,&TestHerdt2010::walkForward},
     {45*200,&TestHerdt2010::startTurningLeftOnSpot},*//*
@@ -571,8 +602,8 @@ protected:
     {95*200,&TestHerdt2010::startTurningRight},*/
 //    {105*200,&TestHerdt2010::stop},
 //    {110*200,&TestHerdt2010::stopOnLineWalking}};
-    {20*200,&TestHerdt2010::stop},
-    {25*200,&TestHerdt2010::stopOnLineWalking}};
+    {25*200,&TestHerdt2010::stop},
+    {30*200,&TestHerdt2010::stopOnLineWalking}};
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
       {
