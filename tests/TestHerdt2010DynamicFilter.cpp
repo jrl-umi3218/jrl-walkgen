@@ -64,34 +64,19 @@ class TestHerdt2010: public TestObject
 {
 
 private:
-  // buffer to save all the zmps positions
-  vector< vector<double> > errZMP_ ;
-  Robot_Model2 robot_ ;
   ComAndFootRealization * ComAndFootRealization_;
   SimplePluginManager * SPM ;
-  double dInitX, dInitY;
-  int iteration,iteration_zmp ;
-  bool once ;
+  int iteration ;
 
 public:
   TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
       TestObject(argc,argv,aString)
   {
     m_TestProfile = TestProfile;
-    {
-      vector<double> tmp_zmp(2) ;
-      tmp_zmp[0] =0.0 ;
-      tmp_zmp[1] =0.0 ;
-      errZMP_.push_back(tmp_zmp);
-    }
-
+    SPM = 0 ;
     ComAndFootRealization_ = 0 ;
-    dInitX = 0 ;
-    dInitY = 0 ;
-    iteration_zmp = 0 ;
     iteration = 0 ;
-    once = true ;
-  };
+  }
 
   ~TestHerdt2010()
   {

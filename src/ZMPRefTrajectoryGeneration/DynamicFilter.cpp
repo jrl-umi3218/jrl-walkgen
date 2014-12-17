@@ -106,11 +106,11 @@ void DynamicFilter::init(
     {NbI_ = (int)(PG_T/interpolationPeriod_);}
 
   NCtrl_ = (int)(PG_T_/controlPeriod_) ;
-  PG_N_ = (int)( (previewWindowSize_+PG_T_/controlPeriod*interpolationPeriod)/PG_T_ ) ;
+  PG_N_ = (int)round((previewWindowSize_+PG_T_/controlPeriod*interpolationPeriod)/PG_T_ ) ;
 
   CoMHeight_ = CoMHeight ;
   PC_->SetPreviewControlTime (previewWindowSize_);
-  PC_->SetSamplingPeriod (interpolationPeriod_);
+  PC_->SetSamplingPeriod (controlPeriod);
   PC_->SetHeightOfCoM(CoMHeight_);
   PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
 
@@ -148,6 +148,7 @@ void DynamicFilter::init(
 
   deltaZMP_deq_.resize( PG_N_*NbI_);
   ZMPMB_vec_.resize( PG_N_*NbI_, vector<double>(2));
+  zmpmb_i_.resize( PG_N_*NCtrl_, vector<double>(2));
 
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
@@ -251,17 +252,43 @@ int DynamicFilter::OnLinefilter(
           previousZMPMBVelocity_      = ZMPMBVelocity_     ;
         }
   }
+
+  unsigned int N_2 = PG_N_ * NCtrl_ ;
+  zmpmb_i_.resize( PG_N_*NCtrl_ , vector<double>(2) ) ;
+  int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
+  for(unsigned int i = 0 ; i < N ; ++i)
+    {
+      zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
+    }
+
+  for(unsigned int i = 0 ; i < N-1 ; ++i)
+    {
+      double xA = zmpmb_i_[i*inc][0] ;
+      double yA = zmpmb_i_[i*inc][1] ;
+      double tA = i*inc ;
+      double xB = zmpmb_i_[(i+1)*inc][0] ;
+      double yB = zmpmb_i_[(i+1)*inc][1] ;
+      double tB = (i+1)*inc ;
+      for(int j = 1 ; j < inc ; ++j)
+        {
+          double t = tA+j ;
+          zmpmb_i_[(i*inc)+j][0] = xA + (t-tA)*(xB-xA)/(tB-tA) ;
+          zmpmb_i_[(i*inc)+j][1] = yA + (t-tA)*(yB-yA)/(tB-tA) ;
+        }
+    }
+    zmpmb_i_[zmpmb_i_.size()-1]= ZMPMB_vec_.back() ;
+
   comAndFootRealization_->SetPreviousConfigurationStage0(previousZMPMBConfiguration_);
   comAndFootRealization_->SetPreviousVelocityStage0(previousZMPMBVelocity_);
 
-  deltaZMP_deq_.resize(N);
-  for (unsigned int i = 0 ; i < N ; ++i)
+  deltaZMP_deq_.resize(N_2);
+  for (unsigned int i = 0 ; i < N_2 ; ++i)
     {
-      deltaZMP_deq_[i].px = inputZMPTraj_deq_[i].px - ZMPMB_vec_[i][0] ;
-      deltaZMP_deq_[i].py = inputZMPTraj_deq_[i].py - ZMPMB_vec_[i][1] ;
+      deltaZMP_deq_[i].px = inputZMPTraj_deq_[i].px - zmpmb_i_[i][0] ;
+      deltaZMP_deq_[i].py = inputZMPTraj_deq_[i].py - zmpmb_i_[i][1] ;
       deltaZMP_deq_[i].pz = 0.0 ;
       deltaZMP_deq_[i].theta = 0.0 ;
-      deltaZMP_deq_[i].time = currentTime + i * interpolationPeriod_ ;
+      deltaZMP_deq_[i].time = currentTime + i * controlPeriod_ ;
       deltaZMP_deq_[i].stepType = inputZMPTraj_deq_[i].stepType ;
     }
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
@@ -705,7 +732,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
                    stage2,
                    20);
   }
-
+  int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
   ofstream aof;
   string aFileName;
   static int iteration_zmp = 0 ;
@@ -723,8 +750,8 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   aof.setf(ios::scientific, ios::floatfield);
   for (unsigned int i = 0 ; i < NbI_ ; ++i)
   {
-    aof << inputZMPTraj_deq_[i].px << " " ;           // 1
-    aof << inputZMPTraj_deq_[i].py << " " ;           // 2
+    aof << inputZMPTraj_deq_[i*inc].px << " " ;       // 1
+    aof << inputZMPTraj_deq_[i*inc].py << " " ;       // 2
 
     aof << ZMPMB_vec_[i][0] << " " ;                  // 3
     aof << ZMPMB_vec_[i][1] << " " ;                  // 4
@@ -777,14 +804,13 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
     aof << inputRightFootTraj_deq_[i].dz << " " ;     // 39
     aof << inputRightFootTraj_deq_[i].ddz << " " ;    // 40
 
-    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].x[0] << " " ;
-    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].x[1] << " " ;
-    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].x[2] << " " ;
+    aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[0] << " " ; // 41
+    aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[1] << " " ; // 42
+    aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].x[2] << " " ; // 43
 
-    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].y[0] << " " ;
-    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].y[1] << " " ;
-    aof << CoM_tmp[i*(int)(interpolationPeriod_/controlPeriod_)].y[2] << " " ;
-
+    aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[0] << " " ; // 44
+    aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[1] << " " ; // 45
+    aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[2] << " " ; // 46
 
     aof << endl ;
   }
@@ -816,68 +842,66 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   aof.open(aFileName.c_str(),ofstream::app);
   aof.precision(8);
   aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < NbI_*PG_N_ ; ++i)
+  for (unsigned int i = 0 ; i < NCtrl_*PG_N_ ; ++i)
   {
     aof << i << " " ; // 0
     aof << inputZMPTraj_deq_[i].px << " " ;           // 1
     aof << inputZMPTraj_deq_[i].py << " " ;           // 2
 
-    aof << ZMPMB_vec_[i][0] << " " ;                  // 3
-    aof << ZMPMB_vec_[i][1] << " " ;                  // 4
+    aof << zmpmb_i_[i][0] << " " ;                    // 3
+    aof << zmpmb_i_[i][1] << " " ;                    // 4
 
-    aof << inputCOMTraj_deq_[i].x[0] << " " ;         // 5
-    aof << inputCOMTraj_deq_[i].x[1] << " " ;         // 6
-    aof << inputCOMTraj_deq_[i].x[2] << " " ;         // 7
+    aof << ctrlCoMState[i].x[0] << " " ;         // 5
+    aof << ctrlCoMState[i].x[1] << " " ;         // 6
+    aof << ctrlCoMState[i].x[2] << " " ;         // 7
 
-    aof << inputLeftFootTraj_deq_[i].x << " " ;       // 8
-    aof << inputLeftFootTraj_deq_[i].dx << " " ;      // 9
-    aof << inputLeftFootTraj_deq_[i].ddx << " " ;     // 10
+    aof << ctrlLeftFoot[i].x << " " ;       // 8
+    aof << ctrlLeftFoot[i].dx << " " ;      // 9
+    aof << ctrlLeftFoot[i].ddx << " " ;     // 10
 
-    aof << inputRightFootTraj_deq_[i].x << " " ;      // 11
-    aof << inputRightFootTraj_deq_[i].dx << " " ;     // 12
-    aof << inputRightFootTraj_deq_[i].ddx << " " ;    // 13
+    aof << ctrlRightFoot[i].x << " " ;      // 11
+    aof << ctrlRightFoot[i].dx << " " ;     // 12
+    aof << ctrlRightFoot[i].ddx << " " ;    // 13
 
-    aof << inputCOMTraj_deq_[i].y[0] << " " ;         // 14
-    aof << inputCOMTraj_deq_[i].y[1] << " " ;         // 15
-    aof << inputCOMTraj_deq_[i].y[2] << " " ;         // 16
+    aof << ctrlCoMState[i].y[0] << " " ;         // 14
+    aof << ctrlCoMState[i].y[1] << " " ;         // 15
+    aof << ctrlCoMState[i].y[2] << " " ;         // 16
 
-    aof << inputLeftFootTraj_deq_[i].y << " " ;       // 17
-    aof << inputLeftFootTraj_deq_[i].dy << " " ;      // 18
-    aof << inputLeftFootTraj_deq_[i].ddy << " " ;     // 19
+    aof << ctrlLeftFoot[i].y << " " ;       // 17
+    aof << ctrlLeftFoot[i].dy << " " ;      // 18
+    aof << ctrlLeftFoot[i].ddy << " " ;     // 19
 
-    aof << inputRightFootTraj_deq_[i].y << " " ;      // 20
-    aof << inputRightFootTraj_deq_[i].dy << " " ;     // 21
-    aof << inputRightFootTraj_deq_[i].ddy << " " ;    // 22
+    aof << ctrlRightFoot[i].y << " " ;      // 20
+    aof << ctrlRightFoot[i].dy << " " ;     // 21
+    aof << ctrlRightFoot[i].ddy << " " ;    // 22
 
-    aof << inputCOMTraj_deq_[i].yaw[0] << " " ;       // 23
-    aof << inputCOMTraj_deq_[i].yaw[1] << " " ;       // 24
-    aof << inputCOMTraj_deq_[i].yaw[2] << " " ;       // 25
+    aof << ctrlCoMState[i].yaw[0] << " " ;       // 23
+    aof << ctrlCoMState[i].yaw[1] << " " ;       // 24
+    aof << ctrlCoMState[i].yaw[2] << " " ;       // 25
 
-    aof << inputLeftFootTraj_deq_[i].theta << " " ;   // 26
-    aof << inputLeftFootTraj_deq_[i].dtheta << " " ;  // 27
-    aof << inputLeftFootTraj_deq_[i].ddtheta << " " ; // 28
+    aof << ctrlLeftFoot[i].theta << " " ;   // 26
+    aof << ctrlLeftFoot[i].dtheta << " " ;  // 27
+    aof << ctrlLeftFoot[i].ddtheta << " " ; // 28
 
-    aof << inputRightFootTraj_deq_[i].theta << " " ;  // 29
-    aof << inputRightFootTraj_deq_[i].dtheta << " " ; // 30
-    aof << inputRightFootTraj_deq_[i].ddtheta << " " ;// 31
+    aof << ctrlRightFoot[i].theta << " " ;  // 29
+    aof << ctrlRightFoot[i].dtheta << " " ; // 30
+    aof << ctrlRightFoot[i].ddtheta << " " ;// 31
 
-    aof << inputCOMTraj_deq_[i].z[0] << " " ;         // 32
-    aof << inputCOMTraj_deq_[i].z[1] << " " ;         // 33
-    aof << inputCOMTraj_deq_[i].z[2] << " " ;         // 34
+    aof << ctrlCoMState[i].z[0] << " " ;         // 32
+    aof << ctrlCoMState[i].z[1] << " " ;         // 33
+    aof << ctrlCoMState[i].z[2] << " " ;         // 34
 
-    aof << inputLeftFootTraj_deq_[i].z << " " ;       // 35
-    aof << inputLeftFootTraj_deq_[i].dz << " " ;      // 36
-    aof << inputLeftFootTraj_deq_[i].ddz << " " ;     // 37
+    aof << ctrlLeftFoot[i].z << " " ;       // 35
+    aof << ctrlLeftFoot[i].dz << " " ;      // 36
+    aof << ctrlLeftFoot[i].ddz << " " ;     // 37
 
-    aof << inputRightFootTraj_deq_[i].z << " " ;      // 38
-    aof << inputRightFootTraj_deq_[i].dz << " " ;     // 39
-    aof << inputRightFootTraj_deq_[i].ddz << " " ;    // 40
+    aof << ctrlRightFoot[i].z << " " ;      // 38
+    aof << ctrlRightFoot[i].dz << " " ;     // 39
+    aof << ctrlRightFoot[i].ddz << " " ;    // 40
 
     aof << endl ;
   }
   aof.close();
-
-
   iteration_zmp++;
   return ;
 }
