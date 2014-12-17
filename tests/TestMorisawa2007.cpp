@@ -645,8 +645,6 @@ protected:
 
   }
 
-
-
  // Define here the function to Generate Walking on Beam motion
  void AnalyticalWalkingOnBeam(PatternGeneratorInterface &aPGI)
   {
@@ -802,7 +800,7 @@ protected:
 	      }
 	  }
       }
-  };
+  }
   
 };
 

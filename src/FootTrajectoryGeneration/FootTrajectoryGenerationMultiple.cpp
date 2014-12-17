@@ -233,7 +233,9 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 									double TimeInterval,
 									double FinalPosition,
 									double InitPosition,
-									double InitSpeed)
+									double InitSpeed,
+									double middlePos
+									)
 {
   if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
     return -1;
@@ -242,7 +244,8 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 											  TimeInterval,
 											  FinalPosition,
 											  InitPosition,
-											  InitSpeed);
+											  InitSpeed,
+											  middlePos);
   return 0;
 }
 

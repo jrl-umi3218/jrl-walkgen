@@ -139,10 +139,11 @@ namespace PatternGeneratorJRL
      @param[in] InitSpeed: Initial speed when computing the polynome at t=0.0.
    */
    int SetParametersWithInitPosInitSpeed(int AxisReference,
-					 double TimeInterval,
-					 double FinalPosition,
-					 double InitPosition,
-					 double InitSpeed);
+                                         double TimeInterval,
+                                         double FinalPosition,
+                                         double InitPosition,
+                                         double InitSpeed,
+                                         double MiddlePos=0.0);
 
    /*! This method get the parameters for each of the polynome used by this
      object. In this case, as it is used for the 3rd order polynome. The polynome to

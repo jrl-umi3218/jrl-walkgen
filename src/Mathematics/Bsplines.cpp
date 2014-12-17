@@ -316,7 +316,7 @@ double FootBSplines::FootComputePosition(double t)
     if (t<=m_FT)
         return ComputeBsplines(t).y;
     else
-        return m_FP;
+        return ComputeBsplines(m_FT).y;
 }
 
 double FootBSplines::FootComputeVelocity(double t)

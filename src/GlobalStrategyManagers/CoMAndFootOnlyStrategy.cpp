@@ -165,6 +165,10 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
 
   //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in   CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
 
+//  cout << "com = " << aStartingCOMState  << endl ;
+//  cout << "zmp = " << aStartingZMPPosition  << endl ;
+//  cout << "lf = " << InitLeftFootPosition  << endl ;
+//  cout << "rf = " << InitRightFootPosition  << endl ;
   return 0;
 }
 

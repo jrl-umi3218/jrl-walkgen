@@ -525,6 +525,33 @@ computing the analytical trajectories. */
                                                        FootAbsolutePosition & InitLeftFootAbsolutePosition,
                                                        FootAbsolutePosition & InitRightFootAbsolutePosition)
   {
+    // INITIALIZE FEET POSITIONS:
+    // --------------------------
+    vector3d lAnklePositionRight,lAnklePositionLeft;
+    CjrlFoot *LeftFoot, *RightFoot;
+    LeftFoot = m_HS->leftFoot();
+    if (LeftFoot==0)
+      LTHROW("No left foot");
+
+    RightFoot = m_HS->rightFoot();
+    if (RightFoot==0)
+      LTHROW("No right foot");
+
+    LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
+    RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
+
+    MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
+    m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
+
+    InitLeftFootAbsolutePosition.x +=  lAnklePositionLeft(0)  + CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
+    InitLeftFootAbsolutePosition.y +=  lAnklePositionLeft(1)  + CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
+    InitLeftFootAbsolutePosition.z +=  lAnklePositionLeft(2)  + CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
+    InitRightFootAbsolutePosition.x += lAnklePositionRight(0) + CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
+    InitRightFootAbsolutePosition.y += lAnklePositionRight(1) + CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
+    InitRightFootAbsolutePosition.z += lAnklePositionRight(2) + CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
+
+
+
     m_RelativeFootPositions = RelativeFootPositions;
     /* This part computes the CoM and ZMP trajectory giving the foot position information.
        It also creates the analytical feet trajectories.
@@ -2437,6 +2464,15 @@ new step has to be generate.
     double down = 0.5, downRight =0.9, downLeft = 0.0;
     double down_a=0.0, down_b=0.0;
 
+    // m_AbsoluteSupportFootPositions[Index].z, the z axis is expressed in the waist frame
+    // we choose the left one by default, the foot are supposed to be symetrical
+    // we use it pass the ankle position to the fot position
+    CjrlFoot *aFoot = m_HS->leftFoot() ;
+    if (aFoot==0)
+      LTHROW("No foot");
+    vector3d leftAnklePosition ;
+    aFoot->getAnklePositionInLocalFrame(leftAnklePosition);
+
     if (t>moving_time){ // we start analyze since 2nd step
 
       Index = int(t/moving_time);
@@ -2537,12 +2573,13 @@ new step has to be generate.
             CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z ;
         }
         else // normal walking
-          // m_AbsoluteSupportFootPositions[Index].z seems to be expressed in the waist frame
-          CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z;
+          {
+            CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z - leftAnklePosition(2);
+          }
       }
 
       else //after final step
-        CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z;
+        CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - leftAnklePosition(2) ;
     }
     else //first step
       CoMz = m_InitialPoseCoMHeight ;
