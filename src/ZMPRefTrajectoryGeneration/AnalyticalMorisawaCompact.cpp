@@ -2537,6 +2537,7 @@ new step has to be generate.
             CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z ;
         }
         else // normal walking
+          // m_AbsoluteSupportFootPositions[Index].z seems to be expressed in the waist frame
           CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z;
       }
 
