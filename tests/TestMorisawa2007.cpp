@@ -39,7 +39,8 @@ enum Profiles_t {
   PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING, // 2
   PROFIL_ANALYTICAL_CLIMBING_STAIRS,        // 3
   PROFIL_ANALYTICAL_GOING_DOWN_STAIRS,       // 4
-  PROFIL_ANALYTICAL_STEPPING_STONES       // 5
+  PROFIL_ANALYTICAL_STEPPING_STONES,         // 5
+  PROFIL_ANALYTICAL_WALKING_ON_BEAM         // 6
 };
 
 #define NBOFPREDEFONLINEFOOTSTEPS 11
@@ -151,11 +152,13 @@ public:
 						       m_CurrentAcceleration,
 						       m_OneStep.ZMPTarget);
 	      }
-
+        // Number of iterations
 	    m_OneStep.NbOfIt++;
 
+        // Check time of one iteration
 	    m_clock.stopOneIteration();
 
+        // Save the current state to have it as previous one in the next iteration
 	    m_PreviousConfiguration = m_CurrentConfiguration;
 	    m_PreviousVelocity = m_CurrentVelocity;
 	    m_PreviousAcceleration = m_CurrentAcceleration;
@@ -641,6 +644,45 @@ protected:
     }
 
   }
+
+
+
+ // Define here the function to Generate Walking on Beam motion
+ void AnalyticalWalkingOnBeam(PatternGeneratorInterface &aPGI)
+  {
+    CommonInitialization(aPGI);
+    {
+      istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":singlesupporttime 1.4");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":doublesupporttime 0.2");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
+                                        0.25 0.19 0.05 0.0\
+                                        0.2 -0.19 0.05 0.0\
+                                        0.25 0.19 0.05 0.0\
+                                        0.2 -0.19 0.05 0.0\
+                                        0.2 0.19 0.0 0.0\
+                                        0.2 -0.19 -0.05 0.0\
+                                        0.2 0.19 -0.05 0.0\
+                                        0.2 -0.19 -0.05 0.0\
+                                        0.2 0.19 0.0 0.0\
+                                        0.0 -0.19 0.0 0.0");
+
+      aPGI.ParseCmd(strm2);
+    }
+  }
+
   void chooseTestProfile()
   {
 
@@ -665,6 +707,12 @@ protected:
       case PROFIL_ANALYTICAL_ONLINE_WALKING:
 	StartAnalyticalOnLineWalking(*m_PGI);
 	break;
+
+    case PROFIL_ANALYTICAL_WALKING_ON_BEAM:
+    AnalyticalWalkingOnBeam(*m_PGI);
+    break;
+
+
       default:
 	throw("No correct test profile");
 	break;
@@ -681,6 +729,11 @@ protected:
       return;
     if (m_TestProfile==PROFIL_ANALYTICAL_STEPPING_STONES)
       return;
+    if (m_TestProfile==PROFIL_ANALYTICAL_WALKING_ON_BEAM)
+      return;
+
+
+
 
 
 
@@ -758,11 +811,13 @@ int PerformTests(int argc, char *argv[])
   std::string CompleteName = string(argv[0]);
   unsigned found = CompleteName.find_last_of("/\\");
   std::string TestName =  CompleteName.substr(found+1);
-  int TestProfiles[5] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
+  int TestProfiles[6] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
 			  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,
 			  PROFIL_ANALYTICAL_CLIMBING_STAIRS,
 			  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS,
-                          PROFIL_ANALYTICAL_STEPPING_STONES};
+                          PROFIL_ANALYTICAL_STEPPING_STONES,
+                          PROFIL_ANALYTICAL_WALKING_ON_BEAM
+              };
   int indexProfile=-1;
 
   if (TestName.compare(16,6,"OnLine")==0)
@@ -775,6 +830,8 @@ int PerformTests(int argc, char *argv[])
     indexProfile=3;
   if (TestName.compare(16,14,"SteppingStones")==0)
     indexProfile=4;
+  if (TestName.compare(16,13,"WalkingOnBeam")==0)
+    indexProfile=5;
 
   if (indexProfile==-1)
     {

@@ -130,7 +130,7 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
   double deltaj = t - m_AbsoluteTimeReference - m_RefTime[IndexInterval];
   ODEBUG("IndexInterval : " << IndexInterval );
 
-  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAll(aFootAbsolutePosition,deltaj);
+  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
   aFootAbsolutePosition.stepType = m_NatureOfIntervals[IndexInterval];
 
  /*   ofstream aof;
@@ -166,7 +166,8 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
 
 	  if (m_SetOfFootTrajectoryGenerationObjects[j]!=0)
 	    {
-	      m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAll(aFootAbsolutePosition,deltaj);
+          m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
+
 	      aFootAbsolutePosition.stepType = m_NatureOfIntervals[j];
 	    }
 	  ODEBUG("t: " << t << " reftime :" << setprecision(12) << reftime <<

@@ -79,7 +79,7 @@ namespace PatternGeneratorJRL
     };
 
    /// Bsplines used for Z trajectory of stair steps
-  class ZBsplines : public Bsplines
+  class FootBSplines : public Bsplines
   {
       public:
       /** Constructor:
@@ -87,19 +87,19 @@ namespace PatternGeneratorJRL
        FP: Final position
        ToMP : Time of Max Position
        MP : Max Position */
-      ZBsplines( double FT, double FP, double ToMP, double MP);
+      FootBSplines( double FT, double FP, double ToMP, double MP);
 
       /*!Compute Position at time t */
-      double ZComputePosition(double t);
+      double FootComputePosition(double t);
 
         /*!Compute Velocity at time t */
-      double ZComputeVelocity(double t);
+      double FootComputeVelocity(double t);
 
         /*!Compute Acceleration at time t */
-      double ZComputeAcc(double t);
+      double FootComputeAcc(double t);
 
       /** Detructor **/
-      ~ZBsplines();
+      ~FootBSplines();
 
       /*!  Set the parameters
 	  This method assumes implicitly a initial position
@@ -129,9 +129,9 @@ namespace PatternGeneratorJRL
       {0.85*m_FT,m_FP},
       {0.9*m_FT,m_FP},
       {m_FT,m_FP}*/
-      void ZGenerateControlPoints(double IP,double FT, double FP, double ToMP, double MP);
+      void FootGenerateControlPoints(double IP,double FT, double FP, double ToMP, double MP);
 
-      void ZGenerateKnotVector(double FT, double ToMP);
+      void  FootGenerateKnotVector(double FT, double ToMP);
 
       double GetMP();
 
@@ -140,6 +140,7 @@ namespace PatternGeneratorJRL
       private:
       double m_IP, m_FT, m_FP, m_ToMP, m_MP;
   };
+
 
 }
 #endif /* _BSPLINES_H_*/

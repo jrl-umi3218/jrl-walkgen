@@ -170,8 +170,13 @@ namespace PatternGeneratorJRL
        double FinalPosition, double InitPosition, double InitSpeed, double InitAcc=0.0, double InitJerk=0.0);
 
    /*! Fill an absolute foot position structure for a given time. */
-   double ComputeAll(FootAbsolutePosition & aFootAbsolutePosition,
+   // Using Polynoms
+   double ComputeAllWithPolynom(FootAbsolutePosition & aFootAbsolutePosition,
 		     double Time);
+
+   // Using BSplines
+   double ComputeAllWithBSplines(FootAbsolutePosition & aFootAbsolutePosition,
+                                 double Time);
 
    /*! Compute the value for a given polynome. */
    double Compute(unsigned int PolynomeIndex, double Time);
@@ -211,7 +216,10 @@ namespace PatternGeneratorJRL
    Polynome6 *m_PolynomeZ;
 
    /*! \brief Bsplines for Z axis position. */
-   ZBsplines *m_BsplinesZ;
+   FootBSplines *m_BsplinesZ;
+
+   /** Definition of BSplines X Y*/
+   FootBSplines *m_BsplinesX, *m_BsplinesY;
 
   // int m_isStepStairOn;
 
