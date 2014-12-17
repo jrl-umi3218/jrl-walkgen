@@ -250,7 +250,6 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
         }
       else if (FinalPosition - InitPosition <= epsilon && FinalPosition - InitPosition >= -epsilon )
         {
-          cout << InitPosition << " " << FinalPosition << " " << MiddlePos << endl;
           m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,FinalPosition+MiddlePos);
         }
       else if (FinalPosition - InitPosition < -epsilon )
