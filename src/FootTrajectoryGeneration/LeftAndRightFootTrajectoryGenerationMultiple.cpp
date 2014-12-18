@@ -486,11 +486,11 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
           double leftMidPos(0.0), rightMidPos(0.0) ;
           if (SupportFoot==1)
             {
-              leftMidPos = m_StepHeight ;
+              rightMidPos = m_StepHeight ;
             }
           else
             {
-              rightMidPos = m_StepHeight ;
+              leftMidPos = m_StepHeight ;
             }
           /* Initialize properly the interval in single support phase */
           ODEBUG("Single support phase");

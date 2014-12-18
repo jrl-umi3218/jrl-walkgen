@@ -246,7 +246,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
       // Check the final and the initial position to decide what to do
       if (FinalPosition - InitPosition > epsilon )
         {
-          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.3*TimeInterval,FinalPosition+m_StepHeight);
+          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.3*TimeInterval,FinalPosition+MiddlePos);
         }
       else if (FinalPosition - InitPosition <= epsilon && FinalPosition - InitPosition >= -epsilon )
         {
@@ -254,7 +254,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
         }
       else if (FinalPosition - InitPosition < -epsilon )
         {
-          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.6*TimeInterval,InitPosition+m_StepHeight/3.0);
+          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.6*TimeInterval,InitPosition+MiddlePos/3.0);
         }
 
       break;
