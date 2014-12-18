@@ -809,39 +809,32 @@ protected:
 
  // Define here the function to Generate Walking on Beam motion
  void AnalyticalWalkingOnBeam(PatternGeneratorInterface &aPGI)
-  {
-    CommonInitialization(aPGI);
-    {
-      istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
-      aPGI.ParseCmd(strm2);
-    }
+ {
+   CommonInitialization(aPGI);
+   {
+     istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
+     aPGI.ParseCmd(strm2);
+   }
+   {
+       istringstream strm2(":stepstairseq\
+                           0.0 -0.105 0.0 0.0\
+                           0.2 0.19 0.0 0.0\
+                           0.2 -0.19 0.0 0.0\
+                           0.2 0.19 0.0 0.0\
+                           0.2 -0.19 0.0 0.0\
+                           0.2 0.19 0.0 0.0\
+                           0.2 -0.19 0.0 0.0\
+                           0.2 0.19 0.0 0.0\
+                           0.2 -0.19 0.0 0.0\
+                           0.2 0.19 0.0 0.0\
+                           0.2 -0.19 0.0 0.0\
+                           0.0 0.19 0.0 0.0\
+                           ");
+     aPGI.ParseCmd(strm2);
+   }
+ }
 
-    {
-      istringstream strm2(":singlesupporttime 1.4");
-      aPGI.ParseCmd(strm2);
-    }
 
-    {
-      istringstream strm2(":doublesupporttime 0.2");
-      aPGI.ParseCmd(strm2);
-    }
-
-    {
-      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
-                                        0.25 0.19 0.05 0.0\
-                                        0.2 -0.19 0.05 0.0\
-                                        0.25 0.19 0.05 0.0\
-                                        0.2 -0.19 0.05 0.0\
-                                        0.2 0.19 0.0 0.0\
-                                        0.2 -0.19 -0.05 0.0\
-                                        0.2 0.19 -0.05 0.0\
-                                        0.2 -0.19 -0.05 0.0\
-                                        0.2 0.19 0.0 0.0\
-                                        0.0 -0.19 0.0 0.0");
-
-      aPGI.ParseCmd(strm2);
-    }
-  }
 
   void chooseTestProfile()
   {

@@ -144,6 +144,26 @@ namespace PatternGeneratorJRL
 					 double InitPosition,
 					 double InitSpeed);
 
+   /*! Overloading -- BSPlines Init Function
+    This method specifies the parameters for each of the Bsplines used by this object
+     @param PolynomeIndex: Set to which axis the parameters will be applied.
+     @param AxisReference: Index to the axis to be used.
+     @param TimeInterval: Set the time base of the polynome.
+     @param FinalTime: The final time of the BSpline
+     @param FinalPosition: Set the final position of the spline at FinalTime.
+     @param TimeMaxPosition: Set when the spline reaches the highest value.
+     @param MaxPosition: Max value of the function.
+   */
+
+   int SetParametersWithInitPosInitSpeed(int AxisReference,
+                                       double TimeInterval,
+                                       double FinalTime,
+                                       double FinalPosition,
+                                       double TimeMaxPosition,
+                                       double MaxPosition,
+                                       double InitSpeed,
+                                       double InitPosition);
+
    /*! This method get the parameters for each of the polynome used by this
      object. In this case, as it is used for the 3rd order polynome. The polynome to
      which those parameters are set is specified with PolynomeIndex.
@@ -158,6 +178,9 @@ namespace PatternGeneratorJRL
 					 double &FinalPosition,
 					 double &InitPosition,
 					 double &InitSpeed);
+
+
+
    /// \brief Set parameters considering initial position, speed, acceleration.
    ///
    /// \param[in] PolynomeIndex
@@ -219,7 +242,8 @@ namespace PatternGeneratorJRL
    FootBSplines *m_BsplinesZ;
 
    /** Definition of BSplines X Y*/
-   FootBSplines *m_BsplinesX, *m_BsplinesY;
+   FootBSplines *m_BsplinesX;
+   FootBSplines *m_BsplinesY;
 
   // int m_isStepStairOn;
 
@@ -231,6 +255,7 @@ namespace PatternGeneratorJRL
 
    /*! \brief Position of the ankle in the right foot. */
    MAL_S3_VECTOR(m_AnklePositionRight,double);
+
 
   };
 

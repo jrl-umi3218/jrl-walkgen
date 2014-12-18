@@ -43,6 +43,9 @@ FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginM
   m_isStepStairOn = 1;
   m_StepHeight = 0.07;
 
+  // Define here the curving during the Step (ray defined along Y axis)
+  m_StepCurving = 0.2;
+
 
   std::string aMethodName[5] =
     {":omega",
@@ -94,7 +97,7 @@ void FootTrajectoryGenerationAbstract::UpdateFootPosition(std::deque<FootAbsolut
 							  int , //IndexInitial,
 							  double , //ModulatedSingleSupportTime,
 							  int , //StepType,
-							  int ) //LeftOrRight)
+                              int ) //LeftOrRight)
 {
   LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-1: To be implemented ");
 }

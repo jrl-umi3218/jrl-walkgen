@@ -124,20 +124,68 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
   aFTGM->SetNatureInterval(IntervalIndex,FootFinalPosition.stepType);
 
 
-  // Y axis.
-  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
-					   FootTrajectoryGenerationStandard::Y_AXIS,
-					   m_DeltaTj[IntervalIndex],
-					   FootFinalPosition.y,
-					   FootInitialPosition.y,
-					   FootInitialPosition.dy);
+  // Here it is introduced the check to see if the previous step and the next one
+  // are really close along Y axis. If they are, then the robot is walking "on beam" or similar
+/*
+  std::cout << "Time Interval: " << IntervalIndex << std::endl
+            << "FootInitialPosition.x " << FootInitialPosition.x << " - " << FootFinalPosition.x << std::endl
+            << "FootInitialPosition.y " << FootInitialPosition.y << " - " << FootFinalPosition.y << std::endl
+            << "FootInitialPosition.z " << FootInitialPosition.z << " - " << FootFinalPosition.z << std::endl
+            << " --------------------------------------- " << std::endl;
+*/
+
+
+      aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+                          FootTrajectoryGenerationStandard::Y_AXIS,
+                          m_DeltaTj[IntervalIndex],
+                          FootFinalPosition.y,
+                          FootInitialPosition.y,
+                          FootInitialPosition.dy);
+
+
+     aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+                              FootTrajectoryGenerationStandard::Z_AXIS,
+                              m_DeltaTj[IntervalIndex],
+                              FootFinalPosition.z,
+                              FootInitialPosition.z,
+                              FootInitialPosition.dz);
+
+/*   TEST: OVERLOADING OF FUNCTION -- NOT WORKING ---
+     aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+                                         FootTrajectoryGenerationStandard::Y_AXIS,
+                                         m_DeltaTj[IntervalIndex],
+                                         m_DeltaTj[IntervalIndex],
+                                         FootFinalPosition.y,
+                                         m_DeltaTj[IntervalIndex],
+                                         FootFinalPosition.y,
+                                         FootInitialPosition.dy,
+                                         FootInitialPosition.y);
+
+     aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+                                         FootTrajectoryGenerationStandard::Z_AXIS,
+                                         m_DeltaTj[IntervalIndex],
+                                         m_DeltaTj[IntervalIndex],
+                                         FootFinalPosition.z,
+                                         m_DeltaTj[IntervalIndex],
+                                         FootFinalPosition.z,
+                                         FootInitialPosition.dz,
+                                         FootInitialPosition.z);
+                                         */
+
 
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
-                           FootTrajectoryGenerationStandard::Z_AXIS,
-                           m_DeltaTj[IntervalIndex],
-                           FootFinalPosition.z,
-                           FootInitialPosition.z,
-                           FootInitialPosition.dz);
+                      FootTrajectoryGenerationStandard::Y_AXIS,
+                      m_DeltaTj[IntervalIndex],
+                      FootFinalPosition.y,
+                      FootInitialPosition.y,
+                      FootInitialPosition.dy);
+
+ aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+                          FootTrajectoryGenerationStandard::Z_AXIS,
+                          m_DeltaTj[IntervalIndex],
+                          FootFinalPosition.z,
+                          FootInitialPosition.z,
+                          FootInitialPosition.dz);
 
   // THETA
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
@@ -1260,6 +1308,8 @@ bool LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition
 
   if (LeftOrRight==1)
     {
+      /*! Left or Right Foot Step - 0: Left Foot; 1: Right Foot*/
+      //aFAP.LeftOrRightFoot = 0; // Left Foot
       bool r = m_LeftFootTrajectory->Compute(time,aFAP);
       if (!r)
 	{ODEBUG3("Unable to compute left foot abs pos at time " <<time);
@@ -1269,6 +1319,8 @@ bool LeftAndRightFootTrajectoryGenerationMultiple::ComputeAnAbsoluteFootPosition
     }
   else
     {
+      /*! Left or Right Foot Step - 0: Left Foot; 1: Right Foot*/
+      //aFAP.LeftOrRightFoot = 1; // Right Foot
       bool r = m_RightFootTrajectory->Compute(time,aFAP);
       if (!r)
 	{ODEBUG3("Unable to compute right foot abs pos at time " <<time);
@@ -1347,6 +1399,16 @@ double LeftAndRightFootTrajectoryGenerationMultiple::GetStepHeight() const
   return m_StepHeight;
 }
 
+void LeftAndRightFootTrajectoryGenerationMultiple::SetStepCurving(double aStepCurving)
+{
+  m_StepCurving = aStepCurving;
+}
+
+double LeftAndRightFootTrajectoryGenerationMultiple::GetStepCurving() const
+{
+  return m_StepCurving;
+}
+
 double LeftAndRightFootTrajectoryGenerationMultiple::GetAbsoluteTimeReference() const
 {
   double res=0.0;
@@ -1381,6 +1443,7 @@ LeftAndRightFootTrajectoryGenerationMultiple::operator=
 
   SetAbsoluteTimeReference(aLRFTGM.GetAbsoluteTimeReference());
   SetStepHeight(aLRFTGM.GetStepHeight());
+  SetStepCurving(aLRFTGM.GetStepCurving());
   aLRFTGM.GetDeltaTj(m_DeltaTj);
 
   *m_LeftFootTrajectory = *(aLRFTGM.getLeftFootTrajectory());

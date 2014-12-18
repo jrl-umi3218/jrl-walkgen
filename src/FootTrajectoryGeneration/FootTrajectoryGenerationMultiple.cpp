@@ -130,7 +130,14 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
   double deltaj = t - m_AbsoluteTimeReference - m_RefTime[IndexInterval];
   ODEBUG("IndexInterval : " << IndexInterval );
 
-  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
+
+  // Use polynoms
+  //m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
+
+  // Use BSplines
+  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithBSplines(aFootAbsolutePosition,deltaj);
+
+
   aFootAbsolutePosition.stepType = m_NatureOfIntervals[IndexInterval];
 
  /*   ofstream aof;
@@ -166,8 +173,8 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
 
 	  if (m_SetOfFootTrajectoryGenerationObjects[j]!=0)
 	    {
-          m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
-
+          //m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
+          m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAllWithBSplines(aFootAbsolutePosition,deltaj);
 	      aFootAbsolutePosition.stepType = m_NatureOfIntervals[j];
 	    }
 	  ODEBUG("t: " << t << " reftime :" << setprecision(12) << reftime <<
@@ -235,6 +242,7 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 									double InitPosition,
 									double InitSpeed)
 {
+  //std::cout << "Entro Pol " << std::endl;
   if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
     return -1;
 
@@ -245,6 +253,40 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 											  InitSpeed);
   return 0;
 }
+
+/*! Overloading -- BSPlines Init Function
+  This method specifies the parameters for each of the Bsplines used by this object.
+  @param TimeInterval: Set the time base of the polynome.
+  @param FinalTime: The final time of the BSpline
+  @param FinalPosition: Set the final position of the spline at FinalTime.
+  @param TimeMaxPosition: Set when the spline reaches the highest value.
+  @param MaxPosition: Max value of the function.
+*/
+
+int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned int IntervalIndex,
+                                    int AxisReference,
+                                    double TimeInterval,
+                                    double FinalTime,
+                                    double FinalPosition,
+                                    double TimeMaxPosition,
+                                    double MaxPosition,
+                                    double InitSpeed,
+                                    double InitPosition)
+{
+  if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
+    return -1;
+
+  m_SetOfFootTrajectoryGenerationObjects[IntervalIndex]->SetParametersWithInitPosInitSpeed(AxisReference,
+                                              TimeInterval,
+                                              FinalTime,
+                                              FinalPosition,
+                                              TimeMaxPosition,
+                                              MaxPosition,
+                                              InitSpeed,
+                                              InitPosition);
+  return 0;
+}
+
 
 /*! This method specifies the parameters for each of the polynome used by this
   object. In this case, as it is used for the 3rd order polynome. The polynome to

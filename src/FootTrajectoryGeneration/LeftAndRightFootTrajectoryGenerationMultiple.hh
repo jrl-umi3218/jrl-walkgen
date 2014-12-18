@@ -203,6 +203,9 @@ namespace PatternGeneratorJRL
       /*! Step height. */
       double m_StepHeight;
 
+      /*! Step Curving */
+      double m_StepCurving;
+
       /*! Single support time. */
       double m_SingleSupportTime;
 
@@ -224,6 +227,12 @@ namespace PatternGeneratorJRL
 
       /*! Get the step height. */
       double GetStepHeight() const;
+
+      /*! Set the curving step */
+      void SetStepCurving(double aStepCurving);
+
+      /*! Get the curving step */
+      double GetStepCurving() const;
 
       /*! \name Methods related to the time reference.
 	@{ */

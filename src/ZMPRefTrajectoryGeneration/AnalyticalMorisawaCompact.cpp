@@ -2403,15 +2403,15 @@ new step has to be generate.
       aCOMPos.yaw[1] = 0.5*(LeftFootAbsPos.dtheta + RightFootAbsPos.dtheta);
       aCOMPos.yaw[2] = 0.5*(LeftFootAbsPos.ddtheta + RightFootAbsPos.ddtheta);
 
-      ComputeCoMz(t,aCOMPos.z[0]);
-      if(t==0.0)
-      {
-        aCOMPos.z[1] = 0.0;
-      }else{
-        aCOMPos.z[1] = (aCOMPos.z[0] - preCoMz) / m_SamplingPeriod;
-      }
+//      ComputeCoMz(t,aCOMPos.z[0]);
+//      if(t==0.0)
+//      {
+//        aCOMPos.z[1] = 0.0;
+//      }else{
+//        aCOMPos.z[1] = (aCOMPos.z[0] - preCoMz) / m_SamplingPeriod;
+//      }
 
-      preCoMz = aCOMPos.z[0];
+//      preCoMz = aCOMPos.z[0];
 
       FinalCoMPositions.push_back(aCOMPos);
       ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " <<

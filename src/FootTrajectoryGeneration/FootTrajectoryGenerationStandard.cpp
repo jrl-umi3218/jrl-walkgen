@@ -176,6 +176,7 @@ void FootTrajectoryGenerationStandard::FreeInternalDataStructures()
 
 }
 
+// Initizialize the parameter to use Polynoms
 int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex,
                                                     double TimeInterval,
                                                     double Position)
@@ -185,17 +186,14 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex,
 
    case X_AXIS:
      m_PolynomeX->SetParameters(TimeInterval,Position);
-     //m_BsplinesX->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position + m_StepHeight);
      break;
 
    case Y_AXIS:
      m_PolynomeY->SetParameters(TimeInterval,Position);
-     //-m_BsplinesY->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position + m_StepHeight);
      break;
 
    case Z_AXIS:
      m_PolynomeZ->SetParameters(TimeInterval,Position+m_StepHeight,Position);
-     m_BsplinesZ->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position + m_StepHeight);
      break;
 
    case THETA_AXIS:
@@ -217,6 +215,8 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex,
  return 0;
 }
 
+
+// Polynoms
 int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int PolynomeIndex,
 									double TimeInterval,
 									double FinalPosition,
@@ -229,10 +229,14 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
    case X_AXIS:
      ODEBUG2("Initspeed: " << InitSpeed << " ");
      m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
+
      break;
 
    case Y_AXIS:
      m_PolynomeY->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
+
+     // Some conditions here
+     m_BsplinesY->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,FinalPosition+m_StepCurving);
      break;
 
    case Z_AXIS:
@@ -270,6 +274,55 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
    }
  return 0;
 }
+
+
+// BSplines
+int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int AxisReference,
+                                    double TimeInterval,
+                                    double FinalTime,
+                                    double FinalPosition,
+                                    double TimeMaxPosition,
+                                    double MaxPosition,
+                                    double InitSpeed,
+                                    double InitPosition)
+{
+
+ switch (AxisReference)
+   {
+   case X_AXIS:
+     ODEBUG2("Initspeed: " << InitSpeed << " ");
+     m_BsplinesX->SetParameters(FinalTime, FinalPosition, TimeMaxPosition, MaxPosition);
+     break;
+
+   case Y_AXIS:
+     m_BsplinesY->SetParameters(FinalTime, FinalPosition, TimeMaxPosition, MaxPosition);
+     break;
+
+   case Z_AXIS:
+
+     m_BsplinesZ->SetParameters(FinalTime, FinalPosition, TimeMaxPosition, MaxPosition);
+
+     break;
+
+   case THETA_AXIS:
+     m_PolynomeTheta->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   case OMEGA_AXIS:
+     m_PolynomeOmega->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   case OMEGA2_AXIS:
+     m_PolynomeOmega2->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+     break;
+
+   default:
+     return -1;
+     break;
+   }
+ return 0;
+}
+
 
 int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double TimeInterval,
     double FinalPosition, double InitPosition, double InitSpeed, double InitAcc, double InitJerk)
@@ -322,6 +375,7 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
    }
  return 0;
 }
+
 
 int FootTrajectoryGenerationStandard::GetParametersWithInitPosInitSpeed(int PolynomeIndex,
 									double &TimeInterval,
@@ -414,27 +468,32 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
                             double Time)
 {
 
-    /** Define Here the BSplines
+    /** Using B-Splines
+    */
 
-      */
-    std::cout << "------------ Using B-Splines ---------" << std::endl;
+
+
+  m_BsplinesY->PrintDegree();
+  m_BsplinesY->PrintControlPoints();
+  m_BsplinesY->PrintKnotVector();
 
   // Trajectory of the foot compute in the X domain (plane X of t)
-  aFootAbsolutePosition.x = m_BsplinesX->FootComputePosition(Time);
-  aFootAbsolutePosition.dx = m_BsplinesX->FootComputeVelocity(Time);
-  aFootAbsolutePosition.ddx = m_BsplinesX->FootComputeAcc(Time);
+  aFootAbsolutePosition.x = m_PolynomeX->Compute(Time);
+  aFootAbsolutePosition.dx = m_PolynomeX->ComputeDerivative(Time);
+  aFootAbsolutePosition.ddx = m_PolynomeX->ComputeSecDerivative(Time);
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.x);
+
+
 
   // Trajectory of the foot compute in the Y domain (plane Y of t)
   aFootAbsolutePosition.y = m_BsplinesY->FootComputePosition(Time);
   aFootAbsolutePosition.dy = m_BsplinesY->FootComputeVelocity(Time);
-  aFootAbsolutePosition.ddy = m_BsplinesY->FootComputeAcc(Time);
+
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.y);
 
   // Trajectory of the foot compute in the Z domain (plane Z of t)
-  //aFootAbsolutePosition.z = m_BsplinesZ->FootComputePosition(Time);
-  //aFootAbsolutePosition.dz = m_BsplinesZ->FootComputeVelocity(Time);
-  //aFootAbsolutePosition.ddz = m_BsplinesZ->FootComputeAcc(Time);
+  aFootAbsolutePosition.z = m_BsplinesZ->FootComputePosition(Time);
+  aFootAbsolutePosition.dz = m_BsplinesZ->FootComputeVelocity(Time);
 
 
   aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(Time);
@@ -542,6 +601,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 							  int StepType,
 							  int /* LeftOrRight */)
 {
+
   unsigned int k = CurrentAbsoluteIndex - IndexInitial;
   // Local time
   double LocalTime = k*m_SamplingPeriod;
