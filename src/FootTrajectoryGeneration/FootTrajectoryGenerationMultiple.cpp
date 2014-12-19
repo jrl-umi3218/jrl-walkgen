@@ -241,7 +241,7 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 									double FinalPosition,
 									double InitPosition,
 									double InitSpeed,
-									double middlePos
+                                    vector<double> middlePos
 									)
 {
   //std::cout << "Entro Pol " << std::endl;
@@ -253,7 +253,7 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 											  FinalPosition,
 											  InitPosition,
 											  InitSpeed,
-											  middlePos);
+                                              middlePos);
   return 0;
 }
 

@@ -329,14 +329,14 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
 	  SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
 			LeftFootTmpInitPos,
-			LeftFootTmpInitPos,0.0);
+                    LeftFootTmpInitPos,vector<double>(3,0.0));
 
 	 /// RightFootTmpInitPos.z = CurrentSupportFootPosition(2,2);
 	  RightFootTmpInitPos.dz = 0;
 	  RightFootTmpInitPos.stepType=9;
 	  SetAnInterval(IntervalIndex,m_RightFootTrajectory,
 			RightFootTmpInitPos,
-			RightFootTmpInitPos,0.0);
+            RightFootTmpInitPos,vector<double>(3,0.0));
 	  ODEBUG("LeftFootTmpInitPos.stepType="<<LeftFootTmpInitPos.stepType);
 	  ODEBUG("RightFootTmpInitPos.stepType="<<RightFootTmpInitPos.stepType);
 	  ODEBUG("End of Double support phase");
@@ -533,21 +533,24 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
           if (SupportFoot==1)
             {
-              // Y offset
-              rightMidPos[1] = m_StepCurving;
-
+              // X offset to curve the step
+              rightMidPos[0] = m_MiddleWayPoint[0];
+              // Y offset to curve the step
+              rightMidPos[1] = m_MiddleWayPoint[1];
               // Z offset
               rightMidPos[2] = m_StepHeight ;
 
             }
           else
             {
-              // Y offset
-              leftMidPos[1] = m_StepCurving;
-
+              // X offset to curve the step
+              leftMidPos[0] = m_MiddleWayPoint[0];
+              // Y offset to curve the step
+              leftMidPos[1] = m_MiddleWayPoint[1];
               // Z offset
               leftMidPos[2] = m_StepHeight ;
             }
+
           /* Initialize properly the interval in single support phase */
           ODEBUG("Single support phase");
           ODEBUG("LeftFootTmpInitPos.stepType="<<LeftFootTmpInitPos.stepType);
@@ -576,7 +579,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  ODEBUG("End of Single support phase");
 	  SetAnInterval(IntervalIndex,m_RightFootTrajectory,
 			RightFootTmpInitPos,
-			RightFootTmpFinalPos,rightMidPos);
+            RightFootTmpFinalPos,rightMidPos);
     //  cout << RightFootTmpFinalPos.z << endl;
         if (SupportFoot==1)
             RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);

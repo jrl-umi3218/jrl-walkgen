@@ -225,15 +225,24 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
 									double FinalPosition,
 									double InitPosition,
 									double InitSpeed,
-									double MiddlePos)
+                                    vector<double> MiddlePos)
 {
   double epsilon = 0.0001;
+  double MaxPosition_x = MiddlePos[0];
+  double MaxPosition_y = MiddlePos[1];
+  double MaxPosition_z = MiddlePos[2];
+
   switch (PolynomeIndex)
     {
 
     case X_AXIS:
       ODEBUG2("Initspeed: " << InitSpeed << " ");
+      // Init polynom
       m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
+      // Init BSpline
+
+      /**                                       ID        Final Time | Final Position | Time Max Value | Max Value             */
+      m_BsplinesX->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.3*TimeInterval,FinalPosition+MaxPosition_x);
       break;
 
     case Y_AXIS:
@@ -249,15 +258,15 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
       // Check the final and the initial position to decide what to do
       if (FinalPosition - InitPosition > epsilon )
         {
-          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.3*TimeInterval,FinalPosition+MiddlePos);
+          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.3*TimeInterval,FinalPosition+MaxPosition_z);
         }
       else if (FinalPosition - InitPosition <= epsilon && FinalPosition - InitPosition >= -epsilon )
         {
-          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,FinalPosition+MiddlePos);
+          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,FinalPosition+MaxPosition_z);
         }
       else if (FinalPosition - InitPosition < -epsilon )
         {
-          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.6*TimeInterval,InitPosition+MiddlePos/3.0);
+          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.6*TimeInterval,InitPosition+MaxPosition_z/3.0);
         }
 
       break;
