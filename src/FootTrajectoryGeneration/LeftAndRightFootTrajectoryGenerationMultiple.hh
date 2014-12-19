@@ -201,6 +201,9 @@ namespace PatternGeneratorJRL
       /*! Step Curving */
       double m_StepCurving;
 
+      /*! Middle Way Point of foot trajectories */
+      MAL_VECTOR(m_MiddleWayPoint, double) ;
+
       /*! Single support time. */
       double m_SingleSupportTime;
 
