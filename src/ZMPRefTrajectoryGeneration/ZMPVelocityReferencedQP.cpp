@@ -78,11 +78,11 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   QP_T_ = 0.1 ;
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
-  InterpolationPeriod_ = QP_T_/10;
-  previewDuration_ = 0.6 ;
+  InterpolationPeriod_ = QP_T_/5;
+  previewDuration_ = 0.8 ;
   NbSampleControl_ = (int)round(QP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(QP_T_/InterpolationPeriod_) ;
-  previewSize_ = 6 ;
+  previewSize_ = 8 ;
   StepPeriod_ = 0.8 ;
   SSPeriod_ = 0.7 ;
   DSPeriod_ = 0.1 ;
@@ -592,17 +592,17 @@ void ZMPVelocityReferencedQP::OnLine(double time,
     if(filterOn_)
     {
       dynamicFilter_->OnLinefilter(time,
-                                   COMTraj_deq_,ZMPTraj_deq_,
+                                   COMTraj_deq_,ZMPTraj_deq_ctrl_,
                                    LeftFootTraj_deq_,
                                    RightFootTraj_deq_,
                                    deltaCOMTraj_deq_);
 
       #define DEBUG
       #ifdef DEBUG
-        dynamicFilter_->Debug(FinalCOMTraj_deq,
-                              FinalLeftFootTraj_deq,
-                              FinalRightFootTraj_deq,
-                              COMTraj_deq_,ZMPTraj_deq_,
+        dynamicFilter_->Debug(COMTraj_deq_ctrl_,
+                              LeftFootTraj_deq_ctrl_,
+                              RightFootTraj_deq_ctrl_,
+                              COMTraj_deq_,ZMPTraj_deq_ctrl_,
                               LeftFootTraj_deq_,
                               RightFootTraj_deq_,
                               deltaCOMTraj_deq_);
@@ -797,6 +797,10 @@ void ZMPVelocityReferencedQP::InterpretSolutionVector()
       FootPrw_vec[size_vec_sol-1][1] = CurrentSupport.Y - Sign*cos(FirstSupport.Yaw)*FeetDistance_;
     }
   }
+  for(unsigned int i = 0 ; i < SupportStates.size() ; ++i)
+    {
+      SupportStates[i].NbStepsLeft = 2 ;
+    }
   return ;
 }
 

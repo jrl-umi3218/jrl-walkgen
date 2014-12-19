@@ -127,8 +127,8 @@ public:
 
     bool doTest(ostream &os)
     {
-        metapod::bcalc<Robot_Model>::run(robot_,q_init_);
         metapod::jcalc<Robot_Model>::run(robot_,q_init_,Robot_Model::confVector::Zero());
+        metapod::bcalc<Robot_Model>::run(robot_,q_init_);
 
         ofstream aof;
         string aFileName;

@@ -240,7 +240,9 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 									double TimeInterval,
 									double FinalPosition,
 									double InitPosition,
-									double InitSpeed)
+									double InitSpeed,
+									double middlePos
+									)
 {
   //std::cout << "Entro Pol " << std::endl;
   if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
@@ -250,40 +252,8 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 											  TimeInterval,
 											  FinalPosition,
 											  InitPosition,
-											  InitSpeed);
-  return 0;
-}
-
-/*! Overloading -- BSPlines Init Function
-  This method specifies the parameters for each of the Bsplines used by this object.
-  @param TimeInterval: Set the time base of the polynome.
-  @param FinalTime: The final time of the BSpline
-  @param FinalPosition: Set the final position of the spline at FinalTime.
-  @param TimeMaxPosition: Set when the spline reaches the highest value.
-  @param MaxPosition: Max value of the function.
-*/
-
-int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned int IntervalIndex,
-                                    int AxisReference,
-                                    double TimeInterval,
-                                    double FinalTime,
-                                    double FinalPosition,
-                                    double TimeMaxPosition,
-                                    double MaxPosition,
-                                    double InitSpeed,
-                                    double InitPosition)
-{
-  if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
-    return -1;
-
-  m_SetOfFootTrajectoryGenerationObjects[IntervalIndex]->SetParametersWithInitPosInitSpeed(AxisReference,
-                                              TimeInterval,
-                                              FinalTime,
-                                              FinalPosition,
-                                              TimeMaxPosition,
-                                              MaxPosition,
-                                              InitSpeed,
-                                              InitPosition);
+											  InitSpeed,
+											  middlePos);
   return 0;
 }
 

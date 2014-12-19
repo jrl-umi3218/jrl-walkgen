@@ -271,6 +271,7 @@ namespace PatternGeneratorJRL
       /// from the inverse Dynamics, and the difference between
       /// this zmp and the reference one.
       deque< vector<double> > ZMPMB_vec_ ;
+      deque< vector<double> > zmpmb_i_ ;
       std::deque<ZMPPosition> deltaZMP_deq_ ;
 
     /// \brief Optimal Control variables

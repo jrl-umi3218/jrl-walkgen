@@ -92,12 +92,6 @@ namespace PatternGeneratorJRL
 	@param[in] IgnoreFirst: Ignore the first double support phase, should be true at beginning of stepping.
 	@param[in] Continuity: Should be true if more steps should be added, false to stop stepping.
       */
-      void InitializeFromRelativeSteps_backup(deque<RelativeFootPosition> &RelativeFootPositions,
-			    FootAbsolutePosition &LeftFootInitialPosition,
-			    FootAbsolutePosition &RightFootInitialPosition,
-			    deque<FootAbsolutePosition> &SupportFootAbsoluteFootPositions,
-			    bool IgnoreFirst, bool Continuity);
-
       void InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 				       FootAbsolutePosition &LeftFootInitialPosition,
 				       FootAbsolutePosition &RightFootInitialPosition,
@@ -176,9 +170,10 @@ namespace PatternGeneratorJRL
 
       /*! Internal method to modify the value of an interval. */
       void SetAnInterval(unsigned int IntervalIndex,
-			 FootTrajectoryGenerationMultiple * aFTGM,
-			 FootAbsolutePosition &FootInitialPosition,
-			 FootAbsolutePosition &FootFinalPosition);
+                         FootTrajectoryGenerationMultiple * aFTGM,
+                         FootAbsolutePosition &FootInitialPosition,
+                         FootAbsolutePosition &FootFinalPosition,
+                         double MiddlePos=0.0);
 
       /*! Left Foot Trajectory Generation object for several intervals. */
       FootTrajectoryGenerationMultiple * m_LeftFootTrajectory;

@@ -247,8 +247,8 @@ OnLineFootTrajectoryGeneration::interpret_solution( double CurrentTime, const so
   else
     {//The solver isn't responsible for the feet positions anymore
       //The robot is supposed to stop always with the feet aligned in the lateral plane.
-      X = CurrentSupport.X ;
-      Y = CurrentSupport.Y ;
+      X = CurrentSupport.X + Sign*sin(CurrentSupport.Yaw)*FeetDistanceDS_;
+      Y = CurrentSupport.Y - Sign*cos(CurrentSupport.Yaw)*FeetDistanceDS_;
     }
 
 }

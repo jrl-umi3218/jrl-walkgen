@@ -158,11 +158,12 @@ namespace PatternGeneratorJRL
       @param InitSpeed: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
     */
    int SetParametersWithInitPosInitSpeed(unsigned int PolynomeIndex,
-					 int AxisReference,
-					 double TimeInterval,
-					 double FinalPosition,
-					 double InitPosition,
-					 double InitSpeed);
+                                         int AxisReference,
+                                         double TimeInterval,
+                                         double FinalPosition,
+                                         double InitPosition,
+                                         double InitSpeed,
+                                         double middlePos=0.0);
 
 
    /*! Overloading -- BSPlines Init Function
