@@ -241,13 +241,15 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
       m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
       // Init BSpline
 
+      std::cout << "Init: " << InitPosition << " Final " << FinalPosition << std::endl;
+
       /**                                       ID        Final Time | Final Position | Time Max Value | Max Value             */
-      m_BsplinesX->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition);
+      m_BsplinesX->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.80*TimeInterval,FinalPosition);
       break;
 
     case Y_AXIS:
       m_PolynomeY->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
-      m_BsplinesY->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition);
+      m_BsplinesY->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,InitPosition+MaxPosition_y);
 
       break;
 

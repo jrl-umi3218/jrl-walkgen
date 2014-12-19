@@ -531,7 +531,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
           std::vector<double> leftMidPos (3,0);
           std::vector<double> rightMidPos (3,0);
           m_MiddleWayPoint[0]=0.0 ;
-          m_MiddleWayPoint[1]=0.0;
+          m_MiddleWayPoint[1]=0.2;      // Curving on Y
           if (SupportFoot==1)
             {
               // X offset to curve the step
