@@ -242,11 +242,13 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
       // Init BSpline
 
       /**                                       ID        Final Time | Final Position | Time Max Value | Max Value             */
-      m_BsplinesX->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.3*TimeInterval,FinalPosition+MaxPosition_x);
+      m_BsplinesX->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition);
       break;
 
     case Y_AXIS:
       m_PolynomeY->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
+      m_BsplinesY->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition);
+
       break;
 
     case Z_AXIS:
@@ -455,9 +457,9 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.y);
 
   // Trajectory of the foot compute in the Z domain (plane Z of t)
-  //aFootAbsolutePosition.z = m_BsplinesZ->FootComputePosition(Time);
-  //aFootAbsolutePosition.dz = m_BsplinesZ->FootComputeVelocity(Time);
-  //aFootAbsolutePosition.ddz = m_BsplinesZ->FootComputeAcc(Time);
+  aFootAbsolutePosition.z = m_BsplinesZ->FootComputePosition(Time);
+  aFootAbsolutePosition.dz = m_BsplinesZ->FootComputeVelocity(Time);
+  aFootAbsolutePosition.ddz = m_BsplinesZ->FootComputeAcc(Time);
 
 
   aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(Time);

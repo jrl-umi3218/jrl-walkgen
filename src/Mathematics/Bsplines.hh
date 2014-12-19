@@ -87,7 +87,7 @@ namespace PatternGeneratorJRL
        FP: Final position
        ToMP : Time of Max Position
        MP : Max Position */
-      FootBSplines( double FT, double FP, double ToMP, double MP);
+      FootBSplines( double FT, double FP, double ToMP=0.0, double MP=0.0);
 
       /*!Compute Position at time t */
       double FootComputePosition(double t);
@@ -109,11 +109,11 @@ namespace PatternGeneratorJRL
        */
       void SetParameters(double FT, double FP, double ToMP, double MP);
 
-      void SetParametersWithInitPosInitSpeed(double FT, double FP, double ToMP, double MP,
-						  double InitPos,
-						  double InitSpeed);
+      void SetParametersWithInitPosInitSpeed(double FT, double FP, double ToMP=0.0, double MP=0.0,
+                          double InitPos=0.0,
+                          double InitSpeed=0.0);
 
-      void SetParametersWithInitPos(double IP, double FT, double FP, double ToMP, double MP);
+      void SetParametersWithInitPos(double IP, double FT, double FP, double ToMP=0.0, double MP=0.0);
 
       void GetParametersWithInitPosInitSpeed(double &FT,
 						  double &MP,
@@ -130,8 +130,10 @@ namespace PatternGeneratorJRL
       {0.9*m_FT,m_FP},
       {m_FT,m_FP}*/
       void FootGenerateControlPoints(double IP,double FT, double FP, double ToMP, double MP);
+      void FootGenerateControlPoints(double IP,double FT, double FP);
 
-      void  FootGenerateKnotVector(double FT, double ToMP);
+      void FootGenerateKnotVector(double FT, double ToMP);
+      void FootGenerateKnotVector(double FT);
 
       double GetMP();
 

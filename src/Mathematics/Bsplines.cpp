@@ -351,14 +351,36 @@ double FootBSplines::FootComputeAcc(double t)
 
 void  FootBSplines::SetParameters(double FT, double FP, double ToMP, double MP)
 {
-    FootGenerateKnotVector(FT,ToMP);
-    FootGenerateControlPoints(0.0, FT, FP, ToMP, MP);
+    if (ToMP == 0.0 && MP == 0.0)
+    {
+        FootGenerateKnotVector(FT);
+        FootGenerateControlPoints(0.0, FT, FP);
+    }
+    else
+    {
+        FootGenerateKnotVector(FT,ToMP);
+        FootGenerateControlPoints(0.0, FT, FP, ToMP, MP);
+    }
+    PrintKnotVector();
+    PrintControlPoints();
+    PrintDegree();
 }
 
 void  FootBSplines::SetParametersWithInitPos(double IP, double FT, double FP, double ToMP, double MP)
 {
-    FootGenerateKnotVector(FT,ToMP);
-    FootGenerateControlPoints(IP, FT, FP, ToMP, MP);
+    if (ToMP == 0.0 && MP == 0.0)
+    {
+        FootGenerateKnotVector(FT);
+        FootGenerateControlPoints(IP, FT, FP);
+    }
+    else
+    {
+        FootGenerateKnotVector(FT,ToMP);
+        FootGenerateControlPoints(IP, FT, FP, ToMP, MP);
+    }
+    PrintKnotVector();
+    PrintControlPoints();
+    PrintDegree();
 }
 
 void FootBSplines::GetParametersWithInitPosInitSpeed(double &FT,
@@ -393,6 +415,25 @@ void FootBSplines::FootGenerateKnotVector(double FT, double ToMP)
     SetKnotVector(knot);
 }
 
+void FootBSplines::FootGenerateKnotVector(double FT)
+{
+    std::vector<double> knot;
+    knot.clear();
+    for (unsigned int i=0;i<=m_degree;i++)
+    {
+        knot.push_back(0.0);
+    }
+
+    knot.push_back(FT*0.5);
+
+    for (unsigned int i =0;i<=m_degree;i++)
+    {
+        knot.push_back(FT);
+    }
+
+    SetKnotVector(knot);
+}
+
 void FootBSplines::FootGenerateControlPoints(double IP, double FT, double FP, double ToMP, double MP)
 {
     m_FT = FT;
@@ -402,42 +443,61 @@ void FootBSplines::FootGenerateControlPoints(double IP, double FT, double FP, do
     m_IP = IP;
     std::vector<Point> control_points;
     control_points.clear();
-//    std::ofstream myfile1;
-//    myfile1.open("control_point.txt");
 
     Point A; A.x = 0.0 ; A.y = IP ;
     control_points.push_back(A);
-//    myfile1 << A.x <<" "<< A.y<< endl;
 
     A.x = m_FT*0.05 ; A.y = IP ;
     control_points.push_back(A);
-//    myfile1 << A.x <<" "<< A.y<< endl;
 
     A.x = m_FT*0.1 ; A.y = IP ;
     control_points.push_back(A);
-//    myfile1 << A.x <<" "<< A.y<< endl;
 
     A.x = 0.85*m_ToMP ; A.y = m_MP ;
     control_points.push_back(A);
-//    myfile1 << A.x <<" "<< A.y<< endl;
 
     A.x = 1.15*m_ToMP ; A.y = m_MP ;
     control_points.push_back(A);
-//    myfile1 << A.x <<" "<< A.y<< endl;
 
     A.x = 0.90*m_FT ; A.y = m_FP ;
     control_points.push_back(A);
-//    myfile1 << A.x <<" "<< A.y<< endl;
 
     A.x = 0.95*m_FT ; A.y = m_FP ;
     control_points.push_back(A);
-//    myfile1 << A.x <<" "<< A.y<< endl;
 
     A.x = m_FT ; A.y = m_FP ;
     control_points.push_back(A);
-//    myfile1 << A.x <<" "<< A.y<< endl;
 
-//    myfile1.close();
+    SetControlPoints(control_points);
+}
+
+void FootBSplines::FootGenerateControlPoints(double IP, double FT, double FP)
+{
+    m_FT = FT;
+    m_FP = FP;
+    m_ToMP = 0.0;
+    m_MP = 0.0;
+    m_IP = IP;
+    std::vector<Point> control_points;
+    control_points.clear();
+
+    Point A; A.x = 0.0 ; A.y = IP ;
+    control_points.push_back(A);
+
+    A.x = m_FT*0.05 ; A.y = IP ;
+    control_points.push_back(A);
+
+    A.x = m_FT*0.1 ; A.y = IP ;
+    control_points.push_back(A);
+
+    A.x = 0.90*m_FT ; A.y = m_FP ;
+    control_points.push_back(A);
+
+    A.x = 0.95*m_FT ; A.y = m_FP ;
+    control_points.push_back(A);
+
+    A.x = m_FT ; A.y = m_FP ;
+    control_points.push_back(A);
 
     SetControlPoints(control_points);
 }
