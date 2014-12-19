@@ -120,7 +120,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 								 FootTrajectoryGenerationMultiple * aFTGM,
 								 FootAbsolutePosition &FootInitialPosition,
 								 FootAbsolutePosition &FootFinalPosition,
-                                 vector<double> MiddlePos)
+				 vector<double> MiddlePos)
 {
 
   ODEBUG("Set interval " << IntervalIndex << "/" << m_DeltaTj.size() << " : " << m_DeltaTj[IntervalIndex] << " X: ("
@@ -513,14 +513,14 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
         dy = FinalPos[0] - InitPos[0] ;
         dc = dx * InitPos[0] + dy *InitPos[1] ;
         distSquareToLine = (dx*currSupp[0]  + dy*currSupp[1] + dc)*(dx*currSupp[0]  + dy*currSupp[1] + dc)/(dx*dx + dy*dy);
+        MAL_VECTOR_RESIZE(m_MiddleWayPoint,2);
+        MAL_VECTOR_FILL(m_MiddleWayPoint,0.0);
         if( distSquareToLine > 0.01 /*10cm from the line*/ )
           {
             MAL_VECTOR_DIM(relWayPoint,double,2);
             relWayPoint[0]=0.0;
             relWayPoint[1]=m_StepCurving;
-
-            m_MiddleWayPoint[0] = 0.0 ; // to be done
-            m_MiddleWayPoint[1] = 0.0 ; // to done
+            m_MiddleWayPoint = MAL_RET_A_by_B(Orientation, relWayPoint) + currSupp  ;
 
           }
       }
