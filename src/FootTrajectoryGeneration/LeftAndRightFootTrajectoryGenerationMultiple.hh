@@ -173,7 +173,7 @@ namespace PatternGeneratorJRL
                          FootTrajectoryGenerationMultiple * aFTGM,
                          FootAbsolutePosition &FootInitialPosition,
                          FootAbsolutePosition &FootFinalPosition,
-                         double MiddlePos=0.0);
+                         vector<double> MiddlePos=vector<double>(3,0));
 
       /*! Left Foot Trajectory Generation object for several intervals. */
       FootTrajectoryGenerationMultiple * m_LeftFootTrajectory;

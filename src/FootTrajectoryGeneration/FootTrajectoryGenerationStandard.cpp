@@ -428,11 +428,11 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
     /** Define Here the BSplines*/
 
 
-
+/*
   m_BsplinesY->PrintDegree();
   m_BsplinesY->PrintControlPoints();
   m_BsplinesY->PrintKnotVector();
-
+*/
   // Trajectory of the foot compute in the X domain (plane X of t)
   aFootAbsolutePosition.x = m_BsplinesX->FootComputePosition(Time);
   aFootAbsolutePosition.dx = m_BsplinesX->FootComputeVelocity(Time);

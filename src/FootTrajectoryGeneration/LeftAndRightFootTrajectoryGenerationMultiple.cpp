@@ -43,6 +43,10 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
   m_Omega2 = 0.0;
   m_Foot = lFoot;
 
+  /** m_StepHeight and m_StepCurving definition -- To Modify*/
+  m_StepHeight = 0.05;
+  m_StepCurving = 0.2;  // Heuristic value
+
   m_LeftFootTrajectory = new FootTrajectoryGenerationMultiple(lSPM,m_Foot);
   m_RightFootTrajectory = new FootTrajectoryGenerationMultiple(lSPM,m_Foot);
 
@@ -115,7 +119,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 								 FootTrajectoryGenerationMultiple * aFTGM,
 								 FootAbsolutePosition &FootInitialPosition,
 								 FootAbsolutePosition &FootFinalPosition,
-								 double MiddlePos)
+                                 vector<double> MiddlePos)
 {
 
   ODEBUG("Set interval " << IntervalIndex << "/" << m_DeltaTj.size() << " : " << m_DeltaTj[IntervalIndex] << " X: ("
@@ -131,7 +135,8 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 					   m_DeltaTj[IntervalIndex],
 					   FootFinalPosition.y,
 					   FootInitialPosition.y,
-					   FootInitialPosition.dy);
+                       FootInitialPosition.dy,
+                       MiddlePos);
 
   // Z axis.
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
@@ -483,14 +488,26 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
       if ((i!=0)|| (Continuity))
         {
-          double leftMidPos(0.0), rightMidPos(0.0) ;
+          //double leftMidPos(0.0), rightMidPos(0.0) ;
+          std::vector<double> leftMidPos (3,0);
+          std::vector<double> rightMidPos (3,0);
+
           if (SupportFoot==1)
             {
-              rightMidPos = m_StepHeight ;
+              // Y offset
+              rightMidPos[1] = m_StepCurving;
+
+              // Z offset
+              rightMidPos[2] = m_StepHeight ;
+
             }
           else
             {
-              leftMidPos = m_StepHeight ;
+              // Y offset
+              leftMidPos[1] = m_StepCurving;
+
+              // Z offset
+              leftMidPos[2] = m_StepHeight ;
             }
           /* Initialize properly the interval in single support phase */
           ODEBUG("Single support phase");
