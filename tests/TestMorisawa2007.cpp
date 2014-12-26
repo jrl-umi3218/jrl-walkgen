@@ -653,6 +653,17 @@ protected:
      istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
      aPGI.ParseCmd(strm2);
    }
+
+   {
+     istringstream strm2(":singlesupporttime 1.2");
+     aPGI.ParseCmd(strm2);
+   }
+
+   {
+     istringstream strm2(":doublesupporttime 0.08");
+     aPGI.ParseCmd(strm2);
+   }
+
    {
        istringstream strm2(":stepstairseq\
                            0.0 -0.105 0.0 0.0\
