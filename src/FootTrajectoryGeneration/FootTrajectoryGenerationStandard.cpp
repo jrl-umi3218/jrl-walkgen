@@ -225,12 +225,12 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
 									double FinalPosition,
 									double InitPosition,
 									double InitSpeed,
-                                    vector<double> MiddlePos)
+									vector<double> MiddlePos)
 {
   double epsilon = 0.0001;
-  double MaxPosition_x = MiddlePos[0];
-  double MaxPosition_y = MiddlePos[1];
-  double MaxPosition_z = MiddlePos[2];
+  double WayPoint_x = MiddlePos[0];
+  double WayPoint_y = MiddlePos[1];
+  double dPos_z = MiddlePos[2];
 
   switch (PolynomeIndex)
     {
@@ -241,16 +241,29 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
       m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
       // Init BSpline
 
-      std::cout << "Init: " << InitPosition << " Final " << FinalPosition << std::endl;
-
-      /**                                       ID        Final Time | Final Position | Time Max Value | Max Value             */
-      m_BsplinesX->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.80*TimeInterval,FinalPosition);
+      if( (WayPoint_x*WayPoint_x + WayPoint_y*WayPoint_y) > epsilon)
+        {
+          /**                                       ID        Final Time | Final Position | Time Max Value | Max Value             */
+          m_BsplinesX->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.30*TimeInterval,WayPoint_x);
+        }
+      else
+        {
+          m_BsplinesX->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.80*TimeInterval,FinalPosition);
+        }
       break;
 
     case Y_AXIS:
       m_PolynomeY->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
-      m_BsplinesY->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,InitPosition+MaxPosition_y);
 
+      if( (WayPoint_x*WayPoint_x + WayPoint_y*WayPoint_y) > 0)
+        {
+          /**                                       ID        Final Time | Final Position | Time Max Value | Max Value             */
+          m_BsplinesY->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.30*TimeInterval,WayPoint_y);
+        }
+      else
+        {
+          m_BsplinesY->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.80*TimeInterval,FinalPosition);
+        }
       break;
 
     case Z_AXIS:
@@ -262,15 +275,15 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
       // Check the final and the initial position to decide what to do
       if (FinalPosition - InitPosition > epsilon )
         {
-          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.3*TimeInterval,FinalPosition+MaxPosition_z);
+          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.3*TimeInterval,FinalPosition+dPos_z);
         }
       else if (FinalPosition - InitPosition <= epsilon && FinalPosition - InitPosition >= -epsilon )
         {
-          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,FinalPosition+MaxPosition_z);
+          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,FinalPosition+dPos_z);
         }
       else if (FinalPosition - InitPosition < -epsilon )
         {
-          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.6*TimeInterval,InitPosition+MaxPosition_z/3.0);
+          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.6*TimeInterval,InitPosition+dPos_z/3.0);
         }
 
       break;

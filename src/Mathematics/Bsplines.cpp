@@ -361,9 +361,6 @@ void  FootBSplines::SetParameters(double FT, double FP, double ToMP, double MP)
         FootGenerateKnotVector(FT,ToMP);
         FootGenerateControlPoints(0.0, FT, FP, ToMP, MP);
     }
-    PrintKnotVector();
-    PrintControlPoints();
-    PrintDegree();
 }
 
 void  FootBSplines::SetParametersWithInitPos(double IP, double FT, double FP, double ToMP, double MP)
@@ -378,9 +375,6 @@ void  FootBSplines::SetParametersWithInitPos(double IP, double FT, double FP, do
         FootGenerateKnotVector(FT,ToMP);
         FootGenerateControlPoints(IP, FT, FP, ToMP, MP);
     }
-    PrintKnotVector();
-    PrintControlPoints();
-    PrintDegree();
 }
 
 void FootBSplines::GetParametersWithInitPosInitSpeed(double &FT,

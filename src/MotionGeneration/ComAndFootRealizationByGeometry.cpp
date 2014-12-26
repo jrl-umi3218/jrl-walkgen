@@ -48,7 +48,7 @@ ComAndFootRealizationByGeometry::
   m_ZARM = -1.0;
   m_LeftShoulder = 0;
   m_RightShoulder = 0;
-  ShiftFoot_ = true ;
+  ShiftFoot_ = false ;
   RegisterMethods();
 
   for(unsigned int i=0;i<3;i++)

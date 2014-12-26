@@ -550,8 +550,6 @@ computing the analytical trajectories. */
     InitRightFootAbsolutePosition.y += lAnklePositionRight(1) + CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
     InitRightFootAbsolutePosition.z += lAnklePositionRight(2) + CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
 
-
-
     m_RelativeFootPositions = RelativeFootPositions;
     /* This part computes the CoM and ZMP trajectory giving the foot position information.
        It also creates the analytical feet trajectories.
@@ -599,7 +597,7 @@ computing the analytical trajectories. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
 
-    bool filterOn_ = false ;
+    bool filterOn_ = true ;
     if(filterOn_)
     {
         /*! initialize the dynamic filter */

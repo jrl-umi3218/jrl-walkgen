@@ -78,11 +78,11 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   QP_T_ = 0.1 ;
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
-  InterpolationPeriod_ = QP_T_/5;
-  previewDuration_ = 0.8 ;
+  InterpolationPeriod_ = QP_T_/2;
+  previewDuration_ = 1.5 ;
   NbSampleControl_ = (int)round(QP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(QP_T_/InterpolationPeriod_) ;
-  previewSize_ = 8 ;
+  previewSize_ = 15 ;
   StepPeriod_ = 0.8 ;
   SSPeriod_ = 0.7 ;
   DSPeriod_ = 0.1 ;
@@ -597,7 +597,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
                                    RightFootTraj_deq_,
                                    deltaCOMTraj_deq_);
 
-      #define DEBUG
+//      #define DEBUG
       #ifdef DEBUG
         dynamicFilter_->Debug(COMTraj_deq_ctrl_,
                               LeftFootTraj_deq_ctrl_,

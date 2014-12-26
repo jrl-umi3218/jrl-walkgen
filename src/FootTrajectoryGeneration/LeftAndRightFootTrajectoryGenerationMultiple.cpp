@@ -486,52 +486,54 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
 	}
 
-      {// verify auto collision
-        MAL_VECTOR_DIM(currSupp,double,2);
-        MAL_VECTOR_DIM(InitPos,double,2);
-        MAL_VECTOR_DIM(FinalPos,double,2);
-        if (SupportFoot==1)
-          {
-            currSupp[0] = LeftFootTmpInitPos.x ;
-            currSupp[1] = LeftFootTmpInitPos.y ;
-            InitPos[0] = RightFootTmpInitPos.x ;
-            InitPos[1] = RightFootTmpInitPos.y ;
-            FinalPos[0] = RightFootTmpFinalPos.x ;
-            FinalPos[1] = RightFootTmpFinalPos.y ;
-          }
-        else
-          {
-            currSupp[0] = RightFootTmpFinalPos.x ;
-            currSupp[1] = RightFootTmpFinalPos.y ;
-            InitPos[0] = LeftFootTmpInitPos.x ;
-            InitPos[1] = LeftFootTmpInitPos.y ;
-            FinalPos[0] = LeftFootTmpInitPos.x ;
-            FinalPos[1] = LeftFootTmpInitPos.y ;
-          }
-        double dx , dy , dc , distSquareToLine ;
-        dx = InitPos[1] - FinalPos[1] ;
-        dy = FinalPos[0] - InitPos[0] ;
-        dc = dx * InitPos[0] + dy *InitPos[1] ;
-        distSquareToLine = (dx*currSupp[0]  + dy*currSupp[1] + dc)*(dx*currSupp[0]  + dy*currSupp[1] + dc)/(dx*dx + dy*dy);
-        MAL_VECTOR_RESIZE(m_MiddleWayPoint,2);
-        MAL_VECTOR_FILL(m_MiddleWayPoint,0.0);
-        if( distSquareToLine > 0.01 /*10cm from the line*/ )
-          {
-            MAL_VECTOR_DIM(relWayPoint,double,2);
-            relWayPoint[0]=0.0;
-            relWayPoint[1]=m_StepCurving;
-            m_MiddleWayPoint = MAL_RET_A_by_B(Orientation, relWayPoint) + currSupp  ;
-
-          }
-      }
 
       if ((i!=0)|| (Continuity))
         {
-          //double leftMidPos(0.0), rightMidPos(0.0) ;
+          {// verify auto collision
+            MAL_VECTOR_DIM(currSupp,double,2);
+            MAL_VECTOR_DIM(InitPos,double,2);
+            MAL_VECTOR_DIM(FinalPos,double,2);
+            MAL_VECTOR_DIM(relWayPoint,double,2);
+            if (SupportFoot==1)
+              {
+                currSupp(0) = LeftFootTmpInitPos.x ;
+                currSupp(1) = LeftFootTmpInitPos.y ;
+                InitPos(0)  = RightFootTmpInitPos.x ;
+                InitPos(1)  = RightFootTmpInitPos.y ;
+                FinalPos(0) = RightFootTmpFinalPos.x ;
+                FinalPos(1) = RightFootTmpFinalPos.y ;
+                relWayPoint(0)=0.0;
+                relWayPoint(1)=-m_StepCurving;
+              }
+            else
+              {
+                currSupp(0) = RightFootTmpInitPos.x ;
+                currSupp(1) = RightFootTmpInitPos.y ;
+                InitPos(0)  = LeftFootTmpInitPos.x ;
+                InitPos(1)  = LeftFootTmpInitPos.y ;
+                FinalPos(0) = LeftFootTmpFinalPos.x ;
+                FinalPos(1) = LeftFootTmpFinalPos.y ;
+                relWayPoint(0)=0.0;
+                relWayPoint(1)=m_StepCurving;
+              }
+
+            double dx , dy , dc , distSquareToLine ;
+            dx = InitPos(1) - FinalPos(1) ;
+            dy = FinalPos(0) - InitPos(0) ;
+            MAL_VECTOR_RESIZE(m_MiddleWayPoint,2);
+            MAL_VECTOR_FILL(m_MiddleWayPoint,0.0);
+            if ( dx!=0 || dy!=0 )// not moving implies no collision
+              {
+                dc = -(dx * InitPos(0) + dy *InitPos(1)) ;
+                distSquareToLine = (dx*currSupp(0)  + dy*currSupp(1) + dc)*(dx*currSupp(0)  + dy*currSupp(1) + dc)/(dx*dx + dy*dy);
+                if( distSquareToLine < 0.4 /*15cm (squared) from the line*/ )
+                  {
+                    m_MiddleWayPoint = MAL_RET_A_by_B(Orientation, relWayPoint) + currSupp  ;
+                  }
+              }
+          }
           std::vector<double> leftMidPos (3,0);
           std::vector<double> rightMidPos (3,0);
-          m_MiddleWayPoint[0]=0.0 ;
-          m_MiddleWayPoint[1]=0.2;      // Curving on Y
           if (SupportFoot==1)
             {
               // X offset to curve the step
