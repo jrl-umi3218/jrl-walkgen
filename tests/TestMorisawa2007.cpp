@@ -655,27 +655,27 @@ protected:
    }
 
    {
-     istringstream strm2(":singlesupporttime 1.2");
+     istringstream strm2(":singlesupporttime 1.56");
      aPGI.ParseCmd(strm2);
    }
 
    {
-     istringstream strm2(":doublesupporttime 0.08");
+     istringstream strm2(":doublesupporttime 0.04");
      aPGI.ParseCmd(strm2);
    }
 
    {
        istringstream strm2(":stepstairseq\
                            0.0 -0.105 0.0 0.0\
-                           0.3 0.095 0.0 0.0\
-                           0.3 0.0 0.0 0.0\
-                           0.3 0.0 0.0 0.0\
-                           0.3 0.0 0.0 0.0\
-                           0.3 0.0 0.0 0.0\
-                           0.3 0.0 0.0 0.0\
-                           0.3 0.0 0.0 0.0\
-                           0.3 0.0 0.0 0.0\
-                           0.3 0.095 0.0 0.0\
+                           0.28 0.095 0.0 0.0\
+                           0.28 0.0 0.0 0.0\
+                           0.28 0.0 0.0 0.0\
+                           0.28 0.0 0.0 0.0\
+                           0.28 0.0 0.0 0.0\
+                           0.28 0.0 0.0 0.0\
+                           0.28 0.0 0.0 0.0\
+                           0.28 0.0 0.0 0.0\
+                           0.28 0.105 0.0 0.0\
                            0.0 -0.19 0.0 0.0\
                            ");
      aPGI.ParseCmd(strm2);
@@ -709,9 +709,9 @@ protected:
 	StartAnalyticalOnLineWalking(*m_PGI);
 	break;
 
-    case PROFIL_ANALYTICAL_WALKING_ON_BEAM:
-    AnalyticalWalkingOnBeam(*m_PGI);
-    break;
+      case PROFIL_ANALYTICAL_WALKING_ON_BEAM:
+      AnalyticalWalkingOnBeam(*m_PGI);
+      break;
 
 
       default:

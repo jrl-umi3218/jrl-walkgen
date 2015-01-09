@@ -258,7 +258,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
       if( (WayPoint_x*WayPoint_x + WayPoint_y*WayPoint_y) > 0)
         {
           /**                                       ID        Final Time | Final Position | Time Max Value | Max Value             */
-          m_BsplinesY->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.30*TimeInterval,WayPoint_y);
+          m_BsplinesY->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.27*TimeInterval,WayPoint_y);
         }
       else
         {
