@@ -132,10 +132,10 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
 
 
   // Use polynoms
-  //m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
+  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
 
   // Use BSplines
-  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithBSplines(aFootAbsolutePosition,deltaj);
+  //m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithBSplines(aFootAbsolutePosition,deltaj);
 
 
   aFootAbsolutePosition.stepType = m_NatureOfIntervals[IndexInterval];
@@ -241,7 +241,7 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 									double FinalPosition,
 									double InitPosition,
 									double InitSpeed,
-                                    vector<double> middlePos
+									vector<double> middlePos
 									)
 {
   //std::cout << "Entro Pol " << std::endl;
@@ -253,7 +253,7 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeed(unsigned
 											  FinalPosition,
 											  InitPosition,
 											  InitSpeed,
-                                              middlePos);
+											  middlePos);
   return 0;
 }
 
