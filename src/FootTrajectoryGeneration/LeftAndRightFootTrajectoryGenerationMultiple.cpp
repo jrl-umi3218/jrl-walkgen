@@ -173,25 +173,9 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 					   FootInitialPosition.domega2);
 
   // X axis.
-  double epsilon = 0.0001 ;
-  if (FootFinalPosition.z <= FootInitialPosition.z )  //down
-    aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::X_AXIS,
-					   0.8*m_DeltaTj[IntervalIndex],
-					   FootFinalPosition.x,
-					   FootInitialPosition.x,
-					   FootInitialPosition.dx);
-    else if ( m_StepHeight <= epsilon )    // normal walk
-    aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
-					   FootTrajectoryGenerationStandard::X_AXIS,
-					   0.9*m_DeltaTj[IntervalIndex],
-					   FootFinalPosition.x,
-					   FootInitialPosition.x,
-					   FootInitialPosition.dx);
-  else if (FootFinalPosition.z > FootInitialPosition.z )    // up
-    aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
-					   FootTrajectoryGenerationStandard::X_AXIS,
-					   0.75*m_DeltaTj[IntervalIndex],
+					   m_DeltaTj[IntervalIndex],
 					   FootFinalPosition.x,
 					   FootInitialPosition.x,
 					   FootInitialPosition.dx);

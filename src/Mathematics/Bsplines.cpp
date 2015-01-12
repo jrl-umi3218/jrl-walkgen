@@ -322,10 +322,10 @@ double FootBSplines::FootComputePosition(double t)
 double FootBSplines::FootComputeVelocity(double t)
 {
     if (m_degree >=1){
-        if (t<m_FT)
+        if (t<=m_FT)
             return DerivativeBsplines().ComputeBsplines(t).y;
         else
-            return DerivativeBsplines().ComputeBsplines(m_FT - t).y;
+            return DerivativeBsplines().ComputeBsplines(m_FT).y;
     }
     else
     {
@@ -337,10 +337,10 @@ double FootBSplines::FootComputeVelocity(double t)
 double FootBSplines::FootComputeAcc(double t)
 {
     if (m_degree >=2){
-        if (t<m_FT)
+        if (t<=m_FT)
             return DerivativeBsplines().DerivativeBsplines().ComputeBsplines(t).y;
         else
-            return DerivativeBsplines().DerivativeBsplines().ComputeBsplines(m_FT - t).y;
+            return DerivativeBsplines().DerivativeBsplines().ComputeBsplines(m_FT).y;
     }
     else
     {
