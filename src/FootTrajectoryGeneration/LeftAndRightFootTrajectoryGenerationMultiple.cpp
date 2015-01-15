@@ -120,7 +120,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 								 FootTrajectoryGenerationMultiple * aFTGM,
 								 FootAbsolutePosition &FootInitialPosition,
 								 FootAbsolutePosition &FootFinalPosition,
-				 vector<double> MiddlePos)
+								 vector<double> MiddlePos)
 {
 
   ODEBUG("Set interval " << IntervalIndex << "/" << m_DeltaTj.size() << " : " << m_DeltaTj[IntervalIndex] << " X: ("
@@ -129,15 +129,26 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 	  << FootFinalPosition.z << "," << FootInitialPosition.z << "," << FootInitialPosition.dz << ")");
   aFTGM->SetNatureInterval(IntervalIndex,FootFinalPosition.stepType);
 
+  double ModulationSupportCoefficient = 0.70;
+  double UnlockedSwingPeriod = m_DeltaTj[IntervalIndex] * ModulationSupportCoefficient;
+
+  // X axis.
+  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+                                           FootTrajectoryGenerationStandard::X_AXIS,
+                                           UnlockedSwingPeriod,
+                                           FootFinalPosition.x,
+                                           FootInitialPosition.x,
+                                           FootInitialPosition.dx,
+                                           MiddlePos);
 
   // Y axis.
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::Y_AXIS,
-					   m_DeltaTj[IntervalIndex],
+					   UnlockedSwingPeriod,
 					   FootFinalPosition.y,
 					   FootInitialPosition.y,
-                       FootInitialPosition.dy,
-                       MiddlePos);
+					   FootInitialPosition.dy,
+					   MiddlePos);
 
   // Z axis.
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
@@ -151,7 +162,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
   // THETA
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::THETA_AXIS,
-					   m_DeltaTj[IntervalIndex],
+					   UnlockedSwingPeriod,
 					   FootFinalPosition.theta,
 					   FootInitialPosition.theta,
 					   FootInitialPosition.dtheta);
@@ -159,7 +170,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
   // Omega
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::OMEGA_AXIS,
-					   m_DeltaTj[IntervalIndex],
+					   UnlockedSwingPeriod,
 					   FootFinalPosition.omega,
 					   FootInitialPosition.omega,
 					   FootInitialPosition.domega);
@@ -167,18 +178,10 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
   // Omega 2
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
 					   FootTrajectoryGenerationStandard::OMEGA2_AXIS,
-					   m_DeltaTj[IntervalIndex],
+					   UnlockedSwingPeriod,
 					   FootFinalPosition.omega2,
 					   FootInitialPosition.omega2,
 					   FootInitialPosition.domega2);
-
-  // X axis.
-  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
-					   FootTrajectoryGenerationStandard::X_AXIS,
-					   m_DeltaTj[IntervalIndex],
-					   FootFinalPosition.x,
-					   FootInitialPosition.x,
-					   FootInitialPosition.dx);
 }
 
 void LeftAndRightFootTrajectoryGenerationMultiple::
@@ -313,14 +316,14 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
 	  SetAnInterval(IntervalIndex,m_LeftFootTrajectory,
 			LeftFootTmpInitPos,
-                    LeftFootTmpInitPos,vector<double>(3,0.0));
+			LeftFootTmpInitPos);
 
 	 /// RightFootTmpInitPos.z = CurrentSupportFootPosition(2,2);
 	  RightFootTmpInitPos.dz = 0;
 	  RightFootTmpInitPos.stepType=9;
 	  SetAnInterval(IntervalIndex,m_RightFootTrajectory,
 			RightFootTmpInitPos,
-            RightFootTmpInitPos,vector<double>(3,0.0));
+			RightFootTmpInitPos);
 	  ODEBUG("LeftFootTmpInitPos.stepType="<<LeftFootTmpInitPos.stepType);
 	  ODEBUG("RightFootTmpInitPos.stepType="<<RightFootTmpInitPos.stepType);
 	  ODEBUG("End of Double support phase");
@@ -486,7 +489,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
                 InitPos(1)  = RightFootTmpInitPos.y ;
                 FinalPos(0) = RightFootTmpFinalPos.x ;
                 FinalPos(1) = RightFootTmpFinalPos.y ;
-                relWayPoint(0)=0.0;
+                relWayPoint(0)=0.0 ;
                 relWayPoint(1)=-m_StepCurving;
               }
             else
@@ -497,7 +500,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
                 InitPos(1)  = LeftFootTmpInitPos.y ;
                 FinalPos(0) = LeftFootTmpFinalPos.x ;
                 FinalPos(1) = LeftFootTmpFinalPos.y ;
-                relWayPoint(0)=0.0;
+                relWayPoint(0)=0.0 ;
                 relWayPoint(1)=m_StepCurving;
               }
 
@@ -510,7 +513,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
               {
                 dc = -(dx * InitPos(0) + dy *InitPos(1)) ;
                 distSquareToLine = (dx*currSupp(0)  + dy*currSupp(1) + dc)*(dx*currSupp(0)  + dy*currSupp(1) + dc)/(dx*dx + dy*dy);
-                if( distSquareToLine < 0.4 /*15cm (squared) from the line*/ )
+                if( distSquareToLine < 0.035 /*19cm (squared) from the line*/ )
                   {
                     m_MiddleWayPoint = MAL_RET_A_by_B(Orientation, relWayPoint) + currSupp  ;
                   }
@@ -566,8 +569,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 	  ODEBUG("End of Single support phase");
 	  SetAnInterval(IntervalIndex,m_RightFootTrajectory,
 			RightFootTmpInitPos,
-            RightFootTmpFinalPos,rightMidPos);
-    //  cout << RightFootTmpFinalPos.z << endl;
+			RightFootTmpFinalPos,rightMidPos);
+
         if (SupportFoot==1)
             RightFootTmpFinalPos.z = CurrentSupportFootPosition(2,2);
         else

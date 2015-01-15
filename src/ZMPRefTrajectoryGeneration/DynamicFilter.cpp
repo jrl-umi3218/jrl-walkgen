@@ -456,6 +456,32 @@ void DynamicFilter::ExtractZMP(vector<double> & ZMPMB)
   metapod::Vector3dTpl< LocalFloatType >::Type CoM_torques (0.0,0.0,0.0);
   CoM_torques = m_force.n() + metapod::Skew<LocalFloatType>(CoM_Waist_vec) * m_force.f() ;
 
+  // dump forces and momentum
+  static int inc = 0.0 ;
+  ofstream aof;
+  string aFileName;
+  ostringstream oss(std::ostringstream::ate);
+  oss.str("ForcesAndMomentum.txt");
+  aFileName = oss.str();
+  if ( inc == 0 )
+  {
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+  }
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  aof << inc*controlPeriod_ << " " // 1
+      << m_force.f()[0] << " "     // 2
+      << m_force.f()[1] << " "     // 3
+      << m_force.f()[2] << " "     // 4
+      << m_force.n()[0] << " "     // 5
+      << m_force.n()[1] << " "     // 6
+      << m_force.n()[2] << " "     // 7
+      << endl ;
+  ++inc ;
+  // end dump forces and momentum
+
   // compute the Multibody ZMP
   ZMPMB.resize(2);
   ZMPMB[0] = - CoM_torques[1] / m_force.f()[2] ;

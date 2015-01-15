@@ -135,9 +135,14 @@ namespace PatternGeneratorJRL
       void FootGenerateKnotVector(double FT, double ToMP);
       void FootGenerateKnotVector(double FT);
 
-      double GetMP();
+      double GetMP()
+      {return m_MP;}
 
-      double GetFT();
+      double GetFT()
+      {return m_FT;}
+
+      double GetFP()
+      {return m_FP;}
 
       private:
       double m_IP, m_FT, m_FP, m_ToMP, m_MP;

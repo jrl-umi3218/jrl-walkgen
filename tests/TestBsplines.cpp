@@ -35,9 +35,11 @@ int main()
 {
     PatternGeneratorJRL::FootBSplines *X;
     PatternGeneratorJRL::FootBSplines *Y;
+    PatternGeneratorJRL::FootBSplines *Z;
 
     double tx=0.0;
     double ty=0.0;
+    double tz=0.0;
 
     ofstream myfile;
     myfile.open("TestBsplines.txt");
@@ -54,6 +56,12 @@ int main()
     double m_MPy = 0.2;
     double m_ToMPy = m_FTx/2.0;
 
+    //Create the parameters of foot trajectory on Z
+    double m_FTz = 0.7;
+    double m_FPz = 0.0;
+    double m_MPz = 0.07;
+    double m_ToMPz = m_FTx/2.0;
+
     //Create an object for test X
     X = new PatternGeneratorJRL::FootBSplines(m_FTx, m_FPx, m_ToMPx, m_MPx);
     X->PrintDegree();
@@ -66,16 +74,25 @@ int main()
     Y->PrintKnotVector();
     Y->PrintControlPoints();
 
+    //Create an object for test Y
+    Z = new PatternGeneratorJRL::FootBSplines(m_FTz, m_FPz, m_ToMPz, m_MPz);
+    Z->PrintDegree();
+    Z->PrintKnotVector();
+    Z->PrintControlPoints();
+
     for (int k=1; k<1000;k++)
     {
 
         tx=double(k)*X->GetKnotVector().back()/1000.0;
         ty=double(k)*Y->GetKnotVector().back()/1000.0;
+        tz=double(k)*Z->GetKnotVector().back()/1000.0;
 
         //cout << k << endl;
         //myfile << t << " " << X->ZComputePosition(t) << " " << X->ZComputeVelocity(t)<< " " << X->ZComputeAcc(t)<< endl;
         myfile << tx << " " << X->FootComputePosition(tx) << " " << X->FootComputeVelocity(tx)<< " " << X->FootComputeAcc(tx)
-                     << " " << Y->FootComputePosition(ty) << " " << Y->FootComputeVelocity(ty)<< " " << Y->FootComputeAcc(ty) << endl;
+                     << " " << Y->FootComputePosition(ty) << " " << Y->FootComputeVelocity(ty)<< " " << Y->FootComputeAcc(ty)
+                     << " " << Y->FootComputePosition(tz) << " " << Z->FootComputeVelocity(tz)<< " " << Z->FootComputeAcc(tz)
+                     << endl;
 
         // time - Position - Velocity - Acceleration
         //cout <<  t  << " " << Z->ZComputePosition(t)<<" "<< Z->ZComputeVelocity(t)<< " "<< Z->ZComputeAcc(t)<< endl;
@@ -95,6 +112,11 @@ int main()
     myfile << "plot 'control_point.txt' with points, 'TestBsplines.txt' using 1:5 with lines title 'PosY'"<< endl;
     myfile << "set term wxt 3" << endl;
     myfile << "plot 'TestBsplines.txt' using 1:5 with lines title 'PosY', 'TestBsplines.txt' using 1:6 with lines title 'SpeedY','TestBsplines.txt' using 1:7 with lines title 'AccY'"<< endl;
+
+    myfile << "set term wxt 2" << endl;
+    myfile << "plot 'control_point.txt' with points, 'TestBsplines.txt' using 1:8 with lines title 'PosZ'"<< endl;
+    myfile << "set term wxt 3" << endl;
+    myfile << "plot 'TestBsplines.txt' using 1:8 with lines title 'PosY', 'TestBsplines.txt' using 1:9 with lines title 'SpeedY','TestBsplines.txt' using 1:10 with lines title 'AccY'"<< endl;
 
     myfile << "set term wxt 4" << endl;
     myfile << "plot 'control_point.txt' with points, 'TestBsplines.txt' using 2:5 with lines title 'PosXY'"<< endl;

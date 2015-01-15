@@ -143,7 +143,7 @@ namespace PatternGeneratorJRL
                                          double FinalPosition,
                                          double InitPosition,
                                          double InitSpeed,
-                                         vector<double> MiddlePos=vector<double>(3,0));
+                                         vector<double> MiddlePos=vector<double>(3,-1));
 
    /*! Overloading -- BSPlines Init Function
     This method specifies the parameters for each of the Bsplines used by this object

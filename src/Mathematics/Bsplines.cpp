@@ -301,7 +301,7 @@ void Bsplines::PrintDegree() const
 // create a foot trajectory of Z on function the time t
 
 
-FootBSplines::FootBSplines(double FT, double FP, double ToMP, double MP):Bsplines(4)
+FootBSplinesZ::FootBSplines(double FT, double FP, double ToMP, double MP):Bsplines(4)
 {
     SetParameters( FT, FP, ToMP, MP);
 }
@@ -495,15 +495,3 @@ void FootBSplines::FootGenerateControlPoints(double IP, double FT, double FP)
 
     SetControlPoints(control_points);
 }
-
-double FootBSplines::GetMP()
-{
-    return m_MP;
-}
-
-
-double FootBSplines::GetFT()
-{
-    return m_FT;
-}
-

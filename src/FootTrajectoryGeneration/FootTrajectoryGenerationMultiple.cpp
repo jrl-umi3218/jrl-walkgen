@@ -132,10 +132,10 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
 
 
   // Use polynoms
-  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
+  //m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
 
   // Use BSplines
-  //m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithBSplines(aFootAbsolutePosition,deltaj);
+  m_SetOfFootTrajectoryGenerationObjects[IndexInterval]->ComputeAllWithBSplines(aFootAbsolutePosition,deltaj);
 
 
   aFootAbsolutePosition.stepType = m_NatureOfIntervals[IndexInterval];

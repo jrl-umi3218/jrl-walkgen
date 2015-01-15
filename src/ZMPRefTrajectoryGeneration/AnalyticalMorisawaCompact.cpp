@@ -657,7 +657,7 @@ computing the analytical trajectories. */
     //    UpperConfig(34)= 0.584685299 ;    // LARM_JOINT5
     //    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
 
-        for(unsigned int i = 0 ; i < 18 ; ++i){
+        for(unsigned int i = 18 ; i < 35 ; ++i){
           UpperVel(i)=0.0;
           UpperAcc(i)=0.0;
         }
