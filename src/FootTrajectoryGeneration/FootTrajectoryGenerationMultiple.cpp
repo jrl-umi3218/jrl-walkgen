@@ -304,11 +304,11 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeedInitAcc(u
 
 
   m_SetOfFootTrajectoryGenerationObjects[IntervalIndex]->SetParameters(AxisReference,
-											  TimeInterval,
-											  FinalPosition,
-											  InitPosition,
-											  InitSpeed,
-											  InitAcc);
+                                                                       TimeInterval,
+                                                                       FinalPosition,
+                                                                       InitPosition,
+                                                                       InitSpeed,
+                                                                       InitAcc);
   return 0;
 }
 

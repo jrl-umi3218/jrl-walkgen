@@ -380,7 +380,7 @@ protected:
                                                                     1);
     // carry the weight in front of him
 //    m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
-//    m_CurrentConfiguration(19)= 0.015 ;            // CHEST_JOINT1
+    m_CurrentConfiguration(19)= 0.015 ;            // CHEST_JOINT1
 //    m_CurrentConfiguration(20)= 0.0 ;            // HEAD_JOINT0
 //    m_CurrentConfiguration(21)= 0.0 ;            // HEAD_JOINT1
 //    m_CurrentConfiguration(22)= -0.108210414 ;   // RARM_JOINT0
@@ -664,28 +664,28 @@ protected:
    }
 
    {
-     istringstream strm2(":singlesupporttime 1.56");
+     istringstream strm2(":singlesupporttime 1.4");
      aPGI.ParseCmd(strm2);
    }
 
    {
-     istringstream strm2(":doublesupporttime 0.04");
+     istringstream strm2(":doublesupporttime 0.15");
      aPGI.ParseCmd(strm2);
    }
 
    {
        istringstream strm2(":stepstairseq\
-                           0.0 -0.105 0.0 0.0\
-                           0.28 0.095 0.0 0.0\
-                           0.28 0.0 0.0 0.0\
-                           0.28 0.0 0.0 0.0\
-                           0.28 0.0 0.0 0.0\
-                           0.28 0.0 0.0 0.0\
-                           0.28 0.0 0.0 0.0\
-                           0.28 0.0 0.0 0.0\
-                           0.28 0.0 0.0 0.0\
-                           0.28 0.105 0.0 0.0\
-                           0.0 -0.19 0.0 0.0\
+                           0.0  -0.105 0.0 0.0\
+                           0.28  0.145 0.0 0.0\
+                           0.28 -0.100 0.0 0.0\
+                           0.28  0.100 0.0 0.0\
+                           0.28 -0.100 0.0 0.0\
+                           0.28  0.100 0.0 0.0\
+                           0.28 -0.100 0.0 0.0\
+                           0.28  0.100 0.0 0.0\
+                           0.28 -0.100 0.0 0.0\
+                           0.28  0.145 0.0 0.0\
+                           0.0  -0.190 0.0 0.0\
                            ");
      aPGI.ParseCmd(strm2);
    }

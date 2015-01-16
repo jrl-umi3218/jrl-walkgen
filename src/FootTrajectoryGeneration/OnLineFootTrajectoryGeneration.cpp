@@ -134,15 +134,15 @@ void
     }
   else
     {
-      if (m_BsplinesZ->FootComputePosition(LocalInterpolationStartTime+InterpolationTime) == 0)
+      if (m_BsplinesZ->Compute(LocalInterpolationStartTime+InterpolationTime) == 0)
         {
           curr_NSFAP.z = prev_NSFAP.z;
         }
       else
         {
-          curr_NSFAP.z = m_BsplinesZ->FootComputePosition(LocalInterpolationStartTime+InterpolationTime);
+          curr_NSFAP.z = m_BsplinesZ->Compute(LocalInterpolationStartTime+InterpolationTime);
         }
-      curr_NSFAP.dz = m_BsplinesZ->FootComputeVelocity(LocalInterpolationStartTime+InterpolationTime);
+      curr_NSFAP.dz = m_BsplinesZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
     }
 
 

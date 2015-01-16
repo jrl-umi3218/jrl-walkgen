@@ -33,9 +33,9 @@ using namespace std;
 
 int main()
 {
-    PatternGeneratorJRL::FootBSplines *X;
-    PatternGeneratorJRL::FootBSplines *Y;
-    PatternGeneratorJRL::FootBSplines *Z;
+    PatternGeneratorJRL::BSplinesFoot *X;
+    PatternGeneratorJRL::BSplinesFoot *Y;
+    PatternGeneratorJRL::BSplinesFoot *Z;
 
     double tx=0.0;
     double ty=0.0;
@@ -47,35 +47,35 @@ int main()
     //Create the parameters of foot trajectory on X
     double m_FTx = 0.7;
     double m_FPx = 0.54;
-    double m_MPx = 0.54;
-    double m_ToMPx = 0.6;
+    vector<double> m_MPx = vector<double>(1,0.54);
+    vector<double> m_ToMPx = vector<double>(1,0.6);
 
     //Create the parameters of foot trajectory on Y
     double m_FTy = 0.7;
     double m_FPy = 0;
-    double m_MPy = 0.2;
-    double m_ToMPy = m_FTx/2.0;
+    vector<double> m_MPy = vector<double>(1,0.2);
+    vector<double> m_ToMPy = vector<double>(1,m_FTx/2.0);
 
     //Create the parameters of foot trajectory on Z
     double m_FTz = 0.7;
     double m_FPz = 0.0;
-    double m_MPz = 0.07;
-    double m_ToMPz = m_FTx/2.0;
+    vector<double> m_MPz = vector<double>(1,0.07);
+    vector<double> m_ToMPz = vector<double>(1,m_FTx/2.0);
 
     //Create an object for test X
-    X = new PatternGeneratorJRL::FootBSplines(m_FTx, m_FPx, m_ToMPx, m_MPx);
+    X = new PatternGeneratorJRL::BSplinesFoot(m_FTx, m_FPx, m_ToMPx, m_MPx);
     X->PrintDegree();
     X->PrintKnotVector();
     X->PrintControlPoints();
 
     //Create an object for test Y
-    Y = new PatternGeneratorJRL::FootBSplines(m_FTy, m_FPy, m_ToMPy, m_MPy);
+    Y = new PatternGeneratorJRL::BSplinesFoot(m_FTy, m_FPy, m_ToMPy, m_MPy);
     Y->PrintDegree();
     Y->PrintKnotVector();
     Y->PrintControlPoints();
 
     //Create an object for test Y
-    Z = new PatternGeneratorJRL::FootBSplines(m_FTz, m_FPz, m_ToMPz, m_MPz);
+    Z = new PatternGeneratorJRL::BSplinesFoot(m_FTz, m_FPz, m_ToMPz, m_MPz);
     Z->PrintDegree();
     Z->PrintKnotVector();
     Z->PrintControlPoints();
@@ -89,9 +89,9 @@ int main()
 
         //cout << k << endl;
         //myfile << t << " " << X->ZComputePosition(t) << " " << X->ZComputeVelocity(t)<< " " << X->ZComputeAcc(t)<< endl;
-        myfile << tx << " " << X->FootComputePosition(tx) << " " << X->FootComputeVelocity(tx)<< " " << X->FootComputeAcc(tx)
-                     << " " << Y->FootComputePosition(ty) << " " << Y->FootComputeVelocity(ty)<< " " << Y->FootComputeAcc(ty)
-                     << " " << Y->FootComputePosition(tz) << " " << Z->FootComputeVelocity(tz)<< " " << Z->FootComputeAcc(tz)
+        myfile << tx << " " << X->Compute(tx) << " " << X->ComputeDerivative(tx)<< " " << X->ComputeSecDerivative(tx)
+                     << " " << Y->Compute(ty) << " " << Y->ComputeDerivative(ty)<< " " << Y->ComputeSecDerivative(ty)
+                     << " " << Y->Compute(tz) << " " << Z->ComputeDerivative(tz)<< " " << Z->ComputeSecDerivative(tz)
                      << endl;
 
         // time - Position - Velocity - Acceleration

@@ -240,11 +240,11 @@ namespace PatternGeneratorJRL
    Polynome6 *m_PolynomeZ;
 
    /*! \brief Bsplines for Z axis position. */
-   FootBSplines *m_BsplinesZ;
+   BSplinesFoot *m_BsplinesZ;
 
    /** Definition of BSplines X Y*/
-   FootBSplines *m_BsplinesX;
-   FootBSplines *m_BsplinesY;
+   BSplinesFoot *m_BsplinesX;
+   BSplinesFoot *m_BsplinesY;
 
   // int m_isStepStairOn;
 

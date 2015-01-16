@@ -136,9 +136,9 @@ void FootTrajectoryGenerationStandard::InitializeInternalDataStructures()
   m_PolynomeY = new Polynome5(0,0);
   m_PolynomeZ = new Polynome6(0,0);
 
-  m_BsplinesX = new FootBSplines(0,0,0,0);
-  m_BsplinesY = new FootBSplines(0,0,0,0);
-  m_BsplinesZ = new FootBSplines(0,0,0,0);
+  m_BsplinesX = new BSplinesFoot();
+  m_BsplinesY = new BSplinesFoot();
+  m_BsplinesZ = new BSplinesFoot();
 
   m_PolynomeOmega = new Polynome3(0,0);
   m_PolynomeOmega2 = new Polynome3(0,0);
@@ -181,41 +181,42 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex,
                                                     double TimeInterval,
                                                     double Position)
 {
- switch (PolynomeIndex)
-   {
+  vector<double> MP (1, Position + m_StepHeight)  ;
+  vector<double> ToMP (1, TimeInterval/3.0) ;
+  switch (PolynomeIndex)
+  {
+    case X_AXIS:
+      m_PolynomeX->SetParameters(TimeInterval,Position);
+      //m_BsplinesX->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position + m_StepHeight);
+      break;
 
-   case X_AXIS:
-     m_PolynomeX->SetParameters(TimeInterval,Position);
-     //m_BsplinesX->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position + m_StepHeight);
-     break;
+    case Y_AXIS:
+      m_PolynomeY->SetParameters(TimeInterval,Position);
+      //-m_BsplinesY->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position + m_StepHeight);
+      break;
 
-   case Y_AXIS:
-     m_PolynomeY->SetParameters(TimeInterval,Position);
-     //-m_BsplinesY->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position + m_StepHeight);
-     break;
+    case Z_AXIS:
+      m_PolynomeZ->SetParameters(TimeInterval,Position+m_StepHeight,Position);
+      m_BsplinesZ->SetParameters(TimeInterval,0.0,Position,ToMP,MP);
+      break;
 
-   case Z_AXIS:
-     m_PolynomeZ->SetParameters(TimeInterval,Position+m_StepHeight,Position);
-     m_BsplinesZ->SetParameters(TimeInterval,Position,TimeInterval/3.0,Position + m_StepHeight);
-     break;
+    case THETA_AXIS:
+      m_PolynomeTheta->SetParameters(TimeInterval,Position);
+      break;
 
-   case THETA_AXIS:
-     m_PolynomeTheta->SetParameters(TimeInterval,Position);
-     break;
+    case OMEGA_AXIS:
+      m_PolynomeOmega->SetParameters(TimeInterval,Position);
+      break;
 
-   case OMEGA_AXIS:
-     m_PolynomeOmega->SetParameters(TimeInterval,Position);
-     break;
+    case OMEGA2_AXIS:
+      m_PolynomeOmega2->SetParameters(TimeInterval,Position);
+      break;
 
-   case OMEGA2_AXIS:
-     m_PolynomeOmega2->SetParameters(TimeInterval,Position);
-     break;
-
-   default:
-     return -1;
-     break;
-   }
- return 0;
+    default:
+      return -1;
+      break;
+  }
+  return 0;
 }
 
 
@@ -228,69 +229,84 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
 									vector<double> MiddlePos)
 {
   double epsilon = 0.0001;
-  double WayPoint_x = MiddlePos[0];
-  double WayPoint_y = MiddlePos[1];
-  double dPos_z = MiddlePos[2];
+  double WayPoint_x = MiddlePos[0] ;
+  double WayPoint_y = MiddlePos[1] ;
+  double WayPoint_z = MiddlePos[2] ;
+
+  vector<double> MP ;
+  vector<double> ToMP ;
+
+  bool isWayPointSet = WayPoint_x != WayPoint_y &&
+                       WayPoint_y != WayPoint_z &&
+                       WayPoint_x != WayPoint_z ;
+
+  bool isFootMoving = abs(m_BsplinesY->FP() - m_BsplinesY->IP())>epsilon ||
+                      abs(m_BsplinesX->FP() - m_BsplinesX->IP())>epsilon ;
 
   switch (PolynomeIndex)
-    {
-
+  {
     case X_AXIS:
       ODEBUG2("Initspeed: " << InitSpeed << " ");
       // Init polynom
       m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
       // Init BSpline
-
-      if( WayPoint_x != WayPoint_y && WayPoint_y != dPos_z && WayPoint_x != dPos_z )
-        {
-          /**                                       ID        Final Time | Final Position | Time Max Value | Max Value             */
-          m_BsplinesX->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.4*TimeInterval,WayPoint_x);
-        }
+      if( isWayPointSet )
+      {
+        ToMP.push_back(0.20*TimeInterval);
+        ToMP.push_back(0.75*TimeInterval);
+        MP.push_back(InitPosition) ;
+        MP.push_back(FinalPosition) ;
+      }
       else
-        {
-          m_BsplinesX->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.80*TimeInterval,FinalPosition);
-        }
+      {
+        ToMP.push_back(0.80*TimeInterval);
+        MP.push_back(FinalPosition);
+      }
+      m_BsplinesX->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP);
       break;
 
     case Y_AXIS:
       m_PolynomeY->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,0.0);
-
-      if( WayPoint_x != WayPoint_y && WayPoint_y != dPos_z && WayPoint_x != dPos_z )
-        {
-          /**                                       ID        Final Time | Final Position | Time Max Value | Max Value             */
-          m_BsplinesY->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.27*TimeInterval,WayPoint_y);
-        }
+      if(isWayPointSet)
+      {
+        ToMP.push_back(0.20*TimeInterval);
+        ToMP.push_back(0.75*TimeInterval);
+        MP.push_back(WayPoint_y);
+        MP.push_back(WayPoint_y);
+      }
       else
-        {
-          m_BsplinesY->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.80*TimeInterval,FinalPosition);
-        }
+      {
+        ToMP.push_back(0.80*TimeInterval);
+        MP.push_back(FinalPosition);
+      }
+      m_BsplinesY->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP);
       break;
 
     case Z_AXIS:
-
-
-      if( WayPoint_x == WayPoint_y && WayPoint_y == dPos_z && WayPoint_x == dPos_z )
+      if( !isFootMoving )
         {
-          dPos_z = 0.0;
+          WayPoint_z = 0.0;
         }
       m_PolynomeZ->SetParametersWithMiddlePos(TimeInterval, FinalPosition+m_StepHeight,
                                               InitPosition, InitSpeed, 0.0, FinalPosition);
 
-
       // Check the final and the initial position to decide what to do
       if (FinalPosition - InitPosition > epsilon )
         {
-          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.3*TimeInterval,FinalPosition+dPos_z);
+          ToMP.push_back(0.3*TimeInterval);
+          MP.push_back(FinalPosition+WayPoint_z);
         }
       else if (FinalPosition - InitPosition <= epsilon && FinalPosition - InitPosition >= -epsilon )
         {
-          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,FinalPosition+dPos_z);
+          ToMP.push_back(0.5*TimeInterval);
+          MP.push_back(FinalPosition+WayPoint_z);
         }
       else if (FinalPosition - InitPosition < -epsilon )
         {
-          m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.6*TimeInterval,InitPosition+dPos_z/3.0);
+          ToMP.push_back(0.6*TimeInterval);
+          MP.push_back(InitPosition+WayPoint_z/3.0);
         }
-
+      m_BsplinesZ->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP);
       break;
 
     case THETA_AXIS:
@@ -308,13 +324,14 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
     default:
       return -1;
       break;
-    }
+  }
   return 0;
 }
 
 int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double TimeInterval,
     double FinalPosition, double InitPosition, double InitSpeed, double InitAcc, double InitJerk)
 {
+
  switch (PolynomeIndex)
    {
 
@@ -327,22 +344,8 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
      break;
 
    case Z_AXIS:
-   //  if (m_isStepStairOn == 0)
-   //{
      m_PolynomeZ->SetParametersWithMiddlePos(TimeInterval,FinalPosition+m_StepHeight,InitPosition,InitSpeed,
                                              InitAcc,FinalPosition);
-   //}
-   //else
-   //{
-       if ((FinalPosition - InitPosition) == m_StepHeight)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,InitPosition,0.5*TimeInterval,InitPosition+m_StepHeight);
-        else if (FinalPosition > InitPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,1.5*TimeInterval/5.0,FinalPosition+m_StepHeight);//InitPosition+abs(FinalPosition-InitPosition)*1.5);
-       else if (FinalPosition == InitPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,0.5*TimeInterval,FinalPosition);//InitPosition+abs(FinalPosition-InitPosition)*1.5);
-       else if (FinalPosition < InitPosition)
-        m_BsplinesZ->SetParametersWithInitPos(InitPosition,TimeInterval,FinalPosition,6.0*TimeInterval/10.0,InitPosition+m_StepHeight/3.0);//+abs(FinalPosition-InitPosition)*0.3);
-
     break;
 
    case THETA_AXIS:
@@ -386,8 +389,6 @@ int FootTrajectoryGenerationStandard::GetParametersWithInitPosInitSpeed(int Poly
    case Z_AXIS:
      m_PolynomeZ->GetParametersWithInitPosInitSpeed(TimeInterval,MiddlePosition,FinalPosition,InitPosition,InitSpeed);
 
-     m_BsplinesZ->GetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
-
     break;
 
    case THETA_AXIS:
@@ -424,29 +425,25 @@ double FootTrajectoryGenerationStandard::ComputeAllWithPolynom(FootAbsolutePosit
   aFootAbsolutePosition.y = m_PolynomeY->Compute(Time);
   aFootAbsolutePosition.dy = m_PolynomeY->ComputeDerivative(Time);
   aFootAbsolutePosition.ddy = m_PolynomeY->ComputeSecDerivative(Time);
+  ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.y);
 
-  if (m_isStepStairOn == 0)
-   {
-      aFootAbsolutePosition.z = m_PolynomeZ->Compute(Time);
-      aFootAbsolutePosition.dz = m_PolynomeZ->ComputeDerivative(Time);
-      aFootAbsolutePosition.ddz = m_PolynomeZ->ComputeSecDerivative(Time);
-   }
-   else
-   {
-     aFootAbsolutePosition.z = m_BsplinesZ->FootComputePosition(Time);
-     aFootAbsolutePosition.dz = m_BsplinesZ->FootComputeVelocity(Time);
-     aFootAbsolutePosition.ddz = m_BsplinesZ->FootComputeAcc(Time);
-   }
+  aFootAbsolutePosition.z = m_PolynomeZ->Compute(Time);
+  aFootAbsolutePosition.dz = m_PolynomeZ->ComputeDerivative(Time);
+  aFootAbsolutePosition.ddz = m_PolynomeZ->ComputeSecDerivative(Time);
+  ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.z);
 
   aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(Time);
   aFootAbsolutePosition.dtheta = m_PolynomeTheta->ComputeDerivative(Time);
   aFootAbsolutePosition.ddtheta = m_PolynomeTheta->ComputeSecDerivative(Time);
+  ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.theta);
 
   aFootAbsolutePosition.omega = m_PolynomeOmega->Compute(Time);
   aFootAbsolutePosition.domega = m_PolynomeOmega->ComputeDerivative(Time);
+  ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.omega);
 
   aFootAbsolutePosition.omega2 = m_PolynomeOmega2->Compute(Time);
   aFootAbsolutePosition.domega2 = m_PolynomeOmega2->ComputeDerivative(Time);
+  ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.omega2);
 
   return Time;
 }
@@ -455,93 +452,54 @@ double FootTrajectoryGenerationStandard::ComputeAllWithPolynom(FootAbsolutePosit
 double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosition & aFootAbsolutePosition,
                             double Time)
 {
-  double UnlockedSwingPeriod = m_BsplinesY->GetFT() ;
-  double ss_time = m_BsplinesZ->GetFT() ;
+  double UnlockedSwingPeriod = m_BsplinesY->FT() ;
+  double ss_time = m_BsplinesZ->FT() ;
   double EndOfLiftOff = (ss_time-UnlockedSwingPeriod)*0.5;
   double StartLanding = EndOfLiftOff + UnlockedSwingPeriod;
 
+  //cout << UnlockedSwingPeriod << " " << ss_time << " " << " " << UnlockedSwingPeriod/ss_time << endl ;
+
+  double timeOfInterpolation = 0.0 ;
   if(Time <= EndOfLiftOff)
-    // the landing is dealt inside the computation of the Polynome or BSpline
     {
-      // Trajectory of the foot compute in the X domain (plane X of t)
-      aFootAbsolutePosition.x = m_BsplinesX->FootComputePosition(0.0);
-      aFootAbsolutePosition.dx = m_BsplinesX->FootComputeVelocity(0.0);
-      aFootAbsolutePosition.ddx = m_BsplinesX->FootComputeAcc(0.0);
-
-      // Trajectory of the foot compute in the Y domain (plane Y of t)
-      aFootAbsolutePosition.y = m_BsplinesY->FootComputePosition(0.0);
-      aFootAbsolutePosition.dy = m_BsplinesY->FootComputeVelocity(0.0);
-      aFootAbsolutePosition.ddy = m_BsplinesY->FootComputeAcc(0.0);
-
-      // Trajectory of the foot in term of roll
-      aFootAbsolutePosition.omega = m_PolynomeOmega->Compute(0.0);
-      aFootAbsolutePosition.domega = m_PolynomeOmega->ComputeDerivative(0.0);
-
-      // Trajectory of the foot in term of pitch
-      aFootAbsolutePosition.omega2 = m_PolynomeOmega2->Compute(0.0);
-      aFootAbsolutePosition.domega2 = m_PolynomeOmega2->ComputeDerivative(0.0);
-
-      // Trajectory of the foot in term of yaw
-      aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(0.0);
-      aFootAbsolutePosition.dtheta = m_PolynomeTheta->ComputeDerivative(0.0);
-      aFootAbsolutePosition.ddtheta = m_PolynomeTheta->ComputeSecDerivative(0.0);
+      timeOfInterpolation = 0.0 ;
     }
   else if (Time <= StartLanding)
     {
-      double remaining_time = Time - EndOfLiftOff ;
-      // Trajectory of the foot compute in the X domain (plane X of t)
-      aFootAbsolutePosition.x = m_BsplinesX->FootComputePosition(remaining_time);
-      aFootAbsolutePosition.dx = m_BsplinesX->FootComputeVelocity(remaining_time);
-      aFootAbsolutePosition.ddx = m_BsplinesX->FootComputeAcc(remaining_time);
-
-      // Trajectory of the foot compute in the Y domain (plane Y of t)
-      aFootAbsolutePosition.y = m_BsplinesY->FootComputePosition(remaining_time);
-      aFootAbsolutePosition.dy = m_BsplinesY->FootComputeVelocity(remaining_time);
-      aFootAbsolutePosition.ddy = m_BsplinesY->FootComputeAcc(remaining_time);
-
-      // Trajectory of the foot in term of roll
-      aFootAbsolutePosition.omega = m_PolynomeOmega->Compute(remaining_time);
-      aFootAbsolutePosition.domega = m_PolynomeOmega->ComputeDerivative(remaining_time);
-
-      // Trajectory of the foot in term of pitch
-      aFootAbsolutePosition.omega2 = m_PolynomeOmega2->Compute(remaining_time);
-      aFootAbsolutePosition.domega2 = m_PolynomeOmega2->ComputeDerivative(remaining_time);
-
-      // Trajectory of the foot in term of yaw
-      aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(remaining_time);
-      aFootAbsolutePosition.dtheta = m_PolynomeTheta->ComputeDerivative(remaining_time);
-      aFootAbsolutePosition.ddtheta = m_PolynomeTheta->ComputeSecDerivative(remaining_time);
+      timeOfInterpolation = Time - EndOfLiftOff ;
     }
   else
     {
-      // Trajectory of the foot compute in the X domain (plane X of t)
-      aFootAbsolutePosition.x = m_BsplinesX->FootComputePosition(UnlockedSwingPeriod-m_SamplingPeriod);
-      aFootAbsolutePosition.dx = m_BsplinesX->FootComputeVelocity(UnlockedSwingPeriod-m_SamplingPeriod);
-      aFootAbsolutePosition.ddx = m_BsplinesX->FootComputeAcc(UnlockedSwingPeriod-m_SamplingPeriod);
-
-      // Trajectory of the foot compute in the Y domain (plane Y of t)
-      aFootAbsolutePosition.y = m_BsplinesY->FootComputePosition(UnlockedSwingPeriod-m_SamplingPeriod);
-      aFootAbsolutePosition.dy = m_BsplinesY->FootComputeVelocity(UnlockedSwingPeriod-m_SamplingPeriod);
-      aFootAbsolutePosition.ddy = m_BsplinesY->FootComputeAcc(UnlockedSwingPeriod-m_SamplingPeriod);
-
-      // Trajectory of the foot in term of roll
-      aFootAbsolutePosition.omega = m_PolynomeOmega->Compute(UnlockedSwingPeriod-m_SamplingPeriod);
-      aFootAbsolutePosition.domega = m_PolynomeOmega->ComputeDerivative(UnlockedSwingPeriod-m_SamplingPeriod);
-
-      // Trajectory of the foot in term of pitch
-      aFootAbsolutePosition.omega2 = m_PolynomeOmega2->Compute(UnlockedSwingPeriod-m_SamplingPeriod);
-      aFootAbsolutePosition.domega2 = m_PolynomeOmega2->ComputeDerivative(UnlockedSwingPeriod-m_SamplingPeriod);
-
-      // Trajectory of the foot in term of yaw
-      aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(UnlockedSwingPeriod-m_SamplingPeriod);
-      aFootAbsolutePosition.dtheta = m_PolynomeTheta->ComputeDerivative(UnlockedSwingPeriod-m_SamplingPeriod);
-      aFootAbsolutePosition.ddtheta = m_PolynomeTheta->ComputeSecDerivative(UnlockedSwingPeriod-m_SamplingPeriod);
+      timeOfInterpolation = UnlockedSwingPeriod-m_SamplingPeriod ;
     }
 
+  // Trajectory of the foot compute in the X domain (plane X of t)
+  aFootAbsolutePosition.x = m_BsplinesX->Compute(timeOfInterpolation);
+  aFootAbsolutePosition.dx = m_BsplinesX->ComputeDerivative(timeOfInterpolation);
+  aFootAbsolutePosition.ddx = m_BsplinesX->ComputeSecDerivative(timeOfInterpolation);
+
+  // Trajectory of the foot compute in the Y domain (plane Y of t)
+  aFootAbsolutePosition.y = m_BsplinesY->Compute(timeOfInterpolation);
+  aFootAbsolutePosition.dy = m_BsplinesY->ComputeDerivative(timeOfInterpolation);
+  aFootAbsolutePosition.ddy = m_BsplinesY->ComputeSecDerivative(timeOfInterpolation);
+
+  // Trajectory of the foot in term of roll
+  aFootAbsolutePosition.omega = m_PolynomeOmega->Compute(timeOfInterpolation);
+  aFootAbsolutePosition.domega = m_PolynomeOmega->ComputeDerivative(timeOfInterpolation);
+
+  // Trajectory of the foot in term of pitch
+  aFootAbsolutePosition.omega2 = m_PolynomeOmega2->Compute(timeOfInterpolation);
+  aFootAbsolutePosition.domega2 = m_PolynomeOmega2->ComputeDerivative(timeOfInterpolation);
+
+  // Trajectory of the foot in term of yaw
+  aFootAbsolutePosition.theta = m_PolynomeTheta->Compute(timeOfInterpolation);
+  aFootAbsolutePosition.dtheta = m_PolynomeTheta->ComputeDerivative(timeOfInterpolation);
+  aFootAbsolutePosition.ddtheta = m_PolynomeTheta->ComputeSecDerivative(timeOfInterpolation);
+
   // Trajectory of the foot compute in the Z domain (plane Z of t)
-  aFootAbsolutePosition.z = m_BsplinesZ->FootComputePosition(Time);
-  aFootAbsolutePosition.dz = m_BsplinesZ->FootComputeVelocity(Time);
-  aFootAbsolutePosition.ddz = m_BsplinesZ->FootComputeAcc(Time);
+  aFootAbsolutePosition.z = m_BsplinesZ->Compute(Time);
+  aFootAbsolutePosition.dz = m_BsplinesZ->ComputeDerivative(Time);
+  aFootAbsolutePosition.ddz = m_BsplinesZ->ComputeSecDerivative(Time);
 
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.x);
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.y);
@@ -573,7 +531,7 @@ double FootTrajectoryGenerationStandard::Compute(unsigned int PolynomeIndex, dou
    if (m_isStepStairOn == 0)
      r=m_PolynomeZ->Compute(Time);
     else
-     r=m_BsplinesZ->FootComputePosition(Time);
+     r=m_BsplinesZ->Compute(Time);
      break;
 
    case THETA_AXIS:
@@ -614,7 +572,7 @@ double FootTrajectoryGenerationStandard::ComputeSecDerivative(unsigned int Polyn
    if (m_isStepStairOn == 0)
      r=m_PolynomeZ->ComputeSecDerivative(Time);
     else
-     r=m_BsplinesZ->FootComputeAcc(Time);
+     r=m_BsplinesZ->ComputeSecDerivative(Time);
 
      break;
 
@@ -687,7 +645,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   if (m_isStepStairOn == 0)
   curr_NSFAP.z = init_NSFAP.z + m_PolynomeZ->Compute(LocalTime);
   else
-  curr_NSFAP.z = init_NSFAP.z + m_BsplinesZ->FootComputePosition(LocalTime);
+  curr_NSFAP.z = init_NSFAP.z + m_BsplinesZ->Compute(LocalTime);
 
   ODEBUG2("x:" << curr_NSFAP.x << " LocalTime - EndOfLiftOff" << LocalTime - EndOfLiftOff
           << " " << m_PolynomeX->Compute(LocalTime - EndOfLiftOff));
@@ -900,17 +858,17 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
     else
 
     {
-        if (m_BsplinesZ->FootComputePosition(LocalInterpolationStartTime+InterpolationTime) == 0)
+        if (m_BsplinesZ->Compute(LocalInterpolationStartTime+InterpolationTime) == 0)
         {
             NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].z;
         }
         else
         {
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = m_BsplinesZ->FootComputePosition(LocalInterpolationStartTime+InterpolationTime);
+        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = m_BsplinesZ->Compute(LocalInterpolationStartTime+InterpolationTime);
 
         }//m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
         //m_AnklePositionRight[2];
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = m_BsplinesZ->FootComputeVelocity(LocalInterpolationStartTime+InterpolationTime);
+        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = m_BsplinesZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
         //m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
         //m_AnklePositionRight[2];
     }

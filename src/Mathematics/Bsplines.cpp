@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <assert.h>
 
 #include <Debug.hh>
 #include <Mathematics/Bsplines.hh>
@@ -30,98 +31,98 @@ void Bsplines::GenerateDegree()
     m_degree = (unsigned)degree ;
 }
 
-void Bsplines::GenerateKnotVector(std::string method)
-{
-    /*Calculer set of parameters*/
-    unsigned int i,j;
-    vector<double> set_of_pam;
+//void Bsplines::GenerateKnotVector(std::string method)
+//{
+//    /*Calculer set of parameters*/
+//    unsigned int i,j;
+//    vector<double> set_of_pam;
 
-        if (method == "centripetal")
-        {
-            //cout << "centripetal" << endl;
-            set_of_pam.clear();
-            set_of_pam.reserve(m_control_points.size());
-            cout << m_control_points.size() << endl;
-            double L = 0.0;
-            double D = 0.0;
-            for (i=0;i<m_control_points.size()-1;i++)
-            {
-                L += sqrt ( sqrt(((m_control_points[i].x - m_control_points[i+1].x)*(m_control_points[i].x - m_control_points[i+1].x)) +
-                              ((m_control_points[i].y - m_control_points[i+1].y)*(m_control_points[i].y - m_control_points[i+1].y)) ) );
-            }
-            for (i=0;i<m_control_points.size();i++)
-            {
-                if (i == 0)
-                {
-                    set_of_pam.push_back(0.0);
-                }
-                else if (i == m_control_points.size()-1)
-                {
-                    set_of_pam.push_back(1.0);
-                }
-                else
-                {
-                    D += sqrt ( sqrt(((m_control_points[i].x - m_control_points[i+1].x)*(m_control_points[i].x - m_control_points[i+1].x)) +
-                              ((m_control_points[i].y - m_control_points[i+1].y)*(m_control_points[i].y - m_control_points[i+1].y)) ) );
-                    set_of_pam.push_back(D/L);
-                }
-            }
+//        if (method == "centripetal")
+//        {
+//            //cout << "centripetal" << endl;
+//            set_of_pam.clear();
+//            set_of_pam.reserve(m_control_points.size());
+//            cout << m_control_points.size() << endl;
+//            double L = 0.0;
+//            double D = 0.0;
+//            for (i=0;i<m_control_points.size()-1;i++)
+//            {
+//                L += sqrt ( sqrt(((m_control_points[i].x - m_control_points[i+1].x)*(m_control_points[i].x - m_control_points[i+1].x)) +
+//                              ((m_control_points[i].y - m_control_points[i+1].y)*(m_control_points[i].y - m_control_points[i+1].y)) ) );
+//            }
+//            for (i=0;i<m_control_points.size();i++)
+//            {
+//                if (i == 0)
+//                {
+//                    set_of_pam.push_back(0.0);
+//                }
+//                else if (i == m_control_points.size()-1)
+//                {
+//                    set_of_pam.push_back(1.0);
+//                }
+//                else
+//                {
+//                    D += sqrt ( sqrt(((m_control_points[i].x - m_control_points[i+1].x)*(m_control_points[i].x - m_control_points[i+1].x)) +
+//                              ((m_control_points[i].y - m_control_points[i+1].y)*(m_control_points[i].y - m_control_points[i+1].y)) ) );
+//                    set_of_pam.push_back(D/L);
+//                }
+//            }
 
-            m_knot_vector.clear();
-            double U = 0.0;
-            for (i=0;i<=m_degree;i++)
-            {
-                m_knot_vector.push_back(0.0);
-            }
+//            m_knot_vector.clear();
+//            double U = 0.0;
+//            for (i=0;i<=m_degree;i++)
+//            {
+//                m_knot_vector.push_back(0.0);
+//            }
 
-            if (m_control_points.size()-1>=m_degree)
-            {
-                for (j=1;j<=m_control_points.size()-1-m_degree;j++)
-                {
-                    i=j;
-                    U=0.0;
-                    while (i<=m_degree-1+j)
-                    {
-                        U +=set_of_pam[i];
-                        i++;
-                    }
-                    m_knot_vector.push_back(U/double(m_degree));
-                }
-            }
+//            if (m_control_points.size()-1>=m_degree)
+//            {
+//                for (j=1;j<=m_control_points.size()-1-m_degree;j++)
+//                {
+//                    i=j;
+//                    U=0.0;
+//                    while (i<=m_degree-1+j)
+//                    {
+//                        U +=set_of_pam[i];
+//                        i++;
+//                    }
+//                    m_knot_vector.push_back(U/double(m_degree));
+//                }
+//            }
 
-            for (i=0;i<=m_degree;i++)
-            {
-                m_knot_vector.push_back(1.0);
-            }
-            if (m_knot_vector.size() - 1 != m_control_points.size() + m_degree)
-            {
-                cout << "Knot vector cant be created. m_control_points.size()-1>=m_degree "<< endl;
-                m_knot_vector.clear();
-            }
+//            for (i=0;i<=m_degree;i++)
+//            {
+//                m_knot_vector.push_back(1.0);
+//            }
+//            if (m_knot_vector.size() - 1 != m_control_points.size() + m_degree)
+//            {
+//                cout << "Knot vector cant be created. m_control_points.size()-1>=m_degree "<< endl;
+//                m_knot_vector.clear();
+//            }
 
-        }
+//        }
 
-        else if (method =="universal")
-        {
-            m_knot_vector.clear();
-            //cout << "universal" << endl;
-            double U=0;
-            for (i=0;i<=m_degree;i++)
-            {
-                m_knot_vector.push_back(0.0);
-            }
-            for (i=1;i<=m_control_points.size()-1-m_degree;i++)
-            {
-                U = double(i)/(m_control_points.size()-1-m_degree+1);
-                m_knot_vector.push_back(U);
-            }
-            for (i=0;i<=m_degree;i++)
-            {
-                m_knot_vector.push_back(1.0);
-            }
+//        else if (method =="universal")
+//        {
+//            m_knot_vector.clear();
+//            //cout << "universal" << endl;
+//            double U=0;
+//            for (i=0;i<=m_degree;i++)
+//            {
+//                m_knot_vector.push_back(0.0);
+//            }
+//            for (i=1;i<=m_control_points.size()-1-m_degree;i++)
+//            {
+//                U = double(i)/(m_control_points.size()-1-m_degree+1);
+//                m_knot_vector.push_back(U);
+//            }
+//            for (i=0;i<=m_degree;i++)
+//            {
+//                m_knot_vector.push_back(1.0);
+//            }
 
-        }
-}
+//        }
+//}
 
 double *Bsplines::ComputeBasisFunction(double t)
 {
@@ -181,56 +182,48 @@ double *Bsplines::ComputeBasisFunction(double t)
 return m_basis_function[m_degree];
 }
 
-Point Bsplines::ComputeBsplines(double t)
+double Bsplines::ComputeBsplines(double t)
 {
     double *m_basis_function = ComputeBasisFunction(t);
-
-    Point C = {0.0,0.0};
+    double result = 0.0 ;
     if (m_degree!= m_knot_vector.size() - m_control_points.size() -1 )
     {
         cout << "The parameters are not compatibles. Please recheck " << endl;
-        return C;
+        return result;
     }
     if (m_degree == ((m_knot_vector.size()-1) - (m_control_points.size()-1)- 1) )
         {
             for (unsigned int i=0;i<m_control_points.size();i++)
             {
-                C.x += m_basis_function[i] * m_control_points[i].x;
-                C.y += m_basis_function[i] * m_control_points[i].y;
+                result += m_basis_function[i] * m_control_points[i];
             }
         }
-return C;
+    return result;
 }
 
 Bsplines Bsplines::DerivativeBsplines()
 {
-    std::vector<Point> Q;
+    std::vector<double> Q;
     Q.clear();
     Q.reserve(m_control_points.size()-1);
 
-    Point T;
+    double T;
     if (m_degree >=1)
     {
         for (unsigned int i=0;i<m_control_points.size()-1;i++)
         {
-            T.x = ((m_control_points[i+1].x - m_control_points[i].x)*double(m_degree) )/ (m_knot_vector[i+m_degree+1] - m_knot_vector[i+1]);
-
-            T.y = ((m_control_points[i+1].y - m_control_points[i].y)*double(m_degree) )/ (m_knot_vector[i+m_degree+1] - m_knot_vector[i+1]);
+            T = ((m_control_points[i+1] - m_control_points[i])*double(m_degree) )/ (m_knot_vector[i+m_degree+1] - m_knot_vector[i+1]);
             Q.push_back(T);
         }
         Bsplines B(m_degree-1);
         B.SetControlPoints(Q);
         std::vector<double> new_knot_vector(m_knot_vector.begin()+1,m_knot_vector.end()-1);
         B.SetKnotVector(new_knot_vector);
-        //cout <<"derivative function "<<endl;
-        //B.PrintKnotVector();
-        //B.PrintControlPoints();
-        //B.PrintDegree();
         return B;
         }
     else
         {
-            std::cout << "the function cannot be derivative " << std::endl;
+            std::cout << "the function cannot be derivated " << std::endl;
             return Bsplines(m_degree);
         }
 }
@@ -240,7 +233,7 @@ void Bsplines::SetDegree(int degree)
     m_degree = degree;
 }
 
-void Bsplines::SetControlPoints(std::vector<Point> &control_points)
+void Bsplines::SetControlPoints(std::vector<double> &control_points)
 {
     if (control_points.size()>=2)
     {
@@ -262,7 +255,7 @@ int Bsplines::GetDegree() const
     return m_degree;
 }
 
-std::vector<Point> Bsplines::GetControlPoints() const
+std::vector<double> Bsplines::GetControlPoints() const
 {
     return m_control_points;
 }
@@ -287,7 +280,7 @@ void Bsplines::PrintControlPoints() const
     std::cout << "Control Points : "<< std::endl;
     for (unsigned int i = 0;i<m_control_points.size();i++)
     {
-        std::cout << m_control_points[i].x << " , " << m_control_points[i].y << std::endl;
+        std::cout << m_control_points[i]  << std::endl;
     }
 }
 
@@ -301,31 +294,31 @@ void Bsplines::PrintDegree() const
 // create a foot trajectory of Z on function the time t
 
 
-FootBSplinesZ::FootBSplines(double FT, double FP, double ToMP, double MP):Bsplines(4)
+BSplinesFoot::BSplinesFoot(double FT, double FP, vector<double> ToMP, vector<double> MP):Bsplines(4)
 {
-    SetParameters( FT, FP, ToMP, MP);
+  SetParameters(FT, 0.0 , FP, ToMP, MP);
 }
 
-FootBSplines::~FootBSplines()
+BSplinesFoot::~BSplinesFoot()
 {
 
 }
 
-double FootBSplines::FootComputePosition(double t)
+double BSplinesFoot::Compute(double t)
 {
     if (t<=m_FT)
-        return ComputeBsplines(t).y;
+        return ComputeBsplines(t);
     else
-        return ComputeBsplines(m_FT).y;
+        return ComputeBsplines(m_FT);
 }
 
-double FootBSplines::FootComputeVelocity(double t)
+double BSplinesFoot::ComputeDerivative(double t)
 {
     if (m_degree >=1){
         if (t<=m_FT)
-            return DerivativeBsplines().ComputeBsplines(t).y;
+            return DerivativeBsplines().ComputeBsplines(t);
         else
-            return DerivativeBsplines().ComputeBsplines(m_FT).y;
+            return DerivativeBsplines().ComputeBsplines(m_FT);
     }
     else
     {
@@ -334,13 +327,13 @@ double FootBSplines::FootComputeVelocity(double t)
     }
 }
 
-double FootBSplines::FootComputeAcc(double t)
+double BSplinesFoot::ComputeSecDerivative(double t)
 {
     if (m_degree >=2){
         if (t<=m_FT)
-            return DerivativeBsplines().DerivativeBsplines().ComputeBsplines(t).y;
+            return DerivativeBsplines().DerivativeBsplines().ComputeBsplines(t);
         else
-            return DerivativeBsplines().DerivativeBsplines().ComputeBsplines(m_FT).y;
+            return DerivativeBsplines().DerivativeBsplines().ComputeBsplines(m_FT);
     }
     else
     {
@@ -349,149 +342,111 @@ double FootBSplines::FootComputeAcc(double t)
     }
 }
 
-void  FootBSplines::SetParameters(double FT, double FP, double ToMP, double MP)
+void  BSplinesFoot::SetParameters(double FT,
+                                  double IP,
+                                  double FP,
+                                  vector<double>ToMP,
+                                  vector<double> MP)
 {
-    if (ToMP == 0.0 && MP == 0.0)
-    {
-        FootGenerateKnotVector(FT);
-        FootGenerateControlPoints(0.0, FT, FP);
-    }
-    else
-    {
-        FootGenerateKnotVector(FT,ToMP);
-        FootGenerateControlPoints(0.0, FT, FP, ToMP, MP);
-    }
+  // verify that each middle point has a reaching time parameter
+  assert(ToMP.size()==MP.size());
+
+  // save the parameters
+  m_FT = FT ;
+  m_IP = IP ;
+  m_FP = FP ;
+  m_ToMP = ToMP ;
+  m_MP = MP ;
+
+
+  // initialize some variables
+  std::vector<double> knot;
+  std::vector<double> control_points;
+  knot.clear();
+  control_points.clear();
+
+  double alpha = 0.0;
+  // generation of the knot vector
+  switch (ToMP.size())
+  {
+    case 0 :
+      // set the first three knots to 0.0
+      // the next one to 50% of the final time
+      // and the last three to the final time
+      for (unsigned int i=0;i<=m_degree;i++)
+        {knot.push_back(0.0);}
+      knot.push_back(FT*0.5);
+      for (unsigned int i =0;i<=m_degree;i++)
+        {knot.push_back(FT);}
+      SetKnotVector(knot);
+
+      // Set the first three control point
+      // to the initial pos and the last three
+      // to the final pos
+      control_points.push_back(m_IP);
+      control_points.push_back(m_IP);
+      control_points.push_back(m_IP);
+      control_points.push_back(m_FP);
+      control_points.push_back(m_FP);
+      control_points.push_back(m_FP);
+    break ;
+
+    case 1 :
+      for (unsigned int i=0;i<=m_degree;i++)
+        {knot.push_back(0.0);}
+      knot.push_back(0.6*ToMP[0]);
+      knot.push_back(    ToMP[0]);
+      knot.push_back(1.3*ToMP[0]);
+      for (unsigned int i =0;i<=m_degree;i++)
+        {knot.push_back(FT);}
+      SetKnotVector(knot);
+
+      control_points.push_back(m_IP);
+      control_points.push_back(m_IP);
+      control_points.push_back(m_IP);
+      control_points.push_back(m_MP[0]);
+      control_points.push_back(m_MP[0]);
+      control_points.push_back(m_FP);
+      control_points.push_back(m_FP);
+      control_points.push_back(m_FP);
+      SetControlPoints(control_points);
+    break ;
+
+    case 2 :
+      for (unsigned int i=0;i<=m_degree;i++)
+        {knot.push_back(0.0);}
+      knot.push_back(ToMP[0]);
+      alpha=0.40;
+      knot.push_back(alpha*ToMP[0] + (1-alpha)*ToMP[1]);
+      knot.push_back(ToMP[1]);
+      for (unsigned int i =0;i<=m_degree;i++)
+        {knot.push_back(FT);}
+      SetKnotVector(knot);
+
+      control_points.push_back(m_IP);
+      control_points.push_back(m_IP);
+      control_points.push_back(m_IP);
+      control_points.push_back(m_MP[0]);
+      control_points.push_back(m_MP[1]);
+      control_points.push_back(m_FP);
+      control_points.push_back(m_FP);
+      control_points.push_back(m_FP);
+      SetControlPoints(control_points);
+    break ;
+
+  }
 }
 
-void  FootBSplines::SetParametersWithInitPos(double IP, double FT, double FP, double ToMP, double MP)
+
+void BSplinesFoot::GetParameters(double &FT,
+				 double &IP,
+				 double &FP,
+				 vector<double> &ToMP,
+				 vector<double> &MP)
 {
-    if (ToMP == 0.0 && MP == 0.0)
-    {
-        FootGenerateKnotVector(FT);
-        FootGenerateControlPoints(IP, FT, FP);
-    }
-    else
-    {
-        FootGenerateKnotVector(FT,ToMP);
-        FootGenerateControlPoints(IP, FT, FP, ToMP, MP);
-    }
-}
-
-void FootBSplines::GetParametersWithInitPosInitSpeed(double &FT,
-						  double &FP,
-						  double &InitPos,
-						  double &InitSpeed)
-{
-    FT = m_FT;
-    FP = m_FP;
-    InitPos = FootComputePosition(0.0);
-    InitSpeed = FootComputeVelocity(0.0);
-}
-
-void FootBSplines::FootGenerateKnotVector(double FT, double ToMP)
-{
-    std::vector<double> knot;
-    knot.clear();
-    for (unsigned int i=0;i<=m_degree;i++)
-    {
-        knot.push_back(0.0);
-    }
-
-    knot.push_back(0.6*ToMP);
-    knot.push_back(ToMP);
-    knot.push_back(1.3*ToMP);
-
-    for (unsigned int i =0;i<=m_degree;i++)
-    {
-        knot.push_back(FT);
-    }
-
-    SetKnotVector(knot);
-}
-
-void FootBSplines::FootGenerateKnotVector(double FT)
-{
-    std::vector<double> knot;
-    knot.clear();
-    for (unsigned int i=0;i<=m_degree;i++)
-    {
-        knot.push_back(0.0);
-    }
-
-    knot.push_back(FT*0.5);
-
-    for (unsigned int i =0;i<=m_degree;i++)
-    {
-        knot.push_back(FT);
-    }
-
-    SetKnotVector(knot);
-}
-
-void FootBSplines::FootGenerateControlPoints(double IP, double FT, double FP, double ToMP, double MP)
-{
-    m_FT = FT;
-    m_FP = FP;
-    m_ToMP = ToMP;
-    m_MP = MP;
-    m_IP = IP;
-    std::vector<Point> control_points;
-    control_points.clear();
-
-    Point A; A.x = 0.0 ; A.y = IP ;
-    control_points.push_back(A);
-
-    A.x = m_FT*0.05 ; A.y = IP ;
-    control_points.push_back(A);
-
-    A.x = m_FT*0.1 ; A.y = IP ;
-    control_points.push_back(A);
-
-    A.x = 0.85*m_ToMP ; A.y = m_MP ;
-    control_points.push_back(A);
-
-    A.x = 1.15*m_ToMP ; A.y = m_MP ;
-    control_points.push_back(A);
-
-    A.x = 0.90*m_FT ; A.y = m_FP ;
-    control_points.push_back(A);
-
-    A.x = 0.95*m_FT ; A.y = m_FP ;
-    control_points.push_back(A);
-
-    A.x = m_FT ; A.y = m_FP ;
-    control_points.push_back(A);
-
-    SetControlPoints(control_points);
-}
-
-void FootBSplines::FootGenerateControlPoints(double IP, double FT, double FP)
-{
-    m_FT = FT;
-    m_FP = FP;
-    m_ToMP = 0.0;
-    m_MP = 0.0;
-    m_IP = IP;
-    std::vector<Point> control_points;
-    control_points.clear();
-
-    Point A; A.x = 0.0 ; A.y = IP ;
-    control_points.push_back(A);
-
-    A.x = m_FT*0.05 ; A.y = IP ;
-    control_points.push_back(A);
-
-    A.x = m_FT*0.1 ; A.y = IP ;
-    control_points.push_back(A);
-
-    A.x = 0.90*m_FT ; A.y = m_FP ;
-    control_points.push_back(A);
-
-    A.x = 0.95*m_FT ; A.y = m_FP ;
-    control_points.push_back(A);
-
-    A.x = m_FT ; A.y = m_FP ;
-    control_points.push_back(A);
-
-    SetControlPoints(control_points);
+    FT = m_FT ;
+    FP = m_FP ;
+    IP = m_IP ;
+    ToMP = m_ToMP ;
+    MP = m_MP ;
 }

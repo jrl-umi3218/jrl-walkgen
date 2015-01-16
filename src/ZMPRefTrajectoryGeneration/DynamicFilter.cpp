@@ -475,9 +475,9 @@ void DynamicFilter::ExtractZMP(vector<double> & ZMPMB)
       << m_force.f()[0] << " "     // 2
       << m_force.f()[1] << " "     // 3
       << m_force.f()[2] << " "     // 4
-      << m_force.n()[0] << " "     // 5
-      << m_force.n()[1] << " "     // 6
-      << m_force.n()[2] << " "     // 7
+      << node_waist.joint.f.n()[0] << " "     // 5
+      << node_waist.joint.f.n()[1] << " "     // 6
+      << node_waist.joint.f.n()[2] << " "     // 7
       << endl ;
   ++inc ;
   // end dump forces and momentum

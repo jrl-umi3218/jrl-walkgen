@@ -34,7 +34,7 @@ namespace PatternGeneratorJRL
         void GenerateDegree();
 
         /*! Create a Knot Vector from m_degree and m_control_points with an algo "method" */
-        void GenerateKnotVector(std::string method);
+        //void GenerateKnotVector(std::string method);
 
         /*! Create a derivative Bsplines*/
         Bsplines DerivativeBsplines();
@@ -43,13 +43,13 @@ namespace PatternGeneratorJRL
         double *ComputeBasisFunction(double t);
 
         /*!Compute Bsplines */
-        Point ComputeBsplines(double t);
+        double ComputeBsplines(double t);
 
         /*! Set Degree */
         void SetDegree(int degree);
 
         /*! Set Control Points */
-        void SetControlPoints(std::vector<Point> &control_points) ;
+        void SetControlPoints(std::vector<double> &control_points) ;
 
         /*! Set Knot Vector */
         void SetKnotVector(std::vector<double> &knot_vector) ;
@@ -58,7 +58,7 @@ namespace PatternGeneratorJRL
         int GetDegree() const;
 
         /*! Get Control Points */
-        std::vector<Point> GetControlPoints() const;
+        std::vector<double> GetControlPoints() const;
 
         /*! Get Knot Vector*/
         std::vector<double> GetKnotVector() const;
@@ -73,13 +73,13 @@ namespace PatternGeneratorJRL
 
         unsigned int m_degree;
 
-        std::vector<Point> m_control_points;
+        std::vector<double> m_control_points;
 
         std::vector<double> m_knot_vector;
     };
 
    /// Bsplines used for Z trajectory of stair steps
-  class FootBSplines : public Bsplines
+  class BSplinesFoot : public Bsplines
   {
       public:
       /** Constructor:
@@ -87,67 +87,65 @@ namespace PatternGeneratorJRL
        FP: Final position
        ToMP : Time of Max Position
        MP : Max Position */
-      FootBSplines( double FT, double FP, double ToMP=0.0, double MP=0.0);
+      BSplinesFoot( double FT=0.0,
+                    double FP=0.0,
+                    std::vector<double>ToMP = std::vector<double>(),
+                    std::vector<double> MP = std::vector<double>());
 
       /*!Compute Position at time t */
-      double FootComputePosition(double t);
+      double Compute(double t);
 
         /*!Compute Velocity at time t */
-      double FootComputeVelocity(double t);
+      double ComputeDerivative(double t);
 
         /*!Compute Acceleration at time t */
-      double FootComputeAcc(double t);
+      double ComputeSecDerivative(double t);
 
       /** Detructor **/
-      ~FootBSplines();
+      ~BSplinesFoot();
 
       /*!  Set the parameters
 	  This method assumes implicitly a initial position
 	  initial speed and initial acceleration equal to zero.
 	  The same for final speed and final acceleration.
 	  Speed at Max Position is around zero.
+	  It generates knot vector and control point vector
+	  according to the input
        */
-      void SetParameters(double FT, double FP, double ToMP, double MP);
+      void SetParameters(double FT,
+                         double IP,
+                         double FP,
+                         std::vector<double>ToMP,
+                         std::vector<double> MP);
 
-      void SetParametersWithInitPosInitSpeed(double FT, double FP, double ToMP=0.0, double MP=0.0,
-                          double InitPos=0.0,
-                          double InitSpeed=0.0);
+      void GetParameters(double &FT,
+                         double &IP,
+                         double &FP,
+                         std::vector<double> &ToMP,
+                         std::vector<double> &MP);
 
-      void SetParametersWithInitPos(double IP, double FT, double FP, double ToMP=0.0, double MP=0.0);
-
-      void GetParametersWithInitPosInitSpeed(double &FT,
-						  double &MP,
-						  double &InitPos,
-						  double &InitSpeed);
-
-      /*! Create a vector of Control Points with 8 Points :
-      {0.0,0.0},
-      {m_FT*0.05,0.0},
-      {m_FT*0.1,0.0}},
-      {0.85*m_ToMP,m_MP},
-      {1.15*m_ToMP,m_MP},
-      {0.85*m_FT,m_FP},
-      {0.9*m_FT,m_FP},
-      {m_FT,m_FP}*/
-      void FootGenerateControlPoints(double IP,double FT, double FP, double ToMP, double MP);
-      void FootGenerateControlPoints(double IP,double FT, double FP);
-
-      void FootGenerateKnotVector(double FT, double ToMP);
-      void FootGenerateKnotVector(double FT);
-
-      double GetMP()
+      std::vector<double> MP()
       {return m_MP;}
 
-      double GetFT()
+      std::vector<double> ToMP()
+      {return m_ToMP;}
+
+      double FT()
       {return m_FT;}
 
-      double GetFP()
+      double IP()
+      {return m_IP;}
+
+      double FP()
       {return m_FP;}
 
       private:
-      double m_IP, m_FT, m_FP, m_ToMP, m_MP;
+      double m_FT ; // final time
+      double m_IP ; // Initial Position
+      double m_FP ; // Final Position
+      std::vector<double> m_ToMP ; // times to reach the middle (intermediate) positions
+      std::vector<double> m_MP ; // middle (intermediate) positions
   };
-
 
 }
 #endif /* _BSPLINES_H_*/
