@@ -669,7 +669,7 @@ protected:
    }
 
    {
-     istringstream strm2(":doublesupporttime 0.15");
+     istringstream strm2(":doublesupporttime 0.2");
      aPGI.ParseCmd(strm2);
    }
 
@@ -677,6 +677,8 @@ protected:
        istringstream strm2(":stepstairseq\
                            0.0  -0.105 0.0 0.0\
                            0.28  0.145 0.0 0.0\
+                           0.28 -0.100 0.0 0.0\
+                           0.28  0.100 0.0 0.0\
                            0.28 -0.100 0.0 0.0\
                            0.28  0.100 0.0 0.0\
                            0.28 -0.100 0.0 0.0\
