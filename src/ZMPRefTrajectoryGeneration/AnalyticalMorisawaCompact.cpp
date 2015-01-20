@@ -2476,14 +2476,14 @@ new step has to be generate.
       }
 
 
-    // veriables that parametrize the trajectory of the CoM in z
+    // variables that parameterize the trajectory of the CoM in z
     double deltaZ,deltaZ2,deltaZ3;
     // double static CoMzpre = CoMz;
     double up=0.1,upRight = 0.9 ,upLeft = 0.0;
     double upRight1 = 0.9 ,upLeft1 = 0.0;
     double up_a=0.0, up_b=0.0;
 
-    double down = 0.5, downRight =0.9, downLeft = 0.0;
+    double down = 0.1, downRight =0.9, downLeft = 0.0;
     double down_a=0.0, down_b=0.0;
 
     // some variables renaming which improve the readibility
@@ -2531,12 +2531,10 @@ new step has to be generate.
           CoMz = m_InitialPoseCoMHeight + absFootz_1 - up*deltaZ;
 
       }
-    else if (absFootz_0 == absFootz_1 &&
-             m_RelativeFootPositions[Index-1].sz > 0) // 2nd leg
+    else if (absFootz_0 == absFootz_1 && m_RelativeFootPositions[Index-1].sz > 0) // 2nd leg
       {
         deltaZ = (absFootz_0 - absFootz_2 );
-        if (t <= Index*moving_time + upRight1*SStime &&
-            t >= Index*moving_time + upLeft1*SStime)
+        if (t <= Index*moving_time + upRight1*SStime && t >= Index*moving_time + upLeft1*SStime)
           CoMz = (t-Index*moving_time - upLeft1*SStime)*(1+up)*deltaZ/
               ((upRight1-upLeft1)*SStime) +  m_InitialPoseCoMHeight +
               absFootz_2 - up*deltaZ ;
@@ -2553,42 +2551,38 @@ new step has to be generate.
     // put the 2nd leg down while standing up the CoM.
     else if (absFootz_0 < absFootz_1 )
       {
-        deltaZ = absFootz_0 - absFootz_1;
+        deltaZ = absFootz_1 - absFootz_0;
 
         if (Index>1)
           {
-            deltaZ2 = absFootz_1 - absFootz_2 ;
-            deltaZ3 = (1-down)*deltaZ2 + down*deltaZ;
+            deltaZ2 = absFootz_2 - absFootz_1  ;
+            deltaZ3 = down*deltaZ2 - (1+down)*deltaZ;
 
-            down_b = m_InitialPoseCoMHeight +  absFootz_2 + down*deltaZ2 ;
+            down_b = m_InitialPoseCoMHeight + absFootz_1 - down*deltaZ2 ;
           }
         else // Special case: starting the motion.
           {
             deltaZ2 = 0;
-            deltaZ3 = absFootz_1 + down*deltaZ ;
+            deltaZ3 = absFootz_0 - down*deltaZ ;
 
             down_b = m_InitialPoseCoMHeight;
           }
 
         down_a = deltaZ3/((downRight-downLeft)*SStime);
 
-        if (t <= Index*moving_time + downRight*SStime &&
-            t >= Index*moving_time + downLeft*SStime)
+        if (t <= Index*moving_time + downRight*SStime && t >= Index*moving_time + downLeft*SStime)
           CoMz = (t-Index*moving_time - downLeft*SStime)*down_a + down_b;
-
         else if (t < Index*moving_time + downLeft*SStime)
           CoMz = down_b;
         else
-          CoMz =  m_InitialPoseCoMHeight +  absFootz_1 + down*deltaZ;
+          CoMz =  m_InitialPoseCoMHeight +  absFootz_0 - down*deltaZ;
       }
-    else if (absFootz_0 == absFootz_1 &&
-             m_RelativeFootPositions[Index-1].sz < 0) //second leg
+    else if (absFootz_0 == absFootz_1 && m_RelativeFootPositions[Index-1].sz < 0) //second leg
       {
 
-        deltaZ = -(absFootz_2 - absFootz_0 );
+        deltaZ = absFootz_2 - absFootz_0;
         if (t <= Index*moving_time + SStime )
-          CoMz = (t-Index*moving_time)*(1-down)*deltaZ/(SStime) +
-              m_InitialPoseCoMHeight + absFootz_2 + down*deltaZ ;
+          CoMz = (t-Index*moving_time)*down*deltaZ/SStime + m_InitialPoseCoMHeight + absFootz_0 - down*deltaZ ;
         else
           CoMz = m_InitialPoseCoMHeight + absFootz_0 ;
       }
