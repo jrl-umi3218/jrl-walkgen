@@ -582,13 +582,13 @@ protected:
     }
 
     {
-      istringstream strm2(":singlesupporttime 1.2");
+      istringstream strm2(":singlesupporttime 1.4");
       aPGI.ParseCmd(strm2);
     }
 
     {
       // warning  !! high speed double support !!
-      istringstream strm2(":doublesupporttime 0.04");
+      istringstream strm2(":doublesupporttime 0.2");
       aPGI.ParseCmd(strm2);
     }
 
@@ -622,7 +622,7 @@ protected:
     }
 
     {
-      istringstream strm2(":doublesupporttime 0.04");
+      istringstream strm2(":doublesupporttime 0.2");
       aPGI.ParseCmd(strm2);
     }
 

@@ -37,6 +37,8 @@ double PolynomeFoot::Compute(double t)
 {
   if (t>=FT_)
     return Polynome::Compute(FT_);
+  else if (t<=0.0)
+    return Polynome::Compute(0.0);
   else
     return Polynome::Compute(t);
 }
@@ -45,6 +47,8 @@ double PolynomeFoot::ComputeDerivative(double t)
 {
   if (t>=FT_)
     return Polynome::ComputeDerivative(FT_);
+  else if (t<=0.0)
+    return Polynome::ComputeDerivative(0.0);
   else
     return Polynome::ComputeDerivative(t);
 }
@@ -53,6 +57,8 @@ double PolynomeFoot::ComputeSecDerivative(double t)
 {
   if (t>=FT_)
     return Polynome::ComputeSecDerivative(FT_);
+  else if (t<=0.0)
+    return Polynome::ComputeSecDerivative(0.0);
   else
     return Polynome::ComputeSecDerivative(t);
 }
@@ -61,6 +67,8 @@ double PolynomeFoot::ComputeJerk(double t)
 {
   if (t>=FT_)
     return Polynome::ComputeJerk(FT_);
+  else if(t<=0.0)
+    return Polynome::ComputeJerk(0.0);
   else
     return Polynome::ComputeJerk(t);
 }

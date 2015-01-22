@@ -559,7 +559,7 @@ namespace PatternGeneratorJRL
 		      deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
 		      deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions);
 
-      void ComputeCoMz(double t, double &CoMz);
+      void ComputeCoMz(double t, COMState &CoMz);
 
       void FillQueues(double samplingPeriod,
                       double StartingTime,
@@ -659,7 +659,7 @@ namespace PatternGeneratorJRL
       /*! \brief End phase */
       bool m_EndPhase;
 
-
+      PatternGeneratorJRL::Polynome5 * m_CoMpolynomeZ ;
 
     public:
       /*! \name Methods related to the Preview Control object used

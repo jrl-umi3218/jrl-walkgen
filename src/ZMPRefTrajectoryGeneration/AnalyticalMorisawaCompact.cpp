@@ -119,6 +119,8 @@ namespace PatternGeneratorJRL
 
     m_FilteringActivate = true;
 
+    m_CoMpolynomeZ = new Polynome5(0.0,0.0);
+
     RESETDEBUG4("Test.dat");
   }
 
@@ -597,7 +599,7 @@ computing the analytical trajectories. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
 
-    bool filterOn_ = true ;
+    bool filterOn_ = false ;
     if(filterOn_)
     {
         /*! initialize the dynamic filter */
@@ -2428,7 +2430,7 @@ new step has to be generate.
       aCOMPos.yaw[1] = 0.5*(LeftFootAbsPos.dtheta + RightFootAbsPos.dtheta);
       aCOMPos.yaw[2] = 0.5*(LeftFootAbsPos.ddtheta + RightFootAbsPos.ddtheta);
 
-      ComputeCoMz(t,aCOMPos.z[0]);
+      ComputeCoMz(t,aCOMPos);
       if(t==0.0)
       {
         aCOMPos.z[1] = 0.0;
@@ -2448,8 +2450,9 @@ new step has to be generate.
   }
 
 
-  void AnalyticalMorisawaCompact::ComputeCoMz(double t, double &CoMz)
+  void AnalyticalMorisawaCompact::ComputeCoMz(double t, COMState &CoM)
   {
+    double* CoMz = CoM.z ;
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
     unsigned int Index = int(t/moving_time) ;
 
@@ -2465,26 +2468,26 @@ new step has to be generate.
     // we start analyze since 2nd step
     if ( t <= moving_time )
       {
-        CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.front().z - corrZ(2) ;
+        CoMz[0] = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.front().z - corrZ(2) ;
+        CoMz[1] = 0.0 ;
+        CoMz[2] = 0.0 ;
         return ;
       }
     // after the final step we keep the same position for a while
     if (Index >= m_AbsoluteSupportFootPositions.size())
       {
-        CoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2) ;
+        CoMz[0] = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2) ;
+        CoMz[1] = 0.0 ;
+        CoMz[2] = 0.0 ;
         return ;
       }
 
 
     // variables that parameterize the trajectory of the CoM in z
-    double deltaZ,deltaZ2,deltaZ3;
+    double deltaZ ;
     // double static CoMzpre = CoMz;
-    double up=0.1,upRight = 0.9 ,upLeft = 0.0;
-    double upRight1 = 0.9 ,upLeft1 = 0.0;
-    double up_a=0.0, up_b=0.0;
-
-    double down = 0.1, downRight =0.9, downLeft = 0.0;
-    double down_a=0.0, down_b=0.0;
+    double up=0.0,upRight = 1.0 ,upLeft = 0.0;
+    double down = 0.0, downRight = 1.0, downLeft = 0.0;
 
     // some variables renaming which improve the readibility
     double absFootz_0 = m_AbsoluteSupportFootPositions[Index].z - corrZ(2);
@@ -2496,8 +2499,9 @@ new step has to be generate.
       }
     double SStime = m_RelativeFootPositions[Index].SStime ;
 
-    // climbing
+    double FinalTime(0.0), InitPos(0.0), InitSpeed(0.0), FinalPos(0.0);
 
+    // climbing
     // put first leg on the stairs with decrease of CoM //up// of stair height
     // the CoM line will decrease between an //upLeft to upRight// interval of SStime.
     // the CoM line will go up between an //upLeft1 to upRight1//
@@ -2505,43 +2509,34 @@ new step has to be generate.
     if (absFootz_0 > absFootz_1) // first leg
       {
         deltaZ = absFootz_0 - absFootz_1;
+        FinalTime = (upRight-upLeft)*SStime ;
+
         if (Index>1)
-          {
-            deltaZ2 = absFootz_1 - absFootz_2 ;
-            deltaZ3 = (1+up)*deltaZ2 - up*deltaZ;
-
-            up_b = m_InitialPoseCoMHeight +  absFootz_2 - up*deltaZ2 ;
-          }
+          InitPos = m_InitialPoseCoMHeight + absFootz_2 - up*(absFootz_1 - absFootz_2) ;
         else // Special case: starting the motion.
-          {
-            deltaZ2 = 0;
-            deltaZ3 = absFootz_1 - up*deltaZ ;
+          InitPos = m_InitialPoseCoMHeight ;
 
-            up_b = m_InitialPoseCoMHeight;
-          }
-        up_a = deltaZ3/
-            ((upRight-upLeft)*SStime);
+        InitSpeed = 0.0 ;
+        FinalPos = m_InitialPoseCoMHeight + absFootz_1 - up*deltaZ;
 
-        if (t <= Index*moving_time + upRight*SStime &&
-            t >= Index*moving_time + upLeft*SStime)
-          CoMz = (t-Index*moving_time - upLeft*SStime)*up_a + up_b;
-        else if (t < Index*moving_time + upLeft*SStime)
-          CoMz = up_b;
-        else
-          CoMz = m_InitialPoseCoMHeight + absFootz_1 - up*deltaZ;
+        m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
+
+        CoMz[0] = m_CoMpolynomeZ->Compute(t-Index*moving_time - upLeft*SStime) ;
+        CoMz[1] = m_CoMpolynomeZ->ComputeDerivative(t-Index*moving_time - upLeft*SStime) ;
 
       }
     else if (absFootz_0 == absFootz_1 && m_RelativeFootPositions[Index-1].sz > 0) // 2nd leg
       {
         deltaZ = (absFootz_0 - absFootz_2 );
-        if (t <= Index*moving_time + upRight1*SStime && t >= Index*moving_time + upLeft1*SStime)
-          CoMz = (t-Index*moving_time - upLeft1*SStime)*(1+up)*deltaZ/
-              ((upRight1-upLeft1)*SStime) +  m_InitialPoseCoMHeight +
-              absFootz_2 - up*deltaZ ;
-        else if (t < Index*moving_time + upLeft1*SStime)
-          CoMz = m_InitialPoseCoMHeight + absFootz_2 - up*deltaZ;
-        else
-          CoMz = m_InitialPoseCoMHeight + absFootz_0;
+        FinalTime = (upRight-upLeft)*SStime ;
+        InitPos = m_InitialPoseCoMHeight + absFootz_2 - up*deltaZ ;
+        InitSpeed = 0.0 ;
+        FinalPos = m_InitialPoseCoMHeight + absFootz_0 ;
+
+        m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
+
+        CoMz[0] = m_CoMpolynomeZ->Compute(t-Index*moving_time - upLeft*SStime) ;
+        CoMz[1] = m_CoMpolynomeZ->ComputeDerivative(t-Index*moving_time - upLeft*SStime) ;
       }
 
 
@@ -2552,46 +2547,43 @@ new step has to be generate.
     else if (absFootz_0 < absFootz_1 )
       {
         deltaZ = absFootz_1 - absFootz_0;
+        FinalTime = (downRight-downLeft)*SStime ;
 
         if (Index>1)
-          {
-            deltaZ2 = absFootz_2 - absFootz_1  ;
-            deltaZ3 = down*deltaZ2 - (1+down)*deltaZ;
-
-            down_b = m_InitialPoseCoMHeight + absFootz_1 - down*deltaZ2 ;
-          }
+          InitPos = m_InitialPoseCoMHeight + absFootz_1 - down*(absFootz_2 - absFootz_1) ;
         else // Special case: starting the motion.
-          {
-            deltaZ2 = 0;
-            deltaZ3 = absFootz_0 - down*deltaZ ;
+          InitPos = m_InitialPoseCoMHeight ;
 
-            down_b = m_InitialPoseCoMHeight;
-          }
+        InitSpeed = 0.0 ;
+        FinalPos = m_InitialPoseCoMHeight +  absFootz_0 - down*deltaZ ;
 
-        down_a = deltaZ3/((downRight-downLeft)*SStime);
+        m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
 
-        if (t <= Index*moving_time + downRight*SStime && t >= Index*moving_time + downLeft*SStime)
-          CoMz = (t-Index*moving_time - downLeft*SStime)*down_a + down_b;
-        else if (t < Index*moving_time + downLeft*SStime)
-          CoMz = down_b;
-        else
-          CoMz =  m_InitialPoseCoMHeight +  absFootz_0 - down*deltaZ;
+        CoMz[0] = m_CoMpolynomeZ->Compute(t-Index*moving_time - downLeft*SStime) ;
+        CoMz[1] = m_CoMpolynomeZ->ComputeDerivative(t-Index*moving_time - downLeft*SStime) ;
       }
     else if (absFootz_0 == absFootz_1 && m_RelativeFootPositions[Index-1].sz < 0) //second leg
       {
-
         deltaZ = absFootz_2 - absFootz_0;
-        if (t <= Index*moving_time + SStime )
-          CoMz = (t-Index*moving_time)*down*deltaZ/SStime + m_InitialPoseCoMHeight + absFootz_0 - down*deltaZ ;
-        else
-          CoMz = m_InitialPoseCoMHeight + absFootz_0 ;
+        FinalTime = (downRight-downLeft)*SStime ;
+        InitPos = m_InitialPoseCoMHeight + absFootz_0 - down*deltaZ ;
+        InitSpeed = 0.0 ;
+        FinalPos = m_InitialPoseCoMHeight + absFootz_0 ;
+
+        m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
+
+        CoMz[0] = m_CoMpolynomeZ->Compute(t-Index*moving_time-downLeft*SStime) ;
+        CoMz[1] = m_CoMpolynomeZ->ComputeDerivative(t-Index*moving_time-downLeft*SStime) ;
+
       }
 
 
     // normal walking
+    // the com stay on the horizotal plane at the initial com altitude
     else
       {
-        CoMz = m_InitialPoseCoMHeight + absFootz_0 ;
+        CoMz[0] = m_InitialPoseCoMHeight + absFootz_0 ;
+        CoMz[1] = 0.0 ;
       }
   }
 
