@@ -40,7 +40,7 @@ namespace PatternGeneratorJRL
         Bsplines DerivativeBsplines();
 
         /*!Compute Basic Function */
-        double *ComputeBasisFunction(double t);
+        std::vector<double> ComputeBasisFunction(double t);
 
         /*!Compute Bsplines */
         double ComputeBsplines(double t);
@@ -74,7 +74,6 @@ namespace PatternGeneratorJRL
         unsigned int m_degree;
 
         std::vector<double> m_control_points;
-
         std::vector<double> m_knot_vector;
     };
 

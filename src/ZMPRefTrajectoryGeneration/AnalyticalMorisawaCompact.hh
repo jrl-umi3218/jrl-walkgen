@@ -559,6 +559,12 @@ namespace PatternGeneratorJRL
 		      deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
 		      deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions);
 
+      void ComputeZMPz(double t,
+           ZMPPosition &ZMPz,
+           unsigned int IndexInterval,
+           FootAbsolutePosition &aLeftFoot,
+           FootAbsolutePosition &aRightFoot);
+
       void ComputeCoMz(double t, COMState &CoMz);
 
       void FillQueues(double samplingPeriod,
@@ -660,6 +666,7 @@ namespace PatternGeneratorJRL
       bool m_EndPhase;
 
       PatternGeneratorJRL::Polynome5 * m_CoMpolynomeZ ;
+      PatternGeneratorJRL::Polynome3 * m_ZMPpolynomeZ ;
 
     public:
       /*! \name Methods related to the Preview Control object used

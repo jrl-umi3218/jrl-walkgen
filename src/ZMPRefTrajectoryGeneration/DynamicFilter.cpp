@@ -24,7 +24,7 @@ DynamicFilter::DynamicFilter(
   comAndFootRealization_->Initialization();
 
   PC_ = new PreviewControl(
-        SPM,OptimalControllerSolver::MODE_WITH_INITIALPOS,false);
+        SPM,OptimalControllerSolver::MODE_WITHOUT_INITIALPOS,false);
   CoMHeight_ = 0.0 ;
 
   deltaZMP_deq_.clear();
@@ -112,7 +112,7 @@ void DynamicFilter::init(
   PC_->SetPreviewControlTime (previewWindowSize_);
   PC_->SetSamplingPeriod (controlPeriod);
   PC_->SetHeightOfCoM(CoMHeight_);
-  PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
+  PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 
   upperPartConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
   previousUpperPartConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
@@ -520,8 +520,8 @@ int DynamicFilter::OptimalControl(
     deque<ZMPPosition> & inputdeltaZMP_deq,
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
-  if(!PC_->IsCoherent())
-    PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
+  assert(PC_->IsCoherent());
+  PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 
   outputDeltaCOMTraj_deq_.resize(NCtrl_);
   // calcul of the preview control along the "deltaZMP_deq_"

@@ -106,7 +106,7 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
       ZMPPosition aZMPPosition = (*m_ZMPPositions)[0];
       ZMPRefPos(0) = aZMPPosition.px;
       ZMPRefPos(1) = aZMPPosition.py;
-      ZMPRefPos(2) = 0;
+      ZMPRefPos(2) = aZMPPosition.pz;
       m_ZMPPositions->pop_front();
     }
   else

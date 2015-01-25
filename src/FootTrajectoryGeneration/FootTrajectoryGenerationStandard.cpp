@@ -470,7 +470,7 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
     }
   else
     {
-      timeOfInterpolation = UnlockedSwingPeriod-m_SamplingPeriod ;
+      timeOfInterpolation = UnlockedSwingPeriod ;
     }
 
   // Trajectory of the foot compute in the X domain (plane X of t)

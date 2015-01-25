@@ -120,6 +120,7 @@ namespace PatternGeneratorJRL
     m_FilteringActivate = true;
 
     m_CoMpolynomeZ = new Polynome5(0.0,0.0);
+    m_ZMPpolynomeZ = new Polynome3(0.0,0.0);
 
     RESETDEBUG4("Test.dat");
   }
@@ -599,7 +600,7 @@ computing the analytical trajectories. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
 
-    bool filterOn_ = false ;
+    bool filterOn_ = true ;
     if(filterOn_)
     {
         /*! initialize the dynamic filter */
@@ -630,14 +631,14 @@ computing the analytical trajectories. */
 //        UpperConfig(25)= -1.41720735 ;    // RARM_JOINT3
 //        UpperConfig(26)= 1.45385927 ;     // RARM_JOINT4
 //        UpperConfig(27)= 0.509636142 ;    // RARM_JOINT5
-//        UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
+        UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
 //        UpperConfig(29)= -0.108210414 ;   // LARM_JOINT0
 //        UpperConfig(30)= -0.129154365 ;   // LARM_JOINT1
 //        UpperConfig(31)= -0.333357887 ;   // LARM_JOINT2
 //        UpperConfig(32)= -1.41720735 ;    // LARM_JOINT3
 //        UpperConfig(33)= 1.45385927 ;     // LARM_JOINT4
 //        UpperConfig(34)= -0.193731547 ;   // LARM_JOINT5
-//        UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
+        UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
 
     //    // carry the weight over the head
     //    UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
@@ -692,6 +693,12 @@ computing the analytical trajectories. */
                     vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
                     outputDeltaCOMTraj_deq);
 
+
+        m_kajitaDynamicFilter->Debug(COMStates,LeftFootAbsolutePositions,RightFootAbsolutePositions,COMStates,ZMPPositions,
+                                     LeftFootAbsolutePositions,
+                                     RightFootAbsolutePositions,
+                                     outputDeltaCOMTraj_deq);
+
         vector <vector<double> > filteredZMPMB (n , vector<double> (2,0.0)) ;
         for (unsigned int i = 0 ; i < n ; ++i)
         {
@@ -709,6 +716,7 @@ computing the analytical trajectories. */
           LeftFootAbsolutePositions.pop_back();
           RightFootAbsolutePositions.pop_back();
         }
+
     }
     // End the Filtering
 
@@ -2386,16 +2394,6 @@ new step has to be generate.
     {
       m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(t,lIndexInterval,lPrevIndexInterval);
 
-      /*! Feed the ZMPPositions. */
-      ZMPPosition aZMPPos;
-      if (!m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px,lIndexInterval))
-        LTHROW("Unable to compute ZMP along X-Axis in EndPhaseOfWalking");
-
-      if (!m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py,lIndexInterval))
-        LTHROW("Unable to compute ZMP along Y-Axis in EndPhaseOfWalking");
-
-      FinalZMPPositions.push_back(aZMPPos);
-
       /*! Feed the FootPositions. */
 
       /*! Left */
@@ -2412,6 +2410,18 @@ new step has to be generate.
       { LTHROW("Unable to compute right foot position in EndPhaseOfWalking");}
       FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
 
+      /*! Feed the ZMPPositions. */
+      ZMPPosition aZMPPos;
+      if (!m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px,lIndexInterval))
+        LTHROW("Unable to compute ZMP along X-Axis in EndPhaseOfWalking");
+
+      if (!m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py,lIndexInterval))
+        LTHROW("Unable to compute ZMP along Y-Axis in EndPhaseOfWalking");
+
+      ComputeZMPz(t,aZMPPos,lIndexInterval,LeftFootAbsPos,RightFootAbsPos);
+
+      FinalZMPPositions.push_back(aZMPPos);
+
       /*! Feed the COMStates. */
       COMState aCOMPos;
       memset(&aCOMPos,0,sizeof(aCOMPos));
@@ -2425,20 +2435,11 @@ new step has to be generate.
       m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1],lIndexInterval);
       m_AnalyticalZMPCoGTrajectoryY->ComputeCOMAcceleration(t,aCOMPos.y[2],lIndexInterval);
 
-      aCOMPos.z[0] = m_InitialPoseCoMHeight;
+      ComputeCoMz(t,aCOMPos);
+
       aCOMPos.yaw[0] = 0.5*(LeftFootAbsPos.theta + RightFootAbsPos.theta);
       aCOMPos.yaw[1] = 0.5*(LeftFootAbsPos.dtheta + RightFootAbsPos.dtheta);
       aCOMPos.yaw[2] = 0.5*(LeftFootAbsPos.ddtheta + RightFootAbsPos.ddtheta);
-
-      ComputeCoMz(t,aCOMPos);
-      if(t==0.0)
-      {
-        aCOMPos.z[1] = 0.0;
-      }else{
-        aCOMPos.z[1] = (aCOMPos.z[0] - preCoMz) / m_SamplingPeriod;
-      }
-
-      preCoMz = aCOMPos.z[0];
 
       FinalCoMPositions.push_back(aCOMPos);
       ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " <<
@@ -2482,12 +2483,11 @@ new step has to be generate.
         return ;
       }
 
-
     // variables that parameterize the trajectory of the CoM in z
     double deltaZ ;
     // double static CoMzpre = CoMz;
     double up=0.0,upRight = 1.0 ,upLeft = 0.0;
-    double down = 0.0, downRight = 1.0, downLeft = 0.0;
+    double down = 0.1, downRight = 1.0, downLeft = 0.0;
 
     // some variables renaming which improve the readibility
     double absFootz_0 = m_AbsoluteSupportFootPositions[Index].z - corrZ(2);
@@ -2499,7 +2499,7 @@ new step has to be generate.
       }
     double SStime = m_RelativeFootPositions[Index].SStime ;
 
-    double FinalTime(0.0), InitPos(0.0), InitSpeed(0.0), FinalPos(0.0);
+    double FinalTime(0.0), InitPos(0.0), InitSpeed(0.0), FinalPos(0.0), interpolationTime(0.0);
 
     // climbing
     // put first leg on the stairs with decrease of CoM //up// of stair height
@@ -2521,9 +2521,7 @@ new step has to be generate.
 
         m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
 
-        CoMz[0] = m_CoMpolynomeZ->Compute(t-Index*moving_time - upLeft*SStime) ;
-        CoMz[1] = m_CoMpolynomeZ->ComputeDerivative(t-Index*moving_time - upLeft*SStime) ;
-
+        interpolationTime = t-Index*moving_time - upLeft*SStime ;
       }
     else if (absFootz_0 == absFootz_1 && m_RelativeFootPositions[Index-1].sz > 0) // 2nd leg
       {
@@ -2535,11 +2533,8 @@ new step has to be generate.
 
         m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
 
-        CoMz[0] = m_CoMpolynomeZ->Compute(t-Index*moving_time - upLeft*SStime) ;
-        CoMz[1] = m_CoMpolynomeZ->ComputeDerivative(t-Index*moving_time - upLeft*SStime) ;
+        interpolationTime = t-Index*moving_time - upLeft*SStime ;
       }
-
-
     // going down
     // the CoM line will decrease an //1+down// stair height
     // between an //downLeft to downRight// interval of SStime while moving first leg down
@@ -2559,8 +2554,7 @@ new step has to be generate.
 
         m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
 
-        CoMz[0] = m_CoMpolynomeZ->Compute(t-Index*moving_time - downLeft*SStime) ;
-        CoMz[1] = m_CoMpolynomeZ->ComputeDerivative(t-Index*moving_time - downLeft*SStime) ;
+        interpolationTime = t-Index*moving_time - downLeft*SStime ;
       }
     else if (absFootz_0 == absFootz_1 && m_RelativeFootPositions[Index-1].sz < 0) //second leg
       {
@@ -2572,19 +2566,64 @@ new step has to be generate.
 
         m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
 
-        CoMz[0] = m_CoMpolynomeZ->Compute(t-Index*moving_time-downLeft*SStime) ;
-        CoMz[1] = m_CoMpolynomeZ->ComputeDerivative(t-Index*moving_time-downLeft*SStime) ;
-
+        interpolationTime = t-Index*moving_time - downLeft*SStime ;
       }
-
-
     // normal walking
     // the com stay on the horizotal plane at the initial com altitude
     else
       {
-        CoMz[0] = m_InitialPoseCoMHeight + absFootz_0 ;
-        CoMz[1] = 0.0 ;
+        FinalTime = moving_time ;
+        InitPos = m_InitialPoseCoMHeight + absFootz_0 ;
+        InitSpeed = 0.0 ;
+        FinalPos = m_InitialPoseCoMHeight + absFootz_0 ;
+        interpolationTime = t-Index*moving_time ;
+        m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
       }
+
+    CoMz[0] = m_CoMpolynomeZ->Compute(interpolationTime) ;
+    CoMz[1] = m_CoMpolynomeZ->ComputeDerivative(interpolationTime) ;
+    CoMz[2] = m_CoMpolynomeZ->ComputeSecDerivative(interpolationTime) ;
+  }
+
+  void AnalyticalMorisawaCompact::ComputeZMPz(double t,
+                                              ZMPPosition &ZMPz,
+                                              unsigned int IndexInterval,
+                                              FootAbsolutePosition &aLeftFoot,
+                                              FootAbsolutePosition &aRightFoot)
+  {
+    // absFootz_0, the z axis is expressed in the waist frame
+    // we choose the left one by default, the foot are supposed to be symetrical
+    // we use it pass the ankle position to the fot position
+    CjrlFoot *aFoot = m_HS->leftFoot() ;
+    if (aFoot==0)
+      LTHROW("No foot");
+    vector3d corrZ ;
+    aFoot->getAnklePositionInLocalFrame(corrZ);
+
+    bool sinple_support = (IndexInterval % 2) == 0 ;
+    double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
+    unsigned int stepNumber = int(t/moving_time) ;
+
+    // we start analyze since 2nd step
+    // after the final step we keep the same position for a while
+    // when a foot fly the zmp.pz is the supportFoot.z
+    if ( t <= moving_time || stepNumber >= m_AbsoluteSupportFootPositions.size() || sinple_support)
+      {
+        if (aLeftFoot.stepType < 0)
+          ZMPz.pz = aLeftFoot.z - corrZ(2);
+        else
+          ZMPz.pz = aRightFoot.z - corrZ(2);
+        return ;
+      }
+    else
+      {
+        double absFootz_0 = m_AbsoluteSupportFootPositions[stepNumber].z - corrZ(2) ;
+        double absFootz_1 = m_AbsoluteSupportFootPositions[stepNumber-1].z - corrZ(2) ;
+        m_ZMPpolynomeZ->SetParametersWithInitPosInitSpeed(m_RelativeFootPositions[0].DStime,
+                                                          absFootz_0,absFootz_1,0.0);
+        ZMPz.pz = m_ZMPpolynomeZ->Compute(t-stepNumber*moving_time-m_RelativeFootPositions[0].SStime);
+      }
+    return ;
   }
 
   void AnalyticalMorisawaCompact::FillQueues(double StartingTime,
