@@ -291,13 +291,23 @@ BSplinesFoot::~BSplinesFoot()
 
 double BSplinesFoot::Compute(double t)
 {
-  return ComputeBsplines(t/m_FT);
+  double time = t/m_FT ;
+  if (time <= 0.0)
+    time = 0.0;
+  if (time >= m_FT)
+    time = 1.0 ;
+  return ComputeBsplines(time);
 }
 
 double BSplinesFoot::ComputeDerivative(double t)
 {
   if (m_degree >=1){
-    return DerivativeBsplines().ComputeBsplines(t/m_FT);
+    double time = t/m_FT ;
+    if (time <= 0.0)
+      time = 0.0;
+    if (time >= m_FT)
+      time = 1.0 ;
+    return DerivativeBsplines().ComputeBsplines(time);
   }
   else
   {
@@ -310,7 +320,12 @@ double BSplinesFoot::ComputeSecDerivative(double t)
 {
   if (m_degree >=2)
   {
-    return DerivativeBsplines().DerivativeBsplines().ComputeBsplines(t/m_FT);
+    double time = t/m_FT ;
+    if (time <= 0.0)
+      time = 0.0;
+    if (time >= m_FT)
+      time = 1.0 ;
+    return DerivativeBsplines().DerivativeBsplines().ComputeBsplines(time);
   }
   else
   {
