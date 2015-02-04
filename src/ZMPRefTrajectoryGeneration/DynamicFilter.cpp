@@ -150,6 +150,7 @@ void DynamicFilter::init(
   ZMPMB_vec_.resize( PG_N_*NbI_, vector<double>(2));
   zmpmb_i_.resize( PG_N_*NCtrl_, vector<double>(2));
 
+  comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
   comAndFootRealization_->SetPreviousConfigurationStage0(ZMPMBConfiguration_);
@@ -414,11 +415,11 @@ void DynamicFilter::InverseKinematics(
       previousUpperPartVelocity_ = upperPartVelocity_ ;
     }
 
-  for ( unsigned int i = 18 ; i < 36 ; ++i )
+  for ( unsigned int i = 0 ; i < upperPartIndex.size() ; ++i )
     {
-      configuration(i)= upperPartConfiguration_(i);
-      velocity(i) = upperPartVelocity_(i) ;
-      acceleration(i) = upperPartAcceleration_(i) ;
+      configuration(upperPartIndex[i])= upperPartConfiguration_(upperPartIndex[i]);
+      velocity(upperPartIndex[i]) = upperPartVelocity_(upperPartIndex[i]) ;
+      acceleration(upperPartIndex[i]) = upperPartAcceleration_(upperPartIndex[i]) ;
     }
 
   return;

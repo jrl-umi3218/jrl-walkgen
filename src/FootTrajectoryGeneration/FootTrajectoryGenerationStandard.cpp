@@ -259,8 +259,8 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
       }
       else
       {
-        ToMP.push_back(0.80*TimeInterval);
-        MP.push_back(FinalPosition);
+          ToMP.clear();
+          MP.clear();
       }
       m_BsplinesX->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP);
       break;
@@ -276,8 +276,8 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
       }
       else
       {
-        ToMP.push_back(0.80*TimeInterval);
-        MP.push_back(FinalPosition);
+        ToMP.clear();
+        MP.clear();
       }
       m_BsplinesY->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP);
       break;
@@ -289,11 +289,13 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
         }
       m_PolynomeZ->SetParametersWithMiddlePos(TimeInterval, FinalPosition+m_StepHeight,
                                               InitPosition, InitSpeed, 0.0, FinalPosition);
+      cout << InitPosition << " " << TimeInterval << endl ;
+      WayPoint_z = 0.0;
 
       // Check the final and the initial position to decide what to do
       if (FinalPosition - InitPosition > epsilon )
         {
-          ToMP.push_back(0.3*TimeInterval);
+          ToMP.push_back(0.4*TimeInterval);
           MP.push_back(FinalPosition+WayPoint_z);
         }
       else if (FinalPosition - InitPosition <= epsilon && FinalPosition - InitPosition >= -epsilon )
@@ -304,7 +306,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
       else if (FinalPosition - InitPosition < -epsilon )
         {
           ToMP.push_back(0.6*TimeInterval);
-          MP.push_back(InitPosition+WayPoint_z/3.0);
+          MP.push_back(InitPosition+WayPoint_z);
         }
       m_BsplinesZ->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP);
       break;
@@ -374,7 +376,7 @@ int FootTrajectoryGenerationStandard::GetParametersWithInitPosInitSpeed(int Poly
 									double &InitSpeed)
 {
   double MiddlePosition = 0.0 ; // for polynome4
- switch (PolynomeIndex)
+  switch (PolynomeIndex)
    {
 
    case X_AXIS:
@@ -460,11 +462,12 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
   //cout << UnlockedSwingPeriod << " " << ss_time << " " << " " << UnlockedSwingPeriod/ss_time << endl ;
 
   double timeOfInterpolation = 0.0 ;
-  if(Time <= EndOfLiftOff)
+  //double timeOfInterpolation = Time - EndOfLiftOff ;
+  if(Time < EndOfLiftOff)
     {
       timeOfInterpolation = 0.0 ;
     }
-  else if (Time <= StartLanding)
+  else if (Time < StartLanding)
     {
       timeOfInterpolation = Time - EndOfLiftOff ;
     }
@@ -498,6 +501,8 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
 
   // Trajectory of the foot compute in the Z domain (plane Z of t)
   aFootAbsolutePosition.z = m_BsplinesZ->Compute(Time);
+  cout << "FT_z = " << m_BsplinesZ->FT() << " " << m_BsplinesZ->Compute(Time-0.005) << endl ;
+  cout << "FT_z = " << m_BsplinesZ->Compute(Time) << " " << m_BsplinesZ->Compute(Time+0.005) << endl ;
   aFootAbsolutePosition.dz = m_BsplinesZ->ComputeDerivative(Time);
   aFootAbsolutePosition.ddz = m_BsplinesZ->ComputeSecDerivative(Time);
 
@@ -508,6 +513,12 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.omega2);
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.theta);
 
+  cout << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.x      << endl
+       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.y      << endl
+       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.z      << endl
+       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.omega  << endl
+       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.omega2 << endl
+       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.theta  << endl;
   return Time;
 }
 
@@ -528,10 +539,7 @@ double FootTrajectoryGenerationStandard::Compute(unsigned int PolynomeIndex, dou
      break;
 
    case Z_AXIS:
-   if (m_isStepStairOn == 0)
      r=m_PolynomeZ->Compute(Time);
-    else
-     r=m_BsplinesZ->Compute(Time);
      break;
 
    case THETA_AXIS:
@@ -569,11 +577,7 @@ double FootTrajectoryGenerationStandard::ComputeSecDerivative(unsigned int Polyn
      break;
 
    case Z_AXIS:
-   if (m_isStepStairOn == 0)
      r=m_PolynomeZ->ComputeSecDerivative(Time);
-    else
-     r=m_BsplinesZ->ComputeSecDerivative(Time);
-
      break;
 
    case THETA_AXIS:
@@ -642,36 +646,32 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
       curr_NSFAP.theta = init_NSFAP.theta + m_PolynomeTheta->Compute(ModulatedSingleSupportTime);
     }
 
-  if (m_isStepStairOn == 0)
   curr_NSFAP.z = init_NSFAP.z + m_PolynomeZ->Compute(LocalTime);
-  else
-  curr_NSFAP.z = init_NSFAP.z + m_BsplinesZ->Compute(LocalTime);
-
   ODEBUG2("x:" << curr_NSFAP.x << " LocalTime - EndOfLiftOff" << LocalTime - EndOfLiftOff
           << " " << m_PolynomeX->Compute(LocalTime - EndOfLiftOff));
   //  m_PolynomeX->print();
 
-  //bool ProtectionNeeded=false;
+  bool ProtectionNeeded=false;
 
   // Treat Omega with the following strategy:
   // First treat the lift-off.
   if (LocalTime<EndOfLiftOff)
     {
       curr_NSFAP.omega = m_PolynomeOmega->Compute(LocalTime) ;
-      //ProtectionNeeded=true;
+      ProtectionNeeded=true;
     }
   // Prepare for the landing.
   else if (LocalTime<StartLanding)
     {
       curr_NSFAP.omega =
-	m_Omega - m_PolynomeOmega2->Compute(LocalTime-EndOfLiftOff);
+        m_Omega - m_PolynomeOmega2->Compute(LocalTime-EndOfLiftOff);
     }
   // Realize the landing.
   else
     {
       curr_NSFAP.omega =
-	m_PolynomeOmega->Compute(LocalTime - StartLanding)  - m_Omega;
-      //ProtectionNeeded=true;
+        m_PolynomeOmega->Compute(LocalTime - StartLanding)  - m_Omega;
+      ProtectionNeeded=true;
     }
   double dFX=0,dFY=0,dFZ=0;
   double lOmega = 0.0;
@@ -689,21 +689,21 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 
     if (lOmega<0)
       {
-	X1 = B*cos(-lOmega);
-	X2 = H*sin(-lOmega);
-	Z1 = H*cos(-lOmega);
-	Z2 = B*sin(-lOmega);
-	dX = -(B - X1 + X2);
-	dFZ = Z1 + Z2 - H;
+        X1 = B*cos(-lOmega);
+        X2 = H*sin(-lOmega);
+        Z1 = H*cos(-lOmega);
+        Z2 = B*sin(-lOmega);
+        dX = -(B - X1 + X2);
+        dFZ = Z1 + Z2 - H;
       }
     else
       {
-	X1 = F*cos(lOmega);
-	X2 = H*sin(lOmega);
-	Z1 = H*cos(lOmega);
-	Z2 = F*sin(lOmega);
-	dX = (F - X1 + X2);
-	dFZ = Z1 + Z2 - H;
+        X1 = F*cos(lOmega);
+        X2 = H*sin(lOmega);
+        Z1 = H*cos(lOmega);
+        Z2 = F*sin(lOmega);
+        dX = (F - X1 + X2);
+        dFZ = Z1 + Z2 - H;
       }
     dFX = c*dX;
     dFY = s*dX;
@@ -779,19 +779,19 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   SupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = (-1)*StepType;
 
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = StepType;
-  //cout<<"LocalInterpolationStartTime+InterpolationTime: "<<LocalInterpolationStartTime+InterpolationTime;
+  cout<<"LocalInterpolationStartTime+InterpolationTime: "<<LocalInterpolationStartTime+InterpolationTime;
   if (LocalInterpolationStartTime +InterpolationTime <= EndOfLiftOff || LocalInterpolationStartTime +InterpolationTime >= StartLanding)
     {
       // Do not modify x, y and theta while liftoff.
       // cout<<"no change"<<endl;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x =
-	NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].x;
+        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].x;
 
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y =
-	NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].y;
+        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].y;
 
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta =
-	NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].theta;
+        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].theta;
     }
   else if (LocalInterpolationStartTime < EndOfLiftOff && LocalInterpolationStartTime +InterpolationTime > EndOfLiftOff)
     {
@@ -799,25 +799,25 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
       // DO MODIFY x, y and theta the remaining time.
       // x, dx
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x =
-	m_PolynomeX->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
-	// NoneSupportFootAbsolutePositions[StartIndex-1].x;
+        m_PolynomeX->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
+        // NoneSupportFootAbsolutePositions[StartIndex-1].x;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dx =
-	m_PolynomeX->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
-	// NoneSupportFootAbsolutePositions[StartIndex-1].dx;
+        m_PolynomeX->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
+        // NoneSupportFootAbsolutePositions[StartIndex-1].dx;
       //y, dy
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y =
-	m_PolynomeY->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);//  +
-	// NoneSupportFootAbsolutePositions[StartIndex-1].y;
+        m_PolynomeY->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);//  +
+        // NoneSupportFootAbsolutePositions[StartIndex-1].y;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy =
-	m_PolynomeY->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff); // +
-	// NoneSupportFootAbsolutePositions[StartIndex-1].dy;
+        m_PolynomeY->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff); // +
+        // NoneSupportFootAbsolutePositions[StartIndex-1].dy;
       //theta, dtheta
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta =
-	m_PolynomeTheta->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
-	//NoneSupportFootAbsolutePositions[StartIndex].theta;
+        m_PolynomeTheta->Compute(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);// +
+        //NoneSupportFootAbsolutePositions[StartIndex].theta;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dtheta =
-	m_PolynomeTheta->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
-	// +NoneSupportFootAbsolutePositions[StartIndex].dtheta;
+        m_PolynomeTheta->ComputeDerivative(LocalInterpolationStartTime + InterpolationTime - EndOfLiftOff);
+        // +NoneSupportFootAbsolutePositions[StartIndex].dtheta;
     }
   else
     {
@@ -825,84 +825,64 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
       // DO MODIFY x, y and theta all the time.
       // x, dx
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x =
-	m_PolynomeX->Compute(InterpolationTime);
+        m_PolynomeX->Compute(InterpolationTime);
       //+NoneSupportFootAbsolutePositions[StartIndex-1].x;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dx =
-	m_PolynomeX->ComputeDerivative(InterpolationTime);
+        m_PolynomeX->ComputeDerivative(InterpolationTime);
       //+NoneSupportFootAbsolutePositions[StartIndex-1].dx;
       //y, dy
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].y =
-	m_PolynomeY->Compute(InterpolationTime);
+        m_PolynomeY->Compute(InterpolationTime);
       //+NoneSupportFootAbsolutePositions[StartIndex].y;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dy =
-	m_PolynomeY->ComputeDerivative(InterpolationTime);
+        m_PolynomeY->ComputeDerivative(InterpolationTime);
       //+NoneSupportFootAbsolutePositions[StartIndex].dy;
       //theta, dtheta
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].theta =
-	m_PolynomeTheta->Compute( InterpolationTime );
+        m_PolynomeTheta->Compute( InterpolationTime );
       // +NoneSupportFootAbsolutePositions[StartIndex].theta;
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dtheta =
-	m_PolynomeTheta->ComputeDerivative(InterpolationTime);
+        m_PolynomeTheta->ComputeDerivative(InterpolationTime);
       // + NoneSupportFootAbsolutePositions[StartIndex].dtheta;
     }
 
-    if (m_isStepStairOn == 0)
-    {
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
-        //m_AnklePositionRight[2];
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z =
+    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+    //m_AnklePositionRight[2];
+  NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz =
+    m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
+    //m_AnklePositionRight[2];
 
-        //m_AnklePositionRight[2];
-    }
-
-    else
-
-    {
-        if (m_BsplinesZ->Compute(LocalInterpolationStartTime+InterpolationTime) == 0)
-        {
-            NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1].z;
-        }
-        else
-        {
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].z = m_BsplinesZ->Compute(LocalInterpolationStartTime+InterpolationTime);
-
-        }//m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
-        //m_AnklePositionRight[2];
-        NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].dz = m_BsplinesZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
-        //m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
-        //m_AnklePositionRight[2];
-    }
-
-  //bool ProtectionNeeded=false;
+  bool ProtectionNeeded=false;
 
   // Treat Omega with the following strategy:
   // First treat the lift-off.
   if (LocalInterpolationStartTime+InterpolationTime<EndOfLiftOff)
     {
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega =
-	m_PolynomeOmega->Compute(InterpolationTime); // +
+        m_PolynomeOmega->Compute(InterpolationTime); // +
     // NoneSupportFootAbsolutePositions[StartIndex-1].omega;
 
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].domega =
-	m_PolynomeOmega->Compute(InterpolationTime);//  +
+        m_PolynomeOmega->Compute(InterpolationTime);//  +
     // NoneSupportFootAbsolutePositions[StartIndex-1].domega;
 
-      //ProtectionNeeded=true;
+      ProtectionNeeded=true;
     }
   // Prepare for the landing.
   else if (LocalInterpolationStartTime+InterpolationTime<StartLanding)
     {
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega =
-	m_Omega - m_PolynomeOmega2->Compute(LocalInterpolationStartTime+InterpolationTime-EndOfLiftOff)-
-	NoneSupportFootAbsolutePositions[StartIndex-1].omega2;
+        m_Omega - m_PolynomeOmega2->Compute(LocalInterpolationStartTime+InterpolationTime-EndOfLiftOff)-
+        NoneSupportFootAbsolutePositions[StartIndex-1].omega2;
     }
   // Realize the landing.
   else
     {
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega =
-	m_PolynomeOmega->Compute(LocalInterpolationStartTime+InterpolationTime - StartLanding) +
-	NoneSupportFootAbsolutePositions[StartIndex-1].omega - m_Omega;
-      //ProtectionNeeded=true;
+        m_PolynomeOmega->Compute(LocalInterpolationStartTime+InterpolationTime - StartLanding) +
+        NoneSupportFootAbsolutePositions[StartIndex-1].omega - m_Omega;
+      ProtectionNeeded=true;
     }
   double dFX=0,dFY=0,dFZ=0;
   double lOmega = 0.0;
@@ -920,21 +900,21 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 
     if (lOmega<0)
       {
-	X1 = B*cos(-lOmega);
-	X2 = H*sin(-lOmega);
-	Z1 = H*cos(-lOmega);
-	Z2 = B*sin(-lOmega);
-	dX = -(B - X1 + X2);
-	dFZ = Z1 + Z2 - H;
+        X1 = B*cos(-lOmega);
+        X2 = H*sin(-lOmega);
+        Z1 = H*cos(-lOmega);
+        Z2 = B*sin(-lOmega);
+        dX = -(B - X1 + X2);
+        dFZ = Z1 + Z2 - H;
       }
     else
       {
-	X1 = F*cos(lOmega);
-	X2 = H*sin(lOmega);
-	Z1 = H*cos(lOmega);
-	Z2 = F*sin(lOmega);
-	dX = (F - X1 + X2);
-	dFZ = Z1 + Z2 - H;
+        X1 = F*cos(lOmega);
+        X2 = H*sin(lOmega);
+        Z1 = H*cos(lOmega);
+        Z2 = F*sin(lOmega);
+        dX = (F - X1 + X2);
+        dFZ = Z1 + Z2 - H;
       }
     dFX = c*dX;
     dFY = s*dX;

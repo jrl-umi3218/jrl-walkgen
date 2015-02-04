@@ -377,7 +377,7 @@ protected:
                                                                     m_CurrentConfiguration,
                                                                     m_CurrentVelocity,
                                                                     m_CurrentAcceleration,
-                                                                    20,
+                                                                    m_OneStep.NbOfIt,
                                                                     1);
     // carry the weight in front of him
 //    m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
@@ -623,7 +623,7 @@ protected:
     }
 
     {
-      istringstream strm2(":doublesupporttime 0.3");
+      istringstream strm2(":doublesupporttime 0.2");
       aPGI.ParseCmd(strm2);
     }
 

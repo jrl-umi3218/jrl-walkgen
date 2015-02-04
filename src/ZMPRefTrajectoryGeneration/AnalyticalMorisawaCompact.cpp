@@ -589,6 +589,9 @@ computing the analytical trajectories. */
       return;
     }
 
+    cout << InitRightFootAbsolutePosition.z << endl ;
+    cout << InitLeftFootAbsolutePosition.z << endl ;
+
     /*! Set the current time reference for the analytical trajectory. */
     double TimeShift = m_Tsingle*2;
     m_AbsoluteTimeReference = m_CurrentTime-TimeShift;
@@ -600,7 +603,10 @@ computing the analytical trajectories. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
 
-    bool filterOn_ = true ;
+    cout << LeftFootAbsolutePositions[0].z  << " " << LeftFootAbsolutePositions[1].z << endl
+         << RightFootAbsolutePositions[0].z << " " << RightFootAbsolutePositions[1].z << endl ;
+
+    bool filterOn_ = false ;
     if(filterOn_)
     {
         /*! initialize the dynamic filter */
@@ -689,8 +695,8 @@ computing the analytical trajectories. */
                     LeftFootAbsolutePositions,
                     RightFootAbsolutePositions,
                     vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
-                    vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
-                    vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
+                    vector< MAL_VECTOR_TYPE(double) > (1,UpperVel),
+                    vector< MAL_VECTOR_TYPE(double) > (1,UpperAcc),
                     outputDeltaCOMTraj_deq);
 
 
@@ -2388,11 +2394,23 @@ new step has to be generate.
     unsigned int lIndexInterval,lPrevIndexInterval;
     m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_AbsoluteTimeReference,lIndexInterval);
     lPrevIndexInterval = lIndexInterval;
-    double preCoMz = 0 ;
+
     /*! Fill in the stacks: minimal strategy only 1 reference. */
     for(double t=StartingTime; t<=EndTime; t+= samplingPeriod)
     {
       m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(t,lIndexInterval,lPrevIndexInterval);
+
+      /*! Feed the ZMPPositions. */
+      ZMPPosition aZMPPos;
+      if (!m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px,lIndexInterval))
+        LTHROW("Unable to compute ZMP along X-Axis in EndPhaseOfWalking");
+
+      if (!m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py,lIndexInterval))
+        LTHROW("Unable to compute ZMP along Y-Axis in EndPhaseOfWalking");
+
+      ComputeZMPz(t,aZMPPos,lIndexInterval);
+
+      FinalZMPPositions.push_back(aZMPPos);
 
       /*! Feed the FootPositions. */
 
@@ -2409,18 +2427,6 @@ new step has to be generate.
       if (!m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,t,RightFootAbsPos,lIndexInterval))
       { LTHROW("Unable to compute right foot position in EndPhaseOfWalking");}
       FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
-
-      /*! Feed the ZMPPositions. */
-      ZMPPosition aZMPPos;
-      if (!m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(t,aZMPPos.px,lIndexInterval))
-        LTHROW("Unable to compute ZMP along X-Axis in EndPhaseOfWalking");
-
-      if (!m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(t,aZMPPos.py,lIndexInterval))
-        LTHROW("Unable to compute ZMP along Y-Axis in EndPhaseOfWalking");
-
-      ComputeZMPz(t,aZMPPos,lIndexInterval,LeftFootAbsPos,RightFootAbsPos);
-
-      FinalZMPPositions.push_back(aZMPPos);
 
       /*! Feed the COMStates. */
       COMState aCOMPos;
@@ -2442,6 +2448,7 @@ new step has to be generate.
       aCOMPos.yaw[2] = 0.5*(LeftFootAbsPos.ddtheta + RightFootAbsPos.ddtheta);
 
       FinalCoMPositions.push_back(aCOMPos);
+
       ODEBUG4(aZMPPos.px << " " << aZMPPos.py << " " <<
               aCOMPos.x[0] << " " << aCOMPos.y[0] << " " << aCOMPos.z[0] <<" "<<
               LeftFootAbsPos.x << " " << LeftFootAbsPos.y << " " << LeftFootAbsPos.z << " " <<
@@ -2486,7 +2493,7 @@ new step has to be generate.
     // variables that parameterize the trajectory of the CoM in z
     double deltaZ ;
     // double static CoMzpre = CoMz;
-    double up=0.0,upRight = 1.0 ,upLeft = 0.0;
+    double up=0.1,upRight = 1.0 ,upLeft = 0.0;
     double down = 0.1, downRight = 1.0, downLeft = 0.0;
 
     // some variables renaming which improve the readibility
@@ -2587,9 +2594,7 @@ new step has to be generate.
 
   void AnalyticalMorisawaCompact::ComputeZMPz(double t,
                                               ZMPPosition &ZMPz,
-                                              unsigned int IndexInterval,
-                                              FootAbsolutePosition &aLeftFoot,
-                                              FootAbsolutePosition &aRightFoot)
+                                              unsigned int IndexInterval)
   {
     // absFootz_0, the z axis is expressed in the waist frame
     // we choose the left one by default, the foot are supposed to be symetrical
@@ -2607,12 +2612,18 @@ new step has to be generate.
     // we start analyze since 2nd step
     // after the final step we keep the same position for a while
     // when a foot fly the zmp.pz is the supportFoot.z
-    if ( t <= moving_time || stepNumber >= m_AbsoluteSupportFootPositions.size() || sinple_support)
+    if( stepNumber >= m_AbsoluteSupportFootPositions.size() )
       {
-        if (aLeftFoot.stepType < 0)
-          ZMPz.pz = aLeftFoot.z - corrZ(2);
-        else
-          ZMPz.pz = aRightFoot.z - corrZ(2);
+        ZMPz.pz = m_AbsoluteSupportFootPositions.back().z - corrZ(2) ;
+        return ;
+      }
+    else if ( stepNumber < 1 )
+      {
+        ZMPz.pz = m_AbsoluteSupportFootPositions.front().z - corrZ(2);
+      }
+    else if ( t <= moving_time || sinple_support)
+      {
+        ZMPz.pz = m_AbsoluteSupportFootPositions[stepNumber-1].z - corrZ(2) ;
         return ;
       }
     else

@@ -141,7 +141,7 @@ vector<double> Bsplines::ComputeBasisFunction(double t)
 
     for(i=0;i <= n;i++)
     {
-      if (j == 0 && m_knot_vector[i] <= t && t < m_knot_vector[i+1])
+      if (j == 0 && m_knot_vector[i] < t && t < m_knot_vector[i+1])
       {
         m_basis_function[j][i] = 1.0;
       }
@@ -188,23 +188,33 @@ double Bsplines::ComputeBsplines(double t)
 
 Bsplines Bsplines::DerivativeBsplines()
 {
-    std::vector<double> Q;
-    Q.clear();
-    Q.reserve(m_control_points.size()-1);
-
-    double T;
     if (m_degree >=1)
     {
-        for (unsigned int i=0;i<m_control_points.size()-1;i++)
+        Bsplines dB(m_degree-1);
+        std::vector<double> dB_control_points(m_control_points.size()-1);
+        std::vector<double> dB_knot_vector (m_knot_vector.size()-2);
+
+
+        for (unsigned int i=0 ; i<dB_control_points.size() ; ++i)
         {
-            T = ((m_control_points[i+1] - m_control_points[i])*double(m_degree) )/ (m_knot_vector[i+m_degree+1] - m_knot_vector[i+1]);
-            Q.push_back(T);
+            if(m_knot_vector[i+m_degree+1] - m_knot_vector[i+1]==0.0)
+            {
+              cout << "Knot no differenciable : result in the zero function\n" ;
+              dB_control_points[i] = 0.0 ;
+            }
+            else
+            {
+              dB_control_points[i] = ((m_control_points[i+1] - m_control_points[i])*double(m_degree) )/ (m_knot_vector[i+m_degree+1] - m_knot_vector[i+1]);
+            }
         }
-        Bsplines B(m_degree-1);
-        B.SetControlPoints(Q);
-        std::vector<double> new_knot_vector(m_knot_vector.begin()+1,m_knot_vector.end()-1);
-        B.SetKnotVector(new_knot_vector);
-        return B;
+
+        for (unsigned int i=0 ; i<dB_knot_vector.size() ; ++i)
+          dB_knot_vector[i] = m_knot_vector[i+1] ;
+
+
+        dB.SetKnotVector(dB_knot_vector);
+        dB.SetControlPoints(dB_control_points);
+        return dB;
         }
     else
         {
@@ -279,7 +289,7 @@ void Bsplines::PrintDegree() const
 // create a foot trajectory of Z in function of the time t
 
 
-BSplinesFoot::BSplinesFoot(double FT, double FP, vector<double> ToMP, vector<double> MP):Bsplines(6)
+BSplinesFoot::BSplinesFoot(double FT, double FP, vector<double> ToMP, vector<double> MP):Bsplines(5)
 {
   SetParameters(FT, 0.0 , FP, ToMP, MP);
 }
@@ -293,9 +303,9 @@ double BSplinesFoot::Compute(double t)
 {
   double time = t/m_FT ;
   if (time <= 0.0)
-    time = 0.0;
-  if (time >= m_FT)
-    time = 1.0 ;
+    return m_IP ;
+  if (time >= 1.0)
+    return m_FP ;
   return ComputeBsplines(time);
 }
 
@@ -304,9 +314,9 @@ double BSplinesFoot::ComputeDerivative(double t)
   if (m_degree >=1){
     double time = t/m_FT ;
     if (time <= 0.0)
-      time = 0.0;
-    if (time >= m_FT)
-      time = 1.0 ;
+      return 0.0 ;
+    if (time >= 1.0)
+      return 0.0 ;
     return DerivativeBsplines().ComputeBsplines(time);
   }
   else
@@ -322,9 +332,9 @@ double BSplinesFoot::ComputeSecDerivative(double t)
   {
     double time = t/m_FT ;
     if (time <= 0.0)
-      time = 0.0;
-    if (time >= m_FT)
-      time = 1.0 ;
+      return 0.0 ;
+    if (time >= 1.0)
+      return 0.0 ;
     return DerivativeBsplines().DerivativeBsplines().ComputeBsplines(time);
   }
   else
@@ -367,45 +377,45 @@ void  BSplinesFoot::SetParameters(double FT,
       // and the last three to the final time
       for (unsigned int i=0;i<=m_degree;i++)
         {knot.push_back(0.0);}
-      knot.push_back(0.5);
+
+      for (unsigned int i=0 ; i<(m_degree-1) ; ++i)
+        {knot.push_back ((double)(i+1) / (m_degree)) ;}
+
       for (unsigned int i =0;i<=m_degree;i++)
         {knot.push_back(1);}
-      SetKnotVector(knot);
 
       // Set the first three control point
       // to the initial pos and the last three
       // to the final pos
-      control_points.push_back(m_IP);
-      control_points.push_back(m_IP);
-      control_points.push_back(m_IP);
-      control_points.push_back(m_IP);
-      control_points.push_back(m_FP);
-      control_points.push_back(m_FP);
-      control_points.push_back(m_FP);
-      control_points.push_back(m_FP);
+      for(unsigned int i=0 ; i<m_degree ; ++i)
+        control_points.push_back(m_IP);
+
+      for(unsigned int i=0 ; i<m_degree ; ++i)
+        control_points.push_back(m_FP);
     break ;
 
     case 1 :
-      for (unsigned int i=0;i<=m_degree;i++)
+      for (unsigned int i=0 ; i<=m_degree ; ++i)
         {knot.push_back(0.0);}
-      knot.push_back(0.6*m_ToMP[0]/m_FT);
-      knot.push_back(    m_ToMP[0]/m_FT);
-      knot.push_back(1.3*m_ToMP[0]/m_FT);
-      for (unsigned int i =0;i<=m_degree;i++)
-        {knot.push_back(1);}
-      SetKnotVector(knot);
 
-      control_points.push_back(m_IP);
-      control_points.push_back(m_IP);
-      control_points.push_back(m_IP);
-      control_points.push_back(m_IP);
+      for (unsigned int i=1 ; i <=3 ; ++i)
+        {knot.push_back((double)i/3.0*m_ToMP[0]/m_FT);}
+
+      for (unsigned int i=0 ; i <3 ; ++i)
+        {knot.push_back((m_ToMP[0]+(double)i/3*(m_FT-m_ToMP[0]))/m_FT);}
+
+      for (unsigned int i =0 ; i<=m_degree ; ++i)
+        {knot.push_back(1);}
+
+      for(unsigned int i=0 ; i<m_degree ; ++i)
+        control_points.push_back(m_IP);
+
       control_points.push_back(m_MP[0]);
       control_points.push_back(m_MP[0]);
-      control_points.push_back(m_FP);
-      control_points.push_back(m_FP);
-      control_points.push_back(m_FP);
-      control_points.push_back(m_FP);
-      SetControlPoints(control_points);
+
+      for(unsigned int i=0 ; i<m_degree ; ++i)
+        control_points.push_back(m_FP);
+
     break ;
 
     case 2 :
@@ -417,7 +427,6 @@ void  BSplinesFoot::SetParameters(double FT,
       knot.push_back(m_ToMP[1]/m_FT);
       for (unsigned int i =0;i<=m_degree;i++)
         {knot.push_back(1);}
-      SetKnotVector(knot);
 
       control_points.push_back(m_IP);
       control_points.push_back(m_IP);
@@ -430,10 +439,13 @@ void  BSplinesFoot::SetParameters(double FT,
       control_points.push_back(m_FP);
       control_points.push_back(m_FP);
       control_points.push_back(m_FP);
-      SetControlPoints(control_points);
     break ;
+  }// end switch case
 
-  }
+  SetKnotVector(knot);
+  SetControlPoints(control_points);
+
+  return ;
 }
 
 

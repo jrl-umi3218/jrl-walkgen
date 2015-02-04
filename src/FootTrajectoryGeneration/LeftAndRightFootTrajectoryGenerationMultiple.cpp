@@ -129,7 +129,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 	  << FootFinalPosition.z << "," << FootInitialPosition.z << "," << FootInitialPosition.dz << ")");
   aFTGM->SetNatureInterval(IntervalIndex,FootFinalPosition.stepType);
 
-  double ModulationSupportCoefficient = 0.85;
+  double ModulationSupportCoefficient = 0.8;
   double UnlockedSwingPeriod = m_DeltaTj[IntervalIndex] * ModulationSupportCoefficient;
 
   // X axis.

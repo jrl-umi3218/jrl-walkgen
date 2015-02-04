@@ -246,7 +246,6 @@ namespace PatternGeneratorJRL
    BSplinesFoot *m_BsplinesX;
    BSplinesFoot *m_BsplinesY;
 
-  // int m_isStepStairOn;
 
    /*! \brief Foot dimension. */
    double m_FootB, m_FootH, m_FootF;

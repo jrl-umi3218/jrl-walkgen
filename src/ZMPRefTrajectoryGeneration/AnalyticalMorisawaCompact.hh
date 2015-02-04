@@ -561,9 +561,7 @@ namespace PatternGeneratorJRL
 
       void ComputeZMPz(double t,
            ZMPPosition &ZMPz,
-           unsigned int IndexInterval,
-           FootAbsolutePosition &aLeftFoot,
-           FootAbsolutePosition &aRightFoot);
+           unsigned int IndexInterval);
 
       void ComputeCoMz(double t, COMState &CoMz);
 
