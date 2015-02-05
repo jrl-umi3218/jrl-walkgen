@@ -289,8 +289,6 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
         }
       m_PolynomeZ->SetParametersWithMiddlePos(TimeInterval, FinalPosition+m_StepHeight,
                                               InitPosition, InitSpeed, 0.0, FinalPosition);
-      cout << InitPosition << " " << TimeInterval << endl ;
-      WayPoint_z = 0.0;
 
       // Check the final and the initial position to decide what to do
       if (FinalPosition - InitPosition > epsilon )
@@ -501,8 +499,6 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
 
   // Trajectory of the foot compute in the Z domain (plane Z of t)
   aFootAbsolutePosition.z = m_BsplinesZ->Compute(Time);
-  cout << "FT_z = " << m_BsplinesZ->FT() << " " << m_BsplinesZ->Compute(Time-0.005) << endl ;
-  cout << "FT_z = " << m_BsplinesZ->Compute(Time) << " " << m_BsplinesZ->Compute(Time+0.005) << endl ;
   aFootAbsolutePosition.dz = m_BsplinesZ->ComputeDerivative(Time);
   aFootAbsolutePosition.ddz = m_BsplinesZ->ComputeSecDerivative(Time);
 
@@ -513,12 +509,14 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.omega2);
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.theta);
 
-  cout << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.x      << endl
-       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.y      << endl
-       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.z      << endl
-       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.omega  << endl
-       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.omega2 << endl
-       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.theta  << endl;
+//  cout << "FT_z = " << m_BsplinesZ->FT() << " " << m_BsplinesZ->Compute(Time-0.005) << endl ;
+//  cout << "FT_z = " << m_BsplinesZ->Compute(Time) << " " << m_BsplinesZ->Compute(Time+0.005) << endl ;
+//  cout << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.x      << endl
+//       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.y      << endl
+//       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.z      << endl
+//       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.omega  << endl
+//       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.omega2 << endl
+//       << "t: " << Time << " " << timeOfInterpolation << " : " << aFootAbsolutePosition.theta  << endl;
   return Time;
 }
 

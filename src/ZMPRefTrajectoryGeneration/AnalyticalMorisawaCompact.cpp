@@ -589,9 +589,6 @@ computing the analytical trajectories. */
       return;
     }
 
-    cout << InitRightFootAbsolutePosition.z << endl ;
-    cout << InitLeftFootAbsolutePosition.z << endl ;
-
     /*! Set the current time reference for the analytical trajectory. */
     double TimeShift = m_Tsingle*2;
     m_AbsoluteTimeReference = m_CurrentTime-TimeShift;
@@ -603,10 +600,7 @@ computing the analytical trajectories. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
 
-    cout << LeftFootAbsolutePositions[0].z  << " " << LeftFootAbsolutePositions[1].z << endl
-         << RightFootAbsolutePositions[0].z << " " << RightFootAbsolutePositions[1].z << endl ;
-
-    bool filterOn_ = false ;
+    bool filterOn_ = true ;
     if(filterOn_)
     {
         /*! initialize the dynamic filter */
@@ -2493,8 +2487,8 @@ new step has to be generate.
     // variables that parameterize the trajectory of the CoM in z
     double deltaZ ;
     // double static CoMzpre = CoMz;
-    double up=0.1,upRight = 1.0 ,upLeft = 0.0;
-    double down = 0.1, downRight = 1.0, downLeft = 0.0;
+    double up=0.1,upRight = 1.1 ,upLeft = 0.0;
+    double down = 0.1, downRight = 0.90, downLeft = 0.1;
 
     // some variables renaming which improve the readibility
     double absFootz_0 = m_AbsoluteSupportFootPositions[Index].z - corrZ(2);
