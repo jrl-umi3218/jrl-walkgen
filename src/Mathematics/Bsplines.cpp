@@ -419,26 +419,34 @@ void  BSplinesFoot::SetParameters(double FT,
     break ;
 
     case 2 :
-      for (unsigned int i=0;i<=m_degree;i++)
+      for (unsigned int i=0 ; i<=m_degree ; ++i)
         {knot.push_back(0.0);}
-      knot.push_back(m_ToMP[0]/m_FT);
-      alpha=0.40;
-      knot.push_back((alpha*m_ToMP[0] + (1-alpha)*m_ToMP[1])/FT);
-      knot.push_back(m_ToMP[1]/m_FT);
-      for (unsigned int i =0;i<=m_degree;i++)
+
+      for (unsigned int i=1 ; i <=2 ; ++i)
+        {knot.push_back((double)i/2.0*m_ToMP[0]/m_FT);}
+
+      for (unsigned int i=0 ; i <2 ; ++i)
+        {knot.push_back( (m_ToMP[0]+m_ToMP[1])*0.5 /m_FT);}
+
+      for (unsigned int i=0 ; i <2 ; ++i)
+        {knot.push_back((m_ToMP[1]+(double)i/2*(m_FT-m_ToMP[1]))/m_FT);}
+
+      for (unsigned int i=0 ; i<=m_degree ; ++i)
         {knot.push_back(1);}
 
-      control_points.push_back(m_IP);
-      control_points.push_back(m_IP);
-      control_points.push_back(m_IP);
-      control_points.push_back(m_IP);
+      for (unsigned int i=0 ; i<=knot.size() ; ++i)
+        cout << knot[i] << " " ;
+      cout << knot.size() << endl ;
+
+      for(unsigned int i=0 ; i<m_degree ; ++i)
+        control_points.push_back(m_IP);
+
       control_points.push_back(m_MP[0]);
       control_points.push_back(m_MP[1]);
-      control_points.push_back(m_FP);
-      control_points.push_back(m_FP);
-      control_points.push_back(m_FP);
-      control_points.push_back(m_FP);
-      control_points.push_back(m_FP);
+
+      for(unsigned int i=0 ; i<m_degree ; ++i)
+        control_points.push_back(m_FP);
+
     break ;
   }// end switch case
 
