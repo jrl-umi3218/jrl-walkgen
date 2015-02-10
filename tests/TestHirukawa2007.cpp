@@ -31,6 +31,7 @@
 #include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
 #include <ZMPRefTrajectoryGeneration/DynamicFilter.hh>
 #include <metapod/models/hrp2_14/hrp2_14.hh>
+#include <metapod/algos/crba.hh>
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/accumulate.hpp>
@@ -63,8 +64,6 @@
     typedef metapod::jac_point_chain < Robot_Model,
     Robot_Model::r_wrist, Robot_Model::RARM_LINK0,0,true,false> Jac_RH;
 #endif
-
-typedef metapod::Nodes< Robot_Model, Robot_Model::BODY >::type RootNode;
 
 using namespace::PatternGeneratorJRL;
 using namespace::PatternGeneratorJRL::TestSuite;
@@ -148,14 +147,13 @@ public:
         cout << "mass * com = \n" << com << endl ;
         cout << "mass = \n" << sum_mass << endl ;
         com      = com / sum_mass ;
-        cout << "com = \n" << com << endl ;
+        cout << "com = \n" << com << endl << endl ;
 
 
-
-
-
-
-
+//        RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
+//        metapod::crba<Robot_Model>::run(robot_,q_init_);
+//        metapod::Spatial::InertiaTpl<LocalFloatType> Iic = node_waist.body.Iic ;
+//        cout << "Inertia properties\n" << Iic << endl ;
 
 
 

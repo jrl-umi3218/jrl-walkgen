@@ -135,7 +135,7 @@ int MultiContactHirukawa::online(vector<COMState> & comPos_,
                                  vector<HandAbsolutePosition> & lh_)
 {
     DetermineContact(rf_,lf_,rh_,lh_);
-    InverseKinematicsOnLimbs(rf_,lf_,rh_,lh_,0);
+    //InverseKinematicsOnLimbs(rf_,lf_,rh_,lh_,0);
 
     return 0 ;
 }

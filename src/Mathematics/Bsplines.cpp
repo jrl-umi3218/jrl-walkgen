@@ -434,10 +434,6 @@ void  BSplinesFoot::SetParameters(double FT,
       for (unsigned int i=0 ; i<=m_degree ; ++i)
         {knot.push_back(1);}
 
-      for (unsigned int i=0 ; i<=knot.size() ; ++i)
-        cout << knot[i] << " " ;
-      cout << knot.size() << endl ;
-
       for(unsigned int i=0 ; i<m_degree ; ++i)
         control_points.push_back(m_IP);
 
