@@ -35,12 +35,13 @@ using namespace::PatternGeneratorJRL::TestSuite;
 using namespace std;
 
 enum Profiles_t {
-  PROFIL_ANALYTICAL_ONLINE_WALKING,         // 1
-  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING, // 2
-  PROFIL_ANALYTICAL_CLIMBING_STAIRS,        // 3
+  PROFIL_ANALYTICAL_ONLINE_WALKING,          // 1
+  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,  // 2
+  PROFIL_ANALYTICAL_CLIMBING_STAIRS,         // 3
   PROFIL_ANALYTICAL_GOING_DOWN_STAIRS,       // 4
   PROFIL_ANALYTICAL_STEPPING_STONES,         // 5
-  PROFIL_ANALYTICAL_WALKING_ON_BEAM         // 6
+  PROFIL_ANALYTICAL_WALKING_ON_BEAM,         // 6
+  PROFIL_ANALYTICAL_GO_THROUGH_WALL          // 7
 };
 
 #define NBOFPREDEFONLINEFOOTSTEPS 11
@@ -195,6 +196,7 @@ public:
     // Compare debugging files
     return compareDebugFiles();
   }
+
   void init()
   {
     // Instanciate and initialize.
@@ -225,6 +227,12 @@ public:
     MAL_VECTOR_RESIZE(m_PreviousConfiguration, m_HDR->numberDof());
     MAL_VECTOR_RESIZE(m_PreviousVelocity, m_HDR->numberDof());
     MAL_VECTOR_RESIZE(m_PreviousAcceleration, m_HDR->numberDof());
+
+    for (unsigned int i = 18 ; i < 35 ; ++i)
+    {
+      m_CurrentConfiguration (i) = InitialPosition (i-6) ;
+      m_PreviousConfiguration (i) = InitialPosition (i-6) ;
+    }
 
     SPM = new SimplePluginManager();
 
@@ -281,6 +289,12 @@ protected:
                                               waist,
                                               m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
     ComAndFootRealization_->Initialization();
+
+    for (int i = 0 ; i < 6 ; ++i )
+    {
+      m_CurrentConfiguration(i) = waist(i);
+    }
+    m_HDR->currentConfiguration(m_CurrentConfiguration);
   }
 
   void fillInDebugFiles()
@@ -368,8 +382,8 @@ protected:
     aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
     aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
     aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
-    aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
-    aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
+    aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta*180/M_PI;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta*180/M_PI;
+    aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega*180/M_PI;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega*180/M_PI;
     ComAndFootRealization_->setSamplingPeriod(0.005);
     ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
                                                                     aLeftFootPosition,
@@ -381,7 +395,7 @@ protected:
                                                                     1);
     // carry the weight in front of him
 //    m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
-    m_CurrentConfiguration(19)= 0.015 ;            // CHEST_JOINT1
+//    m_CurrentConfiguration(19)= 0.015 ;            // CHEST_JOINT1
 //    m_CurrentConfiguration(20)= 0.0 ;            // HEAD_JOINT0
 //    m_CurrentConfiguration(21)= 0.0 ;            // HEAD_JOINT1
 //    m_CurrentConfiguration(22)= -0.108210414 ;   // RARM_JOINT0
@@ -390,14 +404,14 @@ protected:
 //    m_CurrentConfiguration(25)= -1.41720735 ;    // RARM_JOINT3
 //    m_CurrentConfiguration(26)= 1.45385927 ;     // RARM_JOINT4
 //    m_CurrentConfiguration(27)= 0.509636142 ;     // RARM_JOINT5
-    m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
+//    m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
 //    m_CurrentConfiguration(29)= -0.108210414 ;    // LARM_JOINT0
 //    m_CurrentConfiguration(30)= -0.129154365 ;    // LARM_JOINT1
 //    m_CurrentConfiguration(31)= -0.333357887 ;    // LARM_JOINT2
 //    m_CurrentConfiguration(32)= -1.41720735 ;     // LARM_JOINT3
 //    m_CurrentConfiguration(33)= 1.45385927 ;      // LARM_JOINT4
 //    m_CurrentConfiguration(34)= -0.193731547 ;    // LARM_JOINT5
-    m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
+//    m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
 
 //      // carry the weight over the head
 //      m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
@@ -419,6 +433,45 @@ protected:
 //      m_CurrentConfiguration(34)= 0.584685299 ;    // LARM_JOINT5
 //      m_CurrentConfiguration(35)= 0.174532925 ;    // LARM_JOINT6
 
+//      // walk throug wall
+//      m_CurrentConfiguration(18)= 0.0 ;            // CHEST_JOINT0
+//      m_CurrentConfiguration(19)= -0.09 ;          // CHEST_JOINT1
+//      m_CurrentConfiguration(20)= 0.0 ;            // HEAD_JOINT0
+//      m_CurrentConfiguration(21)= -0.37 ;          // HEAD_JOINT1
+//      m_CurrentConfiguration(22)= 0.0 ;            // RARM_JOINT0
+//      m_CurrentConfiguration(23)= -M_PI/2 ;        // RARM_JOINT1
+//      m_CurrentConfiguration(24)= 0.0 ;            // RARM_JOINT2
+//      m_CurrentConfiguration(25)= 0.0 ;            // RARM_JOINT3
+//      m_CurrentConfiguration(26)= 0.0 ;            // RARM_JOINT4
+//      m_CurrentConfiguration(27)= 0.0 ;            // RARM_JOINT5
+//      m_CurrentConfiguration(28)= 0.174532925 ;    // RARM_JOINT6
+//      m_CurrentConfiguration(29)= 0.0 ;            // LARM_JOINT0
+//      m_CurrentConfiguration(30)= M_PI/2 ;         // LARM_JOINT1
+//      m_CurrentConfiguration(31)= 0.0 ;            // LARM_JOINT2
+//      m_CurrentConfiguration(32)= 0.0 ;            // LARM_JOINT3
+//      m_CurrentConfiguration(33)= 0.0 ;            // LARM_JOINT4
+//      m_CurrentConfiguration(34)= 0.0 ;            // LARM_JOINT5
+//      m_CurrentConfiguration(35)= 0.174532925 ;    // LARM_JOINT6
+
+    // init config of the upper body
+    m_CurrentConfiguration(18)= m_HDR->currentConfiguration()(18) ; // CHEST_JOINT0
+    m_CurrentConfiguration(19)= m_HDR->currentConfiguration()(19) ; // CHEST_JOINT1
+    m_CurrentConfiguration(20)= m_HDR->currentConfiguration()(20) ; // HEAD_JOINT0
+    m_CurrentConfiguration(21)= m_HDR->currentConfiguration()(21) ; // HEAD_JOINT1
+    m_CurrentConfiguration(22)= m_HDR->currentConfiguration()(22) ; // RARM_JOINT0
+    m_CurrentConfiguration(23)= m_HDR->currentConfiguration()(23) ; // RARM_JOINT1
+    m_CurrentConfiguration(24)= m_HDR->currentConfiguration()(24) ; // RARM_JOINT2
+    m_CurrentConfiguration(25)= m_HDR->currentConfiguration()(25) ; // RARM_JOINT3
+    m_CurrentConfiguration(26)= m_HDR->currentConfiguration()(26) ; // RARM_JOINT4
+    m_CurrentConfiguration(27)= m_HDR->currentConfiguration()(27) ; // RARM_JOINT5
+    m_CurrentConfiguration(28)= m_HDR->currentConfiguration()(28) ; // RARM_JOINT6
+    m_CurrentConfiguration(29)= m_HDR->currentConfiguration()(29) ; // LARM_JOINT0
+    m_CurrentConfiguration(30)= m_HDR->currentConfiguration()(30) ; // LARM_JOINT1
+    m_CurrentConfiguration(31)= m_HDR->currentConfiguration()(31) ; // LARM_JOINT2
+    m_CurrentConfiguration(32)= m_HDR->currentConfiguration()(32) ; // LARM_JOINT3
+    m_CurrentConfiguration(33)= m_HDR->currentConfiguration()(33) ; // LARM_JOINT4
+    m_CurrentConfiguration(34)= m_HDR->currentConfiguration()(34) ; // LARM_JOINT5
+    m_CurrentConfiguration(35)= m_HDR->currentConfiguration()(35) ; // LARM_JOINT6
 
     /// \brief Create file .hip .pos .zmp
     /// --------------------
@@ -719,7 +772,117 @@ protected:
    }
  }
 
+ void AnalyticalGoThroughWall(PatternGeneratorInterface &aPGI)
+ {
+   CommonInitialization(aPGI);
+   {
+     istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
+     aPGI.ParseCmd(strm2);
+   }
 
+   {
+     istringstream strm2(":singlesupporttime 1.05");
+     aPGI.ParseCmd(strm2);
+   }
+
+   {
+     istringstream strm2(":doublesupporttime 0.15");
+     aPGI.ParseCmd(strm2);
+   }
+
+   {
+     istringstream strm2(":stepheight 0.05");
+     aPGI.ParseCmd(strm2);
+   }
+
+   {
+     // wait for andreas the step sequence
+       istringstream strm2(":stepstairseq\
+                           -0.57 1.93 0.0 0.79   \
+                           0.14 -0.26 0.0 -0.49  \
+                           -0.07 0.19 0.0 0.49   \
+                           0.1 -0.28 0.0 -0.48   \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 0.0    \
+                           -0.06 0.19 0.0 -0.0   \
+                           0.09 -0.29 0.0 -0.03  \
+                           -0.06 0.19 0.0 0.03   \
+                           0.07 -0.29 0.0 -0.2   \
+                           -0.04 0.19 0.0 0.2    \
+                           0.06 -0.29 0.0 -0.19  \
+                           -0.03 0.19 0.0 0.16   \
+                           0.04 -0.29 0.0 -0.16  \
+                           -0.02 0.2 0.0 -0.01   \
+                           0.03 -0.3 0.0 -0.01   \
+                           -0.02 0.2 0.0 0.02    \
+                           0.04 -0.3 0.0 0.06    \
+                           -0.03 0.2 0.0 -0.06   \
+                           0.05 -0.3 0.0 0.08    \
+                           -0.03 0.19 0.0 -0.09  \
+                           0.06 -0.29 0.0 0.09   \
+                           -0.04 0.2 0.0 -0.01   \
+                           0.06 -0.3 0.0 0.01    \
+                           -0.04 0.2 0.0 0.0     \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.2 0.0 0.0     \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.2 0.0 0.0     \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.2 0.0 0.0     \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.2 0.0 0.0     \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.19 0.0 0.0    \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.19 0.0 0.0    \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.2 0.0 0.0     \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.2 0.0 0.0     \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.2 0.0 0.0     \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.19 0.0 0.0    \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.2 0.0 0.0     \
+                           0.06 -0.3 0.0 -0.0    \
+                           -0.04 0.2 0.0 0.0     \
+                           0.05 -0.3 0.0 -0.09   \
+                           -0.03 0.2 0.0 0.09    \
+                           0.04 -0.23 0.0 -0.17  \
+                           -0.02 0.23 0.0 0.17   \
+                           0.02 -0.23 0.0 -0.17  \
+                           -0.01 0.23 0.0 0.08   \
+                           0.01 -0.23 0.0 -0.08  \
+                           0.0 0.2 0.0 0.0      \
+                           ");
+     aPGI.ParseCmd(strm2);
+   }
+ }
 
   void chooseTestProfile()
   {
@@ -747,8 +910,12 @@ protected:
 	break;
 
       case PROFIL_ANALYTICAL_WALKING_ON_BEAM:
-      AnalyticalWalkingOnBeam(*m_PGI);
-      break;
+        AnalyticalWalkingOnBeam(*m_PGI);
+        break;
+
+      case PROFIL_ANALYTICAL_GO_THROUGH_WALL:
+        AnalyticalGoThroughWall(*m_PGI);
+        break;
 
 
       default:
@@ -769,11 +936,8 @@ protected:
       return;
     if (m_TestProfile==PROFIL_ANALYTICAL_WALKING_ON_BEAM)
       return;
-
-
-
-
-
+    if (m_TestProfile==PROFIL_ANALYTICAL_GO_THROUGH_WALL)
+      return;
 
     unsigned int StoppingTime = 70*200;
 
@@ -849,12 +1013,13 @@ int PerformTests(int argc, char *argv[])
   std::string CompleteName = string(argv[0]);
   unsigned found = CompleteName.find_last_of("/\\");
   std::string TestName =  CompleteName.substr(found+1);
-  int TestProfiles[6] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
+  int TestProfiles[7] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
 			  PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,
 			  PROFIL_ANALYTICAL_CLIMBING_STAIRS,
 			  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS,
                           PROFIL_ANALYTICAL_STEPPING_STONES,
-                          PROFIL_ANALYTICAL_WALKING_ON_BEAM
+                          PROFIL_ANALYTICAL_WALKING_ON_BEAM,
+                          PROFIL_ANALYTICAL_GO_THROUGH_WALL
               };
   int indexProfile=-1;
 
@@ -870,6 +1035,9 @@ int PerformTests(int argc, char *argv[])
     indexProfile=4;
   if (TestName.compare(16,13,"WalkingOnBeam")==0)
     indexProfile=5;
+  if (TestName.compare(16,13,"GoThroughWall")==0)
+    indexProfile=6;
+
 
   if (indexProfile==-1)
     {

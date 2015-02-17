@@ -600,7 +600,7 @@ computing the analytical trajectories. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
 
-    bool filterOn_ = true ;
+    bool filterOn_ = false;
     if(filterOn_)
     {
         /*! initialize the dynamic filter */
@@ -631,14 +631,14 @@ computing the analytical trajectories. */
 //        UpperConfig(25)= -1.41720735 ;    // RARM_JOINT3
 //        UpperConfig(26)= 1.45385927 ;     // RARM_JOINT4
 //        UpperConfig(27)= 0.509636142 ;    // RARM_JOINT5
-        UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
+//        UpperConfig(28)= 0.174532925 ;    // RARM_JOINT6
 //        UpperConfig(29)= -0.108210414 ;   // LARM_JOINT0
 //        UpperConfig(30)= -0.129154365 ;   // LARM_JOINT1
 //        UpperConfig(31)= -0.333357887 ;   // LARM_JOINT2
 //        UpperConfig(32)= -1.41720735 ;    // LARM_JOINT3
 //        UpperConfig(33)= 1.45385927 ;     // LARM_JOINT4
 //        UpperConfig(34)= -0.193731547 ;   // LARM_JOINT5
-        UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
+//        UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
 
     //    // carry the weight over the head
     //    UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
@@ -661,6 +661,7 @@ computing the analytical trajectories. */
     //    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
 
         for(unsigned int i = 18 ; i < 35 ; ++i){
+          UpperConfig(i)=m_HS->currentConfiguration()(i);
           UpperVel(i)=0.0;
           UpperAcc(i)=0.0;
         }

@@ -453,7 +453,7 @@ void DynamicFilter::ExtractZMP(vector<double> & ZMPMB)
 
   // extract the CoM momentum and forces
   m_force = node_waist.body.iX0.applyInv(node_waist.joint.f);
-  metapod::Vector3dTpl< LocalFloatType >::Type CoM_Waist_vec (node_waist.body.iX0.r() - com ()) ;
+  metapod::Vector3dTpl< LocalFloatType >::Type CoM_Waist_vec ((node_waist.body.iX0.r() - com ())) ;
   metapod::Vector3dTpl< LocalFloatType >::Type CoM_torques (0.0,0.0,0.0);
   CoM_torques = m_force.n() + metapod::Skew<LocalFloatType>(CoM_Waist_vec) * m_force.f() ;
 
@@ -747,7 +747,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
     }
   }
 
-  int stage2 = 2 ;
+  int stage0 = 0 ;
   vector< vector<double> > zmpmb_corr (NCtrl_,vector<double>(2,0.0));
   for(unsigned int i = 0 ; i < NCtrl_ ; ++i)
   {
@@ -756,7 +756,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
                    ctrlLeftFoot[i],
                    ctrlRightFoot[i],
                    zmpmb_corr[i],
-                   stage2,
+                   stage0,
                    20);
   }
   int inc = (int)round(interpolationPeriod_/controlPeriod_) ;

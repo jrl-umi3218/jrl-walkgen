@@ -155,7 +155,7 @@ public:
 //        metapod::Spatial::InertiaTpl<LocalFloatType> Iic = node_waist.body.Iic ;
 //        cout << "Inertia properties\n" << Iic << endl ;
 
-
+        boost::fusion::for_each(robot_.nodes ,  print_body_state() );
 
 
 
@@ -286,6 +286,16 @@ public:
             aof.precision(7);
             aof.setf(ios::fixed, ios::floatfield);
             aof << Robot_Model::inertias[x.id] ;
+        }
+    };
+
+    struct print_body_state
+    {
+        template <typename T>
+        void operator()(T & x) const
+        {
+          cout << x.joint_name << endl ;
+          cout << x.body.iX0 ;
         }
     };
 
