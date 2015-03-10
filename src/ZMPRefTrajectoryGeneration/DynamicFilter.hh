@@ -110,6 +110,12 @@ namespace PatternGeneratorJRL
     int OptimalControl(deque<ZMPPosition> &inputdeltaZMP_deq,
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
+    /// \brief compute the zmpmb from articulated pos vel and acc
+    int zmpmb(Robot_Model::confVector q,
+              Robot_Model::confVector dq,
+              Robot_Model::confVector ddq,
+              vector<double> & zmpmb);
+
   private: // Private methods
 
     /// \brief Apply the RNEA on the robot model and over the whole trajectory
@@ -118,7 +124,7 @@ namespace PatternGeneratorJRL
                          MAL_VECTOR_TYPE(double)& velocity,
                          MAL_VECTOR_TYPE(double)& acceleration);
 
-    void ExtractZMP(vector<double> & ZMPMB) ;
+    void ExtractZMP(vector<double> & zmpmb) ;
 
     void computeWaist(const FootAbsolutePosition & inputLeftFoot) ;
 

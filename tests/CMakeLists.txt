@@ -209,6 +209,79 @@ ADD_TEST(TestInverseKinematics
 TestInverseKinematics
 ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 
+###########################
+# Test Inverse Kinematics #
+###########################
+
+ADD_EXECUTABLE(TestMulticontactInverseGeometry
+    ../src/portability/gettimeofday.cc
+    TestMulticontactInverseGeometry.cpp
+    CommonTools.cpp
+    TestObject.cpp
+    ClockCPUTime.cpp
+)
+
+TARGET_LINK_LIBRARIES(TestMulticontactInverseGeometry ${PROJECT_NAME})
+PKG_CONFIG_USE_DEPENDENCY(TestMulticontactInverseGeometry jrl-dynamics)
+PKG_CONFIG_USE_DEPENDENCY(TestMulticontactInverseGeometry hrp2-dynamics)
+ADD_DEPENDENCIES(TestMulticontactInverseGeometry ${PROJECT_NAME})
+
+MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
+SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
+SET(samplespec
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
+)
+SET(sampleljr
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
+)
+SET(sampleinitconfig
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
+)
+
+LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
+
+# This test is disabled for now as it fails.
+# FIXME: fix the test and/or the implementation
+ADD_TEST(TestMulticontactInverseGeometry
+TestMulticontactInverseGeometry
+${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+
+##############################
+# Test Kajita Dynamic Filter #
+##############################
+
+ADD_EXECUTABLE(TestKajitaDynamicFilter
+    ../src/portability/gettimeofday.cc
+    TestKajitaDynamicFilter.cpp
+    CommonTools.cpp
+    TestObject.cpp
+    ClockCPUTime.cpp
+)
+
+TARGET_LINK_LIBRARIES(TestKajitaDynamicFilter ${PROJECT_NAME})
+PKG_CONFIG_USE_DEPENDENCY(TestKajitaDynamicFilter jrl-dynamics)
+PKG_CONFIG_USE_DEPENDENCY(TestKajitaDynamicFilter hrp2-dynamics)
+ADD_DEPENDENCIES(TestKajitaDynamicFilter ${PROJECT_NAME})
+
+MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
+SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
+SET(samplespec
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
+)
+SET(sampleljr
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
+)
+SET(sampleinitconfig
+    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
+)
+
+LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
+
+# This test is disabled for now as it fails.
+# FIXME: fix the test and/or the implementation
+ADD_TEST(TestKajitaDynamicFilter
+TestKajitaDynamicFilter
+${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 
 ######################
 # Test Hirukawa 2007 #

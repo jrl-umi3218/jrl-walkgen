@@ -115,13 +115,13 @@ namespace PatternGeneratorJRL
       @param Stage: indicates which stage is reach by the Pattern Generator.
     */
     virtual bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) &CoMPosition,
-							 MAL_VECTOR_TYPE(double) &CoMSpeed,
-							 MAL_VECTOR_TYPE(double) &CoMAcc,
-							 MAL_VECTOR_TYPE(double) &LeftFoot,
-							 MAL_VECTOR_TYPE(double) &RightFoot,
-							 MAL_VECTOR_TYPE(double) &CurrentConfiguration,
-							 MAL_VECTOR_TYPE(double) &CurrentVelocity,
-							 MAL_VECTOR_TYPE(double) &CurrentAcceleration,
+                                                         MAL_VECTOR_TYPE(double) &CoMSpeed,
+                                                         MAL_VECTOR_TYPE(double) &CoMAcc,
+                                                         MAL_VECTOR_TYPE(double) &LeftFoot,
+                                                         MAL_VECTOR_TYPE(double) &RightFoot,
+                                                         MAL_VECTOR_TYPE(double) &CurrentConfiguration,
+                                                         MAL_VECTOR_TYPE(double) &CurrentVelocity,
+                                                         MAL_VECTOR_TYPE(double) &CurrentAcceleration,
 							 int IterationNumber,
 							 int Stage) =0;
 

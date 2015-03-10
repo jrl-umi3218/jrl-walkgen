@@ -600,7 +600,7 @@ computing the analytical trajectories. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
 
-    bool filterOn_ = false;
+    bool filterOn_ = true;
     if(filterOn_)
     {
         /*! initialize the dynamic filter */

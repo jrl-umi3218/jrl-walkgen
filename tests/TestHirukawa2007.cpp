@@ -157,6 +157,23 @@ public:
 
         boost::fusion::for_each(robot_.nodes ,  print_body_state() );
 
+        RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
+        RshoulderNode & node_rshoulder = boost::fusion::at_c<Robot_Model::RARM_LINK0>(robot_.nodes);
+        RhandNode & node_rwrist = boost::fusion::at_c<Robot_Model::r_wrist>(robot_.nodes);
+
+        metapod::Spatial::TransformT<LocalFloatType,metapod::Spatial::RotationMatrixTpl<LocalFloatType> > rshoulderXrwrist ;
+        metapod::Spatial::TransformT<LocalFloatType,metapod::Spatial::RotationMatrixTpl<LocalFloatType> > rshoulderXwaist ;
+        rshoulderXrwrist = node_rshoulder.body.iX0 * node_rwrist.body.iX0.inverse() ;
+        rshoulderXwaist = node_rshoulder.body.iX0 * node_waist.body.iX0.inverse() ;
+        cout << "waist in shoulder : " << rshoulderXwaist << endl ;
+
+
+
+
+
+
+
+
 
 
 

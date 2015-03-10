@@ -541,18 +541,20 @@ bool ComAndFootRealizationByGeometry::
   MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
   MAL_VECTOR_FILL(m_prev_Velocity2,0.0);
 
-  for(unsigned int i = 0 ; i < 6 ; ++i)
-  {
-    m_prev_Configuration (i) = lStartingWaistPose(i);
-    m_prev_Configuration1(i) = lStartingWaistPose(i);
-    m_prev_Configuration2(i) = lStartingWaistPose(i);
-  }
+
   for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(BodyAnglesIni) ; ++i)
   {
     m_prev_Configuration (i) = BodyAnglesIni(i);
     m_prev_Configuration1(i) = BodyAnglesIni(i);
     m_prev_Configuration2(i) = BodyAnglesIni(i);
   }
+  for(unsigned int i = 0 ; i < 6 ; ++i)
+  {
+    m_prev_Configuration (i) = lStartingWaistPose(i);
+    m_prev_Configuration1(i) = lStartingWaistPose(i);
+    m_prev_Configuration2(i) = lStartingWaistPose(i);
+  }
+
 
 
   return true;

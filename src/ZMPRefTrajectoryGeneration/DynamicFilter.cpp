@@ -144,7 +144,8 @@ void DynamicFilter::init(
   prev_q_ = q_ ;
   prev_dq_ = dq_ ;
   prev_ddq_ = ddq_ ;
-  jcalc<Robot_Model>::run(robot_,q_ ,dq_ );
+  // Apply the RNEA on the robot model
+  metapod::rnea< Robot_Model, true >::run(robot_, q_, dq_, ddq_);
 
   deltaZMP_deq_.resize( PG_N_*NbI_);
   ZMPMB_vec_.resize( PG_N_*NbI_, vector<double>(2));
@@ -169,8 +170,9 @@ void DynamicFilter::init(
   MAL_MATRIX_RESIZE(deltay_,3,1);
 
   RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
-  CWx = node_waist.body.iX0.r()(0,0) - inputCoMState.x[0] ;
-  CWy = node_waist.body.iX0.r()(1,0) - inputCoMState.y[0] ;
+  metapod::Vector3dTpl< LocalFloatType >::Type initCoM = com() ;
+  CWx = node_waist.body.iX0.r()(0,0) - initCoM(0) ;
+  CWy = node_waist.body.iX0.r()(1,0) - initCoM(1) ;
 
   sxzmp_ = 0.0 ;
   syzmp_ = 0.0 ;
@@ -297,6 +299,19 @@ int DynamicFilter::OnLinefilter(
   return 0 ;
 }
 
+// #############################
+int DynamicFilter::zmpmb(Robot_Model::confVector q,
+          Robot_Model::confVector dq,
+          Robot_Model::confVector ddq,
+          vector<double> & zmpmb)
+{
+  // Apply the RNEA on the robot model
+  metapod::rnea< Robot_Model, true >::run(robot_, q, dq, ddq);
+  ExtractZMP(zmpmb);
+  return 0 ;
+}
+
+//##################################
 void DynamicFilter::InverseKinematics(
     const COMState & inputCoMState,
     const FootAbsolutePosition & inputLeftFoot,
@@ -447,46 +462,17 @@ void DynamicFilter::InverseDynamics(
   return ;
 }
 
-void DynamicFilter::ExtractZMP(vector<double> & ZMPMB)
+void DynamicFilter::ExtractZMP(vector<double> & zmpmb)
 {
   RootNode & node_waist = boost::fusion::at_c<Robot_Model::BODY>(robot_.nodes);
 
   // extract the CoM momentum and forces
   m_force = node_waist.body.iX0.applyInv(node_waist.joint.f);
-  metapod::Vector3dTpl< LocalFloatType >::Type CoM_Waist_vec ((node_waist.body.iX0.r() - com ())) ;
-  metapod::Vector3dTpl< LocalFloatType >::Type CoM_torques (0.0,0.0,0.0);
-  CoM_torques = m_force.n() + metapod::Skew<LocalFloatType>(CoM_Waist_vec) * m_force.f() ;
-
-  // dump forces and momentum
-  static int inc = 0.0 ;
-  ofstream aof;
-  string aFileName;
-  ostringstream oss(std::ostringstream::ate);
-  oss.str("ForcesAndMomentum.txt");
-  aFileName = oss.str();
-  if ( inc == 0 )
-  {
-    aof.open(aFileName.c_str(),ofstream::out);
-    aof.close();
-  }
-  aof.open(aFileName.c_str(),ofstream::app);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  aof << inc*controlPeriod_ << " " // 1
-      << m_force.f()[0] << " "     // 2
-      << m_force.f()[1] << " "     // 3
-      << m_force.f()[2] << " "     // 4
-      << node_waist.joint.f.n()[0] << " "     // 5
-      << node_waist.joint.f.n()[1] << " "     // 6
-      << node_waist.joint.f.n()[2] << " "     // 7
-      << endl ;
-  ++inc ;
-  // end dump forces and momentum
 
   // compute the Multibody ZMP
-  ZMPMB.resize(2);
-  ZMPMB[0] = - CoM_torques[1] / m_force.f()[2] ;
-  ZMPMB[1] =   CoM_torques[0] / m_force.f()[2] ;
+  zmpmb.resize(2);
+  zmpmb[0] = - m_force.n()[1] / m_force.f()[2] ;
+  zmpmb[1] =   m_force.n()[0] / m_force.f()[2] ;
   return ;
 }
 

@@ -141,7 +141,7 @@ vector<double> Bsplines::ComputeBasisFunction(double t)
 
     for(i=0;i <= n;i++)
     {
-      if (j == 0 && m_knot_vector[i] < t && t < m_knot_vector[i+1])
+      if (j == 0 && m_knot_vector[i] <= t && t < m_knot_vector[i+1] || t == m_knot_vector.back() )
       {
         m_basis_function[j][i] = 1.0;
       }
