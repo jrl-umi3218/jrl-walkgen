@@ -1,5 +1,5 @@
 /*
-* Copyright 2008, 2009, 2010,
+* Copyright 2008, 2009, 2010, 2014, 2015
 *
 * Torea Foissotte
 * Olivier Stasse
@@ -752,10 +752,10 @@ computing the analytical trajectories. */
     m_InitialPoseCoMHeight = lStartingCOMState.z[0];
 
     for(unsigned int i=0;i<3;i++)
-    {
-      for(unsigned int j=1;j<3;j++)
-        lMStartingCOMState(i,j)= 0.0;
-    }
+      {
+        for(unsigned int j=1;j<3;j++)
+          lMStartingCOMState(i,j)= 0.0;
+      }
 
     for(unsigned int i=0;i< maxrelsteps;i++)
       m_RelativeFootPositions.push_back(RelativeFootPositions[i]);
@@ -766,13 +766,13 @@ computing the analytical trajectories. */
       m_AbsoluteCurrentSupportFootPosition = InitLeftFootAbsolutePosition;
 
     /* This part computes the CoM and ZMP trajectory giving the foot position information.
-It also creates the analytical feet trajectories.
-*/
+       It also creates the analytical feet trajectories.
+     */
     if (BuildAndSolveCOMZMPForASetOfSteps(lMStartingCOMState,
                                           InitLeftFootAbsolutePosition,
                                           InitRightFootAbsolutePosition,
                                           true,true)<0)
-    {	LTHROW("Error: Humanoid Specificities not initialized. "); }
+      {	LTHROW("Error: Humanoid Specificities not initialized. "); }
 
     m_AbsoluteTimeReference = m_CurrentTime-m_Tsingle*2;
     m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
@@ -780,7 +780,7 @@ It also creates the analytical feet trajectories.
     m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
 
     /* Current strategy : add 2 values, and update at each iteration the stack.
-When the limit is reached, and the stack exhausted this method is called again. */
+       When the limit is reached, and the stack exhausted this method is called again.  */
     FillQueues(m_CurrentTime,
                m_CurrentTime+2*m_SamplingPeriod,
                FinalZMPPositions,
@@ -791,10 +791,65 @@ When the limit is reached, and the stack exhausted this method is called again. 
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
 
-    m_kajitaDynamicFilter->init( m_SamplingPeriod, 0.04, m_SamplingPeriod, 1.6,
-                                 lStartingCOMState.z[0], InitLeftFootAbsolutePosition, lStartingCOMState );
-
     return m_RelativeFootPositions.size();
+
+//    m_OnLineMode = true;
+//    m_RelativeFootPositions.clear();
+
+//    unsigned int r = RelativeFootPositions.size();
+//    unsigned int maxrelsteps = r < 3 ? r : 3;
+//    MAL_S3x3_MATRIX(lMStartingCOMState,double);
+
+//    lMStartingCOMState(0,0)= lStartingCOMState.x[0];
+//    lMStartingCOMState(1,0)= lStartingCOMState.y[0];
+//    lMStartingCOMState(2,0)= lStartingCOMState.z[0];
+
+//    m_InitialPoseCoMHeight = lStartingCOMState.z[0];
+
+//    for(unsigned int i=0;i<3;i++)
+//    {
+//      for(unsigned int j=1;j<3;j++)
+//        lMStartingCOMState(i,j)= 0.0;
+//    }
+
+//    for(unsigned int i=0;i< maxrelsteps;i++)
+//      m_RelativeFootPositions.push_back(RelativeFootPositions[i]);
+
+//    if (m_RelativeFootPositions[0].sy < 0)
+//      m_AbsoluteCurrentSupportFootPosition = InitRightFootAbsolutePosition;
+//    else
+//      m_AbsoluteCurrentSupportFootPosition = InitLeftFootAbsolutePosition;
+
+//    /* This part computes the CoM and ZMP trajectory giving the foot position information.
+//It also creates the analytical feet trajectories.
+//*/
+//    if (BuildAndSolveCOMZMPForASetOfSteps(lMStartingCOMState,
+//                                          InitLeftFootAbsolutePosition,
+//                                          InitRightFootAbsolutePosition,
+//                                          true,true)<0)
+//    {	LTHROW("Error: Humanoid Specificities not initialized. "); }
+
+//    m_AbsoluteTimeReference = m_CurrentTime-m_Tsingle*2;
+//    m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
+//    m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
+//    m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
+
+//    /* Current strategy : add 2 values, and update at each iteration the stack.
+//When the limit is reached, and the stack exhausted this method is called again. */
+//    FillQueues(m_CurrentTime,
+//               m_CurrentTime+2*m_SamplingPeriod,
+//               FinalZMPPositions,
+//               FinalCoMPositions,
+//               FinalLeftFootAbsolutePositions,
+//               FinalRightFootAbsolutePositions);
+
+//    /*! Recompute time when a new step should be added. */
+//    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
+
+//    m_kajitaDynamicFilter->init( m_SamplingPeriod, 0.04, m_SamplingPeriod, 1.6,
+//                                 lStartingCOMState.z[0], InitLeftFootAbsolutePosition, lStartingCOMState );
+
+//    return m_RelativeFootPositions.size();
   }
 
 
@@ -848,6 +903,7 @@ When the limit is reached, and the stack exhausted this method is called again. 
         aCOMPos.x[0] += lCOMPosx; aCOMPos.x[1] += lCOMPosdx;
         aCOMPos.y[0] += lCOMPosy; aCOMPos.y[1] += lCOMPosdy;
         aCOMPos.z[0] = m_InitialPoseCoMHeight;
+        cout << m_InitialPoseCoMHeight << endl ;
         FinalCOMStates.push_back(aCOMPos);
         /*! Feed the FootPositions. */
         /*! Left */

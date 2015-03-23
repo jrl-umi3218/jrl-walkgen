@@ -578,10 +578,15 @@ protected:
     }
 
     {
-      istringstream strm2(":StartOnLineStepSequencing 0.0 -0.095 0.0\
-                                                      0.0 0.19 0.0\
-                                                      0.0 -0.19 0.0\
-                                                      0.0 0.19 0.0");
+      istringstream strm2(":StartOnLineStepSequencing \
+                          0.0 -0.105 0.0 0.0 \
+                          0.2 0.19 0.0 0.0   \
+                          0.2 -0.19 0.0 0.0  \
+                          0.2 0.19 0.0 0.0   \
+                          0.2 -0.19 0.0 0.0  \
+                          0.2 0.19 0.0 0.0   \
+                          0.0 -0.19 0.0 0.0  \
+                          ");
       aPGI.ParseCmd(strm2);
     }
   }

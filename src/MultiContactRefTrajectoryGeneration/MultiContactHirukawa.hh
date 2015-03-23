@@ -11,8 +11,8 @@
 
 //#include "Clock.hh"
 
-#ifndef METAPOD_TYPEDEF
-#define METAPOD_TYPEDEF
+#ifndef METAPOD_TYPEDEF_HIRUKAWA
+#define METAPOD_TYPEDEF_HIRUKAWA
     typedef double LocalFloatType;
     typedef metapod::Spatial::ForceTpl<LocalFloatType> Force_HRP2_14;
     typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
@@ -29,19 +29,19 @@
     typedef metapod::Nodes< Robot_Model, Robot_Model::r_ankle >::type RankleNode;
 
     typedef metapod::jac_point_chain < Robot_Model,
-        Robot_Model::l_ankle, Robot_Model::BODY,0,true,false> Jac_LF;
+        Robot_Model::l_ankle, Robot_Model::BODY,0,true,false> Jaco_LF;
 
     typedef metapod::jac_point_chain < Robot_Model,
-        Robot_Model::r_ankle, Robot_Model::RLEG_LINK0,0,true,false> Jac_RF;
+        Robot_Model::r_ankle, Robot_Model::RLEG_LINK0,0,true,false> Jaco_RF;
 
     typedef metapod::jac_point_chain < Robot_Model,
-        Robot_Model::l_wrist, Robot_Model::LARM_LINK0,0,true,false> Jac_LH;
+        Robot_Model::l_wrist, Robot_Model::LARM_LINK0,0,true,false> Jaco_LH;
 
     typedef metapod::jac_point_chain < Robot_Model,
-        Robot_Model::r_wrist, Robot_Model::RARM_LINK0,0,true,false> Jac_RH;
+        Robot_Model::r_wrist, Robot_Model::RARM_LINK0,0,true,false> Jaco_RH;
 
     typedef Eigen::Matrix<LocalFloatType, 6 * Robot_Model::NBBODIES, Robot_Model::NBDOF> Robot_Jacobian;
-#endif
+#endif // METAPOD_TYPEDEF_HIRUKAWA
 
 typedef Eigen::Matrix<LocalFloatType,6,1> vector6d ;
 
@@ -83,10 +83,10 @@ private :
     //robot model an configurations
     Robot_Model * robot_ ;
     Robot_Model::confVector q_, dq_ ;
-    Jac_LF::Jacobian jac_LF ;
-    Jac_RF::Jacobian jac_RF ;
-    Jac_LH::Jacobian jac_LH ;
-    Jac_RH::Jacobian jac_RH ;
+    Jaco_LF::Jacobian jac_LF ;
+    Jaco_RF::Jacobian jac_RF ;
+    Jaco_LH::Jacobian jac_LH ;
+    Jaco_RH::Jacobian jac_RH ;
     //Robot_Jacobian jacobian_ ;
 
     unsigned int n_it_ ;                // number of iteration max to converge

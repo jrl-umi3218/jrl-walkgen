@@ -7,10 +7,10 @@ MultiContactHirukawa::MultiContactHirukawa()
 {
     n_it_ = 5;                  // number of iteration max to converge
     sampling_period_ = 0.005;   // sampling period in seconds
-    jac_LF = Jac_LF::Jacobian::Zero(); // init the left  foot jacobian
-    jac_RF = Jac_RF::Jacobian::Zero(); // init the right foot jacobian
-    jac_LH = Jac_LH::Jacobian::Zero(); // init the left  arm  jacobian
-    jac_RH = Jac_RH::Jacobian::Zero();; // init the right arm  jacobian
+    jac_LF = Jaco_LF::Jacobian::Zero(); // init the left  foot jacobian
+    jac_RF = Jaco_RF::Jacobian::Zero(); // init the right foot jacobian
+    jac_LH = Jaco_LH::Jacobian::Zero(); // init the left  arm  jacobian
+    jac_RH = Jaco_RH::Jacobian::Zero();; // init the right arm  jacobian
     //jacobian_ = Robot_Jacobian::Zero();
 }
 
@@ -25,10 +25,10 @@ int MultiContactHirukawa::InverseKinematicsOnLimbs(std::vector< FootAbsolutePosi
                                                    unsigned int currentIndex)
 {
     //metapod::jac< Robot_Model>::run(*robot_, jacobian_);
-    Jac_LF::run(*robot_, q_, metapod::Vector3dTpl<LocalFloatType>::Type(0,0,0), jac_LF);
-    Jac_RF::run(*robot_, q_, metapod::Vector3dTpl<LocalFloatType>::Type(0,0,0), jac_RF);
-    Jac_LH::run(*robot_, q_, metapod::Vector3dTpl<LocalFloatType>::Type(0,0,0), jac_LH);
-    Jac_RH::run(*robot_, q_, metapod::Vector3dTpl<LocalFloatType>::Type(0,0,0), jac_RH);
+    Jaco_LF::run(*robot_, q_, metapod::Vector3dTpl<LocalFloatType>::Type(0,0,0), jac_LF);
+    Jaco_RF::run(*robot_, q_, metapod::Vector3dTpl<LocalFloatType>::Type(0,0,0), jac_RF);
+    Jaco_LH::run(*robot_, q_, metapod::Vector3dTpl<LocalFloatType>::Type(0,0,0), jac_LH);
+    Jaco_RH::run(*robot_, q_, metapod::Vector3dTpl<LocalFloatType>::Type(0,0,0), jac_RH);
 
     cout << "jac_LF = \n" <<  jac_LF << endl ;
     cout << "jac_RF = \n" <<  jac_RF << endl ;
