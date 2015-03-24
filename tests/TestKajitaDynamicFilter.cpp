@@ -47,6 +47,10 @@ private:
   double dInitX, dInitY;
   bool once ;
   MAL_VECTOR(InitialPosition,double);
+  MAL_VECTOR(InitialConfiguration,double);
+  MAL_VECTOR(InitialVelocity,double);
+  MAL_VECTOR(InitialAcceleration,double);
+  MAL_S3_VECTOR(lStartingCOMState,double);
 
   deque<COMState> delta_com ;
 
@@ -63,6 +67,11 @@ public:
     dynamicfilter_ = NULL ;
     once = true ;
     MAL_VECTOR_RESIZE(InitialPosition,36);
+    MAL_VECTOR_RESIZE(InitialConfiguration,36);
+    MAL_VECTOR_RESIZE(InitialVelocity,36);
+    MAL_VECTOR_RESIZE(InitialAcceleration,36);
+    MAL_VECTOR_FILL(InitialVelocity,36);
+    MAL_VECTOR_FILL(InitialAcceleration,36);
   };
 
   ~TestInverseKinematics()
@@ -104,50 +113,45 @@ public:
                           FootAbsolutePosition(),
                           COMState() );
     delta_zmp.resize(N);
-//    for (unsigned int i = 0 ; i < N ; ++i )
-//      {
-//        vector<double> zmpmb ;
-//        dynamicfilter_->zmpmb(q0_,dq0_,ddq0_,zmpmb);
-//        delta_zmp[i].px = 0.0-zmpmb[0];
-//        delta_zmp[i].py = 0.0-zmpmb[1];
+    MAL_VECTOR_FILL(InitialVelocity,0.0);
+    MAL_VECTOR_FILL(InitialAcceleration,0.0);
+    vector<double> zmpmb ;
+    for (unsigned int i = 0 ; i < N ; ++i )
+      {
+        dynamicfilter_->zmpmb(InitialConfiguration,InitialVelocity,InitialAcceleration,zmpmb);
+        delta_zmp[i].px = 0.0-zmpmb[0];
+        delta_zmp[i].py = 0.0-zmpmb[1];
+      }
+      cout << zmpmb[0] << " " << zmpmb[1] << endl ;
 
-//        cout << zmpmb[0] << " " << zmpmb[1] << endl ;
-//      }
+    dynamicfilter_->OptimalControl(delta_zmp,delta_com);
 
+    /// \brief Create file .hip .pos .zmp
+    /// --------------------
+    ofstream aof;
+    string aFileName;
+    static int iteration = 0 ;
+    aFileName = "./TestKajitaDynamicFilter.dat";
+    if ( iteration == 0 ){
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+    }
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    for(unsigned int i = 0 ; i < delta_com.size() ; i++){
+      aof << filterprecision( lStartingCOMState(0)+delta_com[i].x[0] ) << " "  ; // 1
+      aof << filterprecision( lStartingCOMState(1)+delta_com[i].y[0] ) << " "  ; // 2
+      aof << filterprecision( lStartingCOMState(0) ) << " "  ;                   // 3
+      aof << filterprecision( delta_com[i].x[0] ) << " "  ;                          // 4
+      aof << filterprecision( lStartingCOMState(1) ) << " "  ;                   // 5
+      aof << filterprecision( delta_com[i].x[1] ) << " "  ;                          // 6
+      aof << endl ;
+    }
 
-//    dynamicfilter_->OptimalControl(delta_zmp,delta_com);
-//    cout << dynamicfilter_->com() << endl << endl ;
-//    cout << dynamicfilter_->waist_pos() << endl << endl ;
+    aof.close();
 
-
-//    //cout << q0_ << endl ;
-
-//    /// \brief Create file .hip .pos .zmp
-//    /// --------------------
-//    ofstream aof;
-//    string aFileName;
-//    static int iteration = 0 ;
-//    aFileName = "./TestKajitaDynamiqueFilter.dat";
-//    if ( iteration == 0 ){
-//      aof.open(aFileName.c_str(),ofstream::out);
-//      aof.close();
-//    }
-//    aof.open(aFileName.c_str(),ofstream::app);
-//    aof.precision(8);
-//    aof.setf(ios::scientific, ios::floatfield);
-//    for(unsigned int i = 0 ; i < delta_com.size() ; i++){
-//      aof << filterprecision( dynamicfilter_->com()(0)+delta_com[i].x[0] ) << " "  ; // 1
-//      aof << filterprecision( dynamicfilter_->com()(1)+delta_com[i].y[0] ) << " "  ; // 2
-//      aof << filterprecision( dynamicfilter_->com()(0) ) << " "  ;                   // 3
-//      aof << filterprecision( delta_com[i].x[0] ) << " "  ;                          // 4
-//      aof << filterprecision( dynamicfilter_->com()(1) ) << " "  ;                   // 5
-//      aof << filterprecision( delta_com[i].x[1] ) << " "  ;                          // 6
-//      aof << endl ;
-//    }
-
-    //aof.close();
-
-    //++iteration;
+    ++iteration;
 
     return true ;
   }
@@ -304,7 +308,6 @@ protected:
     {
       BodyAngles(i) = InitialPosition(i);
     }
-    MAL_S3_VECTOR(lStartingCOMState,double);
     double samplingPeriod = 0.005 ;
     ComAndFootRealizationByGeometry * CaFR = dynamicfilter_->getComAndFootRealization() ;
     CaFR->SetHeightOfTheCoM(0.814);
@@ -318,20 +321,18 @@ protected:
     CaFR->SetPreviousConfigurationStage0(m_HDR->currentConfiguration());
     CaFR->SetPreviousVelocityStage0(m_HDR->currentVelocity());
 
-//    for (int i = 0 ; i < 6 ; ++i )
-//    {
-//      q0_(i,0) = waist(i) ;
-//    }
-//    for (unsigned int i = 6 ; i < (m_HDR->numberDof()) ; ++i )
-//    {
-//      q0_(i,0) = InitialPosition(i-6);
-//    }
-
-//    for (unsigned int i = 0 ; i < (m_HDR->numberDof()) ; ++i )
-//    {
-//      dq0_(i,0) = 0.0 ;
-//      ddq0_(i,0) = 0.0 ;
-//    }
+    MAL_VECTOR_RESIZE(InitialConfiguration,MAL_VECTOR_SIZE(m_HDR->currentConfiguration()));
+    for (int i = 0 ; i < 6 ; ++i )
+    {
+      InitialConfiguration(i) = waist(i) ;
+    }
+    for (unsigned int i = 6 ; i < (m_HDR->numberDof()) ; ++i )
+    {
+      InitialConfiguration(i) = InitialPosition(i-6);
+    }
+    m_HDR->currentConfiguration(InitialConfiguration);
+    cout << InitialConfiguration << endl ;
+    cout << InitialPosition << endl ;
 
   }
 

@@ -16,9 +16,6 @@
 # Requires at least CMake 2.6 to configure the package.
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-
-INCLUDE(cmake_metapod_configure.cmake)
-
 # Includes from jrl-cmaketools
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/lapack.cmake)
@@ -51,7 +48,6 @@ ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
 ################################################################
 ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
 ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
-ADD_OPTIONAL_DEPENDENCY("metapod >= 1.0.7")
 MESSAGE(STATUS "hrp2-dynamics: " ${HRP2_DYNAMICS_FOUND})
 #################################################################
 

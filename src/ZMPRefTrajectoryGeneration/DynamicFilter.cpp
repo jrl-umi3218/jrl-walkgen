@@ -109,31 +109,9 @@ void DynamicFilter::init(
   PC_->SetHeightOfCoM(CoMHeight_);
   PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 
-  upperPartConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
-  previousUpperPartConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
-  upperPartVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
-  previousUpperPartVelocity_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
-  upperPartAcceleration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
-
-  ZMPMBConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
-  ZMPMBVelocity_      = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
-  ZMPMBAcceleration_  = comAndFootRealization_->getHumanoidDynamicRobot()->currentAcceleration() ;
-  previousZMPMBConfiguration_ = comAndFootRealization_->getHumanoidDynamicRobot()->currentConfiguration() ;
-  previousZMPMBVelocity_      = comAndFootRealization_->getHumanoidDynamicRobot()->currentVelocity() ;
-
   deltaZMP_deq_.resize( PG_N_*NbI_);
   ZMPMB_vec_.resize( PG_N_*NbI_, vector<double>(2));
   zmpmb_i_.resize( PG_N_*NCtrl_, vector<double>(2));
-
-  comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
-  comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
-  comAndFootRealization_->Initialization();
-  comAndFootRealization_->SetPreviousConfigurationStage0(ZMPMBConfiguration_);
-  comAndFootRealization_->SetPreviousVelocityStage0(ZMPMBVelocity_);
-  comAndFootRealization_->SetPreviousVelocityStage1(ZMPMBVelocity_);
-  comAndFootRealization_->SetPreviousConfigurationStage1(ZMPMBConfiguration_);
-  comAndFootRealization_->SetPreviousVelocityStage2(ZMPMBVelocity_);
-  comAndFootRealization_->SetPreviousConfigurationStage2(ZMPMBConfiguration_);
 
   MAL_VECTOR_RESIZE(aCoMState_,6);
   MAL_VECTOR_RESIZE(aCoMSpeed_,6);
@@ -151,6 +129,30 @@ void DynamicFilter::init(
   MAL_MATRIX_FILL(deltax_,0.0);
   MAL_MATRIX_FILL(deltay_,0.0);
 
+  upperPartConfiguration_ = cjrlHDR_->currentConfiguration() ;
+  previousUpperPartConfiguration_ = cjrlHDR_->currentConfiguration() ;
+  upperPartVelocity_ = cjrlHDR_->currentVelocity() ;
+  previousUpperPartVelocity_ = cjrlHDR_->currentVelocity() ;
+  upperPartAcceleration_ = cjrlHDR_->currentAcceleration() ;
+
+  ZMPMBConfiguration_ = cjrlHDR_->currentConfiguration() ;
+  ZMPMBVelocity_      = cjrlHDR_->currentVelocity() ;
+  ZMPMBAcceleration_  = cjrlHDR_->currentAcceleration() ;
+  previousZMPMBConfiguration_ = cjrlHDR_->currentConfiguration() ;
+  previousZMPMBVelocity_      = cjrlHDR_->currentVelocity() ;
+
+  comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
+  comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
+  comAndFootRealization_->Initialization();
+  comAndFootRealization_->SetPreviousConfigurationStage0(ZMPMBConfiguration_);
+  comAndFootRealization_->SetPreviousVelocityStage0(ZMPMBVelocity_);
+
+  comAndFootRealization_->SetPreviousConfigurationStage1(ZMPMBConfiguration_);
+  comAndFootRealization_->SetPreviousVelocityStage1(ZMPMBVelocity_);
+
+  comAndFootRealization_->SetPreviousConfigurationStage2(ZMPMBConfiguration_);
+  comAndFootRealization_->SetPreviousVelocityStage2(ZMPMBVelocity_);
+
   sxzmp_ = 0.0 ;
   syzmp_ = 0.0 ;
   deltaZMPx_ = 0.0 ;
@@ -161,10 +163,6 @@ void DynamicFilter::init(
     {
       upperPartIndex[i]=i+18;
     }
-
-  // Apply the RNEA on the robot model
-  cjrlHDR_->computeCenterOfMassDynamics();
-
   return ;
 }
 
@@ -188,7 +186,7 @@ int DynamicFilter::OffLinefilter(
   for(unsigned int i = 0 ; i < N ; ++i )
     {
       ComputeZMPMB(interpolationPeriod_,inputCOMTraj_deq_[i],inputLeftFootTraj_deq_[i],
-                   inputRightFootTraj_deq_[i], ZMPMB_vec_[i] , stage0_ , i);
+                   inputRightFootTraj_deq_[i], ZMPMB_vec_[i] , 1 , i);
     }
   for (unsigned int i = 0 ; i < N ; ++i)
     {
@@ -335,6 +333,11 @@ void DynamicFilter::InverseKinematics(
       upperPartAcceleration_          = acceleration            ;
       previousUpperPartConfiguration_ = upperPartConfiguration_ ;
       previousUpperPartVelocity_      = upperPartVelocity_      ;
+
+      MAL_VECTOR_FILL(upperPartVelocity_        , 0.0 ) ;
+      MAL_VECTOR_FILL(upperPartAcceleration_    , 0.0 ) ;
+      MAL_VECTOR_FILL(previousUpperPartVelocity_, 0.0 ) ;
+
     }
 
   for ( unsigned int i = 0 ; i < upperPartIndex.size() ; ++i )
@@ -635,8 +638,8 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
                    ctrlLeftFoot[i],
                    ctrlRightFoot[i],
                    zmpmb_corr[i],
-                   stage0,
-                   20);
+                   1,
+                   i);
   }
   int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
   ofstream aof;
