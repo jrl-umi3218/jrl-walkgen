@@ -550,7 +550,7 @@ protected:
     lfs_.clear(); rfs_.clear(); rhs_.clear();
     timing_.clear();
 
-    movingPeriod_  = 1.4 ;
+    movingPeriod_  = 0.7 ;
     supportPeriod_ = 0.1 ;
     initialTime_   = 5.0 ;
     finalTime_     = 5.0 ;
@@ -954,9 +954,11 @@ protected:
   {
     //std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_03_03_18h56m/" ;
     //std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm.csv" ;
-    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_03_03_21h_01m/" ;
-    std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm_ds.csv" ;
+    //std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_03_03_21h_01m/" ;
+    //std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm_ds.csv" ;
 
+    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_03_27_10h35m/" ;
+    std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm.csv" ;
 
     std::ifstream dataStream ;
     dataStream.open(dataFile.c_str(),std::ifstream::in);
