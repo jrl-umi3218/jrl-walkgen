@@ -656,6 +656,19 @@ namespace PatternGeneratorJRL
       /*! \brief Filtering the axis through a preview control. */
       FilteringAnalyticalTrajectoryByPreviewControl * m_FilterXaxisByPC, * m_FilterYaxisByPC;
       DynamicFilter * m_kajitaDynamicFilter ;
+      // deque sampled at m_SamplingPeriod
+      deque<FootAbsolutePosition> ctrlLF_ ;
+      deque<FootAbsolutePosition> ctrlRF_ ;
+      deque<COMState>             ctrlCoM_ ;
+      deque<ZMPPosition>          ctrlZMP_ ;
+      // deque sampled at interpolation time
+      deque<COMState>             intCoM_ ;
+      deque<FootAbsolutePosition> intLF_  ;
+      deque<FootAbsolutePosition> intRF_  ;
+      // output of the filter
+      deque<COMState>     outputDeltaCoM_ ;
+      // size of the Dynamic Filter preview
+      double DFpreviewWindowSize_ ;
 
       /*! \brief Activate or desactivate the filtering. */
       bool m_FilteringActivate;

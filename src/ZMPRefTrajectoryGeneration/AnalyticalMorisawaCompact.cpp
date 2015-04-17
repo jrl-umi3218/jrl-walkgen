@@ -121,6 +121,7 @@ namespace PatternGeneratorJRL
 
     m_CoMpolynomeZ = new Polynome5(0.0,0.0);
     m_ZMPpolynomeZ = new Polynome3(0.0,0.0);
+    DFpreviewWindowSize_ = 0.0 ;
 
     RESETDEBUG4("Test.dat");
   }
@@ -610,8 +611,6 @@ computing the analytical trajectories. */
                                      m_SamplingPeriod,
                                      (double)(n+1)*m_SamplingPeriod,
                                      KajitaPCpreviewWindow,
-                                     lStartingCOMState.z[0],
-                                     InitLeftFootAbsolutePosition,
                                      lStartingCOMState );
 
         /*! Set the upper body trajectory */
@@ -743,6 +742,35 @@ computing the analytical trajectories. */
 
     unsigned int r = RelativeFootPositions.size();
     unsigned int maxrelsteps = r < 3 ? r : 3;
+
+    // INITIALIZE FEET POSITIONS:
+    // --------------------------
+    vector3d lAnklePositionRight,lAnklePositionLeft;
+    CjrlFoot *LeftFoot, *RightFoot;
+    LeftFoot = m_HS->leftFoot();
+    if (LeftFoot==0)
+      LTHROW("No left foot");
+
+    RightFoot = m_HS->rightFoot();
+    if (RightFoot==0)
+      LTHROW("No right foot");
+
+    LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
+    RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
+
+    MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
+    m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
+
+    InitLeftFootAbsolutePosition.x +=  lAnklePositionLeft(0)  + CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
+    InitLeftFootAbsolutePosition.y +=  lAnklePositionLeft(1)  + CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
+    InitLeftFootAbsolutePosition.z +=  lAnklePositionLeft(2)  + CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
+    InitRightFootAbsolutePosition.x += lAnklePositionRight(0) + CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
+    InitRightFootAbsolutePosition.y += lAnklePositionRight(1) + CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
+    InitRightFootAbsolutePosition.z += lAnklePositionRight(2) + CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
+
+
+    // INITIALIZE THE COM
+    // ------------------
     MAL_S3x3_MATRIX(lMStartingCOMState,double);
 
     lMStartingCOMState(0,0)= lStartingCOMState.x[0];
@@ -791,68 +819,98 @@ computing the analytical trajectories. */
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
 
+    DFpreviewWindowSize_ = 1.6 - m_SamplingPeriod ; //second
+    m_kajitaDynamicFilter->init( m_SamplingPeriod, 0.05, m_SamplingPeriod, DFpreviewWindowSize_,
+                                 lStartingCOMState );
+
     return m_RelativeFootPositions.size();
 
-//    m_OnLineMode = true;
-//    m_RelativeFootPositions.clear();
-
-//    unsigned int r = RelativeFootPositions.size();
-//    unsigned int maxrelsteps = r < 3 ? r : 3;
-//    MAL_S3x3_MATRIX(lMStartingCOMState,double);
-
-//    lMStartingCOMState(0,0)= lStartingCOMState.x[0];
-//    lMStartingCOMState(1,0)= lStartingCOMState.y[0];
-//    lMStartingCOMState(2,0)= lStartingCOMState.z[0];
-
-//    m_InitialPoseCoMHeight = lStartingCOMState.z[0];
-
-//    for(unsigned int i=0;i<3;i++)
-//    {
-//      for(unsigned int j=1;j<3;j++)
-//        lMStartingCOMState(i,j)= 0.0;
-//    }
-
-//    for(unsigned int i=0;i< maxrelsteps;i++)
-//      m_RelativeFootPositions.push_back(RelativeFootPositions[i]);
-
-//    if (m_RelativeFootPositions[0].sy < 0)
-//      m_AbsoluteCurrentSupportFootPosition = InitRightFootAbsolutePosition;
-//    else
-//      m_AbsoluteCurrentSupportFootPosition = InitLeftFootAbsolutePosition;
-
-//    /* This part computes the CoM and ZMP trajectory giving the foot position information.
-//It also creates the analytical feet trajectories.
-//*/
-//    if (BuildAndSolveCOMZMPForASetOfSteps(lMStartingCOMState,
-//                                          InitLeftFootAbsolutePosition,
-//                                          InitRightFootAbsolutePosition,
-//                                          true,true)<0)
-//    {	LTHROW("Error: Humanoid Specificities not initialized. "); }
-
-//    m_AbsoluteTimeReference = m_CurrentTime-m_Tsingle*2;
-//    m_AnalyticalZMPCoGTrajectoryX->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
-//    m_AnalyticalZMPCoGTrajectoryY->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
-//    m_FeetTrajectoryGenerator->SetAbsoluteTimeReference(m_AbsoluteTimeReference);
-
-//    /* Current strategy : add 2 values, and update at each iteration the stack.
-//When the limit is reached, and the stack exhausted this method is called again. */
-//    FillQueues(m_CurrentTime,
-//               m_CurrentTime+2*m_SamplingPeriod,
-//               FinalZMPPositions,
-//               FinalCoMPositions,
-//               FinalLeftFootAbsolutePositions,
-//               FinalRightFootAbsolutePositions);
-
-//    /*! Recompute time when a new step should be added. */
-//    m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
-
-//    m_kajitaDynamicFilter->init( m_SamplingPeriod, 0.04, m_SamplingPeriod, 1.6,
-//                                 lStartingCOMState.z[0], InitLeftFootAbsolutePosition, lStartingCOMState );
-
-//    return m_RelativeFootPositions.size();
   }
 
 
+//  void AnalyticalMorisawaCompact::OnLine(double time,
+//                                           deque<ZMPPosition> & FinalZMPPositions,
+//                                           deque<COMState> & FinalCOMStates,
+//                                           deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+//                                           deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
+//    {
+//      unsigned int lIndexInterval;
+//      if (time<m_UpperTimeLimitToUpdateStacks)
+//        {
+//          if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
+//            {
+
+//              ZMPPosition aZMPPos;
+//              memset(&aZMPPos,0,sizeof(aZMPPos));
+//              COMState aCOMPos;
+//              memset(&aCOMPos,0,sizeof(aCOMPos));
+
+//              if (m_FilteringActivate)
+//                {
+//                  double FZmpX=0, FComX=0,FComdX=0;
+
+//                  // Should we filter ?
+//                  bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
+//                  if (r)
+//                    {
+//                      double FZmpY=0, FComY=0,FComdY=0;
+//                      // Yes we should.
+//                      m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
+
+//                      /*! Feed the ZMPPositions. */
+//                      aZMPPos.px = FZmpX;
+//                      aZMPPos.py = FZmpY;
+
+//                      /*! Feed the COMStates. */
+//                      aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
+//                      aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
+//                    }
+//                }
+
+
+//              /*! Feed the ZMPPositions. */
+//              double lZMPPosx=0.0,lZMPPosy=0.0;
+//              m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(time,lZMPPosx,lIndexInterval);
+//              aZMPPos.px += lZMPPosx;
+//              m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(time,lZMPPosy,lIndexInterval);
+//              aZMPPos.py += lZMPPosy;
+//              FinalZMPPositions.push_back(aZMPPos);
+
+//              /*! Feed the COMStates. */
+//              double lCOMPosx=0.0, lCOMPosdx=0.0;
+//              double lCOMPosy=0.0, lCOMPosdy=0.0;
+//              m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,lCOMPosx,lIndexInterval);
+//              m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(time,lCOMPosdx,lIndexInterval);
+//              m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,lCOMPosy,lIndexInterval);
+//              m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(time,lCOMPosdy,lIndexInterval);
+//              aCOMPos.x[0] += lCOMPosx; aCOMPos.x[1] += lCOMPosdx;
+//              aCOMPos.y[0] += lCOMPosy; aCOMPos.y[1] += lCOMPosdy;
+//              aCOMPos.z[0] = m_InitialPoseCoMHeight;
+//              FinalCOMStates.push_back(aCOMPos);
+//              /*! Feed the FootPositions. */
+
+
+//              /*! Left */
+//              FootAbsolutePosition LeftFootAbsPos;
+//              memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
+//              m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,time,LeftFootAbsPos,lIndexInterval);
+//              FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
+
+//              /*! Right */
+//              FootAbsolutePosition RightFootAbsPos;
+//              memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
+//              m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,RightFootAbsPos,lIndexInterval);
+//              FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
+
+//            }
+//        }
+//      else
+//        {
+//          /*! We reached the end of the trajectory generated
+//           and no foot steps have been added. */
+//          m_OnLineMode = false;
+//        }
+//    }
   void AnalyticalMorisawaCompact::OnLine(double time,
                                          deque<ZMPPosition> & FinalZMPPositions,
                                          deque<COMState> & FinalCOMStates,
@@ -886,36 +944,34 @@ computing the analytical trajectories. */
             aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
           }
         }
-        /*! Feed the ZMPPositions. */
-        double lZMPPosx=0.0,lZMPPosy=0.0;
-        m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(time,lZMPPosx,lIndexInterval);
-        aZMPPos.px += lZMPPosx;
-        m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(time,lZMPPosy,lIndexInterval);
-        aZMPPos.py += lZMPPosy;
-        FinalZMPPositions.push_back(aZMPPos);
-        /*! Feed the COMStates. */
-        double lCOMPosx=0.0, lCOMPosdx=0.0;
-        double lCOMPosy=0.0, lCOMPosdy=0.0;
-        m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,lCOMPosx,lIndexInterval);
-        m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(time,lCOMPosdx,lIndexInterval);
-        m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,lCOMPosy,lIndexInterval);
-        m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(time,lCOMPosdy,lIndexInterval);
-        aCOMPos.x[0] += lCOMPosx; aCOMPos.x[1] += lCOMPosdx;
-        aCOMPos.y[0] += lCOMPosy; aCOMPos.y[1] += lCOMPosdy;
-        aCOMPos.z[0] = m_InitialPoseCoMHeight;
-        cout << m_InitialPoseCoMHeight << endl ;
-        FinalCOMStates.push_back(aCOMPos);
-        /*! Feed the FootPositions. */
-        /*! Left */
-        FootAbsolutePosition LeftFootAbsPos;
-        memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
-        m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,time,LeftFootAbsPos,lIndexInterval);
-        FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
-        /*! Right */
-        FootAbsolutePosition RightFootAbsPos;
-        memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
-        m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,RightFootAbsPos,lIndexInterval);
-        FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
+
+        /*! Feed the ZMP, CoMP, and feet positions, velocities and accelerations. */
+        ctrlLF_ .clear() ;
+        ctrlRF_ .clear() ;
+        ctrlCoM_.clear() ;
+        ctrlZMP_.clear() ;
+        FillQueues(m_SamplingPeriod, time, time/* + DFpreviewWindowSize_*/,
+                   ctrlZMP_, ctrlCoM_, ctrlLF_, ctrlRF_);
+
+//        double intPeriod = m_kajitaDynamicFilter->getInterpolationPeriod() ;
+//        unsigned int IndexMax = (int)round(DFpreviewWindowSize_  / intPeriod );
+//        intCoM_.resize(IndexMax);
+//        intLF_ .resize(IndexMax);
+//        intRF_ .resize(IndexMax);
+//        int inc =  (int)round( intPeriod / m_SamplingPeriod) ;
+//        for (unsigned int i = 0 , j = 0 ; j < IndexMax ; i = i + inc , ++j )
+//        {
+//          intCoM_[j] = ctrlCoM_[i] ;
+//          intLF_ [j] = ctrlLF_ [i] ;
+//          intRF_ [j] = ctrlRF_ [i] ;
+//        }
+
+//        m_kajitaDynamicFilter->OnLinefilter(time,intCoM_,ctrlZMP_,intLF_,intRF_,outputDeltaCoM_);
+        cout << "timeOnLine = " << time << endl ;
+        FinalCOMStates.push_back(ctrlCoM_[0]);
+        FinalZMPPositions.push_back(ctrlZMP_[0]);
+        FinalLeftFootAbsolutePositions.push_back(ctrlLF_[0]);
+        FinalRightFootAbsolutePositions.push_back(ctrlRF_[0]);
       }
     }
     else
@@ -925,7 +981,6 @@ computing the analytical trajectories. */
       m_OnLineMode = false;
     }
   }
-
 
   void AnalyticalMorisawaCompact::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
                                                 deque<ZMPPosition> & FinalZMPPositions,
@@ -2153,7 +2208,7 @@ a shift is done to chose the earliest double support interval. */
     unsigned int lChangedIntervalFoot = (IndexInterval-1)/2;
 
     /* Which foot is the support one ? */
-    if (LeftFootAbsolutePositions[0].z==0.0)
+    if (LeftFootAbsolutePositions[0].stepType < 0)
       m_AbsoluteCurrentSupportFootPosition = LeftFootAbsolutePositions[0];
     else
       m_AbsoluteCurrentSupportFootPosition = RightFootAbsolutePositions[0];
@@ -2198,6 +2253,8 @@ a shift is done to chose the earliest double support interval. */
             aFootAbsolutePosition[i].x;
         m_RelativeFootPositions[lChangedIntervalFoot+i].sy +=
             aFootAbsolutePosition[i].y;
+        m_RelativeFootPositions[lChangedIntervalFoot+i].sz +=
+            aFootAbsolutePosition[i].z;
         m_RelativeFootPositions[lChangedIntervalFoot+i].theta +=
             aFootAbsolutePosition[i].theta;
       }

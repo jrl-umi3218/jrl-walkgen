@@ -126,24 +126,9 @@ void
       ComputeXYThetaFootPosition(InterpolationTime,curr_NSFAP);
     }
 
-  if (m_isStepStairOn == 0)
-    {
-      curr_NSFAP.z = m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
-      curr_NSFAP.dz = m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
-      curr_NSFAP.ddz = m_PolynomeZ->ComputeSecDerivative(LocalInterpolationStartTime+InterpolationTime);
-    }
-  else
-    {
-      if (m_BsplinesZ->Compute(LocalInterpolationStartTime+InterpolationTime) == 0)
-        {
-          curr_NSFAP.z = prev_NSFAP.z;
-        }
-      else
-        {
-          curr_NSFAP.z = m_BsplinesZ->Compute(LocalInterpolationStartTime+InterpolationTime);
-        }
-      curr_NSFAP.dz = m_BsplinesZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
-    }
+  curr_NSFAP.z = m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);
+  curr_NSFAP.dz = m_PolynomeZ->ComputeDerivative(LocalInterpolationStartTime+InterpolationTime);
+  curr_NSFAP.ddz = m_PolynomeZ->ComputeSecDerivative(LocalInterpolationStartTime+InterpolationTime);
 
 
   //bool ProtectionNeeded=false;

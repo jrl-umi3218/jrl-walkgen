@@ -86,8 +86,6 @@ void DynamicFilter::init(
     double interpolationPeriod,
     double PG_T,
     double previewWindowSize,
-    double CoMHeight,
-    FootAbsolutePosition inputLeftFoot,
     COMState inputCoMState)
 {
   controlPeriod_ = controlPeriod ;
@@ -95,22 +93,21 @@ void DynamicFilter::init(
   PG_T_ = PG_T ;
   previewWindowSize_ = previewWindowSize ;
 
-  if (interpolationPeriod_>PG_T)
-    {NbI_=1;}
-  else
-    {NbI_ = (int)(PG_T/interpolationPeriod_);}
+  NbI_ = (double)PG_T_/interpolationPeriod_;
 
-  NCtrl_ = (int)(PG_T_/controlPeriod_) ;
-  PG_N_ = (int)round((previewWindowSize_+PG_T_/controlPeriod*interpolationPeriod)/PG_T_ ) ;
+  NCtrl_ = (int)round(PG_T_/controlPeriod_) ;
 
-  CoMHeight_ = CoMHeight ;
+  PG_N_ = (int)round((previewWindowSize_+PG_T_)/PG_T_ ) ;
+
+
+  CoMHeight_ = inputCoMState.z[0] ;
   PC_->SetPreviewControlTime (previewWindowSize_);
   PC_->SetSamplingPeriod (controlPeriod);
   PC_->SetHeightOfCoM(CoMHeight_);
   PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 
-  deltaZMP_deq_.resize( PG_N_*NbI_);
-  ZMPMB_vec_.resize( PG_N_*NbI_, vector<double>(2));
+  deltaZMP_deq_.resize( (int)round(PG_N_*NbI_));
+  ZMPMB_vec_.resize( (int)round(PG_N_*NbI_), vector<double>(2));
   zmpmb_i_.resize( PG_N_*NCtrl_, vector<double>(2));
 
   MAL_VECTOR_RESIZE(aCoMState_,6);
@@ -211,7 +208,7 @@ int DynamicFilter::OnLinefilter(
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
   int currentIteration = 20 ;
-  unsigned int N = PG_N_ * NbI_ ;
+  unsigned int N = (int)round(PG_N_ * NbI_) ;
   ZMPMB_vec_.resize( N , vector<double>(2,0.0));
   for(unsigned int i = 0 ; i < N ; ++i)
   {
@@ -222,7 +219,7 @@ int DynamicFilter::OnLinefilter(
                    ZMPMB_vec_[i],
                    stage0_,
                    currentIteration);
-      if(i == (NbI_-1))
+      if(i == (NbI_-1) || (i==0 && NbI_<1) )
         {
           previousZMPMBConfiguration_ = ZMPMBConfiguration_;
           previousZMPMBVelocity_      = ZMPMBVelocity_     ;

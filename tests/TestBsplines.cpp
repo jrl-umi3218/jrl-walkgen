@@ -45,66 +45,99 @@ int main()
     myfile.open("TestBsplines.txt");
 
     //Create the parameters of foot trajectory on X
-    double m_FTx = 0.7;
+    double m_FTx = 1.0;
     double m_FPx = 0.54;
-    vector<double> m_MPx = vector<double>(1,0.54);
-    vector<double> m_ToMPx = vector<double>(1,0.6);
-
-    //Create the parameters of foot trajectory on Y
-    double m_FTy = 0.7;
-    double m_FPy = 0;
-    vector<double> m_MPy = vector<double>(1,0.2);
-    vector<double> m_ToMPy = vector<double>(1,m_FTx/2.0);
-
-    //Create the parameters of foot trajectory on Z
-    double m_FTz = 0.7;
-    double m_FPz = 0.0;
-    vector<double> m_MPz = vector<double>(1,0.07);
-    vector<double> m_ToMPz = vector<double>(1,m_FTx/2.0);
+    vector<double> m_MPx ;
+    vector<double> m_ToMPx ;
+    m_MPx.clear();
+    m_ToMPx.clear();
 
     //Create an object for test X
-    X = new PatternGeneratorJRL::BSplinesFoot(m_FTx, m_FPx, m_ToMPx, m_MPx);
+    X = new PatternGeneratorJRL::BSplinesFoot(m_FTx, 0.2, m_FPx, m_ToMPx, m_MPx, 2,0.2,0.1,0.2);
+//    vector<double> cpx ;
+//    cpx.push_back(0.2);
+//    cpx.push_back(0.2);
+//    cpx.push_back(0.2);
+//    cpx.push_back(m_FPx);
+//    cpx.push_back(m_FPx);
+//    cpx.push_back(m_FPx);
+//    X->SetControlPoints(cpx);
+    double x,dx,ddx;
+
     X->PrintDegree();
     X->PrintKnotVector();
     X->PrintControlPoints();
 
+    //Create the parameters of foot trajectory on Y
+    double m_FTy = 1.0;
+    double m_FPy = 0.2;
+    vector<double> m_MPy = vector<double>(1,5);
+    vector<double> m_ToMPy = vector<double>(1,m_FTx/2.0);
+
     //Create an object for test Y
-    Y = new PatternGeneratorJRL::BSplinesFoot(m_FTy, m_FPy, m_ToMPy, m_MPy);
+    Y = new PatternGeneratorJRL::BSplinesFoot(m_FTy, 0.1, m_FPy, m_ToMPy, m_MPy);
     Y->PrintDegree();
     Y->PrintKnotVector();
     Y->PrintControlPoints();
+    double y,dy,ddy;
+
+    //Create the parameters of foot trajectory on Z
+    double m_FTz = 1.0;
+    double m_FPz = 0.1;
+    double m_IPz = 0.2;
+    vector<double> m_MPz ;
+    m_MPz.push_back(0.35);
+    m_MPz.push_back(0.25);
+    vector<double> m_ToMPz = vector<double>(2,m_FTx/3.0);
+    m_ToMPz[1]=2*m_FTx/3.0;
 
     //Create an object for test Y
-    Z = new PatternGeneratorJRL::BSplinesFoot(m_FTz, m_FPz, m_ToMPz, m_MPz);
+    Z = new PatternGeneratorJRL::BSplinesFoot(m_FTz, m_IPz, m_FPz, m_ToMPz, m_MPz);
     Z->PrintDegree();
     Z->PrintKnotVector();
     Z->PrintControlPoints();
+    double z,dz,ddz;
 
-    for (int k=1; k<1000;k++)
+    for (int k=0; k<=1000;k++)
     {
 
-        tx=double(k)*X->GetKnotVector().back()/1000.0;
-        ty=double(k)*Y->GetKnotVector().back()/1000.0;
-        tz=double(k)*Z->GetKnotVector().back()/1000.0;
+        tx=double(k)*X->FT()/1000.0;
+        ty=double(k)*X->FT()/1000.0;
+        tz=double(k)*X->FT()/1000.0;
 
         //cout << k << endl;
         //myfile << t << " " << X->ZComputePosition(t) << " " << X->ZComputeVelocity(t)<< " " << X->ZComputeAcc(t)<< endl;
-        myfile << tx << " " << X->Compute(tx) << " " << X->ComputeDerivative(tx)<< " " << X->ComputeSecDerivative(tx)
-                     << " " << Y->Compute(ty) << " " << Y->ComputeDerivative(ty)<< " " << Y->ComputeSecDerivative(ty)
-                     << " " << Y->Compute(tz) << " " << Z->ComputeDerivative(tz)<< " " << Z->ComputeSecDerivative(tz)
+        X->Compute(tx,x,dx,ddx);
+        Y->Compute(ty,y,dy,ddy);
+        Z->Compute(tz,z,dz,ddz);
+        myfile << tx << " " << x << " " << dx << " " << ddx
+                     << " " << y << " " << dy << " " << ddy
+                     << " " << z << " " << dz << " " << ddz
                      << endl;
 
         // time - Position - Velocity - Acceleration
         //cout <<  t  << " " << Z->ZComputePosition(t)<<" "<< Z->ZComputeVelocity(t)<< " "<< Z->ZComputeAcc(t)<< endl;
     }
     myfile.close();
+
+    myfile.open("control_point.txt");
+    for (int k=0; k<X->GetControlPoints().size();k++)
+    {
+      myfile << X->GetControlPoints()[k] << " " ;
+      myfile << Y->GetControlPoints()[k] << " " ;
+      myfile << Z->GetControlPoints()[k] << " " ;
+      myfile << endl ;
+    }
+    myfile.close();
+
     delete X;
     delete Y;
+    delete Z;
 
     //draw a foot trajectory with the data given from bsplines	
     myfile.open("DrawTestBsplines.gnu");
     myfile << "set term wxt 0" << endl;
-    myfile << "plot 'control_point.txt' with points, 'TestBsplines.txt' using 1:2 with lines title 'PosX'"<< endl;
+    myfile << "plot 'control_point.txt' u 0:1 with points, 'TestBsplines.txt' using 1:2 with lines title 'PosX'"<< endl;
     myfile << "set term wxt 1" << endl;
     myfile << "plot 'TestBsplines.txt' using 1:2 with lines title 'PosX', 'TestBsplines.txt' using 1:3 with lines title 'SpeedX','TestBsplines.txt' using 1:4 with lines title 'AccX'"<< endl;
 

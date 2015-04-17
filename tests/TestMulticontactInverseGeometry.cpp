@@ -438,22 +438,33 @@ protected:
             timeOfInterpolation = UnlockedSwingPeriod ;
           }
 
-        aLF(0) = LFX_->Compute(timeOfInterpolation);
-        aLF(1) = LFY_->Compute(timeOfInterpolation);
-        aLF(2) = LFZ_->Compute(i*samplingPeriod_);
+        double tmp,dtmp,ddtmp;
+        LFX_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        aLF(0) = tmp ;
+        LFY_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        aLF(1) = tmp ;
+        LFZ_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        aLF(2) = tmp ;
         aLF(3) = 0.0;
         aLF(4) = 0.0;
 
-        aRF(0) = RFX_->Compute(timeOfInterpolation);
-        aRF(1) = RFY_->Compute(timeOfInterpolation);
-        aRF(2) = RFZ_->Compute(i*samplingPeriod_);
+        RFX_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        aRF(0) = tmp ;
+        RFY_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        aRF(1) = tmp ;
+        RFZ_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        aRF(2) = tmp ;
         aRF(3) = 0.0;
         aRF(4) = 0.0;
 
-        aRH(0) = RHX_->Compute(timeOfInterpolation);
-        aRH(1) = RHY_->Compute(timeOfInterpolation);
-        aRH(2) = RHZ_->Compute(i*samplingPeriod_);
-        aRH(3) = RHOMEGA_->Compute(timeOfInterpolation);
+        RHX_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        aRH(0) = tmp ;
+        RHY_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        aRH(1) = tmp ;
+        RHZ_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        aRH(2) = tmp ;
+        RHOMEGA_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        aRH(3) = tmp ;
         aRH(4) = 0.0;
 
         lfoot_.push_back(aLF) ;

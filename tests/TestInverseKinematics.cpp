@@ -105,8 +105,6 @@ public:
                           samplingPeriod,
                           (double)(comPos.size()-320)*samplingPeriod,
                           1.6,
-                          0.814,
-                          lfFoot[0],
                           comPos[0] );
 
 
@@ -269,7 +267,7 @@ public:
     }
     double samplingPeriod = 0.005;
     dynamicfilter_->init(samplingPeriod,samplingPeriod,0.1,
-                         1.6,0.814,supportFoot,m_OneStep.finalCOMPosition);
+                         1.6,m_OneStep.finalCOMPosition);
     initIK();
     MAL_VECTOR_TYPE(double) UpperConfig = m_HDR->currentConfiguration() ;
     MAL_VECTOR_TYPE(double) UpperVel = m_HDR->currentVelocity() ;

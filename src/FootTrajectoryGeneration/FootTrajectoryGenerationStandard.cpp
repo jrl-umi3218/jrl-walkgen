@@ -262,7 +262,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
           ToMP.clear();
           MP.clear();
       }
-      m_BsplinesX->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP);
+      m_BsplinesX->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed);
       break;
 
     case Y_AXIS:
@@ -279,7 +279,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
         ToMP.clear();
         MP.clear();
       }
-      m_BsplinesY->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP);
+      m_BsplinesY->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed);
       break;
 
     case Z_AXIS:
@@ -306,7 +306,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
           ToMP.push_back(0.6*TimeInterval);
           MP.push_back(InitPosition+WayPoint_z);
         }
-      m_BsplinesZ->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP);
+      m_BsplinesZ->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed);
       break;
 
     case THETA_AXIS:
@@ -474,15 +474,20 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
       timeOfInterpolation = UnlockedSwingPeriod ;
     }
 
+  cout << "timeOfInterpolation = " << timeOfInterpolation << endl ;
+  cout << "time = " << Time << endl ;
+
   // Trajectory of the foot compute in the X domain (plane X of t)
-  aFootAbsolutePosition.x = m_BsplinesX->Compute(timeOfInterpolation);
-  aFootAbsolutePosition.dx = m_BsplinesX->ComputeDerivative(timeOfInterpolation);
-  aFootAbsolutePosition.ddx = m_BsplinesX->ComputeSecDerivative(timeOfInterpolation);
+  m_BsplinesX->Compute(timeOfInterpolation,
+                       aFootAbsolutePosition.x,
+                       aFootAbsolutePosition.dx,
+                       aFootAbsolutePosition.ddx);
 
   // Trajectory of the foot compute in the Y domain (plane Y of t)
-  aFootAbsolutePosition.y = m_BsplinesY->Compute(timeOfInterpolation);
-  aFootAbsolutePosition.dy = m_BsplinesY->ComputeDerivative(timeOfInterpolation);
-  aFootAbsolutePosition.ddy = m_BsplinesY->ComputeSecDerivative(timeOfInterpolation);
+  m_BsplinesY->Compute(timeOfInterpolation,
+                       aFootAbsolutePosition.y,
+                       aFootAbsolutePosition.dy,
+                       aFootAbsolutePosition.ddy);
 
   // Trajectory of the foot in term of roll
   aFootAbsolutePosition.omega = m_PolynomeOmega->Compute(timeOfInterpolation);
@@ -498,9 +503,10 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
   aFootAbsolutePosition.ddtheta = m_PolynomeTheta->ComputeSecDerivative(timeOfInterpolation);
 
   // Trajectory of the foot compute in the Z domain (plane Z of t)
-  aFootAbsolutePosition.z = m_BsplinesZ->Compute(Time);
-  aFootAbsolutePosition.dz = m_BsplinesZ->ComputeDerivative(Time);
-  aFootAbsolutePosition.ddz = m_BsplinesZ->ComputeSecDerivative(Time);
+  m_BsplinesZ->Compute(timeOfInterpolation,
+                       aFootAbsolutePosition.z,
+                       aFootAbsolutePosition.dz,
+                       aFootAbsolutePosition.ddz);
 
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.x);
   ODEBUG2("t: " << Time << " : " << aFootAbsolutePosition.y);

@@ -1078,8 +1078,8 @@ namespace PatternGeneratorJRL {
       double ltime = (double)m_ZMPM->GetTSingleSupport();
       strm >> aFAP.x;
       strm >> aFAP.y;
-      //strm >> aFAP.z;
       strm >> aFAP.theta;
+      strm >> aFAP.z;
 
       ChangeOnLineStep(ltime,aFAP,newtime);
     }

@@ -44,21 +44,20 @@ enum Profiles_t {
   PROFIL_ANALYTICAL_GO_THROUGH_WALL          // 7
 };
 
-#define NBOFPREDEFONLINEFOOTSTEPS 11
+#define NBOFPREDEFONLINEFOOTSTEPS 0 //11
 
-
-double OnLineFootSteps[NBOFPREDEFONLINEFOOTSTEPS][3]={
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0},
-  { 0.05, 0.0, 0.0}
+double OnLineFootSteps[NBOFPREDEFONLINEFOOTSTEPS][4]={
+//  { 0.05, 0.0, 0.0, 0.0},
+//  { 0.05, 0.0, 0.0, 0.0},
+//  { 0.05, 0.0, 0.0, 0.0},
+//  { 0.05, 0.0, 0.0, 0.0},
+//  { 0.05, 0.0, 0.0, 0.0},
+//  { 0.05, 0.0, 0.0, 0.0},
+//  { 0.05, 0.0, 0.0, 0.0},
+//  { 0.05, 0.0, 0.0, 0.0},
+//  { 0.05, 0.0, 0.0, 0.0},
+//  { 0.05, 0.0, 0.0, 0.0},
+//  { 0.05, 0.0, 0.0, 0.0}
 };
 
 class TestMorisawa2007: public TestObject
@@ -930,7 +929,7 @@ protected:
     if (m_TestProfile==PROFIL_ANALYTICAL_GO_THROUGH_WALL)
       return;
 
-    unsigned int StoppingTime = 70*200;
+    unsigned int StoppingTime = 20*200;
 
 
     double r = 100.0*(double)m_OneStep.NbOfIt/(double)StoppingTime;
@@ -948,7 +947,7 @@ protected:
 	  {
 	    if (m_OneStep.NbOfIt%200==0)
 	      {
-		cout << "Progress " << (unsigned int)r << " "<< "\r";
+		cout << "\r" << "Progress " << (unsigned int)r << " " ;
 		cout.flush();
 	      }
 	
@@ -961,13 +960,15 @@ protected:
 		  {
 		    aFAP.x = OnLineFootSteps[m_NbStepsModified][0];
 		    aFAP.y = OnLineFootSteps[m_NbStepsModified][1];
+		    aFAP.z = OnLineFootSteps[m_NbStepsModified][3];
 		    aFAP.theta = OnLineFootSteps[m_NbStepsModified][2];
 		  }
 		else
 		  {
 		    aFAP.x=0.1;
 		    aFAP.y=0.0;
-		    aFAP.theta=5.0;
+		    aFAP.z=0.0;
+		    aFAP.theta=0.0;
 		  }
 		double newtime;
 		bool stepHandledCorrectly=true;

@@ -387,10 +387,12 @@ FootTrajectoryGenerationMultiple::operator=
   SetAbsoluteTimeReference(aFTGM.GetAbsoluteTimeReference());
 
   /* Copy the parameters */
-  for(unsigned int li=0;li<lDeltaTj.size();li++)
+  unsigned int li=0 ;
+  int lk=0 ;
+  for(li=0;li<lDeltaTj.size();li++)
     {
       double TI, FP, IP, IS;
-      for(unsigned int lk=0;lk<6;lk++)
+      for(lk=0;lk<6;lk++)
 	{
 	  GetParametersWithInitPosInitSpeed(li,lk,TI,FP,IP,IS);
 	  /*! Special case when TI is equal to zero */

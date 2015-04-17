@@ -466,7 +466,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   FinalCurrentStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
 
   dynamicFilter_->init(m_SamplingPeriod,InterpolationPeriod_,
-                       QP_T_, previewDuration_ - NbSampleControl_*InterpolationPeriod_ ,CoMHeight_,InitLeftFootAbsolutePosition,lStartingCOMState);
+                       QP_T_, previewDuration_ - NbSampleControl_*InterpolationPeriod_,lStartingCOMState);
   return 0;
 }
 

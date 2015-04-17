@@ -129,7 +129,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 	  << FootFinalPosition.z << "," << FootInitialPosition.z << "," << FootInitialPosition.dz << ")");
   aFTGM->SetNatureInterval(IntervalIndex,FootFinalPosition.stepType);
 
-  double ModulationSupportCoefficient = 0.8;
+  double ModulationSupportCoefficient = 1.0;
   double UnlockedSwingPeriod = m_DeltaTj[IntervalIndex] * ModulationSupportCoefficient;
 
   // X axis.
@@ -743,6 +743,7 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
   for(int k=0;k<2;k++)
     CurrentSupportFootPosition(k,2) = v2(k,0);
 
+
   /* Keep track of the interval index once this is
      for single support, once for double support */
 
@@ -788,8 +789,12 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
       for(int k=0;k<2;k++)
 	CurrentSupportFootPosition(k,2) += v2(k,0);
 
+      CurrentSupportFootPosition(2,2) = SupportFootInitialAbsolutePosition.z ;
+      CurrentSupportFootPosition(2,2) += RelativeFootPositions[i].sz;
+
       AbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
       AbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
+      AbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
       AbsoluteFootPositions[i].theta = CurrentAbsTheta;
 
       ODEBUG("CSFP:" << CurrentSupportFootPosition(0,2) << " " << CurrentSupportFootPosition(1,2));
@@ -797,6 +802,7 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
       /* Populate the set of support foot absolute positions */
       SupportFootAbsoluteFootPositions[i].x = CurrentSupportFootPosition(0,2);
       SupportFootAbsoluteFootPositions[i].y = CurrentSupportFootPosition(1,2);
+      SupportFootAbsoluteFootPositions[i].z = CurrentSupportFootPosition(2,2);
       SupportFootAbsoluteFootPositions[i].theta = CurrentAbsTheta;
       SupportFootAbsoluteFootPositions[i].stepType = -1;
 

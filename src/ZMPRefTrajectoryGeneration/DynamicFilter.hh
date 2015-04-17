@@ -72,13 +72,10 @@ namespace PatternGeneratorJRL
         const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
-    void init(
-        double controlPeriod,
+    void init(double controlPeriod,
         double interpolationPeriod,
         double PG_T,
         double previewWindowSize,
-        double CoMHeight,
-        FootAbsolutePosition supportFoot,
         COMState inputCoM
         );
 
@@ -197,7 +194,7 @@ namespace PatternGeneratorJRL
 
       /// \brief Contain the number of interpolation points
       /// inside the Sampling period of the PG host
-      unsigned int NbI_ ;
+      double NbI_ ;
 
       /// \brief Nb. samplings inside preview window
       unsigned int PG_N_ ;

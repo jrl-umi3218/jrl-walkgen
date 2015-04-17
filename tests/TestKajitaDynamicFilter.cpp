@@ -105,13 +105,13 @@ public:
     double samplingPeriod = 0.005 ;
     unsigned int N = (unsigned int)round(endTime/samplingPeriod);
 
+    COMState com_init ;
+    com_init.z[0]=0.814;
     dynamicfilter_->init( samplingPeriod,
                           samplingPeriod,
                           endTime - previewWindowSize,
                           previewWindowSize,
-                          0.814,
-                          FootAbsolutePosition(),
-                          COMState() );
+                          com_init );
     delta_zmp.resize(N);
     MAL_VECTOR_FILL(InitialVelocity,0.0);
     MAL_VECTOR_FILL(InitialAcceleration,0.0);
@@ -266,7 +266,7 @@ public:
     }
     double samplingPeriod = 0.005;
     dynamicfilter_->init(samplingPeriod,samplingPeriod,0.1,
-                         1.6,0.814,supportFoot,m_OneStep.finalCOMPosition);
+                         1.6,m_OneStep.finalCOMPosition);
     initIK();
     MAL_VECTOR_TYPE(double) UpperConfig = m_HDR->currentConfiguration() ;
     MAL_VECTOR_TYPE(double) UpperVel = m_HDR->currentVelocity() ;

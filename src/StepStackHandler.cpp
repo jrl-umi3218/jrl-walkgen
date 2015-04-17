@@ -192,12 +192,13 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 	    else break;
 	    if (!strm.eof())
 	      strm >> aFootPosition.sy;
-	    else
-	      break;
+	    else break;
 	    if (!strm.eof())
 	      strm >> aFootPosition.theta;
-	    else
-	      break;
+	    else break;
+	    if (!strm.eof())
+	      strm >> aFootPosition.sz;
+	    else break;
 
 	    aFootPosition.DeviationHipHeight = 0;
 	    aFootPosition.SStime=m_SingleSupportTime;
@@ -205,6 +206,7 @@ void StepStackHandler::ReadStepSequenceAccordingToWalkMode(istringstream &strm)
 	    aFootPosition.stepType=1;
 	    ODEBUG4(aFootPosition.sx << " " <<
 		    aFootPosition.sy << " " <<
+		    aFootPosition.sz << " " <<
 		    aFootPosition.theta << " " <<
 		    aFootPosition.SStime << " " <<
 		    aFootPosition.DStime << " " <<
