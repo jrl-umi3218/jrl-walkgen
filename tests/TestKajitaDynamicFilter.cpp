@@ -109,7 +109,7 @@ public:
     com_init.z[0]=0.814;
     dynamicfilter_->init( samplingPeriod,
                           samplingPeriod,
-                          endTime - previewWindowSize,
+                          endTime - previewWindowSize,16,
                           previewWindowSize,
                           com_init );
     delta_zmp.resize(N);
@@ -265,7 +265,7 @@ public:
       supportFoot = m_OneStep.RightFootPosition ;
     }
     double samplingPeriod = 0.005;
-    dynamicfilter_->init(samplingPeriod,samplingPeriod,0.1,
+    dynamicfilter_->init(samplingPeriod,samplingPeriod,0.1,16,
                          1.6,m_OneStep.finalCOMPosition);
     initIK();
     MAL_VECTOR_TYPE(double) UpperConfig = m_HDR->currentConfiguration() ;

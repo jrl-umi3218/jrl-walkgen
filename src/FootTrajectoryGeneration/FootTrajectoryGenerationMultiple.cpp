@@ -172,11 +172,11 @@ bool FootTrajectoryGenerationMultiple::Compute(double t, FootAbsolutePosition & 
 	  deltaj = t-reftime;
 
 	  if (m_SetOfFootTrajectoryGenerationObjects[j]!=0)
-	    {
-          //m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
-          m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAllWithBSplines(aFootAbsolutePosition,deltaj);
-	      aFootAbsolutePosition.stepType = m_NatureOfIntervals[j];
-	    }
+	  {
+	    //m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAllWithPolynom(aFootAbsolutePosition,deltaj);
+	    m_SetOfFootTrajectoryGenerationObjects[j]->ComputeAllWithBSplines(aFootAbsolutePosition,deltaj);
+	    aFootAbsolutePosition.stepType = m_NatureOfIntervals[j];
+	  }
 	  ODEBUG("t: " << t << " reftime :" << setprecision(12) << reftime <<
 		  " AbsoluteTimeReference : " << m_AbsoluteTimeReference <<
 		  " Tj["<<j << "]= " << setprecision(12) << m_DeltaTj[j]
@@ -296,7 +296,8 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeedInitAcc(u
 					 double FinalPosition,
 					 double InitPosition,
 					 double InitSpeed,
-					 double InitAcc
+					 double InitAcc,
+					 vector<double> middlePos
 					 )
 {
   if (IntervalIndex>=m_SetOfFootTrajectoryGenerationObjects.size())
@@ -308,7 +309,8 @@ int FootTrajectoryGenerationMultiple::SetParametersWithInitPosInitSpeedInitAcc(u
                                                                        FinalPosition,
                                                                        InitPosition,
                                                                        InitSpeed,
-                                                                       InitAcc);
+                                                                       InitAcc,
+                                                                       middlePos);
   return 0;
 }
 

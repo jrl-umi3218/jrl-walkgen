@@ -304,34 +304,35 @@ protected:
             << filterprecision(m_OneStep.finalCOMPosition.yaw[2] ) << " "                 // 13
             << filterprecision(m_OneStep.ZMPTarget(0) ) << " "                            // 14
             << filterprecision(m_OneStep.ZMPTarget(1) ) << " "                            // 15
-            << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "                     // 16
-            << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "                     // 17
-            << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "                     // 18
-            << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "                    // 19
-            << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "                    // 20
-            << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "                    // 21
-            << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 22
-            << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 23
-            << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 24
-            << filterprecision(m_OneStep.LeftFootPosition.theta ) << " "                  // 25
-            << filterprecision(m_OneStep.LeftFootPosition.dtheta ) << " "                 // 26
-            << filterprecision(m_OneStep.LeftFootPosition.ddtheta ) << " "                // 27
-            << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 28
-            << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 29
-            << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 30
-            << filterprecision(m_OneStep.RightFootPosition.y ) << " "                     // 31
-            << filterprecision(m_OneStep.RightFootPosition.z ) << " "                     // 32
-            << filterprecision(m_OneStep.RightFootPosition.dx ) << " "                    // 33
-            << filterprecision(m_OneStep.RightFootPosition.dy ) << " "                    // 34
-            << filterprecision(m_OneStep.RightFootPosition.dz ) << " "                    // 35
-            << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                   // 36
-            << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 37
-            << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 38
-            << filterprecision(m_OneStep.RightFootPosition.theta ) << " "                 // 39
-            << filterprecision(m_OneStep.RightFootPosition.dtheta ) << " "                // 40
-            << filterprecision(m_OneStep.RightFootPosition.ddtheta ) << " "               // 41
-            << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 42
-            << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "              ;// 43
+            << filterprecision(m_OneStep.ZMPTarget(2) ) << " "                            // 16
+            << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "                     // 17
+            << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "                     // 18
+            << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "                     // 19
+            << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "                    // 20
+            << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "                    // 21
+            << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "                    // 22
+            << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 23
+            << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 24
+            << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 25
+            << filterprecision(m_OneStep.LeftFootPosition.theta ) << " "                  // 26
+            << filterprecision(m_OneStep.LeftFootPosition.dtheta ) << " "                 // 27
+            << filterprecision(m_OneStep.LeftFootPosition.ddtheta ) << " "                // 28
+            << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 29
+            << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 30
+            << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 31
+            << filterprecision(m_OneStep.RightFootPosition.y ) << " "                     // 32
+            << filterprecision(m_OneStep.RightFootPosition.z ) << " "                     // 33
+            << filterprecision(m_OneStep.RightFootPosition.dx ) << " "                    // 34
+            << filterprecision(m_OneStep.RightFootPosition.dy ) << " "                    // 35
+            << filterprecision(m_OneStep.RightFootPosition.dz ) << " "                    // 36
+            << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "                   // 37
+            << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 38
+            << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 39
+            << filterprecision(m_OneStep.RightFootPosition.theta ) << " "                 // 40
+            << filterprecision(m_OneStep.RightFootPosition.dtheta ) << " "                // 41
+            << filterprecision(m_OneStep.RightFootPosition.ddtheta ) << " "               // 42
+            << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 43
+            << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "              ;// 44
         aof << endl;
         aof.close();
     }

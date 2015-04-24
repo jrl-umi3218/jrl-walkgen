@@ -45,7 +45,7 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
 
   /** m_StepHeight and m_StepCurving definition -- To Modify*/
   m_StepHeight = 0.05;
-  m_StepCurving = 0.2;  // Heuristic value
+  m_StepCurving = 0.19;  // Heuristic value
 
   m_LeftFootTrajectory = new FootTrajectoryGenerationMultiple(lSPM,m_Foot);
   m_RightFootTrajectory = new FootTrajectoryGenerationMultiple(lSPM,m_Foot);
@@ -133,39 +133,43 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
   double UnlockedSwingPeriod = m_DeltaTj[IntervalIndex] * ModulationSupportCoefficient;
 
   // X axis.
-  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+  aFTGM->SetParametersWithInitPosInitSpeedInitAcc(IntervalIndex,
                                            FootTrajectoryGenerationStandard::X_AXIS,
                                            UnlockedSwingPeriod,
                                            FootFinalPosition.x,
                                            FootInitialPosition.x,
                                            FootInitialPosition.dx,
+                                           FootInitialPosition.ddx,
                                            MiddlePos);
 
   // Y axis.
-  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+  aFTGM->SetParametersWithInitPosInitSpeedInitAcc(IntervalIndex,
 					   FootTrajectoryGenerationStandard::Y_AXIS,
 					   UnlockedSwingPeriod,
 					   FootFinalPosition.y,
 					   FootInitialPosition.y,
 					   FootInitialPosition.dy,
+					   FootInitialPosition.ddy,
 					   MiddlePos);
 
   // Z axis.
-  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+  aFTGM->SetParametersWithInitPosInitSpeedInitAcc(IntervalIndex,
                            FootTrajectoryGenerationStandard::Z_AXIS,
                            m_DeltaTj[IntervalIndex],
                            FootFinalPosition.z,
                            FootInitialPosition.z,
                            FootInitialPosition.dz,
+                           FootInitialPosition.ddz,
                            MiddlePos);
 
   // THETA
-  aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,
+  aFTGM->SetParametersWithInitPosInitSpeedInitAcc(IntervalIndex,
 					   FootTrajectoryGenerationStandard::THETA_AXIS,
 					   UnlockedSwingPeriod,
 					   FootFinalPosition.theta,
 					   FootInitialPosition.theta,
-					   FootInitialPosition.dtheta);
+					   FootInitialPosition.dtheta,
+					   FootInitialPosition.ddtheta);
 
   // Omega
   aFTGM->SetParametersWithInitPosInitSpeed(IntervalIndex,

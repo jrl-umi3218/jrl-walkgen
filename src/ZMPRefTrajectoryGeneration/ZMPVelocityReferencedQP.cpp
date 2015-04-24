@@ -79,10 +79,10 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
   InterpolationPeriod_ = QP_T_/2;
-  previewDuration_ = 1.5 ;
+  previewDuration_ = 1.6 ;
   NbSampleControl_ = (int)round(QP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(QP_T_/InterpolationPeriod_) ;
-  previewSize_ = 15 ;
+  previewSize_ = (int)round(previewDuration_/QP_T_) ;
   StepPeriod_ = 0.8 ;
   SSPeriod_ = 0.7 ;
   DSPeriod_ = 0.1 ;
@@ -465,8 +465,12 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   InitStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
   FinalCurrentStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
 
-  dynamicFilter_->init(m_SamplingPeriod,InterpolationPeriod_,
-                       QP_T_, previewDuration_ - NbSampleControl_*InterpolationPeriod_,lStartingCOMState);
+  dynamicFilter_->init(m_SamplingPeriod,
+                       m_SamplingPeriod,//InterpolationPeriod_, again temporary trick
+                       QP_T_,
+                       QP_N_,
+                       previewDuration_ - 2*QP_T_,
+                       lStartingCOMState);
   return 0;
 }
 
@@ -574,12 +578,13 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
     DynamicFilterInterpolation(time);
 
-    unsigned int IndexMax = (int)round(previewDuration_  / InterpolationPeriod_);
+    unsigned int IndexMax = (int)round(previewDuration_  / m_SamplingPeriod/*InterpolationPeriod_*/);
     ZMPTraj_deq_.resize(IndexMax);
     COMTraj_deq_.resize(IndexMax);
     LeftFootTraj_deq_.resize(IndexMax);
     RightFootTraj_deq_.resize(IndexMax);
     int inc =  (int)round(InterpolationPeriod_ / m_SamplingPeriod) ;
+    inc = 1 ; // warning this is temporary trick
     for (unsigned int i = 0 , j = 0 ; j < IndexMax ; i = i + inc , ++j )
     {
       ZMPTraj_deq_[j] = ZMPTraj_deq_ctrl_[i] ;
@@ -681,23 +686,16 @@ void ZMPVelocityReferencedQP::DynamicFilterInterpolation(double time)
   // interpolation the position of the com along the whole preview
   LIPM_subsampled_.setState(InitStateLIPM_) ;
   OrientPrw_DF_->CurrentTrunkState(InitStateOrientPrw_) ;
+  InterpretSolutionVector();
+  OFTG_DF_->SetSamplingPeriod( m_SamplingPeriod );
+
   for ( int i = 0 ; i < previewSize_ ; i++ )
   {
     CoMZMPInterpolation(ZMPTraj_deq_ctrl_, COMTraj_deq_ctrl_,
                         LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_,
                         &Solution_, &LIPM_subsampled_,
                         NbSampleControl_, i, CurrentIndex_);
-  }
 
-  InterpretSolutionVector();
-
-  // Copy the solution for the orientation interpolation function
-  OFTG_DF_->SetSamplingPeriod( m_SamplingPeriod );
-  //solution_  = Solution_ ;
-  //solution_.SupportStates_deq.pop_front();
-
-  for ( int i = 0 ; i < previewSize_ ; i++ )
-  {
     OrientPrw_->interpolate_trunk_orientation( time + i * QP_T_,
                                                CurrentIndex_ + i * NbSampleControl_, m_SamplingPeriod,
                                                solution_.SupportStates_deq, COMTraj_deq_ctrl_ );
@@ -734,12 +732,13 @@ void ZMPVelocityReferencedQP::CoMZMPInterpolation(
 {
   if(aSolutionReference->SupportStates_deq.size() && aSolutionReference->SupportStates_deq[IterationNumber].NbStepsLeft == 0)
   {
-    double jx = (LeftFootTraj_deq[0].x + RightFootTraj_deq[0].x)/2 - COMTraj_deq[0].x[0];
-    double jy = (LeftFootTraj_deq[0].y + RightFootTraj_deq[0].y)/2 - COMTraj_deq[0].y[0];
+    unsigned int i = currentIndex + IterationNumber * numberOfSample ;
+    double jx = (LeftFootTraj_deq[i-1].x + RightFootTraj_deq[i-1].x)/2 - COMTraj_deq[i-1].x[0];
+    double jy = (LeftFootTraj_deq[i-1].y + RightFootTraj_deq[i-1].y)/2 - COMTraj_deq[i-1].y[0];
     if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3) { Running_ = false; }
     const double tf = 0.75;
-    jx = 6/(tf*tf*tf)*(jx - tf*COMTraj_deq[0].x[1] - (tf*tf/2)*COMTraj_deq[0].x[2]);
-    jy = 6/(tf*tf*tf)*(jy - tf*COMTraj_deq[0].y[1] - (tf*tf/2)*COMTraj_deq[0].y[2]);
+    jx = 6/(tf*tf*tf)*(jx - tf*COMTraj_deq[i-1].x[1] - (tf*tf/2)*COMTraj_deq[i-1].x[2]);
+    jy = 6/(tf*tf*tf)*(jy - tf*COMTraj_deq[i-1].y[1] - (tf*tf/2)*COMTraj_deq[i-1].y[2]);
     LIPM->Interpolation( COMTraj_deq, ZMPPositions, currentIndex + IterationNumber * numberOfSample,
                          jx, jy);
     LIPM->OneIteration( jx, jy );
@@ -759,6 +758,10 @@ void ZMPVelocityReferencedQP::InterpretSolutionVector()
 {
   double Vx = VelRef_.Local.X ;
   double Vy = VelRef_.Local.Y ;
+  if (Vx > 0.2 /*ms*/)
+    Vx = 0.2 ;
+  if (Vy > 0.2 /*ms*/)
+    Vy = 0.2 ;
   std::deque<support_state_t> & SupportStates = solution_.SupportStates_deq ;
   support_state_t & LastSupport = solution_.SupportStates_deq.back() ;
   support_state_t & FirstSupport = solution_.SupportStates_deq[1] ;

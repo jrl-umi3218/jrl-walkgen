@@ -518,9 +518,44 @@ void BSplinesFoot::ComputeControlPointFrom2DataPoint(void)
   vector<double> dNi5T0  = m_basis_functions_derivative ;
   vector<double> ddNi5T0 = m_basis_functions_sec_derivative ;
 
+//  for (unsigned int j = 0 ; j < m_basis_functions.size() ; ++j)
+//  {
+//    for (unsigned int i = 0 ; i < m_basis_functions[j].size() ; ++i)
+//    {
+//      cout << m_basis_functions[m_degree][i] << " " ;
+//    }
+//    cout << endl ;
+//  }
+
+//  for (unsigned int i = 0 ; i < dNi5T0.size() ; ++i)
+//    cout << dNi5T0[i] << " " ;
+//  cout << endl ;
+
+//  for (unsigned int i = 0 ; i < ddNi5T0.size() ; ++i)
+//    cout << ddNi5T0[i] << " " ;
+//  cout << endl ;
+
   ComputeBasisFunctions(1);
   vector<double> dNi5T  = m_basis_functions_derivative ;
   vector<double> ddNi5T = m_basis_functions_sec_derivative ;
+
+//  for (unsigned int j = 0 ; j < m_basis_functions.size() ; ++j)
+//  {
+//    for (unsigned int i = 0 ; i < m_basis_functions[j].size() ; ++i)
+//    {
+//      cout << m_basis_functions[m_degree][i] << " " ;
+//    }
+//    cout << endl ;
+//  }
+
+//  for (unsigned int i = 0 ; i < dNi5T.size() ; ++i)
+//    cout << dNi5T[i] << " " ;
+//  cout << endl ;
+
+//  for (unsigned int i = 0 ; i < ddNi5T.size() ; ++i)
+//    cout << ddNi5T[i] << " " ;
+//  cout << endl ;
+
 
   double IP=m_IP ;
   double IS=m_IS ;

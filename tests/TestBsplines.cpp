@@ -46,14 +46,15 @@ int main()
 
     //Create the parameters of foot trajectory on X
     double m_FTx = 1.0;
-    double m_FPx = 0.54;
+    double m_FPx = 0.209 ;
+    double m_IPx = 0.009 ;
     vector<double> m_MPx ;
     vector<double> m_ToMPx ;
     m_MPx.clear();
     m_ToMPx.clear();
 
     //Create an object for test X
-    X = new PatternGeneratorJRL::BSplinesFoot(m_FTx, 0.2, m_FPx, m_ToMPx, m_MPx, 2,0.2,0.1,0.2);
+    X = new PatternGeneratorJRL::BSplinesFoot(m_FTx, m_IPx, m_FPx, m_ToMPx, m_MPx);
 //    vector<double> cpx ;
 //    cpx.push_back(0.2);
 //    cpx.push_back(0.2);
@@ -71,11 +72,12 @@ int main()
     //Create the parameters of foot trajectory on Y
     double m_FTy = 1.0;
     double m_FPy = 0.2;
+    double m_IPy = 0.1;
     vector<double> m_MPy = vector<double>(1,5);
     vector<double> m_ToMPy = vector<double>(1,m_FTx/2.0);
 
     //Create an object for test Y
-    Y = new PatternGeneratorJRL::BSplinesFoot(m_FTy, 0.1, m_FPy, m_ToMPy, m_MPy);
+    Y = new PatternGeneratorJRL::BSplinesFoot(m_FTy, m_IPy, m_FPy, m_ToMPy, m_MPy);
     Y->PrintDegree();
     Y->PrintKnotVector();
     Y->PrintControlPoints();
@@ -98,9 +100,11 @@ int main()
     Z->PrintControlPoints();
     double z,dz,ddz;
 
+    double dx_(0.0),dy_(0.0),dz_(0.0),ddx_(0.0),ddy_(0.0),ddz_(0.0);
+    double x_p(m_IPx),y_p(m_IPy),z_p(m_IPz),dx_p(0.0),dy_p(0.0),dz_p(0.0);
+    double dt = X->FT()/1000.0;
     for (int k=0; k<=1000;k++)
     {
-
         tx=double(k)*X->FT()/1000.0;
         ty=double(k)*X->FT()/1000.0;
         tz=double(k)*X->FT()/1000.0;
@@ -110,9 +114,29 @@ int main()
         X->Compute(tx,x,dx,ddx);
         Y->Compute(ty,y,dy,ddy);
         Z->Compute(tz,z,dz,ddz);
+
+        dx_ = (x - x_p) / dt ;
+        ddx_ = (dx - dx_p) / dt ;
+
+        dy_ = (y - y_p) / dt ;
+        ddy_ = (dy - dy_p) / dt ;
+
+        dz_ = (z - z_p) / dt ;
+        ddz_ = (dz - dz_p) / dt ;
+
+        x_p  = x  ;
+        y_p  = y  ;
+        z_p  = z  ;
+        dx_p = dx ;
+        dy_p = dy ;
+        dz_p = dz ;
+
         myfile << tx << " " << x << " " << dx << " " << ddx
                      << " " << y << " " << dy << " " << ddy
                      << " " << z << " " << dz << " " << ddz
+                     << " " << dx_ << " " << ddx_
+                     << " " << dy_ << " " << ddy_
+                     << " " << dz_ << " " << ddz_
                      << endl;
 
         // time - Position - Velocity - Acceleration

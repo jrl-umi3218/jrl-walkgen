@@ -74,7 +74,7 @@ namespace PatternGeneratorJRL
 
     void init(double controlPeriod,
         double interpolationPeriod,
-        double PG_T,
+        double PG_T, unsigned int PG_N,
         double previewWindowSize,
         COMState inputCoM
         );
@@ -162,7 +162,7 @@ namespace PatternGeneratorJRL
     inline double getPreviewWindowSize_()
     {return previewWindowSize_ ;}
 
-    inline void getPCerror_(double & errx, double & erry)
+    inline void getPCerror_(vector<double> & errx,vector<double> & erry)
     { errx = sxzmp_ ; erry = syzmp_ ; }
 
     inline Clock * getClock()
@@ -245,8 +245,8 @@ namespace PatternGeneratorJRL
       /// \brief Pointer to the Preview Control object.
       PreviewControl *PC_;
       /// \brief data needed by the preview control algorithm
-      double sxzmp_ , syzmp_ ;
-      double deltaZMPx_, deltaZMPy_ ;
+      vector<double> sxzmp_ , syzmp_ ;
+      vector<double> deltaZMPx_, deltaZMPy_ ;
       double CoMHeight_ ;
 
       /// \brief State of the Preview control.

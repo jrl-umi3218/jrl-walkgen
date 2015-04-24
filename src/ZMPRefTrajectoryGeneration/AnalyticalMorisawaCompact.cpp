@@ -601,7 +601,7 @@ computing the analytical trajectories. */
     FillQueues(m_CurrentTime,m_CurrentTime+m_PreviewControlTime-TimeShift,
                ZMPPositions, COMStates,LeftFootAbsolutePositions, RightFootAbsolutePositions);
 
-    bool filterOn_ = true;
+    bool filterOn_ = true ;
     if(filterOn_)
     {
         /*! initialize the dynamic filter */
@@ -610,6 +610,7 @@ computing the analytical trajectories. */
         m_kajitaDynamicFilter->init( m_SamplingPeriod,
                                      m_SamplingPeriod,
                                      (double)(n+1)*m_SamplingPeriod,
+                                     1,
                                      KajitaPCpreviewWindow,
                                      lStartingCOMState );
 
@@ -820,7 +821,7 @@ computing the analytical trajectories. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
 
     DFpreviewWindowSize_ = 1.6 - m_SamplingPeriod ; //second
-    m_kajitaDynamicFilter->init( m_SamplingPeriod, 0.05, m_SamplingPeriod, DFpreviewWindowSize_,
+    m_kajitaDynamicFilter->init( m_SamplingPeriod, 0.05, m_SamplingPeriod, 1, DFpreviewWindowSize_,
                                  lStartingCOMState );
 
     return m_RelativeFootPositions.size();
@@ -950,24 +951,30 @@ computing the analytical trajectories. */
         ctrlRF_ .clear() ;
         ctrlCoM_.clear() ;
         ctrlZMP_.clear() ;
-        FillQueues(m_SamplingPeriod, time, time/* + DFpreviewWindowSize_*/,
+        FillQueues(m_SamplingPeriod, time, time + DFpreviewWindowSize_,
                    ctrlZMP_, ctrlCoM_, ctrlLF_, ctrlRF_);
 
-//        double intPeriod = m_kajitaDynamicFilter->getInterpolationPeriod() ;
-//        unsigned int IndexMax = (int)round(DFpreviewWindowSize_  / intPeriod );
-//        intCoM_.resize(IndexMax);
-//        intLF_ .resize(IndexMax);
-//        intRF_ .resize(IndexMax);
-//        int inc =  (int)round( intPeriod / m_SamplingPeriod) ;
-//        for (unsigned int i = 0 , j = 0 ; j < IndexMax ; i = i + inc , ++j )
-//        {
-//          intCoM_[j] = ctrlCoM_[i] ;
-//          intLF_ [j] = ctrlLF_ [i] ;
-//          intRF_ [j] = ctrlRF_ [i] ;
-//        }
+        double intPeriod = m_kajitaDynamicFilter->getInterpolationPeriod() ;
+        unsigned int IndexMax = (int)round(DFpreviewWindowSize_  / intPeriod );
+        intCoM_.resize(IndexMax);
+        intLF_ .resize(IndexMax);
+        intRF_ .resize(IndexMax);
+        int inc =  (int)round( intPeriod / m_SamplingPeriod) ;
+        for (unsigned int i = 0 , j = 0 ; j < IndexMax ; i = i + inc , ++j )
+        {
+          intCoM_[j] = ctrlCoM_[i] ;
+          intLF_ [j] = ctrlLF_ [i] ;
+          intRF_ [j] = ctrlRF_ [i] ;
+        }
 
-//        m_kajitaDynamicFilter->OnLinefilter(time,intCoM_,ctrlZMP_,intLF_,intRF_,outputDeltaCoM_);
+        m_kajitaDynamicFilter->OnLinefilter(time,intCoM_,ctrlZMP_,intLF_,intRF_,outputDeltaCoM_);
         cout << "timeOnLine = " << time << endl ;
+        ctrlCoM_[0].x[0] += aCOMPos.x[0] + outputDeltaCoM_[0].x[0];
+        ctrlCoM_[0].x[1] += aCOMPos.x[1] + outputDeltaCoM_[0].x[1];
+        ctrlCoM_[0].x[2] +=                outputDeltaCoM_[0].x[2];
+        ctrlCoM_[0].y[0] += aCOMPos.y[0] + outputDeltaCoM_[0].y[0];
+        ctrlCoM_[0].y[1] += aCOMPos.y[1] + outputDeltaCoM_[0].y[1];
+        ctrlCoM_[0].y[2] +=                outputDeltaCoM_[0].y[2];
         FinalCOMStates.push_back(ctrlCoM_[0]);
         FinalZMPPositions.push_back(ctrlZMP_[0]);
         FinalLeftFootAbsolutePositions.push_back(ctrlLF_[0]);

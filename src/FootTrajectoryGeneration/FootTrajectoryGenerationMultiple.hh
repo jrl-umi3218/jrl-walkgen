@@ -177,13 +177,13 @@ namespace PatternGeneratorJRL
      @param InitAcc: Initial speed when computing the polynome at t=m_AbsoluteTimeReference.
    */
    int SetParametersWithInitPosInitSpeedInitAcc(unsigned int PolynomeIndex,
-					 int AxisReference,
-					 double TimeInterval,
-					 double FinalPosition,
-					 double InitPosition,
-					 double InitSpeed,
-					 double InitAcc
-					 );
+                                                int AxisReference,
+                                                double TimeInterval,
+                                                double FinalPosition,
+                                                double InitPosition,
+                                                double InitSpeed,
+                                                double InitAcc,
+                                                vector<double> middlePos = vector<double>(3,-1));
 
     /*! This method gets the parameters for each of the polynome used by this
       object. In this case, as it is used for the 3rd order polynome. The polynome to

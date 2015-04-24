@@ -328,6 +328,111 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
   return 0;
 }
 
+// allow C² continuity in the interpolation
+int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double TimeInterval,
+    double FinalPosition, double InitPosition, double InitSpeed, double InitAcc, vector<double> MiddlePos)
+{
+  double epsilon = 0.0001;
+  double WayPoint_x = MiddlePos[0] ;
+  double WayPoint_y = MiddlePos[1] ;
+  double WayPoint_z = MiddlePos[2] ;
+
+  vector<double> MP ;
+  vector<double> ToMP ;
+
+  bool isWayPointSet = WayPoint_x != WayPoint_y &&
+                       WayPoint_y != WayPoint_z &&
+                       WayPoint_x != WayPoint_z ;
+
+  bool isFootMoving = abs(m_BsplinesY->FP() - m_BsplinesY->IP())>epsilon ||
+                      abs(m_BsplinesX->FP() - m_BsplinesX->IP())>epsilon ;
+
+  switch (PolynomeIndex)
+  {
+    case X_AXIS:
+      ODEBUG2("Initspeed: " << InitSpeed << " ");
+      // Init polynom
+      m_PolynomeX->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
+      // Init BSpline
+      if( isWayPointSet )
+      {
+        ToMP.push_back(0.20*TimeInterval);
+        ToMP.push_back(0.75*TimeInterval);
+        MP.push_back(InitPosition) ;
+        MP.push_back(FinalPosition) ;
+      }
+      else
+      {
+          ToMP.clear();
+          MP.clear();
+      }
+      m_BsplinesX->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed,InitAcc);
+      break;
+
+    case Y_AXIS:
+      m_PolynomeY->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
+      if(isWayPointSet)
+      {
+        ToMP.push_back(0.20*TimeInterval);
+        ToMP.push_back(0.75*TimeInterval);
+        MP.push_back(WayPoint_y);
+        MP.push_back(WayPoint_y);
+      }
+      else
+      {
+        ToMP.clear();
+        MP.clear();
+      }
+      m_BsplinesY->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed,InitAcc);
+      break;
+
+    case Z_AXIS:
+      if( !isFootMoving )
+        {
+          WayPoint_z = 0.0;
+        }
+      m_PolynomeZ->SetParametersWithMiddlePos(TimeInterval, FinalPosition+m_StepHeight,
+                                              InitPosition, InitSpeed, InitAcc, FinalPosition);
+
+      // Check the final and the initial position to decide what to do
+      if (FinalPosition - InitPosition > epsilon )
+        {
+          ToMP.push_back(0.4*TimeInterval);
+          MP.push_back(FinalPosition+WayPoint_z);
+        }
+      else if (FinalPosition - InitPosition <= epsilon && FinalPosition - InitPosition >= -epsilon )
+        {
+          ToMP.push_back(0.5*TimeInterval);
+          MP.push_back(FinalPosition+WayPoint_z);
+        }
+      else if (FinalPosition - InitPosition < -epsilon )
+        {
+          ToMP.push_back(0.6*TimeInterval);
+          MP.push_back(InitPosition+WayPoint_z);
+        }
+      m_BsplinesZ->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed,InitAcc);
+      break;
+
+    case THETA_AXIS:
+      m_PolynomeTheta->SetParameters(TimeInterval,FinalPosition,InitPosition,InitSpeed,InitAcc);
+      break;
+
+    case OMEGA_AXIS:
+      m_PolynomeOmega->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+      break;
+
+    case OMEGA2_AXIS:
+      m_PolynomeOmega2->SetParametersWithInitPosInitSpeed(TimeInterval,FinalPosition,InitPosition,InitSpeed);
+      break;
+
+    default:
+      return -1;
+      break;
+  }
+  return 0;
+}
+
+// allow C² continuity in the interpolation
 int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double TimeInterval,
     double FinalPosition, double InitPosition, double InitSpeed, double InitAcc, double InitJerk)
 {

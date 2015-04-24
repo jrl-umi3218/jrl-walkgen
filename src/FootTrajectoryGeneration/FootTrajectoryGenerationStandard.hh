@@ -191,7 +191,19 @@ namespace PatternGeneratorJRL
    /// \param[in] InitSpeed
    /// \param[in] InitAcc
    int SetParameters(int PolynomeIndex, double TimeInterval,
-       double FinalPosition, double InitPosition, double InitSpeed, double InitAcc=0.0, double InitJerk=0.0);
+       double FinalPosition, double InitPosition, double InitSpeed, double InitAcc, double InitJerk);
+
+   /// \brief Set parameters considering initial position, speed, acceleration.
+   ///
+   /// \param[in] PolynomeIndex
+   /// \param[in] TimeInterval
+   /// \param[in] FinalPosition
+   /// \param[in] InitPosition
+   /// \param[in] InitSpeed
+   /// \param[in] InitAcc
+   int SetParameters(int PolynomeIndex, double TimeInterval,
+       double FinalPosition, double InitPosition, double InitSpeed, double InitAcc,
+       std::vector<double> MiddlePos=vector<double>(3,-1) );
 
    /*! Fill an absolute foot position structure for a given time. */
    // Using Polynoms
