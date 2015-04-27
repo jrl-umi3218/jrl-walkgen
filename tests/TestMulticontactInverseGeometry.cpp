@@ -561,7 +561,7 @@ protected:
     lfs_.clear(); rfs_.clear(); rhs_.clear();
     timing_.clear();
 
-    movingPeriod_  = 0.7 ;
+    movingPeriod_  = 1.4 ;
     supportPeriod_ = 0.1 ;
     initialTime_   = 5.0 ;
     finalTime_     = 5.0 ;
@@ -576,7 +576,7 @@ protected:
     double init_lfz = 0.0;//0.0        ;
                       //
     double init_rfx = 0.0;//0.00949035 ;
-    double init_rfy =-0.1;//-0.095      ;
+    double init_rfy =-0.1;//-0.095     ;
     double init_rfz = 0.0;//0.0        ;
 
     // 0     5.0 second
@@ -967,9 +967,11 @@ protected:
     //std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm.csv" ;
     //std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_03_03_21h_01m/" ;
     //std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm_ds.csv" ;
+//    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_03_27_10h35m/" ;
+//    std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm.csv" ;
 
-    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_03_27_10h35m/" ;
-    std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm.csv" ;
+    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_27_04_10h_43m/" ;
+    std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm_ds.csv" ;
 
     std::ifstream dataStream ;
     dataStream.open(dataFile.c_str(),std::ifstream::in);
