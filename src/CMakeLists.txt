@@ -179,10 +179,18 @@ IF ( '${CMAKE_EXTRA_GENERATOR}' STREQUAL 'CodeBlocks' )
     ADDPREFIX(${PROJECT_NAME}_ABSOLUTE_HEADERS  "${CMAKE_SOURCE_DIR}/"  ${PROJECT_NAME}_HEADERS)
 ENDIF ( '${CMAKE_EXTRA_GENERATOR}' STREQUAL 'CodeBlocks' )
 
+# define and search for metapod library
+SET(WITH_METAPODFROMURDF TRUE)
+SET(model_name "hrp2_14")
+# Define the simple humanoid model for the metapod algorithm
+ADD_SAMPLEURDFMODEL(${model_name})
+
 ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES} ${${PROJECT_NAME}_ABSOLUTE_HEADERS})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
 # Define dependencies
 
+TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name} ${Boost_LIBRARIES})
+message (STATUS "--Boost : " ${Boost_LIBRARIES} )
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta ")
 
 INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})

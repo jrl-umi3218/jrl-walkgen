@@ -21,6 +21,7 @@ INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/lapack.cmake)
 INCLUDE(cmake/cpack.cmake)
 INCLUDE(cmake/boost.cmake)
+INCLUDE(cmake_metapod_configure.cmake)
 INCLUDE(CMakeDependentOption)
 
 # Define properties of the project
@@ -48,6 +49,7 @@ ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
 ################################################################
 ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
 ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
+ADD_OPTIONAL_DEPENDENCY("metapod >= 1.0.7")
 MESSAGE(STATUS "hrp2-dynamics: " ${HRP2_DYNAMICS_FOUND})
 #################################################################
 
