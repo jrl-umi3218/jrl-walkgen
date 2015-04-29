@@ -684,7 +684,6 @@ computing the analytical trajectories. */
         // Filter the trajectory
         deque<COMState> outputDeltaCOMTraj_deq ;
         m_kajitaDynamicFilter->OffLinefilter(
-                    m_CurrentTime,
                     COMStates,
                     ZMPPositions,
                     LeftFootAbsolutePositions,
@@ -967,7 +966,7 @@ computing the analytical trajectories. */
           intRF_ [j] = ctrlRF_ [i] ;
         }
 
-        m_kajitaDynamicFilter->OnLinefilter(time,intCoM_,ctrlZMP_,intLF_,intRF_,outputDeltaCoM_);
+        m_kajitaDynamicFilter->OnLinefilter(intCoM_,ctrlZMP_,intLF_,intRF_,outputDeltaCoM_);
         cout << "timeOnLine = " << time << endl ;
         ctrlCoM_[0].x[0] += aCOMPos.x[0] + outputDeltaCoM_[0].x[0];
         ctrlCoM_[0].x[1] += aCOMPos.x[1] + outputDeltaCoM_[0].x[1];

@@ -67,6 +67,8 @@ private:
   ComAndFootRealization * ComAndFootRealization_;
   SimplePluginManager * SPM ;
   int iteration ;
+  vector<double> err_zmp_x ;
+  vector<double> err_zmp_y ;
 
 public:
   TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
@@ -76,6 +78,8 @@ public:
     SPM = 0 ;
     ComAndFootRealization_ = 0 ;
     iteration = 0 ;
+    err_zmp_x.clear() ;
+    err_zmp_y.clear() ;
   }
 
   ~TestHerdt2010()
@@ -184,13 +188,48 @@ public:
 	os << "<===============================================================>"<<endl;
       }
 
+    ComputeAndDisplayZMPStatistic();
     string lProfileOutput= m_TestName;
     lProfileOutput +="TimeProfile.dat";
     m_clock.writeBuffer(lProfileOutput);
     m_clock.displayStatistics(os,m_OneStep);
-
     // Compare debugging files
     return compareDebugFiles();
+  }
+
+  void ComputeStat(vector<double> vec,double &avg, double &max_abs)
+  {
+    double total = 0.0 ;
+    avg = 0.0 ;
+    max_abs = 0.0 ;
+    for (unsigned int i = 0 ; i < vec.size() ; ++i)
+    {
+      double abs_value = sqrt(vec[i]*vec[i]) ;
+      if( abs_value > max_abs)
+        max_abs = abs_value ;
+
+      total += abs_value ;
+    }
+    avg = total/vec.size() ;
+    return ;
+  }
+
+  void ComputeAndDisplayZMPStatistic()
+  {
+    cout << "Statistic for Dzmp in x : " << endl ;
+    double moy_delta_zmp_x = 0.0 ;
+    double max_abs_err_x = 0.0 ;
+    ComputeStat(err_zmp_x,moy_delta_zmp_x,max_abs_err_x);
+    cout << "average : " << moy_delta_zmp_x << endl ;
+    cout << "maxx error : " << max_abs_err_x << endl ;
+
+    cout << "Statistic for Dzmp in y : " << endl ;
+    double moy_delta_zmp_y = 0.0 ;
+    double max_abs_err_y = 0.0 ;
+    ComputeStat(err_zmp_y,moy_delta_zmp_y,max_abs_err_y);
+    cout << "average : " << moy_delta_zmp_y << endl ;
+    cout << "maxx error : " << max_abs_err_y << endl ;
+    return ;
   }
 
   void init()
@@ -274,6 +313,49 @@ protected:
   void fillInDebugFiles()
   {
     TestObject::fillInDebugFiles();
+
+    /// \brief calculate, from the CoM of computed by the preview control,
+    ///    the corresponding articular position, velocity and acceleration
+    /// ------------------------------------------------------------------
+    MAL_VECTOR_DIM(aCOMState,double,6);
+    MAL_VECTOR_DIM(aCOMSpeed,double,6);
+    MAL_VECTOR_DIM(aCOMAcc,double,6);
+    MAL_VECTOR_DIM(aLeftFootPosition,double,5);
+    MAL_VECTOR_DIM(aRightFootPosition,double,5);
+
+    aCOMState(0) = m_OneStep.finalCOMPosition.x[0];      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
+    aCOMState(1) = m_OneStep.finalCOMPosition.y[0];      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
+    aCOMState(2) = m_OneStep.finalCOMPosition.z[0];      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
+    aCOMState(3) = m_OneStep.finalCOMPosition.roll[0] /**180/M_PI*/;  aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1] /**180/M_PI*/;  aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2] /**180/M_PI*/;
+    aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0]/**180/M_PI*/;  aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1]/**180/M_PI*/;  aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2]/**180/M_PI*/;
+    aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0]  /**180/M_PI*/;  aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1]  /**180/M_PI*/;  aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2]  /**180/M_PI*/;
+
+    aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
+    aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
+    aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
+    aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
+    aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
+    ComAndFootRealization_->setSamplingPeriod(0.005);
+    ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
+                                                                    aLeftFootPosition,
+                                                                    aRightFootPosition,
+                                                                    m_CurrentConfiguration,
+                                                                    m_CurrentVelocity,
+                                                                    m_CurrentAcceleration,
+                                                                    20,
+                                                                    1);
+
+    m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
+    m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
+
+    m_HDR->currentConfiguration(m_CurrentConfiguration);
+    m_HDR->currentVelocity(m_CurrentVelocity);
+    m_HDR->currentAcceleration(m_CurrentAcceleration);
+    m_HDR->computeCenterOfMassDynamics();
+    vector3d zmpmb = m_HDR->zeroMomentumPoint();
+    err_zmp_x.push_back(zmpmb(0)-m_OneStep.ZMPTarget(0)) ;
+    err_zmp_y.push_back(zmpmb(1)-m_OneStep.ZMPTarget(1)) ;
+
     if (m_DebugFGPI)
       {
         static int inc = 0 ;
@@ -332,44 +414,13 @@ protected:
             << filterprecision(m_OneStep.RightFootPosition.dtheta ) << " "                // 41
             << filterprecision(m_OneStep.RightFootPosition.ddtheta ) << " "               // 42
             << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 43
-            << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "              ;// 44
+            << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 44
+            << filterprecision(zmpmb(0)) << " "                                           // 45
+            << filterprecision(zmpmb(1)) << " "                                           // 46
+            << filterprecision(zmpmb(2)) << " "                                          ;// 47
         aof << endl;
         aof.close();
     }
-
-    /// \brief calculate, from the CoM of computed by the preview control,
-    ///    the corresponding articular position, velocity and acceleration
-    /// ------------------------------------------------------------------
-    MAL_VECTOR_DIM(aCOMState,double,6);
-    MAL_VECTOR_DIM(aCOMSpeed,double,6);
-    MAL_VECTOR_DIM(aCOMAcc,double,6);
-    MAL_VECTOR_DIM(aLeftFootPosition,double,5);
-    MAL_VECTOR_DIM(aRightFootPosition,double,5);
-
-    aCOMState(0) = m_OneStep.finalCOMPosition.x[0];      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
-    aCOMState(1) = m_OneStep.finalCOMPosition.y[0];      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
-    aCOMState(2) = m_OneStep.finalCOMPosition.z[0];      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
-    aCOMState(3) = m_OneStep.finalCOMPosition.roll[0]*180/M_PI;   aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1]*180/M_PI;   aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2]*180/M_PI;
-    aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0]*180/M_PI;  aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1]*180/M_PI;  aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2]*180/M_PI;
-    aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0]*180/M_PI;    aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1]*180/M_PI;    aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2]*180/M_PI;
-
-    aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
-    aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
-    aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
-    aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
-    aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
-    ComAndFootRealization_->setSamplingPeriod(0.005);
-    ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
-                                                                    aLeftFootPosition,
-                                                                    aRightFootPosition,
-                                                                    m_CurrentConfiguration,
-                                                                    m_CurrentVelocity,
-                                                                    m_CurrentAcceleration,
-                                                                    20,
-                                                                    1);
-
-    m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
-    m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
 
     /// \brief Create file .hip .pos .zmp
     /// --------------------

@@ -323,29 +323,14 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
   m_Coherent = true;
 }
 
-int PreviewControl::OneIterationOfPreview(MAL_MATRIX( & x, double),
-					  MAL_MATRIX( & y, double),
+int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
+					  MAL_MATRIX(& y, double),
 					  double & sxzmp, double & syzmp,
 					  deque<PatternGeneratorJRL::ZMPPosition> & ZMPPositions,
 					  unsigned int lindex,
 					  double & zmpx2, double & zmpy2,
 					  bool Simulation)
 {
-  ofstream aof;
-  string aFileName;
-  static int iteration = 0 ;
-  ostringstream oss(std::ostringstream::ate);
-  oss.str("optimalControl.txt");
-  aFileName = oss.str();
-  if ( iteration == 0 )
-  {
-    aof.open(aFileName.c_str(),ofstream::out);
-    aof.close();
-  }
-
-  aof.open(aFileName.c_str(),ofstream::app);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
 
   double ux=0.0, uy=0.0;
 
@@ -355,34 +340,19 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( & x, double),
   r = MAL_RET_A_by_B(m_Kx,x);
   ux = - r(0,0) + m_Ks * sxzmp ;
 
-  aof << ux << " " ;       // 1
-  aof << sxzmp << " " ;       // 2
-  aof << x(0,0) << " " ;       // 3
-  aof << x(1,0) << " " ;       // 4
-  aof << x(2,0) << " " ;       // 5
-  aof << r(0,0) << " " ;       // 6
-  aof << ZMPPositions[lindex].px << " " ;// 7
-  aof << ZMPPositions[lindex].py << " " ;// 8
-
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
-  {
-    LTHROW("ZMPPositions.size()<m_SizeOfPreviewWindow:" );
-  }
+    {
+      LTHROW("ZMPPositions.size()<m_SizeOfPreviewWindow:" );
+    }
 
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
     ux += m_F(i,0)* ZMPPositions[lindex+i].px;
 
-  aof << ux << " " ;       // 9
-
   r = MAL_RET_A_by_B(m_Kx, y);
   uy = - r(0,0) + m_Ks * syzmp;
 
-  //aof << uy << " " ;       // 10
-
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
     uy += m_F(i,0)* ZMPPositions[lindex+i].py;
-
-  //aof << uy << " " ;       // 11
 
   x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
   y = MAL_RET_A_by_B(m_A,y) + uy * m_B;
@@ -401,29 +371,6 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( & x, double),
     }
 
 
-  aof << endl ;
-  aof.close();
-
-  oss.str("/tmp/bufferPC_");
-  oss << setfill('0') << setw(3) << iteration << ".txt" ;
-  aFileName = oss.str();
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.close();
-
-  aof.open(aFileName.c_str(),ofstream::app);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
-  {
-    aof << i                         << " " ;           // 0
-    aof << ZMPPositions[lindex+i].px << " " ;           // 1
-    aof << ZMPPositions[lindex+i].py << " " ;           // 2
-    aof << m_F(i,0) << " " ;           // 3
-    aof << endl ;
-  }
-  aof.close();
-
-  ++iteration;
 
   return 0;
 }

@@ -79,10 +79,10 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
   InterpolationPeriod_ = QP_T_/2;
-  previewDuration_ = 1.6 ;
+  previewDuration_ = 1.4 ;
   NbSampleControl_ = (int)round(QP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(QP_T_/InterpolationPeriod_) ;
-  previewSize_ = (int)round(previewDuration_/QP_T_) ;
+  previewSize_ = QP_N_ ;
   StepPeriod_ = 0.8 ;
   SSPeriod_ = 0.7 ;
   DSPeriod_ = 0.1 ;
@@ -466,10 +466,10 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   FinalCurrentStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
 
   dynamicFilter_->init(m_SamplingPeriod,
-                       m_SamplingPeriod,//InterpolationPeriod_, again temporary trick
+                       InterpolationPeriod_,
                        QP_T_,
-                       QP_N_,
-                       previewDuration_ - 2*QP_T_,
+                       (int)round((previewDuration_+QP_T_)  / QP_T_ ),
+                       previewDuration_,
                        lStartingCOMState);
   return 0;
 }
@@ -578,13 +578,12 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
     DynamicFilterInterpolation(time);
 
-    unsigned int IndexMax = (int)round(previewDuration_  / m_SamplingPeriod/*InterpolationPeriod_*/);
+    unsigned int IndexMax = (int)round((previewDuration_+QP_T_)  / InterpolationPeriod_ );
     ZMPTraj_deq_.resize(IndexMax);
     COMTraj_deq_.resize(IndexMax);
     LeftFootTraj_deq_.resize(IndexMax);
     RightFootTraj_deq_.resize(IndexMax);
     int inc =  (int)round(InterpolationPeriod_ / m_SamplingPeriod) ;
-    inc = 1 ; // warning this is temporary trick
     for (unsigned int i = 0 , j = 0 ; j < IndexMax ; i = i + inc , ++j )
     {
       ZMPTraj_deq_[j] = ZMPTraj_deq_ctrl_[i] ;
@@ -596,13 +595,12 @@ void ZMPVelocityReferencedQP::OnLine(double time,
     bool filterOn_ = true ;
     if(filterOn_)
     {
-      dynamicFilter_->OnLinefilter(time,
-                                   COMTraj_deq_,ZMPTraj_deq_ctrl_,
+      dynamicFilter_->OnLinefilter(COMTraj_deq_,ZMPTraj_deq_ctrl_,
                                    LeftFootTraj_deq_,
                                    RightFootTraj_deq_,
                                    deltaCOMTraj_deq_);
 
-      #define DEBUG
+      //#define DEBUG
       #ifdef DEBUG
         dynamicFilter_->Debug(COMTraj_deq_ctrl_,
                               LeftFootTraj_deq_ctrl_,

@@ -1,5 +1,4 @@
 #include "DynamicFilter.hh"
-#include <metapod/algos/rnea.hh>
 #include <iomanip>
 using namespace std;
 using namespace PatternGeneratorJRL;
@@ -26,7 +25,7 @@ DynamicFilter::DynamicFilter(
   comAndFootRealization_->Initialization();
 
   PC_ = new PreviewControl(
-        SPM,OptimalControllerSolver::MODE_WITHOUT_INITIALPOS,false);
+        SPM,OptimalControllerSolver::MODE_WITH_INITIALPOS,false);
   CoMHeight_ = 0.0 ;
 
   deltaZMP_deq_.clear();
@@ -106,7 +105,7 @@ void DynamicFilter::init(
   PC_->SetPreviewControlTime (previewWindowSize_);
   PC_->SetSamplingPeriod (controlPeriod_);
   PC_->SetHeightOfCoM(CoMHeight_);
-  PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
+  PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
 
   deltaZMP_deq_.resize( (int)round((PG_N_-1)*NCtrl_));
   ZMPMB_vec_.resize( (int)round(PG_N_*NbI_), vector<double>(2));
@@ -166,7 +165,6 @@ void DynamicFilter::init(
 }
 
 int DynamicFilter::OffLinefilter(
-    const double currentTime,
     const deque<COMState> &inputCOMTraj_deq_,
     const deque<ZMPPosition> &inputZMPTraj_deq_,
     const deque<FootAbsolutePosition> &inputLeftFootTraj_deq_,
@@ -191,10 +189,6 @@ int DynamicFilter::OffLinefilter(
     {
       deltaZMP_deq_[i].px = inputZMPTraj_deq_[i].px - ZMPMB_vec_[i][0] ;
       deltaZMP_deq_[i].py = inputZMPTraj_deq_[i].py - ZMPMB_vec_[i][1] ;
-      deltaZMP_deq_[i].pz = 0.0 ;
-      deltaZMP_deq_[i].theta = 0.0 ;
-      deltaZMP_deq_[i].time = currentTime + i * interpolationPeriod_ ;
-      deltaZMP_deq_[i].stepType = inputZMPTraj_deq_[i].stepType ;
     }
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq) ;
 
@@ -202,7 +196,6 @@ int DynamicFilter::OffLinefilter(
 }
 
 int DynamicFilter::OnLinefilter(
-    const double currentTime,
     const deque<COMState> & inputCOMTraj_deq_,
     const deque<ZMPPosition> inputZMPTraj_deq_,
     const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
@@ -228,30 +221,29 @@ int DynamicFilter::OnLinefilter(
         }
   }
 
-  zmpmb_i_ = ZMPMB_vec_ ;
-  unsigned int N1 = zmpmb_i_.size() ;
-//  int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
-//  zmpmb_i_.resize( N*inc+1 , vector<double>(2) ) ;
-//  for(unsigned int i = 0 ; i < N-1 ; ++i)
-//    {
-//      zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
-//    }
-//  zmpmb_i_.back() = ZMPMB_vec_.back() ;
-//  for(unsigned int i = 0 ; i < N-1 ; ++i)
-//  {
-//    double xA = zmpmb_i_[i*inc][0] ;
-//    double yA = zmpmb_i_[i*inc][1] ;
-//    double tA = i*inc ;
-//    double xB = zmpmb_i_[(i+1)*inc][0] ;
-//    double yB = zmpmb_i_[(i+1)*inc][1] ;
-//    double tB = (i+1)*inc ;
-//    for(int j = 1 ; j < inc ; ++j)
-//      {
-//        double t = tA+j ;
-//        zmpmb_i_[(i*inc)+j][0] = xA + (t-tA)*(xB-xA)/(tB-tA) ;
-//        zmpmb_i_[(i*inc)+j][1] = yA + (t-tA)*(yB-yA)/(tB-tA) ;
-//      }
-//  }
+  int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
+  unsigned int N1 = N*inc+1 ;
+  zmpmb_i_.resize( N1 , vector<double>(2) ) ;
+  for(unsigned int i = 0 ; i < N-1 ; ++i)
+    {
+      zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
+    }
+  zmpmb_i_.back() = ZMPMB_vec_.back() ;
+  for(unsigned int i = 0 ; i < N-1 ; ++i)
+  {
+    double xA = zmpmb_i_[i*inc][0] ;
+    double yA = zmpmb_i_[i*inc][1] ;
+    double tA = i*inc ;
+    double xB = zmpmb_i_[(i+1)*inc][0] ;
+    double yB = zmpmb_i_[(i+1)*inc][1] ;
+    double tB = (i+1)*inc ;
+    for(int j = 1 ; j < inc ; ++j)
+      {
+        double t = tA+j ;
+        zmpmb_i_[(i*inc)+j][0] = xA + (t-tA)*(xB-xA)/(tB-tA) ;
+        zmpmb_i_[(i*inc)+j][1] = yA + (t-tA)*(yB-yA)/(tB-tA) ;
+      }
+  }
 
   comAndFootRealization_->SetPreviousConfigurationStage1(previousZMPMBConfiguration_);
   comAndFootRealization_->SetPreviousVelocityStage1(previousZMPMBVelocity_);
@@ -411,7 +403,7 @@ int DynamicFilter::OptimalControl(
     PC_->OneIterationOfPreview(deltax_,deltay_,
                                sxzmp,syzmp,
                                inputdeltaZMP_deq,i,
-                               deltaZMPx, deltaZMPy, true);
+                               deltaZMPx, deltaZMPy, false);
 
     sxzmp_[i] = sxzmp ;
     syzmp_[i] = syzmp ;
@@ -424,7 +416,6 @@ int DynamicFilter::OptimalControl(
       outputDeltaCOMTraj_deq_[i].y[j] = deltay_(j,0);
     }
   }
-  cout << sxzmp_.size() << " ; " << NCtrl_  << " ; "  << PC_->SamplingPeriod() << endl;
   // test to verify if the Kajita PC diverged
   for (unsigned int i = 0 ; i < NCtrl_ ; i++)
     {
@@ -638,7 +629,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   {
       InverseKinematics( CoM_tmp[i], ctrlLeftFoot[i], ctrlRightFoot[i],
                          ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
-                         controlPeriod_, 2, i) ;
+                         controlPeriod_, 2, 20) ;
 
       InverseDynamics(ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_);
 

@@ -55,7 +55,6 @@ namespace PatternGeneratorJRL
     ~DynamicFilter();
     /// \brief
     int OffLinefilter(
-        const double currentTime,
         const deque<COMState> & inputCOMTraj_deq_,
         const deque<ZMPPosition> & inputZMPTraj_deq_,
         const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
@@ -65,7 +64,7 @@ namespace PatternGeneratorJRL
         const vector<MAL_VECTOR_TYPE(double) > &UpperPart_ddq,
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
-    int OnLinefilter(const double currentTime,
+    int OnLinefilter(
         const deque<COMState> & inputCOMTraj_deq_,
         const deque<ZMPPosition> inputZMPTraj_deq_,
         const deque<FootAbsolutePosition> & inputLeftFootTraj_deq_,
