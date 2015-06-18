@@ -466,11 +466,15 @@ protected:
     void generateEvent()
     {return;}
 
-    void SpecializedRobotConstructor(CjrlHumanoidDynamicRobot *& aHDR)
+    void SpecializedRobotConstructor( CjrlHumanoidDynamicRobot *& aHDR )
     {
-        dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
-        Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot( &aRobotDynamicsObjectConstructor );
-        aHDR = aHRP2HDR;
+      aHDR = NULL ;
+
+#ifdef WITH_HRP2DYNAMICS
+      dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
+      Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot( &aRobotDynamicsObjectConstructor );
+      aHDR = aHRP2HDR;
+#endif
     }
 
 //    void fillInDebugFiles( )
@@ -566,14 +570,6 @@ protected:
 
 //        iteration++;
 //    }
-
-    void SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR, CjrlHumanoidDynamicRobot *& aDebugHDR )
-    {
-        dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
-        Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot( &aRobotDynamicsObjectConstructor );
-        aHDR = aHRP2HDR;
-        aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
-    }
 
     double filterprecision(double adb)
     {

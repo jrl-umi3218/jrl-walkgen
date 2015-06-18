@@ -608,7 +608,7 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
   aFootAbsolutePosition.ddtheta = m_PolynomeTheta->ComputeSecDerivative(timeOfInterpolation);
 
   // Trajectory of the foot compute in the Z domain (plane Z of t)
-  m_BsplinesZ->Compute(timeOfInterpolation,
+  m_BsplinesZ->Compute(Time,
                        aFootAbsolutePosition.z,
                        aFootAbsolutePosition.dz,
                        aFootAbsolutePosition.ddz);

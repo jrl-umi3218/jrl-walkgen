@@ -236,6 +236,8 @@ namespace PatternGeneratorJRL
     deque<FootAbsolutePosition> LeftFootTraj_deq_ctrl_ ;
     deque<FootAbsolutePosition> RightFootTraj_deq_ctrl_ ;
 
+    /// \brief used to predict the next step using the current solution
+    /// allow the computation of the complete preview
     vector< vector<double> > FootPrw_vec ;
 
     /// \brief Index where to begin the interpolation

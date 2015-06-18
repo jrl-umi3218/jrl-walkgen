@@ -42,7 +42,7 @@
 #include <jrl/dynamics/dynamicsfactory.hh>
 
 #ifdef WITH_HRP2DYNAMICS
-#include <hrp2Dynamics/hrp2OptHumanoidDynamicRobot.h>
+#include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
 #endif
 
 #include <jrl/walkgen/patterngeneratorinterface.hh>

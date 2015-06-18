@@ -119,7 +119,7 @@ namespace PatternGeneratorJRL
 
     m_FilteringActivate = true;
 
-    m_CoMpolynomeZ = new Polynome5(0.0,0.0);
+    m_CoMbsplinesZ = new BSplinesFoot() ;
     m_ZMPpolynomeZ = new Polynome3(0.0,0.0);
     DFpreviewWindowSize_ = 0.0 ;
 
@@ -547,12 +547,17 @@ computing the analytical trajectories. */
     MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
     m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
 
-    InitLeftFootAbsolutePosition.x +=  lAnklePositionLeft(0)  + CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
-    InitLeftFootAbsolutePosition.y +=  lAnklePositionLeft(1)  + CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
-    InitLeftFootAbsolutePosition.z +=  lAnklePositionLeft(2)  + CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
-    InitRightFootAbsolutePosition.x += lAnklePositionRight(0) + CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
-    InitRightFootAbsolutePosition.y += lAnklePositionRight(1) + CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
-    InitRightFootAbsolutePosition.z += lAnklePositionRight(2) + CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
+    cout << InitRightFootAbsolutePosition.z << " "
+         << lAnklePositionRight(2) << " "
+         << CurPosWICF_homogeneous [2] << " "
+         << lStartingCOMState.z[0] << endl  ;
+
+    InitLeftFootAbsolutePosition.x +=  lAnklePositionLeft(0)  ;
+    InitLeftFootAbsolutePosition.y +=  lAnklePositionLeft(1)  ;
+    InitLeftFootAbsolutePosition.z +=  lAnklePositionLeft(2)  ;
+    InitRightFootAbsolutePosition.x += lAnklePositionRight(0) ;
+    InitRightFootAbsolutePosition.y += lAnklePositionRight(1) ;
+    InitRightFootAbsolutePosition.z += lAnklePositionRight(2) ;
 
     m_RelativeFootPositions = RelativeFootPositions;
     /* This part computes the CoM and ZMP trajectory giving the foot position information.
@@ -819,8 +824,9 @@ computing the analytical trajectories. */
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
 
-    DFpreviewWindowSize_ = 1.6 - m_SamplingPeriod ; //second
-    m_kajitaDynamicFilter->init( m_SamplingPeriod, 0.05, m_SamplingPeriod, 1, DFpreviewWindowSize_,
+    double previewWindowSize = 1.6 ;
+    DFpreviewWindowSize_ = previewWindowSize - 0.05 ; //second
+    m_kajitaDynamicFilter->init( m_SamplingPeriod, 0.05, previewWindowSize, 1, DFpreviewWindowSize_,
                                  lStartingCOMState );
 
     return m_RelativeFootPositions.size();
@@ -2555,7 +2561,7 @@ new step has to be generate.
       m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1],lIndexInterval);
       m_AnalyticalZMPCoGTrajectoryY->ComputeCOMAcceleration(t,aCOMPos.y[2],lIndexInterval);
 
-      ComputeCoMz(t,aCOMPos);
+      ComputeCoMz(t,aCOMPos, FinalCoMPositions);
 
       aCOMPos.yaw[0] = 0.5*(LeftFootAbsPos.theta + RightFootAbsPos.theta);
       aCOMPos.yaw[1] = 0.5*(LeftFootAbsPos.dtheta + RightFootAbsPos.dtheta);
@@ -2572,7 +2578,7 @@ new step has to be generate.
   }
 
 
-  void AnalyticalMorisawaCompact::ComputeCoMz(double t, COMState &CoM)
+  void AnalyticalMorisawaCompact::ComputeCoMz(double t, COMState &CoM, deque<COMState> & FinalCoMPositions)
   {
     double* CoMz = CoM.z ;
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
@@ -2609,6 +2615,8 @@ new step has to be generate.
     // double static CoMzpre = CoMz;
     double up=0.1,upRight = 1.1 ,upLeft = 0.0;
     double down = 0.1, downRight = 0.90, downLeft = 0.1;
+    vector<double> MP ; MP.clear() ;
+    vector<double> ToMP ; ToMP.clear() ;
 
     // some variables renaming which improve the readibility
     double absFootz_0 = m_AbsoluteSupportFootPositions[Index].z - corrZ(2);
@@ -2619,8 +2627,18 @@ new step has to be generate.
         absFootz_2 = m_AbsoluteSupportFootPositions[Index-2].z - corrZ(2);
       }
     double SStime = m_RelativeFootPositions[Index].SStime ;
+    double DStime = m_RelativeFootPositions[Index].DStime ;
+    double absFootx_0 = m_AbsoluteSupportFootPositions[Index].x ;
+    double absFootx_1 = m_AbsoluteSupportFootPositions[Index-1].x ;
+    double absFooty_0 = m_AbsoluteSupportFootPositions[Index].y ;
+    double absFooty_1 = m_AbsoluteSupportFootPositions[Index-1].y ;
+    double dx = absFootx_0 - absFootx_1 ;
+    double dy = absFooty_0 - absFooty_1 ;
+    double sx = m_RelativeFootPositions[Index].sx ;
+    double sy = m_RelativeFootPositions[Index].sy ;
+    COMState LastCoM = FinalCoMPositions.back() ;
 
-    double FinalTime(0.0), InitPos(0.0), InitSpeed(0.0), FinalPos(0.0), interpolationTime(0.0);
+    double FinalTime(0.0), InitPos(0.0), InitSpeed(0.0), InitAcc(0.0), FinalPos(0.0), interpolationTime(0.0);
 
     // climbing
     // put first leg on the stairs with decrease of CoM //up// of stair height
@@ -2640,7 +2658,7 @@ new step has to be generate.
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight + absFootz_1 - up*deltaZ;
 
-        m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
+        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
 
         interpolationTime = t-Index*moving_time - upLeft*SStime ;
       }
@@ -2652,7 +2670,7 @@ new step has to be generate.
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight + absFootz_0 ;
 
-        m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
+        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
 
         interpolationTime = t-Index*moving_time - upLeft*SStime ;
       }
@@ -2673,7 +2691,7 @@ new step has to be generate.
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight +  absFootz_0 - down*deltaZ ;
 
-        m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
+        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
 
         interpolationTime = t-Index*moving_time - downLeft*SStime ;
       }
@@ -2685,7 +2703,7 @@ new step has to be generate.
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight + absFootz_0 ;
 
-        m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
+        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
 
         interpolationTime = t-Index*moving_time - downLeft*SStime ;
       }
@@ -2694,16 +2712,43 @@ new step has to be generate.
     else
       {
         FinalTime = moving_time ;
-        InitPos = m_InitialPoseCoMHeight + absFootz_0 ;
         InitSpeed = 0.0 ;
-        FinalPos = m_InitialPoseCoMHeight + absFootz_0 ;
         interpolationTime = t-Index*moving_time ;
-        m_CoMpolynomeZ->SetParametersWithInitPosInitSpeed(FinalTime,FinalPos,InitPos,InitSpeed);
+        double initCoMheight = m_InitialPoseCoMHeight + absFootz_0 ;
+        double lowerCoMheight = 0.95*m_InitialPoseCoMHeight + absFootz_0 ;
+        InitPos = initCoMheight ;
+        FinalPos = initCoMheight ;
+
+
+        if(sx*sx+sy*sy > 0.2*0.2)
+        {
+          if(LastCoM.z[0] >= lowerCoMheight + 0.00001 || LastCoM.z[0] <= lowerCoMheight - 0.00001)
+          {
+            FinalTime = SStime ;
+            FinalPos = lowerCoMheight ;
+          }else{
+            InitPos = lowerCoMheight ;
+            FinalPos = lowerCoMheight ;
+          }
+        }else if (LastCoM.z[0] >= initCoMheight + 0.00001 || LastCoM.z[0] <= initCoMheight - 0.00001)
+        {
+          FinalTime = SStime ;
+          InitPos = lowerCoMheight ;
+        }
+
+        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
       }
 
-    CoMz[0] = m_CoMpolynomeZ->Compute(interpolationTime) ;
-    CoMz[1] = m_CoMpolynomeZ->ComputeDerivative(interpolationTime) ;
-    CoMz[2] = m_CoMpolynomeZ->ComputeSecDerivative(interpolationTime) ;
+    cout << "relative position : "
+         << sx << " "
+         << sy << " "
+         << dx << " "
+         << dy << " "
+         << SStime << " "
+         << m_AbsoluteSupportFootPositions[Index].time << " "
+         << m_AbsoluteSupportFootPositions[Index-1].time << " " << endl ;
+
+    m_CoMbsplinesZ->Compute(interpolationTime,CoMz[0],CoMz[1],CoMz[2]) ;
   }
 
   void AnalyticalMorisawaCompact::ComputeZMPz(double t,

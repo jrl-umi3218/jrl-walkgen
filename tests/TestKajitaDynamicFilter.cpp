@@ -29,7 +29,6 @@
 #include "CommonTools.hh"
 #include "TestObject.hh"
 #include <jrl/walkgen/pgtypes.hh>
-#include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
 #include <ZMPRefTrajectoryGeneration/DynamicFilter.hh>
 
 
@@ -291,9 +290,13 @@ protected:
 
   void SpecializedRobotConstructor(CjrlHumanoidDynamicRobot *& aHDR)
   {
+    aHDR = NULL ;
+
+#ifdef WITH_HRP2DYNAMICS
     dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
     Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot( &aRobotDynamicsObjectConstructor );
     aHDR = aHRP2HDR;
+#endif
   }
 
   void initIK()
@@ -428,14 +431,6 @@ protected:
     aof.close();
 
     iteration++;
-  }
-
-  void SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR, CjrlHumanoidDynamicRobot *& aDebugHDR )
-  {
-    dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
-    Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot( &aRobotDynamicsObjectConstructor );
-    aHDR = aHRP2HDR;
-    aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
   }
 
   double filterprecision(double adb)

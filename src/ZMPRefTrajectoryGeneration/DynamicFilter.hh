@@ -45,9 +45,6 @@ namespace PatternGeneratorJRL
   {
   public: // Public methods
 
-    // to use the vector of eigen used by metapod
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
     /// \brief
     DynamicFilter(SimplePluginManager *SPM,
                   CjrlHumanoidDynamicRobot *aHS
@@ -228,6 +225,9 @@ namespace PatternGeneratorJRL
 
       /// Class that compute the dynamic and kinematic of the robot
       CjrlHumanoidDynamicRobot * cjrlHDR_ ;
+      Robot_Model hrp2_14_ ;
+      Robot_Model::confVector q_,dq_,ddq_;
+      Force_HRP2_14 com_tensor_ ;
 
       /// \brief Buffers the ZMP Multibody computed
       /// from the inverse Dynamics, and the difference between
@@ -259,7 +259,10 @@ namespace PatternGeneratorJRL
       const unsigned int stage0_ ;
       const unsigned int stage1_ ;
 
-    public : // debug functions
+    public : // debug functions      
+      // to use the vector of eigen used by metapod
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
       void Debug(const deque<COMState> & ctrlCoMState,
                  const deque<FootAbsolutePosition> & ctrlLeftFoot,
                  const deque<FootAbsolutePosition> & ctrlRightFoot,

@@ -45,7 +45,6 @@
 #include <jrl/dynamics/dynamicsfactory.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
-#include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
 
 #include "CommonTools.hh"
 #include "ClockCPUTime.hh"

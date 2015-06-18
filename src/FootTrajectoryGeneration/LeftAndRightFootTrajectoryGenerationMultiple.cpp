@@ -45,7 +45,8 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
 
   /** m_StepHeight and m_StepCurving definition -- To Modify*/
   m_StepHeight = 0.05;
-  m_StepCurving = 0.19;  // Heuristic value
+  m_StepCurving = 0.15;  // Heuristic value
+  m_WayPointThreshold = 0.020 ;  /*19cm (squared) from the line*/
 
   m_LeftFootTrajectory = new FootTrajectoryGenerationMultiple(lSPM,m_Foot);
   m_RightFootTrajectory = new FootTrajectoryGenerationMultiple(lSPM,m_Foot);
@@ -129,7 +130,7 @@ void LeftAndRightFootTrajectoryGenerationMultiple::SetAnInterval(unsigned int In
 	  << FootFinalPosition.z << "," << FootInitialPosition.z << "," << FootInitialPosition.dz << ")");
   aFTGM->SetNatureInterval(IntervalIndex,FootFinalPosition.stepType);
 
-  double ModulationSupportCoefficient = 1.0;
+  double ModulationSupportCoefficient = 0.7;
   double UnlockedSwingPeriod = m_DeltaTj[IntervalIndex] * ModulationSupportCoefficient;
 
   // X axis.
@@ -517,7 +518,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
               {
                 dc = -(dx * InitPos(0) + dy *InitPos(1)) ;
                 distSquareToLine = (dx*currSupp(0)  + dy*currSupp(1) + dc)*(dx*currSupp(0)  + dy*currSupp(1) + dc)/(dx*dx + dy*dy);
-                if( distSquareToLine < 0.035 /*19cm (squared) from the line*/ )
+                if( distSquareToLine < m_WayPointThreshold )
                   {
                     m_MiddleWayPoint = MAL_RET_A_by_B(Orientation, relWayPoint) + currSupp  ;
                   }

@@ -347,28 +347,29 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   // --------------------------
   CurrentLeftFootAbsPos = InitLeftFootAbsolutePosition;
   CurrentRightFootAbsPos = InitRightFootAbsolutePosition;
-  vector3d lAnklePositionRight,lAnklePositionLeft;
-  CjrlFoot *LeftFoot, *RightFoot;
-  LeftFoot = HDR_->leftFoot();
-  if (LeftFoot==0)
-    LTHROW("No left foot");
+//  vector3d lAnklePositionRight,lAnklePositionLeft;
+//  CjrlFoot *LeftFoot, *RightFoot;
+//  LeftFoot = HDR_->leftFoot();
+//  if (LeftFoot==0)
+//    LTHROW("No left foot");
 
-  RightFoot = HDR_->rightFoot();
-  if (RightFoot==0)
-    LTHROW("No right foot");
+//  RightFoot = HDR_->rightFoot();
+//  if (RightFoot==0)
+//    LTHROW("No right foot");
 
-  LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
-  RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
+//  LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
+//  RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
 
-  MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
-  dynamicFilter_->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
+//  MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
+//  dynamicFilter_->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
 
-  CurrentLeftFootAbsPos.x +=  lAnklePositionLeft(0)  + CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
-  CurrentLeftFootAbsPos.y +=  lAnklePositionLeft(1)  + CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
-  CurrentLeftFootAbsPos.z +=  lAnklePositionLeft(2)  + CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
-  CurrentRightFootAbsPos.x += lAnklePositionRight(0) + CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
-  CurrentRightFootAbsPos.y += lAnklePositionRight(1) + CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
-  CurrentRightFootAbsPos.z += lAnklePositionRight(2) + CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
+//  CurrentLeftFootAbsPos.x +=  CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
+//  CurrentLeftFootAbsPos.y +=  CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
+//  CurrentLeftFootAbsPos.z +=  CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
+
+//  CurrentRightFootAbsPos.x += CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
+//  CurrentRightFootAbsPos.y += CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
+//  CurrentRightFootAbsPos.z += CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
 
   // FILL THE QUEUES:
   // ----------------
@@ -411,7 +412,6 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
   // INITIAL SUPPORT STATE:
   // ----------------------
-  //TODO check init with left foot (divergence)
   support_state_t CurrentSupport;
   CurrentSupport.Phase = DS;
   CurrentSupport.Foot = LEFT;
@@ -588,6 +588,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
     {
       ZMPTraj_deq_[j] = ZMPTraj_deq_ctrl_[i] ;
       COMTraj_deq_[j] = COMTraj_deq_ctrl_[i] ;
+      COMTraj_deq_[j].roll[0]  = 180/M_PI* COMTraj_deq_ctrl_[i].roll[0] ;
+      COMTraj_deq_[j].pitch[0] = 180/M_PI* COMTraj_deq_ctrl_[i].pitch[0] ;
+      COMTraj_deq_[j].yaw[0]   = 180/M_PI* COMTraj_deq_ctrl_[i].yaw[0] ;
       LeftFootTraj_deq_[j] = LeftFootTraj_deq_ctrl_[i] ;
       RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
     }
@@ -600,7 +603,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
                                    RightFootTraj_deq_,
                                    deltaCOMTraj_deq_);
 
-      //#define DEBUG
+      #define DEBUG
       #ifdef DEBUG
         dynamicFilter_->Debug(COMTraj_deq_ctrl_,
                               LeftFootTraj_deq_ctrl_,

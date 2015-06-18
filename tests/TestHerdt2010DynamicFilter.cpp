@@ -33,6 +33,8 @@
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 
 #include <metapod/models/hrp2_14/hrp2_14.hh>
+#include <ZMPRefTrajectoryGeneration/DynamicFilter.hh>
+#include <metapod/algos/rnea.hh>
 #ifndef METAPOD_INCLUDES
 #define METAPOD_INCLUDES
 // metapod includes
@@ -69,6 +71,12 @@ private:
   int iteration ;
   vector<double> err_zmp_x ;
   vector<double> err_zmp_y ;
+
+  /// Class that compute the dynamic and kinematic of the robot
+  CjrlHumanoidDynamicRobot * cjrlHDR_ ;
+  Robot_Model hrp2_14_ ;
+  Robot_Model::confVector q_,dq_,ddq_;
+  Force_HRP2_14 com_tensor_ ;
 
 public:
   TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
@@ -310,6 +318,23 @@ protected:
     ComAndFootRealization_->Initialization();
   }
 
+  void prepareDebugFiles()
+  {
+    TestObject::prepareDebugFiles() ;
+    if (m_DebugFGPI)
+    {
+      static int inc = 0 ;
+      ofstream aof;
+      string aFileName;
+      aFileName = m_TestName;
+      aFileName += "TestFGPIFull.dat";
+      if (m_OneStep.NbOfIt==1)
+      {
+        aof.open(aFileName.c_str(),ofstream::out);
+      }
+    }
+  }
+
   void fillInDebugFiles()
   {
     TestObject::fillInDebugFiles();
@@ -326,9 +351,9 @@ protected:
     aCOMState(0) = m_OneStep.finalCOMPosition.x[0];      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
     aCOMState(1) = m_OneStep.finalCOMPosition.y[0];      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
     aCOMState(2) = m_OneStep.finalCOMPosition.z[0];      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
-    aCOMState(3) = m_OneStep.finalCOMPosition.roll[0] /**180/M_PI*/;  aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1] /**180/M_PI*/;  aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2] /**180/M_PI*/;
-    aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0]/**180/M_PI*/;  aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1]/**180/M_PI*/;  aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2]/**180/M_PI*/;
-    aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0]  /**180/M_PI*/;  aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1]  /**180/M_PI*/;  aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2]  /**180/M_PI*/;
+    aCOMState(3) = m_OneStep.finalCOMPosition.roll[0]  * 180/M_PI  ;  aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1] /** * 180/M_PI  */ ;  aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2]/** * 180/M_PI  */ ;
+    aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0] * 180/M_PI  ;  aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1]/** * 180/M_PI  */ ;  aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2]/** * 180/M_PI  */ ;
+    aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0] *180/M_PI;  aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1]/** * 180/M_PI  */ ; aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2] /** * 180/M_PI  */;
 
     aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
     aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
@@ -348,13 +373,25 @@ protected:
     m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
     m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
 
-    m_HDR->currentConfiguration(m_CurrentConfiguration);
-    m_HDR->currentVelocity(m_CurrentVelocity);
-    m_HDR->currentAcceleration(m_CurrentAcceleration);
-    m_HDR->computeCenterOfMassDynamics();
-    vector3d zmpmb = m_HDR->zeroMomentumPoint();
-    err_zmp_x.push_back(zmpmb(0)-m_OneStep.ZMPTarget(0)) ;
-    err_zmp_y.push_back(zmpmb(1)-m_OneStep.ZMPTarget(1)) ;
+    // compute the 6D force applied at the CoM
+    for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(m_CurrentConfiguration) ; ++i)
+      {
+        q_(i,0)   = m_CurrentConfiguration (i);
+        dq_(i,0)  = m_CurrentVelocity      (i);
+        ddq_(i,0) = m_CurrentAcceleration  (i);
+      }
+    metapod::rnea< Robot_Model, true >::run(hrp2_14_, q_, dq_, ddq_);
+    vector<double> zmpmb = vector<double>(3,0.0);
+    // extract the CoM momentum and forces
+    RootNode & node_waist = boost::fusion::at_c< Robot_Model::BODY >(hrp2_14_.nodes);
+    com_tensor_ = node_waist.body.iX0.applyInv(node_waist.joint.f);
+
+    // compute the Multibody ZMP
+    zmpmb[0] = - com_tensor_.n()[1] / com_tensor_.f()[2] ;
+    zmpmb[1] =   com_tensor_.n()[0] / com_tensor_.f()[2] ;
+
+    err_zmp_x.push_back(zmpmb[0]-m_OneStep.ZMPTarget(0)) ;
+    err_zmp_y.push_back(zmpmb[1]-m_OneStep.ZMPTarget(1)) ;
 
     if (m_DebugFGPI)
       {
@@ -363,7 +400,7 @@ protected:
         string aFileName;
         aFileName = m_TestName;
         aFileName += "TestFGPIFull.dat";
-        if (inc==0)
+        if (m_OneStep.NbOfIt==1)
           {
             aof.open(aFileName.c_str(),ofstream::out);
           }
@@ -415,15 +452,18 @@ protected:
             << filterprecision(m_OneStep.RightFootPosition.ddtheta ) << " "               // 42
             << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 43
             << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 44
-            << filterprecision(zmpmb(0)) << " "                                           // 45
-            << filterprecision(zmpmb(1)) << " "                                           // 46
-            << filterprecision(zmpmb(2)) << " "                                          ;// 47
+            << filterprecision(zmpmb[0]) << " "                                           // 45
+            << filterprecision(zmpmb[1]) << " "                                           // 46
+            << filterprecision(zmpmb[2]) << " "                                          ;// 47
+        for(unsigned int k = 0 ; k < m_CurrentConfiguration.size() ; k++){                // 48-53 -> 54-83
+          aof << filterprecision( m_CurrentConfiguration(k) ) << " "  ;
+        }
         aof << endl;
         aof.close();
     }
 
     /// \brief Create file .hip .pos .zmp
-    /// --------------------
+    /// ---------------------------------
     ofstream aof ;
     string root = "/opt/grx/HRP2LAAS/etc/mnaveau/" ;
     string aFileName = root + m_TestName + ".pos" ;
@@ -501,10 +541,15 @@ protected:
 
   void SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR, CjrlHumanoidDynamicRobot *& aDebugHDR )
   {
+    aHDR = NULL ;
+    aDebugHDR = NULL ;
+
+#ifdef WITH_HRP2DYNAMICS
     dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
     Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot( &aRobotDynamicsObjectConstructor );
     aHDR = aHRP2HDR;
     aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
+#endif
   }
 
   void startOnLineWalking(PatternGeneratorInterface &aPGI)
@@ -730,15 +775,18 @@ protected:
     };
 #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-    { { 5*200,&TestHerdt2010::walkForward3m_s},
-      {10*200,&TestHerdt2010::walkForward2m_s},
-      {15*200,&TestHerdt2010::walkForward1m_s},
-      {20*200,&TestHerdt2010::walkSidewards1m_s},
-      {25*200,&TestHerdt2010::walkSidewards2m_s},
-      {30*200,&TestHerdt2010::walkSidewards3m_s},
-      {35*200,&TestHerdt2010::startTurningRightOnSpot},
-      {40*200,&TestHerdt2010::stop},
-      {45*200,&TestHerdt2010::stopOnLineWalking}};
+    { //{ 5*200,&TestHerdt2010::walkForward1m_s},
+      //{10*200,&TestHerdt2010::walkForward1m_s},
+      //{15*200,&TestHerdt2010::walkForward1m_s},
+      //{20*200,&TestHerdt2010::walkSidewards1m_s},
+      //{25*200,&TestHerdt2010::walkSidewards1m_s},
+      //{30*200,&TestHerdt2010::walkSidewards1m_s},
+      //{35*200,&TestHerdt2010::startTurningRightOnSpot},
+      //{50*200,&TestHerdt2010::stop},
+      //{55*200,&TestHerdt2010::stopOnLineWalking}
+      {5*200,&TestHerdt2010::startTurningRightOnSpot},
+      {50*200,&TestHerdt2010::stop},
+      {55*200,&TestHerdt2010::stopOnLineWalking}};
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
       {

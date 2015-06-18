@@ -1,4 +1,5 @@
 #include "DynamicFilter.hh"
+#include "metapod/algos/rnea.hh"
 #include <iomanip>
 using namespace std;
 using namespace PatternGeneratorJRL;
@@ -21,6 +22,7 @@ DynamicFilter::DynamicFilter(
   comAndFootRealization_ = new ComAndFootRealizationByGeometry((PatternGeneratorInterfacePrivate*) SPM );
   comAndFootRealization_->setHumanoidDynamicRobot(cjrlHDR_);
   comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
+  comAndFootRealization_->ShiftFoot(true);
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
 
@@ -140,6 +142,7 @@ void DynamicFilter::init(
   previousZMPMBVelocity_      = cjrlHDR_->currentVelocity() ;
 
   comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
+  comAndFootRealization_->ShiftFoot(true);
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
   comAndFootRealization_->SetPreviousConfigurationStage0(ZMPMBConfiguration_);
@@ -343,19 +346,29 @@ void DynamicFilter::InverseDynamics(
     MAL_VECTOR_TYPE(double)& acceleration
     )
 {
-  cjrlHDR_->currentConfiguration(configuration);
-  cjrlHDR_->currentVelocity(velocity);
-  cjrlHDR_->currentAcceleration(acceleration);
-  cjrlHDR_->computeCenterOfMassDynamics();
+  // compute the 6D force applied at the CoM
+  for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(configuration) ; ++i)
+    {
+      q_(i,0)   = configuration(i);
+      dq_(i,0)  = velocity(i);
+      ddq_(i,0) = acceleration(i);
+    }
+  metapod::rnea< Robot_Model, true >::run(hrp2_14_, q_, dq_, ddq_);
+
   return ;
 }
 
 void DynamicFilter::ExtractZMP(vector<double> & zmpmb)
 {
-  MAL_S3_VECTOR_TYPE(double) zmpmb_HDR = cjrlHDR_->zeroMomentumPoint();
-  zmpmb.resize(3);
-  for (unsigned int i = 0 ; i < 3 ; ++i)
-    zmpmb[i] = zmpmb_HDR(i) ;
+  zmpmb.resize(3,0.0);
+  // extract the CoM momentum and forces
+  RootNode & node_waist = boost::fusion::at_c< Robot_Model::BODY >(hrp2_14_.nodes);
+  com_tensor_ = node_waist.body.iX0.applyInv(node_waist.joint.f);
+
+  // compute the Multibody ZMP
+  zmpmb[0] = - com_tensor_.n()[1] / com_tensor_.f()[2] ;
+  zmpmb[1] =   com_tensor_.n()[0] / com_tensor_.f()[2] ;
+  zmpmb[2] = 0.0;
   return ;
 }
 
@@ -624,6 +637,9 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
     }
   }
 
+  vector < MAL_VECTOR_TYPE(double) > conf ;
+  vector < MAL_VECTOR_TYPE(double) > vel ;
+  vector < MAL_VECTOR_TYPE(double) > acc ;
   vector< vector<double> > zmpmb_corr (NCtrl_,vector<double>(2,0.0));
   for(unsigned int i = 0 ; i < NCtrl_ ; ++i)
   {
@@ -633,6 +649,10 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
 
       InverseDynamics(ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_);
 
+      conf.push_back(ZMPMBConfiguration_);
+      vel.push_back(ZMPMBVelocity_);
+      acc.push_back(ZMPMBAcceleration_);
+
       ExtractZMP(zmpmb_corr[i]);
   }
 
@@ -641,7 +661,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   string aFileName;
   static int iteration_zmp = 0 ;
   ostringstream oss(std::ostringstream::ate);
-  oss.str("zmpmb_herdt.txt");
+  oss.str("/tmp/zmpmb_herdt.txt");
   aFileName = oss.str();
   if ( iteration_zmp == 0 )
   {
@@ -716,11 +736,24 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
     aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[1] << " " ; // 45
     aof << CoM_tmp[i*(int)round(interpolationPeriod_/controlPeriod_)].y[2] << " " ; // 46
 
+    //47
+    int it_subsample = i*(int)round(interpolationPeriod_/controlPeriod_) ;
+    for (int k = 0 ; k < MAL_VECTOR_SIZE(conf[it_subsample]) ; ++k)
+      aof << conf[it_subsample](k) << " " ;
+
+    //83
+    for (unsigned int k = 0 ; k < MAL_VECTOR_SIZE(vel[it_subsample]) ; ++k)
+      aof << vel[it_subsample](k) << " " ;
+
+    //119
+    for (unsigned int k = 0 ; k < MAL_VECTOR_SIZE(acc[it_subsample]) ; ++k)
+      aof << acc[it_subsample](k) << " " ;
+
     aof << endl ;
   }
   aof.close();
 
-  aFileName = "zmpmb_corr_herdt.txt" ;
+  aFileName = "/tmp/zmpmb_corr_herdt.txt" ;
   if ( iteration_zmp == 0 )
   {
     aof.open(aFileName.c_str(),ofstream::out);

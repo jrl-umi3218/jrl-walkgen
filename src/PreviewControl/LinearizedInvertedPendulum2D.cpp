@@ -243,6 +243,7 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
       aZMPPos.py = m_C(0,0) * aCOMPos.y[0] +
 	m_C(0,1) * aCOMPos.y[1] + m_C(0,2) * aCOMPos.y[2];
 
+      aZMPPos.pz = 0.0 ;
 
       ODEBUG4(aCOMPos.x[0] << " " << aCOMPos.x[1] << " " << aCOMPos.x[2] << " " <<
 	      aCOMPos.y[0] << " " << aCOMPos.y[1] << " " << aCOMPos.y[2] << " " <<

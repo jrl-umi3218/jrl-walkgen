@@ -563,7 +563,7 @@ namespace PatternGeneratorJRL
            ZMPPosition &ZMPz,
            unsigned int IndexInterval);
 
-      void ComputeCoMz(double t, COMState &CoMz);
+      void ComputeCoMz(double t, COMState &CoMz, deque<COMState> & FinalCoMPositions);
 
       void FillQueues(double samplingPeriod,
                       double StartingTime,
@@ -676,7 +676,7 @@ namespace PatternGeneratorJRL
       /*! \brief End phase */
       bool m_EndPhase;
 
-      PatternGeneratorJRL::Polynome5 * m_CoMpolynomeZ ;
+      PatternGeneratorJRL::BSplinesFoot * m_CoMbsplinesZ ;
       PatternGeneratorJRL::Polynome3 * m_ZMPpolynomeZ ;
 
     public:

@@ -48,7 +48,7 @@ ComAndFootRealizationByGeometry::
   m_ZARM = -1.0;
   m_LeftShoulder = 0;
   m_RightShoulder = 0;
-  ShiftFoot_ = false ;
+  ShiftFoot_ = false ;// set to true with herdt !!!! to be corrected with morisawa
   RegisterMethods();
 
   for(unsigned int i=0;i<3;i++)
@@ -396,7 +396,7 @@ bool ComAndFootRealizationByGeometry::
 
   for(unsigned int i=0;i<3;i++)
     MAL_S4x4_MATRIX_ACCESS_I_J(FootTranslation, i,3) = -
-                                                       m_AnklePosition[i];
+        m_AnklePosition[i];
 
   lFootPose = MAL_S4x4_RET_A_by_B(lFootPose,FootTranslation);
 
@@ -555,7 +555,8 @@ bool ComAndFootRealizationByGeometry::
     m_prev_Configuration2(i) = lStartingWaistPose(i);
   }
 
-
+  InitLeftFootPosition.z = 0.0;
+  InitRightFootPosition.z = 0.0;
 
   return true;
 }

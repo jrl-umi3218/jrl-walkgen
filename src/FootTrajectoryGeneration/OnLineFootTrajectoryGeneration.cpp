@@ -301,7 +301,7 @@ void
     if(CurrentSupport.StateChanged==true)
       {
         SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
-                      m_TSingle,m_AnklePositionLeft[2],
+                      m_TSingle,/*m_AnklePositionLeft[2]*/0.0,
                       LastSFP->z, LastSFP->dz, LastSFP->ddz
                       );
       }

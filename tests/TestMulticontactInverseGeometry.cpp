@@ -161,12 +161,12 @@ public:
 
     aFileName = "";
     aFileName+=m_TestName;
-    aFileName+="Full.dat";
+    aFileName+="Full.bin";
     if ( iteration == 0 ){
-      aof.open(aFileName.c_str(),ofstream::out);
+      aof.open(aFileName.c_str(), ios::out | ios::binary);
       aof.close();
     }
-    aof.open(aFileName.c_str(),ofstream::app);
+    aof.open(aFileName.c_str(), ios::app | ios::binary);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
 
@@ -185,15 +185,28 @@ public:
       aof << filterprecision( rhand_[i](2)  ) << " "  ; // 10  z
       aof << filterprecision( rhand_[i](3)  ) << " "  ; // 11  pitch angle
 
-      aof << filterprecision( cos(rhand_[i](3))  ) << " "  ; // 12  R(0.0) rotation matrix
-      aof << filterprecision( sin(rhand_[i](3))  ) << " "  ; // 13  R(0.1) of the right hand
-      aof << filterprecision( 0.0                ) << " "  ; // 14  R(0.2)
-      aof << filterprecision( -sin(rhand_[i](3)) ) << " "  ; // 15  R(1.0)
-      aof << filterprecision( cos(rhand_[i](3))  ) << " "  ; // 16  R(1.1)
-      aof << filterprecision( 0.0                ) << " "  ; // 17  R(1.2)
-      aof << filterprecision( 0.0                ) << " "  ; // 18  R(2.0)
-      aof << filterprecision( 0.0                ) << " "  ; // 19  R(2.1)
-      aof << filterprecision( 1.0                ) << " "  ; // 20  R(2.2)
+      if (i*0.005 < timing_[0])
+      {
+        aof << filterprecision(  0.9639598  ) << " "  ; // 12  R(0.0) rotation matrix
+        aof << filterprecision( -0.04494346 ) << " "  ; // 13  R(0.1) of the right hand
+        aof << filterprecision( -0.26222429 ) << " "  ; // 14  R(0.2) half sitting compatible
+        aof << filterprecision(  0.08682409 ) << " "  ; // 15  R(1.0) position
+        aof << filterprecision(  0.98480775 ) << " "  ; // 16  R(1.1)
+        aof << filterprecision(  0.15038373 ) << " "  ; // 17  R(1.2)
+        aof << filterprecision(  0.25148175 ) << " "  ; // 18  R(2.0)
+        aof << filterprecision( -0.16773126 ) << " "  ; // 19  R(2.1)
+        aof << filterprecision(  0.95321726 ) << " "  ; // 20  R(2.2)
+      }else{
+        aof << filterprecision( cos(rhand_[i](3))  ) << " "  ; // 12  R(0.0) rotation matrix
+        aof << filterprecision( sin(rhand_[i](3))  ) << " "  ; // 13  R(0.1) of the right hand
+        aof << filterprecision( 0.0                ) << " "  ; // 14  R(0.2)
+        aof << filterprecision( -sin(rhand_[i](3)) ) << " "  ; // 15  R(1.0)
+        aof << filterprecision( cos(rhand_[i](3))  ) << " "  ; // 16  R(1.1)
+        aof << filterprecision( 0.0                ) << " "  ; // 17  R(1.2)
+        aof << filterprecision( 0.0                ) << " "  ; // 18  R(2.0)
+        aof << filterprecision( 0.0                ) << " "  ; // 19  R(2.1)
+        aof << filterprecision( 1.0                ) << " "  ; // 20  R(2.2)
+      }
 
       aof << filterprecision( comPos_[i](0) ) << " "  ; // 21  x
       aof << filterprecision( comPos_[i](1) ) << " "  ; // 22  y
@@ -571,18 +584,22 @@ protected:
     MAL_VECTOR_DIM(aSRF,double,5);
     MAL_VECTOR_DIM(aSRH,double,5);
 
-    double init_lfx = 0.0;//0.00949035 ;
-    double init_lfy = 0.1;//0.095      ;
-    double init_lfz = 0.0;//0.0        ;
+    double init_lfx = 0.00949035 ;
+    double init_lfy = 0.095      ;
+    double init_lfz = 0.0        ;
                       //
-    double init_rfx = 0.0;//0.00949035 ;
-    double init_rfy =-0.1;//-0.095     ;
-    double init_rfz = 0.0;//0.0        ;
+    double init_rfx = 0.00949035 ;
+    double init_rfy = -0.095     ;
+    double init_rfz = 0.0        ;
+
+    double init_rhx = 0.0418343 ;
+    double init_rhy = -0.331008 ;
+    double init_rhz = 0.704285  ;
 
     // 0     5.0 second
-    aSLF(0)=init_lfx ; aSRF(0)=init_rfx;aSRH(0)=0.0658468   ;
-    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=-0.325598   ;
-    aSLF(2)=init_lfz ; aSRF(2)=init_rfz;aSRH(2)=0.610373    ;
+    aSLF(0)=init_lfx ; aSRF(0)=init_rfx;aSRH(0)=init_rhx   ;
+    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=init_rhy   ;
+    aSLF(2)=init_lfz ; aSRF(2)=init_rfz;aSRH(2)=init_rhz   ;
     aSLF(3)=0.0 ;      aSRF(3)=0.0 ;    aSRH(3)=0.0         ;
     aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
@@ -590,7 +607,7 @@ protected:
 //
     // 1     0.7 second
     aSLF(0)=init_lfx ; aSRF(0)=init_rfx;aSRH(0)=0.3         ;
-    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=-0.325598   ;
+    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=init_rhy   ;
     aSLF(2)=init_lfz ; aSRF(2)=init_rfz;aSRH(2)=0.705+1*0.1 ;
     aSLF(3)=0.0 ;      aSRF(3)=0.0 ;    aSRH(3)=-0.451026812;
     aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
@@ -599,7 +616,7 @@ protected:
 
     // 2     0.1 s
     aSLF(0)=init_lfx ; aSRF(0)=init_rfx;aSRH(0)=0.3         ;
-    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=-0.325598   ;
+    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=init_rhy   ;
     aSLF(2)=init_lfz ; aSRF(2)=init_rfz;aSRH(2)=0.705+1*0.1 ;
     aSLF(3)=0.0 ;      aSRF(3)=0.0 ;    aSRH(3)=-0.451026812;
     aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
@@ -607,357 +624,96 @@ protected:
     timing_.push_back(supportPeriod_);
 
     // 3     0.7 s
-    aSLF(0)=0.3 ;      aSRF(0)=init_rfx;aSRH(0)=0.3         ;
-    aSLF(1)=0.1 ;      aSRF(1)=init_rfy;aSRH(1)=-0.325598   ;
-    aSLF(2)=0.1 ;      aSRF(2)=init_rfz;aSRH(2)=0.705+1*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;    aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx;aSRH(0)=0.3         ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy;aSRH(1)=init_rhy   ;
+    aSLF(2)=0.1 ;          aSRF(2)=init_rfz;aSRH(2)=0.705+1*0.1 ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;    aSRH(3)=-0.451026812;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(movingPeriod_);
 
     // 4    0.1 s
-    aSLF(0)=0.3 ;      aSRF(0)=init_rfx;aSRH(0)=0.3         ;
-    aSLF(1)=0.1 ;      aSRF(1)=init_rfy;aSRH(1)=-0.325598   ;
-    aSLF(2)=0.1 ;      aSRF(2)=init_rfz;aSRH(2)=0.705+1*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;    aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx;aSRH(0)=0.3         ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy;aSRH(1)=init_rhy   ;
+    aSLF(2)=0.1 ;          aSRF(2)=init_rfz;aSRH(2)=0.705+1*0.1 ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;    aSRH(3)=-0.451026812;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(supportPeriod_);
 
     // 5    0.7 s
-    aSLF(0)=0.3 ;      aSRF(0)=0.3 ;  aSRH(0)=0.3         ;
-    aSLF(1)=0.1 ;      aSRF(1)=-0.1 ;  aSRH(1)=-0.325598  ;
-    aSLF(2)=0.1 ;      aSRF(2)=0.1 ;  aSRH(2)=0.705+1*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.3         ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy  ;
+    aSLF(2)=0.1 ;          aSRF(2)=0.1 ;           aSRH(2)=0.705+1*0.1 ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(movingPeriod_);
 
     // 6    0.1 s
-    aSLF(0)=0.3 ;      aSRF(0)=0.3 ;  aSRH(0)=0.3         ;
-    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-    aSLF(2)=0.1 ;      aSRF(2)=0.1 ;  aSRH(2)=0.705+1*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.3         ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
+    aSLF(2)=0.1 ;          aSRF(2)=0.1 ;           aSRH(2)=0.705+1*0.1 ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(supportPeriod_);
 //
     // 7    0.7 s
-    aSLF(0)=0.3 ;      aSRF(0)=0.3 ;  aSRH(0)=0.6         ;
-    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-    aSLF(2)=0.1 ;      aSRF(2)=0.1 ;  aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.3 ;aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.6         ;
+    aSLF(1)=init_lfy ;    aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
+    aSLF(2)=0.1 ;         aSRF(2)=0.1 ;           aSRH(2)=0.705+2*0.1 ;
+    aSLF(3)=0.0 ;         aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
+    aSLF(4)=0.0 ;         aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(movingPeriod_);
 
     // 8    0.1 s
-    aSLF(0)=0.3 ;      aSRF(0)=0.3 ;  aSRH(0)=0.6         ;
-    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-    aSLF(2)=0.1 ;      aSRF(2)=0.1 ;  aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.6         ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
+    aSLF(2)=0.1 ;          aSRF(2)=0.1 ;           aSRH(2)=0.705+2*0.1 ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(supportPeriod_);
 
     // 9    0.7 s
-    aSLF(0)=0.6 ;      aSRF(0)=0.3 ;  aSRH(0)=0.6         ;
-    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-    aSLF(2)=0.2 ;      aSRF(2)=0.1 ;  aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.6 ;aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.6         ;
+    aSLF(1)=init_lfy ;    aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
+    aSLF(2)=0.2 ;         aSRF(2)=0.1 ;           aSRH(2)=0.705+2*0.1 ;
+    aSLF(3)=0.0 ;         aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
+    aSLF(4)=0.0 ;         aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(movingPeriod_);
 
     // 10    0.1 s
-    aSLF(0)=0.6 ;      aSRF(0)=0.3 ;  aSRH(0)=0.6         ;
-    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-    aSLF(2)=0.2 ;      aSRF(2)=0.1 ;  aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.6 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.6         ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
+    aSLF(2)=0.2 ;          aSRF(2)=0.1 ;           aSRH(2)=0.705+2*0.1 ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(supportPeriod_);
 
     // 11    0.7 s
-    aSLF(0)=0.6 ;      aSRF(0)=0.6 ;  aSRH(0)=0.6         ;
-    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-    aSLF(2)=0.2 ;      aSRF(2)=0.2 ;  aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.6 ; aSRF(0)=init_rfx+0.6 ;  aSRH(0)=0.6         ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
+    aSLF(2)=0.2 ;          aSRF(2)=0.2 ;           aSRH(2)=0.705+2*0.1 ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(movingPeriod_);
 
     // 12    0.1 s
-    aSLF(0)=0.6 ;      aSRF(0)=0.6 ;  aSRH(0)=0.6         ;
-    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-    aSLF(2)=0.2 ;      aSRF(2)=0.2 ;  aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.6 ; aSRF(0)=init_rfx+0.6 ;  aSRH(0)=0.6         ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
+    aSLF(2)=0.2 ;          aSRF(2)=0.2 ;           aSRH(2)=0.705+2*0.1 ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     //timing_.push_back(supportPeriod_);
     timing_.push_back(finalTime_+supportPeriod_/2);
 
-
-
-
-
-//    // 0     5.0 second
-//    aSLF(0)=0.0 ;      aSRF(0)=0.0  ;  aSRH(0)=0.0658468   ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1 ;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.0 ;      aSRF(2)=0.0  ;  aSRH(2)=0.610373    ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0  ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0  ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(initialTime_+supportPeriod_/2);
-////
-//    // 1     0.7 second
-//    aSLF(0)=0.0 ;      aSRF(0)=0.0  ;  aSRH(0)=0.3         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1 ;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.0 ;      aSRF(2)=0.0  ;  aSRH(2)=0.705+1*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0  ;  aSRH(3)=-0.451026812;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0  ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 2     0.1 s
-//    aSLF(0)=0.0 ;      aSRF(0)=0.0  ;  aSRH(0)=0.3         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1 ;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.0 ;      aSRF(2)=0.0  ;  aSRH(2)=0.705+1*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0  ;  aSRH(3)=-0.451026812;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0  ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(supportPeriod_);
-
-//    // 3     0.7 s
-//    aSLF(0)=0.3 ;      aSRF(0)=0.0  ;  aSRH(0)=0.3         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1 ;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.2 ;      aSRF(2)=0.0  ;  aSRH(2)=0.705+1*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0  ;  aSRH(3)=-0.451026812;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0  ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 4    0.1 s
-//    aSLF(0)=0.3 ;      aSRF(0)=0.0  ;  aSRH(0)=0.3         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1 ;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.2 ;      aSRF(2)=0.0  ;  aSRH(2)=0.705+1*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0  ;  aSRH(3)=-0.451026812;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0  ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(supportPeriod_);
-
-//    // 5    0.7 s
-//    aSLF(0)=0.3 ;      aSRF(0)=0.3 ;  aSRH(0)=0.3         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1 ;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.2 ;      aSRF(2)=0.2 ;  aSRH(2)=0.705+1*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 6    0.1 s
-//    aSLF(0)=0.3 ;      aSRF(0)=0.3 ;  aSRH(0)=0.3         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.2 ;      aSRF(2)=0.2 ;  aSRH(2)=0.705+1*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(supportPeriod_);
-////
-//    // 7    0.7 s
-//    aSLF(0)=0.3 ;      aSRF(0)=0.3 ;  aSRH(0)=0.6         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.2 ;      aSRF(2)=0.2 ;  aSRH(2)=0.705+2*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 8    0.1 s
-//    aSLF(0)=0.3 ;      aSRF(0)=0.3 ;  aSRH(0)=0.6         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.2 ;      aSRF(2)=0.2 ;  aSRH(2)=0.705+2*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(supportPeriod_);
-
-//    // 9    0.7 s
-//    aSLF(0)=0.6 ;      aSRF(0)=0.3 ;  aSRH(0)=0.6         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.4 ;      aSRF(2)=0.2 ;  aSRH(2)=0.705+2*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 10    0.1 s
-//    aSLF(0)=0.6 ;      aSRF(0)=0.3 ;  aSRH(0)=0.6         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.4 ;      aSRF(2)=0.2 ;  aSRH(2)=0.705+2*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(supportPeriod_);
-
-//    // 11    0.7 s
-//    aSLF(0)=0.6 ;      aSRF(0)=0.6 ;  aSRH(0)=0.6         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.4 ;      aSRF(2)=0.4 ;  aSRH(2)=0.705+2*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 12    0.1 s
-//    aSLF(0)=0.6 ;      aSRF(0)=0.6 ;  aSRH(0)=0.6         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.4 ;      aSRF(2)=0.4 ;  aSRH(2)=0.705+2*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=-0.451026812;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    //timing_.push_back(supportPeriod_);
-//    timing_.push_back(finalTime_+supportPeriod_/2);
-
-
-////
-//    // 13    0.7 s
-//    aSLF(0)=0.6 ;      aSRF(0)=0.6 ;  aSRH(0)=0.9         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.4 ;      aSRF(2)=0.4 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 14    0.1 s
-//    aSLF(0)=0.6 ;      aSRF(0)=0.6 ;  aSRH(0)=0.9         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.4 ;      aSRF(2)=0.4 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(supportPeriod_);
-
-//    // 15    0.7 s
-//    aSLF(0)=0.9 ;      aSRF(0)=0.6 ;  aSRH(0)=0.9         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.6 ;      aSRF(2)=0.4 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 16    0.1 s
-//    aSLF(0)=0.9 ;      aSRF(0)=0.6 ;  aSRH(0)=0.9         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.6 ;      aSRF(2)=0.4 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(supportPeriod_);
-
-//    // 17    0.7 s
-//    aSLF(0)=0.9 ;      aSRF(0)=0.9 ;  aSRH(0)=0.9         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.6 ;      aSRF(2)=0.6 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 18    0.1 s
-//    aSLF(0)=0.9 ;      aSRF(0)=0.9 ;  aSRH(0)=0.9         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.6 ;      aSRF(2)=0.6 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(supportPeriod_);
-////
-//    // 19    0.7 s
-//    aSLF(0)=0.9 ;      aSRF(0)=0.9 ;  aSRH(0)=1.2         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.6 ;      aSRF(2)=0.6 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 20    0.1 s
-//    aSLF(0)=0.9 ;      aSRF(0)=0.9 ;  aSRH(0)=1.2         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.6 ;      aSRF(2)=0.6 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(supportPeriod_);
-
-//    // 21    0.7 s
-//    aSLF(0)=1.2 ;      aSRF(0)=0.9 ;  aSRH(0)=1.2         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.8 ;      aSRF(2)=0.6 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 22    0.1 s
-//    aSLF(0)=1.2 ;      aSRF(0)=0.9 ;  aSRH(0)=1.2         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.8 ;      aSRF(2)=0.6 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(supportPeriod_);
-
-//    // 23    0.7 s
-//    aSLF(0)=1.2 ;      aSRF(0)=1.2 ;  aSRH(0)=1.2         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.8 ;      aSRF(2)=0.8 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(movingPeriod_);
-
-//    // 24    0.1 s
-//    aSLF(0)=1.2 ;      aSRF(0)=1.2 ;  aSRH(0)=1.2         ;
-//    aSLF(1)=0.1 ;      aSRF(1)=-0.1;  aSRH(1)=-0.325598   ;
-//    aSLF(2)=0.8 ;      aSRF(2)=0.8 ;  aSRH(2)=0.705+3*0.2 ;
-//    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;  aSRH(3)=0.0         ;
-//    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;  aSRH(4)=0.0         ;
-//    lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-//    timing_.push_back(finalTime_);
-
-//            //LF               RF               LH                 RH
-//    [ [ [0.0, 0.1, 0.0] , [0.0, -0.1, 0.0], [-1, -1, -1] , [-1, -1, -1] ],                   //1
-//      [ [0.0, 0.1, 0.0] , [0.0, -0.1, 0.0], [-1, -1, -1] , [0.3, -0.325598, 0.705+1*0.2] ],  //2
-//      [ [-1, -1, -1]    , [0.0, -0.1, 0.0], [-1, -1, -1] , [0.3, -0.325598, 0.705+1*0.2] ],  //3
-//      [ [0.3, 0.1, 0.2] , [0.0, -0.1, 0.0], [-1, -1, -1] , [0.3, -0.325598, 0.705+1*0.2] ],  //4
-//      [ [0.3, 0.1, 0.2] , [-1, -1, -1]    , [-1, -1, -1] , [0.3, -0.325598, 0.705+1*0.2] ],  //5
-//      [ [0.3, 0.1, 0.2] , [0.3, -0.1, 0.2], [-1, -1, -1] , [0.3, -0.325598, 0.705+1*0.2] ],  //6
-//#
-//      [ [0.3, 0.1, 0.2] , [0.3, -0.1, 0.2], [-1, -1, -1] , [-1, -1, -1] ],                   //7
-//      [ [0.3, 0.1, 0.2] , [0.3, -0.1, 0.2], [-1, -1, -1] , [0.6, -0.325598, 0.705+2*0.2] ],  //8
-//      [ [-1, -1, -1]    , [0.3, -0.1, 0.2], [-1, -1, -1] , [0.6, -0.325598, 0.705+2*0.2] ],  //9
-//      [ [0.6, 0.1, 0.4] , [0.3, -0.1, 0.2], [-1, -1, -1] , [0.6, -0.325598, 0.705+2*0.2] ],  //10
-//      [ [0.6, 0.1, 0.4] , [-1, -1, -1]    , [-1, -1, -1] , [0.6, -0.325598, 0.705+2*0.2] ],  //11
-//      [ [0.6, 0.1, 0.4] , [0.6, -0.1, 0.4], [-1, -1, -1] , [0.6, -0.325598, 0.705+2*0.2] ],  //12
-//#
-//      [ [0.6, 0.1, 0.4] , [0.6, -0.1, 0.4], [-1, -1, -1] , [-1, -1, -1] ],                   //13
-//      [ [0.6, 0.1, 0.4] , [0.6, -0.1, 0.4], [-1, -1, -1] , [0.9, -0.325598, 0.705+3*0.2] ],  //14
-//      [ [-1, -1, -1]    , [0.6, -0.1, 0.4], [-1, -1, -1] , [0.9, -0.325598, 0.705+3*0.2] ],  //15
-//      [ [0.9, 0.1, 0.6] , [0.6, -0.1, 0.4], [-1, -1, -1] , [0.9, -0.325598, 0.705+3*0.2] ],  //16
-//      [ [0.9, 0.1, 0.6] , [-1, -1, -1]    , [-1, -1, -1] , [0.9, -0.325598, 0.705+3*0.2] ],  //17
-//      [ [0.9, 0.1, 0.6] , [0.9, -0.1, 0.6], [-1, -1, -1] , [0.9, -0.325598, 0.705+3*0.2] ],  //18
-//#
-//      [ [0.9, 0.1, 0.6] , [0.9, -0.1, 0.6], [-1, -1, -1] , [-1, -1, -1] ],                   //19
-//      [ [0.9, 0.1, 0.6] , [0.9, -0.1, 0.6], [-1, -1, -1] , [1.2, -0.325598, 0.705+4*0.2] ],  //20
-//      [ [-1, -1, -1]    , [0.9, -0.1, 0.6], [-1, -1, -1] , [1.2, -0.325598, 0.705+4*0.2] ],  //21
-//      [ [1.2, 0.1, 0.8] , [0.9, -0.1, 0.6], [-1, -1, -1] , [1.2, -0.325598, 0.705+4*0.2] ],  //22
-//      [ [1.2, 0.1, 0.8] , [-1, -1, -1]    , [-1, -1, -1] , [1.2, -0.325598, 0.705+4*0.2] ],  //23
-//      [ [1.2, 0.1, 0.8] , [1.2, -0.1, 0.8], [-1, -1, -1] , [1.2, -0.325598, 0.705+4*0.2] ],  //24
-//    ]
     return 1 ;
   }
 
@@ -970,7 +726,10 @@ protected:
 //    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_03_27_10h35m/" ;
 //    std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm.csv" ;
 
-    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_27_04_10h_43m/" ;
+    //std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_04_27_10h_43m/" ;
+    //std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm_ds.csv" ;
+
+    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_06_04_14h_12m/" ;
     std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm_ds.csv" ;
 
     std::ifstream dataStream ;
@@ -986,6 +745,7 @@ protected:
     comSpeed_.clear();
     comAcc_.clear();
 
+    assert(dataStream.good());
     while(dataStream.good())
       {
         double value ;
