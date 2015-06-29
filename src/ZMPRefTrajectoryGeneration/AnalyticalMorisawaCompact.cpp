@@ -547,11 +547,6 @@ computing the analytical trajectories. */
     MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
     m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
 
-    cout << InitRightFootAbsolutePosition.z << " "
-         << lAnklePositionRight(2) << " "
-         << CurPosWICF_homogeneous [2] << " "
-         << lStartingCOMState.z[0] << endl  ;
-
     InitLeftFootAbsolutePosition.x +=  lAnklePositionLeft(0)  ;
     InitLeftFootAbsolutePosition.y +=  lAnklePositionLeft(1)  ;
     InitLeftFootAbsolutePosition.z +=  lAnklePositionLeft(2)  ;
@@ -612,13 +607,13 @@ computing the analytical trajectories. */
         /*! initialize the dynamic filter */
         unsigned int n = COMStates.size();
         double KajitaPCpreviewWindow = 1.6 ;
+        m_kajitaDynamicFilter->getComAndFootRealization()->ShiftFoot(false);
         m_kajitaDynamicFilter->init( m_SamplingPeriod,
                                      m_SamplingPeriod,
-                                     (double)(n+1)*m_SamplingPeriod,
-                                     1,
+                                     m_PreviewControlTime-TimeShift,
+                                     m_PreviewControlTime-TimeShift+KajitaPCpreviewWindow,
                                      KajitaPCpreviewWindow,
                                      lStartingCOMState );
-
         /*! Set the upper body trajectory */
         CjrlHumanoidDynamicRobot * aHDR = m_kajitaDynamicFilter->
                                                  getComAndFootRealization()->getHumanoidDynamicRobot();
@@ -686,6 +681,13 @@ computing the analytical trajectories. */
           RightFootAbsolutePositions.push_back(lastRF);
         }
 
+        for (unsigned int i = 0 ; i < COMStates.size() ; ++i )
+        {
+          COMStates[i].roll[0]  = 180/M_PI* COMStates[i].roll[0] ;
+          COMStates[i].pitch[0] = 180/M_PI* COMStates[i].pitch[0] ;
+          COMStates[i].yaw[0]   = 180/M_PI* COMStates[i].yaw[0] ;
+        }
+
         // Filter the trajectory
         deque<COMState> outputDeltaCOMTraj_deq ;
         m_kajitaDynamicFilter->OffLinefilter(
@@ -699,7 +701,9 @@ computing the analytical trajectories. */
                     outputDeltaCOMTraj_deq);
 
 
-        m_kajitaDynamicFilter->Debug(COMStates,LeftFootAbsolutePositions,RightFootAbsolutePositions,COMStates,ZMPPositions,
+        m_kajitaDynamicFilter->Debug(COMStates,LeftFootAbsolutePositions,
+                                     RightFootAbsolutePositions,
+                                     COMStates,ZMPPositions,
                                      LeftFootAbsolutePositions,
                                      RightFootAbsolutePositions,
                                      outputDeltaCOMTraj_deq);
@@ -721,7 +725,6 @@ computing the analytical trajectories. */
           LeftFootAbsolutePositions.pop_back();
           RightFootAbsolutePositions.pop_back();
         }
-
     }
     // End the Filtering
 
@@ -766,13 +769,12 @@ computing the analytical trajectories. */
     MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
     m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
 
-    InitLeftFootAbsolutePosition.x +=  lAnklePositionLeft(0)  + CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
-    InitLeftFootAbsolutePosition.y +=  lAnklePositionLeft(1)  + CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
-    InitLeftFootAbsolutePosition.z +=  lAnklePositionLeft(2)  + CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
-    InitRightFootAbsolutePosition.x += lAnklePositionRight(0) + CurPosWICF_homogeneous [0] + lStartingCOMState.x[0] ;
-    InitRightFootAbsolutePosition.y += lAnklePositionRight(1) + CurPosWICF_homogeneous [1] + lStartingCOMState.y[0] ;
-    InitRightFootAbsolutePosition.z += lAnklePositionRight(2) + CurPosWICF_homogeneous [2] + lStartingCOMState.z[0] ;
-
+    InitLeftFootAbsolutePosition.x +=  lAnklePositionLeft(0)  ;
+    InitLeftFootAbsolutePosition.y +=  lAnklePositionLeft(1)  ;
+    InitLeftFootAbsolutePosition.z +=  lAnklePositionLeft(2)  ;
+    InitRightFootAbsolutePosition.x += lAnklePositionRight(0) ;
+    InitRightFootAbsolutePosition.y += lAnklePositionRight(1) ;
+    InitRightFootAbsolutePosition.z += lAnklePositionRight(2) ;
 
     // INITIALIZE THE COM
     // ------------------
@@ -824,10 +826,18 @@ computing the analytical trajectories. */
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
 
-    double previewWindowSize = 1.6 ;
-    DFpreviewWindowSize_ = previewWindowSize - 0.05 ; //second
-    m_kajitaDynamicFilter->init( m_SamplingPeriod, 0.05, previewWindowSize, 1, DFpreviewWindowSize_,
+    double previewWindowSize = 0.8 ;
+    double controlWindowSize = 0.005 ;
+    double interpolationPeriod = 0.05 ;
+    DFpreviewWindowSize_ = previewWindowSize - interpolationPeriod ; //second
+    m_kajitaDynamicFilter->getComAndFootRealization()->ShiftFoot(false);
+    m_kajitaDynamicFilter->init( m_SamplingPeriod,
+                                 interpolationPeriod,
+                                 controlWindowSize,
+                                 previewWindowSize,
+                                 DFpreviewWindowSize_,
                                  lStartingCOMState );
+
 
     return m_RelativeFootPositions.size();
 
@@ -956,11 +966,12 @@ computing the analytical trajectories. */
         ctrlRF_ .clear() ;
         ctrlCoM_.clear() ;
         ctrlZMP_.clear() ;
-        FillQueues(m_SamplingPeriod, time, time + DFpreviewWindowSize_,
+        double previewWindowSize = 0.8 ;
+        FillQueues(m_SamplingPeriod, time, time + previewWindowSize,
                    ctrlZMP_, ctrlCoM_, ctrlLF_, ctrlRF_);
 
         double intPeriod = m_kajitaDynamicFilter->getInterpolationPeriod() ;
-        unsigned int IndexMax = (int)round(DFpreviewWindowSize_  / intPeriod );
+        unsigned int IndexMax = (int)round(previewWindowSize  / intPeriod );
         intCoM_.resize(IndexMax);
         intLF_ .resize(IndexMax);
         intRF_ .resize(IndexMax);
@@ -972,7 +983,9 @@ computing the analytical trajectories. */
           intRF_ [j] = ctrlRF_ [i] ;
         }
 
-        m_kajitaDynamicFilter->OnLinefilter(intCoM_,ctrlZMP_,intLF_,intRF_,outputDeltaCoM_);
+        //m_kajitaDynamicFilter->OnLinefilter(intCoM_,ctrlZMP_,intLF_,intRF_,outputDeltaCoM_);
+
+        //m_kajitaDynamicFilter->Debug(ctrlCoM_,ctrlLF_,ctrlRF_, intCoM_, ctrlZMP_, intLF_, intRF_, outputDeltaCoM_);
         cout << "timeOnLine = " << time << endl ;
         ctrlCoM_[0].x[0] += aCOMPos.x[0] + outputDeltaCoM_[0].x[0];
         ctrlCoM_[0].x[1] += aCOMPos.x[1] + outputDeltaCoM_[0].x[1];
@@ -2561,7 +2574,7 @@ new step has to be generate.
       m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(t,aCOMPos.y[1],lIndexInterval);
       m_AnalyticalZMPCoGTrajectoryY->ComputeCOMAcceleration(t,aCOMPos.y[2],lIndexInterval);
 
-      ComputeCoMz(t,aCOMPos, FinalCoMPositions);
+      ComputeCoMz(t, lIndexInterval, aCOMPos, FinalCoMPositions);
 
       aCOMPos.yaw[0] = 0.5*(LeftFootAbsPos.theta + RightFootAbsPos.theta);
       aCOMPos.yaw[1] = 0.5*(LeftFootAbsPos.dtheta + RightFootAbsPos.dtheta);
@@ -2578,11 +2591,11 @@ new step has to be generate.
   }
 
 
-  void AnalyticalMorisawaCompact::ComputeCoMz(double t, COMState &CoM, deque<COMState> & FinalCoMPositions)
+  void AnalyticalMorisawaCompact::ComputeCoMz(double t, unsigned int lIndexInterval, COMState &CoM, deque<COMState> & FinalCoMPositions)
   {
     double* CoMz = CoM.z ;
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
-    unsigned int Index = int(t/moving_time) ;
+    unsigned int Index = lIndexInterval/2 ;
 
     // absFootz_0, the z axis is expressed in the waist frame
     // we choose the left one by default, the foot are supposed to be symetrical
@@ -2593,30 +2606,72 @@ new step has to be generate.
     vector3d corrZ ;
     aFoot->getAnklePositionInLocalFrame(corrZ);
 
-    // we start analyze since 2nd step
-    if ( t <= moving_time )
-      {
-        CoMz[0] = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.front().z - corrZ(2) ;
-        CoMz[1] = 0.0 ;
-        CoMz[2] = 0.0 ;
-        return ;
-      }
     // after the final step we keep the same position for a while
-    if (Index >= m_AbsoluteSupportFootPositions.size())
+    if( Index >= m_AbsoluteSupportFootPositions.size() )
+    {
+      double Lastcom_z = FinalCoMPositions.back().z[0] ;
+      double lowerPoseCoMz = 0.95*m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);
+      double higherPoseCoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);
+
+      if(Lastcom_z >= higherPoseCoMz + 0.00001 || Lastcom_z <= higherPoseCoMz - 0.00001)
       {
-        CoMz[0] = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2) ;
+        m_CoMbsplinesZ->SetParameters(
+            m_RelativeFootPositions[0].SStime,
+            lowerPoseCoMz,higherPoseCoMz,
+            vector<double>(), vector<double>(), CoMz[1], CoMz[2]) ;
+        m_CoMbsplinesZ->Compute(t-Index*moving_time+m_RelativeFootPositions[0].DStime,
+                                CoMz[0],CoMz[1],CoMz[2]) ;
+      }else{
+        CoMz[0] = m_InitialPoseCoMHeight ;
         CoMz[1] = 0.0 ;
         CoMz[2] = 0.0 ;
-        return ;
       }
+      return ;
+    }
+    cout << "INDEX = " << Index << endl ;
+    cout << "lIndexInterval = " << lIndexInterval << endl ;
+
+    double sx = m_RelativeFootPositions[Index].sx ;
+    double sy = m_RelativeFootPositions[Index].sy ;
+    double SStime = m_RelativeFootPositions[Index].SStime ;
+    double DStime = m_RelativeFootPositions[Index].DStime ;
+    double initCoMheight = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z - corrZ(2);
+    double lowerCoMheight = 0.95*m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z - corrZ(2);
+    double FinalTime(0.0), InitPos(0.0), InitSpeed(0.0), InitAcc(0.0), FinalPos(0.0), interpolationTime(0.0);
+    vector<double> MP ; MP.clear() ;
+    vector<double> ToMP ; ToMP.clear() ;
+
+    COMState LastCoM ;
+    if (FinalCoMPositions.size()!=0)
+      LastCoM = FinalCoMPositions.back() ;
+    else
+      LastCoM.z[0] = initCoMheight ;
+
+    // we start analyze since 2nd step
+    if ( Index == 0 )
+    {
+      sx = m_RelativeFootPositions[Index+1].sx ;
+      sy = m_RelativeFootPositions[Index+1].sy ;
+      FinalTime = moving_time ;
+      InitSpeed = 0.0 ;
+      interpolationTime = t-Index*moving_time ;
+      InitPos = initCoMheight ;
+      FinalPos = initCoMheight ;
+      if(sx*sx+sy*sy > 0.2*0.2)
+      {
+          FinalTime = SStime ;
+          FinalPos = lowerCoMheight ;
+      }
+      m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
+      m_CoMbsplinesZ->Compute(interpolationTime,CoMz[0],CoMz[1],CoMz[2]) ;
+      return ;
+    }
 
     // variables that parameterize the trajectory of the CoM in z
     double deltaZ ;
     // double static CoMzpre = CoMz;
     double up=0.1,upRight = 1.1 ,upLeft = 0.0;
     double down = 0.1, downRight = 0.90, downLeft = 0.1;
-    vector<double> MP ; MP.clear() ;
-    vector<double> ToMP ; ToMP.clear() ;
 
     // some variables renaming which improve the readibility
     double absFootz_0 = m_AbsoluteSupportFootPositions[Index].z - corrZ(2);
@@ -2626,19 +2681,12 @@ new step has to be generate.
       {
         absFootz_2 = m_AbsoluteSupportFootPositions[Index-2].z - corrZ(2);
       }
-    double SStime = m_RelativeFootPositions[Index].SStime ;
-    double DStime = m_RelativeFootPositions[Index].DStime ;
     double absFootx_0 = m_AbsoluteSupportFootPositions[Index].x ;
     double absFootx_1 = m_AbsoluteSupportFootPositions[Index-1].x ;
     double absFooty_0 = m_AbsoluteSupportFootPositions[Index].y ;
     double absFooty_1 = m_AbsoluteSupportFootPositions[Index-1].y ;
     double dx = absFootx_0 - absFootx_1 ;
     double dy = absFooty_0 - absFooty_1 ;
-    double sx = m_RelativeFootPositions[Index].sx ;
-    double sy = m_RelativeFootPositions[Index].sy ;
-    COMState LastCoM = FinalCoMPositions.back() ;
-
-    double FinalTime(0.0), InitPos(0.0), InitSpeed(0.0), InitAcc(0.0), FinalPos(0.0), interpolationTime(0.0);
 
     // climbing
     // put first leg on the stairs with decrease of CoM //up// of stair height
@@ -2713,29 +2761,25 @@ new step has to be generate.
       {
         FinalTime = moving_time ;
         InitSpeed = 0.0 ;
-        interpolationTime = t-Index*moving_time ;
-        double initCoMheight = m_InitialPoseCoMHeight + absFootz_0 ;
-        double lowerCoMheight = 0.95*m_InitialPoseCoMHeight + absFootz_0 ;
+        interpolationTime = t-Index*moving_time-SStime ;
         InitPos = initCoMheight ;
         FinalPos = initCoMheight ;
-
 
         if(sx*sx+sy*sy > 0.2*0.2)
         {
           if(LastCoM.z[0] >= lowerCoMheight + 0.00001 || LastCoM.z[0] <= lowerCoMheight - 0.00001)
           {
-            FinalTime = SStime ;
+            FinalTime = DStime ;
             FinalPos = lowerCoMheight ;
           }else{
             InitPos = lowerCoMheight ;
             FinalPos = lowerCoMheight ;
           }
-        }else if (LastCoM.z[0] >= initCoMheight + 0.00001 || LastCoM.z[0] <= initCoMheight - 0.00001)
+        }else if(LastCoM.z[0] >= initCoMheight + 0.00001 || LastCoM.z[0] <= initCoMheight - 0.00001)
         {
           FinalTime = SStime ;
           InitPos = lowerCoMheight ;
         }
-
         m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
       }
 

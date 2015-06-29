@@ -75,7 +75,12 @@ private:
   BSplinesFoot *RHX_;
   BSplinesFoot *RHY_;
   BSplinesFoot *RHZ_;
-  BSplinesFoot *RHOMEGA_;
+  BSplinesFoot *RHroll_cs;
+  BSplinesFoot *RHpitch_cs;
+  BSplinesFoot *RHyaw_cs;
+  BSplinesFoot *RHroll_sn;
+  BSplinesFoot *RHpitch_sn;
+  BSplinesFoot *RHyaw_sn;
 
   double movingPeriod_   ;
   double supportPeriod_  ;
@@ -118,43 +123,20 @@ public:
   bool doTest(ostream &os)
   {
     for (unsigned int step = 0 ; step < timing_.size() ; ++step )
-      {
-        interpolate_support(step);
-      }
+    {
+      interpolate_support(step);
+    }
 
     readData();
     com_sampling_correction();
 
-    q_  .resize(comPos_.size()) ;
-    dq_ .resize(comPos_.size()) ;
-    ddq_.resize(comPos_.size()) ;
-
-    matrix4d identity, rightHandPose, rs_w ;
-    MAL_VECTOR_DIM(rarm_q, double, 6) ;
-    CjrlHumanoidDynamicRobot * HDR = CFRG_->getHumanoidDynamicRobot();
-    CjrlJoint* right_shoulder = NULL ;
-
-
-    MAL_S4x4_MATRIX_SET_IDENTITY(identity);
-    MAL_S4x4_MATRIX_SET_IDENTITY(rightHandPose);
-    MAL_S4x4_MATRIX_SET_IDENTITY(rs_w);
-
-    MAL_S4x4_MATRIX_ACCESS_I_J(rs_w,0,3) = -0.04   ;
-    MAL_S4x4_MATRIX_ACCESS_I_J(rs_w,1,3) = 0.25  ;
-    MAL_S4x4_MATRIX_ACCESS_I_J(rs_w,2,3) = -0.5317 ;
-
-    std::vector<CjrlJoint*> actuatedJoints = HDR->getActuatedJoints() ;
-    for (unsigned int i = 0 ; i < actuatedJoints.size() ; ++i )
-      {
-        if ( actuatedJoints[i]->getName() == "RARM_JOINT0" )
-          right_shoulder = actuatedJoints[i];
-      }
-
-
-    cout << comPos_.size() << endl ;
-    cout << lfoot_.size() << endl ;
-
-    assert(comPos_.size() == lfoot_.size() );
+    cout << "comPos_.size() = " << comPos_.size() << endl ;
+    cout << "lfoot_.size()  = " << lfoot_.size() << endl ;
+    cout << "comSpeed_.size()  = " << comSpeed_.size() << endl ;
+    assert(comPos_.size() == lfoot_.size()
+           && lfoot_.size() == comSpeed_.size()
+           && comPos_.size() == comSpeed_.size()
+           && 19.3/samplingPeriod_);
     ofstream aof;
     string aFileName;
     static int iteration = 0 ;
@@ -183,37 +165,24 @@ public:
       aof << filterprecision( rhand_[i](0)  ) << " "  ; // 8  x
       aof << filterprecision( rhand_[i](1)  ) << " "  ; // 9  y
       aof << filterprecision( rhand_[i](2)  ) << " "  ; // 10  z
-      aof << filterprecision( rhand_[i](3)  ) << " "  ; // 11  pitch angle
+      aof << filterprecision( rhand_[i](3)  ) << " "  ; // 11  roll angle
+      aof << filterprecision( rhand_[i](4)  ) << " "  ; // 12  pitch angle
+      aof << filterprecision( rhand_[i](5)  ) << " "  ; // 13  yaw angle
 
-      if (i*0.005 < timing_[0])
-      {
-        aof << filterprecision(  0.9639598  ) << " "  ; // 12  R(0.0) rotation matrix
-        aof << filterprecision( -0.04494346 ) << " "  ; // 13  R(0.1) of the right hand
-        aof << filterprecision( -0.26222429 ) << " "  ; // 14  R(0.2) half sitting compatible
-        aof << filterprecision(  0.08682409 ) << " "  ; // 15  R(1.0) position
-        aof << filterprecision(  0.98480775 ) << " "  ; // 16  R(1.1)
-        aof << filterprecision(  0.15038373 ) << " "  ; // 17  R(1.2)
-        aof << filterprecision(  0.25148175 ) << " "  ; // 18  R(2.0)
-        aof << filterprecision( -0.16773126 ) << " "  ; // 19  R(2.1)
-        aof << filterprecision(  0.95321726 ) << " "  ; // 20  R(2.2)
-      }else{
-        aof << filterprecision( cos(rhand_[i](3))  ) << " "  ; // 12  R(0.0) rotation matrix
-        aof << filterprecision( sin(rhand_[i](3))  ) << " "  ; // 13  R(0.1) of the right hand
-        aof << filterprecision( 0.0                ) << " "  ; // 14  R(0.2)
-        aof << filterprecision( -sin(rhand_[i](3)) ) << " "  ; // 15  R(1.0)
-        aof << filterprecision( cos(rhand_[i](3))  ) << " "  ; // 16  R(1.1)
-        aof << filterprecision( 0.0                ) << " "  ; // 17  R(1.2)
-        aof << filterprecision( 0.0                ) << " "  ; // 18  R(2.0)
-        aof << filterprecision( 0.0                ) << " "  ; // 19  R(2.1)
-        aof << filterprecision( 1.0                ) << " "  ; // 20  R(2.2)
-      }
+      aof << filterprecision( comPos_[i](0) ) << " "  ; // 14  x
+      aof << filterprecision( comPos_[i](1) ) << " "  ; // 15  y
+      aof << filterprecision( comPos_[i](2) ) << " "  ; // 16  z
+      aof << filterprecision( comPos_[i](3) ) << " "  ; // 17  roll
+      aof << filterprecision( comPos_[i](4) ) << " "  ; // 18  pitch
+      aof << filterprecision( comPos_[i](5) ) << " "  ; // 19  yaw
 
-      aof << filterprecision( comPos_[i](0) ) << " "  ; // 21  x
-      aof << filterprecision( comPos_[i](1) ) << " "  ; // 22  y
-      aof << filterprecision( comPos_[i](2) ) << " "  ; // 23  z
-      aof << filterprecision( comPos_[i](3) ) << " "  ; // 24  roll
-      aof << filterprecision( comPos_[i](4) ) << " "  ; // 25  pitch
-      aof << filterprecision( comPos_[i](5) ) << " "  ; // 26  yaw
+      aof << filterprecision( comSpeed_[i](0) ) << " "  ; // 14  x
+      aof << filterprecision( comSpeed_[i](1) ) << " "  ; // 15  y
+      aof << filterprecision( comSpeed_[i](2) ) << " "  ; // 16  z
+      aof << filterprecision( comSpeed_[i](3) ) << " "  ; // 17  roll
+      aof << filterprecision( comSpeed_[i](4) ) << " "  ; // 18  pitch
+      aof << filterprecision( comSpeed_[i](5) ) << " "  ; // 19  yaw
+
       aof << endl ;
     }
 
@@ -414,7 +383,7 @@ protected:
     if (finPos - iniPos > epsilon )
       {
         ToMP.push_back(0.4*TimeInterval);
-        MP.push_back(finPos+WayPoint_z);
+        MP.push_back(finPos+0.01);
       }
     else if (finPos - iniPos <= epsilon && finPos - iniPos >= -epsilon )
       {}
@@ -422,8 +391,18 @@ protected:
 
     MP.clear(); ToMP.clear() ;
     TimeInterval = gripperCoef*liftCoef*timing_[it] ; iniPos = rhs_[it-1](3) ; finPos = rhs_[it](3) ;
-    RHOMEGA_->SetParameters(TimeInterval,iniPos,finPos,ToMP,MP);
+    RHroll_cs->SetParameters(TimeInterval,cos(iniPos),cos(finPos),ToMP,MP);
+    RHroll_sn->SetParameters(TimeInterval,sin(iniPos),sin(finPos),ToMP,MP);
 
+    MP.clear(); ToMP.clear() ;
+    TimeInterval = gripperCoef*liftCoef*timing_[it] ; iniPos = rhs_[it-1](4) ; finPos = rhs_[it](4) ;
+    RHpitch_cs->SetParameters(TimeInterval,cos(iniPos),cos(finPos),ToMP,MP);
+    RHpitch_sn->SetParameters(TimeInterval,sin(iniPos),sin(finPos),ToMP,MP);
+
+    MP.clear(); ToMP.clear() ;
+    TimeInterval = gripperCoef*liftCoef*timing_[it] ; iniPos = rhs_[it-1](5) ; finPos = rhs_[it](5) ;
+    RHyaw_cs->SetParameters(TimeInterval,cos(iniPos),cos(finPos),ToMP,MP);
+    RHyaw_sn->SetParameters(TimeInterval,sin(iniPos),sin(finPos),ToMP,MP);
 
     double UnlockedSwingPeriod = LFX_->FT() ;
     double ss_time = LFZ_->FT() ;
@@ -432,9 +411,9 @@ protected:
 
     double timeOfInterpolation = 0.0 ;
 
-    MAL_VECTOR_DIM(aLF,double,5);
-    MAL_VECTOR_DIM(aRF,double,5);
-    MAL_VECTOR_DIM(aRH,double,5);
+    MAL_VECTOR_DIM(aLF,double,6);
+    MAL_VECTOR_DIM(aRF,double,6);
+    MAL_VECTOR_DIM(aRH,double,6);
 
     for(int i = 0 ; i < (int)round(timing_[it]/samplingPeriod_) ; ++i )
       {
@@ -451,12 +430,12 @@ protected:
             timeOfInterpolation = UnlockedSwingPeriod ;
           }
 
-        double tmp,dtmp,ddtmp;
+        double tmp,dtmp,ddtmp, sn,dsn,ddsn, cs,dcs,ddcs;
         LFX_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
         aLF(0) = tmp ;
         LFY_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
         aLF(1) = tmp ;
-        LFZ_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        LFZ_->Compute(i*samplingPeriod_,tmp,dtmp,ddtmp);
         aLF(2) = tmp ;
         aLF(3) = 0.0;
         aLF(4) = 0.0;
@@ -465,7 +444,7 @@ protected:
         aRF(0) = tmp ;
         RFY_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
         aRF(1) = tmp ;
-        RFZ_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        RFZ_->Compute(i*samplingPeriod_,tmp,dtmp,ddtmp);
         aRF(2) = tmp ;
         aRF(3) = 0.0;
         aRF(4) = 0.0;
@@ -474,11 +453,20 @@ protected:
         aRH(0) = tmp ;
         RHY_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
         aRH(1) = tmp ;
-        RHZ_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
+        RHZ_->Compute(i*samplingPeriod_,tmp,dtmp,ddtmp);
         aRH(2) = tmp ;
-        RHOMEGA_->Compute(timeOfInterpolation,tmp,dtmp,ddtmp);
-        aRH(3) = tmp ;
-        aRH(4) = 0.0;
+
+        RHroll_cs->Compute(timeOfInterpolation,cs,dcs,ddcs);
+        RHroll_sn->Compute(timeOfInterpolation,sn,dsn,ddsn);
+        aRH(3) = atan2(sn,cs) ;
+
+        RHpitch_cs->Compute(timeOfInterpolation,cs,dcs,ddcs);
+        RHpitch_sn->Compute(timeOfInterpolation,sn,dsn,ddsn);
+        aRH(4) = atan2(sn,cs) ;
+
+        RHyaw_cs->Compute(timeOfInterpolation,cs,dcs,ddcs);
+        RHyaw_sn->Compute(timeOfInterpolation,sn,dsn,ddsn);
+        aRH(5) = atan2(sn,cs) ;
 
         lfoot_.push_back(aLF) ;
         rfoot_.push_back(aRF) ;
@@ -493,38 +481,50 @@ protected:
     deque<MAL_VECTOR_TYPE(double)> com_1ms ;
     deque<MAL_VECTOR_TYPE(double)> com_5ms ;
 
+    deque<MAL_VECTOR_TYPE(double)> comVel_1ms ;
+    deque<MAL_VECTOR_TYPE(double)> comVel_5ms ;
+
     double sampling_time = data_time_[1] - data_time_[0] ;
     if (sampling_time - 0.001 < 0.0001 )
       {
         com_1ms = comPos_ ;
+        comVel_1ms = comSpeed_ ;
       }
     else
       {
           com_1ms.clear();
+          comVel_1ms.clear();
           for (unsigned int i = 0 ; i < comPos_.size()-1 ; ++i)
             {
               com_1ms.push_back(comPos_[i]);
               com_1ms.push_back( 0.5*(comPos_[i]+comPos_[i+1]) );
+              comVel_1ms.push_back(comSpeed_[i]);
+              comVel_1ms.push_back( 0.5*(comSpeed_[i]+comSpeed_[i+1]) );
             }
       }
 
     for (unsigned int i = 0 ; i < com_1ms.size() ; i=i+5)
       {
         com_5ms.push_back(com_1ms[i]);
+        comVel_5ms.push_back(comVel_1ms[i]);
       }
 
     comPos_ = com_5ms ;
     comPos_.pop_back();
+    comSpeed_ = comVel_5ms ;
+    comSpeed_.pop_back();
+
     for (unsigned int i = 0 ; i < initialTime_/samplingPeriod_ ; ++i)
       {
         comPos_.push_front(comPos_.front());
+        comSpeed_.push_front(comSpeed_.front());
       }
     for (unsigned int i = 0 ; i < finalTime_/samplingPeriod_ ; ++i)
       {
         comPos_.push_back(comPos_.back());
+        comSpeed_.push_back(comSpeed_.back());
       }
 
-    comSpeed_.resize(comPos_.size());
     comAcc_.resize(comPos_.size());
     data_time_.resize(comPos_.size());
     for(unsigned int i = 0 ; i < data_time_.size() ; ++i)
@@ -550,8 +550,12 @@ protected:
     RHX_ = new BSplinesFoot() ;
     RHY_ = new BSplinesFoot() ;
     RHZ_ = new BSplinesFoot() ;
-    RHOMEGA_ = new BSplinesFoot() ;
-
+    RHroll_cs  = new BSplinesFoot() ;
+    RHpitch_cs = new BSplinesFoot() ;
+    RHyaw_cs   = new BSplinesFoot() ;
+    RHroll_sn  = new BSplinesFoot() ;
+    RHpitch_sn = new BSplinesFoot() ;
+    RHyaw_sn   = new BSplinesFoot() ;
 
     //                    time     InitPosition   FinalPosition  InitSpeed
     LFX_->SetParameters(timing_[0],lfs_[0](0),lfs_[0](0),ToMP,MP);
@@ -565,7 +569,12 @@ protected:
     RHX_->SetParameters(timing_[0],rhs_[0](0),rhs_[0](0),ToMP,MP);
     RHY_->SetParameters(timing_[0],rhs_[0](1),rhs_[0](1),ToMP,MP);
     RHZ_->SetParameters(timing_[0],rhs_[0](2),rhs_[0](2),ToMP,MP);
-    RHOMEGA_->SetParameters(timing_[0],rhs_[0](3),rhs_[0](3),ToMP,MP);
+    RHroll_cs ->SetParameters(timing_[0],cos(rhs_[0](3)),cos(rhs_[0](3)),ToMP,MP);
+    RHpitch_cs->SetParameters(timing_[0],cos(rhs_[0](4)),cos(rhs_[0](4)),ToMP,MP);
+    RHyaw_cs  ->SetParameters(timing_[0],cos(rhs_[0](5)),cos(rhs_[0](5)),ToMP,MP);
+    RHroll_sn ->SetParameters(timing_[0],sin(rhs_[0](3)),sin(rhs_[0](3)),ToMP,MP);
+    RHpitch_sn->SetParameters(timing_[0],sin(rhs_[0](4)),sin(rhs_[0](4)),ToMP,MP);
+    RHyaw_sn  ->SetParameters(timing_[0],sin(rhs_[0](5)),sin(rhs_[0](5)),ToMP,MP);
     return 1;
   }
 
@@ -576,13 +585,13 @@ protected:
 
     movingPeriod_  = 1.4 ;
     supportPeriod_ = 0.1 ;
-    initialTime_   = 5.0 ;
-    finalTime_     = 5.0 ;
+    initialTime_   = 5. ;
+    finalTime_     = 5. ;
     samplingPeriod_ = 0.005 ;
 
-    MAL_VECTOR_DIM(aSLF,double,5);
-    MAL_VECTOR_DIM(aSRF,double,5);
-    MAL_VECTOR_DIM(aSRH,double,5);
+    MAL_VECTOR_DIM(aSLF,double,6);
+    MAL_VECTOR_DIM(aSRF,double,6);
+    MAL_VECTOR_DIM(aSRH,double,6);
 
     double init_lfx = 0.00949035 ;
     double init_lfy = 0.095      ;
@@ -592,145 +601,184 @@ protected:
     double init_rfy = -0.095     ;
     double init_rfz = 0.0        ;
 
-    double init_rhx = 0.0418343 ;
-    double init_rhy = -0.331008 ;
-    double init_rhz = 0.704285  ;
+    // 10cm handrill ////////////////////////// to pass to left hand be carefull!!!!!
+//    double sth = 0.1 ; // stair height
+//    double sta = -0.3218 ; // stair angle
+//    double init_hx = 0.0418343 ;
+//    double init_hy = 0.331008 ; // left hand
+//    double init_hz = 0.704285  ;
+//    double init_hroll  = 0.17418019 ;
+//    double init_hpitch = -0.25421091 ;
+//    double init_hyaw   = -0.08982785 ;
+
+//    // first hand pose
+//    double hx_1 = 0.3   ;
+//    double hy_1 = 0.35 ;
+//    double hz_1 = 0.792 ;
+//    // sec   hand pose
+//    double hx_2 = 0.6   ;
+//    double hz_2 = 0.892 ;
+
+    // 15cm handrill ///////////////////////////
+    double sth = 0.15 ; // stair height
+    double sta = -0.4537; // stair angle
+    double init_hx = 0.0418343 ;
+    double init_hy = -0.331008 ; // right hand
+    double init_hz = 0.704285  ;
+    double init_hroll  = -0.17418019 ;
+    double init_hpitch = -0.25421091 ;
+    double init_hyaw   =  0.08982785 ;
+    // first hand pose
+    double hx_1 = 0.3   ;
+    double hy_1 = -0.35 ;
+    double hz_1 = 0.839 ;
+    // sec   hand pose
+    double hx_2 = 0.6   ;
+    double hz_2 = 0.985 ;
+
+
 
     // 0     5.0 second
-    aSLF(0)=init_lfx ; aSRF(0)=init_rfx;aSRH(0)=init_rhx   ;
-    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=init_rhy   ;
-    aSLF(2)=init_lfz ; aSRF(2)=init_rfz;aSRH(2)=init_rhz   ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;    aSRH(3)=0.0         ;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx ; aSRF(0)=init_rfx;aSRH(0)=init_hx   ;
+    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=init_hy   ;
+    aSLF(2)=init_lfz ; aSRF(2)=init_rfz;aSRH(2)=init_hz   ;
+    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;    aSRH(3)=init_hroll  ;
+    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=init_hpitch ;
+    aSLF(5)=0.0 ;      aSRF(5)=0.0 ;    aSRH(5)=init_hyaw   ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-    timing_.push_back(initialTime_+supportPeriod_/2);
-//
+    timing_.push_back(initialTime_+3*supportPeriod_/2);
+
+    //double init_hy = -0.331008 ; // left hand
     // 1     0.7 second
-    aSLF(0)=init_lfx ; aSRF(0)=init_rfx;aSRH(0)=0.3         ;
-    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=init_rhy   ;
-    aSLF(2)=init_lfz ; aSRF(2)=init_rfz;aSRH(2)=0.705+1*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;    aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx ; aSRF(0)=init_rfx;aSRH(0)=hx_1        ;
+    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=hy_1        ;
+    aSLF(2)=init_lfz ; aSRF(2)=init_rfz;aSRH(2)=hz_1       ;
+    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;    aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;      aSRF(5)=0.0 ;    aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(movingPeriod_);
 
     // 2     0.1 s
-    aSLF(0)=init_lfx ; aSRF(0)=init_rfx;aSRH(0)=0.3         ;
-    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=init_rhy   ;
-    aSLF(2)=init_lfz ; aSRF(2)=init_rfz;aSRH(2)=0.705+1*0.1 ;
-    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;    aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx ; aSRF(0)=init_rfx;aSRH(0)=hx_1        ;
+    aSLF(1)=init_lfy ; aSRF(1)=init_rfy;aSRH(1)=hy_1        ;
+    aSLF(2)=init_lfz ; aSRF(2)=init_rfz;aSRH(2)=hz_1       ;
+    aSLF(3)=0.0 ;      aSRF(3)=0.0 ;    aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;      aSRF(5)=0.0 ;    aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(supportPeriod_);
 
     // 3     0.7 s
-    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx;aSRH(0)=0.3         ;
-    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy;aSRH(1)=init_rhy   ;
-    aSLF(2)=0.1 ;          aSRF(2)=init_rfz;aSRH(2)=0.705+1*0.1 ;
-    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;    aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
+    init_lfx=0.0;///////////////////////////////////////////////////////////////
+    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx;aSRH(0)=hx_1        ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy;aSRH(1)=hy_1        ;
+    aSLF(2)=sth ;          aSRF(2)=init_rfz;aSRH(2)=hz_1       ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;    aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;    aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;          aSRF(5)=0.0 ;    aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(movingPeriod_);
 
     // 4    0.1 s
-    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx;aSRH(0)=0.3         ;
-    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy;aSRH(1)=init_rhy   ;
-    aSLF(2)=0.1 ;          aSRF(2)=init_rfz;aSRH(2)=0.705+1*0.1 ;
-    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;    aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;    aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx;aSRH(0)=hx_1        ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy;aSRH(1)=hy_1        ;
+    aSLF(2)=sth ;          aSRF(2)=init_rfz;aSRH(2)=hz_1       ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;    aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;    aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;          aSRF(5)=0.0 ;    aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(supportPeriod_);
 
     // 5    0.7 s
-    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.3         ;
-    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy  ;
-    aSLF(2)=0.1 ;          aSRF(2)=0.1 ;           aSRH(2)=0.705+1*0.1 ;
-    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
+    init_rfx = 0.0;//////////////////////////////////////////////////////////////
+    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=hx_1        ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=hy_1        ;
+    aSLF(2)=sth ;          aSRF(2)=sth ;           aSRH(2)=hz_1       ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;          aSRF(5)=0.0 ;           aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(movingPeriod_);
 
     // 6    0.1 s
-    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.3         ;
-    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
-    aSLF(2)=0.1 ;          aSRF(2)=0.1 ;           aSRH(2)=0.705+1*0.1 ;
-    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=hx_1        ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=hy_1        ;
+    aSLF(2)=sth ;          aSRF(2)=sth ;           aSRH(2)=hz_1       ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;          aSRF(5)=0.0 ;           aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(supportPeriod_);
 //
     // 7    0.7 s
-    aSLF(0)=init_lfx+0.3 ;aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.6         ;
-    aSLF(1)=init_lfy ;    aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
-    aSLF(2)=0.1 ;         aSRF(2)=0.1 ;           aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;         aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;         aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.3 ;aSRF(0)=init_rfx+0.3 ;  aSRH(0)=hx_2        ;
+    aSLF(1)=init_lfy ;    aSRF(1)=init_rfy     ;  aSRH(1)=hy_1        ;
+    aSLF(2)=sth ;         aSRF(2)=sth ;           aSRH(2)=hz_2        ;
+    aSLF(3)=0.0 ;         aSRF(3)=0.0 ;           aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;         aSRF(4)=0.0 ;           aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;         aSRF(5)=0.0 ;           aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(movingPeriod_);
 
     // 8    0.1 s
-    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.6         ;
-    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
-    aSLF(2)=0.1 ;          aSRF(2)=0.1 ;           aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=hx_2        ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=hy_1        ;
+    aSLF(2)=sth ;          aSRF(2)=sth ;           aSRH(2)=hz_2        ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;          aSRF(5)=0.0 ;           aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(supportPeriod_);
 
     // 9    0.7 s
-    aSLF(0)=init_lfx+0.6 ;aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.6         ;
-    aSLF(1)=init_lfy ;    aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
-    aSLF(2)=0.2 ;         aSRF(2)=0.1 ;           aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;         aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;         aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.6 ;aSRF(0)=init_rfx+0.3 ;  aSRH(0)=hx_2        ;
+    aSLF(1)=init_lfy ;    aSRF(1)=init_rfy     ;  aSRH(1)=hy_1        ;
+    aSLF(2)=2*sth;        aSRF(2)=sth ;           aSRH(2)=hz_2        ;
+    aSLF(3)=0.0 ;         aSRF(3)=0.0 ;           aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;         aSRF(4)=0.0 ;           aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;         aSRF(5)=0.0 ;           aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(movingPeriod_);
 
     // 10    0.1 s
-    aSLF(0)=init_lfx+0.6 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=0.6         ;
-    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
-    aSLF(2)=0.2 ;          aSRF(2)=0.1 ;           aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.6 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=hx_2        ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=hy_1        ;
+    aSLF(2)=2*sth;         aSRF(2)=sth ;           aSRH(2)=hz_2        ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;          aSRF(5)=0.0 ;           aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(supportPeriod_);
 
     // 11    0.7 s
-    aSLF(0)=init_lfx+0.6 ; aSRF(0)=init_rfx+0.6 ;  aSRH(0)=0.6         ;
-    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
-    aSLF(2)=0.2 ;          aSRF(2)=0.2 ;           aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.6 ; aSRF(0)=init_rfx+0.6 ;  aSRH(0)=hx_2        ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=hy_1        ;
+    aSLF(2)=2*sth;         aSRF(2)=2*sth ;         aSRH(2)=hz_2        ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;          aSRF(5)=0.0 ;           aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     timing_.push_back(movingPeriod_);
 
     // 12    0.1 s
-    aSLF(0)=init_lfx+0.6 ; aSRF(0)=init_rfx+0.6 ;  aSRH(0)=0.6         ;
-    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=init_rhy   ;
-    aSLF(2)=0.2 ;          aSRF(2)=0.2 ;           aSRH(2)=0.705+2*0.1 ;
-    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=-0.451026812;
-    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=0.0         ;
+    aSLF(0)=init_lfx+0.6 ; aSRF(0)=init_rfx+0.6 ;  aSRH(0)=hx_2        ;
+    aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=hy_1        ;
+    aSLF(2)=2*sth;         aSRF(2)=2*sth ;         aSRH(2)=hz_2        ;
+    aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=0.0         ;
+    aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=sta         ;
+    aSLF(5)=0.0 ;          aSRF(5)=0.0 ;           aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     //timing_.push_back(supportPeriod_);
-    timing_.push_back(finalTime_+supportPeriod_/2);
+    timing_.push_back(finalTime_+3*supportPeriod_/2);
 
     return 1 ;
   }
 
   int readData()
   {
-    //std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_03_03_18h56m/" ;
-    //std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm.csv" ;
-    //std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_03_03_21h_01m/" ;
-    //std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm_ds.csv" ;
-//    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_03_27_10h35m/" ;
-//    std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm.csv" ;
-
-    //std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_04_27_10h_43m/" ;
-    //std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm_ds.csv" ;
-
-    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_06_04_14h_12m/" ;
-    std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_10cm_ds.csv" ;
+    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_06_29_16h47m/" ;
+    std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_15cm_ds.csv" ;
 
     std::ifstream dataStream ;
     dataStream.open(dataFile.c_str(),std::ifstream::in);
@@ -759,6 +807,13 @@ protected:
         dataStream >> acomPos(4) ;
         dataStream >> acomPos(5) ;
 
+        dataStream >> acomVel(0) ;
+        dataStream >> acomVel(1) ;
+        dataStream >> acomVel(2) ;
+        dataStream >> acomVel(3) ;
+        dataStream >> acomVel(4) ;
+        dataStream >> acomVel(5) ;
+
         acomPos(3) = acomPos(3) *180/M_PI ;
         acomPos(4) = acomPos(4) *180/M_PI ;
         acomPos(5) = acomPos(5) *180/M_PI ;
@@ -767,7 +822,7 @@ protected:
         comSpeed_.push_back(acomVel);
         comAcc_.push_back(acomAcc);
 
-        for (unsigned int i = 0 ; i < 10 ; ++i)
+        for (unsigned int i = 0 ; i < 4 ; ++i)
           {
             dataStream >> value ;
           }

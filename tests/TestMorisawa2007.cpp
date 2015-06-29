@@ -87,7 +87,7 @@ private:
   // New time between two steps.
   double m_deltatime;
 
-  ComAndFootRealization * ComAndFootRealization_;
+  ComAndFootRealizationByGeometry * ComAndFootRealization_;
   /// Class that compute the dynamic and kinematic of the robot
   CjrlHumanoidDynamicRobot * cjrlHDR_ ;
   Robot_Model hrp2_14_ ;
@@ -385,6 +385,7 @@ protected:
     aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
     aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
     ComAndFootRealization_->setSamplingPeriod(0.005);
+    ComAndFootRealization_->ShiftFoot(false);
     ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
                                                                     aLeftFootPosition,
                                                                     aRightFootPosition,
@@ -566,6 +567,9 @@ protected:
         aof << endl;
         aof.close();
     }
+
+
+
 
     /// \brief Create file .hip .pos .zmp
     /// ---------------------------------
@@ -843,9 +847,8 @@ protected:
 
    {
        istringstream strm2(":stepstairseq\
-                           0.0  -0.105 0.0 0.0\
-                           0.28  0.145 0.0 0.0\
-                           0.28 -0.100 0.0 0.0\
+                           0.0   0.105 0.0 0.0\
+                           0.28 -0.145 0.0 0.0\
                            0.28  0.100 0.0 0.0\
                            0.28 -0.100 0.0 0.0\
                            0.28  0.100 0.0 0.0\
@@ -854,9 +857,10 @@ protected:
                            0.28 -0.100 0.0 0.0\
                            0.28  0.100 0.0 0.0\
                            0.28 -0.100 0.0 0.0\
-                           0.28  0.145 0.0 0.0\
-                           0.2  -0.190 0.0 0.0\
-                           0.0   0.190 0.0 0.0\
+                           0.28  0.100 0.0 0.0\
+                           0.28 -0.145 0.0 0.0\
+                           0.2   0.190 0.0 0.0\
+                           0.0  -0.190 0.0 0.0\
                            ");
      aPGI.ParseCmd(strm2);
    }

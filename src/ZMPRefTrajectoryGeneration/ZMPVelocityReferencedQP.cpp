@@ -465,10 +465,11 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   InitStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
   FinalCurrentStateOrientPrw_ = OrientPrw_->CurrentTrunkState() ;
 
+  dynamicFilter_->getComAndFootRealization()->ShiftFoot(true);
   dynamicFilter_->init(m_SamplingPeriod,
                        InterpolationPeriod_,
                        QP_T_,
-                       (int)round((previewDuration_+QP_T_)  / QP_T_ ),
+                       QP_N_*QP_T_ ,
                        previewDuration_,
                        lStartingCOMState);
   return 0;

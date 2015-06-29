@@ -775,18 +775,18 @@ protected:
     };
 #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-    { //{ 5*200,&TestHerdt2010::walkForward1m_s},
-      //{10*200,&TestHerdt2010::walkForward1m_s},
-      //{15*200,&TestHerdt2010::walkForward1m_s},
-      //{20*200,&TestHerdt2010::walkSidewards1m_s},
-      //{25*200,&TestHerdt2010::walkSidewards1m_s},
-      //{30*200,&TestHerdt2010::walkSidewards1m_s},
-      //{35*200,&TestHerdt2010::startTurningRightOnSpot},
-      //{50*200,&TestHerdt2010::stop},
-      //{55*200,&TestHerdt2010::stopOnLineWalking}
-      {5*200,&TestHerdt2010::startTurningRightOnSpot},
+    { { 5*200,&TestHerdt2010::walkForward1m_s},
+      {10*200,&TestHerdt2010::walkForward1m_s},
+      {15*200,&TestHerdt2010::walkForward1m_s},
+      {20*200,&TestHerdt2010::walkSidewards1m_s},
+      {25*200,&TestHerdt2010::walkSidewards1m_s},
+      {30*200,&TestHerdt2010::walkSidewards1m_s},
+      {35*200,&TestHerdt2010::startTurningRightOnSpot},
       {50*200,&TestHerdt2010::stop},
       {55*200,&TestHerdt2010::stopOnLineWalking}};
+      //{5*200,&TestHerdt2010::startTurningRightOnSpot},
+      //{50*200,&TestHerdt2010::stop},
+      //{55*200,&TestHerdt2010::stopOnLineWalking}};
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
       {

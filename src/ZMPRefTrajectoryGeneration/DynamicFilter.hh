@@ -68,12 +68,13 @@ namespace PatternGeneratorJRL
         const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
         deque<COMState> & outputDeltaCOMTraj_deq_);
 
-    void init(double controlPeriod,
+    void init(
+        double controlPeriod,
         double interpolationPeriod,
-        double PG_T, unsigned int PG_N,
+        double controlWindowSize,
         double previewWindowSize,
-        COMState inputCoM
-        );
+        double kajitaPCwindowSize,
+        COMState inputCoMState);
 
     /// \brief atomic function
     void InverseKinematics(
@@ -125,19 +126,6 @@ namespace PatternGeneratorJRL
 
   public: // The accessors
 
-    /// \brief setter :
-    inline void setControlPeriod(double controlPeriod)
-    {controlPeriod_ = controlPeriod ;}
-
-    inline void setInterpolationPeriod(double interpolationPeriod)
-    {interpolationPeriod_ = interpolationPeriod ; return ;}
-
-    inline void setPGPeriod(double PG_T)
-    {PG_T_ = PG_T ;}
-
-    inline void setPreviewWindowSize_(double previewWindowSize)
-    { previewWindowSize_ = previewWindowSize; }
-
     void setRobotUpperPart(const MAL_VECTOR_TYPE(double) & configuration,
                            const MAL_VECTOR_TYPE(double) & velocity,
                            const MAL_VECTOR_TYPE(double) & acceleration);
@@ -175,25 +163,17 @@ namespace PatternGeneratorJRL
       /// \brief control period of the PG host
       double controlPeriod_;
 
-      /// \brief Interpolation Period for the dynamic filter
+      /// \brief Interpolation Period for the PG host preview window
       double interpolationPeriod_ ;
 
-      /// \brief Sampling period of the PG host
-      double PG_T_;
+      /// \brief size of the kajita PC preview window in second
+      double kajitaPCwindowSize_ ;
 
-      /// \brief size of the previw window in second
+      /// \brief size of the window containing the controls in second
+      double controlWindowSize_ ;
+
+      /// \brief size of the preview window of the PG host in second
       double previewWindowSize_ ;
-
-      //------------------------------------------------------
-      /// \brief Contain the number of control points
-      unsigned int NCtrl_;
-
-      /// \brief Contain the number of interpolation points
-      /// inside the Sampling period of the PG host
-      double NbI_ ;
-
-      /// \brief Nb. samplings inside preview window
-      unsigned int PG_N_ ;
 
     /// \brief Inverse Kinematics variables
     /// -----------------------------------
