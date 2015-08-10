@@ -301,7 +301,7 @@ RelativeFeetInequalities::compute_linear_system ( convex_hull_t & ConvexHull,
     y2 = ConvexHull.Y_vec[0];
     x1 = ConvexHull.X_vec[i];
     x2 = ConvexHull.X_vec[0];
-    cout << x1 << " " << x2 << " " << sign << " " << y1 << " " << y2 << endl;
+
     dx = y1-y2;
     dy = x2-x1;
     dc = dx*x1+dy*y1;

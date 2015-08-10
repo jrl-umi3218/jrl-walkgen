@@ -854,7 +854,6 @@ void NMPC_generator::updateFootVelIneqConstraint()
   double norm_vref = sqrt(vref_x*vref_x + vref_y*vref_y ) ;
   double dyaw = global_vel_ref_.dYaw ;
   double signq = dyaw>=0.0?1:-1;
-  cout << signq << endl ;
 
   double xvmax(0.4), yvmax(0.4), yawvmax(1.5) ;// [m/s,m/s,rad/s]
 
@@ -1158,7 +1157,6 @@ void NMPC_generator::updateCostFunction()
       qp_H_(i+n_x,j+n_x)=Q_x_(i,j) ;
     }
   }
-  unsigned n_theta = nf_;
   for(unsigned i=0 ; i<n_theta ;++i)
     for(unsigned j=0 ; j<n_theta ;++j)
       qp_H_(i+2*n_x,j+2*n_x)=Q_theta_(i,j) ;
@@ -1230,15 +1228,25 @@ void NMPC_generator::updateCostFunction()
   qp_lbJ_vel_ = LBvel_ - MAL_RET_A_by_B(Avel_,U_xy_);
   qp_ubJ_vel_ = UBvel_ - MAL_RET_A_by_B(Avel_,U_xy_);
   //    Obstacle
-  qp_lbJ_obs_ = LBcop_ - MAL_RET_A_by_B(Acop_xy_,U_xy_);
-  qp_ubJ_obs_ = UBcop_ - MAL_RET_A_by_B(Acop_xy_,U_xy_);
+  for(unsigned obs=0 ; obs<obstacles_.size() ; ++obs)
+  {
+    for(unsigned n=0 ; n<nf_ ; ++n)
+    {
+      MAL_VECTOR_TYPE(double) HobsUxy = MAL_RET_A_by_B(Hobs_[obs][n],U_xy_);
+      double deltaObs = 0 ;
+      for(unsigned i=0 ; i<MAL_VECTOR_SIZE(HobsUxy) ; ++i)
+          deltaObs += U_xy_(i) * (HobsUxy(i) + Aobs_[obs][n](i)) ;
+      qp_lbJ_obs_((obs+1)*n) = LBobs_[obs](n) - deltaObs ;
+      qp_ubJ_obs_((obs+1)*n) = UBobs_[obs](n) - deltaObs ;
+    }
+  }
   //    Rotation
   qp_lbJ_rot_ = LBcop_ - MAL_RET_A_by_B(Acop_xy_,U_xy_);
   qp_ubJ_rot_ = UBcop_ - MAL_RET_A_by_B(Acop_xy_,U_xy_);
 
 
-  , qp_lbJ_foot_, qp_lbJ_vel_, qp_lbJ_obs_, qp_lbJ_rot_
-  , qp_ubJ_foot_, qp_ubJ_vel_, qp_ubJ_obs_, qp_ubJ_rot_
+//  , qp_lbJ_foot_, qp_lbJ_vel_, qp_lbJ_obs_, qp_lbJ_rot_
+//  , qp_ubJ_foot_, qp_ubJ_vel_, qp_ubJ_obs_, qp_ubJ_rot_
 
 
   // Fill up qp_lbJ_, qp_ubJ_ and qp_J_
@@ -1282,6 +1290,11 @@ void NMPC_generator::updateCostFunction()
     for(unsigned j=0 ; j<nv_ ; ++j)
       qp_J_(i+index,j) = qp_J_rot_(i,j);
   }
+
+  DumpMatrix("qp_H_",qp_H_);
+  DumpMatrix("qp_J_",qp_J_);
+  DumpVector("qp_lbJ_",qp_lbJ_);
+  DumpVector("qp_ubJ_",qp_ubJ_);
   return ;
 }
 
