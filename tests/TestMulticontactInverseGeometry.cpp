@@ -136,7 +136,7 @@ public:
     assert(comPos_.size() == lfoot_.size()
            && lfoot_.size() == comSpeed_.size()
            && comPos_.size() == comSpeed_.size()
-           && 19.3/samplingPeriod_);
+           && 19/samplingPeriod_);
     ofstream aof;
     string aFileName;
     static int iteration = 0 ;
@@ -154,13 +154,13 @@ public:
 
     for(unsigned int i = 0 ; i < lfoot_.size() ; i++){
       aof << filterprecision( data_time_[i] ) << " "  ; // 1
-      aof << filterprecision( lfoot_[i](0)  ) << " "  ; // 2   x
-      aof << filterprecision( lfoot_[i](1)  ) << " "  ; // 3   y
-      aof << filterprecision( lfoot_[i](2)  ) << " "  ; // 4   z
+      aof << filterprecision( rfoot_[i](0)  ) << " "  ; // 2   x
+      aof << filterprecision( rfoot_[i](1)  ) << " "  ; // 3   y
+      aof << filterprecision( rfoot_[i](2)  ) << " "  ; // 4   z
 
-      aof << filterprecision( rfoot_[i](0)  ) << " "  ; // 5   x
-      aof << filterprecision( rfoot_[i](1)  ) << " "  ; // 6   y
-      aof << filterprecision( rfoot_[i](2)  ) << " "  ; // 7   z
+      aof << filterprecision( lfoot_[i](0)  ) << " "  ; // 5   x
+      aof << filterprecision( lfoot_[i](1)  ) << " "  ; // 6   y
+      aof << filterprecision( lfoot_[i](2)  ) << " "  ; // 7   z
 
       aof << filterprecision( rhand_[i](0)  ) << " "  ; // 8  x
       aof << filterprecision( rhand_[i](1)  ) << " "  ; // 9  y
@@ -318,9 +318,9 @@ protected:
         return 1 ;
       }
 
-    double liftCoef = 0.9;
+    double liftCoef = 0.8;
     double gripperCoef = 1.0;
-    double WayPoint_z = 0.05 ;
+    double WayPoint_z = 0.0 ;
     double epsilon = 0.001 ;
     vector<double> MP ;
     vector<double> ToMP ;
@@ -341,7 +341,7 @@ protected:
     TimeInterval = timing_[it] ; iniPos = lfs_[it-1](2) ; finPos = lfs_[it](2) ;
     if (finPos - iniPos > epsilon )
       {
-        ToMP.push_back(0.4*TimeInterval);
+        ToMP.push_back(0.3*TimeInterval);
         MP.push_back(finPos+WayPoint_z);
       }
     else if (finPos - iniPos <= epsilon && finPos - iniPos >= -epsilon )
@@ -361,7 +361,7 @@ protected:
     TimeInterval = timing_[it] ; iniPos = rfs_[it-1](2) ; finPos = rfs_[it](2) ;
     if (finPos - iniPos > epsilon )
       {
-        ToMP.push_back(0.4*TimeInterval);
+        ToMP.push_back(0.3*TimeInterval);
         MP.push_back(finPos+WayPoint_z);
       }
     else if (finPos - iniPos <= epsilon && finPos - iniPos >= -epsilon )
@@ -383,7 +383,7 @@ protected:
     if (finPos - iniPos > epsilon )
       {
         ToMP.push_back(0.4*TimeInterval);
-        MP.push_back(finPos+0.01);
+        MP.push_back(iniPos+0.6*(finPos-iniPos));
       }
     else if (finPos - iniPos <= epsilon && finPos - iniPos >= -epsilon )
       {}
@@ -406,7 +406,7 @@ protected:
 
     double UnlockedSwingPeriod = LFX_->FT() ;
     double ss_time = LFZ_->FT() ;
-    double EndOfLiftOff = (ss_time-UnlockedSwingPeriod)*0.5;
+    double EndOfLiftOff = (ss_time-UnlockedSwingPeriod)*0.66;
     double StartLanding = EndOfLiftOff + UnlockedSwingPeriod;
 
     double timeOfInterpolation = 0.0 ;
@@ -594,11 +594,11 @@ protected:
     MAL_VECTOR_DIM(aSRH,double,6);
 
     double init_lfx = 0.00949035 ;
-    double init_lfy = 0.095      ;
+    double init_lfy = -0.095      ;
     double init_lfz = 0.0        ;
                       //
     double init_rfx = 0.00949035 ;
-    double init_rfy = -0.095     ;
+    double init_rfy = +0.095     ;
     double init_rfz = 0.0        ;
 
     // 10cm handrill ////////////////////////// to pass to left hand be carefull!!!!!
@@ -621,7 +621,7 @@ protected:
 
     // 15cm handrill ///////////////////////////
     double sth = 0.15 ; // stair height
-    double sta = -0.4537; // stair angle
+    double sta = -0.47123889803846897; // stair angle
     double init_hx = 0.0418343 ;
     double init_hy = -0.331008 ; // right hand
     double init_hz = 0.704285  ;
@@ -629,12 +629,13 @@ protected:
     double init_hpitch = -0.25421091 ;
     double init_hyaw   =  0.08982785 ;
     // first hand pose
-    double hx_1 = 0.3   ;
+    double deltax = 0.0 ;
+    double hx_1 = 0.3535  + deltax * cos(sqrt(sta*sta)) ;
     double hy_1 = -0.35 ;
-    double hz_1 = 0.839 ;
+    double hz_1 = 0.8524  + deltax * sin(sqrt(sta*sta)) ;
     // sec   hand pose
-    double hx_2 = 0.6   ;
-    double hz_2 = 0.985 ;
+    double hx_2 = 0.65346 + deltax * cos(sqrt(sta*sta)) ;
+    double hz_2 = 1.005   + deltax * sin(sqrt(sta*sta)) ;
 
 
 
@@ -646,7 +647,7 @@ protected:
     aSLF(4)=0.0 ;      aSRF(4)=0.0 ;    aSRH(4)=init_hpitch ;
     aSLF(5)=0.0 ;      aSRF(5)=0.0 ;    aSRH(5)=init_hyaw   ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
-    timing_.push_back(initialTime_+3*supportPeriod_/2);
+    timing_.push_back(initialTime_+supportPeriod_/2);
 
     //double init_hy = -0.331008 ; // left hand
     // 1     0.7 second
@@ -694,7 +695,7 @@ protected:
     init_rfx = 0.0;//////////////////////////////////////////////////////////////
     aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=hx_1        ;
     aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=hy_1        ;
-    aSLF(2)=sth ;          aSRF(2)=sth ;           aSRH(2)=hz_1       ;
+    aSLF(2)=sth ;          aSRF(2)=sth ;           aSRH(2)=hz_1        ;
     aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=0.0         ;
     aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=sta         ;
     aSLF(5)=0.0 ;          aSRF(5)=0.0 ;           aSRH(5)=0.0         ;
@@ -704,7 +705,7 @@ protected:
     // 6    0.1 s
     aSLF(0)=init_lfx+0.3 ; aSRF(0)=init_rfx+0.3 ;  aSRH(0)=hx_1        ;
     aSLF(1)=init_lfy ;     aSRF(1)=init_rfy     ;  aSRH(1)=hy_1        ;
-    aSLF(2)=sth ;          aSRF(2)=sth ;           aSRH(2)=hz_1       ;
+    aSLF(2)=sth ;          aSRF(2)=sth ;           aSRH(2)=hz_1        ;
     aSLF(3)=0.0 ;          aSRF(3)=0.0 ;           aSRH(3)=0.0         ;
     aSLF(4)=0.0 ;          aSRF(4)=0.0 ;           aSRH(4)=sta         ;
     aSLF(5)=0.0 ;          aSRF(5)=0.0 ;           aSRH(5)=0.0         ;
@@ -770,14 +771,14 @@ protected:
     aSLF(5)=0.0 ;          aSRF(5)=0.0 ;           aSRH(5)=0.0         ;
     lfs_.push_back(aSLF); rfs_.push_back(aSRF); rhs_.push_back(aSRH);
     //timing_.push_back(supportPeriod_);
-    timing_.push_back(finalTime_+3*supportPeriod_/2);
+    timing_.push_back(finalTime_+supportPeriod_/2);
 
     return 1 ;
   }
 
   int readData()
   {
-    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_06_29_16h47m/" ;
+    std::string dataPath = "/home/mnaveau/devel/mkudruss_data/2015_07_03_10h16m/" ;
     std::string dataFile = dataPath + "conv_sd_walking_stair_climbing_2_steps_15cm_ds.csv" ;
 
     std::ifstream dataStream ;

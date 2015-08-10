@@ -252,5 +252,15 @@ namespace PatternGeneratorJRL
     return os;
   }
 
+  /// Structure to model a circle (e.g : a stricly convex obstable)
+  struct Circle_t
+  {
+    double x_0 ;
+    double y_0 ;
+    double r ;
+    double margin ;
+  };
+  typedef struct Circle_t Circle ;
+
 }
 #endif

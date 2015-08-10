@@ -188,10 +188,8 @@ namespace PatternGeneratorJRL
   convex_hull_t::convex_hull_t( unsigned nbVert, unsigned nbIneq ):
       nbIneq_(0), nbVert_(0)
   {
-
-    resize( nbVert, nbIneq );
     clear();
-
+    resize( nbVert, nbIneq );
   }
 
 

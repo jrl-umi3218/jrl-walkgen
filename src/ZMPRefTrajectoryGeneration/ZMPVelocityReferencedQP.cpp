@@ -604,7 +604,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
                                    RightFootTraj_deq_,
                                    deltaCOMTraj_deq_);
 
-      #define DEBUG
+      //#define DEBUG
       #ifdef DEBUG
         dynamicFilter_->Debug(COMTraj_deq_ctrl_,
                               LeftFootTraj_deq_ctrl_,

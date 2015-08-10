@@ -443,6 +443,43 @@ IF(HRP2_DYNAMICS_FOUND)
   ENDIF(HRP2_14_FOUND)
 ENDIF(HRP2_DYNAMICS_FOUND)
 
+################
+# SQP test #
+################
+IF(HRP2_DYNAMICS_FOUND)
+  IF(HRP2_14_FOUND)
+
+  MESSAGE(STATUS "hrp2-dynamics taken into account")
+  ADD_EXECUTABLE(TestNaveau2015
+     ../src/portability/gettimeofday.cc
+    TestNaveau2015.cpp
+    CommonTools.cpp
+    TestObject.cpp
+    ClockCPUTime.cpp
+  )
+
+  MESSAGE(STATUS "jrl data dir: " ${HRP2_14_PKGDATAROOTDIR})
+  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/)
+  SET(hrp2dynamicsspec
+    ${HRP2_14_PKGDATAROOTDIR}/HRP2SpecificitiesSmall.xml
+  )
+  SET(hrp2dynamicsljr
+    ${HRP2_14_PKGDATAROOTDIR}/HRP2LinkJointRankSmall.xml
+  )
+  SET(hrp2dynamicsinitconfig
+    ${HRP2_14_PKGDATAROOTDIR}/HRP2JRLInitConfig.dat)
+
+  TARGET_LINK_LIBRARIES(TestNaveau2015 ${PROJECT_NAME})
+  PKG_CONFIG_USE_DEPENDENCY(TestNaveau2015 hrp2-dynamics)
+  IF(NOT ${WITH_HRP2_DYNAMICS} EQUAL "" )
+    TARGET_COMPILE_DEFINITIONS(TestNaveau2015 PRIVATE WITH_HRP2DYNAMICS=1)
+  ENDIF(NOT ${WITH_HRP2_DYNAMICS} EQUAL "" )
+
+  ADD_DEPENDENCIES(TestNaveau2015 ${PROJECT_NAME})
+
+  ENDIF(HRP2_14_FOUND)
+ENDIF(HRP2_DYNAMICS_FOUND)
+
 #####################
 # Add user examples #
 #####################

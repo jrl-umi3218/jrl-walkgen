@@ -1,7 +1,7 @@
 /*
  * Copyright 2010,
  *
- * Andrei Herdt
+ * Maximilien naveau
  * Olivier Stasse
  *
  * JRL, CNRS/AIST
@@ -22,8 +22,7 @@
  *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-/* \file This file tests A. Herdt's walking algorithm for
- * automatic foot placement giving an instantaneous CoM velocity reference.
+/* \file This file tests Kajita's dynamic filter on a simple case
  */
 #include "Debug.hh"
 #include "CommonTools.hh"

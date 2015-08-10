@@ -99,6 +99,13 @@ namespace PatternGeneratorJRL
     /// \param[in] Args: Arguments of the methods.
     virtual void CallMethod (std::string & Method, std::istringstream & Args);
 
+
+    /// \brief Reimplement the interface of SimplePluginManager
+    ///
+    /// \param[in] Method: The method to be called.
+    /// \param[in] Args: Arguments of the methods.
+    void getFeetSize(FootHalfSize & leftFootSize, FootHalfSize & rightFootSize);
+
     //
     // Private member functions
     //

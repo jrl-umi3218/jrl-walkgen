@@ -78,8 +78,10 @@ SET(INCLUDES
   ZMPRefTrajectoryGeneration/mpc-trajectory-generation.hh
   ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh
   ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh
+  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.hh
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.hh
   ZMPRefTrajectoryGeneration/generator-vel-ref.hh
+  ZMPRefTrajectoryGeneration/nmpc_generator.hh
   ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.hh
   ZMPRefTrajectoryGeneration/problem-vel-ref.hh
   ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.hh
@@ -137,6 +139,7 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp
   ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp
   ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.cpp
+  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.cpp
   ZMPRefTrajectoryGeneration/OrientationsPreview.cpp
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp
@@ -144,6 +147,7 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/problem-vel-ref.cpp
   ZMPRefTrajectoryGeneration/qp-problem.cpp
   ZMPRefTrajectoryGeneration/generator-vel-ref.cpp
+  ZMPRefTrajectoryGeneration/nmpc_generator.cpp
   ZMPRefTrajectoryGeneration/mpc-trajectory-generation.cpp
   ZMPRefTrajectoryGeneration/DynamicFilter.cpp
   MultiContactRefTrajectoryGeneration/MultiContactHirukawa.cc
