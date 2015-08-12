@@ -78,7 +78,6 @@ SET(INCLUDES
   ZMPRefTrajectoryGeneration/mpc-trajectory-generation.hh
   ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh
   ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh
-  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.hh
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.hh
   ZMPRefTrajectoryGeneration/generator-vel-ref.hh
   ZMPRefTrajectoryGeneration/nmpc_generator.hh
@@ -102,6 +101,14 @@ SET(INCLUDES
   ../include/jrl/walkgen/pgtypes.hh
   ../include/jrl/walkgen/patterngeneratorinterface.hh
 )
+
+IF(${qpOASES_FOUND} STREQUAL "TRUE")
+SET(INCLUDES
+  ${INCLUDES}
+  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.hh
+  ZMPRefTrajectoryGeneration/nmpc_generator.hh
+)
+ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
 
 SET(SOURCES
   ${INCLUDES}
@@ -139,7 +146,7 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.cpp
   ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.cpp
   ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.cpp
-  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.cpp
+
   ZMPRefTrajectoryGeneration/OrientationsPreview.cpp
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.cpp
   ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.cpp
@@ -147,7 +154,7 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/problem-vel-ref.cpp
   ZMPRefTrajectoryGeneration/qp-problem.cpp
   ZMPRefTrajectoryGeneration/generator-vel-ref.cpp
-  ZMPRefTrajectoryGeneration/nmpc_generator.cpp
+
   ZMPRefTrajectoryGeneration/mpc-trajectory-generation.cpp
   ZMPRefTrajectoryGeneration/DynamicFilter.cpp
   MultiContactRefTrajectoryGeneration/MultiContactHirukawa.cc
@@ -165,7 +172,16 @@ SET(SOURCES
   Clock.cpp
   portability/gettimeofday.cc
   privatepgtypes.cpp
-  )
+)
+
+IF(${qpOASES_FOUND} STREQUAL "TRUE")
+SET(SOURCES
+  ${SOURCES}
+  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.cpp
+  ZMPRefTrajectoryGeneration/nmpc_generator.cpp
+)
+ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
+
 
 # prefix and suffix each element of list by ${prefix}elemnt${suffix}
 macro(ADDPREFIX newlist prefix list_name)
@@ -205,3 +221,7 @@ PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-dynamics)
 IF(USE_LSSOL)
  PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen lssol)
 ENDIF(USE_LSSOL)
+
+IF(${qpOASES_FOUND} STREQUAL "TRUE")
+  TARGET_LINK_LIBRARIES(jrl-walkgen ${qpOASES_LIBRARIES})
+ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
