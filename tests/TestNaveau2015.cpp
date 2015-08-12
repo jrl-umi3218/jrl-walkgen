@@ -81,17 +81,17 @@ int main()
 
   SimplePluginManager * aSPM = new SimplePluginManager();
 
-  NMPC_generator nmpc_generator (aSPM,aHRP2HDR) ;
-  vector<double>local_vel_ref(3,0.0);
-  local_vel_ref[0] = 0.2 ;
-  local_vel_ref[1] = 0.0 ;
-  local_vel_ref[2] = 0.2 ;
-  nmpc_generator.initNMPC_generator();
+  NMPCgenerator nmpc_generator (aSPM,aHRP2HDR) ;
+  reference_t local_vel_ref ;
+  local_vel_ref.Local.X   = 0.2 ;
+  local_vel_ref.Local.Y   = 0.0 ;
+  local_vel_ref.Local.Yaw = 0.2 ;
+  nmpc_generator.initNMPCgenerator();
 
 
   for(unsigned i=0 ; i<10 ; ++i)
   {
-    nmpc_generator.setVelocityReference(local_vel_ref);
+    nmpc_generator.setLocalVelocityReference(local_vel_ref);
     nmpc_generator.solve();
   }
 

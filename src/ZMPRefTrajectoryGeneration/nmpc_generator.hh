@@ -37,13 +37,14 @@
 
 namespace PatternGeneratorJRL
 {
-  class NMPC_generator
+  class NMPCgenerator
   {
   public:
-    NMPC_generator(SimplePluginManager *aSPM, CjrlHumanoidDynamicRobot *aHDR);
-    ~NMPC_generator();
-    void initNMPC_generator();
+    NMPCgenerator(SimplePluginManager *aSPM, CjrlHumanoidDynamicRobot *aHDR);
+    ~NMPCgenerator();
+    void initNMPCgenerator();
     void solve();
+
   private:
 
     //////////////////////
@@ -95,7 +96,23 @@ namespace PatternGeneratorJRL
   public:
     // Getter and Setter
     ////////////////////
-    void setVelocityReference(std::vector<double> local_vel_ref);
+    void setLocalVelocityReference(reference_t local_vel_ref);
+    void setGlobalVelocityReference(reference_t local_vel_ref);
+
+    inline support_state_t const & currentSupport() const
+    { return currentSupport_; }
+    inline support_state_t & currentSupport()
+    { return currentSupport_; }
+    inline void setNbStepsLeft(unsigned NbStepsLeft)
+    { currentSupport_.NbStepsLeft=NbStepsLeft; }
+
+    void getSolution(std::vector<double> JerkX,
+                     std::vector<double> JerkY,
+                     std::vector<double> FootStepX,
+                     std::vector<double> FootStepY,
+                     std::vector<double> FootStepYaw);
+    inline std::deque<support_state_t> const & SupportStates_deq() const
+    { return SupportStates_deq_ ; }
 
   private:
     SimplePluginManager * SPM_ ;
@@ -119,11 +136,11 @@ namespace PatternGeneratorJRL
 
     // Usefull for managing the PG
 
-    // currentSupport.x, support foot at time t_k on axis X
-    // currentSupport.y, support foot at time t_k on axis Y
-    // currentSupport.theta, support foot at time t_k around axis Z
-    support_state_t currentSupport ;
-    std::deque<support_state_t> SupportStates_deq ;
+    // currentSupport_.x, support foot at time t_k on axis X
+    // currentSupport_.y, support foot at time t_k on axis Y
+    // currentSupport_.theta, support foot at time t_k around axis Z
+    support_state_t currentSupport_ ;
+    std::deque<support_state_t> SupportStates_deq_ ;
 
     // Constraint Matrix
     // Center of Pressure constraint
@@ -265,11 +282,10 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_TYPE(double) ubB0ds_ ;
 
     // [Vx, Vy, Vtheta], reference velocity express in local frame
-    std::vector<double> local_vel_ref_ ;
     // [Vx, Vy, Vtheta], reference velocity express in global frame
     // contain the vectors for the reference velocity over the
     // entire horizon
-    ReferenceAbsoluteVelocity global_vel_ref_ ;
+    reference_t vel_ref_ ;
 
     // QPoases data structure
     bool isQPinitialized_ ;
@@ -290,47 +306,16 @@ namespace PatternGeneratorJRL
   };
 
 
-  class Constraint
-  {
-  public:
-    Constraint();
-    void buildConstantMatrix();
-    void buildUnconstantPart();
-    void jacobian();
-  };
+// See if a derivation of a constraint class can simplify the code
+//  class Constraint
+//  {
+//  public:
+//    Constraint();
+//    void buildConstantMatrix();
+//    void buildUnconstantPart();
+//    void jacobian();
+//  };
 
-
-  void DumpMatrix(std::string fileName, MAL_MATRIX_TYPE(double) M)
-  {
-    std::ofstream aof;
-    std::ostringstream oss(std::ostringstream::ate);
-    aof.open(fileName.c_str(),std::ofstream::out);
-    aof.close();
-    aof.open(fileName.c_str(),std::ofstream::app);
-    aof.precision(18);
-    aof.setf(std::ios::scientific, std::ios::floatfield);
-    for (unsigned int i = 0 ; i < M.size1() ; ++i)
-    {
-      for (unsigned int j = 0 ; j < M.size2()-1 ; ++j)
-      {
-        aof << M(i,j) << " " ;
-      }
-      aof << M(i,M.size2()-1) << std::endl ;
-    }
-  }
-  void DumpVector(std::string fileName, MAL_VECTOR_TYPE(double) M)
-  {
-    std::ofstream aof;
-    std::ostringstream oss(std::ostringstream::ate);
-    aof.open(fileName.c_str(),std::ofstream::out);
-    aof.close();
-    aof.open(fileName.c_str(),std::ofstream::app);
-    aof.precision(18);
-    aof.setf(std::ios::scientific, std::ios::floatfield);
-    for (unsigned int i = 0 ; i < M.size() ; ++i)
-    {
-      aof << M(i) << std::endl ;
-    }
-  }
 }//End Namespace
+
 #endif // NMPC_GENERATOR_H
