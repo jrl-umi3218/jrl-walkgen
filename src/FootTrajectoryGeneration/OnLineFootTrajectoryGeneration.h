@@ -67,8 +67,8 @@ namespace PatternGeneratorJRL
         deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
         deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
 
-    virtual void interpolate_feet_positions(double Time,
-        const PatternGeneratorJRL::support_state_t &CurrentSupport,
+    virtual void interpolate_feet_positions(
+        double Time, unsigned CurrentIndex,
         const std::deque<PatternGeneratorJRL::support_state_t> &SupportStates_deq,
         std::vector<double> FootStepX,
         std::vector<double> FootStepY,

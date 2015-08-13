@@ -42,7 +42,14 @@ namespace PatternGeneratorJRL
   public:
     NMPCgenerator(SimplePluginManager *aSPM, CjrlHumanoidDynamicRobot *aHDR);
     ~NMPCgenerator();
-    void initNMPCgenerator();
+    void initNMPCgenerator(double time, support_state_t &currentSupport,
+                           FootAbsolutePosition & InitLeftFootAbsolutePosition,
+                           FootAbsolutePosition & InitRightFootAbsolutePosition,
+                           COMState & lStartingCOMState,
+                           reference_t & local_vel_ref);
+    void updateInitialCondition(double time,
+                                std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
+                                std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq);
     void solve();
 
   private:
@@ -60,13 +67,12 @@ namespace PatternGeneratorJRL
 
     // Build Time Variant Matrices
     //////////////////////////////
-    void initializeTimeVariantMatrix();
-    void updateTimeVariantMatrix();
     void computeInitialGuess();
 
-    void initializeFootSelectionMatrix();
-    void updateFootSelectionMatrix();
-    void computeSupportOrder();
+    void updateFinalStateMachine(double time,
+        FootAbsolutePosition &FinalLeftFootTraj,
+        FootAbsolutePosition &FinalRightFootTraj);
+    void computeFootSelectionMatrix();
 
     // build the constraints :
     void initializeCoPConstraint();
@@ -86,9 +92,9 @@ namespace PatternGeneratorJRL
 
     // Build Constant Matrices
     //////////////////////////
+
     // construct the constant matrix depending
     // on the Euler integration scheme and the com height
-    void buildConstantMatrix();
     void buildCoMIntegrationMatrix();
     void buildCoPIntegrationMatrix(); // depend on c_k_z_
     void buildConvexHullSystems(); // depend on the robot
@@ -97,7 +103,7 @@ namespace PatternGeneratorJRL
     // Getter and Setter
     ////////////////////
     void setLocalVelocityReference(reference_t local_vel_ref);
-    void setGlobalVelocityReference(reference_t local_vel_ref);
+    void setGlobalVelocityReference(reference_t global_vel_ref);
 
     inline support_state_t const & currentSupport() const
     { return currentSupport_; }
@@ -141,6 +147,8 @@ namespace PatternGeneratorJRL
     // currentSupport_.theta, support foot at time t_k around axis Z
     support_state_t currentSupport_ ;
     std::deque<support_state_t> SupportStates_deq_ ;
+    SupportFSM * FSM_ ;
+
 
     // Constraint Matrix
     // Center of Pressure constraint
@@ -301,8 +309,6 @@ namespace PatternGeneratorJRL
     int nwsr_ ;
     qpOASES::real_t* deltaU_  ;
     qpOASES::real_t* cput_ ;
-
-
   };
 
 

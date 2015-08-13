@@ -286,6 +286,19 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
   // INITIAL SUPPORT STATE:
   // ----------------------
+
+
+//  currentSupport_.Phase = SS;
+//  currentSupport_.Foot = LEFT;
+//  currentSupport_.TimeLimit = T_;
+//  currentSupport_.NbStepsLeft = 2;
+//  currentSupport_.StateChanged = false;
+//  currentSupport_.X=0.00949035;
+//  currentSupport_.Y=0.095;
+//  currentSupport_.Yaw=0.0;
+//  currentSupport_.StartTime = 0.0;
+
+
   support_state_t CurrentSupport;
   CurrentSupport.Phase = DS;
   CurrentSupport.Foot = LEFT;
@@ -319,7 +332,7 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   // BUILD CONSTANT PART OF THE OBJECTIVE:
   // -------------------------------------
   //NMPCgenerator_->setCurrentState();
-  NMPCgenerator_->initNMPCgenerator();
+  //NMPCgenerator_->initNMPCgenerator(m_CurrentTime);
 
   dynamicFilter_->getComAndFootRealization()->ShiftFoot(true);
   dynamicFilter_->init(m_SamplingPeriod,
@@ -458,7 +471,6 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
   std::vector<double> FootStepY ;
   std::vector<double> FootStepYaw ;
   NMPCgenerator_->getSolution(JerkX, JerkY, FootStepX, FootStepY, FootStepYaw);
-  const support_state_t & CurrentSupport = NMPCgenerator_->currentSupport();
   const std::deque<support_state_t> & SupportStates_deq = NMPCgenerator_->SupportStates_deq();
   LIPM_.setState(COMTraj_deq_ctrl_[CurrentIndex_-1]) ;
   for ( int i = 0 ; i<previewSize_ ; i++ )
@@ -466,16 +478,11 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
     LIPM_.Interpolation( COMTraj_deq_ctrl_, ZMPTraj_deq_ctrl_, CurrentIndex_ + i * NbSampleControl_,
                          JerkX[i], JerkY[i] );
     LIPM_.OneIteration( JerkX[i], JerkY[i] );
-    OFTG_->interpolate_feet_positions(time, CurrentSupport, SupportStates_deq,
-                                      FootStepX, FootStepY, FootStepYaw,
-                                      LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_);
   }
 
-
-
-
-
-
+  OFTG_->interpolate_feet_positions(time, CurrentIndex_, SupportStates_deq,
+                                    FootStepX, FootStepY, FootStepYaw,
+                                    LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_);
 
   unsigned int IndexMax = (int)round((previewDuration_+SQP_T_)  / InterpolationPeriod_ );
   ZMPTraj_deq_.resize(IndexMax);
