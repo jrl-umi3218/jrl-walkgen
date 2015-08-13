@@ -85,13 +85,13 @@ int main()
   reference_t local_vel_ref ;
   local_vel_ref.Local.X   = 0.2 ;
   local_vel_ref.Local.Y   = 0.0 ;
-  local_vel_ref.Local.Yaw = 0.2 ;
+  local_vel_ref.Local.Yaw = 0.0 ;
 
   double time = 0.0;
   support_state_t currentSupport ;
   currentSupport.Phase = SS;
   currentSupport.Foot = LEFT;
-  currentSupport.TimeLimit = 0.1;
+  currentSupport.TimeLimit = 0.9;
   currentSupport.NbStepsLeft = 2;
   currentSupport.StateChanged = false;
   currentSupport.X=0.00949035;
@@ -106,7 +106,7 @@ int main()
 
   FootAbsolutePosition InitRightFootAbsolutePosition ;
   InitRightFootAbsolutePosition.x     = 0.00949035 ;
-  InitRightFootAbsolutePosition.y     = 0.095 ;
+  InitRightFootAbsolutePosition.y     = -0.095 ;
   InitRightFootAbsolutePosition.theta = 0.0 ;
 
   COMState lStartingCOMState ;
@@ -119,7 +119,7 @@ int main()
                                    local_vel_ref);
 
 
-  for(unsigned i=0 ; i<5 ; ++i)
+  for(unsigned i=0 ; i<1 ; ++i)
   {
     nmpc_generator.solve();
   }

@@ -31,6 +31,42 @@
 
 #define DEBUG
 
+#ifdef DEBUG
+void DumpMatrix(std::string fileName, MAL_MATRIX_TYPE(double) M)
+{
+  std::ofstream aof;
+  std::ostringstream oss(std::ostringstream::ate);
+  aof.open(fileName.c_str(),std::ofstream::out);
+  aof.close();
+  aof.open(fileName.c_str(),std::ofstream::app);
+  aof.precision(18);
+  aof.setf(std::ios::scientific, std::ios::floatfield);
+  for (unsigned int i = 0 ; i < M.size1() ; ++i)
+  {
+    for (unsigned int j = 0 ; j < M.size2()-1 ; ++j)
+    {
+      aof << M(i,j) << " " ;
+    }
+    aof << M(i,M.size2()-1) << std::endl ;
+  }
+}
+
+void DumpVector(std::string fileName, MAL_VECTOR_TYPE(double) M)
+{
+  std::ofstream aof;
+  std::ostringstream oss(std::ostringstream::ate);
+  aof.open(fileName.c_str(),std::ofstream::out);
+  aof.close();
+  aof.open(fileName.c_str(),std::ofstream::app);
+  aof.precision(18);
+  aof.setf(std::ios::scientific, std::ios::floatfield);
+  for (unsigned int i = 0 ; i < M.size() ; ++i)
+  {
+    aof << M(i) << std::endl ;
+  }
+}
+#endif // DEBUG
+
 using namespace std;
 using namespace PatternGeneratorJRL;
 
@@ -140,7 +176,9 @@ void NMPCgenerator::initNMPCgenerator(double time,
   SecurityMarginX_ = 0.09 ;
   SecurityMarginY_ = 0.05 ;
 
+  cout << local_vel_ref << endl ;
   setLocalVelocityReference(local_vel_ref);
+
   c_k_x_(0) = lStartingCOMState.x[0] ;
   c_k_x_(1) = lStartingCOMState.x[1] ;
   c_k_x_(2) = lStartingCOMState.x[2] ;
@@ -152,7 +190,21 @@ void NMPCgenerator::initNMPCgenerator(double time,
   // start with Left foot as support
   // the right foot start moving
   currentSupport_ = currentSupport ;
-  SupportStates_deq_.resize(N_,currentSupport_);
+  SupportStates_deq_.resize(N_+1,currentSupport_);
+  FSM_ = new SupportFSM();
+  FSM_->StepPeriod( T_step_ );
+  FSM_->DSPeriod( 1e9 ); // period during the robot move at 0.0 com speed
+  FSM_->DSSSPeriod( T_step_ );
+  FSM_->NbStepsSSDS( 2 ); // number of previw step
+  FSM_->SamplingPeriod( T_ );
+
+  updateFinalStateMachine(time,
+                          InitLeftFootAbsolutePosition,
+                          InitRightFootAbsolutePosition);
+  computeFootSelectionMatrix();
+  for(unsigned i=1 ; i<SupportStates_deq_.size() ; ++i)
+    cout << SupportStates_deq_[i].Foot << " " ;
+  cout << endl ;
 
   RFI_ = new RelativeFeetInequalities(SPM_,HDR_) ;
   ostringstream oss(std::ostringstream::ate);
@@ -161,6 +213,16 @@ void NMPCgenerator::initNMPCgenerator(double time,
   string cmd ;
   strm >> cmd ;
   RFI_->CallMethod(cmd,strm);
+
+  // initialize the solver
+  QP_ = new qpOASES::SQProblem(nv_,nc_) ;
+  //options_.printLevel = qpOASES::PL_NONE ;
+  options_.setToMPC();
+  QP_->setOptions(options_);
+  nwsr_ = 1e+8 ;
+  cput_ = new double[1] ;
+  deltaU_ = new double[nv_];
+  cput_[0] = 1e+8;
 
   // build constant matrices
   buildCoMIntegrationMatrix();
@@ -174,28 +236,6 @@ void NMPCgenerator::initNMPCgenerator(double time,
   initializeRotIneqConstraint();
   initializeObstacleConstraint();
   initializeCostFunction();
-
-  // initialize the solver
-  QP_ = new qpOASES::SQProblem(nv_,nc_,qpOASES::HST_SEMIDEF) ;
-  //options_.printLevel = qpOASES::PL_NONE ;
-  options_.setToMPC();
-  QP_->setOptions(options_);
-  nwsr_ = 1e+8 ;
-  cput_ = new double[1] ;
-  deltaU_ = new double[nv_];
-  cput_[0] = 1e+8;
-
-  FSM_ = new SupportFSM();
-  FSM_->StepPeriod( T_step_ );
-  FSM_->DSPeriod( 1e9 ); // period during the robot move at 0.0 com speed
-  FSM_->DSSSPeriod( T_step_ );
-  FSM_->NbStepsSSDS( 2 ); // number of previw step
-  FSM_->SamplingPeriod( T_ );
-
-  updateFinalStateMachine(time,
-                          InitLeftFootAbsolutePosition,
-                          InitRightFootAbsolutePosition);
-  computeFootSelectionMatrix();
 }
 
 void NMPCgenerator::solve()
@@ -662,23 +702,24 @@ void NMPCgenerator::updateCoPConstraint()
   // depend on the support order
   for (unsigned i=0 ; i<N_ ; ++i)
   {
-    double theta = theta_vec[SupportStates_deq_[i].StepNumber] ;
+    double theta = theta_vec[SupportStates_deq_[i+1].StepNumber] ;
+    cout << theta << endl;
     MAL_MATRIX_DIM(rotMat_xy,double,2,2);
     MAL_MATRIX_DIM(rotMat_theta,double,2,2);
     rotMat_xy(0,0)= cos(theta) ; rotMat_xy(0,1)= sin(theta) ;
     rotMat_xy(1,0)=-sin(theta) ; rotMat_xy(1,1)= cos(theta) ;
     rotMat_theta(0,0)=-sin(theta) ; rotMat_theta(0,1)= cos(theta) ;
     rotMat_theta(1,0)=-cos(theta) ; rotMat_theta(1,1)=-sin(theta) ;
-
+    cout << rotMat_xy << endl ;
     MAL_MATRIX_TYPE(double) A0_xy, A0_theta;
     MAL_VECTOR_TYPE(double) B0;
-    if (SupportStates_deq_[i].NbStepsLeft == 0)
+    if (SupportStates_deq_[i+1].NbStepsLeft == 0)
     {
       A0_xy    = MAL_RET_A_by_B(A0ds_,rotMat_xy   ) ;
       A0_theta = MAL_RET_A_by_B(A0ds_,rotMat_theta) ;
       B0 = ubB0ds_ ;
     }
-    else if (SupportStates_deq_[i].Foot == LEFT)
+    else if (SupportStates_deq_[i+1].Foot == LEFT)
     {
       A0_xy    = MAL_RET_A_by_B(A0lf_,rotMat_xy   ) ;
       A0_theta = MAL_RET_A_by_B(A0lf_,rotMat_theta) ;
@@ -744,10 +785,13 @@ void NMPCgenerator::updateCoPConstraint()
 #ifdef DEBUG
   DumpMatrix("Pzuv_",Pzuv_);
   DumpMatrix("D_kp1_xy_",D_kp1_xy_);
+  DumpVector("b_kp1_",b_kp1_);
   DumpMatrix("D_kp1_theta_",D_kp1_theta_);
   DumpMatrix("Acop_xy_",Acop_xy_);
   DumpMatrix("Acop_theta_",Acop_theta_);
   DumpVector("UBcop_",UBcop_);
+  DumpVector("v_kp1f_",v_kp1f_);
+  DumpVector("Pzsc_",Pzsc_);
 #endif
   return ;
 }
@@ -1201,7 +1245,7 @@ void NMPCgenerator::updateCostFunction()
              + beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_  ), Pzsc_x_ - v_kp1f_x_                 );
 #ifdef DEBUG
   DumpVector("Pvsc_x_"    , Pvsc_x_                    ) ;
-  DumpVector("RefVectorX" , global_vel_ref_.RefVectorX ) ;
+  DumpVector("RefVectorX" , vel_ref_.Global.X_vec ) ;
   DumpVector("Pzsc_x_"    , Pzsc_x_                    ) ;
   DumpVector("v_kp1f_x_"  , v_kp1f_x_                  ) ;
 #endif
