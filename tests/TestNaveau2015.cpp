@@ -32,7 +32,7 @@
 #include <jrl/dynamics/dynamicsfactory.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 #include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
-#include <ZMPRefTrajectoryGeneration/nmpc_generator.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.hh>
 
 using namespace std;
 using namespace PatternGeneratorJRL;
@@ -80,24 +80,10 @@ int main()
   delete [] dInitPos;
 
   SimplePluginManager * aSPM = new SimplePluginManager();
+  string banana ;
+  ZMPVelocityReferencedSQP aZMPVelocityReferencedSQP(aSPM, banana , aHDR ) ;
 
-  NMPCgenerator nmpc_generator (aSPM,aHRP2HDR) ;
-  reference_t local_vel_ref ;
-  local_vel_ref.Local.X   = 0.2 ;
-  local_vel_ref.Local.Y   = 0.0 ;
-  local_vel_ref.Local.Yaw = 0.0 ;
-
-  double time = 0.0;
-  support_state_t currentSupport ;
-  currentSupport.Phase = SS;
-  currentSupport.Foot = LEFT;
-  currentSupport.TimeLimit = 0.9;
-  currentSupport.NbStepsLeft = 2;
-  currentSupport.StateChanged = false;
-  currentSupport.X=0.00949035;
-  currentSupport.Y=0.095;
-  currentSupport.Yaw=0.0;
-  currentSupport.StartTime = 0.0;
+  double time = 0.1;
 
   FootAbsolutePosition InitLeftFootAbsolutePosition  ;
   InitLeftFootAbsolutePosition.x     = 0.00949035 ;
@@ -114,16 +100,49 @@ int main()
   lStartingCOMState.y[0] = 0.095 ;
   lStartingCOMState.z[0] = 0.814 ;
 
-  nmpc_generator.initNMPCgenerator(time,currentSupport,InitLeftFootAbsolutePosition,
-                                   InitRightFootAbsolutePosition,lStartingCOMState,
-                                   local_vel_ref);
+  MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
+  lStartingZMPPosition(0) = lStartingCOMState.x[0] ;
+  lStartingZMPPosition(1) = lStartingCOMState.y[0] ;
+  lStartingZMPPosition(2) = 0.0 ;
+
+  deque<ZMPPosition>           FinalZMPTraj_deq       ;
+  deque<COMState>              FinalCoMPositions_deq  ;
+  deque<FootAbsolutePosition>  FinalLeftFootTraj_deq  ;
+  deque<FootAbsolutePosition>  FinalRightFootTraj_deq ;
+  deque<RelativeFootPosition>  RelFootTraj_deq ;
+
+  aZMPVelocityReferencedSQP.Reference(0.0,0.0,0.0);
+  aZMPVelocityReferencedSQP.InitOnLine(
+         FinalZMPTraj_deq             ,
+         FinalCoMPositions_deq        ,
+         FinalLeftFootTraj_deq        ,
+         FinalRightFootTraj_deq       ,
+         InitLeftFootAbsolutePosition ,
+         InitRightFootAbsolutePosition,
+         RelFootTraj_deq              , // RelativeFootPositions,
+         lStartingCOMState            ,
+         lStartingZMPPosition         );
 
 
-  for(unsigned i=0 ; i<1 ; ++i)
+  for(unsigned i=0 ; i<3 ; ++i)
   {
-    nmpc_generator.solve();
-  }
+    aZMPVelocityReferencedSQP.Reference(0.0,0.0,0.0);
+    aZMPVelocityReferencedSQP.OnLine(time*i,
+                                     FinalZMPTraj_deq,
+                                     FinalCoMPositions_deq,
+                                     FinalLeftFootTraj_deq,
+                                     FinalRightFootTraj_deq);
+    aZMPVelocityReferencedSQP.UpperTimeLimitToUpdate(0.0);
 
+    cout << (int)round(0.1/0.005) << endl ;
+    for(unsigned j=0 ; j<(int)round(0.1/0.005) ; ++j)
+    {
+      FinalZMPTraj_deq      .pop_front();
+      FinalCoMPositions_deq .pop_front();
+      FinalLeftFootTraj_deq .pop_front();
+      FinalRightFootTraj_deq.pop_front();
+    }
+  }
   return 0;
 }
 

@@ -108,6 +108,9 @@ namespace PatternGeneratorJRL
     inline bool Running()
     { return Running_; }
 
+    inline void UpperTimeLimitToUpdate(double UpperTimeLimitToUpdate)
+    {UpperTimeLimitToUpdate_=UpperTimeLimitToUpdate ;}
+
     /// \brief Set the final-stage trigger
     inline void EndingPhase(bool EndingPhase)
     { EndingPhase_ = EndingPhase;}
@@ -162,6 +165,8 @@ namespace PatternGeneratorJRL
 
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D LIPM_ ;
+    // CoM used to reinitialize the SQP at the next iteration
+    COMState itCoM ;
 
     /// \brief Index where to begin the interpolation
     unsigned CurrentIndex_ ;

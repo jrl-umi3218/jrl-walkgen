@@ -146,6 +146,8 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL)
 
   ZMPTraj_deq_ctrl_.resize( SQP_N_ * NbSampleControl_+10) ;
   COMTraj_deq_ctrl_.resize( SQP_N_ * NbSampleControl_+10) ;
+  LeftFootTraj_deq_ctrl_ .resize( SQP_N_ * NbSampleControl_+10) ;
+  RightFootTraj_deq_ctrl_.resize( SQP_N_ * NbSampleControl_+10) ;
 }
 
 
@@ -259,7 +261,7 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   FinalLeftFootTraj_deq.resize(AddArraySize);
   FinalRightFootTraj_deq.resize(AddArraySize);
   int CurrentZMPindex=0;
-  m_CurrentTime = 0;
+  m_CurrentTime = 0.0;
   for( unsigned int i=0;i<FinalZMPTraj_deq.size();i++ )
   {
     // Smooth ramp
@@ -286,32 +288,20 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
   // INITIAL SUPPORT STATE:
   // ----------------------
+  support_state_t currentSupport ;
+  currentSupport.Phase = DS; // TODO make the constraint in jerk working with stanfind still
+  currentSupport.Foot = LEFT;
+  currentSupport.TimeLimit = 0.9;
+  currentSupport.NbStepsLeft = 0;
+  currentSupport.StateChanged = false;
+  currentSupport.X=0.00949035;
+  currentSupport.Y=0.095;
+  currentSupport.Yaw=0.0;
+  currentSupport.StartTime = 0.0;
 
-
-//  currentSupport_.Phase = SS;
-//  currentSupport_.Foot = LEFT;
-//  currentSupport_.TimeLimit = T_;
-//  currentSupport_.NbStepsLeft = 2;
-//  currentSupport_.StateChanged = false;
-//  currentSupport_.X=0.00949035;
-//  currentSupport_.Y=0.095;
-//  currentSupport_.Yaw=0.0;
-//  currentSupport_.StartTime = 0.0;
-
-
-  support_state_t CurrentSupport;
-  CurrentSupport.Phase = DS;
-  CurrentSupport.Foot = LEFT;
-  CurrentSupport.TimeLimit = 1e9;
-  CurrentSupport.NbStepsLeft = 1;
-  CurrentSupport.StateChanged = false;
-  CurrentSupport.X   = CurrentLeftFootAbsPos.x; //0.0 ;
-  CurrentSupport.Y   = CurrentLeftFootAbsPos.y; //0.1 ;
-  CurrentSupport.Yaw = CurrentLeftFootAbsPos.theta*M_PI/180; //0.0 ;
-  CurrentSupport.StartTime = 0.0;
-
-  //IntermedData_->SupportState(CurrentSupport);
-  // TODO make a set initState in the nmpcGenerator
+  NMPCgenerator_->initNMPCgenerator(currentSupport,
+                                    lStartingCOMState,
+                                    VelRef_);
 
   // INITIALIZE CENTER OF MASS:
   // --------------------------
@@ -325,14 +315,10 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM.z[0] = lStartingCOMState.z[0];
   CoM.z[1] = lStartingCOMState.z[1];
   CoM.z[2] = lStartingCOMState.z[2];
+  itCoM = lStartingCOMState;
   LIPM_.SetComHeight(lStartingCOMState.z[0]);
   LIPM_.InitializeSystem();
   LIPM_(CoM);
-
-  // BUILD CONSTANT PART OF THE OBJECTIVE:
-  // -------------------------------------
-  //NMPCgenerator_->setCurrentState();
-  //NMPCgenerator_->initNMPCgenerator(m_CurrentTime);
 
   dynamicFilter_->getComAndFootRealization()->ShiftFoot(true);
   dynamicFilter_->init(m_SamplingPeriod,
@@ -371,9 +357,13 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
 
     // UPDATE INTERNAL DATA:
     // ---------------------
-    //NMPCgenerator_->setCurrentState();
     VelRef_=NewVelRef_;
-    NMPCgenerator_->setLocalVelocityReference(VelRef_);
+    NMPCgenerator_->updateInitialCondition(
+        time,
+        FinalLeftFootTraj_deq.back(),
+        FinalRightFootTraj_deq.back(),
+        itCoM,
+        VelRef_);
 
     // SOLVE PROBLEM:
     // --------------
@@ -386,22 +376,20 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     {
         ZMPTraj_deq_ctrl_[i] = FinalZMPTraj_deq[i] ;
         COMTraj_deq_ctrl_[i] = FinalCOMTraj_deq[i] ;
+        LeftFootTraj_deq_ctrl_ [i]= FinalLeftFootTraj_deq  [i] ;
+        RightFootTraj_deq_ctrl_[i]= FinalRightFootTraj_deq [i] ;
     }
-    LeftFootTraj_deq_ctrl_ = FinalLeftFootTraj_deq ;
-    RightFootTraj_deq_ctrl_ = FinalRightFootTraj_deq ;
-
-    // Compute the full trajectory in the preview window
-
-    FullTrajectoryInterpolation(time);
-    // TODO deal with "Running_ = true";
-
-
-
-    // INTERPOLATION
     FinalZMPTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
     FinalCOMTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
     FinalLeftFootTraj_deq .resize(NbSampleControl_ + CurrentIndex_);
     FinalRightFootTraj_deq.resize(NbSampleControl_ + CurrentIndex_);
+
+    // INTERPOLATION
+    // ------------------------
+    // Compute the full trajectory in the preview window
+    FullTrajectoryInterpolation(time);
+
+    // Take only the data that are actually used by the robot
     for(unsigned i=0 ; i<NbSampleControl_ + CurrentIndex_ ; ++i)
     {
       FinalZMPTraj_deq      [i] = ZMPTraj_deq_ctrl_      [i] ;
@@ -410,9 +398,10 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
       FinalRightFootTraj_deq[i] = RightFootTraj_deq_ctrl_[i] ;
     }
 
-    bool filterOn_ = true ;
+    bool filterOn_ = false ;
     if(filterOn_)
     {
+
       dynamicFilter_->OnLinefilter(COMTraj_deq_,ZMPTraj_deq_ctrl_,
                                    LeftFootTraj_deq_,
                                    RightFootTraj_deq_,
@@ -428,7 +417,6 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
                               RightFootTraj_deq_,
                               deltaCOMTraj_deq_);
       #endif
-
       // Correct the CoM.
       for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
       {
@@ -472,8 +460,12 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
   std::vector<double> FootStepYaw ;
   NMPCgenerator_->getSolution(JerkX, JerkY, FootStepX, FootStepY, FootStepYaw);
   const std::deque<support_state_t> & SupportStates_deq = NMPCgenerator_->SupportStates_deq();
-  LIPM_.setState(COMTraj_deq_ctrl_[CurrentIndex_-1]) ;
-  for ( int i = 0 ; i<previewSize_ ; i++ )
+  LIPM_.setState(itCoM);
+  LIPM_.Interpolation( COMTraj_deq_ctrl_, ZMPTraj_deq_ctrl_, CurrentIndex_,
+                       JerkX[0], JerkY[0] );
+  LIPM_.OneIteration( JerkX[0], JerkY[0] );
+  itCoM = LIPM_.GetState();
+  for ( int i = 1 ; i<previewSize_ ; i++ )
   {
     LIPM_.Interpolation( COMTraj_deq_ctrl_, ZMPTraj_deq_ctrl_, CurrentIndex_ + i * NbSampleControl_,
                          JerkX[i], JerkY[i] );
@@ -500,8 +492,11 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
     LeftFootTraj_deq_[j] = LeftFootTraj_deq_ctrl_[i] ;
     RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
   }
-  return ;
 
+  Running_ = true ;
+  if(SupportStates_deq[0].NbStepsLeft==0)
+    Running_ = false ;
+  return ;
 }
 
 // TODO: New parent class needed

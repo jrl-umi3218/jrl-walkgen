@@ -106,6 +106,9 @@ namespace PatternGeneratorJRL
     /// \param[in] Args: Arguments of the methods.
     void getFeetSize(FootHalfSize & leftFootSize, FootHalfSize & rightFootSize);
 
+    inline double DSFeetDistance()
+    {return DSFeetDistance_;}
+
     //
     // Private member functions
     //

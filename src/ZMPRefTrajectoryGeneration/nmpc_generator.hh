@@ -42,14 +42,14 @@ namespace PatternGeneratorJRL
   public:
     NMPCgenerator(SimplePluginManager *aSPM, CjrlHumanoidDynamicRobot *aHDR);
     ~NMPCgenerator();
-    void initNMPCgenerator(double time, support_state_t &currentSupport,
-                           FootAbsolutePosition & InitLeftFootAbsolutePosition,
-                           FootAbsolutePosition & InitRightFootAbsolutePosition,
+    void initNMPCgenerator(support_state_t &currentSupport,
                            COMState & lStartingCOMState,
                            reference_t & local_vel_ref);
     void updateInitialCondition(double time,
-                                std::deque<FootAbsolutePosition> & FinalLeftFootTraj_deq,
-                                std::deque<FootAbsolutePosition> & FinalRightFootTraj_deq);
+                                FootAbsolutePosition & currentLeftFootAbsolutePosition,
+                                FootAbsolutePosition & currentRightFootAbsolutePosition,
+                                COMState & currentCOMState,
+                                reference_t & local_vel_ref);
     void solve();
 
   private:
@@ -85,6 +85,8 @@ namespace PatternGeneratorJRL
     void updateRotIneqConstraint();
     void initializeObstacleConstraint();
     void updateObstacleConstraint();
+    void initializeStandingConstraint();
+    void updateStandingConstraint();
 
     // build the cost function
     void initializeCostFunction();
@@ -112,11 +114,11 @@ namespace PatternGeneratorJRL
     inline void setNbStepsLeft(unsigned NbStepsLeft)
     { currentSupport_.NbStepsLeft=NbStepsLeft; }
 
-    void getSolution(std::vector<double> JerkX,
-                     std::vector<double> JerkY,
-                     std::vector<double> FootStepX,
-                     std::vector<double> FootStepY,
-                     std::vector<double> FootStepYaw);
+    void getSolution(std::vector<double> &JerkX,
+                     std::vector<double> &JerkY,
+                     std::vector<double> &FootStepX,
+                     std::vector<double> &FootStepY,
+                     std::vector<double> &FootStepYaw);
     inline std::deque<support_state_t> const & SupportStates_deq() const
     { return SupportStates_deq_ ; }
 
@@ -157,14 +159,12 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_TYPE(double) UBcop_, LBcop_ ;
     MAL_MATRIX_TYPE(double) D_kp1_xy_, D_kp1_theta_, Pzuv_, derv_Acop_map_  ;
     MAL_VECTOR_TYPE(double) b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_, v_kp1f_x_, v_kp1f_y_ ;
-
     // Foot position constraint
     unsigned nc_foot_ ;
     MAL_MATRIX_TYPE(double) Afoot_xy_, Afoot_theta_  ;
     MAL_VECTOR_TYPE(double) UBfoot_, LBfoot_ ;
     MAL_MATRIX_TYPE(double) SelecMat_, rotMat1_, rotMat2_, drotMat1_, drotMat2_, derv_Afoot_map_ ;
     MAL_MATRIX_TYPE(double) ASx_xy_, ASy_xy_, ASx_theta_, ASy_theta_ , AS_theta_;
-
     // Foot Velocity constraint
     unsigned nc_vel_ ;
     MAL_MATRIX_TYPE(double) Avel_ ;
@@ -179,6 +179,10 @@ namespace PatternGeneratorJRL
     std::vector< std::vector<MAL_VECTOR_TYPE(double)> > Aobs_ ;
     std::vector< MAL_VECTOR_TYPE(double) > UBobs_, LBobs_ ;
     std::vector<Circle> obstacles_ ;
+    // Standing constraint :
+    unsigned nc_stan_ ;
+    MAL_MATRIX_TYPE(double) Astan_ ;
+    MAL_VECTOR_TYPE(double) UBstan_, LBstan_ ;
 
     // Cost Function
     unsigned nv_ ; // number of degrees of freedom
@@ -206,9 +210,9 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_TYPE(double) qp_ub_  ;
     // temporary usefull variable for matrix manipulation
     MAL_VECTOR_TYPE(double) qp_g_x_, qp_g_y_, qp_g_theta_ ;
-    MAL_MATRIX_TYPE(double) qp_J_cop_, qp_J_foot_, qp_J_vel_, qp_J_obs_, qp_J_rot_ ;
-    MAL_VECTOR_TYPE(double) qp_lbJ_cop_, qp_lbJ_foot_, qp_lbJ_vel_, qp_lbJ_obs_, qp_lbJ_rot_ ;
-    MAL_VECTOR_TYPE(double) qp_ubJ_cop_, qp_ubJ_foot_, qp_ubJ_vel_, qp_ubJ_obs_, qp_ubJ_rot_ ;
+    MAL_MATRIX_TYPE(double) qp_J_cop_, qp_J_foot_, qp_J_vel_, qp_J_obs_, qp_J_rot_ , qp_J_stan_;
+    MAL_VECTOR_TYPE(double) qp_lbJ_cop_, qp_lbJ_foot_, qp_lbJ_vel_, qp_lbJ_obs_, qp_lbJ_rot_, qp_lbJ_stan_ ;
+    MAL_VECTOR_TYPE(double) qp_ubJ_cop_, qp_ubJ_foot_, qp_ubJ_vel_, qp_ubJ_obs_, qp_ubJ_rot_, qp_ubJ_stan_ ;
 
     // Free variable of the system
     // U_       = [C_kp1_x_ F_kp1_x_ C_kp1_y_ F_kp1_y_ F_kp1_theta_]^T
