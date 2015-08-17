@@ -46,8 +46,8 @@ namespace PatternGeneratorJRL
                            COMState & lStartingCOMState,
                            reference_t & local_vel_ref);
     void updateInitialCondition(double time,
-                                FootAbsolutePosition & currentLeftFootAbsolutePosition,
-                                FootAbsolutePosition & currentRightFootAbsolutePosition,
+                                std::deque<FootAbsolutePosition> &currentLeftFootAbsolutePosition,
+                                std::deque<FootAbsolutePosition> &currentRightFootAbsolutePosition,
                                 COMState & currentCOMState,
                                 reference_t & local_vel_ref);
     void solve();
@@ -70,8 +70,8 @@ namespace PatternGeneratorJRL
     void computeInitialGuess();
 
     void updateFinalStateMachine(double time,
-        FootAbsolutePosition &FinalLeftFootTraj,
-        FootAbsolutePosition &FinalRightFootTraj);
+        std::deque<FootAbsolutePosition> &FinalLeftFootTraj,
+        std::deque<FootAbsolutePosition> &FinalRightFootTraj);
     void computeFootSelectionMatrix();
 
     // build the constraints :
@@ -163,7 +163,8 @@ namespace PatternGeneratorJRL
     unsigned nc_foot_ ;
     MAL_MATRIX_TYPE(double) Afoot_xy_, Afoot_theta_  ;
     MAL_VECTOR_TYPE(double) UBfoot_, LBfoot_ ;
-    MAL_MATRIX_TYPE(double) SelecMat_, rotMat1_, rotMat2_, drotMat1_, drotMat2_, derv_Afoot_map_ ;
+    MAL_MATRIX_TYPE(double) SelecMat_, derv_Afoot_map_ ;
+    std::vector<MAL_MATRIX_TYPE(double)> rotMat_, drotMat_ ;
     MAL_MATRIX_TYPE(double) ASx_xy_, ASy_xy_, ASx_theta_, ASy_theta_ , AS_theta_;
     // Foot Velocity constraint
     unsigned nc_vel_ ;
@@ -273,6 +274,7 @@ namespace PatternGeneratorJRL
 
     // Convex Hulls for ZMP and FootStep constraints :
     RelativeFeetInequalities * RFI_;
+    double FeetDistance_;
     // linear system corresponding to the foot step constraints
     // right foot polygonal hull
     MAL_MATRIX_TYPE(double) A0r_  ;

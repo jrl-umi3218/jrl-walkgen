@@ -285,8 +285,7 @@ com_t LinearizedInvertedPendulum2D::OneIteration(double ux, double uy)
 	   m_zk[0] << " " << m_zk[1] << " " <<
 	   Bux[0] << " " << Bux[1] << " " << Bux[2] << " " <<
 	   Buy[0] << " " << Buy[1] << " " << Buy[2] << " " <<
-	   m_B(0,0) << " " << m_B(1,0) << " " << m_B(2,0) << " " <<
-	   m_B(3,0) << " " << m_B(4,0) << " " << m_B(5,0) << " " ,
+       m_B(0,0) << " " << m_B(1,0) << " " << m_B(2,0) << " " ,
 	   "Debug2DLIPM.dat");
 
 

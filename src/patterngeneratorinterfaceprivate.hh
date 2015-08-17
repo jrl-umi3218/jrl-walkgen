@@ -48,6 +48,7 @@
 #include <ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh>
+#include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.hh>
 #include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.hh>
 
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
@@ -263,6 +264,9 @@ namespace PatternGeneratorJRL
     /*! \brief Initialize online mode of Herdt. */
     void initOnlineHerdt();
 
+    /*! \brief Initialize online mode of Naveau. */
+    void initOnlineNaveau();
+
     /*! \brief Read a sequence of steps. */
     void ReadSequenceOfSteps(istringstream &strm);
 
@@ -458,6 +462,9 @@ namespace PatternGeneratorJRL
     /*! QP formulation with a velocity reference. */
     ZMPVelocityReferencedQP * m_ZMPVRQP;
 
+    /*! SQP formulation with a velocity reference. */
+    ZMPVelocityReferencedSQP * m_ZMPVRSQP;
+
     /*! ZMP and CoM trajectories generation from an analytical formulation */
     AnalyticalMorisawaCompact * m_ZMPM;
 
@@ -638,6 +645,9 @@ namespace PatternGeneratorJRL
 
     /*! Using the velocity referenced QP proposed by Herdt in 2010. */
     static const int ZMPCOM_HERDT_2010=5;
+
+    /*! Using the velocity referenced QP proposed by Herdt in 2010. */
+    static const int ZMPCOM_NAVEAU_2015=6;
     /*! @} */
     /*! @} */
 

@@ -267,12 +267,13 @@ namespace PatternGeneratorJRL
     void FullTrajectoryInterpolation(double time); // INPUT
     /// \brief Interpolation form the com jerk the position of the com and the zmp corresponding to the kart table model
     void CoMZMPInterpolation(
-        std::vector<double> JerkX,           // INPUT
-        std::vector<double> JerkY,           // INPUT
+        std::vector<double> &JerkX,           // INPUT
+        std::vector<double> &JerkY,           // INPUT
         LinearizedInvertedPendulum2D * LIPM, // INPUT/OUTPUT
         const unsigned numberOfSample,       // INPUT
         const int IterationNumber,           // INPUT
-        const unsigned int currentIndex);    // INPUT
+        const unsigned int currentIndex,     // INPUT
+        const std::deque<support_state_t> & SupportStates_deq );// INPUT
   };
 }
 
