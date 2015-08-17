@@ -790,7 +790,7 @@ protected:
 #define localNbOfEvents 3
     struct localEvent events [localNbOfEvents] =
     {
-      {1*10,&TestNaveau2015::startTurningRight2},
+      {1*10,&TestNaveau2015::walkForward2m_s},
       {40*200,&TestNaveau2015::stop},
       {50*200,&TestNaveau2015::stopOnLineWalking}
     };

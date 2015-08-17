@@ -1217,9 +1217,9 @@ void NMPCgenerator::initializeObstacleConstraint()
   nc_obs_ = obstacles_.size();
 
   Circle obstacle ;
-  obstacle.x_0    = -1.0 ;
-  obstacle.y_0    = 0.3 ;
-  obstacle.r      = 0.5/2 ;
+  obstacle.x_0    = 1.0 ;
+  obstacle.y_0    = 0.5 ;
+  obstacle.r      = 0.2/2 ;
   obstacle.margin = 0.4172 ;
   obstacles_.push_back(obstacle);
 
