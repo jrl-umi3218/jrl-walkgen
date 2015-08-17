@@ -345,11 +345,11 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization[0]->setHumanoidDynamicRobot(m_HumanoidDynamicRobot);
     m_ComAndFootRealization[0]->SetHeightOfTheCoM(m_PC->GetHeightOfCoM());
     m_ComAndFootRealization[0]->setSamplingPeriod(m_PC->SamplingPeriod());
-    m_ComAndFootRealization[0]->SetStepStackHandler(m_StepStackHandler);
     m_ComAndFootRealization[0]->Initialization();
 
-    m_ComAndFootRealization[1]->SetStepStackHandler(m_StepStackHandler);
-    m_ComAndFootRealization[2]->SetStepStackHandler(m_StepStackHandler);
+    for(vector<ComAndFootRealization *>::iterator CFR_it = m_ComAndFootRealization.begin() ;
+        CFR_it!=m_ComAndFootRealization.end() ; ++CFR_it)
+      (*CFR_it)->SetStepStackHandler(m_StepStackHandler);
 
     m_StOvPl->SetPreviewControl(m_PC);
     m_StOvPl->SetDynamicMultiBodyModel(m_HumanoidDynamicRobot);

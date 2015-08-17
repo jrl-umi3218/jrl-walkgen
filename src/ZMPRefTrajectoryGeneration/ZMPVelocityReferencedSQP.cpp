@@ -405,7 +405,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
       FinalRightFootTraj_deq[i] = RightFootTraj_deq_ctrl_[i] ;
     }
 
-    bool filterOn_ = false ;
+    bool filterOn_ = true ;
     if(filterOn_)
     {
 
@@ -482,6 +482,24 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
                                       SupportStates_deq[i],
                                       FootStepX, FootStepY, FootStepYaw,
                                       LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_);
+  }
+
+  for (unsigned i=CurrentIndex_ ; i<previewSize_*NbSampleControl_ ; i++ )
+  {
+    COMTraj_deq_ctrl_[i].roll[0]  = 0.0 ;
+    COMTraj_deq_ctrl_[i].pitch[0] = 0.0 ;
+    COMTraj_deq_ctrl_[i].yaw[0]   = 0.5*(LeftFootTraj_deq_ctrl_ [i].theta
+                                   +RightFootTraj_deq_ctrl_[i].theta)*M_PI/180 ;
+
+    COMTraj_deq_ctrl_[i].roll[1]  = 0.0 ;
+    COMTraj_deq_ctrl_[i].pitch[1] = 0.0 ;
+    COMTraj_deq_ctrl_[i].yaw[1]   = 0.5*(LeftFootTraj_deq_ctrl_ [i].dtheta
+                                   +RightFootTraj_deq_ctrl_[i].dtheta)*M_PI/180 ;
+
+    COMTraj_deq_ctrl_[i].roll[2]  = 0.0 ;
+    COMTraj_deq_ctrl_[i].pitch[2] = 0.0 ;
+    COMTraj_deq_ctrl_[i].yaw[2]   = 0.5*(LeftFootTraj_deq_ctrl_ [i].ddtheta
+                                   +RightFootTraj_deq_ctrl_[i].ddtheta)*M_PI/180 ;
   }
 
   unsigned int IndexMax = (int)round((previewDuration_+SQP_T_)  / InterpolationPeriod_ );
@@ -588,8 +606,8 @@ void ZMPVelocityReferencedSQP::CoMZMPInterpolation(
   if(SupportStates_deq[0].Phase==DS && SupportStates_deq[0].NbStepsLeft == 0)
   {
     unsigned int i = currentIndex + IterationNumber * numberOfSample ;
-    double jx = (RightFootTraj_deq_ctrl_[i-1].x + RightFootTraj_deq_ctrl_[i-1].x)/2 - COMTraj_deq_ctrl_[i-1].x[0];
-    double jy = (RightFootTraj_deq_ctrl_[i-1].y + RightFootTraj_deq_ctrl_[i-1].y)/2 - COMTraj_deq_ctrl_[i-1].y[0];
+    double jx = (RightFootTraj_deq_ctrl_[i-1].x + LeftFootTraj_deq_ctrl_[i-1].x)/2 - COMTraj_deq_ctrl_[i-1].x[0];
+    double jy = (RightFootTraj_deq_ctrl_[i-1].y + LeftFootTraj_deq_ctrl_[i-1].y)/2 - COMTraj_deq_ctrl_[i-1].y[0];
 
     if(fabs(jx) < 1e-3 && fabs(jy) < 1e-3 && IterationNumber==0 )
     { Running_ = false; }

@@ -566,9 +566,9 @@ void ZMPVelocityReferencedQP::OnLine(double time,
     {
       ZMPTraj_deq_[j] = ZMPTraj_deq_ctrl_[i] ;
       COMTraj_deq_[j] = COMTraj_deq_ctrl_[i] ;
-      COMTraj_deq_[j].roll[0]  = 180/M_PI* COMTraj_deq_ctrl_[i].roll[0] ;
-      COMTraj_deq_[j].pitch[0] = 180/M_PI* COMTraj_deq_ctrl_[i].pitch[0] ;
-      COMTraj_deq_[j].yaw[0]   = 180/M_PI* COMTraj_deq_ctrl_[i].yaw[0] ;
+      COMTraj_deq_[j].roll[0]  = 180/M_PI * COMTraj_deq_ctrl_[i].roll[0] ;
+      COMTraj_deq_[j].pitch[0] = 180/M_PI * COMTraj_deq_ctrl_[i].pitch[0] ;
+      COMTraj_deq_[j].yaw[0]   = 180/M_PI * COMTraj_deq_ctrl_[i].yaw[0] ;
       LeftFootTraj_deq_[j] = LeftFootTraj_deq_ctrl_[i] ;
       RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
     }

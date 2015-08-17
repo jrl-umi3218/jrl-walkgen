@@ -441,9 +441,20 @@ void NMPCgenerator::getSolution(std::vector<double> & JerkX,
     sign = -sign ;
 
   // step on the capture point at the end of the preview
-  FootStepX  [nf] = FootStepX[nf-1] + vel_ref_.Global.X*T_ + sign*sin(FootStepYaw[nf-1])*FeetDistance_ ;
-  FootStepY  [nf] = FootStepY[nf-1] + vel_ref_.Global.Y*T_ - sign*cos(FootStepYaw[nf-1])*FeetDistance_ ;
-  FootStepYaw[nf] = FootStepYaw[nf-1] + vel_ref_.Global.Yaw*T_ ;
+  if(currentSupport_.Phase==DS && currentSupport_.NbStepsLeft == 0)
+  {
+    for(unsigned i=0 ; i<nf ; ++i)
+    {
+      FootStepX  [i] = currentSupport_.X   ;
+      FootStepY  [i] = currentSupport_.Y   ;
+      FootStepYaw[i] = currentSupport_.Yaw ;
+    }
+  }else
+  {
+    FootStepX  [nf] = FootStepX[nf-1] + vel_ref_.Global.X*T_ + sign*sin(FootStepYaw[nf-1])*FeetDistance_ ;
+    FootStepY  [nf] = FootStepY[nf-1] + vel_ref_.Global.Y*T_ - sign*cos(FootStepYaw[nf-1])*FeetDistance_ ;
+    FootStepYaw[nf] = FootStepYaw[nf-1] + vel_ref_.Global.Yaw*T_ ;
+  }
 }
 
 void NMPCgenerator::updateFinalStateMachine(
