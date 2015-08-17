@@ -21,6 +21,7 @@ INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/lapack.cmake)
 INCLUDE(cmake/cpack.cmake)
 INCLUDE(cmake/boost.cmake)
+INCLUDE(cmake/FindqpOASES.cmake)
 INCLUDE(cmake_metapod_configure.cmake)
 INCLUDE(CMakeDependentOption)
 
@@ -54,9 +55,9 @@ ADD_OPTIONAL_DEPENDENCY("metapod >= 1.0.7")
 #################################################################
 
 # Search for qpOases
-FIND_PACKAGE(qpOASES)
+SEARCH_FOR_QPOASES()
 IF(${qpOASES_FOUND} STREQUAL "TRUE")
-  MESSAGE(STATUS "--qpOASES : " ${qpOASES_LIBRARIES} )
+  MESSAGE(STATUS "--qpOASES : " ${qpOASES_LIBRARIES})
   INCLUDE_DIRECTORIES(SYSTEM ${qpOASES_INCLUDE_DIRS})
 ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
 
