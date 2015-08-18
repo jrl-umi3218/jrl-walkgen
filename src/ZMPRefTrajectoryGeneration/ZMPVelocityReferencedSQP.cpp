@@ -519,77 +519,77 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
     RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
   }
 
-  ofstream aof;
-  string aFileName;
-  static int iteration_zmp = 0 ;
-  ostringstream oss(std::ostringstream::ate);
-  oss.str("/tmp/buffer_");
-  oss << setfill('0') << setw(3) << iteration_zmp << ".txt" ;
-  aFileName = oss.str();
-  aof.open(aFileName.c_str(),ofstream::out);
-  aof.close();
+//  ofstream aof;
+//  string aFileName;
+//  static int iteration_zmp = 0 ;
+//  ostringstream oss(std::ostringstream::ate);
+//  oss.str("/tmp/buffer_");
+//  oss << setfill('0') << setw(3) << iteration_zmp << ".txt" ;
+//  aFileName = oss.str();
+//  aof.open(aFileName.c_str(),ofstream::out);
+//  aof.close();
 
-  aof.open(aFileName.c_str(),ofstream::app);
-  aof.precision(8);
-  aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < SQP_N_*(double)round(SQP_T_/m_SamplingPeriod)+CurrentIndex_ ; ++i)
-  {
-    aof << i << " " ; // 0
-    aof << ZMPTraj_deq_ctrl_[i].px << " " ;           // 1
-    aof << ZMPTraj_deq_ctrl_[i].py << " " ;           // 2
+//  aof.open(aFileName.c_str(),ofstream::app);
+//  aof.precision(8);
+//  aof.setf(ios::scientific, ios::floatfield);
+//  for (unsigned int i = 0 ; i < SQP_N_*(double)round(SQP_T_/m_SamplingPeriod)+CurrentIndex_ ; ++i)
+//  {
+//    aof << i << " " ; // 0
+//    aof << ZMPTraj_deq_ctrl_[i].px << " " ;           // 1
+//    aof << ZMPTraj_deq_ctrl_[i].py << " " ;           // 2
 
-    aof << COMTraj_deq_ctrl_[i].x[0] << " " ;         // 3
-    aof << COMTraj_deq_ctrl_[i].x[1] << " " ;         // 4
-    aof << COMTraj_deq_ctrl_[i].x[2] << " " ;         // 5
+//    aof << COMTraj_deq_ctrl_[i].x[0] << " " ;         // 3
+//    aof << COMTraj_deq_ctrl_[i].x[1] << " " ;         // 4
+//    aof << COMTraj_deq_ctrl_[i].x[2] << " " ;         // 5
 
-    aof << LeftFootTraj_deq_ctrl_[i].x << " " ;       // 6
-    aof << LeftFootTraj_deq_ctrl_[i].dx << " " ;      // 7
-    aof << LeftFootTraj_deq_ctrl_[i].ddx << " " ;     // 8
+//    aof << LeftFootTraj_deq_ctrl_[i].x << " " ;       // 6
+//    aof << LeftFootTraj_deq_ctrl_[i].dx << " " ;      // 7
+//    aof << LeftFootTraj_deq_ctrl_[i].ddx << " " ;     // 8
 
-    aof << RightFootTraj_deq_ctrl_[i].x << " " ;      // 9
-    aof << RightFootTraj_deq_ctrl_[i].dx << " " ;     // 10
-    aof << RightFootTraj_deq_ctrl_[i].ddx << " " ;    // 11
+//    aof << RightFootTraj_deq_ctrl_[i].x << " " ;      // 9
+//    aof << RightFootTraj_deq_ctrl_[i].dx << " " ;     // 10
+//    aof << RightFootTraj_deq_ctrl_[i].ddx << " " ;    // 11
 
-    aof << COMTraj_deq_ctrl_[i].y[0] << " " ;         // 12
-    aof << COMTraj_deq_ctrl_[i].y[1] << " " ;         // 13
-    aof << COMTraj_deq_ctrl_[i].y[2] << " " ;         // 14
+//    aof << COMTraj_deq_ctrl_[i].y[0] << " " ;         // 12
+//    aof << COMTraj_deq_ctrl_[i].y[1] << " " ;         // 13
+//    aof << COMTraj_deq_ctrl_[i].y[2] << " " ;         // 14
 
-    aof << LeftFootTraj_deq_ctrl_[i].y << " " ;       // 15
-    aof << LeftFootTraj_deq_ctrl_[i].dy << " " ;      // 16
-    aof << LeftFootTraj_deq_ctrl_[i].ddy << " " ;     // 17
+//    aof << LeftFootTraj_deq_ctrl_[i].y << " " ;       // 15
+//    aof << LeftFootTraj_deq_ctrl_[i].dy << " " ;      // 16
+//    aof << LeftFootTraj_deq_ctrl_[i].ddy << " " ;     // 17
 
-    aof << RightFootTraj_deq_ctrl_[i].y << " " ;      // 18
-    aof << RightFootTraj_deq_ctrl_[i].dy << " " ;     // 19
-    aof << RightFootTraj_deq_ctrl_[i].ddy << " " ;    // 20
+//    aof << RightFootTraj_deq_ctrl_[i].y << " " ;      // 18
+//    aof << RightFootTraj_deq_ctrl_[i].dy << " " ;     // 19
+//    aof << RightFootTraj_deq_ctrl_[i].ddy << " " ;    // 20
 
-    aof << COMTraj_deq_ctrl_[i].yaw[0] << " " ;       // 21
-    aof << COMTraj_deq_ctrl_[i].yaw[1] << " " ;       // 22
-    aof << COMTraj_deq_ctrl_[i].yaw[2] << " " ;       // 23
+//    aof << COMTraj_deq_ctrl_[i].yaw[0] << " " ;       // 21
+//    aof << COMTraj_deq_ctrl_[i].yaw[1] << " " ;       // 22
+//    aof << COMTraj_deq_ctrl_[i].yaw[2] << " " ;       // 23
 
-    aof << LeftFootTraj_deq_ctrl_[i].theta << " " ;   // 24
-    aof << LeftFootTraj_deq_ctrl_[i].dtheta << " " ;  // 25
-    aof << LeftFootTraj_deq_ctrl_[i].ddtheta << " " ; // 26
+//    aof << LeftFootTraj_deq_ctrl_[i].theta << " " ;   // 24
+//    aof << LeftFootTraj_deq_ctrl_[i].dtheta << " " ;  // 25
+//    aof << LeftFootTraj_deq_ctrl_[i].ddtheta << " " ; // 26
 
-    aof << RightFootTraj_deq_ctrl_[i].theta << " " ;  // 27
-    aof << RightFootTraj_deq_ctrl_[i].dtheta << " " ; // 38
-    aof << RightFootTraj_deq_ctrl_[i].ddtheta << " " ;// 29
+//    aof << RightFootTraj_deq_ctrl_[i].theta << " " ;  // 27
+//    aof << RightFootTraj_deq_ctrl_[i].dtheta << " " ; // 38
+//    aof << RightFootTraj_deq_ctrl_[i].ddtheta << " " ;// 29
 
-    aof << COMTraj_deq_ctrl_[i].z[0] << " " ;         // 30
-    aof << COMTraj_deq_ctrl_[i].z[1] << " " ;         // 31
-    aof << COMTraj_deq_ctrl_[i].z[2] << " " ;         // 32
+//    aof << COMTraj_deq_ctrl_[i].z[0] << " " ;         // 30
+//    aof << COMTraj_deq_ctrl_[i].z[1] << " " ;         // 31
+//    aof << COMTraj_deq_ctrl_[i].z[2] << " " ;         // 32
 
-    aof << LeftFootTraj_deq_ctrl_[i].z << " " ;       // 33
-    aof << LeftFootTraj_deq_ctrl_[i].dz << " " ;      // 34
-    aof << LeftFootTraj_deq_ctrl_[i].ddz << " " ;     // 35
+//    aof << LeftFootTraj_deq_ctrl_[i].z << " " ;       // 33
+//    aof << LeftFootTraj_deq_ctrl_[i].dz << " " ;      // 34
+//    aof << LeftFootTraj_deq_ctrl_[i].ddz << " " ;     // 35
 
-    aof << RightFootTraj_deq_ctrl_[i].z << " " ;      // 37
-    aof << RightFootTraj_deq_ctrl_[i].dz << " " ;     // 38
-    aof << RightFootTraj_deq_ctrl_[i].ddz << " " ;    // 39
+//    aof << RightFootTraj_deq_ctrl_[i].z << " " ;      // 37
+//    aof << RightFootTraj_deq_ctrl_[i].dz << " " ;     // 38
+//    aof << RightFootTraj_deq_ctrl_[i].ddz << " " ;    // 39
 
-    aof << endl ;
-  }
-  aof.close();
-  iteration_zmp++;
+//    aof << endl ;
+//  }
+//  aof.close();
+//  iteration_zmp++;
 
   return ;
 }
