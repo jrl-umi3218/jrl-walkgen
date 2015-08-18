@@ -104,7 +104,7 @@ void DynamicFilter::init(
   PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
 
   ZMPMB_vec_.resize( (int)round( previewWindowSize_ / interpolationPeriod_ ), vector<double>(2));
-  zmpmb_i_.resize( previewWindowSize_ / controlPeriod_ , vector<double>(2));
+  zmpmb_i_.resize( (int)round(previewWindowSize_ / controlPeriod_) , vector<double>(2));
   deltaZMP_deq_.resize( (int)round( previewWindowSize_ / controlPeriod_ ));
 
   MAL_VECTOR_RESIZE(aCoMState_,6);
@@ -221,14 +221,15 @@ int DynamicFilter::OnLinefilter(
   }
 
   int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
-  unsigned int N1 = N*inc+1 ;
+  unsigned int N1 = inputZMPTraj_deq_.size() ;
   zmpmb_i_.resize( N1 , vector<double>(2) ) ;
   for(unsigned int i = 0 ; i < N-1 ; ++i)
     {
       zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
     }
   zmpmb_i_.back() = ZMPMB_vec_.back() ;
-  for(unsigned int i = 0 ; i < N-1 ; ++i)
+  unsigned limit = ZMPMB_vec_.size()-1 ;
+  for(unsigned  i=0 ; i<limit  ; ++i)
   {
     double xA = zmpmb_i_[i*inc][0] ;
     double yA = zmpmb_i_[i*inc][1] ;
@@ -408,7 +409,7 @@ int DynamicFilter::OptimalControl(
   double deltaZMPx = 0.0 ;
   double deltaZMPy = 0.0 ;
   // calcul of the preview control along the "deltaZMP_deq_"
-  for (unsigned i = 0 ; i < Nctrl ; i++ )
+  for (int i = 0 ; i < Nctrl ; i++ )
   {
     PC_->OneIterationOfPreview(deltax_,deltay_,
                                sxzmp,syzmp,
@@ -427,7 +428,7 @@ int DynamicFilter::OptimalControl(
     }
   }
   // test to verify if the Kajita PC diverged
-  for (unsigned int i = 0 ; i < Nctrl ; i++)
+  for (int i = 0 ; i < Nctrl ; i++)
     {
       for(int j=0;j<3;j++)
         {
@@ -444,8 +445,8 @@ int DynamicFilter::OptimalControl(
 }
 
 // TODO finish the implementation of a better waist tracking
-void DynamicFilter::computeWaist(const FootAbsolutePosition & inputLeftFoot)
-{
+//void DynamicFilter::computeWaist(const FootAbsolutePosition & inputLeftFoot)
+//{
 //  Eigen::Matrix< LocalFloatType, 6, 1 > waist_speed, waist_acc ;
 //  Eigen::Matrix< LocalFloatType, 3, 1 > waist_theta ;
 //  // compute the speed and acceleration of the waist in the world frame
@@ -612,8 +613,8 @@ void DynamicFilter::computeWaist(const FootAbsolutePosition & inputLeftFoot)
   //  aof.close();
   //  ++it;
 
-  return ;
-}
+//  return ;
+//}
 
 void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
                           const deque<FootAbsolutePosition> & ctrlLeftFoot,
@@ -627,7 +628,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   deque<COMState> CoM_tmp = ctrlCoMState ;
   int Nctrl = (int)round(controlWindowSize_/controlPeriod_) ;
 
-  for (unsigned int i = 0 ; i < Nctrl ; ++i)
+  for (int i = 0 ; i < Nctrl ; ++i)
   {
     for(int j=0;j<3;j++)
     {
@@ -640,7 +641,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   vector < MAL_VECTOR_TYPE(double) > vel ;
   vector < MAL_VECTOR_TYPE(double) > acc ;
   vector< vector<double> > zmpmb_corr (Nctrl,vector<double>(2,0.0));
-  for(unsigned int i = 0 ; i < Nctrl ; ++i)
+  for(int i = 0 ; i < Nctrl ; ++i)
   {
       InverseKinematics( CoM_tmp[i], ctrlLeftFoot[i], ctrlRightFoot[i],
                          ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
@@ -672,7 +673,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   aof.precision(8);
   aof.setf(ios::scientific, ios::floatfield);
   int NbI = (int)round(controlWindowSize_/interpolationPeriod_) ;
-  for (unsigned int i = 0 ; i < NbI ; ++i)
+  for (int i = 0 ; i < NbI ; ++i)
   {
     aof << inputZMPTraj_deq_[i*inc].px << " " ;       // 1
     aof << inputZMPTraj_deq_[i*inc].py << " " ;       // 2
@@ -738,7 +739,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
 
     //47
     int it_subsample = i*(int)round(interpolationPeriod_/controlPeriod_) ;
-    for (int k = 0 ; k < MAL_VECTOR_SIZE(conf[it_subsample]) ; ++k)
+    for (unsigned int k = 0 ; k < MAL_VECTOR_SIZE(conf[it_subsample]) ; ++k)
       aof << conf[it_subsample](k) << " " ;
 
     //83
@@ -762,7 +763,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   aof.open(aFileName.c_str(),ofstream::app);
   aof.precision(8);
   aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < Nctrl ; ++i)
+  for (int i = 0 ; i < Nctrl ; ++i)
   {
     aof << zmpmb_corr[i][0] << " " ;
     aof << zmpmb_corr[i][1] << " " ;
@@ -791,7 +792,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   aof.open(aFileName.c_str(),ofstream::app);
   aof.precision(8);
   aof.setf(ios::scientific, ios::floatfield);
-  for (unsigned int i = 0 ; i < Nctrl*( (int)round(previewWindowSize_/controlWindowSize_)-1) ; ++i)
+  for (int i = 0 ; i < Nctrl*( (int)round(previewWindowSize_/controlWindowSize_)-1) ; ++i)
   {
     aof << i << " " ; // 0
     aof << inputZMPTraj_deq_[i].px << " " ;           // 1

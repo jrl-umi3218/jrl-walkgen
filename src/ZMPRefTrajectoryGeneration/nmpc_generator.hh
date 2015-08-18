@@ -122,6 +122,24 @@ namespace PatternGeneratorJRL
     inline std::deque<support_state_t> const & SupportStates_deq() const
     { return SupportStates_deq_ ; }
 
+    // Sampling period of the SQP preview
+    inline double T()
+    {return T_;}
+    inline void T(double T)
+    {T_=T;}
+
+    // Number of sample in the SQP preview
+    inline double N()
+    {return N_;}
+    inline void N(unsigned N)
+    {N_=N;}
+
+    // Step Period :
+    inline double T_step()
+    {return T_step_;}
+    inline void T_step(double T_step)
+    {T_step_=T_step;}
+
   private:
     SimplePluginManager * SPM_ ;
     CjrlHumanoidDynamicRobot * HDR_ ;
