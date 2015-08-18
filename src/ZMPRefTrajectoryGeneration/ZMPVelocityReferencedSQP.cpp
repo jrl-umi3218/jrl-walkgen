@@ -64,7 +64,7 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL)
   m_SamplingPeriod = 0.005 ;
 
   // Generator Management
-  InterpolationPeriod_ = m_SamplingPeriod*6;
+  InterpolationPeriod_ = m_SamplingPeriod*7;
   previewDuration_ = (SQP_N_-1)*SQP_T_ ;
   NbSampleControl_ = (int)round(SQP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(SQP_T_/InterpolationPeriod_) ;
