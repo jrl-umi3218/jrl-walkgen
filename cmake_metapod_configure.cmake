@@ -97,5 +97,7 @@ FUNCTION(ADD_SAMPLEURDFMODEL name)
     MAIN_DEPENDENCY ${_urdf_file}
   )
   ADD_LIBRARY(${_libname} SHARED ${_sources})
-
+  
+  INSTALL(TARGETS ${_libname} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  
 ENDFUNCTION()
