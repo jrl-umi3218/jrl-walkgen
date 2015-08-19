@@ -49,6 +49,8 @@
 
 #include "ClockCPUTime.hh"
 
+#include <jrl/walkgen/config_private.hh>
+
 #ifndef _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_
 #define _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_
 

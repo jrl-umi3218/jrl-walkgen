@@ -34,6 +34,8 @@
 #include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
 #include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.hh>
 
+#include <jrl/walkgen/config_private.hh>
+
 using namespace std;
 using namespace PatternGeneratorJRL;
 

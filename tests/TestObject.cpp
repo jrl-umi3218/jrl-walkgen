@@ -443,11 +443,11 @@ namespace PatternGeneratorJRL
 
           // Find size of the two files.
           alif.seekg (0, alif.end);
-          int alif_length = alif.tellg();
+          unsigned long int alif_length = (unsigned long int)alif.tellg();
           alif.seekg (0, alif.beg);
 
           arif.seekg (0, arif.end);
-          int arif_length = arif.tellg();
+          unsigned long int arif_length = (unsigned long int)arif.tellg();
           arif.seekg (0, arif.beg);
 
 	  while ((!alif.eof()) &&
