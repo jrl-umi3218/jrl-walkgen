@@ -19,6 +19,7 @@ INCLUDE(CTest)
 # We put them here to prevent them to be listed in the .pc file.
 ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
 ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
+ADD_OPTIONAL_DEPENDENCY("electric-fence >= 1.0.1")
 
 IF(HRP2_DYNAMICS_FOUND)
   MESSAGE(STATUS "hrp2-dynamics: found")
@@ -450,6 +451,8 @@ IF(HRP2_DYNAMICS_FOUND)
   PKG_CONFIG_USE_DEPENDENCY(TestNaveau2015 hrp2-dynamics)
 
   ADD_DEPENDENCIES(TestNaveau2015 ${PROJECT_NAME})
+  SET_TARGET_PROPERTIES(TestNaveau2015 PROPERTIES COMPILE_FLAGS "-lefence")
+
 
   ENDIF(HRP2_14_FOUND)
 ENDIF(HRP2_DYNAMICS_FOUND)

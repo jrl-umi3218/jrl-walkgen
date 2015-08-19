@@ -128,15 +128,15 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL)
   // init of the buffer for the kajita's dynamic filter
 
   // size = numberOfIterationOfThePreviewControl * NumberOfSample + Margin
-  ZMPTraj_deq_.resize( SQP_N_ * NbSampleInterpolation_+10);
-  COMTraj_deq_.resize( SQP_N_ * NbSampleInterpolation_+10);
-  LeftFootTraj_deq_.resize( SQP_N_ * NbSampleInterpolation_+10) ;
-  RightFootTraj_deq_.resize( SQP_N_ * NbSampleInterpolation_+10) ;
+  ZMPTraj_deq_      .resize( (previewSize_+1) * NbSampleInterpolation_);
+  COMTraj_deq_      .resize( (previewSize_+1) * NbSampleInterpolation_);
+  LeftFootTraj_deq_ .resize( (previewSize_+1) * NbSampleInterpolation_) ;
+  RightFootTraj_deq_.resize( (previewSize_+1) * NbSampleInterpolation_) ;
 
-  ZMPTraj_deq_ctrl_.resize( SQP_N_ * NbSampleControl_+10) ;
-  COMTraj_deq_ctrl_.resize( SQP_N_ * NbSampleControl_+10) ;
-  LeftFootTraj_deq_ctrl_ .resize( SQP_N_ * NbSampleControl_+10) ;
-  RightFootTraj_deq_ctrl_.resize( SQP_N_ * NbSampleControl_+10) ;
+  ZMPTraj_deq_ctrl_      .resize( (previewSize_+1) * NbSampleControl_) ;
+  COMTraj_deq_ctrl_      .resize( (previewSize_+1) * NbSampleControl_) ;
+  LeftFootTraj_deq_ctrl_ .resize( (previewSize_+1) * NbSampleControl_) ;
+  RightFootTraj_deq_ctrl_.resize( (previewSize_+1) * NbSampleControl_) ;
 }
 
 
