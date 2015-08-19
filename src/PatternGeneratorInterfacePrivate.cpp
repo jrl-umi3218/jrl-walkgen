@@ -1195,14 +1195,14 @@ namespace PatternGeneratorJRL {
     {
       m_InternalClock = 0.0;
       initOnlineHerdt();
-      printf("Online \n");
+      printf("Online Herdt\n");
       //ODEBUG4("InitOnLine","DebugHerdt.txt");
     }
     else if (aCmd==":NaveauOnline")
     {
       m_InternalClock = 0.0;
       initOnlineNaveau();
-      printf("Online \n");
+      printf("Online Naveau\n");
       //ODEBUG4("InitOnLine","DebugNaveau.txt");
     }
     else if (aCmd==":setCoMPerturbationForce")
