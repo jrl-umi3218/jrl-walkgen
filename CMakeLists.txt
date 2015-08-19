@@ -21,7 +21,6 @@ INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/lapack.cmake)
 INCLUDE(cmake/cpack.cmake)
 INCLUDE(cmake/boost.cmake)
-INCLUDE(cmake/FindqpOASES.cmake)
 INCLUDE(cmake_metapod_configure.cmake)
 INCLUDE(CMakeDependentOption)
 
