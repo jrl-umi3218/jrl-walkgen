@@ -58,8 +58,9 @@ using namespace::PatternGeneratorJRL::TestSuite;
 using namespace std;
 
 enum Profiles_t {
-  PROFIL_HERDT_ONLINE_WALKING,                 // 1
-  PROFIL_HERDT_EMERGENCY_STOP                  // 2
+  PROFIL_HERDT_ONLINE_WALKING,                 // 0
+  PROFIL_HERDT_EMERGENCY_STOP,                 // 1
+  PROFIL_HERDT_POWER_LAW                       // 2
 };
 
 class TestHerdt2010: public TestObject
@@ -72,11 +73,23 @@ private:
   vector<double> err_zmp_x ;
   vector<double> err_zmp_y ;
 
+
   /// Class that compute the dynamic and kinematic of the robot
   CjrlHumanoidDynamicRobot * cjrlHDR_ ;
   Robot_Model hrp2_14_ ;
   Robot_Model::confVector q_,dq_,ddq_;
   Force_HRP2_14 com_tensor_ ;
+
+  /// Array of velocities.
+  typedef std::vector<double> vector_double_t;
+  /// Array of arrays
+  std::vector<vector_double_t> queueOfVelocity_;
+  /// Index in the queue of velocities.
+  unsigned long int indexQueueVelocity_;
+  /// Stop has been reached
+  bool power_law_stop_;
+  /// Stop iteration.
+  unsigned long int power_law_stop_it_;
 
 public:
   TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
@@ -616,6 +629,16 @@ protected:
     }
   }
 
+  void startPowerLaw(PatternGeneratorInterface &aPGI)
+  {
+    power_law_stop_= false;
+    startOnLineWalking(aPGI);
+    std::cout << "Starting Power Law" << std::endl;
+
+    std::string fileName("/home/ostasse/Projets/KOROIBOT/Motions/Trajectories/Arena_[3,2]_Shape_2_Beta_MinusThird.txt");
+    loadFileOfVelocityProfile(fileName);
+  }
+
   void startTurningLeft(PatternGeneratorInterface &aPGI)
   {
     {
@@ -668,8 +691,10 @@ protected:
   void stop(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference 0.0 0.0 0.0");
+      ostringstream ostrm2(":setVelReference 0.0 0.0 0.0");
+      istringstream strm2(ostrm2.str());
       aPGI.ParseCmd(strm2);
+      std::cout << "stop " << ostrm2.str() << std::endl;
     }
   }
   void walkForward1m_s(PatternGeneratorInterface &aPGI)
@@ -740,10 +765,16 @@ protected:
   void stopOnLineWalking(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.0 0.0 0.0");
+      ostringstream ostrm2(":setVelReference  0.0 0.0 0.0");
+
+      istringstream strm2(ostrm2.str());
       aPGI.ParseCmd(strm2);
-      istringstream strm3(":stoppg");
+      std::cout << "stopOnLineWalking " << ostrm2.str() << std::endl;
+
+      ostringstream ostrm3(":stoppg");
+      istringstream strm3(ostrm3.str());
       aPGI.ParseCmd(strm3);
+      std::cout << "stopOnLineWalking " << ostrm3.str() << std::endl;
     }
   }
 
@@ -758,6 +789,9 @@ protected:
       break;
     case PROFIL_HERDT_EMERGENCY_STOP:
       startEmergencyStop(*m_PGI);
+      break;
+    case PROFIL_HERDT_POWER_LAW:
+      startPowerLaw(*m_PGI);
       break;
     default:
       throw("No correct test profile");
@@ -797,6 +831,85 @@ protected:
           }
       }
   }
+
+  void loadFileOfVelocityProfile(const std::string &fileName)
+  {
+
+    std::ifstream aif;
+    aif.open(fileName.c_str(),std::ifstream::in);
+    if (aif.is_open())
+      {
+        while (!aif.eof())
+          {
+            vector_double_t VelCompleteData(7);
+            /// Read time from the start of the trajectory
+            aif >> VelCompleteData[0];
+            /// Read position
+            aif >> VelCompleteData[1]; aif >> VelCompleteData[2];
+            // Read Velocity
+            aif >> VelCompleteData[3]; aif >> VelCompleteData[4]; 
+            aif >> VelCompleteData[5];
+            // Total speed
+            aif >> VelCompleteData[6];
+        
+            queueOfVelocity_.push_back(VelCompleteData);
+          }
+      }
+    aif.close();
+    indexQueueVelocity_ = 0;
+  }
+
+  void generateEventPowerLawVelocity()
+  {
+
+    std::cout << "generateEventPowerLawVelocity " 
+              << indexQueueVelocity_ << " " 
+              << queueOfVelocity_.size() << std::endl;
+    if (indexQueueVelocity_==queueOfVelocity_.size()-1)
+      {
+
+        if (!power_law_stop_)
+          {
+            std::cout << "Generate STOP EVENT"<< std::endl;
+            stop(*m_PGI);
+            power_law_stop_ = true;
+            power_law_stop_it_ = m_OneStep.NbOfIt;
+          }
+        else
+          {
+            std::cout << " It to finish: " 
+                      << power_law_stop_it_+(unsigned long int)(5.6*200) 
+                      << " Current Iteration: " << m_OneStep.NbOfIt << std::endl;
+            if (power_law_stop_it_+(unsigned long int)(5.6*200)==m_OneStep.NbOfIt)
+              stopOnLineWalking(*m_PGI);
+          }
+      }
+    else
+      {
+        vector_double_t VelCompleteData,VelProf(3);
+        VelCompleteData = queueOfVelocity_[indexQueueVelocity_];
+
+        for(unsigned int li=0;li<3;li++)
+          VelProf[li] = VelCompleteData[3+li];
+        
+        {
+          ostringstream ostrm2(":setVelReference  ");
+          ostrm2 << VelProf[0] << " " ;
+          ostrm2 << VelProf[1] << " ";
+          ostrm2 << VelProf[2];
+          istringstream istrm2(ostrm2.str());
+      
+          m_PGI->ParseCmd(istrm2);
+          std::cout << "strm2: " << ostrm2.str() << std::endl;
+          
+        }
+
+        indexQueueVelocity_++;
+      }
+
+    std::cout << "end of generateEventPowerLawVelocity." << std::endl;
+  }
+
   void generateEventEmergencyStop()
   {
 #define localNbOfEventsEMS 4
@@ -825,6 +938,9 @@ protected:
     case PROFIL_HERDT_EMERGENCY_STOP:
       generateEventEmergencyStop();
       break;
+    case PROFIL_HERDT_POWER_LAW:
+      generateEventPowerLawVelocity();
+      break;
     default:
       break;
     }
@@ -834,13 +950,16 @@ protected:
 
 int PerformTests(int argc, char *argv[])
 {
-#define NB_PROFILES 2
+#define NB_PROFILES 3
   std::string TestNames[NB_PROFILES] = { "TestHerdt2010DynamicFilter",
-                                         "TestHerdt2010EmergencyStop"};
-  int TestProfiles[NB_PROFILES] = { PROFIL_HERDT_ONLINE_WALKING,
-                                    PROFIL_HERDT_EMERGENCY_STOP};
+                                         "TestHerdt2010EmergencyStop",
+                                         "TestHerdt2015PowerLaw"};
 
-  for (unsigned int i=0;i<NB_PROFILES;i++){
+  int TestProfiles[NB_PROFILES] = { PROFIL_HERDT_ONLINE_WALKING,
+                                    PROFIL_HERDT_EMERGENCY_STOP,
+                                    PROFIL_HERDT_POWER_LAW};
+
+  for (unsigned int i=NB_PROFILES-2;i<NB_PROFILES;i++){
     TestHerdt2010 aTH2010(argc,argv,TestNames[i],TestProfiles[i]);
     aTH2010.init();
     try{

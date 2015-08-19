@@ -192,16 +192,20 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   dynamicFilter_ = new DynamicFilter(SPM,aHS);
 
   // Register method to handle
-  const unsigned int NbMethods = 3;
-  string aMethodName[NbMethods] =
+  const unsigned int NbMethods = 4;
+  const char *lMethodNames[NbMethods] =
   {":previewcontroltime",
    ":numberstepsbeforestop",
-   ":stoppg"
+   ":stoppg",
    ":setfeetconstraint"};
-
+  RESETDEBUG5("PgDebug2.txt");
+  ODEBUG5("Before registering methods for ZMPVelocityReferencedQP","PgDebug2.txt");
   for(unsigned int i=0;i<NbMethods;i++)
   {
-    if (!RegisterMethod(aMethodName[i]))
+    std::cout << "lMethodNames["<< i << "]=" << lMethodNames[i] <<std::endl;
+    std::string aMethodName(lMethodNames[i]);
+    ODEBUG5("Register method " << aMethodName << "for ZMPVelocityReferencedQP","PgDebug2.txt");
+    if (!RegisterMethod(aMethodName))
     {
       std::cerr << "Unable to register " << aMethodName << std::endl;
     }
@@ -302,7 +306,7 @@ void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x, double y)
 //-----------new functions--------------
 void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &strm)
 {
-
+  std::cout << __PRETTY_FUNCTION__ << " Method:" << Method << std::endl; 
   if (Method==":previewcontroltime")
   {
     strm >> m_PreviewControlTime;
@@ -315,6 +319,7 @@ void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstrea
   }
   if (Method==":stoppg")
   {
+    std::cout << __PRETTY_FUNCTION__ << " EndingPhase" << std::endl; 
     EndingPhase_ = true;
   }
   if(Method==":setfeetconstraint")

@@ -40,6 +40,10 @@ using namespace std;
 
 using namespace PatternGeneratorJRL;
 
+SimplePluginManager::SimplePluginManager()
+{
+  RESETDEBUG5("PgDebug.txt");
+}
 
 SimplePluginManager::~SimplePluginManager()
 {
@@ -98,7 +102,7 @@ bool SimplePluginManager::RegisterMethod(string &MethodName, SimplePlugin *aSP)
 
   m_SimplePlugins.insert(pair < string, SimplePlugin * > (MethodName,aSP));
 
-  ODEBUG("Registered method " << MethodName << " for plugin " << aSP << endl);
+  ODEBUG5("Registered method " << MethodName << " for plugin " << aSP << endl,"PgDebug.txt");
   //  Print();
   return true;  
 }
@@ -119,7 +123,7 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
        CurrentPlugin != RangeOfPlugins.second;++NbPlugins,
 	 ++CurrentPlugin) ;
   
-  ODEBUG4("Size of SimplePlugins: " << m_SimplePlugins.size() 
+  ODEBUG5("Size of SimplePlugins: " << m_SimplePlugins.size() 
 	  << " Found for " << MethodName << " : " << NbPlugins, "PgDebug.txt");
   bool FoundAPlugin = false;
 
@@ -133,7 +137,7 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
   memset(aBuffer,0,size+1);
   for(int i=0;i<size;i++)
     aBuffer[i] = (char)pbuf->sbumpc();
-  ODEBUG4(aBuffer,"PgDebug.txt");
+  ODEBUG5(aBuffer,"PgDebug.txt");
   
   pbuf->pubsetbuf(aBuffer,size);
 
@@ -143,7 +147,7 @@ bool SimplePluginManager::CallMethod(string &MethodName, istringstream &istrm)
     {
       istringstream iss(aBuffer);
       SimplePlugin * aSP = CurrentPlugin->second;
-      ODEBUG4("Found the method " << MethodName 
+      ODEBUG5("Found the method " << MethodName 
 	      << " for plugin :" << aSP << endl
 	      << " Buffer: " << aBuffer,"PgDebug.txt"); 
       if (aSP!=0)
