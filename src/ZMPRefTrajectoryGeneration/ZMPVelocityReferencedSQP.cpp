@@ -127,16 +127,17 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL)
 
   // init of the buffer for the kajita's dynamic filter
 
-  // size = numberOfIterationOfThePreviewControl * NumberOfSample + Margin
-  ZMPTraj_deq_      .resize( previewSize_ * NbSampleInterpolation_ + 20);
-  COMTraj_deq_      .resize( previewSize_ * NbSampleInterpolation_ + 20);
-  LeftFootTraj_deq_ .resize( previewSize_ * NbSampleInterpolation_ + 20) ;
-  RightFootTraj_deq_.resize( previewSize_ * NbSampleInterpolation_ + 20) ;
+  // size = numberOfIterationOfThePreviewControl * NumberOfSample + Margin(=CurrentIndex)
+  // Waring current index is higher on the robot than in the jrl Test suit
+  ZMPTraj_deq_      .resize( previewSize_ * NbSampleInterpolation_ + 40);
+  COMTraj_deq_      .resize( previewSize_ * NbSampleInterpolation_ + 40);
+  LeftFootTraj_deq_ .resize( previewSize_ * NbSampleInterpolation_ + 40);
+  RightFootTraj_deq_.resize( previewSize_ * NbSampleInterpolation_ + 40);
 
-  ZMPTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ +20) ;
-  COMTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ +20) ;
-  LeftFootTraj_deq_ctrl_ .resize( previewSize_ * NbSampleControl_ +20) ;
-  RightFootTraj_deq_ctrl_.resize( previewSize_ * NbSampleControl_ +20) ;
+  ZMPTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ +40) ;
+  COMTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ +40) ;
+  LeftFootTraj_deq_ctrl_ .resize( previewSize_ * NbSampleControl_ +40) ;
+  RightFootTraj_deq_ctrl_.resize( previewSize_ * NbSampleControl_ +40) ;
 }
 
 
