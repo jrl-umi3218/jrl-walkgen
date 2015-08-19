@@ -208,7 +208,7 @@ void ZMPVelocityReferencedSQP::CallMethod(std::string & Method, std::istringstre
   }
   if(Method==":setfeetconstraint")
   {
-   //RFI_->CallMethod(Method,strm); need a callMethod in NMPCgenerator_ class
+    NMPCgenerator_->RFI()->CallMethod(Method,strm);
   }
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
 }

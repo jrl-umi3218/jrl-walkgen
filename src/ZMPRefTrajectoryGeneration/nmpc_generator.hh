@@ -41,7 +41,9 @@ namespace PatternGeneratorJRL
   {
   public:
     NMPCgenerator(SimplePluginManager *aSPM, CjrlHumanoidDynamicRobot *aHDR);
+
     ~NMPCgenerator();
+
     void initNMPCgenerator(support_state_t &currentSupport,
                            COMState & lStartingCOMState,
                            reference_t & local_vel_ref);
@@ -121,6 +123,9 @@ namespace PatternGeneratorJRL
                      std::vector<double> &FootStepYaw);
     inline std::deque<support_state_t> const & SupportStates_deq() const
     { return SupportStates_deq_ ; }
+
+    RelativeFeetInequalities * RFI()
+    {return RFI_;}
 
     // Sampling period of the SQP preview
     inline double T()

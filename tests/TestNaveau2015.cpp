@@ -787,23 +787,26 @@ protected:
       unsigned time;
       localeventHandler_t Handler ;
     };
-#define localNbOfEvents 3
+#define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-    {
-      {1*10,&TestNaveau2015::walkForward2m_s},
-      {40*200,&TestNaveau2015::stop},
-      {50*200,&TestNaveau2015::stopOnLineWalking}
-    };
-
+    { { 5*200,&TestNaveau2015::walkForward1m_s},
+      {10*200,&TestNaveau2015::walkForward2m_s},
+      {15*200,&TestNaveau2015::walkForward3m_s},
+      {20*200,&TestNaveau2015::walkForward2m_s},
+      {25*200,&TestNaveau2015::walkForward2m_s},
+      {30*200,&TestNaveau2015::walkSidewards1m_s},
+      {35*200,&TestNaveau2015::walkSidewards2m_s},
+      {50*200,&TestNaveau2015::stop},
+      {55*200,&TestNaveau2015::stopOnLineWalking}};
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
-    {
-      if ( m_OneStep.NbOfIt==events[i].time)
       {
-        ODEBUG3("********* GENERATE EVENT OLW ***********");
-        (this->*(events[i].Handler))(*m_PGI);
+        if ( m_OneStep.NbOfIt==events[i].time)
+          {
+            ODEBUG3("********* GENERATE EVENT OLW ***********");
+            (this->*(events[i].Handler))(*m_PGI);
+          }
       }
-    }
   }
   void generateEventEmergencyStop()
   {
