@@ -171,6 +171,9 @@ namespace PatternGeneratorJRL
     /// \brief Index where to begin the interpolation
     unsigned CurrentIndex_ ;
 
+    /// \brief Index where to begin the interpolation
+    const unsigned CurrentIndexUpperBound_ ;
+
     /// \brief Generator of QP problem
     NMPCgenerator * NMPCgenerator_;
 

@@ -54,7 +54,7 @@ using namespace PatternGeneratorJRL;
 
 ZMPVelocityReferencedSQP::ZMPVelocityReferencedSQP(SimplePluginManager *SPM,
                                                  string , CjrlHumanoidDynamicRobot *aHS ) :
-ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL)
+ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpperBound_(40)
 {
   // PG management
   Running_ = false ;
@@ -129,15 +129,15 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL)
 
   // size = numberOfIterationOfThePreviewControl * NumberOfSample + Margin(=CurrentIndex)
   // Waring current index is higher on the robot than in the jrl Test suit
-  ZMPTraj_deq_      .resize( previewSize_ * NbSampleInterpolation_ + 40);
-  COMTraj_deq_      .resize( previewSize_ * NbSampleInterpolation_ + 40);
-  LeftFootTraj_deq_ .resize( previewSize_ * NbSampleInterpolation_ + 40);
-  RightFootTraj_deq_.resize( previewSize_ * NbSampleInterpolation_ + 40);
+  ZMPTraj_deq_      .resize( previewSize_ * NbSampleInterpolation_ + CurrentIndexUpperBound_);
+  COMTraj_deq_      .resize( previewSize_ * NbSampleInterpolation_ + CurrentIndexUpperBound_);
+  LeftFootTraj_deq_ .resize( previewSize_ * NbSampleInterpolation_ + CurrentIndexUpperBound_);
+  RightFootTraj_deq_.resize( previewSize_ * NbSampleInterpolation_ + CurrentIndexUpperBound_);
 
-  ZMPTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ +40) ;
-  COMTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ +40) ;
-  LeftFootTraj_deq_ctrl_ .resize( previewSize_ * NbSampleControl_ +40) ;
-  RightFootTraj_deq_ctrl_.resize( previewSize_ * NbSampleControl_ +40) ;
+  ZMPTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
+  COMTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
+  LeftFootTraj_deq_ctrl_ .resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
+  RightFootTraj_deq_ctrl_.resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
 }
 
 
@@ -450,6 +450,18 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
 
 void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
 {
+  if(LeftFootTraj_deq_ctrl_.size() < CurrentIndex_ + previewSize_ * NbSampleControl_)
+  {
+    COMTraj_deq_ctrl_      .resize(CurrentIndex_ + previewSize_ * NbSampleControl_
+                                 + CurrentIndexUpperBound_);
+    ZMPTraj_deq_ctrl_      .resize(CurrentIndex_ + previewSize_ * NbSampleControl_
+                                 + CurrentIndexUpperBound_);
+    LeftFootTraj_deq_ctrl_ .resize(CurrentIndex_ + previewSize_ * NbSampleControl_
+                                 + CurrentIndexUpperBound_);
+    RightFootTraj_deq_ctrl_.resize(CurrentIndex_ + previewSize_ * NbSampleControl_
+                                 + CurrentIndexUpperBound_);
+  }
+
   std::vector<double> JerkX ;
   std::vector<double> JerkY ;
   std::vector<double> FootStepX ;

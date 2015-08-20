@@ -238,7 +238,7 @@ void NMPCgenerator::initNMPCgenerator(
   initializeCostFunction();
 
   // initialize the solver
-  QP_ = new qpOASES::SQProblem((int)nv_,(int)nc_,qpOASES::HST_SEMIDEF) ;
+  QP_ = new qpOASES::SQProblem((int)nv_,(int)nc_,qpOASES::HST_POSDEF) ;
   options_.printLevel = qpOASES::PL_NONE ;
   options_.setToMPC();
   QP_->setOptions(options_);
