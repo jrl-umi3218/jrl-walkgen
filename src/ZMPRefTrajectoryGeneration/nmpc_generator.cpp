@@ -187,8 +187,8 @@ void NMPCgenerator::initNMPCgenerator(
 
   T_ = 0.1 ;
   T_step_ = 0.8 ;
-  alpha_ = 1.0   ; // weight for CoM velocity tracking  : 0.5 * a
-  beta_  = 1e+02 ; // weight for ZMP reference tracking : 0.5 * b
+  alpha_ = 5.0   ; // weight for CoM velocity tracking  : 0.5 * a
+  beta_  = 1e+03 ; // weight for ZMP reference tracking : 0.5 * b
   gamma_ = 5e-04 ; // weight for jerk minimization      : 0.5 * c
   SecurityMarginX_ = 0.09 ;
   SecurityMarginY_ = 0.05 ;
@@ -1219,8 +1219,8 @@ void NMPCgenerator::initializeObstacleConstraint()
   Circle obstacle ;
   obstacle.x_0    = 1.0 ;
   obstacle.y_0    = 0.5 ;
-  obstacle.r      = 0.2/2 ;
-  obstacle.margin = 0.4172 ;
+  obstacle.r      = 0.23 ;
+  obstacle.margin = 0.40 ;
   obstacles_.push_back(obstacle);
 
 }
