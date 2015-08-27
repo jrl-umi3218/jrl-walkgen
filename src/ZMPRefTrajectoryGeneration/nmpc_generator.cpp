@@ -1184,15 +1184,15 @@ void NMPCgenerator::initializeRotIneqConstraint()
   Arot_(0,2*N_+2*nf_+1) = 0.0 ;
   Arot_(1,2*N_+2*nf_  ) = -1.0 ;
   Arot_(1,2*N_+2*nf_+1) =  1.0 ;
-  UBrot_(1) =  0.09 ;
-  LBrot_(1) = -0.09 ;
+  UBrot_(1) =  0.05 ;
+  LBrot_(1) = -0.05 ;
 
 }
 
 void NMPCgenerator::updateRotIneqConstraint()
 {
-  UBrot_(0) =  0.09 + currentSupport_.Yaw ;
-  LBrot_(0) = -0.09 + currentSupport_.Yaw ;
+  UBrot_(0) =  0.05 + currentSupport_.Yaw ;
+  LBrot_(0) = -0.05 + currentSupport_.Yaw ;
 #ifdef DEBUG
   DumpMatrix("Arot_", Arot_);
   DumpVector("UBrot_",UBrot_);
@@ -1217,8 +1217,12 @@ void NMPCgenerator::initializeObstacleConstraint()
   nc_obs_ = obstacles_.size();
 
   Circle obstacle ;
-  obstacle.x_0    = 1.0 ;
-  obstacle.y_0    = 0.5 ;
+  //obstacle.x_0    = 1.0 ;
+  //obstacle.y_0    = 0.5 ;
+  //obstacle.r      = 0.23 ;
+  //obstacle.margin = 0.40 ;
+  obstacle.x_0    = 0.1 ;
+  obstacle.y_0    = 0.9 ;
   obstacle.r      = 0.23 ;
   obstacle.margin = 0.40 ;
   obstacles_.push_back(obstacle);

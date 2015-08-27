@@ -675,6 +675,8 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   int NbI = (int)round(controlWindowSize_/interpolationPeriod_) ;
   for (int i = 0 ; i < NbI ; ++i)
   {
+    aof << (iteration_zmp+i)*interpolationPeriod_ << " " ;       // 1
+
     aof << inputZMPTraj_deq_[i*inc].px << " " ;       // 1
     aof << inputZMPTraj_deq_[i*inc].py << " " ;       // 2
 

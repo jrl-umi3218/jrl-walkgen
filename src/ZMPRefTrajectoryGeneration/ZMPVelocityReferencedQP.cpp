@@ -53,6 +53,8 @@ using namespace std;
 using namespace PatternGeneratorJRL;
 using namespace metapod;
 
+//#define DEBUG
+
 double filterprecision(double adb)
 {
   if (fabs(adb)<1e-7)
@@ -202,7 +204,9 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   ODEBUG5("Before registering methods for ZMPVelocityReferencedQP","PgDebug2.txt");
   for(unsigned int i=0;i<NbMethods;i++)
   {
+#ifdef DEBUG
     std::cout << "lMethodNames["<< i << "]=" << lMethodNames[i] <<std::endl;
+#endif
     std::string aMethodName(lMethodNames[i]);
     ODEBUG5("Register method " << aMethodName << "for ZMPVelocityReferencedQP","PgDebug2.txt");
     if (!RegisterMethod(aMethodName))
@@ -306,7 +310,9 @@ void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x, double y)
 //-----------new functions--------------
 void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstream &strm)
 {
-  std::cout << __PRETTY_FUNCTION__ << " Method:" << Method << std::endl; 
+#ifdef DEBUG
+  std::cout << __PRETTY_FUNCTION__ << " Method:" << Method << std::endl;
+#endif
   if (Method==":previewcontroltime")
   {
     strm >> m_PreviewControlTime;
@@ -319,7 +325,9 @@ void ZMPVelocityReferencedQP::CallMethod(std::string & Method, std::istringstrea
   }
   if (Method==":stoppg")
   {
-    std::cout << __PRETTY_FUNCTION__ << " EndingPhase" << std::endl; 
+#ifdef DEBUG
+    std::cout << __PRETTY_FUNCTION__ << " EndingPhase" << std::endl;
+#endif
     EndingPhase_ = true;
   }
   if(Method==":setfeetconstraint")
@@ -586,7 +594,6 @@ void ZMPVelocityReferencedQP::OnLine(double time,
                                    RightFootTraj_deq_,
                                    deltaCOMTraj_deq_);
 
-      //#define DEBUG
       #ifdef DEBUG
         dynamicFilter_->Debug(COMTraj_deq_ctrl_,
                               LeftFootTraj_deq_ctrl_,
