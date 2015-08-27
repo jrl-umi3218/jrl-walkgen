@@ -1221,8 +1221,8 @@ void NMPCgenerator::initializeObstacleConstraint()
   //obstacle.y_0    = 0.5 ;
   //obstacle.r      = 0.23 ;
   //obstacle.margin = 0.40 ;
-  obstacle.x_0    = 0.1 ;
-  obstacle.y_0    = 0.9 ;
+  obstacle.x_0    = 1.5 ;
+  obstacle.y_0    = -1.5 ;
   obstacle.r      = 0.23 ;
   obstacle.margin = 0.40 ;
   obstacles_.push_back(obstacle);
@@ -1260,6 +1260,9 @@ void NMPCgenerator::updateObstacleConstraint()
                         *(obstacles_[obs].r+obstacles_[obs].margin) ;
       MAL_VECTOR_FILL(UBobs_[obs],1e+8);
     }
+#ifdef DEBUG
+    cout << "prepare the obstacle : " << obstacles_[obs] << endl ;
+#endif
   }
 #ifdef DEBUG
   DumpMatrix("Hobs_0" ,Hobs_ [0][0]);

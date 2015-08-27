@@ -262,5 +262,11 @@ namespace PatternGeneratorJRL
   };
   typedef struct Circle_t Circle ;
 
+  inline std::ostream & operator<<(std::ostream & os, const Circle_t & circle)
+  {
+    os << "x_0 " << circle.x_0 << " y_0 " << circle.y_0 << " R " << circle.r ;
+    return os;
+  }
+
 }
 #endif
