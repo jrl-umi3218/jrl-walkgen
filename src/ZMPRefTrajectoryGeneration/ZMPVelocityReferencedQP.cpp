@@ -177,7 +177,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   OFTG_DF_->QPSamplingPeriod( QP_T_ );
   OFTG_DF_->NbSamplingsPreviewed( QP_N_ );
   OFTG_DF_->FeetDistance( FeetDistance_ );
-  OFTG_DF_->StepHeight( StepHeight_ );
+  OFTG_DF_->SetStepHeight( StepHeight_ );
   OFTG_DF_->SetStepStairOn(0) ;
 
   OFTG_control_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
@@ -188,7 +188,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   OFTG_control_->QPSamplingPeriod( QP_T_ );
   OFTG_control_->NbSamplingsPreviewed( QP_N_ );
   OFTG_control_->FeetDistance( FeetDistance_ );
-  OFTG_control_->StepHeight( StepHeight_ );
+  OFTG_control_->SetStepHeight( StepHeight_ );
   OFTG_control_->SetStepStairOn(0) ;
 
   dynamicFilter_ = new DynamicFilter(SPM,aHS);

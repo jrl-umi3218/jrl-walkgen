@@ -594,6 +594,11 @@ protected:
       istringstream strm2(":setfeetconstraint XY 0.09 0.04");
       m_PGI->ParseCmd(strm2);
     }
+    {
+      istringstream strm2(":stepheight 0.05");
+      m_PGI->ParseCmd(strm2);
+    }
+
   }
 
   void startEmergencyStop(PatternGeneratorInterface &aPGI)
@@ -625,6 +630,11 @@ protected:
       istringstream strm2(":setfeetconstraint XY 0.09 0.04");
       m_PGI->ParseCmd(strm2);
     }
+    {
+      istringstream strm2(":stepheight 0.05");
+      m_PGI->ParseCmd(strm2);
+    }
+
   }
 
   void startTurningLeft(PatternGeneratorInterface &aPGI)
@@ -844,7 +854,7 @@ protected:
 
 int PerformTests(int argc, char *argv[])
 {
-#define NB_PROFILES 2
+#define NB_PROFILES 1
   std::string TestNames[NB_PROFILES] = {"TestNaveau2015"};
   int TestProfiles[NB_PROFILES] = {PROFIL_NAVEAU_ONLINE_WALKING};
 

@@ -42,7 +42,6 @@ OnLineFootTrajectoryGeneration::OnLineFootTrajectoryGeneration(SimplePluginManag
   QP_T_ = 0.0 ;
   QP_N_ = 0 ;
   FeetDistanceDS_ = 0.0 ;
-  StepHeight_ = 0.0 ;
   HalfTimePassed_ = false;
   FPx_ = 0.0 ;
   FPy_ = 0.0 ;

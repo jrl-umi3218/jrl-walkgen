@@ -102,7 +102,7 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   OFTG_->QPSamplingPeriod( SQP_T_ );
   OFTG_->NbSamplingsPreviewed( SQP_N_ );
   OFTG_->FeetDistance( FeetDistance_ );
-  OFTG_->StepHeight( StepHeight_ );
+  OFTG_->SetStepHeight( StepHeight_ );
   OFTG_->SetStepStairOn(0) ;
 
   NMPCgenerator_ = new NMPCgenerator(SPM,aHS);
@@ -147,11 +147,6 @@ ZMPVelocityReferencedSQP::~ZMPVelocityReferencedSQP()
   {
     delete NMPCgenerator_;
     NMPCgenerator_= NULL ;
-  }
-  if (OFTG_!=NULL)
-  {
-    delete OFTG_;
-    OFTG_ = NULL ;
   }
   if (OFTG_!=NULL)
   {

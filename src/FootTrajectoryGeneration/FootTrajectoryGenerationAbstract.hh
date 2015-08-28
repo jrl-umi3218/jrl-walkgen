@@ -183,9 +183,27 @@ namespace PatternGeneratorJRL
     void SetOmega(double anOmega)
     { m_Omega = anOmega; };
 
+
+    /*! \name StepHeight.
+      @{*/
+
+    /*! Get StepHeight */
+    double GetStepHeight() const
+    { return m_StepHeight; };
+
+    /*! Set Omega */
+    void SetStepHeight(double aStepHeight)
+    { m_StepHeight = aStepHeight; };
+
+
+    /*! \name isStepStairOn.
+      @{*/
+
+    /*! Get isStepStairOn */
     int GetSetStepStairOn() const
     { return  m_isStepStairOn; };
 
+    /*! Set isStepStairOn */
     void SetStepStairOn(int aSSO)
     {  m_isStepStairOn= aSSO;};
 
@@ -221,7 +239,9 @@ namespace PatternGeneratorJRL
 
     int m_isStepStairOn;
 
+    /// \brief Height of the flying foot in the middle of the SS phase
     double m_StepHeight;
+
     double m_StepCurving;
 
   };

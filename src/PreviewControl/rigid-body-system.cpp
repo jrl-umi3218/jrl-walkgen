@@ -57,7 +57,7 @@ RigidBodySystem::initialize(  )
   OFTG_->QPSamplingPeriod( T_ );
   OFTG_->NbSamplingsPreviewed( N_ );
   OFTG_->FeetDistance( 0.2 );
-  OFTG_->StepHeight( 0.03 );
+  OFTG_->SetStepHeight( 0.03 );
 
   // Initialize predetermined trajectories:
   // --------------------------------------
@@ -110,7 +110,7 @@ RigidBodySystem::initialize_trajectories()
   FlyingFootTrajectory_deq_.resize(NbInstantsSS);
   std::deque<rigid_body_state_t>::iterator FTIt;
   FTIt = FlyingFootTrajectory_deq_.begin();
-  OFTG_->SetParameters( FootTrajectoryGenerationStandard::Z_AXIS, SSPeriod/2.0, OFTG_->StepHeight() );
+  OFTG_->SetParameters( FootTrajectoryGenerationStandard::Z_AXIS, SSPeriod/2.0, OFTG_->GetStepHeight() );
   double LocalStartTime = 0.0;
   for( unsigned int i = 0; i < NbInstantsSS; i++)
     {
@@ -118,7 +118,7 @@ RigidBodySystem::initialize_trajectories()
         {
           LocalStartTime = SSPeriod/2.0;
           OFTG_->SetParameters( FootTrajectoryGenerationStandard::Z_AXIS, SSPeriod/2.0, 0.0,
-              OFTG_->StepHeight(), 0.0, 0.0 );
+              OFTG_->GetStepHeight(), 0.0, 0.0 );
         }
 
       FTIt->Z(0) = OFTG_->Compute( FootTrajectoryGenerationStandard::Z_AXIS,i*T_-LocalStartTime );
