@@ -110,12 +110,16 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   dynamicFilter_ = new DynamicFilter(SPM,aHS);
 
   // Register method to handle
-  const unsigned int NbMethods = 3;
+  const unsigned int NbMethods = 7;
   string aMethodName[NbMethods] =
   {":previewcontroltime",
    ":numberstepsbeforestop",
-   ":stoppg"
-   ":setfeetconstraint"};
+   ":stoppg",
+   ":setfeetconstraint",
+   ":addoneobstacle",
+   ":updateoneobstacle",
+   ":deleteallobstacles"
+  };
 
   for(unsigned int i=0;i<NbMethods;i++)
   {
@@ -206,6 +210,29 @@ void ZMPVelocityReferencedSQP::CallMethod(std::string & Method, std::istringstre
   {
     NMPCgenerator_->RFI()->CallMethod(Method,strm);
   }
+  if(Method==":addoneobstacle")
+  {
+    double x(0),y(0),r(0);
+    strm >> x;
+    strm >> y;
+    strm >> r;
+    NMPCgenerator_->addOneObstacle(x,y,r);
+  }
+  if(Method==":deleteallobstacles")
+  {
+    NMPCgenerator_->deleteAllObstacles();
+  }
+  if(Method==":updateoneobstacle")
+  {
+    unsigned id(0);
+    double x(0),y(0),r(0);
+    strm >> id;
+    strm >> x;
+    strm >> y;
+    strm >> r;
+    NMPCgenerator_->updateOneObstacle(id,x,y,r);
+  }
+
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
 }
 

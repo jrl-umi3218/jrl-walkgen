@@ -111,8 +111,10 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, CjrlHumanoidDynamicRobo
 
   SPM_ = aSPM ;
   HDR_ = aHDR ;
-  RFI_=NULL;
-  QP_ = NULL ;
+
+  FSM_ = new SupportFSM();
+  RFI_ = new RelativeFeetInequalities(SPM_,HDR_) ;
+
   qpOases_H_ =NULL;
   qpOases_J_ =NULL;
   qpOases_lbJ=NULL;
@@ -207,14 +209,12 @@ void NMPCgenerator::initNMPCgenerator(
   // the right foot start moving
   currentSupport_ = currentSupport ;
   SupportStates_deq_.resize(N_+1,currentSupport_);
-  FSM_ = new SupportFSM();
   FSM_->StepPeriod( T_step_ );
   FSM_->DSPeriod( 1e9 ); // period during the robot move at 0.0 com speed
   FSM_->DSSSPeriod( T_step_ );
   FSM_->NbStepsSSDS( 2 ); // number of previw step
   FSM_->SamplingPeriod( T_ );
 
-  RFI_ = new RelativeFeetInequalities(SPM_,HDR_) ;
   ostringstream oss(std::ostringstream::ate);
   oss << ":setfeetconstraint XY " << SecurityMarginX_ << " " << SecurityMarginY_ ;
   istringstream strm(oss.str());
@@ -1216,16 +1216,16 @@ void NMPCgenerator::initializeObstacleConstraint()
   Aobs_.clear();
   nc_obs_ = obstacles_.size();
 
-  Circle obstacle ;
+//  Circle obstacle ;
   //obstacle.x_0    = 1.0 ;
   //obstacle.y_0    = 0.5 ;
   //obstacle.r      = 0.23 ;
   //obstacle.margin = 0.40 ;
-  obstacle.x_0    = 1.5 ;
-  obstacle.y_0    = -1.5 ;
-  obstacle.r      = 0.23 ;
-  obstacle.margin = 0.40 ;
-  obstacles_.push_back(obstacle);
+//  obstacle.x_0    = 1.5 ;
+//  obstacle.y_0    = -1.5 ;
+//  obstacle.r      = 0.23 ;
+//  obstacle.margin = 0.40 ;
+//  obstacles_.push_back(obstacle);
 
 }
 

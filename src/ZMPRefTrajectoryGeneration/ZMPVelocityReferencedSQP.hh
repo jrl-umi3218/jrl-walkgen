@@ -131,6 +131,12 @@ namespace PatternGeneratorJRL
     //
   private:
 
+
+    /// \brief Standard polynomial trajectories for the feet.
+    OnLineFootTrajectoryGeneration * OFTG_ ;
+
+    DynamicFilter * dynamicFilter_ ;
+
     /// \brief (Updated) Reference
     reference_t VelRef_;
     /// \brief Temporary (updating) reference
@@ -224,11 +230,6 @@ namespace PatternGeneratorJRL
 
     /// \brief Height of the CoM
     double CoMHeight_ ;
-
-    /// \brief Standard polynomial trajectories for the feet.
-    OnLineFootTrajectoryGeneration * OFTG_ ;
-
-    DynamicFilter * dynamicFilter_ ;
 
   public:
 

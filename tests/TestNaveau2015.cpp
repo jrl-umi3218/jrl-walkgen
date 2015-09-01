@@ -599,6 +599,31 @@ protected:
       m_PGI->ParseCmd(strm2);
     }
 
+    //  Circle obstacle ;
+      //obstacle.x_0    = 1.0 ;
+      //obstacle.y_0    = 0.5 ;
+      //obstacle.r      = 0.23 ;
+      //obstacle.margin = 0.40 ;
+    //  obstacle.x_0    = 1.5 ;
+    //  obstacle.y_0    = -1.5 ;
+    //  obstacle.r      = 0.23 ;
+    //  obstacle.margin = 0.40 ;
+    //  obstacles_.push_back(obstacle);
+
+    {
+      istringstream strm2(":deleteallobstacles");
+      m_PGI->ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":addoneobstacle 1.0 0.0 0.23");
+      m_PGI->ParseCmd(strm2);
+    }
+
+//    {
+//      istringstream strm2(":updateoneobstacle 1 1.5 -1.5 0.23");
+//      m_PGI->ParseCmd(strm2);
+//    }
   }
 
   void startEmergencyStop(PatternGeneratorInterface &aPGI)
@@ -799,7 +824,7 @@ protected:
       unsigned time;
       localeventHandler_t Handler ;
     };
-#define localNbOfEvents 12
+#define localNbOfEvents 9
     struct localEvent events [localNbOfEvents] =
     { { 5*200,&TestNaveau2015::walkForward1m_s},
       {10*200,&TestNaveau2015::walkForward2m_s},

@@ -519,7 +519,7 @@ namespace PatternGeneratorJRL {
   {
 #ifdef DEBUG
     std::cout << __PRETTY_FUNCTION__ << " setVelReference" << strm.str() << std::endl; 
-#endif DEBUG
+#endif // DEBUG
     // Read the data inside strm.
     m_ZMPVRQP->Reference(strm);
     istringstream strm2(strm.str());

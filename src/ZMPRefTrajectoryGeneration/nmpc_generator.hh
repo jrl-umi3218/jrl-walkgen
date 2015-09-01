@@ -124,6 +124,28 @@ namespace PatternGeneratorJRL
     inline std::deque<support_state_t> const & SupportStates_deq() const
     { return SupportStates_deq_ ; }
 
+    inline void addOneObstacle(double x, double y, double r)
+    {
+      Circle newObstacle ;
+      newObstacle.x_0 = x ;
+      newObstacle.y_0 = y ;
+      newObstacle.r   = r ;
+      obstacles_.push_back(newObstacle);
+    }
+
+    inline void deleteAllObstacles()
+    {obstacles_.clear();}
+
+    inline void updateOneObstacle(unsigned int id, double x, double y, double r)
+    {
+      if(id <= obstacles_.size())
+      {
+        obstacles_[id-1].x_0 = x ;
+        obstacles_[id-1].y_0 = y ;
+        obstacles_[id-1].r   = r ;
+      }
+    }
+
     RelativeFeetInequalities * RFI()
     {return RFI_;}
 
