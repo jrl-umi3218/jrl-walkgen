@@ -115,6 +115,7 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, CjrlHumanoidDynamicRobo
   FSM_ = new SupportFSM();
   RFI_ = new RelativeFeetInequalities(SPM_,HDR_) ;
 
+  QP_=NULL;
   qpOases_H_ =NULL;
   qpOases_J_ =NULL;
   qpOases_lbJ=NULL;

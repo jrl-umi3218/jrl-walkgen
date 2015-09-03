@@ -959,7 +959,7 @@ int PerformTests(int argc, char *argv[])
                                     PROFIL_HERDT_EMERGENCY_STOP,
                                     PROFIL_HERDT_POWER_LAW};
 
-  for (unsigned int i=NB_PROFILES-2;i<NB_PROFILES;i++){
+  for (unsigned int i=0;i<NB_PROFILES;i++){
     TestHerdt2010 aTH2010(argc,argv,TestNames[i],TestProfiles[i]);
     aTH2010.init();
     try{
