@@ -4,6 +4,7 @@
  * Andrei Herdt
  * Francois Keith
  * Olivier Stasse
+ * Maximilien Naveau
  *
  * JRL, CNRS/AIST
  *
@@ -29,8 +30,7 @@
   formulation and a new QP solver as proposed by Herdt Advanced Robotics 2010.
 
   Andrei Herdt,
-  Olivier Stasse,
-  Maximilien Naveau,
+  Olivier Stasse
  */
 
 #include "portability/gettimeofday.hh"

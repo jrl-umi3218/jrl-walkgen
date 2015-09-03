@@ -616,7 +616,7 @@ protected:
     }
 
     {
-      istringstream strm2(":addoneobstacle 1.0 0.0 0.23");
+      istringstream strm2(":addoneobstacle 1.0 0.5 0.23");
       m_PGI->ParseCmd(strm2);
     }
 
