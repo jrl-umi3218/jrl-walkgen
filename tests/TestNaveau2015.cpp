@@ -75,6 +75,80 @@ enum Profiles_t {
   PROFIL_NAVEAU_ONLINE_WALKING // 1
 };
 
+
+class IO_TextFile
+{
+
+private:
+  string line;
+  string namefile;
+  ifstream myfile_input;
+  ofstream myfile_output;
+
+public:
+  int WriteOnFile_AddText(string text)
+  {
+
+    myfile_output.open(namefile.c_str(),ofstream::app);
+    if (myfile_output.is_open())
+    {
+      myfile_output << text;
+      myfile_output.close();
+      return 0;
+    }
+    else
+    {
+      cout << "Unable to open file";
+      return -1;
+    }
+  }
+
+  int WriteOnFile_DeleteAndWrite(string text)
+  {
+
+    myfile_output.open(namefile.c_str(),ofstream::out);
+    if (myfile_output.is_open())
+    {
+      myfile_output << text;
+      myfile_output.close();
+      return 0;
+    }
+    else
+    {
+      cout << "Unable to open file";
+      return -1;
+    }
+  }
+
+  string ReadFromFile()
+  {
+    myfile_input.open(namefile.c_str(),ifstream::in);
+    if (myfile_input.is_open())
+    {
+      while ( getline (myfile_input,line) )
+      {
+        cout << line << '\n';
+      }
+      myfile_input.close();
+    }
+
+    else cout << "Unable to open file";
+
+    return line;
+  }
+
+  IO_TextFile(string namefile_init)
+  {
+    namefile = namefile_init;
+  }
+
+  ~IO_TextFile()
+  {
+
+  }
+};
+
+// Class TestNaveau2015
 class TestNaveau2015: public TestObject
 {
 
@@ -478,8 +552,8 @@ protected:
     /// \brief Create file .hip .pos .zmp
     /// ---------------------------------
     ofstream aof ;
-    string root = "/opt/grx/HRP2LAAS/etc/mnaveau/" ;
-    string aFileName = root + m_TestName + ".pos" ;
+    string root = "/opt/grx/HRP2LAAS/etc/";
+    string aFileName = m_TestName + ".pos" ;
     if ( iteration == 0 )
     {
       aof.open(aFileName.c_str(),ofstream::out);
@@ -826,7 +900,9 @@ protected:
     };
 #define localNbOfEvents 9
     struct localEvent events [localNbOfEvents] =
-    { { 5*200,&TestNaveau2015::walkForward1m_s},
+    {
+
+      { 5*200,&TestNaveau2015::walkForward1m_s},
       {10*200,&TestNaveau2015::walkForward2m_s},
       {15*200,&TestNaveau2015::walkForward3m_s},
       {20*200,&TestNaveau2015::walkForward2m_s},
@@ -834,7 +910,9 @@ protected:
       {30*200,&TestNaveau2015::walkSidewards1m_s},
       {35*200,&TestNaveau2015::walkSidewards2m_s},
       {50*200,&TestNaveau2015::stop},
-      {55*200,&TestNaveau2015::stopOnLineWalking}};
+      {55*200,&TestNaveau2015::stopOnLineWalking}
+
+  };
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
       {
@@ -883,6 +961,7 @@ int PerformTests(int argc, char *argv[])
   std::string TestNames[NB_PROFILES] = {"TestNaveau2015"};
   int TestProfiles[NB_PROFILES] = {PROFIL_NAVEAU_ONLINE_WALKING};
 
+
   for (unsigned int i=0;i<NB_PROFILES;i++){
     TestNaveau2015 aTN2015(argc,argv,TestNames[i],TestProfiles[i]);
     aTN2015.init();
@@ -898,6 +977,16 @@ int PerformTests(int argc, char *argv[])
       cerr << "Failed on following error " << astr << std::endl;
       return -1; }
   }
+
+
+
+  IO_TextFile TextFileInput("example.txt");
+
+    // Test method
+    TextFileInput.WriteOnFile_AddText("test \n");
+    std::cout << TextFileInput.ReadFromFile();
+
+
   return 0;
 }
 
@@ -914,192 +1003,3 @@ int main(int argc, char *argv[])
   }
   return 1;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-int dummy()
-{
-#ifdef WITH_HRP2DYNAMICS
-  dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
-  Chrp2OptHumanoidDynamicRobot * aHRP2HDR = new Chrp2OptHumanoidDynamicRobot( &aRobotDynamicsObjectConstructor );
-  Chrp2OptHumanoidDynamicRobot * aHDR = aHRP2HDR ;
-#endif
-
-  string RobotFileName ("/home/mnaveau/devel/ros_unstable/install/share/hrp2-14/HRP2LAAS_main_small.wrl");
-  string LinkJointRank ("/home/mnaveau/devel/ros_unstable/install/share/hrp2-14/HRP2LinkJointRankSmall.xml");
-  string SpecificitiesFileName ("/home/mnaveau/devel/ros_unstable/install/share/hrp2-14/HRP2SpecificitiesSmall.xml");
-  string InitConfigFileName ("/home/mnaveau/devel/ros_unstable/install/share/hrp2-14/HRP2JRLInitConfigSmall.dat");
-
-
-  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHRP2HDR,
-                                         RobotFileName,
-                                         LinkJointRank,
-                                         SpecificitiesFileName);
-  PatternGeneratorInterface * aPGI = patternGeneratorInterfaceFactory(aHRP2HDR);
-
-  vector<CjrlJoint *> actuatedJoints = aHDR->getActuatedJoints();
-  unsigned int lNbActuatedJoints = actuatedJoints.size();
-
-  double * dInitPos = new double[lNbActuatedJoints];
-
-  ifstream aif;
-  aif.open(InitConfigFileName.c_str(),ifstream::in);
-  if (aif.is_open())
-  {
-    for(unsigned int i=0;i<lNbActuatedJoints;i++)
-      aif >> dInitPos[i];
-  }
-  aif.close();
-  MAL_VECTOR_DIM(InitialPosition,double,lNbActuatedJoints);
-  for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
-    InitialPosition(i) = dInitPos[i]*M_PI/180.0;
-  aPGI->SetCurrentJointValues(InitialPosition);
-  istringstream strm2(":walkmode 0");
-  aPGI->ParseCmd(strm2);
-
-  delete [] dInitPos;
-
-  SimplePluginManager * aSPM = new SimplePluginManager();
-  string banana ;
-  ZMPVelocityReferencedSQP aZMPVelocityReferencedSQP(aSPM, banana , aHDR ) ;
-
-  double time = 0.1;
-
-  FootAbsolutePosition InitLeftFootAbsolutePosition  ;
-  InitLeftFootAbsolutePosition.x     = 0.00949035 ;
-  InitLeftFootAbsolutePosition.y     = 0.095 ;
-  InitLeftFootAbsolutePosition.theta = 0.0 ;
-
-  FootAbsolutePosition InitRightFootAbsolutePosition ;
-  InitRightFootAbsolutePosition.x     = 0.00949035 ;
-  InitRightFootAbsolutePosition.y     = -0.095 ;
-  InitRightFootAbsolutePosition.theta = 0.0 ;
-
-  COMState lStartingCOMState ;
-  lStartingCOMState.x[0] = 0.00949035 ;
-  lStartingCOMState.y[0] = 0.095 ;
-  lStartingCOMState.z[0] = 0.814 ;
-
-  MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
-  lStartingZMPPosition(0) = lStartingCOMState.x[0] ;
-  lStartingZMPPosition(1) = lStartingCOMState.y[0] ;
-  lStartingZMPPosition(2) = 0.0 ;
-
-  deque<ZMPPosition>           FinalZMPTraj_deq       ;
-  deque<COMState>              FinalCoMPositions_deq  ;
-  deque<FootAbsolutePosition>  FinalLeftFootTraj_deq  ;
-  deque<FootAbsolutePosition>  FinalRightFootTraj_deq ;
-  deque<RelativeFootPosition>  RelFootTraj_deq ;
-
-  aZMPVelocityReferencedSQP.Reference(0.0,0.0,0.0);
-  aZMPVelocityReferencedSQP.InitOnLine(
-        FinalZMPTraj_deq             ,
-        FinalCoMPositions_deq        ,
-        FinalLeftFootTraj_deq        ,
-        FinalRightFootTraj_deq       ,
-        InitLeftFootAbsolutePosition ,
-        InitRightFootAbsolutePosition,
-        RelFootTraj_deq              , // RelativeFootPositions,
-        lStartingCOMState            ,
-        lStartingZMPPosition         );
-
-
-  for(unsigned i=0 ; i<3 ; ++i)
-  {
-    aZMPVelocityReferencedSQP.Reference(0.0,0.0,0.0);
-    aZMPVelocityReferencedSQP.OnLine(time*i,
-                                     FinalZMPTraj_deq,
-                                     FinalCoMPositions_deq,
-                                     FinalLeftFootTraj_deq,
-                                     FinalRightFootTraj_deq);
-    aZMPVelocityReferencedSQP.UpperTimeLimitToUpdate(0.0);
-
-    cout << (int)round(0.1/0.005) << endl ;
-    for(unsigned j=0 ; j<(int)round(0.1/0.005) ; ++j)
-    {
-      FinalZMPTraj_deq      .pop_front();
-      FinalCoMPositions_deq .pop_front();
-      FinalLeftFootTraj_deq .pop_front();
-      FinalRightFootTraj_deq.pop_front();
-    }
-  }
-  return 0;
-}
-
-

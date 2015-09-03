@@ -375,6 +375,7 @@ IF(HRP2_DYNAMICS_FOUND)
 
   PKG_CONFIG_USE_DEPENDENCY(TestKajita2003 hrp2-dynamics)
 
+
   ADD_DEPENDENCIES(TestKajita2003 ${PROJECT_NAME})
 
 # This test is disabled for now as it fails.
@@ -413,6 +414,7 @@ IF(HRP2_DYNAMICS_FOUND)
 
   TARGET_LINK_LIBRARIES(ReadDataForNovela ${PROJECT_NAME})
   PKG_CONFIG_USE_DEPENDENCY(ReadDataForNovela hrp2-dynamics)
+
 
   ADD_DEPENDENCIES(ReadDataForNovela ${PROJECT_NAME})
 
