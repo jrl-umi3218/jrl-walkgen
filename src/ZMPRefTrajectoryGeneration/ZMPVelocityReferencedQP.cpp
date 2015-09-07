@@ -78,7 +78,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   Running_ = false ;
   TimeBuffer_ = 0.04 ;
   QP_T_ = 0.1 ;
-  QP_N_ = 16 ;
+  QP_N_ = 10 ;
   m_SamplingPeriod = 0.005 ;
   InterpolationPeriod_ = m_SamplingPeriod*10;
   previewDuration_ = (QP_N_-1)*QP_T_ ;
