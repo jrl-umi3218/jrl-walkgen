@@ -579,8 +579,8 @@ protected:
     aof.open(aFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( iteration * 0.005 ) << " "  ;                           // 1
-    aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ;  // 2
+    aof << filterprecision( iteration * 0.005 ) << " "  ;                 // 1
+    aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ; // 2
     aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0]) << " "  ;// 3
     aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0]) ;          // 4
     aof << endl ;
