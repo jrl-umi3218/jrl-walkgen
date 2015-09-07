@@ -478,8 +478,7 @@ protected:
     /// \brief Create file .hip .pos .zmp
     /// ---------------------------------
     ofstream aof ;
-    string root = "/opt/grx/HRP2LAAS/etc/mnaveau/" ;
-    string aFileName = root + m_TestName + ".pos" ;
+    string aFileName = m_TestName + ".pos" ;
     if ( iteration == 0 )
     {
       aof.open(aFileName.c_str(),ofstream::out);
@@ -498,7 +497,7 @@ protected:
     aof << 0.0  << endl ;
     aof.close();
 
-    aFileName = root + m_TestName + ".hip" ;
+    aFileName = m_TestName + ".hip" ;
     if ( iteration == 0 ){
       aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
@@ -513,7 +512,7 @@ protected:
       aof << endl ;
     aof.close();
 
-    aFileName = root + m_TestName + ".waist" ;
+    aFileName = m_TestName + ".waist" ;
     if ( iteration == 0 ){
       aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
@@ -521,14 +520,14 @@ protected:
     aof.open(aFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-      aof << filterprecision( iteration * 0.005 ) << " "  ;                           // 1
-      aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ;  // 2
+      aof << filterprecision( iteration * 0.005 ) << " "  ;                 // 1
+      aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ; // 2
       aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0]) << " "  ;// 3
       aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0]) ;          // 4
       aof << endl ;
     aof.close();
 
-    aFileName = root + m_TestName + ".zmp" ;
+    aFileName = m_TestName + ".zmp" ;
     if ( iteration == 0 ){
       aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
@@ -809,13 +808,13 @@ protected:
     };
 #define localNbOfEvents 12
     struct localEvent events [localNbOfEvents] =
-    { { 5*200,&TestHerdt2010::walkForward1m_s},
-      {10*200,&TestHerdt2010::walkForward2m_s},
-      {15*200,&TestHerdt2010::walkForward3m_s},
+    { { 5*200,&TestHerdt2010::walkSidewards1m_s},
+      {10*200,&TestHerdt2010::walkSidewards2m_s},
+      {15*200,&TestHerdt2010::walkForward1m_s},
       {20*200,&TestHerdt2010::walkForward2m_s},
-      {25*200,&TestHerdt2010::walkForward2m_s},
-      {30*200,&TestHerdt2010::walkSidewards1m_s},
-      {35*200,&TestHerdt2010::walkSidewards2m_s},
+      {25*200,&TestHerdt2010::walkForward3m_s},
+      {30*200,&TestHerdt2010::walkForward2m_s},
+      {35*200,&TestHerdt2010::walkForward1m_s},
       {50*200,&TestHerdt2010::stop},
       {55*200,&TestHerdt2010::stopOnLineWalking}};
       //{5*200,&TestHerdt2010::startTurningRightOnSpot},

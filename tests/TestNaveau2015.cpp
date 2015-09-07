@@ -552,7 +552,6 @@ protected:
     /// \brief Create file .hip .pos .zmp
     /// ---------------------------------
     ofstream aof ;
-    string root = "/opt/grx/HRP2LAAS/etc/";
     string aFileName = m_TestName + ".pos" ;
     if ( iteration == 0 )
     {
@@ -572,7 +571,7 @@ protected:
     aof << 0.0  << endl ;
     aof.close();
 
-    aFileName = root + m_TestName + ".hip" ;
+    aFileName = m_TestName + ".hip" ;
     if ( iteration == 0 ){
       aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
@@ -587,7 +586,7 @@ protected:
     aof << endl ;
     aof.close();
 
-    aFileName = root + m_TestName + ".waist" ;
+    aFileName = m_TestName + ".waist" ;
     if ( iteration == 0 ){
       aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
@@ -602,7 +601,7 @@ protected:
     aof << endl ;
     aof.close();
 
-    aFileName = root + m_TestName + ".zmp" ;
+    aFileName = m_TestName + ".zmp" ;
     if ( iteration == 0 ){
       aof.open(aFileName.c_str(),ofstream::out);
       aof.close();

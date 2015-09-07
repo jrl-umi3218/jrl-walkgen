@@ -53,7 +53,7 @@ using namespace std;
 using namespace PatternGeneratorJRL;
 using namespace metapod;
 
-//#define DEBUG
+#define DEBUG
 
 double filterprecision(double adb)
 {
