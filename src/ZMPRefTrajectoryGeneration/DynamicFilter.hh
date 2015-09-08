@@ -25,17 +25,6 @@
     typedef metapod::Nodes< Robot_Model, Robot_Model::RLEG_LINK0 >::type RhipNode;
     typedef metapod::Nodes< Robot_Model, Robot_Model::l_ankle >::type LankleNode;
     typedef metapod::Nodes< Robot_Model, Robot_Model::r_ankle >::type RankleNode;
-
-    typedef metapod::jac_point_chain < Robot_Model,
-    Robot_Model::l_ankle, Robot_Model::LLEG_LINK0,0,true,false> Jac_LF;
-    typedef metapod::jac_point_chain < Robot_Model,
-    Robot_Model::r_ankle, Robot_Model::RLEG_LINK0,0,true,false> Jac_RF;
-
-    typedef metapod::jac_point_chain < Robot_Model,
-    Robot_Model::l_wrist, Robot_Model::LARM_LINK0,0,true,false> Jac_LH;
-    typedef metapod::jac_point_chain < Robot_Model,
-    Robot_Model::r_wrist, Robot_Model::RARM_LINK0,0,true,false> Jac_RH;
-
 #endif
 
 namespace PatternGeneratorJRL

@@ -208,7 +208,6 @@ SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
 # Define dependencies
 
 TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name} ${Boost_LIBRARIES})
-message (STATUS "--Boost : " ${Boost_LIBRARIES} )
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta ")
 
 INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -216,6 +215,8 @@ INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen abstract-robot-dynamics)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-mal)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-dynamics)
+PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen pinocchio)
+
 IF(USE_LSSOL)
  PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen lssol)
 ENDIF(USE_LSSOL)
