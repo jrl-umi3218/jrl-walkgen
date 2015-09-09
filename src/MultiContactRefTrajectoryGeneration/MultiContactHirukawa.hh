@@ -24,7 +24,8 @@ public:
     int InverseKinematicsOnLimbs(FootAbsolutePosition &rf,
                                  FootAbsolutePosition &lf,
                                  HandAbsolutePosition &rh,
-                                 HandAbsolutePosition &lh);
+                                 HandAbsolutePosition &lh,
+                                 COMState &base);
     int ForwardMomentum();
     int ContactWrench();
     int InverseMomentum();
@@ -51,14 +52,22 @@ private :
 
     // all the Jacobians of the end effectors : right hand, left hand, right foot, left foot
     Eigen::MatrixXd Jrh_, Jlh_, Jrf_, Jlf_, J_;
-    Eigen::VectorXd V_ ; // task of the end effector : rh, lh, rf, lf
-    Eigen::VectorXd Vrf_ ;
-    Eigen::VectorXd Vlf_ ;
-    Eigen::VectorXd Vrh_ ;
-    Eigen::VectorXd Vlh_ ;
-    Eigen::VectorXd Vcom_ ;
+    // 3D vector to change from base to end effector frames
+    Eigen::Vector3d omegab_, vb_, b_rh_, b_lh_, b_rf_, b_lf_;
+    // task of the end effector : rh, lh, rf, lf
+    Eigen::VectorXd Ve_ , Vb_ ;
+    // 6D velocity of the end effectors
+    Eigen::VectorXd Vrf_,Vlf_,Vrh_,Vlh_ ;
 
     Eigen::JacobiSVD<Eigen::MatrixXd> svd_ ;
+    Eigen::MatrixXd J_U_,J_V_;
+    Eigen::VectorXd J_S_;
+
+    // linear "P" and angular "L" momentum
+    Eigen::Vector3d P_,L_ , prevP_,prevL_;
+
+    // first derivative of the momentum :
+    Eigen::Vector3d dP_,dL_ ;
 
 public :
     void q(Eigen::VectorXd & q)

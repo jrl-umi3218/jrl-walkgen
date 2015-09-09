@@ -1,5 +1,6 @@
 #include "MultiContactHirukawa.hh"
 #include "pinocchio/algorithm/jacobian.hpp"
+#include "pinocchio/algorithm/crba.hpp"
 #include <Eigen/SVD>
 //#define VERBOSE
 
@@ -21,22 +22,54 @@ Jlh_(6,model->nv),
 Jrf_(6,model->nv),
 Jlf_(6,model->nv),
 J_(4*6,model->nv),
-V_(4*6),
+Ve_(4*6),
+Vb_(4*6),
 Vrf_(6),
 Vlf_(6),
 Vrh_(6),
 Vlh_(6),
-Vcom_(6),
 svd_ ( JacobiSVD<MatrixXd>(4*6,model->nv,ComputeThinU | ComputeThinV) )
 {
   robot_data_ = new se3::Data(*model);
   n_it_ = 5;                  // number of iteration max to converge
   sampling_period_ = 0.005;   // sampling period in seconds
+
+  q_ .fill(0.0);
+  dq_.fill(0.0);
+
   Jrh_.fill(0.0);
   Jlh_.fill(0.0);
   Jrf_.fill(0.0);
   Jlf_.fill(0.0);
   J_  .fill(0.0);
+
+  Ve_ .fill(0.0);
+  Vb_ .fill(0.0);
+  Vrf_.fill(0.0);
+  Vlf_.fill(0.0);
+  Vrh_.fill(0.0);
+  Vlh_.fill(0.0);
+
+  omegab_.fill(0.0);
+  vb_    .fill(0.0);
+  b_rh_  .fill(0.0);
+  b_lh_  .fill(0.0);
+  b_rf_  .fill(0.0);
+  b_lf_  .fill(0.0);
+
+  P_.fill(0.0);
+  L_.fill(0.0);
+  prevP_.fill(0.0);
+  prevL_.fill(0.0);
+  dP_   .fill(0.0);
+  dL_   .fill(0.0);
+
+  // initialize the matrices for the svd computation
+  int n(6),p(model->nv) ;
+  int m = min(n,p) ;
+  J_U_ = MatrixXd(n,m) ;
+  J_V_ = MatrixXd(m,p) ;
+  J_S_ = VectorXd(m)   ;
 }
 
 MultiContactHirukawa::~MultiContactHirukawa()
@@ -46,22 +79,25 @@ MultiContactHirukawa::~MultiContactHirukawa()
 int MultiContactHirukawa::InverseKinematicsOnLimbs(FootAbsolutePosition & rf,
                                                    FootAbsolutePosition & lf,
                                                    HandAbsolutePosition & rh,
-                                                   HandAbsolutePosition & lh)
+                                                   HandAbsolutePosition & lh,
+                                                   COMState & base)
 {
-  Vrf_(0) = rf.dx      ; Vlf_(0) = lf.dx      ;
-  Vrf_(1) = rf.dy      ; Vlf_(1) = lf.dy      ;
-  Vrf_(2) = rf.dz      ; Vlf_(2) = lf.dz      ;
-  Vrf_(3) = rf.domega  ; Vlf_(3) = lf.domega  ;
-  Vrf_(4) = rf.domega2 ; Vlf_(4) = lf.domega2 ;
-  Vrf_(5) = rf.dtheta  ; Vlf_(5) = lf.dtheta  ;
+  Vrh_ << rh.dx, rh.dy, rh.dz, rh.domega, rh.domega2, rh.dtheta ;
+  Vlh_ << lh.dx, lh.dy, lh.dz, lh.domega, lh.domega2, lh.dtheta ;
+  Vrf_ << rf.dx, rf.dy, rf.dz, rf.domega, rf.domega2, rf.dtheta ;
+  Vlf_ << lf.dx, lf.dy, lf.dz, lf.domega, lf.domega2, lf.dtheta ;
+  Ve_ << Vrh_,Vlh_,Vrf_,Vlf_;
 
-  Vrh_(0) = rh.dx      ; Vlh_(0) = lh.dx      ;
-  Vrh_(1) = rh.dy      ; Vlh_(1) = lh.dy      ;
-  Vrh_(2) = rh.dz      ; Vlh_(2) = lh.dz      ;
-  Vrh_(3) = rh.domega  ; Vlh_(3) = lh.domega  ;
-  Vrh_(4) = rh.domega2 ; Vlh_(4) = lh.domega2 ;
-  Vrh_(5) = rh.dtheta  ; Vlh_(5) = lh.dtheta  ;
-  V_ << Vrh_,Vlh_,Vrf_,Vlf_;
+  omegab_<< base.roll[1], base.pitch[1], base.yaw[1] ;
+  vb_    << base.x[1], base.y[1], base.z[1] ;
+  b_rh_ << rh.x - base.x[0], rh.y - base.y[0] , rh.z - base.z[0] ;
+  b_lh_ << lh.x - base.x[0], lh.y - base.y[0] , lh.z - base.z[0] ;
+  b_rf_ << rf.x - base.x[0], rf.y - base.y[0] , rf.z - base.z[0] ;
+  b_lf_ << lf.x - base.x[0], lf.y - base.y[0] , lf.z - base.z[0] ;
+  Vb_ <<  vb_, b_rh_.cross(omegab_) ,
+          vb_, b_lh_.cross(omegab_) ,
+          vb_, b_rf_.cross(omegab_) ,
+          vb_, b_lf_.cross(omegab_) ;
 
   computeJacobians  (*robot_model_,*robot_data_,q_);
   getJacobian<false>(*robot_model_,*robot_data_,idx_r_wrist_,Jrh_);
@@ -70,40 +106,42 @@ int MultiContactHirukawa::InverseKinematicsOnLimbs(FootAbsolutePosition & rf,
   getJacobian<false>(*robot_model_,*robot_data_,idx_l_ankle_,Jlf_);
   J_ << Jrh_, Jlh_, Jrf_, Jlf_ ;
 
-//  cout << "Jrh_ = \n" <<  Jrh_ << endl ;
-//  cout << "Jlh_ = \n" <<  Jlh_ << endl ;
-//  cout << "Jrf_ = \n" <<  Jrf_ << endl ;
-//  cout << "Jlf_ = \n" <<  Jlf_ << endl ;
-//  cout << "J_   = \n" <<  J_   << endl ;
-
   svd_.compute(J_);
-//  cout << "Its singular values are:" << endl << svd_.singularValues() << endl;
-//  cout << "Its left singular vectors are the columns of the thin U matrix:" << endl << svd_.matrixU() << endl;
-//  cout << "Its right singular vectors are the columns of the thin V matrix:" << endl << svd_.matrixV() << endl;
-//  cout << "Now consider this rhs vector:" << endl << V_ << endl;
-//  cout << "A least-squares solution of m*x = rhs is:" << endl << svd_.solve(V_) << endl;
-//  cout << "m*x - rhs is:" << endl << J_ * svd_.solve(V_) - V_  << endl;
+  J_S_ = svd_.singularValues() ;
+  J_U_ = svd_.matrixU() ;
+  J_V_ = svd_.matrixV() ;
 
-//  svd_.singularValues();
-//  MatrixXf::Index nonzeroSingVals = svd_.nonzeroSingularValues();
-//  Index diagSize = (std::min)(dec().rows(), dec().cols());
-//  typename JacobiSVDType::SingularValuesType invertedSingVals(diagSize);
+  MatrixXf::Index nonzeroSingVals (0) ;
+  for(MatrixXd::Index i = 0; i < J_S_.size(); i++)
+  {
+    if(abs(J_S_(i)) < 1e-5 )
+      J_S_(i) = 0.0 ;
+    else
+      ++nonzeroSingVals;
+  }
+  VectorXd::Index diagSize ( (std::min)(J_.rows(), J_.cols()) );
+  VectorXd invertedSingVals(diagSize);
+  invertedSingVals.head(nonzeroSingVals) = J_S_.head(nonzeroSingVals).array().inverse();
+  invertedSingVals.tail(diagSize - nonzeroSingVals).setZero();
 
-//  Index nonzeroSingVals = dec().nonzeroSingularValues();
-//  invertedSingVals.head(nonzeroSingVals) = dec().singularValues().head(nonzeroSingVals).array().inverse();
-//  invertedSingVals.tail(diagSize - nonzeroSingVals).setZero();
-
-//  dst = dec().matrixV().leftCols(diagSize)
-//      * invertedSingVals.asDiagonal()
-//      * dec().matrixU().leftCols(diagSize).adjoint()
-//      * rhs();
-
+  dq_ = J_V_.leftCols(diagSize)
+      * invertedSingVals.asDiagonal()
+      * J_U_.leftCols(diagSize).adjoint()
+      * (Ve_ - Vb_) ;
 
   return 0 ;
 }
 
 int MultiContactHirukawa::ForwardMomentum()
 {
+  robot_data_->M.fill(0.0);
+  crba(*robot_model_,*robot_data_,q_);
+  robot_data_->M.triangularView<Eigen::StrictlyLower>() =
+    robot_data_->M.transpose().triangularView<Eigen::StrictlyLower>();
+
+  prevL_ = L_ ;
+  L_ = robot_data_->M.block(3,robot_model_->nv,3,0) * dq_ ;
+  dL_ = (L_-prevL_)/sampling_period_ ;
   return 0 ;
 }
 
@@ -123,7 +161,7 @@ int MultiContactHirukawa::online(vector<COMState> & comState_deque,
                                  vector<HandAbsolutePosition> & rh_deque,
                                  vector<HandAbsolutePosition> & lh_deque)
 {
-  InverseKinematicsOnLimbs(rf_deque[0],lf_deque[0],rh_deque[0],lh_deque[0]);
+  InverseKinematicsOnLimbs(rf_deque[0],lf_deque[0],rh_deque[0],lh_deque[0],comState_deque[0]);
 
   return 0 ;
 }

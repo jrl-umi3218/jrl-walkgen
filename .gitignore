@@ -72,4 +72,9 @@ tests/tests/
 *.py
 *.pyc
 *#*
-
+tests/*.txt
+tests/*.csv
+_build-DEBUG-QTCREATOR
+_build-RELEASE-QT
+commit_bien_herdt
+tests/TestHirukawa2007.cpp_dummy
