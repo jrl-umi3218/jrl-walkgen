@@ -130,6 +130,7 @@ namespace PatternGeneratorJRL
       newObstacle.x_0 = x ;
       newObstacle.y_0 = y ;
       newObstacle.r   = r ;
+      newObstacle.margin = 0.4 ;
       obstacles_.push_back(newObstacle);
     }
 

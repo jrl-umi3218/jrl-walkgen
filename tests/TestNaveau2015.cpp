@@ -688,10 +688,16 @@ protected:
       m_PGI->ParseCmd(strm2);
     }
 
+//    {
+//      istringstream strm2(":addoneobstacle 1.0 0.5 0.23");
+//      m_PGI->ParseCmd(strm2);
+//    }
+
     {
-      istringstream strm2(":addoneobstacle 1.0 0.5 0.23");
+      istringstream strm2(":addoneobstacle 1.5 -1.5 0.23");
       m_PGI->ParseCmd(strm2);
     }
+
 
 //    {
 //      istringstream strm2(":updateoneobstacle 1 1.5 -1.5 0.23");
@@ -747,7 +753,7 @@ protected:
   {
     {
       //istringstream strm2(":setVelReference  0.2 0.0 -0.2");
-      istringstream strm2(":setVelReference  0.2 0.0 -6.0832");
+      istringstream strm2(":setVelReference  0.15 0.0 -0.08");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -900,14 +906,13 @@ protected:
 #define localNbOfEvents 9
     struct localEvent events [localNbOfEvents] =
     {
-
-      { 5*200,&TestNaveau2015::walkForward1m_s},
-      {10*200,&TestNaveau2015::walkForward2m_s},
-      {15*200,&TestNaveau2015::walkForward3m_s},
-      {20*200,&TestNaveau2015::walkForward2m_s},
-      {25*200,&TestNaveau2015::walkForward2m_s},
-      {30*200,&TestNaveau2015::walkSidewards1m_s},
-      {35*200,&TestNaveau2015::walkSidewards2m_s},
+      { 1,&TestNaveau2015::startTurningRight},
+//      {10*200,&TestNaveau2015::walkForward2m_s},
+//      {15*200,&TestNaveau2015::walkForward3m_s},
+//      {20*200,&TestNaveau2015::walkForward2m_s},
+//      {25*200,&TestNaveau2015::walkForward2m_s},
+//      {30*200,&TestNaveau2015::walkSidewards1m_s},
+//      {35*200,&TestNaveau2015::walkSidewards2m_s},
       {50*200,&TestNaveau2015::stop},
       {55*200,&TestNaveau2015::stopOnLineWalking}
 

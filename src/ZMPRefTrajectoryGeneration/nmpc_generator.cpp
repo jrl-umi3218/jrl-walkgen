@@ -484,9 +484,9 @@ void NMPCgenerator::updateFinalStateMachine(
   if( currentSupport_.StateChanged == true )
   {
     if( currentSupport_.Foot == LEFT )
-      FAP = & FinalLeftFootTraj.front();
+      FAP = & FinalLeftFootTraj.back();
     else
-      FAP = & FinalRightFootTraj.front();
+      FAP = & FinalRightFootTraj.back();
     currentSupport_.X = FAP->x;
     currentSupport_.Y = FAP->y;
     currentSupport_.Yaw = FAP->theta*M_PI/180.0;
@@ -1185,15 +1185,15 @@ void NMPCgenerator::initializeRotIneqConstraint()
   Arot_(0,2*N_+2*nf_+1) = 0.0 ;
   Arot_(1,2*N_+2*nf_  ) = -1.0 ;
   Arot_(1,2*N_+2*nf_+1) =  1.0 ;
-  UBrot_(1) =  0.05 ;
-  LBrot_(1) = -0.05 ;
+  UBrot_(1) =  0.9 ;
+  LBrot_(1) = -0.9 ;
 
 }
 
 void NMPCgenerator::updateRotIneqConstraint()
 {
-  UBrot_(0) =  0.05 + currentSupport_.Yaw ;
-  LBrot_(0) = -0.05 + currentSupport_.Yaw ;
+  UBrot_(0) =  0.9 + currentSupport_.Yaw ;
+  LBrot_(0) = -0.9 + currentSupport_.Yaw ;
 #ifdef DEBUG
   DumpMatrix("Arot_", Arot_);
   DumpVector("UBrot_",UBrot_);
@@ -1487,8 +1487,8 @@ void NMPCgenerator::updateCostFunction()
 
 
   // p_theta_ = ( 0.5 * a * [ f_k_theta+T_step*dTheta^ref  f_k_theta+2*T_step*dTheta^ref ] )
-  p_theta_(0) = - (alpha_ * currentSupport_.Yaw +     T_step_* vel_ref_.Global.Yaw) ;
-  p_theta_(1) = - (alpha_ * currentSupport_.Yaw + 2 * T_step_* vel_ref_.Global.Yaw) ;
+  p_theta_(0) = - alpha_ * ( currentSupport_.Yaw +     T_step_* vel_ref_.Global.Yaw) ;
+  p_theta_(1) = - alpha_ * ( currentSupport_.Yaw + 2 * T_step_* vel_ref_.Global.Yaw) ;
 #ifdef DEBUG
   DumpMatrix("Q_theta_",Q_theta_);
   DumpMatrix("Q_x_"    ,Q_x_    );

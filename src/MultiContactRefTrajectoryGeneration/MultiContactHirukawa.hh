@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <fstream>
+#include <Eigen/Dense>
 #include <jrl/walkgen/pgtypes.hh>
 #include "pinocchio/multibody/model.hpp"
 
@@ -50,12 +51,14 @@ private :
 
     // all the Jacobians of the end effectors : right hand, left hand, right foot, left foot
     Eigen::MatrixXd Jrh_, Jlh_, Jrf_, Jlf_, J_;
-    Eigen::VectorXd end_effectors_vel_ ; // task of the end effector : rh, lh, rf, lf
-    Eigen::VectorXd rf_vel_ ;
-    Eigen::VectorXd lf_vel_ ;
-    Eigen::VectorXd rh_vel_ ;
-    Eigen::VectorXd lh_vel_ ;
-    Eigen::VectorXd v_com ;
+    Eigen::VectorXd V_ ; // task of the end effector : rh, lh, rf, lf
+    Eigen::VectorXd Vrf_ ;
+    Eigen::VectorXd Vlf_ ;
+    Eigen::VectorXd Vrh_ ;
+    Eigen::VectorXd Vlh_ ;
+    Eigen::VectorXd Vcom_ ;
+
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd_ ;
 
 public :
     void q(Eigen::VectorXd & q)
