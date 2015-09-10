@@ -9,6 +9,27 @@
 
 namespace PatternGeneratorJRL {
 
+// repartition of the forces on the contacts
+enum end_effector_e
+{
+  RightFoot,
+  LeftFoot,
+  RightHand,
+  LeftHand
+};
+
+struct contact_t
+{
+  // position of contact
+  Eigen::Vector3d p;
+  // noraml to the contact surface
+  Eigen::Vector3d n;
+  // force repartition factor
+  double lambda ;
+};
+typedef contact_t contact ;
+
+
 class MultiContactHirukawa
 {
 public:
@@ -16,18 +37,19 @@ public:
 
     ~MultiContactHirukawa();
 
-    int online(std::vector<COMState> & comState_deque, // OUTPUT
-               std::vector<FootAbsolutePosition> & rf_deque, // INPUT
-               std::vector<FootAbsolutePosition> & lf_deque, // INPUT
-               std::vector<HandAbsolutePosition> & rh_deque, // INPUT
-               std::vector<HandAbsolutePosition> & lh_deque);// INPUT
+    int oneIteration(
+                     COMState & com_deque,  // INPUT/OUTPUT
+                     COMState & base_deque, // INPUT
+                     FootAbsolutePosition & rf, // INPUT
+                     FootAbsolutePosition & lf, // INPUT
+                     HandAbsolutePosition & rh, // INPUT
+                     HandAbsolutePosition & lh);// INPUT
     int InverseKinematicsOnLimbs(FootAbsolutePosition &rf,
                                  FootAbsolutePosition &lf,
                                  HandAbsolutePosition &rh,
-                                 HandAbsolutePosition &lh,
-                                 COMState &base);
+                                 HandAbsolutePosition &lh);
     int ForwardMomentum();
-    int ContactWrench();
+    int ContactWrench(COMState com_ref);
     int InverseMomentum();
 
     se3::Model::Index findIndex(se3::Model * model, std::string name)
@@ -68,6 +90,21 @@ private :
 
     // first derivative of the momentum :
     Eigen::Vector3d dP_,dL_ ;
+
+    // initialize the finite differentiation
+    bool isInitialized_ ;
+
+    // contact planned
+    std::vector<contact> contacts_ ; // 0:rf , 1:lf , 2:rh , 3:lh
+
+    // forces applied on the contacts
+    std::vector<double> epsilons_ ; // 0:rf , 1:lf , 2:rh , 3:lh
+
+    // average slope of the terrain
+    double alpha_ ;
+
+    // robot global mass
+    double robot_mass_ ;
 
 public :
     void q(Eigen::VectorXd & q)

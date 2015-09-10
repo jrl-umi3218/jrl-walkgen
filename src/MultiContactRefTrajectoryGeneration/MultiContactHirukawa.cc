@@ -11,7 +11,7 @@ using namespace se3;
 
 MultiContactHirukawa::MultiContactHirukawa(se3::Model * model):
 robot_model_(model),
-q_(model->nv),
+q_(model->nq),
 dq_(model->nv),
 idx_r_wrist_( findIndex(model,"RARM_JOINT5") ),
 idx_l_wrist_( findIndex(model,"LARM_JOINT5") ),
@@ -70,6 +70,34 @@ svd_ ( JacobiSVD<MatrixXd>(4*6,model->nv,ComputeThinU | ComputeThinV) )
   J_U_ = MatrixXd(n,m) ;
   J_V_ = MatrixXd(m,p) ;
   J_S_ = VectorXd(m)   ;
+
+  isInitialized_ = false ;
+
+  contacts_.resize(4);
+  contacts_[RightFoot].p.fill(0.0) ;
+  contacts_[RightFoot].n.fill(0.0) ;
+  contacts_[RightFoot].lambda = 1.0 ; // arbitrary value, Check the paper to get more intuition about it
+
+  contacts_[LeftFoot ].p.fill(0.0) ;
+  contacts_[LeftFoot ].n.fill(0.0) ;
+  contacts_[LeftFoot ].lambda = 1.0 ; // arbitrary value, Check the paper to get more intuition about it
+
+  contacts_[RightHand].p.fill(0.0) ;
+  contacts_[RightHand].n.fill(0.0) ;
+  contacts_[RightHand].lambda = 0.2 ; // arbitrary value, Check the paper to get more intuition about it
+
+  contacts_[LeftHand ].p.fill(0.0) ;
+  contacts_[LeftHand ].n.fill(0.0) ;
+  contacts_[LeftHand ].lambda = 0.2 ; // arbitrary value, Check the paper to get more intuition about it
+
+  epsilons_.resize(4,0.0);
+
+  // at first walking on flat ground
+  alpha_ = 0.0;
+
+  robot_mass_ = 0.0 ;
+  for(unsigned i=0 ; i<robot_data_->mass.size() ; ++i)
+    robot_mass_ += robot_data_->mass[i];
 }
 
 MultiContactHirukawa::~MultiContactHirukawa()
@@ -79,25 +107,26 @@ MultiContactHirukawa::~MultiContactHirukawa()
 int MultiContactHirukawa::InverseKinematicsOnLimbs(FootAbsolutePosition & rf,
                                                    FootAbsolutePosition & lf,
                                                    HandAbsolutePosition & rh,
-                                                   HandAbsolutePosition & lh,
-                                                   COMState & base)
+                                                   HandAbsolutePosition & lh)
 {
   Vrh_ << rh.dx, rh.dy, rh.dz, rh.domega, rh.domega2, rh.dtheta ;
   Vlh_ << lh.dx, lh.dy, lh.dz, lh.domega, lh.domega2, lh.dtheta ;
   Vrf_ << rf.dx, rf.dy, rf.dz, rf.domega, rf.domega2, rf.dtheta ;
   Vlf_ << lf.dx, lf.dy, lf.dz, lf.domega, lf.domega2, lf.dtheta ;
   Ve_ << Vrh_,Vlh_,Vrf_,Vlf_;
+  cout << "Ve_ = " << Ve_ << endl ;
 
-  omegab_<< base.roll[1], base.pitch[1], base.yaw[1] ;
-  vb_    << base.x[1], base.y[1], base.z[1] ;
-  b_rh_ << rh.x - base.x[0], rh.y - base.y[0] , rh.z - base.z[0] ;
-  b_lh_ << lh.x - base.x[0], lh.y - base.y[0] , lh.z - base.z[0] ;
-  b_rf_ << rf.x - base.x[0], rf.y - base.y[0] , rf.z - base.z[0] ;
-  b_lf_ << lf.x - base.x[0], lf.y - base.y[0] , lf.z - base.z[0] ;
+  vb_    << dq_(0), dq_(1), dq_(2) ;
+  omegab_<< dq_(3), dq_(4), dq_(5) ;
+  b_rh_ << rh.x - q_(0), rh.y - q_(1) , rh.z - q_(2) ;
+  b_lh_ << lh.x - q_(0), lh.y - q_(1) , lh.z - q_(2) ;
+  b_rf_ << rf.x - q_(0), rf.y - q_(1) , rf.z - q_(2) ;
+  b_lf_ << lf.x - q_(0), lf.y - q_(1) , lf.z - q_(2) ;
   Vb_ <<  vb_, b_rh_.cross(omegab_) ,
           vb_, b_lh_.cross(omegab_) ,
           vb_, b_rf_.cross(omegab_) ,
           vb_, b_lf_.cross(omegab_) ;
+  cout << "Vb_ = " << Vb_ << endl ;
 
   computeJacobians  (*robot_model_,*robot_data_,q_);
   getJacobian<false>(*robot_model_,*robot_data_,idx_r_wrist_,Jrh_);
@@ -129,6 +158,7 @@ int MultiContactHirukawa::InverseKinematicsOnLimbs(FootAbsolutePosition & rf,
       * J_U_.leftCols(diagSize).adjoint()
       * (Ve_ - Vb_) ;
 
+  cout << "dq=" << dq_ << endl ;
   return 0 ;
 }
 
@@ -139,14 +169,44 @@ int MultiContactHirukawa::ForwardMomentum()
   robot_data_->M.triangularView<Eigen::StrictlyLower>() =
     robot_data_->M.transpose().triangularView<Eigen::StrictlyLower>();
 
+  L_ = robot_data_->M.block(3,0,3,robot_model_->nv) * dq_ ;
+  if(!isInitialized_)
+  {
+    dL_.fill(0.0) ;
+  }
+  else
+  {
+    dL_ = (L_-prevL_)/sampling_period_ ;
+  }
   prevL_ = L_ ;
-  L_ = robot_data_->M.block(3,robot_model_->nv,3,0) * dq_ ;
-  dL_ = (L_-prevL_)/sampling_period_ ;
+
+  cout << "L="<<L_ << endl ;
+  cout << "dL="<<dL_ << endl ;
   return 0 ;
 }
 
-int MultiContactHirukawa::ContactWrench()
+int MultiContactHirukawa::ContactWrench(COMState com_ref)
 {
+  double nbContacts = 0.0 ;
+  double n_z_sum = 0.0 ;
+  double lamba_nz_sum = 0.0 ;
+  vector<double> lambda_ratio (contacts_.size());
+  for(unsigned i=0 ; i<contacts_.size() ; ++i)
+  {
+    nbContacts += contacts_[i].n.squaredNorm() ;
+    n_z_sum += contacts_[i].n(2) ;
+    lamba_nz_sum += contacts_[i].lambda*contacts_[i].n(2) ;
+  }
+  for (unsigned i=0 ; i<contacts_.size() ; ++i)
+    lambda_ratio[i] = contacts_[i].n.squaredNorm() * contacts_[i].lambda / lamba_nz_sum ;
+
+  double g = robot_model_->gravity981(2) ;
+  double ddc_z = com_ref.z[2] ;
+  alpha_ = 1.0-1.0/nbContacts * n_z_sum ;
+
+  for(unsigned i=0 ; i<contacts_.size() ; ++i )
+    epsilons_[i] = (1-alpha_)*robot_mass_*(ddc_z+g)*lambda_ratio[i] ;
+
   return 0 ;
 }
 
@@ -155,14 +215,37 @@ int MultiContactHirukawa::InverseMomentum()
   return 0 ;
 }
 
-int MultiContactHirukawa::online(vector<COMState> & comState_deque,
-                                 vector<FootAbsolutePosition> & rf_deque,
-                                 vector<FootAbsolutePosition> & lf_deque,
-                                 vector<HandAbsolutePosition> & rh_deque,
-                                 vector<HandAbsolutePosition> & lh_deque)
+int MultiContactHirukawa::oneIteration(
+    COMState & comState,  // INPUT/OUTPUT
+    COMState & baseState, // INPUT
+    FootAbsolutePosition & rf, // INPUT
+    FootAbsolutePosition & lf, // INPUT
+    HandAbsolutePosition & rh, // INPUT
+    HandAbsolutePosition & lh) // INPUT
 {
-  InverseKinematicsOnLimbs(rf_deque[0],lf_deque[0],rh_deque[0],lh_deque[0],comState_deque[0]);
+  InverseKinematicsOnLimbs(rf,lf,rh,lh);
+  ForwardMomentum();
 
+  // update the contacts_ vector
+  if(rf.z==0.0 && lf.z==0.0)
+  {
+    contacts_[RightFoot].p << rf.x, rf.y, rf.z;
+    contacts_[LeftFoot] .p << lf.x, lf.y, lf.z;
+    contacts_[RightFoot].n << 0.0, 0.0, 1.0;
+    contacts_[LeftFoot] .n << 0.0, 0.0, 1.0;
+  }else if(rf.z==0.0)
+  {
+    contacts_[RightFoot].p << rf.x, rf.y, rf.z;
+    contacts_[RightFoot].n << 0.0, 0.0, 1.0;
+    contacts_[LeftFoot] .n << 0.0, 0.0, 0.0;
+  }else
+  {
+    contacts_[LeftFoot] .p << rf.x, rf.y, rf.z;
+    contacts_[LeftFoot] .n << 0.0, 0.0, 1.0;
+    contacts_[RightFoot].n << 0.0, 0.0, 0.0;
+  }
+  ContactWrench(comState);
+  isInitialized_ = true ;
   return 0 ;
 }
 
