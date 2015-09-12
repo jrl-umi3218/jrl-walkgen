@@ -39,7 +39,6 @@ using namespace se3;
 
 VectorXd HalfSittingPos(se3::Model model);
 void readData(vector<COMState> &comState_ ,
-              vector<COMState> &baseState_,
               vector< FootAbsolutePosition > &rf_ ,
               vector< FootAbsolutePosition > &lf_ ,
               vector< HandAbsolutePosition > &rh_ ,
@@ -65,14 +64,12 @@ int main(int argc, char *argv[])
   VectorXd q = HalfSittingPos(model);
 
   vector<COMState>               comState_deque ;
-  vector<COMState>               baseState_deque ;
   vector< FootAbsolutePosition > rf_deque       ;
   vector< FootAbsolutePosition > lf_deque       ;
   vector< HandAbsolutePosition > rh_deque       ;
   vector< HandAbsolutePosition > lh_deque       ;
   vector<ZMPPosition>            zmp_deque      ;
   readData(comState_deque,
-           baseState_deque,
            rf_deque,
            lf_deque,
            rh_deque,
@@ -85,7 +82,6 @@ int main(int argc, char *argv[])
 
   aMCH.oneIteration(
       comState_deque[0],
-      baseState_deque[0],
       rf_deque[0],
       lf_deque[0],
       rh_deque[0],
@@ -114,7 +110,6 @@ VectorXd HalfSittingPos(se3::Model model)
 }
 
 void readData(vector<COMState> &comPos_ ,
-              vector<COMState> &basePos_ ,
               vector< FootAbsolutePosition > &rf_ ,
               vector< FootAbsolutePosition > &lf_ ,
               vector< HandAbsolutePosition > &rh_ ,
@@ -139,7 +134,6 @@ void readData(vector<COMState> &comPos_ ,
   dataStream.close();
 
   comPos_.resize(data_.size()) ;
-  basePos_.resize(data_.size()) ;
   rf_    .resize(data_.size()) ;
   lf_    .resize(data_.size()) ;
   rh_    .resize(data_.size()) ;
@@ -155,19 +149,6 @@ void readData(vector<COMState> &comPos_ ,
     comPos_[i].x[1] = data_[i][5] ;
     comPos_[i].y[1] = data_[i][6] ;
     comPos_[i].z[1] = data_[i][7] ;
-
-    basePos_[i].x[0] = data_[i][1/*41*/] ;
-    basePos_[i].y[0] = data_[i][2/*42*/] ;
-    basePos_[i].z[0] = data_[i][3/*43*/] ;
-    basePos_[i].yaw[0] = data_[i][46] ;
-    MAL_S3_VECTOR(waistCom,double);
-    waistCom(0) = comPos_[i].x[0] - basePos_[i].x[0] ;
-    waistCom(1) = comPos_[i].y[0] - basePos_[i].y[0] ;
-    waistCom(2) = comPos_[i].z[0] - basePos_[i].z[0] ;
-
-    basePos_[i].x[1] = comPos_[i].x[1] + (waistCom(1)*basePos_[i].yaw[0]  - waistCom(2)*basePos_[i].pitch[0]);
-    basePos_[i].y[1] = comPos_[i].y[1] + (waistCom(2)*basePos_[i].roll[0] - waistCom(0)*basePos_[i].yaw[0]  );
-    basePos_[i].z[1] = comPos_[i].z[1] + (waistCom(0)*basePos_[i].pitch[0]- waistCom(1)*basePos_[i].roll[0] );
 
     rf_[i].x      = data_[i][22] ;
     rf_[i].y      = data_[i][23] ;

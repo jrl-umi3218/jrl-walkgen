@@ -10,25 +10,18 @@ using namespace Eigen;
 using namespace se3;
 
 MultiContactHirukawa::MultiContactHirukawa(se3::Model * model):
-robot_model_(model),
-q_(model->nq),
-dq_(model->nv),
+robot_model_(model),q_(model->nq),dq_(model->nv),
+dqrh_(6), dqlh_(6), dqrf_(6), dqlf_(6),
 idx_r_wrist_( findIndex(model,"RARM_JOINT5") ),
 idx_l_wrist_( findIndex(model,"LARM_JOINT5") ),
 idx_r_ankle_( findIndex(model,"RLEG_JOINT5") ),
 idx_l_ankle_( findIndex(model,"LLEG_JOINT5") ),
-Jrh_(6,model->nv),
-Jlh_(6,model->nv),
-Jrf_(6,model->nv),
-Jlf_(6,model->nv),
-J_(4*6,model->nv),
-Ve_(4*6),
-Vb_(4*6),
-Vrf_(6),
-Vlf_(6),
-Vrh_(6),
-Vlh_(6),
-svd_ ( JacobiSVD<MatrixXd>(4*6,model->nv,ComputeThinU | ComputeThinV) )
+idx_r_hip_( 30 ),idx_l_hip_( 24 ),idx_r_shoulder_( 17 ),idx_l_shoulder_( 10 ),
+tmpJ_(6,model->nv),
+Jrh_(6,6),Jlh_(6,6),Jrf_(6,6),Jlf_(6,6),
+Jrh_1_(6,6),Jlh_1_(6,6),Jrf_1_(6,6),Jlf_1_(6,6),
+xirf_(6),xilf_(6),xirh_(6),xilh_(6),
+svd_ ( JacobiSVD<MatrixXd>(6,6,ComputeThinU | ComputeThinV) )
 {
   robot_data_ = new se3::Data(*model);
   n_it_ = 5;                  // number of iteration max to converge
@@ -36,40 +29,42 @@ svd_ ( JacobiSVD<MatrixXd>(4*6,model->nv,ComputeThinU | ComputeThinV) )
 
   q_ .fill(0.0);
   dq_.fill(0.0);
+  dqrh_.fill(0.0);
+  dqlh_.fill(0.0);
+  dqrf_.fill(0.0);
+  dqlf_.fill(0.0);
 
+  tmpJ_.fill(0.0);
   Jrh_.fill(0.0);
   Jlh_.fill(0.0);
   Jrf_.fill(0.0);
   Jlf_.fill(0.0);
-  J_  .fill(0.0);
+  Jrh_1_.fill(0.0);
+  Jlh_1_.fill(0.0);
+  Jrf_1_.fill(0.0);
+  Jlf_1_.fill(0.0);
 
-  Ve_ .fill(0.0);
-  Vb_ .fill(0.0);
-  Vrf_.fill(0.0);
-  Vlf_.fill(0.0);
-  Vrh_.fill(0.0);
-  Vlh_.fill(0.0);
+  xirf_.fill(0.0);
+  xilf_.fill(0.0);
+  xirh_.fill(0.0);
+  xilh_.fill(0.0);
 
-  omegab_.fill(0.0);
-  vb_    .fill(0.0);
-  b_rh_  .fill(0.0);
-  b_lh_  .fill(0.0);
-  b_rf_  .fill(0.0);
-  b_lf_  .fill(0.0);
+  xiB_.fill(0.0);
+  bXrh_ = MatrixXd::Identity(6,6);
+  bXlh_ = MatrixXd::Identity(6,6);
+  bXrf_ = MatrixXd::Identity(6,6);
+  bXlf_ = MatrixXd::Identity(6,6);
 
   P_.fill(0.0);
   L_.fill(0.0);
-  prevP_.fill(0.0);
   prevL_.fill(0.0);
-  dP_   .fill(0.0);
+  prevP_.fill(0.0);
   dL_   .fill(0.0);
 
-  // initialize the matrices for the svd computation
-  int n(6),p(model->nv) ;
-  int m = min(n,p) ;
-  J_U_ = MatrixXd(n,m) ;
-  J_V_ = MatrixXd(m,p) ;
-  J_S_ = VectorXd(m)   ;
+  // initialize the matrices for the svd computations
+  U_ = MatrixXd(6,6) ;
+  V_ = MatrixXd(6,6) ;
+  S_ = VectorXd(6)   ;
 
   isInitialized_ = false ;
 
@@ -94,75 +89,75 @@ svd_ ( JacobiSVD<MatrixXd>(4*6,model->nv,ComputeThinU | ComputeThinV) )
 
   // at first walking on flat ground
   alpha_ = 0.0;
+  epsilon_sum_ = 0.0 ;
+  xC_ = yC_ = zC_ = 0.0 ;
+  TauX=TauY=0.0;
+
 
   robot_mass_ = 0.0 ;
-  for(unsigned i=0 ; i<robot_data_->mass.size() ; ++i)
-    robot_mass_ += robot_data_->mass[i];
+  for(unsigned i=1 ; i<robot_model_->inertias.size() ; ++i)
+    robot_mass_ += robot_model_->inertias[i].mass();
+
+  A_   = MatrixXd::Zero(6,6) ;
+  B_   = VectorXd::Zero(6) ;
+  xiB_ = VectorXd::Zero(6) ;
 }
 
 MultiContactHirukawa::~MultiContactHirukawa()
 {
 }
 
-int MultiContactHirukawa::InverseKinematicsOnLimbs(FootAbsolutePosition & rf,
+int MultiContactHirukawa::inverseKinematicsOnLimbs(FootAbsolutePosition & rf,
                                                    FootAbsolutePosition & lf,
                                                    HandAbsolutePosition & rh,
                                                    HandAbsolutePosition & lh)
 {
-  Vrh_ << rh.dx, rh.dy, rh.dz, rh.domega, rh.domega2, rh.dtheta ;
-  Vlh_ << lh.dx, lh.dy, lh.dz, lh.domega, lh.domega2, lh.dtheta ;
-  Vrf_ << rf.dx, rf.dy, rf.dz, rf.domega, rf.domega2, rf.dtheta ;
-  Vlf_ << lf.dx, lf.dy, lf.dz, lf.domega, lf.domega2, lf.dtheta ;
-  Ve_ << Vrh_,Vlh_,Vrf_,Vlf_;
-  cout << "Ve_ = " << Ve_ << endl ;
+  xirf_ << rh.dx, rh.dy, rh.dz, rh.domega, rh.domega2, rh.dtheta ;
+  xilf_ << lh.dx, lh.dy, lh.dz, lh.domega, lh.domega2, lh.dtheta ;
+  xirh_ << rf.dx, rf.dy, rf.dz, rf.domega, rf.domega2, rf.dtheta ;
+  xilh_ << lf.dx, lf.dy, lf.dz, lf.domega, lf.domega2, lf.dtheta ;
 
-  vb_    << dq_(0), dq_(1), dq_(2) ;
-  omegab_<< dq_(3), dq_(4), dq_(5) ;
-  b_rh_ << rh.x - q_(0), rh.y - q_(1) , rh.z - q_(2) ;
-  b_lh_ << lh.x - q_(0), lh.y - q_(1) , lh.z - q_(2) ;
-  b_rf_ << rf.x - q_(0), rf.y - q_(1) , rf.z - q_(2) ;
-  b_lf_ << lf.x - q_(0), lf.y - q_(1) , lf.z - q_(2) ;
-  Vb_ <<  vb_, b_rh_.cross(omegab_) ,
-          vb_, b_lh_.cross(omegab_) ,
-          vb_, b_rf_.cross(omegab_) ,
-          vb_, b_lf_.cross(omegab_) ;
-  cout << "Vb_ = " << Vb_ << endl ;
+  xiB_ = dq_.head(6) ;
+  VectorXd brh (3) ; brh << rh.x - q_(0), rh.y - q_(1) , rh.z - q_(2) ;
+  VectorXd blh (3) ; blh << lh.x - q_(0), lh.y - q_(1) , lh.z - q_(2) ;
+  VectorXd brf (3) ; brf << rf.x - q_(0), rf.y - q_(1) , rf.z - q_(2) ;
+  VectorXd blf (3) ; blf << lf.x - q_(0), lf.y - q_(1) , lf.z - q_(2) ;
+  bXrh_.topRightCorner(3,3) = -hat(brh) ;
+  bXlh_.topRightCorner(3,3) = -hat(blh) ;
+  bXrf_.topRightCorner(3,3) = -hat(brf) ;
+  bXlf_.topRightCorner(3,3) = -hat(blf) ;
 
   computeJacobians  (*robot_model_,*robot_data_,q_);
-  getJacobian<false>(*robot_model_,*robot_data_,idx_r_wrist_,Jrh_);
-  getJacobian<false>(*robot_model_,*robot_data_,idx_l_wrist_,Jlh_);
-  getJacobian<false>(*robot_model_,*robot_data_,idx_r_ankle_,Jrf_);
-  getJacobian<false>(*robot_model_,*robot_data_,idx_l_ankle_,Jlf_);
-  J_ << Jrh_, Jlh_, Jrf_, Jlf_ ;
+  tmpJ_.fill(0.0);
+  getJacobian<false>(*robot_model_,*robot_data_,idx_r_wrist_,tmpJ_);
+  Jrh_ = tmpJ_.block(0,idx_r_shoulder_,6,6);
+  getJacobian<false>(*robot_model_,*robot_data_,idx_l_wrist_,tmpJ_);
+  Jlh_ = tmpJ_.block(0,idx_l_shoulder_,6,6);
+  getJacobian<false>(*robot_model_,*robot_data_,idx_r_ankle_,tmpJ_);
+  Jrf_ = tmpJ_.block(0,idx_r_hip_,6,6);
+  getJacobian<false>(*robot_model_,*robot_data_,idx_l_ankle_,tmpJ_);
+  Jlf_ = tmpJ_.block(0,idx_l_hip_,6,6);
 
-  svd_.compute(J_);
-  J_S_ = svd_.singularValues() ;
-  J_U_ = svd_.matrixU() ;
-  J_V_ = svd_.matrixV() ;
+  invertMatrix(Jrh_, Jrh_1_);
+  invertMatrix(Jlh_, Jlh_1_);
+  invertMatrix(Jrf_, Jrf_1_);
+  invertMatrix(Jlf_, Jlf_1_);
 
-  MatrixXf::Index nonzeroSingVals (0) ;
-  for(MatrixXd::Index i = 0; i < J_S_.size(); i++)
-  {
-    if(abs(J_S_(i)) < 1e-5 )
-      J_S_(i) = 0.0 ;
-    else
-      ++nonzeroSingVals;
-  }
-  VectorXd::Index diagSize ( (std::min)(J_.rows(), J_.cols()) );
-  VectorXd invertedSingVals(diagSize);
-  invertedSingVals.head(nonzeroSingVals) = J_S_.head(nonzeroSingVals).array().inverse();
-  invertedSingVals.tail(diagSize - nonzeroSingVals).setZero();
+  dqrh_ = Jrh_1_ * (xirf_ - bXrh_ * xiB_) ;
+  dqlh_ = Jlh_1_ * (xilf_ - bXlh_ * xiB_) ;
+  dqrf_ = Jrf_1_ * (xirh_ - bXrf_ * xiB_) ;
+  dqlf_ = Jlf_1_ * (xilh_ - bXlf_ * xiB_) ;
 
-  dq_ = J_V_.leftCols(diagSize)
-      * invertedSingVals.asDiagonal()
-      * J_U_.leftCols(diagSize).adjoint()
-      * (Ve_ - Vb_) ;
+  dq_.segment(idx_r_shoulder_,6) = dqrh_ ;
+  dq_.segment(idx_l_shoulder_,6) = dqlh_ ;
+  dq_.segment(idx_r_hip_     ,6) = dqrf_ ;
+  dq_.segment(idx_l_hip_     ,6) = dqlf_ ;
 
-  cout << "dq=" << dq_ << endl ;
+//  cout << "dq=" << dq_ << endl ;
   return 0 ;
 }
 
-int MultiContactHirukawa::ForwardMomentum()
+int MultiContactHirukawa::forwardMomentum()
 {
   robot_data_->M.fill(0.0);
   crba(*robot_model_,*robot_data_,q_);
@@ -178,15 +173,14 @@ int MultiContactHirukawa::ForwardMomentum()
   {
     dL_ = (L_-prevL_)/sampling_period_ ;
   }
-  prevL_ = L_ ;
-
-  cout << "L="<<L_ << endl ;
-  cout << "dL="<<dL_ << endl ;
+//  cout << "L="<<L_ << endl ;
+//  cout << "dL="<<dL_ << endl ;
   return 0 ;
 }
 
-int MultiContactHirukawa::ContactWrench(COMState com_ref)
+int MultiContactHirukawa::contactWrench(COMState &com_ref)
 {
+  // compute the repartition of the forces over the contacts
   double nbContacts = 0.0 ;
   double n_z_sum = 0.0 ;
   double lamba_nz_sum = 0.0 ;
@@ -204,124 +198,144 @@ int MultiContactHirukawa::ContactWrench(COMState com_ref)
   double ddc_z = com_ref.z[2] ;
   alpha_ = 1.0-1.0/nbContacts * n_z_sum ;
 
+  epsilon_sum_ = 0.0 ;
   for(unsigned i=0 ; i<contacts_.size() ; ++i )
+  {
     epsilons_[i] = (1-alpha_)*robot_mass_*(ddc_z+g)*lambda_ratio[i] ;
+    epsilon_sum_ += epsilons_[i] ;
+  }
 
+  // compute the virtual contact point Pc :
+  xC_ = 0.0 ; yC_ = 0.0 ; zC_ = 0.0 ;
+  for(unsigned i=0 ; i< contacts_.size() ; ++i)
+  {
+    xC_ += epsilons_[i] * contacts_[i].p(0) ;
+    yC_ += epsilons_[i] * contacts_[i].p(1) ;
+    zC_ += epsilons_[i] * contacts_[i].p(2) ;
+  }
+  xC_ *= alpha_ / epsilon_sum_ ;
+  yC_ *= alpha_ / epsilon_sum_ ;
+  zC_ *= (1-alpha_) / epsilon_sum_ ;
+
+  TauX = 0.0 ; TauY = 0.0 ;
+  for(unsigned i=0 ; i<contacts_.size() ; ++i)
+  {
+    TauX +=  epsilons_[i]*(com_ref.x[0]*contacts_[i].n(2)-com_ref.z[0]*contacts_[i].n(1)) ;
+    TauY += -epsilons_[i]*(com_ref.y[0]*contacts_[i].n(2)-com_ref.z[0]*contacts_[i].n(0)) ;
+  }
+
+  double * xG = com_ref.x ;
+  double * yG = com_ref.y ;
+  double * zG = com_ref.z ;
+
+  P_(0) = prevP_(0) + sampling_period_/(zG[0]-zC_)*(TauY-dL_(1)+robot_mass_*(zG[2]+g)*(xG[0]-xC_)) ;
+  P_(1) = prevP_(1) - sampling_period_/(zG[0]-zC_)*(TauX-dL_(0)-robot_mass_*(zG[2]+g)*(yG[0]-yC_)) ;
+  P_(2) = robot_mass_ * com_ref.z[1] ;
+
+  //cout << "P = \n" << P_ << endl ;
   return 0 ;
 }
 
-int MultiContactHirukawa::InverseMomentum()
+int MultiContactHirukawa::inverseMomentum()
 {
+  A_ = robot_data_->M.block(0,0,6,6)
+      - robot_data_->M.block(0,idx_r_shoulder_,6,6) * Jrh_1_ * bXrh_ ;
+      - robot_data_->M.block(0,idx_l_shoulder_,6,6) * Jlh_1_ * bXlh_ ;
+      - robot_data_->M.block(0,idx_r_hip_     ,6,6) * Jrf_1_ * bXrf_ ;
+      - robot_data_->M.block(0,idx_l_hip_     ,6,6) * Jlf_1_ * bXlf_ ;
+  B_ = (VectorXd(6)<< P_,L_).finished()
+      - robot_data_->M.block(0,idx_r_shoulder_,6,6) * Jrh_1_ * xirf_
+      - robot_data_->M.block(0,idx_l_shoulder_,6,6) * Jlh_1_ * xilf_
+      - robot_data_->M.block(0,idx_r_hip_     ,6,6) * Jrf_1_ * xirh_
+      - robot_data_->M.block(0,idx_l_hip_     ,6,6) * Jlf_1_ * xilh_;
+
+  invertMatrix(A_,A_1_);
+  xiB_ = A_1_ * B_ ;
   return 0 ;
 }
 
 int MultiContactHirukawa::oneIteration(
-    COMState & comState,  // INPUT/OUTPUT
-    COMState & baseState, // INPUT
+    COMState & comState,     // INPUT/OUTPUT
     FootAbsolutePosition & rf, // INPUT
     FootAbsolutePosition & lf, // INPUT
     HandAbsolutePosition & rh, // INPUT
     HandAbsolutePosition & lh) // INPUT
 {
-  InverseKinematicsOnLimbs(rf,lf,rh,lh);
-  ForwardMomentum();
+  cout << "dq_.head(6) = " << endl << dq_.head(6) << endl ;
+  for(unsigned i=0 ; i<500 ; ++i)
+  {
+    inverseKinematicsOnLimbs(rf,lf,rh,lh);
+    forwardMomentum();
 
-  // update the contacts_ vector
-  if(rf.z==0.0 && lf.z==0.0)
-  {
-    contacts_[RightFoot].p << rf.x, rf.y, rf.z;
-    contacts_[LeftFoot] .p << lf.x, lf.y, lf.z;
-    contacts_[RightFoot].n << 0.0, 0.0, 1.0;
-    contacts_[LeftFoot] .n << 0.0, 0.0, 1.0;
-  }else if(rf.z==0.0)
-  {
-    contacts_[RightFoot].p << rf.x, rf.y, rf.z;
-    contacts_[RightFoot].n << 0.0, 0.0, 1.0;
-    contacts_[LeftFoot] .n << 0.0, 0.0, 0.0;
-  }else
-  {
-    contacts_[LeftFoot] .p << rf.x, rf.y, rf.z;
-    contacts_[LeftFoot] .n << 0.0, 0.0, 1.0;
-    contacts_[RightFoot].n << 0.0, 0.0, 0.0;
+    // update the contacts_ vector
+    if(rf.z==0.0 && lf.z==0.0)
+    {
+      contacts_[RightFoot].p << rf.x, rf.y, rf.z;
+      contacts_[LeftFoot] .p << lf.x, lf.y, lf.z;
+      contacts_[RightFoot].n << 0.0, 0.0, 1.0;
+      contacts_[LeftFoot] .n << 0.0, 0.0, 1.0;
+    }else if(rf.z==0.0)
+    {
+      contacts_[RightFoot].p << rf.x, rf.y, rf.z;
+      contacts_[RightFoot].n << 0.0, 0.0, 1.0;
+      contacts_[LeftFoot] .n << 0.0, 0.0, 0.0;
+    }else
+    {
+      contacts_[LeftFoot] .p << rf.x, rf.y, rf.z;
+      contacts_[LeftFoot] .n << 0.0, 0.0, 1.0;
+      contacts_[RightFoot].n << 0.0, 0.0, 0.0;
+    }
+    contactWrench(comState);
+    inverseMomentum();
+
+    VectorXd error = dq_.head(3)-xiB_.head(3);
+    dq_.head(3)=xiB_.head(3);
+    cout << "i= " << i << " ; vB = "
+         << xiB_.head(3)(0) << " " << xiB_.head(3)(1) << " " << xiB_.head(3)(2)
+         << " ; error = "
+         << error(0) << " " << error(1) << " " << error(2)
+         << endl ;
+    double precision = 1e-5 ;
+    if( abs(error(0))<precision && abs(error(1))<precision && abs(error(2))<precision  )
+    {
+      break;
+    }
   }
-  ContactWrench(comState);
+
+  dq_.head(6)=xiB_;
+//  q_ = integrate(dq_);
+
   isInitialized_ = true ;
+  prevP_ = P_ ;
+  prevL_ = L_ ;
   return 0 ;
 }
 
+int MultiContactHirukawa::invertMatrix(
+    Eigen::MatrixXd &A,
+    Eigen::MatrixXd &A_1 // Right Hand Side
+    )
+{
+  svd_.compute(A);
+  S_ = svd_.singularValues() ;
+  U_ = svd_.matrixU() ;
+  V_ = svd_.matrixV() ;
 
-//int DetermineContact(std::vector< FootAbsolutePosition > & rf,
-//                     std::vector< FootAbsolutePosition > & lf,
-//                     std::vector< HandAbsolutePosition > & rh,
-//                     std::vector< HandAbsolutePosition > & lh)
-//{
-//  contactVec_.resize(rf.size());
-//  for (unsigned int i = 0 ; i < contactVec_.size() ; ++i )
-//  {
-//    contactVec_[i].clear();
-//    if ( rf[i].z == 0.0 )
-//    {
-//      Contact aContact ;
-//      aContact.n(0) = 0.0 ;
-//      aContact.n(1) = 0.0 ;
-//      aContact.n(2) = 1.0 ;
+  MatrixXf::Index nonzeroSingVals (0) ;
+  for(MatrixXd::Index i = 0; i < S_.size(); i++)
+  {
+    if(abs(S_(i)) < 1e-5 )
+      S_(i) = 0.0 ;
+    else
+      ++nonzeroSingVals;
+  }
+  VectorXd::Index diagSize ( (std::min)(A.rows(), A.cols()) );
+  VectorXd invertedSingVals(diagSize);
+  invertedSingVals.head(nonzeroSingVals) = S_.head(nonzeroSingVals).array().inverse();
+  invertedSingVals.tail(diagSize - nonzeroSingVals).setZero();
 
-//      aContact.p(0) = rf[i].x ;
-//      aContact.p(1) = rf[i].y ;
-//      aContact.p(2) = rf[i].z ;
-//      contactVec_[i].push_back(aContact) ;
-//    }
-//    if ( lf[i].z == 0.0 )
-//    {
-//      Contact aContact ;
-//      aContact.n(0) = 0.0 ;
-//      aContact.n(1) = 0.0 ;
-//      aContact.n(2) = 1.0 ;
-
-//      aContact.p(0) = lf[i].x ;
-//      aContact.p(1) = lf[i].y ;
-//      aContact.p(2) = lf[i].z ;
-//      contactVec_[i].push_back(aContact) ;
-//    }
-//    if ( rh[i].stepType < 0.0 )
-//    {
-//      Contact aContact ;
-//      aContact.n(0) = 0.0 ;
-//      aContact.n(1) = 0.0 ;
-//      aContact.n(2) = 1.0 ;
-
-//      aContact.p(0) = rh[i].x ;
-//      aContact.p(1) = rh[i].y ;
-//      aContact.p(2) = rh[i].z ;
-//      contactVec_[i].push_back(aContact) ;
-//    }
-//    if ( lh[i].stepType < 0.0 )
-//    {
-//      Contact aContact ;
-//      aContact.n(0) = 0.0 ;
-//      aContact.n(1) = 0.0 ;
-//      aContact.n(2) = 1.0 ;
-
-//      aContact.p(0) = lh[i].x ;
-//      aContact.p(1) = lh[i].y ;
-//      aContact.p(2) = lh[i].z ;
-//      contactVec_[i].push_back(aContact) ;
-//    }
-//  }
-
-//#ifdef VERBOSE
-//  cout << "contactVec_.size() = " << contactVec_.size() << endl ;
-//  for ( unsigned int i=0 ; i < contactVec_.size() ; ++i )
-//  {
-//    for ( unsigned int j=0 ; j < contactVec_[i].size() ; ++j )
-//    {
-//      cout << j << " : ["
-//           << contactVec_[i][j].p(0) << " , "
-//           << contactVec_[i][j].p(1) << " , "
-//           << contactVec_[i][j].p(2) << "] ";
-//    }
-//    cout << endl ;
-//  }
-//#endif
-//  return 0 ;
-//}
+  A_1 = V_.leftCols(diagSize)
+      * invertedSingVals.asDiagonal()
+      * U_.leftCols(diagSize).adjoint() ;
+  return 0 ;
+}
