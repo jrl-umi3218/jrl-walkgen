@@ -1,4 +1,4 @@
-#ifndef DYNAMICFILTER_HH
+#ifndef DYNAMICFILTER_HH 
 #define DYNAMICFILTER_HH
 
 // metapod includes
