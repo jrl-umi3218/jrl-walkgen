@@ -81,7 +81,6 @@ ADD_EXECUTABLE(TestRiccatiEquation
 
 PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-dynamics)
 
-
 ######################
 # Test Morisawa 2007 #
 ######################
@@ -141,8 +140,6 @@ IF(HRP2_DYNAMICS_FOUND)
 
   ENDIF(HRP2_14_FOUND)
 ENDIF(HRP2_DYNAMICS_FOUND)
-
-
 
 ###################
 # Test Herdt 2010 #
@@ -226,43 +223,6 @@ ADD_TEST(TestInverseKinematics
 TestInverseKinematics
 ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 
-###########################
-# Test Inverse Kinematics #
-###########################
-
-ADD_EXECUTABLE(TestMulticontactInverseGeometry
-    ../src/portability/gettimeofday.cc
-    TestMulticontactInverseGeometry.cpp
-    CommonTools.cpp
-    TestObject.cpp
-    ClockCPUTime.cpp
-)
-
-TARGET_LINK_LIBRARIES(TestMulticontactInverseGeometry ${PROJECT_NAME})
-PKG_CONFIG_USE_DEPENDENCY(TestMulticontactInverseGeometry jrl-dynamics)
-PKG_CONFIG_USE_DEPENDENCY(TestMulticontactInverseGeometry hrp2-dynamics)
-ADD_DEPENDENCIES(TestMulticontactInverseGeometry ${PROJECT_NAME})
-
-MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
-SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
-SET(samplespec
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
-)
-SET(sampleljr
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
-)
-SET(sampleinitconfig
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
-)
-
-LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
-
-# This test is disabled for now as it fails.
-# FIXME: fix the test and/or the implementation
-ADD_TEST(TestMulticontactInverseGeometry
-TestMulticontactInverseGeometry
-${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
-
 ##############################
 # Test Kajita Dynamic Filter #
 ##############################
@@ -302,42 +262,6 @@ LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
 ADD_TEST(TestKajitaDynamicFilter
 TestKajitaDynamicFilter
 ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
-
-######################
-# Test Hirukawa 2007 #
-######################
-
-ADD_EXECUTABLE(TestHirukawa2007
-../src/portability/gettimeofday.cc
-TestHirukawa2007.cpp
-CommonTools.cpp
-TestObject.cpp
-ClockCPUTime.cpp
-)
-TARGET_LINK_LIBRARIES(TestHirukawa2007 ${PROJECT_NAME})
-PKG_CONFIG_USE_DEPENDENCY(TestHirukawa2007 jrl-dynamics)
-PKG_CONFIG_USE_DEPENDENCY(TestHirukawa2007 hrp2-dynamics)
-ADD_DEPENDENCIES(TestHirukawa2007 ${PROJECT_NAME})
-
-MESSAGE(STATUS "jrl data dir: " ${JRL_DYNAMICS_PKGDATAROOTDIR})
-SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
-SET(samplespec
-  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
-)
-SET(sampleljr
-  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
-)
-SET(sampleinitconfig
-  ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat)
-
-LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
-
-# This test is disabled for now as it fails.
-# FIXME: fix the test and/or the implementation
-ADD_TEST(TestHirukawa2007
-  TestHirukawa2007
-  ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
-
 
 ####################
 # Test Kajita 2003 #
@@ -423,7 +347,7 @@ IF(HRP2_DYNAMICS_FOUND)
 ENDIF(HRP2_DYNAMICS_FOUND)
 
 ################
-# SQP test #
+# NMPC test #
 ################
 IF(HRP2_DYNAMICS_FOUND)
   IF(HRP2_14_FOUND)

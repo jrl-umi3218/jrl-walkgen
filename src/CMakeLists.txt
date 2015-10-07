@@ -47,7 +47,7 @@ SET(INCLUDES
   Debug.hh
   SimplePluginManager.hh
   privatepgtypes.hh
-  MultiContactRefTrajectoryGeneration/MultiContactHirukawa.hh
+#  MultiContactRefTrajectoryGeneration/MultiContactHirukawa.hh
   patterngeneratorinterfaceprivate.hh
   Mathematics/FootConstraintsAsLinearSystem.hh
   Mathematics/Polynome.hh
@@ -155,7 +155,7 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/generator-vel-ref.cpp
   ZMPRefTrajectoryGeneration/mpc-trajectory-generation.cpp
   ZMPRefTrajectoryGeneration/DynamicFilter.cpp
-  MultiContactRefTrajectoryGeneration/MultiContactHirukawa.cc
+#  MultiContactRefTrajectoryGeneration/MultiContactHirukawa.cc
   MotionGeneration/StepOverPlanner.cpp
   MotionGeneration/CollisionDetector.cpp
   MotionGeneration/WaistHeightVariation.cpp
@@ -215,7 +215,7 @@ INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen abstract-robot-dynamics)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-mal)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-dynamics)
-PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen pinocchio)
+#PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen pinocchio)
 
 IF(USE_LSSOL)
  PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen lssol)

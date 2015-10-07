@@ -21,7 +21,7 @@ INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/lapack.cmake)
 INCLUDE(cmake/cpack.cmake)
 INCLUDE(cmake/boost.cmake)
-INCLUDE(cmake_metapod_configure.cmake)
+INCLUDE(private_cmake/cmake_metapod_configure.cmake)
 INCLUDE(CMakeDependentOption)
 
 # Define properties of the project
@@ -49,8 +49,7 @@ ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
 ################################################################
 ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
 ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
-ADD_OPTIONAL_DEPENDENCY("pinocchio >=  1.0.1")
-MESSAGE(STATUS "hrp2-dynamics: " ${HRP2_DYNAMICS_FOUND})
+#ADD_OPTIONAL_DEPENDENCY("pinocchio >=  1.0.1")
 ADD_OPTIONAL_DEPENDENCY("metapod >= 1.0.7")
 #################################################################
 
@@ -130,7 +129,6 @@ ADD_SUBDIRECTORY(tests)
 
 # Generate dependency to jrl-walkgen in pc file
 PKG_CONFIG_APPEND_LIBS("jrl-walkgen")
-
 
 # Ask to generate the final steps.
 SETUP_PROJECT_FINALIZE()
