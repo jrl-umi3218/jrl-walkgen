@@ -145,7 +145,7 @@ int main()
     myfile.close();
 
     myfile.open("control_point.txt");
-    for (int k=0; k<X->GetControlPoints().size();k++)
+    for (unsigned int k=0; k<X->GetControlPoints().size();k++)
     {
       myfile << X->GetControlPoints()[k] << " " ;
       myfile << Y->GetControlPoints()[k] << " " ;

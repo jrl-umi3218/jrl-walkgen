@@ -760,14 +760,14 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
           << " " << m_PolynomeX->Compute(LocalTime - EndOfLiftOff));
   //  m_PolynomeX->print();
 
-  bool ProtectionNeeded=false;
+  //bool ProtectionNeeded=false;
 
   // Treat Omega with the following strategy:
   // First treat the lift-off.
   if (LocalTime<EndOfLiftOff)
     {
       curr_NSFAP.omega = m_PolynomeOmega->Compute(LocalTime) ;
-      ProtectionNeeded=true;
+      //ProtectionNeeded=true;
     }
   // Prepare for the landing.
   else if (LocalTime<StartLanding)
@@ -780,7 +780,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
     {
       curr_NSFAP.omega =
         m_PolynomeOmega->Compute(LocalTime - StartLanding)  - m_Omega;
-      ProtectionNeeded=true;
+      //ProtectionNeeded=true;
     }
   double dFX=0,dFY=0,dFZ=0;
   double lOmega = 0.0;
@@ -962,7 +962,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
     m_PolynomeZ->Compute(LocalInterpolationStartTime+InterpolationTime);//+
     //m_AnklePositionRight[2];
 
-  bool ProtectionNeeded=false;
+  //bool ProtectionNeeded=false;
 
   // Treat Omega with the following strategy:
   // First treat the lift-off.
@@ -976,7 +976,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
         m_PolynomeOmega->Compute(InterpolationTime);//  +
     // NoneSupportFootAbsolutePositions[StartIndex-1].domega;
 
-      ProtectionNeeded=true;
+      //ProtectionNeeded=true;
     }
   // Prepare for the landing.
   else if (LocalInterpolationStartTime+InterpolationTime<StartLanding)
@@ -991,7 +991,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
       NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].omega =
         m_PolynomeOmega->Compute(LocalInterpolationStartTime+InterpolationTime - StartLanding) +
         NoneSupportFootAbsolutePositions[StartIndex-1].omega - m_Omega;
-      ProtectionNeeded=true;
+      //ProtectionNeeded=true;
     }
   double dFX=0,dFY=0,dFZ=0;
   double lOmega = 0.0;
