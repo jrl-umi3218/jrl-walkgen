@@ -27,7 +27,11 @@ ELSE(NOT HRP2_DYNAMICS_FOUND)
   MESSAGE(STATUS "hrp2-dynamics: not found")
 ENDIF(HRP2_DYNAMICS_FOUND)
 
-SET(WITH_HRP2_DYNAMICS "" CACHE STRING "Option to use HRP2-DYNAMICS robot in the PG" )
+SET(WITH_HRP2_DYNAMICS "" CACHE BOOL "Option to use HRP2-DYNAMICS robot in the PG" )
+SET(WITH_HRP2_DYNAMICS_BOOL 0)
+if (WITH_HRP2_DYNAMICS)
+ SET(WITH_HRP2_DYNAMICS_BOOL 1)
+endif()
 
 # Import jrl-mal flags.
 ADD_DEFINITIONS(${JRL_MAL_CFLAGS})
@@ -88,13 +92,8 @@ IF(HRP2_DYNAMICS_FOUND)
     math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
     CONFIG_FILES_CMAKE(TestMorisawa2007OnLine${BITS}TestFGPI.datref)
     CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalk${BITS}TestFGPI.datref)
-   # CONFIG_FILES_CMAKE(TestMorisawa2007Climbing${BITS}TestFGPI.datref)
-
-   IF(NOT ${WITH_HRP2_DYNAMICS} EQUAL "" )
-     SET(WITH_HRP2_DYNAMICS 1)
-     #TARGET_COMPILE_DEFINITIONS(${testmorisawa2007} PRIVATE WITH_HRP2DYNAMICS=1)
-   ENDIF(NOT ${WITH_HRP2_DYNAMICS} EQUAL "" )
-   CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
+    # CONFIG_FILES_CMAKE(TestMorisawa2007Climbing${BITS}TestFGPI.datref)
+    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
 
 
     MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
