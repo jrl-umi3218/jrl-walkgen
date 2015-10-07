@@ -579,8 +579,8 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
       timeOfInterpolation = UnlockedSwingPeriod ;
     }
 
-  cout << "timeOfInterpolation = " << timeOfInterpolation << endl ;
-  cout << "time = " << Time << endl ;
+//  cout << "timeOfInterpolation = " << timeOfInterpolation << endl ;
+//  cout << "time = " << Time << endl ;
 
   // Trajectory of the foot compute in the X domain (plane X of t)
   m_BsplinesX->Compute(timeOfInterpolation,

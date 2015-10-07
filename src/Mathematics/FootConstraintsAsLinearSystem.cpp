@@ -268,14 +268,13 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(deque<FootA
   // in order to create the corresponding trajectory.
   ComputeConvexHull aCH;
   double lLeftFootHalfWidth,lLeftFootHalfHeight,
-    lRightFootHalfWidth,lRightFootHalfHeight,lZ;
+    lRightFootHalfWidth,lRightFootHalfHeight;
   
   // Read humanoid specificities.
   CjrlFoot * lRightFoot = m_HS->rightFoot();
   lRightFoot->getSoleSize(lRightFootHalfWidth,lRightFootHalfHeight);
   vector3d AnklePosition;
   lRightFoot->getAnklePositionInLocalFrame(AnklePosition);
-  lZ = AnklePosition[2];
   CjrlFoot * lLeftFoot = m_HS->leftFoot();
   lLeftFoot->getSoleSize(lLeftFootHalfWidth,lLeftFootHalfHeight);
 

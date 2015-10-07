@@ -336,7 +336,6 @@ protected:
     TestObject::prepareDebugFiles() ;
     if (m_DebugFGPI)
     {
-      static int inc = 0 ;
       ofstream aof;
       string aFileName;
       aFileName = m_TestName;
@@ -408,7 +407,6 @@ protected:
 
     if (m_DebugFGPI)
       {
-        static int inc = 0 ;
         ofstream aof;
         string aFileName;
         aFileName = m_TestName;
@@ -417,7 +415,6 @@ protected:
           {
             aof.open(aFileName.c_str(),ofstream::out);
           }
-        inc = 1;
         aof.open(aFileName.c_str(),ofstream::app);
         aof.precision(8);
         aof.setf(ios::scientific, ios::floatfield);

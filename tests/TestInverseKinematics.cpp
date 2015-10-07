@@ -66,7 +66,7 @@ public:
     dynamicfilter_ = NULL ;
     once = true ;
     MAL_VECTOR_RESIZE(InitialPosition,36);
-  };
+  }
 
   ~TestInverseKinematics()
   {
@@ -94,8 +94,13 @@ public:
 
   bool doTest(ostream &os)
   {
+    os << "<===============================================================>"<<endl;
+    os << "Reading data ..." << endl;
+
     readData();
 
+    os << "<===============================================================>"<<endl;
+    os << "Initialization ..." << endl;
 
     int stage0 = 0 ;
     int stage1 = 1 ;
@@ -107,7 +112,8 @@ public:
                           1.6,
                           comPos[0] );
 
-
+    os << "<===============================================================>"<<endl;
+    os << "Computing the ZMPMB" << endl;
     vector<vector<double> > zmpmb ( comPos.size() , vector<double>(2) );
     for (unsigned int i= 0 ; i < comPos.size() ; ++i )
     {
@@ -139,6 +145,8 @@ public:
       }
     }
 
+    os << "<===============================================================>"<<endl;
+    os << "Checking the inverse kinematics algorithm" << endl;
     for (unsigned int i = 0 ; i < comPos.size()-320 ; ++i)
     {
       dynamicfilter_->InverseKinematics(comPos[i],lfFoot[i],rfFoot[i],

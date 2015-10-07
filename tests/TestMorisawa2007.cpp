@@ -62,20 +62,20 @@ enum Profiles_t {
   PROFIL_ANALYTICAL_GO_THROUGH_WALL          // 7
 };
 
-#define NBOFPREDEFONLINEFOOTSTEPS 0 //11
+#define NBOFPREDEFONLINEFOOTSTEPS 11
 
 double OnLineFootSteps[NBOFPREDEFONLINEFOOTSTEPS][4]={
-//  { 0.05, 0.0, 0.0, 0.0},
-//  { 0.05, 0.0, 0.0, 0.0},
-//  { 0.05, 0.0, 0.0, 0.0},
-//  { 0.05, 0.0, 0.0, 0.0},
-//  { 0.05, 0.0, 0.0, 0.0},
-//  { 0.05, 0.0, 0.0, 0.0},
-//  { 0.05, 0.0, 0.0, 0.0},
-//  { 0.05, 0.0, 0.0, 0.0},
-//  { 0.05, 0.0, 0.0, 0.0},
-//  { 0.05, 0.0, 0.0, 0.0},
-//  { 0.05, 0.0, 0.0, 0.0}
+ { 0.05, 0.0, 0.0, 0.0},
+ { 0.05, 0.0, 0.0, 0.0},
+ { 0.05, 0.0, 0.0, 0.0},
+ { 0.05, 0.0, 0.0, 0.0},
+ { 0.05, 0.0, 0.0, 0.0},
+ { 0.05, 0.0, 0.0, 0.0},
+ { 0.05, 0.0, 0.0, 0.0},
+ { 0.05, 0.0, 0.0, 0.0},
+ { 0.05, 0.0, 0.0, 0.0},
+ { 0.05, 0.0, 0.0, 0.0},
+ { 0.05, 0.0, 0.0, 0.0}
 };
 
 class TestMorisawa2007: public TestObject
@@ -501,7 +501,6 @@ protected:
 
     if (m_DebugFGPI)
       {
-        static int inc = 0 ;
         ofstream aof;
         string aFileName;
         aFileName = m_TestName;
@@ -510,7 +509,6 @@ protected:
           {
             aof.open(aFileName.c_str(),ofstream::out);
           }
-        inc = 1;
         aof.open(aFileName.c_str(),ofstream::app);
         aof.precision(8);
         aof.setf(ios::scientific, ios::floatfield);

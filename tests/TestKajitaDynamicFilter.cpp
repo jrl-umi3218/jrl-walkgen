@@ -98,6 +98,9 @@ public:
 
   bool doTest(ostream &os)
   {
+    os << "<===============================================================>"<<endl;
+    os << "Initialization..." << endl;
+
     double endTime = 8.0 ;
     double previewWindowSize = 1.6 ;
     double samplingPeriod = 0.005 ;
@@ -110,6 +113,9 @@ public:
                           endTime - previewWindowSize,16,
                           previewWindowSize,
                           com_init );
+
+    os << "<===============================================================>"<<endl;
+    os << "Filtering..." << endl;
     delta_zmp.resize(N);
     MAL_VECTOR_FILL(InitialVelocity,0.0);
     MAL_VECTOR_FILL(InitialAcceleration,0.0);
@@ -124,6 +130,8 @@ public:
 
     dynamicfilter_->OptimalControl(delta_zmp,delta_com);
 
+    os << "<===============================================================>"<<endl;
+    os << "Dumping..." << endl;
     /// \brief Create file .hip .pos .zmp
     /// --------------------
     ofstream aof;

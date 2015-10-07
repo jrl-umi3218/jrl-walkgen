@@ -535,7 +535,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
  {
    ODEBUG6("Beginning of Setup 0 ","DebugData.txt");
    ODEBUG("Setup");
-   double zmpx2, zmpy2;
+   //double zmpx2, zmpy2;
 
 
    m_sxzmp =0.0;
@@ -579,7 +579,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    //  m_sxzmp=-StartingCOMState[0];m_syzmp=-StartingCOMState[1];
    //  zmpx2=StartingCOMState[0];zmpy2=StartingCOMState[1];
    m_sxzmp = 0.0; m_syzmp =0.0;
-   zmpx2 = 0.0; zmpy2 = 0.0;
+   //zmpx2 = 0.0; zmpy2 = 0.0;
 
    m_FIFODeltaZMPPositions.clear();
    m_FIFOCOMStates.clear();
@@ -627,9 +627,9 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    ODEBUG("m_FIFOCOMStates["<<localindex<<"]=" << m_FIFOCOMStates[localindex].x[0] << " " << 
 	   m_FIFOCOMStates[localindex].y[0] << " " << m_FIFOCOMStates[localindex].z[0] <<
 	   " m_FIFOCOMStates.size()=" <<m_FIFOCOMStates.size());
-   COMState acompos = m_FIFOCOMStates[localindex];
-   FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[localindex];
-   FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[localindex];
+   //COMState acompos = m_FIFOCOMStates[localindex];
+   //FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[localindex];
+   //FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[localindex];
 
    ODEBUG4SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
 		 m_FIFOZMPRefPositions[0].py << " " <<

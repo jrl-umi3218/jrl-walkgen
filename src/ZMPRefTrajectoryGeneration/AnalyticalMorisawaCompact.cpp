@@ -2628,8 +2628,8 @@ new step has to be generate.
       }
       return ;
     }
-    cout << "INDEX = " << Index << endl ;
-    cout << "lIndexInterval = " << lIndexInterval << endl ;
+//    cout << "INDEX = " << Index << endl ;
+//    cout << "lIndexInterval = " << lIndexInterval << endl ;
 
     double sx = m_RelativeFootPositions[Index].sx ;
     double sy = m_RelativeFootPositions[Index].sy ;
@@ -2783,14 +2783,14 @@ new step has to be generate.
         m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
       }
 
-    cout << "relative position : "
-         << sx << " "
-         << sy << " "
-         << dx << " "
-         << dy << " "
-         << SStime << " "
-         << m_AbsoluteSupportFootPositions[Index].time << " "
-         << m_AbsoluteSupportFootPositions[Index-1].time << " " << endl ;
+//    cout << "relative position : "
+//         << sx << " "
+//         << sy << " "
+//         << dx << " "
+//         << dy << " "
+//         << SStime << " "
+//         << m_AbsoluteSupportFootPositions[Index].time << " "
+//         << m_AbsoluteSupportFootPositions[Index-1].time << " " << endl ;
 
     m_CoMbsplinesZ->Compute(interpolationTime,CoMz[0],CoMz[1],CoMz[2]) ;
   }

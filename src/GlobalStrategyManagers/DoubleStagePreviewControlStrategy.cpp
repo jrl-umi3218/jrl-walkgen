@@ -139,9 +139,9 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   outWaistPosition.z[0] =  CurrentConfiguration(2);
   
   // In case we are at the end of the motion
-  double CurrentZMPNeutralPosition[2];
-  CurrentZMPNeutralPosition[0] = (*m_ZMPPositions)[0].px;
-  CurrentZMPNeutralPosition[1] = (*m_ZMPPositions)[0].py;
+  //double CurrentZMPNeutralPosition[2];
+  //CurrentZMPNeutralPosition[0] = (*m_ZMPPositions)[0].px;
+  //CurrentZMPNeutralPosition[1] = (*m_ZMPPositions)[0].py;
   
   double temp1;
   double temp2;
