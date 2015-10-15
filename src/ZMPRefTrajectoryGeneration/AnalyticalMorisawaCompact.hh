@@ -563,7 +563,13 @@ namespace PatternGeneratorJRL
            ZMPPosition &ZMPz,
            unsigned int IndexInterval);
 
-      void ComputeCoMz(double t, unsigned int lIndexInterval, COMState &CoMz, deque<COMState> & FinalCoMPositions);
+      void ComputeCoMz(deque<COMState> & FinalCoMPositions,
+                       deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+                       deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions);
+      void ComputeCoMz(double t,
+                       unsigned int lIndexInterval,
+                       COMState &CoMz,
+                       deque<COMState> & FinalCoMPositions);
 
       void FillQueues(double samplingPeriod,
                       double StartingTime,

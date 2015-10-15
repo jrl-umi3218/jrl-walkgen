@@ -2590,6 +2590,22 @@ new step has to be generate.
     }
   }
 
+  void AnalyticalMorisawaCompact::ComputeCoMz(deque<COMState> & FinalCoMPositions,
+                                              deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
+                                              deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions)
+  {
+    vector<double> barriere (500,0.0) ;
+    COMState & c = FinalCoMPositions.front() ;
+    FootAbsolutePosition & lf = FinalLeftFootAbsolutePositions .front() ;
+    FootAbsolutePosition & rf = FinalRightFootAbsolutePositions.front() ;
+    double lb = 0.7;
+    double ub = 0.9;
+    barriere[0] =
+        exp( sqrt((c.x[0]-lf.x)*(c.x[0]-lf.x)+(c.y[0]-lf.y)*(c.y[0]-lf.y)+(c.z[0]-lf.z)*(c.z[0]-lf.z)) - lb)
+      + exp(-sqrt((c.x[0]-lf.x)*(c.x[0]-lf.x)+(c.y[0]-lf.y)*(c.y[0]-lf.y)+(c.z[0]-lf.z)*(c.z[0]-lf.z)) + ub)
+      + exp( sqrt((c.x[0]-rf.x)*(c.x[0]-rf.x)+(c.y[0]-rf.y)*(c.y[0]-rf.y)+(c.z[0]-rf.z)*(c.z[0]-rf.z)) - lb)
+      + exp(-sqrt((c.x[0]-rf.x)*(c.x[0]-rf.x)+(c.y[0]-rf.y)*(c.y[0]-rf.y)+(c.z[0]-rf.z)*(c.z[0]-rf.z)) + ub);
+  }
 
   void AnalyticalMorisawaCompact::ComputeCoMz(double t, unsigned int lIndexInterval, COMState &CoM, deque<COMState> & FinalCoMPositions)
   {
