@@ -2629,7 +2629,7 @@ new step has to be generate.
       double lowerPoseCoMz = 0.95*m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);
       double higherPoseCoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);
 
-      if(Lastcom_z >= higherPoseCoMz + 0.00001 || Lastcom_z <= higherPoseCoMz - 0.00001)
+      if(Lastcom_z >= higherPoseCoMz + 0.0001 || Lastcom_z <= higherPoseCoMz - 0.0001)
       {
         m_CoMbsplinesZ->SetParameters(
             m_RelativeFootPositions[0].SStime,
@@ -2638,7 +2638,7 @@ new step has to be generate.
         m_CoMbsplinesZ->Compute(t-Index*moving_time+m_RelativeFootPositions[0].DStime,
                                 CoMz[0],CoMz[1],CoMz[2]) ;
       }else{
-        CoMz[0] = m_InitialPoseCoMHeight ;
+        CoMz[0] = Lastcom_z;
         CoMz[1] = 0.0 ;
         CoMz[2] = 0.0 ;
       }
@@ -2649,6 +2649,7 @@ new step has to be generate.
 
     double sx = m_RelativeFootPositions[Index].sx ;
     double sy = m_RelativeFootPositions[Index].sy ;
+    double sz = m_RelativeFootPositions[Index].sz ;
     double SStime = m_RelativeFootPositions[Index].SStime ;
     double DStime = m_RelativeFootPositions[Index].DStime ;
     double initCoMheight = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z - corrZ(2);
@@ -2668,12 +2669,13 @@ new step has to be generate.
     {
       sx = m_RelativeFootPositions[Index+1].sx ;
       sy = m_RelativeFootPositions[Index+1].sy ;
+      sz = m_RelativeFootPositions[Index+1].sz ;
       FinalTime = moving_time ;
       InitSpeed = 0.0 ;
       interpolationTime = t-Index*moving_time ;
       InitPos = initCoMheight ;
       FinalPos = initCoMheight ;
-      if(sx*sx+sy*sy > 0.2*0.2)
+      if(sx*sx+sy*sy > 0.2*0.2 && sz*sz+sz*sz < 0.00001)
       {
           FinalTime = SStime ;
           FinalPos = lowerCoMheight ;
@@ -2781,7 +2783,7 @@ new step has to be generate.
         InitPos = initCoMheight ;
         FinalPos = initCoMheight ;
 
-        if(sx*sx+sy*sy > 0.2*0.2)
+        if(sx*sx+sy*sy > 0.2*0.2 && sz*sz+sz*sz < 0.00001)
         {
           if(LastCoM.z[0] >= lowerCoMheight + 0.00001 || LastCoM.z[0] <= lowerCoMheight - 0.00001)
           {
