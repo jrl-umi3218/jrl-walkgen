@@ -2625,6 +2625,13 @@ new step has to be generate.
     // after the final step we keep the same position for a while
     if( Index >= m_AbsoluteSupportFootPositions.size() )
     {
+      if(FinalCoMPositions.size()==0)
+      {
+        CoMz[0] = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions[Index].z - corrZ(2);
+        CoMz[1] = 0.0 ;
+        CoMz[2] = 0.0 ;
+        return ;
+      }
       double Lastcom_z = FinalCoMPositions.back().z[0] ;
       double lowerPoseCoMz = 0.95*m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);
       double higherPoseCoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);

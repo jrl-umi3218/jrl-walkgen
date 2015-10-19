@@ -62,20 +62,20 @@ enum Profiles_t {
   PROFIL_ANALYTICAL_GO_THROUGH_WALL          // 7
 };
 
-#define NBOFPREDEFONLINEFOOTSTEPS 11
+#define NBOFPREDEFONLINEFOOTSTEPS 0
 
 double OnLineFootSteps[NBOFPREDEFONLINEFOOTSTEPS][4]={
- { 0.05, 0.0, 0.0, 0.0},
- { 0.05, 0.0, 0.0, 0.0},
- { 0.05, 0.0, 0.0, 0.0},
- { 0.05, 0.0, 0.0, 0.0},
- { 0.05, 0.0, 0.0, 0.0},
- { 0.05, 0.0, 0.0, 0.0},
- { 0.05, 0.0, 0.0, 0.0},
- { 0.05, 0.0, 0.0, 0.0},
- { 0.05, 0.0, 0.0, 0.0},
- { 0.05, 0.0, 0.0, 0.0},
- { 0.05, 0.0, 0.0, 0.0}
+// { 0.05, 0.0, 0.0, 0.0},
+// { 0.05, 0.0, 0.0, 0.0},
+// { 0.05, 0.0, 0.0, 0.0},
+// { 0.05, 0.0, 0.0, 0.0},
+// { 0.05, 0.0, 0.0, 0.0},
+// { 0.05, 0.0, 0.0, 0.0},
+// { 0.05, 0.0, 0.0, 0.0},
+// { 0.05, 0.0, 0.0, 0.0},
+// { 0.05, 0.0, 0.0, 0.0},
+// { 0.05, 0.0, 0.0, 0.0},
+// { 0.05, 0.0, 0.0, 0.0}
 };
 
 class TestMorisawa2007: public TestObject
@@ -976,45 +976,45 @@ protected:
     }
   }
 
-  void chooseTestProfile()
-  {
+ void chooseTestProfile()
+ {
 
-    switch(m_TestProfile)
-      {
-      case PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING:
-	AnalyticalShortStraightWalking(*m_PGI);
-	break;
+   switch(m_TestProfile)
+   {
+     case PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING:
+       AnalyticalShortStraightWalking(*m_PGI);
+       break;
 
-      case PROFIL_ANALYTICAL_CLIMBING_STAIRS:
-	AnalyticalClimbingStairs(*m_PGI);
-	break;
-        
-      case PROFIL_ANALYTICAL_GOING_DOWN_STAIRS:
-	AnalyticalGoingDownStairs(*m_PGI);
-	break;
+     case PROFIL_ANALYTICAL_CLIMBING_STAIRS:
+       AnalyticalClimbingStairs(*m_PGI);
+       break;
 
-      case PROFIL_ANALYTICAL_STEPPING_STONES:
-	AnalyticalSteppingStones(*m_PGI);
-	break;
+     case PROFIL_ANALYTICAL_GOING_DOWN_STAIRS:
+       AnalyticalGoingDownStairs(*m_PGI);
+       break;
 
-      case PROFIL_ANALYTICAL_ONLINE_WALKING:
-	StartAnalyticalOnLineWalking(*m_PGI);
-	break;
+     case PROFIL_ANALYTICAL_STEPPING_STONES:
+       AnalyticalSteppingStones(*m_PGI);
+       break;
 
-      case PROFIL_ANALYTICAL_WALKING_ON_BEAM:
-        AnalyticalWalkingOnBeam(*m_PGI);
-        break;
+     case PROFIL_ANALYTICAL_ONLINE_WALKING:
+       StartAnalyticalOnLineWalking(*m_PGI);
+       break;
 
-      case PROFIL_ANALYTICAL_GO_THROUGH_WALL:
-        AnalyticalGoThroughWall(*m_PGI);
-        break;
+     case PROFIL_ANALYTICAL_WALKING_ON_BEAM:
+       AnalyticalWalkingOnBeam(*m_PGI);
+       break;
+
+     case PROFIL_ANALYTICAL_GO_THROUGH_WALL:
+       AnalyticalGoThroughWall(*m_PGI);
+       break;
 
 
-      default:
-	throw("No correct test profile");
-	break;
-      }
-  }
+     default:
+       throw("No correct test profile");
+       break;
+   }
+ }
 
   void generateEvent()
   {
