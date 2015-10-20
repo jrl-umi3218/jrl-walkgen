@@ -340,9 +340,9 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
   vector<double> MP ;
   vector<double> ToMP ;
 
-  bool isWayPointSet = WayPoint_x != WayPoint_y &&
-                       WayPoint_y != WayPoint_z &&
-                       WayPoint_x != WayPoint_z ;
+  bool isWayPointSet = WayPoint_y!=WayPoint_x &&
+                       (WayPoint_x*WayPoint_x >= epsilon ||
+                        WayPoint_y*WayPoint_y >= epsilon) ;
 
   bool isFootMoving = abs(m_BsplinesY->FP() - m_BsplinesY->IP())>epsilon ||
                       abs(m_BsplinesX->FP() - m_BsplinesX->IP())>epsilon ;
@@ -395,7 +395,12 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
                                               InitPosition, InitSpeed, InitAcc, FinalPosition);
 
       // Check the final and the initial position to decide what to do
-      if (FinalPosition - InitPosition > epsilon )
+      if(InitSpeed*InitSpeed > 0.00001)
+      {
+        ToMP.clear();
+        MP.clear();
+      }
+      else if (FinalPosition - InitPosition > epsilon )
         {
           ToMP.push_back(0.4*TimeInterval);
           MP.push_back(FinalPosition+WayPoint_z);
@@ -557,6 +562,12 @@ double FootTrajectoryGenerationStandard::ComputeAllWithPolynom(FootAbsolutePosit
 double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosition & aFootAbsolutePosition,
                             double Time)
 {
+  double initz(0.0),initdz(0.0),initddz(0.0) ;
+  m_BsplinesZ->Compute(0.0,
+                       initz,
+                       initdz,
+                       initddz);
+
   double UnlockedSwingPeriod = m_BsplinesY->FT() ;
   double ss_time = m_BsplinesZ->FT() ;
   double EndOfLiftOff = (ss_time-UnlockedSwingPeriod)*0.5;
@@ -566,19 +577,25 @@ double FootTrajectoryGenerationStandard::ComputeAllWithBSplines(FootAbsolutePosi
 
   double timeOfInterpolation = 0.0 ;
   //double timeOfInterpolation = Time - EndOfLiftOff ;
-  if(Time < EndOfLiftOff)
-    {
-      timeOfInterpolation = 0.0 ;
-    }
-  else if (Time < StartLanding)
-    {
-      timeOfInterpolation = Time - EndOfLiftOff ;
-    }
+  if(initdz*initdz > 0.000001)
+  {
+    timeOfInterpolation = Time ;
+  }
   else
-    {
-      timeOfInterpolation = UnlockedSwingPeriod ;
-    }
-
+  {
+    if(Time < EndOfLiftOff)
+      {
+        timeOfInterpolation = 0.0 ;
+      }
+    else if (Time < StartLanding)
+      {
+        timeOfInterpolation = Time - EndOfLiftOff ;
+      }
+    else
+      {
+        timeOfInterpolation = UnlockedSwingPeriod ;
+      }
+  }
 //  cout << "timeOfInterpolation = " << timeOfInterpolation << endl ;
 //  cout << "time = " << Time << endl ;
 

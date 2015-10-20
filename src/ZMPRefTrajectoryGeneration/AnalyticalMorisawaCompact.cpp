@@ -823,6 +823,13 @@ computing the analytical trajectories. */
                FinalLeftFootAbsolutePositions,
                FinalRightFootAbsolutePositions);
 
+    for(unsigned i=0;i<FinalCoMPositions.size();++i)
+    {
+      FinalCoMPositions[i].z[0]=lStartingCOMState.z[0];
+      FinalCoMPositions[i].z[1]=lStartingCOMState.z[1];
+      FinalCoMPositions[i].z[2]=lStartingCOMState.z[2];
+    }
+
     /*! Recompute time when a new step should be added. */
     m_UpperTimeLimitToUpdateStacks = m_AbsoluteTimeReference + m_DeltaTj[0] + m_Tdble + 0.45 * m_Tsingle;
 
@@ -844,168 +851,176 @@ computing the analytical trajectories. */
   }
 
 
-//  void AnalyticalMorisawaCompact::OnLine(double time,
-//                                           deque<ZMPPosition> & FinalZMPPositions,
-//                                           deque<COMState> & FinalCOMStates,
-//                                           deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-//                                           deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
-//    {
-//      unsigned int lIndexInterval;
-//      if (time<m_UpperTimeLimitToUpdateStacks)
-//        {
-//          if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
-//            {
-
-//              ZMPPosition aZMPPos;
-//              memset(&aZMPPos,0,sizeof(aZMPPos));
-//              COMState aCOMPos;
-//              memset(&aCOMPos,0,sizeof(aCOMPos));
-
-//              if (m_FilteringActivate)
-//                {
-//                  double FZmpX=0, FComX=0,FComdX=0;
-
-//                  // Should we filter ?
-//                  bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
-//                  if (r)
-//                    {
-//                      double FZmpY=0, FComY=0,FComdY=0;
-//                      // Yes we should.
-//                      m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
-
-//                      /*! Feed the ZMPPositions. */
-//                      aZMPPos.px = FZmpX;
-//                      aZMPPos.py = FZmpY;
-
-//                      /*! Feed the COMStates. */
-//                      aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
-//                      aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
-//                    }
-//                }
-
-
-//              /*! Feed the ZMPPositions. */
-//              double lZMPPosx=0.0,lZMPPosy=0.0;
-//              m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(time,lZMPPosx,lIndexInterval);
-//              aZMPPos.px += lZMPPosx;
-//              m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(time,lZMPPosy,lIndexInterval);
-//              aZMPPos.py += lZMPPosy;
-//              FinalZMPPositions.push_back(aZMPPos);
-
-//              /*! Feed the COMStates. */
-//              double lCOMPosx=0.0, lCOMPosdx=0.0;
-//              double lCOMPosy=0.0, lCOMPosdy=0.0;
-//              m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,lCOMPosx,lIndexInterval);
-//              m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(time,lCOMPosdx,lIndexInterval);
-//              m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,lCOMPosy,lIndexInterval);
-//              m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(time,lCOMPosdy,lIndexInterval);
-//              aCOMPos.x[0] += lCOMPosx; aCOMPos.x[1] += lCOMPosdx;
-//              aCOMPos.y[0] += lCOMPosy; aCOMPos.y[1] += lCOMPosdy;
-//              aCOMPos.z[0] = m_InitialPoseCoMHeight;
-//              FinalCOMStates.push_back(aCOMPos);
-//              /*! Feed the FootPositions. */
-
-
-//              /*! Left */
-//              FootAbsolutePosition LeftFootAbsPos;
-//              memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
-//              m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,time,LeftFootAbsPos,lIndexInterval);
-//              FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
-
-//              /*! Right */
-//              FootAbsolutePosition RightFootAbsPos;
-//              memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
-//              m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,RightFootAbsPos,lIndexInterval);
-//              FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
-
-//            }
-//        }
-//      else
-//        {
-//          /*! We reached the end of the trajectory generated
-//           and no foot steps have been added. */
-//          m_OnLineMode = false;
-//        }
-//    }
   void AnalyticalMorisawaCompact::OnLine(double time,
-                                         deque<ZMPPosition> & FinalZMPPositions,
-                                         deque<COMState> & FinalCOMStates,
-                                         deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
-                                         deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
-  {
-    unsigned int lIndexInterval;
-    if (time<m_UpperTimeLimitToUpdateStacks)
+                                           deque<ZMPPosition> & FinalZMPPositions,
+                                           deque<COMState> & FinalCOMStates,
+                                           deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+                                           deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
     {
-      if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
-      {
-        ZMPPosition aZMPPos;
-        memset(&aZMPPos,0,sizeof(aZMPPos));
-        COMState aCOMPos;
-        memset(&aCOMPos,0,sizeof(aCOMPos));
-        if (m_FilteringActivate)
+      unsigned int lIndexInterval;
+      if (time<m_UpperTimeLimitToUpdateStacks)
         {
-          double FZmpX=0, FComX=0,FComdX=0;
-          // Should we filter ?
-          bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
-          if (r)
-          {
-            double FZmpY=0, FComY=0,FComdY=0;
-            // Yes we should.
-            m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
-            /*! Feed the ZMPPositions. */
-            aZMPPos.px = FZmpX;
-            aZMPPos.py = FZmpY;
-            /*! Feed the COMStates. */
-            aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
-            aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
-          }
+          if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
+            {
+
+              ZMPPosition aZMPPos;
+              memset(&aZMPPos,0,sizeof(aZMPPos));
+              COMState aCOMPos;
+              memset(&aCOMPos,0,sizeof(aCOMPos));
+
+              if (m_FilteringActivate)
+                {
+                  double FZmpX=0, FComX=0,FComdX=0;
+
+                  // Should we filter ?
+                  bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
+                  if (r)
+                    {
+                      double FZmpY=0, FComY=0,FComdY=0;
+                      // Yes we should.
+                      m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
+
+                      /*! Feed the ZMPPositions. */
+                      aZMPPos.px = FZmpX;
+                      aZMPPos.py = FZmpY;
+
+                      /*! Feed the COMStates. */
+                      aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
+                      aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
+                    }
+                }
+
+
+              /*! Feed the ZMPPositions. */
+              double lZMPPosx=0.0,lZMPPosy=0.0;
+              m_AnalyticalZMPCoGTrajectoryX->ComputeZMP(time,lZMPPosx,lIndexInterval);
+              aZMPPos.px += lZMPPosx;
+              m_AnalyticalZMPCoGTrajectoryY->ComputeZMP(time,lZMPPosy,lIndexInterval);
+              aZMPPos.py += lZMPPosy;
+              FinalZMPPositions.push_back(aZMPPos);
+
+              /*! Feed the COMStates. */
+              double lCOMPosx=0.0, lCOMPosdx=0.0;
+              double lCOMPosy=0.0, lCOMPosdy=0.0;
+              m_AnalyticalZMPCoGTrajectoryX->ComputeCOM(time,lCOMPosx,lIndexInterval);
+              m_AnalyticalZMPCoGTrajectoryX->ComputeCOMSpeed(time,lCOMPosdx,lIndexInterval);
+              m_AnalyticalZMPCoGTrajectoryY->ComputeCOM(time,lCOMPosy,lIndexInterval);
+              m_AnalyticalZMPCoGTrajectoryY->ComputeCOMSpeed(time,lCOMPosdy,lIndexInterval);
+              aCOMPos.x[0] += lCOMPosx; aCOMPos.x[1] += lCOMPosdx;
+              aCOMPos.y[0] += lCOMPosy; aCOMPos.y[1] += lCOMPosdy;
+              aCOMPos.z[0] = m_InitialPoseCoMHeight;
+              FinalCOMStates.push_back(aCOMPos);
+              /*! Feed the FootPositions. */
+
+
+              /*! Left */
+              FootAbsolutePosition LeftFootAbsPos;
+              memset(&LeftFootAbsPos,0,sizeof(LeftFootAbsPos));
+              m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(1,time,LeftFootAbsPos,lIndexInterval);
+              FinalLeftFootAbsolutePositions.push_back(LeftFootAbsPos);
+
+              /*! Right */
+              FootAbsolutePosition RightFootAbsPos;
+              memset(&RightFootAbsPos,0,sizeof(RightFootAbsPos));
+              m_FeetTrajectoryGenerator->ComputeAnAbsoluteFootPosition(-1,time,RightFootAbsPos,lIndexInterval);
+              FinalRightFootAbsolutePositions.push_back(RightFootAbsPos);
+
+            }
         }
-
-        /*! Feed the ZMP, CoMP, and feet positions, velocities and accelerations. */
-        ctrlLF_ .clear() ;
-        ctrlRF_ .clear() ;
-        ctrlCoM_.clear() ;
-        ctrlZMP_.clear() ;
-        double previewWindowSize = 0.8 ;
-        FillQueues(m_SamplingPeriod, time, time + previewWindowSize,
-                   ctrlZMP_, ctrlCoM_, ctrlLF_, ctrlRF_);
-
-        double intPeriod = m_kajitaDynamicFilter->getInterpolationPeriod() ;
-        unsigned int IndexMax = (int)round(previewWindowSize  / intPeriod );
-        intCoM_.resize(IndexMax);
-        intLF_ .resize(IndexMax);
-        intRF_ .resize(IndexMax);
-        int inc =  (int)round( intPeriod / m_SamplingPeriod) ;
-        for (unsigned int i = 0 , j = 0 ; j < IndexMax ; i = i + inc , ++j )
+      else
         {
-          intCoM_[j] = ctrlCoM_[i] ;
-          intLF_ [j] = ctrlLF_ [i] ;
-          intRF_ [j] = ctrlRF_ [i] ;
+          /*! We reached the end of the trajectory generated
+           and no foot steps have been added. */
+          m_OnLineMode = false;
         }
-
-        //m_kajitaDynamicFilter->OnLinefilter(intCoM_,ctrlZMP_,intLF_,intRF_,outputDeltaCoM_);
-
-        //m_kajitaDynamicFilter->Debug(ctrlCoM_,ctrlLF_,ctrlRF_, intCoM_, ctrlZMP_, intLF_, intRF_, outputDeltaCoM_);
-        cout << "timeOnLine = " << time << endl ;
-        ctrlCoM_[0].x[0] += aCOMPos.x[0] + outputDeltaCoM_[0].x[0];
-        ctrlCoM_[0].x[1] += aCOMPos.x[1] + outputDeltaCoM_[0].x[1];
-        ctrlCoM_[0].x[2] +=                outputDeltaCoM_[0].x[2];
-        ctrlCoM_[0].y[0] += aCOMPos.y[0] + outputDeltaCoM_[0].y[0];
-        ctrlCoM_[0].y[1] += aCOMPos.y[1] + outputDeltaCoM_[0].y[1];
-        ctrlCoM_[0].y[2] +=                outputDeltaCoM_[0].y[2];
-        FinalCOMStates.push_back(ctrlCoM_[0]);
-        FinalZMPPositions.push_back(ctrlZMP_[0]);
-        FinalLeftFootAbsolutePositions.push_back(ctrlLF_[0]);
-        FinalRightFootAbsolutePositions.push_back(ctrlRF_[0]);
-      }
     }
-    else
-    {
-      /*! We reached the end of the trajectory generated
-          and no foot steps have been added. */
-      m_OnLineMode = false;
-    }
-  }
+//  void AnalyticalMorisawaCompact::OnLine(double time,
+//                                         deque<ZMPPosition> & FinalZMPPositions,
+//                                         deque<COMState> & FinalCOMStates,
+//                                         deque<FootAbsolutePosition> &FinalLeftFootAbsolutePositions,
+//                                         deque<FootAbsolutePosition> &FinalRightFootAbsolutePositions)
+//  {
+//    unsigned int lIndexInterval;
+//    if (time<m_UpperTimeLimitToUpdateStacks)
+//    {
+//      if (m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(time,lIndexInterval))
+//      {
+//        ZMPPosition aZMPPos;
+//        memset(&aZMPPos,0,sizeof(aZMPPos));
+//        COMState aCOMPos;
+//        memset(&aCOMPos,0,sizeof(aCOMPos));
+//        if (m_FilteringActivate)
+//        {
+//          double FZmpX=0, FComX=0,FComdX=0;
+//          // Should we filter ?
+//          bool r = m_FilterXaxisByPC->UpdateOneStep(time,FZmpX, FComX, FComdX);
+//          if (r)
+//          {
+//            double FZmpY=0, FComY=0,FComdY=0;
+//            // Yes we should.
+//            m_FilterYaxisByPC->UpdateOneStep(time,FZmpY, FComY, FComdY);
+//            /*! Feed the ZMPPositions. */
+//            aZMPPos.px = FZmpX;
+//            aZMPPos.py = FZmpY;
+//            /*! Feed the COMStates. */
+//            aCOMPos.x[0] = FComX; aCOMPos.x[1] = FComdX;
+//            aCOMPos.y[0] = FComY; aCOMPos.y[1] = FComdY;
+//          }
+//        }
+
+//        /*! Feed the ZMP, CoMP, and feet positions, velocities and accelerations. */
+//        ctrlLF_ .clear() ;
+//        ctrlRF_ .clear() ;
+//        ctrlCoM_.clear() ;
+//        ctrlZMP_.clear() ;
+//        double previewWindowSize = 0.8 ;
+//        if(time>=0.8)
+//        {
+//          cout << "timeOnLine = " << time << endl ;
+//        }
+//        FillQueues(m_SamplingPeriod, time, time + previewWindowSize,
+//                   ctrlZMP_, ctrlCoM_, ctrlLF_, ctrlRF_);
+
+//        double intPeriod = m_kajitaDynamicFilter->getInterpolationPeriod() ;
+//        unsigned int IndexMax = (int)round(previewWindowSize  / intPeriod );
+//        intCoM_.resize(IndexMax);
+//        intLF_ .resize(IndexMax);
+//        intRF_ .resize(IndexMax);
+//        int inc =  (int)round( intPeriod / m_SamplingPeriod) ;
+//        for (unsigned int i = 0 , j = 0 ; j < IndexMax ; i = i + inc , ++j )
+//        {
+//          intCoM_[j] = ctrlCoM_[i] ;
+//          intLF_ [j] = ctrlLF_ [i] ;
+//          intRF_ [j] = ctrlRF_ [i] ;
+//        }
+
+//        //m_kajitaDynamicFilter->OnLinefilter(intCoM_,ctrlZMP_,intLF_,intRF_,outputDeltaCoM_);
+//        outputDeltaCoM_[0].x[0]=0.0;
+//        outputDeltaCoM_[0].x[1]=0.0;
+//        outputDeltaCoM_[0].x[2]=0.0;
+//        outputDeltaCoM_[0].y[0]=0.0;
+//        outputDeltaCoM_[0].y[1]=0.0;
+//        outputDeltaCoM_[0].y[2]=0.0;
+//        //m_kajitaDynamicFilter->Debug(ctrlCoM_,ctrlLF_,ctrlRF_, intCoM_, ctrlZMP_, intLF_, intRF_, outputDeltaCoM_);
+//        ctrlCoM_[0].x[0] += aCOMPos.x[0] + outputDeltaCoM_[0].x[0];
+//        ctrlCoM_[0].x[1] += aCOMPos.x[1] + outputDeltaCoM_[0].x[1];
+//        ctrlCoM_[0].x[2] +=                outputDeltaCoM_[0].x[2];
+//        ctrlCoM_[0].y[0] += aCOMPos.y[0] + outputDeltaCoM_[0].y[0];
+//        ctrlCoM_[0].y[1] += aCOMPos.y[1] + outputDeltaCoM_[0].y[1];
+//        ctrlCoM_[0].y[2] +=                outputDeltaCoM_[0].y[2];
+//        FinalCOMStates.push_back(ctrlCoM_[0]);
+//        FinalZMPPositions.push_back(ctrlZMP_[0]);
+//        FinalLeftFootAbsolutePositions.push_back(ctrlLF_[0]);
+//        FinalRightFootAbsolutePositions.push_back(ctrlRF_[0]);
+//      }
+//    }
+//    else
+//    {
+//      /*! We reached the end of the trajectory generated
+//          and no foot steps have been added. */
+//      m_OnLineMode = false;
+//    }
+//  }
 
   void AnalyticalMorisawaCompact::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
                                                 deque<ZMPPosition> & FinalZMPPositions,
@@ -1095,6 +1110,13 @@ When the limit is reached, and the stack exhausted this method is called again. 
                FinalCoMPositions,
                FinalLeftFootAbsolutePositions,
                FinalRightFootAbsolutePositions);
+
+    for(unsigned i=0;i<FinalCoMPositions.size();++i)
+    {
+      FinalCoMPositions[i].z[0]=m_InitialPoseCoMHeight;
+      FinalCoMPositions[i].z[1]=0.0;
+      FinalCoMPositions[i].z[2]=0.0;
+    }
 
     m_Clock3.StopTiming();
     m_Clock3.IncIteration();
@@ -2684,8 +2706,12 @@ new step has to be generate.
       FinalPos = initCoMheight ;
       if(sx*sx+sy*sy > 0.2*0.2 && sz*sz+sz*sz < 0.00001)
       {
-          FinalTime = SStime ;
-          FinalPos = lowerCoMheight ;
+        FinalTime = SStime ;
+        FinalPos = lowerCoMheight ;
+      }else if(LastCoM.z[0] >= initCoMheight + 0.00001 || LastCoM.z[0] <= initCoMheight - 0.00001)
+      {
+        FinalTime = SStime ;
+        InitPos = lowerCoMheight ;
       }
       m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
       m_CoMbsplinesZ->Compute(interpolationTime,CoMz[0],CoMz[1],CoMz[2]) ;
@@ -2804,6 +2830,10 @@ new step has to be generate.
         {
           FinalTime = SStime ;
           InitPos = lowerCoMheight ;
+        }else
+        {
+          InitPos = initCoMheight ;
+          FinalPos = initCoMheight ;
         }
         m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
       }
