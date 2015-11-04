@@ -88,7 +88,7 @@ IF(HRP2_DYNAMICS_FOUND)
 
   IF(HRP2_14_FOUND)
 
-    math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
+    MATH(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
     CONFIG_FILES_CMAKE(TestMorisawa2007OnLine${BITS}TestFGPI.datref)
     CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalk${BITS}TestFGPI.datref)
     # CONFIG_FILES_CMAKE(TestMorisawa2007Climbing${BITS}TestFGPI.datref)
