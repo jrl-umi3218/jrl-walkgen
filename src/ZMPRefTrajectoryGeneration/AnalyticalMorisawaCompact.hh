@@ -563,9 +563,9 @@ namespace PatternGeneratorJRL
            ZMPPosition &ZMPz,
            unsigned int IndexInterval);
 
-      void ComputeCoMz(deque<COMState> & FinalCoMPositions,
-                       deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-                       deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions);
+      void ComputeCoMz(COMState & CoM,
+                       FootAbsolutePosition & LeftFoot,
+                       FootAbsolutePosition & RightFoot);
       void ComputeCoMz(double t,
                        unsigned int lIndexInterval,
                        COMState &CoMz,

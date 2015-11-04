@@ -2612,21 +2612,63 @@ new step has to be generate.
     }
   }
 
-  void AnalyticalMorisawaCompact::ComputeCoMz(deque<COMState> & FinalCoMPositions,
-                                              deque<FootAbsolutePosition> & FinalLeftFootAbsolutePositions,
-                                              deque<FootAbsolutePosition> & FinalRightFootAbsolutePositions)
+  void AnalyticalMorisawaCompact::ComputeCoMz(COMState & CoM,
+                                              FootAbsolutePosition & LeftFoot,
+                                              FootAbsolutePosition & RightFoot)
   {
-    vector<double> barriere (500,0.0) ;
-    COMState & c = FinalCoMPositions.front() ;
-    FootAbsolutePosition & lf = FinalLeftFootAbsolutePositions .front() ;
-    FootAbsolutePosition & rf = FinalRightFootAbsolutePositions.front() ;
-    double lb = 0.7;
-    double ub = 0.9;
-    barriere[0] =
-        exp( sqrt((c.x[0]-lf.x)*(c.x[0]-lf.x)+(c.y[0]-lf.y)*(c.y[0]-lf.y)+(c.z[0]-lf.z)*(c.z[0]-lf.z)) - lb)
-      + exp(-sqrt((c.x[0]-lf.x)*(c.x[0]-lf.x)+(c.y[0]-lf.y)*(c.y[0]-lf.y)+(c.z[0]-lf.z)*(c.z[0]-lf.z)) + ub)
-      + exp( sqrt((c.x[0]-rf.x)*(c.x[0]-rf.x)+(c.y[0]-rf.y)*(c.y[0]-rf.y)+(c.z[0]-rf.z)*(c.z[0]-rf.z)) - lb)
-      + exp(-sqrt((c.x[0]-rf.x)*(c.x[0]-rf.x)+(c.y[0]-rf.y)*(c.y[0]-rf.y)+(c.z[0]-rf.z)*(c.z[0]-rf.z)) + ub);
+//    vector<double> barriere (500,0.0) ;
+//    COMState & c = FinalCoMPositions.front() ;
+//    FootAbsolutePosition & lf = FinalLeftFootAbsolutePositions .front() ;
+//    FootAbsolutePosition & rf = FinalRightFootAbsolutePositions.front() ;
+//    double lb = 0.7;
+//    double ub = 0.9;
+//    barriere[0] =
+//        exp( sqrt((c.x[0]-lf.x)*(c.x[0]-lf.x)+(c.y[0]-lf.y)*(c.y[0]-lf.y)+(c.z[0]-lf.z)*(c.z[0]-lf.z)) - lb)
+//      + exp(-sqrt((c.x[0]-lf.x)*(c.x[0]-lf.x)+(c.y[0]-lf.y)*(c.y[0]-lf.y)+(c.z[0]-lf.z)*(c.z[0]-lf.z)) + ub)
+//      + exp( sqrt((c.x[0]-rf.x)*(c.x[0]-rf.x)+(c.y[0]-rf.y)*(c.y[0]-rf.y)+(c.z[0]-rf.z)*(c.z[0]-rf.z)) - lb)
+//      + exp(-sqrt((c.x[0]-rf.x)*(c.x[0]-rf.x)+(c.y[0]-rf.y)*(c.y[0]-rf.y)+(c.z[0]-rf.z)*(c.z[0]-rf.z)) + ub);
+
+    CoM.z[0] = ( (LeftFoot.z + 0.7) + (LeftFoot.z + 0.85) + (LeftFoot.z + 0.7) + (LeftFoot.z + 0.85) ) * 0.25 ;
+    CoM.z[0] = ( (LeftFoot.dz + 0.7) + (LeftFoot.dz + 0.85) + (LeftFoot.dz + 0.7) + (LeftFoot.dz + 0.85) ) * 0.25 ;
+    CoM.z[0] = ( (LeftFoot.ddz + 0.7) + (LeftFoot.ddz + 0.85) + (LeftFoot.ddz + 0.7) + (LeftFoot.ddz + 0.85) ) * 0.25 ;
+
+//
+//    x = expt(sqrt(- (4 l  - 8 h l + 4 h  + 8) u
+//             3        2       2              3          3
+//     - (- 8 l  + 8 h l  + (8 h  - 12) l - 8 h  - 20 h) u
+//           4        3            2   2       3                4       2        2
+//     - (4 l  + 8 h l  + (8 - 24 h ) l  + (8 h  + 20 h) l + 4 h  + 20 h  + 13) u
+//               4       2        3       3          2         4       2
+//     - (- 8 h l  + (8 h  - 12) l  + (8 h  + 20 h) l  + (- 8 h  - 40 h  - 22) l
+//                    2       4         3          3       4       2        2
+//     - 4 h) u - (4 h  + 8) l  - (- 8 h  - 20 h) l  - (4 h  + 20 h  + 13) l  + 4 h l
+//          2           3/2        3           2               2
+//     - 4 h  - 16)/(4 3   ) + (4 u  + h (- 6 u  + 24 l u - 6 l  + 18)
+//               2           2            2                    3      3       1
+//     + l (- 6 u  - 9) - 6 l  u - 9 u + h  (- 6 u - 6 l) + 4 l  + 4 h )/108, -)
+//                                                                            3
+//         2                        2    2
+//     + (u  - l u + h (- u - l) + l  + h  + 3)
+//                        2              2       4         3        2       2              3          3
+//    /(9 expt(sqrt(- (4 l  - 8 h l + 4 h  + 8) u  - (- 8 l  + 8 h l  + (8 h  - 12) l - 8 h  - 20 h) u
+//           4        3            2   2       3                4       2        2
+//     - (4 l  + 8 h l  + (8 - 24 h ) l  + (8 h  + 20 h) l + 4 h  + 20 h  + 13) u
+//               4       2        3       3          2         4       2
+//     - (- 8 h l  + (8 h  - 12) l  + (8 h  + 20 h) l  + (- 8 h  - 40 h  - 22) l
+//                    2       4         3          3       4       2        2
+//     - 4 h) u - (4 h  + 8) l  - (- 8 h  - 20 h) l  - (4 h  + 20 h  + 13) l  + 4 h l
+//          2           3/2        3           2               2
+//     - 4 h  - 16)/(4 3   ) + (4 u  + h (- 6 u  + 24 l u - 6 l  + 18)
+//               2           2            2                    3      3
+//     + l (- 6 u  - 9) - 6 l  u - 9 u + h  (- 6 u - 6 l) + 4 l  + 4 h )/108,
+//    1     - u - l - h
+//    -)) - -----------]
+//    3          3
+    //double l =
+    //double u =
+
+
+    //CoM.z[0];
   }
 
   void AnalyticalMorisawaCompact::ComputeCoMz(double t, unsigned int lIndexInterval, COMState &CoM, deque<COMState> & FinalCoMPositions)
