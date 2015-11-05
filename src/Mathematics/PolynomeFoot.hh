@@ -83,9 +83,9 @@ namespace PatternGeneratorJRL
                 double FP, double FS);
 
       /*!  Set the parameters
-	This method assumes implicitly a position
-	set to zero, and a speed equals to zero.
-	Final velocity is 0
+    This method assumes implicitly a position
+    set to zero, and a speed equals to zero.
+    Final velocity is 0
        */
       void SetParameters(double FT, double FP);
 
@@ -96,9 +96,9 @@ namespace PatternGeneratorJRL
                     double FP, double FS);
 
       /*! Set the parameters such that
-	the initial position, and initial speed
-	are different from zero.
-	Final velocity is 0
+    the initial position, and initial speed
+    are different from zero.
+    Final velocity is 0
        */
       void SetParametersWithInitPosInitSpeed(double FT,
                double FP,
@@ -106,9 +106,9 @@ namespace PatternGeneratorJRL
                double InitSpeed);
 
       void GetParametersWithInitPosInitSpeed(double &FT,
-					     double &FP,
-					     double &InitPos,
-					     double &InitSpeed);
+                         double &FP,
+                         double &InitPos,
+                         double &InitSpeed);
       /// Destructor.
       ~Polynome3();
 
@@ -178,7 +178,7 @@ namespace PatternGeneratorJRL
   class  Polynome5 : public PolynomeFoot
     {
     private:
-      double FP_, InitPos_, InitSpeed_,InitAcc_;
+      double InitPos_, InitSpeed_, InitAcc_, FinalPos_, FinalSpeed_, FinalAcc_;
     public:
       /** Constructor:
 	  FT: Final time
@@ -209,6 +209,12 @@ namespace PatternGeneratorJRL
       /// \brief Set parameters considering initial position, velocity, acceleration
       void SetParameters(double FT, double FP,
           double InitPos, double InitSpeed, double InitAcc, double InitJerk = 0.0);
+
+      /// \brief Set parameters considering initial position, velocity, acceleration,
+      /// and final poistion, velocity and acceleration
+      void SetParameters(double FT,
+                         double InitPos, double InitSpeed, double InitAcc,
+                         double FinalPos, double FinalSpeed, double FinalAcc);
 
       /// Destructor.
       ~Polynome5();
