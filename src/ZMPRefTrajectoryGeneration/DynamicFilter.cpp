@@ -268,8 +268,11 @@ int DynamicFilter::OnLinefilter(
     }
     for(unsigned i=0 ; i<N-1  ; ++i)
     {
-      Polynome3 polyX(inc,ZMPMB_vec_[i][0],dZMPMB_vec[i][0],ZMPMB_vec_[i+1][0],dZMPMB_vec[i+1][0]);
-      Polynome3 polyY(inc,ZMPMB_vec_[i][1],dZMPMB_vec[i][1],ZMPMB_vec_[i+1][1],dZMPMB_vec[i+1][1]);
+      Polynome5 polyX(1.0,0.0) ;
+      Polynome5 polyY(1.0,0.0) ;
+      polyX.SetParameters(inc,ZMPMB_vec_[i][0],dZMPMB_vec[i][0],0.0,ZMPMB_vec_[i+1][0],dZMPMB_vec[i+1][0],0.0);
+      polyY.SetParameters(inc,ZMPMB_vec_[i][1],dZMPMB_vec[i][1],0.0,ZMPMB_vec_[i+1][1],dZMPMB_vec[i+1][1],0.0);
+
       for(int j = 1 ; j < inc ; ++j)
       {
         zmpmb_i_[(i*inc)+j][0] = polyX.Compute(j) ;

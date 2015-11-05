@@ -47,7 +47,7 @@
 
 #include <Debug.hh>
 
-#define DEBUG
+//#define DEBUG
 
 using namespace std;
 using namespace PatternGeneratorJRL;
@@ -65,8 +65,8 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   m_SamplingPeriod = 0.005 ;
 
   // Generator Management
-  InterpolationPeriod_ = m_SamplingPeriod*7;
-  previewDuration_ =  (SQP_N_-1)*SQP_T_ ;
+  InterpolationPeriod_ = m_SamplingPeriod;
+  previewDuration_ =  (3.5-1)*SQP_T_ ;
   NbSampleControl_ = (int)round(SQP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(SQP_T_/InterpolationPeriod_) ;
   previewSize_ = SQP_N_ ;
