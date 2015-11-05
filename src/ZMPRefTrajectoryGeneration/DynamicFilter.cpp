@@ -7,7 +7,8 @@ using namespace metapod;
 
 DynamicFilter::DynamicFilter(
     SimplePluginManager *SPM,
-    CjrlHumanoidDynamicRobot *aHS): stage0_(0) , stage1_(1)
+    CjrlHumanoidDynamicRobot *aHS): stage0_(0) , stage1_(1),
+    MODE_PC_(OptimalControllerSolver::MODE_WITH_INITIALPOS)
 {
   controlPeriod_       = 0.0 ;
   interpolationPeriod_ = 0.0 ;
@@ -25,8 +26,7 @@ DynamicFilter::DynamicFilter(
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
   comAndFootRealization_->Initialization();
 
-  PC_ = new PreviewControl(
-        SPM,OptimalControllerSolver::MODE_WITH_INITIALPOS,false);
+  PC_ = new PreviewControl(SPM,MODE_PC_,false);
 
   deltaZMP_deq_.clear();
   ZMPMB_vec_.clear();
@@ -101,7 +101,7 @@ void DynamicFilter::init(
   PC_->SetPreviewControlTime (kajitaPCwindowSize_);
   PC_->SetSamplingPeriod (controlPeriod_);
   PC_->SetHeightOfCoM(CoMHeight_);
-  PC_->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITH_INITIALPOS);
+  PC_->ComputeOptimalWeights(MODE_PC_);
 
   ZMPMB_vec_.resize( (int)round( previewWindowSize_ / interpolationPeriod_ ), vector<double>(2));
   zmpmb_i_.resize( (int)round(previewWindowSize_ / controlPeriod_) , vector<double>(2));
@@ -206,44 +206,78 @@ int DynamicFilter::OnLinefilter(
   ZMPMB_vec_.resize( N , vector<double>(2,0.0));
   for(unsigned int i = 0 ; i < N ; ++i)
   {
-      ComputeZMPMB(interpolationPeriod_,
-                   inputCOMTraj_deq_[i],
-                   inputLeftFootTraj_deq_[i],
-                   inputRightFootTraj_deq_[i],
-                   ZMPMB_vec_[i],
-                   stage1_,
-                   currentIteration);
-      if(i == (NbI-1) || (i==0 && NbI<1) )
-        {
-          previousZMPMBConfiguration_ = ZMPMBConfiguration_;
-          previousZMPMBVelocity_      = ZMPMBVelocity_     ;
-        }
+    ComputeZMPMB(interpolationPeriod_,
+                 inputCOMTraj_deq_[i],
+                 inputLeftFootTraj_deq_[i],
+                 inputRightFootTraj_deq_[i],
+                 ZMPMB_vec_[i],
+                 stage1_,
+                 currentIteration);
+    if(i == (NbI-1) || (i==0 && NbI<1) )
+    {
+      previousZMPMBConfiguration_ = ZMPMBConfiguration_;
+      previousZMPMBVelocity_      = ZMPMBVelocity_     ;
+    }
   }
 
-  int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
+
   unsigned int N1 = inputZMPTraj_deq_.size() ;
-  zmpmb_i_.resize( N1 , vector<double>(2) ) ;
-  for(unsigned int i = 0 ; i < N-1 ; ++i)
-    {
-      zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
-    }
-  zmpmb_i_.back() = ZMPMB_vec_.back() ;
-  unsigned limit = ZMPMB_vec_.size()-1 ;
-  for(unsigned  i=0 ; i<limit  ; ++i)
+
+  if(false)
   {
-    double xA = zmpmb_i_[i*inc][0] ;
-    double yA = zmpmb_i_[i*inc][1] ;
-    double tA = i*inc ;
-    double xB = zmpmb_i_[(i+1)*inc][0] ;
-    double yB = zmpmb_i_[(i+1)*inc][1] ;
-    double tB = (i+1)*inc ;
-    for(int j = 1 ; j < inc ; ++j)
+    int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
+    zmpmb_i_.resize( N1 , vector<double>(2) ) ;
+    for(unsigned int i = 0 ; i < N-1 ; ++i)
+      zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
+
+    zmpmb_i_.back() = ZMPMB_vec_.back() ;
+    unsigned limit = ZMPMB_vec_.size()-1 ;
+    for(unsigned  i=0 ; i<limit  ; ++i)
+    {
+      double xA = zmpmb_i_[i*inc][0] ;
+      double yA = zmpmb_i_[i*inc][1] ;
+      double tA = i*inc ;
+      double xB = zmpmb_i_[(i+1)*inc][0] ;
+      double yB = zmpmb_i_[(i+1)*inc][1] ;
+      double tB = (i+1)*inc ;
+      for(int j = 1 ; j < inc ; ++j)
       {
         double t = tA+j ;
         zmpmb_i_[(i*inc)+j][0] = xA + (t-tA)*(xB-xA)/(tB-tA) ;
         zmpmb_i_[(i*inc)+j][1] = yA + (t-tA)*(yB-yA)/(tB-tA) ;
       }
+    }
   }
+  else
+  {
+    int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
+    zmpmb_i_.resize( N1 , vector<double>(2) ) ;
+    for(unsigned int i = 0 ; i < N-1 ; ++i)
+      zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
+    zmpmb_i_.back() = ZMPMB_vec_.back() ;
+
+    vector<vector<double> > dZMPMB_vec (N,vector<double>(2,0.0)) ;
+    dZMPMB_vec[0][0] = (ZMPMB_vec_[1][0]  -ZMPMB_vec_[0][0]  )/inc;
+    dZMPMB_vec[0][1] = (ZMPMB_vec_[1][1]  -ZMPMB_vec_[0][1]  )/inc;
+    dZMPMB_vec[N-1][0] = (ZMPMB_vec_[N-1][0]-ZMPMB_vec_[N-2][0])/inc;
+    dZMPMB_vec[N-1][1] = (ZMPMB_vec_[N-1][1]-ZMPMB_vec_[N-2][1])/inc;
+    for(unsigned i=1 ; i<N-2  ; ++i)
+    {
+      dZMPMB_vec[i][0] = (ZMPMB_vec_[i+1][0]-ZMPMB_vec_[i-1][0])/(2*inc);
+      dZMPMB_vec[i][1] = (ZMPMB_vec_[i+1][1]-ZMPMB_vec_[i-1][1])/(2*inc);
+    }
+    for(unsigned i=0 ; i<N-1  ; ++i)
+    {
+      Polynome3 polyX(inc,ZMPMB_vec_[i][0],dZMPMB_vec[i][0],ZMPMB_vec_[i+1][0],dZMPMB_vec[i+1][0]);
+      Polynome3 polyY(inc,ZMPMB_vec_[i][1],dZMPMB_vec[i][1],ZMPMB_vec_[i+1][1],dZMPMB_vec[i+1][1]);
+      for(int j = 1 ; j < inc ; ++j)
+      {
+        zmpmb_i_[(i*inc)+j][0] = polyX.Compute(j) ;
+        zmpmb_i_[(i*inc)+j][1] = polyY.Compute(j) ;
+      }
+    }
+  }
+
 
   comAndFootRealization_->SetPreviousConfigurationStage1(previousZMPMBConfiguration_);
   comAndFootRealization_->SetPreviousVelocityStage1(previousZMPMBVelocity_);
@@ -408,29 +442,24 @@ int DynamicFilter::OptimalControl(
   double syzmp     = syzmp_.back() ;
   double deltaZMPx = 0.0 ;
   double deltaZMPy = 0.0 ;
-  // calcul of the preview control along the "deltaZMP_deq_"
-  for (int i = 0 ; i < Nctrl ; i++ )
+
+  // computation of the preview control along the "deltaZMP_deq_"
+  for (int i = 0 ; i < Nctrl ; ++i )
   {
     PC_->OneIterationOfPreview(deltax_,deltay_,
-                               sxzmp,syzmp,
+                               sxzmp_[0],syzmp_[0],
                                inputdeltaZMP_deq,i,
                                deltaZMPx, deltaZMPy, false);
-
-    sxzmp_[i] = sxzmp ;
-    syzmp_[i] = syzmp ;
-    deltaZMPx_[i] = deltaZMPx ;
-    deltaZMPy_[i] = deltaZMPy ;
-
-    for(int j=0;j<3;j++)
+    for(int j=0;j<3;++j)
     {
       outputDeltaCOMTraj_deq_[i].x[j] = deltax_(j,0);
       outputDeltaCOMTraj_deq_[i].y[j] = deltay_(j,0);
     }
   }
   // test to verify if the Kajita PC diverged
-  for (int i = 0 ; i < Nctrl ; i++)
+  for (int i = 0 ; i < Nctrl ; ++i)
     {
-      for(int j=0;j<3;j++)
+      for(int j=0;j<3;++j)
         {
           if ( outputDeltaCOMTraj_deq_[i].x[j] == outputDeltaCOMTraj_deq_[i].x[j] ||
                outputDeltaCOMTraj_deq_[i].y[j] == outputDeltaCOMTraj_deq_[i].y[j] )

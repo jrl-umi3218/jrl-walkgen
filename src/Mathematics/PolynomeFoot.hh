@@ -76,6 +76,11 @@ namespace PatternGeneratorJRL
        FT: Final time
        FP: Final position */
       Polynome3(double FT, double FP);
+      /** Additionnal Constructor:
+        */
+      Polynome3(double FT,
+                double IP, double IS,
+                double FP, double FS);
 
       /*!  Set the parameters
 	This method assumes implicitly a position
@@ -83,6 +88,12 @@ namespace PatternGeneratorJRL
 	Final velocity is 0
        */
       void SetParameters(double FT, double FP);
+
+      /*!  Set the parameters
+       */
+      void SetParameters(double FT,
+                    double IP, double IS,
+                    double FP, double FS);
 
       /*! Set the parameters such that
 	the initial position, and initial speed

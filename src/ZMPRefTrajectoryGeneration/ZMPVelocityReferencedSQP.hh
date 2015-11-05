@@ -172,7 +172,7 @@ namespace PatternGeneratorJRL
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D LIPM_ ;
     // CoM used to reinitialize the SQP at the next iteration
-    COMState itCoM ;
+    COMState itCoM_ ;
 
     /// \brief Index where to begin the interpolation
     unsigned CurrentIndex_ ;
@@ -202,6 +202,14 @@ namespace PatternGeneratorJRL
     std::deque<COMState> COMTraj_deq_ctrl_ ;
     std::deque<FootAbsolutePosition> LeftFootTraj_deq_ctrl_ ;
     std::deque<FootAbsolutePosition> RightFootTraj_deq_ctrl_ ;
+
+    // initial value
+    bool feedBackDone_ ;
+    ZMPPosition initZMP_ ;
+    COMState initCOM_ ;
+    FootAbsolutePosition initLeftFoot_ ;
+    FootAbsolutePosition initRightFoot_ ;
+
     /// \brief Duration of the preview for filtering
     double previewDuration_ ;
     /// \brief Size of the preview for filtering

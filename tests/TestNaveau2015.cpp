@@ -906,15 +906,15 @@ protected:
 #define localNbOfEvents 9
     struct localEvent events [localNbOfEvents] =
     {
-      { 1,&TestNaveau2015::startTurningRight},
+      { 1,&TestNaveau2015::walkForward2m_s},
 //      {10*200,&TestNaveau2015::walkForward2m_s},
 //      {15*200,&TestNaveau2015::walkForward3m_s},
 //      {20*200,&TestNaveau2015::walkForward2m_s},
 //      {25*200,&TestNaveau2015::walkForward2m_s},
 //      {30*200,&TestNaveau2015::walkSidewards1m_s},
 //      {35*200,&TestNaveau2015::walkSidewards2m_s},
-      {50*200,&TestNaveau2015::stop},
-      {55*200,&TestNaveau2015::stopOnLineWalking}
+      {500*200,&TestNaveau2015::stop},
+      {510*200,&TestNaveau2015::stopOnLineWalking}
 
   };
     // Test when triggering event.

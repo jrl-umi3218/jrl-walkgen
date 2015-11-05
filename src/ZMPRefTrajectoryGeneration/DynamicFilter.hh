@@ -227,6 +227,8 @@ namespace PatternGeneratorJRL
       const unsigned int stage0_ ;
       const unsigned int stage1_ ;
 
+      const unsigned int MODE_PC_;
+
     public : // debug functions      
       // to use the vector of eigen used by metapod
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

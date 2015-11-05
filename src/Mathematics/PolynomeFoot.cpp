@@ -78,11 +78,39 @@ Polynome3::Polynome3(double FT, double FP) : PolynomeFoot(3,FT)
   SetParameters(FT,FP);
 }
 
+Polynome3::Polynome3(double FT,
+                     double IP, double IS,
+                     double FP, double FS):PolynomeFoot(3,FT)
+{
+  SetParameters(FT,IP,IS,FP,FS);
+}
+
 void Polynome3::SetParameters(double FT, double FP)
 {
   Polynome3::SetParametersWithInitPosInitSpeed(FT,FP,
                 /*InitPos*/0.0,
                 /*InitSpeed*/0.0);
+}
+
+void Polynome3::SetParameters(double FT,
+                              double IP, double IS,
+                              double FP, double FS)
+{
+  FT_ = FT;
+  FP_ = FP;
+
+  double tmp;
+  m_Coefficients[0] = IP;
+  m_Coefficients[1] = IS;
+  tmp = FT*FT;
+  if(FT == 0.0)
+  {
+    m_Coefficients[2] = 0.0;
+    m_Coefficients[3] = 0.0;
+  }else{
+    m_Coefficients[2] = (3*FP - 3*IP - (2*IS+FS)*FT)/tmp;
+    m_Coefficients[3] = ((FS+IS)*FT+ 2*IP - 2*FP)/(tmp*FT);
+  }
 }
 
 void Polynome3::SetParametersWithInitPosInitSpeed(double FT,

@@ -98,7 +98,7 @@ void
   const FootAbsolutePosition & prev_NSFAP = NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex-1];
 
   // The foot support does not move.
-  SupportFootAbsolutePositions[CurrentAbsoluteIndex] = SupportFootAbsolutePositions[StartIndex-1];
+  SupportFootAbsolutePositions[CurrentAbsoluteIndex] = SupportFootAbsolutePositions[StartIndex];
   SupportFootAbsolutePositions[CurrentAbsoluteIndex].stepType = (-1)*StepType;
 
 
@@ -149,14 +149,14 @@ void
   {
     curr_NSFAP.omega =
         m_Omega - m_PolynomeOmega2->Compute(LocalInterpolationStartTime+InterpolationTime-EndOfLiftOff)-
-        NoneSupportFootAbsolutePositions[StartIndex-1].omega2;
+        NoneSupportFootAbsolutePositions[StartIndex].omega2;
   }
   // Realize the landing.
   else
   {
     curr_NSFAP.omega =
         m_PolynomeOmega->Compute(LocalInterpolationStartTime+InterpolationTime - StartLanding) +
-        NoneSupportFootAbsolutePositions[StartIndex-1].omega - m_Omega;
+        NoneSupportFootAbsolutePositions[StartIndex].omega - m_Omega;
     //ProtectionNeeded=true;
   }
 
@@ -346,7 +346,7 @@ void
   }
   else if (CurrentSupport.Phase == DS || Time+3.0/2.0*QP_T_ > CurrentSupport.TimeLimit)
     {
-      for(int k = 0; k<=(int)(QP_T_/m_SamplingPeriod);k++)
+      for(int k = 1; k<=(int)(QP_T_/m_SamplingPeriod);k++)
         {
           FinalRightFootTraj_deq[CurrentIndex+k] = FinalRightFootTraj_deq[CurrentIndex+k-1];
           FinalLeftFootTraj_deq [CurrentIndex+k] = FinalLeftFootTraj_deq [CurrentIndex+k-1];
@@ -480,7 +480,7 @@ void OnLineFootTrajectoryGeneration::interpolate_feet_positions(
   }
   else if (CurrentSupport.Phase == DS || Time+3.0/2.0*QP_T_ > CurrentSupport.TimeLimit)
   {
-    for(int k = 0; k<=(int)(QP_T_/m_SamplingPeriod);k++)
+    for(int k = 1; k<=(int)(QP_T_/m_SamplingPeriod);k++)
     {
       FinalRightFootTraj_deq[CurrentIndex+k] = FinalRightFootTraj_deq[CurrentIndex+k-1];
       FinalLeftFootTraj_deq [CurrentIndex+k] = FinalLeftFootTraj_deq [CurrentIndex+k-1];
