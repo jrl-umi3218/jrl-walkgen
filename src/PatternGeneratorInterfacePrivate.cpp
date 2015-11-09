@@ -1441,6 +1441,11 @@ namespace PatternGeneratorJRL {
                         m_LeftFootPositions,
                         m_RightFootPositions);
       m_Running = m_ZMPVRSQP->Running();
+
+      m_ZMPVRSQP->UpdateCurrentPos(m_ZMPPositions[0],
+                                   m_COMBuffer[0],
+                                   m_LeftFootPositions[0],
+                                   m_RightFootPositions[0]);
     }
 
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,
@@ -1450,6 +1455,7 @@ namespace PatternGeneratorJRL {
                                                     CurrentConfiguration,
                                                     CurrentVelocity,
                                                     CurrentAcceleration);
+
     ODEBUG("finalCOMState: "  <<
            finalCOMState.x[0] << " " <<
            finalCOMState.x[1] << " " <<

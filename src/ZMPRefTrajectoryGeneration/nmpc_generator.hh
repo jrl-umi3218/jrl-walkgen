@@ -46,12 +46,14 @@ namespace PatternGeneratorJRL
 
     void initNMPCgenerator(support_state_t &currentSupport,
                            COMState & lStartingCOMState,
-                           reference_t & local_vel_ref);
+                           reference_t & local_vel_ref,
+                           unsigned N, unsigned nf, double T, double T_step);
     void updateInitialCondition(double time,
-                                std::deque<FootAbsolutePosition> &currentLeftFootAbsolutePosition,
-                                std::deque<FootAbsolutePosition> &currentRightFootAbsolutePosition,
+                                FootAbsolutePosition &currentLeftFootAbsolutePosition,
+                                FootAbsolutePosition &currentRightFootAbsolutePosition,
                                 COMState & currentCOMState,
-                                reference_t & local_vel_ref);
+                                reference_t & local_vel_ref
+                                );
     void solve();
 
   private:

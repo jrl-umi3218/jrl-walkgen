@@ -80,6 +80,18 @@ namespace PatternGeneratorJRL
                    COMState & lStartingCOMState,
                    MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
 
+    int UpdateCurrentPos(ZMPPosition initZMP,
+                         COMState initCOM,
+                         FootAbsolutePosition initLeftFoot,
+                         FootAbsolutePosition initRightFoot)
+    {
+      initZMP_       = initZMP       ;
+      initCOM_       = initCOM       ;
+      initLeftFoot_  = initLeftFoot  ;
+      initRightFoot_ = initRightFoot ;
+      return 0 ;
+    }
+
 
     /// \brief Update the stacks on-line
     void OnLine(double time,
@@ -168,6 +180,9 @@ namespace PatternGeneratorJRL
 
     /// \brief Nb. samplings inside preview window
     int SQP_N_;
+
+    /// \brief Nb. foot support inside preview window
+    int SQP_nf_;
 
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D LIPM_ ;

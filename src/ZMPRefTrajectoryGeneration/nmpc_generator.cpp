@@ -30,7 +30,7 @@
 #include <Debug.hh>
 
 //#define DEBUG
-//#ifdef DEBUG_COUT
+//#define DEBUG_COUT
 
 #ifdef DEBUG
 void DumpMatrix(std::string fileName, MAL_MATRIX_TYPE(double) & M)
@@ -148,13 +148,13 @@ NMPCgenerator::~NMPCgenerator()
   }
 }
 
-void NMPCgenerator::initNMPCgenerator(
-    support_state_t & currentSupport,
+void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
     COMState &lStartingCOMState,
-    reference_t &local_vel_ref)
+    reference_t &local_vel_ref,
+    unsigned N, unsigned nf, double T, double T_step)
 {
-  N_ = 16 ;
-  nf_ = 2 ;
+  N_ = N ;
+  nf_ = nf ;
   // number of degrees of freedom
   nv_ = 2*N_+3*nf_;
 
@@ -188,8 +188,8 @@ void NMPCgenerator::initNMPCgenerator(
   MAL_MATRIX_RESIZE(A0ds_  ,4,2) ;               MAL_MATRIX_FILL(A0ds_  ,0.0);
   MAL_VECTOR_RESIZE(ubB0ds_,4) ;                 MAL_VECTOR_FILL(ubB0ds_,0.0);
 
-  T_ = 0.1 ;
-  T_step_ = 0.8 ;
+  T_ = T ;
+  T_step_ = T_step ;
   alpha_ = 5.0   ; // weight for CoM velocity tracking  : 0.5 * a
   beta_  = 1e+03 ; // weight for ZMP reference tracking : 0.5 * b
   gamma_ = 5e-04 ; // weight for jerk minimization      : 0.5 * c
@@ -251,10 +251,9 @@ void NMPCgenerator::initNMPCgenerator(
 
 }
 
-void NMPCgenerator::updateInitialCondition(
-    double time,
-    deque<FootAbsolutePosition> & LeftFootAbsolutePosition_traj ,
-    deque<FootAbsolutePosition> & RightFootAbsolutePosition_traj,
+void NMPCgenerator::updateInitialCondition(double time,
+    FootAbsolutePosition & currentLeftFootAbsolutePosition,
+    FootAbsolutePosition & currentRightFootAbsolutePosition,
     COMState & currentCOMState,
     reference_t & local_vel_ref)
 {
@@ -282,9 +281,11 @@ void NMPCgenerator::updateInitialCondition(
     initializeCostFunction();
   }
 
+  deque<FootAbsolutePosition> lftraj (1,currentLeftFootAbsolutePosition);
+  deque<FootAbsolutePosition> rftraj (1,currentRightFootAbsolutePosition);
   updateFinalStateMachine(time,
-                          LeftFootAbsolutePosition_traj ,
-                          RightFootAbsolutePosition_traj);
+                          lftraj ,
+                          rftraj);
   computeFootSelectionMatrix();
   return ;
 }
@@ -934,9 +935,18 @@ void NMPCgenerator::initializeFootPoseConstraint()
   MAL_VECTOR_RESIZE(UBfoot_     ,nc_foot_);
   MAL_VECTOR_RESIZE(LBfoot_     ,nc_foot_);
 
-  MAL_MATRIX_RESIZE(SelecMat_,2,2);
-  SelecMat_(0,0) =  1; SelecMat_(0,1) = 0;
-  SelecMat_(1,0) = -1; SelecMat_(1,1) = 1;
+  MAL_MATRIX_RESIZE(SelecMat_,nf_,nf_);
+  MAL_MATRIX_SET_IDENTITY(SelecMat_);
+  for(unsigned i=1 ; i<SelecMat_.size1() ; ++i)
+  {
+    for(unsigned j=0 ; j<SelecMat_.size2() ; ++j)
+    {
+      if(i==j)
+      {
+        SelecMat_(i,j-1)=-1;
+      }
+    }
+  }
 
   MAL_MATRIX_DIM(dummy,double,2,2);
   rotMat_ .resize(nf_, dummy );
@@ -1040,9 +1050,11 @@ void NMPCgenerator::updateFootPoseConstraint()
 #ifdef DEBUG_COUT
   cout << "ASx_xy_ = " << ASx_xy_ << endl ;
 #endif
-  MAL_VECTOR_DIM(SfootX,double,2);
+  MAL_VECTOR_DIM(SfootX,double,nf_);
+  MAL_VECTOR_FILL(SfootX,0.0);
+  MAL_VECTOR_DIM(SfootY,double,nf_);
+  MAL_VECTOR_FILL(SfootY,0.0);
   SfootX(0) = support_state[0].X ; SfootX(1) = 0.0 ;
-  MAL_VECTOR_DIM(SfootY,double,2);
   SfootY(0) = support_state[0].Y ; SfootY(1) = 0.0 ;
 
   UBfoot_ = UBfoot_ + MAL_RET_A_by_B(ASx_xy_,SfootX)  + MAL_RET_A_by_B(ASy_xy_,SfootY) ;

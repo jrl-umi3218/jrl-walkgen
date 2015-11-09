@@ -61,15 +61,16 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   Running_ = false ;
   TimeBuffer_ = 0.04 ;
   SQP_T_ = 0.1 ;
-  SQP_N_ = 8 ;
+  SQP_N_ = 12 ;
+  SQP_nf_ = 2 ;
   m_SamplingPeriod = 0.005 ;
 
   // Generator Management
-  InterpolationPeriod_ = m_SamplingPeriod;
-  previewDuration_ =  (3.5-1)*SQP_T_ ;
+  InterpolationPeriod_ = m_SamplingPeriod*7;
+  previewSize_ = 8 ;
+  previewDuration_ =  previewSize_*SQP_T_ ;
   NbSampleControl_ = (int)round(SQP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(SQP_T_/InterpolationPeriod_) ;
-  previewSize_ = SQP_N_ ;
   StepPeriod_ = 0.8 ;
   SSPeriod_ = 0.7 ;
   DSPeriod_ = 0.1 ;
@@ -366,7 +367,7 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   NMPCgenerator_->T_step(StepPeriod_);
   NMPCgenerator_->initNMPCgenerator(currentSupport,
                                     lStartingCOMState,
-                                    VelRef_);
+                                    VelRef_,SQP_N_,SQP_nf_,SQP_T_,StepPeriod_);
 
   // INITIALIZE CENTER OF MASS:
   // --------------------------
@@ -389,8 +390,8 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   dynamicFilter_->init(m_SamplingPeriod,
                        InterpolationPeriod_,
                        SQP_T_,
-                       SQP_N_*SQP_T_ ,
-                       previewDuration_,
+                       previewDuration_ ,
+                       previewDuration_-SQP_T_,
                        lStartingCOMState);
 
   feedBackDone_  = false ;
@@ -422,32 +423,19 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
   // ----------------------------
   if(time + 0.00001 > UpperTimeLimitToUpdate_)
   {
-    if(feedBackDone_)
-    {
-      FinalZMPTraj_deq      .resize(1,initZMP_      );
-      FinalCOMTraj_deq      .resize(1,initCOM_      );
-      FinalLeftFootTraj_deq .resize(1,initLeftFoot_ );
-      FinalRightFootTraj_deq.resize(1,initRightFoot_);
-      feedBackDone_ = false ;
-    }else
-    {
-      ZMPPosition ZMPTrajtmp                = FinalZMPTraj_deq      [0];
-      COMState COMTrajtmp                   = FinalCOMTraj_deq      [0];
-      FootAbsolutePosition LeftFootTrajtmp  = FinalLeftFootTraj_deq [0];
-      FootAbsolutePosition RightFootTrajtmp = FinalRightFootTraj_deq[0];
-      FinalZMPTraj_deq      .resize(1,ZMPTrajtmp      );
-      FinalCOMTraj_deq      .resize(1,COMTrajtmp      );
-      FinalLeftFootTraj_deq .resize(1,LeftFootTrajtmp );
-      FinalRightFootTraj_deq.resize(1,RightFootTrajtmp);
-    }
+    FinalZMPTraj_deq      .resize(1,initZMP_      );
+    FinalCOMTraj_deq      .resize(1,initCOM_      );
+    FinalLeftFootTraj_deq .resize(1,initLeftFoot_ );
+    FinalRightFootTraj_deq.resize(1,initRightFoot_);
+    //feedBackDone_ = false ;
 
     // UPDATE INTERNAL DATA:
     // ---------------------
     VelRef_=NewVelRef_;
     NMPCgenerator_->updateInitialCondition(
         time,
-        FinalLeftFootTraj_deq ,
-        FinalRightFootTraj_deq,
+        initLeftFoot_ ,
+        initRightFoot_,
         itCoM_,
         VelRef_);
 
@@ -465,8 +453,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
         LeftFootTraj_deq_ctrl_ [i]= FinalLeftFootTraj_deq  [i] ;
         RightFootTraj_deq_ctrl_[i]= FinalRightFootTraj_deq [i] ;
     }
-    FinalZMPTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
-    FinalCOMTraj_deq.resize( NbSampleControl_ + CurrentIndex_ );
+    FinalZMPTraj_deq.resize( NbSampleControl_ + CurrentIndex_);
+    FinalCOMTraj_deq.resize( NbSampleControl_ + CurrentIndex_);
     FinalLeftFootTraj_deq .resize(NbSampleControl_ + CurrentIndex_);
     FinalRightFootTraj_deq.resize(NbSampleControl_ + CurrentIndex_);
 
@@ -476,7 +464,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     FullTrajectoryInterpolation(time);
 
     // Take only the data that are actually used by the robot
-    for(unsigned i=0 ; i<NbSampleControl_ + CurrentIndex_ ; ++i)
+    for(unsigned i=0 ; i < FinalZMPTraj_deq.size() ; ++i)
     {
       FinalZMPTraj_deq      [i] = ZMPTraj_deq_ctrl_      [i] ;
       FinalCOMTraj_deq      [i] = COMTraj_deq_ctrl_      [i] ;
@@ -511,7 +499,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
           FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
         }
       }
-    }
+    }// endif(filterOn_)
+
     // Specify that we are in the ending phase.
     if (time <= m_SamplingPeriod )
       {
@@ -592,7 +581,7 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
                                    +RightFootTraj_deq_ctrl_[i].ddtheta)*M_PI/180 ;
   }
 
-  unsigned int IndexMax = (int)round((previewDuration_+SQP_T_)  / InterpolationPeriod_ );
+  unsigned int IndexMax = (int)round(previewDuration_/InterpolationPeriod_ );
   ZMPTraj_deq_.resize(IndexMax);
   COMTraj_deq_.resize(IndexMax);
   LeftFootTraj_deq_.resize(IndexMax);
@@ -608,6 +597,12 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
     LeftFootTraj_deq_[j] = LeftFootTraj_deq_ctrl_[i] ;
     RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
   }
+
+//  ZMPTraj_deq_ctrl_      .pop_front();
+//  COMTraj_deq_ctrl_      .pop_front();
+//  LeftFootTraj_deq_ctrl_ .pop_front();
+//  RightFootTraj_deq_ctrl_.pop_front();
+
   return ;
 }
 

@@ -693,10 +693,10 @@ protected:
 //      m_PGI->ParseCmd(strm2);
 //    }
 
-    {
-      istringstream strm2(":addoneobstacle 1.5 -0.5 0.23");
-      m_PGI->ParseCmd(strm2);
-    }
+//    {
+//      istringstream strm2(":addoneobstacle 1.5 -0.5 0.23");
+//      m_PGI->ParseCmd(strm2);
+//    }
 
 
 //    {
@@ -913,8 +913,8 @@ protected:
 //      {25*200,&TestNaveau2015::walkForward2m_s},
 //      {30*200,&TestNaveau2015::walkSidewards1m_s},
 //      {35*200,&TestNaveau2015::walkSidewards2m_s},
-      {50*200,&TestNaveau2015::stop},
-      {60*200,&TestNaveau2015::stopOnLineWalking}
+      {200*200,&TestNaveau2015::stop},
+      {210*200,&TestNaveau2015::stopOnLineWalking}
 
   };
     // Test when triggering event.
