@@ -61,7 +61,7 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   Running_ = false ;
   TimeBuffer_ = 0.04 ;
   SQP_T_ = 0.1 ;
-  SQP_N_ = 12 ;
+  SQP_N_ = 16 ;
   SQP_nf_ = 2 ;
   m_SamplingPeriod = 0.005 ;
 

@@ -693,10 +693,10 @@ protected:
 //      m_PGI->ParseCmd(strm2);
 //    }
 
-//    {
-//      istringstream strm2(":addoneobstacle 1.5 -0.5 0.23");
-//      m_PGI->ParseCmd(strm2);
-//    }
+    {
+      istringstream strm2(":addoneobstacle 1.0 -0.5 0.23");
+      m_PGI->ParseCmd(strm2);
+    }
 
 
 //    {
@@ -914,9 +914,9 @@ protected:
 #define localNbOfEvents 20
     struct localEvent events [localNbOfEvents] =
     {
-      { 1,&TestNaveau2015::walkForward2m_s},
-//      {10*200,&TestNaveau2015::walkForward2m_s},
-//      {15*200,&TestNaveau2015::walkForward3m_s},
+      { 1,&TestNaveau2015::walkForward2m_s},/*
+      {10*200,&TestNaveau2015::walkForward2m_s},
+      {15*200,&TestNaveau2015::walkForward3m_s},*/
       {1000,&TestNaveau2015::perturbationForce},
       {1001,&TestNaveau2015::perturbationForce},
       {1002,&TestNaveau2015::perturbationForce},
