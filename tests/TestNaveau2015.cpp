@@ -880,6 +880,14 @@ protected:
     }
   }
 
+  void perturbationForce(PatternGeneratorInterface &aPGI)
+  {
+    {
+      istringstream strm2(":perturbationforce  0.0 125.0");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+
   void chooseTestProfile()
   {
 
@@ -903,18 +911,35 @@ protected:
       unsigned time;
       localeventHandler_t Handler ;
     };
-#define localNbOfEvents 9
+#define localNbOfEvents 20
     struct localEvent events [localNbOfEvents] =
     {
       { 1,&TestNaveau2015::walkForward2m_s},
 //      {10*200,&TestNaveau2015::walkForward2m_s},
 //      {15*200,&TestNaveau2015::walkForward3m_s},
+      {1000,&TestNaveau2015::perturbationForce},
+      {1001,&TestNaveau2015::perturbationForce},
+      {1002,&TestNaveau2015::perturbationForce},
+      {1003,&TestNaveau2015::perturbationForce},
+      {1004,&TestNaveau2015::perturbationForce},
+      {1005,&TestNaveau2015::perturbationForce},
+      {1006,&TestNaveau2015::perturbationForce},
+      {1007,&TestNaveau2015::perturbationForce},
+      {1008,&TestNaveau2015::perturbationForce},
+      {1009,&TestNaveau2015::perturbationForce},
+      {1010,&TestNaveau2015::perturbationForce},
+      {1011,&TestNaveau2015::perturbationForce},
+      {1012,&TestNaveau2015::perturbationForce},
+      {1013,&TestNaveau2015::perturbationForce},
+      {1014,&TestNaveau2015::perturbationForce},
+      {1015,&TestNaveau2015::perturbationForce},
+      {1016,&TestNaveau2015::perturbationForce},
 //      {20*200,&TestNaveau2015::walkForward2m_s},
 //      {25*200,&TestNaveau2015::walkForward2m_s},
 //      {30*200,&TestNaveau2015::walkSidewards1m_s},
 //      {35*200,&TestNaveau2015::walkSidewards2m_s},
-      {200*200,&TestNaveau2015::stop},
-      {210*200,&TestNaveau2015::stopOnLineWalking}
+      {10*200,&TestNaveau2015::stop},
+      {15*200,&TestNaveau2015::stopOnLineWalking}
 
   };
     // Test when triggering event.

@@ -112,7 +112,7 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   dynamicFilter_ = new DynamicFilter(SPM,aHS);
 
   // Register method to handle
-  const unsigned int NbMethods = 7;
+  const unsigned int NbMethods = 9;
   string aMethodName[NbMethods] =
   {":previewcontroltime",
    ":numberstepsbeforestop",
@@ -120,8 +120,9 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
    ":setfeetconstraint",
    ":addoneobstacle",
    ":updateoneobstacle",
-   ":deleteallobstacles"
-   ":feedback"
+   ":deleteallobstacles",
+   ":feedback",
+   ":perturbationforce"
   };
 
   for(unsigned int i=0;i<NbMethods;i++)
@@ -171,7 +172,7 @@ void ZMPVelocityReferencedSQP::setCoMPerturbationForce(istringstream &strm)
 {
 
   MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
-
+  MAL_VECTOR_FILL(PerturbationAcceleration_,0.0);
   strm >> PerturbationAcceleration_(2);
   strm >> PerturbationAcceleration_(5);
   PerturbationAcceleration_(2) = PerturbationAcceleration_(2)/RobotMass_;
@@ -183,6 +184,7 @@ void ZMPVelocityReferencedSQP::setCoMPerturbationForce(double x, double y)
 {
 
   MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
+  MAL_VECTOR_FILL(PerturbationAcceleration_,0.0);
 
   PerturbationAcceleration_(2) = x/RobotMass_;
   PerturbationAcceleration_(5) = y/RobotMass_;
@@ -275,6 +277,10 @@ void ZMPVelocityReferencedSQP::CallMethod(std::string & Method, std::istringstre
     strm >> initRightFoot_.ddtheta  ; // 36
     strm >> initRightFoot_.stepType ; // 37
     feedBackDone_  = true ;
+  }
+  if(Method==":perturbationforce")
+  {
+    setCoMPerturbationForce(strm);
   }
 
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
@@ -431,6 +437,12 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
 
     // UPDATE INTERNAL DATA:
     // ---------------------
+    if(PerturbationOccured_)
+    {
+      itCoM_.x[2]=PerturbationAcceleration_(2);
+      itCoM_.y[2]=PerturbationAcceleration_(5);
+      PerturbationOccured_=false;
+    }
     VelRef_=NewVelRef_;
     NMPCgenerator_->updateInitialCondition(
         time,
@@ -597,12 +609,6 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
     LeftFootTraj_deq_[j] = LeftFootTraj_deq_ctrl_[i] ;
     RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
   }
-
-//  ZMPTraj_deq_ctrl_      .pop_front();
-//  COMTraj_deq_ctrl_      .pop_front();
-//  LeftFootTraj_deq_ctrl_ .pop_front();
-//  RightFootTraj_deq_ctrl_.pop_front();
-
   return ;
 }
 
