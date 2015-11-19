@@ -689,12 +689,18 @@ protected:
     }
 
 //    {
-//      istringstream strm2(":addoneobstacle 1.0 0.5 0.23");
+//      istringstream strm2(":addoneobstacle 9.0 0.5 0.23");
+//      m_PGI->ParseCmd(strm2);
+//    }
+
+
+//    {
+//      istringstream strm2(":addoneobstacle -2.0 0.5 0.23");
 //      m_PGI->ParseCmd(strm2);
 //    }
 
     {
-      istringstream strm2(":addoneobstacle 1.0 -0.5 0.23");
+      istringstream strm2(":addoneobstacle 1.5 -0.0 0.23");
       m_PGI->ParseCmd(strm2);
     }
 
@@ -883,7 +889,7 @@ protected:
   void perturbationForce(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":perturbationforce  0.0 125.0");
+      istringstream strm2(":perturbationforce  0.0 90.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -912,6 +918,7 @@ protected:
       localeventHandler_t Handler ;
     };
 #define localNbOfEvents 20
+//#define localNbOfEvents 3
     struct localEvent events [localNbOfEvents] =
     {
       { 1,&TestNaveau2015::walkForward2m_s},/*
@@ -938,8 +945,8 @@ protected:
 //      {25*200,&TestNaveau2015::walkForward2m_s},
 //      {30*200,&TestNaveau2015::walkSidewards1m_s},
 //      {35*200,&TestNaveau2015::walkSidewards2m_s},
-      {10*200,&TestNaveau2015::stop},
-      {15*200,&TestNaveau2015::stopOnLineWalking}
+      {20*200,&TestNaveau2015::stop},
+      {25*200,&TestNaveau2015::stopOnLineWalking}
 
   };
     // Test when triggering event.
