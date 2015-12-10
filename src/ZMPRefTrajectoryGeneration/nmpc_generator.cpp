@@ -190,9 +190,9 @@ void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
 
   T_ = T ;
   T_step_ = T_step ;
-  alpha_ = 2.5   ; // weight for CoM velocity tracking  : 0.5 * a
-  beta_  = 1e+03 ; // weight for ZMP reference tracking : 0.5 * b
-  gamma_ = 1e-04 ; // weight for jerk minimization      : 0.5 * c
+  alpha_ = 2.5   ; // weight for CoM velocity tracking  : 0.5 * a ; 2.5
+  beta_  = 1e+03 ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
+  gamma_ = 1e-05 ; // weight for jerk minimization      : 0.5 * c ; 1e-04
   SecurityMarginX_ = 0.09 ;
   SecurityMarginY_ = 0.05 ;
 
@@ -1158,7 +1158,7 @@ void NMPCgenerator::updateFootVelIneqConstraint()
   double dyaw = vel_ref_.Global.Yaw ;
   double signq = dyaw>=0.0?1:-1;
 
-  double xvmax(0.4), yvmax(0.4), yawvmax(1.5) ;// [m/s,m/s,rad/s]
+  double xvmax(0.4), yvmax(0.4), yawvmax(0.3) ;// [m/s,m/s,rad/s]
 
   UBvel_(0) = (dt+T_) * xvmax + vref_x * F_kp1_x_(0) / norm_vref ;
   UBvel_(1) = (dt+T_) * yvmax + vref_y * F_kp1_y_(0) / norm_vref ;
@@ -1167,7 +1167,7 @@ void NMPCgenerator::updateFootVelIneqConstraint()
   Avel_(1, 2*N_+nf_) = vref_y / norm_vref ;
 
   Avel_ (2,2*N_+2*nf_) = signq ;
-  UBvel_(2) = (dt+T_) * yawvmax + signq * F_kp1_theta_(0) ;
+  UBvel_(2) = (dt) * yawvmax + signq * F_kp1_theta_(0) ;
 #ifdef DEBUG
   DumpMatrix("Avel_",Avel_);
   DumpVector("UBvel_",UBvel_);

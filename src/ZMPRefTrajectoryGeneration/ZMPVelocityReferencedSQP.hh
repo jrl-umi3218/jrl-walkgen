@@ -91,6 +91,19 @@ namespace PatternGeneratorJRL
       initRightFoot_ = initRightFoot ;
       return 0 ;
     }
+    int UpdateCurrentPos(MAL_VECTOR( &initZMP,double),
+                         COMState initCOM,
+                         FootAbsolutePosition initLeftFoot,
+                         FootAbsolutePosition initRightFoot)
+    {
+      initZMP_.px    = initZMP(0)    ;
+      initZMP_.py    = initZMP(1)    ;
+      initZMP_.pz    = initZMP(2)    ;
+      initCOM_       = initCOM       ;
+      initLeftFoot_  = initLeftFoot  ;
+      initRightFoot_ = initRightFoot ;
+      return 0 ;
+    }
 
 
     /// \brief Update the stacks on-line

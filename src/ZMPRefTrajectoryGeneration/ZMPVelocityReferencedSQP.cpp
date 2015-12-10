@@ -439,8 +439,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     // ---------------------
     if(PerturbationOccured_)
     {
-      itCoM_.x[2]=PerturbationAcceleration_(2);
-      itCoM_.y[2]=PerturbationAcceleration_(5);
+      itCoM_.x[2]+=PerturbationAcceleration_(2);
+      itCoM_.y[2]+=PerturbationAcceleration_(5);
       PerturbationOccured_=false;
     }
     VelRef_=NewVelRef_;

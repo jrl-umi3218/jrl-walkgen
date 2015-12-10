@@ -604,6 +604,10 @@ namespace PatternGeneratorJRL
 
     bool m_Running;
 
+    bool m_feedBackControl ;
+
+
+
     /*! \name To handle a new step.
       @{
      */
