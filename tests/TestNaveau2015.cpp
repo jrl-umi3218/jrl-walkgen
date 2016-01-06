@@ -906,7 +906,7 @@ protected:
   void perturbationForce(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":perturbationforce  -160 .0 0.0");
+      istringstream strm2(":perturbationforce  0.0 -45.0 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -927,28 +927,72 @@ protected:
   }
 
 
+//  void generateEventOnLineWalking()
+//  {
+//    double dx=0.0 ;
+//    double dy=0.0 ;
+//    double dtheta=0.0 ;
+//    if(m_OneStep.NbOfIt<dataFile_->data.size())
+//    {
+//      dx=dataFile_->data[m_OneStep.NbOfIt][1];
+//      dy=dataFile_->data[m_OneStep.NbOfIt][2];
+//      dtheta=dataFile_->data[m_OneStep.NbOfIt][3];
+//    }else if(m_OneStep.NbOfIt > dataFile_->data.size() + 15*200)
+//    {
+//      istringstream strm3(":stoppg");
+//      m_PGI->ParseCmd(strm3);
+//    }
+
+//    stringstream ss ;
+//    ss << ":setVelReference " << dx << " " << dy << " " << dtheta ;
+//    cout << ss.str() << endl ;
+//    istringstream strm(ss.str());
+//    m_PGI->ParseCmd(strm);
+//  }
+
   void generateEventOnLineWalking()
   {
-    double dx=0.0 ;
-    double dy=0.0 ;
-    double dtheta=0.0 ;
-    if(m_OneStep.NbOfIt<dataFile_->data.size())
+    #define localNbOfEvents 20
+    struct localEvent events [localNbOfEvents] =
     {
-      dx=dataFile_->data[m_OneStep.NbOfIt][1];
-      dy=dataFile_->data[m_OneStep.NbOfIt][2];
-      dtheta=dataFile_->data[m_OneStep.NbOfIt][3];
-    }else if(m_OneStep.NbOfIt > dataFile_->data.size() + 15*200)
+      { 1,&TestNaveau2015::walkForward2m_s},
+      //{10*200,&TestNaveau2015::walkForward2m_s},
+      //{15*200,&TestNaveau2015::walkForward3m_s},
+      {1000,&TestNaveau2015::perturbationForce},
+      {1001,&TestNaveau2015::perturbationForce},
+      {1002,&TestNaveau2015::perturbationForce},
+      {1003,&TestNaveau2015::perturbationForce},
+      {1004,&TestNaveau2015::perturbationForce},
+      {1005,&TestNaveau2015::perturbationForce},
+      {1006,&TestNaveau2015::perturbationForce},
+      {1007,&TestNaveau2015::perturbationForce},
+      {1008,&TestNaveau2015::perturbationForce},
+      {1009,&TestNaveau2015::perturbationForce},
+      {1010,&TestNaveau2015::perturbationForce},
+      {1011,&TestNaveau2015::perturbationForce},
+      {1012,&TestNaveau2015::perturbationForce},
+      {1013,&TestNaveau2015::perturbationForce},
+      {1014,&TestNaveau2015::perturbationForce},
+      {1015,&TestNaveau2015::perturbationForce},
+      {1016,&TestNaveau2015::perturbationForce},
+      //{20*200,&TestNaveau2015::walkForward2m_s},
+      //{25*200,&TestNaveau2015::walkForward2m_s},
+      //{30*200,&TestNaveau2015::walkSidewards1m_s},
+      //{35*200,&TestNaveau2015::walkSidewards2m_s},
+      {10*200,&TestNaveau2015::stop},
+      {15*200,&TestNaveau2015::stopOnLineWalking}
+    };
+    // Test when triggering event.
+    for(unsigned int i=0;i<localNbOfEvents;i++)
     {
-      istringstream strm3(":stoppg");
-      m_PGI->ParseCmd(strm3);
+      if ( m_OneStep.NbOfIt==events[i].time)
+      {
+        ODEBUG3("********* GENERATE EVENT EMS ***********");
+        (this->*(events[i].Handler))(*m_PGI);
+      }
     }
-
-    stringstream ss ;
-    ss << ":setVelReference " << dx << " " << dy << " " << dtheta ;
-    cout << ss.str() << endl ;
-    istringstream strm(ss.str());
-    m_PGI->ParseCmd(strm);
   }
+
   void generateEventEmergencyStop()
   {
 #define localNbOfEventsEMS 4
