@@ -457,10 +457,10 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     // Take only the data that are actually used by the robot
     for(unsigned i=0 ; i < FinalZMPTraj_deq.size() ; ++i)
     {
-      FinalZMPTraj_deq      [i] = ZMPTraj_deq_ctrl_      [i] ;
-      FinalCOMTraj_deq      [i] = COMTraj_deq_ctrl_      [i] ;
-      FinalLeftFootTraj_deq [i] = LeftFootTraj_deq_ctrl_ [i] ;
-      FinalRightFootTraj_deq[i] = RightFootTraj_deq_ctrl_[i] ;
+      FinalZMPTraj_deq      [i] = ZMPTraj_deq_ctrl_      [i+1] ;
+      FinalCOMTraj_deq      [i] = COMTraj_deq_ctrl_      [i+1] ;
+      FinalLeftFootTraj_deq [i] = LeftFootTraj_deq_ctrl_ [i+1] ;
+      FinalRightFootTraj_deq[i] = RightFootTraj_deq_ctrl_[i+1] ;
     }
 
     bool filterOn_ = true ;
@@ -591,14 +591,14 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
     RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
   }
 
-  COMTraj_deq_ctrl_      .push_back(COMTraj_deq_ctrl_      .back());
-  ZMPTraj_deq_ctrl_      .push_back(ZMPTraj_deq_ctrl_      .back());
-  LeftFootTraj_deq_ctrl_ .push_back(LeftFootTraj_deq_ctrl_ .back());
-  RightFootTraj_deq_ctrl_.push_back(RightFootTraj_deq_ctrl_.back());
-  COMTraj_deq_ctrl_      .pop_front();
-  ZMPTraj_deq_ctrl_      .pop_front();
-  LeftFootTraj_deq_ctrl_ .pop_front();
-  RightFootTraj_deq_ctrl_.pop_front();
+//  COMTraj_deq_ctrl_      .push_back(COMTraj_deq_ctrl_      .back());
+//  ZMPTraj_deq_ctrl_      .push_back(ZMPTraj_deq_ctrl_      .back());
+//  LeftFootTraj_deq_ctrl_ .push_back(LeftFootTraj_deq_ctrl_ .back());
+//  RightFootTraj_deq_ctrl_.push_back(RightFootTraj_deq_ctrl_.back());
+//  COMTraj_deq_ctrl_      .pop_front();
+//  ZMPTraj_deq_ctrl_      .pop_front();
+//  LeftFootTraj_deq_ctrl_ .pop_front();
+//  RightFootTraj_deq_ctrl_.pop_front();
   return ;
 }
 
