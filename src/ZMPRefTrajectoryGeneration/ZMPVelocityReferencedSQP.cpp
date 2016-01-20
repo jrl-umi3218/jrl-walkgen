@@ -57,7 +57,6 @@ ZMPVelocityReferencedSQP::ZMPVelocityReferencedSQP(SimplePluginManager *SPM,
 ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpperBound_(40)
 {
   // PG management
-  feedBackDone_ = false ;
   Running_ = false ;
   TimeBuffer_ = 0.04 ;
   SQP_T_ = 0.1 ;
@@ -112,7 +111,7 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   dynamicFilter_ = new DynamicFilter(SPM,aHS);
 
   // Register method to handle
-  const unsigned int NbMethods = 9;
+  const unsigned int NbMethods = 8;
   string aMethodName[NbMethods] =
   {":previewcontroltime",
    ":numberstepsbeforestop",
@@ -121,7 +120,6 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
    ":addoneobstacle",
    ":updateoneobstacle",
    ":deleteallobstacles",
-   ":feedback",
    ":perturbationforce"
   };
 
@@ -237,47 +235,6 @@ void ZMPVelocityReferencedSQP::CallMethod(std::string & Method, std::istringstre
     strm >> r;
     NMPCgenerator_->updateOneObstacle(id,x,y,r);
   }
-  if(Method==":feedback")
-  {
-    strm >> initZMP_.px             ; // 1
-    strm >> initZMP_.py             ; // 2
-    strm >> initCOM_.x[0]           ; // 3
-    strm >> initCOM_.x[1]           ; // 4
-    strm >> initCOM_.x[2]           ; // 5
-    strm >> initCOM_.y[0]           ; // 6
-    strm >> initCOM_.y[1]           ; // 7
-    strm >> initCOM_.y[2]           ; // 8
-    strm >> initCOM_.yaw[2]         ; // 9
-    strm >> initCOM_.yaw[2]         ; // 10
-    strm >> initCOM_.yaw[2]         ; // 11
-    strm >> initLeftFoot_.x         ; // 12
-    strm >> initLeftFoot_.dx        ; // 13
-    strm >> initLeftFoot_.ddx       ; // 14
-    strm >> initLeftFoot_.y         ; // 15
-    strm >> initLeftFoot_.dy        ; // 16
-    strm >> initLeftFoot_.ddy       ; // 17
-    strm >> initLeftFoot_.z         ; // 18
-    strm >> initLeftFoot_.dz        ; // 19
-    strm >> initLeftFoot_.ddz       ; // 20
-    strm >> initLeftFoot_.theta     ; // 21
-    strm >> initLeftFoot_.dtheta    ; // 22
-    strm >> initLeftFoot_.ddtheta   ; // 23
-    strm >> initLeftFoot_.stepType  ; // 24
-    strm >> initRightFoot_.x        ; // 25
-    strm >> initRightFoot_.dx       ; // 26
-    strm >> initRightFoot_.ddx      ; // 27
-    strm >> initRightFoot_.y        ; // 28
-    strm >> initRightFoot_.dy       ; // 29
-    strm >> initRightFoot_.ddy      ; // 30
-    strm >> initRightFoot_.z        ; // 31
-    strm >> initRightFoot_.dz       ; // 32
-    strm >> initRightFoot_.ddz      ; // 33
-    strm >> initRightFoot_.theta    ; // 34
-    strm >> initRightFoot_.dtheta   ; // 35
-    strm >> initRightFoot_.ddtheta  ; // 36
-    strm >> initRightFoot_.stepType ; // 37
-    feedBackDone_  = true ;
-  }
   if(Method==":perturbationforce")
   {
     setCoMPerturbationForce(strm);
@@ -318,10 +275,6 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
     AddArraySize = (int)ldAddArraySize;
   }
 
-//  lStartingCOMState.x[0] = InitLeftFootAbsolutePosition.x ;
-//  lStartingCOMState.y[0] = InitLeftFootAbsolutePosition.y ;
-//  lStartingCOMState.z[0] = 0.814 ;
-
   FinalZMPTraj_deq.resize(AddArraySize);
   FinalCoMPositions_deq.resize(AddArraySize);
   FinalLeftFootTraj_deq.resize(AddArraySize);
@@ -355,13 +308,10 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   // INITIAL SUPPORT STATE:
   // ----------------------
   support_state_t currentSupport ;
-//  currentSupport.Phase = SS;
   currentSupport.Phase = DS;
   currentSupport.Foot = LEFT;
-//  currentSupport.TimeLimit = 0.8;
   currentSupport.TimeLimit = 1e+9;
   currentSupport.NbStepsLeft = 1;
-//  currentSupport.StateChanged = true;
   currentSupport.StateChanged = false;
   currentSupport.X = FinalLeftFootTraj_deq[0].x ;
   currentSupport.Y = FinalLeftFootTraj_deq[0].y ;
@@ -387,7 +337,7 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM.z[0] = lStartingCOMState.z[0];
   CoM.z[1] = lStartingCOMState.z[1];
   CoM.z[2] = lStartingCOMState.z[2];
-  itCoM_ = lStartingCOMState;
+  initCOM_ = lStartingCOMState;
   LIPM_.SetComHeight(lStartingCOMState.z[0]);
   LIPM_.InitializeSystem();
   LIPM_(CoM);
@@ -400,7 +350,6 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
                        previewDuration_-SQP_T_,
                        lStartingCOMState);
 
-  feedBackDone_  = false ;
   initZMP_       = FinalZMPTraj_deq      [0] ;
   initCOM_       = FinalCoMPositions_deq [0] ;
   initLeftFoot_  = FinalLeftFootTraj_deq [0] ;
@@ -433,14 +382,44 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     FinalCOMTraj_deq      .resize(1,initCOM_      );
     FinalLeftFootTraj_deq .resize(1,initLeftFoot_ );
     FinalRightFootTraj_deq.resize(1,initRightFoot_);
-    //feedBackDone_ = false ;
+
+
+    {
+      ofstream aof;
+      string aFileName;
+      ostringstream oss(std::ostringstream::ate);
+      oss.str("/tmp/feedback6.dat");
+      aFileName = oss.str();
+      static int vnfkeo = 0 ;
+      if ( vnfkeo == 0 )
+      {
+        aof.open(aFileName.c_str(),ofstream::out);
+        aof.close();
+      }
+      ++vnfkeo;
+      aof.open(aFileName.c_str(),ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      aof << time << " " ;                // 1
+      aof << initCOM_.x[0] << " " ;       // 2
+      aof << initCOM_.x[1] << " " ;       // 3
+      aof << initCOM_.x[2] << " " ;       // 4
+      aof << initCOM_.y[0] << " " ;       // 5
+      aof << initCOM_.y[1] << " " ;       // 6
+      aof << initCOM_.y[2] << " " ;       // 7
+      aof << initCOM_.z[0] << " " ;       // 8
+      aof << initCOM_.z[1] << " " ;       // 9
+      aof << initCOM_.z[2];               // 10
+      aof << endl ;
+      aof.close();
+    }
 
     // UPDATE INTERNAL DATA:
     // ---------------------
     if(PerturbationOccured_)
     {
-      itCoM_.x[2]+=PerturbationAcceleration_(2);
-      itCoM_.y[2]+=PerturbationAcceleration_(5);
+      initCOM_.x[2]+=PerturbationAcceleration_(2);
+      initCOM_.y[2]+=PerturbationAcceleration_(5);
       PerturbationOccured_=false;
     }
     VelRef_=NewVelRef_;
@@ -448,7 +427,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
         time,
         initLeftFoot_ ,
         initRightFoot_,
-        itCoM_,
+        initCOM_,
         VelRef_);
 
     // SOLVE PROBLEM:
@@ -458,7 +437,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     // INITIALIZE INTERPOLATION:
     // ------------------------
     CurrentIndex_ = FinalCOMTraj_deq.size();
-    for (unsigned int i = 0  ; i < CurrentIndex_ ; ++i )
+    for (unsigned int i = 0  ; i <= CurrentIndex_ ; ++i )
     {
         ZMPTraj_deq_ctrl_[i] = FinalZMPTraj_deq[i] ;
         COMTraj_deq_ctrl_[i] = FinalCOMTraj_deq[i] ;
@@ -492,7 +471,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
                                    LeftFootTraj_deq_,
                                    RightFootTraj_deq_,
                                    deltaCOMTraj_deq_);
-//      #define DEBUG
+      #define DEBUG
       #ifdef DEBUG
         dynamicFilter_->Debug(COMTraj_deq_ctrl_,
                               LeftFootTraj_deq_ctrl_,
@@ -503,14 +482,15 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
                               deltaCOMTraj_deq_);
       #endif
       // Correct the CoM.
-      for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
-      {
-        for(int j=0;j<3;j++)
-        {
-          FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
-          FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
-        }
-      }
+//      for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
+//      {
+//        for(int j=0;j<3;j++)
+//        {
+//          FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
+//          FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
+//        }
+//      }
+
     }// endif(filterOn_)
 
     // Specify that we are in the ending phase.
@@ -556,9 +536,10 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
   std::vector<double> FootStepYaw ;
   NMPCgenerator_->getSolution(JerkX, JerkY, FootStepX, FootStepY, FootStepYaw);
   const std::deque<support_state_t> & SupportStates_deq = NMPCgenerator_->SupportStates_deq();
-  LIPM_.setState(itCoM_);
+  LIPM_.setState(initCOM_);
+
   CoMZMPInterpolation(JerkX,JerkY,&LIPM_,NbSampleControl_,0,CurrentIndex_,SupportStates_deq);
-  itCoM_ = LIPM_.GetState();
+  initCOM_ = LIPM_.GetState();
 
   support_state_t currentSupport = SupportStates_deq[0] ;
   currentSupport.StepNumber=0;
@@ -609,6 +590,15 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
     LeftFootTraj_deq_[j] = LeftFootTraj_deq_ctrl_[i] ;
     RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
   }
+
+  COMTraj_deq_ctrl_      .push_back(COMTraj_deq_ctrl_      .back());
+  ZMPTraj_deq_ctrl_      .push_back(ZMPTraj_deq_ctrl_      .back());
+  LeftFootTraj_deq_ctrl_ .push_back(LeftFootTraj_deq_ctrl_ .back());
+  RightFootTraj_deq_ctrl_.push_back(RightFootTraj_deq_ctrl_.back());
+  COMTraj_deq_ctrl_      .pop_front();
+  ZMPTraj_deq_ctrl_      .pop_front();
+  LeftFootTraj_deq_ctrl_ .pop_front();
+  RightFootTraj_deq_ctrl_.pop_front();
   return ;
 }
 

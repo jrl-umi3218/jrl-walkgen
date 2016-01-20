@@ -60,6 +60,7 @@ namespace PatternGeneratorJRL {
 
     m_ObstacleDetected = false;
     m_AutoFirstStep = false;
+    m_feedBackControl = false;
 
     // Initialization of obstacle parameters informations.
     m_ObstaclePars.x=1.0;
@@ -183,7 +184,8 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::RegisterPluginMethods()
   {
-    std::string aMethodName[17] =
+#define number_of_method 18
+    std::string aMethodName[number_of_method] =
     {":LimitsFeasibility",
      ":ZMPShiftParameters",
      ":TimeDistributionParameters",
@@ -200,9 +202,10 @@ namespace PatternGeneratorJRL {
      ":HerdtOnline",
      ":NaveauOnline",
      ":setVelReference",
-     ":setCoMPerturbationForce"};
+     ":setCoMPerturbationForce",
+     ":feedBackControl"};
 
-    for(int i=0;i<16;i++)
+    for(int i=0;i<number_of_method;i++)
     {
       if (!SimplePlugin::RegisterMethod(aMethodName[i]))
       {
@@ -1208,6 +1211,16 @@ namespace PatternGeneratorJRL {
       printf("Online Naveau\n");
       //ODEBUG4("InitOnLine","DebugNaveau.txt");
     }
+    else if(aCmd==":feedBackControl")
+    {
+      std::string lFeedBack;
+      strm>> lFeedBack;
+      if (lFeedBack=="true")
+        m_feedBackControl = true ;
+      else  if (lFeedBack=="false")
+        m_feedBackControl = false;
+      ODEBUG("feedBackControl: " << m_feedBackControl);
+    }
     else if (aCmd==":setCoMPerturbationForce")
     {
       setCoMPerturbationForce(strm);
@@ -1433,6 +1446,13 @@ namespace PatternGeneratorJRL {
 
     if (m_AlgorithmforZMPCOM==ZMPCOM_NAVEAU_2015)
     {
+      if(m_feedBackControl)
+      {
+        m_ZMPVRSQP->UpdateCoM(ZMPTarget,
+                              finalCOMState);
+        //cout << "com feedbacked" << endl;
+      }
+
       ODEBUG("InternalClock:" <<m_InternalClock  <<
              " SamplingPeriod: "<<m_SamplingPeriod);
       m_ZMPVRSQP->OnLine(m_InternalClock,
@@ -1442,10 +1462,13 @@ namespace PatternGeneratorJRL {
                         m_RightFootPositions);
       m_Running = m_ZMPVRSQP->Running();
 
-      m_ZMPVRSQP->UpdateCurrentPos(m_ZMPPositions[0],
-                                   m_COMBuffer[0],
-                                   m_LeftFootPositions[0],
-                                   m_RightFootPositions[0]);
+      if (m_AlgorithmforZMPCOM==ZMPCOM_NAVEAU_2015)
+      {
+        m_ZMPVRSQP->UpdateCurrentPos(m_ZMPPositions[0],
+                                     m_COMBuffer[0],
+                                     m_LeftFootPositions[0],
+                                     m_RightFootPositions[0]);
+      }
     }
 
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,

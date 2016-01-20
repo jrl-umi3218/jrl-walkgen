@@ -158,7 +158,7 @@ namespace PatternGeneratorJRL
 
     /*! Set state. */
     void setState(com_t aCoM);
-    void setState(COMState aCoM);
+    void setState(COMState &aCoM);
     /*! @} */
 
   };

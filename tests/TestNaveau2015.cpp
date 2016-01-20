@@ -131,8 +131,8 @@ public:
       while ( getline (myfile_input,linetmp) )
       {
         stringstream line(linetmp);
-        cout << linetmp << endl ;
-        cout << line.str() << endl ;
+//        cout << linetmp << endl ;
+//        cout << line.str() << endl ;
         vector<double>tmpvector;
         for(unsigned i=0 ; i<5 ; ++i)
         {
@@ -689,21 +689,17 @@ protected:
       m_PGI->ParseCmd(strm2);
     }
 
-    //  Circle obstacle ;
-      //obstacle.x_0    = 1.0 ;
-      //obstacle.y_0    = 0.5 ;
-      //obstacle.r      = 0.23 ;
-      //obstacle.margin = 0.40 ;
-    //  obstacle.x_0    = 1.5 ;
-    //  obstacle.y_0    = -1.5 ;
-    //  obstacle.r      = 0.23 ;
-    //  obstacle.margin = 0.40 ;
-    //  obstacles_.push_back(obstacle);
-
     {
       istringstream strm2(":deleteallobstacles");
       m_PGI->ParseCmd(strm2);
     }
+
+    {
+      istringstream strm2(":feedBackControl false");
+      m_PGI->ParseCmd(strm2);
+    }
+
+
 
 //    {
 //      istringstream strm2(":addoneobstacle 9.0 0.5 0.23");

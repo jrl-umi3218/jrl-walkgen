@@ -104,6 +104,19 @@ namespace PatternGeneratorJRL
       initRightFoot_ = initRightFoot ;
       return 0 ;
     }
+    int UpdateCoM(MAL_VECTOR( &initZMP,double),
+                  COMState initCOM)
+    {
+      initCOM_.x[0] = initCOM.x[0] ;
+      initCOM_.y[0] = initCOM.y[0] ;
+      initCOM_.x[2] = initCOM.x[2] ;
+      initCOM_.y[2] = initCOM.y[2] ;
+
+      initZMP_.px    = initZMP(0)    ;
+      initZMP_.py    = initZMP(1)    ;
+      initZMP_.pz    = initZMP(2)    ;
+      return 0 ;
+    }
 
 
     /// \brief Update the stacks on-line
@@ -199,8 +212,6 @@ namespace PatternGeneratorJRL
 
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D LIPM_ ;
-    // CoM used to reinitialize the SQP at the next iteration
-    COMState itCoM_ ;
 
     /// \brief Index where to begin the interpolation
     unsigned CurrentIndex_ ;
@@ -232,7 +243,6 @@ namespace PatternGeneratorJRL
     std::deque<FootAbsolutePosition> RightFootTraj_deq_ctrl_ ;
 
     // initial value
-    bool feedBackDone_ ;
     ZMPPosition initZMP_ ;
     COMState initCOM_ ;
     FootAbsolutePosition initLeftFoot_ ;
