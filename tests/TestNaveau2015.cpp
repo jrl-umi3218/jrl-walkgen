@@ -902,7 +902,7 @@ protected:
   void perturbationForce(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":perturbationforce  0.0 -45.0 0.0");
+      istringstream strm2(":perturbationforce  0.0 0.0 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
