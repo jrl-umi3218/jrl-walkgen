@@ -163,7 +163,8 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngle
   // The  altitude of the zmp depend on the altitude of the support foot.
   aStartingZMPPosition(2) = 0.5 * (InitLeftFootPosition.z + InitRightFootPosition.z) ;
 
-  //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in   CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
+  //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in \
+  //  CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
 
 //  cout << "com = " << aStartingCOMState  << endl ;
 //  cout << "zmp = " << aStartingZMPPosition  << endl ;

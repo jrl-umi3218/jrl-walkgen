@@ -108,9 +108,21 @@ void
       || LocalInterpolationStartTime +InterpolationTime >= StartLanding)
     {
       // Do not modify x, y and theta while liftoff.
-      curr_NSFAP.x = prev_NSFAP.x;
-      curr_NSFAP.y = prev_NSFAP.y;
-      curr_NSFAP.theta = prev_NSFAP.theta;
+      curr_NSFAP.x        = prev_NSFAP.x;
+      curr_NSFAP.y        = prev_NSFAP.y;
+      curr_NSFAP.theta    = prev_NSFAP.theta;
+      curr_NSFAP.dx       = 0.0;
+      curr_NSFAP.dy       = 0.0;
+      curr_NSFAP.dtheta   = 0.0;
+      curr_NSFAP.ddx      = 0.0;
+      curr_NSFAP.ddy      = 0.0;
+      curr_NSFAP.ddtheta  = 0.0;
+      curr_NSFAP.ddx      = 0.0;
+      curr_NSFAP.ddy      = 0.0;
+      curr_NSFAP.ddtheta  = 0.0;
+      curr_NSFAP.dddx     = 0.0;
+      curr_NSFAP.dddy     = 0.0;
+      curr_NSFAP.dddtheta = 0.0;
       // And all the derivatives are null
     }
   else if (LocalInterpolationStartTime < EndOfLiftOff)
@@ -411,7 +423,7 @@ void OnLineFootTrajectoryGeneration::interpolate_feet_positions(
 
   if(CurrentIndex < 5)
   {
-    cout << Time+1.5*QP_T_ << " <? " << CurrentSupport.TimeLimit << endl ;
+    cout << CurrentSupport.Phase << " && " <<  Time+1.5*QP_T_ << " < " << CurrentSupport.TimeLimit << " : " << (CurrentSupport.Phase == SS && Time+1.5*QP_T_ < CurrentSupport.TimeLimit) <<endl ;
   }
   if(CurrentSupport.Phase == SS && Time+1.5*QP_T_ < CurrentSupport.TimeLimit)
   {
