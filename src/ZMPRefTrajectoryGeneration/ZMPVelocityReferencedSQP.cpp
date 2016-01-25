@@ -83,7 +83,7 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
 
   // interpolation management
   StepHeight_ = 0.05 ;
-  CurrentIndex_ = 0 ;
+  CurrentIndex_ = 1 ;
 
   // Save the reference to HDR
   HDR_ = aHS ;
@@ -354,6 +354,7 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   initCOM_       = FinalCoMPositions_deq [0] ;
   initLeftFoot_  = FinalLeftFootTraj_deq [0] ;
   initRightFoot_ = FinalRightFootTraj_deq[0] ;
+  CurrentIndex_ = 1 ;
   return 0;
 }
 
@@ -378,42 +379,6 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
   // ----------------------------
   if(time + 0.00001 > UpperTimeLimitToUpdate_)
   {
-    FinalZMPTraj_deq      .resize(1,initZMP_      );
-    FinalCOMTraj_deq      .resize(1,initCOM_      );
-    FinalLeftFootTraj_deq .resize(1,initLeftFoot_ );
-    FinalRightFootTraj_deq.resize(1,initRightFoot_);
-
-
-    {
-      ofstream aof;
-      string aFileName;
-      ostringstream oss(std::ostringstream::ate);
-      oss.str("/tmp/feedback6.dat");
-      aFileName = oss.str();
-      static int vnfkeo = 0 ;
-      if ( vnfkeo == 0 )
-      {
-        aof.open(aFileName.c_str(),ofstream::out);
-        aof.close();
-      }
-      ++vnfkeo;
-      aof.open(aFileName.c_str(),ofstream::app);
-      aof.precision(8);
-      aof.setf(ios::scientific, ios::floatfield);
-      aof << time << " " ;                // 1
-      aof << initCOM_.x[0] << " " ;       // 2
-      aof << initCOM_.x[1] << " " ;       // 3
-      aof << initCOM_.x[2] << " " ;       // 4
-      aof << initCOM_.y[0] << " " ;       // 5
-      aof << initCOM_.y[1] << " " ;       // 6
-      aof << initCOM_.y[2] << " " ;       // 7
-      aof << initCOM_.z[0] << " " ;       // 8
-      aof << initCOM_.z[1] << " " ;       // 9
-      aof << initCOM_.z[2];               // 10
-      aof << endl ;
-      aof.close();
-    }
-
     // UPDATE INTERNAL DATA:
     // ---------------------
     if(PerturbationOccured_)
@@ -436,13 +401,12 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
 
     // INITIALIZE INTERPOLATION:
     // ------------------------
-    CurrentIndex_ = FinalCOMTraj_deq.size();
     for (unsigned int i = 0  ; i < NbSampleControl_ + CurrentIndex_ ; ++i )
     {
-        ZMPTraj_deq_ctrl_[i] = initZMP_ ;
-        COMTraj_deq_ctrl_[i] = initCOM_ ;
-        LeftFootTraj_deq_ctrl_[i] = initLeftFoot_ ;
-        RightFootTraj_deq_ctrl_[i] = initRightFoot_ ;
+      ZMPTraj_deq_ctrl_[i] = initZMP_ ;
+      COMTraj_deq_ctrl_[i] = initCOM_ ;
+      LeftFootTraj_deq_ctrl_[i] = initLeftFoot_ ;
+      RightFootTraj_deq_ctrl_[i] = initRightFoot_ ;
     }
     FinalZMPTraj_deq.resize( NbSampleControl_ + CurrentIndex_);
     FinalCOMTraj_deq.resize( NbSampleControl_ + CurrentIndex_);
@@ -482,14 +446,18 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
                               deltaCOMTraj_deq_);
       #endif
       // Correct the CoM.
-//      for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
-//      {
-//        for(int j=0;j<3;j++)
-//        {
-//          FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
-//          FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
-//        }
-//      }
+      for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
+      {
+        for(int j=0;j<3;j++)
+        {
+          FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
+          FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
+        }
+        FinalZMPTraj_deq[i].px = FinalCOMTraj_deq[i].x[0] -
+            FinalCOMTraj_deq[i].x[2]*CoMHeight_/9.81;
+        FinalZMPTraj_deq[i].py = FinalCOMTraj_deq[i].y[0] -
+            FinalCOMTraj_deq[i].y[2]*CoMHeight_/9.81;
+      }
 
     }// endif(filterOn_)
 

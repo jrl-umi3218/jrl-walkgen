@@ -432,6 +432,11 @@ int DynamicFilter::OptimalControl(
   double deltaZMPx = 0.0 ;
   double deltaZMPy = 0.0 ;
   // computation of the preview control along the "deltaZMP_deq_"
+  for(unsigned i=0;i<3;++i)
+  {
+    deltax_(i,0)=0.0;
+    deltay_(i,0)=0.0;
+  }
   for (int i = 0 ; i < Nctrl ; ++i )
   {
     PC_->OneIterationOfPreview(deltax_,deltay_,

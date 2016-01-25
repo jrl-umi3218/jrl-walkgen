@@ -912,8 +912,8 @@ protected:
     struct localEvent events [localNbOfEventsEMS] =
     { {5*200,&TestHerdt2010::startTurningLeft2},
     {10*200,&TestHerdt2010::startTurningRight2},
-    {15.2*200,&TestHerdt2010::stop},
-    {20.8*200,&TestHerdt2010::stopOnLineWalking}};
+    {15*200,&TestHerdt2010::stop},
+    {20*200,&TestHerdt2010::stopOnLineWalking}};
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEventsEMS;i++)
       {

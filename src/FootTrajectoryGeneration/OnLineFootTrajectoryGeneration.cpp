@@ -421,10 +421,6 @@ void OnLineFootTrajectoryGeneration::interpolate_feet_positions(
     LastSFP = &(FinalLeftFootTraj_deq[CurrentIndex]);
   }
 
-  if(CurrentIndex < 5)
-  {
-    cout << CurrentSupport.Phase << " && " <<  Time+1.5*QP_T_ << " < " << CurrentSupport.TimeLimit << " : " << (CurrentSupport.Phase == SS && Time+1.5*QP_T_ < CurrentSupport.TimeLimit) <<endl ;
-  }
   if(CurrentSupport.Phase == SS && Time+1.5*QP_T_ < CurrentSupport.TimeLimit)
   {
     double LocalInterpolationStartTime = Time-(CurrentSupport.TimeLimit-(m_TDouble+m_TSingle));

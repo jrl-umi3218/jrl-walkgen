@@ -102,7 +102,9 @@ ENDIF(USE_LSSOL)
 # Add aggressive optimization flags in release mode.
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET (CMAKE_CXX_FLAGS_RELEASE
-    "-O3 -DNDEBUG")
+    "-O3 -DNDEBUG ")
+  SET (CMAKE_CXX_FLAGS
+    "-std=c++0x")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 #IF(CMAKE_COMPILER_IS_GNUCXX)

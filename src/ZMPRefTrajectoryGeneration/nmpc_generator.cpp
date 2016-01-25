@@ -241,6 +241,8 @@ void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
   // initialize the solver
   QP_ = new qpOASES::SQProblem((int)nv_,(int)nc_,qpOASES::HST_POSDEF) ;
   options_.printLevel = qpOASES::PL_NONE ;
+//  options_.initialStatusBounds = qpOASES::ST_INACTIVE ;
+
   options_.setToMPC();
   QP_->setOptions(options_);
   QP_->setPrintLevel(qpOASES::PL_NONE);

@@ -1462,13 +1462,10 @@ namespace PatternGeneratorJRL {
                         m_RightFootPositions);
       m_Running = m_ZMPVRSQP->Running();
 
-      if (m_AlgorithmforZMPCOM==ZMPCOM_NAVEAU_2015)
-      {
-        m_ZMPVRSQP->UpdateCurrentPos(m_ZMPPositions[0],
-                                     m_COMBuffer[0],
-                                     m_LeftFootPositions[0],
-                                     m_RightFootPositions[0]);
-      }
+      m_ZMPVRSQP->UpdateCurrentPos(m_ZMPPositions[0],
+                                   m_COMBuffer[0],
+                                   m_LeftFootPositions[0],
+                                   m_RightFootPositions[0]);
     }
 
     m_GlobalStrategyManager->OneGlobalStepOfControl(LeftFootPosition,
