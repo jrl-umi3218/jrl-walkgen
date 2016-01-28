@@ -254,7 +254,7 @@ public:
     std::mt19937 gen(rd());
     // values near the mean are the most likely
     // standard deviation affects the dispersion of generated values from the mean
-    double d_std(0.004),d_bias(0);
+    double d_std(0.000),d_bias(0);
     std::normal_distribution<> d(d_bias,d_std);
 
 //    std::map<int, int> hist;
