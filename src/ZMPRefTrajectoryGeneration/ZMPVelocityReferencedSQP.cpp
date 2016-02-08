@@ -352,6 +352,7 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 
   initZMP_       = FinalZMPTraj_deq      [0] ;
   initCOM_       = FinalCoMPositions_deq [0] ;
+  itCOM_         = FinalCoMPositions_deq [0] ;
   initLeftFoot_  = FinalLeftFootTraj_deq [0] ;
   initRightFoot_ = FinalRightFootTraj_deq[0] ;
   CurrentIndex_ = 1 ;
@@ -435,7 +436,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
                                    LeftFootTraj_deq_,
                                    RightFootTraj_deq_,
                                    deltaCOMTraj_deq_);
-      #define DEBUG
+//      #define DEBUG
       #ifdef DEBUG
         dynamicFilter_->Debug(COMTraj_deq_ctrl_,
                               LeftFootTraj_deq_ctrl_,
@@ -453,10 +454,10 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
           FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
           FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
         }
-        FinalZMPTraj_deq[i].px = FinalCOMTraj_deq[i].x[0] -
-            FinalCOMTraj_deq[i].x[2]*CoMHeight_/9.81;
-        FinalZMPTraj_deq[i].py = FinalCOMTraj_deq[i].y[0] -
-            FinalCOMTraj_deq[i].y[2]*CoMHeight_/9.81;
+//        FinalZMPTraj_deq[i].px = FinalCOMTraj_deq[i].x[0] -
+//            FinalCOMTraj_deq[i].x[2]*CoMHeight_/9.81;
+//        FinalZMPTraj_deq[i].py = FinalCOMTraj_deq[i].y[0] -
+//            FinalCOMTraj_deq[i].y[2]*CoMHeight_/9.81;
       }
 
     }// endif(filterOn_)
@@ -504,10 +505,10 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
   std::vector<double> FootStepYaw ;
   NMPCgenerator_->getSolution(JerkX, JerkY, FootStepX, FootStepY, FootStepYaw);
   const std::deque<support_state_t> & SupportStates_deq = NMPCgenerator_->SupportStates_deq();
-  LIPM_.setState(initCOM_);
+  LIPM_.setState(itCOM_);
 
   CoMZMPInterpolation(JerkX,JerkY,&LIPM_,NbSampleControl_,0,CurrentIndex_,SupportStates_deq);
-  initCOM_ = LIPM_.GetState();
+  itCOM_ = LIPM_.GetState();
 
   support_state_t currentSupport = SupportStates_deq[0] ;
   currentSupport.StepNumber=0;

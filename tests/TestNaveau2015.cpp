@@ -1028,8 +1028,8 @@ protected:
       //{25*200,&TestNaveau2015::walkForward2m_s},
       //{30*200,&TestNaveau2015::walkSidewards1m_s},
       //{35*200,&TestNaveau2015::walkSidewards2m_s},
-      {10*200,&TestNaveau2015::stop},
-      {15*200,&TestNaveau2015::stopOnLineWalking}
+      {800*200,&TestNaveau2015::stop},
+      {815*200,&TestNaveau2015::stopOnLineWalking}
     };
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)

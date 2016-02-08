@@ -109,8 +109,10 @@ namespace PatternGeneratorJRL
     {
       initCOM_.x[0] = initCOM.x[0] ;
       initCOM_.y[0] = initCOM.y[0] ;
-      initCOM_.x[2] = initCOM.x[2] ;
+//      initCOM_.x[1] = initCOM.x[1] ;
+//      initCOM_.y[1] = initCOM.y[1] ;
       initCOM_.y[2] = initCOM.y[2] ;
+      initCOM_.x[2] = initCOM.x[2] ;
 
       initZMP_.px    = initZMP(0)    ;
       initZMP_.py    = initZMP(1)    ;
@@ -247,6 +249,7 @@ namespace PatternGeneratorJRL
     COMState initCOM_ ;
     FootAbsolutePosition initLeftFoot_ ;
     FootAbsolutePosition initRightFoot_ ;
+    COMState itCOM_ ;
 
     /// \brief Duration of the preview for filtering
     double previewDuration_ ;
