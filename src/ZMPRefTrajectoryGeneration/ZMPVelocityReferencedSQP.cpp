@@ -168,11 +168,12 @@ ZMPVelocityReferencedSQP::~ZMPVelocityReferencedSQP()
 
 void ZMPVelocityReferencedSQP::setCoMPerturbationForce(istringstream &strm)
 {
-
+  double tmp ;
   MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
   MAL_VECTOR_FILL(PerturbationAcceleration_,0.0);
   strm >> PerturbationAcceleration_(2);
   strm >> PerturbationAcceleration_(5);
+  strm >> tmp ;
   PerturbationAcceleration_(2) = PerturbationAcceleration_(2)/RobotMass_;
   PerturbationAcceleration_(5) = PerturbationAcceleration_(5)/RobotMass_;
   PerturbationOccured_ = true;
