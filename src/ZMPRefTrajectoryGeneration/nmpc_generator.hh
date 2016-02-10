@@ -101,8 +101,8 @@ namespace PatternGeneratorJRL
 
     // construct the constant matrix depending
     // on the Euler integration scheme and the com height
-    void buildCoMIntegrationMatrix();
-    void buildCoPIntegrationMatrix(); // depend on c_k_z_
+    void buildCoMIntegrationMatrix(double t);
+    void buildCoPIntegrationMatrix(double t); // depend on c_k_z_
     void buildConvexHullSystems(); // depend on the robot
 
   public:
@@ -176,6 +176,8 @@ namespace PatternGeneratorJRL
 
     // Time variant parameter
     /////////////////////////
+
+    double time_;
 
     // [x, dx, ddx], com (pos, vel, acc) at instant t_k on axis X
     MAL_VECTOR_TYPE(double) c_k_x_;

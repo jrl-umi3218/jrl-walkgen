@@ -91,6 +91,7 @@ using namespace PatternGeneratorJRL;
 
 NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, CjrlHumanoidDynamicRobot * aHDR)
 {
+  time_=0.0;
   T_ = 0.0 ;
   N_ = 0 ;
   nf_ = 0 ;
@@ -225,8 +226,8 @@ void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
   FeetDistance_ = RFI_->DSFeetDistance();
 
   // build constant matrices
-  buildCoMIntegrationMatrix();
-  buildCoPIntegrationMatrix();
+  buildCoMIntegrationMatrix(0.1);
+  buildCoPIntegrationMatrix(0.1);
   buildConvexHullSystems();
 
   // initialize time dependant matrices
@@ -250,7 +251,6 @@ void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
   cput_ = new double[1] ;
   deltaU_ = new double[nv_];
   cput_[0] = 1e+8;
-
 }
 
 void NMPCgenerator::updateInitialCondition(double time,
@@ -259,6 +259,8 @@ void NMPCgenerator::updateInitialCondition(double time,
     COMState & currentCOMState,
     reference_t & local_vel_ref)
 {
+  time_ = time ;
+
   setLocalVelocityReference(local_vel_ref);
 
   c_k_x_(0) = currentCOMState.x[0] ;
@@ -276,19 +278,33 @@ void NMPCgenerator::updateInitialCondition(double time,
   DumpVector("c_k_x_", c_k_x_);
   DumpVector("c_k_y_", c_k_y_);
 #endif
-  if(c_k_z_!=currentCOMState.z[0])
-  {
-    c_k_z_ = currentCOMState.z[0] ;
-    buildCoPIntegrationMatrix();
-    initializeCostFunction();
-  }
+
+  c_k_z_ = currentCOMState.z[0] ;
 
   deque<FootAbsolutePosition> lftraj (1,currentLeftFootAbsolutePosition);
   deque<FootAbsolutePosition> rftraj (1,currentRightFootAbsolutePosition);
-  updateFinalStateMachine(time,
+  updateFinalStateMachine(time_,
                           lftraj ,
                           rftraj);
   computeFootSelectionMatrix();
+
+//  cout << time_ << "  "
+//       << currentSupport_.StartTime << "  "
+//       << currentSupport_.TimeLimit << "  "
+//       << endl ;
+  double T = 0.0;
+  if(currentSupport_.Phase==DS)
+    T=0.1;
+  else
+    T = (time_-currentSupport_.StartTime)
+        - ((double)(int)((time_-currentSupport_.StartTime)/0.1) * 0.1) ;
+  if(T<0.0001)
+    T=0.1;
+
+  cout << T << endl ;
+  buildCoPIntegrationMatrix(T);
+  buildCoMIntegrationMatrix(T);
+
   return ;
 }
 
@@ -304,7 +320,6 @@ void NMPCgenerator::solve()
 
 void NMPCgenerator::preprocess_solution()
 {
-  //computeInitialGuess();
   updateCoPConstraint();
   updateFootPoseConstraint();
   updateFootVelIneqConstraint();
@@ -571,10 +586,16 @@ void NMPCgenerator::computeFootSelectionMatrix()
   return ;
 }
 
-void NMPCgenerator::buildCoMIntegrationMatrix()
+void NMPCgenerator::buildCoMIntegrationMatrix(double t)
 {
+  double T = 0.0 ;
   for (unsigned i = 0 , k = 1 ; i < N_ ; ++i , k=i+1)
   {
+    if(i==0)
+      T=t;
+    else
+      T=T_;
+
     Pps_(i,0) = 1.0 ; Pps_(i,1) = k*T_ ; Pps_(i,2) = k*k*T_*T_*0.5 ;
     Pvs_(i,0) = 0.0 ; Pvs_(i,1) = 1.0  ; Pvs_(i,2) = k*T_          ;
     Pas_(i,0) = 0.0 ; Pas_(i,1) = 0.0  ; Pas_(i,2) = 1.0           ;
@@ -599,21 +620,27 @@ void NMPCgenerator::buildCoMIntegrationMatrix()
   return ;
 }
 
-void NMPCgenerator::buildCoPIntegrationMatrix()
+void NMPCgenerator::buildCoPIntegrationMatrix(double t)
 {
   const double GRAVITY = 9.81;
   MAL_MATRIX_FILL(Pzu_,0.0);
   MAL_MATRIX_FILL(Pzs_,0.0);
   double k=1.0;
+  double T = 0.0;
   for (unsigned i = 0 ; i < N_ ; ++i , k=i+1)
   {
+    if(i==0)
+      T=t;
+    else
+      T=T_;
+
     Pzs_(i,0) = 1.0 ;
-    Pzs_(i,1) = k*T_ ;
-    Pzs_(i,2) = (double)k*(double)k*T_*T_*0.5 - c_k_z_/GRAVITY ;
+    Pzs_(i,1) = k*T ;
+    Pzs_(i,2) = (double)k*(double)k*T*T*0.5 - c_k_z_/GRAVITY ;
 
     for (unsigned j = 0 ; j <= i ; ++j)
     {
-      Pzu_(i,j) = (3.0*(double)(i-j)*(double)(i-j) + 3.0*(double)(i-j)+1.0)*T_*T_*T_/6.0 - T_*c_k_z_/GRAVITY ;
+      Pzu_(i,j) = (3.0*(double)(i-j)*(double)(i-j) + 3.0*(double)(i-j)+1.0)*T*T*T/6.0 - T*c_k_z_/GRAVITY ;
     }
   }
 #ifdef DEBUG
@@ -768,15 +795,7 @@ void NMPCgenerator::initializeCoPConstraint()
   MAL_VECTOR_FILL(v_kp1f_y_     ,0.0);
   MAL_MATRIX_FILL(derv_Acop_map_,0.0);
 
-  for(unsigned i=0 ; i<MAL_MATRIX_NB_ROWS(Pzu_) ; ++i)
-  {
-    for(unsigned j=0 ; j<MAL_MATRIX_NB_COLS(Pzu_) ; ++j)
-    {
-      Pzuv_(i,j)=Pzu_(i,j);
-      Pzuv_(i+N_,j+N_+nf_)=Pzu_(i,j);
-    }
-  }
-
+  // mapping matrix to compute the gradient_theta of the CoP Constraint Jacobian
   for(unsigned j=0 , k=0; j<N_ ; ++j, k+=MAL_MATRIX_NB_ROWS(A0rf_))
     for(unsigned i=0 ; i<MAL_MATRIX_NB_ROWS(A0rf_) ; ++i )
       derv_Acop_map_(i+k,j) = 1.0 ;
@@ -789,6 +808,16 @@ void NMPCgenerator::initializeCoPConstraint()
 
 void NMPCgenerator::updateCoPConstraint()
 {
+  // update the part PzuV depending on Pzu
+  for(unsigned i=0 ; i<MAL_MATRIX_NB_ROWS(Pzu_) ; ++i)
+  {
+    for(unsigned j=0 ; j<MAL_MATRIX_NB_COLS(Pzu_) ; ++j)
+    {
+      Pzuv_(i,j)=Pzu_(i,j);
+      Pzuv_(i+N_,j+N_+nf_)=Pzu_(i,j);
+    }
+  }
+
   // Compute D_kp1_, it depends on the feet hulls
   vector<double>theta_vec(3);
   theta_vec[0]=SupportStates_deq_[1].Yaw;
@@ -1293,7 +1322,7 @@ void NMPCgenerator::updateObstacleConstraint()
 void NMPCgenerator::initializeStandingConstraint()
 {
   // constraint on the foot position we force them to be next to each other
-  nc_stan_ = 3*nf_ ; // 3 beacause we constraint x,y and theta
+  nc_stan_ = 3*nf_ ; // 3 because we constraint x,y and theta
   MAL_MATRIX_RESIZE(Astan_  ,nc_stan_,nv_); MAL_MATRIX_FILL(Astan_  ,0.0);
   MAL_VECTOR_RESIZE(UBstan_ ,nc_stan_);     MAL_VECTOR_FILL(UBstan_ ,0.0);
   MAL_VECTOR_RESIZE(LBstan_ ,nc_stan_);     MAL_VECTOR_FILL(LBstan_ ,0.0);
@@ -1309,7 +1338,7 @@ void NMPCgenerator::initializeStandingConstraint()
 
 void NMPCgenerator::updateStandingConstraint()
 {
-  // this contraint is valid only if the robot isstanding still
+  // this contraint is valid only if the robot is standing still
   if(/*currentSupport_.Phase==SS*/true)
   {
     nc_stan_=0;
@@ -1401,6 +1430,21 @@ void NMPCgenerator::initializeCostFunction()
   MAL_VECTOR_RESIZE(Pvsc_x_     ,N_);             MAL_VECTOR_FILL(Pvsc_x_       , 0.0);
   MAL_VECTOR_RESIZE(Pvsc_y_     ,N_);             MAL_VECTOR_FILL(Pvsc_y_       , 0.0);
 
+
+  // Q_q = 0.5 * a * ( 1 0 )
+  //                 ( 0 1 )
+  Q_theta_ *= alpha_ ;
+
+  // Q_x_XF_, Q_x_FX_, Q_x_FF_ are time dependant matrices so they
+  // are computed in the update function
+
+  // p_xy_ =  ( p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ )
+  // p_theta_ = ( 0.5 * a * (-2) * [ f_k_theta+T_step*dTheta^ref  f_k_theta+2*T_step*dTheta^ref ] )
+  // Those are time dependant matrices so they are computed in the update function
+}
+
+void NMPCgenerator::updateCostFunction()
+{
   // Q_xXX = (  0.5 * a * Pvu^T   * Pvu + b * Pzu^T * Pzu + c * I )
   // Q_xXF = ( -0.5 * b * Pzu^T   * V_kp1 )
   // Q_xFX = ( -0.5 * b * V_kp1^T * Pzu )^T
@@ -1408,21 +1452,7 @@ void NMPCgenerator::initializeCostFunction()
   Q_x_XX_ = alpha_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_),Pvu_)
           + beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_),Pzu_)
           + gamma_ * I_NN_ ;
-  // Q_x_XF_, Q_x_FX_, Q_x_FF_ are time dependant matrices so they
-  // are computed in the update function
 
-  // Q_q = 0.5 * a * ( 1 0 )
-  //                 ( 0 1 )
-  Q_theta_ *= alpha_ ;
-
-  // p_xy_ =  ( p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ )
-  // p_theta_ = ( 0.5 * a * (-2) * [ f_k_theta+T_step*dTheta^ref  f_k_theta+2*T_step*dTheta^ref ] )
-  // Those are time dependant matrices so they are computed in the update function
-
-}
-
-void NMPCgenerator::updateCostFunction()
-{
   // number of constraint
   nc_ = nc_cop_+nc_foot_+nc_vel_+nc_rot_+nc_obs_+nc_stan_ ;
   MAL_MATRIX_RESIZE(qp_J_, nc_,nv_); MAL_MATRIX_FILL(qp_J_, 0.0);
