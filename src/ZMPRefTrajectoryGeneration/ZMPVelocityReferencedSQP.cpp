@@ -379,8 +379,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
 
   // UPDATE WALKING TRAJECTORIES:
   // ----------------------------
-  if(time + 0.00001 > UpperTimeLimitToUpdate_)
-  {
+  //if(time + 0.00001 > UpperTimeLimitToUpdate_)
+  //{
     // UPDATE INTERNAL DATA:
     // ---------------------
     if(PerturbationOccured_ &&
@@ -433,7 +433,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
       FinalRightFootTraj_deq[i] = RightFootTraj_deq_ctrl_[i] ;
     }
 
-    bool filterOn_ = true ;
+    bool filterOn_ = false ;
     if(filterOn_)
     {
 
@@ -482,7 +482,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
         }
         UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + SQP_T_;
       }
-  }
+  //}
   //-----------------------------------
   //
   //
@@ -513,7 +513,7 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
   LIPM_.setState(itCOM_);
 
   CoMZMPInterpolation(JerkX,JerkY,&LIPM_,NbSampleControl_,0,CurrentIndex_,SupportStates_deq);
-  itCOM_ = LIPM_.GetState();
+  itCOM_ = COMTraj_deq_ctrl_[1];
 
   support_state_t currentSupport = SupportStates_deq[0] ;
   currentSupport.StepNumber=0;
