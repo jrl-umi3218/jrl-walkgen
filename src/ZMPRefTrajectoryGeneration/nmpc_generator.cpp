@@ -93,6 +93,7 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, CjrlHumanoidDynamicRobo
 {
   time_=0.0;
   T_ = 0.0 ;
+  Tfirst_ = 0.0 ;
   N_ = 0 ;
   nf_ = 0 ;
   T_step_ = 0.0 ;
@@ -190,6 +191,7 @@ void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
   MAL_VECTOR_RESIZE(ubB0ds_,4) ;                 MAL_VECTOR_FILL(ubB0ds_,0.0);
 
   T_ = T ;
+  Tfirst_ = T ;
   T_step_ = T_step ;
   alpha_ = 5   ;// 1     ; // weight for CoM velocity tracking  : 0.5 * a ; 2.5
   beta_  = 1e+03 ;// 1     ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
@@ -226,8 +228,8 @@ void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
   FeetDistance_ = RFI_->DSFeetDistance();
 
   // build constant matrices
-  buildCoMIntegrationMatrix(0.1);
-  buildCoPIntegrationMatrix(0.1);
+  buildCoMIntegrationMatrix(Tfirst_);
+  buildCoPIntegrationMatrix(Tfirst_);
   buildConvexHullSystems();
 
   // initialize time dependant matrices
@@ -292,18 +294,20 @@ void NMPCgenerator::updateInitialCondition(double time,
 //       << currentSupport_.StartTime << "  "
 //       << currentSupport_.TimeLimit << "  "
 //       << endl ;
-  double T = 0.0;
   if(currentSupport_.Phase==DS)
-    T=0.1;
+    Tfirst_=0.1;
   else
-    T = (time_-currentSupport_.StartTime)
+  {
+    Tfirst_ = (time_-currentSupport_.StartTime)
         - ((double)(int)((time_-currentSupport_.StartTime)/0.1) * 0.1) ;
-  if(T<0.0001)
-    T=0.1;
+    Tfirst_ = 0.1 - Tfirst_;
+  }
+  if(Tfirst_<0.0001)
+    Tfirst_=0.1;
 
-  cout << T << endl ;
-  buildCoPIntegrationMatrix(T);
-  buildCoMIntegrationMatrix(T);
+  cout << Tfirst_ << endl ;
+  buildCoPIntegrationMatrix(Tfirst_);
+  buildCoMIntegrationMatrix(Tfirst_);
 
   return ;
 }
@@ -579,10 +583,10 @@ void NMPCgenerator::computeFootSelectionMatrix()
   DumpMatrix("V_kp1_",V_kp1_);
   DumpVector("v_kp1_",v_kp1_);
 #endif
-#ifdef DEBUG_COUT
+//#ifdef DEBUG_COUT
   cout << "V_kp1_ = " << V_kp1_ << endl ;
   cout << "v_kp1_ = " << v_kp1_ << endl ;
-#endif
+//#endif
   return ;
 }
 

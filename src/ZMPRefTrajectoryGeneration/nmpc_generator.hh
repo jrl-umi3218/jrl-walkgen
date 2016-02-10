@@ -158,6 +158,9 @@ namespace PatternGeneratorJRL
     inline void T(double T)
     {T_=T;}
 
+    inline double Tfirst()
+    {return Tfirst_ ;}
+
     // Number of sample in the SQP preview
     inline double N()
     {return N_;}
@@ -284,6 +287,8 @@ namespace PatternGeneratorJRL
 
     // Sampling period of the SQP preview
     double T_ ;
+    // Sampling period of the first SQP preview iteration
+    double Tfirst_ ;
     // Number of sample in the SQP preview
     unsigned N_ ;
     // Number of foot step planned in the preview
