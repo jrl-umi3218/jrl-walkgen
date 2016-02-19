@@ -383,10 +383,14 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
   {
     // UPDATE INTERNAL DATA:
     // ---------------------
-    if(PerturbationOccured_)
+    if(PerturbationOccured_ &&
+       NMPCgenerator_->currentSupport().NbStepsLeft>1 &&
+       NMPCgenerator_->SupportStates_deq().back().StepNumber >0)
     {
       initCOM_.x[2]+=PerturbationAcceleration_(2);
       initCOM_.y[2]+=PerturbationAcceleration_(5);
+      itCOM_.x[2]+=PerturbationAcceleration_(2);
+      itCOM_.y[2]+=PerturbationAcceleration_(5);
       PerturbationOccured_=false;
     }
     VelRef_=NewVelRef_;
@@ -406,7 +410,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     for (unsigned int i = 0  ; i < NbSampleControl_ + CurrentIndex_ ; ++i )
     {
       ZMPTraj_deq_ctrl_[i] = initZMP_ ;
-      COMTraj_deq_ctrl_[i] = initCOM_ ;
+      COMTraj_deq_ctrl_[i] = itCOM_ ;
       LeftFootTraj_deq_ctrl_[i] = initLeftFoot_ ;
       RightFootTraj_deq_ctrl_[i] = initRightFoot_ ;
     }

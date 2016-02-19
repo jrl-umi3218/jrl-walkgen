@@ -947,7 +947,7 @@ protected:
   void walkOnSpot(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.0001 0.0 0.0");
+      istringstream strm2(":setVelReference  0.1 0.0 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -955,7 +955,7 @@ protected:
   void perturbationForce(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":perturbationforce  0.0 0.0 0.0");
+      istringstream strm2(":perturbationforce  -20.0 8.0 0.0");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -1004,32 +1004,26 @@ protected:
     #define localNbOfEvents 20
     struct localEvent events [localNbOfEvents] =
     {
-      { 1,&TestNaveau2015::walkForward2m_s},
+      //{ 1,&TestNaveau2015::walkForward2m_s},
+      { 1,&TestNaveau2015::walkOnSpot},
       //{10*200,&TestNaveau2015::walkForward2m_s},
       //{15*200,&TestNaveau2015::walkForward3m_s},
-      {1000,&TestNaveau2015::perturbationForce},
-      {1001,&TestNaveau2015::perturbationForce},
-      {1002,&TestNaveau2015::perturbationForce},
-      {1003,&TestNaveau2015::perturbationForce},
-      {1004,&TestNaveau2015::perturbationForce},
-      {1005,&TestNaveau2015::perturbationForce},
-      {1006,&TestNaveau2015::perturbationForce},
-      {1007,&TestNaveau2015::perturbationForce},
-      {1008,&TestNaveau2015::perturbationForce},
-      {1009,&TestNaveau2015::perturbationForce},
-      {1010,&TestNaveau2015::perturbationForce},
-      {1011,&TestNaveau2015::perturbationForce},
-      {1012,&TestNaveau2015::perturbationForce},
-      {1013,&TestNaveau2015::perturbationForce},
-      {1014,&TestNaveau2015::perturbationForce},
-      {1015,&TestNaveau2015::perturbationForce},
-      {1016,&TestNaveau2015::perturbationForce},
+      //{1*20+5*200,&TestNaveau2015::perturbationForce},
+      //{2*20+5*200,&TestNaveau2015::perturbationForce},
+      //{3*20+5*200,&TestNaveau2015::perturbationForce},
+      //{4*20+5*200,&TestNaveau2015::perturbationForce},
+      //{5*20+5*200,&TestNaveau2015::perturbationForce},
+      //{6*20+5*200,&TestNaveau2015::perturbationForce},
+      //{7*20+5*200,&TestNaveau2015::perturbationForce},
+      //{8*20+5*200,&TestNaveau2015::perturbationForce},
+      //{9*20+5*200,&TestNaveau2015::perturbationForce},
+      //{10*20+5*200,&TestNaveau2015::perturbationForce},
       //{20*200,&TestNaveau2015::walkForward2m_s},
       //{25*200,&TestNaveau2015::walkForward2m_s},
       //{30*200,&TestNaveau2015::walkSidewards1m_s},
       //{35*200,&TestNaveau2015::walkSidewards2m_s},
-      {800*200,&TestNaveau2015::stop},
-      {815*200,&TestNaveau2015::stopOnLineWalking}
+      {15*200,&TestNaveau2015::stop},
+      {20*200,&TestNaveau2015::stopOnLineWalking}
     };
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
@@ -1039,6 +1033,18 @@ protected:
         ODEBUG3("********* GENERATE EVENT EMS ***********");
         (this->*(events[i].Handler))(*m_PGI);
       }
+    }
+    if(m_OneStep.NbOfIt>=5*200)
+    {
+      ostringstream oss ;
+      oss << ":perturbationforce "
+          //<< 15*sin((m_OneStep.NbOfIt-5*200)*0.005)
+          << -20 << " "
+          << -4 << " "
+          << " 0.0";
+      cout << oss.str() << endl ;
+      istringstream strm (oss.str()) ;
+      m_PGI->ParseCmd(strm);
     }
   }
 

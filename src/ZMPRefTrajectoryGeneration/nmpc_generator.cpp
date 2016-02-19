@@ -441,9 +441,11 @@ void NMPCgenerator::getSolution(std::vector<double> & JerkX,
   else
     sign = -1.0;
 
-  // step on the capture point at the end of the preview
+  // to be done : step on/around the capture point at the end of the preview
+#ifdef DEBUG_COUT
   cout << currentSupport_.NbStepsLeft << " "
         << SupportStates_deq_.back().StepNumber << endl;
+#endif //DEBUG_COUT
   if(currentSupport_.NbStepsLeft <= 0 && SupportStates_deq_.back().StepNumber <= 0)
   {
     FootStepX  [0] = currentSupport_.X  + sign*sin(currentSupport_.Yaw)*FeetDistance_ ;
