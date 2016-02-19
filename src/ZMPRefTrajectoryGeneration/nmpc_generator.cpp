@@ -240,7 +240,7 @@ void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
 
   // initialize the solver
   QP_ = new qpOASES::SQProblem((int)nv_,(int)nc_,qpOASES::HST_POSDEF) ;
-  options_.printLevel = qpOASES::PL_NONE ;
+  options_.printLevel = qpOASES::PL_LOW ;
 //  options_.initialStatusBounds = qpOASES::ST_INACTIVE ;
 
   options_.setToMPC();
@@ -440,21 +440,28 @@ void NMPCgenerator::getSolution(std::vector<double> & JerkX,
     sign = 1.0;
   else
     sign = -1.0;
-  // wraning "if StateChanged" we need to plan the second step
-  if(currentSupport_.StateChanged)
-    sign = -sign ;
 
   // step on the capture point at the end of the preview
-  if(currentSupport_.Phase==DS && currentSupport_.NbStepsLeft == 0)
+  cout << currentSupport_.NbStepsLeft << " "
+        << SupportStates_deq_.back().StepNumber << endl;
+  if(currentSupport_.NbStepsLeft <= 0 && SupportStates_deq_.back().StepNumber <= 0)
   {
-    for(unsigned i=0 ; i<nf ; ++i)
+    FootStepX  [0] = currentSupport_.X  + sign*sin(currentSupport_.Yaw)*FeetDistance_ ;
+    FootStepY  [0] = currentSupport_.Y  - sign*cos(currentSupport_.Yaw)*FeetDistance_ ;
+    FootStepYaw[0] = currentSupport_.Yaw ;
+    for(unsigned i=1 ; i<nf ; ++i)
     {
-      FootStepX  [i] = currentSupport_.X   ;
-      FootStepY  [i] = currentSupport_.Y   ;
-      FootStepYaw[i] = currentSupport_.Yaw ;
+      sign = -sign ;
+      FootStepX  [i] = FootStepX[nf-1] + sign*sin(FootStepYaw[nf-1])*FeetDistance_ ;
+      FootStepY  [i] = FootStepY[nf-1] - sign*cos(FootStepYaw[nf-1])*FeetDistance_ ;
+      FootStepYaw[i] = FootStepYaw[nf-1] ;
     }
   }else
   {
+    // warning "if StateChanged" we need to plan the second step
+    if(currentSupport_.StateChanged)
+      sign = -sign ;
+
     FootStepX  [nf] = FootStepX[nf-1] + vel_ref_.Global.X*T_ + sign*sin(FootStepYaw[nf-1])*FeetDistance_ ;
     FootStepY  [nf] = FootStepY[nf-1] + vel_ref_.Global.Y*T_ - sign*cos(FootStepYaw[nf-1])*FeetDistance_ ;
     FootStepYaw[nf] = FootStepYaw[nf-1] + vel_ref_.Global.Yaw*T_ ;
@@ -1143,33 +1150,57 @@ void NMPCgenerator::updateFootVelIneqConstraint()
       ++itBeforeLanding;
     else
       break;
+  --itBeforeLanding;
 
-  double dt = (double)itBeforeLanding * T_ ;// (t_touchdown - t)
+//  double dt = (double)itBeforeLanding * T_ - 2*T_;// (t_touchdown - t)
+//  if(dt<=0.0)
+//  {
+//    dt=0.0;
+//  }
+//  //dt=0.0;
 
-  double vref_x = vel_ref_.Global.X ;
-  double vref_y = vel_ref_.Global.Y ;
-  double norm_vref = sqrt(vref_x*vref_x + vref_y*vref_y ) ;
-  if (norm_vref<=1e-5)
-  {
-    // in that case we use arbitrary velocity reference
-    // to not get division by zero
-    vref_x = 1.0 ;
-    vref_y = 0.0 ;
-    norm_vref = 1.0;
-  }
-  double dyaw = vel_ref_.Global.Yaw ;
-  double signq = dyaw>=0.0?1:-1;
+//  double vref_x = vel_ref_.Global.X ;
+//  double vref_y = vel_ref_.Global.Y ;
+//  double norm_vref = sqrt(vref_x*vref_x + vref_y*vref_y ) ;
+//  if (norm_vref<=1e-5)
+//  {
+//    // in that case we use arbitrary velocity reference
+//    // to not get division by zero
+//    vref_x = 1.0 ;
+//    vref_y = 0.0 ;
+//    norm_vref = 1.0;
+//  }
+//  double dyaw = vel_ref_.Global.Yaw ;
+//  double signq = dyaw>=0.0?1:-1;
 
-  double xvmax(0.4), yvmax(0.4), yawvmax(0.3) ;// [m/s,m/s,rad/s]
+//  double xvmax(0.4), yvmax(0.4), yawvmax(0.3) ;// [m/s,m/s,rad/s]
 
-  UBvel_(0) = (dt+T_) * xvmax + vref_x * F_kp1_x_(0) / norm_vref ;
-  UBvel_(1) = (dt+T_) * yvmax + vref_y * F_kp1_y_(0) / norm_vref ;
+//  UBvel_(0) = (dt) * xvmax + vref_x * F_kp1_x_(0) / norm_vref ;
+//  UBvel_(1) = (dt) * yvmax + vref_y * F_kp1_y_(0) / norm_vref ;
 
-  Avel_(0, N_      ) = vref_x / norm_vref ;
-  Avel_(1, 2*N_+nf_) = vref_y / norm_vref ;
+//  Avel_(0, N_      ) = vref_x / norm_vref ;
+//  Avel_(1, 2*N_+nf_) = vref_y / norm_vref ;
 
-  Avel_ (2,2*N_+2*nf_) = signq ;
-  UBvel_(2) = (dt) * yawvmax + signq * F_kp1_theta_(0) ;
+//  Avel_ (2,2*N_+2*nf_) = signq ;
+//  UBvel_(2) = (dt) * yawvmax + signq * F_kp1_theta_(0) ;
+
+
+
+  double thresh_time = 0.0 ;
+  if(itBeforeLanding < 2)
+    thresh_time=1.0;
+  Avel_(0, N_      ) = thresh_time ;
+  Avel_(1, 2*N_+nf_) = thresh_time ;
+  Avel_ (2,2*N_+2*nf_) = thresh_time ;
+
+  UBvel_(0) = F_kp1_x_(0) * thresh_time ;
+  UBvel_(1) = F_kp1_y_(0) * thresh_time ;
+  UBvel_(2) = F_kp1_theta_(0) * thresh_time;
+
+  LBvel_(0) = F_kp1_x_(0) * thresh_time ;
+  LBvel_(1) = F_kp1_y_(0) * thresh_time ;
+  LBvel_(2) = F_kp1_theta_(0) * thresh_time;
+
 #ifdef DEBUG
   DumpMatrix("Avel_",Avel_);
   DumpVector("UBvel_",UBvel_);
