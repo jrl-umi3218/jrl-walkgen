@@ -1188,20 +1188,23 @@ void NMPCgenerator::updateFootVelIneqConstraint()
 
 
 
-  double thresh_time = 0.0 ;
+  double thresh_time_pos = 0.0 ;
+  double thresh_time_rot = 0.0 ;
   if(itBeforeLanding < 2)
-    thresh_time=1.0;
-  Avel_(0, N_      ) = thresh_time ;
-  Avel_(1, 2*N_+nf_) = thresh_time ;
-  Avel_ (2,2*N_+2*nf_) = thresh_time ;
+    thresh_time_pos=1.0;
+  if(itBeforeLanding < 2)
+    thresh_time_rot=1.0;
+  Avel_(0, N_      ) = thresh_time_pos ;
+  Avel_(1, 2*N_+nf_) = thresh_time_pos ;
+  Avel_ (2,2*N_+2*nf_) = thresh_time_rot ;
 
-  UBvel_(0) = F_kp1_x_(0) * thresh_time ;
-  UBvel_(1) = F_kp1_y_(0) * thresh_time ;
-  UBvel_(2) = F_kp1_theta_(0) * thresh_time;
+  UBvel_(0) = F_kp1_x_(0) * thresh_time_pos ;
+  UBvel_(1) = F_kp1_y_(0) * thresh_time_pos ;
+  UBvel_(2) = F_kp1_theta_(0) * thresh_time_rot;
 
-  LBvel_(0) = F_kp1_x_(0) * thresh_time ;
-  LBvel_(1) = F_kp1_y_(0) * thresh_time ;
-  LBvel_(2) = F_kp1_theta_(0) * thresh_time;
+  LBvel_(0) = F_kp1_x_(0) * thresh_time_pos ;
+  LBvel_(1) = F_kp1_y_(0) * thresh_time_pos ;
+  LBvel_(2) = F_kp1_theta_(0) * thresh_time_rot;
 
 #ifdef DEBUG
   DumpMatrix("Avel_",Avel_);
