@@ -82,26 +82,6 @@ enum Profiles_t {
   PROFIL_NAVEAU_ONLINE_WALKING // 1
 };
 
-///gets White Gaussian Noise
-///having a given bias and standard deviation(std)
-double getWGNoise( double std, double bias)
-{
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  // values near the mean are the most likely
-  // standard deviation affects the dispersion of generated values from the mean
-  std::normal_distribution<> d(std,bias);
-
-  std::map<int, int> hist;
-  for(int n=0; n<10000; ++n) {
-      ++hist[std::round(d(gen))];
-  }
-  for(auto p : hist) {
-      std::cout << std::fixed << std::setprecision(1) << std::setw(2)
-                << p.first << ' ' << std::string(p.second/200, '*') << '\n';
-  }
-}
-
 class IO_TextFile
 {
 
