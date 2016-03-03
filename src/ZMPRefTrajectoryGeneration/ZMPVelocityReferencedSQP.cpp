@@ -494,7 +494,7 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
   if(LeftFootTraj_deq_ctrl_.size() < CurrentIndex_ + previewSize_ * NbSampleControl_)
   {
     COMTraj_deq_ctrl_.resize(CurrentIndex_ + previewSize_ * NbSampleControl_
-                             + CurrentIndexUpperBound_,initCOM_);
+                             + CurrentIndexUpperBound_,itCOM_);
     ZMPTraj_deq_ctrl_.resize(CurrentIndex_ + previewSize_ * NbSampleControl_
                              + CurrentIndexUpperBound_,initZMP_);
     LeftFootTraj_deq_ctrl_.resize(CurrentIndex_ + previewSize_ * NbSampleControl_
