@@ -601,10 +601,10 @@ void NMPCgenerator::computeFootSelectionMatrix()
   DumpMatrix("V_kp1_",V_kp1_);
   DumpVector("v_kp1_",v_kp1_);
 #endif
-#ifdef DEBUG_COUT
+//#ifdef DEBUG_COUT
   cout << "V_kp1_ = " << V_kp1_ << endl ;
   cout << "v_kp1_ = " << v_kp1_ << endl ;
-#endif
+//#endif
   return ;
 }
 
