@@ -421,7 +421,7 @@ void OnLineFootTrajectoryGeneration::interpolate_feet_positions(
     LastSFP = &(FinalLeftFootTraj_deq[CurrentIndex]);
   }
 
-  if(CurrentSupport.Phase == SS && Time+1.5*QP_T_ < CurrentSupport.TimeLimit)
+  if(CurrentSupport.Phase == SS && Time+QP_T_ < CurrentSupport.TimeLimit)
   {
     double LocalInterpolationStartTime = Time-(CurrentSupport.TimeLimit-(m_TDouble+m_TSingle));
     //determine coefficients of interpolation polynome
@@ -490,7 +490,7 @@ void OnLineFootTrajectoryGeneration::interpolate_feet_positions(
           FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
     }
   }
-  else if (CurrentSupport.Phase == DS || Time+3.0/2.0*QP_T_ > CurrentSupport.TimeLimit)
+  else if (CurrentSupport.Phase == DS || Time+QP_T_ > CurrentSupport.TimeLimit)
   {
     for(int k = 1; k<=(int)(QP_T_/m_SamplingPeriod);k++)
     {

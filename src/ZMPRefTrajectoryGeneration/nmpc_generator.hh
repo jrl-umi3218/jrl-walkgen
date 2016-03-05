@@ -202,6 +202,8 @@ namespace PatternGeneratorJRL
     // currentSupport_.theta, support foot at time t_k around axis Z
     support_state_t currentSupport_ ;
     std::deque<support_state_t> SupportStates_deq_ ;
+    FootAbsolutePosition currentLeftFootAbsolutePosition_;
+    FootAbsolutePosition currentRightFootAbsolutePosition_;
     SupportFSM * FSM_ ;
 
 
@@ -345,6 +347,9 @@ namespace PatternGeneratorJRL
     // left foot hull minus security margin
     MAL_MATRIX_TYPE(double) A0lf_    ;
     MAL_VECTOR_TYPE(double) ubB0lf_  ;
+    // transition hull when the two are on the ground while walking
+    MAL_MATRIX_TYPE(double) A0g_    ;
+    MAL_VECTOR_TYPE(double) ubB0g_  ;
     // foot hull minus security margin for standing still
     // or dealing with the switching mass phase
     MAL_MATRIX_TYPE(double) A0ds_   ;
