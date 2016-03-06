@@ -864,7 +864,7 @@ void NMPCgenerator::updateCoPConstraint()
       A0_theta = MAL_RET_A_by_B(A0ds_,rotMat_theta) ;
       B0 = ubB0ds_ ;
     }
-    else if(currentSupport_.Phase==SS && i==0 && time_+T_+0.005 >= currentSupport_.TimeLimit)
+    else if(currentSupport_.Phase==SS && i==0 && time_+T_ > currentSupport_.TimeLimit)
     {
       support_state_t dummySupp ;
       unsigned nbEdges = 4;
@@ -972,7 +972,7 @@ void NMPCgenerator::updateCoPConstraint()
         v_kp1f_y_(i) = v_kp1_(i) *
             (SupportStates_deq_[i+1].Y + cos(SupportStates_deq_[i+1].Yaw)*FeetDistance_*0.5);
       }
-    }else if(currentSupport_.Phase==SS && i==0 && time_+T_ >= currentSupport_.TimeLimit)
+    }else if(currentSupport_.Phase==SS && i==0 && time_+T_ > currentSupport_.TimeLimit)
     {
       double x1 (currentLeftFootAbsolutePosition_ .x);
       double y1 (currentLeftFootAbsolutePosition_ .y);

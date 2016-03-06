@@ -444,7 +444,7 @@ void OnLineFootTrajectoryGeneration::interpolate_feet_positions(
           TimeInterval,FootStepY[CurrentSupport.StepNumber],
         LastSFP->y, LastSFP->dy, LastSFP->ddy
         );
-    if(SwingTimePassed<=1e-5)
+    if(LocalInterpolationStartTime<0.001)
     {
       SetParameters(FootTrajectoryGenerationStandard::Z_AXIS,
                     m_TSingle,/*m_AnklePositionLeft[2]*/0.0,
