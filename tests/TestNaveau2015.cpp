@@ -82,91 +82,6 @@ enum Profiles_t {
   PROFIL_NAVEAU_ONLINE_WALKING // 1
 };
 
-class IO_TextFile
-{
-
-private:
-  string namefile;
-  ifstream myfile_input;
-  ofstream myfile_output;
-
-public:
-  vector<vector<double> > data ;
-
-  int WriteOnFile_AddText(string text)
-  {
-
-    myfile_output.open(namefile.c_str(),ofstream::app);
-    if (myfile_output.is_open())
-    {
-      myfile_output << text;
-      myfile_output.close();
-      return 0;
-    }
-    else
-    {
-      cout << "Unable to open file";
-      return -1;
-    }
-  }
-
-  int WriteOnFile_DeleteAndWrite(string text)
-  {
-
-    myfile_output.open(namefile.c_str(),ofstream::out);
-    if (myfile_output.is_open())
-    {
-      myfile_output << text;
-      myfile_output.close();
-      return 0;
-    }
-    else
-    {
-      cout << "Unable to open file";
-      return -1;
-    }
-  }
-
-  bool ReadFromFile()
-  {
-    data.clear();
-    string linetmp;
-    myfile_input.open(namefile.c_str(),ifstream::in);
-    if (myfile_input.is_open())
-    {
-      while ( getline (myfile_input,linetmp) )
-      {
-        stringstream line(linetmp);
-//        cout << linetmp << endl ;
-//        cout << line.str() << endl ;
-        vector<double>tmpvector;
-        for(unsigned i=0 ; i<5 ; ++i)
-        {
-          double tmpdouble ;
-          line >> tmpdouble ;
-          tmpvector.push_back(tmpdouble);
-        }
-        data.push_back(tmpvector);
-      }
-      myfile_input.close();
-    }
-    else
-      return false ;
-
-    return true ;
-  }
-
-  IO_TextFile(string namefile_init)
-  {
-    namefile = namefile_init;
-  }
-
-  ~IO_TextFile()
-  {
-
-  }
-};
-
 // Class TestNaveau2015
 class TestNaveau2015: public TestObject
 {
@@ -178,7 +93,6 @@ private:
   vector<double> err_zmp_x ;
   vector<double> err_zmp_y ;
   int resetfiles ;
-  IO_TextFile * dataFile_;
 
   /// Class that compute the dynamic and kinematic of the robot
   CjrlHumanoidDynamicRobot * cjrlHDR_ ;
@@ -230,24 +144,6 @@ public:
     /*! Open and reset appropriatly the debug files. */
     prepareDebugFiles();
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    // values near the mean are the most likely
-    // standard deviation affects the dispersion of generated values from the mean
-    double d_std(0.000),d_bias(0);
-    std::normal_distribution<> d(d_bias,d_std);
-
-//    std::map<int, int> hist;
-//    for(int n=0; n<10000; ++n) {
-//      double randvar = d(gen);
-//      cout << randvar << endl ;
-//      ++hist[std::round(randvar)];
-//    }
-//    for(auto p : hist) {
-//        std::cout << std::fixed << std::setprecision(1) << std::setw(2)
-//                  << p.first << ' ' << std::string(p.second/200, '*') << '\n';
-//    }
-
     for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
     {
       os << "<===============================================================>"<<endl;
@@ -275,14 +171,6 @@ public:
 
         if (m_PGIInterface==0)
         {
-          m_OneStep.ZMPTarget(0) += d(gen);
-          m_OneStep.ZMPTarget(1) += d(gen);
-          m_OneStep.finalCOMPosition.x[0]+= d(gen);
-          m_OneStep.finalCOMPosition.x[1]+= d(gen);
-          m_OneStep.finalCOMPosition.x[2]+= d(gen);
-          m_OneStep.finalCOMPosition.y[0]+= d(gen);
-          m_OneStep.finalCOMPosition.y[1]+= d(gen);
-          m_OneStep.finalCOMPosition.y[2]+= d(gen);
           ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
                                                  m_CurrentVelocity,
                                                  m_CurrentAcceleration,
@@ -421,10 +309,6 @@ public:
       istringstream strm2(":setfeetconstraint XY 0.09 0.04");
       m_PGI->ParseCmd(strm2);
     }
-
-
-    dataFile_ = new IO_TextFile ("/home/mnaveau/devel/ros_unstable/src/jrl/jrl-walkgen/tests/CommandedVelocity.txt");
-    dataFile_->ReadFromFile();
   }
 
 protected:
@@ -1014,18 +898,18 @@ protected:
         (this->*(events[i].Handler))(*m_PGI);
       }
     }
-    if(m_OneStep.NbOfIt>=5*200)
-    {
-      ostringstream oss ;
-      oss << ":perturbationforce "
-          //<< 15*sin((m_OneStep.NbOfIt-5*200)*0.005)
-          << -20 << " "
-          << -4 << " "
-          << " 0.0";
-      cout << oss.str() << endl ;
-      istringstream strm (oss.str()) ;
-      m_PGI->ParseCmd(strm);
-    }
+    //if(m_OneStep.NbOfIt>=5*200)
+    //{
+    //  ostringstream oss ;
+    //  oss << ":perturbationforce "
+    //      << 15*sin((m_OneStep.NbOfIt-5*200)*0.005)
+    //      << -20 << " "
+    //      << -4 << " "
+    //      << " 0.0";
+    //  cout << oss.str() << endl ;
+    //  istringstream strm (oss.str()) ;
+    //  m_PGI->ParseCmd(strm);
+    //}
   }
 
   void generateEventEmergencyStop()
@@ -1082,15 +966,6 @@ int PerformTests(int argc, char *argv[])
       cerr << "Failed on following error " << astr << std::endl;
       return -1; }
   }
-
-
-
-//  IO_TextFile TextFileInput("example.txt");
-
-//    // Test method
-//    TextFileInput.WriteOnFile_AddText("test \n");
-//    std::cout << TextFileInput.ReadFromFile();
-
 
   return 0;
 }
