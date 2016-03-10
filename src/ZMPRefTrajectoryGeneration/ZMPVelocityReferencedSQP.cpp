@@ -66,7 +66,7 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
 
   // Generator Management
   InterpolationPeriod_ = m_SamplingPeriod*7;
-  previewSize_ = 8 ;
+  previewSize_ = 16 ;
   previewDuration_ =  previewSize_*SQP_T_ ;
   NbSampleControl_ = (int)round(SQP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(SQP_T_/InterpolationPeriod_) ;
@@ -398,7 +398,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
         time,
         initLeftFoot_ ,
         initRightFoot_,
-        initCOM_,
+        //initCOM_,
+        itCOM_,
         VelRef_);
 
     // SOLVE PROBLEM:
@@ -517,17 +518,22 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
 
   support_state_t currentSupport = SupportStates_deq[0] ;
   currentSupport.StepNumber=0;
-  OFTG_->interpolate_feet_positions(time/*m_SamplingPeriod*CurrentIndex_*/, CurrentIndex_, currentSupport,
+  OFTG_->interpolate_feet_positions(time, CurrentIndex_, currentSupport,
                                   FootStepX, FootStepY, FootStepYaw,
                                   LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_);
 
+  double currentTime = time + NMPCgenerator_->Tfirst();
+  double currentIndex = CurrentIndex_ + (int)round(NMPCgenerator_->Tfirst()/m_SamplingPeriod);
   for ( int i = 1 ; i<previewSize_ ; i++ )
   {
-    CoMZMPInterpolation(JerkX,JerkY,&LIPM_,NbSampleControl_,i,CurrentIndex_,SupportStates_deq);
-    OFTG_->interpolate_feet_positions(time/*+m_SamplingPeriod*CurrentIndex_*/+i*SQP_T_, CurrentIndex_ + i * NbSampleControl_,
+    LIPM_.setState(COMTraj_deq_ctrl_[currentIndex-1]);
+    CoMZMPInterpolation(JerkX,JerkY,&LIPM_,NbSampleControl_,i,currentIndex,SupportStates_deq);
+    OFTG_->interpolate_feet_positions(currentTime, currentIndex,
                                       SupportStates_deq[i],
                                       FootStepX, FootStepY, FootStepYaw,
                                       LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_);
+    currentTime  += SQP_T_;
+    currentIndex += (int)round(SQP_T_/m_SamplingPeriod) ;
   }
 
   for (unsigned i=CurrentIndex_ ; i<previewSize_*NbSampleControl_ ; i++ )
@@ -573,6 +579,84 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
     LeftFootTraj_deq_[j] = LeftFootTraj_deq_ctrl_[i] ;
     RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
   }
+
+  ofstream aof;
+  string aFileName;
+  static int iteration_zmp = 0 ;
+  ostringstream oss(std::ostringstream::ate);
+  oss.str("/tmp/buffer_");
+  oss << setfill('0') << setw(3) << iteration_zmp << ".txt" ;
+  aFileName = oss.str();
+  aof.open(aFileName.c_str(),ofstream::out);
+  aof.close();
+
+  aof.open(aFileName.c_str(),ofstream::app);
+  aof.precision(8);
+  aof.setf(ios::scientific, ios::floatfield);
+  for (int i = 0 ; i < ZMPTraj_deq_ctrl_.size() ; ++i)
+  {
+    aof << i << " " ; // 0
+    aof << ZMPTraj_deq_ctrl_[i].px << " " ;           // 1
+    aof << ZMPTraj_deq_ctrl_[i].py << " " ;           // 2
+
+    aof << ZMPTraj_deq_ctrl_[i].px << " " ;           // 3
+    aof << ZMPTraj_deq_ctrl_[i].py << " " ;           // 4
+
+    aof << COMTraj_deq_ctrl_[i].x[0] << " " ;         // 5
+    aof << COMTraj_deq_ctrl_[i].x[1] << " " ;         // 6
+    aof << COMTraj_deq_ctrl_[i].x[2] << " " ;         // 7
+
+    aof << LeftFootTraj_deq_ctrl_[i].x << " " ;       // 8
+    aof << LeftFootTraj_deq_ctrl_[i].dx << " " ;      // 9
+    aof << LeftFootTraj_deq_ctrl_[i].ddx << " " ;     // 10
+
+    aof << RightFootTraj_deq_ctrl_[i].x << " " ;      // 11
+    aof << RightFootTraj_deq_ctrl_[i].dx << " " ;     // 12
+    aof << RightFootTraj_deq_ctrl_[i].ddx << " " ;    // 13
+
+    aof << COMTraj_deq_ctrl_[i].y[0] << " " ;         // 14
+    aof << COMTraj_deq_ctrl_[i].y[1] << " " ;         // 15
+    aof << COMTraj_deq_ctrl_[i].y[2] << " " ;         // 16
+
+    aof << LeftFootTraj_deq_ctrl_[i].y << " " ;       // 17
+    aof << LeftFootTraj_deq_ctrl_[i].dy << " " ;      // 18
+    aof << LeftFootTraj_deq_ctrl_[i].ddy << " " ;     // 19
+
+    aof << RightFootTraj_deq_ctrl_[i].y << " " ;      // 20
+    aof << RightFootTraj_deq_ctrl_[i].dy << " " ;     // 21
+    aof << RightFootTraj_deq_ctrl_[i].ddy << " " ;    // 22
+
+    aof << COMTraj_deq_ctrl_[i].yaw[0] << " " ;       // 23
+    aof << COMTraj_deq_ctrl_[i].yaw[1] << " " ;       // 24
+    aof << COMTraj_deq_ctrl_[i].yaw[2] << " " ;       // 25
+
+    aof << LeftFootTraj_deq_ctrl_[i].theta << " " ;   // 26
+    aof << LeftFootTraj_deq_ctrl_[i].dtheta << " " ;  // 27
+    aof << LeftFootTraj_deq_ctrl_[i].ddtheta << " " ; // 28
+
+    aof << RightFootTraj_deq_ctrl_[i].theta << " " ;  // 29
+    aof << RightFootTraj_deq_ctrl_[i].dtheta << " " ; // 30
+    aof << RightFootTraj_deq_ctrl_[i].ddtheta << " " ;// 31
+
+    aof << COMTraj_deq_ctrl_[i].z[0] << " " ;         // 32
+    aof << COMTraj_deq_ctrl_[i].z[1] << " " ;         // 33
+    aof << COMTraj_deq_ctrl_[i].z[2] << " " ;         // 34
+
+    aof << LeftFootTraj_deq_ctrl_[i].z << " " ;       // 35
+    aof << LeftFootTraj_deq_ctrl_[i].dz << " " ;      // 36
+    aof << LeftFootTraj_deq_ctrl_[i].ddz << " " ;     // 37
+
+    aof << RightFootTraj_deq_ctrl_[i].z << " " ;      // 38
+    aof << RightFootTraj_deq_ctrl_[i].dz << " " ;     // 39
+    aof << RightFootTraj_deq_ctrl_[i].ddz << " " ;    // 40
+
+    aof << 0.0 << " " ;    // 41
+    aof << 0.0 << " " ;    // 42
+    aof << endl ;
+  }
+  aof.close();
+  iteration_zmp++;
+
   return ;
 }
 
@@ -587,7 +671,7 @@ void ZMPVelocityReferencedSQP::CoMZMPInterpolation(
 {
   if(SupportStates_deq[0].Phase==DS && SupportStates_deq[0].NbStepsLeft == 0)
   {
-    unsigned int i = currentIndex + IterationNumber * numberOfSample ;
+    unsigned int i = currentIndex ;
     double jx = (RightFootTraj_deq_ctrl_[i-1].x + LeftFootTraj_deq_ctrl_[i-1].x)/2 - COMTraj_deq_ctrl_[i-1].x[0];
     double jy = (RightFootTraj_deq_ctrl_[i-1].y + LeftFootTraj_deq_ctrl_[i-1].y)/2 - COMTraj_deq_ctrl_[i-1].y[0];
 
@@ -598,14 +682,14 @@ void ZMPVelocityReferencedSQP::CoMZMPInterpolation(
     jx = 6/(tf*tf*tf)*(jx - tf*COMTraj_deq_ctrl_[i-1].x[1] - (tf*tf/2)*COMTraj_deq_ctrl_[i-1].x[2]);
     jy = 6/(tf*tf*tf)*(jy - tf*COMTraj_deq_ctrl_[i-1].y[1] - (tf*tf/2)*COMTraj_deq_ctrl_[i-1].y[2]);
     LIPM->Interpolation( COMTraj_deq_ctrl_, ZMPTraj_deq_ctrl_, currentIndex + IterationNumber * numberOfSample, jx, jy);
-    LIPM->OneIteration( jx, jy );
+    //LIPM->OneIteration( jx, jy );
   }
   else
   {
     Running_ = true;
-    LIPM->Interpolation( COMTraj_deq_ctrl_, ZMPTraj_deq_ctrl_, currentIndex + IterationNumber * numberOfSample,
+    LIPM->Interpolation( COMTraj_deq_ctrl_, ZMPTraj_deq_ctrl_, currentIndex,
                          JerkX[IterationNumber], JerkY[IterationNumber] );
-    LIPM->OneIteration( JerkX[IterationNumber],JerkY[IterationNumber] );
+    //LIPM->OneIteration( JerkX[IterationNumber],JerkY[IterationNumber] );
   }
   return ;
 }
