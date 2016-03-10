@@ -76,6 +76,12 @@ namespace PatternGeneratorJRL
     void updateFinalStateMachine(double time,
         std::deque<FootAbsolutePosition> &FinalLeftFootTraj,
         std::deque<FootAbsolutePosition> &FinalRightFootTraj);
+    void updateCurrentSupport(double time,
+        std::deque<FootAbsolutePosition> &FinalLeftFootTraj,
+        std::deque<FootAbsolutePosition> &FinalRightFootTraj);
+    void updateSupportdeque(double time,
+        std::deque<FootAbsolutePosition> &FinalLeftFootTraj,
+        std::deque<FootAbsolutePosition> &FinalRightFootTraj);
     void computeFootSelectionMatrix();
 
     // build the constraints :

@@ -247,12 +247,12 @@ void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
 
   // initialize the solver
   QP_ = new qpOASES::SQProblem((int)nv_,(int)nc_,qpOASES::HST_POSDEF) ;
-  options_.printLevel = qpOASES::PL_LOW ;
+  options_.printLevel = qpOASES::PL_NONE;
 //  options_.initialStatusBounds = qpOASES::ST_INACTIVE ;
 
   options_.setToMPC();
   QP_->setOptions(options_);
-  QP_->setPrintLevel(qpOASES::PL_NONE);
+// QP_->setPrintLevel(qpOASES::PL_NONE);
   nwsr_ = 1e+8 ;
   cput_ = new double[1] ;
   deltaU_ = new double[nv_];
@@ -292,19 +292,29 @@ void NMPCgenerator::updateInitialCondition(double time,
 
   deque<FootAbsolutePosition> lftraj (1,currentLeftFootAbsolutePosition);
   deque<FootAbsolutePosition> rftraj (1,currentRightFootAbsolutePosition);
-  updateFinalStateMachine(time_,
-                          lftraj ,
-                          rftraj);
-  computeFootSelectionMatrix();
+  updateCurrentSupport(time_,
+                       lftraj ,
+                       rftraj);
+
 #ifdef COUT
   cout << time_ << "  "
        << currentSupport_.StartTime << "  "
        << currentSupport_.TimeLimit << "  "
        << endl ;
 #endif
-  if(currentSupport_.Phase==DS)
-    Tfirst_=0.1;
-  else
+  if(currentSupport_.TimeLimit>1e+8)
+  {
+    Tfirst_ = 0.1 ;
+  }
+  else if (currentSupport_.StartTime==0.0)
+  {
+    Tfirst_ = (time_+T_-currentSupport_.TimeLimit)
+        - ((double)(int)((time_-currentSupport_.TimeLimit)/0.1) * 0.1) ;
+#ifdef COUT
+    cout << Tfirst_ << " " ;
+#endif
+    Tfirst_ = 0.1 - Tfirst_;
+  }else
   {
     Tfirst_ = (time_-currentSupport_.StartTime)
         - ((double)(int)((time_-currentSupport_.StartTime)/0.1) * 0.1) ;
@@ -312,12 +322,19 @@ void NMPCgenerator::updateInitialCondition(double time,
   }
   if(Tfirst_<0.0001)
     Tfirst_=0.1;
-#ifdef COUT
+//#ifdef COUT
+  cout << time_ << " " ;
+  cout << currentSupport_.TimeLimit << " " ;
+  cout << currentSupport_.StartTime << " " ;
   cout << Tfirst_ << endl ;
-#endif
+//#endif
   buildCoPIntegrationMatrix(Tfirst_);
   buildCoMIntegrationMatrix(Tfirst_);
 
+  updateSupportdeque(time_,
+                     lftraj ,
+                     rftraj);
+  computeFootSelectionMatrix();
   return ;
 }
 
@@ -498,6 +515,94 @@ void NMPCgenerator::getSolution(std::vector<double> & JerkX,
   }
 }
 
+void NMPCgenerator::updateCurrentSupport(double time,
+    std::deque<FootAbsolutePosition> &FinalLeftFootTraj,
+    std::deque<FootAbsolutePosition> &FinalRightFootTraj)
+{
+#ifdef DEBUG_COUT
+  cout << "previous support : \n"
+       << currentSupport_.Phase        << " "
+       << currentSupport_.Foot         << " "
+       << currentSupport_.StepNumber   << " "
+       << currentSupport_.StateChanged << " "
+       << currentSupport_.X   << " "
+       << currentSupport_.Y   << " "
+       << currentSupport_.Yaw << " "
+       << currentSupport_.NbStepsLeft << " "
+       << endl ;
+#endif
+  const FootAbsolutePosition * FAP = NULL;
+  reference_t vel = vel_ref_;
+  //vel.Local.X=1;
+  // DETERMINE CURRENT SUPPORT STATE:
+  // --------------------------------
+  FSM_->set_support_state( time, 0, currentSupport_, vel );
+  if( currentSupport_.StateChanged == true )
+  {
+    if( currentSupport_.Foot == LEFT )
+      FAP = & FinalLeftFootTraj.back();
+    else
+      FAP = & FinalRightFootTraj.back();
+    currentSupport_.X = FAP->x;
+    currentSupport_.Y = FAP->y;
+    currentSupport_.Yaw = FAP->theta*M_PI/180.0;
+    currentSupport_.StartTime = time;
+  }
+}
+
+void NMPCgenerator::updateSupportdeque(double time,
+    std::deque<FootAbsolutePosition> &FinalLeftFootTraj,
+    std::deque<FootAbsolutePosition> &FinalRightFootTraj)
+{
+  SupportStates_deq_[0] = currentSupport_ ;
+  const FootAbsolutePosition * FAP = NULL;
+  reference_t vel = vel_ref_;
+  // PREVIEW SUPPORT STATES:
+  // -----------------------
+  // initialize the previewed support state before previewing
+  support_state_t PreviewedSupport = currentSupport_;
+  PreviewedSupport.StepNumber  = 0;
+  double currentTime = time - (T_-Tfirst_);
+  for( unsigned pi=1 ; pi<=N_ ; pi++ )
+  {
+    FSM_->set_support_state( currentTime, pi, PreviewedSupport, vel );
+    if( PreviewedSupport.StateChanged )
+    {
+      if( pi == 1 || SupportStates_deq_[pi-1].Phase==DS )//Foot down
+      {
+        if( PreviewedSupport.Foot == LEFT )
+          FAP = & FinalLeftFootTraj.back();
+        else
+          FAP = & FinalRightFootTraj.back();
+        PreviewedSupport.X = FAP->x;
+        PreviewedSupport.Y = FAP->y;
+        PreviewedSupport.Yaw = FAP->theta*M_PI/180.0;
+      }
+      if( /*pi > 1 &&*/ PreviewedSupport.StepNumber > 0 )
+      {
+        PreviewedSupport.X = 0.0;
+        PreviewedSupport.Y = 0.0;
+      }
+      PreviewedSupport.StartTime = currentTime+pi*T_;
+    }
+    SupportStates_deq_[pi] = PreviewedSupport ;
+  }
+#ifdef DEBUG_COUT
+  for(unsigned i=0;i<SupportStates_deq_.size();++i)
+  {
+    cout << SupportStates_deq_[i].Phase        << " "
+         << SupportStates_deq_[i].Foot         << " "
+         << SupportStates_deq_[i].StepNumber   << " "
+         << SupportStates_deq_[i].StateChanged << " "
+         << SupportStates_deq_[i].X            << " "
+         << SupportStates_deq_[i].Y            << " "
+         << SupportStates_deq_[i].Yaw          << " "
+         << SupportStates_deq_[i].NbStepsLeft  << " "
+         << endl ;
+  }
+#endif
+}
+
 void NMPCgenerator::updateFinalStateMachine(
     double time,
     deque<FootAbsolutePosition> & FinalLeftFootTraj,
@@ -601,17 +706,18 @@ void NMPCgenerator::computeFootSelectionMatrix()
   DumpMatrix("V_kp1_",V_kp1_);
   DumpVector("v_kp1_",v_kp1_);
 #endif
-//#ifdef DEBUG_COUT
+#ifdef DEBUG_COUT
   cout << "V_kp1_ = " << V_kp1_ << endl ;
   cout << "v_kp1_ = " << v_kp1_ << endl ;
-//#endif
+#endif
   return ;
 }
 
 void NMPCgenerator::buildCoMIntegrationMatrix(double t)
 {
   double T = 0.0 ;
-  for (unsigned i = 0 , k = 1 ; i < N_ ; ++i , k=i+1)
+  double k = 1.0 ;
+  for (unsigned i = 0 ; i < N_ ; ++i , k=(double)i+1.0)
   {
     if(i==0)
       T=t;
@@ -619,15 +725,14 @@ void NMPCgenerator::buildCoMIntegrationMatrix(double t)
       T=T_;
 
     Pps_(i,0) = 1.0 ; Pps_(i,1) = k*T ; Pps_(i,2) = k*k*T*T*0.5 ;
-    Pvs_(i,0) = 0.0 ; Pvs_(i,1) = 1.0  ; Pvs_(i,2) = k*T        ;
-    Pas_(i,0) = 0.0 ; Pas_(i,1) = 0.0  ; Pas_(i,2) = 1.0        ;
+    Pvs_(i,0) = 0.0 ; Pvs_(i,1) = 1.0 ; Pvs_(i,2) = k*T         ;
+    Pas_(i,0) = 0.0 ; Pas_(i,1) = 0.0 ; Pas_(i,2) = 1.0         ;
 
     for (unsigned j = 0 ; j <= i ; ++j)
     {
-      double id = (double)i ;
-      double jd = (double)j ;
-      Ppu_(i,j) = 3.0*(id-jd)*(id-jd)*T*T*T*1/6.0 + 3.0*(id-jd)*T*T*T*1/6.0 + T*T*T*1/6.0 ;
-      Pvu_(i,j) = 2.0*(id-jd)*T*T*0.5 + T*T*0.5 ;
+      double i_j = (double)(i-j) ;
+      Ppu_(i,j) = 3.0*i_j*i_j*T*T*T*1/6.0 + 3.0*i_j*T*T*T*1/6.0 + T*T*T*1/6.0 ;
+      Pvu_(i,j) = 2.0*i_j*T*T*0.5 + T*T*0.5 ;
       Pau_(i,j) = T ;
     }
   }
@@ -647,9 +752,9 @@ void NMPCgenerator::buildCoPIntegrationMatrix(double t)
   const double GRAVITY = 9.81;
   MAL_MATRIX_FILL(Pzu_,0.0);
   MAL_MATRIX_FILL(Pzs_,0.0);
-  double k=1.0;
+  double k = 1.0;
   double T = 0.0;
-  for (unsigned i = 0 ; i < N_ ; ++i , k=i+1)
+  for (unsigned i = 0 ; i < N_ ; ++i , k=(double)i+1.0)
   {
     if(i==0)
       T=t;
@@ -658,11 +763,12 @@ void NMPCgenerator::buildCoPIntegrationMatrix(double t)
 
     Pzs_(i,0) = 1.0 ;
     Pzs_(i,1) = k*T ;
-    Pzs_(i,2) = (double)k*(double)k*T*T*0.5 - c_k_z_/GRAVITY ;
+    Pzs_(i,2) = k*k*T*T*0.5 - c_k_z_/GRAVITY ;
 
     for (unsigned j = 0 ; j <= i ; ++j)
     {
-      Pzu_(i,j) = (3.0*(double)(i-j)*(double)(i-j) + 3.0*(double)(i-j)+1.0)*T*T*T/6.0 - T*c_k_z_/GRAVITY ;
+      double i_j = (double)(i-j) ;
+      Pzu_(i,j) = (3.0*i_j*i_j + 3.0*i_j+1.0)*T*T*T/6.0 - T*c_k_z_/GRAVITY ;
     }
   }
 #ifdef DEBUG
@@ -875,9 +981,6 @@ void NMPCgenerator::updateCoPConstraint()
       double y1 (currentLeftFootAbsolutePosition_ .y);
       double x2 (currentRightFootAbsolutePosition_.x);
       double y2 (currentRightFootAbsolutePosition_.y);
-      double m1=(x1+x2)*0.5;
-      double m2=(y1+y2)*0.5;
-
       double angle = atan2(y2-y1,x2-x1);
 
       MAL_MATRIX_DIM(rotMat,double,2,2);
@@ -885,13 +988,15 @@ void NMPCgenerator::updateCoPConstraint()
       rotMat(1,0)=-sin(angle) ; rotMat(1,1)= cos(angle) ;
 
       double l = 0.04;
-      double L = sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)) ;
+      double L = sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)) + 0.04 ;
 
       hull.X_vec[0] = - L*0.5 ; hull.Y_vec[0] = - l*0.5 ;
       hull.X_vec[1] = - L*0.5 ; hull.Y_vec[1] = + l*0.5 ;
       hull.X_vec[2] = + L*0.5 ; hull.Y_vec[2] = + l*0.5 ;
       hull.X_vec[3] = + L*0.5 ; hull.Y_vec[3] = - l*0.5 ;
 #ifdef COUT
+      double m1=(x1+x2)*0.5;
+      double m2=(y1+y2)*0.5;
       cout << angle*180/M_PI << " ; "
            << L-2*0.01 << " ; "
            << m1 << " "  << m2 << " ; "
@@ -993,8 +1098,6 @@ void NMPCgenerator::updateCoPConstraint()
   cout << "v_kp1f_x_ = " << v_kp1f_x_ << endl ;
   cout << "v_kp1f_y_ = " << v_kp1f_y_ << endl ;
 #endif
-//  v_kp1f_x_ = v_kp1_ * SupportStates_deq_[1].X ;
-//  v_kp1f_y_ = v_kp1_ * SupportStates_deq_[1].Y ;
 
   for(unsigned i=0 ; i<N_ ; ++i)
   {
