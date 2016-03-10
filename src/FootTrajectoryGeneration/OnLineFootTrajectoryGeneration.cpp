@@ -423,7 +423,7 @@ void OnLineFootTrajectoryGeneration::interpolate_feet_positions(
 
   if(CurrentSupport.Phase == SS && Time+QP_T_ < CurrentSupport.TimeLimit)
   {
-    double LocalInterpolationStartTime = Time-(CurrentSupport.TimeLimit-(m_TDouble+m_TSingle));
+    double LocalInterpolationStartTime = Time-CurrentSupport.StartTime;
     //determine coefficients of interpolation polynome
     double ModulationSupportCoefficient = 0.9;
     double UnlockedSwingPeriod = m_TSingle * ModulationSupportCoefficient;
