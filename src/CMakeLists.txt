@@ -208,7 +208,7 @@ SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
 # Define dependencies
 
 TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name} ${Boost_LIBRARIES})
-SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta ")
+SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta -fwhole-program")
 
 INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
