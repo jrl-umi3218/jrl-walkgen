@@ -93,8 +93,6 @@ private:
   vector<double> err_zmp_x ;
   vector<double> err_zmp_y ;
   int resetfiles ;
-  IO_TextFile * dataFile_;
-
   /// Class that compute the dynamic and kinematic of the robot
   CjrlHumanoidDynamicRobot * cjrlHDR_ ;
   Robot_Model hrp2_14_ ;
@@ -338,10 +336,6 @@ public:
       istringstream strm2(":setfeetconstraint XY 0.09 0.04");
       m_PGI->ParseCmd(strm2);
     }
-
-
-    dataFile_ = new IO_TextFile ("/home/mnaveau/devel/ros_unstable/src/jrl/jrl-walkgen/tests/CommandedVelocity.txt");
-    dataFile_->ReadFromFile();
   }
 
 protected:
