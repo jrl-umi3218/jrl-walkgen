@@ -107,8 +107,8 @@ namespace PatternGeneratorJRL
 
     // construct the constant matrix depending
     // on the Euler integration scheme and the com height
-    void buildCoMIntegrationMatrix(double t);
-    void buildCoPIntegrationMatrix(double t); // depend on c_k_z_
+    void buildCoMCoPIntegrationMatrix(); // depend on c_k_z_
+    void updateCoMCoPIntegrationMatrix();
     void buildConvexHullSystems(); // depend on the robot
 
   public:
@@ -220,12 +220,16 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_TYPE(double) UBcop_, LBcop_ ;
     MAL_MATRIX_TYPE(double) D_kp1_xy_, D_kp1_theta_, Pzuv_, derv_Acop_map_  ;
     MAL_VECTOR_TYPE(double) b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_, v_kp1f_x_, v_kp1f_y_ ;
+    MAL_MATRIX_TYPE(double) rotMat_xy_, rotMat_theta_, rotMat_;
+    MAL_MATRIX_TYPE(double) A0_xy_, A0_theta_;
+    MAL_VECTOR_TYPE(double) B0_;
     // Foot position constraint
     unsigned nc_foot_ ;
     MAL_MATRIX_TYPE(double) Afoot_xy_, Afoot_theta_  ;
     MAL_VECTOR_TYPE(double) UBfoot_, LBfoot_ ;
     MAL_MATRIX_TYPE(double) SelecMat_, derv_Afoot_map_ ;
-    std::vector<MAL_MATRIX_TYPE(double)> rotMat_, drotMat_ ;
+    std::vector<MAL_MATRIX_TYPE(double)> rotMat_vec_, drotMat_vec_ ;
+    MAL_MATRIX_TYPE(double) tmpRotMat_;
     MAL_MATRIX_TYPE(double) ASx_xy_, ASy_xy_, ASx_theta_, ASy_theta_ , AS_theta_;
     // Foot Velocity constraint
     unsigned nc_vel_ ;
@@ -241,6 +245,7 @@ namespace PatternGeneratorJRL
     std::vector< std::vector<MAL_VECTOR_TYPE(double)> > Aobs_ ;
     std::vector< MAL_VECTOR_TYPE(double) > UBobs_, LBobs_ ;
     std::vector<Circle> obstacles_ ;
+    MAL_VECTOR_TYPE(double) qp_J_obs_i_ ;
     // Standing constraint :
     unsigned nc_stan_ ;
     MAL_MATRIX_TYPE(double) Astan_ ;
