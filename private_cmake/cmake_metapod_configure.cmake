@@ -97,7 +97,7 @@ FUNCTION(ADD_SAMPLEURDFMODEL name)
     MAIN_DEPENDENCY ${_urdf_file}
   )
   ADD_LIBRARY(${_libname} SHARED ${_sources})
-  
+  SET_TARGET_PROPERTIES(${_libname} PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta ")
   INSTALL(TARGETS ${_libname} DESTINATION ${CMAKE_INSTALL_LIBDIR})
   
 ENDFUNCTION()
