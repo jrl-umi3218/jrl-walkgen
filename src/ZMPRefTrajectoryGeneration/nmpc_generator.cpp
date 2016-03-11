@@ -385,7 +385,7 @@ void NMPCgenerator::solve_qp(){
   */
 
   // force the solver to use the maximum time for computing the solution
-  cput_[0] = 0.0003;
+  cput_[0] = 0.0008;
   nwsr_ = 100000 ;
   //qpOASES::returnValue ret, error ;
   if (!isQPinitialized_)

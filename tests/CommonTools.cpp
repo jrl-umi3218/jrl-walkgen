@@ -74,7 +74,7 @@ namespace PatternGeneratorJRL {
 	  aPGI.ParseCmd(strm);
 	}
       // Evaluate current state of the robot in the PG.
-      COMState   lStartingCOMPosition;
+      COMState lStartingCOMPosition;
       MAL_S3_VECTOR_TYPE(double)  lStartingZMPPosition;
       MAL_VECTOR_TYPE(double)  lStartingWaistPose;
       FootAbsolutePosition  InitLeftFootAbsPos;

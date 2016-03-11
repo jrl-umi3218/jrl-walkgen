@@ -213,10 +213,10 @@ int DynamicFilter::OnLinefilter(
                  i);
   }
   int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
-  ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px  ;
-  ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py  ;
   ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px;
   ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py;
+  ZMPMB_vec_[1][0]=inputZMPTraj_deq_[0].px;
+  ZMPMB_vec_[1][1]=inputZMPTraj_deq_[0].py;
 
   unsigned int N1 = (ZMPMB_vec_.size()-1)*inc +1 ;
   if(false)
@@ -414,9 +414,12 @@ void DynamicFilter::ComputeZMPMB(
                      ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
                      samplingPeriod, stage, iteration) ;
 
-  InverseDynamics(ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_);
+  if(iteration>=2)
+  {
+    InverseDynamics(ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_);
 
-  ExtractZMP(ZMPMB);
+    ExtractZMP(ZMPMB);
+  }
 
   return ;
 }
