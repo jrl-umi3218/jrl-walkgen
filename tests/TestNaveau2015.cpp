@@ -998,13 +998,13 @@ protected:
       //{8*20+5*200,&TestNaveau2015::perturbationForce},
       //{9*20+5*200,&TestNaveau2015::perturbationForce},
       //{10*20+5*200,&TestNaveau2015::perturbationForce},
-      {20*200,&TestNaveau2015::walkForward2m_s},
-      {25*200,&TestNaveau2015::walkForward2m_s},
-      {50*200,&TestNaveau2015::walkSidewards1m_s},
-      {55*200,&TestNaveau2015::walkSidewards2m_s},
-      {70*200,&TestNaveau2015::startTurningRight2},
-      {200*200,&TestNaveau2015::stop},
-      {205*200,&TestNaveau2015::stopOnLineWalking}
+      {5*200,&TestNaveau2015::walkForward2m_s},
+      {10*200,&TestNaveau2015::walkForward3m_s},
+      {15*200,&TestNaveau2015::walkSidewards1m_s},
+      {20*200,&TestNaveau2015::walkSidewards2m_s},
+      {25*200,&TestNaveau2015::startTurningRight2},
+      {30*200,&TestNaveau2015::stop},
+      {35*200,&TestNaveau2015::stopOnLineWalking}
     };
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
