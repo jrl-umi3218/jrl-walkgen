@@ -490,7 +490,7 @@ void OnLineFootTrajectoryGeneration::interpolate_feet_positions(
           FinalRightFootTraj_deq[CurrentIndex+k].time = Time+k*m_SamplingPeriod;
     }
   }
-  else if (CurrentSupport.Phase == DS || Time+QP_T_ > CurrentSupport.TimeLimit)
+  else if (CurrentSupport.Phase == DS || Time+QP_T_ >= CurrentSupport.TimeLimit)
   {
     for(int k = 1; k<=(int)(QP_T_/m_SamplingPeriod);k++)
     {
