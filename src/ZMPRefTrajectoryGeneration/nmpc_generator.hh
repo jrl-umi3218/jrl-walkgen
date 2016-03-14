@@ -173,6 +173,12 @@ namespace PatternGeneratorJRL
     inline void N(unsigned N)
     {N_=N;}
 
+    // Number of planned foot step in the SQP preview
+    inline double nf()
+    {return nf_;}
+    inline void nf(unsigned nf)
+    {nf_=nf;}
+
     // Step Period :
     inline double T_step()
     {return T_step_;}

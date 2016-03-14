@@ -385,7 +385,7 @@ void NMPCgenerator::solve_qp(){
   */
 
   // force the solver to use the maximum time for computing the solution
-  cput_[0] = 0.0008;
+  cput_[0] = 0.1;
   nwsr_ = 100000 ;
   //qpOASES::returnValue ret, error ;
   if (!isQPinitialized_)
@@ -412,7 +412,7 @@ void NMPCgenerator::solve_qp(){
   /*error = */QP_->getPrimalSolution(deltaU_) ;
 
   // save qp solver data
-//#ifdef DEBUG_COUT
+#ifdef DEBUG_COUT
   bool endline = false;
   if(*cput_ >= 0.0005)
   {
@@ -433,7 +433,7 @@ void NMPCgenerator::solve_qp(){
   {
     cout << endl;
   }
-//#endif
+#endif
   return ;
 }
 
@@ -488,8 +488,6 @@ void NMPCgenerator::getSolution(std::vector<double> & JerkX,
                                 std::vector<double> & FootStepY,
                                 std::vector<double> & FootStepYaw)
 {
-  JerkX.resize(N_);
-  JerkY.resize(N_);
   for(unsigned i=0 ; i<N_ ; ++i)
   {
     JerkX[i] = U_x_(i);
@@ -501,9 +499,6 @@ void NMPCgenerator::getSolution(std::vector<double> & JerkX,
     nf=nf_-1 ;
   else
     nf=nf_;
-  FootStepX  .resize(nf+1);
-  FootStepY  .resize(nf+1);
-  FootStepYaw.resize(nf+1);
 
   for(unsigned i=0 ; i<nf ; ++i)
   {

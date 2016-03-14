@@ -111,7 +111,7 @@ public:
     err_zmp_y.clear() ;
     resetfiles=0;
 
-    m_DebugFGPI=false;
+    m_DebugFGPI=true;
   }
 
   ~TestNaveau2015()

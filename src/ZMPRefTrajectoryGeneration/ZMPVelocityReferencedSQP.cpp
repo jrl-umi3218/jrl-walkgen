@@ -132,18 +132,23 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   }
 
   // init of the buffer for the kajita's dynamic filter
-
   // size = numberOfIterationOfThePreviewControl * NumberOfSample + Margin(=CurrentIndex)
   // Waring current index is higher on the robot than in the jrl Test suit
-  ZMPTraj_deq_      .resize( (previewSize_-1) * NbSampleInterpolation_ + CurrentIndexUpperBound_);
-  COMTraj_deq_      .resize( (previewSize_-1) * NbSampleInterpolation_ + CurrentIndexUpperBound_);
-  LeftFootTraj_deq_ .resize( (previewSize_-1) * NbSampleInterpolation_ + CurrentIndexUpperBound_);
-  RightFootTraj_deq_.resize( (previewSize_-1) * NbSampleInterpolation_ + CurrentIndexUpperBound_);
-
+  unsigned int IndexMax = (int)round((previewDuration_)/InterpolationPeriod_ );
+  ZMPTraj_deq_.resize(IndexMax);
+  COMTraj_deq_.resize(IndexMax);
+  LeftFootTraj_deq_.resize(IndexMax);
+  RightFootTraj_deq_.resize(IndexMax);
   ZMPTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
   COMTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
   LeftFootTraj_deq_ctrl_ .resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
   RightFootTraj_deq_ctrl_.resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
+
+  JerkX_      .clear();
+  JerkY_      .clear();
+  FootStepX_  .clear();
+  FootStepY_  .clear();
+  FootStepYaw_.clear();
 }
 
 
@@ -357,6 +362,12 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   initLeftFoot_  = FinalLeftFootTraj_deq [0] ;
   initRightFoot_ = FinalRightFootTraj_deq[0] ;
   CurrentIndex_ = 1 ;
+
+  JerkX_      .resize(NMPCgenerator_->N()) ;
+  JerkY_      .resize(NMPCgenerator_->N()) ;
+  FootStepX_  .resize(NMPCgenerator_->nf()+1);
+  FootStepY_  .resize(NMPCgenerator_->nf()+1);
+  FootStepYaw_.resize(NMPCgenerator_->nf()+1);
   return 0;
 }
 
@@ -415,10 +426,6 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
       LeftFootTraj_deq_ctrl_[i] = initLeftFoot_ ;
       RightFootTraj_deq_ctrl_[i] = initRightFoot_ ;
     }
-    FinalZMPTraj_deq.resize( 1 + CurrentIndex_);
-    FinalCOMTraj_deq.resize( 1 + CurrentIndex_);
-    FinalLeftFootTraj_deq .resize(1 + CurrentIndex_);
-    FinalRightFootTraj_deq.resize(1 + CurrentIndex_);
 
     // INTERPOLATION
     // ------------------------
@@ -426,18 +433,19 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     FullTrajectoryInterpolation(time);
 
     // Take only the data that are actually used by the robot
-    for(unsigned i=0 ; i < FinalZMPTraj_deq.size() ; ++i)
+    FinalZMPTraj_deq      .clear(); FinalLeftFootTraj_deq .clear();
+    FinalCOMTraj_deq      .clear(); FinalRightFootTraj_deq.clear();
+    for(unsigned i=0 ; i < 2 ; ++i)
     {
-      FinalZMPTraj_deq      [i] = ZMPTraj_deq_ctrl_      [i] ;
-      FinalCOMTraj_deq      [i] = COMTraj_deq_ctrl_      [i] ;
-      FinalLeftFootTraj_deq [i] = LeftFootTraj_deq_ctrl_ [i] ;
-      FinalRightFootTraj_deq[i] = RightFootTraj_deq_ctrl_[i] ;
+      FinalZMPTraj_deq      .push_back(ZMPTraj_deq_ctrl_      [i]) ;
+      FinalCOMTraj_deq      .push_back(COMTraj_deq_ctrl_      [i]) ;
+      FinalLeftFootTraj_deq .push_back(LeftFootTraj_deq_ctrl_ [i]) ;
+      FinalRightFootTraj_deq.push_back(RightFootTraj_deq_ctrl_[i]) ;
     }
 
     bool filterOn_ = true ;
     if(filterOn_)
     {
-
       dynamicFilter_->OnLinefilter(COMTraj_deq_,ZMPTraj_deq_ctrl_,
                                    LeftFootTraj_deq_,
                                    RightFootTraj_deq_,
@@ -500,22 +508,17 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
                              + CurrentIndexUpperBound_,initRightFoot_);
   }
 
-  std::vector<double> JerkX ;
-  std::vector<double> JerkY ;
-  std::vector<double> FootStepX ;
-  std::vector<double> FootStepY ;
-  std::vector<double> FootStepYaw ;
-  NMPCgenerator_->getSolution(JerkX, JerkY, FootStepX, FootStepY, FootStepYaw);
+  NMPCgenerator_->getSolution(JerkX_, JerkY_, FootStepX_, FootStepY_, FootStepYaw_);
   const std::deque<support_state_t> & SupportStates_deq = NMPCgenerator_->SupportStates_deq();
   LIPM_.setState(itCOM_);
 
-  CoMZMPInterpolation(JerkX,JerkY,&LIPM_,NbSampleControl_,0,CurrentIndex_,SupportStates_deq);
+  CoMZMPInterpolation(JerkX_,JerkY_,&LIPM_,NbSampleControl_,0,CurrentIndex_,SupportStates_deq);
   itCOM_ = COMTraj_deq_ctrl_[1];
 
   support_state_t currentSupport = SupportStates_deq[0] ;
   currentSupport.StepNumber=0;
   OFTG_->interpolate_feet_positions(time, CurrentIndex_, currentSupport,
-                                  FootStepX, FootStepY, FootStepYaw,
+                                  FootStepX_, FootStepY_, FootStepYaw_,
                                   LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_);
 
   double currentTime = time + NMPCgenerator_->Tfirst();
@@ -523,10 +526,10 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
   for ( int i = 1 ; i<previewSize_ ; i++ )
   {
     LIPM_.setState(COMTraj_deq_ctrl_[currentIndex-1]);
-    CoMZMPInterpolation(JerkX,JerkY,&LIPM_,NbSampleControl_,i,currentIndex,SupportStates_deq);
+    CoMZMPInterpolation(JerkX_,JerkY_,&LIPM_,NbSampleControl_,i,currentIndex,SupportStates_deq);
     OFTG_->interpolate_feet_positions(currentTime, currentIndex,
                                       SupportStates_deq[i],
-                                      FootStepX, FootStepY, FootStepYaw,
+                                      FootStepX_, FootStepY_, FootStepYaw_,
                                       LeftFootTraj_deq_ctrl_, RightFootTraj_deq_ctrl_);
     currentTime  += SQP_T_;
     currentIndex += (int)round(SQP_T_/m_SamplingPeriod) ;
@@ -560,10 +563,6 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
   RightFootTraj_deq_ctrl_.pop_front();
 
   unsigned int IndexMax = (int)round((previewDuration_)/InterpolationPeriod_ );
-  ZMPTraj_deq_.resize(IndexMax);
-  COMTraj_deq_.resize(IndexMax);
-  LeftFootTraj_deq_.resize(IndexMax);
-  RightFootTraj_deq_.resize(IndexMax);
   int inc =  (int)round(InterpolationPeriod_ / m_SamplingPeriod) ;
   for (unsigned int i = 0 , j = 0 ; j < IndexMax ; i = i + inc , ++j )
   {

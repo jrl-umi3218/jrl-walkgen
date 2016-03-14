@@ -243,6 +243,12 @@ namespace PatternGeneratorJRL
     std::deque<COMState> COMTraj_deq_ctrl_ ;
     std::deque<FootAbsolutePosition> LeftFootTraj_deq_ctrl_ ;
     std::deque<FootAbsolutePosition> RightFootTraj_deq_ctrl_ ;
+    // usefull deque to handle the solution of the nmpc
+    std::vector<double> JerkX_ ;
+    std::vector<double> JerkY_ ;
+    std::vector<double> FootStepX_ ;
+    std::vector<double> FootStepY_ ;
+    std::vector<double> FootStepYaw_ ;
 
     // initial value
     ZMPPosition initZMP_ ;
