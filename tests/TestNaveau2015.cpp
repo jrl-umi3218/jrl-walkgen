@@ -145,12 +145,12 @@ public:
     /*! Open and reset appropriatly the debug files. */
     prepareDebugFiles();
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    //    std::random_device rd;
+    //std::mt19937 gen(rd());
     // values near the mean are the most likely
     // standard deviation affects the dispersion of generated values from the mean
-    double d_std(0.000),d_bias(0);
-    std::normal_distribution<> d(d_bias,d_std);
+    //double d_std(0.000),d_bias(0);
+    //std::normal_distribution<> d(d_bias,d_std);
 
 //    std::map<int, int> hist;
 //    for(int n=0; n<10000; ++n) {
@@ -190,14 +190,14 @@ public:
 
         if (m_PGIInterface==0)
         {
-          m_OneStep.ZMPTarget(0) += d(gen);
-          m_OneStep.ZMPTarget(1) += d(gen);
-          m_OneStep.finalCOMPosition.x[0]+= d(gen);
-          m_OneStep.finalCOMPosition.x[1]+= d(gen);
-          m_OneStep.finalCOMPosition.x[2]+= d(gen);
-          m_OneStep.finalCOMPosition.y[0]+= d(gen);
-          m_OneStep.finalCOMPosition.y[1]+= d(gen);
-          m_OneStep.finalCOMPosition.y[2]+= d(gen);
+          //m_OneStep.ZMPTarget(0) += d(gen);
+          //m_OneStep.ZMPTarget(1) += d(gen);
+          //m_OneStep.finalCOMPosition.x[0]+= d(gen);
+          //m_OneStep.finalCOMPosition.x[1]+= d(gen);
+          //m_OneStep.finalCOMPosition.x[2]+= d(gen);
+          //m_OneStep.finalCOMPosition.y[0]+= d(gen);
+          //m_OneStep.finalCOMPosition.y[1]+= d(gen);
+          //m_OneStep.finalCOMPosition.y[2]+= d(gen);
           ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
                                                  m_CurrentVelocity,
                                                  m_CurrentAcceleration,
