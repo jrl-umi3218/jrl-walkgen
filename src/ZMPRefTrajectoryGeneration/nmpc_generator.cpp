@@ -194,8 +194,10 @@ void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
   MAL_VECTOR_RESIZE(ubB0lf_,4) ;             MAL_VECTOR_FILL(ubB0lf_,0.0);
   MAL_MATRIX_RESIZE(A0ds_  ,4,2) ;           MAL_MATRIX_FILL(A0ds_  ,0.0);
   MAL_VECTOR_RESIZE(ubB0ds_,4) ;             MAL_VECTOR_FILL(ubB0ds_,0.0);
-  MAL_MATRIX_RESIZE(A0g_   ,4,2) ;           MAL_MATRIX_FILL(A0g_   ,0.0);
-  MAL_VECTOR_RESIZE(ubB0g_ ,4) ;             MAL_VECTOR_FILL(ubB0g_ ,0.0);
+  MAL_MATRIX_RESIZE(A0_xy_   ,4,2) ;         MAL_MATRIX_FILL(A0_xy_   ,0.0);
+  MAL_MATRIX_RESIZE(A0_theta_,4,2) ;         MAL_MATRIX_FILL(A0_theta_,0.0);
+  MAL_VECTOR_RESIZE(B0_      ,4) ;           MAL_VECTOR_FILL(B0_      ,0.0);
+
   MAL_VECTOR_RESIZE(vel_ref_.Global.X_vec , N_) ;
   MAL_VECTOR_RESIZE(vel_ref_.Global.Y_vec , N_) ;
   MAL_VECTOR_RESIZE(vel_ref_.Global.X_vec , N_) ;
@@ -301,11 +303,9 @@ void NMPCgenerator::updateInitialCondition(double time,
 
   c_k_z_ = currentCOMState.z[0] ;
 
-  deque<FootAbsolutePosition> lftraj (1,currentLeftFootAbsolutePosition);
-  deque<FootAbsolutePosition> rftraj (1,currentRightFootAbsolutePosition);
   updateCurrentSupport(time_,
-                       lftraj ,
-                       rftraj);
+                       currentLeftFootAbsolutePosition,
+                       currentRightFootAbsolutePosition);
 
 #ifdef COUT
   cout << time_ << "  "
@@ -342,8 +342,8 @@ void NMPCgenerator::updateInitialCondition(double time,
   updateCoMCoPIntegrationMatrix();
 
   updateSupportdeque(time_,
-                     lftraj ,
-                     rftraj);
+                     currentLeftFootAbsolutePosition,
+                     currentRightFootAbsolutePosition);
   computeFootSelectionMatrix();
   return ;
 }
@@ -384,12 +384,11 @@ void NMPCgenerator::solve_qp(){
   """
   */
 
-  // force the solver to use the maximum time for computing the solution
-  cput_[0] = 0.1;
-  nwsr_ = 100000 ;
   //qpOASES::returnValue ret, error ;
   if (!isQPinitialized_)
   {
+    cput_[0] = 1000.0;
+    nwsr_ = 100000 ;
     /*ret =*/ QP_->init(
             qpOases_H_, qpOases_g_, qpOases_J_,
             qpOases_lb_, qpOases_ub_,
@@ -400,6 +399,9 @@ void NMPCgenerator::solve_qp(){
   }
   else
   {
+    // force the solver to use the maximum time for computing the solution
+    cput_[0] = 0.0015;
+    nwsr_ = 20 ;
     /*ret = */QP_->hotstart(
       qpOases_H_, qpOases_g_, qpOases_J_,
       qpOases_lb_, qpOases_ub_,
@@ -416,14 +418,14 @@ void NMPCgenerator::solve_qp(){
   bool endline = false;
   if(*cput_ >= 0.0005)
   {
-    cout << *cput_ << " " ;
+    cout << *cput_ * 1000<< " " ;
     endline = true;
   }
-  if(nwsr_ >= 10)
-  {
-    cout << nwsr_ << " " ;
-    endline = true;
-  }
+//  if(nwsr_ >= 10)
+//  {
+//    cout << nwsr_ << " " ;
+//    endline = true;
+//  }
   if(*cput_>= 0.001)
   {
     cout << " : warning on cpu time" ;
@@ -431,7 +433,7 @@ void NMPCgenerator::solve_qp(){
   }
   if(endline)
   {
-    cout << endl;
+    cout << "----" << endl;
   }
 #endif
   return ;
@@ -543,8 +545,8 @@ void NMPCgenerator::getSolution(std::vector<double> & JerkX,
 }
 
 void NMPCgenerator::updateCurrentSupport(double time,
-    std::deque<FootAbsolutePosition> &FinalLeftFootTraj,
-    std::deque<FootAbsolutePosition> &FinalRightFootTraj)
+    FootAbsolutePosition &FinalLeftFoot,
+    FootAbsolutePosition &FinalRightFoot)
 {
 #ifdef DEBUG_COUT
   cout << "previous support : \n"
@@ -567,9 +569,9 @@ void NMPCgenerator::updateCurrentSupport(double time,
   if( currentSupport_.StateChanged == true )
   {
     if( currentSupport_.Foot == LEFT )
-      FAP = & FinalLeftFootTraj.back();
+      FAP = & FinalLeftFoot;
     else
-      FAP = & FinalRightFootTraj.back();
+      FAP = & FinalRightFoot;
     currentSupport_.X = FAP->x;
     currentSupport_.Y = FAP->y;
     currentSupport_.Yaw = FAP->theta*M_PI/180.0;
@@ -578,8 +580,8 @@ void NMPCgenerator::updateCurrentSupport(double time,
 }
 
 void NMPCgenerator::updateSupportdeque(double time,
-    std::deque<FootAbsolutePosition> &FinalLeftFootTraj,
-    std::deque<FootAbsolutePosition> &FinalRightFootTraj)
+    FootAbsolutePosition &FinalLeftFoot,
+    FootAbsolutePosition &FinalRightFoot)
 {
   SupportStates_deq_[0] = currentSupport_ ;
   const FootAbsolutePosition * FAP = NULL;
@@ -598,9 +600,9 @@ void NMPCgenerator::updateSupportdeque(double time,
       if( pi == 1 || SupportStates_deq_[pi-1].Phase==DS )//Foot down
       {
         if( PreviewedSupport.Foot == LEFT )
-          FAP = & FinalLeftFootTraj.back();
+          FAP = & FinalLeftFoot;
         else
-          FAP = & FinalRightFootTraj.back();
+          FAP = & FinalRightFoot;
         PreviewedSupport.X = FAP->x;
         PreviewedSupport.Y = FAP->y;
         PreviewedSupport.Yaw = FAP->theta*M_PI/180.0;
@@ -632,8 +634,8 @@ void NMPCgenerator::updateSupportdeque(double time,
 
 void NMPCgenerator::updateFinalStateMachine(
     double time,
-    deque<FootAbsolutePosition> & FinalLeftFootTraj,
-    deque<FootAbsolutePosition> & FinalRightFootTraj)
+    FootAbsolutePosition & FinalLeftFoot,
+    FootAbsolutePosition & FinalRightFoot)
 {
 #ifdef DEBUG_COUT
   cout << "previous support : \n"
@@ -656,9 +658,9 @@ void NMPCgenerator::updateFinalStateMachine(
   if( currentSupport_.StateChanged == true )
   {
     if( currentSupport_.Foot == LEFT )
-      FAP = & FinalLeftFootTraj.back();
+      FAP = & FinalLeftFoot;
     else
-      FAP = & FinalRightFootTraj.back();
+      FAP = & FinalRightFoot;
     currentSupport_.X = FAP->x;
     currentSupport_.Y = FAP->y;
     currentSupport_.Yaw = FAP->theta*M_PI/180.0;
@@ -679,9 +681,9 @@ void NMPCgenerator::updateFinalStateMachine(
       if( pi == 1 || SupportStates_deq_[pi-1].Phase==DS )//Foot down
       {
         if( PreviewedSupport.Foot == LEFT )
-          FAP = & FinalLeftFootTraj.back();
+          FAP = & FinalLeftFoot;
         else
-          FAP = & FinalRightFootTraj.back();
+          FAP = & FinalRightFoot;
         PreviewedSupport.X = FAP->x;
         PreviewedSupport.Y = FAP->y;
         PreviewedSupport.Yaw = FAP->theta*M_PI/180.0;
@@ -820,48 +822,48 @@ void NMPCgenerator::updateCoMCoPIntegrationMatrix()
 
 void NMPCgenerator::buildConvexHullSystems()
 {
-  support_state_t dummySupp ;
-  unsigned nbEdges = 0;
-  unsigned nbIneq = 0;
-  convex_hull_t hull ;
+  unsigned nbEdges = 4 ;
+  unsigned nbIneq = 4 ;
+  hull4_ = convex_hull_t(nbEdges, nbIneq);
+  nbEdges = 5 ;
+  nbIneq = 5 ;
+  hull5_ = convex_hull_t(nbEdges, nbIneq);
 
   // CoP hulls
   ////////////////////////////////////////////////////////
-  nbEdges = 4 ;
-  nbIneq = 4 ;
-  hull = convex_hull_t(nbEdges, nbIneq);
+
   // RIGHT FOOT
-  dummySupp.Foot = RIGHT ;
-  dummySupp.Phase = SS ;
-  RFI_->set_vertices( hull, dummySupp, INEQ_COP );
-  RFI_->compute_linear_system( hull, dummySupp );
-  for(unsigned i = 0 ; i < hull.A_vec.size() ; ++i)
+  dummySupp_.Foot = RIGHT ;
+  dummySupp_.Phase = SS ;
+  RFI_->set_vertices( hull4_, dummySupp_, INEQ_COP );
+  RFI_->compute_linear_system( hull4_, dummySupp_ );
+  for(unsigned i = 0 ; i < hull4_.A_vec.size() ; ++i)
   {
-    A0rf_(i,0) = hull.A_vec[i] ;
-    A0rf_(i,1) = hull.B_vec[i] ;
-    ubB0rf_(i) = hull.D_vec[i] ;
+    A0rf_(i,0) = hull4_.A_vec[i] ;
+    A0rf_(i,1) = hull4_.B_vec[i] ;
+    ubB0rf_(i) = hull4_.D_vec[i] ;
   }
   // LEFT FOOT
-  dummySupp.Foot = LEFT ;
-  dummySupp.Phase = SS ;
-  RFI_->set_vertices( hull, dummySupp, INEQ_COP );
-  RFI_->compute_linear_system( hull, dummySupp );
-  for(unsigned i = 0 ; i < hull.A_vec.size() ; ++i)
+  dummySupp_.Foot = LEFT ;
+  dummySupp_.Phase = SS ;
+  RFI_->set_vertices( hull4_, dummySupp_, INEQ_COP );
+  RFI_->compute_linear_system( hull4_, dummySupp_ );
+  for(unsigned i = 0 ; i < hull4_.A_vec.size() ; ++i)
   {
-    A0lf_(i,0) = hull.A_vec[i] ;
-    A0lf_(i,1) = hull.B_vec[i] ;
-    ubB0lf_(i) = hull.D_vec[i] ;
+    A0lf_(i,0) = hull4_.A_vec[i] ;
+    A0lf_(i,1) = hull4_.B_vec[i] ;
+    ubB0lf_(i) = hull4_.D_vec[i] ;
   }
   // "SWITCHING MASS"/"DOUBLE SUPPORT" HULL
-  dummySupp.Foot = LEFT ; // foot by default, it shouldn't cause any trouble
-  dummySupp.Phase = SS ;
-  RFI_->set_vertices( hull, dummySupp, INEQ_COP );
-  RFI_->compute_linear_system( hull, dummySupp );
-  for(unsigned i = 0 ; i < hull.A_vec.size() ; ++i)
+  dummySupp_.Foot = LEFT ; // foot by default, it shouldn't cause any trouble
+  dummySupp_.Phase = SS ;
+  RFI_->set_vertices( hull4_, dummySupp_, INEQ_COP );
+  RFI_->compute_linear_system( hull4_, dummySupp_ );
+  for(unsigned i = 0 ; i < hull4_.A_vec.size() ; ++i)
   {
-    A0ds_(i,0) = hull.A_vec[i] ;
-    A0ds_(i,1) = hull.B_vec[i] ;
-    ubB0ds_(i) = hull.D_vec[i] ;
+    A0ds_(i,0) = hull4_.A_vec[i] ;
+    A0ds_(i,1) = hull4_.B_vec[i] ;
+    ubB0ds_(i) = hull4_.D_vec[i] ;
   }
 #ifdef DEBUG
   DumpMatrix("A0lf_",A0lf_);
@@ -873,38 +875,36 @@ void NMPCgenerator::buildConvexHullSystems()
 #endif
   // Polygonal hulls for feasible foot placement
   ///////////////////////////////////////////////////////
-  nbEdges = 5 ;
-  nbIneq = 5 ;
-  hull = convex_hull_t(nbEdges, nbIneq);
+
   // RIGHT FOOT
-  dummySupp.Foot = RIGHT ;
-  dummySupp.Phase = SS ;
-  hull.X_vec[0] = -0.28 ; hull.Y_vec[0] = -0.2 ;
-  hull.X_vec[1] = -0.2  ; hull.Y_vec[1] = -0.3 ;
-  hull.X_vec[2] =  0.0  ; hull.Y_vec[2] = -0.4 ;
-  hull.X_vec[3] =  0.2  ; hull.Y_vec[3] = -0.3 ;
-  hull.X_vec[4] =  0.28 ; hull.Y_vec[4] = -0.2 ;
-  RFI_->compute_linear_system( hull, dummySupp );
-  for(unsigned i = 0 ; i < hull.A_vec.size() ; ++i)
+  dummySupp_.Foot = RIGHT ;
+  dummySupp_.Phase = SS ;
+  hull5_.X_vec[0] = -0.28 ; hull5_.Y_vec[0] = -0.2 ;
+  hull5_.X_vec[1] = -0.2  ; hull5_.Y_vec[1] = -0.3 ;
+  hull5_.X_vec[2] =  0.0  ; hull5_.Y_vec[2] = -0.4 ;
+  hull5_.X_vec[3] =  0.2  ; hull5_.Y_vec[3] = -0.3 ;
+  hull5_.X_vec[4] =  0.28 ; hull5_.Y_vec[4] = -0.2 ;
+  RFI_->compute_linear_system( hull5_, dummySupp_ );
+  for(unsigned i = 0 ; i < hull5_.A_vec.size() ; ++i)
   {
-    A0r_(i,0) = hull.A_vec[i] ;
-    A0r_(i,1) = hull.B_vec[i] ;
-    ubB0r_(i) = hull.D_vec[i] ;
+    A0r_(i,0) = hull5_.A_vec[i] ;
+    A0r_(i,1) = hull5_.B_vec[i] ;
+    ubB0r_(i) = hull5_.D_vec[i] ;
   }
   // LEFT FOOT
-  dummySupp.Foot = LEFT ;
-  dummySupp.Phase = SS ;
-  hull.X_vec[0] = -0.28 ; hull.Y_vec[0] = 0.2 ;
-  hull.X_vec[1] = -0.2  ; hull.Y_vec[1] = 0.3 ;
-  hull.X_vec[2] =  0.0  ; hull.Y_vec[2] = 0.4 ;
-  hull.X_vec[3] =  0.2  ; hull.Y_vec[3] = 0.3 ;
-  hull.X_vec[4] =  0.28 ; hull.Y_vec[4] = 0.2 ;
-  RFI_->compute_linear_system( hull, dummySupp );
-  for(unsigned i = 0 ; i < hull.A_vec.size() ; ++i)
+  dummySupp_.Foot = LEFT ;
+  dummySupp_.Phase = SS ;
+  hull5_.X_vec[0] = -0.28 ; hull5_.Y_vec[0] = 0.2 ;
+  hull5_.X_vec[1] = -0.2  ; hull5_.Y_vec[1] = 0.3 ;
+  hull5_.X_vec[2] =  0.0  ; hull5_.Y_vec[2] = 0.4 ;
+  hull5_.X_vec[3] =  0.2  ; hull5_.Y_vec[3] = 0.3 ;
+  hull5_.X_vec[4] =  0.28 ; hull5_.Y_vec[4] = 0.2 ;
+  RFI_->compute_linear_system( hull5_, dummySupp_ );
+  for(unsigned i = 0 ; i < hull5_.A_vec.size() ; ++i)
   {
-    A0l_(i,0) = hull.A_vec[i] ;
-    A0l_(i,1) = hull.B_vec[i] ;
-    ubB0l_(i) = hull.D_vec[i] ;
+    A0l_(i,0) = hull5_.A_vec[i] ;
+    A0l_(i,1) = hull5_.B_vec[i] ;
+    ubB0l_(i) = hull5_.D_vec[i] ;
   }
 #ifdef DEBUG
   DumpMatrix("A0r_",A0r_);
@@ -912,6 +912,16 @@ void NMPCgenerator::buildConvexHullSystems()
   DumpVector("ubB0r_",ubB0r_);
   DumpVector("ubB0l_",ubB0l_);
 #endif
+
+  MAL_MATRIX_DIM(tmp52d,double,5,2) ;
+  MAL_MATRIX_FILL(tmp52d,0.0) ;
+
+  MAL_VECTOR_DIM(tmp5d,double,5) ;
+  MAL_VECTOR_FILL(tmp5d,0.0) ;
+
+  A0f_xy_.resize(nf_,tmp52d);
+  A0f_theta_.resize(nf_,tmp52d);
+  B0f_.resize(nf_,tmp5d);
 
   return ;
 }
@@ -1008,28 +1018,22 @@ void NMPCgenerator::updateCoPConstraint()
     }
     else if(currentSupport_.Phase==SS && i==0 && time_+T_ > currentSupport_.TimeLimit)
     {
-      support_state_t dummySupp ;
-      unsigned nbEdges = 4;
-      unsigned nbIneq = 4;
-      convex_hull_t hull = convex_hull_t (nbEdges, nbIneq) ;
-
       double x1 (currentLeftFootAbsolutePosition_ .x);
       double y1 (currentLeftFootAbsolutePosition_ .y);
       double x2 (currentRightFootAbsolutePosition_.x);
       double y2 (currentRightFootAbsolutePosition_.y);
       double angle = atan2(y2-y1,x2-x1);
 
-      MAL_MATRIX_DIM(rotMat,double,2,2);
       rotMat_(0,0)= cos(angle) ; rotMat_(0,1)= sin(angle) ;
       rotMat_(1,0)=-sin(angle) ; rotMat_(1,1)= cos(angle) ;
 
       double l = 0.04;
       double L = sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)) + 0.04 ;
 
-      hull.X_vec[0] = - L*0.5 ; hull.Y_vec[0] = - l*0.5 ;
-      hull.X_vec[1] = - L*0.5 ; hull.Y_vec[1] = + l*0.5 ;
-      hull.X_vec[2] = + L*0.5 ; hull.Y_vec[2] = + l*0.5 ;
-      hull.X_vec[3] = + L*0.5 ; hull.Y_vec[3] = - l*0.5 ;
+      hull4_.X_vec[0] = - L*0.5 ; hull4_.Y_vec[0] = - l*0.5 ;
+      hull4_.X_vec[1] = - L*0.5 ; hull4_.Y_vec[1] = + l*0.5 ;
+      hull4_.X_vec[2] = + L*0.5 ; hull4_.Y_vec[2] = + l*0.5 ;
+      hull4_.X_vec[3] = + L*0.5 ; hull4_.Y_vec[3] = - l*0.5 ;
 #ifdef COUT
       double m1=(x1+x2)*0.5;
       double m2=(y1+y2)*0.5;
@@ -1041,19 +1045,18 @@ void NMPCgenerator::updateCoPConstraint()
            << hull.X_vec[2] << " " << hull.Y_vec[2] << " ; "
            << hull.X_vec[3] << " " << hull.Y_vec[3] << endl ;
 #endif
-      dummySupp.Foot = LEFT ;
-      dummySupp.Phase = SS ;
-      RFI_->compute_linear_system( hull, dummySupp );
-      for(unsigned i = 0 ; i < hull.A_vec.size() ; ++i)
+      dummySupp_.Foot = LEFT ;
+      dummySupp_.Phase = SS ;
+      RFI_->compute_linear_system( hull4_, dummySupp_ );
+      for(unsigned i = 0 ; i < hull4_.A_vec.size() ; ++i)
       {
-        A0g_(i,0) = hull.A_vec[i] ;
-        A0g_(i,1) = hull.B_vec[i] ;
-        ubB0g_(i) = hull.D_vec[i] ;
+        A0ds_(i,0) = hull4_.A_vec[i] ;
+        A0ds_(i,1) = hull4_.B_vec[i] ;
+        ubB0ds_(i) = hull4_.D_vec[i] ;
       }
-      A0_xy_ = MAL_RET_A_by_B(A0g_,rotMat_) ;
-      MAL_MATRIX_RESIZE(A0_theta_,MAL_MATRIX_NB_ROWS(A0_xy_),MAL_MATRIX_NB_COLS(A0_xy_));
+      A0_xy_ = MAL_RET_A_by_B(A0ds_,rotMat_) ;
       MAL_MATRIX_FILL(A0_theta_,0.0) ;
-      B0_ = ubB0g_ ;
+      B0_ = ubB0ds_ ;
     }
     else if (SupportStates_deq_[i+1].Foot == LEFT)
     {
@@ -1065,6 +1068,18 @@ void NMPCgenerator::updateCoPConstraint()
       A0_theta_ = MAL_RET_A_by_B(A0rf_,rotMat_theta_) ;
       B0_ = ubB0rf_ ;
     }
+#ifdef DEBUG_COUT
+    if(MAL_MATRIX_NB_ROWS(A0_xy_)!=4 ||
+       MAL_MATRIX_NB_COLS(A0_xy_)!=2 ||
+       MAL_MATRIX_NB_ROWS(A0_theta_)!=4 ||
+       MAL_MATRIX_NB_COLS(A0_theta_)!=2 ||
+       MAL_VECTOR_SIZE(B0_)!=4)
+    {
+    cout << A0_xy_ << endl
+         << A0_theta_ << endl
+         << B0_ << endl ;
+    }
+#endif
     for (unsigned k=0 ; k<MAL_MATRIX_NB_ROWS(A0_xy_) ; ++k)
     {
       // get d_i+1^x(f^theta)
@@ -1147,13 +1162,13 @@ void NMPCgenerator::updateCoPConstraint()
   Acop_xy_ = MAL_RET_A_by_B(D_kp1_xy_,Pzuv_);
 
   // build Acop_theta_ TODO VERIFY THE EQUATION !!!!!
-  MAL_MATRIX_TYPE(double) dummy1 = MAL_RET_A_by_B(D_kp1_theta_,Pzuv_);
-  MAL_VECTOR_TYPE(double) dummy = MAL_RET_A_by_B(dummy1,U_xy_);
-  dummy = MAL_RET_A_by_B(dummy,derv_Acop_map_);
-  dummy = MAL_RET_A_by_B(dummy,V_kp1_);
+  Acop_theta_dummy0_ = MAL_RET_A_by_B(D_kp1_theta_,Pzuv_);
+  Acop_theta_dummy1_ = MAL_RET_A_by_B(Acop_theta_dummy0_,U_xy_);
+  Acop_theta_dummy1_ = MAL_RET_A_by_B(Acop_theta_dummy1_,derv_Acop_map_);
+  Acop_theta_dummy1_ = MAL_RET_A_by_B(Acop_theta_dummy1_,V_kp1_);
   for(unsigned i=0 ; i<MAL_MATRIX_NB_ROWS(Acop_theta_) ; ++i)
     for(unsigned j=0 ; j<MAL_MATRIX_NB_COLS(Acop_theta_) ; ++j)
-      Acop_theta_(i,j) = dummy(j);
+      Acop_theta_(i,j) = Acop_theta_dummy1_(j);
 
   UBcop_ = b_kp1_ + MAL_RET_A_by_B(D_kp1_xy_,v_kp1f_-Pzsc_) ;
 #ifdef DEBUG
@@ -1217,6 +1232,11 @@ void NMPCgenerator::initializeFootPoseConstraint()
 
   MAL_MATRIX_RESIZE(derv_Afoot_map_,nc_foot_,N_);
 
+  MAL_VECTOR_RESIZE(SfootX_,nf_);
+  MAL_VECTOR_RESIZE(SfootY_,nf_);
+  MAL_VECTOR_FILL(SfootX_,0.0);
+  MAL_VECTOR_FILL(SfootY_,0.0);
+
   return ;
 }
 
@@ -1262,8 +1282,7 @@ void NMPCgenerator::updateFootPoseConstraint()
 
   // every time instant in the pattern generator constraints
   // depend on the support order
-  vector<MAL_MATRIX_TYPE(double)> Af_xy(nf_), Af_theta(nf_) ;
-  vector<MAL_VECTOR_TYPE(double)> Bf(nf_);
+
   // reset matrix
   MAL_MATRIX_FILL(ASx_xy_ ,0.0);
   MAL_MATRIX_FILL(ASy_xy_ ,0.0);
@@ -1274,28 +1293,28 @@ void NMPCgenerator::updateFootPoseConstraint()
   {
     if (support_state[i].Foot == LEFT)
     {
-      Af_xy   [i] = MAL_RET_A_by_B(A0r_,rotMat_vec_[i]) ;
-      Af_theta[i] = MAL_RET_A_by_B(A0r_,drotMat_vec_[i]) ;
-      Bf      [i] = ubB0r_ ;
+      A0f_xy_   [i] = MAL_RET_A_by_B(A0r_,rotMat_vec_[i]) ;
+      A0f_theta_[i] = MAL_RET_A_by_B(A0r_,drotMat_vec_[i]) ;
+      B0f_      [i] = ubB0r_ ;
     }else{
-      Af_xy   [i] = MAL_RET_A_by_B(A0l_,rotMat_vec_[i]) ;
-      Af_theta[i] = MAL_RET_A_by_B(A0l_,drotMat_vec_[i]) ;
-      Bf      [i] = ubB0l_ ;
+      A0f_xy_   [i] = MAL_RET_A_by_B(A0l_,rotMat_vec_[i]) ;
+      A0f_theta_[i] = MAL_RET_A_by_B(A0l_,drotMat_vec_[i]) ;
+      B0f_      [i] = ubB0l_ ;
     }
   }
 
-  unsigned nbEdges = MAL_MATRIX_NB_ROWS(Af_xy[0]);
+  unsigned nbEdges = MAL_MATRIX_NB_ROWS(A0f_xy_[0]);
   for(unsigned n=0 ; n<nf_ ; ++n)
   {
     for (unsigned i=0 ; i<nbEdges ; ++i)
     {
-      ASx_xy_(n*nbEdges+i,n) = Af_xy[n](i,0) ;
-      ASy_xy_(n*nbEdges+i,n) = Af_xy[n](i,1) ;
+      ASx_xy_(n*nbEdges+i,n) = A0f_xy_[n](i,0) ;
+      ASy_xy_(n*nbEdges+i,n) = A0f_xy_[n](i,1) ;
 
-      ASx_theta_(n*nbEdges+i,n) = Af_theta[n](i,0) ;
-      ASy_theta_(n*nbEdges+i,n) = Af_theta[n](i,1) ;
+      ASx_theta_(n*nbEdges+i,n) = A0f_theta_[n](i,0) ;
+      ASy_theta_(n*nbEdges+i,n) = A0f_theta_[n](i,1) ;
 
-      UBfoot_(n*nbEdges+i) = Bf[n](i);
+      UBfoot_(n*nbEdges+i) = B0f_[n](i);
     }
   }
 #ifdef DEBUG
@@ -1306,14 +1325,14 @@ void NMPCgenerator::updateFootPoseConstraint()
 #ifdef DEBUG_COUT
   cout << "ASx_xy_ = " << ASx_xy_ << endl ;
 #endif
-  MAL_VECTOR_DIM(SfootX,double,nf_);
-  MAL_VECTOR_FILL(SfootX,0.0);
-  MAL_VECTOR_DIM(SfootY,double,nf_);
-  MAL_VECTOR_FILL(SfootY,0.0);
-  SfootX(0) = support_state[0].X ; SfootX(1) = 0.0 ;
-  SfootY(0) = support_state[0].Y ; SfootY(1) = 0.0 ;
+  MAL_VECTOR_FILL(SfootX_,0.0);
+  MAL_VECTOR_FILL(SfootY_,0.0);
+  SfootX_(0) = support_state[0].X ; SfootX_(1) = 0.0 ;
+  SfootY_(0) = support_state[0].Y ; SfootY_(1) = 0.0 ;
 
-  UBfoot_ = UBfoot_ + MAL_RET_A_by_B(ASx_xy_,SfootX)  + MAL_RET_A_by_B(ASy_xy_,SfootY) ;
+  UBfoot_ = UBfoot_ +
+      MAL_RET_A_by_B(ASx_xy_,SfootX_) +
+      MAL_RET_A_by_B(ASy_xy_,SfootY_) ;
 
   ASx_xy_    = MAL_RET_A_by_B(ASx_xy_   ,SelecMat_);
   ASy_xy_    = MAL_RET_A_by_B(ASy_xy_   ,SelecMat_);

@@ -405,6 +405,10 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
       PerturbationOccured_=false;
     }
     VelRef_=NewVelRef_;
+
+    struct timeval begin ;
+    gettimeofday(&begin,0);
+
     NMPCgenerator_->updateInitialCondition(
         time,
         initLeftFoot_ ,
@@ -416,6 +420,31 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     // SOLVE PROBLEM:
     // --------------
     NMPCgenerator_->solve();
+
+    static int warning=0;
+    struct timeval end ;
+    gettimeofday(&end,0);
+    double ltime = end.tv_sec-begin.tv_sec
+        + 0.000001 * (end.tv_usec - begin.tv_usec);
+
+//    bool endline = false ;
+//    if(ltime >= 0.0005)
+//    {
+//      cout << ltime * 1000 << " "
+//           << NMPCgenerator_->cput()*1000 << " "
+//           << ltime * 1000 - NMPCgenerator_->cput()*1000 ;
+//      endline = true;
+//    }
+//    if((ltime * 1000 - NMPCgenerator_->cput()*1000)>= 0.5)
+//    {
+//      ++warning;
+//      cout << " : warning on cpu time ; " << warning ;
+//      endline = true;
+//    }
+//    if(endline)
+//    {
+//      cout << endl;
+//    }
 
     // INITIALIZE INTERPOLATION:
     // ------------------------
@@ -433,14 +462,14 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     FullTrajectoryInterpolation(time);
 
     // Take only the data that are actually used by the robot
-    FinalZMPTraj_deq      .clear(); FinalLeftFootTraj_deq .clear();
-    FinalCOMTraj_deq      .clear(); FinalRightFootTraj_deq.clear();
+    FinalZMPTraj_deq.resize(2); FinalLeftFootTraj_deq .resize(2);;
+    FinalCOMTraj_deq.resize(2); FinalRightFootTraj_deq.resize(2);;
     for(unsigned i=0 ; i < 2 ; ++i)
     {
-      FinalZMPTraj_deq      .push_back(ZMPTraj_deq_ctrl_      [i]) ;
-      FinalCOMTraj_deq      .push_back(COMTraj_deq_ctrl_      [i]) ;
-      FinalLeftFootTraj_deq .push_back(LeftFootTraj_deq_ctrl_ [i]) ;
-      FinalRightFootTraj_deq.push_back(RightFootTraj_deq_ctrl_[i]) ;
+      FinalZMPTraj_deq      [i] = ZMPTraj_deq_ctrl_      [i] ;
+      FinalCOMTraj_deq      [i] = COMTraj_deq_ctrl_      [i] ;
+      FinalLeftFootTraj_deq [i] = LeftFootTraj_deq_ctrl_ [i] ;
+      FinalRightFootTraj_deq[i] = RightFootTraj_deq_ctrl_[i] ;
     }
 
     bool filterOn_ = true ;

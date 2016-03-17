@@ -74,14 +74,14 @@ namespace PatternGeneratorJRL
     void computeInitialGuess();
 
     void updateFinalStateMachine(double time,
-        std::deque<FootAbsolutePosition> &FinalLeftFootTraj,
-        std::deque<FootAbsolutePosition> &FinalRightFootTraj);
+        FootAbsolutePosition &FinalLeftFoot,
+        FootAbsolutePosition &FinalRightFoot);
     void updateCurrentSupport(double time,
-        std::deque<FootAbsolutePosition> &FinalLeftFootTraj,
-        std::deque<FootAbsolutePosition> &FinalRightFootTraj);
+        FootAbsolutePosition &FinalLeftFoot,
+        FootAbsolutePosition &FinalRightFoot);
     void updateSupportdeque(double time,
-        std::deque<FootAbsolutePosition> &FinalLeftFootTraj,
-        std::deque<FootAbsolutePosition> &FinalRightFootTraj);
+        FootAbsolutePosition &FinalLeftFoot,
+        FootAbsolutePosition &FinalRightFoot);
     void computeFootSelectionMatrix();
 
     // build the constraints :
@@ -185,6 +185,15 @@ namespace PatternGeneratorJRL
     inline void T_step(double T_step)
     {T_step_=T_step;}
 
+    // cpu time consumption for one SQP
+    inline double cput()
+    {return *cput_ ;}
+
+    // number of active set recalculation
+    inline int nwsr()
+    {return nwsr_ ;}
+
+
   private:
     SimplePluginManager * SPM_ ;
     CjrlHumanoidDynamicRobot * HDR_ ;
@@ -229,22 +238,31 @@ namespace PatternGeneratorJRL
     MAL_MATRIX_TYPE(double) rotMat_xy_, rotMat_theta_, rotMat_;
     MAL_MATRIX_TYPE(double) A0_xy_, A0_theta_;
     MAL_VECTOR_TYPE(double) B0_;
+    MAL_MATRIX_TYPE(double) Acop_theta_dummy0_;
+    MAL_VECTOR_TYPE(double) Acop_theta_dummy1_;
+
     // Foot position constraint
     unsigned nc_foot_ ;
     MAL_MATRIX_TYPE(double) Afoot_xy_, Afoot_theta_  ;
     MAL_VECTOR_TYPE(double) UBfoot_, LBfoot_ ;
     MAL_MATRIX_TYPE(double) SelecMat_, derv_Afoot_map_ ;
+    std::vector<MAL_MATRIX_TYPE(double)> A0f_xy_, A0f_theta_ ;
+    std::vector<MAL_VECTOR_TYPE(double)> B0f_;
     std::vector<MAL_MATRIX_TYPE(double)> rotMat_vec_, drotMat_vec_ ;
     MAL_MATRIX_TYPE(double) tmpRotMat_;
     MAL_MATRIX_TYPE(double) ASx_xy_, ASy_xy_, ASx_theta_, ASy_theta_ , AS_theta_;
+    MAL_VECTOR_TYPE(double) SfootX_, SfootY_;
+
     // Foot Velocity constraint
     unsigned nc_vel_ ;
     MAL_MATRIX_TYPE(double) Avel_ ;
     MAL_VECTOR_TYPE(double) UBvel_, LBvel_ ;
+
     // Rotation linear constraint
     unsigned nc_rot_ ;
     MAL_MATRIX_TYPE(double) Arot_ ;
     MAL_VECTOR_TYPE(double) UBrot_, LBrot_ ;
+
     // Obstacle constraint
     unsigned nc_obs_ ;
     std::vector< std::vector<MAL_MATRIX_TYPE(double)> > Hobs_ ;
@@ -347,6 +365,8 @@ namespace PatternGeneratorJRL
     MAL_MATRIX_TYPE(double) Pzu_ ;
 
     // Convex Hulls for ZMP and FootStep constraints :
+    support_state_t dummySupp_ ;
+    convex_hull_t hull4_, hull5_ ;
     RelativeFeetInequalities * RFI_;
     double FeetDistance_;
     // linear system corresponding to the foot step constraints
@@ -364,9 +384,6 @@ namespace PatternGeneratorJRL
     // left foot hull minus security margin
     MAL_MATRIX_TYPE(double) A0lf_    ;
     MAL_VECTOR_TYPE(double) ubB0lf_  ;
-    // transition hull when the two are on the ground while walking
-    MAL_MATRIX_TYPE(double) A0g_    ;
-    MAL_VECTOR_TYPE(double) ubB0g_  ;
     // foot hull minus security margin for standing still
     // or dealing with the switching mass phase
     MAL_MATRIX_TYPE(double) A0ds_   ;
