@@ -334,8 +334,6 @@ namespace PatternGeneratorJRL
         const int IterationNumber,           // INPUT
         const unsigned int currentIndex,     // INPUT
         const std::deque<support_state_t> & SupportStates_deq );// INPUT
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
 
