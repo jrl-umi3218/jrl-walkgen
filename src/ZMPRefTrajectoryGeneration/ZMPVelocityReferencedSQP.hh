@@ -259,32 +259,31 @@ namespace PatternGeneratorJRL
     FootAbsolutePosition initRightFoot_ ;
     COMState itCOM_ ;
 
-    /// \brief Duration of the preview for filtering
-    double previewDuration_ ;
-    /// \brief Size of the preview for filtering
-    int previewSize_ ;
+    /// \brief Size of the output preview
+    unsigned NbSampleOutput_ ;
     /// \brief Number of interpolated point needed for control computed during QP_T_
     unsigned NbSampleControl_ ;
     /// \brief Number of interpolated point needed for the dynamic filter computed during QP_T_
     unsigned NbSampleInterpolation_ ;
+    /// \brief Size of the preview for filtering
+    unsigned previewSize_ ;
+
+    /// \brief Duration of the preview for filtering
+    double previewDuration_ ;
+    /// \brief Duration of the output preview
+    double outputPreviewDuration_ ;
     /// \brief Interpolation Period for the dynamic filter
     double InterpolationPeriod_ ;
-
     /// \brief Step Period of the robot
     double StepPeriod_ ;
-
     /// \brief Period where the robot is on ONE feet
     double SSPeriod_ ;
-
     /// \brief Period where the robot is on TWO feet
     double DSPeriod_ ;
-
     /// \brief Maximum distance between the feet
     double FeetDistance_ ;
-
     /// \brief Maximum height of the feet
     double StepHeight_ ;
-
     /// \brief Height of the CoM
     double CoMHeight_ ;
 
@@ -335,6 +334,8 @@ namespace PatternGeneratorJRL
         const int IterationNumber,           // INPUT
         const unsigned int currentIndex,     // INPUT
         const std::deque<support_state_t> & SupportStates_deq );// INPUT
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
 

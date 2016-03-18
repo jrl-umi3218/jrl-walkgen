@@ -65,9 +65,11 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   m_SamplingPeriod = 0.005 ;
 
   // Generator Management
-  InterpolationPeriod_ = m_SamplingPeriod*10;
-  previewSize_ = 9 ;
+  InterpolationPeriod_ = m_SamplingPeriod*7;
+  previewSize_ = 8 ;
   previewDuration_ =  (previewSize_-1)*SQP_T_ ;
+  outputPreviewDuration_ = m_SamplingPeriod ;
+  NbSampleOutput_ = (int)round(outputPreviewDuration_/m_SamplingPeriod) + 1 ;
   NbSampleControl_ = (int)round(SQP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(SQP_T_/InterpolationPeriod_) ;
   StepPeriod_ = 0.8 ;
@@ -143,6 +145,8 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   COMTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
   LeftFootTraj_deq_ctrl_ .resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
   RightFootTraj_deq_ctrl_.resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
+
+  deltaCOMTraj_deq_.resize((int)round(outputPreviewDuration_/m_SamplingPeriod));
 
   JerkX_      .clear();
   JerkY_      .clear();
@@ -351,7 +355,7 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   dynamicFilter_->getComAndFootRealization()->ShiftFoot(true);
   dynamicFilter_->init(m_SamplingPeriod,
                        InterpolationPeriod_,
-                       m_SamplingPeriod,
+                       outputPreviewDuration_,
                        previewDuration_ ,
                        previewDuration_-SQP_T_,
                        lStartingCOMState);
@@ -384,14 +388,13 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
   }
 
   // Test if the end of the online mode has been reached.
-  if ((EndingPhase_) &&
-      (time>=TimeToStopOnLineMode_))
+  if ((EndingPhase_) && (time>=TimeToStopOnLineMode_))
   { m_OnLineMode = false; }
 
   // UPDATE WALKING TRAJECTORIES:
   // ----------------------------
-  //if(time + 0.00001 > UpperTimeLimitToUpdate_)
-  //{
+  if(time + 0.00001 > UpperTimeLimitToUpdate_)
+  {
     // UPDATE INTERNAL DATA:
     // ---------------------
     if(PerturbationOccured_ &&
@@ -427,24 +430,24 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     double ltime = end.tv_sec-begin.tv_sec
         + 0.000001 * (end.tv_usec - begin.tv_usec);
 
-//    bool endline = false ;
-//    if(ltime >= 0.0005)
-//    {
-//      cout << ltime * 1000 << " "
-//           << NMPCgenerator_->cput()*1000 << " "
-//           << ltime * 1000 - NMPCgenerator_->cput()*1000 ;
-//      endline = true;
-//    }
-//    if((ltime * 1000 - NMPCgenerator_->cput()*1000)>= 0.5)
-//    {
-//      ++warning;
-//      cout << " : warning on cpu time ; " << warning ;
-//      endline = true;
-//    }
-//    if(endline)
-//    {
-//      cout << endl;
-//    }
+    bool endline = false ;
+    if(ltime >= 0.0005)
+    {
+      cout << ltime * 1000 << " "
+           << NMPCgenerator_->cput()*1000 << " "
+           << ltime * 1000 - NMPCgenerator_->cput()*1000 ;
+      endline = true;
+    }
+    if((ltime * 1000 - NMPCgenerator_->cput()*1000)>= 0.5)
+    {
+      ++warning;
+      cout << " : warning on cpu time ; " << warning ;
+      endline = true;
+    }
+    if(endline)
+    {
+      cout << endl;
+    }
 
     // INITIALIZE INTERPOLATION:
     // ------------------------
@@ -462,9 +465,9 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     FullTrajectoryInterpolation(time);
 
     // Take only the data that are actually used by the robot
-    FinalZMPTraj_deq.resize(2); FinalLeftFootTraj_deq .resize(2);;
-    FinalCOMTraj_deq.resize(2); FinalRightFootTraj_deq.resize(2);;
-    for(unsigned i=0 ; i < 2 ; ++i)
+    FinalZMPTraj_deq.resize(NbSampleOutput_); FinalLeftFootTraj_deq .resize(NbSampleOutput_);;
+    FinalCOMTraj_deq.resize(NbSampleOutput_); FinalRightFootTraj_deq.resize(NbSampleOutput_);;
+    for(unsigned i=0 ; i < NbSampleOutput_ ; ++i)
     {
       FinalZMPTraj_deq      [i] = ZMPTraj_deq_ctrl_      [i] ;
       FinalCOMTraj_deq      [i] = COMTraj_deq_ctrl_      [i] ;
@@ -506,17 +509,22 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
       {
         if (EndingPhase_ == false)
         {
-          TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + SQP_T_ * SQP_N_ + m_SamplingPeriod;
+          TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_
+              + outputPreviewDuration_ * SQP_N_
+              + m_SamplingPeriod;
         }
-        UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + SQP_T_ + m_SamplingPeriod ;
+        UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_
+            + outputPreviewDuration_ + m_SamplingPeriod ;
       }else{
         if (EndingPhase_ == false)
         {
-          TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_ + SQP_T_ * SQP_N_;
+          TimeToStopOnLineMode_ = UpperTimeLimitToUpdate_
+              + outputPreviewDuration_ * SQP_N_;
         }
-        UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_ + SQP_T_;
+        UpperTimeLimitToUpdate_ = UpperTimeLimitToUpdate_
+            + outputPreviewDuration_;
       }
-  //}
+  }
   //-----------------------------------
   //
   //
@@ -542,7 +550,7 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
   LIPM_.setState(itCOM_);
 
   CoMZMPInterpolation(JerkX_,JerkY_,&LIPM_,NbSampleControl_,0,CurrentIndex_,SupportStates_deq);
-  itCOM_ = COMTraj_deq_ctrl_[1];
+  itCOM_ = COMTraj_deq_ctrl_[NbSampleOutput_-1];
 
   support_state_t currentSupport = SupportStates_deq[0] ;
   currentSupport.StepNumber=0;
@@ -627,7 +635,7 @@ void ZMPVelocityReferencedSQP::CoMZMPInterpolation(
     const double tf = 0.75;
     jx = 6/(tf*tf*tf)*(jx - tf*COMTraj_deq_ctrl_[i-1].x[1] - (tf*tf/2)*COMTraj_deq_ctrl_[i-1].x[2]);
     jy = 6/(tf*tf*tf)*(jy - tf*COMTraj_deq_ctrl_[i-1].y[1] - (tf*tf/2)*COMTraj_deq_ctrl_[i-1].y[2]);
-    LIPM->Interpolation( COMTraj_deq_ctrl_, ZMPTraj_deq_ctrl_, currentIndex + IterationNumber * numberOfSample, jx, jy);
+    LIPM->Interpolation( COMTraj_deq_ctrl_, ZMPTraj_deq_ctrl_, currentIndex, jx, jy);
   }
   else
   {
