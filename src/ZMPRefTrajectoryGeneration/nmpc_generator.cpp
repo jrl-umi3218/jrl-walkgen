@@ -400,8 +400,10 @@ void NMPCgenerator::solve_qp(){
   else
   {
     // force the solver to use the maximum time for computing the solution
+//    cput_[0] = 0.0015;
+//    nwsr_ = 20 ;
     cput_[0] = 0.0015;
-    nwsr_ = 20 ;
+    nwsr_ = 100 ;
     /*ret = */QP_->hotstart(
       qpOases_H_, qpOases_g_, qpOases_J_,
       qpOases_lb_, qpOases_ub_,
@@ -1028,7 +1030,7 @@ void NMPCgenerator::updateCoPConstraint()
       rotMat_(1,0)=-sin(angle) ; rotMat_(1,1)= cos(angle) ;
 
       double l = 0.04;
-      double L = sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)) + 0.04 ;
+      double L = sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)) ;
 
       hull4_.X_vec[0] = - L*0.5 ; hull4_.Y_vec[0] = - l*0.5 ;
       hull4_.X_vec[1] = - L*0.5 ; hull4_.Y_vec[1] = + l*0.5 ;
@@ -1418,46 +1420,13 @@ void NMPCgenerator::updateFootVelIneqConstraint()
       break;
   --itBeforeLanding;
 
-//  double dt = (double)itBeforeLanding * T_ - 2*T_;// (t_touchdown - t)
-//  if(dt<=0.0)
-//  {
-//    dt=0.0;
-//  }
-//  //dt=0.0;
-
-//  double vref_x = vel_ref_.Global.X ;
-//  double vref_y = vel_ref_.Global.Y ;
-//  double norm_vref = sqrt(vref_x*vref_x + vref_y*vref_y ) ;
-//  if (norm_vref<=1e-5)
-//  {
-//    // in that case we use arbitrary velocity reference
-//    // to not get division by zero
-//    vref_x = 1.0 ;
-//    vref_y = 0.0 ;
-//    norm_vref = 1.0;
-//  }
-//  double dyaw = vel_ref_.Global.Yaw ;
-//  double signq = dyaw>=0.0?1:-1;
-
-//  double xvmax(0.4), yvmax(0.4), yawvmax(0.3) ;// [m/s,m/s,rad/s]
-
-//  UBvel_(0) = (dt) * xvmax + vref_x * F_kp1_x_(0) / norm_vref ;
-//  UBvel_(1) = (dt) * yvmax + vref_y * F_kp1_y_(0) / norm_vref ;
-
-//  Avel_(0, N_      ) = vref_x / norm_vref ;
-//  Avel_(1, 2*N_+nf_) = vref_y / norm_vref ;
-
-//  Avel_ (2,2*N_+2*nf_) = signq ;
-//  UBvel_(2) = (dt) * yawvmax + signq * F_kp1_theta_(0) ;
-
-
-
   double thresh_time_pos = 0.0 ;
   double thresh_time_rot = 0.0 ;
   if(itBeforeLanding < 2)
+  {
     thresh_time_pos=1.0;
-  if(itBeforeLanding < 2)
     thresh_time_rot=1.0;
+  }
   Avel_(0, N_      ) = thresh_time_pos ;
   Avel_(1, 2*N_+nf_) = thresh_time_pos ;
   Avel_ (2,2*N_+2*nf_) = thresh_time_rot ;
@@ -1702,6 +1671,13 @@ void NMPCgenerator::initializeCostFunction()
   MAL_VECTOR_RESIZE(Pvsc_y_     ,N_);             MAL_VECTOR_FILL(Pvsc_y_       , 0.0);
 
 
+//  MAL_MATRIX_RESIZE(qp_J_  ,nc_,nv_);
+//  MAL_VECTOR_RESIZE(qp_lbJ_,nc_);
+//  MAL_VECTOR_RESIZE(qp_ubJ_,nc_);
+//  MAL_MATRIX_FILL(qp_J_  ,0.0);
+//  MAL_VECTOR_FILL(qp_lbJ_,0.0);
+//  MAL_VECTOR_FILL(qp_ubJ_,0.0);
+
   // Q_q = 0.5 * a * ( 1 0 )
   //                 ( 0 1 )
   Q_theta_ *= alpha_ ;
@@ -1725,10 +1701,17 @@ void NMPCgenerator::updateCostFunction()
           + gamma_ * I_NN_ ;
 
   // number of constraint
-  nc_ = nc_cop_+nc_foot_+nc_vel_+nc_rot_+nc_obs_+nc_stan_ ;
-  MAL_MATRIX_RESIZE(qp_J_, nc_,nv_); MAL_MATRIX_FILL(qp_J_, 0.0);
-  MAL_VECTOR_RESIZE(qp_lbJ_, nc_); MAL_VECTOR_FILL(qp_lbJ_, 0.0);
-  MAL_VECTOR_RESIZE(qp_ubJ_, nc_); MAL_VECTOR_FILL(qp_ubJ_, 0.0);
+  unsigned nc = nc_cop_+nc_foot_+nc_vel_+nc_rot_+nc_obs_+nc_stan_ ;
+  if(nc_!=nc)
+  {
+    MAL_MATRIX_RESIZE(qp_J_, nc_,nv_);
+    MAL_VECTOR_RESIZE(qp_lbJ_, nc_);
+    MAL_VECTOR_RESIZE(qp_ubJ_, nc_);
+  }
+  nc_=nc;
+  MAL_MATRIX_FILL(qp_J_, 0.0);
+  MAL_VECTOR_FILL(qp_lbJ_, 0.0);
+  MAL_VECTOR_FILL(qp_ubJ_, 0.0);
 
   // Q_xXX = (  0.5 * a * Pvu^T   * Pvu + b * Pzu^T * Pzu + c * I )
   // Q_xXF = ( -0.5 * b * Pzu^T   * V_kp1 )
@@ -1939,12 +1922,12 @@ void NMPCgenerator::updateCostFunction()
 
 
   // Fill up qp_lbJ_, qp_ubJ_ and qp_J_
-  MAL_MATRIX_RESIZE(qp_J_  ,nc_,nv_);
-  MAL_VECTOR_RESIZE(qp_lbJ_,nc_);
-  MAL_VECTOR_RESIZE(qp_ubJ_,nc_);
-  MAL_MATRIX_FILL(qp_J_  ,0.0);
-  MAL_VECTOR_FILL(qp_lbJ_,0.0);
-  MAL_VECTOR_FILL(qp_ubJ_,0.0);
+//  MAL_MATRIX_RESIZE(qp_J_  ,nc_,nv_);
+//  MAL_VECTOR_RESIZE(qp_lbJ_,nc_);
+//  MAL_VECTOR_RESIZE(qp_ubJ_,nc_);
+//  MAL_MATRIX_FILL(qp_J_  ,0.0);
+//  MAL_VECTOR_FILL(qp_lbJ_,0.0);
+//  MAL_VECTOR_FILL(qp_ubJ_,0.0);
   unsigned index = 0 ;
   for(unsigned i=0 ; i<nc_cop_ ; ++i)
   {
