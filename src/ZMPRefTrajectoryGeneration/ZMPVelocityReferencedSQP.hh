@@ -212,6 +212,8 @@ namespace PatternGeneratorJRL
     /// \brief Nb. foot support inside preview window
     int SQP_nf_;
 
+
+
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D LIPM_ ;
 
@@ -255,9 +257,9 @@ namespace PatternGeneratorJRL
     double previewDuration_ ;
     /// \brief Size of the preview for filtering
     int previewSize_ ;
-    /// \brief Number of interpolated point needed for control computed during QP_T_
+    /// \brief Number of interpolated point needed for control computed during SQP_T_
     unsigned NbSampleControl_ ;
-    /// \brief Number of interpolated point needed for the dynamic filter computed during QP_T_
+    /// \brief Number of interpolated point needed for the dynamic filter computed during SQP_T_
     unsigned NbSampleInterpolation_ ;
     /// \brief Interpolation Period for the dynamic filter
     double InterpolationPeriod_ ;

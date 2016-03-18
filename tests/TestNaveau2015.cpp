@@ -1014,13 +1014,13 @@ protected:
         (this->*(events[i].Handler))(*m_PGI);
       }
     }
-    if(m_OneStep.NbOfIt>=5*200)
+    if(m_OneStep.NbOfIt>=0*200)
     {
       ostringstream oss ;
       oss << ":perturbationforce "
           //<< 15*sin((m_OneStep.NbOfIt-5*200)*0.005)
-          << -20 << " "
-          << -4 << " "
+          << -6 << " "
+          << -6 << " "
           << " 0.0";
       cout << oss.str() << endl ;
       istringstream strm (oss.str()) ;
