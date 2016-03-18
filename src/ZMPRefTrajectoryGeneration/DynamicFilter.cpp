@@ -431,7 +431,7 @@ int DynamicFilter::OptimalControl(
   assert(PC_->IsCoherent());
   int Nctrl = (int)round(controlWindowSize_/controlPeriod_) ;
 
-  outputDeltaCOMTraj_deq_.resize(Nctrl);
+  assert(outputDeltaCOMTraj_deq_.size()==Nctrl);
   double deltaZMPx = 0.0 ;
   double deltaZMPy = 0.0 ;
   // computation of the preview control along the "deltaZMP_deq_"
