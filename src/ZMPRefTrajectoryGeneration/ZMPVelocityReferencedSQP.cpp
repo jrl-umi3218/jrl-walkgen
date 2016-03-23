@@ -63,8 +63,8 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   SQP_N_ = 16 ;
   SQP_nf_ = 2 ;
   m_SamplingPeriod = 0.005 ;
-  //outputPreviewDuration_ = m_SamplingPeriod ;
-  outputPreviewDuration_ = SQP_T_ ;
+  outputPreviewDuration_ = m_SamplingPeriod ;
+  //outputPreviewDuration_ = SQP_T_ ;
 
   // Generator Management
   InterpolationPeriod_ = m_SamplingPeriod*7;
