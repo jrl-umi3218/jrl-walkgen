@@ -63,12 +63,13 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   SQP_N_ = 16 ;
   SQP_nf_ = 2 ;
   m_SamplingPeriod = 0.005 ;
+  //outputPreviewDuration_ = m_SamplingPeriod ;
+  outputPreviewDuration_ = SQP_T_ ;
 
   // Generator Management
   InterpolationPeriod_ = m_SamplingPeriod*7;
   previewSize_ = 8 ;
   previewDuration_ =  (previewSize_-1)*SQP_T_ ;
-  outputPreviewDuration_ = m_SamplingPeriod ;
   NbSampleOutput_ = (int)round(outputPreviewDuration_/m_SamplingPeriod) + 1 ;
   NbSampleControl_ = (int)round(SQP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(SQP_T_/InterpolationPeriod_) ;
@@ -409,45 +410,45 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     }
     VelRef_=NewVelRef_;
 
-    struct timeval begin ;
-    gettimeofday(&begin,0);
+//    struct timeval begin ;
+//    gettimeofday(&begin,0);
 
     NMPCgenerator_->updateInitialCondition(
         time,
         initLeftFoot_ ,
         initRightFoot_,
-        //initCOM_,
-        itCOM_,
+        initCOM_,
+        //itCOM_,
         VelRef_);
 
     // SOLVE PROBLEM:
     // --------------
     NMPCgenerator_->solve();
 
-    static int warning=0;
-    struct timeval end ;
-    gettimeofday(&end,0);
-    double ltime = end.tv_sec-begin.tv_sec
-        + 0.000001 * (end.tv_usec - begin.tv_usec);
+//    static int warning=0;
+//    struct timeval end ;
+//    gettimeofday(&end,0);
+//    double ltime = end.tv_sec-begin.tv_sec
+//        + 0.000001 * (end.tv_usec - begin.tv_usec);
 
-    bool endline = false ;
-    if(ltime >= 0.0005)
-    {
-      cout << ltime * 1000 << " "
-           << NMPCgenerator_->cput()*1000 << " "
-           << ltime * 1000 - NMPCgenerator_->cput()*1000 ;
-      endline = true;
-    }
-    if((ltime * 1000 - NMPCgenerator_->cput()*1000)>= 0.5)
-    {
-      ++warning;
-      cout << " : warning on cpu time ; " << warning ;
-      endline = true;
-    }
-    if(endline)
-    {
-      cout << endl;
-    }
+//    bool endline = false ;
+//    if(ltime >= 0.0005)
+//    {
+//      cout << ltime * 1000 << " "
+//           << NMPCgenerator_->cput()*1000 << " "
+//           << ltime * 1000 - NMPCgenerator_->cput()*1000 ;
+//      endline = true;
+//    }
+//    if((ltime * 1000 - NMPCgenerator_->cput()*1000)>= 0.5)
+//    {
+//      ++warning;
+//      cout << " : warning on cpu time ; " << warning ;
+//      endline = true;
+//    }
+//    if(endline)
+//    {
+//      cout << endl;
+//    }
 
     // INITIALIZE INTERPOLATION:
     // ------------------------
