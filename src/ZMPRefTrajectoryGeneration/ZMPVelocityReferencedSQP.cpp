@@ -356,7 +356,7 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   dynamicFilter_->getComAndFootRealization()->ShiftFoot(true);
   dynamicFilter_->init(m_SamplingPeriod,
                        InterpolationPeriod_,
-                       outputPreviewDuration_,
+                       outputPreviewDuration_+m_SamplingPeriod,
                        previewDuration_ ,
                        previewDuration_-SQP_T_,
                        lStartingCOMState);

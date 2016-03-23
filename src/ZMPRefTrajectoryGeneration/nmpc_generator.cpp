@@ -212,8 +212,8 @@ void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
   T_ = T ;
   Tfirst_ = T ;
   T_step_ = T_step ;
-  alpha_ = 5 ;// 1     ; // weight for CoM velocity tracking  : 0.5 * a ; 2.5
-  beta_  = 1e+03 ;// 1     ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
+  alpha_ = 1 ;// 1     ; // weight for CoM velocity tracking  : 0.5 * a ; 2.5
+  beta_  = 1 ;// 1     ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
   gamma_ = 1e-05 ;// 1e-05 ; // weight for jerk minimization      : 0.5 * c ; 1e-04
   SecurityMarginX_ = 0.09 ;
   SecurityMarginY_ = 0.05 ;
