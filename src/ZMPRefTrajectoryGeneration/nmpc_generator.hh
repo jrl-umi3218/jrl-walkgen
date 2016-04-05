@@ -71,8 +71,6 @@ namespace PatternGeneratorJRL
 
     // Build Time Variant Matrices
     //////////////////////////////
-    void computeInitialGuess();
-
     void updateFinalStateMachine(double time,
         FootAbsolutePosition &FinalLeftFoot,
         FootAbsolutePosition &FinalRightFoot);
@@ -101,6 +99,13 @@ namespace PatternGeneratorJRL
     // build the cost function
     void initializeCostFunction();
     void updateCostFunction();
+
+    // tools for line search
+    void initializeLineSearch();
+    void lineSearch();
+    void evalConstraint(MAL_VECTOR_TYPE(double) & U);
+    double evalMeritFunctionJacobian();
+    double evalMeritFunction();
 
     // Build Constant Matrices
     //////////////////////////
@@ -275,11 +280,20 @@ namespace PatternGeneratorJRL
     MAL_MATRIX_TYPE(double) Astan_ ;
     MAL_VECTOR_TYPE(double) UBstan_, LBstan_ ;
 
+    // evaluate constraint
+    // real problem bounds : lb_ < g(U) < ub_
+    MAL_VECTOR_TYPE(double) lb_  ;
+    MAL_VECTOR_TYPE(double) ub_  ;
+    MAL_VECTOR_TYPE(double) gU_  ;
+    MAL_VECTOR_TYPE(double) Uxy_  ;
+    MAL_VECTOR_TYPE(double) gU_cop_, gU_foot_, gU_vel_ ;
+    MAL_VECTOR_TYPE(double) gU_obs_, gU_rot_ , gU_stan_ ;
+
     // Cost Function
     unsigned nv_ ; // number of degrees of freedom
     // initial problem matrix
-    MAL_MATRIX_TYPE(double) Q_x_, Q_theta_ , I_NN_ ;
-    MAL_VECTOR_TYPE(double) p_x_, p_y_, p_theta_ ;
+    MAL_MATRIX_TYPE(double) Q_theta_, I_NN_ ;
+
     // decomposition of p_xy_
     // p_xy_ = ( p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ )
     MAL_VECTOR_TYPE(double) p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ ;
@@ -290,7 +304,19 @@ namespace PatternGeneratorJRL
     //       ( Q_x_FX Q_x_FF )
     MAL_MATRIX_TYPE(double) Q_x_XX_, Q_x_XF_, Q_x_FX_, Q_x_FF_ ;
 
-    // Gauss-Newton Hessian approximation
+    // Line Search
+    MAL_VECTOR_TYPE(double) p_ , U_n_, selectActiveConstraint ;
+    MAL_VECTOR_TYPE(double) JdU_, contraintValue ;
+    MAL_VECTOR_TYPE(double) HUn_ ;
+    double lineStep_, lineStep0_, stepParam_ ; // step searched
+    double mu_ ; // weight between cost function and constraints
+    double cm_, c_ ; // Merit Function Jacobian
+    double L_n_, L_ ; // Merit function of the next step and Merit function
+    unsigned maxIteration ;
+    qpOASES::Constraints constraints_;
+    qpOASES::Indexlist * indexActiveConstraints_ ;
+
+    // Gauss-Newton Hessian
     unsigned nc_ ;
     MAL_MATRIX_TYPE(double) qp_H_   ;
     MAL_VECTOR_TYPE(double) qp_g_   ;
@@ -301,9 +327,9 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_TYPE(double) qp_ub_  ;
     // temporary usefull variable for matrix manipulation
     MAL_VECTOR_TYPE(double) qp_g_x_, qp_g_y_, qp_g_theta_ ;
-    MAL_MATRIX_TYPE(double) qp_J_cop_, qp_J_foot_, qp_J_vel_, qp_J_obs_, qp_J_rot_ , qp_J_stan_;
-    MAL_VECTOR_TYPE(double) qp_lbJ_cop_, qp_lbJ_foot_, qp_lbJ_vel_, qp_lbJ_obs_, qp_lbJ_rot_, qp_lbJ_stan_ ;
-    MAL_VECTOR_TYPE(double) qp_ubJ_cop_, qp_ubJ_foot_, qp_ubJ_vel_, qp_ubJ_obs_, qp_ubJ_rot_, qp_ubJ_stan_ ;
+    //MAL_MATRIX_TYPE(double) qp_J_cop_, qp_J_foot_, qp_J_vel_, qp_J_obs_, qp_J_rot_ , qp_J_stan_;
+    //MAL_VECTOR_TYPE(double) qp_lbJ_cop_, qp_lbJ_foot_, qp_lbJ_vel_, qp_lbJ_obs_, qp_lbJ_rot_, qp_lbJ_stan_ ;
+    //MAL_VECTOR_TYPE(double) qp_ubJ_cop_, qp_ubJ_foot_, qp_ubJ_vel_, qp_ubJ_obs_, qp_ubJ_rot_, qp_ubJ_stan_ ;
 
     // Free variable of the system
     // U_       = [C_kp1_x_ F_kp1_x_ C_kp1_y_ F_kp1_y_ F_kp1_theta_]^T

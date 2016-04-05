@@ -107,6 +107,14 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, CjrlHumanoidDynamicRobo
   SecurityMarginX_ = 0.0 ;
   SecurityMarginY_ = 0.0 ;
 
+  nc_      = 0 ;
+  nc_cop_  = 0 ;
+  nc_foot_ = 0 ;
+  nc_vel_  = 0 ;
+  nc_rot_  = 0 ;
+  nc_obs_  = 0 ;
+  nc_stan_ = 0 ;
+
   alpha_=0.0;
   beta_ =0.0;
   gamma_=0.0;
@@ -256,8 +264,9 @@ void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
   initializeFootVelIneqConstraint();
   initializeRotIneqConstraint();
   initializeObstacleConstraint();
-  initializeStandingConstraint();
+  //initializeStandingConstraint();
   initializeCostFunction();
+  initializeLineSearch();
 
   // initialize the solver
   QP_ = new qpOASES::SQProblem((int)nv_,(int)nc_,qpOASES::HST_POSDEF) ;
@@ -365,7 +374,7 @@ void NMPCgenerator::preprocess_solution()
   updateFootVelIneqConstraint();
   updateRotIneqConstraint();
   updateObstacleConstraint();
-  updateStandingConstraint();
+  //updateStandingConstraint();
   updateCostFunction();
   qpOases_H_ = MRAWDATA(qp_H_  ) ;
   qpOases_g_ = MRAWDATA(qp_g_  ) ;
@@ -388,22 +397,23 @@ void NMPCgenerator::solve_qp(){
   if (!isQPinitialized_)
   {
     cput_[0] = 1000.0;
-    nwsr_ = 100000 ;
+    nwsr_ = 10000 ;
     /*ret =*/ QP_->init(
             qpOases_H_, qpOases_g_, qpOases_J_,
             qpOases_lb_, qpOases_ub_,
             qpOases_lbJ, qpOases_ubJ,
             nwsr_, cput_
           );
-    isQPinitialized_ = true ;
+    if(time_>0.040)
+      isQPinitialized_ = true ;
   }
   else
   {
     // force the solver to use the maximum time for computing the solution
-//    cput_[0] = 0.0015;
-//    nwsr_ = 20 ;
-    cput_[0] = 0.0015;
-    nwsr_ = 100 ;
+    cput_[0] = 0.0007;
+    nwsr_ = 5 ;
+//    cput_[0] = 10.0;
+//    nwsr_ = 1000.0 ;
     /*ret = */QP_->hotstart(
       qpOases_H_, qpOases_g_, qpOases_J_,
       qpOases_lb_, qpOases_ub_,
@@ -418,16 +428,16 @@ void NMPCgenerator::solve_qp(){
   // save qp solver data
 #ifdef DEBUG_COUT
   bool endline = false;
-  if(*cput_ >= 0.0005)
+  if(*cput_ >= 0.0007)
   {
-    cout << *cput_ * 1000<< " " ;
+    cout << *cput_ * 1000 << " " ;
     endline = true;
   }
-//  if(nwsr_ >= 10)
-//  {
-//    cout << nwsr_ << " " ;
-//    endline = true;
-//  }
+  if(nwsr_ > 2)
+  {
+    cout << nwsr_ << " " ;
+    endline = true;
+  }
   if(*cput_>= 0.001)
   {
     cout << " : warning on cpu time" ;
@@ -457,10 +467,11 @@ void NMPCgenerator::postprocess_solution()
   // data(k+1) = data(k) + alpha * dofs
 
   // TODO add line search when problematic
-  double alpha = 1.0 ;
+  lineSearch();
 
+  //double alpha = 1.0;
   for(unsigned i=0 ; i<nv_ ; ++i)
-    U_(i) += alpha * deltaU_[i];
+    U_(i) += lineStep_/*1.0*/ * deltaU_[i];
 
   for(unsigned i=0 ; i<2*N_+2*nf_ ; ++i)
     U_xy_(i)=U_(i);
@@ -1544,16 +1555,16 @@ void NMPCgenerator::updateObstacleConstraint()
                         *(obstacles_[obs].r+obstacles_[obs].margin) ;
       MAL_VECTOR_FILL(UBobs_[obs],1e+8);
     }
-#ifdef DEBUG
+#ifdef DEBUG_COUT
     cout << "prepare the obstacle : " << obstacles_[obs] << endl ;
 #endif
   }
 #ifdef DEBUG
-  DumpMatrix("Hobs_0" ,Hobs_ [0][0]);
-  DumpVector("Aobs_0" ,Aobs_ [0][0]);
-  DumpMatrix("Hobs_1" ,Hobs_ [0][1]);
-  DumpVector("Aobs_1" ,Aobs_ [0][1]);
-  DumpVector("LBobs_",LBobs_[0]);
+  //DumpMatrix("Hobs_0" ,Hobs_ [0][0]);
+  //DumpVector("Aobs_0" ,Aobs_ [0][0]);
+  //DumpMatrix("Hobs_1" ,Hobs_ [0][1]);
+  //DumpVector("Aobs_1" ,Aobs_ [0][1]);
+  //DumpVector("LBobs_",LBobs_[0]);
 #endif
 
   return ;
@@ -1631,52 +1642,40 @@ void NMPCgenerator::initializeCostFunction()
   // number of constraint
   nc_ = nc_cop_+nc_foot_+nc_vel_+nc_rot_+nc_obs_+nc_stan_ ;
 
-  MAL_MATRIX_RESIZE(qp_H_       ,nv_,nv_);        MAL_MATRIX_SET_IDENTITY(qp_H_);
-  MAL_VECTOR_RESIZE(qp_g_       ,nv_);            MAL_VECTOR_FILL(qp_g_         ,0.0);
-  MAL_VECTOR_RESIZE(qp_g_x_     ,N_+nf_);         MAL_VECTOR_FILL(qp_g_x_       ,0.0);
-  MAL_VECTOR_RESIZE(qp_g_y_     ,N_+nf_);         MAL_VECTOR_FILL(qp_g_y_       ,0.0);
-  MAL_VECTOR_RESIZE(qp_g_theta_ ,nf_);            MAL_VECTOR_FILL(qp_g_theta_   ,0.0);
-  MAL_MATRIX_RESIZE(qp_J_       ,nc_,nv_);        MAL_MATRIX_FILL(qp_J_         ,0.0);
-  MAL_MATRIX_RESIZE(qp_J_cop_   ,nc_cop_,nv_);    MAL_MATRIX_FILL(qp_J_cop_     ,0.0);
-  MAL_MATRIX_RESIZE(qp_J_foot_  ,nc_foot_,nv_);   MAL_MATRIX_FILL(qp_J_foot_    ,0.0);
-  MAL_MATRIX_RESIZE(qp_J_vel_   ,nc_vel_,nv_);    MAL_MATRIX_FILL(qp_J_vel_     ,0.0);
-  MAL_MATRIX_RESIZE(qp_J_rot_   ,nc_rot_,nv_);    MAL_MATRIX_FILL(qp_J_rot_     ,0.0);
-  MAL_VECTOR_RESIZE(qp_lbJ_     ,nc_);            MAL_VECTOR_FILL(qp_lbJ_       ,0.0);
-  MAL_VECTOR_RESIZE(qp_ubJ_     ,nc_);            MAL_VECTOR_FILL(qp_ubJ_       ,0.0);
-  MAL_VECTOR_RESIZE(qp_lbJ_cop_ ,nc_cop_);        MAL_VECTOR_FILL(qp_lbJ_cop_   ,0.0);
-  MAL_VECTOR_RESIZE(qp_lbJ_foot_,nc_foot_);       MAL_VECTOR_FILL(qp_lbJ_foot_  ,0.0);
-  MAL_VECTOR_RESIZE(qp_lbJ_vel_ ,nc_vel_);        MAL_VECTOR_FILL(qp_lbJ_vel_   ,0.0);
-  MAL_VECTOR_RESIZE(qp_lbJ_rot_ ,nc_rot_);        MAL_VECTOR_FILL(qp_lbJ_rot_   ,0.0);
-  MAL_VECTOR_RESIZE(qp_ubJ_cop_ ,nc_cop_);        MAL_VECTOR_FILL(qp_ubJ_cop_   ,0.0);
-  MAL_VECTOR_RESIZE(qp_ubJ_foot_,nc_foot_);       MAL_VECTOR_FILL(qp_ubJ_foot_  ,0.0);
-  MAL_VECTOR_RESIZE(qp_ubJ_vel_ ,nc_vel_);        MAL_VECTOR_FILL(qp_ubJ_vel_   ,0.0);
-  MAL_VECTOR_RESIZE(qp_ubJ_rot_ ,nc_rot_);        MAL_VECTOR_FILL(qp_ubJ_rot_   ,0.0);
-  MAL_VECTOR_RESIZE(qp_lb_      ,nv_);            MAL_VECTOR_FILL(qp_lb_        ,-1e+8);
-  MAL_VECTOR_RESIZE(qp_ub_      ,nv_);            MAL_VECTOR_FILL(qp_ub_        , 1e+8);
-  MAL_MATRIX_RESIZE(Q_x_        ,N_+nf_, N_+nf_); MAL_MATRIX_FILL(Q_x_          ,0.0);
-  MAL_MATRIX_RESIZE(Q_x_XX_     ,N_,N_);          MAL_MATRIX_FILL(Q_x_XX_       ,0.0);
-  MAL_MATRIX_RESIZE(Q_x_XF_     ,N_,nf_);         MAL_MATRIX_FILL(Q_x_XF_       ,0.0);
-  MAL_MATRIX_RESIZE(Q_x_FX_     ,nf_,N_);         MAL_MATRIX_FILL(Q_x_FX_       ,0.0);
-  MAL_MATRIX_RESIZE(Q_x_FF_     ,nf_,nf_);        MAL_MATRIX_FILL(Q_x_FF_       ,0.0);
-  MAL_MATRIX_RESIZE(Q_theta_    ,nf_,nf_);        MAL_MATRIX_SET_IDENTITY(Q_theta_);
-  MAL_VECTOR_RESIZE(p_x_        ,N_+nf_);         MAL_VECTOR_FILL(p_x_          , 0.0);
-  MAL_VECTOR_RESIZE(p_y_        ,N_+nf_);         MAL_VECTOR_FILL(p_y_          , 0.0);
-  MAL_VECTOR_RESIZE(p_xy_X_     ,N_);             MAL_VECTOR_FILL(p_xy_X_       , 0.0);
-  MAL_VECTOR_RESIZE(p_xy_Fx_    ,nf_);            MAL_VECTOR_FILL(p_xy_Fx_      , 0.0);
-  MAL_VECTOR_RESIZE(p_xy_Y_     ,N_);             MAL_VECTOR_FILL(p_xy_Y_       , 0.0);
-  MAL_VECTOR_RESIZE(p_xy_Fy_    ,nf_);            MAL_VECTOR_FILL(p_xy_Fy_      , 0.0);
-  MAL_VECTOR_RESIZE(p_theta_    ,nf_);            MAL_VECTOR_FILL(p_theta_      , 0.0);
-  MAL_MATRIX_RESIZE(I_NN_       ,N_,N_);          MAL_MATRIX_SET_IDENTITY(I_NN_);
-  MAL_VECTOR_RESIZE(Pvsc_x_     ,N_);             MAL_VECTOR_FILL(Pvsc_x_       , 0.0);
-  MAL_VECTOR_RESIZE(Pvsc_y_     ,N_);             MAL_VECTOR_FILL(Pvsc_y_       , 0.0);
+  MAL_MATRIX_RESIZE(qp_H_      ,nv_,nv_);    MAL_MATRIX_SET_IDENTITY(qp_H_);
+  MAL_VECTOR_RESIZE(qp_g_      ,nv_);        MAL_VECTOR_FILL(qp_g_      ,0.0);
+  MAL_VECTOR_RESIZE(qp_g_x_    ,N_+nf_);     MAL_VECTOR_FILL(qp_g_x_    ,0.0);
+  MAL_VECTOR_RESIZE(qp_g_y_    ,N_+nf_);     MAL_VECTOR_FILL(qp_g_y_    ,0.0);
+  MAL_VECTOR_RESIZE(qp_g_theta_,nf_);        MAL_VECTOR_FILL(qp_g_theta_,0.0);
+  MAL_MATRIX_RESIZE(qp_J_     ,nc_,nv_);     MAL_MATRIX_FILL(qp_J_      ,0.0);
+  MAL_VECTOR_RESIZE(qp_lbJ_   ,nc_);         MAL_VECTOR_FILL(qp_lbJ_    ,0.0);
+  MAL_VECTOR_RESIZE(qp_ubJ_   ,nc_);         MAL_VECTOR_FILL(qp_ubJ_    ,0.0);
+  MAL_VECTOR_RESIZE(qp_lb_      ,nv_);       MAL_VECTOR_FILL(qp_lb_   ,-1e+8);
+  MAL_VECTOR_RESIZE(qp_ub_      ,nv_);       MAL_VECTOR_FILL(qp_ub_   , 1e+8);
+  MAL_MATRIX_RESIZE(Q_x_XX_     ,N_,N_);     MAL_MATRIX_FILL(Q_x_XX_     ,0.0);
+  MAL_MATRIX_RESIZE(Q_x_XF_     ,N_,nf_);    MAL_MATRIX_FILL(Q_x_XF_     ,0.0);
+  MAL_MATRIX_RESIZE(Q_x_FX_     ,nf_,N_);    MAL_MATRIX_FILL(Q_x_FX_     ,0.0);
+  MAL_MATRIX_RESIZE(Q_x_FF_     ,nf_,nf_);   MAL_MATRIX_FILL(Q_x_FF_     ,0.0);
+  MAL_MATRIX_RESIZE(Q_theta_    ,nf_,nf_);   MAL_MATRIX_SET_IDENTITY(Q_theta_);
+  MAL_VECTOR_RESIZE(p_xy_X_     ,N_);        MAL_VECTOR_FILL(p_xy_X_ , 0.0);
+  MAL_VECTOR_RESIZE(p_xy_Fx_    ,nf_);       MAL_VECTOR_FILL(p_xy_Fx_, 0.0);
+  MAL_VECTOR_RESIZE(p_xy_Y_     ,N_);        MAL_VECTOR_FILL(p_xy_Y_ , 0.0);
+  MAL_VECTOR_RESIZE(p_xy_Fy_    ,nf_);       MAL_VECTOR_FILL(p_xy_Fy_, 0.0);
+  MAL_VECTOR_RESIZE(p_          ,nv_);       MAL_VECTOR_FILL(p_      , 0.0);
+  MAL_MATRIX_RESIZE(I_NN_       ,N_,N_);     MAL_MATRIX_SET_IDENTITY(I_NN_);
+  MAL_VECTOR_RESIZE(Pvsc_x_     ,N_);        MAL_VECTOR_FILL(Pvsc_x_ , 0.0);
+  MAL_VECTOR_RESIZE(Pvsc_y_     ,N_);        MAL_VECTOR_FILL(Pvsc_y_ , 0.0);
 
-
-//  MAL_MATRIX_RESIZE(qp_J_  ,nc_,nv_);
-//  MAL_VECTOR_RESIZE(qp_lbJ_,nc_);
-//  MAL_VECTOR_RESIZE(qp_ubJ_,nc_);
-//  MAL_MATRIX_FILL(qp_J_  ,0.0);
-//  MAL_VECTOR_FILL(qp_lbJ_,0.0);
-//  MAL_VECTOR_FILL(qp_ubJ_,0.0);
+  MAL_VECTOR_RESIZE(lb_  ,      nc_);  MAL_VECTOR_FILL(lb_  , 0.0);
+  MAL_VECTOR_RESIZE(ub_  ,      nc_);  MAL_VECTOR_FILL(ub_  , 0.0);
+  MAL_VECTOR_RESIZE(gU_  ,      nc_);  MAL_VECTOR_FILL(gU_  , 0.0);
+  MAL_VECTOR_RESIZE(Uxy_ ,2*(N_+nf_));  MAL_VECTOR_FILL(Uxy_ , 0.0);
+  MAL_VECTOR_RESIZE(gU_cop_  ,nc_cop_); MAL_VECTOR_FILL(gU_cop_  , 0.0);
+  MAL_VECTOR_RESIZE(gU_foot_ ,nc_foot_); MAL_VECTOR_FILL(gU_foot_ , 0.0);
+  MAL_VECTOR_RESIZE(gU_vel_  ,nc_vel_); MAL_VECTOR_FILL(gU_vel_  , 0.0);
+  MAL_VECTOR_RESIZE(gU_obs_  ,nc_obs_); MAL_VECTOR_FILL(gU_obs_  , 0.0);
+  MAL_VECTOR_RESIZE(gU_rot_  ,nc_rot_); MAL_VECTOR_FILL(gU_rot_  , 0.0);
+  MAL_VECTOR_RESIZE(gU_stan_ ,nc_stan_); MAL_VECTOR_FILL(gU_stan_ , 0.0);
 
   // Q_q = 0.5 * a * ( 1 0 )
   //                 ( 0 1 )
@@ -1688,6 +1687,11 @@ void NMPCgenerator::initializeCostFunction()
   // p_xy_ =  ( p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ )
   // p_theta_ = ( 0.5 * a * (-2) * [ f_k_theta+T_step*dTheta^ref  f_k_theta+2*T_step*dTheta^ref ] )
   // Those are time dependant matrices so they are computed in the update function
+  unsigned index = nc_cop_+nc_foot_+nc_vel_ ;
+  qp_J_(index  ,2*N_+2*nf_  )= 1.0;
+  qp_J_(index  ,2*N_+2*nf_+1)= 0.0;
+  qp_J_(index+1,2*N_+2*nf_  )=-1.0;
+  qp_J_(index+1,2*N_+2*nf_+1)= 1.0;
 }
 
 void NMPCgenerator::updateCostFunction()
@@ -1700,46 +1704,62 @@ void NMPCgenerator::updateCostFunction()
           + beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_),Pzu_)
           + gamma_ * I_NN_ ;
 
-  // number of constraint
-  unsigned nc = nc_cop_+nc_foot_+nc_vel_+nc_rot_+nc_obs_+nc_stan_ ;
-  if(nc_!=nc)
-  {
-    MAL_MATRIX_RESIZE(qp_J_, nc_,nv_);
-    MAL_VECTOR_RESIZE(qp_lbJ_, nc_);
-    MAL_VECTOR_RESIZE(qp_ubJ_, nc_);
-  }
-  nc_=nc;
-  MAL_MATRIX_FILL(qp_J_, 0.0);
-  MAL_VECTOR_FILL(qp_lbJ_, 0.0);
-  MAL_VECTOR_FILL(qp_ubJ_, 0.0);
-
   // Q_xXX = (  0.5 * a * Pvu^T   * Pvu + b * Pzu^T * Pzu + c * I )
   // Q_xXF = ( -0.5 * b * Pzu^T   * V_kp1 )
-  // Q_xFX = ( -0.5 * b * V_kp1^T * Pzu )^T
+  // Q_xFX = ( -0.5 * b * V_kp1^T * Pzu ) = Q_xXF^T
   // Q_xFF = (  0.5 * b * V_kp1^T * V_kp1 )
   Q_x_XF_ = - beta_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_),V_kp1_);
-  Q_x_FX_ = - beta_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(V_kp1_),Pzu_);
+  Q_x_FX_ =   MAL_RET_TRANSPOSE(Q_x_XF_);
   Q_x_FF_ =   beta_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(V_kp1_),V_kp1_);
 
-  // Q_x = ( Q_xXX Q_xXF ) = Q_y
-  //       ( Q_xFX Q_xFF )
+  // define QP matrices
+  // Gauss-Newton Hessian
+  //                                     dim :
+  // H = (( Q_xXX  Q_xXF   0      0       0     ) N_
+  //      ( Q_xFX  Q_xFF   0      0       0     ) nf_
+  //      (   0      0   Q_xXX  Q_xXF     0     ) N_
+  //      (   0      0   Q_xFX  Q_xFF     0     ) nf_
+  //      (   0      0     0      0    Q_theta_ ) nf_
+  //dim :     N_     nf_   N_     nf_    nf_     = nv_
+  //
+  unsigned Nnf = N_+nf_ ;
+  unsigned N2nf = 2*N_+nf_ ;
+  unsigned N2nf2 = 2*(N_+nf_) ;
   for(unsigned i=0 ; i<N_ ; ++i)
+  {
     for(unsigned j=0 ; j<N_ ; ++j)
-      Q_x_(i,j) = Q_x_XX_(i,j) ;
+    {
+      qp_H_(i,j) = Q_x_XX_(i,j) ;
+      qp_H_(Nnf+i,Nnf+j) = Q_x_XX_(i,j) ;
+    }
+  }
   for(unsigned i=0 ; i<N_ ; ++i)
+  {
     for(unsigned j=0 ; j<nf_ ; ++j)
-      Q_x_(i,N_+j) = Q_x_XF_(i,j) ;
+    {
+      qp_H_(i,N_+j) = Q_x_XF_(i,j) ;
+      qp_H_(Nnf+i,N2nf+j) = Q_x_XF_(i,j) ;
+    }
+  }
   for(unsigned i=0 ; i<nf_ ; ++i)
+  {
     for(unsigned j=0 ; j<N_ ; ++j)
-      Q_x_(N_+i,j) = Q_x_FX_(i,j) ;
+    {
+      qp_H_(N_+i,j) = Q_x_FX_(i,j) ;
+      qp_H_(N2nf+i,Nnf+j) = Q_x_FX_(i,j) ;
+    }
+  }
   for(unsigned i=0 ; i<nf_ ; ++i)
+  {
     for(unsigned j=0 ; j<nf_ ; ++j)
-      Q_x_(N_+i,N_+j) = Q_x_FF_(i,j) ;
-
-  Pvsc_x_ = MAL_RET_A_by_B(Pvs_ , c_k_x_) ;
-  Pvsc_y_ = MAL_RET_A_by_B(Pvs_ , c_k_y_) ;
-  // Pzsc_x_, Pzsc_y_ , v_kp1f_x_ and v_kp1f_y_ alreday up to date
-  //from the CoP constraint building function
+    {
+      qp_H_(N_+i,N_+j) = Q_x_FF_(i,j) ;
+      qp_H_(N2nf+i,N2nf+j) = Q_x_FF_(i,j) ;
+    }
+  }
+  for(unsigned i=0 ; i< nf_ ;++i)
+    for(unsigned j=0 ; j<nf_ ;++j)
+      qp_H_(i+N2nf2,j+N2nf2)=Q_theta_(i,j) ;
 
   // p_xy_ =  ( p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ )
   // p_xy_X  =   0.5 * a * Pvu^T   * ( Pvs * c_k_x - dX^ref )
@@ -1748,10 +1768,15 @@ void NMPCgenerator::updateCostFunction()
   // p_xy_Y  =   0.5 * a * Pvu^T   * ( Pvs * c_k_y - dY^ref )
   //           + 0.5 * b * Pzu^T   * ( Pzs * c_k_y - v_kp1 * f_k_y )
   // p_xy_Fy = - 0.5 * b * V_kp1^T * ( Pzs * c_k_y - v_kp1 * f_k_y )
-#ifdef DEBUG
+#ifdef DEBUG_COUT
   cout << vel_ref_.Global.X << " "
        << vel_ref_.Global.Y << endl;
 #endif
+  Pvsc_x_ = MAL_RET_A_by_B(Pvs_ , c_k_x_) ;
+  Pvsc_y_ = MAL_RET_A_by_B(Pvs_ , c_k_y_) ;
+  // Pzsc_x_, Pzsc_y_ , v_kp1f_x_ and v_kp1f_y_ alreday up to date
+  //from the CoP constraint building function
+
   p_xy_X_ =    alpha_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_  ), Pvsc_x_ - vel_ref_.Global.X_vec)
              + beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_  ), Pzsc_x_ - v_kp1f_x_                 );
 #ifdef DEBUG
@@ -1778,49 +1803,22 @@ void NMPCgenerator::updateCostFunction()
   cout << "c_k_y_ = " << c_k_y_ << endl ;
   cout << "Pvsc_y_ = " << Pvsc_y_ << endl;
 #endif
+  unsigned index = 0 ;
   for(unsigned i=0 ; i<N_ ; ++i)
-    p_x_(i) = p_xy_X_(i) ;
+    p_(index+i) = p_xy_X_(i) ;
+  index+=N_;
   for(unsigned i=0 ; i<nf_ ; ++i)
-    p_x_(N_+i) = p_xy_Fx_(i) ;
+    p_(index+i) = p_xy_Fx_(i) ;
+  index+=nf_;
   for(unsigned i=0 ; i<N_ ; ++i)
-    p_y_(i) = p_xy_Y_(i) ;
+    p_(index+i) = p_xy_Y_(i) ;
+  index+=N_;
   for(unsigned i=0 ; i<nf_ ; ++i)
-    p_y_(N_+i) = p_xy_Fy_(i) ;
-
-
+    p_(index+i) = p_xy_Fy_(i) ;
+  index+=nf_;
   // p_theta_ = ( 0.5 * a * [ f_k_theta+T_step*dTheta^ref  f_k_theta+2*T_step*dTheta^ref ] )
-  p_theta_(0) = - alpha_ * ( currentSupport_.Yaw +     T_step_* vel_ref_.Global.Yaw) ;
-  p_theta_(1) = - alpha_ * ( currentSupport_.Yaw + 2 * T_step_* vel_ref_.Global.Yaw) ;
-#ifdef DEBUG
-  DumpMatrix("Q_theta_",Q_theta_);
-  DumpMatrix("Q_x_"    ,Q_x_    );
-  DumpVector("p_x_"   ,p_x_   );
-  DumpVector("p_y_"   ,p_y_   );
-  DumpVector("p_theta_",p_theta_);
-#endif
-  // define QP matrices
-  // Gauss-Newton Hessian approximation
-  //                                dim :
-  // H = (Q_x_     0          0   ) N_+nf_
-  //     ( 0      Q_x_        0   ) N_+nf_
-  //     ( 0       0      Q_theta_) nf_
-  //dim : N_+nf_  N_+nf_    nf_     = nv_
-  //
-  unsigned n_x = N_+nf_;
-  unsigned n_xy = 2*(N_+nf_);
-  unsigned n_theta = nf_;
-  for(unsigned i=0 ; i<n_x ;++i)
-  {
-    for(unsigned j=0 ; j<n_x ;++j)
-    {
-      // Q_x_(i,j)=Q_y_(i,j)
-      qp_H_(i,j)=Q_x_(i,j) ;
-      qp_H_(i+n_x,j+n_x)=Q_x_(i,j) ;
-    }
-  }
-  for(unsigned i=0 ; i<n_theta ;++i)
-    for(unsigned j=0 ; j<n_theta ;++j)
-      qp_H_(i+n_xy,j+n_xy)=Q_theta_(i,j) ;
+  p_(index/*+0*/) = - alpha_ * ( currentSupport_.Yaw +     T_step_* vel_ref_.Global.Yaw) ;
+  p_(index+1) = - alpha_ * ( currentSupport_.Yaw + 2 * T_step_* vel_ref_.Global.Yaw) ;
 
   // Gradient of Objective
   // qp_g_ = (gx    )
@@ -1829,17 +1827,7 @@ void NMPCgenerator::updateCostFunction()
 #ifdef DEBUG
   DumpVector( "U_x_" , U_x_ );
 #endif
-  qp_g_x_ = MAL_RET_A_by_B(U_x_,Q_x_) + p_x_ ;
-
-
-  qp_g_y_ = MAL_RET_A_by_B(U_y_,Q_x_/*=Q_y_*/) + p_y_ ;
-  qp_g_theta_ = MAL_RET_A_by_B(F_kp1_theta_,Q_theta_) + p_theta_ ;
-  for(unsigned i=0 ; i<n_x ; ++i)
-    qp_g_(i)=qp_g_x_(i) ;
-  for(unsigned i=0 ; i<n_x ; ++i)
-    qp_g_(i+n_x)=qp_g_y_(i) ;
-  for(unsigned i=0 ; i<n_theta ; ++i)
-    qp_g_(i+2*n_x)=qp_g_theta_(i) ;
+  qp_g_ = MAL_RET_A_by_B(qp_H_,U_)+p_;
 
   // Constraints
   // qp_lbJ_ = (qp_lbJ_cop_  ) < qp_J_ * X = (qp_J_cop_  ) * X < qp_ubJ_ = (qp_ubJ_cop_  )
@@ -1850,132 +1838,55 @@ void NMPCgenerator::updateCostFunction()
   //
   //  Jacobians
   // qp_J_cop_ = (Acop_xy_  , Acop_theta_ )
-  for(unsigned i=0; i<nc_cop_ ; ++i)
+  // number of constraint
+  nc_ = nc_cop_+nc_foot_+nc_vel_+nc_rot_+nc_obs_+nc_stan_ ;
+  // Fill up qp_J_
+  index = 0 ;
+  for(unsigned i=0 ; i<nc_cop_ ; ++i)
   {
-    for(unsigned j=0; j<n_xy ; ++j)
-      qp_J_cop_(i,j)=Acop_xy_(i,j);
+    for(unsigned j=0; j<N2nf2 ; ++j)
+      qp_J_(i,j)=Acop_xy_(i,j);
     for(unsigned j=0; j<nf_ ; ++j)
-      qp_J_cop_(i,j+n_xy)=Acop_theta_(i,j);
+      qp_J_(i,j+N2nf2)=Acop_theta_(i,j);
   }
-  // qp_J_foot_ = (Afoot_xy_ , Afoot_theta_)
-  for(unsigned i=0; i<nc_foot_ ; ++i)
+  index = nc_cop_ ;
+  for(unsigned i=0 ; i<nc_foot_ ; ++i)
   {
-    for(unsigned j=0; j<n_xy ; ++j)
-      qp_J_foot_(i,j)=Afoot_xy_(i,j);
+    for(unsigned j=0; j<N2nf2 ; ++j)
+      qp_J_(i+index,j)=Afoot_xy_(i,j);
     for(unsigned j=0; j<nf_ ; ++j)
-      qp_J_foot_(i,j+n_xy)=Afoot_theta_(i,j);
+      qp_J_(i+index,j+N2nf2)=Afoot_theta_(i,j);
   }
-  // qp_J_vel_ = Avel_
-  qp_J_vel_ = Avel_ ;
-  // qp_J_rot_ = Arot_
-  qp_J_rot_ = Arot_ ;
-  // qp_J_rot_ = Arot_
-  qp_J_stan_ = Astan_ ;
-  // qp_J_obs_ = (                 ...                  )
-  //             (  Hobs_[obs][nf] * X + Aobs_[obs][nf] )
-  //             (                 ...                  )
-  MAL_MATRIX_RESIZE(qp_J_obs_   ,nc_obs_,nv_);
-  MAL_MATRIX_FILL(qp_J_obs_     ,0.0);
+  index += nc_foot_ ;
+  for(unsigned i=0 ; i<nc_vel_ ; ++i)
+  {
+    for(unsigned j=0 ; j<nv_ ; ++j)
+      qp_J_(i+index,j) = Avel_(i,j);
+  }
+  index += nc_vel_ ;
+  index += nc_rot_ ;
   for(unsigned obs=0 ; obs<obstacles_.size() ; ++obs)
   {
     for(unsigned n=0 ; n<nf_ ; ++n)
     {
       qp_J_obs_i_ = 2 * MAL_RET_A_by_B(U_xy_,Hobs_[obs][n]) + Aobs_[obs][n] ;
-      for(unsigned j=0 ; j<n_xy ; ++j)
-        qp_J_obs_((obs+1)*n,j) = qp_J_obs_i_(j) ;
+      for(unsigned j=0 ; j<N2nf2 ; ++j)
+        qp_J_((obs+1)*n,j) = qp_J_obs_i_(j) ;
     }
   }
-  //
+  //  for(unsigned i=0 ; i<nc_stan_ ; ++i)
+  //  {
+  //    for(unsigned j=0 ; j<nv_ ; ++j)
+  //      qp_J_(i+index,j) = qp_J_stan_(i,j);
+  //  }
+  //  index += nc_stan_ ;
+
   //  Boundaries
-  //    CoP
-  qp_lbJ_cop_ = LBcop_ - MAL_RET_A_by_B(Acop_xy_,U_xy_);
-  qp_ubJ_cop_ = UBcop_ - MAL_RET_A_by_B(Acop_xy_,U_xy_);
-  //    Foot
-  qp_lbJ_foot_ = LBfoot_ - MAL_RET_A_by_B(Afoot_xy_,U_xy_);
-  qp_ubJ_foot_ = UBfoot_ - MAL_RET_A_by_B(Afoot_xy_,U_xy_);
-  //    Velocity
-  qp_lbJ_vel_ = LBvel_ - MAL_RET_A_by_B(Avel_,U_);
-  qp_ubJ_vel_ = UBvel_ - MAL_RET_A_by_B(Avel_,U_);
-  //    Rotation
-  qp_lbJ_rot_ = LBrot_ - MAL_RET_A_by_B(Arot_,U_);
-  qp_ubJ_rot_ = UBrot_ - MAL_RET_A_by_B(Arot_,U_);
-  //    Obstacle
-  MAL_VECTOR_RESIZE(qp_lbJ_obs_ ,nc_obs_); MAL_VECTOR_FILL(qp_lbJ_obs_   ,0.0);
-  MAL_VECTOR_RESIZE(qp_ubJ_obs_ ,nc_obs_); MAL_VECTOR_FILL(qp_ubJ_obs_   ,0.0);
-  for(unsigned obs=0 ; obs<obstacles_.size() ; ++obs)
-  {
-    for(unsigned n=0 ; n<nf_ ; ++n)
-    {
-      MAL_VECTOR_TYPE(double) HobsUxy = MAL_RET_A_by_B(Hobs_[obs][n],U_xy_);
-      double deltaObs = 0 ;
-      for(unsigned i=0 ; i<MAL_VECTOR_SIZE(HobsUxy) ; ++i)
-          deltaObs += U_xy_(i) * (HobsUxy(i) + Aobs_[obs][n](i)) ;
-      qp_lbJ_obs_((obs+1)*n) = LBobs_[obs](n) - deltaObs ;
-      qp_ubJ_obs_((obs+1)*n) = UBobs_[obs](n) - deltaObs ;
-    }
-  }
-  // Standing
-  MAL_VECTOR_RESIZE(qp_lbJ_stan_ ,nc_stan_); MAL_VECTOR_FILL(qp_lbJ_stan_   ,0.0);
-  MAL_VECTOR_RESIZE(qp_ubJ_stan_ ,nc_stan_); MAL_VECTOR_FILL(qp_ubJ_stan_   ,0.0);
-  qp_lbJ_stan_ = LBstan_ - MAL_RET_A_by_B(Astan_,U_) ;
-  qp_ubJ_stan_ = UBstan_ - MAL_RET_A_by_B(Astan_,U_) ;
+  // compute the constraint value
+  evalConstraint(U_);
+  qp_lbJ_ = lb_ - gU_ ;
+  qp_ubJ_ = ub_ - gU_ ;
 
-
-  // Fill up qp_lbJ_, qp_ubJ_ and qp_J_
-//  MAL_MATRIX_RESIZE(qp_J_  ,nc_,nv_);
-//  MAL_VECTOR_RESIZE(qp_lbJ_,nc_);
-//  MAL_VECTOR_RESIZE(qp_ubJ_,nc_);
-//  MAL_MATRIX_FILL(qp_J_  ,0.0);
-//  MAL_VECTOR_FILL(qp_lbJ_,0.0);
-//  MAL_VECTOR_FILL(qp_ubJ_,0.0);
-  unsigned index = 0 ;
-  for(unsigned i=0 ; i<nc_cop_ ; ++i)
-  {
-    qp_lbJ_(i) = qp_lbJ_cop_(i) ;
-    qp_ubJ_(i) = qp_ubJ_cop_(i) ;
-    for(unsigned j=0 ; j<nv_ ; ++j)
-      qp_J_(i,j) = qp_J_cop_(i,j);
-  }
-  index = nc_cop_ ;
-  for(unsigned i=0 ; i<nc_foot_ ; ++i)
-  {
-    qp_lbJ_(i+index) = qp_lbJ_foot_(i) ;
-    qp_ubJ_(i+index) = qp_ubJ_foot_(i) ;
-    for(unsigned j=0 ; j<nv_ ; ++j)
-      qp_J_(i+index,j) = qp_J_foot_(i,j);
-  }
-  index += nc_foot_ ;
-  for(unsigned i=0 ; i<nc_vel_ ; ++i)
-  {
-    qp_lbJ_(i+index) = qp_lbJ_vel_(i) ;
-    qp_ubJ_(i+index) = qp_ubJ_vel_(i) ;
-    for(unsigned j=0 ; j<nv_ ; ++j)
-      qp_J_(i+index,j) = qp_J_vel_(i,j);
-  }
-  index += nc_vel_ ;
-  for(unsigned i=0 ; i<nc_obs_ ; ++i)
-  {
-    qp_lbJ_(i+index) = qp_lbJ_obs_(i) ;
-    qp_ubJ_(i+index) = qp_ubJ_obs_(i) ;
-    for(unsigned j=0 ; j<nv_ ; ++j)
-      qp_J_(i+index,j) = qp_J_obs_(i,j);
-  }
-  index += nc_obs_ ;
-  for(unsigned i=0 ; i<nc_rot_ ; ++i)
-  {
-    qp_lbJ_(i+index) = qp_lbJ_rot_(i) ;
-    qp_ubJ_(i+index) = qp_ubJ_rot_(i) ;
-    for(unsigned j=0 ; j<nv_ ; ++j)
-      qp_J_(i+index,j) = qp_J_rot_(i,j);
-  }
-  index += nc_rot_ ;
-  for(unsigned i=0 ; i<nc_stan_ ; ++i)
-  {
-    qp_lbJ_(i+index) = qp_lbJ_stan_(i) ;
-    qp_ubJ_(i+index) = qp_ubJ_stan_(i) ;
-    for(unsigned j=0 ; j<nv_ ; ++j)
-      qp_J_(i+index,j) = qp_J_stan_(i,j);
-  }
 #ifdef DEBUG
   DumpMatrix("qp_H_",qp_H_);
   DumpVector("qp_g_",qp_g_);
@@ -2013,5 +1924,246 @@ void NMPCgenerator::setGlobalVelocityReference(reference_t global_vel_ref)
   DumpVector("RefVectorX"    ,vel_ref_.Global.X_vec  );
   DumpVector("RefVectorY"    ,vel_ref_.Global.Y_vec  );
 #endif
+  return ;
+}
+
+void NMPCgenerator::initializeLineSearch()
+{
+  MAL_VECTOR_RESIZE(HUn_, nv_); MAL_VECTOR_FILL(HUn_, 0.0);
+  MAL_VECTOR_RESIZE(U_n_, nv_); MAL_VECTOR_FILL(U_n_, 0.0);
+  MAL_VECTOR_RESIZE(JdU_, nc_); MAL_VECTOR_FILL(JdU_, 0.0);
+  MAL_VECTOR_RESIZE(selectActiveConstraint, nc_);
+  MAL_VECTOR_FILL(selectActiveConstraint, 0.0);
+  lineStep_=1.0; lineStep0_=1.0 ; // step searched
+  cm_=0.0; c_=1.0 ; // Merit Function Jacobian
+  mu_ = 1.0 ;
+  stepParam_ = 0.6 ;
+  L_n_=0.0; L_=0.0; // Merit function of the next step and Merit function
+  maxIteration = 20 ;
+}
+
+void NMPCgenerator::lineSearch()
+{
+//  qpOASES::QProblemStatus status_ = QP_->getStatus();
+//  if(status_ < qpOASES::QPS_AUXILIARYQPSOLVED)
+//  {
+//    lineStep_ = 1e-05;
+//  }
+  //cout << status_ << endl ;
+  //cout << "########################################" << endl ;
+  // selection active constraints
+
+  U_n_ = U_ ;
+  for(unsigned i=0 ; i<nv_ ; ++i)
+    U_n_(i) = U_(i) + lineStep0_*deltaU_[i] ;
+  evalConstraint(U_n_);
+  MAL_VECTOR_FILL(selectActiveConstraint,0.0);
+  bool badConstraints = false ;
+  for(unsigned i=0 ; i<nc_ ; ++i)
+  {
+    if(gU_(i)-ub_(i)>1e-8)
+    {
+      selectActiveConstraint(i)=1.0;
+      badConstraints = true;
+    }
+    if(-gU_(i)+lb_(i)>1e-8)
+    {
+      selectActiveConstraint(i)=-1.0;
+      badConstraints = true;
+    }
+  }
+
+//  if(!badConstraints)
+//  {
+//    lineStep_ = lineStep0_ ;
+//    return ;
+//  }
+
+  evalConstraint(U_);
+  L_ = evalMeritFunction();
+  cm_ = c_ * evalMeritFunctionJacobian();
+
+  lineStep_ = lineStep0_ ;
+  bool find_step = false ;
+  for (unsigned it=0 ; it<maxIteration ; ++it)
+  {
+    for(unsigned i=0 ; i<nv_ ; ++i)
+      U_n_(i) = U_(i) + lineStep_*deltaU_[i] ;
+    evalConstraint(U_n_);
+    L_n_ = evalMeritFunction();
+
+    if ((L_n_ - L_) <= lineStep_ * cm_)
+    {
+      find_step = true ;
+      break;
+    }else
+    {
+      lineStep_ *= stepParam_ ;
+#ifdef DEBUG_COUT
+      cout << "L_n = "<< L_n_ << " ; "
+           << "L = "  << L_   << " ; "
+           << "lineStep_ * cm_ = "  << lineStep_ * cm_ << endl ;
+#endif
+    }
+  }
+#ifdef DEBUG_COUT
+  if(lineStep_!=lineStep0_)
+    cout << "lineStep_ = " << lineStep_ << endl ;
+
+  if(!find_step)
+  {
+    cout << "step not found" << endl ;
+  }
+#endif
+//  if(lineStep_!=lineStep0_)
+//    cout << "lineStep_ = " << lineStep_ << endl ;
+  //assert(find_step);
+}
+
+double NMPCgenerator::evalMeritFunctionJacobian()
+{
+  double meritJac = 0.0 ;
+//  for (unsigned i=0; i<nv_ ; ++i)
+//    meritJac = qp_g_(i) * deltaU_[i] ;
+
+  //constraintJacobian = mu*sum((sign(qp_J_*deltaU_)*qp_J_*deltaU_)*selecActiveConstraint);
+  double constrValue = 0.0 ;
+  MAL_VECTOR_FILL(JdU_,0.0);
+  for (unsigned i=0; i<nc_ ; ++i)
+  {
+    if(selectActiveConstraint(i)!=0.0)
+    {
+      for (unsigned j=0; j<nv_ ; ++j)
+      {
+        JdU_(i) += qp_J_(i,j) * deltaU_[j];
+      }
+      if(selectActiveConstraint(i) < 0.0)
+      {
+        constrValue = -gU_(i) + lb_(i) ;
+      }
+      else if(selectActiveConstraint(i) > 0.0)
+      {
+        constrValue = gU_(i) - ub_(i) ;
+      }
+
+      double sign = 1.0 ;
+      if(constrValue<0.0)
+        sign=-1.0;
+
+      meritJac += mu_ * sign * JdU_(i) ;
+    }
+  }
+  return meritJac ;
+}
+
+double NMPCgenerator::evalMeritFunction()
+{
+  // evaluation of the cost function
+//HUn_ = MAL_RET_A_by_B(U_n_,qp_H_);
+//  double costFunction = 0.0 ;
+//  for(unsigned i=0 ; i<nv_ ; ++i)
+//  {
+//    costFunction = U_n_(i)*HUn_(i) + p_(i)*U_n_(i);
+//  }
+  //cout << "cost = " << costFunction << " ; constrNorm = " ;
+  // evaluate constraint norm
+  double constrValueNorm = 0.0 ;
+  for (unsigned i=0; i<nc_ ; ++i)
+  {
+    if(selectActiveConstraint(i)!=0.0)
+    {
+      if(selectActiveConstraint(i)>0.0)
+      {
+        constrValueNorm += abs(gU_(i) - ub_(i)) ;
+      }
+      else if (selectActiveConstraint(i)<0.0)
+      {
+        constrValueNorm += abs(-gU_(i) + lb_(i)) ;
+      }
+      //cout << constrValueNorm << " " ;
+    }
+  }
+  //cout << endl ;
+  return /*costFunction + mu_ * */constrValueNorm ;
+}
+
+void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
+{
+  //
+  //  Eval real problem bounds : lb_ < g(U) < ub_
+  for(unsigned i=0 ; i<2*(N_+nf_) ; ++i)
+  {Uxy_(i)=U(i);}
+
+  //    CoP
+  gU_cop_ = MAL_RET_A_by_B(Acop_xy_,Uxy_);
+  //    Foot
+  gU_foot_ = MAL_RET_A_by_B(Afoot_xy_,Uxy_);
+  //    Velocity
+  gU_vel_ = MAL_RET_A_by_B(Avel_,U) ;
+  //    Rotation
+  gU_rot_ = MAL_RET_A_by_B(Arot_,U);
+  //    Obstacle
+  MAL_VECTOR_RESIZE(gU_obs_ ,nc_obs_);
+  for(unsigned obs=0 ; obs<obstacles_.size() ; ++obs)
+  {
+    for(unsigned n=0 ; n<nf_ ; ++n)
+    {
+      MAL_VECTOR_TYPE(double) HobsUxy = MAL_RET_A_by_B(Hobs_[obs][n],Uxy_);
+      double deltaObs = 0 ;
+      for(unsigned i=0 ; i<MAL_VECTOR_SIZE(HobsUxy) ; ++i)
+          deltaObs += Uxy_(i) * (HobsUxy(i) + Aobs_[obs][n](i)) ;
+      gU_obs_(obs*nf_ + n) = deltaObs ;
+    }
+  }
+  // Standing
+  //gU_stan_ = MAL_RET_A_by_B(Astan_,U) ;
+
+  // Fill up lb_, ub_ and gU_
+  unsigned index = 0 ;
+  for(unsigned i=0 ; i<nc_cop_ ; ++i)
+  {
+    lb_(index+i) = LBcop_ (i) ;
+    ub_(index+i) = UBcop_ (i) ;
+    gU_(index+i) = gU_cop_(i);
+  }
+  index = nc_cop_ ;
+  for(unsigned i=0 ; i<nc_foot_ ; ++i)
+  {
+    lb_(index+i) = LBfoot_ (i);
+    ub_(index+i) = UBfoot_ (i);
+    gU_(index+i) = gU_foot_(i);
+  }
+  index += nc_foot_ ;
+  for(unsigned i=0 ; i<nc_vel_ ; ++i)
+  {
+    lb_(index+i) = LBvel_ (i);
+    ub_(index+i) = UBvel_ (i);
+    gU_(index+i) = gU_vel_(i);
+  }
+  index += nc_vel_ ;
+  for(unsigned i=0 ; i<nc_rot_ ; ++i)
+  {
+    lb_(index+i) = LBrot_ (i);
+    ub_(index+i) = UBrot_ (i);
+    gU_(index+i) = gU_rot_(i);
+  }
+  index += nc_rot_ ;
+  for(unsigned obs=0 ; obs<obstacles_.size() ; ++obs)
+  {
+    for(unsigned n=0 ; n<nf_ ; ++n)
+    {
+      lb_(index + obs*nf_+n) = LBobs_[obs](n);
+      ub_(index + obs*nf_+n) = UBobs_[obs](n);
+      gU_(index + obs*nf_+n) = gU_obs_(obs*nf_+n) ;
+    }
+  }
+
+//  index += nc_rot_ ;
+//  for(unsigned i=0 ; i<nc_stan_ ; ++i)
+//  {
+//    lb_(index+i) = LBstan_ (i);
+//    ub_(index+i) = UBstan_ (i);
+//    gU_(index+i) = gU_stan_(i);
+//  }
   return ;
 }

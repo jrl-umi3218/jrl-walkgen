@@ -731,7 +731,7 @@ protected:
   void startTurningLeft2(PatternGeneratorInterface &aPGI)
   {
     {
-      istringstream strm2(":setVelReference  0.0 0.0 0.4");
+      istringstream strm2(":setVelReference  0.2 0.0 0.2");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -895,7 +895,8 @@ protected:
     struct localEvent events [localNbOfEvents] =
     {
       //{ 1,&TestNaveau2015::walkForward2m_s},
-      { 1,&TestNaveau2015::walkOnSpot},
+      { 1,&TestNaveau2015::startTurningRight2},
+      { 10,&TestNaveau2015::startTurningLeft2},
       //{10*200,&TestNaveau2015::walkForward2m_s},
       //{15*200,&TestNaveau2015::walkForward3m_s},
       //{1*20+5*200,&TestNaveau2015::perturbationForce},
@@ -908,11 +909,11 @@ protected:
       //{8*20+5*200,&TestNaveau2015::perturbationForce},
       //{9*20+5*200,&TestNaveau2015::perturbationForce},
       //{10*20+5*200,&TestNaveau2015::perturbationForce},
-      {5*200,&TestNaveau2015::walkForward2m_s},
-      {10*200,&TestNaveau2015::walkForward3m_s},
-      {15*200,&TestNaveau2015::walkSidewards1m_s},
-      {20*200,&TestNaveau2015::walkSidewards2m_s},
-      {25*200,&TestNaveau2015::startTurningRight2},
+      {20*200,&TestNaveau2015::walkForward2m_s},
+//      {3*200,&TestNaveau2015::walkForward3m_s},
+//      {4*200,&TestNaveau2015::walkSidewards1m_s},
+//      {5*200,&TestNaveau2015::walkSidewards2m_s},
+//      {6*200,&TestNaveau2015::startTurningRight2},
       {30*200,&TestNaveau2015::stop},
       {35*200,&TestNaveau2015::stopOnLineWalking}
     };
