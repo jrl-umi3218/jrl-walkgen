@@ -53,7 +53,7 @@ using namespace std;
 using namespace PatternGeneratorJRL;
 using namespace metapod;
 
-#define DEBUG
+//#define DEBUG
 
 double filterprecision(double adb)
 {
@@ -78,10 +78,10 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   Running_ = false ;
   TimeBuffer_ = 0.04 ;
   QP_T_ = 0.1 ;
-  QP_N_ = 10 ;
+  QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
   InterpolationPeriod_ = m_SamplingPeriod*7;
-  previewDuration_ = (QP_N_-1)*QP_T_ ;
+  previewDuration_ = 7*QP_T_ ;
   NbSampleControl_ = (int)round(QP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(QP_T_/InterpolationPeriod_) ;
   previewSize_ = QP_N_ ;
@@ -459,7 +459,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   dynamicFilter_->init(m_SamplingPeriod,
                        InterpolationPeriod_,
                        QP_T_,
-                       QP_N_*QP_T_ ,
+                       previewDuration_ + QP_T_ ,
                        previewDuration_,
                        lStartingCOMState);
   return 0;

@@ -227,7 +227,7 @@ namespace PatternGeneratorJRL
     deque<COMState> deltaCOMTraj_deq_ ;
 
     deque<ZMPPosition> ZMPTraj_deq_ ;
-    deque<COMState> COMTraj_deq_ ;    
+    deque<COMState> COMTraj_deq_ ;
     deque<FootAbsolutePosition> LeftFootTraj_deq_ ;
     deque<FootAbsolutePosition> RightFootTraj_deq_ ;
 

@@ -182,8 +182,7 @@ MACRO(ADD_HERDT_2010 test_herdt2010_arg)
     ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
 ENDMACRO(ADD_HERDT_2010)
 
-#ADD_HERDT_2010(TestHerdt2010)
-ADD_HERDT_2010(TestHerdt2010DynamicFilter)
+ADD_HERDT_2010(TestHerdt2010)
 
 ###########################
 # Test Inverse Kinematics #
