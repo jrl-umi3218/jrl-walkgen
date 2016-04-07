@@ -2696,23 +2696,14 @@ new step has to be generate.
         CoMz[2] = 0.0 ;
         return ;
       }
-      double Lastcom_z = FinalCoMPositions.back().z[0] ;
-      double lowerPoseCoMz = 0.95*m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);
-      double higherPoseCoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);
 
-      if(Lastcom_z >= higherPoseCoMz + 0.0001 || Lastcom_z <= higherPoseCoMz - 0.0001)
-      {
-        m_CoMbsplinesZ->SetParameters(
-            m_RelativeFootPositions[0].SStime,
-            lowerPoseCoMz,higherPoseCoMz,
-            vector<double>(), vector<double>(), CoMz[1], CoMz[2]) ;
-        m_CoMbsplinesZ->Compute(t-Index*moving_time+m_RelativeFootPositions[0].DStime,
-                                CoMz[0],CoMz[1],CoMz[2]) ;
-      }else{
-        CoMz[0] = Lastcom_z;
-        CoMz[1] = 0.0 ;
-        CoMz[2] = 0.0 ;
-      }
+      COMState LastCoM = FinalCoMPositions.back();
+      double higherPoseCoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);
+      double ft = m_RelativeFootPositions.back().SStime-(t-Index*moving_time) ;
+
+      m_CoMbsplinesZ->SetParameters(ft,LastCoM.z[0],higherPoseCoMz,
+            vector<double>(), vector<double>(), LastCoM.z[1], LastCoM.z[2]) ;
+      m_CoMbsplinesZ->Compute(m_SamplingPeriod,CoMz[0],CoMz[1],CoMz[2]) ;
       return ;
     }
 //    cout << "INDEX = " << Index << endl ;
@@ -2733,7 +2724,11 @@ new step has to be generate.
     if (FinalCoMPositions.size()!=0)
       LastCoM = FinalCoMPositions.back() ;
     else
+    {
       LastCoM.z[0] = initCoMheight ;
+      LastCoM.z[1] = 0.0 ;
+      LastCoM.z[2] = 0.0 ;
+    }
 
     // we start analyze since 2nd step
     if ( Index == 0 )
@@ -2742,21 +2737,18 @@ new step has to be generate.
       sy = m_RelativeFootPositions[Index+1].sy ;
       sz = m_RelativeFootPositions[Index+1].sz ;
       FinalTime = moving_time ;
-      InitSpeed = 0.0 ;
       interpolationTime = t-Index*moving_time ;
-      InitPos = initCoMheight ;
       FinalPos = initCoMheight ;
-      if(sx*sx+sy*sy > 0.2*0.2 && sz*sz+sz*sz < 0.00001)
+      FinalTime = SStime - interpolationTime ;
+      if(sx*sx+sy*sy > 0.22*0.22 && sz*sz+sz*sz < 0.00001 && sx*sx+sx*sx > 0.00001)
       {
-        FinalTime = SStime ;
         FinalPos = lowerCoMheight ;
-      }else if(LastCoM.z[0] >= initCoMheight + 0.00001 || LastCoM.z[0] <= initCoMheight - 0.00001)
-      {
-        FinalTime = SStime ;
-        InitPos = lowerCoMheight ;
       }
+      InitPos   = LastCoM.z[0];
+      InitSpeed = LastCoM.z[1];
+      InitAcc   = LastCoM.z[2];
       m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
-      m_CoMbsplinesZ->Compute(interpolationTime,CoMz[0],CoMz[1],CoMz[2]) ;
+      m_CoMbsplinesZ->Compute(m_SamplingPeriod,CoMz[0],CoMz[1],CoMz[2]) ;
       return ;
     }
 
@@ -2789,8 +2781,6 @@ new step has to be generate.
     if (absFootz_0 > absFootz_1) // first leg
       {
         deltaZ = absFootz_0 - absFootz_1;
-        FinalTime = (upRight-upLeft)*SStime ;
-
         if (Index>1)
           InitPos = m_InitialPoseCoMHeight + absFootz_2 - up*(absFootz_1 - absFootz_2) ;
         else // Special case: starting the motion.
@@ -2799,21 +2789,18 @@ new step has to be generate.
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight + absFootz_1 - up*deltaZ;
 
-        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
-
         interpolationTime = t-Index*moving_time - upLeft*SStime ;
+        FinalTime = (upRight-upLeft)*SStime - interpolationTime ;
       }
     else if (absFootz_0 == absFootz_1 && m_RelativeFootPositions[Index-1].sz > 0) // 2nd leg
       {
         deltaZ = (absFootz_0 - absFootz_2 );
-        FinalTime = (upRight-upLeft)*SStime ;
         InitPos = m_InitialPoseCoMHeight + absFootz_2 - up*deltaZ ;
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight + absFootz_0 ;
 
-        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
-
         interpolationTime = t-Index*moving_time - upLeft*SStime ;
+        FinalTime = (upRight-upLeft)*SStime - interpolationTime;
       }
     // going down
     // the CoM line will decrease an //1+down// stair height
@@ -2822,8 +2809,6 @@ new step has to be generate.
     else if (absFootz_0 < absFootz_1 )
       {
         deltaZ = absFootz_1 - absFootz_0;
-        FinalTime = (downRight-downLeft)*SStime ;
-
         if (Index>1)
           InitPos = m_InitialPoseCoMHeight + absFootz_1 - down*(absFootz_2 - absFootz_1) ;
         else // Special case: starting the motion.
@@ -2832,37 +2817,33 @@ new step has to be generate.
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight +  absFootz_0 - down*deltaZ ;
 
-        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
-
         interpolationTime = t-Index*moving_time - downLeft*SStime ;
+        FinalTime = (downRight-downLeft)*SStime - interpolationTime;
       }
     else if (absFootz_0 == absFootz_1 && m_RelativeFootPositions[Index-1].sz < 0) //second leg
       {
         deltaZ = absFootz_2 - absFootz_0;
-        FinalTime = (downRight-downLeft)*SStime ;
         InitPos = m_InitialPoseCoMHeight + absFootz_0 - down*deltaZ ;
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight + absFootz_0 ;
-
-        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
-
         interpolationTime = t-Index*moving_time - downLeft*SStime ;
+        FinalTime = (downRight-downLeft)*SStime - interpolationTime ;
       }
     // normal walking
     // the com stay on the horizotal plane at the initial com altitude
     else
       {
-        FinalTime = moving_time ;
         InitSpeed = 0.0 ;
         interpolationTime = t-Index*moving_time-SStime ;
+        FinalTime = moving_time - interpolationTime ;
         InitPos = initCoMheight ;
         FinalPos = initCoMheight ;
 
-        if(sx*sx+sy*sy > 0.2*0.2 && sz*sz+sz*sz < 0.00001)
+        if(sx*sx+sy*sy > 0.22*0.22 && sz*sz+sz*sz < 0.00001 && sx*sx+sx*sx > 0.00001)
         {
           if(LastCoM.z[0] >= lowerCoMheight + 0.00001 || LastCoM.z[0] <= lowerCoMheight - 0.00001)
           {
-            FinalTime = DStime ;
+            FinalTime = DStime - interpolationTime;
             FinalPos = lowerCoMheight ;
           }else{
             InitPos = lowerCoMheight ;
@@ -2870,14 +2851,14 @@ new step has to be generate.
           }
         }else if(LastCoM.z[0] >= initCoMheight + 0.00001 || LastCoM.z[0] <= initCoMheight - 0.00001)
         {
-          FinalTime = SStime ;
+          FinalTime = SStime - interpolationTime;
           InitPos = lowerCoMheight ;
+          FinalPos = initCoMheight ;
         }else
         {
           InitPos = initCoMheight ;
           FinalPos = initCoMheight ;
-        }
-        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
+        }        
       }
 
 //    cout << "relative position : "
@@ -2888,8 +2869,11 @@ new step has to be generate.
 //         << SStime << " "
 //         << m_AbsoluteSupportFootPositions[Index].time << " "
 //         << m_AbsoluteSupportFootPositions[Index-1].time << " " << endl ;
-
-    m_CoMbsplinesZ->Compute(interpolationTime,CoMz[0],CoMz[1],CoMz[2]) ;
+    InitPos = LastCoM.z[0];
+    InitSpeed = LastCoM.z[1];
+    InitAcc = LastCoM.z[2];
+    m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
+    m_CoMbsplinesZ->Compute(m_SamplingPeriod,CoMz[0],CoMz[1],CoMz[2]) ;
   }
 
   void AnalyticalMorisawaCompact::ComputeZMPz(double t,

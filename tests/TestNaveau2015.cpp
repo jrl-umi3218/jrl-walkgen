@@ -50,7 +50,6 @@ using namespace PatternGeneratorJRL;
 #include <iomanip>
 #include <string>
 #include <map>
-#include <random>
 #include <cmath>
 
 #include <metapod/models/hrp2_14/hrp2_14.hh>
@@ -79,7 +78,7 @@ using namespace::PatternGeneratorJRL::TestSuite;
 using namespace std;
 
 enum Profiles_t {
-  PROFIL_NAVEAU_ONLINE_WALKING // 1
+  PROFIL_NAVEAU // 1
 };
 
 // Class TestNaveau2015
@@ -93,6 +92,7 @@ private:
   vector<double> err_zmp_x ;
   vector<double> err_zmp_y ;
   int resetfiles ;
+  bool m_DebugFGPIFull ;
 
   /// Class that compute the dynamic and kinematic of the robot
   CjrlHumanoidDynamicRobot * cjrlHDR_ ;
@@ -111,6 +111,8 @@ public:
     err_zmp_x.clear() ;
     err_zmp_y.clear() ;
     resetfiles=0;
+    m_DebugFGPIFull=false;
+    m_DebugFGPI=true;
   }
 
   ~TestNaveau2015()
@@ -135,98 +137,98 @@ public:
     localeventHandler_t Handler ;
   };
 
-  bool doTest(ostream &os)
-  {
+//  bool doTest(ostream &os)
+//  {
 
-    // Set time reference.
-    m_clock.startingDate();
+//    // Set time reference.
+//    m_clock.startingDate();
 
-    /*! Open and reset appropriatly the debug files. */
-    prepareDebugFiles();
+//    /*! Open and reset appropriatly the debug files. */
+//    prepareDebugFiles();
 
-    for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
-    {
-      os << "<===============================================================>"<<endl;
-      os << "Iteration nb: " << lNbIt << endl;
+//    for (unsigned int lNbIt=0;lNbIt<m_OuterLoopNbItMax;lNbIt++)
+//    {
+//      os << "<===============================================================>"<<endl;
+//      os << "Iteration nb: " << lNbIt << endl;
 
-      m_clock.startPlanning();
+//      m_clock.startPlanning();
 
-      /*! According to test profile initialize the current profile. */
-      chooseTestProfile();
+//      /*! According to test profile initialize the current profile. */
+//      chooseTestProfile();
 
-      m_clock.endPlanning();
+//      m_clock.endPlanning();
 
-      if (m_DebugHDR!=0)
-      {
-        m_DebugHDR->currentConfiguration(m_PreviousConfiguration);
-        m_DebugHDR->currentVelocity(m_PreviousVelocity);
-        m_DebugHDR->currentAcceleration(m_PreviousAcceleration);
-        m_DebugHDR->computeForwardKinematics();
-      }
+//      if (m_DebugHDR!=0)
+//      {
+//        m_DebugHDR->currentConfiguration(m_PreviousConfiguration);
+//        m_DebugHDR->currentVelocity(m_PreviousVelocity);
+//        m_DebugHDR->currentAcceleration(m_PreviousAcceleration);
+//        m_DebugHDR->computeForwardKinematics();
+//      }
 
-      bool ok = true;
-      while(ok)
-      {
-        m_clock.startOneIteration();
+//      bool ok = true;
+//      while(ok)
+//      {
+//        m_clock.startOneIteration();
 
-        if (m_PGIInterface==0)
-        {
-          ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
-                                                 m_CurrentVelocity,
-                                                 m_CurrentAcceleration,
-                                                 m_OneStep.ZMPTarget,
-                                                 m_OneStep.finalCOMPosition,
-                                                 m_OneStep.LeftFootPosition,
-                                                 m_OneStep.RightFootPosition);
-        }
-        else if (m_PGIInterface==1)
-        {
-          ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
-                                                 m_CurrentVelocity,
-                                                 m_CurrentAcceleration,
-                                                 m_OneStep.ZMPTarget);
-        }
+//        if (m_PGIInterface==0)
+//        {
+//          ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
+//                                                 m_CurrentVelocity,
+//                                                 m_CurrentAcceleration,
+//                                                 m_OneStep.ZMPTarget,
+//                                                 m_OneStep.finalCOMPosition,
+//                                                 m_OneStep.LeftFootPosition,
+//                                                 m_OneStep.RightFootPosition);
+//        }
+//        else if (m_PGIInterface==1)
+//        {
+//          ok = m_PGI->RunOneStepOfTheControlLoop(m_CurrentConfiguration,
+//                                                 m_CurrentVelocity,
+//                                                 m_CurrentAcceleration,
+//                                                 m_OneStep.ZMPTarget);
+//        }
 
-        m_OneStep.NbOfIt++;
+//        m_OneStep.NbOfIt++;
 
-        m_clock.stopOneIteration();
+//        m_clock.stopOneIteration();
 
-        m_PreviousConfiguration = m_CurrentConfiguration;
-        m_PreviousVelocity = m_CurrentVelocity;
-        m_PreviousAcceleration = m_CurrentAcceleration;
+//        m_PreviousConfiguration = m_CurrentConfiguration;
+//        m_PreviousVelocity = m_CurrentVelocity;
+//        m_PreviousAcceleration = m_CurrentAcceleration;
 
-        /*! Call the reimplemented method to generate events. */
-        if (ok)
-        {
-          m_clock.startModification();
-          generateEvent();
-          m_clock.stopModification();
+//        /*! Call the reimplemented method to generate events. */
+//        if (ok)
+//        {
+//          m_clock.startModification();
+//          generateEvent();
+//          m_clock.stopModification();
 
-          m_clock.fillInStatistics();
+//          m_clock.fillInStatistics();
 
 
-          /*! Fill the debug files with appropriate information. */
-          fillInDebugFiles();
-        }
-        else
-        {
-          cerr << "Nothing to dump after " << m_OneStep.NbOfIt << endl;
-        }
+//          /*! Fill the debug files with appropriate information. */
+//          fillInDebugFiles();
+//        }
+//        else
+//        {
+//          cerr << "Nothing to dump after " << m_OneStep.NbOfIt << endl;
+//        }
 
-      }
+//      }
 
-      os << endl << "End of iteration " << lNbIt << endl;
-      os << "<===============================================================>"<<endl;
-    }
+//      os << endl << "End of iteration " << lNbIt << endl;
+//      os << "<===============================================================>"<<endl;
+//    }
 
-    ComputeAndDisplayZMPStatistic();
-    string lProfileOutput= m_TestName;
-    lProfileOutput +="TimeProfile.dat";
-    m_clock.writeBuffer(lProfileOutput);
-    m_clock.displayStatistics(os,m_OneStep);
-    // Compare debugging files
-    return compareDebugFiles();
-  }
+//    ComputeAndDisplayZMPStatistic();
+//    string lProfileOutput= m_TestName;
+//    lProfileOutput +="TimeProfile.dat";
+//    m_clock.writeBuffer(lProfileOutput);
+//    m_clock.displayStatistics(os,m_OneStep);
+//    // Compare debugging files
+//    return compareDebugFiles();
+//  }
 
   void ComputeStat(vector<double> vec,double &avg, double &max_abs)
   {
@@ -343,7 +345,7 @@ protected:
   void prepareDebugFiles()
   {
     TestObject::prepareDebugFiles() ;
-    if (m_DebugFGPI)
+    if (m_DebugFGPIFull)
     {
       ofstream aof;
       string aFileName;
@@ -360,62 +362,62 @@ protected:
   {
     TestObject::fillInDebugFiles();
 
-    /// \brief calculate, from the CoM of computed by the preview control,
-    ///    the corresponding articular position, velocity and acceleration
-    /// ------------------------------------------------------------------
-    MAL_VECTOR_DIM(aCOMState,double,6);
-    MAL_VECTOR_DIM(aCOMSpeed,double,6);
-    MAL_VECTOR_DIM(aCOMAcc,double,6);
-    MAL_VECTOR_DIM(aLeftFootPosition,double,5);
-    MAL_VECTOR_DIM(aRightFootPosition,double,5);
-
-    aCOMState(0) = m_OneStep.finalCOMPosition.x[0];      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
-    aCOMState(1) = m_OneStep.finalCOMPosition.y[0];      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
-    aCOMState(2) = m_OneStep.finalCOMPosition.z[0];      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
-    aCOMState(3) = m_OneStep.finalCOMPosition.roll[0]  * 180/M_PI  ;  aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1] /** * 180/M_PI  */ ;  aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2]/** * 180/M_PI  */ ;
-    aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0] * 180/M_PI  ;  aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1]/** * 180/M_PI  */ ;  aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2]/** * 180/M_PI  */ ;
-    aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0] *180/M_PI;  aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1]/** * 180/M_PI  */ ; aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2] /** * 180/M_PI  */;
-
-    aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
-    aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
-    aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
-    aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
-    aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
-    ComAndFootRealization_->setSamplingPeriod(0.005);
-    ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
-                                                                    aLeftFootPosition,
-                                                                    aRightFootPosition,
-                                                                    m_CurrentConfiguration,
-                                                                    m_CurrentVelocity,
-                                                                    m_CurrentAcceleration,
-                                                                    20,
-                                                                    1);
-
-    m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
-    m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
-
-    // compute the 6D force applied at the CoM
-    for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(m_CurrentConfiguration) ; ++i)
+    if(m_DebugFGPIFull)
     {
-      q_(i,0)   = m_CurrentConfiguration (i);
-      dq_(i,0)  = m_CurrentVelocity      (i);
-      ddq_(i,0) = m_CurrentAcceleration  (i);
-    }
-    metapod::rnea< Robot_Model, true >::run(hrp2_14_, q_, dq_, ddq_);
-    vector<double> zmpmb = vector<double>(3,0.0);
-    // extract the CoM momentum and forces
-    RootNode & node_waist = boost::fusion::at_c< Robot_Model::BODY >(hrp2_14_.nodes);
-    com_tensor_ = node_waist.body.iX0.applyInv(node_waist.joint.f);
+      /// \brief calculate, from the CoM of computed by the preview control,
+      ///    the corresponding articular position, velocity and acceleration
+      /// ------------------------------------------------------------------
+      MAL_VECTOR_DIM(aCOMState,double,6);
+      MAL_VECTOR_DIM(aCOMSpeed,double,6);
+      MAL_VECTOR_DIM(aCOMAcc,double,6);
+      MAL_VECTOR_DIM(aLeftFootPosition,double,5);
+      MAL_VECTOR_DIM(aRightFootPosition,double,5);
 
-    // compute the Multibody ZMP
-    zmpmb[0] = - com_tensor_.n()[1] / com_tensor_.f()[2] ;
-    zmpmb[1] =   com_tensor_.n()[0] / com_tensor_.f()[2] ;
+      aCOMState(0) = m_OneStep.finalCOMPosition.x[0];      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
+      aCOMState(1) = m_OneStep.finalCOMPosition.y[0];      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
+      aCOMState(2) = m_OneStep.finalCOMPosition.z[0];      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
+      aCOMState(3) = m_OneStep.finalCOMPosition.roll[0]  * 180/M_PI  ;  aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1] /** * 180/M_PI  */ ;  aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2]/** * 180/M_PI  */ ;
+      aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0] * 180/M_PI  ;  aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1]/** * 180/M_PI  */ ;  aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2]/** * 180/M_PI  */ ;
+      aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0] *180/M_PI;  aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1]/** * 180/M_PI  */ ; aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2] /** * 180/M_PI  */;
 
-    err_zmp_x.push_back(zmpmb[0]-m_OneStep.ZMPTarget(0)) ;
-    err_zmp_y.push_back(zmpmb[1]-m_OneStep.ZMPTarget(1)) ;
+      aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
+      aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
+      aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
+      aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
+      aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
+      ComAndFootRealization_->setSamplingPeriod(0.005);
+      ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
+                                                                      aLeftFootPosition,
+                                                                      aRightFootPosition,
+                                                                      m_CurrentConfiguration,
+                                                                      m_CurrentVelocity,
+                                                                      m_CurrentAcceleration,
+                                                                      20,
+                                                                      1);
 
-    if (m_DebugFGPI)
-    {
+      m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
+      m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
+
+      // compute the 6D force applied at the CoM
+      for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(m_CurrentConfiguration) ; ++i)
+      {
+        q_(i,0)   = m_CurrentConfiguration (i);
+        dq_(i,0)  = m_CurrentVelocity      (i);
+        ddq_(i,0) = m_CurrentAcceleration  (i);
+      }
+      metapod::rnea< Robot_Model, true >::run(hrp2_14_, q_, dq_, ddq_);
+      vector<double> zmpmb = vector<double>(3,0.0);
+      // extract the CoM momentum and forces
+      RootNode & node_waist = boost::fusion::at_c< Robot_Model::BODY >(hrp2_14_.nodes);
+      com_tensor_ = node_waist.body.iX0.applyInv(node_waist.joint.f);
+
+      // compute the Multibody ZMP
+      zmpmb[0] = - com_tensor_.n()[1] / com_tensor_.f()[2] ;
+      zmpmb[1] =   com_tensor_.n()[0] / com_tensor_.f()[2] ;
+
+      err_zmp_x.push_back(zmpmb[0]-m_OneStep.ZMPTarget(0)) ;
+      err_zmp_y.push_back(zmpmb[1]-m_OneStep.ZMPTarget(1)) ;
+
       ofstream aof;
       string aFileName;
       aFileName = m_TestName;
@@ -830,7 +832,7 @@ protected:
     switch(m_TestProfile)
     {
 
-      case PROFIL_NAVEAU_ONLINE_WALKING:
+      case PROFIL_NAVEAU:
         startOnLineWalking(*m_PGI);
         break;
       default:
@@ -838,30 +840,6 @@ protected:
         break;
     }
   }
-
-
-//  void generateEventOnLineWalking()
-//  {
-//    double dx=0.0 ;
-//    double dy=0.0 ;
-//    double dtheta=0.0 ;
-//    if(m_OneStep.NbOfIt<dataFile_->data.size())
-//    {
-//      dx=dataFile_->data[m_OneStep.NbOfIt][1];
-//      dy=dataFile_->data[m_OneStep.NbOfIt][2];
-//      dtheta=dataFile_->data[m_OneStep.NbOfIt][3];
-//    }else if(m_OneStep.NbOfIt > dataFile_->data.size() + 15*200)
-//    {
-//      istringstream strm3(":stoppg");
-//      m_PGI->ParseCmd(strm3);
-//    }
-
-//    stringstream ss ;
-//    ss << ":setVelReference " << dx << " " << dy << " " << dtheta ;
-//    cout << ss.str() << endl ;
-//    istringstream strm(ss.str());
-//    m_PGI->ParseCmd(strm);
-//  }
 
   void generateEventOnLineWalking()
   {
@@ -898,18 +876,16 @@ protected:
         (this->*(events[i].Handler))(*m_PGI);
       }
     }
-    if(m_OneStep.NbOfIt>=0*200)
-    {
-      ostringstream oss ;
-      oss << ":perturbationforce "
-          //<< 15*sin((m_OneStep.NbOfIt-5*200)*0.005)
-          << -6 << " "
-          << -6 << " "
-          << " 0.0";
-      cout << oss.str() << endl ;
-      istringstream strm (oss.str()) ;
-      m_PGI->ParseCmd(strm);
-    }
+//    if(m_OneStep.NbOfIt>=0*200)
+//    {
+//      ostringstream oss ;
+//      oss << ":perturbationforce "
+//          << 0.0 << " "
+//          << 0.0 << " "
+//          << " 0.0";
+//      istringstream strm (oss.str()) ;
+//      m_PGI->ParseCmd(strm);
+//    }
   }
 
   void generateEventEmergencyStop()
@@ -934,7 +910,7 @@ protected:
   void generateEvent()
   {
     switch(m_TestProfile){
-      case PROFIL_NAVEAU_ONLINE_WALKING:
+      case PROFIL_NAVEAU:
         generateEventOnLineWalking();
         break;
       default:
@@ -948,7 +924,7 @@ int PerformTests(int argc, char *argv[])
 {
 #define NB_PROFILES 1
   std::string TestNames[NB_PROFILES] = {"TestNaveau2015"};
-  int TestProfiles[NB_PROFILES] = {PROFIL_NAVEAU_ONLINE_WALKING};
+  int TestProfiles[NB_PROFILES] = {PROFIL_NAVEAU};
 
 
   for (unsigned int i=0;i<NB_PROFILES;i++){
@@ -974,8 +950,7 @@ int main(int argc, char *argv[])
 {
   try
   {
-    int ret = PerformTests(argc,argv);
-    return ret ;
+    return PerformTests(argc,argv);
   }
   catch (const std::string& msg)
   {
