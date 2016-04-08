@@ -150,6 +150,10 @@ ENDIF(HRP2_DYNAMICS_FOUND)
 ###################
 # Test Herdt 2010 #
 ###################
+IF(HRP2_DYNAMICS_FOUND)
+
+  IF(HRP2_14_FOUND)
+
 CONFIG_FILES_CMAKE(TestHerdt2010OnLineTestFGPI.datref)
 CONFIG_FILES_CMAKE(TestHerdt2010EmergencyStopTestFGPI.datref)
 
@@ -189,6 +193,8 @@ ENDMACRO(ADD_HERDT_2010)
 
 ADD_HERDT_2010(TestHerdt2010)
 
+  ENDIF(HRP2_14_FOUND)
+ENDIF(HRP2_DYNAMICS_FOUND)
 ###########################
 # Test Inverse Kinematics #
 ###########################
