@@ -7,7 +7,8 @@ env:
   global:
     - secure: ViEXlUgT66UGxlMPd2ZmZdB9rhFS3rsl6ktJFdyRukdXwZl3/5boy95RJJawFSQ4PmcKX35oZ5Afl7CSuT5r7uiEoFCeZu38b80E3BsuUr4zPgdZS4hI818L/MPhahmN5ravefVbDl+Yf95bWQ79EYj45yvh1dJH+YRBD+ucPDk=
     - "APT_DEPENDENCIES=doxygen doxygen-latex libboost-all-dev libeigen3-dev liblapack-dev libblas-dev gfortran"
-    - DIST=precise
+    - DEBSIGN_KEYID=5AE5CD75
+    - LCOV_IGNORE_RULES="*unittest* /opt/openrobots/*"
 notifications:
   email:
     - hpp-source@laas.fr

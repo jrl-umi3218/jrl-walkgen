@@ -1,9 +1,0 @@
-Document: jrl-walkgen
-Title: Debian jrl-walkgen Manual
-Author: Thomas Moulard <thomas.moulard@gmail.com>
-Abstract: Doxygen documentation of jrl-walkgen.
-Section: Programming
-
-Format: HTML
-Index: /opt/openrobots/share/doc/jrl-walkgen/html/index.html
-Files: /opt/openrobots/doc/jrl-walkgen/html/*.html
