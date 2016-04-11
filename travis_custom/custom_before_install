@@ -15,7 +15,7 @@ sudo free -m -t
 # Setup environment variables.
 export APT_DEPENDENCIES="doxygen doxygen-latex libboost-all-dev libeigen3-dev liblapack-dev libblas-dev gfortran"
 # Add Robot dependencies
-export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-metapod robotpkg-hrp2-14 robotpkg-hrp2-dynamics"
+export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-metapod"
 
 # When this script is called the current directory is ./custom_travis
 . ./.travis/run ../.travis/before_install
