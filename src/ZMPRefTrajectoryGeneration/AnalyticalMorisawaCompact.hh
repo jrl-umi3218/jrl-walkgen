@@ -106,7 +106,7 @@ namespace PatternGeneratorJRL
       const static unsigned int RELATIVE_FRAME = 1;
       /*! @} */
       /*! Constructor */
-      AnalyticalMorisawaCompact(SimplePluginManager * lSPM , CjrlHumanoidDynamicRobot *aHS);
+      AnalyticalMorisawaCompact(SimplePluginManager * lSPM , PinocchioRobot *aPR);
 
       /*! Destructor */
       virtual ~AnalyticalMorisawaCompact();

@@ -30,7 +30,7 @@
 #include <privatepgtypes.hh>
 #include <PreviewControl/SupportFSM.hh>
 #include <FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.h>
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <PinocchioRobot.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -42,7 +42,7 @@ namespace PatternGeneratorJRL
     //
   public:
 
-    RigidBodySystem( SimplePluginManager *SPM, CjrlHumanoidDynamicRobot *aHS, SupportFSM * FSM );
+    RigidBodySystem( SimplePluginManager *SPM, PinocchioRobot *aPR, SupportFSM * FSM );
 
     ~RigidBodySystem();
 
@@ -291,7 +291,7 @@ namespace PatternGeneratorJRL
     /// \brief Finite State Machine
     SupportFSM * FSM_;
 
-    CjrlHumanoidDynamicRobot * HDR_;
+    PinocchioRobot * PR_;
 
   };
 }

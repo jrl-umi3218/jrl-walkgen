@@ -34,7 +34,7 @@
 using namespace PatternGeneratorJRL;
 
 FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginManager *lSPM,
-								   CjrlFoot *aFoot)
+                                   PRFoot *aFoot)
   : SimplePlugin(lSPM)
 {
   m_Omega = 0.0;

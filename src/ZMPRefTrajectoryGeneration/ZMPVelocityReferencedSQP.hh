@@ -49,7 +49,7 @@ namespace PatternGeneratorJRL
   public:
 
     ZMPVelocityReferencedSQP(SimplePluginManager *SPM, string DataFile,
-                            CjrlHumanoidDynamicRobot *aHS=0 );
+                            PinocchioRobot *aPR=0 );
 
     ~ZMPVelocityReferencedSQP();
 

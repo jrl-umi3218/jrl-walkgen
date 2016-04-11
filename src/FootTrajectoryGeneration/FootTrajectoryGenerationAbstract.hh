@@ -38,8 +38,8 @@
 /*! MatrixAbstractLayer */
 #include <jrl/mal/matrixabstractlayer.hh>
 
-/* dynamics JRL Japan related inclusions */
-#include <abstract-robot-dynamics/foot.hh>
+/* dynamics pinocchio related inclusions */
+#include <PinocchioRobot.hh>
 
 /* Walking pattern generation related inclusions */
 
@@ -86,7 +86,7 @@ namespace PatternGeneratorJRL
     /*! Constructor: In order to compute some appropriate strategies,
       this class needs to extract specific details from the humanoid model. */
     FootTrajectoryGenerationAbstract(SimplePluginManager *lSPM,
-				     CjrlFoot *inFoot) ;
+                     PRFoot *inFoot) ;
 
 
     /*! Default destructor. */
@@ -229,7 +229,7 @@ namespace PatternGeneratorJRL
     double m_TDouble;
 
     /*! Store a pointer to Foot information. */
-    CjrlFoot * m_Foot;
+    PRFoot * m_Foot;
 
     /*! Omega the angle for taking off and landing. */
     double m_Omega;

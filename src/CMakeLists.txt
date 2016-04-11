@@ -32,6 +32,7 @@ ADD_DEFINITIONS("/DLSSOL_FOUND")
 ENDIF(USE_LSSOL)
 
 SET(INCLUDES
+  PinocchioRobot.hh
   PreviewControl/rigid-body.hh
   PreviewControl/OptimalControllerSolver.hh
   PreviewControl/rigid-body-system.hh
@@ -112,6 +113,7 @@ ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
 
 SET(SOURCES
   ${INCLUDES}
+  PinocchioRobot.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp
@@ -207,15 +209,15 @@ ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES} ${${PROJECT_NAME}_ABSOLUTE_HEADERS})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
 # Define dependencies
 
-TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name} ${Boost_LIBRARIES})
+#TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name} ${Boost_LIBRARIES})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta ")
 
 INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen abstract-robot-dynamics)
+#PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen abstract-robot-dynamics)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-mal)
-PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-dynamics)
-#PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen pinocchio)
+#PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-dynamics)
+PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen pinocchio)
 
 IF(USE_LSSOL)
  PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen lssol)

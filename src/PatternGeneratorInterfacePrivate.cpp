@@ -47,11 +47,11 @@
 
 namespace PatternGeneratorJRL {
 
-  PatternGeneratorInterfacePrivate::PatternGeneratorInterfacePrivate(CjrlHumanoidDynamicRobot *aHDR)
-    : PatternGeneratorInterface(aHDR),SimplePlugin(this)
+  PatternGeneratorInterfacePrivate::PatternGeneratorInterfacePrivate(PinocchioRobot *aPinocchioRobotRobot)
+    : PatternGeneratorInterface(aPinocchioRobotRobot),SimplePlugin(this)
   {
     //AllowFPE();
-    m_HumanoidDynamicRobot = aHDR;
+    m_PinocchioRobotRobot = aPinocchioRobotRobot;
 
     ODEBUG4("Step 0","DebugPGI.txt");
 
@@ -93,7 +93,8 @@ namespace PatternGeneratorJRL {
 
     // Initialize (if needed) debugging actions.
     m_dt = 0.005;
-    m_DOF = m_HumanoidDynamicRobot->numberDof();
+    //m_DOF = m_HumanoidDynamicRobot->numberDof();
+    m_DOF = m_PinocchioRobotRobot->numberDof() ;
 
     m_SamplingPeriod = m_PC->SamplingPeriod();
     m_PreviewControlTime = m_PC->PreviewControlTime();
@@ -221,14 +222,6 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::ObjectsInstanciation()
   {
     // Create fundamental objects to make the WPG runs.
-    {
-      string inProperty[2]={"ComputeZMP",
-                            "ComputeBackwardDynamics"};
-      string inValue[2]={"true","false"};
-      for(unsigned int i=0;i<2;i++)
-        m_HumanoidDynamicRobot->setProperty(inProperty[i],inValue[i]);
-
-    }
 
     // INFO: This where you should instanciate your own
     // INFO: object for Com and Foot realization.
@@ -237,7 +230,7 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization[0] = new ComAndFootRealizationByGeometry(this);
 
     // Creates the foot trajectory generator.
-    m_FeetTrajectoryGenerator = new LeftAndRightFootTrajectoryGenerationMultiple(this,m_HumanoidDynamicRobot->leftFoot());
+    m_FeetTrajectoryGenerator = new LeftAndRightFootTrajectoryGenerationMultiple(this,m_PinocchioRobotRobot->leftFoot());
 
     // ZMP reference and Foot trajectory planner (Preview control method from Kajita2003)
     m_ZMPD = new ZMPDiscretization(this,"",m_HumanoidDynamicRobot);
@@ -2080,9 +2073,9 @@ namespace PatternGeneratorJRL {
   }
 
 
-  PatternGeneratorInterface * patternGeneratorInterfaceFactory(CjrlHumanoidDynamicRobot *aHDR)
+  PatternGeneratorInterface * patternGeneratorInterfaceFactory(PinocchioRobot * aRobot)
   {
-    return new PatternGeneratorInterfacePrivate(aHDR);
+    return new PatternGeneratorInterfacePrivate(aRobot);
   }
 
 

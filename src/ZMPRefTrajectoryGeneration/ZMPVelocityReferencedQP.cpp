@@ -51,7 +51,7 @@
 #include <Debug.hh>
 using namespace std;
 using namespace PatternGeneratorJRL;
-using namespace metapod;
+//using namespace metapod;
 
 //#define DEBUG
 
@@ -69,7 +69,7 @@ double filterprecision(double adb)
 }
 
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
-                                                 string , CjrlHumanoidDynamicRobot *aHS ) :
+                                                 string , PinocchioRobot *aPR ) :
 ZMPRefTrajectoryGeneration(SPM),
 Robot_(0),SupportFSM_(0),OrientPrw_(0),OrientPrw_DF_(0),
 VRQPGenerator_(0),IntermedData_(0),RFI_(0),Problem_(),

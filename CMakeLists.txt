@@ -43,14 +43,15 @@ ENDIF(SYS_TIME_H)
 
 # Required dependencies
 ADD_REQUIRED_DEPENDENCY("jrl-mal >= 1.9.0")
-ADD_REQUIRED_DEPENDENCY("abstract-robot-dynamics >= 1.15")
-ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
+ADD_REQUIRED_DEPENDENCY("pinocchio >=  1.1.0")
+#ADD_REQUIRED_DEPENDENCY("abstract-robot-dynamics >= 1.15")
+#ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
 
 ################################################################
-ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
-ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
-#ADD_OPTIONAL_DEPENDENCY("pinocchio >=  1.0.1")
-ADD_OPTIONAL_DEPENDENCY("metapod >= 1.0.7")
+#ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
+#ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
+#
+#ADD_OPTIONAL_DEPENDENCY("metapod >= 1.0.7")
 #################################################################
 
 # Search for qpOases

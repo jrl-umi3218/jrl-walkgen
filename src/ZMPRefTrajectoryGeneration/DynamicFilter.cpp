@@ -1,13 +1,13 @@
 #include "DynamicFilter.hh"
-#include "metapod/algos/rnea.hh"
+//#include "metapod/algos/rnea.hh"
 #include <iomanip>
 using namespace std;
 using namespace PatternGeneratorJRL;
-using namespace metapod;
+//using namespace metapod;
 
 DynamicFilter::DynamicFilter(
     SimplePluginManager *SPM,
-    CjrlHumanoidDynamicRobot *aHS): stage0_(0) , stage1_(1),
+    PinocchioRobot *aPR): stage0_(0) , stage1_(1),
     MODE_PC_(OptimalControllerSolver::MODE_WITH_INITIALPOS)
 {
   controlPeriod_       = 0.0 ;
@@ -17,10 +17,10 @@ DynamicFilter::DynamicFilter(
   kajitaPCwindowSize_  = 0.0 ;
   CoMHeight_           = 0.0 ;
 
-  cjrlHDR_ = aHS ;
+  PR_ = aPR ;
 
   comAndFootRealization_ = new ComAndFootRealizationByGeometry((PatternGeneratorInterfacePrivate*) SPM );
-  comAndFootRealization_->setHumanoidDynamicRobot(cjrlHDR_);
+  comAndFootRealization_->setPinocchioRobot(PR_);
   comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
   comAndFootRealization_->ShiftFoot(true);
   comAndFootRealization_->setSamplingPeriod(interpolationPeriod_);
@@ -368,30 +368,30 @@ void DynamicFilter::InverseDynamics(
     MAL_VECTOR_TYPE(double)& acceleration
     )
 {
-  // compute the 6D force applied at the CoM
-  for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(configuration) ; ++i)
-    {
-      q_(i,0)   = configuration(i);
-      dq_(i,0)  = velocity(i);
-      ddq_(i,0) = acceleration(i);
-    }
-  metapod::rnea< Robot_Model, true >::run(hrp2_14_, q_, dq_, ddq_);
+//  // compute the 6D force applied at the CoM
+//  for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(configuration) ; ++i)
+//    {
+//      q_(i,0)   = configuration(i);
+//      dq_(i,0)  = velocity(i);
+//      ddq_(i,0) = acceleration(i);
+//    }
+//  metapod::rnea< Robot_Model, true >::run(hrp2_14_, q_, dq_, ddq_);
 
   return ;
 }
 
 void DynamicFilter::ExtractZMP(vector<double> & zmpmb)
 {
-  zmpmb.resize(3,0.0);
-  // extract the CoM momentum and forces
-  RootNode & node_waist = boost::fusion::at_c< Robot_Model::BODY >(hrp2_14_.nodes);
-  com_tensor_ = node_waist.body.iX0.applyInv(node_waist.joint.f);
+//  zmpmb.resize(3,0.0);
+//  // extract the CoM momentum and forces
+//  RootNode & node_waist = boost::fusion::at_c< Robot_Model::BODY >(hrp2_14_.nodes);
+//  com_tensor_ = node_waist.body.iX0.applyInv(node_waist.joint.f);
 
-  // compute the Multibody ZMP
-  zmpmb[0] = - com_tensor_.n()[1] / com_tensor_.f()[2] ;
-  zmpmb[1] =   com_tensor_.n()[0] / com_tensor_.f()[2] ;
-  zmpmb[2] = 0.0;
-  return ;
+//  // compute the Multibody ZMP
+//  zmpmb[0] = - com_tensor_.n()[1] / com_tensor_.f()[2] ;
+//  zmpmb[1] =   com_tensor_.n()[0] / com_tensor_.f()[2] ;
+//  zmpmb[2] = 0.0;
+//  return ;
 }
 
 void DynamicFilter::stage0INstage1()

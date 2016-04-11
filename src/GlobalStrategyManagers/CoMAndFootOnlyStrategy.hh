@@ -130,7 +130,7 @@ namespace PatternGeneratorJRL
 	       deque<FootAbsolutePosition> & aRightFootAbsolutePositions);
 
     /*! \brief Initialization of the inter objects relationship. */
-    int InitInterObjects(CjrlHumanoidDynamicRobot * aHDR,
+    int InitInterObjects(PinocchioRobot * aPR,
 			 std::vector<ComAndFootRealization *> aCFR,
 			 StepStackHandler * aSSH);
 

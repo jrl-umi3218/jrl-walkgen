@@ -35,7 +35,7 @@
 #define _PATTERN_GENERATOR_INTERFACE_H_
 
 #include <deque>
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <PinocchioRobot.hh>
 #include <jrl/walkgen/pgtypes.hh>
 
 namespace PatternGeneratorJRL
@@ -60,7 +60,7 @@ namespace PatternGeneratorJRL
 	@param strm: Should provide the file to initialize the preview control,
 	the path to the VRML model, and the name of the file containing the VRML model.
       */
-      PatternGeneratorInterface(CjrlHumanoidDynamicRobot *) {};
+      PatternGeneratorInterface(PinocchioRobot *) {};
 
       /*! Destructor */
       virtual ~PatternGeneratorInterface() {};
@@ -303,7 +303,7 @@ namespace PatternGeneratorJRL
     };
 
   /*! Factory of Pattern generator interface. */
-  WALK_GEN_JRL_EXPORT PatternGeneratorInterface * patternGeneratorInterfaceFactory(CjrlHumanoidDynamicRobot *aHDR);
+  WALK_GEN_JRL_EXPORT PatternGeneratorInterface * patternGeneratorInterfaceFactory(PinocchioRobot *);
 }
 
 

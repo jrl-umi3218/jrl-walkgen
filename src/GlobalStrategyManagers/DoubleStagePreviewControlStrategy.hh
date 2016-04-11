@@ -99,7 +99,7 @@ namespace PatternGeneratorJRL
     { m_StepStackHandler = aSSH; }
 
     /*! \brief Initialization of the inter objects relationship. */
-    int InitInterObjects(CjrlHumanoidDynamicRobot * aHDR,
+    int InitInterObjects(PinocchioRobot * aPR,
 			 ComAndFootRealization * aCFR,
 			 StepStackHandler * aSSH);
     

@@ -53,7 +53,7 @@ using namespace std;
 using namespace PatternGeneratorJRL;
 
 ZMPVelocityReferencedSQP::ZMPVelocityReferencedSQP(SimplePluginManager *SPM,
-                                                 string , CjrlHumanoidDynamicRobot *aHS ) :
+                                                 string , PinocchioRobot *aPR ) :
 ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpperBound_(40)
 {
   // PG management

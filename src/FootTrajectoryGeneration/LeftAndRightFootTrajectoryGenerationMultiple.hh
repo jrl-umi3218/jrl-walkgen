@@ -33,7 +33,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 /* abstractRobotDynamics inclusion */
-#include <abstract-robot-dynamics/foot.hh>
+#include <PinocchioRobot.hh>
 
 /* Walking Pattern Generator inclusion */
 
@@ -66,7 +66,7 @@ namespace PatternGeneratorJRL
     public:
       /*! \brief The constructor initialize the plugin part, and the data related to the humanoid. */
       LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager * lSPM,
-						   CjrlFoot * inFoot);
+                           PRFoot * inFoot);
 
       /*! \brief Copy constructor. */
       LeftAndRightFootTrajectoryGenerationMultiple(const LeftAndRightFootTrajectoryGenerationMultiple &);
@@ -164,7 +164,7 @@ namespace PatternGeneratorJRL
 				      unsigned int ChangedInterval);
 
       /*! Returns foot */
-      CjrlFoot * getFoot() const;
+      PRFoot *getFoot() const;
 
      protected:
 
@@ -182,7 +182,7 @@ namespace PatternGeneratorJRL
       FootTrajectoryGenerationMultiple * m_RightFootTrajectory;
 
       /*! Humanoid specificities object handler */
-      CjrlFoot * m_Foot;
+      PRFoot * m_Foot;
 
       /*! Set of time intervals */
       std::vector<double> m_DeltaTj;

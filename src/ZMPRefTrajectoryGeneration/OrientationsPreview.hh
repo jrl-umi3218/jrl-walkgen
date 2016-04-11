@@ -38,7 +38,7 @@
 #include <privatepgtypes.hh>
 #include <jrl/walkgen/pgtypes.hh>
 #include <Mathematics/PolynomeFoot.hh>
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <PinocchioRobot.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -52,7 +52,7 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors
     /// \{
-    OrientationsPreview( CjrlHumanoidDynamicRobot *aHS );
+    OrientationsPreview( PinocchioRobot *aPR );
     ~OrientationsPreview();
     /// \}
 

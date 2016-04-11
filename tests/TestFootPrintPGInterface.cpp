@@ -922,11 +922,11 @@ int main(int argc, char *argv[])
 
   // Creating the humanoid robot.
   CjrlHumanoidDynamicRobot * aHDR = 0, * aDebugHDR = 0;
-  dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
+  //dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
 
 #ifndef WITH_HRP2DYNAMICS
-  aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
-  aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
+//  aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
+//  aDebugHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
 #else
 # ifdef WIN32
 #pragma message ( " -- !!! -- Warning : Compiled with HRP2DYNAMICS !" )
@@ -940,13 +940,13 @@ int main(int argc, char *argv[])
 
   // Parsing the file.
   string RobotFileName = VRMLPath + VRMLFileName;
-  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,
-					 LinkJointRank,
-					 SpecificitiesFileName);
+//  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,
+//					 LinkJointRank,
+//					 SpecificitiesFileName);
 
-  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aDebugHDR,RobotFileName,
-					 LinkJointRank,
-					 SpecificitiesFileName);
+//  dynamicsJRLJapan::parseOpenHRPVRMLFile(*aDebugHDR,RobotFileName,
+//					 LinkJointRank,
+//					 SpecificitiesFileName);
 
   
   // Create Pattern Generator Interface

@@ -30,7 +30,7 @@
 
 #include <jrl/walkgen/pgtypes.hh>
 #include <Mathematics/relative-feet-inequalities.hh>
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <PinocchioRobot.hh>
 #include <iomanip>
 #include <cmath>
 #include <qpOASES.hpp>

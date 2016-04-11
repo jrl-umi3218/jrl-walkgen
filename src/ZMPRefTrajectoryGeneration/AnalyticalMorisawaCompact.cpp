@@ -74,7 +74,7 @@ namespace PatternGeneratorJRL
 {
 
 
-  AnalyticalMorisawaCompact::AnalyticalMorisawaCompact(SimplePluginManager *lSPM , CjrlHumanoidDynamicRobot *aHS)
+  AnalyticalMorisawaCompact::AnalyticalMorisawaCompact(SimplePluginManager *lSPM , PinocchioRobot *aPR)
     : AnalyticalMorisawaAbstract(lSPM)
   {
 

@@ -37,8 +37,6 @@
 
 #include <jrl/mal/matrixabstractlayer.hh>
 
-
-
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 
 #include <PreviewControl/ZMPPreviewControlWithMultiBodyZMP.hh>
@@ -89,7 +87,7 @@ namespace PatternGeneratorJRL
       @param strm: Should provide the file to initialize the preview control,
       the path to the VRML model, and the name of the file containing the VRML model.
      */
-    PatternGeneratorInterfacePrivate(CjrlHumanoidDynamicRobot *aHDR);
+    PatternGeneratorInterfacePrivate(PinocchioRobot *aPinocchioRobotRobot);
 
     /*! Destructor */
     ~PatternGeneratorInterfacePrivate();
@@ -656,7 +654,8 @@ namespace PatternGeneratorJRL
     /*! @} */
 
     /*! Humanoid Dynamic robot */
-    CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot, * m_2HumanoidDynamicRobot;
+    PinocchioRobot * m_PinocchioRobotRobot ;
+    //CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot, * m_2HumanoidDynamicRobot;
 
     /*! Speed of the leg. */
     MAL_VECTOR_TYPE(double) m_dqr,m_dql;

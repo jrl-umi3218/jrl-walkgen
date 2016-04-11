@@ -45,7 +45,7 @@ CoMAndFootOnlyStrategy::~CoMAndFootOnlyStrategy()
 {
 }
 
-int CoMAndFootOnlyStrategy::InitInterObjects(CjrlHumanoidDynamicRobot * /* aHDR */,
+int CoMAndFootOnlyStrategy::InitInterObjects(PinocchioRobot * /* aPR */,
 					     std::vector<ComAndFootRealization *> aCFR,
 					     StepStackHandler * /* aSSH */)
 {

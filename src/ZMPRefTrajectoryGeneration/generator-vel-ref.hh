@@ -31,7 +31,7 @@
 
 #include <ZMPRefTrajectoryGeneration/mpc-trajectory-generation.hh>
 
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <PinocchioRobot.hh>
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 #include <PreviewControl/SupportFSM.hh>
 #include <PreviewControl/LinearizedInvertedPendulum2D.hh>

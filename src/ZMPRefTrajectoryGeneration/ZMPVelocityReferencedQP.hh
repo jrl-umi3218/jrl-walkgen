@@ -58,7 +58,7 @@ namespace PatternGeneratorJRL
   public:
 
     ZMPVelocityReferencedQP(SimplePluginManager *SPM, string DataFile,
-                            CjrlHumanoidDynamicRobot *aHS=0 );
+                            PinocchioRobot *aPR=0 );
 
     ~ZMPVelocityReferencedQP();
 

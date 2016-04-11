@@ -44,7 +44,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 /*! Abstract Interface for dynamic robot. */
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <PinocchioRobot.hh>
 
 /*! Humanoid Walking Pattern Generator */
 
@@ -73,7 +73,7 @@ namespace PatternGeneratorJRL
      
     /*! \brief  Constructor */
     StepOverPlanner(ObstaclePar &ObstacleParameters,
-		    CjrlHumanoidDynamicRobot * inHDR);
+            PinocchioRobot * aPR);
 
     /*! \brief  Destructor */
     ~StepOverPlanner();
@@ -129,7 +129,7 @@ namespace PatternGeneratorJRL
     void SetZMPDiscretization(ZMPDiscretization *aZMPDiscr);      
 
     /*!  Set the link with the Dynamic Multi Body model.*/
-    void SetDynamicMultiBodyModel(CjrlDynamicRobot *aDMB);
+    void SetDynamicMultiBodyModel(PinocchioRobot *aPR);
 
 
     /*! set parameters for the timedistribution of specific stepover points*/
@@ -271,15 +271,11 @@ namespace PatternGeneratorJRL
     /*! Pointer to the ZMPDiscretization object. */
     ZMPDiscretization *m_ZMPDiscr;
 
-    /*! Pointer to the Dynamic Multi body model. */
-    CjrlDynamicRobot *m_DMB;
-
-
     /*! Pointer to the collision detector model.*/
     CollisionDetector *m_CollDet;	
 	
     /*! Previous joint values.*/
-    MAL_MATRIX( m_prev_ql,double);
+    MAL_MATRIX(m_prev_ql,double);
     MAL_MATRIX(m_prev_qr,double);
 
     /*! Sampling Period.*/
@@ -336,7 +332,7 @@ namespace PatternGeneratorJRL
     std::vector<double> m_TimeDistrFactor;
 		
     /*! Reference to the humanoid specificities.*/
-    CjrlHumanoidDynamicRobot *m_HDR;
+    PinocchioRobot *m_PR;
 		
     /*! Distance from the ankle to the soil.*/
     double m_AnkleSoilDistance;

@@ -38,7 +38,7 @@
 
 #include <jrl/mal/matrixabstractlayer.hh>
 
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <PinocchioRobot.hh>
 
 
 #include <jrl/walkgen/pgtypes.hh>
@@ -58,7 +58,7 @@ namespace PatternGeneratorJRL
 
       /*! Constructor */
       FootConstraintsAsLinearSystem(SimplePluginManager *aSPM, 
-				    CjrlHumanoidDynamicRobot *aHS);
+                    PinocchioRobot *aPR);
 
       /*! Destructor */
       ~FootConstraintsAsLinearSystem();
@@ -103,7 +103,7 @@ namespace PatternGeneratorJRL
     private:
 
       /* ! Reference on the Humanoid Specificities. */
-      CjrlHumanoidDynamicRobot * m_HS;
+      PinocchioRobot * m_PR;
       
     };
 }

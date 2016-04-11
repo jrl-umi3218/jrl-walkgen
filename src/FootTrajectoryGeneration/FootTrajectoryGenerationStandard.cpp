@@ -34,7 +34,7 @@
 using namespace PatternGeneratorJRL;
 
 FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginManager *lSPM,
-								   CjrlFoot *aFoot)
+                                   PRFoot *aFoot)
   : FootTrajectoryGenerationAbstract(lSPM,aFoot)
 {
   /* Initialize the pointers to polynomes. */
@@ -55,14 +55,17 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
      from humanoid specific informations. */
   double lWidth,lHeight,lDepth;
   if (m_Foot!=0)
-    m_Foot->getSoleSize(lWidth,lHeight);
+  {
+    lWidth = m_Foot->soleWidth ;
+    lHeight = m_Foot->soleHeight ;
+  }
   else
     {
       cerr << "Pb no ref Foot." << endl;
     }
   vector3d AnklePosition;
   if (m_Foot!=0)
-    m_Foot->getAnklePositionInLocalFrame(AnklePosition);
+    AnklePosition = m_Foot->anklePosition;
   else
     {
       cerr << "Pb no ref Foot." << endl;
@@ -82,10 +85,11 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
 
   /* Compute Left foot coordinates */
   if (m_Foot!=0)
-    {
-      m_Foot->getAnklePositionInLocalFrame(AnklePosition);
-      m_Foot->getSoleSize(lWidth,lHeight);
-    }
+  {
+    lWidth = m_Foot->soleWidth ;
+    lHeight = m_Foot->soleHeight ;
+    AnklePosition = m_Foot->anklePosition;
+  }
   else
     {
       cerr << "Pb no ref Foot." << endl;

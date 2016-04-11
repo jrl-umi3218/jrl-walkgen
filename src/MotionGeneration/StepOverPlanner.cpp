@@ -38,20 +38,21 @@
 using namespace::PatternGeneratorJRL;
 
 StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
-				 CjrlHumanoidDynamicRobot *aHDR)
+                 PinocchioRobot * aPR)
 {
 
 
-  m_HDR = aHDR;
+  m_PR = aPR;
   // Get information specific to the humanoid.
   double lWidth,lHeight;
   vector3d AnklePosition;
 
-  if (m_HDR!=0)
+  if (m_PR!=0)
     {
-      CjrlFoot * HDRFoot = m_HDR->leftFoot();
-      HDRFoot->getSoleSize(lWidth,lHeight);
-      HDRFoot->getAnklePositionInLocalFrame(AnklePosition);
+      PRFoot * leftFoot = m_PR->leftFoot();
+      lWidth = leftFoot->soleWidth ;
+      lHeight = leftFoot->soleHeight ;
+      AnklePosition = leftFoot->anklePosition ;
       m_AnkleSoilDistance = AnklePosition[2];
       m_tipToAnkle = lWidth-AnklePosition[0];
       m_heelToAnkle = m_AnkleSoilDistance;	
@@ -107,8 +108,7 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
   m_ClampedCubicSplineStepOverFootZ = new StepOverClampedCubicSpline ;
   m_ClampedCubicSplineStepOverFootOmega = new StepOverClampedCubicSpline ;
   m_ClampedCubicSplineStepOverFootOmegaImpact = new StepOverClampedCubicSpline ;		
-	
-  m_DMB = 0;
+
   m_PC = 0;
   m_ZMPDiscr = 0;
 	
@@ -1562,14 +1562,14 @@ void StepOverPlanner::SetZMPDiscretization(ZMPDiscretization *aZMPDiscr)
 }
 
 
-void StepOverPlanner::SetDynamicMultiBodyModel(CjrlDynamicRobot *aDR)
+void StepOverPlanner::SetDynamicMultiBodyModel(PinocchioRobot *aPR)
 {
-  m_DMB = aDR;
-  unsigned int NbOfDofs =m_DMB->numberDof();
+  m_PR = aPR;
+  unsigned int NbOfDofs =m_PR->numberDof();
   MAL_VECTOR_DIM(aCurrentVel,double,NbOfDofs); 
   for(unsigned int i=0;i<NbOfDofs;i++)
     aCurrentVel[i]=0.0;
-  m_DMB->currentVelocity(aCurrentVel);
+  m_PR->currentVelocity(aCurrentVel);
 
 }
 

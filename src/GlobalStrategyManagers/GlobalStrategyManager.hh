@@ -33,10 +33,9 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 // Dynamics
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <PinocchioRobot.hh>
 
 // PG
-
 #include <jrl/walkgen/pgtypes.hh>
 #include <SimplePlugin.hh>
 #include <PreviewControl/PreviewControl.hh>
@@ -168,20 +167,20 @@ namespace PatternGeneratorJRL
     int m_ZMPCoMTrajectoryAlgorithm;
 
     /*! Reference to the humanoid structure. */
-    CjrlHumanoidDynamicRobot *m_HumanoidDynamicRobot ;
+    PinocchioRobot *m_PinocchioRobot ;
 
   public:
 
     /*! \name Setter and getter for the jrlHumanoidDynamicRobot object. */
     /*! @param[in] aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
-    inline  bool setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot *aHumanoidDynamicRobot)
-      { m_HumanoidDynamicRobot = aHumanoidDynamicRobot;
+    inline  bool setHumanoidDynamicRobot(PinocchioRobot *aHumanoidDynamicRobot)
+      { m_PinocchioRobot = aHumanoidDynamicRobot;
 	return true;}
     
     /*! \brief Returns the object able to compute the dynamic parameters of the robot. */
-    inline CjrlHumanoidDynamicRobot * getHumanoidDynamicRobot() const
-      { return m_HumanoidDynamicRobot;}
+    inline PinocchioRobot * getHumanoidDynamicRobot() const
+      { return m_PinocchioRobot;}
 
     /** @} */
 

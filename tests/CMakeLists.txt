@@ -17,8 +17,8 @@ INCLUDE(CTest)
 
 # Optional test dependencies.
 # We put them here to prevent them to be listed in the .pc file.
-ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
-ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
+#ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
+#ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
 
 IF(HRP2_DYNAMICS_FOUND)
   MESSAGE(STATUS "hrp2-dynamics: found")
@@ -50,7 +50,7 @@ ADD_EXECUTABLE(TestFootPrintPGInterface
   )
 
 TARGET_LINK_LIBRARIES(TestFootPrintPGInterface ${PROJECT_NAME})
-PKG_CONFIG_USE_DEPENDENCY(TestFootPrintPGInterface jrl-dynamics)
+#PKG_CONFIG_USE_DEPENDENCY(TestFootPrintPGInterface jrl-dynamics)
 ADD_DEPENDENCIES(TestFootPrintPGInterface ${PROJECT_NAME})
 
 #########################
@@ -77,7 +77,7 @@ ADD_EXECUTABLE(TestRiccatiEquation
   ../src/PreviewControl/OptimalControllerSolver.cpp
   )
 
-PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-dynamics)
+PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
 
 ######################
 # Test Morisawa 2007 #
@@ -109,7 +109,7 @@ IF(HRP2_DYNAMICS_FOUND)
       ClockCPUTime.cpp
       )
       TARGET_LINK_LIBRARIES(${testmorisawa2007} ${PROJECT_NAME})
-      PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} jrl-dynamics)
+      #PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} jrl-dynamics)
       PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} hrp2-dynamics)
 
       ADD_DEPENDENCIES(${testmorisawa2007} ${PROJECT_NAME})
@@ -168,7 +168,7 @@ MACRO(ADD_HERDT_2010 test_herdt2010_arg)
 
   TARGET_LINK_LIBRARIES(${test_herdt2010_arg} ${PROJECT_NAME})
   ADD_DEPENDENCIES(${test_herdt2010_arg} ${PROJECT_NAME})
-  PKG_CONFIG_USE_DEPENDENCY(${test_herdt2010_arg} jrl-dynamics)
+  #PKG_CONFIG_USE_DEPENDENCY(${test_herdt2010_arg} jrl-dynamics)
   IF(HRP2_DYNAMICS_FOUND)
     PKG_CONFIG_USE_DEPENDENCY(${test_herdt2010_arg} hrp2-dynamics)
   ENDIF(HRP2_DYNAMICS_FOUND)
@@ -212,7 +212,7 @@ ADD_EXECUTABLE(TestInverseKinematics
 )
 
 TARGET_LINK_LIBRARIES(TestInverseKinematics ${PROJECT_NAME})
-PKG_CONFIG_USE_DEPENDENCY(TestInverseKinematics jrl-dynamics)
+#PKG_CONFIG_USE_DEPENDENCY(TestInverseKinematics jrl-dynamics)
 PKG_CONFIG_USE_DEPENDENCY(TestInverseKinematics hrp2-dynamics)
 ADD_DEPENDENCIES(TestInverseKinematics ${PROJECT_NAME})
 
@@ -253,7 +253,7 @@ ADD_EXECUTABLE(TestKajitaDynamicFilter
 )
 
 TARGET_LINK_LIBRARIES(TestKajitaDynamicFilter ${PROJECT_NAME})
-PKG_CONFIG_USE_DEPENDENCY(TestKajitaDynamicFilter jrl-dynamics)
+#PKG_CONFIG_USE_DEPENDENCY(TestKajitaDynamicFilter jrl-dynamics)
 IF(HRP2_DYNAMICS_FOUND)
   PKG_CONFIG_USE_DEPENDENCY(TestKajitaDynamicFilter hrp2-dynamics)
 ENDIF(HRP2_DYNAMICS_FOUND)
@@ -363,8 +363,8 @@ ENDIF(HRP2_DYNAMICS_FOUND)
 ################
 # NMPC test #
 ################
-IF(HRP2_DYNAMICS_FOUND)
-  IF(HRP2_14_FOUND)
+#IF(HRP2_DYNAMICS_FOUND)
+#  IF(HRP2_14_FOUND)
 
   CONFIG_FILES_CMAKE(TestNaveau2015TestFGPI.datref)
   ADD_EXECUTABLE(TestNaveau2015
@@ -393,8 +393,8 @@ IF(HRP2_DYNAMICS_FOUND)
     ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec}
     ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
 
-  ENDIF(HRP2_14_FOUND)
-ENDIF(HRP2_DYNAMICS_FOUND)
+#  ENDIF(HRP2_14_FOUND)
+#ENDIF(HRP2_DYNAMICS_FOUND)
 
 #####################
 # Add user examples #

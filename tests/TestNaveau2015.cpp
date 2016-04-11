@@ -96,9 +96,9 @@ private:
 
   /// Class that compute the dynamic and kinematic of the robot
   CjrlHumanoidDynamicRobot * cjrlHDR_ ;
-  Robot_Model hrp2_14_ ;
-  Robot_Model::confVector q_,dq_,ddq_;
-  Force_HRP2_14 com_tensor_ ;
+//  Robot_Model hrp2_14_ ;
+//  Robot_Model::confVector q_,dq_,ddq_;
+//  Force_HRP2_14 com_tensor_ ;
 
 public:
   TestNaveau2015(int argc, char *argv[], string &aString, int TestProfile):
@@ -399,24 +399,24 @@ protected:
       m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
 
       // compute the 6D force applied at the CoM
-      for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(m_CurrentConfiguration) ; ++i)
-      {
-        q_(i,0)   = m_CurrentConfiguration (i);
-        dq_(i,0)  = m_CurrentVelocity      (i);
-        ddq_(i,0) = m_CurrentAcceleration  (i);
-      }
-      metapod::rnea< Robot_Model, true >::run(hrp2_14_, q_, dq_, ddq_);
-      vector<double> zmpmb = vector<double>(3,0.0);
-      // extract the CoM momentum and forces
-      RootNode & node_waist = boost::fusion::at_c< Robot_Model::BODY >(hrp2_14_.nodes);
-      com_tensor_ = node_waist.body.iX0.applyInv(node_waist.joint.f);
+//      for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(m_CurrentConfiguration) ; ++i)
+//      {
+//        q_(i,0)   = m_CurrentConfiguration (i);
+//        dq_(i,0)  = m_CurrentVelocity      (i);
+//        ddq_(i,0) = m_CurrentAcceleration  (i);
+//      }
+//      metapod::rnea< Robot_Model, true >::run(hrp2_14_, q_, dq_, ddq_);
+//      vector<double> zmpmb = vector<double>(3,0.0);
+//      // extract the CoM momentum and forces
+//      RootNode & node_waist = boost::fusion::at_c< Robot_Model::BODY >(hrp2_14_.nodes);
+//      com_tensor_ = node_waist.body.iX0.applyInv(node_waist.joint.f);
 
       // compute the Multibody ZMP
-      zmpmb[0] = - com_tensor_.n()[1] / com_tensor_.f()[2] ;
-      zmpmb[1] =   com_tensor_.n()[0] / com_tensor_.f()[2] ;
+//      zmpmb[0] = - com_tensor_.n()[1] / com_tensor_.f()[2] ;
+//      zmpmb[1] =   com_tensor_.n()[0] / com_tensor_.f()[2] ;
 
-      err_zmp_x.push_back(zmpmb[0]-m_OneStep.ZMPTarget(0)) ;
-      err_zmp_y.push_back(zmpmb[1]-m_OneStep.ZMPTarget(1)) ;
+//      err_zmp_x.push_back(zmpmb[0]-m_OneStep.ZMPTarget(0)) ;
+//      err_zmp_y.push_back(zmpmb[1]-m_OneStep.ZMPTarget(1)) ;
 
       ofstream aof;
       string aFileName;
@@ -473,10 +473,10 @@ protected:
           << filterprecision(m_OneStep.RightFootPosition.dtheta ) << " " // 41
           << filterprecision(m_OneStep.RightFootPosition.ddtheta ) << " "// 42
           << filterprecision(m_OneStep.RightFootPosition.omega  ) << " " // 43
-          << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "// 44
-          << filterprecision(zmpmb[0]) << " "                            // 45
-          << filterprecision(zmpmb[1]) << " "                            // 46
-          << filterprecision(zmpmb[2]) << " "                           ;// 47
+          << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " ";// 44
+//          << filterprecision(zmpmb[0]) << " "                            // 45
+//          << filterprecision(zmpmb[1]) << " "                            // 46
+//          << filterprecision(zmpmb[2]) << " "                           ;// 47
       for(unsigned int k = 0 ; k < m_CurrentConfiguration.size() ; k++){ // 48-53 -> 54-83
         aof << filterprecision( m_CurrentConfiguration(k) ) << " "  ;
       }

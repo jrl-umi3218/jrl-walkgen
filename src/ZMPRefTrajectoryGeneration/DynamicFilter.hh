@@ -1,31 +1,59 @@
+/*
+ * Copyright 2015,
+ *
+ * Maximilien Naveau
+ * Olivier Stasse
+ *
+ * JRL, CNRS/AIST
+ *
+ * This file is part of jrl-walkgen.
+ * jrl-walkgen is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * jrl-walkgen is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with jrl-walkgen.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Research carried out within the scope of the
+ *  Joint Japanese-French Robotics Laboratory (JRL)
+ */
+/*! \file DynamicFilter.hh
+  \brief This object defines a dynamic filter that modify the CoM on the
+ground plan taking into account the whole body motion */
+
 #ifndef DYNAMICFILTER_HH 
 #define DYNAMICFILTER_HH
 
 // metapod includes
-#include <metapod/models/hrp2_14/hrp2_14.hh>
+//#include <metapod/models/hrp2_14/hrp2_14.hh>
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
-#include <metapod/algos/jac_point_chain.hh>
+//#include <metapod/algos/jac_point_chain.hh>
 #include "Clock.hh"
-#include <boost/fusion/algorithm/iteration/accumulate.hpp>
-#include <boost/fusion/include/accumulate.hpp>
+//#include <boost/fusion/algorithm/iteration/accumulate.hpp>
+//#include <boost/fusion/include/accumulate.hpp>
 
-#ifndef METAPOD_TYPEDEF
-#define METAPOD_TYPEDEF
-    typedef double LocalFloatType;
-    typedef metapod::Spatial::ForceTpl<LocalFloatType> Force_HRP2_14;
-    typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
+//#ifndef METAPOD_TYPEDEF
+//#define METAPOD_TYPEDEF
+//    typedef double LocalFloatType;
+//    typedef metapod::Spatial::ForceTpl<LocalFloatType> Force_HRP2_14;
+//    typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
 
-    typedef metapod::Nodes< Robot_Model, Robot_Model::BODY >::type RootNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::l_wrist >::type LhandNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::r_wrist >::type RhandNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::LARM_LINK0 >::type LshoulderNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::RARM_LINK0 >::type RshoulderNode;
+//    typedef metapod::Nodes< Robot_Model, Robot_Model::BODY >::type RootNode;
+//    typedef metapod::Nodes< Robot_Model, Robot_Model::l_wrist >::type LhandNode;
+//    typedef metapod::Nodes< Robot_Model, Robot_Model::r_wrist >::type RhandNode;
+//    typedef metapod::Nodes< Robot_Model, Robot_Model::LARM_LINK0 >::type LshoulderNode;
+//    typedef metapod::Nodes< Robot_Model, Robot_Model::RARM_LINK0 >::type RshoulderNode;
 
-    typedef metapod::Nodes< Robot_Model, Robot_Model::LLEG_LINK0 >::type LhipNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::RLEG_LINK0 >::type RhipNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::l_ankle >::type LankleNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::r_ankle >::type RankleNode;
-#endif
+//    typedef metapod::Nodes< Robot_Model, Robot_Model::LLEG_LINK0 >::type LhipNode;
+//    typedef metapod::Nodes< Robot_Model, Robot_Model::RLEG_LINK0 >::type RhipNode;
+//    typedef metapod::Nodes< Robot_Model, Robot_Model::l_ankle >::type LankleNode;
+//    typedef metapod::Nodes< Robot_Model, Robot_Model::r_ankle >::type RankleNode;
+//#endif
 
 namespace PatternGeneratorJRL
 {
@@ -36,7 +64,7 @@ namespace PatternGeneratorJRL
 
     /// \brief
     DynamicFilter(SimplePluginManager *SPM,
-                  CjrlHumanoidDynamicRobot *aHS
+                  PinocchioRobot *aPR
                   );
     ~DynamicFilter();
     /// \brief
@@ -122,8 +150,8 @@ namespace PatternGeneratorJRL
     inline ComAndFootRealizationByGeometry * getComAndFootRealization()
     { return comAndFootRealization_;}
 
-    inline CjrlHumanoidDynamicRobot * getCjrlHumanoidDynamicRobot()
-    { return cjrlHDR_;}
+    inline PinocchioRobot * getPinocchioRobot()
+    { return PR_;}
 
     inline double getControlPeriod()
     {return controlPeriod_ ;}
@@ -192,10 +220,10 @@ namespace PatternGeneratorJRL
       bool walkingHeuristic_ ;
 
       /// Class that compute the dynamic and kinematic of the robot
-      CjrlHumanoidDynamicRobot * cjrlHDR_ ;
-      Robot_Model hrp2_14_ ;
-      Robot_Model::confVector q_,dq_,ddq_;
-      Force_HRP2_14 com_tensor_ ;
+      PinocchioRobot * PR_ ;
+//      Robot_Model hrp2_14_ ;
+//      Robot_Model::confVector q_,dq_,ddq_;
+//      Force_HRP2_14 com_tensor_ ;
 
       /// \brief Buffers the ZMP Multibody computed
       /// from the inverse Dynamics, and the difference between
@@ -231,7 +259,7 @@ namespace PatternGeneratorJRL
 
     public : // debug functions      
       // to use the vector of eigen used by metapod
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
       void Debug(const deque<COMState> & ctrlCoMState,
                  const deque<FootAbsolutePosition> & ctrlLeftFoot,

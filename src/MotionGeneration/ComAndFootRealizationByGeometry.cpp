@@ -108,8 +108,8 @@ void ComAndFootRealizationByGeometry::
 }
 
 void ComAndFootRealizationByGeometry::
-InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
-                   std::vector<CjrlJoint *> &,
+InitializationMaps(std::vector<se3::JointDataVariant *> &FromRootToJoint,
+                   std::vector<se3::JointDataVariant *> &,
                    std::vector<int> &IndexinConfiguration )
 {
   if (FromRootToJoint.size()!=0)
@@ -123,17 +123,18 @@ InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
     // Here we assume that they are in a decending order.
     for(unsigned int i=0;i<FromRootToJoint.size();i++)
     {
-      IndexinConfiguration[lindex] = FromRootToJoint[i]->rankInConfiguration();
+      //IndexinConfiguration[lindex] = FromRootToJoint[i]->rankInConfiguration();
+      IndexinConfiguration[lindex] = FromRootToJoint[i]->which();
       lindex++;
     }
   }
 }
 
 void ComAndFootRealizationByGeometry::
-    InitializeMapsForAHand(CjrlHand * aHand,
-                           std::vector<CjrlJoint *> &ActuatedJoints,
+    InitializeMapsForAHand(PRHand * aHand,
+                           std::vector<se3::JointDataVariant *> &ActuatedJoints,
                            vector<int> & IndexesInConfiguration,
-                           CjrlJoint * & associateShoulder)
+                           se3::JointDataVariant * & associateShoulder)
 {
   if (aHand==0)
     return;
@@ -238,14 +239,14 @@ void ComAndFootRealizationByGeometry::
   // to the VRML ID.
   ODEBUG("Enter 5.0 ");
   // Extract the indexes of the Right leg.
-  CjrlJoint *waist = getHumanoidDynamicRobot()->waist();
+  se3::JointDataVariant *waist = getHumanoidDynamicRobot()->waist();
 
   if (RightFoot->associatedAnkle()==0)
     LTHROW("No right ankle");
 
-  std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint =
+  std::vector<se3::JointDataVariant *> FromRootToJoint2,FromRootToJoint =
       getHumanoidDynamicRobot()->jointsBetween(*waist, *(RightFoot->associatedAnkle()));
-  std::vector<CjrlJoint *> ActuatedJoints =
+  se3::JointDataVector * ActuatedJoints =
       getHumanoidDynamicRobot()->getActuatedJoints();
   ODEBUG4("Size of ActuatedJoints"<<ActuatedJoints.size(),"DebugDataStartingCOM.dat");
   // Build global map.
