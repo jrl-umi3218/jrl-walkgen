@@ -86,7 +86,7 @@ namespace PatternGeneratorJRL
     memset(&m_CTIPY,0,sizeof(m_CTIPY));
 
     m_OnLineChangeStepMode = ABSOLUTE_FRAME;
-    m_HS = aHS;
+    m_PR = aPR;
     m_FeetTrajectoryGenerator =
         m_BackUpm_FeetTrajectoryGenerator = 0;
 
@@ -111,7 +111,7 @@ namespace PatternGeneratorJRL
                                                                           m_AnalyticalZMPCoGTrajectoryY,
                                                                           m_PreviewControl);
 
-    m_kajitaDynamicFilter = new DynamicFilter(lSPM,m_HS);
+    m_kajitaDynamicFilter = new DynamicFilter(lSPM,m_PR);
 
     m_VerboseLevel=0;
 
@@ -532,17 +532,17 @@ computing the analytical trajectories. */
     // INITIALIZE FEET POSITIONS:
     // --------------------------
     vector3d lAnklePositionRight,lAnklePositionLeft;
-    CjrlFoot *LeftFoot, *RightFoot;
-    LeftFoot = m_HS->leftFoot();
+    PRFoot *LeftFoot, *RightFoot;
+    LeftFoot = m_PR->leftFoot();
     if (LeftFoot==0)
       LTHROW("No left foot");
 
-    RightFoot = m_HS->rightFoot();
+    RightFoot = m_PR->rightFoot();
     if (RightFoot==0)
       LTHROW("No right foot");
 
-    LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
-    RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
+    lAnklePositionLeft = LeftFoot->anklePosition ;
+    lAnklePositionRight = RightFoot->anklePosition ;
 
     MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
     m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
@@ -615,11 +615,9 @@ computing the analytical trajectories. */
                                      KajitaPCpreviewWindow,
                                      lStartingCOMState );
         /*! Set the upper body trajectory */
-        CjrlHumanoidDynamicRobot * aHDR = m_kajitaDynamicFilter->
-                                                 getComAndFootRealization()->getHumanoidDynamicRobot();
-        MAL_VECTOR_TYPE(double) UpperConfig = aHDR->currentConfiguration() ;
-        MAL_VECTOR_TYPE(double) UpperVel = aHDR->currentVelocity() ;
-        MAL_VECTOR_TYPE(double) UpperAcc = aHDR->currentAcceleration() ;
+        MAL_VECTOR_TYPE(double) UpperConfig = m_PR->currentConfiguration() ;
+        MAL_VECTOR_TYPE(double) UpperVel    = m_PR->currentVelocity() ;
+        MAL_VECTOR_TYPE(double) UpperAcc    = m_PR->currentAcceleration() ;
         // carry the weight in front of him
 //        UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
 //        UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
@@ -661,7 +659,7 @@ computing the analytical trajectories. */
     //    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
 
         for(unsigned int i = 18 ; i < 35 ; ++i){
-          UpperConfig(i)=m_HS->currentConfiguration()(i);
+          UpperConfig(i)=m_PR->currentConfiguration()(i);
           UpperVel(i)=0.0;
           UpperAcc(i)=0.0;
         }
@@ -754,17 +752,17 @@ computing the analytical trajectories. */
     // INITIALIZE FEET POSITIONS:
     // --------------------------
     vector3d lAnklePositionRight,lAnklePositionLeft;
-    CjrlFoot *LeftFoot, *RightFoot;
-    LeftFoot = m_HS->leftFoot();
+    PRFoot *LeftFoot, *RightFoot;
+    LeftFoot = m_PR->leftFoot();
     if (LeftFoot==0)
       LTHROW("No left foot");
 
-    RightFoot = m_HS->rightFoot();
+    RightFoot = m_PR->rightFoot();
     if (RightFoot==0)
       LTHROW("No right foot");
 
-    LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
-    RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
+    lAnklePositionLeft  = LeftFoot->anklePosition ;
+    lAnklePositionRight = RightFoot->anklePosition ;
 
     MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
     m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
@@ -2680,11 +2678,11 @@ new step has to be generate.
     // absFootz_0, the z axis is expressed in the waist frame
     // we choose the left one by default, the foot are supposed to be symetrical
     // we use it pass the ankle position to the fot position
-    CjrlFoot *aFoot = m_HS->leftFoot() ;
+    PRFoot *aFoot = m_PR->leftFoot() ;
     if (aFoot==0)
       LTHROW("No foot");
     vector3d corrZ ;
-    aFoot->getAnklePositionInLocalFrame(corrZ);
+    corrZ = aFoot->anklePosition ;
 
     // after the final step we keep the same position for a while
     if( Index >= m_AbsoluteSupportFootPositions.size() )
@@ -2883,11 +2881,11 @@ new step has to be generate.
     // absFootz_0, the z axis is expressed in the waist frame
     // we choose the left one by default, the foot are supposed to be symetrical
     // we use it pass the ankle position to the fot position
-    CjrlFoot *aFoot = m_HS->leftFoot() ;
+    PRFoot *aFoot = m_PR->leftFoot() ;
     if (aFoot==0)
       LTHROW("No foot");
     vector3d corrZ ;
-    aFoot->getAnklePositionInLocalFrame(corrZ);
+    corrZ = aFoot->anklePosition ;
 
     bool sinple_support = (IndexInterval % 2) == 0 ;
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;

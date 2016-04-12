@@ -50,7 +50,7 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
   if (m_PR!=0)
     {
       PRFoot * leftFoot = m_PR->leftFoot();
-      lWidth = leftFoot->soleWidth ;
+      lWidth  = leftFoot->soleWidth ;
       lHeight = leftFoot->soleHeight ;
       AnklePosition = leftFoot->anklePosition ;
       m_AnkleSoilDistance = AnklePosition[2];

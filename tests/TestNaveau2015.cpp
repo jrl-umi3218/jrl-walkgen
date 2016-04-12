@@ -299,7 +299,7 @@ public:
     SPM = new SimplePluginManager();
 
     ComAndFootRealization_ = new ComAndFootRealizationByGeometry( (PatternGeneratorInterfacePrivate*) SPM );
-    ComAndFootRealization_->setHumanoidDynamicRobot(m_HDR);
+    ComAndFootRealization_->setPinocchioRobot(m_HDR);
     ComAndFootRealization_->SetStepStackHandler(new StepStackHandler(SPM));
     ComAndFootRealization_->SetHeightOfTheCoM(0.814);
     ComAndFootRealization_->setSamplingPeriod(0.005);

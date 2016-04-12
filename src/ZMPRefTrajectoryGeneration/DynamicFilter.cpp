@@ -40,9 +40,9 @@ DynamicFilter::DynamicFilter(
   MAL_MATRIX_RESIZE(deltay_,3,1);
 
   comAndFootRealization_->SetPreviousConfigurationStage0(
-        cjrlHDR_->currentConfiguration());
+        PR_->currentConfiguration());
   comAndFootRealization_->SetPreviousVelocityStage0(
-        cjrlHDR_->currentVelocity());
+        PR_->currentVelocity());
 
 
   sxzmp_.clear();
@@ -124,17 +124,17 @@ void DynamicFilter::init(
   MAL_MATRIX_FILL(deltax_,0.0);
   MAL_MATRIX_FILL(deltay_,0.0);
 
-  upperPartConfiguration_ = cjrlHDR_->currentConfiguration() ;
-  previousUpperPartConfiguration_ = cjrlHDR_->currentConfiguration() ;
-  upperPartVelocity_ = cjrlHDR_->currentVelocity() ;
-  previousUpperPartVelocity_ = cjrlHDR_->currentVelocity() ;
-  upperPartAcceleration_ = cjrlHDR_->currentAcceleration() ;
+  upperPartConfiguration_ = PR_->currentConfiguration() ;
+  previousUpperPartConfiguration_ = PR_->currentConfiguration() ;
+  upperPartVelocity_ = PR_->currentVelocity() ;
+  previousUpperPartVelocity_ = PR_->currentVelocity() ;
+  upperPartAcceleration_ = PR_->currentAcceleration() ;
 
-  ZMPMBConfiguration_ = cjrlHDR_->currentConfiguration() ;
-  ZMPMBVelocity_      = cjrlHDR_->currentVelocity() ;
-  ZMPMBAcceleration_  = cjrlHDR_->currentAcceleration() ;
-  previousZMPMBConfiguration_ = cjrlHDR_->currentConfiguration() ;
-  previousZMPMBVelocity_      = cjrlHDR_->currentVelocity() ;
+  ZMPMBConfiguration_ = PR_->currentConfiguration() ;
+  ZMPMBVelocity_      = PR_->currentVelocity() ;
+  ZMPMBAcceleration_  = PR_->currentAcceleration() ;
+  previousZMPMBConfiguration_ = PR_->currentConfiguration() ;
+  previousZMPMBVelocity_      = PR_->currentVelocity() ;
 
   comAndFootRealization_->SetHeightOfTheCoM(CoMHeight_);
   comAndFootRealization_->ShiftFoot(true);

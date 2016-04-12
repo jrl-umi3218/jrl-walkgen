@@ -37,7 +37,7 @@ using namespace PatternGeneratorJRL;
 
 LeftAndRightFootTrajectoryGenerationMultiple::
 LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
-                                             PRFoot *lFoot) : SimplePlugin(lSPM)
+                                             PRFoot * lFoot) : SimplePlugin(lSPM)
 {
   m_Omega = 0.0;
   m_Omega2 = 0.0;
@@ -67,7 +67,7 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
 
 }
 
-PRFoot* LeftAndRightFootTrajectoryGenerationMultiple::getFoot() const
+PRFoot * LeftAndRightFootTrajectoryGenerationMultiple::getFoot() const
 {
   return m_Foot;
 }

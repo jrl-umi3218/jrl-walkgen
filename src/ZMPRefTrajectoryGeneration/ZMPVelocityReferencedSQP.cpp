@@ -56,6 +56,9 @@ ZMPVelocityReferencedSQP::ZMPVelocityReferencedSQP(SimplePluginManager *SPM,
                                                  string , PinocchioRobot *aPR ) :
 ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpperBound_(40)
 {
+  // Save the reference to HDR
+  PR_ = aPR ;
+
   // PG management
   Running_ = false ;
   TimeBuffer_ = 0.04 ;
@@ -79,14 +82,11 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
 
   // perturbation management
   PerturbationOccured_ = false ;
-  RobotMass_ = aHS->mass() ;
+  RobotMass_ = PR_->mass() ;
 
   // interpolation management
   StepHeight_ = 0.05 ;
   CurrentIndex_ = 1 ;
-
-  // Save the reference to HDR
-  HDR_ = aHS ;
 
   // Initialize  the 2D LIPM
   LIPM_.SetSimulationControlPeriod( SQP_T_ );
@@ -95,7 +95,7 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
 
   // Create and initialize online interpolation of feet trajectories:
   // ----------------------------------------------------------------
-  OFTG_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
+  OFTG_ = new OnLineFootTrajectoryGeneration(SPM,PR_->leftFoot());
   OFTG_->InitializeInternalDataStructures();
   OFTG_->SetSingleSupportTime( SSPeriod_ );
   OFTG_->SetDoubleSupportTime( DSPeriod_ );
@@ -106,9 +106,9 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   OFTG_->SetStepHeight( StepHeight_ );
   OFTG_->SetStepStairOn(0) ;
 
-  NMPCgenerator_ = new NMPCgenerator(SPM,aHS);
+  NMPCgenerator_ = new NMPCgenerator(SPM,PR_);
 
-  dynamicFilter_ = new DynamicFilter(SPM,aHS);
+  dynamicFilter_ = new DynamicFilter(SPM,PR_);
 
   // Register method to handle
   const unsigned int NbMethods = 8;

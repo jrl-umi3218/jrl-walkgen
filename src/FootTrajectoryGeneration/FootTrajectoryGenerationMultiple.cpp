@@ -36,7 +36,7 @@ FootTrajectoryGenerationMultiple::FootTrajectoryGenerationMultiple(SimplePluginM
                                    PRFoot *aFoot)
   : SimplePlugin(lSPM)
 {
-  m_Foot = aFoot;
+  m_Foot = aFoot ;
   m_Sensitivity=0.0;
 }
 

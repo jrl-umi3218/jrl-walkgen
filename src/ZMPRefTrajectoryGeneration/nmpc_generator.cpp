@@ -89,7 +89,7 @@ void DumpVector(std::string fileName, MAL_VECTOR_TYPE(double) & M)
 using namespace std;
 using namespace PatternGeneratorJRL;
 
-NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, CjrlHumanoidDynamicRobot * aHDR)
+NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, PinocchioRobot *aPR)
 {
   T_ = 0.0 ;
   N_ = 0 ;
@@ -110,10 +110,10 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, CjrlHumanoidDynamicRobo
   gamma_=0.0;
 
   SPM_ = aSPM ;
-  HDR_ = aHDR ;
+  PR_ = aPR ;
 
   FSM_ = new SupportFSM();
-  RFI_ = new RelativeFeetInequalities(SPM_,HDR_) ;
+  RFI_ = new RelativeFeetInequalities(SPM_,PR_) ;
 
   QP_=NULL;
   qpOases_H_ =NULL;

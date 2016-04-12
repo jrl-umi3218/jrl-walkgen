@@ -40,7 +40,7 @@ namespace PatternGeneratorJRL
   class NMPCgenerator
   {
   public:
-    NMPCgenerator(SimplePluginManager *aSPM, CjrlHumanoidDynamicRobot *aHDR);
+    NMPCgenerator(SimplePluginManager *aSPM, PinocchioRobot *aPR);
 
     ~NMPCgenerator();
 
@@ -172,7 +172,7 @@ namespace PatternGeneratorJRL
 
   private:
     SimplePluginManager * SPM_ ;
-    CjrlHumanoidDynamicRobot * HDR_ ;
+    PinocchioRobot * PR_ ;
 
     // Time variant parameter
     /////////////////////////

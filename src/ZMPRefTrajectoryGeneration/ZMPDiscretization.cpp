@@ -84,7 +84,7 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,
   m_InitializationProfile = PREV_ZMP_INIT_PROFIL;
 
   m_PR = aPR;
-  PRFoot *lLeftFoot = m_PR->leftFoot();
+  PRFoot * lLeftFoot = m_PR->leftFoot();
   m_FootTrajectoryGenerationStandard = new FootTrajectoryGenerationStandard(lSPM,lLeftFoot);
   m_FootTrajectoryGenerationStandard->InitializeInternalDataStructures();
 

@@ -137,7 +137,7 @@ namespace PatternGeneratorJRL
       return true;}
 
     /*! Returns the object able to compute dynamic parametersof the robot. */
-    inline PinocchioRobot * getHumanoidDynamicRobot() const
+    inline PinocchioRobot * getPinocchioRobot() const
       { return m_PinocchioRobot;}
 
     /** @} */

@@ -654,7 +654,7 @@ namespace PatternGeneratorJRL
     /*! @} */
 
     /*! Humanoid Dynamic robot */
-    PinocchioRobot * m_PinocchioRobotRobot ;
+    PinocchioRobot * m_PinocchioRobot ;
     //CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot, * m_2HumanoidDynamicRobot;
 
     /*! Speed of the leg. */

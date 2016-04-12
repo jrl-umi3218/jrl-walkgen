@@ -221,7 +221,7 @@ namespace PatternGeneratorJRL
     solution_t solution_ ;
 
     /// \brief HDR allow the computation of the dynamic filter
-    CjrlHumanoidDynamicRobot * HDR_ ;
+    PinocchioRobot * PR_ ;
 
     /// \brief Buffers for the Kajita's dynamic filter
     deque<COMState> deltaCOMTraj_deq_ ;

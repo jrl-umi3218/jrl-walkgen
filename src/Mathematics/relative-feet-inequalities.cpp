@@ -156,21 +156,21 @@ RelativeFeetInequalities::set_feet_dimensions( PinocchioRobot *aPR )
   // Read feet specificities.
   double HeightHalf,WidthHalf;
   PRFoot * RightFoot = aPR->rightFoot();
-  if (RightFoot==0)
+  if (RightFoot->associatedAnkle==0)
     {
       cerr << "Problem with the reading of the right foot"<< endl;
       return 0;
     }
-  WidthHalf = RightFoot->soleWidth  ;
+  WidthHalf  = RightFoot->soleWidth  ;
   HeightHalf = RightFoot->soleHeight ;
 
   PRFoot * LeftFoot = aPR->leftFoot();
-  if (RightFoot==0)
+  if (RightFoot->associatedAnkle==0)
     {
       cerr << "Problem while reading of the left foot"<< endl;
       return 0;
     }
-  WidthHalf = LeftFoot->soleWidth  ;
+  WidthHalf =  LeftFoot->soleWidth  ;
   HeightHalf = LeftFoot->soleHeight ;
 
   assert(WidthHalf > 0);

@@ -240,10 +240,10 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
     lRightFootHalfWidth,lRightFootHalfHeight;
   
   // Read humanoid specificities.
-  PRFoot *RightFoot = m_PR->rightFoot();
+  PRFoot * RightFoot = m_PR->rightFoot();
   lRightFootHalfWidth = RightFoot->soleWidth ;
   lRightFootHalfHeight= RightFoot->soleHeight ;
-  PRFoot *LeftFoot = m_PR->leftFoot();
+  PRFoot * LeftFoot = m_PR->leftFoot();
   lLeftFootHalfWidth  = LeftFoot->soleWidth  ;
   lLeftFootHalfHeight = LeftFoot->soleHeight ;
 

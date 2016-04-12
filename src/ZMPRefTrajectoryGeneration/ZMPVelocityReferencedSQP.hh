@@ -230,7 +230,7 @@ namespace PatternGeneratorJRL
     solution_t solution_;
 
     /// \brief HDR, humanoid dyamic robot
-    CjrlHumanoidDynamicRobot * HDR_ ;
+    PinocchioRobot * PR_ ;
     double RobotMass_ ;
 
     /// \brief Buffers for the Kajita's dynamic filter
