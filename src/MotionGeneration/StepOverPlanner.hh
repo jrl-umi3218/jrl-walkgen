@@ -44,7 +44,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 /*! Abstract Interface for dynamic robot. */
-#include <PinocchioRobot.hh>
+#include <RobotDynamics/PinocchioRobot.hh>
 
 /*! Humanoid Walking Pattern Generator */
 

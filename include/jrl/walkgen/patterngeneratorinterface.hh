@@ -35,7 +35,7 @@
 #define _PATTERN_GENERATOR_INTERFACE_H_
 
 #include <deque>
-#include <PinocchioRobot.hh>
+#include <RobotDynamics/PinocchioRobot.hh>
 #include <jrl/walkgen/pgtypes.hh>
 
 namespace PatternGeneratorJRL

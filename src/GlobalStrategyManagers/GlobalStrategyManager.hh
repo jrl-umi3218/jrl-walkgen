@@ -33,7 +33,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 // Dynamics
-#include <PinocchioRobot.hh>
+#include <RobotDynamics/PinocchioRobot.hh>
 
 // PG
 #include <jrl/walkgen/pgtypes.hh>

@@ -124,14 +124,6 @@ namespace PatternGeneratorJRL
 	delete m_PGI;
     }
 
-    void TestObject::SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR,
-					CjrlHumanoidDynamicRobot *& aDebugHDR)
-    {
-      aHDR = 0;
-      aDebugHDR = 0;
-    }
-
-
     void TestObject::CreateAndInitializeHumanoidRobot(string &RobotFileName,
 						      string &SpecificitiesFileName,
 						      string &LinkJointRank,
@@ -141,7 +133,7 @@ namespace PatternGeneratorJRL
 						      PatternGeneratorInterface * & aPGI)
     {
       // Creating the humanoid robot.
-      SpecializedRobotConstructor(aHDR,aDebugHDR);
+      PinocchioRobot
 
       if ((aHDR==0) || (aDebugHDR==0))
       {

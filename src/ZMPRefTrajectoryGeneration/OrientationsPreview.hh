@@ -38,7 +38,7 @@
 #include <privatepgtypes.hh>
 #include <jrl/walkgen/pgtypes.hh>
 #include <Mathematics/PolynomeFoot.hh>
-#include <PinocchioRobot.hh>
+#include <RobotDynamics/PinocchioRobot.hh>
 
 namespace PatternGeneratorJRL
 {

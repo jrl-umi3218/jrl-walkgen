@@ -44,7 +44,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <jrl/dynamics/dynamicsfactory.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
-#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
+//#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 
 #include "CommonTools.hh"
 #include "ClockCPUTime.hh"
@@ -75,10 +75,6 @@ namespace PatternGeneratorJRL
 
       /*! \brief Perform test. */
       bool doTest(std::ostream &os);
-
-      /*! \brief Decide from which object the robot is build from. */
-      virtual void SpecializedRobotConstructor(PinocchioRobot *& aPR,
-                           PinocchioRobot *& aDebugPR );
 
     protected:
 

@@ -29,7 +29,7 @@
 #ifndef _COM_AND_FOOT_REALIZATION_H_
 #define _COM_AND_FOOT_REALIZATION_H_
 
-#include <PinocchioRobot.hh>
+#include <RobotDynamics/PinocchioRobot.hh>
 
 #include <SimplePlugin.hh>
 #include <StepStackHandler.hh>
@@ -132,7 +132,7 @@ namespace PatternGeneratorJRL
 
     /*! @param aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
-    inline  virtual bool setHumanoidDynamicRobot(PinocchioRobot *aPinocchioRobot)
+    inline  virtual bool setPinocchioRobot(PinocchioRobot *aPinocchioRobot)
     { m_PinocchioRobot = aPinocchioRobot;
       return true;}
 

@@ -32,7 +32,7 @@ ADD_DEFINITIONS("/DLSSOL_FOUND")
 ENDIF(USE_LSSOL)
 
 SET(INCLUDES
-  PinocchioRobot.hh
+  RobotDynamics/PinocchioRobot.hh
   PreviewControl/rigid-body.hh
   PreviewControl/OptimalControllerSolver.hh
   PreviewControl/rigid-body-system.hh
@@ -113,7 +113,7 @@ ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
 
 SET(SOURCES
   ${INCLUDES}
-  PinocchioRobot.cpp
+  RobotDynamics/PinocchioRobot.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp

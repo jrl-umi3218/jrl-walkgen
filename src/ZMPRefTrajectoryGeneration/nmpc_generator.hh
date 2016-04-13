@@ -30,7 +30,7 @@
 
 #include <jrl/walkgen/pgtypes.hh>
 #include <Mathematics/relative-feet-inequalities.hh>
-#include <PinocchioRobot.hh>
+#include <RobotDynamics/PinocchioRobot.hh>
 #include <iomanip>
 #include <cmath>
 #include <qpOASES.hpp>

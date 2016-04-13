@@ -1280,7 +1280,7 @@ void ComAndFootRealizationByGeometry::
 bool ComAndFootRealizationByGeometry::
     setPinocchioRobot(PinocchioRobot * aPinocchioRobot)
 {
-  ComAndFootRealization::setHumanoidDynamicRobot(aPinocchioRobot);
+  ComAndFootRealization::setPinocchioRobot(aPinocchioRobot);
   PinocchioRobot *aPR =  aPinocchioRobot;
 
   MAL_VECTOR_RESIZE(m_prev_Configuration,aPR->numberDof());

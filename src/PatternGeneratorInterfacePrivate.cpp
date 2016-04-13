@@ -338,7 +338,7 @@ namespace PatternGeneratorJRL {
 
     // Read the robot VRML file model.
 
-    m_ComAndFootRealization[0]->setHumanoidDynamicRobot(m_PinocchioRobot);
+    m_ComAndFootRealization[0]->setPinocchioRobot(m_PinocchioRobot);
     m_ComAndFootRealization[0]->SetHeightOfTheCoM(m_PC->GetHeightOfCoM());
     m_ComAndFootRealization[0]->setSamplingPeriod(m_PC->SamplingPeriod());
     m_ComAndFootRealization[0]->Initialization();

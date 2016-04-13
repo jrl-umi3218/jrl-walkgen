@@ -45,7 +45,7 @@
 using namespace::std;
 
 /*! Abstract robot dynamics includes */
-#include <PinocchioRobot.hh>
+#include <RobotDynamics/PinocchioRobot.hh>
 
 /*! Framework includes */
 #include <Mathematics/PolynomeFoot.hh>
