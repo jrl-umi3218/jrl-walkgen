@@ -740,7 +740,8 @@ bool ComAndFootRealizationByGeometry::
 
   ODEBUG("Typeid of humanoid: " << typeid(getHumanoidDynamicRobot()).name() );
   // Call specialized dynamics.
-  getPinocchioRobot()->getSpecializedInverseKinematics(Waist,Ankle,BodyPose,FootPose,lq);
+  getPinocchioRobot()->ComputeSpecializedInverseKinematics(
+        Waist,Ankle,BodyPose,FootPose,lq);
 
   return true;
 }
@@ -1248,11 +1249,12 @@ void ComAndFootRealizationByGeometry::
       TempALeft * m_GainFactor / 0.2;
   MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,2,3) = m_ZARM;
 
-  getPinocchioRobot()->getSpecializedInverseKinematics(*m_LeftShoulder,
-                                                       *getHumanoidDynamicRobot()->leftWrist(),
-                                                       jointRootPosition,
-                                                       jointEndPosition,
-                                                       qArml);
+  getPinocchioRobot()->ComputeSpecializedInverseKinematics(
+        m_LeftShoulder,
+        getPinocchioRobot()->leftHand()->associatedWrist,
+        jointRootPosition,
+        jointEndPosition,
+        qArml);
   ODEBUG4("ComputeHeuristicArm: Step 2 ","DebugDataIKArms.txt");
   ODEBUG4( "IK Left arm p:" << qArml(0)<< " " <<  qArml(1)  << " " << qArml(2)
            << " " << qArml(3) << "  " << qArml(4) << " " << qArml(5), "DebugDataIKArms.txt" );
@@ -1260,11 +1262,12 @@ void ComAndFootRealizationByGeometry::
   MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,0,3) = TempARight;
   MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,2,3) = m_ZARM;
 
-  getPinocchioRobot()->getSpecializedInverseKinematics(*m_RightShoulder,
-                                                       *getHumanoidDynamicRobot()->rightWrist(),
-                                                       jointRootPosition,
-                                                       jointEndPosition,
-                                                       qArmr);
+  getPinocchioRobot()->ComputeSpecializedInverseKinematics(
+        m_RightShoulder,
+        getPinocchioRobot()->rightHand()->associatedWrist,
+        jointRootPosition,
+        jointEndPosition,
+        qArmr);
   ODEBUG4( "IK Right arm p:" << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2)
            << " " << qArmr(3) << "  " << qArmr(4) << " " << qArmr(5), "DebugDataIKArms.txt" );
 

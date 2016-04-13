@@ -77,8 +77,8 @@ namespace PatternGeneratorJRL
       bool doTest(std::ostream &os);
 
       /*! \brief Decide from which object the robot is build from. */
-      virtual void SpecializedRobotConstructor(CjrlHumanoidDynamicRobot *& aHDR,
-					       CjrlHumanoidDynamicRobot *& aDebugHDR );
+      virtual void SpecializedRobotConstructor(PinocchioRobot *& aPR,
+                           PinocchioRobot *& aDebugPR );
 
     protected:
 
@@ -96,12 +96,12 @@ namespace PatternGeneratorJRL
        */
       /*! */
       void CreateAndInitializeHumanoidRobot(std::string &RobotFileName,
-					    std::string &LinkJointRank,
-					    std::string &SpecificitiesFileName,
-					    std::string &InitConfig,
-					    CjrlHumanoidDynamicRobot *& aHDR,
-					    CjrlHumanoidDynamicRobot *& aDebugHDR,
-					    PatternGeneratorJRL::PatternGeneratorInterface *&aPGI);
+                        std::string &LinkJointRank,
+                        std::string &SpecificitiesFileName,
+                        std::string &InitConfig,
+                        PinocchioRobot *& aPR,
+                        PinocchioRobot *& aDebugPR,
+                        PatternGeneratorJRL::PatternGeneratorInterface *&aPGI);
 
       /*! @} */
 
@@ -136,10 +136,10 @@ namespace PatternGeneratorJRL
 	 @{
       */
       /*! \brief Abstract model of the humanoid robot considered */
-      CjrlHumanoidDynamicRobot * m_HDR ;
+      PinocchioRobot * m_HDR ;
 
       /*! \brief Abstract model of the humanoid robot for debugging purposes. */
-      CjrlHumanoidDynamicRobot * m_DebugHDR ;
+      PinocchioRobot * m_DebugHDR ;
 
       /*! @} */
 

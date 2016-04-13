@@ -136,8 +136,8 @@ namespace PatternGeneratorJRL
 						      string &SpecificitiesFileName,
 						      string &LinkJointRank,
 						      string &InitConfig,
-						      CjrlHumanoidDynamicRobot * & aHDR,
-						      CjrlHumanoidDynamicRobot * & aDebugHDR,
+                              PinocchioRobot * & aHDR,
+                              PinocchioRobot * & aDebugHDR,
 						      PatternGeneratorInterface * & aPGI)
     {
       // Creating the humanoid robot.
