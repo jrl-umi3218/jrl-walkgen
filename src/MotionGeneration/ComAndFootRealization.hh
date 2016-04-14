@@ -30,7 +30,6 @@
 #define _COM_AND_FOOT_REALIZATION_H_
 
 #include <jrl/walkgen/pinocchiorobot.hh>
-
 #include <SimplePlugin.hh>
 #include <StepStackHandler.hh>
 

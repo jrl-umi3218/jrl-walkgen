@@ -202,6 +202,7 @@ ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES} ${${PROJECT_NAME}_ABSOLUTE_HEADERS})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta ")
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-mal)
 PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen pinocchio)
+
 IF(USE_LSSOL)
  PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen lssol)
 ENDIF(USE_LSSOL)

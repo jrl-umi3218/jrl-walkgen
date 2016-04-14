@@ -32,7 +32,6 @@ frame work */
 #include "pinocchio/spatial/se3.hpp"
 #include "pinocchio/multibody/model.hpp"
 #include <jrl/mal/matrixabstractlayer.hh>
-#include <vector>
 namespace PatternGeneratorJRL
 {
   struct PinocchioRobotFoot_t{

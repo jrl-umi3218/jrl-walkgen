@@ -29,31 +29,8 @@ ground plan taking into account the whole body motion */
 #ifndef DYNAMICFILTER_HH 
 #define DYNAMICFILTER_HH
 
-// metapod includes
-//#include <metapod/models/hrp2_14/hrp2_14.hh>
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
-//#include <metapod/algos/jac_point_chain.hh>
 #include "Clock.hh"
-//#include <boost/fusion/algorithm/iteration/accumulate.hpp>
-//#include <boost/fusion/include/accumulate.hpp>
-
-//#ifndef METAPOD_TYPEDEF
-//#define METAPOD_TYPEDEF
-//    typedef double LocalFloatType;
-//    typedef metapod::Spatial::ForceTpl<LocalFloatType> Force_HRP2_14;
-//    typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
-
-//    typedef metapod::Nodes< Robot_Model, Robot_Model::BODY >::type RootNode;
-//    typedef metapod::Nodes< Robot_Model, Robot_Model::l_wrist >::type LhandNode;
-//    typedef metapod::Nodes< Robot_Model, Robot_Model::r_wrist >::type RhandNode;
-//    typedef metapod::Nodes< Robot_Model, Robot_Model::LARM_LINK0 >::type LshoulderNode;
-//    typedef metapod::Nodes< Robot_Model, Robot_Model::RARM_LINK0 >::type RshoulderNode;
-
-//    typedef metapod::Nodes< Robot_Model, Robot_Model::LLEG_LINK0 >::type LhipNode;
-//    typedef metapod::Nodes< Robot_Model, Robot_Model::RLEG_LINK0 >::type RhipNode;
-//    typedef metapod::Nodes< Robot_Model, Robot_Model::l_ankle >::type LankleNode;
-//    typedef metapod::Nodes< Robot_Model, Robot_Model::r_ankle >::type RankleNode;
-//#endif
 
 namespace PatternGeneratorJRL
 {
@@ -221,9 +198,6 @@ namespace PatternGeneratorJRL
 
       /// Class that compute the dynamic and kinematic of the robot
       PinocchioRobot * PR_ ;
-//      Robot_Model hrp2_14_ ;
-//      Robot_Model::confVector q_,dq_,ddq_;
-//      Force_HRP2_14 com_tensor_ ;
 
       /// \brief Buffers the ZMP Multibody computed
       /// from the inverse Dynamics, and the difference between

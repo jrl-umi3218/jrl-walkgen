@@ -34,22 +34,12 @@
 #include <time.h>
 #include <sstream>
 #include <fstream>
-
 #include <string.h>
 
 #include <jrl/mal/matrixabstractlayer.hh>
-
-#include <jrl/dynamics/dynamicsfactory.hh>
-
-#ifdef WITH_HRP2DYNAMICS
-#include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
-#endif
-
 #include <jrl/walkgen/patterngeneratorinterface.hh>
-
-#include "ClockCPUTime.hh"
-
 #include <jrl/walkgen/config_private.hh>
+#include "ClockCPUTime.hh"
 
 #ifndef _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_
 #define _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_

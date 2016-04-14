@@ -56,42 +56,42 @@ PinocchioRobot::~PinocchioRobot()
 
 bool PinocchioRobot::checkModel(se3::Model * robotModel)
 {
-  if(!m_robotModel->existBodyName("r_ankle"))
+  if(!robotModel->existBodyName("r_ankle"))
   {
     m_boolModel=false;
     const std::string exception_message ("r_ankle is not a valid body name");
     throw std::invalid_argument(exception_message);
     return false ;
   }
-  if(!m_robotModel->existBodyName("l_ankle"))
+  if(!robotModel->existBodyName("l_ankle"))
   {
     m_boolModel=false;
     const std::string exception_message ("l_ankle is not a valid body name");
     throw std::invalid_argument(exception_message);
     return false ;
   }
-  if(!m_robotModel->existBodyName("BODY"))
+  if(!robotModel->existBodyName("BODY"))
   {
     m_boolModel=false;
     const std::string exception_message ("BODY is not a valid body name");
     throw std::invalid_argument(exception_message);
     return false ;
   }
-  if(!m_robotModel->existBodyName("torso"))
+  if(!robotModel->existBodyName("torso"))
   {
     m_boolModel=false;
     const std::string exception_message ("torso is not a valid body name");
     throw std::invalid_argument(exception_message);
     return false ;
   }
-  if(!m_robotModel->existBodyName("r_wrist"))
+  if(!robotModel->existBodyName("r_wrist"))
   {
     m_boolModel=false;
     const std::string exception_message ("r_wrist is not a valid body name");
     throw std::invalid_argument(exception_message);
     return false ;
   }
-  if(!m_robotModel->existBodyName("l_wrist"))
+  if(!robotModel->existBodyName("l_wrist"))
   {
     const std::string exception_message ("l_wrist is not a valid body name");
     throw std::invalid_argument(exception_message);
@@ -113,7 +113,7 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
 
   // initialize the short cut for the joint ids
   m_chest = m_robotModel->getBodyId("torso");
-  m_waist = m_robotModel->getBodyId("WAIST");
+  m_waist = m_robotModel->getBodyId("BODY");
   m_leftFoot.associatedAnkle  = m_robotModel->getBodyId("l_ankle");
   m_rightFoot.associatedAnkle = m_robotModel->getBodyId("r_ankle");
   m_leftWrist  = m_robotModel->getBodyId("l_ankle");

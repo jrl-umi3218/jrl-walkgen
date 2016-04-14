@@ -46,8 +46,8 @@ OrientationsPreview::OrientationsPreview(PinocchioRobot *aPR)
   if(aPR->Model()->existJointName("LLEG_JOINT0"))
   {
     leftHipIndex = aPR->Model()->getJointId("LLEG_JOINT0");
-    lLimitLeftHipYaw_  = aPR->Data()->lowerPositionLimit(leftHipIndex);//-30.0/180.0*M_PI;
-    uLimitLeftHipYaw_  = aPR->Data()->upperPositionLimit(leftHipIndex);//45.0/180.0*M_PI;
+    lLimitLeftHipYaw_  = aPR->Model()->lowerPositionLimit(leftHipIndex);//-30.0/180.0*M_PI;
+    uLimitLeftHipYaw_  = aPR->Model()->upperPositionLimit(leftHipIndex);//45.0/180.0*M_PI;
   }
   if (lLimitLeftHipYaw_==  uLimitLeftHipYaw_)
   {
@@ -61,8 +61,8 @@ OrientationsPreview::OrientationsPreview(PinocchioRobot *aPR)
   if(aPR->Model()->existJointName("RLEG_JOINT0"))
   {
     rightHipIndex = aPR->Model()->getJointId("RLEG_JOINT0");
-    lLimitRightHipYaw_ = aPR->Data()->lowerPositionLimit(rightHipIndex);//-30.0/180.0*M_PI;
-    uLimitRightHipYaw_ = aPR->Data()->upperPositionLimit(rightHipIndex);//45.0/180.0*M_PI;
+    lLimitRightHipYaw_ = aPR->Model()->lowerPositionLimit(rightHipIndex);//-30.0/180.0*M_PI;
+    uLimitRightHipYaw_ = aPR->Model()->upperPositionLimit(rightHipIndex);//45.0/180.0*M_PI;
   }
   if (lLimitRightHipYaw_==  uLimitRightHipYaw_)
   {
@@ -72,7 +72,7 @@ OrientationsPreview::OrientationsPreview(PinocchioRobot *aPR)
 
   if(leftHipIndex!=0)
   {
-    uvLimitFoot_ = fabs(aPR->Data()->velocityLimit(leftHipIndex));
+    uvLimitFoot_ = fabs(aPR->Model()->velocityLimit(leftHipIndex));
   }
 
   //Acceleration limit not given by HRP2JRLmain.wrl nor the urdf file

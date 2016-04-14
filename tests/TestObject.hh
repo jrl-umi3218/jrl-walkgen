@@ -39,17 +39,10 @@
 
 #include <ostream>
 #include <string>
-
-
-#include <jrl/mal/matrixabstractlayer.hh>
-#include <jrl/dynamics/dynamicsfactory.hh>
-#include <jrl/walkgen/patterngeneratorinterface.hh>
-#include <jrl/walkgen/pinocchiorobot.hh>
-//#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
-
 #include "CommonTools.hh"
 #include "ClockCPUTime.hh"
-
+#include <jrl/mal/matrixabstractlayer.hh>
+#include <jrl/walkgen/patterngeneratorinterface.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -61,6 +54,9 @@ namespace PatternGeneratorJRL
     class TestObject
     {
     public:
+      // overload the new[] eigen operator
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
       /*! \brief Constructor for the test named TestName.
        All generated files will have their names prefixed by TestName*/
       TestObject(int argc, char *argv[],

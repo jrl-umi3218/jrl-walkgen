@@ -27,10 +27,9 @@
 
 #include <fstream>
 #include "Debug.hh"
+#include "TestObject.hh"
 #include "pinocchio/multibody/parser/urdf.hpp"
 #include "pinocchio/multibody/parser/srdf.hpp"
-#include "TestObject.hh"
-
 using namespace std;
 
 #define NB_OF_FIELDS 39
@@ -118,9 +117,9 @@ namespace PatternGeneratorJRL
       {
         correctExtension = false ;
         std::size_t found = m_SRDFPath.find_last_of('.');
-        correctExtension = m_SRDFPath.substr(found).compare(".srdf");
+        correctExtension = (m_SRDFPath.substr(found) == ".srdf") ;
         if(!correctExtension)
-          throw std::string("File is not an urdf, extension has to be .srdf");
+          throw std::string("File is not an srdf, extension has to be .srdf");
       }
       return correctExtension && fileExist ;
     }
@@ -156,7 +155,7 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_DIM(m_CurrentVelocity,double,lNbDofs);
       MAL_VECTOR_DIM(m_CurrentAcceleration,double,lNbDofs);
       MAL_VECTOR_DIM(m_PreviousConfiguration,double,lNbDofs) ;
-      MAL_VECTOR_DIM(m_PreviousVelocity,double,lNbDofs);
+      MAL_VECTOR_DIM(m_PrsrtingeviousVelocity,double,lNbDofs);
       MAL_VECTOR_DIM(m_PreviousAcceleration,double,lNbDofs);
       for(int i=0;i<6;i++)
       {
@@ -202,7 +201,7 @@ namespace PatternGeneratorJRL
     {
       // Creating the humanoid robot via the URDF.
       try{
-        m_robotModel = se3::urdf::buildModel(URDFFile);
+        m_robotModel = se3::urdf::buildModel(URDFFile, se3::JointModelFreeFlyer());
         m_robotData = new se3::Data(m_robotModel) ;
         m_DebugRobotData = new se3::Data(m_robotModel) ;
       }catch(std::invalid_argument e)
