@@ -130,21 +130,20 @@ InitializationMaps(std::vector<se3::Index> &FromRootToJoint,
 }
 
 void ComAndFootRealizationByGeometry::
-    InitializeMapsForAHand(PRHand * aHand,
+    InitializeMapsForAHand(se3::JointIndex aWrist,
                            se3::JointModelVector & ActuatedJoints,
                            vector<int> & IndexesInConfiguration,
                            se3::JointIndex & associateShoulder)
 {
-  if (aHand==0)
+  if (aWrist==0)
     return;
 
   // Find back the path from the shoulder to the left hand.
-  //  CjrlHand *LeftHand = getHumanoidDynamicRobot()->leftHand();
   se3::JointIndex Chest = getPinocchioRobot()->chest();
   if (Chest==0)
     return;
 
-  const se3::JointIndex associatedWrist = aHand->associatedWrist;
+  const se3::JointIndex associatedWrist = aWrist;
   if (associatedWrist==0)
     return;
 
@@ -267,13 +266,13 @@ void ComAndFootRealizationByGeometry::
                      m_LeftLegIndexinConfiguration);
 
   // Create maps for the left hand.
-  InitializeMapsForAHand(getPinocchioRobot()->leftHand(),
+  InitializeMapsForAHand(getPinocchioRobot()->leftWrist(),
                          ActuatedJoints,
                          m_LeftArmIndexinConfiguration,
                          m_LeftShoulder);
 
   // Create maps for the right hand.
-  InitializeMapsForAHand(getPinocchioRobot()->rightHand(),
+  InitializeMapsForAHand(getPinocchioRobot()->rightWrist(),
                          ActuatedJoints,
                          m_RightArmIndexinConfiguration,
                          m_RightShoulder);
@@ -1251,7 +1250,7 @@ void ComAndFootRealizationByGeometry::
 
   getPinocchioRobot()->ComputeSpecializedInverseKinematics(
         m_LeftShoulder,
-        getPinocchioRobot()->leftHand()->associatedWrist,
+        getPinocchioRobot()->leftWrist(),
         jointRootPosition,
         jointEndPosition,
         qArml);
@@ -1264,7 +1263,7 @@ void ComAndFootRealizationByGeometry::
 
   getPinocchioRobot()->ComputeSpecializedInverseKinematics(
         m_RightShoulder,
-        getPinocchioRobot()->rightHand()->associatedWrist,
+        getPinocchioRobot()->rightWrist(),
         jointRootPosition,
         jointEndPosition,
         qArmr);

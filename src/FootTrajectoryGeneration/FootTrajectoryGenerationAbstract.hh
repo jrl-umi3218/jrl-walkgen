@@ -39,7 +39,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 
 /* dynamics pinocchio related inclusions */
-#include <RobotDynamics/PinocchioRobot.hh>
+#include <jrl/walkgen/pinocchiorobot.hh>
 
 /* Walking pattern generation related inclusions */
 

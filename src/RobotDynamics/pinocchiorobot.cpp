@@ -1,38 +1,169 @@
-#include "RobotDynamics/PinocchioRobot.hh"
+#include <jrl/walkgen/pinocchiorobot.hh>
 #include "pinocchio/algorithm/rnea.hpp"
 #include "pinocchio/algorithm/kinematics.hpp"
 using namespace PatternGeneratorJRL;
 
-PinocchioRobot::PinocchioRobot(se3::Model * aModel, se3::Data * aData):
-  m_robotDataInInitialePose(*m_robotModel)
+PinocchioRobot::PinocchioRobot()
 {
-  m_robotModel = aModel ;
-  m_robotData = aData ;
+  // all the pointor are set to 0
+  m_robotModel = 0 ;
+  m_robotData = 0 ;
+  m_robotDataInInitialePose = 0 ;
 
+  // resize by default
+  m_q.resize(50,0.0);
+  m_v.resize(50,0.0);
+  m_a.resize(50,0.0);
+  MAL_VECTOR_RESIZE(m_qmal,50);
+  MAL_VECTOR_RESIZE(m_vmal,50);
+  MAL_VECTOR_RESIZE(m_amal,50);
+  MAL_VECTOR_FILL(m_qmal,0.0);
+  MAL_VECTOR_FILL(m_vmal,0.0);
+  MAL_VECTOR_FILL(m_amal,0.0);
+
+  m_quat = Eigen::Quaterniond(
+        Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) *
+        Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) *
+        Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) ) ;
+  m_f = Eigen::Vector3d::Zero();
+  m_n = Eigen::Vector3d::Zero();
+  m_com = Eigen::Vector3d::Zero();
+
+  m_boolModel     = false ;
+  m_boolData      = false ;
+  m_boolLeftFoot  = false ;
+  m_boolRightFoot = false ;
+
+  m_chest = 0 ;
+  m_waist = 0 ;
+  m_leftShoulder = 0 ;
+  m_rightShoulder = 0 ;
+  m_leftWrist = 0 ;
+  m_rightWrist = 0;
+  m_mass = 0.0 ;
+  memset(&m_leftFoot,0,sizeof(m_leftFoot));
+  memset(&m_rightFoot,0,sizeof(m_rightFoot));
+}
+
+PinocchioRobot::~PinocchioRobot()
+{
+  if (m_robotDataInInitialePose != 0)
+  {
+    delete m_robotDataInInitialePose ;
+    m_robotDataInInitialePose = 0 ;
+  }
+}
+
+bool PinocchioRobot::checkModel(se3::Model * robotModel)
+{
+  if(!m_robotModel->existBodyName("r_ankle"))
+  {
+    m_boolModel=false;
+    const std::string exception_message ("r_ankle is not a valid body name");
+    throw std::invalid_argument(exception_message);
+    return false ;
+  }
+  if(!m_robotModel->existBodyName("l_ankle"))
+  {
+    m_boolModel=false;
+    const std::string exception_message ("l_ankle is not a valid body name");
+    throw std::invalid_argument(exception_message);
+    return false ;
+  }
+  if(!m_robotModel->existBodyName("BODY"))
+  {
+    m_boolModel=false;
+    const std::string exception_message ("BODY is not a valid body name");
+    throw std::invalid_argument(exception_message);
+    return false ;
+  }
+  if(!m_robotModel->existBodyName("torso"))
+  {
+    m_boolModel=false;
+    const std::string exception_message ("torso is not a valid body name");
+    throw std::invalid_argument(exception_message);
+    return false ;
+  }
+  if(!m_robotModel->existBodyName("r_wrist"))
+  {
+    m_boolModel=false;
+    const std::string exception_message ("r_wrist is not a valid body name");
+    throw std::invalid_argument(exception_message);
+    return false ;
+  }
+  if(!m_robotModel->existBodyName("l_wrist"))
+  {
+    const std::string exception_message ("l_wrist is not a valid body name");
+    throw std::invalid_argument(exception_message);
+    return false ;
+  }
+  return true ;
+}
+
+bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
+                                                 se3::Data * robotData)
+{
+  m_boolModel=checkModel(robotModel);
+  if(!m_boolModel)
+    return false ;
+
+  // initialize the model
+  ///////////////////////
+  m_robotModel = robotModel;
+
+  // initialize the short cut for the joint ids
+  m_chest = m_robotModel->getBodyId("torso");
+  m_waist = m_robotModel->getBodyId("WAIST");
+  m_leftFoot.associatedAnkle  = m_robotModel->getBodyId("l_ankle");
+  m_rightFoot.associatedAnkle = m_robotModel->getBodyId("r_ankle");
+  m_leftWrist  = m_robotModel->getBodyId("l_ankle");
+  m_rightWrist = m_robotModel->getBodyId("r_ankle");
+  DetectAutomaticallyShoulders();
+
+  // intialize the "initial pose" (q=[0]) data
+  m_robotDataInInitialePose = new se3::Data(*m_robotModel);
+  m_robotDataInInitialePose->v[0] = se3::Motion::Zero();
+  m_robotDataInInitialePose->a[0] = -m_robotModel->gravity;
   m_q.resize(m_robotModel->nq,0.0);
   m_v.resize(m_robotModel->nv,0.0);
   m_a.resize(m_robotModel->nv,0.0);
+  se3::forwardKinematics(*m_robotModel,*m_robotDataInInitialePose,m_q);
 
-  m_robotData->v[0] = se3::Motion::Zero();
-  m_robotData->a[0] = -m_robotModel->gravity;
-  m_robotDataInInitialePose.v[0] = se3::Motion::Zero();
-  m_robotDataInInitialePose.a[0] = -m_robotModel->gravity;
-
+  // compute the global mass of the robot
   m_mass=0.0;
   for(unsigned i=0; m_robotModel->inertias.size() ; ++i)
   {
     m_mass += m_robotModel->inertias[i].mass();
   }
+
+  // initialize the data
+  //////////////////////
+  if (robotData==0)
+  {
+    m_boolData = false ;
+    return false;
+  }
+  else
+    m_boolData=true;
+  m_robotData = robotData;
+  m_robotData->v[0] = se3::Motion::Zero();
+  m_robotData->a[0] = -m_robotModel->gravity;
+  return true ;
 }
 
-void PinocchioRobot::InitializePinocchioRobot(se3::Model * aModel, se3::Data * aData)
+bool PinocchioRobot::initializeLeftFoot(PRFoot leftFoot)
 {
-  m_q.resize(m_robotModel->nq,0.0);
-  m_v.resize(m_robotModel->nv,0.0);
-  m_a.resize(m_robotModel->nv,0.0);
-  se3::forwardKinematics(*m_robotModel,m_robotDataInInitialePose,m_q);
+  m_leftFoot = leftFoot ;
+  m_boolLeftFoot = true ;
+  return true ;
 }
 
+bool PinocchioRobot::initializeRightFoot(PRFoot rightFoot)
+{
+  m_rightFoot = rightFoot ;
+  m_boolRightFoot = true ;
+  return true ;
+}
 
 void PinocchioRobot::computeForwardKinematics()
 {
@@ -151,7 +282,7 @@ std::vector<se3::JointIndex> PinocchioRobot::jointsBetween
   return out ;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 bool PinocchioRobot::
 ComputeSpecializedInverseKinematics(
     const se3::JointIndex &jointRoot,
@@ -198,7 +329,7 @@ ComputeSpecializedInverseKinematics(
     {
       int Side;
       bool ok=false;
-      if (jointEnd==m_leftHand.associatedWrist)
+      if (jointEnd==m_leftWrist)
       {
         Side = 1;
         ok=true;
@@ -217,7 +348,7 @@ ComputeSpecializedInverseKinematics(
       int Side;
       bool ok=false;
 
-      if (jointEnd==m_rightHand.associatedWrist)
+      if (jointEnd==m_rightWrist)
       {
         Side = -1;
         ok=true;
@@ -276,7 +407,8 @@ void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
   for(unsigned int i=0;i<6;i++)
     q(i)=0.0;
 
-  double OppSignOfDtY = Dt(1) < 0.0 ? 1.0 : -1.0; // if Dt(1)<0.0 then Opp=1.0 else Opp=-1.0
+  // if Dt(1)<0.0 then Opp=1.0 else Opp=-1.0
+  double OppSignOfDtY = Dt(1) < 0.0 ? 1.0 : -1.0;
 
   vector3d d2,d3;
   d2 = Body_P + Body_R * Dt;
@@ -401,7 +533,7 @@ void PinocchioRobot::getShoulderWristKinematics(const matrix4d & jointRootPositi
   double Xmax = ComputeXmax(Z);
   X = X*Xmax;
 
-  double A=0.25, B=0.25;
+  double A=0.25, B=0.25; //UpperArmLegth ForeArmLength
 
   double C=0.0,Gamma=0.0,Theta=0.0;
   C = sqrt(X*X+Z*Z);
@@ -427,18 +559,18 @@ void PinocchioRobot::getShoulderWristKinematics(const matrix4d & jointRootPositi
 
 void PinocchioRobot::DetectAutomaticallyShoulders()
 {
-  DetectAutomaticallyOneShoulder(m_leftHand,m_leftShoulder);
-  DetectAutomaticallyOneShoulder(m_rightHand,m_rightShoulder);
+  DetectAutomaticallyOneShoulder(m_leftWrist,m_leftShoulder);
+  DetectAutomaticallyOneShoulder(m_rightWrist,m_rightShoulder);
 }
 
 void PinocchioRobot::DetectAutomaticallyOneShoulder(
-    PRHand aHand,
+    se3::JointIndex aWrist,
     se3::JointIndex & aShoulder)
 {
   std::vector<se3::JointIndex>FromRootToJoint;
 
   FromRootToJoint.clear();
-  FromRootToJoint = fromRootToIt(aHand.associatedWrist);
+  FromRootToJoint = fromRootToIt(aWrist);
 
   std::vector<se3::JointIndex>::iterator itJoint = FromRootToJoint.begin();
   bool found=false;

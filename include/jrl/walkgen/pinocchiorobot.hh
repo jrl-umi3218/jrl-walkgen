@@ -41,31 +41,18 @@ namespace PatternGeneratorJRL
     double soleWidth ; // y axis
     double soleHeight ;// x axis
     vector3d anklePosition ;
-    unsigned JointNb ;
-    std::vector<unsigned> JointId ;
   };
   typedef PinocchioRobotFoot_t PRFoot ;
-
-  struct PinocchioRobotHand_t{
-    se3::JointIndex associatedWrist ;
-    vector3d center ;
-    vector3d thumbAxis ;
-    vector3d foreFingerAxis ;
-    vector3d palmNormal ;
-    unsigned JointNb ;
-    std::vector<unsigned> JointId ;
-  };
-  typedef PinocchioRobotHand_t PRHand ;
-
-
 
   class PinocchioRobot
   {
   public:
-    /// Constructor and Destructor
-    PinocchioRobot(se3::Model *aModel, se3::Data *aData);
-    void InitializePinocchioRobot(se3::Model * aModel, se3::Data * aData);
+    // overload the new[] eigen operator
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
+    /// Constructor and Destructor
+    PinocchioRobot();
+    ~PinocchioRobot();
 
     /// Functions computing kinematics and dynamics
     void computeInverseDynamics();
@@ -102,10 +89,8 @@ namespace PatternGeneratorJRL
                                     vectorN &q,
                                     int side);
     void DetectAutomaticallyShoulders();
-    void DetectAutomaticallyOneShoulder(PRHand aHand,
+    void DetectAutomaticallyOneShoulder(se3::JointIndex aWrist,
                                         se3::JointIndex & aShoulder);
-
-
 
 
   public :
@@ -114,7 +99,7 @@ namespace PatternGeneratorJRL
     inline se3::Data * Data()
     {return m_robotData;}
     inline se3::Data * DataInInitialePose()
-    {return &m_robotDataInInitialePose;}
+    {return m_robotDataInInitialePose;}
     inline se3::Model * Model()
     {return m_robotModel;}
 
@@ -123,10 +108,10 @@ namespace PatternGeneratorJRL
     inline PRFoot * rightFoot()
     {return &m_rightFoot;}
 
-    inline PRHand * leftHand()
-    {return &m_leftHand;}
-    inline PRHand * rightHand()
-    {return &m_rightHand;}
+    inline se3::JointIndex leftWrist()
+    {return m_leftWrist;}
+    inline se3::JointIndex rightWrist()
+    {return m_rightWrist;}
 
     inline se3::JointIndex chest()
     {return m_chest;}
@@ -176,26 +161,46 @@ namespace PatternGeneratorJRL
     inline void currentAcceleration(MAL_VECTOR_TYPE(double) acc)
     {m_amal=acc;}
 
-  private:
-    se3::Model * m_robotModel ;
-    se3::Data m_robotDataInInitialePose ; // internal variable
-    se3::Data * m_robotData ;
-    PRFoot m_leftFoot , m_rightFoot ;
-    PRHand m_leftHand , m_rightHand ;
-    double m_mass ;
-    se3::JointIndex m_chest, m_waist, m_leftShoulder, m_rightShoulder ;
+    /// Initialization functions
+    /// ////////////////////////
+    inline bool isInitialized()
+    {
+      return m_boolModel && m_boolData && m_boolLeftFoot && m_boolRightFoot;
+    }
+    bool checkModel(se3::Model * robotModel);
+    bool initializeRobotModelAndData(se3::Model * robotModel,
+                                     se3::Data * robotData);
+    bool initializeLeftFoot(PRFoot leftFoot);
+    bool initializeRightFoot(PRFoot rightFoot);
 
-    MAL_VECTOR_TYPE(double) m_qmal ;
-    MAL_VECTOR_TYPE(double) m_vmal ;
-    MAL_VECTOR_TYPE(double) m_amal ;
-    Eigen::VectorXd m_q ;
-    Eigen::VectorXd m_v ;
-    Eigen::VectorXd m_a ;
+    /// Attributes
+    /// //////////
+    private :
+      se3::Model * m_robotModel ;
+      se3::Data * m_robotDataInInitialePose ; // internal variable
+      se3::Data * m_robotData ;
+      PRFoot m_leftFoot , m_rightFoot ;
+      double m_mass ;
+      se3::JointIndex m_chest, m_waist, m_leftShoulder, m_rightShoulder ;
+      se3::JointIndex m_leftWrist , m_rightWrist ;
 
-    // tmp variables
-    Eigen::Quaternion<double> m_quat ;
-    Eigen::Vector3d m_f,m_n; // external forces and torques
-    Eigen::Vector3d m_com; // multibody CoM
-  };
-}
+      MAL_VECTOR_TYPE(double) m_qmal ;
+      MAL_VECTOR_TYPE(double) m_vmal ;
+      MAL_VECTOR_TYPE(double) m_amal ;
+      Eigen::VectorXd m_q ;
+      Eigen::VectorXd m_v ;
+      Eigen::VectorXd m_a ;
+
+      // tmp variables
+      Eigen::Quaterniond m_quat ;
+      Eigen::Vector3d m_f,m_n; // external forces and torques
+      Eigen::Vector3d m_com; // multibody CoM
+
+      bool m_boolModel     ;
+      bool m_boolData      ;
+      bool m_boolLeftFoot  ;
+      bool m_boolRightFoot ;
+
+  }; //PinocchioRobot
+}// namespace PatternGeneratorJRL
 #endif // PinocchioRobot_HH

@@ -44,6 +44,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <jrl/dynamics/dynamicsfactory.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
+#include <jrl/walkgen/pinocchiorobot.hh>
 //#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
 
 #include "CommonTools.hh"
@@ -70,7 +71,7 @@ namespace PatternGeneratorJRL
       ~TestObject();
 
       /*! \brief Initialize the test object. */
-      void init();
+      bool init();
      // void initIK();
 
       /*! \brief Perform test. */
@@ -87,18 +88,27 @@ namespace PatternGeneratorJRL
       /*! \brief Profile of the test to perform. */
       unsigned int m_TestProfile;
 
+      /*! \brief Verify that the input files exist. */
+      bool checkFiles();
+
       /*! \brief Useful methods to create the robot model.
-	@{
+    @{
        */
       /*! */
-      void CreateAndInitializeHumanoidRobot(std::string &RobotFileName,
-                        std::string &LinkJointRank,
-                        std::string &SpecificitiesFileName,
-                        std::string &InitConfig,
-                        PinocchioRobot *& aPR,
-                        PinocchioRobot *& aDebugPR,
-                        PatternGeneratorJRL::PatternGeneratorInterface *&aPGI);
+      void CreateAndInitializeHumanoidRobot(
+          std::string &URDFFile,
+          std::string &SRDFFile,
+          PinocchioRobot *& aPR,
+          PinocchioRobot *& aDebugPR,
+          PatternGeneratorJRL::PatternGeneratorInterface *&aPGI);
+      /*! @} */
 
+      /*! \brief Useful methods to parse srdf file.
+    @{
+       */
+      /*! */
+      void InitializeRobotWithSRDF(PinocchioRobot & aPR,
+                                   const std::string & filename);
       /*! @} */
 
       /*! \name Vectors storing the robot's state.
@@ -122,8 +132,8 @@ namespace PatternGeneratorJRL
       /*! \brief Previous acceleration */
       MAL_VECTOR(m_PreviousAcceleration,double);
 
-      /*! \brief Initial Configuration */
-      MAL_VECTOR(InitialPosition,double);
+      /*! \brief Half Sitting Configuration */
+      MAL_VECTOR(m_HalfSitting,double);
 
 
       /*! @} */
@@ -132,10 +142,16 @@ namespace PatternGeneratorJRL
 	 @{
       */
       /*! \brief Abstract model of the humanoid robot considered */
-      PinocchioRobot * m_HDR ;
+      se3::Model m_robotModel ;
+
+      /*! \brief Abstract model of the humanoid robot considered */
+      PinocchioRobot * m_PR ;
+      se3::Data *m_robotData;
 
       /*! \brief Abstract model of the humanoid robot for debugging purposes. */
-      PinocchioRobot * m_DebugHDR ;
+      PinocchioRobot * m_DebugPR ;
+      se3::Data *m_DebugRobotData;
+
 
       /*! @} */
 
@@ -189,17 +205,10 @@ namespace PatternGeneratorJRL
 
       /*! \brief Store options
        @{*/
-      /*! \brief Path to the VRML. */
-      std::string m_VRMLPath;
-      /*! \brief Name of the VRML. */
-      std::string m_VRMLFileName;
-      /*! \brief File describing the specificities of the robot. */
-      std::string m_SpecificitiesFileName;
-      /*! \brief File describing the relationship between the Joints
-	and their rank in the robot's state vector */
-      std::string m_LinkJointRank;
-
-      std::string m_InitConfig;
+      /*! \brief full path to the URDF. */
+      std::string m_URDFPath;
+      /*! \brief full path of the SRDF. */
+      std::string m_SRDFPath;
 
       /*! @} */
     };

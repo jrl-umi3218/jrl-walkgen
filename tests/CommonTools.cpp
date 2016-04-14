@@ -114,37 +114,24 @@ namespace PatternGeneratorJRL {
 
     void getOptions(int argc,
 		    char *argv[],
-		    string &VRMLPath,
-		    string &VRMLFileName,
-		    string &SpecificitiesFileName,
-		    string &LinkJointRank,
-		    string &InitConfig,
-		    unsigned int &) // TestProfil)
+            string &urdfFullPath,
+            string &srdfFullPath,
+            unsigned int &) // TestProfil)
     {
       std::cout << "argc:" << argc << std::endl;
-      if (argc!=6)
+      if (argc!=3)
 	{
-	  cerr << " This program takes 5 arguments: " << endl;
-	  cerr << "./TestFootPrintPGInterface \
-                         PATH_TO_VRML_FILE \
-                         VRML_FILE_NAME \
-                         SPECIFICITIES_XML \
-                         LINK_JOINT_RANK \
-                         INITIAL_CONFIGURATION" << endl;
+      cerr << " This program takes 2 arguments: " << endl;
+      cerr << "./TestFootPrintPGInterface PATH_TO_URDF_FILE PATH_TO_SRDF_FILE"
+           << endl;
 	  exit(-1);
 	}
       else
 	{
-	  VRMLPath=argv[1];
-	  VRMLFileName=argv[2];
-	  SpecificitiesFileName = argv[3];
-	  LinkJointRank = argv[4];
-	  InitConfig = argv[5];
-      cout << VRMLPath << endl ;
-      cout << VRMLFileName << endl ;
-      cout << SpecificitiesFileName << endl ;
-      cout << LinkJointRank << endl ;
-      cout << InitConfig << endl ;
+      urdfFullPath=argv[1];
+      srdfFullPath=argv[2];
+      cout << urdfFullPath << endl ;
+      cout << srdfFullPath << endl ;
 	}
     }
   } /* End of TestSuite namespace */

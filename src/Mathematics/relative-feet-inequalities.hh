@@ -34,7 +34,7 @@
 
 #include <jrl/mal/matrixabstractlayer.hh>
 
-#include <RobotDynamics/PinocchioRobot.hh>
+#include <jrl/walkgen/pinocchiorobot.hh>
 
 
 #include <jrl/walkgen/pgtypes.hh>

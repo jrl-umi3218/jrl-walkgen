@@ -30,7 +30,7 @@
 #include <privatepgtypes.hh>
 #include <PreviewControl/SupportFSM.hh>
 #include <FootTrajectoryGeneration/OnLineFootTrajectoryGeneration.h>
-#include <RobotDynamics/PinocchioRobot.hh>
+#include <jrl/walkgen/pinocchiorobot.hh>
 
 namespace PatternGeneratorJRL
 {

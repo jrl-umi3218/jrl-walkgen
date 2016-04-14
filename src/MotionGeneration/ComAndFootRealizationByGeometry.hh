@@ -317,7 +317,7 @@ namespace PatternGeneratorJRL
      \param[out] associateShoulder: The shoulder extracted from
      the kinematic chain.
     */
-    void InitializeMapsForAHand(PRHand * aHand,
+    void InitializeMapsForAHand(se3::JointIndex aWrist,
                 se3::JointModelVector &  ActuatedJoints,
 				vector<int> & IndexesInConfiguration,
                 se3::JointIndex & associateShoulder);

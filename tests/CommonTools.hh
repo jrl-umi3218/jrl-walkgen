@@ -58,13 +58,11 @@ namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
-    void getOptions(int , char *[],
-		    std::string &VRMLPath,
-		    std::string &VRMLFileName,
-		    std::string &SpecificitiesFileName,
-		    std::string &LinkJointRank,
-		    std::string &InitConfig,
-		    unsigned int &TestProfil);
+    void getOptions(int argc,
+                    char *argv[],
+                    std::string &urdfFullPath,
+                    std::string &srdfFullPath,
+                    unsigned int &); // TestProfil)
 
     void CommonInitialization(PatternGeneratorJRL::PatternGeneratorInterface &aPGI);
 

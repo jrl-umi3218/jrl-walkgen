@@ -265,48 +265,34 @@ public:
     return ;
   }
 
-  void init()
+  bool init()
   {
-    // Instanciate and initialize.
-    string RobotFileName = m_VRMLPath + m_VRMLFileName;
+    if(!TestObject::init())
+      return false;
 
-    bool fileExist = false;
-    {
-      std::ifstream file (RobotFileName.c_str ());
-      fileExist = !file.fail ();
-    }
-    if (!fileExist)
-      throw std::string ("failed to open robot model");
-
-    CreateAndInitializeHumanoidRobot(RobotFileName,
-                                     m_SpecificitiesFileName,
-                                     m_LinkJointRank,
-                                     m_InitConfig,
-                                     m_HDR, m_DebugHDR, m_PGI);
-
-    // Specify the walking mode: here the default one.
-    istringstream strm2(":walkmode 0");
-    m_PGI->ParseCmd(strm2);
-
-    MAL_VECTOR_RESIZE(m_CurrentConfiguration, m_HDR->numberDof());
-    MAL_VECTOR_RESIZE(m_CurrentVelocity, m_HDR->numberDof());
-    MAL_VECTOR_RESIZE(m_CurrentAcceleration, m_HDR->numberDof());
-
-    MAL_VECTOR_RESIZE(m_PreviousConfiguration, m_HDR->numberDof());
-    MAL_VECTOR_RESIZE(m_PreviousVelocity, m_HDR->numberDof());
-    MAL_VECTOR_RESIZE(m_PreviousAcceleration, m_HDR->numberDof());
-
-    SPM = new SimplePluginManager();
-
-    ComAndFootRealization_ = new ComAndFootRealizationByGeometry( (PatternGeneratorInterfacePrivate*) SPM );
-    ComAndFootRealization_->setPinocchioRobot(m_HDR);
+    ComAndFootRealization_ = new ComAndFootRealizationByGeometry(
+          (PatternGeneratorInterfacePrivate*)m_PGI );
+    ComAndFootRealization_->setPinocchioRobot(m_PR);
     ComAndFootRealization_->SetStepStackHandler(new StepStackHandler(SPM));
     ComAndFootRealization_->SetHeightOfTheCoM(0.814);
     ComAndFootRealization_->setSamplingPeriod(0.005);
     ComAndFootRealization_->Initialization();
 
-    initIK();
+    MAL_VECTOR_DIM(waist,double,6);
+    for (int i = 0 ; i < 6 ; ++i )
+    {
+      waist(i) = 0;
+    }
+    MAL_S3_VECTOR(lStartingCOMState,double);
 
+    lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
+    lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
+    lStartingCOMState(2) = m_OneStep.finalCOMPosition.z[0] ;
+    ComAndFootRealization_->setSamplingPeriod(0.005);
+    ComAndFootRealization_->Initialization();
+    ComAndFootRealization_->InitializationCoM(m_HalfSitting,lStartingCOMState,
+                                              waist,
+                                              m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
     {
       istringstream strm2(":setfeetconstraint XY 0.09 0.04");
       m_PGI->ParseCmd(strm2);
@@ -317,29 +303,7 @@ protected:
 
   void initIK()
   {
-    MAL_VECTOR_DIM(BodyAngles,double,MAL_VECTOR_SIZE(InitialPosition));
-    MAL_VECTOR_DIM(waist,double,6);
-    for (int i = 0 ; i < 6 ; ++i )
-    {
-      waist(i) = 0;
-    }
-    for (unsigned int i = 0 ; i < (m_HDR->numberDof()-6) ; ++i )
-    {
-      BodyAngles(i) = InitialPosition(i);
-    }
-    MAL_S3_VECTOR(lStartingCOMState,double);
 
-    lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
-    lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
-    lStartingCOMState(2) = m_OneStep.finalCOMPosition.z[0] ;
-    ComAndFootRealization_->SetHeightOfTheCoM(0.814);
-    ComAndFootRealization_->setSamplingPeriod(0.005);
-    ComAndFootRealization_->Initialization();
-
-    ComAndFootRealization_->InitializationCoM(BodyAngles,lStartingCOMState,
-                                              waist,
-                                              m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
-    ComAndFootRealization_->Initialization();
   }
 
   void prepareDebugFiles()
@@ -929,8 +893,13 @@ int PerformTests(int argc, char *argv[])
 
   for (unsigned int i=0;i<NB_PROFILES;i++){
     TestNaveau2015 aTN2015(argc,argv,TestNames[i],TestProfiles[i]);
-    aTN2015.init();
-    try{
+    if(!aTN2015.init())
+    {
+      cout << "pb on init" << endl;
+      return -1;
+    }
+    try
+    {
       if (!aTN2015.doTest(std::cout)){
         cout << "Failed test " << i << endl;
         return -1;

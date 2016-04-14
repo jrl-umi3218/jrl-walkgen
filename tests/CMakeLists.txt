@@ -15,23 +15,6 @@
 
 INCLUDE(CTest)
 
-# Optional test dependencies.
-# We put them here to prevent them to be listed in the .pc file.
-#ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
-#ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
-
-IF(HRP2_DYNAMICS_FOUND)
-  MESSAGE(STATUS "hrp2-dynamics: found")
-ELSE(NOT HRP2_DYNAMICS_FOUND)
-  MESSAGE(STATUS "hrp2-dynamics: not found")
-ENDIF(HRP2_DYNAMICS_FOUND)
-
-SET(WITH_HRP2_DYNAMICS "" CACHE BOOL "Option to use HRP2-DYNAMICS robot in the PG" )
-SET(WITH_HRP2_DYNAMICS_BOOL 0)
-IF(WITH_HRP2_DYNAMICS)
- SET(WITH_HRP2_DYNAMICS_BOOL 1)
-ENDIF(WITH_HRP2_DYNAMICS)
-
 # Import jrl-mal flags.
 ADD_DEFINITIONS(${JRL_MAL_CFLAGS})
 LINK_DIRECTORIES(${JRL_DYNAMICS_LIBRARY_DIRS})
@@ -39,326 +22,326 @@ LINK_DIRECTORIES(${JRL_DYNAMICS_LIBRARY_DIRS})
 # Make sure private headers can be used.
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
 
-################
-# Generic test #
-################
-ADD_EXECUTABLE(TestFootPrintPGInterface
-  ../src/portability/gettimeofday.cc
-  TestFootPrintPGInterfaceData.cpp
-  CommonTools.cpp
-  TestFootPrintPGInterface.cpp
-  )
+#################
+## Generic test #
+#################
+#ADD_EXECUTABLE(TestFootPrintPGInterface
+#  ../src/portability/gettimeofday.cc
+#  TestFootPrintPGInterfaceData.cpp
+#  CommonTools.cpp
+#  TestFootPrintPGInterface.cpp
+#  )
 
-TARGET_LINK_LIBRARIES(TestFootPrintPGInterface ${PROJECT_NAME})
-#PKG_CONFIG_USE_DEPENDENCY(TestFootPrintPGInterface jrl-dynamics)
-ADD_DEPENDENCIES(TestFootPrintPGInterface ${PROJECT_NAME})
+#TARGET_LINK_LIBRARIES(TestFootPrintPGInterface ${PROJECT_NAME})
+##PKG_CONFIG_USE_DEPENDENCY(TestFootPrintPGInterface jrl-dynamics)
+#ADD_DEPENDENCIES(TestFootPrintPGInterface ${PROJECT_NAME})
 
-#########################
-# Test Optimal Cholesky #
-#########################
-ADD_EXECUTABLE(TestOptCholesky
-  TestOptCholesky.cpp
-  ../src/Mathematics/OptCholesky.cpp
-)
+##########################
+## Test Optimal Cholesky #
+##########################
+#ADD_EXECUTABLE(TestOptCholesky
+#  TestOptCholesky.cpp
+#  ../src/Mathematics/OptCholesky.cpp
+#)
 
-#########################
-# Test Bspline #
-#########################
-ADD_EXECUTABLE(TestBsplines
-  TestBsplines.cpp
-  ../src/Mathematics/Bsplines.cpp
-  )
+##########################
+## Test Bspline #
+##########################
+#ADD_EXECUTABLE(TestBsplines
+#  TestBsplines.cpp
+#  ../src/Mathematics/Bsplines.cpp
+#  )
 
-#########################
-# Test Ricatti Equation #
-#########################
-ADD_EXECUTABLE(TestRiccatiEquation
-  TestRiccatiEquation.cpp
-  ../src/PreviewControl/OptimalControllerSolver.cpp
-  )
+##########################
+## Test Ricatti Equation #
+##########################
+#ADD_EXECUTABLE(TestRiccatiEquation
+#  TestRiccatiEquation.cpp
+#  ../src/PreviewControl/OptimalControllerSolver.cpp
+#  )
 
-PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
+#PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
 
-######################
-# Test Morisawa 2007 #
-######################
-IF(HRP2_DYNAMICS_FOUND)
+#######################
+## Test Morisawa 2007 #
+#######################
+#IF(HRP2_DYNAMICS_FOUND)
 
-  IF(HRP2_14_FOUND)
+#  IF(HRP2_14_FOUND)
 
-    MATH(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
-#    CONFIG_FILES_CMAKE(TestMorisawa2007OnLine${BITS}TestFGPI.datref)
-    CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalk${BITS}TestFGPI.datref)
-#    CONFIG_FILES_CMAKE(TestMorisawa2007Climbing${BITS}TestFGPI.datref)
-#    CONFIG_FILES_CMAKE(TestMorisawa2007GoingDown${BITS}TestFGPI.datref)
-    CONFIG_FILES_CMAKE(TestMorisawa2007SteppingStones${BITS}TestFGPI.datref)
-#    CONFIG_FILES_CMAKE(TestMorisawa2007WalkingOnBeam${BITS}TestFGPI.datref)
-#    CONFIG_FILES_CMAKE(TestMorisawa2007GoThroughWall${BITS}TestFGPI.datref)
+#    MATH(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
+##    CONFIG_FILES_CMAKE(TestMorisawa2007OnLine${BITS}TestFGPI.datref)
+#    CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalk${BITS}TestFGPI.datref)
+##    CONFIG_FILES_CMAKE(TestMorisawa2007Climbing${BITS}TestFGPI.datref)
+##    CONFIG_FILES_CMAKE(TestMorisawa2007GoingDown${BITS}TestFGPI.datref)
+#    CONFIG_FILES_CMAKE(TestMorisawa2007SteppingStones${BITS}TestFGPI.datref)
+##    CONFIG_FILES_CMAKE(TestMorisawa2007WalkingOnBeam${BITS}TestFGPI.datref)
+##    CONFIG_FILES_CMAKE(TestMorisawa2007GoThroughWall${BITS}TestFGPI.datref)
 
-    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
+#    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
 
 
-    MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
-      SET(testmorisawa2007 "${test_morisawa_arg}${BITS}")
+#    MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
+#      SET(testmorisawa2007 "${test_morisawa_arg}${BITS}")
 
-      ADD_EXECUTABLE(${testmorisawa2007}
-      ../src/portability/gettimeofday.cc
-      TestMorisawa2007.cpp
-      CommonTools.cpp
-      TestObject.cpp
-      ClockCPUTime.cpp
-      )
-      TARGET_LINK_LIBRARIES(${testmorisawa2007} ${PROJECT_NAME})
-      #PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} jrl-dynamics)
-      PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} hrp2-dynamics)
+#      ADD_EXECUTABLE(${testmorisawa2007}
+#      ../src/portability/gettimeofday.cc
+#      TestMorisawa2007.cpp
+#      CommonTools.cpp
+#      TestObject.cpp
+#      ClockCPUTime.cpp
+#      )
+#      TARGET_LINK_LIBRARIES(${testmorisawa2007} ${PROJECT_NAME})
+#      #PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} jrl-dynamics)
+#      PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} hrp2-dynamics)
 
-      ADD_DEPENDENCIES(${testmorisawa2007} ${PROJECT_NAME})
-      MESSAGE(STATUS "hrp2-14 data dir: " ${HRP2_14_PKGDATAROOTDIR})
-      SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/)
-      SET(hrp2dynamicsspec
-        ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2SpecificitiesSmall.xml
-      )
-      SET(hrp2dynamicsljr
-        ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2LinkJointRankSmall.xml
-      )
-      SET(hrp2dynamicsinitconfig
-        ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2JRLInitConfigSmall.dat)
+#      ADD_DEPENDENCIES(${testmorisawa2007} ${PROJECT_NAME})
+#      MESSAGE(STATUS "hrp2-14 data dir: " ${HRP2_14_PKGDATAROOTDIR})
+#      SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/)
+#      SET(hrp2dynamicsspec
+#        ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2SpecificitiesSmall.xml
+#      )
+#      SET(hrp2dynamicsljr
+#        ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2LinkJointRankSmall.xml
+#      )
+#      SET(hrp2dynamicsinitconfig
+#        ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2JRLInitConfigSmall.dat)
 
-      LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
+#      LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
 
-      # FIXME : use pinochio inside the WPG to handle different robot models.
-      # remove HRP2-14 dependencies
-      ADD_TEST(${testmorisawa2007} ${testmorisawa2007}
-        ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec}
-        ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
+#      # FIXME : use pinochio inside the WPG to handle different robot models.
+#      # remove HRP2-14 dependencies
+#      ADD_TEST(${testmorisawa2007} ${testmorisawa2007}
+#        ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec}
+#        ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
 
-    ENDMACRO(ADD_MORISAWA_2007)
+#    ENDMACRO(ADD_MORISAWA_2007)
 
-    #disabled as it fail : fix the code
-    #ADD_MORISAWA_2007(TestMorisawa2007OnLine)
+#    #disabled as it fail : fix the code
+#    #ADD_MORISAWA_2007(TestMorisawa2007OnLine)
 
-    ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
-#    ADD_MORISAWA_2007(TestMorisawa2007Climbing)
-#    ADD_MORISAWA_2007(TestMorisawa2007GoingDown)
-    ADD_MORISAWA_2007(TestMorisawa2007SteppingStones)
-#    ADD_MORISAWA_2007(TestMorisawa2007WalkingOnBeam)
-#    ADD_MORISAWA_2007(TestMorisawa2007GoThroughWall)
+#    ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
+##    ADD_MORISAWA_2007(TestMorisawa2007Climbing)
+##    ADD_MORISAWA_2007(TestMorisawa2007GoingDown)
+#    ADD_MORISAWA_2007(TestMorisawa2007SteppingStones)
+##    ADD_MORISAWA_2007(TestMorisawa2007WalkingOnBeam)
+##    ADD_MORISAWA_2007(TestMorisawa2007GoThroughWall)
 
-  ENDIF(HRP2_14_FOUND)
-ENDIF(HRP2_DYNAMICS_FOUND)
-
-###################
-# Test Herdt 2010 #
-###################
-IF(HRP2_DYNAMICS_FOUND)
-
-  IF(HRP2_14_FOUND)
-
-CONFIG_FILES_CMAKE(TestHerdt2010OnLineTestFGPI.datref)
-CONFIG_FILES_CMAKE(TestHerdt2010EmergencyStopTestFGPI.datref)
-
-MACRO(ADD_HERDT_2010 test_herdt2010_arg)
-  ADD_EXECUTABLE(${test_herdt2010_arg}
-  ../src/portability/gettimeofday.cc
-  ${test_herdt2010_arg}.cpp
-  CommonTools.cpp
-  TestObject.cpp
-  ClockCPUTime.cpp
-  )
-
-  TARGET_LINK_LIBRARIES(${test_herdt2010_arg} ${PROJECT_NAME})
-  ADD_DEPENDENCIES(${test_herdt2010_arg} ${PROJECT_NAME})
-  #PKG_CONFIG_USE_DEPENDENCY(${test_herdt2010_arg} jrl-dynamics)
-  IF(HRP2_DYNAMICS_FOUND)
-    PKG_CONFIG_USE_DEPENDENCY(${test_herdt2010_arg} hrp2-dynamics)
-  ENDIF(HRP2_DYNAMICS_FOUND)
-
-  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/)
-  SET(hrp2dynamicsspec
-    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2SpecificitiesSmall.xml
-  )
-  SET(hrp2dynamicsljr
-    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2LinkJointRankSmall.xml
-  )
-  SET(hrp2dynamicsinitconfig
-    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2JRLInitConfigSmall.dat)
-
-  LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
-
-  ADD_TEST(${test_herdt2010_arg}
-    ${test_herdt2010_arg}
-    ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec}
-    ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
-ENDMACRO(ADD_HERDT_2010)
-
-ADD_HERDT_2010(TestHerdt2010)
-
-  ENDIF(HRP2_14_FOUND)
-ENDIF(HRP2_DYNAMICS_FOUND)
-###########################
-# Test Inverse Kinematics #
-###########################
-#SET(INVERSE_KINEMATICS)
-IF(INVERSE_KINEMATICS)
-
-CONFIG_FILES_CMAKE(TestHerdt2010OnLineTestFGPI.datref)
-
-ADD_EXECUTABLE(TestInverseKinematics
-    ../src/portability/gettimeofday.cc
-    TestInverseKinematics.cpp
-    CommonTools.cpp
-    TestObject.cpp
-    ClockCPUTime.cpp
-)
-
-TARGET_LINK_LIBRARIES(TestInverseKinematics ${PROJECT_NAME})
-#PKG_CONFIG_USE_DEPENDENCY(TestInverseKinematics jrl-dynamics)
-PKG_CONFIG_USE_DEPENDENCY(TestInverseKinematics hrp2-dynamics)
-ADD_DEPENDENCIES(TestInverseKinematics ${PROJECT_NAME})
-
-SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
-SET(samplespec
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
-)
-SET(sampleljr
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
-)
-SET(sampleinitconfig
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
-)
-
-LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
-
-# This test is disabled for now as it fails.
-# FIXME: fix the test and/or the implementation
-ADD_TEST(TestInverseKinematics
-TestInverseKinematics
-${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
-
-ENDIF(INVERSE_KINEMATICS)
-
-##############################
-# Test Kajita Dynamic Filter #
-##############################
-
-#SET(DYNAMIC_FILTER)
-IF(DYNAMIC_FILTER)
-
-ADD_EXECUTABLE(TestKajitaDynamicFilter
-    ../src/portability/gettimeofday.cc
-    TestKajitaDynamicFilter.cpp
-    CommonTools.cpp
-    TestObject.cpp
-    ClockCPUTime.cpp
-)
-
-TARGET_LINK_LIBRARIES(TestKajitaDynamicFilter ${PROJECT_NAME})
-#PKG_CONFIG_USE_DEPENDENCY(TestKajitaDynamicFilter jrl-dynamics)
-IF(HRP2_DYNAMICS_FOUND)
-  PKG_CONFIG_USE_DEPENDENCY(TestKajitaDynamicFilter hrp2-dynamics)
-ENDIF(HRP2_DYNAMICS_FOUND)
-
-ADD_DEPENDENCIES(TestKajitaDynamicFilter ${PROJECT_NAME})
-
-SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
-SET(samplespec
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
-)
-SET(sampleljr
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
-)
-SET(sampleinitconfig
-    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
-)
-
-LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
-
-# This test is disabled for now as it fails.
-# FIXME: fix the test and/or the implementation
-ADD_TEST(TestKajitaDynamicFilter
-TestKajitaDynamicFilter
-${hrp2dynamicsmodelpath} sample.wrl ${hrp2dynamicsspec} ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
-
-ENDIF(DYNAMIC_FILTER)
+#  ENDIF(HRP2_14_FOUND)
+#ENDIF(HRP2_DYNAMICS_FOUND)
 
 ####################
-# Test Kajita 2003 #
+## Test Herdt 2010 #
 ####################
-IF(HRP2_DYNAMICS_FOUND)
-  IF(HRP2_14_FOUND)
+#IF(HRP2_DYNAMICS_FOUND)
 
-  CONFIG_FILES_CMAKE(TestKajita2003StraightWalkingTestFGPI.datref)
-  CONFIG_FILES_CMAKE(TestKajita2003CircleTestFGPI.datref)
-  CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq1TestFGPI.datref)
-  CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq2TestFGPI.datref)
+#  IF(HRP2_14_FOUND)
 
-  ADD_EXECUTABLE(TestKajita2003
-    ../src/portability/gettimeofday.cc
-    TestKajita2003.cpp
-    CommonTools.cpp
-    TestObject.cpp
-    ClockCPUTime.cpp
-  )
+#CONFIG_FILES_CMAKE(TestHerdt2010OnLineTestFGPI.datref)
+#CONFIG_FILES_CMAKE(TestHerdt2010EmergencyStopTestFGPI.datref)
 
-  SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
-  SET(samplespec
-      ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
-  )
-  SET(sampleljr
-      ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
-  )
-  SET(sampleinitconfig
-      ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
-  )
+#MACRO(ADD_HERDT_2010 test_herdt2010_arg)
+#  ADD_EXECUTABLE(${test_herdt2010_arg}
+#  ../src/portability/gettimeofday.cc
+#  ${test_herdt2010_arg}.cpp
+#  CommonTools.cpp
+#  TestObject.cpp
+#  ClockCPUTime.cpp
+#  )
 
-  TARGET_LINK_LIBRARIES(TestKajita2003 ${PROJECT_NAME})
+#  TARGET_LINK_LIBRARIES(${test_herdt2010_arg} ${PROJECT_NAME})
+#  ADD_DEPENDENCIES(${test_herdt2010_arg} ${PROJECT_NAME})
+#  #PKG_CONFIG_USE_DEPENDENCY(${test_herdt2010_arg} jrl-dynamics)
+#  IF(HRP2_DYNAMICS_FOUND)
+#    PKG_CONFIG_USE_DEPENDENCY(${test_herdt2010_arg} hrp2-dynamics)
+#  ENDIF(HRP2_DYNAMICS_FOUND)
 
-  PKG_CONFIG_USE_DEPENDENCY(TestKajita2003 hrp2-dynamics)
+#  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/)
+#  SET(hrp2dynamicsspec
+#    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2SpecificitiesSmall.xml
+#  )
+#  SET(hrp2dynamicsljr
+#    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2LinkJointRankSmall.xml
+#  )
+#  SET(hrp2dynamicsinitconfig
+#    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2JRLInitConfigSmall.dat)
 
-  ADD_DEPENDENCIES(TestKajita2003 ${PROJECT_NAME})
+#  LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
 
-# This test is disabled for now as it fails.
-# FIXME: fix the test and/or the implementation
-  #ADD_TEST(TestKajita2003 TestKajita2003
-    #${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
-  ENDIF(HRP2_14_FOUND)
-ENDIF(HRP2_DYNAMICS_FOUND)
+#  ADD_TEST(${test_herdt2010_arg}
+#    ${test_herdt2010_arg}
+#    ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec}
+#    ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
+#ENDMACRO(ADD_HERDT_2010)
 
-#########################
-# Read Novela Data 2011 #
-#########################
+#ADD_HERDT_2010(TestHerdt2010)
 
-IF(HRP2_DYNAMICS_FOUND)
-  IF(HRP2_14_FOUND)
+#  ENDIF(HRP2_14_FOUND)
+#ENDIF(HRP2_DYNAMICS_FOUND)
+############################
+## Test Inverse Kinematics #
+############################
+##SET(INVERSE_KINEMATICS)
+#IF(INVERSE_KINEMATICS)
 
-  ADD_EXECUTABLE(ReadDataForNovela
-    ../src/portability/gettimeofday.cc
-    ReadDataForNovela.cpp
-    CommonTools.cpp
-    TestObject.cpp
-    ClockCPUTime.cpp
-  )
+#CONFIG_FILES_CMAKE(TestHerdt2010OnLineTestFGPI.datref)
 
-  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/)
-  SET(hrp2dynamicsspec
-    ${HRP2_14_PKGDATAROOTDIR}/HRP2SpecificitiesSmall.xml
-  )
-  SET(hrp2dynamicsljr
-    ${HRP2_14_PKGDATAROOTDIR}/HRP2LinkJointRankSmall.xml
-  )
-  SET(hrp2dynamicsinitconfig
-    ${HRP2_14_PKGDATAROOTDIR}/HRP2JRLInitConfigSmall.dat)
+#ADD_EXECUTABLE(TestInverseKinematics
+#    ../src/portability/gettimeofday.cc
+#    TestInverseKinematics.cpp
+#    CommonTools.cpp
+#    TestObject.cpp
+#    ClockCPUTime.cpp
+#)
 
-  TARGET_LINK_LIBRARIES(ReadDataForNovela ${PROJECT_NAME})
-  PKG_CONFIG_USE_DEPENDENCY(ReadDataForNovela hrp2-dynamics)
+#TARGET_LINK_LIBRARIES(TestInverseKinematics ${PROJECT_NAME})
+##PKG_CONFIG_USE_DEPENDENCY(TestInverseKinematics jrl-dynamics)
+#PKG_CONFIG_USE_DEPENDENCY(TestInverseKinematics hrp2-dynamics)
+#ADD_DEPENDENCIES(TestInverseKinematics ${PROJECT_NAME})
+
+#SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
+#SET(samplespec
+#    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
+#)
+#SET(sampleljr
+#    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
+#)
+#SET(sampleinitconfig
+#    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
+#)
+
+#LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
+
+## This test is disabled for now as it fails.
+## FIXME: fix the test and/or the implementation
+#ADD_TEST(TestInverseKinematics
+#TestInverseKinematics
+#${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+
+#ENDIF(INVERSE_KINEMATICS)
+
+###############################
+## Test Kajita Dynamic Filter #
+###############################
+
+##SET(DYNAMIC_FILTER)
+#IF(DYNAMIC_FILTER)
+
+#ADD_EXECUTABLE(TestKajitaDynamicFilter
+#    ../src/portability/gettimeofday.cc
+#    TestKajitaDynamicFilter.cpp
+#    CommonTools.cpp
+#    TestObject.cpp
+#    ClockCPUTime.cpp
+#)
+
+#TARGET_LINK_LIBRARIES(TestKajitaDynamicFilter ${PROJECT_NAME})
+##PKG_CONFIG_USE_DEPENDENCY(TestKajitaDynamicFilter jrl-dynamics)
+#IF(HRP2_DYNAMICS_FOUND)
+#  PKG_CONFIG_USE_DEPENDENCY(TestKajitaDynamicFilter hrp2-dynamics)
+#ENDIF(HRP2_DYNAMICS_FOUND)
+
+#ADD_DEPENDENCIES(TestKajitaDynamicFilter ${PROJECT_NAME})
+
+#SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
+#SET(samplespec
+#    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
+#)
+#SET(sampleljr
+#    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
+#)
+#SET(sampleinitconfig
+#    ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
+#)
+
+#LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
+
+## This test is disabled for now as it fails.
+## FIXME: fix the test and/or the implementation
+#ADD_TEST(TestKajitaDynamicFilter
+#TestKajitaDynamicFilter
+#${hrp2dynamicsmodelpath} sample.wrl ${hrp2dynamicsspec} ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
+
+#ENDIF(DYNAMIC_FILTER)
+
+#####################
+## Test Kajita 2003 #
+#####################
+#IF(HRP2_DYNAMICS_FOUND)
+#  IF(HRP2_14_FOUND)
+
+#  CONFIG_FILES_CMAKE(TestKajita2003StraightWalkingTestFGPI.datref)
+#  CONFIG_FILES_CMAKE(TestKajita2003CircleTestFGPI.datref)
+#  CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq1TestFGPI.datref)
+#  CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq2TestFGPI.datref)
+
+#  ADD_EXECUTABLE(TestKajita2003
+#    ../src/portability/gettimeofday.cc
+#    TestKajita2003.cpp
+#    CommonTools.cpp
+#    TestObject.cpp
+#    ClockCPUTime.cpp
+#  )
+
+#  SET(samplemodelpath ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
+#  SET(samplespec
+#      ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
+#  )
+#  SET(sampleljr
+#      ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
+#  )
+#  SET(sampleinitconfig
+#      ${JRL_DYNAMICS_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
+#  )
+
+#  TARGET_LINK_LIBRARIES(TestKajita2003 ${PROJECT_NAME})
+
+#  PKG_CONFIG_USE_DEPENDENCY(TestKajita2003 hrp2-dynamics)
+
+#  ADD_DEPENDENCIES(TestKajita2003 ${PROJECT_NAME})
+
+## This test is disabled for now as it fails.
+## FIXME: fix the test and/or the implementation
+#  #ADD_TEST(TestKajita2003 TestKajita2003
+#    #${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
+#  ENDIF(HRP2_14_FOUND)
+#ENDIF(HRP2_DYNAMICS_FOUND)
+
+##########################
+## Read Novela Data 2011 #
+##########################
+
+#IF(HRP2_DYNAMICS_FOUND)
+#  IF(HRP2_14_FOUND)
+
+#  ADD_EXECUTABLE(ReadDataForNovela
+#    ../src/portability/gettimeofday.cc
+#    ReadDataForNovela.cpp
+#    CommonTools.cpp
+#    TestObject.cpp
+#    ClockCPUTime.cpp
+#  )
+
+#  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/)
+#  SET(hrp2dynamicsspec
+#    ${HRP2_14_PKGDATAROOTDIR}/HRP2SpecificitiesSmall.xml
+#  )
+#  SET(hrp2dynamicsljr
+#    ${HRP2_14_PKGDATAROOTDIR}/HRP2LinkJointRankSmall.xml
+#  )
+#  SET(hrp2dynamicsinitconfig
+#    ${HRP2_14_PKGDATAROOTDIR}/HRP2JRLInitConfigSmall.dat)
+
+#  TARGET_LINK_LIBRARIES(ReadDataForNovela ${PROJECT_NAME})
+#  PKG_CONFIG_USE_DEPENDENCY(ReadDataForNovela hrp2-dynamics)
 
 
-  ADD_DEPENDENCIES(ReadDataForNovela ${PROJECT_NAME})
+#  ADD_DEPENDENCIES(ReadDataForNovela ${PROJECT_NAME})
 
-#  ADD_TEST(ReadDataForNovela
-#    ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec} ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
-  ENDIF(HRP2_14_FOUND)
-ENDIF(HRP2_DYNAMICS_FOUND)
+##  ADD_TEST(ReadDataForNovela
+##    ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec} ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
+#  ENDIF(HRP2_14_FOUND)
+#ENDIF(HRP2_DYNAMICS_FOUND)
 
 ################
 # NMPC test #
@@ -375,23 +358,17 @@ ENDIF(HRP2_DYNAMICS_FOUND)
     ClockCPUTime.cpp
   )
 
-  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/)
-  SET(hrp2dynamicsspec
-    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2SpecificitiesSmall.xml
+  SET(urdfpath
+    ${HRP2_14_PKGDATAROOTDIR}/hrp2_14_description/srdf/hrp2_14.urdf
   )
-  SET(hrp2dynamicsljr
-    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2LinkJointRankSmall.xml
+  SET(srdfpath
+    ${HRP2_14_PKGDATAROOTDIR}/hrp2_14_description/srdf/hrp2_14.srdf
   )
-  SET(hrp2dynamicsinitconfig
-    ${HRP2_14_PKGDATAROOTDIR}/hrp2-14/HRP2JRLInitConfigSmall.dat)
 
   TARGET_LINK_LIBRARIES(TestNaveau2015 ${PROJECT_NAME})
-  PKG_CONFIG_USE_DEPENDENCY(TestNaveau2015 hrp2-dynamics)
   ADD_DEPENDENCIES(TestNaveau2015 ${PROJECT_NAME})
 
-  ADD_TEST(TestNaveau2015 TestNaveau2015
-    ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec}
-    ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
+  ADD_TEST(TestNaveau2015 TestNaveau2015 ${urdfpath} ${srdfpath})
 
 #  ENDIF(HRP2_14_FOUND)
 #ENDIF(HRP2_DYNAMICS_FOUND)
