@@ -116,8 +116,8 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   m_waist = m_robotModel->getBodyId("BODY");
   m_leftFoot.associatedAnkle  = m_robotModel->getBodyId("l_ankle");
   m_rightFoot.associatedAnkle = m_robotModel->getBodyId("r_ankle");
-  m_leftWrist  = m_robotModel->getBodyId("l_ankle");
-  m_rightWrist = m_robotModel->getBodyId("r_ankle");
+  m_leftWrist  = m_robotModel->getBodyId("l_wrist");
+  m_rightWrist = m_robotModel->getBodyId("r_wrist");
   DetectAutomaticallyShoulders();
 
   // intialize the "initial pose" (q=[0]) data
@@ -125,6 +125,12 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   m_robotDataInInitialePose->v[0] = se3::Motion::Zero();
   m_robotDataInInitialePose->a[0] = -m_robotModel->gravity;
   m_q.resize(m_robotModel->nq,0.0);
+  Eigen::Quaterniond quat =
+      Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ()) *
+      Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY()) *
+      Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) ;
+//  std::cout << m_q << std::endl ;
+  m_q[3]= 1.0 ;
   m_v.resize(m_robotModel->nv,0.0);
   m_a.resize(m_robotModel->nv,0.0);
   se3::forwardKinematics(*m_robotModel,*m_robotDataInInitialePose,m_q);
@@ -173,20 +179,20 @@ void PinocchioRobot::computeForwardKinematics()
 void PinocchioRobot::computeForwardKinematics(MAL_VECTOR_TYPE(double) & q)
 {
   // euler to quaternion :
-  m_quat = Eigen::Quaternion<double>(
-        Eigen::AngleAxisd((double)q(3), Eigen::Vector3d::UnitX()) *
-        Eigen::AngleAxisd((double)q(4), Eigen::Vector3d::UnitX()) *
-        Eigen::AngleAxisd((double)q(5), Eigen::Vector3d::UnitX()) ) ;
+  m_quat = Eigen::Quaterniond(
+        Eigen::AngleAxisd(q(5), Eigen::Vector3d::UnitZ()) *
+        Eigen::AngleAxisd(q(4), Eigen::Vector3d::UnitY()) *
+        Eigen::AngleAxisd(q(3), Eigen::Vector3d::UnitX()) ) ;
 
   // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
   for(unsigned i=0; i<3 ; ++i)
   {
     m_q(i) = q(i);
   }
-  m_q(3) = m_quat.x() ;
-  m_q(4) = m_quat.y() ;
-  m_q(5) = m_quat.z() ;
-  m_q(6) = m_quat.w() ;
+  m_q(3) = m_quat.w() ;
+  m_q(4) = m_quat.x() ;
+  m_q(5) = m_quat.y() ;
+  m_q(6) = m_quat.z() ;
   for(unsigned i=0; i<m_robotModel->nv-6 ; ++i)
   {
     m_q(7+i) = q(6+i);
@@ -205,9 +211,9 @@ void PinocchioRobot::computeInverseDynamics(MAL_VECTOR_TYPE(double) & q,
 {
   // euler to quaternion :
   m_quat = Eigen::Quaternion<double>(
-        Eigen::AngleAxisd((double)q(3), Eigen::Vector3d::UnitX()) *
-        Eigen::AngleAxisd((double)q(4), Eigen::Vector3d::UnitX()) *
-        Eigen::AngleAxisd((double)q(5), Eigen::Vector3d::UnitX()) ) ;
+        Eigen::AngleAxisd((double)q(5), Eigen::Vector3d::UnitZ()) *
+        Eigen::AngleAxisd((double)q(4), Eigen::Vector3d::UnitY()) *
+        Eigen::AngleAxisd((double)q(3), Eigen::Vector3d::UnitX()) ) ;
 
   // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
   for(unsigned i=0; i<3 ; ++i)
