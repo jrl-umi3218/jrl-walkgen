@@ -174,31 +174,31 @@ namespace PatternGeneratorJRL
 
     /// Attributes
     /// //////////
-    private :
-      se3::Model * m_robotModel ;
-      se3::Data * m_robotDataInInitialePose ; // internal variable
-      se3::Data * m_robotData ;
-      PRFoot m_leftFoot , m_rightFoot ;
-      double m_mass ;
-      se3::JointIndex m_chest, m_waist, m_leftShoulder, m_rightShoulder ;
-      se3::JointIndex m_leftWrist , m_rightWrist ;
+  private :
+    se3::Model * m_robotModel ;
+    se3::Data * m_robotDataInInitialePose ; // internal variable
+    se3::Data * m_robotData ;
+    PRFoot m_leftFoot , m_rightFoot ;
+    double m_mass ;
+    se3::JointIndex m_chest, m_waist, m_leftShoulder, m_rightShoulder ;
+    se3::JointIndex m_leftWrist , m_rightWrist ;
 
-      MAL_VECTOR_TYPE(double) m_qmal ;
-      MAL_VECTOR_TYPE(double) m_vmal ;
-      MAL_VECTOR_TYPE(double) m_amal ;
-      Eigen::VectorXd m_q ;
-      Eigen::VectorXd m_v ;
-      Eigen::VectorXd m_a ;
+    MAL_VECTOR_TYPE(double) m_qmal ;
+    MAL_VECTOR_TYPE(double) m_vmal ;
+    MAL_VECTOR_TYPE(double) m_amal ;
+    Eigen::VectorXd m_q ;
+    Eigen::VectorXd m_v ;
+    Eigen::VectorXd m_a ;
 
-      // tmp variables
-      Eigen::Quaterniond m_quat ;
-      Eigen::Vector3d m_f,m_n; // external forces and torques
-      Eigen::Vector3d m_com; // multibody CoM
+    // tmp variables
+    Eigen::Quaterniond m_quat ;
+    Eigen::Vector3d m_f,m_n; // external forces and torques
+    Eigen::Vector3d m_com; // multibody CoM
 
-      bool m_boolModel     ;
-      bool m_boolData      ;
-      bool m_boolLeftFoot  ;
-      bool m_boolRightFoot ;
+    bool m_boolModel     ;
+    bool m_boolData      ;
+    bool m_boolLeftFoot  ;
+    bool m_boolRightFoot ;
 
   }; //PinocchioRobot
 }// namespace PatternGeneratorJRL
