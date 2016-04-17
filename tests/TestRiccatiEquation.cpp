@@ -110,7 +110,7 @@ int main()
 
   anOCS->GetF(lF);
 
-  aof.open("WeightsOutput.dat",ofstream::out);
+  aof.open("WeightsOutputWithoutInitialPose.dat",ofstream::out);
 
   for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lF);li++)
     {
@@ -155,7 +155,7 @@ int main()
 
   anOCS->GetF(lF);
 
-  aof.open("WeightsOutput2.dat",ofstream::out);
+  aof.open("WeightsOutputWithInitialPose.dat",ofstream::out);
 
   for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lF);li++)
     {
