@@ -55,12 +55,12 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
 ##########################
 ## Test Ricatti Equation #
 ##########################
-#ADD_EXECUTABLE(TestRiccatiEquation
-#  TestRiccatiEquation.cpp
-#  ../src/PreviewControl/OptimalControllerSolver.cpp
-#  )
+ADD_EXECUTABLE(TestRiccatiEquation
+  TestRiccatiEquation.cpp
+  ../src/PreviewControl/OptimalControllerSolver.cpp
+  )
 
-#PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
+PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
 
 #######################
 ## Test Morisawa 2007 #
