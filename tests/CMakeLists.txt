@@ -55,12 +55,16 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
 ##########################
 ## Test Ricatti Equation #
 ##########################
+CONFIG_FILES_CMAKE(TestRiccatiEquationWeightsWithoutInitialPose.datref)
+CONFIG_FILES_CMAKE(TestRiccatiEquationWeightsWithInitialPose.datref)
 ADD_EXECUTABLE(TestRiccatiEquation
   TestRiccatiEquation.cpp
   ../src/PreviewControl/OptimalControllerSolver.cpp
   )
-
+# Need this dependency for the use of the fortran functions (it seems)
 PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
+# Add test on the ricatti equation
+ADD_TEST(TestRiccatiEquation TestRiccatiEquation)
 
 #######################
 ## Test Morisawa 2007 #
