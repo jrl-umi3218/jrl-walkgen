@@ -10,10 +10,23 @@ PinocchioRobot::PinocchioRobot()
   m_robotData = 0 ;
   m_robotDataInInitialePose = 0 ;
 
+  // init quaternion as unit zero rotation
+  m_quat = Eigen::Quaterniond(
+        Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ()) *
+        Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY()) *
+        Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) ) ;
+
   // resize by default
-  m_q.resize(50,0.0);
-  m_v.resize(50,0.0);
-  m_a.resize(50,0.0);
+  m_q.resize(50,1);
+  m_q(3)=m_quat.x();
+  m_q(4)=m_quat.y();
+  m_q(5)=m_quat.z();
+  m_q(6)=m_quat.w();
+  m_v.resize(50,1);
+  m_a.resize(50,1);
+  m_q.fill(0.0);
+  m_v.fill(0.0);
+  m_a.fill(0.0);
   MAL_VECTOR_RESIZE(m_qmal,50);
   MAL_VECTOR_RESIZE(m_vmal,50);
   MAL_VECTOR_RESIZE(m_amal,50);
@@ -21,13 +34,9 @@ PinocchioRobot::PinocchioRobot()
   MAL_VECTOR_FILL(m_vmal,0.0);
   MAL_VECTOR_FILL(m_amal,0.0);
 
-  m_quat = Eigen::Quaterniond(
-        Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) *
-        Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) *
-        Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) ) ;
-  m_f = Eigen::Vector3d::Zero();
-  m_n = Eigen::Vector3d::Zero();
-  m_com = Eigen::Vector3d::Zero();
+  m_f.fill(0.0);
+  m_n.fill(0.0);
+  m_com.fill(0.0);
 
   m_boolModel     = false ;
   m_boolData      = false ;
@@ -124,20 +133,23 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   m_robotDataInInitialePose = new se3::Data(*m_robotModel);
   m_robotDataInInitialePose->v[0] = se3::Motion::Zero();
   m_robotDataInInitialePose->a[0] = -m_robotModel->gravity;
-  m_q.resize(m_robotModel->nq,0.0);
-  Eigen::Quaterniond quat =
-      Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ()) *
-      Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY()) *
-      Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) ;
-//  std::cout << m_q << std::endl ;
-  m_q[3]= 1.0 ;
-  m_v.resize(m_robotModel->nv,0.0);
-  m_a.resize(m_robotModel->nv,0.0);
+  m_q.resize(m_robotModel->nq,1);
+  m_q.fill(0.0);
+  m_q[6]= 1.0 ;
+  m_v.resize(m_robotModel->nv,1);
+  m_a.resize(m_robotModel->nv,1);
   se3::forwardKinematics(*m_robotModel,*m_robotDataInInitialePose,m_q);
+
+  MAL_VECTOR_RESIZE(m_qmal,m_robotModel->nv);
+  MAL_VECTOR_RESIZE(m_vmal,m_robotModel->nv);
+  MAL_VECTOR_RESIZE(m_amal,m_robotModel->nv);
+  MAL_VECTOR_FILL(m_qmal,0.0);
+  MAL_VECTOR_FILL(m_vmal,0.0);
+  MAL_VECTOR_FILL(m_amal,0.0);
 
   // compute the global mass of the robot
   m_mass=0.0;
-  for(unsigned i=0; m_robotModel->inertias.size() ; ++i)
+  for(unsigned i=0; i<m_robotModel->inertias.size() ; ++i)
   {
     m_mass += m_robotModel->inertias[i].mass();
   }
@@ -189,10 +201,10 @@ void PinocchioRobot::computeForwardKinematics(MAL_VECTOR_TYPE(double) & q)
   {
     m_q(i) = q(i);
   }
-  m_q(3) = m_quat.w() ;
-  m_q(4) = m_quat.x() ;
-  m_q(5) = m_quat.y() ;
-  m_q(6) = m_quat.z() ;
+  m_q(3) = m_quat.x() ;
+  m_q(4) = m_quat.y() ;
+  m_q(5) = m_quat.z() ;
+  m_q(6) = m_quat.w() ;
   for(unsigned i=0; i<m_robotModel->nv-6 ; ++i)
   {
     m_q(7+i) = q(6+i);
