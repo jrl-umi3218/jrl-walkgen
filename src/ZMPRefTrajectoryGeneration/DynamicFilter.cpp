@@ -103,9 +103,9 @@ void DynamicFilter::init(
   PC_->SetHeightOfCoM(CoMHeight_);
   PC_->ComputeOptimalWeights(MODE_PC_);
 
-  ZMPMB_vec_.resize( (int)round( previewWindowSize / interpolationPeriod_ ), vector<double>(2,0.0));
+  ZMPMB_vec_.resize( (int)round( previewWindowSize / interpolationPeriod_ ));
   int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
-  zmpmb_i_.resize( (ZMPMB_vec_.size()-1)*inc +1 , vector<double>(2,0.0));
+  zmpmb_i_.resize( (ZMPMB_vec_.size()-1)*inc +1);
   deltaZMP_deq_.resize( (int)round( previewWindowSize_ / controlPeriod_ ));
 
   MAL_VECTOR_RESIZE(aCoMState_,6);
@@ -213,15 +213,17 @@ int DynamicFilter::OnLinefilter(
                  i);
   }
   int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
-  ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px  ;
-  ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py  ;
   ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px;
   ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py;
+  ZMPMB_vec_[0][2]=0.0;
+  ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px;
+  ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py;
+  ZMPMB_vec_[0][2]=0.0;
 
   unsigned int N1 = (ZMPMB_vec_.size()-1)*inc +1 ;
   if(false)
   {
-    zmpmb_i_.resize( N1 , vector<double>(2) ) ;
+    zmpmb_i_.resize( N1 ) ;
     for(unsigned int i = 0 ; i < N ; ++i)
       zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
 
@@ -240,12 +242,13 @@ int DynamicFilter::OnLinefilter(
         double t = tA+j ;
         zmpmb_i_[(i*inc)+j][0] = xA + (t-tA)*(xB-xA)/(tB-tA) ;
         zmpmb_i_[(i*inc)+j][1] = yA + (t-tA)*(yB-yA)/(tB-tA) ;
+        zmpmb_i_[(i*inc)+j][2] = 0.0 ;
       }
     }
   }
   else
   {
-    zmpmb_i_.resize( N1 , vector<double>(2,0.0) ) ;
+    zmpmb_i_.resize( N1 ) ;
     for(unsigned int i = 0 ; i < N ; ++i)
       zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
 
@@ -270,6 +273,7 @@ int DynamicFilter::OnLinefilter(
       {
         zmpmb_i_[(i*inc)+j][0] = polyX.Compute(j) ;
         zmpmb_i_[(i*inc)+j][1] = polyY.Compute(j) ;
+        zmpmb_i_[(i*inc)+j][2] = 0.0 ;
       }
     }
   }
@@ -289,10 +293,10 @@ int DynamicFilter::zmpmb(
           MAL_VECTOR_TYPE(double)& configuration,
           MAL_VECTOR_TYPE(double)& velocity,
           MAL_VECTOR_TYPE(double)& acceleration,
-          vector<double> & zmpmb)
+          MAL_S3_VECTOR_TYPE(double) & zmpmb)
 {
   InverseDynamics(configuration,velocity,acceleration);
-  ExtractZMP(zmpmb);
+  PR_->zeroMomentumPoint(zmpmb);
   return 0 ;
 }
 
@@ -368,30 +372,11 @@ void DynamicFilter::InverseDynamics(
     MAL_VECTOR_TYPE(double)& acceleration
     )
 {
-//  // compute the 6D force applied at the CoM
-//  for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(configuration) ; ++i)
-//    {
-//      q_(i,0)   = configuration(i);
-//      dq_(i,0)  = velocity(i);
-//      ddq_(i,0) = acceleration(i);
-//    }
-//  metapod::rnea< Robot_Model, true >::run(hrp2_14_, q_, dq_, ddq_);
-
+  // compute the 6D force applied at the CoM
+  PR_->computeInverseDynamics(configuration,
+                              velocity,
+                              acceleration);
   return ;
-}
-
-void DynamicFilter::ExtractZMP(vector<double> & zmpmb)
-{
-//  zmpmb.resize(3,0.0);
-//  // extract the CoM momentum and forces
-//  RootNode & node_waist = boost::fusion::at_c< Robot_Model::BODY >(hrp2_14_.nodes);
-//  com_tensor_ = node_waist.body.iX0.applyInv(node_waist.joint.f);
-
-//  // compute the Multibody ZMP
-//  zmpmb[0] = - com_tensor_.n()[1] / com_tensor_.f()[2] ;
-//  zmpmb[1] =   com_tensor_.n()[0] / com_tensor_.f()[2] ;
-//  zmpmb[2] = 0.0;
-//  return ;
 }
 
 void DynamicFilter::stage0INstage1()
@@ -401,12 +386,11 @@ void DynamicFilter::stage0INstage1()
   return ;
 }
 
-void DynamicFilter::ComputeZMPMB(
-    double samplingPeriod,
+void DynamicFilter::ComputeZMPMB(double samplingPeriod,
     const COMState & inputCoMState,
     const FootAbsolutePosition & inputLeftFoot,
     const FootAbsolutePosition & inputRightFoot,
-    vector<double> & ZMPMB,
+    MAL_S3_VECTOR_TYPE(double) &ZMPMB,
     unsigned int stage,
     unsigned int iteration)
 {
@@ -416,7 +400,7 @@ void DynamicFilter::ComputeZMPMB(
 
   InverseDynamics(ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_);
 
-  ExtractZMP(ZMPMB);
+  PR_->zeroMomentumPoint(ZMPMB);
 
   return ;
 }
@@ -662,7 +646,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   vector < MAL_VECTOR_TYPE(double) > conf ;
   vector < MAL_VECTOR_TYPE(double) > vel ;
   vector < MAL_VECTOR_TYPE(double) > acc ;
-  vector< vector<double> > zmpmb_corr (Nctrl,vector<double>(2,0.0));
+  vector< MAL_S3_VECTOR_TYPE(double) > zmpmb_corr (Nctrl);
   for(int i = 0 ; i < Nctrl ; ++i)
   {
       InverseKinematics( CoM_tmp[i], ctrlLeftFoot[i], ctrlRightFoot[i],
@@ -675,7 +659,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
       vel.push_back(ZMPMBVelocity_);
       acc.push_back(ZMPMBAcceleration_);
 
-      ExtractZMP(zmpmb_corr[i]);
+      PR_->zeroMomentumPoint(zmpmb_corr[i]);
   }
 
   int inc = (int)round(interpolationPeriod_/controlPeriod_) ;

@@ -87,7 +87,7 @@ namespace PatternGeneratorJRL
         const COMState & inputCoMState,
         const FootAbsolutePosition & inputLeftFoot,
         const FootAbsolutePosition & inputRightFoot,
-        vector<double> & ZMPMB,
+        MAL_S3_VECTOR_TYPE(double) & ZMPMB,
         unsigned int stage,
         unsigned int iteration);
 
@@ -101,7 +101,7 @@ namespace PatternGeneratorJRL
     int zmpmb(MAL_VECTOR_TYPE(double)& configuration,
               MAL_VECTOR_TYPE(double)& velocity,
               MAL_VECTOR_TYPE(double)& acceleration,
-              vector<double> & zmpmb);
+              MAL_S3_VECTOR_TYPE(double) & zmpmb);
 
   private: // Private methods
 
@@ -110,8 +110,6 @@ namespace PatternGeneratorJRL
     void InverseDynamics(MAL_VECTOR_TYPE(double)& configuration,
                          MAL_VECTOR_TYPE(double)& velocity,
                          MAL_VECTOR_TYPE(double)& acceleration);
-
-    void ExtractZMP(vector<double> & zmpmb) ;
 
     void computeWaist(const FootAbsolutePosition & inputLeftFoot) ;
 
@@ -145,7 +143,7 @@ namespace PatternGeneratorJRL
     inline Clock * getClock()
     { return &clock_ ; }
 
-    inline deque< vector<double> > zmpmb()
+    inline deque< MAL_S3_VECTOR_TYPE(double) > zmpmb()
     { return ZMPMB_vec_ ; }
 
   private: // Private members
@@ -203,9 +201,9 @@ namespace PatternGeneratorJRL
       /// from the inverse Dynamics, and the difference between
       /// this zmp and the reference one.
       /// sampled at interpolation sampling period
-      deque< vector<double> > ZMPMB_vec_ ;
+      deque< MAL_S3_VECTOR_TYPE(double) > ZMPMB_vec_ ;
       /// sampled at control sampling period
-      deque< vector<double> > zmpmb_i_ ;
+      deque< MAL_S3_VECTOR_TYPE(double) > zmpmb_i_ ;
       /// sampled at control sampling period
       std::deque<ZMPPosition> deltaZMP_deq_ ;
 
