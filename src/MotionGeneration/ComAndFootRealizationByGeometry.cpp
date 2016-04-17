@@ -123,7 +123,8 @@ InitializationMaps(std::vector<se3::Index> &FromRootToJoint,
     // Here we assume that they are in a decending order.
     for(unsigned int i=0;i<FromRootToJoint.size();i++)
     {
-      IndexinConfiguration[lindex] = se3::idx_q(actuatedJoints[FromRootToJoint[i]]);
+      // -1 because pinocchio uses quaternion instead of roll pitch yaw
+      IndexinConfiguration[lindex] = se3::idx_q(actuatedJoints[FromRootToJoint[i]])-1 ;
       lindex++;
     }
   }
@@ -245,10 +246,13 @@ void ComAndFootRealizationByGeometry::
   ODEBUG4("Size of ActuatedJoints"<<ActuatedJoints.size(),
           "DebugDataStartingCOM.dat");
 
-  m_GlobalVRMLIDtoConfiguration.resize(ActuatedJoints.size());
-  for(unsigned int j=0;j<ActuatedJoints.size();j++)
+  // here we assume all revolute joint
+  // -2 : because pinocchio assume a non actuated "universe joint"
+  // and a non actuated base joint
+  m_GlobalVRMLIDtoConfiguration.resize(ActuatedJoints.size()-2);
+  for(unsigned int i=0; i<m_GlobalVRMLIDtoConfiguration.size(); ++i)
   {
-    m_GlobalVRMLIDtoConfiguration[j] = se3::idx_q(ActuatedJoints[j]);
+    m_GlobalVRMLIDtoConfiguration[i] = se3::idx_q(ActuatedJoints[i+2]);
   }
 
   // Build right and left leg map.
@@ -340,9 +344,9 @@ bool ComAndFootRealizationByGeometry::
   }
 
   // Initialize the configuration vector.
-  for(unsigned int i=0;i<m_GlobalVRMLIDtoConfiguration.size();i++)
+  for(unsigned int i=0; i<MAL_VECTOR_SIZE(BodyAnglesIni); ++i)
   {
-    CurrentConfig[m_GlobalVRMLIDtoConfiguration[i]] = BodyAnglesIni[i];
+    CurrentConfig[i+6] = BodyAnglesIni[i];
   }
 
   PinocchioRobot *aPR =  getPinocchioRobot();
@@ -419,7 +423,7 @@ bool ComAndFootRealizationByGeometry::
                       FootAbsolutePosition & InitLeftFootPosition,
                       FootAbsolutePosition & InitRightFootPosition)
 {
-
+  cout << BodyAnglesIni << endl;
   /* Initialize properly the left and right initial positions of the feet. */
   memset((char *)&InitLeftFootPosition,0,sizeof(FootAbsolutePosition));
   memset((char *)&InitRightFootPosition,0,sizeof(FootAbsolutePosition));
