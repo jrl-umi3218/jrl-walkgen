@@ -148,6 +148,7 @@ public:
       istringstream strm2(":setfeetconstraint XY 0.09 0.04");
       m_PGI->ParseCmd(strm2);
     }
+    return true ;
   }
 
 protected:

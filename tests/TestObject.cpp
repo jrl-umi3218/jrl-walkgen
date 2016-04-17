@@ -80,8 +80,6 @@ namespace PatternGeneratorJRL
       m_DebugPR = 0 ;
       m_DebugRobotData = 0 ;
       m_PGI = 0 ;
-
-      memset(&m_OneStep,0,sizeof(m_OneStep));
     }
 
     bool TestObject::checkFiles()
@@ -151,12 +149,12 @@ namespace PatternGeneratorJRL
       // This is a vector corresponding to ALL the DOFS of the robot:
       // free flyer + actuated DOFS.
       unsigned lNbDofs = m_PR->numberDof();
-      MAL_VECTOR_DIM(m_CurrentConfiguration,double,lNbDofs);
-      MAL_VECTOR_DIM(m_CurrentVelocity,double,lNbDofs);
-      MAL_VECTOR_DIM(m_CurrentAcceleration,double,lNbDofs);
-      MAL_VECTOR_DIM(m_PreviousConfiguration,double,lNbDofs) ;
-      MAL_VECTOR_DIM(m_PrsrtingeviousVelocity,double,lNbDofs);
-      MAL_VECTOR_DIM(m_PreviousAcceleration,double,lNbDofs);
+      MAL_VECTOR_RESIZE(m_CurrentConfiguration ,lNbDofs);
+      MAL_VECTOR_RESIZE(m_CurrentVelocity      ,lNbDofs);
+      MAL_VECTOR_RESIZE(m_CurrentAcceleration  ,lNbDofs);
+      MAL_VECTOR_RESIZE(m_PreviousConfiguration,lNbDofs);
+      MAL_VECTOR_RESIZE(m_PreviousVelocity     ,lNbDofs);
+      MAL_VECTOR_RESIZE(m_PreviousAcceleration ,lNbDofs);
       for(int i=0;i<6;i++)
       {
         m_PreviousConfiguration[i] = 0.0 ;
@@ -166,7 +164,7 @@ namespace PatternGeneratorJRL
 
       for(unsigned int i=6;i<lNbDofs;i++)
       {
-        m_PreviousConfiguration[i] = m_HalfSitting[i];
+        m_PreviousConfiguration[i] = m_HalfSitting[i-6];
         m_PreviousVelocity[i] = 0.0 ;
         m_PreviousAcceleration[i] = 0.0;
       }
@@ -250,18 +248,21 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_RESIZE(m_HalfSitting,aPR.numberDof()-6);
       MAL_VECTOR_FILL(m_HalfSitting,0.0);
       se3::Model * aModel = aPR.Model();
-      BOOST_FOREACH(const ptree::value_type & v, pt.get_child("robot"))
+      BOOST_FOREACH(const ptree::value_type & v, pt.get_child("robot.group_state"))
       {
-        if (v.first == "group_state")
+        if(v.first=="joint")
         {
           const std::string jointName =
               v.second.get<std::string>("<xmlattr>.name");
           const double jointValue =
               v.second.get<double>("<xmlattr>.value");
-          se3::JointIndex id = aModel->getJointId(jointName);
-          unsigned idq = se3::idx_q(aModel->joints[id]);
-          // we assume only revolute joint here.
-          m_HalfSitting(idq-6) = jointValue ;
+          if(aModel->existJointName(jointName))
+          {
+            se3::JointIndex id = aModel->getJointId(jointName);
+            unsigned idq = se3::idx_q(aModel->joints[id]);
+            // we assume only revolute joint here.
+            m_HalfSitting(idq-7) = jointValue ;
+          }
         }
       } // BOOST_FOREACH
       bool DebugConfiguration = true;
@@ -285,26 +286,38 @@ namespace PatternGeneratorJRL
 
       // Initialize the Right Foot
       PRFoot aFoot ;
-      string path = "robot.Specificities.Feet.Right.AnklePosition." ;
-      aFoot.anklePosition(0) = pt.get(path+string("x"),0);
-      aFoot.anklePosition(1) = pt.get(path+string("y"),0);
-      aFoot.anklePosition(2) = pt.get(path+string("y"),0);
-      path = "robot.Specificities.Feet.Right.Size." ;
-      aFoot.soleDepth = pt.get(path+string("depth"),0);
-      aFoot.soleHeight = pt.get(path+string("height"),0);
-      aFoot.soleWidth = pt.get(path+string("width"),0);
+      string path = "robot.specificities.feet.right.size" ;
+      BOOST_FOREACH(const ptree::value_type & v, pt.get_child(path.c_str()))
+      {
+        aFoot.soleHeight = v.second.get<double>("height");
+        aFoot.soleWidth  = v.second.get<double>("width");
+        aFoot.soleDepth  = v.second.get<double>("depth");
+      }
+      path = "robot.specificities.feet.right.anklePosition" ;
+      BOOST_FOREACH(const ptree::value_type & v, pt.get_child(path.c_str()))
+      {
+        aFoot.anklePosition(0) = v.second.get<double>("x");
+        aFoot.anklePosition(1) = v.second.get<double>("y");
+        aFoot.anklePosition(2) = v.second.get<double>("z");
+      }
       aFoot.associatedAnkle = aModel->getBodyId("r_ankle");
       aPR.initializeRightFoot(aFoot);
 
       // Initialize the Left Foot
-      path = "robot.Specificities.Feet.Left.AnklePosition." ;
-      aFoot.anklePosition(0) = pt.get(path+string("x"),0);
-      aFoot.anklePosition(1) = pt.get(path+string("y"),0);
-      aFoot.anklePosition(2) = pt.get(path+string("y"),0);
-      path = "robot.Specificities.Feet.Left.Size." ;
-      aFoot.soleDepth = pt.get(path+string("depth"),0);
-      aFoot.soleHeight = pt.get(path+string("height"),0);
-      aFoot.soleWidth = pt.get(path+string("width"),0);
+      path = "robot.specificities.feet.left.size" ;
+      BOOST_FOREACH(const ptree::value_type & v, pt.get_child(path.c_str()))
+      {
+        aFoot.soleHeight = v.second.get<double>("height");
+        aFoot.soleWidth  = v.second.get<double>("width");
+        aFoot.soleDepth  = v.second.get<double>("depth");
+      }
+      path = "robot.specificities.feet.left.anklePosition" ;
+      BOOST_FOREACH(const ptree::value_type & v, pt.get_child(path.c_str()))
+      {
+        aFoot.anklePosition(0) = v.second.get<double>("x");
+        aFoot.anklePosition(1) = v.second.get<double>("y");
+        aFoot.anklePosition(2) = v.second.get<double>("z");
+      }
       aFoot.associatedAnkle = aModel->getBodyId("l_ankle");
       aPR.initializeLeftFoot(aFoot);
     }

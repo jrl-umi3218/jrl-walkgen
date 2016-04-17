@@ -43,6 +43,7 @@
 #include "ClockCPUTime.hh"
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
+#include <jrl/walkgen/pinocchiorobot.hh>
 
 namespace PatternGeneratorJRL
 {
