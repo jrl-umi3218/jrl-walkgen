@@ -29,7 +29,7 @@
 #include <cmath>
 #include <Debug.hh>
 
-//#define DEBUG
+#define DEBUG
 //#define DEBUG_COUT
 
 #ifdef DEBUG
@@ -1311,16 +1311,16 @@ void NMPCgenerator::updateObstacleConstraint()
                         *(obstacles_[obs].r+obstacles_[obs].margin) ;
       MAL_VECTOR_FILL(UBobs_[obs],1e+8);
     }
-#ifdef DEBUG
+#ifdef DEBUG_COUT
     cout << "prepare the obstacle : " << obstacles_[obs] << endl ;
 #endif
   }
 #ifdef DEBUG
-  DumpMatrix("Hobs_0" ,Hobs_ [0][0]);
-  DumpVector("Aobs_0" ,Aobs_ [0][0]);
-  DumpMatrix("Hobs_1" ,Hobs_ [0][1]);
-  DumpVector("Aobs_1" ,Aobs_ [0][1]);
-  DumpVector("LBobs_",LBobs_[0]);
+//  DumpMatrix("Hobs_0" ,Hobs_ [0][0]);
+//  DumpVector("Aobs_0" ,Aobs_ [0][0]);
+//  DumpMatrix("Hobs_1" ,Hobs_ [0][1]);
+//  DumpVector("Aobs_1" ,Aobs_ [0][1]);
+//  DumpVector("LBobs_",LBobs_[0]);
 #endif
 
   return ;
@@ -1500,7 +1500,7 @@ void NMPCgenerator::updateCostFunction()
   // p_xy_Y  =   0.5 * a * Pvu^T   * ( Pvs * c_k_y - dY^ref )
   //           + 0.5 * b * Pzu^T   * ( Pzs * c_k_y - v_kp1 * f_k_y )
   // p_xy_Fy = - 0.5 * b * V_kp1^T * ( Pzs * c_k_y - v_kp1 * f_k_y )
-#ifdef DEBUG
+#ifdef DEBUG_COUT
   cout << vel_ref_.Global.X << " "
        << vel_ref_.Global.Y << endl;
 #endif

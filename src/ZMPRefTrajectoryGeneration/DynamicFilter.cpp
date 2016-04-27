@@ -216,9 +216,9 @@ int DynamicFilter::OnLinefilter(
   ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px;
   ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py;
   ZMPMB_vec_[0][2]=0.0;
-  ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px;
-  ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py;
-  ZMPMB_vec_[0][2]=0.0;
+  ZMPMB_vec_[1][0]=inputZMPTraj_deq_[1].px;
+  ZMPMB_vec_[1][1]=inputZMPTraj_deq_[1].py;
+  ZMPMB_vec_[1][2]=0.0;
 
   unsigned int N1 = (ZMPMB_vec_.size()-1)*inc +1 ;
   if(false)
@@ -381,8 +381,10 @@ void DynamicFilter::InverseDynamics(
 
 void DynamicFilter::stage0INstage1()
 {
-  comAndFootRealization_->SetPreviousConfigurationStage1(comAndFootRealization_->GetPreviousConfigurationStage0());
-  comAndFootRealization_->SetPreviousVelocityStage1(comAndFootRealization_->GetPreviousVelocityStage0());
+  comAndFootRealization_->SetPreviousConfigurationStage1(
+        comAndFootRealization_->GetPreviousConfigurationStage0());
+  comAndFootRealization_->SetPreviousVelocityStage1(
+        comAndFootRealization_->GetPreviousVelocityStage0());
   return ;
 }
 
@@ -398,9 +400,33 @@ void DynamicFilter::ComputeZMPMB(double samplingPeriod,
                      ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
                      samplingPeriod, stage, iteration) ;
 
-  InverseDynamics(ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_);
+  ofstream aof ;
+  static bool few=false;
+  if(!few)
+  {
+    aof.open("/tmp/legs.dat",ofstream::out);
+    aof.close();
+    few=true;
+  }
+  aof.open("/tmp/legs.dat",ofstream::app);
+  aof << inputLeftFoot.x << " " ;
+  aof << inputLeftFoot.y << " " ;
+  aof << inputLeftFoot.z << " " ;
+  aof << inputRightFoot.x << " " ;
+  aof << inputRightFoot.y << " " ;
+  aof << inputRightFoot.z << " " ;
+  aof << inputCoMState.x[0] << " " ;
+  aof << inputCoMState.y[0] << " " ;
+  aof << inputCoMState.z[0] << " " ;
+  aof << endl ;
+  aof.close();
 
-  PR_->zeroMomentumPoint(ZMPMB);
+  if(iteration>1)
+  {
+    InverseDynamics(ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_);
+
+    PR_->zeroMomentumPoint(ZMPMB);
+  }
 
   return ;
 }
@@ -649,7 +675,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   vector< MAL_S3_VECTOR_TYPE(double) > zmpmb_corr (Nctrl);
   for(int i = 0 ; i < Nctrl ; ++i)
   {
-      InverseKinematics( CoM_tmp[i], ctrlLeftFoot[i], ctrlRightFoot[i],
+      InverseKinematics( ctrlCoMState[i], ctrlLeftFoot[i], ctrlRightFoot[i],
                          ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
                          controlPeriod_, 2, 20) ;
 
@@ -773,20 +799,22 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   aof.setf(ios::scientific, ios::floatfield);
   for (int i = 0 ; i < Nctrl ; ++i)
   {
-    aof << zmpmb_corr[i][0] << " " ;
-    aof << zmpmb_corr[i][1] << " " ;
-    aof << outputDeltaCOMTraj_deq_[i].x[0] << " "  ;
-    aof << outputDeltaCOMTraj_deq_[i].y[0] << " "  ;
-    aof << outputDeltaCOMTraj_deq_[i].x[1] << " "  ;
-    aof << outputDeltaCOMTraj_deq_[i].y[1] << " "  ;
-    aof << outputDeltaCOMTraj_deq_[i].x[2] << " "  ;
-    aof << outputDeltaCOMTraj_deq_[i].y[2] << " "  ;
-    aof << deltaZMPx_[i] << " " ;
-    aof << deltaZMPy_[i] << " " ;
-    aof << sxzmp_[i] << " " ;
-    aof << syzmp_[i] << " " ;
-    aof << deltaZMP_deq_[i].px << " " ;
-    aof << deltaZMP_deq_[i].py << " " ;
+//    aof << zmpmb_corr[i][0] << " " ;
+//    aof << zmpmb_corr[i][1] << " " ;
+//    aof << outputDeltaCOMTraj_deq_[i].x[0] << " "  ;
+//    aof << outputDeltaCOMTraj_deq_[i].y[0] << " "  ;
+//    aof << outputDeltaCOMTraj_deq_[i].x[1] << " "  ;
+//    aof << outputDeltaCOMTraj_deq_[i].y[1] << " "  ;
+//    aof << outputDeltaCOMTraj_deq_[i].x[2] << " "  ;
+//    aof << outputDeltaCOMTraj_deq_[i].y[2] << " "  ;
+//    aof << deltaZMPx_[i] << " " ;
+//    aof << deltaZMPy_[i] << " " ;
+//    aof << sxzmp_[i] << " " ;
+//    aof << syzmp_[i] << " " ;
+//    aof << deltaZMP_deq_[i].px << " " ;
+//    aof << deltaZMP_deq_[i].py << " " ;
+    for(unsigned j=0 ; j<MAL_VECTOR_SIZE(conf[i]) ; ++j)
+      aof << conf[i][j] << " " ;
     aof << endl ;
   }
   aof.close();
@@ -860,8 +888,6 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
 
     aof << deltaZMP_deq_[i].px << " " ;    // 41
     aof << deltaZMP_deq_[i].py << " " ;    // 42
-
-
     aof << endl ;
   }
   aof.close();

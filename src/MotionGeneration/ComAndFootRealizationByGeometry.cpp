@@ -492,6 +492,7 @@ bool ComAndFootRealizationByGeometry::
   {
     m_TranslationToTheLeftHip(i)  =
         m_StaticToTheLeftHip(i)  + m_DiffBetweenComAndWaist[i];
+    cout << m_StaticToTheLeftHip(i) << endl ;
     m_TranslationToTheRightHip(i) =
         m_StaticToTheRightHip(i) + m_DiffBetweenComAndWaist[i];
   }
@@ -735,7 +736,8 @@ bool ComAndFootRealizationByGeometry::
     MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,i,3) = MAL_S3_VECTOR_ACCESS(Body_P,i);
     MAL_S4x4_MATRIX_ACCESS_I_J(FootPose,i,3) = MAL_S3_VECTOR_ACCESS(Foot_P,i);
   }
-
+  MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,3,3) = 1.0 ;
+  MAL_S4x4_MATRIX_ACCESS_I_J(FootPose,3,3) = 1.0 ;
 
   se3::JointIndex Waist = getPinocchioRobot()->waist();
 
@@ -841,7 +843,6 @@ bool ComAndFootRealizationByGeometry::
   ODEBUG4("Stage " << Stage,"DebugDataIK.dat");
   ODEBUG4("* Left Lego *","DebugDataIK.dat");
   KinematicsForOneLeg(Body_R,Body_P,aLeftFoot,m_DtLeft,aCoMPosition,ToTheHip,1,ql,Stage);
-
 
   // Kinematics for the right leg.
   MAL_S3x3_C_eq_A_by_B(ToTheHip, Body_R, m_TranslationToTheRightHip);

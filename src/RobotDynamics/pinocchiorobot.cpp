@@ -224,10 +224,10 @@ void PinocchioRobot::computeInverseDynamics(MAL_VECTOR_TYPE(double) & q,
                                             MAL_VECTOR_TYPE(double) & a)
 {
   // euler to quaternion :
-  m_quat = Eigen::Quaternion<double>(
-        Eigen::AngleAxisd((double)q(5), Eigen::Vector3d::UnitZ()) *
-        Eigen::AngleAxisd((double)q(4), Eigen::Vector3d::UnitY()) *
-        Eigen::AngleAxisd((double)q(3), Eigen::Vector3d::UnitX()) ) ;
+  m_quat = Eigen::Quaterniond(
+        Eigen::AngleAxisd(q(5), Eigen::Vector3d::UnitZ()) *
+        Eigen::AngleAxisd(q(4), Eigen::Vector3d::UnitY()) *
+        Eigen::AngleAxisd(q(3), Eigen::Vector3d::UnitX()) ) ;
 
   // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
   for(unsigned i=0; i<3 ; ++i)
@@ -553,7 +553,7 @@ void PinocchioRobot::getShoulderWristKinematics(const matrix4d & jointRootPositi
   double Xmax = ComputeXmax(Z);
   X = X*Xmax;
 
-  double A=0.25, B=0.25; //UpperArmLegth ForeArmLength
+  double A=0.25, B=0.25; //UpperArmLength ForeArmLength
 
   double C=0.0,Gamma=0.0,Theta=0.0;
   C = sqrt(X*X+Z*Z);
