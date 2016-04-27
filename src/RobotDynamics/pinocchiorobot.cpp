@@ -1,6 +1,7 @@
 #include <jrl/walkgen/pinocchiorobot.hh>
 #include "pinocchio/algorithm/rnea.hpp"
 #include "pinocchio/algorithm/kinematics.hpp"
+#include "pinocchio/algorithm/center-of-mass.hpp"
 using namespace PatternGeneratorJRL;
 
 PinocchioRobot::PinocchioRobot()
@@ -210,6 +211,7 @@ void PinocchioRobot::computeForwardKinematics(MAL_VECTOR_TYPE(double) & q)
     m_q(7+i) = q(6+i);
   }
   se3::forwardKinematics(*m_robotModel,*m_robotData,m_q);
+  se3::centerOfMass(*m_robotModel,*m_robotData,m_q);
 }
 
 void PinocchioRobot::computeInverseDynamics()

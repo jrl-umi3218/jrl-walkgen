@@ -325,8 +325,8 @@ bool ComAndFootRealizationByGeometry::
 {
   // For initialization we read the current value inside
   // the model. But we do not use it.
-  MAL_VECTOR_TYPE(double) CurrentConfig =
-      getPinocchioRobot()->currentConfiguration();
+  PinocchioRobot *aPR =  getPinocchioRobot();
+  MAL_VECTOR_TYPE(double) CurrentConfig = aPR->currentConfiguration();
 
   // Set to zero the free floating root.
   if(lStartingWaistPose.size())
@@ -349,7 +349,6 @@ bool ComAndFootRealizationByGeometry::
     CurrentConfig[i+6] = BodyAnglesIni[i];
   }
 
-  PinocchioRobot *aPR =  getPinocchioRobot();
   aPR->currentConfiguration(CurrentConfig);
 
   // Compensate for the static translation, not the WAIST position
@@ -378,7 +377,7 @@ bool ComAndFootRealizationByGeometry::
                        FootAbsolutePosition & InitFootPosition)
 {
   se3::JointIndex AnkleJoint = aFoot->associatedAnkle;
-  se3::SE3 lAnkleSE3 = getPinocchioRobot()->Data()->oMi[AnkleJoint].inverse();
+  se3::SE3 lAnkleSE3 = getPinocchioRobot()->Data()->oMi[AnkleJoint] ;
   Eigen::Vector3d translation ;
   translation << -m_AnklePosition[0], -m_AnklePosition[1], -m_AnklePosition[2];
   se3::SE3 FootTranslation = se3::SE3(Eigen::Matrix3d::Identity(),translation);
@@ -423,7 +422,6 @@ bool ComAndFootRealizationByGeometry::
                       FootAbsolutePosition & InitLeftFootPosition,
                       FootAbsolutePosition & InitRightFootPosition)
 {
-  cout << BodyAnglesIni << endl;
   /* Initialize properly the left and right initial positions of the feet. */
   memset((char *)&InitLeftFootPosition,0,sizeof(FootAbsolutePosition));
   memset((char *)&InitRightFootPosition,0,sizeof(FootAbsolutePosition));
