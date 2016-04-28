@@ -22,6 +22,10 @@ LINK_DIRECTORIES(${JRL_DYNAMICS_LIBRARY_DIRS})
 # Make sure private headers can be used.
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
 
+# Make the config_private.hh file available
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake
+               ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
+
 #################
 ## Generic test #
 #################
@@ -82,7 +86,7 @@ ADD_TEST(TestRiccatiEquation TestRiccatiEquation)
 ##    CONFIG_FILES_CMAKE(TestMorisawa2007WalkingOnBeam${BITS}TestFGPI.datref)
 ##    CONFIG_FILES_CMAKE(TestMorisawa2007GoThroughWall${BITS}TestFGPI.datref)
 
-#    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
+#
 
 
 #    MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
