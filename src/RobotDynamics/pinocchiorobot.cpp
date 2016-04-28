@@ -4,6 +4,19 @@
 #include "pinocchio/algorithm/center-of-mass.hpp"
 using namespace PatternGeneratorJRL;
 
+class Joint_shortname : public boost::static_visitor<std::string>
+{
+public:
+  template<typename D>
+  std::string operator()(const se3::JointModelBase<D> & ) const
+  { return D::shortname(); }
+
+  static std::string run( const se3::JointModelVariant & jmodel)
+  { return boost::apply_visitor( Joint_shortname(), jmodel ); }
+};
+inline std::string shortname(const se3::JointModelVariant & jmodel)
+{ return Joint_shortname::run(jmodel); }
+
 PinocchioRobot::PinocchioRobot()
 {
   // all the pointor are set to 0
@@ -43,6 +56,7 @@ PinocchioRobot::PinocchioRobot()
   m_boolData      = false ;
   m_boolLeftFoot  = false ;
   m_boolRightFoot = false ;
+  m_isInverseKinematic = false ;
 
   m_chest = 0 ;
   m_waist = 0 ;
@@ -167,6 +181,10 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   m_robotData = robotData;
   m_robotData->v[0] = se3::Motion::Zero();
   m_robotData->a[0] = -m_robotModel->gravity;
+
+  if(testInverseKinematics())
+    initializeInverseKinematics();
+
   return true ;
 }
 
@@ -182,6 +200,65 @@ bool PinocchioRobot::initializeRightFoot(PRFoot rightFoot)
   m_rightFoot = rightFoot ;
   m_boolRightFoot = true ;
   return true ;
+}
+
+bool PinocchioRobot::testInverseKinematics()
+{
+  std::vector<se3::JointIndex> leftLeg =
+      jointsBetween(m_waist,m_leftFoot.associatedAnkle);
+  std::vector<se3::JointIndex> rightLeg =
+      jointsBetween(m_waist,m_rightFoot.associatedAnkle);
+  std::vector<se3::JointIndex> leftArm =
+      jointsBetween(m_chest,m_leftWrist);
+  std::vector<se3::JointIndex> rightArm =
+      jointsBetween(m_chest,m_rightWrist);
+
+  std::vector<std::string> leftLegJointName,rightLegJointName,
+      leftArmJointName,rightArmJointName;
+  leftLegJointName = {"JointModelFreeFlyer",
+                      "JointModelRZ","JointModelRX","JointModelRY",
+                      "JointModelRY","JointModelRY","JointModelRX"};
+  rightLegJointName = {"JointModelFreeFlyer",
+                      "JointModelRZ", "JointModelRX", "JointModelRY",
+                      "JointModelRY", "JointModelRY", "JointModelRX"};
+  leftArmJointName = {"JointModelRY", "JointModelRX", "JointModelRZ",
+                      "JointModelRY", "JointModelRZ", "JointModelRY"};
+  rightArmJointName = {"JointModelRY", "JointModelRX", "JointModelRZ",
+                       "JointModelRY", "JointModelRZ", "JointModelRY"};
+
+  m_isInverseKinematic = true ;
+
+  for (unsigned  i=0 ; i<leftLegJointName.size() ; ++i)
+  {
+    std::string shortName = boost::apply_visitor(Joint_shortname(),
+                                            m_robotModel->joints[leftLeg[i]]);
+    m_isInverseKinematic &= (shortName == leftLegJointName[i]);
+  }
+  for (unsigned  i=0 ; i<rightLegJointName.size() ; ++i)
+  {
+    std::string shortName = boost::apply_visitor(Joint_shortname(),
+                                            m_robotModel->joints[rightLeg[i]]);
+    m_isInverseKinematic &= (shortName == rightLegJointName[i]);
+  }
+  for (unsigned  i=0 ; i<leftArmJointName.size() ; ++i)
+  {
+    std::string shortName = boost::apply_visitor(Joint_shortname(),
+                                            m_robotModel->joints[leftArm[i]]);
+    m_isInverseKinematic &= (shortName == leftArmJointName[i]);
+  }
+  for (unsigned  i=0 ; i<rightArmJointName.size() ; ++i)
+  {
+    std::string shortName = boost::apply_visitor(Joint_shortname(),
+                                            m_robotModel->joints[rightArm[i]]);
+    m_isInverseKinematic &= (shortName == rightArmJointName[i]);
+  }
+
+  return m_isInverseKinematic;
+}
+
+void PinocchioRobot::initializeInverseKinematics()
+{
+  return ;
 }
 
 void PinocchioRobot::computeForwardKinematics()

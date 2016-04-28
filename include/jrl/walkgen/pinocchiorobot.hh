@@ -62,13 +62,33 @@ namespace PatternGeneratorJRL
     void computeForwardKinematics();
     void computeForwardKinematics(MAL_VECTOR_TYPE(double) & q);
 
-    // compute POSITION (not velocity) of the joints from end effector pose
+    /// \brief compute POSITION (not velocity) of the joints from end effector pose
+    /// This is the implementation of the analitycal inverse kinematic extracted
+    /// from the book of Kajita
+    /// Authors Shuuji Kajita ; Hirohisa Hirukawa ; Kensuke Harada ; Kazuhito Yokoi
+    /// ISBN 9782287877162 ; 9782287877155
+    /// It needs a specific distribution of the joint to work.
+    /// a test at the initialization of the class is [should be] done to check
+    /// if everything is correct
+    /// param root joint index, i.e. the waist or the shoulder
+    /// param end joint index, i.e, the wrist or ankle indexes
+    /// param root joint homogenous matrix position,
+    /// param root joint homogenous matrix index,
+    /// param 6D vector output, is fill with zeros if the robot is not compatible
+    ///
     bool ComputeSpecializedInverseKinematics(
         const se3::JointIndex &jointRoot,
         const se3::JointIndex &jointEnd,
         const MAL_S4x4_MATRIX_TYPE(double) & jointRootPosition,
         const MAL_S4x4_MATRIX_TYPE(double) & jointEndPosition,
         MAL_VECTOR_TYPE(double) &q);
+
+    ///
+    /// \brief testInverseKinematics : test if the robot has the good joint
+    /// configuration to use the analitical inverse geometry
+    /// \return
+    ///
+    bool testInverseKinematics();
 
   public :
     /// tools :
@@ -77,7 +97,8 @@ namespace PatternGeneratorJRL
     std::vector<se3::JointIndex> fromRootToIt (se3::JointIndex it);
 
   private :
-    // need for the inverse geometry (ComputeSpecializedInverseKinematics)
+    // needed for the inverse geometry (ComputeSpecializedInverseKinematics)
+    void initializeInverseKinematics();
     void getWaistFootKinematics(const matrix4d & jointRootPosition,
                                 const matrix4d & jointEndPosition,
                                 vectorN &q,
@@ -195,6 +216,11 @@ namespace PatternGeneratorJRL
     se3::Force m_externalForces ; // external forces and torques
     Eigen::Vector3d m_f,m_n; // external forces and torques
     Eigen::Vector3d m_com; // multibody CoM
+
+    // Variables extracted form the urdf used for the analitycal inverse
+    // kinematic
+    bool m_isInverseKinematic ;
+
 
     bool m_boolModel     ;
     bool m_boolData      ;
