@@ -398,8 +398,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
         time,
         initLeftFoot_ ,
         initRightFoot_,
-        itCOM_,
-        //initCOM_,
+        //itCOM_,
+        initCOM_,
         VelRef_);
 
     // SOLVE PROBLEM:
@@ -442,7 +442,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
                                    LeftFootTraj_deq_,
                                    RightFootTraj_deq_,
                                    deltaCOMTraj_deq_);
-      #define DEBUG
+      //#define DEBUG
       #ifdef DEBUG
         dynamicFilter_->Debug(COMTraj_deq_ctrl_,
                               LeftFootTraj_deq_ctrl_,

@@ -191,7 +191,17 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_TYPE(double) upperPartVelocity_ ;
       MAL_VECTOR_TYPE(double) previousUpperPartVelocity_ ;
       MAL_VECTOR_TYPE(double) upperPartAcceleration_ ;
-      std::vector <unsigned int> upperPartIndex ;
+      /*! \brief For the left leg, Specific for the Inverse Kinematics. */
+      std::vector<int> leftLegIndexinConfiguration_;
+      /*! \brief For the right leg, Specific for the Inverse Kinematics. */
+      std::vector<int> rightLegIndexinConfiguration_;
+      /*! \brief For the left arm, Specific for the Inverse Kinematics. */
+      std::vector<int> leftArmIndexinConfiguration_;
+      /*! \brief For the right leg, Specific for the Inverse Kinematics. */
+      std::vector<int> rightArmIndexinConfiguration_;
+      /*! \brief For the chest. */
+      std::vector<int> chestIndexinConfiguration_;
+
       bool walkingHeuristic_ ;
 
       /// Class that compute the dynamic and kinematic of the robot

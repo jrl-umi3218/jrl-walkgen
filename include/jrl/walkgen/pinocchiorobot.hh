@@ -135,9 +135,9 @@ namespace PatternGeneratorJRL
 
     inline void zeroMomentumPoint(MAL_S3_VECTOR_TYPE(double) & zmp)
     {
-      se3::Force externalForces = m_robotData->oMi[1].act(m_robotData->f[1]) ;
-      m_f = externalForces.linear() ;
-      m_n = externalForces.angular() ;
+      m_externalForces = m_robotData->liMi[1].act(m_robotData->f[1]) ;
+      m_f = m_externalForces.linear() ;
+      m_n = m_externalForces.angular() ;
       zmp(0) = -m_n(1)/m_f(2) ;
       zmp(1) =  m_n(0)/m_f(2) ;
       zmp(2) = 0.0 ; // by default
@@ -192,6 +192,7 @@ namespace PatternGeneratorJRL
 
     // tmp variables
     Eigen::Quaterniond m_quat ;
+    se3::Force m_externalForces ; // external forces and torques
     Eigen::Vector3d m_f,m_n; // external forces and torques
     Eigen::Vector3d m_com; // multibody CoM
 

@@ -29,7 +29,7 @@
 #include <cmath>
 #include <Debug.hh>
 
-#define DEBUG
+//#define DEBUG
 //#define DEBUG_COUT
 
 #ifdef DEBUG

@@ -492,7 +492,6 @@ bool ComAndFootRealizationByGeometry::
   {
     m_TranslationToTheLeftHip(i)  =
         m_StaticToTheLeftHip(i)  + m_DiffBetweenComAndWaist[i];
-    cout << m_StaticToTheLeftHip(i) << endl ;
     m_TranslationToTheRightHip(i) =
         m_StaticToTheRightHip(i) + m_DiffBetweenComAndWaist[i];
   }

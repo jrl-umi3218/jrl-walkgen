@@ -754,22 +754,6 @@ int PerformTests(int argc, char *argv[])
   return 0;
 }
 
-class pivne
-{
-public :
-  pivne(string s){
-  }
-
-  void init(string s){
-    m_model = se3::urdf::buildModel(s) ;
-    m_data = new se3::Data(m_model) ;
-    cout << m_model << endl ;
-  }
-
-  se3::Model m_model ;
-  se3::Data * m_data ;
-};
-
 int main(int argc, char *argv[])
 {
   try
@@ -780,89 +764,5 @@ int main(int argc, char *argv[])
   {
     std::cerr << msg << std::endl;
   }
-
-//  //string URDFFile = "/home/mnaveau/devel/ros_unstable/install/share/metapod/data/hrp2_14/hrp2_14.urdf";
-//  string URDFFile = "/home/mnaveau/devel/ros_unstable/install/share/hrp2_14_description/urdf/hrp2_14_reduced.urdf";
-//  //string URDFFile = "/home/mnaveau/devel/ros_unstable/src/laas/pinocchio/models/simple_humanoid.urdf";
-//  //string URDFFile = "/home/mnaveau/devel/ros_unstable/src/laas/pinocchio/models/romeo.urdf";
-
-  string m_URDFPath, m_SRDFPath ;
-  unsigned int m_TestProfile = 0;
-  getOptions(argc,argv,
-           m_URDFPath,
-           m_SRDFPath,
-           m_TestProfile);
-  pivne aPivne (m_URDFPath);
-  aPivne.init(m_URDFPath);
-
-
-  /*
-  se3::Model m_robotModel ;
-  try{
-    m_robotModel = se3::urdf::buildModel(m_URDFPath);
-  }catch(std::invalid_argument e)
-  {
-    cout << e.what() << endl ;
-  }
-  cout << "Eigen version = " << EIGEN_WORLD_VERSION << " " << EIGEN_MAJOR_VERSION << " " << EIGEN_MINOR_VERSION << endl ;
-  std::cout << "Boost version "
-            << BOOST_VERSION / 100000     << "."  // major version
-            << BOOST_VERSION / 100 % 1000 << "."  // minor version
-            << BOOST_VERSION % 100                // patch level
-            << std::endl;
-  se3::Data * m_robotData = new se3::Data(m_robotModel) ;
-  cout << m_robotModel << endl ;*/
   return 1;
 }
-
-
-
-
-//#include <jrl/mal/matrixabstractlayer.hh>
-//#include <jrl/dynamics/dynamicsfactory.hh>
-//#include <jrl/walkgen/patterngeneratorinterface.hh>
-//#include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
-//#include <ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.hh>
-
-//#include <jrl/walkgen/config_private.hh>
-
-//using namespace std;
-//using namespace PatternGeneratorJRL;
-
-//#include "Debug.hh"
-//#include "CommonTools.hh"
-//#include "TestObject.hh"
-//#include <jrl/walkgen/pgtypes.hh>
-//#include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
-//#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
-
-//#include <iostream>
-//#include <iomanip>
-//#include <string>
-//#include <map>
-//#include <cmath>
-
-//#include <metapod/models/hrp2_14/hrp2_14.hh>
-//#include <ZMPRefTrajectoryGeneration/DynamicFilter.hh>
-//#include <metapod/algos/rnea.hh>
-//#ifndef METAPOD_INCLUDES
-//#define METAPOD_INCLUDES
-//// metapod includes
-//#include <metapod/tools/print.hh>
-//#include <metapod/tools/initconf.hh>
-//#include <metapod/algos/rnea.hh>
-//#include <Eigen/StdVector>
-//#endif
-
-//#ifndef METAPOD_TYPEDEF2
-//#define METAPOD_TYPEDEF2
-//typedef double LocalFloatType2;
-//typedef metapod::Spatial::ForceTpl<LocalFloatType2> Force2;
-//typedef metapod::hrp2_14<LocalFloatType2> Robot_Model2;
-//typedef metapod::Nodes< Robot_Model2, Robot_Model2::BODY >::type Node2;
-//#endif
-
-
-//using namespace::PatternGeneratorJRL;
-//using namespace::PatternGeneratorJRL::TestSuite;
-//using namespace std;

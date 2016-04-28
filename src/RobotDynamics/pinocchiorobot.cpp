@@ -331,9 +331,7 @@ ComputeSpecializedInverseKinematics(
     }
     if (ok)
     {
-      getWaistFootKinematics(jointRootPosition,
-                             jointEndPosition,
-                             q,Dt);
+      getWaistFootKinematics(jointRootPosition, jointEndPosition, q, Dt);
       return true;
     }
   }
@@ -356,9 +354,7 @@ ComputeSpecializedInverseKinematics(
       }
       if (ok)
       {
-        getShoulderWristKinematics(jointRootPosition,
-                                   jointEndPosition,
-                                   q,Side);
+        getShoulderWristKinematics(jointRootPosition,jointEndPosition,q,Side);
         return true;
       }
     }
@@ -375,9 +371,7 @@ ComputeSpecializedInverseKinematics(
       }
       if (ok)
       {
-        getShoulderWristKinematics(jointRootPosition,
-                                   jointEndPosition,
-                                   q,Side);
+        getShoulderWristKinematics(jointRootPosition,jointEndPosition,q,Side);
         return true;
       }
     }

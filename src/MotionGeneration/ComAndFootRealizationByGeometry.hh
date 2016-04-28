@@ -290,6 +290,17 @@ namespace PatternGeneratorJRL
     inline MAL_VECTOR_TYPE(double) & GetPreviousVelocityStage1()
     { return m_prev_Velocity1 ;};
 
+    inline void leftLegIndexinConfiguration(std::vector<int> & leftLegMaps) const
+    { leftLegMaps = m_LeftLegIndexinConfiguration ;}
+    inline void rightLegIndexinConfiguration(std::vector<int> & rightLegMaps) const
+    { rightLegMaps = m_RightLegIndexinConfiguration ;}
+    inline void leftArmIndexinConfiguration(std::vector<int> & leftArmMaps) const
+    { leftArmMaps = m_LeftArmIndexinConfiguration ;}
+    inline void rightArmIndexinConfiguration(std::vector<int> & rightArmMaps) const
+    { rightArmMaps = m_RightArmIndexinConfiguration ;}
+    inline void chestIndexinConfiguration(std::vector<int> & chestMaps) const
+    { chestMaps = m_ChestIndexinConfiguration ;}
+
     inline bool ShiftFoot()
     {return ShiftFoot_ ;}
     inline void ShiftFoot(bool ShiftFoot)
