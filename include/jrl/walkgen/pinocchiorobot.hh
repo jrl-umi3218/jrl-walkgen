@@ -220,6 +220,8 @@ namespace PatternGeneratorJRL
     // Variables extracted form the urdf used for the analitycal inverse
     // kinematic
     bool m_isInverseKinematic ;
+    // length between the waist and the hip
+    MAL_S3_VECTOR_TYPE(double) m_leftDt, m_rightDt ;
 
 
     bool m_boolModel     ;

@@ -258,6 +258,36 @@ bool PinocchioRobot::testInverseKinematics()
 
 void PinocchioRobot::initializeInverseKinematics()
 {
+  std::vector<se3::JointIndex> leftLeg =
+      jointsBetween(m_waist,m_leftFoot.associatedAnkle);
+  std::vector<se3::JointIndex> rightLeg =
+      jointsBetween(m_waist,m_rightFoot.associatedAnkle);
+  std::vector<se3::JointIndex> leftArm =
+      jointsBetween(m_chest,m_leftWrist);
+  std::vector<se3::JointIndex> rightArm =
+      jointsBetween(m_chest,m_rightWrist);
+
+  MAL_S3_VECTOR_CLEAR(m_leftDt);
+  MAL_S3_VECTOR_CLEAR(m_rightDt);
+  se3::SE3 waist_M_leftHip , waist_M_rightHip ;
+  waist_M_leftHip = m_robotModel->jointPlacements[leftLeg[0]].act(
+        m_robotModel->jointPlacements[leftLeg[1]]).act(
+        m_robotModel->jointPlacements[leftLeg[2]]).act(
+        m_robotModel->jointPlacements[leftLeg[3]]);
+  waist_M_rightHip = m_robotModel->jointPlacements[rightLeg[0]].act(
+        m_robotModel->jointPlacements[rightLeg[1]]).act(
+        m_robotModel->jointPlacements[rightLeg[2]]).act(
+        m_robotModel->jointPlacements[rightLeg[3]]);
+
+  m_leftDt(0)=waist_M_leftHip.translation()(0);
+  m_leftDt(1)=waist_M_leftHip.translation()(1);
+  m_leftDt(2)=waist_M_leftHip.translation()(2);
+  m_rightDt(0)=waist_M_rightHip.translation()(0);
+  m_rightDt(1)=waist_M_rightHip.translation()(1);
+  m_rightDt(2)=waist_M_rightHip.translation()(2);
+//  std::cout << m_leftDt << std::endl ;
+//  std::cout << m_rightDt << std::endl ;
+
   return ;
 }
 
@@ -388,72 +418,48 @@ ComputeSpecializedInverseKinematics(
     const MAL_S4x4_MATRIX_TYPE(double) & jointEndPosition,
     MAL_VECTOR_TYPE(double) &q )
 {
+  MAL_VECTOR_FILL(q,0.0);
+  if(!m_isInverseKinematic)
+    return false ;
 
   /*! Try to find out which kinematics chain the user
     send to the method.*/
   if (jointRoot==m_waist)
   {
     /* Consider here the legs. */
-    vector3d Dt;
-    bool ok=false;
     if (jointEnd==m_leftFoot.associatedAnkle)
     {
-      Dt(0)=0.0;Dt(1)=0.06;Dt(2)=0.0;
-      ok=true;
+      getWaistFootKinematics(jointRootPosition, jointEndPosition,
+                             q, m_leftDt);
+      return true;
     }
     else if (jointEnd==m_rightFoot.associatedAnkle)
     {
-      Dt(0)=0.0;Dt(1)=-0.06;Dt(2)=0.0;
-      ok=true;
-    }
-    if (ok)
-    {
-      getWaistFootKinematics(jointRootPosition, jointEndPosition, q, Dt);
+      getWaistFootKinematics(jointRootPosition, jointEndPosition,
+                             q, m_rightDt);
       return true;
+    }else
+    {
+      return false ;
     }
   }
   else
   {
     if ( (m_leftShoulder==0) || (m_rightShoulder==0) )
-    {
       DetectAutomaticallyShoulders();
-    }
 
     /* Here consider the arms */
-    if (jointRoot==m_leftShoulder)
+    if (jointRoot==m_leftShoulder && jointEnd==m_leftWrist)
     {
-      int Side;
-      bool ok=false;
-      if (jointEnd==m_leftWrist)
-      {
-        Side = 1;
-        ok=true;
-      }
-      if (ok)
-      {
-        getShoulderWristKinematics(jointRootPosition,jointEndPosition,q,Side);
-        return true;
-      }
+      getShoulderWristKinematics(jointRootPosition,jointEndPosition,q,1);
+      return true;
     }
-
-    if (jointRoot==m_rightShoulder)
+    if (jointRoot==m_rightShoulder && jointEnd==m_rightWrist)
     {
-      int Side;
-      bool ok=false;
-
-      if (jointEnd==m_rightWrist)
-      {
-        Side = -1;
-        ok=true;
-      }
-      if (ok)
-      {
-        getShoulderWristKinematics(jointRootPosition,jointEndPosition,q,Side);
-        return true;
-      }
+      getShoulderWristKinematics(jointRootPosition,jointEndPosition,q,-1);
+      return true;
     }
   }
-
   return false;
 }
 

@@ -247,9 +247,9 @@ int DynamicFilter::OnLinefilter(
   ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px;
   ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py;
   ZMPMB_vec_[0][2]=0.0;
-  ZMPMB_vec_[1][0]=inputZMPTraj_deq_[1].px;
-  ZMPMB_vec_[1][1]=inputZMPTraj_deq_[1].py;
-  ZMPMB_vec_[1][2]=0.0;
+//  ZMPMB_vec_[1][0]=inputZMPTraj_deq_[1].px;
+//  ZMPMB_vec_[1][1]=inputZMPTraj_deq_[1].py;
+//  ZMPMB_vec_[1][2]=0.0;
 
   unsigned int N1 = (ZMPMB_vec_.size()-1)*inc +1 ;
   if(false)
@@ -450,7 +450,7 @@ void DynamicFilter::ComputeZMPMB(double samplingPeriod,
                      ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
                      samplingPeriod, stage, iteration) ;
 
-  if(iteration>1)
+  if(iteration>0)
   {
     InverseDynamics(ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_);
 

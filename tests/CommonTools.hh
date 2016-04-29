@@ -34,7 +34,8 @@
 #include <time.h>
 #include <sstream>
 #include <fstream>
-#include <string.h>
+#include <string>
+
 
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
@@ -67,14 +68,13 @@ namespace PatternGeneratorJRL
 
       OneStep()
       {
-	MAL_VECTOR_RESIZE(ZMPTarget,3);
-	NbOfIt = 0;
-	memset(&LeftFootPosition,0,sizeof(LeftFootPosition));
-	memset(&RightFootPosition,0,sizeof(RightFootPosition));
-	memset(&finalCOMPosition,0,sizeof(finalCOMPosition));
+        MAL_VECTOR_RESIZE(ZMPTarget,3);
+        NbOfIt = 0;
+        memset(&LeftFootPosition,0,sizeof(LeftFootPosition));
+        memset(&RightFootPosition,0,sizeof(RightFootPosition));
+        memset(&finalCOMPosition,0,sizeof(finalCOMPosition));
       }
     };
-
   } /* end of TestSuite namespace */
 } /* end of PatternGeneratorJRL namespace */
 #endif /* _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_*/

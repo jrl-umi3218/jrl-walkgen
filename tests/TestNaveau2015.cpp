@@ -37,6 +37,7 @@
 #include "Debug.hh"
 #include "CommonTools.hh"
 #include "TestObject.hh"
+#include "MotionGeneration/ComAndFootRealizationByGeometry.hh"
 
 #include "pinocchio/multibody/parser/urdf.hpp"
 #include "pinocchio/multibody/parser/srdf.hpp"
@@ -56,6 +57,13 @@ class TestNaveau2015: public TestObject
 private:
   int resetfiles ;
   bool m_DebugFGPIFull ;
+  ComAndFootRealizationByGeometry * ComAndFootRealization_ ;
+  SimplePluginManager * SPM_ ;
+  vector<double> m_err_zmp_x, m_err_zmp_y;
+  MAL_VECTOR_TYPE(double) m_conf;
+  MAL_VECTOR_TYPE(double) m_vel ;
+  MAL_VECTOR_TYPE(double) m_acc ;
+  int iteration;
 
 public:
   TestNaveau2015(int argc, char *argv[], string &aString, int TestProfile):
@@ -63,16 +71,30 @@ public:
   {
     m_TestProfile = TestProfile;
     resetfiles=0;
-    m_DebugFGPIFull=false;
+    m_DebugFGPIFull=true;
     m_DebugFGPI=true;
+    ComAndFootRealization_ = NULL;
+    SPM_ = NULL ;
+    m_err_zmp_x.clear();
+    m_err_zmp_y.clear();
+    iteration=0;
   }
 
   ~TestNaveau2015()
   {
-
+    if(ComAndFootRealization_!=NULL)
+    {
+      delete ComAndFootRealization_ ;
+      ComAndFootRealization_ = NULL;
+    }
+    if(SPM_!=NULL)
+    {
+      delete SPM_ ;
+      SPM_ = NULL;
+    }
   }
 
-  typedef void (TestNaveau2015::* localeventHandler_t)(PatternGeneratorInterface &);
+  typedef void (TestObject:: * localeventHandler_t)(PatternGeneratorInterface &);
 
   struct localEvent
   {
@@ -80,6 +102,51 @@ public:
     localeventHandler_t Handler ;
   };
 
+  bool doTest(std::ostream &os)
+  {
+    TestObject::doTest(os);
+    ComputeAndDisplayZMPStatistic();
+  }
+
+  bool init()
+  {
+    if(!TestObject::init())
+      return false;
+    SPM_ = new SimplePluginManager();
+    ComAndFootRealization_ = new ComAndFootRealizationByGeometry(
+          (PatternGeneratorInterfacePrivate*)SPM_ );
+    ComAndFootRealization_->setPinocchioRobot(m_PR);
+    ComAndFootRealization_->SetStepStackHandler(new StepStackHandler(SPM_));
+    ComAndFootRealization_->SetHeightOfTheCoM(0.814);
+    ComAndFootRealization_->setSamplingPeriod(0.005);
+    ComAndFootRealization_->Initialization();
+
+    MAL_VECTOR_DIM(waist,double,6);
+    for (int i = 0 ; i < 6 ; ++i )
+    {
+      waist(i) = 0;
+    }
+    MAL_S3_VECTOR(lStartingCOMState,double);
+
+    lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
+    lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
+    lStartingCOMState(2) = m_OneStep.finalCOMPosition.z[0] ;
+    ComAndFootRealization_->setSamplingPeriod(0.005);
+    ComAndFootRealization_->Initialization();
+    ComAndFootRealization_->InitializationCoM(m_HalfSitting,lStartingCOMState,
+                                              waist,
+                                              m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
+    m_conf = m_CurrentConfiguration ;
+    m_vel  = m_CurrentVelocity ;
+    m_acc  = m_CurrentAcceleration ;
+    {
+      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
+      m_PGI->ParseCmd(strm2);
+    }
+    return true ;
+  }
+
+protected:
 
   void ComputeStat(vector<double> vec,double &avg, double &max_abs)
   {
@@ -98,210 +165,80 @@ public:
     return ;
   }
 
-//  void ComputeAndDisplayZMPStatistic()
-//  {
-//    cout << "Statistic for Dzmp in x : " << endl ;
-//    double moy_delta_zmp_x = 0.0 ;
-//    double max_abs_err_x = 0.0 ;
-//    ComputeStat(err_zmp_x,moy_delta_zmp_x,max_abs_err_x);
-//    cout << "average : " << moy_delta_zmp_x << endl ;
-//    cout << "maxx error : " << max_abs_err_x << endl ;
-
-//    cout << "Statistic for Dzmp in y : " << endl ;
-//    double moy_delta_zmp_y = 0.0 ;
-//    double max_abs_err_y = 0.0 ;
-//    ComputeStat(err_zmp_y,moy_delta_zmp_y,max_abs_err_y);
-//    cout << "average : " << moy_delta_zmp_y << endl ;
-//    cout << "maxx error : " << max_abs_err_y << endl ;
-//    return ;
-//  }
-
-  bool init()
+  void ComputeAndDisplayZMPStatistic()
   {
-    if(!TestObject::init())
-      return false;
+    cout << "Statistic for Dzmp in x : " << endl ;
+    double moy_delta_zmp_x = 0.0 ;
+    double max_abs_err_x = 0.0 ;
+    ComputeStat(m_err_zmp_x,moy_delta_zmp_x,max_abs_err_x);
+    cout << "average : " << moy_delta_zmp_x << endl ;
+    cout << "maxx error : " << max_abs_err_x << endl ;
 
-//    ComAndFootRealization_ = new ComAndFootRealizationByGeometry(
-//          (PatternGeneratorInterfacePrivate*)m_PGI );
-//    ComAndFootRealization_->setPinocchioRobot(m_PR);
-//    ComAndFootRealization_->SetStepStackHandler(new StepStackHandler(SPM));
-//    ComAndFootRealization_->SetHeightOfTheCoM(0.814);
-//    ComAndFootRealization_->setSamplingPeriod(0.005);
-//    ComAndFootRealization_->Initialization();
-
-//    MAL_VECTOR_DIM(waist,double,6);
-//    for (int i = 0 ; i < 6 ; ++i )
-//    {
-//      waist(i) = 0;
-//    }
-//    MAL_S3_VECTOR(lStartingCOMState,double);
-
-//    lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
-//    lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
-//    lStartingCOMState(2) = m_OneStep.finalCOMPosition.z[0] ;
-//    ComAndFootRealization_->setSamplingPeriod(0.005);
-//    ComAndFootRealization_->Initialization();
-//    ComAndFootRealization_->InitializationCoM(m_HalfSitting,lStartingCOMState,
-//                                              waist,
-//                                              m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
-    {
-      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
-      m_PGI->ParseCmd(strm2);
-    }
-    return true ;
+    cout << "Statistic for Dzmp in y : " << endl ;
+    double moy_delta_zmp_y = 0.0 ;
+    double max_abs_err_y = 0.0 ;
+    ComputeStat(m_err_zmp_y,moy_delta_zmp_y,max_abs_err_y);
+    cout << "average : " << moy_delta_zmp_y << endl ;
+    cout << "maxx error : " << max_abs_err_y << endl ;
+    return ;
   }
 
-protected:
-
-  void initIK()
+  void analyticalInverseKinematics(MAL_VECTOR_TYPE(double) & conf,
+                                   MAL_VECTOR_TYPE(double) & vel,
+                                   MAL_VECTOR_TYPE(double) & acc)
   {
+    /// \brief calculate, from the CoM of computed by the preview control,
+    ///    the corresponding articular position, velocity and acceleration
+    /// ------------------------------------------------------------------
+    MAL_VECTOR_DIM(aCOMState,double,6);
+    MAL_VECTOR_DIM(aCOMSpeed,double,6);
+    MAL_VECTOR_DIM(aCOMAcc,double,6);
+    MAL_VECTOR_DIM(aLeftFootPosition,double,5);
+    MAL_VECTOR_DIM(aRightFootPosition,double,5);
 
+    aCOMState(0) = m_OneStep.finalCOMPosition.x[0];
+    aCOMState(1) = m_OneStep.finalCOMPosition.y[0];
+    aCOMState(2) = m_OneStep.finalCOMPosition.z[0];
+    aCOMState(3) = m_OneStep.finalCOMPosition.roll[0]  * 180/M_PI ;
+    aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0] * 180/M_PI ;
+    aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0]   * 180/M_PI ;
+
+    aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];
+    aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];
+    aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];
+    aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1] /** * 180/M_PI  */ ;
+    aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1]/** * 180/M_PI  */ ;
+    aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1]/** * 180/M_PI  */ ;
+
+    aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
+    aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
+    aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
+    aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2]/** * 180/M_PI  */ ;
+    aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2]/** * 180/M_PI  */ ;
+    aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2] /** * 180/M_PI  */;
+
+    aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;
+    aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;
+    aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;
+    aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;
+    aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;
+
+    aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
+    aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
+    aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
+    aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
+    aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
+    ComAndFootRealization_->setSamplingPeriod(0.005);
+    ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(
+          aCOMState, aCOMSpeed, aCOMAcc, aLeftFootPosition, aRightFootPosition,
+          conf, vel, acc, iteration, 1);
+    ++iteration;
   }
 
-  void prepareDebugFiles()
+  void createOpenHRPFiles()
   {
-    TestObject::prepareDebugFiles() ;
-    if (m_DebugFGPIFull)
-    {
-      ofstream aof;
-      string aFileName;
-      aFileName = m_TestName;
-      aFileName += "TestFGPIFull.dat";
-      if (m_OneStep.NbOfIt==1)
-      {
-        aof.open(aFileName.c_str(),ofstream::out);
-      }
-    }
-  }
-
-  void fillInDebugFiles()
-  {
-    TestObject::fillInDebugFiles();
-
-    if(m_DebugFGPIFull)
-    {
-      /// \brief calculate, from the CoM of computed by the preview control,
-      ///    the corresponding articular position, velocity and acceleration
-      /// ------------------------------------------------------------------
-//      MAL_VECTOR_DIM(aCOMState,double,6);
-//      MAL_VECTOR_DIM(aCOMSpeed,double,6);
-//      MAL_VECTOR_DIM(aCOMAcc,double,6);
-//      MAL_VECTOR_DIM(aLeftFootPosition,double,5);
-//      MAL_VECTOR_DIM(aRightFootPosition,double,5);
-
-//      aCOMState(0) = m_OneStep.finalCOMPosition.x[0];      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
-//      aCOMState(1) = m_OneStep.finalCOMPosition.y[0];      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
-//      aCOMState(2) = m_OneStep.finalCOMPosition.z[0];      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
-//      aCOMState(3) = m_OneStep.finalCOMPosition.roll[0]  * 180/M_PI  ;  aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1] /** * 180/M_PI  */ ;  aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2]/** * 180/M_PI  */ ;
-//      aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0] * 180/M_PI  ;  aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1]/** * 180/M_PI  */ ;  aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2]/** * 180/M_PI  */ ;
-//      aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0] *180/M_PI;  aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1]/** * 180/M_PI  */ ; aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2] /** * 180/M_PI  */;
-
-//      aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
-//      aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
-//      aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
-//      aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;  aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
-//      aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;  aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
-//      ComAndFootRealization_->setSamplingPeriod(0.005);
-//      ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
-//                                                                      aLeftFootPosition,
-//                                                                      aRightFootPosition,
-//                                                                      m_CurrentConfiguration,
-//                                                                      m_CurrentVelocity,
-//                                                                      m_CurrentAcceleration,
-//                                                                      20,
-//                                                                      1);
-
-      m_CurrentConfiguration(28)= 0.174532925 ;     // RARM_JOINT6
-      m_CurrentConfiguration(35)= 0.174532925 ;     // LARM_JOINT6
-
-      // compute the 6D force applied at the CoM
-//      for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(m_CurrentConfiguration) ; ++i)
-//      {
-//        q_(i,0)   = m_CurrentConfiguration (i);
-//        dq_(i,0)  = m_CurrentVelocity      (i);
-//        ddq_(i,0) = m_CurrentAcceleration  (i);
-//      }
-//      metapod::rnea< Robot_Model, true >::run(hrp2_14_, q_, dq_, ddq_);
-//      vector<double> zmpmb = vector<double>(3,0.0);
-//      // extract the CoM momentum and forces
-//      RootNode & node_waist = boost::fusion::at_c< Robot_Model::BODY >(hrp2_14_.nodes);
-//      com_tensor_ = node_waist.body.iX0.applyInv(node_waist.joint.f);
-
-      // compute the Multibody ZMP
-//      zmpmb[0] = - com_tensor_.n()[1] / com_tensor_.f()[2] ;
-//      zmpmb[1] =   com_tensor_.n()[0] / com_tensor_.f()[2] ;
-
-//      err_zmp_x.push_back(zmpmb[0]-m_OneStep.ZMPTarget(0)) ;
-//      err_zmp_y.push_back(zmpmb[1]-m_OneStep.ZMPTarget(1)) ;
-
-      ofstream aof;
-      string aFileName;
-      aFileName = m_TestName;
-      aFileName += "TestFGPIFull.dat";
-      if (m_OneStep.NbOfIt==1)
-      {
-        aof.open(aFileName.c_str(),ofstream::out);
-      }
-      resetfiles = 1;
-      aof.open(aFileName.c_str(),ofstream::app);
-      aof.precision(8);
-      aof.setf(ios::scientific, ios::floatfield);
-      aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "             // 1
-          << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "    // 2
-          << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "    // 3
-          << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "    // 4
-          << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "  // 5
-          << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "    // 6
-          << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "    // 7
-          << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "    // 8
-          << filterprecision(m_OneStep.finalCOMPosition.yaw[1] ) << " "  // 9
-          << filterprecision(m_OneStep.finalCOMPosition.x[2] ) << " "    // 10
-          << filterprecision(m_OneStep.finalCOMPosition.y[2] ) << " "    // 11
-          << filterprecision(m_OneStep.finalCOMPosition.z[2] ) << " "    // 12
-          << filterprecision(m_OneStep.finalCOMPosition.yaw[2] ) << " "  // 13
-          << filterprecision(m_OneStep.ZMPTarget(0) ) << " "             // 14
-          << filterprecision(m_OneStep.ZMPTarget(1) ) << " "             // 15
-          << filterprecision(m_OneStep.ZMPTarget(2) ) << " "             // 16
-          << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "      // 17
-          << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "      // 18
-          << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "      // 19
-          << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "     // 20
-          << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "     // 21
-          << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "     // 22
-          << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "    // 23
-          << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "    // 24
-          << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "    // 25
-          << filterprecision(m_OneStep.LeftFootPosition.theta ) << " "   // 26
-          << filterprecision(m_OneStep.LeftFootPosition.dtheta ) << " "  // 27
-          << filterprecision(m_OneStep.LeftFootPosition.ddtheta ) << " " // 28
-          << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "  // 29
-          << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " " // 30
-          << filterprecision(m_OneStep.RightFootPosition.x ) << " "      // 31
-          << filterprecision(m_OneStep.RightFootPosition.y ) << " "      // 32
-          << filterprecision(m_OneStep.RightFootPosition.z ) << " "      // 33
-          << filterprecision(m_OneStep.RightFootPosition.dx ) << " "     // 34
-          << filterprecision(m_OneStep.RightFootPosition.dy ) << " "     // 35
-          << filterprecision(m_OneStep.RightFootPosition.dz ) << " "     // 36
-          << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "    // 37
-          << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "    // 38
-          << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "    // 39
-          << filterprecision(m_OneStep.RightFootPosition.theta ) << " "  // 40
-          << filterprecision(m_OneStep.RightFootPosition.dtheta ) << " " // 41
-          << filterprecision(m_OneStep.RightFootPosition.ddtheta ) << " "// 42
-          << filterprecision(m_OneStep.RightFootPosition.omega  ) << " " // 43
-          << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " ";// 44
-//          << filterprecision(zmpmb[0]) << " "                            // 45
-//          << filterprecision(zmpmb[1]) << " "                            // 46
-//          << filterprecision(zmpmb[2]) << " "                           ;// 47
-      for(unsigned int k = 0 ; k < m_CurrentConfiguration.size() ; k++){ // 48-53 -> 54-83
-        aof << filterprecision( m_CurrentConfiguration(k) ) << " "  ;
-      }
-      aof << endl;
-      aof.close();
-    }
-
-//    /// \brief Create file .hip .pos .zmp
-//    /// ---------------------------------
+    /// \brief Create file .hip .pos .zmp
+    /// ---------------------------------
 //    ofstream aof ;
 //    string aFileName = m_TestName + ".pos" ;
 //    if ( iteration == 0 )
@@ -376,6 +313,113 @@ protected:
 //    iteration++;
   }
 
+  void prepareDebugFiles()
+  {
+    TestObject::prepareDebugFiles() ;
+    if (m_DebugFGPIFull)
+    {
+      ofstream aof;
+      string aFileName;
+      aFileName = m_TestName;
+      aFileName += "TestFGPIFull.dat";
+      if (m_OneStep.NbOfIt==1)
+      {
+        aof.open(aFileName.c_str(),ofstream::out);
+      }
+    }
+  }
+
+  void fillInDebugFiles()
+  {
+    TestObject::fillInDebugFiles();
+
+    if(m_DebugFGPIFull)
+    {
+
+      analyticalInverseKinematics(m_conf,m_vel,m_acc);
+
+      se3::JointModelVector & ActuatedJoints = m_DebugPR->getActuatedJoints();
+      se3::JointIndex leftHand = se3::idx_q(
+            ActuatedJoints[m_DebugPR->leftWrist()+1]);
+      se3::JointIndex rightHand = se3::idx_q(
+            ActuatedJoints[m_DebugPR->rightWrist()+1]);
+//      m_conf(leftHand) = 0.174532925 ;     // gripper openning
+//      m_conf(rightHand)= 0.174532925 ;     // gripper openning
+
+      m_DebugPR->computeInverseDynamics(m_conf,m_vel,m_acc);
+      MAL_S3_VECTOR(zmpmb,double);
+      m_DebugPR->zeroMomentumPoint(zmpmb);
+      m_err_zmp_x.push_back(zmpmb[0]-m_OneStep.ZMPTarget(0)) ;
+      m_err_zmp_y.push_back(zmpmb[1]-m_OneStep.ZMPTarget(1)) ;
+
+      ofstream aof;
+      string aFileName;
+      aFileName = m_TestName;
+      aFileName += "TestFGPIFull.dat";
+      if (m_OneStep.NbOfIt==1)
+      {
+        aof.open(aFileName.c_str(),ofstream::out);
+      }
+      resetfiles = 1;
+      aof.open(aFileName.c_str(),ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "             // 1
+          << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "    // 2
+          << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "    // 3
+          << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "    // 4
+          << filterprecision(m_OneStep.finalCOMPosition.yaw[0] ) << " "  // 5
+          << filterprecision(m_OneStep.finalCOMPosition.x[1] ) << " "    // 6
+          << filterprecision(m_OneStep.finalCOMPosition.y[1] ) << " "    // 7
+          << filterprecision(m_OneStep.finalCOMPosition.z[1] ) << " "    // 8
+          << filterprecision(m_OneStep.finalCOMPosition.yaw[1] ) << " "  // 9
+          << filterprecision(m_OneStep.finalCOMPosition.x[2] ) << " "    // 10
+          << filterprecision(m_OneStep.finalCOMPosition.y[2] ) << " "    // 11
+          << filterprecision(m_OneStep.finalCOMPosition.z[2] ) << " "    // 12
+          << filterprecision(m_OneStep.finalCOMPosition.yaw[2] ) << " "  // 13
+          << filterprecision(m_OneStep.ZMPTarget(0) ) << " "             // 14
+          << filterprecision(m_OneStep.ZMPTarget(1) ) << " "             // 15
+          << filterprecision(m_OneStep.ZMPTarget(2) ) << " "             // 16
+          << filterprecision(m_OneStep.LeftFootPosition.x  ) << " "      // 17
+          << filterprecision(m_OneStep.LeftFootPosition.y  ) << " "      // 18
+          << filterprecision(m_OneStep.LeftFootPosition.z  ) << " "      // 19
+          << filterprecision(m_OneStep.LeftFootPosition.dx  ) << " "     // 20
+          << filterprecision(m_OneStep.LeftFootPosition.dy  ) << " "     // 21
+          << filterprecision(m_OneStep.LeftFootPosition.dz  ) << " "     // 22
+          << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "    // 23
+          << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "    // 24
+          << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "    // 25
+          << filterprecision(m_OneStep.LeftFootPosition.theta ) << " "   // 26
+          << filterprecision(m_OneStep.LeftFootPosition.dtheta ) << " "  // 27
+          << filterprecision(m_OneStep.LeftFootPosition.ddtheta ) << " " // 28
+          << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "  // 29
+          << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " " // 30
+          << filterprecision(m_OneStep.RightFootPosition.x ) << " "      // 31
+          << filterprecision(m_OneStep.RightFootPosition.y ) << " "      // 32
+          << filterprecision(m_OneStep.RightFootPosition.z ) << " "      // 33
+          << filterprecision(m_OneStep.RightFootPosition.dx ) << " "     // 34
+          << filterprecision(m_OneStep.RightFootPosition.dy ) << " "     // 35
+          << filterprecision(m_OneStep.RightFootPosition.dz ) << " "     // 36
+          << filterprecision(m_OneStep.RightFootPosition.ddx ) << " "    // 37
+          << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "    // 38
+          << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "    // 39
+          << filterprecision(m_OneStep.RightFootPosition.theta ) << " "  // 40
+          << filterprecision(m_OneStep.RightFootPosition.dtheta ) << " " // 41
+          << filterprecision(m_OneStep.RightFootPosition.ddtheta ) << " "// 42
+          << filterprecision(m_OneStep.RightFootPosition.omega  ) << " " // 43
+          << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "// 44
+          << filterprecision(zmpmb[0]) << " "                            // 45
+          << filterprecision(zmpmb[1]) << " "                            // 46
+          << filterprecision(zmpmb[2]) << " "                           ;// 47
+      for(unsigned int k = 0 ; k < m_CurrentConfiguration.size() ; k++){ // 48-53 -> 54-83
+        aof << filterprecision( m_CurrentConfiguration(k) ) << " "  ;
+      }
+      aof << endl;
+      aof.close();
+    }
+    createOpenHRPFiles();
+  }
+
   void startOnLineWalking(PatternGeneratorInterface &aPGI)
   {
     CommonInitialization(aPGI);
@@ -421,8 +465,6 @@ protected:
       m_PGI->ParseCmd(strm2);
     }
 
-
-
 //    {
 //      istringstream strm2(":addoneobstacle 9.0 0.5 0.23");
 //      m_PGI->ParseCmd(strm2);
@@ -446,189 +488,6 @@ protected:
 //    }
   }
 
-  void startEmergencyStop(PatternGeneratorInterface &aPGI)
-  {
-    CommonInitialization(aPGI);
-
-    {
-      istringstream strm2(":SetAlgoForZmpTrajectory Naveau");
-      aPGI.ParseCmd(strm2);
-
-    }
-    {
-      istringstream strm2(":singlesupporttime 0.7");
-      aPGI.ParseCmd(strm2);
-    }
-    {
-      istringstream strm2(":doublesupporttime 0.1");
-      aPGI.ParseCmd(strm2);
-    }
-    {
-      istringstream strm2(":NaveauOnline");
-      aPGI.ParseCmd(strm2);
-    }
-    {
-      istringstream strm2(":numberstepsbeforestop 2");
-      aPGI.ParseCmd(strm2);
-    }
-    {
-      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
-      m_PGI->ParseCmd(strm2);
-    }
-    {
-      istringstream strm2(":stepheight 0.05");
-      m_PGI->ParseCmd(strm2);
-    }
-
-  }
-
-  void startTurningLeft(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.2 0.0 6.0832");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-
-  void startTurningRight(PatternGeneratorInterface &aPGI)
-  {
-    {
-      //istringstream strm2(":setVelReference  0.2 0.0 -0.2");
-      istringstream strm2(":setVelReference  0.15 0.0 -0.08");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-
-  void startTurningRight2(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.2 0.0 -0.2");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-
-  void startTurningLeft2(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.0 0.0 0.4");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-
-  void startTurningLeftOnSpot(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.0 0.0 10.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-
-  void startTurningRightOnSpot(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.0 0.0 -10.");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-
-  void stop(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference 0.0 0.0 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-  void walkForward1m_s(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.1 0.0 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-  void walkForward2m_s(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.2 0.0 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-  void walkForward3m_s(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.3 0.0 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-  void walkSidewards1m_s(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.0 -0.1 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-  void walkSidewards2m_s(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.0 -0.2 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-  void walkSidewards3m_s(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.0 -0.3 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-  void startWalkInDiagonal1m_s(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.1 0.1 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-  void startWalkInDiagonal2m_s(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.2 0.2 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-
-  void startWalkInDiagonal3m_s(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.3 0.3 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-
-  void stopOnLineWalking(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.0 0.0 0.0");
-      aPGI.ParseCmd(strm2);
-      istringstream strm3(":stoppg");
-      aPGI.ParseCmd(strm3);
-    }
-  }
-
-  void walkOnSpot(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":setVelReference  0.1 0.0 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-
-  void perturbationForce(PatternGeneratorInterface &aPGI)
-  {
-    {
-      istringstream strm2(":perturbationforce  -20.0 8.0 0.0");
-      aPGI.ParseCmd(strm2);
-    }
-  }
-
   void chooseTestProfile()
   {
 
@@ -649,26 +508,16 @@ protected:
     #define localNbOfEvents 20
     struct localEvent events [localNbOfEvents] =
     {
-      //{ 1,&TestNaveau2015::walkForward2m_s},
-      { 1,&TestNaveau2015::walkOnSpot},
-      //{10*200,&TestNaveau2015::walkForward2m_s},
-      //{15*200,&TestNaveau2015::walkForward3m_s},
-      //{1*20+5*200,&TestNaveau2015::perturbationForce},
-      //{2*20+5*200,&TestNaveau2015::perturbationForce},
-      //{3*20+5*200,&TestNaveau2015::perturbationForce},
-      //{4*20+5*200,&TestNaveau2015::perturbationForce},
-      //{5*20+5*200,&TestNaveau2015::perturbationForce},
-      //{6*20+5*200,&TestNaveau2015::perturbationForce},
-      //{7*20+5*200,&TestNaveau2015::perturbationForce},
-      //{8*20+5*200,&TestNaveau2015::perturbationForce},
-      //{9*20+5*200,&TestNaveau2015::perturbationForce},
-      //{10*20+5*200,&TestNaveau2015::perturbationForce},
-      //{20*200,&TestNaveau2015::walkForward2m_s},
-      //{25*200,&TestNaveau2015::walkForward2m_s},
-      //{30*200,&TestNaveau2015::walkSidewards1m_s},
-      //{35*200,&TestNaveau2015::walkSidewards2m_s},
-      {15*200,&TestNaveau2015::stop},
-      {20*200,&TestNaveau2015::stopOnLineWalking}
+      //{ 1,&TestObject::walkForward2m_s},
+      { 1,&TestObject::walkOnSpot},
+      //{10*200,&TestObject::walkForward2m_s},
+      //{15*200,&TestObject::walkForward3m_s},
+      //{20*200,&TestObject::walkForward2m_s},
+      //{25*200,&TestObject::walkForward2m_s},
+      //{30*200,&TestObject::walkSidewards1m_s},
+      //{35*200,&TestObject::walkSidewards2m_s},
+      {15*200,&TestObject::stop},
+      {20*200,&TestObject::stopOnLineWalking}
     };
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
@@ -689,25 +538,6 @@ protected:
 //      istringstream strm (oss.str()) ;
 //      m_PGI->ParseCmd(strm);
 //    }
-  }
-
-  void generateEventEmergencyStop()
-  {
-#define localNbOfEventsEMS 4
-    struct localEvent events [localNbOfEventsEMS] =
-    { {5*200,&TestNaveau2015::startTurningLeft2},
-    {10*200,&TestNaveau2015::startTurningRight2},
-    {15*200,&TestNaveau2015::stop},
-    {20*200,&TestNaveau2015::stopOnLineWalking}};
-    // Test when triggering event.
-    for(unsigned int i=0;i<localNbOfEventsEMS;i++)
-    {
-      if ( m_OneStep.NbOfIt==events[i].time)
-      {
-        ODEBUG3("********* GENERATE EVENT EMS ***********");
-        (this->*(events[i].Handler))(*m_PGI);
-      }
-    }
   }
 
   void generateEvent()
