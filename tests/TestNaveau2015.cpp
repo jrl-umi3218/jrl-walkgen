@@ -64,6 +64,10 @@ private:
   MAL_VECTOR_TYPE(double) m_vel ;
   MAL_VECTOR_TYPE(double) m_acc ;
   int iteration;
+  std::vector<se3::JointIndex> m_leftLeg  ;
+  std::vector<se3::JointIndex> m_rightLeg ;
+  std::vector<se3::JointIndex> m_leftArm  ;
+  std::vector<se3::JointIndex> m_rightArm ;
 
 public:
   TestNaveau2015(int argc, char *argv[], string &aString, int TestProfile):
@@ -78,6 +82,10 @@ public:
     m_err_zmp_x.clear();
     m_err_zmp_y.clear();
     iteration=0;
+    m_leftLeg .clear();
+    m_rightLeg.clear();
+    m_leftArm .clear();
+    m_rightArm.clear();
   }
 
   ~TestNaveau2015()
@@ -143,6 +151,28 @@ public:
       istringstream strm2(":setfeetconstraint XY 0.09 0.04");
       m_PGI->ParseCmd(strm2);
     }
+    m_leftLeg =
+        m_PR->jointsBetween(m_PR->waist(),m_PR->leftFoot()->associatedAnkle);
+    m_rightLeg =
+        m_PR->jointsBetween(m_PR->waist(),m_PR->rightFoot()->associatedAnkle);
+    m_leftArm =
+        m_PR->jointsBetween(m_PR->chest(),m_PR->leftWrist());
+    m_rightArm =
+        m_PR->jointsBetween(m_PR->chest(),m_PR->rightWrist());
+
+    m_leftLeg.erase( m_leftLeg.begin() );
+    m_rightLeg.erase( m_rightLeg.begin() );
+
+    se3::JointModelVector & ActuatedJoints = m_PR->getActuatedJoints();
+    for(unsigned i=0 ; i <m_leftLeg.size() ; ++i)
+      m_leftLeg[i] = se3::idx_q(ActuatedJoints[m_leftLeg[i]])-1;
+    for(unsigned i=0 ; i <m_rightLeg.size() ; ++i)
+      m_rightLeg[i] = se3::idx_q(ActuatedJoints[m_rightLeg[i]])-1;
+    for(unsigned i=0 ; i <m_leftArm.size() ; ++i)
+      m_leftArm[i] = se3::idx_q(ActuatedJoints[m_leftArm[i]])-1;
+    for(unsigned i=0 ; i <m_rightArm.size() ; ++i)
+      m_rightArm[i] = se3::idx_q(ActuatedJoints[m_rightArm[i]])-1;
+
     return true ;
   }
 
@@ -235,82 +265,113 @@ protected:
     ++iteration;
   }
 
+  MAL_VECTOR_TYPE(double) parseFormURDFtoOpenHRPIndex()
+  {
+    MAL_VECTOR_TYPE(double) conf = m_conf;
+    MAL_VECTOR_FILL(conf,0.0);
+    unsigned index=6;
+    //RLEG
+    for(unsigned int i = 0 ; i < m_rightLeg.size() ; i++)
+      conf(index+i) = m_conf(m_rightLeg[i]);
+    index+=m_rightLeg.size();
+    //LLEG
+    for(unsigned int i = 0 ; i < m_leftLeg.size() ; i++)
+      conf(index+i) = m_conf(m_leftLeg[i]);
+    index+=m_rightLeg.size();
+    //CHEST
+    for(unsigned int i = 0 ; i < 2 ; i++)
+      conf(index+i) = 0.0 ;
+    index+= 2 ;
+    //HEAD
+    for(unsigned int i = 0 ; i < 2 ; i++)
+      conf(index+i) = 0.0 ;
+    index+= 2 ;
+    //RARM
+    for(unsigned int i = 0 ; i < m_rightArm.size() ; i++)
+      conf(index+i) = m_conf(m_rightArm[i]);
+    index+=m_rightArm.size();
+    //LARM
+    for(unsigned int i = 0 ; i < m_leftArm.size() ; i++)
+      conf(index+i) = m_conf(m_leftArm[i]);
+
+    return conf ;
+  }
+
   void createOpenHRPFiles()
   {
     /// \brief Create file .hip .pos .zmp
     /// ---------------------------------
-//    ofstream aof ;
-//    string aFileName = m_TestName + ".pos" ;
-//    if ( iteration == 0 )
-//    {
-//      aof.open(aFileName.c_str(),ofstream::out);
-//      aof.close();
-//    }
-//    aof.open(aFileName.c_str(),ofstream::app);
-//    aof.precision(8);
-//    aof.setf(ios::scientific, ios::floatfield);
-//    aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
-//    for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
-//      aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 2
-//    }
-//    for(unsigned int i = 0 ; i < 9 ; i++){
-//      aof << 0.0 << " "  ;
-//    }
-//    aof << 0.0  << endl ;
-//    aof.close();
+    MAL_VECTOR_TYPE(double) conf = parseFormURDFtoOpenHRPIndex();
+    ofstream aof ;
+    string aFileName = "/tmp/" + m_TestName + ".pos" ;
+    if ( iteration == 0 )
+    {
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+    }
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    aof << filterprecision( iteration * 0.005 ) << " "  ;   // 1
+    for(unsigned i=6 ; i<MAL_VECTOR_SIZE(conf) ; ++i)
+      aof << filterprecision( conf(i) ) << " "  ;           // 2-30
+    for(unsigned i=0 ; i<9 ; ++i)
+      aof << filterprecision( 0.0 ) << " "  ;               // 31-40
+    aof << 0.0  << endl ;                                   // 41
+    aof.close();
 
-//    aFileName = m_TestName + ".hip" ;
-//    if ( iteration == 0 ){
-//      aof.open(aFileName.c_str(),ofstream::out);
-//      aof.close();
-//    }
-//    aof.open(aFileName.c_str(),ofstream::app);
-//    aof.precision(8);
-//    aof.setf(ios::scientific, ios::floatfield);
-//    aof << filterprecision( iteration * 0.005 ) << " "  ;                 // 1
-//    aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ; // 2
-//    aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0]) << " "  ;// 3
-//    aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0]) ;          // 4
-//    aof << endl ;
-//    aof.close();
+    aFileName = "/tmp/" + m_TestName + ".hip" ;
+    if ( iteration == 0 ){
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+    }
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    aof << filterprecision( iteration * 0.005 ) << " "  ;                 // 1
+    aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ; // 2
+    aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0]) << " "  ;// 3
+    aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0]) ;          // 4
+    aof << endl ;
+    aof.close();
 
-//    aFileName = m_TestName + ".waist" ;
-//    if ( iteration == 0 ){
-//      aof.open(aFileName.c_str(),ofstream::out);
-//      aof.close();
-//    }
-//    aof.open(aFileName.c_str(),ofstream::app);
-//    aof.precision(8);
-//    aof.setf(ios::scientific, ios::floatfield);
-//    aof << filterprecision( iteration * 0.005 ) << " "  ;                           // 1
-//    aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ;  // 2
-//    aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0]) << " "  ;// 3
-//    aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0]) ;          // 4
-//    aof << endl ;
-//    aof.close();
+    aFileName = "/tmp/" + m_TestName + ".waist" ;
+    if ( iteration == 0 ){
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+    }
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    aof << filterprecision( iteration * 0.005 ) << " "  ;                           // 1
+    aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ;  // 2
+    aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0]) << " "  ;// 3
+    aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0]) ;          // 4
+    aof << endl ;
+    aof.close();
 
-//    aFileName = m_TestName + ".zmp" ;
-//    if ( iteration == 0 ){
-//      aof.open(aFileName.c_str(),ofstream::out);
-//      aof.close();
-//    }
-//    FootAbsolutePosition aSupportState;
-//    if (m_OneStep.LeftFootPosition.stepType < 0 )
-//      aSupportState = m_OneStep.LeftFootPosition ;
-//    else
-//      aSupportState = m_OneStep.RightFootPosition ;
+    aFileName = "/tmp/" + m_TestName + ".zmp" ;
+    if ( iteration == 0 ){
+      aof.open(aFileName.c_str(),ofstream::out);
+      aof.close();
+    }
+    FootAbsolutePosition aSupportState;
+    if (m_OneStep.LeftFootPosition.stepType < 0 )
+      aSupportState = m_OneStep.LeftFootPosition ;
+    else
+      aSupportState = m_OneStep.RightFootPosition ;
 
-//    aof.open(aFileName.c_str(),ofstream::app);
-//    aof.precision(8);
-//    aof.setf(ios::scientific, ios::floatfield);
-//    aof << filterprecision( iteration * 0.005 ) << " "  ;                                 // 1
-//    aof << filterprecision( m_OneStep.ZMPTarget(0) - m_CurrentConfiguration(0)) << " "  ; // 2
-//    aof << filterprecision( m_OneStep.ZMPTarget(1) - m_CurrentConfiguration(1) ) << " "  ;// 3
-//    aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2))  ;              // 4
-//    aof << endl ;
-//    aof.close();
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    aof << filterprecision( iteration * 0.005 ) << " "  ;                                 // 1
+    aof << filterprecision( m_OneStep.ZMPTarget(0) - m_CurrentConfiguration(0)) << " "  ; // 2
+    aof << filterprecision( m_OneStep.ZMPTarget(1) - m_CurrentConfiguration(1) ) << " "  ;// 3
+    aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2))  ;              // 4
+    aof << endl ;
+    aof.close();
 
-//    iteration++;
+    iteration++;
   }
 
   void prepareDebugFiles()

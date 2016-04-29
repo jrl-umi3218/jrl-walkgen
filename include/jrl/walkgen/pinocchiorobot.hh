@@ -222,6 +222,8 @@ namespace PatternGeneratorJRL
     bool m_isInverseKinematic ;
     // length between the waist and the hip
     MAL_S3_VECTOR_TYPE(double) m_leftDt, m_rightDt ;
+    double m_femurLength ;
+    double m_tibiaLength ;
 
 
     bool m_boolModel     ;
