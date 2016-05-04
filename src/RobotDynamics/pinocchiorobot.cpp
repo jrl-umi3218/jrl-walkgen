@@ -518,7 +518,7 @@ void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
   d2 = Body_P + Body_R * Dt;
   d3 = d2 - Foot_P;
 
-  double l0 = sqrt(d3(0)*d3(0)+d3(1)*d3(1)+d3(2)*d3(2) /*- 0.035*0.035*/);
+  double l0 = sqrt(d3(0)*d3(0)+d3(1)*d3(1)+d3(2)*d3(2) - 0.035*0.035);
   c5 = 0.5 * (l0*l0-A*A-B*B) / (A*B);
   if (c5 > 1.0-_epsilon)
   {
@@ -539,7 +539,7 @@ void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
   q6a = asin((A/l0)*sin(M_PI- q[3]));
 
   double l3 = sqrt(r3(1)*r3(1) + r3(2)*r3(2));
-  double l4 = sqrt(l3*l3 /*- 0.035*0.035*/);
+  double l4 = sqrt(l3*l3 - 0.035*0.035);
 
   double phi = atan2(r3(0), l4);
   q[4] = -phi - q6a;

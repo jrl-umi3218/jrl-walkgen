@@ -265,10 +265,13 @@ protected:
     ++iteration;
   }
 
-  MAL_VECTOR_TYPE(double) parseFormURDFtoOpenHRPIndex()
+  MAL_VECTOR_TYPE(double) parseFromURDFtoOpenHRPIndex()
   {
     MAL_VECTOR_TYPE(double) conf = m_conf;
     MAL_VECTOR_FILL(conf,0.0);
+
+    for(unsigned int i = 0 ; i < 6 ; i++)
+      conf(i) = m_conf(i);
     unsigned index=6;
     //RLEG
     for(unsigned int i = 0 ; i < m_rightLeg.size() ; i++)
@@ -277,7 +280,7 @@ protected:
     //LLEG
     for(unsigned int i = 0 ; i < m_leftLeg.size() ; i++)
       conf(index+i) = m_conf(m_leftLeg[i]);
-    index+=m_rightLeg.size();
+    index+=m_leftLeg.size();
     //CHEST
     for(unsigned int i = 0 ; i < 2 ; i++)
       conf(index+i) = 0.0 ;
@@ -288,11 +291,15 @@ protected:
     index+= 2 ;
     //RARM
     for(unsigned int i = 0 ; i < m_rightArm.size() ; i++)
-      conf(index+i) = m_conf(m_rightArm[i]);
+      conf(index+i) = m_HalfSitting(m_rightArm[i]-6);
     index+=m_rightArm.size();
+    conf(index) = 10*M_PI/180;
+    ++index;
     //LARM
     for(unsigned int i = 0 ; i < m_leftArm.size() ; i++)
-      conf(index+i) = m_conf(m_leftArm[i]);
+      conf(index+i) = m_HalfSitting(m_leftArm[i]-6);
+    index+=m_leftArm.size();
+    conf(index) = 10*M_PI/180;
 
     return conf ;
   }
@@ -301,73 +308,70 @@ protected:
   {
     /// \brief Create file .hip .pos .zmp
     /// ---------------------------------
-    MAL_VECTOR_TYPE(double) conf = parseFormURDFtoOpenHRPIndex();
+    MAL_VECTOR_TYPE(double) conf = parseFromURDFtoOpenHRPIndex();
     ofstream aof ;
-    string aFileName = "/tmp/" + m_TestName + ".pos" ;
-    if ( iteration == 0 )
+    string aPosFileName = /*"/tmp/" +*/ m_TestName + ".pos" ;
+    string aZMPFileName = /*"/tmp/" +*/ m_TestName + ".zmp" ;
+    string aWaistFileName = /*"/tmp/" +*/ m_TestName + ".waist" ;
+    string aHipFileName = /*"/tmp/" +*/ m_TestName + ".hip" ;
+    if ( iteration == 1 )
     {
-      aof.open(aFileName.c_str(),ofstream::out);
+      aof.open(aPosFileName.c_str(),ofstream::out);
+      aof.close();
+      aof.open(aZMPFileName.c_str(),ofstream::out);
+      aof.close();
+      aof.open(aWaistFileName.c_str(),ofstream::out);
+      aof.close();
+      aof.open(aHipFileName.c_str(),ofstream::out);
       aof.close();
     }
-    aof.open(aFileName.c_str(),ofstream::app);
+
+    aof.open(aPosFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( iteration * 0.005 ) << " "  ;   // 1
+    aof << filterprecision( (double)(iteration-1) * 0.005 ) << " "  ;// 1
     for(unsigned i=6 ; i<MAL_VECTOR_SIZE(conf) ; ++i)
-      aof << filterprecision( conf(i) ) << " "  ;           // 2-30
+      aof << filterprecision( conf(i) ) << " "  ;                    // 2-30
     for(unsigned i=0 ; i<9 ; ++i)
-      aof << filterprecision( 0.0 ) << " "  ;               // 31-40
-    aof << 0.0  << endl ;                                   // 41
+      aof << filterprecision( 0.0 ) << " "  ;                        // 31-40
+    aof << 0.0  << endl ;                                            // 41
     aof.close();
 
-    aFileName = "/tmp/" + m_TestName + ".hip" ;
-    if ( iteration == 0 ){
-      aof.open(aFileName.c_str(),ofstream::out);
-      aof.close();
-    }
-    aof.open(aFileName.c_str(),ofstream::app);
+     aof.open(aWaistFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( iteration * 0.005 ) << " "  ;                 // 1
+    aof << filterprecision( (double)(iteration-1) * 0.005 ) << " "  ;     // 1
     aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ; // 2
     aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0]) << " "  ;// 3
     aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0]) ;          // 4
     aof << endl ;
     aof.close();
 
-    aFileName = "/tmp/" + m_TestName + ".waist" ;
-    if ( iteration == 0 ){
-      aof.open(aFileName.c_str(),ofstream::out);
-      aof.close();
-    }
-    aof.open(aFileName.c_str(),ofstream::app);
+
+    aof.open(aHipFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( iteration * 0.005 ) << " "  ;                           // 1
-    aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ;  // 2
+    aof << filterprecision( (double)(iteration-1) * 0.005 ) << " "  ;     // 1
+    aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ; // 2
     aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0]) << " "  ;// 3
     aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0]) ;          // 4
     aof << endl ;
     aof.close();
 
-    aFileName = "/tmp/" + m_TestName + ".zmp" ;
-    if ( iteration == 0 ){
-      aof.open(aFileName.c_str(),ofstream::out);
-      aof.close();
-    }
+
     FootAbsolutePosition aSupportState;
     if (m_OneStep.LeftFootPosition.stepType < 0 )
       aSupportState = m_OneStep.LeftFootPosition ;
     else
       aSupportState = m_OneStep.RightFootPosition ;
 
-    aof.open(aFileName.c_str(),ofstream::app);
+    aof.open(aZMPFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( iteration * 0.005 ) << " "  ;                                 // 1
-    aof << filterprecision( m_OneStep.ZMPTarget(0) - m_CurrentConfiguration(0)) << " "  ; // 2
-    aof << filterprecision( m_OneStep.ZMPTarget(1) - m_CurrentConfiguration(1) ) << " "  ;// 3
-    aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2))  ;              // 4
+    aof << filterprecision( (double)(iteration-1) * 0.005 ) << " "  ;   // 1
+    aof << filterprecision( m_OneStep.ZMPTarget(0) - conf(0)) << " "  ; // 2
+    aof << filterprecision( m_OneStep.ZMPTarget(1) - conf(1) ) << " "  ;// 3
+    aof << filterprecision( aSupportState.z  - conf(2))  ;              // 4
     aof << endl ;
     aof.close();
 
@@ -398,6 +402,20 @@ protected:
     {
 
       analyticalInverseKinematics(m_conf,m_vel,m_acc);
+      if(iteration==1)
+      {
+        bool isHalfsitting = true ;
+        for(unsigned i=0 ; i<MAL_VECTOR_SIZE(m_HalfSitting) ; ++i)
+        {
+          isHalfsitting &= abs(m_conf(6+i)-m_HalfSitting(i))<1e-3 ;
+          if(!(abs(m_conf(6+i)-m_HalfSitting(i))<1e-3))
+            cout << i << " " ;
+        }
+        cout << endl ;
+        cout << m_conf << endl ;
+        cout << m_HalfSitting << endl ;
+        assert(isHalfsitting);
+      }
 
       se3::JointModelVector & ActuatedJoints = m_DebugPR->getActuatedJoints();
       se3::JointIndex leftHand = se3::idx_q(
@@ -408,6 +426,7 @@ protected:
 //      m_conf(rightHand)= 0.174532925 ;     // gripper openning
 
       m_DebugPR->computeInverseDynamics(m_conf,m_vel,m_acc);
+      createOpenHRPFiles();
       MAL_S3_VECTOR(zmpmb,double);
       m_DebugPR->zeroMomentumPoint(zmpmb);
       m_err_zmp_x.push_back(zmpmb[0]-m_OneStep.ZMPTarget(0)) ;
@@ -478,7 +497,6 @@ protected:
       aof << endl;
       aof.close();
     }
-    createOpenHRPFiles();
   }
 
   void startOnLineWalking(PatternGeneratorInterface &aPGI)
@@ -570,15 +588,15 @@ protected:
     struct localEvent events [localNbOfEvents] =
     {
       //{ 1,&TestObject::walkForward2m_s},
-      { 1,&TestObject::walkOnSpot},
+      { 5,&TestObject::walkOnSpot},
       //{10*200,&TestObject::walkForward2m_s},
       //{15*200,&TestObject::walkForward3m_s},
       //{20*200,&TestObject::walkForward2m_s},
       //{25*200,&TestObject::walkForward2m_s},
       //{30*200,&TestObject::walkSidewards1m_s},
       //{35*200,&TestObject::walkSidewards2m_s},
-      {15*200,&TestObject::stop},
-      {20*200,&TestObject::stopOnLineWalking}
+      {20*200,&TestObject::stop},
+      {30*200,&TestObject::stopOnLineWalking}
     };
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)

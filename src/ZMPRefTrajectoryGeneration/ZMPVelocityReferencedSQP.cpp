@@ -434,7 +434,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
       FinalRightFootTraj_deq[i] = RightFootTraj_deq_ctrl_[i] ;
     }
 
-    bool filterOn_ = true ;
+    bool filterOn_ = false ;
     if(filterOn_)
     {
 
