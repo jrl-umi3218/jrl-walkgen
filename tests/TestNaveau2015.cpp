@@ -411,14 +411,14 @@ protected:
         for(unsigned i=0 ; i<MAL_VECTOR_SIZE(m_HalfSitting) ; ++i)
         {
           isHalfsitting &= abs(m_conf(6+i)-m_HalfSitting(i))<1e-3 ;
-          if(!(abs(m_conf(6+i)-m_HalfSitting(i))<1e-3))
-            cout << i << " " ;
+//          if(!(abs(m_conf(6+i)-m_HalfSitting(i))<1e-3))
+//            cout << i << " " ;
         }
-        cout << endl ;
-        cout << m_conf << endl ;
-        cout << m_HalfSitting << endl ;
-        cout << std::boolalpha << isHalfsitting << endl ;
-        //assert(isHalfsitting);
+//        cout << endl ;
+//        cout << m_conf << endl ;
+//        cout << m_HalfSitting << endl ;
+//        cout << std::boolalpha << isHalfsitting << endl ;
+        assert(isHalfsitting);
       }
 
       se3::JointModelVector & ActuatedJoints = m_DebugPR->getActuatedJoints();
