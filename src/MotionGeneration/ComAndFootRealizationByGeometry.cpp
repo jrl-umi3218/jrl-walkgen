@@ -325,6 +325,7 @@ bool ComAndFootRealizationByGeometry::
 {
   // For initialization we read the current value inside
   // the model. But we do not use it.
+  // it is used to resize the temporary vector
   PinocchioRobot *aPR =  getPinocchioRobot();
   MAL_VECTOR_TYPE(double) CurrentConfig = aPR->currentConfiguration();
 

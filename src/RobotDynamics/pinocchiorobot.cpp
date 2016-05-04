@@ -69,7 +69,9 @@ PinocchioRobot::PinocchioRobot()
   memset(&m_rightFoot,0,sizeof(m_rightFoot));
 
   m_femurLength = 0.0 ;
-  m_tibiaLength = 0.0 ;
+  m_tibiaLengthZ = 0.0 ;
+  m_tibiaLengthY = 0.0 ;
+
 }
 
 PinocchioRobot::~PinocchioRobot()
@@ -292,9 +294,10 @@ void PinocchioRobot::initializeInverseKinematics()
   m_femurLength = m_robotModel->jointPlacements[rightLeg[4]]
       .translation().norm();
 
-  m_tibiaLength = m_robotModel->jointPlacements[rightLeg[5]]
-      .translation().norm();
-
+  m_tibiaLengthY =
+      std::abs(m_robotModel->jointPlacements[rightLeg[5]].translation()[1]);
+  m_tibiaLengthZ =
+      std::abs(m_robotModel->jointPlacements[rightLeg[5]].translation()[2]);
   return ;
 }
 
@@ -478,7 +481,7 @@ void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
   double _epsilon=1.0e-6;
   // definition des variables relatif au design du robot
   double A = m_femurLength;//m_FemurLength = 0.3 for hrp2-14;
-  double B = m_tibiaLength;//m_TibiaLength = 0.3 for hrp2-14;
+  double B = m_tibiaLengthZ;//m_TibiaLength = 0.3 for hrp2-14;
   //double C = 0.0;
   double c5 = 0.0;
   double q6a = 0.0;
@@ -518,7 +521,8 @@ void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
   d2 = Body_P + Body_R * Dt;
   d3 = d2 - Foot_P;
 
-  double l0 = sqrt(d3(0)*d3(0)+d3(1)*d3(1)+d3(2)*d3(2) - 0.035*0.035);
+  double l0 = sqrt(d3(0)*d3(0)+d3(1)*d3(1)+d3(2)*d3(2)
+                   - m_tibiaLengthY*m_tibiaLengthY);
   c5 = 0.5 * (l0*l0-A*A-B*B) / (A*B);
   if (c5 > 1.0-_epsilon)
   {
@@ -539,14 +543,14 @@ void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
   q6a = asin((A/l0)*sin(M_PI- q[3]));
 
   double l3 = sqrt(r3(1)*r3(1) + r3(2)*r3(2));
-  double l4 = sqrt(l3*l3 - 0.035*0.035);
+  double l4 = sqrt(l3*l3 - m_tibiaLengthY*m_tibiaLengthY);
 
   double phi = atan2(r3(0), l4);
   q[4] = -phi - q6a;
 
   double psi1 = atan2(r3(1), r3(2)) * OppSignOfDtY;
   double psi2 = 0.5*M_PI - psi1;
-  double psi3 = atan2(l4, 0.035);
+  double psi3 = atan2(l4, m_tibiaLengthY);
   q[5] = (psi3 - psi2) * OppSignOfDtY;
 
   if (q[5] > 0.5*M_PI)

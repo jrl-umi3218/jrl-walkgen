@@ -223,7 +223,8 @@ namespace PatternGeneratorJRL
     // length between the waist and the hip
     MAL_S3_VECTOR_TYPE(double) m_leftDt, m_rightDt ;
     double m_femurLength ;
-    double m_tibiaLength ;
+    double m_tibiaLengthZ ;
+    double m_tibiaLengthY ;
 
 
     bool m_boolModel     ;

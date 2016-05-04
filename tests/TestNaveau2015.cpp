@@ -263,6 +263,9 @@ protected:
           aCOMState, aCOMSpeed, aCOMAcc, aLeftFootPosition, aRightFootPosition,
           conf, vel, acc, iteration, 1);
     ++iteration;
+
+    conf(m_leftArm.back()+1) = 10.0*M_PI/180.0;
+    conf(m_rightArm.back()+1) = 10.0*M_PI/180.0;
   }
 
   MAL_VECTOR_TYPE(double) parseFromURDFtoOpenHRPIndex()
@@ -414,7 +417,8 @@ protected:
         cout << endl ;
         cout << m_conf << endl ;
         cout << m_HalfSitting << endl ;
-        assert(isHalfsitting);
+        cout << std::boolalpha << isHalfsitting << endl ;
+        //assert(isHalfsitting);
       }
 
       se3::JointModelVector & ActuatedJoints = m_DebugPR->getActuatedJoints();
