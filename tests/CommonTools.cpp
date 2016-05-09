@@ -68,7 +68,7 @@ namespace PatternGeneratorJRL {
         ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
         ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
         ":UpperBodyMotionParameters -0.1 -1.0 0.0",
-        ":useDynamicFilter 0"
+        ":useDynamicFilter false"
       };
 
       for(int i=0;i<nbMethod;i++)

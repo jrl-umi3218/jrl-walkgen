@@ -94,9 +94,9 @@ void DynamicFilter::CallMethod(string &Method, istringstream &strm)
   //#endif
     if (Method==":useDynamicFilter")
     {
-      unsigned int useDynamicFilter ;
+      string useDynamicFilter ;
       strm >> useDynamicFilter;
-      useDynamicFilter_ = useDynamicFilter==0? false:true ;
+      useDynamicFilter_ = useDynamicFilter=="true"? true:false ;
     }
 }
 

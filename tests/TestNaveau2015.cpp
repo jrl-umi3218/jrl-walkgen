@@ -431,11 +431,11 @@ protected:
 //          if(!(abs(m_conf(6+i)-m_HalfSitting(i))<1e-3))
 //            cout << i << " " ;
         }
-//        cout << endl ;
-//        cout << m_conf << endl ;
-//        cout << m_HalfSitting << endl ;
-//        cout << std::boolalpha << isHalfsitting << endl ;
-        //assert(isHalfsitting);
+        cout << endl ;
+        cout << m_conf << endl ;
+        cout << m_HalfSitting << endl ;
+        cout << std::boolalpha << isHalfsitting << endl ;
+        assert(isHalfsitting);
       }
 
       m_DebugPR->computeInverseDynamics(m_conf,m_vel,m_acc);
@@ -559,6 +559,10 @@ protected:
       m_PGI->ParseCmd(strm2);
     }
 
+    {
+      istringstream strm2(":useDynamicFilter false");
+      m_PGI->ParseCmd(strm2);
+    }
 //    {
 //      istringstream strm2(":addoneobstacle 9.0 0.5 0.23");
 //      m_PGI->ParseCmd(strm2);
