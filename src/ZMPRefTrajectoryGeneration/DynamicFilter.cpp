@@ -347,6 +347,7 @@ int DynamicFilter::OnLinefilter(
     }
   }
   else{
+    deltaZMP_deq_.resize(N1);
     for (unsigned int i = 0 ; i < N1 ; ++i)
     {
       deltaZMP_deq_[i].px = 0.0 ;
