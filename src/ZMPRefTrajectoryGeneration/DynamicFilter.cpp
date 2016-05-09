@@ -8,7 +8,8 @@ using namespace PatternGeneratorJRL;
 DynamicFilter::DynamicFilter(
     SimplePluginManager *SPM,
     PinocchioRobot *aPR): stage0_(0) , stage1_(1),
-    MODE_PC_(OptimalControllerSolver::MODE_WITH_INITIALPOS)
+    MODE_PC_(OptimalControllerSolver::MODE_WITH_INITIALPOS),
+    SimplePlugin(SPM)
 {
   controlPeriod_       = 0.0 ;
   interpolationPeriod_ = 0.0 ;
@@ -58,6 +59,20 @@ DynamicFilter::DynamicFilter(
   chestIndexinConfiguration_   .clear();
 
   walkingHeuristic_ = false ;
+  useDynamicFilter_ = false ;
+
+  // Register method to handle
+  const unsigned int NbMethods = 1;
+  const char *lMethodNames[NbMethods] =
+  {":useDynamicFilter"};
+  for(unsigned int i=0;i<NbMethods;i++)
+  {
+    std::string aMethodName(lMethodNames[i]);
+    if (!RegisterMethod(aMethodName))
+    {
+      std::cerr << "Unable to register " << aMethodName << std::endl;
+    }
+  }
 }
 
 DynamicFilter::~DynamicFilter()
@@ -69,6 +84,19 @@ DynamicFilter::~DynamicFilter()
   if (comAndFootRealization_!=0){
       delete comAndFootRealization_;
       comAndFootRealization_ = 0 ;
+    }
+}
+
+void DynamicFilter::CallMethod(string &Method, istringstream &strm)
+{
+  //#ifdef DEBUG
+  //  std::cout << __PRETTY_FUNCTION__ << " Method:" << Method << std::endl;
+  //#endif
+    if (Method==":useDynamicFilter")
+    {
+      unsigned int useDynamicFilter ;
+      strm >> useDynamicFilter;
+      useDynamicFilter_ = useDynamicFilter==0? false:true ;
     }
 }
 
@@ -232,88 +260,100 @@ int DynamicFilter::OnLinefilter(
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
   unsigned int N = inputRightFootTraj_deq_.size() ;
-  for(unsigned int i = 0 ; i < N ; ++i)
-  {
-    ComputeZMPMB(interpolationPeriod_,
-                 inputCOMTraj_deq_[i],
-                 inputLeftFootTraj_deq_[i],
-                 inputRightFootTraj_deq_[i],
-                 ZMPMB_vec_[i],
-                 stage1_,
-                 //currentIteration
-                 i);
-  }
   int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
-  ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px;
-  ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py;
-  ZMPMB_vec_[0][2]=0.0;
-//  ZMPMB_vec_[1][0]=inputZMPTraj_deq_[1].px;
-//  ZMPMB_vec_[1][1]=inputZMPTraj_deq_[1].py;
-//  ZMPMB_vec_[1][2]=0.0;
-
   unsigned int N1 = (ZMPMB_vec_.size()-1)*inc +1 ;
-  if(false)
+  if(useDynamicFilter_)
   {
-    zmpmb_i_.resize( N1 ) ;
     for(unsigned int i = 0 ; i < N ; ++i)
-      zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
-
-    zmpmb_i_.back() = ZMPMB_vec_.back() ;
-    unsigned limit = ZMPMB_vec_.size()-1 ;
-    for(unsigned  i=0 ; i<limit  ; ++i)
     {
-      double xA = zmpmb_i_[i*inc][0] ;
-      double yA = zmpmb_i_[i*inc][1] ;
-      double tA = i*inc ;
-      double xB = zmpmb_i_[(i+1)*inc][0] ;
-      double yB = zmpmb_i_[(i+1)*inc][1] ;
-      double tB = (i+1)*inc ;
-      for(int j = 1 ; j < inc ; ++j)
+      ComputeZMPMB(interpolationPeriod_,
+                   inputCOMTraj_deq_[i],
+                   inputLeftFootTraj_deq_[i],
+                   inputRightFootTraj_deq_[i],
+                   ZMPMB_vec_[i],
+                   stage1_,
+                   //currentIteration
+                   i);
+    }
+    ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px;
+    ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py;
+    ZMPMB_vec_[0][2]=0.0;
+    //  ZMPMB_vec_[1][0]=inputZMPTraj_deq_[1].px;
+    //  ZMPMB_vec_[1][1]=inputZMPTraj_deq_[1].py;
+    //  ZMPMB_vec_[1][2]=0.0;
+
+
+    if(false)
+    {
+      zmpmb_i_.resize( N1 ) ;
+      for(unsigned int i = 0 ; i < N ; ++i)
+        zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
+
+      zmpmb_i_.back() = ZMPMB_vec_.back() ;
+      unsigned limit = ZMPMB_vec_.size()-1 ;
+      for(unsigned  i=0 ; i<limit  ; ++i)
       {
-        double t = tA+j ;
-        zmpmb_i_[(i*inc)+j][0] = xA + (t-tA)*(xB-xA)/(tB-tA) ;
-        zmpmb_i_[(i*inc)+j][1] = yA + (t-tA)*(yB-yA)/(tB-tA) ;
-        zmpmb_i_[(i*inc)+j][2] = 0.0 ;
+        double xA = zmpmb_i_[i*inc][0] ;
+        double yA = zmpmb_i_[i*inc][1] ;
+        double tA = i*inc ;
+        double xB = zmpmb_i_[(i+1)*inc][0] ;
+        double yB = zmpmb_i_[(i+1)*inc][1] ;
+        double tB = (i+1)*inc ;
+        for(int j = 1 ; j < inc ; ++j)
+        {
+          double t = tA+j ;
+          zmpmb_i_[(i*inc)+j][0] = xA + (t-tA)*(xB-xA)/(tB-tA) ;
+          zmpmb_i_[(i*inc)+j][1] = yA + (t-tA)*(yB-yA)/(tB-tA) ;
+          zmpmb_i_[(i*inc)+j][2] = 0.0 ;
+        }
       }
     }
-  }
-  else
-  {
-    zmpmb_i_.resize( N1 ) ;
-    for(unsigned int i = 0 ; i < N ; ++i)
-      zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
-
-    vector<vector<double> > dZMPMB_vec (N,vector<double>(2,0.0)) ;
-    dZMPMB_vec[0][0] = (ZMPMB_vec_[1][0]  -ZMPMB_vec_[0][0]  )/inc;
-    dZMPMB_vec[0][1] = (ZMPMB_vec_[1][1]  -ZMPMB_vec_[0][1]  )/inc;
-    dZMPMB_vec[N-1][0] = (ZMPMB_vec_[N-1][0]-ZMPMB_vec_[N-2][0])/inc;
-    dZMPMB_vec[N-1][1] = (ZMPMB_vec_[N-1][1]-ZMPMB_vec_[N-2][1])/inc;
-    for(unsigned i=1 ; i<N-2  ; ++i)
+    else
     {
-      dZMPMB_vec[i][0] = (ZMPMB_vec_[i+1][0]-ZMPMB_vec_[i-1][0])/(2*inc);
-      dZMPMB_vec[i][1] = (ZMPMB_vec_[i+1][1]-ZMPMB_vec_[i-1][1])/(2*inc);
-    }
-    for(unsigned i=0 ; i<N-1  ; ++i)
-    {
-      Polynome5 polyX(1.0,0.0) ;
-      Polynome5 polyY(1.0,0.0) ;
-      polyX.SetParameters(inc,ZMPMB_vec_[i][0],dZMPMB_vec[i][0],0.0,ZMPMB_vec_[i+1][0],dZMPMB_vec[i+1][0],0.0);
-      polyY.SetParameters(inc,ZMPMB_vec_[i][1],dZMPMB_vec[i][1],0.0,ZMPMB_vec_[i+1][1],dZMPMB_vec[i+1][1],0.0);
+      zmpmb_i_.resize( N1 ) ;
+      for(unsigned int i = 0 ; i < N ; ++i)
+        zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
 
-      for(int j = 1 ; j < inc ; ++j)
+      vector<vector<double> > dZMPMB_vec (N,vector<double>(2,0.0)) ;
+      dZMPMB_vec[0][0] = (ZMPMB_vec_[1][0]  -ZMPMB_vec_[0][0]  )/inc;
+      dZMPMB_vec[0][1] = (ZMPMB_vec_[1][1]  -ZMPMB_vec_[0][1]  )/inc;
+      dZMPMB_vec[N-1][0] = (ZMPMB_vec_[N-1][0]-ZMPMB_vec_[N-2][0])/inc;
+      dZMPMB_vec[N-1][1] = (ZMPMB_vec_[N-1][1]-ZMPMB_vec_[N-2][1])/inc;
+      for(unsigned i=1 ; i<N-2  ; ++i)
       {
-        zmpmb_i_[(i*inc)+j][0] = polyX.Compute(j) ;
-        zmpmb_i_[(i*inc)+j][1] = polyY.Compute(j) ;
-        zmpmb_i_[(i*inc)+j][2] = 0.0 ;
+        dZMPMB_vec[i][0] = (ZMPMB_vec_[i+1][0]-ZMPMB_vec_[i-1][0])/(2*inc);
+        dZMPMB_vec[i][1] = (ZMPMB_vec_[i+1][1]-ZMPMB_vec_[i-1][1])/(2*inc);
+      }
+      for(unsigned i=0 ; i<N-1  ; ++i)
+      {
+        Polynome5 polyX(1.0,0.0) ;
+        Polynome5 polyY(1.0,0.0) ;
+        polyX.SetParameters(inc,ZMPMB_vec_[i][0],dZMPMB_vec[i][0],0.0,ZMPMB_vec_[i+1][0],dZMPMB_vec[i+1][0],0.0);
+        polyY.SetParameters(inc,ZMPMB_vec_[i][1],dZMPMB_vec[i][1],0.0,ZMPMB_vec_[i+1][1],dZMPMB_vec[i+1][1],0.0);
+
+        for(int j = 1 ; j < inc ; ++j)
+        {
+          zmpmb_i_[(i*inc)+j][0] = polyX.Compute(j) ;
+          zmpmb_i_[(i*inc)+j][1] = polyY.Compute(j) ;
+          zmpmb_i_[(i*inc)+j][2] = 0.0 ;
+        }
       }
     }
-  }
-  deltaZMP_deq_.resize(zmpmb_i_.size());
-  for (unsigned int i = 0 ; i < N1 ; ++i)
+    deltaZMP_deq_.resize(zmpmb_i_.size());
+    for (unsigned int i = 0 ; i < N1 ; ++i)
     {
       deltaZMP_deq_[i].px = inputZMPTraj_deq_[i].px - zmpmb_i_[i][0] ;
       deltaZMP_deq_[i].py = inputZMPTraj_deq_[i].py - zmpmb_i_[i][1] ;
     }
+  }
+  else{
+    for (unsigned int i = 0 ; i < N1 ; ++i)
+    {
+      deltaZMP_deq_[i].px = 0.0 ;
+      deltaZMP_deq_[i].py = 0.0 ;
+    }
+  }
+
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
 
   return 0 ;

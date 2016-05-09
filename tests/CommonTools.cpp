@@ -53,22 +53,25 @@ namespace PatternGeneratorJRL {
 
     void CommonInitialization(PatternGeneratorInterface &aPGI)
     {
-      const char lBuffer[12][256] =
-	{":comheight 0.8078",
-	 ":samplingperiod 0.005",
-	 ":previewcontroltime 1.6",
-	 ":omega 0.0",
-	 ":stepheight 0.07",
-	 ":singlesupporttime 0.78",
-	 ":doublesupporttime 0.02",
-	 ":armparameters 0.5",
-	 ":LimitsFeasibility 0.0",
-	 ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
-	 ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
-	 ":UpperBodyMotionParameters -0.1 -1.0 0.0"
-	};
+      const unsigned int nbMethod = 14 ;
+      const char lBuffer[nbMethod][256] =
+      {
+        ":comheight 0.8078",
+        ":samplingperiod 0.005",
+        ":previewcontroltime 1.6",
+        ":omega 0.0",
+        ":stepheight 0.07",
+        ":singlesupporttime 0.78",
+        ":doublesupporttime 0.02",
+        ":armparameters 0.5",
+        ":LimitsFeasibility 0.0",
+        ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
+        ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
+        ":UpperBodyMotionParameters -0.1 -1.0 0.0",
+        ":useDynamicFilter 0"
+      };
 
-      for(int i=0;i<9;i++)
+      for(int i=0;i<nbMethod;i++)
 	{
 	  std::istringstream strm(lBuffer[i]);
 	  aPGI.ParseCmd(strm);

@@ -35,7 +35,7 @@ ground plan taking into account the whole body motion */
 namespace PatternGeneratorJRL
 {
 
-  class DynamicFilter
+  class DynamicFilter : SimplePlugin
   {
   public: // Public methods
 
@@ -102,6 +102,8 @@ namespace PatternGeneratorJRL
               MAL_VECTOR_TYPE(double)& velocity,
               MAL_VECTOR_TYPE(double)& acceleration,
               MAL_S3_VECTOR_TYPE(double) & zmpmb);
+
+    void CallMethod(std::string & Method, std::istringstream &strm);
 
   private: // Private methods
 
@@ -203,6 +205,7 @@ namespace PatternGeneratorJRL
       std::vector<int> chestIndexinConfiguration_;
 
       bool walkingHeuristic_ ;
+      bool useDynamicFilter_ ;
 
       /// Class that compute the dynamic and kinematic of the robot
       PinocchioRobot * PR_ ;

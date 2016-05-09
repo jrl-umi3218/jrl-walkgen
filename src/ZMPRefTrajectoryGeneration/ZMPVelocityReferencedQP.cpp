@@ -586,34 +586,32 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
     }
 
-    bool filterOn_ = true ;
-    if(filterOn_)
+
+    dynamicFilter_->OnLinefilter(COMTraj_deq_,ZMPTraj_deq_ctrl_,
+                                 LeftFootTraj_deq_,
+                                 RightFootTraj_deq_,
+                                 deltaCOMTraj_deq_);
+//define DEBUG
+#ifdef DEBUG
+    dynamicFilter_->Debug(COMTraj_deq_ctrl_,
+                          LeftFootTraj_deq_ctrl_,
+                          RightFootTraj_deq_ctrl_,
+                          COMTraj_deq_,ZMPTraj_deq_ctrl_,
+                          LeftFootTraj_deq_,
+                          RightFootTraj_deq_,
+                          deltaCOMTraj_deq_);
+#endif
+
+    // Correct the CoM.
+    for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
     {
-      dynamicFilter_->OnLinefilter(COMTraj_deq_,ZMPTraj_deq_ctrl_,
-                                   LeftFootTraj_deq_,
-                                   RightFootTraj_deq_,
-                                   deltaCOMTraj_deq_);
-
-      #ifdef DEBUG
-        dynamicFilter_->Debug(COMTraj_deq_ctrl_,
-                              LeftFootTraj_deq_ctrl_,
-                              RightFootTraj_deq_ctrl_,
-                              COMTraj_deq_,ZMPTraj_deq_ctrl_,
-                              LeftFootTraj_deq_,
-                              RightFootTraj_deq_,
-                              deltaCOMTraj_deq_);
-      #endif
-
-      // Correct the CoM.
-      for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
+      for(int j=0;j<3;j++)
       {
-        for(int j=0;j<3;j++)
-        {
-          FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
-          FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
-        }
+        FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
+        FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
       }
     }
+
     // Specify that we are in the ending phase.
     if (time <= m_SamplingPeriod )
       {
