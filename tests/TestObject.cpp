@@ -237,6 +237,7 @@ namespace PatternGeneratorJRL
       if (! srdf_stream.is_open())
       {
         const std::string exception_message (filename + " does not seem to be a valid file.");
+        cerr << exception_message << endl ;
         throw std::invalid_argument(exception_message);
       }
       // Read xml stream

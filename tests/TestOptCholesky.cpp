@@ -181,5 +181,14 @@ int main()
   delete anOptCholesky;
   delete [] L;
   delete [] A;
+
+  if (return_value == -1){
+    cout << "Failed test" << endl;
+  }
+  else
+  {
+    cout << "Passed test" << endl;
+  }
+
   return return_value;
 }
