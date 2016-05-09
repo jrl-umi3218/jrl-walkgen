@@ -242,7 +242,13 @@ namespace PatternGeneratorJRL
       // Read xml stream
       using boost::property_tree::ptree;
       ptree pt;
-      read_xml(srdf_stream, pt);
+      try{
+        read_xml(srdf_stream, pt);
+      }catch(...)
+      {
+        cerr << "problem while reading the srdf file. File corrupted?" << endl;
+        return ;
+      }
 
       // Get the starting configuration : half sitting
       MAL_VECTOR_RESIZE(m_HalfSitting,aPR.numberDof()-6);
