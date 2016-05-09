@@ -80,3 +80,8 @@ commit_bien_herdt
 tests/TestHirukawa2007.cpp_dummy
 tests/filtre_dynamic_results.txt
 _build-INFORELDEB/*
+_build-Matan/
+_build-RELEASE_tmp/
+src/ZMPRefTrajectoryGeneration/nmpc_generatorMaster.cpp
+src/ZMPRefTrajectoryGeneration/nmpc_generatorMaster.hh
+tmp/
