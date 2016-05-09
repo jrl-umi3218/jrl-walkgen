@@ -116,9 +116,10 @@ public:
 
   bool doTest(std::ostream &os)
   {
-    TestObject::doTest(os);
+    bool ret = TestObject::doTest(os);
     if(m_DebugFGPIFull)
       ComputeAndDisplayZMPStatistic();
+    return ret ;
   }
 
   bool init()
