@@ -68,6 +68,8 @@ private:
   std::vector<se3::JointIndex> m_rightLeg ;
   std::vector<se3::JointIndex> m_leftArm  ;
   std::vector<se3::JointIndex> m_rightArm ;
+  se3::JointIndex m_leftGripper  ;
+  se3::JointIndex m_rightGripper ;
 
 public:
   TestNaveau2015(int argc, char *argv[], string &aString, int TestProfile):
@@ -75,7 +77,7 @@ public:
   {
     m_TestProfile = TestProfile;
     resetfiles=0;
-    m_DebugFGPIFull=true;
+    m_DebugFGPIFull=false;
     m_DebugFGPI=true;
     ComAndFootRealization_ = NULL;
     SPM_ = NULL ;
@@ -86,6 +88,8 @@ public:
     m_rightLeg.clear();
     m_leftArm .clear();
     m_rightArm.clear();
+    m_leftGripper  = 0 ;
+    m_rightGripper = 0 ;
   }
 
   ~TestNaveau2015()
@@ -113,7 +117,8 @@ public:
   bool doTest(std::ostream &os)
   {
     TestObject::doTest(os);
-    ComputeAndDisplayZMPStatistic();
+    if(m_DebugFGPIFull)
+      ComputeAndDisplayZMPStatistic();
   }
 
   bool init()
@@ -172,6 +177,18 @@ public:
       m_leftArm[i] = se3::idx_q(ActuatedJoints[m_leftArm[i]])-1;
     for(unsigned i=0 ; i <m_rightArm.size() ; ++i)
       m_rightArm[i] = se3::idx_q(ActuatedJoints[m_rightArm[i]])-1;
+
+    if((m_robotModel.parents.size() >= m_rightArm.back()+1) &&
+       m_robotModel.parents[m_rightArm.back()+1] == m_rightArm.back())
+      m_rightGripper = m_rightArm.back()+1 ;
+    else
+      m_rightGripper = 0 ;
+
+    if((m_robotModel.parents.size() >= m_leftArm.back()+1) &&
+       m_robotModel.parents[m_leftArm.back()+1] == m_leftArm.back())
+      m_leftGripper = m_leftArm.back()+1 ;
+    else
+      m_leftGripper = 0 ;
 
     return true ;
   }
@@ -262,10 +279,12 @@ protected:
     ComAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(
           aCOMState, aCOMSpeed, aCOMAcc, aLeftFootPosition, aRightFootPosition,
           conf, vel, acc, iteration, 1);
-    ++iteration;
 
-    conf(m_leftArm.back()+1) = 10.0*M_PI/180.0;
-    conf(m_rightArm.back()+1) = 10.0*M_PI/180.0;
+    if(m_leftGripper!=0 && m_rightGripper!=0)
+    {
+      conf(m_leftGripper) = 10.0*M_PI/180.0;
+      conf(m_rightGripper) = 10.0*M_PI/180.0;
+    }
   }
 
   MAL_VECTOR_TYPE(double) parseFromURDFtoOpenHRPIndex()
@@ -317,7 +336,7 @@ protected:
     string aZMPFileName = /*"/tmp/" +*/ m_TestName + ".zmp" ;
     string aWaistFileName = /*"/tmp/" +*/ m_TestName + ".waist" ;
     string aHipFileName = /*"/tmp/" +*/ m_TestName + ".hip" ;
-    if ( iteration == 1 )
+    if ( iteration == 0 )
     {
       aof.open(aPosFileName.c_str(),ofstream::out);
       aof.close();
@@ -332,7 +351,7 @@ protected:
     aof.open(aPosFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( (double)(iteration-1) * 0.005 ) << " "  ;// 1
+    aof << filterprecision( (double)iteration * 0.005 ) << " "  ;// 1
     for(unsigned i=6 ; i<MAL_VECTOR_SIZE(conf) ; ++i)
       aof << filterprecision( conf(i) ) << " "  ;                    // 2-30
     for(unsigned i=0 ; i<9 ; ++i)
@@ -343,7 +362,7 @@ protected:
      aof.open(aWaistFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( (double)(iteration-1) * 0.005 ) << " "  ;     // 1
+    aof << filterprecision( (double)iteration * 0.005 ) << " "  ;     // 1
     aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ; // 2
     aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0]) << " "  ;// 3
     aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0]) ;          // 4
@@ -354,7 +373,7 @@ protected:
     aof.open(aHipFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( (double)(iteration-1) * 0.005 ) << " "  ;     // 1
+    aof << filterprecision( (double)iteration * 0.005 ) << " "  ;     // 1
     aof << filterprecision( m_OneStep.finalCOMPosition.roll[0]) << " "  ; // 2
     aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0]) << " "  ;// 3
     aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0]) ;          // 4
@@ -371,14 +390,12 @@ protected:
     aof.open(aZMPFileName.c_str(),ofstream::app);
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( (double)(iteration-1) * 0.005 ) << " "  ;   // 1
+    aof << filterprecision( (double)iteration * 0.005 ) << " "  ;   // 1
     aof << filterprecision( m_OneStep.ZMPTarget(0) - conf(0)) << " "  ; // 2
     aof << filterprecision( m_OneStep.ZMPTarget(1) - conf(1) ) << " "  ;// 3
     aof << filterprecision( aSupportState.z  - conf(2))  ;              // 4
     aof << endl ;
     aof.close();
-
-    iteration++;
   }
 
   void prepareDebugFiles()
@@ -405,7 +422,7 @@ protected:
     {
 
       analyticalInverseKinematics(m_conf,m_vel,m_acc);
-      if(iteration==1)
+      if(iteration==0)
       {
         bool isHalfsitting = true ;
         for(unsigned i=0 ; i<MAL_VECTOR_SIZE(m_HalfSitting) ; ++i)
@@ -418,16 +435,8 @@ protected:
 //        cout << m_conf << endl ;
 //        cout << m_HalfSitting << endl ;
 //        cout << std::boolalpha << isHalfsitting << endl ;
-        assert(isHalfsitting);
+        //assert(isHalfsitting);
       }
-
-      se3::JointModelVector & ActuatedJoints = m_DebugPR->getActuatedJoints();
-      se3::JointIndex leftHand = se3::idx_q(
-            ActuatedJoints[m_DebugPR->leftWrist()+1]);
-      se3::JointIndex rightHand = se3::idx_q(
-            ActuatedJoints[m_DebugPR->rightWrist()+1]);
-//      m_conf(leftHand) = 0.174532925 ;     // gripper openning
-//      m_conf(rightHand)= 0.174532925 ;     // gripper openning
 
       m_DebugPR->computeInverseDynamics(m_conf,m_vel,m_acc);
       createOpenHRPFiles();
@@ -435,6 +444,8 @@ protected:
       m_DebugPR->zeroMomentumPoint(zmpmb);
       m_err_zmp_x.push_back(zmpmb[0]-m_OneStep.ZMPTarget(0)) ;
       m_err_zmp_y.push_back(zmpmb[1]-m_OneStep.ZMPTarget(1)) ;
+
+      ++iteration;
 
       ofstream aof;
       string aFileName;
