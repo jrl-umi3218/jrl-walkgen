@@ -28,9 +28,7 @@
 #include "Debug.hh"
 #include "CommonTools.hh"
 #include "TestObject.hh"
-#ifdef WITH_HRP2DYNAMICS
-  #include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
-#endif
+
 using namespace::PatternGeneratorJRL;
 using namespace::PatternGeneratorJRL::TestSuite;
 using namespace std;
@@ -61,20 +59,6 @@ public:
 
 protected:
 
-  void SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR, CjrlHumanoidDynamicRobot *& aDebugHDR )
-  {
-    aHDR = NULL ;
-    aDebugHDR = NULL ;
-
-#ifdef WITH_HRP2DYNAMICS
-    dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
-    Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot( &aRobotDynamicsObjectConstructor );
-    aHDR = aHRP2HDR;
-    aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
-#endif
-  }
-
-
   void startOnLineWalking(PatternGeneratorInterface &aPGI)
   {
     CommonInitialization(aPGI);
@@ -83,6 +67,10 @@ protected:
       istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
       aPGI.ParseCmd(strm2);
 
+    }
+    {
+      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
+      m_PGI->ParseCmd(strm2);
     }
     {
       istringstream strm2(":singlesupporttime 0.7");
@@ -111,6 +99,10 @@ protected:
       istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
       aPGI.ParseCmd(strm2);
 
+    }
+    {
+      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
+      m_PGI->ParseCmd(strm2);
     }
     {
       istringstream strm2(":singlesupporttime 0.7");
