@@ -56,7 +56,8 @@ PinocchioRobot::PinocchioRobot()
   m_boolData      = false ;
   m_boolLeftFoot  = false ;
   m_boolRightFoot = false ;
-  m_isInverseKinematic = false ;
+  m_isLegInverseKinematic = false ;
+  m_isArmInverseKinematic = false ;
 
   m_chest = 0 ;
   m_waist = 0 ;
@@ -231,34 +232,34 @@ bool PinocchioRobot::testInverseKinematics()
   rightArmJointName = {"JointModelRY", "JointModelRX", "JointModelRZ",
                        "JointModelRY", "JointModelRZ", "JointModelRY"};
 
-  m_isInverseKinematic = true ;
-
+  m_isLegInverseKinematic = true ;
+  m_isArmInverseKinematic = true ;
   for (unsigned  i=0 ; i<leftLegJointName.size() ; ++i)
   {
     std::string shortName = boost::apply_visitor(Joint_shortname(),
                                             m_robotModel->joints[leftLeg[i]]);
-    m_isInverseKinematic &= (shortName == leftLegJointName[i]);
+    m_isLegInverseKinematic &= (shortName == leftLegJointName[i]);
   }
   for (unsigned  i=0 ; i<rightLegJointName.size() ; ++i)
   {
     std::string shortName = boost::apply_visitor(Joint_shortname(),
                                             m_robotModel->joints[rightLeg[i]]);
-    m_isInverseKinematic &= (shortName == rightLegJointName[i]);
+    m_isLegInverseKinematic &= (shortName == rightLegJointName[i]);
   }
   for (unsigned  i=0 ; i<leftArmJointName.size() ; ++i)
   {
     std::string shortName = boost::apply_visitor(Joint_shortname(),
                                             m_robotModel->joints[leftArm[i]]);
-    m_isInverseKinematic &= (shortName == leftArmJointName[i]);
+    m_isArmInverseKinematic &= (shortName == leftArmJointName[i]);
   }
   for (unsigned  i=0 ; i<rightArmJointName.size() ; ++i)
   {
     std::string shortName = boost::apply_visitor(Joint_shortname(),
                                             m_robotModel->joints[rightArm[i]]);
-    m_isInverseKinematic &= (shortName == rightArmJointName[i]);
+    m_isArmInverseKinematic &= (shortName == rightArmJointName[i]);
   }
 
-  return m_isInverseKinematic;
+  return m_isLegInverseKinematic & m_isArmInverseKinematic;
 }
 
 void PinocchioRobot::initializeInverseKinematics()
@@ -267,10 +268,6 @@ void PinocchioRobot::initializeInverseKinematics()
       jointsBetween(m_waist,m_leftFoot.associatedAnkle);
   std::vector<se3::JointIndex> rightLeg =
       jointsBetween(m_waist,m_rightFoot.associatedAnkle);
-  std::vector<se3::JointIndex> leftArm =
-      jointsBetween(m_chest,m_leftWrist);
-  std::vector<se3::JointIndex> rightArm =
-      jointsBetween(m_chest,m_rightWrist);
 
   MAL_S3_VECTOR_CLEAR(m_leftDt);
   MAL_S3_VECTOR_CLEAR(m_rightDt);
@@ -292,12 +289,16 @@ void PinocchioRobot::initializeInverseKinematics()
   m_rightDt(2)=waist_M_rightHip.translation()(2);
 
   m_femurLength = m_robotModel->jointPlacements[rightLeg[4]]
-      .translation().norm();
+    .translation().norm();
 
   m_tibiaLengthY =
       std::abs(m_robotModel->jointPlacements[rightLeg[5]].translation()[1]);
   m_tibiaLengthZ =
       std::abs(m_robotModel->jointPlacements[rightLeg[5]].translation()[2]);
+
+  if(m_femurLength==0 || m_tibiaLengthZ==0)
+    m_isLegInverseKinematic=false;
+
   return ;
 }
 
@@ -429,13 +430,13 @@ ComputeSpecializedInverseKinematics(
     MAL_VECTOR_TYPE(double) &q )
 {
   MAL_VECTOR_FILL(q,0.0);
-  if(!m_isInverseKinematic)
-    return false ;
-
   /*! Try to find out which kinematics chain the user
     send to the method.*/
   if (jointRoot==m_waist)
   {
+    if(!m_isLegInverseKinematic)
+      return false ;
+
     /* Consider here the legs. */
     if (jointEnd==m_leftFoot.associatedAnkle)
     {
@@ -455,6 +456,9 @@ ComputeSpecializedInverseKinematics(
   }
   else
   {
+    if(!m_isArmInverseKinematic)
+      return false ;
+
     if ( (m_leftShoulder==0) || (m_rightShoulder==0) )
       DetectAutomaticallyShoulders();
 
@@ -480,8 +484,8 @@ void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
 {
   double _epsilon=1.0e-6;
   // definition des variables relatif au design du robot
-  double A = m_femurLength;//m_FemurLength = 0.3 for hrp2-14;
-  double B = m_tibiaLengthZ;//m_TibiaLength = 0.3 for hrp2-14;
+  double A = m_femurLength;
+  double B = m_tibiaLengthZ;
   //double C = 0.0;
   double c5 = 0.0;
   double q6a = 0.0;

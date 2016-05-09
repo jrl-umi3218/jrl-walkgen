@@ -62,7 +62,8 @@ namespace PatternGeneratorJRL
     void computeForwardKinematics();
     void computeForwardKinematics(MAL_VECTOR_TYPE(double) & q);
 
-    /// \brief compute POSITION (not velocity) of the joints from end effector pose
+    /// \brief ComputeSpecializedInverseKinematics :
+    /// compute POSITION (not velocity) of the joints from end effector pose
     /// This is the implementation of the analitycal inverse kinematic extracted
     /// from the book of Kajita
     /// Authors Shuuji Kajita ; Hirohisa Hirukawa ; Kensuke Harada ; Kazuhito Yokoi
@@ -74,9 +75,9 @@ namespace PatternGeneratorJRL
     /// param end joint index, i.e, the wrist or ankle indexes
     /// param root joint homogenous matrix position,
     /// param root joint homogenous matrix index,
-    /// param 6D vector output, is fill with zeros if the robot is not compatible
+    /// param 6D vector output, filled with zeros if the robot is not compatible
     ///
-    bool ComputeSpecializedInverseKinematics(
+    virtual bool ComputeSpecializedInverseKinematics(
         const se3::JointIndex &jointRoot,
         const se3::JointIndex &jointEnd,
         const MAL_S4x4_MATRIX_TYPE(double) & jointRootPosition,
@@ -84,11 +85,21 @@ namespace PatternGeneratorJRL
         MAL_VECTOR_TYPE(double) &q);
 
     ///
-    /// \brief testInverseKinematics : test if the robot has the good joint
+    /// \brief testInverseKinematics :
+    /// test if the robot has the good joint
     /// configuration to use the analitical inverse geometry
+    /// to be overloaded if the user wants another inverse kinematics
     /// \return
     ///
-    bool testInverseKinematics();
+    virtual bool testInverseKinematics();
+
+    ///
+    /// \brief initializeInverseKinematics :
+    /// initialize the internal data for the inverse kinematic e.g. the femur
+    /// length
+    /// \return
+    ///
+    virtual void initializeInverseKinematics();
 
   public :
     /// tools :
@@ -98,7 +109,6 @@ namespace PatternGeneratorJRL
 
   private :
     // needed for the inverse geometry (ComputeSpecializedInverseKinematics)
-    void initializeInverseKinematics();
     void getWaistFootKinematics(const matrix4d & jointRootPosition,
                                 const matrix4d & jointEndPosition,
                                 vectorN &q,
@@ -219,7 +229,9 @@ namespace PatternGeneratorJRL
 
     // Variables extracted form the urdf used for the analitycal inverse
     // kinematic
-    bool m_isInverseKinematic ;
+    bool m_isLegInverseKinematic ;
+    bool m_isArmInverseKinematic ;
+
     // length between the waist and the hip
     MAL_S3_VECTOR_TYPE(double) m_leftDt, m_rightDt ;
     double m_femurLength ;
