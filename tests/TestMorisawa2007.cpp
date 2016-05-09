@@ -27,26 +27,6 @@
 
 #include "CommonTools.hh"
 #include "TestObject.hh"
-#include <metapod/models/hrp2_14/hrp2_14.hh>
-#include <ZMPRefTrajectoryGeneration/DynamicFilter.hh>
-#include <metapod/algos/rnea.hh>
-#ifndef METAPOD_INCLUDES
-#define METAPOD_INCLUDES
-// metapod includes
-#include <metapod/tools/print.hh>
-#include <metapod/tools/initconf.hh>
-#include <metapod/algos/rnea.hh>
-#include <Eigen/StdVector>
-#endif
-
-
-#ifndef METAPOD_TYPEDEF2
-#define METAPOD_TYPEDEF2
-typedef double LocalFloatType2;
-typedef metapod::Spatial::ForceTpl<LocalFloatType2> Force2;
-typedef metapod::hrp2_14<LocalFloatType2> Robot_Model2;
-typedef metapod::Nodes< Robot_Model2, Robot_Model2::BODY >::type Node2;
-#endif
 
 using namespace::PatternGeneratorJRL;
 using namespace::PatternGeneratorJRL::TestSuite;
@@ -87,9 +67,7 @@ private:
   // New time between two steps.
   double m_deltatime;
 
-  /// Class that compute the dynamic and kinematic of the robot
-  CjrlHumanoidDynamicRobot * cjrlHDR_ ;
-  SimplePluginManager * SPM ;
+  // iteration for teh files
   int iteration ;
 
 public:
@@ -100,19 +78,11 @@ public:
     m_TestChangeFoot = true;
     m_NbStepsModified = 0;
     m_deltatime = 0;
-
-    SPM = 0 ;
     iteration = 0 ;
   }
 
   ~TestMorisawa2007()
-  {
-    if ( SPM != 0 )
-    {
-      delete SPM ;
-      SPM = 0 ;
-    }
-  }
+  {}
 
 protected:
 
@@ -124,19 +94,6 @@ protected:
     double ladb2 = adb * 1e7;
     double lintadb2 = trunc(ladb2);
     return lintadb2/1e7;
-  }
-
-  void SpecializedRobotConstructor(   CjrlHumanoidDynamicRobot *& aHDR, CjrlHumanoidDynamicRobot *& aDebugHDR )
-  {
-    aHDR = NULL ;
-    aDebugHDR = NULL ;
-
-#ifdef WITH_HRP2DYNAMICS
-    dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
-    Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot( &aRobotDynamicsObjectConstructor );
-    aHDR = aHRP2HDR;
-    aDebugHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
-#endif
   }
 
   void StartAnalyticalOnLineWalking(PatternGeneratorInterface &aPGI)
@@ -169,6 +126,11 @@ protected:
                           0.0 -0.19 0.0 0.0  \
                           ");
                           aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":useDynamicFilter false");
+      aPGI.ParseCmd(strm2);
     }
   }
 
