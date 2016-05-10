@@ -1,42 +1,47 @@
+/*
+ * Copyright 2015,
+ *
+ * Maximilien Naveau
+ * Olivier Stasse
+ *
+ * JRL, CNRS/AIST
+ *
+ * This file is part of jrl-walkgen.
+ * jrl-walkgen is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * jrl-walkgen is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with jrl-walkgen.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Research carried out within the scope of the
+ *  Joint Japanese-French Robotics Laboratory (JRL)
+ */
+/*! \file DynamicFilter.hh
+  \brief This object defines a dynamic filter that modify the CoM on the
+ground plan taking into account the whole body motion */
+
 #ifndef DYNAMICFILTER_HH 
 #define DYNAMICFILTER_HH
 
-// metapod includes
-#include <metapod/models/hrp2_14/hrp2_14.hh>
 #include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
-#include <metapod/algos/jac_point_chain.hh>
 #include "Clock.hh"
-#include <boost/fusion/algorithm/iteration/accumulate.hpp>
-#include <boost/fusion/include/accumulate.hpp>
-
-#ifndef METAPOD_TYPEDEF
-#define METAPOD_TYPEDEF
-    typedef double LocalFloatType;
-    typedef metapod::Spatial::ForceTpl<LocalFloatType> Force_HRP2_14;
-    typedef metapod::hrp2_14<LocalFloatType> Robot_Model;
-
-    typedef metapod::Nodes< Robot_Model, Robot_Model::BODY >::type RootNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::l_wrist >::type LhandNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::r_wrist >::type RhandNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::LARM_LINK0 >::type LshoulderNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::RARM_LINK0 >::type RshoulderNode;
-
-    typedef metapod::Nodes< Robot_Model, Robot_Model::LLEG_LINK0 >::type LhipNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::RLEG_LINK0 >::type RhipNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::l_ankle >::type LankleNode;
-    typedef metapod::Nodes< Robot_Model, Robot_Model::r_ankle >::type RankleNode;
-#endif
 
 namespace PatternGeneratorJRL
 {
 
-  class DynamicFilter
+  class DynamicFilter : SimplePlugin
   {
   public: // Public methods
 
     /// \brief
     DynamicFilter(SimplePluginManager *SPM,
-                  CjrlHumanoidDynamicRobot *aHS
+                  PinocchioRobot *aPR
                   );
     ~DynamicFilter();
     /// \brief
@@ -82,7 +87,7 @@ namespace PatternGeneratorJRL
         const COMState & inputCoMState,
         const FootAbsolutePosition & inputLeftFoot,
         const FootAbsolutePosition & inputRightFoot,
-        vector<double> & ZMPMB,
+        MAL_S3_VECTOR_TYPE(double) & ZMPMB,
         unsigned int stage,
         unsigned int iteration);
 
@@ -96,7 +101,9 @@ namespace PatternGeneratorJRL
     int zmpmb(MAL_VECTOR_TYPE(double)& configuration,
               MAL_VECTOR_TYPE(double)& velocity,
               MAL_VECTOR_TYPE(double)& acceleration,
-              vector<double> & zmpmb);
+              MAL_S3_VECTOR_TYPE(double) & zmpmb);
+
+    void CallMethod(std::string & Method, std::istringstream &strm);
 
   private: // Private methods
 
@@ -105,8 +112,6 @@ namespace PatternGeneratorJRL
     void InverseDynamics(MAL_VECTOR_TYPE(double)& configuration,
                          MAL_VECTOR_TYPE(double)& velocity,
                          MAL_VECTOR_TYPE(double)& acceleration);
-
-    void ExtractZMP(vector<double> & zmpmb) ;
 
     void computeWaist(const FootAbsolutePosition & inputLeftFoot) ;
 
@@ -122,8 +127,8 @@ namespace PatternGeneratorJRL
     inline ComAndFootRealizationByGeometry * getComAndFootRealization()
     { return comAndFootRealization_;}
 
-    inline CjrlHumanoidDynamicRobot * getCjrlHumanoidDynamicRobot()
-    { return cjrlHDR_;}
+    inline PinocchioRobot * getPinocchioRobot()
+    { return PR_;}
 
     inline double getControlPeriod()
     {return controlPeriod_ ;}
@@ -140,7 +145,7 @@ namespace PatternGeneratorJRL
     inline Clock * getClock()
     { return &clock_ ; }
 
-    inline deque< vector<double> > zmpmb()
+    inline deque< MAL_S3_VECTOR_TYPE(double) > zmpmb()
     { return ZMPMB_vec_ ; }
 
   private: // Private members
@@ -188,22 +193,30 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_TYPE(double) upperPartVelocity_ ;
       MAL_VECTOR_TYPE(double) previousUpperPartVelocity_ ;
       MAL_VECTOR_TYPE(double) upperPartAcceleration_ ;
-      std::vector <unsigned int> upperPartIndex ;
+      /*! \brief For the left leg, Specific for the Inverse Kinematics. */
+      std::vector<int> leftLegIndexinConfiguration_;
+      /*! \brief For the right leg, Specific for the Inverse Kinematics. */
+      std::vector<int> rightLegIndexinConfiguration_;
+      /*! \brief For the left arm, Specific for the Inverse Kinematics. */
+      std::vector<int> leftArmIndexinConfiguration_;
+      /*! \brief For the right leg, Specific for the Inverse Kinematics. */
+      std::vector<int> rightArmIndexinConfiguration_;
+      /*! \brief For the chest. */
+      std::vector<int> chestIndexinConfiguration_;
+
       bool walkingHeuristic_ ;
+      bool useDynamicFilter_ ;
 
       /// Class that compute the dynamic and kinematic of the robot
-      CjrlHumanoidDynamicRobot * cjrlHDR_ ;
-      Robot_Model hrp2_14_ ;
-      Robot_Model::confVector q_,dq_,ddq_;
-      Force_HRP2_14 com_tensor_ ;
+      PinocchioRobot * PR_ ;
 
       /// \brief Buffers the ZMP Multibody computed
       /// from the inverse Dynamics, and the difference between
       /// this zmp and the reference one.
       /// sampled at interpolation sampling period
-      deque< vector<double> > ZMPMB_vec_ ;
+      deque< MAL_S3_VECTOR_TYPE(double) > ZMPMB_vec_ ;
       /// sampled at control sampling period
-      deque< vector<double> > zmpmb_i_ ;
+      deque< MAL_S3_VECTOR_TYPE(double) > zmpmb_i_ ;
       /// sampled at control sampling period
       std::deque<ZMPPosition> deltaZMP_deq_ ;
 
@@ -231,7 +244,7 @@ namespace PatternGeneratorJRL
 
     public : // debug functions      
       // to use the vector of eigen used by metapod
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
       void Debug(const deque<COMState> & ctrlCoMState,
                  const deque<FootAbsolutePosition> & ctrlLeftFoot,

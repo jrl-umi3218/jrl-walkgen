@@ -37,7 +37,7 @@ using namespace PatternGeneratorJRL;
 
 LeftAndRightFootTrajectoryGenerationMultiple::
 LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
-                                             CjrlFoot * lFoot) : SimplePlugin(lSPM)
+                                             PRFoot * lFoot) : SimplePlugin(lSPM)
 {
   m_Omega = 0.0;
   m_Omega2 = 0.0;
@@ -67,7 +67,7 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
 
 }
 
-CjrlFoot* LeftAndRightFootTrajectoryGenerationMultiple::getFoot() const
+PRFoot * LeftAndRightFootTrajectoryGenerationMultiple::getFoot() const
 {
   return m_Foot;
 }
@@ -520,7 +520,14 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
           distSquareToLine = (dx*currSupp(0)  + dy*currSupp(1) + dc)*(dx*currSupp(0)  + dy*currSupp(1) + dc)/(dx*dx + dy*dy);
           if( distSquareToLine < m_WayPointThreshold )
           {
-            m_MiddleWayPoint = MAL_RET_A_by_B(Orientation, relWayPoint) + currSupp  ;
+            double x(currSupp(0)), y(currSupp(1)),
+                x0((FinalPos(0)+InitPos(0))*0.5), y0((FinalPos(1)+InitPos(1))*0.5),
+                R2((dx*dx+dy+dy)*0.5*0.5);
+            bool autocollision = (x-x0)*(x-x0)+(y-y0)*(y-y0)<=R2;
+            if( autocollision )
+            {
+              m_MiddleWayPoint = MAL_RET_A_by_B(Orientation, relWayPoint) + currSupp  ;
+            }
           }
         }
       }

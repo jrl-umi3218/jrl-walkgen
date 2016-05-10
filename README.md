@@ -1,9 +1,12 @@
 jrl-walkgen
 ===========
-
+jrl-umi travis results :
 [![Build Status](https://travis-ci.org/jrl-umi3218/jrl-walkgen.png)](https://travis-ci.org/jrl-umi3218/jrl-walkgen)
 [![Coverage Status](https://coveralls.io/repos/jrl-umi3218/jrl-walkgen/badge.png?branch=master)](https://coveralls.io/r/jrl-umi3218/jrl-walkgen?branch=master)
 
+MaximilienNaveau travis results :
+[![Build Status](https://travis-ci.org/MaximilienNaveau/jrl-walkgen.svg?branch=master)](https://travis-ci.org/MaximilienNaveau/jrl-walkgen)
+[![Coverage Status](https://coveralls.io/repos/MaximilienNaveau/jrl-walkgen/badge.png?branch=master)](https://coveralls.io/r/MaximilienNaveau/jrl-walkgen?branch=master)
 
 This software provides a pattern generator for biped robots.
 

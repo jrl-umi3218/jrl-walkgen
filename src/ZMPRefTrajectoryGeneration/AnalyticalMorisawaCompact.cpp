@@ -74,7 +74,7 @@ namespace PatternGeneratorJRL
 {
 
 
-  AnalyticalMorisawaCompact::AnalyticalMorisawaCompact(SimplePluginManager *lSPM , CjrlHumanoidDynamicRobot *aHS)
+  AnalyticalMorisawaCompact::AnalyticalMorisawaCompact(SimplePluginManager *lSPM , PinocchioRobot *aPR)
     : AnalyticalMorisawaAbstract(lSPM)
   {
 
@@ -86,7 +86,7 @@ namespace PatternGeneratorJRL
     memset(&m_CTIPY,0,sizeof(m_CTIPY));
 
     m_OnLineChangeStepMode = ABSOLUTE_FRAME;
-    m_HS = aHS;
+    m_PR = aPR;
     m_FeetTrajectoryGenerator =
         m_BackUpm_FeetTrajectoryGenerator = 0;
 
@@ -111,7 +111,7 @@ namespace PatternGeneratorJRL
                                                                           m_AnalyticalZMPCoGTrajectoryY,
                                                                           m_PreviewControl);
 
-    m_kajitaDynamicFilter = new DynamicFilter(lSPM,m_HS);
+    m_kajitaDynamicFilter = new DynamicFilter(lSPM,m_PR);
 
     m_VerboseLevel=0;
 
@@ -532,17 +532,17 @@ computing the analytical trajectories. */
     // INITIALIZE FEET POSITIONS:
     // --------------------------
     vector3d lAnklePositionRight,lAnklePositionLeft;
-    CjrlFoot *LeftFoot, *RightFoot;
-    LeftFoot = m_HS->leftFoot();
+    PRFoot *LeftFoot, *RightFoot;
+    LeftFoot = m_PR->leftFoot();
     if (LeftFoot==0)
       LTHROW("No left foot");
 
-    RightFoot = m_HS->rightFoot();
+    RightFoot = m_PR->rightFoot();
     if (RightFoot==0)
       LTHROW("No right foot");
 
-    LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
-    RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
+    lAnklePositionLeft = LeftFoot->anklePosition ;
+    lAnklePositionRight = RightFoot->anklePosition ;
 
     MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
     m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
@@ -615,11 +615,9 @@ computing the analytical trajectories. */
                                      KajitaPCpreviewWindow,
                                      lStartingCOMState );
         /*! Set the upper body trajectory */
-        CjrlHumanoidDynamicRobot * aHDR = m_kajitaDynamicFilter->
-                                                 getComAndFootRealization()->getHumanoidDynamicRobot();
-        MAL_VECTOR_TYPE(double) UpperConfig = aHDR->currentConfiguration() ;
-        MAL_VECTOR_TYPE(double) UpperVel = aHDR->currentVelocity() ;
-        MAL_VECTOR_TYPE(double) UpperAcc = aHDR->currentAcceleration() ;
+        MAL_VECTOR_TYPE(double) UpperConfig = m_PR->currentConfiguration() ;
+        MAL_VECTOR_TYPE(double) UpperVel    = m_PR->currentVelocity() ;
+        MAL_VECTOR_TYPE(double) UpperAcc    = m_PR->currentAcceleration() ;
         // carry the weight in front of him
 //        UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
 //        UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
@@ -661,7 +659,7 @@ computing the analytical trajectories. */
     //    UpperConfig(35)= 0.174532925 ;    // LARM_JOINT6
 
         for(unsigned int i = 18 ; i < 35 ; ++i){
-          UpperConfig(i)=m_HS->currentConfiguration()(i);
+          UpperConfig(i)=m_PR->currentConfiguration()(i);
           UpperVel(i)=0.0;
           UpperAcc(i)=0.0;
         }
@@ -754,17 +752,17 @@ computing the analytical trajectories. */
     // INITIALIZE FEET POSITIONS:
     // --------------------------
     vector3d lAnklePositionRight,lAnklePositionLeft;
-    CjrlFoot *LeftFoot, *RightFoot;
-    LeftFoot = m_HS->leftFoot();
+    PRFoot *LeftFoot, *RightFoot;
+    LeftFoot = m_PR->leftFoot();
     if (LeftFoot==0)
       LTHROW("No left foot");
 
-    RightFoot = m_HS->rightFoot();
+    RightFoot = m_PR->rightFoot();
     if (RightFoot==0)
       LTHROW("No right foot");
 
-    LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
-    RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
+    lAnklePositionLeft  = LeftFoot->anklePosition ;
+    lAnklePositionRight = RightFoot->anklePosition ;
 
     MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
     m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
@@ -2680,11 +2678,11 @@ new step has to be generate.
     // absFootz_0, the z axis is expressed in the waist frame
     // we choose the left one by default, the foot are supposed to be symetrical
     // we use it pass the ankle position to the fot position
-    CjrlFoot *aFoot = m_HS->leftFoot() ;
+    PRFoot *aFoot = m_PR->leftFoot() ;
     if (aFoot==0)
       LTHROW("No foot");
     vector3d corrZ ;
-    aFoot->getAnklePositionInLocalFrame(corrZ);
+    corrZ = aFoot->anklePosition ;
 
     // after the final step we keep the same position for a while
     if( Index >= m_AbsoluteSupportFootPositions.size() )
@@ -2696,23 +2694,14 @@ new step has to be generate.
         CoMz[2] = 0.0 ;
         return ;
       }
-      double Lastcom_z = FinalCoMPositions.back().z[0] ;
-      double lowerPoseCoMz = 0.95*m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);
-      double higherPoseCoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);
 
-      if(Lastcom_z >= higherPoseCoMz + 0.0001 || Lastcom_z <= higherPoseCoMz - 0.0001)
-      {
-        m_CoMbsplinesZ->SetParameters(
-            m_RelativeFootPositions[0].SStime,
-            lowerPoseCoMz,higherPoseCoMz,
-            vector<double>(), vector<double>(), CoMz[1], CoMz[2]) ;
-        m_CoMbsplinesZ->Compute(t-Index*moving_time+m_RelativeFootPositions[0].DStime,
-                                CoMz[0],CoMz[1],CoMz[2]) ;
-      }else{
-        CoMz[0] = Lastcom_z;
-        CoMz[1] = 0.0 ;
-        CoMz[2] = 0.0 ;
-      }
+      COMState LastCoM = FinalCoMPositions.back();
+      double higherPoseCoMz = m_InitialPoseCoMHeight + m_AbsoluteSupportFootPositions.back().z - corrZ(2);
+      double ft = m_RelativeFootPositions.back().SStime-(t-Index*moving_time) ;
+
+      m_CoMbsplinesZ->SetParameters(ft,LastCoM.z[0],higherPoseCoMz,
+            vector<double>(), vector<double>(), LastCoM.z[1], LastCoM.z[2]) ;
+      m_CoMbsplinesZ->Compute(m_SamplingPeriod,CoMz[0],CoMz[1],CoMz[2]) ;
       return ;
     }
 //    cout << "INDEX = " << Index << endl ;
@@ -2733,7 +2722,11 @@ new step has to be generate.
     if (FinalCoMPositions.size()!=0)
       LastCoM = FinalCoMPositions.back() ;
     else
+    {
       LastCoM.z[0] = initCoMheight ;
+      LastCoM.z[1] = 0.0 ;
+      LastCoM.z[2] = 0.0 ;
+    }
 
     // we start analyze since 2nd step
     if ( Index == 0 )
@@ -2742,21 +2735,18 @@ new step has to be generate.
       sy = m_RelativeFootPositions[Index+1].sy ;
       sz = m_RelativeFootPositions[Index+1].sz ;
       FinalTime = moving_time ;
-      InitSpeed = 0.0 ;
       interpolationTime = t-Index*moving_time ;
-      InitPos = initCoMheight ;
       FinalPos = initCoMheight ;
-      if(sx*sx+sy*sy > 0.2*0.2 && sz*sz+sz*sz < 0.00001)
+      FinalTime = SStime - interpolationTime ;
+      if(sx*sx+sy*sy > 0.22*0.22 && sz*sz+sz*sz < 0.00001 && sx*sx+sx*sx > 0.00001)
       {
-        FinalTime = SStime ;
         FinalPos = lowerCoMheight ;
-      }else if(LastCoM.z[0] >= initCoMheight + 0.00001 || LastCoM.z[0] <= initCoMheight - 0.00001)
-      {
-        FinalTime = SStime ;
-        InitPos = lowerCoMheight ;
       }
+      InitPos   = LastCoM.z[0];
+      InitSpeed = LastCoM.z[1];
+      InitAcc   = LastCoM.z[2];
       m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
-      m_CoMbsplinesZ->Compute(interpolationTime,CoMz[0],CoMz[1],CoMz[2]) ;
+      m_CoMbsplinesZ->Compute(m_SamplingPeriod,CoMz[0],CoMz[1],CoMz[2]) ;
       return ;
     }
 
@@ -2789,8 +2779,6 @@ new step has to be generate.
     if (absFootz_0 > absFootz_1) // first leg
       {
         deltaZ = absFootz_0 - absFootz_1;
-        FinalTime = (upRight-upLeft)*SStime ;
-
         if (Index>1)
           InitPos = m_InitialPoseCoMHeight + absFootz_2 - up*(absFootz_1 - absFootz_2) ;
         else // Special case: starting the motion.
@@ -2799,21 +2787,18 @@ new step has to be generate.
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight + absFootz_1 - up*deltaZ;
 
-        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
-
         interpolationTime = t-Index*moving_time - upLeft*SStime ;
+        FinalTime = (upRight-upLeft)*SStime - interpolationTime ;
       }
     else if (absFootz_0 == absFootz_1 && m_RelativeFootPositions[Index-1].sz > 0) // 2nd leg
       {
         deltaZ = (absFootz_0 - absFootz_2 );
-        FinalTime = (upRight-upLeft)*SStime ;
         InitPos = m_InitialPoseCoMHeight + absFootz_2 - up*deltaZ ;
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight + absFootz_0 ;
 
-        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
-
         interpolationTime = t-Index*moving_time - upLeft*SStime ;
+        FinalTime = (upRight-upLeft)*SStime - interpolationTime;
       }
     // going down
     // the CoM line will decrease an //1+down// stair height
@@ -2822,8 +2807,6 @@ new step has to be generate.
     else if (absFootz_0 < absFootz_1 )
       {
         deltaZ = absFootz_1 - absFootz_0;
-        FinalTime = (downRight-downLeft)*SStime ;
-
         if (Index>1)
           InitPos = m_InitialPoseCoMHeight + absFootz_1 - down*(absFootz_2 - absFootz_1) ;
         else // Special case: starting the motion.
@@ -2832,37 +2815,33 @@ new step has to be generate.
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight +  absFootz_0 - down*deltaZ ;
 
-        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
-
         interpolationTime = t-Index*moving_time - downLeft*SStime ;
+        FinalTime = (downRight-downLeft)*SStime - interpolationTime;
       }
     else if (absFootz_0 == absFootz_1 && m_RelativeFootPositions[Index-1].sz < 0) //second leg
       {
         deltaZ = absFootz_2 - absFootz_0;
-        FinalTime = (downRight-downLeft)*SStime ;
         InitPos = m_InitialPoseCoMHeight + absFootz_0 - down*deltaZ ;
         InitSpeed = 0.0 ;
         FinalPos = m_InitialPoseCoMHeight + absFootz_0 ;
-
-        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
-
         interpolationTime = t-Index*moving_time - downLeft*SStime ;
+        FinalTime = (downRight-downLeft)*SStime - interpolationTime ;
       }
     // normal walking
     // the com stay on the horizotal plane at the initial com altitude
     else
       {
-        FinalTime = moving_time ;
         InitSpeed = 0.0 ;
         interpolationTime = t-Index*moving_time-SStime ;
+        FinalTime = moving_time - interpolationTime ;
         InitPos = initCoMheight ;
         FinalPos = initCoMheight ;
 
-        if(sx*sx+sy*sy > 0.2*0.2 && sz*sz+sz*sz < 0.00001)
+        if(sx*sx+sy*sy > 0.22*0.22 && sz*sz+sz*sz < 0.00001 && sx*sx+sx*sx > 0.00001)
         {
           if(LastCoM.z[0] >= lowerCoMheight + 0.00001 || LastCoM.z[0] <= lowerCoMheight - 0.00001)
           {
-            FinalTime = DStime ;
+            FinalTime = DStime - interpolationTime;
             FinalPos = lowerCoMheight ;
           }else{
             InitPos = lowerCoMheight ;
@@ -2870,14 +2849,14 @@ new step has to be generate.
           }
         }else if(LastCoM.z[0] >= initCoMheight + 0.00001 || LastCoM.z[0] <= initCoMheight - 0.00001)
         {
-          FinalTime = SStime ;
+          FinalTime = SStime - interpolationTime;
           InitPos = lowerCoMheight ;
+          FinalPos = initCoMheight ;
         }else
         {
           InitPos = initCoMheight ;
           FinalPos = initCoMheight ;
-        }
-        m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
+        }        
       }
 
 //    cout << "relative position : "
@@ -2888,8 +2867,11 @@ new step has to be generate.
 //         << SStime << " "
 //         << m_AbsoluteSupportFootPositions[Index].time << " "
 //         << m_AbsoluteSupportFootPositions[Index-1].time << " " << endl ;
-
-    m_CoMbsplinesZ->Compute(interpolationTime,CoMz[0],CoMz[1],CoMz[2]) ;
+    InitPos = LastCoM.z[0];
+    InitSpeed = LastCoM.z[1];
+    InitAcc = LastCoM.z[2];
+    m_CoMbsplinesZ->SetParameters(FinalTime,InitPos,FinalPos,ToMP,MP,InitSpeed,InitAcc) ;
+    m_CoMbsplinesZ->Compute(m_SamplingPeriod,CoMz[0],CoMz[1],CoMz[2]) ;
   }
 
   void AnalyticalMorisawaCompact::ComputeZMPz(double t,
@@ -2899,11 +2881,11 @@ new step has to be generate.
     // absFootz_0, the z axis is expressed in the waist frame
     // we choose the left one by default, the foot are supposed to be symetrical
     // we use it pass the ankle position to the fot position
-    CjrlFoot *aFoot = m_HS->leftFoot() ;
+    PRFoot *aFoot = m_PR->leftFoot() ;
     if (aFoot==0)
       LTHROW("No foot");
     vector3d corrZ ;
-    aFoot->getAnklePositionInLocalFrame(corrZ);
+    corrZ = aFoot->anklePosition ;
 
     bool sinple_support = (IndexInterval % 2) == 0 ;
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;

@@ -31,157 +31,154 @@
 
 using namespace std;
 
-int main()
+int PerformTests(int argc, char *argv[])
 {
-    PatternGeneratorJRL::BSplinesFoot *X;
-    PatternGeneratorJRL::BSplinesFoot *Y;
-    PatternGeneratorJRL::BSplinesFoot *Z;
+    // Test Bspline without way point
+    /////////////////////////////////
+    double testIP(0.0), testIS(0.0), testIA(0.0),
+        testMP (0.0), testMS (0.0), testMA (0.0),
+        testMP2(0.0), testMS2(0.0), testMA2(0.0),
+        testFP (0.0), testFS (0.0), testFA (0.0);
+    double FT = 1.0;
+    double IP = 0.209 ;
+    double IS = 0.009 ;
+    double IA = 1.0;
+    double FP = 0.209 ;
+    double FS = 0.009 ;
+    double FA = 0.009 ;
+    vector<double> MP ;
+    vector<double> ToMP ;
+    MP.clear();
+    ToMP.clear();
 
-    double tx=0.0;
-    double ty=0.0;
-    double tz=0.0;
+    PatternGeneratorJRL::BSplinesFoot *bsplineNoWayPoint;
+    bsplineNoWayPoint = new PatternGeneratorJRL::BSplinesFoot(
+          FT, IP, FP, ToMP, MP, IS, IA, FS, FA);
 
-    ofstream myfile;
-    myfile.open("TestBsplines.txt");
+    // results
+    bsplineNoWayPoint->Compute(0.0, testIP, testIS, testIA);
+    bsplineNoWayPoint->Compute(FT , testFP, testFS, testFA);
+    bool test_IP = sqrt((IP-testIP)*(IP-testIP))<1e-08 ;
+    bool test_IS = sqrt((IS-testIS)*(IS-testIS))<1e-08 ;
+    bool test_IA = sqrt((IA-testIA)*(IA-testIA))<1e-08 ;
+    bool test_FP = sqrt((FP-testFP)*(FP-testFP))<1e-08 ;
+    bool test_FS = sqrt((FS-testFS)*(FS-testFS))<1e-08 ;
+    bool test_FA = sqrt((FA-testFA)*(FA-testFA))<1e-08 ;
 
-    //Create the parameters of foot trajectory on X
-    double m_FTx = 1.0;
-    double m_FPx = 0.209 ;
-    double m_IPx = 0.009 ;
-    vector<double> m_MPx ;
-    vector<double> m_ToMPx ;
-    m_MPx.clear();
-    m_ToMPx.clear();
+    bool testBsplinenowayPoint = test_IP && test_IS &&
+        test_IA && test_FP && test_FS && test_FA ;
 
-    //Create an object for test X
-    X = new PatternGeneratorJRL::BSplinesFoot(m_FTx, m_IPx, m_FPx, m_ToMPx, m_MPx);
-//    vector<double> cpx ;
-//    cpx.push_back(0.2);
-//    cpx.push_back(0.2);
-//    cpx.push_back(0.2);
-//    cpx.push_back(m_FPx);
-//    cpx.push_back(m_FPx);
-//    cpx.push_back(m_FPx);
-//    X->SetControlPoints(cpx);
-    double x,dx,ddx;
-
-    X->PrintDegree();
-    X->PrintKnotVector();
-    X->PrintControlPoints();
-
-    //Create the parameters of foot trajectory on Y
-    double m_FTy = 1.0;
-    double m_FPy = 0.2;
-    double m_IPy = 0.1;
-    vector<double> m_MPy = vector<double>(1,5);
-    vector<double> m_ToMPy = vector<double>(1,m_FTx/2.0);
-
-    //Create an object for test Y
-    Y = new PatternGeneratorJRL::BSplinesFoot(m_FTy, m_IPy, m_FPy, m_ToMPy, m_MPy);
-    Y->PrintDegree();
-    Y->PrintKnotVector();
-    Y->PrintControlPoints();
-    double y,dy,ddy;
-
-    //Create the parameters of foot trajectory on Z
-    double m_FTz = 1.0;
-    double m_FPz = 0.1;
-    double m_IPz = 0.2;
-    vector<double> m_MPz ;
-    m_MPz.push_back(0.35);
-    m_MPz.push_back(0.25);
-    vector<double> m_ToMPz = vector<double>(2,m_FTx/3.0);
-    m_ToMPz[1]=2*m_FTx/3.0;
-
-    //Create an object for test Y
-    Z = new PatternGeneratorJRL::BSplinesFoot(m_FTz, m_IPz, m_FPz, m_ToMPz, m_MPz);
-    Z->PrintDegree();
-    Z->PrintKnotVector();
-    Z->PrintControlPoints();
-    double z,dz,ddz;
-
-    double dx_(0.0),dy_(0.0),dz_(0.0),ddx_(0.0),ddy_(0.0),ddz_(0.0);
-    double x_p(m_IPx),y_p(m_IPy),z_p(m_IPz),dx_p(0.0),dy_p(0.0),dz_p(0.0);
-    double dt = X->FT()/1000.0;
-    for (int k=0; k<=1000;k++)
+    if(!testBsplinenowayPoint)
     {
-        tx=double(k)*X->FT()/1000.0;
-        ty=double(k)*X->FT()/1000.0;
-        tz=double(k)*X->FT()/1000.0;
-
-        //cout << k << endl;
-        //myfile << t << " " << X->ZComputePosition(t) << " " << X->ZComputeVelocity(t)<< " " << X->ZComputeAcc(t)<< endl;
-        X->Compute(tx,x,dx,ddx);
-        Y->Compute(ty,y,dy,ddy);
-        Z->Compute(tz,z,dz,ddz);
-
-        dx_ = (x - x_p) / dt ;
-        ddx_ = (dx - dx_p) / dt ;
-
-        dy_ = (y - y_p) / dt ;
-        ddy_ = (dy - dy_p) / dt ;
-
-        dz_ = (z - z_p) / dt ;
-        ddz_ = (dz - dz_p) / dt ;
-
-        x_p  = x  ;
-        y_p  = y  ;
-        z_p  = z  ;
-        dx_p = dx ;
-        dy_p = dy ;
-        dz_p = dz ;
-
-        myfile << tx << " " << x << " " << dx << " " << ddx
-                     << " " << y << " " << dy << " " << ddy
-                     << " " << z << " " << dz << " " << ddz
-                     << " " << dx_ << " " << ddx_
-                     << " " << dy_ << " " << ddy_
-                     << " " << dz_ << " " << ddz_
-                     << endl;
-
-        // time - Position - Velocity - Acceleration
-        //cout <<  t  << " " << Z->ZComputePosition(t)<<" "<< Z->ZComputeVelocity(t)<< " "<< Z->ZComputeAcc(t)<< endl;
+      std::cerr << "Error unexpected behaviour of bspline generation\n"
+                << "bspline with no way point corrupted"
+                << std::endl;
     }
-    myfile.close();
+    delete bsplineNoWayPoint ;
+    bsplineNoWayPoint = NULL ;
 
-    myfile.open("control_point.txt");
-    for (unsigned int k=0; k<X->GetControlPoints().size();k++)
+    // Test Bspline with one way point
+    //////////////////////////////////
+    MP.clear();
+    MP.push_back(0.5);
+    ToMP.clear();
+    ToMP.push_back(FT/2.0);
+    FT = 1.0 ;
+    IP = 0.1 ;
+    IS = 0.0 ;
+    IA = 0.0 ;
+    FP = 0.2 ;
+    FS = 0.0 ;
+    FA = 0.0 ;
+    PatternGeneratorJRL::BSplinesFoot *bsplineOneWayPoint;
+    bsplineOneWayPoint = new PatternGeneratorJRL::BSplinesFoot(
+          FT, IP, FP, ToMP, MP, IS, IA, FS, FA);
+
+    bsplineOneWayPoint->Compute(0.0, testIP, testIS, testIA);
+    bsplineOneWayPoint->Compute(FT/2, testMP, testMS, testMA);
+    bsplineOneWayPoint->Compute(FT , testFP, testFS, testFA);
+    test_IP = sqrt((IP-testIP)*(IP-testIP))<1e-08 ;
+    test_IS = sqrt((IS-testIS)*(IS-testIS))<1e-08 ;
+    test_IA = sqrt((IA-testIA)*(IA-testIA))<1e-08 ;
+    test_FP = sqrt((FP-testFP)*(FP-testFP))<1e-08 ;
+    test_FS = sqrt((FS-testFS)*(FS-testFS))<1e-08 ;
+    test_FA = sqrt((FA-testFA)*(FA-testFA))<1e-08 ;
+    bool test_MP = sqrt((MP[0]-testMP)*(MP[0]-testMP))<1e-08 ;
+    bool testBsplineOneWayPoint =
+        test_IP && test_IS && test_IA &&
+        test_MP &&
+        test_FP && test_FS && test_FA ;
+
+    if(!bsplineOneWayPoint)
     {
-      myfile << X->GetControlPoints()[k] << " " ;
-      myfile << Y->GetControlPoints()[k] << " " ;
-      myfile << Z->GetControlPoints()[k] << " " ;
-      myfile << endl ;
+      std::cerr << "Error unexpected behaviour of bspline generation\n"
+                << "bspline with one way point corrupted"
+                << std::endl;
     }
-    myfile.close();
+    delete bsplineOneWayPoint ;
+    bsplineOneWayPoint = NULL ;
 
-    delete X;
-    delete Y;
-    delete Z;
+    // Test Bspline with two way point
+    //////////////////////////////////
+    FT = 1.0 ;
+    IP = 0.1 ;
+    IS = 0.0 ;
+    IA = 0.0 ;
+    FP = 0.2 ;
+    FS = 0.0 ;
+    FA = 0.0 ;
+    MP.clear();
+    MP.push_back(0.35);
+    MP.push_back(0.25);
+    ToMP.clear();
+    ToMP.push_back(FT/3.0);
+    ToMP.push_back(2.0*FT/3.0);
+    PatternGeneratorJRL::BSplinesFoot *bsplineTwoWayPoint;
+    bsplineTwoWayPoint = new PatternGeneratorJRL::BSplinesFoot(
+          FT, IP, FP, ToMP, MP, IS, IA, FS, FA);
 
-    //draw a foot trajectory with the data given from bsplines	
-    myfile.open("DrawTestBsplines.gnu");
-    myfile << "set term wxt 0" << endl;
-    myfile << "plot 'control_point.txt' u 0:1 with points, 'TestBsplines.txt' using 1:2 with lines title 'PosX'"<< endl;
-    myfile << "set term wxt 1" << endl;
-    myfile << "plot 'TestBsplines.txt' using 1:2 with lines title 'PosX', 'TestBsplines.txt' using 1:3 with lines title 'SpeedX','TestBsplines.txt' using 1:4 with lines title 'AccX'"<< endl;
+    bsplineTwoWayPoint->Compute(       0.0, testIP, testIS, testIA);
+    bsplineTwoWayPoint->Compute(    FT/3.0, testMP, testMS, testMA);
+    bsplineTwoWayPoint->Compute(2.0*FT/3.0, testMP2, testMS2, testMA2);
+    bsplineTwoWayPoint->Compute(FT , testFP, testFS, testFA);
+    test_IP = sqrt((IP-testIP)*(IP-testIP))<1e-08 ;
+    test_IS = sqrt((IS-testIS)*(IS-testIS))<1e-08 ;
+    test_IA = sqrt((IA-testIA)*(IA-testIA))<1e-08 ;
+    test_FP = sqrt((FP-testFP)*(FP-testFP))<1e-08 ;
+    test_FS = sqrt((FS-testFS)*(FS-testFS))<1e-08 ;
+    test_FA = sqrt((FA-testFA)*(FA-testFA))<1e-08 ;
+    test_MP = sqrt((MP[0]-testMP)*(MP[0]-testMP))<1e-08 ;
+    bool test_MP2 = sqrt((MP[1]-testMP2)*(MP[1]-testMP2))<1e-08 ;
+    bool testBsplineTwoWayPoint =
+        test_IP && test_IS && test_IA &&
+        test_MP && test_MP2 &&
+        test_FP && test_FS && test_FA ;
 
-    myfile << "set term wxt 2" << endl;
-    myfile << "plot 'control_point.txt' with points, 'TestBsplines.txt' using 1:5 with lines title 'PosY'"<< endl;
-    myfile << "set term wxt 3" << endl;
-    myfile << "plot 'TestBsplines.txt' using 1:5 with lines title 'PosY', 'TestBsplines.txt' using 1:6 with lines title 'SpeedY','TestBsplines.txt' using 1:7 with lines title 'AccY'"<< endl;
+    if(!testBsplineTwoWayPoint)
+    {
+      std::cerr << "Error unexpected behaviour of bspline generation\n"
+                << "bspline with two way point corrupted"
+                << std::endl;
+    }
+    delete bsplineTwoWayPoint ;
+    bsplineTwoWayPoint = NULL ;
 
-    myfile << "set term wxt 2" << endl;
-    myfile << "plot 'control_point.txt' with points, 'TestBsplines.txt' using 1:8 with lines title 'PosZ'"<< endl;
-    myfile << "set term wxt 3" << endl;
-    myfile << "plot 'TestBsplines.txt' using 1:8 with lines title 'PosY', 'TestBsplines.txt' using 1:9 with lines title 'SpeedY','TestBsplines.txt' using 1:10 with lines title 'AccY'"<< endl;
-
-    myfile << "set term wxt 4" << endl;
-    myfile << "plot 'control_point.txt' with points, 'TestBsplines.txt' using 2:5 with lines title 'PosXY'"<< endl;
-
-
-    myfile.close();
-    
-    return 0;
+    return (testBsplinenowayPoint &&
+        testBsplineOneWayPoint &&
+        testBsplineTwoWayPoint) ? 1 : 0 ;
 }
 
-
+int main(int argc, char *argv[])
+{
+  try
+  {
+    int ret = PerformTests(argc,argv);
+    cout << "return " << ret << endl ;
+    return ret ;
+  }
+  catch (const std::string& msg)
+  {
+    std::cerr << msg << std::endl;
+  }
+  return 1;
+}

@@ -53,22 +53,25 @@ namespace PatternGeneratorJRL {
 
     void CommonInitialization(PatternGeneratorInterface &aPGI)
     {
-      const char lBuffer[12][256] =
-	{":comheight 0.8078",
-	 ":samplingperiod 0.005",
-	 ":previewcontroltime 1.6",
-	 ":omega 0.0",
-	 ":stepheight 0.07",
-	 ":singlesupporttime 0.78",
-	 ":doublesupporttime 0.02",
-	 ":armparameters 0.5",
-	 ":LimitsFeasibility 0.0",
-	 ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
-	 ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
-	 ":UpperBodyMotionParameters -0.1 -1.0 0.0"
-	};
+      const unsigned int nbMethod = 14 ;
+      const char lBuffer[nbMethod][256] =
+      {
+        ":comheight 0.8078",
+        ":samplingperiod 0.005",
+        ":previewcontroltime 1.6",
+        ":omega 0.0",
+        ":stepheight 0.07",
+        ":singlesupporttime 0.78",
+        ":doublesupporttime 0.02",
+        ":armparameters 0.5",
+        ":LimitsFeasibility 0.0",
+        ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
+        ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
+        ":UpperBodyMotionParameters -0.1 -1.0 0.0",
+        ":useDynamicFilter false"
+      };
 
-      for(int i=0;i<9;i++)
+      for(int i=0;i<nbMethod;i++)
 	{
 	  std::istringstream strm(lBuffer[i]);
 	  aPGI.ParseCmd(strm);
@@ -114,37 +117,24 @@ namespace PatternGeneratorJRL {
 
     void getOptions(int argc,
 		    char *argv[],
-		    string &VRMLPath,
-		    string &VRMLFileName,
-		    string &SpecificitiesFileName,
-		    string &LinkJointRank,
-		    string &InitConfig,
-		    unsigned int &) // TestProfil)
+            string &urdfFullPath,
+            string &srdfFullPath,
+            unsigned int &) // TestProfil)
     {
       std::cout << "argc:" << argc << std::endl;
-      if (argc!=6)
+      if (argc!=3)
 	{
-	  cerr << " This program takes 5 arguments: " << endl;
-	  cerr << "./TestFootPrintPGInterface \
-                         PATH_TO_VRML_FILE \
-                         VRML_FILE_NAME \
-                         SPECIFICITIES_XML \
-                         LINK_JOINT_RANK \
-                         INITIAL_CONFIGURATION" << endl;
+      cerr << " This program takes 2 arguments: " << endl;
+      cerr << "./TestFootPrintPGInterface PATH_TO_URDF_FILE PATH_TO_SRDF_FILE"
+           << endl;
 	  exit(-1);
 	}
       else
 	{
-	  VRMLPath=argv[1];
-	  VRMLFileName=argv[2];
-	  SpecificitiesFileName = argv[3];
-	  LinkJointRank = argv[4];
-	  InitConfig = argv[5];
-      cout << VRMLPath << endl ;
-      cout << VRMLFileName << endl ;
-      cout << SpecificitiesFileName << endl ;
-      cout << LinkJointRank << endl ;
-      cout << InitConfig << endl ;
+      urdfFullPath=argv[1];
+      srdfFullPath=argv[2];
+      cout << urdfFullPath << endl ;
+      cout << srdfFullPath << endl ;
 	}
     }
   } /* End of TestSuite namespace */

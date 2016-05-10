@@ -33,10 +33,10 @@
 using namespace PatternGeneratorJRL;
 
 FootTrajectoryGenerationMultiple::FootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
-								   CjrlFoot *aFoot)
+                                   PRFoot *aFoot)
   : SimplePlugin(lSPM)
 {
-  m_Foot = aFoot;
+  m_Foot = aFoot ;
   m_Sensitivity=0.0;
 }
 

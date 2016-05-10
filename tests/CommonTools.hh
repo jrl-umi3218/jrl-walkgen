@@ -34,22 +34,13 @@
 #include <time.h>
 #include <sstream>
 #include <fstream>
+#include <string>
 
-#include <string.h>
 
 #include <jrl/mal/matrixabstractlayer.hh>
-
-#include <jrl/dynamics/dynamicsfactory.hh>
-
-#ifdef WITH_HRP2DYNAMICS
-#include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
-#endif
-
 #include <jrl/walkgen/patterngeneratorinterface.hh>
-
-#include "ClockCPUTime.hh"
-
 #include <jrl/walkgen/config_private.hh>
+#include "ClockCPUTime.hh"
 
 #ifndef _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_
 #define _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_
@@ -58,13 +49,11 @@ namespace PatternGeneratorJRL
 {
   namespace TestSuite
   {
-    void getOptions(int , char *[],
-		    std::string &VRMLPath,
-		    std::string &VRMLFileName,
-		    std::string &SpecificitiesFileName,
-		    std::string &LinkJointRank,
-		    std::string &InitConfig,
-		    unsigned int &TestProfil);
+    void getOptions(int argc,
+                    char *argv[],
+                    std::string &urdfFullPath,
+                    std::string &srdfFullPath,
+                    unsigned int &); // TestProfil)
 
     void CommonInitialization(PatternGeneratorJRL::PatternGeneratorInterface &aPGI);
 
@@ -79,14 +68,13 @@ namespace PatternGeneratorJRL
 
       OneStep()
       {
-	MAL_VECTOR_RESIZE(ZMPTarget,3);
-	NbOfIt = 0;
-	memset(&LeftFootPosition,0,sizeof(LeftFootPosition));
-	memset(&RightFootPosition,0,sizeof(RightFootPosition));
-	memset(&finalCOMPosition,0,sizeof(finalCOMPosition));
+        MAL_VECTOR_RESIZE(ZMPTarget,3);
+        NbOfIt = 0;
+        memset(&LeftFootPosition,0,sizeof(LeftFootPosition));
+        memset(&RightFootPosition,0,sizeof(RightFootPosition));
+        memset(&finalCOMPosition,0,sizeof(finalCOMPosition));
       }
     };
-
   } /* end of TestSuite namespace */
 } /* end of PatternGeneratorJRL namespace */
 #endif /* _COMMON_TOOLS_PATTERN_GENERATOR_UTESTING_H_*/

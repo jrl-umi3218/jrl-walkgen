@@ -28,13 +28,13 @@ using namespace PatternGeneratorJRL;
 using namespace std;
 using namespace boost_ublas;
 
-RigidBodySystem::RigidBodySystem( SimplePluginManager * SPM, CjrlHumanoidDynamicRobot * aHS, SupportFSM * FSM ):
+RigidBodySystem::RigidBodySystem( SimplePluginManager * SPM, PinocchioRobot * aPR, SupportFSM * FSM ):
             mass_(0),CoMHeight_(0),T_(0),Tr_(0),Ta_(0),N_(0),multiBody_(false),
             OFTG_(0), FSM_(0)
 {
-  HDR_ = aHS;
+  PR_ = aPR;
   FSM_ = FSM;
-  OFTG_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
+  OFTG_ = new OnLineFootTrajectoryGeneration(SPM,PR_->leftFoot());
 }
 
 
@@ -167,7 +167,7 @@ RigidBodySystem::precompute_trajectories( const deque<support_state_t> & Support
   // The lowest height is the height of the ankle:
   // ---------------------------------------------
   vector3d LocalAnklePosition;
-  HDR_->leftFoot()->getAnklePositionInLocalFrame( LocalAnklePosition );
+  LocalAnklePosition = PR_->leftFoot()->anklePosition ;
 
   deque<support_state_t>::const_iterator SS_it = SupportStates_deq.begin();
   SS_it++;//First support phase is current support phase

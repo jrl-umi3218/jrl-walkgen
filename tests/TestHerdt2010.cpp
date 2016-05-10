@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Andrei Herdt
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file This file tests A. Herdt's walking algorithm for
@@ -35,47 +35,42 @@ using namespace std;
 
 enum Profiles_t {
   PROFIL_HERDT_ONLINE_WALKING,                 // 1
-  PROFIL_HERDT_EMERGENCY_STOP,                 // 2
-  PROFIL_HERDT_POWER_LAW                       // 3
+  PROFIL_HERDT_EMERGENCY_STOP                  // 2
 };
 
 class TestHerdt2010: public TestObject
 {
-  
+
 private:
-  /// Array of velocities.
-  typedef std::vector<double> vector_double_t;
-  std::vector<vector_double_t> queueOfVelocity_;
-  unsigned long int indexQueueVelocity_;
-  
 public:
   TestHerdt2010(int argc, char *argv[], string &aString, int TestProfile):
     TestObject(argc,argv,aString)
   {
     m_TestProfile = TestProfile;
   };
-  
+
   typedef void (TestHerdt2010::* localeventHandler_t)(PatternGeneratorInterface &);
-  
-  struct localEvent 
+
+  struct localEvent
   {
     unsigned time;
     localeventHandler_t Handler ;
   };
-  
+
 protected:
 
-  
-
-  
   void startOnLineWalking(PatternGeneratorInterface &aPGI)
   {
     CommonInitialization(aPGI);
-    
+
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
       aPGI.ParseCmd(strm2);
-      
+
+    }
+    {
+      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
+      m_PGI->ParseCmd(strm2);
     }
     {
       istringstream strm2(":singlesupporttime 0.7");
@@ -99,11 +94,15 @@ protected:
   void startEmergencyStop(PatternGeneratorInterface &aPGI)
   {
     CommonInitialization(aPGI);
-    
+
     {
       istringstream strm2(":SetAlgoForZmpTrajectory Herdt");
       aPGI.ParseCmd(strm2);
-      
+
+    }
+    {
+      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
+      m_PGI->ParseCmd(strm2);
     }
     {
       istringstream strm2(":singlesupporttime 0.7");
@@ -122,14 +121,6 @@ protected:
       istringstream strm2(":numberstepsbeforestop 2");
       aPGI.ParseCmd(strm2);
     }
-  }
-
-  void startPowerLaw(PatternGeneratorInterface &aPGI)
-  {
-    startOnLineWalking(aPGI);
-
-    std::string fileName("/home/ostasse/Projets/KOROIBOT/Motions/Trajectories/Arena_[3,2]_Shape_2_Beta_MinusThird.txt");
-    loadFileOfVelocityProfile(fileName);
   }
 
   void startTurningLeft(PatternGeneratorInterface &aPGI)
@@ -216,20 +207,19 @@ protected:
 
   void chooseTestProfile()
   {
-    
+
     switch(m_TestProfile)
       {
 
       case PROFIL_HERDT_ONLINE_WALKING:
-	startOnLineWalking(*m_PGI);
-	break;
+    startOnLineWalking(*m_PGI);
+    break;
       case PROFIL_HERDT_EMERGENCY_STOP:
         startEmergencyStop(*m_PGI);
         break;
-        
       default:
-	throw("No correct test profile");
-	break;
+    throw("No correct test profile");
+    break;
       }
   }
 
@@ -237,7 +227,7 @@ protected:
   void generateEventOnLineWalking()
   {
 
-    struct localEvent 
+    struct localEvent
     {
       unsigned time;
       localeventHandler_t Handler ;
@@ -254,69 +244,19 @@ protected:
         {65*200,&TestHerdt2010::startTurningRightOnSpot},
         {75*200,&TestHerdt2010::walkForward},
         {85*200,&TestHerdt2010::startTurningLeft},
-	{95*200,&TestHerdt2010::startTurningRight},
-	{105*200,&TestHerdt2010::stop},
-	{110*200,&TestHerdt2010::stopOnLineWalking}};
-    
+    {95*200,&TestHerdt2010::startTurningRight},
+    {105*200,&TestHerdt2010::stop},
+    {110*200,&TestHerdt2010::stopOnLineWalking}};
+
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
-      { 
-	if ( m_OneStep.NbOfIt==events[i].time)
-	  {
-            ODEBUG3("********* GENERATE EVENT OLW ***********");
-	    (this->*(events[i].Handler))(*m_PGI);
-	  }
-      }
-  }
-
-  void loadFileOfVelocityProfile(const std::string &fileName)
-  {
-
-    std::ifstream aif;
-    aif.open(fileName.c_str(),std::ifstream::in);
-    if (aif.is_open())
       {
-        while (!aif.eof())
-          {
-            vector_double_t VelCompleteData(7);
-            /// Read time from the start of the trajectory
-            aif >> VelCompleteData[0];
-            /// Read position
-            aif >> VelCompleteData[1]; aif >> VelCompleteData[2];
-            // Read Velocity
-            aif >> VelCompleteData[3]; aif >> VelCompleteData[4]; 
-            aif >> VelCompleteData[5];
-            // Total speed
-            aif >> VelCompleteData[6];
-        
-            queueOfVelocity_.push_back(VelCompleteData);
-          }
+    if ( m_OneStep.NbOfIt==events[i].time)
+      {
+            ODEBUG3("********* GENERATE EVENT OLW ***********");
+        (this->*(events[i].Handler))(*m_PGI);
       }
-    aif.close();
-    indexQueueVelocity_ = 0;
-  }
-
-  void generateEventPowerLawVelocity()
-  {
-    vector_double_t VelCompleteData,VelProf;
-    VelCompleteData = queueOfVelocity_[indexQueueVelocity_];
-
-    for(unsigned int li=0;li<3;li++)
-      VelProf[li] = VelCompleteData[3+li];
-    
-    {
-      ostringstream ostrm2(":setVelReference  ");
-      ostrm2 << VelProf[0] << " " ;
-      ostrm2 << VelProf[1] << " ";
-      ostrm2 << VelProf[2];
-      istringstream istrm2(ostrm2.str());
-
-      m_PGI->ParseCmd(istrm2);
-      std::cout << "strm2: " << ostrm2.str() << std::endl;
-
-    }
-
-    indexQueueVelocity_++;
+      }
   }
 
   void generateEventEmergencyStop()
@@ -326,17 +266,17 @@ protected:
     struct localEvent events [localNbOfEventsEMS] =
       { {5*200,&TestHerdt2010::startTurningLeft2},
         {10*200,&TestHerdt2010::startTurningRight2},
-        {15.2*200,&TestHerdt2010::stop},
-        {20.8*200,&TestHerdt2010::stopOnLineWalking}};
-    
+        {16*200,&TestHerdt2010::stop},
+        {22*200,&TestHerdt2010::stopOnLineWalking}};
+
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEventsEMS;i++)
-      { 
-	if ( m_OneStep.NbOfIt==events[i].time)
-	  {
+      {
+    if ( m_OneStep.NbOfIt==events[i].time)
+      {
             ODEBUG3("********* GENERATE EVENT EMS ***********");
-	    (this->*(events[i].Handler))(*m_PGI);
-	  }
+        (this->*(events[i].Handler))(*m_PGI);
+      }
       }
   }
 
@@ -350,9 +290,6 @@ protected:
       case PROFIL_HERDT_EMERGENCY_STOP:
         generateEventEmergencyStop();
         break;
-      case PROFIL_HERDT_POWER_LAW:
-        
-        break;
       default:
         break;
       }
@@ -361,35 +298,31 @@ protected:
 
 int PerformTests(int argc, char *argv[])
 {
-  #define NB_PROFILES 3
+  #define NB_PROFILES 2
   std::string TestNames[NB_PROFILES] = { "TestHerdt2010OnLine",
-                                         "TestHerdt2010EmergencyStop",
-                                         "TestHerdt2010PowerLaw"};
+                               "TestHerdt2010EmergencyStop"};
   int TestProfiles[NB_PROFILES] = { PROFIL_HERDT_ONLINE_WALKING,
-                                    PROFIL_HERDT_EMERGENCY_STOP,
-                                    PROFIL_HERDT_POWER_LAW};
+                                    PROFIL_HERDT_EMERGENCY_STOP};
 
-  for (unsigned int i=NB_PROFILES-2;i<NB_PROFILES;i++)
+  for (unsigned int i=0;i<NB_PROFILES;i++)
     {
       TestHerdt2010 aTH2010(argc,argv,
-			    TestNames[i],
-			    TestProfiles[i]);
+                TestNames[i],
+                TestProfiles[i]);
       aTH2010.init();
-
-
       try
-	{
-	  if (!aTH2010.doTest(std::cout))
-	    {
-	      cout << "Failed test " << i << endl;
-	      return -1;
-	    }
-	  else
-	    cout << "Passed test " << i << endl;
-	}
+    {
+      if (!aTH2010.doTest(std::cout))
+        {
+          cout << "Failed test " << i << endl;
+          return -1;
+        }
+      else
+        cout << "Passed test " << i << endl;
+    }
       catch (const char * astr)
-	{ cerr << "Failed on following error " << astr << std::endl;
-	  return -1; }
+    { cerr << "Failed on following error " << astr << std::endl;
+      return -1; }
     }
   return 0;
 }

@@ -357,7 +357,7 @@ namespace PatternGeneratorJRL
       /*! @} */
 
       /*! \brief Reference to the Humanoid Specificities. */
-      CjrlHumanoidDynamicRobot * m_HS;
+      PinocchioRobot * m_PR;
 
 
       /*! \name Debugging fields
@@ -387,13 +387,13 @@ namespace PatternGeneratorJRL
 
       /*! \brief Get the reference to the object handling the
 	humanoid specificities */
-      CjrlHumanoidDynamicRobot * GetHumanoidSpecificites() const
-	{ return m_HS;};
+      PinocchioRobot * GetHumanoidSpecificites() const
+    { return m_PR;};
 
       /*! \brief Set the reference of the object handling the
 	humanoid specificities */
-      void SetHumanoidSpecificities(CjrlHumanoidDynamicRobot *aHS)
-        {  m_HS = aHS;   };
+      void SetHumanoidSpecificities(PinocchioRobot *aPR)
+        {  m_PR = aPR;   };
     };
 }
 #endif

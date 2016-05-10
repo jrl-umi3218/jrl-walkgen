@@ -43,15 +43,7 @@ ENDIF(SYS_TIME_H)
 
 # Required dependencies
 ADD_REQUIRED_DEPENDENCY("jrl-mal >= 1.9.0")
-ADD_REQUIRED_DEPENDENCY("abstract-robot-dynamics >= 1.15")
-ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
-
-################################################################
-ADD_OPTIONAL_DEPENDENCY("hrp2-14 >= 1.8-6")
-ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.0.1")
-#ADD_OPTIONAL_DEPENDENCY("pinocchio >=  1.0.1")
-ADD_OPTIONAL_DEPENDENCY("metapod >= 1.0.7")
-#################################################################
+ADD_REQUIRED_DEPENDENCY("pinocchio >=  1.1.0")
 
 # Search for qpOases
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/private_cmake)
@@ -83,7 +75,7 @@ IF((BUILD_MULTI_MODEL_BENCHMARK OR BUILD_SINGLE_MODEL_BENCHMARKS)
 ENDIF()
 
 # Search for Eigen.
-ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.0")
+ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.5")
 # Eigen (at least version 3.0.5) makes gcc report conversion warnings
 # when one assigns to a block. This floods the compilation results.
 # So we include Eigen headers as if they were system headers: the compiler
@@ -122,6 +114,7 @@ ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 SET(${PROJECT_NAME}_HEADERS
   include/jrl/walkgen/patterngeneratorinterface.hh
   include/jrl/walkgen/pgtypes.hh
+  include/jrl/walkgen/pinocchiorobot.hh
 )
 
 # Define subdirectories to explore for cmake

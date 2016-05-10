@@ -15,8 +15,6 @@
 
 # Make sure to find Debug.h
 INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src)
-INCLUDE_DIRECTORIES(BEFORE ${HOME}/devel/metapod/_bin/include/)
-INCLUDE_DIRECTORIES(BEFORE ${HOME}/devel/metapod/_bin/include/metapod/)
 
 # Add Boost path to include directories.
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
@@ -112,6 +110,7 @@ ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
 
 SET(SOURCES
   ${INCLUDES}
+  RobotDynamics/pinocchiorobot.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp
@@ -197,30 +196,19 @@ IF ( '${CMAKE_EXTRA_GENERATOR}' STREQUAL 'CodeBlocks' )
     ADDPREFIX(${PROJECT_NAME}_ABSOLUTE_HEADERS  "${CMAKE_SOURCE_DIR}/"  ${PROJECT_NAME}_HEADERS)
 ENDIF ( '${CMAKE_EXTRA_GENERATOR}' STREQUAL 'CodeBlocks' )
 
-# define and search for metapod library
-SET(WITH_METAPODFROMURDF TRUE)
-SET(model_name "hrp2_14")
-# Define the simple humanoid model for the metapod algorithm
-ADD_SAMPLEURDFMODEL(${model_name})
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCES} ${${PROJECT_NAME}_ABSOLUTE_HEADERS})
 
-ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES} ${${PROJECT_NAME}_ABSOLUTE_HEADERS})
-SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
 # Define dependencies
-
-TARGET_LINK_LIBRARIES(jrl-walkgen metapod_${model_name} ${Boost_LIBRARIES})
-SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta ")
-
-INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen abstract-robot-dynamics)
-PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-mal)
-PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-dynamics)
-#PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen pinocchio)
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta ")
+PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME} jrl-mal)
+PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME} pinocchio)
 
 IF(USE_LSSOL)
- PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen lssol)
+ PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME} lssol)
 ENDIF(USE_LSSOL)
-
 IF(${qpOASES_FOUND} STREQUAL "TRUE")
   TARGET_LINK_LIBRARIES(jrl-walkgen ${qpOASES_LIBRARIES})
 ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
+
+INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
+SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})

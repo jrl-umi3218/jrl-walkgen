@@ -41,10 +41,10 @@ using namespace PatternGeneratorJRL;
 
 
 FootConstraintsAsLinearSystem::FootConstraintsAsLinearSystem(SimplePluginManager *aSPM,
-							     CjrlHumanoidDynamicRobot *aHS) :
+							     PinocchioRobot *aPR) :
   SimplePlugin(aSPM)
 {
-  m_HS = aHS;
+  m_PR = aPR;
   //RESETDEBUG5("Constraints-FCSALS.dat");
 }
 
@@ -271,13 +271,13 @@ int FootConstraintsAsLinearSystem::BuildLinearConstraintInequalities(deque<FootA
     lRightFootHalfWidth,lRightFootHalfHeight;
   
   // Read humanoid specificities.
-  CjrlFoot * lRightFoot = m_HS->rightFoot();
-  lRightFoot->getSoleSize(lRightFootHalfWidth,lRightFootHalfHeight);
-  vector3d AnklePosition;
-  lRightFoot->getAnklePositionInLocalFrame(AnklePosition);
-  CjrlFoot * lLeftFoot = m_HS->leftFoot();
-  lLeftFoot->getSoleSize(lLeftFootHalfWidth,lLeftFootHalfHeight);
+  PRFoot * lRightFoot = m_PR->rightFoot();
+  lRightFootHalfWidth  = lRightFoot->soleWidth ;
+  lRightFootHalfHeight = lRightFoot->soleHeight;
 
+  PRFoot * lLeftFoot = m_PR->leftFoot();
+  lLeftFootHalfWidth  = lLeftFoot->soleWidth ;
+  lLeftFootHalfHeight = lLeftFoot->soleHeight ;
 
   lRightFootHalfWidth *= 0.5;
   lRightFootHalfHeight *= 0.5;

@@ -53,9 +53,12 @@ using namespace std;
 using namespace PatternGeneratorJRL;
 
 ZMPVelocityReferencedSQP::ZMPVelocityReferencedSQP(SimplePluginManager *SPM,
-                                                 string , CjrlHumanoidDynamicRobot *aHS ) :
+                                                 string , PinocchioRobot *aPR ) :
 ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpperBound_(40)
 {
+  // Save the reference to HDR
+  PR_ = aPR ;
+
   // PG management
   Running_ = false ;
   TimeBuffer_ = 0.04 ;
@@ -82,14 +85,11 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
 
   // perturbation management
   PerturbationOccured_ = false ;
-  RobotMass_ = aHS->mass() ;
+  RobotMass_ = PR_->mass() ;
 
   // interpolation management
   StepHeight_ = 0.05 ;
   CurrentIndex_ = 1 ;
-
-  // Save the reference to HDR
-  HDR_ = aHS ;
 
   // Initialize  the 2D LIPM
   LIPM_.SetSimulationControlPeriod( SQP_T_ );
@@ -98,7 +98,7 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
 
   // Create and initialize online interpolation of feet trajectories:
   // ----------------------------------------------------------------
-  OFTG_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
+  OFTG_ = new OnLineFootTrajectoryGeneration(SPM,PR_->leftFoot());
   OFTG_->InitializeInternalDataStructures();
   OFTG_->SetSingleSupportTime( SSPeriod_ );
   OFTG_->SetDoubleSupportTime( DSPeriod_ );
@@ -109,9 +109,9 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   OFTG_->SetStepHeight( StepHeight_ );
   OFTG_->SetStepStairOn(0) ;
 
-  NMPCgenerator_ = new NMPCgenerator(SPM,aHS);
+  NMPCgenerator_ = new NMPCgenerator(SPM,PR_);
 
-  dynamicFilter_ = new DynamicFilter(SPM,aHS);
+  dynamicFilter_ = new DynamicFilter(SPM,PR_);
 
   // Register method to handle
   const unsigned int NbMethods = 8;
@@ -417,8 +417,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
         time,
         initLeftFoot_ ,
         initRightFoot_,
-        initCOM_,
-        //itCOM_,
+        itCOM_,
+        //initCOM_,
         VelRef_);
 
     // SOLVE PROBLEM:
@@ -476,34 +476,29 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
       FinalRightFootTraj_deq[i] = RightFootTraj_deq_ctrl_[i] ;
     }
 
-    bool filterOn_ = true ;
-    if(filterOn_)
-    {
-      dynamicFilter_->OnLinefilter(COMTraj_deq_,ZMPTraj_deq_ctrl_,
-                                   LeftFootTraj_deq_,
-                                   RightFootTraj_deq_,
-                                   deltaCOMTraj_deq_);
-//      #define DEBUG
-      #ifdef DEBUG
-        dynamicFilter_->Debug(COMTraj_deq_ctrl_,
-                              LeftFootTraj_deq_ctrl_,
-                              RightFootTraj_deq_ctrl_,
-                              COMTraj_deq_,ZMPTraj_deq_ctrl_,
-                              LeftFootTraj_deq_,
-                              RightFootTraj_deq_,
-                              deltaCOMTraj_deq_);
-      #endif
-      // Correct the CoM.
+    dynamicFilter_->OnLinefilter(COMTraj_deq_,ZMPTraj_deq_ctrl_,
+                                 LeftFootTraj_deq_,
+                                 RightFootTraj_deq_,
+                                 deltaCOMTraj_deq_);
+//#define DEBUG
+#ifdef DEBUG
+    dynamicFilter_->Debug(COMTraj_deq_ctrl_,
+                          LeftFootTraj_deq_ctrl_,
+                          RightFootTraj_deq_ctrl_,
+                          COMTraj_deq_,ZMPTraj_deq_ctrl_,
+                          LeftFootTraj_deq_,
+                          RightFootTraj_deq_,
+                          deltaCOMTraj_deq_);
+#endif
+    // Correct the CoM.
       for (unsigned int i = 0 ; i < deltaCOMTraj_deq_.size() ; ++i)
+    {
+      for(int j=0;j<3;j++)
       {
-        for(int j=0;j<3;j++)
-        {
-          FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
-          FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
-        }
+        FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
+        FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
       }
-
-    }// endif(filterOn_)
+    }
 
     // Specify that we are in the ending phase.
     if (time <= m_SamplingPeriod )

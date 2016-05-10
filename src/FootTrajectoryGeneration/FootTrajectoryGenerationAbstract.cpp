@@ -34,11 +34,10 @@
 using namespace PatternGeneratorJRL;
 
 FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginManager *lSPM,
-								   CjrlFoot *aFoot)
-  : SimplePlugin(lSPM)
+                                   PRFoot * aFoot)
+  : SimplePlugin(lSPM),m_Foot(aFoot)
 {
   m_Omega = 0.0;
-  m_Foot= aFoot;
   m_SamplingPeriod = 0.005;
   m_isStepStairOn = 1;
   m_StepHeight = 0.07;

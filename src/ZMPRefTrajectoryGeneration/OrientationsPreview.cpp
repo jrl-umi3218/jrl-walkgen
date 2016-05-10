@@ -37,34 +37,45 @@ using namespace std;
 
 const double OrientationsPreview::EPS_ = 0.00000001;
 
-OrientationsPreview::OrientationsPreview(CjrlHumanoidDynamicRobot *aHS)
+OrientationsPreview::OrientationsPreview(PinocchioRobot *aPR)
 {
-  CjrlJoint * waist = aHS->waist();
   // left hip
-  CjrlJoint * leftFoot  = aHS->leftFoot()->associatedAnkle();
-  CjrlJoint * leftHip   = aHS->jointsBetween(*waist, *leftFoot)[1];
-  lLimitLeftHipYaw_  = leftHip->lowerBound(0);//-30.0/180.0*M_PI;
-  uLimitLeftHipYaw_  = leftHip->upperBound(0);//45.0/180.0*M_PI;
+  unsigned leftHipIndex = 0 ;
+  lLimitLeftHipYaw_ = 0.0 ;
+  uLimitLeftHipYaw_ = 0.0 ;
+  if(aPR->Model()->existJointName("LLEG_JOINT0"))
+  {
+    leftHipIndex = aPR->Model()->getJointId("LLEG_JOINT0");
+    lLimitLeftHipYaw_  = aPR->Model()->lowerPositionLimit(leftHipIndex);//-30.0/180.0*M_PI;
+    uLimitLeftHipYaw_  = aPR->Model()->upperPositionLimit(leftHipIndex);//45.0/180.0*M_PI;
+  }
   if (lLimitLeftHipYaw_==  uLimitLeftHipYaw_)
   {
     lLimitLeftHipYaw_ = -30.0/180.0*M_PI;
     uLimitLeftHipYaw_ = 45.0/180.0*M_PI;
   }
-
   // right hip
-  CjrlJoint * rightFoot = aHS->rightFoot()->associatedAnkle();
-  CjrlJoint * rightHip  = aHS->jointsBetween(*waist, *rightFoot)[1];
-  lLimitRightHipYaw_ = rightHip->lowerBound(0);//-45.0/180.0*M_PI;
-  uLimitRightHipYaw_ = rightHip->upperBound(0);//30.0/180.0*M_PI;
+  unsigned rightHipIndex = 0 ;
+  lLimitRightHipYaw_ = 0.0 ;
+  uLimitRightHipYaw_ = 0.0 ;
+  if(aPR->Model()->existJointName("RLEG_JOINT0"))
+  {
+    rightHipIndex = aPR->Model()->getJointId("RLEG_JOINT0");
+    lLimitRightHipYaw_ = aPR->Model()->lowerPositionLimit(rightHipIndex);//-30.0/180.0*M_PI;
+    uLimitRightHipYaw_ = aPR->Model()->upperPositionLimit(rightHipIndex);//45.0/180.0*M_PI;
+  }
   if (lLimitRightHipYaw_==  uLimitRightHipYaw_)
   {
     lLimitRightHipYaw_ = -30.0/180.0*M_PI;
     uLimitRightHipYaw_ = 45.0/180.0*M_PI;
   }
 
-  uvLimitFoot_ = fabs(leftHip->upperVelocityBound(0));
+  if(leftHipIndex!=0)
+  {
+    uvLimitFoot_ = fabs(aPR->Model()->velocityLimit(leftHipIndex));
+  }
 
-  //Acceleration limit not given by HRP2JRLmain.wrl
+  //Acceleration limit not given by HRP2JRLmain.wrl nor the urdf file
   uaLimitHipYaw_ = 0.1;
   //Maximal cross angle between the feet
   uLimitFeet_ = 5.0/180.0*M_PI;

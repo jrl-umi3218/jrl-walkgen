@@ -89,7 +89,7 @@ void DumpVector(std::string fileName, MAL_VECTOR_TYPE(double) & M)
 using namespace std;
 using namespace PatternGeneratorJRL;
 
-NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, CjrlHumanoidDynamicRobot * aHDR)
+NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, PinocchioRobot *aPR)
 {
   time_=0.0;
   T_ = 0.0 ;
@@ -120,10 +120,10 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, CjrlHumanoidDynamicRobo
   gamma_=0.0;
 
   SPM_ = aSPM ;
-  HDR_ = aHDR ;
+  PR_ = aPR ;
 
   FSM_ = new SupportFSM();
-  RFI_ = new RelativeFeetInequalities(SPM_,HDR_) ;
+  RFI_ = new RelativeFeetInequalities(SPM_,PR_) ;
 
   QP_=NULL;
   qpOases_H_ =NULL;
@@ -1560,11 +1560,11 @@ void NMPCgenerator::updateObstacleConstraint()
 #endif
   }
 #ifdef DEBUG
-  //DumpMatrix("Hobs_0" ,Hobs_ [0][0]);
-  //DumpVector("Aobs_0" ,Aobs_ [0][0]);
-  //DumpMatrix("Hobs_1" ,Hobs_ [0][1]);
-  //DumpVector("Aobs_1" ,Aobs_ [0][1]);
-  //DumpVector("LBobs_",LBobs_[0]);
+//  DumpMatrix("Hobs_0" ,Hobs_ [0][0]);
+//  DumpVector("Aobs_0" ,Aobs_ [0][0]);
+//  DumpMatrix("Hobs_1" ,Hobs_ [0][1]);
+//  DumpVector("Aobs_1" ,Aobs_ [0][1]);
+//  DumpVector("LBobs_",LBobs_[0]);
 #endif
 
   return ;

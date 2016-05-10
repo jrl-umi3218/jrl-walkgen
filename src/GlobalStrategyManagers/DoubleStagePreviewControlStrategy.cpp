@@ -70,12 +70,12 @@ DoubleStagePreviewControlStrategy::~DoubleStagePreviewControlStrategy()
 }
 
 
-int DoubleStagePreviewControlStrategy::InitInterObjects(CjrlHumanoidDynamicRobot *aHDR,
-							ComAndFootRealization * aCFR,
-							StepStackHandler * aSSH)
+int DoubleStagePreviewControlStrategy::InitInterObjects(PinocchioRobot *aPR,
+                            ComAndFootRealization * aCFR,
+                            StepStackHandler * aSSH)
 {
-  setHumanoidDynamicRobot(aHDR);
-  m_ZMPpcwmbz->setHumanoidDynamicRobot(m_HumanoidDynamicRobot);
+  setHumanoidDynamicRobot(aPR);
+  m_ZMPpcwmbz->setPinocchioRobot(m_PinocchioRobot);
   m_ZMPpcwmbz->setComAndFootRealization(aCFR);
   m_StepStackHandler = aSSH;
   return 1;

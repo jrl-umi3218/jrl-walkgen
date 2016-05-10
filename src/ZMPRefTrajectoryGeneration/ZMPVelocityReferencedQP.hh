@@ -58,7 +58,7 @@ namespace PatternGeneratorJRL
   public:
 
     ZMPVelocityReferencedQP(SimplePluginManager *SPM, string DataFile,
-                            CjrlHumanoidDynamicRobot *aHS=0 );
+                            PinocchioRobot *aPR=0 );
 
     ~ZMPVelocityReferencedQP();
 
@@ -221,13 +221,13 @@ namespace PatternGeneratorJRL
     solution_t solution_ ;
 
     /// \brief HDR allow the computation of the dynamic filter
-    CjrlHumanoidDynamicRobot * HDR_ ;
+    PinocchioRobot * PR_ ;
 
     /// \brief Buffers for the Kajita's dynamic filter
     deque<COMState> deltaCOMTraj_deq_ ;
 
     deque<ZMPPosition> ZMPTraj_deq_ ;
-    deque<COMState> COMTraj_deq_ ;    
+    deque<COMState> COMTraj_deq_ ;
     deque<FootAbsolutePosition> LeftFootTraj_deq_ ;
     deque<FootAbsolutePosition> RightFootTraj_deq_ ;
 

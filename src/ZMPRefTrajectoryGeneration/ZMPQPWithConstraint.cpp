@@ -49,11 +49,11 @@ using namespace PatternGeneratorJRL;
 
 ZMPQPWithConstraint::ZMPQPWithConstraint(SimplePluginManager *lSPM, 
 					 string DataFile,
-					 CjrlHumanoidDynamicRobot *aHS) :
+					 PinocchioRobot *aPR) :
   ZMPRefTrajectoryGeneration(lSPM)
 {
-  m_HS = aHS;
-  m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
+  m_PR = aPR;
+  m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aPR);
 
   // Register method to handle
   string aMethodName[1] = 
@@ -240,10 +240,12 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
     lRightFootHalfWidth,lRightFootHalfHeight;
   
   // Read humanoid specificities.
-  CjrlFoot *RightFoot = m_HS->rightFoot();
-  RightFoot->getSoleSize(lRightFootHalfWidth,lRightFootHalfHeight);
-  CjrlFoot *LeftFoot = m_HS->leftFoot();
-  LeftFoot->getSoleSize(lLeftFootHalfWidth,lLeftFootHalfHeight);
+  PRFoot * RightFoot = m_PR->rightFoot();
+  lRightFootHalfWidth = RightFoot->soleWidth ;
+  lRightFootHalfHeight= RightFoot->soleHeight ;
+  PRFoot * LeftFoot = m_PR->leftFoot();
+  lLeftFootHalfWidth  = LeftFoot->soleWidth  ;
+  lLeftFootHalfHeight = LeftFoot->soleHeight ;
 
   lRightFootHalfWidth *= 0.5;
   lRightFootHalfHeight *= 0.5;

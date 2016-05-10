@@ -77,14 +77,14 @@ OnLineState & OnLineState::operator=(unsigned int NewState)
 
 ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,
 				     string DataFile,
-				     CjrlHumanoidDynamicRobot *aHS)
+				     PinocchioRobot *aPR)
   : ZMPRefTrajectoryGeneration(lSPM)
 {
 
   m_InitializationProfile = PREV_ZMP_INIT_PROFIL;
 
-  m_HS = aHS;
-  CjrlFoot *lLeftFoot = m_HS->leftFoot();
+  m_PR = aPR;
+  PRFoot * lLeftFoot = m_PR->leftFoot();
   m_FootTrajectoryGenerationStandard = new FootTrajectoryGenerationStandard(lSPM,lLeftFoot);
   m_FootTrajectoryGenerationStandard->InitializeInternalDataStructures();
 

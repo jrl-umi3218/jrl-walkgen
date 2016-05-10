@@ -51,9 +51,9 @@
 #include <Debug.hh>
 using namespace std;
 using namespace PatternGeneratorJRL;
-using namespace metapod;
+//using namespace metapod;
 
-#define DEBUG
+//#define DEBUG
 
 double filterprecision(double adb)
 {
@@ -69,19 +69,22 @@ double filterprecision(double adb)
 }
 
 ZMPVelocityReferencedQP::ZMPVelocityReferencedQP(SimplePluginManager *SPM,
-                                                 string , CjrlHumanoidDynamicRobot *aHS ) :
+                                                 string , PinocchioRobot *aPR ) :
 ZMPRefTrajectoryGeneration(SPM),
 Robot_(0),SupportFSM_(0),OrientPrw_(0),OrientPrw_DF_(0),
 VRQPGenerator_(0),IntermedData_(0),RFI_(0),Problem_(),
 Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
 {
+  // Save the reference to HDR
+  PR_ = aPR ;
+
   Running_ = false ;
   TimeBuffer_ = 0.04 ;
   QP_T_ = 0.1 ;
-  QP_N_ = 10 ;
+  QP_N_ = 16 ;
   m_SamplingPeriod = 0.005 ;
   InterpolationPeriod_ = m_SamplingPeriod*7;
-  previewDuration_ = (QP_N_-1)*QP_T_ ;
+  previewDuration_ = 7*QP_T_ ;
   NbSampleControl_ = (int)round(QP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(QP_T_/InterpolationPeriod_) ;
   previewSize_ = QP_N_ ;
@@ -93,16 +96,13 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   CoMHeight_ = 0.814 ;
   PerturbationOccured_ = false ;
   UpperTimeLimitToUpdate_ = 0.0 ;
-  RobotMass_ = aHS->mass() ;
+  RobotMass_ = PR_->mass() ;
   Solution_.useWarmStart=false ;
 
   CurrentIndex_ = 0 ;
 
   // Create and initialize online interpolation of feet trajectories
-  RFI_ = new RelativeFeetInequalities( SPM,aHS );
-
-  // Save the reference to HDR
-  HDR_ = aHS ;
+  RFI_ = new RelativeFeetInequalities( SPM,PR_ );
 
   // Create and initialize the finite state machine for support sequences
   SupportFSM_ = new SupportFSM();
@@ -113,7 +113,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   SupportFSM_->SamplingPeriod( QP_T_ );
 
   // Create and initialize preview of orientations
-  OrientPrw_ = new OrientationsPreview( aHS );
+  OrientPrw_ = new OrientationsPreview( PR_ );
   OrientPrw_->SamplingPeriod( QP_T_ );
   OrientPrw_->NbSamplingsPreviewed( QP_N_ );
   OrientPrw_->SSLength( SupportFSM_->StepPeriod() );
@@ -121,7 +121,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   OrientPrw_->CurrentTrunkState( CurrentTrunkState );
 
   // Create and initialize preview of orientations
-  OrientPrw_DF_ = new OrientationsPreview( aHS );
+  OrientPrw_DF_ = new OrientationsPreview( PR_ );
   OrientPrw_DF_->SamplingPeriod( QP_T_ );
   OrientPrw_DF_->NbSamplingsPreviewed( QP_N_ );
   OrientPrw_DF_->SSLength( SupportFSM_->StepPeriod() );
@@ -144,8 +144,8 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   CoM_.InitializeSystem();
 
   // Create and initialize simplified robot model
-  Robot_ = new RigidBodySystem( SPM, aHS, SupportFSM_ );
-  Robot_->Mass( aHS->mass() );
+  Robot_ = new RigidBodySystem( SPM, PR_, SupportFSM_ );
+  Robot_->Mass( RobotMass_ );
   Robot_->LeftFoot().Mass( 0.0 );
   Robot_->RightFoot().Mass( 0.0 );
   Robot_->NbSamplingsPreviewed( QP_N_ );
@@ -169,7 +169,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
 
   // Create and initialize online interpolation of feet trajectories:
   // ----------------------------------------------------------------
-  OFTG_DF_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
+  OFTG_DF_ = new OnLineFootTrajectoryGeneration(SPM,PR_->leftFoot());
   OFTG_DF_->InitializeInternalDataStructures();
   OFTG_DF_->SetSingleSupportTime( SSPeriod_ );
   OFTG_DF_->SetDoubleSupportTime( DSPeriod_ );
@@ -180,7 +180,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   OFTG_DF_->SetStepHeight( StepHeight_ );
   OFTG_DF_->SetStepStairOn(0) ;
 
-  OFTG_control_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
+  OFTG_control_ = new OnLineFootTrajectoryGeneration(SPM,PR_->leftFoot());
   OFTG_control_->InitializeInternalDataStructures();
   OFTG_control_->SetSingleSupportTime( SSPeriod_ );
   OFTG_control_->SetDoubleSupportTime( DSPeriod_ );
@@ -191,7 +191,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
   OFTG_control_->SetStepHeight( StepHeight_ );
   OFTG_control_->SetStepStairOn(0) ;
 
-  dynamicFilter_ = new DynamicFilter(SPM,aHS);
+  dynamicFilter_ = new DynamicFilter(SPM,PR_);
 
   // Register method to handle
   const unsigned int NbMethods = 4;
@@ -459,7 +459,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   dynamicFilter_->init(m_SamplingPeriod,
                        InterpolationPeriod_,
                        QP_T_,
-                       QP_N_*QP_T_ ,
+                       previewDuration_ + QP_T_ ,
                        previewDuration_,
                        lStartingCOMState);
   return 0;
@@ -586,34 +586,32 @@ void ZMPVelocityReferencedQP::OnLine(double time,
       RightFootTraj_deq_[j] = RightFootTraj_deq_ctrl_[i] ;
     }
 
-    bool filterOn_ = true ;
-    if(filterOn_)
+
+    dynamicFilter_->OnLinefilter(COMTraj_deq_,ZMPTraj_deq_ctrl_,
+                                 LeftFootTraj_deq_,
+                                 RightFootTraj_deq_,
+                                 deltaCOMTraj_deq_);
+//#define DEBUG
+#ifdef DEBUG
+    dynamicFilter_->Debug(COMTraj_deq_ctrl_,
+                          LeftFootTraj_deq_ctrl_,
+                          RightFootTraj_deq_ctrl_,
+                          COMTraj_deq_,ZMPTraj_deq_ctrl_,
+                          LeftFootTraj_deq_,
+                          RightFootTraj_deq_,
+                          deltaCOMTraj_deq_);
+#endif
+
+    // Correct the CoM.
+    for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
     {
-      dynamicFilter_->OnLinefilter(COMTraj_deq_,ZMPTraj_deq_ctrl_,
-                                   LeftFootTraj_deq_,
-                                   RightFootTraj_deq_,
-                                   deltaCOMTraj_deq_);
-
-      #ifdef DEBUG
-        dynamicFilter_->Debug(COMTraj_deq_ctrl_,
-                              LeftFootTraj_deq_ctrl_,
-                              RightFootTraj_deq_ctrl_,
-                              COMTraj_deq_,ZMPTraj_deq_ctrl_,
-                              LeftFootTraj_deq_,
-                              RightFootTraj_deq_,
-                              deltaCOMTraj_deq_);
-      #endif
-
-      // Correct the CoM.
-      for (unsigned int i = 0 ; i < NbSampleControl_ ; ++i)
+      for(int j=0;j<3;j++)
       {
-        for(int j=0;j<3;j++)
-        {
-          FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
-          FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
-        }
+        FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
+        FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
       }
     }
+
     // Specify that we are in the ending phase.
     if (time <= m_SamplingPeriod )
       {

@@ -51,7 +51,7 @@ namespace PatternGeneratorJRL
   public:
 
     ZMPVelocityReferencedSQP(SimplePluginManager *SPM, string DataFile,
-                            CjrlHumanoidDynamicRobot *aHS=0 );
+                            PinocchioRobot *aPR=0 );
 
     ~ZMPVelocityReferencedSQP();
 
@@ -214,6 +214,8 @@ namespace PatternGeneratorJRL
     /// \brief Nb. foot support inside preview window
     int SQP_nf_;
 
+
+
     /// \brief 2D LIPM to simulate the evolution of the robot's CoM.
     LinearizedInvertedPendulum2D LIPM_ ;
 
@@ -230,7 +232,7 @@ namespace PatternGeneratorJRL
     solution_t solution_;
 
     /// \brief HDR, humanoid dyamic robot
-    CjrlHumanoidDynamicRobot * HDR_ ;
+    PinocchioRobot * PR_ ;
     double RobotMass_ ;
 
     /// \brief Buffers for the Kajita's dynamic filter
@@ -261,9 +263,9 @@ namespace PatternGeneratorJRL
 
     /// \brief Size of the output preview
     unsigned NbSampleOutput_ ;
-    /// \brief Number of interpolated point needed for control computed during QP_T_
+    /// \brief Number of interpolated point needed for control computed during SQP_T_
     unsigned NbSampleControl_ ;
-    /// \brief Number of interpolated point needed for the dynamic filter computed during QP_T_
+    /// \brief Number of interpolated point needed for the dynamic filter computed during SQP_T_
     unsigned NbSampleInterpolation_ ;
     /// \brief Size of the preview for filtering
     unsigned previewSize_ ;

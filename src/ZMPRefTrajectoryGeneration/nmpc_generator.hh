@@ -30,7 +30,7 @@
 
 #include <jrl/walkgen/pgtypes.hh>
 #include <Mathematics/relative-feet-inequalities.hh>
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <jrl/walkgen/pinocchiorobot.hh>
 #include <iomanip>
 #include <cmath>
 #include <qpOASES.hpp>
@@ -40,7 +40,7 @@ namespace PatternGeneratorJRL
   class NMPCgenerator
   {
   public:
-    NMPCgenerator(SimplePluginManager *aSPM, CjrlHumanoidDynamicRobot *aHDR);
+    NMPCgenerator(SimplePluginManager *aSPM, PinocchioRobot *aPR);
 
     ~NMPCgenerator();
 
@@ -201,7 +201,7 @@ namespace PatternGeneratorJRL
 
   private:
     SimplePluginManager * SPM_ ;
-    CjrlHumanoidDynamicRobot * HDR_ ;
+    PinocchioRobot * PR_ ;
 
     // Time variant parameter
     /////////////////////////

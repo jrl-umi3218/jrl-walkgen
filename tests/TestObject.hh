@@ -39,16 +39,11 @@
 
 #include <ostream>
 #include <string>
-
-
-#include <jrl/mal/matrixabstractlayer.hh>
-#include <jrl/dynamics/dynamicsfactory.hh>
-#include <jrl/walkgen/patterngeneratorinterface.hh>
-#include <MotionGeneration/ComAndFootRealizationByGeometry.hh>
-
 #include "CommonTools.hh"
 #include "ClockCPUTime.hh"
-
+#include <jrl/mal/matrixabstractlayer.hh>
+#include <jrl/walkgen/patterngeneratorinterface.hh>
+#include <jrl/walkgen/pinocchiorobot.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -60,6 +55,9 @@ namespace PatternGeneratorJRL
     class TestObject
     {
     public:
+      // overload the new[] eigen operator
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
       /*! \brief Constructor for the test named TestName.
        All generated files will have their names prefixed by TestName*/
       TestObject(int argc, char *argv[],
@@ -70,15 +68,11 @@ namespace PatternGeneratorJRL
       ~TestObject();
 
       /*! \brief Initialize the test object. */
-      void init();
+      bool init();
      // void initIK();
 
       /*! \brief Perform test. */
-      bool doTest(std::ostream &os);
-
-      /*! \brief Decide from which object the robot is build from. */
-      virtual void SpecializedRobotConstructor(CjrlHumanoidDynamicRobot *& aHDR,
-					       CjrlHumanoidDynamicRobot *& aDebugHDR );
+      virtual bool doTest(std::ostream &os);
 
     protected:
 
@@ -91,18 +85,27 @@ namespace PatternGeneratorJRL
       /*! \brief Profile of the test to perform. */
       unsigned int m_TestProfile;
 
+      /*! \brief Verify that the input files exist. */
+      bool checkFiles();
+
       /*! \brief Useful methods to create the robot model.
-	@{
+    @{
        */
       /*! */
-      void CreateAndInitializeHumanoidRobot(std::string &RobotFileName,
-					    std::string &LinkJointRank,
-					    std::string &SpecificitiesFileName,
-					    std::string &InitConfig,
-					    CjrlHumanoidDynamicRobot *& aHDR,
-					    CjrlHumanoidDynamicRobot *& aDebugHDR,
-					    PatternGeneratorJRL::PatternGeneratorInterface *&aPGI);
+      void CreateAndInitializeHumanoidRobot(
+          std::string &URDFFile,
+          std::string &SRDFFile,
+          PinocchioRobot *& aPR,
+          PinocchioRobot *& aDebugPR,
+          PatternGeneratorJRL::PatternGeneratorInterface *&aPGI);
+      /*! @} */
 
+      /*! \brief Useful methods to parse srdf file.
+    @{
+       */
+      /*! */
+      void InitializeRobotWithSRDF(PinocchioRobot & aPR,
+                                   const std::string & filename);
       /*! @} */
 
       /*! \name Vectors storing the robot's state.
@@ -126,8 +129,8 @@ namespace PatternGeneratorJRL
       /*! \brief Previous acceleration */
       MAL_VECTOR(m_PreviousAcceleration,double);
 
-      /*! \brief Initial Configuration */
-      MAL_VECTOR(InitialPosition,double);
+      /*! \brief Half Sitting Configuration */
+      MAL_VECTOR(m_HalfSitting,double);
 
 
       /*! @} */
@@ -136,10 +139,16 @@ namespace PatternGeneratorJRL
 	 @{
       */
       /*! \brief Abstract model of the humanoid robot considered */
-      CjrlHumanoidDynamicRobot * m_HDR ;
+      se3::Model m_robotModel ;
+
+      /*! \brief Abstract model of the humanoid robot considered */
+      PinocchioRobot * m_PR ;
+      se3::Data *m_robotData;
 
       /*! \brief Abstract model of the humanoid robot for debugging purposes. */
-      CjrlHumanoidDynamicRobot * m_DebugHDR ;
+      PinocchioRobot * m_DebugPR ;
+      se3::Data *m_DebugRobotData;
+
 
       /*! @} */
 
@@ -164,7 +173,7 @@ namespace PatternGeneratorJRL
 
       /*! \brief Fill in the debug files with the appropriate
 	information */
-      void fillInDebugFiles();
+      virtual void fillInDebugFiles();
 
       /*! \brief Compare debug files with references. */
       bool compareDebugFiles();
@@ -193,22 +202,125 @@ namespace PatternGeneratorJRL
 
       /*! \brief Store options
        @{*/
-      /*! \brief Path to the VRML. */
-      std::string m_VRMLPath;
-      /*! \brief Name of the VRML. */
-      std::string m_VRMLFileName;
-      /*! \brief File describing the specificities of the robot. */
-      std::string m_SpecificitiesFileName;
-      /*! \brief File describing the relationship between the Joints
-	and their rank in the robot's state vector */
-      std::string m_LinkJointRank;
-
-      std::string m_InitConfig;
+      /*! \brief full path to the URDF. */
+      std::string m_URDFPath;
+      /*! \brief full path of the SRDF. */
+      std::string m_SRDFPath;
 
       /*! @} */
-    };
+    // utilities for Herdt and Naveau
+    public :
 
 
+      void startTurningLeft(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.2 0.0 6.0832");
+        aPGI.ParseCmd(strm2);
+      }
+
+      void startTurningRight(PatternGeneratorInterface &aPGI)
+      {
+        //istringstream strm2(":setVelReference  0.2 0.0 -0.2");
+        std::istringstream strm2(":setVelReference  0.15 0.0 -0.08");
+        aPGI.ParseCmd(strm2);
+      }
+
+      void startTurningRight2(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.2 0.0 -0.17");
+        aPGI.ParseCmd(strm2);
+      }
+
+      void startTurningLeft2(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.0 0.0 0.4");
+        aPGI.ParseCmd(strm2);
+      }
+
+      void startTurningLeftOnSpot(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.0 0.0 10.0");
+        aPGI.ParseCmd(strm2);
+      }
+
+      void startTurningRightOnSpot(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.0 0.0 -10.");
+        aPGI.ParseCmd(strm2);
+      }
+
+      void stop(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference 0.0 0.0 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+      void walkForward1m_s(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.1 0.0 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+      void walkForward2m_s(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.2 0.0 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+      void walkForward3m_s(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.3 0.0 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+      void walkSidewards1m_s(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.0 -0.1 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+      void walkSidewards2m_s(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.0 -0.2 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+      void walkSidewards3m_s(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.0 -0.3 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+      void startWalkInDiagonal1m_s(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.1 0.1 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+      void startWalkInDiagonal2m_s(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.2 0.2 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+
+      void startWalkInDiagonal3m_s(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.3 0.3 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+
+      void stopOnLineWalking(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.0 0.0 0.0");
+        aPGI.ParseCmd(strm2);
+        std::istringstream strm3(":stoppg");
+        aPGI.ParseCmd(strm3);
+      }
+
+      void walkOnSpot(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.0001 0.0 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+
+      void perturbationForce(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":perturbationforce  -20.0 8.0 0.0");
+        aPGI.ParseCmd(strm2);
+      }
+    }; /* end of TestObject class */
   } /* end of TestSuite namespace */
 } /* end of PatternGeneratorJRL namespace */
 #endif /* _TEST_OBJECT_PATTERN_GENERATOR_UTESTING_H_*/

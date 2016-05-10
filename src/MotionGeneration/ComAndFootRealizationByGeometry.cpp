@@ -108,8 +108,8 @@ void ComAndFootRealizationByGeometry::
 }
 
 void ComAndFootRealizationByGeometry::
-InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
-                   std::vector<CjrlJoint *> &,
+InitializationMaps(std::vector<se3::Index> &FromRootToJoint,
+                   se3::JointModelVector & actuatedJoints,
                    std::vector<int> &IndexinConfiguration )
 {
   if (FromRootToJoint.size()!=0)
@@ -123,54 +123,55 @@ InitializationMaps(std::vector<CjrlJoint *> &FromRootToJoint,
     // Here we assume that they are in a decending order.
     for(unsigned int i=0;i<FromRootToJoint.size();i++)
     {
-      IndexinConfiguration[lindex] = FromRootToJoint[i]->rankInConfiguration();
+      // -1 because pinocchio uses quaternion instead of roll pitch yaw
+      IndexinConfiguration[lindex] = se3::idx_q(actuatedJoints[FromRootToJoint[i]])-1 ;
       lindex++;
     }
   }
 }
 
 void ComAndFootRealizationByGeometry::
-    InitializeMapsForAHand(CjrlHand * aHand,
-                           std::vector<CjrlJoint *> &ActuatedJoints,
+    InitializeMapsForAHand(se3::JointIndex aWrist,
+                           se3::JointModelVector & ActuatedJoints,
                            vector<int> & IndexesInConfiguration,
-                           CjrlJoint * & associateShoulder)
+                           se3::JointIndex & associateShoulder)
 {
-  if (aHand==0)
+  if (aWrist==0)
     return;
 
   // Find back the path from the shoulder to the left hand.
-  //  CjrlHand *LeftHand = getHumanoidDynamicRobot()->leftHand();
-  CjrlJoint *Chest = getHumanoidDynamicRobot()->chest();
+  se3::JointIndex Chest = getPinocchioRobot()->chest();
   if (Chest==0)
     return;
 
-  const CjrlJoint * associatedWrist = aHand->associatedWrist();
+  const se3::JointIndex associatedWrist = aWrist;
   if (associatedWrist==0)
     return;
 
-  std::vector<CjrlJoint *> FromRootToJoint =
-      getHumanoidDynamicRobot()->jointsBetween(*Chest, *associatedWrist);
+  std::vector<se3::JointIndex> FromRootToJoint =
+      getPinocchioRobot()->jointsBetween(Chest, associatedWrist);
 
   associateShoulder = FromRootToJoint[0];
+
   InitializationMaps(FromRootToJoint,ActuatedJoints,
                      IndexesInConfiguration);
 }
 
 void ComAndFootRealizationByGeometry::
-    InitializeMapForChest(std::vector<CjrlJoint *> &ActuatedJoints)
+    InitializeMapForChest(se3::JointModelVector & ActuatedJoints)
 {
 
-  CjrlJoint *Chest = getHumanoidDynamicRobot()->chest();
+  se3::JointIndex Chest = getPinocchioRobot()->chest();
   if (Chest==0)
     return;
 
-  std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint;
-  FromRootToJoint = Chest->jointsFromRootToThis();
-  std::vector<CjrlJoint *>::iterator itJoint = FromRootToJoint.begin();
+  std::vector<se3::JointIndex> FromRootToJoint2,FromRootToJoint;
+  FromRootToJoint = getPinocchioRobot()->fromRootToIt(Chest);
+  std::vector<se3::JointIndex>::iterator itJoint = FromRootToJoint.begin();
   bool startadding=false;
   while(itJoint!=FromRootToJoint.end())
   {
-    std::vector<CjrlJoint *>::iterator current = itJoint;
+    std::vector<se3::JointIndex>::iterator current = itJoint;
 
     if (*current==Chest)
     {
@@ -185,9 +186,8 @@ void ComAndFootRealizationByGeometry::
     itJoint++;
   }
   InitializationMaps(FromRootToJoint2,ActuatedJoints,m_ChestIndexinConfiguration);
-  InitializationMaps(FromRootToJoint2,ActuatedJoints,m_ChestIndexinConfiguration);
-
 }
+
 void ComAndFootRealizationByGeometry::
     Initialization()
 {
@@ -205,20 +205,17 @@ void ComAndFootRealizationByGeometry::
   ODEBUG("Enter 2.0 ");
   // Take the right ankle position (should be equivalent)
   vector3d lAnklePositionRight,lAnklePositionLeft;
-  CjrlFoot *LeftFoot, *RightFoot;
-  LeftFoot = getHumanoidDynamicRobot()->leftFoot();
+  PRFoot *LeftFoot, *RightFoot;
+  LeftFoot = getPinocchioRobot()->leftFoot();
   if (LeftFoot==0)
     LTHROW("No left foot");
 
-  RightFoot = getHumanoidDynamicRobot()->rightFoot();
+  RightFoot = getPinocchioRobot()->rightFoot();
   if (RightFoot==0)
     LTHROW("No right foot");
 
-  RightFoot->getAnklePositionInLocalFrame(lAnklePositionRight);
-  LeftFoot->getAnklePositionInLocalFrame(lAnklePositionLeft);
-
-  double lWidth,lHeight ;
-  LeftFoot->getSoleSize(lWidth,lHeight);
+  lAnklePositionRight = RightFoot->anklePosition;
+  lAnklePositionLeft = LeftFoot->anklePosition;
 
   m_AnklePositionRight[0] = lAnklePositionRight[0];
   m_AnklePositionLeft[0]  = lAnklePositionLeft[0];
@@ -238,53 +235,53 @@ void ComAndFootRealizationByGeometry::
   // to the VRML ID.
   ODEBUG("Enter 5.0 ");
   // Extract the indexes of the Right leg.
-  CjrlJoint *waist = getHumanoidDynamicRobot()->waist();
+  se3::JointIndex waist = getPinocchioRobot()->waist();
 
-  if (RightFoot->associatedAnkle()==0)
+  if (RightFoot->associatedAnkle==0)
     LTHROW("No right ankle");
 
-  std::vector<CjrlJoint *> FromRootToJoint2,FromRootToJoint =
-      getHumanoidDynamicRobot()->jointsBetween(*waist, *(RightFoot->associatedAnkle()));
-  std::vector<CjrlJoint *> ActuatedJoints =
-      getHumanoidDynamicRobot()->getActuatedJoints();
-  ODEBUG4("Size of ActuatedJoints"<<ActuatedJoints.size(),"DebugDataStartingCOM.dat");
   // Build global map.
-  m_GlobalVRMLIDtoConfiguration.resize(ActuatedJoints.size());
-  for(unsigned int j=0;j<ActuatedJoints.size();j++)
+  se3::JointModelVector & ActuatedJoints =
+      getPinocchioRobot()->getActuatedJoints();
+  ODEBUG4("Size of ActuatedJoints"<<ActuatedJoints.size(),
+          "DebugDataStartingCOM.dat");
+
+  // here we assume all revolute joint
+  // -2 : because pinocchio assume a non actuated "universe joint"
+  // and a non actuated base joint
+  m_GlobalVRMLIDtoConfiguration.resize(ActuatedJoints.size()-2);
+  for(unsigned int i=0; i<m_GlobalVRMLIDtoConfiguration.size(); ++i)
   {
-    m_GlobalVRMLIDtoConfiguration[j] = ActuatedJoints[j]->rankInConfiguration();
+    m_GlobalVRMLIDtoConfiguration[i] = se3::idx_q(ActuatedJoints[i+2]);
   }
 
-
-  // Build Right and left leg map.
+  // Build right and left leg map.
   // Remove the first element
-  FromRootToJoint.erase(FromRootToJoint.begin());
+  std::vector<se3::JointIndex> FromRootToJoint =
+      getPinocchioRobot()->jointsBetween(waist, RightFoot->associatedAnkle);
+  FromRootToJoint.erase(FromRootToJoint.begin()); // be careful with that line potential bug
   InitializationMaps(FromRootToJoint,ActuatedJoints,
-                     m_RightLegIndexinConfiguration);
+                       m_RightLegIndexinConfiguration);
 
   FromRootToJoint =
-      getHumanoidDynamicRobot()->jointsBetween(*waist, *(LeftFoot->associatedAnkle()));
-
+      getPinocchioRobot()->jointsBetween(waist, LeftFoot->associatedAnkle);
   FromRootToJoint.erase(FromRootToJoint.begin());
   InitializationMaps(FromRootToJoint,ActuatedJoints,
                      m_LeftLegIndexinConfiguration);
 
   // Create maps for the left hand.
-  InitializeMapsForAHand(getHumanoidDynamicRobot()->leftHand(),
+  InitializeMapsForAHand(getPinocchioRobot()->leftWrist(),
                          ActuatedJoints,
                          m_LeftArmIndexinConfiguration,
                          m_LeftShoulder);
 
   // Create maps for the right hand.
-  InitializeMapsForAHand(getHumanoidDynamicRobot()->rightHand(),
+  InitializeMapsForAHand(getPinocchioRobot()->rightWrist(),
                          ActuatedJoints,
                          m_RightArmIndexinConfiguration,
                          m_RightShoulder);
 
   FromRootToJoint.clear();
-  FromRootToJoint2.clear();
-
-
 
   ODEBUG("RightLegIndex: "
          << m_RightLegIndexinConfiguration[0] << " "
@@ -328,8 +325,9 @@ bool ComAndFootRealizationByGeometry::
 {
   // For initialization we read the current value inside
   // the model. But we do not use it.
-  MAL_VECTOR_TYPE(double) CurrentConfig =
-      getHumanoidDynamicRobot()->currentConfiguration();
+  // it is used to resize the temporary vector
+  PinocchioRobot *aPR =  getPinocchioRobot();
+  MAL_VECTOR_TYPE(double) CurrentConfig = aPR->currentConfiguration();
 
   // Set to zero the free floating root.
   if(lStartingWaistPose.size())
@@ -347,28 +345,18 @@ bool ComAndFootRealizationByGeometry::
   }
 
   // Initialize the configuration vector.
-  for(unsigned int i=0;i<m_GlobalVRMLIDtoConfiguration.size();i++)
+  for(unsigned int i=0; i<MAL_VECTOR_SIZE(BodyAnglesIni); ++i)
   {
-    CurrentConfig[m_GlobalVRMLIDtoConfiguration[i]] = BodyAnglesIni[i];
+    CurrentConfig[i+6] = BodyAnglesIni[i];
   }
 
-  CjrlHumanoidDynamicRobot *aDMB =  getHumanoidDynamicRobot();
-  aDMB->currentConfiguration(CurrentConfig);
+  aPR->currentConfiguration(CurrentConfig);
 
   // Compensate for the static translation, not the WAIST position
   // but it is the body position which start on the ground.
-  {
-    string inProperty[2]={"ComputeCoM",
-                          "ComputeZMP"};
-    string inValue[2]={"true","false"};
-    for(unsigned int i=0;i<2;i++)
-      aDMB->setProperty(inProperty[i],inValue[i]);
+  aPR->computeForwardKinematics();
 
-  }
-
-  aDMB->computeForwardKinematics();
-
-  CurrentConfig = aDMB->currentConfiguration();
+  CurrentConfig = aPR->currentConfiguration();
 
 
   // Set the waist position.
@@ -385,44 +373,25 @@ bool ComAndFootRealizationByGeometry::
 }
 
 bool ComAndFootRealizationByGeometry::
-    InitializationFoot(CjrlFoot * aFoot,
+    InitializationFoot(PRFoot * aFoot,
                        MAL_S3_VECTOR(& m_AnklePosition,double),
                        FootAbsolutePosition & InitFootPosition)
 {
-  const CjrlJoint * AnkleJoint = aFoot->associatedAnkle();
-  matrix4d lFootPose = AnkleJoint->currentTransformation();
-  MAL_S4x4_MATRIX_TYPE(double) FootTranslation;
-  MAL_S4x4_MATRIX_SET_IDENTITY(FootTranslation);
+  se3::JointIndex AnkleJoint = aFoot->associatedAnkle;
+  se3::SE3 lAnkleSE3 = getPinocchioRobot()->Data()->oMi[AnkleJoint] ;
+  Eigen::Vector3d translation ;
+  translation << -m_AnklePosition[0], -m_AnklePosition[1], -m_AnklePosition[2];
+  se3::SE3 FootTranslation = se3::SE3(Eigen::Matrix3d::Identity(),translation);
+  se3::SE3 lFootSE3 = lAnkleSE3.act(FootTranslation);
 
-  for(unsigned int i=0;i<3;i++)
-    MAL_S4x4_MATRIX_ACCESS_I_J(FootTranslation, i,3) = -
-        m_AnklePosition[i];
+  InitFootPosition.x = lFootSE3.translation()[0];
+  InitFootPosition.y = lFootSE3.translation()[1];
+  InitFootPosition.z = lFootSE3.translation()[2];
 
-  lFootPose = MAL_S4x4_RET_A_by_B(lFootPose,FootTranslation);
-
-  InitFootPosition.x = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 0,3);
-  InitFootPosition.y = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 1,3);
-  InitFootPosition.z = MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,3);
-
-  // Renormalize the feet orientation
-  matrix4d initialRot;
-  initialRot = AnkleJoint->initialPosition();
-  matrix4d invrot;
-  for(unsigned int i=0;i<3;i++)
-    for(unsigned int j=0;j<3;j++)
-    {
-  	MAL_S4x4_MATRIX_ACCESS_I_J(invrot,i,j)=0.0;
-  	for(unsigned int k=0;k<3;k++)
-    {
-      MAL_S4x4_MATRIX_ACCESS_I_J(invrot,i,j)+=
-  	      MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,i,k) *
-  	      MAL_S4x4_MATRIX_ACCESS_I_J(initialRot,j,k);
-    }
-  }
-  for(unsigned int i=0;i<3;i++)
-    for(unsigned int j=0;j<3;j++)
-      MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose,i,j) =
-          MAL_S4x4_MATRIX_ACCESS_I_J(invrot,i,j);
+  se3::SE3 lAnkleInitSE3inv = getPinocchioRobot()
+      ->DataInInitialePose()->oMi[AnkleJoint];
+  Eigen::Matrix3d normalizedRotation =
+      lFootSE3.rotation() * lAnkleInitSE3inv.rotation() ;
 
   // The foot *must be* flat on the floor....
   // Thus
@@ -430,18 +399,14 @@ bool ComAndFootRealizationByGeometry::
   // coct    -st    -soct
   // cost     ct    -sost
   // so        0    co
-  assert((MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,1) == 0) &&
+  assert((normalizedRotation(2,1) == 0) &&
          "Error in the walk pattern generator initialization:" &&
          " Initial foot position is not flat");
 
   InitFootPosition.omega =
-      atan2(MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,0),
-            MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 2,2))*180/M_PI;
+      atan2(normalizedRotation(2,0),normalizedRotation(2,2))*180/M_PI;
   InitFootPosition.theta =
-      atan2(-MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 0,1),
-            MAL_S4x4_MATRIX_ACCESS_I_J(lFootPose, 1,1))*180/M_PI;
-
-
+      atan2(-normalizedRotation(0,1),normalizedRotation(1,1))*180/M_PI;
   return true;
 }
 
@@ -458,7 +423,6 @@ bool ComAndFootRealizationByGeometry::
                       FootAbsolutePosition & InitLeftFootPosition,
                       FootAbsolutePosition & InitRightFootPosition)
 {
-
   /* Initialize properly the left and right initial positions of the feet. */
   memset((char *)&InitLeftFootPosition,0,sizeof(FootAbsolutePosition));
   memset((char *)&InitRightFootPosition,0,sizeof(FootAbsolutePosition));
@@ -470,9 +434,9 @@ bool ComAndFootRealizationByGeometry::
   InitializationHumanoid(BodyAnglesIni,lStartingWaistPose);
 
   // Initialise the right foot position.
-  CjrlHumanoidDynamicRobot *aDMB =  getHumanoidDynamicRobot();
-  CjrlFoot * RightFoot = aDMB->rightFoot();
-  CjrlFoot * LeftFoot = aDMB->leftFoot();
+  PinocchioRobot *aPR =  getPinocchioRobot();
+  PRFoot * RightFoot = aPR->rightFoot();
+  PRFoot * LeftFoot = aPR->leftFoot();
 
   // Initialize Feet.
   InitializationFoot(RightFoot, m_AnklePositionRight,InitRightFootPosition);
@@ -500,7 +464,7 @@ bool ComAndFootRealizationByGeometry::
   lStartingWaistPose(2) -= InitRightFootPosition.z;
 
   // CoM position
-  lStartingCOMPosition = getHumanoidDynamicRobot()->positionCenterOfMass();
+  getPinocchioRobot()->positionCenterOfMass(lStartingCOMPosition);
   ODEBUG4( "COM positions: "
            << lStartingCOMPosition[0] << " "
            << lStartingCOMPosition[1] << " "
@@ -568,7 +532,7 @@ bool ComAndFootRealizationByGeometry::
 {
 
   // Check pre-condition.
-  if (getHumanoidDynamicRobot()==0)
+  if (getPinocchioRobot()==0)
   {
     cerr << "ComAndFootRealizationByGeometry::InitializationUpperBody "  << endl
         << "No Humanoid Specificites class given " << endl;
@@ -720,16 +684,16 @@ bool ComAndFootRealizationByGeometry::
 
   MAL_S3_VECTOR(Foot_Shift,double);
 
-  CjrlJoint *Ankle = 0;
+  se3::JointIndex Ankle = 0;
   if (LeftOrRight==-1)
   {
     MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionRight);
-    Ankle = getHumanoidDynamicRobot()->rightAnkle();
+    Ankle = getPinocchioRobot()->rightFoot()->associatedAnkle;
   }
   else if (LeftOrRight==1)
   {
     MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionLeft);
-    Ankle = getHumanoidDynamicRobot()->leftAnkle();
+    Ankle = getPinocchioRobot()->leftFoot()->associatedAnkle;
   }
 
   if(ShiftFoot_)
@@ -772,14 +736,15 @@ bool ComAndFootRealizationByGeometry::
     MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,i,3) = MAL_S3_VECTOR_ACCESS(Body_P,i);
     MAL_S4x4_MATRIX_ACCESS_I_J(FootPose,i,3) = MAL_S3_VECTOR_ACCESS(Foot_P,i);
   }
+  MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,3,3) = 1.0 ;
+  MAL_S4x4_MATRIX_ACCESS_I_J(FootPose,3,3) = 1.0 ;
 
-
-  CjrlJoint *Waist = getHumanoidDynamicRobot()->waist();
+  se3::JointIndex Waist = getPinocchioRobot()->waist();
 
   ODEBUG("Typeid of humanoid: " << typeid(getHumanoidDynamicRobot()).name() );
   // Call specialized dynamics.
-  getHumanoidDynamicRobot()->getSpecializedInverseKinematics(*Waist,*Ankle,BodyPose,FootPose,lq);
-
+  getPinocchioRobot()->ComputeSpecializedInverseKinematics(
+        Waist,Ankle,BodyPose,FootPose,lq);
 
   return true;
 }
@@ -878,7 +843,6 @@ bool ComAndFootRealizationByGeometry::
   ODEBUG4("Stage " << Stage,"DebugDataIK.dat");
   ODEBUG4("* Left Lego *","DebugDataIK.dat");
   KinematicsForOneLeg(Body_R,Body_P,aLeftFoot,m_DtLeft,aCoMPosition,ToTheHip,1,ql,Stage);
-
 
   // Kinematics for the right leg.
   MAL_S3x3_C_eq_A_by_B(ToTheHip, Body_R, m_TranslationToTheRightHip);
@@ -1287,12 +1251,12 @@ void ComAndFootRealizationByGeometry::
       TempALeft * m_GainFactor / 0.2;
   MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,2,3) = m_ZARM;
 
-  getHumanoidDynamicRobot()->getSpecializedInverseKinematics(*m_LeftShoulder,
-                                                             *getHumanoidDynamicRobot()->leftWrist(),
-                                                             jointRootPosition,
-                                                             jointEndPosition,
-                                                             qArml);
-
+  getPinocchioRobot()->ComputeSpecializedInverseKinematics(
+        m_LeftShoulder,
+        getPinocchioRobot()->leftWrist(),
+        jointRootPosition,
+        jointEndPosition,
+        qArml);
   ODEBUG4("ComputeHeuristicArm: Step 2 ","DebugDataIKArms.txt");
   ODEBUG4( "IK Left arm p:" << qArml(0)<< " " <<  qArml(1)  << " " << qArml(2)
            << " " << qArml(3) << "  " << qArml(4) << " " << qArml(5), "DebugDataIKArms.txt" );
@@ -1300,11 +1264,12 @@ void ComAndFootRealizationByGeometry::
   MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,0,3) = TempARight;
   MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,2,3) = m_ZARM;
 
-  getHumanoidDynamicRobot()->getSpecializedInverseKinematics(*m_RightShoulder,
-                                                             *getHumanoidDynamicRobot()->rightWrist(),
-                                                             jointRootPosition,
-                                                             jointEndPosition,
-                                                             qArmr);
+  getPinocchioRobot()->ComputeSpecializedInverseKinematics(
+        m_RightShoulder,
+        getPinocchioRobot()->rightWrist(),
+        jointRootPosition,
+        jointEndPosition,
+        qArmr);
   ODEBUG4( "IK Right arm p:" << qArmr(0)<< " " <<  qArmr(1)  << " " << qArmr(2)
            << " " << qArmr(3) << "  " << qArmr(4) << " " << qArmr(5), "DebugDataIKArms.txt" );
 
@@ -1315,14 +1280,14 @@ void ComAndFootRealizationByGeometry::
 }
 
 bool ComAndFootRealizationByGeometry::
-    setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot * aHumanoidDynamicRobot)
+    setPinocchioRobot(PinocchioRobot * aPinocchioRobot)
 {
-  ComAndFootRealization::setHumanoidDynamicRobot(aHumanoidDynamicRobot);
-  CjrlHumanoidDynamicRobot *aHDMB =  aHumanoidDynamicRobot;
+  ComAndFootRealization::setPinocchioRobot(aPinocchioRobot);
+  PinocchioRobot *aPR =  aPinocchioRobot;
 
-  MAL_VECTOR_RESIZE(m_prev_Configuration,aHDMB->numberDof());
-  MAL_VECTOR_RESIZE(m_prev_Configuration1,aHDMB->numberDof());
-  MAL_VECTOR_RESIZE(m_prev_Configuration2,aHDMB->numberDof());
+  MAL_VECTOR_RESIZE(m_prev_Configuration,aPR->numberDof());
+  MAL_VECTOR_RESIZE(m_prev_Configuration1,aPR->numberDof());
+  MAL_VECTOR_RESIZE(m_prev_Configuration2,aPR->numberDof());
 
   for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
   {
@@ -1417,8 +1382,8 @@ ostream& PatternGeneratorJRL::operator<<(ostream &os,const ComAndFootRealization
   //      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,0) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,1) << " "
   //      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,2) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,3) << endl ;
 
-  CjrlHumanoidDynamicRobot * HumanoidDynamicRobot = obj.getHumanoidDynamicRobot();
-  os << "The HumanoidDynamicRobot is at the adress :\n" << HumanoidDynamicRobot << endl ;
+  PinocchioRobot * Robot = obj.getPinocchioRobot();
+  os << "The PinocchioRobot is at the adress :\n" << Robot << endl ;
 
   double HeightOfTheCoM = obj.GetHeightOfTheCoM();
   os << "The height of the robot is :\n" << HeightOfTheCoM << endl << endl ;

@@ -46,7 +46,7 @@ namespace PatternGeneratorJRL
     //
   public:
 
-    OnLineFootTrajectoryGeneration(SimplePluginManager *lSPM,CjrlFoot *aFoot);
+    OnLineFootTrajectoryGeneration(SimplePluginManager *lSPM, PRFoot *aFoot);
 
     virtual ~OnLineFootTrajectoryGeneration();
 

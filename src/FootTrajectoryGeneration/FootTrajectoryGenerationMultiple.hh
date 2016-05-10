@@ -77,7 +77,7 @@ namespace PatternGeneratorJRL
     /*! Constructor: In order to compute some appropriate strategies,
       this class needs to extract specific details from the humanoid model. */
     FootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
-				     CjrlFoot *aFoot);
+                     PRFoot *aFoot);
 
     // Default destructor
     ~FootTrajectoryGenerationMultiple();
@@ -222,7 +222,7 @@ namespace PatternGeneratorJRL
     std::vector<FootTrajectoryGenerationStandard *> m_SetOfFootTrajectoryGenerationObjects;
 
     /*! \brief Reference of humanoid specificities. */
-    CjrlFoot * m_Foot;
+    PRFoot * m_Foot;
 
     /*! \brief Set the absolute reference time for this set of intervals. */
     double m_AbsoluteTimeReference;

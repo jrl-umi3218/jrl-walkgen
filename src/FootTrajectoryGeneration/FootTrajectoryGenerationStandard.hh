@@ -68,7 +68,7 @@ namespace PatternGeneratorJRL
 
     /*! Constructor: In order to compute some appropriate strategies,
       this class needs to extract specific details from the humanoid model. */
-    FootTrajectoryGenerationStandard(SimplePluginManager *lSPM,CjrlFoot *aFoot);
+    FootTrajectoryGenerationStandard(SimplePluginManager *lSPM, PRFoot *aFoot);
 
     /*! Default destructor. */
     virtual ~FootTrajectoryGenerationStandard();

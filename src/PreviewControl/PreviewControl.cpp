@@ -268,7 +268,6 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
       ODEBUG("cx:" << cx);
       ODEBUG("Q:" << Q);
       ODEBUG("R:" << R);
-      ODEBUG("Nl:" << Nl);
       anOCS = new PatternGeneratorJRL::OptimalControllerSolver(Ax,bx,cx,Q,R,Nl);
 
       anOCS->ComputeWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
@@ -305,6 +304,7 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
       delete anOCS;
     }
 
+  ODEBUG("Nl:" << Nl);
   ODEBUG("Zc:" << m_Zc <<" T:" << T );
   ODEBUG("Q:" << Q <<" R:" << R);
   ODEBUG("m_Ks: " <<m_Ks);

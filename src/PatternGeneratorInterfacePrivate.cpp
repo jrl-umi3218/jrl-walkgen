@@ -47,11 +47,11 @@
 
 namespace PatternGeneratorJRL {
 
-  PatternGeneratorInterfacePrivate::PatternGeneratorInterfacePrivate(CjrlHumanoidDynamicRobot *aHDR)
-    : PatternGeneratorInterface(aHDR),SimplePlugin(this)
+  PatternGeneratorInterfacePrivate::PatternGeneratorInterfacePrivate(PinocchioRobot *aPinocchioRobotRobot)
+    : PatternGeneratorInterface(aPinocchioRobotRobot),SimplePlugin(this)
   {
     //AllowFPE();
-    m_HumanoidDynamicRobot = aHDR;
+    m_PinocchioRobot = aPinocchioRobotRobot;
 
     ODEBUG4("Step 0","DebugPGI.txt");
 
@@ -93,7 +93,8 @@ namespace PatternGeneratorJRL {
 
     // Initialize (if needed) debugging actions.
     m_dt = 0.005;
-    m_DOF = m_HumanoidDynamicRobot->numberDof();
+    //m_DOF = m_HumanoidDynamicRobot->numberDof();
+    m_DOF = m_PinocchioRobot->numberDof() ;
 
     m_SamplingPeriod = m_PC->SamplingPeriod();
     m_PreviewControlTime = m_PC->PreviewControlTime();
@@ -221,14 +222,6 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::ObjectsInstanciation()
   {
     // Create fundamental objects to make the WPG runs.
-    {
-      string inProperty[2]={"ComputeZMP",
-                            "ComputeBackwardDynamics"};
-      string inValue[2]={"true","false"};
-      for(unsigned int i=0;i<2;i++)
-        m_HumanoidDynamicRobot->setProperty(inProperty[i],inValue[i]);
-
-    }
 
     // INFO: This where you should instanciate your own
     // INFO: object for Com and Foot realization.
@@ -237,27 +230,27 @@ namespace PatternGeneratorJRL {
     m_ComAndFootRealization[0] = new ComAndFootRealizationByGeometry(this);
 
     // Creates the foot trajectory generator.
-    m_FeetTrajectoryGenerator = new LeftAndRightFootTrajectoryGenerationMultiple(this,m_HumanoidDynamicRobot->leftFoot());
+    m_FeetTrajectoryGenerator = new LeftAndRightFootTrajectoryGenerationMultiple(this,m_PinocchioRobot->leftFoot());
 
     // ZMP reference and Foot trajectory planner (Preview control method from Kajita2003)
-    m_ZMPD = new ZMPDiscretization(this,"",m_HumanoidDynamicRobot);
+    m_ZMPD = new ZMPDiscretization(this,"",m_PinocchioRobot);
 
     // ZMP and CoM generation using the method proposed in Wieber2006.
-    m_ZMPQP = new ZMPQPWithConstraint(this,"",m_HumanoidDynamicRobot);
+    m_ZMPQP = new ZMPQPWithConstraint(this,"",m_PinocchioRobot);
 
     // ZMP and CoM generation using the method proposed in Dimitrov2008.
-    m_ZMPCQPFF = new ZMPConstrainedQPFastFormulation(this,"",m_HumanoidDynamicRobot);
+    m_ZMPCQPFF = new ZMPConstrainedQPFastFormulation(this,"",m_PinocchioRobot);
 
-    m_ZMPVRSQP = new ZMPVelocityReferencedSQP(this,"",m_HumanoidDynamicRobot);
+    m_ZMPVRSQP = new ZMPVelocityReferencedSQP(this,"",m_PinocchioRobot);
     m_ComAndFootRealization[3] = m_ZMPVRSQP->getComAndFootRealization();
 
     // ZMP and CoM generation using the method proposed in Herdt2010.
-    m_ZMPVRQP = new ZMPVelocityReferencedQP(this,"",m_HumanoidDynamicRobot);
+    m_ZMPVRQP = new ZMPVelocityReferencedQP(this,"",m_PinocchioRobot);
     m_ComAndFootRealization[1] = m_ZMPVRQP->getComAndFootRealization();
 
     // ZMP and CoM generation using the analytical method proposed in Morisawa2007.
-    m_ZMPM = new AnalyticalMorisawaCompact(this,m_HumanoidDynamicRobot);
-    m_ZMPM->SetHumanoidSpecificities(m_HumanoidDynamicRobot);
+    m_ZMPM = new AnalyticalMorisawaCompact(this,m_PinocchioRobot);
+    m_ZMPM->SetHumanoidSpecificities(m_PinocchioRobot);
     m_ComAndFootRealization[2] = m_ZMPM->getComAndFootRealization();
 
     // Preview control for a 3D Linear inverse pendulum
@@ -275,7 +268,7 @@ namespace PatternGeneratorJRL {
 
     // Stepping over planner.
     m_StOvPl = new StepOverPlanner(m_ObstaclePars,
-                                   m_HumanoidDynamicRobot);
+                                   m_PinocchioRobot);
 
 
     // The creation of the double stage preview control manager.
@@ -305,11 +298,11 @@ namespace PatternGeneratorJRL {
     m_Zc = m_PC->GetHeightOfCoM();
 
     // Initialize the Preview Control general object.
-    m_DoubleStagePCStrategy->InitInterObjects(m_HumanoidDynamicRobot,
+    m_DoubleStagePCStrategy->InitInterObjects(m_PinocchioRobot,
                                               m_ComAndFootRealization[0],
                                               m_StepStackHandler);
 
-    m_CoMAndFootOnlyStrategy->InitInterObjects(m_HumanoidDynamicRobot,
+    m_CoMAndFootOnlyStrategy->InitInterObjects(m_PinocchioRobot,
                                                m_ComAndFootRealization,
                                                m_StepStackHandler);
 
@@ -345,7 +338,7 @@ namespace PatternGeneratorJRL {
 
     // Read the robot VRML file model.
 
-    m_ComAndFootRealization[0]->setHumanoidDynamicRobot(m_HumanoidDynamicRobot);
+    m_ComAndFootRealization[0]->setPinocchioRobot(m_PinocchioRobot);
     m_ComAndFootRealization[0]->SetHeightOfTheCoM(m_PC->GetHeightOfCoM());
     m_ComAndFootRealization[0]->setSamplingPeriod(m_PC->SamplingPeriod());
     m_ComAndFootRealization[0]->Initialization();
@@ -355,7 +348,7 @@ namespace PatternGeneratorJRL {
       (*CFR_it)->SetStepStackHandler(m_StepStackHandler);
 
     m_StOvPl->SetPreviewControl(m_PC);
-    m_StOvPl->SetDynamicMultiBodyModel(m_HumanoidDynamicRobot);
+    m_StOvPl->SetDynamicMultiBodyModel(m_PinocchioRobot);
     m_StOvPl->SetZMPDiscretization(m_ZMPD);
 
 
@@ -656,10 +649,10 @@ namespace PatternGeneratorJRL {
     for(unsigned int i=0;i<MAL_VECTOR_SIZE(Configuration);i++)
       Velocity[i] = 0.0;
 
-    m_HumanoidDynamicRobot->currentConfiguration(Configuration);
-    m_HumanoidDynamicRobot->currentVelocity(Velocity);
-    m_HumanoidDynamicRobot->computeForwardKinematics();
-    lStartingCOMState = m_HumanoidDynamicRobot->positionCenterOfMass();
+    m_PinocchioRobot->currentConfiguration(Configuration);
+    m_PinocchioRobot->currentVelocity(Velocity);
+    m_PinocchioRobot->computeForwardKinematics();
+    m_PinocchioRobot->positionCenterOfMass(lStartingCOMState);
 
   }
 
@@ -832,10 +825,9 @@ namespace PatternGeneratorJRL {
            << " "  << lStartingCOMState.z[0]);
     // We also initialize the iteration number inside DMB.
     //std::cerr << "You have to implement a reset iteration number." << endl;
-    string aProperty("ResetIteration"),aValue("any");
-    m_HumanoidDynamicRobot->setProperty(aProperty,aValue);
-
-
+//    string aProperty("ResetIteration"),aValue("any");
+//    m_HumanoidDynamicRobot->setProperty(aProperty,aValue);
+    // TODO check if an iteration number is needed in the PinocchioRobot class
     if (0)
     {
 
@@ -978,7 +970,7 @@ namespace PatternGeneratorJRL {
 
     MAL_VECTOR_TYPE(double) lCurrentConfiguration;
 
-    lCurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
+    lCurrentConfiguration = m_PinocchioRobot->currentConfiguration();
 
     deque<RelativeFootPosition> lRelativeFootPositions;
     CommonInitializationOfWalking(lStartingCOMState,
@@ -1001,7 +993,7 @@ namespace PatternGeneratorJRL {
     lCurrentConfiguration(3) = 0.0;
     lCurrentConfiguration(4) = 0.0;
     lCurrentConfiguration(5) = 0.0;
-    m_HumanoidDynamicRobot->currentConfiguration(lCurrentConfiguration);
+    m_PinocchioRobot->currentConfiguration(lCurrentConfiguration);
 
     ODEBUG("Size of lRelativeFootPositions :" << lRelativeFootPositions.size());
     // cout <<"Size of lRelativeFootPositions :" << lRelativeFootPositions.size() << endl;
@@ -2080,9 +2072,9 @@ namespace PatternGeneratorJRL {
   }
 
 
-  PatternGeneratorInterface * patternGeneratorInterfaceFactory(CjrlHumanoidDynamicRobot *aHDR)
+  PatternGeneratorInterface * patternGeneratorInterfaceFactory(PinocchioRobot * aRobot)
   {
-    return new PatternGeneratorInterfacePrivate(aHDR);
+    return new PatternGeneratorInterfacePrivate(aRobot);
   }
 
 

@@ -34,7 +34,7 @@
 using namespace PatternGeneratorJRL;
 
 FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginManager *lSPM,
-								   CjrlFoot *aFoot)
+                                   PRFoot *aFoot)
   : FootTrajectoryGenerationAbstract(lSPM,aFoot)
 {
   /* Initialize the pointers to polynomes. */
@@ -54,15 +54,18 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   /* Computes information on foot dimension
      from humanoid specific informations. */
   double lWidth,lHeight,lDepth;
-  if (m_Foot!=0)
-    m_Foot->getSoleSize(lWidth,lHeight);
+  if (m_Foot->associatedAnkle!=0)
+  {
+    lWidth  = m_Foot->soleWidth ;
+    lHeight = m_Foot->soleHeight ;
+  }
   else
     {
       cerr << "Pb no ref Foot." << endl;
     }
   vector3d AnklePosition;
-  if (m_Foot!=0)
-    m_Foot->getAnklePositionInLocalFrame(AnklePosition);
+  if (m_Foot->associatedAnkle!=0)
+    AnklePosition = m_Foot->anklePosition;
   else
     {
       cerr << "Pb no ref Foot." << endl;
@@ -81,11 +84,12 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   m_AnklePositionRight[2] = AnklePosition[2];
 
   /* Compute Left foot coordinates */
-  if (m_Foot!=0)
-    {
-      m_Foot->getAnklePositionInLocalFrame(AnklePosition);
-      m_Foot->getSoleSize(lWidth,lHeight);
-    }
+  if (m_Foot->associatedAnkle!=0)
+  {
+    lWidth        = m_Foot->soleWidth ;
+    lHeight       = m_Foot->soleHeight ;
+    AnklePosition = m_Foot->anklePosition;
+  }
   else
     {
       cerr << "Pb no ref Foot." << endl;

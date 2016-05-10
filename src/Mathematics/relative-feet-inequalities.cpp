@@ -40,7 +40,7 @@ using namespace PatternGeneratorJRL;
 
 
 RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
-                                                    CjrlHumanoidDynamicRobot *aHS ) :
+                                                    PinocchioRobot *aPR ) :
   SimplePlugin(aSPM)
 {
 
@@ -60,7 +60,7 @@ RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
       RightFPosEdgesY_[i] = -DefaultFPosEdgesY[i];
     }
   
-  set_feet_dimensions( aHS );
+  set_feet_dimensions( aPR );
 
   init_convex_hulls();
   
@@ -150,26 +150,28 @@ RelativeFeetInequalities::init_convex_hulls()
 
 
 int
-RelativeFeetInequalities::set_feet_dimensions( CjrlHumanoidDynamicRobot *aHS )
+RelativeFeetInequalities::set_feet_dimensions( PinocchioRobot *aPR )
 {
 
   // Read feet specificities.
   double HeightHalf,WidthHalf;
-  CjrlFoot * RightFoot = aHS->rightFoot();
-  if (RightFoot==0)
+  PRFoot * RightFoot = aPR->rightFoot();
+  if (RightFoot->associatedAnkle==0)
     {
       cerr << "Problem with the reading of the right foot"<< endl;
       return 0;
     }
-  RightFoot->getSoleSize( WidthHalf,HeightHalf );
+  WidthHalf  = RightFoot->soleWidth  ;
+  HeightHalf = RightFoot->soleHeight ;
 
-  CjrlFoot * LeftFoot = aHS->leftFoot();
-  if (RightFoot==0)
+  PRFoot * LeftFoot = aPR->leftFoot();
+  if (RightFoot->associatedAnkle==0)
     {
       cerr << "Problem while reading of the left foot"<< endl;
       return 0;
     }
-  LeftFoot->getSoleSize( WidthHalf,HeightHalf );
+  WidthHalf =  LeftFoot->soleWidth  ;
+  HeightHalf = LeftFoot->soleHeight ;
 
   assert(WidthHalf > 0);
   LeftFootSize_.setHalfSizeInit( WidthHalf, HeightHalf, DSFeetDistance_                 );

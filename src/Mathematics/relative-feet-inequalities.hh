@@ -34,7 +34,7 @@
 
 #include <jrl/mal/matrixabstractlayer.hh>
 
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <jrl/walkgen/pinocchiorobot.hh>
 
 
 #include <jrl/walkgen/pgtypes.hh>
@@ -64,7 +64,7 @@ namespace PatternGeneratorJRL
     /// \name Constructors and destructors.
     /// \{
     RelativeFeetInequalities (SimplePluginManager * aSPM,
-        CjrlHumanoidDynamicRobot * aHS);
+        PinocchioRobot * aPR);
     ~RelativeFeetInequalities ();
     /// \}
 
@@ -123,7 +123,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param aHS object of the robot
     /// \return 0
-    int set_feet_dimensions ( CjrlHumanoidDynamicRobot * aHS );
+    int set_feet_dimensions ( PinocchioRobot * aPR );
 
     /// \brief Initialize the constraint hulls
     ///

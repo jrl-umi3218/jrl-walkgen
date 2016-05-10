@@ -29,8 +29,7 @@
 #ifndef _COM_AND_FOOT_REALIZATION_H_
 #define _COM_AND_FOOT_REALIZATION_H_
 
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
-
+#include <jrl/walkgen/pinocchiorobot.hh>
 #include <SimplePlugin.hh>
 #include <StepStackHandler.hh>
 
@@ -57,7 +56,7 @@ namespace PatternGeneratorJRL
   private:
 
     /*! \brief Store the dynamic robot. */
-    CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot;
+    PinocchioRobot * m_PinocchioRobot;
 
     /*! Store the height of the CoM */
     double m_HeightOfCoM;
@@ -77,7 +76,7 @@ namespace PatternGeneratorJRL
      */
     inline ComAndFootRealization(PatternGeneratorInterfacePrivate * aPatternGeneratorInterface):
       SimplePlugin((PatternGeneratorJRL::SimplePluginManager *)aPatternGeneratorInterface)
-      ,m_HumanoidDynamicRobot(0)
+      ,m_PinocchioRobot(0)
       ,m_HeightOfCoM(0)
       ,m_SamplingPeriod(0.005)
       ,m_StepStackHandler(0)
@@ -132,13 +131,13 @@ namespace PatternGeneratorJRL
 
     /*! @param aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
-    inline  virtual bool setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot *aHumanoidDynamicRobot)
-    { m_HumanoidDynamicRobot = aHumanoidDynamicRobot;
+    inline  virtual bool setPinocchioRobot(PinocchioRobot *aPinocchioRobot)
+    { m_PinocchioRobot = aPinocchioRobot;
       return true;}
 
     /*! Returns the object able to compute dynamic parametersof the robot. */
-    inline CjrlHumanoidDynamicRobot * getHumanoidDynamicRobot() const
-      { return m_HumanoidDynamicRobot;}
+    inline PinocchioRobot * getPinocchioRobot() const
+      { return m_PinocchioRobot;}
 
     /** @} */
 

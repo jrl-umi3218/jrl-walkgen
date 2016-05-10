@@ -149,9 +149,9 @@ public:
       aof << filterprecision( lStartingCOMState(0)+delta_com[i].x[0] ) << " "  ; // 1
       aof << filterprecision( lStartingCOMState(1)+delta_com[i].y[0] ) << " "  ; // 2
       aof << filterprecision( lStartingCOMState(0) ) << " "  ;                   // 3
-      aof << filterprecision( delta_com[i].x[0] ) << " "  ;                          // 4
+      aof << filterprecision( delta_com[i].x[0] ) << " "  ;                      // 4
       aof << filterprecision( lStartingCOMState(1) ) << " "  ;                   // 5
-      aof << filterprecision( delta_com[i].x[1] ) << " "  ;                          // 6
+      aof << filterprecision( delta_com[i].x[1] ) << " "  ;                      // 6
       aof << endl ;
     }
 
@@ -344,100 +344,6 @@ protected:
     cout << InitialConfiguration << endl ;
     cout << InitialPosition << endl ;
 
-  }
-
-  void fillInDebugFiles( )
-  {
-    /// \brief Create file .hip .pos .zmp
-    /// --------------------
-    ofstream aof;
-    string aFileName;
-    static int iteration = 0 ;
-
-    if ( iteration == 0 ){
-      aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
-      aFileName+=m_TestName;
-      aFileName+=".pos";
-      aof.open(aFileName.c_str(),ofstream::out);
-      aof.close();
-    }
-    ///----
-    aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
-      aFileName+=m_TestName;
-      aFileName+=".pos";
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
-    for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
-      aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 2
-    }
-    for(unsigned int i = 0 ; i < 9 ; i++){
-      aof << 0.0 << " "  ;
-    }
-    aof << 0.0  << endl ;
-    aof.close();
-
-    if ( iteration == 0 ){
-      aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
-      aFileName+=m_TestName;
-      aFileName+=".hip";
-      aof.open(aFileName.c_str(),ofstream::out);
-      aof.close();
-    }
-    aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
-      aFileName+=m_TestName;
-      aFileName+=".hip";
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-      aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
-      aof << filterprecision( m_OneStep.finalCOMPosition.roll[0] * M_PI /180) << " "  ; // 2
-      aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0] * M_PI /180 ) << " "  ; // 3
-      aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] * M_PI /180 ) ; // 4
-      aof << endl ;
-    aof.close();
-
-    if ( iteration == 0 ){
-      aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
-      aFileName+=m_TestName;
-      aFileName+=".zmp";
-      aof.open(aFileName.c_str(),ofstream::out);
-      aof.close();
-    }
-
-    FootAbsolutePosition aSupportState;
-    if (m_OneStep.LeftFootPosition.stepType < 0 )
-      aSupportState = m_OneStep.LeftFootPosition ;
-    else
-      aSupportState = m_OneStep.RightFootPosition ;
-
-    aFileName = "/opt/grx3.0/HRP2LAAS/etc/mnaveau/";
-      aFileName+=m_TestName;
-      aFileName+=".zmp";
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-      aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
-      aof << filterprecision( m_OneStep.ZMPTarget(0) - m_CurrentConfiguration(0)) << " "  ; // 2
-      aof << filterprecision( m_OneStep.ZMPTarget(1) - m_CurrentConfiguration(1) ) << " "  ; // 3
-      aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2))  ; // 4
-      aof << endl ;
-    aof.close();
-
-    aFileName = "/opt/grx3.0/HRP2LAAS/log/mnaveau/";
-      aFileName+="footpos";
-      aFileName+=".zmp";
-    aof.open(aFileName.c_str(),ofstream::app);
-    aof.precision(8);
-    aof.setf(ios::scientific, ios::floatfield);
-    aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
-      aof << filterprecision( lfFoot[iteration].x ) << " "  ; // 2
-      aof << filterprecision( lfFoot[iteration].y ) << " "  ; // 3
-      aof << endl ;
-    aof.close();
-
-    iteration++;
   }
 
   double filterprecision(double adb)

@@ -122,7 +122,7 @@ namespace PatternGeneratorJRL
       \param[out] InitFootPosition: The foot position according to the
       free flyer (set to 0.0 0.0 0.0)
     */
-    bool InitializationFoot(CjrlFoot * aFoot,
+    bool InitializationFoot(PRFoot * aFoot,
 			    MAL_S3_VECTOR(& m_AnklePosition,double),
 			    FootAbsolutePosition & InitFootPosition);
 
@@ -193,7 +193,7 @@ namespace PatternGeneratorJRL
 
 
     /*! Reimplementation of the setter of the HumanoidDynamicRobot. */
-    bool setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot * aHumanoidDynamicRobot);
+    bool setPinocchioRobot(PinocchioRobot * aHumanoidDynamicRobot);
 
     /*! Compute the angles values considering a 6DOF leg for a given configuration
       of the waist and the foot of the leg:
@@ -290,6 +290,17 @@ namespace PatternGeneratorJRL
     inline MAL_VECTOR_TYPE(double) & GetPreviousVelocityStage1()
     { return m_prev_Velocity1 ;};
 
+    inline void leftLegIndexinConfiguration(std::vector<int> & leftLegMaps) const
+    { leftLegMaps = m_LeftLegIndexinConfiguration ;}
+    inline void rightLegIndexinConfiguration(std::vector<int> & rightLegMaps) const
+    { rightLegMaps = m_RightLegIndexinConfiguration ;}
+    inline void leftArmIndexinConfiguration(std::vector<int> & leftArmMaps) const
+    { leftArmMaps = m_LeftArmIndexinConfiguration ;}
+    inline void rightArmIndexinConfiguration(std::vector<int> & rightArmMaps) const
+    { rightArmMaps = m_RightArmIndexinConfiguration ;}
+    inline void chestIndexinConfiguration(std::vector<int> & chestMaps) const
+    { chestMaps = m_ChestIndexinConfiguration ;}
+
     inline bool ShiftFoot()
     {return ShiftFoot_ ;}
     inline void ShiftFoot(bool ShiftFoot)
@@ -303,8 +314,8 @@ namespace PatternGeneratorJRL
   protected:
 
     /*! \brief Initialization of internal maps of indexes */
-    void InitializationMaps(std::vector<CjrlJoint *> &FromRootToFoot,
-			    std::vector<CjrlJoint *> &ActuatedJoints,
+    void InitializationMaps(std::vector<se3::JointIndex> &FromRootToFoot,
+                se3::JointModelVector & ActuatedJoints,
 			    std::vector<int> &IndexinConfiguration);
 
     /*! Map shoulders and wrist
@@ -317,13 +328,13 @@ namespace PatternGeneratorJRL
      \param[out] associateShoulder: The shoulder extracted from
      the kinematic chain.
     */
-    void InitializeMapsForAHand(CjrlHand * aHand,
-				std::vector<CjrlJoint *> &ActuatedJoints,
+    void InitializeMapsForAHand(se3::JointIndex aWrist,
+                se3::JointModelVector &  ActuatedJoints,
 				vector<int> & IndexesInConfiguration,
-				CjrlJoint * & associateShoulder);
+                se3::JointIndex & associateShoulder);
 
     /*! Create the map of indexes for the shoulders and wrist */
-    void InitializeMapForChest(std::vector<CjrlJoint *> &ActuatedJoints);
+    void InitializeMapForChest(se3::JointModelVector & ActuatedJoints);
 
     /* Register methods. */
     void RegisterMethods();
@@ -454,7 +465,7 @@ namespace PatternGeneratorJRL
     MAL_S3_VECTOR_TYPE(double) m_COGInitialAnkles;
 
     /*! Store the position of the left and right shoulders. */
-    CjrlJoint *m_LeftShoulder, *m_RightShoulder;
+    se3::JointIndex m_LeftShoulder, m_RightShoulder;
 
     bool ShiftFoot_ ;
   };
