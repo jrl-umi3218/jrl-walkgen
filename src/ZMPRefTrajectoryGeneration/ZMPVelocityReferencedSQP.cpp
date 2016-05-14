@@ -332,7 +332,8 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   NMPCgenerator_->T(SQP_T_);
   NMPCgenerator_->N(SQP_N_);
   NMPCgenerator_->T_step(StepPeriod_);
-  NMPCgenerator_->initNMPCgenerator(currentSupport,
+  NMPCgenerator_->initNMPCgenerator(outputPreviewDuration_,
+                                    currentSupport,
                                     lStartingCOMState,
                                     VelRef_,SQP_N_,SQP_nf_,SQP_T_,StepPeriod_);
 
@@ -417,8 +418,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
         time,
         initLeftFoot_ ,
         initRightFoot_,
-        itCOM_,
-        //initCOM_,
+        //itCOM_,
+        initCOM_,
         VelRef_);
 
     // SOLVE PROBLEM:
@@ -466,8 +467,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     FullTrajectoryInterpolation(time);
 
     // Take only the data that are actually used by the robot
-    FinalZMPTraj_deq.resize(NbSampleOutput_); FinalLeftFootTraj_deq .resize(NbSampleOutput_);;
-    FinalCOMTraj_deq.resize(NbSampleOutput_); FinalRightFootTraj_deq.resize(NbSampleOutput_);;
+    FinalZMPTraj_deq.resize(NbSampleOutput_); FinalLeftFootTraj_deq .resize(NbSampleOutput_);
+    FinalCOMTraj_deq.resize(NbSampleOutput_); FinalRightFootTraj_deq.resize(NbSampleOutput_);
     for(unsigned i=0 ; i < NbSampleOutput_ ; ++i)
     {
       FinalZMPTraj_deq      [i] = ZMPTraj_deq_ctrl_      [i] ;
@@ -491,7 +492,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
                           deltaCOMTraj_deq_);
 #endif
     // Correct the CoM.
-      for (unsigned int i = 0 ; i < deltaCOMTraj_deq_.size() ; ++i)
+    for (unsigned int i = 0 ; i < deltaCOMTraj_deq_.size() ; ++i)
     {
       for(int j=0;j<3;j++)
       {

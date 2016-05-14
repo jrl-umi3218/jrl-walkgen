@@ -107,13 +107,7 @@ namespace PatternGeneratorJRL
 
   private: // Private methods
 
-    /// \brief Apply the RNEA on the robot model and over the whole trajectory
-    /// given by the function "filter"
-    void InverseDynamics(MAL_VECTOR_TYPE(double)& configuration,
-                         MAL_VECTOR_TYPE(double)& velocity,
-                         MAL_VECTOR_TYPE(double)& acceleration);
-
-    void computeWaist(const FootAbsolutePosition & inputLeftFoot) ;
+    //void computeWaist(const FootAbsolutePosition & inputLeftFoot) ;
 
     // -------------------------------------------------------------------
 
@@ -193,16 +187,27 @@ namespace PatternGeneratorJRL
       MAL_VECTOR_TYPE(double) upperPartVelocity_ ;
       MAL_VECTOR_TYPE(double) previousUpperPartVelocity_ ;
       MAL_VECTOR_TYPE(double) upperPartAcceleration_ ;
-      /*! \brief For the left leg, Specific for the Inverse Kinematics. */
-      std::vector<int> leftLegIndexinConfiguration_;
-      /*! \brief For the right leg, Specific for the Inverse Kinematics. */
-      std::vector<int> rightLegIndexinConfiguration_;
-      /*! \brief For the left arm, Specific for the Inverse Kinematics. */
-      std::vector<int> leftArmIndexinConfiguration_;
-      /*! \brief For the right leg, Specific for the Inverse Kinematics. */
-      std::vector<int> rightArmIndexinConfiguration_;
+      /*! \brief left Leg Index in Configuration */
+      std::vector<int> llegIdxq_ ;
+      /*! \brief right Leg Index in Configuration */
+      std::vector<int> rlegIdxq_ ;
+      /*! \brief left Arm Index in Configuration */
+      std::vector<int> larmIdxq_;
+      /*! \brief right Arm Index in Configuration */
+      std::vector<int> rarmIdxq_;
       /*! \brief For the chest. */
-      std::vector<int> chestIndexinConfiguration_;
+      std::vector<int> chestIdxq_;
+
+      /*! \brief left Leg Index in Velocity and acceleration */
+      std::vector<int> llegIdxv_ ;
+      /*! \brief right Leg Index in Configuration */
+      std::vector<int> rlegIdxv_ ;
+      /*! \brief left Arm Index in Configuration */
+      std::vector<int> larmIdxv_;
+      /*! \brief right Arm Index in Configuration */
+      std::vector<int> rarmIdxv_;
+      /*! \brief For the chest. */
+      std::vector<int> chestIdxv_;
 
       bool walkingHeuristic_ ;
       bool useDynamicFilter_ ;

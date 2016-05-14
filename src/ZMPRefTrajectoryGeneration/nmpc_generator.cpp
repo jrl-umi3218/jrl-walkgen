@@ -135,6 +135,7 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, PinocchioRobot *aPR)
   nwsr_ = 0;
   cput_ = NULL;
   isQPinitialized_ = false;
+  useLineSearch_ = false;
 
   SupportStates_deq_.clear();
 }
@@ -163,11 +164,19 @@ NMPCgenerator::~NMPCgenerator()
   }
 }
 
-void NMPCgenerator::initNMPCgenerator(support_state_t & currentSupport,
+void NMPCgenerator::initNMPCgenerator(
+    double outputPreviewDuration,
+    support_state_t & currentSupport,
     COMState &lStartingCOMState,
     reference_t &local_vel_ref,
     unsigned N, unsigned nf, double T, double T_step)
 {
+  if(std::abs(outputPreviewDuration-0.005)<0.000001)
+    useLineSearch_=true;
+  else
+    useLineSearch_=false;
+
+
   N_ = N ;
   nf_ = nf ;
   // number of degrees of freedom
@@ -342,6 +351,7 @@ void NMPCgenerator::updateInitialCondition(double time,
   }
   if(Tfirst_<0.0001)
     Tfirst_=0.1;
+
 #ifdef COUT
   cout << time_ << " " ;
   cout << currentSupport_.TimeLimit << " " ;
@@ -410,10 +420,15 @@ void NMPCgenerator::solve_qp(){
   else
   {
     // force the solver to use the maximum time for computing the solution
-    cput_[0] = 0.0007;
-    nwsr_ = 5 ;
-//    cput_[0] = 10.0;
-//    nwsr_ = 1000.0 ;
+    if(useLineSearch_)
+    {
+      cput_[0] = 0.0007;
+      nwsr_ = 5 ;
+    }else
+    {
+      cput_[0] = 1000.0;
+      nwsr_ = 10000 ;
+    }
     /*ret = */QP_->hotstart(
       qpOases_H_, qpOases_g_, qpOases_J_,
       qpOases_lb_, qpOases_ub_,
@@ -1944,6 +1959,12 @@ void NMPCgenerator::initializeLineSearch()
 
 void NMPCgenerator::lineSearch()
 {
+  if(!useLineSearch_)
+  {
+    lineStep_ = lineStep0_ ;
+    return;
+  }
+
 //  qpOASES::QProblemStatus status_ = QP_->getStatus();
 //  if(status_ < qpOASES::QPS_AUXILIARYQPSOLVED)
 //  {

@@ -29,7 +29,7 @@ PinocchioRobot::PinocchioRobot()
         Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ()) *
         Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY()) *
         Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX()) ) ;
-
+  m_quat.normalize();
   // resize by default
   m_q.resize(50,1);
   m_q(3)=m_quat.x();
@@ -305,6 +305,29 @@ void PinocchioRobot::initializeInverseKinematics()
   return ;
 }
 
+void PinocchioRobot::RPYToSpatialFreeFlyer(Eigen::Vector3d & rpy,
+                                           Eigen::Vector3d & drpy,
+                                           Eigen::Vector3d & ddrpy,
+                                           Eigen::Quaterniond & quat,
+                                           Eigen::Vector3d & omega,
+                                           Eigen::Vector3d & domega)
+{
+  quat = Eigen::Quaterniond(
+        Eigen::AngleAxisd(rpy(2), Eigen::Vector3d::UnitZ()) *
+        Eigen::AngleAxisd(rpy(1), Eigen::Vector3d::UnitY()) *
+        Eigen::AngleAxisd(rpy(0), Eigen::Vector3d::UnitX()) ) ;
+  quat.normalize();
+  double c0,s0; SINCOS (rpy(2), &s0, &c0);
+  double c1,s1; SINCOS (rpy(1), &s1, &c1);
+  double c2,s2; SINCOS (rpy(0), &s2, &c2);
+  m_S << -s1, 0., 1., c1 * s2, c2, 0, c1 * c2, -s2, 0;
+  omega = m_S * drpy ;
+  domega = m_S * ddrpy ;
+  domega(0) += -c1 * drpy (0) * drpy (1);
+  domega(1) += -s1 * s2 * drpy (0) * drpy (1) + c1 * c2 * drpy (0) * drpy (2) - s2 * drpy (1) * drpy (2);
+  domega(2) += -s1 * c2 * drpy (0) * drpy (1) - c1 * s2 * drpy (0) * drpy (2) - c2 * drpy (1) * drpy (2);
+}
+
 void PinocchioRobot::computeForwardKinematics()
 {
   computeForwardKinematics(m_qmal);
@@ -317,7 +340,7 @@ void PinocchioRobot::computeForwardKinematics(MAL_VECTOR_TYPE(double) & q)
         Eigen::AngleAxisd(q(5), Eigen::Vector3d::UnitZ()) *
         Eigen::AngleAxisd(q(4), Eigen::Vector3d::UnitY()) *
         Eigen::AngleAxisd(q(3), Eigen::Vector3d::UnitX()) ) ;
-
+  m_quat.normalize();
   // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
   for(unsigned i=0; i<3 ; ++i)
   {
@@ -344,36 +367,45 @@ void PinocchioRobot::computeInverseDynamics(MAL_VECTOR_TYPE(double) & q,
                                             MAL_VECTOR_TYPE(double) & v,
                                             MAL_VECTOR_TYPE(double) & a)
 {
+//  for(unsigned i=0;i<3;++i)
+//  {
+//    m_rpy   (i) = q(3+i);
+//    m_drpy  (i) = v(3+i);
+//    m_ddrpy (i) = a(3+i);
+//  }
+//  RPYToSpatialFreeFlyer(m_rpy,m_drpy,m_ddrpy,
+//                        m_quat,m_omega,m_domega);
   // euler to quaternion :
   m_quat = Eigen::Quaterniond(
         Eigen::AngleAxisd(q(5), Eigen::Vector3d::UnitZ()) *
         Eigen::AngleAxisd(q(4), Eigen::Vector3d::UnitY()) *
         Eigen::AngleAxisd(q(3), Eigen::Vector3d::UnitX()) ) ;
-
-  std::cout << m_quat.x() << " " << m_quat.y() << " " << m_quat.z() << " " << m_quat.w() << std::endl ;
-  std::cout << q(3) << " " << q(4) << " " << q(5) << std::endl ;
-
-  // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
   for(unsigned i=0; i<3 ; ++i)
   {
     m_q(i) = q(i);
+    m_v(i) = v(i);
+    m_a(i) = a(i);
   }
+  m_rot = m_quat.toRotationMatrix().transpose() ;
+  m_v.segment<3>(0) = m_rot * m_v.segment<3>(0) ;
+  m_a.segment<3>(0) = m_rot * m_a.segment<3>(0) ;
+
+  // fill up m_q following the pinocchio standard : [pos quarternion DoFs]
   m_q(3) = m_quat.x() ;
   m_q(4) = m_quat.y() ;
   m_q(5) = m_quat.z() ;
   m_q(6) = m_quat.w() ;
-  for(unsigned i=0; i<m_robotModel->nv-6 ; ++i)
-  {
-    m_q(7+i) = q(6+i);
-  }
 
   // fill up the velocity and acceleration vectors
-  for(unsigned i=0; i<m_robotModel->nv ; ++i)
-  {
-    m_v(i) = v(i);
-    m_a(i) = a(i);
-  }
+  //m_v.segment<3>(3) = m_omega ;
+  //m_a.segment<3>(3) = m_domega ;
 
+  for(unsigned i=6; i<m_robotModel->nv-6 ; ++i)
+  {
+    m_q(1+i) = q(i);
+    m_v(i)   = v(i);
+    m_a(i)   = a(i);
+  }
   // performing the inverse dynamics
   m_tau = se3::rnea(*m_robotModel,*m_robotData,m_q,m_v,m_a);
 }

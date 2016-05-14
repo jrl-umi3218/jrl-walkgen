@@ -44,7 +44,7 @@ namespace PatternGeneratorJRL
 
     ~NMPCgenerator();
 
-    void initNMPCgenerator(support_state_t &currentSupport,
+    void initNMPCgenerator(double outputPreviewDuration, support_state_t &currentSupport,
                            COMState & lStartingCOMState,
                            reference_t & local_vel_ref,
                            unsigned N, unsigned nf, double T, double T_step);
@@ -305,6 +305,7 @@ namespace PatternGeneratorJRL
     MAL_MATRIX_TYPE(double) Q_x_XX_, Q_x_XF_, Q_x_FX_, Q_x_FF_ ;
 
     // Line Search
+    bool useLineSearch_ ;
     MAL_VECTOR_TYPE(double) p_ , U_n_, selectActiveConstraint ;
     MAL_VECTOR_TYPE(double) JdU_, contraintValue ;
     MAL_VECTOR_TYPE(double) HUn_ ;

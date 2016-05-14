@@ -51,12 +51,12 @@ DynamicFilter::DynamicFilter(
   deltaZMPx_.clear();
   deltaZMPy_.clear();
 
-  leftLegIndexinConfiguration_ .clear();
-  rightLegIndexinConfiguration_.clear();
+  llegIdxq_.clear();
+  rlegIdxq_.clear();
 
-  leftArmIndexinConfiguration_ .clear();
-  rightArmIndexinConfiguration_.clear();
-  chestIndexinConfiguration_   .clear();
+  larmIdxq_.clear();
+  rarmIdxq_.clear();
+  chestIdxq_.clear();
 
   walkingHeuristic_ = false ;
   useDynamicFilter_ = false ;
@@ -104,32 +104,32 @@ void DynamicFilter::setRobotUpperPart(const MAL_VECTOR_TYPE(double) & configurat
                                       const MAL_VECTOR_TYPE(double) & velocity,
                                       const MAL_VECTOR_TYPE(double) & acceleration)
 {
-  for ( unsigned int i = 0 ; i < leftArmIndexinConfiguration_.size() ; ++i )
+  for ( unsigned int i = 0 ; i < larmIdxq_.size() ; ++i )
     {
-      upperPartConfiguration_(leftArmIndexinConfiguration_[i])  =
-          configuration(leftArmIndexinConfiguration_[i]);
-      upperPartVelocity_(leftArmIndexinConfiguration_[i]) =
-          velocity(leftArmIndexinConfiguration_[i]);
-      upperPartAcceleration_(leftArmIndexinConfiguration_[i]) =
-          acceleration(leftArmIndexinConfiguration_[i]);
+      upperPartConfiguration_(larmIdxq_[i])  =
+          configuration(larmIdxq_[i]);
+      upperPartVelocity_(larmIdxq_[i]) =
+          velocity(larmIdxq_[i]);
+      upperPartAcceleration_(larmIdxq_[i]) =
+          acceleration(larmIdxq_[i]);
     }
-  for ( unsigned int i = 0 ; i < rightArmIndexinConfiguration_.size() ; ++i )
+  for ( unsigned int i = 0 ; i < rarmIdxq_.size() ; ++i )
     {
-      upperPartConfiguration_(rightArmIndexinConfiguration_[i])  =
-          configuration(rightArmIndexinConfiguration_[i]);
-      upperPartVelocity_(rightArmIndexinConfiguration_[i]) =
-          velocity(rightArmIndexinConfiguration_[i]);
-      upperPartAcceleration_(rightArmIndexinConfiguration_[i]) =
-          acceleration(rightArmIndexinConfiguration_[i]);
+      upperPartConfiguration_(rarmIdxq_[i])  =
+          configuration(rarmIdxq_[i]);
+      upperPartVelocity_(rarmIdxq_[i]) =
+          velocity(rarmIdxq_[i]);
+      upperPartAcceleration_(rarmIdxq_[i]) =
+          acceleration(rarmIdxq_[i]);
     }
-  for ( unsigned int i = 0 ; i < chestIndexinConfiguration_.size() ; ++i )
+  for ( unsigned int i = 0 ; i < chestIdxq_.size() ; ++i )
     {
-      upperPartConfiguration_(chestIndexinConfiguration_[i])  =
-          configuration(chestIndexinConfiguration_[i]);
-      upperPartVelocity_(chestIndexinConfiguration_[i]) =
-          velocity(chestIndexinConfiguration_[i]);
-      upperPartAcceleration_(chestIndexinConfiguration_[i]) =
-          acceleration(chestIndexinConfiguration_[i]);
+      upperPartConfiguration_(chestIdxq_[i])  =
+          configuration(chestIdxq_[i]);
+      upperPartVelocity_(chestIdxq_[i]) =
+          velocity(chestIdxq_[i]);
+      upperPartAcceleration_(chestIdxq_[i]) =
+          acceleration(chestIdxq_[i]);
     }
   return ;
 }
@@ -208,16 +208,17 @@ void DynamicFilter::init(
   deltaZMPx_.resize( (int)round(controlWindowSize_/controlPeriod_) ,0.0);
   deltaZMPy_.resize( (int)round(controlWindowSize_/controlPeriod_) ,0.0);
 
-  comAndFootRealization_->leftLegIndexinConfiguration(
-        leftLegIndexinConfiguration_);
-  comAndFootRealization_->rightLegIndexinConfiguration(
-        rightLegIndexinConfiguration_);
-  comAndFootRealization_->leftArmIndexinConfiguration(
-        leftArmIndexinConfiguration_);
-  comAndFootRealization_->rightArmIndexinConfiguration(
-        rightArmIndexinConfiguration_);
-  comAndFootRealization_->chestIndexinConfiguration(
-        chestIndexinConfiguration_);
+  comAndFootRealization_->leftLegIndexinConfiguration(llegIdxq_);
+  comAndFootRealization_->rightLegIndexinConfiguration(rlegIdxq_);
+  comAndFootRealization_->leftArmIndexinConfiguration(larmIdxq_);
+  comAndFootRealization_->rightArmIndexinConfiguration(rarmIdxq_);
+  comAndFootRealization_->chestIndexinConfiguration(chestIdxq_);
+
+  comAndFootRealization_->leftLegIndexinVelocity(llegIdxv_);
+  comAndFootRealization_->rightLegIndexinVelocity(rlegIdxv_);
+  comAndFootRealization_->leftArmIndexinVelocity(larmIdxv_);
+  comAndFootRealization_->rightArmIndexinVelocity(rarmIdxv_);
+  comAndFootRealization_->chestIndexinVelocity(chestIdxv_);
   return ;
 }
 
@@ -274,15 +275,17 @@ int DynamicFilter::OnLinefilter(
                    stage1_,
                    //currentIteration
                    i);
+//      cout << "DF : " ;
+//      cout << ZMPMBAcceleration_(3) << " "
+//           << ZMPMBAcceleration_(4) << " "
+//           << ZMPMBAcceleration_(5) << endl ;
     }
     ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px;
     ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py;
     ZMPMB_vec_[0][2]=0.0;
-    //  ZMPMB_vec_[1][0]=inputZMPTraj_deq_[1].px;
-    //  ZMPMB_vec_[1][1]=inputZMPTraj_deq_[1].py;
-    //  ZMPMB_vec_[1][2]=0.0;
-
-
+    ZMPMB_vec_[1][0]=inputZMPTraj_deq_[0].px;
+    ZMPMB_vec_[1][1]=inputZMPTraj_deq_[0].py;
+    ZMPMB_vec_[1][2]=0.0;
     if(false)
     {
       zmpmb_i_.resize( N1 ) ;
@@ -367,7 +370,7 @@ int DynamicFilter::zmpmb(
           MAL_VECTOR_TYPE(double)& acceleration,
           MAL_S3_VECTOR_TYPE(double) & zmpmb)
 {
-  InverseDynamics(configuration,velocity,acceleration);
+  PR_->computeInverseDynamics(configuration,velocity,acceleration);
   PR_->zeroMomentumPoint(zmpmb);
   return 0 ;
 }
@@ -427,47 +430,25 @@ void DynamicFilter::InverseKinematics(
       MAL_VECTOR_FILL(previousUpperPartVelocity_, 0.0 ) ;
   }
 
-  for ( unsigned int i = 0 ; i < leftArmIndexinConfiguration_.size() ; ++i )
+  for ( unsigned int i = 0 ; i < larmIdxq_.size() ; ++i )
   {
-    configuration(leftArmIndexinConfiguration_[i])  =
-        upperPartConfiguration_(leftArmIndexinConfiguration_[i]);
-    velocity(leftArmIndexinConfiguration_[i]) =
-        upperPartVelocity_(leftArmIndexinConfiguration_[i]);
-    acceleration(leftArmIndexinConfiguration_[i]) =
-        upperPartAcceleration_(leftArmIndexinConfiguration_[i]);
+    configuration(larmIdxq_[i]) = upperPartConfiguration_(larmIdxq_[i]);
+    velocity(larmIdxv_[i])      = upperPartVelocity_(larmIdxv_[i]);
+    acceleration(larmIdxv_[i])  = upperPartAcceleration_(larmIdxv_[i]);
   }
-  for ( unsigned int i = 0 ; i < rightArmIndexinConfiguration_.size() ; ++i )
+  for ( unsigned int i = 0 ; i < rarmIdxq_.size() ; ++i )
   {
-    configuration(rightArmIndexinConfiguration_[i])  =
-        upperPartConfiguration_(rightArmIndexinConfiguration_[i]);
-    velocity(rightArmIndexinConfiguration_[i]) =
-        upperPartVelocity_(rightArmIndexinConfiguration_[i]);
-    acceleration(rightArmIndexinConfiguration_[i]) =
-        upperPartAcceleration_(rightArmIndexinConfiguration_[i]);
+    configuration(rarmIdxq_[i]) = upperPartConfiguration_(rarmIdxq_[i]);
+    velocity(rarmIdxv_[i])      = upperPartVelocity_(rarmIdxv_[i]);
+    acceleration(rarmIdxv_[i])  = upperPartAcceleration_(rarmIdxv_[i]);
   }
-  for ( unsigned int i = 0 ; i < chestIndexinConfiguration_.size() ; ++i )
+  for ( unsigned int i = 0 ; i < chestIdxq_.size() ; ++i )
   {
-    configuration(chestIndexinConfiguration_[i])  =
-        upperPartConfiguration_(chestIndexinConfiguration_[i]);
-    velocity(chestIndexinConfiguration_[i]) =
-        upperPartVelocity_(chestIndexinConfiguration_[i]);
-    acceleration(chestIndexinConfiguration_[i]) =
-        upperPartAcceleration_(chestIndexinConfiguration_[i]);
+    configuration(chestIdxq_[i]) = upperPartConfiguration_(chestIdxq_[i]);
+    velocity(chestIdxv_[i])      = upperPartVelocity_(chestIdxv_[i]);
+    acceleration(chestIdxv_[i])  = upperPartAcceleration_(chestIdxv_[i]);
   }
   return;
-}
-
-void DynamicFilter::InverseDynamics(
-    MAL_VECTOR_TYPE(double)& configuration,
-    MAL_VECTOR_TYPE(double)& velocity,
-    MAL_VECTOR_TYPE(double)& acceleration
-    )
-{
-  // compute the 6D force applied at the CoM
-  PR_->computeInverseDynamics(configuration,
-                              velocity,
-                              acceleration);
-  return ;
 }
 
 void DynamicFilter::stage0INstage1()
@@ -493,7 +474,9 @@ void DynamicFilter::ComputeZMPMB(double samplingPeriod,
 
   if(iteration>0)
   {
-    InverseDynamics(ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_);
+    PR_->computeInverseDynamics(ZMPMBConfiguration_,
+                                ZMPMBVelocity_,
+                                ZMPMBAcceleration_);
 
     PR_->zeroMomentumPoint(ZMPMB);
   }
@@ -753,11 +736,17 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
                        ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_,
                        controlPeriod_, 2, 20) ;
 
-    InverseDynamics(ZMPMBConfiguration_, ZMPMBVelocity_, ZMPMBAcceleration_);
+    PR_->computeInverseDynamics(ZMPMBConfiguration_,
+                                ZMPMBVelocity_,
+                                ZMPMBAcceleration_);
 
     conf.push_back(ZMPMBConfiguration_);
     vel.push_back(ZMPMBVelocity_);
     acc.push_back(ZMPMBAcceleration_);
+//    cout << "DF debug : " ;
+//    cout << ZMPMBAcceleration_(3) << " "
+//         << ZMPMBAcceleration_(4) << " "
+//         << ZMPMBAcceleration_(5) << endl ;
 
     PR_->zeroMomentumPoint(zmpmb_corr[i]);
   }
@@ -887,8 +876,12 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
     aof << syzmp_[i] << " " ;                           // 12
     aof << deltaZMP_deq_[i].px << " " ;                 // 13
     aof << deltaZMP_deq_[i].py << " " ;                 // 14
-    for(unsigned j=0 ; j<MAL_VECTOR_SIZE(conf[i]) ; ++j)// 15+nq
-      aof << conf[i][j] << " " ;                        //
+    for(unsigned j=0 ; j<MAL_VECTOR_SIZE(acc[i]) ; ++j)// 15+nq
+      aof << conf[i][j] << " " ;
+    for(unsigned j=0 ; j<MAL_VECTOR_SIZE(acc[i]) ; ++j)// 15+nq
+      aof << vel[i][j] << " " ;
+    for(unsigned j=0 ; j<MAL_VECTOR_SIZE(acc[i]) ; ++j)// 15+nq
+      aof << acc[i][j] << " " ;                        //
     aof << endl ;
   }
   aof.close();

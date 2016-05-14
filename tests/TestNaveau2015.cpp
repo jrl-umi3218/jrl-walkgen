@@ -77,7 +77,7 @@ public:
   {
     m_TestProfile = TestProfile;
     resetfiles=0;
-    m_DebugFGPIFull=true;
+    m_DebugFGPIFull=false;
     m_DebugFGPI=true;
     ComAndFootRealization_ = NULL;
     SPM_ = NULL ;
@@ -432,14 +432,26 @@ protected:
 //          if(!(abs(m_conf(6+i)-m_HalfSitting(i))<1e-3))
 //            cout << i << " " ;
         }
-        cout << endl ;
-        cout << m_conf << endl ;
-        cout << m_HalfSitting << endl ;
-        cout << std::boolalpha << isHalfsitting << endl ;
-        assert(isHalfsitting);
+//        cout << endl ;
+//        cout << m_conf << endl ;
+//        cout << m_HalfSitting << endl ;
+//        cout << std::boolalpha << isHalfsitting << endl ;
+//        assert(isHalfsitting);
       }
 
       m_DebugPR->computeInverseDynamics(m_conf,m_vel,m_acc);
+      MAL_S3_VECTOR_TYPE(double) com, dcom, ddcom;
+      m_DebugPR->CenterOfMass(com, dcom, ddcom);
+//      cout << m_OneStep.finalCOMPosition.x[0] - com(0) << " "
+//           << m_OneStep.finalCOMPosition.y[0] - com(1) << " "
+//           << m_OneStep.finalCOMPosition.z[0] - com(2) << " ; "
+//           << m_OneStep.finalCOMPosition.x[1] - dcom(0) << " "
+//           << m_OneStep.finalCOMPosition.y[1] - dcom(1) << " "
+//           << m_OneStep.finalCOMPosition.z[1] - dcom(2) << " ; "
+//           << m_OneStep.finalCOMPosition.x[2] - ddcom(0) << " "
+//           << m_OneStep.finalCOMPosition.y[2] - ddcom(1) << " "
+//           << m_OneStep.finalCOMPosition.z[2] - ddcom(2) << endl ;
+
       createOpenHRPFiles();
       MAL_S3_VECTOR(zmpmb,double);
       m_DebugPR->zeroMomentumPoint(zmpmb);
@@ -510,6 +522,12 @@ protected:
       for(unsigned int k = 0 ; k < m_conf.size() ; k++){ // 48-53 -> 54-83
         aof << filterprecision( m_conf(k) ) << " "  ;
       }
+      for(unsigned int k = 0 ; k < m_vel.size() ; k++){ // 84-89 -> 90-118
+        aof << filterprecision( m_vel(k) ) << " "  ;
+      }
+      for(unsigned int k = 0 ; k < m_acc.size() ; k++){ // 119-125 -> 125-155
+        aof << filterprecision( m_acc(k) ) << " "  ;
+      }
       aof << endl;
       aof.close();
     }
@@ -555,8 +573,8 @@ protected:
     }
 
     {
-      istringstream strm2(":feedBackControl true");
-      //istringstream strm2(":feedBackControl false");
+      //istringstream strm2(":feedBackControl true");
+      istringstream strm2(":feedBackControl false");
       m_PGI->ParseCmd(strm2);
     }
 
@@ -609,9 +627,8 @@ protected:
     {
       { 5,&TestObject::walkForward2m_s},
       {15*200,&TestObject::startTurningRight2},
-      {25*200,&TestObject::walkOnSpot},
-      {30*200,&TestObject::stop},
-      {35*200,&TestObject::stopOnLineWalking}
+      {25*200,&TestObject::stop},
+      {30*200,&TestObject::stopOnLineWalking}
     };
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)

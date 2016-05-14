@@ -62,6 +62,13 @@ namespace PatternGeneratorJRL
     void computeForwardKinematics();
     void computeForwardKinematics(MAL_VECTOR_TYPE(double) & q);
 
+    void RPYToSpatialFreeFlyer(Eigen::Vector3d & rpy,
+                               Eigen::Vector3d & drpy,
+                               Eigen::Vector3d & ddrpy,
+                               Eigen::Quaterniond & quat,
+                               Eigen::Vector3d & omega,
+                               Eigen::Vector3d & domega);
+
     /// \brief ComputeSpecializedInverseKinematics :
     /// compute POSITION (not velocity) of the joints from end effector pose
     /// This is the implementation of the analitycal inverse kinematic extracted
@@ -166,12 +173,7 @@ namespace PatternGeneratorJRL
 
     inline void zeroMomentumPoint(MAL_S3_VECTOR_TYPE(double) & zmp)
     {
-      se3::SE3 oX1 (Eigen::Matrix3d::Identity(),m_robotData->liMi[1].translation());
-      m_externalForces = oX1.act(m_robotData->f[1]);
-      std::cout << m_robotData->liMi[1] << std::endl ;
-      std::cout << m_externalForces << std::endl ;
-      std::cout << m_robotData->f[1] << std::endl ;
-      std::cout << m_tau.head<6>().transpose() << std::endl << std::endl ;
+      m_externalForces = m_robotData->liMi[1].act(m_robotData->f[1]);
       m_f = m_externalForces.linear() ;
       m_n = m_externalForces.angular() ;
       zmp(0) = -m_n(1)/m_f(2) ;
@@ -181,6 +183,25 @@ namespace PatternGeneratorJRL
 
     inline void positionCenterOfMass(MAL_S3_VECTOR_TYPE(double) & com)
     {
+      m_com = m_robotData->com[0] ;
+      com(0) = m_com(0) ;
+      com(1) = m_com(1) ;
+      com(2) = m_com(2) ;
+    }
+    inline void CenterOfMass(MAL_S3_VECTOR_TYPE(double) &   com,
+                             MAL_S3_VECTOR_TYPE(double) &  dcom,
+                             MAL_S3_VECTOR_TYPE(double) & ddcom)
+    {
+      m_com = m_robotData->acom[0] ;
+      ddcom(0) = m_com(0) ;
+      ddcom(1) = m_com(1) ;
+      ddcom(2) = m_com(2) ;
+
+      m_com = m_robotData->vcom[0] ;
+      dcom(0) = m_com(0) ;
+      dcom(1) = m_com(1) ;
+      dcom(2) = m_com(2) ;
+
       m_com = m_robotData->com[0] ;
       com(0) = m_com(0) ;
       com(1) = m_com(1) ;
@@ -228,10 +249,13 @@ namespace PatternGeneratorJRL
 
     // tmp variables
     Eigen::Quaterniond m_quat ;
+    Eigen::Matrix3d m_rot ;
     se3::Force m_externalForces ; // external forces and torques
     Eigen::VectorXd m_tau ; // external forces and torques
     Eigen::Vector3d m_f,m_n; // external forces and torques
     Eigen::Vector3d m_com; // multibody CoM
+    Eigen::Matrix3d m_S ;
+    Eigen::Vector3d m_rpy,m_drpy,m_ddrpy,m_omega,m_domega ;
 
     // Variables extracted form the urdf used for the analitycal inverse
     // kinematic

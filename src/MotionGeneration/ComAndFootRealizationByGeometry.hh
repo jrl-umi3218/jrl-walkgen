@@ -301,6 +301,17 @@ namespace PatternGeneratorJRL
     inline void chestIndexinConfiguration(std::vector<int> & chestMaps) const
     { chestMaps = m_ChestIndexinConfiguration ;}
 
+    inline void leftLegIndexinVelocity(std::vector<int> & leftLegMaps) const
+    { leftLegMaps = m_LeftLegIndexinConfiguration ;}
+    inline void rightLegIndexinVelocity(std::vector<int> & rightLegMaps) const
+    { rightLegMaps = m_RightLegIndexinConfiguration ;}
+    inline void leftArmIndexinVelocity(std::vector<int> & leftArmMaps) const
+    { leftArmMaps = m_LeftArmIndexinConfiguration ;}
+    inline void rightArmIndexinVelocity(std::vector<int> & rightArmMaps) const
+    { rightArmMaps = m_RightArmIndexinConfiguration ;}
+    inline void chestIndexinVelocity(std::vector<int> & chestMaps) const
+    { chestMaps = m_ChestIndexinConfiguration ;}
+
     inline bool ShiftFoot()
     {return ShiftFoot_ ;}
     inline void ShiftFoot(bool ShiftFoot)
@@ -316,7 +327,8 @@ namespace PatternGeneratorJRL
     /*! \brief Initialization of internal maps of indexes */
     void InitializationMaps(std::vector<se3::JointIndex> &FromRootToFoot,
                 se3::JointModelVector & ActuatedJoints,
-			    std::vector<int> &IndexinConfiguration);
+                std::vector<int> &IndexinConfiguration,
+                std::vector<int> &IndexinVelocity);
 
     /*! Map shoulders and wrist
      \param[in] aHand: The hand to be used for extraction of data.
@@ -331,6 +343,7 @@ namespace PatternGeneratorJRL
     void InitializeMapsForAHand(se3::JointIndex aWrist,
                 se3::JointModelVector &  ActuatedJoints,
 				vector<int> & IndexesInConfiguration,
+                vector<int> & IndexesInVelocity,
                 se3::JointIndex & associateShoulder);
 
     /*! Create the map of indexes for the shoulders and wrist */
@@ -439,16 +452,27 @@ namespace PatternGeneratorJRL
      @{
     */
     /*! \brief For the left leg, Specific for the Inverse Kinematics. */
-    std::vector<int> m_LeftLegIndexinConfiguration;
+    std::vector<int> m_LeftLegIndexinConfiguration ;
     /*! \brief For the right leg, Specific for the Inverse Kinematics. */
-    std::vector<int> m_RightLegIndexinConfiguration;
+    std::vector<int> m_RightLegIndexinConfiguration ;
     /*! \brief For the left arm, Specific for the Inverse Kinematics. */
-    std::vector<int> m_LeftArmIndexinConfiguration;
+    std::vector<int> m_LeftArmIndexinConfiguration ;
     /*! \brief For the right leg, Specific for the Inverse Kinematics. */
-    std::vector<int> m_RightArmIndexinConfiguration;
+    std::vector<int> m_RightArmIndexinConfiguration ;
+
+    /*! \brief For the left leg, Specific for the Inverse Kinematics. */
+    std::vector<int> m_LeftLegIndexinVelocity ;
+    /*! \brief For the right leg, Specific for the Inverse Kinematics. */
+    std::vector<int> m_RightLegIndexinVelocity ;
+    /*! \brief For the left arm, Specific for the Inverse Kinematics. */
+    std::vector<int> m_LeftArmIndexinVelocity ;
+    /*! \brief For the right leg, Specific for the Inverse Kinematics. */
+    std::vector<int> m_RightArmIndexinVelocity ;
 
     /*! \brief For the chest. */
     std::vector<int> m_ChestIndexinConfiguration;
+    /*! \brief For the chest. */
+    std::vector<int> m_ChestIndexinVelocity;
 
     /*! \brief For the entire system. */
     std::vector<int> m_GlobalVRMLIDtoConfiguration;

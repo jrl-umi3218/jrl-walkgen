@@ -92,12 +92,10 @@ namespace PatternGeneratorJRL
     @{
        */
       /*! */
-      void CreateAndInitializeHumanoidRobot(
-          std::string &URDFFile,
+      void CreateAndInitializeHumanoidRobot(std::string &URDFFile,
           std::string &SRDFFile,
           PinocchioRobot *& aPR,
-          PinocchioRobot *& aDebugPR,
-          PatternGeneratorJRL::PatternGeneratorInterface *&aPGI);
+          PinocchioRobot *& aDebugPR);
       /*! @} */
 
       /*! \brief Useful methods to parse srdf file.

@@ -135,8 +135,7 @@ namespace PatternGeneratorJRL
       }
 
       // Instanciate and initialize.
-      CreateAndInitializeHumanoidRobot(m_URDFPath,m_SRDFPath,
-                                       m_PR, m_DebugPR, m_PGI);
+      CreateAndInitializeHumanoidRobot(m_URDFPath,m_SRDFPath,m_PR,m_DebugPR);
 
       // Create Pattern Generator Interface
       m_PGI = patternGeneratorInterfaceFactory(m_PR);
@@ -194,20 +193,19 @@ namespace PatternGeneratorJRL
         std::string &URDFFile,
         std::string &SRDFFile,
         PinocchioRobot *& aPR,
-        PinocchioRobot *& aDebugPR,
-        PatternGeneratorJRL::PatternGeneratorInterface *&aPGI)
+        PinocchioRobot *& aDebugPR)
     {
       // Creating the humanoid robot via the URDF.
-      try{
+//      try{
         m_robotModel = se3::urdf::buildModel(URDFFile, se3::JointModelFreeFlyer());
         m_robotData = new se3::Data(m_robotModel) ;
         m_DebugRobotData = new se3::Data(m_robotModel) ;
-      }catch(std::invalid_argument e)
-      {
-        cout << e.what() ;
-        cout << "robot model or robot data not created properly" << endl ;
-        return ;
-      }
+//      }catch(std::invalid_argument e)
+//      {
+//        cout << e.what() ;
+//        cout << "robot model or robot data not created properly" << endl ;
+//        return ;
+//      }
 
       if ((aPR==0) || (aDebugPR==0))
       {

@@ -110,12 +110,14 @@ void ComAndFootRealizationByGeometry::
 void ComAndFootRealizationByGeometry::
 InitializationMaps(std::vector<se3::Index> &FromRootToJoint,
                    se3::JointModelVector & actuatedJoints,
-                   std::vector<int> &IndexinConfiguration )
+                   std::vector<int> &IndexinConfiguration,
+                   std::vector<int> &IndexinVelocity)
 {
   if (FromRootToJoint.size()!=0)
   {
     ODEBUG("Enter 6.0 " << this);
     IndexinConfiguration.resize(FromRootToJoint.size());
+    IndexinVelocity.resize(FromRootToJoint.size());
 
     ODEBUG("Enter 6.1 " );
     int lindex =0;
@@ -124,7 +126,9 @@ InitializationMaps(std::vector<se3::Index> &FromRootToJoint,
     for(unsigned int i=0;i<FromRootToJoint.size();i++)
     {
       // -1 because pinocchio uses quaternion instead of roll pitch yaw
+      // assuming the model possess only revolute joint
       IndexinConfiguration[lindex] = se3::idx_q(actuatedJoints[FromRootToJoint[i]])-1 ;
+      IndexinVelocity[lindex] = se3::idx_v(actuatedJoints[FromRootToJoint[i]]) ;
       lindex++;
     }
   }
@@ -134,6 +138,7 @@ void ComAndFootRealizationByGeometry::
     InitializeMapsForAHand(se3::JointIndex aWrist,
                            se3::JointModelVector & ActuatedJoints,
                            vector<int> & IndexesInConfiguration,
+                           vector<int> & IndexesInVelocity,
                            se3::JointIndex & associateShoulder)
 {
   if (aWrist==0)
@@ -154,7 +159,8 @@ void ComAndFootRealizationByGeometry::
   associateShoulder = FromRootToJoint[0];
 
   InitializationMaps(FromRootToJoint,ActuatedJoints,
-                     IndexesInConfiguration);
+                     IndexesInConfiguration,
+                     IndexesInVelocity);
 }
 
 void ComAndFootRealizationByGeometry::
@@ -165,8 +171,10 @@ void ComAndFootRealizationByGeometry::
   if (Chest==0)
     return;
 
-  std::vector<se3::JointIndex> FromRootToJoint2,FromRootToJoint;
+  std::vector<se3::JointIndex> /*FromRootToJoint2,*/FromRootToJoint;
   FromRootToJoint = getPinocchioRobot()->fromRootToIt(Chest);
+  // erase the 1rst element as it is the root
+  FromRootToJoint.erase (FromRootToJoint.begin());/*
   std::vector<se3::JointIndex>::iterator itJoint = FromRootToJoint.begin();
   bool startadding=false;
   while(itJoint!=FromRootToJoint.end())
@@ -184,8 +192,9 @@ void ComAndFootRealizationByGeometry::
         FromRootToJoint2.push_back(*itJoint);
     }
     itJoint++;
-  }
-  InitializationMaps(FromRootToJoint2,ActuatedJoints,m_ChestIndexinConfiguration);
+  }*/
+  InitializationMaps(FromRootToJoint,ActuatedJoints,
+                     m_ChestIndexinConfiguration,m_ChestIndexinVelocity);
 }
 
 void ComAndFootRealizationByGeometry::
@@ -261,25 +270,31 @@ void ComAndFootRealizationByGeometry::
       getPinocchioRobot()->jointsBetween(waist, RightFoot->associatedAnkle);
   FromRootToJoint.erase(FromRootToJoint.begin()); // be careful with that line potential bug
   InitializationMaps(FromRootToJoint,ActuatedJoints,
-                       m_RightLegIndexinConfiguration);
+                     m_RightLegIndexinConfiguration,
+                     m_RightLegIndexinVelocity);
 
   FromRootToJoint =
       getPinocchioRobot()->jointsBetween(waist, LeftFoot->associatedAnkle);
   FromRootToJoint.erase(FromRootToJoint.begin());
   InitializationMaps(FromRootToJoint,ActuatedJoints,
-                     m_LeftLegIndexinConfiguration);
+                     m_LeftLegIndexinConfiguration,
+                     m_LeftLegIndexinVelocity);
 
   // Create maps for the left hand.
   InitializeMapsForAHand(getPinocchioRobot()->leftWrist(),
                          ActuatedJoints,
                          m_LeftArmIndexinConfiguration,
+                         m_LeftArmIndexinVelocity,
                          m_LeftShoulder);
 
   // Create maps for the right hand.
   InitializeMapsForAHand(getPinocchioRobot()->rightWrist(),
                          ActuatedJoints,
                          m_RightArmIndexinConfiguration,
+                         m_RightArmIndexinVelocity,
                          m_RightShoulder);
+
+  InitializeMapForChest(ActuatedJoints);
 
   FromRootToJoint.clear();
 
@@ -1025,7 +1040,7 @@ bool ComAndFootRealizationByGeometry::
       /* Compute the speed */
       for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
       {
-        CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration1[i])/ getSamplingPeriod();
+        CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration1[i])/ ldt;
         /* Keep the new value for the legs. */
       }
       if (IterationNumber>1)
@@ -1110,8 +1125,13 @@ bool ComAndFootRealizationByGeometry::
   CurrentAcceleration[2] = aCoMAcc(2) + (waistCom(0)*aCoMAcc(4)  - waistCom(1)*aCoMAcc(3) ) + coriolis(2) ;
 
   // d omega_waist /dt = d omega_com /dt
+  //cout << "CFRG : " ;
   for(int i=3;i<6;i++)
+  {
+    //cout << aCoMAcc(i) << " "  ;
     CurrentAcceleration[i] = aCoMAcc(i);
+  }//cout << endl ;
+
 
   ODEBUG( "CurrentVelocity :" << endl << CurrentVelocity);
   ODEBUG4("SamplingPeriod " << getSamplingPeriod(),"LegsSpeed.dat");

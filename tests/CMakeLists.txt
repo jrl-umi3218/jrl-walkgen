@@ -352,6 +352,7 @@ TARGET_LINK_LIBRARIES(TestNaveau2015 ${PROJECT_NAME})
 ADD_DEPENDENCIES(TestNaveau2015 ${PROJECT_NAME})
 PKG_CONFIG_USE_DEPENDENCY(TestNaveau2015 jrl-mal)
 
+
 ADD_TEST(TestNaveau2015 TestNaveau2015 ${urdfpath} ${srdfpath})
 
 
