@@ -573,13 +573,14 @@ protected:
     }
 
     {
-      //istringstream strm2(":feedBackControl true");
-      istringstream strm2(":feedBackControl false");
+      istringstream strm2(":feedBackControl true");
+      //istringstream strm2(":feedBackControl false");
       m_PGI->ParseCmd(strm2);
     }
 
     {
-      istringstream strm2(":useDynamicFilter true");
+      //istringstream strm2(":useDynamicFilter true");
+      istringstream strm2(":useDynamicFilter false");
       m_PGI->ParseCmd(strm2);
     }
 //    {
