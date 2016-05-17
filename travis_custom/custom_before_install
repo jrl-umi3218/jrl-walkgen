@@ -23,11 +23,11 @@ export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-pinocchio robotpkg-jrl-mal+j
 # Add one git dependency
 export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/laas/simple_humanoid.git"
 
-# When this script is called the current directory is ./custom_travis
-. ./.travis/run ../.travis/before_install
-
 # Set the distribution to be precise
 export DIST=""
+
+# When this script is called the current directory is ./custom_travis
+. ./.travis/run ../.travis/before_install
 
 # End debug mode
 set +v
