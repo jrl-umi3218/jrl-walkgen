@@ -610,7 +610,7 @@ computing the analytical trajectories. */
         m_kajitaDynamicFilter->getComAndFootRealization()->ShiftFoot(false);
         m_kajitaDynamicFilter->init( m_SamplingPeriod,
                                      m_SamplingPeriod,
-                                     m_PreviewControlTime-TimeShift,
+                                     n*m_SamplingPeriod,
                                      m_PreviewControlTime-TimeShift+KajitaPCpreviewWindow,
                                      KajitaPCpreviewWindow,
                                      lStartingCOMState );
@@ -687,7 +687,7 @@ computing the analytical trajectories. */
         }
 
         // Filter the trajectory
-        deque<COMState> outputDeltaCOMTraj_deq ;
+        deque<COMState> outputDeltaCOMTraj_deq (n) ;
         m_kajitaDynamicFilter->OffLinefilter(
                     COMStates,
                     ZMPPositions,
@@ -698,14 +698,14 @@ computing the analytical trajectories. */
                     vector< MAL_VECTOR_TYPE(double) > (1,UpperAcc),
                     outputDeltaCOMTraj_deq);
 
-
+#ifdef DEBUG
         m_kajitaDynamicFilter->Debug(COMStates,LeftFootAbsolutePositions,
                                      RightFootAbsolutePositions,
                                      COMStates,ZMPPositions,
                                      LeftFootAbsolutePositions,
                                      RightFootAbsolutePositions,
                                      outputDeltaCOMTraj_deq);
-
+#endif
         vector <vector<double> > filteredZMPMB (n , vector<double> (2,0.0)) ;
         for (unsigned int i = 0 ; i < n ; ++i)
         {
