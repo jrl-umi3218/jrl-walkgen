@@ -7,7 +7,6 @@ set -v
 
 # Setup environment variables.
 export CMAKE_ADDITIONAL_OPTIONS=" ${CMAKE_ADDITIONAL_OPTIONS} -DBUILD_UNIT_TESTS=\"ON\""
-export CMAKE_ADDITIONAL_OPTIONS=" ${CMAKE_ADDITIONAL_OPTIONS} -DWITH_HRP2_DYNAMICS=\"OFF\""
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/openrobots/lib/pkgconfig"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/openrobots/lib"
 # Setup environment variables.
