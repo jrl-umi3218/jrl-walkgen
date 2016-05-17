@@ -35,8 +35,15 @@ The matrix abstract layer depends on several packages which
 have to be available on your machine.
 
  - Libraries:
-   - [abstract-robot-dynamics][abstract-robot-dynamics] (>= 1.16)
-     The pattern generator uses dynamics provided by the abstract interface.
+   - [pinocchio][pinocchio] (>= 1.1.0)
+     The pattern generator uses dynamics provided by the pinocchio template
+   programming interface.
+   - [jrl-mal][jrl-mal] (>= 1.9.0)
+   - [qpOASES][https://projects.coin-or.org/qpOASES] (normally compatible with
+   the last version)
+   - Boost
+   - Eigen
+
  - System tools:
    - CMake (>=2.6)
    - pkg-config

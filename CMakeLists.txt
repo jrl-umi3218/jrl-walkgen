@@ -120,7 +120,6 @@ SET(${PROJECT_NAME}_HEADERS
 # Define subdirectories to explore for cmake
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(tests)
-#ADD_SUBDIRECTORY(debian)
 
 # Generate dependency to jrl-walkgen in pc file
 PKG_CONFIG_APPEND_LIBS("jrl-walkgen")
