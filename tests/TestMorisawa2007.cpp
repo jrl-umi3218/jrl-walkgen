@@ -67,7 +67,7 @@ private:
   // New time between two steps.
   double m_deltatime;
 
-  // iteration for teh files
+  // iteration for the files
   int iteration ;
 
 public:
@@ -159,6 +159,10 @@ protected:
                           ");
                           aPGI.ParseCmd(strm2);
     }
+    {
+      istringstream strm2(":useDynamicFilter false");
+      aPGI.ParseCmd(strm2);
+    }
   }
 
   void AnalyticalClimbingStairs(PatternGeneratorInterface &aPGI)
@@ -192,6 +196,10 @@ protected:
                           0.0 -0.19 0.0 0.0\
                           ");
                           aPGI.ParseCmd(strm2);
+    }
+    {
+      istringstream strm2(":useDynamicFilter false");
+      aPGI.ParseCmd(strm2);
     }
 
   }
@@ -227,7 +235,10 @@ protected:
                           ");
                           aPGI.ParseCmd(strm2);
     }
-
+    {
+      istringstream strm2(":useDynamicFilter false");
+      aPGI.ParseCmd(strm2);
+    }
   }
 
   void AnalyticalSteppingStones(PatternGeneratorInterface &aPGI)
@@ -263,7 +274,10 @@ protected:
 
                           aPGI.ParseCmd(strm2);
     }
-
+    {
+      istringstream strm2(":useDynamicFilter false");
+      aPGI.ParseCmd(strm2);
+    }
   }
 
   // Define here the function to Generate Walking on Beam motion
@@ -303,6 +317,10 @@ protected:
                           0.0  -0.190 0.0 0.0\
                           ");
                           aPGI.ParseCmd(strm2);
+    }
+    {
+      istringstream strm2(":useDynamicFilter false");
+      aPGI.ParseCmd(strm2);
     }
   }
 
@@ -415,6 +433,10 @@ protected:
                           0.0 0.2 0.0 0.0    \
                           ");
                           aPGI.ParseCmd(strm2);
+    }
+    {
+      istringstream strm2(":useDynamicFilter false");
+      aPGI.ParseCmd(strm2);
     }
   }
 
