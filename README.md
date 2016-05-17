@@ -35,10 +35,10 @@ The matrix abstract layer depends on several packages which
 have to be available on your machine.
 
  - Libraries:
-   - [pinocchio][pinocchio] (>= 1.1.0)
+   - [pinocchio][https://github.com/stack-of-tasks/pinocchio] (>= 1.1.0)
      The pattern generator uses dynamics provided by the pinocchio template
    programming interface.
-   - [jrl-mal][jrl-mal] (>= 1.9.0)
+   - [jrl-mal][https://github.com/jrl-umi3218/jrl-mal] (>= 1.9.0)
    - [qpOASES][https://projects.coin-or.org/qpOASES] (normally compatible with
    the last version)
    - Boost
