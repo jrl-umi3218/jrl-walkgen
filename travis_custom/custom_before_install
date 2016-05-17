@@ -30,7 +30,7 @@ export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/laas/simple_humano
 . ./.travis/run ../.travis/before_install
 
 # Set the distrivution to be precise
-export DIST="precise"
+#export DIST="precise"
 
 # End debug mode
 set +v
