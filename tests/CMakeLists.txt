@@ -53,7 +53,7 @@ ADD_EXECUTABLE(TestOptCholesky
   ../src/Mathematics/OptCholesky.cpp
 )
 # Add test on the ricatti equation
-##ADD_TEST(TestOptCholesky TestOptCholesky)
+ADD_TEST(TestOptCholesky TestOptCholesky)
 
 ##########################
 ## Test Bspline #
@@ -76,285 +76,125 @@ ADD_EXECUTABLE(TestRiccatiEquation
 # Need this dependency for the use of the fortran functions (it seems)
 PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
 # Add test on the ricatti equation
-##ADD_TEST(TestRiccatiEquation TestRiccatiEquation)
+ADD_TEST(TestRiccatiEquation TestRiccatiEquation)
+
+################################################
+## Generic Macro That Create a Boost Test Case #
+################################################
+MATH(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
+MACRO(ADD_JRL_WALKGEN_TEST test_arg test_file_name)
+
+  SET(test_name "${test_arg}${BITS}")
+
+  ADD_EXECUTABLE(${test_name}
+    ${test_file_name}
+    TestObject.cpp
+    CommonTools.cpp
+    ClockCPUTime.cpp
+    ../src/portability/gettimeofday.cc
+  )
+
+  MESSAGE(STATUS "Prepare test : " ${test_name})
+  SET(urdfpath
+    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/urdf/simple_humanoid.urdf
+  )
+  SET(srdfpath
+    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/srdf/simple_humanoid.srdf
+  )
+
+  LIST(APPEND LOGGING_WATCHED_VARIABLES urdfpath srdfpath)
+
+  TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
+  PKG_CONFIG_USE_DEPENDENCY(${test_name} jrl-mal)
+
+  ADD_TEST(${test_name} ${test_name} ${urdfpath} ${srdfpath})
+
+ENDMACRO(ADD_JRL_WALKGEN_TEST)
+
 
 #######################
 ## Test Morisawa 2007 #
 #######################
 
-MATH(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
-CONFIG_FILES_CMAKE(TestMorisawa2007OnLine${BITS}TestFGPI.datref)
-CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalk${BITS}TestFGPI.datref)
-CONFIG_FILES_CMAKE(TestMorisawa2007Climbing${BITS}TestFGPI.datref)
-CONFIG_FILES_CMAKE(TestMorisawa2007GoingDown${BITS}TestFGPI.datref)
-CONFIG_FILES_CMAKE(TestMorisawa2007SteppingStones${BITS}TestFGPI.datref)
-CONFIG_FILES_CMAKE(TestMorisawa2007WalkingOnBeam${BITS}TestFGPI.datref)
-CONFIG_FILES_CMAKE(TestMorisawa2007GoThroughWall${BITS}TestFGPI.datref)
-
-MACRO(ADD_MORISAWA_2007 test_morisawa_arg)
-
-  SET(testmorisawa2007 "${test_morisawa_arg}${BITS}")
-
-  ADD_EXECUTABLE(${testmorisawa2007}
-  ../src/portability/gettimeofday.cc
-  TestMorisawa2007.cpp
-  CommonTools.cpp
-  TestObject.cpp
-  ClockCPUTime.cpp
-  )
-
-  MESSAGE(STATUS "robot data dir: " ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR})
-  SET(urdfpath
-    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/urdf/simple_humanoid.urdf
-  )
-  SET(srdfpath
-    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/srdf/simple_humanoid.srdf
-  )
-
-  LIST(APPEND LOGGING_WATCHED_VARIABLES urdfpath srdfpath)
-
-  TARGET_LINK_LIBRARIES(${testmorisawa2007} ${PROJECT_NAME})
-  PKG_CONFIG_USE_DEPENDENCY(${testmorisawa2007} jrl-mal)
-  ADD_DEPENDENCIES(${testmorisawa2007} ${PROJECT_NAME})
-
-  ADD_TEST(${testmorisawa2007} ${testmorisawa2007} ${urdfpath} ${srdfpath})
-
-ENDMACRO(ADD_MORISAWA_2007)
-
 #disabled as it fail : fix the code
-#ADD_MORISAWA_2007(TestMorisawa2007OnLine)
+#CONFIG_FILES_CMAKE(TestMorisawa2007OnLine${BITS}TestFGPI.datref)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007OnLine TestMorisawa2007.cpp)
 
-##ADD_MORISAWA_2007(TestMorisawa2007ShortWalk)
-#ADD_MORISAWA_2007(TestMorisawa2007Climbing)
-#ADD_MORISAWA_2007(TestMorisawa2007GoingDown)
-##ADD_MORISAWA_2007(TestMorisawa2007SteppingStones)
-##ADD_MORISAWA_2007(TestMorisawa2007WalkingOnBeam)
-#ADD_MORISAWA_2007(TestMorisawa2007GoThroughWall)
+# the following disabled test case are just useful code for offline
+# motion generation using the specialized inverse kinmatics of a robot
+
+CONFIG_FILES_CMAKE(TestMorisawa2007ShortWalk${BITS}TestFGPI.datref)
+ADD_JRL_WALKGEN_TEST(TestMorisawa2007ShortWalk TestMorisawa2007.cpp)
+
+#CONFIG_FILES_CMAKE(TestMorisawa2007Climbing${BITS}TestFGPI.datref)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007Climbing TestMorisawa2007.cpp)
+
+#CONFIG_FILES_CMAKE(TestMorisawa2007GoingDown${BITS}TestFGPI.datref)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007GoingDown TestMorisawa2007.cpp)
+
+CONFIG_FILES_CMAKE(TestMorisawa2007SteppingStones${BITS}TestFGPI.datref)
+ADD_JRL_WALKGEN_TEST(TestMorisawa2007SteppingStones TestMorisawa2007.cpp)
+
+CONFIG_FILES_CMAKE(TestMorisawa2007WalkingOnBeam${BITS}TestFGPI.datref)
+ADD_JRL_WALKGEN_TEST(TestMorisawa2007WalkingOnBeam TestMorisawa2007.cpp)
+
+#CONFIG_FILES_CMAKE(TestMorisawa2007GoThroughWall${BITS}TestFGPI.datref)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007GoThroughWall TestMorisawa2007.cpp)
 
 ####################
 ## Test Herdt 2010 #
 ####################
 
-CONFIG_FILES_CMAKE(TestHerdt2010OnLineTestFGPI.datref)
-CONFIG_FILES_CMAKE(TestHerdt2010EmergencyStopTestFGPI.datref)
+#CONFIG_FILES_CMAKE(TestHerdt2010OnLineTestFGPI.datref)
+#CONFIG_FILES_CMAKE(TestHerdt2010EmergencyStopTestFGPI.datref)
 
-MACRO(ADD_HERDT_2010 test_herdt2010_arg)
-  ADD_EXECUTABLE(${test_herdt2010_arg}
-  ../src/portability/gettimeofday.cc
-  ${test_herdt2010_arg}.cpp
-  CommonTools.cpp
-  TestObject.cpp
-  ClockCPUTime.cpp
-  )
-
-  TARGET_LINK_LIBRARIES(${test_herdt2010_arg} ${PROJECT_NAME})
-  ADD_DEPENDENCIES(${test_herdt2010_arg} ${PROJECT_NAME})
-  PKG_CONFIG_USE_DEPENDENCY(${test_herdt2010_arg} jrl-mal)
-
-  MESSAGE(STATUS "robot data dir: " ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR})
-  SET(urdfpath
-    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/urdf/simple_humanoid.urdf
-  )
-  SET(srdfpath
-    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/srdf/simple_humanoid.srdf
-  )
-
-  LIST(APPEND LOGGING_WATCHED_VARIABLES urdfpath srdfpath)
-
-  ADD_TEST(${test_herdt2010_arg}  ${test_herdt2010_arg} ${urdfpath} ${srdfpath})
-
-ENDMACRO(ADD_HERDT_2010)
-
-##ADD_HERDT_2010(TestHerdt2010)
+#disabled as it is not tested yet with pinocchio
+#ADD_JRL_WALKGEN_TEST(TestHerdt2010 TestHerdt2010.cpp)
 
 ############################
 ## Test Inverse Kinematics #
 ############################
-##SET(INVERSE_KINEMATICS)
-#IF(INVERSE_KINEMATICS)
 
-#CONFIG_FILES_CMAKE(TestHerdt2010OnLineTestFGPI.datref)
-
-#ADD_EXECUTABLE(TestInverseKinematics
-#    ../src/portability/gettimeofday.cc
-#    TestInverseKinematics.cpp
-#    CommonTools.cpp
-#    TestObject.cpp
-#    ClockCPUTime.cpp
-#)
-
-#TARGET_LINK_LIBRARIES(TestInverseKinematics ${PROJECT_NAME})
-##PKG_CONFIG_USE_DEPENDENCY(TestInverseKinematics jrl-dynamics)
-#PKG_CONFIG_USE_DEPENDENCY(TestInverseKinematics hrp2-dynamics)
-#ADD_DEPENDENCIES(TestInverseKinematics ${PROJECT_NAME})
-
-#SET(samplemodelpath ${HRP2_14_DESCRIPTION_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
-#SET(samplespec
-#    ${HRP2_14_DESCRIPTION_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
-#)
-#SET(sampleljr
-#    ${HRP2_14_DESCRIPTION_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
-#)
-#SET(sampleinitconfig
-#    ${HRP2_14_DESCRIPTION_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
-#)
-
-#LIST(APPEND LOGGING_WATCHED_VARIABLES samplespec sampleljr)
-
-## This test is disabled for now as it fails.
-## FIXME: fix the test and/or the implementation
-#ADD_TEST(TestInverseKinematics
-#TestInverseKinematics
-#${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
-
-#ENDIF(INVERSE_KINEMATICS)
+#Disabled : fix the code to handl multiple inverse kinematics
+# Todo compare halfsiting pose after forward and inverse kinematics.
+#ADD_JRL_WALKGEN_TEST(TestInverseKinematics TestInverseKinematics.cpp)
 
 ###############################
 ## Test Kajita Dynamic Filter #
 ###############################
 
+#TO BE FIXED with a proper inverse kinematics computed for the simple humanoid
+#ADD_JRL_WALKGEN_TEST(TestKajitaDynamicFilter TestKajitaDynamicFilter.cpp)
 #SET(DYNAMIC_FILTER) TO BE FIXED
-IF(DYNAMIC_FILTER)
-IF(HRP2_14_DESCRIPTION_FOUND)
-
-ADD_EXECUTABLE(TestKajitaDynamicFilter
-    ../src/portability/gettimeofday.cc
-    TestKajitaDynamicFilter.cpp
-    CommonTools.cpp
-    TestObject.cpp
-    ClockCPUTime.cpp
-)
-
-TARGET_LINK_LIBRARIES(TestKajitaDynamicFilter ${PROJECT_NAME})
-
-ADD_DEPENDENCIES(TestKajitaDynamicFilter ${PROJECT_NAME})
-SET(urdfpath
-  ${HRP2_14_DESCRIPTION_PKGDATAROOTDIR}/hrp2_14_description/urdf/simple_humanoid.urdf
-)
-SET(srdfpath
-  ${HRP2_14_DESCRIPTION_PKGDATAROOTDIR}/hrp2_14_humanoid_description/srdf/simple_humanoid.srdf
-)
-LIST(APPEND LOGGING_WATCHED_VARIABLES urdfpath srdfpath)
-
-# This test is disabled for now as it fails.
-# FIXME: fix the test and/or the implementation
-ADD_TEST(TestKajitaDynamicFilter
-TestKajitaDynamicFilter ${urdfpath} ${srdfpath})
-
-ENDIF(HRP2_14_DESCRIPTION_FOUND)
-ENDIF(DYNAMIC_FILTER)
 
 #####################
 ## Test Kajita 2003 #
 #####################
 
-## This test is disabled for now as it fails.
+## These test is disabled for now as it fails.
 ## FIXME: fix the test and/or the implementation
-
-#IF(HRP2_DYNAMICS_FOUND)
-#  IF(HRP2_14_FOUND)
-
-#  CONFIG_FILES_CMAKE(TestKajita2003StraightWalkingTestFGPI.datref)
-#  CONFIG_FILES_CMAKE(TestKajita2003CircleTestFGPI.datref)
-#  CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq1TestFGPI.datref)
-#  CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq2TestFGPI.datref)
-
-#  ADD_EXECUTABLE(TestKajita2003
-#    ../src/portability/gettimeofday.cc
-#    TestKajita2003.cpp
-#    CommonTools.cpp
-#    TestObject.cpp
-#    ClockCPUTime.cpp
-#  )
-
-#  SET(samplemodelpath ${HRP2_14_DESCRIPTION_PKGDATAROOTDIR}/jrl-dynamics/examples/data/)
-#  SET(samplespec
-#      ${HRP2_14_DESCRIPTION_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleSpecificities.xml
-#  )
-#  SET(sampleljr
-#      ${HRP2_14_DESCRIPTION_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleLinkJointRank.xml
-#  )
-#  SET(sampleinitconfig
-#      ${HRP2_14_DESCRIPTION_PKGDATAROOTDIR}/jrl-dynamics/examples/data/sampleInitConfig.dat
-#  )
-
-#  TARGET_LINK_LIBRARIES(TestKajita2003 ${PROJECT_NAME})
-
-#  PKG_CONFIG_USE_DEPENDENCY(TestKajita2003 hrp2-dynamics)
-
-#  ADD_DEPENDENCIES(TestKajita2003 ${PROJECT_NAME})
-
-#  ADD_TEST(TestKajita2003 TestKajita2003
-#    ${samplemodelpath} sample.wrl ${samplespec} ${sampleljr} ${sampleinitconfig})
-#  ENDIF(HRP2_14_FOUND)
-#ENDIF(HRP2_DYNAMICS_FOUND)
+#CONFIG_FILES_CMAKE(TestKajita2003StraightWalking${BITS}TestFGPI.datref)
+#CONFIG_FILES_CMAKE(TestKajita2003Circle${BITS}TestFGPI.datref)
+#CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq1${BITS}TestFGPI.datref)
+#CONFIG_FILES_CMAKE(TestKajita2003PbFlorentSeq2${BITS}TestFGPI.datref)
+#ADD_JRL_WALKGEN_TEST(TestKajita2003StraightWalking TestKajita2003.cpp)
+#ADD_JRL_WALKGEN_TEST(TestKajita2003Circle          TestKajita2003.cpp)
+#ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq1   TestKajita2003.cpp)
+#ADD_JRL_WALKGEN_TEST(TestKajita2003PbFlorentSeq2   TestKajita2003.cpp)
 
 ##########################
 ## Read Novela Data 2011 #
 ##########################
 
-#IF(HRP2_DYNAMICS_FOUND)
-#  IF(HRP2_14_FOUND)
-
-#  ADD_EXECUTABLE(ReadDataForNovela
-#    ../src/portability/gettimeofday.cc
-#    ReadDataForNovela.cpp
-#    CommonTools.cpp
-#    TestObject.cpp
-#    ClockCPUTime.cpp
-#  )
-
-#  SET(hrp2dynamicsmodelpath ${HRP2_14_PKGDATAROOTDIR}/)
-#  SET(hrp2dynamicsspec
-#    ${HRP2_14_PKGDATAROOTDIR}/HRP2SpecificitiesSmall.xml
-#  )
-#  SET(hrp2dynamicsljr
-#    ${HRP2_14_PKGDATAROOTDIR}/HRP2LinkJointRankSmall.xml
-#  )
-#  SET(hrp2dynamicsinitconfig
-#    ${HRP2_14_PKGDATAROOTDIR}/HRP2JRLInitConfigSmall.dat)
-
-#  TARGET_LINK_LIBRARIES(ReadDataForNovela ${PROJECT_NAME})
-#  PKG_CONFIG_USE_DEPENDENCY(ReadDataForNovela hrp2-dynamics)
-
-
-#  ADD_DEPENDENCIES(ReadDataForNovela ${PROJECT_NAME})
-
-##  ADD_TEST(ReadDataForNovela
-##    ${hrp2dynamicsmodelpath} HRP2JRLmainsmall.wrl ${hrp2dynamicsspec} ${hrp2dynamicsljr} ${hrp2dynamicsinitconfig})
-#  ENDIF(HRP2_14_FOUND)
-#ENDIF(HRP2_DYNAMICS_FOUND)
+#ADD_JRL_WALKGEN_TEST(ReadDataForNovela ReadDataForNovela.cpp)
 
 ################
 # NMPC test #
 ################
 
-CONFIG_FILES_CMAKE(TestNaveau2015TestFGPI.datref)
-ADD_EXECUTABLE(TestNaveau2015
-   ../src/portability/gettimeofday.cc
-  TestNaveau2015.cpp
-  CommonTools.cpp
-  TestObject.cpp
-  ClockCPUTime.cpp
-)
 
-MESSAGE(STATUS "robot data dir: " ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR})
-SET(urdfpath
-  ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/urdf/simple_humanoid.urdf
-)
-SET(srdfpath
-  ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/srdf/simple_humanoid.srdf
-)
-
-LIST(APPEND LOGGING_WATCHED_VARIABLES urdfpath srdfpath)
-
-TARGET_LINK_LIBRARIES(TestNaveau2015 ${PROJECT_NAME})
-ADD_DEPENDENCIES(TestNaveau2015 ${PROJECT_NAME})
-PKG_CONFIG_USE_DEPENDENCY(TestNaveau2015 jrl-mal)
-
-
-ADD_TEST(TestNaveau2015 TestNaveau2015 ${urdfpath} ${srdfpath})
-
+CONFIG_FILES_CMAKE(TestNaveau2015Online${BITS}TestFGPI.datref)
+ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
 
 #####################
 # Add user examples #
