@@ -233,21 +233,31 @@ int DynamicFilter::OffLinefilter(
     deque<COMState> & outputDeltaCOMTraj_deq)
 {
   unsigned int N = inputCOMTraj_deq_.size() ;
-  ZMPMB_vec_.resize(N) ;
   deltaZMP_deq_.resize(N);
+  if(useDynamicFilter_)
+  {
+    ZMPMB_vec_.resize(N) ;
+    setRobotUpperPart(UpperPart_q[0],UpperPart_dq[0],UpperPart_ddq[0]);
 
-  setRobotUpperPart(UpperPart_q[0],UpperPart_dq[0],UpperPart_ddq[0]);
-
-  for(unsigned int i = 0 ; i < N ; ++i )
-    {
-      ComputeZMPMB(interpolationPeriod_,inputCOMTraj_deq_[i],inputLeftFootTraj_deq_[i],
-                   inputRightFootTraj_deq_[i], ZMPMB_vec_[i] , 1 , i);
-    }
-  for (unsigned int i = 0 ; i < N ; ++i)
-    {
-      deltaZMP_deq_[i].px = inputZMPTraj_deq_[i].px - ZMPMB_vec_[i][0] ;
-      deltaZMP_deq_[i].py = inputZMPTraj_deq_[i].py - ZMPMB_vec_[i][1] ;
-    }
+    for(unsigned int i = 0 ; i < N ; ++i )
+      {
+        ComputeZMPMB(interpolationPeriod_,inputCOMTraj_deq_[i],inputLeftFootTraj_deq_[i],
+                     inputRightFootTraj_deq_[i], ZMPMB_vec_[i] , 1 , i);
+      }
+    for (unsigned int i = 0 ; i < N ; ++i)
+      {
+        deltaZMP_deq_[i].px = inputZMPTraj_deq_[i].px - ZMPMB_vec_[i][0] ;
+        deltaZMP_deq_[i].py = inputZMPTraj_deq_[i].py - ZMPMB_vec_[i][1] ;
+      }
+  }
+  else
+  {
+    for (unsigned int i = 0 ; i < N ; ++i)
+      {
+        deltaZMP_deq_[i].px = 0.0 ;
+        deltaZMP_deq_[i].py = 0.0 ;
+      }
+  }
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq) ;
 
   return 0;

@@ -298,32 +298,44 @@ protected:
 
 int PerformTests(int argc, char *argv[])
 {
-  #define NB_PROFILES 2
-  std::string TestNames[NB_PROFILES] = { "TestHerdt2010OnLine",
-                               "TestHerdt2010EmergencyStop"};
+#define NB_PROFILES 2
+  std::string CompleteName = string(argv[0]);
+  unsigned found = CompleteName.find_last_of("/\\");
+  std::string TestName =  CompleteName.substr(found+1);
   int TestProfiles[NB_PROFILES] = { PROFIL_HERDT_ONLINE_WALKING,
                                     PROFIL_HERDT_EMERGENCY_STOP};
+  int indexProfile=-1;
 
-  for (unsigned int i=0;i<NB_PROFILES;i++)
+  if (TestName.compare(13,6,"OnLine")==0)
+    indexProfile=0;
+  if (TestName.compare(13,13,"EmergencyStop")==0)
+    indexProfile=1;
+
+  if (indexProfile==-1)
+  {
+    std::cerr << "CompleteName: " << CompleteName << std::endl;
+    std::cerr<< " TestName: " << TestName <<std::endl;
+    std::cerr<< "Failure to find the proper indexFile:" << TestName.substr(13,6) << endl;
+    exit(-1);
+  }
+
+  TestHerdt2010 aTH2010(argc,argv,
+            TestName,
+            TestProfiles[indexProfile]);
+  aTH2010.init();
+  try
+  {
+    if (!aTH2010.doTest(std::cout))
     {
-      TestHerdt2010 aTH2010(argc,argv,
-                TestNames[i],
-                TestProfiles[i]);
-      aTH2010.init();
-      try
-    {
-      if (!aTH2010.doTest(std::cout))
-        {
-          cout << "Failed test " << i << endl;
-          return -1;
-        }
-      else
-        cout << "Passed test " << i << endl;
+      cout << "Failed test " << indexProfile << endl;
+      return -1;
     }
-      catch (const char * astr)
-    { cerr << "Failed on following error " << astr << std::endl;
-      return -1; }
-    }
+    else
+      cout << "Passed test " << indexProfile << endl;
+  }
+  catch (const char * astr)
+  { cerr << "Failed on following error " << astr << std::endl;
+    return -1; }
   return 0;
 }
 

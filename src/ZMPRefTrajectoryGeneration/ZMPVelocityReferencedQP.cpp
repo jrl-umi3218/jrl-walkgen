@@ -225,6 +225,7 @@ Solution_(),OFTG_DF_(0),OFTG_control_(0),dynamicFilter_(0)
 
   ZMPTraj_deq_ctrl_.resize( QP_N_ * NbSampleControl_+10) ;
   COMTraj_deq_ctrl_.resize( QP_N_ * NbSampleControl_+10) ;
+  deltaCOMTraj_deq_.resize(NbSampleControl_);
 }
 
 
