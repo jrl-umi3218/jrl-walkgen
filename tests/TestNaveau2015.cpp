@@ -668,7 +668,10 @@ protected:
 int PerformTests(int argc, char *argv[])
 {
 #define NB_PROFILES 1
-  std::string TestNames[NB_PROFILES] = {"TestNaveau2015"};
+  std::string CompleteName = string(argv[0]);
+  unsigned found = CompleteName.find_last_of("/\\");
+  std::string TestName =  CompleteName.substr(found+1);
+  std::string TestNames[NB_PROFILES] = {TestName};
   int TestProfiles[NB_PROFILES] = {PROFIL_NAVEAU};
 
 
