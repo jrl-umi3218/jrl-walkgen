@@ -486,7 +486,7 @@ namespace PatternGeneratorJRL
         if (!alif.is_open())
         {
           std::cerr << "Unable to open "<< aFileName << std::endl;
-          return -1;
+          return false;
         }
 
         ifstream arif;
@@ -498,7 +498,7 @@ namespace PatternGeneratorJRL
         if (!arif.is_open())
         {
           std::cerr << "Unable to open "<< aFileName << std::endl;
-          return -1;
+          return false;
         }
 
 
