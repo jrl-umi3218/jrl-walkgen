@@ -20,7 +20,7 @@ export APT_DEPENDENCIES="doxygen doxygen-latex libboost-all-dev libeigen3-dev li
 export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-pinocchio robotpkg-jrl-mal+jrl-mathtools"
 
 # Add one git dependency
-export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/laas/simple_humanoid.git"
+export ROS_GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/laas/simple_humanoid.git"
 
 # When this script is called the current directory is ./custom_travis
 . ./.travis/run ../.travis/before_install
