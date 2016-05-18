@@ -9,13 +9,12 @@ env:
     - "APT_DEPENDENCIES=doxygen doxygen-latex libboost-all-dev libeigen3-dev liblapack-dev libblas-dev gfortran"
     - DEBSIGN_KEYID=5AE5CD75
     - LCOV_IGNORE_RULES="*unittest* /opt/openrobots/*"
-    - DIST="precise"
 notifications:
   email:
     - hpp-source@laas.fr
 branches:
   only:
-  - master
+    - master
 matrix:
   allow_failures:
     - compiler: clang
