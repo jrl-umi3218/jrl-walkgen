@@ -21,7 +21,7 @@ sudo free -m -t
 # Add dependencies from apt
 export APT_DEPENDENCIES="doxygen doxygen-latex libboost-all-dev libeigen3-dev liblapack-dev libblas-dev gfortran"
 # Add urdfdom from ros hydro
-export APT_DEPENDENCIES="ros-hydro-urdfdom ros-hydro-urdfdom-headers"
+export APT_DEPENDENCIES=$APT_DEPENDENCIES" ros-hydro-urdfdom ros-hydro-urdfdom-headers"
 # Add dependencies from robot-pkg
 export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-jrl-mal+jrl-mathtools"
 
