@@ -108,7 +108,6 @@ MACRO(ADD_JRL_WALKGEN_TEST test_arg test_file_name)
 
   TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
   PKG_CONFIG_USE_DEPENDENCY(${test_name} jrl-mal)
-  PKG_CONFIG_USE_DEPENDENCY(${test_name} pinocchio)
 
   ADD_TEST(${test_name} ${test_name} ${urdfpath} ${srdfpath})
 
