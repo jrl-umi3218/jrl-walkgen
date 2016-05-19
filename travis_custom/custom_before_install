@@ -9,6 +9,10 @@ set -v
 sudo sh -c "echo \"deb http://robotpkg.openrobots.org/packages/debian precise robotpkg\" >> /etc/apt/sources.list "
 curl http://robotpkg.openrobots.org/packages/debian/robotpkg.key | sudo apt-key add -
 
+# Add ros-hydro
+sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu precise main\" > /etc/apt/sources.list.d/ros-latest.list"
+curl https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -O - | sudo apt-key add -
+
 # show memory usage before install
 sudo free -m -t
 
@@ -16,8 +20,10 @@ sudo free -m -t
 
 # Add dependencies from apt
 export APT_DEPENDENCIES="doxygen doxygen-latex libboost-all-dev libeigen3-dev liblapack-dev libblas-dev gfortran"
+# Add urdfdom from ros hydro
+export APT_DEPENDENCIES="ros-hydro-urdfdom ros-hydro-urdfdom-headers"
 # Add dependencies from robot-pkg
-export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-urdfdom robotpkg-urdfdom-headers robotpkg-jrl-mal+jrl-mathtools"
+export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-jrl-mal+jrl-mathtools"
 
 # Add one git dependency
 export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/MaximilienNaveau/simple_humanoid_description.git"
