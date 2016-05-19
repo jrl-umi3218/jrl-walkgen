@@ -36,7 +36,7 @@
 #include <ZMPRefTrajectoryGeneration/nmpc_generator.hh>
 #include <ZMPRefTrajectoryGeneration/DynamicFilter.hh>
 
-#include "/home/mnaveau/devel/ros_unstable/src/jrl/jrl-walkgen/tests/ClockCPUTime.hh"
+//#include </home/mnaveau/devel/ros_unstable/src/jrl/jrl-walkgen/tests/ClockCPUTime.hh>
 
 namespace PatternGeneratorJRL
 {

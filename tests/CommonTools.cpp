@@ -53,7 +53,7 @@ namespace PatternGeneratorJRL {
 
     void CommonInitialization(PatternGeneratorInterface &aPGI)
     {
-      const unsigned int nbMethod = 14 ;
+      const unsigned int nbMethod = 13 ;
       const char lBuffer[nbMethod][256] =
       {
         ":comheight 0.8078",

@@ -134,6 +134,7 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, PinocchioRobot *aPR)
   qpOases_ub_=NULL;
   nwsr_ = 0;
   cput_ = NULL;
+  deltaU_ = NULL;
   isQPinitialized_ = false;
   useLineSearch_ = false;
 
