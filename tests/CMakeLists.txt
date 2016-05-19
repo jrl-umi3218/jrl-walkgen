@@ -25,7 +25,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake
                ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
 
-ADD_REQUIRED_DEPENDENCY("simple_humanoid_description >= 1.0.0")
+ADD_REQUIRED_DEPENDENCY("simple_humanoid_description >= 1.0.1")
 ADD_OPTIONAL_DEPENDENCY("hrp2_14_description >= 1.0.2")
 
 #################
