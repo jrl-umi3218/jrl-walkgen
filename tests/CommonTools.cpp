@@ -39,8 +39,6 @@
 
 #include <jrl/mal/matrixabstractlayer.hh>
 
-#include <jrl/dynamics/dynamicsfactory.hh>
-
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 
 #include "TestFootPrintPGInterfaceData.h"
