@@ -17,10 +17,17 @@ sudo free -m -t
 # Add dependencies from apt
 export APT_DEPENDENCIES="doxygen doxygen-latex libboost-all-dev libeigen3-dev liblapack-dev libblas-dev gfortran"
 # Add dependencies from robot-pkg
-export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-pinocchio robotpkg-jrl-mal+jrl-mathtools"
+export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-jrl-mal+jrl-mathtools"
 
 # Add one git dependency
 export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/MaximilienNaveau/simple_humanoid_description.git"
+export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/stack-of-tasks/pinocchio.git#devel"
+export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/jrl-umi3218/jrl-mathtools.git"
+export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/jrl-umi3218/jrl-mal.git"
+
+export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DLINEAR_ALGEBRA_LIB=eigen"
+export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DBUILD_UNIT_TESTS=OFF"
+export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DBUILD_PYTHON_INTERFACE=OFF"
 
 # When this script is called the current directory is ./custom_travis
 . ./.travis/run ../.travis/before_install
