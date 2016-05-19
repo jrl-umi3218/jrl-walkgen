@@ -41,10 +41,11 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/openrobots/lib"
 
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/ros/hydro/lib/pkgconfig"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/ros/hydro/lib"
-source /opt/ros/hydro/setup.bash
 
 # When this script is called the current directory is ./custom_travis
 . ./.travis/run ../.travis/before_install
+
+source /opt/ros/hydro/setup.bash
 
 # End debug mode
 set +v
