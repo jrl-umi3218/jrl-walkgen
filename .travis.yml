@@ -22,11 +22,10 @@ before_install: ./travis_custom/custom_before_install
 install:
   - pip install --user coveralls
 script:
-  - export CMAKE_ADDITIONAL_OPTIONS="-DCMAKE_BUILD_TYPE=${BUILDTYPE}"
   - sudo free -m -t
   - travis_wait ./.travis/run ../travis_custom/custom_build
 script: ./.travis/run ../travis_custom/custom_build
-after_failure: ./.travis/run after_failure
+after_failure: ./.travis/run ../travis_custom/custom_after_failure
 after_success:
   - ./.travis/run after_success
   - export PYTHONPATH=/tmp/_ci/install/lib/python2.7/site-packages
