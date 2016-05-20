@@ -1,5 +1,5 @@
 
-cd /tmp/_ci/build/test
+cd /tmp/_ci/build/tests
 valgrind TestMorisawa2007ShortWalk64 /tmp/_ci/install/share/simple_humanoid_description/urdf/simple_humanoid.urdf /tmp/_ci/install/share/simple_humanoid_description/srdf/simple_humanoid.srdf
 
 ../.travis/run after_failure
