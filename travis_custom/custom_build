@@ -6,6 +6,8 @@ set -x
 set -v
 
 # Setup environment variables.
+source /opt/ros/hydro/setup.bash
+
 export CMAKE_ADDITIONAL_OPTIONS=" ${CMAKE_ADDITIONAL_OPTIONS} -DBUILD_UNIT_TESTS=\"ON\""
 
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/openrobots/lib/pkgconfig"
@@ -13,7 +15,7 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/openrobots/lib"
 
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/ros/hydro/lib/pkgconfig"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/ros/hydro/lib"
-source /opt/ros/hydro/setup.bash
+
 
 # Setup environment variables.
 . ./.travis/run ../.travis/build
