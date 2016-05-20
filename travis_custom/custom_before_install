@@ -24,6 +24,8 @@ export APT_DEPENDENCIES="doxygen doxygen-latex libboost-all-dev libeigen3-dev li
 export APT_DEPENDENCIES=$APT_DEPENDENCIES" ros-hydro-urdfdom ros-hydro-urdfdom-headers"
 # Add dependencies from robot-pkg
 export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-jrl-mal+jrl-mathtools"
+# add valgrind to debug
+export APT_DEPENDENCIES=$APT_DEPENDENCIES" valgrind"
 
 # Add one git dependency
 export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/MaximilienNaveau/simple_humanoid_description.git"
@@ -36,7 +38,6 @@ export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DLINEAR_ALGEBRA_LIB=
 export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DBUILD_UNIT_TESTS=OFF"
 export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DBUILD_PYTHON_INTERFACE=OFF"
 export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DCMAKE_BUILD_TYPE=RELEASE"
-export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DCMAKE_CXX_FLAGS=-O3"
 
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/openrobots/lib/pkgconfig"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/openrobots/lib"
