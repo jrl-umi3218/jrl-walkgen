@@ -23,7 +23,7 @@ export APT_DEPENDENCIES="doxygen doxygen-latex libboost-all-dev libeigen3-dev li
 # Add urdfdom from ros hydro
 export APT_DEPENDENCIES=$APT_DEPENDENCIES" ros-hydro-urdfdom ros-hydro-urdfdom-headers"
 # Add dependencies from robot-pkg
-export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-jrl-mal+jrl-mathtools"
+#export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-jrl-mal+jrl-mathtools"
 # add valgrind to debug
 export APT_DEPENDENCIES=$APT_DEPENDENCIES" valgrind"
 
@@ -39,8 +39,8 @@ export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DBUILD_UNIT_TESTS=OF
 export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DBUILD_PYTHON_INTERFACE=OFF"
 export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DCMAKE_BUILD_TYPE=RELEASE"
 
-export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/openrobots/lib/pkgconfig"
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/openrobots/lib"
+#export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/openrobots/lib/pkgconfig"
+#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/openrobots/lib"
 
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/ros/hydro/lib/pkgconfig"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/ros/hydro/lib"
