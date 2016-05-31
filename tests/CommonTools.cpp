@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Andrei  Herdt
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
@@ -39,8 +39,6 @@
 
 #include <jrl/mal/matrixabstractlayer.hh>
 
-#include <jrl/dynamics/dynamicsfactory.hh>
-
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 
 #include "TestFootPrintPGInterfaceData.h"
@@ -53,28 +51,31 @@ namespace PatternGeneratorJRL {
 
     void CommonInitialization(PatternGeneratorInterface &aPGI)
     {
-      const char lBuffer[12][256] =
-	{":comheight 0.8078",
-	 ":samplingperiod 0.005",
-	 ":previewcontroltime 1.6",
-	 ":omega 0.0",
-	 ":stepheight 0.07",
-	 ":singlesupporttime 0.78",
-	 ":doublesupporttime 0.02",
-	 ":armparameters 0.5",
-	 ":LimitsFeasibility 0.0",
-	 ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
-	 ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
-	 ":UpperBodyMotionParameters -0.1 -1.0 0.0"
-	};
-  
-      for(int i=0;i<9;i++)
+      const unsigned int nbMethod = 13 ;
+      const char lBuffer[nbMethod][256] =
+      {
+        ":comheight 0.8078",
+        ":samplingperiod 0.005",
+        ":previewcontroltime 1.6",
+        ":omega 0.0",
+        ":stepheight 0.07",
+        ":singlesupporttime 0.78",
+        ":doublesupporttime 0.02",
+        ":armparameters 0.5",
+        ":LimitsFeasibility 0.0",
+        ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
+        ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
+        ":UpperBodyMotionParameters -0.1 -1.0 0.0",
+        ":useDynamicFilter false"
+      };
+
+      for(int i=0;i<nbMethod;i++)
 	{
 	  std::istringstream strm(lBuffer[i]);
 	  aPGI.ParseCmd(strm);
 	}
       // Evaluate current state of the robot in the PG.
-      COMState   lStartingCOMPosition;
+      COMState lStartingCOMPosition;
       MAL_S3_VECTOR_TYPE(double)  lStartingZMPPosition;
       MAL_VECTOR_TYPE(double)  lStartingWaistPose;
       FootAbsolutePosition  InitLeftFootAbsPos;
@@ -85,28 +86,28 @@ namespace PatternGeneratorJRL {
 				 lStartingWaistPose,
 				 InitLeftFootAbsPos,
 				 InitRightFootAbsPos);
-      
-      cout << "Starting COM Position: " 
+
+      cout << "Starting COM Position: "
 	   << lStartingCOMPosition.x[0] << " "
 	   << lStartingCOMPosition.y[0] << " "
 	   << lStartingCOMPosition.z[0] << endl;
 
-      cout << "Starting Left Foot Pos: " 
+      cout << "Starting Left Foot Pos: "
 	   << InitLeftFootAbsPos.x << " "
 	   << InitLeftFootAbsPos.y << " "
-	   << InitLeftFootAbsPos.z << " " 
+	   << InitLeftFootAbsPos.z << " "
 	   << InitLeftFootAbsPos.theta<< " "
 	   << InitLeftFootAbsPos.omega << " "
-	   << InitLeftFootAbsPos.omega2 << " " 
+	   << InitLeftFootAbsPos.omega2 << " "
 	   << endl;
 
-      cout << "Starting Right Foot Pos: " 
+      cout << "Starting Right Foot Pos: "
 	   << InitRightFootAbsPos.x << " "
 	   << InitRightFootAbsPos.y << " "
-	   << InitRightFootAbsPos.z << " " 
+	   << InitRightFootAbsPos.z << " "
 	   << InitRightFootAbsPos.theta<< " "
 	   << InitRightFootAbsPos.omega << " "
-	   << InitRightFootAbsPos.omega2 << " " 
+	   << InitRightFootAbsPos.omega2 << " "
 	   << endl;
 
     }
@@ -114,32 +115,24 @@ namespace PatternGeneratorJRL {
 
     void getOptions(int argc,
 		    char *argv[],
-		    string &VRMLPath,
-		    string &VRMLFileName,
-		    string &SpecificitiesFileName,
-		    string &LinkJointRank,
-		    string &InitConfig,
-		    unsigned int &) // TestProfil)
+            string &urdfFullPath,
+            string &srdfFullPath,
+            unsigned int &) // TestProfil)
     {
       std::cout << "argc:" << argc << std::endl;
-      if (argc!=6)
+      if (argc!=3)
 	{
-	  cerr << " This program takes 5 arguments: " << endl;
-	  cerr << "./TestFootPrintPGInterface \
-                         PATH_TO_VRML_FILE	   \
-                         VRML_FILE_NAME		   \
-                         SPECIFICITIES_XML \
-                         LINK_JOINT_RANK	\
-                         INITIAL_CONFIGURATION" << endl;
+      cerr << " This program takes 2 arguments: " << endl;
+      cerr << "./TestFootPrintPGInterface PATH_TO_URDF_FILE PATH_TO_SRDF_FILE"
+           << endl;
 	  exit(-1);
-	}	
-      else 
+	}
+      else
 	{
-	  VRMLPath=argv[1];
-	  VRMLFileName=argv[2];
-	  SpecificitiesFileName = argv[3];
-	  LinkJointRank = argv[4];
-	  InitConfig = argv[5];
+      urdfFullPath=argv[1];
+      srdfFullPath=argv[2];
+      cout << urdfFullPath << endl ;
+      cout << srdfFullPath << endl ;
 	}
     }
   } /* End of TestSuite namespace */

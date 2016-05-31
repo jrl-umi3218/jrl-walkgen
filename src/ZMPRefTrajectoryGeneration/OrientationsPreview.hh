@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 
+ * Copyright 2010,
  *
  * Mehdi    Benallegue
  * Andrei   Herdt
@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /*
@@ -37,7 +37,8 @@
 
 #include <privatepgtypes.hh>
 #include <jrl/walkgen/pgtypes.hh>
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <Mathematics/PolynomeFoot.hh>
+#include <jrl/walkgen/pinocchiorobot.hh>
 
 namespace PatternGeneratorJRL
 {
@@ -51,7 +52,7 @@ namespace PatternGeneratorJRL
 
     /// \name Accessors
     /// \{
-    OrientationsPreview( CjrlHumanoidDynamicRobot *aHS );
+    OrientationsPreview( PinocchioRobot *aPR );
     ~OrientationsPreview();
     /// \}
 
@@ -88,12 +89,27 @@ namespace PatternGeneratorJRL
                                        const std::deque<support_state_t> & PrwSupportStates_deq,
                                        std::deque<COMState> & FinalCOMTraj_deq);
 
+    /// \brief Compute the current state for the preview of the orientation
+    ///
+    /// \param[in] Time
+    /// \param[in] CurrentIndex
+    /// \param[in] NewSamplingPeriod
+    /// \param[in] PrwSupportStates_deq
+    /// \param[out] FinalCOMTraj_deq
+    void one_iteration(double Time,
+                       const std::deque<support_state_t> & PrwSupportStates_deq);
+
+
     /// \name Accessors
     /// \{
     inline COMState const & CurrentTrunkState() const
     { return TrunkState_; };
     inline void CurrentTrunkState(const COMState & TrunkState)
     { TrunkState_ = TrunkState; };
+    inline COMState const & PreviewTrunkState() const
+    { return TrunkStateT_; };
+    inline void PreviewTrunkState(const COMState & TrunkState)
+    { TrunkStateT_ = TrunkState; };
     inline double SSLength() const
     { return SSPeriod_; };
     inline void SSLength( double SSPeriod)
@@ -210,6 +226,9 @@ namespace PatternGeneratorJRL
     /// \brief
     double SupportTimePassed_;
 
+    /// \brief
+    double LastFirstPvwSol_ ;
+
     /// \brief Numerical precision
     const static double EPS_;
 
@@ -218,6 +237,7 @@ namespace PatternGeneratorJRL
     /// \brief State of the trunk at the first previewed sampling
     COMState TrunkStateT_;
 
+    Polynome4 * TrunkStateYaw_ ;
   };
 }
 #endif /* ORIENTATIONSPREVIEW_H_ */

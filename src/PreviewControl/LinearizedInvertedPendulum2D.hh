@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, 2010, 
+ * Copyright 2009, 2010,
  *
  * Andrei Herdt
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
@@ -71,7 +71,7 @@ namespace PatternGeneratorJRL
 		      int CurrentPosition,
 		      double CX, double CY);
 
-      
+
     /*! \brief Simulate one iteration of the LIPM
       \param[in] CX: control value in the forward direction.
       \param[in] CY: control value in the left-right direction.
@@ -81,7 +81,7 @@ namespace PatternGeneratorJRL
 
   private:
 
-    /*! \name Internal parameters. 
+    /*! \name Internal parameters.
       @{
     */
     /*! \brief Control period */
@@ -92,12 +92,12 @@ namespace PatternGeneratorJRL
 
     /*! \brief Interval for interpolation */
     int m_InterpolationInterval;
-      
+
     /*! \brief Interval for robot control */
     double m_SamplingPeriod;
-      
+
     /*! @}*/
-    /* !  Matrices for the dynamical system. 
+    /* !  Matrices for the dynamical system.
        @{
     */
     /* ! Matrix regarding the state of the CoM (pos, velocity, acceleration) */
@@ -115,23 +115,23 @@ namespace PatternGeneratorJRL
 
     /* ! \brief Vector of ZMP  */
     MAL_VECTOR(m_zk,double);
-      
+
     /* ! @} */
 
   public:
-      
-    /*! \name Getter and setter of variables 
+
+    /*! \name Getter and setter of variables
       @{
     */
     /*! Getter for the CoM height */
     const double & GetComHeight() const;
-      
+
     /*! Setter for the CoM height */
     void SetComHeight(const double &);
 
     /*! Getter for the simulation period specifically*/
     const double & GetSimulationControlPeriod() const;
-      
+
     /*! Setter for the simulation period specifically*/
     void SetSimulationControlPeriod(const double &);
 
@@ -151,9 +151,14 @@ namespace PatternGeneratorJRL
 
     /*! Get state. */
     void GetState(MAL_VECTOR_TYPE(double) &lxk);
+    COMState GetState();
 
-    /*! Get state. */
-    void setState(MAL_VECTOR_TYPE(double) lxk);
+    inline com_t getState()
+    {return m_CoM ;}
+
+    /*! Set state. */
+    void setState(com_t aCoM);
+    void setState(COMState &aCoM);
     /*! @} */
 
   };

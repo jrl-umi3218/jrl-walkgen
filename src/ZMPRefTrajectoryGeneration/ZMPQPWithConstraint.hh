@@ -42,7 +42,7 @@ namespace PatternGeneratorJRL
   public:
 
     /* Default constructor. */
-    ZMPQPWithConstraint(SimplePluginManager *lSPM, string DataFile, CjrlHumanoidDynamicRobot *aHS=0);
+    ZMPQPWithConstraint(SimplePluginManager *lSPM, string DataFile, PinocchioRobot *aPR=0);
 
     /* Default destructor. */
     ~ZMPQPWithConstraint();
@@ -201,7 +201,7 @@ namespace PatternGeneratorJRL
 
   protected:
     /* ! Reference on the Humanoid Specificities. */
-    CjrlHumanoidDynamicRobot * m_HS;
+    PinocchioRobot * m_PR;
 
     /* !  Matrices for the dynamical system. 
        @{

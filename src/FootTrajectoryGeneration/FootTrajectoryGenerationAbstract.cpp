@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, 2009, 2010, 
+ * Copyright 2008, 2009, 2010,
  *
  * Francois Keith
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
@@ -34,19 +34,25 @@
 using namespace PatternGeneratorJRL;
 
 FootTrajectoryGenerationAbstract::FootTrajectoryGenerationAbstract(SimplePluginManager *lSPM,
-								   CjrlFoot *aFoot) 
-  : SimplePlugin(lSPM)
+                                   PRFoot * aFoot)
+  : SimplePlugin(lSPM),m_Foot(aFoot)
 {
   m_Omega = 0.0;
-  m_Foot= aFoot;  
   m_SamplingPeriod = 0.005;
+  m_isStepStairOn = 1;
+  m_StepHeight = 0.07;
 
-  std::string aMethodName[5] = 
+  // Define here the curving during the Step (ray defined along Y axis)
+  m_StepCurving = 0.2;
+
+
+  std::string aMethodName[5] =
     {":omega",
-     ":stepheight", 
+     ":stepheight",
      ":singlesupporttime",
      ":doublesupporttime",
-     ":samplingperiod"};
+     ":samplingperiod"
+     ":stepstairon"};
 
   for (int i=0;i<5;i++)
     {
@@ -65,6 +71,10 @@ void FootTrajectoryGenerationAbstract::CallMethod(std::string &Method,
     {
       strm >> m_Omega;
     }
+  else if (Method==":omega2")
+    {
+      strm >> m_Omega2;
+    }
   else if (Method==":singlesupporttime")
     {
       strm >> m_TSingle;
@@ -78,29 +88,33 @@ void FootTrajectoryGenerationAbstract::CallMethod(std::string &Method,
       strm >> m_SamplingPeriod;
       ODEBUG("Sampling period: " << m_SamplingPeriod);
     }
-
-
+  else if (Method==":stepheight")
+    {
+      strm >> m_StepHeight;
+      ODEBUG(":stepheight " << m_StepHeight);
+    }
 }
 
 void FootTrajectoryGenerationAbstract::UpdateFootPosition(std::deque<FootAbsolutePosition> & , //SupportFootAbsolutePositions,
 							  std::deque<FootAbsolutePosition> &, //NoneSupportFootAbsolutePositions,
-							  int , //CurrentAbsoluteIndex,  
-							  int , //IndexInitial, 
+							  int , //CurrentAbsoluteIndex,
+							  int , //IndexInitial,
 							  double , //ModulatedSingleSupportTime,
-							  int , //StepType, 
-							  int ) //LeftOrRight)
+							  int , //StepType,
+                              int ) //LeftOrRight)
 {
   LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-1: To be implemented ");
 }
 
 void FootTrajectoryGenerationAbstract::UpdateFootPosition(std::deque<FootAbsolutePosition> & ,//SupportFootAbsolutePositions,
 							  std::deque<FootAbsolutePosition> & ,//NoneSupportFootAbsolutePositions,
-							  int , // StartIndex, 
+							  int , // StartIndex,
 							  int , //k,
 							  double , //LocalInterpolationStartTime,
 							  double , //ModulatedSingleSupportTime,
-							  int , //StepType, 
+							  int , //StepType,
 							  int ) //LeftOrRight)
 {
   LTHROW("FootTrajectoryGenerationAbstract::UpdateFootPosition-2: To be implemented ");
 }
+

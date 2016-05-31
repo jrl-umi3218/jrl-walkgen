@@ -1,5 +1,5 @@
-/*
- * Copyright 2008, 2009, 2010, 
+ /*
+ * Copyright 2008, 2009, 2010,
  *
  * Olivier Stasse
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 
@@ -32,7 +32,7 @@
 #include <Debug.hh>
 using namespace std;
 
-namespace PatternGeneratorJRL 
+namespace PatternGeneratorJRL
 {
 
   AnalyticalZMPCOGTrajectory::AnalyticalZMPCOGTrajectory(int lNbOfIntervals)
@@ -71,7 +71,7 @@ namespace PatternGeneratorJRL
   void AnalyticalZMPCOGTrajectory::SetNumberOfIntervals(unsigned int lNbOfIntervals)
   {
     m_NbOfIntervals = lNbOfIntervals;
-  
+
     m_V.resize(m_NbOfIntervals);
     m_W.resize(m_NbOfIntervals);
     m_DeltaTj.resize(m_NbOfIntervals);
@@ -101,7 +101,7 @@ namespace PatternGeneratorJRL
 	  {
 	    double deltaj=0.0;
 	    deltaj = t-reftime;
-	  
+
 	    r = cosh(m_omegaj[j]*deltaj) * m_V[j] +
 	      sinh(m_omegaj[j]*deltaj) * m_W[j];
 	    ODEBUG( " coefficients hyperbolique : " << r << \
@@ -116,11 +116,11 @@ namespace PatternGeneratorJRL
 		add2r = m_ListOfCOGPolynomials[j]->Compute(deltaj);
 		ODEBUG( " add2r: " << add2r <<" " \
 			<< "Polynomial ("<<j<<") with degree (supposed:"<<  m_PolynomialDegree[j] << ")"<<endl \
-			<< "Coefficients:"); 
+			<< "Coefficients:");
 		//	      m_ListOfCOGPolynomials[j]->print();
 		r+=add2r;
 	      }
-	    else 
+	    else
 	      return false;
 	    return true;
 	  }
@@ -130,7 +130,7 @@ namespace PatternGeneratorJRL
     return false;
   }
 
- 
+
   bool AnalyticalZMPCOGTrajectory::ComputeCOMSpeed(double t, double &r)
   {
     t -= m_AbsoluteTimeReference;
@@ -144,7 +144,7 @@ namespace PatternGeneratorJRL
 	  {
 	    double deltaj=0.0;
 	    deltaj = t-reftime;
-	  
+
 	    r = m_omegaj[j] * sinh(m_omegaj[j]*deltaj) * m_V[j] +
 	      m_omegaj[j] * cosh(m_omegaj[j]*deltaj) * m_W[j];
 	    ODEBUG( " coefficients hyperbolique : " << r << \
@@ -158,11 +158,11 @@ namespace PatternGeneratorJRL
 		add2r = m_ListOfCOGPolynomials[j]->ComputeDerivative(deltaj);
 		ODEBUG( " add2r: " << add2r <<" " \
 			<< "Polynomial ("<<j<<") with degree (supposed:"<<  m_PolynomialDegree[j] << ")"<<endl \
-			<< "Coefficients:"); 
+			<< "Coefficients:");
 		//	      m_ListOfCOGPolynomials[j]->print();
 		r+=add2r;
 	      }
-	    else 
+	    else
 	      return false;
 	    return true;
 	  }
@@ -176,9 +176,8 @@ namespace PatternGeneratorJRL
   {
     double deltaj=0.0;
     deltaj = t- m_AbsoluteTimeReference - m_RefTime[j];
-	  
     r = cosh(m_omegaj[j]*deltaj) * m_V[j] +
-      sinh(m_omegaj[j]*deltaj) * m_W[j];
+        sinh(m_omegaj[j]*deltaj) * m_W[j];
     r += m_ListOfCOGPolynomials[j]->Compute(deltaj);
     return true;
   }
@@ -187,11 +186,23 @@ namespace PatternGeneratorJRL
   {
     double deltaj=0.0;
     deltaj = t- m_AbsoluteTimeReference - m_RefTime[j];
-	
+
     r = m_omegaj[j] * sinh(m_omegaj[j]*deltaj) * m_V[j] +
-	      m_omegaj[j] * cosh(m_omegaj[j]*deltaj) * m_W[j];  
+        m_omegaj[j] * cosh(m_omegaj[j]*deltaj) * m_W[j];
     r += m_ListOfCOGPolynomials[j]->ComputeDerivative(deltaj);
-    ODEBUG("ComputeCOMPSeed: " << r);
+    ODEBUG("ComputeCOMSpeed: " << r);
+    return true;
+  }
+
+  bool AnalyticalZMPCOGTrajectory::ComputeCOMAcceleration(double t, double &r, int j)
+  {
+    double deltaj=0.0;
+    deltaj = t- m_AbsoluteTimeReference - m_RefTime[j];
+
+    r = m_omegaj[j] * m_omegaj[j] * cosh(m_omegaj[j]*deltaj) * m_V[j] +
+        m_omegaj[j] * m_omegaj[j] * sinh(m_omegaj[j]*deltaj) * m_W[j];
+    r += m_ListOfCOGPolynomials[j]->ComputeSecDerivative(deltaj);
+    ODEBUG("ComputeCOMAcceleration: " << r);
     return true;
   }
 
@@ -213,18 +224,18 @@ namespace PatternGeneratorJRL
 		   " deltaj " << deltaj <<		 \
 		   " m_V[j]:" << m_V[j] <<		 \
 		   " m_W[j]:" << m_W[j] );
-	  
+
 	    if (m_ListOfZMPPolynomials[j]!=0)
 	      {
 		double add2r;
 		add2r = m_ListOfZMPPolynomials[j]->Compute(deltaj);
 		ODEBUG( " add2r: " << add2r << " " );
 		ODEBUG("Polynomial ("<<j<<") with degree (supposed:"<<  m_PolynomialDegree[j] << ")");
-		ODEBUG("Coefficients:"); 
+		ODEBUG("Coefficients:");
 		//	      m_ListOfZMPPolynomials[j]->print();
-		r+=add2r;	      
+		r+=add2r;
 	      }
-	    else 
+	    else
 	      return false;
 	    return true;
 	  }
@@ -246,7 +257,7 @@ namespace PatternGeneratorJRL
 	  {
 	    double deltaj=0.0;
 	    deltaj = t-reftime;
-	  
+
 	    r = 0.0;
 	    ODEBUG( " coefficients hyperbolique : " << r << \
 		    " m_omegaj[j]=" << m_omegaj[j] << \
@@ -259,11 +270,11 @@ namespace PatternGeneratorJRL
 		add2r = m_ListOfCOGPolynomials[j]->ComputeDerivative(deltaj);
 		ODEBUG( " add2r: " << add2r <<" " \
 			<< "Polynomial ("<<j<<") with degree (supposed:"<<  m_PolynomialDegree[j] << ")"<<endl \
-			<< "Coefficients:"); 
+			<< "Coefficients:");
 		//	      m_ListOfCOGPolynomials[j]->print();
 		r+=add2r;
 	      }
-	    else 
+	    else
 	      return false;
 	    return true;
 	  }
@@ -304,11 +315,11 @@ namespace PatternGeneratorJRL
 	    reftime += m_DeltaTj[j];
 	  }
       }
-    else 
+    else
       cerr << "Pb while initializing the time intervals. " << lTj.size() << " " << m_NbOfIntervals << endl;
     if ((int)lomegaj.size()==m_NbOfIntervals)
       m_omegaj = lomegaj;
-    else 
+    else
       cerr << "Pb while initializing the omega " <<endl;
   }
 
@@ -316,7 +327,7 @@ namespace PatternGeneratorJRL
   {
     if ((int)lPolynomialDegree.size()==m_NbOfIntervals)
       m_PolynomialDegree=lPolynomialDegree;
-  
+
     for(unsigned int i=0;i<m_PolynomialDegree.size();i++)
       {
 
@@ -324,7 +335,7 @@ namespace PatternGeneratorJRL
 	if (m_ListOfCOGPolynomials[i]!=0)
 	  delete m_ListOfCOGPolynomials[i];
 	m_ListOfCOGPolynomials[i] = new Polynome(m_PolynomialDegree[i]);
-      
+
 	//      m_ListOfCOGPolynomials[i]->print();
 	if (m_ListOfZMPPolynomials[i]!=0)
 	  delete m_ListOfZMPPolynomials[i];
@@ -390,11 +401,11 @@ namespace PatternGeneratorJRL
 
     vector<double> CoefsFromCOG;
     vector<double> CoefsForZMP;
-  
+
     if ((m_ListOfCOGPolynomials[intervalindex]!=0) &&
 	(m_ListOfZMPPolynomials[intervalindex]!=0))
       {
-      
+
 	m_ListOfCOGPolynomials[intervalindex]->GetCoefficients(CoefsFromCOG);
 	//	  m_ListOfCOGPolynomials[j]->print();
 	CoefsForZMP.resize(CoefsFromCOG.size());
@@ -404,7 +415,7 @@ namespace PatternGeneratorJRL
 	for(unsigned int i=0;i<m_PolynomialDegree[intervalindex]-1;++i)
 	  CoefsForZMP[i] = CoefsFromCOG[i] - ((double)(i+1.0)*(double)(i+2.0))*(CoefsFromCOG[i+2]/sTc);
 	m_ListOfZMPPolynomials[intervalindex]->SetCoefficients(CoefsForZMP);
-      
+
       }
 
   }
@@ -442,7 +453,7 @@ namespace PatternGeneratorJRL
 	CoefsForZMP[3] = -2.0 * CoefsForZMP[2] /(3.0 * lTj);
 	m_ListOfZMPPolynomials[anIntervalj]->SetCoefficients(CoefsForZMP);
       }
-  
+
     double Omegac = m_omegaj[anIntervalj];
     if (m_ListOfCOGPolynomials[anIntervalj]!=0)
       {
@@ -451,45 +462,33 @@ namespace PatternGeneratorJRL
 	CoefsForCOG[2] = CoefsForZMP[2];
 	CoefsForCOG[1] = CoefsForZMP[1] + CoefsForCOG[3] * 6/(Omegac *Omegac);
 	CoefsForCOG[0] = CoefsForZMP[0] + CoefsForCOG[2] * 2/(Omegac *Omegac);
-	m_ListOfCOGPolynomials[anIntervalj]->SetCoefficients(CoefsForCOG);      
-      }  
+	m_ListOfCOGPolynomials[anIntervalj]->SetCoefficients(CoefsForCOG);
+      }
   }
 
   double AnalyticalZMPCOGTrajectory::FluctuationMaximal()
   {
-    
+
     double Tmax;
     vector<double> CoefsForZMP;
     m_ListOfZMPPolynomials[0]->GetCoefficients(CoefsForZMP);
 
     Tmax = m_AbsoluteTimeReference  - 2* CoefsForZMP[2] * m_DeltaTj[0]/
       (2.0 * CoefsForZMP[2] + 3.0 * CoefsForZMP[3] * m_DeltaTj[0]);
-    
+
     return Tmax;
-    
+
   }
 
   bool AnalyticalZMPCOGTrajectory::GetIntervalIndexFromTime(double t, unsigned int &j)
   {
-    ODEBUG("Here "<< m_DeltaTj.size());
-    t -= m_AbsoluteTimeReference;
-    double reftime=0;
-    ODEBUG(" ====== CoM ====== ");
-    for(unsigned int lj=0;lj<m_DeltaTj.size();lj++)
-      {
-	ODEBUG("t: " << t << " reftime :" << reftime << " Tj["<<lj << "]= "<< m_DeltaTj[lj]);
-	if (((t+m_Sensitivity)>=reftime) && (t<=reftime+m_DeltaTj[lj]+m_Sensitivity))
-	  {
-	    j = lj;
-	    return true;
-	  }
-	reftime+=m_DeltaTj[lj];
-      }
-    return false;
+    unsigned int prev_j = 0 ;
+    return GetIntervalIndexFromTime(t, j, prev_j);
   }
 
   bool AnalyticalZMPCOGTrajectory::GetIntervalIndexFromTime(double t, unsigned int &j, unsigned int &prev_j)
   {
+    ODEBUG("Here "<< m_DeltaTj.size());
     t -= m_AbsoluteTimeReference;
     double reftime=0;
     ODEBUG(" ====== CoM ====== ");
@@ -505,13 +504,13 @@ namespace PatternGeneratorJRL
       }
     return false;
   }
-  
+
   ostream& operator <<(ostream &os,const AnalyticalZMPCOGTrajectory &obj)
   {
 
     vector<double> lV,lW;
     vector<unsigned int> lPolynomialDegrees;
-  
+
     obj.GetPolynomialDegrees(lPolynomialDegrees);
 
     unsigned int lNbOfIntervals;
@@ -528,7 +527,7 @@ namespace PatternGeneratorJRL
 	obj.GetFromListOfZMPPolynomials(i,aPolynome);
 	aPolynome->GetCoefficients(CoefsForZMP);
 	obj.GetFromListOfCOGPolynomials(i,aPolynome);
-	aPolynome->GetCoefficients(CoefsForCOG);      
+	aPolynome->GetCoefficients(CoefsForCOG);
 	os << " COG: " << endl;
 	for(unsigned int j=0;j<=lPolynomialDegrees[i];j++)
 	  {

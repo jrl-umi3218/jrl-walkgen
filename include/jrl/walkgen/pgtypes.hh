@@ -90,8 +90,8 @@ namespace PatternGeneratorJRL
 
     friend std::ostream & operator<<(std::ostream &os, const struct COMState_s & acs);
   };
-    
-  
+
+
 
   typedef struct COMState_s COMState;
 
@@ -99,11 +99,11 @@ namespace PatternGeneratorJRL
       a sequence of relative positions. */
   struct RelativeFootPosition_s
   {
-    double sx,sy,theta;
+    double sx,sy,sz,theta;
     double SStime;
     double DStime;
     int stepType;     //1:normal walking 2:one step before obstacle
-                      //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle
+                      //3:first leg over obstacle 4:second leg over obstacle 5:one step after obstacle 6 :stepping stair
     double DeviationHipHeight;
   };
   typedef struct RelativeFootPosition_s RelativeFootPosition;
@@ -145,6 +145,8 @@ namespace PatternGeneratorJRL
     double dx,dy,dz, dtheta, domega, domega2;
     /*! Acceleration of the foot. */
     double ddx,ddy,ddz, ddtheta, ddomega, ddomega2;
+    /*! Jerk of the foot. */
+    double dddx,dddy,dddz, dddtheta, dddomega, dddomega2;
     /*! Time at which this position should be reached. */
     double time;
     /*! 1:normal walking 2:one step before obstacle
@@ -161,6 +163,35 @@ namespace PatternGeneratorJRL
     os << "dx " << fap.dx << " dy " << fap.dy << " dz " << fap.dz << " dtheta " << fap.dtheta << " domega " << fap.domega << " domega2 " << fap.domega2 << std::endl;
     os << "ddx " << fap.ddx << " ddy " << fap.ddy << " ddz " << fap.ddz << " ddtheta " << fap.ddtheta << " ddomega " << fap.ddomega << " ddomega2 " << fap.ddomega2 << std::endl;
     os << "time " << fap.time << " stepType " << fap.stepType;
+    return os;
+  }
+
+  /// Structure to store the absolute foot position.
+  struct HandAbsolutePosition_t
+  {
+    /*! x, y, z in meters, theta in DEGREES. */
+    double x,y,z, theta, omega, omega2;
+    /*! Speed of the foot. */
+    double dx,dy,dz, dtheta, domega, domega2;
+    /*! Acceleration of the foot. */
+    double ddx,ddy,ddz, ddtheta, ddomega, ddomega2;
+    /*! Jerk of the hand. */
+    double dddx,dddy,dddz, dddtheta, dddomega, dddomega2;
+    /*! Time at which this position should be reached. */
+    double time;
+    /*! -1 : contact
+     *   1 : no contact
+     */
+    int stepType;
+  };
+  typedef struct HandAbsolutePosition_t HandAbsolutePosition;
+
+  inline std::ostream & operator<<(std::ostream & os, const HandAbsolutePosition& hap)
+  {
+    os << "x " << hap.x << " y " << hap.y << " z " << hap.z << " theta " << hap.theta << " omega " << hap.omega << " omega2 " << hap.omega2 << std::endl;
+    os << "dx " << hap.dx << " dy " << hap.dy << " dz " << hap.dz << " dtheta " << hap.dtheta << " domega " << hap.domega << " domega2 " << hap.domega2 << std::endl;
+    os << "ddx " << hap.ddx << " ddy " << hap.ddy << " ddz " << hap.ddz << " ddtheta " << hap.ddtheta << " ddomega " << hap.ddomega << " ddomega2 " << hap.ddomega2 << std::endl;
+    os << "time " << hap.time << " stepType " << hap.stepType;
     return os;
   }
 
@@ -218,6 +249,22 @@ namespace PatternGeneratorJRL
   inline std::ostream & operator<<(std::ostream & os, const ReferenceAbsoluteVelocity_t & rav)
   {
     os << "x " << rav.x << " y " << rav.y << " z " << rav.z << " dYaw " << rav.dYaw;
+    return os;
+  }
+
+  /// Structure to model a circle (e.g : a stricly convex obstable)
+  struct Circle_t
+  {
+    double x_0 ;
+    double y_0 ;
+    double r ;
+    double margin ;
+  };
+  typedef struct Circle_t Circle ;
+
+  inline std::ostream & operator<<(std::ostream & os, const Circle_t & circle)
+  {
+    os << "x_0 " << circle.x_0 << " y_0 " << circle.y_0 << " R " << circle.r ;
     return os;
   }
 

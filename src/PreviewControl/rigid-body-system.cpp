@@ -28,26 +28,20 @@ using namespace PatternGeneratorJRL;
 using namespace std;
 using namespace boost_ublas;
 
-RigidBodySystem::RigidBodySystem( SimplePluginManager * SPM, CjrlHumanoidDynamicRobot * aHS, SupportFSM * FSM ):
+RigidBodySystem::RigidBodySystem( SimplePluginManager * SPM, PinocchioRobot * aPR, SupportFSM * FSM ):
             mass_(0),CoMHeight_(0),T_(0),Tr_(0),Ta_(0),N_(0),multiBody_(false),
             OFTG_(0), FSM_(0)
 {
-
-  HDR_ = aHS;
+  PR_ = aPR;
   FSM_ = FSM;
-  OFTG_ = new OnLineFootTrajectoryGeneration(SPM,HDR_->leftFoot());
-
-
-
+  OFTG_ = new OnLineFootTrajectoryGeneration(SPM,PR_->leftFoot());
 }
 
 
 RigidBodySystem::~RigidBodySystem()
 {
-
   if (OFTG_!=0)
     delete OFTG_;
-
 }
 
 
@@ -63,7 +57,7 @@ RigidBodySystem::initialize(  )
   OFTG_->QPSamplingPeriod( T_ );
   OFTG_->NbSamplingsPreviewed( N_ );
   OFTG_->FeetDistance( 0.2 );
-  OFTG_->StepHeight( 0.05 );
+  OFTG_->SetStepHeight( 0.03 );
 
   // Initialize predetermined trajectories:
   // --------------------------------------
@@ -116,7 +110,7 @@ RigidBodySystem::initialize_trajectories()
   FlyingFootTrajectory_deq_.resize(NbInstantsSS);
   std::deque<rigid_body_state_t>::iterator FTIt;
   FTIt = FlyingFootTrajectory_deq_.begin();
-  OFTG_->SetParameters( FootTrajectoryGenerationStandard::Z_AXIS, SSPeriod/2.0, OFTG_->StepHeight() );
+  OFTG_->SetParameters( FootTrajectoryGenerationStandard::Z_AXIS, SSPeriod/2.0, OFTG_->GetStepHeight() );
   double LocalStartTime = 0.0;
   for( unsigned int i = 0; i < NbInstantsSS; i++)
     {
@@ -124,7 +118,7 @@ RigidBodySystem::initialize_trajectories()
         {
           LocalStartTime = SSPeriod/2.0;
           OFTG_->SetParameters( FootTrajectoryGenerationStandard::Z_AXIS, SSPeriod/2.0, 0.0,
-              OFTG_->StepHeight(), 0.0, 0.0 );
+              OFTG_->GetStepHeight(), 0.0, 0.0 );
         }
 
       FTIt->Z(0) = OFTG_->Compute( FootTrajectoryGenerationStandard::Z_AXIS,i*T_-LocalStartTime );
@@ -173,7 +167,7 @@ RigidBodySystem::precompute_trajectories( const deque<support_state_t> & Support
   // The lowest height is the height of the ankle:
   // ---------------------------------------------
   vector3d LocalAnklePosition;
-  HDR_->leftFoot()->getAnklePositionInLocalFrame( LocalAnklePosition );
+  LocalAnklePosition = PR_->leftFoot()->anklePosition ;
 
   deque<support_state_t>::const_iterator SS_it = SupportStates_deq.begin();
   SS_it++;//First support phase is current support phase

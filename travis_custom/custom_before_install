@@ -1,0 +1,55 @@
+#!/bin/bash
+set -e
+
+# Set debug mode
+set -x
+set -v
+
+# Add robotpkg
+sudo sh -c "echo \"deb http://robotpkg.openrobots.org/packages/debian precise robotpkg\" >> /etc/apt/sources.list "
+curl http://robotpkg.openrobots.org/packages/debian/robotpkg.key | sudo apt-key add -
+
+# Add ros-hydro
+sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu precise main\" > /etc/apt/sources.list.d/ros-latest.list"
+curl https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | sudo apt-key add -
+
+# show memory usage before install
+sudo free -m -t
+
+# Setup environment variables.
+
+# Add dependencies from apt
+export APT_DEPENDENCIES="doxygen doxygen-latex libboost-all-dev libeigen3-dev liblapack-dev libblas-dev gfortran"
+# Add urdfdom from ros hydro
+export APT_DEPENDENCIES=$APT_DEPENDENCIES" ros-hydro-urdfdom ros-hydro-urdfdom-headers"
+# Add dependencies from robot-pkg
+#export APT_DEPENDENCIES=$APT_DEPENDENCIES" robotpkg-jrl-mal+jrl-mathtools"
+# add valgrind to debug
+export APT_DEPENDENCIES=$APT_DEPENDENCIES" valgrind"
+
+# Add one git dependency
+export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/MaximilienNaveau/simple_humanoid_description.git"
+export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/stack-of-tasks/pinocchio.git#devel"
+export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/jrl-umi3218/jrl-mathtools.git"
+export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/jrl-umi3218/jrl-mal.git"
+export GIT_DEPENDENCIES=$GIT_DEPENDENCIES" https://github.com/humanoid-path-planner/qpOASES.git"
+
+export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DLINEAR_ALGEBRA_LIB=eigen"
+export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DBUILD_UNIT_TESTS=OFF"
+export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DBUILD_PYTHON_INTERFACE=OFF"
+export CMAKE_ADDITIONAL_OPTIONS=$CMAKE_ADDITIONAL_OPTIONS" -DCMAKE_BUILD_TYPE=RELEASE"
+
+#export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/openrobots/lib/pkgconfig"
+#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/openrobots/lib"
+
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/ros/hydro/lib/pkgconfig"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/ros/hydro/lib"
+
+# When this script is called the current directory is ./custom_travis
+. ./.travis/run ../.travis/before_install
+
+source /opt/ros/hydro/setup.bash
+
+# End debug mode
+set +v
+set +x

@@ -16,6 +16,10 @@
 # Make sure to find Debug.h
 INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src)
 
+# Add Boost path to include directories.
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+message (STATUS "-- Boost Dir : " ${Boost_INCLUDE_DIRS} )
+
 # add flag to compile qld.cc
 IF(WIN32)
 ADD_DEFINITIONS("/D __STDC__")
@@ -25,7 +29,89 @@ IF(USE_LSSOL)
 ADD_DEFINITIONS("/DLSSOL_FOUND")
 ENDIF(USE_LSSOL)
 
+SET(INCLUDES
+  PreviewControl/rigid-body.hh
+  PreviewControl/OptimalControllerSolver.hh
+  PreviewControl/rigid-body-system.hh
+  PreviewControl/ZMPPreviewControlWithMultiBodyZMP.hh
+  PreviewControl/SupportFSM.hh
+  PreviewControl/LinearizedInvertedPendulum2D.hh
+  PreviewControl/PreviewControl.hh
+  PreviewControl/SupportFSM_backup.hh
+  FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.hh
+  FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.hh
+  FootTrajectoryGeneration/FootTrajectoryGenerationStandard.hh
+  FootTrajectoryGeneration/LeftAndRightFootTrajectoryGenerationMultiple.hh
+  Debug.hh
+  SimplePluginManager.hh
+  privatepgtypes.hh
+#  MultiContactRefTrajectoryGeneration/MultiContactHirukawa.hh
+  patterngeneratorinterfaceprivate.hh
+  Mathematics/FootConstraintsAsLinearSystem.hh
+  Mathematics/Polynome.hh
+  Mathematics/ConvexHull.hh
+  Mathematics/Bsplines.hh
+  Mathematics/StepOverPolynome.hh
+  Mathematics/AnalyticalZMPCOGTrajectory.hh
+  Mathematics/qld.hh
+  Mathematics/PLDPSolver.hh
+  Mathematics/FootHalfSize.hh
+  Mathematics/relative-feet-inequalities.hh
+  Mathematics/intermediate-qp-matrices.hh
+  Mathematics/PolynomeFoot.hh
+  Mathematics/PLDPSolverHerdt.hh
+  Mathematics/OptCholesky.hh
+  StepStackHandler.hh
+  configJRLWPG.hh
+  Clock.hh
+  GlobalStrategyManagers/CoMAndFootOnlyStrategy.hh
+  GlobalStrategyManagers/GlobalStrategyManager.hh
+  GlobalStrategyManagers/DoubleStagePreviewControlStrategy.hh
+  ZMPRefTrajectoryGeneration/AnalyticalMorisawaAbstract.hh
+  ZMPRefTrajectoryGeneration/DynamicFilter.hh
+  ZMPRefTrajectoryGeneration/ZMPConstrainedQPFastFormulation.hh
+  ZMPRefTrajectoryGeneration/qp-problem.hh
+  ZMPRefTrajectoryGeneration/ZMPDiscretization.hh
+  ZMPRefTrajectoryGeneration/OrientationsPreview.hh
+  ZMPRefTrajectoryGeneration/mpc-trajectory-generation.hh
+  ZMPRefTrajectoryGeneration/ZMPRefTrajectoryGeneration.hh
+  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedQP.hh
+  ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.hh
+  ZMPRefTrajectoryGeneration/generator-vel-ref.hh
+  ZMPRefTrajectoryGeneration/nmpc_generator.hh
+  ZMPRefTrajectoryGeneration/FilteringAnalyticalTrajectoryByPreviewControl.hh
+  ZMPRefTrajectoryGeneration/problem-vel-ref.hh
+  ZMPRefTrajectoryGeneration/ZMPQPWithConstraint.hh
+  SimplePlugin.hh
+  portability/gettimeofday.hh
+  portability/bzero.hh
+  MotionGeneration/ComAndFootRealizationByGeometry.hh
+  MotionGeneration/StepOverPlanner.hh
+  MotionGeneration/WaistHeightVariation.hh
+  MotionGeneration/ComAndFootRealization.hh
+  MotionGeneration/GenerateMotionFromKineoWorks.hh
+  MotionGeneration/UpperBodyMotion.hh
+  MotionGeneration/CollisionDetector.hh
+  ../tests/CommonTools.hh
+  ../tests/ClockCPUTime.hh
+  ../tests/TestObject.hh
+  ../doc/additionalHeader/modules.hh
+  ../include/jrl/walkgen/pgtypes.hh
+  ../include/jrl/walkgen/patterngeneratorinterface.hh
+  ../include/jrl/walkgen/pinocchiorobot.hh
+)
+
+IF(${qpOASES_FOUND} STREQUAL "TRUE")
+SET(INCLUDES
+  ${INCLUDES}
+  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.hh
+  ZMPRefTrajectoryGeneration/nmpc_generator.hh
+)
+ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
+
 SET(SOURCES
+  ${INCLUDES}
+  RobotDynamics/pinocchiorobot.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationAbstract.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationStandard.cpp
   FootTrajectoryGeneration/FootTrajectoryGenerationMultiple.cpp
@@ -40,6 +126,7 @@ SET(SOURCES
 #  Mathematics/FootConstraintsAsLinearSystemForVelRef.cpp
   Mathematics/FootHalfSize.cpp
   Mathematics/OptCholesky.cpp
+  Mathematics/Bsplines.cpp
   Mathematics/Polynome.cpp
   Mathematics/PolynomeFoot.cpp
   Mathematics/PLDPSolver.cpp
@@ -67,6 +154,8 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/qp-problem.cpp
   ZMPRefTrajectoryGeneration/generator-vel-ref.cpp
   ZMPRefTrajectoryGeneration/mpc-trajectory-generation.cpp
+  ZMPRefTrajectoryGeneration/DynamicFilter.cpp
+#  MultiContactRefTrajectoryGeneration/MultiContactHirukawa.cc
   MotionGeneration/StepOverPlanner.cpp
   MotionGeneration/CollisionDetector.cpp
   MotionGeneration/WaistHeightVariation.cpp
@@ -81,15 +170,46 @@ SET(SOURCES
   Clock.cpp
   portability/gettimeofday.cc
   privatepgtypes.cpp
-  )
+)
 
-ADD_LIBRARY(jrl-walkgen SHARED ${SOURCES})
-SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
-INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
+IF(${qpOASES_FOUND} STREQUAL "TRUE")
+SET(SOURCES
+  ${SOURCES}
+  ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.cpp
+  ZMPRefTrajectoryGeneration/nmpc_generator.cpp
+)
+ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
 
-PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen abstract-robot-dynamics)
-PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-mal)
-PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen jrl-dynamics)
+
+# prefix and suffix each element of list by ${prefix}elemnt${suffix}
+macro(ADDPREFIX newlist prefix list_name)
+    # create empty list - necessary?
+    SET(${newlist})
+
+     # prefix and suffix elements
+    foreach(l ${${list_name}})
+      list(APPEND ${newlist} ${prefix}${l} )
+    endforeach()
+
+endmacro(ADDPREFIX)
+
+IF ( '${CMAKE_EXTRA_GENERATOR}' STREQUAL 'CodeBlocks' )
+    ADDPREFIX(${PROJECT_NAME}_ABSOLUTE_HEADERS  "${CMAKE_SOURCE_DIR}/"  ${PROJECT_NAME}_HEADERS)
+ENDIF ( '${CMAKE_EXTRA_GENERATOR}' STREQUAL 'CodeBlocks' )
+
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCES} ${${PROJECT_NAME}_ABSOLUTE_HEADERS})
+
+# Define dependencies
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta ")
+PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME} jrl-mal)
+PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME} pinocchio)
+
 IF(USE_LSSOL)
- PKG_CONFIG_USE_DEPENDENCY(jrl-walkgen lssol)
+ PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME} lssol)
 ENDIF(USE_LSSOL)
+IF(${qpOASES_FOUND} STREQUAL "TRUE")
+  TARGET_LINK_LIBRARIES(jrl-walkgen ${qpOASES_LIBRARIES})
+ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
+
+INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
+SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})

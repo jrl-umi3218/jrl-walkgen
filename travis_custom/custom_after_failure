@@ -1,0 +1,19 @@
+# Setup environment variables.
+source /opt/ros/hydro/setup.bash
+
+export CMAKE_ADDITIONAL_OPTIONS=" ${CMAKE_ADDITIONAL_OPTIONS} -DBUILD_UNIT_TESTS=\"ON\""
+
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/openrobots/lib/pkgconfig"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/openrobots/lib"
+
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/ros/hydro/lib/pkgconfig"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/ros/hydro/lib"
+
+env
+
+cd /tmp/_ci/build/tests
+valgrind TestMorisawa2007ShortWalk64 /tmp/_ci/install/share/simple_humanoid_description/urdf/simple_humanoid.urdf /tmp/_ci/install/share/simple_humanoid_description/srdf/simple_humanoid.srdf
+
+
+
+../.travis/run ../.travis/after_failure

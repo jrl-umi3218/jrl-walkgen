@@ -45,10 +45,10 @@ double Polynome::Compute(double t)
 {
   double r=0.0,pt=1.0;
   for(unsigned int i=0;i<m_Coefficients.size();i++)
-    {
-      r += m_Coefficients[i]*pt;
-      pt *=t;
-    }
+  {
+    r += m_Coefficients[i]*pt;
+    pt *=t;
+  }
   return r;
 }
 
@@ -56,10 +56,10 @@ double Polynome::ComputeDerivative(double t)
 {
   double r=0,pt=1;
   for(unsigned int i=1;i<m_Coefficients.size();i++)
-    {
-      r += i*m_Coefficients[i]*pt;
-      pt *=t;
-    }
+  {
+    r += i*m_Coefficients[i]*pt;
+    pt *=t;
+  }
   return r;
 }
 
@@ -67,16 +67,27 @@ double Polynome::ComputeSecDerivative(double t)
 {
   double r=0,pt=1;
   for(unsigned int i=2;i<m_Coefficients.size();i++)
-    {
-      r += i*(i-1)*m_Coefficients[i]*pt;
-      pt *=t;
-    }
+  {
+    r += i*(i-1)*m_Coefficients[i]*pt;
+    pt *=t;
+  }
+  return r;
+}
+
+double Polynome::ComputeJerk(double t)
+{
+  double r=0,pt=1;
+  for(unsigned int i=3;i<m_Coefficients.size();i++)
+  {
+    r += i*(i-1)*(i-2)*m_Coefficients[i]*pt;
+    pt *=t;
+  }
   return r;
 }
 
 void Polynome::GetCoefficients(vector<double> &lCoefficients) const
 {
- lCoefficients = m_Coefficients;
+  lCoefficients = m_Coefficients;
 }
 
 

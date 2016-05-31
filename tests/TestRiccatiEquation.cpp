@@ -25,11 +25,127 @@
 /*! \file TestRiccatiEquation.cpp
   \brief Example to solve the Riccati Equation for the preview control. */
 
+#define NB_OF_FIELDS 1
+
 #include <iostream>
 #include <fstream>
+#include <Debug.hh>
 #include "PreviewControl/OptimalControllerSolver.hh"
 
 using namespace std;
+
+bool compareDebugFiles( string fileName )
+{
+  ifstream alif;
+  unsigned max_nb_of_pbs=100;
+  unsigned nb_of_pbs = 0;
+  ODEBUG("Report : " << fileName);
+  alif.open(fileName.c_str(),ifstream::in);
+  if (!alif.is_open())
+  {
+    std::cerr << "Unable to open "<< fileName << std::endl;
+    return -1;
+  }
+
+  ifstream arif;
+  string refFileName = fileName + "ref" ;
+  arif.open(refFileName.c_str(),ifstream::in);
+  ODEBUG("ReportRef : " << refFileName);
+
+  if (!arif.is_open())
+  {
+    std::cerr << "Unable to open "<< refFileName << std::endl;
+    return -1;
+  }
+
+
+  ofstream areportof;
+  string aFileName ;
+  aFileName = fileName ;
+  aFileName += ".report";
+  areportof.open(aFileName.c_str(),ofstream::out);
+
+  // Time
+  double LocalInput[NB_OF_FIELDS], ReferenceInput[NB_OF_FIELDS];
+  bool finalreport = true;
+  unsigned long int nblines = 0;
+  bool endofinspection=false;
+
+  // Find size of the two files.
+  alif.seekg (0, alif.end);
+  unsigned long int alif_length = (unsigned long int)alif.tellg();
+  alif.seekg (0, alif.beg);
+
+  arif.seekg (0, arif.end);
+  unsigned long int arif_length = (unsigned long int)arif.tellg();
+  arif.seekg (0, arif.beg);
+
+  while ((!alif.eof()) &&
+         (!arif.eof()) &&
+         (!endofinspection))
+  {
+    for (unsigned int i=0;i<NB_OF_FIELDS;i++)
+    {
+      alif >> LocalInput[i];
+      if (alif.eof())
+      {
+        endofinspection =true;
+        break;
+      }
+    }
+    if (endofinspection)
+      break;
+
+    for (unsigned int i=0;i<NB_OF_FIELDS;i++)
+    {
+      arif >> ReferenceInput[i];
+      if (arif.eof())
+      {
+        endofinspection =true;
+        break;
+      }
+    }
+    if (endofinspection)
+      break;
+
+
+    for (unsigned int i=0;i<NB_OF_FIELDS;i++)
+    {
+      if  (fabs(LocalInput[i]-
+                ReferenceInput[i])>=1e-6)
+      {
+        finalreport = false;
+        ostringstream oss;
+        oss << "l: " << nblines
+            << " col:" << i
+            << " ref: " << ReferenceInput[i]
+               << " now: " << LocalInput[i]
+                  << " " << nb_of_pbs
+                  <<std::endl;
+        areportof << oss.str();
+        std::cout << oss.str();
+        nb_of_pbs++;
+        if(nb_of_pbs>max_nb_of_pbs)
+        {
+          endofinspection=true;
+        }
+      }
+    }
+
+    nblines++;
+    if ((nblines*2> alif_length) ||
+        (nblines*2> arif_length))
+    {
+      endofinspection=true;
+      break;
+    }
+  }
+
+  alif.close();
+  arif.close();
+  areportof.close();
+  return finalreport;
+}
 
 int main()
 {
@@ -110,14 +226,14 @@ int main()
 
   anOCS->GetF(lF);
 
-  aof.open("WeightsOutput.dat",ofstream::out);
+  aof.open("TestRiccatiEquationWeightsWithoutInitialPose.dat",ofstream::out);
 
   for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lF);li++)
     {
       aof << lF(li,0) << endl;
     }
   aof.close();
-
+  bool sameFile = compareDebugFiles( "TestRiccatiEquationWeightsWithoutInitialPose.dat" );
   delete anOCS;
 
 
@@ -155,7 +271,7 @@ int main()
 
   anOCS->GetF(lF);
 
-  aof.open("WeightsOutput2.dat",ofstream::out);
+  aof.open("TestRiccatiEquationWeightsWithInitialPose.dat",ofstream::out);
 
   for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lF);li++)
     {
@@ -163,6 +279,16 @@ int main()
     }
   aof.close();
 
+  bool sameFile2 = compareDebugFiles( "TestRiccatiEquationWeightsWithInitialPose.dat" );
   delete anOCS;
 
+  if (sameFile && sameFile2){
+    cout << "Passed test " << endl;
+    return 0 ;
+  }
+  else
+  {
+    cout << "Failed test " << endl;
+    return -1;
+  }
 }

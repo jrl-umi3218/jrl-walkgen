@@ -31,7 +31,7 @@
 
 #include <ZMPRefTrajectoryGeneration/mpc-trajectory-generation.hh>
 
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <jrl/walkgen/pinocchiorobot.hh>
 #include <ZMPRefTrajectoryGeneration/qp-problem.hh>
 #include <PreviewControl/SupportFSM.hh>
 #include <PreviewControl/LinearizedInvertedPendulum2D.hh>
@@ -87,7 +87,7 @@ namespace PatternGeneratorJRL
     ///
     /// \param[out] Pb
     /// \param[in] Solution
-    void build_constraints( QPProblem & Pb, const solution_t & Solution );
+    void build_constraints(QPProblem & Pb, solution_t &Solution );
 
     /// \brief Build the constant part of the objective
     ///
@@ -119,7 +119,30 @@ namespace PatternGeneratorJRL
     { IntermedData_->SupportState(SupportState); };
     inline void CoM(const com_t & CoM)
     { IntermedData_->CoM(CoM); };
+    inline void LastFootSol(const solution_t & Solution)
+    {
+      if(Solution.Solution_vec.size()>2*N_)
+      {
+        unsigned NbStepPrvw = Solution.SupportStates_deq.back().StepNumber ;
+        LastFootSolX_ = Solution.Solution_vec[2*N_];
+        LastFootSolY_ = Solution.Solution_vec[2*N_+NbStepPrvw];
+      }
+      else
+      {
+        LastFootSolX_ = 0.0 ;
+        LastFootSolY_ = 0.0 ;
+      }
+    }
+
     /// \}
+
+		/// \brief Generate a queue of inequality constraints on
+    /// the feet positions with respect to previous foot positions
+    ///
+    /// \param[out] Inequalities
+    /// \param[in] SupportStates_deq
+    void build_inequalities_feet(linear_inequality_t & Inequalities,
+        const std::deque<support_state_t> & SupportStates_deq) const;
 
     //
     // Protected methods
@@ -136,14 +159,6 @@ namespace PatternGeneratorJRL
     /// \param[out] Inequalities
     /// \param[in] SupportStates_deq
     void build_inequalities_cop(linear_inequality_t & Inequalities,
-        const std::deque<support_state_t> & SupportStates_deq) const;
-
-    /// \brief Generate a queue of inequality constraints on
-    /// the feet positions with respect to previous foot positions
-    ///
-    /// \param[out] Inequalities
-    /// \param[in] SupportStates_deq
-    void build_inequalities_feet(linear_inequality_t & Inequalities,
         const std::deque<support_state_t> & SupportStates_deq) const;
 
     /// \brief Generate a queue of inequality constraints on
@@ -187,6 +202,12 @@ namespace PatternGeneratorJRL
     void build_eq_constraints_feet( const std::deque<support_state_t> & SupportStates_deq,
         unsigned int NbStepsPreviewed, QPProblem & Pb );
 
+    /// \brief Compute feet equality constraints to restrain the previewed foot position
+    /// some iteration before landing
+    /// \param[in] Solution
+    /// \param[out] Pb
+    void build_eq_constraints_limitPosFeet(const solution_t & Solution,QPProblem & Pb);
+
     /// \brief Initialize inequality matrices
     ///
     /// \param[out] Inequalities
@@ -219,8 +240,8 @@ namespace PatternGeneratorJRL
     IntermedQPMat * IntermedData_;
     RigidBodySystem * Robot_;
     RelativeFeetInequalities * RFI_;
-
-
+    double LastFootSolX_ ;
+    double LastFootSolY_ ;
     //
     //Private members
     //

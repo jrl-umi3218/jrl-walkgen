@@ -46,7 +46,7 @@ using namespace PatternGeneratorJRL;
 
 ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginManager *lSPM, 
 								 string DataFile,
-								 CjrlHumanoidDynamicRobot *aHS) :
+								 PinocchioRobot *aPR) :
   ZMPRefTrajectoryGeneration(lSPM)
 {
   m_Q = 0;
@@ -55,13 +55,13 @@ ZMPConstrainedQPFastFormulation::ZMPConstrainedQPFastFormulation(SimplePluginMan
   m_FastFormulationMode = PLDP;
 
   /*! Getting the ZMP reference from Kajita's heuristic. */
-  m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aHS);
+  m_ZMPD = new ZMPDiscretization(lSPM,DataFile,aPR);
 
   /*! For simulating the linearized inverted pendulum in 2D. */
   m_2DLIPM = new LinearizedInvertedPendulum2D();
 
   /*! For computing the stability constraints from the feet positions. */
-  m_FCALS = new FootConstraintsAsLinearSystem(lSPM,aHS);
+  m_FCALS = new FootConstraintsAsLinearSystem(lSPM,aPR);
 
   // Register method to handle
   string aMethodName[1] = 

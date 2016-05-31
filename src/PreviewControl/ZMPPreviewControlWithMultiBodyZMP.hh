@@ -161,7 +161,7 @@ namespace PatternGeneratorJRL
       ComAndFootRealization *m_ComAndFootRealization;
 
       /*! Store a reference to the object handling humanoid dynamics */
-      CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot;
+      PinocchioRobot * m_PinocchioRobot;
 
       /*! Number of iterations. */
       unsigned long int m_NumberOfIterations;
@@ -490,14 +490,14 @@ namespace PatternGeneratorJRL
       /*! \name Setter and getter for the jrlHumanoidDynamicRobot object. */
       /*! @param[in] aHumanoidDynamicRobot: an object able to compute dynamic parameters
 	of the robot. */
-      inline  bool setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot *aHumanoidDynamicRobot)
-      { m_HumanoidDynamicRobot = aHumanoidDynamicRobot;
+      inline  bool setPinocchioRobot(PinocchioRobot *aPinocchioRobot)
+      { m_PinocchioRobot = aPinocchioRobot;
 	return true;}
       
       /*! Returns the object able to compute the dynamic parameters
 	of the robot. */
-      inline CjrlHumanoidDynamicRobot * getHumanoidDynamicRobot() const
-	{ return m_HumanoidDynamicRobot;}
+      inline PinocchioRobot * getPinocchioRobot() const
+    { return m_PinocchioRobot;}
     
       /*! Set the strategy to handle the preview control stages. */
       void SetStrategyForPCStages(int Strategy);

@@ -46,7 +46,7 @@ namespace PatternGeneratorJRL
 
     /* Default constructor. */
     ZMPConstrainedQPFastFormulation(SimplePluginManager *lSPM, string DataFile, 
-				    CjrlHumanoidDynamicRobot *aHS=0);
+				    PinocchioRobot *aPR=0);
 
     /* Default destructor. */
     ~ZMPConstrainedQPFastFormulation();

@@ -48,7 +48,7 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
 {
 
   m_ComAndFootRealization = 0;
-  m_HumanoidDynamicRobot = 0;
+  m_PinocchioRobot = 0;
 
   m_StageStrategy = ZMPCOM_TRAJECTORY_FULL;
 
@@ -72,7 +72,7 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
   RESETDEBUG5("DebugDataCheckZMP1.txt");
   RESETDEBUG4("2ndStage.dat");
   RESETDEBUG5("ZMPPCWMZOGSOC.dat");
-  // Sampling period.
+  // Sampling period.DMB
   m_SamplingPeriod = -1;
   
   RegisterMethods();
@@ -161,13 +161,13 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    aRightFootPosition(4) = aRightFAP.omega;
 
    /* Get the current configuration vector */
-   CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
+   CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
 
    /* Get the current velocity vector */
-   CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
+   CurrentVelocity = m_PinocchioRobot->currentVelocity();
 
    /* Get the current acceleration vector */
-   CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
+   CurrentAcceleration = m_PinocchioRobot->currentAcceleration();
 
    m_ComAndFootRealization->ComputePostureForGivenCoMAndFeetPosture(aCOMState, aCOMSpeed, aCOMAcc,
 								    aLeftFootPosition,
@@ -181,13 +181,13 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    if (StageOfTheAlgorithm==0)
      {
        /* Update the current configuration vector */
-       m_HumanoidDynamicRobot->currentConfiguration(CurrentConfiguration);
+       m_PinocchioRobot->currentConfiguration(CurrentConfiguration);
 
        /* Update the current velocity vector */
-       m_HumanoidDynamicRobot->currentVelocity(CurrentVelocity);
+       m_PinocchioRobot->currentVelocity(CurrentVelocity);
 
        /* Update the current acceleration vector */
-       m_HumanoidDynamicRobot->currentAcceleration(CurrentAcceleration);
+       m_PinocchioRobot->currentAcceleration(CurrentAcceleration);
      }
  }
 
@@ -447,21 +447,16 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 
  int ZMPPreviewControlWithMultiBodyZMP::EvaluateMultiBodyZMP(int /* StartingIteration */)
  {
-   string sComputeZMP("ComputeBackwardDynamics");
-   string sZMPtrue("true");
-
    ODEBUG("Start EvaluateMultiBodyZMP");
-   // Call the  Dynamic Multi Body computation of the dynamic parameters.
-   m_HumanoidDynamicRobot->setProperty(sComputeZMP,sZMPtrue);
-   m_HumanoidDynamicRobot->computeForwardKinematics();
+   m_PinocchioRobot->computeInverseDynamics();
 
    // Call the Humanoid Dynamic Multi Body robot model to
    // compute the ZMP related to the motion found by CoMAndZMPRealization.
    MAL_S3_VECTOR_TYPE(double) ZMPmultibody;
-   ZMPmultibody = m_HumanoidDynamicRobot->zeroMomentumPoint();
+   m_PinocchioRobot->zeroMomentumPoint(ZMPmultibody);
    ODEBUG4(ZMPmultibody[0] << " " << ZMPmultibody[1], "DebugDataCheckZMP1.txt");
    MAL_S3_VECTOR_TYPE(double) CoMmultibody;
-   CoMmultibody = m_HumanoidDynamicRobot->positionCenterOfMass();
+   m_PinocchioRobot->positionCenterOfMass(CoMmultibody);
    ODEBUG("Stage 2");
    // Fill the delta ZMP FIFO for the second stage of the control.
    ZMPPosition aZMPpos;
@@ -472,12 +467,9 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    aZMPpos.stepType = 1;
    aZMPpos.time = m_FIFOZMPRefPositions[0].time;
    ODEBUG("Stage 3");
-   string inProperty("Iteration");
-   string inValue("-1");
-   m_HumanoidDynamicRobot->getProperty(inProperty,inValue);
    MAL_VECTOR_TYPE(double) CurrentConfiguration;
    /* Get the current configuration vector */
-   CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
+   CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
 
    ODEBUG("Stage 4");
    m_FIFODeltaZMPPositions.push_back(aZMPpos);
@@ -494,22 +486,11 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 					      deque<FootAbsolutePosition> &RightFootPositions)
  {
    m_NumberOfIterations = 0;
-   MAL_VECTOR_TYPE(double) CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
-   MAL_VECTOR_TYPE(double) CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
-   MAL_VECTOR_TYPE(double) CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
+   MAL_VECTOR_TYPE(double) CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
+   MAL_VECTOR_TYPE(double) CurrentVelocity = m_PinocchioRobot->currentVelocity();
+   MAL_VECTOR_TYPE(double) CurrentAcceleration = m_PinocchioRobot->currentAcceleration();
 
    m_PC->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
-
-   string inProperty[5]={"TimeStep","ComputeAcceleration",
-			 "ComputeBackwardDynamics", "ComputeZMP",
-			 "ResetIteration"};
-   ostringstream oss;
-   oss << m_SamplingPeriod;
-   string inValue[5]={oss.str(),"false","false","true","true"};
-
-   for(unsigned int i=0;i<5;i++)
-     m_HumanoidDynamicRobot->setProperty(inProperty[i],
-					 inValue[i]);
 
    SetupFirstPhase(ZMPRefPositions,
 		   COMStates,
@@ -535,7 +516,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
  {
    ODEBUG6("Beginning of Setup 0 ","DebugData.txt");
    ODEBUG("Setup");
-   double zmpx2, zmpy2;
+   //double zmpx2, zmpy2;
 
 
    m_sxzmp =0.0;
@@ -579,7 +560,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    //  m_sxzmp=-StartingCOMState[0];m_syzmp=-StartingCOMState[1];
    //  zmpx2=StartingCOMState[0];zmpy2=StartingCOMState[1];
    m_sxzmp = 0.0; m_syzmp =0.0;
-   zmpx2 = 0.0; zmpy2 = 0.0;
+   //zmpx2 = 0.0; zmpy2 = 0.0;
 
    m_FIFODeltaZMPPositions.clear();
    m_FIFOCOMStates.clear();
@@ -589,16 +570,16 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    MAL_VECTOR(CurrentVelocity,double);
    MAL_VECTOR(CurrentAcceleration,double);
    /* Get the current configuration vector */
-   CurrentConfiguration = m_HumanoidDynamicRobot->currentConfiguration();
-   CurrentVelocity = m_HumanoidDynamicRobot->currentVelocity();
-   CurrentAcceleration = m_HumanoidDynamicRobot->currentAcceleration();
+   CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
+   CurrentVelocity = m_PinocchioRobot->currentVelocity();
+   CurrentAcceleration = m_PinocchioRobot->currentAcceleration();
 
    for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentVelocity);i++)
      {
        CurrentVelocity[i] = CurrentAcceleration[i] = 0.0;
      }
-   m_HumanoidDynamicRobot->currentVelocity(CurrentVelocity);
-   m_HumanoidDynamicRobot->currentAcceleration(CurrentAcceleration);
+   m_PinocchioRobot->currentVelocity(CurrentVelocity);
+   m_PinocchioRobot->currentAcceleration(CurrentAcceleration);
 
  #ifdef _DEBUG_MODE_ON_
    m_FIFOTmpZMPPosition.clear();
@@ -627,9 +608,9 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    ODEBUG("m_FIFOCOMStates["<<localindex<<"]=" << m_FIFOCOMStates[localindex].x[0] << " " << 
 	   m_FIFOCOMStates[localindex].y[0] << " " << m_FIFOCOMStates[localindex].z[0] <<
 	   " m_FIFOCOMStates.size()=" <<m_FIFOCOMStates.size());
-   COMState acompos = m_FIFOCOMStates[localindex];
-   FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[localindex];
-   FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[localindex];
+   //COMState acompos = m_FIFOCOMStates[localindex];
+   //FootAbsolutePosition aLeftFAP = m_FIFOLeftFootPosition[localindex];
+   //FootAbsolutePosition aRightFAP = m_FIFORightFootPosition[localindex];
 
    ODEBUG4SIMPLE(m_FIFOZMPRefPositions[0].px << " " <<
 		 m_FIFOZMPRefPositions[0].py << " " <<

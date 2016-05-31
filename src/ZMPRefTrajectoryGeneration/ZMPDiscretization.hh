@@ -45,7 +45,7 @@
 using namespace::std;
 
 /*! Abstract robot dynamics includes */
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
+#include <jrl/walkgen/pinocchiorobot.hh>
 
 /*! Framework includes */
 #include <Mathematics/PolynomeFoot.hh>
@@ -94,7 +94,7 @@ namespace PatternGeneratorJRL
       public :
     
       /*!  Constructor */
-      ZMPDiscretization(SimplePluginManager *lSPM,string DataFile="",CjrlHumanoidDynamicRobot *aHDR=0);
+      ZMPDiscretization(SimplePluginManager *lSPM,string DataFile="",PinocchioRobot *aHDR=0);
       
       /*!  Destructor */
       ~ZMPDiscretization();
@@ -304,7 +304,7 @@ namespace PatternGeneratorJRL
       
       /*!  Keep an object which relates the specificities
 	with an abstract layer. */
-      CjrlHumanoidDynamicRobot *m_HS;
+      PinocchioRobot *m_PR;
       
       /* !  Matrices for the dynamical system. */
       MAL_MATRIX(m_A,double);

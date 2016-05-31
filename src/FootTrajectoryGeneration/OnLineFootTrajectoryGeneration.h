@@ -46,7 +46,7 @@ namespace PatternGeneratorJRL
     //
   public:
 
-    OnLineFootTrajectoryGeneration(SimplePluginManager *lSPM,CjrlFoot *aFoot);
+    OnLineFootTrajectoryGeneration(SimplePluginManager *lSPM, PRFoot *aFoot);
 
     virtual ~OnLineFootTrajectoryGeneration();
 
@@ -67,6 +67,14 @@ namespace PatternGeneratorJRL
         deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
         deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
 
+    virtual void interpolate_feet_positions(double Time, unsigned CurrentIndex,
+        const PatternGeneratorJRL::support_state_t &CurrentSupport,
+        std::vector<double> FootStepX,
+        std::vector<double> FootStepY,
+        std::vector<double> FootStepYaw,
+        deque<FootAbsolutePosition> &FinalLeftFootTraj_deq,
+        deque<FootAbsolutePosition> &FinalRightFootTraj_deq);
+
     /// \name Accessors
     /// \{
     inline double QPSamplingPeriod() const
@@ -81,10 +89,6 @@ namespace PatternGeneratorJRL
     { return FeetDistanceDS_; };
     inline void FeetDistance( double FeetDistance )
     { FeetDistanceDS_ = FeetDistance; };
-    inline void StepHeight( double StepHeight )
-    { StepHeight_ = StepHeight; };
-    inline double StepHeight()
-    { return StepHeight_; };
     /// \}
 
     //
@@ -104,8 +108,8 @@ namespace PatternGeneratorJRL
 
 
     /// \brief Compute the position of the swinging and the stance foot.
-    /// Use polynomial of 3rd order for the X-axis, Y-axis,
-    /// orientation in the X-Z axis, and orientation in the X-Y axis.
+    /// Use polynomials for the X-axis, Y-axis,
+    /// orientation in the Oy axis, and orientation in the Oz axis.
     /// Use a 4th order polynome for the Z-axis.
     ///
     /// \param SupportFootTraj_deq: Queue of positions for the support foot.
@@ -124,6 +128,14 @@ namespace PatternGeneratorJRL
         double UnlockedSwingPeriod,
         int StepType, int LeftOrRight);
 
+    /// \brief Compute the results of the polynome at time "t".
+    /// And fill the current none support foot absolute positions obect.
+    ///
+    /// \param t : the time
+    /// \param curr_NSFAP : absolute position for the swinging
+    virtual void ComputeXYThetaFootPosition(double t,
+                                     FootAbsolutePosition& curr_NSFAP);
+
     //
     // Protected members
     //
@@ -138,12 +150,14 @@ namespace PatternGeneratorJRL
     /// \brief Distance between feet centers in ds phase
     double FeetDistanceDS_;
 
-    /// \brief Height of the flying foot in the middle of the SS phase
-    double StepHeight_;
-
     /// \brief Half of simple support passed trigger
     bool HalfTimePassed_;
 
+    /// \brief vector containing the first preview support solution along the foot step
+    vector<double> FirstPrvSuppFootX_vec, FirstPrvSuppFootY_vec ;
+    
+    /// \brief final position determined 3 iteration before landing
+    double FPx_,FPy_ ;
   };
 
 }

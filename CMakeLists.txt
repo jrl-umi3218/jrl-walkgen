@@ -20,34 +20,70 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/lapack.cmake)
 INCLUDE(cmake/cpack.cmake)
+INCLUDE(cmake/boost.cmake)
+INCLUDE(private_cmake/cmake_metapod_configure.cmake)
+INCLUDE(CMakeDependentOption)
 
 # Define properties of the project
 SET(PROJECT_NAME jrl-walkgen)
 SET(PROJECT_DESCRIPTION "Walking pattern generator for Humanoids")
 SET(PROJECT_URL "")
 
-
 SET(CXX_DISABLE_WERROR True)
 
 # Initialize generic properties of the project
 SETUP_PROJECT()
 
-# Handle OS specificities 
+# Handle OS specificities
 INCLUDE(CheckIncludeFiles)
 CHECK_INCLUDE_FILES("sys/time.h" SYS_TIME_H)
 IF(SYS_TIME_H)
 ADD_DEFINITIONS("-DHAVE_SYS_TIME_H")
 ENDIF(SYS_TIME_H)
 
-# Define dependencies
-
 # Required dependencies
 ADD_REQUIRED_DEPENDENCY("jrl-mal >= 1.9.0")
-ADD_REQUIRED_DEPENDENCY("abstract-robot-dynamics >= 1.15")
-ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.19.1")
+ADD_REQUIRED_DEPENDENCY("pinocchio >=  1.1.0")
+
+# Search for qpOases
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/private_cmake)
+MESSAGE(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+FIND_PACKAGE(qpOASES)
+
+IF(${qpOASES_FOUND} STREQUAL "TRUE")
+  MESSAGE(STATUS "--qpOASES : " ${qpOASES_LIBRARIES})
+  INCLUDE_DIRECTORIES(SYSTEM ${qpOASES_INCLUDE_DIRS})
+ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
+
+
+# Search for Boost.
+# Boost.Test is used by the test suite.
+# Boost program_options is used by the embedfile utility, which is used
+# by metapod_robotbuilder
+# Boost filesystem and regex are used by metapod_robotbuilder.
+# Boost filesystem depends on Boost system.
+SET(BOOST_COMPONENTS
+  filesystem system unit_test_framework program_options regex)
+SEARCH_FOR_BOOST()
+# If Boost is recent enough, we look for Boost timer which can be used by
+# by metapod_timer, which is in turn used by the benchmark.
+# Boost timer depends on Boost chrono and system.
+IF((BUILD_MULTI_MODEL_BENCHMARK OR BUILD_SINGLE_MODEL_BENCHMARKS)
+   AND NOT Boost_VERSION LESS 104800)
+  SET(BOOST_COMPONENTS ${BOOST_COMPONENTS} timer chrono system)
+  SEARCH_FOR_BOOST()
+ENDIF()
+
+# Search for Eigen.
+ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.5")
+# Eigen (at least version 3.0.5) makes gcc report conversion warnings
+# when one assigns to a block. This floods the compilation results.
+# So we include Eigen headers as if they were system headers: the compiler
+# won't report warning coming from them.
+INCLUDE_DIRECTORIES(SYSTEM ${EIGEN3_INCLUDE_DIRS})
 
 # TODO kinda dirty patch to find lssol for now
-#  using ADD_OPTIONAL_DEPENDENCY prevents the creation 
+#  using ADD_OPTIONAL_DEPENDENCY prevents the creation
 #  of classic variables such as ${PKG}_FOUND
 # hence we use ADD_REQUIRED_DEPENDENCY to get the data
 OPTION(USE_LSSOL "Do you want to use the solver lssol?" OFF)
@@ -58,7 +94,9 @@ ENDIF(USE_LSSOL)
 # Add aggressive optimization flags in release mode.
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET (CMAKE_CXX_FLAGS_RELEASE
-    "-O3 -DNDEBUG")
+    "-O3 -DNDEBUG ")
+  SET (CMAKE_CXX_FLAGS
+    "-std=c++0x")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 #IF(CMAKE_COMPILER_IS_GNUCXX)
@@ -76,12 +114,12 @@ ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 SET(${PROJECT_NAME}_HEADERS
   include/jrl/walkgen/patterngeneratorinterface.hh
   include/jrl/walkgen/pgtypes.hh
+  include/jrl/walkgen/pinocchiorobot.hh
 )
 
 # Define subdirectories to explore for cmake
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(tests)
-#ADD_SUBDIRECTORY(debian)
 
 # Generate dependency to jrl-walkgen in pc file
 PKG_CONFIG_APPEND_LIBS("jrl-walkgen")

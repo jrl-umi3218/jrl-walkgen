@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Francois Keith
  * Olivier Stasse
@@ -19,20 +19,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* \file ComAndFootRealizationByGeometry.h
    \brief Realizes the CoM and Foot position by assuming that the robot
    has 6 DoFs legs. It is then a simple matter of inverse geometry,
-   relying on the inverse kinematics object.  
+   relying on the inverse kinematics object.
 */
 #ifndef _COM_AND_FOOT_REALIZATION_BY_GEOMETRY_H_
 #define _COM_AND_FOOT_REALIZATION_BY_GEOMETRY_H_
 
 
 #include <jrl/walkgen/pgtypes.hh>
-#include <MotionGeneration/ComAndFootRealization.hh> 
+#include <MotionGeneration/ComAndFootRealization.hh>
 #include <MotionGeneration/StepOverPlanner.hh>
 #include <MotionGeneration/WaistHeightVariation.hh>
 #include <MotionGeneration/UpperBodyMotion.hh>
@@ -42,20 +42,20 @@ namespace PatternGeneratorJRL
 {
   /* @ingroup motiongeneration
 
-     This object realizes different kind of motion: stepping over, 
+     This object realizes different kind of motion: stepping over,
      execution of planned trajectory, lowering the waist, but they all
      assume that the upper body position is separated from the legs.
-     It also assumes that the robot has 6 DoFs legs. 
+     It also assumes that the robot has 6 DoFs legs.
      It is then a simple matter of inverse geometry,
      relying on the inverse kinematics object.
-     
+
      The different strategies can by modified by changing the walking mode
      parameter.
-     
+
    */
   class  ComAndFootRealizationByGeometry: public ComAndFootRealization
   {
-    
+
   public:
 
     /*! \name Constructor and destructor */
@@ -69,11 +69,11 @@ namespace PatternGeneratorJRL
     /*! Initialization which should be done after setting the HumanoidDynamicRobot member. */
     void Initialization();
 
-    
+
     /*! Compute the robot state for a given CoM and feet posture.
       Each posture is given by a 3D position and two Euler angles \f$ (\theta, \omega) \f$.
       Very important: This method is assume to set correctly the body angles of
-      its \a HumanoidDynamicRobot and a subsequent call to the ZMP position 
+      its \a HumanoidDynamicRobot and a subsequent call to the ZMP position
       will return the associated ZMP vector.
       @param[in] CoMPosition a 6 dimensional vector with the first 3 dimension for position,
       and the last two for the orientation (Euler angle).
@@ -83,14 +83,14 @@ namespace PatternGeneratorJRL
       and the last two for the angular velocity.
       @param[in] LeftFoot a 6 dimensional following the same convention than for \a CoMPosition.
       @param[in] RightFoot idem.
-      @param[out] CurrentConfiguration The result is a state vector containing 
+      @param[out] CurrentConfiguration The result is a state vector containing
       the position which are put inside this parameter.
       @param[out] CurrentVelocity The result is a state vector containing the speed which are put inside this parameter.
       @param[out] CurrentAcceleration The result is a state vector containing the acceleratio which are put inside this parameter.
       @param[in] IterationNumber Number of iteration.
-      @param[in] Stage indicates which stage is reach by the Pattern Generator. If this is the 
+      @param[in] Stage indicates which stage is reach by the Pattern Generator. If this is the
       last stage, we store some information.
-      
+
     */
     bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) &CoMPosition,
 						 MAL_VECTOR_TYPE(double) & aCoMSpeed,
@@ -101,16 +101,16 @@ namespace PatternGeneratorJRL
 						 MAL_VECTOR_TYPE(double) & CurrentVelocity,
 						 MAL_VECTOR_TYPE(double) & CurrentAcceleration,
 						 int IterationNumber,
-						 int Stage);    
+						 int Stage);
 
-    /*! \name Initialization of the walking. 
+    /*! \name Initialization of the walking.
       @{
      */
-    
-    
+
+
     /*! \brief Initialize the humanoid model considering the current
-      configuration set by the user. 
-      \param[in] BodyAnglesIni: The configuration vector provided by the user. 
+      configuration set by the user.
+      \param[in] BodyAnglesIni: The configuration vector provided by the user.
       \param[out] lStartingWaistPose: The waist pose according to the user configuration vector.
     */
     bool InitializationHumanoid(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
@@ -119,10 +119,10 @@ namespace PatternGeneratorJRL
     /*! \brief Initialize the foot position.
       \param[in] aFoot: Pointer to the foot to be updated.
       \param[in] m_AnklePosition: Translation from the ankle to the soil.
-      \param[out] InitFootPosition: The foot position according to the 
+      \param[out] InitFootPosition: The foot position according to the
       free flyer (set to 0.0 0.0 0.0)
     */
-    bool InitializationFoot(CjrlFoot * aFoot,
+    bool InitializationFoot(PRFoot * aFoot,
 			    MAL_S3_VECTOR(& m_AnklePosition,double),
 			    FootAbsolutePosition & InitFootPosition);
 
@@ -130,15 +130,15 @@ namespace PatternGeneratorJRL
       1/ we take the current state of the robot
       to compute the current CoM value.
       2/ We deduce the difference between the CoM and the waist,
-      which is suppose to be constant for the all duration of the motion. 
+      which is suppose to be constant for the all duration of the motion.
 
       IMPORTANT: The jrlHumanoidDynamicRobot must have been properly set up.
-      
+
     */
     bool InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
 			   MAL_S3_VECTOR_TYPE(double) & lStartingCOMPosition,
 			   MAL_VECTOR_TYPE(double) & lStartingWaistPosition,
-			   FootAbsolutePosition & InitLeftFootAbsPos, 
+			   FootAbsolutePosition & InitLeftFootAbsPos,
 			   FootAbsolutePosition & InitRightFootAbsPos);
 
     /*! This initialization phase, make sure that the needed buffers
@@ -149,7 +149,7 @@ namespace PatternGeneratorJRL
 				 deque<RelativeFootPosition> lRelativeFootPositions);
 
     /* @} */
-    
+
 
 
 
@@ -162,7 +162,7 @@ namespace PatternGeneratorJRL
 				       MAL_S3_VECTOR( &lCOMPosition,double),
 				       FootAbsolutePosition & LeftFootPosition,
 				       FootAbsolutePosition & RightFootPosition);
-    
+
     /*! Evaluate CoM for a given position.
       Assuming that the waist is at (0,0,0)
       It returns the associate initial values for the left and right foot.*/
@@ -179,7 +179,7 @@ namespace PatternGeneratorJRL
 			    FootAbsolutePosition & InitRightFootPosition);
 
     /*! Method to compute the heuristic for the arms. */
-    void ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR_TYPE(double) & qArmr, 
+    void ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR_TYPE(double) & qArmr,
 						   MAL_VECTOR_TYPE(double) & qArml,
 						   MAL_VECTOR_TYPE(double) & aCOMPosition,
 						   MAL_VECTOR_TYPE(double) & RFP,
@@ -193,7 +193,7 @@ namespace PatternGeneratorJRL
 
 
     /*! Reimplementation of the setter of the HumanoidDynamicRobot. */
-    bool setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot * aHumanoidDynamicRobot);
+    bool setPinocchioRobot(PinocchioRobot * aHumanoidDynamicRobot);
 
     /*! Compute the angles values considering a 6DOF leg for a given configuration
       of the waist and the foot of the leg:
@@ -215,7 +215,7 @@ namespace PatternGeneratorJRL
 			     int LeftOrRight,
 			     MAL_VECTOR_TYPE(double) &lq,
 			     int Stage);
-    
+
     /*! Compute the angles values considering two 6DOF legs for a given configuration
       of the waist and of the feet:
       @param aCoMPosition: Position of the CoM (x,y,z,theta, omega, phi).
@@ -234,28 +234,103 @@ namespace PatternGeneratorJRL
 			      MAL_VECTOR_TYPE(double) & qr,
 			      MAL_S3_VECTOR_TYPE(double) & AbsoluteWaistPosition);
 
-    /*! \brief Implement the Plugin part to receive information from 
+    /*! \brief Implement the Plugin part to receive information from
       PatternGeneratorInterface.
      */
     void CallMethod(string &Method, istringstream &istrm);
 
-    /*! Get the current position of the waist in the COM reference frame 
+    /*! Get the current position of the waist in the COM reference frame
       @return a 4x4 matrix which contains the pose and the position of the waist
       in the CoM reference frame.
     */
     MAL_S4x4_MATRIX_TYPE(double) GetCurrentPositionofWaistInCOMFrame();
 
+		/*! \brief Getter and setter for the previous configurations and velocities */
+		inline void SetPreviousConfigurationStage0(MAL_VECTOR_TYPE(double) & prev_Configuration)
+		{ m_prev_Configuration = prev_Configuration ;}
+		inline void SetPreviousVelocityStage0(MAL_VECTOR_TYPE(double) & prev_Velocity)
+		{ m_prev_Velocity = prev_Velocity ;}
+
+		inline void SetPreviousConfigurationStage1(MAL_VECTOR_TYPE(double) & prev_Configuration)
+		{ m_prev_Configuration1 = prev_Configuration ;}
+		inline void SetPreviousVelocityStage1(MAL_VECTOR_TYPE(double) & prev_Velocity)
+		{ m_prev_Velocity1 = prev_Velocity ;}
+
+		inline void SetPreviousConfigurationStage2(MAL_VECTOR_TYPE(double) & prev_Configuration)
+		{ m_prev_Configuration2 = prev_Configuration ;}
+		inline void SetPreviousVelocityStage2(MAL_VECTOR_TYPE(double) & prev_Velocity)
+		{ m_prev_Velocity2 = prev_Velocity ;}
+
+		/*! \brief Getter and setter for the previous configurations and velocities */
+		inline void SetPreviousConfigurationStage0(const MAL_VECTOR_TYPE(double) & prev_Configuration)
+		{ m_prev_Configuration = prev_Configuration ;}
+		inline void SetPreviousVelocityStage0(const MAL_VECTOR_TYPE(double) & prev_Velocity)
+		{ m_prev_Velocity = prev_Velocity ;}
+
+		inline void SetPreviousConfigurationStage1(const MAL_VECTOR_TYPE(double) & prev_Configuration)
+		{ m_prev_Configuration1 = prev_Configuration ;}
+		inline void SetPreviousVelocityStage1(const MAL_VECTOR_TYPE(double) & prev_Velocity)
+		{ m_prev_Velocity1 = prev_Velocity ;}
+
+		inline void SetPreviousConfigurationStage2(const MAL_VECTOR_TYPE(double) & prev_Configuration)
+		{ m_prev_Configuration2 = prev_Configuration ;}
+		inline void SetPreviousVelocityStage2(const MAL_VECTOR_TYPE(double) & prev_Velocity)
+		{ m_prev_Velocity2 = prev_Velocity;}
+
+    /*! \brief Getter and setter for the previous configurations and velocities */
+    inline MAL_VECTOR_TYPE(double) & GetPreviousConfigurationStage0()
+    { return m_prev_Configuration ;};
+
+    inline MAL_VECTOR_TYPE(double) & GetPreviousConfigurationStage1()
+    { return m_prev_Configuration1 ;};
+
+    inline MAL_VECTOR_TYPE(double) & GetPreviousVelocityStage0()
+    { return m_prev_Velocity ;};
+
+    inline MAL_VECTOR_TYPE(double) & GetPreviousVelocityStage1()
+    { return m_prev_Velocity1 ;};
+
+    inline void leftLegIndexinConfiguration(std::vector<int> & leftLegMaps) const
+    { leftLegMaps = m_LeftLegIndexinConfiguration ;}
+    inline void rightLegIndexinConfiguration(std::vector<int> & rightLegMaps) const
+    { rightLegMaps = m_RightLegIndexinConfiguration ;}
+    inline void leftArmIndexinConfiguration(std::vector<int> & leftArmMaps) const
+    { leftArmMaps = m_LeftArmIndexinConfiguration ;}
+    inline void rightArmIndexinConfiguration(std::vector<int> & rightArmMaps) const
+    { rightArmMaps = m_RightArmIndexinConfiguration ;}
+    inline void chestIndexinConfiguration(std::vector<int> & chestMaps) const
+    { chestMaps = m_ChestIndexinConfiguration ;}
+
+    inline void leftLegIndexinVelocity(std::vector<int> & leftLegMaps) const
+    { leftLegMaps = m_LeftLegIndexinConfiguration ;}
+    inline void rightLegIndexinVelocity(std::vector<int> & rightLegMaps) const
+    { rightLegMaps = m_RightLegIndexinConfiguration ;}
+    inline void leftArmIndexinVelocity(std::vector<int> & leftArmMaps) const
+    { leftArmMaps = m_LeftArmIndexinConfiguration ;}
+    inline void rightArmIndexinVelocity(std::vector<int> & rightArmMaps) const
+    { rightArmMaps = m_RightArmIndexinConfiguration ;}
+    inline void chestIndexinVelocity(std::vector<int> & chestMaps) const
+    { chestMaps = m_ChestIndexinConfiguration ;}
+
+    inline bool ShiftFoot()
+    {return ShiftFoot_ ;}
+    inline void ShiftFoot(bool ShiftFoot)
+    {ShiftFoot_=ShiftFoot ;}
+
     /*! \brief Get the COG of the ankles at the starting position. */
     virtual MAL_S3_VECTOR_TYPE(double) GetCOGInitialAnkles();
 
-  protected:
-    
-    /*! \brief Initialization of internal maps of indexes */
-    void InitializationMaps(std::vector<CjrlJoint *> &FromRootToFoot,
-			    std::vector<CjrlJoint *> &ActuatedJoints,
-			    std::vector<int> &IndexinConfiguration);
+    friend ostream& operator <<(ostream &os,const ComAndFootRealization &obj);
 
-    /*! Map shoulders and wrist 
+  protected:
+
+    /*! \brief Initialization of internal maps of indexes */
+    void InitializationMaps(std::vector<se3::JointIndex> &FromRootToFoot,
+                se3::JointModelVector & ActuatedJoints,
+                std::vector<int> &IndexinConfiguration,
+                std::vector<int> &IndexinVelocity);
+
+    /*! Map shoulders and wrist
      \param[in] aHand: The hand to be used for extraction of data.
      \param[in] ActuatedJoints: The vector of actuated joints.
      \param[out] IndexesInVRML: The kinematic chain from the shoulder
@@ -263,29 +338,30 @@ namespace PatternGeneratorJRL
      \param[out] IndexesInConfiguration: The kinematic chain
      from the shoulder given with the depth-first ordering.
      \param[out] associateShoulder: The shoulder extracted from
-     the kinematic chain. 
+     the kinematic chain.
     */
-    void InitializeMapsForAHand(CjrlHand * aHand,
-				std::vector<CjrlJoint *> &ActuatedJoints,
+    void InitializeMapsForAHand(se3::JointIndex aWrist,
+                se3::JointModelVector &  ActuatedJoints,
 				vector<int> & IndexesInConfiguration,
-				CjrlJoint * & associateShoulder);
+                vector<int> & IndexesInVelocity,
+                se3::JointIndex & associateShoulder);
 
     /*! Create the map of indexes for the shoulders and wrist */
-    void InitializeMapForChest(std::vector<CjrlJoint *> &ActuatedJoints);
+    void InitializeMapForChest(se3::JointModelVector & ActuatedJoints);
 
     /* Register methods. */
     void RegisterMethods();
 
   private:
 
-    /*! \name Objects for stepping over. 
+    /*! \name Objects for stepping over.
       @{
      */
-    
+
     /*! Planner for the waist variation for stepping
       over an obstacle. */
-    WaistHeightVariation *m_WaistPlanner;	
-    
+    WaistHeightVariation *m_WaistPlanner;
+
     /*! Planner for the upper body motion. */
     UpperBodyMotion * m_UpBody;
 
@@ -293,15 +369,15 @@ namespace PatternGeneratorJRL
 
     /*! Pointer related to Kineoworks planner. */
     GenerateMotionFromKineoWorks * m_GMFKW;
-    
-    
+
+
     /*! \brief Displacement between the hip and the foot. @{*/
     /*! \brief For the right foot. */
     MAL_S3_VECTOR(m_DtRight,double);
     /*! \brief For the left foot. */
     MAL_S3_VECTOR(m_DtLeft,double);
     /*! @} */
-    
+
     /*! \name Vector from the Waist to the left and right hip. */
 
     /*! Static part from the waist to the left hip.. */
@@ -312,17 +388,20 @@ namespace PatternGeneratorJRL
     MAL_S3_VECTOR(m_TranslationToTheLeftHip,double);
     /*! Dynamic part form the waist to the right hip. */
     MAL_S3_VECTOR( m_TranslationToTheRightHip,double);
-    
+
 
     /*! @} */
-    
+
     /*! \name Previous joint values. */
-    //@{ 
+    //@{
     /*! \brief For the speed (stage 0). */
     MAL_VECTOR(m_prev_Configuration,double);
 
     /*! \brief For the speed (stage 1). */
     MAL_VECTOR( m_prev_Configuration1,double);
+
+    /*! \brief For the speed (stage 1). */
+    MAL_VECTOR( m_prev_Configuration2,double);
 
     /*! \brief For the speed (stage 0). */
     MAL_VECTOR(m_prev_Velocity,double);
@@ -330,30 +409,33 @@ namespace PatternGeneratorJRL
     /*! \brief For the speed (stage 1). */
     MAL_VECTOR( m_prev_Velocity1,double);
 
+    /*! \brief For the speed (stage 1). */
+    MAL_VECTOR( m_prev_Velocity2,double);
+
     //@}
-    
+
     /*! COM Starting position. */
     MAL_S3_VECTOR(m_StartingCOMPosition,double);
-    
+
     /*! Final COM pose. */
     MAL_S4x4_MATRIX(m_FinalDesiredCOMPose,double);
-      
+
     /*! Store the position of the ankle in the right feet. */
     MAL_S3_VECTOR(m_AnklePositionRight,double);
 
     /*! Store the position of the ankle in the left feet. */
     MAL_S3_VECTOR(m_AnklePositionLeft,double);
-        
-    /*! Difference between the CoM and the Waist 
+
+    /*! Difference between the CoM and the Waist
       from the initialization phase,
       i.e. not reevaluated while walking. */
     MAL_S3_VECTOR(m_DiffBetweenComAndWaist,double);
 
-    /*! Difference between the CoM and the Waist 
+    /*! Difference between the CoM and the Waist
       in the CoM reference frame. */
     MAL_S3_VECTOR(m_ComAndWaistInRefFrame,double);
 
-    
+
     /*! Maximal distance along the X axis for the hand motion */
     double m_Xmax;
 
@@ -366,20 +448,31 @@ namespace PatternGeneratorJRL
     /*! Conversion between the index of the plan and the robot DOFs. */
     std::vector<int> m_ConversionForUpperBodyFromLocalIndexToRobotDOFs;
 
-    /*! \name Keep the indexes into the Configuration numbering system. 
+    /*! \name Keep the indexes into the Configuration numbering system.
      @{
     */
     /*! \brief For the left leg, Specific for the Inverse Kinematics. */
-    std::vector<int> m_LeftLegIndexinConfiguration;
+    std::vector<int> m_LeftLegIndexinConfiguration ;
     /*! \brief For the right leg, Specific for the Inverse Kinematics. */
-    std::vector<int> m_RightLegIndexinConfiguration;
+    std::vector<int> m_RightLegIndexinConfiguration ;
     /*! \brief For the left arm, Specific for the Inverse Kinematics. */
-    std::vector<int> m_LeftArmIndexinConfiguration;
+    std::vector<int> m_LeftArmIndexinConfiguration ;
     /*! \brief For the right leg, Specific for the Inverse Kinematics. */
-    std::vector<int> m_RightArmIndexinConfiguration;
-    
+    std::vector<int> m_RightArmIndexinConfiguration ;
+
+    /*! \brief For the left leg, Specific for the Inverse Kinematics. */
+    std::vector<int> m_LeftLegIndexinVelocity ;
+    /*! \brief For the right leg, Specific for the Inverse Kinematics. */
+    std::vector<int> m_RightLegIndexinVelocity ;
+    /*! \brief For the left arm, Specific for the Inverse Kinematics. */
+    std::vector<int> m_LeftArmIndexinVelocity ;
+    /*! \brief For the right leg, Specific for the Inverse Kinematics. */
+    std::vector<int> m_RightArmIndexinVelocity ;
+
     /*! \brief For the chest. */
     std::vector<int> m_ChestIndexinConfiguration;
+    /*! \brief For the chest. */
+    std::vector<int> m_ChestIndexinVelocity;
 
     /*! \brief For the entire system. */
     std::vector<int> m_GlobalVRMLIDtoConfiguration;
@@ -390,15 +483,18 @@ namespace PatternGeneratorJRL
     /*! Buffer of current Upper Body motion. */
     std::vector<double> m_UpperBodyMotion;
 
-    /*! COG of the ankles in the waist reference frame 
+    /*! COG of the ankles in the waist reference frame
       when evaluating the initial position.
      */
     MAL_S3_VECTOR_TYPE(double) m_COGInitialAnkles;
 
     /*! Store the position of the left and right shoulders. */
-    CjrlJoint *m_LeftShoulder, *m_RightShoulder;
+    se3::JointIndex m_LeftShoulder, m_RightShoulder;
+
+    bool ShiftFoot_ ;
   };
 
+  ostream & operator <<(ostream &os,const ComAndFootRealization &obj);
 
 }
-#endif 
+#endif

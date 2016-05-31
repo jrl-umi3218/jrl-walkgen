@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, 2006, 2007, 2008, 2009, 2010, 
+ * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
  * Florent Lamiraux
  * Olivier Stasse
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with walkGenJrl.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Research carried out within the scope of the 
+ *  Research carried out within the scope of the
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
 /* Abstract class to generate Humanoid Body motion
@@ -29,8 +29,7 @@
 #ifndef _COM_AND_FOOT_REALIZATION_H_
 #define _COM_AND_FOOT_REALIZATION_H_
 
-#include <abstract-robot-dynamics/humanoid-dynamic-robot.hh>
-
+#include <jrl/walkgen/pinocchiorobot.hh>
 #include <SimplePlugin.hh>
 #include <StepStackHandler.hh>
 
@@ -57,13 +56,13 @@ namespace PatternGeneratorJRL
   private:
 
     /*! \brief Store the dynamic robot. */
-    CjrlHumanoidDynamicRobot * m_HumanoidDynamicRobot;
-    
+    PinocchioRobot * m_PinocchioRobot;
+
     /*! Store the height of the CoM */
     double m_HeightOfCoM;
 
     /*! Sampling Period. */
-    double m_SamplingPeriod;    
+    double m_SamplingPeriod;
 
     /*! Object which handles a Stack of steps */
     StepStackHandler * m_StepStackHandler;
@@ -72,33 +71,33 @@ namespace PatternGeneratorJRL
 
     /* \name Constructor and destructor.*/
 
-    /*! \brief Constructor 
+    /*! \brief Constructor
 
      */
     inline ComAndFootRealization(PatternGeneratorInterfacePrivate * aPatternGeneratorInterface):
       SimplePlugin((PatternGeneratorJRL::SimplePluginManager *)aPatternGeneratorInterface)
-      ,m_HumanoidDynamicRobot(0)
+      ,m_PinocchioRobot(0)
       ,m_HeightOfCoM(0)
       ,m_SamplingPeriod(0.005)
       ,m_StepStackHandler(0)
       {
       };
-      
+
     /*! \brief virtual destructor */
     inline virtual ~ComAndFootRealization() {};
-      
+
 
     /*! \brief Initialization phase */
     virtual void Initialization() = 0;
     /** @} */
 
-    /*! \name Methods related to the computation to be asked by 
+    /*! \name Methods related to the computation to be asked by
       \a  ZMPPreviewControlWithMultiBodyZMP.  */
 
     /*! Compute the robot state for a given CoM and feet posture.
       Each posture is given by a 3D position and two Euler angles \f$ (\theta, \omega) \f$.
       Very important: This method is assume to set correctly the body angles of
-      its \a HumanoidDynamicRobot and a subsequent call to the ZMP position 
+      its \a HumanoidDynamicRobot and a subsequent call to the ZMP position
       will return the associated ZMP vector.
       @param CoMPosition: a 5 dimensional vector with the first dimension for position,
       and the last two for the orientation (Euler angle).
@@ -115,31 +114,31 @@ namespace PatternGeneratorJRL
       @param Stage: indicates which stage is reach by the Pattern Generator.
     */
     virtual bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) &CoMPosition,
-							 MAL_VECTOR_TYPE(double) &CoMSpeed,
-							 MAL_VECTOR_TYPE(double) &CoMAcc,
-							 MAL_VECTOR_TYPE(double) &LeftFoot,
-							 MAL_VECTOR_TYPE(double) &RightFoot,
-							 MAL_VECTOR_TYPE(double) &CurrentConfiguration,
-							 MAL_VECTOR_TYPE(double) &CurrentVelocity,
-							 MAL_VECTOR_TYPE(double) &CurrentAcceleration,
+                                                         MAL_VECTOR_TYPE(double) &CoMSpeed,
+                                                         MAL_VECTOR_TYPE(double) &CoMAcc,
+                                                         MAL_VECTOR_TYPE(double) &LeftFoot,
+                                                         MAL_VECTOR_TYPE(double) &RightFoot,
+                                                         MAL_VECTOR_TYPE(double) &CurrentConfiguration,
+                                                         MAL_VECTOR_TYPE(double) &CurrentVelocity,
+                                                         MAL_VECTOR_TYPE(double) &CurrentAcceleration,
 							 int IterationNumber,
 							 int Stage) =0;
 
-    /*! Returns the waist position associate to the current  
+    /*! Returns the waist position associate to the current
       @} */
 
     /*! \name Setter and getter for the jrlHumanoidDynamicRobot object. */
-    
+
     /*! @param aHumanoidDynamicRobot: an object able to compute dynamic parameters
       of the robot. */
-    inline  virtual bool setHumanoidDynamicRobot(CjrlHumanoidDynamicRobot *aHumanoidDynamicRobot)
-    { m_HumanoidDynamicRobot = aHumanoidDynamicRobot;
+    inline  virtual bool setPinocchioRobot(PinocchioRobot *aPinocchioRobot)
+    { m_PinocchioRobot = aPinocchioRobot;
       return true;}
 
     /*! Returns the object able to compute dynamic parametersof the robot. */
-    inline CjrlHumanoidDynamicRobot * getHumanoidDynamicRobot() const
-      { return m_HumanoidDynamicRobot;}
-    
+    inline PinocchioRobot * getPinocchioRobot() const
+      { return m_PinocchioRobot;}
+
     /** @} */
 
 
@@ -147,15 +146,15 @@ namespace PatternGeneratorJRL
       1/ we take the current state of the robot
       to compute the current CoM value.
       2/ We deduce the difference between the CoM and the waist,
-      which is suppose to be constant for the all duration of the motion. 
+      which is suppose to be constant for the all duration of the motion.
 
       IMPORTANT: The jrlHumanoidDynamicRobot must have been properly set up.
-      
+
     */
     virtual bool InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
 				   MAL_S3_VECTOR_TYPE(double) & lStartingCOMPosition,
 				   MAL_VECTOR_TYPE(double) & lStartingWaistPose,
-				   FootAbsolutePosition & InitLeftFootAbsPos, 
+				   FootAbsolutePosition & InitLeftFootAbsPos,
 				   FootAbsolutePosition & InitRightFootAbsPos)=0;
 
     /*! This initialization phase, make sure that the needed buffers
@@ -169,27 +168,27 @@ namespace PatternGeneratorJRL
 
     /*! Set the algorithm used for ZMP and CoM trajectory. */
     void SetAlgorithmForZMPAndCoMTrajectoryGeneration(int anAlgo);
-    
+
     /*! Get the algorithm used for ZMP and CoM trajectory. */
     int GetAlgorithmForZMPAndCoMTrajectoryGeneration() ;
 
-    /*! \name Setter and getter for the height of the CoM. 
+    /*! \name Setter and getter for the height of the CoM.
       @{
      */
-    
-    void SetHeightOfTheCoM(double theHeightOfTheCoM) 
+
+    void SetHeightOfTheCoM(double theHeightOfTheCoM)
     { m_HeightOfCoM = theHeightOfTheCoM; }
-    
+
     const double & GetHeightOfTheCoM() const
       {return m_HeightOfCoM;}
     /*! @} */
 
-    /*! \name Setter and getter for the sampling period. 
+    /*! \name Setter and getter for the sampling period.
       @{
      */
     /*! Setter for the sampling period. */
     inline void setSamplingPeriod(double  aSamplingPeriod)
-      { m_SamplingPeriod = aSamplingPeriod; } 
+      { m_SamplingPeriod = aSamplingPeriod; }
     /*! Getter for the sampling period. */
     inline const double & getSamplingPeriod() const
       { return m_SamplingPeriod;}
@@ -197,17 +196,14 @@ namespace PatternGeneratorJRL
 
 
     /*! \name Getter and setter for the handler of step stack  @{ */
-    
     void SetStepStackHandler(StepStackHandler * lStepStackHandler)
     { m_StepStackHandler = lStepStackHandler;}
 
     StepStackHandler *  GetStepStackHandler() const
       { return m_StepStackHandler; }
-
     /*! @} */
 
-
-    /*! Get the current position of the waist in the COM reference frame 
+    /*! Get the current position of the waist in the COM reference frame
       @return a 4x4 matrix which contains the pose and the position of the waist
       in the CoM reference frame.
     */
@@ -215,7 +211,7 @@ namespace PatternGeneratorJRL
 
     /*! \brief Get the COG of the ankles at the starting position. */
     virtual MAL_S3_VECTOR_TYPE(double) GetCOGInitialAnkles() = 0;
-    
+
   };
 
 }

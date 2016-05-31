@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+# Set debug mode
+set -x
+set -v
+
+# Setup environment variables.
+source /opt/ros/hydro/setup.bash
+
+export CMAKE_ADDITIONAL_OPTIONS=" ${CMAKE_ADDITIONAL_OPTIONS} -DLINEAR_ALGEBRA_LIB=eigen"
+export CMAKE_ADDITIONAL_OPTIONS=" ${CMAKE_ADDITIONAL_OPTIONS} -DBUILD_PYTHON_INTERFACE=OFF"
+export CMAKE_ADDITIONAL_OPTIONS=" ${CMAKE_ADDITIONAL_OPTIONS} -DCMAKE_BUILD_TYPE=RELEASE"
+export CMAKE_ADDITIONAL_OPTIONS=" ${CMAKE_ADDITIONAL_OPTIONS} -DBUILD_UNIT_TESTS=\"ON\""
+
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/openrobots/lib/pkgconfig"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/openrobots/lib"
+
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/ros/hydro/lib/pkgconfig"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/ros/hydro/lib"
+
+# run the build
+. ./.travis/run ../.travis/build
+
+# End debug mode
+set +v
+set +x

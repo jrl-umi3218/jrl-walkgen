@@ -40,7 +40,7 @@ using namespace PatternGeneratorJRL;
 
 
 RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
-                                                    CjrlHumanoidDynamicRobot *aHS ) :
+                                                    PinocchioRobot *aPR ) :
   SimplePlugin(aSPM)
 {
 
@@ -60,7 +60,7 @@ RelativeFeetInequalities::RelativeFeetInequalities( SimplePluginManager *aSPM,
       RightFPosEdgesY_[i] = -DefaultFPosEdgesY[i];
     }
   
-  set_feet_dimensions( aHS );
+  set_feet_dimensions( aPR );
 
   init_convex_hulls();
   
@@ -150,26 +150,28 @@ RelativeFeetInequalities::init_convex_hulls()
 
 
 int
-RelativeFeetInequalities::set_feet_dimensions( CjrlHumanoidDynamicRobot *aHS )
+RelativeFeetInequalities::set_feet_dimensions( PinocchioRobot *aPR )
 {
 
   // Read feet specificities.
   double HeightHalf,WidthHalf;
-  CjrlFoot * RightFoot = aHS->rightFoot();
-  if (RightFoot==0)
+  PRFoot * RightFoot = aPR->rightFoot();
+  if (RightFoot->associatedAnkle==0)
     {
       cerr << "Problem with the reading of the right foot"<< endl;
       return 0;
     }
-  RightFoot->getSoleSize( WidthHalf,HeightHalf );
+  WidthHalf  = RightFoot->soleWidth  ;
+  HeightHalf = RightFoot->soleHeight ;
 
-  CjrlFoot * LeftFoot = aHS->leftFoot();
-  if (RightFoot==0)
+  PRFoot * LeftFoot = aPR->leftFoot();
+  if (RightFoot->associatedAnkle==0)
     {
       cerr << "Problem while reading of the left foot"<< endl;
       return 0;
     }
-  LeftFoot->getSoleSize( WidthHalf,HeightHalf );
+  WidthHalf =  LeftFoot->soleWidth  ;
+  HeightHalf = LeftFoot->soleHeight ;
 
   assert(WidthHalf > 0);
   LeftFootSize_.setHalfSizeInit( WidthHalf, HeightHalf, DSFeetDistance_                 );
@@ -236,7 +238,7 @@ RelativeFeetInequalities::set_vertices( convex_hull_t & ConvexHull,
 
 void
 RelativeFeetInequalities::set_inequalities( convex_hull_t & ConvexHull,
-    const support_state_t & Support, ineq_e type)
+    const support_state_t &, ineq_e type)
 {
 
   convex_hull_t * ConvexHull_p = 0;
@@ -265,7 +267,6 @@ void
 RelativeFeetInequalities::compute_linear_system ( convex_hull_t & ConvexHull,
     const support_state_t & PrwSupport ) const
 {
-
   double dx,dy,dc,x1,y1,x2,y2;
   unsigned nbRows = ConvexHull.X_vec.size();
 
@@ -336,15 +337,15 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
           RightFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_ , DSFeetDistance_ );
           LeftFootSize_.setConstraints( SecurityMarginX_, SecurityMarginY_, DSFeetDistance_ );
           init_convex_hulls();
-          cout << "Security margin On X: " << SecurityMarginX_
-               << " Security margin On Y: " << SecurityMarginY_ << endl;
+//          cout << "Security margin On X: " << SecurityMarginX_
+//               << " Security margin On Y: " << SecurityMarginY_ << endl;
         }
     }
   else if( Method == ":setDSFeetDistance" )
     {
       Args >> DSFeetDistance_;
       init_convex_hulls();
-      cout << "DSFeetDistance = " << DSFeetDistance_ << endl;
+      //cout << "DSFeetDistance = " << DSFeetDistance_ << endl;
     }
   else if( Method == ":setFPosEdges" )
     {
@@ -353,27 +354,34 @@ RelativeFeetInequalities::CallMethod( std::string &Method, std::istringstream &A
 
       if (lCmd == "X")
         {
-          cout << "LeftFeftFPosEdgesX = ";
+          //cout << "LeftFeftFPosEdgesX = ";
           for(int i=0;i<5;i++)
             {
               Args >> LeftFPosEdgesX_[i];
               RightFPosEdgesX_[i] = LeftFPosEdgesX_[i];
-              cout << LeftFPosEdgesX_[i] << "  ";
+              //cout << LeftFPosEdgesX_[i] << "  ";
             }
-          cout << endl;
+          //cout << endl;
           init_convex_hulls();
         }
       else if (lCmd == "Y")
         {
-          cout << "LeftFeftFPosEdgesY = ";
+          //cout << "LeftFeftFPosEdgesY = ";
           for(int i=0;i<5;i++)
             {
               Args >> LeftFPosEdgesY_[i];
               RightFPosEdgesY_[i] = -LeftFPosEdgesY_[i];
-              cout << LeftFPosEdgesY_[i] << "  ";
+              //cout << LeftFPosEdgesY_[i] << "  ";
             }
-          cout << endl;
+          //cout << endl;
           init_convex_hulls();
         }
     }
+}
+
+void
+RelativeFeetInequalities::getFeetSize(FootHalfSize & leftFootSize, FootHalfSize & rightFootSize)
+{
+  leftFootSize  = LeftFootSize_  ;
+  rightFootSize = RightFootSize_ ;
 }

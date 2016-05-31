@@ -71,8 +71,7 @@ namespace PatternGeneratorJRL
   public: 
     
     /*! \brief Pointer towards the PGI which is handling this object. */
-    inline SimplePluginManager()
-      {};
+    SimplePluginManager();
     virtual ~SimplePluginManager();
     
     /*! Get the map of plugins. */

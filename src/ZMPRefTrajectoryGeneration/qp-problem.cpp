@@ -614,13 +614,12 @@ QPProblem::dump( qp_element_e Type, std::ostream & aos)
     Name = "DS";
     break;
   }
-
   aos << Name <<"["<<NbRows<< ","<< NbCols << "]" << std::endl;
 
   for(unsigned int i=0;i<NbRows;i++)
     {
       for(unsigned int j=0;j<NbCols;j++)
-        aos << Array[i+j*NbRows] << " ";
+        aos << std::scientific << Array[i+j*NbRows] << " ";
       aos << std::endl;
     }
   aos << std::endl;
