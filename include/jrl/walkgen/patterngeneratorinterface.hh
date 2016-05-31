@@ -55,7 +55,8 @@ namespace PatternGeneratorJRL
   class WALK_GEN_JRL_EXPORT PatternGeneratorInterface 
     {    
     public:
-    
+    // overload the new[] eigen operator
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
       /*! Constructor 
 	@param strm: Should provide the file to initialize the preview control,
 	the path to the VRML model, and the name of the file containing the VRML model.

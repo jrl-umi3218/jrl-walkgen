@@ -407,6 +407,7 @@ void NMPCgenerator::solve_qp(){
   //qpOASES::returnValue ret, error ;
   if (!isQPinitialized_)
   {
+    // force the solver to use the maximum time for computing the solution
     cput_[0] = 1000.0;
     nwsr_ = 10000 ;
     /*ret =*/ QP_->init(
@@ -420,7 +421,6 @@ void NMPCgenerator::solve_qp(){
   }
   else
   {
-    // force the solver to use the maximum time for computing the solution
     if(useLineSearch_)
     {
       cput_[0] = 0.0007;

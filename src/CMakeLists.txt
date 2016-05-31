@@ -98,6 +98,7 @@ SET(INCLUDES
   ../doc/additionalHeader/modules.hh
   ../include/jrl/walkgen/pgtypes.hh
   ../include/jrl/walkgen/patterngeneratorinterface.hh
+  ../include/jrl/walkgen/pinocchiorobot.hh
 )
 
 IF(${qpOASES_FOUND} STREQUAL "TRUE")

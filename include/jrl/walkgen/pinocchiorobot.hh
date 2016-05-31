@@ -40,6 +40,7 @@ namespace PatternGeneratorJRL
     double soleWidth ; // y axis
     double soleHeight ;// x axis
     vector3d anklePosition ;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
   typedef PinocchioRobotFoot_t PRFoot ;
 
