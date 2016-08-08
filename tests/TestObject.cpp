@@ -437,9 +437,9 @@ namespace PatternGeneratorJRL
             << filterprecision(m_OneStep.LeftFootPosition.ddx  ) << " "                   // 17
             << filterprecision(m_OneStep.LeftFootPosition.ddy  ) << " "                   // 18
             << filterprecision(m_OneStep.LeftFootPosition.ddz  ) << " "                   // 19
-            << filterprecision(m_OneStep.LeftFootPosition.theta ) << " "                  // 20
-            << filterprecision(m_OneStep.LeftFootPosition.omega  ) << " "                 // 21
-            << filterprecision(m_OneStep.LeftFootPosition.omega2  ) << " "                // 22
+            << filterprecision(m_OneStep.LeftFootPosition.theta*M_PI/180 ) << " "         // 20
+            << filterprecision(m_OneStep.LeftFootPosition.omega*M_PI/180 ) << " "         // 21
+            << filterprecision(m_OneStep.LeftFootPosition.omega2*M_PI/180 ) << " "        // 22
             << filterprecision(m_OneStep.RightFootPosition.x ) << " "                     // 23
             << filterprecision(m_OneStep.RightFootPosition.y ) << " "                     // 24
             << filterprecision(m_OneStep.RightFootPosition.z ) << " "                     // 25
@@ -450,8 +450,8 @@ namespace PatternGeneratorJRL
             << filterprecision(m_OneStep.RightFootPosition.ddy ) << " "                   // 30
             << filterprecision(m_OneStep.RightFootPosition.ddz ) << " "                   // 31
             << filterprecision(m_OneStep.RightFootPosition.theta*M_PI/180 ) << " "        // 32
-            << filterprecision(m_OneStep.RightFootPosition.omega  ) << " "                // 33
-            << filterprecision(m_OneStep.RightFootPosition.omega2  ) << " "               // 34
+            << filterprecision(m_OneStep.RightFootPosition.omega*M_PI/180 ) << " "        // 33
+            << filterprecision(m_OneStep.RightFootPosition.omega2*M_PI/180 ) << " "       // 34
             << filterprecision(localZMPx) << " "                                          // 35
             << filterprecision(localZMPy) << " "                                          // 36
             << filterprecision(m_CurrentConfiguration(0) ) << " "                         // 37
