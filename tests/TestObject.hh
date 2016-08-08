@@ -252,6 +252,11 @@ namespace PatternGeneratorJRL
         std::istringstream strm2(":setVelReference 0.0 0.0 0.0");
         aPGI.ParseCmd(strm2);
       }
+      void walkForwardSlow(PatternGeneratorInterface &aPGI)
+      {
+        std::istringstream strm2(":setVelReference  0.0001 0.0 0.0");
+        aPGI.ParseCmd(strm2);
+      }
       void walkForward1m_s(PatternGeneratorInterface &aPGI)
       {
         std::istringstream strm2(":setVelReference  0.1 0.0 0.0");
