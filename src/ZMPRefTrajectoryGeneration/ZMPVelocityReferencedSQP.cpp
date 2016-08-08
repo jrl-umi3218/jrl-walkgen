@@ -26,10 +26,12 @@
 
 /*! This object generate all the values for the foot trajectories,
   and the desired ZMP based on a sequence of steps following a SQP
-  formulation using QPoases solver as proposed by Naveau "adding paper citation"
+  formulation using QPoases solver as proposed by Naveau
 
-  Maximilien Naveau,
-  Olivier Stasse,
+  M. Naveau, M. Kudruss, O. Stasse, C. Kirches, K. Mombaur, and P. Sou` eres,
+  “A reactive walking pattern generator based on nonlinear model
+  predictive control,” in IEEE Robotics and Automation Letters (RAL), 2016.
+
  */
 
 #include "portability/gettimeofday.hh"
@@ -66,8 +68,7 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   SQP_N_ = 16 ;
   SQP_nf_ = 2 ;
   m_SamplingPeriod = 0.005 ;
-  outputPreviewDuration_ = m_SamplingPeriod ;
-  //outputPreviewDuration_ = SQP_T_ ;
+  outputPreviewDuration_ = SQP_T_ ;
 
   // Generator Management
   InterpolationPeriod_ = m_SamplingPeriod*7;
@@ -77,8 +78,8 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   NbSampleControl_ = (int)round(SQP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(SQP_T_/InterpolationPeriod_) ;
   StepPeriod_ = 0.8 ;
-  SSPeriod_ = 0.7 ;
-  DSPeriod_ = 0.1 ;
+  m_Tsingle = 0.7 ;
+  m_Tdble = 0.1 ;
   FeetDistance_ = 0.2 ;
   CoMHeight_ = 0.814 ;
   UpperTimeLimitToUpdate_ = 0.0 ;
@@ -99,15 +100,6 @@ ZMPRefTrajectoryGeneration(SPM),OFTG_(NULL),dynamicFilter_(NULL),CurrentIndexUpp
   // Create and initialize online interpolation of feet trajectories:
   // ----------------------------------------------------------------
   OFTG_ = new OnLineFootTrajectoryGeneration(SPM,PR_->leftFoot());
-  OFTG_->InitializeInternalDataStructures();
-  OFTG_->SetSingleSupportTime( SSPeriod_ );
-  OFTG_->SetDoubleSupportTime( DSPeriod_ );
-  OFTG_->SetSamplingPeriod( m_SamplingPeriod );
-  OFTG_->QPSamplingPeriod( SQP_T_ );
-  OFTG_->NbSamplingsPreviewed( SQP_N_ );
-  OFTG_->FeetDistance( FeetDistance_ );
-  OFTG_->SetStepHeight( StepHeight_ );
-  OFTG_->SetStepStairOn(0) ;
 
   NMPCgenerator_ = new NMPCgenerator(SPM,PR_);
 
@@ -252,6 +244,16 @@ void ZMPVelocityReferencedSQP::CallMethod(std::string & Method, std::istringstre
   }
 
   ZMPRefTrajectoryGeneration::CallMethod(Method,strm);
+
+  if (Method==":singlesupporttime" || Method==":doublesupporttime")
+  {
+    StepPeriod_ = m_Tsingle + m_Tdble ;
+  }
+
+  if (Method==":doublesupporttime")
+  {
+    SQP_T_ = m_Tdble ;
+  }
 }
 
 int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
@@ -264,6 +266,17 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
                                         COMState & lStartingCOMState,
                                         MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
 {
+  // Generator Management
+  outputPreviewDuration_ = m_SamplingPeriod ;
+  //outputPreviewDuration_ = SQP_T_ ;
+  previewDuration_ =  (previewSize_-1)*SQP_T_ ;
+  NbSampleOutput_ = (int)round(outputPreviewDuration_/m_SamplingPeriod) + 1 ;
+  NbSampleControl_ = (int)round(SQP_T_/m_SamplingPeriod) ;
+  NbSampleInterpolation_ = (int)round(SQP_T_/InterpolationPeriod_) ;
+
+
+
+
   UpperTimeLimitToUpdate_ = 0.0;
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
 
@@ -329,13 +342,57 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   currentSupport.Yaw=0.0;
   currentSupport.StartTime = 0.0;
 
+  // INITIAL FOOT TRAJ GENERATOR:
+  // ----------------------------
+  OFTG_->InitializeInternalDataStructures();
+  OFTG_->SetSingleSupportTime( m_Tsingle );
+  OFTG_->SetDoubleSupportTime( m_Tdble );
+  OFTG_->SetSamplingPeriod( m_SamplingPeriod );
+  OFTG_->QPSamplingPeriod( SQP_T_ );
+  OFTG_->NbSamplingsPreviewed( SQP_N_ );
+  OFTG_->FeetDistance( FeetDistance_ );
+  OFTG_->SetStepHeight( StepHeight_ );
+  OFTG_->SetStepStairOn(0) ;
+
+  // INITIAL SOLVER:
+  // ---------------
   NMPCgenerator_->T(SQP_T_);
   NMPCgenerator_->N(SQP_N_);
   NMPCgenerator_->T_step(StepPeriod_);
-  NMPCgenerator_->initNMPCgenerator(outputPreviewDuration_,
+  bool useLineSearch = false ;
+  if(outputPreviewDuration_==m_SamplingPeriod &&
+     m_Tsingle == 0.7 && m_Tdble == 0.1 )
+    useLineSearch = true ;
+  //useLineSearch = false ;
+  SQP_nf_ = (int)ceil(SQP_N_*SQP_T_/StepPeriod_);
+  NMPCgenerator_->initNMPCgenerator(useLineSearch,
                                     currentSupport,
                                     lStartingCOMState,
-                                    VelRef_,SQP_N_,SQP_nf_,SQP_T_,StepPeriod_);
+                                    VelRef_,SQP_N_,SQP_nf_,
+                                    SQP_T_,StepPeriod_);
+
+
+
+  // init of the buffer for the kajita's dynamic filter
+  // size = numberOfIterationOfThePreviewControl * NumberOfSample + Margin(=CurrentIndex)
+  // Waring current index is higher on the robot than in the jrl Test suit
+  unsigned int IndexMax = (int)round((previewDuration_)/InterpolationPeriod_ );
+  ZMPTraj_deq_.resize(IndexMax);
+  COMTraj_deq_.resize(IndexMax);
+  LeftFootTraj_deq_.resize(IndexMax);
+  RightFootTraj_deq_.resize(IndexMax);
+  ZMPTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
+  COMTraj_deq_ctrl_      .resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
+  LeftFootTraj_deq_ctrl_ .resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
+  RightFootTraj_deq_ctrl_.resize( previewSize_ * NbSampleControl_ + CurrentIndexUpperBound_);
+
+  deltaCOMTraj_deq_.resize((int)round(outputPreviewDuration_/m_SamplingPeriod));
+
+  JerkX_      .clear();
+  JerkY_      .clear();
+  FootStepX_  .clear();
+  FootStepY_  .clear();
+  FootStepYaw_.clear();
 
   // INITIALIZE CENTER OF MASS:
   // --------------------------
@@ -351,6 +408,8 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   CoM.z[2] = lStartingCOMState.z[2];
   initCOM_ = lStartingCOMState;
   LIPM_.SetComHeight(lStartingCOMState.z[0]);
+  LIPM_.SetSimulationControlPeriod( SQP_T_ );
+  LIPM_.SetRobotControlPeriod( m_SamplingPeriod );
   LIPM_.InitializeSystem();
   LIPM_(CoM);
 
