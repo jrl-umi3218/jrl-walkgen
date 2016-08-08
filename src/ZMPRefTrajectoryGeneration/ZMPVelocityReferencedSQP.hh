@@ -278,10 +278,10 @@ namespace PatternGeneratorJRL
     double InterpolationPeriod_ ;
     /// \brief Step Period of the robot
     double StepPeriod_ ;
-    /// \brief Period where the robot is on ONE feet
-    double SSPeriod_ ;
-    /// \brief Period where the robot is on TWO feet
-    double DSPeriod_ ;
+//    /// \brief Period where the robot is on ONE feet
+//    double SSPeriod_ ;
+//    /// \brief Period where the robot is on TWO feet
+//    double DSPeriod_ ;
     /// \brief Maximum distance between the feet
     double FeetDistance_ ;
     /// \brief Maximum height of the feet
