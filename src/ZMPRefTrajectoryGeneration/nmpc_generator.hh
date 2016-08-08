@@ -44,7 +44,7 @@ namespace PatternGeneratorJRL
 
     ~NMPCgenerator();
 
-    void initNMPCgenerator(double outputPreviewDuration, support_state_t &currentSupport,
+    void initNMPCgenerator(bool useLineSearch, support_state_t &currentSupport,
                            COMState & lStartingCOMState,
                            reference_t & local_vel_ref,
                            unsigned N, unsigned nf, double T, double T_step);
