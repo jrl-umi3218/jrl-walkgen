@@ -96,6 +96,13 @@ namespace PatternGeneratorJRL
     void initializeStandingConstraint();
     void updateStandingConstraint();
 
+    // tools to check if foot is close to land
+    void updateIterationBeforeLanding();
+    bool isFootCloseToLand()
+    {// return (itBeforeLanding_ < 2);}
+      return false ;
+    }
+
     // build the cost function
     void initializeCostFunction();
     void updateCostFunction();
@@ -248,15 +255,17 @@ namespace PatternGeneratorJRL
 
     // Foot position constraint
     unsigned nc_foot_ ;
-    MAL_MATRIX_TYPE(double) Afoot_xy_, Afoot_theta_  ;
-    MAL_VECTOR_TYPE(double) UBfoot_, LBfoot_ ;
-    MAL_MATRIX_TYPE(double) SelecMat_, derv_Afoot_map_ ;
+    unsigned n_vertices_ ;
+    unsigned itBeforeLanding_ ;
+    std::vector<MAL_MATRIX_TYPE(double)> Afoot_xy_, Afoot_theta_  ;
+    std::vector<MAL_VECTOR_TYPE(double)> UBfoot_, LBfoot_ ;
+    std::vector<MAL_MATRIX_TYPE(double)> SelecMat_;
     std::vector<MAL_MATRIX_TYPE(double)> A0f_xy_, A0f_theta_ ;
     std::vector<MAL_VECTOR_TYPE(double)> B0f_;
     std::vector<MAL_MATRIX_TYPE(double)> rotMat_vec_, drotMat_vec_ ;
     MAL_MATRIX_TYPE(double) tmpRotMat_;
-    MAL_MATRIX_TYPE(double) ASx_xy_, ASy_xy_, ASx_theta_, ASy_theta_ , AS_theta_;
-    MAL_VECTOR_TYPE(double) SfootX_, SfootY_;
+    std::vector<MAL_VECTOR_TYPE(double)> deltaF_ ;
+    std::vector<MAL_VECTOR_TYPE(double)> AdRdF_ ;
 
     // Foot Velocity constraint
     unsigned nc_vel_ ;
@@ -286,7 +295,8 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_TYPE(double) ub_  ;
     MAL_VECTOR_TYPE(double) gU_  ;
     MAL_VECTOR_TYPE(double) Uxy_  ;
-    MAL_VECTOR_TYPE(double) gU_cop_, gU_foot_, gU_vel_ ;
+    MAL_VECTOR_TYPE(double) gU_cop_, gU_vel_ ;
+    std::vector<MAL_VECTOR_TYPE(double)> gU_foot_ ;
     MAL_VECTOR_TYPE(double) gU_obs_, gU_rot_ , gU_stan_ ;
 
     // Cost Function

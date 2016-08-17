@@ -32,7 +32,7 @@
 //#define DEBUG
 //#define DEBUG_COUT
 
-#ifdef DEBUG
+//#ifdef DEBUG
 void DumpMatrix(std::string fileName, MAL_MATRIX_TYPE(double) & M)
 {
   std::ofstream aof;
@@ -84,7 +84,7 @@ void DumpVector(std::string fileName, MAL_VECTOR_TYPE(double) & M)
     }
   }
 }
-#endif // DEBUG
+//#endif // DEBUG
 
 using namespace std;
 using namespace PatternGeneratorJRL;
@@ -137,6 +137,7 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, PinocchioRobot *aPR)
   deltaU_ = NULL;
   isQPinitialized_ = false;
   useLineSearch_ = false;
+  itBeforeLanding_ = 0;
 
   SupportStates_deq_.clear();
 }
@@ -214,8 +215,8 @@ void NMPCgenerator::initNMPCgenerator(
 
   MAL_VECTOR_RESIZE(vel_ref_.Global.X_vec , N_) ;
   MAL_VECTOR_RESIZE(vel_ref_.Global.Y_vec , N_) ;
-  MAL_VECTOR_RESIZE(vel_ref_.Global.X_vec , N_) ;
-  MAL_VECTOR_RESIZE(vel_ref_.Global.Y_vec , N_) ;
+  MAL_VECTOR_RESIZE(vel_ref_.Local .X_vec , N_) ;
+  MAL_VECTOR_RESIZE(vel_ref_.Local .Y_vec , N_) ;
 
   MAL_MATRIX_RESIZE(rotMat_xy_,2,2); MAL_MATRIX_FILL(rotMat_xy_ ,0.0);
   MAL_MATRIX_RESIZE(rotMat_theta_,2,2); MAL_MATRIX_FILL(rotMat_theta_ ,0.0);
@@ -227,7 +228,7 @@ void NMPCgenerator::initNMPCgenerator(
   Tfirst_ = T ;
   T_step_ = T_step ;
   alpha_ = 1 ;// 1     ; // weight for CoM velocity tracking  : 0.5 * a ; 2.5
-  beta_  = 10 ;// 1     ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
+  beta_  = 1e+3 ;// 1     ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
   gamma_ = 1e-08 ;// 1e-05 ; // weight for jerk minimization      : 0.5 * c ; 1e-04
   SecurityMarginX_ = 0.09 ;
   SecurityMarginY_ = 0.05 ;
@@ -259,6 +260,8 @@ void NMPCgenerator::initNMPCgenerator(
   strm >> cmd ;
   RFI_->CallMethod(cmd,strm);
   FeetDistance_ = RFI_->DSFeetDistance();
+
+  itBeforeLanding_=(int)round(T_step_/T_);
 
   // build constant matrices
   buildCoMCoPIntegrationMatrix();
@@ -299,7 +302,8 @@ void NMPCgenerator::updateInitialCondition(double time,
   currentLeftFootAbsolutePosition_  = currentLeftFootAbsolutePosition;
   currentRightFootAbsolutePosition_ = currentRightFootAbsolutePosition;
 
-  setLocalVelocityReference(local_vel_ref);
+  //setLocalVelocityReference(local_vel_ref);
+  setGlobalVelocityReference(local_vel_ref);
 
   c_k_x_(0) = currentCOMState.x[0] ;
   c_k_x_(1) = currentCOMState.x[1] ;
@@ -323,7 +327,7 @@ void NMPCgenerator::updateInitialCondition(double time,
                        currentLeftFootAbsolutePosition,
                        currentRightFootAbsolutePosition);
 
-#ifdef COUT
+#ifdef DEBUG_COUT
   cout << time_ << "  "
        << currentSupport_.StartTime << "  "
        << currentSupport_.TimeLimit << "  "
@@ -338,7 +342,7 @@ void NMPCgenerator::updateInitialCondition(double time,
   {
     Tfirst_ = (time_+T_-currentSupport_.TimeLimit)
         - ((double)(int)((time_-currentSupport_.TimeLimit)/T_) * T_) ;
-#ifdef COUT
+#ifdef DEBUG_COUT
     cout << Tfirst_ << " " ;
 #endif
     Tfirst_ = T_ - Tfirst_;
@@ -351,7 +355,7 @@ void NMPCgenerator::updateInitialCondition(double time,
   if(Tfirst_<0.0001)
     Tfirst_=T_;
 
-#ifdef COUT
+#ifdef DEBUG_COUT
   cout << time_ << " " ;
   cout << currentSupport_.TimeLimit << " " ;
   cout << currentSupport_.StartTime << " " ;
@@ -363,6 +367,7 @@ void NMPCgenerator::updateInitialCondition(double time,
                      currentLeftFootAbsolutePosition,
                      currentRightFootAbsolutePosition);
   computeFootSelectionMatrix();
+  updateIterationBeforeLanding();
   return ;
 }
 
@@ -1072,51 +1077,6 @@ void NMPCgenerator::updateCoPConstraint()
       A0_theta_ = MAL_RET_A_by_B(A0ds_,rotMat_theta_) ;
       B0_ = ubB0ds_ ;
     }
-//    else if(currentSupport_.Phase==SS && i==0 &&
-//            time_+T_ > currentSupport_.TimeLimit)
-//    {
-//      double x1 (currentLeftFootAbsolutePosition_ .x);
-//      double y1 (currentLeftFootAbsolutePosition_ .y);
-//      double x2 (currentRightFootAbsolutePosition_.x);
-//      double y2 (currentRightFootAbsolutePosition_.y);
-//      double dx = x2-x1;
-//      double dy = y2-y1;
-//      double angle = atan2(-dy,-dx);
-
-//      rotMat_(0,0)= cos(angle) ; rotMat_(0,1)= sin(angle) ;
-//      rotMat_(1,0)=-sin(angle) ; rotMat_(1,1)= cos(angle) ;
-
-//      double l = 0.01;
-//      double L = sqrt(dx*dx+dy*dy)+0.01 ;
-
-//      hull4_.X_vec[0] = - L*0.5 ; hull4_.Y_vec[0] = - l*0.5 ;
-//      hull4_.X_vec[1] = - L*0.5 ; hull4_.Y_vec[1] = + l*0.5 ;
-//      hull4_.X_vec[2] = + L*0.5 ; hull4_.Y_vec[2] = + l*0.5 ;
-//      hull4_.X_vec[3] = + L*0.5 ; hull4_.Y_vec[3] = - l*0.5 ;
-//#ifdef COUT
-//      double m1=(x1+x2)*0.5;
-//      double m2=(y1+y2)*0.5;
-//      cout << angle*180/M_PI << " ; "
-//           << L-2*0.01 << " ; "
-//           << m1 << " "  << m2 << " ; "
-//           << hull.X_vec[0] << " " << hull.Y_vec[0] << " ; "
-//           << hull.X_vec[1] << " " << hull.Y_vec[1] << " ; "
-//           << hull.X_vec[2] << " " << hull.Y_vec[2] << " ; "
-//           << hull.X_vec[3] << " " << hull.Y_vec[3] << endl ;
-//#endif
-//      dummySupp_.Foot = LEFT ;
-//      dummySupp_.Phase = SS ;
-//      RFI_->compute_linear_system( hull4_, dummySupp_ );
-//      for(unsigned i = 0 ; i < hull4_.A_vec.size() ; ++i)
-//      {
-//        A0ds_(i,0) = hull4_.A_vec[i] ;
-//        A0ds_(i,1) = hull4_.B_vec[i] ;
-//        ubB0ds_(i) = hull4_.D_vec[i] ;
-//      }
-//      A0_xy_ = MAL_RET_A_by_B(A0ds_,rotMat_) ;
-//      MAL_MATRIX_FILL(A0_theta_,0.0) ;
-//      B0_ = ubB0ds_ ;
-//    }
     else if (SupportStates_deq_[i+1].Foot == LEFT)
     {
       A0_xy_    = MAL_RET_A_by_B(A0lf_,rotMat_xy_   ) ;
@@ -1187,17 +1147,7 @@ void NMPCgenerator::updateCoPConstraint()
         v_kp1f_y_(i) = v_kp1_(i) *
             (SupportStates_deq_[i+1].Y + cos(SupportStates_deq_[i+1].Yaw)*FeetDistance_*0.5);
       }
-    }/*else if(currentSupport_.Phase==SS && i==0 && time_+T_ > currentSupport_.TimeLimit)
-    {
-      double x1 (currentLeftFootAbsolutePosition_ .x);
-      double y1 (currentLeftFootAbsolutePosition_ .y);
-      double x2 (currentRightFootAbsolutePosition_.x);
-      double y2 (currentRightFootAbsolutePosition_.y);
-      double m1=(x1+x2)*0.5;
-      double m2=(y1+y2)*0.5;
-      v_kp1f_x_(i) = v_kp1_(i) * m1 ;
-      v_kp1f_y_(i) = v_kp1_(i) * m2 ;
-    }*/
+    }
     else
     {
       v_kp1f_x_(i) = v_kp1_(i) * SupportStates_deq_[i+1].X ;
@@ -1252,55 +1202,60 @@ void NMPCgenerator::initializeFootPoseConstraint()
   NOTE: needs actual SupportStates_deq_ to work properly
   """
   # inequality constraint on both feet A u + B <= 0
-  # A0 R(theta) [Fx_k+1 - Fx_k] <= ubB0
-  #             [Fy_k+1 - Fy_k]
+  # A0 R(Ftheta_k+1) [Fx_k+1 - Fx_k] <= ubB0
+  #                  [Fy_k+1 - Fy_k]
   */
-  nc_foot_ = nf_*MAL_VECTOR_SIZE(ubB0r_) ;
-  MAL_MATRIX_RESIZE(Afoot_xy_   ,nc_foot_,2*(N_+nf_));
-  MAL_MATRIX_RESIZE(Afoot_theta_,nc_foot_,nf_);
-  MAL_MATRIX_RESIZE(AS_theta_   ,nc_foot_,2*(N_+nf_));
-  MAL_VECTOR_RESIZE(UBfoot_     ,nc_foot_);
-  MAL_VECTOR_RESIZE(LBfoot_     ,nc_foot_);
-
-  MAL_MATRIX_RESIZE(SelecMat_,nf_,nf_);
-  MAL_MATRIX_SET_IDENTITY(SelecMat_);
-  for(unsigned i=1 ; i<SelecMat_.size1() ; ++i)
+  n_vertices_ = MAL_VECTOR_SIZE(ubB0r_) ;
+  nc_foot_ = nf_*n_vertices_ ;
+  Afoot_xy_   .resize(nf_);
+  Afoot_theta_.resize(nf_);
+  UBfoot_     .resize(nf_);
+  LBfoot_     .resize(nf_);
+  SelecMat_   .resize(nf_);
+  AdRdF_      .resize(nf_);
+  deltaF_     .resize(nf_);
+  for(unsigned i=0 ; i< nf_ ; ++i)
   {
-    for(unsigned j=0 ; j<SelecMat_.size2() ; ++j)
-    {
-      if(i==j)
-      {
-        SelecMat_(i,j-1)=-1;
-      }
-    }
+    MAL_MATRIX_RESIZE(Afoot_xy_   [i],n_vertices_,2*(N_+nf_));
+    MAL_MATRIX_RESIZE(Afoot_theta_[i],n_vertices_,nf_);
+    MAL_VECTOR_RESIZE(UBfoot_     [i],n_vertices_);
+    MAL_VECTOR_RESIZE(LBfoot_     [i],n_vertices_);
+    MAL_MATRIX_RESIZE(SelecMat_   [i],2,2*(N_+nf_));
+    MAL_VECTOR_RESIZE(AdRdF_      [i],n_vertices_);
+    MAL_VECTOR_RESIZE(deltaF_     [i],2);//2 as [deltaFx,deltaFy]
   }
-
   rotMat_vec_ .resize(nf_, tmpRotMat_ );
   drotMat_vec_.resize(nf_, tmpRotMat_ );
 
-  MAL_MATRIX_RESIZE(ASx_xy_,nc_foot_,nf_);
-  MAL_MATRIX_RESIZE(ASy_xy_,nc_foot_,nf_);
-  MAL_MATRIX_RESIZE(ASx_theta_,nc_foot_,nf_) ;
-  MAL_MATRIX_RESIZE(ASy_theta_,nc_foot_,nf_) ;
 
-  MAL_MATRIX_FILL(Afoot_xy_   ,0.0);
-  MAL_MATRIX_FILL(Afoot_theta_,0.0);
-  MAL_MATRIX_FILL(AS_theta_   ,0.0);
-  MAL_VECTOR_FILL(UBfoot_     ,0.0);
-  MAL_VECTOR_FILL(LBfoot_     ,-1e+08);
-
-  MAL_MATRIX_RESIZE(derv_Afoot_map_,nc_foot_,N_);
-
-  MAL_VECTOR_RESIZE(SfootX_,nf_);
-  MAL_VECTOR_RESIZE(SfootY_,nf_);
-  MAL_VECTOR_FILL(SfootX_,0.0);
-  MAL_VECTOR_FILL(SfootY_,0.0);
-
+  for(unsigned n=0 ; n < nf_ ; ++n)
+  {
+    MAL_MATRIX_FILL(Afoot_xy_   [n],0.0);
+    MAL_MATRIX_FILL(Afoot_theta_[n],0.0);
+    MAL_VECTOR_FILL(UBfoot_     [n],0.0);
+    MAL_VECTOR_FILL(LBfoot_     [n],-1e+08);
+    MAL_MATRIX_FILL(SelecMat_   [n],0.0);
+    MAL_VECTOR_FILL(deltaF_     [n],0.0);
+    SelecMat_[n](0,N_+n) = 1 ;
+    SelecMat_[n](1,2*N_+nf_+n) = 1 ;
+    if(n>0)
+    {
+      SelecMat_[n](0,N_+n-1) = -1 ;
+      SelecMat_[n](1,2*N_+nf_+n-1) = -1 ;
+    }
+  }
   return ;
 }
 
 void NMPCgenerator::updateFootPoseConstraint()
 {
+  int ignoreFirstStep = 0 ;
+  if(isFootCloseToLand())
+  {
+    ignoreFirstStep = 1 ;
+    nc_foot_ = (nf_-1)*n_vertices_ ;
+  }
+
   // rotation matrice from F_k+1 to F_k
   vector<support_state_t>support_state(nf_);
   support_state[0]=SupportStates_deq_[1];
@@ -1326,116 +1281,63 @@ void NMPCgenerator::updateFootPoseConstraint()
     }
   }
 
-  for(unsigned i=0 ; i<nf_ ; ++i)
+  for(unsigned n=ignoreFirstStep ; n<nf_ ; ++n)
   {
-    rotMat_vec_[i](0,0)= cos(support_state[i].Yaw) ;
-    rotMat_vec_[i](0,1)= sin(support_state[i].Yaw) ;
-    rotMat_vec_[i](1,0)=-sin(support_state[i].Yaw) ;
-    rotMat_vec_[i](1,1)= cos(support_state[i].Yaw) ;
+    rotMat_vec_[n](0,0)= cos(support_state[n].Yaw) ;
+    rotMat_vec_[n](0,1)= sin(support_state[n].Yaw) ;
+    rotMat_vec_[n](1,0)=-sin(support_state[n].Yaw) ;
+    rotMat_vec_[n](1,1)= cos(support_state[n].Yaw) ;
 
-    drotMat_vec_[i](0,0)=-sin(support_state[i].Yaw) ;
-    drotMat_vec_[i](0,1)= cos(support_state[i].Yaw) ;
-    drotMat_vec_[i](1,0)=-cos(support_state[i].Yaw) ;
-    drotMat_vec_[i](1,1)=-sin(support_state[i].Yaw) ;
-  }
+    drotMat_vec_[n](0,0)=-sin(support_state[n].Yaw) ;
+    drotMat_vec_[n](0,1)= cos(support_state[n].Yaw) ;
+    drotMat_vec_[n](1,0)=-cos(support_state[n].Yaw) ;
+    drotMat_vec_[n](1,1)=-sin(support_state[n].Yaw) ;
 
-  // every time instant in the pattern generator constraints
-  // depend on the support order
-
-  // reset matrix
-  MAL_MATRIX_FILL(ASx_xy_ ,0.0);
-  MAL_MATRIX_FILL(ASy_xy_ ,0.0);
-  MAL_MATRIX_FILL(ASx_theta_,0.0);
-  MAL_MATRIX_FILL(ASy_theta_,0.0);
-
-  for(unsigned i=0 ; i<nf_ ; ++i)
-  {
-    if (support_state[i].Foot == LEFT)
+    if (support_state[n].Foot == LEFT)
     {
-      A0f_xy_   [i] = MAL_RET_A_by_B(A0r_,rotMat_vec_[i]) ;
-      A0f_theta_[i] = MAL_RET_A_by_B(A0r_,drotMat_vec_[i]) ;
-      B0f_      [i] = ubB0r_ ;
+      A0f_xy_   [n] = MAL_RET_A_by_B(A0r_,rotMat_vec_ [n]) ;
+      A0f_theta_[n] = MAL_RET_A_by_B(A0r_,drotMat_vec_[n]) ;
+      B0f_      [n] = ubB0r_ ;
     }else{
-      A0f_xy_   [i] = MAL_RET_A_by_B(A0l_,rotMat_vec_[i]) ;
-      A0f_theta_[i] = MAL_RET_A_by_B(A0l_,drotMat_vec_[i]) ;
-      B0f_      [i] = ubB0l_ ;
+      A0f_xy_   [n] = MAL_RET_A_by_B(A0l_,rotMat_vec_ [n]) ;
+      A0f_theta_[n] = MAL_RET_A_by_B(A0l_,drotMat_vec_[n]) ;
+      B0f_      [n] = ubB0l_ ;
     }
-  }
+    MAL_MATRIX_FILL(Afoot_xy_   [n],0.0);
+    Afoot_xy_[n] = MAL_RET_A_by_B(A0f_xy_[n],SelecMat_[n]);
 
-  unsigned nbEdges = MAL_MATRIX_NB_ROWS(A0f_xy_[0]);
-  for(unsigned n=0 ; n<nf_ ; ++n)
-  {
-    for (unsigned i=0 ; i<nbEdges ; ++i)
+    MAL_VECTOR_FILL(UBfoot_[n] , 0.0);
+    UBfoot_[n]=B0f_[n];
+
+    if(n==0)
     {
-      ASx_xy_(n*nbEdges+i,n) = A0f_xy_[n](i,0) ;
-      ASy_xy_(n*nbEdges+i,n) = A0f_xy_[n](i,1) ;
-
-      ASx_theta_(n*nbEdges+i,n) = A0f_theta_[n](i,0) ;
-      ASy_theta_(n*nbEdges+i,n) = A0f_theta_[n](i,1) ;
-
-      UBfoot_(n*nbEdges+i) = B0f_[n](i);
-    }
-  }
-#ifdef DEBUG
-  DumpVector("UBfoot_",UBfoot_);
-  DumpMatrix("Ax_xy_",ASx_xy_);
-  DumpMatrix("Ay_xy_",ASy_xy_);
-#endif
-#ifdef DEBUG_COUT
-  cout << "ASx_xy_ = " << ASx_xy_ << endl ;
-#endif
-  MAL_VECTOR_FILL(SfootX_,0.0);
-  MAL_VECTOR_FILL(SfootY_,0.0);
-  SfootX_(0) = support_state[0].X ;
-  SfootY_(0) = support_state[0].Y ;
-
-  UBfoot_ = UBfoot_ +
-      MAL_RET_A_by_B(ASx_xy_,SfootX_) +
-      MAL_RET_A_by_B(ASy_xy_,SfootY_) ;
-
-  ASx_xy_    = MAL_RET_A_by_B(ASx_xy_   ,SelecMat_);
-  ASy_xy_    = MAL_RET_A_by_B(ASy_xy_   ,SelecMat_);
-  ASx_theta_ = MAL_RET_A_by_B(ASx_theta_,SelecMat_);
-  ASy_theta_ = MAL_RET_A_by_B(ASy_theta_,SelecMat_);
-#ifdef DEBUG
-  DumpMatrix("ASx_xy_",ASx_xy_);
-  DumpMatrix("ASy_xy_",ASy_xy_);
-#endif
-  for (unsigned i=0 ; i<nc_foot_ ; ++i)
-  {
-    for (unsigned j=0 ; j<nf_ ; ++j)
-    {
-      Afoot_xy_(i,N_+j)       = ASx_xy_(i,j);
-      Afoot_xy_(i,2*N_+nf_+j) = ASy_xy_(i,j);
-      AS_theta_(i,N_+j)       = ASx_theta_(i,j);
-      AS_theta_(i,2*N_+nf_+j) = ASy_theta_(i,j);
-    }
-  }
-
-  MAL_MATRIX_FILL(derv_Afoot_map_,0.0);
-  for (unsigned k=0 , n=nbEdges ; k<nf_-1 ;++k , n+=nbEdges)
-  {
-    for (unsigned j=0 ; j<N_ ; ++j )
-    {
-      if (V_kp1_(j,k) == 1)
+      for(unsigned i=0 ; i<n_vertices_ ; ++i)
       {
-        for (unsigned i=0 ; i<nbEdges ; ++i )
-          derv_Afoot_map_(n+i,j) = 1.0 ;
-        break;
+        UBfoot_[0](i) += A0f_xy_[0](i,0)*support_state[0].X +
+                         A0f_xy_[0](i,1)*support_state[0].Y ;
       }
     }
-  }
 
-  MAL_VECTOR_TYPE(double) dummy = MAL_RET_A_by_B(AS_theta_,U_xy_);
-  dummy = MAL_RET_A_by_B(dummy,derv_Afoot_map_);
-  dummy = MAL_RET_A_by_B(dummy,V_kp1_);
-  for(unsigned i=0 ; i<MAL_MATRIX_NB_ROWS(Afoot_theta_) ; ++i)
-    for(unsigned j=0 ; j<MAL_MATRIX_NB_COLS(Afoot_theta_) ; ++j)
-      Afoot_theta_(i,j) = dummy(j);
-#ifdef DEBUG
-  DumpMatrix("Afoot_xy_",Afoot_xy_);
-  DumpMatrix("Afoot_theta_",Afoot_theta_);
-#endif
+    MAL_MATRIX_FILL(Afoot_theta_[n],0.0);
+    if(n!=0)
+    {
+      deltaF_[n](0)=F_kp1_x_[n]-F_kp1_x_[n-1];
+      deltaF_[n](1)=F_kp1_y_[n]-F_kp1_y_[n-1];
+      AdRdF_[n] = MAL_RET_A_by_B(A0f_theta_[n],deltaF_[n]);
+      for (unsigned j=0 ; j<n_vertices_ ; ++j)
+      {
+        Afoot_theta_[n](j,n-1) = AdRdF_[n](j);
+      }
+    }
+//#ifdef DEBUG
+  ostringstream os ("") ;
+  os << "Afoot_xy_" << n << "_" ;
+  DumpMatrix(os.str() ,Afoot_xy_   [n]);
+  os.str("");
+  os << "Afoot_theta_" << n << "_" ;
+  DumpMatrix(os.str() ,Afoot_theta_[n]);
+//#endif
+  }
   return ;
 }
 
@@ -1471,17 +1373,9 @@ void NMPCgenerator::initializeFootVelIneqConstraint()
 
 void NMPCgenerator::updateFootVelIneqConstraint()
 {
-  unsigned itBeforeLanding = 0;
-  for(unsigned i=0 ; i<MAL_VECTOR_SIZE(v_kp1_) ; ++i)
-    if(v_kp1_(i))
-      ++itBeforeLanding;
-    else
-      break;
-  --itBeforeLanding;
-
   double thresh_time_pos = 0.0 ;
   double thresh_time_rot = 0.0 ;
-  if( (itBeforeLanding < 1) )
+  if( isFootCloseToLand() )
   {
     thresh_time_pos=1.0;
     thresh_time_rot=1.0;
@@ -1490,13 +1384,13 @@ void NMPCgenerator::updateFootVelIneqConstraint()
     Avel_(1, 2*N_+nf_)  = 1.0 ;
     Avel_(2,2*N_+2*nf_) = 1.0 ;
 
-    UBvel_(0) = F_kp1_x_(0) + 0.01 ;
-    UBvel_(1) = F_kp1_y_(0) + 0.01 ;
-    UBvel_(2) = F_kp1_theta_(0) + 0.01 ;
+    UBvel_(0) = F_kp1_x_(0)     ;
+    UBvel_(1) = F_kp1_y_(0)     ;
+    UBvel_(2) = F_kp1_theta_(0) ;
 
-    LBvel_(0) = F_kp1_x_(0) - 0.01 ;
-    LBvel_(1) = F_kp1_y_(0) - 0.01 ;
-    LBvel_(2) = F_kp1_theta_(0) - 0.01 ;
+    LBvel_(0) = F_kp1_x_(0)     ;
+    LBvel_(1) = F_kp1_y_(0)     ;
+    LBvel_(2) = F_kp1_theta_(0) ;
   }else
   {
     nc_vel_ = 0 ;
@@ -1734,7 +1628,12 @@ void NMPCgenerator::initializeCostFunction()
   MAL_VECTOR_RESIZE(gU_  ,      nc_);  MAL_VECTOR_FILL(gU_  , 0.0);
   MAL_VECTOR_RESIZE(Uxy_ ,2*(N_+nf_));  MAL_VECTOR_FILL(Uxy_ , 0.0);
   MAL_VECTOR_RESIZE(gU_cop_  ,nc_cop_); MAL_VECTOR_FILL(gU_cop_  , 0.0);
-  MAL_VECTOR_RESIZE(gU_foot_ ,nc_foot_); MAL_VECTOR_FILL(gU_foot_ , 0.0);
+  gU_foot_.resize(nf_);
+  for(unsigned n=0 ; n<nf_ ; ++n)
+  {
+    MAL_VECTOR_RESIZE(gU_foot_[n] , n_vertices_);
+    MAL_VECTOR_FILL(gU_foot_[n] , 0.0);
+  }
   MAL_VECTOR_RESIZE(gU_vel_  ,nc_vel_); MAL_VECTOR_FILL(gU_vel_  , 0.0);
   MAL_VECTOR_RESIZE(gU_obs_  ,nc_obs_); MAL_VECTOR_FILL(gU_obs_  , 0.0);
   MAL_VECTOR_RESIZE(gU_rot_  ,nc_rot_); MAL_VECTOR_FILL(gU_rot_  , 0.0);
@@ -1832,11 +1731,11 @@ void NMPCgenerator::updateCostFunction()
 #endif
   Pvsc_x_ = MAL_RET_A_by_B(Pvs_ , c_k_x_) ;
   Pvsc_y_ = MAL_RET_A_by_B(Pvs_ , c_k_y_) ;
-  // Pzsc_x_, Pzsc_y_ , v_kp1f_x_ and v_kp1f_y_ alreday up to date
+  // Pzsc_x_, Pzsc_y_ , v_kp1f_x_ and v_kp1f_y_ already up to date
   //from the CoP constraint building function
 
   p_xy_X_ =    alpha_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_  ), Pvsc_x_ - vel_ref_.Global.X_vec)
-             + beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_  ), Pzsc_x_ - v_kp1f_x_                 );
+             + beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_  ), Pzsc_x_ - v_kp1f_x_            );
 #ifdef DEBUG
   DumpVector("Pvsc_x_"    , Pvsc_x_                    ) ;
   DumpVector("RefVectorX" , vel_ref_.Global.X_vec ) ;
@@ -1910,12 +1809,22 @@ void NMPCgenerator::updateCostFunction()
       qp_J_(i,j+N2nf2)=Acop_theta_(i,j);
   }
   index = nc_cop_ ;
-  for(unsigned i=0 ; i<nc_foot_ ; ++i)
+  if(nc_foot_!=0)
   {
-    for(unsigned j=0; j<N2nf2 ; ++j)
-      qp_J_(i+index,j)=Afoot_xy_(i,j);
-    for(unsigned j=0; j<nf_ ; ++j)
-      qp_J_(i+index,j+N2nf2)=Afoot_theta_(i,j);
+    int istart = 0 ;
+    if(isFootCloseToLand())
+      istart = 1 ;
+
+    for(unsigned i=istart ; i<nf_ ; ++i)
+    {
+      for(unsigned n=0 ; n<n_vertices_ ; ++n)
+      {
+        for(unsigned j=0; j<N2nf2 ; ++j)
+          qp_J_((i-istart)*n_vertices_+n+index,j)=Afoot_xy_[i](n,j);
+        for(unsigned j=0; j<nf_ ; ++j)
+          qp_J_((i-istart)*n_vertices_+n+index,j+N2nf2)=Afoot_theta_[i](n,j);
+      }
+    }
   }
   index += nc_foot_ ;
   for(unsigned i=0 ; i<nc_vel_ ; ++i)
@@ -1930,7 +1839,7 @@ void NMPCgenerator::updateCostFunction()
     {
       if(i==j)
         qp_J_(index+i,2*N_+2*nf_+j) =  1.0 ;
-      if(j==i-1)
+      if(j==(i-1))
         qp_J_(index+i,2*N_+2*nf_+j) = -1.0 ;
     }
   }
@@ -1988,6 +1897,11 @@ void NMPCgenerator::setLocalVelocityReference(reference_t local_vel_ref)
     vel_ref_.Global.Yaw = 0.2 ;
   if(vel_ref_.Global.Yaw<-0.2)
     vel_ref_.Global.Yaw = -0.2 ;
+//#ifdef DEBUG_COUT
+  cout << "velocity = " ;
+  cout << vel_ref_.Global.X << " "  ;
+  cout << vel_ref_.Global.Y << endl ;
+//#endif
   MAL_VECTOR_FILL(vel_ref_.Global.X_vec   , vel_ref_.Global.X  ) ;
   MAL_VECTOR_FILL(vel_ref_.Global.Y_vec   , vel_ref_.Global.Y  ) ;
 #ifdef DEBUG
@@ -1999,7 +1913,9 @@ void NMPCgenerator::setLocalVelocityReference(reference_t local_vel_ref)
 
 void NMPCgenerator::setGlobalVelocityReference(reference_t global_vel_ref)
 {
-  vel_ref_.Global = global_vel_ref.Global ;
+  vel_ref_.Global.X = global_vel_ref.Local.X ;
+  vel_ref_.Global.Y = global_vel_ref.Local.Y ;
+  vel_ref_.Global.Yaw = global_vel_ref.Local.Yaw ;
 
   if(vel_ref_.Global.X>0.4)
     vel_ref_.Global.X = 0.4;
@@ -2216,7 +2132,14 @@ void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
   //    CoP
   gU_cop_ = MAL_RET_A_by_B(Acop_xy_,Uxy_);
   //    Foot
-  gU_foot_ = MAL_RET_A_by_B(Afoot_xy_,Uxy_);
+  int istart = 0 ;
+  if(nc_foot_!=0)
+  {
+    if(isFootCloseToLand())
+      istart = 1 ;
+    for(unsigned i=istart ; i<nf_ ; ++i)
+      gU_foot_[i] = MAL_RET_A_by_B(Afoot_xy_[i],Uxy_);
+  }
   //    Velocity
   gU_vel_ = MAL_RET_A_by_B(Avel_,U) ;
   //    Rotation
@@ -2250,11 +2173,17 @@ void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
     gU_(index+i) = gU_cop_(i);
   }
   index = nc_cop_ ;
-  for(unsigned i=0 ; i<nc_foot_ ; ++i)
+  if(nc_foot_!=0)
   {
-    lb_(index+i) = LBfoot_ (i);
-    ub_(index+i) = UBfoot_ (i);
-    gU_(index+i) = gU_foot_(i);
+    for(unsigned i=istart ; i<nf_ ; ++i)
+    {
+      for(unsigned j=0 ; j<n_vertices_ ; ++j)
+      {
+        lb_(index+(i-istart)*n_vertices_+j) = LBfoot_ [i](j);
+        ub_(index+(i-istart)*n_vertices_+j) = UBfoot_ [i](j);
+        gU_(index+(i-istart)*n_vertices_+j) = gU_foot_[i](j);
+      }
+    }
   }
   index += nc_foot_ ;
   for(unsigned i=0 ; i<nc_vel_ ; ++i)
@@ -2288,5 +2217,17 @@ void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
 //    ub_(index+i) = UBstan_ (i);
 //    gU_(index+i) = gU_stan_(i);
 //  }
+  return ;
+}
+
+void NMPCgenerator::updateIterationBeforeLanding()
+{
+  unsigned itBeforeLanding_ = 0;
+  for(unsigned i=0 ; i<MAL_VECTOR_SIZE(v_kp1_) ; ++i)
+    if(v_kp1_(i))
+      ++itBeforeLanding_;
+    else
+      break;
+  --itBeforeLanding_;
   return ;
 }
