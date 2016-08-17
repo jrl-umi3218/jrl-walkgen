@@ -179,7 +179,7 @@ ENDMACRO(ADD_JRL_WALKGEN_TEST)
 ################
 
 # Disabled as the test fail : random results oscillating around mean behaviour
-#ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
+ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
 
 #####################
 # Add user examples #

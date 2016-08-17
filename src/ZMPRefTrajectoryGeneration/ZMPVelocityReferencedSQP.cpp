@@ -364,7 +364,7 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
      m_Tsingle == 0.7 && m_Tdble == 0.1 )
     useLineSearch = true ;
   //useLineSearch = false ;
-  SQP_nf_ = (int)ceil(SQP_N_*SQP_T_/StepPeriod_);
+  SQP_nf_ = (int)ceil(SQP_N_*SQP_T_/StepPeriod_-1e-6);
   NMPCgenerator_->initNMPCgenerator(useLineSearch,
                                     currentSupport,
                                     lStartingCOMState,
