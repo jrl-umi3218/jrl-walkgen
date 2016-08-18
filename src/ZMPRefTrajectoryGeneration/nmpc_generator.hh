@@ -314,6 +314,7 @@ namespace PatternGeneratorJRL
     // Q_x = ( Q_x_XX Q_x_XF ) = Q_y
     //       ( Q_x_FX Q_x_FF )
     MAL_MATRIX_TYPE(double) Q_x_XX_, Q_x_XF_, Q_x_FX_, Q_x_FF_ ;
+    MAL_MATRIX_TYPE(double) Q_y_XX_;// Q_x_XX_ != Q_y_XX_
 
     // Line Search
     bool useLineSearch_ ;
@@ -377,7 +378,9 @@ namespace PatternGeneratorJRL
     double SecurityMarginY_ ;
 
     // Gain of the cost function :
-    double alpha_ ;
+    double alpha_x_ ;
+    double alpha_y_ ;
+    double alpha_theta_ ;
     double beta_  ;
     double gamma_ ;
 
