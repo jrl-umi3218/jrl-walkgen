@@ -115,7 +115,9 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, PinocchioRobot *aPR)
   nc_obs_  = 0 ;
   nc_stan_ = 0 ;
 
-  alpha_=0.0;
+  alpha_x_     = 0.0 ;
+  alpha_y_     = 0.0 ;
+  alpha_theta_ = 0.0 ;
   beta_ =0.0;
   gamma_=0.0;
 
@@ -230,9 +232,11 @@ void NMPCgenerator::initNMPCgenerator(
   T_ = T ;
   Tfirst_ = T ;
   T_step_ = T_step ;
-  alpha_ = 1 ;// 1     ; // weight for CoM velocity tracking  : 0.5 * a ; 2.5
-  beta_  = 1e+3 ;// 1     ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
-  gamma_ = 1e-05 ;// 1e-05 ; // weight for jerk minimization      : 0.5 * c ; 1e-04
+  alpha_x_     = 1.0 ; // 1.0   ; // weight for CoM velocity X tracking  : 0.5 * a ; 2.5
+  alpha_y_     = 5.0 ; // 1.0   ; // weight for CoM velocity Y tracking  : 0.5 * a ; 2.5
+  alpha_theta_ = 1e+7 ;// 1.0  ; // weight for CoM velocity Yaw tracking  : 0.5 * a ; 2.5
+  beta_  = 1e+3 ;      // 1.0   ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
+  gamma_ = 1e-5 ;      // 1e-05 ; // weight for jerk minimization      : 0.5 * c ; 1e-04
   SecurityMarginX_ = 0.09 ;
   SecurityMarginY_ = 0.05 ;
 
@@ -1321,22 +1325,22 @@ void NMPCgenerator::updateFootPoseConstraint()
       }
     }
 
-//    if(n!=0)
-//    {
-//      deltaF_[n](0)=F_kp1_x_[n]-F_kp1_x_[n-1];
-//      deltaF_[n](1)=F_kp1_y_[n]-F_kp1_y_[n-1];
-//      AdRdF_[n] = MAL_RET_A_by_B(A0f_theta_[n],deltaF_[n]);
-//      double sum = 0.0 ;
-//      for (unsigned j=0 ; j<n_vertices_ ; ++j)
-//      {
-//        sum += AdRdF_[n](j);
-//      }
-//      for (unsigned j=0 ; j<n_vertices_ ; ++j)
-//      {
-//        //Afoot_theta_[n](j,n-1) = sum;
-//        Afoot_theta_[n](j,n-1) = AdRdF_[n](j);
-//      }
-//    }
+    if(n!=0)
+    {
+      deltaF_[n](0)=F_kp1_x_[n]-F_kp1_x_[n-1];
+      deltaF_[n](1)=F_kp1_y_[n]-F_kp1_y_[n-1];
+      AdRdF_[n] = MAL_RET_A_by_B(A0f_theta_[n],deltaF_[n]);
+      double sum = 0.0 ;
+      for (unsigned j=0 ; j<n_vertices_ ; ++j)
+      {
+        sum += AdRdF_[n](j);
+      }
+      for (unsigned j=0 ; j<n_vertices_ ; ++j)
+      {
+        //Afoot_theta_[n](j,n-1) = sum;
+        Afoot_theta_[n](j,n-1) = AdRdF_[n](j);
+      }
+    }
 #ifdef DEBUG
   ostringstream os ("") ;
   os << "Afoot_xy_" << n << "_" ;
@@ -1621,6 +1625,7 @@ void NMPCgenerator::initializeCostFunction()
   MAL_MATRIX_RESIZE(Q_x_XF_     ,N_,nf_);    MAL_MATRIX_FILL(Q_x_XF_     ,0.0);
   MAL_MATRIX_RESIZE(Q_x_FX_     ,nf_,N_);    MAL_MATRIX_FILL(Q_x_FX_     ,0.0);
   MAL_MATRIX_RESIZE(Q_x_FF_     ,nf_,nf_);   MAL_MATRIX_FILL(Q_x_FF_     ,0.0);
+  MAL_MATRIX_RESIZE(Q_y_XX_     ,N_,N_);     MAL_MATRIX_FILL(Q_y_XX_     ,0.0);
   MAL_MATRIX_RESIZE(Q_theta_    ,nf_,nf_);   MAL_MATRIX_SET_IDENTITY(Q_theta_);
   MAL_VECTOR_RESIZE(p_xy_X_     ,N_);        MAL_VECTOR_FILL(p_xy_X_ , 0.0);
   MAL_VECTOR_RESIZE(p_xy_Fx_    ,nf_);       MAL_VECTOR_FILL(p_xy_Fx_, 0.0);
@@ -1649,7 +1654,7 @@ void NMPCgenerator::initializeCostFunction()
 
   // Q_q = 0.5 * a * ( 1 0 )
   //                 ( 0 1 )
-  Q_theta_ *= alpha_ ;
+  Q_theta_ *= alpha_theta_ ;
 
   // Q_x_XF_, Q_x_FX_, Q_x_FF_ are time dependant matrices so they
   // are computed in the update function
@@ -1665,9 +1670,9 @@ void NMPCgenerator::updateCostFunction()
   // Q_xXF = ( -0.5 * b * Pzu^T   * V_kp1 )
   // Q_xFX = ( -0.5 * b * V_kp1^T * Pzu )^T
   // Q_xFF = (  0.5 * b * V_kp1^T * V_kp1 )
-  Q_x_XX_ = alpha_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_),Pvu_)
-          + beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_),Pzu_)
-          + gamma_ * I_NN_ ;
+  Q_x_XX_ = alpha_x_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_),Pvu_)
+          + beta_    * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_),Pzu_)
+          + gamma_   * I_NN_ ;
 
   // Q_xXX = (  0.5 * a * Pvu^T   * Pvu + b * Pzu^T * Pzu + c * I )
   // Q_xXF = ( -0.5 * b * Pzu^T   * V_kp1 )
@@ -1677,12 +1682,18 @@ void NMPCgenerator::updateCostFunction()
   Q_x_FX_ =   MAL_RET_TRANSPOSE(Q_x_XF_);
   Q_x_FF_ =   beta_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(V_kp1_),V_kp1_);
 
+  // Q_yXX = (  0.5 * a * Pvu^T   * Pvu + b * Pzu^T * Pzu + c * I )
+  Q_y_XX_ = alpha_y_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_),Pvu_)
+          + beta_    * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_),Pzu_)
+          + gamma_   * I_NN_ ;
+
+
   // define QP matrices
   // Gauss-Newton Hessian
   //                                     dim :
   // H = (( Q_xXX  Q_xXF   0      0       0     ) N_
   //      ( Q_xFX  Q_xFF   0      0       0     ) nf_
-  //      (   0      0   Q_xXX  Q_xXF     0     ) N_
+  //      (   0      0   Q_yXX  Q_xXF     0     ) N_
   //      (   0      0   Q_xFX  Q_xFF     0     ) nf_
   //      (   0      0     0      0    Q_theta_ ) nf_
   //dim :     N_     nf_   N_     nf_    nf_     = nv_
@@ -1695,7 +1706,7 @@ void NMPCgenerator::updateCostFunction()
     for(unsigned j=0 ; j<N_ ; ++j)
     {
       qp_H_(i,j) = Q_x_XX_(i,j) ;
-      qp_H_(Nnf+i,Nnf+j) = Q_x_XX_(i,j) ;
+      qp_H_(Nnf+i,Nnf+j) = Q_y_XX_(i,j) ;
     }
   }
   for(unsigned i=0 ; i<N_ ; ++i)
@@ -1742,8 +1753,8 @@ void NMPCgenerator::updateCostFunction()
   // Pzsc_x_, Pzsc_y_ , v_kp1f_x_ and v_kp1f_y_ already up to date
   //from the CoP constraint building function
 
-  p_xy_X_ =    alpha_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_  ), Pvsc_x_ - vel_ref_.Global.X_vec)
-             + beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_  ), Pzsc_x_ - v_kp1f_x_            );
+  p_xy_X_ =    alpha_x_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_  ), Pvsc_x_ - vel_ref_.Global.X_vec)
+             + beta_    * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_  ), Pzsc_x_ - v_kp1f_x_            );
 #ifdef DEBUG
   DumpVector("Pvsc_x_"    , Pvsc_x_                    ) ;
   DumpVector("RefVectorX" , vel_ref_.Global.X_vec ) ;
@@ -1752,8 +1763,8 @@ void NMPCgenerator::updateCostFunction()
 #endif
   p_xy_Fx_ = - beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(V_kp1_), Pzsc_x_ - v_kp1f_x_                 );
 
-  p_xy_Y_  =   alpha_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_  ), Pvsc_y_ - vel_ref_.Global.Y_vec)
-             + beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_  ), Pzsc_y_ - v_kp1f_y_                 );
+  p_xy_Y_  =   alpha_y_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_  ), Pvsc_y_ - vel_ref_.Global.Y_vec)
+             + beta_    * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_  ), Pzsc_y_ - v_kp1f_y_                 );
 
   p_xy_Fy_ = - beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(V_kp1_), Pzsc_y_ - v_kp1f_y_                 );
 #ifdef DEBUG
@@ -1783,7 +1794,7 @@ void NMPCgenerator::updateCostFunction()
   index+=nf_;
   // p_theta_ = ( 0.5 * a * [ f_k_theta+T_step*dTheta^ref  f_k_theta+2*T_step*dTheta^ref ] )
   for(unsigned i=0 ; i<nf_ ; ++i)
-    p_(index+i) = - alpha_ * ( currentSupport_.Yaw + (i+1) * T_step_* vel_ref_.Global.Yaw) ;
+    p_(index+i) = - alpha_theta_ * ( currentSupport_.Yaw + (i+1) * T_step_* vel_ref_.Global.Yaw) ;
 
   // Gradient of Objective
   // qp_g_ = (gx    )
