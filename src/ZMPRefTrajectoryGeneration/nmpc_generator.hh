@@ -99,8 +99,9 @@ namespace PatternGeneratorJRL
     // tools to check if foot is close to land
     void updateIterationBeforeLanding();
     bool isFootCloseToLand()
-    {// return (itBeforeLanding_ < 2);}
-      return false ;
+    {
+      return (itBeforeLanding_ < 2);
+      //return false ;
     }
 
     // build the cost function

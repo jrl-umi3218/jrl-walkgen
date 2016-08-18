@@ -224,12 +224,15 @@ void NMPCgenerator::initNMPCgenerator(
   MAL_MATRIX_RESIZE(tmpRotMat_,2,2); MAL_MATRIX_FILL(tmpRotMat_ ,0.0);
   MAL_VECTOR_RESIZE(qp_J_obs_i_, nv_); MAL_VECTOR_FILL(qp_J_obs_i_, 0.0);
 
+  MAL_VECTOR_FILL(F_kp1_x_,currentSupport.X);
+  MAL_VECTOR_FILL(F_kp1_y_,currentSupport.Y);
+
   T_ = T ;
   Tfirst_ = T ;
   T_step_ = T_step ;
   alpha_ = 1 ;// 1     ; // weight for CoM velocity tracking  : 0.5 * a ; 2.5
   beta_  = 1e+3 ;// 1     ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
-  gamma_ = 1e-08 ;// 1e-05 ; // weight for jerk minimization      : 0.5 * c ; 1e-04
+  gamma_ = 1e-05 ;// 1e-05 ; // weight for jerk minimization      : 0.5 * c ; 1e-04
   SecurityMarginX_ = 0.09 ;
   SecurityMarginY_ = 0.05 ;
 
@@ -1313,30 +1316,35 @@ void NMPCgenerator::updateFootPoseConstraint()
     {
       for(unsigned i=0 ; i<n_vertices_ ; ++i)
       {
-        UBfoot_[0](i) += A0f_xy_[0](i,0)*support_state[0].X +
-                         A0f_xy_[0](i,1)*support_state[0].Y ;
+        UBfoot_[0](i) += A0f_xy_[0](i,0)*currentSupport_.X +
+                         A0f_xy_[0](i,1)*currentSupport_.Y ;
       }
     }
 
-    MAL_MATRIX_FILL(Afoot_theta_[n],0.0);
-    if(n!=0)
-    {
-      deltaF_[n](0)=F_kp1_x_[n]-F_kp1_x_[n-1];
-      deltaF_[n](1)=F_kp1_y_[n]-F_kp1_y_[n-1];
-      AdRdF_[n] = MAL_RET_A_by_B(A0f_theta_[n],deltaF_[n]);
-      for (unsigned j=0 ; j<n_vertices_ ; ++j)
-      {
-        Afoot_theta_[n](j,n-1) = AdRdF_[n](j);
-      }
-    }
-//#ifdef DEBUG
+//    if(n!=0)
+//    {
+//      deltaF_[n](0)=F_kp1_x_[n]-F_kp1_x_[n-1];
+//      deltaF_[n](1)=F_kp1_y_[n]-F_kp1_y_[n-1];
+//      AdRdF_[n] = MAL_RET_A_by_B(A0f_theta_[n],deltaF_[n]);
+//      double sum = 0.0 ;
+//      for (unsigned j=0 ; j<n_vertices_ ; ++j)
+//      {
+//        sum += AdRdF_[n](j);
+//      }
+//      for (unsigned j=0 ; j<n_vertices_ ; ++j)
+//      {
+//        //Afoot_theta_[n](j,n-1) = sum;
+//        Afoot_theta_[n](j,n-1) = AdRdF_[n](j);
+//      }
+//    }
+#ifdef DEBUG
   ostringstream os ("") ;
   os << "Afoot_xy_" << n << "_" ;
   DumpMatrix(os.str() ,Afoot_xy_   [n]);
   os.str("");
   os << "Afoot_theta_" << n << "_" ;
   DumpMatrix(os.str() ,Afoot_theta_[n]);
-//#endif
+#endif
   }
   return ;
 }
