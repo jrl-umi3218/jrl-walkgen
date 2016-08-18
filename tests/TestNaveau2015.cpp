@@ -628,8 +628,8 @@ protected:
     {
       //{ 1*200,&TestObject::startTurningRight2},
       {1*200,&TestObject::walkForward3m_s},
-      {50*200,&TestObject::walkForward2m_s},
-      {100*200,&TestObject::walkForwardSlow},
+      //{50*200,&TestObject::walkForward2m_s},
+      {50*200,&TestObject::walkForwardSlow},
       {150*200,&TestObject::stop},
       {165*200,&TestObject::stopOnLineWalking}
     };
