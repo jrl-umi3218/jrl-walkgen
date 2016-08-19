@@ -247,6 +247,7 @@ namespace PatternGeneratorJRL
     MAL_MATRIX_TYPE(double) Acop_xy_, Acop_theta_ ;
     MAL_VECTOR_TYPE(double) UBcop_, LBcop_ ;
     MAL_MATRIX_TYPE(double) D_kp1_xy_, D_kp1_theta_, Pzuv_, derv_Acop_map_  ;
+    MAL_MATRIX_TYPE(double) derv_Acop_map2_ ;
     MAL_VECTOR_TYPE(double) b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_, v_kp1f_x_, v_kp1f_y_ ;
     MAL_MATRIX_TYPE(double) rotMat_xy_, rotMat_theta_, rotMat_;
     MAL_MATRIX_TYPE(double) A0_xy_, A0_theta_;
@@ -267,6 +268,8 @@ namespace PatternGeneratorJRL
     MAL_MATRIX_TYPE(double) tmpRotMat_;
     std::vector<MAL_VECTOR_TYPE(double)> deltaF_ ;
     std::vector<MAL_VECTOR_TYPE(double)> AdRdF_ ;
+    MAL_MATRIX_TYPE(double) Afoot_xy_full_, Afoot_theta_full_  ;
+    MAL_VECTOR_TYPE(double) UBfoot_full_, LBfoot_full_ ;
 
     // Foot Velocity constraint
     unsigned nc_vel_ ;
@@ -297,7 +300,7 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_TYPE(double) gU_  ;
     MAL_VECTOR_TYPE(double) Uxy_  ;
     MAL_VECTOR_TYPE(double) gU_cop_, gU_vel_ ;
-    std::vector<MAL_VECTOR_TYPE(double)> gU_foot_ ;
+    MAL_VECTOR_TYPE(double) gU_foot_ ;
     MAL_VECTOR_TYPE(double) gU_obs_, gU_rot_ , gU_stan_ ;
 
     // Cost Function
