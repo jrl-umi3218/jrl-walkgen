@@ -234,8 +234,8 @@ void NMPCgenerator::initNMPCgenerator(
   T_step_ = T_step ;
   alpha_x_     = 1.0 ; // 1.0   ; // weight for CoM velocity X tracking  : 0.5 * a ; 2.5
   alpha_y_     = 5.0 ; // 1.0   ; // weight for CoM velocity Y tracking  : 0.5 * a ; 2.5
-  alpha_theta_ = 1e+7 ;// 1.0  ; // weight for CoM velocity Yaw tracking  : 0.5 * a ; 2.5
-  beta_  = 1e+3 ;      // 1.0   ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
+  alpha_theta_ = 1e+5 ;// 1.0  ; // weight for CoM velocity Yaw tracking  : 0.5 * a ; 2.5
+  beta_  = 1e+2 ;      // 1.0   ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
   gamma_ = 1e-5 ;      // 1e-05 ; // weight for jerk minimization      : 0.5 * c ; 1e-04
   SecurityMarginX_ = 0.09 ;
   SecurityMarginY_ = 0.05 ;
@@ -1177,14 +1177,13 @@ void NMPCgenerator::updateCoPConstraint()
   // build Acop_xy_
   Acop_xy_ = MAL_RET_A_by_B(D_kp1_xy_,Pzuv_);
 
-  // build Acop_theta_ TODO VERIFY THE EQUATION !!!!!
+  // build Acop_theta_
+  derv_Acop_map2_ = MAL_RET_A_by_B(derv_Acop_map_ , V_kp1_);
   Acop_theta_dummy0_ = MAL_RET_A_by_B(D_kp1_theta_,Pzuv_);
   Acop_theta_dummy1_ = MAL_RET_A_by_B(Acop_theta_dummy0_,U_xy_);
-  Acop_theta_dummy1_ = MAL_RET_A_by_B(Acop_theta_dummy1_,derv_Acop_map_);
-  Acop_theta_dummy1_ = MAL_RET_A_by_B(Acop_theta_dummy1_,V_kp1_);
   for(unsigned i=0 ; i<MAL_MATRIX_NB_ROWS(Acop_theta_) ; ++i)
     for(unsigned j=0 ; j<MAL_MATRIX_NB_COLS(Acop_theta_) ; ++j)
-      Acop_theta_(i,j) = Acop_theta_dummy1_(j);
+      Acop_theta_(i,j) = derv_Acop_map2_(i,j) * Acop_theta_dummy1_(i);
 
   UBcop_ = b_kp1_ + MAL_RET_A_by_B(D_kp1_xy_,v_kp1f_-Pzsc_) ;
 #ifdef DEBUG
@@ -1233,7 +1232,10 @@ void NMPCgenerator::initializeFootPoseConstraint()
   }
   rotMat_vec_ .resize(nf_, tmpRotMat_ );
   drotMat_vec_.resize(nf_, tmpRotMat_ );
-
+  MAL_MATRIX_RESIZE(Afoot_xy_full_   ,nc_foot_,2*(N_+nf_));
+  MAL_MATRIX_RESIZE(Afoot_theta_full_,nc_foot_,nf_);
+  MAL_VECTOR_RESIZE(UBfoot_full_     ,nc_foot_);
+  MAL_VECTOR_RESIZE(LBfoot_full_     ,nc_foot_);
 
   for(unsigned n=0 ; n < nf_ ; ++n)
   {
@@ -1251,6 +1253,10 @@ void NMPCgenerator::initializeFootPoseConstraint()
       SelecMat_[n](1,2*N_+nf_+n-1) = -1 ;
     }
   }
+  MAL_MATRIX_FILL(Afoot_xy_full_   ,0.0);
+  MAL_MATRIX_FILL(Afoot_theta_full_,0.0);
+  MAL_VECTOR_FILL(UBfoot_full_     ,0.0);
+  MAL_VECTOR_FILL(LBfoot_full_     ,-1e+08);
   return ;
 }
 
@@ -1262,6 +1268,14 @@ void NMPCgenerator::updateFootPoseConstraint()
     ignoreFirstStep = 1 ;
     nc_foot_ = (nf_-1)*n_vertices_ ;
   }
+  MAL_MATRIX_RESIZE(Afoot_xy_full_   ,nc_foot_,2*(N_+nf_));
+  MAL_MATRIX_RESIZE(Afoot_theta_full_,nc_foot_,nf_);
+  MAL_VECTOR_RESIZE(UBfoot_full_     ,nc_foot_);
+  MAL_VECTOR_RESIZE(LBfoot_full_     ,nc_foot_);
+  MAL_MATRIX_FILL(Afoot_xy_full_   ,0.0);
+  MAL_MATRIX_FILL(Afoot_theta_full_,0.0);
+  MAL_VECTOR_FILL(UBfoot_full_     ,0.0);
+  MAL_VECTOR_FILL(LBfoot_full_     ,-1e+08);
 
   // rotation matrice from F_k+1 to F_k
   vector<support_state_t>support_state(nf_);
@@ -1312,10 +1326,15 @@ void NMPCgenerator::updateFootPoseConstraint()
     }
     MAL_MATRIX_FILL(Afoot_xy_   [n],0.0);
     Afoot_xy_[n] = MAL_RET_A_by_B(A0f_xy_[n],SelecMat_[n]);
+    for(unsigned i=0 ; i<n_vertices_ ;++i)
+      for(unsigned j=0 ; j<2*(N_+nf_) ; ++j)
+        Afoot_xy_full_((n-ignoreFirstStep)*n_vertices_+i,j)
+            = Afoot_xy_[n](i,j);
+
+
 
     MAL_VECTOR_FILL(UBfoot_[n] , 0.0);
     UBfoot_[n]=B0f_[n];
-
     if(n==0)
     {
       for(unsigned i=0 ; i<n_vertices_ ; ++i)
@@ -1324,6 +1343,10 @@ void NMPCgenerator::updateFootPoseConstraint()
                          A0f_xy_[0](i,1)*currentSupport_.Y ;
       }
     }
+    for(unsigned i=0 ; i<n_vertices_ ;++i)
+      UBfoot_full_((n-ignoreFirstStep)*n_vertices_+i) = UBfoot_[n](i);
+
+
 
     if(n!=0)
     {
@@ -1340,7 +1363,13 @@ void NMPCgenerator::updateFootPoseConstraint()
         //Afoot_theta_[n](j,n-1) = sum;
         Afoot_theta_[n](j,n-1) = AdRdF_[n](j);
       }
+      for(unsigned i=0 ; i<n_vertices_ ;++i)
+        for(unsigned j=0 ; j<nf_ ; ++j)
+          Afoot_theta_full_((n-ignoreFirstStep)*n_vertices_+i,j)
+              = Afoot_theta_[n](i,j);
+
     }
+
 #ifdef DEBUG
   ostringstream os ("") ;
   os << "Afoot_xy_" << n << "_" ;
@@ -1641,12 +1670,7 @@ void NMPCgenerator::initializeCostFunction()
   MAL_VECTOR_RESIZE(gU_  ,      nc_);  MAL_VECTOR_FILL(gU_  , 0.0);
   MAL_VECTOR_RESIZE(Uxy_ ,2*(N_+nf_));  MAL_VECTOR_FILL(Uxy_ , 0.0);
   MAL_VECTOR_RESIZE(gU_cop_  ,nc_cop_); MAL_VECTOR_FILL(gU_cop_  , 0.0);
-  gU_foot_.resize(nf_);
-  for(unsigned n=0 ; n<nf_ ; ++n)
-  {
-    MAL_VECTOR_RESIZE(gU_foot_[n] , n_vertices_);
-    MAL_VECTOR_FILL(gU_foot_[n] , 0.0);
-  }
+  MAL_VECTOR_RESIZE(gU_foot_  ,nc_foot_); MAL_VECTOR_FILL(gU_foot_  , 0.0);
   MAL_VECTOR_RESIZE(gU_vel_  ,nc_vel_); MAL_VECTOR_FILL(gU_vel_  , 0.0);
   MAL_VECTOR_RESIZE(gU_obs_  ,nc_obs_); MAL_VECTOR_FILL(gU_obs_  , 0.0);
   MAL_VECTOR_RESIZE(gU_rot_  ,nc_rot_); MAL_VECTOR_FILL(gU_rot_  , 0.0);
@@ -1828,22 +1852,12 @@ void NMPCgenerator::updateCostFunction()
       qp_J_(i,j+N2nf2)=Acop_theta_(i,j);
   }
   index = nc_cop_ ;
-  if(nc_foot_!=0)
+  for(unsigned i=0 ; i<nc_foot_ ; ++i)
   {
-    int istart = 0 ;
-    if(isFootCloseToLand())
-      istart = 1 ;
-
-    for(unsigned i=istart ; i<nf_ ; ++i)
-    {
-      for(unsigned n=0 ; n<n_vertices_ ; ++n)
-      {
-        for(unsigned j=0; j<N2nf2 ; ++j)
-          qp_J_((i-istart)*n_vertices_+n+index,j)=Afoot_xy_[i](n,j);
-        for(unsigned j=0; j<nf_ ; ++j)
-          qp_J_((i-istart)*n_vertices_+n+index,j+N2nf2)=Afoot_theta_[i](n,j);
-      }
-    }
+    for(unsigned j=0; j<N2nf2 ; ++j)
+      qp_J_(i+index,j)=Afoot_xy_full_(i,j);
+    for(unsigned j=0; j<nf_ ; ++j)
+      qp_J_(i+index,j+N2nf2)=Afoot_theta_full_(i,j);
   }
   index += nc_foot_ ;
   for(unsigned i=0 ; i<nc_vel_ ; ++i)
@@ -1973,18 +1987,18 @@ void NMPCgenerator::initializeLineSearch()
   lineStep_=1.0; lineStep0_=1.0 ; // step searched
   cm_=0.0; c_=1.0 ; // Merit Function Jacobian
   mu_ = 1.0 ;
-  stepParam_ = 0.6 ;
+  stepParam_ = 1.0 ;
   L_n_=0.0; L_=0.0; // Merit function of the next step and Merit function
   maxIteration = 20 ;
 }
 
 void NMPCgenerator::lineSearch()
 {
-  if(!useLineSearch_ || nc_vel_!=0)
-  {
-    lineStep_ = lineStep0_ ;
-    return;
-  }
+//  if(!useLineSearch_ || nc_vel_!=0)
+//  {
+//    lineStep_ = lineStep0_ ;
+//    return;
+//  }
 
 ////  qpOASES::QProblemStatus status_ = QP_->getStatus();
 ////  if(status_ < qpOASES::QPS_HOMOTOPYQPSOLVED)
@@ -2005,14 +2019,16 @@ void NMPCgenerator::lineSearch()
   bool badConstraints = false ;
   for(unsigned i=0 ; i<nc_ ; ++i)
   {
-    if(gU_(i)-ub_(i)>1e-8)
+    if(gU_(i)-ub_(i)>1e-3)
     {
       selectActiveConstraint(i)=1.0;
+//      cout << "constr nb " << i << " ; dist to constr = " << gU_(i)-ub_(i) << endl ;
       badConstraints = true;
     }
-    if(-gU_(i)+lb_(i)>1e-8)
+    if(-gU_(i)+lb_(i)>1e-3)
     {
       selectActiveConstraint(i)=-1.0;
+//      cout << "constr nb " << i << " ; dist to constr = " << -gU_(i)+lb_(i) << endl ;
       badConstraints = true;
     }
   }
@@ -2052,7 +2068,7 @@ void NMPCgenerator::lineSearch()
 //    if(it==(maxIteration-1))
 //      lineStep_ = 0.0 ;
   }
-#ifdef DEBUG_COUT
+//#ifdef DEBUG_COUT
   if(lineStep_!=lineStep0_)
     cout << "lineStep_ = " << lineStep_ << endl ;
 
@@ -2060,7 +2076,7 @@ void NMPCgenerator::lineSearch()
   {
     cout << "step not found" << endl ;
   }
-#endif
+//#endif
 //  if(lineStep_!=lineStep0_)
 //    cout << "lineStep_ = " << lineStep_ << endl ;
   //assert(find_step);
@@ -2151,14 +2167,7 @@ void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
   //    CoP
   gU_cop_ = MAL_RET_A_by_B(Acop_xy_,Uxy_);
   //    Foot
-  int istart = 0 ;
-  if(nc_foot_!=0)
-  {
-    if(isFootCloseToLand())
-      istart = 1 ;
-    for(unsigned i=istart ; i<nf_ ; ++i)
-      gU_foot_[i] = MAL_RET_A_by_B(Afoot_xy_[i],Uxy_);
-  }
+  gU_foot_ = MAL_RET_A_by_B(Afoot_xy_full_,Uxy_);
   //    Velocity
   gU_vel_ = MAL_RET_A_by_B(Avel_,U) ;
   //    Rotation
@@ -2191,18 +2200,12 @@ void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
     ub_(index+i) = UBcop_ (i) ;
     gU_(index+i) = gU_cop_(i);
   }
-  index = nc_cop_ ;
-  if(nc_foot_!=0)
+  index += nc_cop_ ;
+  for(unsigned i=0 ; i<nc_foot_ ; ++i)
   {
-    for(unsigned i=istart ; i<nf_ ; ++i)
-    {
-      for(unsigned j=0 ; j<n_vertices_ ; ++j)
-      {
-        lb_(index+(i-istart)*n_vertices_+j) = LBfoot_ [i](j);
-        ub_(index+(i-istart)*n_vertices_+j) = UBfoot_ [i](j);
-        gU_(index+(i-istart)*n_vertices_+j) = gU_foot_[i](j);
-      }
-    }
+    lb_(index+i) = LBfoot_full_ (i);
+    ub_(index+i) = UBfoot_full_ (i);
+    gU_(index+i) = gU_foot_(i);
   }
   index += nc_foot_ ;
   for(unsigned i=0 ; i<nc_vel_ ; ++i)
