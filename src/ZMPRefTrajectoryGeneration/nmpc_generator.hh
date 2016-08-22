@@ -71,9 +71,9 @@ namespace PatternGeneratorJRL
 
     // Build Time Variant Matrices
     //////////////////////////////
-    void updateFinalStateMachine(double time,
-        FootAbsolutePosition &FinalLeftFoot,
-        FootAbsolutePosition &FinalRightFoot);
+//    void updateFinalStateMachine(double time,
+//        FootAbsolutePosition &FinalLeftFoot,
+//        FootAbsolutePosition &FinalRightFoot);
     void updateCurrentSupport(double time,
         FootAbsolutePosition &FinalLeftFoot,
         FootAbsolutePosition &FinalRightFoot);
@@ -95,6 +95,14 @@ namespace PatternGeneratorJRL
     void updateObstacleConstraint();
     void initializeStandingConstraint();
     void updateStandingConstraint();
+    void initializeFootExactPositionConstraint();
+    void updateFootExactPositionConstraint();
+
+    // tools
+    void computeAbsolutePositionFromRelative(
+        support_state_t currentSupport,
+        const RelativeFootPosition & relativePosition,
+        support_state_t & nextSupport);
 
     // tools to check if foot is close to land
     void updateIterationBeforeLanding();
@@ -206,6 +214,9 @@ namespace PatternGeneratorJRL
     inline int nwsr()
     {return nwsr_ ;}
 
+    std::deque <RelativeFootPosition> & relativeSupportDeque()
+    {return desiredNextSupportFootRelativePosition;}
+
 
   private:
     SimplePluginManager * SPM_ ;
@@ -240,7 +251,6 @@ namespace PatternGeneratorJRL
     FootAbsolutePosition currentRightFootAbsolutePosition_;
     SupportFSM * FSM_ ;
 
-
     // Constraint Matrix
     // Center of Pressure constraint
     unsigned nc_cop_ ;
@@ -273,8 +283,15 @@ namespace PatternGeneratorJRL
 
     // Foot Velocity constraint
     unsigned nc_vel_ ;
+    std::deque <RelativeFootPosition> desiredNextSupportFootRelativePosition ;
+    std::vector<support_state_t> desiredNextSupportFootAbsolutePosition ;
     MAL_MATRIX_TYPE(double) Avel_ ;
     MAL_VECTOR_TYPE(double) UBvel_, LBvel_ ;
+
+    // Foot Position constraint
+    unsigned nc_pos_ ;
+    MAL_MATRIX_TYPE(double) Apos_ ;
+    MAL_VECTOR_TYPE(double) UBpos_, LBpos_ ;
 
     // Rotation linear constraint
     unsigned nc_rot_ ;
@@ -328,9 +345,11 @@ namespace PatternGeneratorJRL
     double mu_ ; // weight between cost function and constraints
     double cm_, c_ ; // Merit Function Jacobian
     double L_n_, L_ ; // Merit function of the next step and Merit function
-    unsigned maxIteration ;
+    unsigned maxLineSearchIteration_ ;
     qpOASES::Constraints constraints_;
     qpOASES::Indexlist * indexActiveConstraints_ ;
+    bool oneMoreStep_ ;
+    unsigned maxSolverIteration_ ;
 
     // Gauss-Newton Hessian
     unsigned nc_ ;
