@@ -235,10 +235,12 @@ void NMPCgenerator::initNMPCgenerator(
   alpha_x_     = 1.0 ; // 1.0   ; // weight for CoM velocity X tracking  : 0.5 * a ; 2.5
   alpha_y_     = 5.0 ; // 1.0   ; // weight for CoM velocity Y tracking  : 0.5 * a ; 2.5
   alpha_theta_ = 1e+5 ;// 1.0  ; // weight for CoM velocity Yaw tracking  : 0.5 * a ; 2.5
-  beta_  = 1e+2 ;      // 1.0   ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
+  beta_  = 1e+3 ;      // 1.0   ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
   gamma_ = 1e-5 ;      // 1e-05 ; // weight for jerk minimization      : 0.5 * c ; 1e-04
   SecurityMarginX_ = 0.09 ;
   SecurityMarginY_ = 0.05 ;
+  maxSolverIteration_=1;
+  oneMoreStep_=false;
 
   setLocalVelocityReference(local_vel_ref);
 
@@ -276,6 +278,7 @@ void NMPCgenerator::initNMPCgenerator(
 
   // initialize time dependant matrices
   initializeCoPConstraint();
+  initializeFootExactPositionConstraint();
   initializeFootPoseConstraint();
   initializeFootVelIneqConstraint();
   initializeRotIneqConstraint();
@@ -309,8 +312,8 @@ void NMPCgenerator::updateInitialCondition(double time,
   currentLeftFootAbsolutePosition_  = currentLeftFootAbsolutePosition;
   currentRightFootAbsolutePosition_ = currentRightFootAbsolutePosition;
 
-  //setLocalVelocityReference(local_vel_ref);
-  setGlobalVelocityReference(local_vel_ref);
+  setLocalVelocityReference(local_vel_ref);
+  //setGlobalVelocityReference(local_vel_ref);
 
   c_k_x_(0) = currentCOMState.x[0] ;
   c_k_x_(1) = currentCOMState.x[1] ;
@@ -333,6 +336,12 @@ void NMPCgenerator::updateInitialCondition(double time,
   updateCurrentSupport(time_,
                        currentLeftFootAbsolutePosition,
                        currentRightFootAbsolutePosition);
+
+  if(currentSupport_.StateChanged &&
+     desiredNextSupportFootRelativePosition.size()!=0)
+  {
+    desiredNextSupportFootRelativePosition.pop_front();
+  }
 
 #ifdef DEBUG_COUT
   cout << time_ << "  "
@@ -383,14 +392,46 @@ void NMPCgenerator::solve()
   if(currentSupport_.Phase==DS && currentSupport_.NbStepsLeft == 0)
     return;
   /* Process and solve problem, s.t. pattern generator data is consistent */
-  preprocess_solution() ;
-  solve_qp()            ;
-  postprocess_solution();
+  unsigned iter = 0 ;
+  oneMoreStep_ = true;
+  double normDeltaU = 0.0 ;
+  while(iter < maxSolverIteration_ && oneMoreStep_ == true)
+  {
+    preprocess_solution() ;
+    solve_qp()            ;
+    postprocess_solution();
+
+    normDeltaU = 0.0 ;
+    for(unsigned i=0 ; i<nv_ ; ++i)
+      normDeltaU += sqrt(deltaU_[i]*deltaU_[i]);
+    //cout << "normDeltaU = " << normDeltaU << endl;
+
+    if(normDeltaU > 1e-5)
+      oneMoreStep_=true;
+    else
+      oneMoreStep_=false;
+
+    ++iter;
+  }
+
+  static unsigned iteration_solver_file = 0 ;
+  if(iteration_solver_file == 0)
+  {
+    ofstream os;
+    os.open("iteration_solver.dat",ios::out);
+    ++iteration_solver_file ;
+  }
+  ofstream os("iteration_solver.dat",ios::app);
+  os << time_ << " "
+     << iter-1  << " "
+     << normDeltaU << endl ;
+  //cout << "solver number of iteration = " << iter << endl ;
 }
 
 void NMPCgenerator::preprocess_solution()
 {
   updateCoPConstraint();
+  updateFootExactPositionConstraint();
   updateFootPoseConstraint();
   updateFootVelIneqConstraint();
   updateRotIneqConstraint();
@@ -515,6 +556,7 @@ void NMPCgenerator::postprocess_solution()
     F_kp1_y_(i)     = U_(2*N_+nf_+i);
     F_kp1_theta_(i) = U_(2*N_+2*nf_+i);
   }
+
 #ifdef DEBUG
   DumpVector("U_",U_);
 #endif
@@ -697,86 +739,86 @@ void NMPCgenerator::updateSupportdeque(double time,
 #endif
 }
 
-void NMPCgenerator::updateFinalStateMachine(
-    double time,
-    FootAbsolutePosition & FinalLeftFoot,
-    FootAbsolutePosition & FinalRightFoot)
-{
-#ifdef DEBUG_COUT
-  cout << "previous support : \n"
-       << currentSupport_.Phase        << " "
-       << currentSupport_.Foot         << " "
-       << currentSupport_.StepNumber   << " "
-       << currentSupport_.StateChanged << " "
-       << currentSupport_.X   << " "
-       << currentSupport_.Y   << " "
-       << currentSupport_.Yaw << " "
-       << currentSupport_.NbStepsLeft << " "
-       << endl ;
-#endif
-  const FootAbsolutePosition * FAP = NULL;
-  reference_t vel = vel_ref_;
-  //vel.Local.X=1;
-  // DETERMINE CURRENT SUPPORT STATE:
-  // --------------------------------
-  FSM_->set_support_state( time, 0, currentSupport_, vel );
-  if( currentSupport_.StateChanged == true )
-  {
-    if( currentSupport_.Foot == LEFT )
-      FAP = & FinalLeftFoot;
-    else
-      FAP = & FinalRightFoot;
-    currentSupport_.X = FAP->x;
-    currentSupport_.Y = FAP->y;
-    currentSupport_.Yaw = FAP->theta*M_PI/180.0;
-    currentSupport_.StartTime = time;
-  }
-  SupportStates_deq_[0] = currentSupport_ ;
+//void NMPCgenerator::updateFinalStateMachine(
+//    double time,
+//    FootAbsolutePosition & FinalLeftFoot,
+//    FootAbsolutePosition & FinalRightFoot)
+//{
+//#ifdef DEBUG_COUT
+//  cout << "previous support : \n"
+//       << currentSupport_.Phase        << " "
+//       << currentSupport_.Foot         << " "
+//       << currentSupport_.StepNumber   << " "
+//       << currentSupport_.StateChanged << " "
+//       << currentSupport_.X   << " "
+//       << currentSupport_.Y   << " "
+//       << currentSupport_.Yaw << " "
+//       << currentSupport_.NbStepsLeft << " "
+//       << endl ;
+//#endif
+//  const FootAbsolutePosition * FAP = NULL;
+//  reference_t vel = vel_ref_;
+//  //vel.Local.X=1;
+//  // DETERMINE CURRENT SUPPORT STATE:
+//  // --------------------------------
+//  FSM_->set_support_state( time, 0, currentSupport_, vel );
+//  if( currentSupport_.StateChanged == true )
+//  {
+//    if( currentSupport_.Foot == LEFT )
+//      FAP = & FinalLeftFoot;
+//    else
+//      FAP = & FinalRightFoot;
+//    currentSupport_.X = FAP->x;
+//    currentSupport_.Y = FAP->y;
+//    currentSupport_.Yaw = FAP->theta*M_PI/180.0;
+//    currentSupport_.StartTime = time;
+//  }
+//  SupportStates_deq_[0] = currentSupport_ ;
 
-  // PREVIEW SUPPORT STATES:
-  // -----------------------
-  // initialize the previewed support state before previewing
-  support_state_t PreviewedSupport = currentSupport_;
-  PreviewedSupport.StepNumber  = 0;
-  for( unsigned pi=1 ; pi<=N_ ; pi++ )
-  {
-    FSM_->set_support_state( time, pi, PreviewedSupport, vel );
-    if( PreviewedSupport.StateChanged )
-    {
-      if( pi == 1 || SupportStates_deq_[pi-1].Phase==DS )//Foot down
-      {
-        if( PreviewedSupport.Foot == LEFT )
-          FAP = & FinalLeftFoot;
-        else
-          FAP = & FinalRightFoot;
-        PreviewedSupport.X = FAP->x;
-        PreviewedSupport.Y = FAP->y;
-        PreviewedSupport.Yaw = FAP->theta*M_PI/180.0;
-        PreviewedSupport.StartTime = time+pi*T_;
-      }
-      if( /*pi > 1 &&*/ PreviewedSupport.StepNumber > 0 )
-      {
-        PreviewedSupport.X = 0.0;
-        PreviewedSupport.Y = 0.0;
-      }
-    }
-    SupportStates_deq_[pi] = PreviewedSupport ;
-  }
-#ifdef DEBUG_COUT
-  for(unsigned i=0;i<SupportStates_deq_.size();++i)
-  {
-    cout << SupportStates_deq_[i].Phase        << " "
-         << SupportStates_deq_[i].Foot         << " "
-         << SupportStates_deq_[i].StepNumber   << " "
-         << SupportStates_deq_[i].StateChanged << " "
-         << SupportStates_deq_[i].X            << " "
-         << SupportStates_deq_[i].Y            << " "
-         << SupportStates_deq_[i].Yaw          << " "
-         << SupportStates_deq_[i].NbStepsLeft  << " "
-         << endl ;
-  }
-#endif
-}
+//  // PREVIEW SUPPORT STATES:
+//  // -----------------------
+//  // initialize the previewed support state before previewing
+//  support_state_t PreviewedSupport = currentSupport_;
+//  PreviewedSupport.StepNumber  = 0;
+//  for( unsigned pi=1 ; pi<=N_ ; pi++ )
+//  {
+//    FSM_->set_support_state( time, pi, PreviewedSupport, vel );
+//    if( PreviewedSupport.StateChanged )
+//    {
+//      if( pi == 1 || SupportStates_deq_[pi-1].Phase==DS )//Foot down
+//      {
+//        if( PreviewedSupport.Foot == LEFT )
+//          FAP = & FinalLeftFoot;
+//        else
+//          FAP = & FinalRightFoot;
+//        PreviewedSupport.X = FAP->x;
+//        PreviewedSupport.Y = FAP->y;
+//        PreviewedSupport.Yaw = FAP->theta*M_PI/180.0;
+//        PreviewedSupport.StartTime = time+pi*T_;
+//      }
+//      if( /*pi > 1 &&*/ PreviewedSupport.StepNumber > 0 )
+//      {
+//        PreviewedSupport.X = 0.0;
+//        PreviewedSupport.Y = 0.0;
+//      }
+//    }
+//    SupportStates_deq_[pi] = PreviewedSupport ;
+//  }
+//#ifdef DEBUG_COUT
+//  for(unsigned i=0;i<SupportStates_deq_.size();++i)
+//  {
+//    cout << SupportStates_deq_[i].Phase        << " "
+//         << SupportStates_deq_[i].Foot         << " "
+//         << SupportStates_deq_[i].StepNumber   << " "
+//         << SupportStates_deq_[i].StateChanged << " "
+//         << SupportStates_deq_[i].X            << " "
+//         << SupportStates_deq_[i].Y            << " "
+//         << SupportStates_deq_[i].Yaw          << " "
+//         << SupportStates_deq_[i].NbStepsLeft  << " "
+//         << endl ;
+//  }
+//#endif
+//}
 
 void NMPCgenerator::computeFootSelectionMatrix()
 {
@@ -1268,6 +1310,12 @@ void NMPCgenerator::updateFootPoseConstraint()
     ignoreFirstStep = 1 ;
     nc_foot_ = (nf_-1)*n_vertices_ ;
   }
+  if( desiredNextSupportFootRelativePosition.size()!=0 )
+  {
+    unsigned nbFoot = std::min(desiredNextSupportFootRelativePosition.size(),nf_);
+    ignoreFirstStep = nbFoot ;
+  }
+
   MAL_MATRIX_RESIZE(Afoot_xy_full_   ,nc_foot_,2*(N_+nf_));
   MAL_MATRIX_RESIZE(Afoot_theta_full_,nc_foot_,nf_);
   MAL_VECTOR_RESIZE(UBfoot_full_     ,nc_foot_);
@@ -1435,6 +1483,105 @@ void NMPCgenerator::updateFootVelIneqConstraint()
   }else
   {
     nc_vel_ = 0 ;
+    return ;
+  }
+
+#ifdef DEBUG
+  DumpMatrix("Avel_",Avel_);
+  DumpVector("UBvel_",UBvel_);
+#endif
+#ifdef DEBUG_COUT
+  cout << "Avel_  = " << Avel_  << endl ;
+  cout << "UBvel_ = " << UBvel_ << endl ;
+#endif
+  return ;
+}
+
+void NMPCgenerator::initializeFootExactPositionConstraint()
+{
+  /**
+  """
+  create constraints that freezes foot position optimization when swing
+  foot comes close to foot step in preview window. Needed for proper
+  interpolation of trajectory.
+  """
+  # B ( f_x_kp1 - f_x_k ) <= (t_touchdown - t) v_max
+  #   ( f_y_kp1 - f_y_k )
+  #
+  # -inf <= velref / ||velref|| S x <= (t_touchdown - t) v_max_x
+  #
+  # with S a selection matrix selecting the f_x_k+1 and f_y_k+1 accordingly.
+  # and B the direction vector of vel_ref : vel_ref / || vel_ref ||
+  #*/
+  nc_pos_ = 3*nf_ ;
+  MAL_MATRIX_RESIZE( Apos_ ,nc_pos_,2*N_+3*nf_)  ;
+  MAL_VECTOR_RESIZE(UBpos_ ,nc_pos_)  ;
+  MAL_VECTOR_RESIZE(LBpos_ ,nc_pos_)  ;
+
+  MAL_MATRIX_FILL( Apos_,0.0)  ;
+  MAL_VECTOR_FILL(UBpos_,0.0)  ;
+  MAL_VECTOR_FILL(LBpos_,0.0)  ;
+
+  nc_pos_ = 0 ;
+
+  desiredNextSupportFootRelativePosition.clear();
+  desiredNextSupportFootAbsolutePosition.resize(nf_);
+
+  return ;
+}
+
+void NMPCgenerator::computeAbsolutePositionFromRelative(
+    support_state_t currentSupport,
+    const RelativeFootPosition & relativePosition,
+    support_state_t & nextSupport)
+{
+  double c = cos(currentSupport.Yaw);
+  double s = sin(currentSupport.Yaw);
+
+  nextSupport.X = currentSupport.X +
+      c * relativePosition.sx - s * relativePosition.sy ;
+  nextSupport.Y = currentSupport.Y +
+      s * relativePosition.sx + c * relativePosition.sy ;
+  nextSupport.Yaw = currentSupport.Yaw + relativePosition.theta ;
+}
+
+void NMPCgenerator::updateFootExactPositionConstraint()
+{
+  if( desiredNextSupportFootRelativePosition.size()!=0 )
+  {
+    unsigned nbFoot = std::min(desiredNextSupportFootRelativePosition.size(),nf_);
+    nc_pos_ = 3*nbFoot ;
+    for(unsigned i=0 ; i<nbFoot ; ++i)
+    {
+      if(i==0)
+      {
+        computeAbsolutePositionFromRelative(
+              currentSupport_,
+              desiredNextSupportFootRelativePosition[0],
+              desiredNextSupportFootAbsolutePosition[0]);
+      }else
+      {
+        computeAbsolutePositionFromRelative(
+              desiredNextSupportFootAbsolutePosition[i-1],
+              desiredNextSupportFootRelativePosition[i],
+              desiredNextSupportFootAbsolutePosition[i]);
+      }
+
+      Avel_(0+i*nf_, N_      )  = 1.0 ;
+      Avel_(1+i*nf_, 2*N_+nf_)  = 1.0 ;
+      Avel_(2+i*nf_,2*N_+2*nf_) = 1.0 ;
+
+      UBvel_(0+i*nf_) = desiredNextSupportFootAbsolutePosition[i].X   ;
+      UBvel_(1+i*nf_) = desiredNextSupportFootAbsolutePosition[i].Y   ;
+      UBvel_(2+i*nf_) = desiredNextSupportFootAbsolutePosition[i].Yaw ;
+
+      LBvel_(0+i*nf_) = desiredNextSupportFootAbsolutePosition[i].X   ;
+      LBvel_(1+i*nf_) = desiredNextSupportFootAbsolutePosition[i].Y   ;
+      LBvel_(2+i*nf_) = desiredNextSupportFootAbsolutePosition[i].Yaw ;
+    }
+  }else
+  {
+    nc_pos_ = 0 ;
     return ;
   }
 
@@ -1930,11 +2077,11 @@ void NMPCgenerator::setLocalVelocityReference(reference_t local_vel_ref)
     vel_ref_.Global.Yaw = 0.2 ;
   if(vel_ref_.Global.Yaw<-0.2)
     vel_ref_.Global.Yaw = -0.2 ;
-//#ifdef DEBUG_COUT
+#ifdef DEBUG_COUT
   cout << "velocity = " ;
   cout << vel_ref_.Global.X << " "  ;
   cout << vel_ref_.Global.Y << endl ;
-//#endif
+#endif
   MAL_VECTOR_FILL(vel_ref_.Global.X_vec   , vel_ref_.Global.X  ) ;
   MAL_VECTOR_FILL(vel_ref_.Global.Y_vec   , vel_ref_.Global.Y  ) ;
 #ifdef DEBUG
@@ -1987,9 +2134,9 @@ void NMPCgenerator::initializeLineSearch()
   lineStep_=1.0; lineStep0_=1.0 ; // step searched
   cm_=0.0; c_=1.0 ; // Merit Function Jacobian
   mu_ = 1.0 ;
-  stepParam_ = 1.0 ;
+  stepParam_ = 0.8 ;
   L_n_=0.0; L_=0.0; // Merit function of the next step and Merit function
-  maxIteration = 20 ;
+  maxLineSearchIteration_ = 5 ;
 }
 
 void NMPCgenerator::lineSearch()
@@ -2045,7 +2192,7 @@ void NMPCgenerator::lineSearch()
 
   lineStep_ = lineStep0_ ;
   bool find_step = false ;
-  for (unsigned it=0 ; it<maxIteration ; ++it)
+  for (unsigned it=0 ; it<maxLineSearchIteration_ ; ++it)
   {
     for(unsigned i=0 ; i<nv_ ; ++i)
       U_n_(i) = U_(i) + lineStep_*deltaU_[i] ;
@@ -2065,18 +2212,20 @@ void NMPCgenerator::lineSearch()
            << "lineStep_ * cm_ = "  << lineStep_ * cm_ << endl ;
 #endif
     }
-//    if(it==(maxIteration-1))
+//    if(it==(maxLineSearchIteration_-1))
 //      lineStep_ = 0.0 ;
   }
-//#ifdef DEBUG_COUT
+#ifdef DEBUG_COUT
   if(lineStep_!=lineStep0_)
+  {
+    cout << "#################################" << endl ;
     cout << "lineStep_ = " << lineStep_ << endl ;
-
+  }
   if(!find_step)
   {
     cout << "step not found" << endl ;
   }
-//#endif
+#endif
 //  if(lineStep_!=lineStep0_)
 //    cout << "lineStep_ = " << lineStep_ << endl ;
   //assert(find_step);
