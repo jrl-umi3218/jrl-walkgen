@@ -8,8 +8,8 @@ class Joint_shortname : public boost::static_visitor<std::string>
 {
 public:
   template<typename D>
-  std::string operator()(const se3::JointModelBase<D> & ) const
-  { return D::shortname(); }
+  std::string operator()(const se3::JointModelBase<D> & jmodel) const
+  { return jmodel.shortname(); }
 
   static std::string run( const se3::JointModelVariant & jmodel)
   { return boost::apply_visitor( Joint_shortname(), jmodel ); }
@@ -144,12 +144,12 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   m_robotModel = robotModel;
 
   // initialize the short cut for the joint ids
-  m_chest = m_robotModel->getBodyId("torso");
-  m_waist = m_robotModel->getBodyId("BODY");
-  m_leftFoot.associatedAnkle  = m_robotModel->getBodyId("l_ankle");
-  m_rightFoot.associatedAnkle = m_robotModel->getBodyId("r_ankle");
-  m_leftWrist  = m_robotModel->getBodyId("l_wrist");
-  m_rightWrist = m_robotModel->getBodyId("r_wrist");
+  m_chest = m_robotModel->getFrameParent("torso");
+  m_waist = m_robotModel->getFrameParent("BODY");
+  m_leftFoot.associatedAnkle  = m_robotModel->getFrameParent("l_ankle");
+  m_rightFoot.associatedAnkle = m_robotModel->getFrameParent("r_ankle");
+  m_leftWrist  = m_robotModel->getFrameParent("l_wrist");
+  m_rightWrist = m_robotModel->getFrameParent("r_wrist");
   DetectAutomaticallyShoulders();
 
   // intialize the "initial pose" (q=[0]) data
