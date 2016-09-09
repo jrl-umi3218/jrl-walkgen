@@ -102,10 +102,10 @@ bool PinocchioRobot::checkModel(se3::Model * robotModel)
     throw std::invalid_argument(exception_message);
     return false ;
   }
-  if(!robotModel->existBodyName("BODY"))
+  if(!robotModel->existBodyName("BODY") and !robotModel->existBodyName("body"))
   {
     m_boolModel=false;
-    const std::string exception_message ("BODY is not a valid body name");
+    const std::string exception_message ("BODY/body is not a valid body name");
     throw std::invalid_argument(exception_message);
     return false ;
   }
@@ -145,7 +145,16 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
 
   // initialize the short cut for the joint ids
   m_chest = m_robotModel->getFrameParent("torso");
-  m_waist = m_robotModel->getFrameParent("BODY");
+  if(robotModel->existBodyName("BODY")) {
+    m_waist = m_robotModel->getFrameParent("BODY");
+  }
+  else if (robotModel->existBodyName("body")) {
+    m_waist = m_robotModel->getFrameParent("body");
+  }
+  else {
+    const std::string exception_message ("BODY/body not found. Check model.");
+    throw std::invalid_argument(exception_message);
+  }
   m_leftFoot.associatedAnkle  = m_robotModel->getFrameParent("l_ankle");
   m_rightFoot.associatedAnkle = m_robotModel->getFrameParent("r_ankle");
   m_leftWrist  = m_robotModel->getFrameParent("l_wrist");
