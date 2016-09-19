@@ -39,8 +39,8 @@
 #include "TestObject.hh"
 #include "MotionGeneration/ComAndFootRealizationByGeometry.hh"
 
-#include "pinocchio/multibody/parser/urdf.hpp"
-#include "pinocchio/multibody/parser/srdf.hpp"
+//#include "pinocchio/multibody/parser/urdf.hpp"
+//#include "pinocchio/multibody/parser/srdf.hpp"
 
 using namespace std;
 using namespace PatternGeneratorJRL;

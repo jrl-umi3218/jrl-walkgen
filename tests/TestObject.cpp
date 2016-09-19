@@ -28,8 +28,8 @@
 #include <fstream>
 #include "Debug.hh"
 #include "TestObject.hh"
-#include "pinocchio/multibody/parser/urdf.hpp"
-#include "pinocchio/multibody/parser/srdf.hpp"
+#include "pinocchio/parsers/urdf.hpp"
+#include "pinocchio/parsers/srdf.hpp"
 using namespace std;
 
 #define NB_OF_FIELDS 39
@@ -305,7 +305,8 @@ namespace PatternGeneratorJRL
         aFoot.anklePosition(1) = v.second.get<double>("y");
         aFoot.anklePosition(2) = v.second.get<double>("z");
       }
-      aFoot.associatedAnkle = aModel->getBodyId("r_ankle");
+      se3::FrameIndex ra = aModel->getFrameId("r_ankle");
+      aFoot.associatedAnkle = aModel->frames[ra].parent ;
       aPR.initializeRightFoot(aFoot);
 
       // Initialize the Left Foot
@@ -323,7 +324,8 @@ namespace PatternGeneratorJRL
         aFoot.anklePosition(1) = v.second.get<double>("y");
         aFoot.anklePosition(2) = v.second.get<double>("z");
       }
-      aFoot.associatedAnkle = aModel->getBodyId("l_ankle");
+      se3::FrameIndex la = aModel->getBodyId("l_ankle");
+      aFoot.associatedAnkle = aModel->frames[la].parent ;
       aPR.initializeLeftFoot(aFoot);
     }
 
