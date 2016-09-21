@@ -144,12 +144,12 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   m_robotModel = robotModel;
 
   // initialize the short cut for the joint ids
-  m_chest = m_robotModel->getFrameParent("torso");
-  m_waist = m_robotModel->getFrameParent("BODY");
-  m_leftFoot.associatedAnkle  = m_robotModel->getFrameParent("l_ankle");
-  m_rightFoot.associatedAnkle = m_robotModel->getFrameParent("r_ankle");
-  m_leftWrist  = m_robotModel->getFrameParent("l_wrist");
-  m_rightWrist = m_robotModel->getFrameParent("r_wrist");
+  m_chest = m_robotModel->getFrameId("torso");
+  m_waist = m_robotModel->getFrameId("BODY");
+  m_leftFoot.associatedAnkle  = m_robotModel->getFrameId("l_ankle");
+  m_rightFoot.associatedAnkle = m_robotModel->getFrameId("r_ankle");
+  m_leftWrist  = m_robotModel->getFrameId("l_wrist");
+  m_rightWrist = m_robotModel->getFrameId("r_wrist");
   DetectAutomaticallyShoulders();
 
   // intialize the "initial pose" (q=[0]) data
