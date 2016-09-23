@@ -1,4 +1,4 @@
-*> \brief <b> DGGES computes the eigenvalues, the Schur form, and, optionally, the matrix of Schur vectors for GE matrices</b>
+*> \brief <b> GDGGES computes the eigenvalues, the Schur form, and, optionally, the matrix of Schur vectors for GE matrices</b>
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -6,7 +6,7 @@
 *            http://www.netlib.org/lapack/explore-html/ 
 *
 *> \htmlonly
-*> Download DGGES + dependencies 
+*> Download GDGGES + dependencies 
 *> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dgges.f"> 
 *> [TGZ]</a> 
 *> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dgges.f"> 
@@ -18,7 +18,7 @@
 *  Definition:
 *  ===========
 *
-*       SUBROUTINE DGGES( JOBVSL, JOBVSR, SORT, SELCTG, N, A, LDA, B, LDB,
+*       SUBROUTINE GDGGES( JOBVSL, JOBVSR, SORT, SELCTG, N, A, LDA, B, LDB,
 *                         SDIM, ALPHAR, ALPHAI, BETA, VSL, LDVSL, VSR,
 *                         LDVSR, WORK, LWORK, BWORK, INFO )
 * 
@@ -43,7 +43,7 @@
 *>
 *> \verbatim
 *>
-*> DGGES computes for a pair of N-by-N real nonsymmetric matrices (A,B),
+*> GDGGES computes for a pair of N-by-N real nonsymmetric matrices (A,B),
 *> the generalized eigenvalues, the generalized real Schur form (S,T),
 *> optionally, the left and/or right matrices of Schur vectors (VSL and
 *> VSR). This gives the generalized Schur factorization
@@ -264,8 +264,8 @@
 *>                      eigenvalues in the Generalized Schur form no
 *>                      longer satisfy SELCTG=.TRUE.  This could also
 *>                      be caused due to scaling.
-*>                =N+3: reordering failed in DTGSEN.
-*> \endverbatim
+*>                =N+3: reordering failed in GDTGSEN.
+*> \endverbatnim
 *
 *  Authors:
 *  ========
@@ -280,7 +280,7 @@
 *> \ingroup doubleGEeigen
 *
 *  =====================================================================
-      SUBROUTINE DGGES( JOBVSL, JOBVSR, SORT, SELCTG, N, A, LDA, B, LDB,
+      SUBROUTINE GDGGES( JOBVSL, JOBVSR, SORT, SELCTG, N, A, LDA, B,LDB,
      $                  SDIM, ALPHAR, ALPHAI, BETA, VSL, LDVSL, VSR,
      $                  LDVSR, WORK, LWORK, BWORK, INFO )
 *
@@ -325,7 +325,7 @@
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           DGEQRF, DGGBAK, DGGBAL, DGGHRD, DHGEQZ, DLABAD,
-     $                   DLACPY, DLASCL, DLASET, DORGQR, DORMQR, DTGSEN,
+     $                   DLACPY, DLASCL, DLASET, DORGQR, DORMQR,GDTGSEN,
      $                   XERBLA
 *     ..
 *     .. External Functions ..
@@ -557,7 +557,7 @@
             BWORK( I ) = SELCTG( ALPHAR( I ), ALPHAI( I ), BETA( I ) )
    10    CONTINUE
 *
-         CALL DTGSEN( 0, ILVSL, ILVSR, BWORK, N, A, LDA, B, LDB, ALPHAR,
+         CALL GDTGSEN( 0, ILVSL, ILVSR, BWORK, N, A, LDA, B, LDB,ALPHAR,
      $                ALPHAI, BETA, VSL, LDVSL, VSR, LDVSR, SDIM, PVSL,
      $                PVSR, DIF, WORK( IWRK ), LWORK-IWRK+1, IDUM, 1,
      $                IERR )
