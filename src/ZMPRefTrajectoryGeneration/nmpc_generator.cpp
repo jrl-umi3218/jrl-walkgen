@@ -107,7 +107,8 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, PinocchioRobot *aPR)
   SecurityMarginX_ = 0.0 ;
   SecurityMarginY_ = 0.0 ;
 
-  nc_      = 0 ;
+  nceq_    = 0 ;
+  ncineq_  = 0 ;
   nc_cop_  = 0 ;
   nc_foot_ = 0 ;
   nc_vel_  = 0 ;
@@ -126,15 +127,15 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, PinocchioRobot *aPR)
   RFI_ = new RelativeFeetInequalities(SPM_,PR_) ;
 
   QP_=NULL;
-  qpOases_H_ =NULL;
-  qpOases_J_ =NULL;
-  qpOases_lbJ=NULL;
-  qpOases_ubJ=NULL;
-  qpOases_lb_=NULL;
-  qpOases_ub_=NULL;
-  nwsr_ = 0;
-  cput_ = NULL;
-  deltaU_ = NULL;
+  QuadProg_H_.resize(1,1);
+  QuadProg_J_eq_.resize(1,1);
+  QuadProg_J_ineq_.resize(1,1);
+  QuadProg_g_.resize(1);
+  QuadProg_bJ_eq_.resize(1);
+  QuadProg_lbJ_ineq_.resize(1);
+  QuadProg_lb_.resize(1);
+  QuadProg_ub_.resize(1);
+  QuadProg_deltaU_.resize(1);
   isQPinitialized_ = false;
   useLineSearch_ = false;
 
@@ -143,16 +144,6 @@ NMPCgenerator::NMPCgenerator(SimplePluginManager * aSPM, PinocchioRobot *aPR)
 
 NMPCgenerator::~NMPCgenerator()
 {
-  if (cput_ !=NULL)
-  {
-    delete cput_;
-    cput_ = NULL ;
-  }
-  if (deltaU_ !=NULL)
-  {
-    delete deltaU_;
-    deltaU_ = NULL ;
-  }
   if (QP_ !=NULL)
   {
     delete QP_;
@@ -275,17 +266,27 @@ void NMPCgenerator::initNMPCgenerator(
   initializeLineSearch();
 
   // initialize the solver
-  QP_ = new qpOASES::SQProblem((int)nv_,(int)nc_,qpOASES::HST_POSDEF) ;
-//  options_.initialStatusBounds = qpOASES::ST_INACTIVE ;
+  // we assume 0 equality constraint at the beginning
+  // call QP_->problem((int)nv_,(int)nceq_,(int)ncineq_) befor using it
+  if(nceq_!=0 && nv_!=0)
+  {
+    QP_ = new Eigen::QuadProgDense((int)nv_,(int)nceq_,(int)ncineq_) ;
+    QuadProg_H_       .resize(nv_,nv_);
+    QuadProg_g_       .resize(nv_);
+    QuadProg_J_eq_    .resize(nceq_,nv_);
+    QuadProg_bJ_eq_   .resize(nceq_);
+    QuadProg_J_ineq_  .resize(ncineq_,nv_);
+    QuadProg_lbJ_ineq_.resize(ncineq_);
+    QuadProg_deltaU_  .resize(nv_);
 
-  options_.setToMPC();
-  QP_->setOptions(options_);
-  QP_->setPrintLevel(qpOASES::PL_NONE);
-  //QP_->setPrintLevel(qpOASES::PL_HIGH);
-  nwsr_ = 1e+8 ;
-  cput_ = new double[1] ;
-  deltaU_ = new double[nv_];
-  cput_[0] = 1e+8;
+    QuadProg_H_       .fill(0.0);
+    QuadProg_g_       .fill(0.0);
+    QuadProg_J_eq_    .fill(0.0);
+    QuadProg_bJ_eq_   .fill(0.0);
+    QuadProg_J_ineq_  .fill(0.0);
+    QuadProg_lbJ_ineq_.fill(0.0);
+    QuadProg_deltaU_  .fill(0.0);
+  }
 }
 
 void NMPCgenerator::updateInitialCondition(double time,
@@ -385,13 +386,48 @@ void NMPCgenerator::preprocess_solution()
   //updateObstacleConstraint();
   //updateStandingConstraint();
   updateCostFunction();
-  qpOases_H_ = MRAWDATA(qp_H_  ) ;
-  qpOases_g_ = MRAWDATA(qp_g_  ) ;
-  qpOases_J_ = MRAWDATA(qp_J_  ) ;
-  qpOases_lbJ= MRAWDATA(qp_lbJ_) ;
-  qpOases_ubJ= MRAWDATA(qp_ubJ_) ;
-  qpOases_lb_= MRAWDATA(qp_lb_ ) ;
-  qpOases_ub_= MRAWDATA(qp_ub_ ) ;
+
+  QP_->problem((int)nv_,(int)nceq_,(int)ncineq_);
+  QuadProg_H_       .resize(nv_,nv_);
+  QuadProg_g_       .resize(nv_);
+  QuadProg_J_eq_    .resize(nceq_,nv_);
+  QuadProg_bJ_eq_   .resize(nceq_);
+  QuadProg_J_ineq_  .resize(ncineq_,nv_);
+  QuadProg_lbJ_ineq_.resize(ncineq_);
+  QuadProg_deltaU_  .resize(nv_);
+
+  for(unsigned i=0 ; i<nv_ ; ++i)
+  {
+    for(unsigned j=0 ; j<nv_ ; ++j)
+    {
+      QuadProg_H_(i,j) = qp_H_(i,j) ;
+    }
+    QuadProg_g_(i) = qp_g_(i) ;
+  }
+
+  for(unsigned i=0 ; i<nceq_ ; ++i)
+  {
+    for(unsigned j=0 ; j<nv_ ; ++j)
+    {
+      QuadProg_J_eq_(i,j) = qp_J_(i,j) ;
+    }
+    QuadProg_g_(i) = qp_g_(i) ;
+  }
+
+  for(unsigned i=0 ; i<nv_ ; ++i)
+  {
+    for(unsigned j=0 ; j<nv_ ; ++j)
+    {
+      QuadProg_H_(i,j) = qp_H_(i,j) ;
+    }
+    QuadProg_g_(i) = qp_g_(i) ;
+  }
+
+      ;
+  QuadProg_bJ_eq_   ;
+  QuadProg_J_ineq_  ;
+  QuadProg_lbJ_ineq_;
+  QuadProg_deltaU_  ;
   return ;
 }
 
@@ -402,44 +438,11 @@ void NMPCgenerator::solve_qp(){
   """
   */
 
-  //qpOASES::returnValue ret, error ;
-  if (!isQPinitialized_)
-  {
-    // force the solver to use the maximum time for computing the solution
-    cput_[0] = 1000.0;
-    nwsr_ = 10000 ;
-    /*ret =*/ QP_->init(
-            qpOases_H_, qpOases_g_, qpOases_J_,
-            qpOases_lb_, qpOases_ub_,
-            qpOases_lbJ, qpOases_ubJ,
-            nwsr_, cput_
-          );
-    if(time_>0.040)
-      isQPinitialized_ = true ;
-  }
-  else
-  {
-    if(useLineSearch_)
-    {
-      //cput_[0] = 0.002;
-      //nwsr_ = 5 ;
-      cput_[0] = 1000.0 ;
-      nwsr_ = 10000 ;
-    }else
-    {
-      cput_[0] = 1000.0;
-      nwsr_ = 10000 ;
-    }
-    /*ret = */QP_->hotstart(
-      qpOases_H_, qpOases_g_, qpOases_J_,
-      qpOases_lb_, qpOases_ub_,
-      qpOases_lbJ, qpOases_ubJ,
-      nwsr_, cput_
-    );
-  }
 
   // primal SQP solution
-  /*error = */QP_->getPrimalSolution(deltaU_) ;
+  QP_->solve(QuadProg_H_,QuadProg_g_,
+             QuadProg_J_eq_,QuadProg_bJ_eq_,
+             QuadProg_J_ineq_,QuadProg_lbJ_ineq_);
 
   // save qp solver data
 #ifdef DEBUG_COUT

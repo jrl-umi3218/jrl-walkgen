@@ -33,7 +33,7 @@
 #include <jrl/walkgen/pinocchiorobot.hh>
 #include <iomanip>
 #include <cmath>
-#include <qpOASES.hpp>
+#include <eigen-quadprog/QuadProg.h>
 
 namespace PatternGeneratorJRL
 {
@@ -190,15 +190,6 @@ namespace PatternGeneratorJRL
     inline void T_step(double T_step)
     {T_step_=T_step;}
 
-    // cpu time consumption for one SQP
-    inline double cput()
-    {return *cput_ ;}
-
-    // number of active set recalculation
-    inline int nwsr()
-    {return nwsr_ ;}
-
-
   private:
     SimplePluginManager * SPM_ ;
     PinocchioRobot * PR_ ;
@@ -314,11 +305,10 @@ namespace PatternGeneratorJRL
     double cm_, c_ ; // Merit Function Jacobian
     double L_n_, L_ ; // Merit function of the next step and Merit function
     unsigned maxIteration ;
-    qpOASES::Constraints constraints_;
-    qpOASES::Indexlist * indexActiveConstraints_ ;
 
     // Gauss-Newton Hessian
-    unsigned nc_ ;
+    unsigned nceq_ ;
+    unsigned ncineq_ ;
     MAL_MATRIX_TYPE(double) qp_H_   ;
     MAL_VECTOR_TYPE(double) qp_g_   ;
     MAL_MATRIX_TYPE(double) qp_J_   ; //constraint Jacobian
@@ -424,18 +414,11 @@ namespace PatternGeneratorJRL
 
     // QPoases data structure
     bool isQPinitialized_ ;
-    qpOASES::SQProblem * QP_ ;
-    qpOASES::Options options_ ;
-    qpOASES::real_t* qpOases_H_  ;
-    qpOASES::real_t* qpOases_g_  ;
-    qpOASES::real_t* qpOases_J_  ;
-    qpOASES::real_t* qpOases_lbJ ;
-    qpOASES::real_t* qpOases_ubJ ;
-    qpOASES::real_t* qpOases_lb_ ;
-    qpOASES::real_t* qpOases_ub_ ;
-    int nwsr_ ;
-    qpOASES::real_t* deltaU_  ;
-    qpOASES::real_t* cput_ ;
+    Eigen::QuadProgDense * QP_ ;
+    Eigen::MatrixXd QuadProg_H_, QuadProg_J_eq_, QuadProg_J_ineq_;
+    Eigen::VectorXd QuadProg_g_, QuadProg_bJ_eq_, QuadProg_lbJ_ineq_,
+                    QuadProg_deltaU_;
+
   };
 
 
