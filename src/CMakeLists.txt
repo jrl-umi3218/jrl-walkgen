@@ -19,7 +19,7 @@ ELSE()
   SET(qpOASES_COMPILE_FLAG 0)
 ENDIF()
 
-CONFIGURE_FILE(configJRLWPG.hh.cmake ${CMAKE_BINARY_DIR}/include/jrl/walkgen/configJRLWPG.hh)
+CONFIGURE_FILE(configJRLWPG.hh.in ${CMAKE_BINARY_DIR}/include/jrl/walkgen/configJRLWPG.hh)
 MESSAGE("${CMAKE_BINARY_DIR}/include/jrl/${PROJECT_NAME}/configJRLWPG.hh")
 # Make sure to find Debug.h
 INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src)
