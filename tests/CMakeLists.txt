@@ -75,6 +75,8 @@ ADD_EXECUTABLE(TestRiccatiEquation
   )
 # Need this dependency for the use of the fortran functions (it seems)
 PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
+TARGET_LINK_LIBRARIES(TestRiccatiEquation sublapack)
+
 # Add test on the ricatti equation
 ADD_TEST(TestRiccatiEquation TestRiccatiEquation)
 
