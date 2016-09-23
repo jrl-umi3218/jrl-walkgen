@@ -326,7 +326,7 @@ namespace PatternGeneratorJRL
 	  aFoot.anklePosition(1) = v.second.get<double>("y");
 	  aFoot.anklePosition(2) = v.second.get<double>("z");
 	}
-      se3::FrameIndex la = aModel->getBodyId("l_ankle");
+      se3::FrameIndex la = aModel->getFrameId("l_ankle");
       aFoot.associatedAnkle = aModel->frames[la].parent ;
       aPR.initializeLeftFoot(aFoot);
     }
