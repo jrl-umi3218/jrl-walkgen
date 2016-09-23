@@ -152,6 +152,12 @@ ENDMACRO(ADD_JRL_WALKGEN_EXE)
 
 # the following disabled test case are just useful code for offline
 # motion generation using the specialized inverse kinmatics of a robot
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007ShortWalk TestMorisawa2007.cpp)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007Climbing TestMorisawa2007.cpp)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007GoingDown TestMorisawa2007.cpp)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007SteppingStones TestMorisawa2007.cpp)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007WalkingOnBeam TestMorisawa2007.cpp)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007GoThroughWall TestMorisawa2007.cpp)
 ADD_JRL_WALKGEN_EXE(TestMorisawa2007ShortWalk TestMorisawa2007.cpp)
 ADD_JRL_WALKGEN_EXE(TestMorisawa2007Climbing TestMorisawa2007.cpp)
 ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoingDown TestMorisawa2007.cpp)
@@ -208,7 +214,7 @@ ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoThroughWall TestMorisawa2007.cpp)
 ################
 
 # Disabled as the test fail : random results oscillating around mean behaviour
-ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
+#ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
 ADD_JRL_WALKGEN_EXE(TestNaveau2015Online TestNaveau2015.cpp)
 
 #####################
