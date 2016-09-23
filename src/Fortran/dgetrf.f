@@ -131,7 +131,7 @@
       INTEGER            I, IINFO, J, JB, NB
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           DGEMM, DGETRF2, DLASWP, DTRSM, XERBLA
+      EXTERNAL           GDGEMM, DGETRF2, DLASWP, DTRSM, XERBLA
 *     ..
 *     .. External Functions ..
       INTEGER            ILAENV
@@ -210,7 +210,7 @@
 *
 *                 Update trailing submatrix.
 *
-                  CALL DGEMM( 'No transpose', 'No transpose', M-J-JB+1,
+                  CALL GDGEMM( 'No transpose', 'No transpose', M-J-JB+1,
      $                        N-J-JB+1, JB, -ONE, A( J+JB, J ), LDA,
      $                        A( J, J+JB ), LDA, ONE, A( J+JB, J+JB ),
      $                        LDA )

@@ -247,7 +247,7 @@
       DOUBLE PRECISION   DUM( 1 )
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           DBDSQR, DGEBRD, DGELQF, DGEMM, DGEQRF, DLACPY,
+      EXTERNAL           DBDSQR, DGEBRD, DGELQF, GDGEMM, DGEQRF, DLACPY,
      $                   DLASCL, DLASET, DORGBR, DORGLQ, DORGQR, DORMBR,
      $                   XERBLA
 *     ..
@@ -816,7 +816,7 @@
 *
                   DO 10 I = 1, M, LDWRKU
                      CHUNK = MIN( M-I+1, LDWRKU )
-                     CALL DGEMM( 'N', 'N', CHUNK, N, N, ONE, A( I, 1 ),
+                     CALL GDGEMM( 'N', 'N', CHUNK, N, N, ONE, A( I, 1 ),
      $                           LDA, WORK( IR ), LDWRKR, ZERO,
      $                           WORK( IU ), LDWRKU )
                      CALL DLACPY( 'F', CHUNK, N, WORK( IU ), LDWRKU,
@@ -949,7 +949,7 @@
 *
                   DO 20 I = 1, M, LDWRKU
                      CHUNK = MIN( M-I+1, LDWRKU )
-                     CALL DGEMM( 'N', 'N', CHUNK, N, N, ONE, A( I, 1 ),
+                     CALL GDGEMM( 'N', 'N', CHUNK, N, N, ONE, A( I, 1 ),
      $                           LDA, WORK( IR ), LDWRKR, ZERO,
      $                           WORK( IU ), LDWRKU )
                      CALL DLACPY( 'F', CHUNK, N, WORK( IU ), LDWRKU,
@@ -1095,7 +1095,7 @@
 *                    WORK(IR), storing result in U
 *                    (Workspace: need N*N)
 *
-                     CALL DGEMM( 'N', 'N', M, N, N, ONE, A, LDA,
+                     CALL GDGEMM( 'N', 'N', M, N, N, ONE, A, LDA,
      $                           WORK( IR ), LDWRKR, ZERO, U, LDU )
 *
                   ELSE
@@ -1254,7 +1254,7 @@
 *                    WORK(IU), storing result in U
 *                    (Workspace: need N*N)
 *
-                     CALL DGEMM( 'N', 'N', M, N, N, ONE, A, LDA,
+                     CALL GDGEMM( 'N', 'N', M, N, N, ONE, A, LDA,
      $                           WORK( IU ), LDWRKU, ZERO, U, LDU )
 *
 *                    Copy right singular vectors of R to A
@@ -1413,7 +1413,7 @@
 *                    WORK(IU), storing result in U
 *                    (Workspace: need N*N)
 *
-                     CALL DGEMM( 'N', 'N', M, N, N, ONE, A, LDA,
+                     CALL GDGEMM( 'N', 'N', M, N, N, ONE, A, LDA,
      $                           WORK( IU ), LDWRKU, ZERO, U, LDU )
 *
                   ELSE
@@ -1561,7 +1561,7 @@
 *                    WORK(IR), storing result in A
 *                    (Workspace: need N*N)
 *
-                     CALL DGEMM( 'N', 'N', M, N, N, ONE, U, LDU,
+                     CALL GDGEMM( 'N', 'N', M, N, N, ONE, U, LDU,
      $                           WORK( IR ), LDWRKR, ZERO, A, LDA )
 *
 *                    Copy left singular vectors of A from A to U
@@ -1726,7 +1726,7 @@
 *                    WORK(IU), storing result in A
 *                    (Workspace: need N*N)
 *
-                     CALL DGEMM( 'N', 'N', M, N, N, ONE, U, LDU,
+                     CALL GDGEMM( 'N', 'N', M, N, N, ONE, U, LDU,
      $                           WORK( IU ), LDWRKU, ZERO, A, LDA )
 *
 *                    Copy left singular vectors of A from A to U
@@ -1890,7 +1890,7 @@
 *                    WORK(IU), storing result in A
 *                    (Workspace: need N*N)
 *
-                     CALL DGEMM( 'N', 'N', M, N, N, ONE, U, LDU,
+                     CALL GDGEMM( 'N', 'N', M, N, N, ONE, U, LDU,
      $                           WORK( IU ), LDWRKU, ZERO, A, LDA )
 *
 *                    Copy left singular vectors of A from A to U
@@ -2214,7 +2214,7 @@
 *
                   DO 30 I = 1, N, CHUNK
                      BLK = MIN( N-I+1, CHUNK )
-                     CALL DGEMM( 'N', 'N', M, BLK, M, ONE, WORK( IR ),
+                     CALL GDGEMM( 'N', 'N', M, BLK, M, ONE, WORK( IR ),
      $                           LDWRKR, A( 1, I ), LDA, ZERO,
      $                           WORK( IU ), LDWRKU )
                      CALL DLACPY( 'F', M, BLK, WORK( IU ), LDWRKU,
@@ -2349,7 +2349,7 @@
 *
                   DO 40 I = 1, N, CHUNK
                      BLK = MIN( N-I+1, CHUNK )
-                     CALL DGEMM( 'N', 'N', M, BLK, M, ONE, WORK( IR ),
+                     CALL GDGEMM( 'N', 'N', M, BLK, M, ONE, WORK( IR ),
      $                           LDWRKR, A( 1, I ), LDA, ZERO,
      $                           WORK( IU ), LDWRKU )
                      CALL DLACPY( 'F', M, BLK, WORK( IU ), LDWRKU,
@@ -2495,7 +2495,7 @@
 *                    Q in A, storing result in VT
 *                    (Workspace: need M*M)
 *
-                     CALL DGEMM( 'N', 'N', M, N, M, ONE, WORK( IR ),
+                     CALL GDGEMM( 'N', 'N', M, N, M, ONE, WORK( IR ),
      $                           LDWRKR, A, LDA, ZERO, VT, LDVT )
 *
                   ELSE
@@ -2655,7 +2655,7 @@
 *                    Q in A, storing result in VT
 *                    (Workspace: need M*M)
 *
-                     CALL DGEMM( 'N', 'N', M, N, M, ONE, WORK( IU ),
+                     CALL GDGEMM( 'N', 'N', M, N, M, ONE, WORK( IU ),
      $                           LDWRKU, A, LDA, ZERO, VT, LDVT )
 *
 *                    Copy left singular vectors of L to A
@@ -2812,7 +2812,7 @@
 *                    Q in A, storing result in VT
 *                    (Workspace: need M*M)
 *
-                     CALL DGEMM( 'N', 'N', M, N, M, ONE, WORK( IU ),
+                     CALL GDGEMM( 'N', 'N', M, N, M, ONE, WORK( IU ),
      $                           LDWRKU, A, LDA, ZERO, VT, LDVT )
 *
                   ELSE
@@ -2960,7 +2960,7 @@
 *                    Q in VT, storing result in A
 *                    (Workspace: need M*M)
 *
-                     CALL DGEMM( 'N', 'N', M, N, M, ONE, WORK( IR ),
+                     CALL GDGEMM( 'N', 'N', M, N, M, ONE, WORK( IR ),
      $                           LDWRKR, VT, LDVT, ZERO, A, LDA )
 *
 *                    Copy right singular vectors of A from A to VT
@@ -3123,7 +3123,7 @@
 *                    Q in VT, storing result in A
 *                    (Workspace: need M*M)
 *
-                     CALL DGEMM( 'N', 'N', M, N, M, ONE, WORK( IU ),
+                     CALL GDGEMM( 'N', 'N', M, N, M, ONE, WORK( IU ),
      $                           LDWRKU, VT, LDVT, ZERO, A, LDA )
 *
 *                    Copy right singular vectors of A from A to VT
@@ -3284,7 +3284,7 @@
 *                    Q in VT, storing result in A
 *                    (Workspace: need M*M)
 *
-                     CALL DGEMM( 'N', 'N', M, N, M, ONE, WORK( IU ),
+                     CALL GDGEMM( 'N', 'N', M, N, M, ONE, WORK( IU ),
      $                           LDWRKU, VT, LDVT, ZERO, A, LDA )
 *
 *                    Copy right singular vectors of A from A to VT
