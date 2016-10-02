@@ -687,6 +687,91 @@ namespace PatternGeneratorJRL
       // Compare debugging files
       return compareDebugFiles();
     }
+    
+    void TestObject::setDirectorySeqplay(std::string & aDirectory)
+    {
+      m_DirectoryName = aDirectory;
+    }
 
+    void TestObject::generateOpenHRPTrajectories()
+    {
+      /// \brief Create file .hip/.waist .pos .zmp
+      /// --------------------
+      ofstream aof;
+      string aFileName;
+      int iteration = m_OneStep.NbOfIt ;
+      
+      if ( iteration == 0 ){
+	aFileName = m_DirectoryName;
+	aFileName+= m_TestName;
+	aFileName+=".pos";
+	aof.open(aFileName.c_str(),ofstream::out);
+	aof.close();
+      }
+
+      ///----
+      aFileName = m_DirectoryName;
+      aFileName+=m_TestName;
+      aFileName+=".pos";
+      aof.open(aFileName.c_str(),ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
+      for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
+	aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 2
+      }
+      for(unsigned int i = 0 ; i < 9 ; i++){
+	aof << 0.0 << " "  ;
+      }
+      aof << 0.0  << endl ;
+      aof.close();
+      
+      if ( iteration == 0 ){
+	aFileName = m_DirectoryName;
+	aFileName += m_TestName;
+	aFileName += ".hip";
+	aof.open(aFileName.c_str(),ofstream::out);
+	aof.close();
+      }
+      aFileName = m_DirectoryName;
+      aFileName += m_TestName;
+      aFileName += ".hip";
+      aof.open(aFileName.c_str(),ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
+      aof << filterprecision( m_OneStep.finalCOMPosition.roll[0] * M_PI /180) << " "  ; // 2
+      aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0] * M_PI /180 ) << " "  ; // 3
+      aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] * M_PI /180 ) ; // 4
+      aof << endl ;
+      aof.close();
+      
+      if ( iteration == 0 ){
+	aFileName = m_DirectoryName;
+	aFileName += m_TestName;
+	aFileName += ".zmp";
+	aof.open(aFileName.c_str(),ofstream::out);
+	aof.close();
+      }
+      
+      FootAbsolutePosition aSupportState;
+      if (m_OneStep.LeftFootPosition.stepType < 0 )
+	aSupportState = m_OneStep.LeftFootPosition ;
+      else
+	aSupportState = m_OneStep.RightFootPosition ;
+      
+      aFileName = m_DirectoryName;
+      aFileName += m_TestName;
+      aFileName += ".zmp";
+      aof.open(aFileName.c_str(),ofstream::app);
+      aof.precision(8);
+      aof.setf(ios::scientific, ios::floatfield);
+      aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
+      aof << filterprecision( m_OneStep.ZMPTarget(0) - m_CurrentConfiguration(0)) << " "  ; // 2
+      aof << filterprecision( m_OneStep.ZMPTarget(1) - m_CurrentConfiguration(1) ) << " "  ; // 3
+      aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2))  ; // 4
+      aof << endl ;
+      aof.close();
+    }
   }
 }

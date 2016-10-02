@@ -74,6 +74,9 @@ namespace PatternGeneratorJRL
       /*! \brief Perform test. */
       virtual bool doTest(std::ostream &os);
 
+      /*! \brief Set directory for OpenHRP seqplay */
+      void setDirectorySeqplay(std::string &aDirectory);
+
     protected:
 
       /*! \brief Choose which test to perform. */
@@ -176,6 +179,8 @@ namespace PatternGeneratorJRL
       /*! \brief Compare debug files with references. */
       bool compareDebugFiles();
 
+      /*! \brief Generate trajectories files for OpenHRP. */
+      void generateOpenHRPTrajectories();
       /*! @} */
 
       /*! \brief Information related to one step of computation. */
@@ -183,6 +188,9 @@ namespace PatternGeneratorJRL
 
       /*! \brief Name of the test */
       std::string m_TestName;
+
+      /*! \brief Directory where to store the files */
+      std::string m_DirectoryName;
 
       /*! \brief Clock CPU timing
 	This object measure three parts of the algorithm:

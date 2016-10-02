@@ -226,7 +226,11 @@ namespace PatternGeneratorJRL {
     // INFO: This where you should instanciate your own
     // INFO: object for Com and Foot realization.
     // INFO: The default one is based on a geometrical approach.
+#if USE_QP_OASES==1
     m_ComAndFootRealization.resize(4);
+#else
+    m_ComAndFootRealization.resize(3);
+#endif
     m_ComAndFootRealization[0] = new ComAndFootRealizationByGeometry(this);
 
     // Creates the foot trajectory generator.

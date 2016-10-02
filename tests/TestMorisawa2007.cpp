@@ -563,7 +563,12 @@ protected:
       }
     }
   }
-  
+
+  void fillInDebugFiles()
+  {
+    TestObject::fillInDebugFiles();
+    generateOpenHRPTrajectories();
+  }
 };
 
 int PerformTests(int argc, char *argv[])
