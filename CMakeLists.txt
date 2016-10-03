@@ -130,6 +130,7 @@ ADD_SUBDIRECTORY(tests)
 
 # Generate dependency to jrl-walkgen in pc file
 PKG_CONFIG_APPEND_LIBS("jrl-walkgen")
+PKG_CONFIG_APPEND_LIBS("sublapack")
 
 # Ask to generate the final steps.
 SETUP_PROJECT_FINALIZE()
