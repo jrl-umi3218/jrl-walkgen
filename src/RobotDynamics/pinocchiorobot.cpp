@@ -144,21 +144,21 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   m_robotModel = robotModel;
 
   // initialize the short cut for the joint ids
-  m_chest = m_robotModel->getFrameParent("torso");
+  m_chest = m_robotModel->frames.at(m_robotModel->getFrameId("torso")).parent;
   if(robotModel->existBodyName("BODY")) {
-    m_waist = m_robotModel->getFrameParent("BODY");
+    m_waist = m_robotModel->frames.at(m_robotModel->getFrameId("BODY")).parent;
   }
   else if (robotModel->existBodyName("body")) {
-    m_waist = m_robotModel->getFrameParent("body");
+    m_waist = m_robotModel->frames.at(m_robotModel->getFrameId("body")).parent;
   }
   else {
     const std::string exception_message ("BODY/body not found. Check model.");
     throw std::invalid_argument(exception_message);
   }
-  m_leftFoot.associatedAnkle  = m_robotModel->getFrameParent("l_ankle");
-  m_rightFoot.associatedAnkle = m_robotModel->getFrameParent("r_ankle");
-  m_leftWrist  = m_robotModel->getFrameParent("l_wrist");
-  m_rightWrist = m_robotModel->getFrameParent("r_wrist");
+  m_leftFoot.associatedAnkle  = m_robotModel->frames.at(m_robotModel->getFrameId("l_ankle")).parent;
+  m_rightFoot.associatedAnkle = m_robotModel->frames.at(m_robotModel->getFrameId("r_ankle")).parent;
+  m_leftWrist  = m_robotModel->frames.at(m_robotModel->getFrameId("l_wrist")).parent;
+  m_rightWrist = m_robotModel->frames.at(m_robotModel->getFrameId("r_wrist")).parent;
   DetectAutomaticallyShoulders();
 
   // intialize the "initial pose" (q=[0]) data
