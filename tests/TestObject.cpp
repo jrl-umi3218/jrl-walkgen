@@ -134,17 +134,54 @@ namespace PatternGeneratorJRL
 	  return false;
 	}
 
-      // Instanciate and initialize.
+      // Instanciate and initialize the model of the robot from URDF
+      // and SRDF files.
       CreateAndInitializeHumanoidRobot(m_URDFPath,m_SRDFPath,m_PR,m_DebugPR);
 
       // Create Pattern Generator Interface
       m_PGI = patternGeneratorInterfaceFactory(m_PR);
       m_PGI->SetCurrentJointValues(m_HalfSitting);
 
+      m_SPM = new SimplePluginManager();
+
       // Specify the walking mode: here the default one.
       istringstream strm2(":walkmode 0");
       m_PGI->ParseCmd(strm2);
 
+      // Initialize m_CurrentConfiguration, m_CurrentVelocity, m_CurrentAcceleration
+      InitializeStateVectors();
+
+      CreateAndInitializeComAndFootRealization();
+
+      // initialize the reference to limbs
+      InitializeLimbs();
+      return true ;
+    }
+    
+    TestObject::~TestObject()
+    {
+
+      if (m_PR!=0)
+        delete m_PR;
+
+      if (m_DebugPR!=0)
+        delete m_DebugPR;
+
+      if (m_robotData!=0)
+        delete m_robotData;
+
+      if (m_DebugRobotData!=0)
+        delete m_DebugRobotData;
+
+      if (m_PGI!=0)
+        delete m_PGI;
+      
+      if (m_SPM!=0)
+	delete m_SPM;
+    }
+
+    void TestObject::InitializeStateVectors()
+    {
       // This is a vector corresponding to ALL the DOFS of the robot:
       // free flyer + actuated DOFS.
       unsigned lNbDofs = m_PR->numberDof();
@@ -167,28 +204,74 @@ namespace PatternGeneratorJRL
 	  m_PreviousVelocity[i] = 0.0 ;
 	  m_PreviousAcceleration[i] = 0.0;
 	}
-      return true ;
+
     }
 
-    TestObject::~TestObject()
+    void TestObject::CreateAndInitializeComAndFootRealization()
     {
-
-      if (m_PR!=0)
-        delete m_PR;
-
-      if (m_DebugPR!=0)
-        delete m_DebugPR;
-
-      if (m_robotData!=0)
-        delete m_robotData;
-
-      if (m_DebugRobotData!=0)
-        delete m_DebugRobotData;
-
-      if (m_PGI!=0)
-        delete m_PGI;
+      m_ComAndFootRealization = 
+	new ComAndFootRealizationByGeometry(								   (PatternGeneratorInterfacePrivate*)m_SPM );
+      m_ComAndFootRealization->setPinocchioRobot(m_PR);
+      m_ComAndFootRealization->SetStepStackHandler(new StepStackHandler(m_SPM));
+      m_ComAndFootRealization->SetHeightOfTheCoM(0.814);
+      m_ComAndFootRealization->setSamplingPeriod(0.005);
+      m_ComAndFootRealization->Initialization();
+      MAL_VECTOR_DIM(waist,double,6);
+      for (int i = 0 ; i < 6 ; ++i )
+	{
+	  waist(i) = 0;
+	}
+      MAL_S3_VECTOR(lStartingCOMState,double);
+      
+      lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
+      lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
+      lStartingCOMState(2) = m_OneStep.finalCOMPosition.z[0] ;
+      m_ComAndFootRealization->setSamplingPeriod(0.005);
+      m_ComAndFootRealization->Initialization();
+      m_ComAndFootRealization->InitializationCoM(m_HalfSitting,lStartingCOMState,
+						waist,
+						m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
+      
+      
     }
-
+    
+    void TestObject::InitializeLimbs()
+    {
+      m_leftLeg =
+        m_PR->jointsBetween(m_PR->waist(),m_PR->leftFoot()->associatedAnkle);
+      m_rightLeg =
+	     m_PR->jointsBetween(m_PR->waist(),m_PR->rightFoot()->associatedAnkle);
+      m_leftArm =
+        m_PR->jointsBetween(m_PR->chest(),m_PR->leftWrist());
+      m_rightArm =
+        m_PR->jointsBetween(m_PR->chest(),m_PR->rightWrist());
+      
+      m_leftLeg.erase( m_leftLeg.begin() );
+      m_rightLeg.erase( m_rightLeg.begin() );
+      
+      se3::JointModelVector & ActuatedJoints = m_PR->getActuatedJoints();
+      for(unsigned i=0 ; i <m_leftLeg.size() ; ++i)
+	m_leftLeg[i] = se3::idx_q(ActuatedJoints[m_leftLeg[i]])-1;
+      for(unsigned i=0 ; i <m_rightLeg.size() ; ++i)
+	m_rightLeg[i] = se3::idx_q(ActuatedJoints[m_rightLeg[i]])-1;
+      for(unsigned i=0 ; i <m_leftArm.size() ; ++i)
+	m_leftArm[i] = se3::idx_q(ActuatedJoints[m_leftArm[i]])-1;
+      for(unsigned i=0 ; i <m_rightArm.size() ; ++i)
+	m_rightArm[i] = se3::idx_q(ActuatedJoints[m_rightArm[i]])-1;
+      
+      if((m_robotModel.parents.size() >= m_rightArm.back()+1) &&
+	 m_robotModel.parents[m_rightArm.back()+1] == m_rightArm.back())
+	m_rightGripper = m_rightArm.back()+1 ;
+      else
+	m_rightGripper = 0 ;
+      
+      if((m_robotModel.parents.size() >= m_leftArm.back()+1) &&
+	 m_robotModel.parents[m_leftArm.back()+1] == m_leftArm.back())
+	m_leftGripper = m_leftArm.back()+1 ;
+      else
+	m_leftGripper = 0 ;
+    }
+    
     void TestObject::CreateAndInitializeHumanoidRobot(
 						      std::string &URDFFile,
 						      std::string &SRDFFile,
@@ -693,15 +776,123 @@ namespace PatternGeneratorJRL
       m_DirectoryName = aDirectory;
     }
 
+    void TestObject::analyticalInverseKinematics(MAL_VECTOR_TYPE(double) & conf,
+						 MAL_VECTOR_TYPE(double) & vel,
+						 MAL_VECTOR_TYPE(double) & acc)
+    {
+      /// \brief calculate, from the CoM of computed by the preview control,
+      ///    the corresponding articular position, velocity and acceleration
+      /// ------------------------------------------------------------------
+      MAL_VECTOR_DIM(aCOMState,double,6);
+      MAL_VECTOR_DIM(aCOMSpeed,double,6);
+      MAL_VECTOR_DIM(aCOMAcc,double,6);
+      MAL_VECTOR_DIM(aLeftFootPosition,double,5);
+      MAL_VECTOR_DIM(aRightFootPosition,double,5);
+      
+      aCOMState(0) = m_OneStep.finalCOMPosition.x[0];
+      aCOMState(1) = m_OneStep.finalCOMPosition.y[0];
+      aCOMState(2) = m_OneStep.finalCOMPosition.z[0];
+      aCOMState(3) = m_OneStep.finalCOMPosition.roll[0]  * 180/M_PI ;
+      aCOMState(4) = m_OneStep.finalCOMPosition.pitch[0] * 180/M_PI ;
+      aCOMState(5) = m_OneStep.finalCOMPosition.yaw[0]   * 180/M_PI ;
+      
+      aCOMSpeed(0) = m_OneStep.finalCOMPosition.x[1];
+      aCOMSpeed(1) = m_OneStep.finalCOMPosition.y[1];
+      aCOMSpeed(2) = m_OneStep.finalCOMPosition.z[1];
+      aCOMSpeed(3) = m_OneStep.finalCOMPosition.roll[1] /** * 180/M_PI  */ ;
+      aCOMSpeed(4) = m_OneStep.finalCOMPosition.pitch[1]/** * 180/M_PI  */ ;
+      aCOMSpeed(5) = m_OneStep.finalCOMPosition.yaw[1]/** * 180/M_PI  */ ;
+      
+      aCOMAcc(0) = m_OneStep.finalCOMPosition.x[2];
+      aCOMAcc(1) = m_OneStep.finalCOMPosition.y[2];
+      aCOMAcc(2) = m_OneStep.finalCOMPosition.z[2];
+      aCOMAcc(3) = m_OneStep.finalCOMPosition.roll[2]/** * 180/M_PI  */ ;
+      aCOMAcc(4) = m_OneStep.finalCOMPosition.pitch[2]/** * 180/M_PI  */ ;
+      aCOMAcc(5) = m_OneStep.finalCOMPosition.yaw[2] /** * 180/M_PI  */;
+      
+      aLeftFootPosition(0) = m_OneStep.LeftFootPosition.x;
+      aLeftFootPosition(1) = m_OneStep.LeftFootPosition.y;
+      aLeftFootPosition(2) = m_OneStep.LeftFootPosition.z;
+      aLeftFootPosition(3) = m_OneStep.LeftFootPosition.theta;
+      aLeftFootPosition(4) = m_OneStep.LeftFootPosition.omega;
+      
+      aRightFootPosition(0) = m_OneStep.RightFootPosition.x;
+      aRightFootPosition(1) = m_OneStep.RightFootPosition.y;
+      aRightFootPosition(2) = m_OneStep.RightFootPosition.z;
+      aRightFootPosition(3) = m_OneStep.RightFootPosition.theta;
+      aRightFootPosition(4) = m_OneStep.RightFootPosition.omega;
+      m_ComAndFootRealization->setSamplingPeriod(0.005);
+      m_ComAndFootRealization->
+	ComputePostureForGivenCoMAndFeetPosture(aCOMState, 
+						aCOMSpeed, 
+						aCOMAcc, 
+						aLeftFootPosition, 
+						aRightFootPosition,
+						conf, vel, acc, 
+						m_OneStep.NbOfIt, 1);
+      
+      if(m_leftGripper!=0 && m_rightGripper!=0)
+	{
+	  conf(m_leftGripper) = 10.0*M_PI/180.0;
+	  conf(m_rightGripper) = 10.0*M_PI/180.0;
+	}
+    }
+
+    void TestObject::parseFromURDFtoOpenHRPIndex(MAL_VECTOR_TYPE(double) &conf)
+    {
+
+      MAL_VECTOR_FILL(conf,0.0);
+
+      for(unsigned int i = 0 ; i < 6 ; i++)
+	conf(i) = m_CurrentConfiguration(i);
+      unsigned index=6;
+      //RLEG
+      for(unsigned int i = 0 ; i < m_rightLeg.size() ; i++)
+	conf(index+i) = m_CurrentConfiguration(m_rightLeg[i]);
+      index+=m_rightLeg.size();
+      //LLEG
+      for(unsigned int i = 0 ; i < m_leftLeg.size() ; i++)
+	conf(index+i) = m_CurrentConfiguration(m_leftLeg[i]);
+      index+=m_leftLeg.size();
+      //CHEST
+      for(unsigned int i = 0 ; i < 2 ; i++)
+	conf(index+i) = 0.0 ;
+      index+= 2 ;
+      //HEAD
+      for(unsigned int i = 0 ; i < 2 ; i++)
+	conf(index+i) = 0.0 ;
+      index+= 2 ;
+      //RARM
+      for(unsigned int i = 0 ; i < m_rightArm.size() ; i++)
+	conf(index+i) = m_HalfSitting(m_rightArm[i]-6);
+      index+=m_rightArm.size();
+      conf(index) = 10*M_PI/180;
+      ++index;
+      //LARM
+      for(unsigned int i = 0 ; i < m_leftArm.size() ; i++)
+	conf(index+i) = m_HalfSitting(m_leftArm[i]-6);
+      index+=m_leftArm.size();
+      conf(index) = 10*M_PI/180;
+
+    }
+
     void TestObject::generateOpenHRPTrajectories()
     {
+      analyticalInverseKinematics(m_CurrentConfiguration,
+				  m_CurrentVelocity,
+				  m_CurrentAcceleration);
+
       /// \brief Create file .hip/.waist .pos .zmp
       /// --------------------
+      MAL_VECTOR_TYPE(double) conf;
+      conf = m_CurrentConfiguration;
+      parseFromURDFtoOpenHRPIndex(conf);
+
       ofstream aof;
       string aFileName;
       int iteration = m_OneStep.NbOfIt ;
       
-      if ( iteration == 0 ){
+      if ( iteration <= 1 ){
 	aFileName = m_DirectoryName;
 	aFileName+= m_TestName;
 	aFileName+=".pos";
@@ -712,13 +903,14 @@ namespace PatternGeneratorJRL
       ///----
       aFileName = m_DirectoryName;
       aFileName+=m_TestName;
-      aFileName+=".pos";
+      aFileName+=".pos2";
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
+      std::cout << iteration << " - Going through this step "<< std::endl;
       aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
-      for(unsigned int i = 6 ; i < m_CurrentConfiguration.size() ; i++){
-	aof << filterprecision( m_CurrentConfiguration(i) ) << " "  ; // 2
+      for(unsigned int i = 6 ; i < 36 ; i++){
+	aof << filterprecision( conf(i) ) << " "  ; // 2
       }
       for(unsigned int i = 0 ; i < 9 ; i++){
 	aof << 0.0 << " "  ;
