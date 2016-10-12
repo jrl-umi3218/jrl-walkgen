@@ -425,13 +425,7 @@ protected:
       analyticalInverseKinematics(m_conf,m_vel,m_acc);
       if(iteration==0)
       {
-        bool isHalfsitting = true ;
-        for(unsigned i=0 ; i<MAL_VECTOR_SIZE(m_HalfSitting) ; ++i)
-        {
-          isHalfsitting &= abs(m_conf(6+i)-m_HalfSitting(i))<1e-3 ;
-//          if(!(abs(m_conf(6+i)-m_HalfSitting(i))<1e-3))
-//            cout << i << " " ;
-        }
+
 //        cout << endl ;
 //        cout << m_conf << endl ;
 //        cout << m_HalfSitting << endl ;

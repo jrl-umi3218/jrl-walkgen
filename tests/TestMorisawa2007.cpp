@@ -75,6 +75,8 @@ public:
   TestMorisawa2007(int argc, char*argv[], string &aString, int TestProfile):
     TestObject(argc, argv, aString)
   {
+    m_DebugFGPIFull = true;
+    m_DebugFGPI = true;
     m_TestProfile = TestProfile;
     m_TestChangeFoot = true;
     m_NbStepsModified = 0;
@@ -615,7 +617,8 @@ protected:
   void fillInDebugFiles()
   {
     TestObject::fillInDebugFiles();
-    generateOpenHRPTrajectories();
+    TestObject::fillInDebugFilesFull();
+    TestObject::generateOpenHRPTrajectories();
   }
 };
 

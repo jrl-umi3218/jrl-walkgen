@@ -170,6 +170,11 @@ namespace PatternGeneratorJRL
       se3::JointIndex m_leftGripper  ;
       se3::JointIndex m_rightGripper ;
 
+      /*! \brief Vector of generalized configurations for whole body motion. */
+      MAL_VECTOR_TYPE(double) m_conf;
+      MAL_VECTOR_TYPE(double) m_vel ;
+      MAL_VECTOR_TYPE(double) m_acc ;
+
       /*! @} */
 
       /*! \brief Pointer towards the Pattern Generator Interface */
@@ -187,6 +192,7 @@ namespace PatternGeneratorJRL
       /*! \brief Output Com, ZMP and feet trajectories
 	for a single mass robot model. */
       bool m_DebugFGPI;
+      bool m_DebugFGPIFull ;
 
       /*! \brief Reset debug files according to flags. */
       void prepareDebugFiles();
@@ -194,6 +200,7 @@ namespace PatternGeneratorJRL
       /*! \brief Fill in the debug files with the appropriate
 	information */
       virtual void fillInDebugFiles();
+      virtual void fillInDebugFilesFull( );
 
       /*! \brief Compare debug files with references. */
       bool compareDebugFiles();

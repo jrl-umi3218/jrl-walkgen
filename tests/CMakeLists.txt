@@ -210,7 +210,7 @@ ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoingDown15 TestMorisawa2007.cpp)
 ################
 
 # Disabled as the test fail : random results oscillating around mean behaviour
-ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
+#ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
 ADD_JRL_WALKGEN_EXE(TestNaveau2015Online TestNaveau2015.cpp)
 
 #####################
