@@ -75,6 +75,8 @@ ADD_EXECUTABLE(TestRiccatiEquation
   )
 # Need this dependency for the use of the fortran functions (it seems)
 PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
+TARGET_LINK_LIBRARIES(TestRiccatiEquation sublapack)
+
 # Add test on the ricatti equation
 ADD_TEST(TestRiccatiEquation TestRiccatiEquation)
 
@@ -113,6 +115,33 @@ MACRO(ADD_JRL_WALKGEN_TEST test_arg test_file_name)
 
 ENDMACRO(ADD_JRL_WALKGEN_TEST)
 
+MACRO(ADD_JRL_WALKGEN_EXE test_arg test_file_name)
+
+  SET(test_name "${test_arg}${BITS}")
+
+  ADD_EXECUTABLE(${test_name}
+    ${test_file_name}
+    TestObject.cpp
+    CommonTools.cpp
+    ClockCPUTime.cpp
+    ../src/portability/gettimeofday.cc
+  )
+
+  MESSAGE(STATUS "Prepare test : " ${test_name})
+  SET(urdfpath
+    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/urdf/simple_humanoid.urdf
+  )
+  SET(srdfpath
+    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/srdf/simple_humanoid.srdf
+  )
+
+  LIST(APPEND LOGGING_WATCHED_VARIABLES urdfpath srdfpath)
+
+  TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
+  TARGET_LINK_LIBRARIES(${test_name} sublapack)
+  PKG_CONFIG_USE_DEPENDENCY(${test_name} jrl-mal)
+  PKG_CONFIG_USE_DEPENDENCY(${test_name} pinocchio)
+ENDMACRO(ADD_JRL_WALKGEN_EXE)
 
 #######################
 ## Test Morisawa 2007 #
@@ -129,6 +158,12 @@ ENDMACRO(ADD_JRL_WALKGEN_TEST)
 #ADD_JRL_WALKGEN_TEST(TestMorisawa2007SteppingStones TestMorisawa2007.cpp)
 #ADD_JRL_WALKGEN_TEST(TestMorisawa2007WalkingOnBeam TestMorisawa2007.cpp)
 #ADD_JRL_WALKGEN_TEST(TestMorisawa2007GoThroughWall TestMorisawa2007.cpp)
+ADD_JRL_WALKGEN_EXE(TestMorisawa2007ShortWalk TestMorisawa2007.cpp)
+ADD_JRL_WALKGEN_EXE(TestMorisawa2007Climbing TestMorisawa2007.cpp)
+ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoingDown TestMorisawa2007.cpp)
+ADD_JRL_WALKGEN_EXE(TestMorisawa2007SteppingStones TestMorisawa2007.cpp)
+ADD_JRL_WALKGEN_EXE(TestMorisawa2007WalkingOnBeam TestMorisawa2007.cpp)
+ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoThroughWall TestMorisawa2007.cpp)
 
 ####################
 ## Test Herdt 2010 #
@@ -180,6 +215,7 @@ ENDMACRO(ADD_JRL_WALKGEN_TEST)
 
 # Disabled as the test fail : random results oscillating around mean behaviour
 #ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
+ADD_JRL_WALKGEN_EXE(TestNaveau2015Online TestNaveau2015.cpp)
 
 #####################
 # Add user examples #

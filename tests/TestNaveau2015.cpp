@@ -39,8 +39,8 @@
 #include "TestObject.hh"
 #include "MotionGeneration/ComAndFootRealizationByGeometry.hh"
 
-#include "pinocchio/multibody/parser/urdf.hpp"
-#include "pinocchio/multibody/parser/srdf.hpp"
+//#include "pinocchio/multibody/parser/urdf.hpp"
+//#include "pinocchio/multibody/parser/srdf.hpp"
 
 using namespace std;
 using namespace PatternGeneratorJRL;
@@ -77,7 +77,7 @@ public:
   {
     m_TestProfile = TestProfile;
     resetfiles=0;
-    m_DebugFGPIFull=false;
+    m_DebugFGPIFull=true;
     m_DebugFGPI=true;
     ComAndFootRealization_ = NULL;
     SPM_ = NULL ;
@@ -543,11 +543,11 @@ protected:
 
     }
     {
-      istringstream strm2(":singlesupporttime 0.7");
+      istringstream strm2(":singlesupporttime 1.4");
       aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":doublesupporttime 0.1");
+      istringstream strm2(":doublesupporttime 0.2");
       aPGI.ParseCmd(strm2);
     }
     {
@@ -579,8 +579,8 @@ protected:
     }
 
     {
-      //istringstream strm2(":useDynamicFilter true");
-      istringstream strm2(":useDynamicFilter false");
+      istringstream strm2(":useDynamicFilter true");
+      //istringstream strm2(":useDynamicFilter false");
       m_PGI->ParseCmd(strm2);
     }
 //    {
@@ -626,10 +626,12 @@ protected:
     #define localNbOfEvents 20
     struct localEvent events [localNbOfEvents] =
     {
-      { 5,&TestObject::walkForward2m_s},
-      {15*200,&TestObject::startTurningRight2},
-      {25*200,&TestObject::stop},
-      {30*200,&TestObject::stopOnLineWalking}
+      //{ 1*200,&TestObject::startTurningRight2},
+      {1*200,&TestObject::startTurningRight2},
+      {25*200,&TestObject::walkX05Y04},
+      {50*200,&TestObject::walkForwardSlow},
+      {150*200,&TestObject::stop},
+      {165*200,&TestObject::stopOnLineWalking}
     };
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)

@@ -88,42 +88,42 @@ PinocchioRobot::~PinocchioRobot()
 
 bool PinocchioRobot::checkModel(se3::Model * robotModel)
 {
-  if(!robotModel->existBodyName("r_ankle"))
+  if(!robotModel->existFrame("r_ankle"))
   {
     m_boolModel=false;
     const std::string exception_message ("r_ankle is not a valid body name");
     throw std::invalid_argument(exception_message);
     return false ;
   }
-  if(!robotModel->existBodyName("l_ankle"))
+  if(!robotModel->existFrame("l_ankle"))
   {
     m_boolModel=false;
     const std::string exception_message ("l_ankle is not a valid body name");
     throw std::invalid_argument(exception_message);
     return false ;
   }
-  if(!robotModel->existBodyName("BODY") and !robotModel->existBodyName("body"))
+  if(!robotModel->existFrame("BODY"))
   {
     m_boolModel=false;
-    const std::string exception_message ("BODY/body is not a valid body name");
+    const std::string exception_message ("BODY is not a valid body name");
     throw std::invalid_argument(exception_message);
     return false ;
   }
-  if(!robotModel->existBodyName("torso"))
+  if(!robotModel->existFrame("torso"))
   {
     m_boolModel=false;
     const std::string exception_message ("torso is not a valid body name");
     throw std::invalid_argument(exception_message);
     return false ;
   }
-  if(!robotModel->existBodyName("r_wrist"))
+  if(!robotModel->existFrame("r_wrist"))
   {
     m_boolModel=false;
     const std::string exception_message ("r_wrist is not a valid body name");
     throw std::invalid_argument(exception_message);
     return false ;
   }
-  if(!robotModel->existBodyName("l_wrist"))
+  if(!robotModel->existFrame("l_wrist"))
   {
     const std::string exception_message ("l_wrist is not a valid body name");
     throw std::invalid_argument(exception_message);
@@ -144,21 +144,19 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   m_robotModel = robotModel;
 
   // initialize the short cut for the joint ids
-  m_chest = m_robotModel->frames.at(m_robotModel->getFrameId("torso")).parent;
-  if(robotModel->existBodyName("BODY")) {
-    m_waist = m_robotModel->frames.at(m_robotModel->getFrameId("BODY")).parent;
-  }
-  else if (robotModel->existBodyName("body")) {
-    m_waist = m_robotModel->frames.at(m_robotModel->getFrameId("body")).parent;
-  }
-  else {
-    const std::string exception_message ("BODY/body not found. Check model.");
-    throw std::invalid_argument(exception_message);
-  }
-  m_leftFoot.associatedAnkle  = m_robotModel->frames.at(m_robotModel->getFrameId("l_ankle")).parent;
-  m_rightFoot.associatedAnkle = m_robotModel->frames.at(m_robotModel->getFrameId("r_ankle")).parent;
-  m_leftWrist  = m_robotModel->frames.at(m_robotModel->getFrameId("l_wrist")).parent;
-  m_rightWrist = m_robotModel->frames.at(m_robotModel->getFrameId("r_wrist")).parent;
+  se3::FrameIndex chest = m_robotModel->getFrameId("torso");
+  m_chest = m_robotModel->frames[chest].parent ;
+  se3::FrameIndex waist = m_robotModel->getFrameId("BODY");
+  m_waist = m_robotModel->frames[waist].parent ;
+  se3::FrameIndex ra = m_robotModel->getFrameId("r_ankle");
+  m_rightFoot.associatedAnkle = m_robotModel->frames[ra].parent ;
+  se3::FrameIndex la = m_robotModel->getFrameId("l_ankle");
+  m_leftFoot.associatedAnkle = m_robotModel->frames[la].parent ;
+  se3::FrameIndex rw = m_robotModel->getFrameId("r_wrist");
+  m_rightWrist = m_robotModel->frames[rw].parent ;
+  se3::FrameIndex lw = m_robotModel->getFrameId("l_wrist");
+  m_leftWrist = m_robotModel->frames[lw].parent ;
+
   DetectAutomaticallyShoulders();
 
   // intialize the "initial pose" (q=[0]) data

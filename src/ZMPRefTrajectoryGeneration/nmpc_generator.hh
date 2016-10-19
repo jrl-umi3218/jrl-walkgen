@@ -71,9 +71,9 @@ namespace PatternGeneratorJRL
 
     // Build Time Variant Matrices
     //////////////////////////////
-    void updateFinalStateMachine(double time,
-        FootAbsolutePosition &FinalLeftFoot,
-        FootAbsolutePosition &FinalRightFoot);
+//    void updateFinalStateMachine(double time,
+//        FootAbsolutePosition &FinalLeftFoot,
+//        FootAbsolutePosition &FinalRightFoot);
     void updateCurrentSupport(double time,
         FootAbsolutePosition &FinalLeftFoot,
         FootAbsolutePosition &FinalRightFoot);
@@ -95,6 +95,22 @@ namespace PatternGeneratorJRL
     void updateObstacleConstraint();
     void initializeStandingConstraint();
     void updateStandingConstraint();
+    void initializeFootExactPositionConstraint();
+    void updateFootExactPositionConstraint();
+
+    // tools
+    void computeAbsolutePositionFromRelative(
+        support_state_t currentSupport,
+        const RelativeFootPosition & relativePosition,
+        support_state_t & nextSupport);
+
+    // tools to check if foot is close to land
+    void updateIterationBeforeLanding();
+    bool isFootCloseToLand()
+    {
+      return (itBeforeLanding_ < 2);
+      //return false ;
+    }
 
     // build the cost function
     void initializeCostFunction();
@@ -198,6 +214,9 @@ namespace PatternGeneratorJRL
     inline int nwsr()
     {return nwsr_ ;}
 
+    std::deque <RelativeFootPosition> & relativeSupportDeque()
+    {return desiredNextSupportFootRelativePosition;}
+
 
   private:
     SimplePluginManager * SPM_ ;
@@ -232,13 +251,13 @@ namespace PatternGeneratorJRL
     FootAbsolutePosition currentRightFootAbsolutePosition_;
     SupportFSM * FSM_ ;
 
-
     // Constraint Matrix
     // Center of Pressure constraint
     unsigned nc_cop_ ;
     MAL_MATRIX_TYPE(double) Acop_xy_, Acop_theta_ ;
     MAL_VECTOR_TYPE(double) UBcop_, LBcop_ ;
     MAL_MATRIX_TYPE(double) D_kp1_xy_, D_kp1_theta_, Pzuv_, derv_Acop_map_  ;
+    MAL_MATRIX_TYPE(double) derv_Acop_map2_ ;
     MAL_VECTOR_TYPE(double) b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_, v_kp1f_x_, v_kp1f_y_ ;
     MAL_MATRIX_TYPE(double) rotMat_xy_, rotMat_theta_, rotMat_;
     MAL_MATRIX_TYPE(double) A0_xy_, A0_theta_;
@@ -248,20 +267,31 @@ namespace PatternGeneratorJRL
 
     // Foot position constraint
     unsigned nc_foot_ ;
-    MAL_MATRIX_TYPE(double) Afoot_xy_, Afoot_theta_  ;
-    MAL_VECTOR_TYPE(double) UBfoot_, LBfoot_ ;
-    MAL_MATRIX_TYPE(double) SelecMat_, derv_Afoot_map_ ;
+    unsigned n_vertices_ ;
+    unsigned itBeforeLanding_ ;
+    std::vector<MAL_MATRIX_TYPE(double)> Afoot_xy_, Afoot_theta_  ;
+    std::vector<MAL_VECTOR_TYPE(double)> UBfoot_, LBfoot_ ;
+    std::vector<MAL_MATRIX_TYPE(double)> SelecMat_;
     std::vector<MAL_MATRIX_TYPE(double)> A0f_xy_, A0f_theta_ ;
     std::vector<MAL_VECTOR_TYPE(double)> B0f_;
     std::vector<MAL_MATRIX_TYPE(double)> rotMat_vec_, drotMat_vec_ ;
     MAL_MATRIX_TYPE(double) tmpRotMat_;
-    MAL_MATRIX_TYPE(double) ASx_xy_, ASy_xy_, ASx_theta_, ASy_theta_ , AS_theta_;
-    MAL_VECTOR_TYPE(double) SfootX_, SfootY_;
+    std::vector<MAL_VECTOR_TYPE(double)> deltaF_ ;
+    std::vector<MAL_VECTOR_TYPE(double)> AdRdF_ ;
+    MAL_MATRIX_TYPE(double) Afoot_xy_full_, Afoot_theta_full_  ;
+    MAL_VECTOR_TYPE(double) UBfoot_full_, LBfoot_full_ ;
 
     // Foot Velocity constraint
     unsigned nc_vel_ ;
+    std::deque <RelativeFootPosition> desiredNextSupportFootRelativePosition ;
+    std::vector<support_state_t> desiredNextSupportFootAbsolutePosition ;
     MAL_MATRIX_TYPE(double) Avel_ ;
     MAL_VECTOR_TYPE(double) UBvel_, LBvel_ ;
+
+    // Foot Position constraint
+    unsigned nc_pos_ ;
+    MAL_MATRIX_TYPE(double) Apos_ ;
+    MAL_VECTOR_TYPE(double) UBpos_, LBpos_ ;
 
     // Rotation linear constraint
     unsigned nc_rot_ ;
@@ -286,7 +316,8 @@ namespace PatternGeneratorJRL
     MAL_VECTOR_TYPE(double) ub_  ;
     MAL_VECTOR_TYPE(double) gU_  ;
     MAL_VECTOR_TYPE(double) Uxy_  ;
-    MAL_VECTOR_TYPE(double) gU_cop_, gU_foot_, gU_vel_ ;
+    MAL_VECTOR_TYPE(double) gU_cop_, gU_vel_ ;
+    MAL_VECTOR_TYPE(double) gU_foot_ ;
     MAL_VECTOR_TYPE(double) gU_obs_, gU_rot_ , gU_stan_ ;
 
     // Cost Function
@@ -303,6 +334,7 @@ namespace PatternGeneratorJRL
     // Q_x = ( Q_x_XX Q_x_XF ) = Q_y
     //       ( Q_x_FX Q_x_FF )
     MAL_MATRIX_TYPE(double) Q_x_XX_, Q_x_XF_, Q_x_FX_, Q_x_FF_ ;
+    MAL_MATRIX_TYPE(double) Q_y_XX_;// Q_x_XX_ != Q_y_XX_
 
     // Line Search
     bool useLineSearch_ ;
@@ -313,9 +345,11 @@ namespace PatternGeneratorJRL
     double mu_ ; // weight between cost function and constraints
     double cm_, c_ ; // Merit Function Jacobian
     double L_n_, L_ ; // Merit function of the next step and Merit function
-    unsigned maxIteration ;
+    unsigned maxLineSearchIteration_ ;
     qpOASES::Constraints constraints_;
     qpOASES::Indexlist * indexActiveConstraints_ ;
+    bool oneMoreStep_ ;
+    unsigned maxSolverIteration_ ;
 
     // Gauss-Newton Hessian
     unsigned nc_ ;
@@ -366,7 +400,9 @@ namespace PatternGeneratorJRL
     double SecurityMarginY_ ;
 
     // Gain of the cost function :
-    double alpha_ ;
+    double alpha_x_ ;
+    double alpha_y_ ;
+    double alpha_theta_ ;
     double beta_  ;
     double gamma_ ;
 

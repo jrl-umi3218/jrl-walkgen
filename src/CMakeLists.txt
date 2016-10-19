@@ -13,6 +13,14 @@
 # received a copy of the GNU Lesser General Public License along with
 # jrl-walkgen. If not, see <http://www.gnu.org/licenses/>.
 
+IF(${qpOASES_FOUND} STREQUAL "TRUE")
+  SET(qpOASES_COMPILE_FLAG 1)
+ELSE()
+  SET(qpOASES_COMPILE_FLAG 0)
+ENDIF()
+
+CONFIGURE_FILE(configJRLWPG.hh.in ${CMAKE_BINARY_DIR}/include/jrl/walkgen/configJRLWPG.hh)
+MESSAGE("${CMAKE_BINARY_DIR}/include/jrl/${PROJECT_NAME}/configJRLWPG.hh")
 # Make sure to find Debug.h
 INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/src)
 
@@ -178,6 +186,7 @@ SET(SOURCES
   ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.cpp
   ZMPRefTrajectoryGeneration/nmpc_generator.cpp
 )
+
 ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
 
 
@@ -208,8 +217,11 @@ IF(USE_LSSOL)
  PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME} lssol)
 ENDIF(USE_LSSOL)
 IF(${qpOASES_FOUND} STREQUAL "TRUE")
-  TARGET_LINK_LIBRARIES(jrl-walkgen ${qpOASES_LIBRARIES})
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${qpOASES_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} sublapack)
 ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
 
 INSTALL(TARGETS jrl-walkgen DESTINATION ${CMAKE_INSTALL_LIBDIR})
 SET_TARGET_PROPERTIES(jrl-walkgen PROPERTIES SOVERSION ${PROJECT_VERSION})
+
+ADD_SUBDIRECTORY(Fortran)

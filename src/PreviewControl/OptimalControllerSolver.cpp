@@ -44,7 +44,7 @@ typedef int integer ;
 extern "C" {
 extern doublereal dlapy2_(doublereal *, doublereal *); 
 extern double dlamch_ (char *);
-extern /* Subroutine */ int dgges_(char *, char *, char *, L_fp, integer *
+extern /* Subroutine */ int gdgges_(char *, char *, char *, L_fp, integer *
 				   , doublereal *, integer *, doublereal *, integer *, integer *, 
 				   doublereal *, doublereal *, doublereal *, doublereal *, integer *,
 				   doublereal *, integer *, doublereal *, integer *, logical *, 
@@ -163,7 +163,7 @@ bool OptimalControllerSolver::GeneralizedSchur(MAL_MATRIX( &A,double),
     bwork[i] =0;
   A = MAL_RET_TRANSPOSE(A);
   B = MAL_RET_TRANSPOSE(B);
-  dgges_ (lV, lV,
+  gdgges_ (lV, lV,
           lS,
          (logical (*)(...))sb02ox,
           &n,
