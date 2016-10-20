@@ -108,8 +108,9 @@ namespace PatternGeneratorJRL
     void updateIterationBeforeLanding();
     bool isFootCloseToLand()
     {
-      return (itBeforeLanding_ < 2);
-      //return false ;
+//      std::cout << itBeforeLanding_ << std::endl;
+      return (itBeforeLanding_ < 2 );
+//      return false ;
     }
 
     // build the cost function
@@ -259,6 +260,8 @@ namespace PatternGeneratorJRL
     MAL_MATRIX_TYPE(double) D_kp1_xy_, D_kp1_theta_, Pzuv_, derv_Acop_map_  ;
     MAL_MATRIX_TYPE(double) derv_Acop_map2_ ;
     MAL_VECTOR_TYPE(double) b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_, v_kp1f_x_, v_kp1f_y_ ;
+    MAL_VECTOR_TYPE(double) v_kf_x_, v_kf_y_ ;
+    MAL_MATRIX_TYPE(double) diffMat_ ;
     MAL_MATRIX_TYPE(double) rotMat_xy_, rotMat_theta_, rotMat_;
     MAL_MATRIX_TYPE(double) A0_xy_, A0_theta_;
     MAL_VECTOR_TYPE(double) B0_;
@@ -269,6 +272,7 @@ namespace PatternGeneratorJRL
     unsigned nc_foot_ ;
     unsigned n_vertices_ ;
     unsigned itBeforeLanding_ ;
+    int itMax_;
     std::vector<MAL_MATRIX_TYPE(double)> Afoot_xy_, Afoot_theta_  ;
     std::vector<MAL_VECTOR_TYPE(double)> UBfoot_, LBfoot_ ;
     std::vector<MAL_MATRIX_TYPE(double)> SelecMat_;
@@ -323,7 +327,7 @@ namespace PatternGeneratorJRL
     // Cost Function
     unsigned nv_ ; // number of degrees of freedom
     // initial problem matrix
-    MAL_MATRIX_TYPE(double) Q_theta_, I_NN_ ;
+    MAL_MATRIX_TYPE(double) Q_theta_, I_NN_, I_FF_ ;
 
     // decomposition of p_xy_
     // p_xy_ = ( p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ )
@@ -405,6 +409,8 @@ namespace PatternGeneratorJRL
     double alpha_theta_ ;
     double beta_  ;
     double gamma_ ;
+    double delta_ ;
+    double kappa_ ;
 
     // Integration Matrices
 
@@ -460,7 +466,9 @@ namespace PatternGeneratorJRL
 
     // QPoases data structure
     bool isQPinitialized_ ;
+    bool isQPlandinginitialized_ ;
     qpOASES::SQProblem * QP_ ;
+    qpOASES::SQProblem * QP_landing_ ;
     qpOASES::Options options_ ;
     qpOASES::real_t* qpOases_H_  ;
     qpOASES::real_t* qpOases_g_  ;
@@ -471,6 +479,7 @@ namespace PatternGeneratorJRL
     qpOASES::real_t* qpOases_ub_ ;
     int nwsr_ ;
     qpOASES::real_t* deltaU_  ;
+    MAL_VECTOR_TYPE(double) deltaU_thresh_ ;
     qpOASES::real_t* cput_ ;
   };
 

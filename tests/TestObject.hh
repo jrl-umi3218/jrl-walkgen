@@ -44,6 +44,7 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 #include <jrl/walkgen/pinocchiorobot.hh>
+#include "MotionGeneration/ComAndFootRealizationByGeometry.hh"
 
 namespace PatternGeneratorJRL
 {
@@ -74,6 +75,9 @@ namespace PatternGeneratorJRL
       /*! \brief Perform test. */
       virtual bool doTest(std::ostream &os);
 
+      /*! \brief Set directory for OpenHRP seqplay */
+      void setDirectorySeqplay(std::string &aDirectory);
+
     protected:
 
       /*! \brief Choose which test to perform. */
@@ -97,6 +101,11 @@ namespace PatternGeneratorJRL
           PinocchioRobot *& aPR,
           PinocchioRobot *& aDebugPR);
       /*! @} */
+      /* !\brief Initialize m_CurrentConfiguration, m_CurrentVelocity, m_CurrentAcceleration */
+      void InitializeStateVectors();
+
+      /* !\brief Initialize m_leftLeg, m_rightLeg, m_leftArm, m_rightArm. */
+      void InitializeLimbs();
 
       /*! \brief Useful methods to parse srdf file.
     @{
@@ -105,6 +114,10 @@ namespace PatternGeneratorJRL
       void InitializeRobotWithSRDF(PinocchioRobot & aPR,
                                    const std::string & filename);
       /*! @} */
+
+      /*! \brief Useful methods to parse srdf file. */
+      void CreateAndInitializeComAndFootRealization();
+
 
       /*! \name Vectors storing the robot's state.
 	@{
@@ -147,6 +160,20 @@ namespace PatternGeneratorJRL
       PinocchioRobot * m_DebugPR ;
       se3::Data *m_DebugRobotData;
 
+      /*! \brief Indexes for left and right legs and arms. */
+      std::vector<se3::JointIndex> m_leftLeg  ;
+      std::vector<se3::JointIndex> m_rightLeg ;
+      std::vector<se3::JointIndex> m_leftArm  ;
+      std::vector<se3::JointIndex> m_rightArm ;
+      
+      /*! \brief Indexes for left and right grippers. */
+      se3::JointIndex m_leftGripper  ;
+      se3::JointIndex m_rightGripper ;
+
+      /*! \brief Vector of generalized configurations for whole body motion. */
+      MAL_VECTOR_TYPE(double) m_conf;
+      MAL_VECTOR_TYPE(double) m_vel ;
+      MAL_VECTOR_TYPE(double) m_acc ;
 
       /*! @} */
 
@@ -165,6 +192,7 @@ namespace PatternGeneratorJRL
       /*! \brief Output Com, ZMP and feet trajectories
 	for a single mass robot model. */
       bool m_DebugFGPI;
+      bool m_DebugFGPIFull ;
 
       /*! \brief Reset debug files according to flags. */
       void prepareDebugFiles();
@@ -172,17 +200,32 @@ namespace PatternGeneratorJRL
       /*! \brief Fill in the debug files with the appropriate
 	information */
       virtual void fillInDebugFiles();
+      virtual void fillInDebugFilesFull( );
 
       /*! \brief Compare debug files with references. */
       bool compareDebugFiles();
 
+      /*! \brief Generate trajectories files for OpenHRP. */
+      void generateOpenHRPTrajectories();
       /*! @} */
+      
+      /*! \brief Computes a configuration from current m_OneStep
+	specifications */
+      void analyticalInverseKinematics(MAL_VECTOR_TYPE(double) & conf,
+				       MAL_VECTOR_TYPE(double) & vel,
+				       MAL_VECTOR_TYPE(double) & acc);
+
+      /* ! \brief parse From URDF to OpenHRP index. */
+      void parseFromURDFtoOpenHRPIndex(MAL_VECTOR_TYPE(double) & conf);
 
       /*! \brief Information related to one step of computation. */
       struct OneStep m_OneStep;
 
       /*! \brief Name of the test */
       std::string m_TestName;
+
+      /*! \brief Directory where to store the files */
+      std::string m_DirectoryName;
 
       /*! \brief Clock CPU timing
 	This object measure three parts of the algorithm:
@@ -204,6 +247,12 @@ namespace PatternGeneratorJRL
       std::string m_URDFPath;
       /*! \brief full path of the SRDF. */
       std::string m_SRDFPath;
+      
+      /*! \brief Object to realize CoM and Foot trajectories*/
+      ComAndFootRealizationByGeometry * m_ComAndFootRealization;
+
+
+      SimplePluginManager * m_SPM ;
 
       /*! @} */
     // utilities for Herdt and Naveau

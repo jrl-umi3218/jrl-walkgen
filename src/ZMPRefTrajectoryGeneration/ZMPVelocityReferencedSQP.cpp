@@ -274,9 +274,6 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   NbSampleControl_ = (int)round(SQP_T_/m_SamplingPeriod) ;
   NbSampleInterpolation_ = (int)round(SQP_T_/InterpolationPeriod_) ;
 
-
-
-
   UpperTimeLimitToUpdate_ = 0.0;
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
 
@@ -363,7 +360,7 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   if(outputPreviewDuration_==m_SamplingPeriod &&
      m_Tsingle == 0.7 && m_Tdble == 0.1 )
     useLineSearch = true ;
-  //useLineSearch = false ;
+  useLineSearch = false ; // WARNING remove to use the line search
   SQP_nf_ = (int)ceil(SQP_N_*SQP_T_/StepPeriod_-1e-6);
   NMPCgenerator_->initNMPCgenerator(useLineSearch,
                                     currentSupport,
@@ -515,7 +512,7 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
     for (unsigned int i = 0  ; i < 1 + CurrentIndex_ ; ++i )
     {
       ZMPTraj_deq_ctrl_[i] = initZMP_ ;
-      COMTraj_deq_ctrl_[i] = itCOM_ ;
+      COMTraj_deq_ctrl_[i] = initCOM_ ;
       LeftFootTraj_deq_ctrl_[i] = initLeftFoot_ ;
       RightFootTraj_deq_ctrl_[i] = initRightFoot_ ;
     }
@@ -540,7 +537,6 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
                                  LeftFootTraj_deq_,
                                  RightFootTraj_deq_,
                                  deltaCOMTraj_deq_);
-//#define DEBUG
 #ifdef DEBUG
     dynamicFilter_->Debug(COMTraj_deq_ctrl_,
                           LeftFootTraj_deq_ctrl_,
@@ -557,6 +553,11 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
       {
         FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
         FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
+        FinalZMPTraj_deq[i].px = FinalCOMTraj_deq[i].x[0] -
+            CoMHeight_ / 9.81 * FinalCOMTraj_deq[i].x[2];
+        FinalZMPTraj_deq[i].py = FinalCOMTraj_deq[i].y[0] -
+            CoMHeight_ / 9.81 * FinalCOMTraj_deq[i].y[2];
+        FinalZMPTraj_deq[i].pz = 0.0 ;
       }
     }
 

@@ -425,13 +425,7 @@ protected:
       analyticalInverseKinematics(m_conf,m_vel,m_acc);
       if(iteration==0)
       {
-        bool isHalfsitting = true ;
-        for(unsigned i=0 ; i<MAL_VECTOR_SIZE(m_HalfSitting) ; ++i)
-        {
-          isHalfsitting &= abs(m_conf(6+i)-m_HalfSitting(i))<1e-3 ;
-//          if(!(abs(m_conf(6+i)-m_HalfSitting(i))<1e-3))
-//            cout << i << " " ;
-        }
+
 //        cout << endl ;
 //        cout << m_conf << endl ;
 //        cout << m_HalfSitting << endl ;
@@ -543,11 +537,13 @@ protected:
 
     }
     {
-      istringstream strm2(":singlesupporttime 1.4");
+      //istringstream strm2(":singlesupporttime 1.4");
+      istringstream strm2(":singlesupporttime 0.7");
       aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":doublesupporttime 0.2");
+      //istringstream strm2(":doublesupporttime 0.2");
+      istringstream strm2(":doublesupporttime 0.1");
       aPGI.ParseCmd(strm2);
     }
     {
@@ -626,12 +622,12 @@ protected:
     #define localNbOfEvents 20
     struct localEvent events [localNbOfEvents] =
     {
-      //{ 1*200,&TestObject::startTurningRight2},
-      {1*200,&TestObject::startTurningRight2},
-      {25*200,&TestObject::walkX05Y04},
-      {50*200,&TestObject::walkForwardSlow},
-      {150*200,&TestObject::stop},
-      {165*200,&TestObject::stopOnLineWalking}
+      {1*200,&TestObject::walkForward2m_s},
+      {10*200,&TestObject::startTurningRight2},
+      {20*200,&TestObject::walkX05Y04},
+      {30*200,&TestObject::walkForwardSlow},
+      {40*200,&TestObject::stop},
+      {60*200,&TestObject::stopOnLineWalking}
     };
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)

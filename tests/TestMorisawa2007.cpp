@@ -36,10 +36,11 @@ enum Profiles_t {
   PROFIL_ANALYTICAL_ONLINE_WALKING,          // 1
   PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,  // 2
   PROFIL_ANALYTICAL_CLIMBING_STAIRS,         // 3
-  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS,       // 4
-  PROFIL_ANALYTICAL_STEPPING_STONES,         // 5
-  PROFIL_ANALYTICAL_WALKING_ON_BEAM,         // 6
-  PROFIL_ANALYTICAL_GO_THROUGH_WALL          // 7
+  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS_10,    // 4
+  PROFIL_ANALYTICAL_GOING_DOWN_STAIRS_15,    // 5
+  PROFIL_ANALYTICAL_STEPPING_STONES,         // 6
+  PROFIL_ANALYTICAL_WALKING_ON_BEAM,         // 7
+  PROFIL_ANALYTICAL_GO_THROUGH_WALL          // 8
 };
 
 #define NBOFPREDEFONLINEFOOTSTEPS 11
@@ -74,6 +75,8 @@ public:
   TestMorisawa2007(int argc, char*argv[], string &aString, int TestProfile):
     TestObject(argc, argv, aString)
   {
+    m_DebugFGPIFull = true;
+    m_DebugFGPI = true;
     m_TestProfile = TestProfile;
     m_TestChangeFoot = true;
     m_NbStepsModified = 0;
@@ -204,7 +207,7 @@ protected:
 
   }
 
-  void AnalyticalGoingDownStairs(PatternGeneratorInterface &aPGI)
+  void AnalyticalGoingDownStairs15(PatternGeneratorInterface &aPGI)
   {
     CommonInitialization(aPGI);
     {
@@ -231,6 +234,47 @@ protected:
                           0.30 0.19 -0.15 0.0\
                           0.0 -0.19 0.0 0.0\
                           0.30 0.19 -0.15 0.0\
+                          0.0 -0.19 0.0 0.0\
+                          ");
+                          aPGI.ParseCmd(strm2);
+    }
+    {
+      istringstream strm2(":useDynamicFilter false");
+      aPGI.ParseCmd(strm2);
+    }
+  }
+
+  void AnalyticalGoingDownStairs10(PatternGeneratorInterface &aPGI)
+  {
+    CommonInitialization(aPGI);
+    {
+      istringstream strm2(":SetAlgoForZmpTrajectory Morisawa");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":singlesupporttime 1.6");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":doublesupporttime 0.2");
+      aPGI.ParseCmd(strm2);
+    }
+
+    {
+      istringstream strm2(":stepstairseq 0.0 -0.105 0.0 0.0\
+                          0.30 0.19 -0.10 0.0\
+                          0.0 -0.19 0.0 0.0\
+                          0.30 0.19 -0.10 0.0\
+                          0.0 -0.19 0.0 0.0\
+                          0.30 0.19 -0.10 0.0\
+                          0.0 -0.19 0.0 0.0\
+                          0.30 0.19 -0.10 0.0\
+                          0.0 -0.19 0.0 0.0\
+                          0.30 0.19 -0.10 0.0\
+                          0.0 -0.19 0.0 0.0\
+                          0.30 0.19 -0.10 0.0\
                           0.0 -0.19 0.0 0.0\
                           ");
                           aPGI.ParseCmd(strm2);
@@ -453,8 +497,12 @@ protected:
         AnalyticalClimbingStairs(*m_PGI);
         break;
 
-      case PROFIL_ANALYTICAL_GOING_DOWN_STAIRS:
-        AnalyticalGoingDownStairs(*m_PGI);
+      case PROFIL_ANALYTICAL_GOING_DOWN_STAIRS_10:
+        AnalyticalGoingDownStairs10(*m_PGI);
+        break;
+
+      case PROFIL_ANALYTICAL_GOING_DOWN_STAIRS_15:
+        AnalyticalGoingDownStairs15(*m_PGI);
         break;
 
       case PROFIL_ANALYTICAL_STEPPING_STONES:
@@ -486,7 +534,9 @@ protected:
       return;
     if (m_TestProfile==PROFIL_ANALYTICAL_CLIMBING_STAIRS)
       return;
-    if (m_TestProfile==PROFIL_ANALYTICAL_GOING_DOWN_STAIRS)
+    if (m_TestProfile==PROFIL_ANALYTICAL_GOING_DOWN_STAIRS_10)
+      return;
+    if (m_TestProfile==PROFIL_ANALYTICAL_GOING_DOWN_STAIRS_15)
       return;
     if (m_TestProfile==PROFIL_ANALYTICAL_STEPPING_STONES)
       return;
@@ -563,7 +613,13 @@ protected:
       }
     }
   }
-  
+
+  void fillInDebugFiles()
+  {
+    TestObject::fillInDebugFiles();
+    TestObject::fillInDebugFilesFull();
+    TestObject::generateOpenHRPTrajectories();
+  }
 };
 
 int PerformTests(int argc, char *argv[])
@@ -571,10 +627,11 @@ int PerformTests(int argc, char *argv[])
   std::string CompleteName = string(argv[0]);
   unsigned found = CompleteName.find_last_of("/\\");
   std::string TestName =  CompleteName.substr(found+1);
-  int TestProfiles[7] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
+  int TestProfiles[8] = { PROFIL_ANALYTICAL_ONLINE_WALKING,
                           PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING,
                           PROFIL_ANALYTICAL_CLIMBING_STAIRS,
-                          PROFIL_ANALYTICAL_GOING_DOWN_STAIRS,
+                          PROFIL_ANALYTICAL_GOING_DOWN_STAIRS_10,
+                          PROFIL_ANALYTICAL_GOING_DOWN_STAIRS_15,
                           PROFIL_ANALYTICAL_STEPPING_STONES,
                           PROFIL_ANALYTICAL_WALKING_ON_BEAM,
                           PROFIL_ANALYTICAL_GO_THROUGH_WALL
@@ -582,19 +639,21 @@ int PerformTests(int argc, char *argv[])
   int indexProfile=-1;
 
   if (TestName.compare(16,6,"OnLine")==0)
-    indexProfile=0;
+    indexProfile=PROFIL_ANALYTICAL_ONLINE_WALKING;
   if (TestName.compare(16,9,"ShortWalk")==0)
-    indexProfile=1;
+    indexProfile=PROFIL_ANALYTICAL_SHORT_STRAIGHT_WALKING;
   if (TestName.compare(16,8,"Climbing")==0)
-    indexProfile=2;
-  if (TestName.compare(16,9,"GoingDown")==0)
-    indexProfile=3;
+    indexProfile=PROFIL_ANALYTICAL_CLIMBING_STAIRS;
+  if (TestName.compare(16,11,"GoingDown10")==0)
+    indexProfile=PROFIL_ANALYTICAL_GOING_DOWN_STAIRS_10;
+  if (TestName.compare(16,11,"GoingDown15")==0)
+    indexProfile=PROFIL_ANALYTICAL_GOING_DOWN_STAIRS_15;
   if (TestName.compare(16,14,"SteppingStones")==0)
-    indexProfile=4;
+    indexProfile=PROFIL_ANALYTICAL_STEPPING_STONES;
   if (TestName.compare(16,13,"WalkingOnBeam")==0)
-    indexProfile=5;
+    indexProfile=PROFIL_ANALYTICAL_WALKING_ON_BEAM;
   if (TestName.compare(16,13,"GoThroughWall")==0)
-    indexProfile=6;
+    indexProfile=PROFIL_ANALYTICAL_GO_THROUGH_WALL;
 
 
   if (indexProfile==-1)
