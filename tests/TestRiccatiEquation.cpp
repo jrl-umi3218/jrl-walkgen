@@ -156,6 +156,7 @@ int main()
   MAL_MATRIX_DIM(b,double,3,1);
   MAL_MATRIX_DIM(c,double,1,3);
   MAL_MATRIX_TYPE( double) lF;
+  MAL_MATRIX_TYPE( double) lK;
 
   /* Declare the weights for the function */
   ofstream aof;
@@ -221,13 +222,15 @@ int main()
   anOCS = new PatternGeneratorJRL::OptimalControllerSolver(Ax,bx,cx,Q,R,Nl);
 
   anOCS->ComputeWeights(PatternGeneratorJRL::OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
-
   anOCS->DisplayWeights();
-
   anOCS->GetF(lF);
+  anOCS->GetK(lK);
 
   aof.open("TestRiccatiEquationWeightsWithoutInitialPose.dat",ofstream::out);
-
+  for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lK);li++)
+    {
+      aof << lK(li,0) << endl;
+    }
   for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lF);li++)
     {
       aof << lF(li,0) << endl;
@@ -270,9 +273,13 @@ int main()
   anOCS->DisplayWeights();
 
   anOCS->GetF(lF);
+  anOCS->GetK(lK);
 
   aof.open("TestRiccatiEquationWeightsWithInitialPose.dat",ofstream::out);
-
+  for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lK);li++)
+    {
+      aof << lK(li,0) << endl;
+    }
   for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lF);li++)
     {
       aof << lF(li,0) << endl;
