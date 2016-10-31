@@ -407,7 +407,7 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
       else if (FinalPosition - InitPosition > epsilon )
         {
           ToMP.push_back(0.4*TimeInterval);
-          MP.push_back(FinalPosition+WayPoint_z);
+          MP.push_back(FinalPosition+0.5*WayPoint_z);
         }
       else if ( sqrt((FinalPosition - InitPosition)*(FinalPosition - InitPosition)) <= epsilon )
         {
@@ -417,7 +417,7 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
       else if (FinalPosition - InitPosition < -epsilon )
         {
           ToMP.push_back(0.6*TimeInterval);
-          MP.push_back(InitPosition+WayPoint_z);
+          MP.push_back(InitPosition+0.5*WayPoint_z);
         }
       m_BsplinesZ->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed,InitAcc);
       break;

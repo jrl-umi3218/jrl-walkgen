@@ -547,12 +547,12 @@ computing the analytical trajectories. */
     MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
     m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
 
-    InitLeftFootAbsolutePosition.x +=  lAnklePositionLeft(0)  ;
-    InitLeftFootAbsolutePosition.y +=  lAnklePositionLeft(1)  ;
-    InitLeftFootAbsolutePosition.z +=  lAnklePositionLeft(2)  ;
-    InitRightFootAbsolutePosition.x += lAnklePositionRight(0) ;
-    InitRightFootAbsolutePosition.y += lAnklePositionRight(1) ;
-    InitRightFootAbsolutePosition.z += lAnklePositionRight(2) ;
+//    InitLeftFootAbsolutePosition.x +=  lAnklePositionLeft(0)  ;
+//    InitLeftFootAbsolutePosition.y +=  lAnklePositionLeft(1)  ;
+//    InitLeftFootAbsolutePosition.z +=  lAnklePositionLeft(2)  ;
+//    InitRightFootAbsolutePosition.x += lAnklePositionRight(0) ;
+//    InitRightFootAbsolutePosition.y += lAnklePositionRight(1) ;
+//    InitRightFootAbsolutePosition.z += lAnklePositionRight(2) ;
 
     m_RelativeFootPositions = RelativeFootPositions;
     /* This part computes the CoM and ZMP trajectory giving the foot position information.
@@ -2886,7 +2886,7 @@ new step has to be generate.
       LTHROW("No foot");
     vector3d corrZ ;
     corrZ = aFoot->anklePosition ;
-
+    corrZ(2) = 0.0 ;
     bool sinple_support = (IndexInterval % 2) == 0 ;
     double moving_time = m_RelativeFootPositions[0].SStime + m_RelativeFootPositions[0].DStime;
     unsigned int stepNumber = int(t/moving_time) ;
