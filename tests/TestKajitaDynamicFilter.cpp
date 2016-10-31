@@ -59,7 +59,7 @@ private:
 
 public:
   TestInverseKinematics(int argc, char *argv[], string &aString):
-      TestObject(argc,argv,aString)
+    TestObject(argc,argv,aString)
   {
     SPM_ = NULL ;
     dynamicfilter_ = NULL ;
@@ -70,7 +70,7 @@ public:
     MAL_VECTOR_RESIZE(InitialAcceleration,36);
     MAL_VECTOR_FILL(InitialVelocity,36);
     MAL_VECTOR_FILL(InitialAcceleration,36);
-  };
+  }
 
   ~TestInverseKinematics()
   {
@@ -79,13 +79,6 @@ public:
       delete dynamicfilter_ ;
       dynamicfilter_ = 0 ;
     }
-    if ( SPM_ != 0 )
-    {
-      delete SPM_ ;
-      SPM_ = 0 ;
-    }
-
-    m_DebugHDR = 0;
   }
 
   typedef void (TestInverseKinematics::* localeventHandler_t)(PatternGeneratorInterface &);
@@ -105,28 +98,33 @@ public:
     double previewWindowSize = 1.6 ;
     double samplingPeriod = 0.005 ;
     unsigned int N = (unsigned int)round(endTime/samplingPeriod);
-
+    unsigned int Nctrl = (unsigned int)round((endTime - previewWindowSize)/samplingPeriod);
     COMState com_init ;
-    com_init.z[0]=0.814;
+    com_init.z[0]=lStartingCOMState(2);
     dynamicfilter_->init( samplingPeriod,
                           samplingPeriod,
-                          endTime - previewWindowSize,16,
+                          endTime - previewWindowSize,
+                          endTime,
                           previewWindowSize,
                           com_init );
 
     os << "<===============================================================>"<<endl;
     os << "Filtering..." << endl;
     delta_zmp.resize(N);
+    delta_com.resize(Nctrl);
     MAL_VECTOR_FILL(InitialVelocity,0.0);
     MAL_VECTOR_FILL(InitialAcceleration,0.0);
-    vector<double> zmpmb ;
+    MAL_S3_VECTOR_TYPE(double) zmpmb ;
+    dynamicfilter_->zmpmb(m_CurrentConfiguration,InitialVelocity,InitialAcceleration,zmpmb);
     for (unsigned int i = 0 ; i < N ; ++i )
-      {
-        dynamicfilter_->zmpmb(InitialConfiguration,InitialVelocity,InitialAcceleration,zmpmb);
-        delta_zmp[i].px = 0.0-zmpmb[0];
-        delta_zmp[i].py = 0.0-zmpmb[1];
-      }
-      cout << zmpmb[0] << " " << zmpmb[1] << endl ;
+    {
+      delta_zmp[i].px = 0.0-zmpmb[0];
+      delta_zmp[i].py = 0.0-zmpmb[1];
+    }
+    cout << m_CurrentConfiguration << endl;
+    cout << InitialVelocity << endl;
+    cout << InitialAcceleration << endl;
+    cout << zmpmb[0] << " " << zmpmb[1] << endl ;
 
     dynamicfilter_->OptimalControl(delta_zmp,delta_com);
 
@@ -137,7 +135,7 @@ public:
     ofstream aof;
     string aFileName;
     static int iteration = 0 ;
-    aFileName = "./TestKajitaDynamicFilter.dat";
+    aFileName = "./TestDynamicFilter32.dat";
     if ( iteration == 0 ){
       aof.open(aFileName.c_str(),ofstream::out);
       aof.close();
@@ -164,128 +162,49 @@ public:
 
   void init()
   {
-    // Instanciate and initialize.
-    string RobotFileName = m_VRMLPath + m_VRMLFileName;
+    TestObject::init();
 
-    bool fileExist = false;
+    dynamicfilter_ = new DynamicFilter(m_SPM,m_PR);
+    ComAndFootRealizationByGeometry * cfr =
+        dynamicfilter_->getComAndFootRealization();
+    cfr->setPinocchioRobot(m_PR);
+    cfr->SetStepStackHandler(new StepStackHandler(m_SPM));
+    cfr->SetHeightOfTheCoM(0.814);
+    cfr->setSamplingPeriod(0.005);
+    cfr->Initialization();
+    MAL_VECTOR_DIM(waist,double,6);
+    for (int i = 0 ; i < 6 ; ++i )
     {
-      std::ifstream file (RobotFileName.c_str ());
-      fileExist = !file.fail ();
-    }
-    if (!fileExist)
-      throw std::string ("failed to open robot model");
-
-    // Creating the humanoid robot.
-    SpecializedRobotConstructor(m_HDR);
-    if(m_HDR==0)
-    {
-      if (m_HDR!=0) delete m_HDR;
-      dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
-      m_HDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
-    }
-    // Parsing the file.
-    dynamicsJRLJapan::parseOpenHRPVRMLFile(*m_HDR,RobotFileName,
-                                           m_LinkJointRank,
-                                           m_SpecificitiesFileName);
-    // Create Pattern Generator Interface
-    m_PGI = patternGeneratorInterfaceFactory(m_HDR);
-
-    unsigned int lNbActuatedJoints = 30;
-    double * dInitPos = new double[lNbActuatedJoints];
-    ifstream aif;
-    aif.open(m_InitConfig.c_str(),ifstream::in);
-    if (aif.is_open())
-    {
-      for(unsigned int i=0;i<lNbActuatedJoints;i++)
-        aif >> dInitPos[i];
-    }
-    aif.close();
-
-    bool DebugConfiguration = true;
-    ofstream aofq;
-    if (DebugConfiguration)
-    {
-      aofq.open("TestConfiguration.dat",ofstream::out);
-      if (aofq.is_open())
-        {
-          for(unsigned int k=0;k<30;k++)
-      {
-        aofq << dInitPos[k] << " ";
-      }
-          aofq << endl;
-        }
-
+      waist(i) = 0;
     }
 
-    // This is a vector corresponding to the DOFs actuated of the robot.
-    bool conversiontoradneeded=true;
-    if (conversiontoradneeded)
-      for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
-        InitialPosition(i) = dInitPos[i]*M_PI/180.0;
-    else
-      for(unsigned int i=0;i<MAL_VECTOR_SIZE(InitialPosition);i++)
-        InitialPosition(i) = dInitPos[i];
+    lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
+    lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
+    lStartingCOMState(2) = m_OneStep.finalCOMPosition.z[0] ;
+    cfr->setSamplingPeriod(0.005);
+    cfr->Initialization();
+    cfr->InitializationCoM(m_HalfSitting,lStartingCOMState,
+                           waist,
+                           m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
+    m_CurrentConfiguration(0) = waist(0);
+    m_CurrentConfiguration(1) = waist(1);
+    m_CurrentConfiguration(2) = waist(2);
+    m_OneStep.finalCOMPosition.x[0] = lStartingCOMState(0) ;
+    m_OneStep.finalCOMPosition.y[0] = lStartingCOMState(1) ;
+    m_OneStep.finalCOMPosition.z[0] = lStartingCOMState(2) ;
 
-    // This is a vector corresponding to ALL the DOFS of the robot:
-    // free flyer + actuated DOFS.
-    unsigned int lNbDofs = 36 ;
-    MAL_VECTOR_DIM(CurrentConfiguration,double,lNbDofs);
-    MAL_VECTOR_DIM(CurrentVelocity,double,lNbDofs);
-    MAL_VECTOR_DIM(CurrentAcceleration,double,lNbDofs);
-    MAL_VECTOR_DIM(PreviousConfiguration,double,lNbDofs) ;
-    MAL_VECTOR_DIM(PreviousVelocity,double,lNbDofs);
-    MAL_VECTOR_DIM(PreviousAcceleration,double,lNbDofs);
-    for(int i=0;i<6;i++)
-    {
-      PreviousConfiguration[i] =
-        PreviousVelocity[i] =
-        PreviousAcceleration[i] = 0.0;
-    }
-
-    for(unsigned int i=6;i<lNbDofs;i++)
-    {
-      PreviousConfiguration[i] = InitialPosition[i-6];
-        PreviousVelocity[i] =
-        PreviousAcceleration[i] = 0.0;
-    }
-
-    delete [] dInitPos;
-
-    MAL_VECTOR_RESIZE(m_CurrentConfiguration, m_HDR->numberDof());
-    MAL_VECTOR_RESIZE(m_CurrentVelocity, m_HDR->numberDof());
-    MAL_VECTOR_RESIZE(m_CurrentAcceleration, m_HDR->numberDof());
-
-    MAL_VECTOR_RESIZE(m_PreviousConfiguration, m_HDR->numberDof());
-    MAL_VECTOR_RESIZE(m_PreviousVelocity, m_HDR->numberDof());
-    MAL_VECTOR_RESIZE(m_PreviousAcceleration, m_HDR->numberDof());
-
-    SPM_ = new SimplePluginManager();
-
-    dynamicfilter_ = new DynamicFilter(SPM_,m_HDR);
-    FootAbsolutePosition supportFoot ;
-    if (m_OneStep.LeftFootPosition.stepType<0)
-    {
-      supportFoot = m_OneStep.LeftFootPosition ;
-    }
-    else{
-      supportFoot = m_OneStep.RightFootPosition ;
-    }
-    double samplingPeriod = 0.005;
-    dynamicfilter_->init(samplingPeriod,samplingPeriod,0.1,16,
-                         1.6,m_OneStep.finalCOMPosition);
-    initIK();
-    MAL_VECTOR_TYPE(double) UpperConfig = m_HDR->currentConfiguration() ;
-    MAL_VECTOR_TYPE(double) UpperVel = m_HDR->currentVelocity() ;
-    MAL_VECTOR_TYPE(double) UpperAcc = m_HDR->currentAcceleration() ;
+    MAL_VECTOR_TYPE(double) UpperConfig = m_CurrentConfiguration ;
+    MAL_VECTOR_TYPE(double) UpperVel = m_CurrentVelocity ;
+    MAL_VECTOR_TYPE(double) UpperAcc = m_CurrentAcceleration ;
     dynamicfilter_->setRobotUpperPart(UpperConfig,UpperVel,UpperAcc);
     dynamicfilter_->InverseKinematics(
-        m_OneStep.finalCOMPosition,
-        m_OneStep.LeftFootPosition,
-        m_OneStep.RightFootPosition,
-        m_CurrentConfiguration,
-        m_CurrentVelocity,
-        m_CurrentAcceleration,
-        0.005,1,0);
+          m_OneStep.finalCOMPosition,
+          m_OneStep.LeftFootPosition,
+          m_OneStep.RightFootPosition,
+          m_CurrentConfiguration,
+          m_CurrentVelocity,
+          m_CurrentAcceleration,
+          0.005,1,0);
   }
 
 protected:
@@ -294,57 +213,6 @@ protected:
   {return;}
   void generateEvent()
   {return;}
-
-  void SpecializedRobotConstructor(CjrlHumanoidDynamicRobot *& aHDR)
-  {
-    aHDR = NULL ;
-
-#ifdef WITH_HRP2DYNAMICS
-    dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
-    Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot( &aRobotDynamicsObjectConstructor );
-    aHDR = aHRP2HDR;
-#endif
-  }
-
-  void initIK()
-  {
-    MAL_VECTOR_DIM(BodyAngles,double,MAL_VECTOR_SIZE(InitialPosition));
-    MAL_VECTOR_DIM(waist,double,6);
-    for (int i = 0 ; i < 6 ; ++i )
-    {
-      waist(i) = 0;
-    }
-    for (unsigned int i = 0 ; i < (m_HDR->numberDof()-6) ; ++i )
-    {
-      BodyAngles(i) = InitialPosition(i);
-    }
-    double samplingPeriod = 0.005 ;
-    ComAndFootRealizationByGeometry * CaFR = dynamicfilter_->getComAndFootRealization() ;
-    CaFR->SetHeightOfTheCoM(0.814);
-    CaFR->setSamplingPeriod(samplingPeriod);
-    CaFR->SetStepStackHandler(new StepStackHandler(SPM_));
-    CaFR->Initialization();
-    CaFR->InitializationCoM(BodyAngles,lStartingCOMState,
-                            waist, m_OneStep.LeftFootPosition,
-                            m_OneStep.RightFootPosition);
-    CaFR->Initialization();
-    CaFR->SetPreviousConfigurationStage0(m_HDR->currentConfiguration());
-    CaFR->SetPreviousVelocityStage0(m_HDR->currentVelocity());
-
-    MAL_VECTOR_RESIZE(InitialConfiguration,MAL_VECTOR_SIZE(m_HDR->currentConfiguration()));
-    for (int i = 0 ; i < 6 ; ++i )
-    {
-      InitialConfiguration(i) = waist(i) ;
-    }
-    for (unsigned int i = 6 ; i < (m_HDR->numberDof()) ; ++i )
-    {
-      InitialConfiguration(i) = InitialPosition(i-6);
-    }
-    m_HDR->currentConfiguration(InitialConfiguration);
-    cout << InitialConfiguration << endl ;
-    cout << InitialPosition << endl ;
-
-  }
 
   double filterprecision(double adb)
   {
