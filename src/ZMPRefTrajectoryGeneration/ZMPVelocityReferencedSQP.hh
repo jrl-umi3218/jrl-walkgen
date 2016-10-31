@@ -254,6 +254,10 @@ namespace PatternGeneratorJRL
     std::vector<double> FootStepY_ ;
     std::vector<double> FootStepYaw_ ;
 
+    MAL_VECTOR_TYPE(double) m_CurrentConfiguration_ ;
+    MAL_VECTOR_TYPE(double) m_CurrentVelocity_ ;
+    MAL_VECTOR_TYPE(double) m_CurrentAcceleration_ ;
+
     // initial value
     ZMPPosition initZMP_ ;
     COMState initCOM_ ;

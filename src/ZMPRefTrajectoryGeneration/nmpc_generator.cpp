@@ -236,10 +236,10 @@ void NMPCgenerator::initNMPCgenerator(
   Tfirst_ = T ;
   T_step_ = T_step ;
 
-  alpha_x_     = 5.0 ; // 1.0   ; // weight for CoM velocity X tracking  : 0.5 * a ; 2.5
-  alpha_y_     = 5.0 ; // 1.0   ; // weight for CoM velocity Y tracking  : 0.5 * a ; 2.5
-  alpha_theta_ = 1e+5 ;// 1.0   ; // weight for CoM velocity Yaw tracking  : 0.5 * a ; 2.5
-  beta_  = 5e+01 ;      // 1.0   ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
+  alpha_x_     = 1.0 ; // 1.0   ; // weight for CoM velocity X tracking  : 0.5 * a ; 2.5
+  alpha_y_     = 1.0 ; // 1.0   ; // weight for CoM velocity Y tracking  : 0.5 * a ; 2.5
+  alpha_theta_ = 1e+8 ;// 1e+3   ; // weight for CoM velocity Yaw tracking  : 0.5 * a ; 2.5
+  beta_  = 1e+03 ;      // 1.0   ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
   gamma_ = 1e-04 ;     // 1e-05 ; // weight for jerk minimization      : 0.5 * c ; 1e-04
   delta_ = 0.0 ;     // 1e-05   // weight for foot position evolution: 0.5 * d ; 1e-04
   kappa_ = 0.0 ;     // 1e-05 ; // weight for foot distance from support: 0.5 * d ; 1e-04
@@ -494,7 +494,7 @@ void NMPCgenerator::solve_qp(){
 //      cput_[0] = 1000.0;
 //      nwsr_ = 10000 ;
 //    }
-    cput_[0] = 0.001;
+    cput_[0] = 1000.0;
     nwsr_ = 10000 ;
     /*ret = */QP_->hotstart(
       qpOases_H_, qpOases_g_, qpOases_J_,
@@ -549,28 +549,31 @@ void NMPCgenerator::postprocess_solution()
   // data(k+1) = data(k) + alpha * dofs
 
   // TODO add line search when problematic
-  lineSearch();
+//  lineSearch();
 
   for(unsigned i=0 ; i<nv_ ; ++i)
     deltaU_thresh_(i) = deltaU_[i];
 
-  for(unsigned i=N_ ; i<N_+nf_ ; ++i)
-    if(deltaU_[i]*deltaU_[i]<1e-05)
-      deltaU_thresh_(i)=0.0;
-    else
-      deltaU_thresh_(i)=deltaU_[i];
+//  if(useLineSearch_)
+//  {
+//    for(unsigned i=N_ ; i<N_+nf_ ; ++i)
+//      if(deltaU_[i]*deltaU_[i]<1e-05)
+//        deltaU_thresh_(i)=0.0;
+//      else
+//        deltaU_thresh_(i)=deltaU_[i];
 
-  for(unsigned i=2*N_+nf_ ; i<2*N_+2*nf_ ; ++i)
-    if(deltaU_[i]*deltaU_[i]<1e-05)
-      deltaU_thresh_(i)=0.0;
-    else
-      deltaU_thresh_(i)=deltaU_[i];
+//    for(unsigned i=2*N_+nf_ ; i<2*N_+2*nf_ ; ++i)
+//      if(deltaU_[i]*deltaU_[i]<1e-05)
+//        deltaU_thresh_(i)=0.0;
+//      else
+//        deltaU_thresh_(i)=deltaU_[i];
 
-  for(unsigned i=2*N_+2*nf_ ; i<2*N_+3*nf_ ; ++i)
-    if(deltaU_[i]*deltaU_[i]<1e-04)
-      deltaU_thresh_(i)=0.0;
-    else
-      deltaU_thresh_(i)=deltaU_[i];
+//    for(unsigned i=2*N_+2*nf_ ; i<2*N_+3*nf_ ; ++i)
+//      if(deltaU_[i]*deltaU_[i]<1e-04)
+//        deltaU_thresh_(i)=0.0;
+//      else
+//        deltaU_thresh_(i)=deltaU_[i];
+//  }
 
   for(unsigned i=0 ; i<nv_ ; ++i)
     U_(i) += lineStep_/*1.0*/ * deltaU_thresh_[i];
@@ -1273,7 +1276,8 @@ void NMPCgenerator::updateCoPConstraint()
   {
     for(unsigned j=0 ; j<MAL_MATRIX_NB_COLS(Acop_theta_) ; ++j)
     {
-      Acop_theta_(i,j) = derv_Acop_map2_(i,j) * Acop_theta_dummy1_(i);
+      Acop_theta_(i,j) = derv_Acop_map2_(i,j) * Acop_theta_dummy1_(i); // warning this is the real jacobian
+      //Acop_theta_(i,j) = 0.0 ; // WARNING this is not the real jacobian !
     }
   }
 
@@ -1456,7 +1460,8 @@ void NMPCgenerator::updateFootPoseConstraint()
       for (unsigned j=0 ; j<n_vertices_ ; ++j)
       {
         //Afoot_theta_[n](j,n-1) = sum;
-        Afoot_theta_[n](j,n-1) = AdRdF_[n](j);
+        Afoot_theta_[n](j,n-1) = AdRdF_[n](j); // This is the real jacobian!
+        //Afoot_theta_[n](j,n-1) = 0.0; // WARNING this is not the real jacobian!
       }
       for(unsigned i=0 ; i<n_vertices_ ;++i)
         for(unsigned j=0 ; j<nf_ ; ++j)
@@ -1493,7 +1498,8 @@ void NMPCgenerator::initializeFootVelIneqConstraint()
   # with S a selection matrix selecting the f_x_k+1 and f_y_k+1 accordingly.
   # and B the direction vector of vel_ref : vel_ref / || vel_ref ||
   #*/
-  nc_vel_ = 1*nf_ ;
+  //nc_vel_ = 1*nf_ ;
+  nc_vel_=3;
   MAL_MATRIX_RESIZE(Avel_ ,nc_vel_,2*N_+3*nf_)  ;
   MAL_VECTOR_RESIZE(UBvel_,nc_vel_)  ;
   MAL_VECTOR_RESIZE(LBvel_,nc_vel_)  ;
@@ -1502,13 +1508,17 @@ void NMPCgenerator::initializeFootVelIneqConstraint()
   MAL_VECTOR_FILL(UBvel_,0.0)  ;
   MAL_VECTOR_FILL(LBvel_,0.0)  ;
 
-  for(unsigned i=0;i<nf_;++i)
-  {
-//    Avel_(i*3+0, i+N_      )  = 1.0 ;
-//    Avel_(i*3+1, i+2*N_+nf_)  = 1.0 ;
-//    Avel_(i*3+2, i+2*N_+2*nf_) = 1.0 ;
-    Avel_(i, i+2*N_+2*nf_) = 1.0 ;
-  }
+//  for(unsigned i=0;i<nf_;++i)
+//  {
+////    Avel_(i*3+0, i+N_      )  = 1.0 ;
+////    Avel_(i*3+1, i+2*N_+nf_)  = 1.0 ;
+////    Avel_(i*3+2, i+2*N_+2*nf_) = 1.0 ;
+//    Avel_(i, i+2*N_+2*nf_) = 1.0 ;
+//  }
+
+  Avel_(0, N_      )  = 1.0 ;
+  Avel_(1, 2*N_+nf_)  = 1.0 ;
+  Avel_(2, 2*N_+2*nf_) = 1.0 ;
 
   return ;
 }
@@ -1517,8 +1527,8 @@ void NMPCgenerator::updateFootVelIneqConstraint()
 {
   if( isFootCloseToLand() )
   {
-    for(unsigned i=0;i<nf_;++i)
-    {
+//    for(unsigned i=0;i<nf_;++i)
+//    {
 //      UBvel_(i*3+0) = F_kp1_x_(i)     ;
 //      UBvel_(i*3+1) = F_kp1_y_(i)     ;
 //      UBvel_(i*3+2) = F_kp1_theta_(i) ;
@@ -1530,10 +1540,17 @@ void NMPCgenerator::updateFootVelIneqConstraint()
 //      Avel_(i*3+0, i+N_      )  = 1.0 ;
 //      Avel_(i*3+1, i+2*N_+nf_)  = 1.0 ;
 //      Avel_(i*3+2, i+2*N_+2*nf_) = 1.0 ;
-      UBvel_(i) = F_kp1_theta_(i) + 1e-06 ;
-      LBvel_(i) = F_kp1_theta_(i) - 1e-06 ;
-      Avel_(i, i+2*N_+2*nf_) = 1.0 ;
-    }
+////      UBvel_(i) = F_kp1_theta_(i) + 1e-06 ;
+////      LBvel_(i) = F_kp1_theta_(i) - 1e-06 ;
+////      Avel_(i, i+2*N_+2*nf_) = 1.0 ;
+//    }
+    UBvel_(0) = F_kp1_x_(0)     ;
+    UBvel_(1) = F_kp1_y_(0)     ;
+    UBvel_(2) = F_kp1_theta_(0) ;
+
+    LBvel_(0) = F_kp1_x_(0)     ;
+    LBvel_(1) = F_kp1_y_(0)     ;
+    LBvel_(2) = F_kp1_theta_(0) ;
   }
   else
   {

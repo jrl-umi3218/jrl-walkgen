@@ -267,8 +267,9 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
                                         MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
 {
   // Generator Management
-  outputPreviewDuration_ = m_SamplingPeriod ;
-  //outputPreviewDuration_ = SQP_T_ ;
+  InterpolationPeriod_ = m_SamplingPeriod*7;
+  //outputPreviewDuration_ = m_SamplingPeriod ;
+  outputPreviewDuration_ = SQP_T_ ;
   previewDuration_ =  (previewSize_-1)*SQP_T_ ;
   NbSampleOutput_ = (int)round(outputPreviewDuration_/m_SamplingPeriod) + 1 ;
   NbSampleControl_ = (int)round(SQP_T_/m_SamplingPeriod) ;
@@ -415,8 +416,12 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
                        InterpolationPeriod_,
                        outputPreviewDuration_,
                        previewDuration_ ,
-                       previewDuration_-SQP_T_,
+                       previewDuration_-outputPreviewDuration_,
                        lStartingCOMState);
+
+  m_CurrentConfiguration_ = PR_->currentConfiguration() ;
+  m_CurrentVelocity_      = PR_->currentVelocity() ;
+  m_CurrentAcceleration_  = PR_->currentAcceleration() ;
 
   initZMP_       = FinalZMPTraj_deq      [0] ;
   initCOM_       = FinalCoMPositions_deq [0] ;
@@ -474,8 +479,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
         time,
         initLeftFoot_ ,
         initRightFoot_,
-        //itCOM_,
-        initCOM_,
+        itCOM_,
+        //initCOM_,
         VelRef_);
 
     // SOLVE PROBLEM:
@@ -532,7 +537,18 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
       FinalLeftFootTraj_deq [i] = LeftFootTraj_deq_ctrl_ [i] ;
       FinalRightFootTraj_deq[i] = RightFootTraj_deq_ctrl_[i] ;
     }
-
+//    if(outputPreviewDuration_==m_SamplingPeriod)
+//    {
+//      dynamicFilter_->InverseKinematics(initCOM_,initLeftFoot_,initRightFoot_,
+//                                        m_CurrentConfiguration_,
+//                                        m_CurrentVelocity_,
+//                                        m_CurrentAcceleration_,
+//                                        m_SamplingPeriod,2,20);
+//      dynamicFilter_->getComAndFootRealization()
+//          ->SetPreviousConfigurationStage1(m_CurrentConfiguration_);
+//      dynamicFilter_->getComAndFootRealization()
+//          ->SetPreviousVelocityStage1(m_CurrentVelocity_);
+//    }
     dynamicFilter_->OnLinefilter(COMTraj_deq_,ZMPTraj_deq_ctrl_,
                                  LeftFootTraj_deq_,
                                  RightFootTraj_deq_,
@@ -553,11 +569,11 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
       {
         FinalCOMTraj_deq[i].x[j] += deltaCOMTraj_deq_[i].x[j] ;
         FinalCOMTraj_deq[i].y[j] += deltaCOMTraj_deq_[i].y[j] ;
-        FinalZMPTraj_deq[i].px = FinalCOMTraj_deq[i].x[0] -
-            CoMHeight_ / 9.81 * FinalCOMTraj_deq[i].x[2];
-        FinalZMPTraj_deq[i].py = FinalCOMTraj_deq[i].y[0] -
-            CoMHeight_ / 9.81 * FinalCOMTraj_deq[i].y[2];
-        FinalZMPTraj_deq[i].pz = 0.0 ;
+//        FinalZMPTraj_deq[i].px = FinalCOMTraj_deq[i].x[0] -
+//            CoMHeight_ / 9.81 * FinalCOMTraj_deq[i].x[2];
+//        FinalZMPTraj_deq[i].py = FinalCOMTraj_deq[i].y[0] -
+//            CoMHeight_ / 9.81 * FinalCOMTraj_deq[i].y[2];
+//        FinalZMPTraj_deq[i].pz = 0.0 ;
       }
     }
 
