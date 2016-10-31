@@ -115,7 +115,7 @@ MACRO(ADD_JRL_WALKGEN_TEST test_arg test_file_name)
   ADD_TEST(${test_name} ${test_name} ${urdfpath} ${srdfpath})
 
 ENDMACRO(ADD_JRL_WALKGEN_TEST)
-
+#################################################
 MACRO(ADD_JRL_WALKGEN_EXE test_arg test_file_name)
 
   SET(test_name "${test_arg}${BITS}")
@@ -127,16 +127,6 @@ MACRO(ADD_JRL_WALKGEN_EXE test_arg test_file_name)
     ClockCPUTime.cpp
     ../src/portability/gettimeofday.cc
   )
-
-  MESSAGE(STATUS "Prepare test : " ${test_name})
-  SET(urdfpath
-    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/urdf/simple_humanoid.urdf
-  )
-  SET(srdfpath
-    ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/srdf/simple_humanoid.srdf
-  )
-
-  LIST(APPEND LOGGING_WATCHED_VARIABLES urdfpath srdfpath)
 
   TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
   TARGET_LINK_LIBRARIES(${test_name} sublapack)
@@ -177,11 +167,11 @@ ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoingDown15 TestMorisawa2007.cpp)
 #ADD_JRL_WALKGEN_TEST(TestInverseKinematics TestInverseKinematics.cpp)
 
 ###############################
-## Test Kajita Dynamic Filter #
+## Test Dynamic Filter #
 ###############################
 
 #TO BE FIXED with a proper inverse kinematics computed for the simple humanoid
-#ADD_JRL_WALKGEN_TEST(TestKajitaDynamicFilter TestKajitaDynamicFilter.cpp)
+ADD_JRL_WALKGEN_EXE(TestDynamicFilter TestKajitaDynamicFilter.cpp)
 #SET(DYNAMIC_FILTER) TO BE FIXED
 
 #####################
