@@ -232,7 +232,11 @@ namespace PatternGeneratorJRL
       m_ComAndFootRealization->InitializationCoM(m_HalfSitting,lStartingCOMState,
                                                  waist,
                                                  m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
-      
+      m_CurrentConfiguration(0) = waist(0);
+      m_CurrentConfiguration(1) = waist(1);
+      m_CurrentConfiguration(2) = waist(2);
+      //cout << waist << endl ;
+
       m_conf = m_CurrentConfiguration ;
       m_vel  = m_CurrentVelocity ;
       m_acc  = m_CurrentAcceleration ;
@@ -428,6 +432,13 @@ namespace PatternGeneratorJRL
         aofzmpmb2.open(aFileName.c_str(),ofstream::out);
       }
 
+      if (m_DebugFGPIFull)
+      {
+        ofstream aofFULL;
+        string aFileName = m_TestName;
+        aFileName += "TestFGPIFull.dat";
+        aofFULL.open(aFileName.c_str(),ofstream::out);
+      }
 
       if (m_DebugFGPI)
       {
