@@ -21,4 +21,4 @@
  *  Research carried out within the scope of the 
  *  Joint Japanese-French Robotics Laboratory (JRL)
  */
-#define USE_QP_OASES @qpOASES_COMPILE_FLAG@
+#define USE_QUADPROG @QUADPROG_COMPILE_FLAG@

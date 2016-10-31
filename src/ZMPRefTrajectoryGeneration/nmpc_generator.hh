@@ -33,7 +33,7 @@
 #include <jrl/walkgen/pinocchiorobot.hh>
 #include <iomanip>
 #include <cmath>
-#include <qpOASES.hpp>
+#include <eigen-quadprog/QuadProg.h>
 
 namespace PatternGeneratorJRL
 {
@@ -81,12 +81,19 @@ namespace PatternGeneratorJRL
         FootAbsolutePosition &FinalLeftFoot,
         FootAbsolutePosition &FinalRightFoot);
     void computeFootSelectionMatrix();
+    void updateInitialConditionDependentMatrices();
 
     // build the constraints :
+    void initializeConstraint();
+    void updateConstraint();
+    void evalConstraint(MAL_VECTOR_TYPE(double) & U);
+
     void initializeCoPConstraint();
-    void updateCoPConstraint();
+    void evalCoPconstraint(MAL_VECTOR_TYPE(double) & U);
+    void updateCoPconstraint(MAL_VECTOR_TYPE(double) & U);
     void initializeFootPoseConstraint();
-    void updateFootPoseConstraint();
+    void evalFootPoseConstraint(MAL_VECTOR_TYPE(double) & U);
+    void updateFootPoseConstraint(MAL_VECTOR_TYPE(double) & U);
     void initializeFootVelIneqConstraint();
     void updateFootVelIneqConstraint();
     void initializeRotIneqConstraint();
@@ -120,7 +127,6 @@ namespace PatternGeneratorJRL
     // tools for line search
     void initializeLineSearch();
     void lineSearch();
-    void evalConstraint(MAL_VECTOR_TYPE(double) & U);
     double evalMeritFunctionJacobian();
     double evalMeritFunction();
 
@@ -206,14 +212,6 @@ namespace PatternGeneratorJRL
     {return T_step_;}
     inline void T_step(double T_step)
     {T_step_=T_step;}
-
-    // cpu time consumption for one SQP
-    inline double cput()
-    {return *cput_ ;}
-
-    // number of active set recalculation
-    inline int nwsr()
-    {return nwsr_ ;}
 
     std::deque <RelativeFootPosition> & relativeSupportDeque()
     {return desiredNextSupportFootRelativePosition;}
@@ -350,12 +348,12 @@ namespace PatternGeneratorJRL
     double cm_, c_ ; // Merit Function Jacobian
     double L_n_, L_ ; // Merit function of the next step and Merit function
     unsigned maxLineSearchIteration_ ;
-    qpOASES::Constraints constraints_;
-    qpOASES::Indexlist * indexActiveConstraints_ ;
     bool oneMoreStep_ ;
     unsigned maxSolverIteration_ ;
 
     // Gauss-Newton Hessian
+    unsigned nceq_ ;
+    unsigned ncineq_ ;
     unsigned nc_ ;
     MAL_MATRIX_TYPE(double) qp_H_   ;
     MAL_VECTOR_TYPE(double) qp_g_   ;
@@ -467,20 +465,10 @@ namespace PatternGeneratorJRL
     // QPoases data structure
     bool isQPinitialized_ ;
     bool isQPlandinginitialized_ ;
-    qpOASES::SQProblem * QP_ ;
-    qpOASES::SQProblem * QP_landing_ ;
-    qpOASES::Options options_ ;
-    qpOASES::real_t* qpOases_H_  ;
-    qpOASES::real_t* qpOases_g_  ;
-    qpOASES::real_t* qpOases_J_  ;
-    qpOASES::real_t* qpOases_lbJ ;
-    qpOASES::real_t* qpOases_ubJ ;
-    qpOASES::real_t* qpOases_lb_ ;
-    qpOASES::real_t* qpOases_ub_ ;
-    int nwsr_ ;
-    qpOASES::real_t* deltaU_  ;
+    Eigen::QuadProgDense * QP_ ;
+    Eigen::MatrixXd QuadProg_H_, QuadProg_J_eq_, QuadProg_J_ineq_;
+    Eigen::VectorXd QuadProg_g_, QuadProg_bJ_eq_, QuadProg_lbJ_ineq_, deltaU_;
     MAL_VECTOR_TYPE(double) deltaU_thresh_ ;
-    qpOASES::real_t* cput_ ;
   };
 
 

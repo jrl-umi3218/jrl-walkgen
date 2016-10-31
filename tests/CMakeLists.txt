@@ -41,7 +41,6 @@ IF(GENERIC_TEST)
     )
 
   TARGET_LINK_LIBRARIES(TestFootPrintPGInterface ${PROJECT_NAME})
-  TARGET_LINK_LIBRARIES(TestFootPrintPGInterface sublapack)
   PKG_CONFIG_USE_DEPENDENCY(TestFootPrintPGInterface jrl-mal)
   ADD_DEPENDENCIES(TestFootPrintPGInterface ${PROJECT_NAME})
 ENDIF(GENERIC_TEST)
@@ -76,7 +75,6 @@ ADD_EXECUTABLE(TestRiccatiEquation
   )
 # Need this dependency for the use of the fortran functions (it seems)
 PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
-TARGET_LINK_LIBRARIES(TestRiccatiEquation sublapack)
 
 # Add test on the ricatti equation
 ADD_TEST(TestRiccatiEquation TestRiccatiEquation)
@@ -86,19 +84,8 @@ ADD_TEST(TestRiccatiEquation TestRiccatiEquation)
 ################################################
 MATH(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
 MACRO(ADD_JRL_WALKGEN_TEST test_arg test_file_name)
-
   SET(test_name "${test_arg}${BITS}")
-
   CONFIG_FILES_CMAKE(${test_name}TestFGPI.datref)
-
-  ADD_EXECUTABLE(${test_name}
-    ${test_file_name}
-    TestObject.cpp
-    CommonTools.cpp
-    ClockCPUTime.cpp
-    ../src/portability/gettimeofday.cc
-  )
-
   MESSAGE(STATUS "Prepare test : " ${test_name})
   SET(urdfpath
     ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/urdf/simple_humanoid.urdf
@@ -106,14 +93,8 @@ MACRO(ADD_JRL_WALKGEN_TEST test_arg test_file_name)
   SET(srdfpath
     ${SIMPLE_HUMANOID_DESCRIPTION_PKGDATAROOTDIR}/simple_humanoid_description/srdf/simple_humanoid.srdf
   )
-
   LIST(APPEND LOGGING_WATCHED_VARIABLES urdfpath srdfpath)
-
-  TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
-  PKG_CONFIG_USE_DEPENDENCY(${test_name} jrl-mal)
-
   ADD_TEST(${test_name} ${test_name} ${urdfpath} ${srdfpath})
-
 ENDMACRO(ADD_JRL_WALKGEN_TEST)
 #################################################
 MACRO(ADD_JRL_WALKGEN_EXE test_arg test_file_name)
@@ -129,9 +110,9 @@ MACRO(ADD_JRL_WALKGEN_EXE test_arg test_file_name)
   )
 
   TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
-  TARGET_LINK_LIBRARIES(${test_name} sublapack)
   PKG_CONFIG_USE_DEPENDENCY(${test_name} jrl-mal)
   PKG_CONFIG_USE_DEPENDENCY(${test_name} pinocchio)
+
 ENDMACRO(ADD_JRL_WALKGEN_EXE)
 
 #######################
@@ -151,10 +132,20 @@ ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoingDown15 TestMorisawa2007.cpp)
 #ADD_JRL_WALKGEN_EXE(TestMorisawa2007WalkingOnBeam TestMorisawa2007.cpp)
 #ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoThroughWall TestMorisawa2007.cpp)
 
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007ShortWalk TestMorisawa2007.cpp)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007Climbing TestMorisawa2007.cpp)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007GoingDown10 TestMorisawa2007.cpp)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007GoingDown15 TestMorisawa2007.cpp)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007SteppingStones TestMorisawa2007.cpp)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007WalkingOnBeam TestMorisawa2007.cpp)
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007GoThroughWall TestMorisawa2007.cpp)
+
 ####################
 ## Test Herdt 2010 #
 ####################
 
+#ADD_JRL_WALKGEN_EXE(TestHerdt2010OnLine TestHerdt2010.cpp)
+#ADD_JRL_WALKGEN_EXE(TestHerdt2010EmergencyStop TestHerdt2010.cpp)
 #ADD_JRL_WALKGEN_TEST(TestHerdt2010OnLine TestHerdt2010.cpp)
 #ADD_JRL_WALKGEN_TEST(TestHerdt2010EmergencyStop TestHerdt2010.cpp)
 
@@ -164,6 +155,7 @@ ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoingDown15 TestMorisawa2007.cpp)
 
 #Disabled : fix the code to handl multiple inverse kinematics
 # Todo compare halfsiting pose after forward and inverse kinematics.
+#ADD_JRL_WALKGEN_EXE(TestInverseKinematics TestInverseKinematics.cpp)
 #ADD_JRL_WALKGEN_TEST(TestInverseKinematics TestInverseKinematics.cpp)
 
 ###############################
@@ -172,7 +164,7 @@ ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoingDown15 TestMorisawa2007.cpp)
 
 #TO BE FIXED with a proper inverse kinematics computed for the simple humanoid
 ADD_JRL_WALKGEN_EXE(TestDynamicFilter TestKajitaDynamicFilter.cpp)
-#SET(DYNAMIC_FILTER) TO BE FIXED
+#ADD_JRL_WALKGEN_TEST(TestDynamicFilter TestKajitaDynamicFilter.cpp)
 
 #####################
 ## Test Kajita 2003 #
@@ -193,6 +185,7 @@ ADD_JRL_WALKGEN_EXE(TestDynamicFilter TestKajitaDynamicFilter.cpp)
 ## Read Novela Data 2011 #
 ##########################
 
+#ADD_JRL_WALKGEN_EXE(ReadDataForNovela ReadDataForNovela.cpp)
 #ADD_JRL_WALKGEN_TEST(ReadDataForNovela ReadDataForNovela.cpp)
 
 ################
@@ -200,8 +193,8 @@ ADD_JRL_WALKGEN_EXE(TestDynamicFilter TestKajitaDynamicFilter.cpp)
 ################
 
 # Disabled as the test fail : random results oscillating around mean behaviour
-#ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
 ADD_JRL_WALKGEN_EXE(TestNaveau2015Online TestNaveau2015.cpp)
+#ADD_JRL_WALKGEN_TEST(TestNaveau2015Online TestNaveau2015.cpp)
 
 #####################
 # Add user examples #

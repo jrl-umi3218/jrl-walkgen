@@ -13,10 +13,10 @@
 # received a copy of the GNU Lesser General Public License along with
 # jrl-walkgen. If not, see <http://www.gnu.org/licenses/>.
 
-IF(${qpOASES_FOUND} STREQUAL "TRUE")
-  SET(qpOASES_COMPILE_FLAG 1)
+IF(USE_QUADPROG)
+  SET(QUADPROG_COMPILE_FLAG 1)
 ELSE()
-  SET(qpOASES_COMPILE_FLAG 0)
+  SET(QUADPROG_COMPILE_FLAG 0)
 ENDIF()
 
 CONFIGURE_FILE(configJRLWPG.hh.in ${CMAKE_BINARY_DIR}/include/jrl/walkgen/configJRLWPG.hh)
@@ -29,11 +29,11 @@ message (STATUS "-- Boost Dir : " ${Boost_INCLUDE_DIRS} )
 
 # add flag to compile qld.cc
 IF(WIN32)
-ADD_DEFINITIONS("/D __STDC__")
+  ADD_DEFINITIONS("/D __STDC__")
 ENDIF(WIN32)
 
 IF(USE_LSSOL)
-ADD_DEFINITIONS("/DLSSOL_FOUND")
+  ADD_DEFINITIONS("/DLSSOL_FOUND")
 ENDIF(USE_LSSOL)
 
 SET(INCLUDES
@@ -108,13 +108,13 @@ SET(INCLUDES
   ../include/jrl/walkgen/pinocchiorobot.hh
 )
 
-IF(${qpOASES_FOUND} STREQUAL "TRUE")
+IF(USE_QUADPROG)
 SET(INCLUDES
   ${INCLUDES}
   ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.hh
   ZMPRefTrajectoryGeneration/nmpc_generator.hh
 )
-ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
+ENDIF(USE_QUADPROG)
 
 SET(SOURCES
   ${INCLUDES}
@@ -179,14 +179,13 @@ SET(SOURCES
   privatepgtypes.cpp
 )
 
-IF(${qpOASES_FOUND} STREQUAL "TRUE")
+IF(USE_QUADPROG)
 SET(SOURCES
   ${SOURCES}
   ZMPRefTrajectoryGeneration/ZMPVelocityReferencedSQP.cpp
   ZMPRefTrajectoryGeneration/nmpc_generator.cpp
 )
-
-ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
+ENDIF(USE_QUADPROG)
 
 
 # prefix and suffix each element of list by ${prefix}elemnt${suffix}
@@ -200,14 +199,11 @@ macro(ADDPREFIX newlist prefix list_name)
     endforeach()
 
 endmacro(ADDPREFIX)
-
 IF ( '${CMAKE_EXTRA_GENERATOR}' STREQUAL 'CodeBlocks' )
     ADDPREFIX(${PROJECT_NAME}_ABSOLUTE_HEADERS  "${CMAKE_SOURCE_DIR}/"  ${PROJECT_NAME}_HEADERS)
 ENDIF ( '${CMAKE_EXTRA_GENERATOR}' STREQUAL 'CodeBlocks' )
 
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCES} ${${PROJECT_NAME}_ABSOLUTE_HEADERS})
-ADD_SUBDIRECTORY(Fortran)
-
 
 # Define dependencies
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-msse -msse2 -msse3 -march=core2 -mfpmath=sse -fivopts -ftree-loop-im -fipa-pta ")
@@ -217,10 +213,10 @@ PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME} pinocchio)
 IF(USE_LSSOL)
  PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME} lssol)
 ENDIF(USE_LSSOL)
-IF(${qpOASES_FOUND} STREQUAL "TRUE")
-  TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${qpOASES_LIBRARIES})
-  TARGET_LINK_LIBRARIES(${PROJECT_NAME} sublapack)
-ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
+
+IF(USE_QUADPROG)
+ PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME} eigen-quadprog)
+ENDIF(USE_QUADPROG)
 
 INSTALL(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})

@@ -226,7 +226,7 @@ namespace PatternGeneratorJRL {
     // INFO: This where you should instanciate your own
     // INFO: object for Com and Foot realization.
     // INFO: The default one is based on a geometrical approach.
-#if USE_QP_OASES==1
+#if USE_QUADPROG==1
     m_ComAndFootRealization.resize(4);
 #else
     m_ComAndFootRealization.resize(3);
@@ -245,7 +245,7 @@ namespace PatternGeneratorJRL {
     // ZMP and CoM generation using the method proposed in Dimitrov2008.
     m_ZMPCQPFF = new ZMPConstrainedQPFastFormulation(this,"",m_PinocchioRobot);
 
-#if USE_QP_OASES==1
+#if USE_QUADPROG==1
     m_ZMPVRSQP = new ZMPVelocityReferencedSQP(this,"",m_PinocchioRobot);
     m_ComAndFootRealization[3] = m_ZMPVRSQP->getComAndFootRealization();
 #endif
@@ -325,7 +325,7 @@ namespace PatternGeneratorJRL {
     m_ZMPCQPFF->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
     m_ZMPCQPFF->SetPreviewControl(m_PC);
 
-#if USE_QP_OASES==1
+#if USE_QUADPROG==1
     m_ZMPVRSQP->SetTimeWindowPreviewControl(m_PC->PreviewControlTime());
 #endif
 
@@ -399,7 +399,7 @@ namespace PatternGeneratorJRL {
     //  delete m_ZMPCQPFF;
     //ODEBUG4("Destructor: did m_ZMPQP","DebugPGI.txt");
 
-#if USE_QP_OASES==1
+#if USE_QUADPROG==1
     if(m_ZMPVRSQP!=0)
       delete m_ZMPVRSQP;
     ODEBUG4("Destructor: did m_ZMPVRSQP","DebugPGI.txt");
@@ -527,7 +527,7 @@ namespace PatternGeneratorJRL {
     std::cout << __PRETTY_FUNCTION__ << " setVelReference" << strm.str() << std::endl; 
 #endif // DEBUG
     // Read the data inside strm.
-#if USE_QP_OASES==1
+#if USE_QUADPROG==1
     m_ZMPVRQP->Reference(strm);
     istringstream strm2(strm.str());
     m_ZMPVRSQP->Reference(strm2);
@@ -539,7 +539,7 @@ namespace PatternGeneratorJRL {
     // Read the data inside strm.
     m_ZMPVRQP->setCoMPerturbationForce(strm);
     istringstream strm2(strm.str());
-#if USE_QP_OASES==1
+#if USE_QUADPROG==1
     m_ZMPVRSQP->setCoMPerturbationForce(strm2);
 #endif
   }
@@ -611,7 +611,7 @@ namespace PatternGeneratorJRL {
                           InitRightFootAbsPos);
 
     deque<RelativeFootPosition> RelativeFootPositions;
-#if USE_QP_OASES==1
+#if USE_QUADPROG==1
     m_ZMPVRSQP->SetCurrentTime(m_InternalClock);
 
     m_ZMPVRSQP->InitOnLine(m_ZMPPositions,
@@ -1451,7 +1451,7 @@ namespace PatternGeneratorJRL {
       m_Running = m_ZMPVRQP->Running();
     }
 
-#if USE_QP_OASES
+#if USE_QUADPROG
     if (m_AlgorithmforZMPCOM==ZMPCOM_NAVEAU_2015)
     {
       if(m_feedBackControl)
@@ -1934,7 +1934,7 @@ namespace PatternGeneratorJRL {
                                                               double yaw)
   {
     m_ZMPVRQP->Reference(x,y,yaw);
-#if USE_QP_OASES
+#if USE_QUADPROG
     m_ZMPVRSQP->Reference(x,y,yaw);
 #endif
   }
@@ -1943,7 +1943,7 @@ namespace PatternGeneratorJRL {
                                                                  double y)
   {
     m_ZMPVRQP->setCoMPerturbationForce(x,y);
-#if USE_QP_OASES
+#if USE_QUADPROG
     m_ZMPVRSQP->setCoMPerturbationForce(x,y);
 #endif
   }
@@ -2023,7 +2023,7 @@ namespace PatternGeneratorJRL {
                                       InitLeftFootAbsPos,
                                       InitRightFootAbsPos);
     }
-#if USE_QP_OASES==1
+#if USE_QUADPROG==1
     else if (m_AlgorithmforZMPCOM==ZMPCOM_NAVEAU_2015)
     {
       ODEBUG("ZMPCOM_NAVEAU_2015 " << m_ZMPPositions.size() );

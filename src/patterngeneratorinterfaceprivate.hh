@@ -461,7 +461,7 @@ namespace PatternGeneratorJRL
     /*! QP formulation with a velocity reference. */
     ZMPVelocityReferencedQP * m_ZMPVRQP;
 
-#if USE_QP_OASES==1
+#if USE_QUADPROG==1
     /*! SQP formulation with a velocity reference. */
     ZMPVelocityReferencedSQP * m_ZMPVRSQP;
 #endif

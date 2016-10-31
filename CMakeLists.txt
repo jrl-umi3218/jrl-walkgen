@@ -21,7 +21,6 @@ INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/lapack.cmake)
 INCLUDE(cmake/cpack.cmake)
 INCLUDE(cmake/boost.cmake)
-INCLUDE(private_cmake/cmake_metapod_configure.cmake)
 INCLUDE(CMakeDependentOption)
 
 # Define properties of the project
@@ -44,24 +43,6 @@ ENDIF(SYS_TIME_H)
 # Required dependencies
 ADD_REQUIRED_DEPENDENCY("jrl-mal >= 1.9.0")
 ADD_REQUIRED_DEPENDENCY("pinocchio >=  1.1.0")
-
-# Search for qpOases
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/private_cmake)
-MESSAGE(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
-
-OPTION(SEARCH_FOR_QPOASES "Search for qpOASES" OFF) 
-IF (${SEARCH_FOR_QPOASES} STREQUAL "ON")
-  FIND_PACKAGE(qpOASES)
-ELSE()
-  SET(qpOASES_FOUND "FALSE")
-ENDIF()
-
-
-IF(${qpOASES_FOUND} STREQUAL "TRUE")
-  MESSAGE(STATUS "--qpOASES : " ${qpOASES_LIBRARIES})
-  INCLUDE_DIRECTORIES(SYSTEM ${qpOASES_INCLUDE_DIRS})
-ENDIF(${qpOASES_FOUND} STREQUAL "TRUE")
-
 
 # Search for Boost.
 # Boost.Test is used by the test suite.
@@ -95,8 +76,13 @@ INCLUDE_DIRECTORIES(SYSTEM ${EIGEN3_INCLUDE_DIRS})
 # hence we use ADD_REQUIRED_DEPENDENCY to get the data
 OPTION(USE_LSSOL "Do you want to use the solver lssol?" OFF)
 IF(USE_LSSOL)
- ADD_REQUIRED_DEPENDENCY("lssol >= 0.1.0")
+  ADD_REQUIRED_DEPENDENCY("lssol >= 0.1.0")
 ENDIF(USE_LSSOL)
+
+OPTION(USE_QUADPROG "Do you want to use the solver eigen-quadprog?" ON)
+IF(USE_QUADPROG)
+  ADD_REQUIRED_DEPENDENCY("eigen-quadprog >= 1.0.0")
+ENDIF(USE_QUADPROG)
 
 # Add aggressive optimization flags in release mode.
 IF(CMAKE_COMPILER_IS_GNUCXX)
@@ -130,7 +116,6 @@ ADD_SUBDIRECTORY(tests)
 
 # Generate dependency to jrl-walkgen in pc file
 PKG_CONFIG_APPEND_LIBS("jrl-walkgen")
-PKG_CONFIG_APPEND_LIBS("sublapack")
 
 # Ask to generate the final steps.
 SETUP_PROJECT_FINALIZE()
