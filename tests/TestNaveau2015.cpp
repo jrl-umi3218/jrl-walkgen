@@ -575,8 +575,8 @@ protected:
     }
 
     {
-      istringstream strm2(":useDynamicFilter true");
-      //istringstream strm2(":useDynamicFilter false");
+      //istringstream strm2(":useDynamicFilter true");
+      istringstream strm2(":useDynamicFilter false");
       m_PGI->ParseCmd(strm2);
     }
 //    {
