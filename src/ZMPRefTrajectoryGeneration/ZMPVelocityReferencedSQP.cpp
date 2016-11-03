@@ -268,8 +268,8 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 {
   // Generator Management
   InterpolationPeriod_ = m_SamplingPeriod*7;
-  //outputPreviewDuration_ = m_SamplingPeriod ;
-  outputPreviewDuration_ = SQP_T_ ;
+  outputPreviewDuration_ = m_SamplingPeriod ;
+  //outputPreviewDuration_ = SQP_T_ ;
   previewDuration_ =  (previewSize_-1)*SQP_T_ ;
   NbSampleOutput_ = (int)round(outputPreviewDuration_/m_SamplingPeriod) + 1 ;
   NbSampleControl_ = (int)round(SQP_T_/m_SamplingPeriod) ;
@@ -479,8 +479,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
         time,
         initLeftFoot_ ,
         initRightFoot_,
-        itCOM_,
-        //initCOM_,
+        //itCOM_,
+        initCOM_,
         VelRef_);
 
     // SOLVE PROBLEM:
