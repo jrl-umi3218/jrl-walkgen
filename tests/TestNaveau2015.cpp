@@ -569,14 +569,14 @@ protected:
     }
 
     {
-      istringstream strm2(":feedBackControl true");
-      //istringstream strm2(":feedBackControl false");
+      //istringstream strm2(":feedBackControl true");
+      istringstream strm2(":feedBackControl false");
       m_PGI->ParseCmd(strm2);
     }
 
     {
       //istringstream strm2(":useDynamicFilter true");
-      istringstream strm2(":useDynamicFilter false");
+      istringstream strm2(":useDynamicFilter true");
       m_PGI->ParseCmd(strm2);
     }
 //    {
@@ -623,9 +623,9 @@ protected:
     struct localEvent events [localNbOfEvents] =
     {
       {1*200,&TestObject::walkForward2m_s},
-      {10*200,&TestObject::startTurningRight2},
-      {20*200,&TestObject::walkX05Y04},
-      {30*200,&TestObject::walkForwardSlow},
+//      {10*200,&TestObject::startTurningRight2},
+//      {20*200,&TestObject::walkX05Y04},
+//      {30*200,&TestObject::walkForwardSlow},
       {40*200,&TestObject::stop},
       {60*200,&TestObject::stopOnLineWalking}
     };
