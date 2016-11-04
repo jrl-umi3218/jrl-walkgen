@@ -321,7 +321,7 @@ void NMPCgenerator::initializeConstraint()
   //initializeFootExactPositionConstraint();
   initializeFootPoseConstraint();
   //initializeFootVelIneqConstraint();
-  //initializeRotIneqConstraint();
+  initializeRotIneqConstraint();
   //initializeObstacleConstraint();
   //initializeStandingConstraint();
 
@@ -344,7 +344,7 @@ void NMPCgenerator::updateConstraint()
   //updateFootExactPositionConstraint();
   updateFootPoseConstraint(U_);
   //updateFootVelIneqConstraint();
-  //updateRotIneqConstraint();
+  updateRotIneqConstraint();
   //updateObstacleConstraint();
   //updateStandingConstraint();
 
@@ -394,10 +394,7 @@ void NMPCgenerator::updateConstraint()
   {
     for (unsigned j=0 ; j<nf_ ; ++j)
     {
-      if(i==j)
-        qp_J_(index+i,2*N_+2*nf_+j) =  1.0 ;
-      if(j==(i-1))
-        qp_J_(index+i,2*N_+2*nf_+j) = -1.0 ;
+      qp_J_(index+i,2*N_+2*nf_+j) = Arot_(i,2*N_+2*nf_+j);
     }
   }
   index += nc_rot_ ;
@@ -601,6 +598,47 @@ void NMPCgenerator::updateInitialCondition(double time,
   computeFootSelectionMatrix();
   updateIterationBeforeLanding();
   updateInitialConditionDependentMatrices();
+  guessWarmStart();
+  return ;
+}
+
+void NMPCgenerator::guessWarmStart()
+{
+  if(Tfirst_==T_ && currentSupport_.StateChanged)
+  {
+    // we need to plan the last step
+    double sign = 1.0 ;
+    if(currentSupport_.Foot==LEFT)
+      sign = 1.0;
+    else
+      sign = -1.0;
+
+    if((nf_%2==0))
+      sign = -sign ;
+
+    if(nf_==1)
+    {
+      F_kp1_x_[0] = currentSupport_.X  + sign*sin(currentSupport_.Yaw)*1.2*FeetDistance_ ;
+      F_kp1_y_[0] = currentSupport_.Y  - sign*cos(currentSupport_.Yaw)*1.2*FeetDistance_ ;
+    }
+    else
+    {
+      for(unsigned i=1 ; i<nf_ ; ++i)
+      {
+        F_kp1_x_[i-1] = F_kp1_x_[i] ;
+        F_kp1_y_[i-1] = F_kp1_y_[i] ;
+        F_kp1_theta_[i-1] = F_kp1_theta_[i] ;
+      }
+      F_kp1_x_[nf_-1] = F_kp1_x_[nf_-2] + sign*sin(F_kp1_theta_[nf_-2])*1.2*FeetDistance_ ;
+      F_kp1_y_[nf_-1] = F_kp1_y_[nf_-2] - sign*cos(F_kp1_theta_[nf_-2])*1.2*FeetDistance_ ;
+    }
+    for(unsigned i=0 ; i<nf_ ; ++i)
+    {
+      U_(N_+i)         = F_kp1_x_(i)     ;
+      U_(2*N_+nf_+i)   = F_kp1_y_(i)     ;
+      U_(2*N_+2*nf_+i) = F_kp1_theta_(i) ;
+    }
+  }
   return ;
 }
 
@@ -798,7 +836,7 @@ void NMPCgenerator::postprocess_solution()
   // data(k+1) = data(k) + alpha * dofs
 
   // TODO add line search when problematic
-//  lineSearch();
+  lineSearch();
 
   for(unsigned i=0 ; i<nv_ ; ++i)
     deltaU_thresh_(i) = deltaU_(i);
@@ -1394,6 +1432,9 @@ void NMPCgenerator::initializeCoPConstraint()
 
 void NMPCgenerator::updateCoPconstraint(MAL_VECTOR_TYPE(double) &U)
 {
+  if(nc_cop_==0)
+    return ;
+
   // buils Acop_xy_ + UBcop_
   evalCoPconstraint(U);
 
@@ -1449,6 +1490,9 @@ void NMPCgenerator::updateCoPconstraint(MAL_VECTOR_TYPE(double) &U)
 
 void NMPCgenerator::evalCoPconstraint(MAL_VECTOR_TYPE(double) & U)
 {
+  if(nc_cop_==0)
+    return ;
+
   // Compute D_kp1_, it depends on the feet hulls
   vector<double>theta_vec(nf_+1);
   theta_vec[0]=SupportStates_deq_[1].Yaw;
@@ -1569,6 +1613,9 @@ void NMPCgenerator::initializeFootPoseConstraint()
 
 void NMPCgenerator::updateFootPoseConstraint(MAL_VECTOR_TYPE(double) &U)
 {
+  if(nc_foot_==0)
+    return ;
+
   int ignoreFirstStep = 0 ;
   nc_foot_ = nf_*n_vertices_ ;
 
@@ -1666,6 +1713,9 @@ void NMPCgenerator::updateFootPoseConstraint(MAL_VECTOR_TYPE(double) &U)
 
 void NMPCgenerator::evalFootPoseConstraint(MAL_VECTOR_TYPE(double) & U)
 {
+  if(nc_foot_==0)
+    return ;
+
   int ignoreFirstStep = 0 ;
   nc_foot_ = nf_*n_vertices_ ;
 //  if( desiredNextSupportFootRelativePosition.size()!=0 )
@@ -1933,7 +1983,7 @@ void NMPCgenerator::initializeRotIneqConstraint()
   # -0.09 + f_k_q <= [  1 0 ] [f_kp1_q] <= 0.09 + f_k_q
   # -0.09         <= [ -1 1 ] [f_kp2_q] <= 0.09
   */
-  nc_rot_ = nf_ ;
+  nc_rot_ = 2*nf_ ;
   MAL_MATRIX_RESIZE(Arot_ ,nc_rot_,2*N_+3*nf_);
   MAL_VECTOR_RESIZE(UBrot_,nc_rot_);
   MAL_VECTOR_RESIZE(LBrot_,nc_rot_);
@@ -1943,23 +1993,38 @@ void NMPCgenerator::initializeRotIneqConstraint()
   MAL_VECTOR_FILL(LBrot_,0.0);
 
 
-  for(unsigned i=0 ; i<nc_rot_ ;++i)
+  for(unsigned i=0 ; i<nf_ ;++i)
   {
     for (unsigned j=0 ; j<nf_ ; ++j)
     {
       if(i==j)
         Arot_(i,2*N_+2*nf_+j) =  1.0 ;
-      if(j==i-1)
+      if((i-1)==j)
         Arot_(i,2*N_+2*nf_+j) = -1.0 ;
     }
     UBrot_(i) =  0.17 ;
-    LBrot_(i) = -0.17 ;
+  }
+
+  for(unsigned i=nf_ ; i<2*nf_ ;++i)
+  {
+    for (unsigned j=0 ; j<nf_ ; ++j)
+    {
+      if((i-nf_)==j)
+        Arot_(i,2*N_+2*nf_+j) = -1.0 ;
+      if((i-nf_-1)==j)
+        Arot_(i,2*N_+2*nf_+j) =  1.0 ;
+    }
+    UBrot_(i) =  0.17 ;
   }
 }
 
 void NMPCgenerator::updateRotIneqConstraint()
 {
+  if(nc_rot_==0)
+    return ;
+
   UBrot_(0) =  0.17 + currentSupport_.Yaw ;
+  UBrot_(nf_) =  0.17 - currentSupport_.Yaw ;
   LBrot_(0) = -0.17 + currentSupport_.Yaw ;
 #ifdef DEBUG
   DumpMatrix("Arot_", Arot_);
@@ -2313,8 +2378,8 @@ void NMPCgenerator::updateCostFunction()
   index+=nf_;
   // p_theta_ = ( 0.5 * a * [ f_k_theta+T_step*dTheta^ref  f_k_theta+2*T_step*dTheta^ref ] )
   for(unsigned i=0 ; i<nf_ ; ++i)
-    p_(index+i) = - alpha_theta_ * ( currentSupport_.Yaw + (i+1)
-                  * T_step_* vel_ref_.Global.Yaw)
+    p_(index+i) = - alpha_theta_ * ( currentSupport_.Yaw +
+                                    (i+1) * T_step_* vel_ref_.Global.Yaw )
                   - delta_ * F_kp1_theta_(i) ;
 
   // Gradient of Objective

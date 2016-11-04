@@ -623,9 +623,9 @@ protected:
     struct localEvent events [localNbOfEvents] =
     {
       {1*200,&TestObject::walkForward2m_s},
-//      {10*200,&TestObject::startTurningRight2},
-//      {20*200,&TestObject::walkX05Y04},
-//      {30*200,&TestObject::walkForwardSlow},
+      {10*200,&TestObject::startTurningRight2},
+      {20*200,&TestObject::walkX05Y04},
+      {30*200,&TestObject::walkForwardSlow},
       {40*200,&TestObject::stop},
       {60*200,&TestObject::stopOnLineWalking}
     };

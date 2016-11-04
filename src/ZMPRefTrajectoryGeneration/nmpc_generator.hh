@@ -82,6 +82,7 @@ namespace PatternGeneratorJRL
         FootAbsolutePosition &FinalRightFoot);
     void computeFootSelectionMatrix();
     void updateInitialConditionDependentMatrices();
+    void guessWarmStart();
 
     // build the constraints :
     void initializeConstraint();
