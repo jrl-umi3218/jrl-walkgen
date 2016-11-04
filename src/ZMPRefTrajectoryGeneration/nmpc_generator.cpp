@@ -293,16 +293,11 @@ void NMPCgenerator::initNMPCgenerator(
 
 void NMPCgenerator::initializeConstraint()
 {
-  MAL_MATRIX_RESIZE(qp_J_     ,nc_,nv_);     MAL_MATRIX_FILL(qp_J_      ,0.0);
-  MAL_VECTOR_RESIZE(qp_lbJ_   ,nc_);         MAL_VECTOR_FILL(qp_lbJ_    ,0.0);
-  MAL_VECTOR_RESIZE(qp_ubJ_   ,nc_);         MAL_VECTOR_FILL(qp_ubJ_    ,0.0);
-  MAL_VECTOR_RESIZE(qp_lb_    ,nv_);       MAL_VECTOR_FILL(qp_lb_   ,-1e+8);
-  MAL_VECTOR_RESIZE(qp_ub_    ,nv_);       MAL_VECTOR_FILL(qp_ub_   , 1e+8);
-
-  MAL_VECTOR_RESIZE(lb_  ,      nc_);  MAL_VECTOR_FILL(lb_  , 0.0);
-  MAL_VECTOR_RESIZE(ub_  ,      nc_);  MAL_VECTOR_FILL(ub_  , 0.0);
-  MAL_VECTOR_RESIZE(gU_  ,      nc_);  MAL_VECTOR_FILL(gU_  , 0.0);
-  MAL_VECTOR_RESIZE(Uxy_ ,2*(N_+nf_));  MAL_VECTOR_FILL(Uxy_ , 0.0);
+  MAL_MATRIX_RESIZE(qp_J_     ,nc_,nv_); MAL_MATRIX_FILL(qp_J_      ,0.0);
+  MAL_VECTOR_RESIZE(qp_ubJ_   ,nc_);     MAL_VECTOR_FILL(qp_ubJ_    ,0.0);
+  MAL_VECTOR_RESIZE(ub_  ,      nc_);    MAL_VECTOR_FILL(ub_  , 0.0);
+  MAL_VECTOR_RESIZE(gU_  ,      nc_);    MAL_VECTOR_FILL(gU_  , 0.0);
+  MAL_VECTOR_RESIZE(Uxy_ ,2*(N_+nf_));   MAL_VECTOR_FILL(Uxy_ , 0.0);
 
   MAL_MATRIX_RESIZE(Pzuv_,2*N_,2*(N_+nf_));
   MAL_VECTOR_RESIZE(Pzsc_,2*N_);
@@ -417,7 +412,6 @@ void NMPCgenerator::updateConstraint()
   //  Boundaries
   // compute the constraint value
   evalConstraint(U_);
-  qp_lbJ_ = lb_ - gU_ ;
   qp_ubJ_ = ub_ - gU_ ;
 
 #ifdef DEBUG
@@ -437,8 +431,10 @@ void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
   {Uxy_(i)=U(i);}
 
   //    CoP
+  evalCoPconstraint(U);
   gU_cop_ = MAL_RET_A_by_B(Acop_xy_,Uxy_);
   //    Foot
+  evalFootPoseConstraint(U);
   gU_foot_ = MAL_RET_A_by_B(Afoot_xy_full_,Uxy_);
   //    Velocity
   gU_vel_ = MAL_RET_A_by_B(Avel_,U) ;
@@ -460,7 +456,6 @@ void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
   // Standing
   //gU_stan_ = MAL_RET_A_by_B(Astan_,U) ;
 
-  MAL_VECTOR_RESIZE(lb_,nc_);
   MAL_VECTOR_RESIZE(ub_,nc_);
   MAL_VECTOR_RESIZE(gU_,nc_);
 
@@ -468,28 +463,24 @@ void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
   unsigned index = 0 ;
   for(unsigned i=0 ; i<nc_vel_ ; ++i)
   {
-    lb_(index+i) = LBvel_ (i);
-    ub_(index+i) = UBvel_ (i);
+    ub_(index+i) = Bvel_ (i);
     gU_(index+i) = gU_vel_(i);
   }
   index += nc_vel_ ;
   for(unsigned i=0 ; i<nc_cop_ ; ++i)
   {
-    lb_(index+i) = LBcop_ (i) ;
     ub_(index+i) = UBcop_ (i) ;
     gU_(index+i) = gU_cop_(i);
   }
   index += nc_cop_ ;
   for(unsigned i=0 ; i<nc_foot_ ; ++i)
   {
-    lb_(index+i) = LBfoot_full_ (i);
     ub_(index+i) = UBfoot_full_ (i);
     gU_(index+i) = gU_foot_(i);
   }
   index += nc_foot_ ;
   for(unsigned i=0 ; i<nc_rot_ ; ++i)
   {
-    lb_(index+i) = LBrot_ (i);
     ub_(index+i) = UBrot_ (i);
     gU_(index+i) = gU_rot_(i);
   }
@@ -498,19 +489,10 @@ void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
   {
     for(unsigned n=0 ; n<nf_ ; ++n)
     {
-      lb_(index + obs*nf_+n) = LBobs_[obs](n);
       ub_(index + obs*nf_+n) = UBobs_[obs](n);
       gU_(index + obs*nf_+n) = gU_obs_(obs*nf_+n) ;
     }
   }
-
-//  index += nc_rot_ ;
-//  for(unsigned i=0 ; i<nc_stan_ ; ++i)
-//  {
-//    lb_(index+i) = LBstan_ (i);
-//    ub_(index+i) = UBstan_ (i);
-//    gU_(index+i) = gU_stan_(i);
-//  }
   return ;
 }
 
@@ -1396,8 +1378,6 @@ void NMPCgenerator::initializeCoPConstraint()
   MAL_MATRIX_RESIZE(Acop_xy_   ,nc_cop_,2*(N_+nf_));
   MAL_MATRIX_RESIZE(Acop_theta_,nc_cop_,nf_);
   MAL_VECTOR_RESIZE(UBcop_     ,nc_cop_);
-  MAL_VECTOR_RESIZE(LBcop_     ,nc_cop_);
-
   MAL_MATRIX_RESIZE(D_kp1_xy_,nc_cop_,2*N_);
   MAL_MATRIX_RESIZE(D_kp1_theta_,nc_cop_,2*N_);
   MAL_VECTOR_RESIZE(b_kp1_,nc_cop_);
@@ -1406,7 +1386,6 @@ void NMPCgenerator::initializeCoPConstraint()
   MAL_MATRIX_FILL(Acop_xy_      ,0.0);
   MAL_MATRIX_FILL(Acop_theta_   ,0.0);
   MAL_VECTOR_FILL(UBcop_        ,0.0);
-  MAL_VECTOR_FILL(LBcop_        ,-1e+08);
   MAL_MATRIX_FILL(D_kp1_xy_     ,0.0);
   MAL_MATRIX_FILL(D_kp1_theta_  ,0.0);
   MAL_VECTOR_FILL(b_kp1_        ,0.0);
@@ -1567,7 +1546,6 @@ void NMPCgenerator::initializeFootPoseConstraint()
   Afoot_xy_   .resize(nf_);
   Afoot_theta_.resize(nf_);
   UBfoot_     .resize(nf_);
-  LBfoot_     .resize(nf_);
   SelecMat_   .resize(nf_);
   AdRdF_      .resize(nf_);
   deltaF_     .resize(nf_);
@@ -1576,7 +1554,6 @@ void NMPCgenerator::initializeFootPoseConstraint()
     MAL_MATRIX_RESIZE(Afoot_xy_   [i],n_vertices_,2*(N_+nf_));
     MAL_MATRIX_RESIZE(Afoot_theta_[i],n_vertices_,nf_);
     MAL_VECTOR_RESIZE(UBfoot_     [i],n_vertices_);
-    MAL_VECTOR_RESIZE(LBfoot_     [i],n_vertices_);
     MAL_MATRIX_RESIZE(SelecMat_   [i],2,2*(N_+nf_));
     MAL_VECTOR_RESIZE(AdRdF_      [i],n_vertices_);
     MAL_VECTOR_RESIZE(deltaF_     [i],2);//2 as [deltaFx,deltaFy]
@@ -1586,14 +1563,12 @@ void NMPCgenerator::initializeFootPoseConstraint()
   MAL_MATRIX_RESIZE(Afoot_xy_full_   ,nc_foot_,2*(N_+nf_));
   MAL_MATRIX_RESIZE(Afoot_theta_full_,nc_foot_,nf_);
   MAL_VECTOR_RESIZE(UBfoot_full_     ,nc_foot_);
-  MAL_VECTOR_RESIZE(LBfoot_full_     ,nc_foot_);
 
   for(unsigned n=0 ; n < nf_ ; ++n)
   {
     MAL_MATRIX_FILL(Afoot_xy_   [n],0.0);
     MAL_MATRIX_FILL(Afoot_theta_[n],0.0);
     MAL_VECTOR_FILL(UBfoot_     [n],0.0);
-    MAL_VECTOR_FILL(LBfoot_     [n],-1e+08);
     MAL_MATRIX_FILL(SelecMat_   [n],0.0);
     MAL_VECTOR_FILL(deltaF_     [n],0.0);
     SelecMat_[n](0,N_+n) = 1 ;
@@ -1607,7 +1582,6 @@ void NMPCgenerator::initializeFootPoseConstraint()
   MAL_MATRIX_FILL(Afoot_xy_full_   ,0.0);
   MAL_MATRIX_FILL(Afoot_theta_full_,0.0);
   MAL_VECTOR_FILL(UBfoot_full_     ,0.0);
-  MAL_VECTOR_FILL(LBfoot_full_     ,-1e+08);
   return ;
 }
 
@@ -1628,11 +1602,9 @@ void NMPCgenerator::updateFootPoseConstraint(MAL_VECTOR_TYPE(double) &U)
   MAL_MATRIX_RESIZE(Afoot_xy_full_   ,nc_foot_,2*(N_+nf_));
   MAL_MATRIX_RESIZE(Afoot_theta_full_,nc_foot_,nf_);
   MAL_VECTOR_RESIZE(UBfoot_full_     ,nc_foot_);
-  MAL_VECTOR_RESIZE(LBfoot_full_     ,nc_foot_);
   MAL_MATRIX_FILL(Afoot_xy_full_   ,0.0);
   MAL_MATRIX_FILL(Afoot_theta_full_,0.0);
   MAL_VECTOR_FILL(UBfoot_full_     ,0.0);
-  MAL_VECTOR_FILL(LBfoot_full_     ,-1e+08);
 
   // compute Afoot_xy_full_, UBfoot_full_
   evalFootPoseConstraint(U);
@@ -1806,12 +1778,10 @@ void NMPCgenerator::initializeFootVelIneqConstraint()
   //nc_vel_ = 1*nf_ ;
   nc_vel_=3;
   MAL_MATRIX_RESIZE(Avel_ ,nc_vel_,2*N_+3*nf_)  ;
-  MAL_VECTOR_RESIZE(UBvel_,nc_vel_)  ;
-  MAL_VECTOR_RESIZE(LBvel_,nc_vel_)  ;
+  MAL_VECTOR_RESIZE(Bvel_,nc_vel_)  ;
 
   MAL_MATRIX_FILL(Avel_ ,0.0)  ;
-  MAL_VECTOR_FILL(UBvel_,0.0)  ;
-  MAL_VECTOR_FILL(LBvel_,0.0)  ;
+  MAL_VECTOR_FILL(Bvel_,0.0)  ;
 
 //  for(unsigned i=0;i<nf_;++i)
 //  {
@@ -1849,19 +1819,14 @@ void NMPCgenerator::updateFootVelIneqConstraint()
 ////      LBvel_(i) = F_kp1_theta_(i) - 1e-06 ;
 ////      Avel_(i, i+2*N_+2*nf_) = 1.0 ;
 //    }
-    UBvel_(0) = F_kp1_x_(0)     ;
-    UBvel_(1) = F_kp1_y_(0)     ;
-    UBvel_(2) = F_kp1_theta_(0) ;
-
-    LBvel_(0) = F_kp1_x_(0)     ;
-    LBvel_(1) = F_kp1_y_(0)     ;
-    LBvel_(2) = F_kp1_theta_(0) ;
+    Bvel_(0) = F_kp1_x_(0)     ;
+    Bvel_(1) = F_kp1_y_(0)     ;
+    Bvel_(2) = F_kp1_theta_(0) ;
   }
   else
   {
-    MAL_MATRIX_FILL(Avel_ ,0.0)  ;
-    MAL_VECTOR_FILL(UBvel_,0.0)  ;
-    MAL_VECTOR_FILL(LBvel_,0.0)  ;
+    MAL_MATRIX_FILL(Avel_ ,0.0) ;
+    MAL_VECTOR_FILL(Bvel_,0.0)  ;
   }
 
 #ifdef DEBUG
@@ -1893,12 +1858,10 @@ void NMPCgenerator::initializeFootExactPositionConstraint()
   #*/
   nc_pos_ = 3*nf_ ;
   MAL_MATRIX_RESIZE( Apos_ ,nc_pos_,2*N_+3*nf_)  ;
-  MAL_VECTOR_RESIZE(UBpos_ ,nc_pos_)  ;
-  MAL_VECTOR_RESIZE(LBpos_ ,nc_pos_)  ;
+  MAL_VECTOR_RESIZE(Bpos_ ,nc_pos_)  ;
 
-  MAL_MATRIX_FILL( Apos_,0.0)  ;
-  MAL_VECTOR_FILL(UBpos_,0.0)  ;
-  MAL_VECTOR_FILL(LBpos_,0.0)  ;
+  MAL_MATRIX_FILL(Apos_,0.0)  ;
+  MAL_VECTOR_FILL(Bpos_,0.0)  ;
 
   nc_pos_ = 0 ;
 
@@ -1949,13 +1912,9 @@ void NMPCgenerator::updateFootExactPositionConstraint()
       Avel_(1+i*nf_, 2*N_+nf_)  = 1.0 ;
       Avel_(2+i*nf_,2*N_+2*nf_) = 1.0 ;
 
-      UBvel_(0+i*nf_) = desiredNextSupportFootAbsolutePosition[i].X   ;
-      UBvel_(1+i*nf_) = desiredNextSupportFootAbsolutePosition[i].Y   ;
-      UBvel_(2+i*nf_) = desiredNextSupportFootAbsolutePosition[i].Yaw ;
-
-      LBvel_(0+i*nf_) = desiredNextSupportFootAbsolutePosition[i].X   ;
-      LBvel_(1+i*nf_) = desiredNextSupportFootAbsolutePosition[i].Y   ;
-      LBvel_(2+i*nf_) = desiredNextSupportFootAbsolutePosition[i].Yaw ;
+      Bvel_(0+i*nf_) = desiredNextSupportFootAbsolutePosition[i].X   ;
+      Bvel_(1+i*nf_) = desiredNextSupportFootAbsolutePosition[i].Y   ;
+      Bvel_(2+i*nf_) = desiredNextSupportFootAbsolutePosition[i].Yaw ;
     }
   }else
   {
@@ -2044,7 +2003,6 @@ void NMPCgenerator::initializeObstacleConstraint()
   */
   obstacles_.clear();
   UBobs_.clear();
-  LBobs_.clear();
   Hobs_.clear();
   Aobs_.clear();
   nc_obs_ = obstacles_.size();
@@ -2075,7 +2033,6 @@ void NMPCgenerator::updateObstacleConstraint()
 
   Hobs_.resize(obstacles_.size() , std::vector<MAL_MATRIX_TYPE(double)>(nc_obs_,H) );
   Aobs_.resize(obstacles_.size() , std::vector<MAL_VECTOR_TYPE(double)>(nc_obs_,A) );
-  LBobs_.resize(obstacles_.size() , B );
   UBobs_.resize(obstacles_.size() , B );
 
   unsigned nc = nf_ ;
@@ -2083,15 +2040,14 @@ void NMPCgenerator::updateObstacleConstraint()
   {
     for (unsigned i=0 ; i<nc ; ++i)
     {
-      Hobs_ [obs][i](N_+i,N_+i)             = 1.0 ;
-      Hobs_ [obs][i](2*N_+nf_+i,2*N_+nf_+i) = 1.0 ;
-      Aobs_ [obs][i](N_+i)       = -2*obstacles_[obs].x_0 ;
-      Aobs_ [obs][i](2*N_+nf_+i) = -2*obstacles_[obs].y_0 ;
-      LBobs_[obs](i) = - obstacles_[obs].x_0*obstacles_[obs].x_0
-                       - obstacles_[obs].y_0*obstacles_[obs].y_0
-                       + (obstacles_[obs].r+obstacles_[obs].margin)
-                        *(obstacles_[obs].r+obstacles_[obs].margin) ;
-      MAL_VECTOR_FILL(UBobs_[obs],1e+8);
+      Hobs_ [obs][i](N_+i,N_+i)             = -1.0 ;
+      Hobs_ [obs][i](2*N_+nf_+i,2*N_+nf_+i) = -1.0 ;
+      Aobs_ [obs][i](N_+i)       = +2*obstacles_[obs].x_0 ;
+      Aobs_ [obs][i](2*N_+nf_+i) = +2*obstacles_[obs].y_0 ;
+      UBobs_[obs](i) = -(-  obstacles_[obs].x_0*obstacles_[obs].x_0
+                         -  obstacles_[obs].y_0*obstacles_[obs].y_0
+                         + (obstacles_[obs].r+obstacles_[obs].margin)
+                         * (obstacles_[obs].r+obstacles_[obs].margin) ) ;
     }
 #ifdef DEBUG_COUT
     cout << "prepare the obstacle : " << obstacles_[obs] << endl ;
@@ -2483,23 +2439,22 @@ void NMPCgenerator::initializeLineSearch()
 
 void NMPCgenerator::lineSearch()
 {
-  if(!useLineSearch_ || nc_vel_!=0)
-  {
-    lineStep_ = lineStep0_ ;
-    return;
-  }
-
-////  qpOASES::QProblemStatus status_ = QP_->getStatus();
-////  if(status_ < qpOASES::QPS_HOMOTOPYQPSOLVED)
-////  {
-////    lineStep_ = 0.5;
-////    return ;
-////  }
-//  cout << status_ << endl ;
-//  cout << "########################################" << endl ;
-  // selection active constraints
+//  if(!useLineSearch_ || nc_vel_!=0)
+//  {
+//    lineStep_ = lineStep0_ ;
+//    return;
+//  }
 
   U_n_ = U_ ;
+  for(unsigned i=0 ; i<nv_ ; ++i)
+    U_n_(i) = U_(i) + lineStep0_*deltaU_[i] ;
+  evalConstraint(U_n_);
+
+
+
+
+  return ;///////////////////////////////////////////////////////////////////////////////
+
   for(unsigned i=0 ; i<nv_ ; ++i)
     U_n_(i) = U_(i) + lineStep0_*deltaU_[i] ;
   evalConstraint(U_n_);
@@ -2512,12 +2467,6 @@ void NMPCgenerator::lineSearch()
     {
       selectActiveConstraint(i)=1.0;
 //      cout << "constr nb " << i << " ; dist to constr = " << gU_(i)-ub_(i) << endl ;
-      badConstraints = true;
-    }
-    if(-gU_(i)+lb_(i)>1e-3)
-    {
-      selectActiveConstraint(i)=-1.0;
-//      cout << "constr nb " << i << " ; dist to constr = " << -gU_(i)+lb_(i) << endl ;
       badConstraints = true;
     }
   }
@@ -2592,11 +2541,7 @@ double NMPCgenerator::evalMeritFunctionJacobian()
       {
         JdU_(i) += qp_J_(i,j) * deltaU_[j];
       }
-      if(selectActiveConstraint(i) < 0.0)
-      {
-        constrValue = -gU_(i) + lb_(i) ;
-      }
-      else if(selectActiveConstraint(i) > 0.0)
+      if(selectActiveConstraint(i) > 0.0)
       {
         constrValue = gU_(i) - ub_(i) ;
       }
@@ -2634,14 +2579,6 @@ double NMPCgenerator::evalMeritFunction()
           tmp = -tmp;
         constrValueNorm += tmp ;
       }
-      else if (selectActiveConstraint(i)<0.0)
-      {
-        double tmp = -gU_(i) + lb_(i) ;
-        if (tmp<0)
-          tmp = -tmp;
-        constrValueNorm += tmp ;
-      }
-      //cout << constrValueNorm << " " ;
     }
   }
   //cout << endl ;

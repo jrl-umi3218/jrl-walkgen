@@ -255,7 +255,7 @@ namespace PatternGeneratorJRL
     // Center of Pressure constraint
     unsigned nc_cop_ ;
     MAL_MATRIX_TYPE(double) Acop_xy_, Acop_theta_ ;
-    MAL_VECTOR_TYPE(double) UBcop_, LBcop_ ;
+    MAL_VECTOR_TYPE(double) UBcop_ ;
     MAL_MATRIX_TYPE(double) D_kp1_xy_, D_kp1_theta_, Pzuv_, derv_Acop_map_  ;
     MAL_MATRIX_TYPE(double) derv_Acop_map2_ ;
     MAL_VECTOR_TYPE(double) b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_, v_kp1f_x_, v_kp1f_y_ ;
@@ -273,7 +273,7 @@ namespace PatternGeneratorJRL
     unsigned itBeforeLanding_ ;
     int itMax_;
     std::vector<MAL_MATRIX_TYPE(double)> Afoot_xy_, Afoot_theta_  ;
-    std::vector<MAL_VECTOR_TYPE(double)> UBfoot_, LBfoot_ ;
+    std::vector<MAL_VECTOR_TYPE(double)> UBfoot_ ;
     std::vector<MAL_MATRIX_TYPE(double)> SelecMat_;
     std::vector<MAL_MATRIX_TYPE(double)> A0f_xy_, A0f_theta_ ;
     std::vector<MAL_VECTOR_TYPE(double)> B0f_;
@@ -282,30 +282,30 @@ namespace PatternGeneratorJRL
     std::vector<MAL_VECTOR_TYPE(double)> deltaF_ ;
     std::vector<MAL_VECTOR_TYPE(double)> AdRdF_ ;
     MAL_MATRIX_TYPE(double) Afoot_xy_full_, Afoot_theta_full_  ;
-    MAL_VECTOR_TYPE(double) UBfoot_full_, LBfoot_full_ ;
+    MAL_VECTOR_TYPE(double) UBfoot_full_ ;
 
     // Foot Velocity constraint
     unsigned nc_vel_ ;
     std::deque <RelativeFootPosition> desiredNextSupportFootRelativePosition ;
     std::vector<support_state_t> desiredNextSupportFootAbsolutePosition ;
     MAL_MATRIX_TYPE(double) Avel_ ;
-    MAL_VECTOR_TYPE(double) UBvel_, LBvel_ ;
+    MAL_VECTOR_TYPE(double) Bvel_ ;
 
     // Foot Position constraint
     unsigned nc_pos_ ;
     MAL_MATRIX_TYPE(double) Apos_ ;
-    MAL_VECTOR_TYPE(double) UBpos_, LBpos_ ;
+    MAL_VECTOR_TYPE(double) Bpos_ ;
 
     // Rotation linear constraint
     unsigned nc_rot_ ;
     MAL_MATRIX_TYPE(double) Arot_ ;
-    MAL_VECTOR_TYPE(double) UBrot_, LBrot_ ;
+    MAL_VECTOR_TYPE(double) UBrot_,LBrot_ ;
 
     // Obstacle constraint
     unsigned nc_obs_ ;
     std::vector< std::vector<MAL_MATRIX_TYPE(double)> > Hobs_ ;
     std::vector< std::vector<MAL_VECTOR_TYPE(double)> > Aobs_ ;
-    std::vector< MAL_VECTOR_TYPE(double) > UBobs_, LBobs_ ;
+    std::vector< MAL_VECTOR_TYPE(double) > UBobs_ ;
     std::vector<Circle> obstacles_ ;
     MAL_VECTOR_TYPE(double) qp_J_obs_i_ ;
     // Standing constraint :
@@ -315,7 +315,6 @@ namespace PatternGeneratorJRL
 
     // evaluate constraint
     // real problem bounds : lb_ < g(U) < ub_
-    MAL_VECTOR_TYPE(double) lb_  ;
     MAL_VECTOR_TYPE(double) ub_  ;
     MAL_VECTOR_TYPE(double) gU_  ;
     MAL_VECTOR_TYPE(double) Uxy_  ;
@@ -359,15 +358,9 @@ namespace PatternGeneratorJRL
     MAL_MATRIX_TYPE(double) qp_H_   ;
     MAL_VECTOR_TYPE(double) qp_g_   ;
     MAL_MATRIX_TYPE(double) qp_J_   ; //constraint Jacobian
-    MAL_VECTOR_TYPE(double) qp_lbJ_ ; //constraint Jacobian
     MAL_VECTOR_TYPE(double) qp_ubJ_ ; //constraint Jacobian
-    MAL_VECTOR_TYPE(double) qp_lb_  ;
-    MAL_VECTOR_TYPE(double) qp_ub_  ;
     // temporary usefull variable for matrix manipulation
     MAL_VECTOR_TYPE(double) qp_g_x_, qp_g_y_, qp_g_theta_ ;
-    //MAL_MATRIX_TYPE(double) qp_J_cop_, qp_J_foot_, qp_J_vel_, qp_J_obs_, qp_J_rot_ , qp_J_stan_;
-    //MAL_VECTOR_TYPE(double) qp_lbJ_cop_, qp_lbJ_foot_, qp_lbJ_vel_, qp_lbJ_obs_, qp_lbJ_rot_, qp_lbJ_stan_ ;
-    //MAL_VECTOR_TYPE(double) qp_ubJ_cop_, qp_ubJ_foot_, qp_ubJ_vel_, qp_ubJ_obs_, qp_ubJ_rot_, qp_ubJ_stan_ ;
 
     // Free variable of the system
     // U_       = [C_kp1_x_ F_kp1_x_ C_kp1_y_ F_kp1_y_ F_kp1_theta_]^T
