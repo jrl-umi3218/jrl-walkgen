@@ -77,7 +77,7 @@ public:
   {
     m_TestProfile = TestProfile;
     resetfiles=0;
-    m_DebugFGPIFull=true;
+    m_DebugFGPIFull=false;
     m_DebugFGPI=true;
     ComAndFootRealization_ = NULL;
     SPM_ = NULL ;
@@ -575,8 +575,8 @@ protected:
     }
 
     {
-      //istringstream strm2(":useDynamicFilter true");
       istringstream strm2(":useDynamicFilter true");
+      //istringstream strm2(":useDynamicFilter false");
       m_PGI->ParseCmd(strm2);
     }
 //    {
