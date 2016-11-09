@@ -117,7 +117,7 @@ namespace PatternGeneratorJRL
     bool isFootCloseToLand()
     {
 //      std::cout << itBeforeLanding_ << std::endl;
-      return (itBeforeLanding_ < 2 );
+      return ((itBeforeLanding_ < 2) && useItBeforeLanding_);
 //      return false ;
     }
 
@@ -271,6 +271,7 @@ namespace PatternGeneratorJRL
     unsigned nc_foot_ ;
     unsigned n_vertices_ ;
     unsigned itBeforeLanding_ ;
+    bool useItBeforeLanding_ ;
     int itMax_;
     std::vector<MAL_MATRIX_TYPE(double)> Afoot_xy_, Afoot_theta_  ;
     std::vector<MAL_VECTOR_TYPE(double)> UBfoot_ ;
@@ -400,7 +401,7 @@ namespace PatternGeneratorJRL
     double alpha_y_ ;
     double alpha_theta_ ;
     double beta_  ;
-    double gamma_ ;
+    double minjerk_ ;
     double delta_ ;
     double kappa_ ;
 
