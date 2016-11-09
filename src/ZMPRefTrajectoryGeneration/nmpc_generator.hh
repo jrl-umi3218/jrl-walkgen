@@ -102,15 +102,7 @@ namespace PatternGeneratorJRL
     void initializeObstacleConstraint();
     void updateObstacleConstraint();
     void initializeStandingConstraint();
-    void updateStandingConstraint();
-    void initializeFootExactPositionConstraint();
-    void updateFootExactPositionConstraint();
-
-    // tools
-    void computeAbsolutePositionFromRelative(
-        support_state_t currentSupport,
-        const RelativeFootPosition & relativePosition,
-        support_state_t & nextSupport);
+    void updateStandingConstraint();    
 
     // tools to check if foot is close to land
     void updateIterationBeforeLanding();
