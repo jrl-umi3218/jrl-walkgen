@@ -293,9 +293,9 @@ int DynamicFilter::OnLinefilter(
     ZMPMB_vec_[0][0]=inputZMPTraj_deq_[0].px;
     ZMPMB_vec_[0][1]=inputZMPTraj_deq_[0].py;
     ZMPMB_vec_[0][2]=0.0;
-    ZMPMB_vec_[1][0]=inputZMPTraj_deq_[0].px;
-    ZMPMB_vec_[1][1]=inputZMPTraj_deq_[0].py;
-    ZMPMB_vec_[1][2]=0.0;
+//    ZMPMB_vec_[1][0]=inputZMPTraj_deq_[0].px;
+//    ZMPMB_vec_[1][1]=inputZMPTraj_deq_[0].py;
+//    ZMPMB_vec_[1][2]=0.0;
     if(false)
     {
       zmpmb_i_.resize( N1 ) ;

@@ -39,9 +39,6 @@
 #include "TestObject.hh"
 #include "MotionGeneration/ComAndFootRealizationByGeometry.hh"
 
-//#include "pinocchio/multibody/parser/urdf.hpp"
-//#include "pinocchio/multibody/parser/srdf.hpp"
-
 using namespace std;
 using namespace PatternGeneratorJRL;
 using namespace::PatternGeneratorJRL::TestSuite;
@@ -77,7 +74,7 @@ public:
   {
     m_TestProfile = TestProfile;
     resetfiles=0;
-    m_DebugFGPIFull=false;
+    m_DebugFGPIFull=true;
     m_DebugFGPI=true;
     ComAndFootRealization_ = NULL;
     SPM_ = NULL ;
@@ -154,7 +151,7 @@ public:
     m_vel  = m_CurrentVelocity ;
     m_acc  = m_CurrentAcceleration ;
     {
-      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
+      istringstream strm2(":setfeetconstraint XY 0.09 0.06");
       m_PGI->ParseCmd(strm2);
     }
     m_leftLeg =
@@ -555,7 +552,7 @@ protected:
       aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
+      istringstream strm2(":setfeetconstraint XY 0.095 0.055");
       m_PGI->ParseCmd(strm2);
     }
     {
@@ -622,10 +619,10 @@ protected:
     #define localNbOfEvents 20
     struct localEvent events [localNbOfEvents] =
     {
-      {1*200,&TestObject::walkForward2m_s},
-      {10*200,&TestObject::startTurningRight2},
-      {20*200,&TestObject::walkX05Y04},
-      {30*200,&TestObject::walkForwardSlow},
+      {1*200,&TestObject::walkForwardSlow},
+//      {10*200,&TestObject::walkForwardSlow},
+//      {20*200,&TestObject::walkForwardSlow},
+//      {30*200,&TestObject::walkForwardSlow},
       {40*200,&TestObject::stop},
       {60*200,&TestObject::stopOnLineWalking}
     };

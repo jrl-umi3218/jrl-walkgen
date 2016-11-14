@@ -223,16 +223,16 @@ void NMPCgenerator::initNMPCgenerator(
   T_step_ = T_step ;
   useLineSearch_=useLineSearch;
 
-  alpha_x_     = 5.0 ; // weight for CoM velocity X tracking  : 0.5 * a ; 2.5
-  alpha_y_     = 5.0 ; // weight for CoM velocity Y tracking  : 0.5 * a ; 2.5
+  alpha_x_     = 1e+03 ; // weight for CoM velocity X tracking  : 0.5 * a ; 2.5
+  alpha_y_     = 1e+03 ; // weight for CoM velocity Y tracking  : 0.5 * a ; 2.5
   alpha_theta_ = 1e+06 ; // weight for CoM velocity Yaw tracking  : 0.5 * a ; 2.5
-  beta_  = 1e+03 ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
+  beta_  = 1e-05 ; // weight for ZMP reference tracking : 0.5 * b ; 1e+03
   minjerk_ = 1e-08 ; // weight for jerk minimization      : 0.5 * c ; 1e-04
   delta_ = 1e-06 ; // weight for foot position evolution: 0.5 * d ; 1e-04
   kappa_ = 0.0 ;   // weight for foot distance from support: 0.5 * d ; 1e-04
 
-  SecurityMarginX_ = 0.09 ;
-  SecurityMarginY_ = 0.05 ;
+  SecurityMarginX_ = 0.095 ;
+  SecurityMarginY_ = 0.055 ;
   maxSolverIteration_=1;
   oneMoreStep_=false;
 

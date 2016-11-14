@@ -266,8 +266,10 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
                                         COMState & lStartingCOMState,
                                         MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
 {
+
   // Generator Management
-  InterpolationPeriod_ = m_SamplingPeriod*7;
+  previewSize_ = 9 ;
+  InterpolationPeriod_ = m_SamplingPeriod*8;
   outputPreviewDuration_ = m_SamplingPeriod ;
   //outputPreviewDuration_ = SQP_T_ ;
   previewDuration_ =  (previewSize_-1)*SQP_T_ ;
@@ -479,8 +481,8 @@ void ZMPVelocityReferencedSQP::OnLine(double time,
         time,
         initLeftFoot_ ,
         initRightFoot_,
-        //itCOM_,
-        initCOM_,
+        itCOM_,
+        //initCOM_,
         VelRef_);
 
     // SOLVE PROBLEM:

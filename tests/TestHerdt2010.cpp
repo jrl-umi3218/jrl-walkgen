@@ -69,7 +69,7 @@ protected:
 
     }
     {
-      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
+      istringstream strm2(":setfeetconstraint XY 0.09 0.06");
       m_PGI->ParseCmd(strm2);
     }
     {
@@ -101,7 +101,7 @@ protected:
 
     }
     {
-      istringstream strm2(":setfeetconstraint XY 0.09 0.04");
+      istringstream strm2(":setfeetconstraint XY 0.09 0.06");
       m_PGI->ParseCmd(strm2);
     }
     {
