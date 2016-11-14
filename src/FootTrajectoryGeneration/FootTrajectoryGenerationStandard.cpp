@@ -406,8 +406,8 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
       }
       else if (FinalPosition - InitPosition > epsilon )
         {
-          ToMP.push_back(0.4*TimeInterval);
-          MP.push_back(FinalPosition+0.5*WayPoint_z);
+          ToMP.push_back(0.5*TimeInterval);
+          MP.push_back(FinalPosition+0.2*WayPoint_z);
         }
       else if ( sqrt((FinalPosition - InitPosition)*(FinalPosition - InitPosition)) <= epsilon )
         {
