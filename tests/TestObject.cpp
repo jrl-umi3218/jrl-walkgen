@@ -993,7 +993,7 @@ namespace PatternGeneratorJRL
       ///----
       aFileName = m_DirectoryName;
       aFileName+=m_TestName;
-      aFileName+=".pos2";
+      aFileName+=".pos";
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
