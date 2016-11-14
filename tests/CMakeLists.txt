@@ -124,14 +124,17 @@ ENDMACRO(ADD_JRL_WALKGEN_EXE)
 
 # the following disabled test case are just useful code for offline
 # motion generation using the specialized inverse kinmatics of a robot
+#ADD_JRL_WALKGEN_EXE(TestMorisawa2007OnLine TestMorisawa2007.cpp)
 #ADD_JRL_WALKGEN_EXE(TestMorisawa2007ShortWalk TestMorisawa2007.cpp)
-#ADD_JRL_WALKGEN_EXE(TestMorisawa2007Climbing TestMorisawa2007.cpp)
-#ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoingDown10 TestMorisawa2007.cpp)
-#ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoingDown15 TestMorisawa2007.cpp)
+ADD_JRL_WALKGEN_EXE(TestMorisawa2007Climbing10 TestMorisawa2007.cpp)
+ADD_JRL_WALKGEN_EXE(TestMorisawa2007Climbing15 TestMorisawa2007.cpp)
+ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoingDown10 TestMorisawa2007.cpp)
+ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoingDown15 TestMorisawa2007.cpp)
 #ADD_JRL_WALKGEN_EXE(TestMorisawa2007SteppingStones TestMorisawa2007.cpp)
-#ADD_JRL_WALKGEN_EXE(TestMorisawa2007WalkingOnBeam TestMorisawa2007.cpp)
+ADD_JRL_WALKGEN_EXE(TestMorisawa2007WalkingOnBeam TestMorisawa2007.cpp)
 #ADD_JRL_WALKGEN_EXE(TestMorisawa2007GoThroughWall TestMorisawa2007.cpp)
 
+#ADD_JRL_WALKGEN_TEST(TestMorisawa2007OnLine TestMorisawa2007.cpp)
 #ADD_JRL_WALKGEN_TEST(TestMorisawa2007ShortWalk TestMorisawa2007.cpp)
 #ADD_JRL_WALKGEN_TEST(TestMorisawa2007Climbing TestMorisawa2007.cpp)
 #ADD_JRL_WALKGEN_TEST(TestMorisawa2007GoingDown10 TestMorisawa2007.cpp)
