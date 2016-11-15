@@ -620,11 +620,13 @@ protected:
     struct localEvent events [localNbOfEvents] =
     {
       {1*200,&TestObject::walkForwardSlow},
-//      {10*200,&TestObject::walkForwardSlow},
-//      {20*200,&TestObject::walkForwardSlow},
-//      {30*200,&TestObject::walkForwardSlow},
-      {40*200,&TestObject::stop},
-      {60*200,&TestObject::stopOnLineWalking}
+      {10*200,&TestObject::walkForward2m_s},
+      {20*200,&TestObject::walkSidewards2m_s},
+      {30*200,&TestObject::walkX05Y04},
+      {40*200,&TestObject::startTurningRight2},
+      {50*200,&TestObject::walkOnSpot},
+      {66*200,&TestObject::stop},
+      {76*200,&TestObject::stopOnLineWalking}
     };
     // Test when triggering event.
     for(unsigned int i=0;i<localNbOfEvents;i++)
