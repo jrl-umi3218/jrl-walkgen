@@ -1861,3 +1861,21 @@ void BSplinesFoot::GetParameters(double &FT,
     ToMP = m_ToMP ;
     MP = m_MP ;
 }
+
+void BSplinesFoot::SetParametersWithoutMPAndToMP(double FT,
+                                                 double IP,
+                                                 double FP,
+                                                 double IS, double IA,
+                                                 double FS, double FA)
+{
+    m_FT = FT ;
+
+    m_IP = IP ;
+    m_IS = IS ;
+    m_IA = IA ;
+
+    m_FP = FP ;
+    m_FS = FS ;
+    m_FA = FA ;
+}
+

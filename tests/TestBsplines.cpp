@@ -163,6 +163,92 @@ int PerformTests(int argc, char *argv[])
     delete bsplineTwoWayPoint ;
     bsplineTwoWayPoint = NULL ;
 
+
+    // Test Bspline with knots and control points
+    ///////////////////////////////////////////
+    /// \brief bsplineKnotsControl
+    ofstream aof;
+    string aFileName = "bsplineKnotsControl.dat";
+    aof.open(aFileName.c_str(),ofstream::out);
+    aof.close();
+    aof.open(aFileName.c_str(),ofstream::app);
+    aof.precision(8);
+    aof.setf(ios::scientific, ios::floatfield);
+    //aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "
+    PatternGeneratorJRL::BSplinesFoot *bsplineKnotsControl;
+    bsplineKnotsControl = new PatternGeneratorJRL::BSplinesFoot(
+                1.4, IP, FP, ToMP, MP, IS, IA, FS, FA);
+
+    deque<double> knot;
+    double TimeInterval = 1.4;
+    for (int i=0;i<8;++i){knot.push_back(0);}
+    double pourcentTime=0.05;
+    knot.push_back(pourcentTime);
+    knot.push_back(pourcentTime);
+    for (int i=0;i<8;++i){knot.push_back(1.0);}
+    bsplineKnotsControl->SetKnotVector(knot);
+    vector<double> controlPoints;
+    double InitPosition=0.0;
+    double FinalPosition=0.1;
+    double WayPoint_z=0.07;
+    controlPoints.push_back(InitPosition);
+    controlPoints.push_back(InitPosition);
+    controlPoints.push_back(InitPosition);
+    controlPoints.push_back(InitPosition);
+    controlPoints.push_back(InitPosition);
+    controlPoints.push_back(FinalPosition);
+    controlPoints.push_back(FinalPosition+WayPoint_z);
+    controlPoints.push_back(FinalPosition);
+    controlPoints.push_back(FinalPosition);
+    controlPoints.push_back(FinalPosition);
+    controlPoints.push_back(FinalPosition);
+    controlPoints.push_back(FinalPosition);
+    //controlPoints.push_back(FinalPosition);
+    bsplineKnotsControl->SetControlPoints(controlPoints);
+    bsplineKnotsControl->FT(TimeInterval);
+    bsplineKnotsControl->GenerateDegree();
+    bsplineKnotsControl->PrintControlPoints();
+    bsplineKnotsControl->PrintDegree();
+    bsplineKnotsControl->PrintKnotVector();
+
+    FT = 1.4 ;
+    IP = 0.0 ;
+    IS = 0.0 ;
+    IA = 0.0 ;
+    FP = 0.1 ;
+    FS = 0.0 ;
+    FA = 0.0 ;
+    bsplineKnotsControl->Compute(0.0, testIP, testIS, testIA);
+    bsplineKnotsControl->Compute(TimeInterval*pourcentTime, testMP, testMS, testMA);
+    bsplineKnotsControl->Compute(TimeInterval , testFP, testFS, testFA);
+    test_IP = sqrt((IP-testIP)*(IP-testIP))<1e-08 ;
+    test_IS = sqrt((IS-testIS)*(IS-testIS))<1e-08 ;
+    test_IA = sqrt((IA-testIA)*(IA-testIA))<1e-08 ;
+    test_FP = sqrt((FP-testFP)*(FP-testFP))<1e-08 ;
+    test_FS = sqrt((FS-testFS)*(FS-testFS))<1e-08 ;
+    test_FA = sqrt((FA-testFA)*(FA-testFA))<1e-08 ;
+    bool testbsplineKnotsControl =
+        test_IP && test_IS && test_IA &&
+        test_FP && test_FS && test_FA ;
+    std::cout << "testFP : " << testFP << std::endl;
+    std::cout << "MP : [" << TimeInterval << ";" << FinalPosition << "]" << std::endl;
+
+    for (double i=0 ; i < 1400 ; ++i)
+    {
+        bsplineKnotsControl->Compute(FT*i/1400.0, testMP, testMS, testMA);
+        aof << testMP << endl;
+    }
+
+    if(!bsplineKnotsControl || !testBsplineTwoWayPoint)
+    {
+      std::cerr << "Error unexpected behaviour of bspline generation\n"
+                << "bspline with knots and control points"
+                << std::endl;
+    }
+    delete bsplineKnotsControl ;
+    bsplineKnotsControl = NULL ;
+
+
     return (testBsplinenowayPoint &&
         testBsplineOneWayPoint &&
         testBsplineTwoWayPoint) ? 1 : 0 ;

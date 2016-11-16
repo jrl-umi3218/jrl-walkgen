@@ -125,6 +125,11 @@ namespace PatternGeneratorJRL
                          std::vector<double> MP,
                          double IS = 0.0, double IA = 0.0,
                          double FS = 0.0, double FA = 0.0);
+      void SetParametersWithoutMPAndToMP(double FT,
+                                                       double IP,
+                                                       double FP,
+                                                       double IS, double IA,
+                                                       double FS, double FA);
 
       /*!Compute Position at time t */
       int Compute(double t, double &x, double &dx, double &ddx);
@@ -151,6 +156,9 @@ namespace PatternGeneratorJRL
 
       double FT()
       {return m_FT;}
+
+      void FT(double ft)
+      {m_FT=ft;}
 
       double IP()
       {return m_IP;}

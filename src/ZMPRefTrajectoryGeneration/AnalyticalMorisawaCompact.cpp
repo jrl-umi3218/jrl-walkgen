@@ -607,7 +607,6 @@ computing the analytical trajectories. */
         /*! initialize the dynamic filter */
         unsigned int n = COMStates.size();
         double KajitaPCpreviewWindow = 1.6 ;
-        m_kajitaDynamicFilter->getComAndFootRealization()->ShiftFoot(false);
         m_kajitaDynamicFilter->init( m_SamplingPeriod,
                                      m_SamplingPeriod,
                                      n*m_SamplingPeriod,
@@ -2683,6 +2682,7 @@ new step has to be generate.
       LTHROW("No foot");
     vector3d corrZ ;
     corrZ = aFoot->anklePosition ;
+    corrZ(2) = 0; //foot height no more equal to ankle height; TODO : remove corrZ
 
     // after the final step we keep the same position for a while
     if( Index >= m_AbsoluteSupportFootPositions.size() )

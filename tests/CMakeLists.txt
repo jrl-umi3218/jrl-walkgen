@@ -59,10 +59,10 @@ ADD_TEST(TestOptCholesky TestOptCholesky)
 ## Test Bspline #
 ##########################
 #TODO create a proper test for polynomes and bsplines
-#ADD_EXECUTABLE(TestBsplines
-#  TestBsplines.cpp
-#  ../src/Mathematics/Bsplines.cpp
-#  )
+ADD_EXECUTABLE(TestBsplines
+  TestBsplines.cpp
+  ../src/Mathematics/Bsplines.cpp
+  )
 
 ##########################
 ## Test Ricatti Equation #
