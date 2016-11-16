@@ -268,8 +268,8 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
 {
 
   // Generator Management
-  previewSize_ = 9 ;
-  InterpolationPeriod_ = m_SamplingPeriod*8;
+  previewSize_ = 8 ;
+  InterpolationPeriod_ = m_SamplingPeriod*7;
   outputPreviewDuration_ = m_SamplingPeriod ;
   //outputPreviewDuration_ = SQP_T_ ;
   previewDuration_ =  (previewSize_-1)*SQP_T_ ;
