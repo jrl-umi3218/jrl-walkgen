@@ -2754,7 +2754,7 @@ new step has to be generate.
     double deltaZ ;
     // double static CoMzpre = CoMz;
     double up=0.1,upRight = 1.1 ,upLeft = 0.0;
-    double down = 0.1, downRight = 0.90, downLeft = 0.1;
+    double down = 0.4, downRight = 0.90, downLeft = 0.1;
 
     // some variables renaming which improve the readibility
     double absFootz_0 = m_AbsoluteSupportFootPositions[Index].z - corrZ(2);

@@ -432,8 +432,8 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
           vector<double> controlPoints;
           for (int i=0 ; i<5 ; ++i)
           {controlPoints.push_back(InitPosition);}
-          controlPoints.push_back(FinalPosition+WayPoint_z);
-          controlPoints.push_back(FinalPosition+WayPoint_z);
+          controlPoints.push_back(FinalPosition+WayPoint_z*1.3);
+          controlPoints.push_back(FinalPosition+WayPoint_z*0.9);
           for (int i=0 ; i<5 ; ++i)
           {controlPoints.push_back(FinalPosition);}
 
@@ -462,9 +462,47 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
         }
       else if (FinalPosition - InitPosition < -epsilon )
         {
-          ToMP.push_back(0.6*TimeInterval);
-          MP.push_back(InitPosition+0.5*WayPoint_z);
-          m_BsplinesZ->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed,InitAcc);
+//          ToMP.push_back(0.6*TimeInterval);
+//          MP.push_back(InitPosition+0.5*WayPoint_z);
+//          m_BsplinesZ->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed,InitAcc);
+          deque<double> knot;
+          double TimeInterval = 1.4;
+          for (int i=0;i<8;++i){knot.push_back(0.0);}
+          double pourcentTime=0.9;
+//          knot.push_back(0.01);
+//          knot.push_back(0.4);
+//          //knot.push_back(pourcentTime*TimeInterval);
+//          knot.push_back(pourcentTime);
+//          knot.push_back(0.99);
+          knot.push_back(0.9);
+          for (int i=0;i<8;++i){knot.push_back(1.0);}
+          m_BsplinesZ->SetKnotVector(knot);
+          vector<double> controlPoints;
+          for (int i=0 ; i<5 ; ++i)
+          {controlPoints.push_back(InitPosition);}
+//          controlPoints.push_back(InitPosition+0.005);
+//          controlPoints.push_back(InitPosition+0.07*0.8);
+//          controlPoints.push_back(InitPosition+0.07*1.4);
+//          controlPoints.push_back(FinalPosition+0.005);
+          controlPoints.push_back(InitPosition+0.25);
+          for (int i=0 ; i<5 ; ++i)
+          {controlPoints.push_back(FinalPosition);}
+
+          m_BsplinesZ->SetControlPoints(controlPoints);
+//          m_BsplinesZ->FT(TimeInterval);
+//          m_BsplinesZ->FP(FinalPosition);
+          double IS = 0.0 ;
+          double IA = 0.0 ;
+          double FS = 0.0 ;
+          double FA = 0.0 ;
+          m_BsplinesZ->SetParametersWithoutMPAndToMP(TimeInterval,
+                                                     InitPosition,
+                                                     FinalPosition,
+                                                     IS,IA,FS,FA);
+          m_BsplinesZ->GenerateDegree();
+          m_BsplinesZ->PrintControlPoints();
+          m_BsplinesZ->PrintDegree();
+          m_BsplinesZ->PrintKnotVector();
         }
       //m_BsplinesZ->SetParameters(TimeInterval,InitPosition,FinalPosition,ToMP,MP,InitSpeed,InitAcc);
       break;
