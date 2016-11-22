@@ -423,17 +423,23 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
 //          controlPoints.push_back(FinalPosition);
           deque<double> knot;
           double TimeInterval = 1.4;
-          for (int i=0;i<8;++i){knot.push_back(0);}
-          double pourcentTime=0.15;
+          for (int i=0;i<6;++i){knot.push_back(0);}
+          double pourcentTime=0.25;
+          knot.push_back(pourcentTime/3);
+          knot.push_back(pourcentTime*2/3);
           knot.push_back(pourcentTime);
           knot.push_back(pourcentTime);
-          for (int i=0;i<8;++i){knot.push_back(1.0);}
+          knot.push_back(pourcentTime+(1-pourcentTime)/3);
+          knot.push_back(pourcentTime+(1-pourcentTime)*2/3);
+          //knot.push_back(pourcentTime);
+          for (int i=0;i<6;++i){knot.push_back(1.0);}
           m_BsplinesZ->SetKnotVector(knot);
           vector<double> controlPoints;
           for (int i=0 ; i<5 ; ++i)
           {controlPoints.push_back(InitPosition);}
-          controlPoints.push_back(FinalPosition+WayPoint_z*1.3);
-          controlPoints.push_back(FinalPosition+WayPoint_z*0.9);
+          controlPoints.push_back(FinalPosition+WayPoint_z);
+          controlPoints.push_back(FinalPosition+WayPoint_z);
+          //controlPoints.push_back(FinalPosition+WayPoint_z*0.9);
           for (int i=0 ; i<5 ; ++i)
           {controlPoints.push_back(FinalPosition);}
 
