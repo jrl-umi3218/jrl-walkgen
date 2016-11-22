@@ -166,6 +166,12 @@ namespace PatternGeneratorJRL
       double FP()
       {return m_FP;}
 
+      void  SetParametersWithInitFinalPose(double FT,
+                                        double IP,
+                                        double FP,
+                                        std::vector<double> &ToMP,
+                                        std::vector<double> &MP);
+
   private:
 
       double m_FT ; // final time
