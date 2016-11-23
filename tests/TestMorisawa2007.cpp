@@ -325,7 +325,7 @@ protected:
                           aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":useDynamicFilter true");
+      istringstream strm2(":useDynamicFilter false");
       aPGI.ParseCmd(strm2);
     }
   }
@@ -401,9 +401,10 @@ protected:
                           0.28  0.100 0.0 0.0\
                           0.28 -0.100 0.0 0.0\
                           0.28  0.100 0.0 0.0\
-                          0.28 -0.110 0.0 0.0\
-                          0.2   0.190 0.0 0.0\
-                          0.0  -0.190 0.0 0.0\
+                          0.28 -0.100 0.0 0.0\
+                          0.28  0.145 0.0 0.0\
+                          0.2  -0.190 0.0 0.0\
+                          0.0   0.190 0.0 0.0\
                           ");
                           aPGI.ParseCmd(strm2);
     }
