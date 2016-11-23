@@ -980,9 +980,9 @@ namespace PatternGeneratorJRL
 
       ofstream aof;
       string aFileName;
-      int iteration = m_OneStep.NbOfIt ;
+      int iteration = m_OneStep.NbOfIt-1 ;
       
-      if ( iteration <= 1 ){
+      if ( iteration == 0 ){
         aFileName = m_DirectoryName;
         aFileName+= m_TestName;
         aFileName+=".pos";
@@ -997,7 +997,7 @@ namespace PatternGeneratorJRL
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
-      std::cout << iteration << " - Going through this step "<< std::endl;
+      //std::cout << iteration << " - Going through this step "<< std::endl;
       aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
       for(unsigned int i = 6 ; i < 36 ; i++){
         aof << filterprecision( conf(i) ) << " "  ; // 2
