@@ -409,7 +409,7 @@ protected:
                           aPGI.ParseCmd(strm2);
     }
     {
-      istringstream strm2(":useDynamicFilter false");
+      istringstream strm2(":useDynamicFilter true");
       aPGI.ParseCmd(strm2);
     }
   }
