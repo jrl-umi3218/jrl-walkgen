@@ -231,16 +231,34 @@ bool PinocchioRobot::testInverseKinematics()
 
   std::vector<std::string> leftLegJointName,rightLegJointName,
       leftArmJointName,rightArmJointName;
-  leftLegJointName = {"JointModelFreeFlyer",
-                      "JointModelRZ","JointModelRX","JointModelRY",
-                      "JointModelRY","JointModelRY","JointModelRX"};
-  rightLegJointName = {"JointModelFreeFlyer",
-                      "JointModelRZ", "JointModelRX", "JointModelRY",
-                      "JointModelRY", "JointModelRY", "JointModelRX"};
-  leftArmJointName = {"JointModelRY", "JointModelRX", "JointModelRZ",
-                      "JointModelRY", "JointModelRZ", "JointModelRY"};
-  rightArmJointName = {"JointModelRY", "JointModelRX", "JointModelRZ",
-                       "JointModelRY", "JointModelRZ", "JointModelRY"};
+  leftLegJointName.push_back("JointModelFreeFlyer");
+  leftLegJointName.push_back("JointModelRZ");
+  leftLegJointName.push_back("JointModelRX");
+  leftLegJointName.push_back("JointModelRY");
+  leftLegJointName.push_back("JointModelRY");
+  leftLegJointName.push_back("JointModelRY");
+  leftLegJointName.push_back("JointModelRX");
+  
+  rightLegJointName.push_back("JointModelFreeFlyer");
+  rightLegJointName.push_back("JointModelRZ");
+  rightLegJointName.push_back("JointModelRX");
+  rightLegJointName.push_back("JointModelRY");
+  rightLegJointName.push_back("JointModelRY");
+  rightLegJointName.push_back("JointModelRY");
+  rightLegJointName.push_back("JointModelRX");
+  
+  leftArmJointName.push_back("JointModelRY");
+  leftArmJointName.push_back("JointModelRX");
+  leftArmJointName.push_back("JointModelRZ");
+  leftArmJointName.push_back("JointModelRY");
+  leftArmJointName.push_back("JointModelRZ");
+  leftArmJointName.push_back("JointModelRY");
+  rightArmJointName.push_back("JointModelRY");
+  rightArmJointName.push_back("JointModelRX");
+  rightArmJointName.push_back("JointModelRZ");
+  rightArmJointName.push_back("JointModelRY");
+  rightArmJointName.push_back("JointModelRZ");
+  rightArmJointName.push_back("JointModelRY");
 
   m_isLegInverseKinematic = true ;
   m_isArmInverseKinematic = true ;
@@ -357,7 +375,7 @@ void PinocchioRobot::computeForwardKinematics(MAL_VECTOR_TYPE(double) & q)
   m_q(4) = m_quat.y() ;
   m_q(5) = m_quat.z() ;
   m_q(6) = m_quat.w() ;
-  for(unsigned i=0; i<m_robotModel->nv-6 ; ++i)
+  for(int i=0; i<m_robotModel->nv-6 ; ++i)
   {
     m_q(7+i) = q(6+i);
   }
@@ -407,7 +425,7 @@ void PinocchioRobot::computeInverseDynamics(MAL_VECTOR_TYPE(double) & q,
   //m_v.segment<3>(3) = m_omega ;
   //m_a.segment<3>(3) = m_domega ;
 
-  for(unsigned i=6; i<m_robotModel->nv-6 ; ++i)
+  for(int i=6; i<m_robotModel->nv-6 ; ++i)
   {
     m_q(1+i) = q(i);
     m_v(i)   = v(i);

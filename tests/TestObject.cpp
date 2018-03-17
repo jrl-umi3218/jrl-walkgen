@@ -26,6 +26,9 @@
  */
 
 #include <fstream>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include "Debug.hh"
 #include "TestObject.hh"
 #include "pinocchio/parsers/urdf.hpp"
