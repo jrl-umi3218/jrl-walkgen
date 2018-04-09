@@ -467,7 +467,8 @@ std::vector<se3::JointIndex> PinocchioRobot::jointsBetween
       ++lastCommonRank;
   }
 
-  for(unsigned k=fromRootToFirst.size()-1; k>lastCommonRank ; --k)
+  for(std::vector<se3::JointIndex>::size_type k=fromRootToFirst.size()-1;
+      k>lastCommonRank ; --k)
   {
     out.push_back(fromRootToFirst[k]);
   }

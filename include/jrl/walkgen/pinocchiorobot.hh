@@ -52,7 +52,7 @@ namespace PatternGeneratorJRL
 
     /// Constructor and Destructor
     PinocchioRobot();
-    ~PinocchioRobot();
+    virtual ~PinocchioRobot();
 
     /// Functions computing kinematics and dynamics
     void computeInverseDynamics();
