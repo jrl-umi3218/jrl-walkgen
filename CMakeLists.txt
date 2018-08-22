@@ -29,6 +29,7 @@ SET(PROJECT_DESCRIPTION "Walking pattern generator for Humanoids")
 SET(PROJECT_URL "")
 
 SET(CXX_DISABLE_WERROR True)
+SET(DOXYGEN_USE_MATHJAX YES)
 
 # Initialize generic properties of the project
 SETUP_PROJECT()
