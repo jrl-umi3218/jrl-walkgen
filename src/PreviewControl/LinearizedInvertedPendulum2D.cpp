@@ -43,14 +43,14 @@ LinearizedInvertedPendulum2D::LinearizedInvertedPendulum2D()
   m_ComHeight = -1.0;
   m_SamplingPeriod = -1.0;
   m_InterpolationInterval = -1;
-  MAL_MATRIX_RESIZE(m_A,3,3);
-  MAL_MATRIX_RESIZE(m_B,3,1);
-  MAL_MATRIX_RESIZE(m_C,1,3);
+  m_A.resize(3,3);
+  m_B.resize(3,1);
+  m_C.resize(1,3);
 
-  MAL_VECTOR_RESIZE(m_xk,6);
-  MAL_VECTOR_RESIZE(m_CoM.x,3);
-  MAL_VECTOR_RESIZE(m_CoM.y,3);
-  MAL_VECTOR_RESIZE(m_zk,2);
+  m_xk.resize(6);
+  m_CoM.x.resize(3);
+  m_CoM.y.resize(3);
+  m_zk.resize(2);
 
   RESETDEBUG4("Debug2DLIPM.dat");
 }
@@ -105,7 +105,7 @@ void LinearizedInvertedPendulum2D::SetRobotControlPeriod(const double & aT)
 }
 
 
-void LinearizedInvertedPendulum2D::GetState(MAL_VECTOR_TYPE(double) &lxk)
+void LinearizedInvertedPendulum2D::GetState(Eigen::VectorXd &lxk)
 {
   //For compability reasons
   m_xk[0] = m_CoM.x[0];m_xk[1] = m_CoM.x[1];m_xk[2] = m_CoM.x[2];
@@ -258,8 +258,8 @@ int LinearizedInvertedPendulum2D::Interpolation(deque<COMState> &COMStates,
 
 com_t LinearizedInvertedPendulum2D::OneIteration(double ux, double uy)
 {
-  MAL_VECTOR_DIM(Bux,double,3);
-  MAL_VECTOR_DIM(Buy,double,3);
+  Eigen::VectorXd Bux(3);
+  Eigen::VectorXd Buy(3);
 
   Bux[0] = ux*m_B(0,0);
   Bux[1] = ux*m_B(1,0);
@@ -270,15 +270,12 @@ com_t LinearizedInvertedPendulum2D::OneIteration(double ux, double uy)
   Buy[2] = uy*m_B(2,0);
 
   // Simulate the dynamical system
-  m_CoM.x = MAL_RET_A_by_B(m_A,m_CoM.x);
+  m_CoM.x = m_A*m_CoM.x;
   m_CoM.x = m_CoM.x + Bux;
-  m_CoM.y = MAL_RET_A_by_B(m_A,m_CoM.y);
+  m_CoM.y = m_A*m_CoM.y;
   m_CoM.y = m_CoM.y + Buy;
 
   // Modif. from Dimitar: Initially a mistake regarding the ordering.
-  //MAL_C_eq_A_by_B(m_zk,m_C,m_xk);
-
-
   ODEBUG4( m_xk[0] << " " << m_xk[1] << " " << m_xk[2] << " " <<
 	   m_xk[3] << " " << m_xk[4] << " " << m_xk[5] << " " <<
 	   m_CoM.x  << " " << m_CoM.y  << " " <<

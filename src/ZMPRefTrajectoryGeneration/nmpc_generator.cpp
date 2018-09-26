@@ -33,7 +33,7 @@
 //#define DEBUG_COUT
 
 //#ifdef DEBUG
-void DumpMatrix(std::string fileName, MAL_MATRIX_TYPE(double) & M)
+void DumpMatrix(std::string fileName, Eigen::MatrixXf & M)
 {
   std::ofstream aof;
   std::ostringstream oss(std::ostringstream::ate);
@@ -64,7 +64,7 @@ void DumpMatrix(std::string fileName, MAL_MATRIX_TYPE(double) & M)
   }
 }
 
-void DumpVector(std::string fileName, MAL_VECTOR_TYPE(double) & M)
+void DumpVector(std::string fileName, Eigen::VectorXf & M)
 {
   std::ofstream aof;
   std::ostringstream oss(std::ostringstream::ate);
@@ -429,7 +429,7 @@ void NMPCgenerator::updateConstraint()
 }
 
 
-void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
+void NMPCgenerator::evalConstraint(Eigen::VectorXf & U)
 {
   //
   //  Eval real problem bounds : lb_ < g(U) < ub_
@@ -452,7 +452,7 @@ void NMPCgenerator::evalConstraint(MAL_VECTOR_TYPE(double) & U)
   {
     for(unsigned n=0 ; n<nf_ ; ++n)
     {
-      MAL_VECTOR_TYPE(double) HobsUxy = MAL_RET_A_by_B(Hobs_[obs][n],Uxy_);
+      Eigen::VectorXf HobsUxy = MAL_RET_A_by_B(Hobs_[obs][n],Uxy_);
       double deltaObs = 0 ;
       for(unsigned i=0 ; i<MAL_VECTOR_SIZE(HobsUxy) ; ++i)
           deltaObs += Uxy_(i) * (HobsUxy(i) + Aobs_[obs][n](i)) ;
@@ -1338,7 +1338,7 @@ void NMPCgenerator::initializeCoPConstraint()
   return ;
 }
 
-void NMPCgenerator::updateCoPconstraint(MAL_VECTOR_TYPE(double) &U)
+void NMPCgenerator::updateCoPconstraint(Eigen::VectorXf &U)
 {
   if(nc_cop_==0)
     return ;
@@ -1396,7 +1396,7 @@ void NMPCgenerator::updateCoPconstraint(MAL_VECTOR_TYPE(double) &U)
   return ;
 }
 
-void NMPCgenerator::evalCoPconstraint(MAL_VECTOR_TYPE(double) & U)
+void NMPCgenerator::evalCoPconstraint(Eigen::VectorXf & U)
 {
   if(nc_cop_==0)
     return ;
@@ -1514,7 +1514,7 @@ void NMPCgenerator::initializeFootPoseConstraint()
   return ;
 }
 
-void NMPCgenerator::updateFootPoseConstraint(MAL_VECTOR_TYPE(double) &U)
+void NMPCgenerator::updateFootPoseConstraint(Eigen::VectorXf &U)
 {
 //  if(nc_foot_==0)
 //    return ;
@@ -1619,7 +1619,7 @@ void NMPCgenerator::updateFootPoseConstraint(MAL_VECTOR_TYPE(double) &U)
   return ;
 }
 
-void NMPCgenerator::evalFootPoseConstraint(MAL_VECTOR_TYPE(double) & U)
+void NMPCgenerator::evalFootPoseConstraint(Eigen::VectorXf & U)
 {
   if(nc_foot_==0)
     return ;
@@ -1846,8 +1846,8 @@ void NMPCgenerator::updateObstacleConstraint()
   MAL_VECTOR_FILL(A,0.0);
   MAL_VECTOR_FILL(B,0.0);
 
-  Hobs_.resize(obstacles_.size() , std::vector<MAL_MATRIX_TYPE(double)>(nc_obs_,H) );
-  Aobs_.resize(obstacles_.size() , std::vector<MAL_VECTOR_TYPE(double)>(nc_obs_,A) );
+  Hobs_.resize(obstacles_.size() , std::vector<Eigen::MatrixXf>(nc_obs_,H) );
+  Aobs_.resize(obstacles_.size() , std::vector<Eigen::VectorXf>(nc_obs_,A) );
   UBobs_.resize(obstacles_.size() , B );
 
   unsigned nc = nf_ ;

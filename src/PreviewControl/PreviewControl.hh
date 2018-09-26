@@ -69,8 +69,8 @@ namespace PatternGeneratorJRL
   
 
       /*! \brief One iteration of the preview control. */
-      int OneIterationOfPreview(MAL_MATRIX(& x,double), 
-				MAL_MATRIX(& y,double),
+      int OneIterationOfPreview(Eigen::MatrixXd &x, 
+				Eigen::MatrixXd &y,
 				double & sxzmp, double & syzmp,
 				deque<PatternGeneratorJRL::ZMPPosition> & ZMPPositions,
 				unsigned int lindex,
@@ -79,7 +79,7 @@ namespace PatternGeneratorJRL
 
 
       /*! \brief One iteration of the preview control along one axis (using queues)*/
-      int OneIterationOfPreview1D(MAL_MATRIX( &x, double), 
+      int OneIterationOfPreview1D(Eigen::MatrixXd &x, 
 				  double & sxzmp,
 				  deque<double> & ZMPPositions,
 				  unsigned int lindex,
@@ -94,7 +94,7 @@ namespace PatternGeneratorJRL
 	\param [out] zmpx2: Resulting ZMP value.
 	\param [in] Simulation: This should be set to false.
        */
-      int OneIterationOfPreview1D(MAL_MATRIX( &x, double), 
+      int OneIterationOfPreview1D(Eigen::MatrixXd &x, 
 				  double & sxzmp,
 				  vector<double> & ZMPPositions,
 				  unsigned int lindex,
@@ -141,20 +141,20 @@ namespace PatternGeneratorJRL
     private:
 
       /*! \brief Matrices for preview control. */
-      MAL_MATRIX(m_A,double);
-      MAL_MATRIX(m_B,double);
-      MAL_MATRIX(m_C,double);
+      Eigen::MatrixXd m_A;
+      Eigen::MatrixXd m_B;
+      Eigen::MatrixXd m_C;
 
 
       /** \name Control parameters. 
        @{ */
 
       /*! Gain on the current state of the CoM. */
-      MAL_MATRIX(m_Kx,double);
+      Eigen::MatrixXd m_Kx;
       /*! Gain on the current ZMP. */
       double m_Ks;
       /*! Window  */
-      MAL_MATRIX(m_F,double);
+      Eigen::MatrixXd m_F;
       //@}
 
       /* \name Preview parameters. */

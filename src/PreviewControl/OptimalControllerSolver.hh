@@ -144,9 +144,9 @@ The augmented system is then
     static const unsigned int MODE_WITH_INITIALPOS=0;
 
     /*! A constructor */
-    OptimalControllerSolver(MAL_MATRIX(&A,double), 
-			    MAL_MATRIX(&b,double), 
-			    MAL_MATRIX(&c,double),
+    OptimalControllerSolver(Eigen::MatrixXd &A, 
+			    Eigen::MatrixXd &b, 
+			    Eigen::MatrixXd &c,
 			    double Q, double R, 
 			    unsigned int Nl);
 
@@ -162,19 +162,19 @@ The augmented system is then
     /*! Display the weights */
     void DisplayWeights();
 
-    bool GeneralizedSchur(MAL_MATRIX(&A,double),
-			  MAL_MATRIX(&B,double),
-			  MAL_VECTOR(&alphar,double),
-			  MAL_VECTOR(&alphai,double),
-			  MAL_VECTOR(&beta,double),
-			  MAL_MATRIX(&L,double),
-			  MAL_MATRIX(&R,double));
+    bool GeneralizedSchur(Eigen::MatrixXd &A,
+			  Eigen::MatrixXd &B,
+			  Eigen::VectorXd &alphar,
+			  Eigen::VectorXd &alphai,
+			  Eigen::VectorXd &beta,
+			  Eigen::MatrixXd &L,
+			  Eigen::MatrixXd &R);
 
     /*! To take matrix F aka the weights of the preview window . */
-    void GetF(MAL_MATRIX(& LF,double) );
+    void GetF(Eigen::MatrixXd & LF );
     
     /*! To take matrix K, aka the weight of the other part of the command */
-    void GetK(MAL_MATRIX(& LK,double) );
+    void GetK(Eigen::MatrixXd & LK );
 
   protected:
     
@@ -186,9 +186,9 @@ The augmented system is then
       \f}
       
      */
-    MAL_MATRIX(m_A,double);
-    MAL_MATRIX(m_b,double);
-    MAL_MATRIX(m_c,double);
+    Eigen::MatrixXd m_A;
+    Eigen::MatrixXd m_b;
+    Eigen::MatrixXd m_c;
 
     /*! The coefficent of the index criteria:
      \f[
@@ -199,8 +199,8 @@ The augmented system is then
 
     
     /*! The weights themselves */
-    MAL_MATRIX(m_K,double); 
-    MAL_MATRIX(m_F,double);
+    Eigen::MatrixXd m_K; 
+    Eigen::MatrixXd m_F;
 			  
     /*! The size of the window for the preview */
     int m_Nl;

@@ -135,9 +135,9 @@ namespace PatternGeneratorJRL
   /// \brief State of the center of mass
   struct com_t
   {
-    MAL_VECTOR(x,double);
-    MAL_VECTOR(y,double);
-    MAL_VECTOR(z,double);
+    Eigen::VectorXd x;
+    Eigen::VectorXd y;
+    Eigen::VectorXd z;
 
     struct com_t & operator=(const com_t &aCS);
 
@@ -150,13 +150,13 @@ namespace PatternGeneratorJRL
   // Support state of the robot at a certain point in time
   struct trunk_t
   {
-    MAL_VECTOR(x,double);
-    MAL_VECTOR(y,double);
-    MAL_VECTOR(z,double);
+    Eigen::VectorXd x;
+    Eigen::VectorXd y;
+    Eigen::VectorXd z;
 
-    MAL_VECTOR(yaw,double);
-    MAL_VECTOR(pitch,double);
-    MAL_VECTOR(roll,double);
+    Eigen::VectorXd yaw;
+    Eigen::VectorXd pitch;
+    Eigen::VectorXd roll;
 
     struct trunk_t & operator=(const trunk_t &aTS);
 
@@ -181,9 +181,9 @@ namespace PatternGeneratorJRL
       double X, Y, Yaw;
 
       /// \brief Reference vectors
-      MAL_VECTOR(X_vec,double);
-      MAL_VECTOR(Y_vec,double);
-      MAL_VECTOR(Yaw_vec,double);
+      Eigen::VectorXd Xvec;
+      Eigen::VectorXd Yvec;
+      Eigen::VectorXd Yawvec;
 
       frame_t();
       frame_t(const frame_t &);

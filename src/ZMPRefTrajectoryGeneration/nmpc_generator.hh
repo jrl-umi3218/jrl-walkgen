@@ -87,14 +87,14 @@ namespace PatternGeneratorJRL
     // build the constraints :
     void initializeConstraint();
     void updateConstraint();
-    void evalConstraint(MAL_VECTOR_TYPE(double) & U);
+    void evalConstraint(Eigen::VectorXf & U);
 
     void initializeCoPConstraint();
-    void evalCoPconstraint(MAL_VECTOR_TYPE(double) & U);
-    void updateCoPconstraint(MAL_VECTOR_TYPE(double) & U);
+    void evalCoPconstraint(Eigen::VectorXf & U);
+    void updateCoPconstraint(Eigen::VectorXf & U);
     void initializeFootPoseConstraint();
-    void evalFootPoseConstraint(MAL_VECTOR_TYPE(double) & U);
-    void updateFootPoseConstraint(MAL_VECTOR_TYPE(double) & U);
+    void evalFootPoseConstraint(Eigen::VectorXf & U);
+    void updateFootPoseConstraint(Eigen::VectorXf & U);
     void initializeFootVelIneqConstraint();
     void updateFootVelIneqConstraint();
     void initializeRotIneqConstraint();
@@ -220,17 +220,17 @@ namespace PatternGeneratorJRL
     double time_;
 
     // [x, dx, ddx], com (pos, vel, acc) at instant t_k on axis X
-    MAL_VECTOR_TYPE(double) c_k_x_;
+    Eigen::VectorXf c_k_x_;
     // [y, dy, ddy], com (pos, vel, acc) at instant t_k on axis Y
-    MAL_VECTOR_TYPE(double) c_k_y_;
+    Eigen::VectorXf c_k_y_;
 
     /**
     NOTE number of foot steps in prediction horizon changes between
     nf and nf+1, because when robot takes first step nf steps are
     planned on the prediction horizon, which makes a total of nf+1 steps.
     */
-    MAL_VECTOR_TYPE(double) v_kp1_ ;
-    MAL_MATRIX_TYPE(double) V_kp1_ ;
+    Eigen::VectorXf v_kp1_ ;
+    Eigen::MatrixXd V_kp1_ ;
 
     // Usefull for managing the PG
 
@@ -246,18 +246,18 @@ namespace PatternGeneratorJRL
     // Constraint Matrix
     // Center of Pressure constraint
     unsigned nc_cop_ ;
-    MAL_MATRIX_TYPE(double) Acop_xy_, Acop_theta_ ;
-    MAL_VECTOR_TYPE(double) UBcop_ ;
-    MAL_MATRIX_TYPE(double) D_kp1_xy_, D_kp1_theta_, Pzuv_, derv_Acop_map_  ;
-    MAL_MATRIX_TYPE(double) derv_Acop_map2_ ;
-    MAL_VECTOR_TYPE(double) b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_, v_kp1f_x_, v_kp1f_y_ ;
-    MAL_VECTOR_TYPE(double) v_kf_x_, v_kf_y_ ;
-    MAL_MATRIX_TYPE(double) diffMat_ ;
-    MAL_MATRIX_TYPE(double) rotMat_xy_, rotMat_theta_, rotMat_;
-    MAL_MATRIX_TYPE(double) A0_xy_, A0_theta_;
-    MAL_VECTOR_TYPE(double) B0_;
-    MAL_MATRIX_TYPE(double) Acop_theta_dummy0_;
-    MAL_VECTOR_TYPE(double) Acop_theta_dummy1_;
+    Eigen::MatrixXd Acop_xy_, Acop_theta_ ;
+    Eigen::VectorXf UBcop_ ;
+    Eigen::MatrixXd D_kp1_xy_, D_kp1_theta_, Pzuv_, derv_Acop_map_  ;
+    Eigen::MatrixXd derv_Acop_map2_ ;
+    Eigen::VectorXf b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_, v_kp1f_x_, v_kp1f_y_ ;
+    Eigen::VectorXf v_kf_x_, v_kf_y_ ;
+    Eigen::MatrixXd diffMat_ ;
+    Eigen::MatrixXd rotMat_xy_, rotMat_theta_, rotMat_;
+    Eigen::MatrixXd A0_xy_, A0_theta_;
+    Eigen::VectorXf B0_;
+    Eigen::MatrixXd Acop_theta_dummy0_;
+    Eigen::VectorXf Acop_theta_dummy1_;
 
     // Foot position constraint
     unsigned nc_foot_ ;
@@ -265,77 +265,77 @@ namespace PatternGeneratorJRL
     unsigned itBeforeLanding_ ;
     bool useItBeforeLanding_ ;
     int itMax_;
-    std::vector<MAL_MATRIX_TYPE(double)> Afoot_xy_, Afoot_theta_  ;
-    std::vector<MAL_VECTOR_TYPE(double)> UBfoot_ ;
-    std::vector<MAL_MATRIX_TYPE(double)> SelecMat_;
-    std::vector<MAL_MATRIX_TYPE(double)> A0f_xy_, A0f_theta_ ;
-    std::vector<MAL_VECTOR_TYPE(double)> B0f_;
-    std::vector<MAL_MATRIX_TYPE(double)> rotMat_vec_, drotMat_vec_ ;
-    MAL_MATRIX_TYPE(double) tmpRotMat_;
-    std::vector<MAL_VECTOR_TYPE(double)> deltaF_ ;
-    std::vector<MAL_VECTOR_TYPE(double)> AdRdF_ ;
-    MAL_MATRIX_TYPE(double) Afoot_xy_full_, Afoot_theta_full_  ;
-    MAL_VECTOR_TYPE(double) UBfoot_full_ ;
+    std::vector<Eigen::MatrixXd> Afoot_xy_, Afoot_theta_  ;
+    std::vector<Eigen::VectorXf> UBfoot_ ;
+    std::vector<Eigen::MatrixXd> SelecMat_;
+    std::vector<Eigen::MatrixXd> A0f_xy_, A0f_theta_ ;
+    std::vector<Eigen::VectorXf> B0f_;
+    std::vector<Eigen::MatrixXd> rotMat_vec_, drotMat_vec_ ;
+    Eigen::MatrixXd tmpRotMat_;
+    std::vector<Eigen::VectorXf> deltaF_ ;
+    std::vector<Eigen::VectorXf> AdRdF_ ;
+    Eigen::MatrixXd Afoot_xy_full_, Afoot_theta_full_  ;
+    Eigen::VectorXf UBfoot_full_ ;
 
     // Foot Velocity constraint
     unsigned nc_vel_ ;
     std::deque <RelativeFootPosition> desiredNextSupportFootRelativePosition ;
     std::vector<support_state_t> desiredNextSupportFootAbsolutePosition ;
-    MAL_MATRIX_TYPE(double) Avel_ ;
-    MAL_VECTOR_TYPE(double) Bvel_ ;
+    Eigen::MatrixXd Avel_ ;
+    Eigen::VectorXf Bvel_ ;
 
     // Foot Position constraint
     unsigned nc_pos_ ;
-    MAL_MATRIX_TYPE(double) Apos_ ;
-    MAL_VECTOR_TYPE(double) Bpos_ ;
+    Eigen::MatrixXd Apos_ ;
+    Eigen::VectorXf Bpos_ ;
 
     // Rotation linear constraint
     unsigned nc_rot_ ;
-    MAL_MATRIX_TYPE(double) Arot_ ;
-    MAL_VECTOR_TYPE(double) UBrot_,LBrot_ ;
+    Eigen::MatrixXd Arot_ ;
+    Eigen::VectorXf UBrot_,LBrot_ ;
 
     // Obstacle constraint
     unsigned nc_obs_ ;
-    std::vector< std::vector<MAL_MATRIX_TYPE(double)> > Hobs_ ;
-    std::vector< std::vector<MAL_VECTOR_TYPE(double)> > Aobs_ ;
-    std::vector< MAL_VECTOR_TYPE(double) > UBobs_ ;
+    std::vector< std::vector<Eigen::MatrixXd> > Hobs_ ;
+    std::vector< std::vector<Eigen::VectorXf> > Aobs_ ;
+    std::vector< Eigen::VectorXf > UBobs_ ;
     std::vector<Circle> obstacles_ ;
-    MAL_VECTOR_TYPE(double) qp_J_obs_i_ ;
+    Eigen::VectorXf qp_J_obs_i_ ;
     // Standing constraint :
     unsigned nc_stan_ ;
-    MAL_MATRIX_TYPE(double) Astan_ ;
-    MAL_VECTOR_TYPE(double) UBstan_, LBstan_ ;
+    Eigen::MatrixXd Astan_ ;
+    Eigen::VectorXf UBstan_, LBstan_ ;
 
     // evaluate constraint
     // real problem bounds : lb_ < g(U) < ub_
-    MAL_VECTOR_TYPE(double) ub_  ;
-    MAL_VECTOR_TYPE(double) gU_  ;
-    MAL_VECTOR_TYPE(double) Uxy_  ;
-    MAL_VECTOR_TYPE(double) gU_cop_, gU_vel_ ;
-    MAL_VECTOR_TYPE(double) gU_foot_ ;
-    MAL_VECTOR_TYPE(double) gU_obs_, gU_rot_ , gU_stan_ ;
+    Eigen::VectorXf ub_  ;
+    Eigen::VectorXf gU_  ;
+    Eigen::VectorXf Uxy_  ;
+    Eigen::VectorXf gU_cop_, gU_vel_ ;
+    Eigen::VectorXf gU_foot_ ;
+    Eigen::VectorXf gU_obs_, gU_rot_ , gU_stan_ ;
 
     // Cost Function
     unsigned nv_ ; // number of degrees of freedom
     // initial problem matrix
-    MAL_MATRIX_TYPE(double) Q_theta_, I_NN_, I_FF_ ;
+    Eigen::MatrixXd Q_theta_, I_NN_, I_FF_ ;
 
     // decomposition of p_xy_
     // p_xy_ = ( p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ )
-    MAL_VECTOR_TYPE(double) p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ ;
-    MAL_VECTOR_TYPE(double) Pvsc_x_ , Pvsc_y_ ;
+    Eigen::VectorXf p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ ;
+    Eigen::VectorXf Pvsc_x_ , Pvsc_y_ ;
 
     // decomposition of Q_x_=Q_y_
     // Q_x = ( Q_x_XX Q_x_XF ) = Q_y
     //       ( Q_x_FX Q_x_FF )
-    MAL_MATRIX_TYPE(double) Q_x_XX_, Q_x_XF_, Q_x_FX_, Q_x_FF_ ;
-    MAL_MATRIX_TYPE(double) Q_y_XX_;// Q_x_XX_ != Q_y_XX_
+    Eigen::MatrixXd Q_x_XX_, Q_x_XF_, Q_x_FX_, Q_x_FF_ ;
+    Eigen::MatrixXd Q_y_XX_;// Q_x_XX_ != Q_y_XX_
 
     // Line Search
     bool useLineSearch_ ;
-    MAL_VECTOR_TYPE(double) p_ , U_n_, selectActiveConstraint ;
-    MAL_VECTOR_TYPE(double) JdU_, contraintValue ;
-    MAL_VECTOR_TYPE(double) HUn_ ;
+    Eigen::VectorXf p_ , U_n_, selectActiveConstraint ;
+    Eigen::VectorXf JdU_, contraintValue ;
+    Eigen::VectorXf HUn_ ;
     double lineStep_, lineStep0_, stepParam_ ; // step searched
     double mu_ ; // weight between cost function and constraints
     double cm_, c_ ; // Merit Function Jacobian
@@ -348,12 +348,12 @@ namespace PatternGeneratorJRL
     unsigned nceq_ ;
     unsigned ncineq_ ;
     unsigned nc_ ;
-    MAL_MATRIX_TYPE(double) qp_H_   ;
-    MAL_VECTOR_TYPE(double) qp_g_   ;
-    MAL_MATRIX_TYPE(double) qp_J_   ; //constraint Jacobian
-    MAL_VECTOR_TYPE(double) qp_ubJ_ ; //constraint Jacobian
+    Eigen::MatrixXd qp_H_   ;
+    Eigen::VectorXf qp_g_   ;
+    Eigen::MatrixXd qp_J_   ; //constraint Jacobian
+    Eigen::VectorXf qp_ubJ_ ; //constraint Jacobian
     // temporary usefull variable for matrix manipulation
-    MAL_VECTOR_TYPE(double) qp_g_x_, qp_g_y_, qp_g_theta_ ;
+    Eigen::VectorXf qp_g_x_, qp_g_y_, qp_g_theta_ ;
 
     // Free variable of the system
     // U_       = [C_kp1_x_ F_kp1_x_ C_kp1_y_ F_kp1_y_ F_kp1_theta_]^T
@@ -361,13 +361,13 @@ namespace PatternGeneratorJRL
     // U_x      = [C_kp1_x_ F_kp1_x_]^T
     // U_y      = [C_kp1_y_ F_kp1_y_]^T
     // U_theta_ = [F_kp1_theta_]^T
-    MAL_VECTOR_TYPE(double) U_           ;
-    MAL_VECTOR_TYPE(double) U_xy_        ;
-    MAL_VECTOR_TYPE(double) U_x_         ;
-    MAL_VECTOR_TYPE(double) U_y_         ;
-    MAL_VECTOR_TYPE(double) F_kp1_x_     ;
-    MAL_VECTOR_TYPE(double) F_kp1_y_     ;
-    MAL_VECTOR_TYPE(double) F_kp1_theta_ ;
+    Eigen::VectorXf U_           ;
+    Eigen::VectorXf U_xy_        ;
+    Eigen::VectorXf U_x_         ;
+    Eigen::VectorXf U_y_         ;
+    Eigen::VectorXf F_kp1_x_     ;
+    Eigen::VectorXf F_kp1_y_     ;
+    Eigen::VectorXf F_kp1_theta_ ;
 
     // Time constant parameter
     //////////////////////////
@@ -406,17 +406,17 @@ namespace PatternGeneratorJRL
     // Z_k+1_%    = position     of the ZMP on the whole preview (free variable)
 
     // C_k+1_% = Pps * c_k_% + Ppu dddC_k+1_%  (%={x,y})
-    MAL_MATRIX_TYPE(double) Pps_ ;
-    MAL_MATRIX_TYPE(double) Ppu_ ;
+    Eigen::MatrixXd Pps_ ;
+    Eigen::MatrixXd Ppu_ ;
     // dC_k+1_% = Pvs * c_k_% + Pvu dddC_k+1_%
-    MAL_MATRIX_TYPE(double) Pvs_ ;
-    MAL_MATRIX_TYPE(double) Pvu_ ;
+    Eigen::MatrixXd Pvs_ ;
+    Eigen::MatrixXd Pvu_ ;
     // ddC_k+1_% = Pas * c_k_% + Pau dddC_k+1_%
-    MAL_MATRIX_TYPE(double) Pas_ ;
-    MAL_MATRIX_TYPE(double) Pau_ ;
+    Eigen::MatrixXd Pas_ ;
+    Eigen::MatrixXd Pau_ ;
     // Z_k+1_% = Pzs * c_k_% + Pzu dddC_k+1_%
-    MAL_MATRIX_TYPE(double) Pzs_ ;
-    MAL_MATRIX_TYPE(double) Pzu_ ;
+    Eigen::MatrixXd Pzs_ ;
+    Eigen::MatrixXd Pzu_ ;
 
     // Convex Hulls for ZMP and FootStep constraints :
     support_state_t dummySupp_ ;
@@ -425,23 +425,23 @@ namespace PatternGeneratorJRL
     double FeetDistance_;
     // linear system corresponding to the foot step constraints
     // right foot polygonal hull
-    MAL_MATRIX_TYPE(double) A0r_  ;
-    MAL_VECTOR_TYPE(double) ubB0r_;
+    Eigen::MatrixXd A0r_  ;
+    Eigen::VectorXf ubB0r_;
     // left foot polygonal hull
-    MAL_MATRIX_TYPE(double) A0l_  ;
-    MAL_VECTOR_TYPE(double) ubB0l_;
+    Eigen::MatrixXd A0l_  ;
+    Eigen::VectorXf ubB0l_;
 
     // linear systems corresponding to the CoP constraints
     // right foot hull minus security margin
-    MAL_MATRIX_TYPE(double) A0rf_    ;
-    MAL_VECTOR_TYPE(double) ubB0rf_  ;
+    Eigen::MatrixXd A0rf_    ;
+    Eigen::VectorXf ubB0rf_  ;
     // left foot hull minus security margin
-    MAL_MATRIX_TYPE(double) A0lf_    ;
-    MAL_VECTOR_TYPE(double) ubB0lf_  ;
+    Eigen::MatrixXd A0lf_    ;
+    Eigen::VectorXf ubB0lf_  ;
     // foot hull minus security margin for standing still
     // or dealing with the switching mass phase
-    MAL_MATRIX_TYPE(double) A0ds_   ;
-    MAL_VECTOR_TYPE(double) ubB0ds_ ;
+    Eigen::MatrixXd A0ds_   ;
+    Eigen::VectorXf ubB0ds_ ;
 
     // [Vx, Vy, Vtheta], reference velocity express in local frame
     // [Vx, Vy, Vtheta], reference velocity express in global frame
@@ -455,7 +455,7 @@ namespace PatternGeneratorJRL
     Eigen::QuadProgDense * QP_ ;
     Eigen::MatrixXd QuadProg_H_, QuadProg_J_eq_, QuadProg_J_ineq_;
     Eigen::VectorXd QuadProg_g_, QuadProg_bJ_eq_, QuadProg_lbJ_ineq_, deltaU_;
-    MAL_VECTOR_TYPE(double) deltaU_thresh_ ;
+    Eigen::VectorXf deltaU_thresh_ ;
   };
 
 

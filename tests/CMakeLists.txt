@@ -15,8 +15,6 @@
 
 INCLUDE(CTest)
 
-# Import jrl-mal flags.
-ADD_DEFINITIONS(${JRL_MAL_CFLAGS})
 
 # Make sure private headers can be used.
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
@@ -26,7 +24,7 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake
                ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
 
 ADD_REQUIRED_DEPENDENCY("simple_humanoid_description >= 1.0.1")
-ADD_OPTIONAL_DEPENDENCY("hrp2_14_description >= 1.0.2")
+#ADD_OPTIONAL_DEPENDENCY("hrp2_14_description >= 1.0.2")
 
 #################
 ## Generic test #
@@ -41,7 +39,6 @@ IF(GENERIC_TEST)
     )
 
   TARGET_LINK_LIBRARIES(TestFootPrintPGInterface ${PROJECT_NAME})
-  PKG_CONFIG_USE_DEPENDENCY(TestFootPrintPGInterface jrl-mal)
   ADD_DEPENDENCIES(TestFootPrintPGInterface ${PROJECT_NAME})
 ENDIF(GENERIC_TEST)
 
@@ -73,8 +70,6 @@ ADD_EXECUTABLE(TestRiccatiEquation
   TestRiccatiEquation.cpp
   ../src/PreviewControl/OptimalControllerSolver.cpp
   )
-# Need this dependency for the use of the fortran functions (it seems)
-PKG_CONFIG_USE_DEPENDENCY(TestRiccatiEquation jrl-mal)
 
 # Add test on the ricatti equation
 ADD_TEST(TestRiccatiEquation TestRiccatiEquation)
@@ -110,7 +105,6 @@ MACRO(ADD_JRL_WALKGEN_EXE test_arg test_file_name)
   )
 
   TARGET_LINK_LIBRARIES(${test_name} ${PROJECT_NAME})
-  PKG_CONFIG_USE_DEPENDENCY(${test_name} jrl-mal)
   PKG_CONFIG_USE_DEPENDENCY(${test_name} pinocchio)
 
 ENDMACRO(ADD_JRL_WALKGEN_EXE)

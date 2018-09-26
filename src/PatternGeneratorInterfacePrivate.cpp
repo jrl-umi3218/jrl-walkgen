@@ -559,7 +559,7 @@ namespace PatternGeneratorJRL {
     memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
     memset(&InitRightFootAbsPos,0,sizeof(InitRightFootAbsPos));
 
-    MAL_VECTOR(lStartingWaistPose,double);
+    Eigen::VectorXd lStartingWaistPose;
 
     EvaluateStartingState(lStartingCOMState,
                           lStartingZMPPosition,
@@ -602,7 +602,7 @@ namespace PatternGeneratorJRL {
     memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
     memset(&InitRightFootAbsPos,0,sizeof(InitRightFootAbsPos));
 
-    MAL_VECTOR(lStartingWaistPose,double);
+    Eigen::VectorXd lStartingWaistPose;
 
     EvaluateStartingState(lStartingCOMState,
                           lStartingZMPPosition,
@@ -659,7 +659,7 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::EvaluateStartingCOM(MAL_VECTOR(  & Configuration,double),
                                                              MAL_S3_VECTOR(  & lStartingCOMState,double))
   {
-    MAL_VECTOR(Velocity,double);
+    Eigen::VectorXd Velocity;
     MAL_VECTOR_RESIZE(Velocity,MAL_VECTOR_SIZE(Configuration));
     for(unsigned int i=0;i<MAL_VECTOR_SIZE(Configuration);i++)
       Velocity[i] = 0.0;
@@ -673,11 +673,11 @@ namespace PatternGeneratorJRL {
 
   void PatternGeneratorInterfacePrivate::EvaluateStartingState(COMState  & lStartingCOMState,
                                                                MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
-                                                               MAL_VECTOR_TYPE(double) & lStartingWaistPose,
+                                                               Eigen::VectorXd & lStartingWaistPose,
                                                                FootAbsolutePosition & InitLeftFootAbsPos,
                                                                FootAbsolutePosition & InitRightFootAbsPos)
   {
-    MAL_VECTOR(lBodyInit,double);
+    Eigen::VectorXd lBodyInit;
     MAL_VECTOR_RESIZE(lBodyInit,m_CurrentActuatedJointValues.size());
 
     for(unsigned int j=0; j<m_CurrentActuatedJointValues.size();j++)
@@ -810,7 +810,7 @@ namespace PatternGeneratorJRL {
 
 
     // Initialize consequently the ComAndFoot Realization object.
-    MAL_VECTOR(lStartingWaistPose,double);
+    Eigen::VectorXd lStartingWaistPose;
     m_GlobalStrategyManager->EvaluateStartingState(BodyAnglesIni,
                                                    lStartingCOMState,
                                                    lStartingZMPPosition,
@@ -983,7 +983,7 @@ namespace PatternGeneratorJRL {
 
 
 
-    MAL_VECTOR_TYPE(double) lCurrentConfiguration;
+    Eigen::VectorXd lCurrentConfiguration;
 
     lCurrentConfiguration = m_PinocchioRobot->currentConfiguration();
 
@@ -1306,9 +1306,9 @@ namespace PatternGeneratorJRL {
 
 
 
-  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-                                                                    MAL_VECTOR_TYPE(double) & CurrentVelocity,
-                                                                    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
+                                                                    Eigen::VectorXd & CurrentVelocity,
+                                                                    Eigen::VectorXd & CurrentAcceleration,
                                                                     MAL_VECTOR( &ZMPTarget,double))
   {
     COMState finalCOMState;
@@ -1329,9 +1329,9 @@ namespace PatternGeneratorJRL {
                                                                     ZMPPosition &ZMPRefPos,
                                                                     COMPosition &COMRefPos)
   {
-    MAL_VECTOR_TYPE(double)  CurrentConfiguration;
-    MAL_VECTOR_TYPE(double)  CurrentVelocity;
-    MAL_VECTOR_TYPE(double)  CurrentAcceleration;
+    Eigen::VectorXd  CurrentConfiguration;
+    Eigen::VectorXd  CurrentVelocity;
+    Eigen::VectorXd  CurrentAcceleration;
     MAL_VECTOR( ZMPTarget,double);
     COMState aCOMRefState;
 
@@ -1351,9 +1351,9 @@ namespace PatternGeneratorJRL {
   }
 
 
-  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-                                                                    MAL_VECTOR_TYPE(double) & CurrentVelocity,
-                                                                    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
+                                                                    Eigen::VectorXd & CurrentVelocity,
+                                                                    Eigen::VectorXd & CurrentAcceleration,
                                                                     MAL_VECTOR( &ZMPTarget,double),
                                                                     COMPosition &finalCOMPosition,
                                                                     FootAbsolutePosition &LeftFootPosition,
@@ -1371,9 +1371,9 @@ namespace PatternGeneratorJRL {
     return m_Running;
   }
 
-  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-                                                                    MAL_VECTOR_TYPE(double) & CurrentVelocity,
-                                                                    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+  bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
+                                                                    Eigen::VectorXd & CurrentVelocity,
+                                                                    Eigen::VectorXd & CurrentAcceleration,
                                                                     MAL_VECTOR( &ZMPTarget,double),
                                                                     COMState &finalCOMState,
                                                                     FootAbsolutePosition &LeftFootPosition,

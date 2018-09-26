@@ -51,11 +51,11 @@ PreviewControl::PreviewControl(SimplePluginManager *lSPM,
   m_Zc = 0.0;
   m_SizeOfPreviewWindow = 0;
 
-  MAL_MATRIX_RESIZE(m_A,3,3);
-  MAL_MATRIX_RESIZE(m_B,3,1);
-  MAL_MATRIX_RESIZE(m_C,1,3);
+  Eigen::MatrixXd m_A.resize(3,3);
+  Eigen::MatrixXd m_B.resize(3,1);
+  Eigen::MatrixXd m_C.resize(1,3);
 
-  MAL_MATRIX_RESIZE(m_Kx,1,3);
+  Eigen::MatrixXd m_Kx.resize(1,3);
   m_Ks = 0;
 
 
@@ -166,7 +166,7 @@ void PreviewControl::ReadPrecomputedFile(string aFileName)
 
       m_SizeOfPreviewWindow = (unsigned int)(m_PreviewControlTime/
 					     m_SamplingPeriod);
-      MAL_MATRIX_RESIZE(m_F,m_SizeOfPreviewWindow,1);
+      Eigen::MatrixXd m_F.resize(m_SizeOfPreviewWindow,1);
 
       for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
 	{
@@ -216,7 +216,7 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
   m_C(0,2) = -m_Zc/9.81;
   ODEBUG(" m_Zc: " << m_Zc << " m_C(0,2)" << m_C(0,2));
 
-  MAL_MATRIX_TYPE( double) lF,lK;
+  Eigen::MatrixXd lF,lK;
 
   double Q=0.0,R=0.0;
   int Nl;
@@ -236,14 +236,14 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
       R = 1e-6;
 
       // Build the derivated system
-      MAL_MATRIX_DIM(Ax,double,4,4);
-      MAL_MATRIX_FILL(Ax,0.0);
-      MAL_MATRIX(tmpA,double);
-      MAL_MATRIX_DIM(bx,double,4,1);
-      MAL_MATRIX(tmpb,double);
-      MAL_MATRIX_DIM(cx,double,1,4);
+      Eigen::Matrix<double,4,4> Ax;
+      Ax::Zero();
+      Eigen::MatrixXd tmpA;
+      Eigen::Matrix<double,4,1> bx;
+      Eigen::MatrixXd tmpb;
+      Eigen::Matrix<double,1,4> cx;
 
-      tmpA = MAL_RET_A_by_B(m_C,m_A);
+      tmpA = m_C*m_A;
 
       Ax(0,0)= 1.0;
       for(int i=0;i<3;i++)
@@ -254,7 +254,7 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
           Ax(i+1,j+1) = m_A(i,j);
       }
 
-      tmpb = MAL_RET_A_by_B(m_C,m_B);
+      tmpb = m_C*m_B;
       bx(0,0) = tmpb(0,0);
       for(int i=0;i<3;i++)
       {
@@ -318,13 +318,13 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
 
   m_SizeOfPreviewWindow = (unsigned int)(m_PreviewControlTime/
 					 m_SamplingPeriod);
-  MAL_MATRIX_RESIZE(m_F,m_SizeOfPreviewWindow,1);
+  Eigen::MatrixXd m_F.resize(m_SizeOfPreviewWindow,1);
 
   m_Coherent = true;
 }
 
-int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
-					  MAL_MATRIX(& y, double),
+int PreviewControl::OneIterationOfPreview(Eigen::MatrixXd &x,
+					  Eigen::MatrixXd& y,
 					  double & sxzmp, double & syzmp,
 					  deque<PatternGeneratorJRL::ZMPPosition> & ZMPPositions,
 					  unsigned int lindex,
@@ -334,10 +334,10 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
 
   double ux=0.0, uy=0.0;
 
-  MAL_MATRIX_DIM(r,double,1,1);
+  Eigen::Matrix<double,1,1> r;
 
   // Compute the command.
-  r = MAL_RET_A_by_B(m_Kx,x);
+  r = m_Kx * x;
   ux = - r(0,0) + m_Ks * sxzmp ;
 
   if(ZMPPositions.size()<m_SizeOfPreviewWindow)
@@ -348,20 +348,20 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
     ux += m_F(i,0)* ZMPPositions[lindex+i].px;
 
-  r = MAL_RET_A_by_B(m_Kx, y);
+  r = m_Kx * y;
   uy = - r(0,0) + m_Ks * syzmp;
 
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
     uy += m_F(i,0)* ZMPPositions[lindex+i].py;
 
-  x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
-  y = MAL_RET_A_by_B(m_A,y) + uy * m_B;
+  x = m_A*x + ux * m_B;
+  y = m_A*y + uy * m_B;
 
   zmpx2 = 0.0;
-  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(x);i++)
+  for(unsigned int i=0;i<x.rows();i++)
     zmpx2 += m_C(0,i)*x(i,0);
   zmpy2 = 0.0;
-  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(y);i++)
+  for(unsigned int i=0;i<y.rows();i++)
     zmpy2 += m_C(0,i)*y(i,0);
 
   if (Simulation)
@@ -375,7 +375,7 @@ int PreviewControl::OneIterationOfPreview(MAL_MATRIX( &x, double),
   return 0;
 }
 
-int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
+int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
 					    double & sxzmp,
 					    deque<double> & ZMPPositions,
 					    unsigned int lindex,
@@ -385,10 +385,10 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
 
   double ux=0.0;
 
-  MAL_MATRIX_DIM(r,double,1,1);
+  Eigen::MatrixXd<double,1,1> r;
 
   // Compute the command.
-  r = MAL_RET_A_by_B(m_Kx,x);
+  r = m_Kx * x;
   ux = - r(0,0) + m_Ks * sxzmp ;
 
   ODEBUG( "x: " << x);
@@ -403,10 +403,10 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
   for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
     ux += m_F(i,0)* ZMPPositions[lindex+i];
   ODEBUG(" ux preview window phase: " << ux );
-  x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
+  x = m_A*x + ux * m_B;
 
   zmpx2 = 0.0;
-  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(x);i++)
+  for(unsigned int i=0;i<x.rows();i++)
     zmpx2 += m_C(0,i)*x(i,0);
 
 
@@ -422,7 +422,7 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
   return 0;
 }
 
-int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
+int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
 					    double & sxzmp,
 					    vector<double> & ZMPPositions,
 					    unsigned int lindex,
@@ -432,10 +432,10 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
 
   double ux=0.0;
 
-  MAL_MATRIX_DIM(r,double,1,1);
+  Eigen::MatrixXd<double,1,1> r;
 
   // Compute the command.
-  r = MAL_RET_A_by_B(m_Kx,x);
+  r = m_Kx * x;
   ux = - r(0,0) + m_Ks * sxzmp ;
 
   ODEBUG( "x: " << x);
@@ -467,10 +467,10 @@ int PreviewControl::OneIterationOfPreview1D(MAL_MATRIX( &x, double),
 	ux += m_F(i,0)* ZMPPositions[i];
     }
   ODEBUG(" ux preview window phase: " << ux );
-  x = MAL_RET_A_by_B(m_A,x) + ux * m_B;
+  x = m_A*x + ux * m_B;
 
   zmpx2 = 0.0;
-  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(x);i++)
+  for(unsigned int i=0;i<x.rows();i++)
     zmpx2 += m_C(0,i)*x(i,0);
 
   if (Simulation)

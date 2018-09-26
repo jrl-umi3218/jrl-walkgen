@@ -33,6 +33,7 @@ frame work */
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/multibody/data.hpp"
 #include <jrl/mal/matrixabstractlayer.hh>
+
 namespace PatternGeneratorJRL
 {
   struct PinocchioRobotFoot_t{
@@ -40,7 +41,7 @@ namespace PatternGeneratorJRL
     double soleDepth ; // z axis
     double soleWidth ; // y axis
     double soleHeight ;// x axis
-    vector3d anklePosition ;
+    Eigen::Vector3d anklePosition ;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
   typedef PinocchioRobotFoot_t PRFoot ;
@@ -57,12 +58,12 @@ namespace PatternGeneratorJRL
 
     /// Functions computing kinematics and dynamics
     void computeInverseDynamics();
-    void computeInverseDynamics(MAL_VECTOR_TYPE(double) & q,
-                                MAL_VECTOR_TYPE(double) & v,
-                                MAL_VECTOR_TYPE(double) & a);
+    void computeInverseDynamics(Eigen::VectorXd & q,
+                                Eigen::VectorXd & v,
+                                Eigen::VectorXd & a);
 
     void computeForwardKinematics();
-    void computeForwardKinematics(MAL_VECTOR_TYPE(double) & q);
+    void computeForwardKinematics(Eigen::VectorXd & q);
 
     void RPYToSpatialFreeFlyer(Eigen::Vector3d & rpy,
                                Eigen::Vector3d & drpy,
@@ -89,9 +90,9 @@ namespace PatternGeneratorJRL
     virtual bool ComputeSpecializedInverseKinematics(
         const se3::JointIndex &jointRoot,
         const se3::JointIndex &jointEnd,
-        const MAL_S4x4_MATRIX_TYPE(double) & jointRootPosition,
-        const MAL_S4x4_MATRIX_TYPE(double) & jointEndPosition,
-        MAL_VECTOR_TYPE(double) &q);
+        const Eigen::Matrix4d & jointRootPosition,
+        const Eigen::Matrix4d & jointEndPosition,
+        Eigen::VectorXd &q);
 
     ///
     /// \brief testInverseKinematics :
@@ -118,14 +119,14 @@ namespace PatternGeneratorJRL
 
   private :
     // needed for the inverse geometry (ComputeSpecializedInverseKinematics)
-    void getWaistFootKinematics(const matrix4d & jointRootPosition,
-                                const matrix4d & jointEndPosition,
-                                vectorN &q,
-                                vector3d Dt);
+    void getWaistFootKinematics(const Eigen::Matrix4d & jointRootPosition,
+                                const Eigen::Matrix4d & jointEndPosition,
+                                Eigen::VectorXd &q,
+                                Eigen::Vector3d Dt);
     double ComputeXmax(double & Z);
-    void getShoulderWristKinematics(const matrix4d & jointRootPosition,
-                                    const matrix4d & jointEndPosition,
-                                    vectorN &q,
+    void getShoulderWristKinematics(const Eigen::Matrix4d & jointRootPosition,
+                                    const Eigen::Matrix4d & jointEndPosition,
+                                    Eigen::VectorXd &q,
                                     int side);
     void DetectAutomaticallyShoulders();
     void DetectAutomaticallyOneShoulder(se3::JointIndex aWrist,
@@ -163,17 +164,17 @@ namespace PatternGeneratorJRL
     inline se3::JointModelVector & getActuatedJoints()
     {return m_robotModel->joints;}
 
-    inline MAL_VECTOR_TYPE(double) currentConfiguration()
+    inline Eigen::VectorXd currentConfiguration()
     {return m_qmal;}
-    inline MAL_VECTOR_TYPE(double) currentVelocity()
+    inline Eigen::VectorXd currentVelocity()
     {return m_vmal;}
-    inline MAL_VECTOR_TYPE(double) currentAcceleration()
+    inline Eigen::VectorXd currentAcceleration()
     {return m_amal;}
 
     inline unsigned numberDof()
     {return m_robotModel->nv;}
 
-    inline void zeroMomentumPoint(MAL_S3_VECTOR_TYPE(double) & zmp)
+    inline void zeroMomentumPoint(Eigen::Vector3d & zmp)
     {
       m_externalForces = m_robotData->liMi[1].act(m_robotData->f[1]);
       m_f = m_externalForces.linear() ;
@@ -183,16 +184,16 @@ namespace PatternGeneratorJRL
       zmp(2) = 0.0 ; // by default
     }
 
-    inline void positionCenterOfMass(MAL_S3_VECTOR_TYPE(double) & com)
+    inline void positionCenterOfMass(Eigen::Vector3d & com)
     {
       m_com = m_robotData->com[0] ;
       com(0) = m_com(0) ;
       com(1) = m_com(1) ;
       com(2) = m_com(2) ;
     }
-    inline void CenterOfMass(MAL_S3_VECTOR_TYPE(double) &   com,
-                             MAL_S3_VECTOR_TYPE(double) &  dcom,
-                             MAL_S3_VECTOR_TYPE(double) & ddcom)
+    inline void CenterOfMass(Eigen::Vector3d &   com,
+                             Eigen::Vector3d &  dcom,
+                             Eigen::Vector3d & ddcom)
     {
       m_com = m_robotData->acom[0] ;
       ddcom(0) = m_com(0) ;
@@ -212,11 +213,11 @@ namespace PatternGeneratorJRL
 
     /// SETTERS
     /// ///////
-    inline void currentConfiguration(MAL_VECTOR_TYPE(double) conf)
+    inline void currentConfiguration(Eigen::VectorXd conf)
     {m_qmal=conf;}
-    inline void currentVelocity(MAL_VECTOR_TYPE(double) vel)
+    inline void currentVelocity(Eigen::VectorXd vel)
     {m_vmal=vel;}
-    inline void currentAcceleration(MAL_VECTOR_TYPE(double) acc)
+    inline void currentAcceleration(Eigen::VectorXd acc)
     {m_amal=acc;}
 
     /// Initialization functions
@@ -242,9 +243,9 @@ namespace PatternGeneratorJRL
     se3::JointIndex m_chest, m_waist, m_leftShoulder, m_rightShoulder ;
     se3::JointIndex m_leftWrist , m_rightWrist ;
 
-    MAL_VECTOR_TYPE(double) m_qmal ;
-    MAL_VECTOR_TYPE(double) m_vmal ;
-    MAL_VECTOR_TYPE(double) m_amal ;
+    Eigen::VectorXd m_qmal ;
+    Eigen::VectorXd m_vmal ;
+    Eigen::VectorXd m_amal ;
     Eigen::VectorXd m_q ;
     Eigen::VectorXd m_v ;
     Eigen::VectorXd m_a ;
@@ -265,7 +266,7 @@ namespace PatternGeneratorJRL
     bool m_isArmInverseKinematic ;
 
     // length between the waist and the hip
-    MAL_S3_VECTOR_TYPE(double) m_leftDt, m_rightDt ;
+    Eigen::Vector3d m_leftDt, m_rightDt ;
     double m_femurLength ;
     double m_tibiaLengthZ ;
     double m_tibiaLengthY ;
