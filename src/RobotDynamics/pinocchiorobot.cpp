@@ -43,12 +43,12 @@ PinocchioRobot::PinocchioRobot()
   m_v.fill(0.0);
   m_a.fill(0.0);
   m_tau.fill(0.0);
-  MAL_VECTOR_RESIZE(m_qmal,50);
-  MAL_VECTOR_RESIZE(m_vmal,50);
-  MAL_VECTOR_RESIZE(m_amal,50);
-  MAL_VECTOR_FILL(m_qmal,0.0);
-  MAL_VECTOR_FILL(m_vmal,0.0);
-  MAL_VECTOR_FILL(m_amal,0.0);
+  m_qmal.resize( 50 );
+  m_vmal.resize( 50 );
+  m_amal.resize( 50 );
+  m_qmal.Zero(50);
+  m_vmal.Zero(50);
+  m_amal.Zero(50);
 
   m_f.fill(0.0);
   m_n.fill(0.0);
@@ -171,12 +171,12 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   m_tau.resize(m_robotModel->nv,1);
   se3::forwardKinematics(*m_robotModel,*m_robotDataInInitialePose,m_q);
 
-  MAL_VECTOR_RESIZE(m_qmal,m_robotModel->nv);
-  MAL_VECTOR_RESIZE(m_vmal,m_robotModel->nv);
-  MAL_VECTOR_RESIZE(m_amal,m_robotModel->nv);
-  MAL_VECTOR_FILL(m_qmal,0.0);
-  MAL_VECTOR_FILL(m_vmal,0.0);
-  MAL_VECTOR_FILL(m_amal,0.0);
+  m_qmal.resize(m_robotModel->nv);
+  m_vmal.resize(m_robotModel->nv);
+  m_amal.resize(m_robotModel->nv);
+  m_qmal.Zero(m_robotModel->nv);
+  m_vmal.Zero(m_robotModel->nv);
+  m_amal.Zero(m_robotModel->nv);
 
   // compute the global mass of the robot
   m_mass=0.0;
@@ -297,8 +297,8 @@ void PinocchioRobot::initializeInverseKinematics()
   std::vector<se3::JointIndex> rightLeg =
       jointsBetween(m_waist,m_rightFoot.associatedAnkle);
 
-  MAL_S3_VECTOR_CLEAR(m_leftDt);
-  MAL_S3_VECTOR_CLEAR(m_rightDt);
+  m_leftDt.Zero();
+  m_rightDt.Zero();
   se3::SE3 waist_M_leftHip , waist_M_rightHip ;
   waist_M_leftHip = m_robotModel->jointPlacements[leftLeg[0]].act(
         m_robotModel->jointPlacements[leftLeg[1]]).act(
@@ -358,7 +358,7 @@ void PinocchioRobot::computeForwardKinematics()
   computeForwardKinematics(m_qmal);
 }
 
-void PinocchioRobot::computeForwardKinematics(MAL_VECTOR_TYPE(double) & q)
+void PinocchioRobot::computeForwardKinematics(Eigen::VectorXd & q)
 {
   // euler to quaternion :
   m_quat = Eigen::Quaterniond(
@@ -388,9 +388,9 @@ void PinocchioRobot::computeInverseDynamics()
   PinocchioRobot::computeInverseDynamics(m_qmal,m_vmal,m_amal);
 }
 
-void PinocchioRobot::computeInverseDynamics(MAL_VECTOR_TYPE(double) & q,
-                                            MAL_VECTOR_TYPE(double) & v,
-                                            MAL_VECTOR_TYPE(double) & a)
+void PinocchioRobot::computeInverseDynamics(Eigen::VectorXd & q,
+                                            Eigen::VectorXd & v,
+                                            Eigen::VectorXd & a)
 {
 //  for(unsigned i=0;i<3;++i)
 //  {
@@ -476,7 +476,7 @@ std::vector<se3::JointIndex> PinocchioRobot::jointsBetween
   {
     out.push_back(fromRootToSecond[0]);
   }
-  for(unsigned k=lastCommonRank+1 ; k<fromRootToSecond.size() ; ++k)
+  for(se3::JointIndex k=lastCommonRank+1 ; k<fromRootToSecond.size() ; ++k)
   {
     out.push_back(fromRootToSecond[k]);
   }
@@ -489,11 +489,11 @@ bool PinocchioRobot::
 ComputeSpecializedInverseKinematics(
     const se3::JointIndex &jointRoot,
     const se3::JointIndex &jointEnd,
-    const MAL_S4x4_MATRIX_TYPE(double) & jointRootPosition,
-    const MAL_S4x4_MATRIX_TYPE(double) & jointEndPosition,
-    MAL_VECTOR_TYPE(double) &q )
+    const Eigen::Matrix4d & jointRootPosition,
+    const Eigen::Matrix4d & jointEndPosition,
+    Eigen::VectorXd &q )
 {
-  MAL_VECTOR_FILL(q,0.0);
+  q.Zero(q.size());
   /*! Try to find out which kinematics chain the user
     send to the method.*/
   if (jointRoot==m_waist)
@@ -541,10 +541,10 @@ ComputeSpecializedInverseKinematics(
   return false;
 }
 
-void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
-                                            const matrix4d & jointEndPosition,
-                                            vectorN &q,
-                                            vector3d Dt)
+void PinocchioRobot::getWaistFootKinematics(const Eigen::Matrix4d & jointRootPosition,
+                                            const Eigen::Matrix4d & jointEndPosition,
+                                            Eigen::VectorXd &q,
+                                            Eigen::Vector3d Dt)
 {
   double _epsilon=1.0e-6;
   // definition des variables relatif au design du robot
@@ -554,30 +554,28 @@ void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
   double c5 = 0.0;
   double q6a = 0.0;
 
-  //vector3d r;
+  //Eigen::Vector3d r;
 
   /* Build sub-matrices */
-  matrix3d Foot_R,Body_R;
-  vector3d Foot_P,Body_P;
+  Eigen::Matrix3d Foot_R,Body_R;
+  Eigen::Vector3d Foot_P,Body_P;
   for(unsigned int i=0;i<3;i++)
   {
     for(unsigned int j=0;j<3;j++)
     {
-      MAL_S3x3_MATRIX_ACCESS_I_J(Body_R,i,j) =
-          MAL_S4x4_MATRIX_ACCESS_I_J(jointRootPosition,i,j);
-      MAL_S3x3_MATRIX_ACCESS_I_J(Foot_R,i,j) =
-          MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,i,j);
+      Body_R(i,j) = jointRootPosition(i,j);
+      Foot_R(i,j) = jointEndPosition(i,j);
     }
-    Body_P(i) = MAL_S4x4_MATRIX_ACCESS_I_J(jointRootPosition,i,3);
-    Foot_P(i) = MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,i,3);
+    Body_P(i) = jointRootPosition(i,3);
+    Foot_P(i) = jointEndPosition(i,3);
   }
 
-  matrix3d Foot_Rt;
-  MAL_S3x3_TRANSPOSE_A_in_At(Foot_R,Foot_Rt);
+  Eigen::Matrix3d Foot_Rt;
+  Foot_Rt=Foot_R.transpose();
 
   // Initialisation of q
-  if (MAL_VECTOR_SIZE(q)!=6)
-    MAL_VECTOR_RESIZE(q,6);
+  if (q.size()!=6)
+    q.resize(6);
 
   for(unsigned int i=0;i<6;i++)
     q(i)=0.0;
@@ -585,7 +583,7 @@ void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
   // if Dt(1)<0.0 then Opp=1.0 else Opp=-1.0
   double OppSignOfDtY = Dt(1) < 0.0 ? 1.0 : -1.0;
 
-  vector3d d2,d3;
+  Eigen::Vector3d d2,d3;
   d2 = Body_P + Body_R * Dt;
   d3 = d2 - Foot_P;
 
@@ -605,7 +603,7 @@ void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
     q[3] = acos(c5);
   }
 
-  vector3d r3;
+  Eigen::Vector3d r3;
   r3 = Foot_Rt * d3;
 
   q6a = asin((A/l0)*sin(M_PI- q[3]));
@@ -630,41 +628,41 @@ void PinocchioRobot::getWaistFootKinematics(const matrix4d & jointRootPosition,
     q[5] += M_PI;
   }
 
-  matrix3d R;
-  matrix3d BRt;
-  MAL_S3x3_TRANSPOSE_A_in_At(Body_R,BRt);
+  Eigen::Matrix3d R;
+  Eigen::Matrix3d BRt;
+  BRt = Body_R.transpose();
 
-  matrix3d Rroll;
+  Eigen::Matrix3d Rroll;
   double c = cos(q[5]);
   double s = sin(q[5]);
 
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rroll,0,0) = 1.0;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rroll,0,1) = 0.0;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rroll,0,2) = 0.0;
+  Rroll(0,0) = 1.0;
+  Rroll(0,1) = 0.0;
+  Rroll(0,2) = 0.0;
 
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rroll,1,0) = 0.0;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rroll,1,1) = c;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rroll,1,2) = s;
+  Rroll(1,0) = 0.0;
+  Rroll(1,1) = c;
+  Rroll(1,2) = s;
 
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rroll,2,0) = 0.0;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rroll,2,1) = -s;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rroll,2,2) = c;
+  Rroll(2,0) = 0.0;
+  Rroll(2,1) = -s;
+  Rroll(2,2) = c;
 
-  matrix3d Rpitch;
+  Eigen::Matrix3d Rpitch;
   c = cos(q[4]+q[3]);
   s = sin(q[4]+q[3]);
 
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rpitch,0,0) = c;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rpitch,0,1) = 0.0;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rpitch,0,2) = -s;
+  Rpitch(0,0) = c;
+  Rpitch(0,1) = 0.0;
+  Rpitch(0,2) = -s;
 
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rpitch,1,0) = 0.0;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rpitch,1,1) = 1.0;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rpitch,1,2) = 0.0;
+  Rpitch(1,0) = 0.0;
+  Rpitch(1,1) = 1.0;
+  Rpitch(1,2) = 0.0;
 
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rpitch,2,0) = s;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rpitch,2,1) = 0.0;
-  MAL_S3x3_MATRIX_ACCESS_I_J(Rpitch,2,2) = c;
+  Rpitch(2,0) = s;
+  Rpitch(2,1) = 0.0;
+  Rpitch(2,2) = c;
 
   R = BRt * Foot_R * Rroll * Rpitch;
   q[0] = atan2(-R(0,1),R(1,1));
@@ -687,24 +685,24 @@ double PinocchioRobot::ComputeXmax(double & Z)
   return Xmax;
 }
 
-void PinocchioRobot::getShoulderWristKinematics(const matrix4d & jointRootPosition,
-                                                const matrix4d & jointEndPosition,
-                                                vectorN &q,
+void PinocchioRobot::getShoulderWristKinematics(const Eigen::Matrix4d & jointRootPosition,
+                                                const Eigen::Matrix4d & jointEndPosition,
+                                                Eigen::VectorXd &q,
                                                 int side)
 {
 
   // Initialisation of q
-  if (MAL_VECTOR_SIZE(q)!=6)
-    MAL_VECTOR_RESIZE(q,6);
+  if (q.size()!=6)
+    q.resize(6);
 
   double Alpha,Beta;
   for(unsigned int i=0;i<6;i++)
     q(i)=0.0;
 
-  double X = MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,0,3)
-      - MAL_S4x4_MATRIX_ACCESS_I_J(jointRootPosition,0,3);
-  double Z = MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,2,3)
-      - MAL_S4x4_MATRIX_ACCESS_I_J(jointRootPosition,2,3);
+  double X = jointEndPosition(0,3)
+    - jointRootPosition(0,3);
+  double Z = jointEndPosition(2,3)
+    - jointRootPosition(2,3);
 
   double Xmax = ComputeXmax(Z);
   X = X*Xmax;

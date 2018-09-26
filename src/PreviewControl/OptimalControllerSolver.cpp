@@ -95,9 +95,9 @@ logical sb02ow (double *_alphar, double * /* _alphai */, double *_beta)
   }
 
 
-OptimalControllerSolver::OptimalControllerSolver(MAL_MATRIX( &A, double), 
-						 MAL_MATRIX( &b, double),
-						 MAL_MATRIX( &c, double),
+OptimalControllerSolver::OptimalControllerSolver(Eigen::MatrixXd  &A, double), 
+						 Eigen::MatrixXd  &b, double),
+						 Eigen::MatrixXd  &c, double),
 						 double Q, double R,
 						 unsigned int Nl)
 {
@@ -130,13 +130,13 @@ OptimalControllerSolver::~OptimalControllerSolver()
   
 }
 
-bool OptimalControllerSolver::GeneralizedSchur(MAL_MATRIX( &A,double),
-					       MAL_MATRIX( &B,double),
+bool OptimalControllerSolver::GeneralizedSchur(Eigen::MatrixXd  &A,double),
+					       Eigen::MatrixXd  &B,double),
 					       MAL_VECTOR( &alphar,double),
 					       MAL_VECTOR( &alphai,double),
 					       MAL_VECTOR( &beta,double),
-					       MAL_MATRIX( &L,double),
-					       MAL_MATRIX( &R,double))
+					       Eigen::MatrixXd  &L,double),
+					       Eigen::MatrixXd  &R,double))
 {
   ODEBUG("A:" << A);
   ODEBUG("B:" << A);
@@ -207,8 +207,8 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   //      [-c'Qc E]]
   //  ODEBUG("m_A:" << m_A);
   // And each sub-matrix is n x n matrix.
-  MAL_MATRIX(H,double);
-  MAL_MATRIX(tm_b,double);
+  Eigen::MatrixXd H;
+  Eigen::MatrixXd tm_b;
 
   // Store the transpose of m_b;
   tm_b = MAL_RET_TRANSPOSE(m_b);
@@ -227,7 +227,7 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
     for(int j=0;j<n;j++)
       H(i,j) = m_A(i,j);
 
-  MAL_MATRIX(H21,double);
+  Eigen::MatrixXd H21;
   H21 = MAL_RET_TRANSPOSE(m_c);
   ODEBUG("H21 (1):" << H21);
   H21 = H21 * m_Q;
@@ -245,10 +245,10 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   MAL_MATRIX_DIM(E,double,2*n,2*n);
   MAL_MATRIX_SET_IDENTITY(E);
 
-  MAL_MATRIX(G,double);
+  Eigen::MatrixXd G;
   G = MAL_RET_A_by_B(m_b * (1/m_R) , tm_b);
 
-  MAL_MATRIX(At,double);
+  Eigen::MatrixXd At;
   At= MAL_RET_TRANSPOSE(m_A);
   for(int i=0;i< n;i++)
     for(int j=0;j<n;j++)
@@ -277,7 +277,7 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
 
 
   // Computes P the solution of the Riccati equation.
-  MAL_MATRIX(P,double);
+  Eigen::MatrixXd P;
   MAL_MATRIX_DIM(Z11,double,n,n);
   MAL_MATRIX_DIM(Z21,double,n,n);
 
@@ -293,14 +293,14 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   ODEBUG( "Z11:" << endl << Z11 << endl
 	   << "Z21:" << endl << Z21 );
   
-  MAL_MATRIX(iZ11,double);
-  MAL_INVERSE(Z11,iZ11,double);
+  Eigen::MatrixXd iZ11;
+  MAL_INVERSE(Z11,iZ11;
   P = MAL_RET_A_by_B(Z21, iZ11);
   
   ODEBUG( "P: " << endl << P);
 
   // Compute the weights.
-  MAL_MATRIX(r,double);
+  Eigen::MatrixXd r;
 
   double la;
   r = tm_b;  // b^T
@@ -318,11 +318,11 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   ODEBUG("K: "<< endl << m_K);
   
   // Computes the weights for the future.
-  MAL_MATRIX(PreMatrix,double);
-  MAL_MATRIX(Recursive,double);
-  MAL_MATRIX(BaseOfRecursion,double);
-  MAL_MATRIX(PostMatrix,double);
-  MAL_MATRIX(Intermediate,double);	
+  Eigen::MatrixXd PreMatrix;
+  Eigen::MatrixXd Recursive;
+  Eigen::MatrixXd BaseOfRecursion;
+  Eigen::MatrixXd PostMatrix;
+  Eigen::MatrixXd Intermediate;	
 
   PreMatrix = la * tm_b;
   BaseOfRecursion = m_A - MAL_RET_A_by_B(m_b , m_K);
@@ -357,12 +357,12 @@ void OptimalControllerSolver::DisplayWeights()
   std::cout << "F:" << m_F << std::endl;
 }
 
-void OptimalControllerSolver::GetF(MAL_MATRIX(& lF, double))
+void OptimalControllerSolver::GetF(Eigen::MatrixXd & lF, double))
 {
   lF = m_F;
 }
 
-void OptimalControllerSolver::GetK(MAL_MATRIX(& lK,double))
+void OptimalControllerSolver::GetK(Eigen::MatrixXd & lK,double))
 {
   lK = m_K;
 }

@@ -101,20 +101,20 @@ namespace PatternGeneratorJRL
        @{
     */
     /* ! Matrix regarding the state of the CoM (pos, velocity, acceleration) */
-    MAL_MATRIX(m_A,double);
+    Eigen::MatrixXd m_A;
     /* ! Vector for the command */
-    MAL_MATRIX(m_B,double);
+    Eigen::MatrixXd m_B;
     /* ! Vector for the ZMP. */
-    MAL_MATRIX(m_C,double);
+    Eigen::MatrixXd m_C;
 
     /*! \brief State of the LIPM at the \f$k\f$ eme iteration
       \f$ x_k = [ c_x \dot{c}_x \ddot{c}_x c_y \dot{c}_y \ddot{c}_y\f$ */
-    MAL_VECTOR(m_xk,double);
+    Eigen::VectorXd m_xk;
 
     com_t m_CoM;
 
     /* ! \brief Vector of ZMP  */
-    MAL_VECTOR(m_zk,double);
+    Eigen::VectorXd m_zk;
 
     /* ! @} */
 
@@ -150,7 +150,7 @@ namespace PatternGeneratorJRL
     {m_CoM = CoM;};
 
     /*! Get state. */
-    void GetState(MAL_VECTOR_TYPE(double) &lxk);
+    void GetState(Eigen::VectorXd &lxk);
     COMState GetState();
 
     inline com_t getState()

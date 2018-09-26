@@ -110,9 +110,9 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
  void ZMPPreviewControlWithMultiBodyZMP::CallToComAndFootRealization(COMState &acomp,
 								     FootAbsolutePosition &aLeftFAP,
 								     FootAbsolutePosition &aRightFAP,
-								     MAL_VECTOR_TYPE(double) &CurrentConfiguration,
-								     MAL_VECTOR_TYPE(double) &CurrentVelocity,
-								     MAL_VECTOR_TYPE(double) &CurrentAcceleration,
+								     Eigen::VectorXd &CurrentConfiguration,
+								     Eigen::VectorXd &CurrentVelocity,
+								     Eigen::VectorXd &CurrentAcceleration,
 								     int IterationNumber,
 								     int StageOfTheAlgorithm)
  {
@@ -197,9 +197,9 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 							       FootAbsolutePosition &RightFootPosition,
 							       ZMPPosition & ,
 							       COMState &refandfinalCOMState,
-							       MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-							       MAL_VECTOR_TYPE(double) & CurrentVelocity,
-							       MAL_VECTOR_TYPE(double) & CurrentAcceleration)
+							       Eigen::VectorXd & CurrentConfiguration,
+							       Eigen::VectorXd & CurrentVelocity,
+							       Eigen::VectorXd & CurrentAcceleration)
  {
    FirstStageOfControl(LeftFootPosition,RightFootPosition,refandfinalCOMState);
    // This call is suppose to initialize
@@ -467,7 +467,7 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    aZMPpos.stepType = 1;
    aZMPpos.time = m_FIFOZMPRefPositions[0].time;
    ODEBUG("Stage 3");
-   MAL_VECTOR_TYPE(double) CurrentConfiguration;
+   Eigen::VectorXd CurrentConfiguration;
    /* Get the current configuration vector */
    CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
 
@@ -486,9 +486,9 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 					      deque<FootAbsolutePosition> &RightFootPositions)
  {
    m_NumberOfIterations = 0;
-   MAL_VECTOR_TYPE(double) CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
-   MAL_VECTOR_TYPE(double) CurrentVelocity = m_PinocchioRobot->currentVelocity();
-   MAL_VECTOR_TYPE(double) CurrentAcceleration = m_PinocchioRobot->currentAcceleration();
+   Eigen::VectorXd CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
+   Eigen::VectorXd CurrentVelocity = m_PinocchioRobot->currentVelocity();
+   Eigen::VectorXd CurrentAcceleration = m_PinocchioRobot->currentAcceleration();
 
    m_PC->ComputeOptimalWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 
@@ -593,9 +593,9 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 							    deque<COMState> &COMStates,
 							    deque<FootAbsolutePosition> &LeftFootPositions,
 							    deque<FootAbsolutePosition> &RightFootPositions,
-							    MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-							    MAL_VECTOR_TYPE(double) & CurrentVelocity,
-							    MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+							    Eigen::VectorXd & CurrentConfiguration,
+							    Eigen::VectorXd & CurrentVelocity,
+							    Eigen::VectorXd & CurrentAcceleration,
 							    int localindex)
  {
 
