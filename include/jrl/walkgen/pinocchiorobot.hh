@@ -31,6 +31,7 @@ frame work */
 
 #include "pinocchio/spatial/se3.hpp"
 #include "pinocchio/multibody/model.hpp"
+#include "pinocchio/multibody/data.hpp"
 #include <jrl/mal/matrixabstractlayer.hh>
 namespace PatternGeneratorJRL
 {
