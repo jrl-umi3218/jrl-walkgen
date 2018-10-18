@@ -29,8 +29,8 @@
   formulation using QPoases solver as proposed by Naveau
 
   M. Naveau, M. Kudruss, O. Stasse, C. Kirches, K. Mombaur, and P. Sou` eres,
-  “A reactive walking pattern generator based on nonlinear model
-  predictive control,” in IEEE Robotics and Automation Letters (RAL), 2016.
+  "A reactive walking pattern generator based on nonlinear model
+  predictive control," in IEEE Robotics and Automation Letters (RAL), 2016.
 
  */
 

@@ -1,3 +1,5 @@
+ANTLR runtime and generated code versions disagree: 4.7.1!=4.5.1
+ANTLR runtime and generated code versions disagree: 4.7.1!=4.5.1
 /*
  * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
@@ -113,14 +115,14 @@ namespace PatternGeneratorJRL
       @param IterationNumber: Number of iteration.
       @param Stage: indicates which stage is reach by the Pattern Generator.
     */
-    virtual bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) &CoMPosition,
-                                                         MAL_VECTOR_TYPE(double) &CoMSpeed,
-                                                         MAL_VECTOR_TYPE(double) &CoMAcc,
-                                                         MAL_VECTOR_TYPE(double) &LeftFoot,
-                                                         MAL_VECTOR_TYPE(double) &RightFoot,
-                                                         MAL_VECTOR_TYPE(double) &CurrentConfiguration,
-                                                         MAL_VECTOR_TYPE(double) &CurrentVelocity,
-                                                         MAL_VECTOR_TYPE(double) &CurrentAcceleration,
+    virtual bool ComputePostureForGivenCoMAndFeetPosture(Eigen::VectorXd &CoMPosition,
+                                                         Eigen::VectorXd &CoMSpeed,
+                                                         Eigen::VectorXd &CoMAcc,
+                                                         Eigen::VectorXd &LeftFoot,
+                                                         Eigen::VectorXd &RightFoot,
+                                                         Eigen::VectorXd &CurrentConfiguration,
+                                                         Eigen::VectorXd &CurrentVelocity,
+                                                         Eigen::VectorXd &CurrentAcceleration,
 							 int IterationNumber,
 							 int Stage) =0;
 
@@ -151,9 +153,9 @@ namespace PatternGeneratorJRL
       IMPORTANT: The jrlHumanoidDynamicRobot must have been properly set up.
 
     */
-    virtual bool InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
-				   MAL_S3_VECTOR_TYPE(double) & lStartingCOMPosition,
-				   MAL_VECTOR_TYPE(double) & lStartingWaistPose,
+    virtual bool InitializationCoM(Eigen::VectorXd &BodyAnglesIni,
+				   Eigen::Vector3d & lStartingCOMPosition,
+				   Eigen::VectorXd & lStartingWaistPose,
 				   FootAbsolutePosition & InitLeftFootAbsPos,
 				   FootAbsolutePosition & InitRightFootAbsPos)=0;
 
@@ -207,10 +209,10 @@ namespace PatternGeneratorJRL
       @return a 4x4 matrix which contains the pose and the position of the waist
       in the CoM reference frame.
     */
-    virtual MAL_S4x4_MATRIX_TYPE(double) GetCurrentPositionofWaistInCOMFrame() = 0;
+    virtual Eigen::Matrix4d GetCurrentPositionofWaistInCOMFrame() = 0;
 
     /*! \brief Get the COG of the ankles at the starting position. */
-    virtual MAL_S3_VECTOR_TYPE(double) GetCOGInitialAnkles() = 0;
+    virtual Eigen::Vector3d GetCOGInitialAnkles() = 0;
 
   };
 
@@ -218,3 +220,5 @@ namespace PatternGeneratorJRL
 
 
 #endif
+
+init
