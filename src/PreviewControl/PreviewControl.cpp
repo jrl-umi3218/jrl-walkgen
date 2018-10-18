@@ -31,7 +31,7 @@
 //#define _DEBUG_MODE_ON_
 #include <Debug.hh>
 
-#include <iomanip> // !!!!!! manip pour debug à jareter !!!!!!!!!
+#include <iomanip> // !!!!!! manip pour debug a jareter !!!!!!!!!
 
 #include <PreviewControl/PreviewControl.hh>
 

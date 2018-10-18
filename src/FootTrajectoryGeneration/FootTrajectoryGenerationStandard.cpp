@@ -332,7 +332,7 @@ int FootTrajectoryGenerationStandard::SetParametersWithInitPosInitSpeed(int Poly
   return 0;
 }
 
-// allow C² continuity in the interpolation
+// allow C^2 continuity in the interpolation
 int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double TimeInterval,
     double FinalPosition, double InitPosition, double InitSpeed, double InitAcc, vector<double> MiddlePos)
 {
@@ -455,7 +455,7 @@ int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double Ti
   return 0;
 }
 
-// allow C² continuity in the interpolation
+// allow C^2 continuity in the interpolation
 int FootTrajectoryGenerationStandard::SetParameters(int PolynomeIndex, double TimeInterval,
     double FinalPosition, double InitPosition, double InitSpeed, double InitAcc, double InitJerk)
 {

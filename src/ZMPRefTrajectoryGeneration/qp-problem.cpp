@@ -301,7 +301,7 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
                 nb_itt_approx++;
             }
         }
-        std::cout << "nb itérations : " << nb_itt_approx << std::endl;
+        std::cout << "nb iterations : " << nb_itt_approx << std::endl;
     }
 
     break;

@@ -165,9 +165,9 @@ void OrientationsPreview::preview_orientations(double Time,
         // with the following cnstraint :
         // - P(0)          = InitAngle          = TrunkState_.yaw[0]
         // - d P(0) /dt    = InitAngleVelocity  = TrunkState_.yaw[0]
-        // - d² P(0) /dt²  = 0
+        // - d^2 P(0) /dt^2  = 0
         // - d P(T_) /dt   = FinalAngleVelocity = TrunkStateT_.yaw[1]
-        // - d² P(T_) /dt² = 0
+        // - d^2 P(T_) /dt^2 = 0
         if (fabs(TrunkStateT_.yaw[1]-TrunkState_.yaw[1]) > EPS_)
         {
           TrunkStateYaw_->SetParameters(T_,
