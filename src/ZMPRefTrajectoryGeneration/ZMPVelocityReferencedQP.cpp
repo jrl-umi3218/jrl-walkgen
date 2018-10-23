@@ -286,7 +286,7 @@ ZMPVelocityReferencedQP::~ZMPVelocityReferencedQP()
 void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
 {
 
-  MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
+  PerturbationAcceleration_.resize(6);
 
   strm >> PerturbationAcceleration_(2);
   strm >> PerturbationAcceleration_(5);
@@ -298,7 +298,7 @@ void ZMPVelocityReferencedQP::setCoMPerturbationForce(istringstream &strm)
 void ZMPVelocityReferencedQP::setCoMPerturbationForce(double x, double y)
 {
 
-  MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
+  PerturbationAcceleration_.resize(6);
 
   PerturbationAcceleration_(2) = x/RobotMass_;
   PerturbationAcceleration_(5) = y/RobotMass_;
@@ -346,7 +346,7 @@ int ZMPVelocityReferencedQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
                                         FootAbsolutePosition & InitRightFootAbsolutePosition,
                                         deque<RelativeFootPosition> &, // RelativeFootPositions,
                                         COMState & lStartingCOMState,
-                                        MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
+                                        Eigen::Vector3d & lStartingZMPPosition)
 {
   UpperTimeLimitToUpdate_ = 0.0;
 
@@ -821,7 +821,7 @@ void ZMPVelocityReferencedQP::GetZMPDiscretization(deque<ZMPPosition> & ,
                                                    deque<FootAbsolutePosition> &,
                                                    double ,
                                                    COMState &,
-                                                   MAL_S3_VECTOR(&,double),
+                                                   Eigen::Vector3d &,
                                                    FootAbsolutePosition & ,
                                                    FootAbsolutePosition & )
 {

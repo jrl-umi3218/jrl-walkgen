@@ -30,6 +30,8 @@
 #ifndef _UPPER_BODY_MOTION_
 #define _UPPER_BODY_MOTION_
 
+
+
 #include <vector>
 #include <string>
 //#define FULL_POLYNOME
@@ -56,9 +58,9 @@ namespace PatternGeneratorJRL
       
       void GenerateDataFile(string aFileName, int LenghtDataArray);
 
-      void ReadDataFile(string aFileName, MAL_MATRIX(&UpperBodyAngles,double));
+      void ReadDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles);
       
-      void WriteDataFile(string aFileName, MAL_MATRIX(&UpperBodyAngles,double));
+      void WriteDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles);
 	
     
    protected:
