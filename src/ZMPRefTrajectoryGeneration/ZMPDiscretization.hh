@@ -36,8 +36,6 @@
 #ifndef _ZMP_DISCRETIZATION_H_
 #define _ZMP_DISCRETIZATION_H_
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
 /*! System includes */
 #include <deque>
 #include <string>
@@ -139,7 +137,7 @@ namespace PatternGeneratorJRL
 				deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 				double Xmax,
 				COMState & lStartingCOMState,
-				MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+				Eigen::Vector3d & lStartingZMPPosition,
 				FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				FootAbsolutePosition & InitRightFootAbsolutePosition);
 
@@ -183,7 +181,7 @@ namespace PatternGeneratorJRL
 		     FootAbsolutePosition & InitRightFootAbsolutePosition,
 		     deque<RelativeFootPosition> &RelativeFootPositions,
 		     COMState & lStartingCOMState,
-		     MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition );
+		     Eigen::Vector3d & lStartingZMPPosition );
       
       /*! \brief  Methods to update the stacks on-line. */
       void OnLine(double time,
@@ -282,10 +280,10 @@ namespace PatternGeneratorJRL
        */
       /* ! \brief Current absolute support position in 2D (but 
 	 with homogeneous coordinates). */
-      MAL_MATRIX(m_CurrentSupportFootPosition,double);
+      Eigen::MatrixXd m_CurrentSupportFootPosition;
 
       /* ! \brief Previous position of the support foot */ 
-      MAL_MATRIX(m_PrevCurrentSupportFootPosition,double);
+      Eigen::MatrixXd m_PrevCurrentSupportFootPosition;
 
       /*! @} */
 
@@ -300,16 +298,16 @@ namespace PatternGeneratorJRL
       double m_CurrentTime;
 
       /* ! Keep track of the previous foot support position. */
-      MAL_MATRIX(m_vdiffsupppre,double);
+      Eigen::MatrixXd m_vdiffsupppre;
       
       /*!  Keep an object which relates the specificities
 	with an abstract layer. */
       PinocchioRobot *m_PR;
       
       /* !  Matrices for the dynamical system. */
-      MAL_MATRIX(m_A,double);
-      MAL_MATRIX(m_B,double);
-      MAL_MATRIX(m_C,double);
+      Eigen::MatrixXd m_A;
+      Eigen::MatrixXd m_B;
+      Eigen::MatrixXd m_C;
       
       /*! Object to handle foot trajectory generation */
       FootTrajectoryGenerationStandard * m_FootTrajectoryGenerationStandard;

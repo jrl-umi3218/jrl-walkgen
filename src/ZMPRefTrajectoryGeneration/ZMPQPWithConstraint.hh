@@ -96,7 +96,7 @@ namespace PatternGeneratorJRL
 			      deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 			      double Xmax,
 			      COMState & lStartingCOMState,
-			      MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+			      Eigen::Vector3d & lStartingZMPPosition,
 			      FootAbsolutePosition & InitLeftFootAbsolutePosition,
 			      FootAbsolutePosition & InitRightFootAbsolutePosition);
 
@@ -119,12 +119,12 @@ namespace PatternGeneratorJRL
 			  & QueueOfLConstraintInequalities,
 			  double Com_Height,
 			  unsigned int &NbOfConstraints,
-			  MAL_VECTOR(&xk,double));
+			  Eigen::VectorXd &xk);
     
     /*! This method helps to build a linear system for constraining the ZMP. */
     int ComputeLinearSystem(std::vector<CH_Point> aVecOfPoints,
-			    MAL_MATRIX(&A,double),
-			    MAL_MATRIX(&B,double));
+			    Eigen::MatrixXd &A,
+			    Eigen::MatrixXd &B);
 
     /*! This method get the COM buffer computed by the QP in off-line mode. */
     void GetComBuffer(deque<COMState> &aCOMBuffer);
@@ -152,7 +152,7 @@ namespace PatternGeneratorJRL
 		   FootAbsolutePosition & InitRightFootAbsolutePosition,
 		   deque<RelativeFootPosition> &RelativeFootPositions,
 		   COMState & lStartingCOMState,
-		   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
+		   Eigen::Vector3d & lStartingZMPPosition);
     
     /* ! Methods to update the stack on-line by inserting a new foot position. */
     void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
@@ -207,11 +207,11 @@ namespace PatternGeneratorJRL
        @{
      */
     /* ! Matrix regarding the state of the CoM (pos, velocity, acceleration) */
-    MAL_MATRIX(m_A,double);
+    Eigen::MatrixXd m_A;
     /* ! Vector for the command */
-    MAL_MATRIX(m_B,double);
+    Eigen::MatrixXd m_B;
     /* ! Vector for the ZMP. */
-    MAL_MATRIX(m_C,double);
+    Eigen::MatrixXd m_C;
     /* ! @} */
 
     /*! Uses a ZMPDiscretization scheme to get the usual Kajita heuristic. */

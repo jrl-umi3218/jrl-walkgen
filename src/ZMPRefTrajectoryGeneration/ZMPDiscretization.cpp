@@ -90,9 +90,9 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,
 
   m_PolynomeZMPTheta = new Polynome3(0,0);
 
-  MAL_MATRIX_RESIZE(m_A,6,6);
-  MAL_MATRIX_RESIZE(m_B,6,1);
-  MAL_MATRIX_RESIZE(m_C,2,6);
+  m_A.resize(6,6);
+  m_B.resize(6,1);
+  m_C.resize(2,6);
 
   m_RelativeFootPositions.clear();
 
@@ -107,7 +107,7 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,
   m_ZMPNeutralPosition[0] = 0.0;
   m_ZMPNeutralPosition[1] = 0.0;
 
-  MAL_MATRIX_RESIZE(m_CurrentSupportFootPosition,3,3);
+  m_CurrentSupportFootPosition.resize(3,3);
   for(int i=0;i<3;i++)
     for(int j=0;j<3;j++)
       if (i!=j)
@@ -118,8 +118,8 @@ ZMPDiscretization::ZMPDiscretization(SimplePluginManager *lSPM,
   m_PrevCurrentSupportFootPosition = m_CurrentSupportFootPosition;
 
   // Prepare size of the matrix used in on-line walking
-  MAL_MATRIX_RESIZE(m_vdiffsupppre,2,1);
-  for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(m_vdiffsupppre);i++)
+  m_vdiffsupppre.resize(2,1);
+  for(unsigned int i=0;i<m_vdiffsupppre.rows();i++)
     m_vdiffsupppre(i,0) = 0.0;
 
   RESETDEBUG4("DebugDataRFPos.txt");
@@ -147,7 +147,7 @@ void ZMPDiscretization::GetZMPDiscretization(deque<ZMPPosition> & FinalZMPPositi
 					     deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					     double , //Xmax,
 					     COMState & lStartingCOMState,
-					     MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+					     Eigen::Vector3d & lStartingZMPPosition,
 					     FootAbsolutePosition & InitLeftFootAbsolutePosition,
 					     FootAbsolutePosition & InitRightFootAbsolutePosition)
 {
@@ -324,7 +324,7 @@ int ZMPDiscretization::InitOnLine(deque<ZMPPosition> & FinalZMPPositions,
 				  FootAbsolutePosition & InitRightFootAbsolutePosition,
 				  deque<RelativeFootPosition> &RelativeFootPositions,
 				  COMState & lStartingCOMState,
-				  MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
+				  Eigen::Vector3d & lStartingZMPPosition)
 {
   m_RelativeFootPositions.clear();
   FootAbsolutePosition CurrentLeftFootAbsPos, CurrentRightFootAbsPos;
@@ -519,8 +519,8 @@ void ZMPDiscretization::UpdateCurrentSupportFootPosition(RelativeFootPosition aR
   // First orientation
   double c = cos(aRFP.theta*M_PI/180.0);
   double s = sin(aRFP.theta*M_PI/180.0);
-  MAL_MATRIX_DIM(MM,double,2,2);
-  MAL_MATRIX_DIM(Orientation,double,2,2);
+  Eigen::Matrix<double,2,2> MM;;
+  Eigen::Matrix<double,2,2> Orientation;;
 
   MM(0,0) = c;      MM(0,1) = -s;
   MM(1,0) = s;      MM(1,1) = c;
@@ -529,14 +529,14 @@ void ZMPDiscretization::UpdateCurrentSupportFootPosition(RelativeFootPosition aR
       Orientation(k,l) = m_CurrentSupportFootPosition(k,l);
 
   // second position.
-  MAL_MATRIX_DIM(v,double,2,1);
-  MAL_MATRIX_DIM(v2,double,2,1);
+  Eigen::Matrix<double,2,1> v;;
+  Eigen::Matrix<double,2,1> v2;;
 
   v(0,0) = aRFP.sx;
   v(1,0) = aRFP.sy;
 
-  Orientation = MAL_RET_A_by_B(MM , Orientation);
-  MAL_C_eq_A_by_B(v2,Orientation, v);
+  Orientation = MM*Orientation;
+  v2=Orientation*v;
   ODEBUG("v :" << v  << " "
 	  "v2 : " << v2 << " "
 	  "Orientation : " << Orientation << " "
@@ -591,8 +591,8 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   int WhoIsSupportFoot=1;
   double TimeFirstPhase=0.0;
   int CurrentZMPindex=0;
-  MAL_MATRIX_DIM(vdiffsupp,double,2,1);
-  MAL_MATRIX_DIM(vrel,double,2,1);
+  Eigen::Matrix<double,2,1> vdiffsupp;;
+  Eigen::Matrix<double,2,1> vrel;;
 
   double lTdble=m_Tdble, lTsingle=m_Tsingle;
 
@@ -666,15 +666,15 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   py0 = FinalZMPPositions.back().py;
   theta0 = FinalZMPPositions.back().theta;
 
-  MAL_VECTOR_DIM(ZMPInFootCoordinates,double,3);
+  Eigen::Matrix<double,3,1> ZMPInFootCoordinates;
 
   ZMPInFootCoordinates[0] = m_ZMPNeutralPosition[0];
   ZMPInFootCoordinates[1] = m_ZMPNeutralPosition[1];
   ZMPInFootCoordinates[2] = 1.0;
 
-  MAL_VECTOR_DIM(ZMPInWorldCoordinates,double,3);
+  Eigen::Matrix<double,3,1> ZMPInWorldCoordinates;
 
-  MAL_C_eq_A_by_B(ZMPInWorldCoordinates,m_CurrentSupportFootPosition, ZMPInFootCoordinates);
+  ZMPInWorldCoordinates=m_CurrentSupportFootPosition+ZMPInFootCoordinates;
 
   delta_x = (ZMPInWorldCoordinates(0) - px0)/SizeOf1stPhase;
   delta_y = (ZMPInWorldCoordinates(1) - py0)/SizeOf1stPhase;
@@ -791,18 +791,18 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
       double c,s;
       c = cos(NextTheta*M_PI/180.0);
       s = sin(NextTheta*M_PI/180.0);
-      MAL_MATRIX_DIM(Orientation,double,2,2);
-      MAL_MATRIX_DIM(v,double,2,1);
+      Eigen::Matrix<double,2,2> Orientation;;
+      Eigen::Matrix<double,2,1> v;;
       Orientation(0,0) = c;      Orientation(0,1) = -s;
       Orientation(1,0) = s;      Orientation(1,1) = c;
 
-      MAL_MATRIX_DIM(SubOrientation,double,2,2);
-      MAL_MATRIX_C_eq_EXTRACT_A(SubOrientation,m_CurrentSupportFootPosition,double,0,0,2,2);
-      Orientation = MAL_RET_A_by_B(Orientation,SubOrientation) ;
+      Eigen::Matrix<double,2,2> SubOrientation;;
+      SubOrientation = m_CurrentSupportFootPosition.block(0,0,2,2);
+      Orientation = Orientation*SubOrientation ;
 
       v(0,0) = m_RelativeFootPositions[1].sx;
       v(1,0) = m_RelativeFootPositions[1].sy;
-      MAL_C_eq_A_by_B(vdiffsupp,Orientation,v);
+      vdiffsupp=Orientation*v;
 
       vrel = vdiffsupp + m_vdiffsupppre;
 
@@ -879,16 +879,15 @@ void ZMPDiscretization::OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosi
   for(unsigned int k=0;k<SizeOfSndPhase;k++)
     {
 
-      MAL_VECTOR_DIM(ZMPInFootCoordinates,double,3);
+      Eigen::Matrix<double,3,1> ZMPInFootCoordinates;
 
       ZMPInFootCoordinates[0] = m_ZMPNeutralPosition[0];
       ZMPInFootCoordinates[1] = m_ZMPNeutralPosition[1];
       ZMPInFootCoordinates[2] = 1.0;
 
-      MAL_VECTOR_DIM(ZMPInWorldCoordinates,double,3);
+      Eigen::Matrix<double,3,1> ZMPInWorldCoordinates;
 
-      MAL_C_eq_A_by_B(ZMPInWorldCoordinates,m_CurrentSupportFootPosition,
-					     ZMPInFootCoordinates);
+      ZMPInWorldCoordinates=m_CurrentSupportFootPosition+ZMPInFootCoordinates;
 
       ODEBUG4("CSFP: " << m_CurrentSupportFootPosition << endl <<
 	      "ZMPiWC"  << ZMPInWorldCoordinates << endl, "DebugData.txt");

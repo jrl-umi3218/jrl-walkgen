@@ -35,8 +35,6 @@
 
 
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
 #include <vector>
 #include <string>
 
@@ -67,11 +65,11 @@ namespace PatternGeneratorJRL
 	 (whichLeg positive for left leg and negative for right leg). 
 	 This function might be replaced by functions from DynamicMultibody
       */
-      void CalcCoordShankLowerLegPoint(MAL_S3_VECTOR(RelCoord,double), 
-				       MAL_S3_VECTOR(&AbsCoord,double), 
-				       MAL_VECTOR(LegAngles,double), 
-				       MAL_S3x3_MATRIX(WaistRot,double),
-				       MAL_S3_VECTOR(WaistPos,double),
+      void CalcCoordShankLowerLegPoint(Eigen::Vector3d RelCoord, 
+				       Eigen::Vector3d &AbsCoord, 
+				       Eigen::VectorXd LegAngles, 
+				       Eigen::Matrix3d WaistRot,
+				       Eigen::Vector3d WaistPos,
 				       int WhichLeg);
       
 	
@@ -84,8 +82,8 @@ namespace PatternGeneratorJRL
       /*! This function transforms the coordinates of a point 
 	expressed in the world frame to the local coordinates 
 	in the obstacle frame */
-      void WorldFrameToObstacleFrame(MAL_S3_VECTOR(&WorldFrameCoord,double), 
-				     MAL_S3_VECTOR(&ObstacleFrameCoord,double));
+      void WorldFrameToObstacleFrame(Eigen::Vector3d &WorldFrameCoord, 
+				     Eigen::Vector3d &ObstacleFrameCoord);
 	
       /*! This function checks for intersection of two line segments 
 	p1p2 and v1v2. It returns true if a collision occurs, else false
@@ -101,35 +99,35 @@ namespace PatternGeneratorJRL
 	plane 2:rear plane.
 	It returns true if a collision occurs, else false. 
       */
-      bool CollisionLineObstaclePlane(MAL_S3_VECTOR(&LegPoint1,double), 
-				      MAL_S3_VECTOR(&LegPoint2,double),
+      bool CollisionLineObstaclePlane(Eigen::Vector3d &LegPoint1, 
+				      Eigen::Vector3d &LegPoint2,
 				      int PlaneNumber);
 	
       /*! This function does the complete check if a linesegment 
 	intersects with the obstacle or is completely inside the obstacle
       */
-      bool CollisionLineObstacleComplete(MAL_S3_VECTOR( & Point1,double), 
-					 MAL_S3_VECTOR( & Point2,double));
+      bool CollisionLineObstacleComplete(Eigen::Vector3d &Point1, 
+					 Eigen::Vector3d &Point2);
 
     protected:
       
       /*! x, y, z position of obstacle in worldframe 
 	(point taken on the front plan of the obstacle 
 	on the floor and in the middel of the width) */
-      MAL_S3_VECTOR(m_ObstaclePosition,double); 
+      Eigen::Vector3d m_ObstaclePosition; 
       
       /*! This is the rotationmatrix from obstacle frame to world frame */
-      MAL_S3x3_MATRIX(m_ObstacleRot,double); 
+      Eigen::Matrix3d m_ObstacleRot; 
       
       /*! This is the rotationmatrix from world frame to obstacle frame */
-      MAL_S3x3_MATRIX(m_ObstacleRotInv,double); 
+      Eigen::Matrix3d m_ObstacleRotInv; 
       
       /*! This contains four points of one side of the obstacle in the 
 	local obstacle frame......this frame is positionend in the origin 
 	of the obstacle to where Obstacle Position is pointing, 
 	the orientation is x following depth, y following width
       */
-      MAL_MATRIX(m_ObstaclePoints,double);  
+      Eigen::MatrixXd m_ObstaclePoints;  
 	
 	
 		

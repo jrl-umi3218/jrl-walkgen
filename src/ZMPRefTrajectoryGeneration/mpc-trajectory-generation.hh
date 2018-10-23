@@ -28,8 +28,6 @@
 #ifndef _TRAJ_GEN_H_
 #define _TRAJ_GEN_H_
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
 
 #include <deque>
 #include <string>

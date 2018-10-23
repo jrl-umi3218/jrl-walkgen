@@ -34,10 +34,6 @@
 
 #include <deque>
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
-
-
 #include <jrl/walkgen/pgtypes.hh>
 #include <SimplePlugin.hh>
 #include <PreviewControl/PreviewControl.hh>
@@ -79,16 +75,16 @@ namespace PatternGeneratorJRL
       /*! Vector from the Waist to the left and right hip. */
       //@{
       /*! Static part from the waist to the left hip.. */
-      MAL_S3_VECTOR(m_StaticToTheLeftHip,double);
+      Eigen::Vector3d m_StaticToTheLeftHip;
       /*! Static part from the waist to the right hip. */
-      MAL_S3_VECTOR(m_StaticToTheRightHip,double);
+      Eigen::Vector3d m_StaticToTheRightHip;
       /*! Dynamic part from the waist to the left hip. */
-      MAL_S3_VECTOR(m_TranslationToTheLeftHip,double);
+      Eigen::Vector3d m_TranslationToTheLeftHip;
       /*! Dynamic part form the waist to the right hip. */
-      MAL_S3_VECTOR( m_TranslationToTheRightHip,double);
+      Eigen::Vector3d m_TranslationToTheRightHip;
 
       /*! Displacement between the hip and the foot. */
-      MAL_S3_VECTOR(m_Dt,double);
+      Eigen::Vector3d m_Dt;
       
       /*! Preview control time. */
       double m_PreviewControlTime;
@@ -99,9 +95,9 @@ namespace PatternGeneratorJRL
       /*! Final state of the leg joints. */
       //@{
       /*! The left leg */
-      MAL_MATRIX( Finalql,double);
+      Eigen::MatrixXd Finalql;
       /*! The right leg */
-      MAL_MATRIX( Finalqr,double);
+      Eigen::MatrixXd Finalqr;
       //@}
       
       /*! Fifo for the ZMP ref. */
@@ -126,12 +122,12 @@ namespace PatternGeneratorJRL
       double m_sxDeltazmp, m_syDeltazmp;
 
       /*! State of the Preview control. */
-      MAL_MATRIX( m_PC1x,double);
-      MAL_MATRIX(m_PC1y,double);
+      Eigen::MatrixXd m_PC1x;
+      Eigen::MatrixXd m_PC1y;
 
       /*! State of the Second Preview control. */
-      MAL_MATRIX( m_Deltax, double);
-      MAL_MATRIX(m_Deltay,double);
+      Eigen::MatrixXd m_Deltax;
+      Eigen::MatrixXd m_Deltay;
 
       /*! Starting a new step sequences. */
       bool m_StartingNewSequence;
@@ -145,13 +141,13 @@ namespace PatternGeneratorJRL
       /*! Difference between the CoM and the Waist 
       from the initialization phase,
       i.e. not reevaluated while walking. */
-      MAL_S3_VECTOR_TYPE(double) m_DiffBetweenComAndWaist;
+      Eigen::Vector3d m_DiffBetweenComAndWaist;
 
       /*! COM Starting position. */
-      MAL_S3_VECTOR_TYPE(double) m_StartingCOMState;
+      Eigen::Vector3d m_StartingCOMState;
 
       /*! Final COM pose. */
-      MAL_S4x4_MATRIX_TYPE(double) m_FinalDesiredCOMPose;
+      Eigen::Matrix4d m_FinalDesiredCOMPose;
       
       
       /*! Store the distance between the ankle and the soil. */
@@ -258,9 +254,9 @@ namespace PatternGeneratorJRL
 				 FootAbsolutePosition &RightFootPosition,
 				 ZMPPosition &NewZMPRefPos,
 				 COMState & finalCOMState,
-				 MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-				 MAL_VECTOR_TYPE(double) & CurrentVelocity,
-				 MAL_VECTOR_TYPE(double) & CurrentAcceleration);
+				 Eigen::VectorXd & CurrentConfiguration,
+				 Eigen::VectorXd & CurrentVelocity,
+				 Eigen::VectorXd & CurrentAcceleration);
 
 	
       /*! First stage of the control, 
@@ -314,10 +310,10 @@ namespace PatternGeneratorJRL
 	@param[out] InitRightFootPosition: Returns the position of the right foot
 	in the waist coordinates frame.
       */
-      int EvaluateStartingState(MAL_VECTOR( &,double) BodyAngles,
-				MAL_S3_VECTOR( &,double) aStartingCOMState,
-				MAL_S3_VECTOR( &,double) aStartingZMPPosition,
-				MAL_VECTOR( &,double) aStartingWaistPose,
+      int EvaluateStartingState(Eigen::VectorXd & BodyAngles,
+				Eigen::Vector3d & aStartingCOMState,
+				Eigen::Vector3d & aStartingZMPPosition,
+				Eigen::VectorXd & aStartingWaistPose,
 				FootAbsolutePosition & InitLeftFootPosition,
 				FootAbsolutePosition & InitRightFootPosition);
 
@@ -332,9 +328,9 @@ namespace PatternGeneratorJRL
 	@param[out] InitRightFootPosition: Position of the right foot in the waist coordinates
 	frame.
       */
-      int EvaluateStartingCoM(MAL_MATRIX( &,double) BodyAngles,
-			      MAL_S3_VECTOR( &,double) aStartingCOMState,
-			      MAL_VECTOR( &,double) aWaistPose,
+      int EvaluateStartingCoM(Eigen::MatrixXd  BodyAngles,
+			      Eigen::Vector3d & aStartingCOMState,
+			      Eigen::VectorXd & aWaistPose,
 			      FootAbsolutePosition & InitLeftFootPosition,
 			      FootAbsolutePosition & InitRightFootPosition);
 
@@ -402,9 +398,9 @@ namespace PatternGeneratorJRL
 			      deque<COMState> &COMStates,
 			      deque<FootAbsolutePosition> &LeftFootPositions,
 			      deque<FootAbsolutePosition> &RightFootPositions,
-			      MAL_VECTOR_TYPE(double) &CurrentConfiguration,
-			      MAL_VECTOR_TYPE(double) & CurrentVelocity,
-			      MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+			      Eigen::VectorXd &CurrentConfiguration,
+			      Eigen::VectorXd & CurrentVelocity,
+			      Eigen::VectorXd & CurrentAcceleration,
 			      int localindex);
       
       
@@ -428,22 +424,22 @@ namespace PatternGeneratorJRL
 	@param[out] InitRightFootPosition: Position of the InitRightFootPosition
 	in the same reference frame than the waist 
        */
-      int EvaluateStartingCoM(MAL_VECTOR(&,double) BodyAnglesInit,
-			      MAL_S3_VECTOR(&,double) aStartingCOMState,
-			      MAL_VECTOR(&,double) aStartingWaistPosition,
+      int EvaluateStartingCoM(Eigen::VectorXd & BodyAnglesInit,
+			      Eigen::Vector3d & aStartingCOMState,
+			      Eigen::VectorXd & aStartingWaistPosition,
 			      FootAbsolutePosition & InitLeftFootPosition,
 			      FootAbsolutePosition & InitRightFootPosition);
 
       /*! This method returns the final COM pose matrix after the second stage of control. 
        @return A 4x4 matrix of double which includes the desired final CoM position and orientation.*/
-      MAL_S4x4_MATRIX_TYPE(double) GetFinalDesiredCOMPose();
+      Eigen::Matrix4d GetFinalDesiredCOMPose();
 
       /*! This method returns the current waist position in the COM reference 
 	frame. This can be used with the previous method to get the final Waist 
 	position.
 	@return A 4x4 matrix of double which includes the desired final Waist in the CoM 
 	phase position and orientation.*/
-      MAL_S4x4_MATRIX_TYPE(double) GetCurrentPositionofWaistInCOMFrame();
+      Eigen::Matrix4d GetCurrentPositionofWaistInCOMFrame();
 
       /*! Returns the last element of the COM FIFO in the first stage of control */
       COMState GetLastCOMFromFirstStage();
@@ -476,9 +472,9 @@ namespace PatternGeneratorJRL
       void CallToComAndFootRealization(COMState &acomp,
 				       FootAbsolutePosition &aLeftFAP,
 				       FootAbsolutePosition &aRightFAP,
-				       MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-				       MAL_VECTOR_TYPE(double) & CurrentVelocity,
-				       MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+				       Eigen::VectorXd & CurrentConfiguration,
+				       Eigen::VectorXd & CurrentVelocity,
+				       Eigen::VectorXd & CurrentAcceleration,
 				       int IterationNumber,
 				       int StageOfTheAlgorithm);
 

@@ -64,11 +64,11 @@ namespace PatternGeneratorJRL
     */
     int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 			       FootAbsolutePosition &RightFootPosition,
-			       MAL_VECTOR_TYPE(double) & ZMPRefPos,
+			       Eigen::VectorXd & ZMPRefPos,
 			       COMState & COMState,
-			       MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-			       MAL_VECTOR_TYPE(double) & CurrentVelocity,
-			       MAL_VECTOR_TYPE(double) & CurrentAcceleration);
+			       Eigen::VectorXd & CurrentConfiguration,
+			       Eigen::VectorXd & CurrentVelocity,
+			       Eigen::VectorXd & CurrentAcceleration);
     
 
     
@@ -87,10 +87,10 @@ namespace PatternGeneratorJRL
       @param[out] InitRightFootPosition: Returns the position of the right foot
       in the waist coordinates frame.
     */
-    int EvaluateStartingState(MAL_VECTOR( &,double) BodyAngles,
+    int EvaluateStartingState(Eigen::VectorXd & BodyAngles,
 			      COMState & aStartingCOMState,
-			      MAL_S3_VECTOR(& ,double) aStartingZMPPosition,
-			      MAL_VECTOR(& ,double) aStartingWaistPose,
+			      Eigen::Vector3d & aStartingZMPPosition,
+			      Eigen::VectorXd & aStartingWaistPose,
 			      FootAbsolutePosition & InitLeftFootPosition,
 			      FootAbsolutePosition & InitRightFootPosition);
 

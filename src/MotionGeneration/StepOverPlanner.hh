@@ -41,7 +41,6 @@
 #include <deque>
 
 /*! MAL */
-#include <jrl/mal/matrixabstractlayer.hh>
 
 /*! Abstract Interface for dynamic robot. */
 #include <jrl/walkgen/pinocchiorobot.hh>
@@ -148,11 +147,11 @@ namespace PatternGeneratorJRL
       of a point on the lower legs given in relative coordinates 
       in the locale frame 
       (whichLeg positive for left leg and negative for right leg) */
-    void CalcCoordShankLowerLegPoint(MAL_MATRIX(RelCoord,double), 
-				     MAL_MATRIX(&AbsCoord,double),
-				     MAL_MATRIX(LegAngles,double),
-				     MAL_MATRIX(WaistRot,double),
-				     MAL_MATRIX(WaistPos,double),
+    void CalcCoordShankLowerLegPoint(Eigen::MatrixXd RelCoord, 
+				     Eigen::MatrixXd &AbsCoord,
+				     Eigen::MatrixXd LegAngles,
+				     Eigen::MatrixXd WaistRot,
+				     Eigen::MatrixXd WaistPos,
 				     int WhichLeg);
 
 
@@ -172,20 +171,20 @@ namespace PatternGeneratorJRL
       (point taken on the front plan of the obstacle 
       on the floor and in the middel of the width 
     */
-    MAL_S3_VECTOR( m_ObstaclePosition,double); 
+    Eigen::Vector3d m_ObstaclePosition; 
       
     /*! This is the rotationmatrix from 
       obstacle frame to world frame */
-    MAL_S3x3_MATRIX(m_ObstacleRot,double); 
+    Eigen::Matrix3d m_ObstacleRot; 
       
     //this is the rotationmatrix from world frame to obstacle frame
-    MAL_S3x3_MATRIX(m_ObstacleRotInv,double); 
+    Eigen::Matrix3d m_ObstacleRotInv; 
        
     double m_StepOverStepLenght,m_StepOverHipHeight;
 	
     deque<RelativeFootPosition> m_FootHolds;
 
-    MAL_MATRIX(mBoundCond,double);   
+    Eigen::MatrixXd mBoundCond;   
     std::vector<double> mTimeDistr;
 
          
@@ -256,14 +255,14 @@ namespace PatternGeneratorJRL
       
     int m_WhoIsFirst;
       
-    MAL_MATRIX(m_LegLayoutPoint,double);
+    Eigen::MatrixXd m_LegLayoutPoint;
       
     /*! Vector from the Waist to the left and right hip. */
-    MAL_S3_VECTOR( m_StaticToTheLeftHip,double);
-    MAL_S3_VECTOR(m_StaticToTheRightHip,double);
+    Eigen::Vector3d m_StaticToTheLeftHip;
+    Eigen::Vector3d m_StaticToTheRightHip;
       
     /*! Displacement between the hip and the foot. */
-    MAL_S3_VECTOR( m_Dt,double);
+    Eigen::Vector3d m_Dt;
 
     /*! Pointer to the Preview Control object. */
     PreviewControl *m_PC;
@@ -275,8 +274,8 @@ namespace PatternGeneratorJRL
     CollisionDetector *m_CollDet;	
 	
     /*! Previous joint values.*/
-    MAL_MATRIX(m_prev_ql,double);
-    MAL_MATRIX(m_prev_qr,double);
+    Eigen::MatrixXd m_prev_ql;
+    Eigen::MatrixXd m_prev_qr;
 
     /*! Sampling Period.*/
     double m_SamplingPeriod;
@@ -289,8 +288,8 @@ namespace PatternGeneratorJRL
     unsigned int m_NL;
 
     /*! Final state of the leg joints.*/
-    MAL_MATRIX( Finalql,double);
-    MAL_MATRIX(Finalqr,double);
+    Eigen::MatrixXd Finalql;
+    Eigen::MatrixXd Finalqr;
 		
     /*! Fifo for the ZMP ref.*/
     deque<ZMPPosition> m_FIFOZMPRefPositions;
@@ -314,12 +313,12 @@ namespace PatternGeneratorJRL
     double m_sxDeltazmp, m_syDeltazmp;
 
     /*! State of the Preview control.*/
-    MAL_MATRIX( m_PC1x,double);
-    MAL_MATRIX(m_PC1y,double);
+    Eigen::MatrixXd m_PC1x;
+    Eigen::MatrixXd m_PC1y;
 
     /*! State of the Second Preview control.*/
-    MAL_MATRIX( m_Deltax,double);
-    MAL_MATRIX(m_Deltay,double);
+    Eigen::MatrixXd m_Deltax;
+    Eigen::MatrixXd m_Deltay;
 
     /*! Starting a new step sequences.*/
     bool m_StartingNewSequence;

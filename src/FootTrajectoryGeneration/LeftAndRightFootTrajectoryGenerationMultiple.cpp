@@ -62,7 +62,7 @@ LeftAndRightFootTrajectoryGenerationMultiple(SimplePluginManager *lSPM,
     }
   }
 
-  MAL_VECTOR_FILL(m_MiddleWayPoint,0.0) ;
+  { for(unsigned int i=0;i<m_MiddleWayPoint.size();m_MiddleWayPoint[i++]=0.0);} ;
   wayPoint.resize(2,0.0);
 
 }
@@ -204,7 +204,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
       RelativeFootPositions.size())
     SupportFootAbsoluteFootPositions.resize(RelativeFootPositions.size());
 
-  unsigned int lNbOfIntervals = RelativeFootPositions.size();
+  deque<RelativeFootPosition>::size_type
+    lNbOfIntervals = RelativeFootPositions.size();
   /*! It is assumed that a set of relative positions for the support foot
     are given as an input. */
   deque<FootAbsolutePosition> AbsoluteFootPositions;
@@ -226,13 +227,13 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
 
   /*! Compute the absolute coordinates of the steps.  */
   double CurrentAbsTheta=0.0,c=0.0,s=0.0;
-  MAL_MATRIX_DIM(MM,double,2,2);
-  MAL_MATRIX_DIM(CurrentSupportFootPosition,double,3,3);
-  MAL_MATRIX_SET_IDENTITY(CurrentSupportFootPosition);
-  MAL_MATRIX_DIM(Orientation,double,2,2);
-  MAL_MATRIX_SET_IDENTITY(Orientation);
-  MAL_MATRIX_DIM(v,double,2,1);
-  MAL_MATRIX_DIM(v2,double,2,1);
+  Eigen::Matrix<double,2,2> MM;;
+  Eigen::Matrix<double,3,3> CurrentSupportFootPosition;;
+  CurrentSupportFootPosition.setIdentity();
+  Eigen::Matrix<double,2,2> Orientation;;
+  Orientation.setIdentity();
+  Eigen::Matrix<double,2,1> v;;
+  Eigen::Matrix<double,2,1> v2;;
 
   if (m_DeltaTj.size()!=lNbOfIntervals)
     m_DeltaTj.resize(lNbOfIntervals);
@@ -380,9 +381,9 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
     v(1,0) = RelativeFootPositions[i].sy;
     // v(2,0) = RelativeFootPositions[i].sz;
     /*! Compute the new orientation of the foot vector. */
-    Orientation = MAL_RET_A_by_B(MM , Orientation);
+    Orientation = MM*Orientation;
 
-    v2 = MAL_RET_A_by_B(Orientation, v);
+    v2 = Orientation*v;
 
     /*! Update the world coordinates of the support foot. */
     if ((!IgnoreFirst) || (i>0))
@@ -482,10 +483,10 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
     if ((i!=0)|| (Continuity))
     {
       {// verify auto collision
-        MAL_VECTOR_DIM(currSupp,double,2);
-        MAL_VECTOR_DIM(InitPos,double,2);
-        MAL_VECTOR_DIM(FinalPos,double,2);
-        MAL_VECTOR_DIM(relWayPoint,double,2);
+        Eigen::Matrix<double,2,1> currSupp;
+        Eigen::Matrix<double,2,1> InitPos;
+        Eigen::Matrix<double,2,1> FinalPos;
+        Eigen::Matrix<double,2,1> relWayPoint;
         if (SupportFoot==1)
         {
           currSupp(0) = LeftFootTmpInitPos.x ;
@@ -512,8 +513,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
         double dx , dy , dc , distSquareToLine ;
         dx = InitPos(1) - FinalPos(1) ;
         dy = FinalPos(0) - InitPos(0) ;
-        MAL_VECTOR_RESIZE(m_MiddleWayPoint,2);
-        MAL_VECTOR_FILL(m_MiddleWayPoint,0.0);
+        m_MiddleWayPoint.resize(2);
+        { for(unsigned int i=0;i<m_MiddleWayPoint.size();m_MiddleWayPoint[i++]=0.0);};
         if ( dx*dx>=1e-6 || dy*dy>=1e-6 )// not moving implies no collision
         {
           dc = -(dx * InitPos(0) + dy *InitPos(1)) ;
@@ -526,7 +527,7 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
             bool autocollision = (x-x0)*(x-x0)+(y-y0)*(y-y0)<=R2;
             if( autocollision )
             {
-              m_MiddleWayPoint = MAL_RET_A_by_B(Orientation, relWayPoint) + currSupp  ;
+              m_MiddleWayPoint = Orientation*relWayPoint + currSupp  ;
             }
           }
         }
@@ -724,7 +725,7 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
       RelativeFootPositions.size())
     SupportFootAbsoluteFootPositions.resize(RelativeFootPositions.size());
 
-  unsigned int lNbOfIntervals = RelativeFootPositions.size();
+  long unsigned int lNbOfIntervals = RelativeFootPositions.size();
   /*! It is assumed that a set of relative positions for the support foot
     are given as an input. */
   deque<FootAbsolutePosition> AbsoluteFootPositions;
@@ -734,13 +735,13 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
 
   /*! Compute the absolute coordinates of the steps.  */
   double CurrentAbsTheta=0.0,c=0.0,s=0.0;
-  MAL_MATRIX_DIM(MM,double,2,2);
-  MAL_MATRIX_DIM(CurrentSupportFootPosition,double,3,3);
-  MAL_MATRIX_SET_IDENTITY(CurrentSupportFootPosition);
-  MAL_MATRIX_DIM(Orientation,double,2,2);
-  MAL_MATRIX_SET_IDENTITY(Orientation);
-  MAL_MATRIX_DIM(v,double,2,1);
-  MAL_MATRIX_DIM(v2,double,2,1);
+  Eigen::Matrix<double,2,2> MM;;
+  Eigen::Matrix<double,3,3> CurrentSupportFootPosition;;
+  CurrentSupportFootPosition.setIdentity();
+  Eigen::Matrix<double,2,2> Orientation;;
+  Orientation.setIdentity();
+  Eigen::Matrix<double,2,1> v;;
+  Eigen::Matrix<double,2,1> v2;;
 
   ODEBUG("Detect support foot on the right.");
   CurrentAbsTheta = SupportFootInitialAbsolutePosition.theta;
@@ -795,8 +796,8 @@ ComputeAbsoluteStepsFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootP
     v(1,0) = RelativeFootPositions[i].sy;
 
     /*! Compute the new orientation of the foot vector. */
-    Orientation = MAL_RET_A_by_B(MM , Orientation);
-    v2 = MAL_RET_A_by_B(Orientation, v);
+    Orientation = MM*Orientation;
+    v2 = Orientation*v;
 
     /*! Update the world coordinates of the support foot. */
     for(int k=0;k<2;k++)
@@ -838,12 +839,12 @@ ChangeRelStepsFromAbsSteps(deque<RelativeFootPosition> &RelativeFootPositions,
     return;
   }
 
-  MAL_S3x3_MATRIX(KM1,double);
-  MAL_S3x3_MATRIX_SET_IDENTITY(KM1);
-  MAL_S3x3_MATRIX(K,double);
-  MAL_S3x3_MATRIX_SET_IDENTITY(K);
-  MAL_S3x3_MATRIX(KP1,double);
-  MAL_S3x3_MATRIX_SET_IDENTITY(KP1);
+  Eigen::Matrix3d KM1;
+  KM1.setIdentity();
+  Eigen::Matrix3d K;
+  K.setIdentity();
+  Eigen::Matrix3d KP1;
+  KP1.setIdentity();
 
   double thetakm1,xkm1,ykm1,c,s;
 
@@ -878,11 +879,11 @@ ChangeRelStepsFromAbsSteps(deque<RelativeFootPosition> &RelativeFootPositions,
   K(0,0) = c;      K(0,1) = -s; K(0,2) = xk;
   K(1,0) = s;      K(1,1) = c;  K(1,2) = yk;
 
-  MAL_S3x3_MATRIX(iKM1,double);
-  MAL_S3x3_INVERSE(KM1,iKM1,double);
-  MAL_S3x3_MATRIX(relMotionM1,double);
+  Eigen::Matrix3d iKM1;
+  iKM1=KM1.inverse();
+  Eigen::Matrix3d relMotionM1;
 
-  MAL_S3x3_C_eq_A_by_B(relMotionM1,iKM1,K);
+  relMotionM1=iKM1+K;
 
   RelativeFootPositions[ChangedInterval].sx = relMotionM1(0,2);
   RelativeFootPositions[ChangedInterval].sy = relMotionM1(1,2);
@@ -902,11 +903,11 @@ ChangeRelStepsFromAbsSteps(deque<RelativeFootPosition> &RelativeFootPositions,
     KP1(0,0) = c;      KP1(0,1) = -s; KP1(0,2) = xkp1;
     KP1(1,0) = s;      KP1(1,1) = c;  KP1(1,2) = ykp1;
 
-    MAL_S3x3_MATRIX(iK,double);
-    MAL_S3x3_INVERSE(K,iK,double);
-    MAL_S3x3_MATRIX(relMotionP1,double);
+    Eigen::Matrix3d iK;
+    iK=K.inverse();
+    Eigen::Matrix3d relMotionP1;
 
-    MAL_S3x3_C_eq_A_by_B(relMotionP1,iK,KP1);
+    relMotionP1=iK+KP1;
 
     RelativeFootPositions[ChangedInterval+1].sx = relMotionP1(0,2);
     RelativeFootPositions[ChangedInterval+1].sy = relMotionP1(1,2);

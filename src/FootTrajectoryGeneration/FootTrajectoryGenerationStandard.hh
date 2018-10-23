@@ -263,10 +263,10 @@ namespace PatternGeneratorJRL
    double m_FootB, m_FootH, m_FootF;
 
    /*! \brief Position of the ankle in the left foot. */
-   MAL_S3_VECTOR(m_AnklePositionLeft,double);
+   Eigen::Vector3d m_AnklePositionLeft;
 
    /*! \brief Position of the ankle in the right foot. */
-   MAL_S3_VECTOR(m_AnklePositionRight,double);
+   Eigen::Vector3d m_AnklePositionRight;
 
 
   };

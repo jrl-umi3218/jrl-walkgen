@@ -29,11 +29,13 @@
 #ifndef _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_
 #define  _PATTERN_GENERATOR_INTERNAL_PRIVATE_H_
 
-#include <jrl/mal/matrixabstractlayer.hh>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 
 #include <deque>
+
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
 
 namespace PatternGeneratorJRL
 {
@@ -269,13 +271,13 @@ namespace PatternGeneratorJRL
   {
     struct coordinate_t
     {
-      boost_ublas::compressed_matrix<double, boost_ublas::row_major> X_mat;
-      boost_ublas::compressed_matrix<double, boost_ublas::row_major> Y_mat;
-      boost_ublas::compressed_matrix<double, boost_ublas::row_major> Z_mat;
+      Eigen::SparseMatrix<double,Eigen::RowMajor> X_mat;
+      Eigen::SparseMatrix<double,Eigen::RowMajor> Y_mat;
+      Eigen::SparseMatrix<double,Eigen::RowMajor> Z_mat;
     };
     struct coordinate_t D;
 
-    boost_ublas::vector<double> Dc_vec;
+    Eigen::SparseMatrix<double> Dc_vec;
 
     /// \brief Classifier
     int type;
@@ -365,9 +367,9 @@ namespace PatternGeneratorJRL
     /// \name Solution vectors
     /// \{
     /// \brief QP solution vector
-    boost_ublas::vector<double> Solution_vec;
+    Eigen::VectorXd Solution_vec;
     /// \brief QP initial solution vector
-    boost_ublas::vector<double> initialSolution;
+    Eigen::VectorXd initialSolution;
     /// \brief Previewed support orientations
     std::deque<double> SupportOrientations_deq;
     /// \brief Previewed trunk orientations (only yaw as for now)
@@ -379,11 +381,11 @@ namespace PatternGeneratorJRL
     /// \name{
     /// \{
     /// \brief Lagrange multipliers of the constraints
-    boost_ublas::vector<double> ConstrLagr_vec;
+    Eigen::VectorXd ConstrLagr_vec;
     /// \brief Lagrange multipliers of the lower bounds
-    boost_ublas::vector<double> LBoundsLagr_vec;
+    Eigen::VectorXd LBoundsLagr_vec;
     /// \brief Lagrange multipliers of the upper bounds
-    boost_ublas::vector<double> UBoundsLagr_vec;
+    Eigen::VectorXd UBoundsLagr_vec;
     /// \}
 
     /// \brief Reset

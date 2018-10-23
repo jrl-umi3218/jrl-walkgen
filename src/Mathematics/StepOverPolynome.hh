@@ -33,11 +33,8 @@
 
 #include <vector>
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
-
 #include <Mathematics/Polynome.hh>
-
+#include <Eigen/Dense>
 
 
 namespace PatternGeneratorJRL
@@ -53,7 +50,7 @@ namespace PatternGeneratorJRL
     StepOverPolynomeFoot();
   
     /*! Set the parameters */
-    void SetParameters(MAL_VECTOR(boundCond,double), 
+    void SetParameters(Eigen::VectorXd boundCond, 
 		       std::vector<double> timeDistr);
 
     /*! Destructor. */
@@ -73,7 +70,7 @@ namespace PatternGeneratorJRL
     StepOverPolynomeFootZtoX();
   
     /*! Set the parameters */
-    void SetParameters(MAL_VECTOR(Zpos,double), 
+    void SetParameters(Eigen::VectorXd Zpos, 
 		       std::vector<double> Xpos);
 
     /*! Destructor. */
@@ -92,7 +89,7 @@ namespace PatternGeneratorJRL
     StepOverPolynomeFootXtoTime();
   
     /*! Set the parameters */
-    void SetParameters(MAL_VECTOR(Xbound,double), 
+    void SetParameters(Eigen::VectorXd Xbound, 
 		       std::vector<double> timedistr);
 
     /*! Destructor. */
@@ -112,7 +109,7 @@ namespace PatternGeneratorJRL
     StepOverPolynomeHip4();
     
     // Set the parameters
-    void SetParameters(MAL_VECTOR( boundCond,double),
+    void SetParameters(Eigen::VectorXd boundCond,
 		       std::vector<double> timeDistr);
     
     /*! Destructor. */
@@ -132,9 +129,9 @@ namespace PatternGeneratorJRL
     StepOverSpline();
     
     /*! Set the parameters */
-    void SetParameters(MAL_VECTOR( Points,double));
+    void SetParameters(Eigen::VectorXd Points);
     
-    double GetValueSpline(MAL_VECTOR( TimePoints,double),
+    double GetValueSpline(Eigen::VectorXd TimePoints,
 			  double CurrentLocalTime);
     
     void print();
@@ -144,7 +141,7 @@ namespace PatternGeneratorJRL
 
   protected:
     unsigned int number;
-    MAL_MATRIX( Coefficients,double);
+    Eigen::MatrixXd Coefficients;
   };
 
   /*! @ingroup steppingover
@@ -156,11 +153,11 @@ namespace PatternGeneratorJRL
     StepOverClampedCubicSpline();
     
     /*! Set the parameters */
-    void SetParameters(MAL_VECTOR(Points,double),
-		       MAL_VECTOR(TimePoints,double),
-		       MAL_VECTOR(DerivativeEndPoints,double));
+    void SetParameters(Eigen::VectorXd Points,
+		       Eigen::VectorXd TimePoints,
+		       Eigen::VectorXd DerivativeEndPoints);
     
-    double GetValueSpline(MAL_VECTOR(TimePoints,double), 
+    double GetValueSpline(Eigen::VectorXd TimePoints, 
 			  double CurrentLocalTime);
     
     void print();
@@ -169,7 +166,7 @@ namespace PatternGeneratorJRL
     
   protected:
     unsigned int number;
-    MAL_MATRIX( Coefficients,double);
+    Eigen::MatrixXd Coefficients;
     
   };
   

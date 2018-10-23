@@ -30,8 +30,7 @@
 #ifndef _OPTIMAL_CONTROLLER_SOLVER_H_
 #define _OPTIMAL_CONTROLLER_SOLVER_H_
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
+#include <Eigen/Dense>
 
 namespace PatternGeneratorJRL
 {

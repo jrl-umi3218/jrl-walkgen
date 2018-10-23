@@ -411,10 +411,10 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
       aFootPosition.theta = OmegaStep;
 
       {
-	MAL_MATRIX_DIM(A,double,2,2);
-	MAL_MATRIX_SET_IDENTITY(A);
-	MAL_MATRIX_DIM(Ap,double,2,2);
-	MAL_MATRIX_SET_IDENTITY(Ap);
+	Eigen::Matrix<double,2,2> A;;
+	A.setIdentity();
+	Eigen::Matrix<double,2,2> Ap;;
+	Ap.setIdentity();
 
 	Omegakp = Omegak;
 	Omegak = Omegak + OmegaStep;
@@ -432,11 +432,11 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
 	cp = cos(Omegakp*M_PI/180.0);
 	sp = sin(Omegakp*M_PI/180.0);
 
-	MAL_VECTOR_DIM(lv,double,2);
-	MAL_VECTOR_DIM(lv2,double,2);
+	Eigen::Matrix<double,2,1> lv;
+	Eigen::Matrix<double,2,1> lv2;
 	lv(0) = (R+DirectionRay*SupportFoot*0.095)*s - (R-DirectionRay*SupportFoot*0.095)*sp;
 	lv(1) = -((R+DirectionRay*SupportFoot*0.095)*c - (R-DirectionRay*SupportFoot*0.095)*cp);
-	MAL_C_eq_A_by_B(lv2,A,lv);
+	lv2=A+lv;
 	ODEBUG(" X: " << (R+DirectionRay*SupportFoot*0.095)*s << " " << (R-DirectionRay*SupportFoot*0.095)*sp
 		<< " " << StepMax << " " << lv(0) << " " << lv2(0) );
 	ODEBUG(" Y: " << (R+DirectionRay*SupportFoot*0.095)*c << " " << (R-DirectionRay*SupportFoot*0.095)*cp
@@ -465,8 +465,8 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
       aFootPosition.theta = LastOmegaStep;
 
       {
-	MAL_MATRIX_DIM(A,double,2,2);
-	MAL_MATRIX_SET_IDENTITY(A);
+	Eigen::Matrix<double,2,2> A;;
+	A.setIdentity();
 
 	Omegakp = Omegak;
 	Omegak = Omegak + LastOmegaStep;
@@ -481,11 +481,11 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
 
 	A(0,0) = c;  A(0,1) =s;
 	A(1,0) = -s;  A(1,1) = c;
-	MAL_VECTOR_DIM(lv,double,2);
-	MAL_VECTOR_DIM(lv2,double,2);
+	Eigen::Matrix<double,2,1> lv;
+	Eigen::Matrix<double,2,1> lv2;
 	lv(0) = (R+DirectionRay*SupportFoot*0.095)*s - (R-DirectionRay*SupportFoot*0.095)*sp;
 	lv(1) = -((R+DirectionRay*SupportFoot*0.095)*c - (R-DirectionRay*SupportFoot*0.095)*cp);
-	MAL_C_eq_A_by_B(lv2,A,lv);
+	lv2=A+lv;
 	ODEBUG(" X: " << (R+DirectionRay*SupportFoot*0.095)*s << " " << (R-DirectionRay*SupportFoot*0.095)*sp
 		<< " " << lv(0) << " " << lv2(0) );
 	ODEBUG(" Y: " << (R+DirectionRay*SupportFoot*0.095)*c << " " << (R-DirectionRay*SupportFoot*0.095)*cp
@@ -576,7 +576,7 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
 
   double S=-SupportFoot*0.095;
 
-  MAL_MATRIX_DIM(Romegastep,double,3,3);
+  Eigen::Matrix<double,3,3> Romegastep;;
   for(int i=0;i<3;i++)
     for(int j=0;j<3;j++)
       if (i==j)
@@ -586,15 +586,15 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
   Romegastep(0,0) = cosOmegaStep; Romegastep(0,1) = -sinOmegaStep;
   Romegastep(1,0) = sinOmegaStep; Romegastep(1,1) =  cosOmegaStep;
 
-  MAL_MATRIX_DIM(MFNSF,double,3,3);
-  MAL_MATRIX_DIM(MFSF,double,3,3);
-  MAL_MATRIX_DIM(Romega,double,3,3);
-  MAL_MATRIX_DIM(iRomega,double,3,3);
-  MAL_MATRIX_DIM(RiR,double,3,3);
-  MAL_MATRIX_DIM(FPos,double,3,3);
-  MAL_MATRIX_DIM(MSupportFoot,double,3,3);
-  MAL_MATRIX_DIM(Mtmp,double,3,3);
-  MAL_MATRIX_DIM(Mtmp2,double,3,3);
+  Eigen::Matrix<double,3,3> MFNSF;;
+  Eigen::Matrix<double,3,3> MFSF;;
+  Eigen::Matrix<double,3,3> Romega;;
+  Eigen::Matrix<double,3,3> iRomega;;
+  Eigen::Matrix<double,3,3> RiR;;
+  Eigen::Matrix<double,3,3> FPos;;
+  Eigen::Matrix<double,3,3> MSupportFoot;;
+  Eigen::Matrix<double,3,3> Mtmp;;
+  Eigen::Matrix<double,3,3> Mtmp2;;
 
   for(int i=0;i<3;i++)
     for(int j=0;j<3;j++)
@@ -645,17 +645,17 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
       Romega(0,2) = 0;
       Romega(1,2) = 0;
 
-      MAL_MATRIX(lTmp,double);
-      MAL_C_eq_A_by_B(lTmp,MSupportFoot,Romegastep);
-      MAL_INVERSE(lTmp, RiR,double);
+      Eigen::MatrixXd lTmp;
+      lTmp=MSupportFoot+Romegastep;
+      lTmp=RiR.inverse();
 
       ODEBUG(" Iteration " << i);
       ODEBUG(" Romega " << Romega);
       ODEBUG(" RiR " << RiR);
 
-      MAL_C_eq_A_by_B(FPos, Romega, MFNSF);
+      FPos=Romega+MFNSF;
       ODEBUG("FPos: " << FPos);
-      MAL_C_eq_A_by_B(FPos,RiR,FPos);
+      FPos=RiR+FPos;
       ODEBUG("FPos final :");
 
       aFootPosition.sx = FPos(0,2);
@@ -665,7 +665,7 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
       aFootPosition.DStime = m_DoubleSupportTime;
 
       m_RelativeFootPositions.push_back(aFootPosition);
-      MAL_C_eq_A_by_B(MSupportFoot, Romega,MFNSF);
+      MSupportFoot=Romega+MFNSF;
 
 #if 0
       DebugFile.open("/tmp/outputL.txt",ofstream::app);
@@ -703,7 +703,7 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
 
 	  Mtmp2 = Mtmp2*Mtmp;
       */
-      MSupportFoot =  MAL_RET_A_by_B( MSupportFoot, Mtmp);
+      MSupportFoot =  MSupportFoot*Mtmp;
 
 #if 0
       DebugFile.open("/tmp/outputNL.txt",ofstream::app);
@@ -744,12 +744,12 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
       iRomega(1,0) = sinlOmegaStep;
       iRomega(1,1) = coslOmegaStep;
 
-      MAL_MATRIX(lTmp,double);
-      MAL_C_eq_A_by_B(lTmp,MSupportFoot,iRomega);
-      MAL_INVERSE(lTmp, RiR,double);
+      Eigen::MatrixXd lTmp;
+      lTmp=MSupportFoot+iRomega;
+      lTmp=RiR.inverse();
 
-      MAL_C_eq_A_by_B(FPos, Romega, MFNSF);
-      FPos = MAL_RET_A_by_B(RiR,FPos);
+      FPos=Romega+MFNSF;
+      FPos = RiR*FPos;
 
       aFootPosition.sx = FPos(0,2);
       aFootPosition.sy = FPos(1,2);
@@ -758,7 +758,7 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
       aFootPosition.DStime = m_DoubleSupportTime;
 
       m_RelativeFootPositions.push_back(aFootPosition);
-      MAL_C_eq_A_by_B(MSupportFoot,Romega,MFNSF);
+      MSupportFoot=Romega+MFNSF;
 
 #if 0
       DebugFile.open("/tmp/outputL.txt",ofstream::app);
@@ -790,7 +790,7 @@ void StepStackHandler::CreateArcCenteredInStepStack(  double R,
 		<< endl;
       DebugFile.close();
 #endif
-      MSupportFoot = MAL_RET_A_by_B( MSupportFoot , Mtmp);
+      MSupportFoot = MSupportFoot*Mtmp;
 
 #if 0
       DebugFile.open("/tmp/outputNL.txt",ofstream::app);

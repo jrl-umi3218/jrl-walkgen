@@ -26,7 +26,7 @@
 #ifndef _RIGID_BODY_
 #define _RIGID_BODY_
 
-#include <jrl/mal/matrixabstractlayer.hh>
+
 #include <deque>
 #include <jrl/walkgen/pgtypes.hh>
 #include <privatepgtypes.hh>
@@ -39,15 +39,15 @@ namespace PatternGeneratorJRL
   {
     /// \name Translational degrees of freedom
     /// \{
-    boost_ublas::vector<double> X;
-    boost_ublas::vector<double> Y;
-    boost_ublas::vector<double> Z;
+    Eigen::VectorXd X;
+    Eigen::VectorXd Y;
+    Eigen::VectorXd Z;
     /// \}
     /// \name Rotational degrees of freedom
     /// \{
-    boost_ublas::vector<double> Pitch;
-    boost_ublas::vector<double> Roll;
-    boost_ublas::vector<double> Yaw;
+    Eigen::VectorXd Pitch;
+    Eigen::VectorXd Roll;
+    Eigen::VectorXd Yaw;
     /// \}
 
     struct rigid_body_state_s & operator=(const rigid_body_state_s &RB);
@@ -63,24 +63,24 @@ namespace PatternGeneratorJRL
   struct linear_dynamics_s
   {
     /// \brief Control matrix
-    boost_ublas::matrix<double,boost_ublas::row_major> U;
+    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> U;
 
     /// \brief Inverse of control matrix
-    boost_ublas::matrix<double> Um1;
+    Eigen::MatrixXd Um1;
 
     /// \brief Transpose of control matrix
-    boost_ublas::matrix<double> UT;
+    Eigen::MatrixXd UT;
 
     /// \brief State matrix
-    boost_ublas::matrix<double, boost_ublas::row_major> S;
+    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> S;
 
     dynamics_e Type;
 
     void clear()
     {
-      U.clear();
-      UT.clear();
-      S.clear();
+      U.setZero();
+      UT.setZero();
+      S.setZero();
     }
   };
   typedef linear_dynamics_s linear_dynamics_t;
@@ -121,7 +121,7 @@ namespace PatternGeneratorJRL
     /// \param[in] Trajectory The injected trajectory
     ///
     /// \return 0
-    int inject_trajectory( unsigned int Axis, boost_ublas::vector<double> Trajectory );
+    int inject_trajectory( unsigned int Axis, Eigen::VectorXd Trajectory );
 
     /// \name Accessors
     /// \{

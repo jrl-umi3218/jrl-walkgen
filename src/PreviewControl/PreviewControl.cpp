@@ -51,11 +51,11 @@ PreviewControl::PreviewControl(SimplePluginManager *lSPM,
   m_Zc = 0.0;
   m_SizeOfPreviewWindow = 0;
 
-  Eigen::MatrixXd m_A.resize(3,3);
-  Eigen::MatrixXd m_B.resize(3,1);
-  Eigen::MatrixXd m_C.resize(1,3);
+  m_A.resize(3,3);
+  m_B.resize(3,1);
+  m_C.resize(1,3);
 
-  Eigen::MatrixXd m_Kx.resize(1,3);
+  m_Kx.resize(1,3);
   m_Ks = 0;
 
 
@@ -166,7 +166,7 @@ void PreviewControl::ReadPrecomputedFile(string aFileName)
 
       m_SizeOfPreviewWindow = (unsigned int)(m_PreviewControlTime/
 					     m_SamplingPeriod);
-      Eigen::MatrixXd m_F.resize(m_SizeOfPreviewWindow,1);
+      Eigen::MatrixXd m_F(m_SizeOfPreviewWindow,1);
 
       for(unsigned int i=0;i<m_SizeOfPreviewWindow;i++)
 	{
@@ -236,12 +236,12 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
       R = 1e-6;
 
       // Build the derivated system
-      Eigen::Matrix<double,4,4> Ax;
-      Ax::Zero();
+      Eigen::MatrixXd Ax(4,4);
+      Ax.setZero();
       Eigen::MatrixXd tmpA;
-      Eigen::Matrix<double,4,1> bx;
+      Eigen::MatrixXd bx(4,1);
       Eigen::MatrixXd tmpb;
-      Eigen::Matrix<double,1,4> cx;
+      Eigen::MatrixXd cx(1,4);
 
       tmpA = m_C*m_A;
 
@@ -268,7 +268,8 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
       ODEBUG("cx:" << cx);
       ODEBUG("Q:" << Q);
       ODEBUG("R:" << R);
-      anOCS = new PatternGeneratorJRL::OptimalControllerSolver(Ax,bx,cx,Q,R,Nl);
+      anOCS = new PatternGeneratorJRL::
+	OptimalControllerSolver(Ax,bx,cx,Q,R,Nl);
 
       anOCS->ComputeWeights(OptimalControllerSolver::MODE_WITHOUT_INITIALPOS);
 
@@ -318,7 +319,7 @@ void PreviewControl::ComputeOptimalWeights(unsigned int mode)
 
   m_SizeOfPreviewWindow = (unsigned int)(m_PreviewControlTime/
 					 m_SamplingPeriod);
-  Eigen::MatrixXd m_F.resize(m_SizeOfPreviewWindow,1);
+  Eigen::MatrixXd m_F(m_SizeOfPreviewWindow,1);
 
   m_Coherent = true;
 }
@@ -385,7 +386,7 @@ int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
 
   double ux=0.0;
 
-  Eigen::MatrixXd<double,1,1> r;
+  Eigen::Matrix<double,1,1> r;
 
   // Compute the command.
   r = m_Kx * x;
@@ -432,7 +433,7 @@ int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
 
   double ux=0.0;
 
-  Eigen::MatrixXd<double,1,1> r;
+  Eigen::Matrix<double,1,1> r;
 
   // Compute the command.
   r = m_Kx * x;

@@ -29,7 +29,6 @@
 #ifndef _ZMPREF_TRAJ_GEN_H_
 #define _ZMPREF_TRAJ_GEN_H_
 
-#include <jrl/mal/matrixabstractlayer.hh>
 
 #include <deque>
 #include <string>
@@ -212,7 +211,7 @@ namespace PatternGeneratorJRL
 				      std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 				      double Xmax,
 				      COMState & lStartingCOMState,
-				      MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+				      Eigen::Vector3d & lStartingZMPPosition,
 				      FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				      FootAbsolutePosition & InitRightFootAbsolutePosition) = 0;
     
@@ -244,7 +243,7 @@ namespace PatternGeneratorJRL
 			   FootAbsolutePosition & InitRightFootAbsolutePosition,
 			   std::deque<RelativeFootPosition> &RelativeFootPositions,
 			   COMState & lStartingCOMState,
-			   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)   = 0;
+			   Eigen::Vector3d & lStartingZMPPosition)   = 0;
     
 
 

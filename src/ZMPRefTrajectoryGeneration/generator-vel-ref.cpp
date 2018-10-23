@@ -547,8 +547,8 @@ GeneratorVelRef::build_eq_constraints_feet( const std::deque<support_state_t> & 
     Robot_->SupportTrajectory().pop_front();
   std::deque<support_state_t>::const_iterator SPTraj_it = Robot_->SupportTrajectory().begin();
 
-  boost_ublas::matrix<double> EqualityMatrix;
-  boost_ublas::vector<double> EqualityVector;
+  Eigen::MatrixXd EqualityMatrix;
+  Eigen::VectorXd EqualityVector;
   EqualityMatrix.resize(2,2*NbStepsPreviewed, false);
   EqualityMatrix.clear();
   EqualityVector.resize(2, false);
@@ -589,8 +589,8 @@ void GeneratorVelRef::build_eq_constraints_limitPosFeet(const solution_t & Solut
       && Solution.SupportStates_deq.front().StateChanged != 1 && NbStepsPreviewed > 0 )
   {
     unsigned int NbConstraints = Pb.NbConstraints();
-    boost_ublas::matrix<double> EqualityMatrix;
-    boost_ublas::vector<double> EqualityVector;
+    Eigen::MatrixXd EqualityMatrix;
+    Eigen::VectorXd EqualityVector;
 
     EqualityMatrix.resize(2,2*N_+2*NbStepsPreviewed, false);
     EqualityMatrix.clear();
@@ -751,8 +751,8 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
   support_state_t currentSupport = Solution.SupportStates_deq.front();
 
   // ZMP position vector
-  boost_ublas::vector<double> zx(N_);
-  boost_ublas::vector<double> zy(N_);
+  Eigen::VectorXd zx(N_);
+  Eigen::VectorXd zy(N_);
 
   double feetSpacing = 0.2;
   double sgn = 0;
@@ -796,8 +796,8 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
 
   // Compute initial jerk:
   // ---------------------
-  boost_ublas::vector<double> X(N_);
-  boost_ublas::vector<double> Y(N_);
+  Eigen::VectorXd X(N_);
+  Eigen::VectorXd Y(N_);
   MV2_= prod( Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.x  );
   X=    prod( Robot_->DynamicsCoPJerk().Um1, zx-MV2_                     );
   MV2_= prod( Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.y  );
@@ -814,40 +814,40 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
 
 
 void
-GeneratorVelRef::compute_term(MAL_MATRIX (&weightMM, double), double weight,
-    const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double))
+GeneratorVelRef::compute_term(Eigen::MatrixXd &weightMM, double weight,
+    const Eigen::MatrixXd &M1, const Eigen::MatrixXd &M2)
 {
-  weightMM = MAL_RET_A_by_B(M1,M2);
+  weightMM = M1*M2;
   weightMM *= weight;
 }
 
 
 void
-GeneratorVelRef::compute_term(MAL_VECTOR (&weightMV, double), double weight,
-    const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double))
+GeneratorVelRef::compute_term(Eigen::VectorXd &weightMV, double weight,
+    const Eigen::MatrixXd &M, const Eigen::VectorXd &V)
 {
-  weightMV = MAL_RET_A_by_B(M,V);
+  weightMV = M*V;
   weightMV *= weight;
 }
 
 
 void
-GeneratorVelRef::compute_term(MAL_VECTOR (&weightMV, double),
-    double weight, const MAL_MATRIX (&M, double),
-    const MAL_VECTOR (&V, double), double scalar)
+GeneratorVelRef::compute_term(Eigen::VectorXd &weightMV,
+    double weight, const Eigen::MatrixXd &M,
+    const Eigen::VectorXd &V, double scalar)
 {
-  weightMV = MAL_RET_A_by_B(M,V);
+  weightMV = M*V;
   weightMV *= weight*scalar;
 }
 
 
 void
-GeneratorVelRef::compute_term(MAL_VECTOR (&weightMV, double),
-    double weight, const MAL_MATRIX (&M1, double),
-    const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double))
+GeneratorVelRef::compute_term(Eigen::VectorXd &weightMV,
+    double weight, const Eigen::MatrixXd &M1,
+    const Eigen::MatrixXd &M2, const Eigen::VectorXd &V2)
 {
-  MV2_ = MAL_RET_A_by_B(M2,V2);
-  weightMV = MAL_RET_A_by_B(M1,MV2_);
+  MV2_ = M2*V2;
+  weightMV = M1*MV2_;
   weightMV *= weight;
 }
 

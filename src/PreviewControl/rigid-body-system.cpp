@@ -26,7 +26,6 @@
 
 using namespace PatternGeneratorJRL;
 using namespace std;
-using namespace boost_ublas;
 
 RigidBodySystem::RigidBodySystem( SimplePluginManager * SPM, PinocchioRobot * aPR, SupportFSM * FSM ):
             mass_(0),CoMHeight_(0),T_(0),Tr_(0),Ta_(0),N_(0),multiBody_(false),
@@ -77,8 +76,8 @@ RigidBodySystem::initialize(  )
   // TODO: Remove CoP dynamics
   if(multiBody_)
     {
-      LeftFoot_.Dynamics ( COP_POSITION ).S.resize(N_,3,false);
-      RightFoot_.Dynamics( COP_POSITION ).S.resize(N_,3,false);
+      LeftFoot_.Dynamics ( COP_POSITION ).S.resize(N_,3);
+      RightFoot_.Dynamics( COP_POSITION ).S.resize(N_,3);
       LeftFoot_.Dynamics ( COP_POSITION ).clear();
       RightFoot_.Dynamics( COP_POSITION ).clear();
     }
@@ -166,7 +165,7 @@ RigidBodySystem::precompute_trajectories( const deque<support_state_t> & Support
   // Precompute vertical foot trajectories
   // The lowest height is the height of the ankle:
   // ---------------------------------------------
-  vector3d LocalAnklePosition;
+  Eigen::Vector3d LocalAnklePosition;
   LocalAnklePosition = PR_->leftFoot()->anklePosition ;
 
   deque<support_state_t>::const_iterator SS_it = SupportStates_deq.begin();
@@ -253,33 +252,34 @@ RigidBodySystem::update( const std::deque<support_state_t> & SupportStates_deq,
 
 }
 
-
+#if 0
 /* TODO : Move this function on another file
  *
  * Matrix inversion routine.
    Uses lu_factorize and lu_substitute in uBLAS to invert a matrix */
 template<class T> bool
-invertMatrix (const boost_ublas::matrix<T>& input, boost_ublas::matrix<T>& inverse) {
+invertMatrix (const Eigen::Matrix<T,Dynamic,Dynamic>& input,
+	      Eigen::Matrix<T,Dynamic,Dynamic>& inverse) {
   using namespace boost::numeric::ublas;
   typedef permutation_matrix<std::size_t> pmatrix;
   // create a working copy of the input
   matrix<T> A(input);
   // create a permutation matrix for the LU-factorization
-  pmatrix pm(A.size1());
+  pmatrix pm(A.rows());
 
   // perform LU-factorization
   int res = lu_factorize(A,pm);
   if( res != 0 ) return false;
 
   // create identity matrix of "inverse"
-  inverse.assign(boost_ublas::identity_matrix<T>(A.size1()));
+  inverse.assign(boost_ublas::identity_matrix<T>(A.rows()));
 
   // backsubstitute to get the inverse
   lu_substitute(A, pm, inverse);
 
   return true;
 }
-
+#endif
 
 int
 RigidBodySystem::compute_dyn_cop( unsigned nbSteps )
@@ -290,10 +290,10 @@ RigidBodySystem::compute_dyn_cop( unsigned nbSteps )
   if(multiBody_)
     {
       //TODO: Use of bounded_array to avoid dynamic allocation
-      LeftFoot_. Dynamics( COP_POSITION ).U.resize(N_,nbSteps,false);
-      LeftFoot_. Dynamics( COP_POSITION ).UT.resize(nbSteps,N_,false);
-      RightFoot_.Dynamics( COP_POSITION ).U.resize(N_,nbSteps,false);
-      RightFoot_.Dynamics( COP_POSITION ).UT.resize(nbSteps,N_,false);
+      LeftFoot_. Dynamics( COP_POSITION ).U.resize(N_,nbSteps);
+      LeftFoot_. Dynamics( COP_POSITION ).UT.resize(nbSteps,N_);
+      RightFoot_.Dynamics( COP_POSITION ).U.resize(N_,nbSteps);
+      RightFoot_.Dynamics( COP_POSITION ).UT.resize(nbSteps,N_);
       LeftFoot_. Dynamics( COP_POSITION ).clear();
       RightFoot_.Dynamics( COP_POSITION ).clear();
     }
@@ -314,28 +314,28 @@ RigidBodySystem::compute_dyn_cop( unsigned nbSteps )
           LeftFoot_.Mass()*(LFTraj_it->Z[2]+GRAVITY)+
           RightFoot_.Mass()*(RFTraj_it->Z[2]+GRAVITY);
 
-      row   ( CoPDynamicsJerk_.S, i )  += row( CoM_.Dynamics(POSITION).S, i ) *           CoM_.Mass()*( CoMTraj_it->Z[2]+GRAVITY )/GRF;
-      row   ( CoPDynamicsJerk_.U, i )  += row( CoM_.Dynamics(POSITION).U, i ) *           CoM_.Mass()*( CoMTraj_it->Z[2]+GRAVITY )/GRF;
-      column( CoPDynamicsJerk_.UT, i ) += row( CoM_.Dynamics(POSITION).U, i ) *           CoM_.Mass()*( CoMTraj_it->Z[2]+GRAVITY )/GRF;
-      row   ( CoPDynamicsJerk_.S, i )  -= row( CoM_.Dynamics(ACCELERATION).S, i ) *       CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
-      row   ( CoPDynamicsJerk_.U, i )  -= row( CoM_.Dynamics(ACCELERATION).U, i ) *       CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
-      column( CoPDynamicsJerk_.UT, i ) -= row( CoM_.Dynamics(ACCELERATION).U, i ) *       CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
+      CoPDynamicsJerk_.S.row( i )     += CoM_.Dynamics(POSITION).S.row( i ) *     CoM_.Mass()*( CoMTraj_it->Z[2]+GRAVITY )/GRF;
+      CoPDynamicsJerk_.U.row(i )      += CoM_.Dynamics(POSITION).U.row( i ) *     CoM_.Mass()*( CoMTraj_it->Z[2]+GRAVITY )/GRF;
+      CoPDynamicsJerk_.UT.col( i )    += CoM_.Dynamics(POSITION).U.row( i ) *     CoM_.Mass()*( CoMTraj_it->Z[2]+GRAVITY )/GRF;
+      CoPDynamicsJerk_.S.row( i )     -= CoM_.Dynamics(ACCELERATION).S.row( i ) * CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
+      CoPDynamicsJerk_.U.row( i )     -= CoM_.Dynamics(ACCELERATION).U.row( i ) * CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
+      CoPDynamicsJerk_.UT.col( i )    -= CoM_.Dynamics(ACCELERATION).U.row( i ) * CoM_.Mass()*( CoMTraj_it->Z[0] )/GRF;
 
       if(multiBody_)
         {
-          row   ( LeftFoot_.Dynamics(COP_POSITION).S, i )  += row( LeftFoot_.Dynamics(POSITION).S, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
-          row   ( LeftFoot_.Dynamics(COP_POSITION).U, i )  += row( LeftFoot_.Dynamics(POSITION).U, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
-          column( LeftFoot_.Dynamics(COP_POSITION).UT, i ) += row( LeftFoot_.Dynamics(POSITION).U, i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
-          row   ( LeftFoot_.Dynamics(COP_POSITION).S, i )  -= row( LeftFoot_.Dynamics(ACCELERATION).S, i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
-          row   ( LeftFoot_.Dynamics(COP_POSITION).U, i )  -= row( LeftFoot_.Dynamics(ACCELERATION).U, i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
-          column( LeftFoot_.Dynamics(COP_POSITION).UT, i ) -= row( LeftFoot_.Dynamics(ACCELERATION).U, i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
+          LeftFoot_.Dynamics(COP_POSITION).S.row( i )  +=  LeftFoot_.Dynamics(POSITION).S.row( i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
+          LeftFoot_.Dynamics(COP_POSITION).U.row( i )  +=  LeftFoot_.Dynamics(POSITION).U.row( i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
+	  LeftFoot_.Dynamics(COP_POSITION).UT.col( i ) +=  LeftFoot_.Dynamics(POSITION).U.row( i ) *      LeftFoot_.Mass()*( LFTraj_it->Z[2]+GRAVITY )/GRF;
+          LeftFoot_.Dynamics(COP_POSITION).S.row( i )  -=  LeftFoot_.Dynamics(ACCELERATION).S.row( i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
+          LeftFoot_.Dynamics(COP_POSITION).U.row( i )  -=  LeftFoot_.Dynamics(ACCELERATION).U.row( i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
+	  LeftFoot_.Dynamics(COP_POSITION).UT.col( i ) -=  LeftFoot_.Dynamics(ACCELERATION).U.row( i ) *  LeftFoot_.Mass()*( LFTraj_it->Z[0] )/GRF;
 
-          row   ( RightFoot_.Dynamics(COP_POSITION).S, i )  += row( RightFoot_.Dynamics(POSITION).S, i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
-          row   ( RightFoot_.Dynamics(COP_POSITION).U, i )  += row( RightFoot_.Dynamics(POSITION).U, i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
-          column( RightFoot_.Dynamics(COP_POSITION).UT, i ) += row( RightFoot_.Dynamics(POSITION).U, i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
-          row   ( RightFoot_.Dynamics(COP_POSITION).S, i )  -= row( RightFoot_.Dynamics(ACCELERATION).S, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
-          row   ( RightFoot_.Dynamics(COP_POSITION).U, i )  -= row( RightFoot_.Dynamics(ACCELERATION).U, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
-          column( RightFoot_.Dynamics(COP_POSITION).UT, i ) -= row( RightFoot_.Dynamics(ACCELERATION).U, i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
+          RightFoot_.Dynamics(COP_POSITION).S.row( i )  +=  RightFoot_.Dynamics(POSITION).S.row( i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
+          RightFoot_.Dynamics(COP_POSITION).U.row( i )  +=  RightFoot_.Dynamics(POSITION).U.row( i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
+	  RightFoot_.Dynamics(COP_POSITION).UT.col( i ) +=  RightFoot_.Dynamics(POSITION).U.row( i ) *     RightFoot_.Mass()*( RFTraj_it->Z[2]+GRAVITY )/GRF;
+          RightFoot_.Dynamics(COP_POSITION).S.row( i )  -=  RightFoot_.Dynamics(ACCELERATION).S.row( i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
+          RightFoot_.Dynamics(COP_POSITION).U.row( i )  -=  RightFoot_.Dynamics(ACCELERATION).U.row( i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
+  	  RightFoot_.Dynamics(COP_POSITION).UT.col( i ) -=  RightFoot_.Dynamics(ACCELERATION).U.row( i ) * RightFoot_.Mass()*( RFTraj_it->Z[0] )/GRF;
         }
 
       CoMTraj_it++;
@@ -343,7 +343,7 @@ RigidBodySystem::compute_dyn_cop( unsigned nbSteps )
       RFTraj_it++;
     }
 
-  CoPDynamicsJerk_.Um1.resize(CoPDynamicsJerk_.U.size1(),CoPDynamicsJerk_.U.size2());
+  CoPDynamicsJerk_.Um1.resize(CoPDynamicsJerk_.U.rows(),CoPDynamicsJerk_.U.cols());
   //    invertMatrix(CoPDynamicsJerk_.U,CoPDynamicsJerk_.Um1);
 
   return 0;
@@ -372,12 +372,12 @@ int
 RigidBodySystem::compute_dyn_cjerk( linear_dynamics_t & Dynamics )
 {
   //TODO: This can be moved to RigidBody.
-  Dynamics.U.resize(N_,N_,false);
-  Dynamics.U.clear();
-  Dynamics.UT.resize(N_,N_,false);
-  Dynamics.UT.clear();
-  Dynamics.S.resize(N_,3,false);
-  Dynamics.S.clear();
+  Dynamics.U.resize(N_,N_);
+  Dynamics.U.setZero();
+  Dynamics.UT.resize(N_,N_);
+  Dynamics.UT.setZero();
+  Dynamics.S.resize(N_,3);
+  Dynamics.S.setZero();
 
   switch(Dynamics.Type)
   {
@@ -455,16 +455,16 @@ RigidBodySystem::compute_foot_zero_dynamics( const std::deque<support_state_t> &
   // --------------------
   unsigned int nbSteps = SupportStates_deq.back().StepNumber;
 
-  LeftFootDynamics.U.resize(N_,nbSteps,false);
-  LeftFootDynamics.U.clear();
-  LeftFootDynamics.UT.resize(nbSteps,N_,false);
-  LeftFootDynamics.UT.clear();
-  LeftFootDynamics.S.clear();
-  RightFootDynamics.U.resize(N_,nbSteps,false);
-  RightFootDynamics.U.clear();
-  RightFootDynamics.UT.resize(nbSteps,N_,false);
-  RightFootDynamics.UT.clear();
-  RightFootDynamics.S.clear();
+  LeftFootDynamics.U.resize(N_,nbSteps);
+  LeftFootDynamics.U.setZero();
+  LeftFootDynamics.UT.resize(nbSteps,N_);
+  LeftFootDynamics.UT.setZero();
+  LeftFootDynamics.S.setZero();
+  RightFootDynamics.U.resize(N_,nbSteps);
+  RightFootDynamics.U.setZero();
+  RightFootDynamics.UT.resize(nbSteps,N_);
+  RightFootDynamics.UT.setZero();
+  RightFootDynamics.S.setZero();
 
   // Fill the matrices:
   // ------------------
@@ -568,16 +568,16 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
   // --------------------
   unsigned int nbSteps = SupportStates_deq.back().StepNumber;
 
-  LeftFootDynamics.U.resize(N_,nbSteps,false);
-  LeftFootDynamics.U.clear();
-  LeftFootDynamics.UT.resize(nbSteps,N_,false);
-  LeftFootDynamics.UT.clear();
-  LeftFootDynamics.S.clear();
-  RightFootDynamics.U.resize(N_,nbSteps,false);
-  RightFootDynamics.U.clear();
-  RightFootDynamics.UT.resize(nbSteps,N_,false);
-  RightFootDynamics.UT.clear();
-  RightFootDynamics.S.clear();
+  LeftFootDynamics.U.resize(N_,nbSteps);
+  LeftFootDynamics.U.setZero();
+  LeftFootDynamics.UT.resize(nbSteps,N_);
+  LeftFootDynamics.UT.setZero();
+  LeftFootDynamics.S.setZero();
+  RightFootDynamics.U.resize(N_,nbSteps);
+  RightFootDynamics.U.setZero();
+  RightFootDynamics.UT.resize(nbSteps,N_);
+  RightFootDynamics.UT.setZero();
+  RightFootDynamics.S.setZero();
 
   // Fill the matrices:
   // ------------------
@@ -719,16 +719,16 @@ RigidBodySystem::compute_foot_pol_dynamics( const std::deque<support_state_t> & 
 //  // Resize the matrices:
 //  // --------------------
 //  unsigned int nbSteps = SupportStates_deq.back().StepNumber;
-//  LeftFootDynamics.U.resize(N_,nbSteps,false);
-//  LeftFootDynamics.U.clear();
-//  LeftFootDynamics.UT.resize(nbSteps,N_,false);
-//  LeftFootDynamics.UT.clear();
-//  LeftFootDynamics.S.clear();
-//  RightFootDynamics.U.resize(N_,nbSteps,false);
-//  RightFootDynamics.U.clear();
-//  RightFootDynamics.UT.resize(nbSteps,N_,false);
-//  RightFootDynamics.UT.clear();
-//  RightFootDynamics.S.clear();
+//  LeftFootDynamics.U.resize(N_,nbSteps);
+//  LeftFootDynamics.U.setZero();
+//  LeftFootDynamics.UT.resize(nbSteps,N_);
+//  LeftFootDynamics.UT.setZero();
+//  LeftFootDynamics.S.setZero();
+//  RightFootDynamics.U.resize(N_,nbSteps);
+//  RightFootDynamics.U.setZero();
+//  RightFootDynamics.UT.resize(nbSteps,N_);
+//  RightFootDynamics.UT.setZero();
+//  RightFootDynamics.S.setZero();
 //
 //  // Fill the matrices:
 //  // ------------------

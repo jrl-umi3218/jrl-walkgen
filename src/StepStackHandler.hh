@@ -33,8 +33,6 @@
 
 #include <deque>
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
 
 #include <SimplePlugin.hh>
 #include <jrl/walkgen/pgtypes.hh>

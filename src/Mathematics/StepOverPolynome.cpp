@@ -27,7 +27,6 @@
 #include <iostream>
 #include <vector>
 
-#include <jrl/mal/matrixabstractlayer.hh>
 
 #include <Mathematics/StepOverPolynome.hh>
 
@@ -42,11 +41,11 @@ StepOverPolynomeFoot::StepOverPolynomeFoot() :Polynome(8)
   // SetParameters(boundCond,timeDistr);
 }
 
-void StepOverPolynomeFoot::SetParameters(MAL_VECTOR(boundCond,double), 
+void StepOverPolynomeFoot::SetParameters(Eigen::VectorXd boundCond, 
 					 vector<double> timeDistr)
 {
-  MAL_MATRIX_DIM(Base,double,8,8);
-  MAL_MATRIX_DIM(Temp,double,8,8);
+  Eigen::Matrix<double,8,8> Base;;
+  Eigen::Matrix<double,8,8> Temp;;
 
   double t1,t2,T;
   double Ts2,Ts3,Ts4,Ts5,Ts6,Ts7;
@@ -77,7 +76,7 @@ void StepOverPolynomeFoot::SetParameters(MAL_VECTOR(boundCond,double),
  
   double detBase;
 
-  detBase=MAL_MATRIX_RET_DETERMINANT(Base,double); 
+  detBase=Base.determinant(); 
 
   // cout << "determinant of Base matrix: " << detBase << endl;
 
@@ -85,9 +84,9 @@ void StepOverPolynomeFoot::SetParameters(MAL_VECTOR(boundCond,double),
   for (unsigned int i=0;i<boundCond.size();i++)
     {
       Temp=Base;
-      for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(Temp);j++)
+      for(unsigned int j=0;j<Temp.rows();j++)
 	Temp(j,i) = boundCond(j);
-      m_Coefficients[i] = MAL_MATRIX_RET_DETERMINANT(Temp,double)/detBase;
+      m_Coefficients[i] = Temp.determinant()/detBase;
     };
 
 }
@@ -102,11 +101,11 @@ StepOverPolynomeFootZtoX::StepOverPolynomeFootZtoX() :Polynome(3)
   // SetParameters(boundCond,timeDistr);
 }
 
-void StepOverPolynomeFootZtoX::SetParameters(MAL_VECTOR(Zpos,double),
+void StepOverPolynomeFootZtoX::SetParameters(Eigen::VectorXd Zpos,
 					     vector<double> Xpos)
 {
-  MAL_MATRIX_DIM(Base,double,4,4);
-  MAL_MATRIX_DIM(Temp,double,4,4);
+  Eigen::Matrix<double,4,4> Base;;
+  Eigen::Matrix<double,4,4> Temp;;
 
   double x1,x2,x3;
   double x1s2,x1s3,x2s2,x2s3,x3s2,x3s3;
@@ -132,14 +131,14 @@ void StepOverPolynomeFootZtoX::SetParameters(MAL_VECTOR(Zpos,double),
   
   double detBase;
 
-  detBase=MAL_MATRIX_RET_DETERMINANT(Base,double); 
+  detBase=Base.determinant(); 
  
   for (unsigned int i=0;i<Zpos.size();i++)
     {
       Temp=Base;
       for(unsigned int j=0;j<Zpos.size();j++)
 	Temp(j,i) = Zpos(j);
-      m_Coefficients[i] = MAL_MATRIX_RET_DETERMINANT(Temp,double)/detBase;
+      m_Coefficients[i] = Temp.determinant()/detBase;
     };
 
 }
@@ -155,11 +154,11 @@ StepOverPolynomeFootXtoTime::StepOverPolynomeFootXtoTime() :Polynome(4)
   // SetParameters(boundCond,timeDistr);
 }
 
-void StepOverPolynomeFootXtoTime::SetParameters(MAL_VECTOR(Xbound,double), 
+void StepOverPolynomeFootXtoTime::SetParameters(Eigen::VectorXd Xbound, 
 						vector<double> timeDistr)
 {
-  MAL_MATRIX_DIM(Base,double,5,5);
-  MAL_MATRIX_DIM(Temp,double,5,5);
+  Eigen::Matrix<double,5,5> Base;;
+  Eigen::Matrix<double,5,5> Temp;;
 
   double t1,t2,T;
   double Ts2,Ts3,Ts4;
@@ -182,7 +181,7 @@ void StepOverPolynomeFootXtoTime::SetParameters(MAL_VECTOR(Xbound,double),
  
   double detBase;
 
-  detBase=MAL_MATRIX_RET_DETERMINANT(Base,double); 
+  detBase=Base.determinant(); 
 
   // cout << "determinant of Base matrix: " << detBase << endl;
 
@@ -191,7 +190,7 @@ void StepOverPolynomeFootXtoTime::SetParameters(MAL_VECTOR(Xbound,double),
       Temp=Base;
       for (unsigned int j=0;j<Xbound.size();j++)
 	Temp(j,i) = Xbound(j);
-      m_Coefficients[i] = MAL_MATRIX_RET_DETERMINANT(Temp,double)/detBase;
+      m_Coefficients[i] = Temp.determinant()/detBase;
     };
 
 }
@@ -209,11 +208,11 @@ StepOverPolynomeHip4::StepOverPolynomeHip4() :Polynome(4)
   // SetParameters(boundCond,timeDistr);
 }
 
-void StepOverPolynomeHip4::SetParameters(MAL_VECTOR(boundCond,double), 
+void StepOverPolynomeHip4::SetParameters(Eigen::VectorXd boundCond, 
 					 vector<double> timeDistr)
 {
-  MAL_MATRIX_DIM(Base,double,4,4);
-  MAL_MATRIX_DIM(Temp,double,4,4);
+  Eigen::Matrix<double,4,4> Base;;
+  Eigen::Matrix<double,4,4> Temp;;
 
   double T;
   double Ts2,Ts3;
@@ -239,7 +238,7 @@ void StepOverPolynomeHip4::SetParameters(MAL_VECTOR(boundCond,double),
  
   double detBase;
 
-  detBase=MAL_MATRIX_RET_DETERMINANT(Base,double); 
+  detBase=Base.determinant(); 
 
   // cout << "determinant of Base matrix: " << detBase << endl;
 
@@ -247,9 +246,9 @@ void StepOverPolynomeHip4::SetParameters(MAL_VECTOR(boundCond,double),
   for (unsigned int i=0;i<boundCond.size();i++)
     {
       Temp=Base;
-      for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(Temp);j++)
+      for(unsigned int j=0;j<Temp.rows();j++)
 	Temp(j,i) = boundCond(j);
-      m_Coefficients[i] =MAL_MATRIX_RET_DETERMINANT(Temp,double)/detBase;
+      m_Coefficients[i] =Temp.determinant()/detBase;
     };
 
 }
@@ -270,18 +269,18 @@ StepOverSpline::StepOverSpline()
   // SetParameters(boundCond,timeDistr);
 }
 
-void StepOverSpline::SetParameters(MAL_VECTOR(Points,double))
+void StepOverSpline::SetParameters(Eigen::VectorXd Points)
 {
-  MAL_MATRIX_DIM(LhSide,double,4,4);
-  MAL_MATRIX_DIM(RhSide,double,4,1);
-  MAL_MATRIX_DIM(TempSol,double,4,1);
+  Eigen::Matrix<double,4,4> LhSide;;
+  Eigen::Matrix<double,4,1> RhSide;;
+  Eigen::Matrix<double,4,1> TempSol;;
  
   number = Points.size();
  
-  MAL_MATRIX_RESIZE(LhSide,number,number);
-  MAL_MATRIX_RESIZE(RhSide,number,1);
-  MAL_MATRIX_RESIZE(TempSol,number,1);
-  MAL_MATRIX_RESIZE(Coefficients,4,number);
+  LhSide.resize(number,number);
+  RhSide.resize(number,1);
+  TempSol.resize(number,1);
+  Coefficients.resize(4,number);
 
   for (unsigned int i=0;i<number;i++)
     { 
@@ -307,9 +306,9 @@ void StepOverSpline::SetParameters(MAL_VECTOR(Points,double))
   LhSide(0,0) = 2.0;
   LhSide(number-1,number-1) = 2.0;
 
-  MAL_MATRIX(iLhSide, double);
-  MAL_INVERSE(LhSide,iLhSide,double);
-  MAL_C_eq_A_by_B(TempSol,iLhSide,RhSide);
+  Eigen::MatrixXd iLhSide;
+  iLhSide=LhSide.inverse();
+  TempSol=iLhSide+RhSide;
 	
   for (unsigned int i=0;i<number-1;i++)
     {
@@ -322,11 +321,11 @@ void StepOverSpline::SetParameters(MAL_VECTOR(Points,double))
 }
 
 // TimePoints has to be defined [t1=O, t2, t3,....,tnumber]
-double StepOverSpline::GetValueSpline(MAL_VECTOR(TimePoints,double), 
+double StepOverSpline::GetValueSpline(Eigen::VectorXd TimePoints, 
 				      double CurrentLocalTime) 
 {
   double ValueSpline =0.0;
-  unsigned int numberComp;
+  long unsigned int numberComp;
   numberComp = TimePoints.size();
   if (!(numberComp=number))
     {
@@ -405,21 +404,21 @@ StepOverClampedCubicSpline::StepOverClampedCubicSpline()
   // SetParameters(boundCond,timeDistr);
 }
  
-void StepOverClampedCubicSpline::SetParameters(MAL_VECTOR( Points, double),
-					       MAL_VECTOR( TimePoints, double),
-					       MAL_VECTOR( DerivativeEndPoints,double))
+void StepOverClampedCubicSpline::SetParameters(Eigen::VectorXd Points,
+					       Eigen::VectorXd TimePoints,
+					       Eigen::VectorXd DerivativeEndPoints)
 {
-  MAL_MATRIX_DIM( LhSide,double,4,4);
-  MAL_MATRIX_DIM( RhSide,double,4,1);
-  MAL_MATRIX_DIM( TempSol,double,4,1);
-  MAL_VECTOR_DIM( h,double,4);
+  Eigen::Matrix<double,4,4> LhSide;;
+  Eigen::Matrix<double,4,1> RhSide;;
+  Eigen::Matrix<double,4,1> TempSol;;
+  Eigen::Matrix<double,4,1> h;
   number = Points.size()-1;
  
-  MAL_MATRIX_RESIZE(LhSide,number+1,number+1);
-  MAL_MATRIX_RESIZE(RhSide,number+1,1);
-  MAL_MATRIX_RESIZE(TempSol,number+1,1);
-  MAL_MATRIX_RESIZE(Coefficients,4,number);
-  MAL_VECTOR_RESIZE(h,number);
+  LhSide.resize(number+1,number+1);
+  RhSide.resize(number+1,1);
+  TempSol.resize(number+1,1);
+  Coefficients.resize(4,number);
+  h.resize(number);
 
   for (unsigned int i=0;i<number;i++)
     { 
@@ -453,11 +452,9 @@ void StepOverClampedCubicSpline::SetParameters(MAL_VECTOR( Points, double),
   LhSide(number,number-1) = h(number-1);
   LhSide(number-1,number) = h(number-1);
 
-  MAL_MATRIX_DIM(iLhSide,double,
-		 MAL_MATRIX_NB_ROWS(LhSide),
-		 MAL_MATRIX_NB_COLS(LhSide));
-  MAL_INVERSE(LhSide,iLhSide,double);
-  MAL_C_eq_A_by_B(TempSol,iLhSide,RhSide);
+  Eigen::MatrixXd iLhSide( LhSide.rows(),LhSide.cols());
+  iLhSide=LhSide.inverse();
+  TempSol=iLhSide+RhSide;
 
   for (unsigned int i=0;i<number;i++)
     {
@@ -472,10 +469,10 @@ void StepOverClampedCubicSpline::SetParameters(MAL_VECTOR( Points, double),
  
 
 
-double StepOverClampedCubicSpline::GetValueSpline(MAL_VECTOR( TimePoints,double), double CurrentLocalTime)
+double StepOverClampedCubicSpline::GetValueSpline(Eigen::VectorXd TimePoints, double CurrentLocalTime)
 {
   double ValueSpline =0.0;
-  unsigned int numberComp;
+  long unsigned int numberComp;
   numberComp = TimePoints.size();
   if (!(numberComp=number))
     {
