@@ -35,8 +35,6 @@
 /* System related inclusions */
 #include <deque>
 
-/*! MatrixAbstractLayer */
-#include <jrl/mal/matrixabstractlayer.hh>
 
 /* dynamics pinocchio related inclusions */
 #include <jrl/walkgen/pinocchiorobot.hh>

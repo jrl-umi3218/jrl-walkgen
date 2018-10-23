@@ -27,7 +27,6 @@
 #ifndef INTERMEDQPMAT_HH_
 #define INTERMEDQPMAT_HH_
 
-#include <jrl/mal/matrixabstractlayer.hh>
 #include <privatepgtypes.hh>
 
 #include <iostream>
@@ -62,19 +61,19 @@ namespace PatternGeneratorJRL
       trunk_t Trunk;
 
       /// \brief Selection matrix for the previewed feet positions
-      boost_ublas::matrix<double> V;
+      Eigen::MatrixXd V;
       /// \brief Shifted selection matrix for the previewed feet positions
-      boost_ublas::matrix<double> Vshift;
+      Eigen::MatrixXd Vshift;
       /// \brief Transpose of V
-      boost_ublas::matrix<double> VT;
+      Eigen::MatrixXd VT;
       /// \brief Selection matrix multiplied with the current foot position
-      boost_ublas::vector<double> VcX, VcY;
+      Eigen::VectorXd VcX, VcY;
       /// \brief Shifted selection matrix multiplied with the current feet position
-      boost_ublas::vector<double> VcshiftX, VcshiftY;
+      Eigen::VectorXd VcshiftX, VcshiftY;
       /// \brief Selection matrix for the current foot position
-      boost_ublas::vector<double> Vc_fX, Vc_fY;
+      Eigen::VectorXd Vc_fX, Vc_fY;
       /// \brief Selection matrix for relative feet positions
-      boost_ublas::matrix<double> V_f;
+      Eigen::MatrixXd V_f;
       /// \brief Current support state
       support_state_t SupportState;
     };

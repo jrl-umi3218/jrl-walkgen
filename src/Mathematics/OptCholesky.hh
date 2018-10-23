@@ -34,8 +34,6 @@
 #include <vector>
 
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
 using namespace::std;
 
 namespace PatternGeneratorJRL

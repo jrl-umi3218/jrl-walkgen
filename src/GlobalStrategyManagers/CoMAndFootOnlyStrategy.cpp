@@ -55,11 +55,11 @@ int CoMAndFootOnlyStrategy::InitInterObjects(PinocchioRobot * /* aPR */,
 
 int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 						   FootAbsolutePosition &RightFootPosition,
-						   MAL_VECTOR_TYPE(double) & ZMPRefPos,
+						   Eigen::VectorXd & ZMPRefPos,
 						   COMState & finalCOMPosition,
-						   MAL_VECTOR_TYPE(double) & ,//CurrentConfiguration,
-						   MAL_VECTOR_TYPE(double) & ,//CurrentVelocity,
-						   MAL_VECTOR_TYPE(double) & )//CurrentAcceleration)
+						   Eigen::VectorXd & ,//CurrentConfiguration,
+						   Eigen::VectorXd & ,//CurrentVelocity,
+						   Eigen::VectorXd & )//CurrentAcceleration)
 {
   ODEBUG("Begin OneGlobalStepOfControl "
 	  << m_LeftFootPositions->size() << " "
@@ -124,14 +124,14 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
 }
 
 
-int CoMAndFootOnlyStrategy::EvaluateStartingState(MAL_VECTOR(&,double) BodyAngles,
+int CoMAndFootOnlyStrategy::EvaluateStartingState(Eigen::VectorXd & BodyAngles,
 						  COMState & aStartingCOMState,
-						  MAL_S3_VECTOR(&,double) aStartingZMPPosition,
-						  MAL_VECTOR(&,double) lStartingWaistPose,
+						  Eigen::Vector3d & aStartingZMPPosition,
+						  Eigen::VectorXd & lStartingWaistPose,
 						  FootAbsolutePosition & InitLeftFootPosition,
 						  FootAbsolutePosition & InitRightFootPosition)
 {
-  MAL_S3_VECTOR(lStartingCOMState,double);
+  Eigen::Vector3d lStartingCOMState;
 
   lStartingCOMState(0) = aStartingCOMState.x[0];
   lStartingCOMState(1) = aStartingCOMState.y[0];

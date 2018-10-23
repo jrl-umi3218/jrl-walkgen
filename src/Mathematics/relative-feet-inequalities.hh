@@ -32,8 +32,6 @@
 #ifndef _RELATIVE_FEET_INEQUALITIES_
 #define _RELATIVE_FEET_INEQUALITIES_
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
 #include <jrl/walkgen/pinocchiorobot.hh>
 
 

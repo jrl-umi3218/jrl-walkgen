@@ -36,8 +36,6 @@
 #include <string>
 #include <sstream>
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
 #include <jrl/walkgen/pinocchiorobot.hh>
 
 #include <jrl/walkgen/pgtypes.hh>
@@ -67,9 +65,9 @@ namespace PatternGeneratorJRL
 	the convex hull of the robot contact points with the ground.
        */
       int ComputeLinearSystem(std::vector<CH_Point> aVecOfPoints,
-			      MAL_MATRIX(&A,double),
-			      MAL_MATRIX(&B,double),
-			      MAL_VECTOR(&C,double));
+			      Eigen::MatrixXd &A,
+			      Eigen::MatrixXd &B,
+			      Eigen::VectorXd &C);
 
       /*!  Build a queue of constraint Inequalities based on a list of Foot Absolute
 	Position.
@@ -90,7 +88,7 @@ namespace PatternGeneratorJRL
 					     double ConstraintOnY);
 
       /*! Find Similar Constraints */
-      int FindSimilarConstraints(MAL_MATRIX(&A,double),
+      int FindSimilarConstraints(Eigen::MatrixXd &A,
 				 std::vector<int> &SimilarConstraints);
 
       /*! Reimplement the interface of SimplePluginManager 

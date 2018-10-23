@@ -24,7 +24,7 @@
 /** \file OptCholesky.cpp
     \brief This object performs a cholesky decomposition optimized for 
     the problem to solved. */
-
+#include <math.h>
 #include <Mathematics/OptCholesky.hh>
 #include <Debug.hh>
 
@@ -160,7 +160,7 @@ int OptCholesky::UpdateCholeskyMatrixNormal()
       if (lj!=(int)m_SetActiveConstraints.size()-1)
 	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj]=r/m_L[lj*m_NbMaxOfConstraints+lj];
       else
-	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj] = sqrt(r);
+	m_L[IndexNewRowAKAi*m_NbMaxOfConstraints+lj] =  sqrt(r);
       
     }
   

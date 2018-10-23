@@ -108,7 +108,7 @@ namespace PatternGeneratorJRL
 					deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 					double Xmax,
 					COMState & lStartingCOMState,
-					MAL_S3_VECTOR_TYPE(double) &lStartingZMPPosition,
+					Eigen::Vector3d &lStartingZMPPosition,
 					FootAbsolutePosition & InitLeftFootAbsolutePosition,
 					FootAbsolutePosition & InitRightFootAbsolutePosition) =0;
 
@@ -130,7 +130,7 @@ namespace PatternGeneratorJRL
 			     FootAbsolutePosition & InitRightFootAbsolutePosition,
 			     deque<RelativeFootPosition> &RelativeFootPositions,
 			     COMState & lStartingCOMState,
-			     MAL_S3_VECTOR(&,double) aStartingZMPPosition) =0 ;
+			     Eigen::Vector3d & aStartingZMPPosition) =0 ;
 
       /* ! \brief Method to update the stacks on-line */
       virtual void OnLine(double time,
@@ -284,14 +284,13 @@ namespace PatternGeneratorJRL
 
       /*! One of the most important matrix which stores all the temporal
 	relationship between the intervals. */
-      MAL_MATRIX_TYPE(double) m_Z;
-
+      Eigen::MatrixXd m_Z;
 
       /*! The matrix used to specify the conditions of the intervals. */
-      MAL_VECTOR_TYPE(double) m_w;
+      Eigen::VectorXd m_w;
 
       /*! The matrix used to store the solution of the linear equation. */
-      MAL_VECTOR_TYPE(double) m_y;
+      Eigen::VectorXd m_y;
 
       /*! @} */
 

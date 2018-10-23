@@ -104,15 +104,15 @@ namespace PatternGeneratorJRL {
       m_NL = (unsigned int)(m_PreviewControlTime/m_SamplingPeriod);
 
     /* For debug purposes. */
-    MAL_VECTOR_RESIZE(m_Debug_prev_qr,6);
-    MAL_VECTOR_RESIZE(m_Debug_prev_dqr,6);
-    MAL_VECTOR_RESIZE(m_Debug_prev_ql,6);
-    MAL_VECTOR_RESIZE(m_Debug_prev_dql,6);
+    m_Debug_prev_qr.resize(6);
+    m_Debug_prev_dqr.resize(6);
+    m_Debug_prev_ql.resize(6);
+    m_Debug_prev_dql.resize(6);
 
-    MAL_VECTOR_RESIZE(m_Debug_prev_qr_RefState,6);
-    MAL_VECTOR_RESIZE(m_Debug_prev_ql_RefState,6);
+    m_Debug_prev_qr_RefState.resize(6);
+    m_Debug_prev_ql_RefState.resize(6);
 
-    MAL_VECTOR_RESIZE(m_Debug_prev_UpperBodyAngles,28);
+    m_Debug_prev_UpperBodyAngles.resize(28);
 
     m_ZMPShift.resize(4);
     m_ZMPShift[0] = 0.02;
@@ -124,16 +124,16 @@ namespace PatternGeneratorJRL {
     {
       for(int j=0;j<4;j++)
         if (i==j)
-          MAL_S4x4_MATRIX_ACCESS_I_J(m_MotionAbsPos, i,j) =
-              MAL_S4x4_MATRIX_ACCESS_I_J(m_MotionAbsOrientation, i,j) =
-              MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, i,j) =
-              MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, i,j) =
+          m_MotionAbsPos[i][j]) =
+              m_MotionAbsOrientation[i][j]) =
+              m_WaistAbsPos[i][j]) =
+              m_WaistRelativePos[i][j]) =
               1.0;
       else
-        MAL_S4x4_MATRIX_ACCESS_I_J(m_MotionAbsPos, i,j) =
-            MAL_S4x4_MATRIX_ACCESS_I_J(m_MotionAbsOrientation, i,j) =
-            MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, i,j) =
-            MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, i,j) =
+        m_MotionAbsPos[i][j]) =
+            m_MotionAbsOrientation[i][j]) =
+            m_WaistAbsPos[i][j]) =
+            m_WaistRelativePos[i][j]) =
             0.0;
 
     }
@@ -553,7 +553,7 @@ namespace PatternGeneratorJRL {
 
     COMState lStartingCOMState;
     memset(&lStartingCOMState,0,sizeof(COMState));
-    MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;;
+    Eigen::Vector3d lStartingZMPPosition;;
 
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
     memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
@@ -596,7 +596,7 @@ namespace PatternGeneratorJRL {
 
     COMState lStartingCOMState;
     memset(&lStartingCOMState,0,sizeof(COMState));
-    MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;;
+    Eigen::Vector3d lStartingZMPPosition;;
 
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
     memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
@@ -656,12 +656,12 @@ namespace PatternGeneratorJRL {
   }
 
 
-  void PatternGeneratorInterfacePrivate::EvaluateStartingCOM(MAL_VECTOR(  & Configuration,double),
-                                                             MAL_S3_VECTOR(  & lStartingCOMState,double))
+  void PatternGeneratorInterfacePrivate::EvaluateStartingCOM(Eigen::VectorXd &Configuration,
+                                                             Eigen::Vector3d &lStartingCOMState)
   {
     Eigen::VectorXd Velocity;
-    MAL_VECTOR_RESIZE(Velocity,MAL_VECTOR_SIZE(Configuration));
-    for(unsigned int i=0;i<MAL_VECTOR_SIZE(Configuration);i++)
+    MAL_VECTOR_RESIZE(Velocity,Configuration.size());
+    for(unsigned int i=0;i<Configuration.size();i++)
       Velocity[i] = 0.0;
 
     m_PinocchioRobot->currentConfiguration(Configuration);
@@ -672,7 +672,7 @@ namespace PatternGeneratorJRL {
   }
 
   void PatternGeneratorInterfacePrivate::EvaluateStartingState(COMState  & lStartingCOMState,
-                                                               MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+                                                               Eigen::Vector3d & lStartingZMPPosition,
                                                                Eigen::VectorXd & lStartingWaistPose,
                                                                FootAbsolutePosition & InitLeftFootAbsPos,
                                                                FootAbsolutePosition & InitRightFootAbsPos)
@@ -707,8 +707,8 @@ namespace PatternGeneratorJRL {
                                                                    FootAbsolutePosition & InitRightFootAbsPos,
                                                                    COMState &lStartingCOMState)
   {
-    MAL_S3x3_MATRIX(InitPos,double);
-    MAL_S3x3_MATRIX(CoMPos,double);
+    Eigen::Matrix3d InitPos;
+    Eigen::Matrix3d CoMPos;
 
     double coscomyaw, sincomyaw;
     coscomyaw = cos(lStartingCOMState.yaw[0]);
@@ -751,12 +751,12 @@ namespace PatternGeneratorJRL {
     ODEBUG("InitPos:" << InitPos);
     ODEBUG("CoMPos: " << CoMPos);
 
-    MAL_S3x3_MATRIX(iCoMPos,double);
+    Eigen::Matrix3d iCoMPos;
     MAL_S3x3_INVERSE(CoMPos,iCoMPos,double);
-    MAL_S3x3_MATRIX(InitialMotion,double);
+    Eigen::Matrix3d InitialMotion;
 
     // Compute the rigid motion from the CoM to the next support foot.
-    MAL_S3x3_C_eq_A_by_B(InitialMotion,iCoMPos,InitPos);
+    InitialMotion=iCoMPos+InitPos;
 
     // Create from the rigid motion the step to be added to the list of steps.
     RelativeFootPosition aRFP;
@@ -772,8 +772,8 @@ namespace PatternGeneratorJRL {
   }
 
   void PatternGeneratorInterfacePrivate::CommonInitializationOfWalking(COMState  & lStartingCOMState,
-                                                                       MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
-                                                                       MAL_VECTOR(  & BodyAnglesIni,double),
+                                                                       Eigen::Vector3d & lStartingZMPPosition,
+                                                                       Eigen::VectorXd &BodyAnglesIni,
                                                                        FootAbsolutePosition & InitLeftFootAbsPos,
                                                                        FootAbsolutePosition & InitRightFootAbsPos,
                                                                        deque<RelativeFootPosition> & lRelativeFootPositions,
@@ -867,8 +867,8 @@ namespace PatternGeneratorJRL {
   {
     COMState lStartingCOMState;
     memset(&lStartingCOMState,0,sizeof(COMState));
-    MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
-    MAL_VECTOR( BodyAnglesIni,double);
+    Eigen::Vector3d lStartingZMPPosition;
+    Eigen::VectorXd BodyAnglesIni;
 
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
     memset(&InitLeftFootAbsPos,0,sizeof(InitLeftFootAbsPos));
@@ -969,8 +969,8 @@ namespace PatternGeneratorJRL {
   {
     ODEBUG("PGI-Start");
     COMState lStartingCOMState;
-    MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
-    MAL_VECTOR( BodyAnglesIni,double);
+    Eigen::Vector3d lStartingZMPPosition;
+    Eigen::VectorXd BodyAnglesIni;
     FootAbsolutePosition InitLeftFootAbsPos, InitRightFootAbsPos;
     struct timeval begin, end, time4, time5;
 
@@ -1309,7 +1309,7 @@ namespace PatternGeneratorJRL {
   bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
                                                                     Eigen::VectorXd & CurrentVelocity,
                                                                     Eigen::VectorXd & CurrentAcceleration,
-                                                                    MAL_VECTOR( &ZMPTarget,double))
+                                                                    Eigen::VectorXd &ZMPTarget)
   {
     COMState finalCOMState;
     FootAbsolutePosition LeftFootPosition,RightFootPosition;
@@ -1332,7 +1332,7 @@ namespace PatternGeneratorJRL {
     Eigen::VectorXd  CurrentConfiguration;
     Eigen::VectorXd  CurrentVelocity;
     Eigen::VectorXd  CurrentAcceleration;
-    MAL_VECTOR( ZMPTarget,double);
+    Eigen::VectorXd ZMPTarget;
     COMState aCOMRefState;
 
     m_Running = RunOneStepOfTheControlLoop(CurrentConfiguration,
@@ -1354,7 +1354,7 @@ namespace PatternGeneratorJRL {
   bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
                                                                     Eigen::VectorXd & CurrentVelocity,
                                                                     Eigen::VectorXd & CurrentAcceleration,
-                                                                    MAL_VECTOR( &ZMPTarget,double),
+                                                                    Eigen::VectorXd &ZMPTarget,
                                                                     COMPosition &finalCOMPosition,
                                                                     FootAbsolutePosition &LeftFootPosition,
                                                                     FootAbsolutePosition &RightFootPosition )
@@ -1374,7 +1374,7 @@ namespace PatternGeneratorJRL {
   bool PatternGeneratorInterfacePrivate::RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
                                                                     Eigen::VectorXd & CurrentVelocity,
                                                                     Eigen::VectorXd & CurrentAcceleration,
-                                                                    MAL_VECTOR( &ZMPTarget,double),
+                                                                    Eigen::VectorXd &ZMPTarget,
                                                                     COMState &finalCOMState,
                                                                     FootAbsolutePosition &LeftFootPosition,
                                                                     FootAbsolutePosition &RightFootPosition )
@@ -1696,12 +1696,12 @@ namespace PatternGeneratorJRL {
     }
   }
 
-  void PatternGeneratorInterfacePrivate::SetCurrentJointValues(MAL_VECTOR( & lCurrentJointValues,double))
+  void PatternGeneratorInterfacePrivate::SetCurrentJointValues(Eigen::VectorXd &lCurrentJointValues)
   {
-    if(MAL_VECTOR_SIZE(lCurrentJointValues)!=m_CurrentActuatedJointValues.size())
-      m_CurrentActuatedJointValues.resize(MAL_VECTOR_SIZE(lCurrentJointValues));
+    if(lCurrentJointValues.size()!=m_CurrentActuatedJointValues.size())
+      m_CurrentActuatedJointValues.resize(lCurrentJointValues.size());
 
-    for(unsigned int i=0;i<MAL_VECTOR_SIZE(lCurrentJointValues);i++)
+    for(unsigned int i=0;i<lCurrentJointValues.size();i++)
     {
       m_CurrentActuatedJointValues[i] = lCurrentJointValues(i);
     }
@@ -1735,8 +1735,8 @@ namespace PatternGeneratorJRL {
       m_StepStackHandler->m_PartialStepSequence(strm);
   }
 
-  void PatternGeneratorInterfacePrivate::GetLegJointVelocity(MAL_VECTOR( & dqr,double),
-                                                             MAL_VECTOR( & dql,double)) const
+  void PatternGeneratorInterfacePrivate::GetLegJointVelocity(Eigen::VectorXd &dqr,
+                                                             Eigen::VectorXd &dql) const
   {
 
     // TO DO: take the joint specific to the legs
@@ -1782,36 +1782,36 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::UpdateAbsolutePosition(bool UpdateAbsMotionOrNot)
   {
     // Compute relative, absolution position and speed.
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 3,0) = 0.0;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 3,1) = 0.0;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 3,2) = 0.0;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 3,3) = 1.0;
+    m_WaistRelativePos[3][0]) = 0.0;
+    m_WaistRelativePos[3][1]) = 0.0;
+    m_WaistRelativePos[3][2]) = 0.0;
+    m_WaistRelativePos[3][3]) = 1.0;
 
     double thetarad = m_CurrentWaistState.yaw[0];
     double c = cos(thetarad);
     double s = sin(thetarad);
 
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 0,0) = c;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 0,1)=-s;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 0,2) = 0;
+    m_WaistRelativePos[0][0]) = c;
+    m_WaistRelativePos[0][1])=-s;
+    m_WaistRelativePos[0][2]) = 0;
 
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 1,0) = s;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 1,1)= c;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 1,2) = 0;
+    m_WaistRelativePos[1][0]) = s;
+    m_WaistRelativePos[1][1])= c;
+    m_WaistRelativePos[1][2]) = 0;
 
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 2,0) = 0;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 2,1)= 0;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 2,2) = 1;
+    m_WaistRelativePos[2][0]) = 0;
+    m_WaistRelativePos[2][1])= 0;
+    m_WaistRelativePos[2][2]) = 1;
 
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 3,3) = 1;
+    m_WaistRelativePos[3][3]) = 1;
 
-    MAL_S4_VECTOR( RelativeLinearVelocity,double);
+    Eigen::Vector4d RelativeLinearVelocity;
     RelativeLinearVelocity(0) =  m_CurrentWaistState.x[1];
     RelativeLinearVelocity(1) =  m_CurrentWaistState.y[1];
     RelativeLinearVelocity(2) =  m_CurrentWaistState.z[0];
     RelativeLinearVelocity(3) =  1.0;
 
-    MAL_S4_VECTOR( RelativeLinearAcc,double);
+    Eigen::Vector4d RelativeLinearAcc;
     RelativeLinearAcc(0) =  m_CurrentWaistState.x[2];
     RelativeLinearAcc(1) =  m_CurrentWaistState.y[2];
     RelativeLinearAcc(2) =  0.0;
@@ -1824,11 +1824,11 @@ namespace PatternGeneratorJRL {
                          m_MotionAbsOrientation ,
                          RelativeLinearAcc);
 
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 0,3) = m_CurrentWaistState.x[0];
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 1,3) = m_CurrentWaistState.y[0];
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistRelativePos, 2,3) = m_CurrentWaistState.z[0];
+    m_WaistRelativePos[0][3]) = m_CurrentWaistState.x[0];
+    m_WaistRelativePos[1][3]) = m_CurrentWaistState.y[0];
+    m_WaistRelativePos[2][3]) = m_CurrentWaistState.z[0];
 
-    MAL_S4x4_MATRIX( prevWaistAbsPos,double);
+    Eigen::Matrix4d prevWaistAbsPos;
     prevWaistAbsPos = m_WaistAbsPos;
 
     MAL_S4x4_C_eq_A_by_B(m_WaistAbsPos, m_MotionAbsPos , m_WaistRelativePos);
@@ -1853,13 +1853,13 @@ namespace PatternGeneratorJRL {
     {
       m_MotionAbsPos = m_WaistAbsPos;
       // The position is supposed at the ground level
-      MAL_S4x4_MATRIX_ACCESS_I_J(m_MotionAbsPos, 2,3) = 0.0;
+      m_MotionAbsPos[2][3]) = 0.0;
       m_AbsMotionTheta = m_AbsTheta;
     }
 
   }
 
-  void PatternGeneratorInterfacePrivate::getWaistPositionMatrix(MAL_S4x4_MATRIX( &lWaistAbsPos,double)) const
+  void PatternGeneratorInterfacePrivate::getWaistPositionMatrix(Eigen::Matrix4d &lWaistAbsPos) const
   {
     lWaistAbsPos = m_WaistAbsPos;
   }
@@ -1868,9 +1868,9 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::getWaistPositionAndOrientation(double aTQ[7], double &Orientation) const
   {
     // Position
-    aTQ[0] = MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 0,3);
-    aTQ[1] = MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 1,3);
-    aTQ[2] = MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 2,3);
+    aTQ[0] = m_WaistAbsPos[0][3]);
+    aTQ[1] = m_WaistAbsPos[1][3]);
+    aTQ[2] = m_WaistAbsPos[2][3]);
 
 
     // Carefull : Extremly specific to the pattern generator.
@@ -1887,9 +1887,9 @@ namespace PatternGeneratorJRL {
   void PatternGeneratorInterfacePrivate::setWaistPositionAndOrientation(double aTQ[7])
   {
     // Position
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 0,3) = aTQ[0];
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 1,3) = aTQ[1];
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 2,3) = aTQ[2];
+    m_WaistAbsPos[0][3]) = aTQ[0];
+    m_WaistAbsPos[1][3]) = aTQ[1];
+    m_WaistAbsPos[2][3]) = aTQ[2];
     double _x = aTQ[3];
     double _y = aTQ[4];
     double _z = aTQ[5];
@@ -1901,9 +1901,9 @@ namespace PatternGeneratorJRL {
     double z2 = _z * _z;
     double r2 = _r * _r;
     // fill diagonal terms
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 0,0) = r2 + x2 - y2 - z2;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 1,1) = r2 - x2 + y2 - z2;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 2,2) = r2 - x2 - y2 + z2;
+    m_WaistAbsPos[0][0]) = r2 + x2 - y2 - z2;
+    m_WaistAbsPos[1][1]) = r2 - x2 + y2 - z2;
+    m_WaistAbsPos[2][2]) = r2 - x2 - y2 + z2;
     double xy = _x * _y;
     double yz = _y * _z;
     double zx = _z * _x;
@@ -1911,12 +1911,12 @@ namespace PatternGeneratorJRL {
     double ry = _r * _y;
     double rz = _r * _z;
     // fill off diagonal terms
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 0,1) = 2 * (xy - rz);
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 0,2) = 2 * (zx + ry);
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 1,0) = 2 * (xy + rz);
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 1,2) = 2 * (yz - rx);
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 2,0) = 2 * (zx - ry);
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_WaistAbsPos, 2,1) = 2 * (yz + rx);
+    m_WaistAbsPos[0][1]) = 2 * (xy - rz);
+    m_WaistAbsPos[0][2]) = 2 * (zx + ry);
+    m_WaistAbsPos[1][0]) = 2 * (xy + rz);
+    m_WaistAbsPos[1][2]) = 2 * (yz - rx);
+    m_WaistAbsPos[2][0]) = 2 * (zx - ry);
+    m_WaistAbsPos[2][1]) = 2 * (yz + rx);
 
   }
 
@@ -1974,7 +1974,7 @@ namespace PatternGeneratorJRL {
 
   int PatternGeneratorInterfacePrivate::CreateZMPReferences(deque<RelativeFootPosition> &lRelativeFootPositions,
                                                             COMState &lStartingCOMState,
-                                                            MAL_S3_VECTOR(&,double) lStartingZMPPosition,
+                                                            Eigen::Vector3d & lStartingZMPPosition,
                                                             FootAbsolutePosition &InitLeftFootAbsPos,
                                                             FootAbsolutePosition &InitRightFootAbsPos)
   {
@@ -2084,13 +2084,13 @@ namespace PatternGeneratorJRL {
     }
   }
 
-  void PatternGeneratorInterfacePrivate::setZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint)
+  void PatternGeneratorInterfacePrivate::setZMPInitialPoint(Eigen::Vector3d & lZMPInitialPoint)
   {
     m_ZMPInitialPoint = lZMPInitialPoint;
     m_ZMPInitialPointSet = true;
   }
 
-  void PatternGeneratorInterfacePrivate::getZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint) const
+  void PatternGeneratorInterfacePrivate::getZMPInitialPoint(Eigen::Vector3d & lZMPInitialPoint) const
   {
     lZMPInitialPoint = m_ZMPInitialPoint;
   }

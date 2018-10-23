@@ -78,8 +78,8 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
   RegisterMethods();
 
   // Initialization of the first and second preview controls.
-  MAL_MATRIX_RESIZE(m_PC1x,3,1);  MAL_MATRIX_RESIZE(m_PC1y,3,1);
-  MAL_MATRIX_RESIZE(m_Deltax,3,1);  MAL_MATRIX_RESIZE(m_Deltay,3,1);
+  m_PC1x.resize(3,1);  m_PC1y.resize(3,1);
+  m_Deltax.resize(3,1);  m_Deltay.resize(3,1);
 
   m_PC = new PreviewControl(lSPM,
 			    OptimalControllerSolver::MODE_WITHOUT_INITIALPOS,
@@ -88,7 +88,7 @@ ZMPPreviewControlWithMultiBodyZMP::ZMPPreviewControlWithMultiBodyZMP(SimplePlugi
 
   for(int i=0;i<4;i++)
     for(int j=0;j<4;j++)
-      MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, i,j) =0.0;
+      m_FinalDesiredCOMPose(i,j) =0.0;
 
 
   m_NumberOfIterations = 0;
@@ -120,9 +120,9 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    // New scheme for WPG v3.0
    // We call the object in charge of generating the whole body
    // motion  ( for a given CoM and Feet points)  before applying the second filter.
-   MAL_VECTOR_DIM(aCOMState,double,6);
-   MAL_VECTOR_DIM(aCOMSpeed,double,6);
-   MAL_VECTOR_DIM(aCOMAcc,double,6);
+   Eigen::VectorXd aCOMState(6);
+   Eigen::VectorXd aCOMSpeed(6);
+   Eigen::VectorXd aCOMAcc(6);
 
    aCOMState(0) = acomp.x[0];
    aCOMState(1) = acomp.y[0];
@@ -145,8 +145,8 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    aCOMAcc(4) = acomp.roll[2];
    aCOMAcc(5) = acomp.roll[2];
 
-   MAL_VECTOR_DIM(aLeftFootPosition,double,5);
-   MAL_VECTOR_DIM(aRightFootPosition,double,5);
+   Eigen::VectorXd aLeftFootPosition(5);
+   Eigen::VectorXd aRightFootPosition(5);
 
    aLeftFootPosition(0) = aLeftFAP.x;
    aLeftFootPosition(1) = aLeftFAP.y;
@@ -270,22 +270,22 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    co = cos(CurrentConfiguration(4));
    so = sin(CurrentConfiguration(4));
 
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 0,0) = c*co;
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 0,1) = -s;
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 0,2) = c*so;
+   m_FinalDesiredCOMPose(0,0) = c*co;
+   m_FinalDesiredCOMPose(0,1) = -s;
+   m_FinalDesiredCOMPose(0,2) = c*so;
 
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 1,0) = s*co;
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 1,1) =  c;
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 1,2) = s*so;
+   m_FinalDesiredCOMPose(1,0) = s*co;
+   m_FinalDesiredCOMPose(1,1) =  c;
+   m_FinalDesiredCOMPose(1,2) = s*so;
 
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 2,0) =  -so;
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 2,1)=  0;
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 2,2) = co;
+   m_FinalDesiredCOMPose(2,0) =  -so;
+   m_FinalDesiredCOMPose(2,1)=  0;
+   m_FinalDesiredCOMPose(2,2) = co;
 
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 0,3) = refandfinalCOMState.x[0];
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 1,3) = refandfinalCOMState.y[0];
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 2,3) = refandfinalCOMState.z[0];
-   MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 3,3) = 1.0;
+   m_FinalDesiredCOMPose(0,3) = refandfinalCOMState.x[0];
+   m_FinalDesiredCOMPose(1,3) = refandfinalCOMState.y[0];
+   m_FinalDesiredCOMPose(2,3) = refandfinalCOMState.z[0];
+   m_FinalDesiredCOMPose(3,3) = 1.0;
 
    ODEBUG4SIMPLE(CurrentConfiguration[6]<< " " <<
 		 CurrentConfiguration[7]<< " " <<
@@ -452,10 +452,10 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 
    // Call the Humanoid Dynamic Multi Body robot model to
    // compute the ZMP related to the motion found by CoMAndZMPRealization.
-   MAL_S3_VECTOR_TYPE(double) ZMPmultibody;
+   Eigen::Vector3d ZMPmultibody;
    m_PinocchioRobot->zeroMomentumPoint(ZMPmultibody);
    ODEBUG4(ZMPmultibody[0] << " " << ZMPmultibody[1], "DebugDataCheckZMP1.txt");
-   MAL_S3_VECTOR_TYPE(double) CoMmultibody;
+   Eigen::Vector3d CoMmultibody;
    m_PinocchioRobot->positionCenterOfMass(CoMmultibody);
    ODEBUG("Stage 2");
    // Fill the delta ZMP FIFO for the second stage of the control.
@@ -566,15 +566,15 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    m_FIFOCOMStates.clear();
 
 
-   MAL_VECTOR(CurrentConfiguration,double);
-   MAL_VECTOR(CurrentVelocity,double);
-   MAL_VECTOR(CurrentAcceleration,double);
+   Eigen::VectorXd CurrentConfiguration;
+   Eigen::VectorXd CurrentVelocity;
+   Eigen::VectorXd CurrentAcceleration;
    /* Get the current configuration vector */
    CurrentConfiguration = m_PinocchioRobot->currentConfiguration();
    CurrentVelocity = m_PinocchioRobot->currentVelocity();
    CurrentAcceleration = m_PinocchioRobot->currentAcceleration();
 
-   for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentVelocity);i++)
+   for(unsigned int i=0;i<CurrentVelocity.size();i++)
      {
        CurrentVelocity[i] = CurrentAcceleration[i] = 0.0;
      }
@@ -649,8 +649,8 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 
  {
    deque<ZMPPosition> aFIFOZMPRefPositions;
-   MAL_MATRIX(aPC1x,double);
-   MAL_MATRIX(aPC1y,double);
+   Eigen::MatrixXd aPC1x;
+   Eigen::MatrixXd aPC1y;
    double aSxzmp, aSyzmp;
    double aZmpx2, aZmpy2;
 
@@ -761,24 +761,24 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
  }
 
  // TODO : Compute the position of the waist inside the COM Frame.
- MAL_S4x4_MATRIX_TYPE(double) ZMPPreviewControlWithMultiBodyZMP::GetCurrentPositionofWaistInCOMFrame()
+ Eigen::Matrix4d ZMPPreviewControlWithMultiBodyZMP::GetCurrentPositionofWaistInCOMFrame()
  {
-   MAL_S4x4_MATRIX_TYPE(double) PosOfWaistInCoMFrame;
+   Eigen::Matrix4d PosOfWaistInCoMFrame;
    PosOfWaistInCoMFrame = m_ComAndFootRealization->GetCurrentPositionofWaistInCOMFrame();
    //  cerr << " Should implement: ZMPPreviewControlWithMultiBodyZMP::GetCurrentPositionOfWaistInCOMFrame()" << endl;
    return PosOfWaistInCoMFrame;
  }
 
- MAL_S4x4_MATRIX_TYPE(double)  ZMPPreviewControlWithMultiBodyZMP::GetFinalDesiredCOMPose()
+ Eigen::Matrix4d  ZMPPreviewControlWithMultiBodyZMP::GetFinalDesiredCOMPose()
  {
     return m_FinalDesiredCOMPose;
  }
 
 
- int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingState(MAL_VECTOR(&BodyAnglesInit,double),
-							      MAL_S3_VECTOR(&aStartingCOMState,double),
-							      MAL_S3_VECTOR(&,double) aStartingZMPPosition,
-							      MAL_VECTOR(&,double) aStartingWaistPosition,
+ int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingState(Eigen::VectorXd & BodyAnglesInit,
+							      Eigen::Vector3d & aStartingCOMState,
+							      Eigen::Vector3d & aStartingZMPPosition,
+							      Eigen::VectorXd & aStartingWaistPosition,
 							      FootAbsolutePosition & InitLeftFootPosition,
 							      FootAbsolutePosition & InitRightFootPosition)
  {
@@ -788,9 +788,9 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    aStartingZMPPosition= m_ComAndFootRealization->GetCOGInitialAnkles();
    return r;
  }
- int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(MAL_VECTOR(&BodyAnglesInit,double),
-							    MAL_S3_VECTOR(&aStartingCOMState,double),
-							    MAL_VECTOR(&,double) aStartingWaistPosition,
+ int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(Eigen::VectorXd &BodyAnglesInit,
+							    Eigen::Vector3d &aStartingCOMState,
+							    Eigen::VectorXd & aStartingWaistPosition,
 							    FootAbsolutePosition & InitLeftFootPosition,
 							    FootAbsolutePosition & InitRightFootPosition)
  {

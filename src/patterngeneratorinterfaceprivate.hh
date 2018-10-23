@@ -153,8 +153,8 @@ namespace PatternGeneratorJRL
       @param[in] ClearStepStackHandler: Clean the stack of steps after copy.
      */
     void CommonInitializationOfWalking(COMState & lStartingCOMState,
-				       MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
-				       MAL_VECTOR(  & ,double) BodyAnglesIni,
+				       Eigen::Vector3d & lStartingZMPPosition,
+				       Eigen::VectorXd & BodyAnglesIni,
 				       FootAbsolutePosition & InitLeftFootAbsPos,
 				       FootAbsolutePosition & InitRightFootAbsPos,
 				       deque<RelativeFootPosition> & lRelativeFootPositions,
@@ -245,14 +245,14 @@ namespace PatternGeneratorJRL
       It also updates the state of the robot if other control mechanisms
       modifies the upper body part and if this should be taken into account
       into the pattern generator in the second loop of control. */
-    void SetCurrentJointValues(MAL_VECTOR( &lCurrentJointValues,double));
+    void SetCurrentJointValues(Eigen::VectorXd &lCurrentJointValues);
 
     /*! \brief Returns the walking mode. */
     int GetWalkMode() const;
 
     /*! \brief Get the leg joint velocity */
-    void GetLegJointVelocity(MAL_VECTOR( &dqr,double),
-			     MAL_VECTOR( &dql,double)) const;
+    void GetLegJointVelocity(Eigen::VectorXd &dqr,
+			     Eigen::VectorXd &dql) const;
 
     /*! \brief Read a velocity reference. */
     void setVelReference(istringstream &strm);
@@ -327,7 +327,7 @@ namespace PatternGeneratorJRL
 			  double &omega) const;
 
     /*! \brief An other method to get the waist position using a matrix. */
-    void getWaistPositionMatrix(MAL_S4x4_MATRIX( &lWaistAbsPos,double)) const;
+    void getWaistPositionMatrix(Eigen::Matrix4d &lWaistAbsPos) const;
 
     /*!@} */
 
@@ -345,10 +345,10 @@ namespace PatternGeneratorJRL
     /*! @}*/
 
     /*! \brief Set the initial ZMP reference point. */
-    void setZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint);
+    void setZMPInitialPoint(Eigen::Vector3d & lZMPInitialPoint);
 
     /*! \brief Get the initial ZMP reference point. */
-    void getZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint) const;
+    void getZMPInitialPoint(Eigen::Vector3d & lZMPInitialPoint) const;
 
     /*! \name System to call a given method based on registration of a method.
       @{
@@ -366,7 +366,7 @@ namespace PatternGeneratorJRL
     /*! \brief Returns the ZMP, CoM, left foot absolute position, and right foot absolute position
      for the initiale pose.*/
     void EvaluateStartingState(COMState  & lStartingCOMState,
-			       MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+			       Eigen::Vector3d & lStartingZMPPosition,
 			       Eigen::VectorXd & lStartingWaistPose,
 			       FootAbsolutePosition & InitLeftFootAbsPos,
 			       FootAbsolutePosition & InitRightFootAbsPos);
@@ -470,7 +470,7 @@ namespace PatternGeneratorJRL
     AnalyticalMorisawaCompact * m_ZMPM;
 
     /*! Specified ZMP starting point. */
-    MAL_S3_VECTOR_TYPE( double) m_ZMPInitialPoint;
+    Eigen::Vector3d m_ZMPInitialPoint;
 
     /*! Boolean stating if the user has specified or not the ZMP initial point.
      This boolean is set to true when the user is setting the previous value.
@@ -498,24 +498,24 @@ namespace PatternGeneratorJRL
 
     /*! Position of the waist:
       Relative.*/
-    MAL_S4x4_MATRIX( m_WaistRelativePos,double);
+    Eigen::Matrix4d m_WaistRelativePos;
 
     /*! Absolute: */
-    MAL_S4x4_MATRIX( m_WaistAbsPos,double);
+    Eigen::Matrix4d m_WaistAbsPos;
 
     /*! Orientation: */
     double m_AbsTheta, m_AbsMotionTheta;
 
     /*! Position of the motion: */
-    MAL_S4x4_MATRIX( m_MotionAbsPos,double);
-    MAL_S4x4_MATRIX( m_MotionAbsOrientation,double);
+    Eigen::Matrix4d m_MotionAbsPos;
+    Eigen::Matrix4d m_MotionAbsOrientation;
 
     /*! Absolute speed:*/
-    MAL_S4_VECTOR( m_AbsLinearVelocity,double);
-    MAL_S4_VECTOR( m_AbsAngularVelocity,double);
+    Eigen::Vector4d m_AbsLinearVelocity;
+    Eigen::Vector4d m_AbsAngularVelocity;
 
     /*! Aboluste acceleration */
-    MAL_S4_VECTOR( m_AbsLinearAcc,double);
+    Eigen::Vector4d m_AbsLinearAcc;
 
     /*! Keeps track of the last correct support foot. */
     int m_KeepLastCorrectSupportFoot;
@@ -582,23 +582,23 @@ namespace PatternGeneratorJRL
     double m_Xmax;
 
     /*! Variables used to compute speed for other purposes. */
-    MAL_VECTOR( m_prev_qr,double);
-    MAL_VECTOR( m_prev_ql,double);
-    MAL_VECTOR( m_prev_dqr, double);
-    MAL_VECTOR( m_prev_dql, double);
+    Eigen::VectorXd m_prev_qr;
+    Eigen::VectorXd m_prev_ql;
+    Eigen::VectorXd m_prev_dqr;
+    Eigen::VectorXd m_prev_dql;
 
 
     /* Debug variables. */
-    MAL_VECTOR( m_Debug_prev_qr, double);
-    MAL_VECTOR( m_Debug_prev_ql,double);
-    MAL_VECTOR( m_Debug_prev_dqr, double);
-    MAL_VECTOR( m_Debug_prev_dql,double);
-    MAL_VECTOR( m_Debug_prev_UpperBodyAngles,double);
-    MAL_VECTOR( m_Debug_prev_qr_RefState, double);
-    MAL_VECTOR( m_Debug_prev_ql_RefState,double);
+    Eigen::VectorXd m_Debug_prev_qr;
+    Eigen::VectorXd m_Debug_prev_ql;
+    Eigen::VectorXd m_Debug_prev_dqr;
+    Eigen::VectorXd m_Debug_prev_dql;
+    Eigen::VectorXd m_Debug_prev_UpperBodyAngles;
+    Eigen::VectorXd m_Debug_prev_qr_RefState;
+    Eigen::VectorXd m_Debug_prev_ql_RefState;
 
     double m_Debug_prev_qWaistYaw, m_Debug_prev_dqWaistYaw;
-    MAL_S3_VECTOR_TYPE(double) m_Debug_prev_P, m_Debug_prev_L;
+    Eigen::Vector3d m_Debug_prev_P, m_Debug_prev_L;
     bool m_FirstPrint, m_FirstRead;
 
     bool m_ShouldBeRunning;
@@ -735,8 +735,8 @@ namespace PatternGeneratorJRL
     void ExpandCOMPositionsQueues(int aNumber);
 
     /*! \brief Compute the COM, left and right foot position for a given BodyAngle position */
-    void EvaluateStartingCOM(MAL_VECTOR(  & Configuration,double),
-			     MAL_S3_VECTOR(  & lStartingCOMPosition,double));
+    void EvaluateStartingCOM(Eigen::VectorXd &Configuration,
+			     Eigen::Vector3d &lStartingCOMPosition);
 
 
     /*! \brief Fill the internal buffer with the appropriate information depending on the strategy.
@@ -744,7 +744,7 @@ namespace PatternGeneratorJRL
     */
     int CreateZMPReferences(deque<RelativeFootPosition> &lRelativeFootPositions,
 			    COMState &lStartingCOMState,
-			    MAL_S3_VECTOR(&,double) lStartingZMPPosition,
+			    Eigen::Vector3d & lStartingZMPPosition,
 			    FootAbsolutePosition & InitLeftFootAbsPos,
 			    FootAbsolutePosition & InitRightFootAbsPos);
 

@@ -29,7 +29,6 @@
 
 
 
-#include <jrl/mal/matrixabstractlayer.hh>
 #include <Mathematics/qld.hh>
 #include <privatepgtypes.hh>
 #include <PreviewControl/rigid-body-system.hh>
@@ -69,7 +68,7 @@ namespace PatternGeneratorJRL
     /// \param[in] Mat Added matrix
     /// \param[in] Row First row inside the target
     /// \param[in] Col First column inside the target
-    void add_term_to( qp_element_e Type, const boost_ublas::matrix<double> & Mat,
+    void add_term_to( qp_element_e Type, const Eigen::MatrixXd & Mat,
         unsigned int Row, unsigned int Col );
 
     /// \brief Add a vector to the final optimization problem in array form
@@ -77,7 +76,7 @@ namespace PatternGeneratorJRL
     /// \param[in] Type Target vector type
     /// \param[in] Mat Added vector
     /// \param[in] Row First row inside the target
-    void add_term_to( qp_element_e Type, const boost_ublas::vector<double> & Vec,
+    void add_term_to( qp_element_e Type, const Eigen::VectorXd & Vec,
         unsigned Row, unsigned Col = 0 );
 
     /// \brief Dump current problem on disk.
@@ -302,7 +301,7 @@ namespace PatternGeneratorJRL
     RigidBodySystem * Robot_;
 
     /// \brief Last solution
-    boost_ublas::vector<double> lastSolution_;
+    Eigen::VectorXd lastSolution_;
 
     /// \brief Number of optimization parameters
     unsigned int NbVariables_;

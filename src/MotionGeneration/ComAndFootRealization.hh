@@ -1,5 +1,3 @@
-ANTLR runtime and generated code versions disagree: 4.7.1!=4.5.1
-ANTLR runtime and generated code versions disagree: 4.7.1!=4.5.1
 /*
  * Copyright 2005, 2006, 2007, 2008, 2009, 2010,
  *
@@ -221,4 +219,3 @@ namespace PatternGeneratorJRL
 
 #endif
 
-init

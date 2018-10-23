@@ -52,14 +52,14 @@ FootConstraintsAsLinearSystem::~FootConstraintsAsLinearSystem()
 {
 }
 
-int FootConstraintsAsLinearSystem::FindSimilarConstraints(MAL_MATRIX(&A,double),
+int FootConstraintsAsLinearSystem::FindSimilarConstraints(Eigen::MatrixXd &A,
 							  vector<int> &SimilarConstraints)
 {
 
-  SimilarConstraints.resize(MAL_MATRIX_NB_ROWS(A));
+  SimilarConstraints.resize(A.rows());
   SimilarConstraints[0] = 0;
   SimilarConstraints[1] = 0;
-  if(MAL_MATRIX_NB_ROWS(A)==4)
+  if(A.rows()==4)
     {
       if ((A(0,0)==-A(2,0)) &&
 	  (A(0,1)==-A(2,1)))
@@ -69,7 +69,7 @@ int FootConstraintsAsLinearSystem::FindSimilarConstraints(MAL_MATRIX(&A,double),
 	SimilarConstraints[3]=-2;
 
     }
-  else if(MAL_MATRIX_NB_ROWS(A)==6)
+  else if(A.rows()==6)
     {
       SimilarConstraints[2] = 0;
       if ((A(0,0)==-A(3,0)) &&
@@ -95,15 +95,15 @@ int FootConstraintsAsLinearSystem::FindSimilarConstraints(MAL_MATRIX(&A,double),
 // and that the foot's interior is at the left of the points.
 // The result is : A [ Zx(k), Zy(k)]' + B  >=0
 int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPoints, 
-						       MAL_MATRIX(&A,double),
-						       MAL_MATRIX(&B,double),
-						       MAL_VECTOR(&C,double))
+						       Eigen::MatrixXd &A,
+						       Eigen::MatrixXd &B,
+						       Eigen::VectorXd &C)
 {
   double a,b,c;
-  unsigned int n = aVecOfPoints.size();
-  MAL_MATRIX_RESIZE(A,aVecOfPoints.size(),2);
-  MAL_MATRIX_RESIZE(B,aVecOfPoints.size(),1);
-  MAL_VECTOR_RESIZE(C,2);
+  long unsigned int n = aVecOfPoints.size();
+  A.resize(aVecOfPoints.size(),2);
+  B.resize(aVecOfPoints.size(),1);
+  C.resize(2);
 
   // Dump a file to display on scilab .
   // This should be removed during real usage inside a robot.
@@ -236,8 +236,8 @@ int FootConstraintsAsLinearSystem::ComputeLinearSystem(vector<CH_Point> aVecOfPo
   B(n-1,0) = b;
   
   // Verification of inclusion of the center inside the polytope.
-  MAL_VECTOR_DIM(W,double,2);  
-  W = MAL_RET_A_by_B(A,C);
+  Eigen::Matrix<double,2,1> W;  
+  W = A*C;
 
   W(0) = W(0) + B(0,0);
   W(1) = W(1) + B(1,0);

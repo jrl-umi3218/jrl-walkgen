@@ -63,7 +63,7 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
     {
       cerr << "Pb no ref Foot." << endl;
     }
-  vector3d AnklePosition;
+  Eigen::Vector3d AnklePosition;
   if (m_Foot->associatedAnkle!=0)
     AnklePosition = m_Foot->anklePosition;
   else
@@ -859,7 +859,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   aoflocal << dFX << " " << dFY << " " << dFZ << " " << lOmega << endl;
   aoflocal.close();
 #endif
-  MAL_S3_VECTOR(Foot_Shift,double);
+  Eigen::Vector3d Foot_Shift;
 #if 0
   double co,so;
 
@@ -867,7 +867,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   so = sin(lOmega);
 
   // COM Orientation
-  MAL_S3x3_MATRIX(Foot_R,double);
+  Eigen::Matrix3d Foot_R;
 
   Foot_R(0,0) = c*co;        Foot_R(0,1) = -s;      Foot_R(0,2) = c*so;
   Foot_R(1,0) = s*co;        Foot_R(1,1) =  c;      Foot_R(1,2) = s*so;
@@ -875,10 +875,10 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 
   if (LeftOrRight==-1)
     {
-      MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionRight);
+      Foot_Shift=Foot_R+m_AnklePositionRight;
     }
   else if (LeftOrRight==1)
-    MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionLeft);
+    Foot_Shift=Foot_R+m_AnklePositionLeft;
 
   // Modification of the foot position.
   curr_NSFAP.x += (dFX + Foot_Shift(0));
@@ -1070,7 +1070,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   aoflocal << dFX << " " << dFY << " " << dFZ << " " << lOmega << endl;
   aoflocal.close();
 #endif
-  MAL_S3_VECTOR(Foot_Shift,double);
+  Eigen::Vector3d Foot_Shift;
 #if 0
   double co,so;
 
@@ -1078,7 +1078,7 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
   so = sin(lOmega);
 
   // COM Orientation
-  MAL_S3x3_MATRIX(Foot_R,double);
+  Eigen::Matrix3d Foot_R;
 
   Foot_R(0,0) = c*co;        Foot_R(0,1) = -s;      Foot_R(0,2) = c*so;
   Foot_R(1,0) = s*co;        Foot_R(1,1) =  c;      Foot_R(1,2) = s*so;
@@ -1086,10 +1086,10 @@ void FootTrajectoryGenerationStandard::UpdateFootPosition(deque<FootAbsolutePosi
 
   if (LeftOrRight==-1)
     {
-      MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionRight);
+      Foot_Shift=Foot_R+m_AnklePositionRight;
     }
   else if (LeftOrRight==1)
-    MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionLeft);
+    Foot_Shift=Foot_R+m_AnklePositionLeft;
 
   // Modification of the foot position.
   NoneSupportFootAbsolutePositions[CurrentAbsoluteIndex].x += (dFX + Foot_Shift(0));
@@ -1120,12 +1120,12 @@ void FootTrajectoryGenerationStandard::ComputingAbsFootPosFromQueueOfRelPos(dequ
 
   /*! Compute the absolute coordinates of the steps.  */
   double CurrentAbsTheta=0.0,c=0.0,s=0.0;
-  MAL_MATRIX_DIM(MM,double,2,2);
-  MAL_MATRIX_DIM(CurrentSupportFootPosition,double,3,3);
-  MAL_MATRIX_DIM(Orientation,double,2,2);
-  MAL_MATRIX_SET_IDENTITY(CurrentSupportFootPosition);
-  MAL_MATRIX_DIM(v,double,2,1);
-  MAL_MATRIX_DIM(v2,double,2,1);
+  Eigen::Matrix<double,2,2> MM;;
+  Eigen::Matrix<double,3,3> CurrentSupportFootPosition;;
+  Eigen::Matrix<double,2,2> Orientation;;
+  CurrentSupportFootPosition.setIdentity();
+  Eigen::Matrix<double,2,1> v;;
+  Eigen::Matrix<double,2,1> v2;;
 
   for(unsigned int i=0;i<RelativeFootPositions.size();i++)
     {
@@ -1150,8 +1150,8 @@ void FootTrajectoryGenerationStandard::ComputingAbsFootPosFromQueueOfRelPos(dequ
       v(1,0) = RelativeFootPositions[i].sy;
 
       /*! Compute the new orientation of the foot vector. */
-      Orientation = MAL_RET_A_by_B(MM , Orientation);
-      v2 = MAL_RET_A_by_B(Orientation, v);
+      Orientation = MM*Orientation;
+      v2 = Orientation*v;
 
       /*! Update the world coordinates of the support foot. */
       for(int k=0;k<2;k++)

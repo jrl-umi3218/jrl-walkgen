@@ -42,7 +42,9 @@
 #endif
 #include <iostream>
 #include <fstream>
-#include <jrl/mal/matrixabstractlayer.hh>
+
+#include <Eigen/Dense>
+#include <vector>
 
 namespace PatternGeneratorJRL
 {
@@ -198,9 +200,9 @@ namespace PatternGeneratorJRL
   // Linear constraint.
   struct LinearConstraintInequality_s
   {
-    MAL_MATRIX(A,double);
-    MAL_MATRIX(B,double);
-    MAL_VECTOR(Center,double);
+    Eigen::MatrixXd A;
+    Eigen::MatrixXd B;
+    Eigen::VectorXd Center;
     std::vector<int> SimilarConstraints;
     double StartingTime, EndingTime;
   };
@@ -210,8 +212,8 @@ namespace PatternGeneratorJRL
   /// Linear constraints with variable feet placement.
   struct LinearConstraintInequalityFreeFeet_s
   {
-    MAL_MATRIX(D,double);
-    MAL_MATRIX(Dc,double);
+    Eigen::MatrixXd D;
+    Eigen::MatrixXd Dc;
     int StepNumber;
   };
   typedef struct LinearConstraintInequalityFreeFeet_s
@@ -240,9 +242,9 @@ namespace PatternGeneratorJRL
     double x,y,z, dYaw;
 
     /*! reference values for the whole preview window */
-    MAL_VECTOR(RefVectorX,double);
-    MAL_VECTOR(RefVectorY,double);
-    MAL_VECTOR(RefVectorTheta,double);
+    Eigen::VectorXd RefVectorX;
+    Eigen::VectorXd RefVectorY;
+    Eigen::VectorXd RefVectorTheta;
   };
   typedef struct ReferenceAbsoluteVelocity_t ReferenceAbsoluteVelocity;
 

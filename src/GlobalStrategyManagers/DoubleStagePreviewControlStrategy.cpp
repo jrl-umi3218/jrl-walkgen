@@ -83,11 +83,11 @@ int DoubleStagePreviewControlStrategy::InitInterObjects(PinocchioRobot *aPR,
 
 int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 							      FootAbsolutePosition &RightFootPosition,
-							      MAL_VECTOR_TYPE(double) & ZMPRefPos,
+							      Eigen::VectorXd & ZMPRefPos,
 							      COMState & finalCOMState,
-							      MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-							      MAL_VECTOR_TYPE(double) & CurrentVelocity,
-							      MAL_VECTOR_TYPE(double) & CurrentAcceleration)
+							      Eigen::VectorXd & CurrentConfiguration,
+							      Eigen::VectorXd & CurrentVelocity,
+							      Eigen::VectorXd & CurrentAcceleration)
 {
   // New scheme:
   // Update the queue of ZMP ref
@@ -129,7 +129,7 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   RightFootPosition = (*m_RightFootPositions)[0];
     
   // Compute the waist position in the current motion global reference frame.
-  MAL_S4x4_MATRIX( PosOfWaistInCOMF,double);
+  Eigen::Matrix4d PosOfWaistInCOMF;
   PosOfWaistInCOMF = m_ZMPpcwmbz->GetCurrentPositionofWaistInCOMFrame();
   
   COMState outWaistPosition;
@@ -155,7 +155,7 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
       
       ZMPRefPos(0) = cos(temp3)*temp1+sin(temp3)*temp2 ;
       ZMPRefPos(1) = -sin(temp3)*temp1+cos(temp3)*temp2;
-      ZMPRefPos(2) = -finalCOMState.z[0] - MAL_S4x4_MATRIX_ACCESS_I_J(PosOfWaistInCOMF, 2,3) - (*m_ZMPPositions)[0].pz;
+      ZMPRefPos(2) = -finalCOMState.z[0] - PosOfWaistInCOMF(2,3) - (*m_ZMPPositions)[0].pz;
     }
   else if (m_ZMPFrame==ZMPFRAME_WORLD)
     {
@@ -190,14 +190,14 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   return 0;
 }
 
-int DoubleStagePreviewControlStrategy::EvaluateStartingState(MAL_VECTOR( &,double) BodyAngles,
+int DoubleStagePreviewControlStrategy::EvaluateStartingState(Eigen::VectorXd & BodyAngles,
 							     COMState & aStartingCOMState,
-							     MAL_S3_VECTOR(&,double) aStartingZMPPosition,
-							     MAL_VECTOR(&,double) aStartingWaistPose,
+							     Eigen::Vector3d & aStartingZMPPosition,
+							     Eigen::VectorXd & aStartingWaistPose,
 							     FootAbsolutePosition & InitLeftFootPosition,
 							     FootAbsolutePosition & InitRightFootPosition)
 {
-  MAL_S3_VECTOR(lStartingCOMState,double);
+  Eigen::Vector3d lStartingCOMState;
   lStartingCOMState(0) = aStartingCOMState.x[0];
   lStartingCOMState(1) = aStartingCOMState.y[0];
   lStartingCOMState(2) = aStartingCOMState.z[0];

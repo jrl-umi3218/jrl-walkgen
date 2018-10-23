@@ -214,22 +214,30 @@ namespace PatternGeneratorJRL
     void initialize_matrices( linear_inequality_t & Inequalities);
 
     /// \brief Scaled product\f$ weight*M*M \f$
-    void compute_term(MAL_MATRIX (&weightMM, double),
-        double weight, const MAL_MATRIX (&M1, double), const MAL_MATRIX (&M2, double));
+    void compute_term(Eigen::MatrixXd&weightMM,
+		      double weight,
+		      const Eigen::MatrixXd&M1,
+		      const Eigen::MatrixXd&M2);
 
     /// \brief Scaled product \f$ weight*M*V \f$
-    void compute_term(MAL_VECTOR (&weightMV, double),
-        double weight, const MAL_MATRIX (&M, double), const MAL_VECTOR (&V, double));
+    void compute_term(Eigen::VectorXd&weightMV,
+		      double weight,
+		      const Eigen::MatrixXd& M,
+		      const Eigen::VectorXd& V);
 
     /// \brief Scaled product \f$ weight*M*V*scalar \f$
-    void compute_term(MAL_VECTOR (&weightMV, double),
-        double weight, const MAL_MATRIX (&M, double),
-        const MAL_VECTOR (&V, double), const double scalar);
+    void compute_term(Eigen::VectorXd &weightMV,
+		      double weight,
+		      const Eigen::MatrixXd& M,
+		      const Eigen::VectorXd& V,
+		      const double scalar);
 
     /// \brief Scaled product \f$ weight*M*M*V \f$
-    void compute_term(MAL_VECTOR (&weightMV, double),
-        double weight, const MAL_MATRIX (&M1, double),
-        const MAL_MATRIX (&M2, double), const MAL_VECTOR (&V2, double));
+    void compute_term(Eigen::VectorXd &weightMV,
+		      double weight,
+		      const Eigen::MatrixXd &M1,
+		      const Eigen::MatrixXd&M2,
+		      const Eigen::VectorXd &V2);
 
 
     //
@@ -249,9 +257,9 @@ namespace PatternGeneratorJRL
 
     /// \name Temporary vectors
     /// \{
-    boost_ublas::matrix<double> MM_;
-    boost_ublas::vector<double> MV_;
-    boost_ublas::vector<double> MV2_;
+    Eigen::MatrixXd MM_;
+    Eigen::VectorXd MV_;
+    Eigen::VectorXd MV2_;
     /// \}
 
 

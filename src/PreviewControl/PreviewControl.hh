@@ -34,7 +34,6 @@
 #include <deque>
 #include <vector>
 
-#include <jrl/mal/matrixabstractlayer.hh>
 using namespace::std;
 
 
@@ -166,7 +165,7 @@ namespace PatternGeneratorJRL
       double m_SamplingPeriod;
 
       /*! Size of the preview window. */
-      unsigned int m_SizeOfPreviewWindow;
+      long unsigned int m_SizeOfPreviewWindow;
       
       /*! Height of the CoM. */
       double m_Zc;

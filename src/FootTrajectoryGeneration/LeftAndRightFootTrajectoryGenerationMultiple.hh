@@ -30,8 +30,6 @@
 #ifndef _LEFT_AND_RIGHT_FOOT_TRAJECTORY_GENERATION_MULTIPLE_H_
 #define _LEFT_AND_RIGHT_FOOT_TRAJECTORY_GENERATION_MULTIPLE_H_
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
 /* abstractRobotDynamics inclusion */
 #include <jrl/walkgen/pinocchiorobot.hh>
 
@@ -203,7 +201,7 @@ namespace PatternGeneratorJRL
       double m_StepCurving;
 
       /*! Middle Way Point of foot trajectories */
-      MAL_VECTOR(m_MiddleWayPoint, double) ;
+      Eigen::VectorXd m_MiddleWayPoint ;
 
       /*! Single support time. */
       double m_SingleSupportTime;

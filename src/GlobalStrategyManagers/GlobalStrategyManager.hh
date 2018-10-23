@@ -29,9 +29,6 @@
 
 /*! JRL inclusion */
 
-// MAL 
-#include <jrl/mal/matrixabstractlayer.hh>
-
 // Dynamics
 #include <jrl/walkgen/pinocchiorobot.hh>
 
@@ -85,11 +82,11 @@ namespace PatternGeneratorJRL
     */
     virtual int OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
 				       FootAbsolutePosition &RightFootPosition,
-				       MAL_VECTOR_TYPE(double) & ZMPRefPos,
+				       Eigen::VectorXd & ZMPRefPos,
 				       COMState & aCOMState,
-				       MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-				       MAL_VECTOR_TYPE(double) & CurrentVelocity,
-				       MAL_VECTOR_TYPE(double) & CurrentAcceleration)=0;
+				       Eigen::VectorXd & CurrentConfiguration,
+				       Eigen::VectorXd & CurrentVelocity,
+				       Eigen::VectorXd & CurrentAcceleration)=0;
 
 
     
@@ -108,10 +105,10 @@ namespace PatternGeneratorJRL
       @param[out] InitRightFootPosition: Returns the position of the right foot
       in the waist coordinates frame.
     */
-    virtual int EvaluateStartingState(MAL_VECTOR( &,double) BodyAngles,
+    virtual int EvaluateStartingState(Eigen::VectorXd & BodyAngles,
 				      COMState & aStartingCOMState,
-				      MAL_S3_VECTOR(& ,double) aStartingZMPPosition,
-				      MAL_VECTOR(& ,double) aStartingWaistPose,
+				      Eigen::Vector3d & aStartingZMPPosition,
+				      Eigen::VectorXd & aStartingWaistPose,
 				      FootAbsolutePosition & InitLeftFootPosition,
 				      FootAbsolutePosition & InitRightFootPosition)=0;
 

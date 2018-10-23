@@ -48,9 +48,6 @@
 #include <string>
 #include <deque>
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
-
 #include <Mathematics/Polynome.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
 #include <PreviewControl/PreviewControl.hh>

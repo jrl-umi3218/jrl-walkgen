@@ -92,7 +92,7 @@ namespace PatternGeneratorJRL
 			      deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 			      double Xmax,
 			      COMState & lStartingCOMState,
-			      MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+			      Eigen::Vector3d & lStartingZMPPosition,
 			      FootAbsolutePosition & InitLeftFootAbsolutePosition,
 			      FootAbsolutePosition & InitRightFootAbsolutePosition);
 
@@ -128,10 +128,10 @@ namespace PatternGeneratorJRL
     int BuildingConstantPartOfTheObjectiveFunction();
 
     /*! Transform the matrices with LQ. */
-    int BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(MAL_MATRIX_TYPE(double) &OptA);
+    int BuildingConstantPartOfTheObjectiveFunctionQLDANDLQ(Eigen::MatrixXd &OptA);
 
     /*! Compute the quadratic form of the objective function. */
-    int BuildingConstantPartOfTheObjectiveFunctionQLD(MAL_MATRIX_TYPE(double) &OptA);
+    int BuildingConstantPartOfTheObjectiveFunctionQLD(Eigen::MatrixXd &OptA);
 
 
     /*! \brief Call the two previous methods 
@@ -148,8 +148,8 @@ namespace PatternGeneratorJRL
 				& QueueOfLConstraintInequalities,
 				double Com_Height,
 				unsigned int &NbOfConstraints,
-				MAL_VECTOR(&xk,double),
-				MAL_VECTOR(&ZMPRef,double),
+				Eigen::VectorXd &xk,
+				Eigen::VectorXd &ZMPRef,
 				unsigned int &NextNumberOfRemovedConstraints);
 
     /*! \brief Build the constant part of the constraint matrices. */
@@ -157,8 +157,8 @@ namespace PatternGeneratorJRL
 
     /*! This method helps to build a linear system for constraining the ZMP. */
     int ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
-			    MAL_MATRIX(&A,double),
-			    MAL_MATRIX(&B,double));
+			    Eigen::MatrixXd &A,
+			    Eigen::MatrixXd &B);
 
     /*! @} */
 
@@ -187,7 +187,7 @@ namespace PatternGeneratorJRL
 		   FootAbsolutePosition & InitRightFootAbsolutePosition,
 		   deque<RelativeFootPosition> &RelativeFootPositions,
 		   COMState & lStartingCOMState,
-		   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
+		   Eigen::Vector3d & lStartingZMPPosition);
     
     /* ! Methods to update the stack on-line by inserting a new foot position. */
     void OnLineAddFoot(RelativeFootPosition & NewRelativeFootPosition,
@@ -293,32 +293,32 @@ namespace PatternGeneratorJRL
     /*! \name Variables related to the QP
       @{ */
     /*! \brief Matrix relating the command and the CoM position. */
-    MAL_MATRIX(m_PPu,double);
+    Eigen::MatrixXd m_PPu;
 
     /*! \brief Matrix relating the command and the CoM speed. */
-    MAL_MATRIX(m_VPu,double); 
+    Eigen::MatrixXd m_VPu; 
  
     /*! \brief Matrix relating the CoM state and the CoM position. */
-    MAL_MATRIX(m_PPx,double);
+    Eigen::MatrixXd m_PPx;
 
     /*! \brief Matrix relating the CoM state and the CoM speed. */
-    MAL_MATRIX(m_VPx,double);
+    Eigen::MatrixXd m_VPx;
 
     /*! \brief Matrix of the objective function $Q$ */
     double *m_Q;
 
     /*! \brief Cholesky decomposition of the initial objective function $Q$ */
-    MAL_MATRIX(m_LQ,double);
+    Eigen::MatrixXd m_LQ;
 
     /*! \brief Cholesky decomposition of the initial objective function $Q$ */
-    MAL_MATRIX(m_iLQ,double);
+    Eigen::MatrixXd m_iLQ;
 
     /*! \brief Optimized cholesky decomposition */
     OptCholesky * m_OptCholesky;
 
     /*! \brief Sub matrix to compute the linear part of the objective function $p^{\top}_k$. */
-    MAL_MATRIX(m_OptB,double);
-    MAL_MATRIX(m_OptC,double);
+    Eigen::MatrixXd m_OptB;
+    Eigen::MatrixXd m_OptC;
 
     /*! \name Parameters of the objective function 
     @{ */
@@ -333,10 +333,10 @@ namespace PatternGeneratorJRL
     double * m_Pu;
 
     /* Constant parts of the linear constraints. */
-    MAL_MATRIX(m_iPu,double);
+    Eigen::MatrixXd m_iPu;
 
     /* Constant parts of the dynamical system. */
-    MAL_MATRIX(m_Px,double);
+    Eigen::MatrixXd m_Px;
 
     /*! \brief Debugging variable: dump everything is set to 1 */
     unsigned int m_FullDebug;

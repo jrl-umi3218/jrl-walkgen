@@ -48,14 +48,14 @@ RigidBody::~RigidBody()
 int RigidBody::initialize()
 {
 
-  PositionDynamics_.S.resize( N_,3,false );
-  PositionDynamics_.S.clear();
-  VelocityDynamics_.S.resize( N_,3,false );
-  VelocityDynamics_.S.clear();
-  AccelerationDynamics_.S.resize( N_,3,false );
-  AccelerationDynamics_.S.clear();
-  CoPDynamics_.S.resize( N_,3,false );
-  CoPDynamics_.S.clear();
+  PositionDynamics_.S.resize( N_,3);
+  PositionDynamics_.S.setZero();
+  VelocityDynamics_.S.resize( N_,3 );
+  VelocityDynamics_.S.setZero();
+  AccelerationDynamics_.S.resize( N_,3);
+  AccelerationDynamics_.S.setZero();
+  CoPDynamics_.S.resize( N_,3);
+  CoPDynamics_.S.setZero();
 
   Trajectory_.resize( N_ );
 
@@ -178,11 +178,11 @@ rigid_body_state_t::reset()
   Pitch.resize(3,false);
   Roll.resize(3,false);
 
-  X.clear();
-  Y.clear();
-  Z.clear();
-  Yaw.clear();
-  Pitch.clear();
-  Roll.clear();
+  X.setZero();
+  Y.setZero();
+  Z.setZero();
+  Yaw.setZero();
+  Pitch.setZero();
+  Roll.setZero();
 
 }

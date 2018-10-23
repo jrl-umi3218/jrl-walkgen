@@ -30,6 +30,9 @@
 #include <fstream>
 #include <cstring>
 
+#include <stdlib.h>
+#include <math.h>
+
 #include "portability/gettimeofday.hh"
 
 #ifdef WIN32
@@ -952,10 +955,10 @@ int PLDPSolver::SolveProblem(double *CstPartOfTheCostFunction,
       aof.close();
     }
 
-  if ((std::isnan(X[0])) ||
-      (std::isnan(X[m_CardV])) ||
-      (std::isinf(X[0])) ||
-      (std::isinf(X[m_CardV]))
+  if ((isnan(X[0])) ||
+      (isnan(X[m_CardV])) ||
+      (isinf(X[0])) ||
+      (isinf(X[m_CardV]))
       )
     {
       cout << "Nan or inf value " << X[0]<< " " << X[m_CardV]
