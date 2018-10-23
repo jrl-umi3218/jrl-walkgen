@@ -35,6 +35,9 @@ ICRA 2007, 3989--39994
 #include <fstream>
 #include <ZMPRefTrajectoryGeneration/AnalyticalMorisawaCompact.hh>
 #include <iomanip>
+
+#include <boost/version.hpp>
+
 typedef double doublereal;
 typedef int integer;
 
@@ -59,6 +62,7 @@ extern "C"
                       integer *, /* 19 IWORK */
                       integer * /* 20 INFO */
                       );
+
 #if BOOST_VERSION >=104000
   extern void dgetrf_( integer * m, /* M */
                        integer * n, /* N */
@@ -232,11 +236,11 @@ namespace PatternGeneratorJRL
 
   void AnalyticalMorisawaCompact::ComputePolynomialWeights()
   {
-    MAL_MATRIX_TYPE(double) iZ;
-    MAL_INVERSE(m_Z,iZ,double);
+    Eigen::MatrixXd iZ;
+    iZ=m_Z.inverse();
 
     // Compute the weights.
-    MAL_C_eq_A_by_B(m_y,iZ,m_w);
+    m_y=iZ+m_w;
 
     if (m_VerboseLevel>=2)
     {
@@ -244,7 +248,7 @@ namespace PatternGeneratorJRL
       ofs.open("YMatrix.dat",ofstream::out);
       ofs.precision(10);
 
-      for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_y);i++)
+      for(unsigned int i=0;i<m_y.size();i++)
       {
         ofs << m_y[i]<< " ";
       }
@@ -256,46 +260,47 @@ namespace PatternGeneratorJRL
 
   void AnalyticalMorisawaCompact::ResetTheResolutionOfThePolynomial()
   {
-    int SizeOfZ = MAL_MATRIX_NB_ROWS(m_Z);
+    long int SizeOfZ = m_Z.rows();
 
-    MAL_MATRIX_RESIZE(m_AF,SizeOfZ,2*SizeOfZ);
-    MAL_VECTOR_RESIZE(m_IPIV,SizeOfZ);
+    m_AF.resize(SizeOfZ,2*SizeOfZ);
+    m_IPIV.resize(SizeOfZ);
 
-    MAL_MATRIX_FILL(m_AF,0);
-    MAL_VECTOR_FILL(m_IPIV,0);
+    {for(unsigned int i=0;i<m_AF.rows();i++) for(unsigned int j=0;j<m_AF.cols();j++)
+					       m_AF(i,j)=0;};
+    { for(unsigned int i=0;i<m_IPIV.size();m_IPIV[i++]=0);};
 
     m_NeedToReset = true;
   }
 
   void AnalyticalMorisawaCompact::ComputePolynomialWeights2()
   {
-    int SizeOfZ = MAL_MATRIX_NB_ROWS(m_Z),
+    int SizeOfZ = (int)m_Z.rows(),
     LDA,LDAF,LDB;
     int NRHS = 1;
 
     char EQUED='N';
 
-    MAL_MATRIX_TYPE(double) tZ;
-    tZ = MAL_RET_TRANSPOSE(m_Z);
+    Eigen::MatrixXd tZ;
+    tZ = m_Z.transpose();
 
 
-    MAL_VECTOR_TYPE(double) lR;
-    MAL_VECTOR_RESIZE(lR,SizeOfZ);
-    MAL_VECTOR_TYPE(double) lC;
-    MAL_VECTOR_RESIZE( lC,SizeOfZ);
+    Eigen::VectorXd lR;
+    lR.resize(SizeOfZ);
+    Eigen::VectorXd lC;
+    lC.resize(SizeOfZ);
 
-    MAL_VECTOR_RESIZE(m_y,SizeOfZ);
-    //MAL_VECTOR_TYPE(double) m_X;
-    //b MAL_VECTOR_RESIZE(m_X,SizeOfZ);
+    m_y.resize(SizeOfZ);
+    //Eigen::VectorXd m_X;
+    //b m_X.resize(SizeOfZ);
     LDA = SizeOfZ;
     LDAF = SizeOfZ;
     LDB = SizeOfZ;
 
     double lRCOND;
 
-    MAL_VECTOR_TYPE(double) lFERR, lBERR;
-    MAL_VECTOR_RESIZE(lFERR,SizeOfZ);
-    MAL_VECTOR_RESIZE(lBERR,SizeOfZ);
+    Eigen::VectorXd lFERR, lBERR;
+    lFERR.resize(SizeOfZ);
+    lBERR.resize(SizeOfZ);
 
     int lwork = 4* SizeOfZ;
     double *work = new double[lwork];
@@ -305,12 +310,12 @@ namespace PatternGeneratorJRL
 
     if (m_NeedToReset)
     {
-      m_AF = MAL_RET_TRANSPOSE(m_Z);
+      m_AF = m_Z.transpose();
       dgetrf_(&SizeOfZ, /* M */
               &SizeOfZ, /* N here M=N=SizeOfZ */
-              MAL_RET_MATRIX_DATABLOCK(m_AF), /* A */
+              &m_AF(0), /* A */
               &SizeOfZ, /* Leading dimension cf before */
-              MAL_RET_VECTOR_DATABLOCK(m_IPIV), /* IPIV */
+              &m_IPIV(0), /* IPIV */
               &info /* info */
               );
       m_NeedToReset = false;
@@ -322,28 +327,28 @@ namespace PatternGeneratorJRL
             lN, /* A * X = B */
             &SizeOfZ, /* Size of A */
             &NRHS, /*Nb of columns for X et B */
-            MAL_RET_MATRIX_DATABLOCK(tZ), /* Access to A */
+            &tZ(0), /* Access to A */
             &LDA, /* Leading size of A */
-            MAL_RET_MATRIX_DATABLOCK(m_AF),
+            &m_AF(0),
             &LDAF,
-            MAL_RET_VECTOR_DATABLOCK(m_IPIV),
+            &m_IPIV(0),
             &EQUED,
-            MAL_RET_VECTOR_DATABLOCK(lR),
-            MAL_RET_VECTOR_DATABLOCK(lC),
-            MAL_RET_VECTOR_DATABLOCK(m_w),
+            &lR(0),
+            &lC(0),
+            &m_w(0),
             &LDB,
-            MAL_RET_VECTOR_DATABLOCK(m_y),
+            &m_y(0),
             &lsizeofx,
             &lRCOND,
-            MAL_RET_VECTOR_DATABLOCK(lFERR),
-            MAL_RET_VECTOR_DATABLOCK(lBERR),
+            &lFERR(0),
+            &lBERR(0),
             work,
             iwork,
             &info
             );
 
     // Compute the weights.
-    // MAL_C_eq_A_by_B(m_y,iZ,m_w);
+    // m_y=iZ+m_w;
 
     if (m_VerboseLevel>=2)
     {
@@ -351,7 +356,7 @@ namespace PatternGeneratorJRL
       ofs.open("YMatrix.dat",ofstream::out);
       ofs.precision(10);
 
-      for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_y);i++)
+      for(unsigned int i=0;i<m_y.size();i++)
       {
         ofs << m_y[i]<< " ";
       }
@@ -364,7 +369,7 @@ namespace PatternGeneratorJRL
   }
 
 
-  int AnalyticalMorisawaCompact::BuildAndSolveCOMZMPForASetOfSteps(MAL_S3x3_MATRIX(& lStartingCOMState,double),
+  int AnalyticalMorisawaCompact::BuildAndSolveCOMZMPForASetOfSteps(Eigen::Matrix3d &lStartingCOMState,
                                                                    FootAbsolutePosition &LeftFootInitialPosition,
                                                                    FootAbsolutePosition &RightFootInitialPosition,
                                                                    bool IgnoreFirstRelativeFoot,
@@ -374,7 +379,7 @@ namespace PatternGeneratorJRL
     if (m_RelativeFootPositions.size()==0)
       return -2;
 
-    int NbSteps = m_RelativeFootPositions.size();
+    int NbSteps = (int)m_RelativeFootPositions.size();
     int NbOfIntervals=2*NbSteps+1;
 
     SetNumberOfStepsInAdvance(NbSteps);
@@ -459,7 +464,7 @@ computing the analytical trajectories. */
 
       // Strategy for the final CoM pos: middle of the segment
       // between the two final steps, in order to be statically stable.
-      unsigned int lindex = m_AbsoluteSupportFootPositions.size()-1;
+      unsigned int lindex = (unsigned int)(m_AbsoluteSupportFootPositions.size()-1);
 
       if (DoNotPrepareLastFoot)
         FinalCoMPosX = m_AbsoluteSupportFootPositions[lindex].x;
@@ -525,13 +530,13 @@ computing the analytical trajectories. */
                                                        deque<FootAbsolutePosition> &RightFootAbsolutePositions,
                                                        double ,
                                                        COMState & lStartingCOMState,
-                                                       MAL_S3_VECTOR(&,double) ,
+                                                       Eigen::Vector3d & ,
                                                        FootAbsolutePosition & InitLeftFootAbsolutePosition,
                                                        FootAbsolutePosition & InitRightFootAbsolutePosition)
   {
     // INITIALIZE FEET POSITIONS:
     // --------------------------
-    vector3d lAnklePositionRight,lAnklePositionLeft;
+    Eigen::Vector3d lAnklePositionRight,lAnklePositionLeft;
     PRFoot *LeftFoot, *RightFoot;
     LeftFoot = m_PR->leftFoot();
     if (LeftFoot==0)
@@ -544,21 +549,15 @@ computing the analytical trajectories. */
     lAnklePositionLeft = LeftFoot->anklePosition ;
     lAnklePositionRight = RightFoot->anklePosition ;
 
-    MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
-    m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
-
-//    InitLeftFootAbsolutePosition.x +=  lAnklePositionLeft(0)  ;
-//    InitLeftFootAbsolutePosition.y +=  lAnklePositionLeft(1)  ;
-//    InitLeftFootAbsolutePosition.z +=  lAnklePositionLeft(2)  ;
-//    InitRightFootAbsolutePosition.x += lAnklePositionRight(0) ;
-//    InitRightFootAbsolutePosition.y += lAnklePositionRight(1) ;
-//    InitRightFootAbsolutePosition.z += lAnklePositionRight(2) ;
+    Eigen::Matrix4d CurPosWICF_homogeneous ;
+    CurPosWICF_homogeneous = m_kajitaDynamicFilter->getComAndFootRealization()
+      ->GetCurrentPositionofWaistInCOMFrame();
 
     m_RelativeFootPositions = RelativeFootPositions;
     /* This part computes the CoM and ZMP trajectory giving the foot position information.
        It also creates the analytical feet trajectories.
     */
-    MAL_S3x3_MATRIX(lMStartingCOMState,double);
+    Eigen::Matrix3d lMStartingCOMState;
 
     lMStartingCOMState(0,0)= lStartingCOMState.x[0];
     lMStartingCOMState(1,0)= lStartingCOMState.y[0];
@@ -605,7 +604,7 @@ computing the analytical trajectories. */
     if(filterOn_)
     {
         /*! initialize the dynamic filter */
-        unsigned int n = COMStates.size();
+      unsigned int n =(unsigned int) COMStates.size();
         double KajitaPCpreviewWindow = 1.6 ;
         m_kajitaDynamicFilter->init( m_SamplingPeriod,
                                      m_SamplingPeriod,
@@ -614,9 +613,9 @@ computing the analytical trajectories. */
                                      KajitaPCpreviewWindow,
                                      lStartingCOMState );
         /*! Set the upper body trajectory */
-        MAL_VECTOR_TYPE(double) UpperConfig = m_PR->currentConfiguration() ;
-        MAL_VECTOR_TYPE(double) UpperVel    = m_PR->currentVelocity() ;
-        MAL_VECTOR_TYPE(double) UpperAcc    = m_PR->currentAcceleration() ;
+        Eigen::VectorXd UpperConfig = m_PR->currentConfiguration() ;
+        Eigen::VectorXd UpperVel    = m_PR->currentVelocity() ;
+        Eigen::VectorXd UpperAcc    = m_PR->currentAcceleration() ;
         // carry the weight in front of him
 //        UpperConfig(18)= 0.0 ;            // CHEST_JOINT0
 //        UpperConfig(19)= 0.015 ;          // CHEST_JOINT1
@@ -692,9 +691,9 @@ computing the analytical trajectories. */
                     ZMPPositions,
                     LeftFootAbsolutePositions,
                     RightFootAbsolutePositions,
-                    vector< MAL_VECTOR_TYPE(double) > (1,UpperConfig),
-                    vector< MAL_VECTOR_TYPE(double) > (1,UpperVel),
-                    vector< MAL_VECTOR_TYPE(double) > (1,UpperAcc),
+                    vector< Eigen::VectorXd > (1,UpperConfig),
+                    vector< Eigen::VectorXd > (1,UpperVel),
+                    vector< Eigen::VectorXd > (1,UpperAcc),
                     outputDeltaCOMTraj_deq);
 
 #ifdef DEBUG
@@ -740,17 +739,17 @@ computing the analytical trajectories. */
                                             FootAbsolutePosition & InitRightFootAbsolutePosition,
                                             deque<RelativeFootPosition> &RelativeFootPositions,
                                             COMState & lStartingCOMState,
-                                            MAL_S3_VECTOR(&,double))
+                                            Eigen::Vector3d &)
   {
     m_OnLineMode = true;
     m_RelativeFootPositions.clear();
 
-    unsigned int r = RelativeFootPositions.size();
+    unsigned int r = (unsigned int)RelativeFootPositions.size();
     unsigned int maxrelsteps = r < 3 ? r : 3;
 
     // INITIALIZE FEET POSITIONS:
     // --------------------------
-    vector3d lAnklePositionRight,lAnklePositionLeft;
+    Eigen::Vector3d lAnklePositionRight,lAnklePositionLeft;
     PRFoot *LeftFoot, *RightFoot;
     LeftFoot = m_PR->leftFoot();
     if (LeftFoot==0)
@@ -763,8 +762,10 @@ computing the analytical trajectories. */
     lAnklePositionLeft  = LeftFoot->anklePosition ;
     lAnklePositionRight = RightFoot->anklePosition ;
 
-    MAL_VECTOR_DIM(CurPosWICF_homogeneous,double,4) ;
-    m_kajitaDynamicFilter->getComAndFootRealization()->GetCurrentPositionofWaistInCOMFrame(CurPosWICF_homogeneous);
+    Eigen::Matrix<double,4,1> CurPosWICF_homogeneous ;
+    CurPosWICF_homogeneous =
+      m_kajitaDynamicFilter->getComAndFootRealization()
+      ->GetCurrentPositionofWaistInCOMFrame();
 
     InitLeftFootAbsolutePosition.x +=  lAnklePositionLeft(0)  ;
     InitLeftFootAbsolutePosition.y +=  lAnklePositionLeft(1)  ;
@@ -775,7 +776,7 @@ computing the analytical trajectories. */
 
     // INITIALIZE THE COM
     // ------------------
-    MAL_S3x3_MATRIX(lMStartingCOMState,double);
+    Eigen::Matrix3d lMStartingCOMState;
 
     lMStartingCOMState(0,0)= lStartingCOMState.x[0];
     lMStartingCOMState(1,0)= lStartingCOMState.y[0];
@@ -843,7 +844,7 @@ computing the analytical trajectories. */
                                  lStartingCOMState );
 
 
-    return m_RelativeFootPositions.size();
+    return (int) m_RelativeFootPositions.size();
 
   }
 
@@ -1030,7 +1031,7 @@ computing the analytical trajectories. */
     unsigned int StartingIndexInterval;
     m_AnalyticalZMPCoGTrajectoryX->GetIntervalIndexFromTime(m_CurrentTime,StartingIndexInterval);
 
-    unsigned int IndexInterval = m_CTIPX.ZMPProfil.size()-1;
+    unsigned int IndexInterval = (unsigned int)(m_CTIPX.ZMPProfil.size()-1);
 
     /* If the interval detected is not a double support interval,
 a shift is done to chose the earliest double support interval. */
@@ -1135,7 +1136,7 @@ When the limit is reached, and the stack exhausted this method is called again. 
 
     // Again assuming that the number of unknowns
     // is based on a 4- (m-2) 3 -4 th order polynomials.
-    MAL_VECTOR_RESIZE(m_w, 2 * m_NumberOfIntervals + 6);
+    m_w.resize( 2 * m_NumberOfIntervals + 6);
 
     // Initial CoM Position
     m_w(lindex)= InitialCoMPos - ZMPPosSequence[0];
@@ -1228,7 +1229,7 @@ When the limit is reached, and the stack exhausted this method is called again. 
       ofs.open("WCompactMatrix.dat",ofstream::out);
       ofs.precision(10);
 
-      for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_w);i++)
+      for(unsigned int i=0;i<m_w.size();i++)
       {
         ofs << m_w[i]<< " ";
       }
@@ -1413,12 +1414,15 @@ When the limit is reached, and the stack exhausted this method is called again. 
 
     NbRows = 2+4+2*(m_NumberOfIntervals-2)+4;
     NbCols = 2*m_NumberOfIntervals + 6;
-    MAL_MATRIX_RESIZE(m_Z,NbRows,NbCols);
+    m_Z.resize(NbRows,NbCols);
 
     // Initial condition for the COG position and the velocity
     double SquareOmega0 = m_Omegaj[0]*m_Omegaj[0];
 
-    MAL_MATRIX_FILL(m_Z,0.0);
+    {for(unsigned int i=0;i<m_Z.rows();i++)
+	for(unsigned int j=0;j<m_Z.cols();j++)
+	  m_Z(i,j)=0.0;
+    };
     m_Z(0,0) = 2.0/SquareOmega0;
     m_Z(0,3) = 1.0;
     rowindex++;
@@ -1446,9 +1450,9 @@ When the limit is reached, and the stack exhausted this method is called again. 
       std::ofstream ofs;
       ofs.open("ZCompactMatrix.dat",ofstream::out);
       ofs.precision(10);
-      for(unsigned int i=0;i<MAL_MATRIX_NB_ROWS(m_Z);i++)
+      for(unsigned int i=0;i<m_Z.rows();i++)
       {
-        for(unsigned int j=0;j<MAL_MATRIX_NB_COLS(m_Z);j++)
+        for(unsigned int j=0;j<m_Z.cols();j++)
         {
           ofs << m_Z(i,j) << " ";
         }
@@ -1671,7 +1675,7 @@ and if there is a StepStack Handler available.
       if (aStepStackHandler!=0)
       {
         /* Compute the number of steps needed. */
-        int NeededSteps = (aCTIPX.ZMPProfil.size()-j+1)/2;
+        int NeededSteps = (int)((aCTIPX.ZMPProfil.size()-j+1)/2);
         int r;
 
         /* Test if there is enough step in the stack of.
@@ -1699,7 +1703,7 @@ We have to remove one, because there is still the last foot added.
         lRelativeFootPositions.pop_front();
 
         deque<FootAbsolutePosition> lAbsoluteSupportFootPositions;
-        int lLastIndex = m_AbsoluteSupportFootPositions.size()-1;
+        int lLastIndex = (int)(m_AbsoluteSupportFootPositions.size()-1);
         m_FeetTrajectoryGenerator->ComputeAbsoluteStepsFromRelativeSteps(lRelativeFootPositions,
                                                                          m_AbsoluteSupportFootPositions[lLastIndex],
                                                                          lAbsoluteSupportFootPositions);
@@ -1786,8 +1790,8 @@ and final CoM to be feed to the new system. */
     else r = rnum/rden;
 
     ;
-    r2 = ( m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit) + (aFP.CoMSpeedInit - aFP.ZMPSpeedInit) )/
-         (m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew) + (aFP.CoMSpeedNew - aFP.ZMPSpeedNew));
+    /*    r2 = ( m_Omegaj[0]*(aFP.CoMInit - aFP.ZMPInit) + (aFP.CoMSpeedInit - aFP.ZMPSpeedInit) )/
+	  (m_Omegaj[0] * ( aFP.CoMNew - aFP.ZMPNew) + (aFP.CoMSpeedNew - aFP.ZMPSpeedNew)); */
 
     if (r<0.0)
       DeltaTNew = DeltaTInit + m_Tsingle*0.5;
@@ -2103,7 +2107,7 @@ and final condition, and update the queue of foot prints. */
     /* Initiliazing the Preview Control according to the trajectory
 to filter. */
     double lAbsoluteTimeReference = aAZCT.GetAbsoluteTimeReference();
-    MAL_MATRIX_DIM(x,double,3,1);
+    Eigen::MatrixXd x(3,1);
 
     /*! Initialize the state vector used by the preview controller */
     x(0,0) = 0.0;//aAZCT.ComputeCOM(lAbsoluteTimeReference,x(0,0));
@@ -2137,8 +2141,9 @@ to filter. */
     lsxzmp = 0.0;
     for(double lx=0;lx<m_DeltaTj[0]+PreviewWindowTime;lx+= m_SamplingPeriod)
     {
-      m_PreviewControl->OneIterationOfPreview1D(x,lsxzmp,FIFOZMPRefPositions,lindex,
-                                                lxzmp,false);
+      m_PreviewControl->
+	OneIterationOfPreview1D(x,lsxzmp,FIFOZMPRefPositions,lindex,
+				lxzmp);
       ZMPTrajectory.push_back(lxzmp);
       CoGTrajectory.push_back(x(0,0));
       lindex++;
@@ -2516,7 +2521,7 @@ new step has to be generate.
     }
     else if (Method==":setRobotUpperPart")
     {
-//      MAL_VECTOR_TYPE(double) configuration ;
+//      Eigen::VectorXd configuration ;
 //      if (strm.good())
 //      {
 //        strm >> configuration;
@@ -2680,7 +2685,7 @@ new step has to be generate.
     PRFoot *aFoot = m_PR->leftFoot() ;
     if (aFoot==0)
       LTHROW("No foot");
-    vector3d corrZ ;
+    Eigen::Vector3d corrZ ;
     corrZ = aFoot->anklePosition ;
     corrZ(2) = 0; //foot height no more equal to ankle height; TODO : remove corrZ
 
@@ -2884,7 +2889,7 @@ new step has to be generate.
     PRFoot *aFoot = m_PR->leftFoot() ;
     if (aFoot==0)
       LTHROW("No foot");
-    vector3d corrZ ;
+    Eigen::Vector3d corrZ ;
     corrZ = aFoot->anklePosition ;
     corrZ(2) = 0.0 ;
     bool sinple_support = (IndexInterval % 2) == 0 ;

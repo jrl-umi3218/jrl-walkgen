@@ -92,7 +92,7 @@ namespace PatternGeneratorJRL
     PreviewControl *  m_PreviewControl;
 
     /*! \brief State of the CoM */
-    MAL_MATRIX(m_ComState,double);
+    Eigen::MatrixXd m_ComState;
 
     /*! \brief Starting time of the filter. */
     double m_StartingTime;

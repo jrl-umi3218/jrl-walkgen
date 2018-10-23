@@ -92,14 +92,14 @@ namespace PatternGeneratorJRL
       last stage, we store some information.
 
     */
-    bool ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) &CoMPosition,
-						 MAL_VECTOR_TYPE(double) & aCoMSpeed,
-						 MAL_VECTOR_TYPE(double) & aCoMAcc,
-						 MAL_VECTOR_TYPE(double) &LeftFoot,
-						 MAL_VECTOR_TYPE(double) &RightFoot,
-						 MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-						 MAL_VECTOR_TYPE(double) & CurrentVelocity,
-						 MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+    bool ComputePostureForGivenCoMAndFeetPosture(Eigen::VectorXd &CoMPosition,
+						 Eigen::VectorXd & aCoMSpeed,
+						 Eigen::VectorXd & aCoMAcc,
+						 Eigen::VectorXd &LeftFoot,
+						 Eigen::VectorXd &RightFoot,
+						 Eigen::VectorXd & CurrentConfiguration,
+						 Eigen::VectorXd & CurrentVelocity,
+						 Eigen::VectorXd & CurrentAcceleration,
 						 int IterationNumber,
 						 int Stage);
 
@@ -113,8 +113,8 @@ namespace PatternGeneratorJRL
       \param[in] BodyAnglesIni: The configuration vector provided by the user.
       \param[out] lStartingWaistPose: The waist pose according to the user configuration vector.
     */
-    bool InitializationHumanoid(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
-			    MAL_VECTOR_TYPE(double) &lStartingWaistPose);
+    bool InitializationHumanoid(Eigen::VectorXd &BodyAnglesIni,
+			    Eigen::VectorXd &lStartingWaistPose);
 
     /*! \brief Initialize the foot position.
       \param[in] aFoot: Pointer to the foot to be updated.
@@ -123,7 +123,7 @@ namespace PatternGeneratorJRL
       free flyer (set to 0.0 0.0 0.0)
     */
     bool InitializationFoot(PRFoot * aFoot,
-			    MAL_S3_VECTOR(& m_AnklePosition,double),
+			    Eigen::Vector3d &m_AnklePosition,
 			    FootAbsolutePosition & InitFootPosition);
 
     /*! This initialization phase does the following:
@@ -135,9 +135,9 @@ namespace PatternGeneratorJRL
       IMPORTANT: The jrlHumanoidDynamicRobot must have been properly set up.
 
     */
-    bool InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
-			   MAL_S3_VECTOR_TYPE(double) & lStartingCOMPosition,
-			   MAL_VECTOR_TYPE(double) & lStartingWaistPosition,
+    bool InitializationCoM(Eigen::VectorXd &BodyAnglesIni,
+			   Eigen::Vector3d & lStartingCOMPosition,
+			   Eigen::VectorXd & lStartingWaistPosition,
 			   FootAbsolutePosition & InitLeftFootAbsPos,
 			   FootAbsolutePosition & InitRightFootAbsPos);
 
@@ -157,9 +157,9 @@ namespace PatternGeneratorJRL
       Assuming that the waist is at (0,0,0)
       It returns the associate initial values for the left and right foot.
     */
-    int EvaluateCOMForStartingPosition(MAL_VECTOR( &BodyAngles,double),
+    int EvaluateCOMForStartingPosition(Eigen::VectorXd &BodyAngles,
 				       double omega, double theta,
-				       MAL_S3_VECTOR( &lCOMPosition,double),
+				       Eigen::Vector3d &lCOMPosition,
 				       FootAbsolutePosition & LeftFootPosition,
 				       FootAbsolutePosition & RightFootPosition);
 
@@ -167,29 +167,29 @@ namespace PatternGeneratorJRL
       Assuming that the waist is at (0,0,0)
       It returns the associate initial values for the left and right foot.*/
 
-    int EvaluateStartingCoM(MAL_VECTOR_TYPE(double) &BodyAngles,
-			    MAL_S3_VECTOR_TYPE(double) & aStartingCOMPosition,
+    int EvaluateStartingCoM(Eigen::VectorXd &BodyAngles,
+			    Eigen::Vector3d & aStartingCOMPosition,
 			    FootAbsolutePosition & InitLeftFootPosition,
 			    FootAbsolutePosition & InitRightFootPosition);
 
-    int EvaluateStartingCoM(MAL_VECTOR(&BodyAngles,double),
-			    MAL_S3_VECTOR(&aStartingCOMPosition,double),
-			    MAL_VECTOR(&aWaistPose,double),
+    int EvaluateStartingCoM(Eigen::VectorXd &BodyAngles,
+			    Eigen::Vector3d &aStartingCOMPosition,
+			    Eigen::VectorXd &aWaistPose,
 			    FootAbsolutePosition & InitLeftFootPosition,
 			    FootAbsolutePosition & InitRightFootPosition);
 
     /*! Method to compute the heuristic for the arms. */
-    void ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR_TYPE(double) & qArmr,
-						   MAL_VECTOR_TYPE(double) & qArml,
-						   MAL_VECTOR_TYPE(double) & aCOMPosition,
-						   MAL_VECTOR_TYPE(double) & RFP,
-						   MAL_VECTOR_TYPE(double) &  LFP);
+    void ComputeUpperBodyHeuristicForNormalWalking(Eigen::VectorXd & qArmr,
+						   Eigen::VectorXd & qArml,
+						   Eigen::VectorXd & aCOMPosition,
+						   Eigen::VectorXd & RFP,
+						   Eigen::VectorXd &  LFP);
 
     /*! This method returns the final COM pose matrix after the second stage of control. */
-    MAL_MATRIX_TYPE(double) GetFinalDesiredCOMPose();
+    Eigen::MatrixXd GetFinalDesiredCOMPose();
 
     /*! Returns the position of the Waist in the the COM Frame . */
-    void GetCurrentPositionofWaistInCOMFrame(MAL_VECTOR_TYPE(double) & CurPosWICF_homogeneous);
+    void GetCurrentPositionofWaistInCOMFrame(Eigen::VectorXd & CurPosWICF_homogeneous);
 
 
     /*! Reimplementation of the setter of the HumanoidDynamicRobot. */
@@ -206,14 +206,14 @@ namespace PatternGeneratorJRL
       @param[in] LeftOrRight: -1 for the right leg, 1 for the left.
       @param[out] lq : Values of the leg which realize the position asked for.
      */
-    bool KinematicsForOneLeg(MAL_S3x3_MATRIX_TYPE(double) & Body_R,
-			     MAL_S3_VECTOR_TYPE(double) & Body_P,
-			     MAL_VECTOR_TYPE(double) &aFoot,
-			     MAL_S3_VECTOR_TYPE(double) &lDt,
-			     MAL_VECTOR_TYPE(double) &aCoMPosition,
-			     MAL_S3_VECTOR_TYPE(double) &ToTheHip,
+    bool KinematicsForOneLeg(Eigen::Matrix3d & Body_R,
+			     Eigen::Vector3d & Body_P,
+			     Eigen::VectorXd &aFoot,
+			     Eigen::Vector3d &lDt,
+			     Eigen::VectorXd &aCoMPosition,
+			     Eigen::Vector3d &ToTheHip,
 			     int LeftOrRight,
-			     MAL_VECTOR_TYPE(double) &lq,
+			     Eigen::VectorXd &lq,
 			     int Stage);
 
     /*! Compute the angles values considering two 6DOF legs for a given configuration
@@ -226,13 +226,13 @@ namespace PatternGeneratorJRL
       @param qr: Angles for the right leg to achieve the positions.
       @param AbsoluteWaistPosition: The waist position.
      */
-    bool KinematicsForTheLegs(MAL_VECTOR_TYPE(double) & aCoMPosition,
-			      MAL_VECTOR_TYPE(double) & aLeftFoot,
-			      MAL_VECTOR_TYPE(double) & aRightFoot,
+    bool KinematicsForTheLegs(Eigen::VectorXd & aCoMPosition,
+			      Eigen::VectorXd & aLeftFoot,
+			      Eigen::VectorXd & aRightFoot,
 			      int Stage,
-			      MAL_VECTOR_TYPE(double) & ql,
-			      MAL_VECTOR_TYPE(double) & qr,
-			      MAL_S3_VECTOR_TYPE(double) & AbsoluteWaistPosition);
+			      Eigen::VectorXd & ql,
+			      Eigen::VectorXd & qr,
+			      Eigen::Vector3d & AbsoluteWaistPosition);
 
     /*! \brief Implement the Plugin part to receive information from
       PatternGeneratorInterface.
@@ -243,51 +243,51 @@ namespace PatternGeneratorJRL
       @return a 4x4 matrix which contains the pose and the position of the waist
       in the CoM reference frame.
     */
-    MAL_S4x4_MATRIX_TYPE(double) GetCurrentPositionofWaistInCOMFrame();
+    Eigen::Matrix4d GetCurrentPositionofWaistInCOMFrame();
 
 		/*! \brief Getter and setter for the previous configurations and velocities */
-		inline void SetPreviousConfigurationStage0(MAL_VECTOR_TYPE(double) & prev_Configuration)
+		inline void SetPreviousConfigurationStage0(Eigen::VectorXd & prev_Configuration)
 		{ m_prev_Configuration = prev_Configuration ;}
-		inline void SetPreviousVelocityStage0(MAL_VECTOR_TYPE(double) & prev_Velocity)
+		inline void SetPreviousVelocityStage0(Eigen::VectorXd & prev_Velocity)
 		{ m_prev_Velocity = prev_Velocity ;}
 
-		inline void SetPreviousConfigurationStage1(MAL_VECTOR_TYPE(double) & prev_Configuration)
+		inline void SetPreviousConfigurationStage1(Eigen::VectorXd & prev_Configuration)
 		{ m_prev_Configuration1 = prev_Configuration ;}
-		inline void SetPreviousVelocityStage1(MAL_VECTOR_TYPE(double) & prev_Velocity)
+		inline void SetPreviousVelocityStage1(Eigen::VectorXd & prev_Velocity)
 		{ m_prev_Velocity1 = prev_Velocity ;}
 
-		inline void SetPreviousConfigurationStage2(MAL_VECTOR_TYPE(double) & prev_Configuration)
+		inline void SetPreviousConfigurationStage2(Eigen::VectorXd & prev_Configuration)
 		{ m_prev_Configuration2 = prev_Configuration ;}
-		inline void SetPreviousVelocityStage2(MAL_VECTOR_TYPE(double) & prev_Velocity)
+		inline void SetPreviousVelocityStage2(Eigen::VectorXd & prev_Velocity)
 		{ m_prev_Velocity2 = prev_Velocity ;}
 
 		/*! \brief Getter and setter for the previous configurations and velocities */
-		inline void SetPreviousConfigurationStage0(const MAL_VECTOR_TYPE(double) & prev_Configuration)
+		inline void SetPreviousConfigurationStage0(const Eigen::VectorXd & prev_Configuration)
 		{ m_prev_Configuration = prev_Configuration ;}
-		inline void SetPreviousVelocityStage0(const MAL_VECTOR_TYPE(double) & prev_Velocity)
+		inline void SetPreviousVelocityStage0(const Eigen::VectorXd & prev_Velocity)
 		{ m_prev_Velocity = prev_Velocity ;}
 
-		inline void SetPreviousConfigurationStage1(const MAL_VECTOR_TYPE(double) & prev_Configuration)
+		inline void SetPreviousConfigurationStage1(const Eigen::VectorXd & prev_Configuration)
 		{ m_prev_Configuration1 = prev_Configuration ;}
-		inline void SetPreviousVelocityStage1(const MAL_VECTOR_TYPE(double) & prev_Velocity)
+		inline void SetPreviousVelocityStage1(const Eigen::VectorXd & prev_Velocity)
 		{ m_prev_Velocity1 = prev_Velocity ;}
 
-		inline void SetPreviousConfigurationStage2(const MAL_VECTOR_TYPE(double) & prev_Configuration)
+		inline void SetPreviousConfigurationStage2(const Eigen::VectorXd & prev_Configuration)
 		{ m_prev_Configuration2 = prev_Configuration ;}
-		inline void SetPreviousVelocityStage2(const MAL_VECTOR_TYPE(double) & prev_Velocity)
+		inline void SetPreviousVelocityStage2(const Eigen::VectorXd & prev_Velocity)
 		{ m_prev_Velocity2 = prev_Velocity;}
 
     /*! \brief Getter and setter for the previous configurations and velocities */
-    inline MAL_VECTOR_TYPE(double) & GetPreviousConfigurationStage0()
+    inline Eigen::VectorXd & GetPreviousConfigurationStage0()
     { return m_prev_Configuration ;};
 
-    inline MAL_VECTOR_TYPE(double) & GetPreviousConfigurationStage1()
+    inline Eigen::VectorXd & GetPreviousConfigurationStage1()
     { return m_prev_Configuration1 ;};
 
-    inline MAL_VECTOR_TYPE(double) & GetPreviousVelocityStage0()
+    inline Eigen::VectorXd & GetPreviousVelocityStage0()
     { return m_prev_Velocity ;};
 
-    inline MAL_VECTOR_TYPE(double) & GetPreviousVelocityStage1()
+    inline Eigen::VectorXd & GetPreviousVelocityStage1()
     { return m_prev_Velocity1 ;};
 
     inline void leftLegIndexinConfiguration(std::vector<int> & leftLegMaps) const
@@ -318,7 +318,7 @@ namespace PatternGeneratorJRL
     {ShiftFoot_=ShiftFoot ;}
 
     /*! \brief Get the COG of the ankles at the starting position. */
-    virtual MAL_S3_VECTOR_TYPE(double) GetCOGInitialAnkles();
+    virtual Eigen::Vector3d GetCOGInitialAnkles();
 
     friend ostream& operator <<(ostream &os,const ComAndFootRealization &obj);
 
@@ -373,21 +373,21 @@ namespace PatternGeneratorJRL
 
     /*! \brief Displacement between the hip and the foot. @{*/
     /*! \brief For the right foot. */
-    MAL_S3_VECTOR(m_DtRight,double);
+    Eigen::Vector3d m_DtRight;
     /*! \brief For the left foot. */
-    MAL_S3_VECTOR(m_DtLeft,double);
+    Eigen::Vector3d m_DtLeft;
     /*! @} */
 
     /*! \name Vector from the Waist to the left and right hip. */
 
     /*! Static part from the waist to the left hip.. */
-    MAL_S3_VECTOR(m_StaticToTheLeftHip,double);
+    Eigen::Vector3d m_StaticToTheLeftHip;
     /*! Static part from the waist to the right hip. */
-    MAL_S3_VECTOR(m_StaticToTheRightHip,double);
+    Eigen::Vector3d m_StaticToTheRightHip;
     /*! Dynamic part from the waist to the left hip. */
-    MAL_S3_VECTOR(m_TranslationToTheLeftHip,double);
+    Eigen::Vector3d m_TranslationToTheLeftHip;
     /*! Dynamic part form the waist to the right hip. */
-    MAL_S3_VECTOR( m_TranslationToTheRightHip,double);
+    Eigen::Vector3d m_TranslationToTheRightHip;
 
 
     /*! @} */
@@ -395,45 +395,45 @@ namespace PatternGeneratorJRL
     /*! \name Previous joint values. */
     //@{
     /*! \brief For the speed (stage 0). */
-    MAL_VECTOR(m_prev_Configuration,double);
+    Eigen::VectorXd m_prev_Configuration;
 
     /*! \brief For the speed (stage 1). */
-    MAL_VECTOR( m_prev_Configuration1,double);
+    Eigen::VectorXd m_prev_Configuration1;
 
     /*! \brief For the speed (stage 1). */
-    MAL_VECTOR( m_prev_Configuration2,double);
+    Eigen::VectorXd m_prev_Configuration2;
 
     /*! \brief For the speed (stage 0). */
-    MAL_VECTOR(m_prev_Velocity,double);
+    Eigen::VectorXd m_prev_Velocity;
 
     /*! \brief For the speed (stage 1). */
-    MAL_VECTOR( m_prev_Velocity1,double);
+    Eigen::VectorXd m_prev_Velocity1;
 
     /*! \brief For the speed (stage 1). */
-    MAL_VECTOR( m_prev_Velocity2,double);
+    Eigen::VectorXd m_prev_Velocity2;
 
     //@}
 
     /*! COM Starting position. */
-    MAL_S3_VECTOR(m_StartingCOMPosition,double);
+    Eigen::Vector3d m_StartingCOMPosition;
 
     /*! Final COM pose. */
-    MAL_S4x4_MATRIX(m_FinalDesiredCOMPose,double);
+    Eigen::Matrix4d m_FinalDesiredCOMPose;
 
     /*! Store the position of the ankle in the right feet. */
-    MAL_S3_VECTOR(m_AnklePositionRight,double);
+    Eigen::Vector3d m_AnklePositionRight;
 
     /*! Store the position of the ankle in the left feet. */
-    MAL_S3_VECTOR(m_AnklePositionLeft,double);
+    Eigen::Vector3d m_AnklePositionLeft;
 
     /*! Difference between the CoM and the Waist
       from the initialization phase,
       i.e. not reevaluated while walking. */
-    MAL_S3_VECTOR(m_DiffBetweenComAndWaist,double);
+    Eigen::Vector3d m_DiffBetweenComAndWaist;
 
     /*! Difference between the CoM and the Waist
       in the CoM reference frame. */
-    MAL_S3_VECTOR(m_ComAndWaistInRefFrame,double);
+    Eigen::Vector3d m_ComAndWaistInRefFrame;
 
 
     /*! Maximal distance along the X axis for the hand motion */
@@ -486,7 +486,7 @@ namespace PatternGeneratorJRL
     /*! COG of the ankles in the waist reference frame
       when evaluating the initial position.
      */
-    MAL_S3_VECTOR_TYPE(double) m_COGInitialAnkles;
+    Eigen::Vector3d m_COGInitialAnkles;
 
     /*! Store the position of the left and right shoulders. */
     se3::JointIndex m_LeftShoulder, m_RightShoulder;

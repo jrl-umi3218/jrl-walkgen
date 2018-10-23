@@ -87,7 +87,7 @@ namespace PatternGeneratorJRL
                    FootAbsolutePosition & InitRightFootAbsolutePosition,
                    deque<RelativeFootPosition> &RelativeFootPositions,
                    COMState & lStartingCOMState,
-                   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
+                   Eigen::Vector3d & lStartingZMPPosition);
 
 
     /// \brief Update the stacks on-line
@@ -173,7 +173,7 @@ namespace PatternGeneratorJRL
     double TimeBuffer_;
 
     /// \brief Additional term on the acceleration of the CoM
-    MAL_VECTOR(PerturbationAcceleration_,double);
+    Eigen::VectorXd PerturbationAcceleration_;
 
     /// \brief Sampling period considered in the QP
     double QP_T_;
@@ -290,7 +290,7 @@ namespace PatternGeneratorJRL
                               std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
                               double Xmax,
                               COMState & lStartingCOMState,
-                              MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+                              Eigen::Vector3d & lStartingZMPPosition,
                               FootAbsolutePosition & InitLeftFootAbsolutePosition,
                               FootAbsolutePosition & InitRightFootAbsolutePosition);
 

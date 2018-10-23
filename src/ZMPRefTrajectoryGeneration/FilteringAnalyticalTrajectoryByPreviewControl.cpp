@@ -48,7 +48,7 @@ FilteringAnalyticalTrajectoryByPreviewControl::FilteringAnalyticalTrajectoryByPr
   m_PreviewControl = 0;
 
   /*! Initialize the state vector used by the preview controller */
-  MAL_MATRIX_RESIZE(m_ComState,3,1);
+  m_ComState.resize(3,1);
   m_ComState(0,0) = 0.0;
   m_ComState(1,0) = 0.0;
   m_ComState(2,0) = 0.0;

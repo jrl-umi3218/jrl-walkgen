@@ -154,7 +154,7 @@ namespace PatternGeneratorJRL
 				deque<FootAbsolutePosition> &RightFootAbsolutePositions,
 				double Xmax,
 				COMState & lStartingCOMState,
-				MAL_S3_VECTOR_TYPE(double) &lStartingZMPPosition,
+				Eigen::Vector3d &lStartingZMPPosition,
 				FootAbsolutePosition & InitLeftFootAbsolutePosition,
 				FootAbsolutePosition & InitRightFootAbsolutePosition);
 
@@ -187,7 +187,7 @@ namespace PatternGeneratorJRL
 		     FootAbsolutePosition & InitRightFootAbsolutePosition,
 		     deque<RelativeFootPosition> &RelativeFootPositions,
 		     COMState &lStartingCOMState,
-		     MAL_S3_VECTOR(&,double) lStartingZMPPosition
+		     Eigen::Vector3d & lStartingZMPPosition
 		     );
 
       /* ! \brief Methods to update the stack on-line by inserting a new foot position.
@@ -520,7 +520,7 @@ namespace PatternGeneratorJRL
 
 
       */
-      int BuildAndSolveCOMZMPForASetOfSteps(MAL_S3x3_MATRIX(& ,double) lStartingCOMState,
+      int BuildAndSolveCOMZMPForASetOfSteps(Eigen::Matrix3d & lStartingCOMState,
 					    FootAbsolutePosition &LeftFootInitialPosition,
 					    FootAbsolutePosition &RightFootInitialPosition,
 					    bool IgnoreFirstRelativeFoot,
@@ -588,10 +588,10 @@ namespace PatternGeneratorJRL
                                        FootAbsolutePosition & FinalRightFootAbsolutePosition);
 
       /*! \brief LU decomposition of the Z matrix. */
-      MAL_MATRIX_TYPE(double) m_AF;
+      Eigen::MatrixXd m_AF;
 
       /*! \brief Pivots of the Z matrix LU decomposition. */
-      MAL_VECTOR_TYPE(int) m_IPIV;
+      Eigen::Matrix<int, Eigen::Dynamic, 1> m_IPIV;
 
       /*! \brief Boolean on the need to reset to the
 	precomputed Z matrix LU decomposition */

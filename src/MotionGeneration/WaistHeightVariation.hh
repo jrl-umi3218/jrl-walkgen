@@ -27,18 +27,18 @@
 /** \file WaistHeightVariation.h
 
     \brief This object generate all the values for the foot trajectories,
-   and the desired ZMP based on a sequence of relative steps.
-   If you want to change the reference trajectories, and the planning
-   of the foot, this is the object to modify.
+    and the desired ZMP based on a sequence of relative steps.
+    If you want to change the reference trajectories, and the planning
+    of the foot, this is the object to modify.
 
-   Copyright (c) 2005-2009, 
-   @author Olivier Stasse,Ramzi Sellouati, Francois Keith, 
+    Copyright (c) 2005-2009, 
+    @author Olivier Stasse,Ramzi Sellouati, Francois Keith, 
    
-   JRL-Japan, CNRS/AIST
+    JRL-Japan, CNRS/AIST
 
-   All rights reserved.
+    All rights reserved.
 
-   Please see License.txt for further information on license.
+    Please see License.txt for further information on license.
 */
 
 #ifndef _WAISTHEIGHT_VARIATION_H_
@@ -59,21 +59,21 @@
 namespace PatternGeneratorJRL
 {
 
-class  WaistPolynome : public Polynome
-    {
-    public:
-      /// Constructor:
-      /// boundCond: the different boundary conditions begin, intermediate and end of polynomial
-      /// timeDistr: vector with time instants for intermediate boundary conditions and end time
+  class  WaistPolynome : public Polynome
+  {
+  public:
+    /// Constructor:
+    /// boundCond: the different boundary conditions begin, intermediate and end of polynomial
+    /// timeDistr: vector with time instants for intermediate boundary conditions and end time
     
-      WaistPolynome();
+    WaistPolynome();
   
-      /// Set the parameters
-	void SetParameters(MAL_VECTOR( boundCond,double), std::vector<double> timeDistr);
+    /// Set the parameters
+    void SetParameters( Eigen::MatrixXd boundCond, std::vector<double> timeDistr);
 
-      /// Destructor.
-      ~WaistPolynome();
-    };
+    /// Destructor.
+    ~WaistPolynome();
+  };
 
 
 
@@ -81,48 +81,48 @@ class  WaistPolynome : public Polynome
 
   /// Object to compute new foot trajectories for the height of the waist with waist differnces as input for each step
   class WaistHeightVariation
-    {
-      public :
+  {
+  public :
      
-    	/// Constructor
-      	WaistHeightVariation();
+    /// Constructor
+    WaistHeightVariation();
 
-       	/// Destructor
-      	~WaistHeightVariation();
+    /// Destructor
+    ~WaistHeightVariation();
 
-	///call for polynomial planning of both steps during the obstacle stepover
-	void PolyPlanner(deque<COMPosition> &aCOMBuffer,
-			 deque<RelativeFootPosition> &aFootHolds,
-			 deque<ZMPPosition> aZMPPosition);
+    ///call for polynomial planning of both steps during the obstacle stepover
+    void PolyPlanner(deque<COMPosition> &aCOMBuffer,
+		     deque<RelativeFootPosition> &aFootHolds,
+		     deque<ZMPPosition> aZMPPosition);
 	
-	protected:
+  protected:
 
-      	deque<RelativeFootPosition> m_FootHolds;
+    deque<RelativeFootPosition> m_FootHolds;
 
-      	MAL_MATRIX(mBoundCond,double);   
-      	std::vector<double> mTimeDistr;
+    Eigen::MatrixXd mBoundCond;   
+    std::vector<double> mTimeDistr;
 
     
       
-      	WaistPolynome *m_PolynomeHip;
+    WaistPolynome *m_PolynomeHip;
 	
-	///extra COMPosition buffer calculated in ZMPMultibody class 
-	std::vector<COMPosition> m_ExtraCOMBuffer;
+    ///extra COMPosition buffer calculated in ZMPMultibody class 
+    std::vector<COMPosition> m_ExtraCOMBuffer;
 
 	
 
-	/// buffers for first preview
-	deque<COMPosition> m_COMBuffer;
-	unsigned int m_ExtraBufferLength;
-	double m_ModulationSupportCoefficient;
-	float m_Tsingle,m_TsingleStepOver; 
-        float m_Tdble;
-	double m_DiffBetweenComAndWaist;
-    	/// Sampling Period.
-      	double m_SamplingPeriod;
-      	/// Starting a new step sequences.
-      	bool m_StartingNewSequence;
-};
+    /// buffers for first preview
+    deque<COMPosition> m_COMBuffer;
+    unsigned int m_ExtraBufferLength;
+    double m_ModulationSupportCoefficient;
+    float m_Tsingle,m_TsingleStepOver; 
+    float m_Tdble;
+    double m_DiffBetweenComAndWaist;
+    /// Sampling Period.
+    double m_SamplingPeriod;
+    /// Starting a new step sequences.
+    bool m_StartingNewSequence;
+  };
 
 }
 
