@@ -37,7 +37,7 @@
 #include <string>
 
 
-#include <jrl/mal/matrixabstractlayer.hh>
+
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 #include <jrl/walkgen/config_private.hh>
 #include "ClockCPUTime.hh"
@@ -63,12 +63,12 @@ namespace PatternGeneratorJRL
       COMState finalCOMPosition;
       FootAbsolutePosition LeftFootPosition;
       FootAbsolutePosition RightFootPosition;
-      MAL_VECTOR(ZMPTarget,double);
+      Eigen::VectorXd ZMPTarget;
       unsigned long int NbOfIt;
 
       OneStep()
       {
-        MAL_VECTOR_RESIZE(ZMPTarget,3);
+        ZMPTarget.resize(3);
         NbOfIt = 0;
         memset(&LeftFootPosition,0,sizeof(LeftFootPosition));
         memset(&RightFootPosition,0,sizeof(RightFootPosition));

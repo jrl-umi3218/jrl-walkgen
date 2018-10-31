@@ -181,7 +181,9 @@ RigidBodySystem::precompute_trajectories( const deque<support_state_t> & Support
       // Typically, I witnessed during TestHerdt2010
       // a case where SS_it->NbInstants = 9  while FlyingFootTrajectory_deq_.size()=8
       //TODO: enhance this correction (find its origin).
-      unsigned int endLoop = std::min<unsigned>(SS_it->NbInstants, FlyingFootTrajectory_deq_.size());
+      unsigned int endLoop = 
+	std::min<unsigned>(SS_it->NbInstants,(unsigned int)
+			    FlyingFootTrajectory_deq_.size());
       for(unsigned int j = 0; j < endLoop; j++)
         FFTraj_it++;
       if(SS_it->StateChanged)

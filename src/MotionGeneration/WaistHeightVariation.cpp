@@ -63,8 +63,8 @@ void WaistHeightVariation::PolyPlanner(deque<COMPosition> &aCOMBuffer,
 
   unsigned int u_start=0;
   int stepnumber =0;
-  MAL_VECTOR_DIM(aBoundCond,double,4);
-  MAL_VECTOR_FILL(aBoundCond,1);
+  Eigen::Matrix<double,4,1> aBoundCond;
+  { for(unsigned int i=0;i<aBoundCond.size();aBoundCond[i++]=1);};
 
   vector<double> aTimeDistr;
   aTimeDistr.resize(1);
@@ -187,10 +187,11 @@ WaistPolynome::WaistPolynome() :Polynome(4)
   // SetParameters(boundCond,timeDistr);
 }
 
-void WaistPolynome::SetParameters(MAL_VECTOR( boundCond,double), vector<double> timeDistr)
+void WaistPolynome::SetParameters(Eigen::VectorXd boundCond,
+				  vector<double> timeDistr)
 {
-  MAL_MATRIX_DIM(Base,double,4,4);
-  MAL_MATRIX_DIM(Temp,double,4,4);
+  Eigen::Matrix<double,4,4> Base;;
+  Eigen::Matrix<double,4,4> Temp;;
 
   double T;
   double Ts2,Ts3;
@@ -215,15 +216,15 @@ void WaistPolynome::SetParameters(MAL_VECTOR( boundCond,double), vector<double> 
   double detBase;
 
 
-  detBase=MAL_MATRIX_RET_DETERMINANT(Base,double); 
+  detBase=Base.determinant(); 
 
  
   for (unsigned int i=0;i<boundCond.size();i++)
     {
       Temp=Base;
-      for(unsigned int j=0;j<MAL_MATRIX_NB_ROWS(Temp);j++)
+      for(unsigned int j=0;j<Temp.rows();j++)
 	Temp(j,i) = boundCond(j);
-      m_Coefficients[i] = MAL_MATRIX_RET_DETERMINANT(Temp,double)/detBase;	
+      m_Coefficients[i] = Temp.determinant()/detBase;	
     };
 
 }

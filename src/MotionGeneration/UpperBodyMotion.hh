@@ -38,7 +38,7 @@
 
 using namespace::std;
 
-
+#include <Eigen/Dense>
 #include <Mathematics/PolynomeFoot.hh>
 
 

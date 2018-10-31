@@ -127,7 +127,7 @@ int CoMAndFootOnlyStrategy::OneGlobalStepOfControl(FootAbsolutePosition &LeftFoo
 int CoMAndFootOnlyStrategy::EvaluateStartingState(Eigen::VectorXd & BodyAngles,
 						  COMState & aStartingCOMState,
 						  Eigen::Vector3d & aStartingZMPPosition,
-						  Eigen::VectorXd & lStartingWaistPose,
+						  Eigen::Matrix<double, 6,1> & lStartingWaistPose,
 						  FootAbsolutePosition & InitLeftFootPosition,
 						  FootAbsolutePosition & InitRightFootPosition)
 {
@@ -143,8 +143,9 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(Eigen::VectorXd & BodyAngles,
     // here we use the analytical forward kinematics to initialise the position of the CoM of mass according to
     // the articular position of the robot.
     (*itCFR)->InitializationCoM(BodyAngles,lStartingCOMState,
-					     lStartingWaistPose,
-					     InitLeftFootPosition, InitRightFootPosition);
+				lStartingWaistPose,
+				InitLeftFootPosition,
+				InitRightFootPosition);
 
     ODEBUG("EvaluateStartingCOM: m_StartingCOMState: " << lStartingCOMState);
     aStartingCOMState.x[0] = lStartingCOMState(0);
@@ -163,7 +164,7 @@ int CoMAndFootOnlyStrategy::EvaluateStartingState(Eigen::VectorXd & BodyAngles,
   // The  altitude of the zmp depend on the altitude of the support foot.
   aStartingZMPPosition(2) = 0.5 * (InitLeftFootPosition.z + InitRightFootPosition.z) ;
 
-  //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in \
+  //  cerr << "YOU SHOULD INITIALIZE PROPERLY aStartingZMPosition in	\
   //  CoMAndFootOnlyStrategy::EvaluateStartingState" <<endl;
 
 //  cout << "com = " << aStartingCOMState  << endl ;

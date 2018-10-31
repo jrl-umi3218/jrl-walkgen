@@ -73,6 +73,7 @@ ADD_EXECUTABLE(TestRiccatiEquation
 
 # Add test on the ricatti equation
 ADD_TEST(TestRiccatiEquation TestRiccatiEquation)
+TARGET_LINK_LIBRARIES(TestRiccatiEquation ${LAPACK_LIBRARIES} ${PROJECT_NAME})
 
 ################################################
 ## Generic Macro That Create a Boost Test Case #

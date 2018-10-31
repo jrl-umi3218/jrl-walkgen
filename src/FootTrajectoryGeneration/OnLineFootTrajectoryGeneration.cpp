@@ -271,7 +271,7 @@ void
   double LocalInterpolationStartTime = Time-(CurrentSupport.TimeLimit-(m_TDouble+m_TSingle));
 
   int StepType = 1;
-  unsigned int CurrentIndex = FinalLeftFootTraj_deq.size()-1;
+  unsigned int CurrentIndex = (unsigned int)(FinalLeftFootTraj_deq.size()-1);
 
 
   FootAbsolutePosition * LastSFP; //LastSwingFootPosition

@@ -95,9 +95,9 @@ namespace PatternGeneratorJRL
     x.resize(3,false);
     y.resize(3,false);
     z.resize(3,false);
-    x.clear();
-    y.clear();
-    z.clear();
+    x.setZero();
+    y.setZero();
+    z.setZero();
 
   }
 
@@ -137,12 +137,12 @@ namespace PatternGeneratorJRL
     yaw.resize(3,false);
     pitch.resize(3,false);
     roll.resize(3,false);
-    x.clear();
-    y.clear();
-    z.clear();
-    yaw.clear();
-    pitch.clear();
-    roll.clear();
+    x.setZero();
+    y.setZero();
+    z.setZero();
+    yaw.setZero();
+    pitch.setZero();
+    roll.setZero();
 
   }
 
@@ -284,10 +284,10 @@ namespace PatternGeneratorJRL
   linear_inequality_t::clear()
   {
 
-    D.X_mat.clear();
-    D.Y_mat.clear();
-    D.Z_mat.clear();
-    Dc_vec.clear();
+    D.X_mat.setZero();
+    D.Y_mat.setZero();
+    D.Z_mat.setZero();
+    Dc_vec.setZero();
 
   }
 
@@ -296,10 +296,10 @@ namespace PatternGeneratorJRL
   linear_inequality_t::resize( int NbRows, int NbCols, bool Preserve )
   {
 
-    D.X_mat.resize(NbRows, NbCols, Preserve);
-    D.Y_mat.resize(NbRows, NbCols, Preserve);
-    D.Z_mat.resize(NbRows, NbCols, Preserve);
-    Dc_vec.resize(NbRows, Preserve);
+    D.X_mat.resize(NbRows, NbCols);
+    D.Y_mat.resize(NbRows, NbCols);
+    D.Z_mat.resize(NbRows, NbCols);
+    Dc_vec.resize(NbRows);
 
   }
 

@@ -41,9 +41,9 @@ GeneratorVelRef::GeneratorVelRef(SimplePluginManager *lSPM,
 , RFI_(RFI)
 , LastFootSolX_(0.0)
 , LastFootSolY_(0.0)
-, MM_(1,1,false)
-, MV_(1,false)
-, MV2_(1,false){
+, MM_(1,1)
+, MV_(1)
+, MV2_(1){
 }
 
 
@@ -142,18 +142,18 @@ GeneratorVelRef::generate_selection_matrices( const std::deque<support_state_t> 
   IntermedQPMat::state_variant_t & State = IntermedData_->State();
   const unsigned & NbPrwSteps = SupportStates_deq.back().StepNumber;
 
-  State.VcX.clear();
-  State.VcY.clear();
-  State.V.resize(N_,NbPrwSteps,false);
-  State.V.clear();
-  State.VT.resize(NbPrwSteps,N_,false);
-  State.VT.clear();
-  State.Vc_fX.resize(NbPrwSteps,false);
-  State.Vc_fX.clear();
-  State.Vc_fY.resize(NbPrwSteps,false);
-  State.Vc_fY.clear();
-  State.V_f.resize(NbPrwSteps,NbPrwSteps,false);
-  State.V_f.clear();
+  State.VcX.setZero();
+  State.VcY.setZero();
+  State.V.resize(N_,NbPrwSteps);
+  State.V.setZero();
+  State.VT.resize(NbPrwSteps,N_);
+  State.VT.setZero();
+  State.Vc_fX.resize(NbPrwSteps);
+  State.Vc_fX.setZero();
+  State.Vc_fY.resize(NbPrwSteps);
+  State.Vc_fY.setZero();
+  State.V_f.resize(NbPrwSteps,NbPrwSteps);
+  State.V_f.setZero();
 
 
   std::deque<support_state_t>::const_iterator SS_it;
@@ -188,10 +188,10 @@ GeneratorVelRef::generate_selection_matrices( const std::deque<support_state_t> 
   }
 
 
-  State.VcshiftX.clear();
-  State.VcshiftY.clear();
-  State.Vshift.resize(N_,NbPrwSteps,false);
-  State.Vshift.clear();
+  State.VcshiftX.setZero();
+  State.VcshiftY.setZero();
+  State.Vshift.resize(N_,NbPrwSteps);
+  State.Vshift.setZero();
   SS_it = SupportStates_deq.begin();
   State.VcshiftX(0) = SS_it->X;
   State.VcshiftY(0) = SS_it->Y;
@@ -215,10 +215,10 @@ GeneratorVelRef::compute_global_reference( const solution_t & Solution )
 
   reference_t & Ref = IntermedData_->Reference();
 
-  Ref.Global.X_vec.resize(N_,false);
-  Ref.Global.X_vec.clear();
-  Ref.Global.Y_vec.resize(N_,false);
-  Ref.Global.Y_vec.clear();
+  Ref.Global.X_vec.resize(N_);
+  Ref.Global.X_vec.setZero();
+  Ref.Global.Y_vec.resize(N_);
+  Ref.Global.Y_vec.setZero();
   double YawTrunk;
   for( unsigned i=0;i<N_;i++ )
     {
@@ -242,13 +242,13 @@ GeneratorVelRef::initialize_matrices()
   IntermedQPMat::state_variant_t & State = IntermedData_->State();
   bool Preserve = true;
   State.VcshiftX.resize(N_,!Preserve);
-  State.VcshiftX.clear();
+  State.VcshiftX.setZero();
   State.VcshiftY.resize(N_,!Preserve);
-  State.VcshiftY.clear();
+  State.VcshiftY.setZero();
   State.VcX.resize(N_,!Preserve);
-  State.VcX.clear();
+  State.VcX.setZero();
   State.VcY.resize(N_,!Preserve);
-  State.VcY.clear();
+  State.VcY.setZero();
 
 }
 
@@ -260,22 +260,22 @@ GeneratorVelRef::initialize_matrices( linear_inequality_t & Inequalities)
   switch(Inequalities.type)
   {
   case INEQ_COP:
-    Inequalities.D.X_mat.resize(4*N_,N_,false);
-    Inequalities.D.X_mat.clear();
-    Inequalities.D.Y_mat.resize(4*N_,N_,false);
-    Inequalities.D.Y_mat.clear();
-    Inequalities.Dc_vec.resize(4*N_,false);
-    Inequalities.Dc_vec.clear();
+    Inequalities.D.X_mat.resize(4*N_,N_);
+    Inequalities.D.X_mat.setZero();
+    Inequalities.D.Y_mat.resize(4*N_,N_);
+    Inequalities.D.Y_mat.setZero();
+    Inequalities.Dc_vec.resize(4*N_);
+    Inequalities.Dc_vec.setZero();
     break;
   case INEQ_COM://TODO: fixed resize
-    Inequalities.D.X_mat.resize(40,N_,false);
-    Inequalities.D.X_mat.clear();
-    Inequalities.D.Y_mat.resize(40,N_,false);
-    Inequalities.D.Y_mat.clear();
-    Inequalities.D.Z_mat.resize(40,1,false);
-    Inequalities.D.Z_mat.clear();
-    Inequalities.Dc_vec.resize(40,false);
-    Inequalities.Dc_vec.clear();
+    Inequalities.D.X_mat.resize(40,N_);
+    Inequalities.D.X_mat.setZero();
+    Inequalities.D.Y_mat.resize(40,N_);
+    Inequalities.D.Y_mat.setZero();
+    Inequalities.D.Z_mat.resize(40,1);
+    Inequalities.D.Z_mat.setZero();
+    Inequalities.Dc_vec.resize(40);
+    Inequalities.Dc_vec.setZero();
     break;
   }
 
@@ -295,6 +295,9 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
   RFI_->set_vertices( CoPHull, *prwSS_it, INEQ_COP );
 
   ++prwSS_it;//Point at the first previewed instant
+  Inequalities.D.X_mat.reserve(N_*nbEdges);
+  Inequalities.D.Y_mat.reserve(N_*nbEdges);
+
   for( unsigned i=0; i<N_; i++ )
     {
     if( prwSS_it->StateChanged ){
@@ -312,8 +315,8 @@ GeneratorVelRef::build_inequalities_cop(linear_inequality_t & Inequalities,
 //      cout << "linear system \n";
       for( unsigned j = 0; j < nbEdges; j++ )
         {
-          Inequalities.D.X_mat.push_back( i*nbEdges+j, i, CoPHull.A_vec[j] );
-          Inequalities.D.Y_mat.push_back( i*nbEdges+j, i, CoPHull.B_vec[j] );
+          Inequalities.D.X_mat.insert( i*nbEdges+j, i)= CoPHull.A_vec[j] ;
+	  Inequalities.D.Y_mat.insert( i*nbEdges+j, i)= CoPHull.B_vec[j] ;
           Inequalities.Dc_vec( i*nbEdges+j ) = CoPHull.D_vec[j];
 //          cout << CoPHull.A_vec[j] << " " << CoPHull.B_vec[j] << " " << CoPHull.D_vec[j] << endl;
         }
@@ -339,6 +342,8 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
 
   deque<support_state_t>::const_iterator prwSS_it = SupportStates_deq.begin();
   prwSS_it++;//Point at the first previewed instant
+  Inequalities.D.X_mat.reserve(N_*nbEdges);
+  Inequalities.D.Y_mat.reserve(N_*nbEdges);  
   for( unsigned i=0; i<N_; i++ )
     {
       //foot positioning constraints
@@ -359,8 +364,8 @@ GeneratorVelRef::build_inequalities_feet( linear_inequality_t & Inequalities,
           //cout << "linear system \n";
           for( unsigned j = 0; j < nbEdges; j++ )
           {
-            Inequalities.D.X_mat.push_back( (prwSS_it->StepNumber-1)*nbEdges+j, (prwSS_it->StepNumber-1), FeetHull.A_vec[j] );
-            Inequalities.D.Y_mat.push_back( (prwSS_it->StepNumber-1)*nbEdges+j, (prwSS_it->StepNumber-1), FeetHull.B_vec[j] );
+            Inequalities.D.X_mat.insert ((prwSS_it->StepNumber-1)*nbEdges+j, (prwSS_it->StepNumber-1))= FeetHull.A_vec[j] ;
+	    Inequalities.D.Y_mat.insert ((prwSS_it->StepNumber-1)*nbEdges+j, (prwSS_it->StepNumber-1))= FeetHull.B_vec[j] ;
             Inequalities.Dc_vec( (prwSS_it->StepNumber-1)*nbEdges+j ) = FeetHull.D_vec[j];
 //            cout << FeetHull.A_vec[j] << " " << FeetHull.B_vec[j] << " " << FeetHull.D_vec[j] << endl;
           }
@@ -386,6 +391,8 @@ GeneratorVelRef::build_inequalities_com(linear_inequality_t & Inequalities,
 
   ++prwSS_it;//Point at the first previewed instant
   unsigned nbIneqsSet = 0;
+  Inequalities.D.X_mat.reserve(N_*nbIneq);
+  
   for( unsigned i=0; i<N_; ++i )
     {
       if( prwSS_it->StateChanged )
@@ -394,9 +401,9 @@ GeneratorVelRef::build_inequalities_com(linear_inequality_t & Inequalities,
 
           for( unsigned j = 0; j < nbIneq; j++ )
             {
-              Inequalities.D.X_mat.push_back( nbIneqsSet+j, i, CoPHull.A_vec[j] );
-              Inequalities.D.Y_mat.push_back( nbIneqsSet+j, i, CoPHull.B_vec[j] );
-              Inequalities.D.Z_mat.push_back( nbIneqsSet+j, 0, CoPHull.C_vec[j] );
+              Inequalities.D.X_mat.insert( nbIneqsSet+j, i)= CoPHull.A_vec[j] ;
+	      Inequalities.D.Y_mat.insert( nbIneqsSet+j, i)= CoPHull.B_vec[j] ;
+	      Inequalities.D.Z_mat.insert( nbIneqsSet+j, 0)= CoPHull.C_vec[j] ;
               Inequalities.Dc_vec( i*nbEdges+j ) = CoPHull.D_vec[j];
             }
           nbIneqsSet+=nbIneq;
@@ -549,10 +556,10 @@ GeneratorVelRef::build_eq_constraints_feet( const std::deque<support_state_t> & 
 
   Eigen::MatrixXd EqualityMatrix;
   Eigen::VectorXd EqualityVector;
-  EqualityMatrix.resize(2,2*NbStepsPreviewed, false);
-  EqualityMatrix.clear();
+  EqualityMatrix.resize(2,2*NbStepsPreviewed);
+  EqualityMatrix.setZero();
   EqualityVector.resize(2, false);
-  EqualityVector.clear();
+  EqualityVector.setZero();
   Pb.NbEqConstraints(2*NbStepsPreviewed);
   for(unsigned int i = 0; i< NbStepsPreviewed; i++)
     {
@@ -560,8 +567,8 @@ GeneratorVelRef::build_eq_constraints_feet( const std::deque<support_state_t> & 
       EqualityMatrix(1,NbStepsPreviewed+i) = 1.0; EqualityVector(1) = -SPTraj_it->Y;
       Pb.add_term_to( MATRIX_DU, EqualityMatrix, 2*i, 2*N_ );
       Pb.add_term_to( VECTOR_DS, EqualityVector, 2*i );
-      EqualityMatrix.clear();
-      EqualityVector.clear();
+      EqualityMatrix.setZero();
+      EqualityVector.setZero();
       SPTraj_it++;
     }
 
@@ -592,19 +599,19 @@ void GeneratorVelRef::build_eq_constraints_limitPosFeet(const solution_t & Solut
     Eigen::MatrixXd EqualityMatrix;
     Eigen::VectorXd EqualityVector;
 
-    EqualityMatrix.resize(2,2*N_+2*NbStepsPreviewed, false);
-    EqualityMatrix.clear();
+    EqualityMatrix.resize(2,2*N_+2*NbStepsPreviewed);
+    EqualityMatrix.setZero();
     EqualityVector.resize(2, false);
-    EqualityVector.clear();
+    EqualityVector.setZero();
 
     EqualityMatrix(0,2*N_) =  1.0;                  EqualityVector(0) =  -LastFootSolX_ ;
     EqualityMatrix(1,2*N_+NbStepsPreviewed) =  1.0; EqualityVector(1) =  -LastFootSolY_ ;
     Pb.add_term_to( MATRIX_DU, EqualityMatrix, NbConstraints, 0 );
     Pb.add_term_to( VECTOR_DS, EqualityVector, NbConstraints );
 
-    EqualityMatrix.clear();
-    EqualityVector.clear();
-    Pb.NbEqConstraints(EqualityVector.size()+1);
+    EqualityMatrix.setZero();
+    EqualityVector.setZero();
+    Pb.NbEqConstraints((unsigned int)(EqualityVector.size()+1));
   }else{
     Pb.NbEqConstraints(0);
   }
@@ -798,10 +805,10 @@ GeneratorVelRef::compute_warm_start( solution_t & Solution )
   // ---------------------
   Eigen::VectorXd X(N_);
   Eigen::VectorXd Y(N_);
-  MV2_= prod( Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.x  );
-  X=    prod( Robot_->DynamicsCoPJerk().Um1, zx-MV2_                     );
-  MV2_= prod( Robot_->DynamicsCoPJerk().S, IntermedData_->State().CoM.y  );
-  Y=    prod( Robot_->DynamicsCoPJerk().Um1, zy-MV2_                     );
+  MV2_=  Robot_->DynamicsCoPJerk().S * IntermedData_->State().CoM.x  ;
+  X=     Robot_->DynamicsCoPJerk().Um1 * zx-MV2_                     ;
+  MV2_=  Robot_->DynamicsCoPJerk().S * IntermedData_->State().CoM.y  ;
+  Y=     Robot_->DynamicsCoPJerk().Um1* zy-MV2_                     ;
 
   for(unsigned int i=0;i<N_;i++)
     {

@@ -87,14 +87,14 @@ namespace PatternGeneratorJRL
     // build the constraints :
     void initializeConstraint();
     void updateConstraint();
-    void evalConstraint(Eigen::VectorXf & U);
+    void evalConstraint(Eigen::VectorXd & U);
 
     void initializeCoPConstraint();
-    void evalCoPconstraint(Eigen::VectorXf & U);
-    void updateCoPconstraint(Eigen::VectorXf & U);
+    void evalCoPconstraint(Eigen::VectorXd & U);
+    void updateCoPconstraint(Eigen::VectorXd & U);
     void initializeFootPoseConstraint();
-    void evalFootPoseConstraint(Eigen::VectorXf & U);
-    void updateFootPoseConstraint(Eigen::VectorXf & U);
+    void evalFootPoseConstraint(Eigen::VectorXd & U);
+    void updateFootPoseConstraint(Eigen::VectorXd & U);
     void initializeFootVelIneqConstraint();
     void updateFootVelIneqConstraint();
     void initializeRotIneqConstraint();
@@ -220,16 +220,16 @@ namespace PatternGeneratorJRL
     double time_;
 
     // [x, dx, ddx], com (pos, vel, acc) at instant t_k on axis X
-    Eigen::VectorXf c_k_x_;
+    Eigen::VectorXd c_k_x_;
     // [y, dy, ddy], com (pos, vel, acc) at instant t_k on axis Y
-    Eigen::VectorXf c_k_y_;
+    Eigen::VectorXd c_k_y_;
 
     /**
     NOTE number of foot steps in prediction horizon changes between
     nf and nf+1, because when robot takes first step nf steps are
     planned on the prediction horizon, which makes a total of nf+1 steps.
     */
-    Eigen::VectorXf v_kp1_ ;
+    Eigen::VectorXd v_kp1_ ;
     Eigen::MatrixXd V_kp1_ ;
 
     // Usefull for managing the PG
@@ -247,17 +247,17 @@ namespace PatternGeneratorJRL
     // Center of Pressure constraint
     unsigned nc_cop_ ;
     Eigen::MatrixXd Acop_xy_, Acop_theta_ ;
-    Eigen::VectorXf UBcop_ ;
+    Eigen::VectorXd UBcop_ ;
     Eigen::MatrixXd D_kp1_xy_, D_kp1_theta_, Pzuv_, derv_Acop_map_  ;
     Eigen::MatrixXd derv_Acop_map2_ ;
-    Eigen::VectorXf b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_, v_kp1f_x_, v_kp1f_y_ ;
-    Eigen::VectorXf v_kf_x_, v_kf_y_ ;
+    Eigen::VectorXd b_kp1_, Pzsc_, Pzsc_x_, Pzsc_y_, v_kp1f_, v_kp1f_x_, v_kp1f_y_ ;
+    Eigen::VectorXd v_kf_x_, v_kf_y_ ;
     Eigen::MatrixXd diffMat_ ;
     Eigen::MatrixXd rotMat_xy_, rotMat_theta_, rotMat_;
     Eigen::MatrixXd A0_xy_, A0_theta_;
-    Eigen::VectorXf B0_;
+    Eigen::VectorXd B0_;
     Eigen::MatrixXd Acop_theta_dummy0_;
-    Eigen::VectorXf Acop_theta_dummy1_;
+    Eigen::VectorXd Acop_theta_dummy1_;
 
     // Foot position constraint
     unsigned nc_foot_ ;
@@ -266,54 +266,54 @@ namespace PatternGeneratorJRL
     bool useItBeforeLanding_ ;
     int itMax_;
     std::vector<Eigen::MatrixXd> Afoot_xy_, Afoot_theta_  ;
-    std::vector<Eigen::VectorXf> UBfoot_ ;
+    std::vector<Eigen::VectorXd> UBfoot_ ;
     std::vector<Eigen::MatrixXd> SelecMat_;
     std::vector<Eigen::MatrixXd> A0f_xy_, A0f_theta_ ;
-    std::vector<Eigen::VectorXf> B0f_;
+    std::vector<Eigen::VectorXd> B0f_;
     std::vector<Eigen::MatrixXd> rotMat_vec_, drotMat_vec_ ;
     Eigen::MatrixXd tmpRotMat_;
-    std::vector<Eigen::VectorXf> deltaF_ ;
-    std::vector<Eigen::VectorXf> AdRdF_ ;
+    std::vector<Eigen::VectorXd> deltaF_ ;
+    std::vector<Eigen::VectorXd> AdRdF_ ;
     Eigen::MatrixXd Afoot_xy_full_, Afoot_theta_full_  ;
-    Eigen::VectorXf UBfoot_full_ ;
+    Eigen::VectorXd UBfoot_full_ ;
 
     // Foot Velocity constraint
     unsigned nc_vel_ ;
     std::deque <RelativeFootPosition> desiredNextSupportFootRelativePosition ;
     std::vector<support_state_t> desiredNextSupportFootAbsolutePosition ;
     Eigen::MatrixXd Avel_ ;
-    Eigen::VectorXf Bvel_ ;
+    Eigen::VectorXd Bvel_ ;
 
     // Foot Position constraint
     unsigned nc_pos_ ;
     Eigen::MatrixXd Apos_ ;
-    Eigen::VectorXf Bpos_ ;
+    Eigen::VectorXd Bpos_ ;
 
     // Rotation linear constraint
     unsigned nc_rot_ ;
     Eigen::MatrixXd Arot_ ;
-    Eigen::VectorXf UBrot_,LBrot_ ;
+    Eigen::VectorXd UBrot_,LBrot_ ;
 
     // Obstacle constraint
     unsigned nc_obs_ ;
     std::vector< std::vector<Eigen::MatrixXd> > Hobs_ ;
-    std::vector< std::vector<Eigen::VectorXf> > Aobs_ ;
-    std::vector< Eigen::VectorXf > UBobs_ ;
+    std::vector< std::vector<Eigen::VectorXd> > Aobs_ ;
+    std::vector< Eigen::VectorXd > UBobs_ ;
     std::vector<Circle> obstacles_ ;
-    Eigen::VectorXf qp_J_obs_i_ ;
+    Eigen::VectorXd qp_J_obs_i_ ;
     // Standing constraint :
     unsigned nc_stan_ ;
     Eigen::MatrixXd Astan_ ;
-    Eigen::VectorXf UBstan_, LBstan_ ;
+    Eigen::VectorXd UBstan_, LBstan_ ;
 
     // evaluate constraint
     // real problem bounds : lb_ < g(U) < ub_
-    Eigen::VectorXf ub_  ;
-    Eigen::VectorXf gU_  ;
-    Eigen::VectorXf Uxy_  ;
-    Eigen::VectorXf gU_cop_, gU_vel_ ;
-    Eigen::VectorXf gU_foot_ ;
-    Eigen::VectorXf gU_obs_, gU_rot_ , gU_stan_ ;
+    Eigen::VectorXd ub_  ;
+    Eigen::VectorXd gU_  ;
+    Eigen::VectorXd Uxy_  ;
+    Eigen::VectorXd gU_cop_, gU_vel_ ;
+    Eigen::VectorXd gU_foot_ ;
+    Eigen::VectorXd gU_obs_, gU_rot_ , gU_stan_ ;
 
     // Cost Function
     unsigned nv_ ; // number of degrees of freedom
@@ -322,8 +322,8 @@ namespace PatternGeneratorJRL
 
     // decomposition of p_xy_
     // p_xy_ = ( p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ )
-    Eigen::VectorXf p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ ;
-    Eigen::VectorXf Pvsc_x_ , Pvsc_y_ ;
+    Eigen::VectorXd p_xy_X_, p_xy_Fx_, p_xy_Y_, p_xy_Fy_ ;
+    Eigen::VectorXd Pvsc_x_ , Pvsc_y_ ;
 
     // decomposition of Q_x_=Q_y_
     // Q_x = ( Q_x_XX Q_x_XF ) = Q_y
@@ -333,9 +333,9 @@ namespace PatternGeneratorJRL
 
     // Line Search
     bool useLineSearch_ ;
-    Eigen::VectorXf p_ , U_n_, selectActiveConstraint ;
-    Eigen::VectorXf JdU_, contraintValue ;
-    Eigen::VectorXf HUn_ ;
+    Eigen::VectorXd p_ , U_n_, selectActiveConstraint ;
+    Eigen::VectorXd JdU_, contraintValue ;
+    Eigen::VectorXd HUn_ ;
     double lineStep_, lineStep0_, stepParam_ ; // step searched
     double mu_ ; // weight between cost function and constraints
     double cm_, c_ ; // Merit Function Jacobian
@@ -349,11 +349,11 @@ namespace PatternGeneratorJRL
     unsigned ncineq_ ;
     unsigned nc_ ;
     Eigen::MatrixXd qp_H_   ;
-    Eigen::VectorXf qp_g_   ;
+    Eigen::VectorXd qp_g_   ;
     Eigen::MatrixXd qp_J_   ; //constraint Jacobian
-    Eigen::VectorXf qp_ubJ_ ; //constraint Jacobian
+    Eigen::VectorXd qp_ubJ_ ; //constraint Jacobian
     // temporary usefull variable for matrix manipulation
-    Eigen::VectorXf qp_g_x_, qp_g_y_, qp_g_theta_ ;
+    Eigen::VectorXd qp_g_x_, qp_g_y_, qp_g_theta_ ;
 
     // Free variable of the system
     // U_       = [C_kp1_x_ F_kp1_x_ C_kp1_y_ F_kp1_y_ F_kp1_theta_]^T
@@ -361,13 +361,13 @@ namespace PatternGeneratorJRL
     // U_x      = [C_kp1_x_ F_kp1_x_]^T
     // U_y      = [C_kp1_y_ F_kp1_y_]^T
     // U_theta_ = [F_kp1_theta_]^T
-    Eigen::VectorXf U_           ;
-    Eigen::VectorXf U_xy_        ;
-    Eigen::VectorXf U_x_         ;
-    Eigen::VectorXf U_y_         ;
-    Eigen::VectorXf F_kp1_x_     ;
-    Eigen::VectorXf F_kp1_y_     ;
-    Eigen::VectorXf F_kp1_theta_ ;
+    Eigen::VectorXd U_           ;
+    Eigen::VectorXd U_xy_        ;
+    Eigen::VectorXd U_x_         ;
+    Eigen::VectorXd U_y_         ;
+    Eigen::VectorXd F_kp1_x_     ;
+    Eigen::VectorXd F_kp1_y_     ;
+    Eigen::VectorXd F_kp1_theta_ ;
 
     // Time constant parameter
     //////////////////////////
@@ -426,22 +426,22 @@ namespace PatternGeneratorJRL
     // linear system corresponding to the foot step constraints
     // right foot polygonal hull
     Eigen::MatrixXd A0r_  ;
-    Eigen::VectorXf ubB0r_;
+    Eigen::VectorXd ubB0r_;
     // left foot polygonal hull
     Eigen::MatrixXd A0l_  ;
-    Eigen::VectorXf ubB0l_;
+    Eigen::VectorXd ubB0l_;
 
     // linear systems corresponding to the CoP constraints
     // right foot hull minus security margin
     Eigen::MatrixXd A0rf_    ;
-    Eigen::VectorXf ubB0rf_  ;
+    Eigen::VectorXd ubB0rf_  ;
     // left foot hull minus security margin
     Eigen::MatrixXd A0lf_    ;
-    Eigen::VectorXf ubB0lf_  ;
+    Eigen::VectorXd ubB0lf_  ;
     // foot hull minus security margin for standing still
     // or dealing with the switching mass phase
     Eigen::MatrixXd A0ds_   ;
-    Eigen::VectorXf ubB0ds_ ;
+    Eigen::VectorXd ubB0ds_ ;
 
     // [Vx, Vy, Vtheta], reference velocity express in local frame
     // [Vx, Vy, Vtheta], reference velocity express in global frame
@@ -455,7 +455,7 @@ namespace PatternGeneratorJRL
     Eigen::QuadProgDense * QP_ ;
     Eigen::MatrixXd QuadProg_H_, QuadProg_J_eq_, QuadProg_J_ineq_;
     Eigen::VectorXd QuadProg_g_, QuadProg_bJ_eq_, QuadProg_lbJ_ineq_, deltaU_;
-    Eigen::VectorXf deltaU_thresh_ ;
+    Eigen::VectorXd deltaU_thresh_ ;
   };
 
 

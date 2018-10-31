@@ -313,7 +313,7 @@ namespace PatternGeneratorJRL
       int EvaluateStartingState(Eigen::VectorXd & BodyAngles,
 				Eigen::Vector3d & aStartingCOMState,
 				Eigen::Vector3d & aStartingZMPPosition,
-				Eigen::VectorXd & aStartingWaistPose,
+				Eigen::Matrix<double, 6, 1> & aStartingWaistPose,
 				FootAbsolutePosition & InitLeftFootPosition,
 				FootAbsolutePosition & InitRightFootPosition);
 
@@ -426,7 +426,7 @@ namespace PatternGeneratorJRL
        */
       int EvaluateStartingCoM(Eigen::VectorXd & BodyAnglesInit,
 			      Eigen::Vector3d & aStartingCOMState,
-			      Eigen::VectorXd & aStartingWaistPosition,
+			      Eigen::Matrix<double,6,1> & aStartingWaistPosition,
 			      FootAbsolutePosition & InitLeftFootPosition,
 			      FootAbsolutePosition & InitRightFootPosition);
 

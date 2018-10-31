@@ -30,7 +30,9 @@ frame work */
 #define PinocchioRobot_HH
 
 #include "pinocchio/spatial/se3.hpp"
+#include "pinocchio/multibody/data.hpp"
 #include "pinocchio/multibody/model.hpp"
+#include "pinocchio/parsers/urdf.hpp"
 
 namespace PatternGeneratorJRL
 {

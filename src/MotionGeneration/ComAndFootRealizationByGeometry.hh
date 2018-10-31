@@ -93,8 +93,8 @@ namespace PatternGeneratorJRL
 
     */
     bool ComputePostureForGivenCoMAndFeetPosture(Eigen::VectorXd &CoMPosition,
-						 Eigen::VectorXd & aCoMSpeed,
-						 Eigen::VectorXd & aCoMAcc,
+						 Eigen::VectorXd &aCoMSpeed,
+						 Eigen::VectorXd &aCoMAcc,
 						 Eigen::VectorXd &LeftFoot,
 						 Eigen::VectorXd &RightFoot,
 						 Eigen::VectorXd & CurrentConfiguration,
@@ -114,7 +114,7 @@ namespace PatternGeneratorJRL
       \param[out] lStartingWaistPose: The waist pose according to the user configuration vector.
     */
     bool InitializationHumanoid(Eigen::VectorXd &BodyAnglesIni,
-			    Eigen::VectorXd &lStartingWaistPose);
+				Eigen::Matrix<double, 6, 1> &lStartingWaistPose);
 
     /*! \brief Initialize the foot position.
       \param[in] aFoot: Pointer to the foot to be updated.
@@ -137,7 +137,7 @@ namespace PatternGeneratorJRL
     */
     bool InitializationCoM(Eigen::VectorXd &BodyAnglesIni,
 			   Eigen::Vector3d & lStartingCOMPosition,
-			   Eigen::VectorXd & lStartingWaistPosition,
+			   Eigen::Matrix<double,6,1> & lStartingWaistPosition,
 			   FootAbsolutePosition & InitLeftFootAbsPos,
 			   FootAbsolutePosition & InitRightFootAbsPos);
 
@@ -174,7 +174,7 @@ namespace PatternGeneratorJRL
 
     int EvaluateStartingCoM(Eigen::VectorXd &BodyAngles,
 			    Eigen::Vector3d &aStartingCOMPosition,
-			    Eigen::VectorXd &aWaistPose,
+			    Eigen::Matrix<double, 6, 1> &aWaistPose,
 			    FootAbsolutePosition & InitLeftFootPosition,
 			    FootAbsolutePosition & InitRightFootPosition);
 

@@ -550,7 +550,7 @@ void ZMPVelocityReferencedQP::OnLine(double time,
 
     // INITIALIZE INTERPOLATION:
     // ------------------------
-    CurrentIndex_ = FinalCOMTraj_deq.size();
+    CurrentIndex_ = (unsigned int)FinalCOMTraj_deq.size();
     for (unsigned int i = 0  ; i < CurrentIndex_ ; ++i )
     {
         ZMPTraj_deq_ctrl_[i] = FinalZMPTraj_deq[i] ;
@@ -770,7 +770,7 @@ void ZMPVelocityReferencedQP::InterpretSolutionVector()
 
   // compute an additional previewed foot position
   {
-    int size_vec_sol = FootPrw_vec.size();
+    int size_vec_sol = (int) FootPrw_vec.size();
 
     if ( nbSteps > 0 ){
       // center of the feet of the last preview double support phase :

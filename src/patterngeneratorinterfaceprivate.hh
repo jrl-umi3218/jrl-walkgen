@@ -35,8 +35,6 @@
 
 #include <sstream>
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 
 #include <jrl/walkgen/configJRLWPG.hh>
@@ -367,7 +365,7 @@ namespace PatternGeneratorJRL
      for the initiale pose.*/
     void EvaluateStartingState(COMState  & lStartingCOMState,
 			       Eigen::Vector3d & lStartingZMPPosition,
-			       Eigen::VectorXd & lStartingWaistPose,
+			       Eigen::Matrix<double, 6, 1> & lStartingWaistPose,
 			       FootAbsolutePosition & InitLeftFootAbsPos,
 			       FootAbsolutePosition & InitRightFootAbsPos);
 

@@ -80,7 +80,7 @@ namespace PatternGeneratorJRL
                    FootAbsolutePosition & InitRightFootAbsolutePosition,
                    deque<RelativeFootPosition> &RelativeFootPositions,
                    COMState & lStartingCOMState,
-                   MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition);
+                   Eigen::Vector3d & lStartingZMPPosition);
 
     int UpdateCurrentPos(ZMPPosition initZMP,
                          COMState initCOM,
@@ -93,7 +93,7 @@ namespace PatternGeneratorJRL
       initRightFoot_ = initRightFoot ;
       return 0 ;
     }
-    int UpdateCurrentPos(MAL_VECTOR( &initZMP,double),
+    int UpdateCurrentPos(Eigen::VectorXd &initZMP,
                          COMState initCOM,
                          FootAbsolutePosition initLeftFoot,
                          FootAbsolutePosition initRightFoot)
@@ -106,7 +106,7 @@ namespace PatternGeneratorJRL
       initRightFoot_ = initRightFoot ;
       return 0 ;
     }
-    int UpdateCoM(MAL_VECTOR( &initZMP,double),
+    int UpdateCoM(Eigen::VectorXd &initZMP,
                   COMState initCOM)
     {
       initCOM_.x[0] = initCOM.x[0] ;
@@ -203,7 +203,7 @@ namespace PatternGeneratorJRL
     double TimeBuffer_;
 
     /// \brief Additional term on the acceleration of the CoM
-    MAL_VECTOR(PerturbationAcceleration_,double);
+    Eigen::VectorXd PerturbationAcceleration_;
 
     /// \brief Sampling period considered in the QP
     double SQP_T_;
@@ -254,9 +254,9 @@ namespace PatternGeneratorJRL
     std::vector<double> FootStepY_ ;
     std::vector<double> FootStepYaw_ ;
 
-    MAL_VECTOR_TYPE(double) m_CurrentConfiguration_ ;
-    MAL_VECTOR_TYPE(double) m_CurrentVelocity_ ;
-    MAL_VECTOR_TYPE(double) m_CurrentAcceleration_ ;
+    Eigen::VectorXd m_CurrentConfiguration_ ;
+    Eigen::VectorXd m_CurrentVelocity_ ;
+    Eigen::VectorXd m_CurrentAcceleration_ ;
 
     // initial value
     ZMPPosition initZMP_ ;
@@ -302,7 +302,7 @@ namespace PatternGeneratorJRL
                               std::deque<FootAbsolutePosition> &RightFootAbsolutePositions,
                               double Xmax,
                               COMState & lStartingCOMState,
-                              MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
+                              Eigen::Vector3d & lStartingZMPPosition,
                               FootAbsolutePosition & InitLeftFootAbsolutePosition,
                               FootAbsolutePosition & InitRightFootAbsolutePosition);
 

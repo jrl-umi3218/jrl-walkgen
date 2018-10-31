@@ -37,7 +37,7 @@
 #include <sstream>
 #include <fstream>
 
-#include <jrl/mal/matrixabstractlayer.hh>
+
 
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 
@@ -69,15 +69,15 @@ namespace PatternGeneratorJRL {
         ":useDynamicFilter false"
       };
 
-      for(int i=0;i<nbMethod;i++)
+      for(unsigned int i=0;i<nbMethod;i++)
 	{
 	  std::istringstream strm(lBuffer[i]);
 	  aPGI.ParseCmd(strm);
 	}
       // Evaluate current state of the robot in the PG.
       COMState lStartingCOMPosition;
-      MAL_S3_VECTOR_TYPE(double)  lStartingZMPPosition;
-      MAL_VECTOR_TYPE(double)  lStartingWaistPose;
+      Eigen::Vector3d  lStartingZMPPosition;
+      Eigen::Matrix<double, 6, 1>  lStartingWaistPose;
       FootAbsolutePosition  InitLeftFootAbsPos;
       FootAbsolutePosition  InitRightFootAbsPos;
 

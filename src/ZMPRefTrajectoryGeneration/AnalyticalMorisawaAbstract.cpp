@@ -117,7 +117,7 @@ namespace PatternGeneratorJRL
 
   bool AnalyticalMorisawaAbstract::GetPolynomialWeights(vector<double> &PolynomialWeights)
   {
-    unsigned int r = m_y.size();
+    unsigned int r = (unsigned int) m_y.size();
     PolynomialWeights.resize(r);
     for(unsigned int i=0;i<r;++i)
       PolynomialWeights[i] = m_y[i];

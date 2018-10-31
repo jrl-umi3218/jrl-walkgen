@@ -31,7 +31,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <jrl/mal/matrixabstractlayer.hh>
+
 
 #include <PreviewControl/PreviewControl.hh>
 #include <ZMPRefTrajectoryGeneration/ZMPDiscretization.hh>
@@ -194,8 +194,8 @@ namespace PatternGeneratorJRL
   void GenerateMotionFromKineoWorks::CreateBufferFirstPreview(deque<ZMPPosition> &ZMPRefBuffer)
   {
     deque<ZMPPosition> aFIFOZMPRefPositions;
-    MAL_MATRIX(aPC1x,double);
-    MAL_MATRIX(aPC1y,double);
+    Eigen::MatrixXd aPC1x;
+    Eigen::MatrixXd aPC1y;
     double aSxzmp, aSyzmp;
     double aZmpx2, aZmpy2;
 	
@@ -209,7 +209,7 @@ namespace PatternGeneratorJRL
     aSxzmp = 0.0;//m_sxzmp;
     aSyzmp = 0.0;//m_syzmp;
 
-    MAL_MATRIX_RESIZE(aPC1x,3,1);  MAL_MATRIX_RESIZE(aPC1y,3,1);
+    aPC1x.resize(3,1);  aPC1y.resize(3,1);
 
     aPC1x(0,0)= 0;    aPC1x(1,0)= 0;    aPC1x(2,0)= 0;
     aPC1y(0,0)= 0;    aPC1y(1,0)= 0;    aPC1y(2,0)= 0;

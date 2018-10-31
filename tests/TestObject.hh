@@ -41,7 +41,7 @@
 #include <string>
 #include "CommonTools.hh"
 #include "ClockCPUTime.hh"
-#include <jrl/mal/matrixabstractlayer.hh>
+
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 #include <jrl/walkgen/pinocchiorobot.hh>
 #include "MotionGeneration/ComAndFootRealizationByGeometry.hh"
@@ -123,25 +123,25 @@ namespace PatternGeneratorJRL
 	@{
       */
       /*! \brief Configuration of the robot joints. */
-      MAL_VECTOR(m_CurrentConfiguration,double);
+      Eigen::VectorXd m_CurrentConfiguration;
 
       /*! \brief Velocity of the robot joints*/
-      MAL_VECTOR(m_CurrentVelocity,double);
+      Eigen::VectorXd m_CurrentVelocity;
 
       /*! \brief Acceleration of the robot joints. */
-      MAL_VECTOR(m_CurrentAcceleration,double);
+      Eigen::VectorXd m_CurrentAcceleration;
 
       /*! \brief Previous configuration of the robot. */
-      MAL_VECTOR(m_PreviousConfiguration,double) ;
+      Eigen::VectorXd m_PreviousConfiguration ;
 
       /*! \brief Previous velocity */
-      MAL_VECTOR(m_PreviousVelocity,double);
+      Eigen::VectorXd m_PreviousVelocity;
 
       /*! \brief Previous acceleration */
-      MAL_VECTOR(m_PreviousAcceleration,double);
+      Eigen::VectorXd m_PreviousAcceleration;
 
       /*! \brief Half Sitting Configuration */
-      MAL_VECTOR(m_HalfSitting,double);
+      Eigen::VectorXd m_HalfSitting;
 
 
       /*! @} */
@@ -171,9 +171,9 @@ namespace PatternGeneratorJRL
       se3::JointIndex m_rightGripper ;
 
       /*! \brief Vector of generalized configurations for whole body motion. */
-      MAL_VECTOR_TYPE(double) m_conf;
-      MAL_VECTOR_TYPE(double) m_vel ;
-      MAL_VECTOR_TYPE(double) m_acc ;
+      Eigen::VectorXd m_conf;
+      Eigen::VectorXd m_vel ;
+      Eigen::VectorXd m_acc ;
 
       /*! @} */
 
@@ -211,12 +211,12 @@ namespace PatternGeneratorJRL
       
       /*! \brief Computes a configuration from current m_OneStep
 	specifications */
-      void analyticalInverseKinematics(MAL_VECTOR_TYPE(double) & conf,
-				       MAL_VECTOR_TYPE(double) & vel,
-				       MAL_VECTOR_TYPE(double) & acc);
+      void analyticalInverseKinematics(Eigen::VectorXd & conf,
+				       Eigen::VectorXd & vel,
+				       Eigen::VectorXd & acc);
 
       /* ! \brief parse From URDF to OpenHRP index. */
-      void parseFromURDFtoOpenHRPIndex(MAL_VECTOR_TYPE(double) & conf);
+      void parseFromURDFtoOpenHRPIndex(Eigen::VectorXd & conf);
 
       /*! \brief Information related to one step of computation. */
       struct OneStep m_OneStep;

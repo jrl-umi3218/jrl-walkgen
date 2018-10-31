@@ -31,6 +31,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <math.h>
+
 #include "Mathematics/OptCholesky.hh"
 
 using namespace std;

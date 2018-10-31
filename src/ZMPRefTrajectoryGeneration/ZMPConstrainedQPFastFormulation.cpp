@@ -823,7 +823,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
 	{
 	  break;
 	}
-      IndexConstraint += (*LCI_it)->A.rows();
+      IndexConstraint += (unsigned int)((*LCI_it)->A.rows());
     }  
   NbOfConstraints = IndexConstraint;
   
@@ -836,7 +836,7 @@ int ZMPConstrainedQPFastFormulation::BuildConstraintMatrices(double * & DPx,doub
 
   // Store the number of constraint to be generated for the first 
   // slot of time control of the algorithm.
-  NextNumberOfRemovedConstraints = (*LCI_it)->A.rows();
+  NextNumberOfRemovedConstraints = (unsigned int)((*LCI_it)->A.rows());
 
   IndexConstraint = 0;
   ODEBUG("Starting Matrix to build the constraints. ");
@@ -1422,7 +1422,7 @@ int ZMPConstrainedQPFastFormulation::BuildZMPTrajectoryFromFootTrajectory(deque<
       // Compute CPU consumption time.
       gettimeofday(&end,0);
       CurrentCPUTime = end.tv_sec - start.tv_sec + 
-	0.000001 * (end.tv_usec - start.tv_usec);
+	0.000001 * (double)(end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
       ODEBUG("Current Time : " << StartingTime << " " << 
 	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime << 

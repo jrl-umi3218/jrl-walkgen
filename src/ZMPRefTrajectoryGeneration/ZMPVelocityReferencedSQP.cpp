@@ -171,8 +171,8 @@ ZMPVelocityReferencedSQP::~ZMPVelocityReferencedSQP()
 void ZMPVelocityReferencedSQP::setCoMPerturbationForce(istringstream &strm)
 {
   double tmp ;
-  MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
-  MAL_VECTOR_FILL(PerturbationAcceleration_,0.0);
+  PerturbationAcceleration_.resize(6);
+  { for(unsigned int i=0;i<PerturbationAcceleration_.size();PerturbationAcceleration_[i++]=0.0);};
   strm >> PerturbationAcceleration_(2);
   strm >> PerturbationAcceleration_(5);
   strm >> tmp ;
@@ -184,8 +184,8 @@ void ZMPVelocityReferencedSQP::setCoMPerturbationForce(istringstream &strm)
 void ZMPVelocityReferencedSQP::setCoMPerturbationForce(double x, double y)
 {
 
-  MAL_VECTOR_RESIZE(PerturbationAcceleration_,6);
-  MAL_VECTOR_FILL(PerturbationAcceleration_,0.0);
+  PerturbationAcceleration_.resize(6);
+  { for(unsigned int i=0;i<PerturbationAcceleration_.size();PerturbationAcceleration_[i++]=0.0);};
 
   PerturbationAcceleration_(2) = x/RobotMass_;
   PerturbationAcceleration_(5) = y/RobotMass_;
@@ -264,7 +264,7 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
                                         FootAbsolutePosition & InitRightFootAbsolutePosition,
                                         deque<RelativeFootPosition> &, // RelativeFootPositions,
                                         COMState & lStartingCOMState,
-                                        MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition)
+                                        Eigen::Vector3d & lStartingZMPPosition)
 {
 
   // Generator Management
@@ -432,11 +432,11 @@ int ZMPVelocityReferencedSQP::InitOnLine(deque<ZMPPosition> & FinalZMPTraj_deq,
   initRightFoot_ = FinalRightFootTraj_deq[0] ;
   CurrentIndex_ = 1 ;
 
-  JerkX_      .resize(NMPCgenerator_->N()) ;
-  JerkY_      .resize(NMPCgenerator_->N()) ;
-  FootStepX_  .resize(NMPCgenerator_->nf()+1);
-  FootStepY_  .resize(NMPCgenerator_->nf()+1);
-  FootStepYaw_.resize(NMPCgenerator_->nf()+1);
+  JerkX_      .resize((long unsigned int)NMPCgenerator_->N()) ;
+  JerkY_      .resize((long unsigned int)NMPCgenerator_->N()) ;
+  FootStepX_  .resize((long unsigned int)(NMPCgenerator_->nf()+1));
+  FootStepY_  .resize((long unsigned int)(NMPCgenerator_->nf()+1));
+  FootStepYaw_.resize((long unsigned int)(NMPCgenerator_->nf()+1));
   return 0;
 }
 
@@ -635,7 +635,7 @@ void ZMPVelocityReferencedSQP::FullTrajectoryInterpolation(double time)
 
   double currentTime = time + NMPCgenerator_->Tfirst();
   double currentIndex = CurrentIndex_ + (int)round(NMPCgenerator_->Tfirst()/m_SamplingPeriod);
-  for ( int i = 1 ; i<previewSize_ ; i++ )
+  for ( unsigned int i = 1 ; i<previewSize_ ; i++ )
   {
     LIPM_.setState(COMTraj_deq_ctrl_[currentIndex-1]);
     CoMZMPInterpolation(JerkX_,JerkY_,&LIPM_,NbSampleControl_,i,currentIndex,SupportStates_deq);
@@ -729,7 +729,7 @@ void ZMPVelocityReferencedSQP::GetZMPDiscretization(deque<ZMPPosition> & ,
                                                    deque<FootAbsolutePosition> &,
                                                    double ,
                                                    COMState &,
-                                                   MAL_S3_VECTOR(&,double),
+                                                   Eigen::Vector3d &,
                                                    FootAbsolutePosition & ,
                                                    FootAbsolutePosition & )
 {

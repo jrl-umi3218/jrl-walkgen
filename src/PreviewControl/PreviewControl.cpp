@@ -448,7 +448,7 @@ int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
       exit(0);
     }
 
-  int TestSize = ZMPPositions.size()-lindex - m_SizeOfPreviewWindow;
+  int TestSize = (int)ZMPPositions.size()-lindex - (int)m_SizeOfPreviewWindow;
 
   if (TestSize>=0)
     {
@@ -463,7 +463,8 @@ int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
       for(unsigned int i=lindex;i<ZMPPositions.size();i++)
 	ux += m_F(i,0)* ZMPPositions[i];
 
-      int StillToRealized = m_SizeOfPreviewWindow - ZMPPositions.size() + lindex;
+      int StillToRealized = m_SizeOfPreviewWindow - (int)ZMPPositions.size()
+	+ (int)lindex;
       for(unsigned int i=0;i<(unsigned int)StillToRealized ;i++)
 	ux += m_F(i,0)* ZMPPositions[i];
     }

@@ -96,7 +96,7 @@ int ZMPQPWithConstraint::ComputeLinearSystem(vector<CH_Point> aVecOfPoints,
 					     Eigen::MatrixXd &B)
 {
   double a,b,c;
-  unsigned int n = aVecOfPoints.size();
+  unsigned int n = (unsigned int)aVecOfPoints.size();
   A.resize(aVecOfPoints.size(),2);
   B.resize(aVecOfPoints.size(),1);
 
@@ -268,7 +268,6 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
   double lx=0.0, ly=0.0;
   double lxcoefs[4] = { 1.0, 1.0, -1.0, -1.0};
   double lycoefs[4] = {-1.0, 1.0,  1.0, -1.0};
-  double prev_xmin=1e7, prev_xmax=-1e7, prev_ymin=1e7, prev_ymax=-1e7;
   RESETDEBUG4("ConstraintMax.dat");
 
   double s_t,c_t;
@@ -464,16 +463,10 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
 	      QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
 	      ODEBUG6( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
 		       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
-		       prev_xmin << " "  <<
-		       prev_xmax << " "  <<
-		       prev_ymin << " "  <<
-		       prev_ymax
 		       ,"ConstraintMax.dat");
 
 	    }
 	  ODEBUG("Final " << xmin << " " << xmax << " " << ymin << " " << ymax);
-	  prev_xmin = xmin; prev_xmax = xmax;
-	  prev_ymin = ymin; prev_ymax = ymax;
 
 	  QueueOfLConstraintInequalities.push_back(aLCI);
 	  
@@ -487,10 +480,6 @@ int ZMPQPWithConstraint::BuildLinearConstraintInequalities(deque<FootAbsolutePos
 	      QueueOfLConstraintInequalities.back()->EndingTime = LeftFootAbsolutePositions[i].time;
 	      ODEBUG6( QueueOfLConstraintInequalities.back()->StartingTime << " " <<
 		       QueueOfLConstraintInequalities.back()->EndingTime << " " <<
-		       prev_xmin << " "  <<
-		       prev_xmax << " "  <<
-		       prev_ymin << " "  <<
-		       prev_ymax 
 		       ,"ConstraintMax.dat");
 
 	    }
@@ -576,7 +565,7 @@ int ZMPQPWithConstraint::BuildMatricesPxPu(double * & Px,double * &Pu,
 	{
 	  break;
 	}
-      IndexConstraint += (*LCI_it)->A.rows();
+      IndexConstraint += (int)((*LCI_it)->A.rows());
     }  
   NbOfConstraints = IndexConstraint;
 
@@ -1260,7 +1249,7 @@ int ZMPQPWithConstraint::BuildZMPTrajectoryFromFootTrajectory(deque<FootAbsolute
       // Compute CPU consumption time.
       gettimeofday(&end,0);
       CurrentCPUTime = end.tv_sec - start.tv_sec + 
-	0.000001 * (end.tv_usec - start.tv_usec);
+	0.000001 * (double)(end.tv_usec - start.tv_usec);
       TotalAmountOfCPUTime += CurrentCPUTime;
       ODEBUG("Current Time : " << StartingTime << " " << 
 	     " Virtual time to simulate: " << QueueOfLConstraintInequalities.back()->EndingTime - StartingTime << 
