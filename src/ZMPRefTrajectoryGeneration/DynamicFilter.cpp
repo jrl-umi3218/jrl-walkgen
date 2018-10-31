@@ -7,9 +7,10 @@ using namespace PatternGeneratorJRL;
 
 DynamicFilter::DynamicFilter(
     SimplePluginManager *SPM,
-    PinocchioRobot *aPR): stage0_(0) , stage1_(1),
-    MODE_PC_(OptimalControllerSolver::MODE_WITH_INITIALPOS),
-    SimplePlugin(SPM)
+    PinocchioRobot *aPR):
+  SimplePlugin(SPM),  
+  stage0_(0) , stage1_(1),
+  MODE_PC_(OptimalControllerSolver::MODE_WITH_INITIALPOS)
 {
   controlPeriod_       = 0.0 ;
   interpolationPeriod_ = 0.0 ;
@@ -32,13 +33,13 @@ DynamicFilter::DynamicFilter(
   deltaZMP_deq_.clear();
   ZMPMB_vec_.clear();
 
-  MAL_VECTOR_RESIZE(aCoMState_,6);
-  MAL_VECTOR_RESIZE(aCoMSpeed_,6);
-  MAL_VECTOR_RESIZE(aCoMAcc_,6);
-  MAL_VECTOR_RESIZE(aLeftFootPosition_,5);
-  MAL_VECTOR_RESIZE(aRightFootPosition_,5);
-  MAL_MATRIX_RESIZE(deltax_,3,1);
-  MAL_MATRIX_RESIZE(deltay_,3,1);
+  aCoMState_.resize(6);
+  aCoMSpeed_.resize(6);
+  aCoMAcc_.resize(6);
+  aLeftFootPosition_.resize(5);
+  aRightFootPosition_.resize(5);
+  deltax_.resize(3,1);
+  deltay_.resize(3,1);
 
   comAndFootRealization_->SetPreviousConfigurationStage0(
         PR_->currentConfiguration());
@@ -100,9 +101,9 @@ void DynamicFilter::CallMethod(string &Method, istringstream &strm)
     }
 }
 
-void DynamicFilter::setRobotUpperPart(const MAL_VECTOR_TYPE(double) & configuration,
-                                      const MAL_VECTOR_TYPE(double) & velocity,
-                                      const MAL_VECTOR_TYPE(double) & acceleration)
+void DynamicFilter::setRobotUpperPart(const Eigen::VectorXd & configuration,
+                                      const Eigen::VectorXd & velocity,
+                                      const Eigen::VectorXd & acceleration)
 {
   for ( unsigned int i = 0 ; i < larmIdxq_.size() ; ++i )
     {
@@ -162,21 +163,21 @@ void DynamicFilter::init(
   zmpmb_i_.resize( (ZMPMB_vec_.size()-1)*inc +1);
   deltaZMP_deq_.resize( (int)round( previewWindowSize_ / controlPeriod_ ));
 
-  MAL_VECTOR_RESIZE(aCoMState_,6);
-  MAL_VECTOR_RESIZE(aCoMSpeed_,6);
-  MAL_VECTOR_RESIZE(aCoMAcc_,6);
-  MAL_VECTOR_RESIZE(aLeftFootPosition_,5);
-  MAL_VECTOR_RESIZE(aRightFootPosition_,5);
-  MAL_MATRIX_RESIZE(deltax_,3,1);
-  MAL_MATRIX_RESIZE(deltay_,3,1);
+  aCoMState_.resize(6);
+  aCoMSpeed_.resize(6);
+  aCoMAcc_.resize(6);
+  aLeftFootPosition_.resize(5);
+  aRightFootPosition_.resize(5);
+  deltax_.resize(3,1);
+  deltay_.resize(3,1);
 
-  MAL_VECTOR_FILL(aCoMState_,0.0);
-  MAL_VECTOR_FILL(aCoMSpeed_,0.0);
-  MAL_VECTOR_FILL(aCoMAcc_,0.0);
-  MAL_VECTOR_FILL(aLeftFootPosition_,0.0);
-  MAL_VECTOR_FILL(aRightFootPosition_,0.0);
-  MAL_MATRIX_FILL(deltax_,0.0);
-  MAL_MATRIX_FILL(deltay_,0.0);
+  { for(unsigned int i=0;i<aCoMState_.size();aCoMState_[i++]=0.0);};
+  { for(unsigned int i=0;i<aCoMSpeed_.size();aCoMSpeed_[i++]=0.0);};
+  { for(unsigned int i=0;i<aCoMAcc_.size();aCoMAcc_[i++]=0.0);};
+  { for(unsigned int i=0;i<aLeftFootPosition_.size();aLeftFootPosition_[i++]=0.0);};
+  { for(unsigned int i=0;i<aRightFootPosition_.size();aRightFootPosition_[i++]=0.0);};
+  {for(unsigned int i=0;i<deltax_.rows();i++) for(unsigned int j=0;j<deltax_.cols();j++) deltax_(i,j)=0.0;};
+  {for(unsigned int i=0;i<deltay_.rows();i++) for(unsigned int j=0;j<deltay_.cols();j++) deltay_(i,j)=0.0;};
 
   upperPartConfiguration_ = PR_->currentConfiguration() ;
   previousUpperPartConfiguration_ = PR_->currentConfiguration() ;
@@ -227,12 +228,12 @@ int DynamicFilter::OffLinefilter(
     const deque<ZMPPosition> &inputZMPTraj_deq_,
     const deque<FootAbsolutePosition> &inputLeftFootTraj_deq_,
     const deque<FootAbsolutePosition> &inputRightFootTraj_deq_,
-    const vector< MAL_VECTOR_TYPE(double) > & UpperPart_q,
-    const vector< MAL_VECTOR_TYPE(double) > & UpperPart_dq,
-    const vector< MAL_VECTOR_TYPE(double) > & UpperPart_ddq,
+    const vector< Eigen::VectorXd > & UpperPart_q,
+    const vector< Eigen::VectorXd > & UpperPart_dq,
+    const vector< Eigen::VectorXd > & UpperPart_ddq,
     deque<COMState> & outputDeltaCOMTraj_deq)
 {
-  unsigned int N = inputCOMTraj_deq_.size() ;
+  unsigned int N = (unsigned int)inputCOMTraj_deq_.size() ;
   deltaZMP_deq_.resize(N);
   if(useDynamicFilter_)
   {
@@ -270,9 +271,9 @@ int DynamicFilter::OnLinefilter(
     const deque<FootAbsolutePosition> & inputRightFootTraj_deq_,
     deque<COMState> & outputDeltaCOMTraj_deq_)
 {
-  unsigned int N = inputRightFootTraj_deq_.size() ;
+  unsigned int N = (unsigned int)inputRightFootTraj_deq_.size() ;
   int inc = (int)round(interpolationPeriod_/controlPeriod_) ;
-  unsigned int N1 = (ZMPMB_vec_.size()-1)*inc +1 ;
+  unsigned int N1 = (unsigned int)((ZMPMB_vec_.size()-1)*inc +1 );
   if(useDynamicFilter_)
   {
     for(unsigned int i = 0 ; i < N ; ++i)
@@ -303,7 +304,7 @@ int DynamicFilter::OnLinefilter(
         zmpmb_i_[i*inc] = ZMPMB_vec_[i] ;
 
       zmpmb_i_.back() = ZMPMB_vec_.back() ;
-      unsigned limit = ZMPMB_vec_.size()-1 ;
+      unsigned limit = (unsigned int)(ZMPMB_vec_.size()-1);
       for(unsigned  i=0 ; i<limit  ; ++i)
       {
         double xA = zmpmb_i_[i*inc][0] ;
@@ -375,10 +376,10 @@ int DynamicFilter::OnLinefilter(
 
 // #############################
 int DynamicFilter::zmpmb(
-          MAL_VECTOR_TYPE(double)& configuration,
-          MAL_VECTOR_TYPE(double)& velocity,
-          MAL_VECTOR_TYPE(double)& acceleration,
-          MAL_S3_VECTOR_TYPE(double) & zmpmb)
+          Eigen::VectorXd& configuration,
+          Eigen::VectorXd& velocity,
+          Eigen::VectorXd& acceleration,
+          Eigen::Vector3d & zmpmb)
 {
   PR_->computeInverseDynamics(configuration,velocity,acceleration);
   PR_->zeroMomentumPoint(zmpmb);
@@ -390,9 +391,9 @@ void DynamicFilter::InverseKinematics(
     const COMState & inputCoMState,
     const FootAbsolutePosition & inputLeftFoot,
     const FootAbsolutePosition & inputRightFoot,
-    MAL_VECTOR_TYPE(double)& configuration,
-    MAL_VECTOR_TYPE(double)& velocity,
-    MAL_VECTOR_TYPE(double)& acceleration,
+    Eigen::VectorXd& configuration,
+    Eigen::VectorXd& velocity,
+    Eigen::VectorXd& acceleration,
     double samplingPeriod,
     int stage,
     int iteration)
@@ -435,9 +436,9 @@ void DynamicFilter::InverseKinematics(
       previousUpperPartConfiguration_ = upperPartConfiguration_ ;
       previousUpperPartVelocity_      = upperPartVelocity_      ;
 
-      MAL_VECTOR_FILL(upperPartVelocity_        , 0.0 ) ;
-      MAL_VECTOR_FILL(upperPartAcceleration_    , 0.0 ) ;
-      MAL_VECTOR_FILL(previousUpperPartVelocity_, 0.0 ) ;
+      { for(unsigned int i=0;i<upperPartVelocity_.size();upperPartVelocity_[i++]=0.0);} ;
+      { for(unsigned int i=0;i<upperPartAcceleration_.size();upperPartAcceleration_[i++]=0.0);} ;
+      { for(unsigned int i=0;i<previousUpperPartVelocity_.size();previousUpperPartVelocity_[i++]=0.0);} ;
   }
 
   for ( unsigned int i = 0 ; i < larmIdxq_.size() ; ++i )
@@ -474,7 +475,7 @@ void DynamicFilter::ComputeZMPMB(double samplingPeriod,
     const COMState & inputCoMState,
     const FootAbsolutePosition & inputLeftFoot,
     const FootAbsolutePosition & inputRightFoot,
-    MAL_S3_VECTOR_TYPE(double) &ZMPMB,
+    Eigen::Vector3d &ZMPMB,
     unsigned int stage,
     unsigned int iteration)
 {
@@ -732,10 +733,10 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
     }
   }
 
-  vector < MAL_VECTOR_TYPE(double) > conf ;
-  vector < MAL_VECTOR_TYPE(double) > vel ;
-  vector < MAL_VECTOR_TYPE(double) > acc ;
-  vector< MAL_S3_VECTOR_TYPE(double) > zmpmb_corr (Nctrl);
+  vector < Eigen::VectorXd > conf ;
+  vector < Eigen::VectorXd > vel ;
+  vector < Eigen::VectorXd > acc ;
+  vector< Eigen::Vector3d > zmpmb_corr (Nctrl);
   for(int i = 0 ; i < Nctrl ; ++i)
   {
     COMState com = ctrlCoMState[i];
@@ -846,15 +847,15 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
 
     //47
     int it_subsample = i*(int)round(interpolationPeriod_/controlPeriod_) ;
-    for (unsigned int k = 0 ; k < MAL_VECTOR_SIZE(conf[it_subsample]) ; ++k)
+    for (unsigned int k = 0 ; k < conf[it_subsample].size() ; ++k)
       aof << conf[it_subsample](k) << " " ;
 
     //83
-    for (unsigned int k = 0 ; k < MAL_VECTOR_SIZE(vel[it_subsample]) ; ++k)
+    for (unsigned int k = 0 ; k < vel[it_subsample].size() ; ++k)
       aof << vel[it_subsample](k) << " " ;
 
     //119
-    for (unsigned int k = 0 ; k < MAL_VECTOR_SIZE(acc[it_subsample]) ; ++k)
+    for (unsigned int k = 0 ; k < acc[it_subsample].size() ; ++k)
       aof << acc[it_subsample](k) << " " ;
 
     aof << endl ;
@@ -886,11 +887,11 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
     aof << syzmp_[i] << " " ;                           // 12
     aof << deltaZMP_deq_[i].px << " " ;                 // 13
     aof << deltaZMP_deq_[i].py << " " ;                 // 14
-    for(unsigned j=0 ; j<MAL_VECTOR_SIZE(acc[i]) ; ++j)// 15+nq
+    for(unsigned j=0 ; j<acc[i].size() ; ++j)// 15+nq
       aof << conf[i][j] << " " ;
-    for(unsigned j=0 ; j<MAL_VECTOR_SIZE(acc[i]) ; ++j)// 15+nq
+    for(unsigned j=0 ; j<acc[i].size() ; ++j)// 15+nq
       aof << vel[i][j] << " " ;
-    for(unsigned j=0 ; j<MAL_VECTOR_SIZE(acc[i]) ; ++j)// 15+nq
+    for(unsigned j=0 ; j<acc[i].size() ; ++j)// 15+nq
       aof << acc[i][j] << " " ;                        //
     aof << endl ;
   }
@@ -906,7 +907,7 @@ void DynamicFilter::Debug(const deque<COMState> & ctrlCoMState,
   aof.precision(8);
   aof.setf(ios::scientific, ios::floatfield);
   //for (int i = 0 ; i < zmpmb_i_.size() ; ++i)
-  for (int i = 0 ; i < zmpmb_i_.size() ; ++i)
+  for (int i = 0 ; i < (int)zmpmb_i_.size() ; ++i)
   {
     aof << i << " " ; // 0
     aof << inputZMPTraj_deq_[i].px << " " ;           // 1

@@ -108,7 +108,7 @@ namespace PatternGeneratorJRL
     virtual int EvaluateStartingState(Eigen::VectorXd & BodyAngles,
 				      COMState & aStartingCOMState,
 				      Eigen::Vector3d & aStartingZMPPosition,
-				      Eigen::VectorXd & aStartingWaistPose,
+				      Eigen::Matrix<double, 6, 1> & aStartingWaistPose,
 				      FootAbsolutePosition & InitLeftFootPosition,
 				      FootAbsolutePosition & InitRightFootPosition)=0;
 

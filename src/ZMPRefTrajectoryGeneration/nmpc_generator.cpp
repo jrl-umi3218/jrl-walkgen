@@ -33,7 +33,7 @@
 //#define DEBUG_COUT
 
 //#ifdef DEBUG
-void DumpMatrix(std::string fileName, Eigen::MatrixXf & M)
+void DumpMatrix(std::string fileName, Eigen::MatrixXd & M)
 {
   std::ofstream aof;
   std::ostringstream oss(std::ostringstream::ate);
@@ -42,9 +42,9 @@ void DumpMatrix(std::string fileName, Eigen::MatrixXf & M)
   aof.open(fileName.c_str(),std::ofstream::app);
   aof.precision(18);
   aof.setf(std::ios::scientific, std::ios::floatfield);
-  for (unsigned int i = 0 ; i < M.size1() ; ++i)
+  for (unsigned int i = 0 ; i < M.rows() ; ++i)
   {
-    for (unsigned int j = 0 ; j < M.size2()-1 ; ++j)
+    for (unsigned int j = 0 ; j < M.cols()-1 ; ++j)
     {
       if(M(i,j)*M(i,j) < 1e-10)
       {
@@ -54,17 +54,17 @@ void DumpMatrix(std::string fileName, Eigen::MatrixXf & M)
         aof << M(i,j) << " " ;
       }
     }
-    if(M(i,M.size2()-1)*M(i,M.size2()-1) < 1e-10)
+    if(M(i,M.cols()-1)*M(i,M.cols()-1) < 1e-10)
     {
       aof << 0.0 << std::endl ;
     }else
     {
-      aof << M(i,M.size2()-1) << std::endl ;
+      aof << M(i,M.cols()-1) << std::endl ;
     }
   }
 }
 
-void DumpVector(std::string fileName, Eigen::VectorXf & M)
+void DumpVector(std::string fileName, Eigen::VectorXd & M)
 {
   std::ofstream aof;
   std::ostringstream oss(std::ostringstream::ate);
@@ -173,50 +173,50 @@ void NMPCgenerator::initNMPCgenerator(
   nf_ = nf ;
   // number of degrees of freedom
   nv_ = 2*N_+3*nf_;
-  MAL_MATRIX_RESIZE(Pps_,N_,3);              MAL_MATRIX_FILL(Pps_,0.0);
-  MAL_MATRIX_RESIZE(Ppu_,N_,N_);             MAL_MATRIX_FILL(Ppu_,0.0);
-  MAL_MATRIX_RESIZE(Pvs_,N_,3);              MAL_MATRIX_FILL(Pvs_,0.0);
-  MAL_MATRIX_RESIZE(Pvu_,N_,N_);             MAL_MATRIX_FILL(Pvu_,0.0);
-  MAL_MATRIX_RESIZE(Pas_,N_,3);              MAL_MATRIX_FILL(Pas_,0.0);
-  MAL_MATRIX_RESIZE(Pau_,N_,N_);             MAL_MATRIX_FILL(Pau_,0.0);
-  MAL_MATRIX_RESIZE(Pzs_,N_,3);              MAL_MATRIX_FILL(Pzs_,0.0);
-  MAL_MATRIX_RESIZE(Pzu_,N_,N_);             MAL_MATRIX_FILL(Pzu_,0.0);
-  MAL_VECTOR_RESIZE(v_kp1_,N_) ;             MAL_VECTOR_FILL(v_kp1_,0.0) ;
-  MAL_MATRIX_RESIZE(V_kp1_,N_,nf_) ;         MAL_MATRIX_FILL(V_kp1_,0.0) ;
-  MAL_VECTOR_RESIZE(U_          ,2*N_+3*nf_);MAL_VECTOR_FILL(U_          ,0.0);
-  MAL_VECTOR_RESIZE(deltaU_thresh_,2*N_+3*nf_);MAL_VECTOR_FILL(deltaU_thresh_,0.0);
-  MAL_VECTOR_RESIZE(U_xy_       ,2*(N_+nf_));MAL_VECTOR_FILL(U_xy_       ,0.0);
-  MAL_VECTOR_RESIZE(U_x_        ,N_);        MAL_VECTOR_FILL(U_x_        ,0.0);
-  MAL_VECTOR_RESIZE(U_y_        ,N_);        MAL_VECTOR_FILL(U_y_        ,0.0);
-  MAL_VECTOR_RESIZE(F_kp1_x_    ,nf_);       MAL_VECTOR_FILL(F_kp1_x_    ,0.0);
-  MAL_VECTOR_RESIZE(F_kp1_y_    ,nf_);       MAL_VECTOR_FILL(F_kp1_y_    ,0.0);
-  MAL_VECTOR_RESIZE(F_kp1_theta_,nf_);       MAL_VECTOR_FILL(F_kp1_theta_,0.0);
-  MAL_VECTOR_RESIZE(c_k_x_,3);               MAL_VECTOR_FILL(c_k_x_ ,0.0);
-  MAL_VECTOR_RESIZE(c_k_y_,3);               MAL_VECTOR_FILL(c_k_y_ ,0.0);
-  MAL_MATRIX_RESIZE(A0r_   ,5,2) ;           MAL_MATRIX_FILL(A0r_   ,0.0);
-  MAL_VECTOR_RESIZE(ubB0r_ ,5) ;             MAL_VECTOR_FILL(ubB0r_ ,0.0);
-  MAL_MATRIX_RESIZE(A0l_   ,5,2) ;           MAL_MATRIX_FILL(A0l_   ,0.0);
-  MAL_VECTOR_RESIZE(ubB0l_ ,5) ;             MAL_VECTOR_FILL(ubB0l_ ,0.0);
-  MAL_MATRIX_RESIZE(A0rf_  ,4,2) ;           MAL_MATRIX_FILL(A0rf_  ,0.0);
-  MAL_VECTOR_RESIZE(ubB0rf_,4) ;             MAL_VECTOR_FILL(ubB0rf_,0.0);
-  MAL_MATRIX_RESIZE(A0lf_  ,4,2) ;           MAL_MATRIX_FILL(A0lf_  ,0.0);
-  MAL_VECTOR_RESIZE(ubB0lf_,4) ;             MAL_VECTOR_FILL(ubB0lf_,0.0);
-  MAL_MATRIX_RESIZE(A0ds_  ,4,2) ;           MAL_MATRIX_FILL(A0ds_  ,0.0);
-  MAL_VECTOR_RESIZE(ubB0ds_,4) ;             MAL_VECTOR_FILL(ubB0ds_,0.0);
-  MAL_MATRIX_RESIZE(A0_xy_   ,4,2) ;         MAL_MATRIX_FILL(A0_xy_   ,0.0);
-  MAL_MATRIX_RESIZE(A0_theta_,4,2) ;         MAL_MATRIX_FILL(A0_theta_,0.0);
-  MAL_VECTOR_RESIZE(B0_      ,4) ;           MAL_VECTOR_FILL(B0_      ,0.0);
-  MAL_VECTOR_RESIZE(vel_ref_.Global.X_vec , N_) ;
-  MAL_VECTOR_RESIZE(vel_ref_.Global.Y_vec , N_) ;
-  MAL_VECTOR_RESIZE(vel_ref_.Local .X_vec , N_) ;
-  MAL_VECTOR_RESIZE(vel_ref_.Local .Y_vec , N_) ;
-  MAL_MATRIX_RESIZE(rotMat_xy_,2,2); MAL_MATRIX_FILL(rotMat_xy_ ,0.0);
-  MAL_MATRIX_RESIZE(rotMat_theta_,2,2); MAL_MATRIX_FILL(rotMat_theta_ ,0.0);
-  MAL_MATRIX_RESIZE(rotMat_,2,2); MAL_MATRIX_FILL(rotMat_ ,0.0);
-  MAL_MATRIX_RESIZE(tmpRotMat_,2,2); MAL_MATRIX_FILL(tmpRotMat_ ,0.0);
-  MAL_VECTOR_RESIZE(qp_J_obs_i_, nv_); MAL_VECTOR_FILL(qp_J_obs_i_, 0.0);
-  MAL_VECTOR_FILL(F_kp1_x_,currentSupport.X);
-  MAL_VECTOR_FILL(F_kp1_y_,currentSupport.Y);
+  Pps_.resize(N_,3);              {for(unsigned int i=0;i<Pps_.rows();i++) for(unsigned int j=0;j<Pps_.cols();j++) Pps_(i,j)=0.0;};
+  Ppu_.resize(N_,N_);             {for(unsigned int i=0;i<Ppu_.rows();i++) for(unsigned int j=0;j<Ppu_.cols();j++) Ppu_(i,j)=0.0;};
+  Pvs_.resize(N_,3);              {for(unsigned int i=0;i<Pvs_.rows();i++) for(unsigned int j=0;j<Pvs_.cols();j++) Pvs_(i,j)=0.0;};
+  Pvu_.resize(N_,N_);             {for(unsigned int i=0;i<Pvu_.rows();i++) for(unsigned int j=0;j<Pvu_.cols();j++) Pvu_(i,j)=0.0;};
+  Pas_.resize(N_,3);              {for(unsigned int i=0;i<Pas_.rows();i++) for(unsigned int j=0;j<Pas_.cols();j++) Pas_(i,j)=0.0;};
+  Pau_.resize(N_,N_);             {for(unsigned int i=0;i<Pau_.rows();i++) for(unsigned int j=0;j<Pau_.cols();j++) Pau_(i,j)=0.0;};
+  Pzs_.resize(N_,3);              {for(unsigned int i=0;i<Pzs_.rows();i++) for(unsigned int j=0;j<Pzs_.cols();j++) Pzs_(i,j)=0.0;};
+  Pzu_.resize(N_,N_);             {for(unsigned int i=0;i<Pzu_.rows();i++) for(unsigned int j=0;j<Pzu_.cols();j++) Pzu_(i,j)=0.0;};
+  v_kp1_.resize(N_) ;             { for(unsigned int i=0;i<v_kp1_.size();v_kp1_[i++]=0.0);} ;
+  V_kp1_.resize(N_,nf_) ;         {for(unsigned int i=0;i<V_kp1_.rows();i++) for(unsigned int j=0;j<V_kp1_.cols();j++) V_kp1_(i,j)=0.0;} ;
+  U_.resize(2*N_+3*nf_);{ for(unsigned int i=0;i<U_.size();U_[i++]=0.0);};
+  deltaU_thresh_.resize(2*N_+3*nf_);{ for(unsigned int i=0;i<deltaU_thresh_.size();deltaU_thresh_[i++]=0.0);};
+  U_xy_ .resize(2*(N_+nf_));{ for(unsigned int i=0;i<U_xy_.size();U_xy_[i++]=0.0);};
+  U_x_.resize(N_);        { for(unsigned int i=0;i<U_x_.size();U_x_[i++]=0.0);};
+  U_y_.resize(N_);        { for(unsigned int i=0;i<U_y_.size();U_y_[i++]=0.0);};
+  F_kp1_x_.resize(nf_);       { for(unsigned int i=0;i<F_kp1_x_.size();F_kp1_x_[i++]=0.0);};
+  F_kp1_y_.resize(nf_);       { for(unsigned int i=0;i<F_kp1_y_.size();F_kp1_y_[i++]=0.0);};
+  F_kp1_theta_.resize(nf_);       { for(unsigned int i=0;i<F_kp1_theta_.size();F_kp1_theta_[i++]=0.0);};
+  c_k_x_.resize(3);               { for(unsigned int i=0;i<c_k_x_.size();c_k_x_[i++]=0.0);};
+  c_k_y_.resize(3);               { for(unsigned int i=0;i<c_k_y_.size();c_k_y_[i++]=0.0);};
+  A0r_.resize(5,2) ;           {for(unsigned int i=0;i<A0r_.rows();i++) for(unsigned int j=0;j<A0r_.cols();j++) A0r_(i,j)=0.0;};
+  ubB0r_.resize(5) ;             { for(unsigned int i=0;i<ubB0r_.size();ubB0r_[i++]=0.0);};
+  A0l_.resize(5,2) ;           {for(unsigned int i=0;i<A0l_.rows();i++) for(unsigned int j=0;j<A0l_.cols();j++) A0l_(i,j)=0.0;};
+  ubB0l_.resize(5) ;             { for(unsigned int i=0;i<ubB0l_.size();ubB0l_[i++]=0.0);};
+  A0rf_.resize(4,2) ;           {for(unsigned int i=0;i<A0rf_.rows();i++) for(unsigned int j=0;j<A0rf_.cols();j++) A0rf_(i,j)=0.0;};
+  ubB0rf_.resize(4) ;             { for(unsigned int i=0;i<ubB0rf_.size();ubB0rf_[i++]=0.0);};
+  A0lf_.resize(4,2) ;           {for(unsigned int i=0;i<A0lf_.rows();i++) for(unsigned int j=0;j<A0lf_.cols();j++) A0lf_(i,j)=0.0;};
+  ubB0lf_.resize(4) ;             { for(unsigned int i=0;i<ubB0lf_.size();ubB0lf_[i++]=0.0);};
+  A0ds_.resize(4,2) ;           {for(unsigned int i=0;i<A0ds_.rows();i++) for(unsigned int j=0;j<A0ds_.cols();j++) A0ds_(i,j)=0.0;};
+  ubB0ds_.resize(4) ;             { for(unsigned int i=0;i<ubB0ds_.size();ubB0ds_[i++]=0.0);};
+  A0_xy_.resize(4,2) ;         {for(unsigned int i=0;i<A0_xy_.rows();i++) for(unsigned int j=0;j<A0_xy_.cols();j++) A0_xy_(i,j)=0.0;};
+  A0_theta_.resize(4,2) ;         {for(unsigned int i=0;i<A0_theta_.rows();i++) for(unsigned int j=0;j<A0_theta_.cols();j++) A0_theta_(i,j)=0.0;};
+  B0_.resize(4) ;           { for(unsigned int i=0;i<B0_.size();B0_[i++]=0.0);};
+  vel_ref_.Global.X_vec.resize(N_) ;
+  vel_ref_.Global.Y_vec.resize(N_) ;
+  vel_ref_.Local .X_vec.resize( N_) ;
+  vel_ref_.Local .Y_vec.resize( N_) ;
+  rotMat_xy_.resize(2,2); {for(unsigned int i=0;i<rotMat_xy_.rows();i++) for(unsigned int j=0;j<rotMat_xy_.cols();j++) rotMat_xy_(i,j)=0.0;};
+  rotMat_theta_.resize(2,2); {for(unsigned int i=0;i<rotMat_theta_.rows();i++) for(unsigned int j=0;j<rotMat_theta_.cols();j++) rotMat_theta_(i,j)=0.0;};
+  rotMat_.resize(2,2); {for(unsigned int i=0;i<rotMat_.rows();i++) for(unsigned int j=0;j<rotMat_.cols();j++) rotMat_(i,j)=0.0;};
+  tmpRotMat_.resize(2,2); {for(unsigned int i=0;i<tmpRotMat_.rows();i++) for(unsigned int j=0;j<tmpRotMat_.cols();j++) tmpRotMat_(i,j)=0.0;};
+  qp_J_obs_i_.resize(nv_); { for(unsigned int i=0;i<qp_J_obs_i_.size();qp_J_obs_i_[i++]=0.0);};
+  { for(unsigned int i=0;i<F_kp1_x_.size();F_kp1_x_[i++]=currentSupport.X);};
+  { for(unsigned int i=0;i<F_kp1_y_.size();F_kp1_y_[i++]=currentSupport.Y);};
 
   T_ = T ;
   Tfirst_ = T ;
@@ -295,19 +295,19 @@ void NMPCgenerator::initNMPCgenerator(
 
 void NMPCgenerator::initializeConstraint()
 {
-  MAL_MATRIX_RESIZE(qp_J_     ,nc_,nv_); MAL_MATRIX_FILL(qp_J_      ,0.0);
-  MAL_VECTOR_RESIZE(qp_ubJ_   ,nc_);     MAL_VECTOR_FILL(qp_ubJ_    ,0.0);
-  MAL_VECTOR_RESIZE(ub_  ,      nc_);    MAL_VECTOR_FILL(ub_  , 0.0);
-  MAL_VECTOR_RESIZE(gU_  ,      nc_);    MAL_VECTOR_FILL(gU_  , 0.0);
-  MAL_VECTOR_RESIZE(Uxy_ ,2*(N_+nf_));   MAL_VECTOR_FILL(Uxy_ , 0.0);
+  qp_J_.resize(nc_,nv_); {for(unsigned int i=0;i<qp_J_.rows();i++) for(unsigned int j=0;j<qp_J_.cols();j++) qp_J_(i,j)=0.0;};
+  qp_ubJ_.resize(nc_);     { for(unsigned int i=0;i<qp_ubJ_.size();qp_ubJ_[i++]=0.0);};
+  ub_.resize(nc_);    { for(unsigned int i=0;i<ub_.size();ub_[i++]=0.0);};
+  gU_.resize(nc_);    { for(unsigned int i=0;i<gU_.size();gU_[i++]=0.0);};
+  Uxy_.resize(2*(N_+nf_));   { for(unsigned int i=0;i<Uxy_.size();Uxy_[i++]=0.0);};
 
-  MAL_MATRIX_RESIZE(Pzuv_,2*N_,2*(N_+nf_));
-  MAL_VECTOR_RESIZE(Pzsc_,2*N_);
-  MAL_VECTOR_RESIZE(Pzsc_x_,N_);
-  MAL_VECTOR_RESIZE(Pzsc_y_,N_);
-  MAL_VECTOR_RESIZE(v_kp1f_,2*N_);
-  MAL_VECTOR_RESIZE(v_kp1f_x_,N_);
-  MAL_VECTOR_RESIZE(v_kp1f_y_,N_);
+  Pzuv_.resize(2*N_,2*(N_+nf_));
+  Pzsc_.resize(2*N_);
+  Pzsc_x_.resize(N_);
+  Pzsc_y_.resize(N_);
+  v_kp1f_.resize(2*N_);
+  v_kp1f_x_.resize(N_);
+  v_kp1f_y_.resize(N_);
 
   // build constant matrices
   buildCoMCoPIntegrationMatrix();
@@ -328,11 +328,11 @@ void NMPCgenerator::initializeConstraint()
   nceq_ = nc_vel_ ;
   nc_ = nceq_ + ncineq_;
 
-  MAL_VECTOR_RESIZE(gU_cop_  ,nc_cop_); MAL_VECTOR_FILL(gU_cop_  , 0.0);
-  MAL_VECTOR_RESIZE(gU_foot_ ,nc_foot_); MAL_VECTOR_FILL(gU_foot_ , 0.0);
-  MAL_VECTOR_RESIZE(gU_obs_  ,nc_obs_); MAL_VECTOR_FILL(gU_obs_  , 0.0);
-  MAL_VECTOR_RESIZE(gU_rot_  ,nc_rot_); MAL_VECTOR_FILL(gU_rot_  , 0.0);
-  MAL_VECTOR_RESIZE(gU_stan_ ,nc_stan_); MAL_VECTOR_FILL(gU_stan_ , 0.0);
+  gU_cop_.resize(nc_cop_); { for(unsigned int i=0;i<gU_cop_.size();gU_cop_[i++]=0.0);};
+  gU_foot_.resize(nc_foot_); { for(unsigned int i=0;i<gU_foot_.size();gU_foot_[i++]=0.0);};
+  gU_obs_.resize(nc_obs_); { for(unsigned int i=0;i<gU_obs_.size();gU_obs_[i++]=0.0);};
+  gU_rot_.resize(nc_rot_); { for(unsigned int i=0;i<gU_rot_.size();gU_rot_[i++]=0.0);};
+  gU_stan_.resize(nc_stan_); { for(unsigned int i=0;i<gU_stan_.size();gU_stan_[i++]=0.0);};
 
   return ;
 }
@@ -365,8 +365,8 @@ void NMPCgenerator::updateConstraint()
   nc_ = ncineq_ + nceq_ ;
 
   unsigned N2nf2 = 2*(N_+nf_) ;
-  MAL_MATRIX_RESIZE(qp_J_,nc_,nv_);
-  MAL_MATRIX_FILL(qp_J_,0.0);
+  qp_J_.resize(nc_,nv_);
+  {for(unsigned int i=0;i<qp_J_.rows();i++) for(unsigned int j=0;j<qp_J_.cols();j++) qp_J_(i,j)=0.0;};
   // Fill up qp_J_
   unsigned index = 0 ;
   for(unsigned i=0 ; i<nc_vel_ ; ++i)
@@ -403,7 +403,7 @@ void NMPCgenerator::updateConstraint()
   {
     for(unsigned n=0 ; n<nf_ ; ++n)
     {
-      qp_J_obs_i_ = 2 * MAL_RET_A_by_B(U_xy_,Hobs_[obs][n]) + Aobs_[obs][n] ;
+      qp_J_obs_i_ = 2 * U_xy_.transpose()*Hobs_[obs][n] + Aobs_[obs][n];
       for(unsigned j=0 ; j<N2nf2 ; ++j)
         qp_J_((obs+1)*n,j) = qp_J_obs_i_(j) ;
     }
@@ -429,7 +429,7 @@ void NMPCgenerator::updateConstraint()
 }
 
 
-void NMPCgenerator::evalConstraint(Eigen::VectorXf & U)
+void NMPCgenerator::evalConstraint(Eigen::VectorXd & U)
 {
   //
   //  Eval real problem bounds : lb_ < g(U) < ub_
@@ -438,23 +438,23 @@ void NMPCgenerator::evalConstraint(Eigen::VectorXf & U)
 
   //    CoP
   evalCoPconstraint(U);
-  gU_cop_ = MAL_RET_A_by_B(Acop_xy_,Uxy_);
+  gU_cop_ = Acop_xy_*Uxy_;
   //    Foot
   evalFootPoseConstraint(U);
-  gU_foot_ = MAL_RET_A_by_B(Afoot_xy_full_,Uxy_);
+  gU_foot_ = Afoot_xy_full_*Uxy_;
   //    Velocity
-  MAL_VECTOR_FILL(gU_vel_,0.0);
+  { for(unsigned int i=0;i<gU_vel_.size();gU_vel_[i++]=0.0);};
   //    Rotation
-  gU_rot_ = MAL_RET_A_by_B(Arot_,U);
+  gU_rot_ = Arot_*U;
   //    Obstacle
-  MAL_VECTOR_RESIZE(gU_obs_ ,nc_obs_);
+  gU_obs_.resize(nc_obs_);
   for(unsigned obs=0 ; obs<obstacles_.size() ; ++obs)
   {
     for(unsigned n=0 ; n<nf_ ; ++n)
     {
-      Eigen::VectorXf HobsUxy = MAL_RET_A_by_B(Hobs_[obs][n],Uxy_);
+      Eigen::VectorXd HobsUxy = Hobs_[obs][n]*Uxy_;
       double deltaObs = 0 ;
-      for(unsigned i=0 ; i<MAL_VECTOR_SIZE(HobsUxy) ; ++i)
+      for(unsigned i=0 ; i<HobsUxy.size() ; ++i)
           deltaObs += Uxy_(i) * (HobsUxy(i) + Aobs_[obs][n](i)) ;
       gU_obs_(obs*nf_ + n) = deltaObs ;
     }
@@ -462,8 +462,8 @@ void NMPCgenerator::evalConstraint(Eigen::VectorXf & U)
   // Standing
   //gU_stan_ = MAL_RET_A_by_B(Astan_,U) ;
 
-  MAL_VECTOR_RESIZE(ub_,nc_);
-  MAL_VECTOR_RESIZE(gU_,nc_);
+  ub_.resize(nc_);
+  gU_.resize(nc_);
 
   // Fill up lb_, ub_ and gU_
   unsigned index = 0 ;
@@ -659,8 +659,8 @@ void NMPCgenerator::updateInitialConditionDependentMatrices()
   }
 
   // build Pzsc_ and v_kp1f_
-  Pzsc_x_ = MAL_RET_A_by_B(Pzs_,c_k_x_);
-  Pzsc_y_ = MAL_RET_A_by_B(Pzs_,c_k_y_);
+  Pzsc_x_ = Pzs_*c_k_x_;
+  Pzsc_y_ = Pzs_*c_k_y_;
 
   for (unsigned i=0 ; i<N_ ; ++i)
   {
@@ -754,7 +754,7 @@ void NMPCgenerator::preprocess_solution()
   QuadProg_J_ineq_  .resize(ncineq_,nv_);
   QuadProg_lbJ_ineq_.resize(ncineq_);
   deltaU_  .resize(nv_);
-  MAL_VECTOR_RESIZE(deltaU_thresh_,nv_);
+  deltaU_thresh_.resize(nv_);
 
   for(unsigned i=0 ; i<nv_ ; ++i)
   {
@@ -1071,8 +1071,8 @@ void NMPCgenerator::computeFootSelectionMatrix()
   std::deque<support_state_t>::const_iterator SS_it;
   SS_it = SupportStates_deq_.begin();//points at the cur. sup. st.
   ++SS_it;
-  MAL_VECTOR_FILL(v_kp1_,0.0);
-  MAL_MATRIX_FILL(V_kp1_,0.0);
+  { for(unsigned int i=0;i<v_kp1_.size();v_kp1_[i++]=0.0);};
+  {for(unsigned int i=0;i<V_kp1_.rows();i++) for(unsigned int j=0;j<V_kp1_.cols();j++) V_kp1_(i,j)=0.0;};
   //double local_time = time_ ;
   for(unsigned i=0;i<N_;++i, ++SS_it)
   {
@@ -1173,9 +1173,9 @@ void NMPCgenerator::updateCoMCoPIntegrationMatrix()
   }
 
   // update the part PzuV depending on Pzu
-  for(unsigned i=0 ; i<MAL_MATRIX_NB_ROWS(Pzu_) ; ++i)
+  for(unsigned i=0 ; i<Pzu_.rows() ; ++i)
   {
-    for(unsigned j=0 ; j<MAL_MATRIX_NB_COLS(Pzu_) ; ++j)
+    for(unsigned j=0 ; j<Pzu_.cols() ; ++j)
     {
       Pzuv_(i,j)=Pzu_(i,j);
       Pzuv_(i+N_,j+N_+nf_)=Pzu_(i,j);
@@ -1277,11 +1277,11 @@ void NMPCgenerator::buildConvexHullSystems()
   DumpVector("ubB0l_",ubB0l_);
 #endif
 
-  MAL_MATRIX_DIM(tmp52d,double,5,2) ;
-  MAL_MATRIX_FILL(tmp52d,0.0) ;
+  Eigen::Matrix<double,5,2> tmp52d; ;
+  {for(unsigned int i=0;i<tmp52d.rows();i++) for(unsigned int j=0;j<tmp52d.cols();j++) tmp52d(i,j)=0.0;} ;
 
-  MAL_VECTOR_DIM(tmp5d,double,5) ;
-  MAL_VECTOR_FILL(tmp5d,0.0) ;
+  Eigen::Matrix<double,5,1> tmp5d ;
+  { for(unsigned int i=0;i<tmp5d.size();tmp5d[i++]=0.0);} ;
 
   A0f_xy_.resize(nf_,tmp52d);
   A0f_theta_.resize(nf_,tmp52d);
@@ -1302,34 +1302,34 @@ void NMPCgenerator::initializeCoPConstraint()
   # A0 R(theta) [Zx_k - Fx_k] <= UB
   #             [Zy_k - Fy_k]
   */
-  nc_cop_ = N_*MAL_VECTOR_SIZE(ubB0rf_) ;
+  nc_cop_ = N_*ubB0rf_.size() ;
 
-  MAL_MATRIX_RESIZE(Acop_xy_   ,nc_cop_,2*(N_+nf_));
-  MAL_MATRIX_RESIZE(Acop_theta_,nc_cop_,nf_);
-  MAL_VECTOR_RESIZE(UBcop_     ,nc_cop_);
-  MAL_MATRIX_RESIZE(D_kp1_xy_,nc_cop_,2*N_);
-  MAL_MATRIX_RESIZE(D_kp1_theta_,nc_cop_,2*N_);
-  MAL_VECTOR_RESIZE(b_kp1_,nc_cop_);
-  MAL_MATRIX_RESIZE(derv_Acop_map_,nc_cop_,N_);
+  Acop_xy_.resize(nc_cop_,2*(N_+nf_));
+  Acop_theta_.resize(nc_cop_,nf_);
+  UBcop_.resize(nc_cop_);
+  D_kp1_xy_.resize(nc_cop_,2*N_);
+  D_kp1_theta_.resize(nc_cop_,2*N_);
+  b_kp1_.resize(nc_cop_);
+  derv_Acop_map_.resize(nc_cop_,N_);
 
-  MAL_MATRIX_FILL(Acop_xy_      ,0.0);
-  MAL_MATRIX_FILL(Acop_theta_   ,0.0);
-  MAL_VECTOR_FILL(UBcop_        ,0.0);
-  MAL_MATRIX_FILL(D_kp1_xy_     ,0.0);
-  MAL_MATRIX_FILL(D_kp1_theta_  ,0.0);
-  MAL_VECTOR_FILL(b_kp1_        ,0.0);
-  MAL_MATRIX_FILL(Pzuv_         ,0.0);
-  MAL_VECTOR_FILL(Pzsc_         ,0.0);
-  MAL_VECTOR_FILL(Pzsc_x_       ,0.0);
-  MAL_VECTOR_FILL(Pzsc_y_       ,0.0);
-  MAL_VECTOR_FILL(v_kp1f_       ,0.0);
-  MAL_VECTOR_FILL(v_kp1f_x_     ,0.0);
-  MAL_VECTOR_FILL(v_kp1f_y_     ,0.0);
-  MAL_MATRIX_FILL(derv_Acop_map_,0.0);
+  {for(unsigned int i=0;i<Acop_xy_.rows();i++) for(unsigned int j=0;j<Acop_xy_.cols();j++) Acop_xy_(i,j)=0.0;};
+  {for(unsigned int i=0;i<Acop_theta_.rows();i++) for(unsigned int j=0;j<Acop_theta_.cols();j++) Acop_theta_(i,j)=0.0;};
+  { for(unsigned int i=0;i<UBcop_.size();UBcop_[i++]=0.0);};
+  {for(unsigned int i=0;i<D_kp1_xy_.rows();i++) for(unsigned int j=0;j<D_kp1_xy_.cols();j++) D_kp1_xy_(i,j)=0.0;};
+  {for(unsigned int i=0;i<D_kp1_theta_.rows();i++) for(unsigned int j=0;j<D_kp1_theta_.cols();j++) D_kp1_theta_(i,j)=0.0;};
+  { for(unsigned int i=0;i<b_kp1_.size();b_kp1_[i++]=0.0);};
+  {for(unsigned int i=0;i<Pzuv_.rows();i++) for(unsigned int j=0;j<Pzuv_.cols();j++) Pzuv_(i,j)=0.0;};
+  { for(unsigned int i=0;i<Pzsc_.size();Pzsc_[i++]=0.0);};
+  { for(unsigned int i=0;i<Pzsc_x_.size();Pzsc_x_[i++]=0.0);};
+  { for(unsigned int i=0;i<Pzsc_y_.size();Pzsc_y_[i++]=0.0);};
+  { for(unsigned int i=0;i<v_kp1f_.size();v_kp1f_[i++]=0.0);};
+  { for(unsigned int i=0;i<v_kp1f_x_.size();v_kp1f_x_[i++]=0.0);};
+  { for(unsigned int i=0;i<v_kp1f_y_.size();v_kp1f_y_[i++]=0.0);};
+  {for(unsigned int i=0;i<derv_Acop_map_.rows();i++) for(unsigned int j=0;j<derv_Acop_map_.cols();j++) derv_Acop_map_(i,j)=0.0;};
 
   // mapping matrix to compute the gradient_theta of the CoP Constraint Jacobian
-  for(unsigned j=0 , k=0; j<N_ ; ++j, k+=MAL_MATRIX_NB_ROWS(A0rf_))
-    for(unsigned i=0 ; i<MAL_MATRIX_NB_ROWS(A0rf_) ; ++i )
+  for(unsigned j=0 , k=0; j<N_ ; ++j, k+=A0rf_.rows())
+    for(unsigned i=0 ; i<A0rf_.rows() ; ++i )
       derv_Acop_map_(i+k,j) = 1.0 ;
 #ifdef DEBUG
   DumpMatrix("derv_Acop_map_",derv_Acop_map_);
@@ -1338,7 +1338,7 @@ void NMPCgenerator::initializeCoPConstraint()
   return ;
 }
 
-void NMPCgenerator::updateCoPconstraint(Eigen::VectorXf &U)
+void NMPCgenerator::updateCoPconstraint(Eigen::VectorXd &U)
 {
   if(nc_cop_==0)
     return ;
@@ -1353,8 +1353,8 @@ void NMPCgenerator::updateCoPconstraint(Eigen::VectorXf &U)
   {
     theta_vec[i+1]=U(2*N_+2*nf_+i); //F_kp1_theta_(i);
   }
-  MAL_VECTOR_DIM(U_xy,double,2*N_+2*nf_);
-  for(unsigned i=0; i<MAL_VECTOR_SIZE(U_xy) ; ++i)
+  Eigen::MatrixXd U_xy(2*N_+2*nf_,1);
+  for(unsigned i=0; i<U_xy.size() ; ++i)
     U_xy(i)=U(i);
   // every time instant in the pattern generator constraints
   // depend on the support order
@@ -1365,29 +1365,29 @@ void NMPCgenerator::updateCoPconstraint(Eigen::VectorXf &U)
     rotMat_theta_(1,0)=-cos(theta) ; rotMat_theta_(1,1)=-sin(theta) ;
     if (SupportStates_deq_[i+1].Phase == DS)
     {
-      A0_theta_ = MAL_RET_A_by_B(A0ds_,rotMat_theta_) ;
+      A0_theta_ = A0ds_*rotMat_theta_ ;
     }
     else if (SupportStates_deq_[i+1].Foot == LEFT)
     {
-      A0_theta_ = MAL_RET_A_by_B(A0lf_,rotMat_theta_) ;
+      A0_theta_ = A0lf_*rotMat_theta_ ;
     }else{
-      A0_theta_ = MAL_RET_A_by_B(A0rf_,rotMat_theta_) ;
+      A0_theta_ = A0rf_*rotMat_theta_ ;
     }
 
-    for (unsigned k=0 ; k<MAL_MATRIX_NB_ROWS(A0_theta_) ; ++k)
+    for (unsigned k=0 ; k<A0_theta_.rows() ; ++k)
     {
       // get d_i+1^x(f^'dtheta/dt')
-      D_kp1_theta_(i*MAL_MATRIX_NB_ROWS(A0_theta_)+k, i) = A0_theta_(k,0);
+      D_kp1_theta_(i*A0_theta_.rows()+k, i) = A0_theta_(k,0);
       // get d_i+1^y(f^'dtheta/dt')
-      D_kp1_theta_(i*MAL_MATRIX_NB_ROWS(A0_theta_)+k, i+N_) = A0_theta_(k,1);
+      D_kp1_theta_(i*A0_theta_.rows()+k, i+N_) = A0_theta_(k,1);
     }
   }
-  derv_Acop_map2_ = MAL_RET_A_by_B(derv_Acop_map_ , V_kp1_);
-  Acop_theta_dummy0_ = MAL_RET_A_by_B(D_kp1_theta_,Pzuv_);
-  Acop_theta_dummy1_ = MAL_RET_A_by_B(Acop_theta_dummy0_,U_xy);
-  for(unsigned i=0 ; i<MAL_MATRIX_NB_ROWS(Acop_theta_) ; ++i)
+  derv_Acop_map2_ = derv_Acop_map_*V_kp1_;
+  Acop_theta_dummy0_ = D_kp1_theta_*Pzuv_;
+  Acop_theta_dummy1_ = Acop_theta_dummy0_*U_xy;
+  for(unsigned i=0 ; i<Acop_theta_.rows() ; ++i)
   {
-    for(unsigned j=0 ; j<MAL_MATRIX_NB_COLS(Acop_theta_) ; ++j)
+    for(unsigned j=0 ; j<Acop_theta_.cols() ; ++j)
     {
       Acop_theta_(i,j) = derv_Acop_map2_(i,j) * Acop_theta_dummy1_(i); // warning this is the real jacobian
       //Acop_theta_(i,j) = 0.0 ; // WARNING this is not the real jacobian !
@@ -1396,7 +1396,7 @@ void NMPCgenerator::updateCoPconstraint(Eigen::VectorXf &U)
   return ;
 }
 
-void NMPCgenerator::evalCoPconstraint(Eigen::VectorXf & U)
+void NMPCgenerator::evalCoPconstraint(Eigen::VectorXd & U)
 {
   if(nc_cop_==0)
     return ;
@@ -1417,33 +1417,33 @@ void NMPCgenerator::evalCoPconstraint(Eigen::VectorXf & U)
     rotMat_xy_(1,0)=-sin(theta) ; rotMat_xy_(1,1)= cos(theta) ;
     if (SupportStates_deq_[i+1].Phase == DS)
     {
-      A0_xy_    = MAL_RET_A_by_B(A0ds_,rotMat_xy_  ) ;
+      A0_xy_    = A0ds_*rotMat_xy_ ;
       B0_ = ubB0ds_ ;
     }
     else if (SupportStates_deq_[i+1].Foot == LEFT)
     {
-      A0_xy_    = MAL_RET_A_by_B(A0lf_,rotMat_xy_   ) ;
+      A0_xy_    = A0lf_*rotMat_xy_ ;
       B0_ = ubB0lf_ ;
     }else{
-      A0_xy_    = MAL_RET_A_by_B(A0rf_,rotMat_xy_   ) ;
+      A0_xy_    = A0rf_*rotMat_xy_ ;
       B0_ = ubB0rf_ ;
     }
-    for (unsigned k=0 ; k<MAL_MATRIX_NB_ROWS(A0_xy_) ; ++k)
+    for (unsigned k=0 ; k<A0_xy_.rows() ; ++k)
     {
       // get d_i+1^x(f^theta)
-      D_kp1_xy_(i*MAL_MATRIX_NB_ROWS(A0_xy_)+k, i) = A0_xy_(k,0);
+      D_kp1_xy_(i*A0_xy_.rows()+k, i) = A0_xy_(k,0);
       // get d_i+1^y(f^theta)
-      D_kp1_xy_(i*MAL_MATRIX_NB_ROWS(A0_xy_)+k, i+N_) = A0_xy_(k,1);
+      D_kp1_xy_(i*A0_xy_.rows()+k, i+N_) = A0_xy_(k,1);
 
       // get right hand side of equation
-      b_kp1_(i*MAL_MATRIX_NB_ROWS(A0_xy_)+k) = B0_(k) ;
+      b_kp1_(i*A0_xy_.rows()+k) = B0_(k) ;
     }
   }
 
   // build Acop_xy_
-  Acop_xy_ = MAL_RET_A_by_B(D_kp1_xy_,Pzuv_);
+  Acop_xy_ = D_kp1_xy_*Pzuv_;
   // build UBcop_
-  UBcop_ = b_kp1_ + MAL_RET_A_by_B(D_kp1_xy_,v_kp1f_-Pzsc_) ;
+  UBcop_ = b_kp1_ + D_kp1_xy_*v_kp1f_-Pzsc_ ;
 
 #ifdef DEBUG
   DumpMatrix("Pzuv_",Pzuv_);
@@ -1470,7 +1470,7 @@ void NMPCgenerator::initializeFootPoseConstraint()
   # A0 R(Ftheta_k+1) [Fx_k+1 - Fx_k] <= ubB0
   #                  [Fy_k+1 - Fy_k]
   */
-  n_vertices_ = MAL_VECTOR_SIZE(ubB0r_) ;
+  n_vertices_ = ubB0r_.size() ;
   nc_foot_ = nf_*n_vertices_ ;
   Afoot_xy_   .resize(nf_);
   Afoot_theta_.resize(nf_);
@@ -1480,26 +1480,26 @@ void NMPCgenerator::initializeFootPoseConstraint()
   deltaF_     .resize(nf_);
   for(unsigned i=0 ; i< nf_ ; ++i)
   {
-    MAL_MATRIX_RESIZE(Afoot_xy_   [i],n_vertices_,2*(N_+nf_));
-    MAL_MATRIX_RESIZE(Afoot_theta_[i],n_vertices_,nf_);
-    MAL_VECTOR_RESIZE(UBfoot_     [i],n_vertices_);
-    MAL_MATRIX_RESIZE(SelecMat_   [i],2,2*(N_+nf_));
-    MAL_VECTOR_RESIZE(AdRdF_      [i],n_vertices_);
-    MAL_VECTOR_RESIZE(deltaF_     [i],2);//2 as [deltaFx,deltaFy]
+    Afoot_xy_   [i].resize(n_vertices_,2*(N_+nf_));
+    Afoot_theta_[i].resize(n_vertices_,nf_);
+    UBfoot_     [i].resize(n_vertices_);
+    SelecMat_   [i].resize(2,2*(N_+nf_));
+    AdRdF_      [i].resize(n_vertices_);
+    deltaF_     [i].resize(2);//2 as [deltaFx,deltaFy]
   }
   rotMat_vec_ .resize(nf_, tmpRotMat_ );
   drotMat_vec_.resize(nf_, tmpRotMat_ );
-  MAL_MATRIX_RESIZE(Afoot_xy_full_   ,nc_foot_,2*(N_+nf_));
-  MAL_MATRIX_RESIZE(Afoot_theta_full_,nc_foot_,nf_);
-  MAL_VECTOR_RESIZE(UBfoot_full_     ,nc_foot_);
+  Afoot_xy_full_.resize(nc_foot_,2*(N_+nf_));
+  Afoot_theta_full_.resize(nc_foot_,nf_);
+  UBfoot_full_.resize(nc_foot_);
 
   for(unsigned n=0 ; n < nf_ ; ++n)
   {
-    MAL_MATRIX_FILL(Afoot_xy_   [n],0.0);
-    MAL_MATRIX_FILL(Afoot_theta_[n],0.0);
-    MAL_VECTOR_FILL(UBfoot_     [n],0.0);
-    MAL_MATRIX_FILL(SelecMat_   [n],0.0);
-    MAL_VECTOR_FILL(deltaF_     [n],0.0);
+    Afoot_xy_   [n].setZero();
+    {for(unsigned int i=0;i<Afoot_theta_[n].rows();i++) for(unsigned int j=0;j<Afoot_theta_[n].cols();j++) Afoot_theta_[n](i,j)=0.0;};
+    UBfoot_     [n].setZero();
+    SelecMat_   [n].setZero();
+    deltaF_     [n].setZero();
     SelecMat_[n](0,N_+n) = 1 ;
     SelecMat_[n](1,2*N_+nf_+n) = 1 ;
     if(n>0)
@@ -1508,13 +1508,13 @@ void NMPCgenerator::initializeFootPoseConstraint()
       SelecMat_[n](1,2*N_+nf_+n-1) = -1 ;
     }
   }
-  MAL_MATRIX_FILL(Afoot_xy_full_   ,0.0);
-  MAL_MATRIX_FILL(Afoot_theta_full_,0.0);
-  MAL_VECTOR_FILL(UBfoot_full_     ,0.0);
+  {for(unsigned int i=0;i<Afoot_xy_full_.rows();i++) for(unsigned int j=0;j<Afoot_xy_full_.cols();j++) Afoot_xy_full_(i,j)=0.0;};
+  {for(unsigned int i=0;i<Afoot_theta_full_.rows();i++) for(unsigned int j=0;j<Afoot_theta_full_.cols();j++) Afoot_theta_full_(i,j)=0.0;};
+  { for(unsigned int i=0;i<UBfoot_full_.size();UBfoot_full_[i++]=0.0);};
   return ;
 }
 
-void NMPCgenerator::updateFootPoseConstraint(Eigen::VectorXf &U)
+void NMPCgenerator::updateFootPoseConstraint(Eigen::VectorXd &U)
 {
 //  if(nc_foot_==0)
 //    return ;
@@ -1531,12 +1531,12 @@ void NMPCgenerator::updateFootPoseConstraint(Eigen::VectorXf &U)
 //    ignoreFirstStep = nbFoot ;
 //  }
 
-  MAL_MATRIX_RESIZE(Afoot_xy_full_   ,nc_foot_,2*(N_+nf_));
-  MAL_MATRIX_RESIZE(Afoot_theta_full_,nc_foot_,nf_);
-  MAL_VECTOR_RESIZE(UBfoot_full_     ,nc_foot_);
-  MAL_MATRIX_FILL(Afoot_xy_full_   ,0.0);
-  MAL_MATRIX_FILL(Afoot_theta_full_,0.0);
-  MAL_VECTOR_FILL(UBfoot_full_     ,0.0);
+  Afoot_xy_full_.resize(nc_foot_,2*(N_+nf_));
+  Afoot_theta_full_.resize(nc_foot_,nf_);
+  UBfoot_full_.resize(nc_foot_);
+  Afoot_xy_full_.setZero();
+  Afoot_theta_full_.setZero();
+  UBfoot_full_.setZero();
 
   // compute Afoot_xy_full_, UBfoot_full_
   evalFootPoseConstraint(U);
@@ -1576,15 +1576,15 @@ void NMPCgenerator::updateFootPoseConstraint(Eigen::VectorXf &U)
 
     if (support_state[n].Foot == LEFT)
     {
-      A0f_theta_[n] = MAL_RET_A_by_B(A0r_,drotMat_vec_[n]) ;
+      A0f_theta_[n] = A0r_*drotMat_vec_[n] ;
     }else{
-      A0f_theta_[n] = MAL_RET_A_by_B(A0l_,drotMat_vec_[n]) ;
+      A0f_theta_[n] = A0l_*drotMat_vec_[n] ;
     }
     if(n!=0)
     {
       deltaF_[n](0)=U(N_+n)-U(N_+n-1) ;//F_kp1_x_[n]-F_kp1_x_[n-1];
       deltaF_[n](1)=U(2*N_+nf_+n)-U(2*N_+nf_+n-1) ;//F_kp1_y_[n]-F_kp1_y_[n-1];
-      AdRdF_[n] = MAL_RET_A_by_B(A0f_theta_[n],deltaF_[n]);
+      AdRdF_[n] = A0f_theta_[n]*deltaF_[n];
       double sum = 0.0 ;
       for (unsigned j=0 ; j<n_vertices_ ; ++j)
       {
@@ -1619,7 +1619,7 @@ void NMPCgenerator::updateFootPoseConstraint(Eigen::VectorXf &U)
   return ;
 }
 
-void NMPCgenerator::evalFootPoseConstraint(Eigen::VectorXf & U)
+void NMPCgenerator::evalFootPoseConstraint(Eigen::VectorXd & U)
 {
   if(nc_foot_==0)
     return ;
@@ -1662,20 +1662,20 @@ void NMPCgenerator::evalFootPoseConstraint(Eigen::VectorXf & U)
 
     if (support_state[n].Foot == LEFT)
     {
-      A0f_xy_   [n] = MAL_RET_A_by_B(A0r_,rotMat_vec_ [n]) ;
+      A0f_xy_   [n] = A0r_*rotMat_vec_ [n] ;
       B0f_      [n] = ubB0r_ ;
     }else{
-      A0f_xy_   [n] = MAL_RET_A_by_B(A0l_,rotMat_vec_ [n]) ;
+      A0f_xy_   [n] = A0l_*rotMat_vec_ [n] ;
       B0f_      [n] = ubB0l_ ;
     }
-    MAL_MATRIX_FILL(Afoot_xy_   [n],0.0);
-    Afoot_xy_[n] = MAL_RET_A_by_B(A0f_xy_[n],SelecMat_[n]);
+    Afoot_xy_   [n].setZero();
+    Afoot_xy_[n] = A0f_xy_[n]*SelecMat_[n];
     for(unsigned i=0 ; i<n_vertices_ ;++i)
       for(unsigned j=0 ; j<2*(N_+nf_) ; ++j)
         Afoot_xy_full_((n-ignoreFirstStep)*n_vertices_+i,j)
             = Afoot_xy_[n](i,j);
 
-    MAL_VECTOR_FILL(UBfoot_[n] , 0.0);
+    { for(unsigned int i=0;i<UBfoot_[n].size();UBfoot_[n][i++]=0.0);};
     UBfoot_[n]=B0f_[n];
     if(n==0)
     {
@@ -1708,12 +1708,12 @@ void NMPCgenerator::initializeFootVelIneqConstraint()
   # and B the direction vector of vel_ref : vel_ref / || vel_ref ||
   #*/
   nc_vel_=3*nf_;
-  MAL_MATRIX_RESIZE(Avel_,nc_vel_,2*N_+3*nf_)  ;
-  MAL_VECTOR_RESIZE(Bvel_,nc_vel_)  ;
-  MAL_VECTOR_RESIZE(gU_vel_,nc_vel_);
+  Avel_.resize(nc_vel_,2*N_+3*nf_)  ;
+  Bvel_.resize(nc_vel_)  ;
+  gU_vel_.resize(nc_vel_);
 
-  MAL_MATRIX_FILL(Avel_ ,0.0)  ;
-  MAL_VECTOR_FILL(Bvel_,0.0)  ;
+  {for(unsigned int i=0;i<Avel_.rows();i++) for(unsigned int j=0;j<Avel_.cols();j++) Avel_(i,j)=0.0;}  ;
+  { for(unsigned int i=0;i<Bvel_.size();Bvel_[i++]=0.0);}  ;
 
   for(unsigned i=0 ; i<nf_ ; ++i)
   {
@@ -1758,13 +1758,13 @@ void NMPCgenerator::initializeRotIneqConstraint()
   # -0.09         <= [ -1 1 ] [f_kp2_q] <= 0.09
   */
   nc_rot_ = 2*nf_ ;
-  MAL_MATRIX_RESIZE(Arot_ ,nc_rot_,2*N_+3*nf_);
-  MAL_VECTOR_RESIZE(UBrot_,nc_rot_);
-  MAL_VECTOR_RESIZE(LBrot_,nc_rot_);
+  Arot_.resize(nc_rot_,2*N_+3*nf_);
+  UBrot_.resize(nc_rot_);
+  LBrot_.resize(nc_rot_);
 
-  MAL_MATRIX_FILL(Arot_ ,0.0);
-  MAL_VECTOR_FILL(UBrot_,0.0);
-  MAL_VECTOR_FILL(LBrot_,0.0);
+  {for(unsigned int i=0;i<Arot_.rows();i++) for(unsigned int j=0;j<Arot_.cols();j++) Arot_(i,j)=0.0;};
+  { for(unsigned int i=0;i<UBrot_.size();UBrot_[i++]=0.0);};
+  { for(unsigned int i=0;i<LBrot_.size();LBrot_[i++]=0.0);};
 
 
   for(unsigned i=0 ; i<nf_ ;++i)
@@ -1838,16 +1838,16 @@ void NMPCgenerator::initializeObstacleConstraint()
 void NMPCgenerator::updateObstacleConstraint()
 {
   nc_obs_ = nf_*obstacles_.size() ;
-  MAL_MATRIX_DIM(H,double,2*(N_+nf_),2*(N_+nf_));
-  MAL_VECTOR_DIM(A,double,2*(N_+nf_));
-  MAL_VECTOR_DIM(B,double,nc_obs_);
+  Eigen::MatrixXd H(2*(N_+nf_),2*(N_+nf_));
+  Eigen::VectorXd A(2*(N_+nf_));
+  Eigen::VectorXd B(nc_obs_);
 
-  MAL_MATRIX_FILL(H,0.0);
-  MAL_VECTOR_FILL(A,0.0);
-  MAL_VECTOR_FILL(B,0.0);
+  H.setZero();
+  A.setZero();
+  B.setZero();
 
-  Hobs_.resize(obstacles_.size() , std::vector<Eigen::MatrixXf>(nc_obs_,H) );
-  Aobs_.resize(obstacles_.size() , std::vector<Eigen::VectorXf>(nc_obs_,A) );
+  Hobs_.resize(obstacles_.size() , std::vector<Eigen::MatrixXd>(nc_obs_,H) );
+  Aobs_.resize(obstacles_.size() , std::vector<Eigen::VectorXd>(nc_obs_,A) );
   UBobs_.resize(obstacles_.size() , B );
 
   unsigned nc = nf_ ;
@@ -1883,9 +1883,9 @@ void NMPCgenerator::initializeStandingConstraint()
 {
   // constraint on the foot position we force them to be next to each other
   nc_stan_ = 3*nf_ ; // 3 because we constraint x,y and theta
-  MAL_MATRIX_RESIZE(Astan_  ,nc_stan_,nv_); MAL_MATRIX_FILL(Astan_  ,0.0);
-  MAL_VECTOR_RESIZE(UBstan_ ,nc_stan_);     MAL_VECTOR_FILL(UBstan_ ,0.0);
-  MAL_VECTOR_RESIZE(LBstan_ ,nc_stan_);     MAL_VECTOR_FILL(LBstan_ ,0.0);
+  Astan_.resize(nc_stan_,nv_); {for(unsigned int i=0;i<Astan_.rows();i++) for(unsigned int j=0;j<Astan_.cols();j++) Astan_(i,j)=0.0;};
+  UBstan_.resize(nc_stan_);     { for(unsigned int i=0;i<UBstan_.size();UBstan_[i++]=0.0);};
+  LBstan_.resize(nc_stan_);     { for(unsigned int i=0;i<LBstan_.size();LBstan_[i++]=0.0);};
   for(unsigned i=0 ; i<nf_ ; ++i)
   {
     Astan_ (i*3  ,N_+i)         = 1.0 ;
@@ -1951,33 +1951,33 @@ void NMPCgenerator::initializeCostFunction()
   // number of constraint
   nc_ = nc_cop_+nc_foot_+nc_vel_+nc_rot_+nc_obs_+nc_stan_ ;
 
-  MAL_MATRIX_RESIZE(qp_H_      ,nv_,nv_);    MAL_MATRIX_SET_IDENTITY(qp_H_);
-  MAL_VECTOR_RESIZE(qp_g_      ,nv_);        MAL_VECTOR_FILL(qp_g_      ,0.0);
-  MAL_VECTOR_RESIZE(qp_g_x_    ,N_+nf_);     MAL_VECTOR_FILL(qp_g_x_    ,0.0);
-  MAL_VECTOR_RESIZE(qp_g_y_    ,N_+nf_);     MAL_VECTOR_FILL(qp_g_y_    ,0.0);
-  MAL_VECTOR_RESIZE(qp_g_theta_,nf_);        MAL_VECTOR_FILL(qp_g_theta_,0.0);
-  MAL_MATRIX_RESIZE(Q_x_XX_     ,N_,N_);     MAL_MATRIX_FILL(Q_x_XX_     ,0.0);
-  MAL_MATRIX_RESIZE(Q_x_XF_     ,N_,nf_);    MAL_MATRIX_FILL(Q_x_XF_     ,0.0);
-  MAL_MATRIX_RESIZE(Q_x_FX_     ,nf_,N_);    MAL_MATRIX_FILL(Q_x_FX_     ,0.0);
-  MAL_MATRIX_RESIZE(Q_x_FF_     ,nf_,nf_);   MAL_MATRIX_FILL(Q_x_FF_     ,0.0);
-  MAL_MATRIX_RESIZE(Q_y_XX_     ,N_,N_);     MAL_MATRIX_FILL(Q_y_XX_     ,0.0);
-  MAL_MATRIX_RESIZE(Q_theta_    ,nf_,nf_);   MAL_MATRIX_SET_IDENTITY(Q_theta_);
-  MAL_VECTOR_RESIZE(p_xy_X_     ,N_);        MAL_VECTOR_FILL(p_xy_X_ , 0.0);
-  MAL_VECTOR_RESIZE(p_xy_Fx_    ,nf_);       MAL_VECTOR_FILL(p_xy_Fx_, 0.0);
-  MAL_VECTOR_RESIZE(p_xy_Y_     ,N_);        MAL_VECTOR_FILL(p_xy_Y_ , 0.0);
-  MAL_VECTOR_RESIZE(p_xy_Fy_    ,nf_);       MAL_VECTOR_FILL(p_xy_Fy_, 0.0);
-  MAL_VECTOR_RESIZE(p_          ,nv_);       MAL_VECTOR_FILL(p_      , 0.0);
-  MAL_MATRIX_RESIZE(I_NN_       ,N_,N_);     MAL_MATRIX_SET_IDENTITY(I_NN_);
-  MAL_MATRIX_RESIZE(I_FF_       ,nf_,nf_);   MAL_MATRIX_FILL(I_FF_,0.0);
+  qp_H_.resize(nv_,nv_);    qp_H_.setIdentity();
+  qp_g_.resize(nv_);        { for(unsigned int i=0;i<qp_g_.size();qp_g_[i++]=0.0);};
+  qp_g_x_.resize(N_+nf_);     { for(unsigned int i=0;i<qp_g_x_.size();qp_g_x_[i++]=0.0);};
+  qp_g_y_.resize(N_+nf_);     { for(unsigned int i=0;i<qp_g_y_.size();qp_g_y_[i++]=0.0);};
+  qp_g_theta_.resize(nf_);        { for(unsigned int i=0;i<qp_g_theta_.size();qp_g_theta_[i++]=0.0);};
+  Q_x_XX_.resize(N_,N_);     {for(unsigned int i=0;i<Q_x_XX_.rows();i++) for(unsigned int j=0;j<Q_x_XX_.cols();j++) Q_x_XX_(i,j)=0.0;};
+  Q_x_XF_.resize(N_,nf_);    {for(unsigned int i=0;i<Q_x_XF_.rows();i++) for(unsigned int j=0;j<Q_x_XF_.cols();j++) Q_x_XF_(i,j)=0.0;};
+  Q_x_FX_.resize(nf_,N_);    {for(unsigned int i=0;i<Q_x_FX_.rows();i++) for(unsigned int j=0;j<Q_x_FX_.cols();j++) Q_x_FX_(i,j)=0.0;};
+  Q_x_FF_.resize(nf_,nf_);   {for(unsigned int i=0;i<Q_x_FF_.rows();i++) for(unsigned int j=0;j<Q_x_FF_.cols();j++) Q_x_FF_(i,j)=0.0;};
+  Q_y_XX_.resize(N_,N_);     {for(unsigned int i=0;i<Q_y_XX_.rows();i++) for(unsigned int j=0;j<Q_y_XX_.cols();j++) Q_y_XX_(i,j)=0.0;};
+  Q_theta_.resize(nf_,nf_);   Q_theta_.setIdentity();
+  p_xy_X_.resize(N_);        { for(unsigned int i=0;i<p_xy_X_.size();p_xy_X_[i++]=0.0);};
+  p_xy_Fx_.resize(nf_);       { for(unsigned int i=0;i<p_xy_Fx_.size();p_xy_Fx_[i++]=0.0);};
+  p_xy_Y_.resize(N_);        { for(unsigned int i=0;i<p_xy_Y_.size();p_xy_Y_[i++]=0.0);};
+  p_xy_Fy_.resize(nf_);       { for(unsigned int i=0;i<p_xy_Fy_.size();p_xy_Fy_[i++]=0.0);};
+  p_.resize(nv_);       { for(unsigned int i=0;i<p_.size();p_[i++]=0.0);};
+  I_NN_.resize(N_,N_);     I_NN_.setIdentity();
+  I_FF_.resize(nf_,nf_);   {for(unsigned int i=0;i<I_FF_.rows();i++) for(unsigned int j=0;j<I_FF_.cols();j++) I_FF_(i,j)=0.0;};
   I_FF_(nf_-1,nf_-1)=1.0;
-  MAL_MATRIX_SET_IDENTITY(I_FF_);
-  MAL_VECTOR_RESIZE(Pvsc_x_     ,N_);        MAL_VECTOR_FILL(Pvsc_x_ , 0.0);
-  MAL_VECTOR_RESIZE(Pvsc_y_     ,N_);        MAL_VECTOR_FILL(Pvsc_y_ , 0.0);
-  MAL_VECTOR_RESIZE(Pvsc_y_     ,N_);        MAL_VECTOR_FILL(Pvsc_y_ , 0.0);
-  MAL_VECTOR_RESIZE(Pvsc_y_     ,N_);        MAL_VECTOR_FILL(Pvsc_y_ , 0.0);
-  MAL_VECTOR_RESIZE(v_kf_x_, nf_);           MAL_VECTOR_FILL(v_kf_x_ , 0.0);
-  MAL_VECTOR_RESIZE(v_kf_y_, nf_);           MAL_VECTOR_FILL(v_kf_y_ , 0.0);
-  MAL_MATRIX_RESIZE(diffMat_, nf_,nf_);      MAL_MATRIX_SET_IDENTITY(diffMat_);
+  I_FF_.setIdentity();
+  Pvsc_x_.resize(N_);        { for(unsigned int i=0;i<Pvsc_x_.size();Pvsc_x_[i++]=0.0);};
+  Pvsc_y_.resize(N_);        { for(unsigned int i=0;i<Pvsc_y_.size();Pvsc_y_[i++]=0.0);};
+  Pvsc_y_.resize(N_);        { for(unsigned int i=0;i<Pvsc_y_.size();Pvsc_y_[i++]=0.0);};
+  Pvsc_y_.resize(N_);        { for(unsigned int i=0;i<Pvsc_y_.size();Pvsc_y_[i++]=0.0);};
+  v_kf_x_.resize(nf_);           { for(unsigned int i=0;i<v_kf_x_.size();v_kf_x_[i++]=0.0);};
+  v_kf_y_.resize(nf_);           { for(unsigned int i=0;i<v_kf_y_.size();v_kf_y_[i++]=0.0);};
+  diffMat_.resize(nf_,nf_);      diffMat_.setIdentity();
   for(unsigned i=0 ; i<nf_ ; ++i)
     for(unsigned j=0 ; j<nf_ ; ++j)
       if((i-j)==1)
@@ -2004,23 +2004,23 @@ void NMPCgenerator::updateCostFunction()
   // Q_xXF = ( -0.5 * b * Pzu^T   * V_kp1 )
   // Q_xFX = ( -0.5 * b * V_kp1^T * Pzu )^T
   // Q_xFF = (  0.5 * b * V_kp1^T * V_kp1 )
-  Q_x_XX_ = alpha_x_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_),Pvu_)
-          + beta_    * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_),Pzu_)
+  Q_x_XX_ = alpha_x_ * Pvu_.transpose() * Pvu_
+          + beta_    * Pzu_.transpose() * Pzu_
           + minjerk_ * I_NN_ ;
 
   // Q_xXX = (  0.5 * a * Pvu^T   * Pvu + b * Pzu^T * Pzu + c * I )
   // Q_xXF = ( -0.5 * b * Pzu^T   * V_kp1 )
   // Q_xFX = ( -0.5 * b * V_kp1^T * Pzu ) = Q_xXF^T
   // Q_xFF = (  0.5 * b * V_kp1^T * V_kp1 - 0.5 * d * I_FF_)
-  Q_x_XF_ = - beta_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_),V_kp1_);
-  Q_x_FX_ =   MAL_RET_TRANSPOSE(Q_x_XF_);
-  Q_x_FF_ =   beta_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(V_kp1_),V_kp1_)
+  Q_x_XF_ = - beta_ * Pzu_.transpose() *V_kp1_;
+  Q_x_FX_ =   Q_x_XF_.transpose();
+  Q_x_FF_ =   beta_ * V_kp1_.transpose() *V_kp1_
             + delta_ * I_FF_
-            + kappa_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(diffMat_),diffMat_);
+            + kappa_ * diffMat_.transpose() * diffMat_;
 
   // Q_yXX = (  0.5 * a * Pvu^T   * Pvu + b * Pzu^T * Pzu + c * I )
-  Q_y_XX_ = alpha_y_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_),Pvu_)
-          + beta_    * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_),Pzu_)
+  Q_y_XX_ = alpha_y_ * Pvu_.transpose() *Pvu_
+          + beta_    * Pzu_.transpose() *Pzu_
           + minjerk_   * I_NN_ ;
 
 
@@ -2037,7 +2037,7 @@ void NMPCgenerator::updateCostFunction()
   unsigned Nnf = N_+nf_ ;
   unsigned N2nf = 2*N_+nf_ ;
   unsigned N2nf2 = 2*(N_+nf_) ;
-  MAL_MATRIX_FILL(qp_H_,0.0);
+  qp_H_.setZero();
   for(unsigned i=0 ; i<N_ ; ++i)
   {
     for(unsigned j=0 ; j<N_ ; ++j)
@@ -2085,13 +2085,13 @@ void NMPCgenerator::updateCostFunction()
   cout << vel_ref_.Global.X << " "
        << vel_ref_.Global.Y << endl;
 #endif
-  Pvsc_x_ = MAL_RET_A_by_B(Pvs_ , c_k_x_) ;
-  Pvsc_y_ = MAL_RET_A_by_B(Pvs_ , c_k_y_) ;
+  Pvsc_x_ = Pvs_*c_k_x_ ;
+  Pvsc_y_ = Pvs_*c_k_y_ ;
   // Pzsc_x_, Pzsc_y_ , v_kp1f_x_ and v_kp1f_y_ already up to date
   //from the CoP constraint building function
 
-  p_xy_X_ =    alpha_x_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_  ), Pvsc_x_ - vel_ref_.Global.X_vec)
-             + beta_    * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_  ), Pzsc_x_ - v_kp1f_x_            );
+  p_xy_X_ =    alpha_x_ * Pvu_.transpose() *( Pvsc_x_ - vel_ref_.Global.X_vec)
+    + beta_    * Pzu_.transpose() *( Pzsc_x_ - v_kp1f_x_            );
 #ifdef DEBUG
   DumpVector("Pvsc_x_"    , Pvsc_x_                    ) ;
   DumpVector("RefVectorX" , vel_ref_.Global.X_vec ) ;
@@ -2099,17 +2099,17 @@ void NMPCgenerator::updateCostFunction()
   DumpVector("v_kp1f_x_"  , v_kp1f_x_                  ) ;
 #endif
   v_kf_x_(0) = currentSupport_.X ;
-  p_xy_Fx_ = - beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(V_kp1_), Pzsc_x_ - v_kp1f_x_)
-             - delta_ * MAL_RET_A_by_B(I_FF_,F_kp1_x_) ;
-             - kappa_ * MAL_RET_A_by_B(diffMat_,v_kf_x_);
-
-  p_xy_Y_  =   alpha_y_ * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pvu_  ), Pvsc_y_ - vel_ref_.Global.Y_vec)
-             + beta_    * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(Pzu_  ), Pzsc_y_ - v_kp1f_y_                 );
+  p_xy_Fx_ = - beta_  * V_kp1_.transpose()*( Pzsc_x_ - v_kp1f_x_)
+    - delta_ * I_FF_*F_kp1_x_ ;
+  - kappa_ * diffMat_*v_kf_x_;
+  
+  p_xy_Y_  =   alpha_y_ * Pvu_.transpose() * (Pvsc_y_ - vel_ref_.Global.Y_vec)
+    + beta_    * Pzu_.transpose() *( Pzsc_y_ - v_kp1f_y_                 );
 
   v_kf_y_(0) = currentSupport_.Y ;
-  p_xy_Fy_ = - beta_  * MAL_RET_A_by_B(MAL_RET_TRANSPOSE(V_kp1_), Pzsc_y_ - v_kp1f_y_)
-             - delta_ * MAL_RET_A_by_B(I_FF_,F_kp1_y_) ;
-             - kappa_ * MAL_RET_A_by_B(diffMat_,v_kf_y_) ;
+  p_xy_Fy_ = - beta_  * V_kp1_.transpose() * ( Pzsc_y_ - v_kp1f_y_)
+             - delta_ * I_FF_*F_kp1_y_ ;
+             - kappa_ * diffMat_*v_kf_y_ ;
 
 #ifdef DEBUG
   DumpVector("Pvsc_y_"    , Pvsc_y_                    ) ;
@@ -2149,7 +2149,7 @@ void NMPCgenerator::updateCostFunction()
 #ifdef DEBUG
   DumpVector( "U_x_" , U_x_ );
 #endif
-  qp_g_ = MAL_RET_A_by_B(qp_H_,U_)+p_;
+  qp_g_ = qp_H_*U_+p_;
 
 #ifdef DEBUG
   DumpMatrix("qp_H_",qp_H_);
@@ -2184,8 +2184,8 @@ void NMPCgenerator::setLocalVelocityReference(reference_t local_vel_ref)
   cout << vel_ref_.Global.X << " "  ;
   cout << vel_ref_.Global.Y << endl ;
 #endif
-  MAL_VECTOR_FILL(vel_ref_.Global.X_vec   , vel_ref_.Global.X  ) ;
-  MAL_VECTOR_FILL(vel_ref_.Global.Y_vec   , vel_ref_.Global.Y  ) ;
+  { for(unsigned int i=0;i<vel_ref_.Global.X_vec.size();vel_ref_.Global.X_vec[i++]=vel_ref_.Global.X);} ;
+  { for(unsigned int i=0;i<vel_ref_.Global.Y_vec.size();vel_ref_.Global.Y_vec[i++]=vel_ref_.Global.Y);} ;
 #ifdef DEBUG
   DumpVector("RefVectorX"    ,vel_ref_.Global.X_vec  );
   DumpVector("RefVectorY"    ,vel_ref_.Global.Y_vec  );
@@ -2217,8 +2217,8 @@ void NMPCgenerator::setGlobalVelocityReference(reference_t global_vel_ref)
   vel_ref_.Local.X   =  vel_ref_.Global.X * cos(currentSupport_.Yaw) + vel_ref_.Global.Y * sin(currentSupport_.Yaw) ;
   vel_ref_.Local.Y   = -vel_ref_.Global.X * sin(currentSupport_.Yaw) + vel_ref_.Global.Y * cos(currentSupport_.Yaw) ;
   vel_ref_.Local.Yaw = vel_ref_.Global.Yaw ;
-  MAL_VECTOR_FILL(vel_ref_.Global.X_vec   , vel_ref_.Global.X  ) ;
-  MAL_VECTOR_FILL(vel_ref_.Global.Y_vec   , vel_ref_.Global.Y  ) ;
+  { for(unsigned int i=0;i<vel_ref_.Global.X_vec.size();vel_ref_.Global.X_vec[i++]=vel_ref_.Global.X);} ;
+  { for(unsigned int i=0;i<vel_ref_.Global.Y_vec.size();vel_ref_.Global.Y_vec[i++]=vel_ref_.Global.Y);} ;
 #ifdef DEBUG
   DumpVector("RefVectorX"    ,vel_ref_.Global.X_vec  );
   DumpVector("RefVectorY"    ,vel_ref_.Global.Y_vec  );
@@ -2228,11 +2228,11 @@ void NMPCgenerator::setGlobalVelocityReference(reference_t global_vel_ref)
 
 void NMPCgenerator::initializeLineSearch()
 {
-  MAL_VECTOR_RESIZE(HUn_, nv_); MAL_VECTOR_FILL(HUn_, 0.0);
-  MAL_VECTOR_RESIZE(U_n_, nv_); MAL_VECTOR_FILL(U_n_, 0.0);
-  MAL_VECTOR_RESIZE(JdU_, nc_); MAL_VECTOR_FILL(JdU_, 0.0);
-  MAL_VECTOR_RESIZE(selectActiveConstraint, nc_);
-  MAL_VECTOR_FILL(selectActiveConstraint, 0.0);
+  HUn_.resize(nv_); { for(unsigned int i=0;i<HUn_.size();HUn_[i++]=0.0);};
+  U_n_.resize(nv_); { for(unsigned int i=0;i<U_n_.size();U_n_[i++]=0.0);};
+  JdU_.resize(nc_); { for(unsigned int i=0;i<JdU_.size();JdU_[i++]=0.0);};
+  selectActiveConstraint.resize(nc_);
+  { for(unsigned int i=0;i<selectActiveConstraint.size();selectActiveConstraint[i++]=0.0);};
   lineStep_=1.0; lineStep0_=1.0 ; // step searched
   cm_=0.0; c_=1.0 ; // Merit Function Jacobian
   mu_ = 1.0 ;
@@ -2257,8 +2257,8 @@ double NMPCgenerator::evalMeritFunctionJacobian()
   //constraintJacobian = mu*sum((sign(qp_J_*deltaU_)*qp_J_*deltaU_)
   //                       *selecActiveConstraint);
   double constrValue = 0.0 ;
-  MAL_VECTOR_RESIZE(JdU_, nc_);
-  MAL_VECTOR_FILL(JdU_,0.0);
+  JdU_.resize(nc_);
+  { for(unsigned int i=0;i<JdU_.size();JdU_[i++]=0.0);};
   for (unsigned i=0; i<nc_ ; ++i)
   {
     if(selectActiveConstraint(i)!=0.0)
@@ -2285,7 +2285,7 @@ double NMPCgenerator::evalMeritFunctionJacobian()
 double NMPCgenerator::evalMeritFunction()
 {
   // evaluation of the cost function
-  HUn_ = MAL_RET_A_by_B(U_n_,qp_H_);
+  HUn_ = U_n_*qp_H_;
   double costFunction = 0.0 ;
   for(unsigned i=0 ; i<nv_ ; ++i)
   {
@@ -2317,7 +2317,7 @@ void NMPCgenerator::updateIterationBeforeLanding()
   cout << "v_kp1_ = " << v_kp1_ << endl ;
 #endif
   itBeforeLanding_ = 0;
-  for(unsigned i=0 ; i<MAL_VECTOR_SIZE(v_kp1_) ; ++i)
+  for(unsigned i=0 ; i<v_kp1_.size() ; ++i)
     if(v_kp1_(i))
       ++itBeforeLanding_;
     else

@@ -60,7 +60,7 @@ void CollisionDetector::SetObstacleCoordinates(ObstaclePar aObstacleInfo)
   //double ObstacleWidth, ObstacleHeight, ObstacleDepth;
   double c,s;
   
-  MAL_MATRIX_RESIZE(m_ObstaclePoints,3,4);
+  m_ObstaclePoints.resize(3,4);
 
   m_ObstaclePosition(0) = aObstacleInfo.x;
   m_ObstaclePosition(1) = aObstacleInfo.y;
@@ -110,13 +110,13 @@ void CollisionDetector::SetObstacleCoordinates(ObstaclePar aObstacleInfo)
   //cout << "I have set the obstacle info in the colission detection class" << endl;
 }
 
-void CollisionDetector::WorldFrameToObstacleFrame(MAL_S3_VECTOR(& WorldFrameCoord,double), 
-						  MAL_S3_VECTOR(&ObstacleFrameCoord,double))
+void CollisionDetector::WorldFrameToObstacleFrame(Eigen::Vector3d &WorldFrameCoord, 
+						  Eigen::Vector3d &ObstacleFrameCoord)
 { 
   // This function transforms the coordinates of a point 
   // expressed in the world frame to the local coordinates in the obstacle frame
   
-  ObstacleFrameCoord = MAL_S3x3_RET_A_by_B(m_ObstacleRotInv , (WorldFrameCoord - m_ObstaclePosition));
+  ObstacleFrameCoord = m_ObstacleRotInv * (WorldFrameCoord - m_ObstaclePosition);
   /*
     cout << "X WorldFrameCoord:  " <<  WorldFrameCoord(0,0) << endl;
     cout << "Y WorldFrameCoord:  " <<  WorldFrameCoord(1,0) << endl;
@@ -132,16 +132,16 @@ void CollisionDetector::WorldFrameToObstacleFrame(MAL_S3_VECTOR(& WorldFrameCoor
   */
 }
 
-void CollisionDetector::CalcCoordShankLowerLegPoint(MAL_S3_VECTOR( RelCoord,double),
-						    MAL_S3_VECTOR( &AbsCoord,double),
-						    MAL_VECTOR( LegAngles,double), 
-						    MAL_S3x3_MATRIX( WaistRot,double), 
-						    MAL_S3_VECTOR( WaistPos,double),
+void CollisionDetector::CalcCoordShankLowerLegPoint(Eigen::Vector3d RelCoord,
+						    Eigen::Vector3d &AbsCoord,
+						    Eigen::VectorXd LegAngles, 
+						    Eigen::Matrix3d WaistRot, 
+						    Eigen::Vector3d WaistPos,
 						    int WhichLeg)
 {
-  MAL_S3x3_MATRIX(Rotation,double);
-  MAL_S3_VECTOR(TempCoord,double);
-  MAL_S3_VECTOR(Translation,double);
+  Eigen::Matrix3d Rotation;
+  Eigen::Vector3d TempCoord;
+  Eigen::Vector3d Translation;
   
   double c,s;
   
@@ -154,7 +154,7 @@ void CollisionDetector::CalcCoordShankLowerLegPoint(MAL_S3_VECTOR( RelCoord,doub
   Rotation(1,0) = 0;       Rotation(1,1) = 1;        Rotation(1,2) = 0;
   Rotation(2,0) =-s;       Rotation(2,1) = 0;        Rotation(2,2) = c;
   
-  TempCoord =  MAL_S3x3_RET_A_by_B(Rotation , RelCoord);
+  TempCoord =  Rotation*RelCoord;
   
   
   //translation from knee to hip along Z axis
@@ -175,7 +175,7 @@ void CollisionDetector::CalcCoordShankLowerLegPoint(MAL_S3_VECTOR( RelCoord,doub
   Rotation(1,0) = 0;       Rotation(1,1) = 1;        Rotation(1,2) = 0;
   Rotation(2,0) =-s;       Rotation(2,1) = 0;        Rotation(2,2) = c;
   
-  TempCoord =  MAL_S3x3_RET_A_by_B(Rotation , TempCoord);
+  TempCoord =  Rotation*TempCoord;
   
   //rotation from hip to hip  angle 1  frame  1 -> 0
   
@@ -186,7 +186,7 @@ void CollisionDetector::CalcCoordShankLowerLegPoint(MAL_S3_VECTOR( RelCoord,doub
   Rotation(1,0) = 0;       Rotation(1,1) = c;        Rotation(1,2) =-s;
   Rotation(2,0) = 0;       Rotation(2,1) = s;        Rotation(2,2) = c;
 	
-  TempCoord =  MAL_S3x3_RET_A_by_B(Rotation , TempCoord);
+  TempCoord =  Rotation*TempCoord;
 	
 	
   //rotation from hip to hip   angle 0  frame  0 -> waistframe orientation
@@ -198,7 +198,7 @@ void CollisionDetector::CalcCoordShankLowerLegPoint(MAL_S3_VECTOR( RelCoord,doub
   Rotation(1,0) = s;       Rotation(1,1) = c;        Rotation(1,2) = 0;
   Rotation(2,0) = 0;       Rotation(2,1) = 0;        Rotation(2,2) = 1;
 	
-  TempCoord =  MAL_S3x3_RET_A_by_B(Rotation , TempCoord);
+  TempCoord =  Rotation*TempCoord;
 	
 	
   //translation from hip to waist along x axis
@@ -218,7 +218,7 @@ void CollisionDetector::CalcCoordShankLowerLegPoint(MAL_S3_VECTOR( RelCoord,doub
 	
   //translation and rotation of the waist in the world frame
 	
-  TempCoord = MAL_S3x3_RET_A_by_B(WaistRot, TempCoord);
+  TempCoord = WaistRot*TempCoord;
   /*	
     cout << "X TempCoord coordinate:  " <<  TempCoord(0,0) << endl;
     cout << "Y TempCoord coordinate:  " <<  TempCoord(1,0) << endl;
@@ -262,8 +262,8 @@ bool CollisionDetector::CollisionTwoLines(vector<double> p1,
 
 }
 
-bool CollisionDetector::CollisionLineObstaclePlane(MAL_S3_VECTOR(&LegPoint1,double), 
-						   MAL_S3_VECTOR(&LegPoint2,double),
+bool CollisionDetector::CollisionLineObstaclePlane(Eigen::Vector3d &LegPoint1, 
+						   Eigen::Vector3d &LegPoint2,
 						   int PlaneNumber)
 {
   /*! This function checks for intersection of a linesegment p1p2 
@@ -367,8 +367,8 @@ bool CollisionDetector::CollisionLineObstaclePlane(MAL_S3_VECTOR(&LegPoint1,doub
 
 }
 
-bool CollisionDetector::CollisionLineObstacleComplete(MAL_S3_VECTOR(&Point1,double), 
-						      MAL_S3_VECTOR(&Point2,double))
+bool CollisionDetector::CollisionLineObstacleComplete(Eigen::Vector3d &Point1, 
+						      Eigen::Vector3d &Point2)
 {
   
   if ((((Point1(0)>0.0)

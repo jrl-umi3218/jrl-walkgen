@@ -73,7 +73,7 @@ namespace PatternGeneratorJRL
       
       gettimeofday(&end,0);
       double ltime = end.tv_sec-m_begin.tv_sec 
-	+ 0.000001 * (end.tv_usec - m_begin.tv_usec);
+	+ 0.000001 * (double)(end.tv_usec - m_begin.tv_usec);
       m_totaltimeinplanning+=ltime;
 
     }
@@ -85,7 +85,7 @@ namespace PatternGeneratorJRL
 
     double ClockCPUTime::getStartOneIteration()
     {
-      return m_begin.tv_sec + 0.000001 * m_begin.tv_usec ;
+      return m_begin.tv_sec + 0.000001 * (double)(m_begin.tv_usec) ;
     }
 
     void ClockCPUTime::stopOneIteration()
@@ -94,7 +94,7 @@ namespace PatternGeneratorJRL
 
       gettimeofday(&end,0);
       m_currenttime = end.tv_sec-m_begin.tv_sec 
-	+ 0.000001 * (end.tv_usec - m_begin.tv_usec);
+	+ 0.000001 * (double)(end.tv_usec - m_begin.tv_usec);
       if (m_maxtime<m_currenttime)
 	m_maxtime = m_currenttime;
       
@@ -116,7 +116,7 @@ namespace PatternGeneratorJRL
 
       gettimeofday(&end,0);
       m_modificationtime = end.tv_sec - m_begin.tv_sec 
-	+ 0.000001 * (end.tv_usec - m_begin.tv_usec);
+	+ 0.000001 * (double)(end.tv_usec - m_begin.tv_usec);
 
       if (m_modificationtime> 0.0005)
 	m_nbofmodifs++;
@@ -129,7 +129,7 @@ namespace PatternGeneratorJRL
       m_TimeProfile[m_TimeProfileIndex] = 
 	m_currenttime + m_modificationtime;
       m_TimeProfileTS[m_TimeProfileIndex] = 
-	m_begin.tv_sec + 0.000001 * m_begin.tv_usec;
+	m_begin.tv_sec + 0.000001 * (double)m_begin.tv_usec;
 
       m_TimeProfileIndex++;
       if (m_TimeProfileIndex>m_TimeProfileUpperLimit)
@@ -141,7 +141,8 @@ namespace PatternGeneratorJRL
     {
       ofstream lProfileOutput(aFileName.c_str(),ofstream::out);
       // Shift all the measurement to the origin.
-      double dST = m_startingtime.tv_sec + 0.000001 * m_startingtime.tv_usec;
+      double dST = m_startingtime.tv_sec + 0.000001 *
+	(double)m_startingtime.tv_usec;
       for(unsigned int i=0;i<m_TimeProfileIndex;i++)
 	lProfileOutput << " " << m_TimeProfileTS[i] - dST
 		       << " " << m_TimeProfile[i] << std::endl;

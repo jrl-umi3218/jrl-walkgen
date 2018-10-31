@@ -104,15 +104,15 @@ void UpperBodyMotion::GenerateDataFile(string aFileName, int LenghtDataArray)
 }
 
 
-void UpperBodyMotion::ReadDataFile(string aFileName, MAL_MATRIX(&UpperBodyAngles,double))
+void UpperBodyMotion::ReadDataFile(string aFileName, Eigen::MatrixXd &UpperBodyAngles)
 {
  
   std::ifstream aif;
 
   unsigned int NumberRows, NumberColumns;
    	
-  NumberRows = MAL_MATRIX_NB_ROWS(UpperBodyAngles);
-  NumberColumns = MAL_MATRIX_NB_COLS(UpperBodyAngles);
+  NumberRows = UpperBodyAngles.rows();
+  NumberColumns = UpperBodyAngles.cols();
 
   double r;
 
@@ -134,12 +134,12 @@ void UpperBodyMotion::ReadDataFile(string aFileName, MAL_MATRIX(&UpperBodyAngles
   
 }
 
-void UpperBodyMotion::WriteDataFile(string aFileName,MAL_MATRIX( &UpperBodyAngles,double) )
+void UpperBodyMotion::WriteDataFile(string aFileName,Eigen::MatrixXd &UpperBodyAngles )
 {
   ofstream aof;
   unsigned int NumberRows, NumberColumns;
-  NumberRows = MAL_MATRIX_NB_ROWS(UpperBodyAngles);
-  NumberColumns = MAL_MATRIX_NB_COLS(UpperBodyAngles);
+  NumberRows = UpperBodyAngles.rows();
+  NumberColumns = UpperBodyAngles.cols();
 
   aof.open(aFileName.c_str(),ofstream::out);
   if (aof.is_open())

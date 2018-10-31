@@ -152,11 +152,11 @@ int main()
   PatternGeneratorJRL::OptimalControllerSolver *anOCS;
 
   /* Declare the linear system */
-  MAL_MATRIX_DIM(A,double,3,3);
-  MAL_MATRIX_DIM(b,double,3,1);
-  MAL_MATRIX_DIM(c,double,1,3);
-  MAL_MATRIX_TYPE( double) lF;
-  MAL_MATRIX_TYPE( double) lK;
+  Eigen::MatrixXd A;
+  Eigen::MatrixXd b;
+  Eigen::MatrixXd c;
+  Eigen::MatrixXd lF;
+  Eigen::MatrixXd lK;
 
   /* Declare the weights for the function */
   ofstream aof;
@@ -184,13 +184,13 @@ int main()
   Nl = (int)(1.6/T);
 
   // Build the derivated system
-  MAL_MATRIX_DIM(Ax,double,4,4);
-  MAL_MATRIX(tmpA,double);
-  MAL_MATRIX_DIM(bx,double,4,1);
-  MAL_MATRIX(tmpb,double);
-  MAL_MATRIX_DIM(cx,double,1,4);
+  Eigen::MatrixXd Ax(4,4);
+  Eigen::MatrixXd tmpA;
+  Eigen::MatrixXd bx(4,1);
+  Eigen::MatrixXd tmpb;
+  Eigen::MatrixXd cx(1,4);
   
-  tmpA = MAL_RET_A_by_B(c,A);
+  tmpA = c*A;
   cout << "tmpA :" << tmpA<<endl;
 
   Ax(0,0)= 1.0;
@@ -203,7 +203,7 @@ int main()
     }
   cout << "Ax: " << endl << Ax<< endl;
 
-  tmpb = MAL_RET_A_by_B(c,b);
+  tmpb = c*b;
   bx(0,0) = tmpb(0,0);
   for(int i=0;i<3;i++)
     {
@@ -227,11 +227,11 @@ int main()
   anOCS->GetK(lK);
 
   aof.open("TestRiccatiEquationWeightsWithoutInitialPose.dat",ofstream::out);
-  for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lK);li++)
+  for(unsigned int li=0;li<lK.rows();li++)
     {
       aof << lK(li,0) << endl;
     }
-  for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lF);li++)
+  for(unsigned int li=0;li<lF.rows();li++)
     {
       aof << lF(li,0) << endl;
     }
@@ -276,11 +276,11 @@ int main()
   anOCS->GetK(lK);
 
   aof.open("TestRiccatiEquationWeightsWithInitialPose.dat",ofstream::out);
-  for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lK);li++)
+  for(unsigned int li=0;li<lK.rows();li++)
     {
       aof << lK(li,0) << endl;
     }
-  for(unsigned int li=0;li<MAL_MATRIX_NB_ROWS(lF);li++)
+  for(unsigned int li=0;li<lF.rows();li++)
     {
       aof << lF(li,0) << endl;
     }

@@ -57,9 +57,9 @@ private:
   ComAndFootRealizationByGeometry * ComAndFootRealization_ ;
   SimplePluginManager * SPM_ ;
   vector<double> m_err_zmp_x, m_err_zmp_y;
-  MAL_VECTOR_TYPE(double) m_conf;
-  MAL_VECTOR_TYPE(double) m_vel ;
-  MAL_VECTOR_TYPE(double) m_acc ;
+  Eigen::VectorXd m_conf;
+  Eigen::VectorXd m_vel ;
+  Eigen::VectorXd m_acc ;
   int iteration;
   std::vector<se3::JointIndex> m_leftLeg  ;
   std::vector<se3::JointIndex> m_rightLeg ;
@@ -132,12 +132,12 @@ public:
     ComAndFootRealization_->setSamplingPeriod(0.005);
     ComAndFootRealization_->Initialization();
 
-    MAL_VECTOR_DIM(waist,double,6);
+    Eigen::Matrix<double,6,1> waist;
     for (int i = 0 ; i < 6 ; ++i )
     {
       waist(i) = 0;
     }
-    MAL_S3_VECTOR(lStartingCOMState,double);
+    Eigen::Vector3d lStartingCOMState;
 
     lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
     lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
@@ -206,7 +206,7 @@ protected:
 
       total += abs_value ;
     }
-    avg = total/vec.size() ;
+    avg = total/(double)(vec.size());
     return ;
   }
 
@@ -228,18 +228,18 @@ protected:
     return ;
   }
 
-  void analyticalInverseKinematics(MAL_VECTOR_TYPE(double) & conf,
-                                   MAL_VECTOR_TYPE(double) & vel,
-                                   MAL_VECTOR_TYPE(double) & acc)
+  void analyticalInverseKinematics(Eigen::VectorXd & conf,
+                                   Eigen::VectorXd & vel,
+                                   Eigen::VectorXd & acc)
   {
     /// \brief calculate, from the CoM of computed by the preview control,
     ///    the corresponding articular position, velocity and acceleration
     /// ------------------------------------------------------------------
-    MAL_VECTOR_DIM(aCOMState,double,6);
-    MAL_VECTOR_DIM(aCOMSpeed,double,6);
-    MAL_VECTOR_DIM(aCOMAcc,double,6);
-    MAL_VECTOR_DIM(aLeftFootPosition,double,5);
-    MAL_VECTOR_DIM(aRightFootPosition,double,5);
+    Eigen::VectorXd aCOMState(6);
+    Eigen::VectorXd aCOMSpeed(6);
+    Eigen::VectorXd aCOMAcc(6);
+    Eigen::VectorXd aLeftFootPosition(5);
+    Eigen::VectorXd aRightFootPosition(5);
 
     aCOMState(0) = m_OneStep.finalCOMPosition.x[0];
     aCOMState(1) = m_OneStep.finalCOMPosition.y[0];
@@ -285,10 +285,10 @@ protected:
     }
   }
 
-  MAL_VECTOR_TYPE(double) parseFromURDFtoOpenHRPIndex()
+  Eigen::VectorXd parseFromURDFtoOpenHRPIndex()
   {
-    MAL_VECTOR_TYPE(double) conf = m_conf;
-    MAL_VECTOR_FILL(conf,0.0);
+    Eigen::VectorXd conf = m_conf;
+    { for(unsigned int i=0;i<conf.size();conf[i++]=0.0);};
 
     for(unsigned int i = 0 ; i < 6 ; i++)
       conf(i) = m_conf(i);
@@ -296,11 +296,11 @@ protected:
     //RLEG
     for(unsigned int i = 0 ; i < m_rightLeg.size() ; i++)
       conf(index+i) = m_conf(m_rightLeg[i]);
-    index+=m_rightLeg.size();
+    index+=(unsigned)m_rightLeg.size();
     //LLEG
     for(unsigned int i = 0 ; i < m_leftLeg.size() ; i++)
       conf(index+i) = m_conf(m_leftLeg[i]);
-    index+=m_leftLeg.size();
+    index+=(unsigned)m_leftLeg.size();
     //CHEST
     for(unsigned int i = 0 ; i < 2 ; i++)
       conf(index+i) = 0.0 ;
@@ -312,7 +312,7 @@ protected:
     //RARM
     for(unsigned int i = 0 ; i < m_rightArm.size() ; i++)
       conf(index+i) = m_HalfSitting(m_rightArm[i]-6);
-    index+=m_rightArm.size();
+    index+=(unsigned)m_rightArm.size();
     conf(index) = 10*M_PI/180;
     ++index;
     //LARM
@@ -328,7 +328,7 @@ protected:
   {
     /// \brief Create file .hip .pos .zmp
     /// ---------------------------------
-    MAL_VECTOR_TYPE(double) conf = parseFromURDFtoOpenHRPIndex();
+    Eigen::VectorXd conf = parseFromURDFtoOpenHRPIndex();
     ofstream aof ;
     string aPosFileName = /*"/tmp/" +*/ m_TestName + ".pos" ;
     string aZMPFileName = /*"/tmp/" +*/ m_TestName + ".zmp" ;
@@ -350,7 +350,7 @@ protected:
     aof.precision(8);
     aof.setf(ios::scientific, ios::floatfield);
     aof << filterprecision( (double)iteration * 0.005 ) << " "  ;// 1
-    for(unsigned i=6 ; i<MAL_VECTOR_SIZE(conf) ; ++i)
+    for(unsigned i=6 ; i<conf.size() ; ++i)
       aof << filterprecision( conf(i) ) << " "  ;                    // 2-30
     for(unsigned i=0 ; i<9 ; ++i)
       aof << filterprecision( 0.0 ) << " "  ;                        // 31-40
@@ -431,7 +431,7 @@ protected:
       }
 
       m_DebugPR->computeInverseDynamics(m_conf,m_vel,m_acc);
-      MAL_S3_VECTOR_TYPE(double) com, dcom, ddcom;
+      Eigen::Vector3d com, dcom, ddcom;
       m_DebugPR->CenterOfMass(com, dcom, ddcom);
 //      cout << m_OneStep.finalCOMPosition.x[0] - com(0) << " "
 //           << m_OneStep.finalCOMPosition.y[0] - com(1) << " "
@@ -444,7 +444,7 @@ protected:
 //           << m_OneStep.finalCOMPosition.z[2] - ddcom(2) << endl ;
 
       createOpenHRPFiles();
-      MAL_S3_VECTOR(zmpmb,double);
+      Eigen::Vector3d zmpmb;
       m_DebugPR->zeroMomentumPoint(zmpmb);
       m_err_zmp_x.push_back(zmpmb[0]-m_OneStep.ZMPTarget(0)) ;
       m_err_zmp_y.push_back(zmpmb[1]-m_OneStep.ZMPTarget(1)) ;

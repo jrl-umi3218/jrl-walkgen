@@ -56,12 +56,12 @@ ComAndFootRealizationByGeometry::
 
   // By assumption on this implementation
   // the humanoid is assume to have 6 DOFs per leg.
-  MAL_VECTOR_FILL(m_prev_Configuration,0.0);
-  MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
-  MAL_VECTOR_FILL(m_prev_Configuration2,0.0);
-  MAL_VECTOR_FILL(m_prev_Velocity,0.0);
-  MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
-  MAL_VECTOR_FILL(m_prev_Velocity2,0.0);
+  { for(unsigned int i=0;i<m_prev_Configuration.size();m_prev_Configuration[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Configuration1.size();m_prev_Configuration1[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Configuration2.size();m_prev_Configuration2[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Velocity.size();m_prev_Velocity[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Velocity1.size();m_prev_Velocity1[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Velocity2.size();m_prev_Velocity2[i++]=0.0);};
 
   RESETDEBUG4("DebugDataVelocity.dat");
 
@@ -88,7 +88,7 @@ ComAndFootRealizationByGeometry::
   m_UpperBodyMotion[1]=0.0;
   m_UpperBodyMotion[2]=0.0;
 
-  MAL_S3_VECTOR_FILL(m_COGInitialAnkles,0.0);
+  m_COGInitialAnkles.setZero();
 }
 
 void ComAndFootRealizationByGeometry::
@@ -213,7 +213,7 @@ void ComAndFootRealizationByGeometry::
 
   ODEBUG("Enter 2.0 ");
   // Take the right ankle position (should be equivalent)
-  vector3d lAnklePositionRight,lAnklePositionLeft;
+  Eigen::Vector3d lAnklePositionRight,lAnklePositionLeft;
   PRFoot *LeftFoot, *RightFoot;
   LeftFoot = getPinocchioRobot()->leftFoot();
   if (LeftFoot==0)
@@ -315,12 +315,12 @@ void ComAndFootRealizationByGeometry::
 
   ODEBUG("Enter 12.0 ");
 
-  MAL_VECTOR_FILL(m_prev_Configuration,0.0);
-  MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
-  MAL_VECTOR_FILL(m_prev_Configuration2,0.0);
-  MAL_VECTOR_FILL(m_prev_Velocity,0.0);
-  MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
-  MAL_VECTOR_FILL(m_prev_Velocity2,0.0);
+  { for(unsigned int i=0;i<m_prev_Configuration.size();m_prev_Configuration[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Configuration1.size();m_prev_Configuration1[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Configuration2.size();m_prev_Configuration2[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Velocity.size();m_prev_Velocity[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Velocity1.size();m_prev_Velocity1[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Velocity2.size();m_prev_Velocity2[i++]=0.0);};
 
 }
 
@@ -335,14 +335,14 @@ ComAndFootRealizationByGeometry::~ComAndFootRealizationByGeometry()
 }
 
 bool ComAndFootRealizationByGeometry::
-    InitializationHumanoid(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
-                           MAL_VECTOR_TYPE(double) & lStartingWaistPose)
+InitializationHumanoid(Eigen::VectorXd &BodyAnglesIni,
+		       Eigen::Matrix<double, 6, 1> & lStartingWaistPose)
 {
   // For initialization we read the current value inside
   // the model. But we do not use it.
   // it is used to resize the temporary vector
   PinocchioRobot *aPR =  getPinocchioRobot();
-  MAL_VECTOR_TYPE(double) CurrentConfig = aPR->currentConfiguration();
+  Eigen::VectorXd CurrentConfig = aPR->currentConfiguration();
 
   // Set to zero the free floating root.
   if(lStartingWaistPose.size())
@@ -360,7 +360,7 @@ bool ComAndFootRealizationByGeometry::
   }
 
   // Initialize the configuration vector.
-  for(unsigned int i=0; i<MAL_VECTOR_SIZE(BodyAnglesIni); ++i)
+  for(unsigned int i=0; i<BodyAnglesIni.size(); ++i)
   {
     CurrentConfig[i+6] = BodyAnglesIni[i];
   }
@@ -389,7 +389,7 @@ bool ComAndFootRealizationByGeometry::
 
 bool ComAndFootRealizationByGeometry::
     InitializationFoot(PRFoot * aFoot,
-                       MAL_S3_VECTOR(& m_AnklePosition,double),
+                       Eigen::Vector3d &m_AnklePosition,
                        FootAbsolutePosition & InitFootPosition)
 {
   se3::JointIndex AnkleJoint = aFoot->associatedAnkle;
@@ -432,17 +432,17 @@ bool ComAndFootRealizationByGeometry::
   which is suppose to be constant for the all duration of the motion.
 */
 bool ComAndFootRealizationByGeometry::
-    InitializationCoM(MAL_VECTOR_TYPE(double) &BodyAnglesIni,
-                      MAL_S3_VECTOR_TYPE(double) & lStartingCOMPosition,
-                      MAL_VECTOR_TYPE(double) & lStartingWaistPose,
+    InitializationCoM(Eigen::VectorXd &BodyAnglesIni,
+                      Eigen::Vector3d & lStartingCOMPosition,
+                      Eigen::Matrix<double,6,1> & lStartingWaistPose,
                       FootAbsolutePosition & InitLeftFootPosition,
                       FootAbsolutePosition & InitRightFootPosition)
 {
   /* Initialize properly the left and right initial positions of the feet. */
   memset((char *)&InitLeftFootPosition,0,sizeof(FootAbsolutePosition));
   memset((char *)&InitRightFootPosition,0,sizeof(FootAbsolutePosition));
-  MAL_S3_VECTOR_CLEAR(lStartingCOMPosition);
-  MAL_VECTOR_FILL(lStartingWaistPose,0.0);
+  lStartingCOMPosition.setZero();
+  { for(unsigned int i=0;i<lStartingWaistPose.size();lStartingWaistPose[i++]=0.0);};
 
   // Compute the forward dynamics from the configuration vector provided by the user.
   // Initialize waist pose.
@@ -467,11 +467,11 @@ bool ComAndFootRealizationByGeometry::
          << " Ankle: " << m_AnklePositionLeft);
 
   // Compute the center of gravity between the ankles.
-  MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,0) =
+  m_COGInitialAnkles[0] =
       0.5 * (InitRightFootPosition.x + InitLeftFootPosition.x);
-  MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,1) =
+  m_COGInitialAnkles[1] =
       0.5 * (InitRightFootPosition.y + InitLeftFootPosition.y);
-  MAL_S3_VECTOR_ACCESS(m_COGInitialAnkles,2) =
+  m_COGInitialAnkles[2] =
       0.5 * (InitRightFootPosition.z + InitLeftFootPosition.z);
   ODEBUG("COGInitialAnkle : "<<m_COGInitialAnkles);
 
@@ -513,15 +513,15 @@ bool ComAndFootRealizationByGeometry::
   }
 
   // Initialize previous configuration vector
-  MAL_VECTOR_FILL(m_prev_Configuration,0.0);
-  MAL_VECTOR_FILL(m_prev_Configuration1,0.0);
-  MAL_VECTOR_FILL(m_prev_Configuration2,0.0);
-  MAL_VECTOR_FILL(m_prev_Velocity,0.0);
-  MAL_VECTOR_FILL(m_prev_Velocity1,0.0);
-  MAL_VECTOR_FILL(m_prev_Velocity2,0.0);
+  { for(unsigned int i=0;i<m_prev_Configuration.size();m_prev_Configuration[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Configuration1.size();m_prev_Configuration1[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Configuration2.size();m_prev_Configuration2[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Velocity.size();m_prev_Velocity[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Velocity1.size();m_prev_Velocity1[i++]=0.0);};
+  { for(unsigned int i=0;i<m_prev_Velocity2.size();m_prev_Velocity2[i++]=0.0);};
 
 
-  for(unsigned int i = 0 ; i < MAL_VECTOR_SIZE(BodyAnglesIni) ; ++i)
+  for(unsigned int i = 0 ; i < BodyAnglesIni.size() ; ++i)
   {
     m_prev_Configuration (i) = BodyAnglesIni(i);
     m_prev_Configuration1(i) = BodyAnglesIni(i);
@@ -620,7 +620,7 @@ bool ComAndFootRealizationByGeometry::
 	{
 	  m_UpperBodyPositionsBuffer[i].Joints.resize(UpperBodyJointNb);
 
-	  MAL_VECTOR_TYPE(double) currentConfiguration;
+	  Eigen::VectorXd currentConfiguration;
 	  currentConfiguration = getHumanoidDynamicRobot()->currentConfiguration();
 
 	  if (i==0)
@@ -657,21 +657,21 @@ bool ComAndFootRealizationByGeometry::
 }
 
 bool ComAndFootRealizationByGeometry::
-    KinematicsForOneLeg(MAL_S3x3_MATRIX_TYPE(double) & Body_R,
-                        MAL_S3_VECTOR_TYPE(double) & Body_P,
-                        MAL_VECTOR_TYPE(double) &aFoot,
-                        MAL_S3_VECTOR_TYPE(double) & lDt,
-                        MAL_VECTOR_TYPE(double) &  aCoMPosition,
-                        MAL_S3_VECTOR_TYPE(double) & ToTheHip,
+    KinematicsForOneLeg(Eigen::Matrix3d & Body_R,
+                        Eigen::Vector3d & Body_P,
+                        Eigen::VectorXd &aFoot,
+                        Eigen::Vector3d & lDt,
+                        Eigen::VectorXd &  aCoMPosition,
+                        Eigen::Vector3d & ToTheHip,
                         int LeftOrRight,
-                        MAL_VECTOR_TYPE(double) &lq,
+                        Eigen::VectorXd &lq,
                         int Stage)
 {
 
   // Foot Orientation
-  MAL_S3x3_MATRIX(Foot_R,double);
+  Eigen::Matrix3d Foot_R;
   // Foot position
-  MAL_S3_VECTOR(Foot_P,double);
+  Eigen::Vector3d Foot_P;
 
   // LEFT Foot.
   double FootPositiontheta = aFoot(3);
@@ -697,17 +697,17 @@ bool ComAndFootRealizationByGeometry::
   // position
   Foot_P(0) = aFoot(0);Foot_P(1) = aFoot(1); Foot_P(2) = aFoot(2);
 
-  MAL_S3_VECTOR(Foot_Shift,double);
+  Eigen::Vector3d Foot_Shift;
 
   se3::JointIndex Ankle = 0;
   if (LeftOrRight==-1)
   {
-    MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionRight);
+    Foot_Shift=Foot_R*m_AnklePositionRight;
     Ankle = getPinocchioRobot()->rightFoot()->associatedAnkle;
   }
   else if (LeftOrRight==1)
   {
-    MAL_S3x3_C_eq_A_by_B(Foot_Shift, Foot_R,m_AnklePositionLeft);
+    Foot_Shift=Foot_R*m_AnklePositionLeft;
     Ankle = getPinocchioRobot()->leftFoot()->associatedAnkle;
   }
 
@@ -738,21 +738,21 @@ bool ComAndFootRealizationByGeometry::
   ODEBUG4("lDt " << lDt,"DebugDataIK.dat");
 
   // Homogeneous matrix
-  matrix4d BodyPose,FootPose;
+  Eigen::Matrix4d BodyPose,FootPose;
   for(unsigned int i=0;i<3;i++)
   {
     for(unsigned int j=0;j<3;j++)
     {
-      MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,i,j) =
-          MAL_S3x3_MATRIX_ACCESS_I_J(Body_R,i,j);
-      MAL_S4x4_MATRIX_ACCESS_I_J(FootPose,i,j) =
-          MAL_S3x3_MATRIX_ACCESS_I_J(Foot_R,i,j);
+      BodyPose(i,j) =
+	Body_R(i,j);
+      FootPose(i,j) =
+	Foot_R(i,j);
     }
-    MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,i,3) = MAL_S3_VECTOR_ACCESS(Body_P,i);
-    MAL_S4x4_MATRIX_ACCESS_I_J(FootPose,i,3) = MAL_S3_VECTOR_ACCESS(Foot_P,i);
+    BodyPose(i,3) = Body_P(i);
+    FootPose(i,3) = Foot_P(i);
   }
-  MAL_S4x4_MATRIX_ACCESS_I_J(BodyPose,3,3) = 1.0 ;
-  MAL_S4x4_MATRIX_ACCESS_I_J(FootPose,3,3) = 1.0 ;
+  BodyPose(3,3) = 1.0 ;
+  FootPose(3,3) = 1.0 ;
 
   se3::JointIndex Waist = getPinocchioRobot()->waist();
 
@@ -765,22 +765,22 @@ bool ComAndFootRealizationByGeometry::
 }
 
 bool ComAndFootRealizationByGeometry::
-    KinematicsForTheLegs(MAL_VECTOR_TYPE(double) & aCoMPosition,
-                         MAL_VECTOR_TYPE(double) & aLeftFoot,
-                         MAL_VECTOR_TYPE(double) & aRightFoot,
+    KinematicsForTheLegs(Eigen::VectorXd & aCoMPosition,
+                         Eigen::VectorXd & aLeftFoot,
+                         Eigen::VectorXd & aRightFoot,
                          int Stage,
-                         MAL_VECTOR_TYPE(double) & ql,
-                         MAL_VECTOR_TYPE(double) & qr,
-                         MAL_S3_VECTOR_TYPE(double) & AbsoluteWaistPosition )
+                         Eigen::VectorXd & ql,
+                         Eigen::VectorXd & qr,
+                         Eigen::Vector3d & AbsoluteWaistPosition )
 
 {
 
   // Body attitude
-  MAL_S3x3_MATRIX_TYPE(double) Body_R;
+  Eigen::Matrix3d Body_R;
   // Body position
-  MAL_S3_VECTOR(Body_P,double);
+  Eigen::Vector3d Body_P;
   // To the hip
-  MAL_S3_VECTOR(ToTheHip,double);
+  Eigen::Vector3d ToTheHip;
 
   // Angles for the COM
   double COMtheta, COMomega;
@@ -817,7 +817,7 @@ bool ComAndFootRealizationByGeometry::
 
   // COM position
 
-  MAL_S3x3_C_eq_A_by_B(ToTheHip,Body_R , m_TranslationToTheLeftHip);
+  ToTheHip=Body_R*m_TranslationToTheLeftHip;
   Body_P(0) = aCoMPosition(0) + ToTheHip(0) ;
   Body_P(1) = aCoMPosition(1) + ToTheHip(1);
   Body_P(2) = aCoMPosition(2) + ToTheHip(2);
@@ -829,22 +829,22 @@ bool ComAndFootRealizationByGeometry::
      it is the final desired CoM */
   if (Stage==1)
   {
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 0,0) = CosTheta*CosOmega;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 0,1) = -SinTheta;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 0,2) = CosTheta*SinOmega;
+    m_FinalDesiredCOMPose(0,0) = CosTheta*CosOmega;
+    m_FinalDesiredCOMPose(0,1) = -SinTheta;
+    m_FinalDesiredCOMPose(0,2) = CosTheta*SinOmega;
 
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 1,0) = SinTheta*CosOmega;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 1,1) = CosTheta;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 1,2) = SinTheta*SinOmega;
+    m_FinalDesiredCOMPose(1,0) = SinTheta*CosOmega;
+    m_FinalDesiredCOMPose(1,1) = CosTheta;
+    m_FinalDesiredCOMPose(1,2) = SinTheta*SinOmega;
 
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 2,0) = -SinOmega;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 2,1)=  0;
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 2,2) = CosOmega;
+    m_FinalDesiredCOMPose(2,0) = -SinOmega;
+    m_FinalDesiredCOMPose(2,1)=  0;
+    m_FinalDesiredCOMPose(2,2) = CosOmega;
 
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 0,3) = aCoMPosition(0);
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 1,3) = aCoMPosition(1);
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 2,3) = aCoMPosition(2);
-    MAL_S4x4_MATRIX_ACCESS_I_J(m_FinalDesiredCOMPose, 3,3) = 1.0;
+    m_FinalDesiredCOMPose(0,3) = aCoMPosition(0);
+    m_FinalDesiredCOMPose(1,3) = aCoMPosition(1);
+    m_FinalDesiredCOMPose(2,3) = aCoMPosition(2);
+    m_FinalDesiredCOMPose(3,3) = 1.0;
 
     ODEBUG4(Body_P ,"DebugDataBodyP1.dat");
   }
@@ -860,7 +860,7 @@ bool ComAndFootRealizationByGeometry::
   KinematicsForOneLeg(Body_R,Body_P,aLeftFoot,m_DtLeft,aCoMPosition,ToTheHip,1,ql,Stage);
 
   // Kinematics for the right leg.
-  MAL_S3x3_C_eq_A_by_B(ToTheHip, Body_R, m_TranslationToTheRightHip);
+  ToTheHip=Body_R*m_TranslationToTheRightHip;
   Body_P(0) = aCoMPosition(0) + ToTheHip(0);
   Body_P(1) = aCoMPosition(1) + ToTheHip(1);
   Body_P(2) = aCoMPosition(2) + ToTheHip(2);
@@ -870,7 +870,7 @@ bool ComAndFootRealizationByGeometry::
 
   ODEBUG4("**************","DebugDataIK.dat");
   /* Should compute now the Waist Position */
-  MAL_S3x3_C_eq_A_by_B(m_ComAndWaistInRefFrame, Body_R, m_DiffBetweenComAndWaist);
+  m_ComAndWaistInRefFrame=Body_R*m_DiffBetweenComAndWaist;
 
   AbsoluteWaistPosition[0] = aCoMPosition(0) + m_ComAndWaistInRefFrame[0];
   AbsoluteWaistPosition[1] = aCoMPosition(1) + m_ComAndWaistInRefFrame[1];
@@ -880,20 +880,20 @@ bool ComAndFootRealizationByGeometry::
 }
 
 bool ComAndFootRealizationByGeometry::
-    ComputePostureForGivenCoMAndFeetPosture(MAL_VECTOR_TYPE(double) & aCoMPosition,
-                                            MAL_VECTOR_TYPE(double) & aCoMSpeed,
-                                            MAL_VECTOR_TYPE(double) & aCoMAcc,
-                                            MAL_VECTOR_TYPE(double) & aLeftFoot,
-                                            MAL_VECTOR_TYPE(double) & aRightFoot,
-                                            MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-                                            MAL_VECTOR_TYPE(double) & CurrentVelocity,
-                                            MAL_VECTOR_TYPE(double) & CurrentAcceleration,
+    ComputePostureForGivenCoMAndFeetPosture(Eigen::VectorXd & aCoMPosition,
+                                            Eigen::VectorXd & aCoMSpeed,
+                                            Eigen::VectorXd & aCoMAcc,
+                                            Eigen::VectorXd & aLeftFoot,
+                                            Eigen::VectorXd & aRightFoot,
+                                            Eigen::VectorXd & CurrentConfiguration,
+                                            Eigen::VectorXd & CurrentVelocity,
+                                            Eigen::VectorXd & CurrentAcceleration,
                                             int IterationNumber,
                                             int Stage)
 {
-  MAL_S3_VECTOR(AbsoluteWaistPosition,double);
-  MAL_VECTOR_DIM(lqr,double,6);
-  MAL_VECTOR_DIM(lql,double,6);
+  Eigen::Vector3d AbsoluteWaistPosition;
+  Eigen::VectorXd lqr(6);
+  Eigen::VectorXd lql(6);
 
   // Kinematics for the legs.
   KinematicsForTheLegs(aCoMPosition,
@@ -904,10 +904,10 @@ bool ComAndFootRealizationByGeometry::
                        lqr,
                        AbsoluteWaistPosition);
   /// NOW IT IS ABOUT THE UPPER BODY... ////
-  MAL_VECTOR_DIM(qArmr,double,6);
-  MAL_VECTOR_DIM(qArml,double,6);
+  Eigen::VectorXd qArmr(6);
+  Eigen::VectorXd qArml(6);
 
-  for(unsigned int i=0;i<MAL_VECTOR_SIZE(qArmr);i++)
+  for(unsigned int i=0;i<qArmr.size();i++)
   {
     qArmr[i] = 0.0;
     qArml[i] = 0.0;
@@ -915,10 +915,10 @@ bool ComAndFootRealizationByGeometry::
 
   if (GetStepStackHandler()->GetWalkMode()<3)
   {
-    MAL_VECTOR_DIM(lAbsoluteWaistPosition,double,6);
+    Eigen::VectorXd lAbsoluteWaistPosition(6);
     for(unsigned int i=0;i<3;i++)
     {
-      lAbsoluteWaistPosition(i) = MAL_S3_VECTOR_ACCESS(AbsoluteWaistPosition,i);
+      lAbsoluteWaistPosition(i) = AbsoluteWaistPosition[i];
       lAbsoluteWaistPosition(i+3) = aCoMPosition(i+3);
     }
     ODEBUG("AbsoluteWaistPosition:" << lAbsoluteWaistPosition  <<
@@ -976,23 +976,23 @@ bool ComAndFootRealizationByGeometry::
   for(int i=3;i<6;i++)
     CurrentConfiguration[i] = aCoMPosition(i)*M_PI/180.0;
 
-  for(unsigned int i=0;i<MAL_VECTOR_SIZE(lqr);i++)
+  for(unsigned int i=0;i<lqr.size();i++)
     CurrentConfiguration[m_RightLegIndexinConfiguration[i]] = lqr[i];
 
-  for(unsigned int i=0;i<MAL_VECTOR_SIZE(lql);i++)
+  for(unsigned int i=0;i<lql.size();i++)
     CurrentConfiguration[m_LeftLegIndexinConfiguration[i]] = lql[i];
 
-  for(unsigned int i=0;i<MAL_VECTOR_SIZE(qArmr);i++)
+  for(unsigned int i=0;i<qArmr.size();i++)
     CurrentConfiguration[m_RightArmIndexinConfiguration[i]] = qArmr[i];
 
-  for(unsigned int i=0;i<MAL_VECTOR_SIZE(qArml);i++)
+  for(unsigned int i=0;i<qArml.size();i++)
     CurrentConfiguration[m_LeftArmIndexinConfiguration[i]] = qArml[i];
 
   // Update the speed values.
   /* If this is the first call ( stage = 0)
      we should update the current stored values.  */
   /* Initialize the acceleration */
-  for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentAcceleration);i++)
+  for(unsigned int i=0;i<CurrentAcceleration.size();i++)
   {
     CurrentVelocity[i]=0.0;
     CurrentAcceleration[i] = 0.0;
@@ -1006,7 +1006,7 @@ bool ComAndFootRealizationByGeometry::
     if (IterationNumber>0)
     {
       /* Compute the speed */
-      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
+      for(unsigned int i=6;i<m_prev_Configuration.size();i++)
       {
         CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration[i])/ ldt;
         /* Keep the new value for the legs. */
@@ -1014,14 +1014,14 @@ bool ComAndFootRealizationByGeometry::
 
       if (IterationNumber>1)
       {
-        for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity);i++)
+        for(unsigned int i=6;i<m_prev_Velocity.size();i++)
           CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity[i])/ ldt;
       }
     }
     else
     {
       /* Compute the speed */
-      for(unsigned int i=0;i<MAL_VECTOR_SIZE(CurrentVelocity);i++)
+      for(unsigned int i=0;i<CurrentVelocity.size();i++)
       {
         CurrentVelocity[i] = 0.0;
         /* Keep the new value for the legs. */
@@ -1038,21 +1038,21 @@ bool ComAndFootRealizationByGeometry::
     if (IterationNumber>0)
     {
       /* Compute the speed */
-      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
+      for(unsigned int i=6;i<m_prev_Configuration1.size();i++)
       {
         CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration1[i])/ ldt;
         /* Keep the new value for the legs. */
       }
       if (IterationNumber>1)
       {
-        for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity1);i++)
+        for(unsigned int i=6;i<m_prev_Velocity1.size();i++)
           CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity1[i])/ ldt;
       }
     }
     else
     {
       /* Compute the speed */
-      for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_prev_Configuration1);i++)
+      for(unsigned int i=0;i<m_prev_Configuration1.size();i++)
       {
         CurrentVelocity[i] = 0.0;
         /* Keep the new value for the legs. */
@@ -1068,21 +1068,21 @@ bool ComAndFootRealizationByGeometry::
     if (IterationNumber>0)
     {
       /* Compute the speed */
-      for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Configuration2);i++)
+      for(unsigned int i=6;i<m_prev_Configuration2.size();i++)
       {
         CurrentVelocity[i] = (CurrentConfiguration[i] - m_prev_Configuration2[i])/ getSamplingPeriod();
         /* Keep the new value for the legs. */
       }
       if (IterationNumber>1)
       {
-        for(unsigned int i=6;i<MAL_VECTOR_SIZE(m_prev_Velocity2);i++)
+        for(unsigned int i=6;i<m_prev_Velocity2.size();i++)
           CurrentAcceleration[i] = (CurrentVelocity[i] - m_prev_Velocity2[i])/ ldt;
       }
     }
     else
     {
       /* Compute the speed */
-      for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_prev_Configuration2);i++)
+      for(unsigned int i=0;i<m_prev_Configuration2.size();i++)
       {
         CurrentVelocity[i] = 0.0;
         /* Keep the new value for the legs. */
@@ -1093,7 +1093,7 @@ bool ComAndFootRealizationByGeometry::
     m_prev_Velocity2 = CurrentVelocity;
   }
 
-  MAL_S3_VECTOR(waistCom,double);
+  Eigen::Vector3d waistCom;
   for(int i=0;i<3;i++)
     waistCom(i) = aCoMPosition(i) - AbsoluteWaistPosition(i) ;
 
@@ -1108,7 +1108,7 @@ bool ComAndFootRealizationByGeometry::
 
 
   // (omega x waist-com) x omega = waist-com ( omega . omega ) - omega ( omega . waist-com )
-  MAL_S3_VECTOR(coriolis,double);
+  Eigen::Vector3d coriolis;
   double omega_dot_omega = aCoMSpeed(3)*aCoMSpeed(3) +
                            aCoMSpeed(4)*aCoMSpeed(4) +
                            aCoMSpeed(5)*aCoMSpeed(5) ;
@@ -1155,8 +1155,8 @@ bool ComAndFootRealizationByGeometry::
 }
 
 int ComAndFootRealizationByGeometry::
-    EvaluateStartingCoM(MAL_VECTOR(&BodyAngles,double),
-                        MAL_S3_VECTOR(&aStartingCOMPosition,double),
+    EvaluateStartingCoM(Eigen::VectorXd &BodyAngles,
+                        Eigen::Vector3d &aStartingCOMPosition,
                         FootAbsolutePosition & InitLeftFootPosition,
                         FootAbsolutePosition & InitRightFootPosition)
 {
@@ -1175,13 +1175,13 @@ int ComAndFootRealizationByGeometry::
 }
 
 int ComAndFootRealizationByGeometry::
-    EvaluateStartingCoM(MAL_VECTOR(&BodyAngles,double),
-                        MAL_S3_VECTOR(&aStartingCOMPosition,double),
-                        MAL_VECTOR(&aWaistPose,double),
+    EvaluateStartingCoM(Eigen::VectorXd &BodyAngles,
+                        Eigen::Vector3d &aStartingCOMPosition,
+                        Eigen::Matrix<double, 6, 1> &aWaistPose,
                         FootAbsolutePosition & InitLeftFootPosition,
                         FootAbsolutePosition & InitRightFootPosition)
 {
-  MAL_VECTOR(WaistPose,double);
+  Eigen::VectorXd WaistPose;
   InitializationCoM(BodyAngles,
                     m_StartingCOMPosition,
                     aWaistPose,
@@ -1195,24 +1195,25 @@ int ComAndFootRealizationByGeometry::
 }
 
 int ComAndFootRealizationByGeometry::
-    EvaluateCOMForStartingPosition( MAL_VECTOR( &BodyAngles,double),
+    EvaluateCOMForStartingPosition( Eigen::VectorXd &BodyAngles,
                                     double , // omega,
                                     double , // theta,
-                                    MAL_S3_VECTOR( &lCOMPosition,double),
+                                    Eigen::Vector3d &lCOMPosition,
                                     FootAbsolutePosition & InitLeftFootPosition,
                                     FootAbsolutePosition & InitRightFootPosition)
 {
-  MAL_VECTOR(lWaistPose,double);
+  Eigen::Matrix<double, 6, 1> lWaistPose;
   return InitializationCoM(BodyAngles,
                            lCOMPosition,
                            lWaistPose,
-                           InitLeftFootPosition, InitRightFootPosition);
+                           InitLeftFootPosition,
+			   InitRightFootPosition);
 
 }
 
 
 void ComAndFootRealizationByGeometry::
-    GetCurrentPositionofWaistInCOMFrame(MAL_VECTOR_TYPE(double) &CurPosWICF_homogeneous)
+    GetCurrentPositionofWaistInCOMFrame(Eigen::VectorXd &CurPosWICF_homogeneous)
 {
   for(int i=0;i<3;i++)
     CurPosWICF_homogeneous[i] = m_DiffBetweenComAndWaist[i];
@@ -1221,11 +1222,11 @@ void ComAndFootRealizationByGeometry::
 }
 
 void ComAndFootRealizationByGeometry::
-    ComputeUpperBodyHeuristicForNormalWalking(MAL_VECTOR_TYPE(double) & qArmr,
-                                              MAL_VECTOR_TYPE(double) & qArml,
-                                              MAL_VECTOR_TYPE(double) & aCOMPosition,
-                                              MAL_VECTOR_TYPE(double) & RFP,
-                                              MAL_VECTOR_TYPE(double) & LFP)
+    ComputeUpperBodyHeuristicForNormalWalking(Eigen::VectorXd & qArmr,
+                                              Eigen::VectorXd & qArml,
+                                              Eigen::VectorXd & aCOMPosition,
+                                              Eigen::VectorXd & RFP,
+                                              Eigen::VectorXd & LFP)
 {
 
   ODEBUG4("aCOMPosition:" << aCOMPosition << endl <<
@@ -1263,13 +1264,13 @@ void ComAndFootRealizationByGeometry::
          " "    << m_Xmax );
   // Compute angles using inverse kinematics and the computed hand position.
 
-  matrix4d jointRootPosition,jointEndPosition;
-  MAL_S4x4_MATRIX_SET_IDENTITY(jointRootPosition);
-  MAL_S4x4_MATRIX_SET_IDENTITY(jointEndPosition);
+  Eigen::Matrix4d jointRootPosition,jointEndPosition;
+  jointRootPosition.setIdentity();
+  jointEndPosition.setIdentity();
 
-  MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,0,3) =
+  jointEndPosition(0,3) =
       TempALeft * m_GainFactor / 0.2;
-  MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,2,3) = m_ZARM;
+  jointEndPosition(2,3) = m_ZARM;
 
   getPinocchioRobot()->ComputeSpecializedInverseKinematics(
         m_LeftShoulder,
@@ -1281,8 +1282,8 @@ void ComAndFootRealizationByGeometry::
   ODEBUG4( "IK Left arm p:" << qArml(0)<< " " <<  qArml(1)  << " " << qArml(2)
            << " " << qArml(3) << "  " << qArml(4) << " " << qArml(5), "DebugDataIKArms.txt" );
 
-  MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,0,3) = TempARight;
-  MAL_S4x4_MATRIX_ACCESS_I_J(jointEndPosition,2,3) = m_ZARM;
+  jointEndPosition(0,3) = TempARight;
+  jointEndPosition(2,3) = m_ZARM;
 
   getPinocchioRobot()->ComputeSpecializedInverseKinematics(
         m_RightShoulder,
@@ -1305,11 +1306,11 @@ bool ComAndFootRealizationByGeometry::
   ComAndFootRealization::setPinocchioRobot(aPinocchioRobot);
   PinocchioRobot *aPR =  aPinocchioRobot;
 
-  MAL_VECTOR_RESIZE(m_prev_Configuration,aPR->numberDof());
-  MAL_VECTOR_RESIZE(m_prev_Configuration1,aPR->numberDof());
-  MAL_VECTOR_RESIZE(m_prev_Configuration2,aPR->numberDof());
+  m_prev_Configuration.resize(aPR->numberDof());
+  m_prev_Configuration1.resize(aPR->numberDof());
+  m_prev_Configuration2.resize(aPR->numberDof());
 
-  for(unsigned int i=0;i<MAL_VECTOR_SIZE(m_prev_Configuration);i++)
+  for(unsigned int i=0;i<m_prev_Configuration.size();i++)
   {
     m_prev_Configuration[i] = 0.0;
     m_prev_Configuration1[i] = 0.0;
@@ -1351,20 +1352,20 @@ void ComAndFootRealizationByGeometry::
   }
 }
 
-MAL_S4x4_MATRIX_TYPE(double) ComAndFootRealizationByGeometry::
+Eigen::Matrix4d ComAndFootRealizationByGeometry::
     GetCurrentPositionofWaistInCOMFrame()
 {
-  MAL_S4x4_MATRIX_TYPE(double) P;
+  Eigen::Matrix4d P;
 
-  MAL_S4x4_MATRIX_SET_IDENTITY(P);
-  MAL_S4x4_MATRIX_ACCESS_I_J(P, 0,3) = m_DiffBetweenComAndWaist[0];
-  MAL_S4x4_MATRIX_ACCESS_I_J(P, 1,3) = m_DiffBetweenComAndWaist[1];
-  MAL_S4x4_MATRIX_ACCESS_I_J(P, 2,3) = m_DiffBetweenComAndWaist[2];
+  P.setIdentity();
+  P(0,3) = m_DiffBetweenComAndWaist[0];
+  P(1,3) = m_DiffBetweenComAndWaist[1];
+  P(2,3) = m_DiffBetweenComAndWaist[2];
 
   return P;
 }
 
-MAL_S3_VECTOR_TYPE(double) ComAndFootRealizationByGeometry::GetCOGInitialAnkles()
+Eigen::Vector3d ComAndFootRealizationByGeometry::GetCOGInitialAnkles()
 {
 
   return m_COGInitialAnkles;
@@ -1377,7 +1378,7 @@ ostream& PatternGeneratorJRL::operator<<(ostream &os,const ComAndFootRealization
   os << "The Simple Plugin Manager is :\n" ;
   os << SPM << endl ;
 
-  //  MAL_S3_VECTOR_TYPE(double) COGInitialAnkles = obj.GetCOGInitialAnkles() ;
+  //  Eigen::Vector3d COGInitialAnkles = obj.GetCOGInitialAnkles() ;
   //  os << "The initial COG of ankles is :\n" ;
   //  os << COGInitialAnkles(0,0) << endl
   //  << COGInitialAnkles(1,0) << endl
@@ -1391,16 +1392,16 @@ ostream& PatternGeneratorJRL::operator<<(ostream &os,const ComAndFootRealization
   os << "The sampling period is :\n" ;
   os << SamplingPeriod << endl ;
 
-  //  MAL_S4x4_MATRIX_TYPE(double) P = obj.GetCurrentPositionofWaistInCOMFrame();
+  //  Eigen::Matrix4d P = obj.GetCurrentPositionofWaistInCOMFrame();
   //  os<< "The current position of waist in COM frame is :\n" ;
-  //      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 0,0) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 0,1) << " "
-  //      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 0,2) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 0,3) << endl
-  //      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 1,0) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 1,1) << " "
-  //      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 1,2) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 1,3) << endl
-  //      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 2,0) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 2,1) << " "
-  //      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 2,2) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 2,3) << endl
-  //      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,0) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,1) << " "
-  //      << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,2) << " " << MAL_S4x4_MATRIX_ACCESS_I_J(P, 3,3) << endl ;
+  //      << P[0,0]) << " " << P[0,1]) << " "
+  //      << P[0,2]) << " " << P[0,3]) << endl
+  //      << P[1,0]) << " " << P[1,1]) << " "
+  //      << P[1,2]) << " " << P[1,3]) << endl
+  //      << P[2,0]) << " " << P[2,1]) << " "
+  //      << P[2,2]) << " " << P[2,3]) << endl
+  //      << P[3,0]) << " " << P[3,1]) << " "
+  //      << P[3,2]) << " " << P[3,3]) << endl ;
 
   PinocchioRobot * Robot = obj.getPinocchioRobot();
   os << "The PinocchioRobot is at the adress :\n" << Robot << endl ;

@@ -183,9 +183,9 @@ namespace PatternGeneratorJRL
       double X, Y, Yaw;
 
       /// \brief Reference vectors
-      Eigen::VectorXd Xvec;
-      Eigen::VectorXd Yvec;
-      Eigen::VectorXd Yawvec;
+      Eigen::VectorXd X_vec;
+      Eigen::VectorXd Y_vec;
+      Eigen::VectorXd Yaw_vec;
 
       frame_t();
       frame_t(const frame_t &);
@@ -277,7 +277,7 @@ namespace PatternGeneratorJRL
     };
     struct coordinate_t D;
 
-    Eigen::SparseMatrix<double> Dc_vec;
+    Eigen::VectorXd Dc_vec;
 
     /// \brief Classifier
     int type;

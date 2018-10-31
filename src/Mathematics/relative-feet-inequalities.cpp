@@ -268,7 +268,7 @@ RelativeFeetInequalities::compute_linear_system ( convex_hull_t & ConvexHull,
     const support_state_t & PrwSupport ) const
 {
   double dx,dy,dc,x1,y1,x2,y2;
-  unsigned nbRows = ConvexHull.X_vec.size();
+  unsigned int nbRows = (unsigned int)ConvexHull.X_vec.size();
 
   double sign;
   if( PrwSupport.Foot == LEFT )

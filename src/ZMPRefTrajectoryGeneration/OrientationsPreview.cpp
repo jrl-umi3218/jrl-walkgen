@@ -45,7 +45,7 @@ OrientationsPreview::OrientationsPreview(PinocchioRobot *aPR)
   uLimitLeftHipYaw_ = 0.0 ;
   if(aPR->Model()->existJointName("LLEG_JOINT0"))
   {
-    leftHipIndex = aPR->Model()->getJointId("LLEG_JOINT0");
+    leftHipIndex = (unsigned int)(aPR->Model()->getJointId("LLEG_JOINT0"));
     lLimitLeftHipYaw_  = aPR->Model()->lowerPositionLimit(leftHipIndex);//-30.0/180.0*M_PI;
     uLimitLeftHipYaw_  = aPR->Model()->upperPositionLimit(leftHipIndex);//45.0/180.0*M_PI;
   }
@@ -60,7 +60,7 @@ OrientationsPreview::OrientationsPreview(PinocchioRobot *aPR)
   uLimitRightHipYaw_ = 0.0 ;
   if(aPR->Model()->existJointName("RLEG_JOINT0"))
   {
-    rightHipIndex = aPR->Model()->getJointId("RLEG_JOINT0");
+    rightHipIndex = (unsigned int)(aPR->Model()->getJointId("RLEG_JOINT0"));
     lLimitRightHipYaw_ = aPR->Model()->lowerPositionLimit(rightHipIndex);//-30.0/180.0*M_PI;
     uLimitRightHipYaw_ = aPR->Model()->upperPositionLimit(rightHipIndex);//45.0/180.0*M_PI;
   }

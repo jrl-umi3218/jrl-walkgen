@@ -76,7 +76,6 @@ QPProblem::QPProblem():
   eps_ = 1e-8;
 
   lastSolution_.resize(1,1);
-  lastSolution_.empty();
 
   istate_       = 0x0;
   kx_ 	        = 0x0;
@@ -338,10 +337,10 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
 
     if (tests==CTR || tests==ALL){
         // Check if initial solution respect all the constraints
-        boost_ublas::matrix<double> DU(NbConstraints_, NbVariables_);
-        boost_ublas::vector<double> XX(NbVariables_);
-        boost_ublas::vector<double> DS(NbConstraints_);
-        boost_ublas::vector<double> tmp;
+        Eigen::MatrixXd DU(NbConstraints_, NbVariables_);
+        Eigen::VectorXd XX(NbVariables_);
+        Eigen::VectorXd DS(NbConstraints_);
+        Eigen::VectorXd tmp;
         for(unsigned i=0;i<NbConstraints_;++i){
             for(unsigned j=0;j<NbVariables_;++j){
                 DU(i,j)=DU_.Array_[i+DU_.NbRows_*j];
@@ -408,7 +407,7 @@ QPProblem::solve( solver_e Solver, solution_t & Result, const tests_e & tests )
 
 
 void
-QPProblem::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
+QPProblem::add_term_to( qp_element_e Type, const Eigen::MatrixXd &Mat,
     unsigned int row,  unsigned int col )
 {
 
@@ -418,13 +417,13 @@ QPProblem::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
   {
   case MATRIX_Q:
     Array_p = &Q_;
-    NbVariables_ = (col+Mat.size2()>NbVariables_) ? col+Mat.size2() : NbVariables_;
+    NbVariables_ = (unsigned int)((col+Mat.cols()>NbVariables_) ? col+Mat.cols() : NbVariables_);
     break;
 
   case MATRIX_DU:
     Array_p = &DU_;
-    NbConstraints_ = ( row+Mat.size1() > NbConstraints_ ) ? row+Mat.size1() : NbConstraints_;
-    NbVariables_ = ( col+Mat.size2() > NbVariables_ ) ? col+Mat.size2() : NbVariables_;
+    NbConstraints_ = (unsigned int)(( row+Mat.rows() > NbConstraints_ ) ? row+Mat.rows() : NbConstraints_);
+    NbVariables_ = (unsigned int)(( col+Mat.cols() > NbVariables_ ) ? col+Mat.cols() : NbVariables_);
     row++;//The first rows of DU,DS are empty
     break;
 
@@ -436,7 +435,7 @@ QPProblem::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
     break;
   case VECTOR_DS:
     Array_p = &DS_;
-    NbConstraints_ = (row+Mat.size1()>NbConstraints_) ? row+Mat.size1() : NbConstraints_;
+    NbConstraints_ = (unsigned int)( (row+Mat.rows()>NbConstraints_) ? row+Mat.rows() : NbConstraints_);
     row++;//The first rows of DU,DS are empty
     break;
   }
@@ -462,28 +461,22 @@ QPProblem::add_term_to( qp_element_e Type, const MAL_MATRIX (&Mat, double),
       war_.resize( warsize, 1, true );
 
   double * p = Array_p->Array_;
-  boost_ublas::matrix<double>::const_iterator1 row_it = Mat.begin1();
-  boost_ublas::matrix<double>::const_iterator2 col_it = Mat.begin2();
   double * p_it = &p[row+(col)*Array_p->NbRows_];
-  for( unsigned j = 0; j < Mat.size2(); j++ )
+  for( unsigned j = 0; j < Mat.cols(); j++ )
     {
-      row_it = col_it.begin();
       p_it = &p[row+(col+j)*Array_p->NbRows_];
-      for( unsigned i = 0; i < Mat.size1(); i++ )
+      for( unsigned i = 0; i < Mat.rows(); i++ )
         {
-          *p_it += *row_it;
+          *p_it += Mat(i,j);
           ++p_it;
-          ++row_it;
         }
-
-      ++col_it;
     }
 
 }
 
 
 void
-QPProblem::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
+QPProblem::add_term_to( qp_element_e Type, const Eigen::VectorXd &Vec,
     unsigned row, unsigned col )
 {
 
@@ -493,22 +486,22 @@ QPProblem::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
   {
   case VECTOR_D:
     Array_p = &D_;
-    NbVariables_ = (row+Vec.size()>NbVariables_) ? row+Vec.size() : NbVariables_;
+    NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() : NbVariables_);
     break;
 
   case VECTOR_XL:
     Array_p = &XL_;
-    NbVariables_ = (row+Vec.size()>NbVariables_) ? row+Vec.size() : NbVariables_;
+    NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() : NbVariables_);
     break;
 
   case VECTOR_XU:
     Array_p = &XU_;
-    NbVariables_ = (row+Vec.size()>NbVariables_) ? row+Vec.size() : NbVariables_;
+    NbVariables_ = (unsigned int)((row+Vec.size()>NbVariables_) ? row+Vec.size() : NbVariables_);
     break;
 
   case VECTOR_DS:
     Array_p = &DS_;
-    NbConstraints_ = (row+Vec.size()>NbConstraints_) ? row+Vec.size() : NbConstraints_;
+    NbConstraints_ = (unsigned int)((row+Vec.size()>NbConstraints_) ? row+Vec.size() : NbConstraints_);
     row++;//The first rows of DU,DS are empty
     break;
 
@@ -523,14 +516,12 @@ QPProblem::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
   if( (NbVariables_ > D_.NbRows_ ) && (NbVariables_>0) )
       resize_all();
 
-  boost_ublas::vector<double>::const_iterator vec_it = Vec.begin();
   double * p_it = &Array_p->Array_[row+col*Array_p->NbRows_];
   if(Type == MATRIX_DU)
     {
       for( unsigned i = 0; i < Vec.size(); i++ )
         {
-          *p_it += *vec_it;
-          ++vec_it;
+          *p_it += Vec(i);
           ++p_it;
       }
   }
@@ -538,8 +529,7 @@ QPProblem::add_term_to( qp_element_e Type, const MAL_VECTOR (&Vec, double),
     {
       for( unsigned i = 0; i < Vec.size(); i++ )
         {
-          *p_it += *vec_it;
-          ++vec_it;
+          *p_it += Vec(i);
           ++p_it;
       }
   }

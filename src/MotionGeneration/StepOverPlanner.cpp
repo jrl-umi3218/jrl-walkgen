@@ -45,7 +45,7 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
   m_PR = aPR;
   // Get information specific to the humanoid.
   double lWidth,lHeight;
-  vector3d AnklePosition;
+  Eigen::Vector3d AnklePosition;
 
   if (m_PR!=0)
     {
@@ -141,7 +141,7 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
   Angle1=60.0/180.0*M_PI;
   Angle2=30.0/180.0*M_PI;
 	
-  MAL_MATRIX_RESIZE(m_LegLayoutPoint,3,7);
+  m_LegLayoutPoint.resize(3,7);
 	
   //point1	
   m_LegLayoutPoint(0,0)= RadiusKnee*cos(Angle1);
@@ -362,34 +362,34 @@ void StepOverPlanner::DoubleSupportFeasibility()
   int EvaluationNumber = 10;
   double IncrementStepLenght, IncrementCOMHeight;
 
-  MAL_S3x3_MATRIX(Body_R,double);
-  MAL_S3_VECTOR(Body_P,double);
-  MAL_S3x3_MATRIX(Foot_R,double); 
-  MAL_S3_VECTOR(Foot_P,double);
+  Eigen::Matrix3d Body_R;
+  Eigen::Vector3d Body_P;
+  Eigen::Matrix3d Foot_R; 
+  Eigen::Vector3d Foot_P;
   double c,s,co,so;
-  MAL_S3_VECTOR(ToTheHip,double);
-  MAL_VECTOR_DIM(LeftLegAngles,double,6);
-  MAL_VECTOR_DIM(RightLegAngles,double,6); 
+  Eigen::Vector3d ToTheHip;
+  Eigen::Matrix<double,6,1> LeftLegAngles;
+  Eigen::Matrix<double,6,1> RightLegAngles; 
 	
 
 	
-  MAL_S3_VECTOR(AnkleBeforeObst,double);
-  MAL_S3_VECTOR(AnkleAfterObst,double);
-  MAL_S3_VECTOR(TempCOMState,double);
-  MAL_MATRIX_DIM(Temp,double,3,3);
+  Eigen::Vector3d AnkleBeforeObst;
+  Eigen::Vector3d AnkleAfterObst;
+  Eigen::Vector3d TempCOMState;
+  Eigen::Matrix<double,3,3> Temp;;
 	
   COMState aCOMState;
 
-  MAL_S3_VECTOR(PointOnLeg,double);
-  MAL_S3_VECTOR(AbsCoord,double);
-  MAL_S3_VECTOR(AbsCoord1,double);
-  MAL_S3_VECTOR(AbsCoord2,double);
-  MAL_MATRIX_DIM(LegAngles,double,6,1);
-  MAL_S3x3_MATRIX(WaistRot,double);
-  MAL_S3_VECTOR(WaistPos,double);
-  MAL_S3_VECTOR(ObstFrameCoord,double);
-  MAL_S3_VECTOR(ObstFrameCoord1,double);
-  MAL_S3_VECTOR(ObstFrameCoord2,double);
+  Eigen::Vector3d PointOnLeg;
+  Eigen::Vector3d AbsCoord;
+  Eigen::Vector3d AbsCoord1;
+  Eigen::Vector3d AbsCoord2;
+  Eigen::Matrix<double,6,1> LegAngles;;
+  Eigen::Matrix3d WaistRot;
+  Eigen::Vector3d WaistPos;
+  Eigen::Vector3d ObstFrameCoord;
+  Eigen::Vector3d ObstFrameCoord1;
+  Eigen::Vector3d ObstFrameCoord2;
 	
   bool CollisionStatus, FinalCollisionStatus;
 	
@@ -445,7 +445,7 @@ void StepOverPlanner::DoubleSupportFeasibility()
 	  		
 
 	  //position left foot in front of the obstacle to world frame coordinates
-	  Foot_P = m_ObstaclePosition + MAL_S3x3_RET_A_by_B(m_ObstacleRot, AnkleBeforeObst);
+	  Foot_P = m_ObstaclePosition + m_ObstacleRot*AnkleBeforeObst;
 
 	
 	  TempCOMState(0) = AnkleBeforeObst(0)+ DoubleSupportCOMPosFactor * StepOverStepLenght;
@@ -453,7 +453,7 @@ void StepOverPlanner::DoubleSupportFeasibility()
 	  TempCOMState(2) = StepOverCOMHeight;
 
 	  //to worldframe 
-	  TempCOMState = m_ObstaclePosition + MAL_S3x3_RET_A_by_B(m_ObstacleRot , TempCOMState);
+	  TempCOMState = m_ObstaclePosition + m_ObstacleRot*TempCOMState;
 			
 	  aCOMState.x[0] = TempCOMState(0);
 	  aCOMState.y[0] = TempCOMState(1);
@@ -471,7 +471,7 @@ void StepOverPlanner::DoubleSupportFeasibility()
 	  Body_R(2,0) = 0;       Body_R(2,1) = 0;        Body_R(2,2) = 1;
 		
 	  // COM position
-	  MAL_S3x3_C_eq_A_by_B(ToTheHip,Body_R, m_StaticToTheLeftHip);
+	  ToTheHip=Body_R*m_StaticToTheLeftHip;
 	  Body_P(0) = aCOMState.x[0] + ToTheHip(0) ;
 	  Body_P(1) = aCOMState.y[0] + ToTheHip(1);
 	  Body_P(2) = aCOMState.z[0] + ToTheHip(2);
@@ -518,11 +518,11 @@ void StepOverPlanner::DoubleSupportFeasibility()
 	  Foot_R(2,0) =  -so;       Foot_R(2,1) =  0;       Foot_R(2,2) = co;
 			
 	  // position
-	  Foot_P = m_ObstaclePosition + MAL_S3x3_RET_A_by_B(m_ObstacleRot, AnkleAfterObst);
+	  Foot_P = m_ObstaclePosition + m_ObstacleRot*AnkleAfterObst;
 
 	
 	  // COM position
-	  MAL_S3x3_C_eq_A_by_B(ToTheHip,Body_R, m_StaticToTheRightHip);
+	  ToTheHip=Body_R*m_StaticToTheRightHip;
 	  Body_P(0) = aCOMState.x[0] + ToTheHip(0) ;
 	  Body_P(1) = aCOMState.y[0] + ToTheHip(1);
 	  Body_P(2) = aCOMState.z[0] + ToTheHip(2);
@@ -755,10 +755,10 @@ void StepOverPlanner::PolyPlanner(deque<COMState> &aCOMBuffer,
 void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOverFootBuffer)
 {
  
-  MAL_VECTOR_DIM(aBoundCondZ,double,8);
-  MAL_VECTOR_DIM(aBoundCondY,double,8);
-  MAL_VECTOR_DIM(aBoundCondX,double,8);
-  MAL_VECTOR_DIM(aBoundCondOmega,double,8); 	
+  Eigen::Matrix<double,8,1> aBoundCondZ;
+  Eigen::Matrix<double,8,1> aBoundCondY;
+  Eigen::Matrix<double,8,1> aBoundCondX;
+  Eigen::Matrix<double,8,1> aBoundCondOmega; 	
 	
   double StepTime;
   double StepLenght;
@@ -814,9 +814,9 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
   aTimeDistrModulated[1]=aTimeDistr[1]-LiftOffTime;
   aTimeDistrModulated[2]=aTimeDistr[2]-2.0*LiftOffTime;
 
-  MAL_VECTOR_DIM(ZfootPos,double,5);
-  MAL_VECTOR_DIM(TimeIntervalsZ,double,5);
-  MAL_VECTOR_DIM(ZfootSpeedBound,double,2) ;
+  Eigen::Matrix<double,5,1> ZfootPos;
+  Eigen::Matrix<double,5,1> TimeIntervalsZ;
+  Eigen::Matrix<double,2,1> ZfootSpeedBound ;
   double PreviousSpeedZ,EndSpeedZ,SpeedAccZ,IntermediateZAcc;
   vector<double> SpeedWeightZ;
 
@@ -830,8 +830,8 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
   NumberIntermediate2 = 20;
 	
 	
-  MAL_VECTOR_RESIZE(ZfootPos,2+ 3*NumberIntermediate);
-  MAL_VECTOR_RESIZE(TimeIntervalsZ,2+3*NumberIntermediate);
+  ZfootPos.resize(2+ 3*NumberIntermediate);
+  TimeIntervalsZ.resize(2+3*NumberIntermediate);
   SpeedWeightZ.resize(NumberIntermediate);
 	
   ZfootPos(0) = 0.0;
@@ -921,9 +921,9 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
   m_ClampedCubicSplineStepOverFootZ->SetParameters(ZfootPos,TimeIntervalsZ,ZfootSpeedBound);
  
 
-  MAL_VECTOR_DIM(XfootPos,double,4);
-  MAL_VECTOR_DIM(TimeIntervalsX,double,4);
-  MAL_VECTOR_DIM(XfootSpeedBound,double,2) ;
+  Eigen::Matrix<double,4,1> XfootPos;
+  Eigen::Matrix<double,4,1> TimeIntervalsX;
+  Eigen::Matrix<double,2,1> XfootSpeedBound ;
        
        
   XfootPos(0) = 0.0;
@@ -941,9 +941,9 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
 
   m_ClampedCubicSplineStepOverFootX->SetParameters(XfootPos,TimeIntervalsX,XfootSpeedBound);
   
-  MAL_VECTOR_DIM(OmegafootPos,double,4);
-  MAL_VECTOR_DIM(TimeIntervalsOmega,double,4);
-  MAL_VECTOR_DIM(OmegafootSpeedBound,double,2);
+  Eigen::Matrix<double,4,1> OmegafootPos;
+  Eigen::Matrix<double,4,1> TimeIntervalsOmega;
+  Eigen::Matrix<double,2,1> OmegafootSpeedBound;
 
   OmegafootPos(0) = 0.0;
   OmegafootPos(1) = OmegaImpact*1.0/3.0;
@@ -962,9 +962,9 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
 						       TimeIntervalsOmega,
 						       OmegafootSpeedBound);
  
-  MAL_VECTOR_DIM(OmegaImpactfootPos,double,2);
-  MAL_VECTOR_DIM(TimeIntervalsOmegaImpact,double,2);
-  MAL_VECTOR_DIM(OmegaImpactfootSpeedBound,double,2);
+  Eigen::Matrix<double,2,1> OmegaImpactfootPos;
+  Eigen::Matrix<double,2,1> TimeIntervalsOmegaImpact;
+  Eigen::Matrix<double,2,1> OmegaImpactfootSpeedBound;
 
   OmegaImpactfootPos(0) = OmegaImpact;
   OmegaImpactfootPos(1) = 0.0;
@@ -982,7 +982,7 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
 
 
   vector<double> aTimeDistrModulatedYSide;
-  MAL_VECTOR_DIM(aBoundCondYSide,double,5);
+  Eigen::Matrix<double,5,1> aBoundCondYSide;
 	 
   aTimeDistrModulatedYSide.resize(2);
 
@@ -996,9 +996,9 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
 		
 	
 
-  MAL_VECTOR_DIM(YfootPos,double,4);
-  MAL_VECTOR_DIM(TimeIntervalsY,double,4);
-  MAL_VECTOR_DIM(YfootSpeedBound,double,2) ;
+  Eigen::Matrix<double,4,1> YfootPos;
+  Eigen::Matrix<double,4,1> TimeIntervalsY;
+  Eigen::Matrix<double,2,1> YfootSpeedBound ;
 
   {
     if (m_ObstacleParameters.h> 0.20)
@@ -1068,10 +1068,10 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
 void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOverFootBuffer)
 {
  
-  MAL_VECTOR_DIM(aBoundCondZ,double,8);
-  MAL_VECTOR_DIM(aBoundCondY,double,8);
-  MAL_VECTOR_DIM(aBoundCondX,double,8);
-  MAL_VECTOR_DIM(aBoundCondOmega,double,8);
+  Eigen::Matrix<double,8,1> aBoundCondZ;
+  Eigen::Matrix<double,8,1> aBoundCondY;
+  Eigen::Matrix<double,8,1> aBoundCondX;
+  Eigen::Matrix<double,8,1> aBoundCondOmega;
 	
   double StepTime;
   double StepLenght;
@@ -1120,9 +1120,9 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
   aTimeDistrModulated[1]=aTimeDistr[1]-LiftOffTime;
   aTimeDistrModulated[2]=aTimeDistr[2]-2.0*LiftOffTime;
 
-  MAL_VECTOR_DIM(ZfootPos,double,10);
-  MAL_VECTOR_DIM(TimeIntervalsZ,double,10);
-  MAL_VECTOR_DIM(ZfootSpeedBound,double,2);
+  Eigen::Matrix<double,10,1> ZfootPos;
+  Eigen::Matrix<double,10,1> TimeIntervalsZ;
+  Eigen::Matrix<double,2,1> ZfootSpeedBound;
 
         
   ZfootSpeedBound(0)=0.0;
@@ -1134,8 +1134,8 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
   NumberIntermediate = 10;
   IntermediateTimeStep = (aTimeDistr[1]-aTimeDistr[0])/(NumberIntermediate+1);	
 
-  MAL_VECTOR_RESIZE(ZfootPos,4+NumberIntermediate);
-  MAL_VECTOR_RESIZE(TimeIntervalsZ,4+NumberIntermediate);
+  ZfootPos.resize(4+NumberIntermediate);
+  TimeIntervalsZ.resize(4+NumberIntermediate);
 
   Point3Z= Point1Z+0.01;
 
@@ -1158,9 +1158,9 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
 
   m_ClampedCubicSplineStepOverFootZ->SetParameters(ZfootPos,TimeIntervalsZ,ZfootSpeedBound);
 
-  MAL_VECTOR_DIM(XfootPos,double,4);
-  MAL_VECTOR_DIM(TimeIntervalsX,double,4);
-  MAL_VECTOR_DIM(XfootSpeedBound,double,2) ;
+  Eigen::Matrix<double,4,1> XfootPos;
+  Eigen::Matrix<double,4,1> TimeIntervalsX;
+  Eigen::Matrix<double,2,1> XfootSpeedBound ;
 
   XfootSpeedBound(0)=0.0;
   XfootSpeedBound(1)=0.0;
@@ -1168,8 +1168,8 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
   NumberIntermediate = 10;
   IntermediateTimeStep = (aTimeDistrModulated[2]-aTimeDistrModulated[1])/(NumberIntermediate+1);	
 
-  MAL_VECTOR_RESIZE(XfootPos,4+NumberIntermediate);
-  MAL_VECTOR_RESIZE(TimeIntervalsX,4+NumberIntermediate);
+  XfootPos.resize(4+NumberIntermediate);
+  TimeIntervalsX.resize(4+NumberIntermediate);
 
   //Use of speed to weight the extra points for the last interval on X to prevent overshoot of the spline on X
   double PreviousSpeedX,EndSpeedX,SpeedAccX;
@@ -1205,9 +1205,9 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
 
   m_ClampedCubicSplineStepOverFootX->SetParameters(XfootPos,TimeIntervalsX,XfootSpeedBound);
  
-  MAL_VECTOR_DIM(OmegafootPos,double,4);
-  MAL_VECTOR_DIM(TimeIntervalsOmega,double,4);
-  MAL_VECTOR_DIM(OmegafootSpeedBound,double,2);
+  Eigen::Matrix<double,4,1> OmegafootPos;
+  Eigen::Matrix<double,4,1> TimeIntervalsOmega;
+  Eigen::Matrix<double,2,1> OmegafootSpeedBound;
 
   OmegafootSpeedBound(0)=0.0;
   OmegafootSpeedBound(1)=0.0;
@@ -1215,8 +1215,8 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
   NumberIntermediate = 10;
   IntermediateTimeStep = (aTimeDistrModulated[1]-aTimeDistrModulated[0])/(NumberIntermediate+1);	
 
-  MAL_VECTOR_RESIZE(OmegafootPos,4+NumberIntermediate);
-  MAL_VECTOR_RESIZE(TimeIntervalsOmega,4+NumberIntermediate);
+  OmegafootPos.resize(4+NumberIntermediate);
+  TimeIntervalsOmega.resize(4+NumberIntermediate);
 
   double Omega3;
 
@@ -1253,9 +1253,9 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
   */
   m_ClampedCubicSplineStepOverFootOmega->SetParameters(OmegafootPos,TimeIntervalsOmega,OmegafootSpeedBound);
  
-  MAL_VECTOR_DIM(OmegaImpactfootPos,double,2);
-  MAL_VECTOR_DIM(TimeIntervalsOmegaImpact,double,2);
-  MAL_VECTOR_DIM(OmegaImpactfootSpeedBound,double,2);
+  Eigen::Matrix<double,2,1> OmegaImpactfootPos;
+  Eigen::Matrix<double,2,1> TimeIntervalsOmegaImpact;
+  Eigen::Matrix<double,2,1> OmegaImpactfootSpeedBound;
 
   OmegaImpactfootPos(0) = OmegaImpact;
   OmegaImpactfootPos(1) = 0.0;
@@ -1271,9 +1271,9 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
 							     OmegaImpactfootSpeedBound);
  
 
-  MAL_VECTOR_DIM(YfootPos,double,4);
-  MAL_VECTOR_DIM(TimeIntervalsY,double,4);
-  MAL_VECTOR_DIM(YfootSpeedBound,double,2) ;
+  Eigen::Matrix<double,4,1> YfootPos;
+  Eigen::Matrix<double,4,1> TimeIntervalsY;
+  Eigen::Matrix<double,2,1> YfootSpeedBound ;
 
 	
   YfootPos(0) = 0.0;
@@ -1347,7 +1347,7 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
 
 void StepOverPlanner::PolyPlannerHip()
 {
-  MAL_VECTOR_DIM(aBoundCond,double,4); 	
+  Eigen::Matrix<double,4,1> aBoundCond; 	
 	
   double StepTime;
   double HeightDifference;
@@ -1566,7 +1566,7 @@ void StepOverPlanner::SetDynamicMultiBodyModel(PinocchioRobot *aPR)
 {
   m_PR = aPR;
   unsigned int NbOfDofs =m_PR->numberDof();
-  MAL_VECTOR_DIM(aCurrentVel,double,NbOfDofs); 
+  Eigen::VectorXd aCurrentVel(NbOfDofs); 
   for(unsigned int i=0;i<NbOfDofs;i++)
     aCurrentVel[i]=0.0;
   m_PR->currentVelocity(aCurrentVel);
@@ -1597,8 +1597,8 @@ void StepOverPlanner::CreateBufferFirstPreview(deque<COMState> &m_COMBuffer,
 					       deque<ZMPPosition> &m_ZMPRefBuffer)
 {
   deque<ZMPPosition> aFIFOZMPRefPositions;
-  MAL_MATRIX(aPC1x,double);
-  MAL_MATRIX(aPC1y,double); 
+  Eigen::MatrixXd aPC1x;
+  Eigen::MatrixXd aPC1y; 
   double aSxzmp, aSyzmp;
   double aZmpx2, aZmpy2;
 	
@@ -1610,7 +1610,7 @@ void StepOverPlanner::CreateBufferFirstPreview(deque<COMState> &m_COMBuffer,
   aSxzmp = 0.0;//m_sxzmp;
   aSyzmp = 0.0;//m_syzmp;
 
-  MAL_MATRIX_RESIZE(aPC1x,3,1);  MAL_MATRIX_RESIZE(aPC1y,3,1);
+  aPC1x.resize(3,1);  aPC1y.resize(3,1);
 
   aPC1x(0,0)= 0;    aPC1x(1,0)= 0;    aPC1x(2,0)= 0;
   aPC1y(0,0)= 0;    aPC1y(1,0)= 0;    aPC1y(2,0)= 0;

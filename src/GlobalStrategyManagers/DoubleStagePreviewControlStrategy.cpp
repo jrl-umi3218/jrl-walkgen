@@ -33,7 +33,6 @@ using namespace std;
 
 #include <Debug.hh>
 #include <GlobalStrategyManagers/DoubleStagePreviewControlStrategy.hh>
-
 using namespace PatternGeneratorJRL;
 
 DoubleStagePreviewControlStrategy::DoubleStagePreviewControlStrategy(SimplePluginManager * aSPM)
@@ -190,12 +189,13 @@ int DoubleStagePreviewControlStrategy::OneGlobalStepOfControl(FootAbsolutePositi
   return 0;
 }
 
-int DoubleStagePreviewControlStrategy::EvaluateStartingState(Eigen::VectorXd & BodyAngles,
-							     COMState & aStartingCOMState,
-							     Eigen::Vector3d & aStartingZMPPosition,
-							     Eigen::VectorXd & aStartingWaistPose,
-							     FootAbsolutePosition & InitLeftFootPosition,
-							     FootAbsolutePosition & InitRightFootPosition)
+int DoubleStagePreviewControlStrategy::
+EvaluateStartingState(Eigen::VectorXd & BodyAngles,
+		      COMState & aStartingCOMState,
+		      Eigen::Vector3d & aStartingZMPPosition,
+		      Eigen::Matrix<double, 6, 1> & aStartingWaistPose,
+		      FootAbsolutePosition & InitLeftFootPosition,
+		      FootAbsolutePosition & InitRightFootPosition)
 {
   Eigen::Vector3d lStartingCOMState;
   lStartingCOMState(0) = aStartingCOMState.x[0];
@@ -206,7 +206,8 @@ int DoubleStagePreviewControlStrategy::EvaluateStartingState(Eigen::VectorXd & B
 				     lStartingCOMState,
 				     aStartingZMPPosition,
 				     aStartingWaistPose,
-				     InitLeftFootPosition,InitRightFootPosition);
+				     InitLeftFootPosition,
+				     InitRightFootPosition);
 
   aStartingCOMState.x[0] = lStartingCOMState(0);
   aStartingCOMState.y[0] = lStartingCOMState(1);

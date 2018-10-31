@@ -69,7 +69,8 @@ namespace PatternGeneratorJRL
     WaistPolynome();
   
     /// Set the parameters
-    void SetParameters( Eigen::MatrixXd boundCond, std::vector<double> timeDistr);
+    void SetParameters( Eigen::VectorXd boundCond,
+			std::vector<double> timeDistr);
 
     /// Destructor.
     ~WaistPolynome();

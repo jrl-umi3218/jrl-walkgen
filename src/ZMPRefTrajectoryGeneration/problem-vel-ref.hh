@@ -27,7 +27,7 @@
 #ifndef _PROBLEM_VEL_REF_H_
 #define _PROBLEM_VEL_REF_H_
 
-#include <jrl/mal/matrixabstractlayer.hh>
+
 
 
 namespace PatternGeneratorJRL

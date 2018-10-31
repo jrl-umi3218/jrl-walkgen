@@ -189,12 +189,12 @@ namespace PatternGeneratorJRL
       // This is a vector corresponding to ALL the DOFS of the robot:
       // free flyer + actuated DOFS.
       unsigned lNbDofs = m_PR->numberDof();
-      MAL_VECTOR_RESIZE(m_CurrentConfiguration ,lNbDofs);
-      MAL_VECTOR_RESIZE(m_CurrentVelocity      ,lNbDofs);
-      MAL_VECTOR_RESIZE(m_CurrentAcceleration  ,lNbDofs);
-      MAL_VECTOR_RESIZE(m_PreviousConfiguration,lNbDofs);
-      MAL_VECTOR_RESIZE(m_PreviousVelocity     ,lNbDofs);
-      MAL_VECTOR_RESIZE(m_PreviousAcceleration ,lNbDofs);
+      m_CurrentConfiguration.resize(lNbDofs);
+      m_CurrentVelocity.resize(lNbDofs);
+      m_CurrentAcceleration.resize(lNbDofs);
+      m_PreviousConfiguration.resize(lNbDofs);
+      m_PreviousVelocity.resize(lNbDofs);
+      m_PreviousAcceleration.resize(lNbDofs);
       for(int i=0;i<6;i++)
       {
         m_PreviousConfiguration[i] = 0.0 ;
@@ -220,12 +220,12 @@ namespace PatternGeneratorJRL
       m_ComAndFootRealization->SetHeightOfTheCoM(0.814);
       m_ComAndFootRealization->setSamplingPeriod(0.005);
       m_ComAndFootRealization->Initialization();
-      MAL_VECTOR_DIM(waist,double,6);
+      Eigen::Matrix<double,6,1> waist;
       for (int i = 0 ; i < 6 ; ++i )
       {
         waist(i) = 0;
       }
-      MAL_S3_VECTOR(lStartingCOMState,double);
+      Eigen::Vector3d lStartingCOMState;
       
       lStartingCOMState(0) = m_OneStep.finalCOMPosition.x[0] ;
       lStartingCOMState(1) = m_OneStep.finalCOMPosition.y[0] ;
@@ -234,7 +234,8 @@ namespace PatternGeneratorJRL
       m_ComAndFootRealization->Initialization();
       m_ComAndFootRealization->InitializationCoM(m_HalfSitting,lStartingCOMState,
                                                  waist,
-                                                 m_OneStep.LeftFootPosition, m_OneStep.RightFootPosition);
+                                                 m_OneStep.LeftFootPosition,
+						 m_OneStep.RightFootPosition);
       m_CurrentConfiguration(0) = waist(0);
       m_CurrentConfiguration(1) = waist(1);
       m_CurrentConfiguration(2) = waist(2);
@@ -345,8 +346,9 @@ namespace PatternGeneratorJRL
       }
 
       // Get the starting configuration : half sitting
-      MAL_VECTOR_RESIZE(m_HalfSitting,aPR.numberDof()-6);
-      MAL_VECTOR_FILL(m_HalfSitting,0.0);
+      m_HalfSitting.resize(aPR.numberDof()-6);
+      m_HalfSitting.setZero();
+      { for(unsigned int i=0;i<m_HalfSitting.size();m_HalfSitting[i++]=0.0);};
       se3::Model * aModel = aPR.Model();
       BOOST_FOREACH(const ptree::value_type & v, pt.get_child("robot.group_state"))
       {
@@ -372,7 +374,7 @@ namespace PatternGeneratorJRL
         aofq.open("TestConfiguration.dat",ofstream::out);
         if (aofq.is_open())
         {
-          for(unsigned int k=0;k<MAL_VECTOR_SIZE(m_HalfSitting);k++)
+          for(unsigned int k=0;k<m_HalfSitting.size();k++)
           {
             aofq << m_HalfSitting(k) << " ";
           }
@@ -576,7 +578,7 @@ namespace PatternGeneratorJRL
       {
         analyticalInverseKinematics(m_conf,m_vel,m_acc);
         m_DebugPR->computeInverseDynamics(m_conf,m_vel,m_acc);
-        MAL_S3_VECTOR(zmpmb,double);
+        Eigen::Vector3d zmpmb;
         m_DebugPR->zeroMomentumPoint(zmpmb);
 
         ofstream aof;
@@ -869,18 +871,18 @@ namespace PatternGeneratorJRL
       m_DirectoryName = aDirectory;
     }
 
-    void TestObject::analyticalInverseKinematics(MAL_VECTOR_TYPE(double) & conf,
-                                                 MAL_VECTOR_TYPE(double) & vel,
-                                                 MAL_VECTOR_TYPE(double) & acc)
+    void TestObject::analyticalInverseKinematics(Eigen::VectorXd & conf,
+                                                 Eigen::VectorXd & vel,
+                                                 Eigen::VectorXd & acc)
     {
       /// \brief calculate, from the CoM of computed by the preview control,
       ///    the corresponding articular position, velocity and acceleration
       /// ------------------------------------------------------------------
-      MAL_VECTOR_DIM(aCOMState,double,6);
-      MAL_VECTOR_DIM(aCOMSpeed,double,6);
-      MAL_VECTOR_DIM(aCOMAcc,double,6);
-      MAL_VECTOR_DIM(aLeftFootPosition,double,5);
-      MAL_VECTOR_DIM(aRightFootPosition,double,5);
+      Eigen::VectorXd aCOMState(6);
+      Eigen::VectorXd aCOMSpeed(6);
+      Eigen::VectorXd aCOMAcc(6);
+      Eigen::VectorXd aLeftFootPosition(5);
+      Eigen::VectorXd aRightFootPosition(5);
       
       aCOMState(0) = m_OneStep.finalCOMPosition.x[0];
       aCOMState(1) = m_OneStep.finalCOMPosition.y[0];
@@ -931,14 +933,14 @@ namespace PatternGeneratorJRL
       }
     }
 
-    void TestObject::parseFromURDFtoOpenHRPIndex(MAL_VECTOR_TYPE(double) &conf)
+    void TestObject::parseFromURDFtoOpenHRPIndex(Eigen::VectorXd &conf)
     {
 
-      MAL_VECTOR_FILL(conf,0.0);
+      { for(unsigned int i=0;i<conf.size();conf[i++]=0.0);};
 
       for(unsigned int i = 0 ; i < 6 ; i++)
         conf(i) = m_CurrentConfiguration(i);
-      unsigned index=6;
+      long unsigned index=6;
       //RLEG
       for(unsigned int i = 0 ; i < m_rightLeg.size() ; i++)
         conf(index+i) = m_CurrentConfiguration(m_rightLeg[i]);
@@ -977,7 +979,7 @@ namespace PatternGeneratorJRL
 
       /// \brief Create file .hip/.waist .pos .zmp
       /// --------------------
-      MAL_VECTOR_TYPE(double) conf;
+      Eigen::VectorXd conf;
       conf = m_CurrentConfiguration;
       parseFromURDFtoOpenHRPIndex(conf);
 

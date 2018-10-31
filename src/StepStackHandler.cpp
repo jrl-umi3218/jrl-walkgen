@@ -29,8 +29,6 @@
 #include <fstream>
 #include <math.h>
 
-#include <jrl/mal/matrixabstractlayer.hh>
-
 #define deg2rad(x) x*M_PI/180.0
 #define rad2deg(x) x*180.0/M_PI
 
@@ -436,7 +434,7 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
 	Eigen::Matrix<double,2,1> lv2;
 	lv(0) = (R+DirectionRay*SupportFoot*0.095)*s - (R-DirectionRay*SupportFoot*0.095)*sp;
 	lv(1) = -((R+DirectionRay*SupportFoot*0.095)*c - (R-DirectionRay*SupportFoot*0.095)*cp);
-	lv2=A+lv;
+	lv2=A*lv;
 	ODEBUG(" X: " << (R+DirectionRay*SupportFoot*0.095)*s << " " << (R-DirectionRay*SupportFoot*0.095)*sp
 		<< " " << StepMax << " " << lv(0) << " " << lv2(0) );
 	ODEBUG(" Y: " << (R+DirectionRay*SupportFoot*0.095)*c << " " << (R-DirectionRay*SupportFoot*0.095)*cp
@@ -485,7 +483,7 @@ void StepStackHandler::CreateArcInStepStack(  double x,double y, double R,
 	Eigen::Matrix<double,2,1> lv2;
 	lv(0) = (R+DirectionRay*SupportFoot*0.095)*s - (R-DirectionRay*SupportFoot*0.095)*sp;
 	lv(1) = -((R+DirectionRay*SupportFoot*0.095)*c - (R-DirectionRay*SupportFoot*0.095)*cp);
-	lv2=A+lv;
+	lv2=A*lv;
 	ODEBUG(" X: " << (R+DirectionRay*SupportFoot*0.095)*s << " " << (R-DirectionRay*SupportFoot*0.095)*sp
 		<< " " << lv(0) << " " << lv2(0) );
 	ODEBUG(" Y: " << (R+DirectionRay*SupportFoot*0.095)*c << " " << (R-DirectionRay*SupportFoot*0.095)*cp

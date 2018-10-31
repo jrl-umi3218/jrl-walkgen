@@ -63,6 +63,8 @@ IF((BUILD_MULTI_MODEL_BENCHMARK OR BUILD_SINGLE_MODEL_BENCHMARKS)
   SEARCH_FOR_BOOST()
 ENDIF()
 
+SEARCH_FOR_LAPACK()
+
 # Search for Eigen.
 ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.5")
 # Eigen (at least version 3.0.5) makes gcc report conversion warnings

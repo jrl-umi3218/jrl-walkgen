@@ -89,8 +89,8 @@ namespace PatternGeneratorJRL
 	@param[in] ClearStepStackHandler: Clean the stack of steps after copy.
       */
       virtual void CommonInitializationOfWalking(COMState & lStartingCOMState,
-						 MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
-						 MAL_VECTOR(  & ,double) BodyAnglesIni,
+						 Eigen::Vector3d & lStartingZMPPosition,
+						 Eigen::VectorXd & BodyAnglesIni,
 						 FootAbsolutePosition & InitLeftFootAbsPos, 
 						 FootAbsolutePosition & InitRightFootAbsPos,
 						 std::deque<RelativeFootPosition> & lRelativeFootPositions,
@@ -113,10 +113,10 @@ namespace PatternGeneratorJRL
 	@param[out]  ZMPTarget  The target ZMP in the waist reference frame.
 	@return True is there is still some data to send, false otherwise.
       */
-      virtual bool RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-					      MAL_VECTOR_TYPE(double) & CurrentVelocity,
-					      MAL_VECTOR_TYPE(double) & CurrentAcceleration,
-					      MAL_VECTOR_TYPE(double) & ZMPTarget)=0;
+      virtual bool RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
+					      Eigen::VectorXd & CurrentVelocity,
+					      Eigen::VectorXd & CurrentAcceleration,
+					      Eigen::VectorXd & ZMPTarget)=0;
 
       /*! \brief Run One Step of the global control loop aka The Main Method To Be Used.
 	@param[out]  CurrentConfiguration The current configuration of the robot according to 
@@ -132,10 +132,10 @@ namespace PatternGeneratorJRL
 	@param[out] RightFootPosition: Absolute position of the right foot.
 	@return True is there is still some data to send, false otherwise.
       */
-      virtual bool RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-					      MAL_VECTOR_TYPE(double) & CurrentVelocity,
-					      MAL_VECTOR_TYPE(double) & CurrentAcceleration,
-					      MAL_VECTOR_TYPE(double) &ZMPTarget,
+      virtual bool RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
+					      Eigen::VectorXd & CurrentVelocity,
+					      Eigen::VectorXd & CurrentAcceleration,
+					      Eigen::VectorXd &ZMPTarget,
 					      COMPosition &COMPosition,
 					      FootAbsolutePosition &LeftFootPosition,
 					      FootAbsolutePosition &RightFootPosition)=0;
@@ -154,10 +154,10 @@ namespace PatternGeneratorJRL
 	@param[out] RightFootPosition: Absolute position of the right foot.
 	@return True is there is still some data to send, false otherwise.
       */
-      virtual bool RunOneStepOfTheControlLoop(MAL_VECTOR_TYPE(double) & CurrentConfiguration,
-					      MAL_VECTOR_TYPE(double) & CurrentVelocity,
-					      MAL_VECTOR_TYPE(double) & CurrentAcceleration,
-					      MAL_VECTOR_TYPE(double) &ZMPTarget,
+      virtual bool RunOneStepOfTheControlLoop(Eigen::VectorXd & CurrentConfiguration,
+					      Eigen::VectorXd & CurrentVelocity,
+					      Eigen::VectorXd & CurrentAcceleration,
+					      Eigen::VectorXd &ZMPTarget,
 					      COMState &COMState,
 					      FootAbsolutePosition &LeftFootPosition,
 					      FootAbsolutePosition &RightFootPosition)=0;
@@ -182,14 +182,14 @@ namespace PatternGeneratorJRL
 	It also updates the state of the robot if other control mechanisms 
 	modifies the upper body part and if this should be taken into account
 	into the pattern generator in the second loop of control. */
-      virtual void SetCurrentJointValues(MAL_VECTOR( &lCurrentJointValues,double))=0;
+      virtual void SetCurrentJointValues(Eigen::VectorXd &lCurrentJointValues)=0;
 
       /*! \brief Returns the walking mode. */
       virtual int GetWalkMode() const=0;
     
       /*! \brief Get the leg joint velocity */
-      virtual void GetLegJointVelocity(MAL_VECTOR( &dqr,double), 
-				       MAL_VECTOR( &dql,double)) const=0;
+      virtual void GetLegJointVelocity(Eigen::VectorXd &dqr, 
+				       Eigen::VectorXd &dql) const=0;
 
       /*! \brief Read a sequence of steps. */
       virtual void ReadSequenceOfSteps(std::istringstream &strm)=0;
@@ -252,16 +252,16 @@ namespace PatternGeneratorJRL
 				    double &omega) const=0;
 
       /*! \brief An other method to get the waist position using a matrix. */
-      virtual void getWaistPositionMatrix(MAL_S4x4_MATRIX( &lWaistAbsPos,double)) const=0;
+      virtual void getWaistPositionMatrix(Eigen::Matrix4d &lWaistAbsPos) const=0;
      
       /*!@} */
 
 
       /*! \brief Set the initial ZMP reference point. */
-      virtual void setZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint)=0;
+      virtual void setZMPInitialPoint(Eigen::Vector3d & lZMPInitialPoint)=0;
 
       /*! \brief Get the initial ZMP reference point. */
-      virtual void getZMPInitialPoint(MAL_S3_VECTOR(&,double) lZMPInitialPoint) const=0;
+      virtual void getZMPInitialPoint(Eigen::Vector3d & lZMPInitialPoint) const=0;
 
       /*! \name System to call a given method based on registration of a method. 
 	@{
@@ -278,8 +278,8 @@ namespace PatternGeneratorJRL
       /*! \brief Returns the ZMP, CoM, left foot absolute position, and right foot absolute position
 	for the initiale pose.*/
       virtual void EvaluateStartingState(COMState  & lStartingCOMState,
-					 MAL_S3_VECTOR_TYPE(double) & lStartingZMPPosition,
-					 MAL_VECTOR_TYPE(double) & lStartingWaistPose,
+					 Eigen::Vector3d & lStartingZMPPosition,
+					 Eigen::Matrix<double, 6, 1> & lStartingWaistPose,
 					 FootAbsolutePosition & InitLeftFootAbsPos,
 					 FootAbsolutePosition & InitRightFootAbsPos)=0;
 

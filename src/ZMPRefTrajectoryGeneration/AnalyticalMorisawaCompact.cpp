@@ -312,40 +312,40 @@ namespace PatternGeneratorJRL
     {
       m_AF = m_Z.transpose();
       dgetrf_(&SizeOfZ, /* M */
-              &SizeOfZ, /* N here M=N=SizeOfZ */
-              &m_AF(0), /* A */
-              &SizeOfZ, /* Leading dimension cf before */
-              &m_IPIV(0), /* IPIV */
-              &info /* info */
-              );
+	     &SizeOfZ, /* N here M=N=SizeOfZ */
+	     &m_AF(0), /* A */
+	     &SizeOfZ, /* Leading dimension cf before */
+	     &m_IPIV(0), /* IPIV */
+	     &info /* info */
+	     );
       m_NeedToReset = false;
     }
 
     char lF[2]="F";
     char lN[2]="N";
     dgesvx_(lF, /* Specify that AF and IPIV should be used. */
-            lN, /* A * X = B */
-            &SizeOfZ, /* Size of A */
-            &NRHS, /*Nb of columns for X et B */
-            &tZ(0), /* Access to A */
-            &LDA, /* Leading size of A */
-            &m_AF(0),
-            &LDAF,
-            &m_IPIV(0),
-            &EQUED,
-            &lR(0),
-            &lC(0),
-            &m_w(0),
-            &LDB,
-            &m_y(0),
-            &lsizeofx,
-            &lRCOND,
-            &lFERR(0),
-            &lBERR(0),
-            work,
-            iwork,
-            &info
-            );
+	   lN, /* A * X = B */
+	   &SizeOfZ, /* Size of A */
+	   &NRHS, /*Nb of columns for X et B */
+	   &tZ(0), /* Access to A */
+	   &LDA, /* Leading size of A */
+	   &m_AF(0),
+	   &LDAF,
+	   &m_IPIV(0),
+	   &EQUED,
+	   &lR(0),
+	   &lC(0),
+	   &m_w(0),
+	   &LDB,
+	   &m_y(0),
+	   &lsizeofx,
+	   &lRCOND,
+	   &lFERR(0),
+	   &lBERR(0),
+	   work,
+	   iwork,
+	   &info
+	   );
 
     // Compute the weights.
     // m_y=iZ+m_w;
@@ -762,7 +762,7 @@ computing the analytical trajectories. */
     lAnklePositionLeft  = LeftFoot->anklePosition ;
     lAnklePositionRight = RightFoot->anklePosition ;
 
-    Eigen::Matrix<double,4,1> CurPosWICF_homogeneous ;
+    Eigen::Matrix4d CurPosWICF_homogeneous ;
     CurPosWICF_homogeneous =
       m_kajitaDynamicFilter->getComAndFootRealization()
       ->GetCurrentPositionofWaistInCOMFrame();
@@ -1759,7 +1759,7 @@ and final CoM to be feed to the new system. */
   double AnalyticalMorisawaCompact::TimeCompensationForZMPFluctuation(FluctuationParameters &aFP,
                                                                       double DeltaTInit)
   {
-    double r=0.0,r2=0.0;
+    double r=0.0;
     double DeltaTNew=0.0;
     if (fabs(aFP.CoMSpeedNew)<1e-7)
       aFP.CoMSpeedNew = 0.0;
@@ -1822,7 +1822,7 @@ and final CoM to be feed to the new system. */
       {
         lIndexForFootPrintInterval = i/2;
         if (lIndexForFootPrintInterval>=NewFootAbsPos.size())
-          lIndexForFootPrintInterval=NewFootAbsPos.size()-1;
+          lIndexForFootPrintInterval=(unsigned int)(NewFootAbsPos.size()-1);
       }
 
       if (lIndexStep<aCTIPX.ZMPProfil.size())
@@ -1877,7 +1877,6 @@ and final CoM to be feed to the new system. */
     int RetourTC=0;
 
     double NewTj=0.0;
-    double TmaxX=0.0,TmaxY=0.0;
     FluctuationParameters aFPX,aFPY;
     double TCX=0.0, TCY=0.0, TCMax=0.0;
 
@@ -1906,7 +1905,7 @@ a foot step. */
     if (!AddingAFootStep)
     {
       /* Compute the time of maximal fluctuation for the initial solution along the X axis.*/
-      TmaxX = aAZCTX.FluctuationMaximal();
+      aAZCTX.FluctuationMaximal();
       aAZCTX.ComputeCOM(t,aFPX.CoMInit,IndexStartingInterval);
 
       aAZCTX.ComputeCOMSpeed(t,aFPX.CoMSpeedInit);
@@ -1915,7 +1914,6 @@ a foot step. */
       aAZCTX.ComputeZMPSpeed(t,aFPX.ZMPSpeedInit);
 
       /* Compute the time of maximal fluctuation for the initial solution along the Y axis.*/
-      TmaxY = aAZCTY.FluctuationMaximal();
       aAZCTY.ComputeCOM(t,aFPY.CoMInit,IndexStartingInterval);
       aAZCTY.ComputeCOMSpeed(t,aFPY.CoMSpeedInit);
       aAZCTY.ComputeZMP(t,aFPY.ZMPInit,IndexStartingInterval);
@@ -2143,7 +2141,7 @@ to filter. */
     {
       m_PreviewControl->
 	OneIterationOfPreview1D(x,lsxzmp,FIFOZMPRefPositions,lindex,
-				lxzmp);
+				lxzmp,false);
       ZMPTrajectory.push_back(lxzmp);
       CoGTrajectory.push_back(x(0,0));
       lindex++;
@@ -2398,7 +2396,7 @@ new step has to be generate.
 
     m_OnLineMode = true;
     bool DoNotPrepareLastFoot = false;
-    int NbSteps = m_RelativeFootPositions.size();
+    int NbSteps = (int)m_RelativeFootPositions.size();
     int NbOfIntervals=2*NbSteps+1;
 
     /* Update the relative and absolute foot positions. */
@@ -2407,7 +2405,7 @@ new step has to be generate.
     ODEBUG("****************** Begin EndPhaseOfTheWalking **************************");
     // Strategy for the final CoM pos: middle of the segment
     // between the two final steps, in order to be statically stable.
-    unsigned int lindex = m_AbsoluteSupportFootPositions.size()-1;
+    unsigned int lindex = (unsigned int)(m_AbsoluteSupportFootPositions.size()-1);
     vector<double> * lZMPX=0;
     double FinalCoMPosX=0.6;
 
@@ -2424,7 +2422,7 @@ new step has to be generate.
 
     /*! Prepare end condition for ZMP along X axis */
     lZMPX = &m_CTIPX.ZMPProfil;
-    unsigned int j=lZMPX->size();
+    unsigned int j=(unsigned int)lZMPX->size();
     if (DoNotPrepareLastFoot)
       (*lZMPX)[j-2] = (*lZMPX)[j-1] = m_AbsoluteSupportFootPositions[lindex].x;
     else
@@ -2616,7 +2614,7 @@ new step has to be generate.
 
   void AnalyticalMorisawaCompact::ComputeCoMz(COMState & CoM,
                                               FootAbsolutePosition & LeftFoot,
-                                              FootAbsolutePosition & RightFoot)
+                                              FootAbsolutePosition & )
   {
 //    vector<double> barriere (500,0.0) ;
 //    COMState & c = FinalCoMPositions.front() ;

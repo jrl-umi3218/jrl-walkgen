@@ -193,13 +193,14 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
 
  /* Removed lqr and lql, now they should be set automatically by
     m_ComAndFootRealization */
- int ZMPPreviewControlWithMultiBodyZMP::OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
-							       FootAbsolutePosition &RightFootPosition,
-							       ZMPPosition & ,
-							       COMState &refandfinalCOMState,
-							       Eigen::VectorXd & CurrentConfiguration,
-							       Eigen::VectorXd & CurrentVelocity,
-							       Eigen::VectorXd & CurrentAcceleration)
+ int ZMPPreviewControlWithMultiBodyZMP::
+ OneGlobalStepOfControl(FootAbsolutePosition &LeftFootPosition,
+			FootAbsolutePosition &RightFootPosition,
+			ZMPPosition & ,
+			COMState &refandfinalCOMState,
+			Eigen::VectorXd & CurrentConfiguration,
+			Eigen::VectorXd & CurrentVelocity,
+			Eigen::VectorXd & CurrentAcceleration)
  {
    FirstStageOfControl(LeftFootPosition,RightFootPosition,refandfinalCOMState);
    // This call is suppose to initialize
@@ -775,12 +776,13 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
  }
 
 
- int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingState(Eigen::VectorXd & BodyAnglesInit,
-							      Eigen::Vector3d & aStartingCOMState,
-							      Eigen::Vector3d & aStartingZMPPosition,
-							      Eigen::VectorXd & aStartingWaistPosition,
-							      FootAbsolutePosition & InitLeftFootPosition,
-							      FootAbsolutePosition & InitRightFootPosition)
+ int ZMPPreviewControlWithMultiBodyZMP::
+ EvaluateStartingState(Eigen::VectorXd & BodyAnglesInit,
+		       Eigen::Vector3d & aStartingCOMState,
+		       Eigen::Vector3d & aStartingZMPPosition,
+		       Eigen::Matrix<double, 6, 1> & aStartingWaistPosition,
+		       FootAbsolutePosition & InitLeftFootPosition,
+		       FootAbsolutePosition & InitRightFootPosition)
  {
    int r = EvaluateStartingCoM(BodyAnglesInit,aStartingCOMState,
 			       aStartingWaistPosition,
@@ -788,17 +790,19 @@ void ZMPPreviewControlWithMultiBodyZMP::SetPreviewControl(PreviewControl *aPC)
    aStartingZMPPosition= m_ComAndFootRealization->GetCOGInitialAnkles();
    return r;
  }
- int ZMPPreviewControlWithMultiBodyZMP::EvaluateStartingCoM(Eigen::VectorXd &BodyAnglesInit,
-							    Eigen::Vector3d &aStartingCOMState,
-							    Eigen::VectorXd & aStartingWaistPosition,
-							    FootAbsolutePosition & InitLeftFootPosition,
-							    FootAbsolutePosition & InitRightFootPosition)
+ int ZMPPreviewControlWithMultiBodyZMP::
+ EvaluateStartingCoM(Eigen::VectorXd &BodyAnglesInit,
+		     Eigen::Vector3d &aStartingCOMState,
+		     Eigen::Matrix<double,6,1> & aStartingWaistPosition,
+		     FootAbsolutePosition & InitLeftFootPosition,
+		     FootAbsolutePosition & InitRightFootPosition)
  {
    ODEBUG("EvaluateStartingCOM: BodyAnglesInit :" << BodyAnglesInit);
 
-   m_ComAndFootRealization->InitializationCoM(BodyAnglesInit,m_StartingCOMState,
-					      aStartingWaistPosition,
-					      InitLeftFootPosition, InitRightFootPosition);  
+   m_ComAndFootRealization->
+     InitializationCoM(BodyAnglesInit,m_StartingCOMState,
+		       aStartingWaistPosition,
+		       InitLeftFootPosition, InitRightFootPosition);  
    ODEBUG("EvaluateStartingCOM: m_StartingCOMState: " << m_StartingCOMState);
    aStartingCOMState[0] = m_StartingCOMState[0];
    aStartingCOMState[1] = m_StartingCOMState[1];
