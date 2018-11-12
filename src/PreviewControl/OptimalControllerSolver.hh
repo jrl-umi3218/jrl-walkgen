@@ -161,13 +161,6 @@ The augmented system is then
     /*! Display the weights */
     void DisplayWeights();
 
-    bool GeneralizedSchur(Eigen::MatrixXd &A,
-			  Eigen::MatrixXd &B,
-			  Eigen::VectorXd &alphar,
-			  Eigen::VectorXd &alphai,
-			  Eigen::VectorXd &beta,
-			  Eigen::MatrixXd &L,
-			  Eigen::MatrixXd &R);
 
     /*! To take matrix F aka the weights of the preview window . */
     void GetF(Eigen::MatrixXd & LF );
@@ -176,7 +169,8 @@ The augmented system is then
     void GetK(Eigen::MatrixXd & LK );
 
   protected:
-    
+
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,Eigen::RowMajor> MatrixRXd;
     /*! The matrices needed for the dynamical system such as
       \f{eqnarray*}
       
@@ -185,9 +179,9 @@ The augmented system is then
       \f}
       
      */
-    Eigen::MatrixXd m_A;
-    Eigen::MatrixXd m_b;
-    Eigen::MatrixXd m_c;
+    MatrixRXd m_A;
+    MatrixRXd m_b;
+    MatrixRXd m_c;
 
     /*! The coefficent of the index criteria:
      \f[
@@ -198,11 +192,20 @@ The augmented system is then
 
     
     /*! The weights themselves */
-    Eigen::MatrixXd m_K; 
-    Eigen::MatrixXd m_F;
+    MatrixRXd m_K; 
+    MatrixRXd m_F;
 			  
     /*! The size of the window for the preview */
     int m_Nl;
+
+    bool GeneralizedSchur(MatrixRXd &A,
+			  MatrixRXd &B,
+			  Eigen::VectorXd &alphar,
+			  Eigen::VectorXd &alphai,
+			  Eigen::VectorXd &beta,
+			  MatrixRXd &L,
+			  MatrixRXd &R);
+
   };
 
   /*! 

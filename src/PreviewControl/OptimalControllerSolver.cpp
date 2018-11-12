@@ -30,7 +30,7 @@
 #include <iostream>
 #include <PreviewControl/OptimalControllerSolver.hh>
 
-//#define _DEBUG_MODE_ON_
+#define _DEBUG_MODE_ON_
 #include <Debug.hh>
 
 using namespace PatternGeneratorJRL;
@@ -127,20 +127,20 @@ OptimalControllerSolver::~OptimalControllerSolver()
   
 }
 
-bool OptimalControllerSolver::GeneralizedSchur(Eigen::MatrixXd  &A,
-					       Eigen::MatrixXd  &B,
+bool OptimalControllerSolver::GeneralizedSchur(MatrixRXd  &A,
+					       MatrixRXd  &B,
 					       Eigen::VectorXd  &alphar,
 					       Eigen::VectorXd  &alphai,
 					       Eigen::VectorXd  &beta,
-					       Eigen::MatrixXd  &L,
-					       Eigen::MatrixXd  &R)
+					       MatrixRXd  &L,
+					       MatrixRXd  &R)
 {
   ODEBUG("A:" << A);
   ODEBUG("B:" << A);
   int n = A.rows();
-  alphar.resize(n); { for(unsigned int i=0;i<alphar.size();alphar[i++]=0);};
-  alphai.resize(n); { for(unsigned int i=0;i<alphai.size();alphai[i++]=0);};
-  beta.resize(n); { for(unsigned int i=0;i<beta.size();beta[i++]=0);};
+  alphar.resize(n); alphar.setZero();
+  alphai.resize(n); alphai.setZero();
+  beta.resize(n); beta.setZero();
   L.resize(n, n);L.setZero();
   R.resize(n,n); R.setZero();
 		    
@@ -158,28 +158,35 @@ bool OptimalControllerSolver::GeneralizedSchur(Eigen::MatrixXd  &A,
   char lS[2]="S";
   for(int i=0;i<2*n;i++)
     bwork[i] =0;
-  A = A.transpose();
-  B = B.transpose();
+  A.transposeInPlace();
+  B.transposeInPlace();
+  cout <<"A:" << std::endl;
+  for (int i = 0; i < A.size(); i++)
+    cout << *(A.data() + i) << "  ";
+  cout << endl << endl;
+  for (int i = 0; i < B.size(); i++)
+    cout << *(B.data() + i) << "  ";
+  cout << endl << endl;
   dgges_ (lV, lV,
           lS,
 	  (logical (*)(...))sb02ox,
           &n,
-          &A(0), &n,
-          &B(0), &n,
+          A.data(), &n,
+          B.data(), &n,
           &sdim,
-          &alphar(0),
-          &alphai(0),
-          &beta(0),
-          &L(0), &n,
-          &R(0), &n,
+          alphar.data(),
+          alphai.data(),
+          beta.data(),
+          L.data(), &n,
+          R.data(), &n,
           &work[0], &lwork,
           bwork,
           &info);
 
-  A = A.transpose();
-  B = B.transpose();
-  L = L.transpose();
-  R = R.transpose();
+  A.transposeInPlace();
+  B.transposeInPlace();
+  L.transposeInPlace();
+  R.transposeInPlace();
   
   delete [] work;
   delete [] bwork;
@@ -204,8 +211,8 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   //      [-c'Qc E]]
   //  ODEBUG("m_A:" << m_A);
   // And each sub-matrix is n x n matrix.
-  Eigen::MatrixXd H;
-  Eigen::MatrixXd tm_b;
+  MatrixRXd H;
+  MatrixRXd tm_b;
 
   // Store the transpose of m_b;
   tm_b = m_b.transpose();
@@ -222,7 +229,7 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
     for(int j=0;j<n;j++)
       H(i,j) = m_A(i,j);
 
-  Eigen::MatrixXd H21;
+  MatrixRXd H21;
   H21 = m_c.transpose();
   ODEBUG("H21 (1):" << H21);
   H21 = H21 * m_Q;
@@ -237,13 +244,13 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
       H(i+n,j) = H21(i,j);
 
   ODEBUG("H:" << endl << H);
-  Eigen::MatrixXd E(2*n,2*n);
+  MatrixRXd E(2*n,2*n);
   E.setIdentity();
 
-  Eigen::MatrixXd G;
+  MatrixRXd G;
   G = (m_b * (1/m_R) )* tm_b;
 
-  Eigen::MatrixXd At;
+  MatrixRXd At;
   At= m_A.transpose();
   for(int i=0;i< n;i++)
     for(int j=0;j<n;j++)
@@ -254,11 +261,11 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
 
   ODEBUG("E:" << endl << E);
   // Computes S the Schur form of Laub_Z
-  Eigen::MatrixXd ZH(2*n,2*n); // The matrix of schur vectors
-  Eigen::MatrixXd ZE(2*n,2*n); // The matrix of Schur vectors.
+  MatrixRXd ZH(2*n,2*n); // The matrix of schur vectors
+  MatrixRXd ZE(2*n,2*n); // The matrix of Schur vectors.
   Eigen::VectorXd WR(2*n);
   Eigen::VectorXd WI(2*n); // The eigenvalues ( a matrix to handle complex eigenvalues).
-  Eigen::VectorXd GS(2*n,1);
+  Eigen::VectorXd GS(2*n);
 
   if (!GeneralizedSchur(H,E,WR,WI,GS,ZH,ZE))
     {
@@ -272,9 +279,9 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
 
 
   // Computes P the solution of the Riccati equation.
-  Eigen::MatrixXd P;
-  Eigen::MatrixXd Z11(n,n);
-  Eigen::MatrixXd Z21(n,n);
+  MatrixRXd P;
+  MatrixRXd Z11(n,n);
+  MatrixRXd Z21(n,n);
 
 
   for(int i=0;i< n;i++)
@@ -288,14 +295,14 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   ODEBUG( "Z11:" << endl << Z11 << endl
 	  << "Z21:" << endl << Z21 );
   
-  Eigen::MatrixXd iZ11;
+  MatrixRXd iZ11;
   iZ11=Z11.inverse();
   P = Z21*iZ11;
   
   ODEBUG( "P: " << endl << P);
 
   // Compute the weights.
-  Eigen::MatrixXd r;
+  MatrixRXd r;
 
   double la;
   r = tm_b;  // b^T
@@ -313,15 +320,15 @@ void OptimalControllerSolver::ComputeWeights(unsigned int Mode)
   ODEBUG("K: "<< endl << m_K);
   
   // Computes the weights for the future.
-  Eigen::MatrixXd PreMatrix;
-  Eigen::MatrixXd Recursive;
-  Eigen::MatrixXd BaseOfRecursion;
-  Eigen::MatrixXd PostMatrix;
-  Eigen::MatrixXd Intermediate;	
+  MatrixRXd PreMatrix;
+  MatrixRXd Recursive;
+  MatrixRXd BaseOfRecursion;
+  MatrixRXd PostMatrix;
+  MatrixRXd Intermediate;	
 
   PreMatrix = la * tm_b;
   BaseOfRecursion = m_A - m_b*m_K;
-  BaseOfRecursion = BaseOfRecursion.transpose();
+  BaseOfRecursion.transposeInPlace();
 
   PostMatrix = m_c.transpose();
   PostMatrix = PostMatrix * m_Q;

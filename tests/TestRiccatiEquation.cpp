@@ -152,9 +152,9 @@ int main()
   PatternGeneratorJRL::OptimalControllerSolver *anOCS;
 
   /* Declare the linear system */
-  Eigen::MatrixXd A;
-  Eigen::MatrixXd b;
-  Eigen::MatrixXd c;
+  Eigen::MatrixXd A(3,3);
+  Eigen::MatrixXd b(3,1);
+  Eigen::MatrixXd c(1,3);
   Eigen::MatrixXd lF;
   Eigen::MatrixXd lK;
 
