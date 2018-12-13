@@ -238,7 +238,7 @@ bool PinocchioRobot::testInverseKinematics()
   leftLegJointName.push_back("JointModelRY");
   leftLegJointName.push_back("JointModelRY");
   leftLegJointName.push_back("JointModelRX");
-  
+
   rightLegJointName.push_back("JointModelFreeFlyer");
   rightLegJointName.push_back("JointModelRZ");
   rightLegJointName.push_back("JointModelRX");
@@ -246,7 +246,7 @@ bool PinocchioRobot::testInverseKinematics()
   rightLegJointName.push_back("JointModelRY");
   rightLegJointName.push_back("JointModelRY");
   rightLegJointName.push_back("JointModelRX");
-  
+
   leftArmJointName.push_back("JointModelRY");
   leftArmJointName.push_back("JointModelRX");
   leftArmJointName.push_back("JointModelRZ");
@@ -342,9 +342,9 @@ void PinocchioRobot::RPYToSpatialFreeFlyer(Eigen::Vector3d & rpy,
         Eigen::AngleAxisd(rpy(1), Eigen::Vector3d::UnitY()) *
         Eigen::AngleAxisd(rpy(0), Eigen::Vector3d::UnitX()) ) ;
   quat.normalize();
-  double c0,s0; SINCOS (rpy(2), &s0, &c0);
-  double c1,s1; SINCOS (rpy(1), &s1, &c1);
-  double c2,s2; SINCOS (rpy(0), &s2, &c2);
+  double c0,s0; se3::SINCOS (rpy(2), &s0, &c0);
+  double c1,s1; se3::SINCOS (rpy(1), &s1, &c1);
+  double c2,s2; se3::SINCOS (rpy(0), &s2, &c2);
   m_S << -s1, 0., 1., c1 * s2, c2, 0, c1 * c2, -s2, 0;
   omega = m_S * drpy ;
   domega = m_S * ddrpy ;
