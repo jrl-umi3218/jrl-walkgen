@@ -380,10 +380,6 @@ namespace PatternGeneratorJRL
 
     /*! \name Vector from the Waist to the left and right hip. */
 
-    /*! Static part from the waist to the left hip.. */
-    Eigen::Vector3d m_StaticToTheLeftHip;
-    /*! Static part from the waist to the right hip. */
-    Eigen::Vector3d m_StaticToTheRightHip;
     /*! Dynamic part from the waist to the left hip. */
     Eigen::Vector3d m_TranslationToTheLeftHip;
     /*! Dynamic part form the waist to the right hip. */

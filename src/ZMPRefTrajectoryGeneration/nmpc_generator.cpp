@@ -1443,7 +1443,7 @@ void NMPCgenerator::evalCoPconstraint(Eigen::VectorXd & U)
   // build Acop_xy_
   Acop_xy_ = D_kp1_xy_*Pzuv_;
   // build UBcop_
-  UBcop_ = b_kp1_ + D_kp1_xy_*v_kp1f_-Pzsc_ ;
+  UBcop_ = b_kp1_ + D_kp1_xy_*(v_kp1f_-Pzsc_);
 
 #ifdef DEBUG
   DumpMatrix("Pzuv_",Pzuv_);

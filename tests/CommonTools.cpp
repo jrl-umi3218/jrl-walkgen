@@ -53,21 +53,21 @@ namespace PatternGeneratorJRL {
     {
       const unsigned int nbMethod = 13 ;
       const char lBuffer[nbMethod][256] =
-      {
-        ":comheight 0.8078",
-        ":samplingperiod 0.005",
-        ":previewcontroltime 1.6",
-        ":omega 0.0",
-        ":stepheight 0.07",
-        ":singlesupporttime 0.78",
-        ":doublesupporttime 0.02",
-        ":armparameters 0.5",
-        ":LimitsFeasibility 0.0",
-        ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
-        ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
-        ":UpperBodyMotionParameters -0.1 -1.0 0.0",
-        ":useDynamicFilter false"
-      };
+	{
+	  ":comheight 0.8078",
+	  ":samplingperiod 0.005",
+	  ":previewcontroltime 1.6",
+	  ":omega 0.0",
+	  ":stepheight 0.07",
+	  ":singlesupporttime 0.78",
+	  ":doublesupporttime 0.02",
+	  ":armparameters 0.5",
+	  ":LimitsFeasibility 0.0",
+	  ":ZMPShiftParameters 0.015 0.015 0.015 0.015",
+	  ":TimeDistributionParameters 2.0 3.7 1.7 3.0",
+	  ":UpperBodyMotionParameters -0.1 -1.0 0.0",
+	  ":useDynamicFilter false"
+	};
 
       for(unsigned int i=0;i<nbMethod;i++)
 	{
@@ -115,24 +115,24 @@ namespace PatternGeneratorJRL {
 
     void getOptions(int argc,
 		    char *argv[],
-            string &urdfFullPath,
-            string &srdfFullPath,
-            unsigned int &) // TestProfil)
+		    string &urdfFullPath,
+		    string &srdfFullPath,
+		    unsigned int &) // TestProfil)
     {
       std::cout << "argc:" << argc << std::endl;
       if (argc!=3)
 	{
-      cerr << " This program takes 2 arguments: " << endl;
-      cerr << "./TestFootPrintPGInterface PATH_TO_URDF_FILE PATH_TO_SRDF_FILE"
-           << endl;
+	  cerr << " This program takes 2 arguments: " << endl;
+	  cerr << "./TestFootPrintPGInterface PATH_TO_URDF_FILE PATH_TO_SRDF_FILE"
+	       << endl;
 	  exit(-1);
 	}
       else
 	{
-      urdfFullPath=argv[1];
-      srdfFullPath=argv[2];
-      cout << urdfFullPath << endl ;
-      cout << srdfFullPath << endl ;
+	  urdfFullPath=argv[1];
+	  srdfFullPath=argv[2];
+	  cout << urdfFullPath << endl ;
+	  cout << srdfFullPath << endl ;
 	}
     }
   } /* End of TestSuite namespace */

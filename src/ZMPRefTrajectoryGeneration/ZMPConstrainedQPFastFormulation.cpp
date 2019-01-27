@@ -466,10 +466,10 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunctionQ
 
 
   // New formulation (Dimitar08)
-  m_OptB=m_iLQ+m_OptB;
+  m_OptB=m_iLQ*m_OptB;
 
   // New formulation (Dimitar08)
-  m_OptC=m_iLQ+m_OptC;
+  m_OptC=m_iLQ*m_OptC;
 
   if (m_FullDebug>0)
     {  
@@ -549,9 +549,9 @@ int ZMPConstrainedQPFastFormulation::BuildingConstantPartOfTheObjectiveFunction(
 
   /*! Compute constants of the linear part of the objective function. */
   lterm1 = m_PPu.transpose();
-  lterm1=lterm1+m_PPx;
+  lterm1=lterm1*m_PPx;
   m_OptB = m_VPu.transpose();
-  tmp=m_OptB+m_VPx;
+  tmp=m_OptB*m_VPx;
   m_OptB=m_Alpha*tmp;
   m_OptB = m_OptB + m_Beta * lterm1;
   
