@@ -241,13 +241,13 @@ GeneratorVelRef::initialize_matrices()
 
   IntermedQPMat::state_variant_t & State = IntermedData_->State();
   bool Preserve = true;
-  State.VcshiftX.resize(N_,!Preserve);
+  State.VcshiftX.resize(N_);
   State.VcshiftX.setZero();
-  State.VcshiftY.resize(N_,!Preserve);
+  State.VcshiftY.resize(N_);
   State.VcshiftY.setZero();
-  State.VcX.resize(N_,!Preserve);
+  State.VcX.resize(N_);
   State.VcX.setZero();
-  State.VcY.resize(N_,!Preserve);
+  State.VcY.resize(N_);
   State.VcY.setZero();
 
 }

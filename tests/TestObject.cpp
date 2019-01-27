@@ -283,11 +283,12 @@ namespace PatternGeneratorJRL
         m_leftGripper = 0 ;
     }
     
-    void TestObject::CreateAndInitializeHumanoidRobot(
-        std::string &URDFFile,
-        std::string &SRDFFile,
-        PinocchioRobot *& aPR,
-        PinocchioRobot *& aDebugPR)
+    void TestObject::
+    CreateAndInitializeHumanoidRobot(
+				     std::string &URDFFile,
+				     std::string &SRDFFile,
+				     PinocchioRobot *& aPR,
+				     PinocchioRobot *& aDebugPR)
     {
       // Creating the humanoid robot via the URDF.
       //      try{
@@ -330,7 +331,8 @@ namespace PatternGeneratorJRL
       std::ifstream srdf_stream(filename.c_str());
       if (! srdf_stream.is_open())
       {
-        const std::string exception_message (filename + " does not seem to be a valid file.");
+        const std::string exception_message
+	  (filename + " does not seem to be a valid file.");
         cerr << exception_message << endl ;
         throw std::invalid_argument(exception_message);
       }
@@ -346,9 +348,10 @@ namespace PatternGeneratorJRL
       }
 
       // Get the starting configuration : half sitting
+      // Uses the order 
       m_HalfSitting.resize(aPR.numberDof()-6);
       m_HalfSitting.setZero();
-      { for(unsigned int i=0;i<m_HalfSitting.size();m_HalfSitting[i++]=0.0);};
+
       se3::Model * aModel = aPR.Model();
       BOOST_FOREACH(const ptree::value_type & v, pt.get_child("robot.group_state"))
       {
@@ -424,6 +427,22 @@ namespace PatternGeneratorJRL
       se3::FrameIndex la = aModel->getFrameId("l_ankle");
       aFoot.associatedAnkle = aModel->frames[la].parent ;
       aPR.initializeLeftFoot(aFoot);
+
+      //path="robot.mapURDFToOpenHRP";
+      unsigned int lindex=0;
+      BOOST_FOREACH(const ptree::value_type & v, pt.get_child("robot.group"))
+      {
+	if (v.first=="joint")
+	  {
+	    std::cerr << "Found mapURDFToOpenHRP"<< std::endl;
+	    const std::string jointName =
+              v.second.get<std::string>("<xmlattr>.name");
+	    se3::JointIndex id = aModel->getJointId(jointName);
+            unsigned idq = se3::idx_q(aModel->joints[id]);
+	    m_fromURDFToOpenHRP.push_back(idq-1);
+	  }
+	lindex++;
+      }
     }
 
     void TestObject::prepareDebugFiles()
@@ -933,46 +952,32 @@ namespace PatternGeneratorJRL
       }
     }
 
+    void TestObject::setFromURDFToOpenHRP(std::vector<unsigned int> &vfromURDFToOpenHRP)
+    {
+      m_fromURDFToOpenHRP = vfromURDFToOpenHRP;
+    }
+    
     void TestObject::parseFromURDFtoOpenHRPIndex(Eigen::VectorXd &conf)
     {
-
-      { for(unsigned int i=0;i<conf.size();conf[i++]=0.0);};
-
-      for(unsigned int i = 0 ; i < 6 ; i++)
-        conf(i) = m_CurrentConfiguration(i);
-      long unsigned index=6;
-      //RLEG
-      for(unsigned int i = 0 ; i < m_rightLeg.size() ; i++)
-        conf(index+i) = m_CurrentConfiguration(m_rightLeg[i]);
-      index+=m_rightLeg.size();
-      //LLEG
-      for(unsigned int i = 0 ; i < m_leftLeg.size() ; i++)
-        conf(index+i) = m_CurrentConfiguration(m_leftLeg[i]);
-      index+=m_leftLeg.size();
-      //CHEST
-      for(unsigned int i = 0 ; i < 2 ; i++)
-        conf(index+i) = 0.0 ;
-      index+= 2 ;
-      //HEAD
-      for(unsigned int i = 0 ; i < 2 ; i++)
-        conf(index+i) = 0.0 ;
-      index+= 2 ;
-      //RARM
-      for(unsigned int i = 0 ; i < m_rightArm.size() ; i++)
-        conf(index+i) = m_HalfSitting(m_rightArm[i]-6);
-      index+=m_rightArm.size();
-      conf(index) = 10*M_PI/180;
-      ++index;
-      //LARM
-      for(unsigned int i = 0 ; i < m_leftArm.size() ; i++)
-        conf(index+i) = m_HalfSitting(m_leftArm[i]-6);
-      index+=m_leftArm.size();
-      conf(index) = 10*M_PI/180;
+      if (conf.size()!=m_fromURDFToOpenHRP.size())
+	{
+	  std::cerr << "" << std::endl;
+	  return;
+	}
+      
+      std::cout << "conf size():" << conf.size() << std::endl;
+      std::cout << "Current Configuration: "
+		<< m_CurrentConfiguration.size()
+		<< std::endl;
+      conf.setZero();
+      for(unsigned int i=0;i<m_fromURDFToOpenHRP.size();i++)
+	conf(i) = m_CurrentConfiguration(m_fromURDFToOpenHRP[i]);
 
     }
 
     void TestObject::generateOpenHRPTrajectories()
     {
+      
       analyticalInverseKinematics(m_CurrentConfiguration,
                                   m_CurrentVelocity,
                                   m_CurrentAcceleration);
@@ -1004,7 +1009,7 @@ namespace PatternGeneratorJRL
       aof.setf(ios::scientific, ios::floatfield);
       //std::cout << iteration << " - Going through this step "<< std::endl;
       aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
-      for(unsigned int i = 6 ; i < 36 ; i++){
+      for(unsigned int i = 6 ; i < conf.size() ; i++){
         aof << filterprecision( conf(i) ) << " "  ; // 2
       }
       for(unsigned int i = 0 ; i < 9 ; i++){

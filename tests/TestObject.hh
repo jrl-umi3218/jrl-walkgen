@@ -170,6 +170,9 @@ namespace PatternGeneratorJRL
       se3::JointIndex m_leftGripper  ;
       se3::JointIndex m_rightGripper ;
 
+      /*! \brief From URDF to OpenHRP indexes. */
+      std::vector<unsigned int> m_fromURDFToOpenHRP;
+      
       /*! \brief Vector of generalized configurations for whole body motion. */
       Eigen::VectorXd m_conf;
       Eigen::VectorXd m_vel ;
@@ -205,6 +208,9 @@ namespace PatternGeneratorJRL
       /*! \brief Compare debug files with references. */
       bool compareDebugFiles();
 
+      /*! \brief Set map from URDF joint index to OpenHRP index */
+      void setFromURDFToOpenHRP(std::vector<unsigned int> &vfromURDFToOpenHRP);
+      
       /*! \brief Generate trajectories files for OpenHRP. */
       void generateOpenHRPTrajectories();
       /*! @} */

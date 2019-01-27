@@ -368,7 +368,19 @@ int DynamicFilter::OnLinefilter(
       deltaZMP_deq_[i].py = 0.0 ;
     }
   }
-
+  /*
+  for (unsigned int i = 0 ; i < N1 ; ++i)
+    {
+      std::cout << i
+		<< " - Dx=" << deltaZMP_deq_[i].px
+		<< " Dy=" << deltaZMP_deq_[i].py
+		<< " " << inputZMPTraj_deq_[i].px
+		<< " " << zmpmb_i_[i][0]
+		<< " " << inputZMPTraj_deq_[i].py
+		<< " " << zmpmb_i_[i][1]
+		<< " useDynamicFilter: " << useDynamicFilter_
+		<< std::endl;
+		} */
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
 
   return 0 ;
@@ -420,6 +432,11 @@ void DynamicFilter::InverseKinematics(
   aRightFootPosition_(3) = inputRightFoot.theta;
   aRightFootPosition_(4) = inputRightFoot.omega;
 
+  /*
+  std::cout << "aCoMState_ :" << aCoMState_ << std::endl
+	    << " aCoMSpeed_ :" << aCoMSpeed_ << std::endl
+	    << " aCoMAcc_ :" << aCoMAcc_ << std::endl;
+  */
   comAndFootRealization_->setSamplingPeriod(samplingPeriod);
   comAndFootRealization_->ComputePostureForGivenCoMAndFeetPosture(
         aCoMState_, aCoMSpeed_, aCoMAcc_,
@@ -427,6 +444,8 @@ void DynamicFilter::InverseKinematics(
         configuration, velocity, acceleration,
         iteration, stage);
 
+  //  std::cout << " configuration:" << configuration << std::endl;
+  
   // upper body
   if (walkingHeuristic_)
   {
@@ -528,11 +547,17 @@ int DynamicFilter::OptimalControl(
     {
       for(int j=0;j<3;++j)
         {
-          if ( outputDeltaCOMTraj_deq_[i].x[j] == outputDeltaCOMTraj_deq_[i].x[j] ||
-               outputDeltaCOMTraj_deq_[i].y[j] == outputDeltaCOMTraj_deq_[i].y[j] )
+          if ( (outputDeltaCOMTraj_deq_[i].x[j] ==
+		outputDeltaCOMTraj_deq_[i].x[j]) ||
+               (outputDeltaCOMTraj_deq_[i].y[j] ==
+		outputDeltaCOMTraj_deq_[i].y[j]) )
             {}
           else{
-              cout << "kajita2003 preview control diverged\n" ;
+              cout << "kajita2003 preview control diverged "
+		   << outputDeltaCOMTraj_deq_[i].x[j] << " "
+		   << outputDeltaCOMTraj_deq_[i].y[j] << " "
+		   << deltaZMPx << " "
+		   << deltaZMPy << "\n" ;
               return -1 ;
             }
         }

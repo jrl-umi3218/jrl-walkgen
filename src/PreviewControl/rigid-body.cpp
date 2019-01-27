@@ -171,12 +171,12 @@ void
 rigid_body_state_t::reset()
 {
 
-  X.resize(3,false);
-  Y.resize(3,false);
-  Z.resize(3,false);
-  Yaw.resize(3,false);
-  Pitch.resize(3,false);
-  Roll.resize(3,false);
+  X.resize(3);
+  Y.resize(3);
+  Z.resize(3);
+  Yaw.resize(3);
+  Pitch.resize(3);
+  Roll.resize(3);
 
   X.setZero();
   Y.setZero();
