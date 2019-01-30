@@ -368,19 +368,7 @@ int DynamicFilter::OnLinefilter(
       deltaZMP_deq_[i].py = 0.0 ;
     }
   }
-  /*
-  for (unsigned int i = 0 ; i < N1 ; ++i)
-    {
-      std::cout << i
-		<< " - Dx=" << deltaZMP_deq_[i].px
-		<< " Dy=" << deltaZMP_deq_[i].py
-		<< " " << inputZMPTraj_deq_[i].px
-		<< " " << zmpmb_i_[i][0]
-		<< " " << inputZMPTraj_deq_[i].py
-		<< " " << zmpmb_i_[i][1]
-		<< " useDynamicFilter: " << useDynamicFilter_
-		<< std::endl;
-		} */
+  
   OptimalControl(deltaZMP_deq_,outputDeltaCOMTraj_deq_) ;
 
   return 0 ;
@@ -525,11 +513,11 @@ int DynamicFilter::OptimalControl(
   double deltaZMPx = 0.0 ;
   double deltaZMPy = 0.0 ;
   // computation of the preview control along the "deltaZMP_deq_"
-//  for(unsigned i=0;i<3;++i)
-//  {
-//    deltax_(i,0)=0.0;
-//    deltay_(i,0)=0.0;
-//  }
+  //  for(unsigned i=0;i<3;++i)
+  //  {
+  //    deltax_(i,0)=0.0;
+  //    deltay_(i,0)=0.0;
+  //  }
   for (int i = 0 ; i < Nctrl ; ++i )
   {
     PC_->OneIterationOfPreview(deltax_,deltay_,

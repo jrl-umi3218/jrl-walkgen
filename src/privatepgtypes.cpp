@@ -92,9 +92,9 @@ namespace PatternGeneratorJRL
   void com_t::reset()
   {
 
-    x.resize(3,false);
-    y.resize(3,false);
-    z.resize(3,false);
+    x.resize(3);
+    y.resize(3);
+    z.resize(3);
     x.setZero();
     y.setZero();
     z.setZero();
@@ -131,12 +131,12 @@ namespace PatternGeneratorJRL
   void trunk_t::reset()
   {
 
-    x.resize(3,false);
-    y.resize(3,false);
-    z.resize(3,false);
-    yaw.resize(3,false);
-    pitch.resize(3,false);
-    roll.resize(3,false);
+    x.resize(3);
+    y.resize(3);
+    z.resize(3);
+    yaw.resize(3);
+    pitch.resize(3);
+    roll.resize(3);
     x.setZero();
     y.setZero();
     z.setZero();
