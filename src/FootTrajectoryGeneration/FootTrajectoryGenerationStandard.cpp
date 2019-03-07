@@ -53,17 +53,17 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
 
   /* Computes information on foot dimension
      from humanoid specific informations. */
-  double lWidth,lHeight,lDepth;
+  double lWidth=0.0,lDepth=0.0;
   if (m_Foot->associatedAnkle!=0)
   {
     lWidth  = m_Foot->soleWidth ;
-    lHeight = m_Foot->soleHeight ;
   }
   else
     {
       cerr << "Pb no ref Foot." << endl;
     }
   Eigen::Vector3d AnklePosition;
+  AnklePosition.Zero();
   if (m_Foot->associatedAnkle!=0)
     AnklePosition = m_Foot->anklePosition;
   else
@@ -87,7 +87,6 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
   if (m_Foot->associatedAnkle!=0)
   {
     lWidth        = m_Foot->soleWidth ;
-    lHeight       = m_Foot->soleHeight ;
     AnklePosition = m_Foot->anklePosition;
   }
   else

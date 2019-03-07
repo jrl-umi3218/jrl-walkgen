@@ -8,13 +8,13 @@ class Joint_shortname : public boost::static_visitor<std::string>
 {
 public:
   template<typename D>
-  std::string operator()(const se3::JointModelBase<D> & jmodel) const
+  std::string operator()(const pinocchio::JointModelBase<D> & jmodel) const
   { return jmodel.shortname(); }
 
-  static std::string run( const se3::JointModelVariant & jmodel)
+  static std::string run( const pinocchio::JointModelVariant & jmodel)
   { return boost::apply_visitor( Joint_shortname(), jmodel ); }
 };
-inline std::string shortname(const se3::JointModelVariant & jmodel)
+inline std::string shortname(const pinocchio::JointModelVariant & jmodel)
 { return Joint_shortname::run(jmodel); }
 
 PinocchioRobot::PinocchioRobot()
@@ -86,7 +86,7 @@ PinocchioRobot::~PinocchioRobot()
     }
 }
 
-bool PinocchioRobot::checkModel(se3::Model * robotModel)
+bool PinocchioRobot::checkModel(pinocchio::Model * robotModel)
 {
   if(!robotModel->existFrame("r_ankle"))
     {
@@ -132,8 +132,8 @@ bool PinocchioRobot::checkModel(se3::Model * robotModel)
   return true ;
 }
 
-bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
-                                                 se3::Data * robotData)
+bool PinocchioRobot::initializeRobotModelAndData(pinocchio::Model * robotModel,
+                                                 pinocchio::Data * robotData)
 {
   m_boolModel=checkModel(robotModel);
   if(!m_boolModel)
@@ -144,24 +144,24 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   m_robotModel = robotModel;
 
   // initialize the short cut for the joint ids
-  se3::FrameIndex chest = m_robotModel->getFrameId("torso");
+  pinocchio::FrameIndex chest = m_robotModel->getFrameId("torso");
   m_chest = m_robotModel->frames[chest].parent ;
-  se3::FrameIndex waist = (robotModel->existFrame("BODY"))?m_robotModel->getFrameId("BODY"):m_robotModel->getFrameId("body");
+  pinocchio::FrameIndex waist = (robotModel->existFrame("BODY"))?m_robotModel->getFrameId("BODY"):m_robotModel->getFrameId("body");
   m_waist = m_robotModel->frames[waist].parent ;
-  se3::FrameIndex ra = m_robotModel->getFrameId("r_ankle");
+  pinocchio::FrameIndex ra = m_robotModel->getFrameId("r_ankle");
   m_rightFoot.associatedAnkle = m_robotModel->frames[ra].parent ;
-  se3::FrameIndex la = m_robotModel->getFrameId("l_ankle");
+  pinocchio::FrameIndex la = m_robotModel->getFrameId("l_ankle");
   m_leftFoot.associatedAnkle = m_robotModel->frames[la].parent ;
-  se3::FrameIndex rw = m_robotModel->getFrameId("r_wrist");
+  pinocchio::FrameIndex rw = m_robotModel->getFrameId("r_wrist");
   m_rightWrist = m_robotModel->frames[rw].parent ;
-  se3::FrameIndex lw = m_robotModel->getFrameId("l_wrist");
+  pinocchio::FrameIndex lw = m_robotModel->getFrameId("l_wrist");
   m_leftWrist = m_robotModel->frames[lw].parent ;
 
   DetectAutomaticallyShoulders();
 
   // intialize the "initial pose" (q=[0]) data
-  m_robotDataInInitialePose = new se3::Data(*m_robotModel);
-  m_robotDataInInitialePose->v[0] = se3::Motion::Zero();
+  m_robotDataInInitialePose = new pinocchio::Data(*m_robotModel);
+  m_robotDataInInitialePose->v[0] = pinocchio::Motion::Zero();
   m_robotDataInInitialePose->a[0] = -m_robotModel->gravity;
   m_q.resize(m_robotModel->nq,1);
   m_q.fill(0.0);
@@ -169,7 +169,7 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   m_v.resize(m_robotModel->nv,1);
   m_a.resize(m_robotModel->nv,1);
   m_tau.resize(m_robotModel->nv,1);
-  se3::forwardKinematics(*m_robotModel,*m_robotDataInInitialePose,m_q);
+  pinocchio::forwardKinematics(*m_robotModel,*m_robotDataInInitialePose,m_q);
 
   m_qmal.resize(m_robotModel->nv);
   m_vmal.resize(m_robotModel->nv);
@@ -195,7 +195,7 @@ bool PinocchioRobot::initializeRobotModelAndData(se3::Model * robotModel,
   else
     m_boolData=true;
   m_robotData = robotData;
-  m_robotData->v[0] = se3::Motion::Zero();
+  m_robotData->v[0] = pinocchio::Motion::Zero();
   m_robotData->a[0] = -m_robotModel->gravity;
 
   if(testInverseKinematics())
@@ -220,13 +220,13 @@ bool PinocchioRobot::initializeRightFoot(PRFoot rightFoot)
 
 bool PinocchioRobot::testInverseKinematics()
 {
-  std::vector<se3::JointIndex> leftLeg =
+  std::vector<pinocchio::JointIndex> leftLeg =
     jointsBetween(m_waist,m_leftFoot.associatedAnkle);
-  std::vector<se3::JointIndex> rightLeg =
+  std::vector<pinocchio::JointIndex> rightLeg =
     jointsBetween(m_waist,m_rightFoot.associatedAnkle);
-  std::vector<se3::JointIndex> leftArm =
+  std::vector<pinocchio::JointIndex> leftArm =
     jointsBetween(m_chest,m_leftWrist);
-  std::vector<se3::JointIndex> rightArm =
+  std::vector<pinocchio::JointIndex> rightArm =
     jointsBetween(m_chest,m_rightWrist);
 
   std::vector<std::string> leftLegJointName,rightLegJointName,
@@ -292,14 +292,14 @@ bool PinocchioRobot::testInverseKinematics()
 
 void PinocchioRobot::initializeInverseKinematics()
 {
-  std::vector<se3::JointIndex> leftLeg =
+  std::vector<pinocchio::JointIndex> leftLeg =
     jointsBetween(m_waist,m_leftFoot.associatedAnkle);
-  std::vector<se3::JointIndex> rightLeg =
+  std::vector<pinocchio::JointIndex> rightLeg =
     jointsBetween(m_waist,m_rightFoot.associatedAnkle);
 
   m_leftDt.Zero();
   m_rightDt.Zero();
-  se3::SE3 waist_M_leftHip , waist_M_rightHip ;
+  pinocchio::SE3 waist_M_leftHip , waist_M_rightHip ;
   waist_M_leftHip = m_robotModel->jointPlacements[leftLeg[0]].act(
 								  m_robotModel->jointPlacements[leftLeg[1]]).act(
 														 m_robotModel->jointPlacements[leftLeg[2]]).act(
@@ -342,9 +342,9 @@ void PinocchioRobot::RPYToSpatialFreeFlyer(Eigen::Vector3d & rpy,
 			    Eigen::AngleAxisd(rpy(1), Eigen::Vector3d::UnitY()) *
 			    Eigen::AngleAxisd(rpy(0), Eigen::Vector3d::UnitX()) ) ;
   quat.normalize();
-  double c0,s0; se3::SINCOS (rpy(2), &s0, &c0);
-  double c1,s1; se3::SINCOS (rpy(1), &s1, &c1);
-  double c2,s2; se3::SINCOS (rpy(0), &s2, &c2);
+  double c0,s0; pinocchio::SINCOS (rpy(2), &s0, &c0);
+  double c1,s1; pinocchio::SINCOS (rpy(1), &s1, &c1);
+  double c2,s2; pinocchio::SINCOS (rpy(0), &s2, &c2);
   m_S << -s1, 0., 1., c1 * s2, c2, 0, c1 * c2, -s2, 0;
   omega = m_S * drpy ;
   domega = m_S * ddrpy ;
@@ -379,8 +379,8 @@ void PinocchioRobot::computeForwardKinematics(Eigen::VectorXd & q)
     {
       m_q(7+i) = q(6+i);
     }
-  se3::forwardKinematics(*m_robotModel,*m_robotData,m_q);
-  se3::centerOfMass(*m_robotModel,*m_robotData,m_q);
+  pinocchio::forwardKinematics(*m_robotModel,*m_robotData,m_q);
+  pinocchio::centerOfMass(*m_robotModel,*m_robotData,m_q);
 }
 
 void PinocchioRobot::computeInverseDynamics()
@@ -432,14 +432,14 @@ void PinocchioRobot::computeInverseDynamics(Eigen::VectorXd & q,
       m_a(i)   = a(i);
     }
   // performing the inverse dynamics
-  m_tau = se3::rnea(*m_robotModel,*m_robotData,m_q,m_v,m_a);
+  m_tau = pinocchio::rnea(*m_robotModel,*m_robotData,m_q,m_v,m_a);
 }
 
-std::vector<se3::JointIndex> PinocchioRobot::fromRootToIt(se3::JointIndex it)
+std::vector<pinocchio::JointIndex> PinocchioRobot::fromRootToIt(pinocchio::JointIndex it)
 {
-  std::vector<se3::JointIndex> fromRootToIt ;
+  std::vector<pinocchio::JointIndex> fromRootToIt ;
   fromRootToIt.clear();
-  se3::JointIndex i = it ;
+  pinocchio::JointIndex i = it ;
   while(i!=0)
     {
       fromRootToIt.insert(fromRootToIt.begin(),i);
@@ -448,16 +448,16 @@ std::vector<se3::JointIndex> PinocchioRobot::fromRootToIt(se3::JointIndex it)
   return fromRootToIt ;
 }
 
-std::vector<se3::JointIndex> PinocchioRobot::jointsBetween
-( se3::JointIndex first, se3::JointIndex second)
+std::vector<pinocchio::JointIndex> PinocchioRobot::jointsBetween
+( pinocchio::JointIndex first, pinocchio::JointIndex second)
 {
-  std::vector<se3::JointIndex> fromRootToFirst  = fromRootToIt(first);
-  std::vector<se3::JointIndex> fromRootToSecond = fromRootToIt(second);
+  std::vector<pinocchio::JointIndex> fromRootToFirst  = fromRootToIt(first);
+  std::vector<pinocchio::JointIndex> fromRootToSecond = fromRootToIt(second);
 
-  std::vector<se3::JointIndex> out ;
+  std::vector<pinocchio::JointIndex> out ;
   out.clear();
-  se3::JointIndex lastCommonRank = 0 ;
-  se3::JointIndex minChainLength =
+  pinocchio::JointIndex lastCommonRank = 0 ;
+  pinocchio::JointIndex minChainLength =
     fromRootToFirst.size() < fromRootToSecond.size()
 			     ? fromRootToFirst.size() : fromRootToSecond.size() ;
 
@@ -467,7 +467,7 @@ std::vector<se3::JointIndex> PinocchioRobot::jointsBetween
 	++lastCommonRank;
     }
 
-  for(std::vector<se3::JointIndex>::size_type k=fromRootToFirst.size()-1;
+  for(std::vector<pinocchio::JointIndex>::size_type k=fromRootToFirst.size()-1;
       k>lastCommonRank ; --k)
     {
       out.push_back(fromRootToFirst[k]);
@@ -476,7 +476,7 @@ std::vector<se3::JointIndex> PinocchioRobot::jointsBetween
     {
       out.push_back(fromRootToSecond[0]);
     }
-  for(se3::JointIndex k=lastCommonRank+1 ; k<fromRootToSecond.size() ; ++k)
+  for(pinocchio::JointIndex k=lastCommonRank+1 ; k<fromRootToSecond.size() ; ++k)
     {
       out.push_back(fromRootToSecond[k]);
     }
@@ -487,8 +487,8 @@ std::vector<se3::JointIndex> PinocchioRobot::jointsBetween
 ///////////////////////////////////////////////////////////////////////////////
 bool PinocchioRobot::
 ComputeSpecializedInverseKinematics(
-				    const se3::JointIndex &jointRoot,
-				    const se3::JointIndex &jointEnd,
+				    const pinocchio::JointIndex &jointRoot,
+				    const pinocchio::JointIndex &jointEnd,
 				    const Eigen::Matrix4d & jointRootPosition,
 				    const Eigen::Matrix4d & jointEndPosition,
 				    Eigen::VectorXd &q )
@@ -738,19 +738,19 @@ void PinocchioRobot::DetectAutomaticallyShoulders()
 }
 
 void PinocchioRobot::DetectAutomaticallyOneShoulder(
-						    se3::JointIndex aWrist,
-						    se3::JointIndex & aShoulder)
+						    pinocchio::JointIndex aWrist,
+						    pinocchio::JointIndex & aShoulder)
 {
-  std::vector<se3::JointIndex>FromRootToJoint;
+  std::vector<pinocchio::JointIndex>FromRootToJoint;
 
   FromRootToJoint.clear();
   FromRootToJoint = fromRootToIt(aWrist);
 
-  std::vector<se3::JointIndex>::iterator itJoint = FromRootToJoint.begin();
+  std::vector<pinocchio::JointIndex>::iterator itJoint = FromRootToJoint.begin();
   bool found=false;
   while(itJoint!=FromRootToJoint.end())
     {
-      std::vector<se3::JointIndex>::iterator current = itJoint;
+      std::vector<pinocchio::JointIndex>::iterator current = itJoint;
       if (*current==m_chest)
 	found=true;
       else

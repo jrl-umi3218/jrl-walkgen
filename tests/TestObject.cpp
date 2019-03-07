@@ -260,15 +260,15 @@ namespace PatternGeneratorJRL
       m_leftLeg.erase( m_leftLeg.begin() );
       m_rightLeg.erase( m_rightLeg.begin() );
       
-      se3::JointModelVector & ActuatedJoints = m_PR->getActuatedJoints();
+      pinocchio::JointModelVector & ActuatedJoints = m_PR->getActuatedJoints();
       for(unsigned i=0 ; i <m_leftLeg.size() ; ++i)
-        m_leftLeg[i] = se3::idx_q(ActuatedJoints[m_leftLeg[i]])-1;
+        m_leftLeg[i] = pinocchio::idx_q(ActuatedJoints[m_leftLeg[i]])-1;
       for(unsigned i=0 ; i <m_rightLeg.size() ; ++i)
-        m_rightLeg[i] = se3::idx_q(ActuatedJoints[m_rightLeg[i]])-1;
+        m_rightLeg[i] = pinocchio::idx_q(ActuatedJoints[m_rightLeg[i]])-1;
       for(unsigned i=0 ; i <m_leftArm.size() ; ++i)
-        m_leftArm[i] = se3::idx_q(ActuatedJoints[m_leftArm[i]])-1;
+        m_leftArm[i] = pinocchio::idx_q(ActuatedJoints[m_leftArm[i]])-1;
       for(unsigned i=0 ; i <m_rightArm.size() ; ++i)
-        m_rightArm[i] = se3::idx_q(ActuatedJoints[m_rightArm[i]])-1;
+        m_rightArm[i] = pinocchio::idx_q(ActuatedJoints[m_rightArm[i]])-1;
       
       if((m_robotModel.parents.size() >= m_rightArm.back()+1) &&
          m_robotModel.parents[m_rightArm.back()+1] == m_rightArm.back())
@@ -292,11 +292,11 @@ namespace PatternGeneratorJRL
     {
       // Creating the humanoid robot via the URDF.
       //      try{
-      se3::urdf::buildModel(URDFFile,
-                            se3::JointModelFreeFlyer(),
+      pinocchio::urdf::buildModel(URDFFile,
+                            pinocchio::JointModelFreeFlyer(),
                             m_robotModel);
-      m_robotData = new se3::Data(m_robotModel) ;
-      m_DebugRobotData = new se3::Data(m_robotModel) ;
+      m_robotData = new pinocchio::Data(m_robotModel) ;
+      m_DebugRobotData = new pinocchio::Data(m_robotModel) ;
       //      }catch(std::invalid_argument e)
       //      {
       //        cout << e.what() ;
@@ -352,7 +352,7 @@ namespace PatternGeneratorJRL
       m_HalfSitting.resize(aPR.numberDof()-6);
       m_HalfSitting.setZero();
 
-      se3::Model * aModel = aPR.Model();
+      pinocchio::Model * aModel = aPR.Model();
       BOOST_FOREACH(const ptree::value_type & v, pt.get_child("robot.group_state"))
       {
         if(v.first=="joint")
@@ -363,8 +363,8 @@ namespace PatternGeneratorJRL
               v.second.get<double>("<xmlattr>.value");
           if(aModel->existJointName(jointName))
           {
-            se3::JointIndex id = aModel->getJointId(jointName);
-            unsigned idq = se3::idx_q(aModel->joints[id]);
+            pinocchio::JointIndex id = aModel->getJointId(jointName);
+            unsigned idq = pinocchio::idx_q(aModel->joints[id]);
             // we assume only revolute joint here.
             m_HalfSitting(idq-7) = jointValue ;
           }
@@ -405,7 +405,7 @@ namespace PatternGeneratorJRL
         aFoot.anklePosition(1) = v.second.get<double>("y");
         aFoot.anklePosition(2) = v.second.get<double>("z");
       }
-      se3::FrameIndex ra = aModel->getFrameId("r_ankle");
+      pinocchio::FrameIndex ra = aModel->getFrameId("r_ankle");
       aFoot.associatedAnkle = aModel->frames[ra].parent ;
       aPR.initializeRightFoot(aFoot);
 
@@ -424,7 +424,7 @@ namespace PatternGeneratorJRL
         aFoot.anklePosition(1) = v.second.get<double>("y");
         aFoot.anklePosition(2) = v.second.get<double>("z");
       }
-      se3::FrameIndex la = aModel->getFrameId("l_ankle");
+      pinocchio::FrameIndex la = aModel->getFrameId("l_ankle");
       aFoot.associatedAnkle = aModel->frames[la].parent ;
       aPR.initializeLeftFoot(aFoot);
 
@@ -437,8 +437,8 @@ namespace PatternGeneratorJRL
 	    std::cerr << "Found mapURDFToOpenHRP"<< std::endl;
 	    const std::string jointName =
               v.second.get<std::string>("<xmlattr>.name");
-	    se3::JointIndex id = aModel->getJointId(jointName);
-            unsigned idq = se3::idx_q(aModel->joints[id]);
+	    pinocchio::JointIndex id = aModel->getJointId(jointName);
+            unsigned idq = pinocchio::idx_q(aModel->joints[id]);
 	    m_fromURDFToOpenHRP.push_back(idq-1);
 	  }
 	lindex++;

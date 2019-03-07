@@ -108,8 +108,8 @@ void ComAndFootRealizationByGeometry::
 }
 
 void ComAndFootRealizationByGeometry::
-InitializationMaps(std::vector<se3::Index> &FromRootToJoint,
-                   se3::JointModelVector & actuatedJoints,
+InitializationMaps(std::vector<pinocchio::Index> &FromRootToJoint,
+                   pinocchio::JointModelVector & actuatedJoints,
                    std::vector<int> &IndexinConfiguration,
                    std::vector<int> &IndexinVelocity)
 {
@@ -127,33 +127,33 @@ InitializationMaps(std::vector<se3::Index> &FromRootToJoint,
     {
       // -1 because pinocchio uses quaternion instead of roll pitch yaw
       // assuming the model possess only revolute joint
-      IndexinConfiguration[lindex] = se3::idx_q(actuatedJoints[FromRootToJoint[i]])-1 ;
-      IndexinVelocity[lindex] = se3::idx_v(actuatedJoints[FromRootToJoint[i]]) ;
+      IndexinConfiguration[lindex] = pinocchio::idx_q(actuatedJoints[FromRootToJoint[i]])-1 ;
+      IndexinVelocity[lindex] = pinocchio::idx_v(actuatedJoints[FromRootToJoint[i]]) ;
       lindex++;
     }
   }
 }
 
 void ComAndFootRealizationByGeometry::
-    InitializeMapsForAHand(se3::JointIndex aWrist,
-                           se3::JointModelVector & ActuatedJoints,
+    InitializeMapsForAHand(pinocchio::JointIndex aWrist,
+                           pinocchio::JointModelVector & ActuatedJoints,
                            vector<int> & IndexesInConfiguration,
                            vector<int> & IndexesInVelocity,
-                           se3::JointIndex & associateShoulder)
+                           pinocchio::JointIndex & associateShoulder)
 {
   if (aWrist==0)
     return;
 
   // Find back the path from the shoulder to the left hand.
-  se3::JointIndex Chest = getPinocchioRobot()->chest();
+  pinocchio::JointIndex Chest = getPinocchioRobot()->chest();
   if (Chest==0)
     return;
 
-  const se3::JointIndex associatedWrist = aWrist;
+  const pinocchio::JointIndex associatedWrist = aWrist;
   if (associatedWrist==0)
     return;
 
-  std::vector<se3::JointIndex> FromRootToJoint =
+  std::vector<pinocchio::JointIndex> FromRootToJoint =
       getPinocchioRobot()->jointsBetween(Chest, associatedWrist);
 
   associateShoulder = FromRootToJoint[0];
@@ -164,22 +164,22 @@ void ComAndFootRealizationByGeometry::
 }
 
 void ComAndFootRealizationByGeometry::
-    InitializeMapForChest(se3::JointModelVector & ActuatedJoints)
+    InitializeMapForChest(pinocchio::JointModelVector & ActuatedJoints)
 {
 
-  se3::JointIndex Chest = getPinocchioRobot()->chest();
+  pinocchio::JointIndex Chest = getPinocchioRobot()->chest();
   if (Chest==0)
     return;
 
-  std::vector<se3::JointIndex> /*FromRootToJoint2,*/FromRootToJoint;
+  std::vector<pinocchio::JointIndex> /*FromRootToJoint2,*/FromRootToJoint;
   FromRootToJoint = getPinocchioRobot()->fromRootToIt(Chest);
   // erase the 1rst element as it is the root
   FromRootToJoint.erase (FromRootToJoint.begin());/*
-  std::vector<se3::JointIndex>::iterator itJoint = FromRootToJoint.begin();
+  std::vector<pinocchio::JointIndex>::iterator itJoint = FromRootToJoint.begin();
   bool startadding=false;
   while(itJoint!=FromRootToJoint.end())
   {
-    std::vector<se3::JointIndex>::iterator current = itJoint;
+    std::vector<pinocchio::JointIndex>::iterator current = itJoint;
 
     if (*current==Chest)
     {
@@ -244,13 +244,13 @@ void ComAndFootRealizationByGeometry::
   // to the VRML ID.
   ODEBUG("Enter 5.0 ");
   // Extract the indexes of the Right leg.
-  se3::JointIndex waist = getPinocchioRobot()->waist();
+  pinocchio::JointIndex waist = getPinocchioRobot()->waist();
 
   if (RightFoot->associatedAnkle==0)
     LTHROW("No right ankle");
 
   // Build global map.
-  se3::JointModelVector & ActuatedJoints =
+  pinocchio::JointModelVector & ActuatedJoints =
       getPinocchioRobot()->getActuatedJoints();
   ODEBUG5("Size of ActuatedJoints"<<ActuatedJoints.size(),
           "DebugDataStartingCOM.dat");
@@ -261,12 +261,12 @@ void ComAndFootRealizationByGeometry::
   m_GlobalVRMLIDtoConfiguration.resize(ActuatedJoints.size()-2);
   for(unsigned int i=0; i<m_GlobalVRMLIDtoConfiguration.size(); ++i)
   {
-    m_GlobalVRMLIDtoConfiguration[i] = se3::idx_q(ActuatedJoints[i+2]);
+    m_GlobalVRMLIDtoConfiguration[i] = pinocchio::idx_q(ActuatedJoints[i+2]);
   }
 
   // Build right and left leg map.
   // Remove the first element
-  std::vector<se3::JointIndex> FromRootToJoint =
+  std::vector<pinocchio::JointIndex> FromRootToJoint =
       getPinocchioRobot()->jointsBetween(waist, RightFoot->associatedAnkle);
   FromRootToJoint.erase(FromRootToJoint.begin()); // be careful with that line potential bug
   InitializationMaps(FromRootToJoint,ActuatedJoints,
@@ -392,18 +392,18 @@ bool ComAndFootRealizationByGeometry::
                        Eigen::Vector3d &m_AnklePosition,
                        FootAbsolutePosition & InitFootPosition)
 {
-  se3::JointIndex AnkleJoint = aFoot->associatedAnkle;
-  se3::SE3 lAnkleSE3 = getPinocchioRobot()->Data()->oMi[AnkleJoint] ;
+  pinocchio::JointIndex AnkleJoint = aFoot->associatedAnkle;
+  pinocchio::SE3 lAnkleSE3 = getPinocchioRobot()->Data()->oMi[AnkleJoint] ;
   Eigen::Vector3d translation ;
   translation << -m_AnklePosition[0], -m_AnklePosition[1], -m_AnklePosition[2];
-  se3::SE3 FootTranslation = se3::SE3(Eigen::Matrix3d::Identity(),translation);
-  se3::SE3 lFootSE3 = lAnkleSE3.act(FootTranslation);
+  pinocchio::SE3 FootTranslation = pinocchio::SE3(Eigen::Matrix3d::Identity(),translation);
+  pinocchio::SE3 lFootSE3 = lAnkleSE3.act(FootTranslation);
 
   InitFootPosition.x = lFootSE3.translation()[0];
   InitFootPosition.y = lFootSE3.translation()[1];
   InitFootPosition.z = lFootSE3.translation()[2];
 
-  se3::SE3 lAnkleInitSE3inv = getPinocchioRobot()
+  pinocchio::SE3 lAnkleInitSE3inv = getPinocchioRobot()
       ->DataInInitialePose()->oMi[AnkleJoint];
   Eigen::Matrix3d normalizedRotation =
       lFootSE3.rotation() * lAnkleInitSE3inv.rotation() ;
@@ -697,7 +697,7 @@ bool ComAndFootRealizationByGeometry::
 
   Eigen::Vector3d Foot_Shift;
 
-  se3::JointIndex Ankle = 0;
+  pinocchio::JointIndex Ankle = 0;
   if (LeftOrRight==-1)
   {
     Foot_Shift=Foot_R*m_AnklePositionRight;
@@ -752,7 +752,7 @@ bool ComAndFootRealizationByGeometry::
   BodyPose(3,3) = 1.0 ;
   FootPose(3,3) = 1.0 ;
 
-  se3::JointIndex Waist = getPinocchioRobot()->waist();
+  pinocchio::JointIndex Waist = getPinocchioRobot()->waist();
 
   ODEBUG("Typeid of humanoid: " << typeid(getHumanoidDynamicRobot()).name() );
   // Call specialized dynamics.

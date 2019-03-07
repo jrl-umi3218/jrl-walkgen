@@ -61,12 +61,12 @@ private:
   Eigen::VectorXd m_vel ;
   Eigen::VectorXd m_acc ;
   int iteration;
-  std::vector<se3::JointIndex> m_leftLeg  ;
-  std::vector<se3::JointIndex> m_rightLeg ;
-  std::vector<se3::JointIndex> m_leftArm  ;
-  std::vector<se3::JointIndex> m_rightArm ;
-  se3::JointIndex m_leftGripper  ;
-  se3::JointIndex m_rightGripper ;
+  std::vector<pinocchio::JointIndex> m_leftLeg  ;
+  std::vector<pinocchio::JointIndex> m_rightLeg ;
+  std::vector<pinocchio::JointIndex> m_leftArm  ;
+  std::vector<pinocchio::JointIndex> m_rightArm ;
+  pinocchio::JointIndex m_leftGripper  ;
+  pinocchio::JointIndex m_rightGripper ;
 
 public:
   TestNaveau2015(int argc, char *argv[], string &aString, int TestProfile):
@@ -166,15 +166,15 @@ public:
     m_leftLeg.erase( m_leftLeg.begin() );
     m_rightLeg.erase( m_rightLeg.begin() );
 
-    se3::JointModelVector & ActuatedJoints = m_PR->getActuatedJoints();
+    pinocchio::JointModelVector & ActuatedJoints = m_PR->getActuatedJoints();
     for(unsigned i=0 ; i <m_leftLeg.size() ; ++i)
-      m_leftLeg[i] = se3::idx_q(ActuatedJoints[m_leftLeg[i]])-1;
+      m_leftLeg[i] = pinocchio::idx_q(ActuatedJoints[m_leftLeg[i]])-1;
     for(unsigned i=0 ; i <m_rightLeg.size() ; ++i)
-      m_rightLeg[i] = se3::idx_q(ActuatedJoints[m_rightLeg[i]])-1;
+      m_rightLeg[i] = pinocchio::idx_q(ActuatedJoints[m_rightLeg[i]])-1;
     for(unsigned i=0 ; i <m_leftArm.size() ; ++i)
-      m_leftArm[i] = se3::idx_q(ActuatedJoints[m_leftArm[i]])-1;
+      m_leftArm[i] = pinocchio::idx_q(ActuatedJoints[m_leftArm[i]])-1;
     for(unsigned i=0 ; i <m_rightArm.size() ; ++i)
-      m_rightArm[i] = se3::idx_q(ActuatedJoints[m_rightArm[i]])-1;
+      m_rightArm[i] = pinocchio::idx_q(ActuatedJoints[m_rightArm[i]])-1;
 
     if((m_robotModel.parents.size() >= m_rightArm.back()+1) &&
        m_robotModel.parents[m_rightArm.back()+1] == m_rightArm.back())

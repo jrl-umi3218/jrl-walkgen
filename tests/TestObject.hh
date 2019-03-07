@@ -150,25 +150,25 @@ namespace PatternGeneratorJRL
 	 @{
       */
       /*! \brief Abstract model of the humanoid robot considered */
-      se3::Model m_robotModel ;
+      pinocchio::Model m_robotModel ;
 
       /*! \brief Abstract model of the humanoid robot considered */
       PinocchioRobot * m_PR ;
-      se3::Data *m_robotData;
+      pinocchio::Data *m_robotData;
 
       /*! \brief Abstract model of the humanoid robot for debugging purposes. */
       PinocchioRobot * m_DebugPR ;
-      se3::Data *m_DebugRobotData;
+      pinocchio::Data *m_DebugRobotData;
 
       /*! \brief Indexes for left and right legs and arms. */
-      std::vector<se3::JointIndex> m_leftLeg  ;
-      std::vector<se3::JointIndex> m_rightLeg ;
-      std::vector<se3::JointIndex> m_leftArm  ;
-      std::vector<se3::JointIndex> m_rightArm ;
+      std::vector<pinocchio::JointIndex> m_leftLeg  ;
+      std::vector<pinocchio::JointIndex> m_rightLeg ;
+      std::vector<pinocchio::JointIndex> m_leftArm  ;
+      std::vector<pinocchio::JointIndex> m_rightArm ;
       
       /*! \brief Indexes for left and right grippers. */
-      se3::JointIndex m_leftGripper  ;
-      se3::JointIndex m_rightGripper ;
+      pinocchio::JointIndex m_leftGripper  ;
+      pinocchio::JointIndex m_rightGripper ;
 
       /*! \brief From URDF to OpenHRP indexes. */
       std::vector<unsigned int> m_fromURDFToOpenHRP;

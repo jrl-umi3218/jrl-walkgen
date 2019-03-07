@@ -325,8 +325,8 @@ namespace PatternGeneratorJRL
   protected:
 
     /*! \brief Initialization of internal maps of indexes */
-    void InitializationMaps(std::vector<se3::JointIndex> &FromRootToFoot,
-                se3::JointModelVector & ActuatedJoints,
+    void InitializationMaps(std::vector<pinocchio::JointIndex> &FromRootToFoot,
+                pinocchio::JointModelVector & ActuatedJoints,
                 std::vector<int> &IndexinConfiguration,
                 std::vector<int> &IndexinVelocity);
 
@@ -340,14 +340,14 @@ namespace PatternGeneratorJRL
      \param[out] associateShoulder: The shoulder extracted from
      the kinematic chain.
     */
-    void InitializeMapsForAHand(se3::JointIndex aWrist,
-                se3::JointModelVector &  ActuatedJoints,
+    void InitializeMapsForAHand(pinocchio::JointIndex aWrist,
+                pinocchio::JointModelVector &  ActuatedJoints,
 				vector<int> & IndexesInConfiguration,
                 vector<int> & IndexesInVelocity,
-                se3::JointIndex & associateShoulder);
+                pinocchio::JointIndex & associateShoulder);
 
     /*! Create the map of indexes for the shoulders and wrist */
-    void InitializeMapForChest(se3::JointModelVector & ActuatedJoints);
+    void InitializeMapForChest(pinocchio::JointModelVector & ActuatedJoints);
 
     /* Register methods. */
     void RegisterMethods();
@@ -485,7 +485,7 @@ namespace PatternGeneratorJRL
     Eigen::Vector3d m_COGInitialAnkles;
 
     /*! Store the position of the left and right shoulders. */
-    se3::JointIndex m_LeftShoulder, m_RightShoulder;
+    pinocchio::JointIndex m_LeftShoulder, m_RightShoulder;
 
     bool ShiftFoot_ ;
   };
