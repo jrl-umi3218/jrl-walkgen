@@ -2771,8 +2771,6 @@ new step has to be generate.
     double absFootx_1 = m_AbsoluteSupportFootPositions[Index-1].x ;
     double absFooty_0 = m_AbsoluteSupportFootPositions[Index].y ;
     double absFooty_1 = m_AbsoluteSupportFootPositions[Index-1].y ;
-    double dx = absFootx_0 - absFootx_1 ;
-    double dy = absFooty_0 - absFooty_1 ;
 
     // climbing
     // put first leg on the stairs with decrease of CoM //up// of stair height
@@ -2862,14 +2860,14 @@ new step has to be generate.
         }        
       }
 
-//    cout << "relative position : "
-//         << sx << " "
-//         << sy << " "
-//         << dx << " "
-//         << dy << " "
-//         << SStime << " "
-//         << m_AbsoluteSupportFootPositions[Index].time << " "
-//         << m_AbsoluteSupportFootPositions[Index-1].time << " " << endl ;
+    //    cout << "relative position : "
+    //         << sx << " "
+    //         << sy << " "
+    //         << dx << " "
+    //         << dy << " "
+    //         << SStime << " "
+    //         << m_AbsoluteSupportFootPositions[Index].time << " "
+    //         << m_AbsoluteSupportFootPositions[Index-1].time << " " << endl ;
     InitPos = LastCoM.z[0];
     InitSpeed = LastCoM.z[1];
     InitAcc = LastCoM.z[2];

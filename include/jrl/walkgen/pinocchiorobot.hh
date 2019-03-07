@@ -37,7 +37,7 @@ frame work */
 namespace PatternGeneratorJRL
 {
   struct PinocchioRobotFoot_t{
-    se3::JointIndex associatedAnkle ;
+    pinocchio::JointIndex associatedAnkle ;
     double soleDepth ; // z axis
     double soleWidth ; // y axis
     double soleHeight ;// x axis
@@ -88,8 +88,8 @@ namespace PatternGeneratorJRL
     /// param 6D vector output, filled with zeros if the robot is not compatible
     ///
     virtual bool ComputeSpecializedInverseKinematics(
-        const se3::JointIndex &jointRoot,
-        const se3::JointIndex &jointEnd,
+        const pinocchio::JointIndex &jointRoot,
+        const pinocchio::JointIndex &jointEnd,
         const Eigen::Matrix4d & jointRootPosition,
         const Eigen::Matrix4d & jointEndPosition,
         Eigen::VectorXd &q);
@@ -113,9 +113,9 @@ namespace PatternGeneratorJRL
 
   public :
     /// tools :
-    std::vector<se3::JointIndex> jointsBetween
-    ( se3::JointIndex first, se3::JointIndex second);
-    std::vector<se3::JointIndex> fromRootToIt (se3::JointIndex it);
+    std::vector<pinocchio::JointIndex> jointsBetween
+    ( pinocchio::JointIndex first, pinocchio::JointIndex second);
+    std::vector<pinocchio::JointIndex> fromRootToIt (pinocchio::JointIndex it);
 
   private :
     // needed for the inverse geometry (ComputeSpecializedInverseKinematics)
@@ -129,18 +129,18 @@ namespace PatternGeneratorJRL
                                     Eigen::VectorXd &q,
                                     int side);
     void DetectAutomaticallyShoulders();
-    void DetectAutomaticallyOneShoulder(se3::JointIndex aWrist,
-                                        se3::JointIndex & aShoulder);
+    void DetectAutomaticallyOneShoulder(pinocchio::JointIndex aWrist,
+                                        pinocchio::JointIndex & aShoulder);
 
 
   public :
     /// Getters
     /// ///////
-    inline se3::Data * Data()
+    inline pinocchio::Data * Data()
     {return m_robotData;}
-    inline se3::Data * DataInInitialePose()
+    inline pinocchio::Data * DataInInitialePose()
     {return m_robotDataInInitialePose;}
-    inline se3::Model * Model()
+    inline pinocchio::Model * Model()
     {return m_robotModel;}
 
     inline PRFoot * leftFoot()
@@ -148,20 +148,20 @@ namespace PatternGeneratorJRL
     inline PRFoot * rightFoot()
     {return &m_rightFoot;}
 
-    inline se3::JointIndex leftWrist()
+    inline pinocchio::JointIndex leftWrist()
     {return m_leftWrist;}
-    inline se3::JointIndex rightWrist()
+    inline pinocchio::JointIndex rightWrist()
     {return m_rightWrist;}
 
-    inline se3::JointIndex chest()
+    inline pinocchio::JointIndex chest()
     {return m_chest;}
-    inline se3::JointIndex waist()
+    inline pinocchio::JointIndex waist()
     {return m_waist;}
 
     inline double mass()
     {return m_mass;}
 
-    inline se3::JointModelVector & getActuatedJoints()
+    inline pinocchio::JointModelVector & getActuatedJoints()
     {return m_robotModel->joints;}
 
     inline Eigen::VectorXd currentConfiguration()
@@ -226,22 +226,22 @@ namespace PatternGeneratorJRL
     {
       return m_boolModel && m_boolData && m_boolLeftFoot && m_boolRightFoot;
     }
-    bool checkModel(se3::Model * robotModel);
-    bool initializeRobotModelAndData(se3::Model * robotModel,
-                                     se3::Data * robotData);
+    bool checkModel(pinocchio::Model * robotModel);
+    bool initializeRobotModelAndData(pinocchio::Model * robotModel,
+                                     pinocchio::Data * robotData);
     bool initializeLeftFoot(PRFoot leftFoot);
     bool initializeRightFoot(PRFoot rightFoot);
 
     /// Attributes
     /// //////////
   private :
-    se3::Model * m_robotModel ;
-    se3::Data * m_robotDataInInitialePose ; // internal variable
-    se3::Data * m_robotData ;
+    pinocchio::Model * m_robotModel ;
+    pinocchio::Data * m_robotDataInInitialePose ; // internal variable
+    pinocchio::Data * m_robotData ;
     PRFoot m_leftFoot , m_rightFoot ;
     double m_mass ;
-    se3::JointIndex m_chest, m_waist, m_leftShoulder, m_rightShoulder ;
-    se3::JointIndex m_leftWrist , m_rightWrist ;
+    pinocchio::JointIndex m_chest, m_waist, m_leftShoulder, m_rightShoulder ;
+    pinocchio::JointIndex m_leftWrist , m_rightWrist ;
 
     Eigen::VectorXd m_qmal ;
     Eigen::VectorXd m_vmal ;
@@ -253,7 +253,7 @@ namespace PatternGeneratorJRL
     // tmp variables
     Eigen::Quaterniond m_quat ;
     Eigen::Matrix3d m_rot ;
-    se3::Force m_externalForces ; // external forces and torques
+    pinocchio::Force m_externalForces ; // external forces and torques
     Eigen::VectorXd m_tau ; // external forces and torques
     Eigen::Vector3d m_f,m_n; // external forces and torques
     Eigen::Vector3d m_com; // multibody CoM

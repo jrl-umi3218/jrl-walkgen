@@ -463,7 +463,7 @@ int PreviewControl::OneIterationOfPreview1D(Eigen::MatrixXd &x,
       for(unsigned int i=lindex;i<ZMPPositions.size();i++)
 	ux += m_F(i,0)* ZMPPositions[i];
 
-      int StillToRealized = m_SizeOfPreviewWindow - (int)ZMPPositions.size()
+      int StillToRealized = (int)m_SizeOfPreviewWindow - (int)ZMPPositions.size()
 	+ (int)lindex;
       for(unsigned int i=0;i<(unsigned int)StillToRealized ;i++)
 	ux += m_F(i,0)* ZMPPositions[i];

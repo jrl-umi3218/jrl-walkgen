@@ -44,14 +44,13 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
 
   m_PR = aPR;
   // Get information specific to the humanoid.
-  double lWidth,lHeight;
+  double lWidth;
   Eigen::Vector3d AnklePosition;
 
   if (m_PR!=0)
     {
       PRFoot * leftFoot = m_PR->leftFoot();
       lWidth  = leftFoot->soleWidth ;
-      lHeight = leftFoot->soleHeight ;
       AnklePosition = leftFoot->anklePosition ;
       m_AnkleSoilDistance = AnklePosition[2];
       m_tipToAnkle = lWidth-AnklePosition[0];
@@ -60,7 +59,7 @@ StepOverPlanner::StepOverPlanner(ObstaclePar &ObstacleParameters,
     }
   else 
     {
-      lWidth = 0.2; lHeight=0.15;
+      lWidth = 0.2; 
       cerr << "WARNING: no object with humanoid specificities properly defined." << endl;
       m_AnkleSoilDistance = 0.1;
       m_tipToAnkle = 0.1;
@@ -354,7 +353,7 @@ void StepOverPlanner::DoubleSupportFeasibility()
   double StepOverStepWidth;
   double StepOverStepLenght, StepOverStepLenghtMin, StepOverStepLenghtMax; 
   double StepOverCOMHeight, StepOverCOMHeightMin, StepOverCOMHeightMax; 
-  double OrientationHipToObstacle, OrientationFeetToObstacle = 0.0, OmegaAngleFeet = 0.0;
+  double OrientationFeetToObstacle = 0.0, OmegaAngleFeet = 0.0;
   //this is the factor determining aproximately the COM position due to preview control during double support
   double DoubleSupportCOMPosFactor;  
 
@@ -406,7 +405,6 @@ void StepOverPlanner::DoubleSupportFeasibility()
   IncrementStepLenght = double ((StepOverStepLenghtMax  - StepOverStepLenghtMin)/((EvaluationNumber)));
   IncrementCOMHeight  = double ((StepOverCOMHeightMax   - StepOverCOMHeightMin)/((EvaluationNumber)));
  
-  OrientationHipToObstacle = 0.0*M_PI/180.0; 
   /*! this angle can be used to extend the steplength during stepover but currently it is set to 0 convinience*/
 	
     
@@ -763,16 +761,15 @@ void StepOverPlanner::PolyPlannerFirstStep(deque<FootAbsolutePosition> &aStepOve
   double StepTime;
   double StepLenght;
   double Omega1,Omega2,OmegaImpact;
-  double xOffset,zOffset;
-  double Point1X, Point1Y, Point1Z;
-  double Point2X, Point2Y, Point2Z;
+  double xOffset;
+  double Point1X, Point1Y=0.0,Point1Z;
+  double Point2X, Point2Y=0.0,Point2Z;
   double Point3Z;
 	
   StepTime = aStepOverFootBuffer[m_StartDoubleSupp].time-aStepOverFootBuffer[m_StartStepOver].time; 
   StepLenght = aStepOverFootBuffer[m_StartDoubleSupp].x-aStepOverFootBuffer[m_StartStepOver].x; 
 	
   xOffset=0.00;
-  zOffset=0.0;
 
   Omega1=0.0;
   Omega2=0.0;
@@ -1076,7 +1073,7 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
   double StepTime;
   double StepLenght;
   double Omega1,Omega2,OmegaImpact;
-  double xOffset,zOffset;
+  double xOffset;
   double Point1X,Point1Y,Point1Z;
   double Point2X,Point2Y,Point2Z;
   double Point3Z;
@@ -1085,7 +1082,6 @@ void StepOverPlanner::PolyPlannerSecondStep(deque<FootAbsolutePosition> &aStepOv
   StepLenght = aStepOverFootBuffer[m_EndStepOver].x-aStepOverFootBuffer[m_StartSecondStep].x; 
 	
   xOffset=0.0;
-  zOffset=0.0;
 
   Omega1=120.0*m_ObstacleParameters.h;    //in degrees
   Omega2=120.0*m_ObstacleParameters.h;
