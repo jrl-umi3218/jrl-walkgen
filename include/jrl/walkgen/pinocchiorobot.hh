@@ -33,7 +33,7 @@ frame work */
 #include "pinocchio/multibody/data.hpp"
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/multibody/data.hpp"
-#include <jrl/mal/matrixabstractlayer.hh>
+#include "pinocchio/parsers/urdf.hpp"
 
 namespace PatternGeneratorJRL
 {
