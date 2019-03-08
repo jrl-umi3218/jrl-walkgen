@@ -42,8 +42,7 @@ ADD_DEFINITIONS("-DHAVE_SYS_TIME_H")
 ENDIF(SYS_TIME_H)
 
 # Required dependencies
-ADD_REQUIRED_DEPENDENCY("jrl-mal >= 1.9.0")
-ADD_REQUIRED_DEPENDENCY("pinocchio >=  1.3.0")
+ADD_REQUIRED_DEPENDENCY("pinocchio >=  2.1.0")
 
 # Search for Boost.
 # Boost.Test is used by the test suite.
