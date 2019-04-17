@@ -71,17 +71,17 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
       cerr << "Pb no ref Foot." << endl;
     }
 
-  lDepth = AnklePosition[2];
+  lDepth = AnklePosition(2);
 
   /*! Compute information for omega. */
-  m_FootB =  AnklePosition[0];
-  m_FootH = m_AnklePositionRight[2] = AnklePosition[2];
-  m_AnklePositionRight[1] = AnklePosition[1];
-  m_FootF = lDepth-AnklePosition[0];
+  m_FootB =  AnklePosition(0);
+  m_FootH = m_AnklePositionRight(2) = AnklePosition(2);
+  m_AnklePositionRight(1) = AnklePosition(1);
+  m_FootF = lDepth-AnklePosition(0);
 
-  m_AnklePositionRight[0] = -lDepth*0.5 + AnklePosition[0];
-  m_AnklePositionRight[1] = lWidth*0.5 - AnklePosition[1];
-  m_AnklePositionRight[2] = AnklePosition[2];
+  m_AnklePositionRight(0) = -lDepth*0.5 + AnklePosition(0);
+  m_AnklePositionRight(1) = lWidth*0.5 - AnklePosition(1);
+  m_AnklePositionRight(2) = AnklePosition(2);
 
   /* Compute Left foot coordinates */
   if (m_Foot->associatedAnkle!=0)
@@ -94,9 +94,9 @@ FootTrajectoryGenerationStandard::FootTrajectoryGenerationStandard(SimplePluginM
       cerr << "Pb no ref Foot." << endl;
     }
 
-  m_AnklePositionLeft[0] = -lDepth*0.5 + AnklePosition[0];
-  m_AnklePositionLeft[1] = -lWidth*0.5 + AnklePosition[1];
-  m_AnklePositionLeft[2] = AnklePosition[2];
+  m_AnklePositionLeft[0] = -lDepth*0.5 + AnklePosition(0);
+  m_AnklePositionLeft[1] = -lWidth*0.5 + AnklePosition(1);
+  m_AnklePositionLeft[2] = AnklePosition(2);
 
   RESETDEBUG5("GeneratedFoot.dat");
 }
