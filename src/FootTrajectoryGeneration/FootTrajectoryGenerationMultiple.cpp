@@ -69,7 +69,7 @@ void FootTrajectoryGenerationMultiple::SetNumberOfIntervals(int lNumberOfInterva
 
 int FootTrajectoryGenerationMultiple::GetNumberOfIntervals() const
 {
-  return m_SetOfFootTrajectoryGenerationObjects.size();
+  return static_cast<int>(m_SetOfFootTrajectoryGenerationObjects.size());
 }
 
 
