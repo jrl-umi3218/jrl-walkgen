@@ -355,21 +355,32 @@ namespace PatternGeneratorJRL
       pinocchio::Model * aModel = aPR.Model();
       BOOST_FOREACH(const ptree::value_type & v, pt.get_child("robot.group_state"))
       {
+	if (v.first=="<xmlattr>")
+	  {
+	    std::string nameOfGroup = v.second.get<std::string>("name");
+	    if (nameOfGroup!="half_sitting")
+	      break;
+	  }
+
         if(v.first=="joint")
         {
           const std::string jointName =
               v.second.get<std::string>("<xmlattr>.name");
-          const double jointValue =
-              v.second.get<double>("<xmlattr>.value");
-          if(aModel->existJointName(jointName))
-          {
-            pinocchio::JointIndex id = aModel->getJointId(jointName);
-            unsigned idq = pinocchio::idx_q(aModel->joints[id]);
-            // we assume only revolute joint here.
-            m_HalfSitting(idq-7) = jointValue ;
-          }
+	  if (jointName!="root_joint")
+	    {
+	      const double jointValue =
+		v.second.get<double>("<xmlattr>.value");
+	      if(aModel->existJointName(jointName))
+		{
+		  pinocchio::JointIndex id = aModel->getJointId(jointName);
+		  unsigned idq = pinocchio::idx_q(aModel->joints[id]);
+		  // we assume only revolute joint here.
+		  m_HalfSitting(idq-7) = jointValue ;
+		}
+	    }
         }
       } // BOOST_FOREACH
+      std::cout << "Half sitting: " << m_HalfSitting <<std::endl;
       bool DebugConfiguration = true;
       if (DebugConfiguration)
       {
@@ -432,9 +443,17 @@ namespace PatternGeneratorJRL
       unsigned int lindex=0;
       BOOST_FOREACH(const ptree::value_type & v, pt.get_child("robot.group"))
       {
+	// Check if the group is mapURDFToOpenHRP
+	// This will only work if the first group has the name
+	// mapURDFToOpenHRP.
+	if (v.first=="<xmlattr>")
+	  {
+	    std::string nameOfGroup = v.second.get<std::string>("name");
+	    if (nameOfGroup!="mapURDFToOpenHRP")
+	      break;
+	  }
 	if (v.first=="joint")
 	  {
-	    std::cerr << "Found mapURDFToOpenHRP"<< std::endl;
 	    const std::string jointName =
               v.second.get<std::string>("<xmlattr>.name");
 	    pinocchio::JointIndex id = aModel->getJointId(jointName);
@@ -543,7 +562,7 @@ namespace PatternGeneratorJRL
         aof.open(aFileName.c_str(),ofstream::app);
         aof.precision(8);
         aof.setf(ios::scientific, ios::floatfield);
-        aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "                     // 1
+        aof << filterprecision(((double)m_OneStep.NbOfIt)*0.005 ) << " "                     // 1
             << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "            // 2
             << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "            // 3
             << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "            // 4
@@ -607,7 +626,7 @@ namespace PatternGeneratorJRL
         aof.open(aFileName.c_str(),ofstream::app);
         aof.precision(8);
         aof.setf(ios::scientific, ios::floatfield);
-        aof << filterprecision(m_OneStep.NbOfIt*0.005 ) << " "             // 1
+        aof << filterprecision(((double)m_OneStep.NbOfIt)*0.005 ) << " "             // 1
             << filterprecision(m_OneStep.finalCOMPosition.x[0] ) << " "    // 2
             << filterprecision(m_OneStep.finalCOMPosition.y[0] ) << " "    // 3
             << filterprecision(m_OneStep.finalCOMPosition.z[0] ) << " "    // 4
@@ -943,7 +962,7 @@ namespace PatternGeneratorJRL
                                                   aLeftFootPosition,
                                                   aRightFootPosition,
                                                   conf, vel, acc,
-                                                  m_OneStep.NbOfIt, 1);
+                                                  ((int)m_OneStep.NbOfIt),1);
       
       if(m_leftGripper!=0 && m_rightGripper!=0)
       {
@@ -959,7 +978,7 @@ namespace PatternGeneratorJRL
     
     void TestObject::parseFromURDFtoOpenHRPIndex(Eigen::VectorXd &conf)
     {
-      if (conf.size()!=m_fromURDFToOpenHRP.size())
+      if (((unsigned int)conf.size())!=m_fromURDFToOpenHRP.size())
 	{
 	  std::cerr << "" << std::endl;
 	  return;
@@ -990,7 +1009,7 @@ namespace PatternGeneratorJRL
 
       ofstream aof;
       string aFileName;
-      int iteration = m_OneStep.NbOfIt-1 ;
+      long int iteration = m_OneStep.NbOfIt-1 ;
       
       if ( iteration == 0 ){
         aFileName = m_DirectoryName;
@@ -1008,7 +1027,7 @@ namespace PatternGeneratorJRL
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
       //std::cout << iteration << " - Going through this step "<< std::endl;
-      aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
+      aof << filterprecision( ((double)iteration) * 0.005 ) << " "  ; // 1
       for(unsigned int i = 6 ; i < conf.size() ; i++){
         aof << filterprecision( conf(i) ) << " "  ; // 2
       }
@@ -1031,7 +1050,7 @@ namespace PatternGeneratorJRL
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
-      aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
+      aof << filterprecision( ((double)iteration) * 0.005 ) << " "  ; // 1
       aof << filterprecision( m_OneStep.finalCOMPosition.roll[0] * M_PI /180) << " "  ; // 2
       aof << filterprecision( m_OneStep.finalCOMPosition.pitch[0] * M_PI /180 ) << " "  ; // 3
       aof << filterprecision( m_OneStep.finalCOMPosition.yaw[0] * M_PI /180 ) ; // 4
@@ -1058,7 +1077,7 @@ namespace PatternGeneratorJRL
       aof.open(aFileName.c_str(),ofstream::app);
       aof.precision(8);
       aof.setf(ios::scientific, ios::floatfield);
-      aof << filterprecision( iteration * 0.005 ) << " "  ; // 1
+      aof << filterprecision( ((double) iteration) * 0.005 ) << " "  ; // 1
       aof << filterprecision( m_OneStep.ZMPTarget(0) - m_CurrentConfiguration(0)) << " "  ; // 2
       aof << filterprecision( m_OneStep.ZMPTarget(1) - m_CurrentConfiguration(1) ) << " "  ; // 3
       aof << filterprecision( aSupportState.z  - m_CurrentConfiguration(2))  ; // 4
