@@ -221,8 +221,8 @@ InitializeFromRelativeSteps(deque<RelativeFootPosition> &RelativeFootPositions,
   lNbOfIntervals = 2*lNbOfIntervals+1;
 
   /*! Resize the Left and Right foot trajectories. */
-  m_LeftFootTrajectory->SetNumberOfIntervals(lNbOfIntervals);
-  m_RightFootTrajectory->SetNumberOfIntervals(lNbOfIntervals);
+  m_LeftFootTrajectory->SetNumberOfIntervals((int)lNbOfIntervals);
+  m_RightFootTrajectory->SetNumberOfIntervals((int)lNbOfIntervals);
   ODEBUG("resize left and right foot trajectories: " << lNbOfIntervals);
 
   /*! Compute the absolute coordinates of the steps.  */
