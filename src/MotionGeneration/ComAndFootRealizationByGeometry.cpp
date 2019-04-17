@@ -407,14 +407,14 @@ bool ComAndFootRealizationByGeometry::
       ->DataInInitialePose()->oMi[AnkleJoint];
   Eigen::Matrix3d normalizedRotation =
       lFootSE3.rotation() * lAnkleInitSE3inv.rotation() ;
-
   // The foot *must be* flat on the floor....
   // Thus
   // lRightFootPose(0:2,0:2)=
   // coct    -st    -soct
   // cost     ct    -sost
   // so        0    co
-  assert((normalizedRotation(2,1) == 0) &&
+  std::cout << normalizedRotation(2,1) << std::endl;
+  assert((fabs(normalizedRotation(2,1))<2e-3) &&
          "Error in the walk pattern generator initialization:" &&
          " Initial foot position is not flat");
 
